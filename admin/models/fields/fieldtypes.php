@@ -13,14 +13,12 @@ defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
-//use \Joomla\CMS\Form\FormFieldtypes;
-use \Joomla\CMS\Form\Field\ListField;
 
 jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
+jimport('cms.html.select');    // JHtmlSelect
 
-jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
-\Joomla\CMS\Form\FormHelper::loadFieldClass('list');   // \Joomla\CMS\Form\Field\ListField
+jimport('joomla.form.helper'); // JFormHelper
+JFormHelper::loadFieldClass('list');   // JFormFieldList
 
 /**
  * Renders a author element
@@ -29,7 +27,7 @@ jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
  * @subpackage	FLEXIcontent
  * @since		1.0
  */
-class FormFieldypes extends ListField
+class JFormFieldFieldtypes extends JFormFieldList
 {
 	/**
 	 * The form field type.
@@ -40,7 +38,7 @@ class FormFieldypes extends ListField
 	protected $type = 'Fieldtypes';
 
 	protected function getOptions() {
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 
 		$query = 'SELECT element AS value, REPLACE(name, "FLEXIcontent - ", "") AS text'
 		. ' FROM '.(FLEXI_J16GE ? '#__extensions' : '#__plugins')

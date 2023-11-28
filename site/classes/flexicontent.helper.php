@@ -24,7 +24,7 @@ if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 
 // Try re-appling Joomla configuration of error reporting (some installed plugins may disable it)
-switch ( \Joomla\CMS\Factory::getConfig()->get('error_reporting') )  // Set the error_reporting
+switch ( JFactory::getConfig()->get('error_reporting') )  // Set the error_reporting
 {
 	case 'default': case '-1':
 		break;
@@ -49,7 +49,7 @@ switch ( \Joomla\CMS\Factory::getConfig()->get('error_reporting') )  // Set the 
 		break;
 		
 	default:
-		error_reporting( \Joomla\CMS\Factory::getConfig()->get('error_reporting') );
+		error_reporting( JFactory::getConfig()->get('error_reporting') );
 		ini_set('display_errors', 1);
 		break;
 }

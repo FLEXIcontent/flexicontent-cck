@@ -95,7 +95,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 
 		if ($result !== false && $this->task === 'save' && $this->input->getCmd('tmpl') === 'component')
 		{
-			\Joomla\CMS\Factory::getApplication()->enqueueMessage(
+			JFactory::getApplication()->enqueueMessage(
 				"<script>
 					setTimeout(function(){
 						window.parent.fc_closeDialog('fc_modal_popup_container');
@@ -129,7 +129,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 	{
 		if ($this->input->getCmd('tmpl') === 'component')
 		{
-			\Joomla\CMS\Factory::getApplication()->enqueueMessage(
+			JFactory::getApplication()->enqueueMessage(
 				"<script>
 					window.parent.fc_closeDialog('fc_modal_popup_container');
 				</script>"
@@ -190,10 +190,10 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 	public function approved()
 	{
 		// Check for request forgeries
-		\Joomla\CMS\Session\Session::checkToken() or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
 
-		$app   = \Joomla\CMS\Factory::getApplication();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$app   = JFactory::getApplication();
+		$user  = JFactory::getUser();
 
 		$cid    = $this->input->get('cid', array(), 'array');
 		$values = array('approved' => 1, 'unapproved' => 0);
@@ -206,14 +206,14 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 			{
 				// Prune items that you can't change.
 				unset($cid[$i]);
-				JError::raiseNotice(403, \Joomla\CMS\Language\Text::_('JLIB_APPLICATION_ERROR_EDITSTATE_NOT_PERMITTED'));
+				JError::raiseNotice(403, JText::_('JLIB_APPLICATION_ERROR_EDITSTATE_NOT_PERMITTED'));
 			}
 		}
 
 		if (empty($cid))
 		{
 			$app->setHeader('status', '500', true);
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_NO_ITEMS_SELECTED'), 'error');
+			$app->enqueueMessage(JText::_('FLEXI_NO_ITEMS_SELECTED'), 'error');
 			$this->setRedirect($this->returnURL);
 
 			return;
@@ -230,8 +230,8 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		}
 
 		$message = $value == 1
-			? \Joomla\CMS\Language\Text::plural('FLEXI_N_REVIEWS_APPROVED', count($cid))
-			: \Joomla\CMS\Language\Text::plural('FLEXI_N_REVIEWS_UNAPPROVED', count($cid));
+			? JText::plural('FLEXI_N_REVIEWS_APPROVED', count($cid))
+			: JText::plural('FLEXI_N_REVIEWS_UNAPPROVED', count($cid));
 		$this->setRedirect($this->returnURL, $message);
 	}
 
@@ -245,10 +245,10 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 	 */
 	public function edit()
 	{
-		$app      = \Joomla\CMS\Factory::getApplication();
-		$user     = \Joomla\CMS\Factory::getUser();
-		$session  = \Joomla\CMS\Factory::getSession();
-		$document = \Joomla\CMS\Factory::getDocument();
+		$app      = JFactory::getApplication();
+		$user     = JFactory::getUser();
+		$session  = JFactory::getSession();
+		$document = JFactory::getDocument();
 
 		$this->input->set('view', $this->record_name);
 		$this->input->set('hidemainmenu', 1);
@@ -348,19 +348,19 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		{
 			if (!$user->id && $app->isClient('site'))
 			{
-				$cparams   = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
-				$uri       = \Joomla\CMS\Uri\Uri::getInstance();
+				$cparams   = JComponentHelper::getParams('com_flexicontent');
+				$uri       = JUri::getInstance();
 				$return    = strtr(base64_encode($uri->toString()), '+/=', '-_,');           // Current URL as return URL (but we will for id / cid)
 				$login_url = $cparams->get('login_page', 'index.php?option=com_users&view=login');
 				$login_url .= (strstr($login_url, '?') ? '&'  : '?') . 'tmpl=component&return='.$return;
 
-				$app->enqueueMessage(\Joomla\CMS\Language\Text::_('Please register or login before you can post a review'), 'warning');
+				$app->enqueueMessage(JText::_('Please register or login before you can post a review'), 'warning');
 				$this->setRedirect($login_url);
 			}
 			else
 			{
 				$app->setHeader('status', '403 Forbidden', true);
-				$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+				$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
 
 				if ($this->input->getCmd('tmpl') !== 'component')
 				{
@@ -375,7 +375,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		if ($model->isCheckedOut($user->get('id')))
 		{
 			$app->setHeader('status', '400 Bad Request', true);
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_EDITED_BY_ANOTHER_ADMIN'), 'warning');
+			$app->enqueueMessage(JText::_('FLEXI_EDITED_BY_ANOTHER_ADMIN'), 'warning');
 
 			if ($this->input->getCmd('tmpl') !== 'component')
 			{
@@ -389,7 +389,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		if (!$model->checkout())
 		{
 			$app->setHeader('status', '400 Bad Request', true);
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_OPERATION_FAILED') . ' : ' . $model->getError(), 'error');
+			$app->enqueueMessage(JText::_('FLEXI_OPERATION_FAILED') . ' : ' . $model->getError(), 'error');
 
 			if ($this->input->getCmd('tmpl') !== 'component')
 			{
@@ -429,7 +429,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 
 
 	/**
-	 * Method for extra form validation after \Joomla\CMS\Form\Form validation is executed
+	 * Method for extra form validation after JForm validation is executed
 	 *
 	 * @param   array     $validated_data  The already jform-validated data of the record
 	 * @param   object    $model           The Model object of current controller instance
@@ -477,8 +477,8 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 	{
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 
-		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
-		$user    = \Joomla\CMS\Factory::getUser();
+		$cparams = JComponentHelper::getParams('com_flexicontent');
+		$user    = JFactory::getUser();
 		$user_id = (int) $user->id;
 		$isNew   = !$model->get('id');
 		$item  = (object) array('type_id' => empty($record->item_type_id) ? 0 : $record->item_type_id);
@@ -560,8 +560,8 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 	{
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 
-		$app   = \Joomla\CMS\Factory::getApplication();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$app   = JFactory::getApplication();
+		$user  = JFactory::getUser();
 		$field = $model->getVotingReviewsField($item, $setAsDefault = true);
 
 		/**
@@ -581,7 +581,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		 * Load content item related to the review
 		 */
 
-		$item = \Joomla\CMS\Table\Table::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
+		$item = JTable::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
 
 		if ($content_id && !$item->load($content_id))
 		{
@@ -600,11 +600,11 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 	 */
 	public function ajaxvote()
 	{
-		$app  = \Joomla\CMS\Factory::getApplication();
-		$user = \Joomla\CMS\Factory::getUser();
-		$db   = \Joomla\CMS\Factory::getDbo();
-		$session = \Joomla\CMS\Factory::getSession();
-		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
+		$app  = JFactory::getApplication();
+		$user = JFactory::getUser();
+		$db   = JFactory::getDbo();
+		$session = JFactory::getSession();
+		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 
 		$no_ajax     = $this->input->get('no_ajax', 0, 'int');
 		$user_rating = $this->input->get('user_rating', 0, 'int');
@@ -630,7 +630,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		 * Load item
 		 */
 
-		$item = \Joomla\CMS\Table\Table::getInstance( $type = 'flexicontent_items', $prefix = '', $config = array() );
+		$item = JTable::getInstance( $type = 'flexicontent_items', $prefix = '', $config = array() );
 		$item->load($cid);
 
 
@@ -646,8 +646,8 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		FlexicontentFields::loadFieldConfig($field, $item);
 
 		// Load field's language files
-		\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, 'en-GB', true);
-		\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, null, true);
+		JFactory::getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, 'en-GB', true);
+		JFactory::getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, null, true);
 
 		// Get needed parameters
 		$rating_resolution = (int) $field->parameters->get('rating_resolution', 5);
@@ -686,7 +686,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 			$logged_no_acc_msg = $field->parameters->get('logged_no_acc_msg', '');
 			$guest_no_acc_msg  = $field->parameters->get('guest_no_acc_msg', '');
 			$no_acc_msg = $user->id ? $logged_no_acc_msg : $guest_no_acc_msg;
-			$no_acc_msg = $no_acc_msg ? \Joomla\CMS\Language\Text::_($no_acc_msg) : '';
+			$no_acc_msg = $no_acc_msg ? JText::_($no_acc_msg) : '';
 
 			// Message not set create a Default Message
 			if (!$no_acc_msg)
@@ -700,7 +700,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 					$acclvl_name = 'Access Level: ' . $acclvl . ' not found / was deleted';
 				}
 
-				$no_acc_msg = \Joomla\CMS\Language\Text::sprintf('FLEXI_NO_ACCESS_TO_VOTE', $acclvl_name);
+				$no_acc_msg = JText::sprintf('FLEXI_NO_ACCESS_TO_VOTE', $acclvl_name);
 			}
 
 			$error = $no_acc_msg;
@@ -713,7 +713,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 
 		elseif ($user_rating < $min_rating || $user_rating > $max_rating)
 		{
-			$error = \Joomla\CMS\Language\Text::sprintf( 'FLEXI_VOTE_OUT_OF_RANGE', $min_rating, $max_rating);
+			$error = JText::sprintf( 'FLEXI_VOTE_OUT_OF_RANGE', $min_rating, $max_rating);
 			return $this->_ajaxvote_error($error, $xid, $no_ajax);
 		}
 
@@ -752,7 +752,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		{
 			if (count($xids_extra))
 			{
-				$error = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_AVERAGE_RATING_CALCULATED_AUTOMATICALLY');
+				$error = JText::_('FLEXI_VOTE_AVERAGE_RATING_CALCULATED_AUTOMATICALLY');
 				return $this->_ajaxvote_error($error, $xid, $no_ajax);
 			}
 		}
@@ -760,7 +760,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		elseif (!isset($xids_extra[$xid]))
 		{
 			$error = !$enable_extra_votes
-				? \Joomla\CMS\Language\Text::_('FLEXI_VOTE_COMPOSITE_VOTING_IS_DISABLED')
+				? JText::_('FLEXI_VOTE_COMPOSITE_VOTING_IS_DISABLED')
 				: 'Voting characteristic with id: ' . $xid . ' does not exist';
 			return $this->_ajaxvote_error($error, $xid, $no_ajax);
 		}
@@ -919,7 +919,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 
 				if ($xid_n == $xid && !$old_rating && $currip === $db_itemratings->lastip)
 				{
-					$error = \Joomla\CMS\Language\Text::_('FLEXI_YOU_HAVE_ALREADY_VOTED');
+					$error = JText::_('FLEXI_YOU_HAVE_ALREADY_VOTED');
 					return $this->_ajaxvote_error($error, $xid, $no_ajax);
 				}
 
@@ -953,7 +953,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 				$result->ratingcount_main = $db_rating_count + ($voteIsComplete && !$old_ratings['main'] ? 1 : 0);
 				$result->percentage_main  = !$result->ratingcount_main ? 0 : (($result->rating_sum_main / $result->ratingcount_main) * (100 / $rating_resolution));
 				$result->htmlrating_main  = ($main_counter ?
-					$result->ratingcount_main . ($main_counter_show_label ? ' ' . \Joomla\CMS\Language\Text::_($db_rating_count > 1 ? 'FLEXI_VOTES' : 'FLEXI_VOTE') : '') . ($main_counter_show_percentage ? ' - ' : '')
+					$result->ratingcount_main . ($main_counter_show_label ? ' ' . JText::_($db_rating_count > 1 ? 'FLEXI_VOTES' : 'FLEXI_VOTE') : '') . ($main_counter_show_percentage ? ' - ' : '')
 					: '')
 					. ($main_counter_show_percentage ? (int) $result->percentage_main . '%' : '');
 			}
@@ -965,7 +965,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 				$result->ratingcount = $db_rating_count + ($old_rating ? 0 : 1);
 				$result->percentage  = !$result->ratingcount ? 0 : (($result->rating_sum / $result->ratingcount) * (100 / $rating_resolution));
 				$result->htmlrating  = ($extra_counter ?
-					$result->ratingcount . ($extra_counter_show_label ? ' ' . \Joomla\CMS\Language\Text::_($db_rating_count > 1 ? 'FLEXI_VOTES' : 'FLEXI_VOTE') : '') . ($extra_counter_show_percentage ? ' - ' : '')
+					$result->ratingcount . ($extra_counter_show_label ? ' ' . JText::_($db_rating_count > 1 ? 'FLEXI_VOTES' : 'FLEXI_VOTE') : '') . ($extra_counter_show_percentage ? ' - ' : '')
 					: '')
 					. ($extra_counter_show_percentage ? (int) $result->percentage . '%' : '');
 			}
@@ -989,7 +989,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 			$result->message = '
 				<div class="fc-mssg fc-warning fc-nobgimage">
 					<button type="button" class="close" data-dismiss="alert">&times;</button>
-					'.\Joomla\CMS\Language\Text::_('FLEXI_VOTE_YOUR_RATING').': '.(100*($user_rating / $max_rating)).'%
+					'.JText::_('FLEXI_VOTE_YOUR_RATING').': '.(100*($user_rating / $max_rating)).'%
 				</div>';
 
 			if (!$voteIsComplete)
@@ -997,16 +997,16 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 				$result->message_main = '
 					<div class="fc-mssg fc-warning fc-nobgimage">
 						<button type="button" class="close" data-dismiss="alert">&times;</button>
-						'.\Joomla\CMS\Language\Text::sprintf('FLEXI_VOTE_PLEASE_COMPLETE_VOTING', $user_ratings_completed, count($xids_extra)).'
+						'.JText::sprintf('FLEXI_VOTE_PLEASE_COMPLETE_VOTING', $user_ratings_completed, count($xids_extra)).'
 					</div>';
 			}
 			else
 			{
-				$result->html_main = \Joomla\CMS\Language\Text::_($old_ratings['main'] ? 'FLEXI_VOTE_AVERAGE_RATING_UPDATED' : 'FLEXI_VOTE_AVERAGE_RATING_SUBMITTED');
+				$result->html_main = JText::_($old_ratings['main'] ? 'FLEXI_VOTE_AVERAGE_RATING_UPDATED' : 'FLEXI_VOTE_AVERAGE_RATING_SUBMITTED');
 				$result->message_main = '
 				<div class="fc-mssg fc-success fc-nobgimage">
 					<button type="button" class="close" data-dismiss="alert">&times;</button>
-						' . \Joomla\CMS\Language\Text::_( $old_rating ? 'FLEXI_VOTE_YOUR_OLD_AVERAGE_RATING_WAS_UPDATED' : 'FLEXI_VOTE_YOUR_AVERAGE_RATING_STORED' ) . ':
+						' . JText::_( $old_rating ? 'FLEXI_VOTE_YOUR_OLD_AVERAGE_RATING_WAS_UPDATED' : 'FLEXI_VOTE_YOUR_AVERAGE_RATING_STORED' ) . ':
 						<b>' . ($old_ratings['main'] ? (100 * ($old_ratings['main'] / $max_rating)) . '% => ' : '') . (100 * ($user_rating_main / $max_rating)) . '%</b>
 				</div>';
 			}
@@ -1017,7 +1017,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 			$result->message_main ='
 				<div class="fc-mssg fc-success fc-nobgimage">
 					<button type="button" class="close" data-dismiss="alert">&times;</button>
-					'.\Joomla\CMS\Language\Text::_( $old_rating ? 'FLEXI_VOTE_YOUR_OLD_RATING_WAS_CHANGED' : 'FLEXI_THANK_YOU_FOR_VOTING' ).'
+					'.JText::_( $old_rating ? 'FLEXI_VOTE_YOUR_OLD_RATING_WAS_CHANGED' : 'FLEXI_THANK_YOU_FOR_VOTING' ).'
 				</div>';
 		}
 
@@ -1060,7 +1060,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		// Handle non ajax call
 		if ($no_ajax)
 		{
-			\Joomla\CMS\Factory::getApplication()->enqueueMessage($mssg, 'notice');
+			JFactory::getApplication()->enqueueMessage($mssg, 'notice');
 			return;
 		}
 

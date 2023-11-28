@@ -55,8 +55,8 @@ $ctrl_task = FLEXI_J16GE ? 'task=templates.' : 'controller=templates&task=';
 
 	<fieldset>
 		<legend>
-			<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_DUPLICATE_TEMPLATE' ); ?>
-			<span class="hasTooltip" title="<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_DUPLICATE_TEMPLATE_DESC', true ); ?>" style="text-decoration: none; color: #333;">
+			<?php echo JText::_( 'FLEXI_DUPLICATE_TEMPLATE' ); ?>
+			<span class="hasTooltip" title="<?php echo JText::_( 'FLEXI_DUPLICATE_TEMPLATE_DESC', true ); ?>" style="text-decoration: none; color: #333;">
 				<img src="components/com_flexicontent/assets/images/information.png" border="0" alt="Note"/>
 			</span>
 		</legend>
@@ -67,14 +67,14 @@ $ctrl_task = FLEXI_J16GE ? 'task=templates.' : 'controller=templates&task=';
 	<table width="100%">
 		<tr>
 			<td>
-			<input id="import" type="submit" class="btn" value="<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_DUPLICATE_TEMPLATE_BUTTON' ); ?>" />
-			<input type="button" class="btn" onclick="window.parent.fc_tmpls_modal.dialog('close');" value="<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_CLOSE_IMPORT_TAGS' ); ?>" />			
+			<input id="import" type="submit" class="btn" value="<?php echo JText::_( 'FLEXI_DUPLICATE_TEMPLATE_BUTTON' ); ?>" />
+			<input type="button" class="btn" onclick="window.parent.fc_tmpls_modal.dialog('close');" value="<?php echo JText::_( 'FLEXI_CLOSE_IMPORT_TAGS' ); ?>" />			
 			</td>
 		</tr>
 	</table>
 	<div id="log-bind"></div>
 
-	<?php echo \Joomla\CMS\HTML\HTMLHelper::_( 'form.token' ); ?>
+	<?php echo JHtml::_( 'form.token' ); ?>
 	<input type="hidden" name="option" value="com_flexicontent" />
 	<input type="hidden" name="task" value="templates.duplicate" />
 	<input type="hidden" name="layout" value="templates.duplicate" />

@@ -46,7 +46,7 @@ class FlexicontentTasksCore
 
 		if (!defined('FLEXI_J40GE'))
 		{
-			$jversion = new \Joomla\CMS\Version;
+			$jversion = new JVersion;
 			define('FLEXI_J40GE', version_compare( $jversion->getShortVersion(), '3.99.99', '>' ) );
 		}
 
@@ -55,7 +55,7 @@ class FlexicontentTasksCore
 		 */
 		if (!FLEXI_J40GE)
 		{
-			$app = \Joomla\CMS\Factory::getApplication($client_name);
+			$app = JFactory::getApplication($client_name);
 			$app->initialise();
 		}
 		else
@@ -69,7 +69,7 @@ class FlexicontentTasksCore
 
 			$container->alias('session.web', 'session.web.' . $client_name)
 				->alias('session', 'session.web.' . $client_name)
-				->alias('\Joomla\CMS\Session\Session', 'session.web.' . $client_name)
+				->alias('JSession', 'session.web.' . $client_name)
 				->alias(\Joomla\CMS\Session\Session::class, 'session.web.' . $client_name)
 				->alias(\Joomla\Session\Session::class, 'session.web.' . $client_name)
 				->alias(\Joomla\Session\SessionInterface::class, 'session.web.' . $client_name);
@@ -105,9 +105,9 @@ class FlexicontentTasksCore
 		$this->_callPlugins();
 		global $globalcats;
 
-		$app     = \Joomla\CMS\Factory::getApplication();
+		$app     = JFactory::getApplication();
 		$jinput  = $app->input;
-		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams($this->option);
+		$cparams = JComponentHelper::getParams($this->option);
 		$use_tmp = true;
 
 		// Get request variables
@@ -205,7 +205,7 @@ class FlexicontentTasksCore
 		$newtext = '+' . implode( ' +', $_words ) .'*';  //print_r($_words); exit;
 
 		// Query CLAUSE for match the given text
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 		$quoted_text = $db->escape($newtext, true);
 		$quoted_text = $db->Quote( $quoted_text, false );
 		$_text_match  = ' MATCH (si.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
@@ -220,7 +220,7 @@ class FlexicontentTasksCore
 		{
 			$lta = 'i';
 			$lang_where .= ' AND (' . $lta . '.language LIKE ' . $db->Quote( $lang .'%' ) . ' OR ' . $lta . '.language="*" ) ';
-			//$lang_where .= ' AND (' . $lta . '.language = ' . $db->Quote(\Joomla\CMS\Factory::getLanguage()->getTag()) . ' OR ' . $lta . '.language = ' . $db->Quote('*') . ')';
+			//$lang_where .= ' AND (' . $lta . '.language = ' . $db->Quote(JFactory::getLanguage()->getTag()) . ' OR ' . $lta . '.language = ' . $db->Quote('*') . ')';
 		}
 
 		$access_where = '';
@@ -228,8 +228,8 @@ class FlexicontentTasksCore
 
 		/*if (!$show_noauth)
 		{
-			$user = \Joomla\CMS\Factory::getUser();
-			$aid_arr = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
+			$user = JFactory::getUser();
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
 			$access_where .= ' AND ty.access IN (0,'.$aid_list.')';
 			$access_where .= ' AND mc.access IN (0,'.$aid_list.')';
@@ -340,11 +340,11 @@ class FlexicontentTasksCore
 	public function viewtags()
 	{
 		// Check for request forgeries
-		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
-		require_once \Joomla\CMS\Filesystem\Path::clean(JPATH_SITE . '/components/com_flexicontent/helpers/permission.php');
+		require_once JPath::clean(JPATH_SITE . '/components/com_flexicontent/helpers/permission.php');
 
-		$app    = \Joomla\CMS\Factory::getApplication();
+		$app    = JFactory::getApplication();
 		$perms  = FlexicontentHelperPerm::getPerm();
 
 		@ob_end_clean();
@@ -362,7 +362,7 @@ class FlexicontentTasksCore
 			$this->_loadLanguage();
 			$array[] = (object) array(
 				'id' => '0',
-				'name' => \Joomla\CMS\Language\Text::_('FLEXI_FIELD_NO_ACCESS')
+				'name' => JText::_('FLEXI_FIELD_NO_ACCESS')
 			);
 		}
 		else
@@ -392,7 +392,7 @@ class FlexicontentTasksCore
 				$this->_loadLanguage();
 				$array[] = (object) array(
 					'id' => '0',
-					'name' => \Joomla\CMS\Language\Text::_($perms->CanCreateTags ? 'FLEXI_NEW_TAG_ENTER_TO_CREATE' : 'FLEXI_NO_TAGS_FOUND'),
+					'name' => JText::_($perms->CanCreateTags ? 'FLEXI_NEW_TAG_ENTER_TO_CREATE' : 'FLEXI_NO_TAGS_FOUND'),
 					'translated_text' => '',
 				);
 			}
@@ -408,11 +408,11 @@ class FlexicontentTasksCore
 
 	private function _isStopWord($word, $tbl='flexicontent_items_ext', $col='search_index')
 	{
-		$app     = \Joomla\CMS\Factory::getApplication();
+		$app     = JFactory::getApplication();
 		$jinput  = $app->input;
 		if ($jinput->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 		$quoted_word = $db->escape($word, true);
 		$query = 'SELECT '.$col
 			.' FROM #__'.$tbl
@@ -426,7 +426,7 @@ class FlexicontentTasksCore
 
 	private function _callPlugins()
 	{
-		$app     = \Joomla\CMS\Factory::getApplication();
+		$app     = JFactory::getApplication();
 		$jinput  = $app->input;
 		if ($jinput->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
 
@@ -438,7 +438,7 @@ class FlexicontentTasksCore
 		require_once JPATH_SITE . '/plugins/'.$extfolder.'/'.$extname.'/'.$extname.'.php';
 
 		$dispatcher   = JEventDispatcher::getInstance();
-		$plg_db_data  = \Joomla\CMS\Plugin\PluginHelper::getPlugin($extfolder, $extname);
+		$plg_db_data  = JPluginHelper::getPlugin($extfolder, $extname);
 		$plg = new $className($dispatcher, array('type'=>$extfolder, 'name'=>$extname, 'params'=>$plg_db_data->params));
 
 		// Load cached category data
@@ -446,7 +446,7 @@ class FlexicontentTasksCore
 		if (FLEXI_CACHE)
 		{
 			// Add the category tree to categories cache
-			$catscache = \Joomla\CMS\Factory::getCache('com_flexicontent_cats');
+			$catscache = JFactory::getCache('com_flexicontent_cats');
 			$catscache->setCaching(1);                  // Force cache ON
 			$catscache->setLifeTime(FLEXI_CACHE_TIME);  // Set expire time (default is 1 hour)
 			$globalcats = $catscache->get(
@@ -469,18 +469,18 @@ class FlexicontentTasksCore
 	 */
 	private function _getTags($text = '', $limit = 500)
 	{
-		if (!defined('FLEXI_FISH'))    define('FLEXI_FISH'		, ($params->get('flexi_fish', 0) && (\Joomla\CMS\Plugin\PluginHelper::isEnabled('system', 'falangdriver' ))) ? 1 : 0);
+		if (!defined('FLEXI_FISH'))    define('FLEXI_FISH'		, ($params->get('flexi_fish', 0) && (JPluginHelper::isEnabled('system', 'falangdriver' ))) ? 1 : 0);
 
-		$app     = \Joomla\CMS\Factory::getApplication();
+		$app     = JFactory::getApplication();
 		$jinput  = $app->input;
 		if ($jinput->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 
 		$lang_code = $jinput->getString('item_lang');
 		$lang_code = $lang_code && $lang_code !== '*'
           ? $lang_code
-          : $jinput->getString('lang', \Joomla\CMS\Factory::getLanguage()->getTag());
+          : $jinput->getString('lang', JFactory::getLanguage()->getTag());
 
 		$query = $db->getQuery(true)
 			->select('la.*')
@@ -528,12 +528,12 @@ class FlexicontentTasksCore
 	 */
 	private function _loadLanguage()
 	{
-		$app     = \Joomla\CMS\Factory::getApplication();
+		$app     = JFactory::getApplication();
 		$jinput  = $app->input;
 		if ($jinput->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
 
 		// Load english language file for 'com_flexicontent' component then override with current language file
-		\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
-		\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+		JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+		JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 	}
 }

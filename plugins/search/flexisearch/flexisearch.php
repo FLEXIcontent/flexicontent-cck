@@ -39,7 +39,7 @@ require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'f
  * @subpackage	Search.flexisearch
  * @since		1.6
  */
-class plgSearchFlexisearch extends \Joomla\CMS\Plugin\CMSPlugin
+class plgSearchFlexisearch extends JPlugin
 {
 	var $autoloadLanguage = false;
 
@@ -56,18 +56,18 @@ class plgSearchFlexisearch extends \Joomla\CMS\Plugin\CMSPlugin
 		parent::__construct($subject, $config);
 
 		static $language_loaded = null;
-		if (!$this->autoloadLanguage && $language_loaded === null) $language_loaded = \Joomla\CMS\Plugin\CMSPlugin::loadLanguage('plg_search_flexisearch', JPATH_ADMINISTRATOR);
+		if (!$this->autoloadLanguage && $language_loaded === null) $language_loaded = JPlugin::loadLanguage('plg_search_flexisearch', JPATH_ADMINISTRATOR);
 	}
 	
 	
 	function _getAreas()
 	{
 		$areas = array();
-		if ($this->params->get('search_title',	1)) {$areas['FlexisearchTitle'] = \Joomla\CMS\Language\Text::_('FLEXI_STDSEARCH_TITLE');}
-		if ($this->params->get('search_desc',		1)) {$areas['FlexisearchDesc'] = \Joomla\CMS\Language\Text::_('FLEXI_STDSEARCH_DESC');}
-		if ($this->params->get('search_fields',	1)) {$areas['FlexisearchFields'] = \Joomla\CMS\Language\Text::_('FLEXI_STDSEARCH_FIELDS');}
-		if ($this->params->get('search_meta',		1)) {$areas['FlexisearchMeta'] = \Joomla\CMS\Language\Text::_('FLEXI_STDSEARCH_META');}
-		if ($this->params->get('search_tags',		1)) {$areas['FlexisearchTags'] = \Joomla\CMS\Language\Text::_('FLEXI_STDSEARCH_TAGS');}
+		if ($this->params->get('search_title',	1)) {$areas['FlexisearchTitle'] = JText::_('FLEXI_STDSEARCH_TITLE');}
+		if ($this->params->get('search_desc',		1)) {$areas['FlexisearchDesc'] = JText::_('FLEXI_STDSEARCH_DESC');}
+		if ($this->params->get('search_fields',	1)) {$areas['FlexisearchFields'] = JText::_('FLEXI_STDSEARCH_FIELDS');}
+		if ($this->params->get('search_meta',		1)) {$areas['FlexisearchMeta'] = JText::_('FLEXI_STDSEARCH_META');}
+		if ($this->params->get('search_tags',		1)) {$areas['FlexisearchTags'] = JText::_('FLEXI_STDSEARCH_TAGS');}
 		
 		// Goto last element of array and add to it 2 line breaks, this layout hack is not appropriate e.g. the areas maybe inside a list ...
 		//end($areas);
@@ -91,7 +91,7 @@ class plgSearchFlexisearch extends \Joomla\CMS\Plugin\CMSPlugin
 		}
 		$whereTypes =  $wheres ? '(' . implode(') OR (', $wheres) . ')' : '';
 		
-		$db		= \Joomla\CMS\Factory::getDbo();
+		$db		= JFactory::getDbo();
 		$query	= $db->getQuery(true);
 		$query->clear();
 		$query->select('t.id, t.name ');
@@ -146,17 +146,17 @@ class plgSearchFlexisearch extends \Joomla\CMS\Plugin\CMSPlugin
 	 */
 	function onContentSearch( $text, $phrase='', $ordering='', $areas=null )
 	{
-		$db		= \Joomla\CMS\Factory::getDbo();
-		$app	= \Joomla\CMS\Factory::getApplication();
-		$user	= \Joomla\CMS\Factory::getUser();
+		$db		= JFactory::getDbo();
+		$app	= JFactory::getApplication();
+		$user	= JFactory::getUser();
 		
 		// Get language
-		$cntLang = substr(\Joomla\CMS\Factory::getLanguage()->getTag(), 0,2);  // Current Content language (Can be natively switched in J2.5)
-		$urlLang  = \Joomla\CMS\Factory::getApplication()->input->getWord('lang', '' );                 // Language from URL (Can be switched via Joomfish in J1.5)
+		$cntLang = substr(JFactory::getLanguage()->getTag(), 0,2);  // Current Content language (Can be natively switched in J2.5)
+		$urlLang  = JFactory::getApplication()->input->getWord('lang', '' );                 // Language from URL (Can be switched via Joomfish in J1.5)
 		$lang = (FLEXI_J16GE || empty($urlLang)) ? $cntLang : $urlLang;
 		
 	  // COMPONENT PARAMETERS
-		$cparams 	= $app->isClient('site')  ?  $app->getParams('com_flexicontent')  : \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+		$cparams 	= $app->isClient('site')  ?  $app->getParams('com_flexicontent')  : JComponentHelper::getParams('com_flexicontent');
 		if (!defined('FLEXI_SECTION'))
 			define('FLEXI_SECTION', $cparams->get('flexi_section'));		// define section
 		$show_noauth = $cparams->get('show_noauth', 0);		// items the user cannot see ...
@@ -192,7 +192,7 @@ class plgSearchFlexisearch extends \Joomla\CMS\Plugin\CMSPlugin
 
 		// NULL and CURRENT dates,
 		// NOTE: the current date needs to use built-in MYSQL function, otherwise filter caching can not work because the CURRENT DATETIME is continuously different !!!
-		//$now = \Joomla\CMS\Factory::getDate()->toSql();
+		//$now = JFactory::getDate()->toSql();
 		$_nowDate = 'UTC_TIMESTAMP()'; //$db->Quote($now);
 		$nullDate = $db->getNullDate();
 		
@@ -264,7 +264,7 @@ class plgSearchFlexisearch extends \Joomla\CMS\Plugin\CMSPlugin
 		$select_access .= ',  c.access as category_access, ty.access as type_access';
 		
 		if ( !$show_noauth ) {   // User not allowed to LIST unauthorized items
-			$aid_arr = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
 			$andaccess .= ' AND ty.access IN (0,'.$aid_list.')';
 			$andaccess .= ' AND  c.access IN (0,'.$aid_list.')';
@@ -273,7 +273,7 @@ class plgSearchFlexisearch extends \Joomla\CMS\Plugin\CMSPlugin
 		}
 		else {
 			// Access Flags for: content type, main category, item
-			$aid_arr = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
 			$select_access .= ', '
 				.' CASE WHEN '
@@ -316,7 +316,7 @@ class plgSearchFlexisearch extends \Joomla\CMS\Plugin\CMSPlugin
 				.' fir.value as field,'
 				.' i.access, ie.type_id,'
 				.' CONCAT(i.introtext, i.fulltext) AS text,'
-				.' CONCAT_WS( " / ", '. $db->Quote( \Joomla\CMS\Language\Text::_( 'FLEXICONTENT' ) ) .', c.title, i.title ) AS section,'
+				.' CONCAT_WS( " / ", '. $db->Quote( JText::_( 'FLEXICONTENT' ) ) .', c.title, i.title ) AS section,'
 				.' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END AS slug,'
 				.' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END AS catslug,'
 				.' "2" AS browsernav'
@@ -361,11 +361,11 @@ class plgSearchFlexisearch extends \Joomla\CMS\Plugin\CMSPlugin
 					// If joomla article view is allowed allowed and then search view may optional create Joomla article links
 					if( $typeData[$item->type_id]->params->get('allow_jview', 0) == 1 && $typeData[$item->type_id]->params->get('search_jlinks', 1) )
 					{
-						$item->href = \Joomla\CMS\Router\Route::_(ContentHelperRoute::getArticleRoute($item->slug, $item->catslug, $item->language));
+						$item->href = JRoute::_(ContentHelperRoute::getArticleRoute($item->slug, $item->catslug, $item->language));
 					}
 					else
 					{
-						$item->href = \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->catslug, 0, $item));
+						$item->href = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->catslug, 0, $item));
 					}
 					
 					if (searchHelper::checkNoHTML($item, $searchText, array('title', 'metadesc', 'metakey', 'tagname', 'field', 'text' ))) {

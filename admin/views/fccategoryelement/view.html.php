@@ -34,13 +34,13 @@ class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 		 */
 
 		global $globalcats;
-		$app      = \Joomla\CMS\Factory::getApplication();
+		$app      = JFactory::getApplication();
 		$jinput   = $app->input;
-		$document = \Joomla\CMS\Factory::getDocument();
-		$user     = \Joomla\CMS\Factory::getUser();
-		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
-		$session  = \Joomla\CMS\Factory::getSession();
-		$db       = \Joomla\CMS\Factory::getDbo();
+		$document = JFactory::getDocument();
+		$user     = JFactory::getUser();
+		$cparams  = JComponentHelper::getParams('com_flexicontent');
+		$session  = JFactory::getSession();
+		$db       = JFactory::getDbo();
 		$perms    = FlexicontentHelperPerm::getPerm();
 
 		$option   = $jinput->getCmd('option', '');
@@ -58,18 +58,18 @@ class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 		// Load Joomla language files of other extension
 		if (!empty($this->proxy_option))
 		{
-			\Joomla\CMS\Factory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
-			\Joomla\CMS\Factory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
+			JFactory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
+			JFactory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
 		}
 
-		if (\Joomla\CMS\Factory::getApplication()->isClient('site'))
+		if (JFactory::getApplication()->isClient('site'))
 		{
 			// Note : we use some strings from administrator part, so we will also load administrator language file
 			// TODO: remove this need by moving common language string to different file ?
 
 			// Load english language file for 'com_flexicontent' component then override with current language file
-			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
-			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 		}
 
 		// Get model
@@ -136,30 +136,30 @@ class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 			// Add css to document
 			if ($isAdmin)
 			{
-				!\Joomla\CMS\Factory::getLanguage()->isRtl()
-					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
-					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
-				!\Joomla\CMS\Factory::getLanguage()->isRtl()
-					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
-					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
+				!JFactory::getLanguage()->isRtl()
+					? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
+					: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
+				!JFactory::getLanguage()->isRtl()
+					? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
+					: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 			}
 			else
 			{
-				!\Joomla\CMS\Factory::getLanguage()->isRtl()
-					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
-					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
+				!JFactory::getLanguage()->isRtl()
+					? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
+					: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
 			}
 
 			// Add JS frameworks
 			flexicontent_html::loadFramework('select2');
 
 			// Load custom behaviours: form validation, popup tooltips
-			\Joomla\CMS\HTML\HTMLHelper::_('behavior.formvalidator');
-			\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip');
+			JHtml::_('behavior.formvalidator');
+			JHtml::_('bootstrap.tooltip');
 
 			// Add js function to overload the joomla submitform validation
-			$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
-			$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
+			$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
+			$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
 		}
 
 
@@ -171,7 +171,7 @@ class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 		// NA
 
 		// Create document/toolbar titles
-		$doc_title = \Joomla\CMS\Language\Text::_( 'FLEXI_SELECTITEM' );
+		$doc_title = JText::_( 'FLEXI_SELECTITEM' );
 		$document->setTitle($doc_title);
 
 		// Create the toolbar
@@ -202,7 +202,7 @@ class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 		// Parse configuration for every category
    	foreach ($rows as $cat)
 		{
-			$cat->config = new \Joomla\Registry\Registry($cat->params);
+			$cat->config = new JRegistry($cat->params);
 		}
 
 
@@ -220,7 +220,7 @@ class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 		$value     = $filter_cats;
 
 		$lists[$elementid] = $this->getFilterDisplay(array(
-			'label' => \Joomla\CMS\Language\Text::_('FLEXI_CATEGORY'),
+			'label' => JText::_('FLEXI_CATEGORY'),
 			'label_extra_class' => ($value ? ' fc-lbl-inverted' : ''),
 			'html' => flexicontent_cats::buildcatselect(
 				$categories,
@@ -240,12 +240,12 @@ class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 
 		// Build depth level filter
 		$options = array(
-			\Joomla\CMS\HTML\HTMLHelper::_('select.option', '', '-'/*'FLEXI_SELECT_MAX_DEPTH'*/),
+			JHtml::_('select.option', '', '-'/*'FLEXI_SELECT_MAX_DEPTH'*/),
 		);
 
 		for ($i = 1; $i <= 10; $i++)
 		{
-			$options[]	= \Joomla\CMS\HTML\HTMLHelper::_('select.option', $i, $i);
+			$options[]	= JHtml::_('select.option', $i, $i);
 		}
 
 		$fieldname = 'filter_level';
@@ -255,9 +255,9 @@ class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 		if (1)
 		{
 			$lists[$elementid] = $this->getFilterDisplay(array(
-				'label' => \Joomla\CMS\Language\Text::_('FLEXI_MAX_DEPTH'),
+				'label' => JText::_('FLEXI_MAX_DEPTH'),
 				'label_extra_class' => ($value ? ' fc-lbl-inverted' : ''),
-				'html' => \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist',
+				'html' => JHtml::_('select.genericlist',
 					$options,
 					$fieldname,
 					array(
@@ -282,7 +282,7 @@ class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 		if (!$assocs_id || $assocanytrans || !$created_by)
 		{
 			$lists[$elementid] = $this->getFilterDisplay(array(
-				'label' => \Joomla\CMS\Language\Text::_('FLEXI_AUTHOR'),
+				'label' => JText::_('FLEXI_AUTHOR'),
 				'label_extra_class' => ($value ? ' fc-lbl-inverted' : ''),
 				'html' => flexicontent_html::buildauthorsselect(
 					$authors,
@@ -300,8 +300,8 @@ class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 		else
 		{
 			$lists[$elementid] = $this->getFilterDisplay(array(
-				'label' => \Joomla\CMS\Language\Text::_('FLEXI_AUTHOR'),
-				'html' => '<span class="add-on"><i>' . \Joomla\CMS\Factory::getUser($created_by)->name . '</i></span>',
+				'label' => JText::_('FLEXI_AUTHOR'),
+				'html' => '<span class="add-on"><i>' . JFactory::getUser($created_by)->name . '</i></span>',
 			));
 		}
 
@@ -314,7 +314,7 @@ class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 		if (!$assocs_id || !$item_lang)
 		{
 			$lists[$elementid] = $this->getFilterDisplay(array(
-				'label' => \Joomla\CMS\Language\Text::_('FLEXI_LANGUAGE'),
+				'label' => JText::_('FLEXI_LANGUAGE'),
 				'label_extra_class' => ($value ? ' fc-lbl-inverted' : ''),
 				'html' => flexicontent_html::buildlanguageslist(
 					$fieldname,
@@ -330,30 +330,30 @@ class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 		else
 		{
 			$lists[$elementid] = $this->getFilterDisplay(array(
-				'label' => \Joomla\CMS\Language\Text::_('FLEXI_LANGUAGE'),
+				'label' => JText::_('FLEXI_LANGUAGE'),
 				'html' => '<span class="add-on"><i>' . $item_lang . '</i></span>',
 			));
 		}
 
 
 		// Build publication state filter
-		//$options = \Joomla\CMS\HTML\HTMLHelper::_('jgrid.publishedOptions');
+		//$options = JHtml::_('jgrid.publishedOptions');
 		$options = array();
 
 		foreach ($model_s->supported_conditions as $condition_value => $condition_name)
 		{
-			$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', $condition_value, $condition_name);
+			$options[] = JHtml::_('select.option', $condition_value, $condition_name);
 		}
-		array_unshift($options, \Joomla\CMS\HTML\HTMLHelper::_('select.option', '', '-'/*'FLEXI_SELECT_STATE'*/));
+		array_unshift($options, JHtml::_('select.option', '', '-'/*'FLEXI_SELECT_STATE'*/));
 
 		$fieldname = 'filter_state';
 		$elementid = 'filter_state';
 		$value     = $filter_state;
 
 		$lists[$elementid] = $this->getFilterDisplay(array(
-			'label' => \Joomla\CMS\Language\Text::_('FLEXI_STATE'),
+			'label' => JText::_('FLEXI_STATE'),
 			'label_extra_class' => ($value ? ' fc-lbl-inverted' : ''),
-			'html' => \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist',
+			'html' => JHtml::_('select.genericlist',
 				$options,
 				$fieldname,
 				array(
@@ -371,17 +371,17 @@ class FlexicontentViewFccategoryelement extends FlexicontentViewBaseRecords
 
 
 		// Build access level filter
-		$options = \Joomla\CMS\HTML\HTMLHelper::_('access.assetgroups');
-		array_unshift($options, \Joomla\CMS\HTML\HTMLHelper::_('select.option', '', '-'/*'JOPTION_SELECT_ACCESS'*/));
+		$options = JHtml::_('access.assetgroups');
+		array_unshift($options, JHtml::_('select.option', '', '-'/*'JOPTION_SELECT_ACCESS'*/));
 
 		$fieldname = 'filter_access';
 		$elementid = 'filter_access';
 		$value     = $filter_access;
 
 		$lists[$elementid] = $this->getFilterDisplay(array(
-			'label' => \Joomla\CMS\Language\Text::_('FLEXI_ACCESS'),
+			'label' => JText::_('FLEXI_ACCESS'),
 			'label_extra_class' => ($value ? ' fc-lbl-inverted' : ''),
-			'html' => \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist',
+			'html' => JHtml::_('select.genericlist',
 				$options,
 				$fieldname,
 				array(

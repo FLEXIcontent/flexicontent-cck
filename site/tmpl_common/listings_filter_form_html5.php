@@ -1,6 +1,6 @@
 <?php
 defined( '_JEXEC' ) or die( 'Restricted access' );
-if ( \Joomla\CMS\Factory::getApplication()->input->getInt('print', 0) ) return;
+if ( JFactory::getApplication()->input->getInt('print', 0) ) return;
 
 ob_start();
 
@@ -23,7 +23,7 @@ if ( empty($filter_form_body) ) return;
 <div class="fcfilter_form_outer fcfilter_form_component">
 
 <?php
-$jcookie = \Joomla\CMS\Factory::getApplication()->input->cookie;
+$jcookie = JFactory::getApplication()->input->cookie;
 $cookie_name = 'fc_active_TabSlidePage';
 
 // FORM in slider
@@ -36,7 +36,7 @@ if ($ff_placement)
 		($model->_id     ? '_cat_' . $model->_id : '').
 		($model->_layout ? '_cat_' . $model->_layout : '')
 		;
-	$ff_toggle_search_title = \Joomla\CMS\Language\Text::_($this->params->get('ff_toggle_search_title', 'FLEXI_TOGGLE_SEARCH_FORM'))
+	$ff_toggle_search_title = JText::_($this->params->get('ff_toggle_search_title', 'FLEXI_TOGGLE_SEARCH_FORM'))
 		. (!empty($active_filters)
 			? ' - <span class="ff_filter_active_count badge badge-important">' . $active_filters . '</span>'
 			: ''
@@ -51,13 +51,13 @@ if ($ff_placement)
 	}
 	catch (Exception $e)
 	{
-		$jcookie->set($cookie_name, '{}', time()+60*60*24*(365*5), \Joomla\CMS\Uri\Uri::base(true), '');
+		$jcookie->set($cookie_name, '{}', time()+60*60*24*(365*5), JUri::base(true), '');
 	}
 
 	$last_active_slide = isset($active_slides->$ff_slider_tagid) ? $active_slides->$ff_slider_tagid : null;
 
-	echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.startAccordion', $ff_slider_tagid, array('active' => $last_active_slide));
-	echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addSlide', $ff_slider_tagid, $ff_toggle_search_title, $ff_slider_tagid . '_filters_slide');
+	echo JHtml::_('bootstrap.startAccordion', $ff_slider_tagid, array('active' => $last_active_slide));
+	echo JHtml::_('bootstrap.addSlide', $ff_slider_tagid, $ff_toggle_search_title, $ff_slider_tagid . '_filters_slide');
 }
 ?>
 
@@ -74,10 +74,10 @@ if ($ff_placement)
 	<input type="hidden" name="cid" value="<?php echo $this->category->id; ?>" />
 	<input type="hidden" name="layout" value="<?php echo $this->layout_vars['layout']; ?>" />
 
-	<input type="hidden" name="letter" value="<?php echo htmlspecialchars(\Joomla\CMS\Factory::getApplication()->input->get('letter', '', 'string'), ENT_QUOTES, 'UTF-8'); ?>" id="alpha_index" />
+	<input type="hidden" name="letter" value="<?php echo htmlspecialchars(JFactory::getApplication()->input->get('letter', '', 'string'), ENT_QUOTES, 'UTF-8'); ?>" id="alpha_index" />
 
 	<?php if (flexicontent_html::initial_list_limited($this->params)) : ?>
-	<input type="hidden" name="listall" value="<?php echo \Joomla\CMS\Factory::getApplication()->input->get('listall', 0, 'int'); ?>" />
+	<input type="hidden" name="listall" value="<?php echo JFactory::getApplication()->input->get('listall', 0, 'int'); ?>" />
 	<?php endif; ?>
 
 </form>
@@ -86,10 +86,10 @@ if ($ff_placement)
 // FORM in slider
 if ($ff_placement)
 {
-	echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endSlide');
-	echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endAccordion');
+	echo JHtml::_('bootstrap.endSlide');
+	echo JHtml::_('bootstrap.endAccordion');
 	
-	\Joomla\CMS\Factory::getDocument()->addScriptDeclaration("
+	JFactory::getDocument()->addScriptDeclaration("
 	(function($) {
 		$(document).ready(function ()
 		{

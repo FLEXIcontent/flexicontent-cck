@@ -29,7 +29,7 @@ jimport('joomla.filesystem.file');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
+class FlexicontentViewCategory extends JViewLegacy
 {
 	/**
 	 * Creates the page's display
@@ -39,10 +39,10 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 	function display( $tpl = null )
 	{
 		// Initialize framework variables
-		$app      = \Joomla\CMS\Factory::getApplication();
+		$app      = JFactory::getApplication();
 		$jinput   = $app->input;
-		$user     = \Joomla\CMS\Factory::getUser();
-		$aid      = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
+		$user     = JFactory::getUser();
+		$aid      = JAccess::getAuthorisedViewLevels($user->id);
 
 		// Get model
 		$model  = $this->getModel();
@@ -59,7 +59,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		 * For backend this is component parameters only
 		 * For frontend this category parameters as VIEW's parameters (category parameters are merged parameters in order: layout(template-manager)/component/ancestors-cats/category/author/menu)
 		 */
-		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+		$cparams = JComponentHelper::getParams('com_flexicontent');
 		$params  = $app->isClient('administrator')
 			? $cparams
 			: $model->getCategory()->parameters;
@@ -86,31 +86,31 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 
 		if (!$filter_type && $app->isClient('administrator'))
 		{
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_CSV_EXPORT_PLEASE_FILTER_BY_TYPE'), 'warning');
+			$app->enqueueMessage(JText::_('FLEXI_CSV_EXPORT_PLEASE_FILTER_BY_TYPE'), 'warning');
 			$app->redirect($this->_getSafeReferer());
 		}
 
 		if (!$csv_header && $app->isClient('administrator'))
 		{
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('Please select Field name or Field label as header row.'), 'warning');
+			$app->enqueueMessage(JText::_('Please select Field name or Field label as header row.'), 'warning');
 			$err_count++;
 		}
 
 		if (!$csv_raw_export && $app->isClient('administrator'))
 		{
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('Please select to export values according to field configuration or to export raw values.'), 'warning');
+			$app->enqueueMessage(JText::_('Please select to export values according to field configuration or to export raw values.'), 'warning');
 			$err_count++;
 		}
 
 		if (!$csv_all_fields && $app->isClient('administrator'))
 		{
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('Please select to export all fields or only configured fields'), 'warning');
+			$app->enqueueMessage(JText::_('Please select to export all fields or only configured fields'), 'warning');
 			$err_count++;
 		}
 
 		if ($err_count)
 		{
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('(Set this inside filters slider)'), 'warning');
+			$app->enqueueMessage(JText::_('(Set this inside filters slider)'), 'warning');
 			$app->redirect($this->_getSafeReferer());
 		}
 
@@ -136,7 +136,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 			'publish_down' =>'publish_down',
 		);
 
-		$has_pro       = \Joomla\CMS\Plugin\PluginHelper::isEnabled($extfolder = 'system', $extname = 'flexisyspro');
+		$has_pro       = JPluginHelper::isEnabled($extfolder = 'system', $extname = 'flexisyspro');
 		$export_all_be = $has_pro && $app->isClient('administrator') && $jinput->getCmd('items_set', '') === 'all';
 
 		if ($export_all_be)
@@ -144,7 +144,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 			// Create plugin instance
 			$className   = 'plg' . ucfirst($extfolder) . $extname;
 			$dispatcher  = JEventDispatcher::getInstance();
-			$plg_db_data = \Joomla\CMS\Plugin\PluginHelper::getPlugin($extfolder, $extname);
+			$plg_db_data = JPluginHelper::getPlugin($extfolder, $extname);
 
 			$plg = new $className($dispatcher, array(
 				'type'   => $extfolder,
@@ -154,7 +154,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 
 			if (!method_exists($plg, 'getItemsSet'))
 			{
-				$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_PRO_VERSION_OUTDATED'), 'warning');
+				$app->enqueueMessage(JText::_('FLEXI_PRO_VERSION_OUTDATED'), 'warning');
 				$app->redirect($this->_getSafeReferer());
 			}
 		}
@@ -208,7 +208,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		// Abort if no fields were configured for CSV export
 		if ($total_fields === 0)
 		{
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_CSV_EXPORT_ZERO_FIELDS_CONFIGURED_FOR_CSV_EXPORT'), 'warning');
+			$app->enqueueMessage(JText::_('FLEXI_CSV_EXPORT_ZERO_FIELDS_CONFIGURED_FOR_CSV_EXPORT'), 'warning');
 			$app->redirect($this->_getSafeReferer());
 		}
 
@@ -412,6 +412,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		$referer = !empty($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : null;
 		return flexicontent_html::is_safe_url($referer)
 			? $referer
-			: \Joomla\CMS\Uri\Uri::base();
+			: JUri::base();
 	}
 }

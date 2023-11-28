@@ -71,7 +71,7 @@ foreach ($related_items_sets as $n => $related_items)
 	if ($disp->total_info && (!empty($options->total) || !empty($related_items)))
 	{
 		$total_count = isset($options->total) ? $options->total : count($related_items);
-		$total_append_text = \Joomla\CMS\Language\Text::_($field->parameters->get('total_append_text', ''));
+		$total_append_text = JText::_($field->parameters->get('total_append_text', ''));
 
 		// show_total_only: 2 , dictates to hide if empty, thus skip display if zero items were found
 		// (e.g. according to configuration we may not include unpublished items)

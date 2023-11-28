@@ -194,10 +194,10 @@
 				<option value="4">FLEXI_CLOSE_OPEN_TEXTS_AS_SEP</option>
 				<option value="5">FLEXI_NOCHAR_EMPTY_SEPARATOR</option>
 			</field>
-			<field name="filter_pretext" type="text" filter="\Joomla\CMS\Component\ComponentHelper::filterText" default="" label="FLEXI_RECORD_PREFIX_TEXT" description="FLEXI_RECORD_PREFIX_TEXT_DESC" class="usefilters input-xxlarge" />
-			<field name="filter_posttext" type="text" filter="\Joomla\CMS\Component\ComponentHelper::filterText" default="" label="FLEXI_RECORD_SUFFIX_TEXT" description="FLEXI_RECORD_SUFFIX_TEXT_DESC" class="usefilters input-xxlarge" />
-			<field name="filter_opentag" type="text" filter="\Joomla\CMS\Component\ComponentHelper::filterText" default="" label="FLEXI_RECORD_LIST_OPENING_TEXT" description="FLEXI_RECORD_LIST_OPENING_TEXT_DESC" class="usefilters input-xxlarge" />
-			<field name="filter_closetag" type="text" filter="\Joomla\CMS\Component\ComponentHelper::filterText" default="" label="FLEXI_RECORD_LIST_CLOSING_TEXT" description="FLEXI_RECORD_LIST_CLOSING_TEXT_DESC" class="usefilters input-xxlarge" />
+			<field name="filter_pretext" type="text" filter="JComponentHelper::filterText" default="" label="FLEXI_RECORD_PREFIX_TEXT" description="FLEXI_RECORD_PREFIX_TEXT_DESC" class="usefilters input-xxlarge" />
+			<field name="filter_posttext" type="text" filter="JComponentHelper::filterText" default="" label="FLEXI_RECORD_SUFFIX_TEXT" description="FLEXI_RECORD_SUFFIX_TEXT_DESC" class="usefilters input-xxlarge" />
+			<field name="filter_opentag" type="text" filter="JComponentHelper::filterText" default="" label="FLEXI_RECORD_LIST_OPENING_TEXT" description="FLEXI_RECORD_LIST_OPENING_TEXT_DESC" class="usefilters input-xxlarge" />
+			<field name="filter_closetag" type="text" filter="JComponentHelper::filterText" default="" label="FLEXI_RECORD_LIST_CLOSING_TEXT" description="FLEXI_RECORD_LIST_CLOSING_TEXT_DESC" class="usefilters input-xxlarge" />
 
 
 			<field name="" type="separator" default="FLEXI_LOCKED_FILTERS" description="" level="level1" />
@@ -237,7 +237,7 @@
 				<option value="0" show_list="" hide_list="using_php_rule">FLEXI_NO</option>
 				<option value="1" show_list="using_php_rule" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="php_rule" type="textarea" filter="\Joomla\CMS\Component\ComponentHelper::filterText" rows="5" cols="40" label="FLEXI_PHP_RULE_CODE" description="FLEXI_PHP_RULE_CODE_DESC" class="using_php_rule input-xxlarge" />
+			<field name="php_rule" type="textarea" filter="JComponentHelper::filterText" rows="5" cols="40" label="FLEXI_PHP_RULE_CODE" description="FLEXI_PHP_RULE_CODE_DESC" class="using_php_rule input-xxlarge" />
 
 		</fieldset>
 

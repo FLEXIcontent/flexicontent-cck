@@ -286,8 +286,8 @@
 				<option value="9" fcreadonly="{'subcat_opentag':1,'subcat_closetag':1,'subcat_pretext':1,'subcat_posttext':1,'subcat_separatorf':1}" fcconfigs="{'subcat_opentag':'','subcat_closetag':'','subcat_pretext':'&lt;span class=\'badge bg-warning badge-warning\'&gt;','subcat_posttext':'&lt;/span&gt;','subcat_separatorf':'5'}">Badge warning</option>
 				<option value="10" fcreadonly="{'subcat_opentag':1,'subcat_closetag':1,'subcat_pretext':1,'subcat_posttext':1,'subcat_separatorf':1}" fcconfigs="{'subcat_opentag':'','subcat_closetag':'','subcat_pretext':'&lt;span class=\'badge badge-important\'&gt;','subcat_posttext':'&lt;/span&gt;','subcat_separatorf':'5'}">Badge important</option>
 			</field>
-			<field name="subcat_pretext" type="text" filter="\Joomla\CMS\Component\ComponentHelper::filterText" default="" label="FLEXI_RECORD_PREFIX_TEXT" description="FLEXI_RECORD_PREFIX_TEXT_DESC" class="input-xxlarge" />
-			<field name="subcat_posttext" type="text" filter="\Joomla\CMS\Component\ComponentHelper::filterText" default="" label="FLEXI_RECORD_SUFFIX_TEXT" description="FLEXI_RECORD_SUFFIX_TEXT_DESC" class="input-xxlarge" />
+			<field name="subcat_pretext" type="text" filter="JComponentHelper::filterText" default="" label="FLEXI_RECORD_PREFIX_TEXT" description="FLEXI_RECORD_PREFIX_TEXT_DESC" class="input-xxlarge" />
+			<field name="subcat_posttext" type="text" filter="JComponentHelper::filterText" default="" label="FLEXI_RECORD_SUFFIX_TEXT" description="FLEXI_RECORD_SUFFIX_TEXT_DESC" class="input-xxlarge" />
 			<field name="subcat_separatorf" type="multilist" subtype="list" default="" label="FLEXI_RECORD_SEPARATOR" description="FLEXI_RECORD_SEPARATOR_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_SPACE</option>
@@ -297,8 +297,8 @@
 				<option value="4">FLEXI_CLOSE_OPEN_TEXTS_AS_SEP</option>
 				<option value="5">FLEXI_NOCHAR_EMPTY_SEPARATOR</option>
 			</field>
-			<field name="subcat_opentag" type="text" filter="\Joomla\CMS\Component\ComponentHelper::filterText" default="" label="FLEXI_RECORD_LIST_OPENING_TEXT" description="FLEXI_RECORD_LIST_OPENING_TEXT_DESC" class="input-xxlarge" />
-			<field name="subcat_closetag" type="text" filter="\Joomla\CMS\Component\ComponentHelper::filterText" default="" label="FLEXI_RECORD_LIST_CLOSING_TEXT" description="FLEXI_RECORD_LIST_CLOSING_TEXT_DESC" class="input-xxlarge" />
+			<field name="subcat_opentag" type="text" filter="JComponentHelper::filterText" default="" label="FLEXI_RECORD_LIST_OPENING_TEXT" description="FLEXI_RECORD_LIST_OPENING_TEXT_DESC" class="input-xxlarge" />
+			<field name="subcat_closetag" type="text" filter="JComponentHelper::filterText" default="" label="FLEXI_RECORD_LIST_CLOSING_TEXT" description="FLEXI_RECORD_LIST_CLOSING_TEXT_DESC" class="input-xxlarge" />
 
 
 		<field name="" type="separator" default="FLEXI_PARAMS_PEERCATS_LIST" icon_class="icon-tree-2" level="tab_open" box_type="1" />
@@ -397,8 +397,8 @@
 				<option value="9" fcreadonly="{'peercat_opentag':1,'peercat_closetag':1,'peercat_pretext':1,'peercat_posttext':1,'peercat_separatorf':1}" fcconfigs="{'peercat_opentag':'','peercat_closetag':'','peercat_pretext':'&lt;span class=\'badge bg-warning badge-warning\'&gt;','peercat_posttext':'&lt;/span&gt;','peercat_separatorf':'5'}">Badge warning</option>
 				<option value="10" fcreadonly="{'peercat_opentag':1,'peercat_closetag':1,'peercat_pretext':1,'peercat_posttext':1,'peercat_separatorf':1}" fcconfigs="{'peercat_opentag':'','peercat_closetag':'','peercat_pretext':'&lt;span class=\'badge badge-important\'&gt;','peercat_posttext':'&lt;/span&gt;','peercat_separatorf':'5'}">Badge important</option>
 			</field>
-			<field name="peercat_pretext" type="text" filter="\Joomla\CMS\Component\ComponentHelper::filterText" default="" label="FLEXI_RECORD_PREFIX_TEXT" description="FLEXI_RECORD_PREFIX_TEXT_DESC" class="input-xxlarge" />
-			<field name="peercat_posttext" type="text" filter="\Joomla\CMS\Component\ComponentHelper::filterText" default="" label="FLEXI_RECORD_SUFFIX_TEXT" description="FLEXI_RECORD_SUFFIX_TEXT_DESC" class="input-xxlarge" />
+			<field name="peercat_pretext" type="text" filter="JComponentHelper::filterText" default="" label="FLEXI_RECORD_PREFIX_TEXT" description="FLEXI_RECORD_PREFIX_TEXT_DESC" class="input-xxlarge" />
+			<field name="peercat_posttext" type="text" filter="JComponentHelper::filterText" default="" label="FLEXI_RECORD_SUFFIX_TEXT" description="FLEXI_RECORD_SUFFIX_TEXT_DESC" class="input-xxlarge" />
 			<field name="peercat_separatorf" type="multilist" subtype="list" default="" label="FLEXI_RECORD_SEPARATOR" description="FLEXI_RECORD_SEPARATOR_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_SPACE</option>
@@ -408,8 +408,8 @@
 				<option value="4">FLEXI_CLOSE_OPEN_TEXTS_AS_SEP</option>
 				<option value="5">FLEXI_NOCHAR_EMPTY_SEPARATOR</option>
 			</field>
-			<field name="peercat_opentag" type="text" filter="\Joomla\CMS\Component\ComponentHelper::filterText" default="" label="FLEXI_RECORD_LIST_OPENING_TEXT" description="FLEXI_RECORD_LIST_OPENING_TEXT_DESC" class="input-xxlarge" />
-			<field name="peercat_closetag" type="text" filter="\Joomla\CMS\Component\ComponentHelper::filterText" default="" label="FLEXI_RECORD_LIST_CLOSING_TEXT" description="FLEXI_RECORD_LIST_CLOSING_TEXT_DESC" class="input-xxlarge" />
+			<field name="peercat_opentag" type="text" filter="JComponentHelper::filterText" default="" label="FLEXI_RECORD_LIST_OPENING_TEXT" description="FLEXI_RECORD_LIST_OPENING_TEXT_DESC" class="input-xxlarge" />
+			<field name="peercat_closetag" type="text" filter="JComponentHelper::filterText" default="" label="FLEXI_RECORD_LIST_CLOSING_TEXT" description="FLEXI_RECORD_LIST_CLOSING_TEXT_DESC" class="input-xxlarge" />
 
 
 		<field name="" type="separator" default="FLEXI_CAT_DISPLAY_HEADER" level="tabset_close" box_type="1" />
@@ -477,10 +477,10 @@
 			<field name="flexi_button_class_reset_custom" type="text" size="20" default="" label="FLEXI_BUTTON_CLASS_RESET_CUSTOM" description="FLEXI_BUTTON_CLASS_RESET_CUSTOM_DESC" class="disp_resetbtn custom_resetclass input-xxlarge" />
 			
 			<field name="" type="separator" default="FLEXI_TEXT_SEARCH_FILTER_ENCLOSING" level="level3" />
-			<field name="filter_pretext" type="text" filter="\Joomla\CMS\Component\ComponentHelper::filterText" default="" label="FLEXI_RECORD_PREFIX_TEXT" description="FLEXI_RECORD_PREFIX_TEXT_DESC" class="input-xxlarge" />
-			<field name="filter_posttext" type="text" filter="\Joomla\CMS\Component\ComponentHelper::filterText" default="" label="FLEXI_RECORD_SUFFIX_TEXT" description="FLEXI_RECORD_SUFFIX_TEXT_DESC" class="input-xxlarge" />
-			<field name="filter_opentag" type="text" filter="\Joomla\CMS\Component\ComponentHelper::filterText" default="" label="FLEXI_RECORD_LIST_OPENING_TEXT" description="FLEXI_RECORD_LIST_OPENING_TEXT_DESC" class="input-xxlarge" />
-			<field name="filter_closetag" type="text" filter="\Joomla\CMS\Component\ComponentHelper::filterText" default="" label="FLEXI_RECORD_LIST_CLOSING_TEXT" description="FLEXI_RECORD_LIST_CLOSING_TEXT_DESC" class="input-xxlarge" />
+			<field name="filter_pretext" type="text" filter="JComponentHelper::filterText" default="" label="FLEXI_RECORD_PREFIX_TEXT" description="FLEXI_RECORD_PREFIX_TEXT_DESC" class="input-xxlarge" />
+			<field name="filter_posttext" type="text" filter="JComponentHelper::filterText" default="" label="FLEXI_RECORD_SUFFIX_TEXT" description="FLEXI_RECORD_SUFFIX_TEXT_DESC" class="input-xxlarge" />
+			<field name="filter_opentag" type="text" filter="JComponentHelper::filterText" default="" label="FLEXI_RECORD_LIST_OPENING_TEXT" description="FLEXI_RECORD_LIST_OPENING_TEXT_DESC" class="input-xxlarge" />
+			<field name="filter_closetag" type="text" filter="JComponentHelper::filterText" default="" label="FLEXI_RECORD_LIST_CLOSING_TEXT" description="FLEXI_RECORD_LIST_CLOSING_TEXT_DESC" class="input-xxlarge" />
 			<field name="filter_placement" type="fcradio" default="" label="FLEXI_ONE_RECORD_PER_ROW" description="FLEXI_ONE_RECORD_PER_ROW_DESC" class="btn-group group-fcinfo">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO_USE_SEPARATOR</option>

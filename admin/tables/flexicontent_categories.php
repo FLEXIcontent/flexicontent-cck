@@ -25,7 +25,7 @@ require_once('flexicontent_basetablenested.php');
 
 class _flexicontent_categories_common extends flexicontent_basetablenested
 {
-	protected function __getAssetParentId(\Joomla\CMS\Table\Table $table = null, $id = null)
+	protected function __getAssetParentId(JTable $table = null, $id = null)
 	{
 		// Initialise variables.
 		$assetId = null;
@@ -82,7 +82,7 @@ if (FLEXI_J30GE)
 {
 	class _flexicontent_categories extends _flexicontent_categories_common
 	{
-		protected function _getAssetParentId(\Joomla\CMS\Table\Table $table = null, $id = null)
+		protected function _getAssetParentId(JTable $table = null, $id = null)
 		{
 			return parent::__getAssetParentId($table, $id);
 		}
@@ -153,7 +153,7 @@ class flexicontent_categories extends _flexicontent_categories
 	/**
 	 * Constructor
 	 *
-	 * @param   \Joomla\Data\DataObjectbaseDriver  $db  Database driver object.
+	 * @param   JDatabaseDriver  $db  Database driver object.
 	 *
 	 * @since  3.3
 	 */
@@ -191,7 +191,7 @@ class flexicontent_categories extends _flexicontent_categories
 	/**
 	 * Get the parent asset id for the record
 	 *
-	 * @param   \Joomla\CMS\Table\Table   $table  A \Joomla\CMS\Table\Table object for the asset parent.
+	 * @param   JTable   $table  A JTable object for the asset parent.
 	 * @param   integer  $id     The id for the asset
 	 *
 	 * @return  integer  The id of the asset's parent
@@ -239,7 +239,7 @@ class flexicontent_categories extends _flexicontent_categories
 
 		$xid = intval( $this->_db->loadResult() );
 		if ($xid && $xid != intval( $this->id )) {
-			$this->_error = \Joomla\CMS\Language\Text::sprintf( 'WARNNAMETRYAGAIN', \Joomla\CMS\Language\Text::_( 'FLEXI_Category' ) );
+			$this->_error = JText::sprintf( 'WARNNAMETRYAGAIN', JText::_( 'FLEXI_Category' ) );
 			return false;
 		}*/
 
@@ -256,7 +256,7 @@ class flexicontent_categories extends _flexicontent_categories
 	 *
 	 * @return  mixed  Null if operation was satisfactory, otherwise returns an error string
 	 *
-	 * @see     \Joomla\CMS\Table\Table:bind
+	 * @see     JTable:bind
 	 * @since   3.3
 	 */
 	public function bind($array, $ignore = '')
@@ -266,7 +266,7 @@ class flexicontent_categories extends _flexicontent_categories
 		// Bind parameters (params or attribs)
 		if (isset($array['params']) && is_array($array['params']))
 		{
-			$registry = new \Joomla\Registry\Registry;
+			$registry = new JRegistry;
 			$registry->loadArray($array['params']);
 			$array['params'] = (string)$registry;
 		}
@@ -274,7 +274,7 @@ class flexicontent_categories extends _flexicontent_categories
 		// Bind metadata
 		if (isset($array['metadata']) && is_array($array['metadata']))
 		{
-			$registry = new \Joomla\Registry\Registry;
+			$registry = new JRegistry;
 			$registry->loadArray($array['metadata']);
 			$array['metadata'] = (string)$registry;
 		}
@@ -282,7 +282,7 @@ class flexicontent_categories extends _flexicontent_categories
 		// Bind the rules.
 		if (isset($array['rules']) && is_array($array['rules']))
 		{
-			$rules = new \Joomla\CMS\Access\Rules($array['rules']);
+			$rules = new JAccessRules($array['rules']);
 			$this->setRules($rules);
 		}
 
@@ -291,7 +291,7 @@ class flexicontent_categories extends _flexicontent_categories
 
 
 	/**
-	 * Overloaded \Joomla\CMS\Table\Table::store
+	 * Overloaded JTable::store
 	 *
 	 * @param   boolean  $updateNulls  True to update fields even if they are null.
 	 *
@@ -302,8 +302,8 @@ class flexicontent_categories extends _flexicontent_categories
 	public function store($updateNulls = true)
 	{
 		$updateNulls = FLEXI_J40GE ? $updateNulls : false;
-		$date	= \Joomla\CMS\Factory::getDate();
-		$user	= \Joomla\CMS\Factory::getUser();
+		$date	= JFactory::getDate();
+		$user	= JFactory::getUser();
 
 		// Existing category
 		if ($this->id)
@@ -322,17 +322,17 @@ class flexicontent_categories extends _flexicontent_categories
 		}
 
 		// Verify that the alias is unique
-		$table = \Joomla\CMS\Table\Table::getInstance('flexicontent_categories','');
+		$table = JTable::getInstance('flexicontent_categories','');
 		if ($table->load(array('alias'=>$this->alias,'parent_id'=>$this->parent_id,'extension'=>$this->extension)) && ($table->id != $this->id || $this->id==0)) {
 
-			$this->setError(\Joomla\CMS\Language\Text::_('JLIB_DATABASE_ERROR_CATEGORY_UNIQUE_ALIAS'));
+			$this->setError(JText::_('JLIB_DATABASE_ERROR_CATEGORY_UNIQUE_ALIAS'));
 			return false;
 		}
 
 		// NOT NEEDED handle by parent::store()
 		/*if (isset($this->asset_id))
 		{
-			$asset	= \Joomla\CMS\Table\Table::getInstance('Asset');
+			$asset	= JTable::getInstance('Asset');
 			if (!$asset->load($this->asset_id)) {
 				$name = $this->_getAssetName();
 				$asset->loadByName($name);

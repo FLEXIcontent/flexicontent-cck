@@ -70,7 +70,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	public function getversionlist()
 	{
 		// Check for request forgeries
-		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
 
 		@ob_end_clean();
 		$id     = $this->input->getInt('id', 0);
@@ -81,15 +81,15 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			return;
 		}
 
-		$revert 	= \Joomla\CMS\HTML\HTMLHelper::image('administrator/components/com_flexicontent/assets/images/arrow_rotate_anticlockwise.png', \Joomla\CMS\Language\Text::_('FLEXI_REVERT'));
-		$view 		= \Joomla\CMS\HTML\HTMLHelper::image('administrator/components/com_flexicontent/assets/images/magnifier.png', \Joomla\CMS\Language\Text::_('FLEXI_VIEW'));
-		$comment 	= \Joomla\CMS\HTML\HTMLHelper::image('administrator/components/com_flexicontent/assets/images/comments.png', \Joomla\CMS\Language\Text::_('FLEXI_COMMENT'));
+		$revert 	= JHtml::image('administrator/components/com_flexicontent/assets/images/arrow_rotate_anticlockwise.png', JText::_('FLEXI_REVERT'));
+		$view 		= JHtml::image('administrator/components/com_flexicontent/assets/images/magnifier.png', JText::_('FLEXI_VIEW'));
+		$comment 	= JHtml::image('administrator/components/com_flexicontent/assets/images/comments.png', JText::_('FLEXI_COMMENT'));
 
 		$model = $this->getModel($this->record_name);
 		$model->setId($id);
 		$item = $model->getItem($id);
 
-		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+		$cparams = JComponentHelper::getParams('com_flexicontent');
 		$versionsperpage = $cparams->get('versionsperpage', 10);
 		$currentversion = $item->version;
 		$page = $this->input->getInt('page', 0);
@@ -111,10 +111,10 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		$jt_date_format = FLEXI_J16GE ? 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS_J16GE' : 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS';
 		$df_date_format = FLEXI_J16GE ? "d/M H:i" : "%d/%m %H:%M";
-		$date_format = \Joomla\CMS\Language\Text::_($jt_date_format);
+		$date_format = JText::_($jt_date_format);
 		$date_format = ( $date_format == $jt_date_format ) ? $df_date_format : $date_format;
 		$ctrl_task = 'task=items.edit';
-		$app     = \Joomla\CMS\Factory::getApplication();
+		$app     = JFactory::getApplication();
 		$isSite  = $app->isClient('site');
 
 		foreach ($versions as $v)
@@ -123,15 +123,15 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			echo '
 			<tr' . $class . '>
 				<td class="versions">#' . $v->nr . '</td>
-				<td class="versions">' . \Joomla\CMS\HTML\HTMLHelper::_('date', (($v->nr == 1) ? $item->created : $v->date), $date_format) . '</td>
+				<td class="versions">' . JHtml::_('date', (($v->nr == 1) ? $item->created : $v->date), $date_format) . '</td>
 				<td class="versions">' . (($v->nr == 1) ? $item->creator : $v->modifier) . '</td>
 				<td class="versions" align="center">
-					<a href="javascript:;" class="hasTooltip" title="' . \Joomla\CMS\HTML\HTMLHelper::tooltipText(\Joomla\CMS\Language\Text::_('FLEXI_COMMENT'), ($v->comment ? $v->comment : 'No comment written'), 0, 1) . '">' . $comment . '</a>
+					<a href="javascript:;" class="hasTooltip" title="' . JHtml::tooltipText(JText::_('FLEXI_COMMENT'), ($v->comment ? $v->comment : 'No comment written'), 0, 1) . '">' . $comment . '</a>
 				' . (
 				((int) $v->nr === (int) $currentversion) ? // Is current version ?
-					'<a onclick="javascript:return clickRestore(\'index.php?option=com_flexicontent&' . $ctrl_task . '&' . ($isSite ? 'id=' : 'cid=') . $item->id . '&version=' . $v->nr . '\');" href="javascript:;">' . \Joomla\CMS\Language\Text::_('FLEXI_CURRENT') . '</a>' :
-					'<a class="modal-versions" href="index.php?option=com_flexicontent&view=itemcompare&cid[]=' . $item->id . '&version=' . $v->nr . '&tmpl=component" title="' . \Joomla\CMS\Language\Text::_('FLEXI_COMPARE_WITH_CURRENT_VERSION') . '" rel="{handler: \'iframe\', size: {x:window.getSize().scrollSize.x-100, y: window.getSize().size.y-100}}">' . $view . '</a>
-					<a onclick="javascript:return clickRestore(\'index.php?option=com_flexicontent&' . $ctrl_task . '&' . ($isSite ? 'id=' : 'cid=') . $item->id . '&version=' . $v->nr . '&' . \Joomla\CMS\Session\Session::getFormToken() . '=1\');" href="javascript:;" title="' . \Joomla\CMS\Language\Text::sprintf('FLEXI_REVERT_TO_THIS_VERSION', $v->nr) . '">' . $revert . '</a>
+					'<a onclick="javascript:return clickRestore(\'index.php?option=com_flexicontent&' . $ctrl_task . '&' . ($isSite ? 'id=' : 'cid=') . $item->id . '&version=' . $v->nr . '\');" href="javascript:;">' . JText::_('FLEXI_CURRENT') . '</a>' :
+					'<a class="modal-versions" href="index.php?option=com_flexicontent&view=itemcompare&cid[]=' . $item->id . '&version=' . $v->nr . '&tmpl=component" title="' . JText::_('FLEXI_COMPARE_WITH_CURRENT_VERSION') . '" rel="{handler: \'iframe\', size: {x:window.getSize().scrollSize.x-100, y: window.getSize().size.y-100}}">' . $view . '</a>
+					<a onclick="javascript:return clickRestore(\'index.php?option=com_flexicontent&' . $ctrl_task . '&' . ($isSite ? 'id=' : 'cid=') . $item->id . '&version=' . $v->nr . '&' . JSession::getFormToken() . '=1\');" href="javascript:;" title="' . JText::sprintf('FLEXI_REVERT_TO_THIS_VERSION', $v->nr) . '">' . $revert . '</a>
 				') . '
 				</td>
 			</tr>';
@@ -183,7 +183,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		$this->_cleanCache();
 
-		jexit(\Joomla\CMS\Language\Text::_('FLEXI_NOT_RATED_YET'));
+		jexit(JText::_('FLEXI_NOT_RATED_YET'));
 	}
 
 
@@ -237,9 +237,9 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	function viewtags()
 	{
 		// Check for request forgeries
-		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
-		$app    = \Joomla\CMS\Factory::getApplication();
+		$app    = JFactory::getApplication();
 		$perms  = FlexicontentHelperPerm::getPerm();
 
 		@ob_end_clean();
@@ -256,7 +256,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		{
 			$array[] = (object) array(
 				'id' => '0',
-				'name' => \Joomla\CMS\Language\Text::_('FLEXI_FIELD_NO_ACCESS')
+				'name' => JText::_('FLEXI_FIELD_NO_ACCESS')
 			);
 		}
 		else
@@ -282,7 +282,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			{
 				$array[] = (object) array(
 					'id' => '0',
-					'name' => \Joomla\CMS\Language\Text::_($perms->CanCreateTags ? 'FLEXI_NEW_TAG_ENTER_TO_CREATE' : 'FLEXI_NO_TAGS_FOUND')
+					'name' => JText::_($perms->CanCreateTags ? 'FLEXI_NEW_TAG_ENTER_TO_CREATE' : 'FLEXI_NO_TAGS_FOUND')
 				);
 			}
 		}
@@ -313,12 +313,12 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			header("Cache-Control: no-cache");
 			header("Pragma: no-cache");
 
-			$rtl_sfx = !\Joomla\CMS\Factory::getLanguage()->isRtl() ? '' : '_rtl';
-			$fc_css = \Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x' . $rtl_sfx . '.css' : 'j3x' . $rtl_sfx . '.css');
+			$rtl_sfx = !JFactory::getLanguage()->isRtl() ? '' : '_rtl';
+			$fc_css = JUri::base(true) . '/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x' . $rtl_sfx . '.css' : 'j3x' . $rtl_sfx . '.css');
 			echo '
-			<link rel="stylesheet" href="' . \Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/css/flexicontentbackend.css?' . FLEXI_VHASH . '" />
+			<link rel="stylesheet" href="' . JUri::base(true) . '/components/com_flexicontent/assets/css/flexicontentbackend.css?' . FLEXI_VHASH . '" />
 			<link rel="stylesheet" href="' . $fc_css . '?' . FLEXI_VHASH . '" />
-			<link rel="stylesheet" href="' . \Joomla\CMS\Uri\Uri::root(true) . '/media/jui/css/bootstrap.min.css" />
+			<link rel="stylesheet" href="' . JUri::root(true) . '/media/jui/css/bootstrap.min.css" />
 			';
 			?>
 	<div id="flexicontent" class="flexicontent">
@@ -345,7 +345,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 				$state['T'] = array( 'name' => 'FLEXI_TRASHED', 'desc' => 'FLEXI_TRASHED_TO_BE_DELETED', 'icon' => 'trash.png', 'btn_class' => 'btn-danger' );
 			}
 
-			// echo "<b>". \Joomla\CMS\Language\Text::_( 'FLEXI_SELECT_STATE' ).":</b>";
+			// echo "<b>". JText::_( 'FLEXI_SELECT_STATE' ).":</b>";
 			echo "<br /><br />";
 		?>
 
@@ -353,19 +353,19 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		foreach ($state as $shortname => $statedata)
 		{
 			$css = "width:216px; margin:0px 12px 12px 0px;";
-			$link = \Joomla\CMS\Uri\Uri::base(true) . "/index.php?option=com_flexicontent&task=items.changestate&newstate=" . $shortname . "&" . \Joomla\CMS\Session\Session::getFormToken() . "=1";
+			$link = JUri::base(true) . "/index.php?option=com_flexicontent&task=items.changestate&newstate=" . $shortname . "&" . JSession::getFormToken() . "=1";
 			$icon = "../components/com_flexicontent/assets/images/" . $statedata['icon'];
 		?>
 			<span class="fc-filter nowrap_box">
 			<?php
 				/*
-				<!-- <img src="<?php echo $icon; ?>" style="margin:4px 0 0 0; border-width:0px; vertical-align:top;" alt="<?php echo \Joomla\CMS\Language\Text::_($statedata['desc']); ?>" /> &nbsp; -->
+				<!-- <img src="<?php echo $icon; ?>" style="margin:4px 0 0 0; border-width:0px; vertical-align:top;" alt="<?php echo JText::_($statedata['desc']); ?>" /> &nbsp; -->
 				*/
 				?>
 				<span style="<?php echo $css; ?>" class="<?php echo $btn_class . ' ' . $statedata['btn_class']; ?>"
 					onclick="window.parent.fc_parent_form_submit('fc_modal_popup_container', 'adminForm', {'newstate':'<?php echo $shortname; ?>', 'task':'items.changestate'}, {'task':'items.changestate', 'is_list':true});"
 				>
-					<?php echo \Joomla\CMS\Language\Text::_($statedata['name']); ?>
+					<?php echo JText::_($statedata['name']); ?>
 				</span>
 			</span>
 		<?php
@@ -421,7 +421,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	{
 		// Need to recheck post-installation / integrity tasks after,
 		// this should NOT effect RAW HTTP requests, used by AJAX ITEM binding
-		// \Joomla\CMS\Factory::getSession()->set('flexicontent.recheck_aftersave', true);
+		// JFactory::getSession()->set('flexicontent.recheck_aftersave', true);
 
 		$bind_limit = $this->input->getInt('bind_limit', 25000);
 
@@ -469,11 +469,11 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		header("Pragma: no-cache");
 
 		// Check for request forgeries
-		\Joomla\CMS\Session\Session::checkToken('request') or jexit('fail | ' . \Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or jexit('fail | ' . JText::_('JINVALID_TOKEN'));
 
 		if (!FlexicontentHelperPerm::getPerm()->CanConfig)
 		{
-			jexit('fail | ' . \Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'));
+			jexit('fail | ' . JText::_('FLEXI_ALERTNOTAUTH_TASK'));
 		}
 
 		// Test counting with limited memory
@@ -485,9 +485,9 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$indexer     = $this->input->getCmd('indexer', 'tag_assignments');
 		$rebuildmode = $this->input->getCmd('rebuildmode', '');
 
-		$session = \Joomla\CMS\Factory::getSession();
-		$db      = \Joomla\CMS\Factory::getDbo();
-		$app     = \Joomla\CMS\Factory::getApplication();
+		$session = JFactory::getSession();
+		$db      = JFactory::getDbo();
+		$app     = JFactory::getApplication();
 
 		// Get records model to call needed methods
 		$records_model = $this->getModel($this->record_name_pl);
@@ -498,7 +498,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		if ($indexer === 'tag_assignments')
 		{
-			$log_filename = 'tag_assignments_' . \Joomla\CMS\Factory::getUser()->id . '.php';
+			$log_filename = 'tag_assignments_' . \JFactory::getUser()->id . '.php';
 			$log_category = 'com_flexicontent.items.tag_assignments_indexer';
 
 			// Get ids of records to process
@@ -510,7 +510,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		elseif ($indexer === 'resave')
 		{
-			$log_filename = 'resave_' . \Joomla\CMS\Factory::getUser()->id . '.php';
+			$log_filename = 'resave_' . \JFactory::getUser()->id . '.php';
 			$log_category = 'com_flexicontent.items.resave_indexer';
 
 			// Get ids of records to process
@@ -525,7 +525,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		}
 
 		// Get full logfile path
-		$log_filename_full = JPATH::clean(\Joomla\CMS\Factory::getConfig()->get('log_path') . DS . $log_filename);
+		$log_filename_full = JPATH::clean(\JFactory::getConfig()->get('log_path') . DS . $log_filename);
 
 		// Clear previous log file
 		if (file_exists($log_filename_full))
@@ -565,12 +565,12 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		header("Pragma: no-cache");
 
 		// Check for request forgeries
-		// \Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		// JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		// Not need because this task need the user session data that are set by countrows that checked for forgeries
 
 		if (!FlexicontentHelperPerm::getPerm()->CanConfig)
 		{
-			jexit('fail | ' . \Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'));
+			jexit('fail | ' . JText::_('FLEXI_ALERTNOTAUTH_TASK'));
 		}
 
 		// Test indexing with limited memory
@@ -578,9 +578,9 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		$start_microtime = microtime(true);
 
-		$session = \Joomla\CMS\Factory::getSession();
-		$db      = \Joomla\CMS\Factory::getDbo();
-		$app     = \Joomla\CMS\Factory::getApplication();
+		$session = JFactory::getSession();
+		$db      = JFactory::getDbo();
+		$app     = JFactory::getApplication();
 
 		$has_zlib      = function_exists("zlib_encode"); // Version_compare(PHP_VERSION, '5.4.0', '>=');
 
@@ -594,12 +594,12 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$log_category = $session->get($indexer . '_log_category', null, 'flexicontent');
 
 		jimport('joomla.log.log');
-		\Joomla\CMS\Log\Log::addLogger(
+		JLog::addLogger(
 			array(
 				'text_file' => $log_filename,  // Sets the target log file
 				'text_entry_format' => '{DATETIME} {PRIORITY} {MESSAGE}'  // Sets the format of each line
 			),
-			\Joomla\CMS\Log\Log::ALL,  // Sets messages of all log levels to be sent to the file
+			JLog::ALL,  // Sets messages of all log levels to be sent to the file
 			array($log_category)  // category of logged messages
 		);
 
@@ -721,7 +721,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 				foreach ($errors as $error_message)
 				{
-					\Joomla\CMS\Log\Log::add($error_message, \Joomla\CMS\Log\Log::WARNING, $log_category);
+					JLog::add($error_message, JLog::WARNING, $log_category);
 				}
 			}
 
@@ -824,13 +824,13 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	 */
 	private function _getEditorModel()
 	{
-		$app    = \Joomla\CMS\Factory::getApplication();
+		$app    = JFactory::getApplication();
 		$jinput = $app->input;
 		$id = $jinput->getInt('id', 0);
 
 		if (!$id)
 		{
-			return \Joomla\CMS\Language\Text::_('Item not found');
+			return JText::_('Item not found');
 		}
 
 		$model = $this->getModel($this->record_name);
@@ -839,13 +839,13 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		if (!$item)
 		{
-			return \Joomla\CMS\Language\Text::_('Item not found');
+			return JText::_('Item not found');
 		}
 
 		// Task usage reversed for editors only
 		if (!$model->canEdit())
 		{
-			return \Joomla\CMS\Language\Text::_('FLEXI_NO_ACCESS_EDIT');
+			return JText::_('FLEXI_NO_ACCESS_EDIT');
 		}
 
 		return $model;

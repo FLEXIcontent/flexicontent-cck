@@ -62,24 +62,24 @@ $close_popup_js = FLEXI_J16GE ? "window.parent.SqueezeBox.close();" : "window.pa
 
 	<fieldset style="height: 92%;">
 		<legend style="font-size:12px; font-style:arial;" >
-			<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_IMPORT_TAGS' ); ?>
-			<img class="hasTooltip tags" data-placement="bottom" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_IMPORT_TAGS_DESC', true); ?>" style="float:none; margin:0 0 -4px 4px;" src="components/com_flexicontent/assets/images/information.png" border="0" alt="Note"/>
+			<?php echo JText::_( 'FLEXI_IMPORT_TAGS' ); ?>
+			<img class="hasTooltip tags" data-placement="bottom" title="<?php echo JText::_('FLEXI_IMPORT_TAGS_DESC', true); ?>" style="float:none; margin:0 0 -4px 4px;" src="components/com_flexicontent/assets/images/information.png" border="0" alt="Note"/>
 		</legend>
 		<textarea id="taglist" name="taglist" style="width: 84%; padding: 4%; margin: 0 4% 8px 4%; height: 90%"></textarea>
 	</fieldset>
 	<table width="100%" align="center">
 		<tr>
 			<td width="50%" align="right">
-			<input id="import" type="submit" class="btn btn-success" value="<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_IMPORT_TAGS_BUTTON' ); ?>" />
+			<input id="import" type="submit" class="btn btn-success" value="<?php echo JText::_( 'FLEXI_IMPORT_TAGS_BUTTON' ); ?>" />
 			</td>
 			<td width="50%" align="left">
-			<input type="button" class="btn" onclick="window.parent.document.adminForm.submit();<?php echo $close_popup_js;?>" value="<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_CLOSE_IMPORT_TAGS' ); ?>" />			
+			<input type="button" class="btn" onclick="window.parent.document.adminForm.submit();<?php echo $close_popup_js;?>" value="<?php echo JText::_( 'FLEXI_CLOSE_IMPORT_TAGS' ); ?>" />			
 			</td>
 		</tr>
 	</table>
 	<div id="log-bind"></div>
 
-	<?php echo \Joomla\CMS\HTML\HTMLHelper::_( 'form.token' ); ?>
+	<?php echo JHtml::_( 'form.token' ); ?>
 	<input type="hidden" name="option" value="com_flexicontent" />
 
 <?php if (FLEXI_J16GE) : ?>

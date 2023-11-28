@@ -17,18 +17,18 @@ use Joomla\String\StringHelper;
 /**
  * View class for the FLEXIcontent templates screen
  */
-class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
+class FlexicontentViewTemplate extends JViewLegacy
 {
 
 	function display($tpl = null)
 	{
 		// Initialise variables
-		$app      = \Joomla\CMS\Factory::getApplication();
+		$app      = JFactory::getApplication();
 		$jinput   = $app->input;
 		$option   = $jinput->getCmd('option');
-		$db       = \Joomla\CMS\Factory::getDbo();
-		$document = \Joomla\CMS\Factory::getDocument();
-		$user     = \Joomla\CMS\Factory::getUser();
+		$db       = JFactory::getDbo();
+		$document = JFactory::getDocument();
+		$user     = JFactory::getUser();
 
 		$use_jquery_sortable = true;
 
@@ -40,7 +40,7 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 		$layout  = $this->get( 'Data');
 		if (!$layout)
 		{
-			$app->redirect('index.php?option=com_flexicontent', \Joomla\CMS\Language\Text::_( 'Template not found: <b>' ) . $jinput->getString('folder', 'table') . '</b>');
+			$app->redirect('index.php?option=com_flexicontent', JText::_( 'Template not found: <b>' ) . $jinput->getString('folder', 'table') . '</b>');
 		}
 		$conf    = $this->get( 'LayoutConf');
 
@@ -63,22 +63,22 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 			$field->type_ids = !empty($field->reltypes)  ?  explode("," , $field->reltypes)  :  array();
 		}
 		$options = array();
-		$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  '',  \Joomla\CMS\Language\Text::_( 'FLEXI_ALL' ) );
+		$options[] = JHtml::_('select.option',  '',  JText::_( 'FLEXI_ALL' ) );
 		foreach ($contentTypes as $contentType) {
-			$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', $contentType->id, \Joomla\CMS\Language\Text::_( $contentType->name ) );
+			$options[] = JHtml::_('select.option', $contentType->id, JText::_( $contentType->name ) );
 		}
 		$fieldname = $elementid = 'content_type__au__';
 		$attribs = ' onchange="filterFieldList(\'%s\', \'%s\', \'%s\');" class="use_select2_lib" ';
-		$content_type_select = \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', '', $elementid );
+		$content_type_select = JHtml::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', '', $elementid );
 
 
 		// Create FIELD TYPE SELECTOR
-		//$ALL = StringHelper::strtoupper(\Joomla\CMS\Language\Text::_( 'FLEXI_ALL' )) . ' : ';
+		//$ALL = StringHelper::strtoupper(JText::_( 'FLEXI_ALL' )) . ' : ';
 		$fftypes = array();
-		$fftypes[] = array('value'=>'', 'text'=>\Joomla\CMS\Language\Text::_( 'FLEXI_ALL' ) );
-		//$fftypes[] = array('value' => 'BV', 'text' => $ALL . \Joomla\CMS\Language\Text::_('FLEXI_BACKEND_FIELDS'));
-		//$fftypes[] = array('value' => 'C',  'text' => $ALL . \Joomla\CMS\Language\Text::_('FLEXI_CORE_FIELDS'));
-		//$fftypes[] = array('value' => 'NC', 'text' => $ALL . \Joomla\CMS\Language\Text::_('FLEXI_CUSTOM_NON_CORE_FIELDS'));
+		$fftypes[] = array('value'=>'', 'text'=>JText::_( 'FLEXI_ALL' ) );
+		//$fftypes[] = array('value' => 'BV', 'text' => $ALL . JText::_('FLEXI_BACKEND_FIELDS'));
+		//$fftypes[] = array('value' => 'C',  'text' => $ALL . JText::_('FLEXI_CORE_FIELDS'));
+		//$fftypes[] = array('value' => 'NC', 'text' => $ALL . JText::_('FLEXI_CUSTOM_NON_CORE_FIELDS'));
 		$n = 0;
 		foreach ($fieldTypes as $field_group => $ft_types)
 		{
@@ -185,12 +185,12 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 		// ***
 
 		// Add css to document
-		!\Joomla\CMS\Factory::getLanguage()->isRtl()
-			? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
-			: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
-		!\Joomla\CMS\Factory::getLanguage()->isRtl()
-			? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
-			: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
+		!JFactory::getLanguage()->isRtl()
+			? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
+			: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
+		!JFactory::getLanguage()->isRtl()
+			? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
+			: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 
 		// Add JS frameworks
 		flexicontent_html::loadJQuery();
@@ -201,12 +201,12 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 		flexicontent_html::loadFramework('flexi-lib-form');
 
 		// Load custom behaviours: form validation, popup tooltips
-		\Joomla\CMS\HTML\HTMLHelper::_('behavior.formvalidator');  // load default validation JS to make sure it is overriden
-		\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip');
+		JHtml::_('behavior.formvalidator');  // load default validation JS to make sure it is overriden
+		JHtml::_('bootstrap.tooltip');
 
 		// Add js function to overload the joomla submitform validation
-		$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
-		$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
+		$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
+		$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
 
 
 		// *****************************
@@ -216,7 +216,7 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 		$perms = FlexicontentHelperPerm::getPerm();
 
 		if (!$perms->CanTemplates) {
-			$app->redirect('index.php?option=com_flexicontent', \Joomla\CMS\Language\Text::_( 'FLEXI_NO_ACCESS' ));
+			$app->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
 		}
 
 
@@ -229,14 +229,14 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 		FLEXIUtilities::ManagerSideMenu('CanTemplates');
 
 		//create the toolbar
-		$bar = \Joomla\CMS\Toolbar\Toolbar::getInstance('toolbar');
-		\Joomla\CMS\Toolbar\ToolbarHelper::title( \Joomla\CMS\Language\Text::_( 'FLEXI_EDIT_TEMPLATE' ), 'eye' );
+		$bar = JToolbar::getInstance('toolbar');
+		JToolbarHelper::title( JText::_( 'FLEXI_EDIT_TEMPLATE' ), 'eye' );
 		if (!$ismodal) {
-			\Joomla\CMS\Toolbar\ToolbarHelper::apply('templates.apply');
-			\Joomla\CMS\Toolbar\ToolbarHelper::save('templates.save');
-			\Joomla\CMS\Toolbar\ToolbarHelper::cancel('templates.cancel');
+			JToolbarHelper::apply('templates.apply');
+			JToolbarHelper::save('templates.save');
+			JToolbarHelper::cancel('templates.cancel');
 		} else {
-			\Joomla\CMS\Toolbar\ToolbarHelper::apply('templates.apply_modal');
+			JToolbarHelper::apply('templates.apply_modal');
 			echo $bar->render();
 		}
 
@@ -247,7 +247,7 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 		// Create / load layout parameters if not already done above
 		if (!is_object($layout->params))
 		{
-			$jform = new \Joomla\CMS\Form\Form('com_flexicontent.template', array('control' => 'jform', 'load_data' => false));
+			$jform = new JForm('com_flexicontent.template', array('control' => 'jform', 'load_data' => false));
 			$jform->load($layout->params);
 			$layout->params = $jform;
 		}
@@ -296,7 +296,7 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 		$view = $layout->view;
 		$less_data = "/* This is created automatically, do NOT edit this manually! \nThis is used by _layout_type_ layout to save parameters as less variables. \nNOTE: Make sure that this is imported by 'config.less' \n to make a parameter be a LESS variable, edit parameter in _layout_type_.xml and add cssprep=\"less\" \n created parameters will be like: @FCLL_parameter_name: value; */\n\n";
 		$_less_auto = false;
-		if ( !\Joomla\CMS\Filesystem\File::exists($tmpldir . '/less/include/config_auto_'.$view.'.less') || filemtime($tmpldir . '/less/include/config_auto_'.$view.'.less') < filemtime($tmpldir . '/'.$view.'.xml') ) {
+		if ( !JFile::exists($tmpldir . '/less/include/config_auto_'.$view.'.less') || filemtime($tmpldir . '/less/include/config_auto_'.$view.'.less') < filemtime($tmpldir . '/'.$view.'.xml') ) {
 			$_less_auto = $tmpldir . '/less/include/config_auto_'.$view.'.less';
 			file_put_contents($_less_auto, str_replace("FCLL_", "FCI_", str_replace("_layout_type_", $view, $less_data)));
 		}
@@ -326,18 +326,18 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 		$tmpldir = JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$folder;
 
 		// Create less folders if they do not exist already
-		if ( !\Joomla\CMS\Filesystem\Folder::exists( $tmpldir . '/less' ) ) if ( !\Joomla\CMS\Filesystem\Folder::create( $tmpldir . '/less') )  JError::raiseWarning(100, \Joomla\CMS\Language\Text::_('Unable to create "/less/" folder'));
+		if ( !JFolder::exists( $tmpldir . '/less' ) ) if ( !JFolder::create( $tmpldir . '/less') )  JError::raiseWarning(100, JText::_('Unable to create "/less/" folder'));
 
 		// Abort if directory creation failed
-		if ( ! \Joomla\CMS\Filesystem\Folder::exists( $tmpldir . '/less' ) ) return;
+		if ( ! JFolder::exists( $tmpldir . '/less' ) ) return;
 
 
 		// ***********************************************************************
 		// Create CUSTOM config.less, that is include by item.less / category.less
 		// ************************************************************ ***********
 
-		if ( !\Joomla\CMS\Filesystem\Folder::exists( $tmpldir . '/less/include' ) ) if ( !\Joomla\CMS\Filesystem\Folder::create( $tmpldir . '/less/include') )  JError::raiseWarning(100, \Joomla\CMS\Language\Text::_('Unable to create "/less/include" folder'));
-		if ( !\Joomla\CMS\Filesystem\File::exists($tmpldir . '/less/include/config.less') ) {
+		if ( !JFolder::exists( $tmpldir . '/less/include' ) ) if ( !JFolder::create( $tmpldir . '/less/include') )  JError::raiseWarning(100, JText::_('Unable to create "/less/include" folder'));
+		if ( !JFile::exists($tmpldir . '/less/include/config.less') ) {
 			file_put_contents($tmpldir . '/less/include/config.less', "/* Place your less variables, mixins, etc, here \n1. This is commonly imported by files: item.less and category.less, \n2. If you add extra less file imports, then place files \ninside same folder for automatic compiling to be triggered */\n\n@import 'config_auto_item.less';\n@import 'config_auto_category.less';\n");
 		}
 
@@ -348,10 +348,10 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 
 		$less_files = array('/css/item.css'=>'/less/item.less', '/css/category.css'=>'/less/category.less');
 		foreach($less_files as $css_name => $less_name) {
-			if ( !\Joomla\CMS\Filesystem\File::exists($tmpldir . $css_name) )  continue;  // Do not try to copy CSS file that does not exist
-			if ( !\Joomla\CMS\Filesystem\File::exists($tmpldir . $less_name) ) {
-				if ( !\Joomla\CMS\Filesystem\File::copy($tmpldir.$css_name, $tmpldir.$less_name) ) {
-					JError::raiseWarning(100, \Joomla\CMS\Language\Text::_('Unable to create file: "'.$tmpldir.$less_name.'"'));
+			if ( !JFile::exists($tmpldir . $css_name) )  continue;  // Do not try to copy CSS file that does not exist
+			if ( !JFile::exists($tmpldir . $less_name) ) {
+				if ( !JFile::copy($tmpldir.$css_name, $tmpldir.$less_name) ) {
+					JError::raiseWarning(100, JText::_('Unable to create file: "'.$tmpldir.$less_name.'"'));
 				} else {
 					$file_data = "@import 'include/config.less';\n\n";
 					$file_data .= preg_replace("/[ \t]*\*zoom[\s]*:[\s]*expression[^\r\n]+[\r\n]+/u", "", file_get_contents($tmpldir.$less_name));  // copy and replace old invalid code

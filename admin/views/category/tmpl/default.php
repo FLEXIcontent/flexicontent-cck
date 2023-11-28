@@ -20,11 +20,11 @@ $tabCnt = array();
 $tabSetStack = array();
 
 //keep session alive while editing
-\Joomla\CMS\HTML\HTMLHelper::_('behavior.keepalive');
+JHtml::_('behavior.keepalive');
 
 // Load JS tabber lib
-$this->document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
-$this->document->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
+$this->document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
+$this->document->addStyleSheet(JUri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
 $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 $js = "
 	jQuery(document).ready(function(){
@@ -33,7 +33,7 @@ $js = "
 ";
 $this->document->addScriptDeclaration($js);
 //adding inline help
-if (FLEXI_J40GE) \Joomla\CMS\Toolbar\ToolbarHelper::inlinehelp();
+if (FLEXI_J40GE) JToolbarHelper::inlinehelp();
 ?>
 
 <div id="flexicontent" class="flexicontent fcconfig-form">
@@ -65,7 +65,7 @@ if (FLEXI_J40GE) \Joomla\CMS\Toolbar\ToolbarHelper::inlinehelp();
 	<div class="fctabber tabset_cat_props fcparams_tabset" id="tabset_cat_props">
 
 		<div class="tabbertab" id="tabset_cat_props_desc_tab" data-icon-class="icon-file-2" >
-			<h3 class="tabberheading"> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_BASIC' ); ?> </h3>
+			<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_BASIC' ); ?> </h3>
 
 			<div class="container-fluid row" style="padding: 0px !important; margin: 0px !important">
 
@@ -133,7 +133,7 @@ if (FLEXI_J40GE) \Joomla\CMS\Toolbar\ToolbarHelper::inlinehelp();
 						$fieldSet = $this->form->getFieldset('basic');
 
 						if (isset($fieldSet->description) && trim($fieldSet->description)) :
-							echo '<div class="fc-mssg fc-info">' . \Joomla\CMS\Language\Text::_($fieldSet->description) . '</div>';
+							echo '<div class="fc-mssg fc-info">' . JText::_($fieldSet->description) . '</div>';
 						endif;
 						?>
 
@@ -158,26 +158,26 @@ if (FLEXI_J40GE) \Joomla\CMS\Toolbar\ToolbarHelper::inlinehelp();
 
 
 		<div class="tabbertab" id="tabset_cat_props_metaseo_tab" data-icon-class="icon-bookmark" >
-			<h3 class="tabberheading"> <?php echo \Joomla\CMS\Language\Text::_('FLEXI_PUBLISHING') . ', ' . \Joomla\CMS\Language\Text::_('FLEXI_META'); ?> </h3>
+			<h3 class="tabberheading"> <?php echo JText::_('FLEXI_PUBLISHING') . ', ' . JText::_('FLEXI_META'); ?> </h3>
 
 			<div class="container-fluid row" style="padding: 0px !important; margin: 0px !important">
 
 				<div class="span6 col-6 full_width_980" style="max-width: 980px;">
-					<div class="fcsep_level1"><?php echo \Joomla\CMS\Language\Text::_('FLEXI_PUBLISHING'); ?></div>
+					<div class="fcsep_level1"><?php echo JText::_('FLEXI_PUBLISHING'); ?></div>
 					<div class="fcclear"></div>
 					
 
 					<?php /* No inheritage needed for these */ ?>
-					<?php echo \Joomla\CMS\Layout\LayoutHelper::render('joomla.edit.publishingdata', $this); ?>
+					<?php echo JLayoutHelper::render('joomla.edit.publishingdata', $this); ?>
 
 				</div>
 
 				<!--RIGHT COLUMN-->
 				<div class="span6 col-6 full_width_980" style="max-width: 980px;">
-					<div class="fcsep_level1"><?php echo \Joomla\CMS\Language\Text::_('FLEXI_META_SEO'); ?></div>
+					<div class="fcsep_level1"><?php echo JText::_('FLEXI_META_SEO'); ?></div>
 					<div class="fcclear"></div>
 
-					<?php /*echo \Joomla\CMS\Layout\LayoutHelper::render('joomla.edit.metadata', $this);*/ ?>
+					<?php /*echo JLayoutHelper::render('joomla.edit.metadata', $this);*/ ?>
 					<?php
 					$fieldnames_arr = array(
 						'metadesc' => null,
@@ -217,7 +217,7 @@ if (FLEXI_J40GE) \Joomla\CMS\Toolbar\ToolbarHelper::inlinehelp();
 		<?php if ($useAssocs) : ?>
 
 		<div class="tabbertab" id="tabset_cat_props_metaseo_tab" data-icon-class="icon-tree-2" >
-			<h3 class="tabberheading"> <?php echo \Joomla\CMS\Language\Text::_('FLEXI_ASSOCIATIONS'); ?> </h3>
+			<h3 class="tabberheading"> <?php echo JText::_('FLEXI_ASSOCIATIONS'); ?> </h3>
 
 			<?php echo $this->loadTemplate('associations'); ?>
 		</div><!-- tabbertab FLEXI_ASSOCIATIONS -->
@@ -227,19 +227,19 @@ if (FLEXI_J40GE) \Joomla\CMS\Toolbar\ToolbarHelper::inlinehelp();
 
 
 		<div class="tabbertab" id="tabset_cat_params_display_tab" data-icon-class="icon-screen fc-display-params-icon" >
-			<h3 class="tabberheading"> <?php echo \Joomla\CMS\Language\Text::_('FLEXI_DISPLAY'); ?> </h3>
+			<h3 class="tabberheading"> <?php echo JText::_('FLEXI_DISPLAY'); ?> </h3>
 
 
 			<div class="fctabber tabset_cat_params fcparams_tabset" id="tabset_cat_params">
 
 				<div class="tabbertab" id="tabset_cat_params_display_header_tab" data-icon-class="icon-info-circle fc-display-params-icon" >
-					<h3 class="tabberheading"> <?php echo \Joomla\CMS\Language\Text::_('FLEXI_CAT_DISPLAY_HEADER'); ?> </h3>
+					<h3 class="tabberheading"> <?php echo JText::_('FLEXI_CAT_DISPLAY_HEADER'); ?> </h3>
 
 					<?php
 					$fieldSet = $this->form->getFieldset('cats_display');
 
 					if (isset($fieldSet->description) && trim($fieldSet->description)) :
-						echo '<div class="fc-mssg fc-info">' . \Joomla\CMS\Language\Text::_($fieldSet->description) . '</div>';
+						echo '<div class="fc-mssg fc-info">' . JText::_($fieldSet->description) . '</div>';
 					endif;
 					?>
 
@@ -258,13 +258,13 @@ if (FLEXI_J40GE) \Joomla\CMS\Toolbar\ToolbarHelper::inlinehelp();
 
 
 				<div class="tabbertab" id="tabset_cat_params_search_filter_form_tab" data-icon-class="icon-search fc-display-params-icon" >
-					<h3 class="tabberheading"> <?php echo \Joomla\CMS\Language\Text::_('FLEXI_CAT_DISPLAY_SEARCH_FILTER_FORM'); ?> </h3>
+					<h3 class="tabberheading"> <?php echo JText::_('FLEXI_CAT_DISPLAY_SEARCH_FILTER_FORM'); ?> </h3>
 
 					<?php
 					$fieldSet = $this->form->getFieldset('cat_search_filter_form');
 
 					if (isset($fieldSet->description) && trim($fieldSet->description)) :
-						echo '<div class="fc-mssg fc-info">'.\Joomla\CMS\Language\Text::_($fieldSet->description).'</div>';
+						echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
 					endif;
 					?>
 
@@ -283,16 +283,16 @@ if (FLEXI_J40GE) \Joomla\CMS\Toolbar\ToolbarHelper::inlinehelp();
 
 
 				<div class="tabbertab" id="tabset_cat_params_layout_tab" data-icon-class="icon-palette fc-display-params-icon" >
-					<h3 class="tabberheading"> <?php echo \Joomla\CMS\Language\Text::_('FLEXI_LAYOUT'); ?> </h3>
+					<h3 class="tabberheading"> <?php echo JText::_('FLEXI_LAYOUT'); ?> </h3>
 
 					<span class="btn-group input-append" style="margin: 2px 0px 6px;">
-						<span id="fc-layouts-help_btn" class="btn" onclick="fc_toggle_box_via_btn('fc-layouts-help', this, 'btn-primary');" ><span class="icon-help"></span><?php echo \Joomla\CMS\Language\Text::_('JHELP'); ?></span>
+						<span id="fc-layouts-help_btn" class="btn" onclick="fc_toggle_box_via_btn('fc-layouts-help', this, 'btn-primary');" ><span class="icon-help"></span><?php echo JText::_('JHELP'); ?></span>
 					</span>
 					<div class="fcclear"></div>
 
 					<div class="fc-info fc-nobgimage fc-mssg-inline" id="fc-layouts-help" style="margin: 2px 0px!important; font-size: 12px; display: none;">
 						<h3 class="themes-title">
-							<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_PARAMETERS_LAYOUT_EXPLANATION' ); ?>
+							<?php echo JText::_( 'FLEXI_PARAMETERS_LAYOUT_EXPLANATION' ); ?>
 						</h3>
 						<b>NOTE:</b> Common method for -displaying- fields is by <b>editing the template layout</b> in template manager and placing the fields into <b>template positions</b>
 					</div>
@@ -326,10 +326,10 @@ if (FLEXI_J40GE) \Joomla\CMS\Toolbar\ToolbarHelper::inlinehelp();
 					<div class="fctabber tabset_cat_props" id="tabset_layout">
 
 						<div class="tabbertab" id="tabset_layout_params_tab" data-icon-class="icon-palette" >
-							<h3 class="tabberheading"> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_LAYOUT_PARAMETERS' ); ?> </h3>
+							<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_LAYOUT_PARAMETERS' ); ?> </h3>
 
 							<div class="fc-success fc-mssg-inline" style="font-size: 12px; margin: 8px 0 !important;" id="__category_inherited_layout__">
-								<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_TMPL_USING_INHERITED_CATEGORY_LAYOUT' ). ': <b>'. $this->iparams->get('clayout') .'</b>'; ?>
+								<?php echo JText::_( 'FLEXI_TMPL_USING_INHERITED_CATEGORY_LAYOUT' ). ': <b>'. $this->iparams->get('clayout') .'</b>'; ?>
 							</div>
 							<div class="fcclear"></div>
 
@@ -338,8 +338,8 @@ if (FLEXI_J40GE) \Joomla\CMS\Toolbar\ToolbarHelper::inlinehelp();
 							<div class="fc-sliders-plain-outer <?php echo $cat_layout ? 'fc_preloaded' : ''; ?>">
 								<?php
 								$slider_set_id = 'theme-sliders-' . $this->form->getValue('id');
-								//echo \Joomla\CMS\HTML\HTMLHelper::_('sliders.start', $slider_set_id, array('useCookie'=>1, 'show'=>1));
-								echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.startAccordion', $slider_set_id, array(/*'active' => ''*/));
+								//echo JHtml::_('sliders.start', $slider_set_id, array('useCookie'=>1, 'show'=>1));
+								echo JHtml::_('bootstrap.startAccordion', $slider_set_id, array(/*'active' => ''*/));
 
 								$groupname = 'attribs';  // Field Group name this is for name of <fields name="..." >
 
@@ -348,16 +348,16 @@ if (FLEXI_J40GE) \Joomla\CMS\Toolbar\ToolbarHelper::inlinehelp();
 									$form_layout = $tmpl->params;
 									$slider_title = '
 										<span class="btn"><i class="icon-edit"></i>
-											' . \Joomla\CMS\Language\Text::_('FLEXI_PARAMETERS_THEMES_SPECIFIC') . ' : ' . $tmpl->name . '
+											' . JText::_('FLEXI_PARAMETERS_THEMES_SPECIFIC') . ' : ' . $tmpl->name . '
 										</span>';
 									$slider_id = $tmpl->name . '-' . $groupname . '-options';
 
-									//echo \Joomla\CMS\HTML\HTMLHelper::_('sliders.panel', $slider_title, $slider_id);
-									echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addSlide', $slider_set_id, $slider_title, $slider_id);
+									//echo JHtml::_('sliders.panel', $slider_title, $slider_id);
+									echo JHtml::_('bootstrap.addSlide', $slider_set_id, $slider_title, $slider_id);
 
 									if (!$cat_layout || $tmpl->name !== $cat_layout)
 									{
-										echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endSlide');
+										echo JHtml::_('bootstrap.endSlide');
 										continue;
 									}
 
@@ -367,10 +367,10 @@ if (FLEXI_J40GE) \Joomla\CMS\Toolbar\ToolbarHelper::inlinehelp();
 
 										<?php
 										if (isset($fieldSet->label) && trim($fieldSet->label)) :
-											echo '<div style="margin:0 0 12px 0; font-size: 16px; background-color: #333; float:none;" class="fcsep_level0">'.\Joomla\CMS\Language\Text::_($fieldSet->label).'</div>';
+											echo '<div style="margin:0 0 12px 0; font-size: 16px; background-color: #333; float:none;" class="fcsep_level0">'.JText::_($fieldSet->label).'</div>';
 										endif;
 										if (isset($fieldSet->description) && trim($fieldSet->description)) :
-											echo '<div class="fc-mssg fc-info">'.\Joomla\CMS\Language\Text::_($fieldSet->description).'</div>';
+											echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
 										endif;
 
 										foreach ($form_layout->getFieldset($fsname) as $field) :
@@ -418,7 +418,7 @@ if (FLEXI_J40GE) \Joomla\CMS\Toolbar\ToolbarHelper::inlinehelp();
 																)
 															)
 														) .
-														($cssprep ? ' <span class="icon-info hasTooltip" title="' . \Joomla\CMS\Language\Text::_('Used to auto-create a CSS styles file. To modify this, you can edit layout in template manager', true) . '"></span>' : '') . '
+														($cssprep ? ' <span class="icon-info hasTooltip" title="' . JText::_('Used to auto-create a CSS styles file. To modify this, you can edit layout in template manager', true) . '"></span>' : '') . '
 													</div>
 												</div>
 											';
@@ -428,11 +428,11 @@ if (FLEXI_J40GE) \Joomla\CMS\Toolbar\ToolbarHelper::inlinehelp();
 										</fieldset>
 
 									<?php endforeach; //fieldSets ?>
-									<?php echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endSlide'); ?>
+									<?php echo JHtml::_('bootstrap.endSlide'); ?>
 
 								<?php endforeach; //tmpls ?>
 
-								<?php echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endAccordion'); //echo \Joomla\CMS\HTML\HTMLHelper::_('sliders.end'); ?>
+								<?php echo JHtml::_('bootstrap.endAccordion'); //echo JHtml::_('sliders.end'); ?>
 
 							</div><!-- END class="fc-sliders-plain-outer" -->
 
@@ -440,7 +440,7 @@ if (FLEXI_J40GE) \Joomla\CMS\Toolbar\ToolbarHelper::inlinehelp();
 
 
 						<div class="tabbertab" id="tabset_layout_switcher_tab" data-icon-class="icon-grid" >
-							<h3 class="tabberheading"> <?php echo \Joomla\CMS\Language\Text::_('FLEXI_CATEGORY_LAYOUT_SWITCHER'); ?> </h3>
+							<h3 class="tabberheading"> <?php echo JText::_('FLEXI_CATEGORY_LAYOUT_SWITCHER'); ?> </h3>
 
 							<?php
 							$_p = & $this->row->params;
@@ -475,13 +475,13 @@ if (FLEXI_J40GE) \Joomla\CMS\Toolbar\ToolbarHelper::inlinehelp();
 
 
 				<div class="tabbertab tabbertabdefault" id="tabset_cat_params_itemslist_tab" data-icon-class="icon-list-2 fc-display-params-icon" >
-					<h3 class="tabberheading"> <?php echo \Joomla\CMS\Language\Text::_('FLEXI_CAT_DISPLAY_ITEMS_LIST'); ?> </h3>
+					<h3 class="tabberheading"> <?php echo JText::_('FLEXI_CAT_DISPLAY_ITEMS_LIST'); ?> </h3>
 
 					<?php
 					$fieldSet = $this->form->getFieldset('cat_items_list');
 
 					if (isset($fieldSet->description) && trim($fieldSet->description)) :
-						echo '<div class="fc-mssg fc-info">'.\Joomla\CMS\Language\Text::_($fieldSet->description).'</div>';
+						echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
 					endif;
 					?>
 
@@ -500,13 +500,13 @@ if (FLEXI_J40GE) \Joomla\CMS\Toolbar\ToolbarHelper::inlinehelp();
 
 
 				<div class="tabbertab" id="tabset_cat_params_rss_feeds_tab" data-icon-class="icon-feed fc-rss-params-icon" >
-					<h3 class="tabberheading"> <?php echo \Joomla\CMS\Language\Text::_('FLEXI_PARAMS_CAT_RSS_FEEDS'); ?> </h3>
+					<h3 class="tabberheading"> <?php echo JText::_('FLEXI_PARAMS_CAT_RSS_FEEDS'); ?> </h3>
 
 					<?php
 					$fieldSet = $this->form->getFieldset('cat_rss_feeds');
 
 					if (isset($fieldSet->description) && trim($fieldSet->description)) :
-						echo '<div class="fc-mssg fc-info">'.\Joomla\CMS\Language\Text::_($fieldSet->description).'</div>';
+						echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
 					endif;
 					?>
 
@@ -525,19 +525,19 @@ if (FLEXI_J40GE) \Joomla\CMS\Toolbar\ToolbarHelper::inlinehelp();
 
 
 				<div class="tabbertab" id="tabset_cat_props_params_handling_tab" data-icon-class="icon-wrench" >
-					<h3 class="tabberheading"> <?php echo (1 ? '&nbsp;' : \Joomla\CMS\Language\Text::_('FLEXI_PARAMETERS_HANDLING')); ?> </h3>
+					<h3 class="tabberheading"> <?php echo (1 ? '&nbsp;' : JText::_('FLEXI_PARAMETERS_HANDLING')); ?> </h3>
 
 					<div class="fcsep_level0 fc-nomargin" style="background-color: #444;">
-						<?php echo \Joomla\CMS\Language\Text::_('FLEXI_PARAMETERS_HANDLING'); ?>
+						<?php echo JText::_('FLEXI_PARAMETERS_HANDLING'); ?>
 					</div>
 
 					<span class="btn-group input-append" style="margin: 2px 0px 6px;">
-						<span id="fc-heritage-help_btn" class="btn" onclick="fc_toggle_box_via_btn('fc-heritage-help', this, 'btn-primary');" ><span class="icon-help"></span><?php echo \Joomla\CMS\Language\Text::_('FLEXI_HERITAGE_OVERRIDE_ORDER'); ?></span>
+						<span id="fc-heritage-help_btn" class="btn" onclick="fc_toggle_box_via_btn('fc-heritage-help', this, 'btn-primary');" ><span class="icon-help"></span><?php echo JText::_('FLEXI_HERITAGE_OVERRIDE_ORDER'); ?></span>
 					</span>
 					<div class="fcclear"></div>
 
 					<div class="fc-mssg fc-info fc-nobgimage" id="fc-heritage-help" style="margin: 2px 0px!important; font-size:12px; display: none;">
-						<?php echo \Joomla\CMS\Language\Text::_('FLEXI_CAT_PARAM_OVERRIDE_ORDER_DETAILS_INHERIT'); ?>
+						<?php echo JText::_('FLEXI_CAT_PARAM_OVERRIDE_ORDER_DETAILS_INHERIT'); ?>
 					</div>
 					<div class="fcclear"></div>
 
@@ -568,13 +568,13 @@ if (FLEXI_J40GE) \Joomla\CMS\Toolbar\ToolbarHelper::inlinehelp();
 
 
 		<div class="tabbertab" id="tabset_cat_props_content_notifications_tab" data-icon-class="icon-mail" >
-			<h3 class="tabberheading"> <?php echo \Joomla\CMS\Language\Text::_('FLEXI_NOTIFICATIONS_CONF'); ?> </h3>
+			<h3 class="tabberheading"> <?php echo JText::_('FLEXI_NOTIFICATIONS_CONF'); ?> </h3>
 
 			<?php
 			$fieldSet = $this->form->getFieldset('notifications_conf');
 
 			if (isset($fieldSet->description) && trim($fieldSet->description)) :
-				echo '<div class="fc-mssg fc-info">' . \Joomla\CMS\Language\Text::_($fieldSet->description) . '</div>';
+				echo '<div class="fc-mssg fc-info">' . JText::_($fieldSet->description) . '</div>';
 			endif;
 			?>
 
@@ -595,7 +595,7 @@ if (FLEXI_J40GE) \Joomla\CMS\Toolbar\ToolbarHelper::inlinehelp();
 			$fieldSet = $this->form->getFieldset('cat_notifications_conf');
 
 				if (isset($fieldSet->description) && trim($fieldSet->description)) :
-					echo '<div class="fc-mssg fc-info">' . \Joomla\CMS\Language\Text::_($fieldSet->description) . '</div>';
+					echo '<div class="fc-mssg fc-info">' . JText::_($fieldSet->description) . '</div>';
 				endif;
 
 				foreach ($fieldSet as $field) :
@@ -612,12 +612,12 @@ if (FLEXI_J40GE) \Joomla\CMS\Toolbar\ToolbarHelper::inlinehelp();
 			<?php else : ?>
 
 				<div class="fcsep_level0">
-					<?php echo \Joomla\CMS\Language\Text::_('FLEXI_NOTIFY_EMAIL_RECEPIENTS'); ?>
+					<?php echo JText::_('FLEXI_NOTIFY_EMAIL_RECEPIENTS'); ?>
 				</div>
 				<div class="fcclear"></div>
 
 				<div class="alert alert-info">
-					<?php echo \Joomla\CMS\Language\Text::_('FLEXI_INACTIVE_PER_CONTENT_CAT_NOTIFICATIONS_INFO'); ?>
+					<?php echo JText::_('FLEXI_INACTIVE_PER_CONTENT_CAT_NOTIFICATIONS_INFO'); ?>
 				</div>
 
 			<?php endif; ?>
@@ -628,7 +628,7 @@ if (FLEXI_J40GE) \Joomla\CMS\Toolbar\ToolbarHelper::inlinehelp();
 		<?php if ( $this->perms->CanRights ) : ?>
 
 		<div class="tabbertab fcperms_tab" id="tabset_cat_props_perms_tab" data-icon-class="icon-power-cord">
-			<h3 class="tabberheading"> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_PERMISSIONS' ); ?> </h3>
+			<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_PERMISSIONS' ); ?> </h3>
 
 			<div class="fc_tabset_inner">
 				<div id="access">
@@ -651,7 +651,7 @@ if (FLEXI_J40GE) \Joomla\CMS\Toolbar\ToolbarHelper::inlinehelp();
 	<input type="hidden" name="view" value="<?php echo $this->view; ?>" />
 	<input type="hidden" name="task" value="" />
 	<?php echo $this->form->getInput('extension'); ?>
-	<?php echo \Joomla\CMS\HTML\HTMLHelper::_( 'form.token' ); ?>
+	<?php echo JHtml::_( 'form.token' ); ?>
 
 
 </form>

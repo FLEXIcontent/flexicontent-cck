@@ -21,7 +21,7 @@ jimport('joomla.event.dispatcher');
  * @package     Joomla.Platform
  * @subpackage  Event
  * @link        http://docs.joomla.org/Tutorial:Plugins Plugin tutorials
- * @see         \Joomla\CMS\Plugin\CMSPlugin
+ * @see         JPlugin
  * @since       11.1
  */
 class FCDispatcher extends JEventDispatcher
@@ -44,7 +44,7 @@ class FCDispatcher extends JEventDispatcher
 		$this->debug = $debug;
 		
 		if ( !$this->prepContentFuncs ) {
-			$plgs = \Joomla\CMS\Plugin\PluginHelper::getPlugin('content');
+			$plgs = JPluginHelper::getPlugin('content');
 			$this->prepContentFuncs = array();
 			
 			if ($this->debug) {

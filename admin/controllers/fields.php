@@ -107,11 +107,11 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 	public function reorder($dir = null)
 	{
 		// Check for request forgeries
-		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
 
-		$app   = \Joomla\CMS\Factory::getApplication();
+		$app   = JFactory::getApplication();
 		$model = $this->getModel($this->record_name_pl);
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = JFactory::getUser();
 
 		// Calculate ACL access
 		$is_authorised = $user->authorise('flexicontent.orderfields', 'com_flexicontent');
@@ -120,7 +120,7 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 		if (!$is_authorised)
 		{
 			$app->setHeader('status', '403 Forbidden', true);
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
 			$app->redirect($this->returnURL);
 		}
 
@@ -137,11 +137,11 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 		if (!$model->move($dir, reset($filter_type)))
 		{
 			$app->setHeader('status', '500 Internal Server Error', true);
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ERROR_SAVING_ORDER') . ': ' . $model->getError(), 'error');
+			$app->enqueueMessage(JText::_('FLEXI_ERROR_SAVING_ORDER') . ': ' . $model->getError(), 'error');
 			$app->redirect($this->returnURL);
 		}
 
-		// Note we no longer set the somewhat redundant message: \Joomla\CMS\Language\Text::_('FLEXI_NEW_ORDERING_SAVED')
+		// Note we no longer set the somewhat redundant message: JText::_('FLEXI_NEW_ORDERING_SAVED')
 		$this->setRedirect($this->returnURL);
 	}
 
@@ -182,11 +182,11 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 	public function saveorder()
 	{
 		// Check for request forgeries
-		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
 
-		$app   = \Joomla\CMS\Factory::getApplication();
+		$app   = JFactory::getApplication();
 		$model = $this->getModel($this->record_name_pl);
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = JFactory::getUser();
 
 		// Calculate ACL access
 		$is_authorised = $user->authorise('flexicontent.orderfields', 'com_flexicontent');
@@ -195,7 +195,7 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 		if (!$is_authorised)
 		{
 			$app->setHeader('status', 403);
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
 			$app->redirect($this->returnURL);
 		}
 
@@ -211,11 +211,11 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 		if (!$model->saveorder($cid, $order, reset($filter_type)))
 		{
 			$app->setHeader('status', 500);
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ERROR_SAVING_ORDER') . ': ' . $model->getError(), 'error');
+			$app->enqueueMessage(JText::_('FLEXI_ERROR_SAVING_ORDER') . ': ' . $model->getError(), 'error');
 			$app->redirect($this->returnURL);
 		}
 
-		// Note we no longer set the somewhat redundant message: \Joomla\CMS\Language\Text::_('FLEXI_NEW_ORDERING_SAVED')
+		// Note we no longer set the somewhat redundant message: JText::_('FLEXI_NEW_ORDERING_SAVED')
 		$this->setRedirect($this->returnURL);
 	}
 
@@ -336,7 +336,7 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 
 
 	/**
-	 * Method for extra form validation after \Joomla\CMS\Form\Form validation is executed
+	 * Method for extra form validation after JForm validation is executed
 	 *
 	 * @param   array     $validated_data  The already jform-validated data of the record
 	 * @param   object    $model            The Model object of current controller instance
@@ -409,11 +409,11 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 	public function copy()
 	{
 		// Check for request forgeries
-		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
 
 		// Initialize variables
-		$app   = \Joomla\CMS\Factory::getApplication();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$app   = JFactory::getApplication();
+		$user  = JFactory::getUser();
 		$task   = $this->input->get('task', 'copy', 'cmd');
 		$option = $this->input->get('option', '', 'cmd');
 
@@ -427,7 +427,7 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 		// Check at least one item was selected
 		if (!count($cid))
 		{
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_SELECT_ITEMS'), 'error');
+			$app->enqueueMessage(JText::_('FLEXI_SELECT_ITEMS'), 'error');
 			$app->setHeader('status', 500, true);
 			$this->setRedirect($this->returnURL);
 
@@ -440,7 +440,7 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 		// Check access
 		if (!$is_authorised)
 		{
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
 			$app->setHeader('status', 403, true);
 			$this->setRedirect($this->returnURL);
 
@@ -489,7 +489,7 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 
 		if (!$ids_map)
 		{
-			$msg = \Joomla\CMS\Language\Text::_('FLEXI_FIELDS_COPY_FAILED');
+			$msg = JText::_('FLEXI_FIELDS_COPY_FAILED');
 			JError::raiseWarning(500, $model->getError());
 		}
 		else
@@ -498,25 +498,25 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 
 			if (count($ids_map))
 			{
-				$msg .= \Joomla\CMS\Language\Text::sprintf('FLEXI_FIELDS_COPY_SUCCESS', count($ids_map)) . ' ';
+				$msg .= JText::sprintf('FLEXI_FIELDS_COPY_SUCCESS', count($ids_map)) . ' ';
 			}
 
 			if (count($auth_cid) - count($ids_map))
 			{
-				// $msg .= \Joomla\CMS\Language\Text::sprintf('FLEXI_FIELDS_SKIPPED_DURING_COPY', count($auth_cid)-count($ids_map)) . ' ';
+				// $msg .= JText::sprintf('FLEXI_FIELDS_SKIPPED_DURING_COPY', count($auth_cid)-count($ids_map)) . ' ';
 			}
 
 			if (count($cid_locked))
 			{
-				$msg .= \Joomla\CMS\Language\Text::sprintf('FLEXI_FIELDS_CORE_FIELDS_NOT_COPIED', count($cid_locked)) . ' ';
+				$msg .= JText::sprintf('FLEXI_FIELDS_CORE_FIELDS_NOT_COPIED', count($cid_locked)) . ' ';
 			}
 
 			if (count($non_auth_cid))
 			{
-				$msg .= \Joomla\CMS\Language\Text::sprintf('FLEXI_FIELDS_UNEDITABLE_FIELDS_NOT_COPIED', count($non_auth_cid)) . ' ';
+				$msg .= JText::sprintf('FLEXI_FIELDS_UNEDITABLE_FIELDS_NOT_COPIED', count($non_auth_cid)) . ' ';
 			}
 
-			$cache = \Joomla\CMS\Factory::getCache('com_flexicontent');
+			$cache = JFactory::getCache('com_flexicontent');
 			$cache->clean();
 		}
 
@@ -525,7 +525,7 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 		if ($filter_type)
 		{
 			$app->setUserState($option . '.fields.filter_type', '');
-			$msg .= ' ' . \Joomla\CMS\Language\Text::_('FLEXI_TYPE_FILTER_CLEARED_TO_VIEW_NEW_FIELDS');
+			$msg .= ' ' . JText::_('FLEXI_TYPE_FILTER_CLEARED_TO_VIEW_NEW_FIELDS');
 		}
 
 		$this->setRedirect($this->returnURL, $msg);
@@ -573,10 +573,10 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 	function toggleprop($toggle_value = null)
 	{
 		// Check for request forgeries
-		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
 
-		$app   = \Joomla\CMS\Factory::getApplication();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$app   = JFactory::getApplication();
+		$user  = JFactory::getUser();
 
 		// Get model
 		$model = $this->getModel($this->record_name_pl);
@@ -590,7 +590,7 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 		// Check at least one item was selected
 		if (!count($cid))
 		{
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_SELECT_ITEMS'), 'error');
+			$app->enqueueMessage(JText::_('FLEXI_SELECT_ITEMS'), 'error');
 			$app->setHeader('status', 500, true);
 			$this->setRedirect($this->returnURL);
 
@@ -614,7 +614,7 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 		// Check access
 		if (!$is_authorised)
 		{
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
 			$app->setHeader('status', 403, true);
 			$this->setRedirect($this->returnURL);
 
@@ -631,7 +631,7 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 
 		if ($affected === false)
 		{
-			$msg = \Joomla\CMS\Language\Text::_('FLEXI_OPERATION_FAILED') . ' : ' . $model->getError();
+			$msg = JText::_('FLEXI_OPERATION_FAILED') . ' : ' . $model->getError();
 			throw new Exception($msg, 500);
 		}
 
@@ -642,13 +642,13 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 			'isadvsearch' => 'FLEXI_TOGGLE_ADV_TEXT_SEARCHABLE',
 			'isadvfilter' => 'FLEXI_TOGGLE_ADV_FILTERABLE'
 		);
-		$property_fullname = isset($prop_map[$propname]) ? "'" . \Joomla\CMS\Language\Text::_($prop_map[$propname]) . "'" : '';
+		$property_fullname = isset($prop_map[$propname]) ? "'" . JText::_($prop_map[$propname]) . "'" : '';
 
-		$msg = \Joomla\CMS\Language\Text::sprintf('FLEXI_FIELDS_TOGGLED_PROPERTY', $property_fullname, $affected);
+		$msg = JText::sprintf('FLEXI_FIELDS_TOGGLED_PROPERTY', $property_fullname, $affected);
 
 		if ($unsupported || $locked)
 		{
-			$msg .= '<br/>' . \Joomla\CMS\Language\Text::sprintf('FLEXI_FIELDS_TOGGLED_PROPERTY_FIELDS_SKIPPED', $unsupported + $locked, $unsupported, $locked);
+			$msg .= '<br/>' . JText::sprintf('FLEXI_FIELDS_TOGGLED_PROPERTY_FIELDS_SKIPPED', $unsupported + $locked, $unsupported, $locked);
 		}
 
 		// Clear dependent cache data
@@ -667,14 +667,14 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 	 */
 	function selectsearchflag()
 	{
-		$document = \Joomla\CMS\Factory::getDocument();
+		$document = JFactory::getDocument();
 		flexicontent_html::loadFramework('flexi-lib');
-		!\Joomla\CMS\Factory::getLanguage()->isRtl()
-			? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
-			: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
-		!\Joomla\CMS\Factory::getLanguage()->isRtl()
-			? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
-			: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
+		!JFactory::getLanguage()->isRtl()
+			? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
+			: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
+		!JFactory::getLanguage()->isRtl()
+			? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
+			: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 
 		$btn_class = 'btn';
 
@@ -709,14 +709,14 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 			function field_toggleprop(shortname, onoff)
 			{
 				if (window.parent.document.adminForm.boxchecked.value==0) {
-					alert("' . \Joomla\CMS\Language\Text::_('FLEXI_NO_ITEMS_SELECTED', true) . '");
+					alert("' . JText::_('FLEXI_NO_ITEMS_SELECTED', true) . '");
 					return false;
 				}
 				var fc_blocker_mssg = document.getElementsByClassName("fc_blocker_mssg")[0];
 				var fc_filter_form_blocker = document.getElementById("fc_filter_form_blocker");
 				var fc_blocker_bar = document.getElementsByClassName("fc_blocker_bar")[0];
 
-				fc_blocker_mssg.innerHTML = "' . \Joomla\CMS\Language\Text::_('FLEXI_LOADING') . '";
+				fc_blocker_mssg.innerHTML = "' . JText::_('FLEXI_LOADING') . '";
 				fc_filter_form_blocker.style.display = "block";
 				submit_progressbar(fc_blocker_bar);
 
@@ -731,31 +731,31 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 		foreach ($state as $shortname => $statedata)
 		{
 			$css = "width: auto; margin:0px 24px 12px 0px; text-align: left;";
-			$link = \Joomla\CMS\Uri\Uri::base(true) . "/index.php?option=com_flexicontent&task=fields.toggleprop&propname=" . $shortname . "&" . \Joomla\CMS\Session\Session::getFormToken() . "=1";
+			$link = JUri::base(true) . "/index.php?option=com_flexicontent&task=fields.toggleprop&propname=" . $shortname . "&" . JSession::getFormToken() . "=1";
 			$icon = $statedata['icon'];
 
 			if ($shortname == 'issearch')
 			{
-				echo '<h2>' . \Joomla\CMS\Language\Text::_('FLEXI_CONTENT_LISTS') . '</h2>';
+				echo '<h2>' . JText::_('FLEXI_CONTENT_LISTS') . '</h2>';
 			}
 			elseif ($shortname == 'isadvsearch')
 			{
-				echo '<h2>' . \Joomla\CMS\Language\Text::_('FLEXI_SEARCH_VIEW_CONF') . '</h2>';
+				echo '<h2>' . JText::_('FLEXI_SEARCH_VIEW_CONF') . '</h2>';
 			}
 			?>
 			
-			<div style="display: inline-block; min-width: 216px;" class="hasTooltip" data-placement="right" title="<?php echo \Joomla\CMS\Language\Text::_($statedata['desc']); ?>" style="font-size: 1rem;">
+			<div style="display: inline-block; min-width: 216px;" class="hasTooltip" data-placement="right" title="<?php echo JText::_($statedata['desc']); ?>" style="font-size: 1rem;">
 				<span class="icon-info"></span>
 				<span class="icon-<?php echo $icon; ?>"></span>
-				<?php echo \Joomla\CMS\Language\Text::_($statedata['name']); ?>
+				<?php echo JText::_($statedata['name']); ?>
 			</div>
 
 			<button style="<?php echo $css; ?>" class="<?php echo $btn_class . ' ' . $statedata['btn_class'] . ' btn-success'; ?>" onclick="field_toggleprop('<?php echo $shortname; ?>','on');">
-				<?php echo \Joomla\CMS\Language\Text::_('JON'); ?> 
+				<?php echo JText::_('JON'); ?> 
 			</button>
 
 			<button style="<?php echo $css; ?>" class="<?php echo $btn_class . ' ' . $statedata['btn_class'] . ' btn-danger'; ?>" onclick="field_toggleprop('<?php echo $shortname; ?>', 'off');">
-				<?php echo \Joomla\CMS\Language\Text::_('JOFF'); ?> 
+				<?php echo JText::_('JOFF'); ?> 
 			</button>
 
 			<?php

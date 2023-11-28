@@ -5,7 +5,7 @@ extract($displayData);
 
 // Get Favourites field configuration (if FIELD is empty then retrieve it)
 $favs_field = $field ?: reset(FlexicontentFields::getFieldsByIds(array(12)));
-$favs_field->parameters = new \Joomla\Registry\Registry($favs_field->attribs);
+$favs_field->parameters = new JRegistry($favs_field->attribs);
 
 $users_counter = (int) $favs_field->parameters->get('display_favoured_usercount', 0);
 $users_list_type = (int) $favs_field->parameters->get('display_favoured_userlist', 0);
@@ -26,7 +26,7 @@ if ( $users_list_type )
 {
   $uname = $users_list_type==1 ? "u.username" : "u.name";
 
-  $db	= \Joomla\CMS\Factory::getDbo();
+  $db	= JFactory::getDbo();
   $query = 'SELECT '.($users_list_type==1 ? "u.username" : "u.name")
     .' FROM #__flexicontent_favourites AS ff'
     .' LEFT JOIN #__users AS u ON u.id=ff.userid '

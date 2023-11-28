@@ -19,14 +19,13 @@ use Joomla\Database\DatabaseQuery;
 use Joomla\Event\DispatcherAwareInterface;
 use Joomla\Event\DispatcherAwareTrait;
 use Joomla\Event\DispatcherInterface;
-use \Joomla\CMS\Table\Table;
 
 jimport('joomla.access.rules');
 require_once('flexicontent_basetable.php');
 
 class _flexicontent_items_common extends flexicontent_basetable
 {
-	protected function __getAssetParentId(Table $table = null, $id = null)
+	protected function __getAssetParentId(JTable $table = null, $id = null)
 	{
 		// Initialise variables.
 		$assetId = null;
@@ -68,7 +67,7 @@ if (FLEXI_J30GE)
 {
 	class _flexicontent_items extends _flexicontent_items_common
 	{
-		protected function _getAssetParentId(Table $table = null, $id = null)
+		protected function _getAssetParentId(JTable $table = null, $id = null)
 		{
 			return parent::__getAssetParentId($table, $id);
 		}
@@ -191,7 +190,7 @@ class flexicontent_items extends _flexicontent_items
 	var $_allow_underscore = true;
 
 	var $_jtbls = array(
-		'#__content' => array('Content', 'Table', 'state'),
+		'#__content' => array('Content', 'JTable', 'state'),
 		'#__flexicontent_items_ext' => array('flexicontent_items_ext', '', false),
 		'#__flexicontent_items_tmp' => array('flexicontent_items_tmp', '', 'state'),
 	);
@@ -245,7 +244,7 @@ class flexicontent_items extends _flexicontent_items
 	/**
 	 * Constructor
 	 *
-	 * @param   \Joomla\Data\DataObjectbaseDriver  $db  Database driver object.
+	 * @param   JDatabaseDriver  $db  Database driver object.
 	 *
 	 * @since  3.3
 	 */
@@ -647,21 +646,21 @@ class flexicontent_items extends _flexicontent_items
 	 *
 	 * @return  mixed  Null if operation was satisfactory, otherwise returns an error string
 	 *
-	 * @see     Table:bind
+	 * @see     JTable:bind
 	 * @since   3.3
 	 */
 	public function bind($array, $ignore = '')
 	{
 		if (isset($array['images']) && is_array($array['images']))
 		{
-			$registry = new \Joomla\Registry\Registry;
+			$registry = new JRegistry;
 			$registry->loadArray($array['images']);
 			$array['images'] = (string)$registry;
 		}
 
 		if (isset($array['urls']) && is_array($array['urls']))
 		{
-			$registry = new \Joomla\Registry\Registry;
+			$registry = new JRegistry;
 			$registry->loadArray($array['urls']);
 			$array['urls'] = (string)$registry;
 		}
@@ -669,7 +668,7 @@ class flexicontent_items extends _flexicontent_items
 		// Bind parameters (params or attribs)
 		if (isset($array['attribs']) && is_array($array['attribs']))
 		{
-			$registry = new \Joomla\Registry\Registry;
+			$registry = new JRegistry;
 			$registry->loadArray($array['attribs']);
 			$array['attribs'] = (string)$registry;
 		}
@@ -677,7 +676,7 @@ class flexicontent_items extends _flexicontent_items
 		// Bind metadata
 		if (isset($array['metadata']) && is_array($array['metadata']))
 		{
-			$registry = new \Joomla\Registry\Registry;
+			$registry = new JRegistry;
 			$registry->loadArray($array['metadata']);
 			$array['metadata'] = (string)$registry;
 		}
@@ -685,7 +684,7 @@ class flexicontent_items extends _flexicontent_items
 		// Bind the rules.
 		if (isset($array['rules']) && is_array($array['rules']))
 		{
-			$rules = new \Joomla\CMS\Access\Rules($array['rules']);
+			$rules = new JAccessRules($array['rules']);
 			$this->setRules($rules);
 		}
 
@@ -694,7 +693,7 @@ class flexicontent_items extends _flexicontent_items
 
 
 	/**
-	 * Overloaded Table::store
+	 * Overloaded JTable::store
 	 *
 	 * @param   boolean  $updateNulls  True to update fields even if they are null.
 	 *
@@ -712,15 +711,15 @@ class flexicontent_items extends _flexicontent_items
 		$tk_tmp = $this->_tbl_key_tmp;
 
 		// Split the data to their actual DB table, (#__flexicontent_items_tmp duplicates non-TEXT data of #__content)
-		$record = Table::getInstance($this->_jtbls[$this->_tbl][0], $this->_jtbls[$this->_tbl][1]);
+		$record = JTable::getInstance($this->_jtbls[$this->_tbl][0], $this->_jtbls[$this->_tbl][1]);
 		$record->_tbl = $this->_tbl;
 		$record->_tbl_key = $k;
 
-		$record_ext = Table::getInstance($this->_jtbls[$this->_tbl_ext][0], $this->_jtbls[$this->_tbl_ext][1]);
+		$record_ext = JTable::getInstance($this->_jtbls[$this->_tbl_ext][0], $this->_jtbls[$this->_tbl_ext][1]);
 		$record_ext->_tbl = $this->_tbl_ext;
 		$record_ext->_tbl_key = $fk_ext;
 
-		$record_tmp = Table::getInstance($this->_jtbls[$this->_tbl_tmp][0], $this->_jtbls[$this->_tbl_tmp][1]);
+		$record_tmp = JTable::getInstance($this->_jtbls[$this->_tbl_tmp][0], $this->_jtbls[$this->_tbl_tmp][1]);
 		$record_tmp->_tbl = $this->_tbl_tmp;
 		$record_tmp->_tbl_key = $fk_tmp;
 
@@ -837,13 +836,13 @@ class flexicontent_items extends _flexicontent_items
 		$name  = $this->_getAssetName();
 		$title = $this->_getAssetTitle();
 
-		$asset = Table::getInstance('Asset');
+		$asset = JTable::getInstance('Asset');
 		$asset->loadByName($name);
 
 		// Check for an error.
 		if ($asset->getError())
 		{
-			\Joomla\CMS\Factory::getApplication()->enqueueMessage('Error saving permissions asset. ' . $error, 'Notice');
+			JFactory::getApplication()->enqueueMessage('Error saving permissions asset. ' . $error, 'Notice');
 			//$this->setError('Error saving permissions asset. ' .$asset->getError());
 			return true;
 		}
@@ -859,14 +858,14 @@ class flexicontent_items extends _flexicontent_items
 		$asset->name  = $name;
 		$asset->title = $title;
 
-		if ($this->_rules instanceof \Joomla\CMS\Access\Rules)
+		if ($this->_rules instanceof JAccessRules)
 		{
 			$asset->rules = (string) $this->_rules;
 		}
 
 		if (!$asset->check() || !$asset->store($updateNulls))
 		{
-			\Joomla\CMS\Factory::getApplication()->enqueueMessage('Error saving permissions asset. ' . $error, 'Notice');
+			JFactory::getApplication()->enqueueMessage('Error saving permissions asset. ' . $error, 'Notice');
 			//$this->setError('Error saving permissions asset. ' .$asset->getError());
 			return true;
 		}

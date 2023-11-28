@@ -119,7 +119,7 @@ foreach($displayed_at_tab as $fieldname => $_places)
 
 if ($field_n_places)
 {
-	$msg = \Joomla\CMS\Language\Text::sprintf( 'FLEXI_FORM_FIELDS_DISPLAYED_TWICE', implode('<br>', $field_n_places) );
+	$msg = JText::sprintf( 'FLEXI_FORM_FIELDS_DISPLAYED_TWICE', implode('<br>', $field_n_places) );
 	echo sprintf( $alert_box, '', 'error', '', $msg );
 }
 
@@ -192,7 +192,7 @@ $tabCnt[$tabSetCnt] = 0;
 $TAB_NAME = 'tab01'; 
 
 if ( count($tab_fields[$TAB_NAME]) ) :
-	$tab_lbl = isset($tab_titles[$TAB_NAME]) ? $tab_titles[$TAB_NAME] : \Joomla\CMS\Language\Text::_( 'FLEXI_DESCRIPTION' );
+	$tab_lbl = isset($tab_titles[$TAB_NAME]) ? $tab_titles[$TAB_NAME] : JText::_( 'FLEXI_DESCRIPTION' );
 	$tab_ico = isset($tab_icocss[$TAB_NAME]) ? $tab_icocss[$TAB_NAME] : 'icon-file-2';
 	$tab_cls = isset($tab_classes[$TAB_NAME]) ? $tab_classes[$TAB_NAME] : '';
 	?>
@@ -275,7 +275,7 @@ if ( count($tab_fields[$TAB_NAME]) ) : ?>
 		$fseticon = 'icon-pencil-2';
 	}
 
-	$tab_lbl = isset($tab_titles[$TAB_NAME]) && $tab_titles[$TAB_NAME] !== '_DEFAULT_' ? $tab_titles[$TAB_NAME] : \Joomla\CMS\Language\Text::_($fsetname);
+	$tab_lbl = isset($tab_titles[$TAB_NAME]) && $tab_titles[$TAB_NAME] !== '_DEFAULT_' ? $tab_titles[$TAB_NAME] : JText::_($fsetname);
 	$tab_ico = isset($tab_icocss[$TAB_NAME]) && $tab_icocss[$TAB_NAME] !== '_default_'? $tab_icocss[$TAB_NAME] : $fseticon;
 	$tab_cls = isset($tab_classes[$TAB_NAME]) ? $tab_classes[$TAB_NAME] : '';
 	$tab_cls = $tab_cls !== 'default-tab-box' ? $tab_cls : 'flexi-compatibility-tab-box';
@@ -333,16 +333,16 @@ foreach ($fieldSets as $name => $fieldSet) :
 	if (substr($name, 0, 7) !== 'fields-') continue;
 
 	$label = !empty($fieldSet->label) ? $fieldSet->label : 'COM_FLEXICONTENT_'.$name.'_FIELDSET_LABEL';
-	if ( \Joomla\CMS\Language\Text::_($label)=='COM_FLEXICONTENT_'.$name.'_FIELDSET_LABEL' ) $label = 'COM_CONTENT_'.$name.'_FIELDSET_LABEL';
+	if ( JText::_($label)=='COM_FLEXICONTENT_'.$name.'_FIELDSET_LABEL' ) $label = 'COM_CONTENT_'.$name.'_FIELDSET_LABEL';
 
 	$icon_class = 'icon-pencil-2';
 	$tab_cls = 'jcustom-' . $name . '-tab-box';
-	//echo \Joomla\CMS\HTML\HTMLHelper::_('sliders.panel', \Joomla\CMS\Language\Text::_($label), $name.'-options');
+	//echo JHtml::_('sliders.panel', JText::_($label), $name.'-options');
 	//echo "<h2>".$label. "</h2> " . "<h3>".$name. "</h3> ";
 	?>
 	<!-- CUSTOM parameters TABs -->
 	<div class="tabbertab <?php echo $tab_cls; ?>" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="<?php echo $icon_class; ?>">
-		<h3 class="tabberheading"> <?php echo \Joomla\CMS\Language\Text::_($label); ?> </h3>
+		<h3 class="tabberheading"> <?php echo JText::_($label); ?> </h3>
 
 		<div class="fc_tabset_inner">
 			<?php foreach ($this->form->getFieldset($name) as $field) : ?>
@@ -379,7 +379,7 @@ foreach ($fieldSets as $name => $fieldSet) :
 $TAB_NAME = 'tab03';
 
 if ( count($tab_fields[$TAB_NAME]) ) :
-	$tab_lbl = isset($tab_titles[$TAB_NAME]) ? $tab_titles[$TAB_NAME] : \Joomla\CMS\Language\Text::_( 'FLEXI_ASSIGNMENTS' );
+	$tab_lbl = isset($tab_titles[$TAB_NAME]) ? $tab_titles[$TAB_NAME] : JText::_( 'FLEXI_ASSIGNMENTS' );
 	$tab_ico = isset($tab_icocss[$TAB_NAME]) ? $tab_icocss[$TAB_NAME] : 'icon-signup';
 	$tab_cls = isset($tab_classes[$TAB_NAME]) ? $tab_classes[$TAB_NAME] : '';
 
@@ -435,7 +435,7 @@ $TAB_NAME = 'tab04';
 
 if ( count($tab_fields[$TAB_NAME]) ) : ?>
 	<?php
-	$tab_lbl = isset($tab_titles[$TAB_NAME]) ? $tab_titles[$TAB_NAME] : \Joomla\CMS\Language\Text::_( 'FLEXI_PUBLISHING' );
+	$tab_lbl = isset($tab_titles[$TAB_NAME]) ? $tab_titles[$TAB_NAME] : JText::_( 'FLEXI_PUBLISHING' );
 	$tab_ico = isset($tab_icocss[$TAB_NAME]) ? $tab_icocss[$TAB_NAME] : 'icon-calendar';
 	$tab_cls = isset($tab_classes[$TAB_NAME]) ? $tab_classes[$TAB_NAME] : '';
 
@@ -490,7 +490,7 @@ $TAB_NAME = 'tab05';
 
 if ( count($tab_fields[$TAB_NAME]) ) : ?>
 	<?php
-	$tab_lbl = isset($tab_titles[$TAB_NAME]) ? $tab_titles[$TAB_NAME] : \Joomla\CMS\Language\Text::_( 'FLEXI_META_SEO' );
+	$tab_lbl = isset($tab_titles[$TAB_NAME]) ? $tab_titles[$TAB_NAME] : JText::_( 'FLEXI_META_SEO' );
 	$tab_ico = isset($tab_icocss[$TAB_NAME]) ? $tab_icocss[$TAB_NAME] : 'icon-bookmark';
 	$tab_cls = isset($tab_classes[$TAB_NAME]) ? $tab_classes[$TAB_NAME] : '';
 
@@ -545,7 +545,7 @@ $TAB_NAME = 'tab06';
 
 if ( count($tab_fields[$TAB_NAME]) ) : ?>
 	<?php
-	$tab_lbl = isset($tab_titles[$TAB_NAME]) ? $tab_titles[$TAB_NAME] : \Joomla\CMS\Language\Text::_( 'FLEXI_DISPLAYING' );
+	$tab_lbl = isset($tab_titles[$TAB_NAME]) ? $tab_titles[$TAB_NAME] : JText::_( 'FLEXI_DISPLAYING' );
 	$tab_ico = isset($tab_icocss[$TAB_NAME]) ? $tab_icocss[$TAB_NAME] : 'icon-eye-open';
 	$tab_cls = isset($tab_classes[$TAB_NAME]) ? $tab_classes[$TAB_NAME] : '';
 	?>
@@ -579,7 +579,7 @@ $TAB_NAME = 'tab07';
 
 if ( count($tab_fields[$TAB_NAME]) ) : ?>
 	<?php
-	$tab_lbl = isset($tab_titles[$TAB_NAME]) ? $tab_titles[$TAB_NAME] : \Joomla\CMS\Language\Text::_( 'FLEXI_TEMPLATE' );
+	$tab_lbl = isset($tab_titles[$TAB_NAME]) ? $tab_titles[$TAB_NAME] : JText::_( 'FLEXI_TEMPLATE' );
 	$tab_ico = isset($tab_icocss[$TAB_NAME]) ? $tab_icocss[$TAB_NAME] : 'icon-palette';
 	$tab_cls = isset($tab_classes[$TAB_NAME]) ? $tab_classes[$TAB_NAME] : '';
 	?>
@@ -617,7 +617,7 @@ $TAB_NAME = 'tab08';
 
 if ( count($tab_fields[$TAB_NAME]) ) : ?>
 	<?php
-	$tab_lbl = isset($tab_titles[$TAB_NAME]) ? $tab_titles[$TAB_NAME] : \Joomla\CMS\Language\Text::_( 'FLEXI_VERSIONS' );
+	$tab_lbl = isset($tab_titles[$TAB_NAME]) ? $tab_titles[$TAB_NAME] : JText::_( 'FLEXI_VERSIONS' );
 	$tab_ico = isset($tab_icocss[$TAB_NAME]) ? $tab_icocss[$TAB_NAME] : 'icon-stack';
 	$tab_cls = isset($tab_classes[$TAB_NAME]) ? $tab_classes[$TAB_NAME] : '';
 

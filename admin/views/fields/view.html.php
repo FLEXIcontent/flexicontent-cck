@@ -34,13 +34,13 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 		 */
 
 		global $globalcats;
-		$app      = \Joomla\CMS\Factory::getApplication();
+		$app      = JFactory::getApplication();
 		$jinput   = $app->input;
-		$document = \Joomla\CMS\Factory::getDocument();
-		$user     = \Joomla\CMS\Factory::getUser();
-		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
-		$session  = \Joomla\CMS\Factory::getSession();
-		$db       = \Joomla\CMS\Factory::getDbo();
+		$document = JFactory::getDocument();
+		$user     = JFactory::getUser();
+		$cparams  = JComponentHelper::getParams('com_flexicontent');
+		$session  = JFactory::getSession();
+		$db       = JFactory::getDbo();
 
 		$option   = $jinput->getCmd('option', '');
 		$view     = $jinput->getCmd('view', '');
@@ -57,8 +57,8 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 		// Load Joomla language files of other extension
 		if (!empty($this->proxy_option))
 		{
-			\Joomla\CMS\Factory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
-			\Joomla\CMS\Factory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
+			JFactory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
+			JFactory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
 		}
 
 		// Get model
@@ -114,30 +114,30 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 			// Add css to document
 			if ($isAdmin)
 			{
-				!\Joomla\CMS\Factory::getLanguage()->isRtl()
-					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
-					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
-				!\Joomla\CMS\Factory::getLanguage()->isRtl()
-					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
-					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
+				!JFactory::getLanguage()->isRtl()
+					? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
+					: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
+				!JFactory::getLanguage()->isRtl()
+					? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
+					: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 			}
 			else
 			{
-				!\Joomla\CMS\Factory::getLanguage()->isRtl()
-					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
-					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
+				!JFactory::getLanguage()->isRtl()
+					? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
+					: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
 			}
 
 			// Add JS frameworks
 			flexicontent_html::loadFramework('select2');
 
 			// Load custom behaviours: form validation, popup tooltips
-			\Joomla\CMS\HTML\HTMLHelper::_('behavior.formvalidator');
-			\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip');
+			JHtml::_('behavior.formvalidator');
+			JHtml::_('bootstrap.tooltip');
 
 			// Add js function to overload the joomla submitform validation
-			$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
-			$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
+			$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
+			$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
 		}
 
 
@@ -149,9 +149,9 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 		FLEXIUtilities::ManagerSideMenu('CanFields');
 
 		// Create document/toolbar titles
-		$doc_title = \Joomla\CMS\Language\Text::_( 'FLEXI_FIELDS' );
+		$doc_title = JText::_( 'FLEXI_FIELDS' );
 		$site_title = $document->getTitle();
-		\Joomla\CMS\Toolbar\ToolbarHelper::title( $doc_title, 'puzzle' );
+		JToolbarHelper::title( $doc_title, 'puzzle' );
 		$document->setTitle($doc_title .' - '. $site_title);
 
 		// Create the toolbar
@@ -175,7 +175,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 		 */
 		foreach($types as $type)
 		{
-			$type->jname = \Joomla\CMS\Language\Text::_($type->name);
+			$type->jname = JText::_($type->name);
 		}
 
 		$rowsByIds    = array();
@@ -193,7 +193,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 			$rowsByIds[$id] = $row;
 
 			// Load field parameters
-			$row->parameters = new \Joomla\Registry\Registry($row->attribs);
+			$row->parameters = new JRegistry($row->attribs);
 
 			// Find ids of master fields (if any)
 			$cascade_after = (int) $row->parameters->get('cascade_after');
@@ -234,7 +234,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 			$id = $row->id;
 
 			// Handle displaying information: FIELDGROUP feature
-			$row->parameters = new \Joomla\Registry\Registry($row->attribs);
+			$row->parameters = new JRegistry($row->attribs);
 
 			$ingroup_fids = array_filter(preg_split('/[\s]*,[\s]*/', $row->parameters->get('fields')), function($v) { return (trim($v) !== ''); });
 			$ingroup_fids = ArrayHelper::toInteger($ingroup_fids);
@@ -292,26 +292,26 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 		 * Add usage information notices if these are enabled
 		 */
 
-		$conf_link = '<a href="index.php?option=com_config&amp;view=component&amp;component=com_flexicontent&amp;path=" class="' . $this->btn_sm_class . ' btn-info">'.\Joomla\CMS\Language\Text::_("FLEXI_CONFIG").'</a>';
+		$conf_link = '<a href="index.php?option=com_config&amp;view=component&amp;component=com_flexicontent&amp;path=" class="' . $this->btn_sm_class . ' btn-info">'.JText::_("FLEXI_CONFIG").'</a>';
 
 		if ($cparams->get('show_usability_messages', 1))
 		{
-			/*$conf_link = '<a href="index.php?option=com_config&view=component&component=com_flexicontent&path=" class="btn btn-info btn-small">'.\Joomla\CMS\Language\Text::_("FLEXI_CONFIG").'</a>';
+			/*$conf_link = '<a href="index.php?option=com_config&view=component&component=com_flexicontent&path=" class="btn btn-info btn-small">'.JText::_("FLEXI_CONFIG").'</a>';
 			$notice_content_type_order = $app->getUserStateFromRequest( $option.'.'.$view.'.notice_content_type_order',	'notice_content_type_order',	0, 'int' );
 			if (!$notice_content_type_order)
 			{
 				$app->setUserState( $option.'.'.$view.'.notice_content_type_order', 1 );
-				\Joomla\CMS\Factory::getDocument()->addStyleDeclaration("#system-message-container .alert.alert-info > .alert-heading { display:none; }");
+				JFactory::getDocument()->addStyleDeclaration("#system-message-container .alert.alert-info > .alert-heading { display:none; }");
 
-				$disable_use_notices = '<span class="fc-nowrap-box fc-disable-notices-box">'. \Joomla\CMS\Language\Text::_('FLEXI_USABILITY_MESSAGES_TURN_OFF_IN').' '.$conf_link.'</span><div class="fcclear"></div>';
-				$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_FILTER_BY_TYPE_BEFORE_ACTIONS') .' '. $disable_use_notices, 'notice');
+				$disable_use_notices = '<span class="fc-nowrap-box fc-disable-notices-box">'. JText::_('FLEXI_USABILITY_MESSAGES_TURN_OFF_IN').' '.$conf_link.'</span><div class="fcclear"></div>';
+				$app->enqueueMessage(JText::_('FLEXI_FILTER_BY_TYPE_BEFORE_ACTIONS') .' '. $disable_use_notices, 'notice');
 			}*/
 		}
 
 		$this->minihelp = '
 			<div id="fc-mini-help" class="fc-mssg fc-info" style="display:none; min-width: 600px;">
-				'.\Joomla\CMS\Language\Text::_('FLEXI_FILTER_BY_TYPE_BEFORE_ACTIONS') .' <br/><br/>
-				'.\Joomla\CMS\Language\Text::_('FLEXI_FIELDS_ORDER_NO_TYPE_FILTER_ACTIVE').'
+				'.JText::_('FLEXI_FILTER_BY_TYPE_BEFORE_ACTIONS') .' <br/><br/>
+				'.JText::_('FLEXI_FIELDS_ORDER_NO_TYPE_FILTER_ACTIVE').'
 			</div>
 		';
 
@@ -329,25 +329,25 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 			$o = clone($t);
 			if ($reOrderingActive)
 			{
-				$o->name = \Joomla\CMS\Language\Text::_('FLEXI_ITEM_FORM') . ' : ' . $o->name;
+				$o->name = JText::_('FLEXI_ITEM_FORM') . ' : ' . $o->name;
 			}
 			$options[] = $o;
 		}
-		array_unshift($options, (object) array('id' => 0, 'name' => ($reOrderingActive ? 'FLEXI_FILTERS' : '-')/*\Joomla\CMS\Language\Text::_('FLEXI_SELECT_TYPE')*/));
+		array_unshift($options, (object) array('id' => 0, 'name' => ($reOrderingActive ? 'FLEXI_FILTERS' : '-')/*JText::_('FLEXI_SELECT_TYPE')*/));
 
 		if (!$filter_type)
 		{
-			$_img_title = \Joomla\CMS\Language\Text::_('FLEXI_GLOBAL_ORDER', true);
-			$_img_title_desc = \Joomla\CMS\Language\Text::_('FLEXI_GLOBAL_ORDER_DESC', true);
+			$_img_title = JText::_('FLEXI_GLOBAL_ORDER', true);
+			$_img_title_desc = JText::_('FLEXI_GLOBAL_ORDER_DESC', true);
 		}
 		else
 		{
-			$_img_title = \Joomla\CMS\Language\Text::_('FLEXI_TYPE_ORDER', true);
-			$_img_title_desc = \Joomla\CMS\Language\Text::_('FLEXI_TYPE_ORDER_DESC', true);
+			$_img_title = JText::_('FLEXI_TYPE_ORDER', true);
+			$_img_title_desc = JText::_('FLEXI_TYPE_ORDER_DESC', true);
 		}
 
 		$lists['filter_type'] = $this->getFilterDisplay(array(
-			'label' => ($reOrderingActive ? \Joomla\CMS\Language\Text::_('FLEXI_ORDER') : \Joomla\CMS\Language\Text::_('FLEXI_TYPE')),
+			'label' => ($reOrderingActive ? JText::_('FLEXI_ORDER') : JText::_('FLEXI_TYPE')),
 			'label_extra_class' => ($reOrderingActive ? 'fc-lbl-inverted fc-lbl-short icon-info-2 ' . $this->popover_class : ''),
 			'label_extra_attrs' => array(
 				'data-placement' => 'bottom',
@@ -370,13 +370,13 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 
 		// Build orphaned/assigned filter
 		$options 	= array();
-		$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  '', '-'/*\Joomla\CMS\Language\Text::_( 'FLEXI_ALL_FIELDS' )*/ );
-		$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  'O', \Joomla\CMS\Language\Text::_( 'FLEXI_ORPHANED' ) );
-		$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  'A', \Joomla\CMS\Language\Text::_( 'FLEXI_ASSIGNED' ) );
+		$options[] = JHtml::_('select.option',  '', '-'/*JText::_( 'FLEXI_ALL_FIELDS' )*/ );
+		$options[] = JHtml::_('select.option',  'O', JText::_( 'FLEXI_ORPHANED' ) );
+		$options[] = JHtml::_('select.option',  'A', JText::_( 'FLEXI_ASSIGNED' ) );
 
 		$lists['filter_assigned'] = $this->getFilterDisplay(array(
-			'label' => \Joomla\CMS\Language\Text::_('FLEXI_ASSIGNED'),
-			'html' => \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist',
+			'label' => JText::_('FLEXI_ASSIGNED'),
+			'html' => JHtml::_('select.genericlist',
 				$options,
 				'filter_assigned', 
 				array(
@@ -393,12 +393,12 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 
 		// Build field-type filter
 		$fieldTypes = flexicontent_db::getFieldTypes($_grouped = true, $_usage=true, $_published=false);  // Field types with content type ASSIGNMENT COUNTING
-		$ALL = StringHelper::strtoupper(\Joomla\CMS\Language\Text::_( 'FLEXI_ALL' )) . ' : ';
+		$ALL = StringHelper::strtoupper(JText::_( 'FLEXI_ALL' )) . ' : ';
 		$options = array();
-		$options[] = array('value' => '', 'text' => '-'/*\Joomla\CMS\Language\Text::_( 'FLEXI_ALL_FIELDS_TYPE' )*/ );
-		$options[] = array('value' => 'BV', 'text' => $ALL . \Joomla\CMS\Language\Text::_( 'FLEXI_BACKEND_FIELDS' ) );
-		$options[] = array('value' => 'C',  'text' => $ALL . \Joomla\CMS\Language\Text::_( 'FLEXI_CORE_COREPROPS_FIELDS' ) );
-		$options[] = array('value' => 'NC', 'text' => $ALL . \Joomla\CMS\Language\Text::_( 'FLEXI_CUSTOM_NON_CORE_FIELDS' ));
+		$options[] = array('value' => '', 'text' => '-'/*JText::_( 'FLEXI_ALL_FIELDS_TYPE' )*/ );
+		$options[] = array('value' => 'BV', 'text' => $ALL . JText::_( 'FLEXI_BACKEND_FIELDS' ) );
+		$options[] = array('value' => 'C',  'text' => $ALL . JText::_( 'FLEXI_CORE_COREPROPS_FIELDS' ) );
+		$options[] = array('value' => 'NC', 'text' => $ALL . JText::_( 'FLEXI_CUSTOM_NON_CORE_FIELDS' ));
 		$n = 0;
 
 		foreach ($fieldTypes as $field_group => $ft_types)
@@ -417,7 +417,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 
 		// Build item type filter
 		$lists['filter_fieldtype'] = $this->getFilterDisplay(array(
-			'label' => \Joomla\CMS\Language\Text::_('FLEXI_FIELD_TYPE'),
+			'label' => JText::_('FLEXI_FIELD_TYPE'),
 			'label_extra_class' => ($reOrderingActive ? 'fc-lbl-inverted fc-lbl-short ' : ''),
 			'html' => flexicontent_html::buildfieldtypeslist(
 				$options,
@@ -435,21 +435,21 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 
 
 		// Build publication state filter
-		//$options = \Joomla\CMS\HTML\HTMLHelper::_('jgrid.publishedOptions');
+		//$options = JHtml::_('jgrid.publishedOptions');
 		$options = array();
 
 		foreach ($model_s->supported_conditions as $condition_value => $condition_name)
 		{
-			$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', $condition_value, \Joomla\CMS\Language\Text::_($condition_name));
+			$options[] = JHtml::_('select.option', $condition_value, JText::_($condition_name));
 		}
-		array_unshift($options, \Joomla\CMS\HTML\HTMLHelper::_('select.option', '', '-'/*'FLEXI_STATE'*/));
+		array_unshift($options, JHtml::_('select.option', '', '-'/*'FLEXI_STATE'*/));
 
 		$fieldname = 'filter_state';
 		$elementid = 'filter_state';
 
 		$lists[$elementid] = $this->getFilterDisplay(array(
-			'label' => \Joomla\CMS\Language\Text::_('FLEXI_STATE'),
-			'html' => \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist',
+			'label' => JText::_('FLEXI_STATE'),
+			'html' => JHtml::_('select.genericlist',
 				$options,
 				$fieldname,
 				array(
@@ -467,15 +467,15 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 
 
 		// Build access level filter
-		$options = \Joomla\CMS\HTML\HTMLHelper::_('access.assetgroups');
-		array_unshift($options, \Joomla\CMS\HTML\HTMLHelper::_('select.option', '', '-'/*'JOPTION_SELECT_ACCESS'*/));
+		$options = JHtml::_('access.assetgroups');
+		array_unshift($options, JHtml::_('select.option', '', '-'/*'JOPTION_SELECT_ACCESS'*/));
 
 		$fieldname = 'filter_access';
 		$elementid = 'filter_access';
 
 		$lists[$elementid] = $this->getFilterDisplay(array(
-			'label' => \Joomla\CMS\Language\Text::_('FLEXI_ACCESS'),
-			'html' => \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist',
+			'label' => JText::_('FLEXI_ACCESS'),
+			'html' => JHtml::_('select.genericlist',
 				$options,
 				$fieldname,
 				array(
@@ -530,7 +530,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 
 		if (!$jinput->getCmd('nosidebar'))
 		{
-			$this->sidebar = FLEXI_J30GE ? \Joomla\CMS\HTML\Helpers\Sidebar::render() : null;
+			$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		}
 
 		/**
@@ -554,11 +554,11 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 	 */
 	function setToolbar()
 	{
-		$user     = \Joomla\CMS\Factory::getUser();
-		$document = \Joomla\CMS\Factory::getDocument();
-		$toolbar  = \Joomla\CMS\Toolbar\Toolbar::getInstance('toolbar');
+		$user     = JFactory::getUser();
+		$document = JFactory::getDocument();
+		$toolbar  = JToolbar::getInstance('toolbar');
 		$perms    = FlexicontentHelperPerm::getPerm();
-		$session  = \Joomla\CMS\Factory::getSession();
+		$session  = JFactory::getSession();
 		$useAssocs= flexicontent_db::useAssociations();
 
 		$js = '';
@@ -566,7 +566,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 		$contrl = $this->ctrl . '.';
 		$contrl_s = $this->name_singular . '.';
 
-		$loading_msg = flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_LOADING') .' ... '. \Joomla\CMS\Language\Text::_('FLEXI_PLEASE_WAIT'), 2);
+		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
 
 		// Get if state filter is active
 		$model   = $this->getModel();
@@ -582,12 +582,12 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 
 		if ($hasCreate)
 		{
-			\Joomla\CMS\Toolbar\ToolbarHelper::addNew($contrl.'add');
+			JToolbarHelper::addNew($contrl.'add');
 		}
 
 		if (0 && $hasEdit)
 		{
-			\Joomla\CMS\Toolbar\ToolbarHelper::editList($contrl.'edit');
+			JToolbarHelper::editList($contrl.'edit');
 		}
 
 		$btn_arr = array();
@@ -599,9 +599,9 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 			unset($states_applicable[-2]);
 
 			/*
-			\Joomla\CMS\Toolbar\ToolbarHelper::publishList($contrl.'publish', 'JTOOLBAR_PUBLISH', true);
-			\Joomla\CMS\Toolbar\ToolbarHelper::unpublishList($contrl.'unpublish', 'JTOOLBAR_UNPUBLISH', true);
-			\Joomla\CMS\Toolbar\ToolbarHelper::archiveList($contrl.'archive', 'JTOOLBAR_ARCHIVE', true);
+			JToolbarHelper::publishList($contrl.'publish', 'JTOOLBAR_PUBLISH', true);
+			JToolbarHelper::unpublishList($contrl.'unpublish', 'JTOOLBAR_UNPUBLISH', true);
+			JToolbarHelper::archiveList($contrl.'archive', 'JTOOLBAR_ARCHIVE', true);
 			*/
 		}
 
@@ -613,47 +613,47 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 		{
 			$btn_arr = array();
 
-			//\Joomla\CMS\Toolbar\ToolbarHelper::deleteList(\Joomla\CMS\Language\Text::_('FLEXI_ARE_YOU_SURE'), $contrl.'remove');
-			$msg_alert   = \Joomla\CMS\Language\Text::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', \Joomla\CMS\Language\Text::_('FLEXI_DELETE'));
-			$msg_confirm = \Joomla\CMS\Language\Text::_('FLEXI_ARE_YOU_SURE');
+			//JToolbarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), $contrl.'remove');
+			$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_DELETE'));
+			$msg_confirm = JText::_('FLEXI_ARE_YOU_SURE');
 			$btn_task    = $contrl.'remove';
 			$extra_js    = "";
 			$btn_arr[] = flexicontent_html::addToolBarButton(
 				'FLEXI_RECORDS', 'delete', '', $msg_alert, $msg_confirm,
 				$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true,
 				$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? '_DDI_class_ ' . 'btn-warning' : '') . ' ' . $this->tooltip_class, 'icon-remove',
-				'data-placement="right" title="' . flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_ABOUT_DELETING_RECORDS_WITHOUT_ASSIGNMENTS'), 2) . '"', $auto_add = 0, $tag_type='button'
+				'data-placement="right" title="' . flexicontent_html::encodeHTML(JText::_('FLEXI_ABOUT_DELETING_RECORDS_WITHOUT_ASSIGNMENTS'), 2) . '"', $auto_add = 0, $tag_type='button'
 			);
 
 			if ($model::canDelRelated)
 			{
-				$msg_alert   = \Joomla\CMS\Language\Text::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', \Joomla\CMS\Language\Text::_('FLEXI_ASSIGNMENTS'));
-				$msg_confirm = \Joomla\CMS\Language\Text::_('FLEXI_ARE_YOU_SURE');
+				$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_ASSIGNMENTS'));
+				$msg_confirm = JText::_('FLEXI_ARE_YOU_SURE');
 				$btn_task    = $contrl.'remove_relations';
 				$extra_js    = "";
 				$btn_arr[] = flexicontent_html::addToolBarButton(
 					'FLEXI_ASSIGNMENTS', 'delete', '', $msg_alert, $msg_confirm,
 					$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true,
 					$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? '_DDI_class_ ' . 'btn-warning' : '') . ' ' . $this->tooltip_class, 'icon-remove',
-					'data-placement="right" title="' . flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_ABOUT_DELETING_ASSIGNMENTS'), 2) . '"', $auto_add = 0, $tag_type='button'
+					'data-placement="right" title="' . flexicontent_html::encodeHTML(JText::_('FLEXI_ABOUT_DELETING_ASSIGNMENTS'), 2) . '"', $auto_add = 0, $tag_type='button'
 				);
 
-				$msg_alert   = \Joomla\CMS\Language\Text::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', \Joomla\CMS\Language\Text::_('FLEXI_ASSIGNMENTS_N_RECORDS'));
-				$msg_confirm = \Joomla\CMS\Language\Text::_('FLEXI_ARE_YOU_SURE');
+				$msg_alert   = JText::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_ASSIGNMENTS_N_RECORDS'));
+				$msg_confirm = JText::_('FLEXI_ARE_YOU_SURE');
 				$btn_task    = $contrl.'remove_cascade';
 				$extra_js    = "";
 				$btn_arr[] = flexicontent_html::addToolBarButton(
 					'FLEXI_ASSIGNMENTS_N_RECORDS', 'delete', '', $msg_alert, $msg_confirm,
 					$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true,
 					$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? '_DDI_class_ ' . 'btn-warning' : '') . ' ' . $this->tooltip_class, 'icon-remove',
-					'data-placement="right" title="' . flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_ABOUT_DELETING_ASSIGNMENTS_N_RECORDS'), 2) . '"', $auto_add = 0, $tag_type='button'
+					'data-placement="right" title="' . flexicontent_html::encodeHTML(JText::_('FLEXI_ABOUT_DELETING_ASSIGNMENTS_N_RECORDS'), 2) . '"', $auto_add = 0, $tag_type='button'
 				);
 			}
 
 			$drop_btn = '
 				<button id="toolbar-delete" class="' . $this->btn_sm_class . ' dropdown-toggle btn-fcaction" data-toggle="dropdown" data-bs-toggle="dropdown">
-					<span title="'.\Joomla\CMS\Language\Text::_('FLEXI_DELETE').'" class="icon-delete"></span>
-					'.\Joomla\CMS\Language\Text::_('FLEXI_DELETE').'
+					<span title="'.JText::_('FLEXI_DELETE').'" class="icon-delete"></span>
+					'.JText::_('FLEXI_DELETE').'
 					<span class="caret"></span>
 				</button>';
 			array_unshift($btn_arr, $drop_btn);
@@ -664,7 +664,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 			if (isset($model_s->supported_conditions[-2]))
 			{
 				$states_applicable['T'] = 0;
-				//\Joomla\CMS\Toolbar\ToolbarHelper::trash($contrl.'trash');
+				//JToolbarHelper::trash($contrl.'trash');
 			}
 		}
 
@@ -678,18 +678,18 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 		if ($hasEdit)
 		{
 			$ctrl_task = '&task=fields.selectsearchflag';
-			$popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent'.$ctrl_task.'&tmpl=component';
+			$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent'.$ctrl_task.'&tmpl=component';
 
 			$btn_name = 'basicindex';
 				$full_js="var url = jQuery(this).data('taskurl'); fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 0, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
-							.$loading_msg."<\/span>'; window.location.reload(false)}, {'title': '".flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_TOGGLE_SEARCH_FLAG'), 2)."'}); return false;";
+							.$loading_msg."<\/span>'; window.location.reload(false)}, {'title': '".flexicontent_html::encodeHTML(JText::_('FLEXI_TOGGLE_SEARCH_FLAG'), 2)."'}); return false;";
 
 				flexicontent_html::addToolBarButton(
 					'FLEXI_TOGGLE_SEARCH_FLAG', $btn_name, $full_js,
-					$msg_alert = \Joomla\CMS\Language\Text::_('FLEXI_SELECT_FIELDS_TO_TOGGLE_PROPERTY'), $msg_confirm = '',
+					$msg_alert = JText::_('FLEXI_SELECT_FIELDS_TO_TOGGLE_PROPERTY'), $msg_confirm = '',
 					$btn_task='', $extra_js='', $btn_list=true, $btn_menu=true, $btn_confirm=false,
 					$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? $this->btn_iv_class : '') . ' ' . $this->popover_class, 'icon-upload',
-					'data-placement="right" data-taskurl="' . $popup_load_url .'" data-content="' . flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_MASS_TAGS_IMPORT_DESC'), 2) . '"', $auto_add = 1, $tag_type='button'
+					'data-placement="right" data-taskurl="' . $popup_load_url .'" data-content="' . flexicontent_html::encodeHTML(JText::_('FLEXI_MASS_TAGS_IMPORT_DESC'), 2) . '"', $auto_add = 1, $tag_type='button'
 				);
 
 		}
@@ -700,8 +700,8 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 		 */
 		if ($hasCopy)
 		{
-			\Joomla\CMS\Toolbar\ToolbarHelper::custom($contrl.'copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY');
-			\Joomla\CMS\Toolbar\ToolbarHelper::custom( $contrl.'copy_wvalues', 'copy_wvalues.png', 'copy_f2.png', 'FLEXI_COPY_WITH_VALUES' );
+			JToolbarHelper::custom($contrl.'copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY');
+			JToolbarHelper::custom( $contrl.'copy_wvalues', 'copy_wvalues.png', 'copy_f2.png', 'FLEXI_COPY_WITH_VALUES' );
 		}
 
 
@@ -711,14 +711,14 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 
 		$btn_arr = array();
 
-		//\Joomla\CMS\Toolbar\ToolbarHelper::checkin($contrl . 'checkin');
+		//JToolbarHelper::checkin($contrl . 'checkin');
 		$btn_task  = $contrl . 'checkin';
 		$btn_arr[] = flexicontent_html::addToolBarButton(
 			'JTOOLBAR_CHECKIN', $btn_name = 'checkin', $full_js = '',
 			$msg_alert = '', $msg_confirm = '',
 			$btn_task, $extra_js = '', $btn_list=true, $btn_menu=true, $btn_confirm=false,
 			$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? '_DDI_class_ ' . $this->btn_iv_class : '') . ' ' . $this->popover_class, $btn_icon='icon-checkin',
-			'data-placement="right" data-content="' . flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_MAINTENANCE_CHECKIN_DESC'), 2) . '"', $auto_add = 0, $tag_type='button'
+			'data-placement="right" data-content="' . flexicontent_html::encodeHTML(JText::_('FLEXI_MAINTENANCE_CHECKIN_DESC'), 2) . '"', $auto_add = 0, $tag_type='button'
 		);
 
 		$appsman_path = JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'appsman';
@@ -730,10 +730,10 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 			$extra_js = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; jQuery('<input>').attr({type: 'hidden', name: 'table', value: '" . $this->db_tbl . "'}).appendTo(jQuery(f));";
 			$btn_arr[] = flexicontent_html::addToolBarButton(
 				'Export now',
-				$btn_name, $full_js='', $msg_alert='', $msg_confirm=\Joomla\CMS\Language\Text::_('FLEXI_EXPORT_NOW_AS_XML'),
+				$btn_name, $full_js='', $msg_alert='', $msg_confirm=JText::_('FLEXI_EXPORT_NOW_AS_XML'),
 				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true,
 				$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? '_DDI_class_ ' . $this->btn_iv_class : '') . ' ' . $this->popover_class, $btn_icon,
-				'data-placement="right" data-content="' . flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_(''), 2) . '"', $auto_add = 0, $tag_type='button'
+				'data-placement="right" data-content="' . flexicontent_html::encodeHTML(JText::_(''), 2) . '"', $auto_add = 0, $tag_type='button'
 			);
 
 			$btn_icon = 'icon-box-add';
@@ -742,10 +742,10 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 			$extra_js = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; jQuery('<input>').attr({type: 'hidden', name: 'table', value: '" . $this->db_tbl . "'}).appendTo(jQuery(f));";
 			$btn_arr[] = flexicontent_html::addToolBarButton(
 				'Add to export',
-				$btn_name, $full_js='', $msg_alert='', $msg_confirm=\Joomla\CMS\Language\Text::_('FLEXI_ADD_TO_EXPORT_LIST'),
+				$btn_name, $full_js='', $msg_alert='', $msg_confirm=JText::_('FLEXI_ADD_TO_EXPORT_LIST'),
 				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true,
 				$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? '_DDI_class_ ' . $this->btn_iv_class : '') . ' ' . $this->popover_class, $btn_icon,
-				'data-placement="right" data-content="' . flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_(''), 2) . '"', $auto_add = 0, $tag_type='button'
+				'data-placement="right" data-content="' . flexicontent_html::encodeHTML(JText::_(''), 2) . '"', $auto_add = 0, $tag_type='button'
 			);
 
 			$btn_icon = 'icon-download';
@@ -756,7 +756,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 				'Export SQL', $btn_name, $full_js='', $msg_alert='', $msg_confirm='Field\'s configuration will be exported as SQL',
 				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true,
 				$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? '_DDI_class_ ' . $this->btn_iv_class : '') . ' ' . $this->popover_class, $btn_icon,
-				'data-placement="right" data-content="' . flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_(''), 2) . '"', $auto_add = 0, $tag_type='button'
+				'data-placement="right" data-content="' . flexicontent_html::encodeHTML(JText::_(''), 2) . '"', $auto_add = 0, $tag_type='button'
 			);
 
 			$btn_icon = 'icon-download';
@@ -767,7 +767,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 				'Export CSV', $btn_name, $full_js='', $msg_alert='', $msg_confirm='Field\'s configuration will be exported as CSV',
 				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true,
 				$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? '_DDI_class_ ' . $this->btn_iv_class : '') . ' ' . $this->popover_class, $btn_icon,
-				'data-placement="right" data-content="' . flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_(''), 2) . '"', $auto_add = 0, $tag_type='button'
+				'data-placement="right" data-content="' . flexicontent_html::encodeHTML(JText::_(''), 2) . '"', $auto_add = 0, $tag_type='button'
 			);
 		}
 
@@ -775,8 +775,8 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 		{
 			$drop_btn = '
 				<button id="toolbar-maintenance" class="' . $this->btn_sm_class . ' dropdown-toggle btn-fcaction" data-toggle="dropdown" data-bs-toggle="dropdown">
-					<span title="'.\Joomla\CMS\Language\Text::_('FLEXI_MAINTENANCE').'" class="icon-tools"></span>
-					'.\Joomla\CMS\Language\Text::_('FLEXI_MAINTENANCE').'
+					<span title="'.JText::_('FLEXI_MAINTENANCE').'" class="icon-tools"></span>
+					'.JText::_('FLEXI_MAINTENANCE').'
 					<span class="caret"></span>
 				</button>';
 
@@ -791,7 +791,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
 			$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
 			$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
-			\Joomla\CMS\Toolbar\ToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
+			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
 		}
 
 

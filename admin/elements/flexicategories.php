@@ -20,14 +20,14 @@
 defined('_JEXEC') or die('Restricted access');
 
 jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
-jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
+jimport('cms.html.select');    // JHtmlSelect
+jimport('joomla.form.field');  // JFormField
 
-//jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
-//\Joomla\CMS\Form\FormHelper::loadFieldClass('...');   // \Joomla\CMS\Form\FormField...
+//jimport('joomla.form.helper'); // JFormHelper
+//JFormHelper::loadFieldClass('...');   // JFormField...
 
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
-\Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
+JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 
 // Load the category class
 require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.categories.php');
@@ -45,7 +45,7 @@ flexicontent_html::loadFramework('select2');
  * @subpackage FLEXIcontent
  * @since 1.5
  */
-class JFormFieldFlexicategories extends \Joomla\CMS\Form\FormField
+class JFormFieldFlexicategories extends JFormField
 {
 	/**
 	 * Element name
@@ -126,7 +126,7 @@ class JFormFieldFlexicategories extends \Joomla\CMS\Form\FormField
 				document.getElementById(\'a_id_\' + name).value = value_list;
 			}';
 
-			\Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+			JFactory::getDocument()->addScriptDeclaration($js);
 		}
 		
 		$html = '';

@@ -20,10 +20,10 @@
 defined('_JEXEC') or die('Restricted access');
 
 jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
+jimport('cms.html.select');    // JHtmlSelect
 
-jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
-\Joomla\CMS\Form\FormHelper::loadFieldClass('list');   // \Joomla\CMS\Form\Field\ListField
+jimport('joomla.form.helper'); // JFormHelper
+JFormHelper::loadFieldClass('list');   // JFormFieldList
 
 /**
  * Renders the list of the content plugins
@@ -32,7 +32,7 @@ jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-class JFormFieldPluginlist extends \Joomla\CMS\Form\Field\ListField
+class JFormFieldPluginlist extends JFormFieldList
 {
 	/**
 	 * Element name
@@ -43,8 +43,8 @@ class JFormFieldPluginlist extends \Joomla\CMS\Form\Field\ListField
 
 	function getInput()
 	{
-		$doc = \Joomla\CMS\Factory::getDocument();
-		$db  = \Joomla\CMS\Factory::getDbo();
+		$doc = JFactory::getDocument();
+		$db  = JFactory::getDbo();
 		
 		$node = & $this->element;
 		$attributes = get_object_vars($node->attributes());
@@ -78,11 +78,11 @@ class JFormFieldPluginlist extends \Joomla\CMS\Form\Field\ListField
 		$plugins = array();
 		foreach ($plgs as $plg)
 		{
-			$plugins[] = \Joomla\CMS\HTML\Helpers\Select::option($plg->name, $plg->name); 
+			$plugins[] = JHtmlSelect::option($plg->name, $plg->name); 
 		}
 		
 		$attribs = ' class="use_select2_lib" multiple="multiple" size="5" ';
 		
-		return \Joomla\CMS\HTML\Helpers\Select::genericList($plugins, $fieldname, $attribs, 'value', 'text', $values, $element_id);
+		return JHtmlSelect::genericList($plugins, $fieldname, $attribs, 'value', 'text', $values, $element_id);
 	}
 }

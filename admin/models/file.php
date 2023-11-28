@@ -178,17 +178,17 @@ class FlexicontentModelFile extends FCModelAdmin
 	/**
 	 * Method to preprocess the form.
 	 *
-	 * @param   \Joomla\CMS\Form\Form   $form   A \Joomla\CMS\Form\Form object.
+	 * @param   JForm   $form   A JForm object.
 	 * @param   mixed   $data   The data expected for the form.
 	 * @param   string  $plugins_group  The name of the plugin group to import and trigger
 	 *
 	 * @return  void
 	 *
-	 * @see     \Joomla\CMS\Form\FormField
+	 * @see     JFormField
 	 * @since   1.6
 	 * @throws  Exception if there is an error in the form event.
 	 */
-	protected function preprocessForm(\Joomla\CMS\Form\Form $form, $data, $plugins_group = null)
+	protected function preprocessForm(JForm $form, $data, $plugins_group = null)
 	{
 		parent::preprocessForm($form, $data, $plugins_group);
 	}
@@ -229,12 +229,12 @@ class FlexicontentModelFile extends FCModelAdmin
 	public function canEdit($record = null, $user = null)
 	{
 		$record  = $record ?: $this->_record;
-		$user    = $user ?: \Joomla\CMS\Factory::getUser();
+		$user    = $user ?: JFactory::getUser();
 		$isOwner = $record && $user->id && $record->uploaded_by == $user->id;
 
 		if ($record->id && $record->estorage_fieldid < 0)
 		{
-			\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_( 'File is being moved to external storage, please edit later' ), 'warning');
+			JFactory::getApplication()->enqueueMessage(JText::_( 'File is being moved to external storage, please edit later' ), 'warning');
 			return false;
 		}
 
@@ -257,7 +257,7 @@ class FlexicontentModelFile extends FCModelAdmin
 	public function canEditState($record = null, $user = null)
 	{
 		$record  = $record ?: $this->_record;
-		$user    = $user ?: \Joomla\CMS\Factory::getUser();
+		$user    = $user ?: JFactory::getUser();
 		$isOwner = $record && $user->id && $record->uploaded_by == $user->id;
 
 		$canpublish = $user->authorise('flexicontent.publishfile', 'com_flexicontent');
@@ -278,7 +278,7 @@ class FlexicontentModelFile extends FCModelAdmin
 	public function canDelete($record = null)
 	{
 		$record  = $record ?: $this->_record;
-		$user    = \Joomla\CMS\Factory::getUser();
+		$user    = JFactory::getUser();
 		$isOwner = $record && $user->id && $record->uploaded_by == $user->id;
 
 		$candelete = $user->authorise('flexicontent.deletefile', 'com_flexicontent');
@@ -290,7 +290,7 @@ class FlexicontentModelFile extends FCModelAdmin
 
 
 	/**
-	 * Method to do some record / data preprocessing before call \Joomla\CMS\Table\Table::bind()
+	 * Method to do some record / data preprocessing before call JTable::bind()
 	 *
 	 * Note. Typically called inside this MODEL 's store()
 	 *
@@ -323,7 +323,7 @@ class FlexicontentModelFile extends FCModelAdmin
 
 
 	/**
-	 * Method to do some work after record has been loaded via \Joomla\CMS\Table\Table::load()
+	 * Method to do some work after record has been loaded via JTable::load()
 	 *
 	 * Note. Typically called inside this MODEL 's store()
 	 *

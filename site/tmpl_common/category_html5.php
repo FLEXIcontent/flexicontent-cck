@@ -4,19 +4,19 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 $page_classes  = '';
 $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 $page_classes .= ' fccategory fccat'.$this->category->id;
-$menu = \Joomla\CMS\Factory::getApplication()->getMenu()->getActive();
+$menu = JFactory::getApplication()->getMenu()->getActive();
 if ($menu) $page_classes .= ' menuitem'.$menu->id; 
 
 ?>
 <div id="flexicontent" class="flexicontent <?php echo $page_classes; ?>" >
 
 <!-- BOF buttons -->
-<?php if (\Joomla\CMS\Factory::getApplication()->input->getInt('print', 0)) : ?>
+<?php if (JFactory::getApplication()->input->getInt('print', 0)) : ?>
 
 	<?php if ($this->params->get('print_behaviour', 'auto') == 'auto') : ?>
 		<script>jQuery(document).ready(function(){ window.print(); });</script>
 	<?php	elseif ($this->params->get('print_behaviour') == 'button') : ?>
-		<input type='button' id='printBtn' name='printBtn' value='<?php echo \Joomla\CMS\Language\Text::_('Print');?>' class='btn btn-info' onclick='this.style.display="none"; window.print(); return false;'>
+		<input type='button' id='printBtn' name='printBtn' value='<?php echo JText::_('Print');?>' class='btn btn-info' onclick='this.style.display="none"; window.print(); return false;'>
 	<?php endif; ?>
 
 <?php else : ?>
@@ -118,7 +118,7 @@ if ($menu) $page_classes .= ' menuitem'.$menu->id;
 <!-- BOF item list display -->
 <?php
 	echo $this->loadTemplate('items_html5');
-	echo empty($this->items) && $this->getModel()->getState('limit') ? '<span class="fc_return_msg">'.\Joomla\CMS\Language\Text::sprintf('FLEXI_CLICK_HERE_TO_RETURN', '"JavaScript:window.history.back();"').'</span>' : "";
+	echo empty($this->items) && $this->getModel()->getState('limit') ? '<span class="fc_return_msg">'.JText::sprintf('FLEXI_CLICK_HERE_TO_RETURN', '"JavaScript:window.history.back();"').'</span>' : "";
 ?>
 <!-- BOF item list display -->
 

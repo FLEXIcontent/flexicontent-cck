@@ -21,14 +21,14 @@ defined('_JEXEC') or die('Restricted access');
 $records_name = 'items';
 $ctrl_task = 'task=search.';
 
-$app = \Joomla\CMS\Factory::getApplication();
+$app = JFactory::getApplication();
 $indexer_name = $app->input->get('indexer', 'advanced', 'cmd');
 $rebuildmode  = $app->input->get('rebuildmode', '', 'cmd');
 ?>
 
 <div>&nbsp;</div>
 <div style="heading">
-	<?php echo \Joomla\CMS\Language\Text::_('FLEXI_TASK_RUNNING'); ?> ... <?php echo FlexicontentFields::getPDFParser() ? 'Indexing PDF files enabled ...' : ''; ?> <br/>
+	<?php echo JText::_('FLEXI_TASK_RUNNING'); ?> ... <?php echo FlexicontentFields::getPDFParser() ? 'Indexing PDF files enabled ...' : ''; ?> <br/>
 	
 <script>
 jQuery(document).ready(function() {
@@ -92,7 +92,7 @@ jQuery(document).ready(function() {
 	var start_time = new Date().getTime();
 
 	jQuery.ajax({
-		url: "index.php?option=com_flexicontent&format=raw&<?php echo $ctrl_task; ?>countrows&indexer=<?php echo $indexer_name;?>&<?php echo \Joomla\CMS\Session\Session::getFormToken().'=1'; ?>",
+		url: "index.php?option=com_flexicontent&format=raw&<?php echo $ctrl_task; ?>countrows&indexer=<?php echo $indexer_name;?>&<?php echo JSession::getFormToken().'=1'; ?>",
 		success: function(response, status, xhr) {
 			var request_time = new Date().getTime() - start_time;
 			total_time += request_time;

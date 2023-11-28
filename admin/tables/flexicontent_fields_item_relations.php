@@ -18,7 +18,7 @@ defined('_JEXEC') or die('Restricted access');
  * @subpackage FLEXIcontent
  * @since 1.5
  */
-class flexicontent_fields_item_relations extends \Joomla\CMS\Table\Table
+class flexicontent_fields_item_relations extends JTable
 {
 	/**
 	 * Primary Key
@@ -86,10 +86,10 @@ class flexicontent_fields_item_relations extends \Joomla\CMS\Table\Table
 
 
 	/**
-	 * Method to store a row in the database from the \Joomla\CMS\Table\Table instance properties.
+	 * Method to store a row in the database from the JTable instance properties.
 	 *
 	 * If a primary key value is set the row with that primary key value will be updated with the instance property values.
-	 * If no primary key value is set a new row will be inserted into the database with the properties from the \Joomla\CMS\Table\Table instance.
+	 * If no primary key value is set a new row will be inserted into the database with the properties from the JTable instance.
 	 *
 	 * @param   boolean  $updateNulls  True to update fields even if they are null.
 	 *

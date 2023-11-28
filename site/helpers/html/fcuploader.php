@@ -8,7 +8,7 @@
  */
 
 defined('_JEXEC') or die;
-\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip');
+JHtml::_('bootstrap.tooltip');
 
 
 /**
@@ -39,7 +39,7 @@ abstract class JHtmlFcuploader
 		$tBtn = $options['toggle_btn'];
 
 		isset($tBtn['class'])   || $tBtn['class']  = 'btn';
-		isset($tBtn['text'])    || $tBtn['text']   = '<span class="icon-upload"></span> ' . \Joomla\CMS\Language\Text::_('FLEXI_UPLOAD');
+		isset($tBtn['text'])    || $tBtn['text']   = '<span class="icon-upload"></span> ' . JText::_('FLEXI_UPLOAD');
 		isset($tBtn['onclick']) || $tBtn['onclick']= '';
 		isset($tBtn['action'])  || $tBtn['action'] = 'false';  // 'show', 'hide'
 
@@ -95,8 +95,8 @@ abstract class JHtmlFcuploader
 		$initialized[$up_tag_id] = true;
 
 		$defaults = array(
-			'action' => \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&task=filemanager.uploads'
-				. '&'.\Joomla\CMS\Session\Session::getFormToken().'=1' . '&fieldid='.($field ? $field->id : ''). '&u_item_id='.$u_item_id,
+			'action' => JUri::base(true) . '/index.php?option=com_flexicontent&task=filemanager.uploads'
+				. '&'.JSession::getFormToken().'=1' . '&fieldid='.($field ? $field->id : ''). '&u_item_id='.$u_item_id,
 			'upload_maxcount' => 0,
 			'autostart_on_select' => false,
 			'layout' => 'default',
@@ -121,20 +121,20 @@ abstract class JHtmlFcuploader
 		// *** Load plupload JS framework
 		// ***
 
-		$pluploadlib = \Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/librairies/plupload/';
+		$pluploadlib = JUri::root(true).'/components/com_flexicontent/librairies/plupload/';
 		$plupload_mode = 'runtime';  // 'runtime,ui'
 		flexicontent_html::loadFramework('plupload', $plupload_mode);
 		flexicontent_html::loadFramework('flexi-lib');
 
-		\Joomla\CMS\Language\Text::script("FLEXI_PREPARING_FILE_DATA", true);
-		\Joomla\CMS\Language\Text::script("FLEXI_UPLOAD_FINISHED", true);
-		\Joomla\CMS\Language\Text::script("FLEXI_LOADING_IMAGES", true);
-		\Joomla\CMS\Language\Text::script("FLEXI_THUMBNAILS", true);
-		\Joomla\CMS\Language\Text::script("FLEXI_UPLOADING", true);
-		\Joomla\CMS\Language\Text::script("FLEXI_PLEASE_WAIT", true);
-		\Joomla\CMS\Language\Text::script("FLEXI_FILE_PROPERTIES", true);
-		\Joomla\CMS\Language\Text::script("FLEXI_APPLYING_DOT", true);
-		\Joomla\CMS\Factory::getDocument()->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/plupload-extend.js', array('version' => FLEXI_VHASH));
+		JText::script("FLEXI_PREPARING_FILE_DATA", true);
+		JText::script("FLEXI_UPLOAD_FINISHED", true);
+		JText::script("FLEXI_LOADING_IMAGES", true);
+		JText::script("FLEXI_THUMBNAILS", true);
+		JText::script("FLEXI_UPLOADING", true);
+		JText::script("FLEXI_PLEASE_WAIT", true);
+		JText::script("FLEXI_FILE_PROPERTIES", true);
+		JText::script("FLEXI_APPLYING_DOT", true);
+		JFactory::getDocument()->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/plupload-extend.js', array('version' => FLEXI_VHASH));
 
 		// Add plupload Queue handling functions and initialize a plupload Queue
 		$js = '
@@ -185,7 +185,7 @@ abstract class JHtmlFcuploader
 		});
 		';
 
-		\Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+		JFactory::getDocument()->addScriptDeclaration($js);
 	}
 
 
@@ -205,8 +205,8 @@ abstract class JHtmlFcuploader
 			return $uops[$conf_index];
 		}
 		
-		$uconf = new \Joomla\Registry\Registry();
-		$uconf->merge(\Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent'));
+		$uconf = new JRegistry();
+		$uconf->merge(JComponentHelper::getParams('com_flexicontent'));
 
 		if (!empty($field))
 		{

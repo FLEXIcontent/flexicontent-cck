@@ -23,37 +23,37 @@ jimport('legacy.view.legacy');
 /**
  * View class for the FLEXIcontent item comparison screen
  */
-class FlexicontentViewItemcompare extends \Joomla\CMS\MVC\View\HtmlView {
+class FlexicontentViewItemcompare extends JViewLegacy {
 
 	function display($tpl = null)
 	{
-		$app      = \Joomla\CMS\Factory::getApplication();
+		$app      = JFactory::getApplication();
 		$jinput   = $app->input;
 		$option   = $jinput->getCmd('option');
-		$db       = \Joomla\CMS\Factory::getDbo();
-		$document = \Joomla\CMS\Factory::getDocument();
+		$db       = JFactory::getDbo();
+		$document = JFactory::getDocument();
 
 		// Initialise variables
 		$template   = $app->getTemplate();
 		$dispatcher = JEventDispatcher::getInstance();
 		$version    = $jinput->get('version', 0, 'int');
 		$codemode   = $jinput->getInt('codemode', 0);
-		$cparams    = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+		$cparams    = JComponentHelper::getParams('com_flexicontent');
 		$isAdmin    = $app->isClient('administrator');
 
 		// Add css to document
 		if ($isAdmin)
 		{
-			!\Joomla\CMS\Factory::getLanguage()->isRtl()
-				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
-				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
+			!JFactory::getLanguage()->isRtl()
+				? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
+				: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
 		}
-		!\Joomla\CMS\Factory::getLanguage()->isRtl()
-			? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
-			: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
+		!JFactory::getLanguage()->isRtl()
+			? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
+			: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 
 		// Fields common CSS
-		$document->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/css/flexi_form_fields.css', array('version' => FLEXI_VHASH));
+		$document->addStyleSheet(JUri::root(true).'/components/com_flexicontent/assets/css/flexi_form_fields.css', array('version' => FLEXI_VHASH));
 		
 		//a trick to avoid loosing general style in modal window
 		$document->addStyleDeclaration('
@@ -103,7 +103,7 @@ class FlexicontentViewItemcompare extends \Joomla\CMS\MVC\View\HtmlView {
 
 		// Get type parameters, these are needed besides the 'merged' item parameters, e.g. to get Type's default layout
 		$tparams = $model->getTypeparams();
-		$tparams = new \Joomla\Registry\Registry($tparams);
+		$tparams = new JRegistry($tparams);
 		
 		// Add html to field object trought plugins
 		foreach($fsets as $iver => $fields)

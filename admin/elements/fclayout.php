@@ -16,20 +16,20 @@ use Joomla\Utilities\ArrayHelper;
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
-jimport('joomla.filesystem.folder');  // \Joomla\CMS\Filesystem\Folder
-jimport('joomla.filesystem.file');    // \Joomla\CMS\Filesystem\File
+jimport('joomla.filesystem.folder');  // JFolder
+jimport('joomla.filesystem.file');    // JFile
 
 jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
-jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
+jimport('cms.html.select');    // JHtmlSelect
+jimport('joomla.form.field');  // JFormField
 
-jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
-\Joomla\CMS\Form\FormHelper::loadFieldClass('groupedlist');   // \Joomla\CMS\Form\Field\GroupedlistField
+jimport('joomla.form.helper'); // JFormHelper
+JFormHelper::loadFieldClass('groupedlist');   // JFormFieldGroupedList
 
 // Load JS tabber lib
-\Joomla\CMS\Factory::getDocument()->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
-\Joomla\CMS\Factory::getDocument()->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
-\Joomla\CMS\Factory::getDocument()->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
+JFactory::getDocument()->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
+JFactory::getDocument()->addStyleSheet(JUri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
+JFactory::getDocument()->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
 /**
  * Renders an HTML select list of FLEXIcontent layouts
@@ -38,7 +38,7 @@ jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
  * @subpackage  Form
  * @since       1.5
  */
-class JFormFieldFclayout extends \Joomla\CMS\Form\Field\GroupedlistField
+class JFormFieldFclayout extends JFormFieldGroupedList
 {
 	/**
 	 * The form field type.
@@ -70,7 +70,7 @@ class JFormFieldFclayout extends \Joomla\CMS\Form\Field\GroupedlistField
 		$value = $value ? $value : $attributes['default'];
 
 		// Get current extension and id being edited
-		$app    = \Joomla\CMS\Factory::getApplication();
+		$app    = JFactory::getApplication();
 		$jinput = $app->input;
 		$task   = $jinput->get('task', '', 'CMD');
 
@@ -116,7 +116,7 @@ class JFormFieldFclayout extends \Joomla\CMS\Form\Field\GroupedlistField
 		$use_default_label  = $use_default_label ?: 'JOPTION_USE_DEFAULT';
 
 		$layout_label = (string) @ $attributes['layout_label'];
-		$layout_label = \Joomla\CMS\Language\Text::_($layout_label ?: 'FLEXI_LAYOUT');
+		$layout_label = JText::_($layout_label ?: 'FLEXI_LAYOUT');
 
 		// Get the path which contains layouts
 		$ext_name   = (string) @ $attributes['ext_name'];
@@ -150,12 +150,12 @@ class JFormFieldFclayout extends \Joomla\CMS\Form\Field\GroupedlistField
 		if ($ext_view === 'module')
 		{
 			$groups[$grp_index]['id'] = $this->id . '__';
-			$groups[$grp_index]['text'] = $ext_view === 'module' ? \Joomla\CMS\Language\Text::sprintf('JOPTION_FROM_MODULE') : '';
+			$groups[$grp_index]['text'] = $ext_view === 'module' ? JText::sprintf('JOPTION_FROM_MODULE') : '';
 		}
 
 		// Prepend some default options based on field attributes.
-		if (!$hideNone)   $groups[$grp_index]['items'][] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '-1', \Joomla\CMS\Language\Text::alt('JOPTION_DO_NOT_USE', preg_replace('/[^a-zA-Z0-9_\-]/', '_', $this->fieldname)));
-		if (!$hideDefault) $groups[$grp_index]['items'][] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '', \Joomla\CMS\Language\Text::alt($use_default_label, preg_replace('/[^a-zA-Z0-9_\-]/', '_', $this->fieldname)));
+		if (!$hideNone)   $groups[$grp_index]['items'][] = JHtml::_('select.option', '-1', JText::alt('JOPTION_DO_NOT_USE', preg_replace('/[^a-zA-Z0-9_\-]/', '_', $this->fieldname)));
+		if (!$hideDefault) $groups[$grp_index]['items'][] = JHtml::_('select.option', '', JText::alt($use_default_label, preg_replace('/[^a-zA-Z0-9_\-]/', '_', $this->fieldname)));
 
 		// ***
 		// *** Get any additional options in the XML definition.
@@ -167,7 +167,7 @@ class JFormFieldFclayout extends \Joomla\CMS\Form\Field\GroupedlistField
 		{
 			$groups['extended'] = array();
 			$groups['extended']['id'] = $this->id . '_extended';
-			$groups['extended']['text'] =  \Joomla\CMS\Language\Text::_('Built-in');
+			$groups['extended']['text'] =  JText::_('Built-in');
 			$groups['extended']['items'] = $options;
 		}
 		*/
@@ -189,7 +189,7 @@ class JFormFieldFclayout extends \Joomla\CMS\Form\Field\GroupedlistField
 			foreach ($children as $sub_option)
 			{
 				$val  = (string) $sub_option->attributes()->value;
-				$text = \Joomla\CMS\Language\Text::_( (string) $sub_option );
+				$text = JText::_( (string) $sub_option );
 				$attr_arr = array();
 
 				// When filename cannot be calculated from 'value' e.g. value is an integer (legacy parameter value)
@@ -204,7 +204,7 @@ class JFormFieldFclayout extends \Joomla\CMS\Form\Field\GroupedlistField
 				if (isset($sub_option->attributes()->displayname))
 				{
 					$displayname = (string) $sub_option->attributes()->displayname;
-					$attr_arr['data-displayname']  = \Joomla\CMS\Language\Text::_($displayname);
+					$attr_arr['data-displayname']  = JText::_($displayname);
 				}
 
 				$disable = $sub_option->attributes()->disable ? true : false;
@@ -231,7 +231,7 @@ class JFormFieldFclayout extends \Joomla\CMS\Form\Field\GroupedlistField
 				$grp = (string) $grp;
 				$groups[$grp] = array();
 				$groups[$grp]['id'] = null;
-				$groups[$grp]['text'] = \Joomla\CMS\Language\Text::_($option->attributes()->label);
+				$groups[$grp]['text'] = JText::_($option->attributes()->label);
 				$groups[$grp]['items'] = $_options;
 				$last_was_grp = true;
 			}
@@ -248,7 +248,7 @@ class JFormFieldFclayout extends \Joomla\CMS\Form\Field\GroupedlistField
 		 * Get a list of files in the search path with the given filter.
 		 */
 
-		$files = \Joomla\CMS\Filesystem\Folder::files($path, $filter);
+		$files = JFolder::files($path, $filter);
 		$files = is_array($files) ? $files : array();
 		$files = array_flip($files);
 
@@ -256,8 +256,8 @@ class JFormFieldFclayout extends \Joomla\CMS\Form\Field\GroupedlistField
 		$groups['custom'] = array();
 		$groups['custom']['id'] = $this->id . '_custom';
 		$groups['custom']['text'] = $ext_view === 'module'
-			? \Joomla\CMS\Language\Text::sprintf('JOPTION_FROM_MODULE')
-			: \Joomla\CMS\Language\Text::_($custom_layouts_label ?: 'FLEXI_LAYOUTS');
+			? JText::sprintf('JOPTION_FROM_MODULE')
+			: JText::_($custom_layouts_label ?: 'FLEXI_LAYOUTS');
 		$groups['custom']['items'] = array();
 
 		$layout_files = array();
@@ -272,7 +272,7 @@ class JFormFieldFclayout extends \Joomla\CMS\Form\Field\GroupedlistField
 			// If the extension is to be stripped, do it.
 			if ($stripExt)
 			{
-				$file = \Joomla\CMS\Filesystem\File::stripExt($file);
+				$file = JFile::stripExt($file);
 			}
 
 			if (isset($core_layout_names[$file]))
@@ -348,7 +348,7 @@ flexicontent_html::loadJQuery();
 
 if ( ! @$attributes['skipparams'] )
 {
-		$doc 	= \Joomla\CMS\Factory::getDocument();
+		$doc 	= JFactory::getDocument();
 		$js 	= "
 
 ".($params_source=="file" ? "
@@ -409,7 +409,7 @@ function fc_getLayout_".$_name."(el, initial)
 
 	jQuery.ajax({
 		type: 'GET',
-		url: 'index.php?option=com_flexicontent&task=templates.getlayoutparams&ext_option=".$ext_option."&ext_view=".$ext_view."&ext_type=".$ext_type."&ext_name=".$ext_name."&layout_pfx=".$layout_pfx."&ext_id=".$pk."&directory=".$directory."&layout_sfx=".$layout_sfx."&layout_name='+filename+'&format=raw&" . \Joomla\CMS\Session\Session::getFormToken() . "=1',
+		url: 'index.php?option=com_flexicontent&task=templates.getlayoutparams&ext_option=".$ext_option."&ext_view=".$ext_view."&ext_type=".$ext_type."&ext_name=".$ext_name."&layout_pfx=".$layout_pfx."&ext_id=".$pk."&directory=".$directory."&layout_sfx=".$layout_sfx."&layout_name='+filename+'&format=raw&" . JSession::getFormToken() . "=1',
 		success: function(str) {
 			if (bs_tab_handle.length)
 			{
@@ -480,7 +480,7 @@ jQuery(document).ready(function(){
 		$selected = array($this->value);
 
 		// Create form element
-		return \Joomla\CMS\HTML\HTMLHelper::_('select.groupedlist', $groups, $fieldname,
+		return JHtml::_('select.groupedlist', $groups, $fieldname,
 			array(
 				'id' =>  $element_id,
 				'group.id' => 'id',
@@ -504,7 +504,7 @@ jQuery(document).ready(function(){
 	 */
 	protected function getModuleLayoutsFromTemplates(& $groups, $layout_files)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 
 		// Get the client id.
 		$clientId = $this->element['client_id'];
@@ -515,7 +515,7 @@ jQuery(document).ready(function(){
 		}
 		$clientId = (int) $clientId;
 
-		$client = \Joomla\CMS\Application\ApplicationHelper::getClientInfo($clientId);
+		$client = JApplicationHelper::getClientInfo($clientId);
 
 		// Get the module.
 		$module = (string) $this->element['module'];
@@ -563,7 +563,7 @@ jQuery(document).ready(function(){
 		$templates = $db->setQuery($query)->loadObjectList('element');
 
 		// Load 'sys' language file of current module
-		$lang = \Joomla\CMS\Factory::getLanguage();
+		$lang = JFactory::getLanguage();
 		$lang->load($module . '.sys', $client->path, null, false, true)
 			|| $lang->load($module . '.sys', $client->path . '/modules/' . $module, null, false, true);
 
@@ -574,10 +574,10 @@ jQuery(document).ready(function(){
 			$lang->load('tpl_' . $template->element . '.sys', $client->path, null, false, true)
 				|| $lang->load('tpl_' . $template->element . '.sys', $client->path . '/templates/' . $template->element, null, false, true);
 
-			$template_path = \Joomla\CMS\Filesystem\Path::clean($client->path . '/templates/' . $template->element . '/html/' . $module);
+			$template_path = JPath::clean($client->path . '/templates/' . $template->element . '/html/' . $module);
 
 			// Add the layout options from the template path.
-			if (is_dir($template_path) && ($files = \Joomla\CMS\Filesystem\Folder::files($template_path, '^[^_]*\.php$')))
+			if (is_dir($template_path) && ($files = JFolder::files($template_path, '^[^_]*\.php$')))
 			{
 				$is_override = array();
 				$display_overrides = true;
@@ -601,7 +601,7 @@ jQuery(document).ready(function(){
 					// Create the group for the template
 					$groups[$template->element] = array();
 					$groups[$template->element]['id'] = $this->id . '_' . $template->element;
-					$groups[$template->element]['text'] = \Joomla\CMS\Language\Text::sprintf('JOPTION_FROM_TEMPLATE', $template->name);
+					$groups[$template->element]['text'] = JText::sprintf('JOPTION_FROM_TEMPLATE', $template->name);
 					$groups[$template->element]['items'] = array();
 
 					foreach ($files as $i => $file)
@@ -609,10 +609,10 @@ jQuery(document).ready(function(){
 						// Add an option to the template group
 						$value = basename($file, '.php');
 						$text = $lang->hasKey($key = strtoupper('TPL_' . $template->element . '_' . $module . '_LAYOUT_' . $value))
-							? \Joomla\CMS\Language\Text::_($key)
+							? JText::_($key)
 							: $value;
 
-						//$groups[$template->element]['items'][] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', $template->element . ':' . $value, $text);
+						//$groups[$template->element]['items'][] = JHtml::_('select.option', $template->element . ':' . $value, $text);
 						$groups[$template->element]['items'][] = (object) array(
 							'value' => $template->element . ':' . $value,
 							'text'  => $text . (!empty($is_override[$i]) ? '  -- overrides builtin automatically' : ''),

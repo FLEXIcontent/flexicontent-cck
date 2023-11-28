@@ -65,7 +65,7 @@ class flexicontent_cats
 	 */
 	protected function getParentCats($all_cols=false)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 
 		$this->parentcats_data = array();
 		if (empty($this->parentcats_ids)) return;
@@ -90,10 +90,10 @@ class flexicontent_cats
 	 */
 	protected function buildParentCats($cid)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 
 		// ALTERNATIVE 1
-		/*$currcat = \Joomla\CMS\Categories\Categories::getInstance('Content')->get($cid);
+		/*$currcat = JCategories::getInstance('Content')->get($cid);
 		while ($currcat->id != 'root') {
 			$this->parentcats_ids[] = $currcat->id;
 			$currcat = $currcat->getParent();
@@ -147,7 +147,7 @@ class flexicontent_cats
 	public static function getCategoriesTree( $published_only = false, $parent_id = 0, $depth_limit=0 )
 	{
 		global $globalcats;
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 		
 		$allowed_catstates = is_array($published_only) ? $published_only : array();
 
@@ -328,9 +328,9 @@ class flexicontent_cats
 		global $globalcats;
 		if (!$globalcats) $globalcats = array();
 
-		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
-		$user = \Joomla\CMS\Factory::getUser();
-		$app  = \Joomla\CMS\Factory::getApplication();
+		$cparams = JComponentHelper::getParams('com_flexicontent');
+		$user = JFactory::getUser();
+		$app  = JFactory::getApplication();
 		$controller = $app->input->get('controller', '', 'cmd');
 		$task = $app->input->get('task', '', 'cmd');
 
@@ -346,7 +346,7 @@ class flexicontent_cats
 		$isSuperAdmin = $user->authorise('core.admin', 'root.1');
 
 		// Access levels granted to current user
-		$user_levels = array_flip(\Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id));
+		$user_levels = array_flip(JAccess::getAuthorisedViewLevels($user->id));
 
 		// Allowed category languages and allowed category states
 		$langs_allowed     = array_flip($allowed_langs);
@@ -445,28 +445,28 @@ class flexicontent_cats
 		// A tree to select: e.g. a parent category
 		if (!is_numeric($top) && strlen($top))
 		{
-			$catlist[] 	= \Joomla\CMS\HTML\HTMLHelper::_( 'select.option', '', $top );
+			$catlist[] 	= JHtml::_( 'select.option', '', $top );
 		}
 
 		else if ($top == 1)
 		{
-			$catlist[] 	= \Joomla\CMS\HTML\HTMLHelper::_( 'select.option', 1, \Joomla\CMS\Language\Text::_( 'FLEXI_TOPLEVEL' ));
+			$catlist[] 	= JHtml::_( 'select.option', 1, JText::_( 'FLEXI_TOPLEVEL' ));
 		}
 
 		// A tree to select a category
 		else if($top == 2 || $top == -1)
 		{
-			$catlist[] 	= \Joomla\CMS\HTML\HTMLHelper::_( 'select.option', '', \Joomla\CMS\Language\Text::_( $top==-1 ? '' : 'FLEXI_SELECT_CATEGORY' ));
+			$catlist[] 	= JHtml::_( 'select.option', '', JText::_( $top==-1 ? '' : 'FLEXI_SELECT_CATEGORY' ));
 		}
 
 		else if($top == 4)
 		{
-			$catlist[] 	= \Joomla\CMS\HTML\HTMLHelper::_( 'select.option', '', '- ' . \Joomla\CMS\Language\Text::_( 'FLEXI_DO_NOT_CHANGE' ) . ' -');
+			$catlist[] 	= JHtml::_( 'select.option', '', '- ' . JText::_( 'FLEXI_DO_NOT_CHANGE' ) . ' -');
 		}
 
 		else if($top == 5)
 		{
-			$catlist[] 	= \Joomla\CMS\HTML\HTMLHelper::_( 'select.option', '-99', '- ' . \Joomla\CMS\Language\Text::_( 'FLEXI_TRY_ASSOCIATED_CATEGORY' ) . ' -');
+			$catlist[] 	= JHtml::_( 'select.option', '-99', '- ' . JText::_( 'FLEXI_TRY_ASSOCIATED_CATEGORY' ) . ' -');
 		}
 
 		// A sub-tree where root category of the sub-tree should be excluded, in place of it a disabled prompt is added ... NOTE that:
@@ -476,14 +476,14 @@ class flexicontent_cats
 			// Backup first element's modified properties, so that we restore them later
 			$first_item = reset($list); //$first_key = key($list);
 			$_first_item_treename = $first_item->treename; $_first_item_title = $first_item->title; $_first_item_id = $first_item->id;
-			$first_item->treename = $first_item->title = \Joomla\CMS\Language\Text::_( 'FLEXI_SELECT_CATEGORY' );
+			$first_item->treename = $first_item->title = JText::_( 'FLEXI_SELECT_CATEGORY' );
 			$first_item->id = "";
 		}
 
 		// Extra custom options ... applies to all top parameters
 		foreach ($custom_options as $custom_value => $custom_option)
 		{
-			$catlist[] 	= \Joomla\CMS\HTML\HTMLHelper::_( 'select.option', $custom_value, '-- '.\Joomla\CMS\Language\Text::_( $custom_option ).' --');
+			$catlist[] 	= JHtml::_( 'select.option', $custom_value, '-- '.JText::_( $custom_option ).' --');
 		}
 
 
@@ -605,7 +605,7 @@ class flexicontent_cats
 					$parent_title = htmlspecialchars($parent_title, ENT_COMPAT, 'UTF-8');
 				}
 
-				//$catlist[] = \Joomla\CMS\HTML\HTMLHelper::_( 'select.option', $cat->id, $cat_title, array( 'attr' => array('title' => $parent_title), 'disable' => false) );
+				//$catlist[] = JHtml::_( 'select.option', $cat->id, $cat_title, array( 'attr' => array('title' => $parent_title), 'disable' => false) );
 				$catlist[] = (object) array(
 					'value' => $cat->id,
 					'text'  => $cat_title,
@@ -637,7 +637,7 @@ class flexicontent_cats
 
 		$html = $empty_errmsg && $cats_count==0 ?
 			'<div class="alert alert-error">'.$empty_errmsg.'</div>' :
-			\Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $catlist, $name, $sg_options )  // $catlist, $name, $attribs, 'value', 'text', $selected, $idtag )
+			JHtml::_('select.genericlist', $catlist, $name, $sg_options )  // $catlist, $name, $attribs, 'value', 'text', $selected, $idtag )
 			;
 		//echo '<pre>'; print_r($catlist); exit;
 
@@ -666,8 +666,8 @@ class flexicontent_cats
 	public static function getExtraCats($cids, $treeinclude, $curritemcats)
 	{
 		global $globalcats;
-		$app     = \Joomla\CMS\Factory::getApplication();
-		$user    = \Joomla\CMS\Factory::getUser();
+		$app     = JFactory::getApplication();
+		$user    = JFactory::getUser();
 		$fparams = $app->getParams('com_flexicontent');
 		$show_noauth = $fparams->get('show_noauth', 0);
 
@@ -711,13 +711,13 @@ class flexicontent_cats
 		$joinaccess = '';
 		$andaccess = '';
 		if (!$show_noauth) {
-			$aid_arr = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
 			$andaccess .= ' AND c.access IN ('.$aid_list.')';
 		}
 
 		// Filter categories (check that are published and that have ACCESS Level that is assinged to current user)
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 		$query = 'SELECT DISTINCT c.id'
 			.' FROM #__categories AS c'
 			.$joinaccess

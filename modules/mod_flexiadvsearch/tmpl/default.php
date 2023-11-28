@@ -19,12 +19,12 @@
 defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
-$app = \Joomla\CMS\Factory::getApplication();
-$doc = \Joomla\CMS\Factory::getDocument();
+$app = JFactory::getApplication();
+$doc = JFactory::getDocument();
 $tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 
 require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
-$action = \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getSearchRoute(0, $itemid), true);
+$action = JRoute::_(FlexicontentHelperRoute::getSearchRoute(0, $itemid), true);
 $form_id = "default_form_".$module->id;
 $form_name = "default_form_".$module->id;
 
@@ -207,12 +207,12 @@ if ($canseltypes)
 
 	if ($show_filters)
 	{
-		$types[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '', \Joomla\CMS\Language\Text::_('FLEXI_PLEASE_SELECT'));
+		$types[] = JHtml::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT'));
 	}
 
 	foreach($typeData as $type)
 	{
-		$types[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', $type->id, \Joomla\CMS\Language\Text::_($type->name));
+		$types[] = JHtml::_('select.option', $type->id, JText::_($type->name));
 	}
 
 	$attrs = array();
@@ -229,10 +229,10 @@ if ($canseltypes)
 		 $attrs['multiple'] = "multiple";
 	}
 	$attrs['size'] = "5";
-	$attrs['data-placeholder']    = htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_CLICK_TO_LIST', ENT_QUOTES, 'UTF-8'));
-	$attrs['data-fc_prompt_text'] = htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_TYPE_TO_FILTER', ENT_QUOTES, 'UTF-8'));
+	$attrs['data-placeholder']    = htmlspecialchars(JText::_('FLEXI_CLICK_TO_LIST', ENT_QUOTES, 'UTF-8'));
+	$attrs['data-fc_prompt_text'] = htmlspecialchars(JText::_('FLEXI_TYPE_TO_FILTER', ENT_QUOTES, 'UTF-8'));
 
-	$lists['contenttypes'] = \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist',
+	$lists['contenttypes'] = JHtml::_('select.genericlist',
 		$types,
 		'contenttypes[]',
 		$attrs,
@@ -255,19 +255,19 @@ if( $txtmode==2 && count($fields_text) )
 	{
 		foreach ($form_txtflds as $i => $form_txtfld)
 		{
-			$form_txtflds[$i] = \Joomla\CMS\Filter\InputFilter::getInstance()->clean($form_txtfld, 'string');
+			$form_txtflds[$i] = JFilterInput::getInstance()->clean($form_txtfld, 'string');
 		}
 	}
 
-	$lists['txtflds'] = \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist',
+	$lists['txtflds'] = JHtml::_('select.genericlist',
 		$fields_text,
 		'txtflds[]',
 		array(
 			'multiple' => 'multiple',
 			'size' => '5',
 			'class' => 'fc_field_filter use_select2_lib fc_prompt_internal fc_is_selmultiple',
-			'data-placeholder' => htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_CLICK_TO_LIST', ENT_QUOTES, 'UTF-8')),
-			'data-fc_prompt_text' => htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_TYPE_TO_FILTER', ENT_QUOTES, 'UTF-8')),
+			'data-placeholder' => htmlspecialchars(JText::_('FLEXI_CLICK_TO_LIST', ENT_QUOTES, 'UTF-8')),
+			'data-fc_prompt_text' => htmlspecialchars(JText::_('FLEXI_TYPE_TO_FILTER', ENT_QUOTES, 'UTF-8')),
 		),
 		'name',
 		'label',
@@ -336,7 +336,7 @@ $doc->addScriptDeclaration($js);
 	<fieldset id="modfcadvsearch_fc_advsearch_options_set_<?php echo $module->id;?>" class="fc_search_set">
 		<legend>
 			<span class="fc_legend_text <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_SEARCH_CONTENT_TYPE', 'FLEXI_SEARCH_CONTENT_TYPE_TIP', 1); ?>">
-				<span><?php echo \Joomla\CMS\Language\Text::_('FLEXI_SEARCH_CONTENT_TYPE'); ?></span>
+				<span><?php echo JText::_('FLEXI_SEARCH_CONTENT_TYPE'); ?></span>
 			</span>
 		</legend>
 
@@ -346,7 +346,7 @@ $doc->addScriptDeclaration($js);
 				<?php if($params->get('show_type_label', 1)): ?>
 				<td class="fc_search_label_cell">
 					<label for="contenttypes" class="label">
-						<?php echo \Joomla\CMS\Language\Text::_('FLEXI_SEARCH_CONTENT_TYPE'); ?>
+						<?php echo JText::_('FLEXI_SEARCH_CONTENT_TYPE'); ?>
 					</label>
 				</td>
 				<td class="fc_search_option_cell">
@@ -392,9 +392,9 @@ $doc->addScriptDeclaration($js);
 		$_label_internal = '';//'fc_label_internal';  // data-fc_label_text="..."
 		$text_search_class .= $search_autocomplete ? ($search_autocomplete==2 ? ' fc_index_complete_tlike '.$_ac_index : ' fc_index_complete_simple '.$_ac_index.' '.$_label_internal) : ' '.$_label_internal;
 
-		//$text_search_label = \Joomla\CMS\Language\Text::_($show_search_label==2 ? 'FLEXI_TEXT_SEARCH' : 'FLEXI_TYPE_TO_LIST');
-		$search_inner_width = \Joomla\CMS\Language\Text::_($params->get('search_inner_width', 20));
-		$search_inner_prompt = \Joomla\CMS\Language\Text::_($params->get('search_inner_prompt', 'FLEXI_ADV_MOD_SEARCH_PROMPT'));
+		//$text_search_label = JText::_($show_search_label==2 ? 'FLEXI_TEXT_SEARCH' : 'FLEXI_TYPE_TO_LIST');
+		$search_inner_width = JText::_($params->get('search_inner_width', 20));
+		$search_inner_prompt = JText::_($params->get('search_inner_prompt', 'FLEXI_ADV_MOD_SEARCH_PROMPT'));
 		$width = $params->get('width', 10);
 		$maxchars = $params->get('maxchars', 200);
 
@@ -408,14 +408,14 @@ $doc->addScriptDeclaration($js);
 
 		$output[] = '
 			<input type="'.($search_autocomplete==2 ? 'hidden' : 'text').'"
-				data-txt_ac_lang="' . \Joomla\CMS\Factory::getLanguage()->getTag() . '"
+				data-txt_ac_lang="' . JFactory::getLanguage()->getTag() . '"
 				id="mod_search_searchword-'.$module->id.'" class="'.$text_search_class.'"
 				placeholder="'.$search_inner_prompt.'" label="'.$search_inner_prompt.'"  name="q" '.($search_autocomplete==2 ? '' : ' size="'.$search_inner_width.'" maxlength="'.$maxchars.'"').' value="'.$searchword.'" aria-label="'.$search_inner_prompt.'"  />';
 
 		// Search's GO button
 		if ($button) :
 			if ($button_as) :
-				$button_html = '<input type="image" title="'.$button_text.'" class="'.(!$isInputGrp ? 'fc_filter_button' : '').$tooltip_class.' '.$flexi_button_class_go.'" src="' . \Joomla\CMS\Uri\Uri::root(true) . '/' . $button_image . '" onclick="this.form.q.focus();"/>';
+				$button_html = '<input type="image" title="'.$button_text.'" class="'.(!$isInputGrp ? 'fc_filter_button' : '').$tooltip_class.' '.$flexi_button_class_go.'" src="' . JUri::root(true) . '/' . $button_image . '" onclick="this.form.q.focus();"/>';
 			else :
 				$button_html = '<input type="submit" value="'.$button_text.'" class="'.(!$isInputGrp ? 'fc_filter_button' : '').' '.$flexi_button_class_go.'" onclick="this.form.q.focus();"/>';
 			endif;
@@ -438,7 +438,7 @@ $doc->addScriptDeclaration($js);
 				// hidden field, is workaround for image button not being able to submit a value
 				$direct_html = '
 					<input type="hidden" name="direct" value="" />
-					<input type="image" title="'.$direct_text.'" class="'.(!$isInputGrp ? 'fc_filter_button' : '').$tooltip_class.' '.$flexi_button_class_direct.'" src="' . \Joomla\CMS\Uri\Uri::root(true) . '/' . $direct_image . '" onclick="this.form.direct.value=1; this.form.q.focus();"/>
+					<input type="image" title="'.$direct_text.'" class="'.(!$isInputGrp ? 'fc_filter_button' : '').$tooltip_class.' '.$flexi_button_class_direct.'" src="' . JUri::root(true) . '/' . $direct_image . '" onclick="this.form.direct.value=1; this.form.q.focus();"/>
 					';
 			else :
 			 $direct_html = '<input type="submit" name="direct" value="'.$direct_text.'" class="'.(!$isInputGrp ? 'fc_filter_button' : '').' '.$flexi_button_class_direct.'" onclick="this.form.q.focus();"/>';
@@ -473,8 +473,8 @@ $doc->addScriptDeclaration($js);
 			$checked_class = $use_advsearch_options ? 'btn-primary' : '';
 			$advbox_button_html = '
 			<input type="checkbox" id="modfcadvsearch_use_advsearch_options_'.$module->id.'" name="use_advsearch_options" value="1" '.$checked_attr.' onclick="jQuery(this).next().toggleClass(\'btn-primary\');" style="display:none" />
-			<label id="modfcadvsearch_use_advsearch_options_lbl_'.$module->id.'" class="btn '.$checked_class.' hasTooltip" for="modfcadvsearch_use_advsearch_options_'.$module->id.'" title="'.\Joomla\CMS\Language\Text::_('FLEXI_SEARCH_ADVANCED_OPTIONS').'">
-				<span class="icon-list"></span>' . \Joomla\CMS\Language\Text::_('FLEXI_SEARCH_ADVANCED') . '
+			<label id="modfcadvsearch_use_advsearch_options_lbl_'.$module->id.'" class="btn '.$checked_class.' hasTooltip" for="modfcadvsearch_use_advsearch_options_'.$module->id.'" title="'.JText::_('FLEXI_SEARCH_ADVANCED_OPTIONS').'">
+				<span class="icon-list"></span>' . JText::_('FLEXI_SEARCH_ADVANCED') . '
 			</label>
 			';
 			array_push($output, $advbox_button_html);
@@ -500,7 +500,7 @@ $doc->addScriptDeclaration($js);
 	<tr id="modfcadvsearch_fcsearch_txtflds_row_<?php echo $module->id;?>" class="fc_search_row_<?php echo (($r++)%2);?>">
 		<td class="fc_search_label_cell">
 			<label for="txtflds" class="label <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_SEARCH_SEARCHWORDS_IN_FIELDS', 'FLEXI_SEARCH_SEARCHWORDS_IN_FIELDS_TIP', 1); ?>">
-				<?php echo \Joomla\CMS\Language\Text::_('FLEXI_SEARCH_SEARCHWORDS_IN_FIELDS'); ?>:
+				<?php echo JText::_('FLEXI_SEARCH_SEARCHWORDS_IN_FIELDS'); ?>:
 			</label>
 		</td>
 		<td class="fc_search_option_cell">

@@ -5,7 +5,7 @@ class flexicontent_ajax
 {
 	static function call_extfunc()
 	{
-		$app     = \Joomla\CMS\Factory::getApplication();
+		$app     = JFactory::getApplication();
 		$jinput  = $app->input;
 
 		// Prevent the url from being indexed
@@ -30,7 +30,7 @@ class flexicontent_ajax
 		if ($exttype=='modules')
 		{
 			// Import module helper file
-			$helper_path = \Joomla\CMS\Filesystem\Path::clean(JPATH_SITE.DS.$exttype.DS.'mod_'.$extname.DS.'helper.php');
+			$helper_path = JPath::clean(JPATH_SITE.DS.$exttype.DS.'mod_'.$extname.DS.'helper.php');
 			if ( !file_exists($helper_path) )
 			{
 				jexit("no helper file found at expected path, filepath is ".$helper_path);
@@ -66,7 +66,7 @@ class flexicontent_ajax
 
 			// Create a plugin instance, also pass the parameters so that $this->params are created too
 			$dispatcher = JEventDispatcher::getInstance();
-			$plg_db_data = \Joomla\CMS\Plugin\PluginHelper::getPlugin($extfolder, $extname);
+			$plg_db_data = JPluginHelper::getPlugin($extfolder, $extname);
 			$obj = new $className($dispatcher, array('type'=>$extfolder, 'name'=>$extname, 'params'=>$plg_db_data->params));
 		}
 
@@ -87,8 +87,8 @@ class flexicontent_ajax
 			$extension_name = 'mod_'.strtolower($extname);
 		else
 			$extension_name = 'plg_'.strtolower($extname);
-		\Joomla\CMS\Factory::getLanguage()->load($extension_name, JPATH_SITE, 'en-GB', true);
-		\Joomla\CMS\Factory::getLanguage()->load($extension_name, JPATH_SITE, null, true);
+		JFactory::getLanguage()->load($extension_name, JPATH_SITE, 'en-GB', true);
+		JFactory::getLanguage()->load($extension_name, JPATH_SITE, null, true);
 		
 		// Call the method
 		$obj->$extfunc();

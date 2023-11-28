@@ -23,13 +23,13 @@ jimport('cms.plugin.helper');
 global $is_fc_component;
 $is_fc_component = 1;
 
-$cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
-$app     = \Joomla\CMS\Factory::getApplication();
-$document= \Joomla\CMS\Factory::getDocument();
+$cparams = JComponentHelper::getParams('com_flexicontent');
+$app     = JFactory::getApplication();
+$document= JFactory::getDocument();
 $jinput  = $app->input;
 $format  = $jinput->get('format', 'html', 'cmd');
 
-// No PDF support in J2.5, but too late to do this here, it must be done before \Joomla\CMS\Document\Document instatiation
+// No PDF support in J2.5, but too late to do this here, it must be done before JDocument instatiation
 // Furthermore, user may have installed 3rd party extension to handle PDF format
 /*if ( $format == 'pdf' )
 {
@@ -51,7 +51,7 @@ if ($print_logging_info && $format === 'html')
 	$start_microtime = microtime(true);
 	global $fc_jprof;
 	jimport('joomla.profiler.profiler');
-	$fc_jprof = new \Joomla\CMS\Profiler\Profiler();
+	$fc_jprof = new JProfiler();
 	$fc_jprof->mark('START: FLEXIcontent component');
 }
 
@@ -72,14 +72,14 @@ require_once (JPATH_SITE.'/components/com_flexicontent/helpers/permission.php');
 require_once (JPATH_SITE.'/components/com_flexicontent/helpers/route.php');
 
 // Add component's table directory to the include path
-\Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR.'/components/com_flexicontent/tables');
+JTable::addIncludePath(JPATH_ADMINISTRATOR.'/components/com_flexicontent/tables');
 
 // Import the flexicontent_fields plugins and flexicontent plugins
 if (!FLEXI_ONDEMAND)
 {
-	\Joomla\CMS\Plugin\PluginHelper::importPlugin('flexicontent_fields');
+	JPluginHelper::importPlugin('flexicontent_fields');
 }
-\Joomla\CMS\Plugin\PluginHelper::importPlugin('flexicontent');
+JPluginHelper::importPlugin('flexicontent');
 
 
 
@@ -88,24 +88,24 @@ if (!FLEXI_ONDEMAND)
  */
 
 
-if ( \Joomla\CMS\Factory::getLanguage()->getDefault() != 'en-GB' )
+if ( JFactory::getLanguage()->getDefault() != 'en-GB' )
 {
 	// If site default language is not english then load english language file for 'com_flexicontent' component, and the override (forcing a reload) with current language file
 	// We make sure that 'english' file has been loaded, because we need it as fallback for language strings that do not exist in current language
-	\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', $force_reload = false, $load_default = true);
-	\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_SITE, null, $force_reload = true, $load_default = true);
+	JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', $force_reload = false, $load_default = true);
+	JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, null, $force_reload = true, $load_default = true);
 }
 
 else
 	// No force loading needed, save some time, and do not force language file reload
-	\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_SITE);
+	JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE);
 
 // Load language overrides, just before executing the component (DONE manually for J1.5)
 /*if (!FLEXI_J16GE)
 {
 	$overrideDir = JPATH_SITE . '/languages/overrides/';
-	\Joomla\CMS\Factory::getLanguage()->load('override', $overrideDir, 'en-GB', $force_reload = true, $load_default = true);
-	\Joomla\CMS\Factory::getLanguage()->load('override', $overrideDir, null, $force_reload = true, $load_default = true);
+	JFactory::getLanguage()->load('override', $overrideDir, 'en-GB', $force_reload = true, $load_default = true);
+	JFactory::getLanguage()->load('override', $overrideDir, null, $force_reload = true, $load_default = true);
 }*/
 
 
@@ -213,7 +213,7 @@ $jinput->set('task', $controller_task);
 
 
 // **************************************************************************
-// The view-specific controller is included automatically \Joomla\CMS\MVC\Controller\BaseController,
+// The view-specific controller is included automatically JControllerLegacy,
 // also base controller should be auto-loaded by the view controller itself !
 // **************************************************************************
 
@@ -259,7 +259,7 @@ if ( $cparams->get('recompile_core_less', 0) && $format == 'html' )
  * Create a controller instance
  */
 
-$controller	= \Joomla\CMS\MVC\Controller\BaseController::getInstance('Flexicontent');
+$controller	= JControllerLegacy::getInstance('Flexicontent');
 
 
 
@@ -278,7 +278,7 @@ if ( $cparams->get('default_menuitem_nopathway',1) )
 	$pathway =  $app->getPathWay();
 	$default_menu_itemid = $cparams->get('default_menu_itemid', 0);
 	$pathway_arr = $pathway->getPathway();
-	if ( count($pathway_arr) && preg_match("/Itemid=([0-9]+)/",$pathway_arr[0]->link, $matches) )
+	if ( count($pathway_arr) && preg_match("/Itemid=([0-9]+)/", (string) $pathway_arr[0]->link, $matches) )
 	{
 		if ($matches[1] == $default_menu_itemid)
 		{
@@ -307,11 +307,11 @@ if ($format === 'html')
 	if ( $cparams->get('add_tooltips', 1) )
 	{
 		// J3.0+ tooltips (bootstrap based)
-		\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip');
+		JHtml::_('bootstrap.tooltip');
 	}
 
 	// Add flexi-lib JS
-	//\Joomla\CMS\Factory::getDocument()->addScript( \Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', array('version' => FLEXI_VHASH));  // Frontend/backend script
+	//JFactory::getDocument()->addScript( JUri::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', array('version' => FLEXI_VHASH));  // Frontend/backend script
 
 	// Validate when Joomla.submitForm() is called, NOTE: for non-FC views this is done before the method is called
 	$js = '
@@ -321,11 +321,11 @@ if ($format === 'html')
 
 	// Load bootstrap CSS
 	if ( $cparams->get('loadfw_bootstrap_css', 2)==1 )
-		\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.loadCss', true);
+		JHtml::_('bootstrap.loadCss', true);
 
 	// Load icomoon CSS
 	if ( $cparams->get('loadfw_icomoon_css', 2)==1 )
-		\Joomla\CMS\Factory::getDocument()->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/media/jui/css/icomoon.css');
+		JFactory::getDocument()->addStyleSheet(JUri::root(true).'/media/jui/css/icomoon.css');
 }
 
 

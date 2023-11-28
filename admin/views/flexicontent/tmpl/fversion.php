@@ -17,7 +17,7 @@
 */
 
 defined('_JEXEC') or die('Restricted access');
-$app = \Joomla\CMS\Factory::getApplication();
+$app = JFactory::getApplication();
 $template	= $app->getTemplate();
 if($this->check['connect'] == 0) {
 ?>
@@ -25,7 +25,7 @@ if($this->check['connect'] == 0) {
 		<thead>
 			<tr>
 				<th colspan="2">
-					<span class="label text-white bg-info label-info"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_VERSION' ); ?></span>
+					<span class="label text-white bg-info label-info"><?php echo JText::_( 'FLEXI_VERSION' ); ?></span>
 				</th>
 			</tr>
 		</thead>
@@ -33,7 +33,7 @@ if($this->check['connect'] == 0) {
 			<tr>
 				<td colspan="2">
 				<?php
-					echo '<strong><font color="red">'.\Joomla\CMS\Language\Text::_( 'FLEXI_CONNECTION_FAILED' ).'</font></strong>';
+					echo '<strong><font color="red">'.JText::_( 'FLEXI_CONNECTION_FAILED' ).'</font></strong>';
 				?>
 				</td>
 			</tr>
@@ -56,23 +56,23 @@ if($this->check['connect'] == 0) {
 			<td colspan="2" style="text-align: center;">
 			<?php
 				if ($this->check['current'] == 0 ) {		  				
-					echo \Joomla\CMS\HTML\HTMLHelper::image( 'components/com_flexicontent/assets/images/'.'accept.png', \Joomla\CMS\Language\Text::_('FLEXI_LATEST_VERSION_INSTALLED'),  '');
+					echo JHtml::image( 'components/com_flexicontent/assets/images/'.'accept.png', JText::_('FLEXI_LATEST_VERSION_INSTALLED'),  '');
 				} elseif( $this->check['current'] == -1 ) {
-					echo \Joomla\CMS\HTML\HTMLHelper::image( 'components/com_flexicontent/assets/images/'.'note.gif', \Joomla\CMS\Language\Text::_('FLEXI_OLD_VERSION_INSTALLED'),  '');
+					echo JHtml::image( 'components/com_flexicontent/assets/images/'.'note.gif', JText::_('FLEXI_OLD_VERSION_INSTALLED'),  '');
 				} else {
-					echo \Joomla\CMS\HTML\HTMLHelper::image( 'components/com_flexicontent/assets/images/'.'note.gif', \Joomla\CMS\Language\Text::_('You have installed a newer version than the latest officially stable version'),  '');
+					echo JHtml::image( 'components/com_flexicontent/assets/images/'.'note.gif', JText::_('You have installed a newer version than the latest officially stable version'),  '');
 				}
 			?> &nbsp;
 			<?php
 				if ($this->check['current'] == 0) {
-					echo '<strong><span style="color:darkgreen">'.\Joomla\CMS\Language\Text::_( 'FLEXI_LATEST_VERSION_INSTALLED' ).'</span></strong>';
+					echo '<strong><span style="color:darkgreen">'.JText::_( 'FLEXI_LATEST_VERSION_INSTALLED' ).'</span></strong>';
 				} elseif( $this->check['current'] == -1 ) {
 					echo '
-					<strong><span style="color:darkorange">'.\Joomla\CMS\Language\Text::_( 'FLEXI_NEWS_VERSION_COMPONENT' ).'</span></strong>
-					<a class="btn btn-small btn-primary" href="http://www.flexicontent.org/downloads/latest-version.html" target="_blank" style="margin:4px;">'.\Joomla\CMS\Language\Text::_( 'FLEXI_DOWNLOAD' ) .'</a>
+					<strong><span style="color:darkorange">'.JText::_( 'FLEXI_NEWS_VERSION_COMPONENT' ).'</span></strong>
+					<a class="btn btn-small btn-primary" href="http://www.flexicontent.org/downloads/latest-version.html" target="_blank" style="margin:4px;">'.JText::_( 'FLEXI_DOWNLOAD' ) .'</a>
 					';
 				} else {
-					echo '<strong><span style="color:#777">'.\Joomla\CMS\Language\Text::_( 'FLEXI_NEWER_THAN_OFFICIAL_INSTALLED' ).'</span></strong>';
+					echo '<strong><span style="color:#777">'.JText::_( 'FLEXI_NEWER_THAN_OFFICIAL_INSTALLED' ).'</span></strong>';
 				}
 			?>
 			</td>
@@ -80,27 +80,27 @@ if($this->check['connect'] == 0) {
 		
 		<tr>
 			<td>
-				<span class="label"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_LATEST_VERSION' ); ?></span>
+				<span class="label"><?php echo JText::_( 'FLEXI_LATEST_VERSION' ); ?></span>
 			</td>
 			<td>
 				<span class="badge bg-success badge-success"><?php echo $this->check['version']; ?></span>
-				&nbsp; <strong><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_RELEASED_DATE' ); ?></strong>:
+				&nbsp; <strong><?php echo JText::_( 'FLEXI_RELEASED_DATE' ); ?></strong>:
 				<?php echo $this->check['released']; ?>
 			</td>
 		</tr>
 		<tr>
 			<td>
-				<span class="label"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_INSTALLED_VERSION' ); ?></span>
+				<span class="label"><?php echo JText::_( 'FLEXI_INSTALLED_VERSION' ); ?></span>
 			</td>
 			<td>
 				<span class="badge <?php echo $this->check['current']==-1 ? 'badge-warning' : ($this->check['current']==0 ? 'badge-success' : 'badge-info'); ?>"><?php echo $this->check['current_version']; ?></span>
-				&nbsp; <strong><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_RELEASED_DATE' ); ?></strong>:
+				&nbsp; <strong><?php echo JText::_( 'FLEXI_RELEASED_DATE' ); ?></strong>:
 				
 				<?php
 					try {
 						$timezone = 'UTC';
 						$dateformat = 'Y-m-d';
-						$date = \Joomla\CMS\HTML\HTMLHelper::_('date', $this->check['current_creationDate'], $dateformat, $timezone );
+						$date = JHtml::_('date', $this->check['current_creationDate'], $dateformat, $timezone );
 					} catch ( Exception $e ) {
 						$date = $this->check['current_creationDate'];
 					}

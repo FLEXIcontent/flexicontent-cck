@@ -21,7 +21,7 @@ class jc_com_flexicontent extends JCommentsPlugin
 		if (is_file($routerHelper)) {
 			require_once($routerHelper);
 
-			$db = \Joomla\CMS\Factory::getDbo();
+			$db = JFactory::getDbo();
 			$lta = FLEXI_J16GE ? 'i' : 'ie';
 			$query = 'SELECT i.id, i.title, i.access, i.created_by, ie.type_id, '.$lta.'.language'
 				. ' , CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug'
@@ -38,7 +38,7 @@ class jc_com_flexicontent extends JCommentsPlugin
 				$info->title = $row->title;
 				$info->access = $row->access;
 				$info->userid = $row->created_by;
-				$info->link = \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->catslug, 0, $row));
+				$info->link = JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->catslug, 0, $row));
 			}
 		}
 

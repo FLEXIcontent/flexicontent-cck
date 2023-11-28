@@ -1,6 +1,6 @@
 <?php
-$app    = \Joomla\CMS\Factory::getApplication();
-$document = \Joomla\CMS\Factory::getDocument();
+$app    = JFactory::getApplication();
+$document = JFactory::getDocument();
 
 // Form (text search / filters) configuration
 $show_search_go = $params->get('show_search_go', 1);
@@ -27,8 +27,8 @@ $fgInfo = FlexicontentFields::getFieldsPerGroup();
 
 // Prepare for filters inside TABs
 if ($filter_placement==3) {
-	$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
-	$document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
+	$document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
+	$document->addScript(JUri::base(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
 	$document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');
 	static $_filter_TABsetCnt = null;
 	if ($_filter_TABsetCnt === null) $_filter_TABsCnt = -1;
@@ -63,9 +63,9 @@ if ($filter_instructions == 1)
 {
 	$legend_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 	$legend_tip =
-		($use_search ? '<b>'.\Joomla\CMS\Language\Text::_('FLEXI_TEXT_SEARCH').'</b><br/>'.\Joomla\CMS\Language\Text::_('FLEXI_TEXT_SEARCH_INFO') : '')
+		($use_search ? '<b>'.JText::_('FLEXI_TEXT_SEARCH').'</b><br/>'.JText::_('FLEXI_TEXT_SEARCH_INFO') : '')
 		.(($use_search || $use_filters) ? '<br/><br/>' : '')
-		.($use_filters ? '<b>'.\Joomla\CMS\Language\Text::_('FLEXI_FIELD_FILTERS').'</b><br/>'.\Joomla\CMS\Language\Text::_('FLEXI_FIELD_FILTERS_INFO') : '')
+		.($use_filters ? '<b>'.JText::_('FLEXI_FIELD_FILTERS').'</b><br/>'.JText::_('FLEXI_FIELD_FILTERS_INFO') : '')
 	;
 	$legend_tip = flexicontent_html::getToolTip(null, $legend_tip, 0, 1);
 }
@@ -73,16 +73,16 @@ if ($filter_instructions == 1)
 elseif ($filter_instructions == 2)
 {
 	$legend_inline =
-		($use_search ? '<strong>'.\Joomla\CMS\Language\Text::_('FLEXI_TEXT_SEARCH').'</strong><br/>'.\Joomla\CMS\Language\Text::_('FLEXI_TEXT_SEARCH_INFO') : '')
+		($use_search ? '<strong>'.JText::_('FLEXI_TEXT_SEARCH').'</strong><br/>'.JText::_('FLEXI_TEXT_SEARCH_INFO') : '')
 		.(($use_search || $use_filters) ? '<br/><br/>' : '')
-		.($use_filters ? '<strong>'.\Joomla\CMS\Language\Text::_('FLEXI_FIELD_FILTERS').'</strong><br/>'.\Joomla\CMS\Language\Text::_('FLEXI_FIELD_FILTERS_INFO') : '')
+		.($use_filters ? '<strong>'.JText::_('FLEXI_FIELD_FILTERS').'</strong><br/>'.JText::_('FLEXI_FIELD_FILTERS_INFO') : '')
 	;
 }
 
 if ( $use_search || $use_filters ) : /* BOF search and filters block */
 	if (!$params->get('disablecss', ''))
 	{
-		$document->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/css/flexi_filters.css', array('version' => FLEXI_VHASH));
+		$document->addStyleSheet(JUri::root(true).'/components/com_flexicontent/assets/css/flexi_filters.css', array('version' => FLEXI_VHASH));
 	}
 	$searchphrase_selector = flexicontent_html::searchphrase_selector($params, $form_name);
 
@@ -94,7 +94,7 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 		}else{
 			$ff_slider_id = '_category';
 		}
-		$ff_toggle_search_title = \Joomla\CMS\Language\Text::_($params->get('ff_toggle_search_title', 'FLEXI_TOGGLE_SEARCH_FORM'));
+		$ff_toggle_search_title = JText::_($params->get('ff_toggle_search_title', 'FLEXI_TOGGLE_SEARCH_FORM'));
 		$ff_slider_tagid = 'fcfilter_form_slider'.$ff_slider_id;
 
 
@@ -111,7 +111,7 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 			<?php if ($filter_instructions == 1) : ?>
 				<legend>
 			<span class="<?php echo $legend_class; ?>" title="<?php echo $legend_tip; ?>">
-				<span><?php echo \Joomla\CMS\Language\Text::_('FLEXI_SEARCH_FILTERING'); ?></span>
+				<span><?php echo JText::_('FLEXI_SEARCH_FILTERING'); ?></span>
 			</span>
 				</legend>
 			<?php endif; ?>
@@ -128,13 +128,13 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 
 				$msg = '';
 				$msg .= $ignoredwords
-					? \Joomla\CMS\Language\Text::_('FLEXI_WORDS_IGNORED_MISSING_COMMON') . ': <b>' . $ignoredwords . '</b>'
+					? JText::_('FLEXI_WORDS_IGNORED_MISSING_COMMON') . ': <b>' . $ignoredwords . '</b>'
 					: '';
 				$msg .= $ignoredwords && $shortwords
 					? ' <br/> '
 					: '';
 				$msg .= $shortwords
-					? \Joomla\CMS\Language\Text::sprintf('FLEXI_WORDS_IGNORED_TOO_SHORT', $min_word_len) . ': <b>' . $shortwords . '</b>'
+					? JText::sprintf('FLEXI_WORDS_IGNORED_TOO_SHORT', $min_word_len) . ': <b>' . $shortwords . '</b>'
 					: '';
 				?>
 
@@ -143,16 +143,16 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 					$text_search_class = 'fc_text_filter';
 					$_label_internal = '';//'fc_label_internal';  // data-fc_label_text="..."
 					$text_search_class .= $search_autocomplete ? ($search_autocomplete==2 ? ' fc_index_complete_tlike fc_basic_complete' : ' fc_index_complete_simple fc_basic_complete '.$_label_internal) : ' '.$_label_internal;
-					$text_search_prompt = htmlspecialchars(\Joomla\CMS\Language\Text::_($show_search_label==2 ? 'FLEXI_TEXT_SEARCH' : 'FLEXI_TYPE_TO_LIST'), ENT_QUOTES, 'UTF-8');
+					$text_search_prompt = htmlspecialchars(JText::_($show_search_label==2 ? 'FLEXI_TEXT_SEARCH' : 'FLEXI_TYPE_TO_LIST'), ENT_QUOTES, 'UTF-8');
 					?>
 
 					<?php if ($show_search_label==1) : ?>
-						<div class="fc_filter_label"><?php echo \Joomla\CMS\Language\Text::_('FLEXI_TEXT_SEARCH'); ?></div>
+						<div class="fc_filter_label"><?php echo JText::_('FLEXI_TEXT_SEARCH'); ?></div>
 					<?php endif; ?>
 
 					<div class="fc_filter_html fc_text_search">
 						<input type="text" class="<?php echo $text_search_class; ?>"
-							<?php echo 'data-txt_ac_lang="'.\Joomla\CMS\Factory::getLanguage()->getTag().'"'; ?>
+							<?php echo 'data-txt_ac_lang="'.JFactory::getLanguage()->getTag().'"'; ?>
 							<?php echo 'data-txt_ac_cid="'.$txt_ac_cid.'"'; ?>
 							<?php echo 'data-txt_ac_cids="'. implode(',', $txt_ac_cids) .'"'; ?>
 							<?php echo 'data-txt_ac_usesubs="'. $txt_ac_usesubs .'"'; ?>
@@ -283,8 +283,8 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 
 						($filters_in_slide ?
 
-							\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.startAccordion', $ff_slider_tagid, array('active' => $last_active_slide)).
-							\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addSlide', $ff_slider_tagid, $filt_lbl, '_filters_slide'.$filt->id)
+							JHtml::_('bootstrap.startAccordion', $ff_slider_tagid, array('active' => $last_active_slide)).
+							JHtml::_('bootstrap.addSlide', $ff_slider_tagid, $filt_lbl, '_filters_slide'.$filt->id)
 							: '')
 
 
@@ -305,7 +305,7 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 					'.
 
 						($filters_in_slide ?
-							\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endSlide'): '').
+							JHtml::_('bootstrap.endSlide'): '').
 
 						/* Optional TAB end */
 						($filters_in_tabs ? '
@@ -333,7 +333,7 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 				}
 
 				// Create HTML of filters
-				echo $opentag . implode($separatorf, $filters_html) . $closetag .($filters_in_slide ? \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endAccordion'): '');
+				echo $opentag . implode($separatorf, $filters_html) . $closetag .($filters_in_slide ? JHtml::_('bootstrap.endAccordion'): '');
 				unset ($filters_html);
 				?>
 
@@ -351,19 +351,19 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 				<div class="<?php echo $filter_container_class; ?> fc_filter_buttons_box">
 					<div class="fc_buttons btn-group">
 						<?php if ($show_search_go) : ?>
-							<button class="<?php echo $flexi_button_class_go; ?>" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormPrepare(form, 2); return false;" title="<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_APPLY_FILTERING' ); ?>">
-								<i class="icon-search"></i><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_GO' ); ?>
+							<button class="<?php echo $flexi_button_class_go; ?>" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormPrepare(form, 2); return false;" title="<?php echo JText::_( 'FLEXI_APPLY_FILTERING' ); ?>">
+								<i class="icon-search"></i><?php echo JText::_( 'FLEXI_GO' ); ?>
 							</button>
 						<?php endif; ?>
 
 						<?php if ($show_search_reset) : ?>
-							<button class="<?php echo $flexi_button_class_reset; ?>" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormClearFilters(form); adminFormPrepare(form, 2); return false;" title="<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_REMOVE_FILTERING' ); ?>">
-								<i class="icon-remove"></i><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_RESET' ); ?>
+							<button class="<?php echo $flexi_button_class_reset; ?>" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormClearFilters(form); adminFormPrepare(form, 2); return false;" title="<?php echo JText::_( 'FLEXI_REMOVE_FILTERING' ); ?>">
+								<i class="icon-remove"></i><?php echo JText::_( 'FLEXI_RESET' ); ?>
 							</button>
 						<?php endif; ?>
 
 					</div>
-					<div id="<?php echo $form_id; ?>_submitWarn" class="fc-mssg fc-note" style="display:none;"><?php echo \Joomla\CMS\Language\Text::_('FLEXI_FILTERS_CHANGED_CLICK_TO_SUBMIT'); ?></div>
+					<div id="<?php echo $form_id; ?>_submitWarn" class="fc-mssg fc-note" style="display:none;"><?php echo JText::_('FLEXI_FILTERS_CHANGED_CLICK_TO_SUBMIT'); ?></div>
 				</div>
 			<?php endif; ?>
 

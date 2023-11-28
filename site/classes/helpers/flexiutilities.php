@@ -58,7 +58,7 @@ class FLEXIUtilities
 	static function loadTemplateLanguageFile( $tmplname='default', $tmpldir='', $extension='', $language_tag='' )
 	{
 		static $print_logging_info = null;
-		$print_logging_info = $print_logging_info !== null  ?  $print_logging_info  :  \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('print_logging_info');
+		$print_logging_info = $print_logging_info !== null  ?  $print_logging_info  :  JComponentHelper::getParams('com_flexicontent')->get('print_logging_info');
 
 		if ($print_logging_info) {
 			global $fc_run_times; $start_microtime = microtime(true);
@@ -74,7 +74,7 @@ class FLEXIUtilities
 		//$extension = $extension ? $extension : 'com_flexicontent';
 
 		// Get current UI language, because language file paths use LL-CC (language-country)
-		$language_tag = $language_tag ? $language_tag : \Joomla\CMS\Factory::getLanguage()->getTag();
+		$language_tag = $language_tag ? $language_tag : JFactory::getLanguage()->getTag();
 
 		// We will use template folder as BASE of language files instead of joomla's language folder
 		// Since FLEXIcontent templates are meant to be user-editable it makes sense to place language files inside them
@@ -82,8 +82,8 @@ class FLEXIUtilities
 		$base_dir = $tmpldir.DS.$tmplname;
 
 		// Final use joomla's API to load our template's language files -- (load english template language file then override with current language file)
-		\Joomla\CMS\Factory::getLanguage()->load($extension, $base_dir, 'en-GB', $reload=true);        // Fallback to english language template file
-		\Joomla\CMS\Factory::getLanguage()->load($extension, $base_dir, $language_tag, $reload=true);  // User's current language template file
+		JFactory::getLanguage()->load($extension, $base_dir, 'en-GB', $reload=true);        // Fallback to english language template file
+		JFactory::getLanguage()->load($extension, $base_dir, $language_tag, $reload=true);  // User's current language template file
 
 		if ($print_logging_info) $fc_run_times['templates_parsing_ini'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 	}
@@ -97,8 +97,8 @@ class FLEXIUtilities
 	 */
 	static function getlanguageslist($published_only=false, $add_all = true)
 	{
-		$app = \Joomla\CMS\Factory::getApplication();
-		$db = \Joomla\CMS\Factory::getDbo();
+		$app = JFactory::getApplication();
+		$db = JFactory::getDbo();
 		static $langs_cache = array();
 		//static $pub_languages = array();
 		//static $all_languages = array();
@@ -145,7 +145,7 @@ class FLEXIUtilities
 		{
 			$lang_all = new stdClass();
 			$lang_all->code = '*';
-			$lang_all->name = \Joomla\CMS\Language\Text::_('FLEXI_ALL');
+			$lang_all->name = JText::_('FLEXI_ALL');
 			$lang_all->shortcode = '*';
 			$lang_all->id = 0;
 			$_languages = array( 0 => $lang_all);
@@ -223,7 +223,7 @@ class FLEXIUtilities
 		) {
 			if (!$id) $all_retrieved = true;
 			$g_lastversions =  array();
-			$db = \Joomla\CMS\Factory::getDbo();
+			$db = JFactory::getDbo();
 			$query = "SELECT item_id as id, max(version_id) as version"
 									." FROM #__flexicontent_versions"
 									." WHERE 1"
@@ -257,7 +257,7 @@ class FLEXIUtilities
 
 		if( $g_currentversions==NULL || $force )
 		{
-			$db = \Joomla\CMS\Factory::getDbo();
+			$db = JFactory::getDbo();
 			if (!FLEXI_J16GE) {
 				$query = "SELECT i.id, i.version FROM #__content AS i"
 					." WHERE i.sectionid=".FLEXI_SECTION
@@ -295,7 +295,7 @@ class FLEXIUtilities
 
 	static function &getLastItemVersion($id)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 		$query = 'SELECT max(version) as version'
 				.' FROM #__flexicontent_items_versions'
 				.' WHERE item_id = ' . (int)$id
@@ -313,7 +313,7 @@ class FLEXIUtilities
 
 		if ($status === null)
 		{
-			$db = \Joomla\CMS\Factory::getDbo();
+			$db = JFactory::getDbo();
 			$query = "SELECT c.id,c.version,iv.version as iversion FROM #__content as c "
 				." LEFT JOIN #__flexicontent_items_versions as iv ON c.id=iv.item_id AND c.version=iv.version"
 				." JOIN #__categories as cat ON c.catid=cat.id"
@@ -338,7 +338,7 @@ class FLEXIUtilities
 	 */
 	static function &getFirstVersion($id, $max, $current_version)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 		$query = 'SELECT version_id'
 				.' FROM #__flexicontent_versions'
 				.' WHERE item_id = ' . (int)$id
@@ -359,7 +359,7 @@ class FLEXIUtilities
 	 */
 	static function &getVersionsCount($id)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 		$query = 'SELECT COUNT(*)'
 				.' FROM #__flexicontent_versions'
 				.' WHERE item_id = ' . (int)$id
@@ -373,7 +373,7 @@ class FLEXIUtilities
 
 	static function getCache($group='', $client=0)
 	{
-		$conf = \Joomla\CMS\Factory::getConfig();
+		$conf = JFactory::getConfig();
 
 		//$client = 0;//0 is site, 1 is admin
 		$options = array(
@@ -384,7 +384,7 @@ class FLEXIUtilities
 		);
 
 		jimport('joomla.cache.cache');
-		$cache = \Joomla\CMS\Cache\Cache::getInstance('', $options);
+		$cache = JCache::getInstance('', $options);
 
 		return $cache;
 	}
@@ -403,8 +403,8 @@ class FLEXIUtilities
 			if (!file_exists($path))
 			{
 				$func
-					? \Joomla\CMS\Factory::getApplication()->enqueueMessage(nl2br("While calling field method: $func(): cann't find field type: $fieldtype. This is internal error or wrong field name"), 'error')
-					: \Joomla\CMS\Factory::getApplication()->enqueueMessage(nl2br("Field of type: <b>'$fieldtype'</b> seems to have been uninstalled"), 'notice');
+					? JFactory::getApplication()->enqueueMessage(nl2br("While calling field method: $func(): cann't find field type: $fieldtype. This is internal error or wrong field name"), 'error')
+					: JFactory::getApplication()->enqueueMessage(nl2br("Field of type: <b>'$fieldtype'</b> seems to have been uninstalled"), 'notice');
 
 				return false;
 			}
@@ -412,13 +412,13 @@ class FLEXIUtilities
 
 			if (!class_exists($className))
 			{
-				\Joomla\CMS\Factory::getApplication()->enqueueMessage(nl2br("Could not find class: $className in file: $path\n Please correct field name"), 'error');
+				JFactory::getApplication()->enqueueMessage(nl2br("Could not find class: $className in file: $path\n Please correct field name"), 'error');
 				return false;
 			}
 
 			// 2. Create a plugin instance, also pass the parameters so that $this->params are created too
 			$dispatcher  = JEventDispatcher::getInstance();
-			$plg_db_data = \Joomla\CMS\Plugin\PluginHelper::getPlugin('flexicontent_fields', $fieldtype);
+			$plg_db_data = JPluginHelper::getPlugin('flexicontent_fields', $fieldtype);
 			$fc_plgs[$fieldtype] = new $className($dispatcher, array('type'=>'flexicontent_fields', 'name'=>$fieldtype, 'params'=>$plg_db_data->params));
 		}
 
@@ -443,7 +443,7 @@ class FLEXIUtilities
 			$path = JPATH_ROOT.DS.'plugins'.DS.'content'.$plgfolder.DS.strtolower($plgname).'.php';
 			if (!file_exists($path))
 			{
-				\Joomla\CMS\Factory::getApplication()->enqueueMessage(nl2br("Cannot load CONTENT Plugin: $plgname\n Plugin may have been uninistalled"), 'error');
+				JFactory::getApplication()->enqueueMessage(nl2br("Cannot load CONTENT Plugin: $plgname\n Plugin may have been uninistalled"), 'error');
 				return;
 			}
 
@@ -451,13 +451,13 @@ class FLEXIUtilities
 
 			if(!class_exists($className))
 			{
-				\Joomla\CMS\Factory::getApplication()->enqueueMessage(nl2br("Could not find class: $className in file: $path\n Please correct plugin name"), 'error');
+				JFactory::getApplication()->enqueueMessage(nl2br("Could not find class: $className in file: $path\n Please correct plugin name"), 'error');
 				return;
 			}
 
 			// 2. Create a plugin instance, also pass the parameters so that $this->params are created too
 			$dispatcher  = JEventDispatcher::getInstance();
-			$plg_db_data = \Joomla\CMS\Plugin\PluginHelper::getPlugin('content', $plgname);
+			$plg_db_data = JPluginHelper::getPlugin('content', $plgname);
 			$content_plgs[$plgname] = new $className($dispatcher, array('type'=>'content', 'name'=>$plgname, 'params'=>$plg_db_data->params));
 		}
 
@@ -581,7 +581,7 @@ class FLEXIUtilities
 	 */
 	static function isSqlValidDate($date)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 		$q = "SELECT day(".$db->Quote($date).")";
 		$db->setQuery($q);
 		$num = $db->loadResult();
@@ -716,16 +716,16 @@ class FLEXIUtilities
 	static function ManagerSideMenu($cando = null)
 	{
 		$perms   = FlexicontentHelperPerm::getPerm();
-		$app     = \Joomla\CMS\Factory::getApplication();
+		$app     = JFactory::getApplication();
 		$jinput  = $app->input;
-		$db      = \Joomla\CMS\Factory::getDbo();
-		$session = \Joomla\CMS\Factory::getSession();
-		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
+		$db      = JFactory::getDbo();
+		$session = JFactory::getSession();
+		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 
 		// Redirect to Joomla backend
 		if (!$perms->CanManage)
 		{
-			$app->redirect('index.php', \Joomla\CMS\Language\Text::_('FLEXI_NO_ACCESS'), 'warning');
+			$app->redirect('index.php', JText::_('FLEXI_NO_ACCESS'), 'warning');
 		}
 
 		// Check access to current management tab
@@ -734,7 +734,7 @@ class FLEXIUtilities
 		// Redirect to Flexicontent backend Dashboard
 		if (!$is_authorized)
 		{
-			$app->redirect('index.php?option=com_flexicontent', \Joomla\CMS\Language\Text::_('FLEXI_NO_ACCESS'), 'warning');
+			$app->redirect('index.php?option=com_flexicontent', JText::_('FLEXI_NO_ACCESS'), 'warning');
 		}
 
 		// Get post-installation FLAG (session variable), and current view (HTTP request variable)
@@ -742,19 +742,19 @@ class FLEXIUtilities
 		$view = $jinput->get('view', 'flexicontent', 'cmd');
 
 		// Create Submenu, Dashboard (HOME is always added, other will appear only if post-installation tasks are done)
-		$addEntry = array(FLEXI_J30GE ? '\Joomla\CMS\HTML\Helpers\Sidebar' : 'JSubMenuHelper', 'addEntry');
+		$addEntry = array(FLEXI_J30GE ? 'JHtmlSidebar' : 'JSubMenuHelper', 'addEntry');
 
-		call_user_func($addEntry, '<h2 class="fcsbnav-content-editing">'.\Joomla\CMS\Language\Text::_( 'FLEXI_NAV_SD_CONTENT_EDITING' ).'</h2>', '', '');
-		call_user_func($addEntry, '<span class="fcsb-icon-flexicontent icon-home"></span>'.\Joomla\CMS\Language\Text::_( 'FLEXI_HOME' ), 'index.php?option=com_flexicontent', !$view || $view=='flexicontent');
+		call_user_func($addEntry, '<h2 class="fcsbnav-content-editing">'.JText::_( 'FLEXI_NAV_SD_CONTENT_EDITING' ).'</h2>', '', '');
+		call_user_func($addEntry, '<span class="fcsb-icon-flexicontent icon-home"></span>'.JText::_( 'FLEXI_HOME' ), 'index.php?option=com_flexicontent', !$view || $view=='flexicontent');
 
 		if ($dopostinstall && version_compare(PHP_VERSION, '5.0.0', '>'))
 		{
 			true
-				? call_user_func($addEntry, '<span class="fcsb-icon-items icon-stack"></span>'.\Joomla\CMS\Language\Text::_( 'FLEXI_ITEMS' ), 'index.php?option=com_flexicontent&view=items', $view=='items') : null;
+				? call_user_func($addEntry, '<span class="fcsb-icon-items icon-stack"></span>'.JText::_( 'FLEXI_ITEMS' ), 'index.php?option=com_flexicontent&view=items', $view=='items') : null;
 			/*$perms->CanArchives
-				? call_user_func($addEntry, '<span class="fcsb-icon-archive icon-archive"></span>'.\Joomla\CMS\Language\Text::_( 'FLEXI_ARCHIVE' ), 'index.php?option=com_flexicontent&view=archive', $view=='archive') : null;*/
+				? call_user_func($addEntry, '<span class="fcsb-icon-archive icon-archive"></span>'.JText::_( 'FLEXI_ARCHIVE' ), 'index.php?option=com_flexicontent&view=archive', $view=='archive') : null;*/
 			$perms->CanCats
-				? call_user_func($addEntry, '<span class="fcsb-icon-fc_categories icon-folder"></span>'.\Joomla\CMS\Language\Text::_( 'FLEXI_CATEGORIES' ), 'index.php?option=com_flexicontent&view=categories', $view=='categories') : null;
+				? call_user_func($addEntry, '<span class="fcsb-icon-fc_categories icon-folder"></span>'.JText::_( 'FLEXI_CATEGORIES' ), 'index.php?option=com_flexicontent&view=categories', $view=='categories') : null;
 
 
 			/**
@@ -767,28 +767,28 @@ class FLEXIUtilities
 			{
 				call_user_func($addEntry,
 					'<span class="fcsb-icon-comments icon-comments disabled"></span>'.
-						'<span class="fc_sidebar_entry disabled">' . \Joomla\CMS\Language\Text::_('FLEXI_COMMENTS') .
+						'<span class="fc_sidebar_entry disabled">' . JText::_('FLEXI_COMMENTS') .
 					'</span>', '', false);
 			}
 			elseif ($comments === 1 && $perms->CanComments)
 			{
 				call_user_func($addEntry,
 					'<a href="index.php?option=com_jcomments&amp;task=view&amp;fog=com_flexicontent" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;">'.
-						'<span class="fcsb-icon-comments icon-comments"></span>' . \Joomla\CMS\Language\Text::_('FLEXI_COMMENTS') .
+						'<span class="fcsb-icon-comments icon-comments"></span>' . JText::_('FLEXI_COMMENTS') .
 					'</a>', '', false);
 			}
 			elseif ($comments === 3 && $perms->CanComments)
 			{
 				call_user_func($addEntry,
 					'<a href="index.php?option=com_komento" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;">'.
-						'<span class="fcsb-icon-comments icon-comments"></span>' . \Joomla\CMS\Language\Text::_('FLEXI_COMMENTS') .
+						'<span class="fcsb-icon-comments icon-comments"></span>' . JText::_('FLEXI_COMMENTS') .
 					'</a>', '', false);
 			}
 			elseif ($comments === 0 && $cparams->get('comments_admin_link'))
 			{
 				call_user_func($addEntry,
 					'<a href="' . $cparams->get('comments_admin_link') . '" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;">'.
-						'<span class="fcsb-icon-comments icon-comments"></span>'.\Joomla\CMS\Language\Text::_('FLEXI_COMMENTS').
+						'<span class="fcsb-icon-comments icon-comments"></span>'.JText::_('FLEXI_COMMENTS').
 					'</a>', '', false);
 			}
 
@@ -802,7 +802,7 @@ class FLEXIUtilities
 
 				if ($fields_exist)
 				{
-					call_user_func($addEntry, '<span class="fcsb-icon-mediadata icon-equalizer"></span>'.\Joomla\CMS\Language\Text::_( 'FLEXI_MEDIADATAS' ), 'index.php?option=com_flexicontent&view=mediadatas', $view=='mediadatas');
+					call_user_func($addEntry, '<span class="fcsb-icon-mediadata icon-equalizer"></span>'.JText::_( 'FLEXI_MEDIADATAS' ), 'index.php?option=com_flexicontent&view=mediadatas', $view=='mediadatas');
 				}
 			}
 
@@ -818,89 +818,89 @@ class FLEXIUtilities
 
 				if ($allow_reviews && $perms->CanReviews)
 				{
-					call_user_func($addEntry, '<span class="fcsb-icon-reviews icon-comments-2"></span>'.\Joomla\CMS\Language\Text::_( 'FLEXI_REVIEWS' ), 'index.php?option=com_flexicontent&view=reviews', $view=='reviews');
+					call_user_func($addEntry, '<span class="fcsb-icon-reviews icon-comments-2"></span>'.JText::_( 'FLEXI_REVIEWS' ), 'index.php?option=com_flexicontent&view=reviews', $view=='reviews');
 				}
 			}
 
 			if ($perms->CanTypes || $perms->CanFields || $perms->CanTags || $perms->CanFiles)
 			{
-				call_user_func($addEntry, '<h2 class="fcsbnav-type-fields">'.\Joomla\CMS\Language\Text::_( 'FLEXI_NAV_SD_TYPES_N_FIELDS' ).'</h2>', '', '');
+				call_user_func($addEntry, '<h2 class="fcsbnav-type-fields">'.JText::_( 'FLEXI_NAV_SD_TYPES_N_FIELDS' ).'</h2>', '', '');
 			}
 
 			$perms->CanTypes
-				? call_user_func($addEntry, '<span class="fcsb-icon-types icon-briefcase"></span>'.\Joomla\CMS\Language\Text::_( 'FLEXI_TYPES' ), 'index.php?option=com_flexicontent&view=types', $view=='types') : null;
+				? call_user_func($addEntry, '<span class="fcsb-icon-types icon-briefcase"></span>'.JText::_( 'FLEXI_TYPES' ), 'index.php?option=com_flexicontent&view=types', $view=='types') : null;
 			$perms->CanFields
-				? call_user_func($addEntry, '<span class="fcsb-icon-fields icon-signup"></span>'.\Joomla\CMS\Language\Text::_( 'FLEXI_FIELDS' ), 'index.php?option=com_flexicontent&view=fields', $view=='fields') : null;
+				? call_user_func($addEntry, '<span class="fcsb-icon-fields icon-signup"></span>'.JText::_( 'FLEXI_FIELDS' ), 'index.php?option=com_flexicontent&view=fields', $view=='fields') : null;
 			$perms->CanTags
-				? call_user_func($addEntry, '<span class="fcsb-icon-tags icon-tags"></span>'.\Joomla\CMS\Language\Text::_( 'FLEXI_TAGS' ), 'index.php?option=com_flexicontent&view=tags', $view=='tags') : null;
+				? call_user_func($addEntry, '<span class="fcsb-icon-tags icon-tags"></span>'.JText::_( 'FLEXI_TAGS' ), 'index.php?option=com_flexicontent&view=tags', $view=='tags') : null;
 			$perms->CanFiles
-				? call_user_func($addEntry, '<span class="fcsb-icon-filemanager icon-images"></span>'.\Joomla\CMS\Language\Text::_( 'FLEXI_FILEMANAGER' ), 'index.php?option=com_flexicontent&view=filemanager', $view=='filemanager') : null;
+				? call_user_func($addEntry, '<span class="fcsb-icon-filemanager icon-images"></span>'.JText::_( 'FLEXI_FILEMANAGER' ), 'index.php?option=com_flexicontent&view=filemanager', $view=='filemanager') : null;
 
 			if ($perms->CanTemplates || $perms->CanIndex || $perms->CanStats)
 			{
-				call_user_func($addEntry, '<h2 class="fcsbnav-content-viewing">'.\Joomla\CMS\Language\Text::_( 'FLEXI_NAV_SD_CONTENT_VIEWING' ).'</h2>', '', '');
+				call_user_func($addEntry, '<h2 class="fcsbnav-content-viewing">'.JText::_( 'FLEXI_NAV_SD_CONTENT_VIEWING' ).'</h2>', '', '');
 			}
 
 			$perms->CanTemplates
-				? call_user_func($addEntry, '<span class="fcsb-icon-templates icon-eye"></span>'.\Joomla\CMS\Language\Text::_( 'FLEXI_TEMPLATES' ), 'index.php?option=com_flexicontent&view=templates', $view=='templates') : null;
+				? call_user_func($addEntry, '<span class="fcsb-icon-templates icon-eye"></span>'.JText::_( 'FLEXI_TEMPLATES' ), 'index.php?option=com_flexicontent&view=templates', $view=='templates') : null;
 			$perms->CanIndex
-				? call_user_func($addEntry, '<span class="fcsb-icon-search icon-search"></span>'.\Joomla\CMS\Language\Text::_( 'FLEXI_SEARCH_INDEXES' ), 'index.php?option=com_flexicontent&view=search', $view=='search') : null;
+				? call_user_func($addEntry, '<span class="fcsb-icon-search icon-search"></span>'.JText::_( 'FLEXI_SEARCH_INDEXES' ), 'index.php?option=com_flexicontent&view=search', $view=='search') : null;
 
-			$CanSeeSearchLogs = !FLEXI_J40GE && \Joomla\CMS\Factory::getUser()->authorise('core.admin', 'com_search');
+			$CanSeeSearchLogs = !FLEXI_J40GE && JFactory::getUser()->authorise('core.admin', 'com_search');
 
 			if ($CanSeeSearchLogs)
 			{
-				$params = \Joomla\CMS\Component\ComponentHelper::getParams('com_search');
+				$params = JComponentHelper::getParams('com_search');
 				$enable_log_searches = $params->get('enabled');
 				if ($enable_log_searches)
 				{
 					call_user_func($addEntry,
 					'<a href="index.php?option=com_search&tmpl=component" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;" >'.
-						'<span class="fcsb-icon-book icon-book"></span>'.\Joomla\CMS\Language\Text::_( 'FLEXI_NAV_SD_SEARCH_LOGS' ).
+						'<span class="fcsb-icon-book icon-book"></span>'.JText::_( 'FLEXI_NAV_SD_SEARCH_LOGS' ).
 					'</a>', '', false);
 				}
 				else
 				{
 					call_user_func($addEntry,
 					'<a href="index.php?option=com_config&view=component&component=com_search&path=" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, function(){window.location.reload(false)}); return false;" >'.
-						'<span class="fcsb-icon-book icon-book"></span>'.\Joomla\CMS\Language\Text::_( 'FLEXI_NAV_SD_SEARCH_LOGS' ).
+						'<span class="fcsb-icon-book icon-book"></span>'.JText::_( 'FLEXI_NAV_SD_SEARCH_LOGS' ).
 					'</a>', '', false);
 				}
 			}
 
 			$perms->CanStats
-				? call_user_func($addEntry, '<span class="fcsb-icon-stats icon-chart"></span>'.\Joomla\CMS\Language\Text::_( 'FLEXI_STATISTICS' ), 'index.php?option=com_flexicontent&view=stats', $view=='stats') : null;
+				? call_user_func($addEntry, '<span class="fcsb-icon-stats icon-chart"></span>'.JText::_( 'FLEXI_STATISTICS' ), 'index.php?option=com_flexicontent&view=stats', $view=='stats') : null;
 
 			if ($perms->CanAuthors || $perms->CanGroups /*|| $perms->CanArchives*/)
 			{
-				call_user_func($addEntry, '<h2 class="fcsbnav-users">'.\Joomla\CMS\Language\Text::_( 'FLEXI_NAV_SD_USERS_N_GROUPS' ).'</h2>', '', '');
+				call_user_func($addEntry, '<h2 class="fcsbnav-users">'.JText::_( 'FLEXI_NAV_SD_USERS_N_GROUPS' ).'</h2>', '', '');
 			}
 
 			$perms->CanAuthors
-				? call_user_func($addEntry, '<span class="fcsb-icon-users icon-user"></span>'.\Joomla\CMS\Language\Text::_( 'FLEXI_USERS' ), 'index.php?option=com_flexicontent&view=users', $view=='users') : null;
+				? call_user_func($addEntry, '<span class="fcsb-icon-users icon-user"></span>'.JText::_( 'FLEXI_USERS' ), 'index.php?option=com_flexicontent&view=users', $view=='users') : null;
 			$perms->CanGroups
-				? call_user_func($addEntry, '<span class="fcsb-icon-groups icon-users"></span>'.\Joomla\CMS\Language\Text::_( 'FLEXI_GROUPS' ), 'index.php?option=com_flexicontent&view=groups', $view=='groups') : null;
+				? call_user_func($addEntry, '<span class="fcsb-icon-groups icon-users"></span>'.JText::_( 'FLEXI_GROUPS' ), 'index.php?option=com_flexicontent&view=groups', $view=='groups') : null;
 
 			if ($perms->CanConfig || $perms->CanImport || $perms->CanPlugins)
 			{
-				call_user_func($addEntry, '<h2 class="fcsbnav-expert">'.\Joomla\CMS\Language\Text::_( 'FLEXI_NAV_SD_EXPERT_USAGE' ).'</h2>', '', '');
+				call_user_func($addEntry, '<h2 class="fcsbnav-expert">'.JText::_( 'FLEXI_NAV_SD_EXPERT_USAGE' ).'</h2>', '', '');
 			}
 
 			$appsman_path = JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'appsman';
 
 			if (file_exists($appsman_path) && version_compare(FLEXI_VERSION, '3.3.99', '>'))
 			{
-				if ($perms->CanConfig)	call_user_func($addEntry, '<span class="fcsb-icon-wrench icon-wrench"></span>'.\Joomla\CMS\Language\Text::_( 'FLEXI_WEBSITE_APPS_IMPORT_EXPORT' ), 'index.php?option=com_flexicontent&view=appsman', $view=='appsman');
+				if ($perms->CanConfig)	call_user_func($addEntry, '<span class="fcsb-icon-wrench icon-wrench"></span>'.JText::_( 'FLEXI_WEBSITE_APPS_IMPORT_EXPORT' ), 'index.php?option=com_flexicontent&view=appsman', $view=='appsman');
 			}
 
 			$perms->CanImport
-				? call_user_func($addEntry, '<span class="fcsb-icon-import icon-upload"></span>'.\Joomla\CMS\Language\Text::_( 'FLEXI_CONTENT_IMPORT' ), 'index.php?option=com_flexicontent&view=import', $view=='import') : null;
+				? call_user_func($addEntry, '<span class="fcsb-icon-import icon-upload"></span>'.JText::_( 'FLEXI_CONTENT_IMPORT' ), 'index.php?option=com_flexicontent&view=import', $view=='import') : null;
 
 			if ($perms->CanPlugins)
 			{
 				call_user_func($addEntry,
 				'<a href="index.php?option=com_plugins" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;" >'.
-					'<span class="fcsb-icon-plugins icon-power-cord"></span>'.\Joomla\CMS\Language\Text::_( 'FLEXI_PLUGINS' ).
+					'<span class="fcsb-icon-plugins icon-power-cord"></span>'.JText::_( 'FLEXI_PLUGINS' ).
 				'</a>', '', false);
 			}
 			
@@ -908,14 +908,14 @@ class FLEXIUtilities
 			{
 				call_user_func($addEntry,
 				'<a href="https://flexicontent.org/downloads/translations.html?tmpl=component" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 650, 0); return false;" >'.
-					'<span class="fcsb-icon-translations icon-flag"></span>'.\Joomla\CMS\Language\Text::_( 'FLEXI_TRANSLATION_PACKAGES' ).
+					'<span class="fcsb-icon-translations icon-flag"></span>'.JText::_( 'FLEXI_TRANSLATION_PACKAGES' ).
 				'</a>', '', false);
 			}
 			elseif ($perms->CanConfig)
 			{
 				call_user_func($addEntry,
 				'<a href="http://www.flexicontent.org/downloads/download-translation-flexicontent.html?tmpl=component" target="_blank">'.
-					'<span class="fcsb-icon-translations icon-flag"></span>'.\Joomla\CMS\Language\Text::_( 'FLEXI_TRANSLATION_PACKAGES' ).
+					'<span class="fcsb-icon-translations icon-flag"></span>'.JText::_( 'FLEXI_TRANSLATION_PACKAGES' ).
 				'</a>', '', false);
 			}
 		}

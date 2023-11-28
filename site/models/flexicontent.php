@@ -28,7 +28,7 @@ jimport('legacy.model.legacy');
  * @subpackage Flexicontent
  * @since		1.0
  */
-class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
+class FlexicontentModelFlexicontent extends JModelLegacy
 {
 	/**
 	 * Root category from this directory
@@ -78,7 +78,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		$id = 0;  // no id used by this view
 		$this->setId((int)$id);
 		$params = $this->_params;
-		$app    = \Joomla\CMS\Factory::getApplication();
+		$app    = JFactory::getApplication();
 		
 		// Get the root category of the directory
 		$this->_rootcat = (int) $app->input->getInt('rootcat', 0);
@@ -189,14 +189,14 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		$params = $this->_params;
 		$use_tmp = true;
 		
-		$user = \Joomla\CMS\Factory::getUser();
-		$db   = \Joomla\CMS\Factory::getDbo();
+		$user = JFactory::getUser();
+		$db   = JFactory::getDbo();
 		$orderby = $this->_buildCatOrderBy('cat_');
 		
 		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
 		// thus the items are published globally at the time the author specified in his/her local clock
-		//$now  = \Joomla\CMS\Factory::getApplication()->requestTime;   // NOT correct behavior it should be UTC (below)
-		//$now  = \Joomla\CMS\Factory::getDate()->toSql();              // NOT good if string passed to function that will be cached, because string continuesly different
+		//$now  = JFactory::getApplication()->requestTime;   // NOT correct behavior it should be UTC (below)
+		//$now  = JFactory::getDate()->toSql();              // NOT good if string passed to function that will be cached, because string continuesly different
 		$_nowDate = 'UTC_TIMESTAMP()'; //$db->Quote($now);
 		$nullDate = $db->getNullDate();
 		
@@ -215,7 +215,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		{
 			$lta = $use_tmp ? 'i': 'ie';
 			//$where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . ' OR '.$lta.'.language="*" ) ';
-			$where .= ' AND (' . $lta . ' .language = ' . $db->Quote(\Joomla\CMS\Factory::getLanguage()->getTag()) . ' OR ' . $lta . '.language = ' . $db->Quote('*') . ')';
+			$where .= ' AND (' . $lta . ' .language = ' . $db->Quote(JFactory::getLanguage()->getTag()) . ' OR ' . $lta . '.language = ' . $db->Quote('*') . ')';
 		}
 		
 		// Get privilege to view non viewable items (upublished, archived, trashed, expired, scheduled).
@@ -237,7 +237,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 
 		if (!$show_noauth)
 		{
-			$aid_arr = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
 			$where .= ' AND ty.access IN (0,'.$aid_list.')';
 			$where .= ' AND cc.access IN (0,'.$aid_list.')';
@@ -286,7 +286,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 	{
 		$params = $this->_params;
 
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = JFactory::getUser();
 		
 		// show unauthorized items
 		$show_noauth = $params->get('show_noauth', 0);
@@ -294,7 +294,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		// Select only items user has access to if he is not allowed to show unauthorized items
 		$join = $and = '';
 		if (!$show_noauth) {
-			$aid_arr = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
 			$and		= ' AND c.access IN (0,'.$aid_list.')';
 		}
@@ -360,14 +360,14 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		$params = $this->_params;
 		$use_tmp = true;
 		
-		$user = \Joomla\CMS\Factory::getUser();
-		$db   = \Joomla\CMS\Factory::getDbo();
+		$user = JFactory::getUser();
+		$db   = JFactory::getDbo();
 		$cat_orderby = $this->_buildCatOrderBy('subcat_');
 		
 		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
 		// thus the items are published globally at the time the author specified in his/her local clock
-		//$now  = \Joomla\CMS\Factory::getApplication()->requestTime;   // NOT correct behavior it should be UTC (below)
-		//$now  = \Joomla\CMS\Factory::getDate()->toSql();              // NOT good if string passed to function that will be cached, because string continuesly different
+		//$now  = JFactory::getApplication()->requestTime;   // NOT correct behavior it should be UTC (below)
+		//$now  = JFactory::getDate()->toSql();              // NOT good if string passed to function that will be cached, because string continuesly different
 		$_nowDate = 'UTC_TIMESTAMP()'; //$db->Quote($now);
 		$nullDate = $db->getNullDate();
 		
@@ -386,7 +386,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		{
 			$lta = $use_tmp ? 'i': 'ie';
 			//$where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . ' OR '.$lta.'.language="*" ) ';
-			$where .= ' AND (' . $lta . ' .language = ' . $db->Quote(\Joomla\CMS\Factory::getLanguage()->getTag()) . ' OR ' . $lta . '.language = ' . $db->Quote('*') . ')';
+			$where .= ' AND (' . $lta . ' .language = ' . $db->Quote(JFactory::getLanguage()->getTag()) . ' OR ' . $lta . '.language = ' . $db->Quote('*') . ')';
 		}
 		
 		// Get privilege to view non viewable items (upublished, archived, trashed, expired, scheduled).
@@ -405,7 +405,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		// Select only items that user has view access, checking item, category, content type access level
 		$and = $asscat_and = '';
 		if (!$show_noauth) {
-			$aid_arr = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
 			$where .= ' AND ty.access IN (0,'.$aid_list.')';
 			$where .= ' AND cc.access IN (0,'.$aid_list.')';
@@ -476,12 +476,12 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 	{
 		if ( $this->_params !== NULL ) return;
 		
-		$app  = \Joomla\CMS\Factory::getApplication();
+		$app  = JFactory::getApplication();
 		$menu = $app->getMenu()->getActive();     // Retrieve active menu
 		
 		// Get the COMPONENT only parameter
-		$params  = new \Joomla\Registry\Registry();
-		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+		$params  = new JRegistry();
+		$cparams = JComponentHelper::getParams('com_flexicontent');
 		$params->merge($cparams);
 		
 		// Merge the active menu parameters

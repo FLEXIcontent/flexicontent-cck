@@ -120,7 +120,7 @@ switch ($content_layout) {
 // *** Default image and image fitting
 // ***
 $mod_default_img_path = $params->get('mod_default_img_path', 'components/com_flexicontent/assets/images/image.png');
-$img_path = \Joomla\CMS\Uri\Uri::base(true) .'/'; 
+$img_path = JUri::base(true) .'/'; 
 
 // image of FEATURED items, auto-fit and (optionally) limit to image max-dimensions to avoid stretching
 $img_auto_dims_css_feat=" width: 100%; height: auto; display: block !important; border: 0 !important;";
@@ -145,8 +145,8 @@ $item_placement_std = (int) $params->get($layout.'_item_placement', 0);
 $item_columns_std   = (int) $params->get('item_columns', 4);
 $cols_class_std     = $item_columns_std  <= 1 ? '' : 'cols_' . $item_columns_std;
 
-$document = \Joomla\CMS\Factory::getDocument();
-$jcookie  = \Joomla\CMS\Factory::getApplication()->input->cookie;
+$document = JFactory::getDocument();
+$jcookie  = JFactory::getApplication()->input->cookie;
 
 
 /**
@@ -173,7 +173,7 @@ if ($item_placement_feat === 2 || $item_placement_std === 2 || $item_placement_f
 	}
 	catch (Exception $e)
 	{
-		$jcookie->set($cookie_name, '{}', time()+60*60*24, \Joomla\CMS\Uri\Uri::base(true), '');
+		$jcookie->set($cookie_name, '{}', time()+60*60*24, JUri::base(true), '');
 	}
 
 	$fcMods_conf = is_object($fcMods_conf)
@@ -285,34 +285,34 @@ if ($std_builder_layout_num)
 	include(JPATH_SITE.'/modules/mod_flexicontent/tmpl_common/category.php');
 
 	$ord_titles = array(
-		'popular'=>\Joomla\CMS\Language\Text::_( 'FLEXI_UMOD_MOST_POPULAR'),  // popular == hits
-		'rhits'=>\Joomla\CMS\Language\Text::_( 'FLEXI_UMOD_LESS_VIEWED'),
+		'popular'=>JText::_( 'FLEXI_UMOD_MOST_POPULAR'),  // popular == hits
+		'rhits'=>JText::_( 'FLEXI_UMOD_LESS_VIEWED'),
 
-		'author'=>\Joomla\CMS\Language\Text::_( 'FLEXI_UMOD_AUTHOR_ALPHABETICAL'),
-		'rauthor'=>\Joomla\CMS\Language\Text::_( 'FLEXI_UMOD_AUTHOR_ALPHABETICAL_REVERSE'),
+		'author'=>JText::_( 'FLEXI_UMOD_AUTHOR_ALPHABETICAL'),
+		'rauthor'=>JText::_( 'FLEXI_UMOD_AUTHOR_ALPHABETICAL_REVERSE'),
 
-		'published'=>\Joomla\CMS\Language\Text::_( 'FLEXI_UMOD_RECENTLY_PUBLISHED_SCHEDULED'),
-		'published_oldest'=>\Joomla\CMS\Language\Text::_( 'FLEXI_UMOD_OLDEST_PUBLISHED_SCHEDULED'),
-		'expired'=>\Joomla\CMS\Language\Text::_( 'FLEXI_UMOD_FLEXI_RECENTLY_EXPIRING_EXPIRED'),
-		'expired_oldest'=>\Joomla\CMS\Language\Text::_( 'FLEXI_UMOD_OLDEST_EXPIRING_EXPIRED_FIRST'),
+		'published'=>JText::_( 'FLEXI_UMOD_RECENTLY_PUBLISHED_SCHEDULED'),
+		'published_oldest'=>JText::_( 'FLEXI_UMOD_OLDEST_PUBLISHED_SCHEDULED'),
+		'expired'=>JText::_( 'FLEXI_UMOD_FLEXI_RECENTLY_EXPIRING_EXPIRED'),
+		'expired_oldest'=>JText::_( 'FLEXI_UMOD_OLDEST_EXPIRING_EXPIRED_FIRST'),
 
-		'commented'=>\Joomla\CMS\Language\Text::_( 'FLEXI_UMOD_MOST_COMMENTED'),
-		'rated'=>\Joomla\CMS\Language\Text::_( 'FLEXI_UMOD_BEST_RATED' ),
+		'commented'=>JText::_( 'FLEXI_UMOD_MOST_COMMENTED'),
+		'rated'=>JText::_( 'FLEXI_UMOD_BEST_RATED' ),
 
-		'added'=>	\Joomla\CMS\Language\Text::_( 'FLEXI_UMOD_RECENTLY_ADDED'),  // added == rdate
-		'addedrev'=>\Joomla\CMS\Language\Text::_( 'FLEXI_UMOD_RECENTLY_ADDED_REVERSE' ),  // addedrev == date
-		'updated'=>\Joomla\CMS\Language\Text::_( 'FLEXI_UMOD_RECENTLY_UPDATED'),  // updated == modified
+		'added'=>	JText::_( 'FLEXI_UMOD_RECENTLY_ADDED'),  // added == rdate
+		'addedrev'=>JText::_( 'FLEXI_UMOD_RECENTLY_ADDED_REVERSE' ),  // addedrev == date
+		'updated'=>JText::_( 'FLEXI_UMOD_RECENTLY_UPDATED'),  // updated == modified
 
-		'alpha'=>	\Joomla\CMS\Language\Text::_( 'FLEXI_UMOD_ALPHABETICAL'),
-		'alpharev'=>\Joomla\CMS\Language\Text::_( 'FLEXI_UMOD_ALPHABETICAL_REVERSE'),   // alpharev == ralpha
+		'alpha'=>	JText::_( 'FLEXI_UMOD_ALPHABETICAL'),
+		'alpharev'=>JText::_( 'FLEXI_UMOD_ALPHABETICAL_REVERSE'),   // alpharev == ralpha
 
-		'id'=>\Joomla\CMS\Language\Text::_( 'FLEXI_UMOD_HIGHEST_ITEM_ID'),
-		'rid'=>\Joomla\CMS\Language\Text::_( 'FLEXI_UMOD_LOWEST_ITEM_ID'),
+		'id'=>JText::_( 'FLEXI_UMOD_HIGHEST_ITEM_ID'),
+		'rid'=>JText::_( 'FLEXI_UMOD_LOWEST_ITEM_ID'),
 
-		'catorder'=>\Joomla\CMS\Language\Text::_( 'FLEXI_UMOD_CAT_ORDER'),  // catorder == order
-		'jorder'=>\Joomla\CMS\Language\Text::_( 'FLEXI_UMOD_CAT_ORDER_JOOMLA'),
-		'random'=>\Joomla\CMS\Language\Text::_( 'FLEXI_UMOD_RANDOM_ITEMS' ),
-		'field'=>\Joomla\CMS\Language\Text::sprintf( 'FLEXI_UMOD_CUSTOM_FIELD', $orderby_custom_field->label)
+		'catorder'=>JText::_( 'FLEXI_UMOD_CAT_ORDER'),  // catorder == order
+		'jorder'=>JText::_( 'FLEXI_UMOD_CAT_ORDER_JOOMLA'),
+		'random'=>JText::_( 'FLEXI_UMOD_RANDOM_ITEMS' ),
+		'field'=>JText::sprintf( 'FLEXI_UMOD_CUSTOM_FIELD', $orderby_custom_field->label)
 	);
 
 	$separator  = '';
@@ -380,8 +380,8 @@ if ($std_builder_layout_num)
 					: $itemset_tagid . '_' . $first_item->id;
 
 				echo $item_placement_feat === 2
-					? \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.startTabSet', $itemset_tagid, array('active' => $last_active_tagid))
-					: \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.startAccordion', $itemset_tagid, array('active' => $last_active_tagid));
+					? JHtml::_('bootstrap.startTabSet', $itemset_tagid, array('active' => $last_active_tagid))
+					: JHtml::_('bootstrap.startAccordion', $itemset_tagid, array('active' => $last_active_tagid));
 			}
 
 			foreach ($list[$ord]['featured'] as $item) :
@@ -389,8 +389,8 @@ if ($std_builder_layout_num)
 				if ($item_placement_feat === 2 || $item_placement_feat === 3)
 				{
 					echo $item_placement_feat === 2
-						? \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addTab', $itemset_tagid, $itemset_tagid . '_' . $item->id, $item->title)
-						: \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addSlide', $itemset_tagid, $item->title, $itemset_tagid . '_' . $item->id);
+						? JHtml::_('bootstrap.addTab', $itemset_tagid, $itemset_tagid . '_' . $item->id, $item->title)
+						: JHtml::_('bootstrap.addSlide', $itemset_tagid, $item->title, $itemset_tagid . '_' . $item->id);
 				}
 
 				$img_force_dims_css_feat = $img_auto_dims_css_feat;
@@ -546,7 +546,7 @@ if ($std_builder_layout_num)
 					<?php if ($mod_readmore_feat) : ?>
 					<div class="fc_block">
 						<div class="fcitem_readon">
-							<a href="<?php echo $item->link; ?>" class="readon"><span><?php echo \Joomla\CMS\Language\Text::_('FLEXI_MOD_READ_MORE'); ?></span></a>
+							<a href="<?php echo $item->link; ?>" class="readon"><span><?php echo JText::_('FLEXI_MOD_READ_MORE'); ?></span></a>
 						</div>
 					</div>
 					<?php endif; ?>
@@ -578,8 +578,8 @@ if ($std_builder_layout_num)
 				if ($item_placement_feat === 2 || $item_placement_feat === 3)
 				{
 					echo $item_placement_feat === 2
-						? \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endTab')
-						: \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endSlide');
+						? JHtml::_('bootstrap.endTab')
+						: JHtml::_('bootstrap.endSlide');
 				}
 				elseif ($item_placement_feat === 0)  // 0: clear, 1: as masonry tiles
 				{
@@ -591,10 +591,10 @@ if ($std_builder_layout_num)
 			if ($item_placement_feat === 2 || $item_placement_feat === 3)
 			{
 				echo $item_placement_feat === 2
-					? \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endTabSet')
-					: \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endAccordion');
+					? JHtml::_('bootstrap.endTabSet')
+					: JHtml::_('bootstrap.endAccordion');
 
-				\Joomla\CMS\Factory::getDocument()->addScriptDeclaration("
+				JFactory::getDocument()->addScriptDeclaration("
 				(function($) {
 					$(document).ready(function ()
 					{
@@ -690,8 +690,8 @@ if ($std_builder_layout_num)
 					: $itemset_tagid . '_' . $first_item->id;
 
 				echo $item_placement_std === 2
-					? \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.startTabSet', $itemset_tagid, array('active' => $last_active_tagid))
-					: \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.startAccordion', $itemset_tagid, array('active' => $last_active_tagid));
+					? JHtml::_('bootstrap.startTabSet', $itemset_tagid, array('active' => $last_active_tagid))
+					: JHtml::_('bootstrap.startAccordion', $itemset_tagid, array('active' => $last_active_tagid));
 			}
 
 			foreach ($list[$ord]['standard'] as $item) :
@@ -699,8 +699,8 @@ if ($std_builder_layout_num)
 				if ($item_placement_std === 2 || $item_placement_std === 3)
 				{
 					echo $item_placement_std === 2
-						? \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addTab', $itemset_tagid, $itemset_tagid . '_' . $item->id, $item->title)
-						: \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addSlide', $itemset_tagid, $item->title, $itemset_tagid . '_' . $item->id);
+						? JHtml::_('bootstrap.addTab', $itemset_tagid, $itemset_tagid . '_' . $item->id, $item->title)
+						: JHtml::_('bootstrap.addSlide', $itemset_tagid, $item->title, $itemset_tagid . '_' . $item->id);
 				}
 
 				$img_force_dims_css = $img_auto_dims_css;
@@ -858,7 +858,7 @@ if ($std_builder_layout_num)
 					<?php if ($mod_readmore) : ?>
 					<div class="fc_block">
 						<div class="fcitem_readon">
-							<a href="<?php echo $item->link; ?>" class="readon"><span><?php echo \Joomla\CMS\Language\Text::_('FLEXI_MOD_READ_MORE'); ?></span></a>
+							<a href="<?php echo $item->link; ?>" class="readon"><span><?php echo JText::_('FLEXI_MOD_READ_MORE'); ?></span></a>
 						</div>
 					</div>
 					<?php endif; ?>
@@ -890,8 +890,8 @@ if ($std_builder_layout_num)
 			if ($item_placement_std === 2 || $item_placement_std === 3)
 			{
 				echo $item_placement_std === 2
-					? \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endTab')
-					: \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endSlide');
+					? JHtml::_('bootstrap.endTab')
+					: JHtml::_('bootstrap.endSlide');
 			}
 			elseif ($item_placement_std === 0)  // 0: clear, 1: as masonry tiles
 			{
@@ -904,10 +904,10 @@ if ($std_builder_layout_num)
 			if ($item_placement_std === 2 || $item_placement_std === 3)
 			{
 				echo $item_placement_std === 2
-					? \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endTabSet')
-					: \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endAccordion');
+					? JHtml::_('bootstrap.endTabSet')
+					: JHtml::_('bootstrap.endAccordion');
 
-				\Joomla\CMS\Factory::getDocument()->addScriptDeclaration("
+				JFactory::getDocument()->addScriptDeclaration("
 				(function($) {
 					$(document).ready(function ()
 					{

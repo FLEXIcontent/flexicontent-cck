@@ -51,25 +51,25 @@ defined('_JEXEC') or die('Restricted access');
 <form action="index.php?option=com_flexicontent&task=categories.params&layout=params&format=raw" method="post" name="adminForm" id="adminForm">
 
 	<fieldset>
-		<span class="label"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_COPY_PARAMETERS_SOURCE' ).':'; ?></span>
+		<span class="label"><?php echo JText::_( 'FLEXI_COPY_PARAMETERS_SOURCE' ).':'; ?></span>
 		<?php echo $this->lists['copyid']; ?>
 		<br/>
-		<span class="label"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_COPY_PARAMETERS_DEST' ).':'; ?></span>
+		<span class="label"><?php echo JText::_( 'FLEXI_COPY_PARAMETERS_DEST' ).':'; ?></span>
 		<?php echo $this->lists['destid']; ?>
 	</fieldset>
 	<table width="100%" align="center">
 		<tr>
 			<td width="50%" align="right">
-			<input id="copy" type="submit" class="fc_button" value="<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_COPY_PARAMETERS_BUTTON' ); ?>" />
+			<input id="copy" type="submit" class="fc_button" value="<?php echo JText::_( 'FLEXI_COPY_PARAMETERS_BUTTON' ); ?>" />
 			</td>
 			<td width="50%" align="left">
-			<input type="button" class="fc_button" onclick="window.parent.SqueezeBox.close();;" value="<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_CANCEL' ); ?>" />			
+			<input type="button" class="fc_button" onclick="window.parent.SqueezeBox.close();;" value="<?php echo JText::_( 'FLEXI_CANCEL' ); ?>" />			
 			</td>
 		</tr>
 	</table>
 	<div id="log-bind"></div>
 
-<?php echo \Joomla\CMS\HTML\HTMLHelper::_( 'form.token' ); ?>
+<?php echo JHtml::_( 'form.token' ); ?>
 <input type="hidden" name="option" value="com_flexicontent" />
 <input type="hidden" name="task" value="categories.params" />
 <input type="hidden" name="layout" value="categories.params" />
@@ -78,5 +78,5 @@ defined('_JEXEC') or die('Restricted access');
 
 <?php
 //keep session alive while editing
-\Joomla\CMS\HTML\HTMLHelper::_('behavior.keepalive');
+JHtml::_('behavior.keepalive');
 ?>

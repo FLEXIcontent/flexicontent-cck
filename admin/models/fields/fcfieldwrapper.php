@@ -19,17 +19,17 @@ if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
 jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
-jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
+jimport('cms.html.select');    // JHtmlSelect
+jimport('joomla.form.field');  // JFormField
 
-//jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
-//\Joomla\CMS\Form\FormHelper::loadFieldClass('...');   // \Joomla\CMS\Form\FormField...
+//jimport('joomla.form.helper'); // JFormHelper
+//JFormHelper::loadFieldClass('...');   // JFormField...
 
 /**
 * Renders a multiple select element
 *
 */
-class \Joomla\CMS\Form\FormFieldFCFieldWrapper extends \Joomla\CMS\Form\FormField
+class JFormFieldFCFieldWrapper extends JFormField
 {
 	protected $_options;
 	protected $_inherited;
@@ -58,7 +58,7 @@ class \Joomla\CMS\Form\FormFieldFCFieldWrapper extends \Joomla\CMS\Form\FormFiel
 		$name = $this->element['name'];
 		$control_name = str_replace($name, '', $element_id);
 
-		$app = \Joomla\CMS\Factory::getApplication();
+		$app = JFactory::getApplication();
 		$option = $app->input->get('option');
 		if (!empty($this->element['item_id']))
 		{
@@ -75,7 +75,7 @@ class \Joomla\CMS\Form\FormFieldFCFieldWrapper extends \Joomla\CMS\Form\FormFiel
 
 		// Create containers for the already rendered the fields
 		$html = $this->renderFieldsForm(static::$fcform_item);
-		$html = $html ?: '<span class="alert alert-info">' . \Joomla\CMS\Language\Text::_( 'FLEXI_NO_FIELDS_TO_TYPE' ) .' </span>';
+		$html = $html ?: '<span class="alert alert-info">' . JText::_( 'FLEXI_NO_FIELDS_TO_TYPE' ) .' </span>';
 		return '</div></div>
 		<div id="flexicontent" class="flexicontent">'
 			. $html . '
@@ -96,11 +96,11 @@ class \Joomla\CMS\Form\FormFieldFCFieldWrapper extends \Joomla\CMS\Form\FormFiel
 	*/
 	function renderFieldsForm($item)
 	{
-		$noplugin = '<div class="fc-mssg-inline fc-warning" style="margin:0 2px 6px 2px; max-width: unset;">'.\Joomla\CMS\Language\Text::_( 'FLEXI_PLEASE_PUBLISH_THIS_PLUGIN' ).'</div>';
+		$noplugin = '<div class="fc-mssg-inline fc-warning" style="margin:0 2px 6px 2px; max-width: unset;">'.JText::_( 'FLEXI_PLEASE_PUBLISH_THIS_PLUGIN' ).'</div>';
 		$hide_ifempty_fields = array('fcloadmodule', 'fcpagenav', 'toolbar', 'comments');
 		$row_k = 0;
 
-		$lbl_class = ' ' . $item->parameters->get(\Joomla\CMS\Factory::getApplication()->isClient('administrator') ? 'form_lbl_class_be' : 'form_lbl_class_fe');
+		$lbl_class = ' ' . $item->parameters->get(JFactory::getApplication()->isClient('administrator') ? 'form_lbl_class_be' : 'form_lbl_class_fe');
 		$tip_class = ' hasTooltip';
 
 		$FC_jfields_html['images'] = '<span class="alert alert-info">Edit in \'Image and links\' TABs</span>';
@@ -145,7 +145,7 @@ class \Joomla\CMS\Form\FormFieldFCFieldWrapper extends \Joomla\CMS\Form\FormFiel
 			{
 				if ($field->parameters->get('image_source')==-1)
 				{
-					$replace_txt = !empty($FC_jfields_html['images']) ? $FC_jfields_html['images'] : '<span class="alert alert-warning fc-small fc-iblock">'.\Joomla\CMS\Language\Text::_('FLEXI_ENABLE_INTRO_FULL_IMAGES_IN_TYPE_CONFIGURATION').'</span>';
+					$replace_txt = !empty($FC_jfields_html['images']) ? $FC_jfields_html['images'] : '<span class="alert alert-warning fc-small fc-iblock">'.JText::_('FLEXI_ENABLE_INTRO_FULL_IMAGES_IN_TYPE_CONFIGURATION').'</span>';
 					unset($FC_jfields_html['images']);
 					$field->html = str_replace('_INTRO_FULL_IMAGES_HTML_', $replace_txt, $field->html);
 				}
@@ -156,7 +156,7 @@ class \Joomla\CMS\Form\FormFieldFCFieldWrapper extends \Joomla\CMS\Form\FormFiel
 			{
 				if ($field->parameters->get('link_source')==-1)
 				{
-					$replace_txt = !empty($FC_jfields_html['urls']) ? $FC_jfields_html['urls'] : '<span class="alert alert-warning">'.\Joomla\CMS\Language\Text::_('FLEXI_ENABLE_LINKS_IN_TYPE_CONFIGURATION').'</span>';
+					$replace_txt = !empty($FC_jfields_html['urls']) ? $FC_jfields_html['urls'] : '<span class="alert alert-warning">'.JText::_('FLEXI_ENABLE_LINKS_IN_TYPE_CONFIGURATION').'</span>';
 					unset($FC_jfields_html['urls']);
 					$field->html = str_replace('_JOOMLA_ARTICLE_LINKS_HTML_', $replace_txt, $field->html);
 				}

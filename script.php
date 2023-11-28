@@ -23,7 +23,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 if (!defined('FLEXI_J16GE') || !defined('FLEXI_J30GE'))
 {
 	jimport('cms.version.version');
-	$jversion = new \Joomla\CMS\Version;
+	$jversion = new JVersion;
 }
 if (!defined('FLEXI_J16GE'))   define('FLEXI_J16GE', version_compare( $jversion->getShortVersion(), '1.6.0', 'ge' ) );
 if (!defined('FLEXI_J30GE'))   define('FLEXI_J30GE', version_compare( $jversion->getShortVersion(), '3.0.0', 'ge' ) );
@@ -77,10 +77,10 @@ class com_flexicontentInstallerScript
 		if (version_compare(PHP_VERSION, $PHP_VERSION_NEEDED, '<'))
 		{
 			// load english language file for 'com_flexicontent' component then override with current language file
-			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
-			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 
-			\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::sprintf('FLEXI_UPGRADE_PHP_VERSION_GE', $PHP_VERSION_NEEDED), 'warning');
+			JFactory::getApplication()->enqueueMessage(JText::sprintf('FLEXI_UPGRADE_PHP_VERSION_GE', $PHP_VERSION_NEEDED), 'warning');
 			return false;
 		}
 
@@ -88,7 +88,7 @@ class com_flexicontentInstallerScript
 		$existing_manifest = $this->getExistingManifest();
 
 		// Get Joomla version
-		$jversion = new \Joomla\CMS\Version();
+		$jversion = new JVersion();
 
 		// File version of new manifest file
 		$this->release = $parent->getManifest()->version;
@@ -109,7 +109,7 @@ class com_flexicontentInstallerScript
 		    	<img src="<?php echo 'components/com_flexicontent/assets/images/logo.png'; ?>" style="width:300px; margin: 0px 48px 0px 0px;" alt="FLEXIcontent Logo" />
 				</td>
 				<td valign="top">
-	     	 	<span><?php echo \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_DESCRIPTION'); ?></></span><br />
+	     	 	<span><?php echo JText::_('COM_FLEXICONTENT_DESCRIPTION'); ?></></span><br />
 	      	<font class="small">by <a href="http://www.flexicontent.org" target="_blank">Emmanuel Danan</a>,
 	      	<font class="small">by <a href="http://www.flexicontent.org" target="_blank">Georgios Papadakis</a>,
 	      	<font class="small">by <a href="http://www.flexicontent.org" target="_blank">Berges Yannick</a>,
@@ -123,13 +123,13 @@ class com_flexicontentInstallerScript
 
 		<?php
 		echo '
-		<div class="alert alert-info" style="margin:32px 0px 0px 0px;">' .\Joomla\CMS\Language\Text::_('Performing prior to installation tasks ... '). '
+		<div class="alert alert-info" style="margin:32px 0px 0px 0px;">' .JText::_('Performing prior to installation tasks ... '). '
 		<br/>
 		<ul>
 			<li>
-				' . \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_REQUIRED_PHPVER') . '
-				' . \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_MIN').': <span class="badge bg-info badge-info">' . $PHP_VERSION_NEEDED . '</span>
-				' . \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_CURRENT').': <span class="badge bg-success badge-success">' . PHP_VERSION . '</span>
+				' . JText::_('COM_FLEXICONTENT_REQUIRED_PHPVER') . '
+				' . JText::_('COM_FLEXICONTENT_MIN').': <span class="badge bg-info badge-info">' . $PHP_VERSION_NEEDED . '</span>
+				' . JText::_('COM_FLEXICONTENT_CURRENT').': <span class="badge bg-success badge-success">' . PHP_VERSION . '</span>
 			</li>
 		';
 
@@ -137,16 +137,16 @@ class com_flexicontentInstallerScript
 		if ( version_compare($jversion->getShortVersion(), $this->minimum_joomla_release, 'lt') )
 		{
 			echo '</ul>';
-			\Joomla\CMS\Factory::getApplication()->enqueueMessage('Cannot install com_flexicontent in a Joomla release prior to ' . $this->minimum_joomla_release, 'warning');
+			JFactory::getApplication()->enqueueMessage('Cannot install com_flexicontent in a Joomla release prior to ' . $this->minimum_joomla_release, 'warning');
 			return false;
 		}
 		else
 		{
 			echo '
 				<li>
-					' . \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_REQUIRED_JVER') . '
-					' . \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_MIN').': <span class="badge bg-info badge-info">' . $this->minimum_joomla_release . '</span>
-					' . \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_CURRENT').': <span class="badge bg-success badge-success">' . $jversion->getShortVersion() . '</span>
+					' . JText::_('COM_FLEXICONTENT_REQUIRED_JVER') . '
+					' . JText::_('COM_FLEXICONTENT_MIN').': <span class="badge bg-info badge-info">' . $this->minimum_joomla_release . '</span>
+					' . JText::_('COM_FLEXICONTENT_CURRENT').': <span class="badge bg-success badge-success">' . $jversion->getShortVersion() . '</span>
 				</li>';
 		}
 
@@ -157,11 +157,11 @@ class com_flexicontentInstallerScript
 			if ( !$downgrade_allowed && version_compare( $this->release, $this->release_existing, '<' ) )
 			{
 				$from_to = ''
-					.\Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_FROM'). ' <span class="badge bg-info badge-info">' .$this->release_existing. '</span> '
-					.\Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_TO'). ' <span class="badge bg-warning badge-warning">' .$this->release. '</span> ';
+					.JText::_('COM_FLEXICONTENT_FROM'). ' <span class="badge bg-info badge-info">' .$this->release_existing. '</span> '
+					.JText::_('COM_FLEXICONTENT_TO'). ' <span class="badge bg-warning badge-warning">' .$this->release. '</span> ';
 				// ?? Abort if the component being installed is not newer than the currently installed version
 				//echo '</ul>';
-				\Joomla\CMS\Factory::getApplication()->enqueueMessage('Can not perform downgrade of FLEXIcontent ' . $from_to, 'warning');
+				JFactory::getApplication()->enqueueMessage('Can not perform downgrade of FLEXIcontent ' . $from_to, 'warning');
 				return false;
 				echo '</ul>';
 				return false;  // Returning false here would abort
@@ -190,8 +190,8 @@ class com_flexicontentInstallerScript
 	{
 		echo '
 		<div class="alert alert-success" style="margin:8px 0px 8px 0px;">'
-			. \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_INSTALLING') . ' '
-			//. \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_VERSION')
+			. JText::_('COM_FLEXICONTENT_INSTALLING') . ' '
+			//. JText::_('COM_FLEXICONTENT_VERSION')
 			. ' <span class="badge bg-success badge-success">'.$this->release.'</span>
 		</div>';
 
@@ -211,22 +211,22 @@ class com_flexicontentInstallerScript
 	function update( $parent )
 	{
 		echo '<div class="alert alert-success" style="margin:8px 0px 8px 0px;">'
-			. \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_UPDATING_INSTALLATION') . ' '
-			//. \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_VERSION')
+			. JText::_('COM_FLEXICONTENT_UPDATING_INSTALLATION') . ' '
+			//. JText::_('COM_FLEXICONTENT_VERSION')
 			;
 
 		if ( version_compare( $this->release, $this->release_existing, 'ge' ) ) {
 			echo '
-				<span class="badge bg-success badge-success">' . \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_UPGRADING') . '</span>
-				' . \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_FROM') . ' <span class="badge bg-info badge-info">' . $this->release_existing . '</span>
-				' . \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_TO')   . ' <span class="badge bg-success badge-success">' . $this->release . '</span>';
+				<span class="badge bg-success badge-success">' . JText::_('COM_FLEXICONTENT_UPGRADING') . '</span>
+				' . JText::_('COM_FLEXICONTENT_FROM') . ' <span class="badge bg-info badge-info">' . $this->release_existing . '</span>
+				' . JText::_('COM_FLEXICONTENT_TO')   . ' <span class="badge bg-success badge-success">' . $this->release . '</span>';
 		}
 		else
 		{
 			echo '
-				<span class="badge bg-warning badge-warning">' . \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_DOWNGRADING') . '</span>
-				' . \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_FROM') . ' <span class="badge bg-info badge-info">' . $this->release_existing . '</span>
-				' . \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_TO')   . ' <span class="badge bg-info badge-info">' . $this->release . '</span>';
+				<span class="badge bg-warning badge-warning">' . JText::_('COM_FLEXICONTENT_DOWNGRADING') . '</span>
+				' . JText::_('COM_FLEXICONTENT_FROM') . ' <span class="badge bg-info badge-info">' . $this->release_existing . '</span>
+				' . JText::_('COM_FLEXICONTENT_TO')   . ' <span class="badge bg-info badge-info">' . $this->release . '</span>';
 		}
 		echo '</div>';
 
@@ -244,7 +244,7 @@ class com_flexicontentInstallerScript
 		$extensions = array();
 
 		// clear a cache
-		$cache = \Joomla\CMS\Factory::getCache();
+		$cache = JFactory::getCache();
 		$cache->clean( '_system' );  // This might be necessary as installing-uninstalling in same session may result in wrong extension ids, etc
 		$cache->clean( 'com_flexicontent' );
 		$cache->clean( 'com_flexicontent_tmpl' );
@@ -253,14 +253,14 @@ class com_flexicontentInstallerScript
 		$cache->clean( 'com_flexicontent_filters' );
 
 		// reseting post installation session variables
-		$session  = \Joomla\CMS\Factory::getSession();
+		$session  = JFactory::getSession();
 		$session->set('flexicontent.postinstall', false);
 		$session->set('flexicontent.allplgpublish', false);
 		$session->set('flexicontent.allplgpublish', false);
 		$session->set('unbounded_noext', false, 'flexicontent');
 		$session->set('unbounded_badcat', false, 'flexicontent');
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 
 		// Parse XML file to identify additional extensions,
 		// This code part (for installing additional extensions) originates from Zoo J1.5 Component:
@@ -284,7 +284,7 @@ class com_flexicontentInstallerScript
 					'ext_name' => ((string) $ext->attributes()->name),  // needs to be converted to string
 					'ext_folder' => ((string) $ext->attributes()->instfolder),  // needs to be converted to string
 					'enabled' => ((string) $ext->attributes()->enabled),
-					'installer' => new \Joomla\CMS\Installer\Installer(),
+					'installer' => new JInstaller(),
 					'status' => null,
 				);
 	    }
@@ -295,7 +295,7 @@ class com_flexicontentInstallerScript
 		// Install discovered extensions
 		foreach ($extensions as $i => $extension)
 		{
-			$jinstaller = & $extensions[$i]['installer'];    // new \Joomla\CMS\Installer\Installer();
+			$jinstaller = & $extensions[$i]['installer'];    // new JInstaller();
 
 			// J1.6+ installer requires that we explicit set override/upgrade options
 			$jinstaller->setOverwrite(true);
@@ -339,22 +339,22 @@ class com_flexicontentInstallerScript
 		 * Instead we will use buttons with basic JS to toggle the installation logs
 		 */
 
-		//echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.startAccordion', 'additional-extensions', array());
-		//echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addSlide', 'additional-extensions', \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_LOG') . ' : ' . \Joomla\CMS\Language\Text::_( 'COM_FLEXICONTENT_ADDITIONAL_EXTENSIONS' ), 'additional-extensions-slide0' );
+		//echo JHtml::_('bootstrap.startAccordion', 'additional-extensions', array());
+		//echo JHtml::_('bootstrap.addSlide', 'additional-extensions', JText::_('COM_FLEXICONTENT_LOG') . ' : ' . JText::_( 'COM_FLEXICONTENT_ADDITIONAL_EXTENSIONS' ), 'additional-extensions-slide0' );
 		?>
 
 		<span class="btn btn-primary" onclick="var tbl = document.getElementById('fc_additional_extensions_log'); tbl.style.display = tbl.style.display === 'none' ? '' : 'none';">
-			<?php echo \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_LOG') . ' : ' . \Joomla\CMS\Language\Text::_( 'COM_FLEXICONTENT_ADDITIONAL_EXTENSIONS' ); ?>
+			<?php echo JText::_('COM_FLEXICONTENT_LOG') . ' : ' . JText::_( 'COM_FLEXICONTENT_ADDITIONAL_EXTENSIONS' ); ?>
 		</span>
 
 		<table class="adminlist" id="fc_additional_extensions_log" style="display: none;">
 			<thead>
 				<tr>
 					<th style="text-align:left; width:500px;">
-						<span class="label"><?php echo \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_EXTENSION'); ?></span>
+						<span class="label"><?php echo JText::_('COM_FLEXICONTENT_EXTENSION'); ?></span>
 					</th>
 					<th style="text-align:left">
-						<span class="label"><?php echo \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_STATUS'); ?></span>
+						<span class="label"><?php echo JText::_('COM_FLEXICONTENT_STATUS'); ?></span>
 					</th>
 				</tr>
 			</thead>
@@ -366,7 +366,7 @@ class com_flexicontentInstallerScript
 			<tbody>
 				<?php foreach ($extensions as $i => $ext) : ?>
 					<tr class="row<?php echo $i % 2; ?>">
-						<td class="key" style="font-size:11px;">[<?php echo \Joomla\CMS\Language\Text::_($ext['type']); ?>] <?php echo $ext['name']; ?></td>
+						<td class="key" style="font-size:11px;">[<?php echo JText::_($ext['type']); ?>] <?php echo $ext['name']; ?></td>
 						<td>
 							<?php
 							if ($ext['status']===null)
@@ -379,14 +379,14 @@ class com_flexicontentInstallerScript
 							<span class="<?php echo $status_class; ?>">
 								<?php
 									if ( $ext['status'] === null ) {
-										echo \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_SKIPPED');
+										echo JText::_('COM_FLEXICONTENT_SKIPPED');
 									} else if ($ext['status']) {
-										echo \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_INSTALLED');
+										echo JText::_('COM_FLEXICONTENT_INSTALLED');
 									} else {
-										$msg = \Joomla\CMS\Language\Text::_(FLEXI_NEW_INSTALL ? 'Upgrade ERROR (extension removed)' : 'Installation -- FAILED --' ) ."<br/>";
+										$msg = JText::_(FLEXI_NEW_INSTALL ? 'Upgrade ERROR (extension removed)' : 'Installation -- FAILED --' ) ."<br/>";
 										if (FLEXI_NEW_INSTALL) $msg .= "FLEXIcontent may not work properly, please install an older or newer FLEXIcontent package";
 										echo $msg;
-										\Joomla\CMS\Factory::getApplication()->enqueueMessage('<br/>'.$extensions[$i]['name'] .' '. \Joomla\CMS\Language\Text::_($extensions[$i]['type']) . ': ' . $msg, 'warning');
+										JFactory::getApplication()->enqueueMessage('<br/>'.$extensions[$i]['name'] .' '. JText::_($extensions[$i]['type']) . ': ' . $msg, 'warning');
 									}
 								?>
 							</span>
@@ -397,8 +397,8 @@ class com_flexicontentInstallerScript
 		</table>
 
 		<?php
-		//echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endSlide');
-		//echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endAccordion');
+		//echo JHtml::_('bootstrap.endSlide');
+		//echo JHtml::_('bootstrap.endAccordion');
 
 		// Rollback on installation errors, abort() will be called on every additional extension installed above
 		if ($error)
@@ -408,17 +408,17 @@ class com_flexicontentInstallerScript
 				if ( $extensions[$i]['status'] )
 				{
 					$extensions[$i]['installer']->abort('<span style="color:black">'.
-						$extensions[$i]['name'] .' '. \Joomla\CMS\Language\Text::_($extensions[$i]['type']) .' '. \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_INSTALLED') .':</span>'.
-						' <span class="badge bg-warning badge-warning">'. \Joomla\CMS\Language\Text::_('rolling back').'</span>',
+						$extensions[$i]['name'] .' '. JText::_($extensions[$i]['type']) .' '. JText::_('COM_FLEXICONTENT_INSTALLED') .':</span>'.
+						' <span class="badge bg-warning badge-warning">'. JText::_('rolling back').'</span>',
 						$extensions[$i]['type']
 					);
 					//$extensions[$i]['status'] = false;
 				} /*else if ( $extensions[$i]['status'] === false ) {
-					$msg = ' <span style="color:red">'. \Joomla\CMS\Language\Text::_('-- FAILED --').'</span>';
-					\Joomla\CMS\Factory::getApplication()->enqueueMessage('<span style="color:black">'.$extensions[$i]['name'] . ' ' . \Joomla\CMS\Language\Text::_($extensions[$i]['type']) . ' ' . \Joomla\CMS\Language\Text::_('Install') . '</span> : ' . $msg, 'warning');
+					$msg = ' <span style="color:red">'. JText::_('-- FAILED --').'</span>';
+					JFactory::getApplication()->enqueueMessage('<span style="color:black">'.$extensions[$i]['name'] . ' ' . JText::_($extensions[$i]['type']) . ' ' . JText::_('Install') . '</span> : ' . $msg, 'warning');
 				} else {
-					$msg = ' <span style="color:darkgray">'. \Joomla\CMS\Language\Text::_('Skipped').'</span>';
-					\Joomla\CMS\Factory::getApplication()->enqueueMessage('<span style="color:black">'.$extensions[$i]['name'] . ' ' . \Joomla\CMS\Language\Text::_($extensions[$i]['type']) . ' ' . \Joomla\CMS\Language\Text::_('Install') . '</span> : ' . $msg, 'warning');
+					$msg = ' <span style="color:darkgray">'. JText::_('Skipped').'</span>';
+					JFactory::getApplication()->enqueueMessage('<span style="color:black">'.$extensions[$i]['name'] . ' ' . JText::_($extensions[$i]['type']) . ' ' . JText::_('Install') . '</span> : ' . $msg, 'warning');
 				}*/
 			}
 
@@ -442,8 +442,8 @@ class com_flexicontentInstallerScript
 			return;
 		}
 
-		$app = \Joomla\CMS\Factory::getApplication();
-		$db = \Joomla\CMS\Factory::getDbo();
+		$app = JFactory::getApplication();
+		$db = JFactory::getDbo();
 		$dbprefix = $app->getCfg('dbprefix');
 		$dbname   = $app->getCfg('db');
 
@@ -460,7 +460,7 @@ class com_flexicontentInstallerScript
 
 		$this->_setComponentParams( $params );*/
 
-		/*\Joomla\CMS\Factory::getApplication()->enqueueMessage('
+		/*JFactory::getApplication()->enqueueMessage('
 			Please clear your frontend / backend Joomla cache once, <br/>
 			- to make sure that any changes (e.g in filtering) take immediate effect<br/>
 			In case of display issue, press CTRL+F5 / F5 / command+R, (Windows / Linux / Apple\'s Safari)<br/>
@@ -473,22 +473,22 @@ class com_flexicontentInstallerScript
 			: '<link type="text/css" href="components/com_flexicontent/assets/css/j4x.css" rel="stylesheet">';
 		echo '<link type="text/css" href="components/com_flexicontent/assets/css/flexicontentbackend.css" rel="stylesheet">';
 
-		//echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.startAccordion', 'upgrade-tasks', array());
-		//echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addSlide', 'upgrade-tasks', \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_LOG') . ' : ' . \Joomla\CMS\Language\Text::_( 'COM_FLEXICONTENT_UPGRADE_TASKS' ), 'upgrade-tasks-slide0' );
+		//echo JHtml::_('bootstrap.startAccordion', 'upgrade-tasks', array());
+		//echo JHtml::_('bootstrap.addSlide', 'upgrade-tasks', JText::_('COM_FLEXICONTENT_LOG') . ' : ' . JText::_( 'COM_FLEXICONTENT_UPGRADE_TASKS' ), 'upgrade-tasks-slide0' );
 		?>
 
 		<span class="btn btn-primary" onclick="var tbl = document.getElementById('fc_upgrade_tasks_log'); tbl.style.display = tbl.style.display === 'none' ? '' : 'none';">
-			<?php echo \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_LOG') . ' : ' . \Joomla\CMS\Language\Text::_( 'COM_FLEXICONTENT_UPGRADE_TASKS' ); ?>
+			<?php echo JText::_('COM_FLEXICONTENT_LOG') . ' : ' . JText::_( 'COM_FLEXICONTENT_UPGRADE_TASKS' ); ?>
 		</span>
 
 		<table class="adminlist" id="fc_upgrade_tasks_log" style="display: none;">
 			<thead>
 				<tr>
 					<th style="text-align:left; width:500px;">
-						<span class="label"><?php echo \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_TASKS'); ?></span>
+						<span class="label"><?php echo JText::_('COM_FLEXICONTENT_TASKS'); ?></span>
 					</th>
 					<th style="text-align:left">
-						<span class="label"><?php echo \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_STATUS'); ?></span>
+						<span class="label"><?php echo JText::_('COM_FLEXICONTENT_STATUS'); ?></span>
 					</th>
 				</tr>
 			</thead>
@@ -1495,29 +1495,29 @@ class com_flexicontentInstallerScript
 			</tbody>
 		</table>
 		<?php
-		//echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endSlide');
-		//echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endAccordion');
+		//echo JHtml::_('bootstrap.endSlide');
+		//echo JHtml::_('bootstrap.endAccordion');
 		?>
 
 		<div class="alert alert-success" style="margin: 8px 0 64px 0;">
 			<span class="btn btn-info" onclick="window.open('index.php?option=com_flexicontent','_self');" style="cursor: pointer;">
-				<?php echo \Joomla\CMS\Language\Text::_('FLEXI_DASHBOARD'); ?>
+				<?php echo JText::_('FLEXI_DASHBOARD'); ?>
   		</span>
-			<?php echo \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_PLEASE_COMPLETE_POST_INSTALL_TASKS_AT_DASHBOARD'); ?>
+			<?php echo JText::_('COM_FLEXICONTENT_PLEASE_COMPLETE_POST_INSTALL_TASKS_AT_DASHBOARD'); ?>
   	</div>
 
 		<?php
 		/* This code maybe used in the future to automate post-installation tasks
 			<tr>
 				<td valign="top">
-					<?php // echo \Joomla\CMS\Language\Text::_('Choose an option to finish the install :'); ?>
+					<?php // echo JText::_('Choose an option to finish the install :'); ?>
 				</td>
 				<td valign="top" width="100%" style="font-weight: bold; color: red; font-size: 14px;">
 					<a href="index.php?option=com_flexicontent&task=finishinstall&action=newinstall" style="font-weight: bold; color: red; font-size: 14px;">
-		    		<?php // echo \Joomla\CMS\Language\Text::_('New install'); ?>
+		    		<?php // echo JText::_('New install'); ?>
 					</a>&nbsp;&nbsp;|&nbsp;&nbsp;
 					<a href="index.php?option=com_flexicontent&task=finishinstall&action=update" style="font-weight: bold; color: red; font-size: 14px;">
-		    		<?php // echo \Joomla\CMS\Language\Text::_('Update an existing install'); ?>
+		    		<?php // echo JText::_('Update an existing install'); ?>
 					</a>
 				</td>
 			</tr>
@@ -1534,7 +1534,7 @@ class com_flexicontentInstallerScript
 		error_reporting(E_ERROR || E_WARNING || E_NOTICE);
 		ini_set('display_errors',1);
 
-		$app = \Joomla\CMS\Factory::getApplication();
+		$app = JFactory::getApplication();
 
 		// Extra CSS needed for J3.x+
 		echo FLEXI_J40GE
@@ -1548,7 +1548,7 @@ class com_flexicontentInstallerScript
 		// init vars
 		$error = false;
 		$extensions = array();
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 		$dbprefix = $app->getCfg('dbprefix');
 		$dbname   = $app->getCfg('db');
 
@@ -1589,7 +1589,7 @@ class com_flexicontentInstallerScript
 								'type' => $ext->getName(),
 								'id' => $res_id,
 								'client_id' => isset($res->client_id) ? $res->client_id : 0,
-								'installer' => new \Joomla\CMS\Installer\Installer(),
+								'installer' => new JInstaller(),
 								'status' => false
 							);
 						}
@@ -1609,7 +1609,7 @@ class com_flexicontentInstallerScript
 							'type' => $ext->getName(),
 							'id' => $res_id,
 							'client_id' => isset($res->client_id) ? $res->client_id : 0,
-							'installer' => new \Joomla\CMS\Installer\Installer(),
+							'installer' => new JInstaller(),
 							'status' => false);
 						break;
 				}
@@ -1626,15 +1626,15 @@ class com_flexicontentInstallerScript
 		}
 
 		?>
-		<div class="alert alert-warning" style="margin:24px 0px 2px 0px; width: 300px;"><?php echo \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_ADDITIONAL_EXTENSIONS'); ?></div>
+		<div class="alert alert-warning" style="margin:24px 0px 2px 0px; width: 300px;"><?php echo JText::_('COM_FLEXICONTENT_ADDITIONAL_EXTENSIONS'); ?></div>
 		<table class="adminlist">
 			<thead>
 				<tr>
 					<th style="text-align:left; width:500px;">
-						<span class="label"><?php echo \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_EXTENSION'); ?></span>
+						<span class="label"><?php echo JText::_('COM_FLEXICONTENT_EXTENSION'); ?></span>
 					</th>
 					<th style="text-align:left">
-						<span class="label"><?php echo \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_STATUS'); ?></span>
+						<span class="label"><?php echo JText::_('COM_FLEXICONTENT_STATUS'); ?></span>
 					</th>
 				</tr>
 			</thead>
@@ -1646,10 +1646,10 @@ class com_flexicontentInstallerScript
 			<tbody>
 				<?php foreach ($extensions as $i => $ext) : ?>
 					<tr class="row<?php echo ($i+1) % 2; ?>">
-						<td class="key" style="font-size:11px;">[<?php echo \Joomla\CMS\Language\Text::_($ext['type']); ?>] <?php echo $ext['name']; ?></td>
+						<td class="key" style="font-size:11px;">[<?php echo JText::_($ext['type']); ?>] <?php echo $ext['name']; ?></td>
 						<td>
 							<?php $status_class = $ext['status'] ? 'badge bg-success badge-success' : 'badge badge-error'; ?>
-							<span class="<?php echo $status_class; ?>"><?php echo $ext['status'] ? \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_UNINSTALLED') : \Joomla\CMS\Language\Text::_('uninstall FAILED'); ?></span>
+							<span class="<?php echo $status_class; ?>"><?php echo $ext['status'] ? JText::_('COM_FLEXICONTENT_UNINSTALLED') : JText::_('uninstall FAILED'); ?></span>
 						</td>
 					</tr>
 				<?php endforeach; ?>
@@ -1661,10 +1661,10 @@ class com_flexicontentInstallerScript
 			<thead>
 				<tr>
 					<th style="text-align:left; width:500px;">
-						<span class="label"><?php echo \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_TASKS'); ?></span>
+						<span class="label"><?php echo JText::_('COM_FLEXICONTENT_TASKS'); ?></span>
 					</th>
 					<th style="text-align:left">
-						<span class="label"><?php echo \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_STATUS'); ?></span>
+						<span class="label"><?php echo JText::_('COM_FLEXICONTENT_STATUS'); ?></span>
 					</th>
 				</tr>
 			</thead>
@@ -1684,7 +1684,7 @@ class com_flexicontentInstallerScript
 						<?php
 						$queries = array();
 
-						$query = 'SHOW TABLES LIKE "' . \Joomla\CMS\Factory::getApplication()->getCfg('dbprefix') . 'jcomments"';
+						$query = 'SHOW TABLES LIKE "' . JFactory::getApplication()->getCfg('dbprefix') . 'jcomments"';
 						$db->setQuery($query);
 						$jcomments_tbl_exists = (boolean) count($db->loadObjectList());
 						if ($jcomments_tbl_exists) {
@@ -1706,7 +1706,7 @@ class com_flexicontentInstallerScript
 								}
 							}
 							if ( $count_rows ) {
-								echo '<span class="badge bg-success badge-success">'.\Joomla\CMS\Language\Text::_("Comments restored").' ('.$count_rows.' effected rows)</span>';
+								echo '<span class="badge bg-success badge-success">'.JText::_("Comments restored").' ('.$count_rows.' effected rows)</span>';
 							} else echo '<span class="badge bg-info badge-info">restoring not needed</span>';
 						}
 						else echo '<span class="badge bg-info badge-info">jComments not installed, nothing to do</span>';
@@ -1720,12 +1720,12 @@ class com_flexicontentInstallerScript
 					<td class="key" style="font-size:11px;">Restore com_content top-level category assets</td>
 					<td>
 						<?php
-						$asset	= \Joomla\CMS\Table\Table::getInstance('asset');
+						$asset	= JTable::getInstance('asset');
 						$asset_loaded = $asset->loadByName('com_content');  // Try to load component asset for com_content
 						if (!$asset_loaded) {
 							$result = 0;
 						} else {
-							$cc_asset	= \Joomla\CMS\Table\Table::getInstance('asset');
+							$cc_asset	= JTable::getInstance('asset');
 							$query = 'SELECT s.id FROM #__assets AS s'
 								.' JOIN #__categories AS c ON s.id=c.asset_id'
 								.' WHERE c.parent_id=1 AND c.extension="com_content"';
@@ -1756,11 +1756,11 @@ class com_flexicontentInstallerScript
 						?>
 						<span class="<?php echo $status_class; ?>"><?php
 						if ($result==2) {
-							echo \Joomla\CMS\Language\Text::_("Assets restored");
+							echo JText::_("Assets restored");
 						} else if ($result==1) {
-							echo \Joomla\CMS\Language\Text::_("Failed to restore some assets");
+							echo JText::_("Failed to restore some assets");
 						} else {
-							echo \Joomla\CMS\Language\Text::_("Failed to load asset for com_content.");
+							echo JText::_("Failed to load asset for com_content.");
 						}
 						?></span>
 					</td>
@@ -1828,9 +1828,9 @@ class com_flexicontentInstallerScript
 						{
 							foreach($tmpl_override_files as $file)
 							{
-								if (\Joomla\CMS\Filesystem\File::exists($file))
+								if (JFile::exists($file))
 								{
-									if (!\Joomla\CMS\Filesystem\File::delete($file))
+									if (!JFile::delete($file))
 									{
 										echo 'Cannot delete legacy file: ' . $file . '<br />';
 									}
@@ -1857,7 +1857,7 @@ class com_flexicontentInstallerScript
 		static $paramsArr = null;
 		if ($paramsArr !== null) return $paramsArr;
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 		$db->setQuery( 'SELECT manifest_cache FROM #__extensions WHERE element = '. $db->quote($name) .' AND type= '. $db->quote($type) );
 		$manifest_cache =  $db->loadResult();
 
@@ -1873,7 +1873,7 @@ class com_flexicontentInstallerScript
 		if ( count($param_array) > 0 )
 		{
 			// read the existing component value(s)
-			$db = \Joomla\CMS\Factory::getDbo();
+			$db = JFactory::getDbo();
 			$db->setQuery('SELECT params FROM #__extensions WHERE element = "com_flexicontent"');
 			$params = json_decode( $db->loadResult(), true );
 			// add the new variable(s) to the existing one(s)
@@ -1896,7 +1896,7 @@ class com_flexicontentInstallerScript
 	private function _renameExtensionLegacyParameters($map, $dbtbl_name, $dbcol_name, $record_id)
 	{
 		// Load parameters directly from DB
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 		$query = 'SELECT ' . $dbcol_name
 			. ' FROM #__' . $dbtbl_name . ' '
 			. ' WHERE '
@@ -1951,7 +1951,7 @@ class com_flexicontentInstallerScript
 			$attr_vals_fix = array()  // For an example see groupmarker case
 	)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 		
 		$where = array();
 		foreach($match_cols as $col => $val)
@@ -2033,7 +2033,7 @@ class com_flexicontentInstallerScript
 	 */
 	private function _deprecate_field($old_type, $new_type, & $msg, & $n)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 
 		$query = 'UPDATE #__flexicontent_fields'
 			.' SET field_type = ' .$db->Quote($new_type)
@@ -2060,7 +2060,7 @@ class com_flexicontentInstallerScript
 
 		if ($ext && $ext['id'] > 0)
 		{
-			$installer = new \Joomla\CMS\Installer\Installer();
+			$installer = new JInstaller();
 
 			$msg[$n] = $installer->uninstall($ext['type'], $ext['id'], (int)$ext['client_id'])
 				? '<br/>'.$msg[$n].', uninstalling plugin: <span class="badge bg-success badge-success">success</span> <br/>'

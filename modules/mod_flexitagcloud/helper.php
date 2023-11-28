@@ -24,12 +24,12 @@ class modFlexiTagCloudHelper
 	static function getTags(&$params, &$module)
 	{
 		// Initialize
-		$app  = \Joomla\CMS\Factory::getApplication();
-		$db   = \Joomla\CMS\Factory::getDbo();
-		$user = \Joomla\CMS\Factory::getUser();
-		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
+		$app  = JFactory::getApplication();
+		$db   = JFactory::getDbo();
+		$user = JFactory::getUser();
+		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 
-		//$now    = FLEXI_J16GE ? \Joomla\CMS\Factory::getDate()->toSql() : \Joomla\CMS\Factory::getDate()->toMySQL();
+		//$now    = FLEXI_J16GE ? JFactory::getDate()->toSql() : JFactory::getDate()->toMySQL();
 		$_nowDate = 'UTC_TIMESTAMP()'; //$db->Quote($now);
 		$nullDate	= $db->getNullDate();
 		$show_noauth = $cparams->get('show_noauth', 0);
@@ -58,7 +58,7 @@ class modFlexiTagCloudHelper
 		// access scope
 		if (!$show_noauth)
 		{
-			$aid_arr  = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
+			$aid_arr  = JAccess::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
 			$where  .= ' AND i.access IN ('.$aid_list.')';
 		}
@@ -228,12 +228,12 @@ class modFlexiTagCloudHelper
 			//usort($list, fn($a, $b) => ((int)$b->assignments_count > (int)$a->assignments_count));
 
 			$lists[$i]->description = $row->description;
-			$lists[$i]->screenreader = \Joomla\CMS\Language\Text::sprintf('FLEXI_NR_ITEMS_TAGGED', $row->no);
+			$lists[$i]->screenreader = JText::sprintf('FLEXI_NR_ITEMS_TAGGED', $row->no);
 
 			$lists[$i]->link = $use_catlinks
 				? FlexicontentHelperRoute::getCategoryRoute(0, $tagitemid, array('layout'=>'tags','tagid'=>$row->slug)) . ($typeid ? '&filter_8=' . $typeid : '')
 				: FlexicontentHelperRoute::getTagRoute($row->slug, $tagitemid) . '&module='.$module->id;
-			$lists[$i]->link = \Joomla\CMS\Router\Route::_( $lists[$i]->link );
+			$lists[$i]->link = JRoute::_( $lists[$i]->link );
 
 			$i++;
 		}

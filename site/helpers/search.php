@@ -30,9 +30,9 @@ class FLEXIadvsearchHelper
 	static function santiseSearchWord(&$searchword, $searchphrase, $min=2)
 	{
 		$ignored = false;
-		$lang = \Joomla\CMS\Factory::getLanguage();
+		$lang = JFactory::getLanguage();
 		$lang_tag = $lang->getTag();
-		$search_prefix = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
+		$search_prefix = JComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
 
 		$search_ignore = array();
 		$ignoreFile = LanguageHelper::getLanguagePath().DS.$lang_tag.DS.$lang_tag.'.ignore.php';
@@ -68,7 +68,7 @@ class FLEXIadvsearchHelper
 		}
 
 		// Set words that were removed due to being too short
-		\Joomla\CMS\Factory::getApplication()->input->set('shortwords_sanitize', implode(' ', $search_ignore));
+		JFactory::getApplication()->input->set('shortwords_sanitize', implode(' ', $search_ignore));
 
 		return $ignored;
 	}
@@ -96,8 +96,8 @@ class FLEXIadvsearchHelper
 
 	static function logSearch( $search_term )
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
-		$params = \Joomla\CMS\Component\ComponentHelper::getParams('com_search');
+		$db = JFactory::getDbo();
+		$params = JComponentHelper::getParams('com_search');
 		$enable_log_searches = $params->get('enabled');
 
 		$search_term_quoted = $db->Quote(trim($search_term));

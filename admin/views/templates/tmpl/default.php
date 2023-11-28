@@ -17,15 +17,15 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
-$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+$cparams  = JComponentHelper::getParams('com_flexicontent');
 
 $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 $ico_class = 'btn'; //'fc-man-icon-s';
-$commentimage = \Joomla\CMS\HTML\HTMLHelper::image ( 'administrator/components/com_flexicontent/assets/images/comments.png', \Joomla\CMS\Language\Text::_( 'FLEXI_COMMENT' ), ' class="fc-man-icon-s" style="vertical-align:top;" ');
-$loading_msg = flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_LOADING') .' ... '. \Joomla\CMS\Language\Text::_('FLEXI_PLEASE_WAIT'), 2);
+$commentimage = JHtml::image ( 'administrator/components/com_flexicontent/assets/images/comments.png', JText::_( 'FLEXI_COMMENT' ), ' class="fc-man-icon-s" style="vertical-align:top;" ');
+$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
 
-\Joomla\CMS\Language\Text::script("FLEXI_UPDATING_CONTENTS", true);
-\Joomla\CMS\Factory::getDocument()->addScriptDeclaration('
+JText::script("FLEXI_UPDATING_CONTENTS", true);
+JFactory::getDocument()->addScriptDeclaration('
 	function fc_template_modal_close()
 	{
 		window.location.reload(false);
@@ -35,13 +35,13 @@ $loading_msg = flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI
 
 $basetemplates = array('grid','table','faq','items-tabbed');
 $ctrl_task = FLEXI_J16GE ? 'task=templates.' : 'controller=templates&task=';
-$form_token = \Joomla\CMS\Session\Session::getFormToken();
+$form_token = JSession::getFormToken();
 $js = "
 var fc_tmpls_modal;
 
 jQuery(document).ready(function() {
 	jQuery('span.deletable-template').click(function( event ) {
-		var answer = confirm('".\Joomla\CMS\Language\Text::_( 'FLEXI_TEMPLATE_DELETE_CONFIRM',true )."')
+		var answer = confirm('".JText::_( 'FLEXI_TEMPLATE_DELETE_CONFIRM',true )."')
 		if (!answer) return;
 		var el = jQuery(this);
 		var tmpl_name = el.attr('id').replace('del-','');
@@ -58,20 +58,20 @@ jQuery(document).ready(function() {
 	});
 });
 ";
-\Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+JFactory::getDocument()->addScriptDeclaration($js);
 
-$edit_layout = htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', true), ENT_QUOTES, 'UTF-8');
+$edit_layout = htmlspecialchars(JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', true), ENT_QUOTES, 'UTF-8');
 $edit_icon         = '<span class="icon-edit"></span>';
 $editSingle_icon   = $edit_icon . ' <span class="icon-file"></span>';
-	//\Joomla\CMS\HTML\HTMLHelper::image ( 'components/com_flexicontent/assets/images/page_single_edit.png', $edit_layout, ' style="min-width:22px;" class="'.$ico_class.' '.$tip_class.'" title="'.$edit_layout.'" ' );
+	//JHtml::image ( 'components/com_flexicontent/assets/images/page_single_edit.png', $edit_layout, ' style="min-width:22px;" class="'.$ico_class.' '.$tip_class.'" title="'.$edit_layout.'" ' );
 $editMultiple_icon = $edit_icon . ' <span class="icon-stack"></span>';
-	//\Joomla\CMS\HTML\HTMLHelper::image ( 'components/com_flexicontent/assets/images/page_multiple_edit.png', $edit_layout, ' style="min-width:22px;" class="'.$ico_class.' '.$tip_class.'" title="'.$edit_layout.'" '  );
+	//JHtml::image ( 'components/com_flexicontent/assets/images/page_multiple_edit.png', $edit_layout, ' style="min-width:22px;" class="'.$ico_class.' '.$tip_class.'" title="'.$edit_layout.'" '  );
 $editLayout_icon   = $editSingle_icon;
-$noEditLayout_icon = '<span class="icon-edit" title="' . \Joomla\CMS\Language\Text::_( 'FLEXI_NOEDIT_LAYOUT', true ) .'"></span>';
+$noEditLayout_icon = '<span class="icon-edit" title="' . JText::_( 'FLEXI_NOEDIT_LAYOUT', true ) .'"></span>';
 $copyTmpl_icon     = '<span class="icon-copy"></span>';
-	//\Joomla\CMS\HTML\HTMLHelper::image ( 'administrator/components/com_flexicontent/assets/images/layout_add.png', \Joomla\CMS\Language\Text::_( 'FLEXI_DUPLICATE', true ), ' style="min-width:16px;" class="'.$ico_class.' '.$tip_class.'" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_DUPLICATE', true ).'" '  );
+	//JHtml::image ( 'administrator/components/com_flexicontent/assets/images/layout_add.png', JText::_( 'FLEXI_DUPLICATE', true ), ' style="min-width:16px;" class="'.$ico_class.' '.$tip_class.'" title="'.JText::_( 'FLEXI_DUPLICATE', true ).'" '  );
 $delTmpl_icon      = '<span class="icon-delete"></span>';
-	//\Joomla\CMS\HTML\HTMLHelper::image ( 'administrator/components/com_flexicontent/assets/images/layout_delete.png', \Joomla\CMS\Language\Text::_( 'FLEXI_REMOVE', true ), ' style="min-width:16px;" class="'.$ico_class.' '.$tip_class.'" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_REMOVE', true ).'" '  );
+	//JHtml::image ( 'administrator/components/com_flexicontent/assets/images/layout_delete.png', JText::_( 'FLEXI_REMOVE', true ), ' style="min-width:16px;" class="'.$ico_class.' '.$tip_class.'" title="'.JText::_( 'FLEXI_REMOVE', true ).'" '  );
 
 $list_total_cols = 8;
 ?>
@@ -119,7 +119,7 @@ $list_total_cols = 8;
 	<!--
 	<?php $_class = FLEXI_J30GE ? ' btn' : ' fc_button fcsimple fcsmall'; ?>
 	<div class="btn-group" style="margin: 2px 32px 6px -3px; display:inline-block;">
-		<input type="button" id="fc_howto_box_btn" class="<?php echo $_class; ?> btn-warning" onclick="fc_toggle_box_via_btn('howto_box', this, 'btn-primary');" value="<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_HOW_TO' ); ?>" />
+		<input type="button" id="fc_howto_box_btn" class="<?php echo $_class; ?> btn-warning" onclick="fc_toggle_box_via_btn('howto_box', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_HOW_TO' ); ?>" />
 	</div>
 	-->
 	
@@ -127,19 +127,19 @@ $list_total_cols = 8;
 	
 	<thead>
 		<tr>
-			<th><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_NUM' ); ?></th>
+			<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 			<th class="left">
-				<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value="" title="<?php echo \Joomla\CMS\Language\Text::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
+				<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
 				<label for="checkall-toggle" class="green single"></label>
 			</th>
 			<th></th>
-			<th class="title" style="text-align:left;"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_TEMPLATE_NAME' ); ?></th>
+			<th class="title" style="text-align:left;"><?php echo JText::_( 'FLEXI_TEMPLATE_NAME' ); ?></th>
 			<th colspan="2" style="text-align: left">
-				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_SINGLE_CONTENT' ); ?><br/>
+				<?php echo JText::_( 'FLEXI_SINGLE_CONTENT' ); ?><br/>
 				<span class="badge text-white bg-info">ITEM Layout</span>
 			</th>
 			<th colspan="2" style="text-align: left">
-				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_CONTENT_LISTS' ); ?><br/>
+				<?php echo JText::_( 'FLEXI_CONTENT_LISTS' ); ?><br/>
 				<span class="badge text-white bg-info">CATEGORY Layout</span>
 			</th>
 		</tr>
@@ -154,8 +154,8 @@ $list_total_cols = 8;
 		$cats_texts = flexicontent_tmpl::getLayoutTexts('category');
 		foreach ($this->rows as $row) :
 			$copylink 	= 'index.php?option=com_flexicontent&amp;view=templates&amp;layout=duplicate&amp;tmpl=component&amp;source='. $row->name;
-			$itemlink	= 'index.php?option=com_flexicontent&amp;view=template&amp;type=items&amp;folder=' . $row->name . '&amp;' . \Joomla\CMS\Session\Session::getFormToken() . '=1';
-			$catlink	= 'index.php?option=com_flexicontent&amp;view=template&amp;type=category&amp;folder=' . $row->name . '&amp;' . \Joomla\CMS\Session\Session::getFormToken() . '=1';
+			$itemlink	= 'index.php?option=com_flexicontent&amp;view=template&amp;type=items&amp;folder=' . $row->name . '&amp;' . JSession::getFormToken() . '=1';
+			$catlink	= 'index.php?option=com_flexicontent&amp;view=template&amp;type=category&amp;folder=' . $row->name . '&amp;' . JSession::getFormToken() . '=1';
 			
 			$defaulttitle_item = !empty($row->items)    ? @ $item_texts->{$row->name}->title    : '';
 			$defaulttitle_cat  = !empty($row->category) ? @ $cats_texts->{$row->name}->title : '';
@@ -164,7 +164,7 @@ $list_total_cols = 8;
 			$description_cat  = !empty($row->category) ? @ $cats_texts->{$row->name}->description : '';
 			
 			$row->id = $row->name;
-			$checked	= \Joomla\CMS\HTML\HTMLHelper::_('grid.checkedout', $row, $i );
+			$checked	= JHtml::_('grid.checkedout', $row, $i );
 			?>
 		<tr class="<?php echo "row$k"; ?>" id="<?php echo 'up-'.$row->name ?>">
 			<td>
@@ -172,17 +172,17 @@ $list_total_cols = 8;
 			</td>
 			<td>
 				<!--div class="adminlist-table-row"></div-->
-				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.id', $i, $row->id); ?>
+				<?php echo JHtml::_('grid.id', $i, $row->id); ?>
 				<label for="cb<?php echo $i; ?>" class="green single"></label>
 			</td>
 			<td class="right">
 				<?php if (!in_array($row->name, $basetemplates)) :?>
-					<span class="<?php echo $this->btn_sm_class; ?> hasTooltip deletable-template" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_REMOVE_TEMPLATE', true); ?>" id="<?php echo 'del-' . $row->name ?>">
+					<span class="<?php echo $this->btn_sm_class; ?> hasTooltip deletable-template" title="<?php echo JText::_('FLEXI_REMOVE_TEMPLATE', true); ?>" id="<?php echo 'del-' . $row->name ?>">
 						<?php echo $delTmpl_icon; ?>
 					</span>
 			 	<?php endif; ?>
 				<?php /*<a class="modal" onclick="javascript:;" rel="{handler: 'iframe', size: {x: 390, y: 210}}" href="<?php echo $copylink; ?>"><?php echo $copyTmpl_icon; ?></a>*/ ?>
-				<span class="<?php echo $this->btn_sm_class; ?> hasTooltip" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_DUPLICATE_TEMPLATE', true); ?>" onclick="var url = jQuery(this).attr('data-href'); fc_tmpls_modal = fc_showDialog(url, 'fc_modal_popup_container', 0, 440, 300, fc_template_modal_close); return false;" data-href="<?php echo $copylink; ?>">
+				<span class="<?php echo $this->btn_sm_class; ?> hasTooltip" title="<?php echo JText::_('FLEXI_DUPLICATE_TEMPLATE', true); ?>" onclick="var url = jQuery(this).attr('data-href'); fc_tmpls_modal = fc_showDialog(url, 'fc_modal_popup_container', 0, 440, 300, fc_template_modal_close); return false;" data-href="<?php echo $copylink; ?>">
 					<?php echo $copyTmpl_icon; ?>
 				</span>
 			</td>
@@ -191,7 +191,7 @@ $list_total_cols = 8;
 				<?php if (in_array($row->name, $basetemplates)) :?>
 					<!--<span class="icon-lock"></span>-->
 				<?php else: ?>
-					<span class="icon-user"></span><span class="badge bg-dark text-white"><?php echo \Joomla\CMS\Language\Text::_('FLEXI_USER').' - '.\Joomla\CMS\Language\Text::_('FLEXI_CREATED'); ?></span>
+					<span class="icon-user"></span><span class="badge bg-dark text-white"><?php echo JText::_('FLEXI_USER').' - '.JText::_('FLEXI_CREATED'); ?></span>
 				<?php endif; ?>
 			</td>
 			<td>
@@ -237,13 +237,13 @@ $list_total_cols = 8;
 						<?php echo '<span style="font-size: 14px;">'.$copyTmpl_icon.'</span>'; ?>
 						</td>
 						<td>
-						<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_DUPLICATE_TEMPLATE' ); ?>
+						<?php echo JText::_( 'FLEXI_DUPLICATE_TEMPLATE' ); ?>
 						</td>
 						<td>
 						<?php echo '<span style="font-size: 14px;">'.$edit_icon.'</span>'; ?>
 						</td>
 						<td>
-						<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS' ); ?>
+						<?php echo JText::_( 'FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS' ); ?>
 						</td>
 					</tr>
 					<tr>
@@ -251,13 +251,13 @@ $list_total_cols = 8;
 						<?php echo '<span style="font-size: 14px;">'.$delTmpl_icon.'</span>'; ?>
 						</td>
 						<td>
-						<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_REMOVE_TEMPLATE' ); ?>
+						<?php echo JText::_( 'FLEXI_REMOVE_TEMPLATE' ); ?>
 						</td>
 						<td>
 						<?php echo '<span  style="font-size: 14px;" class="disabled">'.$noEditLayout_icon.'</span>'; ?>
 						</td>
 						<td>
-						<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_NOEDIT_LAYOUT' ); ?>
+						<?php echo JText::_( 'FLEXI_NOEDIT_LAYOUT' ); ?>
 						</td>
 					</tr>
 				</table>
@@ -277,7 +277,7 @@ $list_total_cols = 8;
 	<input type="hidden" name="view" value="templates" />
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" name="fcform" value="1" />
-	<?php echo \Joomla\CMS\HTML\HTMLHelper::_('form.token'); ?>
+	<?php echo JHtml::_('form.token'); ?>
 
 	<!-- fc_perf -->
 

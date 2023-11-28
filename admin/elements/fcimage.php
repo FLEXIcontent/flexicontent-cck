@@ -20,11 +20,11 @@
 defined('_JEXEC') or die('Restricted access');
 
 jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
-jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
+jimport('cms.html.select');    // JHtmlSelect
+jimport('joomla.form.field');  // JFormField
 
-jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
-\Joomla\CMS\Form\FormHelper::loadFieldClass('groupedlist');   // \Joomla\CMS\Form\Field\GroupedlistField
+jimport('joomla.form.helper'); // JFormHelper
+JFormHelper::loadFieldClass('groupedlist');   // JFormFieldGroupedList
 
 /**
  * Renders an image element
@@ -33,7 +33,7 @@ jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
- class JFormFieldFcimage extends \Joomla\CMS\Form\Field\GroupedlistField
+ class JFormFieldFcimage extends JFormFieldGroupedList
 {
 	/**
 	 * Element name
@@ -44,7 +44,7 @@ jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 
 	public function getGroups()
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 		$node = & $this->element;
 		$attributes = get_object_vars($node->attributes());
 		$attributes = $attributes['@attributes'];
@@ -53,7 +53,7 @@ jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 
 		$images = array();
 		$images[] = array(
-			array('value' => '', 'text' => \Joomla\CMS\Language\Text::_($prompt_text))
+			array('value' => '', 'text' => JText::_($prompt_text))
 		);
 
 		$valcolumn = 'name';
@@ -71,7 +71,7 @@ jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 		$db->setQuery($query);
 		$fields = $db->loadObjectList();
 
-		$grp = \Joomla\CMS\Language\Text::_('FLEXI_FIELD');
+		$grp = JText::_('FLEXI_FIELD');
 		$images[$grp] = array();
 
 		foreach ($fields as $field)

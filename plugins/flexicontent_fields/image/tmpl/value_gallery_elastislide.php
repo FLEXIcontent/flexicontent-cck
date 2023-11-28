@@ -45,18 +45,18 @@ foreach ($values as $n => $value)
 	if ($size === 'l')
 	{
 		$w_l = $size_w_l ?: $field->parameters->get('w_l', self::$default_widths['l']);
-		$srcset[] = \Joomla\CMS\Uri\Uri::root() . $srcl . ' ' . $w_l . 'w';
+		$srcset[] = JUri::root() . $srcl . ' ' . $w_l . 'w';
 		$_sizes[] = '(min-width: ' . $w_l . 'px) ' . $w_l . 'px';
 	}
 
 	if ($size === 'l' || $size === 'm')
 	{
 		$w_m = $size_w_m ?: $field->parameters->get('w_m', self::$default_widths['m']);
-		$srcset[] = \Joomla\CMS\Uri\Uri::root() . $srcm . ' ' . $w_m . 'w';
+		$srcset[] = JUri::root() . $srcm . ' ' . $w_m . 'w';
 		$_sizes[] = '(min-width: ' . $w_m . 'px) ' . $w_m . 'px';
 
 		$w_s = $size_w_s ?: $field->parameters->get('w_s', self::$default_widths['s']);
-		$srcset[] = \Joomla\CMS\Uri\Uri::root() . $srcs . ' ' . $w_s . 'w';
+		$srcset[] = JUri::root() . $srcs . ' ' . $w_s . 'w';
 		$_sizes[] = $w_s . 'px';
 	}
 
@@ -70,10 +70,10 @@ foreach ($values as $n => $value)
 	$img_size_attrs .= ' width="' . $w . '" height="' . $h . '" style="height: auto; max-width: 100%;" ';
 
 	$img_legend_custom ='
-		<img src="'.\Joomla\CMS\Uri\Uri::root(true).'/'.$src.'" alt="' . $alt_encoded . '"' . $legend . ' class="' . $class . '"
+		<img src="'.JUri::root(true).'/'.$src.'" alt="' . $alt_encoded . '"' . $legend . ' class="' . $class . '"
 			' . $img_size_attrs . '
-			data-medium="' . \Joomla\CMS\Uri\Uri::root(true).'/'.$srcm . '"
-			data-large="' . \Joomla\CMS\Uri\Uri::root(true).'/'.$srcl . '"
+			data-medium="' . JUri::root(true).'/'.$srcm . '"
+			data-large="' . JUri::root(true).'/'.$srcl . '"
 			data-title="' . $title_encoded . '"
 			data-description="' . $desc_encoded . '" itemprop="image"/>
 	';
@@ -140,7 +140,7 @@ if (!isset(static::$js_added[$field->id][__FILE__][$item->id]))
 	$carousel_speed        = (int) $field->parameters->get( $PPFX_ . 'carousel_speed', 600 );
 
 
-	\Joomla\CMS\Factory::getDocument()->addScriptDeclaration('
+	JFactory::getDocument()->addScriptDeclaration('
 	jQuery(document).ready(function()
 	{
 		var elastislide_options_'.$uid.' = {
@@ -168,13 +168,13 @@ if (!isset(static::$js_added[$field->id][__FILE__][$item->id]))
 	});
 	');
 
-	\Joomla\CMS\Factory::getDocument()->addCustomTag('
+	JFactory::getDocument()->addCustomTag('
 	<script id="img-wrapper-tmpl_'.$uid.'" type="text/x-jquery-tmpl">
 		<div class="rg-image-wrapper">
 			{{if itemsCount > 1}}
 				<div class="rg-image-nav">
-					<a href="javascript:;" class="rg-image-nav-prev"><div>'.\Joomla\CMS\Language\Text::_('FLEXI_PREVIOUS').'</div></a>
-					<a href="javascript:;" class="rg-image-nav-next"><div>'.\Joomla\CMS\Language\Text::_('FLEXI_NEXT').'</div></a>
+					<a href="javascript:;" class="rg-image-nav-prev"><div>'.JText::_('FLEXI_PREVIOUS').'</div></a>
+					<a href="javascript:;" class="rg-image-nav-next"><div>'.JText::_('FLEXI_NEXT').'</div></a>
 				</div>
 			{{/if}}
 			<div class="rg-image"></div>

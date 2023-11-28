@@ -24,10 +24,10 @@ if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
 jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
+jimport('cms.html.select');    // JHtmlSelect
 
-jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
-jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
+jimport('joomla.form.field');  // JFormField
+jimport('joomla.form.helper'); // JFormHelper
 
 /**
  * Renders a fields element
@@ -36,7 +36,7 @@ jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-class JFormFieldFields extends \Joomla\CMS\Form\FormField
+class JFormFieldFields extends JFormField
 {
 	/**
 	* Element name
@@ -59,10 +59,10 @@ class JFormFieldFields extends \Joomla\CMS\Form\FormField
 			$js_css_added = true;
 		}
 
-		$app  = \Joomla\CMS\Factory::getApplication();
-		$doc	= \Joomla\CMS\Factory::getDocument();
-		$db		= \Joomla\CMS\Factory::getDbo();
-		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+		$app  = JFactory::getApplication();
+		$doc	= JFactory::getDocument();
+		$db		= JFactory::getDbo();
+		$cparams = JComponentHelper::getParams('com_flexicontent');
 
 		$node = & $this->element;
 		$attributes = get_object_vars($node->attributes());
@@ -221,7 +221,7 @@ class JFormFieldFields extends \Joomla\CMS\Form\FormField
 			{
 				if ( !isset($field->params) )
 				{
-					$field->params = new \Joomla\Registry\Registry($field->attribs);
+					$field->params = new JRegistry($field->attribs);
 				}
 				if ($field->params->get('use_ingroup')) $_fields[$field->id] = $field;
 			}
@@ -262,7 +262,7 @@ class JFormFieldFields extends \Joomla\CMS\Form\FormField
 		foreach($fields as $field)
 		{
 			$option = new stdClass();
-			$option->text = \Joomla\CMS\Language\Text::_($field->label) . (isset($_dupls[$field->id]) ? ' :: '.$field->name : '');
+			$option->text = JText::_($field->label) . (isset($_dupls[$field->id]) ? ' :: '.$field->name : '');
 			$option->value = $field->value;
 			$options[] = $option;
 			$field->option_text = & $option->text;
@@ -302,17 +302,17 @@ class JFormFieldFields extends \Joomla\CMS\Form\FormField
 		{
 			if ((boolean) @ $attributes['display_useglobal'] && !$issortable)
 			{
-				array_unshift($options, \Joomla\CMS\HTML\HTMLHelper::_('select.option', '' , '- '.\Joomla\CMS\Language\Text::_('FLEXI_USE_GLOBAL').' -'));
-				array_unshift($options, \Joomla\CMS\HTML\HTMLHelper::_('select.option', '0', '- '.\Joomla\CMS\Language\Text::_('FLEXI_NOT_SET').' -'));   // Compatibility with older FC versions
+				array_unshift($options, JHtml::_('select.option', '' , '- '.JText::_('FLEXI_USE_GLOBAL').' -'));
+				array_unshift($options, JHtml::_('select.option', '0', '- '.JText::_('FLEXI_NOT_SET').' -'));   // Compatibility with older FC versions
 			}
 
 			else
 			{
 				$custom_prompt = (string) @ $attributes['custom_prompt'];
-				$custom_prompt = \Joomla\CMS\Language\Text::_($custom_prompt ? $custom_prompt : 'FLEXI_PLEASE_SELECT');
+				$custom_prompt = JText::_($custom_prompt ? $custom_prompt : 'FLEXI_PLEASE_SELECT');
 				$custom_value = isset($attributes['custom_value']) ? (string) @ $attributes['custom_value'] : ($issortable ? '' : '0');
 
-				array_unshift($options, \Joomla\CMS\HTML\HTMLHelper::_('select.option', $custom_value, '- '.$custom_prompt.' -'));
+				array_unshift($options, JHtml::_('select.option', $custom_value, '- '.$custom_prompt.' -'));
 			}
 		}
 
@@ -346,7 +346,7 @@ class JFormFieldFields extends \Joomla\CMS\Form\FormField
 				$sorter_html .= '
 					<li data-value="field_'.$val.'" class="fcrecord">
 						<span class="fcprop_box">'.$v2f[$val]->option_text.'</span>
-						<span class="delfield_handle" title="'.\Joomla\CMS\Language\Text::_('FLEXI_REMOVE').'" onclick="fcfield_del_sortable_element(this);"></span>
+						<span class="delfield_handle" title="'.JText::_('FLEXI_REMOVE').'" onclick="fcfield_del_sortable_element(this);"></span>
 					</li>';
 			}
 			$sorter_html .= '
@@ -356,7 +356,7 @@ class JFormFieldFields extends \Joomla\CMS\Form\FormField
 			<div class="fcclear"></div>';
 
 			$js = "";
-			if ($js) \Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+			if ($js) JFactory::getDocument()->addScriptDeclaration($js);
 
 			$attribs .= ' class="use_select2_lib" ';
 			flexicontent_html::loadFramework('select2');
@@ -379,8 +379,8 @@ class JFormFieldFields extends \Joomla\CMS\Form\FormField
 			$preview_img = $preview_img ? $preview_img : '';
 			$tip_class = @$attributes['tip_class'];
 			$tip_class .= ' hasTooltip';
-			$hintmage = \Joomla\CMS\HTML\HTMLHelper::image ( 'administrator/components/com_flexicontent/assets/images/'.$tip_img, \Joomla\CMS\Language\Text::_( 'FLEXI_NOTES' ), ' style="vertical-align:middle; max-height:24px; padding:0px; margin:0 0 0 12px;" ' );
-			$previewimage = $preview_img ? \Joomla\CMS\HTML\HTMLHelper::image ( 'administrator/components/com_flexicontent/assets/images/'.$preview_img, \Joomla\CMS\Language\Text::_( 'FLEXI_NOTES' ), ' style="vertical-align:middle; max-height:24px; padding:0px; margin:0 0 0 12px;" ' ) : '';
+			$hintmage = JHtml::image ( 'administrator/components/com_flexicontent/assets/images/'.$tip_img, JText::_( 'FLEXI_NOTES' ), ' style="vertical-align:middle; max-height:24px; padding:0px; margin:0 0 0 12px;" ' );
+			$previewimage = $preview_img ? JHtml::image ( 'administrator/components/com_flexicontent/assets/images/'.$preview_img, JText::_( 'FLEXI_NOTES' ), ' style="vertical-align:middle; max-height:24px; padding:0px; margin:0 0 0 12px;" ' ) : '';
 			$tip_text = '<span class="'.$tip_class.'" style="float:left;" title="'.flexicontent_html::getToolTip(null, $inline_tip, 1, 1).'">'.$hintmage.$previewimage.'</span>';
 		}
 
@@ -393,7 +393,7 @@ class JFormFieldFields extends \Joomla\CMS\Form\FormField
 		<div class="container_fcfield-inner">
 			' : '').
 
-			\Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', ($issortable ? array() : $values), $element_id).'
+			JHtml::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', ($issortable ? array() : $values), $element_id).'
 			'.$tip_text.'
 			'.$sorter_html
 

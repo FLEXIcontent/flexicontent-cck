@@ -12,11 +12,11 @@
 defined('_JEXEC') or die('Restricted access');
 
 // Include the component HTML helpers.
-\Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_COMPONENT.'/helpers/html');
+JHtml::addIncludePath(JPATH_COMPONENT.'/helpers/html');
 
 // Load the tooltip behavior.
-//\Joomla\CMS\HTML\HTMLHelper::_('behavior.tooltip');
-\Joomla\CMS\HTML\HTMLHelper::_('behavior.formvalidator');
+//JHtml::_('behavior.tooltip');
+JHtml::_('behavior.formvalidator');
 $canDo = UsersHelper::getActions();
 ?>
 
@@ -29,10 +29,10 @@ $canDo = UsersHelper::getActions();
 	}
 </script>
 
-<form action="<?php echo \Joomla\CMS\Router\Route::_('index.php?option=com_flexicontent&layout=edit&id='.(int) $this->item->id); ?>" method="post" name="adminForm" id="adminForm" class="form-validate form-horizontal">
+<form action="<?php echo JRoute::_('index.php?option=com_flexicontent&layout=edit&id='.(int) $this->item->id); ?>" method="post" name="adminForm" id="adminForm" class="form-validate form-horizontal">
 	<div class="width-100">
 		<fieldset>
-			<legend><?php echo \Joomla\CMS\Language\Text::_('COM_USERS_USERGROUP_DETAILS');?></legend>
+			<legend><?php echo JText::_('COM_USERS_USERGROUP_DETAILS');?></legend>
 			<table class="fc-form-tbl">
 				<tr>
 					<td class="key"><?php echo $this->form->getLabel('title'); ?></td>
@@ -47,7 +47,7 @@ $canDo = UsersHelper::getActions();
 			</table>
 		</fieldset>
 		<input type="hidden" name="task" value="" />
-		<?php echo \Joomla\CMS\HTML\HTMLHelper::_('form.token'); ?>
+		<?php echo JHtml::_('form.token'); ?>
 	</div>
 </form>
 <div class="clr"></div>

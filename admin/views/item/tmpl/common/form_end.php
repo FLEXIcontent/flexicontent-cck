@@ -8,7 +8,7 @@ defined('_JEXEC') or die('Restricted access');
 			<?php if ($buttons_placement === 1) : /* PLACE buttons at BOTTOM of form */ ?>
 			<div class="fctoolbar_bottom_placement fcpos_right">
 				<div id="fctoolbar_btn" class="btn btn-primary" onclick="fc_toggle_box_via_btn(<?php echo FLEXI_J40GE ? "jQuery('#fctoolbar').parent()" : "'fctoolbar'"; ?>, this, 'btn-primary');" >
-					<?php echo \Joomla\CMS\Language\Text::_('JTOOLBAR'); ?> <span class="icon-wrench"></span></a>
+					<?php echo JText::_('JTOOLBAR'); ?> <span class="icon-wrench"></span></a>
 				</div>
 				<?php // An EXAMPLE of adding more buttons: $this->toolbar->appendButton('Standard', 'cancel', 'JCANCEL', 'items.cancel', false);
 				echo $this->toolbar->render(); ?>
@@ -16,7 +16,7 @@ defined('_JEXEC') or die('Restricted access');
 			<?php endif; ?>
 
 				<br class="clear" />
-				<?php echo \Joomla\CMS\HTML\HTMLHelper::_( 'form.token' ); ?>
+				<?php echo JHtml::_( 'form.token' ); ?>
 				<input type="hidden" name="task" id="task" value="" />
 				<input type="hidden" name="option" value="com_flexicontent" />
 				<input type="hidden" name="controller" value="items" />
@@ -58,7 +58,7 @@ defined('_JEXEC') or die('Restricted access');
 	<?php if ($buttons_placement === 3) : /* PLACE buttons at RIGHT of form */ ?>
 		<div class="span2 col-md-2 fctoolbar_side_placement">
 			<div id="fctoolbar_btn" class="btn btn-primary" onclick="fc_toggle_box_via_btn(<?php echo FLEXI_J40GE ? "jQuery('#fctoolbar').parent()" : "'fctoolbar'"; ?>, this, 'btn-primary');" >
-				<?php echo \Joomla\CMS\Language\Text::_('JTOOLBAR'); ?> <span class="icon-wrench"></span></a>
+				<?php echo JText::_('JTOOLBAR'); ?> <span class="icon-wrench"></span></a>
 			</div>
 			<?php // An EXAMPLE of adding more buttons: $this->toolbar->appendButton('Standard', 'cancel', 'JCANCEL', 'items.cancel', false);
 			echo $this->toolbar->render(); ?>
@@ -70,4 +70,4 @@ defined('_JEXEC') or die('Restricted access');
 
 <?php
 //keep session alive while editing
-\Joomla\CMS\HTML\HTMLHelper::_('behavior.keepalive');
+JHtml::_('behavior.keepalive');

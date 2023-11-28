@@ -640,14 +640,14 @@ table.fcmanlist tbody td.col_status div.statetoggler {
 #flexicontent div .fc_img_preview_btn.icon-search:after,
 #flexicontent div .fc_img_preview_btn.icon-search:before,
 #flexicontent div .fcfield-expand-view.fcfont-icon:before {
-	font-family: 'Font Awesome 5 Free', 'Font Awesome 6 Free';
+	font-family: 'Font Awesome 5 Free' !important;
 	font-size: 1.4em;
 }
 #flexicontent div .fa,
 #flexicontent div .fas,
 #flexicontent div [class*=" icon-"],
 #flexicontent div [class^="icon-"] {
-	font-family: 'Font Awesome 5 Free', 'Font Awesome 6 Free';
+	font-family: Font Awesome 5 Free;
 	font-weight: 900;
 }
 #flexicontent div .fcfield-drag-handle.fcfont-icon:before {
@@ -982,138 +982,4 @@ body div .control-group {
 }
 div.flexicontent .sidebar-nav li a:before {
 	content: '';
-}
-table#version_tbl td.versions {
-	border-bottom: 0px dotted silver;
-	padding: 10px 20px;
-}
-div table.fc-table-list tr:nth-child(odd) td {
-	background: initial;
-}
-@media (prefers-color-scheme: dark) {
-	div#fc-dash-boardbtns .fc-board-button {
-		background-color: var(--bg-color);
-	}
-	table.fcmanlist tbody tr td,
-	table.fcmanlist tbody tr td.filtered_column,
-	table.fcmanlist tbody tr.row0 td.filtered_column,
-	table.fcmanlist tbody tr.row1 td.filtered_column {
-		background-color: var(--table-bg);
-	}
-	table.fcmanlist tbody tr.row1 td {
-		background: inherit;
-	}
-	body span.maincat a {
-		color: initial;
-	}
-	table.fcmanlist tbody tr.row0:hover td,
-	table.fcmanlist tbody tr.row1:hover td,
-	table.fcmanlist tr:hover td.filtered_column {
-		background: var(--template-bg-dark-80) !important;
-	}
-	table.fcmanlist tbody tr {
-		border-top: 1px solid var(--border-color) !important;
-	}
-	#flexicontent #j-main-container .btn-group > *,
-	#flexicontent #j-main-container .fc-xpended > *,
-	#flexicontent #j-main-container .fc-xpended-row > *,
-	body #fc-managers-header .btn-group,
-	.btn-group.fc-group.fc-items {
-		color: var(--body-color) !important;
-		background: var(--body-bg) !important;
-	}
-	#flexicontent #j-main-container select.fcfield_selectval,
-	#flexicontent #j-main-container select {
-		background: initial !important;
-		color: var(--body-color) !important;
-	}
-	body label.fc-prop-lbl,
-	body span.fc-prop-lbl,
-	body #flexicontent label.fc-prop-lbl,
-	body #flexicontent span.fc-prop-lbl,
-	label.btn,
-	label.btn.btn-outline-secondary,
-	table.fcmanlist thead th {
-		color: var(--body-color) !important;
-	}
-	body .tabbertab,
-	#flexicontent .tabbertab {
-		background-color: var(--body-bg);
-	}
-	body #flexicontent ul.tabbernav > li > a,
-	#flexicontent ul.tabbernav > li > a {
-		color: var(--body-color) !important;
-	}
-	body li.tabberactive,
-	body ul.tabbernav > li.tabberactive a,
-	body ul.tabbernav > li.tabberactive a:hover,
-	#flexicontent ul.tabbernav > li.tabberactive a,
-	#flexicontent ul.tabbernav > li.tabberactive a:hover {
-		background: var(--template-bg-dark-60) !important;
-		color: var(--body-color) !important;
-	}
-	#flexicontent form span.fcfield_textval,
-	#flexicontent form select.fcfield_selectval,
-	#flexicontent form input.fcfield_textval {
-		color: var(--body-color) !important;
-	}
-	.select2-container .select2-choice {
-		background: var(--body-bg) !important;
-		color: var(--body-color) !important;
-	}
-	.plupload_droptext,
-	.plupload_filelist_footer {
-		background: var(--body-bg) !important;
-	}
-	div.select2-drop.select2-drop-multi li.select2-result-selectable > .select2-result-label,
-	.group-fcset input + label,
-	input[type="checkbox"].fc_checkradio + label,
-	input[type="radio"].fc_checkradio + label {
-		color: var(--body-color) !important;
-	}
-	div.width-20 fieldset,
-	div.width-30 fieldset,
-	div.width-35 fieldset,
-	div.width-40 fieldset,
-	div.width-45 fieldset,
-	div.width-50 fieldset,
-	div.width-55 fieldset,
-	div.width-60 fieldset,
-	div.width-65 fieldset,
-	div.width-70 fieldset,
-	div.width-80 fieldset,
-	div.width-100 fieldset {
-		background-color: var(--body-bg) !important;
-	}
-	body .tabbertab,
-	#flexicontent .tabbertab,
-	div.records_container,
-	div.positions_container {
-		background: var(--body-bg) !important;
-		background-color: var(--body-bg) !important;
-	}
-	body .records_container > ul > li.fcrecord,
-	body .positions_container > ul > li.fields {
-		background: var(--body-bg) !important;
-	}
-	#flexicontent div [class^="fcfield-"].fcfont-icon:before,
-	#flexicontent div [class*=" fcfield-"].fcfont-icon:before,
-	#flexicontent div [class^="fcfield-"].fcfont-icon:after,
-	#flexicontent div [class*=" fcfield-"].fcfont-icon:after,
-	#flexicontent ul.fcfield-sortables > li [class^="fcfield-"].fcfont-icon:before,
-	#flexicontent ul.fcfield-sortables > li [class*=" fcfield-"].fcfont-icon:before,
-	#flexicontent ul.fcfield-sortables > li [class^="fcfield-"].fcfont-icon:after,
-	#flexicontent ul.fcfield-sortables > li [class*=" fcfield-"].fcfont-icon:after {
-		color: var(--body-color) !important;
-	}
-	div table.fc-table-list {
-		text-shadow: none;
-		background: var(--body-bg) !important;
-		border-collapse: collapse;
-		font-size: initial;
-		line-height: initial;
-		margin: 16px;
-		text-align: left;
-		min-width: initial;
-	}
 }

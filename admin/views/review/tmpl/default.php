@@ -18,9 +18,9 @@ $form = $this->form;
 <form action="index.php" method="post" name="adminForm" id="adminForm" class="form-validate form-horizontal">
 
 	<?php
-	if (!\Joomla\CMS\Factory::getApplication()->isClient('administrator') || \Joomla\CMS\Factory::getApplication()->input->getCmd('tmpl') === 'component')
+	if (!JFactory::getApplication()->isClient('administrator') || JFactory::getApplication()->input->getCmd('tmpl') === 'component')
 	{
-		echo \Joomla\CMS\Toolbar\Toolbar::getInstance('toolbar')->render();
+		echo JToolBar::getInstance('toolbar')->render();
 		echo '<div class="fcclear"></div><br><br>';
 	}
 
@@ -28,7 +28,7 @@ $form = $this->form;
 	foreach ($fieldSets as $name => $fieldSet) :
 
 		//$label = !empty($fieldSet->label) ? $fieldSet->label : 'COM_FLEXICONTENT_'.$name.'_FIELDSET_LABEL';
-		//echo '<h2>' . \Joomla\CMS\Language\Text::_($label) . '</h2>';
+		//echo '<h2>' . JText::_($label) . '</h2>';
 	?>
 
 	<table class="fc-form-tbl">
@@ -53,7 +53,7 @@ $form = $this->form;
 
 	<?php endforeach; ?>
 
-	<?php echo \Joomla\CMS\HTML\HTMLHelper::_( 'form.token' ); ?>
+	<?php echo JHtml::_( 'form.token' ); ?>
 	<input type="hidden" name="option" value="com_flexicontent" />
 	<input type="hidden" name="controller" value="reviews" />
 	<input type="hidden" name="view" value="review" />
@@ -66,5 +66,5 @@ $form = $this->form;
 
 <?php
 //keep session alive while editing
-\Joomla\CMS\HTML\HTMLHelper::_('behavior.keepalive');
+JHtml::_('behavior.keepalive');
 ?>

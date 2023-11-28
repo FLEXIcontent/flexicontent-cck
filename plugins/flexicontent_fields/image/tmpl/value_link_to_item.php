@@ -20,7 +20,7 @@ foreach ($values as $n => $value)
 	if ($result === _FC_BREAK_) break;
 
 	// Create link to current item
-	$item_link = \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item));
+	$item_link = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item));
 
 	// Create HTML linking to current item
 	$field->{$prop}[] =
@@ -30,7 +30,7 @@ foreach ($values as $n => $value)
 		</a><br/>'
 		.($_method == 'display_single_total' || $_method == 'display_single_total_link' ? '
 		<span class="fc_img_total_data badge bg-info badge-info" style="display: inline-block;" >
-			'.count($values).' '.\Joomla\CMS\Language\Text::_('FLEXI_IMAGES').'
+			'.count($values).' '.JText::_('FLEXI_IMAGES').'
 		</span>' : '').'
 	</span>';
 
@@ -51,7 +51,7 @@ if ( !isset(static::$js_added[$field->id][__FILE__]) )
 {
 	$js = '';
 
-	if ($js) \Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+	if ($js) JFactory::getDocument()->addScriptDeclaration($js);
 
 	static::$js_added[$field->id][__FILE__] = true;
 }

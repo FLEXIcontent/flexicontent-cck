@@ -33,13 +33,13 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 		 */
 
 		global $globalcats;
-		$app      = \Joomla\CMS\Factory::getApplication();
+		$app      = JFactory::getApplication();
 		$jinput   = $app->input;
-		$document = \Joomla\CMS\Factory::getDocument();
-		$user     = \Joomla\CMS\Factory::getUser();
-		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
-		$session  = \Joomla\CMS\Factory::getSession();
-		$db       = \Joomla\CMS\Factory::getDbo();
+		$document = JFactory::getDocument();
+		$user     = JFactory::getUser();
+		$cparams  = JComponentHelper::getParams('com_flexicontent');
+		$session  = JFactory::getSession();
+		$db       = JFactory::getDbo();
 
 		$option   = $jinput->getCmd('option', '');
 		$view     = $jinput->getCmd('view', '');
@@ -60,8 +60,8 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 		// Load Joomla language files of other extension
 		if (!empty($this->proxy_option))
 		{
-			\Joomla\CMS\Factory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
-			\Joomla\CMS\Factory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
+			JFactory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
+			JFactory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
 		}
 
 		// Get model
@@ -131,30 +131,30 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 			// Add css to document
 			if ($isAdmin)
 			{
-				!\Joomla\CMS\Factory::getLanguage()->isRtl()
-					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
-					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
-				!\Joomla\CMS\Factory::getLanguage()->isRtl()
-					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
-					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
+				!JFactory::getLanguage()->isRtl()
+					? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
+					: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
+				!JFactory::getLanguage()->isRtl()
+					? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
+					: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 			}
 			else
 			{
-				!\Joomla\CMS\Factory::getLanguage()->isRtl()
-					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
-					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
+				!JFactory::getLanguage()->isRtl()
+					? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
+					: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
 			}
 
 			// Add JS frameworks
 			flexicontent_html::loadFramework('select2');
 
 			// Load custom behaviours: form validation, popup tooltips
-			\Joomla\CMS\HTML\HTMLHelper::_('behavior.formvalidator');
-			\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip');
+			JHtml::_('behavior.formvalidator');
+			JHtml::_('bootstrap.tooltip');
 
 			// Add js function to overload the joomla submitform validation
-			$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
-			$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
+			$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
+			$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
 		}
 
 
@@ -166,9 +166,9 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 		FLEXIUtilities::ManagerSideMenu('CanIndex');
 
 		// Create document/toolbar titles
-		$doc_title = \Joomla\CMS\Language\Text::_( 'FLEXI_SEARCH_INDEX' );
+		$doc_title = JText::_( 'FLEXI_SEARCH_INDEX' );
 		$site_title = $document->getTitle();
-		\Joomla\CMS\Toolbar\ToolbarHelper::title( $doc_title, 'search' );
+		JToolbarHelper::title( $doc_title, 'search' );
 		$document->setTitle($doc_title .' - '. $site_title);
 
 		// Create the toolbar
@@ -207,17 +207,17 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 		if ($isADV)
 		{
 			$fftypes = array();
-			$fftypes[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  '', '-' /*\Joomla\CMS\Language\Text::_( 'FLEXI_ALL_FIELDS_TYPE' )*/ );
-			$fftypes[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  'C', \Joomla\CMS\Language\Text::_( 'FLEXI_CORE_FIELDS' ) );
-			$fftypes[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  'NC', \Joomla\CMS\Language\Text::_( 'FLEXI_CUSTOM_NON_CORE_FIELDS' ) );
+			$fftypes[] = JHtml::_('select.option',  '', '-' /*JText::_( 'FLEXI_ALL_FIELDS_TYPE' )*/ );
+			$fftypes[] = JHtml::_('select.option',  'C', JText::_( 'FLEXI_CORE_FIELDS' ) );
+			$fftypes[] = JHtml::_('select.option',  'NC', JText::_( 'FLEXI_CUSTOM_NON_CORE_FIELDS' ) );
 			foreach ($fieldtypes as $field_type => $ftdata)
 			{
-				$fftypes[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', $field_type, '-'.$ftdata->assigned.'- '. $field_type);
+				$fftypes[] = JHtml::_('select.option', $field_type, '-'.$ftdata->assigned.'- '. $field_type);
 			}
 
 			$lists['filter_fieldtype'] = $this->getFilterDisplay(array(
-				'label' => \Joomla\CMS\Language\Text::_('FLEXI_FIELD_TYPE'),
-				'html' => \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist',
+				'label' => JText::_('FLEXI_FIELD_TYPE'),
+				'html' => JHtml::_('select.genericlist',
 					$fftypes,
 					'filter_fieldtype',
 					array(
@@ -235,7 +235,7 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 
 		// Build item language filter
 		$lists['filter_itemlang'] = $this->getFilterDisplay(array(
-			'label' => \Joomla\CMS\Language\Text::_('FLEXI_LANGUAGE'),
+			'label' => JText::_('FLEXI_LANGUAGE'),
 			'html' => flexicontent_html::buildlanguageslist(
 				'filter_itemlang',
 				array(
@@ -251,7 +251,7 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 
 		// Build item type filter
 		$lists['filter_type'] = $this->getFilterDisplay(array(
-			'label' => \Joomla\CMS\Language\Text::_('FLEXI_TYPE'),
+			'label' => JText::_('FLEXI_TYPE'),
 			'html' => flexicontent_html::buildtypesselect(
 				$types,
 				'filter_type',
@@ -268,13 +268,13 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 
 		// Build state filter (grouping published and unpublished states)
 		$ffstates = array();
-		$ffstates[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  '', '-' /*\Joomla\CMS\Language\Text::_( 'FLEXI_SELECT_STATE' )*/ );
-		$ffstates[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  'ALL_P', \Joomla\CMS\Language\Text::_('FLEXI_GRP_PUBLISHED') . ' ' . \Joomla\CMS\Language\Text::_('FLEXI_STATE_S'));
-		$ffstates[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  'ALL_U', \Joomla\CMS\Language\Text::_('FLEXI_GRP_UNPUBLISHED') . ' ' . \Joomla\CMS\Language\Text::_('FLEXI_STATE_S'));
+		$ffstates[] = JHtml::_('select.option',  '', '-' /*JText::_( 'FLEXI_SELECT_STATE' )*/ );
+		$ffstates[] = JHtml::_('select.option',  'ALL_P', JText::_('FLEXI_GRP_PUBLISHED') . ' ' . JText::_('FLEXI_STATE_S'));
+		$ffstates[] = JHtml::_('select.option',  'ALL_U', JText::_('FLEXI_GRP_UNPUBLISHED') . ' ' . JText::_('FLEXI_STATE_S'));
 
 		$lists['filter_state'] = $this->getFilterDisplay(array(
-			'label' => \Joomla\CMS\Language\Text::_('FLEXI_STATE'),
-			'html' => \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist',
+			'label' => JText::_('FLEXI_STATE'),
+			'html' => JHtml::_('select.genericlist',
 				$ffstates,
 				'filter_state',
 				array(
@@ -289,11 +289,11 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 		));
 
 		// Build index type filter
-		$itn['basic'] = \Joomla\CMS\Language\Text::_( 'FLEXI_INDEX_BASIC' );
-		$itn['advanced'] = \Joomla\CMS\Language\Text::_( 'FLEXI_INDEX_ADVANCED' );
+		$itn['basic'] = JText::_( 'FLEXI_INDEX_BASIC' );
+		$itn['advanced'] = JText::_( 'FLEXI_INDEX_ADVANCED' );
 		$indextypes = array();
-		//foreach ($itn as $i => $v) $indextypes[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', $i, $v);
-		//$lists['filter_indextype'] = \Joomla\CMS\HTML\HTMLHelper::_('select.radiolist', $indextypes, 'filter_indextype', 'size="1" class="inputbox" onchange="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_indextype );
+		//foreach ($itn as $i => $v) $indextypes[] = JHtml::_('select.option', $i, $v);
+		//$lists['filter_indextype'] = JHtml::_('select.radiolist', $indextypes, 'filter_indextype', 'size="1" class="inputbox" onchange="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform()"', 'value', 'text', $filter_indextype );
 
 		$lists['filter_indextype'] = '<div class="fc-iblock group-fcset radio" style="vertical-align: middle">';
 
@@ -309,7 +309,7 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 
 		// Build text search scope
 		$scopes = array(
-			'-1' => \Joomla\CMS\Language\Text::_('FLEXI_INDEXED_CONTENT'),
+			'-1' => JText::_('FLEXI_INDEXED_CONTENT'),
 		);
 
 		$lists['scope_tip'] = '';
@@ -328,14 +328,14 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 
 		// Build item title filter
 		$lists['search_itemtitle'] = $this->getFilterDisplay(array(
-			'label' => \Joomla\CMS\Language\Text::_('FLEXI_TITLE'),
+			'label' => JText::_('FLEXI_TITLE'),
 			'html' => '<input type="text" name="search_itemtitle" id="search_itemtitle" value="' . htmlspecialchars($search_itemtitle, ENT_QUOTES, 'UTF-8') . '" class="text_area" onchange="document.adminForm.submit();" size="30"/>',
 		));
 
 
 		// Build item id filter
 		$lists['search_itemid'] = $this->getFilterDisplay(array(
-			'label' => \Joomla\CMS\Language\Text::_('FLEXI_ID'),
+			'label' => JText::_('FLEXI_ID'),
 			'html' => '<input type="text" name="search_itemid" id="search_itemid" value="' . htmlspecialchars($search_itemid, ENT_QUOTES, 'UTF-8') . '" class="text_area" onchange="document.adminForm.submit();" size="6" />',
 		));
 
@@ -361,7 +361,7 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 		// Add modal edit code
 		if (1)
 		{
-			\Joomla\CMS\Language\Text::script("FLEXI_UPDATING_CONTENTS", true);
+			JText::script("FLEXI_UPDATING_CONTENTS", true);
 			$document->addScriptDeclaration('
 				function fc_edit_fcitem_modal_load( container )
 				{
@@ -427,7 +427,7 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 
 		if (!$jinput->getCmd('nosidebar'))
 		{
-			$this->sidebar = FLEXI_J30GE ? \Joomla\CMS\HTML\Helpers\Sidebar::render() : null;
+			$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		}
 
 		/**
@@ -451,57 +451,57 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 	 */
 	function setToolbar()
 	{
-		$user     = \Joomla\CMS\Factory::getUser();
-		$document = \Joomla\CMS\Factory::getDocument();
-		$toolbar  = \Joomla\CMS\Toolbar\Toolbar::getInstance('toolbar');
+		$user     = JFactory::getUser();
+		$document = JFactory::getDocument();
+		$toolbar  = JToolbar::getInstance('toolbar');
 		$perms    = FlexicontentHelperPerm::getPerm();
-		$session  = \Joomla\CMS\Factory::getSession();
+		$session  = JFactory::getSession();
 
 		$js = '';
 
 		$contrl = "search.";
 		$contrl_s = null;
 
-		$loading_msg = flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_LOADING') .' ... '. \Joomla\CMS\Language\Text::_('FLEXI_PLEASE_WAIT'), 2);
+		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
 
 		$btn_arr = array();
 
 		if ($perms->CanIndex)
 		{
-			$popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&amp;view=search&amp;layout=indexer&amp;tmpl=component&amp;indexer=basic';
-			$btn_text = str_replace('<br/>', '', \Joomla\CMS\Language\Text::_('FLEXI_REINDEX_BASIC_CONTENT_LISTS'));
+			$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&amp;view=search&amp;layout=indexer&amp;tmpl=component&amp;indexer=basic';
+			$btn_text = str_replace('<br/>', '', JText::_('FLEXI_REINDEX_BASIC_CONTENT_LISTS'));
 			$btn_name = 'search_adv_index_dirty_only';
-			$full_js="if (!confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_MAY_TAKE_TIME_IN_LARGE_WEBSITES'), 'd')) . "')) return false; var url = jQuery(this).data('taskurl'); fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 420, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
-						.$loading_msg."<\/span>'; window.location.reload(false)}, {'title': '".flexicontent_html::encodeHTML(strip_tags(\Joomla\CMS\Language\Text::_('FLEXI_REINDEX_BASIC_CONTENT_LISTS')), 'd')."'}); return false;";
+			$full_js="if (!confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(JText::_('FLEXI_MAY_TAKE_TIME_IN_LARGE_WEBSITES'), 'd')) . "')) return false; var url = jQuery(this).data('taskurl'); fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 420, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
+						.$loading_msg."<\/span>'; window.location.reload(false)}, {'title': '".flexicontent_html::encodeHTML(strip_tags(JText::_('FLEXI_REINDEX_BASIC_CONTENT_LISTS')), 'd')."'}); return false;";
 			$btn_arr[] = flexicontent_html::addToolBarButton(
 				$btn_text, $btn_name, $full_js,
-				$msg_alert = \Joomla\CMS\Language\Text::_('FLEXI_NO_ITEMS_SELECTED'), $msg_confirm = '',
+				$msg_alert = JText::_('FLEXI_NO_ITEMS_SELECTED'), $msg_confirm = '',
 				$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
 				'btn btn-fcaction ' . (FLEXI_J40GE ? '_DDI_class_ ' . $this->btn_iv_class : '') . ' ' . $this->tooltip_class, 'icon-loop',
 				'data-placement="right" data-taskurl="' . $popup_load_url .'" title=""', $auto_add = 0, $tag_type='button')
 				;
 
-			$popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&amp;view=search&amp;layout=indexer&amp;tmpl=component&amp;indexer=advanced';
-			$btn_text = str_replace('<br/>', '', \Joomla\CMS\Language\Text::_('FLEXI_REINDEX_ADVANCED_SEARCH_VIEW'));
+			$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&amp;view=search&amp;layout=indexer&amp;tmpl=component&amp;indexer=advanced';
+			$btn_text = str_replace('<br/>', '', JText::_('FLEXI_REINDEX_ADVANCED_SEARCH_VIEW'));
 			$btn_name = 'search_adv_index_dirty_only';
-			$full_js="if (!confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_MAY_TAKE_TIME_IN_LARGE_WEBSITES'), 'd')) . "')) return false; var url = jQuery(this).data('taskurl'); fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 420, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
-						.$loading_msg."<\/span>'; window.location.reload(false)}, {'title': '".flexicontent_html::encodeHTML(strip_tags(\Joomla\CMS\Language\Text::_('FLEXI_REINDEX_ADVANCED_SEARCH_VIEW')), 'd')."'}); return false;";
+			$full_js="if (!confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(JText::_('FLEXI_MAY_TAKE_TIME_IN_LARGE_WEBSITES'), 'd')) . "')) return false; var url = jQuery(this).data('taskurl'); fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 420, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
+						.$loading_msg."<\/span>'; window.location.reload(false)}, {'title': '".flexicontent_html::encodeHTML(strip_tags(JText::_('FLEXI_REINDEX_ADVANCED_SEARCH_VIEW')), 'd')."'}); return false;";
 			$btn_arr[] = flexicontent_html::addToolBarButton(
 				$btn_text, $btn_name, $full_js,
-				$msg_alert = \Joomla\CMS\Language\Text::_('FLEXI_NO_ITEMS_SELECTED'), $msg_confirm = '',
+				$msg_alert = JText::_('FLEXI_NO_ITEMS_SELECTED'), $msg_confirm = '',
 				$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
 				'btn btn-fcaction ' . (FLEXI_J40GE ? '_DDI_class_ ' . $this->btn_iv_class : '') . ' ' . $this->tooltip_class, 'icon-loop',
 				'data-placement="right" data-taskurl="' . $popup_load_url .'" title=""', $auto_add = 0, $tag_type='button')
 				;
 
-			$popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&amp;view=search&amp;layout=indexer&amp;tmpl=component&amp;indexer=advanced&amp;rebuildmode=quick';
-			$btn_text = str_replace('<br/>', '', \Joomla\CMS\Language\Text::_('FLEXI_REINDEX_ADVANCED_SEARCH_VIEW_DIRTY_ONLY'));
+			$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&amp;view=search&amp;layout=indexer&amp;tmpl=component&amp;indexer=advanced&amp;rebuildmode=quick';
+			$btn_text = str_replace('<br/>', '', JText::_('FLEXI_REINDEX_ADVANCED_SEARCH_VIEW_DIRTY_ONLY'));
 			$btn_name = 'search_adv_index_dirty_only';
-			$full_js="if (!confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_MAY_TAKE_TIME_IN_LARGE_WEBSITES'), 'd')) . "')) return false; var url = jQuery(this).data('taskurl'); fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 420, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
-						.$loading_msg."<\/span>'; window.location.reload(false)}, {'title': '".flexicontent_html::encodeHTML(strip_tags(\Joomla\CMS\Language\Text::_('FLEXI_REINDEX_ADVANCED_SEARCH_VIEW_DIRTY_ONLY')), 'd')."'}); return false;";
+			$full_js="if (!confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(JText::_('FLEXI_MAY_TAKE_TIME_IN_LARGE_WEBSITES'), 'd')) . "')) return false; var url = jQuery(this).data('taskurl'); fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 420, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
+						.$loading_msg."<\/span>'; window.location.reload(false)}, {'title': '".flexicontent_html::encodeHTML(strip_tags(JText::_('FLEXI_REINDEX_ADVANCED_SEARCH_VIEW_DIRTY_ONLY')), 'd')."'}); return false;";
 			$btn_arr[] = flexicontent_html::addToolBarButton(
 				$btn_text, $btn_name, $full_js,
-				$msg_alert = \Joomla\CMS\Language\Text::_('FLEXI_NO_ITEMS_SELECTED'), $msg_confirm = '',
+				$msg_alert = JText::_('FLEXI_NO_ITEMS_SELECTED'), $msg_confirm = '',
 				$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
 				'btn btn-fcaction ' . (FLEXI_J40GE ? '_DDI_class_ ' . $this->btn_iv_class : '') . ' ' . $this->tooltip_class, 'icon-loop',
 				'data-placement="right" data-taskurl="' . $popup_load_url .'" title=""', $auto_add = 0, $tag_type='button')
@@ -512,8 +512,8 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 		{
 			$drop_btn = '
 				<button type="button" class="' . $this->btn_sm_class . ' btn-primary dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown">
-					<span title="'.\Joomla\CMS\Language\Text::_('FLEXI_SEARCH_INDEXES').'" class="icon-menu"></span>
-					'.\Joomla\CMS\Language\Text::_('FLEXI_SEARCH_INDEXES').'
+					<span title="'.JText::_('FLEXI_SEARCH_INDEXES').'" class="icon-menu"></span>
+					'.JText::_('FLEXI_SEARCH_INDEXES').'
 					<span class="caret"></span>
 				</button>';
 			array_unshift($btn_arr, $drop_btn);
@@ -527,7 +527,7 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 		$extra_js = "";
 		flexicontent_html::addToolBarButton(
 			'FLEXI_INDEX_ADVANCED_PURGE',
-			$btn_name, $full_js='', $msg_alert='', $msg_confirm=\Joomla\CMS\Language\Text::_('FLEXI_PURGE_INDEX_CONFIRM'),
+			$btn_name, $full_js='', $msg_alert='', $msg_confirm=JText::_('FLEXI_PURGE_INDEX_CONFIRM'),
 			$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="", $btn_icon);
 
 		//$toolbar->appendButton('Confirm', 'Update ?', 'shuffle', 'FLEXI_UPDATE_CUSTOM_ORDER_INDEXES', $contrl . 'custom_order', false);
@@ -537,7 +537,7 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 		$extra_js = "";
 		flexicontent_html::addToolBarButton(
 			'FLEXI_UPDATE_CUSTOM_ORDER_INDEXES',
-			$btn_name, $full_js='', $msg_alert='', $msg_confirm=\Joomla\CMS\Language\Text::_('FLEXI_UPDATE_CUSTOM_ORDER_INDEXES'),
+			$btn_name, $full_js='', $msg_alert='', $msg_confirm=JText::_('FLEXI_UPDATE_CUSTOM_ORDER_INDEXES'),
 			$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="", $btn_icon);
 
 		// Configuration button
@@ -547,7 +547,7 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
 			$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
 			$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
-			\Joomla\CMS\Toolbar\ToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
+			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
 		}
 
 		if ($js)

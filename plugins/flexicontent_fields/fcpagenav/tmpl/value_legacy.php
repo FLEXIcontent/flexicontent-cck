@@ -14,7 +14,7 @@ if ($use_category_link)
 	if (!empty($rows[$item->id]->categoryslug)) {
 		$html .= '
 		<span class="fc-pagenav-return">
-			<a class="btn" href="'. \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getCategoryRoute($rows[$item->id]->categoryslug)) . ($start ? '?start='.$start : '') . '">' . htmlspecialchars($category_label, ENT_NOQUOTES, 'UTF-8') . '
+			<a class="btn" href="'. JRoute::_(FlexicontentHelperRoute::getCategoryRoute($rows[$item->id]->categoryslug)) . ($start ? '?start='.$start : '') . '">' . htmlspecialchars($category_label, ENT_NOQUOTES, 'UTF-8') . '
 				' . ($cat_image ? '
 				<br/><img src="'.$cat_image.'" alt="Return"/>
 				' : '') .'

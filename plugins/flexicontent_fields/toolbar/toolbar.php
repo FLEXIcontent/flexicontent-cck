@@ -45,7 +45,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
-		$field->label = \Joomla\CMS\Language\Text::_($field->label);
+		$field->label = JText::_($field->label);
 
 		// Set field and item objects
 		$this->setField($field);
@@ -63,8 +63,8 @@ class plgFlexicontent_fieldsToolbar extends FCField
 		{
 			$initialized = 1;
 
-			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$app       = JFactory::getApplication();
+			$document  = JFactory::getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -82,8 +82,8 @@ class plgFlexicontent_fieldsToolbar extends FCField
 
 		if ($app->input->get('print', '', 'cmd')) return;
 
-		//$scheme = \Joomla\CMS\Uri\Uri::getInstance()->getScheme();  // we replaced http(s):// with //
-		$document	= \Joomla\CMS\Factory::getDocument();
+		//$scheme = JUri::getInstance()->getScheme();  // we replaced http(s):// with //
+		$document	= JFactory::getDocument();
 
 		$lang = $document->getLanguage();
 		$lang = $item->parameters->get('language', $lang);
@@ -122,7 +122,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 		if ($load_css && !$css_loaded)
 		{
 			$css_loaded = true;
-			$document->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/plugins/flexicontent_fields/toolbar/toolbar/toolbar.css');
+			$document->addStyleSheet(JUri::root(true).'/plugins/flexicontent_fields/toolbar/toolbar/toolbar.css');
 		}
 
 
@@ -132,9 +132,9 @@ class plgFlexicontent_fieldsToolbar extends FCField
 			$item_url = FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug);
 
 			// NOTE: this uses current SSL setting (e.g menu item), and not URL scheme: http/https
-			//$item_url_abs = \Joomla\CMS\Router\Route::_($item_url, true, -1);
+			//$item_url_abs = JRoute::_($item_url, true, -1);
 
-			$item_url_abs = \Joomla\CMS\Uri\Uri::getInstance()->toString(array('scheme', 'host', 'port')) . \Joomla\CMS\Router\Route::_($item_url);
+			$item_url_abs = JUri::getInstance()->toString(array('scheme', 'host', 'port')) . JRoute::_($item_url);
 			$item_title_escaped = htmlspecialchars( $item->title, ENT_COMPAT, 'UTF-8' );
 		}
 
@@ -147,7 +147,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 			// OPEN GRAPH: site name
 			if ($field->parameters->get('add_og_site_name') && $view == 'item')
 			{
-				$document->addCustomTag("<meta property=\"og:site_name\" content=\"".\Joomla\CMS\Factory::getApplication()->getCfg('sitename')."\" />");
+				$document->addCustomTag("<meta property=\"og:site_name\" content=\"".JFactory::getApplication()->getCfg('sitename')."\" />");
 			}
 
 			// OPEN GRAPH: title
@@ -202,13 +202,13 @@ class plgFlexicontent_fieldsToolbar extends FCField
 				if ($imageurl)
 				{
 					$is_absolute = (boolean) parse_url($imageurl, PHP_URL_SCHEME); // preg_match("#^http|^https|^ftp#i", $imageurl);
-					$imageurl = $is_absolute ? $imageurl : \Joomla\CMS\Uri\Uri::root().$imageurl;
+					$imageurl = $is_absolute ? $imageurl : JUri::root().$imageurl;
 					$document->addCustomTag("<meta property=\"og:image\" content=\"{$imageurl}\" />");
 				}
 			}
 
 			// Add og-URL explicitely as this is required by facebook ?
-			if ($item_url_abs && \Joomla\CMS\Factory::getApplication()->input->get('format', 'html') === 'html')
+			if ($item_url_abs && JFactory::getApplication()->input->get('format', 'html') === 'html')
 			{
 				$document->addCustomTag("<meta property=\"og:url\" content=\"".$item_url_abs."\" />");
 			}
@@ -260,11 +260,11 @@ class plgFlexicontent_fieldsToolbar extends FCField
 
 	private function _getCommentsCount($id)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 		static $jcomment_installed = null;
 
 		if ($jcomment_installed===null) {
-			$app = \Joomla\CMS\Factory::getApplication();
+			$app = JFactory::getApplication();
 			$dbprefix = $app->getCfg('dbprefix');
 			$db->setQuery('SHOW TABLES LIKE "'.$dbprefix.'jcomments"');
 			$jcomment_installed = (boolean) count($db->loadObjectList());
@@ -306,9 +306,9 @@ class plgFlexicontent_fieldsToolbar extends FCField
 					$paths[] = $folder;
 				}
 				$imageurl = '/'.implode('/', $paths);
-				$imageurl = \Joomla\CMS\Uri\Uri::root(true).$imageurl;
+				$imageurl = JUri::root(true).$imageurl;
 			}elseif(substr($imageurl, 0, 7)=='images/') {
-				$imageurl = \Joomla\CMS\Uri\Uri::root(true).'/'.$imageurl;
+				$imageurl = JUri::root(true).'/'.$imageurl;
 			}
 		}
 		return $imageurl;

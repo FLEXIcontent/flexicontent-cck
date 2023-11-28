@@ -32,12 +32,12 @@ class FlexicontentViewMediadata extends FlexicontentViewBaseRecord
 		 * Initialize variables, flags, etc
 		 */
 
-		$app        = \Joomla\CMS\Factory::getApplication();
+		$app        = JFactory::getApplication();
 		$jinput     = $app->input;
-		$document   = \Joomla\CMS\Factory::getDocument();
-		$user       = \Joomla\CMS\Factory::getUser();
-		$db         = \Joomla\CMS\Factory::getDbo();
-		$cparams    = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+		$document   = JFactory::getDocument();
+		$user       = JFactory::getUser();
+		$db         = JFactory::getDbo();
+		$cparams    = JComponentHelper::getParams('com_flexicontent');
 		$perms      = FlexicontentHelperPerm::getPerm();
 
 		// Get url vars and some constants
@@ -89,7 +89,7 @@ class FlexicontentViewMediadata extends FlexicontentViewBaseRecord
 		// Fail if an existing record is checked out by someone else
 		if ($row->id && $model->isCheckedOut($user->get('id')))
 		{
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ), 'warning');
+			$app->enqueueMessage(JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ), 'warning');
 
 			if ($jinput->getCmd('tmpl') !== 'component')
 			{
@@ -106,18 +106,18 @@ class FlexicontentViewMediadata extends FlexicontentViewBaseRecord
 		// Add css to document
 		if ($isAdmin)
 		{
-			!\Joomla\CMS\Factory::getLanguage()->isRtl()
-				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
-				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
-			!\Joomla\CMS\Factory::getLanguage()->isRtl()
-				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/j3x.css', array('version' => FLEXI_VHASH))
-				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', array('version' => FLEXI_VHASH));
+			!JFactory::getLanguage()->isRtl()
+				? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
+				: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
+			!JFactory::getLanguage()->isRtl()
+				? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/j3x.css', array('version' => FLEXI_VHASH))
+				: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/j3x_rtl.css', array('version' => FLEXI_VHASH));
 		}
 		else
 		{
-			!\Joomla\CMS\Factory::getLanguage()->isRtl()
-				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
-				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
+			!JFactory::getLanguage()->isRtl()
+				? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
+				: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
 		}
 
 		// Add JS frameworks
@@ -126,27 +126,27 @@ class FlexicontentViewMediadata extends FlexicontentViewBaseRecord
 		flexicontent_html::loadFramework('flexi-lib-form');
 
 		// Load custom behaviours: form validation, popup tooltips
-		\Joomla\CMS\HTML\HTMLHelper::_('behavior.formvalidator');
-		\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip');
+		JHtml::_('behavior.formvalidator');
+		JHtml::_('bootstrap.tooltip');
 
 		// Add js function to overload the joomla submitform validation
-		$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
-		$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
+		$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
+		$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
 
 
 		/**
 		 * Create the toolbar
 		 */
 
-		$toolbar = \Joomla\CMS\Toolbar\Toolbar::getInstance('toolbar');
+		$toolbar = JToolbar::getInstance('toolbar');
 
 		// Creation flag used to decide if adding save and new / save as copy buttons are allowed
 		$cancreate = true;
 
 		// SET toolbar title
 		!$isnew
-			? \Joomla\CMS\Toolbar\ToolbarHelper::title(\Joomla\CMS\Language\Text::_('FLEXI_EDIT_MEDIADATA'), 'mediadataedit')
-			: \Joomla\CMS\Toolbar\ToolbarHelper::title(\Joomla\CMS\Language\Text::_('FLEXI_NEW_MEDIADATA'), 'mediadataadd');
+			? JToolbarHelper::title(JText::_('FLEXI_EDIT_MEDIADATA'), 'mediadataedit')
+			: JToolbarHelper::title(JText::_('FLEXI_NEW_MEDIADATA'), 'mediadataadd');
 
 
 		/**
@@ -166,7 +166,7 @@ class FlexicontentViewMediadata extends FlexicontentViewBaseRecord
 				'FLEXI_APPLY', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".apply_ajax')", $msg_alert='', $msg_confirm='',
 				$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
 				$btn_class=(FLEXI_J40GE ? ' _DDI_class_ btn-success ' : '') . ' ' . $this->tooltip_class, $btn_icon="icon-loop",
-				'data-placement="bottom" title="'.\Joomla\CMS\Language\Text::_('FLEXI_FAST_SAVE_INFO', true).'"', $auto_add = 0);
+				'data-placement="bottom" title="'.JText::_('FLEXI_FAST_SAVE_INFO', true).'"', $auto_add = 0);
 		}
 
 		// Apply & Reload button   ***   (Apply Type, is a special case of new that has not loaded custom fieds yet, due to type not defined on initial form load)
@@ -176,7 +176,7 @@ class FlexicontentViewMediadata extends FlexicontentViewBaseRecord
 			$btn_task = $ctrl.'.apply';
 			$btn_title = !$isnew ? 'FLEXI_APPLY_N_RELOAD' : 'FLEXI_ADD';
 
-			//\Joomla\CMS\Toolbar\ToolbarHelper::apply($btn_task, $btn_title, false);
+			//JToolbarHelper::apply($btn_task, $btn_title, false);
 
 			$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
 				$btn_title, $btn_name, $full_js="Joomla.submitbutton('".$btn_task."')", $msg_alert='', $msg_confirm='',
@@ -203,7 +203,7 @@ class FlexicontentViewMediadata extends FlexicontentViewBaseRecord
 			$btn_name = 'save';
 			$btn_task = $ctrl.'.save';
 
-			//\Joomla\CMS\Toolbar\ToolbarHelper::save($btn_task);  //\Joomla\CMS\Toolbar\ToolbarHelper::custom( $btn_task, 'save.png', 'save.png', 'JSAVE', false );
+			//JToolbarHelper::save($btn_task);  //JToolbarHelper::custom( $btn_task, 'save.png', 'save.png', 'JSAVE', false );
 
 			$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
 				'JSAVE', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".save')", $msg_alert='', $msg_confirm='',
@@ -219,13 +219,13 @@ class FlexicontentViewMediadata extends FlexicontentViewBaseRecord
 			$btn_name = 'save2new';
 			$btn_task = $ctrl.'.save2new';
 
-			//\Joomla\CMS\Toolbar\ToolbarHelper::save2new($btn_task);  //\Joomla\CMS\Toolbar\ToolbarHelper::custom( $btn_task, 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
+			//JToolbarHelper::save2new($btn_task);  //JToolbarHelper::custom( $btn_task, 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
 
 			$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
 				'FLEXI_SAVE_AND_NEW', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".save2new')", $msg_alert='', $msg_confirm='',
 				$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
 				$btn_class= (FLEXI_J40GE ? ' _DDI_class_ btn-success ' : '') . ' ' . $this->tooltip_class, $btn_icon="icon-save-new",
-				'data-placement="right" title="'.\Joomla\CMS\Language\Text::_('FLEXI_SAVE_AND_NEW_INFO', true).'"', $auto_add = 0);
+				'data-placement="right" title="'.JText::_('FLEXI_SAVE_AND_NEW_INFO', true).'"', $auto_add = 0);
 
 			// Also if an existing item, can save to a copy
 			if (!$isnew)
@@ -233,13 +233,13 @@ class FlexicontentViewMediadata extends FlexicontentViewBaseRecord
 				$btn_name = 'save2copy';
 				$btn_task = $ctrl.'.save2copy';
 
-				//\Joomla\CMS\Toolbar\ToolbarHelper::save2copy($btn_task);  //\Joomla\CMS\Toolbar\ToolbarHelper::custom( $btn_task, 'save2copy.png', 'save2copy.png', 'FLEXI_SAVE_AS_COPY', false );
+				//JToolbarHelper::save2copy($btn_task);  //JToolbarHelper::custom( $btn_task, 'save2copy.png', 'save2copy.png', 'FLEXI_SAVE_AS_COPY', false );
 
 				$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
 					'FLEXI_SAVE_AS_COPY', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".save2copy')", $msg_alert='', $msg_confirm='',
 					$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
 					$btn_class= (FLEXI_J40GE ? ' _DDI_class_ btn-success ' : '') . ' ' . $this->tooltip_class, $btn_icon="icon-save-copy",
-					'data-placement="right" title="'.\Joomla\CMS\Language\Text::_('FLEXI_SAVE_AS_COPY_INFO', true).'"', $auto_add = 0);
+					'data-placement="right" title="'.JText::_('FLEXI_SAVE_AS_COPY_INFO', true).'"', $auto_add = 0);
 			}
 		}
 
@@ -253,8 +253,8 @@ class FlexicontentViewMediadata extends FlexicontentViewBaseRecord
 
 		// Cancel button, TODO frontend modal close
 		$isnew
-			? \Joomla\CMS\Toolbar\ToolbarHelper::cancel($ctrl.'.cancel', $isAdmin ? 'JTOOLBAR_CANCEL' : 'FLEXI_CANCEL')
-			: \Joomla\CMS\Toolbar\ToolbarHelper::cancel($ctrl.'.cancel', $isAdmin ? 'JTOOLBAR_CLOSE' : 'FLEXI_CLOSE_FORM');
+			? JToolbarHelper::cancel($ctrl.'.cancel', $isAdmin ? 'JTOOLBAR_CANCEL' : 'FLEXI_CANCEL')
+			: JToolbarHelper::cancel($ctrl.'.cancel', $isAdmin ? 'JTOOLBAR_CLOSE' : 'FLEXI_CLOSE_FORM');
 
 
 		/**
@@ -271,10 +271,10 @@ class FlexicontentViewMediadata extends FlexicontentViewBaseRecord
 
 		/**
 		 * Encode (UTF-8 charset) HTML entities form data so that they can be set as form field values
-		 * NOTE: we will use \Joomla\CMS\Form\Form to output fields so this is redundant
+		 * NOTE: we will use JForm to output fields so this is redundant
 		 */
 
-		//\Joomla\CMS\Filter\OutputFilter::objectHTMLSafe( $row, ENT_QUOTES, $exclude_keys = '' );
+		//JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES, $exclude_keys = '' );
 
 
 		/**

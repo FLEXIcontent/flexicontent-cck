@@ -16,7 +16,7 @@ use Joomla\CMS\Language\Multilanguage;
 use Joomla\Component\Categories\Administrator\Helper\CategoryAssociationHelper as J4_CategoryAssociationHelper;
 
 JLoader::register('FlexicontentHelperRoute', JPATH_SITE . '/components/com_flexicontent/helpers/route.php');
-\Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
+JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 
 
 /*
@@ -56,7 +56,7 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 
 	public static function getAssociations($id = 0, $view = null)
 	{
-		$jinput = \Joomla\CMS\Factory::getApplication()->input;
+		$jinput = JFactory::getApplication()->input;
 
 		$view   = is_null($view) ? $jinput->get('view', '', 'cmd') : $view;
 		$id     = empty($id) ? $jinput->get('id', 0, 'int') : $id;
@@ -134,7 +134,7 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 			return array();
 		}
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 		$query = 'SELECT i.language, ie.type_id, i.id, i.catid, '
 			. '  CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(":", i.id, i.alias) ELSE i.id END as title_slug, '
 			. '  CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(":", c.id, c.alias) ELSE c.id END as cat_slug '
@@ -159,7 +159,7 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 			return array();
 		}
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 		if (!FLEXI_FALANG) return array();
 
 		$query  =
@@ -200,7 +200,7 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 			return array();
 		}
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 		$query = 'SELECT c.language, c.id, '
 			. '  CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(":", c.id, c.alias) ELSE c.id END as title_slug '
 			. ' FROM #__associations AS a'
@@ -218,12 +218,12 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 	{
 		if ($view == 'item')
 		{
-			$record = \Joomla\CMS\Table\Table::getInstance('flexicontent_items', '');
+			$record = JTable::getInstance('flexicontent_items', '');
 			$record->load(array('id' => $id));
 		}
 		elseif ($view == 'category')
 		{
-			$record = \Joomla\CMS\Table\Table::getInstance('flexicontent_categories', '');
+			$record = JTable::getInstance('flexicontent_categories', '');
 			$record->load(array('id' => $id));
 		}
 
@@ -232,12 +232,12 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 			return array();
 		}
 
-		$app    = \Joomla\CMS\Factory::getApplication();
+		$app    = JFactory::getApplication();
 		$jinput = $app->input;
 		$menus  = $app->getMenu();
 		$Itemid = $jinput->getInt('Itemid', 0);
 
-		$langAssociations = \Joomla\CMS\Language\Associations::getAssociations('com_menus', '#__menu', 'com_menus.item', $Itemid, 'id', '', '');
+		$langAssociations = JLanguageAssociations::getAssociations('com_menus', '#__menu', 'com_menus.item', $Itemid, 'id', '', '');
 		$associations     = array();
 
 		foreach ($langAssociations as $tag => $menu_item)
@@ -287,7 +287,7 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 	 */
 	private static function _getItemCatSlug($record, $menu)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 
 		$moption = isset($menu->query['option']) ? $menu->query['option'] : '';
 		$mview   = isset($menu->query['view']) ? $menu->query['view'] : '';
@@ -310,7 +310,7 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 		// Use matching category from menu item, otherwise use main category of item
 		$matched_cid = in_array($mcid, $catids) ? $mcid : $record->catid;
 
-		$cat = \Joomla\CMS\Table\Table::getInstance('flexicontent_categories', '');
+		$cat = JTable::getInstance('flexicontent_categories', '');
 		$cat->load(array('id' => $matched_cid));
 
 		return $matched_cid . ($cat ? ':' . $cat->alias : '');

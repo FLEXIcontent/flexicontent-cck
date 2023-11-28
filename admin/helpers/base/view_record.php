@@ -19,7 +19,7 @@ jimport('legacy.view.legacy');
 /**
  * HTML View class for backend record screens (Base)
  */
-class FlexicontentViewBaseRecord extends \Joomla\CMS\MVC\View\HtmlView
+class FlexicontentViewBaseRecord extends JViewLegacy
 {
 	var $tooltip_class = FLEXI_J40GE ? 'hasTooltip' : 'hasTooltip';
 	var $popover_class = FLEXI_J40GE ? 'hasPopover' : 'hasPopover';
@@ -49,15 +49,15 @@ class FlexicontentViewBaseRecord extends \Joomla\CMS\MVC\View\HtmlView
 	 */
 	public function prepare_common_fcview($config = array())
 	{
-		$isAdmin = \Joomla\CMS\Factory::getApplication()->isClient('administrator');
+		$isAdmin = JFactory::getApplication()->isClient('administrator');
 
 		/**
 		 * Load Joomla language files of other extension
 		 */
 		if (!empty($this->proxy_option))
 		{
-			\Joomla\CMS\Factory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
-			\Joomla\CMS\Factory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
+			JFactory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
+			JFactory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
 		}
 
 		/**
@@ -67,12 +67,12 @@ class FlexicontentViewBaseRecord extends \Joomla\CMS\MVC\View\HtmlView
 		if (!$isAdmin)
 		{
 			// Load english language file for 'com_content' component then override with current language file
-			\Joomla\CMS\Factory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR, 'en-GB', true);
-			\Joomla\CMS\Factory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR, null, true);
+			JFactory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR, 'en-GB', true);
+			JFactory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR, null, true);
 
 			// Load english language file for 'com_flexicontent' component then override with current language file
-			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
-			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 
 			// Frontend form layout is named 'form' instead of 'default', 'default' in frontend is typically used for viewing would be used for
 			$this->setLayout('form');
@@ -81,9 +81,9 @@ class FlexicontentViewBaseRecord extends \Joomla\CMS\MVC\View\HtmlView
 		/**
 		 * In older Joomla versions include Toolbar Helper in frontend
 		 */
-		if (\Joomla\CMS\Factory::getApplication()->isClient('site'))
+		if (JFactory::getApplication()->isClient('site'))
 		{
-			$jversion = new \Joomla\CMS\Version;
+			$jversion = new JVersion;
 
 			if (version_compare($jversion->getShortVersion(), '3.9.0', 'lt'))
 			{

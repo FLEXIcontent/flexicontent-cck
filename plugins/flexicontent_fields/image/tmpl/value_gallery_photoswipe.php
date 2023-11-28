@@ -28,7 +28,7 @@ foreach ($values as $n => $value)
 
 	$group_str = $group_name ? 'rel="['.$group_name.']"' : '';
 	$field->{$prop}[] = $pretext.
-		'<a style="'.$style.'" href="'.\Joomla\CMS\Uri\Uri::root(true).'/'.$srcl.'" '.$group_str.' class="fc_image_thumb">
+		'<a style="'.$style.'" href="'.JUri::root(true).'/'.$srcl.'" '.$group_str.' class="fc_image_thumb">
 			'.$img_legend.'
 		</a>'
 		.$inline_info.$posttext;
@@ -46,7 +46,7 @@ if ( !isset(static::$js_added[$field->id][__FILE__]) )
 
 	$js = '';
 
-	if ($js) \Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+	if ($js) JFactory::getDocument()->addScriptDeclaration($js);
 
 	static::$js_added[$field->id][__FILE__] = true;
 }

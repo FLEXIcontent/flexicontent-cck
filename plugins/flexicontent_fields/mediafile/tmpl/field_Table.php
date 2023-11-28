@@ -43,17 +43,17 @@ foreach ($field->value as $file_id)
 		switch((int) $file_data->url)
 		{
 			case 0:
-				$img_path = \Joomla\CMS\Uri\Uri::root(true) . '/' . (empty($file_data->secure) ? $mediapath : $docspath) . '/' . $file_data->filename;
+				$img_path = JUri::root(true) . '/' . (empty($file_data->secure) ? $mediapath : $docspath) . '/' . $file_data->filename;
 				break;
 			case 1:
 				$img_path = $file_data->filename;
 				break;
 			case 2:
 			default:
-				$img_path = \Joomla\CMS\Uri\Uri::root(true) . '/' . $file_data->filename;
+				$img_path = JUri::root(true) . '/' . $file_data->filename;
 				break;
 		}
-		$preview_src = \Joomla\CMS\Uri\Uri::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&amp;w=100&amp;h=100&amp;zc=1&amp;q=95&amp;ar=x';
+		$preview_src = JUri::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&amp;w=100&amp;h=100&amp;zc=1&amp;q=95&amp;ar=x';
 		$preview_text = '';
 		$has_preview = true;
 	}
@@ -63,7 +63,7 @@ foreach ($field->value as $file_id)
 
 	$_select_file_lbl = '
 			<label class="fc-prop-lbl inlinefile-data-lbl '.$tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_FIELD_'.$FT.'_ABOUT_SELECTED_FILE', 'FLEXI_FIELD_'.$FT.'_ABOUT_SELECTED_FILE_DESC', 1, 1).'" id="'.$elementid_n.'_file-data-lbl" for="'.$elementid_n.'_file-data-txt">
-				' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD_'.$FT.'_SELECT_FILE') . '
+				' . JText::_('FLEXI_FIELD_'.$FT.'_SELECT_FILE') . '
 			</label>
 	';
 
@@ -82,7 +82,7 @@ foreach ($field->value as $file_id)
 
 	if ($use_inline_uploaders)
 	{
-		$uploader_html = $uploader_html_arr[$n] = \Joomla\CMS\HTML\HTMLHelper::_('fcuploader.getUploader', $field, $u_item_id, null, $n,
+		$uploader_html = $uploader_html_arr[$n] = JHtml::_('fcuploader.getUploader', $field, $u_item_id, null, $n,
 			array(
 			'container_class' => ($multiple ? 'fc_inline_uploader fc_uploader_thumbs_view fc-box' : '') . ' fc_compact_uploader fc_auto_uploader thumb_'.$thumb_size_default,
 			'upload_maxcount' => 1,
@@ -91,7 +91,7 @@ foreach ($field->value as $file_id)
 			'thumb_size_default' => $thumb_size_default,
 			'toggle_btn' => array(
 				'class' => ($file_btns_position ? $add_on_class : '') . ' fcfield-uploadvalue dropdown-item' . $font_icon_class,
-				'text' => (!$file_btns_position ? '&nbsp; ' . \Joomla\CMS\Language\Text::_('FLEXI_UPLOAD') : ''),
+				'text' => (!$file_btns_position ? '&nbsp; ' . JText::_('FLEXI_UPLOAD') : ''),
 				'onclick' => $toggleUploader_onclick,
 				'action' => null
 			),
@@ -106,18 +106,18 @@ foreach ($field->value as $file_id)
 		$btn_classes = 'fc-files-modal-link ' . ($file_btns_position ? $add_on_class : '') . ' ' . $font_icon_class;
 		$uploader_html->multiUploadBtn = '';  /*'
 			<span data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" class="'.$btn_classes.' fc-up fcfield-uploadvalue multi dropdown-item" id="'.$elementid_n.'_mul_uploadvalue">
-				&nbsp; ' . $multi_icon . ' ' . (!$file_btns_position || $file_btns_position==2 ? \Joomla\CMS\Language\Text::_('FLEXI_UPLOAD') : '') . '
+				&nbsp; ' . $multi_icon . ' ' . (!$file_btns_position || $file_btns_position==2 ? JText::_('FLEXI_UPLOAD') : '') . '
 			</span>';*/
 		$uploader_html->myFilesBtn = '
 			<span data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" class="'.$btn_classes.' fc-sel fcfield-selectvalue multi dropdown-item" data-rowno="'.$n.'" id="'.$elementid_n.'_selectvalue">
-				' .  ($file_btns_position ? $multi_icon : '') . ' ' . (!$file_btns_position || $file_btns_position==2 ? '&nbsp; ' . \Joomla\CMS\Language\Text::_('FLEXI_MY_FILES') : '') . ' ' . (!$file_btns_position ? $multi_icon : '') .'
+				' .  ($file_btns_position ? $multi_icon : '') . ' ' . (!$file_btns_position || $file_btns_position==2 ? '&nbsp; ' . JText::_('FLEXI_MY_FILES') : '') . ' ' . (!$file_btns_position ? $multi_icon : '') .'
 			</span>';
 		$uploader_html->mediaUrlBtn = !$usemediaurl ? '' : '
 			<span class="' . ($file_btns_position ? $add_on_class : '') . ' fcfield-medialurlvalue ' . $font_icon_class . ' dropdown-item" onclick="fcfield_mediafile.toggleMediaURL(\''.$elementid_n.'\', \''.$field_name_js.'\'); return false;">
-				' . (!$file_btns_position || $file_btns_position==2 ? '&nbsp; ' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD_MEDIA_URL') : '') . '
+				' . (!$file_btns_position || $file_btns_position==2 ? '&nbsp; ' . JText::_('FLEXI_FIELD_MEDIA_URL') : '') . '
 			</span>';
 		$uploader_html->clearBtn = '
-			<span class="' . $add_on_class . ' fcfield-clearvalue ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_('FLEXI_CLEAR').'" onclick="fcfield_mediafile.clearField(this, {}, \''.$field_name_js.'\');">
+			<span class="' . $add_on_class . ' fcfield-clearvalue ' . $font_icon_class . '" title="'.JText::_('FLEXI_CLEAR').'" onclick="fcfield_mediafile.clearField(this, {}, \''.$field_name_js.'\');">
 			</span>';
 	}
 
@@ -147,21 +147,21 @@ foreach ($field->value as $file_id)
 		<fieldset class="group-fcset">
 			<input type="checkbox" id="'.$elementid_n.'_file-del" class="inlinefile-del" name="'.$fieldname_n.'[file-del]" value="1" onchange="file_fcfield_del_existing_value'.$field->id.'(this);" />
 			<label class="fc-prop-lbl inlinefile-del-lbl '.$tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_FIELD_'.$FT.'_ABOUT_REMOVE_FILE', 'FLEXI_FIELD_'.$FT.'_ABOUT_REMOVE_FILE_DESC', 1, 1).'" id="'.$elementid_n.'_file-del-lbl" for="'.$elementid_n.'_file-del" >
-				'.\Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_FILE_DELETE_FROM_SERVER_STORAGE' ).'
+				'.JText::_( 'FLEXI_FIELD_FILE_DELETE_FROM_SERVER_STORAGE' ).'
 			</label>
 		</fieldset>
 		<div class="fcclear"></div>
 
 		' : ( (!$multiple || $use_ingroup) && $required_class && $file_data->filename ? '
 			<div class="fcclear"></div>
-			<div class="alert alert-info fc-small fc-iblock" style="margin: 8px 0;">'.\Joomla\CMS\Language\Text::_('FLEXI_FIELD_'.$FT.'_REQUIRED_UPLOAD_NEW_TO_REPLACE').'</div>
+			<div class="alert alert-info fc-small fc-iblock" style="margin: 8px 0;">'.JText::_('FLEXI_FIELD_'.$FT.'_REQUIRED_UPLOAD_NEW_TO_REPLACE').'</div>
 			<div class="fcclear"></div>
 		' : '')).'
 
 		'.(!$iform_title ? '
 		<div class="fcclear"></div>
 		<div class="'.$input_grp_class.'">
-			<label class="' . $add_on_class . ' fc-lbl fc_filedata_title-lbl">'.\Joomla\CMS\Language\Text::_( 'FLEXI_FILE_DISPLAY_TITLE' ).'</label>
+			<label class="' . $add_on_class . ' fc-lbl fc_filedata_title-lbl">'.JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ).'</label>
 			<span class="' . $add_on_class . ' fc_filedata_title">'. ($file_data->altname && $filename_original!=$file_data->altname ? $file_data->altname : '-').'</span>
 		</div>' : '').'
 
@@ -185,7 +185,7 @@ foreach ($field->value as $file_id)
 			<tr class="inlinefile-title-row">
 				<td class="key inlinefile-title-lbl-cell">
 					<label class="fc-prop-lbl inlinefile-title-lbl '.$tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_FILE_DISPLAY_TITLE', 'FLEXI_FILE_DISPLAY_TITLE_DESC', 1, 1).'" id="'.$elementid_n.'_file-title-lbl" for="'.$elementid_n.'_file-title">
-						'.\Joomla\CMS\Language\Text::_( 'FLEXI_FILE_DISPLAY_TITLE' ).'
+						'.JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ).'
 					</label>
 				</td>
 				<td class="inlinefile-title-data-cell">
@@ -199,7 +199,7 @@ foreach ($field->value as $file_id)
 			<tr class="inlinefile-lang-row">
 				<td class="key inlinefile-lang-lbl-cell">
 					<label class="fc-prop-lbl inlinefile-lang-lbl '.$tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_LANGUAGE', 'FLEXI_FILE_LANGUAGE_DESC', 1, 1).'" id="'.$elementid_n.'_file-lang-lbl" for="'.$elementid_n.'_file-lang">
-						'.\Joomla\CMS\Language\Text::_( 'FLEXI_LANGUAGE' ).'
+						'.JText::_( 'FLEXI_LANGUAGE' ).'
 					</label>
 				</td>
 				<td class="inlinefile-lang-data-cell">
@@ -213,12 +213,12 @@ foreach ($field->value as $file_id)
 			<tr class="inlinefile-access-row">
 				<td class="key inlinefile-access-lbl-cell">
 					<label class="fc-prop-lbl inlinefile-access-lbl '.$tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_ACCESS', 'FLEXI_FILE_ACCESS_DESC', 1, 1).'" id="'.$elementid_n.'_file-access-lbl" for="'.$elementid_n.'_file-access">
-						'.\Joomla\CMS\Language\Text::_( 'FLEXI_ACCESS' ).'
+						'.JText::_( 'FLEXI_ACCESS' ).'
 					</label>
 				</td>
 				<td class="inlinefile-access-data-cell">
 					<span class="inlinefile-access-data">
-					'.\Joomla\CMS\HTML\HTMLHelper::_('access.assetgrouplist', $fieldname_n.'[file-access]', (!isset($form_data[$file_id]) ? $file_data->access : $form_data[$file_id]['file-access']), $attribs=' class="fc_fileaccess use_select2_lib" ', $config=array(/*'title' => \Joomla\CMS\Language\Text::_('FLEXI_SELECT'), */'id' => $elementid_n.'_file-access')).'
+					'.JHtml::_('access.assetgrouplist', $fieldname_n.'[file-access]', (!isset($form_data[$file_id]) ? $file_data->access : $form_data[$file_id]['file-access']), $attribs=' class="fc_fileaccess use_select2_lib" ', $config=array(/*'title' => JText::_('FLEXI_SELECT'), */'id' => $elementid_n.'_file-access')).'
 					</span>
 				</td>
 			</tr>' : '').
@@ -227,7 +227,7 @@ foreach ($field->value as $file_id)
 			<tr class="inlinefile-desc-row">
 				<td class="key inlinefile-desc-lbl-cell">
 					<label class="fc-prop-lbl inlinefile-desc-lbl '.$tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_DESCRIPTION', 'FLEXI_FILE_DESCRIPTION_DESC', 1, 1).'" id="'.$elementid_n.'_file-desc-lbl" for="'.$elementid_n.'_file-desc">
-						'.\Joomla\CMS\Language\Text::_( 'FLEXI_DESCRIPTION' ).'
+						'.JText::_( 'FLEXI_DESCRIPTION' ).'
 					</label>
 				</td>
 				<td class="inlinefile-desc-data-cell">
@@ -241,16 +241,16 @@ foreach ($field->value as $file_id)
 			<tr class="inlinefile-secure-row">
 				<td class="key inlinefile-secure-lbl-cell">
 					<label class="fc-prop-lbl inlinefile-secure-lbl '.$tooltip_class.'" data-placement="top" title="'.flexicontent_html::getToolTip('FLEXI_URL_SECURE', 'FLEXI_URL_SECURE_DESC', 1, 1).'" id="'.$elementid_n.'_secure-lbl">
-						'.\Joomla\CMS\Language\Text::_( 'FLEXI_URL_SECURE' ).'
+						'.JText::_( 'FLEXI_URL_SECURE' ).'
 					</label>
 				</td>
 				<td class="inlinefile-secure-data-cell">
 					'.($has_values ? '
 					<span class="inlinefile-secure-info" style="'.(!$has_values ? 'display:none;' : '').'">
-						<span class="badge bg-info badge-info">'.\Joomla\CMS\Language\Text::_($file_data->secure ?  'FLEXI_YES' : 'FLEXI_NO').'</span>
+						<span class="badge bg-info badge-info">'.JText::_($file_data->secure ?  'FLEXI_YES' : 'FLEXI_NO').'</span>
 					</span>' : '').'
 					<span class="inlinefile-secure-data" style="'.($has_values ? 'display:none;' : '').'">
-						'.flexicontent_html::buildradiochecklist( array(1=> \Joomla\CMS\Language\Text::_( 'FLEXI_YES' ), 0=> \Joomla\CMS\Language\Text::_( 'FLEXI_NO' )) , $fieldname_n.'[secure]', (!isset($form_data[$file_id]) ? $file_data->secure : (int)$form_data[$file_id]['secure']), 1, ' class="fc_filedir" ', $elementid_n.'_secure').'
+						'.flexicontent_html::buildradiochecklist( array(1=> JText::_( 'FLEXI_YES' ), 0=> JText::_( 'FLEXI_NO' )) , $fieldname_n.'[secure]', (!isset($form_data[$file_id]) ? $file_data->secure : (int)$form_data[$file_id]['secure']), 1, ' class="fc_filedir" ', $elementid_n.'_secure').'
 					</span>
 				</td>
 			</tr>' : '').
@@ -259,12 +259,12 @@ foreach ($field->value as $file_id)
 			<tr class="inlinefile-stamp-row">
 				<td class="key inlinefile-stamp-lbl-cell">
 					<label class="fc-prop-lbl inlinefile-stamp-lbl '.$tooltip_class.'" data-placement="top" title="'.flexicontent_html::getToolTip('FLEXI_DOWNLOAD_STAMPING', 'FLEXI_FILE_DOWNLOAD_STAMPING_DESC', 1, 1).'" id="'.$elementid_n.'_stamp-lbl">
-						'.\Joomla\CMS\Language\Text::_( 'FLEXI_DOWNLOAD_STAMPING' ).'
+						'.JText::_( 'FLEXI_DOWNLOAD_STAMPING' ).'
 					</label>
 				</td>
 				<td class="inlinefile-stamp-data-cell">
 					<span class="inlinefile-stamp-data">
-					'.flexicontent_html::buildradiochecklist( array(1=> \Joomla\CMS\Language\Text::_( 'FLEXI_YES' ), 0=> \Joomla\CMS\Language\Text::_( 'FLEXI_NO' )) , $fieldname_n.'[stamp]', (!isset($form_data[$file_id]) ? $file_data->stamp : (int)$form_data[$file_id]['stamp']), 1, ' class="fc_filestamp" ', $elementid_n.'_stamp').'
+					'.flexicontent_html::buildradiochecklist( array(1=> JText::_( 'FLEXI_YES' ), 0=> JText::_( 'FLEXI_NO' )) , $fieldname_n.'[stamp]', (!isset($form_data[$file_id]) ? $file_data->stamp : (int)$form_data[$file_id]['stamp']), 1, ' class="fc_filestamp" ', $elementid_n.'_stamp').'
 					</span>
 				</td>
 			</tr>' : '').
@@ -283,16 +283,16 @@ foreach ($field->value as $file_id)
 				<!--div id="fc_mediafile_current_time_' . $fnn . '" class="media_time">00:00:00</div-->
 				<div id="fc_mediafile_controls_' . $fnn . '" class="fc_mediafile_controls">
 					<a href="javascript:;" class="btn playBtn">
-						<span class="icon-play-circle controls"></span><span class="btnControlsText">' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD_MEDIAFILE_PLAY') . '</span>
+						<span class="icon-play-circle controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_PLAY') . '</span>
 					</a>
 					<a href="javascript:;" class="btn pauseBtn" style="display: none;">
-						<span class="icon-pause-circle controls"></span><span class="btnControlsText">' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD_MEDIAFILE_PAUSE') . '</span>
+						<span class="icon-pause-circle controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_PAUSE') . '</span>
 					</a>
 					<a href="javascript:;" class="btn stopBtn" style="display: none;">
-						<span class="icon-stop-circle controls"></span><span class="btnControlsText">' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD_MEDIAFILE_STOP') . '</span>
+						<span class="icon-stop-circle controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_STOP') . '</span>
 					</a>
 					<a href="javascript:;" class="btn loadBtn" style="display: none;">
-						<span class="icon-loop controls"></span><span class="btnControlsText">' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD_MEDIAFILE_LOAD') . '</span>
+						<span class="icon-loop controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_LOAD') . '</span>
 					</a>
 					' . ($allowdownloads ? $_download_btn_html : '') . '
 					' . (!$wf_zoom_slider ? '' : '

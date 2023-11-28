@@ -8,7 +8,7 @@
 	<field name="asset_id" type="hidden" filter="unset" />
 	<field name="name" type="text" label="FLEXI_TYPE_NAME" description="JFIELD_TITLE_DESC" class="inputbox required" size="40" required="true" labelclass="fc-prop-lbl" />
 	<field name="alias" type="text" label="FLEXI_ALIAS" description="JFIELD_ALIAS_DESC" class="inputbox" size="40" labelclass="fc-prop-lbl" />
-	<field name="description" type="editor" filter="\Joomla\CMS\Component\ComponentHelper::filterText" cols="30" rows="5" default="" label="FLEXI_FIELD_DESCRIPTION" description="FLEXI_FIELD_DESCRIPTION_DESC" labelclass="fc-prop-lbl" />
+	<field name="description" type="editor" filter="JComponentHelper::filterText" cols="30" rows="5" default="" label="FLEXI_FIELD_DESCRIPTION" description="FLEXI_FIELD_DESCRIPTION_DESC" labelclass="fc-prop-lbl" />
 	<field name="published" type="radio" default="1" size="1" label="FLEXI_PUBLISHED" description="JFIELD_PUBLISHED_DESC" labelclass="fc-prop-lbl" class="btn-group btn-group-yesno">
 		<option value="1">JPUBLISHED</option>
 		<option value="0">JUNPUBLISHED</option>
@@ -503,7 +503,7 @@
 			</field-->
 
 			<field name="" type="separator" default="FLEXI_STYLING_N_BEHAVIOUR" label="" level="level1" />
-			<field name="view_extra_css_fe" type="editor" editor="codemirror" default="" filter="\Joomla\CMS\Component\ComponentHelper::filterText" rows="5" cols="80" label="FLEXI_ITEM_VIEW_CSS" description="FLEXI_ITEM_VIEW_CSS_DESC" />
+			<field name="view_extra_css_fe" type="editor" editor="codemirror" default="" filter="JComponentHelper::filterText" rows="5" cols="80" label="FLEXI_ITEM_VIEW_CSS" description="FLEXI_ITEM_VIEW_CSS_DESC" />
 			<field name="view_extra_js_fe" type="editor" editor="codemirror" default="" filter="RAW" rows="5" cols="80" label="FLEXI_ITEM_VIEW_JS" description="FLEXI_ITEM_VIEW_JS_DESC" />
 
 		</fieldset>
@@ -796,8 +796,8 @@
 
 			<field name="form_lbl_class_fe" type="text" default="" label="FLEXI_LABEL_CLASS" description="FLEXI_LABEL_CLASS_DESC" class="input-xxlarge" />
 			<field name="form_container_class_fe" type="text" default="" label="FLEXI_FORM_CONTAINER_CLASS" description="FLEXI_FORM_CONTAINER_CLASS_DESC" class="input-xxlarge" />
-			<field name="form_container_css_fe" type="textarea" default="" filter="\Joomla\CMS\Component\ComponentHelper::filterText" rows="1" cols="80" label="FLEXI_FORM_CONTAINER_CSS" description="FLEXI_FORM_CONTAINER_CSS_DESC" />
-			<field name="form_extra_css_fe" type="editor" editor="codemirror" default="" filter="\Joomla\CMS\Component\ComponentHelper::filterText" rows="5" cols="80" label="FLEXI_EDIT_FORM_CSS" description="FLEXI_EDIT_FORM_CSS_DESC" />
+			<field name="form_container_css_fe" type="textarea" default="" filter="JComponentHelper::filterText" rows="1" cols="80" label="FLEXI_FORM_CONTAINER_CSS" description="FLEXI_FORM_CONTAINER_CSS_DESC" />
+			<field name="form_extra_css_fe" type="editor" editor="codemirror" default="" filter="JComponentHelper::filterText" rows="5" cols="80" label="FLEXI_EDIT_FORM_CSS" description="FLEXI_EDIT_FORM_CSS_DESC" />
 			<field name="form_extra_js_fe" type="editor" editor="codemirror" default="" filter="RAW" rows="5" cols="80" label="FLEXI_EDIT_FORM_JS" description="FLEXI_EDIT_FORM_JS_DESC" />
 
 
@@ -1067,8 +1067,8 @@
 
 			<field name="form_lbl_class_be" type="text" default="" label="FLEXI_LABEL_CLASS" description="FLEXI_LABEL_CLASS_DESC" class="input-xxlarge" />
 			<field name="form_container_class_be" type="text" default="" label="FLEXI_FORM_CONTAINER_CLASS" description="FLEXI_FORM_CONTAINER_CLASS_DESC" class="input-xxlarge" />
-			<field name="form_container_css_be" type="textarea" default="" filter="\Joomla\CMS\Component\ComponentHelper::filterText" rows="1" cols="80" label="FLEXI_FORM_CONTAINER_CSS" description="FLEXI_FORM_CONTAINER_CSS_DESC" />
-			<field name="form_extra_css_be" type="editor" editor="codemirror" default="" filter="\Joomla\CMS\Component\ComponentHelper::filterText" rows="5" cols="80" label="FLEXI_EDIT_FORM_CSS" description="FLEXI_EDIT_FORM_CSS_DESC" />
+			<field name="form_container_css_be" type="textarea" default="" filter="JComponentHelper::filterText" rows="1" cols="80" label="FLEXI_FORM_CONTAINER_CSS" description="FLEXI_FORM_CONTAINER_CSS_DESC" />
+			<field name="form_extra_css_be" type="editor" editor="codemirror" default="" filter="JComponentHelper::filterText" rows="5" cols="80" label="FLEXI_EDIT_FORM_CSS" description="FLEXI_EDIT_FORM_CSS_DESC" />
 			<field name="form_extra_js_be" type="editor" editor="codemirror" default="" filter="RAW" rows="5" cols="80" label="FLEXI_EDIT_FORM_JS" description="FLEXI_EDIT_FORM_JS_DESC" />
 
 			<field name="item_form_be_eof" type="separator" default="FLEXI_ITEM_FORM_BE" level="tabset_close" box_type="1" />
@@ -1083,7 +1083,7 @@
 			</field>
 
 			<field name="" type="separator" default="FLEXI_STYLING_N_BEHAVIOUR" label="" level="level1" />
-			<field name="form_extra_css" type="editor" editor="codemirror" default="" filter="\Joomla\CMS\Component\ComponentHelper::filterText" rows="5" cols="80" label="FLEXI_EDIT_FORM_CSS" description="FLEXI_EDIT_FORM_CSS_DESC" />
+			<field name="form_extra_css" type="editor" editor="codemirror" default="" filter="JComponentHelper::filterText" rows="5" cols="80" label="FLEXI_EDIT_FORM_CSS" description="FLEXI_EDIT_FORM_CSS_DESC" />
 			<field name="form_extra_js" type="editor" editor="codemirror" default="" filter="RAW" rows="5" cols="80" label="FLEXI_EDIT_FORM_JS" description="FLEXI_EDIT_FORM_JS_DESC" />
 
 			<field name="item_form_eof" type="separator" default="ITEM_FORM_EOF" level="tabset_close" box_type="1" />

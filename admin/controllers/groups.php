@@ -82,7 +82,7 @@ class FlexicontentControllerGroups extends FlexicontentControllerBaseAdmin
 	/**
 	 * Removes an item.
 	 *
-	 * Overrides \Joomla\CMS\MVC\Controller\AdminController::delete to check the core.admin permission.
+	 * Overrides JControllerAdmin::delete to check the core.admin permission.
 	 *
 	 * @return  boolean  Returns true on success, false on failure.
 	 *
@@ -92,9 +92,9 @@ class FlexicontentControllerGroups extends FlexicontentControllerBaseAdmin
 	{
 		if (!$this->canManage)
 		{
-			$app = \Joomla\CMS\Factory::getApplication();
+			$app = JFactory::getApplication();
 			$app->setHeader('status', 403);
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
 			$app->redirect($this->returnURL);
 		}
 
@@ -104,7 +104,7 @@ class FlexicontentControllerGroups extends FlexicontentControllerBaseAdmin
 	/**
 	 * Method to publish a list of records.
 	 *
-	 * Overrides \Joomla\CMS\MVC\Controller\AdminController::publish to check the core.admin permission.
+	 * Overrides JControllerAdmin::publish to check the core.admin permission.
 	 *
 	 * @return  void
 	 *
@@ -114,9 +114,9 @@ class FlexicontentControllerGroups extends FlexicontentControllerBaseAdmin
 	{
 		if (!$this->canManage)
 		{
-			$app = \Joomla\CMS\Factory::getApplication();
+			$app = JFactory::getApplication();
 			$app->setHeader('status', 403);
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
 			$app->redirect($this->returnURL);
 		}
 
@@ -126,7 +126,7 @@ class FlexicontentControllerGroups extends FlexicontentControllerBaseAdmin
 	/**
 	 * Changes the order of one or more records.
 	 *
-	 * Overrides \Joomla\CMS\MVC\Controller\AdminController::reorder to check the core.admin permission.
+	 * Overrides JControllerAdmin::reorder to check the core.admin permission.
 	 *
 	 * @return  boolean  True on success
 	 *
@@ -136,9 +136,9 @@ class FlexicontentControllerGroups extends FlexicontentControllerBaseAdmin
 	{
 		if (!$this->canManage)
 		{
-			$app = \Joomla\CMS\Factory::getApplication();
+			$app = JFactory::getApplication();
 			$app->setHeader('status', 403);
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
 			$app->redirect($this->returnURL);
 		}
 
@@ -148,7 +148,7 @@ class FlexicontentControllerGroups extends FlexicontentControllerBaseAdmin
 	/**
 	 * Method to save the submitted ordering values for records.
 	 *
-	 * Overrides \Joomla\CMS\MVC\Controller\AdminController::saveorder to check the core.admin permission.
+	 * Overrides JControllerAdmin::saveorder to check the core.admin permission.
 	 *
 	 * @return  boolean  True on success
 	 *
@@ -158,9 +158,9 @@ class FlexicontentControllerGroups extends FlexicontentControllerBaseAdmin
 	{
 		if (!$this->canManage)
 		{
-			$app = \Joomla\CMS\Factory::getApplication();
+			$app = JFactory::getApplication();
 			$app->setHeader('status', 403);
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
 			$app->redirect($this->returnURL);
 		}
 
@@ -170,7 +170,7 @@ class FlexicontentControllerGroups extends FlexicontentControllerBaseAdmin
 	/**
 	 * Check in of one or more records.
 	 *
-	 * Overrides \Joomla\CMS\MVC\Controller\AdminController::checkin to check the core.admin permission.
+	 * Overrides JControllerAdmin::checkin to check the core.admin permission.
 	 *
 	 * @return  boolean  True on success
 	 *
@@ -180,9 +180,9 @@ class FlexicontentControllerGroups extends FlexicontentControllerBaseAdmin
 	{
 		if (!$this->canManage)
 		{
-			$app = \Joomla\CMS\Factory::getApplication();
+			$app = JFactory::getApplication();
 			$app->setHeader('status', 403);
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
 			$app->redirect($this->returnURL);
 		}
 

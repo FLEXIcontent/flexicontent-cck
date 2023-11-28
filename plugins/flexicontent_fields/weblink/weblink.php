@@ -37,7 +37,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
-		$field->label = $field->parameters->get('label_form') ? \Joomla\CMS\Language\Text::_($field->parameters->get('label_form')) : \Joomla\CMS\Language\Text::_($field->label);
+		$field->label = $field->parameters->get('label_form') ? JText::_($field->parameters->get('label_form')) : JText::_($field->label);
 
 		// Set field and item objects
 		$this->setField($field);
@@ -63,8 +63,8 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		$auto_value = $auto_value === 2 && !$auto_value_code ? 0 : $auto_value;
 
 		// Initialize framework objects and other variables
-		$document = \Joomla\CMS\Factory::getDocument();
-		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
+		$document = JFactory::getDocument();
+		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 
 		$tooltip_class = 'hasTooltip';
 		$add_on_class    = $cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
@@ -137,13 +137,13 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		// URL value
 		$link_usage   = $field->parameters->get( 'link_usage', 0 ) ;
 		$default_link = ($item->version == 0 || $link_usage > 0) ? $field->parameters->get( 'default_link', '' ) : '';
-		$default_link = $default_link ? \Joomla\CMS\Language\Text::_($default_link) : '';
+		$default_link = $default_link ? JText::_($default_link) : '';
 
 		// URL image (optional)
 		$useimage      = $field->parameters->get( 'use_image', 0 ) ;
 		$image_usage   = $field->parameters->get( 'image_usage', 0 ) ;
-		$default_image = ($item->version == 0 || $image_usage > 0) ? \Joomla\CMS\Language\Text::_($field->parameters->get( 'default_image', '' )) : '';
-		$default_image = $default_image ? \Joomla\CMS\Language\Text::_($default_image) : '';
+		$default_image = ($item->version == 0 || $image_usage > 0) ? JText::_($field->parameters->get( 'default_image', '' )) : '';
+		$default_image = $default_image ? JText::_($default_image) : '';
 		$image_options = array('' => '-');
 
 		if ($useimage == 2)
@@ -159,14 +159,14 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		// URL title (optional)
 		$usetitle      = $field->parameters->get( 'use_title', 0 ) ;
 		$title_usage   = $field->parameters->get( 'title_usage', 0 ) ;
-		$default_title = ($item->version == 0 || $title_usage > 0) ? \Joomla\CMS\Language\Text::_($field->parameters->get( 'default_title', '' )) : '';
-		$default_title = $default_title ? \Joomla\CMS\Language\Text::_($default_title) : '';
+		$default_title = ($item->version == 0 || $title_usage > 0) ? JText::_($field->parameters->get( 'default_title', '' )) : '';
+		$default_title = $default_title ? JText::_($default_title) : '';
 
 		// URL linking text (optional)
 		$usetext      = $field->parameters->get( 'use_text', 0 ) ;
 		$text_usage   = $field->parameters->get( 'text_usage', 0 ) ;
 		$default_text = ($item->version == 0 || $text_usage > 0) ? $field->parameters->get( 'default_text', '' ) : '';
-		$default_text = $default_text ? \Joomla\CMS\Language\Text::_($default_text) : '';
+		$default_text = $default_text ? JText::_($default_text) : '';
 
 		// URL address type (optional)
 		$useaddrtype = $field->parameters->get( 'use_addrtype', 0 ) ;
@@ -180,7 +180,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		$useid      = $field->parameters->get( 'use_id', 0 ) ;
 		$id_usage   = $field->parameters->get( 'id_usage', 0 ) ;
 		$default_id = ($item->version == 0 || $id_usage > 0) ? $field->parameters->get( 'default_id', '' ) : '';
-		$default_id = $default_id ? \Joomla\CMS\Language\Text::_($default_id) : '';
+		$default_id = $default_id ? JText::_($default_id) : '';
 
 		// URL target
 		$usetarget  = $field->parameters->get( 'use_target', 0 ) ;
@@ -192,7 +192,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		$addrtype_choices = $field->parameters->get('addrtype_choices', '');
 		if ($useaddrtype == 2)
 		{
-			$default_option  = (object) array('value' => '', 'label' => \Joomla\CMS\Language\Text::_('FLEXI_SELECT'));
+			$default_option  = (object) array('value' => '', 'label' => JText::_('FLEXI_SELECT'));
 			$addrtype_options = $this->getPropertyOptions($addrtype_choices, $default_option);
 		}
 
@@ -200,7 +200,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		$class_choices = $field->parameters->get('class_choices', '');
 		if ($useclass == 2)
 		{
-			$default_option = (object) array('value' => $default_class, 'label' => \Joomla\CMS\Language\Text::_('FLEXI_DEFAULT'));
+			$default_option = (object) array('value' => $default_class, 'label' => JText::_('FLEXI_DEFAULT'));
 			$class_options  = $this->getPropertyOptions($class_choices, $default_option);
 		}
 
@@ -253,10 +253,10 @@ class plgFlexicontent_fieldsWeblink extends FCField
 				flexicontent_html::install_template_overrides();
 
 				// We will use the mootools based media manager
-				\Joomla\CMS\HTML\HTMLHelper::_('behavior.framework', true);
+				JHtml::_('behavior.framework', true);
 
 				// Load the modal behavior script.
-				\Joomla\CMS\HTML\HTMLHelper::_('behavior.modal'/*, '.fc_image_field_mm_modal'*/);
+				JHtml::_('behavior.modal'/*, '.fc_image_field_mm_modal'*/);
 
 				// Include media field JS, detecting different version of Joomla
 				if (file_exists($path = JPATH_ROOT.'/media/media/js/mediafield-mootools.min.js'))
@@ -270,23 +270,23 @@ class plgFlexicontent_fieldsWeblink extends FCField
 						: 'media/mediafield.js';
 				}
 
-				\Joomla\CMS\HTML\HTMLHelper::_('script', $media_js, $mootools_framework = true, $media_folder_relative_path = true, false, false, true);
+				JHtml::_('script', $media_js, $mootools_framework = true, $media_folder_relative_path = true, false, false, true);
 
 				// Tooltips for image path and image popup preview
-				\Joomla\CMS\HTML\HTMLHelper::_('behavior.tooltip', '.hasTipImgpath', array('onShow' => 'jMediaRefreshImgpathTip'));
-				\Joomla\CMS\HTML\HTMLHelper::_('behavior.tooltip', '.hasTipPreview', array('onShow' => 'jMediaRefreshPreviewTip'));
+				JHtml::_('behavior.tooltip', '.hasTipImgpath', array('onShow' => 'jMediaRefreshImgpathTip'));
+				JHtml::_('behavior.tooltip', '.hasTipPreview', array('onShow' => 'jMediaRefreshPreviewTip'));
 			}
 			else
 			{
-				jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
-				\Joomla\CMS\Form\FormHelper::loadFieldClass('media');   // \Joomla\CMS\Form\Field\MediaField
+				jimport('joomla.form.helper'); // JFormHelper
+				JFormHelper::loadFieldClass('media');   // JFormFieldMedia
 			}
 
-			\Joomla\CMS\Language\Text::script("FLEXI_FIELD_WEBLINK_ENTER_MEDIA_URL", true);
-			\Joomla\CMS\Language\Text::script("FLEXI_FIELD_WEBLINK_ENTER_MEDIA_URL_WARNING", true);
-			\Joomla\CMS\Language\Text::script("FLEXI_FIELD_MEDIA_URL", true);
-			\Joomla\CMS\Language\Text::script("FLEXI_ERROR", true);
-			$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/weblink/js/form.js', array('version' => FLEXI_VHASH));
+			JText::script("FLEXI_FIELD_WEBLINK_ENTER_MEDIA_URL", true);
+			JText::script("FLEXI_FIELD_WEBLINK_ENTER_MEDIA_URL_WARNING", true);
+			JText::script("FLEXI_FIELD_MEDIA_URL", true);
+			JText::script("FLEXI_ERROR", true);
+			$document->addScript(JUri::root(true) . '/plugins/flexicontent_fields/weblink/js/form.js', array('version' => FLEXI_VHASH));
 
 			$mm_mode_common_js_added = true;
 		}
@@ -319,7 +319,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			});
 			";
 
-			if ($max_values) \Joomla\CMS\Language\Text::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
+			if ($max_values) JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
 			$js .= "
 			function addField".$field->id."(el, groupval_box, fieldval_box, params)
 			{
@@ -476,7 +476,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 				}
 
 				// Set hits to zero for new row value
-				newField.find('span.hitcount').html('0 ' + " . json_encode(\Joomla\CMS\Language\Text::_('FLEXI_HITS')) . ");
+				newField.find('span.hitcount').html('0 ' + " . json_encode(JText::_('FLEXI_HITS')) . ");
 				";
 
 			// Add new field to DOM
@@ -514,11 +514,11 @@ class plgFlexicontent_fieldsWeblink extends FCField
 				/*
 				// Set tooltip data placeholders (this is for preview on mouseover)
 				var _name = '_image';
-				newField.find('.media-preview').html('<span class=\"hasTipPreview\" title=\"&lt;strong&gt;" . \Joomla\CMS\Language\Text::_('JLIB_FORM_MEDIA_PREVIEW_SELECTED_IMAGE', true)
-					. "&lt;/strong&gt;&lt;br /&gt;&lt;span style=&quot;display: block;&quot; id=&quot;' + element_id + _name + '_preview_empty&quot; style=&quot;display:none&quot;&gt;" . \Joomla\CMS\Language\Text::_('JLIB_FORM_MEDIA_PREVIEW_EMPTY', true)
-					. "&lt;/span&gt;&lt;span style=&quot;display: block;&quot; id=&quot;' + element_id + _name + '_preview_img&quot;&gt;&lt;img src=&quot;&quot; alt=&quot;" . \Joomla\CMS\Language\Text::_('JLIB_FORM_MEDIA_PREVIEW_SELECTED_IMAGE', true)
+				newField.find('.media-preview').html('<span class=\"hasTipPreview\" title=\"&lt;strong&gt;" . JText::_('JLIB_FORM_MEDIA_PREVIEW_SELECTED_IMAGE', true)
+					. "&lt;/strong&gt;&lt;br /&gt;&lt;span style=&quot;display: block;&quot; id=&quot;' + element_id + _name + '_preview_empty&quot; style=&quot;display:none&quot;&gt;" . JText::_('JLIB_FORM_MEDIA_PREVIEW_EMPTY', true)
+					. "&lt;/span&gt;&lt;span style=&quot;display: block;&quot; id=&quot;' + element_id + _name + '_preview_img&quot;&gt;&lt;img src=&quot;&quot; alt=&quot;" . JText::_('JLIB_FORM_MEDIA_PREVIEW_SELECTED_IMAGE', true)
 					. "&quot; id=&quot;' + element_id + _name + '_preview&quot; class=&quot;media-preview&quot; style=&quot; style=&quot;max-width:480px; max-height:360&quot; &quot; /&gt;&lt;/span&gt;\"><span class=\"icon-eye\" aria-hidden=\"true\"></span><span class=\"icon-image\" aria-hidden=\"true\"></span> "
-					. \Joomla\CMS\Language\Text::_('FLEXI_FIELD_WEBLINK_URLIMAGE', true)
+					. JText::_('FLEXI_FIELD_WEBLINK_URLIMAGE', true)
 					. "</span>');
 				*/
 				"
@@ -582,11 +582,11 @@ class plgFlexicontent_fieldsWeblink extends FCField
 
 			$css .= '';
 
-			$remove_button = '<span class="' . $add_on_class . ' fcfield-delvalue ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
-			$move2 = '<span class="' . $add_on_class . ' fcfield-drag-handle ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
+			$remove_button = '<span class="' . $add_on_class . ' fcfield-delvalue ' . $font_icon_class . '" title="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
+			$move2 = '<span class="' . $add_on_class . ' fcfield-drag-handle ' . $font_icon_class . '" title="'.JText::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
 			$add_here = '';
-			$add_here .= $add_position==2 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
-			$add_here .= $add_position==1 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
+			$add_here .= $add_position==2 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.JText::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
+			$add_here .= $add_position==1 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.JText::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
 		}
 
 		// Field not multi-value
@@ -678,8 +678,8 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
 			if (!$add_position) $field->html .= '
 				<div class="input-append input-prepend fc-xpended-btns">
-					<span class="fcfield-addvalue ' . $font_icon_class . ' fccleared" onclick="addField'.$field->id.'(jQuery(this).closest(\'.fc-xpended-btns\').get(0));" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_TO_BOTTOM' ).'">
-						'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_VALUE' ).'
+					<span class="fcfield-addvalue ' . $font_icon_class . ' fccleared" onclick="addField'.$field->id.'(jQuery(this).closest(\'.fc-xpended-btns\').get(0));" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'">
+						'.JText::_( 'FLEXI_ADD_VALUE' ).'
 					</span>
 				</div>';
 		}
@@ -702,7 +702,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 
 		if (count($skipped_vals))
 		{
-			$app->enqueueMessage( \Joomla\CMS\Language\Text::sprintf('FLEXI_FIELD_DATE_EDIT_VALUES_SKIPPED', $field->label, implode(',',$skipped_vals)), 'notice' );
+			$app->enqueueMessage( JText::sprintf('FLEXI_FIELD_DATE_EDIT_VALUES_SKIPPED', $field->label, implode(',',$skipped_vals)), 'notice' );
 		}
 
 		// Add toggle button for: Compact values view (= multiple values per row)
@@ -710,10 +710,10 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		if (!$use_ingroup && $show_values_expand_btn)
 		{
 			$field->html = '
-			<button type="button" class="fcfield-expand-view-btn btn btn-small" data-expandedFieldState="0" aria-label="' . \Joomla\CMS\Language\Text::_('FLEXI_EXPAND') . '"
+			<button type="button" class="fcfield-expand-view-btn btn btn-small" data-expandedFieldState="0" aria-label="' . JText::_('FLEXI_EXPAND') . '"
 				onclick="fc_toggleCompactValuesView(this, jQuery(this).closest(\'.container_fcfield\'));"
 			>
-				<span class="fcfield-expand-view ' . $font_icon_class . '" aria-hidden="true"></span>&nbsp; ' . \Joomla\CMS\Language\Text::_('FLEXI_EXPAND', true) . '
+				<span class="fcfield-expand-view ' . $font_icon_class . '" aria-hidden="true"></span>&nbsp; ' . JText::_('FLEXI_EXPAND', true) . '
 			</button>
 			' . $field->html;
 		}
@@ -725,7 +725,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
-		$field->label = \Joomla\CMS\Language\Text::_($field->label);
+		$field->label = JText::_($field->label);
 
 		// Set field and item objects
 		$this->setField($field);
@@ -743,8 +743,8 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		{
 			$initialized = 1;
 
-			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$app       = JFactory::getApplication();
+			$document  = JFactory::getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -789,25 +789,25 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		// URL value
 		$link_usage   = $field->parameters->get( 'link_usage', 0 ) ;
 		$default_link = ($link_usage == 2) ? $field->parameters->get( 'default_link', '' ) : '';
-		$default_link = $default_link ? \Joomla\CMS\Language\Text::_($default_link) : '';
+		$default_link = $default_link ? JText::_($default_link) : '';
 
 		// URL image (optional)
 		$useimage      = $field->parameters->get( 'use_image', 0 ) ;
 		$image_usage   = $field->parameters->get( 'image_usage', 0 ) ;
-		$default_image = ($item->version == 0 || $image_usage > 0) ? \Joomla\CMS\Language\Text::_($field->parameters->get( 'default_image', '' )) : '';
-		$default_image = $default_image ? \Joomla\CMS\Language\Text::_($default_image) : '';
+		$default_image = ($item->version == 0 || $image_usage > 0) ? JText::_($field->parameters->get( 'default_image', '' )) : '';
+		$default_image = $default_image ? JText::_($default_image) : '';
 
 		// URL title (optional)
 		$usetitle      = $field->parameters->get( 'use_title', 0 ) ;
 		$title_usage   = $field->parameters->get( 'title_usage', 0 ) ;
-		$default_title = ($title_usage == 2) ? \Joomla\CMS\Language\Text::_($field->parameters->get( 'default_title', '' )) : '';
-		$default_title = $default_title ? \Joomla\CMS\Language\Text::_($default_title) : '';
+		$default_title = ($title_usage == 2) ? JText::_($field->parameters->get( 'default_title', '' )) : '';
+		$default_title = $default_title ? JText::_($default_title) : '';
 
 		// URL linking text (optional)
 		$usetext      = $field->parameters->get( 'use_text', 0 ) ;
 		$text_usage   = $field->parameters->get( 'text_usage', 0 ) ;
 		$default_text = ($text_usage == 2)  ?  $field->parameters->get( 'default_text', '' ) : '';
-		$default_text = $default_text ? \Joomla\CMS\Language\Text::_($default_text) : '';
+		$default_text = $default_text ? JText::_($default_text) : '';
 
 		// URL address type (optional)
 		$useaddrtype      = $field->parameters->get( 'use_addrtype', 0 ) ;
@@ -821,7 +821,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		$useid      = $field->parameters->get( 'use_id', 0 ) ;
 		$id_usage	  = $field->parameters->get( 'id_usage', 0 ) ;
 		$default_id = ($id_usage == 2)  ?  $field->parameters->get( 'default_id', '' ) : '';
-		$default_id = $default_id ? \Joomla\CMS\Language\Text::_($default_id) : '';
+		$default_id = $default_id ? JText::_($default_id) : '';
 
 		// URL target && rel-nofollow
 		$usetarget      = $field->parameters->get( 'use_target', 0 ) ;
@@ -873,7 +873,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 				{
 					try
 					{
-						$item->urls = new \Joomla\Registry\Registry($item->urls);
+						$item->urls = new JRegistry($item->urls);
 					}
 					catch (Exception $e)
 					{
@@ -1069,10 +1069,10 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
 
 		// Get configuration
-		$app  = \Joomla\CMS\Factory::getApplication();
+		$app  = JFactory::getApplication();
 		$is_importcsv = $app->input->get('task', '', 'cmd') == 'importcsv';
 		$allow_relative_addrs = (int) $field->parameters->get( 'allow_relative_addrs', 0 ) ;
-		$domain = \Joomla\CMS\Uri\Uri::getInstance('SERVER')->gethost();
+		$domain = JUri::getInstance('SERVER')->gethost();
 
 		// URL title (optional)
 		$useimage    = $field->parameters->get( 'use_image', 0 ) ;
@@ -1139,8 +1139,8 @@ class plgFlexicontent_fieldsWeblink extends FCField
 				: $link;
 
 			// Absolute path without protocol, port, domain (subfolder only) and with them
-			$Abs_Path = \Joomla\CMS\Uri\Uri::root(true) . '/';
-			$Abs_Path_Full = \Joomla\CMS\Uri\Uri::root();
+			$Abs_Path = JUri::root(true) . '/';
+			$Abs_Path_Full = JUri::root();
 
 			// Remove joomla uri root to make it relative if relative allowed but an absolute URL was given
 			if (!$force_absolute)
@@ -1195,7 +1195,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 					$link = substr($link, 1);
 				}
 				$prefix = substr($link, 0, 9) === 'index.php'
-					? \Joomla\CMS\Uri\Uri::root()
+					? JUri::root()
 					: 'http://';
 			}
 
@@ -1237,7 +1237,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			if ($v!==null) $post[$i] = serialize($v);
 		}
 		/*if ($use_ingroup) {
-			$app = \Joomla\CMS\Factory::getApplication();
+			$app = JFactory::getApplication();
 			$app->enqueueMessage( print_r($post, true), 'warning');
 		}*/
 	}

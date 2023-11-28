@@ -37,7 +37,7 @@ class plgFlexicontent_fieldsText extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
-		$field->label = $field->parameters->get('label_form') ? \Joomla\CMS\Language\Text::_($field->parameters->get('label_form')) : \Joomla\CMS\Language\Text::_($field->label);
+		$field->label = $field->parameters->get('label_form') ? JText::_($field->parameters->get('label_form')) : JText::_($field->label);
 
 		// Set field and item objects
 		$this->setField($field);
@@ -60,8 +60,8 @@ class plgFlexicontent_fieldsText extends FCField
 		$auto_value = $auto_value === 2 && !$auto_value_code ? 0 : $auto_value;
 
 		// Initialize framework objects and other variables
-		$document = \Joomla\CMS\Factory::getDocument();
-		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
+		$document = JFactory::getDocument();
+		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 
 		$tooltip_class = 'hasTooltip';
 		$add_on_class    = $cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
@@ -115,7 +115,7 @@ class plgFlexicontent_fieldsText extends FCField
 		$simple_form_layout = $display_label_form === -1;
 		$placeholder        = $display_label_form === -1 && !$simple_form_layout
 			? $field->label
-			: \Joomla\CMS\Language\Text::_($field->parameters->get( 'placeholder', '' )) ;
+			: JText::_($field->parameters->get( 'placeholder', '' )) ;
 
 		// Create extra HTML TAG parameters for the form field
 		$classes = '';
@@ -197,7 +197,7 @@ class plgFlexicontent_fieldsText extends FCField
 			});
 			";
 
-			if ($max_values) \Joomla\CMS\Language\Text::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
+			if ($max_values) JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
 			$js .= "
 			function addField".$field->id."(el, groupval_box, fieldval_box, params)
 			{
@@ -316,11 +316,11 @@ class plgFlexicontent_fieldsText extends FCField
 
 			$css .= '';
 
-			$remove_button = '<span class="' . $add_on_class . ' fcfield-delvalue ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
-			$move2 = '<span class="' . $add_on_class . ' fcfield-drag-handle ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
+			$remove_button = '<span class="' . $add_on_class . ' fcfield-delvalue ' . $font_icon_class . '" title="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
+			$move2 = '<span class="' . $add_on_class . ' fcfield-drag-handle ' . $font_icon_class . '" title="'.JText::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
 			$add_here = '';
-			$add_here .= $add_position==2 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
-			$add_here .= $add_position==1 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
+			$add_here .= $add_position==2 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.JText::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
+			$add_here .= $add_position==1 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.JText::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
 		}
 
 		// Field not multi-value
@@ -350,7 +350,7 @@ class plgFlexicontent_fieldsText extends FCField
 
 			$sel_fieldname = 'custom['.$field->name.'_sel][]';
 			$sel_options = plgFlexicontent_fieldsText::buildSelectOptions($field, $item);
-			$select_field = \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $sel_options, $sel_fieldname, $sel_attribs, 'value', 'text', array());
+			$select_field = JHtml::_('select.genericlist', $sel_options, $sel_fieldname, $sel_attribs, 'value', 'text', array());
 			$select_field_placement = (int) $field->parameters->get('select_field_placement', 0);
 		}
 
@@ -465,8 +465,8 @@ class plgFlexicontent_fieldsText extends FCField
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
 			if (!$add_position) $field->html .= '
 				<div class="input-append input-prepend fc-xpended-btns">
-					<span class="fcfield-addvalue ' . $font_icon_class . ' fccleared" onclick="addField'.$field->id.'(jQuery(this).closest(\'.fc-xpended-btns\').get(0));" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_TO_BOTTOM' ).'">
-						'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_VALUE' ).'
+					<span class="fcfield-addvalue ' . $font_icon_class . ' fccleared" onclick="addField'.$field->id.'(jQuery(this).closest(\'.fc-xpended-btns\').get(0));" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'">
+						'.JText::_( 'FLEXI_ADD_VALUE' ).'
 					</span>
 				</div>';
 		}
@@ -489,7 +489,7 @@ class plgFlexicontent_fieldsText extends FCField
 
 		if (count($skipped_vals))
 		{
-			$app->enqueueMessage( \Joomla\CMS\Language\Text::sprintf('FLEXI_FIELD_DATE_EDIT_VALUES_SKIPPED', $field->label, implode(',',$skipped_vals)), 'notice' );
+			$app->enqueueMessage( JText::sprintf('FLEXI_FIELD_DATE_EDIT_VALUES_SKIPPED', $field->label, implode(',',$skipped_vals)), 'notice' );
 		}
 	}
 
@@ -499,7 +499,7 @@ class plgFlexicontent_fieldsText extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
-		$field->label = \Joomla\CMS\Language\Text::_($field->label);
+		$field->label = JText::_($field->label);
 
 		// Set field and item objects
 		$this->setField($field);
@@ -517,8 +517,8 @@ class plgFlexicontent_fieldsText extends FCField
 		{
 			$initialized = 1;
 
-			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$app       = JFactory::getApplication();
+			$document  = JFactory::getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -554,8 +554,8 @@ class plgFlexicontent_fieldsText extends FCField
 			$decimal_digits_displayed = $format_output === 2 ? 0 : (int)$field->parameters->get('decimal_digits_displayed', 2);
 			$decimal_digits_sep    = $field->parameters->get('decimal_digits_sep', '.');
 			$decimal_thousands_sep = $field->parameters->get('decimal_thousands_sep', ',');
-			$output_prefix = \Joomla\CMS\Language\Text::_($field->parameters->get('output_prefix', ''));
-			$output_suffix = \Joomla\CMS\Language\Text::_($field->parameters->get('output_suffix', ''));
+			$output_prefix = JText::_($field->parameters->get('output_prefix', ''));
+			$output_suffix = JText::_($field->parameters->get('output_suffix', ''));
 		}
 		else if ($format_output === -1)
 		{
@@ -589,7 +589,7 @@ class plgFlexicontent_fieldsText extends FCField
 
 		if ($clean_output)
 		{
-			$ifilter = $clean_output == 1 ? \Joomla\CMS\Filter\InputFilter::getInstance([], [], 1, 1) : \Joomla\CMS\Filter\InputFilter::getInstance();
+			$ifilter = $clean_output == 1 ? JFilterInput::getInstance([], [], 1, 1) : JFilterInput::getInstance();
 		}
 		if ($lang_filter_values || $clean_output || $encode_output || $format_output)
 		{
@@ -608,13 +608,13 @@ class plgFlexicontent_fieldsText extends FCField
 				}
 				else if ($format_output === -1)
 				{
-					$item_link = empty($item->slug) ? '' : \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item));
+					$item_link = empty($item->slug) ? '' : JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item));
 					$value = eval( "\$item_link= \"{$item_link}\";" . "\$value= \"{$value}\";" . $output_custom_func);
 				}
 
 				if ($lang_filter_values)
 				{
-					$value = \Joomla\CMS\Language\Text::_($value);
+					$value = JText::_($value);
 				}
 				if ($clean_output)
 				{
@@ -699,7 +699,7 @@ class plgFlexicontent_fieldsText extends FCField
 				{
 					$content_val = !$is_ingroup ? flexicontent_html::striptagsandcut($field->{$prop}, $ogpmaxlen) :
 						flexicontent_html::striptagsandcut($opentag.implode($separatorf, $field->{$prop}).$closetag, $ogpmaxlen) ;
-					\Joomla\CMS\Factory::getDocument()->addCustomTag('<meta property="og:'.$usagetype.'" content="'.$content_val.'" />');
+					JFactory::getDocument()->addCustomTag('<meta property="og:'.$usagetype.'" content="'.$content_val.'" />');
 				}
 			}
 		}
@@ -952,7 +952,7 @@ class plgFlexicontent_fieldsText extends FCField
 			? 'FLEXI_FIELD_SELECT_EXISTING_VALUE'
 			: 'FLEXI_FIELD_SELECT_VALUE';
 		$field_prompt = $field->parameters->get('select_field_prompt', $default_prompt);
-		$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '', \Joomla\CMS\Language\Text::_($field_prompt));
+		$options[] = JHtml::_('select.option', '', JText::_($field_prompt));
 
 		$lang_filter_values = $field->parameters->get('lang_filter_values', 0);
 
@@ -962,9 +962,9 @@ class plgFlexicontent_fieldsText extends FCField
 			{
 				if (strlen($result->value))
 				{
-					$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',
+					$options[] = JHtml::_('select.option',
 						$result->value,
-						($lang_filter_values ? \Joomla\CMS\Language\Text::_($result->text) : $result->text)
+						($lang_filter_values ? JText::_($result->text) : $result->text)
 					);
 				}
 			}
@@ -976,9 +976,9 @@ class plgFlexicontent_fieldsText extends FCField
 			{
 				if (strlen($result->value) && (!$results_predefined || !isset($results_predefined[$result->value])))
 				{
-					$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',
+					$options[] = JHtml::_('select.option',
 						$result->value,
-						($lang_filter_values ? \Joomla\CMS\Language\Text::_($result->text) : $result->text)
+						($lang_filter_values ? JText::_($result->text) : $result->text)
 					);
 				}
 			}

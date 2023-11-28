@@ -40,7 +40,7 @@ abstract class JHtmlFctags extends JHtmlFcbase
 	 */
 	protected static function _getPreviewUrl($row)
 	{
-		return \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('tags_using_catview', 0)
+		return JComponentHelper::getParams('com_flexicontent')->get('tags_using_catview', 0)
 			? FlexicontentHelperRoute::getCategoryRoute(0, 0, array('layout'=>'tags','tagid'=>$row->slug), $row)
 			: FlexicontentHelperRoute::getTagRoute($row->slug);
 	}
@@ -58,7 +58,7 @@ abstract class JHtmlFctags extends JHtmlFcbase
 	 */
 	public static function rss_link($row, $target, $i, $hash = '')
 	{
-		if (!\Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('tags_using_catview', 0))
+		if (!JComponentHelper::getParams('com_flexicontent')->get('tags_using_catview', 0))
 		{
 			return '';
 		}
@@ -83,7 +83,7 @@ abstract class JHtmlFctags extends JHtmlFcbase
 		// UNUSED, possibly add layout parameter to tag parameters ?
 		return 'UNUSED';
 
-		if (!\Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('tags_using_catview', 0))
+		if (!JComponentHelper::getParams('com_flexicontent')->get('tags_using_catview', 0))
 		{
 			$layout = false;
 		}

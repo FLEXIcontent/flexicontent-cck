@@ -29,17 +29,17 @@ jimport('legacy.controller.legacy');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentController extends \Joomla\CMS\MVC\Controller\AdminController
+class FlexicontentController extends JControllerAdmin
 {
 	public function __construct($config = array())
 	{
 		parent::__construct($config);
 
-		$params = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+		$params = JComponentHelper::getParams('com_flexicontent');
 		$print_logging_info = $params->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
 
-		$jversion = new \Joomla\CMS\Version;
+		$jversion = new JVersion;
 
 		$config_saved = $params->get('flexi_cat_extension', 0);
 		//$config_saved = $config_saved && $params->get('search_mode', 0);  // an Extra configuration check
@@ -51,7 +51,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\AdminController
 			$link 	= 'index.php?option=com_flexicontent';
 			$this->setRedirect($link);   // we do not message since this will be displayed by template of the view ...
 		}
-		$session = \Joomla\CMS\Factory::getSession();
+		$session = JFactory::getSession();
 
 		// GET POSTINSTALL tasks from session variable AND IF NEEDED re-evaluate it
 		// NOTE, POSTINSTALL WILL NOT LET USER USE ANYTHING UNTIL ALL TASKS ARE COMPLETED
@@ -112,7 +112,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\AdminController
 
 			if ($view && in_array($view, array('items', 'item', 'types', 'type', 'categories', 'category', 'fields', 'field', 'reviews', 'review', 'tags', 'tag', 'archive', 'filemanager', 'templates', 'stats', 'search', 'import')) && !$postinst_integrity_ok)
 			{
-				$msg = \Joomla\CMS\Language\Text::_( 'FLEXI_PLEASE_COMPLETE_POST_INSTALL' );
+				$msg = JText::_( 'FLEXI_PLEASE_COMPLETE_POST_INSTALL' );
 				$link 	= 'index.php?option=com_flexicontent';
 				$this->setRedirect($link, $msg);
 			}
@@ -129,7 +129,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\AdminController
 
 	function getPostinstallState()
 	{
-		$params = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+		$params = JComponentHelper::getParams('com_flexicontent');
 		$print_logging_info = $params->get('print_logging_info');
 		if ( $print_logging_info ) {
 			global $fc_run_times;
@@ -142,7 +142,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\AdminController
 		$model->install_template_overrides();
 		$model->install_3rdParty_plugins();
 
-		$params = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+		$params = JComponentHelper::getParams('com_flexicontent');
 		$use_versioning = $params->get('use_versioning', 1);
 		if ( $print_logging_info ) @$fc_run_times['checking_postinstall_task_init'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		//printf('<br/>-- [checking_postinstall_task_init: %.2f s] ', $fc_run_times['checking_postinstall_task_init']/1000000);
@@ -270,7 +270,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\AdminController
 	 * Method to display a view.
 	 *
 	 * @param   boolean        $cachable   If true, the view output will be cached
-	 * @param   mixed|boolean  $urlparams  An array of safe URL parameters and their variable types, for valid values see {@link \Joomla\CMS\Filter\InputFilter::clean()}.
+	 * @param   mixed|boolean  $urlparams  An array of safe URL parameters and their variable types, for valid values see {@link JFilterInput::clean()}.
 	 *
 	 * @return  JController  This object to support chaining.
 	 *
@@ -279,7 +279,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\AdminController
 	public function display($cachable = false, $urlparams = false)
 	{
 		/**
-		 * Alternative way to get clasname could be: get_parent_class('\Joomla\CMS\MVC\Controller\AdminController')
+		 * Alternative way to get clasname could be: get_parent_class('JControllerAdmin')
 		 * Also for PHP < 7.0 we need class name inside a string variable
 		 */
 		$class = get_parent_class(get_parent_class(get_class()));

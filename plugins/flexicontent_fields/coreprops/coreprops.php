@@ -53,7 +53,7 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
-		$field->label = \Joomla\CMS\Language\Text::_($field->label);
+		$field->label = JText::_($field->label);
 
 		// Set field and item objects
 		$this->setField($field);
@@ -71,8 +71,8 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 		{
 			$initialized = 1;
 
-			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$app       = JFactory::getApplication();
+			$document  = JFactory::getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -136,7 +136,7 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 					if ( !isset($cat_links[$maincatid]) )
 					{
 						$maincat_slug = $item->maincatid  ?  $item->maincatid.':'.$item->maincat_alias : $item->catid;
-						$cat_links[$maincatid] = \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getCategoryRoute($maincat_slug));
+						$cat_links[$maincatid] = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($maincat_slug));
 					}
 				}
 
@@ -201,7 +201,7 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 		$formfieldname = 'filter_'.$filter->id;
 
 		$_s = $isSearchView ? '_s' : '';
@@ -210,7 +210,7 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 
 		// Create first prompt option of drop-down select
 		$label_filter = $filter->parameters->get( 'display_label_filter'.$_s, 2 ) ;
-		$first_option_txt = $label_filter==2 ? $filter->label : \Joomla\CMS\Language\Text::_('FLEXI_ALL');
+		$first_option_txt = $label_filter==2 ? $filter->label : JText::_('FLEXI_ALL');
 
 		// Prepend Field's Label to filter HTML
 		//$filter->html = $label_filter==1 ? $filter->label.': ' : '';
@@ -240,7 +240,7 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 				$filter->filter_valuesselect =
 					'CASE WHEN i.language IS NULL THEN ' . $db->Quote('*') . ' ELSE i.language END AS value, ' .
 					'CASE WHEN CHAR_LENGTH(lg.title_native) THEN lg.title_native ELSE ' .
-						'(CASE WHEN lg.title IS NULL THEN ' . $db->Quote(\Joomla\CMS\Language\Text::_('JALL')) . ' ELSE lg.title END) ' .
+						'(CASE WHEN lg.title IS NULL THEN ' . $db->Quote(JText::_('JALL')) . ' ELSE lg.title END) ' .
 					'END as text';
 				$filter->filter_valuesfrom   = ' FROM #__content AS i ';
 				$filter->filter_valuesjoin   =
@@ -268,18 +268,18 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 
 			// Add the options
 			$options = array();
-			$_inner_lb = $label_filter==2 ? $filter->label : \Joomla\CMS\Language\Text::_('FLEXI_CLICK_TO_LIST');
+			$_inner_lb = $label_filter==2 ? $filter->label : JText::_('FLEXI_CLICK_TO_LIST');
 			$_inner_lb = htmlspecialchars($_inner_lb, ENT_COMPAT, 'UTF-8');
 			if ($display_filter_as == 6)
 			{
 				if ($label_filter==2)
 				{
-					$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '', $_inner_lb, 'value', 'text', $_disabled = true);
+					$options[] = JHtml::_('select.option', '', $_inner_lb, 'value', 'text', $_disabled = true);
 				}
 			}
 			else
-				$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '', '- '.$first_option_txt.' -');
-			foreach ($lists as $list) $options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', $list->value, $list->text . ($count_column ? ' ('.$list->found.')' : '') );
+				$options[] = JHtml::_('select.option', '', '- '.$first_option_txt.' -');
+			foreach ($lists as $list) $options[] = JHtml::_('select.option', $list->value, $list->text . ($count_column ? ' ('.$list->found.')' : '') );
 		}
 
 		// b. If field filter has defined drop-down select options the create the drop-down select form field
@@ -299,7 +299,7 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 				$extra_param = ' data-placeholder="'.$_inner_lb.'"';
 
 				// Add type to filter PROMPT (via js)
-				$extra_param .= ' data-fc_prompt_text="'.htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_TYPE_TO_FILTER'), ENT_QUOTES, 'UTF-8').'"';
+				$extra_param .= ' data-fc_prompt_text="'.htmlspecialchars(JText::_('FLEXI_TYPE_TO_FILTER'), ENT_QUOTES, 'UTF-8').'"';
 			}
 
 			// Create HTML tag attributes
@@ -317,14 +317,14 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 			// Calculate if field has value
 			$has_value = (!is_array($value) && $value !== null && strlen($value)) || (is_array($value) && count($value));
 			$filter->html	.= $label_filter==2 && $has_value
-				? ' <span class="badge fc_mobile_label" style="display:none;">'.\Joomla\CMS\Language\Text::_($filter->label).'</span> '
+				? ' <span class="badge fc_mobile_label" style="display:none;">'.JText::_($filter->label).'</span> '
 				: '';
 
 			// Create filter
 			// Need selected values: array('') instead of array(), to force selecting the "field's prompt option" (e.g. field label) thus avoid "0 selected" display in mobiles
 			$filter->html	.= $display_filter_as != 6
-				? \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $options, $filter_ffname.'[]', $attribs_str, 'value', 'text', $value, $filter_ffid)
-				: \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $options, $filter_ffname.'[]', $attribs_str, 'value', 'text', ($label_filter==2 && !count($value) ? array('') : $value), $filter_ffid);
+				? JHtml::_('select.genericlist', $options, $filter_ffname.'[]', $attribs_str, 'value', 'text', $value, $filter_ffid)
+				: JHtml::_('select.genericlist', $options, $filter_ffname.'[]', $attribs_str, 'value', 'text', ($label_filter==2 && !count($value) ? array('') : $value), $filter_ffid);
 		}
 
 		// Special CASE for some filters, do some replacements
@@ -338,7 +338,7 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 		$value_quoted = array();
 		foreach ($value as $i => $v)
 		{
@@ -386,7 +386,7 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 		$value_quoted = array();
 		foreach ($value as $i => $v)
 		{

@@ -20,11 +20,11 @@
 defined('_JEXEC') or die('Restricted access');
 
 jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
-jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
+jimport('cms.html.select');    // JHtmlSelect
+jimport('joomla.form.field');  // JFormField
 
-//jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
-//\Joomla\CMS\Form\FormHelper::loadFieldClass('...');   // \Joomla\CMS\Form\FormField...
+//jimport('joomla.form.helper'); // JFormHelper
+//JFormHelper::loadFieldClass('...');   // JFormField...
 
 
 require "fctag.php";
@@ -37,7 +37,7 @@ require "fctag.php";
  * @since 1.0
  */
 
-class \Joomla\CMS\Form\Field\TagField extends \Joomla\CMS\Form\FormFieldFctag
+class JFormFieldTag extends JFormFieldFctag
 {
  /**
 	* Element name

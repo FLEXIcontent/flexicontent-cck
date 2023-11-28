@@ -26,7 +26,7 @@ if (FLEXI_J40GE)
 	{
 		public function getDebugActions()
 		{
-			$app    = \Joomla\CMS\Factory::getApplication();
+			$app    = JFactory::getApplication();
 			$component = $app->input->getCmd('option', '');
 
 			return UsersHelperDebug::getDebugActions($component);
@@ -41,7 +41,7 @@ else
 	{
 		public function getDebugActions()
 		{
-			$app    = \Joomla\CMS\Factory::getApplication();
+			$app    = JFactory::getApplication();
 			$component = $app->input->getCmd('option', '');
 
 			return UsersHelperDebug::getDebugActions($component);

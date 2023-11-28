@@ -37,7 +37,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
-		$field->label = $field->parameters->get('label_form') ? \Joomla\CMS\Language\Text::_($field->parameters->get('label_form')) : \Joomla\CMS\Language\Text::_($field->label);
+		$field->label = $field->parameters->get('label_form') ? JText::_($field->parameters->get('label_form')) : JText::_($field->label);
 
 		// Set field and item objects
 		$this->setField($field);
@@ -49,10 +49,10 @@ class plgFlexicontent_fieldsTermlist extends FCField
 		if ($use_ingroup && empty($field->ingroup)) return;
 
 		// Initialize framework objects and other variables
-		$document = \Joomla\CMS\Factory::getDocument();
-		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
-		$app  = \Joomla\CMS\Factory::getApplication();
-		$user = \Joomla\CMS\Factory::getUser();
+		$document = JFactory::getDocument();
+		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
+		$app  = JFactory::getApplication();
+		$user = JFactory::getUser();
 
 		$tooltip_class = 'hasTooltip';
 		$add_on_class    = $cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
@@ -65,7 +65,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 		// Create the editor object of editor prefered by the user,
 		// this will also add the needed JS to the HTML head
 		$editor_name = $field->parameters->get( 'editor',  $user->getParam('editor', $app->getCfg('editor'))  );
-		$editor  = \Joomla\CMS\Editor\Editor::getInstance($editor_name);
+		$editor  = JEditor::getInstance($editor_name);
 		$editor_plg_params = array();  // Override parameters of the editor plugin, ignored by most editors !!
 
 
@@ -91,12 +91,12 @@ class plgFlexicontent_fieldsTermlist extends FCField
 		 */
 
 		// Label
-		$title_label = \Joomla\CMS\Language\Text::_($field->parameters->get('title_label', 'FLEXI_FIELD_TERMTITLE'));
+		$title_label = JText::_($field->parameters->get('title_label', 'FLEXI_FIELD_TERMTITLE'));
 
 		// Default value
 		$title_usage   = $field->parameters->get( 'title_usage', 0 ) ;
-		$default_title = ($item->version == 0 || $title_usage > 0) ? \Joomla\CMS\Language\Text::_($field->parameters->get( 'default_value_title', '' )) : '';
-		$default_title = strlen($default_title) ? \Joomla\CMS\Language\Text::_($default_title) : '';
+		$default_title = ($item->version == 0 || $title_usage > 0) ? JText::_($field->parameters->get( 'default_value_title', '' )) : '';
+		$default_title = strlen($default_title) ? JText::_($default_title) : '';
 
 
 		/**
@@ -117,12 +117,12 @@ class plgFlexicontent_fieldsTermlist extends FCField
 		 */
 
 		// Label
-		$value_label = \Joomla\CMS\Language\Text::_($field->parameters->get('value_label', 'FLEXI_FIELD_TERMTEXT'));
+		$value_label = JText::_($field->parameters->get('value_label', 'FLEXI_FIELD_TERMTEXT'));
 
 		// Default value
 		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_value = ($item->version == 0 || $value_usage > 0) ? $field->parameters->get( 'default_value', '' ) : '';
-		$default_value = strlen($default_value) ? \Joomla\CMS\Language\Text::_($default_value) : '';
+		$default_value = strlen($default_value) ? JText::_($default_value) : '';
 
 		// Editing method, text editor or HTML editor
 		$use_html = (int) $field->parameters->get( 'use_html', 0 );
@@ -204,7 +204,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 			});
 			";
 
-			if ($max_values) \Joomla\CMS\Language\Text::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
+			if ($max_values) JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
 			$js .= "
 			function addField".$field->id."(el, groupval_box, fieldval_box, params)
 			{
@@ -439,11 +439,11 @@ class plgFlexicontent_fieldsTermlist extends FCField
 
 			$css .= '';
 
-			$remove_button = '<span class="' . $add_on_class . ' fcfield-delvalue ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
-			$move2 = '<span class="' . $add_on_class . ' fcfield-drag-handle ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
+			$remove_button = '<span class="' . $add_on_class . ' fcfield-delvalue ' . $font_icon_class . '" title="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
+			$move2 = '<span class="' . $add_on_class . ' fcfield-drag-handle ' . $font_icon_class . '" title="'.JText::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
 			$add_here = '';
-			$add_here .= $add_position==2 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
-			$add_here .= $add_position==1 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
+			$add_here .= $add_position==2 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.JText::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
+			$add_here .= $add_position==1 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.JText::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
 		}
 
 		// Field not multi-value
@@ -568,8 +568,8 @@ class plgFlexicontent_fieldsTermlist extends FCField
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
 			if (!$add_position) $field->html .= '
 				<div class="input-append input-prepend fc-xpended-btns">
-					<span class="fcfield-addvalue ' . $font_icon_class . ' fccleared" onclick="addField'.$field->id.'(jQuery(this).closest(\'.fc-xpended-btns\').get(0));" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_TO_BOTTOM' ).'">
-						'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_VALUE' ).'
+					<span class="fcfield-addvalue ' . $font_icon_class . ' fccleared" onclick="addField'.$field->id.'(jQuery(this).closest(\'.fc-xpended-btns\').get(0));" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'">
+						'.JText::_( 'FLEXI_ADD_VALUE' ).'
 					</span>
 				</div>';
 		}
@@ -592,7 +592,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 
 		if (count($skipped_vals))
 		{
-			$app->enqueueMessage( \Joomla\CMS\Language\Text::sprintf('FLEXI_FIELD_DATE_EDIT_VALUES_SKIPPED', $field->label, implode(',',$skipped_vals)), 'notice' );
+			$app->enqueueMessage( JText::sprintf('FLEXI_FIELD_DATE_EDIT_VALUES_SKIPPED', $field->label, implode(',',$skipped_vals)), 'notice' );
 		}
 	}
 
@@ -602,7 +602,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
-		$field->label = \Joomla\CMS\Language\Text::_($field->label);
+		$field->label = JText::_($field->label);
 
 		// Set field and item objects
 		$this->setField($field);
@@ -620,8 +620,8 @@ class plgFlexicontent_fieldsTermlist extends FCField
 		{
 			$initialized = 1;
 
-			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$app       = JFactory::getApplication();
+			$document  = JFactory::getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -645,7 +645,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		$multiple    = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
 
-		$app = \Joomla\CMS\Factory::getApplication();
+		$app = JFactory::getApplication();
 		$view = $app->input->get('flexi_callview', $app->input->get('view', 'item', 'cmd'), 'cmd');
 
 		// Value handling parameters
@@ -658,8 +658,8 @@ class plgFlexicontent_fieldsTermlist extends FCField
 		$cut_text        = $view=='item' ? 0 : $field->parameters->get('cut_text_catview', 0);
 		$cut_text_length = $field->parameters->get('cut_text_length_catview', 200);
 		$cut_text_display = $field->parameters->get('cut_text_display_catview', 0);
-		$cut_text_display_btn_icon = \Joomla\CMS\Language\Text::_($field->parameters->get('cut_text_display_btn_icon_catview', 'icon-paragraph-center'));
-		$cut_text_display_btn_text = \Joomla\CMS\Language\Text::_($field->parameters->get('cut_text_display_btn_text_catview', '...'));
+		$cut_text_display_btn_icon = JText::_($field->parameters->get('cut_text_display_btn_icon_catview', 'icon-paragraph-center'));
+		$cut_text_display_btn_text = JText::_($field->parameters->get('cut_text_display_btn_text_catview', '...'));
 
 
 		/**
@@ -667,16 +667,16 @@ class plgFlexicontent_fieldsTermlist extends FCField
 		 */
 
 		// Term Title
-		$title_label = \Joomla\CMS\Language\Text::_($field->parameters->get('title_label', 'FLEXI_FIELD_TERMTITLE'));
+		$title_label = JText::_($field->parameters->get('title_label', 'FLEXI_FIELD_TERMTITLE'));
 		$title_usage   = $field->parameters->get( 'title_usage', 0 ) ;
-		$default_title = ($title_usage == 2) ? \Joomla\CMS\Language\Text::_($field->parameters->get( 'default_value_title', '' )) : '';
-		$default_title = strlen($default_title) ? \Joomla\CMS\Language\Text::_($default_title) : '';
+		$default_title = ($title_usage == 2) ? JText::_($field->parameters->get( 'default_value_title', '' )) : '';
+		$default_title = strlen($default_title) ? JText::_($default_title) : '';
 
 		// Term (description) Text
-		$value_label = \Joomla\CMS\Language\Text::_($field->parameters->get('value_label', 'FLEXI_FIELD_TERMTEXT'));
+		$value_label = JText::_($field->parameters->get('value_label', 'FLEXI_FIELD_TERMTEXT'));
 		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_value = ($value_usage == 2) ? $field->parameters->get( 'default_value', '' ) : '';
-		$default_value = strlen($default_value) ? \Joomla\CMS\Language\Text::_($default_value) : '';
+		$default_value = strlen($default_value) ? JText::_($default_value) : '';
 
 		// Get field values
 		$values = $values ? $values : $field->value;
@@ -702,7 +702,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 
 		if ($clean_output)
 		{
-			$ifilter = $clean_output == 1 ? \Joomla\CMS\Filter\InputFilter::getInstance([], [], 1, 1) : \Joomla\CMS\Filter\InputFilter::getInstance();
+			$ifilter = $clean_output == 1 ? JFilterInput::getInstance([], [], 1, 1) : JFilterInput::getInstance();
 		}
 		if (1)  // 1 because we will unserialize
 		{
@@ -720,8 +720,8 @@ class plgFlexicontent_fieldsTermlist extends FCField
 
 				if ($lang_filter_values)
 				{
-					$value['title'] = \Joomla\CMS\Language\Text::_($value['title']);
-					$value['text']  = \Joomla\CMS\Language\Text::_($value['text']);
+					$value['title'] = JText::_($value['title']);
+					$value['text']  = JText::_($value['text']);
 				}
 				if ($clean_output)
 				{
@@ -804,7 +804,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 		$mce_fieldname = '_FC_FIELD_' . $field->name;
 
 		// Get configuration
-		$app  = \Joomla\CMS\Factory::getApplication();
+		$app  = JFactory::getApplication();
 		$is_importcsv = $app->input->get('task', '', 'cmd') == 'importcsv';
 
 		// Server side validation
@@ -868,7 +868,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 			if ($v!==null) $post[$i] = serialize($v);
 		}
 		/*if ($use_ingroup) {
-			$app = \Joomla\CMS\Factory::getApplication();
+			$app = JFactory::getApplication();
 			$app->enqueueMessage( print_r($post, true), 'warning');
 		}*/
 	}

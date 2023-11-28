@@ -30,7 +30,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 	 */
 	public function display($tpl = null)
 	{
-		$app    = \Joomla\CMS\Factory::getApplication();
+		$app    = JFactory::getApplication();
 		$jinput = $app->input;
 
 		// Check for form layout
@@ -66,18 +66,18 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 	 */
 	function _displayForm($tpl)
 	{
-		if (\Joomla\CMS\Factory::getApplication()->isClient('site'))
+		if (JFactory::getApplication()->isClient('site'))
 		{
 			// Note : we use some strings from administrator part, so we will also load administrator language file
 			// TODO: remove this need by moving common language string to different file ?
 
 			// Load english language file for 'com_content' component then override with current language file
-			\Joomla\CMS\Factory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR, 'en-GB', true);
-			\Joomla\CMS\Factory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR, null, true);
+			JFactory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR, 'en-GB', true);
+			JFactory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR, null, true);
 
 			// Load english language file for 'com_flexicontent' component then override with current language file
-			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
-			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 		}
 
 		/**
@@ -86,17 +86,17 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 		global $globalcats;
 
-		$app        = \Joomla\CMS\Factory::getApplication();
+		$app        = JFactory::getApplication();
 		$jinput     = $app->input;
 		$dispatcher = JEventDispatcher::getInstance();
-		$document   = \Joomla\CMS\Factory::getDocument();
-		$config     = \Joomla\CMS\Factory::getConfig();
-		$session    = \Joomla\CMS\Factory::getSession();
-		$user       = \Joomla\CMS\Factory::getUser();
-		$db         = \Joomla\CMS\Factory::getDbo();
-		$uri        = \Joomla\CMS\Uri\Uri::getInstance();
+		$document   = JFactory::getDocument();
+		$config     = JFactory::getConfig();
+		$session    = JFactory::getSession();
+		$user       = JFactory::getUser();
+		$db         = JFactory::getDbo();
+		$uri        = JUri::getInstance();
 		$task       = $jinput->getCmd('task');
-		$cparams    = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+		$cparams    = JComponentHelper::getParams('com_flexicontent');
 		$isAdmin    = $app->isClient('administrator');
 		$isSite     = $app->isClient('site');
 		$CFGsfx     = $isSite ? '_fe' : '_be';
@@ -111,7 +111,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 			: false;
 
 		// Get the COMPONENT only parameter, since we do not have item parameters yet, but we need to do some work before creating the item
-		$page_params  = new \Joomla\Registry\Registry();
+		$page_params  = new JRegistry();
 		$page_params->merge($cparams);
 
 		// Runtime stats
@@ -223,7 +223,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		if (!$item)
 		{
 			$app->enqueueMessage($model->getError(), 'warning');
-			$returnURL = isset($_SERVER['HTTP_REFERER']) && flexicontent_html::is_safe_url($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : \Joomla\CMS\Uri\Uri::base();
+			$returnURL = isset($_SERVER['HTTP_REFERER']) && flexicontent_html::is_safe_url($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : JUri::base();
 			$app->redirect( $returnURL );
 		}
 
@@ -263,7 +263,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 			if ($jinput->getCmd('tmpl') !== 'component')
 			{
-				$returnURL = isset($_SERVER['HTTP_REFERER']) && flexicontent_html::is_safe_url($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : \Joomla\CMS\Uri\Uri::base();
+				$returnURL = isset($_SERVER['HTTP_REFERER']) && flexicontent_html::is_safe_url($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : JUri::base();
 				$app->redirect( $returnURL );
 			}
 			return;
@@ -327,7 +327,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 		// Get type parameters, these are needed besides the 'merged' item parameters, e.g. to get Type's default layout
 		$tparams = $model->getTypeparams();
-		$tparams = new \Joomla\Registry\Registry($tparams);
+		$tparams = new JRegistry($tparams);
 
 		// Backend: Apply type configuration if it type is set
 		$isAdmin
@@ -342,16 +342,16 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		// Add css to document
 		if ($isAdmin)
 		{
-			!\Joomla\CMS\Factory::getLanguage()->isRtl()
-				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
-				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
+			!JFactory::getLanguage()->isRtl()
+				? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
+				: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
 		}
-		!\Joomla\CMS\Factory::getLanguage()->isRtl()
-			? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
-			: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
+		!JFactory::getLanguage()->isRtl()
+			? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
+			: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 
 		// Fields common CSS
-		$document->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/css/flexi_form_fields.css', array('version' => FLEXI_VHASH));
+		$document->addStyleSheet(JUri::root(true).'/components/com_flexicontent/assets/css/flexi_form_fields.css', array('version' => FLEXI_VHASH));
 
 		// Add JS frameworks
 		flexicontent_html::loadFramework('jQuery');
@@ -362,15 +362,15 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		flexicontent_html::loadFramework('flexi-lib-form');
 
 		// Load custom behaviours: form validation, popup tooltips
-		\Joomla\CMS\HTML\HTMLHelper::_('behavior.formvalidator');  // load default validation JS to make sure it is overriden
-		\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip');
+		JHtml::_('behavior.formvalidator');  // load default validation JS to make sure it is overriden
+		JHtml::_('bootstrap.tooltip');
 
 		// Add js function to overload the joomla submitform validation
-		$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
-		$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
+		$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
+		$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
 
 		// Add js function for custom code used by FLEXIcontent item form
-		$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/itemscreen.js', array('version' => FLEXI_VHASH));
+		$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/itemscreen.js', array('version' => FLEXI_VHASH));
 
 
 		if ($isSite)
@@ -412,7 +412,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 					$c_namespace = 'fc_item_form';
 
 					// Try to load the configured captcha plugin, (check if disabled or uninstalled), Joomla will enqueue an error message if needed
-					$captcha_obj = \Joomla\CMS\Captcha\Captcha::getInstance($c_plugin, array('namespace' => $c_namespace));
+					$captcha_obj = JCaptcha::getInstance($c_plugin, array('namespace' => $c_namespace));
 					if ($captcha_obj)
 					{
 						$captcha_field = $captcha_obj->display($c_name, $c_id, $c_class);
@@ -421,7 +421,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 						$label_tooltip = flexicontent_html::getToolTip(null, 'FLEXI_CAPTCHA_ENTER_CODE_DESC', 1, 1);
 						$captcha_field = '
 							<label id="'.$c_name.'-lbl" data-for="'.$c_name.'" class="'.$label_class.'" title="'.$label_tooltip.'" >
-							'. \Joomla\CMS\Language\Text::_( 'FLEXI_CAPTCHA_ENTER_CODE' ).'
+							'. JText::_( 'FLEXI_CAPTCHA_ENTER_CODE' ).'
 							</label>
 							<div id="container_fcfield_'.$c_plugin.'" class="container_fcfield container_fcfield_name_'.$c_plugin.'">
 								<div class="fcfieldval_container valuebox fcfieldval_container_'.$c_plugin.'">
@@ -488,7 +488,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 							}
 							else
 							{
-								$app->enqueueMessage(\Joomla\CMS\Language\Text::_('EDIT_TOKEN_IS_INVALID') . ' : ' . $edittok, 'warning');
+								$app->enqueueMessage(JText::_('EDIT_TOKEN_IS_INVALID') . ' : ' . $edittok, 'warning');
 							}
 						}
 					}
@@ -507,7 +507,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 							. '&fcreturn='.base64_encode($fcreturn);
 
 						$app->setHeader('status', 403);
-						$app->enqueueMessage(\Joomla\CMS\Language\Text::sprintf('FLEXI_LOGIN_TO_ACCESS', $url), 'warning');
+						$app->enqueueMessage(JText::sprintf('FLEXI_LOGIN_TO_ACCESS', $url), 'warning');
 						$app->redirect($url);
 					}
 
@@ -515,14 +515,14 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 					elseif ($unauthorized_page)
 					{
 						$app->setHeader('status', 403);
-						$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'), 'warning');
+						$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'warning');
 						$app->redirect($unauthorized_page);
 					}
 
 					// Logged user, no unauthorized page has been configured, throw no access exception
 					else
 					{
-						$msg = \Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK');
+						$msg = JText::_('FLEXI_ALERTNOTAUTH_TASK');
 						throw new Exception($msg, 403);
 					}
 				}
@@ -530,15 +530,15 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 				// Finally check if item is currently being checked-out (currently being edited)
 				if ($model->isCheckedOut($user->get('id')))
 				{
-					$msg = \Joomla\CMS\Language\Text::sprintf('FLEXI_DESCBEINGEDITTED', $model->get('title'));
-					$app->redirect(\Joomla\CMS\Router\Route::_('index.php?view='.FLEXI_ITEMVIEW.'&cid='.$model->get('catid').'&id='.$model->get('id'), false), $msg);
+					$msg = JText::sprintf('FLEXI_DESCBEINGEDITTED', $model->get('title'));
+					$app->redirect(JRoute::_('index.php?view='.FLEXI_ITEMVIEW.'&cid='.$model->get('catid').'&id='.$model->get('id'), false), $msg);
 				}
 
 				//Checkout the item
 				if ( !$model->checkout() )
 				{
 					$app->setHeader('status', '400 Bad Request', true);
-					$app->redirect(\Joomla\CMS\Router\Route::_('index.php?view='.FLEXI_ITEMVIEW.'&cid='.$model->get('catid').'&id='.$model->get('id'), false), \Joomla\CMS\Language\Text::_('FLEXI_OPERATION_FAILED') . ' : Cannot checkout file for editing', 'error');
+					$app->redirect(JRoute::_('index.php?view='.FLEXI_ITEMVIEW.'&cid='.$model->get('catid').'&id='.$model->get('id'), false), JText::_('FLEXI_OPERATION_FAILED') . ' : Cannot checkout file for editing', 'error');
 				}
 			}
 
@@ -579,12 +579,12 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 					$msg = '';
 					if (!$canCreateType)
 					{
-						$type_name = isset($types[$new_typeid]) ? '"'.\Joomla\CMS\Language\Text::_($types[$new_typeid]->name).'"' : \Joomla\CMS\Language\Text::_('FLEXI_ANY');
-						$msg .= ($msg ? '<br/>' : ''). \Joomla\CMS\Language\Text::sprintf( 'FLEXI_NO_ACCESS_CREATE_CONTENT_OF_TYPE', $type_name );
+						$type_name = isset($types[$new_typeid]) ? '"'.JText::_($types[$new_typeid]->name).'"' : JText::_('FLEXI_ANY');
+						$msg .= ($msg ? '<br/>' : ''). JText::sprintf( 'FLEXI_NO_ACCESS_CREATE_CONTENT_OF_TYPE', $type_name );
 					}
 					if (!$canAssignToCategory)
 					{
-						$msg .= ($msg ? '<br/>' : ''). \Joomla\CMS\Language\Text::_( 'FLEXI_ALERTNOTAUTH_CREATE_IN_ANY_CAT' );
+						$msg .= ($msg ? '<br/>' : ''). JText::_( 'FLEXI_ALERTNOTAUTH_CREATE_IN_ANY_CAT' );
 					}
 				}
 
@@ -593,7 +593,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 					$db->setQuery('SELECT COUNT(id) FROM #__content WHERE created_by = ' . $user->id);
 					$authored_count = $db->loadResult();
 					$content_is_limited = $authored_count >= $max_auth_limit;
-					$msg = $content_is_limited ? \Joomla\CMS\Language\Text::sprintf( 'FLEXI_ALERTNOTAUTH_CREATE_MORE', $max_auth_limit ) : '';
+					$msg = $content_is_limited ? JText::sprintf( 'FLEXI_ALERTNOTAUTH_CREATE_MORE', $max_auth_limit ) : '';
 				}
 
 				// User isn't authorize to add ANY content
@@ -603,7 +603,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 					if ($notauth_menu = $app->getMenu()->getItem($notauth_itemid))
 					{
 						$internal_link_vars = !empty($notauth_menu->component) ? '&Itemid=' . $notauth_itemid . '&option=' . $notauth_menu->component : '';
-						$notauthurl = \Joomla\CMS\Router\Route::_($notauth_menu->link . $internal_link_vars, false);
+						$notauthurl = JRoute::_($notauth_menu->link . $internal_link_vars, false);
 
 						$app->setHeader('status', 403);
 						$app->enqueueMessage($msg, 'notice');
@@ -649,8 +649,8 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 		// Set toolbar title
 		$item->id
-			? \Joomla\CMS\Toolbar\ToolbarHelper::title( \Joomla\CMS\Language\Text::_( 'FLEXI_EDIT_ITEM' ), 'icon-pencil-alt' )   // Editing existing item
-			: \Joomla\CMS\Toolbar\ToolbarHelper::title( \Joomla\CMS\Language\Text::_( 'FLEXI_NEW_ITEM' ), 'icon-file-alt' );    // Creating new item
+			? JToolbarHelper::title( JText::_( 'FLEXI_EDIT_ITEM' ), 'icon-pencil-alt' )   // Editing existing item
+			: JToolbarHelper::title( JText::_( 'FLEXI_NEW_ITEM' ), 'icon-file-alt' );    // Creating new item
 
 		// Hide default toolbar
 		$buttons_placement = (int) $page_params->get('buttons_placement' . $CFGsfx, ($isSite ? 0 : -1));
@@ -729,8 +729,8 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		if (!$lists['catid'] && !$menuCats)
 		{
 			$app->setHeader('status', 403);
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::sprintf('FLEXI_LOGIN_TO_ACCESS', $url), 'warning');
-			$app->redirect($url, \Joomla\CMS\Language\Text::_("FLEXI_CANNOT_SUBMIT_IN_TYPE_ALLOWED_CATS"), 'warning');
+			$app->enqueueMessage(JText::sprintf('FLEXI_LOGIN_TO_ACCESS', $url), 'warning');
+			$app->redirect($url, JText::_("FLEXI_CANNOT_SUBMIT_IN_TYPE_ALLOWED_CATS"), 'warning');
 		}
 
 		// Item language related vars
@@ -751,8 +751,8 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 			-2 => 'FLEXI_TRASHED',
 		);
 		$published = isset($state_labels[$item->state])
-			? \Joomla\CMS\Language\Text::_($state_labels[$item->state])
-			: \Joomla\CMS\Language\Text::_('FLEXI_UNKNOWN');
+			? JText::_($state_labels[$item->state])
+			: JText::_('FLEXI_UNKNOWN');
 
 
 		/**
@@ -836,10 +836,10 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		// *** SET INTO THE FORM, parameter values for various parameter groups
 		// ***
 
-		if ( \Joomla\CMS\HTML\HTMLHelper::_('date', $item->publish_down ?? '' , 'Y') <= 1969 || $item->publish_down == $nullDate || empty($item->publish_down) )
+		if ( JHtml::_('date', $item->publish_down ?? '' , 'Y') <= 1969 || $item->publish_down == $nullDate || empty($item->publish_down) )
 		{
-			$item->publish_down = '';//\Joomla\CMS\Language\Text::_( 'FLEXI_NEVER' );
-			$form->setValue('publish_down', null, ''/*\Joomla\CMS\Language\Text::_( 'FLEXI_NEVER' )*/);  // Setting to text will break form date element
+			$item->publish_down = '';//JText::_( 'FLEXI_NEVER' );
+			$form->setValue('publish_down', null, ''/*JText::_( 'FLEXI_NEVER' )*/);  // Setting to text will break form date element
 		}
 
 
@@ -889,12 +889,12 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 			$tmpls = $tmpls_all;
 		}
 
-		// (f) Create \Joomla\CMS\Form\Form for the layout and apply Layout parameters values into the fields
+		// (f) Create JForm for the layout and apply Layout parameters values into the fields
 		foreach ($tmpls as $tmpl)
 		{
 			if ($tmpl->name != $_ilayout) continue;
 
-			$jform = new \Joomla\CMS\Form\Form('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => false));
+			$jform = new JForm('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => false));
 			$jform->load($tmpl->params);
 			$tmpl->params = $jform;
 			foreach ($tmpl->params->getGroup('attribs') as $field)
@@ -911,7 +911,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		 */
 
 		$this->item   = $item;
-		$this->form   = $form;  // most core field are created via calling \Joomla\CMS\Form\Form methods
+		$this->form   = $form;  // most core field are created via calling JForm methods
 
 		if ($useAssocs)  $this->lang_assocs = $langAssocs;
 		$this->langs   = $langs;
@@ -996,14 +996,14 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 	 */
 	private function _buildEditLists(&$perms, &$page_params, &$session_data)
 	{
-		$app      = \Joomla\CMS\Factory::getApplication();
+		$app      = JFactory::getApplication();
 		$jinput   = $app->input;
-		$db       = \Joomla\CMS\Factory::getDbo();
-		$user     = \Joomla\CMS\Factory::getUser();	// get current user
+		$db       = JFactory::getDbo();
+		$user     = JFactory::getUser();	// get current user
 		$model    = $this->getModel();
 		$item     = $model->getItem(null, $check_view_access=false, $no_cache=false, $force_version=0);  // ZERO force_version means unversioned data
-		$document = \Joomla\CMS\Factory::getDocument();
-		$session  = \Joomla\CMS\Factory::getSession();
+		$document = JFactory::getDocument();
+		$session  = JFactory::getSession();
 		$option   = $jinput->get('option', '', 'cmd');
 		$isAdmin  = $app->isClient('administrator');
 		$isSite   = $app->isClient('site');
@@ -1075,7 +1075,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 		// Encode (UTF-8 charset) HTML entities form data so that they can be set as form field values
 		// we do this after creating the description field which is used un-encoded inside 'textarea' tags
-		\Joomla\CMS\Filter\OutputFilter::objectHTMLSafe( $item, ENT_QUOTES, $exclude_keys = '' );  // Maybe exclude description text ?
+		JFilterOutput::objectHTMLSafe( $item, ENT_QUOTES, $exclude_keys = '' );  // Maybe exclude description text ?
 
 		$lists = array();
 		$prettycheckable_added = flexicontent_html::loadFramework('prettyCheckable');  // Get if prettyCheckable was loaded
@@ -1089,16 +1089,16 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 		// States for publishers
 		$ops = array(
-			array('value' =>  1, 'text' => \Joomla\CMS\Language\Text::_('FLEXI_PUBLISHED')),
-			array('value' =>  0, 'text' => \Joomla\CMS\Language\Text::_('FLEXI_UNPUBLISHED')),
-			array('value' => -5, 'text' => \Joomla\CMS\Language\Text::_('FLEXI_IN_PROGRESS'))
+			array('value' =>  1, 'text' => JText::_('FLEXI_PUBLISHED')),
+			array('value' =>  0, 'text' => JText::_('FLEXI_UNPUBLISHED')),
+			array('value' => -5, 'text' => JText::_('FLEXI_IN_PROGRESS'))
 		);
 		if ($non_publishers_stategrp || $special_privelege_stategrp)
 		{
 			$grp = 'publishers_workflow_states';
 			$state[$grp] = array();
 			$state[$grp]['id'] = 'publishers_workflow_states';
-			$state[$grp]['text'] = \Joomla\CMS\Language\Text::_('FLEXI_PUBLISHERS_WORKFLOW_STATES');
+			$state[$grp]['text'] = JText::_('FLEXI_PUBLISHERS_WORKFLOW_STATES');
 			$state[$grp]['items'] = $ops;
 		}
 		else
@@ -1109,8 +1109,8 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 		// States reserved for workflow
 		$ops = array();
-		if ($item->state==-3 || $perms['canconfig'])  $ops[] = array('value' => -3, 'text' => \Joomla\CMS\Language\Text::_('FLEXI_PENDING'));
-		if ($item->state==-4 || $perms['canconfig'])  $ops[] = array('value' => -4, 'text' => \Joomla\CMS\Language\Text::_('FLEXI_TO_WRITE'));
+		if ($item->state==-3 || $perms['canconfig'])  $ops[] = array('value' => -3, 'text' => JText::_('FLEXI_PENDING'));
+		if ($item->state==-4 || $perms['canconfig'])  $ops[] = array('value' => -4, 'text' => JText::_('FLEXI_TO_WRITE'));
 
 		if ( $ops )
 		{
@@ -1119,7 +1119,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 				$grp = 'non_publishers_workflow_states';
 				$state[$grp] = array();
 				$state[$grp]['id'] = 'non_publishers_workflow_states';
-				$state[$grp]['text'] = \Joomla\CMS\Language\Text::_('FLEXI_NON_PUBLISHERS_WORKFLOW_STATES');
+				$state[$grp]['text'] = JText::_('FLEXI_NON_PUBLISHERS_WORKFLOW_STATES');
 				$state[$grp]['items'] = $ops;
 			}
 			else
@@ -1131,8 +1131,8 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 		// Special access states
 		$ops = array();
-		if ($item->state==2  || $perms['canarchive']) $ops[] = array('value' =>  2, 'text' => \Joomla\CMS\Language\Text::_('FLEXI_ARCHIVED'));
-		if ($item->state==-2 || $perms['candelete'])  $ops[] = array('value' => -2, 'text' => \Joomla\CMS\Language\Text::_('FLEXI_TRASHED'));
+		if ($item->state==2  || $perms['canarchive']) $ops[] = array('value' =>  2, 'text' => JText::_('FLEXI_ARCHIVED'));
+		if ($item->state==-2 || $perms['candelete'])  $ops[] = array('value' => -2, 'text' => JText::_('FLEXI_TRASHED'));
 
 		if ( $ops )
 		{
@@ -1141,7 +1141,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 				$grp = 'special_action_states';
 				$state[$grp] = array();
 				$state[$grp]['id'] = 'special_action_states';
-				$state[$grp]['text'] = \Joomla\CMS\Language\Text::_('FLEXI_SPECIAL_ACTION_STATES');
+				$state[$grp]['text'] = JText::_('FLEXI_SPECIAL_ACTION_STATES');
 				$state[$grp]['items'] = $ops;
 			}
 			else
@@ -1155,7 +1155,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$elementid = 'jform_state';
 		$class = 'use_select2_lib';
 		$attribs = 'class="'.$class.'"';
-		$lists['state'] = \Joomla\CMS\HTML\HTMLHelper::_('select.groupedlist', $state, $fieldname,
+		$lists['state'] = JHtml::_('select.groupedlist', $state, $fieldname,
 			array(
 				'id' => $elementid,
 				'group.id' => 'id',
@@ -1175,25 +1175,25 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 			$elementid = 'jform_featured';
 			/*
 			$options = array();
-			$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  0, \Joomla\CMS\Language\Text::_( 'FLEXI_NO' ) );
-			$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  1, \Joomla\CMS\Language\Text::_( 'FLEXI_YES' ) );
+			$options[] = JHtml::_('select.option',  0, JText::_( 'FLEXI_NO' ) );
+			$options[] = JHtml::_('select.option',  1, JText::_( 'FLEXI_YES' ) );
 			$attribs = '';
-			$lists['featured'] = \Joomla\CMS\HTML\HTMLHelper::_('select.radiolist', $options, $fieldname, $attribs, 'value', 'text', $item->featured, $elementid);
+			$lists['featured'] = JHtml::_('select.radiolist', $options, $fieldname, $attribs, 'value', 'text', $item->featured, $elementid);
 			*/
 			$classes = !$prettycheckable_added ? '' : ' use_prettycheckable ';
 			$attribs = ' class="'.$classes.'" ';
 			$i = 1;
-			$options = array(0=>\Joomla\CMS\Language\Text::_( 'FLEXI_NO' ), 1=>\Joomla\CMS\Language\Text::_( 'FLEXI_YES' ) );
+			$options = array(0=>JText::_( 'FLEXI_NO' ), 1=>JText::_( 'FLEXI_YES' ) );
 			$lists['featured'] = '';
 			foreach ($options as $option_id => $option_label)
 			{
 				$checked = $option_id==$item->featured ? ' checked="checked"' : '';
 				$elementid_no = $elementid.'_'.$i;
 				if (!$prettycheckable_added) $lists['featured'] .= '<label class="fccheckradio_lbl" for="'.$elementid_no.'">';
-				$extra_params = !$prettycheckable_added ? '' : ' data-labeltext="'.\Joomla\CMS\Language\Text::_($option_label).'" data-labelPosition="right" data-customClass="fcradiocheck"';
+				$extra_params = !$prettycheckable_added ? '' : ' data-labeltext="'.JText::_($option_label).'" data-labelPosition="right" data-customClass="fcradiocheck"';
 				$lists['featured'] .= ' <input type="radio" id="'.$elementid_no.'" data-element-grpid="'.$elementid
 					.'" name="'.$fieldname.'" '.$attribs.' value="'.$option_id.'" '.$checked.$extra_params.' />';
-				if (!$prettycheckable_added) $lists['featured'] .= '&nbsp;'.\Joomla\CMS\Language\Text::_($option_label).'</label>';
+				if (!$prettycheckable_added) $lists['featured'] .= '&nbsp;'.JText::_($option_label).'</label>';
 				$i++;
 			}
 		}
@@ -1203,24 +1203,24 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$elementid = 'jform_vstate';
 		/*
 		$options = array();
-		$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  1, \Joomla\CMS\Language\Text::_( 'FLEXI_NO' ) );
-		$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  2, \Joomla\CMS\Language\Text::_( 'FLEXI_YES' ) );
+		$options[] = JHtml::_('select.option',  1, JText::_( 'FLEXI_NO' ) );
+		$options[] = JHtml::_('select.option',  2, JText::_( 'FLEXI_YES' ) );
 		$attribs = FLEXI_J16GE ? ' style ="float:left!important;" '  :  '';   // this is not right for J1.5' style ="float:left!important;" ';
-		$lists['vstate'] = \Joomla\CMS\HTML\HTMLHelper::_('select.radiolist', $options, $fieldname, $attribs, 'value', 'text', 2, $elementid);
+		$lists['vstate'] = JHtml::_('select.radiolist', $options, $fieldname, $attribs, 'value', 'text', 2, $elementid);
 		*/
 		$classes = !$prettycheckable_added ? '' : ' use_prettycheckable ';
 		$attribs = ' class="'.$classes.'" ';
 		$i = 1;
-		$options = array(1=>\Joomla\CMS\Language\Text::_( 'FLEXI_NO' ), 2=>\Joomla\CMS\Language\Text::_( 'FLEXI_YES' ) );
+		$options = array(1=>JText::_( 'FLEXI_NO' ), 2=>JText::_( 'FLEXI_YES' ) );
 		$lists['vstate'] = '';
 		foreach ($options as $option_id => $option_label) {
 			$checked = $option_id==2 ? ' checked="checked"' : '';
 			$elementid_no = $elementid.'_'.$i;
 			if (!$prettycheckable_added) $lists['vstate'] .= '<label class="fccheckradio_lbl" for="'.$elementid_no.'">';
-			$extra_params = !$prettycheckable_added ? '' : ' data-labeltext="'.\Joomla\CMS\Language\Text::_($option_label).'" data-labelPosition="right" data-customClass="fcradiocheck"';
+			$extra_params = !$prettycheckable_added ? '' : ' data-labeltext="'.JText::_($option_label).'" data-labelPosition="right" data-customClass="fcradiocheck"';
 			$lists['vstate'] .= ' <input type="radio" id="'.$elementid_no.'" data-element-grpid="'.$elementid
 				.'" name="'.$fieldname.'" '.$attribs.' value="'.$option_id.'" '.$checked.$extra_params.' />';
-			if (!$prettycheckable_added) $lists['vstate'] .= '&nbsp;'.\Joomla\CMS\Language\Text::_($option_label).'</label>';
+			if (!$prettycheckable_added) $lists['vstate'] .= '&nbsp;'.JText::_($option_label).'</label>';
 			$i++;
 		}
 
@@ -1229,7 +1229,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$level_name = flexicontent_html::userlevel(null, $item->access, null, null, '', $_createlist = false);
 		if (empty($level_name))
 		{
-			\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::sprintf('FLEXI_ABOUT_INVALID_ACCESS_LEVEL_PLEASE_SAVE_NEW', $item->access, 'Public'), 'warning');
+			JFactory::getApplication()->enqueueMessage(JText::sprintf('FLEXI_ABOUT_INVALID_ACCESS_LEVEL_PLEASE_SAVE_NEW', $item->access, 'Public'), 'warning');
 			$document->addScriptDeclaration("jQuery(document).ready(function() { jQuery('#jform_access').val(1).trigger('change'); });");
 		}
 
@@ -1237,7 +1237,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		// Build field for notifying subscribers
 		if (!$subscribers)
 		{
-			$lists['notify'] = !$isnew ? '<div class="alert alert-info fc-small fc-iblock">'.\Joomla\CMS\Language\Text::_('FLEXI_NO_SUBSCRIBERS_EXIST').'</div>' : '';
+			$lists['notify'] = !$isnew ? '<div class="alert alert-info fc-small fc-iblock">'.JText::_('FLEXI_NO_SUBSCRIBERS_EXIST').'</div>' : '';
 		}
 		else
 		{
@@ -1245,14 +1245,14 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 			$subscribers_notified = $session->get('subscribers_notified', array(),'flexicontent');
 			if ( !empty($subscribers_notified[$item->id]) )
 			{
-				$lists['notify'] = '<div class="alert alert-info fc-small fc-iblock">'.\Joomla\CMS\Language\Text::_('FLEXI_SUBSCRIBERS_ALREADY_NOTIFIED').'</div>';
+				$lists['notify'] = '<div class="alert alert-info fc-small fc-iblock">'.JText::_('FLEXI_SUBSCRIBERS_ALREADY_NOTIFIED').'</div>';
 			}
 			else
 			{
 				$fieldname = 'jform[notify]';
 				$elementid = 'jform_notify';
 
-				$lbltxt   = $subscribers . ' ' . \Joomla\CMS\Language\Text::_($subscribers > 1 ? 'FLEXI_SUBSCRIBERS' : 'FLEXI_SUBSCRIBER');
+				$lbltxt   = $subscribers . ' ' . JText::_($subscribers > 1 ? 'FLEXI_SUBSCRIBERS' : 'FLEXI_SUBSCRIBER');
 				$classes  = !$prettycheckable_added ? '' : ' use_prettycheckable ';
 				$attribs  = ' class="' . $classes . '" '
 					. (!$prettycheckable_added ? '' : ' data-labeltext="' . $lbltxt . '" data-labelPosition="right" data-customClass="fcradiocheck"');
@@ -1272,7 +1272,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 			$fieldname = 'jform[notify_owner]';
 			$elementid = 'jform_notify_owner';
 
-			$lbltxt   = \Joomla\CMS\Language\Text::_('FLEXI_NOTIFY_OWNER');
+			$lbltxt   = JText::_('FLEXI_NOTIFY_OWNER');
 			$classes  = !$prettycheckable_added ? '' : ' use_prettycheckable ';
 			$attribs  = ' class="' . $classes . '" '
 				. (!$prettycheckable_added ? '' : ' data-labeltext="' . $lbltxt . '" data-labelPosition="right" data-customClass="fcradiocheck"');
@@ -1282,8 +1282,8 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 				. ' <input type="checkbox" id="' . $elementid . '" data-element-grpid="' . $elementid . '" name="' . $fieldname . '" ' . $attribs . ' value="1" checked="checked" />'
 				. ($prettycheckable_added ? '' : '&nbsp;' . $lbltxt . '</label>');
 
-			$this->ownerCanEdit     = $model->canEdit(null, \Joomla\CMS\Factory::getUser($item->created_by));
-			$this->ownerCanEditState = $model->canEditState(null, \Joomla\CMS\Factory::getUser($item->created_by));
+			$this->ownerCanEdit     = $model->canEdit(null, JFactory::getUser($item->created_by));
+			$this->ownerCanEditState = $model->canEditState(null, JFactory::getUser($item->created_by));
 		}
 
 		// Retrieve author configuration
@@ -1295,7 +1295,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 			max_cat_assign_fc = '.$max_cat_assign.';
 			existing_cats_fc  = ["'.implode('","', $form_cid).'"];
 		');
-		\Joomla\CMS\Language\Text::script('FLEXI_TOO_MANY_ITEM_CATEGORIES',true);
+		JText::script('FLEXI_TOO_MANY_ITEM_CATEGORIES',true);
 
 
 		// Creating categorories tree for item assignment, we use the 'create' privelege
@@ -1470,7 +1470,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 				flexicontent_cats::buildcatselect($catid_tree, $fieldname, $item->catid, 2, $attribs,
 					$allowed_catstates, ($item->id ? 'edit' : 'create'), $actions_allowed,
 					$require_all=true, $skip_subtrees=array(), $disable_subtrees=array(), $custom_options=array(), $disabled_cats,
-					$empty_errmsg=\Joomla\CMS\Language\Text::_('FLEXI_FORM_NO_MAIN_CAT_ALLOWED'),
+					$empty_errmsg=JText::_('FLEXI_FORM_NO_MAIN_CAT_ALLOWED'),
 					$show_viewable=false, $allowed_catlangs
 				);
 		} else if ( !$isnew && $item->catid ) {
@@ -1500,25 +1500,25 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 			$elementid = 'jform_attribs_comments';
 			/*
 			$options = array();
-			$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', "",  \Joomla\CMS\Language\Text::_( 'FLEXI_DEFAULT_BEHAVIOR' ) );
-			$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', 0, \Joomla\CMS\Language\Text::_( 'FLEXI_DISABLE' ) );
+			$options[] = JHtml::_('select.option', "",  JText::_( 'FLEXI_DEFAULT_BEHAVIOR' ) );
+			$options[] = JHtml::_('select.option', 0, JText::_( 'FLEXI_DISABLE' ) );
 			$attribs = '';
-			$lists['disable_comments'] = \Joomla\CMS\HTML\HTMLHelper::_('select.radiolist', $options, $fieldname, $attribs, 'value', 'text', $fieldvalue, $elementid);
+			$lists['disable_comments'] = JHtml::_('select.radiolist', $options, $fieldname, $attribs, 'value', 'text', $fieldvalue, $elementid);
 			*/
 			$classes = !$prettycheckable_added ? '' : ' use_prettycheckable ';
 			$attribs = ' class="'.$classes.'" ';
 			$i = 1;
-			$options = array(""=>\Joomla\CMS\Language\Text::_( 'FLEXI_DEFAULT_BEHAVIOR' ), 0=>\Joomla\CMS\Language\Text::_( 'FLEXI_DISABLE' ) );
+			$options = array(""=>JText::_( 'FLEXI_DEFAULT_BEHAVIOR' ), 0=>JText::_( 'FLEXI_DISABLE' ) );
 			$lists['disable_comments'] = '';
 			foreach ($options as $option_id => $option_label)
 			{
 				$checked = $option_id===$fieldvalue ? ' checked="checked"' : '';
 				$elementid_no = $elementid.'_'.$i;
 				if (!$prettycheckable_added) $lists['disable_comments'] .= '<label class="fccheckradio_lbl" for="'.$elementid_no.'">';
-				$extra_params = !$prettycheckable_added ? '' : ' data-labeltext="'.\Joomla\CMS\Language\Text::_($option_label).'" data-labelPosition="right" data-customClass="fcradiocheck"';
+				$extra_params = !$prettycheckable_added ? '' : ' data-labeltext="'.JText::_($option_label).'" data-labelPosition="right" data-customClass="fcradiocheck"';
 				$lists['disable_comments'] .= ' <input type="radio" id="'.$elementid_no.'" data-element-grpid="'.$elementid
 					.'" name="'.$fieldname.'" '.$attribs.' value="'.$option_id.'" '.$checked.$extra_params.' />';
-				if (!$prettycheckable_added) $lists['disable_comments'] .= '&nbsp;'.\Joomla\CMS\Language\Text::_($option_label).'</label>';
+				if (!$prettycheckable_added) $lists['disable_comments'] .= '&nbsp;'.JText::_($option_label).'</label>';
 				$i++;
 			}
 		}
@@ -1528,7 +1528,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		// *** Build languages list
 		// ***
 
-		// We will not use the default getInput() \Joomla\CMS\Form\Form method, since we want to customize display of language selection according to configuration
+		// We will not use the default getInput() JForm method, since we want to customize display of language selection according to configuration
 		// probably we should create a new form element and use it in record's XML ... but maybe this is an overkill, we may do it in the future
 
 		// Find user's allowed languages
@@ -1578,7 +1578,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 		// Get user, user's global permissions
 		$permission = FlexicontentHelperPerm::getPerm();
-		$user       = \Joomla\CMS\Factory::getUser();
+		$user       = JFactory::getUser();
 
 		$perms = array();
 		$perms['isSuperAdmin'] = $permission->SuperAdmin;
@@ -1648,13 +1648,13 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		global $globalcats;
 		$categories = & $globalcats;
 
-		$app     = \Joomla\CMS\Factory::getApplication();
-		$user    = \Joomla\CMS\Factory::getUser();
-		$session = \Joomla\CMS\Factory::getSession();
+		$app     = JFactory::getApplication();
+		$user    = JFactory::getUser();
+		$session = JFactory::getSession();
 
 		$perms   = $this->_getItemPerms();
 		$tparams = $model->getTypeparams();
-		$tparams = new \Joomla\Registry\Registry($tparams);
+		$tparams = new JRegistry($tparams);
 
 		$typeselected = $model->getItemType();
 
@@ -1675,7 +1675,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		}
 
 		$tbname  = $buttons_placement === -1 ? 'toolbar' : 'fctoolbar';  // -1 : Place at page header
-		$toolbar = \Joomla\CMS\Toolbar\Toolbar::getInstance($tbname);
+		$toolbar = JToolbar::getInstance($tbname);
 
 		$isSideBtns = in_array($buttons_placement, array(2,3));  // Side placement (left, right)
 		$add_inline = false; // $isSideBtns
@@ -1717,7 +1717,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 				'FLEXI_APPLY', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".apply_ajax')", $msg_alert='', $msg_confirm='',
 				$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
 				$btn_class=(FLEXI_J40GE ? ' _DDI_class_ btn-success ' : '') . ' ' . $this->tooltip_class, $btn_icon="icon-loop",
-				'data-placement="'.$tip_place_mainbtn.'" title="'.\Joomla\CMS\Language\Text::_('FLEXI_FAST_SAVE_INFO', true).'"', $auto_add = 0, $tbname);
+				'data-placement="'.$tip_place_mainbtn.'" title="'.JText::_('FLEXI_FAST_SAVE_INFO', true).'"', $auto_add = 0, $tbname);
 		}
 
 		// Apply & Reload button   ***   (Apply Type, is a special case of new that has not loaded custom fieds yet, due to type not defined on initial form load)
@@ -1731,7 +1731,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 				? (in_array( 'apply_ajax', $allowbuttons) ? 'FLEXI_APPLY_N_RELOAD' : 'FLEXI_SAVE')
 				: ($typeselected->id ? 'FLEXI_ADD' : 'FLEXI_APPLY_TYPE');
 
-			//\Joomla\CMS\Toolbar\ToolbarHelper::apply($btn_task, $btn_title, false);
+			//JToolbarHelper::apply($btn_task, $btn_title, false);
 
 			$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
 				$btn_title, $btn_name, $full_js="Joomla.submitbutton('".$btn_task."')", $msg_alert='', $msg_confirm='',
@@ -1760,7 +1760,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 			$btn_name = 'save';
 			$btn_task = $ctrl.'.save';
 
-			//\Joomla\CMS\Toolbar\ToolbarHelper::save($btn_task);  //\Joomla\CMS\Toolbar\ToolbarHelper::custom( $btn_task, 'save.png', 'save.png', 'JSAVE', false );
+			//JToolbarHelper::save($btn_task);  //JToolbarHelper::custom( $btn_task, 'save.png', 'save.png', 'JSAVE', false );
 
 			$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
 				'JSAVE', $btn_name, $full_js="Joomla.submitbutton('".$btn_task."')", $msg_alert='', $msg_confirm='',
@@ -1775,7 +1775,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 					$btn_name = 'save_a_preview';
 					$btn_task = $ctrl.'.save_a_preview';
 
-					//\Joomla\CMS\Toolbar\ToolbarHelper::save($btn_task);  //\Joomla\CMS\Toolbar\ToolbarHelper::custom( $btn_task, 'save.png', 'save.png', 'JSAVE', false );
+					//JToolbarHelper::save($btn_task);  //JToolbarHelper::custom( $btn_task, 'save.png', 'save.png', 'JSAVE', false );
 
 					$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
 						(!$isnew ? 'FLEXI_SAVE_A_PREVIEW' : 'FLEXI_ADD_A_PREVIEW'), $btn_name, $full_js="Joomla.submitbutton('".$btn_task."')", $msg_alert='', $msg_confirm='',
@@ -1791,13 +1791,13 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 						$btn_name = 'save2new';
 						$btn_task = $ctrl.'.save2new';
 
-						//\Joomla\CMS\Toolbar\ToolbarHelper::save2new($btn_task);  //\Joomla\CMS\Toolbar\ToolbarHelper::custom( $btn_task, 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
+						//JToolbarHelper::save2new($btn_task);  //JToolbarHelper::custom( $btn_task, 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
 
 						$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
 							'FLEXI_SAVE_AND_NEW', $btn_name, $full_js="Joomla.submitbutton('".$btn_task."')", $msg_alert='', $msg_confirm='',
 							$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
 							$btn_class= (FLEXI_J40GE ? ' _DDI_class_ btn-success ' : '') . ' ' . $this->tooltip_class, $btn_icon="icon-save-new",
-							'data-placement="'.$tip_place_subbtn.'" title="'.\Joomla\CMS\Language\Text::_('FLEXI_SAVE_AND_NEW_INFO', true).'"', $auto_add = 0, $tbname);
+							'data-placement="'.$tip_place_subbtn.'" title="'.JText::_('FLEXI_SAVE_AND_NEW_INFO', true).'"', $auto_add = 0, $tbname);
 					}
 
 					// Also if an existing item, can save to a copy
@@ -1806,13 +1806,13 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 						$btn_name = 'save2copy';
 						$btn_task = $ctrl.'.save2copy';
 
-						//\Joomla\CMS\Toolbar\ToolbarHelper::save2copy($btn_task);  //\Joomla\CMS\Toolbar\ToolbarHelper::custom( $btn_task, 'save2copy.png', 'save2copy.png', 'FLEXI_SAVE_AS_COPY', false );
+						//JToolbarHelper::save2copy($btn_task);  //JToolbarHelper::custom( $btn_task, 'save2copy.png', 'save2copy.png', 'FLEXI_SAVE_AS_COPY', false );
 
 						$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
 							'FLEXI_SAVE_AS_COPY', $btn_name, $full_js="Joomla.submitbutton('".$btn_task."')", $msg_alert='', $msg_confirm='',
 							$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
 							$btn_class= (FLEXI_J40GE ? ' _DDI_class_ btn-success ' : '') . ' ' . $this->tooltip_class, $btn_icon="icon-save-copy",
-							'data-placement="'.$tip_place_subbtn.'" title="'.\Joomla\CMS\Language\Text::_('FLEXI_SAVE_AS_COPY_INFO', true).'"', $auto_add = 0, $tbname);
+							'data-placement="'.$tip_place_subbtn.'" title="'.JText::_('FLEXI_SAVE_AS_COPY_INFO', true).'"', $auto_add = 0, $tbname);
 					}
 				}
 			}
@@ -1829,7 +1829,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 			$tbname
 		);
 
-		//\Joomla\CMS\Toolbar\ToolbarHelper::cancel($ctrl.'.cancel');   // This add to default 'toolbar' object, instead we need to use the custom toolbar object
+		//JToolbarHelper::cancel($ctrl.'.cancel');   // This add to default 'toolbar' object, instead we need to use the custom toolbar object
 		$toolbar->appendButton('Standard', 'cancel', 'JCANCEL', $ctrl.'.cancel', false);
 
 
@@ -1837,8 +1837,8 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		 * Add a preview button(s)
 		 */
 
-		//$_sh404sef = \Joomla\CMS\Plugin\PluginHelper::isEnabled('system', 'sh404sef') && \Joomla\CMS\Factory::getConfig()->get('sef');
-		$_sh404sef = defined('SH404SEF_IS_RUNNING') && \Joomla\CMS\Factory::getConfig()->get('sef');
+		//$_sh404sef = JPluginHelper::isEnabled('system', 'sh404sef') && JFactory::getConfig()->get('sef');
+		$_sh404sef = defined('SH404SEF_IS_RUNNING') && JFactory::getConfig()->get('sef');
 		if ( !$isnew && in_array( 'preview_latest', $allowbuttons) )
 		{
 			// Create the non-SEF URL
@@ -1861,7 +1861,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 				<a class="toolbar ' . $this->btn_sm_class . (FLEXI_J40GE ? ' _DDI_class_ ' : '') .' btn-fcaction spaced-btn" href="javascript:;" '
 				. ' onclick="window.open(\'_PREVIEW_LINK_\', \'preview2\', \''.$link_params.'\'); return false;">'
 				. '<span class="icon-screen"></span>_LBL_TEXT_</a>';
-			$inline_txt = '(' . \Joomla\CMS\Language\Text::_('FLEXI_INLINE') . ') - ';
+			$inline_txt = '(' . JText::_('FLEXI_INLINE') . ') - ';
 
 			// PREVIEW for latest version
 			$use_versioning = $page_params->get('use_versioning', 1);
@@ -1870,7 +1870,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 				$btn_arr = array();
 				$btn_arr['fc_actions'] = '';
 
-				$lbl_txt = \Joomla\CMS\Language\Text::_($use_versioning ? 'FLEXI_PREVIEW_LATEST' :'FLEXI_PREVIEW');
+				$lbl_txt = JText::_($use_versioning ? 'FLEXI_PREVIEW_LATEST' :'FLEXI_PREVIEW');
 				$btn_arr['preview_current'] = str_replace('_PREVIEW_LINK_', $previewlink . '&amp;tmpl=component',
 					 str_replace('_LBL_TEXT_', $lbl_txt, $preview_btn_html));
 				$btn_arr['preview_current_insite'] = str_replace('_PREVIEW_LINK_', $previewlink,
@@ -1884,13 +1884,13 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 				$btn_arr['fc_actions'] = '';
 
 				$prvlink_loaded_ver = $previewlink .'&amp;version='.$item->version;
-				$lbl_txt_loaded_ver = \Joomla\CMS\Language\Text::_('FLEXI_PREVIEW_FORM_LOADED_VERSION') . ' ' . \Joomla\CMS\Language\Text::_('JVERSION') . ': ' . $item->version;
+				$lbl_txt_loaded_ver = JText::_('FLEXI_PREVIEW_FORM_LOADED_VERSION') . ' ' . JText::_('JVERSION') . ': ' . $item->version;
 
 				$prvlink_active_ver = $previewlink .'&amp;version='.$item->current_version;
-				$lbl_txt_active_ver = \Joomla\CMS\Language\Text::_('FLEXI_PREVIEW_FRONTEND_ACTIVE_VERSION'). ' ' . \Joomla\CMS\Language\Text::_('JVERSION') . ': ' . $item->current_version;
+				$lbl_txt_active_ver = JText::_('FLEXI_PREVIEW_FRONTEND_ACTIVE_VERSION'). ' ' . JText::_('JVERSION') . ': ' . $item->current_version;
 
 				$prvlink_last_ver = $previewlink; //'&amp;version='.$item->last_version;
-				$lbl_txt_last_ver = \Joomla\CMS\Language\Text::_('FLEXI_PREVIEW_LATEST_SAVED_VERSION'). ' ' . \Joomla\CMS\Language\Text::_('JVERSION') . ': ' . $item->last_version;
+				$lbl_txt_last_ver = JText::_('FLEXI_PREVIEW_LATEST_SAVED_VERSION'). ' ' . JText::_('JVERSION') . ': ' . $item->last_version;
 
 				// Add a preview button for (currently) LOADED version of the item
 				$btn_arr['preview_current'] = str_replace('_PREVIEW_LINK_', $prvlink_loaded_ver . '&amp;tmpl=component',
@@ -1919,8 +1919,8 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 			$drop_btn = '
 				<button type="button" class="' . $this->btn_sm_class . ' btn-info dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown">
-					<span title="'.\Joomla\CMS\Language\Text::_('FLEXI_ACTIONS').'" class="icon-menu"></span>
-					'.\Joomla\CMS\Language\Text::_('FLEXI_PREVIEW').'
+					<span title="'.JText::_('FLEXI_ACTIONS').'" class="icon-menu"></span>
+					'.JText::_('FLEXI_PREVIEW').'
 					<span class="caret"></span>
 				</button>';
 
@@ -1943,7 +1943,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 		if ($perms['cantemplates'] && !$isSite)
 		{
-			$edit_layout = htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS'), ENT_QUOTES, 'UTF-8');
+			$edit_layout = htmlspecialchars(JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS'), ENT_QUOTES, 'UTF-8');
 			if (!$isnew)
 			{
 				$btn_name='edit_layout';
@@ -1953,7 +1953,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 					$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
 					$btn_class='btn-fcaction ' . (FLEXI_J40GE ? ' _DDI_class_ ' . $this->btn_iv_class : '') . ' ' . $this->tooltip_class, $btn_icon="icon-pencil",
 					'data-placement="right" data-href="index.php?option=com_flexicontent&amp;view=template&amp;type=items&amp;tmpl=component&amp;ismodal=1&amp;folder=' . $item->itemparams->get('ilayout', $tparams->get('ilayout', 'default'))
-						. '&amp;' . \Joomla\CMS\Session\Session::getFormToken() . '=1' .
+						. '&amp;' . JSession::getFormToken() . '=1' .
 					'" title="Edit the display layout of this item. <br/><br/>Note: this layout maybe assigned to content types or other items, thus changing it will effect them too"',
 					$auto_add = 0,$tbname
 				);
@@ -1965,22 +1965,22 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		 * Add collaboration button
 		 */
 
-		$has_pro = \Joomla\CMS\Plugin\PluginHelper::isEnabled($extfolder = 'system', $extname = 'flexisyspro');
+		$has_pro = JPluginHelper::isEnabled($extfolder = 'system', $extname = 'flexisyspro');
 
 		if ($has_pro && $item->id)
 		{
 			$status = 'width=700,height=360,menubar=yes,resizable=yes';
-			$btn_title = \Joomla\CMS\Language\Text::_('FLEXI_COLLABORATE_EMAIL_ABOUT_THIS_ITEM');
-			$btn_info  = flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_COLLABORATE_EMAIL_ABOUT_THIS_ITEM_INFO'), 2);
+			$btn_title = JText::_('FLEXI_COLLABORATE_EMAIL_ABOUT_THIS_ITEM');
+			$btn_info  = flexicontent_html::encodeHTML(JText::_('FLEXI_COLLABORATE_EMAIL_ABOUT_THIS_ITEM_INFO'), 2);
 			$task_url = 'index.php?option=com_flexicontent&tmpl=component'
 				.'&task=call_extfunc&exttype=plugins&extfolder=system&extname=flexisyspro&extfunc=collaborate_form'
 				.'&content_id='.$item->id;
 			$full_js = $has_pro
-				? "var url = jQuery(this).attr('data-href'); fc_showDialog(url, 'fc_modal_popup_container', 0, 800, 800, 0, {title:'" . \Joomla\CMS\Language\Text::_($btn_title) . "'}); return false;"
-				: "var box = jQuery('#fc_available_in_pro'); fc_file_props_handle = fc_showAsDialog(box, 480, 320, null, {title:'" . \Joomla\CMS\Language\Text::_($btn_title) . "'}); return false;";
+				? "var url = jQuery(this).attr('data-href'); fc_showDialog(url, 'fc_modal_popup_container', 0, 800, 800, 0, {title:'" . JText::_($btn_title) . "'}); return false;"
+				: "var box = jQuery('#fc_available_in_pro'); fc_file_props_handle = fc_showAsDialog(box, 480, 320, null, {title:'" . JText::_($btn_title) . "'}); return false;";
 
 			$btn_name='collaborate';
-			$btn_arr[$btn_name] = '<div id="fc_available_in_pro" style="display: none;">' . \Joomla\CMS\Language\Text::_('FLEXI_AVAILABLE_IN_PRO_VERSION') . '</div>' . flexicontent_html::addToolBarButton(
+			$btn_arr[$btn_name] = '<div id="fc_available_in_pro" style="display: none;">' . JText::_('FLEXI_AVAILABLE_IN_PRO_VERSION') . '</div>' . flexicontent_html::addToolBarButton(
 					$btn_title, $btn_name, $full_js ,
 					$msg_alert='', $msg_confirm='',
 					$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
@@ -1997,8 +1997,8 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		}
 		$drop_btn = '
 			<button type="button" class="' . $this->btn_sm_class . ' btn-info dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown">
-				<span title="'.\Joomla\CMS\Language\Text::_('FLEXI_ACTIONS').'" class="icon-menu"></span>
-				'.\Joomla\CMS\Language\Text::_('FLEXI_MORE').'
+				<span title="'.JText::_('FLEXI_ACTIONS').'" class="icon-menu"></span>
+				'.JText::_('FLEXI_MORE').'
 				<span class="caret"></span>
 			</button>';
 		flexicontent_html::addToolBarDropMenu(
@@ -2033,18 +2033,18 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		if (!is_array($globalnoroute)) $globalnoroute = array();
 
 		// Initialize variables
-		$app    = \Joomla\CMS\Factory::getApplication();
+		$app    = JFactory::getApplication();
 		$jinput = $app->input;
 
 		$dispatcher = JEventDispatcher::getInstance();
-		$session  = \Joomla\CMS\Factory::getSession();
-		$document = \Joomla\CMS\Factory::getDocument();
+		$session  = JFactory::getSession();
+		$document = JFactory::getDocument();
 		$menus = $app->getMenu();
 		$menu  = $menus->getActive();
-		$uri   = \Joomla\CMS\Uri\Uri::getInstance();
-		$user  = \Joomla\CMS\Factory::getUser();
-		$aid   = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
-		$db    = \Joomla\CMS\Factory::getDbo();
+		$uri   = JUri::getInstance();
+		$user  = JFactory::getUser();
+		$aid   = JAccess::getAuthorisedViewLevels($user->id);
+		$db    = JFactory::getDbo();
 		$nullDate = $db->getNullDate();
 
 
@@ -2115,9 +2115,9 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		if (!$params->get('disablecss', ''))
 		{
 			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
-			!\Joomla\CMS\Factory::getLanguage()->isRtl()
-				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
-				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
+			!JFactory::getLanguage()->isRtl()
+				? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
+				: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 		}
 
 		if (FLEXI_J40GE && file_exists(JPATH_SITE.DS.'media/templates/site'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css'))
@@ -2166,11 +2166,11 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 			if ( in_array($parents[$p]->id, $globalnoroute) )  { $p++; continue; }
 
 			// Add current parent category
-			$pathway->addItem( $parents[$p]->title, \Joomla\CMS\Router\Route::_( FlexicontentHelperRoute::getCategoryRoute($parents[$p]->slug) ) );
+			$pathway->addItem( $parents[$p]->title, JRoute::_( FlexicontentHelperRoute::getCategoryRoute($parents[$p]->slug) ) );
 			$p++;
 		}
 		if ($params->get('add_item_pathway', 1)) {
-			$pathway->addItem( $item->title, \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)) );
+			$pathway->addItem( $item->title, JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)) );
 		}
 
 
@@ -2185,7 +2185,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$themes = flexicontent_tmpl::getTemplates( array($ilayout) );
 
 		// Compatibility for content plugins that use this
-		$item->readmore_link = \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item));
+		$item->readmore_link = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item));
 
 
 		/**
@@ -2300,7 +2300,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 		// Maybe here not to import all plugins but just those for description field ???
 		// Anyway these events are usually not very time consuming, so lets trigger all of them ???
-		\Joomla\CMS\Plugin\PluginHelper::importPlugin('content');
+		JPluginHelper::importPlugin('content');
 
 		// Suppress some plugins from triggering for compatibility reasons, e.g.
 		// (a) jcomments, jom_comment_bot plugins, because we will get comments HTML manually inside the template files
@@ -2378,7 +2378,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		if ($params->get('add_canonical'))
 		{
 			// Create desired REL canonical URL
-			$ucanonical = \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getItemRoute($item->slug, $globalcats[$item->maincatid]->slug, 0, $item));  // $item->categoryslug
+			$ucanonical = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $globalcats[$item->maincatid]->slug, 0, $item));  // $item->categoryslug
 			flexicontent_html::setRelCanonical($ucanonical);
 		}
 
@@ -2406,7 +2406,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		// It will consider things like: template exists, is allowed, client is mobile, current frontend user override, etc
 
 		// !!! The following method of loading layouts, is Joomla legacy view loading of layouts
-		// TODO: EXAMINE IF NEEDED to re-use these layouts, and use \Joomla\CMS\Layout\LayoutInterface ??
+		// TODO: EXAMINE IF NEEDED to re-use these layouts, and use JLayout ??
 
 		// Despite layout variable not being empty, there may be missing some sub-layout files,
 		// e.g. item_somefilename.php for this reason we will use a fallback layout that surely has these files
@@ -2570,7 +2570,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		);
 		$submit_conf_hash = md5(serialize($submit_conf));
 
-		$session = \Joomla\CMS\Factory::getSession();
+		$session = JFactory::getSession();
 		$item_submit_conf = $session->get('item_submit_conf', array(),'flexicontent');
 		$item_submit_conf[$submit_conf_hash] = $submit_conf;
 		$session->set('item_submit_conf', $item_submit_conf, 'flexicontent');
@@ -2588,7 +2588,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 	 */
 	private function _createPlacementConf( $item, & $fields, $page_params, $typeselected )
 	{
-		$app    = \Joomla\CMS\Factory::getApplication();
+		$app    = JFactory::getApplication();
 		$CFGsfx = $app->isClient('site') ? '' : '_be';
 
 
@@ -2647,7 +2647,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		}
 		else
 		{
-			\Joomla\CMS\Factory::getApplication()->enqueueMessage('A layout file is missing : ' . $params_file, 'warning');
+			JFactory::getApplication()->enqueueMessage('A layout file is missing : ' . $params_file, 'warning');
 			$placementConf = array('placeViaLayout' => array(), 'coreprop_missing' => array() );
 		}
 
@@ -2659,8 +2659,8 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		if ( count($placementConf ['coreprop_missing']) && $typeselected->id )
 		{
 			$placementConf['placementMsgs']['warning'] = array();
-			$placementConf['placementMsgs']['warning'][] = \Joomla\CMS\Language\Text::sprintf( 'FLEXI_FORM_FIELDSMAN_PLACING_FIELDS_MISSING',
-				'<span class="badge">'. \Joomla\CMS\Language\Text::_($typeselected->name) . '</span>',
+			$placementConf['placementMsgs']['warning'][] = JText::sprintf( 'FLEXI_FORM_FIELDSMAN_PLACING_FIELDS_MISSING',
+				'<span class="badge">'. JText::_($typeselected->name) . '</span>',
 				'<br><span class="fc_elements_listed_small">' . implode(', ', array_keys($placementConf ['coreprop_missing'])) . '</span><br>',
 				'<a href="javascript:;" class="btn btn-primary"
 					onclick="alert(\'Not implemented yet, please create manually\'); return false;"
@@ -2682,7 +2682,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 	 */
 	protected function _getReturnUrl()
 	{
-		$app         = \Joomla\CMS\Factory::getApplication();
+		$app         = JFactory::getApplication();
 		$this->input = $app->input;
 
 		// Try 'return' from the GET / POST data (base64 encoded)
@@ -2708,7 +2708,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 			{
 				$referer = !empty($_SERVER['HTTP_REFERER']) && flexicontent_html::is_safe_url($_SERVER['HTTP_REFERER'])
 					? $_SERVER['HTTP_REFERER']
-					: \Joomla\CMS\Uri\Uri::base();
+					: JUri::base();
 			}
 
 			$return = $referer;
@@ -2723,7 +2723,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 			}
 			else
 			{
-				$return = $app->isClient('administrator') ? null : \Joomla\CMS\Uri\Uri::base();
+				$return = $app->isClient('administrator') ? null : JUri::base();
 			}
 		}
 

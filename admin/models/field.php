@@ -115,8 +115,8 @@ class FlexicontentModelField extends FCModelAdmin
 	{
 		parent::__construct($config);
 
-		$jinput = \Joomla\CMS\Factory::getApplication()->input;
-		$filter = \Joomla\CMS\Filter\InputFilter::getInstance();
+		$jinput = JFactory::getApplication()->input;
+		$filter = JFilterInput::getInstance();
 
 		$data = $jinput->post->get('jform', array(), 'array');
 
@@ -188,7 +188,7 @@ class FlexicontentModelField extends FCModelAdmin
 
 
 	/**
-	 * Method to set a new field type. The type will be validated if it exists during \Joomla\CMS\Form\Form preprocessing
+	 * Method to set a new field type. The type will be validated if it exists during JForm preprocessing
 	 *
 	 * @param   string  $field_type  The forced field type
 	 *
@@ -196,24 +196,24 @@ class FlexicontentModelField extends FCModelAdmin
 	 */
 	public function setFieldType($field_type)
 	{
-		$this->forced_field_type = \Joomla\CMS\Filter\InputFilter::getInstance()->clean($field_type, 'CMD');
+		$this->forced_field_type = JFilterInput::getInstance()->clean($field_type, 'CMD');
 	}
 
 
 	/**
 	 * Method to preprocess the form.
 	 *
-	 * @param   \Joomla\CMS\Form\Form   $form   A \Joomla\CMS\Form\Form object.
+	 * @param   JForm   $form   A JForm object.
 	 * @param   mixed   $data   The data expected for the form.
 	 * @param   string  $plugins_group  The name of the plugin group to import and trigger
 	 *
 	 * @return  void
 	 *
-	 * @see     \Joomla\CMS\Form\FormField
+	 * @see     JFormField
 	 * @since   1.6
 	 * @throws  Exception if there is an error in the form event.
 	 */
-	protected function preprocessForm(\Joomla\CMS\Form\Form $form, $data, $plugins_group = null)
+	protected function preprocessForm(JForm $form, $data, $plugins_group = null)
 	{
 		$data_obj = $data && is_array($data) ? (object) $data : $data;
 
@@ -221,7 +221,7 @@ class FlexicontentModelField extends FCModelAdmin
 		jimport('joomla.filesystem.folder');
 
 		// Initialise variables.
-		$client = \Joomla\CMS\Application\ApplicationHelper::getClientInfo(0);
+		$client = JApplicationHelper::getClientInfo(0);
 
 
 		/**
@@ -237,9 +237,9 @@ class FlexicontentModelField extends FCModelAdmin
 		/**
 		 * Try to load plugin file: /plugins/folder/element/element.xml
 		 */
-		$plugin_path = \Joomla\CMS\Filesystem\Path::clean(JPATH_PLUGINS . DS . 'flexicontent_fields' . DS . $plugin_name . DS . $plugin_name . '.xml');
+		$plugin_path = JPath::clean(JPATH_PLUGINS . DS . 'flexicontent_fields' . DS . $plugin_name . DS . $plugin_name . '.xml');
 
-		if (!\Joomla\CMS\Filesystem\File::exists($plugin_path))
+		if (!JFile::exists($plugin_path))
 		{
 			throw new Exception('Error field XML file for field type: - ' . $plugin_name . '- was not found');
 		}
@@ -289,7 +289,7 @@ class FlexicontentModelField extends FCModelAdmin
 		$xml = simplexml_load_string($xml_string);  //simplexml_load_file($plugin_path);
 		if (!$xml)
 		{
-			throw new Exception(\Joomla\CMS\Language\Text::_('JERROR_LOADFILE_FAILED'));
+			throw new Exception(JText::_('JERROR_LOADFILE_FAILED'));
 		}
 
 		// Load XML file into the form
@@ -355,7 +355,7 @@ class FlexicontentModelField extends FCModelAdmin
 		}
 
 		$record  = $record ?: $this->_record;
-		$user    = $user ?: \Joomla\CMS\Factory::getUser();
+		$user    = $user ?: JFactory::getUser();
 
 		return !$record || !$record->id
 			? $this->canCreate
@@ -378,7 +378,7 @@ class FlexicontentModelField extends FCModelAdmin
 		}
 
 		$record  = $record ?: $this->_record;
-		$user    = $user ?: \Joomla\CMS\Factory::getUser();
+		$user    = $user ?: JFactory::getUser();
 
 		return $record->id < 7
 			?	false
@@ -396,7 +396,7 @@ class FlexicontentModelField extends FCModelAdmin
 	public function canDelete($record = null)
 	{
 		$record  = $record ?: $this->_record;
-		$user    = \Joomla\CMS\Factory::getUser();
+		$user    = JFactory::getUser();
 
 		return $record->id < 7
 			?	false
@@ -405,7 +405,7 @@ class FlexicontentModelField extends FCModelAdmin
 
 
 	/**
-	 * Method to do some record / data preprocessing before call \Joomla\CMS\Table\Table::bind()
+	 * Method to do some record / data preprocessing before call JTable::bind()
 	 *
 	 * Note. Typically called inside this MODEL 's store()
 	 *
@@ -479,7 +479,7 @@ class FlexicontentModelField extends FCModelAdmin
 
 
 	/**
-	 * Method to do some work after record has been loaded via \Joomla\CMS\Table\Table::load()
+	 * Method to do some work after record has been loaded via JTable::load()
 	 *
 	 * Note. Typically called inside this MODEL 's store()
 	 *

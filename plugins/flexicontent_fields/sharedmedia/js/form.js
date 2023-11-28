@@ -295,7 +295,7 @@
 			}
 			else
 			{
-				jQuery("#fcfield_message_box_" + element_id_n).html("<div class=\"alert alert-warning\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\">?</button>'. \Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_URL_NOT_MEDIA').'</div>");
+				jQuery("#fcfield_message_box_" + element_id_n).html("<div class=\"alert alert-warning\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\">?</button>'. JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_URL_NOT_MEDIA').'</div>");
 			}
 		}
 		else

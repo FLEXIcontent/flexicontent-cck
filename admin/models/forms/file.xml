@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <form>
 	<field name="id" type="hidden" default="0" label="JGLOBAL_FIELD_ID_LABEL" description="JGLOBAL_FIELD_ID_DESC" class="readonly" readonly="true" />
-	<field name="description" type="textarea" filter="\Joomla\CMS\Component\ComponentHelper::filterText" cols="30" rows="5" default="" label="FLEXI_FIELD_DESCRIPTION" description="FLEXI_FIELD_DESCRIPTION_DESC" class="inputbox" labelclass="fc-prop-lbl" />
+	<field name="description" type="textarea" filter="JComponentHelper::filterText" cols="30" rows="5" default="" label="FLEXI_FIELD_DESCRIPTION" description="FLEXI_FIELD_DESCRIPTION_DESC" class="inputbox" labelclass="fc-prop-lbl" />
 	<field name="published" type="fcradio" default="1" label="FLEXI_PUBLISHED" description="FLEXI_FIELD_PUBLISHED_DESC" class="btn-group btn-group-yesno" labelclass="fc-prop-lbl">
 		<option value="0">FLEXI_NO</option>
 		<option value="1">FLEXI_YES</option>

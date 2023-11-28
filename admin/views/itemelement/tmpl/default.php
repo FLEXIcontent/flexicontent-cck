@@ -52,11 +52,11 @@ $btn_class = 'btn';
 $ico_class = 'fc-man-icon-s';
 $out_class = FLEXI_J40GE ? 'btn btn-outline-dark' : 'btn';
 
-$edit_cat_title  = \Joomla\CMS\Language\Text::_('FLEXI_EDIT_CATEGORY', true);
-$rem_filt_txt    = \Joomla\CMS\Language\Text::_('FLEXI_REMOVE_FILTER', true);
+$edit_cat_title  = JText::_('FLEXI_EDIT_CATEGORY', true);
+$rem_filt_txt    = JText::_('FLEXI_REMOVE_FILTER', true);
 $rem_filt_tip    = ' class="' . $this->tooltip_class . ' filterdel" title="'.flexicontent_html::getToolTip('FLEXI_ACTIVE_FILTER', 'FLEXI_CLICK_TO_REMOVE_THIS_FILTER', 1, 1).'" ';
-$_NEVER_         = \Joomla\CMS\Language\Text::_('FLEXI_NEVER');
-$_NULL_DATE_     = \Joomla\CMS\Factory::getDbo()->getNullDate();
+$_NEVER_         = JText::_('FLEXI_NEVER');
+$_NULL_DATE_     = JFactory::getDbo()->getNullDate();
 
 
 /**

@@ -137,12 +137,12 @@
 	}
 
 
-	$abs_srcb = $isURL ? $srcb : \Joomla\CMS\Uri\Uri::root(true).'/'.$srcb;
-	$abs_srcs = $isURL ? $srcs : \Joomla\CMS\Uri\Uri::root(true).'/'.$srcs;
-	$abs_srcm = $isURL ? $srcm : \Joomla\CMS\Uri\Uri::root(true).'/'.$srcm;
-	$abs_srcl = $isURL ? $srcl : \Joomla\CMS\Uri\Uri::root(true).'/'.$srcl;
-	$abs_srco = $isURL ? $srco : \Joomla\CMS\Uri\Uri::root(true).'/'.$srco;
-	$abs_src  = $isURL ? $src  : \Joomla\CMS\Uri\Uri::root(true).'/'.$src;
+	$abs_srcb = $isURL ? $srcb : JUri::root(true).'/'.$srcb;
+	$abs_srcs = $isURL ? $srcs : JUri::root(true).'/'.$srcs;
+	$abs_srcm = $isURL ? $srcm : JUri::root(true).'/'.$srcm;
+	$abs_srcl = $isURL ? $srcl : JUri::root(true).'/'.$srcl;
+	$abs_srco = $isURL ? $srco : JUri::root(true).'/'.$srco;
+	$abs_src  = $isURL ? $src  : JUri::root(true).'/'.$src;
 
 
 	// ADD some extra (display) properties that point to all sizes, currently SINGLE IMAGE only (for consistency use 'use_ingroup' of 'ingroup')
@@ -190,11 +190,11 @@
 		{
 			switch ($ogpthumbsize)
 			{
-				case 1: $ogp_src = $isURL ? $srcs : \Joomla\CMS\Uri\Uri::root().$srcs; break;   // this maybe problematic, since it maybe too small or not accepted by social website
-				case 2: $ogp_src = $isURL ? $srcm : \Joomla\CMS\Uri\Uri::root().$srcm; break;
-				case 3: $ogp_src = $isURL ? $srcl : \Joomla\CMS\Uri\Uri::root().$srcl; break;
-				case 4: $ogp_src =  $isURL ? $srco : \Joomla\CMS\Uri\Uri::root().$srco; break;
-				default: $ogp_src = $isURL ? $srcm : \Joomla\CMS\Uri\Uri::root().$srcm; break;
+				case 1: $ogp_src = $isURL ? $srcs : JUri::root().$srcs; break;   // this maybe problematic, since it maybe too small or not accepted by social website
+				case 2: $ogp_src = $isURL ? $srcm : JUri::root().$srcm; break;
+				case 3: $ogp_src = $isURL ? $srcl : JUri::root().$srcl; break;
+				case 4: $ogp_src =  $isURL ? $srco : JUri::root().$srco; break;
+				default: $ogp_src = $isURL ? $srcm : JUri::root().$srcm; break;
 			}
 			$document->addCustomTag('<link rel="image_src" href="'.$ogp_src.'" />');
 			$document->addCustomTag('<meta property="og:image" content="'.$ogp_src.'" />');
@@ -247,7 +247,7 @@
 			{
 				$minmax_prefix  = ! (int) $field->parameters->get( 'l_thumb_width_as_min_or_max', 0) ? 'min' : 'max';
 				$w_l = $size_w_l ?: $field->parameters->get('w_l', self::$default_widths['l']);
-				$srcset[] = (!$isURL ? \Joomla\CMS\Uri\Uri::root() : '') . $srcl . ' ' . $w_l . 'w';
+				$srcset[] = (!$isURL ? JUri::root() : '') . $srcl . ' ' . $w_l . 'w';
 				$_sizes[] = '(' . $minmax_prefix . '-width: ' . $w_l . 'px) ' . $w_l . 'px';
 			}
 		}
@@ -258,14 +258,14 @@
 			{
 				$minmax_prefix  = ! (int) $field->parameters->get( 'm_thumb_width_as_min_or_max', 0) ? 'min' : 'max';
 				$w_m = $size_w_m ?: $field->parameters->get('w_m', self::$default_widths['m']);
-				$srcset[] = (!$isURL ? \Joomla\CMS\Uri\Uri::root() : '') . $srcm . ' ' . $w_m . 'w';
+				$srcset[] = (!$isURL ? JUri::root() : '') . $srcm . ' ' . $w_m . 'w';
 				$_sizes[] = '(' . $minmax_prefix . '-width: ' . $w_m . 'px) ' . $w_m . 'px';
 			}
 			if ($srcs)
 			{
 				$minmax_prefix  = ! (int) $field->parameters->get( 's_thumb_width_as_min_or_max', 0) ? 'min' : 'max';
 				$w_s = $size_w_s ?: $field->parameters->get('w_s', self::$default_widths['s']);
-				$srcset[] = (!$isURL ? \Joomla\CMS\Uri\Uri::root() : '') . $srcs . ' ' . $w_s . 'w';
+				$srcset[] = (!$isURL ? JUri::root() : '') . $srcs . ' ' . $w_s . 'w';
 				$_sizes[] = '(' . $minmax_prefix . '-width: ' . $w_s . 'px) ' . $w_s . 'px';
 			}
 		}

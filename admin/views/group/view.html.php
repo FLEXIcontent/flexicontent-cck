@@ -34,12 +34,12 @@ class FlexicontentViewGroup extends FlexicontentViewBaseRecord
 		 * Initialize variables, flags, etc
 		 */
 
-		$app        = \Joomla\CMS\Factory::getApplication();
+		$app        = JFactory::getApplication();
 		$jinput     = $app->input;
-		$document   = \Joomla\CMS\Factory::getDocument();
-		$user       = \Joomla\CMS\Factory::getUser();
-		$db         = \Joomla\CMS\Factory::getDbo();
-		$cparams    = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+		$document   = JFactory::getDocument();
+		$user       = JFactory::getUser();
+		$db         = JFactory::getDbo();
+		$cparams    = JComponentHelper::getParams('com_flexicontent');
 		$perms      = FlexicontentHelperPerm::getPerm();
 
 		// Get url vars and some constants
@@ -83,18 +83,18 @@ class FlexicontentViewGroup extends FlexicontentViewBaseRecord
 		// Add css to document
 		if ($isAdmin)
 		{
-			!\Joomla\CMS\Factory::getLanguage()->isRtl()
-				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
-				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
-			!\Joomla\CMS\Factory::getLanguage()->isRtl()
-				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
-				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
+			!JFactory::getLanguage()->isRtl()
+				? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
+				: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
+			!JFactory::getLanguage()->isRtl()
+				? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
+				: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 		}
 		else
 		{
-			!\Joomla\CMS\Factory::getLanguage()->isRtl()
-				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
-				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
+			!JFactory::getLanguage()->isRtl()
+				? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
+				: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
 		}
 		
 		$this->addToolbar();
@@ -108,36 +108,36 @@ class FlexicontentViewGroup extends FlexicontentViewBaseRecord
 	 */
 	protected function addToolbar()
 	{
-		\Joomla\CMS\Factory::getApplication()->input->set('hidemainmenu', 1);
+		JFactory::getApplication()->input->set('hidemainmenu', 1);
 
-		$user		= \Joomla\CMS\Factory::getUser();
+		$user		= JFactory::getUser();
 		$isNew		= ($this->item->id == 0);
 		$canDo		= UsersHelper::getActions();
 
-		\Joomla\CMS\Toolbar\ToolbarHelper::title(\Joomla\CMS\Language\Text::_($isNew ? 'COM_USERS_VIEW_NEW_GROUP_TITLE' : 'COM_USERS_VIEW_EDIT_GROUP_TITLE'), 'users-cog');
+		JToolbarHelper::title(JText::_($isNew ? 'COM_USERS_VIEW_NEW_GROUP_TITLE' : 'COM_USERS_VIEW_EDIT_GROUP_TITLE'), 'users-cog');
 
 		if ($canDo->get('core.edit') || $canDo->get('core.create'))
 		{
-			\Joomla\CMS\Toolbar\ToolbarHelper::apply('group.apply');
-			\Joomla\CMS\Toolbar\ToolbarHelper::save('group.save');
+			JToolbarHelper::apply('group.apply');
+			JToolbarHelper::save('group.save');
 		}
 
 		if ($canDo->get('core.create'))
 		{
-			\Joomla\CMS\Toolbar\ToolbarHelper::save2new('group.save2new');
+			JToolbarHelper::save2new('group.save2new');
 		}
 
 		// If an existing item, can save to a copy.
 		if (!$isNew && $canDo->get('core.create'))
 		{
-			\Joomla\CMS\Toolbar\ToolbarHelper::save2copy('group.save2copy');
+			JToolbarHelper::save2copy('group.save2copy');
 		}
 
 		empty($this->item->id)
-			? \Joomla\CMS\Toolbar\ToolbarHelper::cancel('group.cancel')
-			: \Joomla\CMS\Toolbar\ToolbarHelper::cancel('group.cancel', 'JTOOLBAR_CLOSE');
+			? JToolbarHelper::cancel('group.cancel')
+			: JToolbarHelper::cancel('group.cancel', 'JTOOLBAR_CLOSE');
 
-		\Joomla\CMS\Toolbar\ToolbarHelper::divider();
-		\Joomla\CMS\Toolbar\ToolbarHelper::help('JHELP_USERS_GROUPS_EDIT');
+		JToolbarHelper::divider();
+		JToolbarHelper::help('JHELP_USERS_GROUPS_EDIT');
 	}
 }

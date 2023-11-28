@@ -15,11 +15,11 @@ use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
 jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
-jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
+jimport('cms.html.select');    // JHtmlSelect
+jimport('joomla.form.field');  // JFormField
 
-//jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
-//\Joomla\CMS\Form\FormHelper::loadFieldClass('...');   // \Joomla\CMS\Form\FormField...
+//jimport('joomla.form.helper'); // JFormHelper
+//JFormHelper::loadFieldClass('...');   // JFormField...
 
 /**
  * Form Field class for the Joomla Framework.
@@ -28,7 +28,7 @@ jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
  * @subpackage	Form
  * @since		1.6
  */
-class \Joomla\CMS\Form\FormFieldBooleanlist extends \Joomla\CMS\Form\FormField
+class JFormFieldBooleanlist extends JFormField
 {
 	/**
 	 * The form field type.
@@ -52,6 +52,6 @@ class \Joomla\CMS\Form\FormFieldBooleanlist extends \Joomla\CMS\Form\FormField
 		// Initialize some field attributes.
 		$attr .= $this->element['class'] ? ' class="'.(string) $this->element['class'].'"' : '';
 
-		return \Joomla\CMS\HTML\HTMLHelper::_('select.booleanlist', $this->name, $attr, $this->value );
+		return JHtml::_('select.booleanlist', $this->name, $attr, $this->value );
 	}
 }
