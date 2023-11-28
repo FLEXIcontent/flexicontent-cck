@@ -712,7 +712,7 @@ class flexicontent_items extends _flexicontent_items
 		$tk_tmp = $this->_tbl_key_tmp;
 
 		// Split the data to their actual DB table, (#__flexicontent_items_tmp duplicates non-TEXT data of #__content)
-		$record = Table::getInstance($this->_jtbls[$this->_tbl][0], $this->_jtbls[$this->_tbl][1]);
+		$record = Table::getInstance($this->_jtbls[$this->_tbl][0]);
 		$record->_tbl = $this->_tbl;
 		$record->_tbl_key = $k;
 
