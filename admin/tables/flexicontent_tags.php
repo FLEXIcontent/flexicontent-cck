@@ -340,6 +340,15 @@ class flexicontent_tags extends flexicontent_basetable
 		$record->_tbl_key = $k;
 
 		$record_ext = \Joomla\CMS\Table\Table::getInstance($this->_jtbls[$this->_tbl_ext][0], $this->_jtbls[$this->_tbl_ext][1]);
+
+		if(FLEXI_J40GE && !$record_ext)
+		{
+			$record_ext = \Joomla\CMS\Factory::getApplication()
+				->bootComponent('com_tags')
+				->getMVCFactory()
+				->createTable($this->_jtbls[$this->_tbl_ext][0], 'Administrator');
+		}
+
 		$record_ext->_tbl = $this->_tbl_ext;
 		$record_ext->_tbl_key = $fk_ext;
 

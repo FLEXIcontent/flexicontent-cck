@@ -47,7 +47,7 @@ class FlexicontentModelGroups extends FCModelAdminList
 	use FCModelTraitNestableRecord;
 
 	var $records_dbtbl  = 'usergroups';
-	var $records_jtable = 'JTableUserGroup';
+	var $records_jtable = 'JTableUsergroup';
 
 	/**
 	 * Column names

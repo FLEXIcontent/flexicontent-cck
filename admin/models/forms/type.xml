@@ -377,7 +377,7 @@
 			<field name="allowed_ilayouts" type="ilayoutlist" default="" multiple="true" size="12" label="FLEXI_CHOOSE_ALLOWED_TYPEITEMS_LAYOUT" description="FLEXI_CHOOSE_ALLOWED_TYPEITEMS_LAYOUT_DESC" labelclass="label text-white bg-info label-info"/>
 
 			<field name="" type="separator" default="Common tags (seleactable via checkboxes)" level="level1" />
-			<field name="quick_tags" type="tags" default="" multiple="true" label="FLEXI_TAGS" description="Tags selectable as checkboxes in item form (for quicker / easier selection)"/>
+			<field name="quick_tags" type="tag" default="" multiple="true" label="FLEXI_TAGS" description="Tags selectable as checkboxes in item form (for quicker / easier selection)"/>
 
 		</fieldset>
 
