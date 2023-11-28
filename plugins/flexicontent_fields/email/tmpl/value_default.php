@@ -26,7 +26,7 @@ foreach ($values as $value)
 
 	if ( !strlen($text) || !$usetitle )
 	{
-		$text = \Joomla\CMS\String\PunycodeHelper::emailToUTF8($addr);  // email in Punycode to UTF8, for the purpose of displaying it
+		$text = JStringPunycode::emailToUTF8($addr);  // email in Punycode to UTF8, for the purpose of displaying it
 		$text_is_email = 1;
 	}
 	else
@@ -38,7 +38,7 @@ foreach ($values as $value)
 	// Use paremeters to decide if email should be cloaked and if we need a mailto: link
 	if ($format != 'feed' && $email_cloaking)
 	{
-		$html = \Joomla\CMS\HTML\HTMLHelper::_('email.cloak', $addr, $mailto_link, $text, $text_is_email);
+		$html = JHtml::_('email.cloak', $addr, $mailto_link, $text, $text_is_email);
 	}
 	else
 	{

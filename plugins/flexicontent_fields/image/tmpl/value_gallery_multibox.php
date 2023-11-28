@@ -21,7 +21,7 @@ foreach ($values as $n => $value)
 
 	$group_str = $group_name ? 'data-rel="['.$group_name.']"' : '';
 	$field->{$prop}[] = $pretext.
-		'<a style="'.$style.'" href="'.\Joomla\CMS\Uri\Uri::root(true).'/'.$srcl.'" id="mb'.$uniqueid.'" class="fc_image_thumb mb field_' . $field->id . '" '.$group_str.' >
+		'<a style="'.$style.'" href="'.JUri::root(true).'/'.$srcl.'" id="mb'.$uniqueid.'" class="fc_image_thumb mb field_' . $field->id . '" '.$group_str.' >
 			'.$img_legend.'
 		</a>
 		<div class="multiBoxDesc mb'.$uniqueid.'">
@@ -70,7 +70,7 @@ if ( !isset(static::$js_added[$field->id][__FILE__]) )
 		});
 	});";
 
-	if ($js) \Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+	if ($js) JFactory::getDocument()->addScriptDeclaration($js);
 
 	static::$js_added[$field->id][__FILE__] = true;
 }

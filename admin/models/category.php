@@ -14,7 +14,6 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\Component\Categories\Administrator\Helper\CategoriesHelper;
-use \Joomla\CMS\Table\Table;
 
 require_once('base/base.php');
 require_once('base/traitnestable.php');
@@ -202,7 +201,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 	 * @param   string  $prefix  The class prefix. Optional.
 	 * @param   array   $config  Configuration array for model. Optional.
 	 *
-	 * @return  \Joomla\CMS\Table\Table  A \Joomla\CMS\Table\Table object
+	 * @return  JTable  A JTable object
 	 *
 	 * @since   3.2.0
 	 */
@@ -264,10 +263,10 @@ class FlexicontentModelCategory extends FCModelAdmin
 
 		$id = (int) $this->_id;
 
-		$app = \Joomla\CMS\Factory::getApplication();
+		$app = JFactory::getApplication();
 
 		// a. Clone component parameters ... we will use these as parameters base for merging
-		$compParams = clone(\Joomla\CMS\Component\ComponentHelper::getComponent('com_flexicontent')->params);
+		$compParams = clone(JComponentHelper::getComponent('com_flexicontent')->params);
 
 		// b. Retrieve category parameters and create parameter object
 		if ($id)
@@ -277,11 +276,11 @@ class FlexicontentModelCategory extends FCModelAdmin
 				->from('#__categories')
 				->where('id = ' . (int) $id);
 			$catParams = $this->_db->setQuery($query)->loadResult();
-			$catParams = new \Joomla\Registry\Registry($catParams);
+			$catParams = new JRegistry($catParams);
 		}
 		else
 		{
-			$catParams = new \Joomla\Registry\Registry();
+			$catParams = new JRegistry();
 		}
 
 
@@ -307,7 +306,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 			{
 				foreach ($catdata as $parentcat)
 				{
-					$parentcat->params = new \Joomla\Registry\Registry($parentcat->params);
+					$parentcat->params = new JRegistry($parentcat->params);
 					array_push($heritage_stack, $parentcat);
 					$inheritcid = $parentcat->params->get('inheritcid', '');
 					$inherit_parent = $inheritcid==='-1' || ($inheritcid==='' && $inheritcid_comp);
@@ -332,7 +331,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 
 			if ($catdata)
 			{
-				$catdata->params = new \Joomla\Registry\Registry($catdata->params);
+				$catdata->params = new JRegistry($catdata->params);
 				array_push($heritage_stack, $catdata);
 			}
 		}
@@ -345,7 +344,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 		// -1. layout parameters will be placed on top at end of this code ...
 
 		// 0. Start from component parameters
-		$params = new \Joomla\Registry\Registry();
+		$params = new JRegistry();
 		$params->merge($compParams);
 
 		// 1. Merge category's inherited parameters (e.g. ancestor categories or specific category)
@@ -373,7 +372,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 
 		// 3. Retrieve and merge Global Layout's parameters (placing these at TOP allows proper heritage)
 		$layoutParams = flexicontent_tmpl::getLayoutparams('category', $params->get('clayout'), '', $force);
-		$layoutParams = new \Joomla\Registry\Registry($layoutParams);
+		$layoutParams = new JRegistry($layoutParams);
 
 		$this->_inherited_params = clone($layoutParams);
 		$this->_inherited_params->merge($params);
@@ -429,7 +428,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 	 * @param   array    $data      An optional array of data for the form to interogate.
 	 * @param   boolean  $loadData  True if the form is to load its own data (default case), false if not.
 	 *
-	 * @return  mixed  A \Joomla\CMS\Form\Form object on success, false on failure
+	 * @return  mixed  A JForm object on success, false on failure
 	 *
 	 * @since   1.6
 	 */
@@ -438,7 +437,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 		$this->setState($this->getName().'.extension', 'com_content');
 		$extension = $this->getState($this->getName().'.extension');
 
-		$jinput = \Joomla\CMS\Factory::getApplication()->input;
+		$jinput = JFactory::getApplication()->input;
 
 		// A workaround to get the extension and other data into the model for save requests.
 		if (empty($extension) && isset($data['extension']))
@@ -470,7 +469,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 		$categoryId = $jinput->get('id');
 		$assetKey   = $categoryId ? $this->extension_proxy . '.category.' . $categoryId : $this->extension_proxy;
 
-		if (!\Joomla\CMS\Factory::getUser()->authorise('core.edit.state', $assetKey))
+		if (!JFactory::getUser()->authorise('core.edit.state', $assetKey))
 		{
 			// Disable fields for display.
 			$form->setFieldAttribute('ordering', 'disabled', 'true');
@@ -503,7 +502,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 		static $items = array();
 		if ( $pk && isset($items[$pk]) ) return $items[$pk];
 
-		// Instatiate the \Joomla\CMS\Table\Table
+		// Instatiate the JTable
 		$item = parent::getItem($pk);
 
 		if ( $item )
@@ -516,20 +515,20 @@ class FlexicontentModelCategory extends FCModelAdmin
 			}
 
 			// Convert the metadata field to an array.
-			$registry = new \Joomla\Registry\Registry($item->metadata);
+			$registry = new JRegistry($item->metadata);
 			$item->metadata = $registry->toArray();
 
 			// Convert the created and modified dates to local user time for display in the form.
 			jimport('joomla.utilities.date');
 
-			$site_zone = \Joomla\CMS\Factory::getApplication()->getCfg('offset');
-			$user_zone = \Joomla\CMS\Factory::getUser()->getParam('timezone', $site_zone);
+			$site_zone = JFactory::getApplication()->getCfg('offset');
+			$user_zone = JFactory::getUser()->getParam('timezone', $site_zone);
 			$tz_string = $user_zone;
 			$tz = new DateTimeZone( $tz_string );
 
 			if (intval($item->created_time))
 			{
-				$date = new \Joomla\CMS\Date\Date($item->created_time);
+				$date = new JDate($item->created_time);
 				$date->setTimezone($tz);
 				$item->created_time = $date->toSql(true);
 			}
@@ -540,7 +539,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 
 			if (intval($item->modified_time))
 			{
-				$date = new \Joomla\CMS\Date\Date($item->modified_time);
+				$date = new JDate($item->modified_time);
 				$date->setTimezone($tz);
 				$item->modified_time = $date->toSql(true);
 			}
@@ -576,31 +575,31 @@ class FlexicontentModelCategory extends FCModelAdmin
 	/**
 	 * Method to preprocess the form.
 	 *
-	 * @param   \Joomla\CMS\Form\Form   $form   A \Joomla\CMS\Form\Form object.
+	 * @param   JForm   $form   A JForm object.
 	 * @param   mixed   $data   The data expected for the form.
 	 * @param   string  $plugins_group  The name of the plugin group to import and trigger
 	 *
 	 * @return  void
 	 *
-	 * @see     \Joomla\CMS\Form\FormField
+	 * @see     JFormField
 	 * @since   1.6
 	 * @throws  Exception if there is an error in the form event.
 	 */
-	protected function preprocessForm(\Joomla\CMS\Form\Form $form, $data, $plugins_group = null)
+	protected function preprocessForm(JForm $form, $data, $plugins_group = null)
 	{
 		jimport('joomla.filesystem.path');
 
-		$lang = \Joomla\CMS\Factory::getLanguage();
+		$lang = JFactory::getLanguage();
 		$component = $this->getState($this->getName().'.component', '');
 		$section   = $this->getState($this->getName().'.section', '');
-		$extension = \Joomla\CMS\Factory::getApplication()->input->get('extension', null);
+		$extension = JFactory::getApplication()->input->get('extension', null);
 
 		// Get the component form if it exists
 		$name = 'category' . ($section ? ('.' . $section) : '');
 
 		// Try to find the component helper.
 		$eName = str_replace('com_', '', $component);
-		$path = \Joomla\CMS\Filesystem\Path::clean(JPATH_ADMINISTRATOR . "/components/$component/helpers/category.php");
+		$path = JPath::clean(JPATH_ADMINISTRATOR . "/components/$component/helpers/category.php");
 
 		if (file_exists($path))
 		{
@@ -633,7 +632,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 		// Association category items
 		if ($this->useAssociations())
 		{
-			$languages = \Joomla\CMS\Language\LanguageHelper::getContentLanguages(false, true, null, 'ordering', 'asc');
+			$languages = JLanguageHelper::getContentLanguages(false, true, null, 'ordering', 'asc');
 			$data_language = !empty($data->language) ? $data->language : $this->getState($this->getName().'.language');
 
 			if (count($languages) > 1)
@@ -698,7 +697,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 	public function canEdit($record = null, $user = null)
 	{
 		$record  = $record ?: $this->_record;
-		$user    = $user ?: \Joomla\CMS\Factory::getUser();
+		$user    = $user ?: JFactory::getUser();
 		$asset   = $record && !$record->id ? $this->type_alias . '.' . $record->id : $this->option;
 		$isOwner = $record && $user->id && $record->created_user_id == $user->id;
 
@@ -719,7 +718,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 	public function canEditState($record = null, $user = null)
 	{
 		$record  = $record ?: $this->_record;
-		$user    = $user ?: \Joomla\CMS\Factory::getUser();
+		$user    = $user ?: JFactory::getUser();
 		$asset   = $record && !$record->id ? $this->type_alias . '.' . $record->id : $this->option;
 		$isOwner = $record && $user->id && $record->created_user_id == $user->id;
 
@@ -740,7 +739,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 	public function canDelete($record = null)
 	{
 		$record  = $record ?: $this->_record;
-		$user    = \Joomla\CMS\Factory::getUser();
+		$user    = JFactory::getUser();
 		$asset   = $record && !$record->id ? $this->type_alias . '.' . $record->id : $this->option;
 		$isOwner = $record && $user->id && $record->created_user_id == $user->id;
 
@@ -752,7 +751,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 
 
 	/**
-	 * Method to do some record / data preprocessing before call \Joomla\CMS\Table\Table::bind()
+	 * Method to do some record / data preprocessing before call JTable::bind()
 	 *
 	 * Note. Typically called inside this MODEL 's store()
 	 *
@@ -778,7 +777,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 		}
 
 		// Get RAW layout field values, validation will follow ...
-		$raw_data = \Joomla\CMS\Factory::getApplication()->input->post->get('jform', array(), 'array');
+		$raw_data = JFactory::getApplication()->input->post->get('jform', array(), 'array');
 		$data['params']['layouts'] = !empty($raw_data['layouts']) ? $raw_data['layouts'] : null;
 
 
@@ -797,7 +796,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 		$this->mergeAttributes($record, $data, $mergeProperties, $mergeOptions);
 
 		// Unset the above handled FIELDSETs from $data, since we selectively merged them above into the RECORD,
-		// thus they will not overwrite the respective RECORD's properties during call of \Joomla\CMS\Table\Table::bind()
+		// thus they will not overwrite the respective RECORD's properties during call of JTable::bind()
 		foreach($mergeProperties as $prop)
 		{
 			unset($data[$prop]);
@@ -857,7 +856,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 
 
 	/**
-	 * Method to do some work after record has been loaded via \Joomla\CMS\Table\Table::load()
+	 * Method to do some work after record has been loaded via JTable::load()
 	 *
 	 * Note. Typically called inside this MODEL 's store()
 	 *
@@ -911,7 +910,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 			parent::cleanCache('com_flexicontent_cats', $client_id);
 
 			// Indicate to our system plugin that its category cache needs to be cleaned
-			\Joomla\CMS\Factory::getSession()->set('clear_cats_cache', 1, 'flexicontent');
+			JFactory::getSession()->set('clear_cats_cache', 1, 'flexicontent');
 		}
 	}
 

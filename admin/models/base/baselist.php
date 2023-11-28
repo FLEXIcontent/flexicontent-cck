@@ -23,7 +23,7 @@ require_once('traitlegacylist.php');
  * FLEXIcontent Component BASE (list) Model
  *
  */
-abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
+abstract class FCModelAdminList extends JModelList
 {
 	use FCModelTraitBase;
 	use FCModelTraitLegacyList;
@@ -143,7 +143,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 	 */
 	public function __construct($config = array())
 	{
-		$app    = \Joomla\CMS\Factory::getApplication();
+		$app    = JFactory::getApplication();
 		$jinput = $app->input;
 		$option = $jinput->getCmd('option', '');
 		$view   = $jinput->getCmd('view', '');
@@ -156,7 +156,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 		$p = $this->ovid = $option . '.' . ($this->view_id ?: $view . '_' . $layout) . '.';
 
 		// Parameters of the view, in our case it is only the component parameters
-		$this->cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+		$this->cparams = JComponentHelper::getParams('com_flexicontent');
 
 		// Make sure this is correct if called from different component ...
 		$this->option = 'com_flexicontent';
@@ -270,9 +270,9 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 
 
 	/**
-	 * Method to get a \Joomla\CMS\Pagination\Pagination object for the data set
+	 * Method to get a \JPagination object for the data set
 	 *
-	 * @return  \Joomla\CMS\Pagination\Pagination  A \Joomla\CMS\Pagination\Pagination object for the data set
+	 * @return  \JPagination  A \JPagination object for the data set
 	 *
 	 * @since	1.5
 	 */
@@ -304,6 +304,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 			$this->_data  = $this->_getList($this->_getListQuery(), $this->getState('limitstart'), $this->getState('limit'));
 			$this->_total = $this->_db->setQuery('SELECT FOUND_ROWS()')->loadResult();
 		}
+
 		return $this->_data;
 	}
 
@@ -332,7 +333,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 	 *
 	 * This method ensures that the query is constructed only once for a given state of the model.
 	 *
-	 * @return  \Joomla\Data\DataObjectbaseQuery  A \Joomla\Data\DataObjectbaseQuery object
+	 * @return  \JDatabaseQuery  A \JDatabaseQuery object
 	 *
 	 * @since   1.6
 	 */
@@ -351,7 +352,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 	/**
 	 * Method to build the query for the records
 	 *
-	 * @return  \Joomla\Data\DataObjectbaseQuery   The DB Query object
+	 * @return  JDatabaseQuery   The DB Query object
 	 *
 	 * @since   3.3.0
 	 */
@@ -407,9 +408,9 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 	/**
 	 * Method to build the orderby clause of the query for the records
 	 *
-	 * @param		\Joomla\Data\DataObjectbaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
+	 * @param		JDatabaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
 	 *
-	 * @return  \Joomla\Data\DataObjectbaseQuery|array
+	 * @return  JDatabaseQuery|array
 	 *
 	 * @since 3.3.0
 	 */
@@ -420,7 +421,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 
 		$order = $this->_db->escape($filter_order . ' ' . $filter_order_Dir);
 
-		if ($q instanceof \Joomla\Data\DataObjectbaseQuery)
+		if ($q instanceof \JDatabaseQuery)
 		{
 			return $order ? $q->order($order) : $q;
 		}
@@ -434,16 +435,16 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 	/**
 	 * Method to build the where clause of the query for the records
 	 *
-	 * @param		\Joomla\Data\DataObjectbaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
+	 * @param		JDatabaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
 	 *
-	 * @return  \Joomla\Data\DataObjectbaseQuery|array
+	 * @return  JDatabaseQuery|array
 	 *
 	 * @since   3.3.0
 	 */
 	protected function _buildContentWhere($q = false)
 	{
 		$table = $this->getTable($this->records_jtable, '');
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = JFactory::getUser();
 
 		// Various filters
 		$filter_state  = $this->getState('filter_state');
@@ -541,9 +542,9 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 			}
 
 			// Filter via View Level Access, if user is not super-admin
-			if (!\Joomla\CMS\Factory::getUser()->authorise('core.admin') && (\Joomla\CMS\Factory::getApplication()->isClient('site') || $this->listViaAccess))
+			if (!JFactory::getUser()->authorise('core.admin') && (JFactory::getApplication()->isClient('site') || $this->listViaAccess))
 			{
-				$groups  = implode(',', \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id));
+				$groups  = implode(',', JAccess::getAuthorisedViewLevels($user->id));
 				$where[] = 'a.access IN (' . $groups . ')';
 			}
 		}
@@ -565,7 +566,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 			$where[] = '(' . implode(' OR ', $textwhere) . ')';
 		}
 
-		if ($q instanceof \Joomla\Data\DataObjectbaseQuery)
+		if ($q instanceof \JDatabaseQuery)
 		{
 			return $where ? $q->where($where) : $q;
 		}
@@ -579,9 +580,9 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 	/**
 	 * Method to build the having clause of the query for the files
 	 *
-	 * @param		\Joomla\Data\DataObjectbaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
+	 * @param		JDatabaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
 	 *
-	 * @return  \Joomla\Data\DataObjectbaseQuery|array
+	 * @return  JDatabaseQuery|array
 	 *
 	 * @since 1.0
 	 */
@@ -589,7 +590,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 	{
 		$having = array();
 
-		if ($q instanceof \Joomla\Data\DataObjectbaseQuery)
+		if ($q instanceof \JDatabaseQuery)
 		{
 			return $having ? $q->having($having) : $q;
 		}
@@ -652,7 +653,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 
 		if (count($ids))
 		{
-			$user = \Joomla\CMS\Factory::getUser();
+			$user = JFactory::getUser();
 
 			// This is already done by controller task / caller but redo
 			$ids = ArrayHelper::toInteger($ids);
@@ -846,15 +847,15 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 
 		if ($model && $this->event_context && ($this->event_before_delete || $this->event_after_delete))
 		{
-			$app = \Joomla\CMS\Factory::getApplication();
+			$app = JFactory::getApplication();
 			$dispatcher = JEventDispatcher::getInstance();
 
 			// Load all content and flexicontent plugins for triggering their delete events
 			if ($this->event_context === 'com_content.article')
 			{
-				\Joomla\CMS\Plugin\PluginHelper::importPlugin('content');
+				JPluginHelper::importPlugin('content');
 			}
-			\Joomla\CMS\Plugin\PluginHelper::importPlugin('flexicontent');
+			JPluginHelper::importPlugin('flexicontent');
 
 			foreach ($cid as $record_id)
 			{
@@ -945,7 +946,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 
 			$table->id    = 0;
 			$table->$name = $table->$name . ' [copy]';
-			$table->alias = \Joomla\CMS\Filter\OutputFilter::stringURLSafe($table->$name);
+			$table->alias = JFilterOutput::stringURLSafe($table->$name);
 
 			$table->check();
 			$table->store();
@@ -1030,7 +1031,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 	 */
 	public function filterByPermission($cid, $action)
 	{
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = JFactory::getUser();
 		$table = $this->getTable($this->records_jtable, '');
 
 		$cid   = ArrayHelper::toInteger($cid);
@@ -1128,7 +1129,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 	 */
 	protected function _setStateOrder()
 	{
-		$app    = \Joomla\CMS\Factory::getApplication();
+		$app    = JFactory::getApplication();
 		$jinput = $app->input;
 		$view   = $jinput->getCmd('view', '');
 		$fcform = $jinput->getInt('fcform', 0);
@@ -1212,7 +1213,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 				}
 				else
 				{
-					\Joomla\CMS\Factory::getApplication()->enqueueMessage('Text search scope ' . $scope . ' is unknown, search failed', 'warning');
+					JFactory::getApplication()->enqueueMessage('Text search scope ' . $scope . ' is unknown, search failed', 'warning');
 				}
 			}
 		}

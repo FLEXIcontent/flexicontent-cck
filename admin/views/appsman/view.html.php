@@ -24,7 +24,7 @@ use Joomla\String\StringHelper;
 /**
  * View class for the FLEXIcontent appsman screen
  */
-class FlexicontentViewAppsman extends \Joomla\CMS\MVC\View\HtmlView
+class FlexicontentViewAppsman extends JViewLegacy
 {
 	function display( $tpl = null )
 	{
@@ -32,17 +32,17 @@ class FlexicontentViewAppsman extends \Joomla\CMS\MVC\View\HtmlView
 		// *** Initialise variables
 		// ***
 
-		$app     = \Joomla\CMS\Factory::getApplication();
+		$app     = JFactory::getApplication();
 		$jinput  = $app->input;
 		$option  = $jinput->get('option', '', 'cmd');
 		$view    = $jinput->get('view', '', 'cmd');
 		$task    = $jinput->get('task', '', 'cmd');
 
-		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
-		$user     = \Joomla\CMS\Factory::getUser();
-		$db       = \Joomla\CMS\Factory::getDbo();
-		$document = \Joomla\CMS\Factory::getDocument();
-		$session  = \Joomla\CMS\Factory::getSession();
+		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
+		$user     = JFactory::getUser();
+		$db       = JFactory::getDbo();
+		$document = JFactory::getDocument();
+		$session  = JFactory::getSession();
 		
 		// Get model
 		$model = $this->getModel();
@@ -62,12 +62,12 @@ class FlexicontentViewAppsman extends \Joomla\CMS\MVC\View\HtmlView
 		// *** Add css and js to document
 		// ***
 		
-		!\Joomla\CMS\Factory::getLanguage()->isRtl()
-			? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
-			: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
-		!\Joomla\CMS\Factory::getLanguage()->isRtl()
-			? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
-			: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
+		!JFactory::getLanguage()->isRtl()
+			? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
+			: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
+		!JFactory::getLanguage()->isRtl()
+			? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
+			: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 
 		// Add JS frameworks
 		flexicontent_html::loadFramework('select2');
@@ -75,9 +75,9 @@ class FlexicontentViewAppsman extends \Joomla\CMS\MVC\View\HtmlView
 		flexicontent_html::loadFramework('flexi-lib');
 
 		// Add js function to overload the joomla submitform validation
-		\Joomla\CMS\HTML\HTMLHelper::_('behavior.formvalidator');  // load default validation JS to make sure it is overriden
-		$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
-		$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
+		JHtml::_('behavior.formvalidator');  // load default validation JS to make sure it is overriden
+		$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
+		$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
 
 
 
@@ -89,9 +89,9 @@ class FlexicontentViewAppsman extends \Joomla\CMS\MVC\View\HtmlView
 		FLEXIUtilities::ManagerSideMenu('CanAppsman');
 		
 		// Create document/toolbar titles
-		$doc_title = \Joomla\CMS\Language\Text::_( 'FLEXI_WEBSITE_APPS_IMPORT_EXPORT' );
+		$doc_title = JText::_( 'FLEXI_WEBSITE_APPS_IMPORT_EXPORT' );
 		$site_title = $document->getTitle();
-		\Joomla\CMS\Toolbar\ToolbarHelper::title( $doc_title, 'appsman' );
+		JToolbarHelper::title( $doc_title, 'appsman' );
 		$document->setTitle($doc_title .' - '. $site_title);
 
 		// Create the toolbar
@@ -114,7 +114,7 @@ class FlexicontentViewAppsman extends \Joomla\CMS\MVC\View\HtmlView
 		// ***
 
 		$this->setLayout('import');
-		$this->sidebar = FLEXI_J30GE ? \Joomla\CMS\HTML\Helpers\Sidebar::render() : null;
+		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		
 		
 		// Execute the import task, load the log-like AJAX-based layout (import_process.php), to display results including any warnings
@@ -220,17 +220,17 @@ class FlexicontentViewAppsman extends \Joomla\CMS\MVC\View\HtmlView
 		// we could also create a new class and override getInput() method but maybe this is an overkill, we may do it in the future
 		$lists['languages'] = flexicontent_html::buildlanguageslist('language'
 			, ' style="vertical-align:top;" onchange="var m=jQuery(\'#fc_import_about_langcol\'); this.value ? m.hide(600) : m.show(600);"'
-			, $formvals['language'], 6/*'- '.\Joomla\CMS\Language\Text::_('FLEXI_USE_LANGUAGE_COLUMN').' -'*/, $allowed_langs, $published_only=true
+			, $formvals['language'], 6/*'- '.JText::_('FLEXI_USE_LANGUAGE_COLUMN').' -'*/, $allowed_langs, $published_only=true
 			, $disable_langs=null, $add_all=true, $conf=array('required'=>true)
 		).'
 			<span class="fc-mssg-inline fc-note fc-nobgimage" id="fc_import_about_langcol" style="display:none;">
-				'.\Joomla\CMS\Language\Text::_('FLEXI_USE_LANGUAGE_COLUMN_TIP').'
+				'.JText::_('FLEXI_USE_LANGUAGE_COLUMN_TIP').'
 			</span>';
 
 		$lists['states'] = flexicontent_html::buildstateslist('state', ' style="vertical-align:top;" onchange="var m=jQuery(\'#fc_import_about_statecol\'); this.value ? m.hide(600) : m.show(600);"'
-			, $formvals['state'], 2/*'- '.\Joomla\CMS\Language\Text::_('FLEXI_USE_STATE_COLUMN').' -'*/).
+			, $formvals['state'], 2/*'- '.JText::_('FLEXI_USE_STATE_COLUMN').' -'*/).
 			'<span class="fc-mssg-inline fc-note fc-nobgimage" id="fc_import_about_statecol" style="display:none;">
-				'.\Joomla\CMS\Language\Text::_('FLEXI_USE_STATE_COLUMN_TIP').'
+				'.JText::_('FLEXI_USE_STATE_COLUMN_TIP').'
 			</span>';
 		
 		
@@ -265,27 +265,27 @@ class FlexicontentViewAppsman extends \Joomla\CMS\MVC\View\HtmlView
 	 */
 	function setToolbar($conf, $task)
 	{
-		$user     = \Joomla\CMS\Factory::getUser();
-		$document = \Joomla\CMS\Factory::getDocument();
-		$toolbar  = \Joomla\CMS\Toolbar\Toolbar::getInstance('toolbar');
+		$user     = JFactory::getUser();
+		$document = JFactory::getDocument();
+		$toolbar  = JToolbar::getInstance('toolbar');
 		$perms    = FlexicontentHelperPerm::getPerm();
-		$session  = \Joomla\CMS\Factory::getSession();
+		$session  = JFactory::getSession();
 
 		$js = '';
 
 		$contrl = "appsman.";
 		$contrl_s = null;
 
-		$document = \Joomla\CMS\Factory::getDocument();
-		$toolbar = \Joomla\CMS\Toolbar\Toolbar::getInstance('toolbar');
-		$loading_msg = flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_LOADING') .' ... '. \Joomla\CMS\Language\Text::_('FLEXI_PLEASE_WAIT'), 2);
+		$document = JFactory::getDocument();
+		$toolbar = JToolbar::getInstance('toolbar');
+		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
 
 	
 		if (!empty($conf))
 		{
 			if ($task !== 'processxml')
 			{
-				$import_btn_title = \Joomla\CMS\Language\Text::_(empty($lineno) ? 'FLEXI_IMPORT_START_TASK' : 'FLEXI_IMPORT_CONTINUE_TASK');
+				$import_btn_title = JText::_(empty($lineno) ? 'FLEXI_IMPORT_START_TASK' : 'FLEXI_IMPORT_CONTINUE_TASK');
 
 				$btn_icon = 'icon-import';
 				$btn_name = 'import';
@@ -298,13 +298,13 @@ class FlexicontentViewAppsman extends \Joomla\CMS\MVC\View\HtmlView
 			}
 
 			$ctrl_task = 'appsman.clearxml';
-			\Joomla\CMS\Toolbar\ToolbarHelper::custom( $ctrl_task, 'cancel.png', 'cancel.png', 'FLEXI_IMPORT_CLEAR_TASK', $list_check = false );
+			JToolbarHelper::custom( $ctrl_task, 'cancel.png', 'cancel.png', 'FLEXI_IMPORT_CLEAR_TASK', $list_check = false );
 		}
 
 		else
 		{
 			//$ctrl_task = 'appsman.initxml';
-			//\Joomla\CMS\Toolbar\ToolbarHelper::custom( $ctrl_task, 'import.png', 'import.png', 'FLEXI_IMPORT_PREPARE_TASK', $list_check = false );
+			//JToolbarHelper::custom( $ctrl_task, 'import.png', 'import.png', 'FLEXI_IMPORT_PREPARE_TASK', $list_check = false );
 		}
 
 
@@ -343,7 +343,7 @@ class FlexicontentViewAppsman extends \Joomla\CMS\MVC\View\HtmlView
 			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
 			$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
 			$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
-			\Joomla\CMS\Toolbar\ToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
+			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
 		}
 		
 		if ($js)

@@ -1,9 +1,9 @@
 <?php
 defined('_JEXEC') or die('Restricted access');
 
-$app     = \Joomla\CMS\Factory::getApplication();
-$user    = \Joomla\CMS\Factory::getUser();
-$session = \Joomla\CMS\Factory::getSession();
+$app     = JFactory::getApplication();
+$user    = JFactory::getUser();
+$session = JFactory::getSession();
 $isSite  = $app->isClient('site');
 $CFGsfx  = $isSite ? '_fe' : '_be';
 
@@ -24,12 +24,12 @@ $this->menuCats = $isnew ? $this->menuCats : false;  // just make sure ...
  * 
  */
 
-$close_btn = '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="'.\Joomla\CMS\Language\Text::_('CLOSE').'"></button>';  // '<a class="fc-close" onclick="this.parentNode.parentNode.removeChild(this.parentNode);">&#215;</a>';
+$close_btn = '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="'.JText::_('CLOSE').'"></button>';  // '<a class="fc-close" onclick="this.parentNode.parentNode.removeChild(this.parentNode);">&#215;</a>';
 $alert_box = '<div %s class="alert alert-%s %s alert-dismissible fade show" role="alert">'.$close_btn.'%s</div>';  // '<div %s class="fc-mssg fc-%s %s">'.$close_btn.'%s</div>';
 $btn_class = 'btn';  // 'fc_button';
 $tip_class = ' hasTooltip';
 $lbl_class = ' ' . $this->params->get('form_lbl_class' . $CFGsfx, '');
-$noplugin  = '<div class="fc-mssg-inline fc-warning" style="margin:0 2px 6px 2px; max-width: unset;">'.\Joomla\CMS\Language\Text::_( 'FLEXI_PLEASE_PUBLISH_THIS_PLUGIN' ).'</div>';
+$noplugin  = '<div class="fc-mssg-inline fc-warning" style="margin:0 2px 6px 2px; max-width: unset;">'.JText::_( 'FLEXI_PLEASE_PUBLISH_THIS_PLUGIN' ).'</div>';
 
 
 /**
@@ -146,7 +146,7 @@ if ($usemaincat === 0 && empty($this->menuCats->cancatid) && !$this->row->id && 
 
 	$this->lists['catid'] = sprintf( $alert_box,
 		' style="margin: 2px 0px 6px 0px; display: inline-block;" ',
-		'error', '', \Joomla\CMS\Language\Text::_('FLEXI_CANNOT_HIDE_MAINCAT_MISCONFIG_INFO')
+		'error', '', JText::_('FLEXI_CANNOT_HIDE_MAINCAT_MISCONFIG_INFO')
 	) . '<br>' . $this->lists['catid'];
 }
 
@@ -156,22 +156,22 @@ if ($usemaincat === 0 && empty($this->menuCats->cancatid) && !$this->row->id && 
  */
 $info_image = $this->params->get('use_font_icons', 1)
 	? '<i class="icon-info text-info"></i>'
-	: \Joomla\CMS\HTML\HTMLHelper::image ( 'administrator/components/com_flexicontent/assets/images/information.png', \Joomla\CMS\Language\Text::_( 'FLEXI_NOTES' ) );
+	: JHtml::image ( 'administrator/components/com_flexicontent/assets/images/information.png', JText::_( 'FLEXI_NOTES' ) );
 $revert_image = $this->params->get('use_font_icons', 1)
 	? '<i class="icon-undo" style="color:darkgray"></i>'
-	: \Joomla\CMS\HTML\HTMLHelper::image ( 'administrator/components/com_flexicontent/assets/images/arrow_rotate_anticlockwise.png', \Joomla\CMS\Language\Text::_( 'FLEXI_REVERT' ) );
+	: JHtml::image ( 'administrator/components/com_flexicontent/assets/images/arrow_rotate_anticlockwise.png', JText::_( 'FLEXI_REVERT' ) );
 $compare_image = $this->params->get('use_font_icons', 1)
 	? '<i class="icon-contract-2" style="color:darkgray"></i>'
-	: \Joomla\CMS\HTML\HTMLHelper::image ( 'administrator/components/com_flexicontent/assets/images/arrow-in-out.png', \Joomla\CMS\Language\Text::_( 'FLEXI_VIEW' ) );
+	: JHtml::image ( 'administrator/components/com_flexicontent/assets/images/arrow-in-out.png', JText::_( 'FLEXI_VIEW' ) );
 $comment_image = $this->params->get('use_font_icons', 1)
 	? '<i class="icon-comment" style="color:darkgray"></i>'
-	: \Joomla\CMS\HTML\HTMLHelper::image ( 'administrator/components/com_flexicontent/assets/images/comments.png', \Joomla\CMS\Language\Text::_( 'FLEXI_COMMENT' ) );
+	: JHtml::image ( 'administrator/components/com_flexicontent/assets/images/comments.png', JText::_( 'FLEXI_COMMENT' ) );
 $hint_image = $this->params->get('use_font_icons', 1)
 	? '<i class="icon-lamp"></i>'
-	: \Joomla\CMS\HTML\HTMLHelper::image ( 'administrator/components/com_flexicontent/assets/images/lightbulb.png', \Joomla\CMS\Language\Text::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
+	: JHtml::image ( 'administrator/components/com_flexicontent/assets/images/lightbulb.png', JText::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
 $warn_image = $this->params->get('use_font_icons', 1)
 	? '<i class="icon-warning text-warning"></i>'
-	: \Joomla\CMS\HTML\HTMLHelper::image ( 'administrator/components/com_flexicontent/assets/images/warning.png', \Joomla\CMS\Language\Text::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
+	: JHtml::image ( 'administrator/components/com_flexicontent/assets/images/warning.png', JText::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
 $conf_image = '<i class="icon-cog"></i>';
 
 $lbl_extra_class = $isSite ? '' : ' pull-left label-fcinner label-toplevel';
@@ -184,8 +184,8 @@ if ($this->params->get('form_extra_js'))     $this->document->addScriptDeclarati
 if ($this->params->get('form_extra_js' . $CFGsfx))  $this->document->addScriptDeclaration($this->params->get('form_extra_js' . $CFGsfx));
 
 // Load JS tabber lib
-$this->document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
-$this->document->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
+$this->document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
+$this->document->addStyleSheet(JUri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
 $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
 
@@ -194,16 +194,16 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
  */
 if ($tags_editable || (!$isSite && $this->perms['canversion']))
 {
-	//$this->document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.bgiframe.min.js', array('version' => FLEXI_VHASH));
-	//$this->document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.ajaxQueue.js', array('version' => FLEXI_VHASH));
-	//$this->document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.min.js', array('version' => FLEXI_VHASH));
-	$this->document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/jquery.pager.js', array('version' => FLEXI_VHASH));     // e.g. pagination for item versions
-	$this->document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/jquery.autogrow.js', array('version' => FLEXI_VHASH));  // e.g. autogrow version comment textarea
+	//$this->document->addScript(JUri::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.bgiframe.min.js', array('version' => FLEXI_VHASH));
+	//$this->document->addScript(JUri::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.ajaxQueue.js', array('version' => FLEXI_VHASH));
+	//$this->document->addScript(JUri::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.min.js', array('version' => FLEXI_VHASH));
+	$this->document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/jquery.pager.js', array('version' => FLEXI_VHASH));     // e.g. pagination for item versions
+	$this->document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/jquery.autogrow.js', array('version' => FLEXI_VHASH));  // e.g. autogrow version comment textarea
 
-	//$this->document->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.css', array('version' => FLEXI_VHASH));
+	//$this->document->addStyleSheet(JUri::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.css', array('version' => FLEXI_VHASH));
 
-	\Joomla\CMS\Language\Text::script("FLEXI_DELETE_TAG", true);
-	\Joomla\CMS\Language\Text::script("FLEXI_ENTER_TAG", true);
+	JText::script("FLEXI_DELETE_TAG", true);
+	JText::script("FLEXI_ENTER_TAG", true);
 
 	$this->document->addScriptDeclaration("
 		jQuery(document).ready(function(){
@@ -264,13 +264,13 @@ if ($tags_editable || (!$isSite && $this->perms['canversion']))
 					//window.console.log(jQuery('#jform_language').val());
 
 					jQuery.ajax({
-						url: '".\Joomla\CMS\Uri\Uri::base(true)."/components/com_flexicontent/tasks/core.php?". \Joomla\CMS\Session\Session::getFormToken() ."=1',
+						url: '".JUri::base(true)."/components/com_flexicontent/tasks/core.php?". JSession::getFormToken() ."=1',
 						dataType: 'json',
 						data: {
 							q: term,
 							task: 'viewtags',
 							item_lang: jQuery('#jform_language').val(),
-							lang: '". \Joomla\CMS\Factory::getLanguage()->getTag() . "',
+							lang: '". JFactory::getLanguage()->getTag() . "',
 							format: 'json'
 						},
 						success: function(data)
@@ -374,7 +374,7 @@ if ($tags_editable || (!$isSite && $this->perms['canversion']))
 			}
 
 			var tag = new itemscreen();
-			tag.addtag( id, tagname, '".\Joomla\CMS\Uri\Uri::base(true)."/index.php?option=com_flexicontent&".$tags_task."addtag&format=raw&". \Joomla\CMS\Session\Session::getFormToken() ."=1');
+			tag.addtag( id, tagname, '".JUri::base(true)."/index.php?option=com_flexicontent&".$tags_task."addtag&format=raw&". JSession::getFormToken() ."=1');
 		}
 
 		function deleteTag(obj)
@@ -387,7 +387,7 @@ if ($tags_editable || (!$isSite && $this->perms['canversion']))
 		" . ($isSite || !$this->perms['canversion'] ? "" : "
 
 		PageClick = function(pageclickednumber) {
-			jQuery.ajax({ url: '".\Joomla\CMS\Uri\Uri::base(true)."/index.php?option=com_flexicontent&".$task_items."getversionlist&id=".$this->row->id."&active=".$this->row->version."&". \Joomla\CMS\Session\Session::getFormToken() ."=1&format=raw&page='+pageclickednumber, context: jQuery('#version_tbl'), success: function(str){
+			jQuery.ajax({ url: '".JUri::base(true)."/index.php?option=com_flexicontent&".$task_items."getversionlist&id=".$this->row->id."&active=".$this->row->version."&". JSession::getFormToken() ."=1&format=raw&page='+pageclickednumber, context: jQuery('#version_tbl'), success: function(str){
 				jQuery(this).html(\"\\
 				<table class='fc-table-list fc-tbl-short' style='margin:10px;'>\\
 				\"+str+\"\\
@@ -448,9 +448,9 @@ if ($tags_editable || (!$isSite && $this->perms['canversion']))
 $this->document->addScriptDeclaration
 ("
 	jQuery(document).ready(function(){
-		var hits = new itemscreen('hits', {id:".($this->row->id ? $this->row->id : 0).", task:'".$ctrl_items."gethits', sess_token:'" . \Joomla\CMS\Session\Session::getFormToken() . "'});
+		var hits = new itemscreen('hits', {id:".($this->row->id ? $this->row->id : 0).", task:'".$ctrl_items."gethits', sess_token:'" . JSession::getFormToken() . "'});
 		//hits.fetchscreen();
-		var votes = new itemscreen('votes', {id:".($this->row->id ? $this->row->id : 0).", task:'".$ctrl_items."getvotes', sess_token:'" . \Joomla\CMS\Session\Session::getFormToken() . "'});
+		var votes = new itemscreen('votes', {id:".($this->row->id ? $this->row->id : 0).", task:'".$ctrl_items."getvotes', sess_token:'" . JSession::getFormToken() . "'});
 		//votes.fetchscreen();
 	});
 
@@ -458,12 +458,12 @@ $this->document->addScriptDeclaration
 	{
 		var res = new itemscreen();
 		task = '".$ctrl_items."' + task;
-		res.reseter(task, id, div, '" . \Joomla\CMS\Uri\Uri::base(true) . "/index.php?option=com_flexicontent&controller=items&" . \Joomla\CMS\Session\Session::getFormToken() . "=1');
+		res.reseter(task, id, div, '" . JUri::base(true) . "/index.php?option=com_flexicontent&controller=items&" . JSession::getFormToken() . "=1');
 	}
 
 	function clickRestore(link)
 	{
-		if (confirm('".\Joomla\CMS\Language\Text::_( 'FLEXI_CONFIRM_VERSION_RESTORE',true )."'))
+		if (confirm('".JText::_( 'FLEXI_CONFIRM_VERSION_RESTORE',true )."'))
 		{
 			location.href=link;
 		}

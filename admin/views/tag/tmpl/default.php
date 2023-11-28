@@ -22,7 +22,7 @@ $form = $this->form;
 	foreach ($fieldSets as $name => $fieldSet) :
 
 		//$label = !empty($fieldSet->label) ? $fieldSet->label : 'COM_FLEXICONTENT_'.$name.'_FIELDSET_LABEL';
-		//echo '<h2>' . \Joomla\CMS\Language\Text::_($label) . '</h2>';
+		//echo '<h2>' . JText::_($label) . '</h2>';
 	?>
 
 	<table class="fc-form-tbl">
@@ -47,7 +47,7 @@ $form = $this->form;
 
 	<?php endforeach; ?>
 
-	<?php echo \Joomla\CMS\HTML\HTMLHelper::_( 'form.token' ); ?>
+	<?php echo JHtml::_( 'form.token' ); ?>
 	<input type="hidden" name="option" value="com_flexicontent" />
 	<input type="hidden" name="controller" value="tags" />
 	<input type="hidden" name="view" value="tag" />
@@ -59,5 +59,5 @@ $form = $this->form;
 
 <?php
 //keep session alive while editing
-\Joomla\CMS\HTML\HTMLHelper::_('behavior.keepalive');
+JHtml::_('behavior.keepalive');
 ?>

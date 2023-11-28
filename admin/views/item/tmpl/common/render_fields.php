@@ -34,7 +34,7 @@ endif;
 /**
  * Capture JOOMLA INTRO/FULL IMAGES and URLS
  */
-$show_jui = \Joomla\CMS\Component\ComponentHelper::getParams('com_content')->get('show_urls_images' . ($isSite ? '_frontend' : '_backend'), 0);
+$show_jui = JComponentHelper::getParams('com_content')->get('show_urls_images' . ($isSite ? '_frontend' : '_backend'), 0);
 if ( $this->params->get('use_jimages' . $CFGsfx, $show_jui) || $this->params->get('use_jurls' . $CFGsfx, $show_jui) ) :
 
 	// Do not change these are the 'images' and 'urls' names these are the names in the XML file
@@ -80,13 +80,13 @@ if ( !$this->params->get('auto_title', 0) || $usetitle ) :  ob_start();  // titl
 	<div class="control-group">
 		<?php
 		$field = isset($this->fields['title']) ? $this->fields['title'] : false;
-		$field_description = $field && $field->description ? $field->description : \Joomla\CMS\Language\Text::_($this->form->getField('title')->description);
+		$field_description = $field && $field->description ? $field->description : JText::_($this->form->getField('title')->description);
 		$label_attrs = 'class="' . $tip_class . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"';
 		ob_start();
 		?>
 		<div class="control-label" id="jform_title-lbl-outer">
 			<label id="jform_title-lbl" for="jform_title" data-for="jform_title" <?php echo $label_attrs; ?> >
-				<?php echo $field ? $field->label : \Joomla\CMS\Language\Text::_($this->form->getField('title')->getAttribute('label'));
+				<?php echo $field ? $field->label : JText::_($this->form->getField('title')->getAttribute('label'));
 				/* $field->label is set per type */ ?>
 			</label>
 		</div>
@@ -95,7 +95,7 @@ if ( !$this->params->get('auto_title', 0) || $usetitle ) :  ob_start();  // titl
 		<div class="controls container_fcfield container_fcfield_id_6 container_fcfield_name_title input-fcmax" id="container_fcfield_6">
 
 		<?php if ( $this->params->get('auto_title', 0) ): ?>
-			<?php echo $this->row->title . ' <div class="fc-nobgimage fc-info fc-mssg-inline hasTooltip" title="' . \Joomla\CMS\Language\Text::_('FLEXI_SET_TO_AUTOMATIC_VALUE_ON_SAVE', true) . '"><span class="icon-info"></span> ' . \Joomla\CMS\Language\Text::_('FLEXI_AUTO', true) . '</div>' ; ?>
+			<?php echo $this->row->title . ' <div class="fc-nobgimage fc-info fc-mssg-inline hasTooltip" title="' . JText::_('FLEXI_SET_TO_AUTOMATIC_VALUE_ON_SAVE', true) . '"><span class="icon-info"></span> ' . JText::_('FLEXI_AUTO', true) . '</div>' ; ?>
 		<?php elseif ( isset($this->row->item_translations) ) : ?>
 
 			<?php
@@ -147,13 +147,13 @@ if ($usealias) : ob_start();  // alias ?>
 	<div class="control-group">
 		<?php
 		$field = isset($this->fields['alias']) ? $this->fields['alias'] : false;
-		$field_description = $field && $field->description ? $field->description : \Joomla\CMS\Language\Text::_($this->form->getField('alias')->description);
+		$field_description = $field && $field->description ? $field->description : JText::_($this->form->getField('alias')->description);
 		$label_attrs = 'class="' . $tip_class . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"';
 		ob_start();
 		?>
 		<div class="control-label" id="jform_alias-lbl-outer">
 			<label id="jform_alias-lbl" for="jform_alias" data-for="jform_alias" <?php echo $label_attrs; ?> >
-				<?php echo $field ? $field->label : \Joomla\CMS\Language\Text::_($this->form->getField('alias')->getAttribute('label'));
+				<?php echo $field ? $field->label : JText::_($this->form->getField('alias')->getAttribute('label'));
 				/* $field->label is set per type */ ?>
 			</label>
 		</div>
@@ -213,14 +213,14 @@ if ((!$this->menuCats || $this->menuCats->cancatid) && $usemaincat) : ob_start()
 		// Field via coreprops field type
 		$field = isset($this->fields['core_category']) ? $this->fields['core_category'] : false;
 		$field = isset($this->fields['core_category_' . $typeid]) ? $this->fields['core_category_' . $typeid] : $field;
-		$field_description = $field && $field->description ? $field->description : \Joomla\CMS\Language\Text::_($this->form->getField('catid')->description);
+		$field_description = $field && $field->description ? $field->description : JText::_($this->form->getField('catid')->description);
 		$label_attrs = 'class="' . $tip_class . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"';
 		ob_start();
 		?>
 		<div class="control-label" id="jform_catid-lbl-outer">
 			<label id="jform_catid-lbl" for="jform_catid" data-for="jform_catid" <?php echo $label_attrs; ?> >
 				<?php
-				$label_maincat = \Joomla\CMS\Language\Text::_(!$secondary_displayed ? $this->form->getLabel('catid') : 'FLEXI_MAIN_CATEGORY');
+				$label_maincat = JText::_(!$secondary_displayed ? $this->form->getLabel('catid') : 'FLEXI_MAIN_CATEGORY');
 				echo $field ? $field->label : $label_maincat;
 				/* $field->label is set per type */ ?>
 				<i class="icon-tree-2"></i>
@@ -258,7 +258,7 @@ if ($uselang) : ob_start();  // lang ?>
 		// Field via coreprops field type
 		$field = isset($this->fields['core_lang']) ? $this->fields['core_lang'] : false;
 		$field = isset($this->fields['core_lang_' . $typeid]) ? $this->fields['core_lang_' . $typeid] : $field;
-		$field_description = $field && $field->description ? $field->description : \Joomla\CMS\Language\Text::_($this->form->getField('tag')->description);  // Note: form element (XML file) is 'tag' not 'tags'
+		$field_description = $field && $field->description ? $field->description : JText::_($this->form->getField('tag')->description);  // Note: form element (XML file) is 'tag' not 'tags'
 		$label_attrs = $field
 			? 'class="' . $tip_class . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"'
 			: 'class="' . $lbl_class . $lbl_extra_class . '"';
@@ -266,7 +266,7 @@ if ($uselang) : ob_start();  // lang ?>
 		?>
 		<div class="control-label" id="jform_language-lbl-outer">
 			<label id="jform_language-lbl" for="jform_language" data-for="jform_language" class="<?php echo $lbl_class; ?> pull-left label-fcinner label-toplevel" >
-				<?php echo $field ? $field->label : \Joomla\CMS\Language\Text::_($this->form->getField('language')->getAttribute('label'));
+				<?php echo $field ? $field->label : JText::_($this->form->getField('language')->getAttribute('label'));
 				/* $field->label is set per type */ ?>
 				<i class="icon-flag"></i>
 			</label>
@@ -300,7 +300,7 @@ if ($tags_displayed) : ob_start();  // tags ?>
 	<div class="control-group">
 		<?php
 		$field = isset($this->fields['tags']) ? $this->fields['tags'] : false;
-		$field_description = $field && $field->description ? $field->description : \Joomla\CMS\Language\Text::_($this->form->getField('tag')->description);  // Note: form element (XML file) is 'tag' not 'tags'
+		$field_description = $field && $field->description ? $field->description : JText::_($this->form->getField('tag')->description);  // Note: form element (XML file) is 'tag' not 'tags'
 		$label_attrs = $field
 			? 'class="' . $tip_class . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"'
 			: 'class="' . $lbl_class . $lbl_extra_class . '"';
@@ -308,7 +308,7 @@ if ($tags_displayed) : ob_start();  // tags ?>
 		?>
 		<div class="control-label" id="jform_tag-lbl-outer">
 			<label id="jform_tag-lbl" data-for="input-tags" <?php echo $label_attrs; ?> >
-				<?php echo $field ? $field->label : \Joomla\CMS\Language\Text::_($this->form->getField('tag')->getAttribute('label'));
+				<?php echo $field ? $field->label : JText::_($this->form->getField('tag')->getAttribute('label'));
 				/* $field->label is set per type */ ?>
 				<i class="icon-tags-2"></i>
 			</label>
@@ -320,7 +320,7 @@ if ($tags_displayed) : ob_start();  // tags ?>
 			<?php if ($tags_editable) : ?>
 				<div id="tags">
 					<input type="text" id="input-tags" name="tagname" class="<?php echo $tip_class; ?>"
-						placeholder="<?php echo \Joomla\CMS\Language\Text::_($this->perms['cancreatetags'] ? 'FLEXI_TAG_SEARCH_EXISTING_CREATE_NEW' : 'FLEXI_TAG_SEARCH_EXISTING'); ?>"
+						placeholder="<?php echo JText::_($this->perms['cancreatetags'] ? 'FLEXI_TAG_SEARCH_EXISTING_CREATE_NEW' : 'FLEXI_TAG_SEARCH_EXISTING'); ?>"
 						title="<?php echo flexicontent_html::getToolTip( 'FLEXI_NOTES', ($this->perms['cancreatetags'] ? 'FLEXI_TAG_CAN_ASSIGN_CREATE' : 'FLEXI_TAG_CAN_ASSIGN_ONLY'), 1, 1);?>"
 					/>
 					<span id='input_new_tag' ></span>
@@ -351,7 +351,7 @@ if ($tags_displayed) : ob_start();  // tags ?>
 								<li class="tagitem">
 									<span>' . $tag->name . ($tag->translated_text ? ' (' . $tag->translated_text . ')' : '') . '</span>
 									<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" />
-									<a href="javascript:;" class="deletetag" onclick="javascript:deleteTag(this);" title="'.\Joomla\CMS\Language\Text::_('FLEXI_DELETE_TAG').'"></a>
+									<a href="javascript:;" class="deletetag" onclick="javascript:deleteTag(this);" title="'.JText::_('FLEXI_DELETE_TAG').'"></a>
 								</li>';
 							}
 							else
@@ -371,7 +371,7 @@ if ($tags_displayed) : ob_start();  // tags ?>
 					<?php
 					if ($tags_editable && count($this->quicktagsdata))
 					{
-						echo '<span class="tagicon '.$tip_class.'" title="'.\Joomla\CMS\Language\Text::_('FLEXI_COMMON_TAGS').'"></span>';
+						echo '<span class="tagicon '.$tip_class.'" title="'.JText::_('FLEXI_COMMON_TAGS').'"></span>';
 						foreach ($this->quicktagsdata as $tag)
 						{
 							$_checked = isset($common_tags_selected[$tag->id]) ? ' checked="checked" ' : '';
@@ -402,7 +402,7 @@ if (!$typeid || $usetype) : ob_start();  // type ?>
 	<div class="control-group">
 		<?php
 		$field = isset($this->fields['document_type']) ? $this->fields['document_type'] : false;
-		$field_description = $field && $field->description ? $field->description : \Joomla\CMS\Language\Text::_($this->form->getField('type_id')->description);  // Note: form element (XML file) is 'type_id' not 'document_type'
+		$field_description = $field && $field->description ? $field->description : JText::_($this->form->getField('type_id')->description);  // Note: form element (XML file) is 'type_id' not 'document_type'
 		$warning_class = !$typeid && !$isSite ? ' label text-white bg-warning label-warning' : '';
 		$label_attrs = $field
 			? 'class="' . $tip_class . $lbl_class . $lbl_extra_class . $warning_class . '" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"'
@@ -411,7 +411,7 @@ if (!$typeid || $usetype) : ob_start();  // type ?>
 		?>
 		<div class="control-label" id="jform_type_id-lbl-outer">
 			<label id="jform_type_id-lbl" for="jform_type_id" data-for="jform_type_id" <?php echo $label_attrs; ?> >
-				<?php echo $field ? $field->label : \Joomla\CMS\Language\Text::_($this->form->getField('type_id')->getAttribute('label'));
+				<?php echo $field ? $field->label : JText::_($this->form->getField('type_id')->getAttribute('label'));
 				/* $field->label is set per type */ ?>
 				<i class="icon-briefcase"></i>
 			</label>
@@ -424,7 +424,7 @@ if (!$typeid || $usetype) : ob_start();  // type ?>
 			<span class="inlineFormTip <?php echo $tip_class; ?>" style="display:inline-block;" title="<?php echo $type_warning; ?>">
 				<?php echo $info_image; ?>
 			</span>
-			<?php echo sprintf( $alert_box, 'id="fc-change-warning" style="display:none; float:left;"', 'warning', '', '<h4>'.\Joomla\CMS\Language\Text::_( 'FLEXI_WARNING' ).'</h4> '.\Joomla\CMS\Language\Text::_( 'FLEXI_TAKE_CARE_CHANGING_FIELD_TYPE' ) ); ?>
+			<?php echo sprintf( $alert_box, 'id="fc-change-warning" style="display:none; float:left;"', 'warning', '', '<h4>'.JText::_( 'FLEXI_WARNING' ).'</h4> '.JText::_( 'FLEXI_TAKE_CARE_CHANGING_FIELD_TYPE' ) ); ?>
 		</div>
 
 		<?php $input_html = ob_get_clean(); echo $input_html; ?>
@@ -445,7 +445,7 @@ if (!$is_autopublished) :  // state and vstate (= approval of new document versi
 	<div class="control-group">
 		<?php
 		$field = isset($this->fields['state']) ? $this->fields['state'] : false;
-		$field_description = $field && $field->description ? $field->description : \Joomla\CMS\Language\Text::_($this->form->getField('state')->description);
+		$field_description = $field && $field->description ? $field->description : JText::_($this->form->getField('state')->description);
 		$label_attrs = $field
 			? 'class="' . $tip_class . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"'
 			: 'class="' . $lbl_class . $lbl_extra_class . '"';
@@ -453,7 +453,7 @@ if (!$is_autopublished) :  // state and vstate (= approval of new document versi
 		?>
 		<div class="control-label" id="jform_state-lbl-outer">
 			<label id="jform_state-lbl" for="jform_state" data-for="jform_state" <?php echo $label_attrs; ?> >
-				<?php echo $field ? $field->label : \Joomla\CMS\Language\Text::_($this->form->getField('state')->getAttribute('label'));
+				<?php echo $field ? $field->label : JText::_($this->form->getField('state')->getAttribute('label'));
 				/* $field->label is set per type */ ?>
 				<i class="icon-file-check"></i>
 			</label>
@@ -504,7 +504,7 @@ if (!$is_autopublished) :  // state and vstate (= approval of new document versi
 
 			<div class="control-label" id="jform_vstate-lbl-outer">
 				<label id="jform_vstate-lbl" data-for="jform_vstate" <?php echo $label_attrs; ?> >
-					<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_PUBLIC_DOCUMENT_CHANGES' ); ?>
+					<?php echo JText::_( 'FLEXI_PUBLIC_DOCUMENT_CHANGES' ); ?>
 				</label>
 			</div>
 			<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
@@ -543,7 +543,7 @@ if (!$is_autopublished) :  // state and vstate (= approval of new document versi
 
 			<div class="controls container_fcfield container_fcfield_name_vstate">
 			<?php
-			echo '<div class="alert alert-info">' . \Joomla\CMS\Language\Text::_(($isnew || $use_versioning ? 'FLEXI_NEEDS_APPROVAL' : 'FLEXI_WITHOUT_APPROVAL') . ($isSite ? '' : '_BE')) . '</div>';
+			echo '<div class="alert alert-info">' . JText::_(($isnew || $use_versioning ? 'FLEXI_NEEDS_APPROVAL' : 'FLEXI_WITHOUT_APPROVAL') . ($isSite ? '' : '_BE')) . '</div>';
 			// Enable approval if versioning disabled, this make sense,
 			// since if use can edit item THEN item should be updated !!!
 			$item_vstate = $use_versioning ? 1 : 2;
@@ -569,7 +569,7 @@ if ($useaccess) : ob_start();  // access ?>
 		<?php
 		$field = isset($this->fields['core_access']) ? $this->fields['core_access'] : false;
 		$field = isset($this->fields['core_access_' . $typeid]) ? $this->fields['core_access_' . $typeid] : $field;
-		$field_description = $field && $field->description ? $field->description : \Joomla\CMS\Language\Text::_($this->form->getField('access')->description);
+		$field_description = $field && $field->description ? $field->description : JText::_($this->form->getField('access')->description);
 		$label_attrs = $field
 			? 'class="' . $tip_class . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"'
 			: 'class="' . $lbl_class . $lbl_extra_class . '"';
@@ -577,7 +577,7 @@ if ($useaccess) : ob_start();  // access ?>
 		?>
 		<div class="control-label" id="jform_access-lbl-outer">
 			<label id="jform_access-lbl" for="jform_access" data-for="jform_access" <?php echo $label_attrs; ?> >
-				<?php echo $field ? $field->label : \Joomla\CMS\Language\Text::_($this->form->getField('access')->getAttribute('label'));
+				<?php echo $field ? $field->label : JText::_($this->form->getField('access')->getAttribute('label'));
 				/* $field->label is set per type */ ?>
 				<i class="icon-lock"></i>
 			</label>
@@ -613,7 +613,7 @@ if ($typeid && $allowdisablingcomments) : ob_start();  // disable_comments ?>
 		?>
 		<div class="control-label" id="jform_attribs_comments-title-outer">
 			<label id="jform_attribs_comments-title" <?php echo $label_attrs; ?> >
-				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_ALLOW_COMMENTS' );?>
+				<?php echo JText::_( 'FLEXI_ALLOW_COMMENTS' );?>
 				<i class="icon-comment"></i>
 			</label>
 		</div>
@@ -643,7 +643,7 @@ if ($typeid && $allow_subscribers_notify && $this->subscribers) :  ob_start();  
 		?>
 		<div class="control-label" id="jform_notify-lbl-outer">
 			<label id="jform_notify-lbl" <?php echo $label_attrs; ?> >
-				<?php echo \Joomla\CMS\Language\Text::_( $isSite ? 'FLEXI_NOTIFY_FAVOURING_USERS' : 'FLEXI_NOTIFY_SUBSCRIBERS' ); ?>
+				<?php echo JText::_( $isSite ? 'FLEXI_NOTIFY_FAVOURING_USERS' : 'FLEXI_NOTIFY_SUBSCRIBERS' ); ?>
 				<i class="icon-mail"></i>
 			</label>
 		</div>
@@ -676,7 +676,7 @@ if ($typeid && $allow_owner_notify && $this->row->created_by != $user->id) :  ob
 		?>
 		<div class="control-label" id="jform_notify_owner-lbl-outer">
 			<label id="jform_notify_owner-lbl" <?php echo $label_attrs; ?> >
-				<?php echo \Joomla\CMS\Language\Text::_('FLEXI_NOTIFY_OWNER'); ?>
+				<?php echo JText::_('FLEXI_NOTIFY_OWNER'); ?>
 				<i class="icon-mail"></i>
 			</label>
 		</div>
@@ -688,8 +688,8 @@ if ($typeid && $allow_owner_notify && $this->row->created_by != $user->id) :  ob
 			</span>
 
 			<?php
-				$tipOwnerCanEdit      = \Joomla\CMS\Language\Text::_('FLEXI_OWNER_CAN_EDIT_THIS_ITEM') . ': &nbsp; - ' . mb_strtoupper(\Joomla\CMS\Language\Text::_($this->ownerCanEdit ? 'JYES' : 'JNO')) . ' -';
-				$tipOwnerCanEditState = \Joomla\CMS\Language\Text::_('FLEXI_OWNER_CAN_PUBLISH_CHANGES_OF_THIS_ITEM') . ': &nbsp; - ' . mb_strtoupper(\Joomla\CMS\Language\Text::_($this->ownerCanEdit ? 'JYES' : 'JNO')) . ' -';
+				$tipOwnerCanEdit      = JText::_('FLEXI_OWNER_CAN_EDIT_THIS_ITEM') . ': &nbsp; - ' . mb_strtoupper(JText::_($this->ownerCanEdit ? 'JYES' : 'JNO')) . ' -';
+				$tipOwnerCanEditState = JText::_('FLEXI_OWNER_CAN_PUBLISH_CHANGES_OF_THIS_ITEM') . ': &nbsp; - ' . mb_strtoupper(JText::_($this->ownerCanEdit ? 'JYES' : 'JNO')) . ' -';
 			?>
 			<span class="inlineFormTip <?php echo $tip_class; ?>" style="display:inline-block;"
 			      title="<?php echo flexicontent_html::getToolTip('FLEXI_NOTES', $tipOwnerCanEdit . '<br>' . $tipOwnerCanEditState, 1, 1); ?>">
@@ -713,8 +713,8 @@ if ( $secondary_displayed || !empty($this->lists['featured_cid']) ) : ob_start()
 
 	<fieldset class="basicfields_set" id="fcform_categories_container">
 		<legend>
-			<?php $fset_lbl = \Joomla\CMS\Language\Text::_('FLEXI_CATEGORIES') .' / '. \Joomla\CMS\Language\Text::_('FLEXI_FEATURED');?>
-			<span class="fc_legend_header_text"><?php echo \Joomla\CMS\Language\Text::_( $fset_lbl ); ?></span>
+			<?php $fset_lbl = JText::_('FLEXI_CATEGORIES') .' / '. JText::_('FLEXI_FEATURED');?>
+			<span class="fc_legend_header_text"><?php echo JText::_( $fset_lbl ); ?></span>
 		</legend>
 
 		<!--__FC_CATEGORY_BOX__--><?php /* This is replaced by item 's main categry selector if this is placed inside here */ ?>
@@ -725,13 +725,13 @@ if ( $secondary_displayed || !empty($this->lists['featured_cid']) ) : ob_start()
 			<div class="control-group">
 				<?php
 				$field = isset($this->fields['categories']) ? $this->fields['categories'] : false;
-				$field_description = $field && $field->description ? $field->description : ($isSite ? \Joomla\CMS\Language\Text::_('FLEXI_CATEGORIES_NOTES') : '');
+				$field_description = $field && $field->description ? $field->description : ($isSite ? JText::_('FLEXI_CATEGORIES_NOTES') : '');
 				$label_attrs = 'class="' . $tip_class . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"';
 				ob_start();
 				?>
 				<div class="control-label" id="jform_cid-lbl-outer">
 					<label id="jform_cid-lbl" for="jform_cid" data-for="jform_cid" <?php echo $label_attrs; ?>>
-						<?php echo $field ? $field->label : \Joomla\CMS\Language\Text::_($this->form->getField('title')->getAttribute('label'));
+						<?php echo $field ? $field->label : JText::_($this->form->getField('title')->getAttribute('label'));
 						/* $field->label is set per type */ ?>
 					</label>
 				</div>
@@ -760,7 +760,7 @@ if ( $secondary_displayed || !empty($this->lists['featured_cid']) ) : ob_start()
 				<?php ob_start(); ?>
 				<div class="control-label" id="jform_featured_cid-lbl-outer">
 					<label id="jform_featured_cid-lbl" for="jform_featured_cid" data-for="jform_featured_cid" class="<?php echo $lbl_class; ?>  pull-left label-fcinner label-toplevel">
-						<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_FEATURED_CATEGORIES' ); ?>
+						<?php echo JText::_( 'FLEXI_FEATURED_CATEGORIES' ); ?>
 					</label>
 				</div>
 				<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
@@ -788,9 +788,9 @@ if ( $secondary_displayed || !empty($this->lists['featured_cid']) ) : ob_start()
 			<?php ob_start(); ?>
 			<div class="control-label" id="jform_featured-lbl-outer">
 				<label id="jform_featured-lbl" class="<?php echo $lbl_class; ?>  pull-left label-fcinner label-toplevel">
-					<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_FEATURED' ); ?>
+					<?php echo JText::_( 'FLEXI_FEATURED' ); ?>
 					<br>
-					<small><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_JOOMLA_FEATURED_VIEW' ); ?></small>
+					<small><?php echo JText::_( 'FLEXI_JOOMLA_FEATURED_VIEW' ); ?></small>
 				</label>
 			</div>
 			<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
@@ -827,7 +827,7 @@ if ( flexicontent_db::useAssociations() && $modifyLangAssocs ) : ob_start(); // 
 	<fieldset class="basicfields_set" id="fcform_language_container">
 		<legend>
 			<span class="fc_legend_header_text">
-				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_LANGUAGE' ) . ' '. \Joomla\CMS\Language\Text::_( 'FLEXI_ASSOCIATIONS' ) ; ?>
+				<?php echo JText::_( 'FLEXI_LANGUAGE' ) . ' '. JText::_( 'FLEXI_ASSOCIATIONS' ) ; ?>
 			</span>
 		</legend>
 
@@ -838,9 +838,9 @@ if ( flexicontent_db::useAssociations() && $modifyLangAssocs ) : ob_start(); // 
 			<div class="fcclear"></div>
 
 			<?php if ($this->row->language!='*'): ?>
-				<?php echo \Joomla\CMS\Layout\LayoutHelper::render('joomla.edit.associations', $this); ?>
+				<?php echo JLayoutHelper::render('joomla.edit.associations', $this); ?>
 			<?php else: ?>
-				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_ASSOC_NOT_POSSIBLE' ); ?>
+				<?php echo JText::_( 'FLEXI_ASSOC_NOT_POSSIBLE' ); ?>
 			<?php endif; ?>
 		<?php endif; ?>
 		<!-- EOF of language / language associations section -->
@@ -867,7 +867,7 @@ if ($typeid && $this->perms['canright'] && $usepublicationdetails === 2) : ob_st
 		<table class="fc-form-tbl fcinner" style="margin: 10px; width: auto;">
 		<tr>
 			<td colspan="2">
-				<h3><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_VERSION_INFO' ); ?></h3>
+				<h3><?php echo JText::_( 'FLEXI_VERSION_INFO' ); ?></h3>
 			</td>
 		</tr>
 		<?php
@@ -875,7 +875,7 @@ if ($typeid && $this->perms['canright'] && $usepublicationdetails === 2) : ob_st
 		?>
 		<tr>
 			<td class="key">
-				<label class="fc-prop-lbl"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_ITEM_ID' ); ?></label>
+				<label class="fc-prop-lbl"><?php echo JText::_( 'FLEXI_ITEM_ID' ); ?></label>
 			</td>
 			<td>
 				<span class="badge badge-info"><?php echo $this->row->id; ?></span>
@@ -888,12 +888,12 @@ if ($typeid && $this->perms['canright'] && $usepublicationdetails === 2) : ob_st
 			<td class="key">
 				<?php
 					$field = isset($this->fields['state']) ? $this->fields['state'] : false;
-					$field_description = $field && $field->description ? $field->description : \Joomla\CMS\Language\Text::_($this->form->getField('state')->description);
+					$field_description = $field && $field->description ? $field->description : JText::_($this->form->getField('state')->description);
 					$label_attrs = $field
 						? 'class="' . $tip_class . ' fc-prop-lbl" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"'
 						: 'class="' . $default_label_class . '"';
 				?>
-				<label <?php echo $label_attrs; ?>><?php echo $field ? $field->label : \Joomla\CMS\Language\Text::_( 'FLEXI_STATE' ); ?></label>
+				<label <?php echo $label_attrs; ?>><?php echo $field ? $field->label : JText::_( 'FLEXI_STATE' ); ?></label>
 			</td>
 			<td>
 				<span class="badge badge-info"><?php echo $this->published; ?></span>
@@ -903,17 +903,17 @@ if ($typeid && $this->perms['canright'] && $usepublicationdetails === 2) : ob_st
 			<td class="key">
 				<?php
 					$field = isset($this->fields['hits']) ? $this->fields['hits'] : false;
-					$field_description = $field && $field->description ? $field->description : \Joomla\CMS\Language\Text::_($this->form->getField('hits')->description);
+					$field_description = $field && $field->description ? $field->description : JText::_($this->form->getField('hits')->description);
 					$label_attrs = $field
 						? 'class="' . $tip_class . ' fc-prop-lbl" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"'
 						: 'class="' . $default_label_class . '"';
 				?>
-				<label <?php echo $label_attrs; ?>><?php echo $field ? $field->label : \Joomla\CMS\Language\Text::_( 'FLEXI_HITS' ); ?></label>
+				<label <?php echo $label_attrs; ?>><?php echo $field ? $field->label : JText::_( 'FLEXI_HITS' ); ?></label>
 			</td>
 			<td>
 				<div id="hits" style="float:left;" class="badge badge-info"><?php echo $this->row->hits; ?></div> &nbsp;
 				<span <?php echo $visibility; ?>>
-					<input name="reset_hits" type="button" class="button btn-small btn-warning" value="<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_RESET' ); ?>" onclick="reseter('<?php echo $ctrl_items; ?>resethits', '<?php echo $this->row->id; ?>', 'hits')" />
+					<input name="reset_hits" type="button" class="button btn-small btn-warning" value="<?php echo JText::_( 'FLEXI_RESET' ); ?>" onclick="reseter('<?php echo $ctrl_items; ?>resethits', '<?php echo $this->row->id; ?>', 'hits')" />
 				</span>
 			</td>
 		</tr>
@@ -926,29 +926,29 @@ if ($typeid && $this->perms['canright'] && $usepublicationdetails === 2) : ob_st
 						? 'class="' . $tip_class . ' fc-prop-lbl" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"'
 						: 'class="' . $default_label_class . '"';
 				?>
-				<label <?php echo $label_attrs; ?>><?php echo $field ? $field->label : \Joomla\CMS\Language\Text::_( 'FLEXI_SCORE' ); ?></label>
+				<label <?php echo $label_attrs; ?>><?php echo $field ? $field->label : JText::_( 'FLEXI_SCORE' ); ?></label>
 			</td>
 			<td>
 				<div id="votes" style="float:left;" class="badge badge-info"><?php echo $this->ratings; ?></div> &nbsp;
 				<span <?php echo $visibility2; ?>>
-					<input name="reset_votes" type="button" class="button btn-small btn-warning" value="<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_RESET' ); ?>" onclick="reseter('<?php echo $ctrl_items; ?>resetvotes', '<?php echo $this->row->id; ?>', 'votes')" />
+					<input name="reset_votes" type="button" class="button btn-small btn-warning" value="<?php echo JText::_( 'FLEXI_RESET' ); ?>" onclick="reseter('<?php echo $ctrl_items; ?>resetvotes', '<?php echo $this->row->id; ?>', 'votes')" />
 				</span>
 			</td>
 		</tr>
 
 		<tr>
 			<td class="key">
-				<label class="<?php echo $default_label_class; ?>"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_REVISED' ); ?></label>
+				<label class="<?php echo $default_label_class; ?>"><?php echo JText::_( 'FLEXI_REVISED' ); ?></label>
 			</td>
 			<td>
 				<span class="badge badge-info">
-					<?php echo $this->row->last_version;?> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_TIMES' ); ?>
+					<?php echo $this->row->last_version;?> <?php echo JText::_( 'FLEXI_TIMES' ); ?>
 				</span>
 			</td>
 		</tr>
 		<tr>
 			<td class="key">
-				<label class="<?php echo $default_label_class; ?>"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_FRONTEND_ACTIVE_VERSION' ); ?></label>
+				<label class="<?php echo $default_label_class; ?>"><?php echo JText::_( 'FLEXI_FRONTEND_ACTIVE_VERSION' ); ?></label>
 			</td>
 			<td>
 				<span class="badge badge-info">#<?php echo $this->row->current_version;?></span>
@@ -956,7 +956,7 @@ if ($typeid && $this->perms['canright'] && $usepublicationdetails === 2) : ob_st
 		</tr>
 		<tr>
 			<td class="key">
-				<label class="<?php echo $default_label_class; ?>"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_FORM_LOADED_VERSION' ); ?></label>
+				<label class="<?php echo $default_label_class; ?>"><?php echo JText::_( 'FLEXI_FORM_LOADED_VERSION' ); ?></label>
 			</td>
 			<td>
 				<span class="badge badge-info">#<?php echo $this->row->version;?></span>
@@ -966,36 +966,36 @@ if ($typeid && $this->perms['canright'] && $usepublicationdetails === 2) : ob_st
 			<td class="key">
 				<?php
 					$field = isset($this->fields['created']) ? $this->fields['created'] : false;
-					$field_description = $field && $field->description ? $field->description : \Joomla\CMS\Language\Text::_($this->form->getField('created')->description);
+					$field_description = $field && $field->description ? $field->description : JText::_($this->form->getField('created')->description);
 					$label_attrs = $field
 						? 'class="' . $tip_class . ' fc-prop-lbl" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"'
 						: 'class="' . $default_label_class . '"';
 				?>
-				<label <?php echo $label_attrs; ?>><?php echo $field ? $field->label : \Joomla\CMS\Language\Text::_( 'FLEXI_CREATED' ); ?></label>
+				<label <?php echo $label_attrs; ?>><?php echo $field ? $field->label : JText::_( 'FLEXI_CREATED' ); ?></label>
 			</td>
 			<td>
 				<?php echo $this->row->created == $this->nullDate
-					? \Joomla\CMS\Language\Text::_( 'FLEXI_NEW_ITEM' )
-					: \Joomla\CMS\HTML\HTMLHelper::_('date',  $this->row->created,  \Joomla\CMS\Language\Text::_( 'DATE_FORMAT_LC2' ) ); ?>
+					? JText::_( 'FLEXI_NEW_ITEM' )
+					: JHtml::_('date',  $this->row->created,  JText::_( 'DATE_FORMAT_LC2' ) ); ?>
 			</td>
 		</tr>
 		<tr>
 			<td class="key">
 				<?php
 					$field = isset($this->fields['modified']) ? $this->fields['modified'] : false;
-					$field_description = $field && $field->description ? $field->description : \Joomla\CMS\Language\Text::_($this->form->getField('modified')->description);
+					$field_description = $field && $field->description ? $field->description : JText::_($this->form->getField('modified')->description);
 					$label_attrs = $field
 						? 'class="' . $tip_class . ' fc-prop-lbl" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"'
 						: 'class="' . $default_label_class . '"';
 				?>
-				<label <?php echo $label_attrs; ?>><?php echo $field ? $field->label : \Joomla\CMS\Language\Text::_( 'FLEXI_MODIFIED' ); ?></label>
+				<label <?php echo $label_attrs; ?>><?php echo $field ? $field->label : JText::_( 'FLEXI_MODIFIED' ); ?></label>
 			</td>
 			<td>
 				<?php
 					if ( $this->row->modified == $this->nullDate ) {
-						echo \Joomla\CMS\Language\Text::_( 'FLEXI_NOT_MODIFIED' );
+						echo JText::_( 'FLEXI_NOT_MODIFIED' );
 					} else {
-						echo \Joomla\CMS\HTML\HTMLHelper::_('date',  $this->row->modified, \Joomla\CMS\Language\Text::_( 'DATE_FORMAT_LC2' ));
+						echo JHtml::_('date',  $this->row->modified, JText::_( 'DATE_FORMAT_LC2' ));
 					}
 				?>
 			</td>
@@ -1003,7 +1003,7 @@ if ($typeid && $this->perms['canright'] && $usepublicationdetails === 2) : ob_st
 	<?php if ($use_versioning) : ?>
 			<tr>
 				<td class="key">
-					<label class="<?php echo $default_label_class; ?>"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_VERSION_COMMENT' ); ?></label>
+					<label class="<?php echo $default_label_class; ?>"><?php echo JText::_( 'FLEXI_VERSION_COMMENT' ); ?></label>
 				</td>
 				<td></td>
 			</tr><tr>
@@ -1034,11 +1034,11 @@ if ($usepublicationdetails) : // timezone_info, publication_details ?>
 		$user_zone = $user->getParam('timezone', $site_zone);
 
 		$tz = new DateTimeZone( $user_zone );
-		$tz_offset = $tz->getOffset(new \Joomla\CMS\Date\Date()) / 3600;
+		$tz_offset = $tz->getOffset(new JDate()) / 3600;
 		$tz_info =  $tz_offset > 0 ? ' UTC +' . $tz_offset : ' UTC ' . $tz_offset;
 
 		$tz_info .= ' ('.$user_zone.')';
-		$msg = \Joomla\CMS\Language\Text::sprintf( FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE' : 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', ' ', $tz_info );
+		$msg = JText::sprintf( FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE' : 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', ' ', $tz_info );
 		echo sprintf( $alert_box, ' style="display: inline-block;" ', 'info', 'fc-nobgimage', $msg );
 		?>
 	<?php
@@ -1144,7 +1144,7 @@ if ($usepublicationdetails) : // timezone_info, publication_details ?>
 if ( $typeid && $usemetadata ) : ob_start(); // metadata ?>
 	<fieldset class="panelform">
 		<legend>
-			<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_META' ); ?>
+			<?php echo JText::_( 'FLEXI_META' ); ?>
 		</legend>
 
 		<?php if ( $usemetadata >= 1) : ?>
@@ -1271,7 +1271,7 @@ endif;
 if ($typeid && $useseoconf) : ob_start(); // seoconf ?>
 	<fieldset class="panelform">
 		<legend>
-			<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_SEO' ); ?>
+			<?php echo JText::_( 'FLEXI_SEO' ); ?>
 		</legend>
 
 		<?php foreach ($this->form->getFieldset('params-seoconf') as $field) :
@@ -1322,17 +1322,17 @@ if ($displayed_fieldSets) : ob_start();  // display_params ?>
 		$label = !empty($fieldSet->label)
 			? $fieldSet->label
 			: 'COM_FLEXICONTENT_'.$name.'_FIELDSET_LABEL';
-		$label = \Joomla\CMS\Language\Text::_($label) === 'COM_FLEXICONTENT_'.$name.'_FIELDSET_LABEL'
+		$label = JText::_($label) === 'COM_FLEXICONTENT_'.$name.'_FIELDSET_LABEL'
 			? 'COM_CONTENT_'.$name.'_FIELDSET_LABEL'
 			: $label;
 		$icon_class = $name === 'metafb' ? 'icon-users' : '';
 
 		if(count($displayed_fieldSets) > 1) : ?>
 		<div class="tabbertab fc-tabbed-displayparams-box" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" >
-			<h3 class="tabberheading"> <?php echo \Joomla\CMS\Language\Text::_($label); ?> </h3>
+			<h3 class="tabberheading"> <?php echo JText::_($label); ?> </h3>
 		<?php else : ?>
 		<fieldset class="flexi_params panelform">
-			<legend><?php echo \Joomla\CMS\Language\Text::_($label); ?></legend>
+			<legend><?php echo JText::_($label); ?></legend>
 		<?php endif ?>
 
 
@@ -1409,8 +1409,8 @@ if ($typeid && $selecttheme) : ?>
 
 		<div class="fcclear"></div>
 		<div class="fc-success fc-mssg-inline" style="font-size: 12px; margin: 8px 0 !important;" id="__content_type_default_layout__">
-			<?php /*echo \Joomla\CMS\Language\Text::sprintf( 'FLEXI_USING_CONTENT_TYPE_LAYOUT', $this->tparams->get('ilayout') ) . "<br/><br/>";*/ ?>
-			<?php echo \Joomla\CMS\Language\Text::_($isSite ? 'FLEXI_USING_LAYOUT_DEFAULTS' : 'FLEXI_RECOMMEND_CONTENT_TYPE_LAYOUT'); ?>
+			<?php /*echo JText::sprintf( 'FLEXI_USING_CONTENT_TYPE_LAYOUT', $this->tparams->get('ilayout') ) . "<br/><br/>";*/ ?>
+			<?php echo JText::_($isSite ? 'FLEXI_USING_LAYOUT_DEFAULTS' : 'FLEXI_RECOMMEND_CONTENT_TYPE_LAYOUT'); ?>
 		</div>
 	<?php
 	$fn = 'layout_selection';
@@ -1427,8 +1427,8 @@ if ($typeid && $selecttheme) : ?>
 		<div class="fc-sliders-plain-outer <?php echo $item_layout ? 'fc_preloaded' : ''; ?>">
 			<?php
 			$slider_set_id = 'theme-sliders-' . $this->form->getValue('id');
-			//echo \Joomla\CMS\HTML\HTMLHelper::_('sliders.start', $slider_set_id, array('useCookie'=>1));
-			echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.startAccordion', $slider_set_id, array(/*'active' => ''*/));
+			//echo JHtml::_('sliders.start', $slider_set_id, array('useCookie'=>1));
+			echo JHtml::_('bootstrap.startAccordion', $slider_set_id, array(/*'active' => ''*/));
 
 			$groupname = 'attribs';  // Field Group name this is for name of <fields name="..." >
 
@@ -1437,16 +1437,16 @@ if ($typeid && $selecttheme) : ?>
 				$form_layout = $tmpl->params;
 				$slider_title = '
 					<span class="btn"><i class="icon-edit"></i>
-						' . \Joomla\CMS\Language\Text::_('FLEXI_PARAMETERS_THEMES_SPECIFIC') . ' : ' . $tmpl->name . '
+						' . JText::_('FLEXI_PARAMETERS_THEMES_SPECIFIC') . ' : ' . $tmpl->name . '
 					</span>';
 				$slider_id = $tmpl->name . '-' . $groupname . '-options';
 
-				//echo \Joomla\CMS\HTML\HTMLHelper::_('sliders.panel', $slider_title, $slider_id);
-				echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addSlide', $slider_set_id, $slider_title, $slider_id);
+				//echo JHtml::_('sliders.panel', $slider_title, $slider_id);
+				echo JHtml::_('bootstrap.addSlide', $slider_set_id, $slider_title, $slider_id);
 
 				if (!$item_layout || $tmpl->name !== $item_layout)
 				{
-					echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endSlide');
+					echo JHtml::_('bootstrap.endSlide');
 					continue;
 				}
 
@@ -1456,10 +1456,10 @@ if ($typeid && $selecttheme) : ?>
 
 					<?php
 					if (isset($fieldSet->label) && trim($fieldSet->label)) :
-						echo '<div style="margin:0 0 12px 0; font-size: 16px; background-color: #333; float:none;" class="fcsep_level0">'.\Joomla\CMS\Language\Text::_($fieldSet->label).'</div>';
+						echo '<div style="margin:0 0 12px 0; font-size: 16px; background-color: #333; float:none;" class="fcsep_level0">'.JText::_($fieldSet->label).'</div>';
 					endif;
 					if (isset($fieldSet->description) && trim($fieldSet->description)) :
-						echo '<div class="fc-mssg fc-info">'.\Joomla\CMS\Language\Text::_($fieldSet->description).'</div>';
+						echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
 					endif;
 
 					foreach ($form_layout->getFieldset($fsname) as $field) :
@@ -1507,7 +1507,7 @@ if ($typeid && $selecttheme) : ?>
 											)
 										)
 									) .
-									($cssprep ? ' <span class="icon-info hasTooltip" title="' . \Joomla\CMS\Language\Text::_('Used to auto-create a CSS styles file. To modify this, you can edit layout in template manager', true) . '"></span>' : '') . '
+									($cssprep ? ' <span class="icon-info hasTooltip" title="' . JText::_('Used to auto-create a CSS styles file. To modify this, you can edit layout in template manager', true) . '"></span>' : '') . '
 								</div>
 							</div>
 						';
@@ -1518,11 +1518,11 @@ if ($typeid && $selecttheme) : ?>
 
 
 				<?php endforeach; //fieldSets ?>
-				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endSlide'); ?>
+				<?php echo JHtml::_('bootstrap.endSlide'); ?>
 
 			<?php endforeach; //tmpls ?>
 
-			<?php echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endAccordion'); //echo \Joomla\CMS\HTML\HTMLHelper::_('sliders.end'); ?>
+			<?php echo JHtml::_('bootstrap.endAccordion'); //echo JHtml::_('sliders.end'); ?>
 
 		</div><!-- END class="fc-sliders-plain-outer" -->
 	<?php
@@ -1541,18 +1541,18 @@ if ($typeid && $use_versioning && $this->perms['canversion'] && $versionsplaceme
 	<table class="" style="margin: 10px; width: auto;">
 		<tr>
 			<td>
-				<h3><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_VERSIONS_HISTORY' ); ?></h3>
+				<h3><?php echo JText::_( 'FLEXI_VERSIONS_HISTORY' ); ?></h3>
 			</td>
 		</tr>
 		<tr><td>
 			<table id="version_tbl" class="fc-table-list fc-tbl-short">
 			<?php if ($this->row->id == 0) : ?>
 			<tr>
-				<td class="versions-first" colspan="4"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_NEW_ARTICLE' ); ?></td>
+				<td class="versions-first" colspan="4"><?php echo JText::_( 'FLEXI_NEW_ARTICLE' ); ?></td>
 			</tr>
 			<?php
 			else :
-			$date_format = (($date_format = \Joomla\CMS\Language\Text::_( 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS_J16GE' )) == 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS_J16GE') ? "d/M H:i" : $date_format;
+			$date_format = (($date_format = JText::_( 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS_J16GE' )) == 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS_J16GE') ? "d/M H:i" : $date_format;
 			foreach ($this->versions as $version) :
 				$isCurrent = (int) $version->nr === (int) $this->row->current_version;
 				$class = $isCurrent ? ' id="active-version" class="success"' : '';
@@ -1560,29 +1560,29 @@ if ($typeid && $use_versioning && $this->perms['canversion'] && $versionsplaceme
 			?>
 			<tr<?php echo $class; ?>>
 				<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo '#' . $version->nr; ?></span></td>
-				<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo \Joomla\CMS\HTML\HTMLHelper::_('date', (($version->nr == 1) ? $this->row->created : $version->date), $date_format ); ?></span></td>
+				<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo JHtml::_('date', (($version->nr == 1) ? $this->row->created : $version->date), $date_format ); ?></span></td>
 				<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo ($version->nr == 1) ? flexicontent_html::striptagsandcut($this->row->creator, 25) : flexicontent_html::striptagsandcut($version->modifier, 25); ?></span></td>
 				<td class="versions">
 
-					<a href="javascript:;" class="hasTooltip" title="<?php echo \Joomla\CMS\HTML\HTMLHelper::tooltipText( \Joomla\CMS\Language\Text::_( 'FLEXI_COMMENT' ), ($version->comment ? $version->comment : 'No comment written'), 0, 1); ?>"><?php echo $comment_image;?></a>
+					<a href="javascript:;" class="hasTooltip" title="<?php echo JHtml::tooltipText( JText::_( 'FLEXI_COMMENT' ), ($version->comment ? $version->comment : 'No comment written'), 0, 1); ?>"><?php echo $comment_image;?></a>
 
 					<?php if (!$isSite) :?>
 
 						<?php if (!$isCurrent && $allow_versioncomparing) : ?>
 							<a class="modal-versions"
 								href="index.php?option=com_flexicontent&amp;view=itemcompare&amp;cid=<?php echo $this->row->id; ?>&amp;version=<?php echo $version->nr; ?>&amp;tmpl=component"
-								title="<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_COMPARE_WITH_CURRENT_VERSION' ); ?>"
+								title="<?php echo JText::_( 'FLEXI_COMPARE_WITH_CURRENT_VERSION' ); ?>"
 							>
 								<?php echo $compare_image; ?>
 							</a>
 						<?php endif; ?>
 
 						<?php if ($isCurrent) : ?>
-							<a onclick="javascript:return clickRestore('<?php echo \Joomla\CMS\Uri\Uri::base(true); ?>/index.php?option=com_flexicontent&amp;view=item&amp;<?php echo $task_items;?>edit&amp;<?php echo ($isSite ? 'id=' : 'cid=') . $this->row->id;?>&amp;version=<?php echo $version->nr; ?>');" href="javascript:;"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_CURRENT' ); ?></a>
+							<a onclick="javascript:return clickRestore('<?php echo JUri::base(true); ?>/index.php?option=com_flexicontent&amp;view=item&amp;<?php echo $task_items;?>edit&amp;<?php echo ($isSite ? 'id=' : 'cid=') . $this->row->id;?>&amp;version=<?php echo $version->nr; ?>');" href="javascript:;"><?php echo JText::_( 'FLEXI_CURRENT' ); ?></a>
 						<?php else : ?>
-							<a onclick="javascript:return clickRestore('<?php echo \Joomla\CMS\Uri\Uri::base(true); ?>/index.php?option=com_flexicontent&amp;task=items.edit&amp;<?php echo ($isSite ? 'id=' : 'cid=') . $this->row->id;?>&amp;version=<?php echo $version->nr; ?>&amp;<?php echo \Joomla\CMS\Session\Session::getFormToken();?>=1');"
+							<a onclick="javascript:return clickRestore('<?php echo JUri::base(true); ?>/index.php?option=com_flexicontent&amp;task=items.edit&amp;<?php echo ($isSite ? 'id=' : 'cid=') . $this->row->id;?>&amp;version=<?php echo $version->nr; ?>&amp;<?php echo JSession::getFormToken();?>=1');"
 								href="javascript:;"
-								title="<?php echo \Joomla\CMS\Language\Text::sprintf( 'FLEXI_REVERT_TO_THIS_VERSION', $version->nr ); ?>"
+								title="<?php echo JText::sprintf( 'FLEXI_REVERT_TO_THIS_VERSION', $version->nr ); ?>"
 							>
 								<?php echo $revert_image; ?>
 							</a>
@@ -1615,13 +1615,13 @@ endif;
 
 if ($permsplacement && $this->perms['canright'] ) : ob_start(); // perms ?>
 	<fieldset id="flexiaccess" class="flexiaccess basicfields_set">
-		<legend><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
+		<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
 		<div id="tabacces">
 			<div id="accessrules"><?php echo $this->form->getInput('rules'); ?></div>
 		</div>
 		<?php if ($permsplacement === 2) : ?>
 		<div id="notabacces">
-			<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
+			<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
 		</div>
 		<?php endif; ?>
 	</fieldset>
@@ -1757,7 +1757,7 @@ if ($this->fields && $typeid) :
 				{
 					$replace_txt = !empty($captured['jimages'])
 						? $captured['jimages']
-						: sprintf( $alert_box, '', 'warning', 'fc-nobgimage', \Joomla\CMS\Language\Text::_('FLEXI_ENABLE_INTRO_FULL_IMAGES_IN_TYPE_CONFIGURATION') );
+						: sprintf( $alert_box, '', 'warning', 'fc-nobgimage', JText::_('FLEXI_ENABLE_INTRO_FULL_IMAGES_IN_TYPE_CONFIGURATION') );
 					unset($captured['jimages']);
 					$field->html = str_replace('_INTRO_FULL_IMAGES_HTML_', $replace_txt, $field->html);
 				}
@@ -1770,7 +1770,7 @@ if ($this->fields && $typeid) :
 				{
 					$replace_txt = !empty($captured['jurls'])
 						? $captured['jurls']
-						: sprintf( $alert_box, '', 'warning', 'fc-nobgimage', \Joomla\CMS\Language\Text::_('FLEXI_ENABLE_LINKS_IN_TYPE_CONFIGURATION') );
+						: sprintf( $alert_box, '', 'warning', 'fc-nobgimage', JText::_('FLEXI_ENABLE_LINKS_IN_TYPE_CONFIGURATION') );
 					unset($captured['jurls']);
 					$field->html = str_replace('_JOOMLA_ARTICLE_LINKS_HTML_', $replace_txt, $field->html);
 				}
@@ -1959,9 +1959,9 @@ if ($this->fields && $typeid) :
 
 		<?php if ( $typeid == 0) : // type_id is not set (user allowed to select item type) ?>
 			<input name="jform[type_id_not_set]" value="1" type="hidden" />
-			<?php echo sprintf( $alert_box, '', 'info', '', \Joomla\CMS\Language\Text::_( 'FLEXI_CHOOSE_ITEM_TYPE' ) ); ?>
+			<?php echo sprintf( $alert_box, '', 'info', '', JText::_( 'FLEXI_CHOOSE_ITEM_TYPE' ) ); ?>
 		<?php else : // existing item that has no custom fields, warn the user ?>
-			<?php echo sprintf( $alert_box, '', 'info', '', \Joomla\CMS\Language\Text::_( 'FLEXI_NO_FIELDS_TO_TYPE' ) ); ?>
+			<?php echo sprintf( $alert_box, '', 'info', '', JText::_( 'FLEXI_NO_FIELDS_TO_TYPE' ) ); ?>
 		<?php endif; ?>
 
 <?php endif;

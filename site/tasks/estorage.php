@@ -74,7 +74,7 @@ class FlexicontentCronTasks
 
 		if (!defined('FLEXI_J40GE'))
 		{
-			$jversion = new \Joomla\CMS\Version;
+			$jversion = new JVersion;
 			define('FLEXI_J40GE', version_compare( $jversion->getShortVersion(), '3.99.99', '>' ) );
 		}
 
@@ -83,7 +83,7 @@ class FlexicontentCronTasks
 		 */
 		if (!FLEXI_J40GE)
 		{
-			$app = \Joomla\CMS\Factory::getApplication($client_name);
+			$app = JFactory::getApplication($client_name);
 			$app->initialise();
 		}
 		else
@@ -100,7 +100,7 @@ class FlexicontentCronTasks
 			$container = \Joomla\CMS\Factory::getContainer();
 
 			$container->alias('session', 'session.cli')
-				->alias('\Joomla\CMS\Session\Session', 'session.cli')
+				->alias('JSession', 'session.cli')
 				->alias(\Joomla\CMS\Session\Session::class, 'session.cli')
 				->alias(\Joomla\Session\Session::class, 'session.cli')
 				->alias(\Joomla\Session\SessionInterface::class, 'session.cli');
@@ -126,16 +126,16 @@ class FlexicontentCronTasks
 	{
 		$log_filename = 'cron_estorage.php';
 		jimport('joomla.log.log');
-		\Joomla\CMS\Log\Log::addLogger(
+		JLog::addLogger(
 			array(
 				'text_file' => $log_filename,  // Sets the target log file
 				'text_entry_format' => '{DATE} {TIME} {PRIORITY} {MESSAGE}'  // Sets the format of each line
 			),
-			\Joomla\CMS\Log\Log::ALL,  // Sets messages of all log levels to be sent to the file
+			JLog::ALL,  // Sets messages of all log levels to be sent to the file
 			array('com_flexicontent.estorage')  // category of logged messages
 		);
 
-		$db  = \Joomla\CMS\Factory::getDbo();
+		$db  = JFactory::getDbo();
 
 
 		/**
@@ -151,7 +151,7 @@ class FlexicontentCronTasks
 		if (!count($field_ids))
 		{
 			$msg = 'CRON TASK STARTED: terminating, no files need to be moved';
-			\Joomla\CMS\Log\Log::add($msg, \Joomla\CMS\Log\Log::INFO, 'com_flexicontent.estorage');
+			JLog::add($msg, JLog::INFO, 'com_flexicontent.estorage');
 			return;
 		}
 
@@ -167,7 +167,7 @@ class FlexicontentCronTasks
 			// Create field parameters, if not already created, NOTE: for 'custom' fields loadFieldConfig() is optional
 			if (empty($field->parameters))
 			{
-				$field->parameters = new \Joomla\Registry\Registry($field->attribs);
+				$field->parameters = new JRegistry($field->attribs);
 			}
 
 			$estorage_mode = $field->parameters->get('estorage_mode', '0');
@@ -189,7 +189,7 @@ class FlexicontentCronTasks
 			if (!$ftpConnID[$field_id])
 			{
 				$msg = 'FAILED TO CONNECT TO FTP server: (host:port) :' . $efs_ftp_host . ':' . $efs_ftp_port;
-				\Joomla\CMS\Log\Log::add($msg, \Joomla\CMS\Log\Log::ERROR, 'com_flexicontent.estorage');
+				JLog::add($msg, JLog::ERROR, 'com_flexicontent.estorage');
 				$ftpConnID[$field_id] = 0;
 				continue;
 			}
@@ -199,7 +199,7 @@ class FlexicontentCronTasks
 			if (!$login_result)
 			{
 				$msg = 'FAILED TO LOGIN TO FTP SERVER: (user@host:port) :' . $efs_ftp_user . '@' . $efs_ftp_host . ':' . $efs_ftp_port;
-				\Joomla\CMS\Log\Log::add($msg, \Joomla\CMS\Log\Log::ERROR, 'com_flexicontent.estorage');
+				JLog::add($msg, JLog::ERROR, 'com_flexicontent.estorage');
 				$ftpConnID[$field_id] = 0;
 				continue;
 			}
@@ -210,7 +210,7 @@ class FlexicontentCronTasks
 			if (!$pasv_result)
 			{
 				$msg = 'FAILED TO TURN ON PASSIVE MODE FOR FTP CONNECTION FOR FTP SERVER: (user@host:port) :' . $efs_ftp_user . '@' . $efs_ftp_host . ':' . $efs_ftp_port;
-				\Joomla\CMS\Log\Log::add($msg, \Joomla\CMS\Log\Log::ERROR, 'com_flexicontent.estorage');
+				JLog::add($msg, JLog::ERROR, 'com_flexicontent.estorage');
 				$ftpConnID[$field_id] = 0;
 				continue;
 			}
@@ -222,7 +222,7 @@ class FlexicontentCronTasks
 				if (!$cwd_result)
 				{
 					$msg = 'FAILED TO CHANGE (REMOTE) FTP DIRECTORY TO : ' . $efs_ftp_path . ' FOR FTP SERVER: (user@host:port) :' . $efs_ftp_user . '@' . $efs_ftp_host . ':' . $efs_ftp_port;
-					\Joomla\CMS\Log\Log::add($msg, \Joomla\CMS\Log\Log::ERROR, 'com_flexicontent.estorage');
+					JLog::add($msg, JLog::ERROR, 'com_flexicontent.estorage');
 					$ftpConnID[$field_id] = 0;
 					continue;
 				}
@@ -243,7 +243,7 @@ class FlexicontentCronTasks
 		if (!count($files)) return;
 
 		$msg = 'CRON TASK STARTED: moving ' . count($files) . ' files';
-		\Joomla\CMS\Log\Log::add($msg, \Joomla\CMS\Log\Log::INFO, 'com_flexicontent.estorage');
+		JLog::add($msg, JLog::INFO, 'com_flexicontent.estorage');
 
 		foreach($files as $file)
 		{
@@ -304,7 +304,7 @@ class FlexicontentCronTasks
 					if (!$mkd_result)
 					{
 						$msg = 'FAILED TO CREATE (REMOTE) FTP DIRECTORY TO : ' . $efs_ftp_path . '/o_' . $assigned_item->created_by . ' FOR FTP SERVER: (user@host:port) :' . $efs_ftp_user . '@' . $efs_ftp_host . ':' . $efs_ftp_port;
-						\Joomla\CMS\Log\Log::add($msg, \Joomla\CMS\Log\Log::ERROR, 'com_flexicontent.estorage');
+						JLog::add($msg, JLog::ERROR, 'com_flexicontent.estorage');
 					}
 					$cwd_result = ftp_chdir($ftpConnID[$field_id], $efs_ftp_path . '/o_' . $assigned_item->created_by);
 				}
@@ -319,7 +319,7 @@ class FlexicontentCronTasks
 						if (!$mkd_result)
 						{
 							$msg = 'FAILED TO CREATE (REMOTE) FTP DIRECTORY TO : ' . $efs_ftp_path . '/o_' . $assigned_item->created_by . '/i_' . $assigned_item->id . ' FOR FTP SERVER: (user@host:port) :' . $efs_ftp_user . '@' . $efs_ftp_host . ':' . $efs_ftp_port;
-							\Joomla\CMS\Log\Log::add($msg, \Joomla\CMS\Log\Log::ERROR, 'com_flexicontent.estorage');
+							JLog::add($msg, JLog::ERROR, 'com_flexicontent.estorage');
 						}
 						$cwd_result = ftp_chdir($ftpConnID[$field_id], $efs_ftp_path . '/o_' . $assigned_item->created_by . '/i_' . $assigned_item->id);
 					}
@@ -327,14 +327,14 @@ class FlexicontentCronTasks
 					if (!$cwd_result)
 					{
 						$msg = 'FAILED TO CHANGE (REMOTE) FTP DIRECTORY TO : ' . $efs_ftp_path . '/o_' . $assigned_item->created_by . '/i_' . $assigned_item->id . ' FOR FTP SERVER: (user@host:port) :' . $efs_ftp_user . '@' . $efs_ftp_host . ':' . $efs_ftp_port;
-						\Joomla\CMS\Log\Log::add($msg, \Joomla\CMS\Log\Log::ERROR, 'com_flexicontent.estorage');
+						JLog::add($msg, JLog::ERROR, 'com_flexicontent.estorage');
 						continue;
 					}
 				}
 				else
 				{
 					$msg = 'FAILED TO CHANGE (REMOTE) FTP DIRECTORY TO : ' . $efs_ftp_path . '/o_' . $assigned_item->created_by . ' FOR FTP SERVER: (user@host:port) :' . $efs_ftp_user . '@' . $efs_ftp_host . ':' . $efs_ftp_port;
-					\Joomla\CMS\Log\Log::add($msg, \Joomla\CMS\Log\Log::ERROR, 'com_flexicontent.estorage');
+					JLog::add($msg, JLog::ERROR, 'com_flexicontent.estorage');
 					continue;
 				}
 			}
@@ -345,7 +345,7 @@ class FlexicontentCronTasks
 				if (!$cwd_result)
 				{
 					$msg = 'FAILED TO CHANGE (REMOTE) FTP DIRECTORY TO : ' . $efs_ftp_path . ' FOR FTP SERVER: (user@host:port) :' . $efs_ftp_user . '@' . $efs_ftp_host . ':' . $efs_ftp_port;
-					\Joomla\CMS\Log\Log::add($msg, \Joomla\CMS\Log\Log::ERROR, 'com_flexicontent.estorage');
+					JLog::add($msg, JLog::ERROR, 'com_flexicontent.estorage');
 					continue;
 				}
 			}
@@ -360,7 +360,7 @@ class FlexicontentCronTasks
 				? $file->source_path
 				:	($file->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH);  // JPATH_ROOT . DS . <media_path | file_path>
 
-			$source_file  = \Joomla\CMS\Filesystem\Path::clean($file->source_path . DS . $file->filename);
+			$source_file  = JPath::clean($file->source_path . DS . $file->filename);
 			$dest_file    = basename($source_file);
 
 			/*$contents_on_server = ftp_nlist($ftpConnID[$field_id], $efs_ftp_path); //Returns an array of filenames from the specified directory on success or FALSE on error. 
@@ -369,7 +369,7 @@ class FlexicontentCronTasks
 			if (in_array($dest_file, $contents_on_server)) 
 			{
 				$msg = 'Files exist on remote server: ' . $dest_file;
-				\Joomla\CMS\Log\Log::add($msg, \Joomla\CMS\Log\Log::WARNING, 'com_flexicontent.estorage');
+				JLog::add($msg, JLog::WARNING, 'com_flexicontent.estorage');
 				continue;
 			}*/
 
@@ -383,7 +383,7 @@ class FlexicontentCronTasks
 			if ($ftp_result === FTP_FAILED)
 			{
 				$msg = 'FTP upload failed for file : ' . $source_file . ' to ' . $dest_file;
-				\Joomla\CMS\Log\Log::add($msg, \Joomla\CMS\Log\Log::ERROR, 'com_flexicontent.estorage');
+				JLog::add($msg, JLog::ERROR, 'com_flexicontent.estorage');
 
 				if ($file->id > 0) $query = 'UPDATE #__flexicontent_files '
 					. ' SET checked_out = 0, estorage_fieldid = ' . (int) $field_id
@@ -393,7 +393,7 @@ class FlexicontentCronTasks
 			elseif ($ftp_result === FTP_FINISHED)
 			{
 				$msg = 'FTP upload succeeded for file : ' . $source_file . ' to ' . $dest_file;
-				\Joomla\CMS\Log\Log::add($msg, \Joomla\CMS\Log\Log::INFO, 'com_flexicontent.estorage');
+				JLog::add($msg, JLog::INFO, 'com_flexicontent.estorage');
 
 				// Do not modify original name 'filename_original' which is used during download to set appropriate HTTP header
 				if ($file->id > 0) $query = 'UPDATE #__flexicontent_files '
@@ -407,7 +407,7 @@ class FlexicontentCronTasks
 			else
 			{
 				$msg = 'FTP upload could not be started for uploading file : ' . $source_file . ' to ' . $dest_file;
-				\Joomla\CMS\Log\Log::add($msg, \Joomla\CMS\Log\Log::ERROR, 'com_flexicontent.estorage');
+				JLog::add($msg, JLog::ERROR, 'com_flexicontent.estorage');
 
 				if ($file->id > 0) $query = 'UPDATE #__flexicontent_files '
 					. ' SET checked_out = 0, estorage_fieldid = ' . (int) $field_id
@@ -477,7 +477,7 @@ class FlexicontentCronTasks
 	private function _get_system_messages_html($add_containers=false)
 	{
 		$msgsByType = array();  // Initialise variables.
-		$messages = \Joomla\CMS\Factory::getApplication()->getMessageQueue();  // Get the message queue
+		$messages = JFactory::getApplication()->getMessageQueue();  // Get the message queue
 
 		// Build the sorted message list
 		if (is_array($messages) && !empty($messages)) {
@@ -499,7 +499,7 @@ class FlexicontentCronTasks
 				<?php foreach ($msgsByType as $type => $msgs) : ?>
 					<div class="alert <?php echo $alert_class[$type]; ?>">
 						<button type="button" class="close" data-dismiss="alert">&times;</button>
-						<h4 class="alert-heading"><?php echo \Joomla\CMS\Language\Text::_($type); ?></h4>
+						<h4 class="alert-heading"><?php echo JText::_($type); ?></h4>
 						<?php if ($msgs) : ?>
 							<?php foreach ($msgs as $msg) : ?>
 								<div class="alert-<?php echo $type; ?>"><?php echo $msg; ?></div>

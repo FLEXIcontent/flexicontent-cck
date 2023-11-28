@@ -1,6 +1,6 @@
 <?php
 defined( '_JEXEC' ) or die( 'Restricted access' );
-if ( \Joomla\CMS\Factory::getApplication()->input->getInt('print', 0) ) return;
+if ( JFactory::getApplication()->input->getInt('print', 0) ) return;
 
 // ***********************************************************************************************************
 // Form for Text search, Field Filters, Alpha-Index, Items Total Statistics, Selectors(e.g. per page, orderby)
@@ -81,5 +81,5 @@ $tooltip_class = 'hasTooltip';
 <?php endif; ?>
 
 <?php if (!$clayout_selector) : ?>
-	<input type="hidden" name="clayout" value="<?php \Joomla\CMS\Factory::getApplication()->input->getCmd('clayout', ''); ?>" />
+	<input type="hidden" name="clayout" value="<?php JFactory::getApplication()->input->getCmd('clayout', ''); ?>" />
 <?php endif; ?>

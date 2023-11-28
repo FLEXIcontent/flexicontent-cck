@@ -13,11 +13,11 @@ if ($ext_installed === null)
 
 	// Check if Communit Builder is installed and active
 	$destpath = JPATH_SITE.DS.'components'.DS.'com_profiler';
-	$ext_installed['com_comprofiler'] = \Joomla\CMS\Filesystem\Folder::exists($destpath); // && \Joomla\CMS\Plugin\PluginHelper::isEnabled('system', 'comprofiler');
+	$ext_installed['com_comprofiler'] = JFolder::exists($destpath); // && JPluginHelper::isEnabled('system', 'comprofiler');
 
 	// Check if Jomsocial is installed and active
 	$destpath = JPATH_SITE.DS.'components'.DS.'com_community';
-	$ext_installed['com_community'] = \Joomla\CMS\Filesystem\Folder::exists($destpath); // && \Joomla\CMS\Plugin\PluginHelper::isEnabled('system', 'community');
+	$ext_installed['com_community'] = JFolder::exists($destpath); // && JPluginHelper::isEnabled('system', 'community');
 }
 
 
@@ -39,7 +39,7 @@ if ($link_to_profile === 1)
 	if ($uids)
 	{
 		$query = 'SELECT * FROM #__contact_details WHERE user_id IN (' . implode(',', $uids) . ')';
-		$contacts = \Joomla\CMS\Factory::getDbo()->setQuery($query)->loadObjectList('user_id');
+		$contacts = JFactory::getDbo()->setQuery($query)->loadObjectList('user_id');
 
 		foreach ($uids as $uid)
 		{
@@ -68,8 +68,8 @@ foreach ($values as $value)
 	// Create a new user object if needed
 	if (!isset(static::$users[$user_id]))
 	{
-		$user = new \Joomla\CMS\User\User($user_id);
-		$user->profile = \Joomla\CMS\User\UserHelper::getProfile($user_id);
+		$user = new JUser($user_id);
+		$user->profile = JUserHelper::getProfile($user_id);
 
 		static::$users[$user_id] = $user;
 	}
@@ -85,37 +85,37 @@ foreach ($values as $value)
 	if ($display_jprofile_data === 1)
 	{
 		$html .= '
-		<span class="alert alert-info fc-iblock" style="min-width:50%; margin-bottom:0px;">'.\Joomla\CMS\Language\Text::_('COM_USERS_PROFILE_CORE_LEGEND').'</span><br/>
+		<span class="alert alert-info fc-iblock" style="min-width:50%; margin-bottom:0px;">'.JText::_('COM_USERS_PROFILE_CORE_LEGEND').'</span><br/>
 		<dl class="dl-horizontal">
 			<dt><span class="label">
-				'.\Joomla\CMS\Language\Text::_('COM_USERS_PROFILE_NAME_LABEL').'
+				'.JText::_('COM_USERS_PROFILE_NAME_LABEL').'
 			</span><dt>
 			<dd>
 				'.$user->name.'
 			</dd>
 			<dt><span class="label">
-				'.\Joomla\CMS\Language\Text::_('COM_USERS_PROFILE_USERNAME_LABEL').'
+				'.JText::_('COM_USERS_PROFILE_USERNAME_LABEL').'
 			</span><dt>
 			<dd>
 				'.htmlspecialchars($user->username).'
 			</dd>
 			<dt><span class="label">
-				'.\Joomla\CMS\Language\Text::_('COM_USERS_PROFILE_REGISTERED_DATE_LABEL').'
+				'.JText::_('COM_USERS_PROFILE_REGISTERED_DATE_LABEL').'
 			</span><dt>
 			<dd>
-				'.\Joomla\CMS\HTML\HTMLHelper::_('date', $user->registerDate).'
+				'.JHtml::_('date', $user->registerDate).'
 			</dd>
 			<dt><span class="label">
-				'.\Joomla\CMS\Language\Text::_('COM_USERS_PROFILE_LAST_VISITED_DATE_LABEL').'
+				'.JText::_('COM_USERS_PROFILE_LAST_VISITED_DATE_LABEL').'
 			</span><dt>
 			'.
 			($user->lastvisitDate != '0000-00-00 00:00:00' ? '
 				<dd>
-					'.\Joomla\CMS\HTML\HTMLHelper::_('date', $user->lastvisitDate).'
+					'.JHtml::_('date', $user->lastvisitDate).'
 				</dd>
 			' : '
 				<dd>
-					'.\Joomla\CMS\Language\Text::_('COM_USERS_PROFILE_NEVER_VISITED').'
+					'.JText::_('COM_USERS_PROFILE_NEVER_VISITED').'
 				</dd>
 			').'
 		</dl>
@@ -132,7 +132,7 @@ foreach ($values as $value)
 		{
 			foreach ($matches[1] as $translate_string)
 			{
-				$link_text = str_replace('%%'.$translate_string.'%%', \Joomla\CMS\Language\Text::_($translate_string), $link_text);
+				$link_text = str_replace('%%'.$translate_string.'%%', JText::_($translate_string), $link_text);
 			}
 		}
 
@@ -167,14 +167,14 @@ foreach ($values as $value)
 	/**
 	 * Joomla Contact page
 	 */
-	//Self: \Joomla\CMS\Router\Route::_('index.php?option=com_users&view=profile');
+	//Self: JRoute::_('index.php?option=com_users&view=profile');
 	//User: --
 
 	if ($link_to_profile === 1)
 	{
 		if (!empty($contacts[$user->id]))
 		{
-			$link = \Joomla\CMS\Router\Route::_('index.php?option=com_contact&view=contact&id=' . $contacts[$user->id]->id);
+			$link = JRoute::_('index.php?option=com_contact&view=contact&id=' . $contacts[$user->id]->id);
 			$html .= str_replace('__profile_url__', $link, $link_text);
 		}
 		else
@@ -182,7 +182,7 @@ foreach ($values as $value)
 			$html .= '
 			<div class="fc-iblock alert alert-info">' .
 				' (' . $user->name . ') : ' .
-				\Joomla\CMS\Language\Text::_('FLEXI_FIELD_JP_NO_CONTACT_PAGE_THIS_USER') . '
+				JText::_('FLEXI_FIELD_JP_NO_CONTACT_PAGE_THIS_USER') . '
 			</div>';
 		}
 	}
@@ -191,14 +191,14 @@ foreach ($values as $value)
 	/**
 	 * Community Builder Profile
 	 */
-	//Self: \Joomla\CMS\Router\Route::_('index.php?option=com_comprofiler&task=userprofile');
-	//User: \Joomla\CMS\Router\Route::_('index.php?option=com_comprofiler&task=userprofile&user=' . user_id);
+	//Self: JRoute::_('index.php?option=com_comprofiler&task=userprofile');
+	//User: JRoute::_('index.php?option=com_comprofiler&task=userprofile&user=' . user_id);
 
 	if ($link_to_profile === 2)
 	{
 		if (1 || $ext_installed['com_comprofiler'])
 		{
-			$link = \Joomla\CMS\Router\Route::_('index.php?option=com_comprofiler&task=userprofile&user=' . $user_id);
+			$link = JRoute::_('index.php?option=com_comprofiler&task=userprofile&user=' . $user_id);
 			$html .= str_replace('__profile_url__', $link, $link_text);
 		}
 		else
@@ -255,7 +255,7 @@ foreach ($values as $value)
 		</dl>';
 	}*/
 
-	//$userProfile = \Joomla\CMS\User\UserHelper::getProfile( $user_id );
+	//$userProfile = JUserHelper::getProfile( $user_id );
 	//echo "Main Address :" . $userProfile->profile['address1'];
 
 

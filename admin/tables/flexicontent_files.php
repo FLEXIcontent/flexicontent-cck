@@ -12,7 +12,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 
-class flexicontent_files extends \Joomla\CMS\Table\Table
+class flexicontent_files extends JTable
 {
 	/**
 	 * Primary Key

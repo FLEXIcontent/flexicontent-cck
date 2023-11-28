@@ -37,7 +37,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
-		$field->label = $field->parameters->get('label_form') ? \Joomla\CMS\Language\Text::_($field->parameters->get('label_form')) : \Joomla\CMS\Language\Text::_($field->label);
+		$field->label = $field->parameters->get('label_form') ? JText::_($field->parameters->get('label_form')) : JText::_($field->label);
 
 		// Set field and item objects
 		$this->setField($field);
@@ -50,8 +50,8 @@ class plgFlexicontent_fieldsAddressint extends FCField
 
 
 		// Initialize framework objects and other variables
-		$document = \Joomla\CMS\Factory::getDocument();
-		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
+		$document = JFactory::getDocument();
+		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 
 		$tooltip_class = 'hasTooltip';
 		$add_on_class    = $cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
@@ -206,13 +206,13 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		$_list = count($ac_country_allowed_list) ? array_flip($ac_country_allowed_list) : $list_countries;
 
 		$allowed_country_names = array();
-		$allowed_countries     = array('' => \Joomla\CMS\Language\Text::_('FLEXI_SELECT'));
+		$allowed_countries     = array('' => JText::_('FLEXI_SELECT'));
 
 		foreach($_list as $country_code => $k)
 		{
 			$country_op = new stdClass;
 			$country_op->value = $country_code;
-			$country_op->text  = \Joomla\CMS\Language\Text::_('PLG_FC_ADDRESSINT_CC_' . $country_code);
+			$country_op->text  = JText::_('PLG_FC_ADDRESSINT_CC_' . $country_code);
 
 			$allowed_countries[] = $country_op;
 
@@ -244,11 +244,11 @@ class plgFlexicontent_fieldsAddressint extends FCField
 				$custom_marker_default = 'https://unpkg.com/leaflet@1.5.1/dist/images/marker-icon.png';
 			}
 
-			$imgs = \Joomla\CMS\Filesystem\Folder::files($custom_marker_path_abs);
+			$imgs = JFolder::files($custom_marker_path_abs);
 
 			if ($imgs)
 			{
-				$custom_markers = array('' => \Joomla\CMS\Language\Text::_('FLEXI_SELECT'));
+				$custom_markers = array('' => JText::_('FLEXI_SELECT'));
 				foreach ($imgs as $custom_marker)
 				{
 					$custom_markers_op = new stdClass;
@@ -260,15 +260,15 @@ class plgFlexicontent_fieldsAddressint extends FCField
 				}
 			}
 			$marker_anchors = array(
-				(object) array('value'=>'TopL', 'text'=>\Joomla\CMS\Language\Text::_('FLEXI_TOP') . ' ' . \Joomla\CMS\Language\Text::_('FLEXI_LEFT')),
-				(object) array('value'=>'TopC', 'text'=>\Joomla\CMS\Language\Text::_('FLEXI_TOP') . ' ' . \Joomla\CMS\Language\Text::_('FLEXI_CENTER')),
-				(object) array('value'=>'TopR', 'text'=>\Joomla\CMS\Language\Text::_('FLEXI_TOP') . ' ' . \Joomla\CMS\Language\Text::_('FLEXI_RIGHT')),
-				(object) array('value'=>'MidL', 'text'=>\Joomla\CMS\Language\Text::_('FLEXI_MIDDLE') . ' ' . \Joomla\CMS\Language\Text::_('FLEXI_LEFT')),
-				(object) array('value'=>'MidC', 'text'=>\Joomla\CMS\Language\Text::_('FLEXI_MIDDLE') . ' ' . \Joomla\CMS\Language\Text::_('FLEXI_CENTER')),
-				(object) array('value'=>'MidR', 'text'=>\Joomla\CMS\Language\Text::_('FLEXI_MIDDLE') . ' ' . \Joomla\CMS\Language\Text::_('FLEXI_RIGHT')),
-				(object) array('value'=>'BotL', 'text'=>\Joomla\CMS\Language\Text::_('FLEXI_BOTTOM') . ' ' . \Joomla\CMS\Language\Text::_('FLEXI_LEFT')),
-				(object) array('value'=>'BotC', 'text'=>\Joomla\CMS\Language\Text::_('FLEXI_BOTTOM') . ' ' . \Joomla\CMS\Language\Text::_('FLEXI_CENTER')),
-				(object) array('value'=>'BotR', 'text'=>\Joomla\CMS\Language\Text::_('FLEXI_BOTTOM') . ' ' . \Joomla\CMS\Language\Text::_('FLEXI_RIGHT')),
+				(object) array('value'=>'TopL', 'text'=>JText::_('FLEXI_TOP') . ' ' . JText::_('FLEXI_LEFT')),
+				(object) array('value'=>'TopC', 'text'=>JText::_('FLEXI_TOP') . ' ' . JText::_('FLEXI_CENTER')),
+				(object) array('value'=>'TopR', 'text'=>JText::_('FLEXI_TOP') . ' ' . JText::_('FLEXI_RIGHT')),
+				(object) array('value'=>'MidL', 'text'=>JText::_('FLEXI_MIDDLE') . ' ' . JText::_('FLEXI_LEFT')),
+				(object) array('value'=>'MidC', 'text'=>JText::_('FLEXI_MIDDLE') . ' ' . JText::_('FLEXI_CENTER')),
+				(object) array('value'=>'MidR', 'text'=>JText::_('FLEXI_MIDDLE') . ' ' . JText::_('FLEXI_RIGHT')),
+				(object) array('value'=>'BotL', 'text'=>JText::_('FLEXI_BOTTOM') . ' ' . JText::_('FLEXI_LEFT')),
+				(object) array('value'=>'BotC', 'text'=>JText::_('FLEXI_BOTTOM') . ' ' . JText::_('FLEXI_CENTER')),
+				(object) array('value'=>'BotR', 'text'=>JText::_('FLEXI_BOTTOM') . ' ' . JText::_('FLEXI_RIGHT')),
 			);
 		}
 
@@ -277,7 +277,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		foreach($ac_type_allowed_list as $ac_type)
 		{
 			$lbl = $list_ac_types[$ac_type];
-			$ac_type_options .= '<option value="'.htmlspecialchars($ac_type, ENT_COMPAT, 'UTF-8').'"  '.($ac_type == $ac_types_default ? 'selected="selected"' : '').'>'.\Joomla\CMS\Language\Text::_($lbl)."</option>\n";
+			$ac_type_options .= '<option value="'.htmlspecialchars($ac_type, ENT_COMPAT, 'UTF-8').'"  '.($ac_type == $ac_types_default ? 'selected="selected"' : '').'>'.JText::_($lbl)."</option>\n";
 		}
 
 		// CSS classes of value container
@@ -381,7 +381,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			});
 			";
 
-			if ($max_values) \Joomla\CMS\Language\Text::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
+			if ($max_values) JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
 			$js .= "
 			function addField".$field->id."(el, groupval_box, fieldval_box, params)
 			{
@@ -679,11 +679,11 @@ class plgFlexicontent_fieldsAddressint extends FCField
 
 			$css .= '';
 
-			$remove_button = '<span class="' . $add_on_class . ' fcfield-delvalue ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
-			$move2 = '<span class="' . $add_on_class . ' fcfield-drag-handle ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
+			$remove_button = '<span class="' . $add_on_class . ' fcfield-delvalue ' . $font_icon_class . '" title="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
+			$move2 = '<span class="' . $add_on_class . ' fcfield-drag-handle ' . $font_icon_class . '" title="'.JText::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
 			$add_here = '';
-			$add_here .= $add_position==2 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
-			$add_here .= $add_position==1 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
+			$add_here .= $add_position==2 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.JText::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
+			$add_here .= $add_position==1 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.JText::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
 		}
 
 		// Field not multi-value
@@ -726,10 +726,10 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		// Check if not required, and add buttons  Edit / Skip to allow skipping the value block
 		$enable_disable_btns = !$required /*&& count($required_props)*/ ? '
 			<div class="'.$input_grp_class.' fc-xpended-btns" style="%s">
-				<span class="fcfield-enablevalue ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ENABLE_N_EDIT_VALUE_DATA' ).'" onclick="enableField'.$field->id.'(this);"> '.\Joomla\CMS\Language\Text::_( 'FLEXI_EDIT' ).'</span>
+				<span class="fcfield-enablevalue ' . $font_icon_class . '" title="'.JText::_( 'FLEXI_ENABLE_N_EDIT_VALUE_DATA' ).'" onclick="enableField'.$field->id.'(this);"> '.JText::_( 'FLEXI_EDIT' ).'</span>
 			</div>
 			<div class="'.$input_grp_class.' fc-xpended-btns" style="%s">
-				<span class="fcfield-disablevalue ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_SKIP_VALUE_DATA_ON_SAVE' ).'" onclick="disableField'.$field->id.'(this);"> '.\Joomla\CMS\Language\Text::_( 'FLEXI_SKIP' ).'</span>
+				<span class="fcfield-disablevalue ' . $font_icon_class . '" title="'.JText::_( 'FLEXI_SKIP_VALUE_DATA_ON_SAVE' ).'" onclick="disableField'.$field->id.'(this);"> '.JText::_( 'FLEXI_SKIP' ).'</span>
 			</div>
 		' : '';
 
@@ -742,16 +742,16 @@ class plgFlexicontent_fieldsAddressint extends FCField
 
 			if (count($js_added) < 2)
 			{
-				\Joomla\CMS\Language\Text::script('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ADDRESS_NOT_FOUND_WITHIN_TOLERANCE', false);
-				\Joomla\CMS\Language\Text::script('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ADDRESS_FOUND_WITHIN_TOLERANCE', false);
-				\Joomla\CMS\Language\Text::script('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ADDRESS_NOT_FOUND_AT_MARKER', false);
-				\Joomla\CMS\Language\Text::script('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ADDRESS_ONLY_LONG_LAT', false);
-				\Joomla\CMS\Language\Text::script('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_COUNTRY_NOT_ALLOWED_WARNING', false);
-				\Joomla\CMS\Language\Text::script('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_PLEASE_USE_COUNTRIES', false);
+				JText::script('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ADDRESS_NOT_FOUND_WITHIN_TOLERANCE', false);
+				JText::script('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ADDRESS_FOUND_WITHIN_TOLERANCE', false);
+				JText::script('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ADDRESS_NOT_FOUND_AT_MARKER', false);
+				JText::script('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ADDRESS_ONLY_LONG_LAT', false);
+				JText::script('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_COUNTRY_NOT_ALLOWED_WARNING', false);
+				JText::script('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_PLEASE_USE_COUNTRIES', false);
 			}
 
 			// Load form.js (google maps)
-			$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/addressint/js/form.js', array('version' => FLEXI_VHASH));
+			$document->addScript(JUri::root(true) . '/plugins/flexicontent_fields/addressint/js/form.js', array('version' => FLEXI_VHASH));
 
 			// Load google maps library
 			if ($mapapi_edit === 'googlemap')
@@ -825,8 +825,8 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
 			if (!$add_position) $field->html .= '
 				<div class="input-append input-prepend fc-xpended-btns">
-					<span class="fcfield-addvalue ' . $font_icon_class . ' fccleared" onclick="addField'.$field->id.'(jQuery(this).closest(\'.fc-xpended-btns\').get(0));" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_TO_BOTTOM' ).'">
-						'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_VALUE' ).'
+					<span class="fcfield-addvalue ' . $font_icon_class . ' fccleared" onclick="addField'.$field->id.'(jQuery(this).closest(\'.fc-xpended-btns\').get(0));" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'">
+						'.JText::_( 'FLEXI_ADD_VALUE' ).'
 					</span>
 				</div>';
 		}
@@ -955,7 +955,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
-		$field->label = \Joomla\CMS\Language\Text::_($field->label);
+		$field->label = JText::_($field->label);
 
 		// Set field and item objects
 		$this->setField($field);
@@ -973,8 +973,8 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		{
 			$initialized = 1;
 
-			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$app       = JFactory::getApplication();
+			$document  = JFactory::getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -1114,7 +1114,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		');
 
 		$directions_position = $field->parameters->get('directions_position','after');
-		$directions_link_label = $field->parameters->get('directions_link_label', \Joomla\CMS\Language\Text::_('PLG_FC_ADDRESSINT_GET_DIRECTIONS'));
+		$directions_link_label = $field->parameters->get('directions_link_label', JText::_('PLG_FC_ADDRESSINT_GET_DIRECTIONS'));
 
 		$show_map = $field->parameters->get('show_map','');
 		$show_map = $show_map === 'both' || ($view !== 'item' && $show_map === 'category') || ($view === 'item' && $show_map === 'item');

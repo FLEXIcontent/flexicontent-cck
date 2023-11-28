@@ -23,11 +23,11 @@ class FlexicontentHelperPerm
 		static $permission = null;
 		if ($permission && !$force) return $permission;
 
-		$user_id = \Joomla\CMS\Factory::getUser()->id;
+		$user_id = JFactory::getUser()->id;
 
 		// Return cached data
 		if ( FLEXI_CACHE ) {
-			$catscache = \Joomla\CMS\Factory::getCache('com_flexicontent_cats');  // Get desired cache group
+			$catscache = JFactory::getCache('com_flexicontent_cats');  // Get desired cache group
 			$catscache->setCaching(1); 		              // Force cache ON
 			$catscache->setLifeTime(FLEXI_CACHE_TIME);  // Set expire time (default is 1 hour)
 
@@ -49,22 +49,22 @@ class FlexicontentHelperPerm
 
 	static function getUserPerms($user_id = null)
 	{
-		$cparams   = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+		$cparams   = JComponentHelper::getParams('com_flexicontent');
 
 		// Handle jcomments integration
-		$JComments_Installed = \Joomla\CMS\Plugin\PluginHelper::isEnabled('system', 'jcomments') &&  \Joomla\CMS\Plugin\PluginHelper::isEnabled('content', 'jcomments');
+		$JComments_Installed = JPluginHelper::isEnabled('system', 'jcomments') &&  JPluginHelper::isEnabled('content', 'jcomments');
 
 		// Handle komento integration
-		$Komento_Installed = \Joomla\CMS\Plugin\PluginHelper::isEnabled('system', 'komento') && \Joomla\CMS\Plugin\PluginHelper::isEnabled('content', 'komento');
+		$Komento_Installed = JPluginHelper::isEnabled('system', 'komento') && JPluginHelper::isEnabled('content', 'komento');
 
 		// Find permissions for given user id
-		$user = $user_id ? \Joomla\CMS\Factory::getUser($user_id) : \Joomla\CMS\Factory::getUser();  // no user id given, use current user)
+		$user = $user_id ? JFactory::getUser($user_id) : JFactory::getUser();  // no user id given, use current user)
 		$user_id = $user->id;
 		$permission = new stdClass;
 
 		/**
 		 * This is the Super User Privilege of Global Configuration	(core.admin ACTION allowed on ROOT ASSET: 'root.1')
-		 * Alternative way is \Joomla\CMS\Access\Access::check($user->id, 'core.admin', 'root.1'), but this will fail with emergency root user
+		 * Alternative way is JAccess::check($user->id, 'core.admin', 'root.1'), but this will fail with emergency root user
 		 */
 		$permission->SuperAdmin		= $user->authorise('core.admin', 'root.1');
 
@@ -211,9 +211,9 @@ class FlexicontentHelperPerm
 	static function getAllowedCats( &$user, $actions_allowed=array('core.create', 'core.edit', 'core.edit.own'), $require_all=true, $check_published = false, $specific_catids=false, $find_first = false )
 	{
 		// Return cached data
-		$user_id = $user ? $user->id : \Joomla\CMS\Factory::getUser()->id;
+		$user_id = $user ? $user->id : JFactory::getUser()->id;
 		if (FLEXI_CACHE) {
-			$catscache = \Joomla\CMS\Factory::getCache('com_flexicontent_cats');  // Get desired cache group
+			$catscache = JFactory::getCache('com_flexicontent_cats');  // Get desired cache group
 			$catscache->setCaching(1); 		              // Force cache ON
 			$catscache->setLifeTime(FLEXI_CACHE_TIME);  // set expire time (default is 1 hour)
 
@@ -232,11 +232,11 @@ class FlexicontentHelperPerm
 	static function _getAllowedCats( $user_id, $actions_allowed, $require_all, $check_published, $specific_catids, $find_first)
 	{
 		global $globalcats;
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 		$usercats = array();
 
 		// -- passing user_id parameter to this function allows to cache per user
-		$user = \Joomla\CMS\Factory::getUser($user_id);
+		$user = JFactory::getUser($user_id);
 
 		$allcats = FlexicontentHelperPerm::returnAllCats ($check_published, $specific_catids);
 
@@ -319,8 +319,8 @@ class FlexicontentHelperPerm
 
 		if(!isset($elements[$uid][$section][$action]) || $force) {
 			// Get database and use objects
-			$db = \Joomla\CMS\Factory::getDbo();
-			$user = \Joomla\CMS\Factory::getUser($uid);
+			$db = JFactory::getDbo();
+			$user = JFactory::getUser($uid);
 
 			// Query the assets table to retrieve the asset names for the specified section
 			$query = "SELECT name FROM #__assets WHERE name like '{$asset_partial}.%';";
@@ -374,7 +374,7 @@ class FlexicontentHelperPerm
 		if (!isset($actions[$uid][$asset]) || $force)
 		{
 			// Get user object
-			$user = \Joomla\CMS\Factory::getUser($uid);
+			$user = JFactory::getUser($uid);
 
 			// This string will be removed from action names to make them shorter e.g. will make 'core.edit.own' to be 'edit.own'
 			$action_start = ($dbsection == 'category' || $dbsection == 'article' ) ? 'core.' : 'flexicontent.';
@@ -383,7 +383,7 @@ class FlexicontentHelperPerm
 			$actions[$uid][$asset] = array();
 
 			// Retrieve all available user actions for the section
-			$actions_arr = \Joomla\CMS\Access\Access::getActionsFromFile(
+			$actions_arr = JAccess::getActionsFromFile(
 				JPATH_ADMINISTRATOR . '/components/' . 'com_flexicontent' . '/access.xml',
 				"/access/section[@name='" . $dbsection . "']/"
 			);
@@ -459,7 +459,7 @@ class FlexicontentHelperPerm
 	static function getPermAny($action = null, $user_id = null, $assetname='com_flexicontent')
 	{
 		// Find permissions for given user id
-		$user = $user_id ? \Joomla\CMS\Factory::getUser($user_id) : \Joomla\CMS\Factory::getUser();  // no user id given, use current user)
+		$user = $user_id ? JFactory::getUser($user_id) : JFactory::getUser();  // no user id given, use current user)
 		$user_id = $user->id;
 
 		// Return already calculated data
@@ -470,10 +470,10 @@ class FlexicontentHelperPerm
 
 		if (!$permsAny[$user_id][$action])
 		{
-			$permsAny[$user_id][$action] = \Joomla\CMS\Access\Access::check($user_id, $action, $assetname);
+			$permsAny[$user_id][$action] = JAccess::check($user_id, $action, $assetname);
 		}
 
-		//if ($permsAny[$user_id][$action] === NULL)  // Soft deny check was broken in J3.6.5, use \Joomla\CMS\Access\Access::check above
+		//if ($permsAny[$user_id][$action] === NULL)  // Soft deny check was broken in J3.6.5, use JAccess::check above
 		if (!$permsAny[$user_id][$action])
 		{
 			// Get Allowed Cats which is cacheable !

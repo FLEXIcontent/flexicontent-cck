@@ -12,18 +12,18 @@
 defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
-\Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html');
+JHtml::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html');
 
-$app      = \Joomla\CMS\Factory::getApplication();
+$app      = JFactory::getApplication();
 $option   = $app->input->get('option', '', 'CMD');
-$user     = \Joomla\CMS\Factory::getUser();
+$user     = JFactory::getUser();
 $template = $app->getTemplate();
-$session  = \Joomla\CMS\Factory::getSession();
+$session  = JFactory::getSession();
 $hlpname  = 'fcbase';
 
 $btn_class = 'btn';
 $tooltip_class = 'hasTooltip';
-$edit_item_txt = \Joomla\CMS\Language\Text::_( 'FLEXI_EDIT_ITEM' );
+$edit_item_txt = JText::_( 'FLEXI_EDIT_ITEM' );
 
 // hide dashboard buttons
 $dashboard_buttons_hide = $this->params->get('dashboard_buttons_hide', array());
@@ -75,7 +75,7 @@ $skip_sliders = $skip_sliders && $this->dopostinstall && $this->allplgpublish &&
 if (version_compare(PHP_VERSION, FLEXI_PHP_NEEDED, '<'))
 {
 	echo '<div class="fc-mssg fc-error">';
-	echo \Joomla\CMS\Language\Text::sprintf( 'FLEXI_UPGRADE_PHP_VERSION_GE', FLEXI_PHP_NEEDED) . '<br/>';
+	echo JText::sprintf( 'FLEXI_UPGRADE_PHP_VERSION_GE', FLEXI_PHP_NEEDED) . '<br/>';
 	echo '</div>';
 	return false;
 }
@@ -115,7 +115,7 @@ $items_task = 'task=items.';
 
 		if (version_compare(PHP_VERSION, FLEXI_PHP_RECOMMENDED, '<'))
 		{
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::sprintf( 'PHP version >= %s is recommended', FLEXI_PHP_RECOMMENDED), 'warning');
+			$app->enqueueMessage(JText::sprintf( 'PHP version >= %s is recommended', FLEXI_PHP_RECOMMENDED), 'warning');
 		}
 		$_title = "PHP/DB Requirements";
 
@@ -130,12 +130,12 @@ $items_task = 'task=items.';
 				foreach($php_lims as $type => $html) {
 					$mssg .= implode('<br/>', $html);
 				}
-				$mssg .= \Joomla\CMS\Language\Text::sprintf(
+				$mssg .= JText::sprintf(
 					'<br/>(you may have to contact your web hosting company for setting these for you)<br/>
 					For more information on changing these limitations, please see this article: %s',
 					'<a href="http://www.flexicontent.org/documentation/faq/78-installation-upgrade/591">PHP/DB Requirements</a>'
 				);
-				\Joomla\CMS\Factory::getApplication()->enqueueMessage($mssg, 'warning', '');
+				JFactory::getApplication()->enqueueMessage($mssg, 'warning', '');
 			}
 		}
 
@@ -152,7 +152,7 @@ $items_task = 'task=items.';
 		if (!$this->dopostinstall)
 		{
 			echo '<div class="fc-mssg fc-warning">';
-			echo \Joomla\CMS\Language\Text::_( 'FLEXI_DO_POSTINSTALL' );
+			echo JText::_( 'FLEXI_DO_POSTINSTALL' );
 			echo '</div>';
 		}
 		else if ( !$this->existmenu || !$this->existcat || !$config_saved )
@@ -167,10 +167,10 @@ $items_task = 'task=items.';
 				$conf_link = 'index.php?option=com_config&view=component&component=com_flexicontent&path=';
 				$conf_link = '<a href="'.$conf_link.'" class="btn btn-warning">';
 
-				echo \Joomla\CMS\Language\Text::sprintf( 'FLEXI_CONFIGURATION_NOT_SAVED', $conf_link.\Joomla\CMS\Language\Text::_("FLEXI_CONFIG").'</a>' ) . '<br/>';
+				echo JText::sprintf( 'FLEXI_CONFIGURATION_NOT_SAVED', $conf_link.JText::_("FLEXI_CONFIG").'</a>' ) . '<br/>';
 			}
-			else if (!$this->existcat)	echo \Joomla\CMS\Language\Text::_( 'FLEXI_NO_CATEGORIES_CREATED' );
-			else if (!$this->existmenu)	echo \Joomla\CMS\Language\Text::_( 'FLEXI_NO_MENU_CREATED' );
+			else if (!$this->existcat)	echo JText::_( 'FLEXI_NO_CATEGORIES_CREATED' );
+			else if (!$this->existmenu)	echo JText::_( 'FLEXI_NO_MENU_CREATED' );
 			echo '</div>';
 		}
 		?>
@@ -183,13 +183,13 @@ $items_task = 'task=items.';
 
 		<?php if (empty($skip_content_fieldset)): ?>
 		<fieldset class="fc-board-set">
-			<h3 class="fc-board-header"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_NAV_SD_CONTENT_EDITING' );?></h3>
+			<h3 class="fc-board-header"><?php echo JText::_( 'FLEXI_NAV_SD_CONTENT_EDITING' );?></h3>
 
 			<div class="fc-board-set-inner"><?php
 			if (!isset($sbtns['items']))
 			{
 				$link = 'index.php?option='.$option.'&amp;view=items';
-				FlexicontentViewFlexicontent::quickiconButton( $link, '', 'icon-items', \Joomla\CMS\Language\Text::_( 'FLEXI_ITEMS' ) );
+				FlexicontentViewFlexicontent::quickiconButton( $link, '', 'icon-items', JText::_( 'FLEXI_ITEMS' ) );
 			}
 			if (!isset($sbtns['additem']))
 			{
@@ -202,20 +202,20 @@ $items_task = 'task=items.';
 				if ($CanAddAny)
 				{
 					$link = 'index.php?option='.$option.'&amp;view=types&amp;tmpl=component&amp;layout=typeslist&amp;action=new';
-					FlexicontentViewFlexicontent::quickiconButton($link, '', 'icon-apply', \Joomla\CMS\Language\Text::_('FLEXI_NEW_ITEM' ), 1, 1, 1200, 0);
+					FlexicontentViewFlexicontent::quickiconButton($link, '', 'icon-apply', JText::_('FLEXI_NEW_ITEM' ), 1, 1, 1200, 0);
 				}
 			}
 			/*if ($this->perms->CanArchives && !isset($sbtns['archives']))
 			{
 				$link = 'index.php?option='.$option.'&amp;view=archive';
-				FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-archive.png', \Joomla\CMS\Language\Text::_( 'FLEXI_ARCHIVE' ) );
+				FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-archive.png', JText::_( 'FLEXI_ARCHIVE' ) );
 			}*/
 			if ($this->perms->CanCats)
 			{
 				if (!isset($sbtns['cats']))
 				{
 					$link = 'index.php?option='.$option.'&amp;view=categories';
-					FlexicontentViewFlexicontent::quickiconButton( $link, '' ,'icon-folder', \Joomla\CMS\Language\Text::_( 'FLEXI_CATEGORIES' ) );
+					FlexicontentViewFlexicontent::quickiconButton( $link, '' ,'icon-folder', JText::_( 'FLEXI_CATEGORIES' ) );
 				}
 				if (!isset($sbtns['addcat']))
 				{
@@ -223,7 +223,7 @@ $items_task = 'task=items.';
 					if ($canCreateAny)
 					{
 						$link = 'index.php?option='.$option.'&amp;view=category';
-						FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-folder-plus', \Joomla\CMS\Language\Text::_( 'FLEXI_NEW_CATEGORY' ) );
+						FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-folder-plus', JText::_( 'FLEXI_NEW_CATEGORY' ) );
 					}
 				}
 			}
@@ -241,15 +241,15 @@ $items_task = 'task=items.';
 				{
 					case 1:
 						$link = 'index.php?option=com_jcomments&amp;task=view&amp;fog=com_flexicontent';
-						$link_title = \Joomla\CMS\Language\Text::_('JComments');
+						$link_title = JText::_('JComments');
 						break;
 					case 3:
 						$link = 'index.php?option=com_komento';
-						$link_title = \Joomla\CMS\Language\Text::_('Komento');
+						$link_title = JText::_('Komento');
 						break;
 					default:
 						$link = $this->params->get('comments_admin_link');
-						$link_title = \Joomla\CMS\Language\Text::_('FLEXI_COMMENTS');
+						$link_title = JText::_('FLEXI_COMMENTS');
 						break;
 				}
 				FlexicontentViewFlexicontent::quickiconButton( $link, '', 'icon-comment', $link_title, 1 );
@@ -258,7 +258,7 @@ $items_task = 'task=items.';
 			{
 				echo '<span class="fc-board-button_sep"></span>';
 				$link = '';
-				FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-comment' , \Joomla\CMS\Language\Text::_( 'FLEXI_JCOMMENTS_MISSING' ), 1 );
+				FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-comment' , JText::_( 'FLEXI_JCOMMENTS_MISSING' ), 1 );
 			}
 			?>
 			</div>
@@ -268,7 +268,7 @@ $items_task = 'task=items.';
 
 		<?php if (empty($skip_types_fieldset)): ?>
 		<fieldset class="fc-board-set">
-			<h3 class="fc-board-header"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_NAV_SD_TYPES_N_FIELDS' );?></h3>
+			<h3 class="fc-board-header"><?php echo JText::_( 'FLEXI_NAV_SD_TYPES_N_FIELDS' );?></h3>
 
 			<div class="fc-board-set-inner"><?php
 			$add_sep = false;
@@ -276,12 +276,12 @@ $items_task = 'task=items.';
 			{
 				if (!isset($sbtns['types'])) {
 					$link = 'index.php?option='.$option.'&amp;view=types';
-					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-briefcase', \Joomla\CMS\Language\Text::_( 'FLEXI_TYPES' ) );
+					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-briefcase', JText::_( 'FLEXI_TYPES' ) );
 					$add_sep = true;
 				}
 				if (!isset($sbtns['addtype'])) {
 					$link = 'index.php?option='.$option.'&amp;view=type';
-					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-file-add', \Joomla\CMS\Language\Text::_( 'FLEXI_NEW_TYPE' ) );
+					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-file-add', JText::_( 'FLEXI_NEW_TYPE' ) );
 					$add_sep = true;
 				}
 			}
@@ -289,12 +289,12 @@ $items_task = 'task=items.';
 			{
 				if (!isset($sbtns['fields'])) {
 					$link = 'index.php?option='.$option.'&amp;view=fields';
-					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-signup', \Joomla\CMS\Language\Text::_( 'FLEXI_FIELDS' ) );
+					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-signup', JText::_( 'FLEXI_FIELDS' ) );
 					$add_sep = true;
 				}
 				if (!isset($sbtns['addfield'])) {
 					$link = 'index.php?option='.$option.'&amp;view=field';
-					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-file-add', \Joomla\CMS\Language\Text::_( 'FLEXI_NEW_FIELD' ) );
+					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-file-add', JText::_( 'FLEXI_NEW_FIELD' ) );
 					$add_sep = true;
 				}
 				$addTagsBtns  = $this->perms->CanTags && (!isset($sbtns['tags']) || !isset($sbtns['addtag']));
@@ -306,17 +306,17 @@ $items_task = 'task=items.';
 			{
 				if (!isset($sbtns['tags'])) {
 					$link = 'index.php?option='.$option.'&amp;view=tags';
-					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-tags', \Joomla\CMS\Language\Text::_( 'FLEXI_TAGS' ) );
+					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-tags', JText::_( 'FLEXI_TAGS' ) );
 				}
 				if (!isset($sbtns['addtag'])) {
 					$link = 'index.php?option='.$option.'&amp;view=tag';
-					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-file-add', \Joomla\CMS\Language\Text::_( 'FLEXI_NEW_TAG' ) );
+					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-file-add', JText::_( 'FLEXI_NEW_TAG' ) );
 				}
 			}
 			if ($this->perms->CanFiles && !isset($sbtns['files']))
 			{
 				$link = 'index.php?option='.$option.'&amp;view=filemanager';
-				FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-images' , \Joomla\CMS\Language\Text::_( 'FLEXI_FILEMANAGER' ) );
+				FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-images' , JText::_( 'FLEXI_FILEMANAGER' ) );
 			}
 			?>
 			</div>
@@ -326,39 +326,39 @@ $items_task = 'task=items.';
 
 		<?php if (empty($skip_viewing_fieldset)): ?>
 		<fieldset class="fc-board-set">
-			<h3 class="fc-board-header"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_NAV_SD_CONTENT_VIEWING' );?></h3>
+			<h3 class="fc-board-header"><?php echo JText::_( 'FLEXI_NAV_SD_CONTENT_VIEWING' );?></h3>
 
 			<div class="fc-board-set-inner"><?php
 			$add_sep = false;
 			if ($this->perms->CanTemplates && !isset($sbtns['templates']))
 			{
 				$link = 'index.php?option='.$option.'&amp;view=templates';
-				FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-eye', \Joomla\CMS\Language\Text::_( 'FLEXI_TEMPLATES' ) );
+				FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-eye', JText::_( 'FLEXI_TEMPLATES' ) );
 				$add_sep = true;
 			}
 			if ($this->perms->CanIndex && !isset($sbtns['index']))
 			{
 				$link = 'index.php?option='.$option.'&amp;view=search';
-				FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-search', \Joomla\CMS\Language\Text::_( 'FLEXI_SEARCH_INDEXES' ) );
+				FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-search', JText::_( 'FLEXI_SEARCH_INDEXES' ) );
 				$add_sep = true;
 			}
 
-			$CanSeeSearchLogs = \Joomla\CMS\Factory::getUser()->authorise('core.manage', 'com_search');
+			$CanSeeSearchLogs = JFactory::getUser()->authorise('core.manage', 'com_search');
 
 			if ($CanSeeSearchLogs)
 			{
-				$params = \Joomla\CMS\Component\ComponentHelper::getParams('com_search');
+				$params = JComponentHelper::getParams('com_search');
 				$enable_log_searches = $params->get('enabled');
 				if ($enable_log_searches)
 				{
 					$link = 'index.php?option=com_search&tmpl=component';
-					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-book', \Joomla\CMS\Language\Text::_( 'FLEXI_NAV_SD_SEARCH_LOGS' ), $modal = 1 );
+					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-book', JText::_( 'FLEXI_NAV_SD_SEARCH_LOGS' ), $modal = 1 );
 					$add_sep = true;
 				}
 				else
 				{
 					$link = 'index.php?option=com_config&view=component&component=com_search&path=';
-					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-book', \Joomla\CMS\Language\Text::_( 'FLEXI_NAV_SD_SEARCH_LOGS' ), $modal = 1, $close_function = 'function(){window.location.reload(false)}' );
+					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-book', JText::_( 'FLEXI_NAV_SD_SEARCH_LOGS' ), $modal = 1, $close_function = 'function(){window.location.reload(false)}' );
 					$add_sep = true;
 				}
 			}
@@ -369,7 +369,7 @@ $items_task = 'task=items.';
 					echo '<span class="fc-board-button_sep"></span>';
 
 				$link = 'index.php?option='.$option.'&amp;view=stats';
-				FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-chart', \Joomla\CMS\Language\Text::_( 'FLEXI_STATISTICS' ) );
+				FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-chart', JText::_( 'FLEXI_STATISTICS' ) );
 			}
 			?>
 			</div>
@@ -379,29 +379,29 @@ $items_task = 'task=items.';
 
 		<?php if (empty($skip_users_fieldset)): ?>
 		<fieldset class="fc-board-set">
-			<h3 class="fc-board-header"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_NAV_SD_USERS_N_GROUPS' );?></h3>
+			<h3 class="fc-board-header"><?php echo JText::_( 'FLEXI_NAV_SD_USERS_N_GROUPS' );?></h3>
 
 			<div class="fc-board-set-inner"><?php
 			if ($this->perms->CanAuthors)
 			{
 				if (!isset($sbtns['users'])) {
 					$link = 'index.php?option='.$option.'&amp;view=users';
-					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-users', \Joomla\CMS\Language\Text::_( 'FLEXI_USERS' ) );
+					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-users', JText::_( 'FLEXI_USERS' ) );
 				}
 				if (!isset($sbtns['adduser'])) {
 					$link = 'index.php?option='.$option.'&amp;task=users.add';
-					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-file-add', \Joomla\CMS\Language\Text::_( 'FLEXI_ADD_USER' ) );
+					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-file-add', JText::_( 'FLEXI_ADD_USER' ) );
 				}
 			}
 			if ($this->perms->CanGroups)
 			{
 				if (!isset($sbtns['groups'])) {
 					$link = 'index.php?option='.$option.'&amp;view=groups';
-					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-users', \Joomla\CMS\Language\Text::_( 'FLEXI_GROUPS' ) );
+					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-users', JText::_( 'FLEXI_GROUPS' ) );
 				}
 				if (!isset($sbtns['addgroup'])) {
 					$link = 'index.php?option='.$option.'&amp;task=groups.add';
-					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-file-add', \Joomla\CMS\Language\Text::_( 'FLEXI_ADD_GROUP' ) );
+					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-file-add', JText::_( 'FLEXI_ADD_GROUP' ) );
 				}
 			}
 			?>
@@ -412,14 +412,14 @@ $items_task = 'task=items.';
 
 		<?php if (empty($skip_expert_fieldset)): ?>
 		<fieldset class="fc-board-set">
-			<h3 class="fc-board-header"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_NAV_SD_EXPERT_USAGE' );?></h3>
+			<h3 class="fc-board-header"><?php echo JText::_( 'FLEXI_NAV_SD_EXPERT_USAGE' );?></h3>
 
 			<div class="fc-board-set-inner"><?php
 			$add_sep = false;
 			if ($this->perms->CanImport && !isset($sbtns['import']))
 			{
 				$link = 'index.php?option='.$option.'&amp;view=import';
-				FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-upload', \Joomla\CMS\Language\Text::_( 'FLEXI_IMPORT' ) );
+				FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-upload', JText::_( 'FLEXI_IMPORT' ) );
 				$add_sep = true;
 			}
 			if ($this->perms->CanPlugins)
@@ -429,21 +429,21 @@ $items_task = 'task=items.';
 
 				if (!isset($sbtns['plgfields'])) {
 					$link = 'index.php?option=com_plugins&amp;filter_folder=flexicontent_fields';
-					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-power-cord', \Joomla\CMS\Language\Text::_( 'FLEXI_PLUGINS' ). ' - Fields', 1 );
+					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-power-cord', JText::_( 'FLEXI_PLUGINS' ). ' - Fields', 1 );
 				}
 				if (!isset($sbtns['plgsystem'])) {
-					$link = 'index.php?option=com_plugins&amp;filter_folder=system&amp;filter_search=flexi&amp;tmpl=component';
-					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-cube', \Joomla\CMS\Language\Text::_( 'FLEXI_PLUGINS' ). ' - System', 1 );
+					$link = 'index.php?option=com_plugins&amp;filter_folder=system&amp;filter_search=flexi';
+					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-cube', JText::_( 'FLEXI_PLUGINS' ). ' - System', 1 );
 				}
 				if (!isset($sbtns['plgflexicontent'])) {
-					$link = 'index.php?option=com_plugins&amp;filter_folder=flexicontent&amp;tmpl=component';
-					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-puzzle', \Joomla\CMS\Language\Text::_( 'FLEXI_PLUGINS' ). ' - Flexicontent', 1 );
+					$link = 'index.php?option=com_plugins&amp;filter_folder=flexicontent';
+					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-puzzle', JText::_( 'FLEXI_PLUGINS' ). ' - Flexicontent', 1 );
 				}
 			}
 			if ( $this->perms->CanEdit )
 			{
 				//$link = 'index.php?option=com_content&amp;view=featured';
-				//if (!isset($sbtns['featured'])) FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-featured.png', \Joomla\CMS\Language\Text::_( 'FLEXI_FEATURED' ), 1 );
+				//if (!isset($sbtns['featured'])) FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-featured.png', JText::_( 'FLEXI_FEATURED' ), 1 );
 			}
 			?>
 			</div>
@@ -453,18 +453,18 @@ $items_task = 'task=items.';
 
 		<?php if ($this->params->get('support_url')): ?>
 		<fieldset class="fc-board-set">
-			<h3 class="fc-board-header"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_HELP' );?></h3>
+			<h3 class="fc-board-header"><?php echo JText::_( 'FLEXI_HELP' );?></h3>
 
 			<div class="fc-board-set-inner"><?php
 			$link = $this->params->get('support_url');
-			FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-help', \Joomla\CMS\Language\Text::_( 'FLEXI_SUPPORT' ), 1 );
+			FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-help', JText::_( 'FLEXI_SUPPORT' ), 1 );
 
 			// Read installation file
 			/*$manifest_path = JPATH_ADMINISTRATOR .DS. 'components' .DS. 'com_flexicontent' .DS. 'flexicontent.xml';
-			$com_xml = \Joomla\CMS\Installer\Installer::parseXMLInstallFile( $manifest_path );
+			$com_xml = JInstaller::parseXMLInstallFile( $manifest_path );
 			if (!empty($com_xml['authorUrl']))
 			{
-				FlexicontentViewFlexicontent::quickiconButton( $com_xml['authorUrl'], 'icon-48-dashboard.png', \Joomla\CMS\Language\Text::_( 'FLEXI_ABOUT' ), 1 );
+				FlexicontentViewFlexicontent::quickiconButton( $com_xml['authorUrl'], 'icon-48-dashboard.png', JText::_( 'FLEXI_ABOUT' ), 1 );
 			}*/
 			?>
 			</div>
@@ -484,7 +484,7 @@ $items_task = 'task=items.';
 				if(jQuery.trim(jQuery('#displayfversion').html())=='') {
 					jQuery('#displayfversion').html('<p><img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" style=\"vertical-align: middle;\"><\/p>');
 					jQuery.ajax({
-						url: 'index.php?option=com_flexicontent&task=flexicontent.fcversioncompare&format=raw&". \Joomla\CMS\Session\Session::getFormToken() ."=1',
+						url: 'index.php?option=com_flexicontent&task=flexicontent.fcversioncompare&format=raw&". JSession::getFormToken() ."=1',
 						success: function(str) {
 							jQuery('#displayfversion').html(str);
 							jQuery('#displayfversion').parent().css('height', 'auto');
@@ -495,7 +495,7 @@ $items_task = 'task=items.';
 			");
 			echo '
 			<fieldset class="fc-board-set">
-				<h3 class="fc-board-header">'.\Joomla\CMS\Language\Text::_( 'FLEXI_UPDATE_CHECK' ).'</h3>
+				<h3 class="fc-board-header">'.JText::_( 'FLEXI_UPDATE_CHECK' ).'</h3>
 				<div class="fc-board-set-inner">
 					<div id="displayfversion" style="float: left;"></div>
 				</div>
@@ -512,36 +512,36 @@ $items_task = 'task=items.';
 		if (!$this->dopostinstall || !$this->allplgpublish) :
 
 			// Make sure POST-INSTALLATION Task slider is open
-			echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.startAccordion', 'fc-dash-sliders', array('active' => 'fc-dash-sliders-postinstall'));
+			echo JHtml::_('bootstrap.startAccordion', 'fc-dash-sliders', array('active' => 'fc-dash-sliders-postinstall'));
 
-			$title = \Joomla\CMS\Language\Text::_( 'FLEXI_POST_INSTALL' );
-			echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addSlide', 'fc-dash-sliders', $title, 'fc-dash-sliders-postinstall' );
+			$title = JText::_( 'FLEXI_POST_INSTALL' );
+			echo JHtml::_('bootstrap.addSlide', 'fc-dash-sliders', $title, 'fc-dash-sliders-postinstall' );
 			echo $this->loadTemplate('postinstall');
-			echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endSlide');
+			echo JHtml::_('bootstrap.endSlide');
 
-			echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endAccordion');
+			echo JHtml::_('bootstrap.endAccordion');
 
 
 		elseif (!$skip_sliders && $config_saved) :
 
-			echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.startAccordion', 'fc-dash-sliders', array());
+			echo JHtml::_('bootstrap.startAccordion', 'fc-dash-sliders', array());
 
 			ob_start(); ?>
 
 			<?php
-				echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addSlide', 'fc-dash-sliders', $_title, 'fc-dash-sliders-requirements' );
+				echo JHtml::_('bootstrap.addSlide', 'fc-dash-sliders', $_title, 'fc-dash-sliders-requirements' );
 				echo '<div class="fc-mssg fc-note" style="margin: 24px; display: inline-block;">';
 				echo '<b>PHP/DB requirements</b><br/>';
 				foreach($php_lims as $type => $html) {
 					echo implode('<br/>', $html);
 				}
-				echo \Joomla\CMS\Language\Text::sprintf(
+				echo JText::sprintf(
 					'<br/>(you may have to contact your web hosting company for setting these for you)<br/>
 					For more information on changing these limitations, please see this article: %s',
 					'<a href="http://www.flexicontent.org/documentation/faq/78-installation-upgrade/591">PHP/DB Requirements</a>'
 				);
 				echo '</div>';
-				echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endSlide');
+				echo JHtml::_('bootstrap.endSlide');
 			?>
 
 			<?php $fc_requirements = ob_get_clean();
@@ -552,17 +552,17 @@ $items_task = 'task=items.';
 
 
 			<?php if (!isset($ssliders['pending'])):
-				$title = \Joomla\CMS\Language\Text::_( 'FLEXI_PENDING_SLIDER' ).' - <span class="badge bg-warning badge-warning">'.$this->totalrows['pending'].'</span>';
-				echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addSlide', 'fc-dash-sliders', $title, 'fc-dash-sliders-pending' );
+				$title = JText::_( 'FLEXI_PENDING_SLIDER' ).' - <span class="badge bg-warning badge-warning">'.$this->totalrows['pending'].'</span>';
+				echo JHtml::_('bootstrap.addSlide', 'fc-dash-sliders', $title, 'fc-dash-sliders-pending' );
 				$show_all_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_state=PE';
 			?>
 			<table class="table">
 
 				<thead>
 				<tr>
-					<th><?php echo \Joomla\CMS\Language\Text::_('FLEXI_TITLE'); ?></th>
-					<th><?php echo \Joomla\CMS\Language\Text::_('FLEXI_CREATED'); ?></th>
-					<th><?php echo \Joomla\CMS\Language\Text::_('FLEXI_AUTHOR'); ?></th>
+					<th><?php echo JText::_('FLEXI_TITLE'); ?></th>
+					<th><?php echo JText::_('FLEXI_CREATED'); ?></th>
+					<th><?php echo JText::_('FLEXI_AUTHOR'); ?></th>
 				</tr>
 				</thead>
 
@@ -581,43 +581,43 @@ $items_task = 'task=items.';
 				<tr>
 					<td>
 					<?php
-					echo \Joomla\CMS\HTML\HTMLHelper::_($hlpname . '.edit_link', $row, $i, $row->canEdit, $config = array(
+					echo JHtml::_($hlpname . '.edit_link', $row, $i, $row->canEdit, $config = array(
 						'ctrl'     => 'items',
 						'view'     => 'item',
-						'onclick'  => 'var url = jQuery(this).attr(\'data-href\'); var the_dialog = fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, fc_edit_fcitem_modal_close, {title:\'' . \Joomla\CMS\Language\Text::_('FLEXI_EDIT', true) . '\', loadFunc: fc_edit_fcitem_modal_load}); return false;" ',
+						'onclick'  => 'var url = jQuery(this).attr(\'data-href\'); var the_dialog = fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, fc_edit_fcitem_modal_close, {title:\'' . JText::_('FLEXI_EDIT', true) . '\', loadFunc: fc_edit_fcitem_modal_load}); return false;" ',
 					));
 					?>
 					</td>
-					<td><?php echo \Joomla\CMS\HTML\HTMLHelper::_('date',  $row->created); ?></td>
+					<td><?php echo JHtml::_('date',  $row->created); ?></td>
 					<td><?php echo $row->creator; ?></td>
 				</tr>
 				<?php $k = 1 - $k; } ?>
 				<tr>
 					<td colspan="3">
 						... &nbsp;
-						<?php echo '<span class="'.$btn_class.'" onclick="window.open(\''.$show_all_link.'\')" >' . \Joomla\CMS\Language\Text::_('FLEXI_SHOW_ALL') . ' ( ' . \Joomla\CMS\Language\Text::_('FLEXI_ITEMS_MANAGER') . ' )</span><br/>'; ?>
+						<?php echo '<span class="'.$btn_class.'" onclick="window.open(\''.$show_all_link.'\')" >' . JText::_('FLEXI_SHOW_ALL') . ' ( ' . JText::_('FLEXI_ITEMS_MANAGER') . ' )</span><br/>'; ?>
 					</td>
 				</tr>
 				</tbody>
 
 			</table>
 			<?php
-				echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endSlide');
+				echo JHtml::_('bootstrap.endSlide');
 			endif; /* !isset($ssliders['pending']) */ ?>
 
 
 			<?php if (!isset($ssliders['revised'])):
-				$title = \Joomla\CMS\Language\Text::_( 'FLEXI_REVISED_VER_SLIDER' ).' - <span class="badge bg-warning badge-warning">'.$this->totalrows['revised'].'</span>';
-				echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addSlide', 'fc-dash-sliders', $title, 'fc-dash-sliders-revised' );
+				$title = JText::_( 'FLEXI_REVISED_VER_SLIDER' ).' - <span class="badge bg-warning badge-warning">'.$this->totalrows['revised'].'</span>';
+				echo JHtml::_('bootstrap.addSlide', 'fc-dash-sliders', $title, 'fc-dash-sliders-revised' );
 				$show_all_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_state=RV';
 			?>
 			<table class="table">
 
 				<thead>
 				<tr>
-					<th><?php echo \Joomla\CMS\Language\Text::_('FLEXI_TITLE'); ?></th>
-					<th><?php echo \Joomla\CMS\Language\Text::_('FLEXI_MODIFIED'); ?></th>
-					<th><?php echo \Joomla\CMS\Language\Text::_('FLEXI_NF_MODIFIER'); ?></th>
+					<th><?php echo JText::_('FLEXI_TITLE'); ?></th>
+					<th><?php echo JText::_('FLEXI_MODIFIED'); ?></th>
+					<th><?php echo JText::_('FLEXI_NF_MODIFIER'); ?></th>
 				</tr>
 				</thead>
 
@@ -636,44 +636,44 @@ $items_task = 'task=items.';
 				<tr>
 					<td>
 					<?php
-					echo \Joomla\CMS\HTML\HTMLHelper::_($hlpname . '.edit_link', $row, $i, $row->canEdit, $config = array(
+					echo JHtml::_($hlpname . '.edit_link', $row, $i, $row->canEdit, $config = array(
 						'ctrl'     => 'items',
 						'view'     => 'item',
-						'onclick'  => 'var url = jQuery(this).attr(\'data-href\'); var the_dialog = fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, fc_edit_fcitem_modal_close, {title:\'' . \Joomla\CMS\Language\Text::_('FLEXI_EDIT', true) . '\', loadFunc: fc_edit_fcitem_modal_load}); return false;" ',
+						'onclick'  => 'var url = jQuery(this).attr(\'data-href\'); var the_dialog = fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, fc_edit_fcitem_modal_close, {title:\'' . JText::_('FLEXI_EDIT', true) . '\', loadFunc: fc_edit_fcitem_modal_load}); return false;" ',
 					));
 					?>
 					</td>
-					<td><?php echo \Joomla\CMS\HTML\HTMLHelper::_('date',  $row->modified); ?></td>
+					<td><?php echo JHtml::_('date',  $row->modified); ?></td>
 					<td><?php echo $row->modifier; ?></td>
 				</tr>
 				<?php $k = 1 - $k; } ?>
 				<tr>
 					<td colspan="3">
 						... &nbsp;
-						<?php echo '<span class="'.$btn_class.'" onclick="window.open(\''.$show_all_link.'\')" >' . \Joomla\CMS\Language\Text::_('FLEXI_SHOW_ALL') . ' ( ' . \Joomla\CMS\Language\Text::_('FLEXI_ITEMS_MANAGER') . ' )</span><br/>'; ?>
+						<?php echo '<span class="'.$btn_class.'" onclick="window.open(\''.$show_all_link.'\')" >' . JText::_('FLEXI_SHOW_ALL') . ' ( ' . JText::_('FLEXI_ITEMS_MANAGER') . ' )</span><br/>'; ?>
 					</td>
 				</tr>
 				</tbody>
 
 			</table>
 			<?php
-				echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endSlide');
+				echo JHtml::_('bootstrap.endSlide');
 			endif; /* !isset($ssliders['revised']) */ ?>
 
 
 			<?php if (!isset($ssliders['inprogress'])): ?>
 			<?php
-				$title = \Joomla\CMS\Language\Text::_( 'FLEXI_IN_PROGRESS_SLIDER' ).' - <span class="badge bg-info badge-info-2">'.$this->totalrows['inprogress'].'</span>';
-				echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addSlide', 'fc-dash-sliders', $title, 'fc-dash-sliders-inprogress' );
+				$title = JText::_( 'FLEXI_IN_PROGRESS_SLIDER' ).' - <span class="badge bg-info badge-info-2">'.$this->totalrows['inprogress'].'</span>';
+				echo JHtml::_('bootstrap.addSlide', 'fc-dash-sliders', $title, 'fc-dash-sliders-inprogress' );
 				$show_all_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_state=IP';
 			?>
 			<table class="table">
 
 				<thead>
 				<tr>
-					<th><?php echo \Joomla\CMS\Language\Text::_('FLEXI_TITLE'); ?></th>
-					<th><?php echo \Joomla\CMS\Language\Text::_('FLEXI_CREATED'); ?></th>
-					<th><?php echo \Joomla\CMS\Language\Text::_('FLEXI_AUTHOR'); ?></th>
+					<th><?php echo JText::_('FLEXI_TITLE'); ?></th>
+					<th><?php echo JText::_('FLEXI_CREATED'); ?></th>
+					<th><?php echo JText::_('FLEXI_AUTHOR'); ?></th>
 				</tr>
 				</thead>
 
@@ -692,21 +692,21 @@ $items_task = 'task=items.';
 				<tr>
 					<td>
 					<?php
-					echo \Joomla\CMS\HTML\HTMLHelper::_($hlpname . '.edit_link', $row, $i, $row->canEdit, $config = array(
+					echo JHtml::_($hlpname . '.edit_link', $row, $i, $row->canEdit, $config = array(
 						'ctrl'     => 'items',
 						'view'     => 'item',
-						'onclick'  => 'var url = jQuery(this).attr(\'data-href\'); var the_dialog = fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, fc_edit_fcitem_modal_close, {title:\'' . \Joomla\CMS\Language\Text::_('FLEXI_EDIT', true) . '\', loadFunc: fc_edit_fcitem_modal_load}); return false;" ',
+						'onclick'  => 'var url = jQuery(this).attr(\'data-href\'); var the_dialog = fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, fc_edit_fcitem_modal_close, {title:\'' . JText::_('FLEXI_EDIT', true) . '\', loadFunc: fc_edit_fcitem_modal_load}); return false;" ',
 					));
 					?>
 					</td>
-					<td><?php echo \Joomla\CMS\HTML\HTMLHelper::_('date',  $row->created); ?></td>
+					<td><?php echo JHtml::_('date',  $row->created); ?></td>
 					<td><?php echo $row->creator; ?></td>
 				</tr>
 				<?php $k = 1 - $k; } ?>
 				<tr>
 					<td colspan="3">
 						... &nbsp;
-						<?php echo '<span class="'.$btn_class.'" onclick="window.open(\''.$show_all_link.'\')" >' . \Joomla\CMS\Language\Text::_('FLEXI_SHOW_ALL') . ' ( ' . \Joomla\CMS\Language\Text::_('FLEXI_ITEMS_MANAGER') . ' )</span><br/>'; ?>
+						<?php echo '<span class="'.$btn_class.'" onclick="window.open(\''.$show_all_link.'\')" >' . JText::_('FLEXI_SHOW_ALL') . ' ( ' . JText::_('FLEXI_ITEMS_MANAGER') . ' )</span><br/>'; ?>
 					</td>
 				</tr>
 				</tbody>
@@ -714,23 +714,23 @@ $items_task = 'task=items.';
 
 			</table>
 			<?php
-				echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endSlide');
+				echo JHtml::_('bootstrap.endSlide');
 			endif; /* !isset($ssliders['inprogress']) */ ?>
 
 
 			<?php if (!isset($ssliders['draft'])): ?>
 			<?php
-				$title = \Joomla\CMS\Language\Text::_( 'FLEXI_DRAFT_SLIDER' ).' - <span class="badge bg-info badge-info-2">'.$this->totalrows['draft'].'</span>';
-				echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addSlide', 'fc-dash-sliders', $title, 'fc-dash-sliders-draft' );
+				$title = JText::_( 'FLEXI_DRAFT_SLIDER' ).' - <span class="badge bg-info badge-info-2">'.$this->totalrows['draft'].'</span>';
+				echo JHtml::_('bootstrap.addSlide', 'fc-dash-sliders', $title, 'fc-dash-sliders-draft' );
 				$show_all_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_state=OQ';
 			?>
 			<table class="table">
 
 				<thead>
 				<tr>
-					<th><?php echo \Joomla\CMS\Language\Text::_('FLEXI_TITLE'); ?></th>
-					<th><?php echo \Joomla\CMS\Language\Text::_('FLEXI_CREATED'); ?></th>
-					<th><?php echo \Joomla\CMS\Language\Text::_('FLEXI_AUTHOR'); ?></th>
+					<th><?php echo JText::_('FLEXI_TITLE'); ?></th>
+					<th><?php echo JText::_('FLEXI_CREATED'); ?></th>
+					<th><?php echo JText::_('FLEXI_AUTHOR'); ?></th>
 				</tr>
 				</thead>
 
@@ -749,14 +749,14 @@ $items_task = 'task=items.';
 				<tr>
 					<td>
 					<?php
-					echo \Joomla\CMS\HTML\HTMLHelper::_($hlpname . '.edit_link', $row, $i, $row->canEdit, $config = array(
+					echo JHtml::_($hlpname . '.edit_link', $row, $i, $row->canEdit, $config = array(
 						'ctrl'     => 'items',
 						'view'     => 'item',
-						'onclick'  => 'var url = jQuery(this).attr(\'data-href\'); var the_dialog = fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, fc_edit_fcitem_modal_close, {title:\'' . \Joomla\CMS\Language\Text::_('FLEXI_EDIT', true) . '\', loadFunc: fc_edit_fcitem_modal_load}); return false;" ',
+						'onclick'  => 'var url = jQuery(this).attr(\'data-href\'); var the_dialog = fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, fc_edit_fcitem_modal_close, {title:\'' . JText::_('FLEXI_EDIT', true) . '\', loadFunc: fc_edit_fcitem_modal_load}); return false;" ',
 					));
 					?>
 					</td>
-					<td><?php echo \Joomla\CMS\HTML\HTMLHelper::_('date',  $row->created); ?></td>
+					<td><?php echo JHtml::_('date',  $row->created); ?></td>
 					<td><?php echo $row->creator; ?></td>
 				</tr>
 				<?php $k = 1 - $k; } ?>
@@ -765,7 +765,7 @@ $items_task = 'task=items.';
 						... &nbsp;
 						<?php echo '
 						<a href="javascript:;" role="button" class="' . $btn_class . '" onclick="window.open(\''.$show_all_link.'\'); return false;" >
-							' . \Joomla\CMS\Language\Text::_('FLEXI_SHOW_ALL') . ' ( ' . \Joomla\CMS\Language\Text::_('FLEXI_ITEMS_MANAGER') . ' )
+							' . JText::_('FLEXI_SHOW_ALL') . ' ( ' . JText::_('FLEXI_ITEMS_MANAGER') . ' )
 						</a><br/>';
 						?>
 					</td>
@@ -774,7 +774,7 @@ $items_task = 'task=items.';
 
 			</table>
 			<?php
-				echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endSlide');
+				echo JHtml::_('bootstrap.endSlide');
 			endif; /* !isset($ssliders['draft']) */ ?>
 
 
@@ -788,7 +788,7 @@ $items_task = 'task=items.';
 						if(jQuery.trim(jQuery('#displayfversion').html())=='') {
 							jQuery('#displayfversion').html('<p><img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" style=\"vertical-align: middle;\"><\/p>');
 							jQuery.ajax({
-								url: 'index.php?option=com_flexicontent&task=flexicontent.fcversioncompare&format=raw&". \Joomla\CMS\Session\Session::getFormToken() ."=1',
+								url: 'index.php?option=com_flexicontent&task=flexicontent.fcversioncompare&format=raw&". JSession::getFormToken() ."=1',
 								success: function(str) {
 									jQuery('#displayfversion').html(str);
 									jQuery('#displayfversion').parent().css('height', 'auto');
@@ -798,22 +798,22 @@ $items_task = 'task=items.';
 					});
 				});
 				");
-				echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addSlide', 'fc-dash-sliders', \Joomla\CMS\Language\Text::_( 'FLEXI_VERSION_CHECKING' ), 'fc-dash-sliders-updatecomponent' );
+				echo JHtml::_('bootstrap.addSlide', 'fc-dash-sliders', JText::_( 'FLEXI_VERSION_CHECKING' ), 'fc-dash-sliders-updatecomponent' );
 				echo "<div id=\"displayfversion\" style='min-height:20px;'></div>";
-				echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endSlide');
+				echo JHtml::_('bootstrap.endSlide');
 			}
 			endif; /* !isset($ssliders['version']) */ ?>
 
 
 			<?php ob_start(); ?>
 			<div id="fc-dash-credits">
-			<?php echo !$hide_fc_license_credits ? '<fieldset class="fc-board-set"><h3 class="fc-board-header">'.\Joomla\CMS\Language\Text::_( 'About FLEXIcontent' ).'</h3>' : ''; ?>
+			<?php echo !$hide_fc_license_credits ? '<fieldset class="fc-board-set"><h3 class="fc-board-header">'.JText::_( 'About FLEXIcontent' ).'</h3>' : ''; ?>
 				<div class="fc-board-set-inner">
 				<?php
 					$logo_style = ';';
 					if (!$disable_fc_logo)
 					{
-						echo \Joomla\CMS\HTML\HTMLHelper::image('administrator/components/com_flexicontent/assets/images/logo.png', 'FLEXIcontent', ' id="fc-dash-logo" ');
+						echo JHtml::image('administrator/components/com_flexicontent/assets/images/logo.png', 'FLEXIcontent', ' id="fc-dash-logo" ');
 					}
 				?>
 					<span id="fc-dash-license" class="nowrap_box fc-mssg-inline fc-info fc-nobgimage" style="">
@@ -869,12 +869,12 @@ $items_task = 'task=items.';
 			endif;
 
 			if ($hide_fc_license_credits) :
-				echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addSlide', 'fc-dash-sliders', "About FLEXIcontent", 'fc-dash-sliders-aboutflexi' );
+				echo JHtml::_('bootstrap.addSlide', 'fc-dash-sliders', "About FLEXIcontent", 'fc-dash-sliders-aboutflexi' );
 				echo $fc_logo_license;
-				echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endSlide');
+				echo JHtml::_('bootstrap.endSlide');
 			endif;
 
-			echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endAccordion');
+			echo JHtml::_('bootstrap.endAccordion');
 
 		endif; /* !$skip_sliders */ ?>
 
@@ -888,7 +888,7 @@ $items_task = 'task=items.';
 	<input type="hidden" name="view" value="" />
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" name="fcform" value="1" />
-	<?php echo \Joomla\CMS\HTML\HTMLHelper::_( 'form.token' ); ?>
+	<?php echo JHtml::_( 'form.token' ); ?>
 
 	<!-- fc_perf -->
 

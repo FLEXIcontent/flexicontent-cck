@@ -8,7 +8,7 @@ extract($displayData);
 $_s = $isSearchView ? '_s' : '';
 
 // Component's parameters
-$cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');  // createFilter maybe called in backend too ...
+$cparams = JComponentHelper::getParams('com_flexicontent');  // createFilter maybe called in backend too ...
 $use_font_icons = $cparams->get('use_font_icons', 1);
 
 // Field's parameters
@@ -28,15 +28,15 @@ if ($display_filter_as == 6)
 	$classes .= ' fc_prompt_internal fc_is_selmultiple';
 	
 	// Add field's LABEL internally or click to select PROMPT (via js)
-	$_inner_lb = $label_filter==2 ? $filter->label : \Joomla\CMS\Language\Text::_('FLEXI_CLICK_TO_LIST');
+	$_inner_lb = $label_filter==2 ? $filter->label : JText::_('FLEXI_CLICK_TO_LIST');
 	if ($label_filter==2)
 	{
-		$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '', $_inner_lb, 'value', 'text', $_disabled = true);
+		$options[] = JHtml::_('select.option', '', $_inner_lb, 'value', 'text', $_disabled = true);
 	}
 	$extra_param = ' data-placeholder="'.htmlspecialchars($_inner_lb, ENT_QUOTES, 'UTF-8').'"';
 
 	// Add type to filter PROMPT (via js)
-	$extra_param .= ' data-fc_prompt_text="'.htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_TYPE_TO_FILTER'), ENT_QUOTES, 'UTF-8').'"';
+	$extra_param .= ' data-fc_prompt_text="'.htmlspecialchars(JText::_('FLEXI_TYPE_TO_FILTER'), ENT_QUOTES, 'UTF-8').'"';
 }
 
 // SINGLE-select does not has an internal label a drop-down list option
@@ -49,16 +49,16 @@ else
 		$first_option_txt = $filter->label;
 	} else {
 		$first_option_txt = $filter->parameters->get( 'filter_usefirstoption'.$_s, 0) ? $filter->parameters->get( 'filter_firstoptiontext'.$_s, 'FLEXI_ALL') : 'FLEXI_ANY';
-		$first_option_txt = \Joomla\CMS\Language\Text::_($first_option_txt);
+		$first_option_txt = JText::_($first_option_txt);
 	}
-	$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '', !$first_option_txt ? '-' : '- '.$first_option_txt.' -');
+	$options[] = JHtml::_('select.option', '', !$first_option_txt ? '-' : '- '.$first_option_txt.' -');
 }
 
 
 foreach ($results as $result)
 {
 	if ( !strlen($result->value) ) continue;
-	$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', $result->value, $result->text, 'value', 'text', $disabled = ($faceted_filter==2 && !$result->found));
+	$options[] = JHtml::_('select.option', $result->value, $result->text, 'value', 'text', $disabled = ($faceted_filter==2 && !$result->found));
 }
 
 // Create HTML tag attributes
@@ -72,26 +72,26 @@ if ( $extra_attribs = $filter->parameters->get( 'filter_extra_attribs'.$_s, '' )
 
 if ($display_filter_as==6 && $filter->parameters->get('filter_values_require_all_tip', 0))
 {
-	$filter->html	.= ' <span class="fc_filter_tip_inline badge bg-info badge-info">'.\Joomla\CMS\Language\Text::_(!$require_all_values ? 'FLEXI_ANY_OF' : 'FLEXI_ALL_OF').'</span> ';
+	$filter->html	.= ' <span class="fc_filter_tip_inline badge bg-info badge-info">'.JText::_(!$require_all_values ? 'FLEXI_ANY_OF' : 'FLEXI_ALL_OF').'</span> ';
 }
 
 // Calculate if field has value
 $has_value = (!is_array($value) && $value !== null && strlen($value)) || (is_array($value) && count($value));
 $filter->html	.= $label_filter==2 && $has_value
-	? ' <span class="badge fc_mobile_label" style="display:none;">'.\Joomla\CMS\Language\Text::_($filter->label).'</span> '
+	? ' <span class="badge fc_mobile_label" style="display:none;">'.JText::_($filter->label).'</span> '
 	: '';
 
 if ($display_filter_as==0 || $display_filter_as==6)
 {
 	// Need selected values: array('') instead of array(), to force selecting the "field's prompt option" (e.g. field label) thus avoid "0 selected" display in mobiles
 	$filter->html	.= $display_filter_as != 6
-		? \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $options, $filter_ffname, $attribs_str, 'value', 'text', $value, $filter_ffid)
-		: \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $options, $filter_ffname.'[]', $attribs_str, 'value', 'text', ($label_filter==2 && !count($value) ? array('') : $value), $filter_ffid);
+		? JHtml::_('select.genericlist', $options, $filter_ffname, $attribs_str, 'value', 'text', $value, $filter_ffid)
+		: JHtml::_('select.genericlist', $options, $filter_ffname.'[]', $attribs_str, 'value', 'text', ($label_filter==2 && !count($value) ? array('') : $value), $filter_ffid);
 }
 else
 {
 	$filter->html	.=
-		\Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $options, $filter_ffname.'[1]', $attribs_str, 'value', 'text', @ $value[1], $filter_ffid.'1') . '
+		JHtml::_('select.genericlist', $options, $filter_ffname.'[1]', $attribs_str, 'value', 'text', @ $value[1], $filter_ffid.'1') . '
 			' . ($use_font_icons ? ' <span class="fc_icon_range icon-arrow-left-4"></span><span class="fc_icon_range icon-arrow-right-4"></span> ' : ' <span class="fc_range"></span> ') . '
-		' . \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $options, $filter_ffname.'[2]', $attribs_str, 'value', 'text', @ $value[2], $filter_ffid.'2');
+		' . JHtml::_('select.genericlist', $options, $filter_ffname.'[2]', $attribs_str, 'value', 'text', @ $value[2], $filter_ffid.'2');
 }

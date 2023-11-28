@@ -51,7 +51,7 @@ class FlexicontentModelUser extends _FlexicontentModelUser
 	 * @param   array    $data      An optional array of data for the form to interogate.
 	 * @param   boolean  $loadData  True if the form is to load its own data (default case), false if not.
 	 *
-	 * @return  mixed  A \Joomla\CMS\Form\Form object on success, false on failure
+	 * @return  mixed  A JForm object on success, false on failure
 	 *
 	 * @since   1.6
 	 */
@@ -59,9 +59,9 @@ class FlexicontentModelUser extends _FlexicontentModelUser
 	{
 		$pluginParams = new Registry;
 
-		if (\Joomla\CMS\Plugin\PluginHelper::isEnabled('user', 'joomla'))
+		if (JPluginHelper::isEnabled('user', 'joomla'))
 		{
-			$plugin = \Joomla\CMS\Plugin\PluginHelper::getPlugin('user', 'joomla');
+			$plugin = JPluginHelper::getPlugin('user', 'joomla');
 			$pluginParams->loadString($plugin->params);
 		}
 
@@ -83,20 +83,20 @@ class FlexicontentModelUser extends _FlexicontentModelUser
 		}
 
 		// If the user needs to change their password, mark the password fields as required
-		if (\Joomla\CMS\Factory::getUser()->requireReset)
+		if (JFactory::getUser()->requireReset)
 		{
 			$form->setFieldAttribute('password', 'required', 'true');
 			$form->setFieldAttribute('password2', 'required', 'true');
 		}
 
 		// When multilanguage is set, a user's default site language should also be a Content Language
-		if (\Joomla\CMS\Language\Multilanguage::isEnabled())
+		if (JLanguageMultilang::isEnabled())
 		{
 			$form->setFieldAttribute('language', 'type', 'frontend_language', 'params');
 		}
 
 		// The user should not be able to set the requireReset value on their own account
-		if ((int) $userId === (int) \Joomla\CMS\Factory::getUser()->id)
+		if ((int) $userId === (int) JFactory::getUser()->id)
 		{
 			$form->removeField('requireReset');
 		}
@@ -114,7 +114,7 @@ class FlexicontentModelUser extends _FlexicontentModelUser
 	protected function loadFormData()
 	{
 		// Check the session for previously entered form data.
-		$data = \Joomla\CMS\Factory::getApplication()->getUserState('com_flexicontent.edit.user.data', array());
+		$data = JFactory::getApplication()->getUserState('com_flexicontent.edit.user.data', array());
 
 		if (empty($data))
 		{

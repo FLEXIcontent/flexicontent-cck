@@ -97,11 +97,11 @@ class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 	 */
 	function addtoexport()
 	{
-		$app   = \Joomla\CMS\Factory::getApplication();
+		$app   = JFactory::getApplication();
 		$model = $this->getModel($this->record_name);
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = JFactory::getUser();
 
-		$session  = \Joomla\CMS\Factory::getSession();
+		$session  = JFactory::getSession();
 
 		// Calculate ACL access
 		$is_authorised = $this->canManage;
@@ -110,7 +110,7 @@ class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 		if (!$is_authorised)
 		{
 			$app->setHeader('status', '403 Forbidden', true);
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
 			$app->redirect($this->returnURL);
 		}
 
@@ -124,7 +124,7 @@ class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 		if (!in_array($table, self::$allowed_tables))
 		{
 			$app->setHeader('status', '403 Forbidden', true);
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_NO_ACCESS') . ' Table: ' . $table . ' not in allowed tables', 'error');
+			$app->enqueueMessage(JText::_('FLEXI_NO_ACCESS') . ' Table: ' . $table . ' not in allowed tables', 'error');
 			$app->redirect($this->returnURL);
 		}
 
@@ -205,9 +205,9 @@ class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 	 */
 	public function exportclear()
 	{
-		$app      = \Joomla\CMS\Factory::getApplication();
-		$user     = \Joomla\CMS\Factory::getUser();
-		$session  = \Joomla\CMS\Factory::getSession();
+		$app      = JFactory::getApplication();
+		$user     = JFactory::getUser();
+		$session  = JFactory::getSession();
 
 		// Calculate access
 		$is_authorised = $this->canManage;
@@ -216,7 +216,7 @@ class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 		if (!$is_authorised)
 		{
 			$app->setHeader('status', '403 Forbidden', true);
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
 			$app->redirect($this->returnURL);
 		}
 
@@ -236,10 +236,10 @@ class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 	 */
 	public function import()
 	{
-		$app      = \Joomla\CMS\Factory::getApplication();
-		$user     = \Joomla\CMS\Factory::getUser();
-		$session  = \Joomla\CMS\Factory::getSession();
-		$document = \Joomla\CMS\Factory::getDocument();
+		$app      = JFactory::getApplication();
+		$user     = JFactory::getUser();
+		$session  = JFactory::getSession();
+		$document = JFactory::getDocument();
 		$has_zlib = version_compare(PHP_VERSION, '5.4.0', '>=');
 
 		$this->input->set('view', $this->record_name);
@@ -265,7 +265,7 @@ class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 		if (!$is_authorised)
 		{
 			$app->setHeader('status', '403 Forbidden', true);
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
 			$app->redirect($this->returnURL);
 		}
 
@@ -324,7 +324,7 @@ class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 					$app->redirect($this->returnURL);
 				}
 
-				$db = \Joomla\CMS\Factory::getDbo();
+				$db = JFactory::getDbo();
 				$nullDate = $db->getNullDate();
 
 				$remap = array();
@@ -490,10 +490,10 @@ class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 	 */
 	public function export()
 	{
-		$app      = \Joomla\CMS\Factory::getApplication();
-		$user     = \Joomla\CMS\Factory::getUser();
-		$session  = \Joomla\CMS\Factory::getSession();
-		$document = \Joomla\CMS\Factory::getDocument();
+		$app      = JFactory::getApplication();
+		$user     = JFactory::getUser();
+		$session  = JFactory::getSession();
+		$document = JFactory::getDocument();
 
 		$this->input->set('view', $this->record_name);
 		$this->input->set('hidemainmenu', 1);
@@ -517,7 +517,7 @@ class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 		if (!$is_authorised)
 		{
 			$app->setHeader('status', '403 Forbidden', true);
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_NO_ACCESS'), 'error');
+			$app->enqueueMessage(JText::_('FLEXI_NO_ACCESS'), 'error');
 			$app->redirect($this->returnURL);
 		}
 
@@ -543,15 +543,15 @@ class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 
 			if (!$table)
 			{
-				$error[500] = \Joomla\CMS\Language\Text::_('No table name given. Export aborted');
+				$error[500] = JText::_('No table name given. Export aborted');
 			}
 			elseif (!in_array($table, self::$allowed_tables))
 			{
-				$error[403] = \Joomla\CMS\Language\Text::_('FLEXI_NO_ACCESS') . ' Table: ' . $table . ' not in allowed tables. Export aborted';
+				$error[403] = JText::_('FLEXI_NO_ACCESS') . ' Table: ' . $table . ' not in allowed tables. Export aborted';
 			}
 			elseif (!count($cid))
 			{
-				$error[500] = \Joomla\CMS\Language\Text::_('No records IDs were specified. Export aborted');
+				$error[500] = JText::_('No records IDs were specified. Export aborted');
 			}
 
 			if (!empty($error))
@@ -663,7 +663,7 @@ class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 
 			$tmp_ffname = 'fcmd_uid_' . $user->id . '_' . date('Y-m-d__H-i-s');
 			$archivename = $tmp_ffname . '.zip';
-			$archivepath = \Joomla\CMS\Filesystem\Path::clean($app->getCfg('tmp_path') . DS . $archivename);
+			$archivepath = JPath::clean($app->getCfg('tmp_path') . DS . $archivename);
 
 			/**
 			 * Create a new Zip archive on the server disk

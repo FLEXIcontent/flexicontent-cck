@@ -32,7 +32,7 @@ class WFLinkBrowser_Flexicontentlinks {
 		$path = dirname( __FILE__ ) . '/flexicontentlinks';
 
 		// Get all files
-		$files = \Joomla\CMS\Filesystem\Folder::files($path, '\.(php)$');
+		$files = JFolder::files($path, '\.(php)$');
 
 		if (!empty($files)) {
 			foreach ($files as $file) {

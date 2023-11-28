@@ -20,7 +20,7 @@ foreach ($categories as $category)
 		// Performance concern, only do routing once per category
 		if ( $link_to_view && !isset($cat_links[$catid]) )
 		{
-			$cat_links[$catid] = \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getCategoryRoute($category->slug));
+			$cat_links[$catid] = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug));
 		}
 
 		// With / without link

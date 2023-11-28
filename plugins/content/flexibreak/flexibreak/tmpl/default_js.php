@@ -15,7 +15,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 // - RETURNED HTML is used as 'toc' 
 // - Optionally set 'visible pages HTML' into $this->_text 
 
-$custom_allpages = \Joomla\CMS\Language\Text::_($this->params->get('custom_allpages', 'FLEXIBREAK_ALL_PAGES'));
+$custom_allpages = JText::_($this->params->get('custom_allpages', 'FLEXIBREAK_ALL_PAGES'));
 $display_method  = (int) $this->params->get('display_method', 1);
 $multipage_toc   = (int) $this->params->get('multipage_toc', 1);
 
@@ -27,14 +27,14 @@ $link_class = $display_method === 1
 	? ' tocPaginated'
 	: ($display_method === 0 ? ' tocScrolled' : ' tocReloaded');
 
-$sef_link   = \Joomla\CMS\Router\Route::_($this->nonsef_link);  // Get current SEF link of current item
+$sef_link   = JRoute::_($this->nonsef_link);  // Get current SEF link of current item
 
 if ($multipage_toc) : /* TOC Start */ ?>
 
 	<div class="contenttoc" id="articleTOC">
 	<a id="articleToc"></a>
 		<?php if ( $this->params->get('toc_title', 1) ) : ?>
-		<p class="tocHeader"><?php echo \Joomla\CMS\Language\Text::_('FLEXIBREAK_TABLE_OF_CONTENT') ?></p>
+		<p class="tocHeader"><?php echo JText::_('FLEXIBREAK_TABLE_OF_CONTENT') ?></p>
 		<?php endif; ?>
 		
 		<ul class="tocList">
@@ -68,7 +68,7 @@ if ($multipage_toc) : /* TOC Start */ ?>
 			
 			<?php if ( $this->params->get('allpages_link', 1) && ($display_method == 1 || $display_method == 2) ) : ?>
 				<li class="<?php echo $this->showall ? 'active' : ''; ?>">
-					<a class="tocAll" id="showall" onclick="<?php echo $onclick ?>" href="<?php echo \Joomla\CMS\Router\Route::_($this->nonsef_link.($display_method == 0 ? '#showall' : '&showall=1' )); ?>"> - <?php echo $custom_allpages; ?> - </a>
+					<a class="tocAll" id="showall" onclick="<?php echo $onclick ?>" href="<?php echo JRoute::_($this->nonsef_link.($display_method == 0 ? '#showall' : '&showall=1' )); ?>"> - <?php echo $custom_allpages; ?> - </a>
 				</li>
 			<?php endif; ?>
 		

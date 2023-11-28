@@ -28,7 +28,7 @@ jimport('legacy.model.legacy');
  * @subpackage FLEXIcontent
  * @since		1.5
  */
-class FlexicontentModelTags extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
+class FlexicontentModelTags extends JModelLegacy
 {
 	/**
 	 * Current Tag properties
@@ -73,7 +73,7 @@ class FlexicontentModelTags extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 	public function __construct()
 	{
 		// Set record id and call constrcuctor
-		$id = \Joomla\CMS\Factory::getApplication()->input->get('id', 0, 'int');
+		$id = JFactory::getApplication()->input->get('id', 0, 'int');
 		$this->setId((int)$id);
 		parent::__construct();
 
@@ -90,9 +90,9 @@ class FlexicontentModelTags extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 	 */
 	protected function populateRecordState($ordering = null, $direction = null)
 	{
-		$app    = \Joomla\CMS\Factory::getApplication();
+		$app    = JFactory::getApplication();
 		$jinput = $app->input;
-		$user   = \Joomla\CMS\Factory::getUser();
+		$user   = JFactory::getUser();
 
 		$option = $jinput->getCmd('option', '');
 		$view   = $jinput->getCmd('view', '');
@@ -183,7 +183,7 @@ class FlexicontentModelTags extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 			$this->getTag();
 		}
 
-		$app    = \Joomla\CMS\Factory::getApplication();
+		$app    = JFactory::getApplication();
 		$jinput = $app->input;
 
 		$print_logging_info = $this->_params->get('print_logging_info');
@@ -302,7 +302,7 @@ class FlexicontentModelTags extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 	 */
 	function _buildQuery()
 	{
-		$user		= \Joomla\CMS\Factory::getUser();
+		$user		= JFactory::getUser();
 
 		// Show special state items
 		$show_noauth = $this->_params->get('show_noauth', 0);   // Show unauthorized items
@@ -318,7 +318,7 @@ class FlexicontentModelTags extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 		// User not allowed to LIST unauthorized items
 		if ( !$show_noauth )
 		{
-			$aid_arr = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
 			$andaccess .= ' AND ty.access IN (0,'.$aid_list.')';
 			$andaccess .= ' AND  c.access IN (0,'.$aid_list.')';
@@ -329,7 +329,7 @@ class FlexicontentModelTags extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 		// Access Flags for: content type, main category, item
 		else
 		{
-			$aid_arr = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
 			$select_access .= ', '
 				.' CASE WHEN '
@@ -447,19 +447,19 @@ class FlexicontentModelTags extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 	 */
 	function _buildItemWhere( )
 	{
-		$app    = \Joomla\CMS\Factory::getApplication();
+		$app    = JFactory::getApplication();
 		$jinput = $app->input;
-		$user   = \Joomla\CMS\Factory::getUser();
-		$db     = \Joomla\CMS\Factory::getDbo();
+		$user   = JFactory::getUser();
+		$db     = JFactory::getDbo();
 
 		$show_owned = $this->_params->get('show_owned', 1);     // Show items owned by current user, regardless of their state
 		$show_trashed = $this->_params->get('show_trashed', 1);   // Show trashed items (to authorized users)
 
 		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
 		//  thus the items are published globally at the time the author specified in his/her local clock
-		//$app  = \Joomla\CMS\Factory::getApplication();
+		//$app  = JFactory::getApplication();
 		//$now  = FLEXI_J16GE ? $app->requestTime : $app->get('requestTime');   // NOT correct behavior it should be UTC (below)
-		//$date = \Joomla\CMS\Factory::getDate();
+		//$date = JFactory::getDate();
 		//$now  = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();              // NOT good if string passed to function that will be cached, because string continuesly different
 		$_nowDate = 'UTC_TIMESTAMP()'; //$db->Quote($now);
 		$nullDate = $db->getNullDate();
@@ -479,7 +479,7 @@ class FlexicontentModelTags extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 		{
 			$lta = 'i';
 			//$where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . ' OR '.$lta.'.language="*" ) ';
-			$where .= ' AND (' . $lta . ' .language = ' . $db->Quote(\Joomla\CMS\Factory::getLanguage()->getTag()) . ' OR ' . $lta . '.language = ' . $db->Quote('*') . ')';
+			$where .= ' AND (' . $lta . ' .language = ' . $db->Quote(JFactory::getLanguage()->getTag()) . ' OR ' . $lta . '.language = ' . $db->Quote('*') . ')';
 		}
 
 		// Get privilege to view non viewable items (upublished, archived, trashed, expired, scheduled).
@@ -623,13 +623,13 @@ class FlexicontentModelTags extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 	{
 		if ( $this->_params !== NULL ) return;
 
-		$app    = \Joomla\CMS\Factory::getApplication();
+		$app    = JFactory::getApplication();
 		$jinput = $app->input;
 		$menu   = $app->getMenu()->getActive();
 
 		// Get the COMPONENT only parameter
-		$params  = new \Joomla\Registry\Registry();
-		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+		$params  = new JRegistry();
+		$cparams = JComponentHelper::getParams('com_flexicontent');
 		$params->merge($cparams);
 
 		// Merge the active menu parameters
@@ -647,11 +647,11 @@ class FlexicontentModelTags extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 		{
 			// Load by module id
 			$module_id = $jinput->getInt('module', 0);
-			$module   = \Joomla\CMS\Table\Table::getInstance('Module', '\Joomla\CMS\Table\Table');
+			$module   = JTable::getInstance('Module', 'JTable');
 
 			if ($module->load($module_id))
 			{
-				$moduleParams = new \Joomla\Registry\Registry($module->params);
+				$moduleParams = new JRegistry($module->params);
 				$params->merge($moduleParams);
 			}
 			else

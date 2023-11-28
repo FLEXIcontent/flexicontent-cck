@@ -179,7 +179,7 @@ class FlexicontentModelMediadata extends FCModelAdmin
 
 		if (!$this->_record->file_id)
 		{
-			$this->_record->file_id = \Joomla\CMS\Factory::getApplication()->input->getInt('file_id', 0);
+			$this->_record->file_id = JFactory::getApplication()->input->getInt('file_id', 0);
 		}
 
 		// Attempt to load file data
@@ -254,17 +254,17 @@ class FlexicontentModelMediadata extends FCModelAdmin
 	/**
 	 * Method to preprocess the form.
 	 *
-	 * @param   \Joomla\CMS\Form\Form   $form   A \Joomla\CMS\Form\Form object.
+	 * @param   JForm   $form   A JForm object.
 	 * @param   mixed   $data   The data expected for the form.
 	 * @param   string  $plugins_group  The name of the plugin group to import and trigger
 	 *
 	 * @return  void
 	 *
-	 * @see     \Joomla\CMS\Form\FormField
+	 * @see     JFormField
 	 * @since   1.6
 	 * @throws  Exception if there is an error in the form event.
 	 */
-	protected function preprocessForm(\Joomla\CMS\Form\Form $form, $data, $plugins_group = null)
+	protected function preprocessForm(JForm $form, $data, $plugins_group = null)
 	{
 		parent::preprocessForm($form, $data, $plugins_group);
 	}
@@ -310,7 +310,7 @@ class FlexicontentModelMediadata extends FCModelAdmin
 		}
 
 		$record  = $record ?: $this->_record;
-		$user    = $user ?: \Joomla\CMS\Factory::getUser();
+		$user    = $user ?: JFactory::getUser();
 
 		$isOwner = $record && $record->user_id == $user->id;
 
@@ -335,7 +335,7 @@ class FlexicontentModelMediadata extends FCModelAdmin
 		}
 
 		$record  = $record ?: $this->_record;
-		$user    = $user ?: \Joomla\CMS\Factory::getUser();
+		$user    = $user ?: JFactory::getUser();
 
 		return $this->canManage;
 	}
@@ -351,14 +351,14 @@ class FlexicontentModelMediadata extends FCModelAdmin
 	public function canDelete($record = null)
 	{
 		$record  = $record ?: $this->_record;
-		$user    = \Joomla\CMS\Factory::getUser();
+		$user    = JFactory::getUser();
 
 		return $this->canManage;
 	}
 
 
 	/**
-	 * Method to do some record / data preprocessing before call \Joomla\CMS\Table\Table::bind()
+	 * Method to do some record / data preprocessing before call JTable::bind()
 	 *
 	 * Note. Typically called inside this MODEL 's store()
 	 *
@@ -391,7 +391,7 @@ class FlexicontentModelMediadata extends FCModelAdmin
 
 
 	/**
-	 * Method to do some work after record has been loaded via \Joomla\CMS\Table\Table::load()
+	 * Method to do some work after record has been loaded via JTable::load()
 	 *
 	 * Note. Typically called inside this MODEL 's store()
 	 *
@@ -413,7 +413,7 @@ class FlexicontentModelMediadata extends FCModelAdmin
 	/**
 	 * Method to validate the data posted by the submitter
 	 *
-	 * @param   array     $data  The (already \Joomla\CMS\Form\Form validated) record data
+	 * @param   array     $data  The (already JForm validated) record data
 	 *
 	 * @return  boolean   true on success, false on failure
 	 *
@@ -421,8 +421,8 @@ class FlexicontentModelMediadata extends FCModelAdmin
 	 */
 	public function submitterValidation($data)
 	{
-		$user = \Joomla\CMS\Factory::getUser();
-		$db   = \Joomla\CMS\Factory::getDbo();
+		$user = JFactory::getUser();
+		$db   = JFactory::getDbo();
 
 		$mediadata_id   = $data['id'];
 		$content_id  = $data['content_id'];

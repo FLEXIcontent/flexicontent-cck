@@ -23,7 +23,7 @@ class FcFormLayoutParameters
 	 */
 	function createPlacementConf( $item, & $fields, $params, $coreprops_fields, $via_core_field, $via_core_prop, $typeselected)
 	{
-		$app    = \Joomla\CMS\Factory::getApplication();
+		$app    = JFactory::getApplication();
 		$CFGsfx = $app->isClient('site') ? '' : '_be';
 
 		$placeable_fields = array_merge($via_core_field, $via_core_prop);
@@ -104,18 +104,18 @@ class FcFormLayoutParameters
 		// Create title of the custom fields default TAB (field manager TAB)
 		if ($item->type_id)
 		{
-			$_str = \Joomla\CMS\Language\Text::_('FLEXI_DETAILS');
+			$_str = JText::_('FLEXI_DETAILS');
 			$_str = StringHelper::strtoupper(StringHelper::substr($_str, 0, 1)) . StringHelper::substr($_str, 1);
 
 			$types_arr = flexicontent_html::getTypesList();
 			$type_name = isset($types_arr[$item->type_id]) ? $types_arr[$item->type_id]->name : 'FLEXI_CONTENT_TYPE';
-			$type_lbl  = \Joomla\CMS\Language\Text::_($type_name);
+			$type_lbl  = JText::_($type_name);
 			$type_lbl  = $type_lbl .' ('. $_str .')';
 		}
 		else
 		{
 			$type_name = 'FLEXI_TYPE_NOT_DEFINED';
-			$type_lbl  = \Joomla\CMS\Language\Text::_($type_name);
+			$type_lbl  = JText::_($type_name);
 		}
 
 		// Also assign it for usage by layout
@@ -139,8 +139,8 @@ class FcFormLayoutParameters
 					break;
 				}
 
-				$tab_titles['tab0'.$arr[0]] = $arr[1] === '__TYPE_NAME__' ? $type_lbl : \Joomla\CMS\Language\Text::_($arr[1]);
-				$tab_classes['tab0'.$arr[0]] = \Joomla\CMS\Filter\OutputFilter::stringURLSafe(
+				$tab_titles['tab0'.$arr[0]] = $arr[1] === '__TYPE_NAME__' ? $type_lbl : JText::_($arr[1]);
+				$tab_classes['tab0'.$arr[0]] = JFilterOutput::stringURLSafe(
 					StringHelper::strtolower($arr[1] === '__TYPE_NAME__'
 						? (($item->type_id ? 'flexi-type-' : '') . $type_name)
 						: $arr[1]

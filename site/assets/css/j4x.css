@@ -109,7 +109,7 @@ button.btn.btn-highlight:hover,
 #flexicontent div .fc_img_preview_btn.icon-search:after,
 #flexicontent div .fc_img_preview_btn.icon-search:before,
 #flexicontent div .fcfield-expand-view.fcfont-icon:before {
-	font-family: 'Font Awesome 5 Free', 'Font Awesome 6 Free';
+	font-family: 'Font Awesome 5 Free' !important;
 	font-size: 1.4em;
 }
 #flexicontent div .fa,

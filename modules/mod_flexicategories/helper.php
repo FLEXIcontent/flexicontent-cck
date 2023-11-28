@@ -33,7 +33,7 @@ abstract class ModFlexiCategoriesHelper
 		$options               = array();
 		$options['countItems'] = $params->get('numitems', 0);
 
-		$categories = \Joomla\CMS\Categories\Categories::getInstance('Content', $options);
+		$categories = JCategories::getInstance('Content', $options);
 		$category   = $categories->get($params->get('parent', 'root'));
 
 		if ($category != null)

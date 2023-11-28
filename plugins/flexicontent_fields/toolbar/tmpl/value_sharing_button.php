@@ -24,7 +24,7 @@ if ($display_comments)
 	$ops[] = '
 			<div class="flexi-react toolbar-element">
 				<span class="comments-bubble">'.($module_position ? '<!-- jot '.$module_position.' s -->' : '').$this->_getCommentsCount($item->id).($module_position ? '<!-- jot '.$module_position.' e -->' : '').'</span>
-				<span class="comments-legend flexi-legend"><a href="'.$comment_link.'" title="'.\Joomla\CMS\Language\Text::_('FLEXI_FIELD_TOOLBAR_COMMENT').'">'.\Joomla\CMS\Language\Text::_('FLEXI_FIELD_TOOLBAR_COMMENT').'</a></span>
+				<span class="comments-legend flexi-legend"><a href="'.$comment_link.'" title="'.JText::_('FLEXI_FIELD_TOOLBAR_COMMENT').'">'.JText::_('FLEXI_FIELD_TOOLBAR_COMMENT').'</a></span>
 			</div>
 			';
 }
@@ -52,9 +52,9 @@ if ($display_resizer && $view == 'item')  // *** Item view only
 			}');
 	$ops[] = '
 			<div class="flexi-resizer toolbar-element">
-				<a class="decrease" href="javascript:fsize(textsize,lineheight,\'px\',\''.$target.'\');" onclick="changetextsize(0);"><svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M432 256c0 17.7-14.3 32-32 32L48 288c-17.7 0-32-14.3-32-32s14.3-32 32-32l352 0c17.7 0 32 14.3 32 32z"/></svg><span class="sublegend">'.\Joomla\CMS\Language\Text::_("FLEXI_FIELD_TOOLBAR_DECREASE").'</span></a>
-				<a class="increase" href="javascript:fsize(textsize,lineheight,\'px\',\''.$target.'\');" onclick="changetextsize(1);"><svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg><span class="sublegend">'.\Joomla\CMS\Language\Text::_("FLEXI_FIELD_TOOLBAR_INCREASE").'</span></a>
-				<span class="flexi-legend">'.\Joomla\CMS\Language\Text::_("FLEXI_FIELD_TOOLBAR_SIZE").'</span>
+				<a class="decrease" href="javascript:fsize(textsize,lineheight,\'px\',\''.$target.'\');" onclick="changetextsize(0);"><svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M432 256c0 17.7-14.3 32-32 32L48 288c-17.7 0-32-14.3-32-32s14.3-32 32-32l352 0c17.7 0 32 14.3 32 32z"/></svg><span class="sublegend">'.JText::_("FLEXI_FIELD_TOOLBAR_DECREASE").'</span></a>
+				<a class="increase" href="javascript:fsize(textsize,lineheight,\'px\',\''.$target.'\');" onclick="changetextsize(1);"><svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg><span class="sublegend">'.JText::_("FLEXI_FIELD_TOOLBAR_INCREASE").'</span></a>
+				<span class="flexi-legend">'.JText::_("FLEXI_FIELD_TOOLBAR_SIZE").'</span>
 			</div>
 			';
 }
@@ -68,7 +68,7 @@ if ($display_resizer && $view == 'item')  // *** Item view only
 //	$estatus = 'width=400,height=400,menubar=yes,resizable=yes';
 //	$ops[] = '
 //	<div class="flexi-email toolbar-element">
-//		<span class="email-legend flexi-legend"><a rel="nofollow" href="'. \Joomla\CMS\Router\Route::_($url) .'" onclick="window.open(this.href,\'win2\',\''.$estatus.'\'); return false;" title="'.\Joomla\CMS\Language\Text::_('FLEXI_FIELD_TOOLBAR_SEND').'">'.\Joomla\CMS\Language\Text::_('FLEXI_FIELD_TOOLBAR_SEND').'</a></span>
+//		<span class="email-legend flexi-legend"><a rel="nofollow" href="'. JRoute::_($url) .'" onclick="window.open(this.href,\'win2\',\''.$estatus.'\'); return false;" title="'.JText::_('FLEXI_FIELD_TOOLBAR_SEND').'">'.JText::_('FLEXI_FIELD_TOOLBAR_SEND').'</a></span>
 //	</div>
 //	';
 //}
@@ -82,8 +82,8 @@ if ($display_print)
 	$js_link = $print ? 'onclick="window.print();return false;"' : 'onclick="window.open(this.href,\'win2\',\''.$pstatus.'\'); return false;"';
 	$ops[] = '
 			<div class="flexi-print toolbar-element">
-				<a rel="nofollow" href="'. $print_link .'" '.$js_link.' title="'.\Joomla\CMS\Language\Text::_('FLEXI_FIELD_TOOLBAR_PRINT').'"><svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M128 0C92.7 0 64 28.7 64 64v96h64V64H354.7L384 93.3V160h64V93.3c0-17-6.7-33.3-18.7-45.3L400 18.7C388 6.7 371.7 0 354.7 0H128zM384 352v32 64H128V384 368 352H384zm64 32h32c17.7 0 32-14.3 32-32V256c0-35.3-28.7-64-64-64H64c-35.3 0-64 28.7-64 64v96c0 17.7 14.3 32 32 32H64v64c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V384zM432 248a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"/></svg>
-        <span class="print-legend flexi-legend">'.\Joomla\CMS\Language\Text::_('FLEXI_FIELD_TOOLBAR_PRINT').'</span></a>
+				<a rel="nofollow" href="'. $print_link .'" '.$js_link.' title="'.JText::_('FLEXI_FIELD_TOOLBAR_PRINT').'"><svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M128 0C92.7 0 64 28.7 64 64v96h64V64H354.7L384 93.3V160h64V93.3c0-17-6.7-33.3-18.7-45.3L400 18.7C388 6.7 371.7 0 354.7 0H128zM384 352v32 64H128V384 368 352H384zm64 32h32c17.7 0 32-14.3 32-32V256c0-35.3-28.7-64-64-64H64c-35.3 0-64 28.7-64 64v96c0 17.7 14.3 32 32 32H64v64c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V384zM432 248a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"/></svg>
+        <span class="print-legend flexi-legend">'.JText::_('FLEXI_FIELD_TOOLBAR_PRINT').'</span></a>
 			</div>
 			';
 }
@@ -93,7 +93,7 @@ if ($display_print)
 //{
 //	if ($lang=='th') {
 // Special case language case, maybe la=laos, and Bhutan languages in the future (NECTEC support these languages)
-//		$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/plugins/flexicontent_fields/toolbar/toolbar/th.js');
+//		$document->addScript(JUri::root(true).'/plugins/flexicontent_fields/toolbar/toolbar/th.js');
 //	} else {
 //		$document->addScript('//vozme.com/get_text.js');
 //	}
@@ -113,7 +113,7 @@ if ($display_pdf)
 	$pdflink 	= 'index.php?view=items&cid='.$item->categoryslug.'&id='.$item->slug.'&format=pdf';
 	$ops[] = '
 			<div class="flexi-pdf toolbar-element">
-				<span class="pdf-legend flexi-legend"><a href="'.\Joomla\CMS\Router\Route::_($pdflink).'" title="'.\Joomla\CMS\Language\Text::_('FLEXI_FIELD_TOOLBAR_PDF').'">'.\Joomla\CMS\Language\Text::_('FLEXI_FIELD_TOOLBAR_PDF').'</a></span>
+				<span class="pdf-legend flexi-legend"><a href="'.JRoute::_($pdflink).'" title="'.JText::_('FLEXI_FIELD_TOOLBAR_PDF').'">'.JText::_('FLEXI_FIELD_TOOLBAR_PDF').'</a></span>
 			</div>
 			';
 }

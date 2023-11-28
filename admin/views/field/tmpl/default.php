@@ -21,18 +21,18 @@ defined('_JEXEC') or die('Restricted access');
 
 $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
-$hint_image = '<i class="icon-info"></i>';//\Joomla\CMS\HTML\HTMLHelper::image ( 'administrator/components/com_flexicontent/assets/images/comments.png', \Joomla\CMS\Language\Text::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
-$warn_image = '<i class="icon-warning"></i>';//\Joomla\CMS\HTML\HTMLHelper::image ( 'administrator/components/com_flexicontent/assets/images/note.gif', \Joomla\CMS\Language\Text::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
+$hint_image = '<i class="icon-info"></i>';//JHtml::image ( 'administrator/components/com_flexicontent/assets/images/comments.png', JText::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
+$warn_image = '<i class="icon-warning"></i>';//JHtml::image ( 'administrator/components/com_flexicontent/assets/images/note.gif', JText::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
 $conf_image = '<i class="icon-cog"></i>';
 
 //adding inline help
-if (FLEXI_J40GE) \Joomla\CMS\Toolbar\ToolbarHelper::inlinehelp();
+if (FLEXI_J40GE) JToolbarHelper::inlinehelp();
 
 $form = $this->form;
 
 // Load JS tabber lib
-$this->document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
-$this->document->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
+$this->document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
+$this->document->addStyleSheet(JUri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
 $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
 // Add FC dependencies JS
@@ -66,13 +66,13 @@ $this->document->addScriptDeclaration($js);
 
 	<div class="span6 col-6 full_width_980">
 	
-		<!--span class="badge"><h3><?php echo \Joomla\CMS\Language\Text::_( /*'FLEXI_STANDARD_FIELDS_PROPERTIES'*/'Common configuration' ); ?></h3></span-->
+		<!--span class="badge"><h3><?php echo JText::_( /*'FLEXI_STANDARD_FIELDS_PROPERTIES'*/'Common configuration' ); ?></h3></span-->
 		
 		<table class="fc-form-tbl fcinner" style="margin-bottom:12px;">
 			<tr>
 				<td class="key">
 					<?php
-					$_title = htmlspecialchars(\Joomla\CMS\Language\Text::_($form->getFieldAttribute('label', 'description', '')), ENT_QUOTES , 'UTF-8' );
+					$_title = htmlspecialchars(JText::_($form->getFieldAttribute('label', 'description', '')), ENT_QUOTES , 'UTF-8' );
 					$_label = strpos($form->getLabel('label'),'class=')
 						? str_replace('class="', ' data-bs-content="'.$_title.'" class="label-fcinner hasPopover ', $form->getLabel('label'))
 						: str_replace('<label ', '<label data-bs-content="'.$_title.'" data-placement="top" class="label-fcinner hasPopover" ', $form->getLabel('label'));
@@ -92,21 +92,21 @@ $this->document->addScriptDeclaration($js);
 					<input type="hidden" id="jform_title" name="jform[title]" value="<?php echo $this->form->getValue('name'); ?>" />
 
 					<?php if (! $form->getValue('iscore')) : ?>
-						<span class="fc-info fc-nobgimage fc-mssg fc-mssg-inline <?php echo $tip_class; ?>" data-placement="bottom" title="<?php echo '<b>'.\Joomla\CMS\Language\Text::_('FLEXI_NOTES').'</b><br/>'.\Joomla\CMS\Language\Text::_('FLEXI_FIELDNAME_CHANGE_WARNING'); ?>">
+						<span class="fc-info fc-nobgimage fc-mssg fc-mssg-inline <?php echo $tip_class; ?>" data-placement="bottom" title="<?php echo '<b>'.JText::_('FLEXI_NOTES').'</b><br/>'.JText::_('FLEXI_FIELDNAME_CHANGE_WARNING'); ?>">
 							<?php echo $warn_image; ?>
 							<?php echo $conf_image; ?>
-							<?php echo \Joomla\CMS\Language\Text::_('FLEXI_NOTES'); ?>
+							<?php echo JText::_('FLEXI_NOTES'); ?>
 						</span>
 					<?php endif; ?>
 
 					<?php
 					if ($form->getValue('field_type') === 'textarea')
 					{
-						$customize_mssg = flexicontent_html::getToolTip(\Joomla\CMS\Language\Text::_('FLEXI_NOTES'), \Joomla\CMS\Language\Text::sprintf('FLEXI_CORE_FIELDS_CUSTOMIZATION', 'text', '<b>'.\Joomla\CMS\Language\Text::_('FLEXI_DESCRIPTION').'</b>', 'text'), 0, 1);
+						$customize_mssg = flexicontent_html::getToolTip(JText::_('FLEXI_NOTES'), JText::sprintf('FLEXI_CORE_FIELDS_CUSTOMIZATION', 'text', '<b>'.JText::_('FLEXI_DESCRIPTION').'</b>', 'text'), 0, 1);
 					}
 					elseif ($form->getValue('field_type')=='maintext') 
 					{
-						$customize_mssg = flexicontent_html::getToolTip(\Joomla\CMS\Language\Text::_('FLEXI_NOTES'), \Joomla\CMS\Language\Text::sprintf('FLEXI_FIELD_CUSTOMIZE_PER_CONTENT_TYPE', 'textarea', 'text', 'text'), 0, 1);
+						$customize_mssg = flexicontent_html::getToolTip(JText::_('FLEXI_NOTES'), JText::sprintf('FLEXI_FIELD_CUSTOMIZE_PER_CONTENT_TYPE', 'textarea', 'text', 'text'), 0, 1);
 					}
 					?>
 
@@ -114,7 +114,7 @@ $this->document->addScriptDeclaration($js);
 						<span class="fc-info fc-nobgimage fc-mssg fc-mssg-inline <?php echo $tip_class; ?>" data-placement="bottom" title="<?php echo $customize_mssg; ?>">
 							<?php echo $hint_image; ?>
 							<?php echo $conf_image; ?>
-							<?php echo \Joomla\CMS\Language\Text::_('FLEXI_NOTES'); ?>
+							<?php echo JText::_('FLEXI_NOTES'); ?>
 						</span>
 					<?php endif; ?>
 
@@ -140,7 +140,7 @@ $this->document->addScriptDeclaration($js);
 		<div class="fctabber fields_tabset" id="field_basic_props_tabset">
 			
 			<div class="tabbertab" id="fcform_tabset_common_basic_tab" data-icon-class="icon-home-2" >
-				<h3 class="tabberheading hasTooltip"> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_BASIC' ); ?> </h3>
+				<h3 class="tabberheading hasTooltip"> <?php echo JText::_( 'FLEXI_BASIC' ); ?> </h3>
 				
 				<table class="fc-form-tbl fcinner">
 					<tr>
@@ -178,14 +178,14 @@ $this->document->addScriptDeclaration($js);
 						<td style="padding-top:24px;">
 							<?php $box_class = $this->row->iscore ? 'fc-info' : ($this->typesselected ? 'fc-success' : 'fc-warning'); ?>
 							<span class="<?php echo $box_class; ?> fc-mssg" style="width:90%; margin:6px 0px 0px 0px !important;">
-								<?php echo \Joomla\CMS\Language\Text::_( $this->row->iscore ? 'FLEXI_SELECT_TYPES_CORE_NOTES' : 'FLEXI_SELECT_TYPES_CUSTOM_NOTES' ); ?>
+								<?php echo JText::_( $this->row->iscore ? 'FLEXI_SELECT_TYPES_CORE_NOTES' : 'FLEXI_SELECT_TYPES_CUSTOM_NOTES' ); ?>
 							</span>
 						</td>
 					</tr>
 					<tr>
 						<td>
 							<label class="label text-white bg-warning label-warning" style="vertical-align:middle;">
-								<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_TYPES' ); ?>
+								<?php echo JText::_( 'FLEXI_TYPES' ); ?>
 							</label>
 							<?php echo /*FLEXI_J16GE ? $form->getInput('tid') :*/ $this->lists['tid']; ?>
 						</td>
@@ -196,7 +196,7 @@ $this->document->addScriptDeclaration($js);
 			
 			
 			<div class="tabbertab" id="fcform_tabset_common_item_form_tab" data-icon-class="icon-pencil" >
-				<h3 class="tabberheading"> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_ITEM_FORM' ); ?> </h3>
+				<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_ITEM_FORM' ); ?> </h3>
 				<table class="fc-form-tbl fcinner">
 					
 					<tr<?php echo !$this->supportuntranslatable?' style="display:none;"':'';?>>
@@ -250,11 +250,11 @@ $this->document->addScriptDeclaration($js);
 			
 			<?php if ($this->supportsearch || $this->supportfilter || $this->supportadvsearch || $this->supportadvfilter) : ?>
 			<div class="tabbertab" id="fcform_tabset_common_search_filtering_tab" data-icon-class="icon-search" >
-				<h3 class="tabberheading"> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_SEARCH_FILTERING' ); ?> </h3>
+				<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_FIELD_SEARCH_FILTERING' ); ?> </h3>
 				
 				<?php if ($this->supportsearch || $this->supportfilter) : ?>
-					<span class="fcsep_level1" style="width:90%; margin-top:16px;"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_BASIC_INDEX' ); ?></span>
-					<span class="fcsep_level4 alert alert-info" style="margin-left: 32px;"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_BASIC_INDEX_NOTES' ); ?></span>
+					<span class="fcsep_level1" style="width:90%; margin-top:16px;"><?php echo JText::_( 'FLEXI_BASIC_INDEX' ); ?></span>
+					<span class="fcsep_level4 alert alert-info" style="margin-left: 32px;"><?php echo JText::_( 'FLEXI_BASIC_INDEX_NOTES' ); ?></span>
 					<div class="fcclear"></div>
 				
 					<table class="fc-form-tbl fcinner">
@@ -266,9 +266,9 @@ $this->document->addScriptDeclaration($js);
 							<td>
 								<?php echo
 									in_array($form->getValue('issearch'),array(-1,2)) ?
-										\Joomla\CMS\Language\Text::_($form->getValue('issearch')==-1 ? 'FLEXI_NO' : 'FLEXI_YES') .' -- 
+										JText::_($form->getValue('issearch')==-1 ? 'FLEXI_NO' : 'FLEXI_YES') .' -- 
 										<a href="index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=basic" class="btn btn-warning" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){window.location.reload(false)}); return false;">'
-											.\Joomla\CMS\Language\Text::_('FLEXI_FIELD_DIRTY_REBUILD_SEARCH_INDEX').'
+											.JText::_('FLEXI_FIELD_DIRTY_REBUILD_SEARCH_INDEX').'
 										</a>' :
 										$form->getInput('issearch'); ?>
 							</td>
@@ -283,9 +283,9 @@ $this->document->addScriptDeclaration($js);
 							<td>
 								<?php echo
 									in_array($form->getValue('isfilter'),array(-1,2)) ?
-										\Joomla\CMS\Language\Text::_($form->getValue('isfilter')==-1 ? 'FLEXI_NO' : 'FLEXI_YES') .' -- 
+										JText::_($form->getValue('isfilter')==-1 ? 'FLEXI_NO' : 'FLEXI_YES') .' -- 
 										<a href="index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=basic" class="btn btn-warning" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){window.location.reload(false)}); return false;">'
-											.\Joomla\CMS\Language\Text::_('FLEXI_FIELD_DIRTY_REBUILD_SEARCH_INDEX').'
+											.JText::_('FLEXI_FIELD_DIRTY_REBUILD_SEARCH_INDEX').'
 										</a>' :
 										$form->getInput('isfilter'); ?>
 							</td>
@@ -296,8 +296,8 @@ $this->document->addScriptDeclaration($js);
 				
 				
 				<?php if ($this->supportadvsearch || $this->supportadvfilter) : ?>
-					<span class="fcsep_level1" style="width:90%; margin-top:16px; "><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_ADV_INDEX' ); ?></span>
-					<span class="fcsep_level4 alert alert-info" style="margin-left: 32px;"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_ADV_INDEX_NOTES' ); ?></span>
+					<span class="fcsep_level1" style="width:90%; margin-top:16px; "><?php echo JText::_( 'FLEXI_ADV_INDEX' ); ?></span>
+					<span class="fcsep_level4 alert alert-info" style="margin-left: 32px;"><?php echo JText::_( 'FLEXI_ADV_INDEX_NOTES' ); ?></span>
 					<div class="fcclear"></div>
 					
 					<table class="fc-form-tbl fcinner">
@@ -309,9 +309,9 @@ $this->document->addScriptDeclaration($js);
 							<td>
 								<?php echo
 									in_array($form->getValue('isadvsearch'),array(-1,2)) ?
-										\Joomla\CMS\Language\Text::_($form->getValue('isadvsearch')==-1 ? 'FLEXI_NO' : 'FLEXI_YES') .' -- 
+										JText::_($form->getValue('isadvsearch')==-1 ? 'FLEXI_NO' : 'FLEXI_YES') .' -- 
 										<a href="index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced" class="btn btn-warning" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){window.location.reload(false)}); return false;">'
-											.\Joomla\CMS\Language\Text::_('FLEXI_FIELD_DIRTY_REBUILD_SEARCH_INDEX').'
+											.JText::_('FLEXI_FIELD_DIRTY_REBUILD_SEARCH_INDEX').'
 										</a>' :
 										$form->getInput('isadvsearch'); ?>
 							</td>
@@ -326,9 +326,9 @@ $this->document->addScriptDeclaration($js);
 							<td>
 								<?php echo
 									in_array($form->getValue('isadvfilter'),array(-1,2)) ?
-										\Joomla\CMS\Language\Text::_($form->getValue('isadvfilter')==-1 ? 'FLEXI_NO' : 'FLEXI_YES') .' -- 
+										JText::_($form->getValue('isadvfilter')==-1 ? 'FLEXI_NO' : 'FLEXI_YES') .' -- 
 										<a href="index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced" class="btn btn-warning" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 350, function(){window.location.reload(false)}); return false;">'
-											.\Joomla\CMS\Language\Text::_('FLEXI_FIELD_DIRTY_REBUILD_SEARCH_INDEX').'
+											.JText::_('FLEXI_FIELD_DIRTY_REBUILD_SEARCH_INDEX').'
 										</a>' :
 										$form->getInput('isadvfilter'); ?>
 							</td>
@@ -342,18 +342,18 @@ $this->document->addScriptDeclaration($js);
 
 			<?php if ($this->perms->CanConfig) : ?>
 			<div class="tabbertab" id="fcform_tabset_common_perms_tab" data-icon-class="icon-power-cord" >
-				<h3 class="tabberheading"> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_PERMISSIONS' ); ?> </h3>
+				<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_PERMISSIONS' ); ?> </h3>
 				
 				<?php /*
 				<fieldset id="flexiaccess" class="flexiaccess basicfields_set">
-					<legend><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
+					<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
 					<div id="tabacces">
 				*/ ?>
 						<div id="access"><?php echo $this->form->getInput('rules'); ?></div>
 				<?php /*
 					</div>
 					<div id="notabacces">
-					<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
+					<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
 					</div>
 				</fieldset>
 				*/ ?>
@@ -366,7 +366,7 @@ $this->document->addScriptDeclaration($js);
 	</div>
 	<div class="span6 col-6 full_width_980 padded_wrap_box">
 			
-		<span class="fcsep_level0" style="margin:0 0 12px 0; background-color:#777; "><?php echo \Joomla\CMS\Language\Text::_( /*'FLEXI_THIS_FIELDTYPE_PROPERTIES'*/'FIELD TYPE specific configuration' ); ?></span>
+		<span class="fcsep_level0" style="margin:0 0 12px 0; background-color:#777; "><?php echo JText::_( /*'FLEXI_THIS_FIELDTYPE_PROPERTIES'*/'FIELD TYPE specific configuration' ); ?></span>
 			
 		<div id="fieldspecificproperties">
 			<div class="fctabber fields_tabset" id="field_specific_props_tabset">
@@ -384,14 +384,14 @@ $this->document->addScriptDeclaration($js);
 			if ($field_type) foreach ($fieldSets as $name => $fieldSet)
 			{
 				if ($name!='basic' && $name!='standard' && (substr($name, 0, $prefix_len)!='group-'.$field_type.'-' || $name==='group-'.$field_type) ) continue;
-				if ($fieldSet->label) $label = \Joomla\CMS\Language\Text::_($fieldSet->label);
-				else $label = $name=='basic' || $name=='standard' ? \Joomla\CMS\Language\Text::_('FLEXI_BASIC') : ucfirst(str_replace("group-", "", $name));
+				if ($fieldSet->label) $label = JText::_($fieldSet->label);
+				else $label = $name=='basic' || $name=='standard' ? JText::_('FLEXI_BASIC') : ucfirst(str_replace("group-", "", $name));
 				
-				if (@$fieldSet->label_prefix) $label = \Joomla\CMS\Language\Text::_($fieldSet->label_prefix) .' - '. $label;
+				if (@$fieldSet->label_prefix) $label = JText::_($fieldSet->label_prefix) .' - '. $label;
 				$icon = @$fieldSet->icon_class ? 'data-icon-class="'.$fieldSet->icon_class.'"' : '';
-				$prepend = @$fieldSet->prepend_text ? 'data-prefix-text="'.\Joomla\CMS\Language\Text::_($fieldSet->prepend_text).'"' : '';
+				$prepend = @$fieldSet->prepend_text ? 'data-prefix-text="'.JText::_($fieldSet->prepend_text).'"' : '';
 				
-				$description = $fieldSet->description ? \Joomla\CMS\Language\Text::_($fieldSet->description) : '';
+				$description = $fieldSet->description ? JText::_($fieldSet->description) : '';
 				?>
 				<div class="tabbertab" id="fcform_tabset_<?php echo $name; ?>_tab" <?php echo $icon; ?> <?php echo $prepend; ?>>
 					<h3 class="tabberheading hasTooltip" title="<?php echo $description; ?>"><?php echo $label; ?> </h3>
@@ -403,7 +403,7 @@ $this->document->addScriptDeclaration($js);
 							echo $field->input;
 						else
 						{
-							$_title = htmlspecialchars(\Joomla\CMS\Language\Text::_($field->description), ENT_QUOTES , 'UTF-8' );
+							$_title = htmlspecialchars(JText::_($field->description), ENT_QUOTES , 'UTF-8' );
 							$_label = strpos($field->label,'class=')
 								? str_replace('class="', 'class="label-fcinner ', $field->label)
 								: str_replace('<label ', '<label class="label-fcinner hasPopover" data-placement="top" data-bs-content="'.$_title.'" ', $field->label);
@@ -421,7 +421,7 @@ $this->document->addScriptDeclaration($js);
 				</div>
 				<?php
 			} else {
-				echo "<br /><span style=\"padding-left:25px;\"'>" . \Joomla\CMS\Language\Text::_( 'FLEXI_APPLY_TO_SEE_THE_PARAMETERS' ) . "</span><br /><br />";
+				echo "<br /><span style=\"padding-left:25px;\"'>" . JText::_( 'FLEXI_APPLY_TO_SEE_THE_PARAMETERS' ) . "</span><br /><br />";
 			}
 			?>
 			</div>
@@ -432,7 +432,7 @@ $this->document->addScriptDeclaration($js);
 </div>
 
 
-	<?php echo \Joomla\CMS\HTML\HTMLHelper::_( 'form.token' ); ?>
+	<?php echo JHtml::_( 'form.token' ); ?>
 	<input type="hidden" name="option" value="com_flexicontent" />
 	<?php echo $this->form->getInput('id'); ?>
 	<input type="hidden" name="controller" value="fields" />
@@ -446,5 +446,5 @@ $this->document->addScriptDeclaration($js);
 
 <?php
 //keep session alive while editing
-\Joomla\CMS\HTML\HTMLHelper::_('behavior.keepalive');
+JHtml::_('behavior.keepalive');
 HTMLHelper::_('bootstrap.popover', '.hasPopover', array('trigger' => 'click hover'));

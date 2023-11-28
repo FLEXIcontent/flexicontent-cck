@@ -78,7 +78,7 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 		$this->input->set('format', 'raw');    
 
 		// Import field to execute its constructor, e.g. needed for loading language file etc
-		\Joomla\CMS\Plugin\PluginHelper::importPlugin('flexicontent_fields', $this->input->get('field_type', '', 'cmd'));
+		JPluginHelper::importPlugin('flexicontent_fields', $this->input->get('field_type', '', 'cmd'));
 
 		// Display the field parameters
 		parent::display();
@@ -94,8 +94,8 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 	 */
 	function getIndexedFieldJSON()
 	{
-		$user   = \Joomla\CMS\Factory::getUser();
-		$app    = \Joomla\CMS\Factory::getApplication();
+		$user   = JFactory::getUser();
+		$app    = JFactory::getApplication();
 		$jinput = $app->input;
 
 		$field_id  = $jinput->get('field_id', 0, 'int');
@@ -106,7 +106,7 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 
 		if (!$is_authorised)
 		{
-			jexit(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'));
+			jexit(JText::_('FLEXI_ALERTNOTAUTH_TASK'));
 		}
 
 		// Get field configuration
@@ -128,15 +128,15 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 
 			if ($sql_mode && $item_pros > 0)
 			{
-				$error_mssg = sprintf(\Joomla\CMS\Language\Text::_('FLEXI_FIELD_ITEM_SPECIFIC_AS_FILTERABLE'), $field->label);
+				$error_mssg = sprintf(JText::_('FLEXI_FIELD_ITEM_SPECIFIC_AS_FILTERABLE'), $field->label);
 			}
 			elseif ($sql_mode)
 			{
-				$error_mssg = \Joomla\CMS\Language\Text::_('FLEXI_FIELD_INVALID_QUERY');
+				$error_mssg = JText::_('FLEXI_FIELD_INVALID_QUERY');
 			}
 			else
 			{
-				$error_mssg = \Joomla\CMS\Language\Text::_('FLEXI_FIELD_INVALID_ELEMENTS');
+				$error_mssg = JText::_('FLEXI_FIELD_INVALID_ELEMENTS');
 			}
 
 			jexit($error_mssg);

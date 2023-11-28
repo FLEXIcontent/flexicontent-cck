@@ -1,7 +1,6 @@
 <?php
-\Joomla\CMS\HTML\HTMLHelper::_('behavior.formvalidator');
-\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.modal');
-use \Joomla\CMS\Language\Text;
+JHtml::_('behavior.formvalidator');
+JHtml::_('bootstrap.modal');
 
 // Create field's HTML
 $field->{$prop} = array();
@@ -31,7 +30,7 @@ foreach ($values as $value)
 
 	if ( !strlen($text) || !$usetitle )
 	{
-		$text = \Joomla\CMS\String\PunycodeHelper::emailToUTF8($addr);  // email in Punycode to UTF8, for the purpose of displaying it
+		$text = JStringPunycode::emailToUTF8($addr);  // email in Punycode to UTF8, for the purpose of displaying it
 		$text_is_email = 1;
 	}
 	else
@@ -53,14 +52,14 @@ foreach ($values as $value)
 	}
 
 	// Add styles for label position
-	$document = \Joomla\CMS\Factory::getDocument();
-	$styleurl = \Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/email/css/style.css';
+	$document = JFactory::getDocument();
+	$styleurl = JUri::root(true) . '/plugins/flexicontent_fields/email/css/style.css';
 	$document->addStyleSheet($styleurl);
 
 	// Use paremeters to decide if email should be cloaked and if we need a mailto: link
 
 	// Title form display
-	$titleform         = \Joomla\CMS\Language\Text::_($field->parameters->get($LPN . 'title_form', ''));
+	$titleform         = JText::_($field->parameters->get($LPN . 'title_form', ''));
 	$display_titleform = $field->parameters->get($LPN . 'display_title_form', 0);
 
   // Modal display 
@@ -68,7 +67,7 @@ foreach ($values as $value)
 	$view = $app->input->getCmd('flexi_callview', ($realview ?: 'item'));
 	$use_modal = $field->parameters->get($LPN . 'use_modal', 1);
 	$use_modal_in_view = $field->parameters->get($LPN . 'use_modal_in_view', 'both');
-	$modal_button_text = \Joomla\CMS\Language\Text::_($field->parameters->get($LPN . 'modal_button_text', 'FLEXI_FIELD_EMAIL_MODAL_BUTTON_CONTENT'));
+	$modal_button_text = JText::_($field->parameters->get($LPN . 'modal_button_text', 'FLEXI_FIELD_EMAIL_MODAL_BUTTON_CONTENT'));
 	$modal_button_class = $field->parameters->get($LPN . 'modal_button_class', 'btn btn-info');
 	$modal_height = $field->parameters->get($LPN . 'modal_height', 400);
 	$modal_width = $field->parameters->get($LPN . 'modal_width', 400);
@@ -134,7 +133,7 @@ foreach ($values as $value)
 			<div class="field form-group control-group">
 				<input type="checkbox" id="consent" name="consent" value="consent" class="required">
 				<label for="consent">
-				<a href="'.$consent_field_link.'" target="_blank">'.Text::_($consent_field_text).'</a>
+				<a href="'.$consent_field_link.'" target="_blank">'.Jtext::_($consent_field_text).'</a>
 				</label>
 			</div>
 		';
@@ -147,7 +146,7 @@ foreach ($values as $value)
 
 	if ($captcha_plgname)
 	{
-		\Joomla\CMS\Plugin\PluginHelper::importPlugin('captcha');
+		JPluginHelper::importPlugin('captcha');
 		$dispatcher = JEventDispatcher::getInstance();
 
 		// This will put the code to load reCAPTCHA's JavaScript file into your <head>
@@ -178,16 +177,16 @@ foreach ($values as $value)
 			$required = $list_field->field_required ? 'required' : '';
 
 			// Create JText value
-			$field_label = \Joomla\CMS\Language\Text::_($list_field->field_label);
+			$field_label = JText::_($list_field->field_label);
 
 			// Create field id
-			$field_id = preg_replace("#[^a-zA-Z-0-9_]#", "", \Joomla\CMS\Language\Text::_($list_field->field_name));
+			$field_id = preg_replace("#[^a-zA-Z-0-9_]#", "", JText::_($list_field->field_name));
 
 			// Create field name
-			$field_name = $formid.'['.\Joomla\CMS\Language\Text::_($list_field->field_name).']';
+			$field_name = $formid.'['.JText::_($list_field->field_name).']';
 
 			// Create field value
-			$field_value = preg_replace("#[^a-zA-Z-0-9]#", "", \Joomla\CMS\Language\Text::_($list_field->field_value));
+			$field_value = preg_replace("#[^a-zA-Z-0-9]#", "", JText::_($list_field->field_value));
 
 			// Placeholder
 			$placeholder = ($label_position === 'placeholder') ? ' placeholder="' . $list_field->field_label . '"' : '';
@@ -226,7 +225,7 @@ foreach ($values as $value)
 
 					foreach ($values_field as $value_field)
 					{
-						$value =  \Joomla\CMS\Language\Text::_($value_field);
+						$value =  JText::_($value_field);
 						$fields_display .= '<input type="radio" value="'.$value.'" name="'.$formid.'['.$value.']'.'" aria-label="'.$value.'" style="margin:0" class="form-control"><label for="'.$field_id.'">'.$value.'</label>';
 					}
 
@@ -239,7 +238,7 @@ foreach ($values as $value)
 
 					foreach ($values_field as $value_field)
 					{
-						$value = \Joomla\CMS\Language\Text::_($value_field);
+						$value = JText::_($value_field);
 						$fields_display .= '<input type="checkbox" value="'.$value.'" name="'.$value.'" class="form-control" aria-label="'.$value.'" style="margin:0" ><label for="'.$field_id.'">'.$value.'</label>'; //TODO add required system
 					}
 					$fields_display .='</div>';
@@ -247,13 +246,13 @@ foreach ($values as $value)
 
 				case 'select':
 					$values_field = explode(";;",$list_field->field_value);
-					$select_label = ($class == 'placeholder') ? $field_label : \Joomla\CMS\Language\Text::_('FLEXI_SELECT');
+					$select_label = ($class == 'placeholder') ? $field_label : JText::_('FLEXI_SELECT');
 					$fields_display .= '<div class="'.$field_id.' field field_select form-group control-group" ><label for="'.$field_id.'" class="'.$class.'" style="margin:0">'.$field_label.'</label><select id="'.$field_name.'" name="'.$field_name.'" aria-label="'.$field_label.'" class="form-control"><option value="">'.$select_label.'</option>';//TODO add required system
 
 					foreach ($values_field as $value_field)
 					{
-						$value = \Joomla\CMS\Language\Text::_($value_field);
-						$fields_display .='<option value="'.$value.'">'.\Joomla\CMS\Language\Text::_($value_field).'</option>';
+						$value = JText::_($value_field);
+						$fields_display .='<option value="'.$value.'">'.JText::_($value_field).'</option>';
 					}
 					$fields_display .='</select></div>';
 					break;
@@ -289,7 +288,7 @@ foreach ($values as $value)
 					break;
 
 				case 'freehtml':
-					$fields_display .= '<div class="'.$field_id.' field field_html form-group control-group"><p>'.$field_label.'</p><p>'.\Joomla\CMS\Language\Text::_($list_field->field_value).'</p></div>';
+					$fields_display .= '<div class="'.$field_id.' field field_html form-group control-group"><p>'.$field_label.'</p><p>'.JText::_($list_field->field_value).'</p></div>';
 					break;
 
 				case 'url':
@@ -313,7 +312,7 @@ foreach ($values as $value)
 				'.$consent_field.'
 				'.$captcha_html.'
 				<div class="form-group control-group submit-button">
-				<input type="submit" name="submit" value="'.\Joomla\CMS\Language\Text::_('FLEXI_FIELD_EMAIL_SUBMIT_LABEL_VALUE').'" class="'.$submit_class.'">
+				<input type="submit" name="submit" value="'.JText::_('FLEXI_FIELD_EMAIL_SUBMIT_LABEL_VALUE').'" class="'.$submit_class.'">
 				</div>
 				<input type="hidden" name="emailtask" value="plg.email.submit" />
 				<input type="hidden" name="formid" value="'.$formid.'" />
@@ -324,7 +323,7 @@ foreach ($values as $value)
 				<input type="hidden" name="itemauthor" value="'.$item->author.'" />
 				<input type="hidden" name="catid" value="'.$item->catid.'" />
 				<input type="hidden" name="return" value="" />
-				'.\Joomla\CMS\HTML\HTMLHelper::_("form.token").'
+				'.JHtml::_("form.token").'
 			</fieldset>
 		</form>
 		'.$modal_footer.'
@@ -338,7 +337,7 @@ foreach ($values as $value)
 				{
 					if (inp.files.length > inp.dataset.max)
 					{
-						alert(`'.\Joomla\CMS\Language\Text::_("FLEXI_ALLOWED_NUM_FILES").' ${inp.dataset.max} '.\Joomla\CMS\Language\Text::_("FLEXI_FILES_FOR").' ${inp.placeholder}`);
+						alert(`'.JText::_("FLEXI_ALLOWED_NUM_FILES").' ${inp.dataset.max} '.JText::_("FLEXI_FILES_FOR").' ${inp.placeholder}`);
 						e.preventDefault();
 					}
 				});

@@ -23,9 +23,9 @@ jimport('cms.plugin.helper');
 global $is_fc_component;
 $is_fc_component = 1;
 
-$cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
-$app     = \Joomla\CMS\Factory::getApplication();
-$document= \Joomla\CMS\Factory::getDocument();
+$cparams = JComponentHelper::getParams('com_flexicontent');
+$app     = JFactory::getApplication();
+$document= JFactory::getDocument();
 $jinput  = $app->input;
 $format  = $jinput->get('format', 'html', 'cmd');
 
@@ -38,7 +38,7 @@ $force_print = false || JDEBUG;
 
 // Force post-install check for testing purposes
 /*if ( $format == "html" ) {
-	$session = \Joomla\CMS\Factory::getSession();
+	$session = JFactory::getSession();
 	$postinst_integrity_ok = $session->get('flexicontent.postinstall');
 	$recheck_aftersave = $session->get('flexicontent.recheck_aftersave');
 	$force_print = $postinst_integrity_ok===NULL || $postinst_integrity_ok===false || $recheck_aftersave;
@@ -52,7 +52,7 @@ if ($print_logging_info && $format === 'html')
 	$start_microtime = microtime(true);
 	global $fc_jprof;
 	jimport('joomla.profiler.profiler');
-	$fc_jprof = new \Joomla\CMS\Profiler\Profiler();
+	$fc_jprof = new JProfiler();
 	$fc_jprof->mark('START: FLEXIcontent component');
 }
 
@@ -73,14 +73,14 @@ require_once (JPATH_SITE.'/components/com_flexicontent/helpers/permission.php');
 require_once (JPATH_SITE.'/components/com_flexicontent/helpers/route.php');
 
 // Add component's table directory to the include path
-\Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR.'/components/com_flexicontent/tables');
+JTable::addIncludePath(JPATH_ADMINISTRATOR.'/components/com_flexicontent/tables');
 
 // Import the flexicontent_fields plugins and flexicontent plugins
 if (!FLEXI_ONDEMAND)
 {
-	\Joomla\CMS\Plugin\PluginHelper::importPlugin('flexicontent_fields');
+	JPluginHelper::importPlugin('flexicontent_fields');
 }
-\Joomla\CMS\Plugin\PluginHelper::importPlugin('flexicontent');
+JPluginHelper::importPlugin('flexicontent');
 
 
 
@@ -89,26 +89,26 @@ if (!FLEXI_ONDEMAND)
  */
 
 // Load language file of 'com_content' component
-\Joomla\CMS\Factory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR);
+JFactory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR);
 
-if ( \Joomla\CMS\Factory::getLanguage()->getDefault() != 'en-GB' )
+if ( JFactory::getLanguage()->getDefault() != 'en-GB' )
 {
 	// If site default language is not english then load english language file for 'com_flexicontent' component, and the override (forcing a reload) with current language file
 	// We make sure that 'english' file has been loaded, because we need it as fallback for language strings that do not exist in current language
-	\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', $force_reload = false, $load_default = true);
-	\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, $force_reload = true, $load_default = true);
+	JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', $force_reload = false, $load_default = true);
+	JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, $force_reload = true, $load_default = true);
 }
 
 else
 	// No force loading needed, save some time, and do not force language file reload
-	\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR);
+	JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR);
 
 // Load language overrides, just before executing the component (DONE manually for J1.5)
 /*if (!FLEXI_J16GE)
 {
 	$overrideDir = JPATH_ADMINISTRATOR . '/languages/overrides/';
-	\Joomla\CMS\Factory::getLanguage()->load('override', $overrideDir, 'en-GB', $force_reload = true, $load_default = true);
-	\Joomla\CMS\Factory::getLanguage()->load('override', $overrideDir, null, $force_reload = true, $load_default = true);
+	JFactory::getLanguage()->load('override', $overrideDir, 'en-GB', $force_reload = true, $load_default = true);
+	JFactory::getLanguage()->load('override', $overrideDir, null, $force_reload = true, $load_default = true);
 }*/
 
 
@@ -214,8 +214,8 @@ if (
 )
 {
 	// Load english language file for 'com_users' component then override with current language file
-	\Joomla\CMS\Factory::getLanguage()->load('com_users', JPATH_ADMINISTRATOR, 'en-GB', true);
-	\Joomla\CMS\Factory::getLanguage()->load('com_users', JPATH_ADMINISTRATOR, null, true);
+	JFactory::getLanguage()->load('com_users', JPATH_ADMINISTRATOR, 'en-GB', true);
+	JFactory::getLanguage()->load('com_users', JPATH_ADMINISTRATOR, null, true);
 	// users helper file
 	require_once (JPATH_ADMINISTRATOR.'/components/com_flexicontent/helpers/users.php');
 }
@@ -253,7 +253,7 @@ if ( $cparams->get('recompile_core_less', 0) && $format == 'html' )
  * Create a controller instance
  */
 
-$controller	= \Joomla\CMS\MVC\Controller\BaseController::getInstance('Flexicontent');
+$controller	= JControllerLegacy::getInstance('Flexicontent');
 
 
 
@@ -284,11 +284,11 @@ if ($format === 'html')
 	if ( 1 ) // always load tooltips JS in backend
 	{
 		// J3.0+ tooltips (bootstrap based)
-		\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip');
+		JHtml::_('bootstrap.tooltip');
 	}
 	// Add flexi-lib JS
-	\Joomla\CMS\Factory::getDocument()->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', array('version' => FLEXI_VHASH));  // Frontend/backend script
-	\Joomla\CMS\Factory::getDocument()->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/js/flexi-lib.js', array('version' => FLEXI_VHASH));  // Backend only script
+	JFactory::getDocument()->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', array('version' => FLEXI_VHASH));  // Frontend/backend script
+	JFactory::getDocument()->addScript(JUri::base(true).'/components/com_flexicontent/assets/js/flexi-lib.js', array('version' => FLEXI_VHASH));  // Backend only script
 
 	// Validate when Joomla.submitForm() is called, NOTE: for non-FC views this is done before the method is called
 	$js = '
@@ -298,7 +298,7 @@ if ($format === 'html')
 
 	// Load bootstrap CSS
 	if ( 0 )  // Let backend template decide to load bootstrap CSS
-		\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.loadCss', true);
+		JHtml::_('bootstrap.loadCss', true);
 }
 
 

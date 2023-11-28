@@ -37,7 +37,7 @@ class plgFlexicontent_fieldsDate extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
-		$field->label = $field->parameters->get('label_form') ? \Joomla\CMS\Language\Text::_($field->parameters->get('label_form')) : \Joomla\CMS\Language\Text::_($field->label);
+		$field->label = $field->parameters->get('label_form') ? JText::_($field->parameters->get('label_form')) : JText::_($field->label);
 
 		// Set field and item objects
 		$this->setField($field);
@@ -75,11 +75,11 @@ class plgFlexicontent_fieldsDate extends FCField
 		}
 
 		// Initialize framework objects and other variables
-		$document = \Joomla\CMS\Factory::getDocument();
-		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
-		$config   = \Joomla\CMS\Factory::getConfig();
-		$app      = \Joomla\CMS\Factory::getApplication();
-		$user     = \Joomla\CMS\Factory::getUser();
+		$document = JFactory::getDocument();
+		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
+		$config   = JFactory::getConfig();
+		$app      = JFactory::getApplication();
+		$user     = JFactory::getUser();
 
 		$tooltip_class = 'hasTooltip';
 		$add_on_class    = $cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
@@ -127,7 +127,7 @@ class plgFlexicontent_fieldsDate extends FCField
 		$size = (int) $field->parameters->get( 'size', 30 ) ;
 
 		$display_label_form = (int) $field->parameters->get( 'display_label_form', 1 ) ;
-		$placeholder        = $display_label_form==-1 ? $field->label : \Joomla\CMS\Language\Text::_($field->parameters->get( 'placeholder', '' )) ;
+		$placeholder        = $display_label_form==-1 ? $field->label : JText::_($field->parameters->get( 'placeholder', '' )) ;
 
 		// Input field display limitations
 		$minyear = $field->parameters->get('minyear', '');
@@ -156,7 +156,7 @@ class plgFlexicontent_fieldsDate extends FCField
 		$use_editor_tz  = $date_allowtime ? $use_editor_tz : 0;  // Timezone IS disabled, if time usage is disabled
 
 		$dateformat = $field->parameters->get('date_format_form', '%Y-%m-%d');
-		$dateformat = \Joomla\CMS\Language\Text::_($dateformat);
+		$dateformat = JText::_($dateformat);
 
 		$timezone = 'UTC'; // Default is not to use TIMEZONE
 		$tz_info  = '';    // Default is not to show TIMEZONE info
@@ -167,7 +167,7 @@ class plgFlexicontent_fieldsDate extends FCField
 		{
 			if ($date_source !== 3)
 			{
-				$field_notes .= \Joomla\CMS\Language\Text::_('FLEXI_DATE_CAN_ENTER_TIME') .($date_allowtime==2 ? '<br/>'.\Joomla\CMS\Language\Text::_('FLEXI_DATE_USE_ZERO_TIME_ON_EMPTY') : '');
+				$field_notes .= JText::_('FLEXI_DATE_CAN_ENTER_TIME') .($date_allowtime==2 ? '<br/>'.JText::_('FLEXI_DATE_USE_ZERO_TIME_ON_EMPTY') : '');
 			}
 		}
 
@@ -175,34 +175,34 @@ class plgFlexicontent_fieldsDate extends FCField
 		{
 			// Raw date storing, ignoring timezone. NOTE: this is OLD BEHAVIOUR
 			$timezone = 'UTC';
-			$field_notes .= '<br/>'.\Joomla\CMS\Language\Text::_('FLEXI_DATE_TIMEZONE_USAGE_DISABLED');
+			$field_notes .= '<br/>'.JText::_('FLEXI_DATE_TIMEZONE_USAGE_DISABLED');
 			$tz_info = $date_allowtime ? ' &nbsp; UTC' : '';
 		}
 		else
 		{
 			$timezone = $user->getParam('timezone', $config->get('offset'));   // Use timezone of editor, unlogged editor will use site's default timezone
 			$tz = new DateTimeZone($timezone);
-			$tz_offset = $tz->getOffset(new \Joomla\CMS\Date\Date()) / 3600;
+			$tz_offset = $tz->getOffset(new JDate()) / 3600;
 			$tz_info =  $tz_offset > 0 ? ' &nbsp; UTC +'.$tz_offset : ' UTC '.$tz_offset;
 
 			$field_notes .= '
-				<br/>'.\Joomla\CMS\Language\Text::_('FLEXI_DATE_TIMEZONE_USAGE_ENABLED').'
-				<br/>'.\Joomla\CMS\Language\Text::_($user->id ? 'FLEXI_DATE_ENTER_HOURS_IN_YOUR_TIMEZONE' : 'FLEXI_DATE_ENTER_HOURS_IN_TIMEZONE').': '.$tz_info;
+				<br/>'.JText::_('FLEXI_DATE_TIMEZONE_USAGE_ENABLED').'
+				<br/>'.JText::_($user->id ? 'FLEXI_DATE_ENTER_HOURS_IN_YOUR_TIMEZONE' : 'FLEXI_DATE_ENTER_HOURS_IN_TIMEZONE').': '.$tz_info;
 		}
 
 		// Timestamp mode (Current time), which will be displayed as user time but saved as 'UTC 0'
 		if ($date_source === 3)
 		{
 			$tz = new DateTimeZone($timezone);
-			$date_now = \Joomla\CMS\Factory::getDate('now');
+			$date_now = JFactory::getDate('now');
 			$date_now->setTimezone($tz);
 			$date_now_str = $date_now->format(
-				str_replace('%', '', \Joomla\CMS\Language\Text::_($dateformat)),
+				str_replace('%', '', JText::_($dateformat)),
 				$local = true
 			);
 		}
 
-		$field_notes = $field_notes ? '<b>'.\Joomla\CMS\Language\Text::_('FLEXI_NOTES').'</b>: '.$field_notes : '';
+		$field_notes = $field_notes ? '<b>'.JText::_('FLEXI_NOTES').'</b>: '.$field_notes : '';
 
 		// Initialise property with default value
 		if (!$field->value || (count($field->value) === 1 && reset($field->value) === null))
@@ -249,7 +249,7 @@ class plgFlexicontent_fieldsDate extends FCField
 			});
 			";
 
-			if ($max_values) \Joomla\CMS\Language\Text::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
+			if ($max_values) JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
 			$js .= "
 			function addField".$field->id."(el, groupval_box, fieldval_box, params)
 			{
@@ -384,11 +384,11 @@ class plgFlexicontent_fieldsDate extends FCField
 
 			$css .= '';
 
-			$remove_button = '<span class="' . $add_on_class . ' fcfield-delvalue ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
-			$move2 = '<span class="' . $add_on_class . ' fcfield-drag-handle ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
+			$remove_button = '<span class="' . $add_on_class . ' fcfield-delvalue ' . $font_icon_class . '" title="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
+			$move2 = '<span class="' . $add_on_class . ' fcfield-drag-handle ' . $font_icon_class . '" title="'.JText::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
 			$add_here = '';
-			$add_here .= $add_position==2 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
-			$add_here .= $add_position==1 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
+			$add_here .= $add_position==2 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.JText::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
+			$add_here .= $add_position==1 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.JText::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
 		}
 
 		// Field not multi-value
@@ -434,7 +434,7 @@ class plgFlexicontent_fieldsDate extends FCField
 				if ($value)
 				{
 					try {
-						$timestamp = '<span class="alert alert-info fc-small fc-iblock fcfield_timestamp_value_existing">'. \Joomla\CMS\HTML\HTMLHelper::_('date', $value, $dateformat, $timezone ).$tz_info.'</span> ';
+						$timestamp = '<span class="alert alert-info fc-small fc-iblock fcfield_timestamp_value_existing">'. JHtml::_('date', $value, $dateformat, $timezone ).$tz_info.'</span> ';
 					} catch ( Exception $e ) {
 						$timestamp = '';
 					}
@@ -445,8 +445,8 @@ class plgFlexicontent_fieldsDate extends FCField
 				}
 
 				$timestamp .=
-						'<span class="alert alert-info fc-small fc-iblock fcfield_timestamp_value_new" style="'.($timestamp ? 'display:none;' : '').'">'.\Joomla\CMS\Language\Text::_('FLEXI_FIELD_DATE_NOW').', '. // ' - '$date_now_str.' - '
-						'<span class="fcfield_timestamp_note">'.\Joomla\CMS\Language\Text::_( 'FLEXI_AUTO' ).'</span></span>';
+						'<span class="alert alert-info fc-small fc-iblock fcfield_timestamp_value_new" style="'.($timestamp ? 'display:none;' : '').'">'.JText::_('FLEXI_FIELD_DATE_NOW').', '. // ' - '$date_now_str.' - '
+						'<span class="fcfield_timestamp_note">'.JText::_( 'FLEXI_AUTO' ).'</span></span>';
 
 				$html = $timestamp .'
 					<input type="hidden" class="fcfield_date" value="'.($value ? $n : '').'" id="'.$elementid_n.'" name="'.$fieldname_n.'" />
@@ -553,8 +553,8 @@ class plgFlexicontent_fieldsDate extends FCField
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
 			if (!$add_position) $field->html .= '
 				<div class="input-append input-prepend fc-xpended-btns">
-					<span class="fcfield-addvalue ' . $font_icon_class . ' fccleared" onclick="addField'.$field->id.'(jQuery(this).closest(\'.fc-xpended-btns\').get(0));" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_TO_BOTTOM' ).'">
-						'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_VALUE' ).'
+					<span class="fcfield-addvalue ' . $font_icon_class . ' fccleared" onclick="addField'.$field->id.'(jQuery(this).closest(\'.fc-xpended-btns\').get(0));" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'">
+						'.JText::_( 'FLEXI_ADD_VALUE' ).'
 					</span>
 				</div>';
 		}
@@ -577,7 +577,7 @@ class plgFlexicontent_fieldsDate extends FCField
 
 		if (count($skipped_vals))
 		{
-			$app->enqueueMessage( \Joomla\CMS\Language\Text::sprintf('FLEXI_FIELD_DATE_EDIT_VALUES_SKIPPED', $field->label, implode(',',$skipped_vals)), 'notice' );
+			$app->enqueueMessage( JText::sprintf('FLEXI_FIELD_DATE_EDIT_VALUES_SKIPPED', $field->label, implode(',',$skipped_vals)), 'notice' );
 		}
 	}
 
@@ -587,7 +587,7 @@ class plgFlexicontent_fieldsDate extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
-		$field->label = \Joomla\CMS\Language\Text::_($field->label);
+		$field->label = JText::_($field->label);
 
 		// Set field and item objects
 		$this->setField($field);
@@ -605,8 +605,8 @@ class plgFlexicontent_fieldsDate extends FCField
 		{
 			$initialized = 1;
 
-			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$app       = JFactory::getApplication();
+			$document  = JFactory::getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -629,8 +629,8 @@ class plgFlexicontent_fieldsDate extends FCField
 		$is_ingroup  = !empty($field->ingroup);
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		$multiple    = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
-		$config = \Joomla\CMS\Factory::getConfig();
-		$user = \Joomla\CMS\Factory::getUser();
+		$config = JFactory::getConfig();
+		$user = JFactory::getUser();
 
 		// Value handling parameters
 		$lang_filter_values = 0;
@@ -649,8 +649,8 @@ class plgFlexicontent_fieldsDate extends FCField
 			static $nullDate, $never_date;
 			if ($nullDate == null)
 			{
-				$nullDate = \Joomla\CMS\Factory::getDbo()->getNullDate();
-				$never_date = ''; //\Joomla\CMS\Language\Text::_('FLEXI_NEVER');
+				$nullDate = JFactory::getDbo()->getNullDate();
+				$never_date = ''; //JText::_('FLEXI_NEVER');
 			}
 
 			$_value = $date_source === 1
@@ -696,12 +696,12 @@ class plgFlexicontent_fieldsDate extends FCField
 		{
 			$customdate = $field->parameters->get('custom_date' . $sfx, $date_source !== 3 ? 'DATE_FORMAT_LC2' : 'Y-M-d, H:i:s');
 			$dateformat = (int) $field->parameters->get('lang_filter_format' . $sfx, 0)
-				? \Joomla\CMS\Language\Text::_($customdate)
+				? JText::_($customdate)
 				: $customdate;
 		}
 		else
 		{
-			$dateformat = \Joomla\CMS\Language\Text::_($dateformat);
+			$dateformat = JText::_($dateformat);
 		}
 
 		$display_tz_logged   = $field->parameters->get( 'display_tz_logged', 2) ;
@@ -758,7 +758,7 @@ class plgFlexicontent_fieldsDate extends FCField
 		if ($display_tz_suffix && $tz_suffix_type > 0)
 		{
 			$tz        = new DateTimeZone($timezone);
-			$tz_offset = $tz->getOffset(new \Joomla\CMS\Date\Date()) / 3600;
+			$tz_offset = $tz->getOffset(new JDate()) / 3600;
 			$tz_info   = $tz_offset > 0 ? ' UTC +' . $tz_offset : ' UTC ' . $tz_offset;
 		}
 
@@ -821,7 +821,7 @@ class plgFlexicontent_fieldsDate extends FCField
 			// Dates are always stored using 'UTC 0' timezone
 			$tz = new DateTimeZone('UTC');
 
-			$date_now = \Joomla\CMS\Factory::getDate('now');
+			$date_now = JFactory::getDate('now');
 			$date_now->setTimezone($tz);
 
 			$date_now_value = $date_now->toSql();
@@ -830,8 +830,8 @@ class plgFlexicontent_fieldsDate extends FCField
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
 
-		$config = \Joomla\CMS\Factory::getConfig();
-		$user = \Joomla\CMS\Factory::getUser();
+		$config = JFactory::getConfig();
+		$user = JFactory::getUser();
 
 		$date_allowtime = (int) $field->parameters->get( 'date_allowtime', 1 ) ;
 		$use_editor_tz  = (int) $field->parameters->get( 'use_editor_tz', 0 ) ;
@@ -919,13 +919,13 @@ class plgFlexicontent_fieldsDate extends FCField
 			 * Verify that we have a valid date !! Try to parse the date, while considering timezone
 			 */
 			try {
-				$dateObj  = new \Joomla\CMS\Date\Date($post[$n], ($time ? $timezone : 'UTC'));
+				$dateObj  = new JDate($post[$n], ($time ? $timezone : 'UTC'));
 				$post[$n] = $dateObj->toSql();
 			}
 			catch ( Exception $e ) {
-				\Joomla\CMS\Factory::getApplication()->enqueueMessage(
-					'<b>' . $field->label . ' ' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD') . '</b>: ' .
-					\Joomla\CMS\Language\Text::sprintf('FLEXI_CLEARING_INVALID_CALENDAR_DATE', $post[$n])
+				JFactory::getApplication()->enqueueMessage(
+					'<b>' . $field->label . ' ' . JText::_('FLEXI_FIELD') . '</b>: ' .
+					JText::sprintf('FLEXI_CLEARING_INVALID_CALENDAR_DATE', $post[$n])
 				, 'warning');
 			}
 
@@ -1005,7 +1005,7 @@ class plgFlexicontent_fieldsDate extends FCField
 		$filter->date_valformat = $date_valformat;
 		$filter->date_txtformat = $date_txtformat;
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 		$nullDate_quoted = $db->Quote($db->getNullDate());
 
 		$filter_as_range = in_array($display_filter_as, array(2,3,8));  // We don't want null date if using a range
@@ -1031,12 +1031,12 @@ class plgFlexicontent_fieldsDate extends FCField
 			if (!$filter_as_age)
 			{
 				$valuecol = sprintf(' CASE WHEN %s='.$nullDate_quoted.' THEN '.(!$filter_as_range ? $nullDate_quoted : $db->Quote('')).' ELSE DATE_FORMAT(%s, "%s") END ', $_value_col, $_value_col, !in_array($display_filter_as, array(1, 3)) ? $date_valformat : $date_txtformat);
-				$textcol  = sprintf(' CASE WHEN %s='.$nullDate_quoted.' THEN "'.\Joomla\CMS\Language\Text::_('FLEXI_NEVER').'" ELSE DATE_FORMAT(%s, "%s") END ', $_value_col, $_value_col, $date_txtformat);
+				$textcol  = sprintf(' CASE WHEN %s='.$nullDate_quoted.' THEN "'.JText::_('FLEXI_NEVER').'" ELSE DATE_FORMAT(%s, "%s") END ', $_value_col, $_value_col, $date_txtformat);
 			}
 			else
 			{
 				$valuecol = sprintf(' CASE WHEN %s='.$nullDate_quoted.' THEN '.(!$filter_as_range ? $nullDate_quoted : $db->Quote('')).' ELSE TIMESTAMPDIFF(' . $filter_age_type . ', ' . $_value_col . ', CURDATE()) END ', $_value_col);
-				$textcol  = sprintf(' CASE WHEN %s='.$nullDate_quoted.' THEN "'.\Joomla\CMS\Language\Text::_('FLEXI_NEVER').'" ELSE TIMESTAMPDIFF(' . $filter_age_type . ', ' . $_value_col . ', CURDATE()) END ', $_value_col);
+				$textcol  = sprintf(' CASE WHEN %s='.$nullDate_quoted.' THEN "'.JText::_('FLEXI_NEVER').'" ELSE TIMESTAMPDIFF(' . $filter_age_type . ', ' . $_value_col . ', CURDATE()) END ', $_value_col);
 			}
 		}
 		else
@@ -1157,7 +1157,7 @@ class plgFlexicontent_fieldsDate extends FCField
 		}
 		else
 		{
-			\Joomla\CMS\Factory::getApplication()->enqueueMessage( __FUNCTION__." for field: '".$filter->label.", date_source: ".$date_source." not implemented" , 'notice' );
+			JFactory::getApplication()->enqueueMessage( __FUNCTION__." for field: '".$filter->label.", date_source: ".$date_source." not implemented" , 'notice' );
 		}
 
 		// Format of given values must be same as format of the value-column, for filter as age  posted filter value is already a number
@@ -1256,7 +1256,7 @@ class plgFlexicontent_fieldsDate extends FCField
 			return true;
 		}
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 
 		foreach ($values as $v)
 		{
@@ -1274,7 +1274,7 @@ class plgFlexicontent_fieldsDate extends FCField
 				 * Use UTC timezone, aka do not do any shifting of dates during fixing !!
 				 * This is not an edit or an import operation
 				 */
-				$dateObj = new \Joomla\CMS\Date\Date($date_string, 'UTC');
+				$dateObj = new JDate($date_string, 'UTC');
 				$date_string = $dateObj->toSql();
 
 				// We produced a different date string, update the database !!
@@ -1310,7 +1310,7 @@ class plgFlexicontent_fieldsDate extends FCField
 	{
 		// Get date format
 		$dateformat = $field->parameters->get('date_format_form', '%Y-%m-%d');
-		$dateformat = str_replace('%', '', \Joomla\CMS\Language\Text::_($dateformat));
+		$dateformat = str_replace('%', '', JText::_($dateformat));
 
 		// Get timeformat
 		$date_allowtime = (int) $field->parameters->get( 'date_allowtime', 1 ) ;
@@ -1328,7 +1328,7 @@ class plgFlexicontent_fieldsDate extends FCField
 			$value = $dt->format('Y-m-d' . $timeformat);
 		}
 
-		//\Joomla\CMS\Factory::getApplication()->enqueueMessage('dt_format: ' . $dt_format . ' - input: ' . $value . ' - toSql(): ' .  $v, 'notice');
+		//JFactory::getApplication()->enqueueMessage('dt_format: ' . $dt_format . ' - input: ' . $value . ' - toSql(): ' .  $v, 'notice');
 
 		return $value;
 	}
@@ -1401,7 +1401,7 @@ class plgFlexicontent_fieldsDate extends FCField
 		else
 		{
 			$values = array();
-			$db = \Joomla\CMS\Factory::getDbo();
+			$db = JFactory::getDbo();
 
 			if ($date_source === 1 || $date_source === 2)
 			{

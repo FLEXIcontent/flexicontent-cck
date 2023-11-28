@@ -55,8 +55,8 @@
 			</field>
 
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" level="level2" />
-			<field name="pretext_form" type="text" default="" filter="\Joomla\CMS\Component\ComponentHelper::filterText" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
-			<field name="posttext_form" type="text" default="" filter="\Joomla\CMS\Component\ComponentHelper::filterText" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
+			<field name="pretext_form" type="text" default="" filter="JComponentHelper::filterText" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
+			<field name="posttext_form" type="text" default="" filter="JComponentHelper::filterText" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
 			<field name="separator" type="list" default="0" label="FLEXI_VALUE_SEPARATOR_ITEM_FORM" description="FLEXI_VALUE_SEPARATOR_ITEM_FORM_DESC">
 				<option value="0">FLEXI_SPACE</option>
 				<option value="1">FLEXI_LINE_BREAK</option>

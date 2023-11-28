@@ -17,7 +17,7 @@
  *   {{fieldname:label}}
  *
  * - Language string
- *   \Joomla\CMS\Language\Text::_('LANG_STRING_NAME')
+ *   JText::_('LANG_STRING_NAME')
  */
 
 

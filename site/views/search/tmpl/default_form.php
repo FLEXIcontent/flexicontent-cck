@@ -5,7 +5,6 @@ use \Joomla\CMS\Language\Text;
 use \Joomla\CMS\HTML\HTMLHelper;
 
 $app = Factory::getApplication();
-
 $form_id = $this->form_id;
 $form_name = $this->form_name;
 
@@ -115,7 +114,6 @@ $r = 0;
 /**
  * Filters in slider
  */
-
 $jcookie = Factory::getApplication()->input->cookie;
 $cookie_name = 'fc_active_TabSlideFilter';
 
@@ -130,7 +128,7 @@ if ($disp_slide_filter)
 	}
 	catch (Exception $e)
 	{
-		$jcookie->set($cookie_name, '{}', time()+60*60*24*(365*5), \Joomla\CMS\Uri\Uri::base(true), '');
+		$jcookie->set($cookie_name, '{}', time()+60*60*24*(365*5), JUri::base(true), '');
 	}
 
 	$last_active_slide = isset($active_slides->$ff_slider_tagid) ? $active_slides->$ff_slider_tagid : null;
@@ -334,6 +332,7 @@ if ($disp_slide_filter)
 					
 				<?php if ( !count($this->filters) && $this->type_based_search ) : ?>
 					<div class="alert alert-info"><?php echo Text::_('FLEXI_SELECT_CONTENT_TYPE_BEFORE_USING_FILTERS'); ?></div>
+				<?php endif; ?>
 				
 				<?php /*if($show_operator = $this->params->get('show_filtersop', 1)) : ?>
 					<tr class="fc_search_row_<?php echo (($r++)%2);?>">

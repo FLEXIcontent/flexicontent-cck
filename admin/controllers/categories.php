@@ -82,8 +82,8 @@ class FlexicontentControllerCategories extends FlexicontentControllerBaseAdmin
 		$this->msg_records_deleted         = 'FLEXI_CATEGORIES_DELETED';
 
 		// Load Joomla 'com_categories' language files
-		\Joomla\CMS\Factory::getLanguage()->load('com_categories', JPATH_ADMINISTRATOR, 'en-GB', true);
-		\Joomla\CMS\Factory::getLanguage()->load('com_categories', JPATH_ADMINISTRATOR, null, true);
+		JFactory::getLanguage()->load('com_categories', JPATH_ADMINISTRATOR, 'en-GB', true);
+		JFactory::getLanguage()->load('com_categories', JPATH_ADMINISTRATOR, null, true);
 	}
 
 
@@ -161,7 +161,7 @@ class FlexicontentControllerCategories extends FlexicontentControllerBaseAdmin
 	public function orderup()
 	{
 		// Check for request forgeries
-		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
 
 		// Move record
 		$model = $this->getModel($this->record_name_pl);
@@ -182,7 +182,7 @@ class FlexicontentControllerCategories extends FlexicontentControllerBaseAdmin
 	public function orderdown()
 	{
 		// Check for request forgeries
-		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
 
 		// Move record
 		$model = $this->getModel($this->record_name_pl);
@@ -205,11 +205,11 @@ class FlexicontentControllerCategories extends FlexicontentControllerBaseAdmin
 	public function access()
 	{
 		// Check for request forgeries
-		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
 
 		// Initialize variables
-		$app   = \Joomla\CMS\Factory::getApplication();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$app   = JFactory::getApplication();
+		$user  = JFactory::getUser();
 
 		// Get model
 		$model = $this->getModel($this->record_name_pl);
@@ -221,7 +221,7 @@ class FlexicontentControllerCategories extends FlexicontentControllerBaseAdmin
 		// Check at least one item was selected
 		if (!count($cid))
 		{
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_NO_ITEMS_SELECTED'), 'error');
+			$app->enqueueMessage(JText::_('FLEXI_NO_ITEMS_SELECTED'), 'error');
 			$app->setHeader('status', '500 Internal Server Error', true);
 			$this->setRedirect($this->returnURL);
 
@@ -237,7 +237,7 @@ class FlexicontentControllerCategories extends FlexicontentControllerBaseAdmin
 		// Check access
 		if (!$is_authorised)
 		{
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
 			$app->setHeader('status', 403, true);
 			$this->setRedirect($this->returnURL);
 
@@ -251,7 +251,7 @@ class FlexicontentControllerCategories extends FlexicontentControllerBaseAdmin
 
 		if (!$model->saveaccess($id, $access))
 		{
-			$msg = \Joomla\CMS\Language\Text::_('FLEXI_OPERATION_FAILED') . ' : ' . $model->getError();
+			$msg = JText::_('FLEXI_OPERATION_FAILED') . ' : ' . $model->getError();
 			throw new Exception($msg, 500);
 		}
 
@@ -269,7 +269,7 @@ class FlexicontentControllerCategories extends FlexicontentControllerBaseAdmin
 	 * @param   string  $prefix  The class prefix. Optional.
 	 * @param   array   $config  The array of possible config values. Optional.
 	 *
-	 * @return  \Joomla\CMS\MVC\Model\BaseDatabaseModel  The model.
+	 * @return  JModelLegacy  The model.
 	 *
 	 * @since   1.6
 	 */
@@ -295,9 +295,9 @@ class FlexicontentControllerCategories extends FlexicontentControllerBaseAdmin
 	{
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 		// Clean cache
-		$cache = \Joomla\CMS\Factory::getCache('com_flexicontent');
+		$cache = JFactory::getCache('com_flexicontent');
 		$cache->clean();
-		$catscache = \Joomla\CMS\Factory::getCache('com_flexicontent_cats');
+		$catscache = JFactory::getCache('com_flexicontent_cats');
 		$catscache->clean();
 	}
 
@@ -312,10 +312,10 @@ class FlexicontentControllerCategories extends FlexicontentControllerBaseAdmin
 	public function rebuild()
 	{
 		// Check for request forgeries
-		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
 
 		$extension = 'com_content';
-		$this->setRedirect(\Joomla\CMS\Router\Route::_('index.php?option=com_flexicontent&view=categories', false));
+		$this->setRedirect(JRoute::_('index.php?option=com_flexicontent&view=categories', false));
 
 		/** @var CategoriesModelCategory $model */
 		$model = $this->getModel($this->record_name);
@@ -323,13 +323,13 @@ class FlexicontentControllerCategories extends FlexicontentControllerBaseAdmin
 		if ($model->rebuild())
 		{
 			// Rebuild succeeded.
-			$this->setMessage(\Joomla\CMS\Language\Text::_('COM_CATEGORIES_REBUILD_SUCCESS'));
+			$this->setMessage(JText::_('COM_CATEGORIES_REBUILD_SUCCESS'));
 
 			return true;
 		}
 
 		// Rebuild failed.
-		$this->setMessage(\Joomla\CMS\Language\Text::_('COM_CATEGORIES_REBUILD_FAILURE'));
+		$this->setMessage(JText::_('COM_CATEGORIES_REBUILD_FAILURE'));
 
 		return false;
 	}

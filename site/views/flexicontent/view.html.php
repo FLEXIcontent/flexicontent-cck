@@ -28,7 +28,7 @@ jimport('legacy.view.legacy');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
+class FlexicontentViewFlexicontent extends JViewLegacy
 {
 	/**
 	 * Creates the page's display
@@ -38,11 +38,11 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 	function display( $tpl = null )
 	{
 		//initialize variables
-		$app      = \Joomla\CMS\Factory::getApplication();
-		$document = \Joomla\CMS\Factory::getDocument();
+		$app      = JFactory::getApplication();
+		$document = JFactory::getDocument();
 		$menus = $app->getMenu();
 		$menu  = $menus->getActive();
-		$uri   = \Joomla\CMS\Uri\Uri::getInstance();
+		$uri   = JUri::getInstance();
 		
 		// Get view's Model
 		$model  = $this->getModel();
@@ -66,9 +66,9 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 		if (!$params->get('disablecss', ''))
 		{
 			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
-			!\Joomla\CMS\Factory::getLanguage()->isRtl()
-				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
-				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
+			!JFactory::getLanguage()->isRtl()
+				? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
+				: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 		}
 
 		if (FLEXI_J40GE && file_exists(JPATH_SITE.DS.'media/templates/site'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css'))
@@ -112,7 +112,7 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 			
 			// Calculate default page heading (=called page title in J1.5), which in turn will be document title below !! ...
 			// meta_params->get('page_title') is meant for <title> but let's use as ... default page heading
-			$default_heading = \Joomla\CMS\Language\Text::_( 'FLEXI_CATEGORIES' );
+			$default_heading = JText::_( 'FLEXI_CATEGORIES' );
 			
 			// Decide to show page heading (=J1.5 page title), this is always yes
 			$show_default_heading = 1;
@@ -142,10 +142,10 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 		// Check and prepend or append site name to page title
 		if ( $doc_title != $app->getCfg('sitename') ) {
 			if ($app->getCfg('sitename_pagetitles', 0) == 1) {
-				$doc_title = \Joomla\CMS\Language\Text::sprintf('JPAGETITLE', $app->getCfg('sitename'), $doc_title);
+				$doc_title = JText::sprintf('JPAGETITLE', $app->getCfg('sitename'), $doc_title);
 			}
 			elseif ($app->getCfg('sitename_pagetitles', 0) == 2) {
-				$doc_title = \Joomla\CMS\Language\Text::sprintf('JPAGETITLE', $doc_title, $app->getCfg('sitename'));
+				$doc_title = JText::sprintf('JPAGETITLE', $doc_title, $app->getCfg('sitename'));
 			}
 		}
 		
@@ -173,9 +173,9 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 		if ($params->get('show_feed_link', 1) == 1) {
 			$link	= '&format=feed';
 			$attribs = array('type' => 'application/rss+xml', 'title' => 'RSS 2.0');
-			$document->addHeadLink(\Joomla\CMS\Router\Route::_($link.'&type=rss'), 'alternate', 'rel', $attribs);
+			$document->addHeadLink(JRoute::_($link.'&type=rss'), 'alternate', 'rel', $attribs);
 			$attribs = array('type' => 'application/atom+xml', 'title' => 'Atom 1.0');
-			$document->addHeadLink(\Joomla\CMS\Router\Route::_($link.'&type=atom'), 'alternate', 'rel', $attribs);
+			$document->addHeadLink(JRoute::_($link.'&type=atom'), 'alternate', 'rel', $attribs);
 		}
 		
 		// Create the pagination object

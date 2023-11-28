@@ -128,7 +128,7 @@
 				<option value="3">Jomsocial</option>
 			</field>
 			<field name="display_text" type="textarea" rows="5" label="Displayed HTML"
-				default="{{user->name}} &#13;&lt;a href=&quot;__profile_link__&quot; class=&quot;btn&quot; &gt; &#13; %%FLEXI_FIELD_JP_VIEW_PROFILE%% &#13;&lt;/a&gt;" filter="\Joomla\CMS\Component\ComponentHelper::filterText"
+				default="{{user->name}} &#13;&lt;a href=&quot;__profile_link__&quot; class=&quot;btn&quot; &gt; &#13; %%FLEXI_FIELD_JP_VIEW_PROFILE%% &#13;&lt;/a&gt;" filter="JComponentHelper::filterText"
 				description="Replacements: &lt;br&gt; Profile url: __profile_url__ &lt;br&gt; Language strings: %%string%% &lt;br&gt; Item properties: {{item->prop}} &lt;br&gt; User properties {{user->prop}}"
 			/>
 

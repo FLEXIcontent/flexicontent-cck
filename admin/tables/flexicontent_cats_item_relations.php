@@ -12,7 +12,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 
-class flexicontent_cats_item_relations extends \Joomla\CMS\Table\Table
+class flexicontent_cats_item_relations extends JTable
 {
 	/**
 	 * Primary Key

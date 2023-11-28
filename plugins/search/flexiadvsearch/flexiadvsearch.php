@@ -42,7 +42,7 @@ require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'f
  * @subpackage	Search.flexiadvsearch
  * @since		1.6
  */
-class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
+class plgSearchFlexiadvsearch extends JPlugin
 {
 	var $autoloadLanguage = false;
 
@@ -59,14 +59,14 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 		parent::__construct($subject, $config);
 
 		static $language_loaded = null;
-		if (!$this->autoloadLanguage && $language_loaded === null) $language_loaded = \Joomla\CMS\Plugin\CMSPlugin::loadLanguage('plg_search_flexiadvsearch', JPATH_ADMINISTRATOR);
+		if (!$this->autoloadLanguage && $language_loaded === null) $language_loaded = JPlugin::loadLanguage('plg_search_flexiadvsearch', JPATH_ADMINISTRATOR);
 
 		// Get the COMPONENT only parameter
-		$this->_params = new \Joomla\Registry\Registry();
-		$this->_params->merge(\Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent'));
+		$this->_params = new JRegistry();
+		$this->_params->merge(JComponentHelper::getParams('com_flexicontent'));
 
 		// Merge the active menu parameters
-		$menu = \Joomla\CMS\Factory::getApplication()->getMenu()->getActive();
+		$menu = JFactory::getApplication()->getMenu()->getActive();
 
 		if ($menu)
 		{
@@ -104,14 +104,14 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 	public function onContentSearch($text, $phrase = '', $ordering = '', $areas = null)
 	{
 		// Initialize variables
-		$app      = \Joomla\CMS\Factory::getApplication();
-		$jinput   = \Joomla\CMS\Factory::getApplication()->input;
+		$app      = JFactory::getApplication();
+		$jinput   = JFactory::getApplication()->input;
 
 		$option = $jinput->getCmd('option', '');
 		$view   = $jinput->getCmd('view', '');
 
-		$db       = \Joomla\CMS\Factory::getDbo();
-		$user     = \Joomla\CMS\Factory::getUser();
+		$db       = JFactory::getDbo();
+		$user     = JFactory::getUser();
 
 		$app->setUserState('fc_view_total_'.$view, 0);
 		$app->setUserState('fc_view_limit_max_'.$view, 0);
@@ -385,8 +385,8 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 		 * Load Plugin parameters
 		 */
 
-		$plugin = \Joomla\CMS\Plugin\PluginHelper::getPlugin('search', 'flexiadvsearch');
-		$pluginParams = new \Joomla\Registry\Registry($plugin->params);
+		$plugin = JPluginHelper::getPlugin('search', 'flexiadvsearch');
+		$pluginParams = new JRegistry($plugin->params);
 
 		// Shortcuts for plugin parameters
 		$search_limit    = $params->get( 'search_limit', $pluginParams->get( 'search_limit', 20 ) );      // Limits the returned results of this seach plugin
@@ -404,12 +404,12 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 
 		// NULL and CURRENT dates,
 		// NOTE: the current date needs to use built-in MYSQL function, otherwise filter caching can not work because the CURRENT DATETIME is continuously different !!!
-		//$now = \Joomla\CMS\Factory::getDate()->toSql();
+		//$now = JFactory::getDate()->toSql();
 		$_nowDate = 'UTC_TIMESTAMP()'; //$db->Quote($now);
 		$nullDate = $db->getNullDate();
 
 		// Section name
-		$searchFlexicontent = \Joomla\CMS\Language\Text::_( 'FLEXICONTENT' );
+		$searchFlexicontent = JText::_( 'FLEXICONTENT' );
 
 		// REMOVED / COMMENTED OUT this feature:
 		// Require any OR all Filters ... this can be user selectable
@@ -612,7 +612,7 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 		if ( !$show_noauth )
 		{
 			// User not allowed to LIST unauthorized items
-			$aid_arr = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
 			$andaccess .= ' AND ty.access IN (0,'.$aid_list.')';
 			$andaccess .= ' AND  c.access IN (0,'.$aid_list.')';
@@ -623,7 +623,7 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 		else
 		{
 			// Access Flags for: content type, main category, item
-			$aid_arr = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
 			$select_access .= ', '
 				.' CASE WHEN '
@@ -886,11 +886,11 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 				// If joomla article view is allowed allowed and then search view may optional create Joomla article links
 				if( $typeData[$item->type_id]->params->get('allow_jview', 0) == 1 && $typeData[$item->type_id]->params->get('search_jlinks', 1) )
 				{
-					$item->href = \Joomla\CMS\Router\Route::_(ContentHelperRoute::getArticleRoute($item->slug, $item->categoryslug, $item->language));
+					$item->href = JRoute::_(ContentHelperRoute::getArticleRoute($item->slug, $item->categoryslug, $item->language));
 				}
 				else
 				{
-					$item->href = \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item));
+					$item->href = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item));
 				}
 				$item->browsernav = $browsernav;
 			}
@@ -908,9 +908,9 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 	 */
 	function _buildTextSearch($text = null, $phrase = null, $txtmode = 0, & $select_relevance = array())
 	{
-		$app    = \Joomla\CMS\Factory::getApplication();
+		$app    = JFactory::getApplication();
 		$option = $app->input->getCmd('option', '');
-		$db     = \Joomla\CMS\Factory::getDbo();
+		$db     = JFactory::getDbo();
 
 		static $text_search = null;
 
@@ -958,7 +958,7 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 			: 'flexicontent_advsearch_index';
 
 		// Try to add space between words for current language using a dictionary
-		$lang_handler = FlexicontentFields::getLangHandler(\Joomla\CMS\Factory::getLanguage()->getTag());
+		$lang_handler = FlexicontentFields::getLangHandler(JFactory::getLanguage()->getTag());
 
 		if ($lang_handler)
 		{
@@ -999,7 +999,7 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 			 */
 			if ($filter_word_like_any
 				&& in_array(flexicontent_html::getUserCurrentLang(), array('zh', 'jp', 'ja', 'th'))
-				&& ! FlexicontentFields::getLangHandler(\Joomla\CMS\Factory::getLanguage()->getTag(), $_hasHandlerOnly = true)
+				&& ! FlexicontentFields::getLangHandler(JFactory::getLanguage()->getTag(), $_hasHandlerOnly = true)
 			)
 			{
 				$_index_match = ' LOWER ('.$ts.'.search_index) LIKE '.$db->Quote( '%'.$escaped_text.'%', false );
@@ -1062,7 +1062,7 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 				case 'all':
 					$nospace_languages = array('th-TH');
 
-					$is_nospace_language = in_array(\Joomla\CMS\Factory::getLanguage()->getTag(), $nospace_languages);
+					$is_nospace_language = in_array(JFactory::getLanguage()->getTag(), $nospace_languages);
 
 					// TODO check if not using the * for THAI is appropriate & needed
 					$newtext = $is_nospace_language

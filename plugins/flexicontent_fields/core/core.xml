@@ -198,8 +198,8 @@
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_LABEL" level="level3" />
 			<field name="pretext_filter" type="text" default="" filter="string" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
 			<field name="posttext_filter" type="text" default="" filter="string" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
-			<field name="opentag_filter" type="text" default="" filter="\Joomla\CMS\Component\ComponentHelper::filterText" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
-			<field name="closetag_filter" type="text" default="" filter="\Joomla\CMS\Component\ComponentHelper::filterText" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
+			<field name="opentag_filter" type="text" default="" filter="JComponentHelper::filterText" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
+			<field name="closetag_filter" type="text" default="" filter="JComponentHelper::filterText" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
 
 			<field name="" type="separator" default="FLEXI_CATEGORY_BASED_VIEWS" level="level2" />
 			<field name="display_label_filter" type="radio" default="2" label="FLEXI_LABEL_FILTER_WITH_OVERRIDE" description="FLEXI_LABEL_FILTER_WITH_OVERRIDE_DESC" class="btn-group btn-group-yesno">
@@ -532,8 +532,8 @@
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_LABEL" level="level3" />
 			<field name="pretext_filter" type="text" default="" filter="string" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
 			<field name="posttext_filter" type="text" default="" filter="string" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
-			<field name="opentag_filter" type="text" default="" filter="\Joomla\CMS\Component\ComponentHelper::filterText" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
-			<field name="closetag_filter" type="text" default="" filter="\Joomla\CMS\Component\ComponentHelper::filterText" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
+			<field name="opentag_filter" type="text" default="" filter="JComponentHelper::filterText" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
+			<field name="closetag_filter" type="text" default="" filter="JComponentHelper::filterText" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
 
 			<field name="" type="separator" default="FLEXI_CATEGORY_BASED_VIEWS" level="level2" />
 			<field name="display_label_filter" type="radio" default="2" label="FLEXI_LABEL_FILTER_WITH_OVERRIDE" description="FLEXI_LABEL_FILTER_WITH_OVERRIDE_DESC" class="btn-group btn-group-yesno">

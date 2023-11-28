@@ -40,7 +40,7 @@ foreach ($values as $value)
 
 			if ($invalid)
 			{
-				$age = \Joomla\CMS\Language\Text::_('FLEXI_NA');
+				$age = JText::_('FLEXI_NA');
 			}
 			else
 			{
@@ -52,40 +52,40 @@ foreach ($values as $value)
 					case 7:
 						$u = 'y';
 						$s = 'm';
-						$JText_normal_unit = \Joomla\CMS\Language\Text::_('FLEXI_FIELD_DATE_YEARS');
-						$JText_small_unit  = \Joomla\CMS\Language\Text::_('FLEXI_FIELD_DATE_MONTHS');
+						$JText_normal_unit = JText::_('FLEXI_FIELD_DATE_YEARS');
+						$JText_small_unit  = JText::_('FLEXI_FIELD_DATE_MONTHS');
 						$small_units = 12;
 						break;
 					// QUARTERS (disabled our diff does not calculate this and our filtering does not support it, so such display will cause confusion)
 					/*case 6:
 						$u = 'q';
 						$s = 'm';
-						$JText_normal_unit = \Joomla\CMS\Language\Text::_('FLEXI_FIELD_DATE_QUARTERS');
-						$JText_small_unit  = \Joomla\CMS\Language\Text::_('FLEXI_FIELD_DATE_MONTHS');
+						$JText_normal_unit = JText::_('FLEXI_FIELD_DATE_QUARTERS');
+						$JText_small_unit  = JText::_('FLEXI_FIELD_DATE_MONTHS');
 						$small_units = 3;
 						break;*/
 					// MONTHS
 					case 5:
 						$u = 'm';
 						$s = 'd';
-						$JText_normal_unit = \Joomla\CMS\Language\Text::_('FLEXI_FIELD_DATE_MONTHS');
-						$JText_small_unit  = \Joomla\CMS\Language\Text::_('FLEXI_FIELD_DATE_DAYS');
+						$JText_normal_unit = JText::_('FLEXI_FIELD_DATE_MONTHS');
+						$JText_small_unit  = JText::_('FLEXI_FIELD_DATE_DAYS');
 						$small_units = 3;
 						break;
 					// WEEKS (disabled our diff does not calculate this and our filtering does not support it, so such display will cause confusion)
 					/*case 3:
 						$u = 'ww';
 						$s = 'd';
-						$JText_normal_unit = \Joomla\CMS\Language\Text::_('FLEXI_FIELD_DATE_WEEKS');
-						$JText_small_unit  = \Joomla\CMS\Language\Text::_('FLEXI_FIELD_DATE_DAYS');
+						$JText_normal_unit = JText::_('FLEXI_FIELD_DATE_WEEKS');
+						$JText_small_unit  = JText::_('FLEXI_FIELD_DATE_DAYS');
 						$small_units = 7;
 						break;*/
 					// DAYS
 					case 2:
 						$u = 'd';
 						$s = 'h';
-						$JText_normal_unit = \Joomla\CMS\Language\Text::_('FLEXI_FIELD_DATE_DAYS');
-						$JText_small_unit  = \Joomla\CMS\Language\Text::_('FLEXI_FIELD_DATE_HOURS');
+						$JText_normal_unit = JText::_('FLEXI_FIELD_DATE_DAYS');
+						$JText_small_unit  = JText::_('FLEXI_FIELD_DATE_HOURS');
 						$small_units = 24;
 						break;
 				}
@@ -112,7 +112,7 @@ foreach ($values as $value)
 			}
 		}
 		catch (Exception $e) {
-			$age = \Joomla\CMS\Language\Text::_('FLEXI_NA');
+			$age = JText::_('FLEXI_NA');
 		}
 	}
 

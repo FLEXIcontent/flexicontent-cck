@@ -77,22 +77,22 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 	 */
 	public function importcsv()
 	{
-		$app = \Joomla\CMS\Factory::getApplication();
+		$app = JFactory::getApplication();
 		$jinput = $app->input;
 
 		// Check for request forgeries
 		if ($this->input->getCmd('task') !== 'importcsv')
 		{
-			\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
-			echo '<link rel="stylesheet" href="' . \Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/css/flexicontentbackend.css?' . FLEXI_VHASH . '" />';
-			$rtl_sfx = !\Joomla\CMS\Factory::getLanguage()->isRtl() ? '' : '_rtl';
-			$fc_css = \Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x' . $rtl_sfx . '.css' : 'j3x' . $rtl_sfx . '.css');
+			JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
+			echo '<link rel="stylesheet" href="' . JUri::base(true) . '/components/com_flexicontent/assets/css/flexicontentbackend.css?' . FLEXI_VHASH . '" />';
+			$rtl_sfx = !JFactory::getLanguage()->isRtl() ? '' : '_rtl';
+			$fc_css = JUri::base(true) . '/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x' . $rtl_sfx . '.css' : 'j3x' . $rtl_sfx . '.css');
 			echo '<link rel="stylesheet" href="' . $fc_css . '?' . FLEXI_VHASH . '" />';
 		}
 		else
 		{
 			// Output this before every other output
-			echo 'success||||' . \Joomla\CMS\Session\Session::getFormToken() . '||||';
+			echo 'success||||' . JSession::getFormToken() . '||||';
 		}
 
 		// Get item model
@@ -102,21 +102,21 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 		// Set some variables
 		$link  = 'index.php?option=com_flexicontent&view=import';  // $_SERVER['HTTP_REFERER'];
 		$task  = $jinput->get('task', '', 'cmd');
-		$db    = \Joomla\CMS\Factory::getDbo();
-		$user  = \Joomla\CMS\Factory::getUser();
-		$session = \Joomla\CMS\Factory::getSession();
+		$db    = JFactory::getDbo();
+		$user  = JFactory::getUser();
+		$session = JFactory::getSession();
 		$has_zlib = function_exists("zlib_encode"); // Version_compare(PHP_VERSION, '5.4.0', '>=');
 
 		$parse_log = "\n\n\n" . '<b>please click</b> <a href="' . $link . '">here</a> to return previous page' . "\n\n\n";
 		$log_filename = 'importcsv_' . ($user->id) . '.php';
 
 		jimport('joomla.log.log');
-		\Joomla\CMS\Log\Log::addLogger(
+		JLog::addLogger(
 			array(
 				'text_file' => $log_filename,  // Sets the target log file
 			'text_entry_format' => '{DATETIME} {PRIORITY} {MESSAGE}'  // Sets the format of each line
 			),
-			\Joomla\CMS\Log\Log::ALL,  // Sets messages of all log levels to be sent to the file
+			JLog::ALL,  // Sets messages of all log levels to be sent to the file
 			array('com_flexicontent.importcsv')  // category of logged messages
 		);
 
@@ -932,7 +932,7 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 
 					if (!is_array($item->attribs) && !is_object($item->attribs))
 					{
-						$item->attribs = new \Joomla\Registry\Registry($item->attribs);
+						$item->attribs = new JRegistry($item->attribs);
 					}
 
 					$data['attribs'] = is_object($item->attribs) ? $item->attribs->toArray() : $item->attribs;
@@ -947,7 +947,7 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 
 					if (!is_array($item->metadata) && !is_object($item->metadata))
 					{
-						$item->metadata = new \Joomla\Registry\Registry($item->metadata);
+						$item->metadata = new JRegistry($item->metadata);
 					}
 
 					$data['metadata'] = is_object($item->metadata) ? $item->metadata->toArray() : $item->metadata;
@@ -1011,7 +1011,7 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 			elseif ($data['id'] == -1)
 			{
 				$msg = 'Internal Error item with ID: "' . $c_item_id . " could not be loaded in order to be updated";
-				\Joomla\CMS\Log\Log::add($msg, \Joomla\CMS\Log\Log::WARNING, 'com_flexicontent.importcsv');
+				JLog::add($msg, JLog::WARNING, 'com_flexicontent.importcsv');
 				echo $msg . "<br/>";
 			}
 
@@ -1020,7 +1020,7 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 			{
 				$conf['failure_count']++;
 				$msg = 'Failed item no: ' . $lineno . ". titled as: '" . $data['title'] . "' : " . $itemmodel->getError();
-				\Joomla\CMS\Log\Log::add($msg, \Joomla\CMS\Log\Log::WARNING, 'com_flexicontent.importcsv');
+				JLog::add($msg, JLog::WARNING, 'com_flexicontent.importcsv');
 				echo $msg . "<br/>";
 			}
 
@@ -1029,7 +1029,7 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 			{
 				$conf['success_count']++;
 				$msg = 'Imported item no: ' . $lineno . ". titled as: '" . $data['title'] . "'";
-				\Joomla\CMS\Log\Log::add($msg, \Joomla\CMS\Log\Log::INFO, 'com_flexicontent.importcsv');
+				JLog::add($msg, JLog::INFO, 'com_flexicontent.importcsv');
 				echo $msg . "<br/>";
 
 				// Remap 'ID' of item (when 'id' column is being used)
@@ -1115,11 +1115,11 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 	{
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 
-		$app = \Joomla\CMS\Factory::getApplication();
+		$app = JFactory::getApplication();
 		$jinput = $app->input;
 
-		$mfolder  = \Joomla\CMS\Filesystem\Path::clean(JPATH_SITE . DS . $conf['media_folder'] . DS);
-		$dfolder  = \Joomla\CMS\Filesystem\Path::clean(JPATH_SITE . DS . $conf['docs_folder'] . DS);
+		$mfolder  = JPath::clean(JPATH_SITE . DS . $conf['media_folder'] . DS);
+		$dfolder  = JPath::clean(JPATH_SITE . DS . $conf['docs_folder'] . DS);
 
 		$ff_types_to_props = array('image' => 'originalname', 'file' => '_value_', 'mediafile' => '_value_');
 		$ff_types_to_paths = array('image' => $mfolder, 'file' => $dfolder, 'mediafile' => $mfolder);
@@ -1214,15 +1214,15 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 							$fext  = $path_parts['extension'];
 							$fname = $path_parts['filename'];
 
-							//echo "<pre>"; print_r(\Joomla\CMS\Filesystem\Path::clean( $srcpath_original . $filename)); echo '</pre>';
-							//echo "<pre>"; print_r(\Joomla\CMS\Filesystem\Path::clean( $srcpath_original . ($filename_LE = $fname . '.' . strtolower($fext)))); echo '</pre>';
-							//echo "<pre>"; print_r(\Joomla\CMS\Filesystem\Path::clean( $srcpath_original . ($filename_UE = $fname . '.' . strtoupper($fext)))); echo '</pre>';
+							//echo "<pre>"; print_r(JPath::clean( $srcpath_original . $filename)); echo '</pre>';
+							//echo "<pre>"; print_r(JPath::clean( $srcpath_original . ($filename_LE = $fname . '.' . strtolower($fext)))); echo '</pre>';
+							//echo "<pre>"; print_r(JPath::clean( $srcpath_original . ($filename_UE = $fname . '.' . strtoupper($fext)))); echo '</pre>';
 
-							$_filename = \Joomla\CMS\Filesystem\File::exists( \Joomla\CMS\Filesystem\Path::clean($srcpath_original . $filename) ) ? $filename : false;
+							$_filename = JFile::exists( JPath::clean($srcpath_original . $filename) ) ? $filename : false;
 							$_filename = $_filename ?:
-								(\Joomla\CMS\Filesystem\File::exists( \Joomla\CMS\Filesystem\Path::clean($srcpath_original . ($filename_LE = $fname . '.' . strtolower($fext))) ) ? $filename_LE : false);
+								(JFile::exists( JPath::clean($srcpath_original . ($filename_LE = $fname . '.' . strtolower($fext))) ) ? $filename_LE : false);
 							$_filename = $_filename ?:
-								(\Joomla\CMS\Filesystem\File::exists( \Joomla\CMS\Filesystem\Path::clean($srcpath_original . ($filename_UE = $fname . '.' . strtoupper($fext))) ) ? $filename_UE : false);
+								(JFile::exists( JPath::clean($srcpath_original . ($filename_UE = $fname . '.' . strtoupper($fext))) ) ? $filename_UE : false);
 
 							if ($_filename)
 							{
@@ -1311,7 +1311,7 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 			if (count($fields) > $colcount)
 			{
 				$msg = "Redundadant columns at record row " . $lineno . ", Found # columns: " . count($fields) . " > expected: " . $colcount;
-				\Joomla\CMS\Log\Log::add($msg, \Joomla\CMS\Log\Log::NOTICE, 'com_flexicontent.importcsv');
+				JLog::add($msg, JLog::NOTICE, 'com_flexicontent.importcsv');
 
 				if ($task === 'testcsv')
 				{
@@ -1511,7 +1511,7 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 		// Create a plugin instance if not already created
 		if ($plg === null)
 		{
-			$plg_enabled = \Joomla\CMS\Plugin\PluginHelper::isEnabled('system', 'flexisyspro');
+			$plg_enabled = JPluginHelper::isEnabled('system', 'flexisyspro');
 			$extfolder   = 'system';
 			$extname     = 'flexisyspro';
 			$className   = 'plg' . ucfirst($extfolder) . $extname;
@@ -1531,7 +1531,7 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 			else
 			{
 				$dispatcher   = JEventDispatcher::getInstance();
-				$plg_db_data  = \Joomla\CMS\Plugin\PluginHelper::getPlugin($extfolder, $extname);
+				$plg_db_data  = JPluginHelper::getPlugin($extfolder, $extname);
 
 				$plg = new $className($dispatcher, array(
 					'type'   => $extfolder,

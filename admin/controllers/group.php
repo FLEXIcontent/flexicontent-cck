@@ -22,7 +22,7 @@ jimport('legacy.controller.form');
  *
  * @since 3.3
  */
-class FlexicontentControllerGroup extends \Joomla\CMS\MVC\Controller\FormController
+class FlexicontentControllerGroup extends JControllerForm
 {
 	/**
 	 * @var     string  The prefix to use with controller messages.
@@ -51,7 +51,7 @@ class FlexicontentControllerGroup extends \Joomla\CMS\MVC\Controller\FormControl
 	/**
 	 * Method to check if you can save a new or existing record.
 	 *
-	 * Overrides \Joomla\CMS\MVC\Controller\FormController::allowSave to check the core.admin permission.
+	 * Overrides JControllerForm::allowSave to check the core.admin permission.
 	 *
 	 * @param   array   $data  An array of input data.
 	 * @param   string  $key   The name of the key for the primary key.
@@ -62,11 +62,11 @@ class FlexicontentControllerGroup extends \Joomla\CMS\MVC\Controller\FormControl
 	 */
 	protected function allowSave($data, $key = 'id')
 	{
-		return (\Joomla\CMS\Factory::getUser()->authorise('core.admin', 'com_users') && parent::allowSave($data, $key));
+		return (JFactory::getUser()->authorise('core.admin', 'com_users') && parent::allowSave($data, $key));
 	}
 
 	/**
-	 * Overrides \Joomla\CMS\MVC\Controller\FormController::allowEdit
+	 * Overrides JControllerForm::allowEdit
 	 *
 	 * Checks that non-Super Admins are not editing Super Admins.
 	 *
@@ -80,10 +80,10 @@ class FlexicontentControllerGroup extends \Joomla\CMS\MVC\Controller\FormControl
 	protected function allowEdit($data = array(), $key = 'id')
 	{
 		// Check if this group is a Super Admin
-		if (\Joomla\CMS\Access\Access::checkGroup($data[$key], 'core.admin'))
+		if (JAccess::checkGroup($data[$key], 'core.admin'))
 		{
 			// If I'm not a Super Admin, then disallow the edit.
-			if (!\Joomla\CMS\Factory::getUser()->authorise('core.admin'))
+			if (!JFactory::getUser()->authorise('core.admin'))
 			{
 				return false;
 			}

@@ -60,10 +60,10 @@ abstract class JHtmlFcitems extends JHtmlFcbase
 
 		if ($tz === null)
 		{
-			$nullDate = \Joomla\CMS\Factory::getDbo()->getNullDate();
-			$nowDate = \Joomla\CMS\Factory::getDate()->toUnix();
+			$nullDate = JFactory::getDbo()->getNullDate();
+			$nowDate = JFactory::getDate()->toUnix();
 
-			$tz = \Joomla\CMS\Factory::getUser()->getTimezone();
+			$tz = JFactory::getUser()->getTimezone();
 		}
 
 		// Check publication START/FINISH dates on if item has state: publised / in-progress / archived
@@ -73,18 +73,18 @@ abstract class JHtmlFcitems extends JHtmlFcbase
 		}
 
 		$publish_up = $row->publish_up && $row->publish_up != $nullDate
-			? \Joomla\CMS\Factory::getDate($row->publish_up, 'UTC')->setTimeZone($tz)
+			? JFactory::getDate($row->publish_up, 'UTC')->setTimeZone($tz)
 			: false;
 		$publish_down = $row->publish_down && $row->publish_down != $nullDate
-			? \Joomla\CMS\Factory::getDate($row->publish_down, 'UTC')->setTimeZone($tz)
+			? JFactory::getDate($row->publish_down, 'UTC')->setTimeZone($tz)
 			: false;
 
 		// Create tip text, only if we have publish up or down settings
 		if ($publish_up && $publish_up > $nullDate && $nowDate < $publish_up->toUnix())
 		{
-			$tip_text = \Joomla\CMS\Language\Text::_('FLEXI_SCHEDULED_FOR_PUBLICATION', true)
+			$tip_text = JText::_('FLEXI_SCHEDULED_FOR_PUBLICATION', true)
 				. ' <br> '
-				. \Joomla\CMS\Language\Text::sprintf('JLIB_HTML_PUBLISHED_START', \Joomla\CMS\HTML\HTMLHelper::_('date', $publish_up, \Joomla\CMS\Language\Text::_('DATE_FORMAT_LC5'), 'UTC'));
+				. JText::sprintf('JLIB_HTML_PUBLISHED_START', JHtml::_('date', $publish_up, JText::_('DATE_FORMAT_LC5'), 'UTC'));
 
 			return '
 			<span class="ntxt">
@@ -94,9 +94,9 @@ abstract class JHtmlFcitems extends JHtmlFcbase
 
 		if ($publish_down && $publish_down > $nullDate && $nowDate > $publish_down->toUnix())
 		{
-			$tip_text = \Joomla\CMS\Language\Text::_('FLEXI_PUBLICATION_EXPIRED', true)
+			$tip_text = JText::_('FLEXI_PUBLICATION_EXPIRED', true)
 				. ' <br> '
-				. \Joomla\CMS\Language\Text::sprintf('JLIB_HTML_PUBLISHED_FINISHED', \Joomla\CMS\HTML\HTMLHelper::_('date', $publish_down, \Joomla\CMS\Language\Text::_('DATE_FORMAT_LC5'), 'UTC'));
+				. JText::sprintf('JLIB_HTML_PUBLISHED_FINISHED', JHtml::_('date', $publish_down, JText::_('DATE_FORMAT_LC5'), 'UTC'));
 
 			return '
 			<span class="ntxt">
@@ -123,7 +123,7 @@ abstract class JHtmlFcitems extends JHtmlFcbase
 
 		if ($row->unapproved_version)
 		{
-			$tip_text = \Joomla\CMS\Language\Text::_('FLEXI_UNREVIEWED_VERSION') . ' , ' . \Joomla\CMS\Language\Text::_('FLEXI_NEED_TO_BE_APPROVED');
+			$tip_text = JText::_('FLEXI_UNREVIEWED_VERSION') . ' , ' . JText::_('FLEXI_NEED_TO_BE_APPROVED');
 			$html = '
 			<span class="fc-revised-icon">
 				<span class="icon-out-3 ' . static::$tooltip_class . '" title="' . $tip_text . '"></span>
@@ -150,8 +150,8 @@ abstract class JHtmlFcitems extends JHtmlFcbase
 		{
 			// Array of image, task, title, action
 			$states = array(
-				0 => array('unfeatured', static::$ctrl . '.featured', \Joomla\CMS\HTML\HTMLHelper::tooltipText('COM_CONTENT_UNFEATURED'), \Joomla\CMS\HTML\HTMLHelper::tooltipText('JGLOBAL_TOGGLE_FEATURED')),
-				1 => array('featured', static::$ctrl . '.unfeatured', \Joomla\CMS\HTML\HTMLHelper::tooltipText('COM_CONTENT_FEATURED'), \Joomla\CMS\HTML\HTMLHelper::tooltipText('JGLOBAL_TOGGLE_FEATURED')),
+				0 => array('unfeatured', static::$ctrl . '.featured', JHtml::tooltipText('COM_CONTENT_UNFEATURED'), JHtml::tooltipText('JGLOBAL_TOGGLE_FEATURED')),
+				1 => array('featured', static::$ctrl . '.unfeatured', JHtml::tooltipText('COM_CONTENT_FEATURED'), JHtml::tooltipText('JGLOBAL_TOGGLE_FEATURED')),
 			);
 		}
 		$value = (int) $row->featured;

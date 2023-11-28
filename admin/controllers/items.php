@@ -61,7 +61,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	{
 		parent::__construct($config);
 
-		if (\Joomla\CMS\Factory::getApplication()->isClient('site'))
+		if (JFactory::getApplication()->isClient('site'))
 		{
 			$task = $this->input->get('task', '', 'cmd');
 
@@ -71,8 +71,8 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			}
 
 			// Since we are in frontend we need to manually load the backend language files, (english and then  override with current language)
-			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
-			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 		}
 
 		/**
@@ -81,11 +81,11 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$this->registerTask('apply_type',   'save');
 		$this->registerTask('save_a_preview', 'save');
 
-		if (\Joomla\CMS\Factory::getApplication()->isClient('site'))
+		if (JFactory::getApplication()->isClient('site'))
 		{
 			$this->registerTask('download_tree',  'download');
 
-			$this->input  = empty($this->input) ? \Joomla\CMS\Factory::getApplication()->input : $this->input;
+			$this->input  = empty($this->input) ? JFactory::getApplication()->input : $this->input;
 			$this->option = $this->input->get('option', '', 'cmd');
 			$this->task   = $this->input->get('task', '', 'cmd');
 			$this->view   = $this->input->get('view', '', 'cmd');
@@ -94,7 +94,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			// Get referer URL from HTTP request and validate it
 			$this->refererURL = !empty($_SERVER['HTTP_REFERER']) && flexicontent_html::is_safe_url($_SERVER['HTTP_REFERER'])
 				? $_SERVER['HTTP_REFERER']
-				: \Joomla\CMS\Uri\Uri::base();
+				: JUri::base();
 
 			// Get return URL from HTTP request and validate it
 			$this->returnURL = $this->_getReturnUrl();
@@ -124,11 +124,11 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	public function set_uptodate()
 	{
 		// Check for request forgeries
-		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
 
 		// Initialize variables
-		$app     = \Joomla\CMS\Factory::getApplication();
-		$db      = \Joomla\CMS\Factory::getDbo();
+		$app     = JFactory::getApplication();
+		$db      = JFactory::getDbo();
 
 		$cid = $this->input->get('cid', array(), 'array');
 		$cid = ArrayHelper::toInteger($cid);
@@ -143,8 +143,8 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$db->setQuery($query)->execute();
 
 		$message = $value == 1
-			? \Joomla\CMS\Language\Text::_('FLEXI_N_ITEMS_SET_UPTODATE', count($cid))
-			: \Joomla\CMS\Language\Text::_('FLEXI_N_ITEMS_CLEAR_UPTODATE', count($cid));
+			? JText::_('FLEXI_N_ITEMS_SET_UPTODATE', count($cid))
+			: JText::_('FLEXI_N_ITEMS_CLEAR_UPTODATE', count($cid));
 		$this->setRedirect($this->returnURL, $message);
 	}
 
@@ -158,14 +158,14 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	public function save()
 	{
 		// Check for request forgeries
-		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
 
 		// Initialize variables
-		$app     = \Joomla\CMS\Factory::getApplication();
-		$db      = \Joomla\CMS\Factory::getDbo();
-		$user    = \Joomla\CMS\Factory::getUser();
-		$config  = \Joomla\CMS\Factory::getConfig();
-		$session = \Joomla\CMS\Factory::getSession();
+		$app     = JFactory::getApplication();
+		$db      = JFactory::getDbo();
+		$user    = JFactory::getUser();
+		$config  = JFactory::getConfig();
+		$session = JFactory::getSession();
 		$perms   = FlexicontentHelperPerm::getPerm();
 		$isSite  = $app->isClient('site');
 
@@ -208,7 +208,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		 * Note: Providing $force_type_id is not really needed, as the model should do it anyway
 		 */
 		$force_type_id = !$isnew ? $model->get('type_id') : (int) $data['type_id'];
-		$params = new \Joomla\Registry\Registry( $model->getComponentTypeParams($force_type_id) );
+		$params = new JRegistry( $model->getComponentTypeParams($force_type_id) );
 
 		if (! (int) $params->get('usetitle' . $CFGsfx, 1) && (int) $params->get('auto_title', 0))
 			unset($data['title']);
@@ -256,7 +256,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		 * Then get AGAIN the component + type parameters
 		 */
 		$data['type_id'] = empty($data['type_id']) ? $model->get('type_id') : (int) $data['type_id'];
-		$params = new \Joomla\Registry\Registry( $model->getComponentTypeParams($data['type_id']) );
+		$params = new JRegistry( $model->getComponentTypeParams($data['type_id']) );
 
 
 		/**
@@ -268,7 +268,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			if ($model->checkin($data['id']) === false)
 			{
 				// Check-in failed
-				$app->enqueueMessage(\Joomla\CMS\Language\Text::sprintf('JLIB_APPLICATION_ERROR_CHECKIN_FAILED', $model->getError()), 'error');
+				$app->enqueueMessage(JText::sprintf('JLIB_APPLICATION_ERROR_CHECKIN_FAILED', $model->getError()), 'error');
 
 				// Set the POSTed form data into the session, so that they get reloaded
 				$app->setUserState('com_flexicontent.edit.' . $this->record_name . '.data', $data);      // Save the jform data in the session
@@ -344,8 +344,8 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 			// We use some strings from administrator part, load english language file
 			// for 'com_flexicontent' component then override with current language file
-			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
-			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 		}
 
 		// Get some flags this will also trigger item loading if not already loaded
@@ -505,13 +505,13 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		 * Basic Form data validation
 		 */
 
-		// Get the \Joomla\CMS\Form\Form object, but do not pass any data we only want the form object,
+		// Get the JForm object, but do not pass any data we only want the form object,
 		// in order to validate the data and not create a filled-in form
 		$form = $model->getForm();
 
 
 		/**
-		 * Check custom-injected (non-\Joomla\CMS\Form\Form field) (frontend) captcha field
+		 * Check custom-injected (non-JForm field) (frontend) captcha field
 		 */
 		if ($isSite)
 		{
@@ -530,13 +530,13 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 					$c_id = $c_plugin=='recaptcha' ? 'dynamic_recaptcha_1' : 'fc_dynamic_captcha';
 					$c_namespace = 'fc_item_form';
 
-					$captcha_obj = \Joomla\CMS\Captcha\Captcha::getInstance($c_plugin, array('namespace' => $c_namespace));
+					$captcha_obj = JCaptcha::getInstance($c_plugin, array('namespace' => $c_namespace));
 					if (!$captcha_obj->checkAnswer($c_value))
 					{
 						// Get the captch validation message and push it out to the user
 						//$error = $captcha_obj->getError();
 						//$app->enqueueMessage($error instanceof Exception ? $error->getMessage() : $error, 'error');
-						$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_CAPTCHA_FAILED') .' '. \Joomla\CMS\Language\Text::_('FLEXI_MUST_REFILL_SOME_FIELDS'), 'error');
+						$app->enqueueMessage(JText::_('FLEXI_CAPTCHA_FAILED') .' '. JText::_('FLEXI_MUST_REFILL_SOME_FIELDS'), 'error');
 
 						// Set the POSTed form data into the session, so that they get reloaded
 						$app->setUserState($form->option.'.edit.item.data', $data);      // Save the jform data in the session.
@@ -591,7 +591,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			// Check for errors in after-validation handler
 			if (!$extraChecks)
 			{
-				$app->enqueueMessage($model->getError() ?: \Joomla\CMS\Language\Text::_('FLEXI_ERROR_SAVING_' . $this->_NAME), 'error');
+				$app->enqueueMessage($model->getError() ?: JText::_('FLEXI_ERROR_SAVING_' . $this->_NAME), 'error');
 			}
 
 			// Set the POSTed form data into the session, so that they get reloaded
@@ -635,7 +635,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$ilayout = isset($data['attribs']['ilayout']) ? $data['attribs']['ilayout'] : null;
 
 		// Give UNVALIDATED data for the case of LAYOUTS to the MODEL. Model will load the
-		// XML file of the layout into a \Joomla\CMS\Form\Form object and do validation before merging them
+		// XML file of the layout into a JForm object and do validation before merging them
 		if ($ilayout && !empty($data['layouts'][$ilayout]))
 		{
 			$validated_data['attribs']['layouts'] = $data['layouts'];
@@ -711,7 +711,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		// New item: check if user can create in at least one category
 		if ($isnew && !$canAdd)
 		{
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_NO_ACCESS_CREATE'), 'error');
+			$app->enqueueMessage(JText::_('FLEXI_NO_ACCESS_CREATE'), 'error');
 			$app->setHeader('status', 403, true);
 			$this->setRedirect($this->returnURL);
 
@@ -728,7 +728,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		// Existing item: Check if user can edit current item
 		if (!$isnew && !$canEdit)
 		{
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_NO_ACCESS_EDIT'), 'error');
+			$app->enqueueMessage(JText::_('FLEXI_NO_ACCESS_EDIT'), 'error');
 			$app->setHeader('status', 403, true);
 			$this->setRedirect($this->returnURL);
 
@@ -745,7 +745,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		if (!$canCreateType)
 		{
 			$msg = isset($types[$type_id])
-				? \Joomla\CMS\Language\Text::sprintf('FLEXI_NO_ACCESS_CREATE_CONTENT_OF_TYPE', \Joomla\CMS\Language\Text::_($types[$type_id]->name))
+				? JText::sprintf('FLEXI_NO_ACCESS_CREATE_CONTENT_OF_TYPE', JText::_($types[$type_id]->name))
 				: ' Content Type ' . $type_id . ' was not found OR is not published';
 
 			$app->enqueueMessage($msg, 'error');
@@ -793,7 +793,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 			// Set error message and the redirect URL (back to the record form)
 			$app->setHeader('status', '500 Internal Server Error', true);
-			$app->enqueueMessage($model->getError() ?: \Joomla\CMS\Language\Text::_('FLEXI_ERROR_SAVING_' . $this->_NAME), 'error');
+			$app->enqueueMessage($model->getError() ?: JText::_('FLEXI_ERROR_SAVING_' . $this->_NAME), 'error');
 
 			// Skip redirection back to return url if inside a component-area-only view, showing error using current page, since usually we are inside a iframe modal
 			if ($this->input->getCmd('tmpl') !== 'component')
@@ -1039,7 +1039,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		 * and thus being able to set this category as item's main category, but then have no edit/editown permission for this category
 		 */
 
-		// This will clear JAcesse cache by calling: Access::clearStatics(), but it will also clear caches inside relevant inside \Joomla\CMS\User\User
+		// This will clear JAcesse cache by calling: Access::clearStatics(), but it will also clear caches inside relevant inside JUser
 		$user->clearAccessRights();
 
 		// Now we can recalculate
@@ -1085,7 +1085,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 				if ($params->get('items_session_editable', 1))
 				{
 					// Set notice for existing item being editable till logoff
-					$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_CANNOT_EDIT_AFTER_LOGOFF'), 'notice');
+					$app->enqueueMessage(JText::_('FLEXI_CANNOT_EDIT_AFTER_LOGOFF'), 'notice');
 
 					// Allow item to be editable till logoff
 					$rendered_uneditable = $session->get('rendered_uneditable', array(), 'flexicontent');
@@ -1098,7 +1098,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			// Set notice about saving an item that cannot be changed further
 			if (!$canEdit)
 			{
-				$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_CANNOT_MAKE_FURTHER_CHANGES_TO_CONTENT'), 'notice');
+				$app->enqueueMessage(JText::_('FLEXI_CANNOT_MAKE_FURTHER_CHANGES_TO_CONTENT'), 'notice');
 			}
 		}
 
@@ -1153,7 +1153,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		 * Saving is done, decide where to redirect
 		 */
 
-		$msg  = \Joomla\CMS\Language\Text::_('FLEXI_' . $this->_NAME . '_SAVED');
+		$msg  = JText::_('FLEXI_' . $this->_NAME . '_SAVED');
 		$tmpl = $this->input->getCmd('tmpl');
 
 		switch ($this->task)
@@ -1169,7 +1169,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 				{
 					// Create the URL, maintain current menu item if this was given
 					$Itemid = $this->input->get('Itemid', 0, 'int');
-					$item_url = \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, $Itemid));
+					$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, $Itemid));
 
 					// Set task to 'edit', and pass original referer back to avoid making the form itself the referer, but also check that it is safe enough
 					$link = $item_url
@@ -1200,7 +1200,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 						. ($tmpl ? '&tmpl=' . $tmpl : '');
 
 					// Set task to 'edit', and pass original referer back to avoid making the form itself the referer, but also check that it is safe enough
-					$link = \Joomla\CMS\Router\Route::_($item_url, false);
+					$link = JRoute::_($item_url, false);
 				}
 				break;
 
@@ -1212,7 +1212,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 				{
 					// Do not use SLUG !!! since we maybe previewing a non-current version !!
 					$item_url = FlexicontentHelperRoute::getItemRoute($model->get('id') . ':' . $model->get('alias'), $model->get('catid'), 0, $item);
-					$link = \Joomla\CMS\Router\Route::_($item_url . ($tmpl ? '&tmpl=' . $tmpl : '') . '&preview=1', false);
+					$link = JRoute::_($item_url . ($tmpl ? '&tmpl=' . $tmpl : '') . '&preview=1', false);
 				}
 
 				elseif ($app->isClient('administrator'))
@@ -1230,11 +1230,11 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 				else
 				{
 					$msg = $newly_submitted_item
-						? \Joomla\CMS\Language\Text::_('FLEXI_THANKS_SUBMISSION')
-						: \Joomla\CMS\Language\Text::_('FLEXI_ITEM_SAVED');
+						? JText::_('FLEXI_THANKS_SUBMISSION')
+						: JText::_('FLEXI_ITEM_SAVED');
 
 					$item_url = FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item);
-					$link = $this->returnURL ?: \Joomla\CMS\Router\Route::_($item_url . ($tmpl ? '&tmpl=' . $tmpl : ''), false);
+					$link = $this->returnURL ?: JRoute::_($item_url . ($tmpl ? '&tmpl=' . $tmpl : ''), false);
 				}
 				break;
 		}
@@ -1260,10 +1260,10 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	 */
 	public function edit()
 	{
-		$app      = \Joomla\CMS\Factory::getApplication();
-		$user     = \Joomla\CMS\Factory::getUser();
-		$session  = \Joomla\CMS\Factory::getSession();
-		$document = \Joomla\CMS\Factory::getDocument();
+		$app      = JFactory::getApplication();
+		$user     = JFactory::getUser();
+		$session  = JFactory::getSession();
+		$document = JFactory::getDocument();
 		$isAdmin  = $app->isClient('administrator');
 
 		$this->input->set('view', $this->record_name);
@@ -1306,7 +1306,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		if (!$record)
 		{
 			$app->setHeader('status', '404', true);
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_OPERATION_FAILED') . ' : ' . $model->getError(), 'error');
+			$app->enqueueMessage(JText::_('FLEXI_OPERATION_FAILED') . ' : ' . $model->getError(), 'error');
 
 			if ($this->input->getCmd('tmpl') !== 'component')
 			{
@@ -1354,7 +1354,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 				if (!$canAdd)
 				{
 					$app->setHeader('status', '403 Forbidden', true);
-					$this->setRedirect($this->returnURL, \Joomla\CMS\Language\Text::_('FLEXI_NO_ACCESS_CREATE'), 'error');
+					$this->setRedirect($this->returnURL, JText::_('FLEXI_NO_ACCESS_CREATE'), 'error');
 
 					$model->enqueueMessages($_exclude = array('showAfterLoad' => 1));
 
@@ -1362,7 +1362,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 				}
 
 				// Get User Group / Author parameters
-				$db = \Joomla\CMS\Factory::getDbo();
+				$db = JFactory::getDbo();
 				$authorparams = flexicontent_db::getUserConfig($user->id);
 				$max_auth_limit = intval($authorparams->get('max_auth_limit', 0));  // Maximum number of content items the user can create
 
@@ -1375,7 +1375,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 					if ($authored_count >= $max_auth_limit)
 					{
 						$app->setHeader('status', '403 Forbidden', true);
-						$this->setRedirect($this->returnURL, \Joomla\CMS\Language\Text::sprintf('FLEXI_ALERTNOTAUTH_CREATE_MORE', $max_auth_limit), 'warning');
+						$this->setRedirect($this->returnURL, JText::sprintf('FLEXI_ALERTNOTAUTH_CREATE_MORE', $max_auth_limit), 'warning');
 
 						$model->enqueueMessages($_exclude = array('showAfterLoad' => 1));
 
@@ -1402,9 +1402,9 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 					{
 						$status    = '403 Forbidden';
 						$type_name = isset($types[$typeid])
-							? '"' . \Joomla\CMS\Language\Text::_($types[$typeid]->name) . '"'
-							: \Joomla\CMS\Language\Text::_('FLEXI_ANY');
-						$msg = \Joomla\CMS\Language\Text::sprintf('FLEXI_NO_ACCESS_CREATE_CONTENT_OF_TYPE', $type_name);
+							? '"' . JText::_($types[$typeid]->name) . '"'
+							: JText::_('FLEXI_ANY');
+						$msg = JText::sprintf('FLEXI_NO_ACCESS_CREATE_CONTENT_OF_TYPE', $type_name);
 					}
 
 					$app->setHeader('status', $status, true);
@@ -1422,7 +1422,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 				if (!$canEdit)
 				{
 					$app->setHeader('status', '403 Forbidden', true);
-					$this->setRedirect($this->returnURL, \Joomla\CMS\Language\Text::_('FLEXI_NO_ACCESS_EDIT'), 'error');
+					$this->setRedirect($this->returnURL, JText::_('FLEXI_NO_ACCESS_EDIT'), 'error');
 
 					$model->enqueueMessages($_exclude = array('showAfterLoad' => 1));
 
@@ -1433,7 +1433,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 				if ($model->isCheckedOut($user->get('id')))
 				{
 					$app->setHeader('status', '400 Bad Request', true);
-					$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_EDITED_BY_ANOTHER_ADMIN'), 'warning');
+					$app->enqueueMessage(JText::_('FLEXI_EDITED_BY_ANOTHER_ADMIN'), 'warning');
 
 					if ($this->input->getCmd('tmpl') !== 'component')
 					{
@@ -1450,7 +1450,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 				if (!$model->checkout())
 				{
 					$app->setHeader('status', '400 Bad Request', true);
-					$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_OPERATION_FAILED') . ' : ' . $model->getError(), 'error');
+					$app->enqueueMessage(JText::_('FLEXI_OPERATION_FAILED') . ' : ' . $model->getError(), 'error');
 
 					if ($this->input->getCmd('tmpl') !== 'component')
 					{
@@ -1501,7 +1501,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 
 	/**
-	 * Method for extra form validation after \Joomla\CMS\Form\Form validation is executed
+	 * Method for extra form validation after JForm validation is executed
 	 *
 	 * @param   array     $validated_data  The already jform-validated data of the record
 	 * @param   object    $model            The Model object of current controller instance
@@ -1544,11 +1544,11 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	public function reorder($dir = null)
 	{
 		// Check for request forgeries
-		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
 
-		$app   = \Joomla\CMS\Factory::getApplication();
+		$app   = JFactory::getApplication();
 		$model = $this->getModel($this->record_name_pl);
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = JFactory::getUser();
 
 		// Calculate ACL access
 		$is_authorised = $user->authorise('flexicontent.orderitems', 'com_flexicontent');
@@ -1557,7 +1557,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		if (!$is_authorised)
 		{
 			$app->setHeader('status', '403 Forbidden', true);
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
 			$app->redirect($this->returnURL);
 		}
 
@@ -1574,11 +1574,11 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		if (!$model->move($dir, reset($filter_cats)))
 		{
 			$app->setHeader('status', '500 Internal Server Error', true);
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ERROR_SAVING_ORDER') . ': ' . $model->getError(), 'error');
+			$app->enqueueMessage(JText::_('FLEXI_ERROR_SAVING_ORDER') . ': ' . $model->getError(), 'error');
 			$app->redirect($this->returnURL);
 		}
 
-		// Note we no longer set the somewhat redundant message: \Joomla\CMS\Language\Text::_('FLEXI_NEW_ORDERING_SAVED')
+		// Note we no longer set the somewhat redundant message: JText::_('FLEXI_NEW_ORDERING_SAVED')
 		$this->setRedirect($this->returnURL);
 	}
 
@@ -1619,11 +1619,11 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	public function saveorder()
 	{
 		// Check for request forgeries
-		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
 
-		$app   = \Joomla\CMS\Factory::getApplication();
+		$app   = JFactory::getApplication();
 		$model = $this->getModel($this->record_name_pl);
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = JFactory::getUser();
 
 		// Calculate ACL access
 		$is_authorised = $user->authorise('flexicontent.orderitems', 'com_flexicontent');
@@ -1632,7 +1632,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		if (!$is_authorised)
 		{
 			$app->setHeader('status', 403);
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
 			$app->redirect($this->returnURL);
 		}
 
@@ -1648,11 +1648,11 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		if (!$model->saveorder($cid, $order, reset($filter_cats)))
 		{
 			$app->setHeader('status', 500);
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ERROR_SAVING_ORDER') . ': ' . $model->getError(), 'error');
+			$app->enqueueMessage(JText::_('FLEXI_ERROR_SAVING_ORDER') . ': ' . $model->getError(), 'error');
 			$app->redirect($this->returnURL);
 		}
 
-		// Note we no longer set the somewhat redundant message: \Joomla\CMS\Language\Text::_('FLEXI_NEW_ORDERING_SAVED')
+		// Note we no longer set the somewhat redundant message: JText::_('FLEXI_NEW_ORDERING_SAVED')
 		$this->setRedirect($this->returnURL);
 	}
 
@@ -1667,12 +1667,12 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	public function batchprocess()
 	{
 		// Check for request forgeries
-		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
 
-		$app   = \Joomla\CMS\Factory::getApplication();
-		$db    = \Joomla\CMS\Factory::getDbo();
+		$app   = JFactory::getApplication();
+		$db    = JFactory::getDbo();
 		$model = $this->getModel($this->record_name_pl);
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = JFactory::getUser();
 
 		$cid = $this->input->get('cid', array(), 'array');
 		$cid = ArrayHelper::toInteger($cid);
@@ -1681,7 +1681,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		if (!count($cid))
 		{
 			$app->setHeader('status', '500', true);
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_NO_ITEMS_SELECTED'), 'error');
+			$app->enqueueMessage(JText::_('FLEXI_NO_ITEMS_SELECTED'), 'error');
 			$this->setRedirect($this->returnURL);
 
 			return;
@@ -1717,7 +1717,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		if (!$canCopy)
 		{
 			$app->setHeader('status', 403);
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
 			$this->setRedirect($this->returnURL);
 
 			return false;
@@ -1745,7 +1745,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$seccats = $keepseccats ? null : $seccats;
 
 		// Access check
-		$copytask_allow_uneditable = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('copytask_allow_uneditable', 1);
+		$copytask_allow_uneditable = JComponentHelper::getParams('com_flexicontent')->get('copytask_allow_uneditable', 1);
 
 		if (!$copytask_allow_uneditable || $method == 2)  // If method is 2 (move) we will deny moving uneditable items
 		{
@@ -1785,8 +1785,8 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		// Set warning for uneditable items
 		if (count($non_auth_cid))
 		{
-			$msg_noauth = \Joomla\CMS\Language\Text::_('FLEXI_CANNOT_COPY_ASSETS') . ' ' . \Joomla\CMS\Language\Text::_('FLEXI_REASON_NO_EDIT_PERMISSION')
-				. '<br>' . \Joomla\CMS\Language\Text::_('FLEXI_ROWS_SKIPPED') . ' : '. implode(',', $non_auth_cid);
+			$msg_noauth = JText::_('FLEXI_CANNOT_COPY_ASSETS') . ' ' . JText::_('FLEXI_REASON_NO_EDIT_PERMISSION')
+				. '<br>' . JText::_('FLEXI_ROWS_SKIPPED') . ' : '. implode(',', $non_auth_cid);
 			$app->enqueueMessage($msg_noauth, 'warning');
 
 			if (!count($auth_cid))  // Cancel task if no items can be copied
@@ -1811,27 +1811,27 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			case 1:
 				if ($model->copyitems($auth_cid, $keeptags, $prefix, $suffix, $copynr, $lang, $state))
 				{
-					$msg = \Joomla\CMS\Language\Text::sprintf('FLEXI_ITEMS_COPY_SUCCESS', count($auth_cid));
+					$msg = JText::sprintf('FLEXI_ITEMS_COPY_SUCCESS', count($auth_cid));
 					$clean_cache_flag = true;
 				}
 				else
 				{
 					$app->setHeader('status', 500);
-					$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ERROR_COPY_ITEMS') . " " . $model->getError(), 'error');
+					$app->enqueueMessage(JText::_('FLEXI_ERROR_COPY_ITEMS') . " " . $model->getError(), 'error');
 					$msg = '';
 				}
 				break;
 
 			// Update CASE (optionally moving)
 			case 2:
-				$msg = \Joomla\CMS\Language\Text::sprintf('FLEXI_ITEMS_MOVE_SUCCESS', count($auth_cid));
+				$msg = JText::sprintf('FLEXI_ITEMS_MOVE_SUCCESS', count($auth_cid));
 
 				foreach ($auth_cid as $itemid)
 				{
 					if (!$model->moveitem($itemid, $maincat, $seccats, $lang, $state, $type_id, $access))
 					{
 						$app->setHeader('status', 500);
-						$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ERROR_MOVE_ITEMS') . " " . $model->getError(), 'error');
+						$app->enqueueMessage(JText::_('FLEXI_ERROR_MOVE_ITEMS') . " " . $model->getError(), 'error');
 						$msg = '';
 					}
 				}
@@ -1853,13 +1853,13 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 				$total_cnt = $model->copyitems($auth_cid, $keeptags, $prefix, $suffix, $copynr, $languages, $state, $method, $maincat, $seccats, $type_id, $access);
 				if ($total_cnt)
 				{
-					$msg = \Joomla\CMS\Language\Text::sprintf('FLEXI_ITEMS_COPYMOVE_SUCCESS', $total_cnt);   //count($auth_cid)
+					$msg = JText::sprintf('FLEXI_ITEMS_COPYMOVE_SUCCESS', $total_cnt);   //count($auth_cid)
 					$clean_cache_flag = true;
 				}
 				else
 				{
 					$app->setHeader('status', 500);
-					$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ERROR_COPYMOVE_ITEMS') . " " . $model->getError(), 'error');
+					$app->enqueueMessage(JText::_('FLEXI_ERROR_COPYMOVE_ITEMS') . " " . $model->getError(), 'error');
 					$msg = '';
 				}
 				break;
@@ -1872,7 +1872,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		// CHECK CASE OF TRANSLATING SINGLE ITEM TO MULTIPLE LANGUAGES and terminate with success message, because this is inside a modal window
 		if ($lang_arr)
 		{
-			$msg = \Joomla\CMS\Language\Text::sprintf('FLEXI_N_ITEMS_CREATED', $total_cnt);
+			$msg = JText::sprintf('FLEXI_N_ITEMS_CREATED', $total_cnt);
 			jexit('<div class="alert alert-info">' . $msg . '</div>');
 		}
 
@@ -1948,10 +1948,10 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	public function featured()
 	{
 		// Check for request forgeries
-		\Joomla\CMS\Session\Session::checkToken() or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
 
-		$app   = \Joomla\CMS\Factory::getApplication();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$app   = JFactory::getApplication();
+		$user  = JFactory::getUser();
 
 		$cid    = $this->input->get('cid', array(), 'array');
 		$values = array('featured' => 1, 'unfeatured' => 0);
@@ -1964,14 +1964,14 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			{
 				// Prune items that you can't change.
 				unset($cid[$i]);
-				$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ITEM') . ': ' . $id . ' - ' . \Joomla\CMS\Language\Text::_('JLIB_APPLICATION_ERROR_EDITSTATE_NOT_PERMITTED'), 'warning');
+				$app->enqueueMessage(JText::_('FLEXI_ITEM') . ': ' . $id . ' - ' . JText::_('JLIB_APPLICATION_ERROR_EDITSTATE_NOT_PERMITTED'), 'warning');
 			}
 		}
 
 		if (empty($cid))
 		{
 			$app->setHeader('status', '500', true);
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_NO_ITEMS_SELECTED'), 'error');
+			$app->enqueueMessage(JText::_('FLEXI_NO_ITEMS_SELECTED'), 'error');
 			$this->setRedirect($this->returnURL);
 
 			return;
@@ -1988,8 +1988,8 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		}
 
 		$message = $value == 1
-			? \Joomla\CMS\Language\Text::plural('COM_CONTENT_N_ITEMS_FEATURED', count($cid))
-			: \Joomla\CMS\Language\Text::plural('COM_CONTENT_N_ITEMS_UNFEATURED', count($cid));
+			? JText::plural('COM_CONTENT_N_ITEMS_FEATURED', count($cid))
+			: JText::plural('COM_CONTENT_N_ITEMS_UNFEATURED', count($cid));
 		$this->setRedirect($this->returnURL, $message);
 	}
 
@@ -2017,12 +2017,12 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	 */
 	function approval()
 	{
-		$app    = \Joomla\CMS\Factory::getApplication();
+		$app    = JFactory::getApplication();
 		$isSite = $app->isClient('site');
 		$tokarr = $app->isClient('site') ? 'request' : 'post';
 
 		// Check for request forgeries, use REQUEST in the case of FRONTEND (which may uses GET urls)
-		\Joomla\CMS\Session\Session::checkToken($tokarr) or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		JSession::checkToken($tokarr) or jexit(JText::_('JINVALID_TOKEN'));
 
 		// FRONTEND: get item ID via 'id' URL variable, instead of 'cid' (BACKEND)
 		$cid_name = $isSite ? 'id' : 'cid';
@@ -2032,7 +2032,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		if (!count($cid))
 		{
 			$app->setHeader('status', '500 Internal Server Error', true);
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_APPROVAL_SELECT_ITEM_SUBMIT'), 'warning');
+			$app->enqueueMessage(JText::_('FLEXI_APPROVAL_SELECT_ITEM_SUBMIT'), 'warning');
 			$app->redirect($this->returnURL);
 		}
 
@@ -2053,17 +2053,17 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	 */
 	public function remove()
 	{
-		$app    = \Joomla\CMS\Factory::getApplication();
+		$app    = JFactory::getApplication();
 		$isSite = $app->isClient('site');
 		$tokarr = $app->isClient('site') ? 'request' : 'post';
 
 		// Check for request forgeries, use REQUEST (frontend uses GET urls)
-		\Joomla\CMS\Session\Session::checkToken($tokarr) or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		JSession::checkToken($tokarr) or jexit(JText::_('JINVALID_TOKEN'));
 
 		// Frontend may use GET request, before calling parent task method, set token to POST too
-		if ($isSite && !\Joomla\CMS\Session\Session::checkToken('post'))
+		if ($isSite && !JSession::checkToken('post'))
 		{
-			$this->input->post->set(\Joomla\CMS\Session\Session::getFormToken(), '1');
+			$this->input->post->set(JSession::getFormToken(), '1');
 		}
 
 		// FRONTEND: Get extra variables
@@ -2085,7 +2085,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		if ($isSite && $result && reset($cid) === $this->input->getInt('id') && $isitemview)
 		{
 			$non_sef_link = FlexicontentHelperRoute::getCategoryRoute($catid, $Itemid = 0, $urlvars = array());
-			$category_link = \Joomla\CMS\Router\Route::_($non_sef_link);
+			$category_link = JRoute::_($non_sef_link);
 			$this->setRedirect($category_link);
 		}
 	}
@@ -2101,25 +2101,25 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	function restore()
 	{
 		// Check for request forgeries
-		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
 
 		$id			= $this->input->getInt('id', 0);
 		$version	= $this->input->getInt('version', 0);
 		$record_model = $this->getModel($this->record_name);
 
 		// First checkin the open item
-		$item = \Joomla\CMS\Table\Table::getInstance($this->records_jtable, '');
+		$item = JTable::getInstance($this->records_jtable, '');
 		$item->load($id);
 		$item->checkin();
 
 		if ($version)
 		{
-			$msg = \Joomla\CMS\Language\Text::sprintf('FLEXI_VERSION_RESTORED', $version);
+			$msg = JText::sprintf('FLEXI_VERSION_RESTORED', $version);
 			$record_model->restore($version, $id);
 		}
 		else
 		{
-			$msg = \Joomla\CMS\Language\Text::_('FLEXI_NOTHING_TO_RESTORE');
+			$msg = JText::_('FLEXI_NOTHING_TO_RESTORE');
 		}
 
 		$ctrlTask = 'task=items.edit';
@@ -2155,11 +2155,11 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	public function field_set_value(array $cid = null, array $custom = null, bool $checkACL = true)
 	{
 		// Check for request forgeries
-		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
 
 		// Initialize variables
-		$app   = \Joomla\CMS\Factory::getApplication();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$app   = JFactory::getApplication();
+		$user  = JFactory::getUser();
 		$isAdmin  = $app->isClient('administrator');
 
 		// Get model
@@ -2176,7 +2176,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			if (!$fieldname)
 			{
 				$app->setHeader('status', '400 Bad request', true);
-				$app->enqueueMessage(\Joomla\CMS\Language\Text::_('No fieldname was provided'), 'error');
+				$app->enqueueMessage(JText::_('No fieldname was provided'), 'error');
 				$this->setRedirect($this->returnURL);
 
 				return;
@@ -2185,7 +2185,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			if ($values === null)
 			{
 				$app->setHeader('status', '400 Bad request', true);
-				$app->enqueueMessage(\Joomla\CMS\Language\Text::_('No values were provided'), 'error');
+				$app->enqueueMessage(JText::_('No values were provided'), 'error');
 				$this->setRedirect($this->returnURL);
 
 				return;
@@ -2203,7 +2203,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		if (!count($cid))
 		{
 			$app->setHeader('status', '400 Bad request', true);
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_NO_ITEMS_SELECTED'), 'error');
+			$app->enqueueMessage(JText::_('FLEXI_NO_ITEMS_SELECTED'), 'error');
 			$this->setRedirect($this->returnURL);
 
 			return;
@@ -2230,9 +2230,9 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 			$is_authorised = count($cid);
 
-			$msg_noauth = \Joomla\CMS\Language\Text::_('These items cannot be changed')
+			$msg_noauth = JText::_('These items cannot be changed')
 				. ': ' . implode(',', $cid_noauth)
-				. ',' . \Joomla\CMS\Language\Text::_('FLEXI_REASON_NO_EDIT_PERMISSION');
+				. ',' . JText::_('FLEXI_REASON_NO_EDIT_PERMISSION');
 
 			// Check access
 			if (!$is_authorised)
@@ -2286,7 +2286,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			if (!$result)
 			{
 				$msg = 'Failed to store item: ' . $record_model->getError();
-				\Joomla\CMS\Log\Log::add($msg);
+				JLog::add($msg);
 				echo $msg . "<br/>";
 			}
 		}
@@ -2294,7 +2294,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		// Clear dependent cache data
 		$this->_cleanCache();
 
-		$msg = count($cid) . ' ' . \Joomla\CMS\Language\Text::_('FLEXI_RECORDS_MODIFIED');
+		$msg = count($cid) . ' ' . JText::_('FLEXI_RECORDS_MODIFIED');
 
 		/*echo '<pre>';
 		print_r($cid); echo "\n";
@@ -2316,12 +2316,12 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	public function gettags()
 	{
 		// Check for request forgeries
-		\Joomla\CMS\Session\Session::checkToken() or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		JSession::checkToken() or die(JText::_('JINVALID_TOKEN'));
 
 		$id    = $this->input->get('id', 0, 'int');
 		$record_model = $this->getModel($this->record_name);
 		$tags  = $record_model->gettags();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = JFactory::getUser();
 
 		// Get tag ids if non-new item
 		$used = $id ? $record_model->getUsedtagsIds($id) : null;
@@ -2356,7 +2356,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 					<li class="tagitem">
 						<span>' . $tag->name . '</span>
 						<input type="hidden" name="jform[tag][]" value="' . $tag->tid . '" />
-						<a href="javascript:;" class="deletetag" onclick="javascript:deleteTag(this);" title="' . \Joomla\CMS\Language\Text::_('FLEXI_DELETE_TAG') . '"></a>
+						<a href="javascript:;" class="deletetag" onclick="javascript:deleteTag(this);" title="' . JText::_('FLEXI_DELETE_TAG') . '"></a>
 					</li>';
 				}
 				else
@@ -2378,9 +2378,9 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		{
 			$html .= '
 			<div class="fc_addtag">
-				<label for="addtags">' . \Joomla\CMS\Language\Text::_('FLEXI_ADD_TAG') . '</label>
+				<label for="addtags">' . JText::_('FLEXI_ADD_TAG') . '</label>
 				<input type="text" id="tagname" class="inputbox" size="30" />
-				<input type="button" class="fc_button" value="' . \Joomla\CMS\Language\Text::_('FLEXI_ADD') . '" onclick="addtag()" />
+				<input type="button" class="fc_button" value="' . JText::_('FLEXI_ADD') . '" onclick="addtag()" />
 			</div>';
 		}
 
@@ -2398,12 +2398,12 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	public function batch()
 	{
 		// Check for request forgeries
-		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
 
 		// Initialize variables
-		$app   = \Joomla\CMS\Factory::getApplication();
-		$db    = \Joomla\CMS\Factory::getDbo();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$app   = JFactory::getApplication();
+		$db    = JFactory::getDbo();
+		$user  = JFactory::getUser();
 
 		$cid = $this->input->get('cid', array(), 'array');
 		$cid = ArrayHelper::toInteger($cid);
@@ -2412,7 +2412,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		if (!count($cid))
 		{
 			$app->setHeader('status', '500', true);
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_NO_ITEMS_SELECTED'), 'error');
+			$app->enqueueMessage(JText::_('FLEXI_NO_ITEMS_SELECTED'), 'error');
 			$this->setRedirect($this->returnURL);
 
 			return;
@@ -2425,12 +2425,12 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		if (!$canCopy)
 		{
 			$app->setHeader('status', 403);
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
 			$app->redirect($this->returnURL);
 		}
 
 		// Access check
-		$copytask_allow_uneditable = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('copytask_allow_uneditable', 1);
+		$copytask_allow_uneditable = JComponentHelper::getParams('com_flexicontent')->get('copytask_allow_uneditable', 1);
 
 		if (!$copytask_allow_uneditable)
 		{
@@ -2470,8 +2470,8 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		// Set warning for uneditable items
 		if (count($non_auth_cid))
 		{
-			$msg_noauth = \Joomla\CMS\Language\Text::_('FLEXI_CANNOT_COPY_ASSETS') . ' ' . \Joomla\CMS\Language\Text::_('FLEXI_REASON_NO_EDIT_PERMISSION')
-				. '<br>' . \Joomla\CMS\Language\Text::_('FLEXI_ROWS_SKIPPED') . ' : '. implode(',', $non_auth_cid);
+			$msg_noauth = JText::_('FLEXI_CANNOT_COPY_ASSETS') . ' ' . JText::_('FLEXI_REASON_NO_EDIT_PERMISSION')
+				. '<br>' . JText::_('FLEXI_ROWS_SKIPPED') . ' : '. implode(',', $non_auth_cid);
 			$app->enqueueMessage($msg_noauth, 'warning');
 
 			if (!count($auth_cid))  // Cancel task if no items can be copied

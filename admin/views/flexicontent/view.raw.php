@@ -24,7 +24,7 @@ jimport('legacy.view.legacy');
 /**
  * HTML View class for the FLEXIcontent View
  */
-class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
+class FlexicontentViewFlexicontent extends JViewLegacy
 {
 	/**
 	 * Creates the Entrypage
@@ -33,13 +33,13 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 	 */
 	function display( $tpl = null )
 	{
-		$app      = \Joomla\CMS\Factory::getApplication();
-		$config   = \Joomla\CMS\Factory::getConfig();
-		$params   = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
-		$document	= \Joomla\CMS\Factory::getDocument();
-		$session  = \Joomla\CMS\Factory::getSession();
-		$user     = \Joomla\CMS\Factory::getUser();		
-		$db       = \Joomla\CMS\Factory::getDbo();
+		$app      = JFactory::getApplication();
+		$config   = JFactory::getConfig();
+		$params   = JComponentHelper::getParams('com_flexicontent');
+		$document	= JFactory::getDocument();
+		$session  = JFactory::getSession();
+		$user     = JFactory::getUser();		
+		$db       = JFactory::getDbo();
 		$print_logging_info = $params->get('print_logging_info');
 		
 		// Special displaying when getting flexicontent version
@@ -62,7 +62,7 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 	{
 		// Read installation file
 		$manifest_path = JPATH_ADMINISTRATOR .DS. 'components' .DS. 'com_flexicontent' .DS. 'flexicontent.xml';
-		$com_xml = \Joomla\CMS\Installer\Installer::parseXMLInstallFile( $manifest_path );
+		$com_xml = JInstaller::parseXMLInstallFile( $manifest_path );
 		
 		// Version checking URL
 		$url = 'https://www.flexicontent.org/flexicontent_update.xml';
@@ -166,7 +166,7 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 	function fversion(&$params)
 	{
 		// Cache update check of FLEXIcontent version
-		$cache = \Joomla\CMS\Factory::getCache('com_flexicontent');
+		$cache = JFactory::getCache('com_flexicontent');
 		$cache->setCaching( 1 );
 		$cache->setLifeTime( 3600 );  // Set expire time (hard-code this to 1 hour), to avoid server load
 		$check = $cache->get(array( 'FlexicontentViewFlexicontent', 'getUpdateComponent'), array('component'));

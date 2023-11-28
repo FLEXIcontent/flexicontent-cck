@@ -48,10 +48,10 @@ class FlexicontentHelperRoute
 		if ( isset(self::$menuitems[$language]) ) return self::$menuitems[$language];
 
 		// Get component
-		$component = \Joomla\CMS\Component\ComponentHelper::getComponent('com_flexicontent');
+		$component = JComponentHelper::getComponent('com_flexicontent');
 
 		// Get frontend menu items
-		$menus = \Joomla\CMS\Factory::getApplication()->getMenu('site', array());
+		$menus = JFactory::getApplication()->getMenu('site', array());
 
 		/**
 		 * Limit to flexicontent component
@@ -88,7 +88,7 @@ class FlexicontentHelperRoute
 		{
 			/**
 			 * We do not need to check and skip menu items of non-allowed access level, since
-			 * filtering by access levels of current user, is already done by \Joomla\CMS\Menu\SiteMenu::getItems()
+			 * filtering by access levels of current user, is already done by JMenuSite::getItems()
 			 */
 
 			// Index by menu id
@@ -106,7 +106,7 @@ class FlexicontentHelperRoute
 	{
 		static $active = null;
 
-		$active = \Joomla\CMS\Factory::getApplication()->getMenu('site', array())->getActive();
+		$active = JFactory::getApplication()->getMenu('site', array())->getActive();
 
 		if (!$active || !isset($active->query['option']) || $active->query['option'] !== 'com_flexicontent')
 		{
@@ -130,12 +130,12 @@ class FlexicontentHelperRoute
 		$_component_default_menuitem_id = false;
 
 		// Get 'current' language. This SITE Default language if we are in Backend, and Current UI language if we are in Frontend
-		$current_language = \Joomla\CMS\Factory::getApplication()->isClient('administrator')
-			? \Joomla\CMS\Component\ComponentHelper::getParams('com_languages')->get('site', 'en-GB')
-			: \Joomla\CMS\Factory::getLanguage()->getTag();
+		$current_language = JFactory::getApplication()->isClient('administrator')
+			? JComponentHelper::getParams('com_languages')->get('site', 'en-GB')
+			: JFactory::getLanguage()->getTag();
 
 		// Get preference for default menu item
-		$params = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+		$params = JComponentHelper::getParams('com_flexicontent');
 		$default_menuitem_preference = $params->get('default_menuitem_preference', 0);
 
 		switch ($default_menuitem_preference)
@@ -147,8 +147,8 @@ class FlexicontentHelperRoute
 			// Check that (a) it exists and is active (b) points to com_flexicontent
 			if ($menu)
 			{
-				// Check language, checking access is not needed as it was done already above, by the \Joomla\CMS\Menu\AbstractMenu::getItem()
-				$item_matches = $current_language === '*' || in_array($menu->language, array('*', $current_language)) || !\Joomla\CMS\Language\Multilanguage::isEnabled();
+				// Check language, checking access is not needed as it was done already above, by the JMenu::getItem()
+				$item_matches = $current_language === '*' || in_array($menu->language, array('*', $current_language)) || !JLanguageMultilang::isEnabled();
 
 				// If item matched then set it as default and return it
 				if ($item_matches)  return  $_component_default_menuitem_id = $menu->id;
@@ -182,12 +182,12 @@ class FlexicontentHelperRoute
 		$_layouts_default_menuitem_id = array();
 
 		// Get 'current' language. This SITE Default language if we are in Backend, and Current UI language if we are in Frontend
-		$current_language = \Joomla\CMS\Factory::getApplication()->isClient('administrator')
-			? \Joomla\CMS\Component\ComponentHelper::getParams('com_languages')->get('site', 'en-GB')
-			: \Joomla\CMS\Factory::getLanguage()->getTag();
+		$current_language = JFactory::getApplication()->isClient('administrator')
+			? JComponentHelper::getParams('com_languages')->get('site', 'en-GB')
+			: JFactory::getLanguage()->getTag();
 
 		// Get preference for default menu item
-		$params = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+		$params = JComponentHelper::getParams('com_flexicontent');
 
 		$_layouts_default_menuitem_id = array();
 		$_layouts_default_menuitem_id['tags'] = $params->get('cat_tags_default_menu_itemid', 0);
@@ -218,7 +218,7 @@ class FlexicontentHelperRoute
 			return;
 		}
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 
 		/**
 		 * Create map of: item language code to SEF URL language code
@@ -237,11 +237,11 @@ class FlexicontentHelperRoute
 		}
 
 		// Get configuration whether to remove SEF language code from URL
-		$plugin = \Joomla\CMS\Plugin\PluginHelper::getPlugin('system', 'languagefilter');
+		$plugin = JPluginHelper::getPlugin('system', 'languagefilter');
 
 		if (!empty($plugin))
 		{
-			$pluginParams = new \Joomla\Registry\Registry($plugin->params);
+			$pluginParams = new JRegistry($plugin->params);
 			self::$add_url_lang = ! $pluginParams->get('remove_default_prefix', 0);
 		}
 		else
@@ -253,14 +253,14 @@ class FlexicontentHelperRoute
 		if ( !self::$add_url_lang ) return;
 
 		// Get user's access levels
-		$user	= \Joomla\CMS\Factory::getUser();
-		$levels = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
+		$user	= JFactory::getUser();
+		$levels = JAccess::getAuthorisedViewLevels($user->id);
 
 		// Get home page menu items according to language, and
-		$menus = \Joomla\CMS\Factory::getApplication()->getMenu('site', array());
+		$menus = JFactory::getApplication()->getMenu('site', array());
 
 		// Get content languages and filter them to include only inteface languages
-		$content_langs = \Joomla\CMS\Language\LanguageHelper::getLanguages();
+		$content_langs = JLanguageHelper::getLanguages();
 		$interface_langs = array();
 
 		foreach ($content_langs as $i => &$language)
@@ -300,7 +300,7 @@ class FlexicontentHelperRoute
 		}
 
 		// Retrieve item's Content Type parameters
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 		$query = $db->getQuery(true)
 			->select('t.attribs, t.id')
 			->from('#__flexicontent_types AS t');
@@ -309,7 +309,7 @@ class FlexicontentHelperRoute
 
 		foreach ($types as $type)
 		{
-			$type->params = new \Joomla\Registry\Registry($type->attribs);
+			$type->params = new JRegistry($type->attribs);
 		}
 
 		return $types;
@@ -334,7 +334,7 @@ class FlexicontentHelperRoute
 
 		// Finally last fallback, make a DB query to load the item
 		//echo "FlexicontentHelperRoute::_loadItem(".$_id .") doing query<br/>";
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 		$query = $db->getQuery(true)
 			->select('i.*, ie.type_id')
 			->from('#__content AS i')
@@ -362,14 +362,14 @@ class FlexicontentHelperRoute
 		if ($current_language === null)
 		{
 			// Get 'current' language. This SITE Default language if we are in Backend, and Current UI language if we are in Frontend
-			$current_language = \Joomla\CMS\Factory::getApplication()->isClient('administrator')
-				? \Joomla\CMS\Component\ComponentHelper::getParams('com_languages')->get('site', 'en-GB')
-				: \Joomla\CMS\Factory::getLanguage()->getTag();
+			$current_language = JFactory::getApplication()->isClient('administrator')
+				? JComponentHelper::getParams('com_languages')->get('site', 'en-GB')
+				: JFactory::getLanguage()->getTag();
 		}
 
 		if ($use_language === null)
 		{
-			$use_language = \Joomla\CMS\Language\Multilanguage::isEnabled();
+			$use_language = JLanguageMultilang::isEnabled();
 			if ($use_language)
 			{
 				self::_buildLanguageLookup();
@@ -549,14 +549,14 @@ class FlexicontentHelperRoute
 		if ($current_language === null)
 		{
 			// Get 'current' language. This SITE Default language if we are in Backend, and Current UI language if we are in Frontend
-			$current_language = \Joomla\CMS\Factory::getApplication()->isClient('administrator')
-				? \Joomla\CMS\Component\ComponentHelper::getParams('com_languages')->get('site', 'en-GB')
-				: \Joomla\CMS\Factory::getLanguage()->getTag();
+			$current_language = JFactory::getApplication()->isClient('administrator')
+				? JComponentHelper::getParams('com_languages')->get('site', 'en-GB')
+				: JFactory::getLanguage()->getTag();
 		}
 
 		if ($use_language === null)
 		{
-			$use_language = \Joomla\CMS\Language\Multilanguage::isEnabled();
+			$use_language = JLanguageMultilang::isEnabled();
 			if ($use_language) {
 				self::_buildLanguageLookup();
 			}
@@ -721,7 +721,7 @@ class FlexicontentHelperRoute
 		static $_search_default_menuitem_id = null;
 		if ($_search_default_menuitem_id === null)
 		{
-			$params = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+			$params = JComponentHelper::getParams('com_flexicontent');
 			$_search_default_menuitem_id = $params->get('search_view_default_menu_itemid', false);
 		}
 
@@ -776,7 +776,7 @@ class FlexicontentHelperRoute
 		static $_favs_default_menuitem_id = null;
 		if ($_favs_default_menuitem_id === null)
 		{
-			$params = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+			$params = JComponentHelper::getParams('com_flexicontent');
 			$_favs_default_menuitem_id = $params->get('favs_view_default_menu_itemid', false);
 		}
 
@@ -833,14 +833,14 @@ class FlexicontentHelperRoute
 		if ($current_language === null)
 		{
 			// Get 'current' language. This SITE Default language if we are in Backend, and Current UI language if we are in Frontend
-			$current_language = \Joomla\CMS\Factory::getApplication()->isClient('administrator')
-				? \Joomla\CMS\Component\ComponentHelper::getParams('com_languages')->get('site', 'en-GB')
-				: \Joomla\CMS\Factory::getLanguage()->getTag();
+			$current_language = JFactory::getApplication()->isClient('administrator')
+				? JComponentHelper::getParams('com_languages')->get('site', 'en-GB')
+				: JFactory::getLanguage()->getTag();
 		}
 
 		if ($use_language === null)
 		{
-			$use_language = \Joomla\CMS\Language\Multilanguage::isEnabled();
+			$use_language = JLanguageMultilang::isEnabled();
 			if ($use_language)
 			{
 				self::_buildLanguageLookup();
@@ -851,7 +851,7 @@ class FlexicontentHelperRoute
 		static $_tags_default_menuitem_id = null;
 		if ($_tags_default_menuitem_id === null)
 		{
-			$params = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+			$params = JComponentHelper::getParams('com_flexicontent');
 			$_tags_default_menuitem_id = $params->get('tags_view_default_menu_itemid', false);
 		}
 
@@ -949,9 +949,9 @@ class FlexicontentHelperRoute
 
 		if ($current_language === null)
 		{
-			$current_language = \Joomla\CMS\Factory::getApplication()->isClient('administrator')
-				? \Joomla\CMS\Component\ComponentHelper::getParams('com_languages')->get('site', 'en-GB')
-				: \Joomla\CMS\Factory::getLanguage()->getTag();
+			$current_language = JFactory::getApplication()->isClient('administrator')
+				? JComponentHelper::getParams('com_languages')->get('site', 'en-GB')
+				: JFactory::getLanguage()->getTag();
 		}
 
 
@@ -984,7 +984,7 @@ class FlexicontentHelperRoute
 			$active = FlexicontentHelperRoute::_getActiveFlexiMenuitem();
 
 			// Get if active language menu items are allowed for language all records
-			self::$route_active_lang = self::$route_active_lang !== null ? self::$route_active_lang : (int) \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('route_active_lang', 1);
+			self::$route_active_lang = self::$route_active_lang !== null ? self::$route_active_lang : (int) JComponentHelper::getParams('com_flexicontent')->get('route_active_lang', 1);
 		}
 
 		$route_active_lang = self::$route_active_lang && $language === '*';
@@ -1008,7 +1008,7 @@ class FlexicontentHelperRoute
 		// Now find menu item for given needles
 		$matched_menu = false;
 
-		//\Joomla\CMS\Factory::getApplication()->enqueueMessage("Finding Item: ".$item->id ."<br/>Language:".$language." <br/> ". print_r(self::$lookup[$language]['item'], true)."<br/>".print_r($needles,true),'message');
+		//JFactory::getApplication()->enqueueMessage("Finding Item: ".$item->id ."<br/>Language:".$language." <br/> ". print_r(self::$lookup[$language]['item'], true)."<br/>".print_r($needles,true),'message');
 		foreach ($needles as $view => $ids)
 		{
 			if ( is_object($ids) && ($ids->language=='*' || $ids->language==$language) ) return $ids;  // done, this an already appropriate menu item object
@@ -1038,7 +1038,7 @@ class FlexicontentHelperRoute
 					continue;
 				}
 
-				//\Joomla\CMS\Factory::getApplication()->enqueueMessage("MATCHED $language $view $id : ". self::$lookup[$language][$view][(int)$id],'message');
+				//JFactory::getApplication()->enqueueMessage("MATCHED $language $view $id : ". self::$lookup[$language][$view][(int)$id],'message');
 				$menuid = self::$lookup[$lookup_language][$view][(int)$id];
 				$menuitem = $component_menuitems[$lookup_language][$menuid];
 
@@ -1105,9 +1105,9 @@ class FlexicontentHelperRoute
 
 		if ($current_language === null)
 		{
-			$current_language = \Joomla\CMS\Factory::getApplication()->isClient('administrator')
-				? \Joomla\CMS\Component\ComponentHelper::getParams('com_languages')->get('site', 'en-GB')
-				: \Joomla\CMS\Factory::getLanguage()->getTag();
+			$current_language = JFactory::getApplication()->isClient('administrator')
+				? JComponentHelper::getParams('com_languages')->get('site', 'en-GB')
+				: JFactory::getLanguage()->getTag();
 		}
 
 
@@ -1140,7 +1140,7 @@ class FlexicontentHelperRoute
 			$active = FlexicontentHelperRoute::_getActiveFlexiMenuitem();
 
 			// Get if active language menu items are allowed for language all records
-			self::$route_active_lang = self::$route_active_lang !== null ? self::$route_active_lang : (int) \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('route_active_lang', 1);
+			self::$route_active_lang = self::$route_active_lang !== null ? self::$route_active_lang : (int) JComponentHelper::getParams('com_flexicontent')->get('route_active_lang', 1);
 		}
 
 		$route_active_lang = self::$route_active_lang && $language === '*';
@@ -1270,9 +1270,9 @@ class FlexicontentHelperRoute
 
 		if ($current_language === null)
 		{
-			$current_language = \Joomla\CMS\Factory::getApplication()->isClient('administrator')
-				? \Joomla\CMS\Component\ComponentHelper::getParams('com_languages')->get('site', 'en-GB')
-				: \Joomla\CMS\Factory::getLanguage()->getTag();
+			$current_language = JFactory::getApplication()->isClient('administrator')
+				? JComponentHelper::getParams('com_languages')->get('site', 'en-GB')
+				: JFactory::getLanguage()->getTag();
 		}
 
 
@@ -1305,7 +1305,7 @@ class FlexicontentHelperRoute
 			$active = FlexicontentHelperRoute::_getActiveFlexiMenuitem();
 
 			// Get if active language menu items are allowed for language all records
-			self::$route_active_lang = self::$route_active_lang !== null ? self::$route_active_lang : (int) \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('route_active_lang', 1);
+			self::$route_active_lang = self::$route_active_lang !== null ? self::$route_active_lang : (int) JComponentHelper::getParams('com_flexicontent')->get('route_active_lang', 1);
 		}
 
 		$route_active_lang = self::$route_active_lang && $language === '*';
@@ -1410,7 +1410,7 @@ class FlexicontentHelperRoute
 		);
 
 		self::$lookup[$language] = array();
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = JFactory::getUser();
 
 		foreach($component_menuitems[$language] as $menuitem)
 		{
@@ -1451,18 +1451,18 @@ class FlexicontentHelperRoute
 	static function verifyMenuItem(& $menuitem_id)
 	{
 		// Get 'current' language. This SITE Default language if we are in Backend, and Current UI language if we are in Frontend
-		$current_language = \Joomla\CMS\Factory::getApplication()->isClient('administrator')
-			? \Joomla\CMS\Component\ComponentHelper::getParams('com_languages')->get('site', 'en-GB')
-			: \Joomla\CMS\Factory::getLanguage()->getTag();
+		$current_language = JFactory::getApplication()->isClient('administrator')
+			? JComponentHelper::getParams('com_languages')->get('site', 'en-GB')
+			: JFactory::getLanguage()->getTag();
 
-		$menus = \Joomla\CMS\Factory::getApplication()->getMenu('site', array());   // this will work in J1.5 backend too !!!
+		$menus = JFactory::getApplication()->getMenu('site', array());   // this will work in J1.5 backend too !!!
 		$menu = $menus->getItem($menuitem_id);  // Try to load the menu item
 
 		// Check that (a) it exists and is active (b) points to com_flexicontent
 		if ($menu && isset($menu->query['option']) && $menu->query['option'] === 'com_flexicontent')
 		{
-			// Check language, checking access is not needed as it was done already above, by the \Joomla\CMS\Menu\AbstractMenu::getItem()
-			$item_matches = $current_language === '*' || in_array($menu->language, array('*', $current_language)) || !\Joomla\CMS\Language\Multilanguage::isEnabled();
+			// Check language, checking access is not needed as it was done already above, by the JMenu::getItem()
+			$item_matches = $current_language === '*' || in_array($menu->language, array('*', $current_language)) || !JLanguageMultilang::isEnabled();
 
 			// If matched set default and return it
 			if ($item_matches) ;

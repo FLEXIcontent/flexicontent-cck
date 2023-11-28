@@ -107,7 +107,7 @@ class FlexicontentModelTags extends FCModelAdminList
 	 */
 	public function __construct($config = array())
 	{
-		$app    = \Joomla\CMS\Factory::getApplication();
+		$app    = JFactory::getApplication();
 		$jinput = $app->input;
 		$option = $jinput->getCmd('option', '');
 		$view   = $jinput->getCmd('view', '');
@@ -138,14 +138,14 @@ class FlexicontentModelTags extends FCModelAdminList
 		$this->canManage = FlexicontentHelperPerm::getPerm()->CanTags;
 
 		// Initialize Tags helper object
-		$this->tagsHelper = new \Joomla\CMS\Helper\TagsHelper;
+		$this->tagsHelper = new \JHelperTags;
 	}
 
 
 	/**
 	 * Method to build the query for the records
 	 *
-	 * @return  \Joomla\Data\DataObjectbaseQuery   The DB Query object
+	 * @return  JDatabaseQuery   The DB Query object
 	 *
 	 * @since   3.3.0
 	 */
@@ -191,9 +191,9 @@ class FlexicontentModelTags extends FCModelAdminList
 	/**
 	 * Method to build the where clause of the query for the records
 	 *
-	 * @param		\Joomla\Data\DataObjectbaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
+	 * @param		JDatabaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
 	 *
-	 * @return  \Joomla\Data\DataObjectbaseQuery|array
+	 * @return  JDatabaseQuery|array
 	 *
 	 * @since   3.3.0
 	 */
@@ -202,7 +202,7 @@ class FlexicontentModelTags extends FCModelAdminList
 		// Inherited filters : filter_state, search
 		$where = parent::_buildContentWhere(false);
 
-		if ($q instanceof \Joomla\Data\DataObjectbaseQuery)
+		if ($q instanceof \JDatabaseQuery)
 		{
 			return $where ? $q->where($where) : $q;
 		}
@@ -216,9 +216,9 @@ class FlexicontentModelTags extends FCModelAdminList
 	/**
 	 * Method to build the having clause of the query for the files
 	 *
-	 * @param		\Joomla\Data\DataObjectbaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
+	 * @param		JDatabaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
 	 *
-	 * @return  \Joomla\Data\DataObjectbaseQuery|array
+	 * @return  JDatabaseQuery|array
 	 *
 	 * @since 1.0
 	 */
@@ -240,7 +240,7 @@ class FlexicontentModelTags extends FCModelAdminList
 				break;
 		}
 
-		if ($q instanceof \Joomla\Data\DataObjectbaseQuery)
+		if ($q instanceof \JDatabaseQuery)
 		{
 			return $having ? $q->having($having) : $q;
 		}
@@ -302,7 +302,7 @@ class FlexicontentModelTags extends FCModelAdminList
 
 			$table->id    = 0;
 			$table->$name = $table->$name . ' [copy]';
-			$table->alias = \Joomla\CMS\Filter\OutputFilter::stringURLSafe($table->$name);
+			$table->alias = JFilterOutput::stringURLSafe($table->$name);
 
 			$table->check();
 			$table->store();

@@ -37,7 +37,7 @@ class plgFlexicontent_fieldsFcloadmodule extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
-		$field->label = $field->parameters->get('label_form') ? \Joomla\CMS\Language\Text::_($field->parameters->get('label_form')) : \Joomla\CMS\Language\Text::_($field->label);
+		$field->label = $field->parameters->get('label_form') ? JText::_($field->parameters->get('label_form')) : JText::_($field->label);
 
 		// initialise property
 		if ( empty($field->value[0]) )
@@ -45,7 +45,7 @@ class plgFlexicontent_fieldsFcloadmodule extends FCField
 			$field->value[0] = '';
 		}
 
-		$document	= \Joomla\CMS\Factory::getDocument();
+		$document	= JFactory::getDocument();
 
 		$fieldname = 'custom['.$field->name.']';
 		$elementid = 'custom_'.$field->name;
@@ -94,7 +94,7 @@ class plgFlexicontent_fieldsFcloadmodule extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
-		$field->label = \Joomla\CMS\Language\Text::_($field->label);
+		$field->label = JText::_($field->label);
 
 		// Set field and item objects
 		$this->setField($field);
@@ -112,8 +112,8 @@ class plgFlexicontent_fieldsFcloadmodule extends FCField
 		{
 			$initialized = 1;
 
-			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$app       = JFactory::getApplication();
+			$document  = JFactory::getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -162,7 +162,7 @@ class plgFlexicontent_fieldsFcloadmodule extends FCField
 		$position		= $field->parameters->get('position', '');
 		$style 			= $field->parameters->get('style', -2);
 
-		$document		= \Joomla\CMS\Factory::getDocument();
+		$document		= JFactory::getDocument();
 		$display 		= array();
 		$renderer		= $document->loadRenderer('module');
 		$mparams		= array('style'=>$style);
@@ -196,7 +196,7 @@ class plgFlexicontent_fieldsFcloadmodule extends FCField
 			/**
 			 * Get module object
 			 */
-			$mod = \Joomla\CMS\Helper\ModuleHelper::getModule($object->module, $object->title);
+			$mod = JModuleHelper::getModule($object->module, $object->title);
 			//echo '<pre>'; print_r($mod); echo '</pre>';
 
 			// Check if module is not assigned to current menu item (not assigned to current page), and terminate
@@ -227,7 +227,7 @@ class plgFlexicontent_fieldsFcloadmodule extends FCField
 				list($param_label, $param_name) = preg_split("/[\s]*!![\s]*/", $mod_param);
 				$custom_mod_params[$param_name] = isset($value[$param_name]) ? $value[$param_name] : null;
 			}
-			$_mod_params = new \Joomla\Registry\Registry($mod->params);
+			$_mod_params = new JRegistry($mod->params);
 			foreach ($custom_mod_params as $i => $v)
 			{
 				$_mod_params->set($i,$v);
@@ -252,7 +252,7 @@ class plgFlexicontent_fieldsFcloadmodule extends FCField
 				$field->{$prop} = 'Error';
 				return;
 			}
-			foreach (\Joomla\CMS\Helper\ModuleHelper::getModules($position) as $mod)
+			foreach (JModuleHelper::getModules($position) as $mod)
 			{
 				$display[] = $renderer->render($mod, $mparams);
 			}
@@ -296,7 +296,7 @@ class plgFlexicontent_fieldsFcloadmodule extends FCField
 
 	function _getModuleObject($id)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 
 		$query 	= 'SELECT * FROM #__modules'
 				. ' WHERE id = ' . (int)$id

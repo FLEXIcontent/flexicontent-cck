@@ -26,17 +26,17 @@ if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
 jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
-jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
+jimport('cms.html.select');    // JHtmlSelect
+jimport('joomla.form.field');  // JFormField
 
-jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
-\Joomla\CMS\Form\FormHelper::loadFieldClass('groupedlist');   // \Joomla\CMS\Form\Field\GroupedlistField
+jimport('joomla.form.helper'); // JFormHelper
+JFormHelper::loadFieldClass('groupedlist');   // JFormFieldGroupedList
 
 /**
 * Renders a multiple select element
 *
 */
-class JFormFieldMultiList extends \Joomla\CMS\Form\Field\GroupedlistField
+class JFormFieldMultiList extends JFormFieldGroupedList
 {
 	protected $_options;
 	protected $_inherited;
@@ -159,7 +159,7 @@ class JFormFieldMultiList extends \Joomla\CMS\Form\Field\GroupedlistField
 				if (isset($sub_option->attributes()->class))  $attr_arr['class'] = $sub_option->attributes()->class;
 
 				$val  = (string) $sub_option->attributes()->value;
-				$text = \Joomla\CMS\Language\Text::_( (string) $sub_option );
+				$text = JText::_( (string) $sub_option );
 
 				$_options[] = (object) array(
 					'value' => $val,
@@ -176,7 +176,7 @@ class JFormFieldMultiList extends \Joomla\CMS\Form\Field\GroupedlistField
 				$grp = (string) $grp;
 				$this->_options[$grp] = array();
 				$this->_options[$grp]['id'] = null;
-				$this->_options[$grp]['text'] = \Joomla\CMS\Language\Text::_($option->attributes()->label);
+				$this->_options[$grp]['text'] = JText::_($option->attributes()->label);
 				$this->_options[$grp]['items'] = $_options;
 				$last_was_grp = true;
 			}
@@ -194,7 +194,7 @@ class JFormFieldMultiList extends \Joomla\CMS\Form\Field\GroupedlistField
 			self::$css_js_added = true;
 			flexicontent_html::loadFramework('flexi-lib');
 
-			if ( \Joomla\CMS\Factory::getApplication()->input->get('option', '', 'cmd') != 'com_flexicontent' )
+			if ( JFactory::getApplication()->input->get('option', '', 'cmd') != 'com_flexicontent' )
 			{
 				$js = "
 				jQuery(document).ready(function(){
@@ -204,7 +204,7 @@ class JFormFieldMultiList extends \Joomla\CMS\Form\Field\GroupedlistField
 					)."
 				});
 				";
-				\Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+				JFactory::getDocument()->addScriptDeclaration($js);
 			}
 		}
 
@@ -295,7 +295,7 @@ class JFormFieldMultiList extends \Joomla\CMS\Form\Field\GroupedlistField
 			{
 				$this->_options[0]['items'][0]->text = StringHelper::strtoupper($this->_options[0]['items'][0]->text). ' ... '. $V2L[$this->_inherited];
 			}
-			$html = \Joomla\CMS\HTML\HTMLHelper::_('select.groupedlist', $this->_options, $fieldname, $attribs);
+			$html = JHtml::_('select.groupedlist', $this->_options, $fieldname, $attribs);
 		}
 
 
@@ -311,10 +311,10 @@ class JFormFieldMultiList extends \Joomla\CMS\Form\Field\GroupedlistField
 			$preview_img = $this->element['preview_img'] ? $this->element['preview_img'] : '';
 			$tip_class = $this->element['tip_class'] . ' ' . $popover_class;
 
-			$hintmage = \Joomla\CMS\HTML\HTMLHelper::image ( 'administrator/components/com_flexicontent/assets/images/'.$tip_img, \Joomla\CMS\Language\Text::_( 'FLEXI_NOTES' ), ' style="vertical-align:middle; max-height:24px; padding:0px; margin:0 0 0 12px;" ' );
-			$previewimage = $preview_img ? \Joomla\CMS\HTML\HTMLHelper::image ( 'administrator/components/com_flexicontent/assets/images/'.$preview_img, \Joomla\CMS\Language\Text::_( 'FLEXI_NOTES' ), ' style="max-height:24px; padding:0px; margin:0 0 0 12px;" ' ) : '';
+			$hintmage = JHtml::image ( 'administrator/components/com_flexicontent/assets/images/'.$tip_img, JText::_( 'FLEXI_NOTES' ), ' style="vertical-align:middle; max-height:24px; padding:0px; margin:0 0 0 12px;" ' );
+			$previewimage = $preview_img ? JHtml::image ( 'administrator/components/com_flexicontent/assets/images/'.$preview_img, JText::_( 'FLEXI_NOTES' ), ' style="max-height:24px; padding:0px; margin:0 0 0 12px;" ' ) : '';
 			$tip_text .= '
-				<span class="'.$tip_class.'" style="display: inline-block;" data-content="' . htmlspecialchars(\Joomla\CMS\Language\Text::_($inline_tip), ENT_COMPAT, 'UTF-8') . '">
+				<span class="'.$tip_class.'" style="display: inline-block;" data-content="' . htmlspecialchars(JText::_($inline_tip), ENT_COMPAT, 'UTF-8') . '">
 					' . $hintmage . $previewimage . '
 				</span>';
 		}
@@ -325,7 +325,7 @@ class JFormFieldMultiList extends \Joomla\CMS\Form\Field\GroupedlistField
 			$text_class .= ($text_class ? ' ' : '') . 'fc_toggle_current';
 			$tip_text .= '
 				<span class="'.$text_class.'" style="display: inline-block;">
-					' . \Joomla\CMS\Language\Text::_($inline_text) . '
+					' . JText::_($inline_text) . '
 				</span>';
 		}
 
@@ -335,10 +335,10 @@ class JFormFieldMultiList extends \Joomla\CMS\Form\Field\GroupedlistField
 			$preview_img = $this->element['preview_img2'] ? $this->element['preview_img2'] : '';
 			$tip_class = $this->element['tip_class2'] . ' ' . $popover_class;
 
-			$hintmage = \Joomla\CMS\HTML\HTMLHelper::image ( 'administrator/components/com_flexicontent/assets/images/'.$tip_img, \Joomla\CMS\Language\Text::_( 'FLEXI_NOTES' ), ' style="vertical-align:middle; max-height:24px; padding:0px; margin:0 0 0 12px;" ' );
-			$previewimage = $preview_img ? \Joomla\CMS\HTML\HTMLHelper::image ( 'administrator/components/com_flexicontent/assets/images/'.$preview_img, \Joomla\CMS\Language\Text::_( 'FLEXI_NOTES' ), ' style="max-height:24px; padding:0px; margin:0 0 0 12px;" ' ) : '';
+			$hintmage = JHtml::image ( 'administrator/components/com_flexicontent/assets/images/'.$tip_img, JText::_( 'FLEXI_NOTES' ), ' style="vertical-align:middle; max-height:24px; padding:0px; margin:0 0 0 12px;" ' );
+			$previewimage = $preview_img ? JHtml::image ( 'administrator/components/com_flexicontent/assets/images/'.$preview_img, JText::_( 'FLEXI_NOTES' ), ' style="max-height:24px; padding:0px; margin:0 0 0 12px;" ' ) : '';
 			$tip_text2 .= '
-				<span class="'.$tip_class.'" style="display: inline-block;" data-content="' . htmlspecialchars(\Joomla\CMS\Language\Text::_($inline_tip), ENT_COMPAT, 'UTF-8') . '">
+				<span class="'.$tip_class.'" style="display: inline-block;" data-content="' . htmlspecialchars(JText::_($inline_tip), ENT_COMPAT, 'UTF-8') . '">
 					' . $hintmage . $previewimage . '
 				</span>';
 		}

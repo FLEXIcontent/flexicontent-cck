@@ -23,13 +23,13 @@ require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'
 //require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'category.php');
 
 //require_once (JPATH_SITE.DS.'modules'.DS.'mod_flexicontent'.DS.'classes'.DS.'datetime.php');
-//\Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
-JLoader::register('\Joomla\CMS\Form\FormFieldFclayoutbuilder', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'elements' . DS . 'fclayoutbuilder.php');
+//JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
+JLoader::register('JFormFieldFclayoutbuilder', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'elements' . DS . 'fclayoutbuilder.php');
 
 
 // Decide whether to show module contents
-$app     = \Joomla\CMS\Factory::getApplication();
-$config  = \Joomla\CMS\Factory::getConfig();
+$app     = JFactory::getApplication();
+$config  = JFactory::getConfig();
 $jinput  = $app->input;
 $option  = $jinput->get('option', '', 'cmd');
 $view    = $jinput->get('view', '', 'cmd');
@@ -89,7 +89,7 @@ if ( !$show_mod )  return;
 
 global $modfc_jprof;
 jimport('joomla.profiler.profiler');
-$modfc_jprof = new \Joomla\CMS\Profiler\Profiler();
+$modfc_jprof = new JProfiler();
 $modfc_jprof->mark('START: FLEXIcontent Categories Module');
 
 // Include helpers class file
@@ -104,14 +104,14 @@ if ($mod_initialized === null)
 }
 
 // Initialize various variables
-$document = \Joomla\CMS\Factory::getDocument();
-$flexiparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+$document = JFactory::getDocument();
+$flexiparams = JComponentHelper::getParams('com_flexicontent');
 
 // Include the helper only once
 require_once (dirname(__FILE__).DS.'helper.php');
 
-// Include \Joomla\CMS\Categories\CategoryNode class file
-JLoader::register('\Joomla\CMS\Categories\CategoryNode', JPATH_BASE . '/libraries/legacy/categories/categories.php');
+// Include JCategoryNode class file
+JLoader::register('JCategoryNode', JPATH_BASE . '/libraries/legacy/categories/categories.php');
 
 // Get module's basic display parameters
 $cacheid = md5($module->id);
@@ -123,14 +123,14 @@ $cacheparams->method       = 'getList';
 $cacheparams->methodparams = $params;
 $cacheparams->modeparams   = $cacheid;
 
-$list = \Joomla\CMS\Helper\ModuleHelper::moduleCache($module, $params, $cacheparams);
+$list = JModuleHelper::moduleCache($module, $params, $cacheparams);
 
 if (!empty($list))
 {
 	$moduleclass_sfx = htmlspecialchars($params->get('moduleclass_sfx') ?? '');
 	$startLevel      = reset($list)->getParent()->level;
 	// Render Layout
-	require \Joomla\CMS\Helper\ModuleHelper::getLayoutPath('mod_flexicategories', $params->get('layout', 'default'));
+	require JModuleHelper::getLayoutPath('mod_flexicategories', $params->get('layout', 'default'));
 }
 
 // append performance stats to global variable

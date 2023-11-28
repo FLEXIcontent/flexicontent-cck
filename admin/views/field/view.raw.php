@@ -23,7 +23,7 @@ jimport('legacy.view.legacy');
 /**
  * View class for the FLEXIcontent field screen
  */
-class FlexicontentViewField extends \Joomla\CMS\MVC\View\HtmlView
+class FlexicontentViewField extends JViewLegacy
 {
 	function display($tpl = null)
 	{
@@ -31,9 +31,9 @@ class FlexicontentViewField extends \Joomla\CMS\MVC\View\HtmlView
 		// *** Initialise variables
 		// ***
 
-		$app      = \Joomla\CMS\Factory::getApplication();
+		$app      = JFactory::getApplication();
 		$jinput   = $app->input;
-		$user     = \Joomla\CMS\Factory::getUser();
+		$user     = JFactory::getUser();
 
 		// Get url vars and some constants
 		$cid = $jinput->getInt('cid', 0);
@@ -48,7 +48,7 @@ class FlexicontentViewField extends \Joomla\CMS\MVC\View\HtmlView
 		$model = $this->getModel();
 
 		// Set requested field type into the model, so that we will display the correct type-specific parameters of the new field type
-		// Note: this needs to be done --before-- calling anything that loads \Joomla\CMS\Form\Form (aka also before loading the record)
+		// Note: this needs to be done --before-- calling anything that loads JForm (aka also before loading the record)
 		if ($field_type)
 		{
 			$model->setFieldType($field_type);
@@ -68,7 +68,7 @@ class FlexicontentViewField extends \Joomla\CMS\MVC\View\HtmlView
 		// Fail if an existing record is checked out by someone else
 		if ($row->id && $model->isCheckedOut($user->get('id')))
 		{
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ), 'warning');
+			$app->enqueueMessage(JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ), 'warning');
 			$app->redirect( 'index.php?option=com_flexicontent&view=' . $manager_view );
 		}
 		
@@ -86,14 +86,14 @@ class FlexicontentViewField extends \Joomla\CMS\MVC\View\HtmlView
 
 			foreach ($fieldSets as $name => $fieldSet) :
 				if ($name!='basic' && $name!='standard' && (substr($name, 0, $prefix_len)!='group-'.$field_type.'-' || $name==='group-'.$field_type) ) continue;
-				if ($fieldSet->label) $label = \Joomla\CMS\Language\Text::_($fieldSet->label);
-				else $label = $name=='basic' || $name=='standard' ? \Joomla\CMS\Language\Text::_('FLEXI_BASIC') : ucfirst(str_replace("group-", "", $name));
+				if ($fieldSet->label) $label = JText::_($fieldSet->label);
+				else $label = $name=='basic' || $name=='standard' ? JText::_('FLEXI_BASIC') : ucfirst(str_replace("group-", "", $name));
 				
-				if (@$fieldSet->label_prefix) $label = \Joomla\CMS\Language\Text::_($fieldSet->label_prefix) .' - '. $label;
+				if (@$fieldSet->label_prefix) $label = JText::_($fieldSet->label_prefix) .' - '. $label;
 				$icon = @$fieldSet->icon_class ? 'data-icon-class="'.$fieldSet->icon_class.'"' : '';
-				$prepend = @$fieldSet->prepend_text ? 'data-prefix-text="'.\Joomla\CMS\Language\Text::_($fieldSet->prepend_text).'"' : '';
+				$prepend = @$fieldSet->prepend_text ? 'data-prefix-text="'.JText::_($fieldSet->prepend_text).'"' : '';
 				
-				$description = $fieldSet->description ? \Joomla\CMS\Language\Text::_($fieldSet->description) : '';
+				$description = $fieldSet->description ? JText::_($fieldSet->description) : '';
 				?>
 				<div class="tabbertab" id="fcform_tabset_<?php echo $name; ?>_tab" <?php echo $icon; ?> <?php echo $prepend; ?>>
 					<h3 class="tabberheading hasTooltip" title="<?php echo $description; ?>"><?php echo $label; ?> </h3>
@@ -105,7 +105,7 @@ class FlexicontentViewField extends \Joomla\CMS\MVC\View\HtmlView
 							echo $field->input;
 						else
 						{
-							$_title = htmlspecialchars(\Joomla\CMS\Language\Text::_($field->description), ENT_QUOTES , 'UTF-8' );
+							$_title = htmlspecialchars(JText::_($field->description), ENT_QUOTES , 'UTF-8' );
 							$_label = strpos($field->label,'class=')
 								? str_replace('class="', 'class="label-fcinner ', $field->label)
 								: str_replace('<label ', '<label class="label-fcinner hasPopover" data-placement="top" data-bs-content="'.$_title.'" ', $field->label);

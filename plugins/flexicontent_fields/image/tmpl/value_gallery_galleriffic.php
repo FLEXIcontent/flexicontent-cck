@@ -39,10 +39,10 @@ foreach ($values as $n => $value)
 	$group_str = $group_name ? 'data-fancybox="' . $group_name . '"' : '';
 
 	$field->{$prop}[] =
-		'<a class="thumb" name="drop" href="'.\Joomla\CMS\Uri\Uri::root(true).'/'.$srcl.'" data-width="' . $size_w_l . '" data-height="' . $size_h_l . '" title="' . $title_encoded . '">
+		'<a class="thumb" name="drop" href="'.JUri::root(true).'/'.$srcl.'" data-width="' . $size_w_l . '" data-height="' . $size_h_l . '" title="' . $title_encoded . '">
 			'.$img_legend.'
 		</a>
-		<a class="gf_fancybox" href="'.\Joomla\CMS\Uri\Uri::root(true).'/'.$srcl.'" data-title="' . $title_encoded . '" data-caption="' . $desc_encoded . '"' . $group_str . '
+		<a class="gf_fancybox" href="'.JUri::root(true).'/'.$srcl.'" data-title="' . $title_encoded . '" data-caption="' . $desc_encoded . '"' . $group_str . '
 			onclick="if (gf_gallery_' . $uid . '.mSlider.isDragging) {event.preventDefault(); event.stopPropagation(); return false; }"; style="display: none;">
 			' . str_replace('style="', 'style="display: none;', $img_legend) . '
 		</a>
@@ -119,12 +119,12 @@ $(document).ready(function()
 		navControlsContainerSel:   '#gf_navcontrols_" . $uid . "',
 		captionContainerSel:       '#gf_caption_" . $uid . "',
 		loadingContainerSel:       '#gf_loading_" . $uid . "',
-		playLinkText:              '". '<span class="icon-play-circle" style="color: white"></span> ' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD_IMAGE_PLAY_SLIDESHOW') ."',
-		pauseLinkText:             '". '<span class="icon-pause-circle" style="color: white"></span> ' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD_IMAGE_PAUSE_SLIDESHOW') ."',
-		prevLinkText:              '". ($over_image_btns ? '&lt;' : \Joomla\CMS\Language\Text::_('FLEXI_FIELD_IMAGE_PREV_LINK')) ."',
-		nextLinkText:              '". ($over_image_btns ? '&gt;' : \Joomla\CMS\Language\Text::_('FLEXI_FIELD_IMAGE_NEXT_LINK')) ."',
-		prevPageLinkText:          '". ($enable_top_pager === 2 ? '&lt;' : \Joomla\CMS\Language\Text::_('FLEXI_FIELD_IMAGE_PREV_PAGE_LINK')) ."',
-		nextPageLinkText:          '". ($enable_top_pager === 2 ? '&gt;' : \Joomla\CMS\Language\Text::_('FLEXI_FIELD_IMAGE_NEXT_PAGE_LINK')) ."',
+		playLinkText:              '". '<span class="icon-play-circle" style="color: white"></span> ' . JText::_('FLEXI_FIELD_IMAGE_PLAY_SLIDESHOW') ."',
+		pauseLinkText:             '". '<span class="icon-pause-circle" style="color: white"></span> ' . JText::_('FLEXI_FIELD_IMAGE_PAUSE_SLIDESHOW') ."',
+		prevLinkText:              '". ($over_image_btns ? '&lt;' : JText::_('FLEXI_FIELD_IMAGE_PREV_LINK')) ."',
+		nextLinkText:              '". ($over_image_btns ? '&gt;' : JText::_('FLEXI_FIELD_IMAGE_NEXT_LINK')) ."',
+		prevPageLinkText:          '". ($enable_top_pager === 2 ? '&lt;' : JText::_('FLEXI_FIELD_IMAGE_PREV_PAGE_LINK')) ."',
+		nextPageLinkText:          '". ($enable_top_pager === 2 ? '&gt;' : JText::_('FLEXI_FIELD_IMAGE_NEXT_PAGE_LINK')) ."',
 
 		enableHistory:             false,
 		enableFancybox:            ".($enable_popup ? 'true' : 'false').",
@@ -150,7 +150,7 @@ $(document).ready(function()
 })(jQuery);
 ";
 
-if ($js) \Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+if ($js) JFactory::getDocument()->addScriptDeclaration($js);
 
 
 /**

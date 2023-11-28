@@ -71,7 +71,7 @@ foreach ($values as $value)
 	}
 
 	// Container of missing API key error
-	$message_error = $message_error ? '<span class="alert alert-warning fc-iblock">' . \Joomla\CMS\Language\Text::_($message_error) . '</span>' : '';
+	$message_error = $message_error ? '<span class="alert alert-warning fc-iblock">' . JText::_($message_error) . '</span>' : '';
 
 
 	$field_html = '
@@ -98,7 +98,7 @@ foreach ($values as $value)
 
 		($addr_edit_mode != 'plaintext' ? '' : '
 			<tr>
-				<td class="key"><label class="fc-prop-lbl addrint_addr_display-lbl" for="'.$elementid_n.'_addr_display">'.\Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ADDRESS').'</label></td>
+				<td class="key"><label class="fc-prop-lbl addrint_addr_display-lbl" for="'.$elementid_n.'_addr_display">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ADDRESS').'</label></td>
 				<td><textarea class="fcfield_textval addrint_addr_display ' . (in_array('address', $required_props) ? ' required' : '') . $disabled_class . '" ' . $disabled_attr . ' id="'.$elementid_n.'_addr_display" name="'.$fieldname_n.'[addr_display]" rows="4" cols="24">'
 				.($value['addr_display'] ? $value['addr_display'] :
 					(
@@ -113,7 +113,7 @@ foreach ($values as $value)
 						.($value['city'] || $value['state'] ? ($value['city']  ? ' ' . $value['city']  : '') . ($value['state'] ? ' ' . $value['state'] : '') : '')
 						.($value['province'] ? ' '  . $value['province'] : '')
 						.($value['zip']      ? ', ' . $value['zip'] . ($value['zip_suffix'] ? ' '.$value['zip_suffix'] : '') . "\n" : '')
-						.($value['country']  ? \Joomla\CMS\Language\Text::_('PLG_FC_ADDRESSINT_CC_'.$value['country']) . "\n" : '')
+						.($value['country']  ? JText::_('PLG_FC_ADDRESSINT_CC_'.$value['country']) . "\n" : '')
 					: ''
 					)
 				)
@@ -125,12 +125,12 @@ foreach ($values as $value)
 
 		($addr_edit_mode === 'formatted' ? '
 			<tr '.($use_name ? '' : 'style="display:none;"').' class="fc_gm_name_row">
-				<td class="key"><label class="fc-prop-lbl addrint_name-lbl" for="'.$elementid_n.'_name" >'.\Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_BUSINESS_LOCATION').'</label></td>
+				<td class="key"><label class="fc-prop-lbl addrint_name-lbl" for="'.$elementid_n.'_name" >'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_BUSINESS_LOCATION').'</label></td>
 				<td><input type="text" class="fcfield_textval addrint_name ' . ($use_name && in_array('business_location', $required_props) ? ' required' : '') . $disabled_class . '" ' . $disabled_attr . ' id="'.$elementid_n.'_name" name="'.$fieldname_n.'[name]" value="'.htmlspecialchars($value['name'], ENT_COMPAT, 'UTF-8').'" size="50" maxlength="100" /></td>
 			</tr>
 
 			<tr class="fc_gm_addr_row">
-				<td class="key"><label class="fc-prop-lbl addrint_addr1-lbl" for="'.$elementid_n.'_addr1">'.\Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_STREET_ADDRESS').'</label></td>
+				<td class="key"><label class="fc-prop-lbl addrint_addr1-lbl" for="'.$elementid_n.'_addr1">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_STREET_ADDRESS').'</label></td>
 				<td>
 					<textarea class="fcfield_textval addrint_addr1 ' . (in_array('street_address', $required_props) ? ' required' : '') . $disabled_class . '" ' . $disabled_attr . ' id="'.$elementid_n.'_addr1" name="'.$fieldname_n.'[addr1]" maxlength="400" cols="47" rows="2">'.$value['addr1'].'</textarea>'
 					.($use_addr2 ? '<br/><textarea class="fcfield_textval addrint_addr2" id="'.$elementid_n.'_addr2" name="'.$fieldname_n.'[addr2]" maxlength="400" rows="2">'.$value['addr2'].'</textarea>' : '')
@@ -140,26 +140,26 @@ foreach ($values as $value)
 			</tr>
 
 			<tr class="fc_gm_city_row">
-				<td class="key"><label class="fc-prop-lbl fc_gm_city-lbl" for="'.$elementid_n.'_city">'.\Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_CITY').'</label></td>
+				<td class="key"><label class="fc-prop-lbl fc_gm_city-lbl" for="'.$elementid_n.'_city">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_CITY').'</label></td>
 				<td><input type="text" class="fcfield_textval fc_gm_city ' . (in_array('city', $required_props) ? ' required' : '') . $disabled_class . '" ' . $disabled_attr . ' id="'.$elementid_n.'_city" name="'.$fieldname_n.'[city]" value="'.htmlspecialchars($value['city'], ENT_COMPAT, 'UTF-8').'" size="50" maxlength="100" /></td>
 			</tr>
 
 			<tr '.($use_usstate && $value['country'] === 'US' ? '' : 'style="display:none;"').' class="fc_gm_usstate_row">
-				<td class="key"><label class="fc-prop-lbl fc_gm_usstate-lbl" for="'.$elementid_n.'_state">'.\Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_US_STATE').'</label></td>
+				<td class="key"><label class="fc-prop-lbl fc_gm_usstate-lbl" for="'.$elementid_n.'_state">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_US_STATE').'</label></td>
 				<td>' .
-					\Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $list_states, $fieldname_n.'[state]',
+					JHtml::_('select.genericlist', $list_states, $fieldname_n.'[state]',
 						' class="use_select2_lib fc_gm_usstate ' . ($use_usstate && in_array('us_state', $required_props) ? ' required' : '') . $disabled_class . '" ' . $disabled_attr,
 						'value', 'text', $value['state'], $elementid_n.'_state') . '
 				</td>
 			</tr>
 
 			<tr '.($use_province ? '' : 'style="display:none;"').' class="fc_gm_province_row">
-				<td class="key"><label class="fc-prop-lbl fc_gm_province-lbl" for="'.$elementid_n.'_province">'.\Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_NON_US_STATE_PROVINCE').'</label></td>
+				<td class="key"><label class="fc-prop-lbl fc_gm_province-lbl" for="'.$elementid_n.'_province">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_NON_US_STATE_PROVINCE').'</label></td>
 				<td><input type="text" class="fcfield_textval fc_gm_province ' . ($use_province && in_array('non_us_state_province', $required_props) ? ' required' : '') . $disabled_class . '" ' . $disabled_attr . ' id="'.$elementid_n.'_province" name="'.$fieldname_n.'[province]" value="'.htmlspecialchars($value['province'], ENT_COMPAT, 'UTF-8').'" size="50" maxlength="100" /></td>
 			</tr>
 
 			<tr class="fc_gm_zip_row">
-				<td class="key"><label class="fc-prop-lbl addrint_zip-lbl" for="'.$elementid_n.'_zip">'.\Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ZIP_POSTAL_CODE').'</label></td>
+				<td class="key"><label class="fc-prop-lbl addrint_zip-lbl" for="'.$elementid_n.'_zip">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ZIP_POSTAL_CODE').'</label></td>
 				<td>
 					<input type="text" class="fcfield_textval inlineval addrint_zip ' . (in_array('zip_postal_code', $required_props) ? ' required' : '') . $disabled_class . '" ' . $disabled_attr . ' id="'.$elementid_n.'_zip" name="'.$fieldname_n.'[zip]" value="'.htmlspecialchars($value['zip'], ENT_COMPAT, 'UTF-8').'" size="10" maxlength="10" />
 					' .
@@ -169,9 +169,9 @@ foreach ($values as $value)
 			</tr>
 
 			<tr '.($use_country ? '' : 'style="display:none;"').' class="fc_gm_country_row">
-				<td class="key"><label class="fc-prop-lbl fc_gm_country-lbl" for="'.$elementid_n.'_country">'.\Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_COUNTRY').'</label></td>
+				<td class="key"><label class="fc-prop-lbl fc_gm_country-lbl" for="'.$elementid_n.'_country">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_COUNTRY').'</label></td>
 				<td>' .
-					\Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $allowed_countries, $fieldname_n.'[country]', $countries_attribs . ' class="use_select2_lib fc_gm_country ' .
+					JHtml::_('select.genericlist', $allowed_countries, $fieldname_n.'[country]', $countries_attribs . ' class="use_select2_lib fc_gm_country ' .
 						($use_country && in_array('country', $required_props) ? ' required' : '') . $disabled_class . '" ' . $disabled_attr,
 						'value', 'text', ($value['country'] ? $value['country'] : $ac_country_default), $elementid_n.'_country') . '
 				</td>
@@ -179,11 +179,11 @@ foreach ($values as $value)
 		' : '') . '
 
 			<tr '.($edit_latlon ? '' : 'style="display:none;"').' class="fc_gm_latitude_row">
-				<td class="key"><label class="fc-prop-lbl addrint_lat-lbl">'.\Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_LATITUDE').'</label></td>
+				<td class="key"><label class="fc-prop-lbl addrint_lat-lbl">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_LATITUDE').'</label></td>
 				<td><input type="text" class="fcfield_textval addrint_lat ' . (in_array('latitude', $required_props) ? ' required' : '') . $disabled_class . '" ' . $disabled_attr . ' id="'.$elementid_n.'_lat" name="'.$fieldname_n.'[lat]" value="'.htmlspecialchars($value['lat'], ENT_COMPAT, 'UTF-8').'" size="50" maxlength="10" ' . (!$edit_latlon || $edit_latlon == 2 ? ' readonly="readonly" ' : '') . '/></td>
 			</tr>
 			<tr class="fc_gm_longitude_row">
-				<td class="key"><label class="fc-prop-lbl addrint_lon-lbl">'.\Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_LONGITUDE').'</label></td>
+				<td class="key"><label class="fc-prop-lbl addrint_lon-lbl">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_LONGITUDE').'</label></td>
 				<td><input type="text" class="fcfield_textval addrint_lon ' . (in_array('longitude', $required_props) ? ' required' : '') . $disabled_class . '" ' . $disabled_attr . ' id="'.$elementid_n.'_lon" name="'.$fieldname_n.'[lon]" value="'.htmlspecialchars($value['lon'], ENT_COMPAT, 'UTF-8').'" size="50" maxlength="10" ' . (!$edit_latlon || $edit_latlon == 2 ? ' readonly="readonly" ' : '') . '/></td>
 			</tr>' .
 
@@ -191,21 +191,21 @@ foreach ($values as $value)
 		// MANUALLY entered PROPERTY !! Remove from form instead of hiding !!
 		($use_custom_marker ? '
 			<tr class="fc_gm_custom_marker_row">
-			<td class="key"><label class="fc-prop-lbl fc_gm_custom_marker-lbl" for="'.$elementid_n.'_custom_marker">'.\Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_CUSTOM_MARKER').'</label></td>
+			<td class="key"><label class="fc-prop-lbl fc_gm_custom_marker-lbl" for="'.$elementid_n.'_custom_marker">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_CUSTOM_MARKER').'</label></td>
 				<td>' .
-					\Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $custom_markers, $fieldname_n.'[custom_marker]',
+					JHtml::_('select.genericlist', $custom_markers, $fieldname_n.'[custom_marker]',
 						' class="fc_gm_custom_marker has_select2_lib" data-marker-base-url = "' . $custom_marker_url_base . '" ' .
 						' onchange="fcfield_addrint.updateMarkerIcon' . ($mapapi_edit === 'googlemap' ? '' : '_OS') . '(this.id.replace(\'_custom_marker\', \'\'), \''.$field_name_js.'\');" ',
 						'value', 'text', $value['custom_marker'], $elementid_n.'_custom_marker') . '
 				</td>
 			</tr>
 			<tr class="fc_gm_marker_anchor_row">
-			<td class="key"><label class="fc-prop-lbl fc_gm_marker_anchor-lbl" for="'.$elementid_n.'_marker_anchor">'.\Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ANCHOR').'</label></td>
+			<td class="key"><label class="fc-prop-lbl fc_gm_marker_anchor-lbl" for="'.$elementid_n.'_marker_anchor">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ANCHOR').'</label></td>
 				<td style="position: relative;">' .
-					\Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $marker_anchors, $fieldname_n.'[marker_anchor]',
+					JHtml::_('select.genericlist', $marker_anchors, $fieldname_n.'[marker_anchor]',
 						' class="fc_gm_marker_anchor use_select2_lib" onchange="fcfield_addrint.updateMarkerIcon' . ($mapapi_edit === 'googlemap' ? '' : '_OS') . '(this.id.replace(\'_marker_anchor\', \'\'), \''.$field_name_js.'\');" ',
 						'value', 'text', $value['marker_anchor'], $elementid_n.'_marker_anchor') . '
-						<button type="button" class="btn btn-small btn-sm hasPopover" data-toggle="popover" title="' .  \Joomla\CMS\Language\Text::_('FLEXI_EXAMPLES', true) . '" data-content="' .  \Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ANCHOR_INFO', true) . '"><span class="icon-info"></span>' .  \Joomla\CMS\Language\Text::_('FLEXI_ABOUT', true) . '</button>
+						<button type="button" class="btn btn-small btn-sm hasPopover" data-toggle="popover" title="' .  JText::_('FLEXI_EXAMPLES', true) . '" data-content="' .  JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ANCHOR_INFO', true) . '"><span class="icon-info"></span>' .  JText::_('FLEXI_ABOUT', true) . '</button>
 				</td>
 			</tr>
 
@@ -220,13 +220,13 @@ foreach ($values as $value)
 		<div>
 			' . ($mapapi_edit === "googlemap" ? '
 			<div class="'.$input_grp_class.' fc-xpended" class="addrint_marker_tolerance_box">
-				<label class="' . $add_on_class . ' fc-lbl-short addrint_marker_tolerance-lbl" for="'.$elementid_n.'_marker_tolerance">'.\Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_TOLERANCE').'</label>
+				<label class="' . $add_on_class . ' fc-lbl-short addrint_marker_tolerance-lbl" for="'.$elementid_n.'_marker_tolerance">'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_TOLERANCE').'</label>
 				<input type="text" class="fcfield_textval inlineval addrint_marker_tolerance" id="'.$elementid_n.'_marker_tolerance" name="'.$fieldname_n.'[marker_tolerance]" value="50" size="7" maxlength="7" />
 			</div>
 			&nbsp;
 			' : '') . '
 			<div class="'.$input_grp_class.' fc-xpended" class="addrint_zoom_box">
-				<label class="' . $add_on_class . ' fc-lbl-short addrint_zoom-lbl" for="'.$elementid_n.'_zoom" >'.\Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ZOOM_LEVEL').'</label>
+				<label class="' . $add_on_class . ' fc-lbl-short addrint_zoom-lbl" for="'.$elementid_n.'_zoom" >'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ZOOM_LEVEL').'</label>
 				<input type="text" class="fcfield_textval inlineval addrint_zoom" id="'.$elementid_n.'_zoom" name="'.$fieldname_n.'[zoom]" value="'.htmlspecialchars($value['zoom'], ENT_COMPAT, 'UTF-8').'" readonly="readonly" size="2" />
 			</div>
 		</div>

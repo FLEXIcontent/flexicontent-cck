@@ -23,13 +23,13 @@ require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'
 require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'category.php');
 
 //require_once (JPATH_SITE.DS.'modules'.DS.'mod_flexicontent'.DS.'classes'.DS.'datetime.php');
-//\Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
-JLoader::register('\Joomla\CMS\Form\FormFieldFclayoutbuilder', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'elements' . DS . 'fclayoutbuilder.php');
+//JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
+JLoader::register('JFormFieldFclayoutbuilder', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'elements' . DS . 'fclayoutbuilder.php');
 
 
 // Decide whether to show module contents
-$app     = \Joomla\CMS\Factory::getApplication();
-$config  = \Joomla\CMS\Factory::getConfig();
+$app     = JFactory::getApplication();
+$config  = JFactory::getConfig();
 $jinput  = $app->input;
 $option  = $jinput->get('option', '', 'cmd');
 $view    = $jinput->get('view', '', 'cmd');
@@ -89,7 +89,7 @@ if ( !$show_mod )  return;
 
 global $modfc_jprof;
 jimport('joomla.profiler.profiler');
-$modfc_jprof = new \Joomla\CMS\Profiler\Profiler();
+$modfc_jprof = new JProfiler();
 $modfc_jprof->mark('START: FLEXIcontent Filter-Search Module');
 
 // Include helpers class file
@@ -104,8 +104,8 @@ if ($mod_initialized === null)
 }
 
 // Initialize various variables
-$document = \Joomla\CMS\Factory::getDocument();
-$flexiparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+$document = JFactory::getDocument();
+$flexiparams = JComponentHelper::getParams('com_flexicontent');
 
 // Include the helper only once
 require_once (dirname(__FILE__).DS.'helper.php');
@@ -138,7 +138,7 @@ $current_cid = $is_flexiview ? $jinput->get($catid_fieldname, 0, 'int') : 0;
 
 // Catch case that 'cid' is an array (legacy bug of 'mcats' menu item ?)
 $current_cid = is_array($current_cid) ? (int) reset($current_cid) : $current_cid;
-\Joomla\CMS\Factory::getApplication()->input->set($catid_fieldname, $current_cid ?: null);
+JFactory::getApplication()->input->set($catid_fieldname, $current_cid ?: null);
 
 // Decide to use specific category ID or use current category ID
 $force_specific_cid = !$display_cat_list && $config_catid;
@@ -156,14 +156,14 @@ if ($mcats_selection)
 
 	if ($mcats_itemid)
 	{
-		$menus = \Joomla\CMS\Factory::getApplication()->getMenu('site', array());
+		$menus = JFactory::getApplication()->getMenu('site', array());
 		$mcats_menu = $menus->getItem( $mcats_itemid );
 		if (!$mcats_menu) $mcats_itemid = 0;
 
 		if ( !empty($mcats_menu) )
 		{
-			$menu_params = new \Joomla\Registry\Registry();   // Empty parameters object
-			$menu_params->merge( \Joomla\CMS\Component\ComponentHelper::getComponent('com_flexicontent')->params );   // Merge component parameters
+			$menu_params = new JRegistry();   // Empty parameters object
+			$menu_params->merge( JComponentHelper::getComponent('com_flexicontent')->params );   // Merge component parameters
 			$menu_params->merge($mcats_menu->getParams());   // Merge menu parameters
 		}
 	}
@@ -220,8 +220,8 @@ if ($display_cat_list)
 	$_fld_classes = 'fc_field_filter use_select2_lib';
 	
 	$loader_html = '<span class=\"ajax-loader\"></span>';
-	$url_to_load = \Joomla\CMS\Uri\Uri::root().'index.php?option=com_flexicontent&amp;task=getsefurl&amp;view=category&amp;tmpl=component&amp;cid=';
-	$autosubmit_msg = '<span>'.\Joomla\CMS\Language\Text::_('FLEXI_RELOADING_PLEASE_WAIT').'</span>';
+	$url_to_load = JUri::root().'index.php?option=com_flexicontent&amp;task=getsefurl&amp;view=category&amp;tmpl=component&amp;cid=';
+	$autosubmit_msg = '<span>'.JText::_('FLEXI_RELOADING_PLEASE_WAIT').'</span>';
 	
 	$_fld_onchange = $_fld_multiple = '';
 	
@@ -397,7 +397,7 @@ flexicontent_html::loadFramework('flexi_tmpl_common');
 // Add tooltips
 if ($add_tooltips)
 {
-	\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip');
+	JHtml::_('bootstrap.tooltip');
 }
 
 // Add css
@@ -409,24 +409,24 @@ if ($add_ccs && $layout)
 		// Active module layout css (optional)
 		if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css'))
 		{
-			echo flexicontent_html::getInlineLinkOnce(\Joomla\CMS\Uri\Uri::base(true).'/modules/'.$modulename.'/tmpl/'.$layout.'/'.$layout.'.css', array('version'=>FLEXI_VHASH));
+			echo flexicontent_html::getInlineLinkOnce(JUri::base(true).'/modules/'.$modulename.'/tmpl/'.$layout.'/'.$layout.'.css', array('version'=>FLEXI_VHASH));
 		}
 
 		// Module 's core CSS
 		if (file_exists(dirname(__FILE__).DS.'tmpl_common'.DS.'module.css'))
 		{
-			echo flexicontent_html::getInlineLinkOnce(\Joomla\CMS\Uri\Uri::base(true).'/modules/'.$modulename.'/tmpl_common/module.css', array('version'=>FLEXI_VHASH));
+			echo flexicontent_html::getInlineLinkOnce(JUri::base(true).'/modules/'.$modulename.'/tmpl_common/module.css', array('version'=>FLEXI_VHASH));
 		}
 
 		// Component CSS with optional override
-		echo flexicontent_html::getInlineLinkOnce(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version'=>FLEXI_VHASH));
+		echo flexicontent_html::getInlineLinkOnce(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version'=>FLEXI_VHASH));
 		if (FLEXI_J40GE && file_exists(JPATH_SITE.DS.'media/templates/site'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css'))
 		{
-			echo flexicontent_html::getInlineLinkOnce(\Joomla\CMS\Uri\Uri::base(true).'/media/templates/site/'.$app->getTemplate().'/css/flexicontent.css', array('version'=>FLEXI_VHASH));
+			echo flexicontent_html::getInlineLinkOnce(JUri::base(true).'/media/templates/site/'.$app->getTemplate().'/css/flexicontent.css', array('version'=>FLEXI_VHASH));
 		}
 		elseif (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css'))
 		{
-			echo flexicontent_html::getInlineLinkOnce(\Joomla\CMS\Uri\Uri::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css', array('version'=>FLEXI_VHASH));
+			echo flexicontent_html::getInlineLinkOnce(JUri::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css', array('version'=>FLEXI_VHASH));
 		}
 	}
 	
@@ -436,32 +436,32 @@ if ($add_ccs && $layout)
 		// Active module layout css (optional)
 		if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css'))
 		{
-			$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/modules/'.$modulename.'/tmpl/'.$layout.'/'.$layout.'.css', array('version' => FLEXI_VHASH));
+			$document->addStyleSheet(JUri::base(true).'/modules/'.$modulename.'/tmpl/'.$layout.'/'.$layout.'.css', array('version' => FLEXI_VHASH));
 		}
 
 		// Module 's core CSS
 		if (file_exists(dirname(__FILE__).DS.'tmpl_common'.DS.'module.css'))
 		{
-			$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/modules/'.$modulename.'/tmpl_common/module.css', array('version' => FLEXI_VHASH));
+			$document->addStyleSheet(JUri::base(true).'/modules/'.$modulename.'/tmpl_common/module.css', array('version' => FLEXI_VHASH));
 		}
 
 		// Component CSS with optional override
-		$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
+		$document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		if (FLEXI_J40GE && file_exists(JPATH_SITE.DS.'media/templates/site'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css'))
 		{
-			$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/media/templates/site/'.$app->getTemplate().'/css/flexicontent.css', array('version' => FLEXI_VHASH));
+			$document->addStyleSheet(JUri::base(true).'/media/templates/site/'.$app->getTemplate().'/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		}
 		elseif (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css'))
 		{
-			$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css');
+			$document->addStyleSheet(JUri::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css');
 		}
 	}
 }
 
 $form_target = '';
 $default_mcats_target = $mcats_itemid
-	? \Joomla\CMS\Router\Route::_('index.php?Itemid='.$mcats_itemid)
-	: \Joomla\CMS\Uri\Uri::base(true).'/index.php?option=com_flexicontent&view=category&layout=mcats';
+	? JRoute::_('index.php?Itemid='.$mcats_itemid)
+	: JUri::base(true).'/index.php?option=com_flexicontent&view=category&layout=mcats';
 
 // !! target MCATS layout of category view when selecting multiple categories OR selecting single category but no default category set (or no current category)
 if ( ($display_cat_list && $mcats_selection) || !$catid)
@@ -472,12 +472,12 @@ if ( ($display_cat_list && $mcats_selection) || !$catid)
 // !! target (single) category view when selecting single category a category is currently selected
 else if ($catid)
 {
-	$db = \Joomla\CMS\Factory::getDbo();
+	$db = JFactory::getDbo();
 	$query 	= 'SELECT CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
 		.' FROM #__categories AS c WHERE c.id = '.$catid;
 	$db->setQuery( $query );
 	$categoryslug = $db->loadResult();
-	$form_target = \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getCategoryRoute($categoryslug), $cat_itemid);
+	$form_target = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($categoryslug), $cat_itemid);
 }
 
 $scroll_to_anchor_tag = (int) $params->get('scroll_to_anchor_tag', '0');
@@ -509,7 +509,7 @@ if ($scroll_to_anchor_tag === 2)
 
 
 // Render Layout
-require(\Joomla\CMS\Helper\ModuleHelper::getLayoutPath('mod_flexifilter', $layout));
+require(JModuleHelper::getLayoutPath('mod_flexifilter', $layout));
 
 // Add needed js
 $js = '';
@@ -553,7 +553,7 @@ if ($display_cat_list && !$mcats_selection)
 
 if ($js)
 {
-	\Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+	JFactory::getDocument()->addScriptDeclaration($js);
 }
 
 // append performance stats to global variable

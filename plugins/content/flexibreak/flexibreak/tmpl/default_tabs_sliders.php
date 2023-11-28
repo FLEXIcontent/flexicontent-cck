@@ -28,7 +28,7 @@ $t[] = $this->texts[0];
 if ($this->pagescount)
 {
 	// Start TAB-set / Sliders
-	$t[] = (string) \Joomla\CMS\HTML\HTMLHelper::_($style . '.start', 'article' . $this->row->id . '-' . $style);
+	$t[] = (string) JHtml::_($style . '.start', 'article' . $this->row->id . '-' . $style);
 	
 	// Create 1 TAB / Slider per page
 	$n = !empty($this->texts[0]) ? -1 : 0;
@@ -36,12 +36,12 @@ if ($this->pagescount)
 	for ($i = 1; $i <= $this->pagescount; $i++)
 	{
 		$page = $this->_generateToc($this->row, $i);  // Create page data of current page, needed to create TOC navigation entries (in our case TAB / Slider handle)
-		$t[] = \Joomla\CMS\HTML\HTMLHelper::_($style . '.panel', $page->title, 'article' . $this->row->id . '-' . $style . $i);
+		$t[] = JHtml::_($style . '.panel', $page->title, 'article' . $this->row->id . '-' . $style . $i);
 		$t[] = $this->texts[$i];
 	}
 	
 	// End TAB-set / Sliders
-	$t[] = (string) \Joomla\CMS\HTML\HTMLHelper::_($style . '.end');
+	$t[] = (string) JHtml::_($style . '.end');
 }
 
 // Create 'visible pages text' (visible without page reload)

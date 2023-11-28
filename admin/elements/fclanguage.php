@@ -24,11 +24,11 @@ if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
 jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
-jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
+jimport('cms.html.select');    // JHtmlSelect
+jimport('joomla.form.field');  // JFormField
 
-//jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
-//\Joomla\CMS\Form\FormHelper::loadFieldClass('...');   // \Joomla\CMS\Form\FormField...
+//jimport('joomla.form.helper'); // JFormHelper
+//JFormHelper::loadFieldClass('...');   // JFormField...
 
 /**
  * Renders a fields element
@@ -37,7 +37,7 @@ jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-class JFormFieldFclanguage extends \Joomla\CMS\Form\FormField
+class JFormFieldFclanguage extends JFormField
 {
 	/**
 	 * Element name
@@ -48,8 +48,8 @@ class JFormFieldFclanguage extends \Joomla\CMS\Form\FormField
 
 	function getInput()
 	{
-		$doc	= \Joomla\CMS\Factory::getDocument();
-		$db		= \Joomla\CMS\Factory::getDbo();
+		$doc	= JFactory::getDocument();
+		$db		= JFactory::getDbo();
 		
 		// Get field configuration
 		$node = & $this->element;
@@ -70,12 +70,12 @@ class JFormFieldFclanguage extends \Joomla\CMS\Form\FormField
 		
 		// Add 'use global' (no value option)
 		if (@$attributes['use_global']) {
-			$langs[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '', \Joomla\CMS\Language\Text::_('FLEXI_USE_GLOBAL') );
+			$langs[] = JHtml::_('select.option', '', JText::_('FLEXI_USE_GLOBAL') );
 		}
 		
 		// Add 'please select' (no value option)
 		if (@$attributes['please_select']) {
-			$langs[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '', \Joomla\CMS\Language\Text::_('FLEXI_PLEASE_SELECT') );
+			$langs[] = JHtml::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT') );
 		}
 
 		// Whether to add language 'ALL' (*)
@@ -84,13 +84,13 @@ class JFormFieldFclanguage extends \Joomla\CMS\Form\FormField
 		foreach ($node->children() as $option)
 		{
 			$val  = $option->attributes()->value;
-			$text = \Joomla\CMS\Language\Text::_( FLEXI_J30GE ? $option->__toString() : $option->data() );
-			$langs[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', $val, $text );
+			$text = JText::_( FLEXI_J30GE ? $option->__toString() : $option->data() );
+			$langs[] = JHtml::_('select.option', $val, $text );
 		}
 		
 		$languages = FLEXIUtilities::getlanguageslist($_published_only=false, $add_all);
 		foreach($languages as $lang) {
-			$langs[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', $lang->code, $lang->name );
+			$langs[] = JHtml::_('select.option', $lang->code, $lang->name );
 		}
 		
 		// Create HTML tag parameters
@@ -106,6 +106,6 @@ class JFormFieldFclanguage extends \Joomla\CMS\Form\FormField
 		$attribs .= ' class="'.$classes.'" ';
 		
 		// Render the field's HTML
-		return \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $langs, $fieldname, $attribs, 'value', 'text', $values, $element_id);
+		return JHtml::_('select.genericlist', $langs, $fieldname, $attribs, 'value', 'text', $values, $element_id);
 	}
 }

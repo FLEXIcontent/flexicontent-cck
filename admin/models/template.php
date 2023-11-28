@@ -145,7 +145,7 @@ class FlexicontentModelTemplate extends FCModelAdmin
 	{
 		parent::__construct($config);
 
-		$jinput = \Joomla\CMS\Factory::getApplication()->input;
+		$jinput = JFactory::getApplication()->input;
 
 		$type 	= $jinput->getWord('type', 'items');
 		$folder = $jinput->getCmd('folder', 'table');
@@ -225,7 +225,7 @@ class FlexicontentModelTemplate extends FCModelAdmin
 		}
 
 		$record = $record ?: $this->_record;
-		$user   = $user ?: \Joomla\CMS\Factory::getUser();
+		$user   = $user ?: JFactory::getUser();
 
 		return $this->canManage;
 	}
@@ -246,7 +246,7 @@ class FlexicontentModelTemplate extends FCModelAdmin
 		}
 
 		$record = $record ?: $this->_record;
-		$user    = $user ?: \Joomla\CMS\Factory::getUser();
+		$user    = $user ?: JFactory::getUser();
 
 		return $this->canManage;
 	}
@@ -262,14 +262,14 @@ class FlexicontentModelTemplate extends FCModelAdmin
 	public function canDelete($record = null)
 	{
 		$record = $record ?: $this->_record;
-		$user   = \Joomla\CMS\Factory::getUser();
+		$user   = JFactory::getUser();
 
 		return $this->canManage;
 	}
 
 
 	/**
-	 * Method to do some record / data preprocessing before call \Joomla\CMS\Table\Table::bind()
+	 * Method to do some record / data preprocessing before call JTable::bind()
 	 *
 	 * Note. Typically called inside this MODEL 's store()
 	 *
@@ -302,7 +302,7 @@ class FlexicontentModelTemplate extends FCModelAdmin
 
 
 	/**
-	 * Method to do some work after record has been loaded via \Joomla\CMS\Table\Table::load()
+	 * Method to do some work after record has been loaded via JTable::load()
 	 *
 	 * Note. Typically called inside this MODEL 's store()
 	 *
@@ -419,7 +419,7 @@ class FlexicontentModelTemplate extends FCModelAdmin
 			$layoutConf->cfgname = $this->_cfgname;
 			$layoutConf->attribs = '';
 		}
-		$layoutConf->attribs = new \Joomla\Registry\Registry($layoutConf->attribs);
+		$layoutConf->attribs = new JRegistry($layoutConf->attribs);
 		$layoutConf->attribs = $layoutConf->attribs->toArray();
 
 		//echo "<pre>"; print_r($layoutConf); echo "</pre>";
@@ -481,7 +481,7 @@ class FlexicontentModelTemplate extends FCModelAdmin
 	 */
 	function getFieldTypesList()
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 
 		$query = 'SELECT element AS type_name, REPLACE(name, "FLEXIcontent - ", "") AS field_name '
 		. ' FROM #__extensions'
@@ -642,13 +642,13 @@ class FlexicontentModelTemplate extends FCModelAdmin
 	 */
 	function storeLessConf($folder, $cfgname, $layout, $attribs)
 	{
-		// Load the XML file into a \Joomla\CMS\Form\Form object
-		$jform = new \Joomla\CMS\Form\Form('com_flexicontent.template', array('control' => 'jform', 'load_data' => false));
+		// Load the XML file into a JForm object
+		$jform = new JForm('com_flexicontent.template', array('control' => 'jform', 'load_data' => false));
 		$jform->load($this->_getLayout()->params);   // params is the XML file contents as a string
 
 		$layout_type = $layout=='items' ? 'item' : 'category';
-		$tmpldir = \Joomla\CMS\Filesystem\Path::clean(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates');
-		$less_path = \Joomla\CMS\Filesystem\Path::clean($tmpldir.DS.$folder.DS.'less/include/config_auto_'.$layout_type.'.less');
+		$tmpldir = JPath::clean(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates');
+		$less_path = JPath::clean($tmpldir.DS.$folder.DS.'less/include/config_auto_'.$layout_type.'.less');
 		//echo "<pre>".$less_path."<br/>";
 
 		$_FCLL = '@FC'. ($layout == 'items' ? 'I' : 'C').'_';

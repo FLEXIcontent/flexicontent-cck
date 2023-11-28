@@ -13,15 +13,13 @@ defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
-use \Joomla\CMS\Form\Field\OrderingField;
-use \Joomla\CMS\Form\FormField;
 
 jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
-jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
+jimport('cms.html.select');    // JHtmlSelect
+jimport('joomla.form.field');  // JFormField
 
-//jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
-//\Joomla\CMS\Form\FormHelper::loadFieldClass('...');   // \Joomla\CMS\Form\FormField...
+//jimport('joomla.form.helper'); // JFormHelper
+//JFormHelper::loadFieldClass('...');   // JFormField...
 
 /**
  * Supports an HTML select list of plugins
@@ -30,7 +28,7 @@ jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
  * @subpackage	com_newsfeeds
  * @since		1.6
  */
-class FormFieldFieldordering extends FormField
+class JFormFieldFieldordering extends JFormField
 {
 	/**
 	 * The form field type.
@@ -63,7 +61,7 @@ class FormFieldFieldordering extends FormField
 		// Initialize JavaScript field attributes.
 		$attr .= $this->element['onchange'] ? ' onchange="'.(string) $this->element['onchange'].'"' : '';
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 
 		// Build the query for the ordering list.
 		$query = 'SELECT ordering AS value, label AS text'
@@ -80,12 +78,12 @@ class FormFieldFieldordering extends FormField
 		if ( (string) $this->element['readonly'] == 'true' ) {
 			$attr .= ' disabled="disabled" ';
 			$ordering = $this->form->getValue('ordering');
-			$html[] = str_replace('jform'.$attributes['name'], $element_id, \Joomla\CMS\HTML\HTMLHelper::_('list.ordering', $this->name, $query, trim($attr), $ordering, $fieldid ? 0 : 1));
+			$html[] = str_replace('jform'.$attributes['name'], $element_id, JHtml::_('list.ordering', $this->name, $query, trim($attr), $ordering, $fieldid ? 0 : 1));
 		}
 		// Create a regular list.
 		else {
 			$ordering = $this->form->getValue('ordering');
-			$html[] = str_replace('jform'.$attributes['name'], $element_id, \Joomla\CMS\HTML\HTMLHelper::_('list.ordering', $this->name, $query, trim($attr), $ordering, $fieldid ? 0 : 1));
+			$html[] = str_replace('jform'.$attributes['name'], $element_id, JHtml::_('list.ordering', $this->name, $query, trim($attr), $ordering, $fieldid ? 0 : 1));
 		}
 
 		return implode($html);

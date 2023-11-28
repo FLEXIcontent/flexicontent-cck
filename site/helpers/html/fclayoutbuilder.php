@@ -8,7 +8,7 @@
  */
 
 defined('_JEXEC') or die;
-\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip');
+JHtml::_('bootstrap.tooltip');
 
 
 /**
@@ -51,7 +51,7 @@ abstract class JHtmlFclayoutbuilder
 		static $cnt = -1;
 		$cnt++;
 		
-		$path        = \Joomla\CMS\Filesystem\Path::clean(JPATH_ROOT . $config->location);
+		$path        = JPath::clean(JPATH_ROOT . $config->location);
 		$css_prefix  = $config->css_prefix;
 		$layout_name = $config->layout_name;
 
@@ -88,7 +88,7 @@ abstract class JHtmlFclayoutbuilder
 
 		//echo '<pre>' . $less_code . '</pre>';
 		$less_file  = 'less/' . $layout_name . '_' . $module->id . '.less';
-		$less_path  = \Joomla\CMS\Filesystem\Path::clean($path . $less_file);
+		$less_path  = JPath::clean($path . $less_file);
 
 		// Create LESS file
 		if (!file_exists($less_path))
@@ -119,23 +119,23 @@ abstract class JHtmlFclayoutbuilder
 	 */
 	public static function prepareLess($file_path)
 	{
-		$jinput    = \Joomla\CMS\Factory::getApplication()->input;
+		$jinput    = JFactory::getApplication()->input;
 		$id        = $jinput->getInt('id', 0);
 
 		if ($id)
 		{
 			$path = $file_path;
 			$path = str_replace('{{id}}', $id, $path);
-			$path = \Joomla\CMS\Filesystem\Path::clean(JPATH_ROOT . $path . '.less');
+			$path = JPath::clean(JPATH_ROOT . $path . '.less');
 
 			if (file_exists($path))
 			{
-				//\Joomla\CMS\Factory::getApplication()->enqueueMessage('Removing LESS file: ' . $path, 'message');
+				//JFactory::getApplication()->enqueueMessage('Removing LESS file: ' . $path, 'message');
 				unlink($path);
 			}
 			else
 			{
-				//\Joomla\CMS\Factory::getApplication()->enqueueMessage('Skipped non-existent LESS file: ' . $path, 'notice');
+				//JFactory::getApplication()->enqueueMessage('Skipped non-existent LESS file: ' . $path, 'notice');
 			}
 		}
 
@@ -154,19 +154,19 @@ abstract class JHtmlFclayoutbuilder
 		$element_id = $options->element_id;
 		$lessfile   = $options->lessfile;
 		$editor_sfx = $options->editor_sfx;
-		$jinput     = \Joomla\CMS\Factory::getApplication()->input;
+		$jinput     = JFactory::getApplication()->input;
 		$html       = '';
 
 		// Remove less files so that it gets recreated, this happens on form load, ideally it should happen on form save ...
 		if (!$lessfile)
 		{
-			\Joomla\CMS\Factory::getApplication()->enqueueMessage('lessfile not given for the layout builder');
+			JFactory::getApplication()->enqueueMessage('lessfile not given for the layout builder');
 		}
 		else
 		{
 			$matches = null;
 			preg_match_all("/{{([0-9a-zA-Z_]+)}}/", $lessfile, $matches);
-			//\Joomla\CMS\Factory::getApplication()->enqueueMessage(print_r($matches, true));
+			//JFactory::getApplication()->enqueueMessage(print_r($matches, true));
 
 			foreach ($matches[0] as $i => $replacement_string)
 			{
@@ -175,7 +175,7 @@ abstract class JHtmlFclayoutbuilder
 
 				if (!strlen($url_value))
 				{
-					\Joomla\CMS\Factory::getApplication()->enqueueMessage($replacement_string . ' (for less file path creation), respective URL variable ' . $url_variable . ' is empty');
+					JFactory::getApplication()->enqueueMessage($replacement_string . ' (for less file path creation), respective URL variable ' . $url_variable . ' is empty');
 				}
 				else
 				{
@@ -183,8 +183,8 @@ abstract class JHtmlFclayoutbuilder
 				}
 			}
 
-			//\Joomla\CMS\Factory::getApplication()->enqueueMessage($lessfile);
-			//unlink(\Joomla\CMS\Filesystem\Path::clean(JPATH_ROOT . '/' . $lessfile));
+			//JFactory::getApplication()->enqueueMessage($lessfile);
+			//unlink(JPath::clean(JPATH_ROOT . '/' . $lessfile));
 		}
 
 		static $framework_added = null;
@@ -193,7 +193,7 @@ abstract class JHtmlFclayoutbuilder
 		{
 			$framework_added = true;
 
-			$document = \Joomla\CMS\Factory::getDocument();
+			$document = JFactory::getDocument();
 			flexicontent_html::loadframework('grapejs');
 
 			$document->addStyleDeclaration('
@@ -350,7 +350,7 @@ abstract class JHtmlFclayoutbuilder
 		}
 		');
 		
-		//\Joomla\CMS\Factory::getDocument()->addScriptDeclaration(
+		//JFactory::getDocument()->addScriptDeclaration(
 		// TODO add template.css file in editor for better display
 		$html .= '
 		<script>
@@ -1502,8 +1502,8 @@ abstract class JHtmlFclayoutbuilder
 		<span style="pointer: cursor; font-size: 48px;" class="btn"
 			onclick="this.style.display = \'none\'; this.nextElementSibling.style.display = \'\'; fclayout_init_builder(\'' . $editor_sfx . '\', \'' . $element_id . '\', ); return false;"
 		>
-			<img alt="Layout Builer" src="' . \Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/assets/images/layout_builder.png" style="width: 64px; height: 64px; line-height: 100%;" />
-			<span style="font-size: 24px;">' . \Joomla\CMS\Language\Text::_('FLEXI_EDIT') . '</span>
+			<img alt="Layout Builer" src="' . JUri::root(true) . '/components/com_flexicontent/assets/images/layout_builder.png" style="width: 64px; height: 64px; line-height: 100%;" />
+			<span style="font-size: 24px;">' . JText::_('FLEXI_EDIT') . '</span>
 		</span>
 
 		<div style="height: 90%; margin: 0px; display: none;">

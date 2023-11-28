@@ -39,13 +39,13 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 					switch ((int) $this->row->url)
 					{
 						case 0:
-							echo \Joomla\CMS\Language\Text::_('FLEXI_FILE_STORAGE_FILENAME');
+							echo JText::_('FLEXI_FILE_STORAGE_FILENAME');
 							break;
 						case 1:
-							echo \Joomla\CMS\Language\Text::_('FLEXI_URL_LINK');
+							echo JText::_('FLEXI_URL_LINK');
 							break;
 						case 2:
-							echo \Joomla\CMS\Language\Text::_('FLEXI_JMEDIA_LINK');
+							echo JText::_('FLEXI_JMEDIA_LINK');
 							break;
 					}
 					?>
@@ -69,7 +69,7 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 						'value' => $this->row->filename,
 						'folder' => '',
 					);
-					echo \Joomla\CMS\Layout\LayoutHelper::render($media_field_layout = 'joomla.form.field.media', $jMedia_file_displayData, $layouts_path = null);
+					echo JLayoutHelper::render($media_field_layout = 'joomla.form.field.media', $jMedia_file_displayData, $layouts_path = null);
 
 				else :
 
@@ -89,7 +89,7 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_DOWNLOAD_FILENAME', 'FLEXI_FILE_DOWNLOAD_FILENAME_DESC', 1, 1); ?>">
 				<label class="fc-prop-lbl" for="filename_original">
 					<?php
-						echo \Joomla\CMS\Language\Text::_('FLEXI_DOWNLOAD_FILENAME');
+						echo JText::_('FLEXI_DOWNLOAD_FILENAME');
 					?>
 				</label>
 			</td>
@@ -105,7 +105,7 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 		<tr>
 			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_DISPLAY_TITLE', 'FLEXI_FILE_DISPLAY_TITLE_DESC', 1, 1); ?>">
 				<label class="fc-prop-lbl" for="altname">
-					<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_FILE_DISPLAY_TITLE' ); ?>
+					<?php echo JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ); ?>
 				</label>
 			</td>
 			<td>
@@ -116,7 +116,7 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 		<tr>
 			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_DESCRIPTION', 'FLEXI_FILE_DESCRIPTION_DESC', 1, 1); ?>">
 				<label class="fc-prop-lbl" for="file-desc">
-				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_DESCRIPTION' ); ?>
+				<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
 				</label>
 			</td>
 			<td>
@@ -127,7 +127,7 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 		<tr>
 			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_LANGUAGE', 'FLEXI_FILE_LANGUAGE_DESC', 1, 1); ?>">
 				<label class="fc-prop-lbl" for="language">
-					<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_LANGUAGE' ); ?>
+					<?php echo JText::_( 'FLEXI_LANGUAGE' ); ?>
 				</label>
 			</td>
 			<td>
@@ -140,7 +140,7 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 		<tr>
 			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_ACCESS', 'FLEXI_FILE_ACCESS_DESC', 1, 1); ?>">
 				<label class="fc-prop-lbl" for="access">
-					<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_ACCESS' ); ?>
+					<?php echo JText::_( 'FLEXI_ACCESS' ); ?>
 				</label>
 			</td>
 			<td>
@@ -151,7 +151,7 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 		<tr>
 			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_DOWNLOAD_STAMPING', 'FLEXI_FILE_DOWNLOAD_STAMPING_CONF_FILE_FIELD_DESC', 1, 1); ?>">
 				<label class="fc-prop-lbl" data-for="stamp">
-					<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_DOWNLOAD_STAMPING' ); ?>
+					<?php echo JText::_( 'FLEXI_DOWNLOAD_STAMPING' ); ?>
 				</label>
 			</td>
 			<td>
@@ -162,7 +162,7 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 		<tr>
 			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_HITS', 'FLEXI_DOWNLOAD_HITS', 1, 1); ?>">
 				<label class="fc-prop-lbl" for="access">
-					<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_HITS' ); ?>
+					<?php echo JText::_( 'FLEXI_HITS' ); ?>
 				</label>
 			</td>
 			<td>
@@ -173,13 +173,13 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 		<tr>
 			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILEEXT_MIME', 'FLEXI_FILEEXT_MIME_DESC' ); ?>">
 				<label class="fc-prop-lbl" for="mime_ext">
-					<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_FILEEXT_MIME' ); ?>
+					<?php echo JText::_( 'FLEXI_FILEEXT_MIME' ); ?>
 				</label>
 			</td>
 			<td>
 				<input type="text" id="mime_ext" name="ext" value="<?php echo $this->row->ext; ?>" size="5" style="max-width:100px;" maxlength="100"/>
 <select class="use_select2_lib" onchange="jQuery(this).parent().find('input').val(jQuery(this).val()); jQuery(this).val('').select2('destroy').show().select2(); ">
-<option value=""><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_PLEASE_SELECT' ); ?></option>
+<option value=""><?php echo JText::_( 'FLEXI_PLEASE_SELECT' ); ?></option>
 <option value="3dm">3dm :: x-world/x-3dmf</option>
 <option value="3dmf">3dmf :: x-world/x-3dmf</option>
 <option value="a">a :: application/octet-stream</option>
@@ -836,16 +836,16 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 
 		<tr>
 			<td class="key">
-				<span class="label text-white bg-info label-info"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_SIZE' ); ?></span> &nbsp;
+				<span class="label text-white bg-info label-info"><?php echo JText::_( 'FLEXI_SIZE' ); ?></span> &nbsp;
 			</td>
 			<td>
-				<?php echo file_exists($this->rowdata->path) ? $this->rowdata->size_display : \Joomla\CMS\Language\Text::_('FLEXI_FILE_NOT_FOUND'); ?>
+				<?php echo file_exists($this->rowdata->path) ? $this->rowdata->size_display : JText::_('FLEXI_FILE_NOT_FOUND'); ?>
 			</td>
 		</tr>
 
 		<tr>
 			<td class="key">
-				<span class="label text-white bg-info label-info"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_REAL_PATH' ); ?></span> &nbsp;
+				<span class="label text-white bg-info label-info"><?php echo JText::_( 'FLEXI_REAL_PATH' ); ?></span> &nbsp;
 			</td>
 			<td>
 				<?php echo $this->rowdata->path;?>
@@ -857,7 +857,7 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 		<tr>
 			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_SIZE', 'FLEXI_SIZE_IN_FORM', 1, 1); ?>">
 				<label class="fc-prop-lbl" for="size">
-					<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_SIZE' ); ?>
+					<?php echo JText::_( 'FLEXI_SIZE' ); ?>
 				</label>
 			</td>
 			<td>
@@ -878,7 +878,7 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 	</table>
 
 
-<?php echo \Joomla\CMS\HTML\HTMLHelper::_( 'form.token' ); ?>
+<?php echo JHtml::_( 'form.token' ); ?>
 <input type="hidden" name="option" value="com_flexicontent" />
 <?php if (!$this->row->url) : ?>
 <input type="hidden" name="ext" value="<?php echo $this->row->ext; ?>" />
@@ -897,5 +897,5 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 
 <?php
 //keep session alive while editing
-\Joomla\CMS\HTML\HTMLHelper::_('behavior.keepalive');
+JHtml::_('behavior.keepalive');
 ?>

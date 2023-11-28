@@ -28,7 +28,7 @@ jimport('legacy.model.legacy');
  * @subpackage FLEXIcontent
  * @since		1.5
  */
-class FLEXIcontentModelSearch extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
+class FLEXIcontentModelSearch extends JModelLegacy
 {
 	/**
 	 * Item list data
@@ -80,7 +80,7 @@ class FLEXIcontentModelSearch extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 		$id = 0;  // no id used by this view
 		$this->setId((int)$id);
 		$params = $this->_params;
-		$app = \Joomla\CMS\Factory::getApplication();
+		$app = JFactory::getApplication();
 
 		// Get limits & set the pagination variables into state (We get them from http request OR use default search view parameters)
 		$limit = strlen($app->input->getString('limit', '')) ? $app->input->getInt('limit') : $this->_params->get('limit');
@@ -121,7 +121,7 @@ class FLEXIcontentModelSearch extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 		{
 			foreach ($areas as $i => $area)
 			{
-				$areas[$i] = \Joomla\CMS\Filter\InputFilter::getInstance()->clean($area, 'cmd');
+				$areas[$i] = JFilterInput::getInstance()->clean($area, 'cmd');
 			}
 		}
 
@@ -134,12 +134,12 @@ class FLEXIcontentModelSearch extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 		$option = $app->input->getCmd('option');
 
 		//if ( !$app->getUserState( $option.'.min_word_len', 0 ) ) {  // Do not cache to allow configuration changes
-			$db = \Joomla\CMS\Factory::getDbo();
+			$db = JFactory::getDbo();
 			$db->setQuery("SHOW VARIABLES LIKE '%ft_min_word_len%'");
 			$_dbvariable = $db->loadObject();
 			$min_word_len = (int) @ $_dbvariable->Value;
 			$minchars = $params->get('minchars', 3);
-			$search_prefix = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
+			$search_prefix = JComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
 			$min_word_len = !$search_prefix && $min_word_len > $minchars  ?  $min_word_len : $minchars;
 			$app->setUserState($option.'.min_word_len', $min_word_len);
 		//}
@@ -213,9 +213,9 @@ class FLEXIcontentModelSearch extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 			// Trigger search event to get the content items
 			$areas = $this->getAreas();
 
-			\Joomla\CMS\Plugin\PluginHelper::importPlugin( 'search');
+			JPluginHelper::importPlugin( 'search');
 			$dispatcher = JEventDispatcher::getInstance();
-			$app        = \Joomla\CMS\Factory::getApplication();
+			$app        = JFactory::getApplication();
 
 			$search_data = array(
 				$this->getState('keyword'),
@@ -295,9 +295,9 @@ class FLEXIcontentModelSearch extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 		}
 
 		// Using other search areas, get all search
-		\Joomla\CMS\Plugin\PluginHelper::importPlugin( 'search');
+		JPluginHelper::importPlugin( 'search');
 		$dispatcher = JEventDispatcher::getInstance();
-		$app        = \Joomla\CMS\Factory::getApplication();
+		$app        = JFactory::getApplication();
 
 		$searchareas = FLEXI_J40GE
 			? $app->triggerEvent('onContentSearchAreas')
@@ -336,12 +336,12 @@ class FLEXIcontentModelSearch extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 	{
 		if ( $this->_params !== NULL ) return;
 
-		$app  = \Joomla\CMS\Factory::getApplication();
+		$app  = JFactory::getApplication();
 		$menu = $app->getMenu()->getActive();     // Retrieve active menu
 
 		// Get the COMPONENT only parameter
-		$params  = new \Joomla\Registry\Registry();
-		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+		$params  = new JRegistry();
+		$cparams = JComponentHelper::getParams('com_flexicontent');
 		$params->merge($cparams);
 
 		// Merge the active menu parameters

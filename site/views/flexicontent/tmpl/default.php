@@ -21,7 +21,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 $page_classes  = '';
 $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 $page_classes .= ' fcdirectory rootcat'.$this->params->get('rootcat', FLEXI_J16GE ? 1:0);
-$menu = \Joomla\CMS\Factory::getApplication()->getMenu()->getActive();
+$menu = JFactory::getApplication()->getMenu()->getActive();
 if ($menu) $page_classes .= ' menuitem'.$menu->id; 
 ?>
 <div id="flexicontent" class="flexicontent <?php echo $page_classes; ?>" >
@@ -32,7 +32,7 @@ if ($menu) $page_classes .= ' menuitem'.$menu->id;
 	</h1>
 <?php else : ?>
 	<h2 class="contentheading">
-		<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_CATEGORIES' ) ;?>
+		<?php echo JText::_( 'FLEXI_CATEGORIES' ) ;?>
 	</h2>
 <?php endif; ?>
 

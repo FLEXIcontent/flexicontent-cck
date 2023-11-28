@@ -100,7 +100,7 @@ class FlexicontentModelFields extends FCModelAdminList
 	 */
 	public function __construct($config = array())
 	{
-		$app    = \Joomla\CMS\Factory::getApplication();
+		$app    = JFactory::getApplication();
 		$jinput = $app->input;
 		$option = $jinput->getCmd('option', '');
 		$view   = $jinput->getCmd('view', '');
@@ -181,7 +181,7 @@ class FlexicontentModelFields extends FCModelAdminList
 	/**
 	 * Method to build the query for the records
 	 *
-	 * @return  \Joomla\Data\DataObjectbaseQuery   The DB Query object
+	 * @return  JDatabaseQuery   The DB Query object
 	 *
 	 * @since   3.3.0
 	 */
@@ -205,9 +205,9 @@ class FlexicontentModelFields extends FCModelAdminList
 	/**
 	 * Method to build the where clause of the query for the records
 	 *
-	 * @param		\Joomla\Data\DataObjectbaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
+	 * @param		JDatabaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
 	 *
-	 * @return  \Joomla\Data\DataObjectbaseQuery|array
+	 * @return  JDatabaseQuery|array
 	 *
 	 * @since   3.3.0
 	 */
@@ -249,7 +249,7 @@ class FlexicontentModelFields extends FCModelAdminList
 		// Limit to plugin type 'flexicontent_fields'
 		$where[] = '(plg.extension_id IS NULL OR plg.folder = ' . $this->_db->quote('flexicontent_fields') . ')';
 
-		if ($q instanceof \Joomla\Data\DataObjectbaseQuery)
+		if ($q instanceof \JDatabaseQuery)
 		{
 			return $where ? $q->where($where) : $q;
 		}
@@ -263,9 +263,9 @@ class FlexicontentModelFields extends FCModelAdminList
 	/**
 	 * Method to build the having clause of the query for the files
 	 *
-	 * @param		\Joomla\Data\DataObjectbaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
+	 * @param		JDatabaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
 	 *
-	 * @return  \Joomla\Data\DataObjectbaseQuery|array
+	 * @return  JDatabaseQuery|array
 	 *
 	 * @since 1.0
 	 */
@@ -287,7 +287,7 @@ class FlexicontentModelFields extends FCModelAdminList
 				break;
 		}
 
-		if ($q instanceof \Joomla\Data\DataObjectbaseQuery)
+		if ($q instanceof \JDatabaseQuery)
 		{
 			return $having ? $q->having($having) : $q;
 		}
@@ -364,7 +364,7 @@ class FlexicontentModelFields extends FCModelAdminList
 		 * CASE 1
 		 *
 		 * Global ordering (no content type), use ordering column inside DB table itself
-		 * do reordering via \Joomla\CMS\Table\Table calls
+		 * do reordering via JTable calls
 		 */
 
 		if (!$multi_assigns_ordering)
@@ -378,7 +378,7 @@ class FlexicontentModelFields extends FCModelAdminList
 		 * CASE 2
 		 *
 		 * Specific item type ordering (multi-type assignments), use ordering column at the fields-types relation DB table
-		 * we will not use \Joomla\CMS\Table\Table calls for changing order,
+		 * we will not use JTable calls for changing order,
 		 * instead we will use custom optimized queries to update multiple records at once
 		 */
 
@@ -454,8 +454,8 @@ class FlexicontentModelFields extends FCModelAdminList
 			 */
 			else
 			{
-				\Joomla\CMS\Factory::getApplication()->enqueueMessage(
-					\Joomla\CMS\Language\Text::_('Previous/Next record was not found or has same ordering, trying saving ordering once to create incrementing unique ordering numbers'),
+				JFactory::getApplication()->enqueueMessage(
+					JText::_('Previous/Next record was not found or has same ordering, trying saving ordering once to create incrementing unique ordering numbers'),
 					'notice'
 				);
 			}
@@ -478,7 +478,7 @@ class FlexicontentModelFields extends FCModelAdminList
 	 */
 	public function saveorder($pks, $order, $typeid = 0)
 	{
-		$app = \Joomla\CMS\Factory::getApplication();
+		$app = JFactory::getApplication();
 
 		$typeid = $typeid ?: $this->getState('filter_type');
 
@@ -487,7 +487,7 @@ class FlexicontentModelFields extends FCModelAdminList
 		 * CASE 1
 		 *
 		 * Global ordering (no content type), use ordering column inside DB table itself
-		 * do reordering via \Joomla\CMS\Table\Table calls
+		 * do reordering via JTable calls
 		 */
 
 		if (!$typeid)
@@ -501,7 +501,7 @@ class FlexicontentModelFields extends FCModelAdminList
 				$table->load((int) $pks[$i]);
 
 
-				// Save \Joomla\CMS\Table\Table record only if ordering differs
+				// Save JTable record only if ordering differs
 				if ($table->ordering != $order[$i])
 				{
 					$table->ordering = $order[$i];
@@ -529,7 +529,7 @@ class FlexicontentModelFields extends FCModelAdminList
 		 * CASE 2
 		 *
 		 * Specific item type ordering (multi-type assignments), use ordering column at the fields-types relation DB table
-		 * we will not use \Joomla\CMS\Table\Table calls for changing order,
+		 * we will not use JTable calls for changing order,
 		 * instead we will use custom optimized queries to update multiple records at once
 		 */
 
@@ -709,11 +709,11 @@ class FlexicontentModelFields extends FCModelAdminList
 
 			if ($copyRelations && in_array($table->field_type, array('image')))
 			{
-				$params = new \Joomla\Registry\Registry($table->attribs);
+				$params = new JRegistry($table->attribs);
 
 				if ($params->get('image_source'))
 				{
-					\Joomla\CMS\Factory::getApplication()->enqueueMessage('You cannot copy image field -- "' . $table->name . '" -- together with its values, since this field has data in folders too', 'error');
+					JFactory::getApplication()->enqueueMessage('You cannot copy image field -- "' . $table->name . '" -- together with its values, since this field has data in folders too', 'error');
 					continue;
 				}
 			}
@@ -841,7 +841,7 @@ class FlexicontentModelFields extends FCModelAdminList
 	 */
 	protected function _setStateOrder()
 	{
-		$app    = \Joomla\CMS\Factory::getApplication();
+		$app    = JFactory::getApplication();
 		$jinput = $app->input;
 		$fcform = $jinput->get('fcform', 0, 'int');
 		$p      = $this->ovid;
@@ -926,15 +926,15 @@ class FlexicontentModelFields extends FCModelAdminList
 
 		if ($top)
 		{
-			$typelist[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '0', \Joomla\CMS\Language\Text::_('FLEXI_SELECT_TYPE'));
+			$typelist[] = JHtml::_('select.option', '0', JText::_('FLEXI_SELECT_TYPE'));
 		}
 
 		foreach ($list as $item)
 		{
-			$typelist[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', $item->id, $item->name);
+			$typelist[] = JHtml::_('select.option', $item->id, $item->name);
 		}
 
-		return \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $typelist, $name, $class, 'value', 'text', $selected);
+		return JHtml::_('select.genericlist', $typelist, $name, $class, 'value', 'text', $selected);
 	}
 
 
@@ -975,7 +975,7 @@ class FlexicontentModelFields extends FCModelAdminList
 	 */
 	public function toggleprop($cid = array(), $propname = null, &$unsupported = 0, &$locked = 0, $toggle_value = null)
 	{
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = JFactory::getUser();
 
 		$affected = 0;
 

@@ -26,9 +26,9 @@ class FlexicontentViewDebugUser extends UsersViewDebugUser
 	public function display($tpl = null)
 	{
 		// Access check.
-		if (!\Joomla\CMS\Factory::getUser()->authorise('core.manage', 'com_users') || !\Joomla\CMS\Factory::getConfig()->get('debug'))
+		if (!JFactory::getUser()->authorise('core.manage', 'com_users') || !JFactory::getConfig()->get('debug'))
 		{
-			return JError::raiseWarning(404, \Joomla\CMS\Language\Text::_('JERROR_ALERTNOAUTHOR'));
+			return JError::raiseWarning(404, JText::_('JERROR_ALERTNOAUTHOR'));
 		}
 
 		$this->actions		= $this->get('DebugActions');
@@ -56,8 +56,8 @@ class FlexicontentViewDebugUser extends UsersViewDebugUser
 	 */
 	protected function addToolbar()
 	{
-		\Joomla\CMS\Toolbar\ToolbarHelper::title(\Joomla\CMS\Language\Text::sprintf('COM_USERS_VIEW_DEBUG_USER_TITLE', $this->user->id, $this->user->name), 'user');
+		JToolbarHelper::title(JText::sprintf('COM_USERS_VIEW_DEBUG_USER_TITLE', $this->user->id, $this->user->name), 'user');
 
-		\Joomla\CMS\Toolbar\ToolbarHelper::help('JHELP_USERS_DEBUG_USERS');
+		JToolbarHelper::help('JHELP_USERS_DEBUG_USERS');
 	}
 }

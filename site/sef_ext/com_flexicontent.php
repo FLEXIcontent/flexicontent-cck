@@ -21,7 +21,7 @@ if ( !class_exists('sh404_fc_helper') )
 	{
 		function getCats($ids = false)
 		{
-			$db = \Joomla\CMS\Factory::getDbo();
+			$db = JFactory::getDbo();
 			$query = 'SELECT id, title, alias'
 				. ' FROM #__categories'
 				. (empty($ids) ? '' : ' WHERE id IN (' . implode(', ', $ids) . ')');
@@ -51,7 +51,7 @@ $shLangIso = shLoadPluginLanguage('com_flexicontent', $shLangIso, '_SH404SEF_FLE
 
 // Get DB, Application, etc
 $database = ShlDbHelper::getDb();
-$app = \Joomla\CMS\Factory::getApplication();
+$app = JFactory::getApplication();
 
 // CHECK for if the given URL is the home page, if so we must return an empty string
 $shHomePageFlag = false;
@@ -116,7 +116,7 @@ if (!$FC_sh404sef_init)
 	if (FLEXI_FISH)
 	{
 		// Get template XML data from cache
-		$_cache = \Joomla\CMS\Factory::getCache('com_flexicontent_cats');  // Get Joomla Cache
+		$_cache = JFactory::getCache('com_flexicontent_cats');  // Get Joomla Cache
 		//$_cache->setCaching(1); 		              // Force cache ON
 		//$_cache->setLifeTime(FLEXI_CACHE_TIME); 	// Set expire time (default is 1 hour)
 		$_helper = new sh404_fc_helper();
@@ -169,7 +169,7 @@ if ( !$Itemid_exists_in_URL )
 	$shItemidString = '';
 	if ($sefConfig->shAlwaysInsertItemid && (! empty($Itemid) || ! empty($shCurrentItemid)))
 	{
-		$shItemidString = \Joomla\CMS\Language\Text::_('COM_SH404SEF_ALWAYS_INSERT_ITEMID_PREFIX')
+		$shItemidString = JText::_('COM_SH404SEF_ALWAYS_INSERT_ITEMID_PREFIX')
 			. $sefConfig->replacement . (empty($Itemid) ? $shCurrentItemid : $Itemid);
 	}
 }
@@ -178,7 +178,7 @@ if ( !$Itemid_exists_in_URL )
 else
 {
 	$shItemidString = $sefConfig->shAlwaysInsertItemid ?
-		\Joomla\CMS\Language\Text::_('COM_SH404SEF_ALWAYS_INSERT_ITEMID_PREFIX') . $sefConfig->replacement . $Itemid : '';
+		JText::_('COM_SH404SEF_ALWAYS_INSERT_ITEMID_PREFIX') . $sefConfig->replacement . $Itemid : '';
 	if ($sefConfig->shAlwaysInsertMenuTitle)
 	{
 		// global $Itemid; V 1.2.4.g we want the string option, not current page !
@@ -388,7 +388,7 @@ switch ($view)
 				// Add date segments, if adding for all categories (cats-list===true) or if item's category id is in cats-list
 				else if ( $cats_Date === true || isset($cats_Date[$row->catid]) )
 				{
-					$creationDate = new \Joomla\CMS\Date\Date($row->created);
+					$creationDate = new JDate($row->created);
 					$title[] = $creationDate->year;
 					$title[] = $creationDate->month;
 					$title[] = $creationDate->day;

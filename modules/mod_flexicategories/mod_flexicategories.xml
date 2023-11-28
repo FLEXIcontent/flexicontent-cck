@@ -192,7 +192,7 @@
 				<option value="0" show_list="" hide_list="using_php_rule">FLEXI_NO</option>
 				<option value="1" show_list="using_php_rule" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="php_rule" type="textarea" filter="\Joomla\CMS\Component\ComponentHelper::filterText" rows="5" cols="40" label="FLEXI_PHP_RULE_CODE" description="FLEXI_PHP_RULE_CODE_DESC" class="using_php_rule input-xxlarge" />
+			<field name="php_rule" type="textarea" filter="JComponentHelper::filterText" rows="5" cols="40" label="FLEXI_PHP_RULE_CODE" description="FLEXI_PHP_RULE_CODE_DESC" class="using_php_rule input-xxlarge" />
 
 		</fieldset>
 		

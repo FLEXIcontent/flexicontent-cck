@@ -6,7 +6,7 @@ if (!count($this->results))
 	if ($this->searchword || count($this->filter_values)) :	
 	?>
 		<div class="fcclear"></div>
-		<div class="alert alert-warning noitems_search"> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_SEARCH_NO_ITEMS_FOUND' ); ?> </div>
+		<div class="alert alert-warning noitems_search"> <?php echo JText::_( 'FLEXI_SEARCH_NO_ITEMS_FOUND' ); ?> </div>
 		<div class="fcclear"></div>
 	<?php
 	endif;
@@ -22,7 +22,7 @@ $fcitems = array();
 foreach ($this->results as $i => $result)
 {
 	if ( ! @$result->fc_item_id ) continue;
-	$fcitems[$i] = \Joomla\CMS\Table\Table::getInstance('flexicontent_items', '');
+	$fcitems[$i] = JTable::getInstance('flexicontent_items', '');
 	$fcitems[$i]->load($result->fc_item_id);
 	$fcitems[$i]->category_access = $result->category_access;
 	$fcitems[$i]->type_access = $result->type_access ;
@@ -120,7 +120,7 @@ else
 			$markup_tags .= '</span>';
 		}
 		
-		$item_link = \Joomla\CMS\Router\Route::_($result->href);
+		$item_link = JRoute::_($result->href);
 	?>
 	<fieldset id="searchlist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>">
 	 <div class="search-results<?php echo $this->pageclass_sfx; ?>">
@@ -168,7 +168,7 @@ else
 			if (!empty($img_field_name)) :
 				FlexicontentFields::getFieldDisplay($fcitems[$i], $img_field_name, $values=null, $method='display');
 				$img_field = & $fcitems[$i]->fields[$img_field_name];
-				$src = str_replace(\Joomla\CMS\Uri\Uri::root(), '', ($img_field->thumbs_src[$img_field_size][0] ?? '') );
+				$src = str_replace(JUri::root(), '', ($img_field->thumbs_src[$img_field_size][0] ?? '') );
 			else :
 				$src = flexicontent_html::extractimagesrc($fcitems[$i]);
 			endif;
@@ -186,8 +186,8 @@ else
 				$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
 				$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 				
-				$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  \Joomla\CMS\Uri\Uri::base(true).'/' : '';
-				$thumb = \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+				$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JUri::base(true).'/' : '';
+				$thumb = JUri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 			} else {
 				// Do not resize image when (a) image src path not set or (b) using image field's already created thumbnails
 				$thumb = $src;

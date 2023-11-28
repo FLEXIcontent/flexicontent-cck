@@ -12,11 +12,11 @@ use Joomla\String\StringHelper;
 
 // first define the template name
 $tmpl = $this->tmpl;
-$user = \Joomla\CMS\Factory::getUser();
+$user = JFactory::getUser();
 
-\Joomla\CMS\Factory::getDocument()->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
-\Joomla\CMS\Factory::getDocument()->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
-\Joomla\CMS\Factory::getDocument()->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
+JFactory::getDocument()->addScript(JUri::base(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
+JFactory::getDocument()->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
+JFactory::getDocument()->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
 // MICRODATA 'itemtype' for ALL items in the listing (this is the fallback if the 'itemtype' in content type / item configuration are not set)
 $microdata_itemtype_cat = $this->params->get( 'microdata_itemtype_cat', 'Article' );
@@ -51,7 +51,7 @@ if (!$this->items)
 		echo '
 		<div class="fcclear"></div>
 		<div class="noitems group">
-			' . \Joomla\CMS\Language\Text::_( 'FLEXI_NO_ITEMS_FOUND' ) . '
+			' . JText::_( 'FLEXI_NO_ITEMS_FOUND' ) . '
 		</div>';
 	}
 	return;
@@ -338,9 +338,9 @@ foreach ($items as $i => $item) :
 	<?php if ( $readmore_shown ) : ?>
 	<span class="readmore">
 		
-		<a href="<?php echo \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>" class="btn" itemprop="url">
+		<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>" class="btn" itemprop="url">
 			<span class="icon-chevron-right"></span>
-			<?php echo $item->params->get('readmore')  ?  $item->params->get('readmore') : \Joomla\CMS\Language\Text::sprintf('FLEXI_READ_MORE', $item->title); ?>
+			<?php echo $item->params->get('readmore')  ?  $item->params->get('readmore') : JText::sprintf('FLEXI_READ_MORE', $item->title); ?>
 		</a>
 		
 	</span>
@@ -356,7 +356,7 @@ foreach ($items as $i => $item) :
 	<?php endif; ?>
 	
 	
-	<?php if ($this->params->get('show_comments_incat') && !\Joomla\CMS\Factory::getApplication()->input->getInt('print', 0)) : /* PARAMETER MISSING */?>
+	<?php if ($this->params->get('show_comments_incat') && !JFactory::getApplication()->input->getInt('print', 0)) : /* PARAMETER MISSING */?>
 		<!-- BOF comments -->
 		<section class="comments group">
 		<?php

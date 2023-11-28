@@ -20,11 +20,11 @@
 defined('_JEXEC') or die('Restricted access');
 
 jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
-jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
+jimport('cms.html.select');    // JHtmlSelect
+jimport('joomla.form.field');  // JFormField
 
-//jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
-//\Joomla\CMS\Form\FormHelper::loadFieldClass('...');   // \Joomla\CMS\Form\FormField...
+//jimport('joomla.form.helper'); // JFormHelper
+//JFormHelper::loadFieldClass('...');   // JFormField...
 
 /**
  * Renders a module positions list
@@ -33,7 +33,7 @@ jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-class JFormFieldFcpositions extends \Joomla\CMS\Form\FormField
+class JFormFieldFcpositions extends JFormField
 {
 	/**
 	 * The field type.
@@ -44,8 +44,8 @@ class JFormFieldFcpositions extends \Joomla\CMS\Form\FormField
 	
 	protected function getInput()
 	{
-		$doc = \Joomla\CMS\Factory::getDocument();
-		$db  = \Joomla\CMS\Factory::getDbo();
+		$doc = JFactory::getDocument();
+		$db  = JFactory::getDbo();
 
 		$node = & $this->element;
 		$attributes = get_object_vars($node->attributes());
@@ -71,11 +71,11 @@ class JFormFieldFcpositions extends \Joomla\CMS\Form\FormField
 		// Put a select module option at top of list
 		$first_option = new stdClass();
 		$first_option->value = '';
-		$first_option->text = \Joomla\CMS\Language\Text::_( 'FLEXI_SELECT_MODULE' );
+		$first_option->text = JText::_( 'FLEXI_SELECT_MODULE' );
 		array_unshift($positions, $first_option);
 		
 		$attribs = '';
 		
-		return \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $positions, $fieldname, $attribs, 'value', 'text', $values, $element_id);
+		return JHtml::_('select.genericlist', $positions, $fieldname, $attribs, 'value', 'text', $values, $element_id);
 	}
 }

@@ -2,7 +2,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 $i = 0;
-$layout = \Joomla\CMS\Factory::getApplication()->input->getCmd('layout', '');
+$layout = JFactory::getApplication()->input->getCmd('layout', '');
 
 // Sub-category prefix/suffix/separator parameters
 $pretext = $this->params->get( 'peercat_pretext', '' ); $posttext = $this->params->get( 'peercat_posttext', '' );
@@ -12,15 +12,15 @@ $separatorf = $this->params->get( 'peercat_separatorf' );
 $separators_arr = array( 0 => '&nbsp;', 1 => '<br />', 2 => '&nbsp;|&nbsp;', 3 => ',&nbsp;', 4 => $closetag.$opentag, 5 => '' );
 $separatorf = isset($separators_arr[$separatorf]) ? $separators_arr[$separatorf] : '&nbsp;';
 
-$cats_label = \Joomla\CMS\Language\Text::_( $this->category->id ? 'FLEXI_PEERCATEGORIES' : 'FLEXI_CATEGORIES' );
+$cats_label = JText::_( $this->category->id ? 'FLEXI_PEERCATEGORIES' : 'FLEXI_CATEGORIES' );
 
 // Sub-category information parameters
 $show_empty_cats = $this->params->get('show_empty_peercats', 1);
 $show_label_peercats = $this->params->get('show_label_peercats', 1);
 $show_itemcount   = $this->params->get('show_itemcount_peercat', 0);
 $show_subcatcount = $this->params->get('show_subcatcount_peercat', 0);
-$itemcount_label   = ($show_itemcount==2   ? ' '.\Joomla\CMS\Language\Text::_('FLEXI_ITEM_S').' ' : '');
-$peercatcount_label = ($show_subcatcount==2 ? ' '.\Joomla\CMS\Language\Text::_('FLEXI_CATEGORIES').' ' : '');
+$itemcount_label   = ($show_itemcount==2   ? ' '.JText::_('FLEXI_ITEM_S').' ' : '');
+$peercatcount_label = ($show_subcatcount==2 ? ' '.JText::_('FLEXI_CATEGORIES').' ' : '');
 $show_description_image_peercat = (int) $this->params->get('show_description_image_peercat', 0);
 $show_description_peercat     = (int) $this->params->get('show_description_peercat', 0);
 $description_cut_text_peercat = (int) $this->params->get('description_cut_text_peercat', 120);
@@ -46,7 +46,7 @@ foreach ($this->peercats as $sub) {
 
 	// b. Category title with link and optional item counts
 	$cat_link = ($layout=='myitems' || $layout=='author') ? $this->action .(strstr($this->action, '?') ? '&amp;'  : '?'). 'cid='.$sub->slug :
-		\Joomla\CMS\Router\Route::_( FlexicontentHelperRoute::getCategoryRoute($sub->slug) );
+		JRoute::_( FlexicontentHelperRoute::getCategoryRoute($sub->slug) );
 	$infocount_str = '';
 	if ($show_itemcount)   $infocount_str .= (int) $sub->assigneditems . $itemcount_label;
 	if ($show_subcatcount) $infocount_str .= ($show_itemcount ? ' / ' : '').count($sub->subcats) . $peercatcount_label;

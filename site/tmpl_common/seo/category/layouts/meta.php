@@ -19,7 +19,7 @@
 	$filter_A = $filters['some_fieldname'];   // One of the category view's filters
 	$filter_A->raw_values;                    // Array of raw uncompressed field VALUEs, to test use:    // echo '<pre>'; print_r($field_A->raw_values); echo '</pre>';
 	$filter_A->basic_texts;                   // Array of basic textual display of VALUEs, to test use:  // echo '<pre>'; print_r($field_A->basic_texts); echo '</pre>';
-	echo \Joomla\CMS\Language\Text::_('LANG_STRING_NAME');        // A Joomla language string
+	echo JText::_('LANG_STRING_NAME');        // A Joomla language string
 	echo '<pre>';
 
  *

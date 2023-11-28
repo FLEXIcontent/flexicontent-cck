@@ -20,11 +20,11 @@
 defined('_JEXEC') or die('Restricted access');
 
 jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
-jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
+jimport('cms.html.select');    // JHtmlSelect
+jimport('joomla.form.field');  // JFormField
 
-//jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
-//\Joomla\CMS\Form\FormHelper::loadFieldClass('...');   // \Joomla\CMS\Form\FormField...
+//jimport('joomla.form.helper'); // JFormHelper
+//JFormHelper::loadFieldClass('...');   // JFormField...
 
 /**
  * Renders a types element
@@ -33,7 +33,7 @@ jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-class JFormFieldTypes extends \Joomla\CMS\Form\FormField
+class JFormFieldTypes extends JFormField
 {
 	/**
 	 * Element name
@@ -44,8 +44,8 @@ class JFormFieldTypes extends \Joomla\CMS\Form\FormField
 
 	function getInput()
 	{
-		$doc = \Joomla\CMS\Factory::getDocument();
-		$db  = \Joomla\CMS\Factory::getDbo();
+		$doc = JFactory::getDocument();
+		$db  = JFactory::getDbo();
 		
 		$node = & $this->element;
 		$attributes = get_object_vars($node->attributes());
@@ -73,9 +73,9 @@ class JFormFieldTypes extends \Joomla\CMS\Form\FormField
 			$attribs .= @ $attributes['size'] ? ' size="'.$attributes['size'].'" ' : ' size="6" ';
 		} else {
 			if ( @ $attributes['user_selection'] )
-				array_unshift($types, \Joomla\CMS\HTML\HTMLHelper::_('select.option', '', \Joomla\CMS\Language\Text::_('FLEXI_MENU_ALLOW_CONTENT_TYPE_SELECTION')));
+				array_unshift($types, JHtml::_('select.option', '', JText::_('FLEXI_MENU_ALLOW_CONTENT_TYPE_SELECTION')));
 			else
-				array_unshift($types, \Joomla\CMS\HTML\HTMLHelper::_('select.option', '', \Joomla\CMS\Language\Text::_('FLEXI_PLEASE_SELECT')));
+				array_unshift($types, JHtml::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT')));
 		}
 		if ($onchange = @$attributes['onchange']) {
 			$attribs .= ' onchange="'.$onchange.'"';
@@ -84,6 +84,6 @@ class JFormFieldTypes extends \Joomla\CMS\Form\FormField
 			$attribs .= ' class="'.$class.'"';
 		}
 
-		return \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $types, $fieldname, $attribs, 'value', 'text', $values, $element_id);
+		return JHtml::_('select.genericlist', $types, $fieldname, $attribs, 'value', 'text', $values, $element_id);
 	}
 }

@@ -137,7 +137,7 @@ trait flexicontent_basetable_trait
 		}
 
 		/**
-		 * Because default code in \Joomla\CMS\Language\Language::transliterate will call
+		 * Because default code in JLanguage::transliterate will call
 		 *
  		 * a. (ll_CC)Localise::transliterate() ... if it exists
 		 * b. Transliterate::utf8_latin_to_ascii($string)
@@ -170,7 +170,7 @@ trait flexicontent_basetable_trait
 
 
 	/**
-	 * A replacement of \Joomla\CMS\Application\ApplicationHelper::stringURLSafe(), that adds support for languages that does not define (ll_CC)Localise::transliterate() , but do need transliteration
+	 * A replacement of JApplicationHelper::stringURLSafe(), that adds support for languages that does not define (ll_CC)Localise::transliterate() , but do need transliteration
 	 *
 	 * Make given string safe, also transliterating it - EITHER - if unicode aliases are not enabled - OR - if force ascii alias for current record type is true
 	 *
@@ -185,9 +185,9 @@ trait flexicontent_basetable_trait
 	public function stringURLSafe($string, $language, $force_ascii)
 	{
 		// Return a cleaned unicode alias
-		if (\Joomla\CMS\Factory::getConfig()->get('unicodeslugs') && !$force_ascii)
+		if (JFactory::getConfig()->get('unicodeslugs') && !$force_ascii)
 		{
-			return \Joomla\CMS\Filter\OutputFilter::stringURLUnicodeSlug($string);
+			return JFilterOutput::stringURLUnicodeSlug($string);
 		}
 
 
@@ -198,7 +198,7 @@ trait flexicontent_basetable_trait
 		// Use record's language or use SITE's default language in case of record's language is ALL (or empty)
 		$language = !empty($language) && $language !== '*'
 			? $language
-			: \Joomla\CMS\Component\ComponentHelper::getParams('com_languages')->get('site', '*');
+			: JComponentHelper::getParams('com_languages')->get('site', '*');
 		$title = $this->_title;
 		$alias = $this->_alias;
 
@@ -208,7 +208,7 @@ trait flexicontent_basetable_trait
 			 * If language does not have (ll_CC)Localise::transliterate()
 			 * then run our own transliterate method
 			 */
-			if (!\Joomla\CMS\Language\Language::getInstance($language)->getTransliterator())
+			if (!JLanguage::getInstance($language)->getTransliterator())
 			{
 				// Remove any '-' from the string since they will be used as concatenaters
 				$string = str_replace('-', ' ', $string);
@@ -219,15 +219,15 @@ trait flexicontent_basetable_trait
 
 			/**
 			 * Language has (ll_CC)Localise::transliterate(), run it ONLY if ASCII alias is being forced
-			 * since if not forced then it will be run by \Joomla\CMS\Filter\OutputFilter::stringURLSafe($string, $language)
+			 * since if not forced then it will be run by JFilterOutput::stringURLSafe($string, $language)
 			 */
 			else
 			{
 				// Detect that unicode aliases are enabled but this ascii alias is forced for this record
-				$unicodeslugs_override = \Joomla\CMS\Factory::getConfig()->get('unicodeslugs') && $force_ascii;
+				$unicodeslugs_override = JFactory::getConfig()->get('unicodeslugs') && $force_ascii;
 
 				// Detect old joomla versions (Joomla <=3.5.x) that will not run the transliterator element's language
-				$r = new ReflectionMethod('\Joomla\CMS\Application\ApplicationHelper', 'stringURLSafe');
+				$r = new ReflectionMethod('JApplicationHelper', 'stringURLSafe');
 				$supports_content_language_transliteration = count( $r->getParameters() ) > 1;
 
 				if ($unicodeslugs_override || !$supports_content_language_transliteration)
@@ -236,7 +236,7 @@ trait flexicontent_basetable_trait
 					$this->$alias = str_replace('-', ' ', $this->$alias);
 
 					// Do the transliteration according to ELEMENT's language transliterator: (ll_CC)Localise::transliterate()
-					$this->$alias = \Joomla\CMS\Language\Language::getInstance($language)->transliterate($this->$alias);
+					$this->$alias = JLanguage::getInstance($language)->transliterate($this->$alias);
 				}
 			}
 		}
@@ -248,7 +248,7 @@ trait flexicontent_basetable_trait
 		 * c. Transliterate::utf8_latin_to_ascii($string)
 		 * d. Replace remaining non valid characters, and trim dashes '-'
 		 */
-		$output = \Joomla\CMS\Filter\OutputFilter::stringURLSafe($string, $language);
+		$output = JFilterOutput::stringURLSafe($string, $language);
 
 		return $output;
 	}
@@ -268,7 +268,7 @@ trait flexicontent_basetable_trait
 		// Use record's language or use SITE's default language in case of record's language is ALL (or empty)
 		$language = !empty($this->language) && $this->language !== '*'
 			? $this->language
-			: \Joomla\CMS\Component\ComponentHelper::getParams('com_languages')->get('site', '*');
+			: JComponentHelper::getParams('com_languages')->get('site', '*');
 		$title = $this->_title;
 		$alias = $this->_alias;
 		$original_alias = $this->$alias;
@@ -279,8 +279,8 @@ trait flexicontent_basetable_trait
 		 */
 		if (trim($this->$title) == '')
 		{
-			$msg = \Joomla\CMS\Language\Text::_('FLEXI_ADD_' . strtoupper($title));
-			\Joomla\CMS\Factory::getApplication()->enqueueMessage($msg, 'error');
+			$msg = JText::_('FLEXI_ADD_' . strtoupper($title));
+			JFactory::getApplication()->enqueueMessage($msg, 'error');
 			$this->setError($msg);
 			return false;
 		}
@@ -321,7 +321,7 @@ trait flexicontent_basetable_trait
 			// Check for empty alias and fallback to using current date
 			if (trim(str_replace('-', '', $this->$alias)) == '')
 			{
-				$this->$alias = \Joomla\CMS\Factory::getDate()->format('Y-m-d-H-i-s');
+				$this->$alias = JFactory::getDate()->format('Y-m-d-H-i-s');
 			}
 		}
 
@@ -393,21 +393,21 @@ trait flexicontent_basetable_trait
 		if ($n >= $max_retries)
 		{
 			$msg = 'Too many retries ' . $max_retries . ' to find a unique alias for alias: ' . $original_alias;
-			\Joomla\CMS\Factory::getApplication()->enqueueMessage($msg, 'warning');
+			JFactory::getApplication()->enqueueMessage($msg, 'warning');
 		}
 
 		// Warn on invalid characters alias changed (but do not add message on empty original alias)
 		elseif (!empty($invalid_chars_alias) && $invalid_chars_alias !== $this->alias)
 		{
-			$msg = \Joomla\CMS\Language\Text::sprintf('FLEXI_WARN_' . $this->_NAME . '_' . strtoupper($alias) . '_CORRECTED', $invalid_chars_alias, $this->$alias);
-			\Joomla\CMS\Factory::getApplication()->enqueueMessage($msg, 'notice');
+			$msg = JText::sprintf('FLEXI_WARN_' . $this->_NAME . '_' . strtoupper($alias) . '_CORRECTED', $invalid_chars_alias, $this->$alias);
+			JFactory::getApplication()->enqueueMessage($msg, 'notice');
 		}
 
 		// Warn on non unique original alias changed (but do not add message on empty original alias)
 		elseif (!empty($non_unique_alias))
 		{
-			//$msg = \Joomla\CMS\Language\Text::sprintf('FLEXI_THIS_' . strtoupper($alias) . '_ALREADY_EXIST', $non_unique_alias);
-			//\Joomla\CMS\Factory::getApplication()->enqueueMessage($msg, 'warning');
+			//$msg = JText::sprintf('FLEXI_THIS_' . strtoupper($alias) . '_ALREADY_EXIST', $non_unique_alias);
+			//JFactory::getApplication()->enqueueMessage($msg, 'warning');
 		}
 
 		return true;
@@ -429,7 +429,7 @@ trait flexicontent_basetable_trait
 	 */
 	public function publish($pks = null, $state = 1, $userId = 0)
 	{
-		$record = \Joomla\CMS\Table\Table::getInstance($this->_jtbls[$this->_tbl][0], $this->_jtbls[$this->_tbl][1]);
+		$record = JTable::getInstance($this->_jtbls[$this->_tbl][0], $this->_jtbls[$this->_tbl][1]);
 		$record->_tbl = $this->_tbl;
 		$record->_tbl_key = $this->_tbl_key;
 		$record->setColumnAlias('published', $this->_jtbls[$this->_tbl][2]);
@@ -454,7 +454,7 @@ trait flexicontent_basetable_trait
 
 		if (!empty($this->_tbl_ext) && $this->_jtbls[$this->_tbl_ext][2])
 		{
-			$record_ext = \Joomla\CMS\Table\Table::getInstance($this->_jtbls[$this->_tbl_ext][0], $this->_jtbls[$this->_tbl_ext][1]);
+			$record_ext = JTable::getInstance($this->_jtbls[$this->_tbl_ext][0], $this->_jtbls[$this->_tbl_ext][1]);
 			$record_ext->_tbl = $this->_tbl_ext;
 			$record_ext->_tbl_key = $this->_frn_key_ext;
 			$record_ext->setColumnAlias('published', $this->_jtbls[$this->_tbl_ext][2]);
@@ -463,7 +463,7 @@ trait flexicontent_basetable_trait
 
 		if (!empty($this->_tbl_tmp) && $this->_jtbls[$this->_tbl_tmp][2])
 		{
-			$record_tmp = \Joomla\CMS\Table\Table::getInstance($this->_jtbls[$this->_tbl_tmp][0], $this->_jtbls[$this->_tbl_tmp][1]);
+			$record_tmp = JTable::getInstance($this->_jtbls[$this->_tbl_tmp][0], $this->_jtbls[$this->_tbl_tmp][1]);
 			$record_tmp->_tbl = $this->_tbl_tmp;
 			$record_tmp->_tbl_key = $this->_frn_key_tmp;
 			$record_tmp->setColumnAlias('published', $this->_jtbls[$this->_tbl_tmp][2]);

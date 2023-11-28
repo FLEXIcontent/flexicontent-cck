@@ -28,7 +28,7 @@ jimport('legacy.view.legacy');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewFavourites extends \Joomla\CMS\MVC\View\HtmlView
+class FlexicontentViewFavourites extends JViewLegacy
 {
 	/**
 	 * Creates the page's display
@@ -38,16 +38,16 @@ class FlexicontentViewFavourites extends \Joomla\CMS\MVC\View\HtmlView
 	function display( $tpl = null )
 	{
 		//initialize variables
-		$app      = \Joomla\CMS\Factory::getApplication();
+		$app      = JFactory::getApplication();
 		$jinput   = $app->input;
 
 		$option   = $jinput->getCmd('option', '');
 		$view     = $jinput->getCmd('view', '');
 
-		$document = \Joomla\CMS\Factory::getDocument();
+		$document = JFactory::getDocument();
 		$menus    = $app->getMenu();
 		$menu     = $menus->getActive();
-		$uri      = \Joomla\CMS\Uri\Uri::getInstance();
+		$uri      = JUri::getInstance();
 
 		// Get view's Model
 		$model  = $this->getModel();
@@ -67,7 +67,7 @@ class FlexicontentViewFavourites extends \Joomla\CMS\MVC\View\HtmlView
 
 		// ***
 		// *** Bind Fields to items and RENDER their display HTML, but check for document type, due to Joomla issue with system
-		// *** plugins creating \Joomla\CMS\Document\Document in early events forcing it to be wrong type, when format as url suffix is enabled
+		// *** plugins creating JDocument in early events forcing it to be wrong type, when format as url suffix is enabled
 		// ***
 
 		$items 	= FlexicontentFields::getFields($items, $view, $params);
@@ -91,9 +91,9 @@ class FlexicontentViewFavourites extends \Joomla\CMS\MVC\View\HtmlView
 		if (!$params->get('disablecss', ''))
 		{
 			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
-			!\Joomla\CMS\Factory::getLanguage()->isRtl()
-				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
-				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
+			!JFactory::getLanguage()->isRtl()
+				? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
+				: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 		}
 
 		if (FLEXI_J40GE && file_exists(JPATH_SITE.DS.'media/templates/site'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css'))
@@ -145,7 +145,7 @@ class FlexicontentViewFavourites extends \Joomla\CMS\MVC\View\HtmlView
 
 			// Calculate default page heading (=called page title in J1.5), which in turn will be document title below !! ...
 			// meta_params->get('page_title') is meant for <title> but let's use as ... default page heading
-			$default_heading = \Joomla\CMS\Language\Text::_('FLEXI_MY_FAVOURITES');
+			$default_heading = JText::_('FLEXI_MY_FAVOURITES');
 
 			// Decide to show page heading (=J1.5 page title), this is always yes
 			$show_default_heading = 1;
@@ -176,10 +176,10 @@ class FlexicontentViewFavourites extends \Joomla\CMS\MVC\View\HtmlView
 		// Check and prepend or append site name to page title
 		if ( $doc_title != $app->getCfg('sitename') ) {
 			if ($app->getCfg('sitename_pagetitles', 0) == 1) {
-				$doc_title = \Joomla\CMS\Language\Text::sprintf('JPAGETITLE', $app->getCfg('sitename'), $doc_title);
+				$doc_title = JText::sprintf('JPAGETITLE', $app->getCfg('sitename'), $doc_title);
 			}
 			elseif ($app->getCfg('sitename_pagetitles', 0) == 2) {
-				$doc_title = \Joomla\CMS\Language\Text::sprintf('JPAGETITLE', $doc_title, $app->getCfg('sitename'));
+				$doc_title = JText::sprintf('JPAGETITLE', $doc_title, $app->getCfg('sitename'));
 			}
 		}
 
@@ -281,7 +281,7 @@ class FlexicontentViewFavourites extends \Joomla\CMS\MVC\View\HtmlView
 			}
 
 
-			$_sh404sef = defined('SH404SEF_IS_RUNNING') && \Joomla\CMS\Factory::getConfig()->get('sef');
+			$_sh404sef = defined('SH404SEF_IS_RUNNING') && JFactory::getConfig()->get('sef');
 			if ($_sh404sef)
 			{
 				$pageNav->setAdditionalUrlParam('limit', $model->getState('limit'));
@@ -289,9 +289,9 @@ class FlexicontentViewFavourites extends \Joomla\CMS\MVC\View\HtmlView
 		}
 
 		// Create links, etc
-		$link = \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getFavsRoute(0, $menu_matches ? $menu->id : 0));
+		$link = JRoute::_(FlexicontentHelperRoute::getFavsRoute(0, $menu_matches ? $menu->id : 0));
 
-		//$print_link = \Joomla\CMS\Router\Route::_('index.php?view=favourites&pop=1&tmpl=component');
+		//$print_link = JRoute::_('index.php?view=favourites&pop=1&tmpl=component');
 		$curr_url   = str_replace('&', '&amp;', $_SERVER['REQUEST_URI']);
 		$print_link = $curr_url .(strstr($curr_url, '?') ? '&amp;'  : '?').'pop=1&amp;tmpl=component&amp;print=1';
 		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx', ''));

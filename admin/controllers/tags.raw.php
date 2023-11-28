@@ -77,11 +77,11 @@ class FlexicontentControllerTags extends FlexicontentControllerBaseAdmin
 	function import( )
 	{
 		// Check for request forgeries
-		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		if (!FlexicontentHelperPerm::getPerm()->CanCreateTags)
 		{
-			echo '<div class="copyfailed">' . \Joomla\CMS\Language\Text::_('FLEXI_NO_AUTH_CREATE_NEW_TAGS') . '</div>';
+			echo '<div class="copyfailed">' . JText::_('FLEXI_NO_AUTH_CREATE_NEW_TAGS') . '</div>';
 
 			return;
 		}
@@ -95,17 +95,17 @@ class FlexicontentControllerTags extends FlexicontentControllerBaseAdmin
 		{
 			if ($logs['success'])
 			{
-				echo '<div class="copyok">' . \Joomla\CMS\Language\Text::sprintf('FLEXI_TAG_IMPORT_SUCCESS', $logs['success']) . '</div>';
+				echo '<div class="copyok">' . JText::sprintf('FLEXI_TAG_IMPORT_SUCCESS', $logs['success']) . '</div>';
 			}
 
 			if ($logs['error'])
 			{
-				echo '<div class="copywarn>' . \Joomla\CMS\Language\Text::sprintf('FLEXI_TAG_IMPORT_FAILED', $logs['error']) . '</div>';
+				echo '<div class="copywarn>' . JText::sprintf('FLEXI_TAG_IMPORT_FAILED', $logs['error']) . '</div>';
 			}
 		}
 		else
 		{
-			echo '<div class="copyfailed">' . \Joomla\CMS\Language\Text::_('FLEXI_NO_TAG_TO_IMPORT') . '</div>';
+			echo '<div class="copyfailed">' . JText::_('FLEXI_NO_TAG_TO_IMPORT') . '</div>';
 		}
 	}
 
@@ -117,7 +117,7 @@ class FlexicontentControllerTags extends FlexicontentControllerBaseAdmin
 	function addtag()
 	{
 		// Check for request forgeries
-		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$name = $this->input->get('name', null, 'string');
 		$cid  = $this->input->get('cid', array(0), 'array');
@@ -147,7 +147,7 @@ class FlexicontentControllerTags extends FlexicontentControllerBaseAdmin
 
 		if (!FlexicontentHelperPerm::getPerm()->CanCreateTags)
 		{
-			echo "0|" . \Joomla\CMS\Language\Text::_('FLEXI_NO_AUTH_CREATE_NEW_TAGS');
+			echo "0|" . JText::_('FLEXI_NO_AUTH_CREATE_NEW_TAGS');
 			jexit();
 		}
 
@@ -186,11 +186,11 @@ class FlexicontentControllerTags extends FlexicontentControllerBaseAdmin
 		header("Pragma: no-cache");
 
 		// Check for request forgeries
-		\Joomla\CMS\Session\Session::checkToken('request') or jexit('fail | ' . \Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or jexit('fail | ' . JText::_('JINVALID_TOKEN'));
 
 		if (!FlexicontentHelperPerm::getPerm()->CanConfig)
 		{
-			jexit('fail | ' . \Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'));
+			jexit('fail | ' . JText::_('FLEXI_ALERTNOTAUTH_TASK'));
 		}
 
 		// Test counting with limited memory
@@ -202,9 +202,9 @@ class FlexicontentControllerTags extends FlexicontentControllerBaseAdmin
 		$indexer     = $this->input->getCmd('indexer', 'tag_mappings');
 		$rebuildmode = $this->input->getCmd('rebuildmode', '');
 
-		$session = \Joomla\CMS\Factory::getSession();
-		$db      = \Joomla\CMS\Factory::getDbo();
-		$app     = \Joomla\CMS\Factory::getApplication();
+		$session = JFactory::getSession();
+		$db      = JFactory::getDbo();
+		$app     = JFactory::getApplication();
 
 		// Check indexer type
 		if ($indexer !== 'tag_mappings')
@@ -213,8 +213,8 @@ class FlexicontentControllerTags extends FlexicontentControllerBaseAdmin
 		}
 
 		// Clear previous log file
-		$log_filename = 'tag_mappings_checker_' . \Joomla\CMS\Factory::getUser()->id . '.php';
-		$log_filename_full = JPATH::clean(\Joomla\CMS\Factory::getConfig()->get('log_path') . DS . $log_filename);
+		$log_filename = 'tag_mappings_checker_' . \JFactory::getUser()->id . '.php';
+		$log_filename_full = JPATH::clean(\JFactory::getConfig()->get('log_path') . DS . $log_filename);
 
 		if (file_exists($log_filename_full))
 		{
@@ -261,12 +261,12 @@ class FlexicontentControllerTags extends FlexicontentControllerBaseAdmin
 		header("Pragma: no-cache");
 
 		// Check for request forgeries
-		// \Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		// JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		// Not need because this task need the user session data that are set by countrows that checked for forgeries
 
 		if (!FlexicontentHelperPerm::getPerm()->CanConfig)
 		{
-			jexit('fail | ' . \Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'));
+			jexit('fail | ' . JText::_('FLEXI_ALERTNOTAUTH_TASK'));
 		}
 
 		// Test indexing with limited memory
@@ -274,9 +274,9 @@ class FlexicontentControllerTags extends FlexicontentControllerBaseAdmin
 
 		$start_microtime = microtime(true);
 
-		$session = \Joomla\CMS\Factory::getSession();
-		$db      = \Joomla\CMS\Factory::getDbo();
-		$app     = \Joomla\CMS\Factory::getApplication();
+		$session = JFactory::getSession();
+		$db      = JFactory::getDbo();
+		$app     = JFactory::getApplication();
 
 		$has_zlib      = function_exists("zlib_encode"); // Version_compare(PHP_VERSION, '5.4.0', '>=');
 
@@ -288,12 +288,12 @@ class FlexicontentControllerTags extends FlexicontentControllerBaseAdmin
 
 		$log_filename = $session->get($indexer . '_log_filename', null, 'flexicontent');
 		jimport('joomla.log.log');
-		\Joomla\CMS\Log\Log::addLogger(
+		JLog::addLogger(
 			array(
 				'text_file' => $log_filename,  // Sets the target log file
 				'text_entry_format' => '{DATETIME} {PRIORITY} {MESSAGE}'  // Sets the format of each line
 			),
-			\Joomla\CMS\Log\Log::ALL,  // Sets messages of all log levels to be sent to the file
+			JLog::ALL,  // Sets messages of all log levels to be sent to the file
 			array('com_flexicontent.tags.mappings_indexer')  // category of logged messages
 		);
 
@@ -384,7 +384,7 @@ class FlexicontentControllerTags extends FlexicontentControllerBaseAdmin
 
 				foreach ($errors as $error_message)
 				{
-					\Joomla\CMS\Log\Log::add($error_message, \Joomla\CMS\Log\Log::WARNING, 'com_flexicontent.tags.mappings_indexer');
+					JLog::add($error_message, JLog::WARNING, 'com_flexicontent.tags.mappings_indexer');
 				}
 			}
 

@@ -9,21 +9,21 @@
 
 defined('JPATH_PLATFORM') or die;
 
-jimport('joomla.filesystem.folder');  // \Joomla\CMS\Filesystem\Folder
-jimport('joomla.filesystem.file');    // \Joomla\CMS\Filesystem\File
+jimport('joomla.filesystem.folder');  // JFolder
+jimport('joomla.filesystem.file');    // JFile
 
 jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
+jimport('cms.html.select');    // JHtmlSelect
 
-jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
-\Joomla\CMS\Form\FormHelper::loadFieldClass('list');   // \Joomla\CMS\Form\Field\ListField
+jimport('joomla.form.helper'); // JFormHelper
+JFormHelper::loadFieldClass('list');   // JFormFieldList
 
 /**
  * Supports an HTML select list of files
  *
  * @since  11.1
  */
-class JFormFieldFcFileList extends \Joomla\CMS\Form\Field\ListField
+class JFormFieldFcFileList extends JFormFieldList
 {
 	/**
 	 * The form field type.
@@ -159,7 +159,7 @@ class JFormFieldFcFileList extends \Joomla\CMS\Form\Field\ListField
 	}
 
 	/**
-	 * Method to attach a \Joomla\CMS\Form\Form object to the field.
+	 * Method to attach a JForm object to the field.
 	 *
 	 * @param   SimpleXMLElement  $element  The SimpleXMLElement object representing the <field /> tag for the form field object.
 	 * @param   mixed             $value    The form field value to validate.
@@ -169,7 +169,7 @@ class JFormFieldFcFileList extends \Joomla\CMS\Form\Field\ListField
 	 *
 	 * @return  boolean  True on success.
 	 *
-	 * @see     \Joomla\CMS\Form\FormField::setup()
+	 * @see     JFormField::setup()
 	 * @since   3.2
 	 */
 	public function setup(SimpleXMLElement $element, $value, $group = null)
@@ -223,16 +223,16 @@ class JFormFieldFcFileList extends \Joomla\CMS\Form\Field\ListField
 		// Prepend some default options based on field attributes.
 		if (!$this->hideNone)
 		{
-			$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '-1', \Joomla\CMS\Language\Text::alt('JOPTION_DO_NOT_USE', preg_replace('/[^a-zA-Z0-9_\-]/', '_', $this->fieldname)));
+			$options[] = JHtml::_('select.option', '-1', JText::alt('JOPTION_DO_NOT_USE', preg_replace('/[^a-zA-Z0-9_\-]/', '_', $this->fieldname)));
 		}
 
 		if (!$this->hideDefault)
 		{
-			$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '', ($this->defaultLabel ? \Joomla\CMS\Language\Text::_($this->defaultLabel) : \Joomla\CMS\Language\Text::alt('JOPTION_USE_DEFAULT', preg_replace('/[^a-zA-Z0-9_\-]/', '_', $this->fieldname))));
+			$options[] = JHtml::_('select.option', '', ($this->defaultLabel ? JText::_($this->defaultLabel) : JText::alt('JOPTION_USE_DEFAULT', preg_replace('/[^a-zA-Z0-9_\-]/', '_', $this->fieldname))));
 		}
 
 		// Get a list of files in the search path with the given filter.
-		$files = \Joomla\CMS\Filesystem\Folder::files($path, $this->filter);
+		$files = JFolder::files($path, $this->filter);
 
 		// Build the options list from the list of files.
 		if (is_array($files))
@@ -259,16 +259,16 @@ class JFormFieldFcFileList extends \Joomla\CMS\Form\Field\ListField
 				// If the extension is to be stripped, do it.
 				if ($this->stripExt)
 				{
-					$text = $value = \Joomla\CMS\Filesystem\File::stripExt($value);
+					$text = $value = JFile::stripExt($value);
 				}
 
 				// Handle case of (default) file name being exact the stripPrefix
 				if ($this->stripPrefix && $text == rtrim($this->stripPrefix, '_'))
 				{
-					$text = '- ' . \Joomla\CMS\Language\Text::_('FLEXI_DEFAULT') . ' -';
+					$text = '- ' . JText::_('FLEXI_DEFAULT') . ' -';
 				}
 
-				$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', $value, $text);
+				$options[] = JHtml::_('select.option', $value, $text);
 			}
 		}
 

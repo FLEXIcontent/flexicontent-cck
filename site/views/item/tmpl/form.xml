@@ -248,7 +248,7 @@
 
 			<field name="form_lbl_class_fe" type="text" default="" label="FLEXI_LABEL_CLASS" description="FLEXI_LABEL_CLASS_DESC" class="input-xxlarge" />
 			<field name="form_container_css_fe" type="text" default="" size="36" label="FLEXI_FORM_CONTAINER_CSS" description="FLEXI_FORM_CONTAINER_CSS_DESC" />
-			<field name="form_extra_css_fe" type="editor" editor="codemirror" default="" filter="\Joomla\CMS\Component\ComponentHelper::filterText" rows="5" cols="80" label="FLEXI_EDIT_FORM_CSS" description="FLEXI_EDIT_FORM_CSS_DESC" />
+			<field name="form_extra_css_fe" type="editor" editor="codemirror" default="" filter="JComponentHelper::filterText" rows="5" cols="80" label="FLEXI_EDIT_FORM_CSS" description="FLEXI_EDIT_FORM_CSS_DESC" />
 			<field name="form_extra_js_fe" type="editor" editor="codemirror" default="" filter="RAW" rows="5" cols="80" label="FLEXI_EDIT_FORM_JS" description="FLEXI_EDIT_FORM_JS_DESC" />
 
 		</fieldset>

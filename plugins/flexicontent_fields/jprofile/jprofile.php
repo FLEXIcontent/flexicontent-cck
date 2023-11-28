@@ -39,7 +39,7 @@ class plgFlexicontent_fieldsJProfile extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
-		$field->label = $field->parameters->get('label_form') ? \Joomla\CMS\Language\Text::_($field->parameters->get('label_form')) : \Joomla\CMS\Language\Text::_($field->label);
+		$field->label = $field->parameters->get('label_form') ? JText::_($field->parameters->get('label_form')) : JText::_($field->label);
 
 		// Set field and item objects
 		$this->setField($field);
@@ -73,9 +73,9 @@ class plgFlexicontent_fieldsJProfile extends FCField
 		}
 
 		// Initialize framework objects and other variables
-		$document = \Joomla\CMS\Factory::getDocument();
-		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
-		$app      = \Joomla\CMS\Factory::getApplication();
+		$document = JFactory::getDocument();
+		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
+		$app      = JFactory::getApplication();
 		$isSite   = $app->isClient('site');
 
 		$tooltip_class = 'hasTooltip';
@@ -182,7 +182,7 @@ class plgFlexicontent_fieldsJProfile extends FCField
 			});
 			";
 
-			if ($max_values) \Joomla\CMS\Language\Text::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
+			if ($max_values) JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
 			$js .= "
 			function addField".$field->id."(el, groupval_box, fieldval_box, params)
 			{
@@ -326,11 +326,11 @@ class plgFlexicontent_fieldsJProfile extends FCField
 
 			$css .= '';
 
-			$remove_button = '<span class="' . $add_on_class . ' fcfield-delvalue ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
-			$move2 = '<span class="' . $add_on_class . ' fcfield-drag-handle ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
+			$remove_button = '<span class="' . $add_on_class . ' fcfield-delvalue ' . $font_icon_class . '" title="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
+			$move2 = '<span class="' . $add_on_class . ' fcfield-drag-handle ' . $font_icon_class . '" title="'.JText::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
 			$add_here = '';
-			$add_here .= $add_position==2 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
-			$add_here .= $add_position==1 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
+			$add_here .= $add_position==2 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.JText::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
+			$add_here .= $add_position==1 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.JText::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
 		}
 
 		// Field not multi-value
@@ -352,11 +352,11 @@ class plgFlexicontent_fieldsJProfile extends FCField
 			$classes = ' fcfield_auto_value ';
 		}
 
-		// Load \Joomla\CMS\Form\FormHelper
+		// Load JFormHelper
 		jimport('joomla.form.helper');
 
-		// Load \Joomla\CMS\Form\Field\UserField
-		\Joomla\CMS\Form\FormHelper::loadFieldClass('user');
+		// Load JFormFieldUser
+		JFormHelper::loadFieldClass('user');
 
 
 		/**
@@ -381,9 +381,9 @@ class plgFlexicontent_fieldsJProfile extends FCField
 			$xml_field = '<field name="'.$fieldname_n.'" type="user" ' . ($isSite ? ' readonly="true" ' : '') . '/>';
 			$xml_form = '<form><fields name="attribs"><fieldset name="attribs">'.$xml_field.'</fieldset></fields></form>';
 
-			$jform = new \Joomla\CMS\Form\Form('flexicontent_field.jprofile', array('control' => '', 'load_data' => true));
+			$jform = new JForm('flexicontent_field.jprofile', array('control' => '', 'load_data' => true));
 			$jform->load($xml_form);
-			$jfield = new \Joomla\CMS\Form\Field\UserField($jform);
+			$jfield = new JFormFieldUser($jform);
 
 			$jfield->setup(new SimpleXMLElement($xml_field), $value, '');
 
@@ -438,8 +438,8 @@ class plgFlexicontent_fieldsJProfile extends FCField
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
 			if (!$add_position) $field->html .= '
 				<div class="input-append input-prepend fc-xpended-btns">
-					<span class="fcfield-addvalue ' . $font_icon_class . ' fccleared" onclick="addField'.$field->id.'(jQuery(this).closest(\'.fc-xpended-btns\').get(0));" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_TO_BOTTOM' ).'">
-						'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_VALUE' ).'
+					<span class="fcfield-addvalue ' . $font_icon_class . ' fccleared" onclick="addField'.$field->id.'(jQuery(this).closest(\'.fc-xpended-btns\').get(0));" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'">
+						'.JText::_( 'FLEXI_ADD_VALUE' ).'
 					</span>
 				</div>';
 		}
@@ -462,7 +462,7 @@ class plgFlexicontent_fieldsJProfile extends FCField
 
 		if (count($skipped_vals))
 		{
-			$app->enqueueMessage( \Joomla\CMS\Language\Text::sprintf('FLEXI_FIELD_DATE_EDIT_VALUES_SKIPPED', $field->label, implode(',',$skipped_vals)), 'notice' );
+			$app->enqueueMessage( JText::sprintf('FLEXI_FIELD_DATE_EDIT_VALUES_SKIPPED', $field->label, implode(',',$skipped_vals)), 'notice' );
 		}
 	}
 
@@ -472,7 +472,7 @@ class plgFlexicontent_fieldsJProfile extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
-		$field->label = \Joomla\CMS\Language\Text::_($field->label);
+		$field->label = JText::_($field->label);
 
 		// Set field and item objects
 		$this->setField($field);
@@ -490,8 +490,8 @@ class plgFlexicontent_fieldsJProfile extends FCField
 		{
 			$initialized = 1;
 
-			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$app       = JFactory::getApplication();
+			$document  = JFactory::getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -512,8 +512,8 @@ class plgFlexicontent_fieldsJProfile extends FCField
 		{
 			$users = array();
 			jimport('joomla.user.helper');
-			\Joomla\CMS\Factory::getLanguage()->load('com_users', JPATH_SITE, 'en-GB', $force_reload = false);
-			\Joomla\CMS\Factory::getLanguage()->load('com_users', JPATH_SITE, null, $force_reload = false);
+			JFactory::getLanguage()->load('com_users', JPATH_SITE, 'en-GB', $force_reload = false);
+			JFactory::getLanguage()->load('com_users', JPATH_SITE, null, $force_reload = false);
 		}
 
 
@@ -537,7 +537,7 @@ class plgFlexicontent_fieldsJProfile extends FCField
 		{
 			// Current user
 			case 3:
-				$values = array((int) \Joomla\CMS\Factory::getUser()->id);
+				$values = array((int) JFactory::getUser()->id);
 				break;
 
 			// Values (user ids) selected in item form
@@ -683,7 +683,7 @@ class plgFlexicontent_fieldsJProfile extends FCField
 		// Render author profile
 		if ($authordescr_itemid = $authorparams->get('authordescr_itemid'))
 		{
-			$app = \Joomla\CMS\Factory::getApplication();
+			$app = JFactory::getApplication();
 			$saved_view = $app->input->get('view', '', 'cmd');
 
 			$app->input->set('view', 'module');

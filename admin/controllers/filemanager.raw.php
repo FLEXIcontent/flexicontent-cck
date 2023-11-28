@@ -64,7 +64,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 	function saveprops()
 	{
 		// Set tree data into session
-		$session = \Joomla\CMS\Factory::getSession();
+		$session = JFactory::getSession();
 		$file_row_id = $this->input->get('file_row_id', '', 'string');
 		$uploader_file_data = $session->get('uploader_file_data', array(), 'flexicontent');
 		$props = array();
@@ -82,11 +82,11 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$uploader_file_data[$file_row_id] = & $props;
 		$session->set('uploader_file_data', $uploader_file_data, 'flexicontent');
 
-		// $app = \Joomla\CMS\Factory::getApplication();
+		// $app = JFactory::getApplication();
 		// $app->enqueueMessage('<pre>'.print_r($props, true).'</pre>', 'message');
 
 		// Return Success JSON-RPC response
-		die('{"jsonrpc" : "2.0", "result" : "<div class=\"fc-mssg fc-success fc-iblock fc-left\">' . \Joomla\CMS\Language\Text::_('FLEXI_APPLIED') . '</div>", "row_id" : ' . json_encode($file_row_id) . ', "sys_messages" : ' . json_encode(flexicontent_html::get_system_messages_html()) . '}');
+		die('{"jsonrpc" : "2.0", "result" : "<div class=\"fc-mssg fc-success fc-iblock fc-left\">' . JText::_('FLEXI_APPLIED') . '</div>", "row_id" : ' . json_encode($file_row_id) . ', "sys_messages" : ' . json_encode(flexicontent_html::get_system_messages_html()) . '}');
 	}
 
 
@@ -105,11 +105,11 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		header("Pragma: no-cache");
 
 		// Check for request forgeries
-		\Joomla\CMS\Session\Session::checkToken('request') or jexit('fail | ' . \Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or jexit('fail | ' . JText::_('JINVALID_TOKEN'));
 
 		if (!FlexicontentHelperPerm::getPerm()->CanConfig)
 		{
-			jexit('fail | ' . \Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'));
+			jexit('fail | ' . JText::_('FLEXI_ALERTNOTAUTH_TASK'));
 		}
 
 		// Test counting with limited memory
@@ -122,9 +122,9 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$rebuildmode = $this->input->getCmd('rebuildmode', '');
 		$index_urls  = $this->input->getInt('index_urls', 0);
 
-		$session = \Joomla\CMS\Factory::getSession();
-		$db      = \Joomla\CMS\Factory::getDbo();
-		$app     = \Joomla\CMS\Factory::getApplication();
+		$session = JFactory::getSession();
+		$db      = JFactory::getDbo();
+		$app     = JFactory::getApplication();
 
 		// Check indexer type
 		if ($indexer !== 'filemanager_stats')
@@ -133,8 +133,8 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		}
 
 		// Clear previous log file
-		$log_filename      = 'filemanager_stats_indexer_' . \Joomla\CMS\Factory::getUser()->id . '.php';
-		$log_filename_full = JPATH::clean(\Joomla\CMS\Factory::getConfig()->get('log_path') . DS . $log_filename);
+		$log_filename      = 'filemanager_stats_indexer_' . \JFactory::getUser()->id . '.php';
+		$log_filename_full = JPATH::clean(\JFactory::getConfig()->get('log_path') . DS . $log_filename);
 
 		if (file_exists($log_filename_full))
 		{
@@ -186,12 +186,12 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		header("Pragma: no-cache");
 
 		// Check for request forgeries
-		// \Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		// JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 		// Not need because this task need the user session data that are set by countrows that checked for forgeries
 
 		if (!FlexicontentHelperPerm::getPerm()->SuperAdmin)
 		{
-			jexit('fail | ' . \Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'));
+			jexit('fail | ' . JText::_('FLEXI_ALERTNOTAUTH_TASK'));
 		}
 
 		// Test indexing with limited memory
@@ -199,9 +199,9 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 		$start_microtime = microtime(true);
 
-		$session = \Joomla\CMS\Factory::getSession();
-		$db      = \Joomla\CMS\Factory::getDbo();
-		$app     = \Joomla\CMS\Factory::getApplication();
+		$session = JFactory::getSession();
+		$db      = JFactory::getDbo();
+		$app     = JFactory::getApplication();
 
 		$has_zlib      = function_exists("zlib_encode"); // Version_compare(PHP_VERSION, '5.4.0', '>=');
 
@@ -392,7 +392,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 				foreach ($errors as $error_message)
 				{
-					\Joomla\CMS\Log\Log::add($error_message, \Joomla\CMS\Log\Log::WARNING, $log_namespace);
+					JLog::add($error_message, JLog::WARNING, $log_namespace);
 				}
 			}
 
@@ -409,7 +409,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			}
 			if ($mediadata_err_count || $mediadata_file_count)
 			{
-				$session->set('mediadata_stats_log_filename', 'mediadata_stats_indexer_' . \Joomla\CMS\Factory::getUser()->id . '.php', 'flexicontent');
+				$session->set('mediadata_stats_log_filename', 'mediadata_stats_indexer_' . \JFactory::getUser()->id . '.php', 'flexicontent');
 			}
 
 
@@ -547,12 +547,12 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 		foreach($custom_loggers as $logger)
 		{
-			\Joomla\CMS\Log\Log::addLogger(
+			JLog::addLogger(
 				array(
 					'text_file' => $logger->filename,  // Sets the target log file
 					'text_entry_format' => '{DATETIME} {PRIORITY} {MESSAGE}'  // Sets the format of each line
 				),
-				\Joomla\CMS\Log\Log::ALL,  // Sets messages of all log levels to be sent to the file
+				JLog::ALL,  // Sets messages of all log levels to be sent to the file
 				array($logger->namespace)  // category of logged messages
 			);
 		}

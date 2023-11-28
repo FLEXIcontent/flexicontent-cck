@@ -41,14 +41,14 @@ class flexicontent_mediadatas extends flexicontent_basetable
 		// Set submit date if it is empty
 		/*if ( !$this->submit_date )
 		{
-			$datenow = \Joomla\CMS\Factory::getDate();
+			$datenow = JFactory::getDate();
 			$this->submit_date = $datenow->toSql();
 		}*/
 
 		// If edited by mediadata submitter then also set the update_date
-		/*if ( $this->id && $this->user_id == \Joomla\CMS\Factory::getUser()->id )
+		/*if ( $this->id && $this->user_id == JFactory::getUser()->id )
 		{
-			$datenow = \Joomla\CMS\Factory::getDate();
+			$datenow = JFactory::getDate();
 			$this->update_date = $datenow->toSql();
 		}*/
 

@@ -44,7 +44,7 @@ $subcat_image_method = $this->params->get('subcat_image_method', 1);
 $subcat_image_width = $this->params->get('subcat_image_width', 80);
 $subcat_image_height = $this->params->get('subcat_image_height', 80);
 
-$app = \Joomla\CMS\Factory::getApplication();
+$app = JFactory::getApplication();
 $joomla_image_path = $app->getCfg('image_path',  FLEXI_J16GE ? '' : 'images'.DS.'stories' );
 $joomla_image_url  = str_replace (DS, '/', $joomla_image_path);
 $joomla_image_path = $joomla_image_path ? $joomla_image_path.DS : '';
@@ -106,7 +106,7 @@ switch ($cols)
 	<?php
 	if (!is_object($cat->params))
 	{
-		$cat->params = new \Joomla\Registry\Registry($cat->params);
+		$cat->params = new JRegistry($cat->params);
 	}
 
 	if ($this->params->get('hide_empty_cats'))
@@ -134,7 +134,7 @@ switch ($cols)
 <div class="floattext">
 
 	<h2 class="fccat_title_box cat<?php echo $cat->id; ?>">
-		<?php echo $cat_link_title ? '<a class="fccat_title" href="'.\Joomla\CMS\Router\Route::_( FlexicontentHelperRoute::getCategoryRoute($cat->slug) ).'">' : '<span class="fccat_title">'; ?>
+		<?php echo $cat_link_title ? '<a class="fccat_title" href="'.JRoute::_( FlexicontentHelperRoute::getCategoryRoute($cat->slug) ).'">' : '<span class="fccat_title">'; ?>
 			
 		<?php echo $this->escape($cat->title); ?>
 		
@@ -154,8 +154,8 @@ switch ($cols)
 		$cat->introtext = & $cat->description;
 		$cat->fulltext = "";
 		
-		if ( $cat_image_source && $cat->image && \Joomla\CMS\Filesystem\File::exists( JPATH_SITE .DS. $joomla_image_path . $cat->image ) ) {
-			$src = \Joomla\CMS\Uri\Uri::base(true) ."/". $joomla_image_url . $cat->image;
+		if ( $cat_image_source && $cat->image && JFile::exists( JPATH_SITE .DS. $joomla_image_path . $cat->image ) ) {
+			$src = JUri::base(true) ."/". $joomla_image_url . $cat->image;
 	
 			$h		= '&amp;h=' . $cat_image_height;
 			$w		= '&amp;w=' . $cat_image_width;
@@ -167,7 +167,7 @@ switch ($cols)
 			$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
 			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 	
-			$image = \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
+			$image = JUri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
 		} else if ( $cat_image_source!=1 && $src = flexicontent_html::extractimagesrc($cat) ) {
 
 			$h		= '&amp;h=' . $cat_image_height;
@@ -180,8 +180,8 @@ switch ($cols)
 			$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
 			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 
-			$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  \Joomla\CMS\Uri\Uri::base(true).'/' : '';
-			$image = \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+			$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JUri::base(true).'/' : '';
+			$image = JUri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 		}
 		
 		if ($image) {
@@ -190,7 +190,7 @@ switch ($cols)
 			//$image = '<div class="fccat_image" style="height:'.$cat_image_height.'px;width:'.$cat_image_width.'px;" ></div>';
 		}
 		if ($cat_link_image && $image) {
-			$image = '<a href="'.\Joomla\CMS\Router\Route::_( FlexicontentHelperRoute::getCategoryRoute($cat->slug) ).'">'.$image.'</a>';
+			$image = '<a href="'.JRoute::_( FlexicontentHelperRoute::getCategoryRoute($cat->slug) ).'">'.$image.'</a>';
 		}
 	}
 	?>
@@ -213,7 +213,7 @@ switch ($cols)
 			<?php
 			if (!is_object($subcat->params))
 			{
-				$subcat->params = new \Joomla\Registry\Registry($subcat->params);
+				$subcat->params = new JRegistry($subcat->params);
 			}
 
 			$oddeven = $oddeven === 'even'
@@ -227,7 +227,7 @@ switch ($cols)
 			?>
 		
 			<li class='fcsubcat <?php echo $oddeven; ?>' >
-				<a class='fcsubcat_title'  href="<?php echo \Joomla\CMS\Router\Route::_( FlexicontentHelperRoute::getCategoryRoute($subcat->slug) ); ?>"><?php echo $this->escape($subcat->title); ?></a>
+				<a class='fcsubcat_title'  href="<?php echo JRoute::_( FlexicontentHelperRoute::getCategoryRoute($subcat->slug) ); ?>"><?php echo $this->escape($subcat->title); ?></a>
 				<?php if ($showassignated) : ?>
 				<span class="fcsubcat_assigned small nowrap_box">
 					<?php echo '[ <b>'
@@ -248,8 +248,8 @@ switch ($cols)
 				$subcat->introtext = & $subcat->description;
 				$subcat->fulltext = "";
 				
-				if ( $subcat_image_source && $subcat->image && \Joomla\CMS\Filesystem\File::exists( JPATH_SITE .DS. $joomla_image_path . $subcat->image ) ) {
-					$src = \Joomla\CMS\Uri\Uri::base(true) ."/". $joomla_image_url . $subcat->image;
+				if ( $subcat_image_source && $subcat->image && JFile::exists( JPATH_SITE .DS. $joomla_image_path . $subcat->image ) ) {
+					$src = JUri::base(true) ."/". $joomla_image_url . $subcat->image;
 			
 					$h		= '&amp;h=' . $subcat_image_height;
 					$w		= '&amp;w=' . $subcat_image_width;
@@ -260,7 +260,7 @@ switch ($cols)
 					$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
 					$conf	= $w . $h . $aoe . $q . $zc . $f;
 			
-					$image = \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
+					$image = JUri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
 				} else if ( $subcat_image_source!=1 && $src = flexicontent_html::extractimagesrc($subcat) ) {
 		
 					$h		= '&amp;h=' . $subcat_image_height;
@@ -272,8 +272,8 @@ switch ($cols)
 					$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
 					$conf	= $w . $h . $aoe . $q . $zc . $f;
 		
-					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  \Joomla\CMS\Uri\Uri::base(true).'/' : '';
-					$image = \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JUri::base(true).'/' : '';
+					$image = JUri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 				}
 				
 				if ($image) {
@@ -283,7 +283,7 @@ switch ($cols)
 				}
 				
 				if ($subcat_link_image && $image) {
-					$image = '<a href="'.\Joomla\CMS\Router\Route::_( FlexicontentHelperRoute::getCategoryRoute($subcat->slug) ).'">'.$image.'</a>';
+					$image = '<a href="'.JRoute::_( FlexicontentHelperRoute::getCategoryRoute($subcat->slug) ).'">'.$image.'</a>';
 				}
 			}
 			?>

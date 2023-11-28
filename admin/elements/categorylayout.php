@@ -26,15 +26,15 @@ if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
 jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
+jimport('cms.html.select');    // JHtmlSelect
 
-jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
-\Joomla\CMS\Form\FormHelper::loadFieldClass('list');   // \Joomla\CMS\Form\Field\ListField
+jimport('joomla.form.helper'); // JFormHelper
+JFormHelper::loadFieldClass('list');   // JFormFieldList
 
 // Load JS tabber lib
-\Joomla\CMS\Factory::getDocument()->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
-\Joomla\CMS\Factory::getDocument()->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
-\Joomla\CMS\Factory::getDocument()->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
+JFactory::getDocument()->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
+JFactory::getDocument()->addStyleSheet(JUri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
+JFactory::getDocument()->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
 /**
  * Renders a categorylayout element
@@ -43,7 +43,7 @@ jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
  * @subpackage	FLEXIcontent
  * @since		1.0
  */
-class JFormFieldCategorylayout extends \Joomla\CMS\Form\Field\ListField
+class JFormFieldCategorylayout extends JFormFieldList
 {
 	/**
 	 * The form field type.
@@ -66,13 +66,13 @@ class JFormFieldCategorylayout extends \Joomla\CMS\Form\Field\ListField
 		//$value = $value ? $value : @$attributes['default'];
 		
 		// Get current extension and id being edited
-		$app    = \Joomla\CMS\Factory::getApplication();
-		$db     = \Joomla\CMS\Factory::getDbo();
+		$app    = JFactory::getApplication();
+		$db     = JFactory::getDbo();
 		$jinput = $app->input;
 		$option = $jinput->get('option', '', 'CMD');
 		$view   = $jinput->get('view', '', 'CMD');
 
-		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+		$cparams = JComponentHelper::getParams('com_flexicontent');
 
 		// Get RECORD id of current view
 		$id = $jinput->get('id', array(0), 'array');
@@ -116,7 +116,7 @@ if (!@$attributes['skipparams'])
 {
 		$ext_option = 'com_flexicontent';
 		$ext_view   = $view;
-		$doc 	= \Joomla\CMS\Factory::getDocument();
+		$doc 	= JFactory::getDocument();
 		$js 	= "
 var clayout_names = ['".$lays."'];
 
@@ -209,7 +209,7 @@ function clayout_loadPanel(element)
 
 	// Add LOADING animation into the panel header, and show outer box that contains the panel header and the panel
 	var _loading_img = '<img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" style=\"vertical-align: middle;\">';
-	panel_header_link.html('<span><span class=\"btn\"><i class=\"icon-edit\"><\/i>'+(panel.hasClass('fc_layout_loaded') ? '".\Joomla\CMS\Language\Text::_( 'FLEXI_REFRESHING' )."' : '".\Joomla\CMS\Language\Text::_( 'FLEXI_LOADING' )."')+' ... '+_loading_img+'<\/span><\/span>');
+	panel_header_link.html('<span><span class=\"btn\"><i class=\"icon-edit\"><\/i>'+(panel.hasClass('fc_layout_loaded') ? '".JText::_( 'FLEXI_REFRESHING' )."' : '".JText::_( 'FLEXI_LOADING' )."')+' ... '+_loading_img+'<\/span><\/span>');
 	panel.parent().removeClass('pane-disabled').show();
 
 	//window.console.log('Server call to load panel : ' + element);
@@ -219,7 +219,7 @@ function clayout_loadPanel(element)
 	{
 	 	panel.find('.fclayout_disabled_element').removeAttr('disabled').removeClass('fclayout_disabled_element');
 	 	setTimeout(function(){
-			panel_header_link.html('<span><span class=\"btn\"><i class=\"icon-edit\"><\/i>".\Joomla\CMS\Language\Text::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ).": '+element+'<\/span><\/span>');
+			panel_header_link.html('<span><span class=\"btn\"><i class=\"icon-edit\"><\/i>".JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ).": '+element+'<\/span><\/span>');
 
 			if (panel_header_link.hasClass('collapsed') || panel_header.hasClass('pane-toggler'))
 			{
@@ -234,7 +234,7 @@ function clayout_loadPanel(element)
 	{
 		jQuery.ajax({
 			type: 'GET',
-			url: 'index.php?option=com_flexicontent&task=templates.getlayoutparams&ext_view=".$ext_view."&ext_option=".$ext_option."&ext_name='+element+'&ext_id=".$pk."&layout_name=category&ext_type=templates&directory='+element+'&format=raw&" . \Joomla\CMS\Session\Session::getFormToken() . "=1',
+			url: 'index.php?option=com_flexicontent&task=templates.getlayoutparams&ext_view=".$ext_view."&ext_option=".$ext_option."&ext_name='+element+'&ext_id=".$pk."&layout_name=category&ext_type=templates&directory='+element+'&format=raw&" . JSession::getFormToken() . "=1',
 			success: function(str)
 			{
 				panel.addClass('fc_layout_loaded');
@@ -242,7 +242,7 @@ function clayout_loadPanel(element)
 				// Initialize JS and CSS of the layout
 				fc_initDynamicLayoutJsCss(panel_id, ['subform-row-add'], str);
 
-				panel_header_link.html('<span><span class=\"btn\"><i class=\"icon-edit\"><\/i>".\Joomla\CMS\Language\Text::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ).": '+element+'<\/span><\/span>');
+				panel_header_link.html('<span><span class=\"btn\"><i class=\"icon-edit\"><\/i>".JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ).": '+element+'<\/span><\/span>');
 
 				if (panel_header_link.hasClass('collapsed') || panel_header.hasClass('pane-toggler'))
 				{
@@ -290,16 +290,16 @@ jQuery(document).ready(function() {
 
 		if (@$attributes['firstoption'])
 		{
-			$layouts[] = \Joomla\CMS\HTML\Helpers\Select::option('', \Joomla\CMS\Language\Text::_($attributes['firstoption']));
+			$layouts[] = JHtmlSelect::option('', JText::_($attributes['firstoption']));
 		}
 		else
 		{
-			$layouts[] = \Joomla\CMS\HTML\Helpers\Select::option('', '-- '.\Joomla\CMS\Language\Text::_( 'FLEXI_USE_GLOBAL' ). ' --');
+			$layouts[] = JHtmlSelect::option('', '-- '.JText::_( 'FLEXI_USE_GLOBAL' ). ' --');
 		}
 
 		foreach ($tmpls as $tmpl)
 		{
-			$layouts[] = \Joomla\CMS\HTML\Helpers\Select::option($tmpl->name, $tmpl->name);
+			$layouts[] = JHtmlSelect::option($tmpl->name, $tmpl->name);
 		}
 		
 		$fieldname	= $this->name;
@@ -327,8 +327,8 @@ jQuery(document).ready(function() {
 			$preview_img = $preview_img ? $preview_img : '';
 			$tip_class = @$attributes['tip_class'];
 			$tip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
-			$hintmage = \Joomla\CMS\HTML\HTMLHelper::image ( 'components/com_flexicontent/assets/images/'.$tip_img, \Joomla\CMS\Language\Text::_( 'FLEXI_NOTES' ), ' style="max-height:24px; padding:0px; margin-left:12px; margin-right:0px;" ' );
-			$previewimage = $preview_img ? \Joomla\CMS\HTML\HTMLHelper::image ( 'components/com_flexicontent/assets/images/'.$preview_img, \Joomla\CMS\Language\Text::_( 'FLEXI_NOTES' ), ' style="max-height:24px; padding:0px; margin:0px;" ' ) : '';
+			$hintmage = JHtml::image ( 'components/com_flexicontent/assets/images/'.$tip_img, JText::_( 'FLEXI_NOTES' ), ' style="max-height:24px; padding:0px; margin-left:12px; margin-right:0px;" ' );
+			$previewimage = $preview_img ? JHtml::image ( 'components/com_flexicontent/assets/images/'.$preview_img, JText::_( 'FLEXI_NOTES' ), ' style="max-height:24px; padding:0px; margin:0px;" ' ) : '';
 			$tip_text = '<span class="'.$tip_class.'" style="" title="'.flexicontent_html::getToolTip(null, $inline_tip, 1, 1).'">'.$hintmage.$previewimage.'</span>';
 		}
 		if ($inline_tip = @$attributes['inline_tip2'])
@@ -339,12 +339,12 @@ jQuery(document).ready(function() {
 			$preview_img = $preview_img ? $preview_img : '';
 			$tip_class = @$attributes['tip_class2'];
 			$tip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
-			$hintmage = \Joomla\CMS\HTML\HTMLHelper::image ( 'administrator/components/com_flexicontent/assets/images/'.$tip_img, \Joomla\CMS\Language\Text::_( 'FLEXI_NOTES' ), ' style="max-height:24px; padding:0px; margin-left:12px; margin-right:0px;" ' );
-			$previewimage = $preview_img ? \Joomla\CMS\HTML\HTMLHelper::image ( 'administrator/components/com_flexicontent/assets/images/'.$preview_img, \Joomla\CMS\Language\Text::_( 'FLEXI_NOTES' ), ' style="max-height:24px; padding:0px; margin:0px;" ' ) : '';
+			$hintmage = JHtml::image ( 'administrator/components/com_flexicontent/assets/images/'.$tip_img, JText::_( 'FLEXI_NOTES' ), ' style="max-height:24px; padding:0px; margin-left:12px; margin-right:0px;" ' );
+			$previewimage = $preview_img ? JHtml::image ( 'administrator/components/com_flexicontent/assets/images/'.$preview_img, JText::_( 'FLEXI_NOTES' ), ' style="max-height:24px; padding:0px; margin:0px;" ' ) : '';
 			$tip_text2 = '<span class="'.$tip_class.'" style="" title="'.flexicontent_html::getToolTip(null, $inline_tip, 1, 1).'">'.$hintmage.$previewimage.'</span>';
 		}
 		return
-			\Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $layouts, $fieldname, $attribs, 'value', 'text', $value, $element_id)
+			JHtml::_('select.genericlist', $layouts, $fieldname, $attribs, 'value', 'text', $value, $element_id)
 			. @ $tip_text . @ $tip_text2;
 	}
 	
@@ -356,7 +356,7 @@ jQuery(document).ready(function() {
 		$attributes = $attributes['@attributes'];
 		
 		if ( @$attributes['enableparam'] ) {
-			if ( !\Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get($attributes['enableparam']) ) return '';
+			if ( !JComponentHelper::getParams('com_flexicontent')->get($attributes['enableparam']) ) return '';
 		}
 		
 		$label = $this->element['label'];
@@ -370,7 +370,7 @@ jQuery(document).ready(function() {
 			? flexicontent_html::getToolTip($label, (string) $this->element['description'], 1, 1)
 			: '...';
 
-		return '<label style=""  class="'.$class.'" title="'.$title.'" >'.\Joomla\CMS\Language\Text::_($label).'</label>';
+		return '<label style=""  class="'.$class.'" title="'.$title.'" >'.JText::_($label).'</label>';
 	}
 
 	function set($property, $value)

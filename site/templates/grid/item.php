@@ -29,11 +29,11 @@ if ($html5) {  /* BOF html5  */
 // first define the template name
 $tmpl = $this->tmpl;
 $item = $this->item;
-$menu = \Joomla\CMS\Factory::getApplication()->getMenu()->getActive();
+$menu = JFactory::getApplication()->getMenu()->getActive();
 
-\Joomla\CMS\Factory::getDocument()->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
-\Joomla\CMS\Factory::getDocument()->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
-\Joomla\CMS\Factory::getDocument()->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
+JFactory::getDocument()->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
+JFactory::getDocument()->addStyleSheet(JUri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
+JFactory::getDocument()->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
 // Prepend toc (Table of contents) before item's description (toc will usually float right)
 // By prepend toc to description we make sure that it get's displayed at an appropriate place
@@ -82,12 +82,12 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 		<!-- EOF beforeDisplayContent -->
 	<?php endif; ?>
 	
-	<?php if (\Joomla\CMS\Factory::getApplication()->input->getInt('print')) : ?>
+	<?php if (JFactory::getApplication()->input->getInt('print')) : ?>
 		<!-- BOF Print handling -->
 		<?php if ($this->params->get('print_behaviour', 'auto') == 'auto') : ?>
 			<script>jQuery(document).ready(function(){ window.print(); });</script>
 		<?php	elseif ($this->params->get('print_behaviour') == 'button') : ?>
-			<input type='button' id='printBtn' name='printBtn' value='<?php echo \Joomla\CMS\Language\Text::_('Print');?>' class='btn btn-info' onclick='this.style.display="none"; window.print(); return false;'>
+			<input type='button' id='printBtn' name='printBtn' value='<?php echo JText::_('Print');?>' class='btn btn-info' onclick='this.style.display="none"; window.print(); return false;'>
 		<?php endif; ?>
 		<!-- EOF Print handling -->
 		
@@ -265,7 +265,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 		$subtitle_tab_titles = preg_split('/\s*,,\s*/', $subtitle_tab_titles);
 		for ($tc=1; $tc<=$tabcount; $tc++) :
 			$tabpos_name  = 'subtitle_tab'.$tc;
-			$tabpos_label = \Joomla\CMS\Language\Text::_(isset($subtitle_tab_titles[$tc-1]) ? $subtitle_tab_titles[$tc-1] : $tabpos_name);
+			$tabpos_label = JText::_(isset($subtitle_tab_titles[$tc-1]) ? $subtitle_tab_titles[$tc-1] : $tabpos_name);
 			$tab_id = 'fc_'.$tabpos_name;
 			?>
 			
@@ -366,7 +366,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 		<table class="table fc-tbl-featured">
 			<tr>
 
-				<?php $featured_row_title = \Joomla\CMS\Language\Text::_($this->params->get('featured_row_title', 'JFEATURED')); ?>
+				<?php $featured_row_title = JText::_($this->params->get('featured_row_title', 'JFEATURED')); ?>
 				<?php if ($featured_row_title) : ?>
 					<td rowspan="2" class="fc-tbl-row-title">
 						<div class="fc-featured-row-title"><?php echo $featured_row_title; ?></div>
@@ -422,7 +422,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 		$bottom_tab_titles = preg_split('/\s*,,\s*/', $bottom_tab_titles);
 		for ($tc=1; $tc<=$tabcount; $tc++) :
 			$tabpos_name  = 'bottom_tab'.$tc;
-			$tabpos_label = \Joomla\CMS\Language\Text::_(isset($bottom_tab_titles[$tc-1]) ? $bottom_tab_titles[$tc-1] : $tabpos_name);
+			$tabpos_label = JText::_(isset($bottom_tab_titles[$tc-1]) ? $bottom_tab_titles[$tc-1] : $tabpos_name);
 			$tab_id = 'fc_'.$tabpos_name;
 			?>
 		
@@ -498,7 +498,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 	
 	<?php echo $mainAreaTag == 'section' ? '</article>' : ''; ?>
 	
-	<?php if ($this->params->get('comments') && !\Joomla\CMS\Factory::getApplication()->input->getInt('print')) : ?>
+	<?php if ($this->params->get('comments') && !JFactory::getApplication()->input->getInt('print')) : ?>
 		<!-- BOF comments -->
 		<div class="comments ">
 		<?php

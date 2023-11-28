@@ -19,7 +19,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 //adding inline help
-if (FLEXI_J40GE) \Joomla\CMS\Toolbar\ToolbarHelper::inlinehelp();
+if (FLEXI_J40GE) JToolbarHelper::inlinehelp();
 
 jimport('joomla.filesystem.folder');
 jimport('joomla.filesystem.file');
@@ -28,16 +28,16 @@ jimport('joomla.filesystem.path');
 if ( !$this->layout->name ) die('Template folder does not exist');
 
 // Load JS tabber lib
-$this->document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
-$this->document->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
+$this->document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
+$this->document->addStyleSheet(JUri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
 $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
 $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
 
-$app = \Joomla\CMS\Factory::getApplication();
-$db = \Joomla\CMS\Factory::getDbo();
-\Joomla\CMS\Factory::getApplication()->setUserState('editor.source.syntax', 'css');
+$app = JFactory::getApplication();
+$db = JFactory::getDbo();
+JFactory::getApplication()->setUserState('editor.source.syntax', 'css');
 
 $code_btn_lbls = array(
 	'fieldPosXML'=>'FLEXI_ADD_FIELD_POSITION_XML',
@@ -133,12 +133,12 @@ $query = $db->getQuery(true)
 	);
 $db->setQuery($query);
 $use_editor = (boolean)$db->loadResult();
-if (!$use_editor)  $app->enqueueMessage(\Joomla\CMS\Language\Text::_('Codemirror is disabled, please enable, simple textarea will be used for editting files'), 'warning');
+if (!$use_editor)  $app->enqueueMessage(JText::_('Codemirror is disabled, please enable, simple textarea will be used for editting files'), 'warning');
 
-\Joomla\CMS\Language\Text::script('FLEXI_TMPLS_LOAD_FILE_BEFORE_SAVING', true);
-\Joomla\CMS\Language\Text::script('FLEXI_TMPLS_SAVE_BUILT_IN_TEMPLATE_FILE_WARNING', true);
-\Joomla\CMS\Language\Text::script('FLEXI_SAVING', true);
-\Joomla\CMS\Language\Text::script('FLEXI_LOADING', true);
+JText::script('FLEXI_TMPLS_LOAD_FILE_BEFORE_SAVING', true);
+JText::script('FLEXI_TMPLS_SAVE_BUILT_IN_TEMPLATE_FILE_WARNING', true);
+JText::script('FLEXI_SAVING', true);
+JText::script('FLEXI_LOADING', true);
 ?>
 
 <script>
@@ -147,12 +147,12 @@ if (!$use_editor)  $app->enqueueMessage(\Joomla\CMS\Language\Text::_('Codemirror
 		<?php echo $this->jssort . ';' ; ?>
 	}
 
-	var jformToken   = '<?php echo \Joomla\CMS\Session\Session::getFormToken();?>';
+	var jformToken   = '<?php echo JSession::getFormToken();?>';
 	var isCoreLayout = <?php echo in_array($this->layout->name, array('grid','table','faq','items-tabbed')) ? 1: 0;?>
 </script>
 
 <?php
-$this->document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/js/layout_editor.js', array('version' => FLEXI_VHASH));
+$this->document->addScript(JUri::base(true).'/components/com_flexicontent/assets/js/layout_editor.js', array('version' => FLEXI_VHASH));
 ?>
 
 <div id="flexicontent" class="flexicontent fcconfig-form">
@@ -162,24 +162,24 @@ $this->document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flex
 	<div class="fctabber tabset_layout fcparams_tabset" id="tabset_layout" style="margin:16px 0 !important;">
 
 		<div class="tabbertab" id="tabset_layout_information_tab" data-icon-class="icon-info" >
-			<h3 class="tabberheading"> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_INFORMATION' ); ?></h3>
+			<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_INFORMATION' ); ?></h3>
 
 	<!--div class="fc-info fc-nobgimage fc-mssg-inline" style="font-size: 12px; margin: 0px 0px 16px 0px !important; padding: 16px 32px !important">
-		<?php echo !empty($fieldSet->label) ? $fieldSet->label : \Joomla\CMS\Language\Text::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $this->layout->name; ?>
+		<?php echo !empty($fieldSet->label) ? $fieldSet->label : JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $this->layout->name; ?>
 	</div-->
 
 
 	<table>
 		<tr>
 			<td style="vertical-align:top;">
-				<img src="../<?php echo $this->layout->thumb; ?>" alt="<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_TEMPLATE_THUMBNAIL' ); ?>" style="max-width:none;" />
+				<img src="../<?php echo $this->layout->thumb; ?>" alt="<?php echo JText::_( 'FLEXI_TEMPLATE_THUMBNAIL' ); ?>" style="max-width:none;" />
 			</td>
 			<td style="vertical-align:top;">
 				<table class="admintable" id="lay-desc-table">
 					<tr>
 						<td style="text-align:right;">
 							<label class="label">
-							<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_FOLDER' ); ?>
+							<?php echo JText::_( 'FLEXI_FOLDER' ); ?>
 							</label>
 						</td>
 						<td>
@@ -189,7 +189,7 @@ $this->document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flex
 					<tr>
 						<td style="text-align:right;">
 							<label class="label">
-								<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_VIEW' ); ?>
+								<?php echo JText::_( 'FLEXI_VIEW' ); ?>
 							</label>
 						</td>
 						<td>
@@ -204,21 +204,21 @@ $this->document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flex
 					<tr>
 						<td style="text-align:right;">
 							<label class="label">
-								<?php echo \Joomla\CMS\Language\Text::_( 'Default title' ); ?>
+								<?php echo JText::_( 'Default title' ); ?>
 							</label>
 						</td>
 						<td>
-							<?php echo \Joomla\CMS\Language\Text::_($this->layout->defaulttitle); ?>
+							<?php echo JText::_($this->layout->defaulttitle); ?>
 						</td>
 					</tr>
 					<tr>
 						<td style="text-align:right;">
 							<label class="label">
-								<?php echo \Joomla\CMS\Language\Text::_( 'Description' ); ?>
+								<?php echo JText::_( 'Description' ); ?>
 							</label>
 						</td>
 						<td>
-							<?php echo \Joomla\CMS\Language\Text::_($this->layout->description); ?>
+							<?php echo JText::_($this->layout->description); ?>
 						</td>
 					</tr>
 
@@ -230,7 +230,7 @@ $this->document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flex
 					<tr>
 						<td style="text-align:right;">
 							<label class="label">
-								<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_MICRODATA' ); ?>
+								<?php echo JText::_( 'FLEXI_MICRODATA' ); ?>
 							</label>
 						</td>
 						<td>
@@ -246,7 +246,7 @@ $this->document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flex
 					<tr>
 						<td style="text-align:right;">
 							<label class="label">
-								<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_AUTHOR' ); ?>
+								<?php echo JText::_( 'FLEXI_AUTHOR' ); ?>
 							</label>
 						</td>
 						<td>
@@ -256,7 +256,7 @@ $this->document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flex
 					<tr>
 						<td style="text-align:right;">
 							<label class="label">
-								<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_WEBSITE' ); ?>
+								<?php echo JText::_( 'FLEXI_WEBSITE' ); ?>
 							</label>
 						</td>
 						<td>
@@ -266,7 +266,7 @@ $this->document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flex
 					<tr>
 						<td style="text-align:right;">
 							<label class="label">
-								<?php echo \Joomla\CMS\Language\Text::_( 'Email' ); ?>
+								<?php echo JText::_( 'Email' ); ?>
 							</label>
 						</td>
 						<td>
@@ -276,7 +276,7 @@ $this->document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flex
 					<tr>
 						<td style="text-align:right;">
 							<label class="label">
-								<?php echo \Joomla\CMS\Language\Text::_( 'License' ); ?>
+								<?php echo JText::_( 'License' ); ?>
 							</label>
 						</td>
 						<td>
@@ -286,7 +286,7 @@ $this->document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flex
 					<tr>
 						<td style="text-align:right;">
 							<label class="label">
-								<?php echo \Joomla\CMS\Language\Text::_( 'Version' ); ?>
+								<?php echo JText::_( 'Version' ); ?>
 							</label>
 						</td>
 						<td>
@@ -296,7 +296,7 @@ $this->document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flex
 					<tr>
 						<td style="text-align:right;">
 							<label class="label">
-								<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_RELEASE' ); ?>
+								<?php echo JText::_( 'FLEXI_RELEASE' ); ?>
 							</label>
 						</td>
 						<td>
@@ -311,12 +311,12 @@ $this->document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flex
 		</div>
 
 		<div class="tabbertab" id="tabset_layout_fields_placement_tab" data-icon-class="icon-signup" >
-			<h3 class="tabberheading"> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_FIELDS_PLACEMENT' ); ?></h3>
+			<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_FIELDS_PLACEMENT' ); ?></h3>
 
 			<div class="fcclear"></div>
 			<div class="fc-mssg fc-success fc-nobgimage" style="font-size: 100%; margin: 4px 0;">
-				<span style="font-weight:bold;"><?php echo \Joomla\CMS\Language\Text::_('FLEXI_NOTES');?>:</span>
-				<?php echo \Joomla\CMS\Language\Text::_('FLEXI_INSTRUCTIONS_ADD_FIELD_TO_LAYOUT_POSITION');?>
+				<span style="font-weight:bold;"><?php echo JText::_('FLEXI_NOTES');?>:</span>
+				<?php echo JText::_('FLEXI_INSTRUCTIONS_ADD_FIELD_TO_LAYOUT_POSITION');?>
 			</div>
 
 			<div class="container-fluid row" style="padding: 0px !important; margin: 0px! important;">
@@ -324,18 +324,18 @@ $this->document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flex
 				<div class="span6 col-6 full_width_980">
 
 					<fieldset id="available_fields_container">
-						<legend style="margin:0 0 12px 0; font-size:14px; padding-top:6px; padding-bottom:6px; background:gray;" class="fcsep_level1"><?php echo \Joomla\CMS\Language\Text::_('FLEXI_AVAILABLE_FIELDS') ?></legend>
+						<legend style="margin:0 0 12px 0; font-size:14px; padding-top:6px; padding-bottom:6px; background:gray;" class="fcsep_level1"><?php echo JText::_('FLEXI_AVAILABLE_FIELDS') ?></legend>
 						<div class="fcclear"></div>
 
 						<div style="float:left; clear:both; width:100%; margin:0px 0px 12px 0px;">
 							<div style="float:left; margin-right:32px;">
-								<div style="float:left;" class="positions_title label" ><?php echo \Joomla\CMS\Language\Text::_('FLEXI_FILTER').' '.\Joomla\CMS\Language\Text::_('FLEXI_TYPE'); ?></div>
+								<div style="float:left;" class="positions_title label" ><?php echo JText::_('FLEXI_FILTER').' '.JText::_('FLEXI_TYPE'); ?></div>
 								<div style="float:left; clear:both;">
 									<?php echo sprintf(str_replace('__au__', '_available', $this->content_type_select), 'available_fields_container', 'hide', 'available'); ?>
 								</div>
 							</div>
 							<div style="float:left;">
-								<div style="float:left;" class="positions_title label" ><?php echo \Joomla\CMS\Language\Text::_('FLEXI_FILTER').' '.\Joomla\CMS\Language\Text::_('FLEXI_FIELD_TYPE'); ?></div>
+								<div style="float:left;" class="positions_title label" ><?php echo JText::_('FLEXI_FILTER').' '.JText::_('FLEXI_FIELD_TYPE'); ?></div>
 								<div style="float:left; clear:both;">
 									<?php echo sprintf(str_replace('__au__', '_available', $this->field_type_select), 'available_fields_container', 'hide', 'available'); ?>
 								</div>
@@ -343,7 +343,7 @@ $this->document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flex
 						</div>
 
 
-						<div class="positions_title label text-white bg-info label-info" style="margin-top:10px;"><?php echo \Joomla\CMS\Language\Text::_('FLEXI_CORE_FIELDS'); ?></div>
+						<div class="positions_title label text-white bg-info label-info" style="margin-top:10px;"><?php echo JText::_('FLEXI_CORE_FIELDS'); ?></div>
 
 						<div class="positions_container">
 							<ul id="sortablecorefields" class="positions">
@@ -363,7 +363,7 @@ $this->document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flex
 						</div>
 
 
-						<div class="positions_title label text-white bg-info label-info" style="margin-top:10px;"><?php echo \Joomla\CMS\Language\Text::_('FLEXI_CUSTOM_NON_CORE_FIELDS'); ?></div>
+						<div class="positions_title label text-white bg-info label-info" style="margin-top:10px;"><?php echo JText::_('FLEXI_CUSTOM_NON_CORE_FIELDS'); ?></div>
 
 						<div class="positions_container">
 							<ul id="sortableuserfields" class="positions">
@@ -389,18 +389,18 @@ $this->document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flex
 				<div class="span6 col-6 full_width_980 padded_wrap_box">
 
 					<fieldset id="layout_positions_container">
-						<legend style="margin:0 0 12px 0; font-size:14px; padding-top:6px; padding-bottom:6px; background:gray;" class="fcsep_level1"><?php echo \Joomla\CMS\Language\Text::_('FLEXI_AVAILABLE_POS') ?></legend>
+						<legend style="margin:0 0 12px 0; font-size:14px; padding-top:6px; padding-bottom:6px; background:gray;" class="fcsep_level1"><?php echo JText::_('FLEXI_AVAILABLE_POS') ?></legend>
 						<div class="fcclear"></div>
 
 						<div style="float:left; clear:both; width:100%; margin:0px 0px 12px 0px;">
 							<div style="float:left; margin-right:32px;">
-								<div style="float:left;" class="positions_title label" ><?php echo \Joomla\CMS\Language\Text::_('FLEXI_FILTER').' '.\Joomla\CMS\Language\Text::_('FLEXI_TYPE'); ?></div>
+								<div style="float:left;" class="positions_title label" ><?php echo JText::_('FLEXI_FILTER').' '.JText::_('FLEXI_TYPE'); ?></div>
 								<div style="float:left; clear:both;">
 									<?php echo sprintf(str_replace('__au__', '_used',$this->content_type_select), 'layout_positions_container', 'highlight', 'used'); ?>
 								</div>
 							</div>
 							<div style="float:left;">
-								<div style="float:left;" class="positions_title label" ><?php echo \Joomla\CMS\Language\Text::_('FLEXI_FILTER').' '.\Joomla\CMS\Language\Text::_('FLEXI_FIELD_TYPE'); ?></div>
+								<div style="float:left;" class="positions_title label" ><?php echo JText::_('FLEXI_FILTER').' '.JText::_('FLEXI_FIELD_TYPE'); ?></div>
 								<div style="float:left; clear:both;">
 									<?php echo sprintf(str_replace('__au__', '_used',$this->field_type_select), 'layout_positions_container', 'highlight', 'used'); ?>
 								</div>
@@ -472,7 +472,7 @@ $this->document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flex
 							// Close any field group line that it is still open
 							echo $posrow ? "</td></tr></table>\n" : "";
 						else :
-							echo \Joomla\CMS\Language\Text::_('FLEXI_NO_GROUPS_AVAILABLE');
+							echo JText::_('FLEXI_NO_GROUPS_AVAILABLE');
 						endif;
 						?>
 					</fieldset>
@@ -487,36 +487,36 @@ $this->document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flex
 		?>
 
 		<div class="tabbertab" id="tabset_layout_disp_params_tab" data-icon-class="icon-options" >
-			<h3 class="tabberheading"> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_DISPLAY_PARAMETERS' ); ?> </h3>
+			<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_DISPLAY_PARAMETERS' ); ?> </h3>
 
 			<div style="max-width:1024px; margin-bottom:16px;">
 
 				<div id="fc-mini-help_btn1" class="btn" onclick="fc_toggle_box_via_btn('fc-mini-help-heritage', this, 'btn-primary');" style="margin: 0 32px 0 0;">
-					<span class="icon-help"></span> <?php echo \Joomla\CMS\Language\Text::_('FLEXI_HELP2'); ?>
+					<span class="icon-help"></span> <?php echo JText::_('FLEXI_HELP2'); ?>
 				</div>
 
 				<div id="fc-mini-help_btn2" class="btn" onclick="fc_toggle_box_via_btn('fc-mini-help-less', this, 'btn-primary');" style="margin: 0 0 0 0;">
-					<span class="icon-help"></span> <?php echo \Joomla\CMS\Language\Text::_('CSS'); ?> ... <small><?php echo \Joomla\CMS\Language\Text::_('FLEXI_ADVANCED_USERS'); ?></small>
+					<span class="icon-help"></span> <?php echo JText::_('CSS'); ?> ... <small><?php echo JText::_('FLEXI_ADVANCED_USERS'); ?></small>
 				</div>
 
 				<div class="fcclear"></div>
 
 				<div id="fc-mini-help-heritage" class="fc-mssg fc-info fc-nobgimage" style="max-width: unset; font-size:100%; margin: 32px 0 !important; padding-top:4px; padding-bottom:4px; display:none;">
-					<b><?php echo \Joomla\CMS\Language\Text::_('FLEXI_TMPL_ABOUT_HERITAGE'); ?></b>
+					<b><?php echo JText::_('FLEXI_TMPL_ABOUT_HERITAGE'); ?></b>
 
 					<br/><br/>
-					-	<?php echo \Joomla\CMS\Language\Text::_( $this->layout->view == 'item' ?
+					-	<?php echo JText::_( $this->layout->view == 'item' ?
 						'your <b>content types / items</b> ' :
 						'your <b>content lists</b> (categories, etc)'
 					);?>
 					will inherit defaults from here, you may <b>override</b> them inside <b>type</b> (but <b>avoid</b> overriding inside the <b>item</b>)
 
 					<br/>
-					-	<?php echo \Joomla\CMS\Language\Text::_( 'setting any parameter below to <b>"Use global"</b>, will use default value inside the <b>template\'s PHP code</b>');?>
+					-	<?php echo JText::_( 'setting any parameter below to <b>"Use global"</b>, will use default value inside the <b>template\'s PHP code</b>');?>
 				</div>
 
 				<div id="fc-mini-help-less" class="fc-mssg fc-info fc-nobgimage" style="max-width: unset; font-size:100%; margin: 32px 0 !important; padding-top:4px; padding-bottom:4px; display:none;">
-					<b><?php echo \Joomla\CMS\Language\Text::_('FLEXI_TMPL_ABOUT_CSS_VIA_PARAMS'); ?></b>
+					<b><?php echo JText::_('FLEXI_TMPL_ABOUT_CSS_VIA_PARAMS'); ?></b>
 
 					<br/><br/>
 					-	<span class="fc_less_parameter"></span> parameters: add more to <b><?php echo $this->layout->view; ?>.xml</b> , then inside file: <b>less/<?php echo $this->layout->view; ?>.less</b> use less variables: &nbsp; @<b><?php echo $pfx; ?>_</b>parameter_name;
@@ -534,7 +534,7 @@ $this->document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flex
 				$fieldSets = $this->layout->params->getFieldsets($groupname);
 				foreach ($fieldSets as $fsname => $fieldSet) :
 					if (isset($fieldSet->description) && trim($fieldSet->description)) :
-						echo '<div class="fc-mssg fc-info">'.\Joomla\CMS\Language\Text::_($fieldSet->description).'</div>';
+						echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
 					endif;
 					?>
 					<fieldset class="panelform">
@@ -573,11 +573,11 @@ $this->document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flex
 		</div>
 
 		<div class="tabbertab" id="tabset_layout_edit_files_tab" data-icon-class="icon-signup" >
-			<h3 class="tabberheading"> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_EDIT_LAYOUT_FILES' ); ?></h3>
+			<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_EDIT_LAYOUT_FILES' ); ?></h3>
 			<div class="container-fluid row">
 			<div id="layout-filelist-container" class="span3 col-3" style="">
 				<span class="fcsep_level0" style="margin:0 0 12px 0; background-color:#333; ">
-					<span class="badge"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_LAYOUT_FILES' ); ?></span>
+					<span class="badge"><?php echo JText::_( 'FLEXI_LAYOUT_FILES' ); ?></span>
 				</span>
 
 				<?php
@@ -688,19 +688,19 @@ $this->document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flex
 
 			<div id="layout-fileeditor-container" class="span9 col-9" style="">
 				<span class="fcsep_level0" style="margin:0 0 12px 0; background-color:#333; ">
-					<span id="layout_edit_name_container" class="label text-white bg-info label-info"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_NO_FILE_LOADED' ); ?></span>
+					<span id="layout_edit_name_container" class="label text-white bg-info label-info"><?php echo JText::_( 'FLEXI_NO_FILE_LOADED' ); ?></span>
 				</span>
 				<div class="fcclear"></div>
 				<div id="ajax-system-message-container"></div>
 				<div class="fcclear"></div>
 
 				<div class="fc-note fc-mssg" id="edit-css-files-warning" style="display: none;">
-					<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_MODIFY_LESS_FILES_INSTEAD_OF_CSS' ); ?>
+					<?php echo JText::_( 'FLEXI_MODIFY_LESS_FILES_INSTEAD_OF_CSS' ); ?>
 				</div>
 
 				<?php
 				if ($use_editor) {
-					$editor = \Joomla\CMS\Editor\Editor::getInstance('codemirror');
+					$editor = JEditor::getInstance('codemirror');
 					$editor_plg_params = array('mode'=>'php');  // Override parameters of the editor plugin, ignored by most editors !!
 				}
 
@@ -716,7 +716,7 @@ $this->document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flex
 
 				<br/>
 
-				<?php echo str_replace('<input', '<input form="layout_file_editor_form"', \Joomla\CMS\HTML\HTMLHelper::_( 'form.token' )); ?>
+				<?php echo str_replace('<input', '<input form="layout_file_editor_form"', JHtml::_( 'form.token' )); ?>
 				<input type="hidden" name="load_mode" id="editor__load_mode" form="layout_file_editor_form"/>
 				<input type="hidden" name="layout_name" id="editor__layout_name" form="layout_file_editor_form"/>
 				<input type="hidden" name="file_subpath" id="editor__file_subpath" form="layout_file_editor_form"/>
@@ -734,7 +734,7 @@ $this->document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flex
 
 
 				<span class="fcsep_level0" id="code_box_header" style="display:none; margin:16px 0 12px 0; background-color:#333; ">
-					<span id="layout_edit_" class="label text-white bg-info label-info"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_INSERT_TEMPLATE_CODE' ); ?></span>
+					<span id="layout_edit_" class="label text-white bg-info label-info"><?php echo JText::_( 'FLEXI_INSERT_TEMPLATE_CODE' ); ?></span>
 				</span>
 				<div class="fcclear"></div>
 
@@ -742,9 +742,9 @@ $this->document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flex
 				<div class="code_box <?php echo $_posname; ?> nowrap_box" style="display:none;" >
 					<div class="btn <?php echo $tip_class; ?>"
 						title="<?php echo flexicontent_html::getToolTip('Insert code', $code_btn_tips[$_posname], 0, 1); ?>"
-						onclick="toggle_code_inputbox(this);"><span class="icon-eye"></span><?php echo \Joomla\CMS\Language\Text::_( $code_btn_lbls[$_posname] ); ?></div>
+						onclick="toggle_code_inputbox(this);"><span class="icon-eye"></span><?php echo JText::_( $code_btn_lbls[$_posname] ); ?></div>
 					<div class="nowrap_box" style="display:none; float:left; clear:both; margin:2px 0px 0px 0px;">
-						<div class="alert alert-warning" style="clear:both; margin:2px 0px 2px 0px;"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_COPY_CODE' ); ?></div>
+						<div class="alert alert-warning" style="clear:both; margin:2px 0px 2px 0px;"><?php echo JText::_( 'FLEXI_COPY_CODE' ); ?></div>
 						<div class="alert alert-info" style="clear:both; margin:2px 0px 2px 0px;">
 							<?php echo $code_btn_tips[$_posname]; ?>
 						</div>
@@ -769,7 +769,7 @@ $this->document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flex
 	<input type="hidden" name="type" value="<?php echo $this->type; ?>" />
 	<input type="hidden" name="folder" value="<?php echo $this->folder; ?>" />
 	<input type="hidden" name="task" value="" />
-	<?php echo \Joomla\CMS\HTML\HTMLHelper::_( 'form.token' ); ?>
+	<?php echo JHtml::_( 'form.token' ); ?>
 </form>
 
 <form id="layout_file_editor_form" name="layout_file_editor_form" action="index.php?option=com_flexicontent&task=templates.loadlayoutfile&format=raw" method="POST"></form>

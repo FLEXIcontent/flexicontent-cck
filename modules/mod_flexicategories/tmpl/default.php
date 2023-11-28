@@ -10,5 +10,5 @@
 defined('_JEXEC') or die;
 ?>
 <ul class="categories-module<?php echo $moduleclass_sfx; ?>">
-<?php require \Joomla\CMS\Helper\ModuleHelper::getLayoutPath('mod_flexicategories', $params->get('layout', 'default') . '_items'); ?>
+<?php require JModuleHelper::getLayoutPath('mod_flexicategories', $params->get('layout', 'default') . '_items'); ?>
 </ul>

@@ -57,8 +57,8 @@ class _FlexicontentSiteRouter
 			unset($query['start']);
 		}
 
-		$app = \Joomla\CMS\Factory::getApplication();
-		$params = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+		$app = JFactory::getApplication();
+		$params = JComponentHelper::getParams('com_flexicontent');
 
 		$add_item_sef_segment = (int) $params->get('add_item_sef_segment', 1);
 		$remove_ids = (int) $params->get('sef_ids', 0);
@@ -116,7 +116,7 @@ class _FlexicontentSiteRouter
 			{
 				foreach($query as $index => $value)
 				{
-					// Do not unset option, Itemid and format variables, as these are needed / handled by \Joomla\CMS\Router\Route
+					// Do not unset option, Itemid and format variables, as these are needed / handled by JRoute
 					if ($index === 'option' || $index === 'Itemid' || $index === 'format')
 					{
 						continue;
@@ -593,13 +593,13 @@ class _FlexicontentSiteRouter
 		$vars = array();
 		$_tbl = null;
 
-		$params = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+		$params = JComponentHelper::getParams('com_flexicontent');
 
 		$add_item_sef_segment = (int) $params->get('add_item_sef_segment', 1);
 		$remove_ids = (int) $params->get('sef_ids', 0);
 
 		// Get the active menu item
-		$menu = \Joomla\CMS\Factory::getApplication()->getMenu('site', array())->getActive();
+		$menu = JFactory::getApplication()->getMenu('site', array())->getActive();
 
 		// Count route segments
 		$count = count($segments);
@@ -1007,10 +1007,10 @@ class _FlexicontentSiteRouter
 						if (!$record_id)
 						{
 							// Make sure our language file has been loaded
-							\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', true);
-							\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_SITE, null, true);
+							JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', true);
+							JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, null, true);
 
-							throw new Exception(\Joomla\CMS\Language\Text::sprintf('FLEXI_REQUESTED_CONTENT_OR_VIEW_NOT_FOUND', $explicit_view), 404);
+							throw new Exception(JText::sprintf('FLEXI_REQUESTED_CONTENT_OR_VIEW_NOT_FOUND', $explicit_view), 404);
 						}
 
 						$segments[$i] = $record_id . ':' . str_replace(':', '-', $segments[$i]);
@@ -1055,9 +1055,9 @@ class _FlexicontentSiteRouter
 		$tbl = '#__categories', $alias_col = 'alias'
 	)
 	{
-		$language = !$language /*&& !$parent_id*/ ? \Joomla\CMS\Factory::getLanguage()->getTag() : $language;
+		$language = !$language /*&& !$parent_id*/ ? JFactory::getLanguage()->getTag() : $language;
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 		$query = $db->getQuery(true)
 			->select('i.id')
 			->from($db->QuoteName($tbl) . ' AS i')
@@ -1152,10 +1152,10 @@ class _FlexicontentSiteRouter
 		if (count($records) > 1)
 		{
 			// Make sure our language file has been loaded
-			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', true);
-			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_SITE, null, true);
+			JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', true);
+			JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, null, true);
 
-			throw new Exception(\Joomla\CMS\Language\Text::sprintf('FLEXI_DUPLICATE_ALIAS_FAILED_TO_FIND_UNIQUE_PAGE', ($tbl === '#__categories' ? 'category' : 'item'), $alias), 404);
+			throw new Exception(JText::sprintf('FLEXI_DUPLICATE_ALIAS_FAILED_TO_FIND_UNIQUE_PAGE', ($tbl === '#__categories' ? 'category' : 'item'), $alias), 404);
 		}
 
 		return 0;
@@ -1179,7 +1179,7 @@ class _FlexicontentSiteRouter
 			return null;
 		}
 
-		$params = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+		$params = JComponentHelper::getParams('com_flexicontent');
 
 		$add_item_sef_segment = (int) $params->get('add_item_sef_segment', 1);
 		$remove_ids = (int) $params->get('sef_ids', 0);
@@ -1276,7 +1276,7 @@ class _FlexicontentSiteRouter
 		// If current category id not given then use item's main category
 		if (!isset($globalcats[$cid]))
 		{
-			$db = \Joomla\CMS\Factory::getDbo();
+			$db = JFactory::getDbo();
 
 			$query = $db->getQuery(true)
 				->select('i.catid')
@@ -1316,7 +1316,7 @@ class _FlexicontentSiteRouter
 
 		if ($add_item_sef_segment === null)
 		{
-			$add_item_sef_segment = (int) \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('add_item_sef_segment', 1);
+			$add_item_sef_segment = (int) JComponentHelper::getParams('com_flexicontent')->get('add_item_sef_segment', 1);
 		}
 
 		/**
@@ -1375,10 +1375,10 @@ class _FlexicontentSiteRouter
 			if (!$record_id)
 			{
 				// Make sure our language file has been loaded
-				\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', true);
-				\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_SITE, null, true);
+				JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', true);
+				JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, null, true);
 
-				throw new Exception(\Joomla\CMS\Language\Text::sprintf('FLEXI_REQUESTED_CONTENT_OR_VIEW_NOT_FOUND', $expected_view), 404);
+				throw new Exception(JText::sprintf('FLEXI_REQUESTED_CONTENT_OR_VIEW_NOT_FOUND', $expected_view), 404);
 			}
 
 			$segments[$i] = $record_id . ':' . str_replace(':', '-', $segments[$i]);

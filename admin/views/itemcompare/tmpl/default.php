@@ -38,7 +38,7 @@ table#itemcompare s{
 			'&version=' . $this->version .
 			'&tmpl=component&codemode=' . ($this->codemode ? 0 : 1) .
 		'">
-			' . \Joomla\CMS\Language\Text::_('FLEXI_CHANGE_TO') . ' ' . \Joomla\CMS\Language\Text::_($this->codemode ? 'FLEXI_VERSION_VIEW_MODE' : 'FLEXI_VERSION_CODE_MODE') . '
+			' . JText::_('FLEXI_CHANGE_TO') . ' ' . JText::_($this->codemode ? 'FLEXI_VERSION_VIEW_MODE' : 'FLEXI_VERSION_CODE_MODE') . '
 		</a>';
 		?>
 	</div>
@@ -46,19 +46,19 @@ table#itemcompare s{
 	<table id="itemcompare" class="table table-striped table-condensed" style="width: 100%;">
 		<tr>
 			<th style="align: right; width: 6%;">
-				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_FIELD' ); ?>
+				<?php echo JText::_( 'FLEXI_FIELD' ); ?>
 			</th>
 			<th style="align: left;">
-				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_VERSION_NR' ) . $this->version; ?>
+				<?php echo JText::_( 'FLEXI_VERSION_NR' ) . $this->version; ?>
 			</th>
 			<th style="align: left;">
-				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_CURRENT_VERSION' ); ?>
+				<?php echo JText::_( 'FLEXI_CURRENT_VERSION' ); ?>
 			</th>
 			<th style="align: left;">
 			</th>
 		</tr>
 		<?php
-		$novalue = '<span class="novalue">' . \Joomla\CMS\Language\Text::_('FLEXI_NO_VALUE') . '</span>';
+		$novalue = '<span class="novalue">' . JText::_('FLEXI_NO_VALUE') . '</span>';
 		$cnt = 0;
 		//echo count($this->fsets[$this->version]); exit;
 		foreach ($this->fsets[$this->version] as $fn => $field)
@@ -98,7 +98,7 @@ table#itemcompare s{
 		<tr>
 			<td class="key" style="text-align:right; vertical-align:top;">
 				<label for="<?php echo $field->name; ?>" class="label <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip($field->label, $field->description, 0); ?>">
-					<?php echo \Joomla\CMS\Language\Text::_($field->label); ?>
+					<?php echo JText::_($field->label); ?>
 				</label>
 			</td>
 			<td valign="top">

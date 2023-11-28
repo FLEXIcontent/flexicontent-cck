@@ -22,16 +22,16 @@ class modFlexicontentHelper
 		global $modfc_jprof, $mod_fc_run_times;
 
 		$forced_itemid = $params->get('forced_itemid');
-		$db   = \Joomla\CMS\Factory::getDbo();
-		$user = \Joomla\CMS\Factory::getUser();
-		$app  = \Joomla\CMS\Factory::getApplication();
+		$db   = JFactory::getDbo();
+		$user = JFactory::getUser();
+		$app  = JFactory::getApplication();
 
 		$jinput  = $app->input;
 		$option  = $jinput->get('option', '', 'cmd');
 		$view    = $jinput->get('view', '', 'cmd');
 
 		// Get IDs of user's access view levels
-		$aid_arr = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
+		$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 
 		// get module ordering parameters
 		$ordering		= $params->get('ordering', array());
@@ -96,7 +96,7 @@ class modFlexicontentHelper
 			$db->setQuery($query);
 			$mod_image_dbdata = $db->loadObject();
 			$mod_image_name = $mod_image_dbdata->name;
-			//$img_fieldparams = new \Joomla\Registry\Registry($mod_image_dbdata->attribs);
+			//$img_fieldparams = new JRegistry($mod_image_dbdata->attribs);
 		}
 		if ($mod_default_img_show) {
 			$src = $mod_default_img_path;
@@ -112,8 +112,8 @@ class modFlexicontentHelper
 			$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
 			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 
-			$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  \Joomla\CMS\Uri\Uri::base(true).'/' : '';
-			$thumb_default = \Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+			$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JUri::base(true).'/' : '';
+			$thumb_default = JUri::root(true) . '/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 
 			// Default image standard
 			$h		= '&amp;h=' . $mod_height_feat;
@@ -126,8 +126,8 @@ class modFlexicontentHelper
 			$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
 			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 
-			$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  \Joomla\CMS\Uri\Uri::base(true).'/' : '';
-			$thumb_default_feat = \Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+			$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JUri::base(true).'/' : '';
+			$thumb_default_feat = JUri::root(true) . '/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 		}
 
 		// Retrieve custom displayed field data (including their parameters and access):  hits/voting/etc
@@ -144,12 +144,12 @@ class modFlexicontentHelper
 
 			if ($display_hits || $display_hits_feat) {
 				$hitsfield = $disp_fields_data['hits'];
-				$hitsfield->parameters = new \Joomla\Registry\Registry($hitsfield->attribs);
+				$hitsfield->parameters = new JRegistry($hitsfield->attribs);
 				$has_access_hits = in_array($hitsfield->access, $aid_arr);
 			}
 			if ($display_voting || $display_voting_feat) {
 				$votingfield = $disp_fields_data['voting'];
-				$votingfield->parameters = new \Joomla\Registry\Registry($votingfield->attribs);
+				$votingfield->parameters = new JRegistry($votingfield->attribs);
 				$has_access_voting = in_array($votingfield->access, $aid_arr);
 			}
 		}
@@ -229,7 +229,7 @@ class modFlexicontentHelper
 
 			// 0. Add ONLY skipfields to the list of fields to be rendered
 			$fields_list = implode(',', $skiponempty_fields);
-			//$skip_params = new \Joomla\Registry\Registry();
+			//$skip_params = new JRegistry();
 			//$skip_params->set('fields',$fields_list);
 
 			$filtered_rows_arr = array();
@@ -350,15 +350,15 @@ class modFlexicontentHelper
 		if (($display_hits_feat || $display_hits) && $has_access_hits)
 		{
 			$hits_icon = FLEXI_J16GE ?
-				\Joomla\CMS\HTML\HTMLHelper::image('components/com_flexicontent/assets/images/'.'user.png', \Joomla\CMS\Language\Text::_( 'FLEXI_HITS_L' )) :
-				\Joomla\CMS\HTML\HTMLHelper::_('image.site', 'user.png', 'components/com_flexicontent/assets/images/', NULL, NULL, \Joomla\CMS\Language\Text::_( 'FLEXI_HITS_L' ));
+				JHtml::image('components/com_flexicontent/assets/images/'.'user.png', JText::_( 'FLEXI_HITS_L' )) :
+				JHtml::_('image.site', 'user.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_HITS_L' ));
 		}
 
 		if ($display_comments_feat || $display_comments)
 		{
 			$comments_icon = FLEXI_J16GE ?
-				\Joomla\CMS\HTML\HTMLHelper::image('components/com_flexicontent/assets/images/'.'comments.png', \Joomla\CMS\Language\Text::_( 'FLEXI_COMMENTS_L' )) :
-				\Joomla\CMS\HTML\HTMLHelper::_('image.site', 'comments.png', 'components/com_flexicontent/assets/images/', NULL, NULL, \Joomla\CMS\Language\Text::_( 'FLEXI_COMMENTS_L' ));
+				JHtml::image('components/com_flexicontent/assets/images/'.'comments.png', JText::_( 'FLEXI_COMMENTS_L' )) :
+				JHtml::_('image.site', 'comments.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_COMMENTS_L' ));
 		}
 
 		// Needed if forcing language
@@ -448,7 +448,7 @@ class modFlexicontentHelper
 
 								if ($mod_use_image_feat==1)
 								{
-									$src = str_replace(\Joomla\CMS\Uri\Uri::root(), '', ($img_field->thumbs_src['large'][0] ?? ''));
+									$src = str_replace(JUri::root(), '', ($img_field->thumbs_src['large'][0] ?? ''));
 								}
 								else
 								{
@@ -472,7 +472,7 @@ class modFlexicontentHelper
 
 									if ($mod_use_image_feat==1)
 									{
-										$src = str_replace(\Joomla\CMS\Uri\Uri::root(), '', ($img_field2->thumbs_src['large'][0] ?? '') );
+										$src = str_replace(JUri::root(), '', ($img_field2->thumbs_src['large'][0] ?? '') );
 									}
 									else
 									{
@@ -502,8 +502,8 @@ class modFlexicontentHelper
 							$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
 							$conf	= $w . $h . $aoe . $q . $zc . $f;
 
-    					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  \Joomla\CMS\Uri\Uri::base(true).'/' : '';
-    					$thumb = \Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+    					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JUri::base(true).'/' : '';
+    					$thumb = JUri::root(true) . '/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 		    		}
 					}
 					$lists[$ord]['featured'][$i] = new stdClass();
@@ -514,22 +514,22 @@ class modFlexicontentHelper
 
 					//date
 					if ($display_date_feat == 1) {
-						$dateformat = \Joomla\CMS\Language\Text::_($params->get('date_format_feat', 'DATE_FORMAT_LC3'));
-						if($dateformat == \Joomla\CMS\Language\Text::_('custom'))
-							$dateformat = $params->get('custom_date_format_feat', \Joomla\CMS\Language\Text::_('DATE_FORMAT_LC3'));
+						$dateformat = JText::_($params->get('date_format_feat', 'DATE_FORMAT_LC3'));
+						if($dateformat == JText::_('custom'))
+							$dateformat = $params->get('custom_date_format_feat', JText::_('DATE_FORMAT_LC3'));
 
 						$date_fields_feat = $params->get('date_fields_feat', array('created'));
 						$date_fields_feat = !is_array($date_fields_feat) ? array($date_fields_feat) : $date_fields_feat;
 
 	 			  	$lists[$ord]['featured'][$i]->date_created = "";
 						if (in_array('created',$date_fields_feat)) { // Created
-							$lists[$ord]['featured'][$i]->date_created .= $params->get('date_label_feat',1) ? '<span class="date_label_feat">'.\Joomla\CMS\Language\Text::_('FLEXI_DATE_CREATED').'</span> ' : '';
-							$lists[$ord]['featured'][$i]->date_created .= '<span class="date_value_feat">' . \Joomla\CMS\HTML\HTMLHelper::_('date', $row->created, $dateformat) . '</span>';
+							$lists[$ord]['featured'][$i]->date_created .= $params->get('date_label_feat',1) ? '<span class="date_label_feat">'.JText::_('FLEXI_DATE_CREATED').'</span> ' : '';
+							$lists[$ord]['featured'][$i]->date_created .= '<span class="date_value_feat">' . JHtml::_('date', $row->created, $dateformat) . '</span>';
 						}
 	 			  	$lists[$ord]['featured'][$i]->date_modified = "";
 						if (in_array('modified',$date_fields_feat)) { // Modified
-							$lists[$ord]['featured'][$i]->date_modified .= $params->get('date_label_feat',1) ? '<span class="date_label_feat">'.\Joomla\CMS\Language\Text::_('FLEXI_DATE_MODIFIED').'</span> ' : '';
-							$modified_date = ($row->modified != $db->getNullDate()) ? \Joomla\CMS\HTML\HTMLHelper::_('date', $row->modified, $dateformat) : \Joomla\CMS\Language\Text::_( 'FLEXI_DATE_NEVER' );
+							$lists[$ord]['featured'][$i]->date_modified .= $params->get('date_label_feat',1) ? '<span class="date_label_feat">'.JText::_('FLEXI_DATE_MODIFIED').'</span> ' : '';
+							$modified_date = ($row->modified != $db->getNullDate()) ? JHtml::_('date', $row->modified, $dateformat) : JText::_( 'FLEXI_DATE_NEVER' );
 							$lists[$ord]['featured'][$i]->date_modified .= '<span class="date_value_feat">' . $modified_date . '</span>';
 						}
 					}
@@ -543,7 +543,7 @@ class modFlexicontentHelper
 					if ($display_hits_feat && $has_access_hits)
 					{
 						FlexicontentFields::loadFieldConfig($hitsfield, $row);
-						$lists[$ord]['featured'][$i]->hits_rendered .= $params->get('hits_label_feat') ? '<span class="hits_label_feat">'.\Joomla\CMS\Language\Text::_($hitsfield->label).'</span> ' : '';
+						$lists[$ord]['featured'][$i]->hits_rendered .= $params->get('hits_label_feat') ? '<span class="hits_label_feat">'.JText::_($hitsfield->label).'</span> ' : '';
 						$lists[$ord]['featured'][$i]->hits_rendered .= $hits_icon;
 						$lists[$ord]['featured'][$i]->hits_rendered .= ' ('.$row->hits.(!$params->get('hits_label_feat') ? ' '.JTEXT::_('FLEXI_HITS_L') : '').')';
 					}
@@ -555,14 +555,14 @@ class modFlexicontentHelper
 						FlexicontentFields::loadFieldConfig($votingfield, $row);
 						$votingfield->item_id    = $row->id;
 						$votingfield->item_title = $row->title;
-						$lists[$ord]['featured'][$i]->voting .= $params->get('voting_label_feat') ? '<span class="voting_label_feat">'.\Joomla\CMS\Language\Text::_($votingfield->label).'</span> ' : '';
+						$lists[$ord]['featured'][$i]->voting .= $params->get('voting_label_feat') ? '<span class="voting_label_feat">'.JText::_($votingfield->label).'</span> ' : '';
 						$lists[$ord]['featured'][$i]->voting .= '<div class="voting_value_feat">' . flexicontent_html::ItemVoteDisplay($votingfield, $row->id, $row->rating_sum, $row->rating_count, 'main', '', $params->get('vote_stars_feat',1), $params->get('allow_vote_feat',0), $params->get('vote_counter_feat',1), !$params->get('voting_label_feat') ) .'</div>';
 					}
 
 					if ($display_comments_feat)
 					{
 						$lists[$ord]['featured'][$i]->comments = $row->comments_total;
-						$lists[$ord]['featured'][$i]->comments_rendered = $params->get('comments_label_feat') ? '<span class="comments_label_feat">'.\Joomla\CMS\Language\Text::_('FLEXI_COMMENTS').'</span> ' : '';
+						$lists[$ord]['featured'][$i]->comments_rendered = $params->get('comments_label_feat') ? '<span class="comments_label_feat">'.JText::_('FLEXI_COMMENTS').'</span> ' : '';
 						$lists[$ord]['featured'][$i]->comments_rendered .= $comments_icon;
 						$lists[$ord]['featured'][$i]->comments_rendered .= ' ('.$row->comments_total.(!$params->get('comments_label_feat') ? ' '.JTEXT::_('FLEXI_COMMENTS_L') : '').')';
 					}
@@ -575,7 +575,7 @@ class modFlexicontentHelper
 						FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug, $forced_itemid, $row)
 						. ($sef_lang ? '&lang=' . $sef_lang : '');
 
-					$lists[$ord]['featured'][$i]->link	= \Joomla\CMS\Router\Route::_($non_sef_link);
+					$lists[$ord]['featured'][$i]->link	= JRoute::_($non_sef_link);
 					$lists[$ord]['featured'][$i]->title	= StringHelper::strlen($row->title) > $cuttitle_feat  ?  StringHelper::substr($row->title, 0, $cuttitle_feat) . '...'  :  $row->title;
 					$lists[$ord]['featured'][$i]->alias	= $row->alias;
 					$lists[$ord]['featured'][$i]->fulltitle = $row->title;
@@ -639,7 +639,7 @@ class modFlexicontentHelper
 
 								if ($mod_use_image==1)
 								{
-									$src = str_replace(\Joomla\CMS\Uri\Uri::root(), '', ($img_field->thumbs_src['large'][0] ?? '') );
+									$src = str_replace(JUri::root(), '', ($img_field->thumbs_src['large'][0] ?? '') );
 								}
 								else
 								{
@@ -663,7 +663,7 @@ class modFlexicontentHelper
 
 									if ($mod_use_image==1)
 									{
-										$src = str_replace(\Joomla\CMS\Uri\Uri::root(), '', ($img_field2->thumbs_src['large'][0] ?? '') );
+										$src = str_replace(JUri::root(), '', ($img_field2->thumbs_src['large'][0] ?? '') );
 									}
 									else
 									{
@@ -693,8 +693,8 @@ class modFlexicontentHelper
 							$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
 							$conf	= $w . $h . $aoe . $q . $zc . $f;
 
-    					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  \Joomla\CMS\Uri\Uri::base(true).'/' : '';
-    					$thumb = \Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+    					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JUri::base(true).'/' : '';
+    					$thumb = JUri::root(true) . '/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 		    		}
 					}
 
@@ -708,22 +708,22 @@ class modFlexicontentHelper
 
 					//date
 					if ($display_date == 1) {
-						$dateformat = \Joomla\CMS\Language\Text::_($params->get('date_format', 'DATE_FORMAT_LC3'));
-						if($dateformat == \Joomla\CMS\Language\Text::_('custom'))
-							$dateformat = $params->get('custom_date_format', \Joomla\CMS\Language\Text::_('DATE_FORMAT_LC3'));
+						$dateformat = JText::_($params->get('date_format', 'DATE_FORMAT_LC3'));
+						if($dateformat == JText::_('custom'))
+							$dateformat = $params->get('custom_date_format', JText::_('DATE_FORMAT_LC3'));
 
 						$date_fields = $params->get('date_fields', array('created'));
 						$date_fields = !is_array($date_fields) ? array($date_fields) : $date_fields;
 
 	 			  	$lists[$ord]['standard'][$i]->date_created = "";
 						if (in_array('created',$date_fields)) { // Created
-							$lists[$ord]['standard'][$i]->date_created .= $params->get('date_label',1) ? '<span class="date_label">'.\Joomla\CMS\Language\Text::_('FLEXI_DATE_CREATED').'</span> ' : '';
-							$lists[$ord]['standard'][$i]->date_created .= '<span class="date_value">' . \Joomla\CMS\HTML\HTMLHelper::_('date', $row->created, $dateformat) . '</span>';
+							$lists[$ord]['standard'][$i]->date_created .= $params->get('date_label',1) ? '<span class="date_label">'.JText::_('FLEXI_DATE_CREATED').'</span> ' : '';
+							$lists[$ord]['standard'][$i]->date_created .= '<span class="date_value">' . JHtml::_('date', $row->created, $dateformat) . '</span>';
 						}
 	 			  	$lists[$ord]['standard'][$i]->date_modified = "";
 						if (in_array('modified',$date_fields)) { // Modified
-							$lists[$ord]['standard'][$i]->date_modified .= $params->get('date_label',1) ? '<span class="date_label">'.\Joomla\CMS\Language\Text::_('FLEXI_DATE_MODIFIED').'</span> ' : '';
-							$modified_date = ($row->modified != $db->getNullDate()) ? \Joomla\CMS\HTML\HTMLHelper::_('date', $row->modified, $dateformat) : \Joomla\CMS\Language\Text::_( 'FLEXI_DATE_NEVER' );
+							$lists[$ord]['standard'][$i]->date_modified .= $params->get('date_label',1) ? '<span class="date_label">'.JText::_('FLEXI_DATE_MODIFIED').'</span> ' : '';
+							$modified_date = ($row->modified != $db->getNullDate()) ? JHtml::_('date', $row->modified, $dateformat) : JText::_( 'FLEXI_DATE_NEVER' );
 							$lists[$ord]['standard'][$i]->date_modified .= '<span class="date_value_feat">' . $modified_date . '</span>';
 						}
 					}
@@ -735,7 +735,7 @@ class modFlexicontentHelper
 					$lists[$ord]['standard'][$i]->hits_rendered = '';
 					if ($display_hits && $has_access_hits) {
 						FlexicontentFields::loadFieldConfig($hitsfield, $row);
-						$lists[$ord]['standard'][$i]->hits_rendered .= $params->get('hits_label') ? '<span class="hits_label">'.\Joomla\CMS\Language\Text::_($hitsfield->label).'</span> ' : '';
+						$lists[$ord]['standard'][$i]->hits_rendered .= $params->get('hits_label') ? '<span class="hits_label">'.JText::_($hitsfield->label).'</span> ' : '';
 						$lists[$ord]['standard'][$i]->hits_rendered .= $hits_icon;
 						$lists[$ord]['standard'][$i]->hits_rendered .= ' ('.$row->hits.(!$params->get('hits_label') ? ' '.JTEXT::_('FLEXI_HITS_L') : '').')';
 					}
@@ -747,14 +747,14 @@ class modFlexicontentHelper
 						FlexicontentFields::loadFieldConfig($votingfield, $row);
 						$votingfield->item_id    = $row->id;
 						$votingfield->item_title = $row->title;
-						$lists[$ord]['standard'][$i]->voting .= $params->get('voting_label') ? '<span class="voting_label">'.\Joomla\CMS\Language\Text::_($votingfield->label).'</span> ' : '';
+						$lists[$ord]['standard'][$i]->voting .= $params->get('voting_label') ? '<span class="voting_label">'.JText::_($votingfield->label).'</span> ' : '';
 						$lists[$ord]['standard'][$i]->voting .= '<div class="voting_value">' . flexicontent_html::ItemVoteDisplay($votingfield, $row->id, $row->rating_sum, $row->rating_count, 'main', '', $params->get('vote_stars',1), $params->get('allow_vote',0), $params->get('vote_counter',1), !$params->get('voting_label')) .'</div>';
 					}
 
 					if ($display_comments)
 					{
 						$lists[$ord]['standard'][$i]->comments = $row->comments_total;
-						$lists[$ord]['standard'][$i]->comments_rendered = $params->get('comments_label') ? '<span class="comments_label">'.\Joomla\CMS\Language\Text::_('FLEXI_COMMENTS').'</span> ' : '';
+						$lists[$ord]['standard'][$i]->comments_rendered = $params->get('comments_label') ? '<span class="comments_label">'.JText::_('FLEXI_COMMENTS').'</span> ' : '';
 						$lists[$ord]['standard'][$i]->comments_rendered .= $comments_icon;
 						$lists[$ord]['standard'][$i]->comments_rendered .= ' ('.$row->comments_total.(!$params->get('comments_label') ? ' '.JTEXT::_('FLEXI_COMMENTS_L') : '').')';
 					}
@@ -767,7 +767,7 @@ class modFlexicontentHelper
 						FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug, $forced_itemid, $row)
 						. ($sef_lang ? '&lang=' . $sef_lang : '');
 
-					$lists[$ord]['standard'][$i]->link	= \Joomla\CMS\Router\Route::_($non_sef_link);
+					$lists[$ord]['standard'][$i]->link	= JRoute::_($non_sef_link);
 					$lists[$ord]['standard'][$i]->title	= StringHelper::strlen($row->title) > $cuttitle  ?  StringHelper::substr($row->title, 0, $cuttitle) . '...'  :  $row->title;
 					$lists[$ord]['standard'][$i]->alias	= $row->alias;
 					$lists[$ord]['standard'][$i]->fulltitle = $row->title;
@@ -832,11 +832,11 @@ class modFlexicontentHelper
 		// For specific cache issues
 		if (empty($globalcats))
 		{
-			\Joomla\CMS\Plugin\PluginHelper::importPlugin('system', 'flexisystem');
+			JPluginHelper::importPlugin('system', 'flexisystem');
 			if (FLEXI_CACHE)
 			{
 				// add the category tree to categories cache
-				$catscache 	= \Joomla\CMS\Factory::getCache('com_flexicontent_cats');
+				$catscache 	= JFactory::getCache('com_flexicontent_cats');
 				$catscache->setCaching(1); 		//force cache
 				$catscache->setLifeTime(84600); //set expiry to one day
 				$globalcats = $catscache->get(
@@ -851,9 +851,9 @@ class modFlexicontentHelper
 		}
 
 		// Initialize variables
-		$db   = \Joomla\CMS\Factory::getDbo();
-		$user = \Joomla\CMS\Factory::getUser();
-		$app  = \Joomla\CMS\Factory::getApplication();
+		$db   = JFactory::getDbo();
+		$user = JFactory::getUser();
+		$app  = JFactory::getApplication();
 
 		$jinput  = $app->input;
 		$option  = $jinput->get('option', '', 'cmd');
@@ -940,17 +940,17 @@ class modFlexicontentHelper
 			$query = 'SELECT attribs, name FROM #__flexicontent_fields WHERE id = '.(int) $datecomp_field;
 			$db->setQuery($query);
 			$date_field_dbdata = $db->loadObject();
-			$date_field_params = new \Joomla\Registry\Registry($date_field_dbdata->attribs);
+			$date_field_params = new JRegistry($date_field_dbdata->attribs);
 			$use_local_time = $date_field_params->get('date_allowtime', 0) && $date_field_params->get('use_editor_tz', 0);
 		}
 
 		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
 		//  thus the items are published globally at the time the author specified in his/her local clock
-		$nowDate  = \Joomla\CMS\Factory::getDate('now')->toSql();
+		$nowDate  = JFactory::getDate('now')->toSql();
 		$nullDate	= $db->getNullDate();
 		if ($use_local_time)
 		{
-			$nowDate = \Joomla\CMS\HTML\HTMLHelper::_('date', $nowDate, 'Y-m-d H:i:s', $app->getCfg('offset') );
+			$nowDate = JHtml::_('date', $nowDate, 'Y-m-d H:i:s', $app->getCfg('offset') );
 		}
 
 		// Server date
@@ -1014,7 +1014,7 @@ class modFlexicontentHelper
 		$joinaccess = '';
 		if (!$show_noauth)
 		{
-			$aid_arr = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
 			$where .= ' AND ty.access IN (0,'.$aid_list.')';
 			$where .= ' AND mc.access IN (0,'.$aid_list.')';
@@ -1310,7 +1310,7 @@ class modFlexicontentHelper
 				{
 					echo '
 						<div class="alert alert-notice">
-							' . \Joomla\CMS\Language\Text::_("MOD_FLEXI_NO_CONTENT_CURRENTVIEW_ACCESS_LEVEL") . '
+							' . JText::_("MOD_FLEXI_NO_CONTENT_CURRENTVIEW_ACCESS_LEVEL") . '
 						</div>';
 				}
 				return;
@@ -1323,7 +1323,7 @@ class modFlexicontentHelper
 				{
 					echo '
 						<div class="alert alert-warning">
-						' . \Joomla\CMS\Language\Text::_("MOD_FLEXI_WARNING_MESSAGE_CAT_SCOPE") . '
+						' . JText::_("MOD_FLEXI_WARNING_MESSAGE_CAT_SCOPE") . '
 						</div>';
 					return;
 				}
@@ -1368,7 +1368,7 @@ class modFlexicontentHelper
 		else
 		{
 			if (($behaviour_cat == 2 || $behaviour_cat == 4) && $apply_config_per_category) {
-				echo  \Joomla\CMS\Language\Text::_("MOD_FLEXI_WARNING_MESSAGE_CAT_SCOPE");
+				echo  JText::_("MOD_FLEXI_WARNING_MESSAGE_CAT_SCOPE");
 				return;
 			}
 
@@ -1421,7 +1421,7 @@ class modFlexicontentHelper
 				{
 					echo '
 						<div class="alert alert-notice">
-							' . \Joomla\CMS\Language\Text::_("MOD_FLEXI_NO_CONTENT_CURRENTVIEW_ACCESS_LEVEL") . '
+							' . JText::_("MOD_FLEXI_NO_CONTENT_CURRENTVIEW_ACCESS_LEVEL") . '
 						</div>';
 				}
 				return;
@@ -1472,7 +1472,7 @@ class modFlexicontentHelper
 			{
 				echo '
 				<div class="alert alert-warning">
-				' . \Joomla\CMS\Language\Text::_("MOD_FLEXI_WARNING_TYPE_SCOPE") . '
+				' . JText::_("MOD_FLEXI_WARNING_TYPE_SCOPE") . '
 				</div>';
 				return;
 			}
@@ -1530,7 +1530,7 @@ class modFlexicontentHelper
 			{
 				echo '
 					<div class="alert alert-warning">
-						' . \Joomla\CMS\Language\Text::_("MOD_FLEXI_WARNING_AUTHOR_SCOPE") . '
+						' . JText::_("MOD_FLEXI_WARNING_AUTHOR_SCOPE") . '
 					</div>';
 				return;
 			}
@@ -1589,7 +1589,7 @@ class modFlexicontentHelper
 			{
 				echo '
 					<div class="alert alert-warning">
-						' . \Joomla\CMS\Language\Text::_("MOD_FLEXI_WARNING_ITEMS_SCOPE") . '
+						' . JText::_("MOD_FLEXI_WARNING_ITEMS_SCOPE") . '
 					</div>';
 				return;
 			}
@@ -1692,7 +1692,7 @@ class modFlexicontentHelper
 			{
 				echo '
 					<div class="alert alert-warning">
-					' . \Joomla\CMS\Language\Text::_("MOD_FLEXI_WARNING_TAGS_SCOPE") . '
+					' . JText::_("MOD_FLEXI_WARNING_TAGS_SCOPE") . '
 					</div>';
 				return;
 			}
@@ -1745,7 +1745,7 @@ class modFlexicontentHelper
 			{
 				echo '
 					<div class="alert alert-warning">
-					' . \Joomla\CMS\Language\Text::_("MOD_FLEXI_WARNING_DATES_SCOPE") . '
+					' . JText::_("MOD_FLEXI_WARNING_DATES_SCOPE") . '
 					</div>';
 				return;
 			}
@@ -1761,7 +1761,7 @@ class modFlexicontentHelper
 			{
 				echo '
 					<div class="alert alert-warning">
-						' . \Joomla\CMS\Language\Text::_("MOD_FLEXI_WARNING_DATES_SCOPE") . '
+						' . JText::_("MOD_FLEXI_WARNING_DATES_SCOPE") . '
 					</div>';
 				return;
 			}
@@ -1796,7 +1796,7 @@ class modFlexicontentHelper
 						);
 						if (empty($edate[1]))
 						{
-							echo \Joomla\CMS\Language\Text::_("MOD_FLEXI_WARNING_DATES_SCOPE");
+							echo JText::_("MOD_FLEXI_WARNING_DATES_SCOPE");
 							return;
 						}
 						else
@@ -1815,7 +1815,7 @@ class modFlexicontentHelper
 						);
 						if (empty($bdate[1]))
 						{
-							echo \Joomla\CMS\Language\Text::_("MOD_FLEXI_WARNING_DATES_SCOPE_BEGIN");
+							echo JText::_("MOD_FLEXI_WARNING_DATES_SCOPE_BEGIN");
 							return;
 						}
 						else
@@ -1970,7 +1970,7 @@ class modFlexicontentHelper
 				{
 					echo '
 						<div class="alert alert-warning">
-							' . \Joomla\CMS\Language\Text::_("MOD_FLEXI_WARNING_DATES_SCOPE_INI") . '
+							' . JText::_("MOD_FLEXI_WARNING_DATES_SCOPE_INI") . '
 						</div>';
 					return;
 				}
@@ -2435,8 +2435,8 @@ class modFlexicontentHelper
 	{
 		if (!$params->get('apply_config_per_category', 0)) return false;
 
-		$db   = \Joomla\CMS\Factory::getDbo();
-		$app  = \Joomla\CMS\Factory::getApplication();
+		$db   = JFactory::getDbo();
+		$app  = JFactory::getApplication();
 
 		$jinput  = $app->input;
 		$option  = $jinput->get('option', '', 'cmd');
@@ -2544,7 +2544,7 @@ class modFlexicontentHelper
 		$joomla_image_path = $app->getCfg('image_path',  FLEXI_J16GE ? '' : 'images'.DS.'stories' );
 		foreach ($catdata_arr as $i => $catdata)
 		{
-			$catdata->params = new \Joomla\Registry\Registry($catdata->params);
+			$catdata->params = new JRegistry($catdata->params);
 
 			// Category Title
 			$catdata->title = flexicontent_html::striptagsandcut($catdata->title, $catconf->cuttitle);
@@ -2559,9 +2559,9 @@ class modFlexicontentHelper
 				$catdata->introtext = & $catdata->description;
 				$catdata->fulltext = "";
 
-				if ($catconf->image_source && $catdata->image && \Joomla\CMS\Filesystem\File::exists(JPATH_SITE .DS. $joomla_image_path .DS. $catdata->image))
+				if ($catconf->image_source && $catdata->image && JFile::exists(JPATH_SITE .DS. $joomla_image_path .DS. $catdata->image))
 				{
-					$src = \Joomla\CMS\Uri\Uri::base(true)."/".$joomla_image_path."/".$catdata->image;
+					$src = JUri::base(true)."/".$joomla_image_path."/".$catdata->image;
 
 					$h		= '&amp;h=' . $catconf->image_height;
 					$w		= '&amp;w=' . $catconf->image_width;
@@ -2572,7 +2572,7 @@ class modFlexicontentHelper
 					$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
 					$conf	= $w . $h . $aoe . $q . $zc . $f;
 
-					$catimage = \Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
+					$catimage = JUri::root(true) . '/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
 				}
 				elseif ($catconf->image_source!=1 && $src = flexicontent_html::extractimagesrc($catdata))
 				{
@@ -2585,8 +2585,8 @@ class modFlexicontentHelper
 					$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
 					$conf	= $w . $h . $aoe . $q . $zc . $f;
 
-					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  \Joomla\CMS\Uri\Uri::base(true).'/' : '';
-					$catimage = \Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JUri::base(true).'/' : '';
+					$catimage = JUri::root(true) . '/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 				}
 
 				$catdata->image = $catimage;
@@ -2606,7 +2606,7 @@ class modFlexicontentHelper
 			// Category Links (title and image links)
 			if ($catconf->link_title || $catconf->link_image || $catconf->readmore)
 			{
-				$catlink = \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getCategoryRoute($catdata->categoryslug));
+				$catlink = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($catdata->categoryslug));
 				$catdata->titlelink = $catlink;
 				$catdata->imagelink = $catlink;
 			}
@@ -2624,7 +2624,7 @@ class modFlexicontentHelper
 	public static function verifyParams($params)
 	{
 		// Calculate menu itemid for item links
-		$app    = \Joomla\CMS\Factory::getApplication();
+		$app    = JFactory::getApplication();
 		$jinput = $app->input;
 		$menus  = $app->getMenu();
 
@@ -2664,7 +2664,7 @@ class modFlexicontentHelper
 	 */
 	public static function getComments($params, &$items)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 
 		$list_comments = $params->get('list_comments');
 		$list_comments_feat = $params->get('list_comments_feat');
@@ -2727,8 +2727,8 @@ class modFlexicontentHelper
 		$location   = '/modules/mod_flexicontent/builder/';
 		$css_file   = 'css/' . $layout_name . '_' . $module->id . '.css';
 
-		\Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
-		\Joomla\CMS\HTML\HTMLHelper::_('fclayoutbuilder.createCss',
+		JHtml::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
+		JHtml::_('fclayoutbuilder.createCss',
 			$module,
 			$params,
 			$config = (object) array(
@@ -2743,8 +2743,8 @@ class modFlexicontentHelper
 		 */
 		flexicontent_html::loadframework('grapesjs_view');
 
-		\Joomla\CMS\Factory::getDocument()->addStyleSheet(
-			\Joomla\CMS\Uri\Uri::base(true) . $location . $css_file,
+		JFactory::getDocument()->addStyleSheet(
+			JUri::base(true) . $location . $css_file,
 			array('version' => $params->get($layout_name . '_hash'))
 		);
 	}

@@ -17,7 +17,7 @@ $submit_msg = $approval_msg = '';
  */
 if ($isnew && $submit_message)
 {
-	$submit_msg = sprintf( $info_box, 'id="fc_submit_msg"', 'note', 'fc-nobgimage', \Joomla\CMS\Language\Text::_($submit_message) );
+	$submit_msg = sprintf( $info_box, 'id="fc_submit_msg"', 'note', 'fc-nobgimage', JText::_($submit_message) );
 }
 
 
@@ -29,7 +29,7 @@ if ($is_autopublished)
 {
 	$approval_msg = $this->params->get('autopublished_message')
 		? $this->params->get('autopublished_message')
-		:  \Joomla\CMS\Language\Text::_( 'FLEXI_CONTENT_WILL_BE_AUTOPUBLISHED' . ($isSite ? '' : '_BE') ) ;
+		:  JText::_( 'FLEXI_CONTENT_WILL_BE_AUTOPUBLISHED' . ($isSite ? '' : '_BE') ) ;
 	$approval_msg = str_replace('_PUBLISH_UP_DAYS_INTERVAL_', $this->params->get('autopublished_up_interval') / (24*60), $approval_msg);
 	$approval_msg = str_replace('_PUBLISH_DOWN_DAYS_INTERVAL_', $this->params->get('autopublished_up_interval') / (24*60), $approval_msg);
 }
@@ -43,15 +43,15 @@ elseif ($approval_warning_inform)
 	{
 		if ($isnew)
 		{
-			$approval_msg = \Joomla\CMS\Language\Text::_( $this->params->get('document_approval_msg' . $CFGsfx, 'FLEXI_REQUIRES_DOCUMENT_APPROVAL') ) ;
+			$approval_msg = JText::_( $this->params->get('document_approval_msg' . $CFGsfx, 'FLEXI_REQUIRES_DOCUMENT_APPROVAL') ) ;
 		}
 		elseif ($use_versioning)
 		{
-			$approval_msg = \Joomla\CMS\Language\Text::_( $this->params->get('version_reviewal_msg' . $CFGsfx, 'FLEXI_REQUIRES_VERSION_REVIEWAL') ) ;
+			$approval_msg = JText::_( $this->params->get('version_reviewal_msg' . $CFGsfx, 'FLEXI_REQUIRES_VERSION_REVIEWAL') ) ;
 		}
 		else
 		{
-			$approval_msg = \Joomla\CMS\Language\Text::_( $this->params->get('changes_applied_immediately_msg' . $CFGsfx, 'FLEXI_CHANGES_APPLIED_IMMEDIATELY') ) ;
+			$approval_msg = JText::_( $this->params->get('changes_applied_immediately_msg' . $CFGsfx, 'FLEXI_CHANGES_APPLIED_IMMEDIATELY') ) ;
 		}
 	}
 
@@ -63,15 +63,15 @@ elseif ($approval_warning_inform)
 	{
 		if ($isnew)
 		{
-			$approval_msg = \Joomla\CMS\Language\Text::_( $this->params->get('mr_document_approval_msg' . $CFGsfx, 'FLEXI_MIGHT_REQUIRE_DOCUMENT_APPROVAL') ) ;
+			$approval_msg = JText::_( $this->params->get('mr_document_approval_msg' . $CFGsfx, 'FLEXI_MIGHT_REQUIRE_DOCUMENT_APPROVAL') ) ;
 		}
 		elseif ($use_versioning)
 		{
-			$approval_msg = \Joomla\CMS\Language\Text::_( $this->params->get('version_reviewal_msg' . $CFGsfx, 'FLEXI_MIGHT_REQUIRE_VERSION_REVIEWAL') ) ;
+			$approval_msg = JText::_( $this->params->get('version_reviewal_msg' . $CFGsfx, 'FLEXI_MIGHT_REQUIRE_VERSION_REVIEWAL') ) ;
 		}
 		else
 		{
-			$approval_msg = \Joomla\CMS\Language\Text::_( $this->params->get('changes_applied_immediately_msg' . $CFGsfx, 'FLEXI_CHANGES_APPLIED_IMMEDIATELY') ) ;
+			$approval_msg = JText::_( $this->params->get('changes_applied_immediately_msg' . $CFGsfx, 'FLEXI_CHANGES_APPLIED_IMMEDIATELY') ) ;
 		}
 	}
 }
