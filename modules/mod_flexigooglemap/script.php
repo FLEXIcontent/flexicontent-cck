@@ -83,11 +83,11 @@ class mod_flexigooglemapInstallerScript
 	function postflight($type, $parent)
 	{
 		/** marker copy **/
-		$pathSourceName = JPath::clean(JPATH_ROOT.'/modules/mod_flexigooglemap/assets/marker');
-		$pathDestName   = JPath::clean(JPATH_ROOT.'/images/mod_flexigooglemap/marker');
+		$pathSourceName = \Joomla\CMS\Filesystem\Path::clean(JPATH_ROOT.'/modules/mod_flexigooglemap/assets/marker');
+		$pathDestName   = \Joomla\CMS\Filesystem\Path::clean(JPATH_ROOT.'/images/mod_flexigooglemap/marker');
 
 		// 1. Check DESTINATION folder
-		if ( !JFolder::exists($pathDestName) && !JFolder::create($pathDestName) )
+		if ( !\Joomla\CMS\Filesystem\Folder::exists($pathDestName) && !\Joomla\CMS\Filesystem\Folder::create($pathDestName) )
 		{
 			echo '<span class="alert alert-warning"> Error, unable to create folder: '. $pathDestName.'</span>';
 		}
@@ -102,11 +102,11 @@ class mod_flexigooglemapInstallerScript
 
 
 		/** cluster copy **/
-		$pathSourceName2 = JPath::clean(JPATH_ROOT.'/modules/mod_flexigooglemap/assets/cluster');
-		$pathDestName2   = JPath::clean(JPATH_ROOT.'/images/mod_flexigooglemap/cluster');
+		$pathSourceName2 = \Joomla\CMS\Filesystem\Path::clean(JPATH_ROOT.'/modules/mod_flexigooglemap/assets/cluster');
+		$pathDestName2   = \Joomla\CMS\Filesystem\Path::clean(JPATH_ROOT.'/images/mod_flexigooglemap/cluster');
 
 		// 1. Check DESTINATION folder
-		if ( !JFolder::exists($pathDestName2) && !JFolder::create($pathDestName2) )
+		if ( !\Joomla\CMS\Filesystem\Folder::exists($pathDestName2) && !\Joomla\CMS\Filesystem\Folder::create($pathDestName2) )
 		{
 			echo '<span class="alert alert-warning"> Error, unable to create folder: '. $pathDestName2.'</span>';
 		}

@@ -124,7 +124,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	 */
 	public function __construct($config = array())
 	{
-		$app    = JFactory::getApplication();
+		$app    = \Joomla\CMS\Factory::getApplication();
 		$jinput = $app->input;
 		$option = $jinput->getCmd('option', '');
 		$view   = $jinput->getCmd('view', '');
@@ -148,8 +148,8 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		 */
 		if ($app->isClient('site'))
 		{
-			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
-			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 		}
 
 
@@ -288,7 +288,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 
 			$filter_order = $this->getState('filter_order');
 			$default_size_message = $filter_order != 'a.size' ? null : '
-				<span class="hasTooltip" title="' . JText::sprintf('FLEXI_PLEASE_REINDEX_FILE_STATISTICS', JText::_('FLEXI_INDEX_FILE_STATISTICS')) . '">
+				<span class="hasTooltip" title="' . \Joomla\CMS\Language\Text::sprintf('FLEXI_PLEASE_REINDEX_FILE_STATISTICS', \Joomla\CMS\Language\Text::_('FLEXI_INDEX_FILE_STATISTICS')) . '">
 					<span class="icon-warning"></span>
 					<span class="icon-loop"></span>
 				</span>';
@@ -330,7 +330,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			// These can be used by the items manager without need to recalculate
 			if ($this->sess_assignments)
 			{
-				$session = JFactory::getSession();
+				$session = \Joomla\CMS\Factory::getSession();
 
 				$fileid_to_itemids = $session->get('fileid_to_itemids', array(),'flexicontent');
 				foreach ($this->_data as $row)
@@ -455,7 +455,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			// Remove old folders
 			if ($days_diff > 2)
 			{
-				JFolder::delete($subpath);
+				\Joomla\CMS\Filesystem\Folder::delete($subpath);
 			}
 
 			$it->next();
@@ -479,10 +479,10 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		$this->_total_pending = 0;
 		$this->_total = 0;
 
-		$app    = JFactory::getApplication();
+		$app    = \Joomla\CMS\Factory::getApplication();
 		$jinput = $app->input;
 		$option = $jinput->get('option', '', 'cmd');
-		$cparams = JComponentHelper::getParams('com_flexicontent');
+		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 
 		$exts = $exts ?: $cparams->get('upload_extensions', 'bmp,wbmp,csv,doc,docx,webp,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,txt,xcf,xls,xlsx,zip,ics');
 		$imageexts = array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico');  // Common image extensions
@@ -508,7 +508,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 				return array();
 			}
 			$upload_context = 'fc_upload_history.item_' . $itemid . '_field_' . $fieldid;
-			$session_files = JFactory::getSession()->get($upload_context, array());
+			$session_files = \Joomla\CMS\Factory::getSession()->get($upload_context, array());
 
 			$names_pending = isset($session_files['names_pending'])
 				? $session_files['names_pending']
@@ -566,7 +566,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 
 			if ( in_array(strtolower($row->ext), $imageexts))
 			{
-				$row->icon = JUri::root()."components/com_flexicontent/assets/images/mime-icon-16/image.png";
+				$row->icon = \Joomla\CMS\Uri\Uri::root()."components/com_flexicontent/assets/images/mime-icon-16/image.png";
 			}
 			else
 			{
@@ -581,8 +581,8 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 				}
 
 				$row->icon = $exists
-					? JUri::root() . 'components/com_flexicontent/assets/images/mime-icon-16/' . $row->ext . '.png'
-					: JUri::root() . 'components/com_flexicontent/assets/images/mime-icon-16/unknown.png';
+					? \Joomla\CMS\Uri\Uri::root() . 'components/com_flexicontent/assets/images/mime-icon-16/' . $row->ext . '.png'
+					: \Joomla\CMS\Uri\Uri::root() . 'components/com_flexicontent/assets/images/mime-icon-16/unknown.png';
 			}
 
 			if ($this->_pending)
@@ -629,7 +629,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 
 		// Load XML file of field
 		$plugin_path = JPATH_PLUGINS . DS . 'flexicontent_fields' . DS . $field->field_type . DS . $field->field_type . '.xml';
-		$form = new JForm('com_flexicontent.field.' . $field->field_type, array('control' => 'jform', 'load_data' => false));
+		$form = new \Joomla\CMS\Form\Form('com_flexicontent.field.' . $field->field_type, array('control' => 'jform', 'load_data' => false));
 		$form->load(file_get_contents($plugin_path), false, '/extension/config');
 
 		$image_source_exists = (bool) $form->getField('image_source', 'attribs');
@@ -642,7 +642,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 				'item_' . $itemid,
 				'field_' . $fieldid
 			);
-			$options['base_path'] = JPATH::clean(JPATH_SITE . DS . $field->parameters->get('dir', 'images/stories/flexicontent'));
+			$options['base_path'] = \Joomla\Filesystem\Path::clean(JPATH_SITE . DS . $field->parameters->get('dir', 'images/stories/flexicontent'));
 			$gallery_path = $options['base_path'] . DS . implode('_', $gallery_path_arr) . DS . 'original' . DS;
 		}
 		else if ($image_source===0 || $image_source===null)
@@ -654,7 +654,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			die(__FUNCTION__.'(): image_source : $image_source for field id:' . $fieldid . ' is not implemented');
 		}
 
-		return JPATH::clean($gallery_path);
+		return \Joomla\Filesystem\Path::clean($gallery_path);
 	}
 
 
@@ -686,11 +686,11 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		// Parse field parameters and find currently active item id and verrify item is editable by current user
 		if (!empty($fields[$fieldid]))
 		{
-			$fields[$fieldid]->parameters = new JRegistry($fields[$fieldid]->attribs);
+			$fields[$fieldid]->parameters = new \Joomla\Registry\Registry($fields[$fieldid]->attribs);
 
-			$app    = JFactory::getApplication();
+			$app    = \Joomla\CMS\Factory::getApplication();
 			$jinput = $app->input;
-			$user   = JFactory::getUser();
+			$user   = \Joomla\CMS\Factory::getUser();
 			$option = $jinput->get('option', '', 'cmd');
 			$view   = $jinput->get('view', '', 'cmd');
 			$p      = $this->ovid;
@@ -701,8 +701,8 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			{
 				$u_item_id = (int) $u_item_id;
 
-				JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
-				$record = JTable::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
+				\Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
+				$record = \Joomla\CMS\Table\Table::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
 				if ($record->load($u_item_id))
 				{
 					$asset = 'com_content.article.' . $u_item_id;
@@ -869,7 +869,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		}
 
 		$upload_context = 'fc_upload_history.item_' . $field->item_id . '_field_' . $field->id;
-		$session_files = JFactory::getSession()->get($upload_context, array());
+		$session_files = \Joomla\CMS\Factory::getSession()->get($upload_context, array());
 
 		$file_ids = isset($session_files['ids_pending'])
 			? $session_files['ids_pending']
@@ -910,7 +910,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		}
 
 		$upload_context = 'fc_upload_history.item_' . $field->item_id . '_field_' . $field->id;
-		$session_files = JFactory::getSession()->get($upload_context, array());
+		$session_files = \Joomla\CMS\Factory::getSession()->get($upload_context, array());
 
 		$file_ids = isset($session_files['ids_pending'])
 			? $session_files['ids_pending']
@@ -925,9 +925,9 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	/**
 	 * Method to build the where clause of the query for the records
 	 *
-	 * @param		JDatabaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
+	 * @param		\Joomla\Data\DataObjectbaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
 	 *
-	 * @return  JDatabaseQuery|array
+	 * @return  \Joomla\Data\DataObjectbaseQuery|array
 	 *
 	 * @since   3.3.0
 	 */
@@ -935,15 +935,15 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	{
 		$table = $this->getTable($this->records_jtable, '');
 
-		$app    = JFactory::getApplication();
-		$user   = JFactory::getUser();
+		$app    = \Joomla\CMS\Factory::getApplication();
+		$user   = \Joomla\CMS\Factory::getUser();
 		$jinput = $app->input;
 		$option = $jinput->get('option', '', 'cmd');
 
 		$where = array();
 
 		$field  = $this->getField();
-		$params = $field ? $field->parameters : new JRegistry();
+		$params = $field ? $field->parameters : new \Joomla\Registry\Registry();
 
 		// Limit listed files to specific uploader,  1: current user, 0: any user, and respect 'filter_uploader' URL variable
 		$limit_by_uploader = 0;
@@ -1063,9 +1063,9 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			}
 
 			// Filter via View Level Access, if user is not super-admin
-			if (!JFactory::getUser()->authorise('core.admin') && (JFactory::getApplication()->isClient('site') || $this->listViaAccess))
+			if (!\Joomla\CMS\Factory::getUser()->authorise('core.admin') && (\Joomla\CMS\Factory::getApplication()->isClient('site') || $this->listViaAccess))
 			{
-				$groups  = implode(',', JAccess::getAuthorisedViewLevels($user->id));
+				$groups  = implode(',', \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id));
 				$where[] = 'a.access IN (' . $groups . ')';
 			}
 		}
@@ -1150,7 +1150,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 				}
 				else
 				{
-					JFactory::getApplication()->enqueueMessage('Text search scope ' . $scope . ' is unknown, search failed', 'warning');
+					\Joomla\CMS\Factory::getApplication()->enqueueMessage('Text search scope ' . $scope . ' is unknown, search failed', 'warning');
 				}
 
 				if ($textwhere)
@@ -1160,7 +1160,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			}
 		}
 
-		if ($q instanceof \JDatabaseQuery)
+		if ($q instanceof \Joomla\Data\DataObjectbaseQuery)
 		{
 			return $where ? $q->where($where) : $q;
 		}
@@ -1174,9 +1174,9 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	/**
 	 * Method to build the having clause of the query for the files
 	 *
-	 * @param		JDatabaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
+	 * @param		\Joomla\Data\DataObjectbaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
 	 *
-	 * @return  JDatabaseQuery|array
+	 * @return  \Joomla\Data\DataObjectbaseQuery|array
 	 *
 	 * @since 1.0
 	 */
@@ -1195,7 +1195,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			$having[] = 'COUNT(rel.fileid) > 0';
 		}
 
-		if ($q instanceof \JDatabaseQuery)
+		if ($q instanceof \Joomla\Data\DataObjectbaseQuery)
 		{
 			return $having ? $q->having($having) : $q;
 		}
@@ -1246,7 +1246,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	{
 		// Get configuration parameters
 		$target_dir = (int) $params->get('target_dir', 1);
-		$securepath = JPath::clean(($target_dir ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH).DS);
+		$securepath = \Joomla\CMS\Filesystem\Path::clean(($target_dir ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH).DS);
 
 		// Retrieve usage of images for the given field from the DB
 		$query = 'SELECT value'
@@ -1307,7 +1307,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		if ($field->item_id)
 		{
 			$upload_context = 'fc_upload_history.item_' . $field->item_id . '_field_' . $field->id;
-			$session_files = JFactory::getSession()->get($upload_context, array());
+			$session_files = \Joomla\CMS\Factory::getSession()->get($upload_context, array());
 
 			$new_file_ids = isset($session_files['ids'])
 				? $session_files['ids']
@@ -1381,8 +1381,8 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	 */
 	function getCustomLinksFileUsage($file_ids=array(), $count_items=false, $ignored=false)
 	{
-		$app    = JFactory::getApplication();
-		$user   = JFactory::getUser();
+		$app    = \Joomla\CMS\Factory::getApplication();
+		$user   = \Joomla\CMS\Factory::getUser();
 		$jinput = $app->input;
 		$option = $jinput->get('option', '', 'cmd');
 
@@ -1465,8 +1465,8 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	 */
 	function getItemsSingleprop( $field_types=array('file', 'mediafile'), $file_ids=array(), $count_items=false, $ignored=false )
 	{
-		$app    = JFactory::getApplication();
-		$user   = JFactory::getUser();
+		$app    = \Joomla\CMS\Factory::getApplication();
+		$user   = \Joomla\CMS\Factory::getUser();
 		$jinput = $app->input;
 		$option = $jinput->get('option', '', 'cmd');
 
@@ -1553,8 +1553,8 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	 */
 	function getItemsMultiprop( $field_props=array('image'=>array('originalname', 'existingname')), $value_props=array('image'=>array('filename', 'filename')) , $file_ids=array(), $count_items=false, $ignored=false )
 	{
-		$app    = JFactory::getApplication();
-		$user   = JFactory::getUser();
+		$app    = \Joomla\CMS\Factory::getApplication();
+		$user   = \Joomla\CMS\Factory::getUser();
 		$jinput = $app->input;
 		$option = $jinput->get('option', '', 'cmd');
 
@@ -1801,9 +1801,9 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			if ($file->url != 1)
 			{
 				$basepath	= $file->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;
-				$path 		= JPath::clean($basepath.DS.DS.$file->filename);
-				if (!JFile::delete($path)) {
-					JError::raiseWarning(100, JText::_( 'FLEXI_UNABLE_TO_DELETE' ).$path);
+				$path 		= \Joomla\CMS\Filesystem\Path::clean($basepath.DS.DS.$file->filename);
+				if (!\Joomla\CMS\Filesystem\File::delete($path)) {
+					JError::raiseWarning(100, \Joomla\CMS\Language\Text::_( 'FLEXI_UNABLE_TO_DELETE' ).$path);
 				}
 			}
 		}
@@ -1816,15 +1816,15 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 
 		if ($model && $this->event_context && ($this->event_before_delete || $this->event_after_delete))
 		{
-			$app = JFactory::getApplication();
+			$app = \Joomla\CMS\Factory::getApplication();
 			$dispatcher = JEventDispatcher::getInstance();
 
 			// Load all content and flexicontent plugins for triggering their delete events
 			if ($this->event_context === 'com_content.article')
 			{
-				JPluginHelper::importPlugin('content');
+				\Joomla\CMS\Plugin\PluginHelper::importPlugin('content');
 			}
-			JPluginHelper::importPlugin('flexicontent');
+			\Joomla\CMS\Plugin\PluginHelper::importPlugin('flexicontent');
 
 			foreach ($cid as $record_id)
 			{
@@ -2008,7 +2008,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	 */
 	function publish($cid = array(), $publish = 1)
 	{
-		$user = JFactory::getUser();
+		$user = \Joomla\CMS\Factory::getUser();
 
 		if (count( $cid ))
 		{
@@ -2089,7 +2089,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		{
 			$error_mssg = "Cannot create audio preview file. Function(s): " . implode(', ', $disabled_funcs) . " are disabled. \n";
 			$this->setError($error_mssg);
-			JLog::add($error_mssg, JLog::ERROR, $logger->namespace);
+			\Joomla\CMS\Log\Log::add($error_mssg, \Joomla\CMS\Log\Log::ERROR, $logger->namespace);
 			return false;
 		}
 
@@ -2118,7 +2118,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		{
 			$error_mssg = $file->filename . ' : Failed to open ffmpeg path: ' . $ffmpeg_path;
 			$this->setError($error_mssg);
-			JLog::add($error_mssg, JLog::ERROR, $logger->namespace);
+			\Joomla\CMS\Log\Log::add($error_mssg, \Joomla\CMS\Log\Log::ERROR, $logger->namespace);
 			$ffmpeg_path = '';
 		}
 
@@ -2126,7 +2126,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		{
 			$error_mssg = $file->filename . ' : Failed to open audiowaveform path: ' . $audiowaveform_path;
 			$this->setError($error_mssg);
-			JLog::add($error_mssg, JLog::ERROR, $logger->namespace);
+			\Joomla\CMS\Log\Log::add($error_mssg, \Joomla\CMS\Log\Log::ERROR, $logger->namespace);
 			$audiowaveform_path = '';
 		}
 
@@ -2141,11 +2141,11 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			$filename = str_ireplace('.' . $ext, '', basename($full_path));
 
 			// Check preview folder
-			if (!JFolder::exists($prv_path) && !JFolder::create($prv_path))
+			if (!\Joomla\CMS\Filesystem\Folder::exists($prv_path) && !\Joomla\CMS\Filesystem\Folder::create($prv_path))
 			{
 				$error_mssg = $file->filename . ' : Failed to create preview folder: ' . $prv_path;
 				$this->setError($error_mssg);
-				JLog::add($error_mssg, JLog::ERROR, $logger->namespace);
+				\Joomla\CMS\Log\Log::add($error_mssg, \Joomla\CMS\Log\Log::ERROR, $logger->namespace);
 				return false;
 			}
 
@@ -2188,7 +2188,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 				//}
 				exec($cmd);
 
-				JLog::add($file->filename . "\nCreating waveform peaks (JSON file):\n" . str_replace(JPATH_ROOT, '', $cmd) . "\n", JLog::INFO, $logger->namespace);
+				\Joomla\CMS\Log\Log::add($file->filename . "\nCreating waveform peaks (JSON file):\n" . str_replace(JPATH_ROOT, '', $cmd) . "\n", \Joomla\CMS\Log\Log::INFO, $logger->namespace);
 			}
 		}
 
@@ -2235,7 +2235,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		{
 			$error_mssg = $file->filename . ' : Failed to open ffprobe path: ' . $ffprobe_path;
 			$this->setError($error_mssg);
-			JLog::add($error_mssg, JLog::ERROR, $logger->namespace);
+			\Joomla\CMS\Log\Log::add($error_mssg, \Joomla\CMS\Log\Log::ERROR, $logger->namespace);
 			$ffprobe_path = '';
 		}
 
@@ -2253,7 +2253,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			{
 				$error_mssg = "Cannot detect audio properties. Function(s): " . implode(', ', $disabled_funcs) . " are disabled. \n";
 				$this->setError($error_mssg);
-				JLog::add($error_mssg, JLog::ERROR, $logger->namespace);
+				\Joomla\CMS\Log\Log::add($error_mssg, \Joomla\CMS\Log\Log::ERROR, $logger->namespace);
 				return false;
 			}
 
@@ -2274,7 +2274,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			{
 				$error_mssg = "Unsupported file type. Cannot detect audio properties.\nOR bad output";
 				$this->setError($error_mssg);
-				JLog::add($error_mssg	. "\nCommand: " . $json_cmd . "\nCommand output is:\n". $json_data, JLog::ERROR, $logger->namespace);
+				\Joomla\CMS\Log\Log::add($error_mssg	. "\nCommand: " . $json_cmd . "\nCommand output is:\n". $json_data, \Joomla\CMS\Log\Log::ERROR, $logger->namespace);
 				return false;
 			}
 			else
@@ -2328,13 +2328,13 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 
 				//print_r($json, true);
 				$logger->detailed_log
-					? JLog::add($full_path . "\n" . print_r($json->streams[0], true), JLog::INFO, $logger->namespace)
-					: JLog::add($full_path . "\n" .
+					? \Joomla\CMS\Log\Log::add($full_path . "\n" . print_r($json->streams[0], true), \Joomla\CMS\Log\Log::INFO, $logger->namespace)
+					: \Joomla\CMS\Log\Log::add($full_path . "\n" .
 						'media_type: ' . $md_obj->media_type . ', media_format: ' . $md_obj->media_format . ', channels: ' . $md_obj->channels . ', channel_layout: ' . $md_obj->channel_layout . "\n" .
 						'codec_name: ' . $md_obj->codec_name . ', codec_name: ' . $md_obj->codec_name . ', codec_long_name: ' . $md_obj->codec_long_name . "\n" .
 						'duration: ' . $md_obj->duration . ', resolution: ' . $md_obj->resolution . ', fps: ' . $md_obj->fps . "\n" .
 						'bit_rate: ' . $md_obj->bit_rate . ', bits_per_sample: ' . $md_obj->bits_per_sample . ', sample_rate: ' . $md_obj->sample_rate  . "\n"
-					, JLog::INFO, $logger->namespace);
+					, \Joomla\CMS\Log\Log::INFO, $logger->namespace);
 			}
 		}
 
@@ -2368,12 +2368,12 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		}
 
 		jimport('joomla.log.log');
-		JLog::addLogger(
+		\Joomla\CMS\Log\Log::addLogger(
 			array(
 				'text_file' => $logger->filename,  // Sets the target log file
 				'text_entry_format' => '{DATE} {TIME} {PRIORITY} {MESSAGE}'  // Sets the format of each line
 			),
-			JLog::ALL,  // Sets messages of all log levels to be sent to the file
+			\Joomla\CMS\Log\Log::ALL,  // Sets messages of all log levels to be sent to the file
 			array($logger->namespace)  // category of logged messages
 		);
 	}

@@ -13,7 +13,7 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 require_once('flexicontent_basetable_trait.php');
 
-class flexicontent_basetable extends JTable
+class flexicontent_basetable extends \Joomla\CMS\Table\Table
 {
 	use flexicontent_basetable_trait;
 }

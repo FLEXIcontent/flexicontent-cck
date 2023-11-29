@@ -58,7 +58,7 @@ if (!$this->error)
 {
 	if (Factory::getApplication()->input->getInt('direct', 0) && count($this->results) > 0)
 	{
-		header('Location: '.JRoute::_($this->results[0]->href));
+		header('Location: '.\Joomla\CMS\Router\Route::_($this->results[0]->href));
 	}
 
 	else

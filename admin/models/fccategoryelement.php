@@ -108,7 +108,7 @@ class FlexicontentModelFccategoryelement extends FCModelAdminList
 	 */
 	public function __construct($config = array())
 	{
-		$app    = JFactory::getApplication();
+		$app    = \Joomla\CMS\Factory::getApplication();
 		$jinput = $app->input;
 		$option = $jinput->getCmd('option', '');
 		$view   = $jinput->getCmd('view', '');
@@ -148,12 +148,12 @@ class FlexicontentModelFccategoryelement extends FCModelAdminList
 			$item_lang   = $app->getUserStateFromRequest($p . 'item_lang', 'item_lang', '', 'string');
 			$created_by  = $app->getUserStateFromRequest($p . 'created_by', 'created_by', 0, 'int');
 
-			$assocanytrans = JFactory::getUser()->authorise('flexicontent.assocanytrans', 'com_flexicontent');
+			$assocanytrans = \Joomla\CMS\Factory::getUser()->authorise('flexicontent.assocanytrans', 'com_flexicontent');
 
 			// Limit to creator if creator not privileged
 			if (!$assocanytrans && !$created_by)
 			{
-				$created_by = JFactory::getUser()->id;
+				$created_by = \Joomla\CMS\Factory::getUser()->id;
 
 				$this->setState('created_by', $created_by);
 				$app->setUserState($p . 'created_by', $created_by);
@@ -181,7 +181,7 @@ class FlexicontentModelFccategoryelement extends FCModelAdminList
 	function getData()
 	{
 		// Catch case of guest user submitting in frontend
-		if (!JFactory::getUser()->id)
+		if (!\Joomla\CMS\Factory::getUser()->id)
 		{
 			return $this->_data = array();
 		}
@@ -273,7 +273,7 @@ class FlexicontentModelFccategoryelement extends FCModelAdminList
 	public function getTotal()
 	{
 		// Catch case of guest user submitting in frontend
-		if (!JFactory::getUser()->id)
+		if (!\Joomla\CMS\Factory::getUser()->id)
 		{
 			return $this->_total = 0;
 		}
@@ -291,7 +291,7 @@ class FlexicontentModelFccategoryelement extends FCModelAdminList
 	/**
 	 * Method to build the query for the records
 	 *
-	 * @return  JDatabaseQuery   The DB Query object
+	 * @return  \Joomla\Data\DataObjectbaseQuery   The DB Query object
 	 *
 	 * @since   3.3.0
 	 */
@@ -337,9 +337,9 @@ class FlexicontentModelFccategoryelement extends FCModelAdminList
 	/**
 	 * Method to build the where clause of the query for the records
 	 *
-	 * @param		JDatabaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
+	 * @param		\Joomla\Data\DataObjectbaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
 	 *
-	 * @return  JDatabaseQuery|array
+	 * @return  \Joomla\Data\DataObjectbaseQuery|array
 	 *
 	 * @since   3.3.0
 	 */
@@ -370,7 +370,7 @@ class FlexicontentModelFccategoryelement extends FCModelAdminList
 			$where[] = 'a.level <= ' . (int) $filter_level;
 		}
 
-		if ($q instanceof \JDatabaseQuery)
+		if ($q instanceof \Joomla\Data\DataObjectbaseQuery)
 		{
 			return $where ? $q->where($where) : $q;
 		}

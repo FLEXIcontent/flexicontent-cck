@@ -19,8 +19,8 @@ fcpass_element['jform_catid'] = 1;
  * @subpackage	Forms
  * @since		1.5
  */
-var JFormValidator_FC_instance = null;
-var JFormValidator_FC = function()
+var FormValidator_FC_instance = null;
+var FormValidator_FC = function()
 {
 	"use strict";
 	var handlers, inputEmail, custom, IEversion, isIE8, isIE9, isRTL,
@@ -28,10 +28,10 @@ var JFormValidator_FC = function()
 	initialize = function()
 	{
 		// Prevent Joomla form validation JS script to create 2nd validation object
-		if (JFormValidator_FC_instance) return JFormValidator_FC_instance;
+		if (FormValidator_FC_instance) return FormValidator_FC_instance;
 
 		//Joomla.fc_debug = 1;
-		//window.console.log('Initializing FLEXIcontent JFormValidator_FC');
+		//window.console.log('Initializing FLEXIcontent FormValidator_FC');
 		
 		// Initialize variables
 		handlers = {};
@@ -1000,13 +1000,13 @@ var JFormValidator_FC = function()
 };
 
 //alert('Loading FLEXIcontent form validator');
-JFormValidator_FC_instance = new JFormValidator_FC();
+FormValidator_FC_instance = new FormValidator_FC();
 
 document.formvalidator = null;
 
 jQuery(document).ready(function()
 {
-	document.formvalidator = JFormValidator_FC_instance;
+	document.formvalidator = FormValidator_FC_instance;
 	
 	var vTimeStart = new Date().getTime();
 	jQuery('form.form-validate').each(function(){

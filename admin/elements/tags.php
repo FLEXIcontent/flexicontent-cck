@@ -21,11 +21,11 @@
 defined('_JEXEC') or die('Restricted access');
 
 jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // JHtmlSelect
-jimport('joomla.form.field');  // JFormField
+jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
+jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
 
-//jimport('joomla.form.helper'); // JFormHelper
-//JFormHelper::loadFieldClass('...');   // JFormField...
+//jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
+//\Joomla\CMS\Form\FormHelper::loadFieldClass('...');   // \Joomla\CMS\Form\FormField...
 
 /**
  * Renders a tags element
@@ -34,7 +34,7 @@ jimport('joomla.form.field');  // JFormField
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-class JFormFieldTags extends JFormField
+class JFormFieldTags extends \Joomla\CMS\Form\FormField
 {
 	/**
 	 * Element name
@@ -45,8 +45,8 @@ class JFormFieldTags extends JFormField
 
 	function getInput()
 	{
-		$doc = JFactory::getDocument();
-		$db  = JFactory::getDbo();
+		$doc = \Joomla\CMS\Factory::getDocument();
+		$db  = \Joomla\CMS\Factory::getDbo();
 		
 		$node = & $this->element;
 		$attributes = get_object_vars($node->attributes());
@@ -73,7 +73,7 @@ class JFormFieldTags extends JFormField
 			$attribs .= ' multiple="multiple" ';
 			$attribs .= (@$attributes['size']) ? ' size="'.$attributes['size'].'" ' : ' size="6" ';
 		} else {
-			array_unshift($tags, JHtml::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT')));
+			array_unshift($tags, \Joomla\CMS\HTML\HTMLHelper::_('select.option', '', \Joomla\CMS\Language\Text::_('FLEXI_PLEASE_SELECT')));
 		}
 		$classes = 'use_select2_lib';
 		if ($class = @$attributes['class']) {
@@ -85,6 +85,6 @@ class JFormFieldTags extends JFormField
 
 		$attribs .= ' class="'.$classes.'" ';
 
-		return JHtml::_('select.genericlist', $tags, $fieldname, $attribs, 'value', 'text', $values, $element_id);
+		return \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $tags, $fieldname, $attribs, 'value', 'text', $values, $element_id);
 	}
 }

@@ -14,7 +14,7 @@ defined('_JEXEC') or die;
  *
  * @since  1.5
  */
-class PlgButtonFcfile extends JPlugin
+class PlgButtonFcfile extends \Joomla\CMS\Plugin\CMSPlugin
 {
 	/**
 	 * Load the language file on instantiation.
@@ -29,7 +29,7 @@ class PlgButtonFcfile extends JPlugin
 	 *
 	 * @param   string  $name  The name of the button to add
 	 *
-	 * @return  JObject  The button options as JObject
+	 * @return  \Joomla\CMS\Object\CMSObject  The button options as \Joomla\CMS\Object\CMSObject
 	 *
 	 * @since   1.5
 	 */
@@ -39,9 +39,9 @@ class PlgButtonFcfile extends JPlugin
 		 * Our elements view already filters records according to user's view access levels
 		 */
 		$link = 'index.php?option=com_flexicontent&amp;view=fileselement&amp;layout=default&amp;isxtdbtn=1&amp;tmpl=component&amp;'
-			. JSession::getFormToken() . '=1&amp;editor=' . $name;
+			. \Joomla\CMS\Session\Session::getFormToken() . '=1&amp;editor=' . $name;
 
-		$button = new JObject;
+		$button = new \Joomla\CMS\Object\CMSObject;
 		$button->modal   = true;
 		$button->icon    = 'file-download';
 		$button->iconSVG = '
@@ -59,7 +59,7 @@ class PlgButtonFcfile extends JPlugin
 		</svg>';
 		$button->class   = 'btn';
 		$button->link    = $link;
-		$button->text    = JText::_('PLG_EDITORS-XTD_FCFILE_BUTTON_FCFILE');
+		$button->text    = \Joomla\CMS\Language\Text::_('PLG_EDITORS-XTD_FCFILE_BUTTON_FCFILE');
 		$button->name    = FLEXI_J40GE ? 'fcfile' : 'download';
 		$button->options = "{handler: 'iframe', size: {x: 800, y: 500}}";
 

@@ -128,7 +128,7 @@ if ($disp_slide_filter)
 	}
 	catch (Exception $e)
 	{
-		$jcookie->set($cookie_name, '{}', time()+60*60*24*(365*5), JUri::base(true), '');
+		$jcookie->set($cookie_name, '{}', time()+60*60*24*(365*5), \Joomla\CMS\Uri\Uri::base(true), '');
 	}
 
 	$last_active_slide = isset($active_slides->$ff_slider_tagid) ? $active_slides->$ff_slider_tagid : null;

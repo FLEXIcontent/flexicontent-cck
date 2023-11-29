@@ -21,7 +21,7 @@ jimport('legacy.model.list');
  * FLEXIcontent Component types Model
  *
  */
-class FlexicontentModelAppsman extends JModelList
+class FlexicontentModelAppsman extends \Joomla\CMS\MVC\Model\ListModel
 {
 	/**
 	 * Constructor
@@ -32,7 +32,7 @@ class FlexicontentModelAppsman extends JModelList
 	{
 		parent::__construct($config);
 
-		$app    = JFactory::getApplication();
+		$app    = \Joomla\CMS\Factory::getApplication();
 		$jinput = $app->input;
 		$option = $jinput->get('option', '', 'cmd');
 		$view   = $jinput->get('view', '', 'cmd');
@@ -40,7 +40,7 @@ class FlexicontentModelAppsman extends JModelList
 		$p      = $option.'.'.$view.'.';
 
 		// Parameters of the view, in our case it is only the component parameters
-		$this->cparams = JComponentHelper::getParams( 'com_flexicontent' );
+		$this->cparams = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
 
 
 		// **************
@@ -59,7 +59,7 @@ class FlexicontentModelAppsman extends JModelList
 
 	function getTableCreateSQL($table, $backup_filename=false, $where='', $id_colname=null, $clear_id=false)
 	{
-		$app = JFactory::getApplication();
+		$app = \Joomla\CMS\Factory::getApplication();
 		$dbprefix = $app->getCfg('dbprefix');
 		$dbtype   = $app->getCfg('dbtype');
 
@@ -103,7 +103,7 @@ class FlexicontentModelAppsman extends JModelList
 	/*** NEEDS PHP 5.5.4+ ***/
 	function create_CSV_file($rows, $table, $id_colname=null, $clear_id=false)
 	{
-		$app         = JFactory::getApplication();
+		$app         = \Joomla\CMS\Factory::getApplication();
 		$temp_stream = fopen('php://temp', 'r+');
 		if (!$temp_stream)
 		{
@@ -239,12 +239,12 @@ class FlexicontentModelAppsman extends JModelList
 		// *****************************************************
 
 		$template_names = array();
-		$type = JTable::getInstance('flexicontent_types', '');
+		$type = \Joomla\CMS\Table\Table::getInstance('flexicontent_types', '');
 		foreach ($type_ids as $type_id)
 		{
 			$type->id = $type_id;
 			$type->load();
-			$type->params = new JRegistry($type->attribs);
+			$type->params = new \Joomla\Registry\Registry($type->attribs);
 			$ilayout = $type->params->get('ilayout', 'grid');   // template folder name
 			$related_ids['flexicontent_templates'][$ilayout] = $ilayout;
 		}

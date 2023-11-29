@@ -12,7 +12,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 
-class flexicontent_items_ext extends JTable{
+class flexicontent_items_ext extends \Joomla\CMS\Table\Table{
 	/** @var int Primary key */
 	var $item_id					= null;
 	/** @var int */

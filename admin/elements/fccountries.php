@@ -20,10 +20,10 @@
 defined('_JEXEC') or die('Restricted access');
 
 jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // JHtmlSelect
+jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
 
-jimport('joomla.form.helper'); // JFormHelper
-JFormHelper::loadFieldClass('list');   // JFormFieldList
+jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
+\Joomla\CMS\Form\FormHelper::loadFieldClass('list');   // \Joomla\CMS\Form\Field\ListField
 
 require_once("fcsortablelist.php");
 
@@ -35,10 +35,10 @@ require_once("fcsortablelist.php");
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-class JFormFieldFcCountries extends JFormFieldFcSortableList
+class JFormFieldFcCountries extends \Joomla\CMS\Form\FormFieldFcSortableList
 {
 	/**
-	 * JFormField type
+	 * \Joomla\CMS\Form\FormField type
 	 * @access	protected
 	 * @var		string
 	 */
