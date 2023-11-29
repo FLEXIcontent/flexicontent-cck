@@ -36,7 +36,7 @@ class FlexicontentModelUsers extends FCModelAdminList
 	 *
 	 * @var string
 	 */
-	var $records_jtable = '\Joomla\CMS\Table\User';
+	var $records_jtable = 'JTableUser';
 
 	/**
 	 * Column names

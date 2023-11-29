@@ -525,7 +525,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		}
 
 		// Get full logfile path
-		$log_filename_full = JPATH::clean(\Joomla\CMS\Factory::getConfig()->get('log_path') . DS . $log_filename);
+		$log_filename_full = \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getConfig()->get('log_path') . DS . $log_filename);
 
 		// Clear previous log file
 		if (file_exists($log_filename_full))

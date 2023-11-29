@@ -47,7 +47,7 @@ class FlexicontentModelGroups extends FCModelAdminList
 	use FCModelTraitNestableRecord;
 
 	var $records_dbtbl  = 'usergroups';
-	var $records_jtable = '\Joomla\CMS\Table\Usergroup';
+	var $records_jtable = 'JTableUsergroup';
 
 	/**
 	 * Column names
@@ -345,7 +345,7 @@ class FlexicontentModelGroups extends FCModelAdminList
 			$item->user_count      = $item->count_enabled + $item->count_disabled;
 		}
 
-		$groups = new \Joomla\CMS\Help\HelperUsergroups($groupsByKey);
+		$groups = new \Joomla\CMS\Helper\UserGroupsHelper($groupsByKey);
 
 		return array_values($groups->getAll());
 	}

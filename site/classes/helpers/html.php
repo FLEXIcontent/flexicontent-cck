@@ -6220,8 +6220,9 @@ class flexicontent_html
 			// This also works in J4 
 			// return $url = \Joomla\CMS\Router\Route::link('site', $url);
 
-			$router = Router::getInstance('site');  // ALTERNATIVE: CMSApplication::getInstance('site')->getRouter('site');
-			$url = $router->build($url);
+//			$router = Router::getInstance('site');  // ALTERNATIVE: CMSApplication::getInstance('site')->getRouter('site');
+			$router = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Router\SiteRouter::class);
+            $url = $router->build($url);
 			$url = $url->toString();
 
 			return $url;

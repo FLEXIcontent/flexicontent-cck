@@ -231,7 +231,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		 */
 		if ($use_custom_marker)
 		{
-			$custom_marker_path_abs = JPATH::clean(JPATH_SITE . DS . $custom_marker_path. DS);
+			$custom_marker_path_abs = \Joomla\Filesystem\Path::clean(JPATH_SITE . DS . $custom_marker_path. DS);
 			$custom_marker_url_base = str_replace('\\', '/', \Joomla\CMS\Uri\Uri::root() . $custom_marker_path . '/');
 
 			// Default marker

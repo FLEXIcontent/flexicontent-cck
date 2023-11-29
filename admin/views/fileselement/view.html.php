@@ -808,7 +808,8 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 
 		// Uploadstuff
 		jimport('joomla.client.helper');
-		$require_ftp = !\Joomla\CMS\Application\CliApplicationentHelper::hasCredentials('ftp');
+
+		$require_ftp = !\Joomla\CMS\Client\ClientHelper::hasCredentials('ftp');
 
 
 		/**

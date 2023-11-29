@@ -64,11 +64,11 @@ class JFormFieldAlphaindex extends \Joomla\CMS\Form\FormField
 		$i=-1;
 		if (@ $attributes['use_global'])
 		{
-			$options[++$i] = new stdClass(); $options[$i]->text=JTEXT::_("FLEXI_USE_GLOBAL"); $options[$i]->value='';
+			$options[++$i] = new stdClass(); $options[$i]->text=\Joomla\CMS\Language\Text::_("FLEXI_USE_GLOBAL"); $options[$i]->value='';
 		}
-		$options[++$i] = new stdClass(); $options[$i]->text=JTEXT::_("FLEXI_HIDE"); $options[$i]->value=0;
-		$options[++$i] = new stdClass(); $options[$i]->text=JTEXT::_("FLEXI_SHOW_ALPHA_USE_LANG_DEFAULT"); $options[$i]->value=1;
-		$options[++$i] = new stdClass(); $options[$i]->text=JTEXT::_("FLEXI_SHOW_ALPHA_USE_CUSTOM_CHARS"); $options[$i]->value=2;
+		$options[++$i] = new stdClass(); $options[$i]->text=\Joomla\CMS\Language\Text::_("FLEXI_HIDE"); $options[$i]->value=0;
+		$options[++$i] = new stdClass(); $options[$i]->text=\Joomla\CMS\Language\Text::_("FLEXI_SHOW_ALPHA_USE_LANG_DEFAULT"); $options[$i]->value=1;
+		$options[++$i] = new stdClass(); $options[$i]->text=\Joomla\CMS\Language\Text::_("FLEXI_SHOW_ALPHA_USE_CUSTOM_CHARS"); $options[$i]->value=2;
 		
 		$value = $this->value;
 		

@@ -199,7 +199,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 
 				// Load language file of the template
 				FLEXIUtilities::loadTemplateLanguageFile($ext_name);
-				$path = JPATH::clean(JPATH_SITE . DS . 'components' . DS . 'com_flexicontent' . DS . 'templates' . DS . $directory);
+				$path = \Joomla\Filesystem\Path::clean(JPATH_SITE . DS . 'components' . DS . 'com_flexicontent' . DS . 'templates' . DS . $directory);
 				$groupname = 'attribs';  // Name="..." of <fields> container
 				break;
 
@@ -214,7 +214,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 				\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, null, true);
 				$ext_params = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 				$query = '';
-				$path = JPATH::clean(JPATH_ADMINISTRATOR . '/components/com_flexicontent/views/item/tmpl');
+				$path = \Joomla\Filesystem\Path::clean(JPATH_ADMINISTRATOR . '/components/com_flexicontent/views/item/tmpl');
 
 				$groupname = 'attribs';  // when empty we use 'attribs'
 				break;
@@ -228,7 +228,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 					\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, 'en-GB', true);
 					\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, null, true);
 					$inh_params = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
-					$path = JPATH::clean(JPATH_ADMINISTRATOR . '/components/com_flexicontent/views/item/tmpl');
+					$path = \Joomla\Filesystem\Path::clean(JPATH_ADMINISTRATOR . '/components/com_flexicontent/views/item/tmpl');
 				}
 				// Load item view layout
 				else
@@ -238,7 +238,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 
 					// Also Load language file of the template
 					FLEXIUtilities::loadTemplateLanguageFile($ext_name);
-					$path = JPATH::clean(JPATH_SITE . DS . 'components' . DS . 'com_flexicontent' . DS . 'templates' . DS . $directory);
+					$path = \Joomla\Filesystem\Path::clean(JPATH_SITE . DS . 'components' . DS . 'com_flexicontent' . DS . 'templates' . DS . $directory);
 				}
 
 				$groupname = 'attribs';  // Name="..." of <fields> container
@@ -256,7 +256,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 
 				// Load language file of the template
 				FLEXIUtilities::loadTemplateLanguageFile($ext_name);
-				$path = JPATH::clean(JPATH_SITE . DS . 'components' . DS . 'com_flexicontent' . DS . 'templates' . DS . $directory);
+				$path = \Joomla\Filesystem\Path::clean(JPATH_SITE . DS . 'components' . DS . 'com_flexicontent' . DS . 'templates' . DS . $directory);
 				$groupname = 'attribs';  // Name="..." of <fields> container
 				break;
 
@@ -267,7 +267,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 
 				// Load language file of the template
 				FLEXIUtilities::loadTemplateLanguageFile($ext_name);
-				$path = JPATH::clean(JPATH_SITE . DS . 'components' . DS . 'com_flexicontent' . DS . 'templates' . DS . $directory);
+				$path = \Joomla\Filesystem\Path::clean(JPATH_SITE . DS . 'components' . DS . 'com_flexicontent' . DS . 'templates' . DS . $directory);
 				$groupname = 'attribs';  // Name="..." of <fields> container
 				break;
 
@@ -348,12 +348,12 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 		{
 			$template_name = $layout_names[0];
 			$layout_name   = $layout_names[1];
-			$layoutpath    = JPATH::clean(JPATH_ROOT . DS . 'templates' . DS . $template_name . DS . 'html' . DS . $ext_name . DS . $layout_name . '.xml');
+			$layoutpath    = \Joomla\Filesystem\Path::clean(JPATH_ROOT . DS . 'templates' . DS . $template_name . DS . 'html' . DS . $ext_name . DS . $layout_name . '.xml');
 		}
 
 		if ($layout_name && (empty($layoutpath) || !file_exists($layoutpath)))
 		{
-			$layoutpath = JPATH::clean($path . DS . $layout_name . '.xml');
+			$layoutpath = \Joomla\Filesystem\Path::clean($path . DS . $layout_name . '.xml');
 		}
 
 		if (!$layout_name)

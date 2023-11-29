@@ -2789,7 +2789,7 @@ class FlexicontentFields
 		/*
 		$pdfparser_path = $cparams->get('pdfparser_path', 'components/com_flexicontent/librairies/pdfparser');
 		jimport('joomla.filesystem.path');
-		$pdfparser_path = JPATH::clean($pdfparser_path);
+		$pdfparser_path = \Joomla\Filesystem\Path::clean($pdfparser_path);
 
 		if (!$pdfparser_path)
 		{
@@ -2799,7 +2799,7 @@ class FlexicontentFields
 		if (! is_dir($pdfparser_path) || ! is_readable($pdfparser_path))
 		{
 			// Try relative to Joomla path
-			$_pdfparser_path = JPATH::clean(JPATH_SITE.DS.$pdfparser_path);
+			$_pdfparser_path = \Joomla\Filesystem\Path::clean(JPATH_SITE.DS.$pdfparser_path);
 			if (! is_dir($_pdfparser_path) || ! is_readable($_pdfparser_path))
 			{
 				\Joomla\CMS\Factory::getApplication()->enqueueMessage('PDF parser path does not seem to be exist and to be readable: '. $pdfparser_path .' please correct path');
@@ -2808,7 +2808,7 @@ class FlexicontentFields
 			$pdfparser_path = $_pdfparser_path;
 		}
 
-		$vendor_path = JPATH::clean($pdfparser_path.DS.'vendor');
+		$vendor_path = \Joomla\Filesystem\Path::clean($pdfparser_path.DS.'vendor');
 		if (! is_dir($vendor_path) || ! is_readable($vendor_path))
 		{
 			\Joomla\CMS\Factory::getApplication()->enqueueMessage('PDF parser path does not seem to have installed dependent libraries in vendor subfolder: '. $vendor_path .' please run composer');
@@ -2816,8 +2816,8 @@ class FlexicontentFields
 		}
 
 		// Create parser
-		require_once(JPATH::clean($vendor_path.DS.'autoload.php'));
-		require_once(JPATH::clean($pdfparser_path.DS.'src'.DS.'Smalot'.DS.'PdfParser'.DS.'Parser.php'));
+		require_once(\Joomla\Filesystem\Path::clean($vendor_path.DS.'autoload.php'));
+		require_once(\Joomla\Filesystem\Path::clean($pdfparser_path.DS.'src'.DS.'Smalot'.DS.'PdfParser'.DS.'Parser.php'));
 		$parser = new \Smalot\PdfParser\Parser();
 
 		return $parser;

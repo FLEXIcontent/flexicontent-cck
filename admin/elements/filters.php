@@ -29,7 +29,7 @@ require_once("fields.php");
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-class JFormFieldFilters extends \Joomla\CMS\Form\FormFieldFields
+class JFormFieldFilters extends JFormFieldFields
 {
 	/**
 	* Element name

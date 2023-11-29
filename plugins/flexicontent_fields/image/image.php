@@ -2060,7 +2060,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		jimport('joomla.client.helper');
 
 		// Set FTP credentials, if given
-		\Joomla\CMS\Application\CliApplicationentHelper::setCredentialsFromRequest('ftp');
+		\Joomla\CMS\Client\ClientHelper::setCredentialsFromRequest('ftp');
 
 		// Make the filename safe
 		$file['name'] = \Joomla\CMS\Filesystem\File::makeSafe($file['name']);

@@ -68,7 +68,7 @@ $map_height = (int) $field->parameters->get('map_height', 150);
 $use_custom_marker      = (int) $field->parameters->get('use_custom_marker', 1);
 $custom_marker_path     = $field->parameters->get('custom_marker_path', 'modules/mod_flexigooglemap/assets/marker');
 
-$custom_marker_path_abs = JPATH::clean(JPATH_SITE . DS . $custom_marker_path. DS);
+$custom_marker_path_abs = \Joomla\Filesystem\Path::clean(JPATH_SITE . DS . $custom_marker_path. DS);
 $custom_marker_url_base = str_replace('\\', '/', \Joomla\CMS\Uri\Uri::root() . $custom_marker_path . '/');
 
 $defaut_icon_url = $map_api === 'googlemap'

@@ -642,7 +642,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 				'item_' . $itemid,
 				'field_' . $fieldid
 			);
-			$options['base_path'] = JPATH::clean(JPATH_SITE . DS . $field->parameters->get('dir', 'images/stories/flexicontent'));
+			$options['base_path'] = \Joomla\Filesystem\Path::clean(JPATH_SITE . DS . $field->parameters->get('dir', 'images/stories/flexicontent'));
 			$gallery_path = $options['base_path'] . DS . implode('_', $gallery_path_arr) . DS . 'original' . DS;
 		}
 		else if ($image_source===0 || $image_source===null)
@@ -654,7 +654,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			die(__FUNCTION__.'(): image_source : $image_source for field id:' . $fieldid . ' is not implemented');
 		}
 
-		return JPATH::clean($gallery_path);
+		return \Joomla\Filesystem\Path::clean($gallery_path);
 	}
 
 

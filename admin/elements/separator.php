@@ -230,7 +230,7 @@ class JFormFieldSeparator extends \Joomla\CMS\Form\Field\SpacerField
 			}
 			unset($vpart);
 			array_unshift($vparts, $value);
-			$title = call_user_func_array(array('JText', 'sprintf'), $vparts);
+			$title = call_user_func_array(array('\\Joomla\\CMS\\Language\\Text', 'sprintf'), $vparts);
 		}
 
 		$desc = \Joomla\CMS\Language\Text::_($description);

@@ -138,7 +138,7 @@ class FlexicontentModelTags extends FCModelAdminList
 		$this->canManage = FlexicontentHelperPerm::getPerm()->CanTags;
 
 		// Initialize Tags helper object
-		$this->tagsHelper = new \Joomla\CMS\Help\HelperTags;
+		$this->tagsHelper = new \Joomla\CMS\Helper\TagsHelper;
 	}
 
 

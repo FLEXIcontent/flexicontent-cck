@@ -191,7 +191,7 @@ class flexicontent_items extends _flexicontent_items
 	var $_allow_underscore = true;
 
 	var $_jtbls = array(
-		'#__content' => array('Content', 'Table', 'state'),
+		'#__content' => array('Content', 'JTable', 'state'),
 		'#__flexicontent_items_ext' => array('flexicontent_items_ext', '', false),
 		'#__flexicontent_items_tmp' => array('flexicontent_items_tmp', '', 'state'),
 	);

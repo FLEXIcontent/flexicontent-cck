@@ -709,7 +709,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 		// Set FTP credentials, if given
 		jimport('joomla.client.helper');
-		\Joomla\CMS\Application\CliApplicationentHelper::setCredentialsFromRequest('ftp');
+		\Joomla\CMS\Client\ClientHelper::setCredentialsFromRequest('ftp');
 
 		// Make the filename safe
 		jimport('joomla.filesystem.file');
@@ -1787,6 +1787,6 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 		// Set FTP credentials, if given
 		jimport('joomla.client.helper');
-		\Joomla\CMS\Application\CliApplicationentHelper::setCredentialsFromRequest('ftp');
+		\Joomla\CMS\Client\ClientHelper::setCredentialsFromRequest('ftp');
 	}
 }

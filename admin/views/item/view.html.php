@@ -729,8 +729,8 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		if (!$lists['catid'] && !$menuCats)
 		{
 			$app->setHeader('status', 403);
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::sprintf('FLEXI_LOGIN_TO_ACCESS', $url), 'warning');
-			$app->redirect($url, \Joomla\CMS\Language\Text::_("FLEXI_CANNOT_SUBMIT_IN_TYPE_ALLOWED_CATS"), 'warning');
+			$app->enqueueMessage(\Joomla\CMS\Language\Text::_("FLEXI_CANNOT_SUBMIT_IN_TYPE_ALLOWED_CATS"), 'warning');
+			$app->redirect($url);
 		}
 
 		// Item language related vars

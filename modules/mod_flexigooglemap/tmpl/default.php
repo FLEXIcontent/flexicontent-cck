@@ -108,7 +108,7 @@ $usescrollmouse = $params->get('usescrollmouse', 'true');
 $clustermode = $params->get('clustermode', '');
 if ($clustermode) {
 	$imgcluster = $params->get('imgcluster', '');
-	if ($imgcluster && $img_info = getimagesize(JPATH::clean(JPATH_ROOT . DS . $imgcluster))) {
+	if ($imgcluster && $img_info = getimagesize(\Joomla\Filesystem\Path::clean(JPATH_ROOT . DS . $imgcluster))) {
 		$imgcluster_w = $img_info[0];
 		$imgcluster_h = $img_info[1];
 		$imgcluster_url  = \Joomla\CMS\Uri\Uri::root(true) . '/' . $imgcluster;

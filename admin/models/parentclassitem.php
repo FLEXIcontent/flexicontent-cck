@@ -326,7 +326,7 @@ class ParentClassItem extends FCModelAdmin
 		if ($this->_typeid || $forced_typeid)
 		{
 			$tparams = $this->getTypeparams($forced_typeid);
-			$tparams = $this->_new_\Joomla\Registry\Registry($tparams);
+			$tparams = $this->_new_JRegistry($tparams);
 			$params->merge($tparams);
 		}
 
@@ -3790,11 +3790,11 @@ class ParentClassItem extends FCModelAdmin
 			$catParams = $catData->params;
 			$this->_record->category_title = $catData->title;
 		}
-		$catParams = $this->_new_\Joomla\Registry\Registry($catParams);
+		$catParams = $this->_new_JRegistry($catParams);
 
 		// Retrieve/Create item's Content Type parameters
 		$typeParams = $this->getTypeparams();
-		$typeParams = $this->_new_\Joomla\Registry\Registry($typeParams);
+		$typeParams = $this->_new_JRegistry($typeParams);
 
 		// Create item parameters
 		if ( !is_object($this->_record->attribs) )
@@ -3816,7 +3816,7 @@ class ParentClassItem extends FCModelAdmin
 		/**
 		 * Bug fix for bad parameter merge code in item model for parameters not present in the form
 		 */
-		$itemParams = $this->_new_\Joomla\Registry\Registry($itemParams);
+		$itemParams = $this->_new_JRegistry($itemParams);
 
 		// Retrieve Layout's parameters, also deciding the layout
 		if ($app->isClient('administrator') || !empty($this->isForm))
@@ -3830,7 +3830,7 @@ class ParentClassItem extends FCModelAdmin
 		}
 
 		$layoutParams = $this->getLayoutparams();
-		$layoutParams = $this->_new_\Joomla\Registry\Registry($layoutParams);  //print_r($layoutParams);
+		$layoutParams = $this->_new_JRegistry($layoutParams);  //print_r($layoutParams);
 
 
 		/**
@@ -4766,7 +4766,7 @@ class ParentClassItem extends FCModelAdmin
 
 			foreach ($mcats_params as $cat_params)
 			{
-				$cat_params = $this->_new_\Joomla\Registry\Registry($cat_params);
+				$cat_params = $this->_new_JRegistry($cat_params);
 				if ( ! $cat_params->get('cats_enable_notifications', 0) ) continue;  // Skip this category if category-specific notifications are not enabled for this category
 
 				$cats_userlist_notify_new            = FLEXIUtilities::paramToArray( $cat_params->get('cats_userlist_notify_new'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
@@ -6703,7 +6703,7 @@ class ParentClassItem extends FCModelAdmin
 	/**
 	 * Create a \Joomla\Registry\Registry object checking for legacy bug of bad parameter merging code in during model saving
 	 */
-	private function _new_\Joomla\Registry\Registry($params)
+	private function _new_JRegistry($params)
 	{
 		if (!is_object($params))
 		{

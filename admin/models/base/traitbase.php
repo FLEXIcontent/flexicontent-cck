@@ -62,10 +62,10 @@ trait FCModelTraitBase
 		}
 
 		// Fix for Joomla 4 and up, enabling us to load UserTable & UserGroupTable without BC plugin.
-		if(FLEXI_J40GE && substr($name, 0, 6) === '\Joomla\CMS\Table\Table')
+		if(FLEXI_J40GE && substr($name, 0, 6) === 'JTable')
 		{
-			$prefix = '\Joomla\CMS\Table\Table';
-			$name = str_replace('\Joomla\CMS\Table\Table', '', $name);
+			$prefix = 'JTable';
+			$name = str_replace('JTable', '', $name);
 		}
 
 		if ($table = $this->_createTable($name, $prefix, $options))

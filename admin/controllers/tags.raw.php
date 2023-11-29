@@ -214,7 +214,7 @@ class FlexicontentControllerTags extends FlexicontentControllerBaseAdmin
 
 		// Clear previous log file
 		$log_filename = 'tag_mappings_checker_' . \Joomla\CMS\Factory::getUser()->id . '.php';
-		$log_filename_full = JPATH::clean(\Joomla\CMS\Factory::getConfig()->get('log_path') . DS . $log_filename);
+		$log_filename_full = \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getConfig()->get('log_path') . DS . $log_filename);
 
 		if (file_exists($log_filename_full))
 		{
