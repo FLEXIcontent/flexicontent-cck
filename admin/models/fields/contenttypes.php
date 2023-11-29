@@ -13,13 +13,12 @@ defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
-use \Joomla\CMS\Form\Field\ListField;
 
 jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
+jimport('cms.html.select');    // JHtmlSelect
 
-jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
-\Joomla\CMS\Form\FormHelper::loadFieldClass('list');   // \Joomla\CMS\Form\Field\ListField
+jimport('joomla.form.helper'); // JFormHelper
+JFormHelper::loadFieldClass('list');   // JFormFieldList
 
 /**
  * Renders a fields element
@@ -28,7 +27,7 @@ jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-class ContenttypeFields extends ListField
+class JFormFieldContenttypes extends JFormFieldList
 {
 	/**
 	 * The form field type.
@@ -58,14 +57,14 @@ class ContenttypeFields extends ListField
 		$fieldname	= $this->name;
 		$element_id = $this->id;
 
-		return \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $options, $fieldname, trim($attr), 'value', 'text', $value, $element_id);
-		//return \Joomla\CMS\HTML\Helpers\Select::genericList($options, $fieldname, $attr, 'value', 'text', $value, $element_id);
+		return JHtml::_('select.genericlist', $options, $fieldname, trim($attr), 'value', 'text', $value, $element_id);
+		//return JHtmlSelect::genericList($options, $fieldname, $attr, 'value', 'text', $value, $element_id);
 	}
 
 
 	protected function getOptions()
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 		$query = 'SELECT id AS value, name AS text'
 		. ' FROM #__flexicontent_types'
 		. ' WHERE published = 1'
@@ -82,6 +81,6 @@ class ContenttypeFields extends ListField
 	{
 		$this->name = $attribs['name'];
 		$this->value = $attribs['value'];
-		$this->label = \Joomla\CMS\Language\Text::_($attribs['label']);
+		$this->label = JText::_($attribs['label']);
 	}
 }

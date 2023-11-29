@@ -12,16 +12,16 @@
 defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
-\Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html');
+JHtml::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html');
 
 global $globalcats;
-$app      = \Joomla\CMS\Factory::getApplication();
+$app      = JFactory::getApplication();
 $jinput   = $app->input;
-$config   = \Joomla\CMS\Factory::getConfig();
-$user     = \Joomla\CMS\Factory::getUser();
-$session  = \Joomla\CMS\Factory::getSession();
-$document = \Joomla\CMS\Factory::getDocument();
-$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+$config   = JFactory::getConfig();
+$user     = JFactory::getUser();
+$session  = JFactory::getSession();
+$document = JFactory::getDocument();
+$cparams  = JComponentHelper::getParams('com_flexicontent');
 $ctrl     = 'fields.';
 $hlpname  = 'fcfields';
 $isAdmin  = $app->isClient('administrator');
@@ -37,12 +37,12 @@ $btn_class = 'btn';
 $ico_class = 'fc-man-icon-s';
 $out_class = FLEXI_J40GE ? 'btn btn-outline-dark' : 'btn';
 
-$edit_entry      = \Joomla\CMS\Language\Text::_('FLEXI_EDIT_FIELD', true);
-$flexi_yes       = \Joomla\CMS\Language\Text::_('FLEXI_YES');
-$flexi_no        = \Joomla\CMS\Language\Text::_('FLEXI_NO');
-$flexi_nosupport = \Joomla\CMS\Language\Text::_('FLEXI_PROPERTY_NOT_SUPPORTED', true);
-$flexi_rebuild   = \Joomla\CMS\Language\Text::_('FLEXI_REBUILD_SEARCH_INDEX', true);
-$flexi_toggle    = \Joomla\CMS\Language\Text::_('FLEXI_CLICK_TO_TOGGLE', true);
+$edit_entry      = JText::_('FLEXI_EDIT_FIELD', true);
+$flexi_yes       = JText::_('FLEXI_YES');
+$flexi_no        = JText::_('FLEXI_NO');
+$flexi_nosupport = JText::_('FLEXI_PROPERTY_NOT_SUPPORTED', true);
+$flexi_rebuild   = JText::_('FLEXI_REBUILD_SEARCH_INDEX', true);
+$flexi_toggle    = JText::_('FLEXI_CLICK_TO_TOGGLE', true);
 
 
 
@@ -53,8 +53,8 @@ $flexi_toggle    = \Joomla\CMS\Language\Text::_('FLEXI_CLICK_TO_TOGGLE', true);
 flexicontent_html::jscode_to_showhide_table(
 	'mainChooseColBox',
 	'adminListTableFC' . $this->view,
-	$start_html = '',  //'<span class="badge ' . (FLEXI_J40GE ? 'badge-dark' : 'badge-inverse') . '">' . \Joomla\CMS\Language\Text::_('FLEXI_COLUMNS', true) . '<\/span> &nbsp; ',
-	$end_html = '<div id="fc-columns-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="' . \Joomla\CMS\Language\Text::_('FLEXI_HIDE') . '" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/div>'
+	$start_html = '',  //'<span class="badge ' . (FLEXI_J40GE ? 'badge-dark' : 'badge-inverse') . '">' . JText::_('FLEXI_COLUMNS', true) . '<\/span> &nbsp; ',
+	$end_html = '<div id="fc-columns-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="' . JText::_('FLEXI_HIDE') . '" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/div>'
 );
 
 
@@ -93,15 +93,15 @@ $ordering_draggable = $cparams->get('draggable_reordering', 1);
 
 if ($this->reOrderingActive)
 {
-	$_title = \Joomla\CMS\Language\Text::_(!$this->filter_type ? 'FLEXI_GLOBAL_ORDER' : 'FLEXI_TYPE_ORDER', true);
+	$_title = JText::_(!$this->filter_type ? 'FLEXI_GLOBAL_ORDER' : 'FLEXI_TYPE_ORDER', true);
 
 	$image_ordering_tip = '<span class="icon-info ' . $this->tooltip_class . '" title="' . flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_ENABLED_DESC', 1, 1)  . '<br><br>' . $_title . '"></span>';
-	$drag_handle_box = '<div class="fc_drag_handle%s" title="' . \Joomla\CMS\Language\Text::_('FLEXI_ORDER_SAVE_WHEN_DONE', true) . '"></div>';
+	$drag_handle_box = '<div class="fc_drag_handle%s" title="' . JText::_('FLEXI_ORDER_SAVE_WHEN_DONE', true) . '"></div>';
 }
 else
 {
 	$image_ordering_tip = '<span class="icon-info ' . $this->tooltip_class . '" title="' . flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_DISABLED_DESC', 1, 1) . '"></span>';
-	$drag_handle_box = '<div class="fc_drag_handle%s" title="' . \Joomla\CMS\Language\Text::_('FLEXI_ORDER_COLUMN_FIRST', true) . '" ></div>';
+	$drag_handle_box = '<div class="fc_drag_handle%s" title="' . JText::_('FLEXI_ORDER_COLUMN_FIRST', true) . '" ></div>';
 	$image_saveorder    = '';
 }
 $common_properties_tip = '<span class="icon-info ' . $this->tooltip_class . '" data-placement="bottom" title="'.flexicontent_html::getToolTip(
@@ -124,7 +124,7 @@ $ord_col = !$this->filter_type
 	: 'typeordering';
 $ord_grp = 1;
 
-//\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_text', JPATH_ADMINISTRATOR);
+//JFactory::getLanguage()->load('plg_flexicontent_fields_text', JPATH_ADMINISTRATOR);
 $inputmask_txts = array(
 	//'' => 'FLEXI_NO_MASK',
 	'__regex__' => 'REGULAR EXPRESSION',
@@ -165,18 +165,18 @@ $inputmask_txts = array(
 	'mm/yyyy' => 'Month/Year (mm/yyyy)',
 );
 
-\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_image', JPATH_ADMINISTRATOR);
+JFactory::getLanguage()->load('plg_flexicontent_fields_image', JPATH_ADMINISTRATOR);
 $image_source_txts = array(
 	'-2' => 'Joomla media manager',
 	'-1' => 'Joomla article images: (intro + full)',
-	'0' => \Joomla\CMS\Language\Text::_('FLEXI_FIELD_REUSABLE_DB_MODE'),
-	'1' => \Joomla\CMS\Language\Text::_('FLEXI_FIELD_ITEM_SPECIFIC_FOLDER_MODE'),
+	'0' => JText::_('FLEXI_FIELD_REUSABLE_DB_MODE'),
+	'1' => JText::_('FLEXI_FIELD_ITEM_SPECIFIC_FOLDER_MODE'),
 );
 
 $current_type = $this->filter_type ? $this->types[$this->filter_type] : false;
 if ($current_type)
 {
-	$current_type->config = new \Joomla\Registry\Registry($current_type->attribs);
+	$current_type->config = new JRegistry($current_type->attribs);
 }
 
 
@@ -274,11 +274,11 @@ if ($js)
 				<?php
 					echo !empty($this->lists['scope']) ? $this->lists['scope'] : '';
 				?>
-				<input type="text" name="search" id="search" placeholder="<?php echo !empty($this->scope_title) ? $this->scope_title : \Joomla\CMS\Language\Text::_('FLEXI_SEARCH'); ?>" value="<?php echo htmlspecialchars($this->lists['search'], ENT_QUOTES, 'UTF-8'); ?>" class="fcfield_textval" />
-				<button title="" data-original-title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_SEARCH'); ?>" class="<?php echo $btn_class . (FLEXI_J40GE ? ' btn-outline-dark ' : ' ') . $this->tooltip_class; ?>" onclick="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-search"></i>' : \Joomla\CMS\Language\Text::_('FLEXI_GO'); ?></button>
+				<input type="text" name="search" id="search" placeholder="<?php echo !empty($this->scope_title) ? $this->scope_title : JText::_('FLEXI_SEARCH'); ?>" value="<?php echo htmlspecialchars($this->lists['search'], ENT_QUOTES, 'UTF-8'); ?>" class="fcfield_textval" />
+				<button title="" data-original-title="<?php echo JText::_('FLEXI_SEARCH'); ?>" class="<?php echo $btn_class . (FLEXI_J40GE ? ' btn-outline-dark ' : ' ') . $this->tooltip_class; ?>" onclick="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-search"></i>' : JText::_('FLEXI_GO'); ?></button>
 
-				<div id="fc_filters_box_btn" data-original-title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_FILTERS'); ?>" class="<?php echo $this->tooltip_class . ' ' . ($this->count_filters ? 'btn ' . $this->btn_iv_class : $out_class); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary', false, undefined, 1);">
-					<?php echo FLEXI_J30GE ? '<i class="icon-filter"></i>' : \Joomla\CMS\Language\Text::_('FLEXI_FILTERS'); ?>
+				<div id="fc_filters_box_btn" data-original-title="<?php echo JText::_('FLEXI_FILTERS'); ?>" class="<?php echo $this->tooltip_class . ' ' . ($this->count_filters ? 'btn ' . $this->btn_iv_class : $out_class); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary', false, undefined, 1);">
+					<?php echo FLEXI_J30GE ? '<i class="icon-filter"></i>' : JText::_('FLEXI_FILTERS'); ?>
 					<?php echo ($this->count_filters  ? ' <sup>' . $this->count_filters . '</sup>' : ''); ?>
 				</div>
 
@@ -294,10 +294,10 @@ if ($js)
 					echo $this->lists['filter_access'];
 					?>
 
-					<div id="fc-filters-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
+					<div id="fc-filters-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
 				</div>
 
-				<button title="" data-original-title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_RESET_FILTERS'); ?>" class="<?php echo $btn_class . (FLEXI_J40GE ? ' btn-outline-dark ' : ' ') . $this->tooltip_class; ?>" onclick="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; delAllFilters(); Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-cancel"></i>' : \Joomla\CMS\Language\Text::_('FLEXI_CLEAR'); ?></button>
+				<button title="" data-original-title="<?php echo JText::_('FLEXI_RESET_FILTERS'); ?>" class="<?php echo $btn_class . (FLEXI_J40GE ? ' btn-outline-dark ' : ' ') . $this->tooltip_class; ?>" onclick="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; delAllFilters(); Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-cancel"></i>' : JText::_('FLEXI_CLEAR'); ?></button>
 			</div>
 
 		</div>
@@ -353,7 +353,7 @@ if ($js)
 
 		if (!$this->filter_type)
 		{
-			//$ico_text  = \Joomla\CMS\Language\Text::_('FLEXI_GLOBAL_ORDER');
+			//$ico_text  = JText::_('FLEXI_GLOBAL_ORDER');
 			//$msg_icon  = '<span class="icon-question ' . $this->popover_class . '" data-content="'.flexicontent_html::getToolTip(null, $msg_text, 0, 1) . '"></span>';
 			$msg_class = '';//'fc-mssg-inline fc-nobgimage fc-success';
 		}
@@ -361,13 +361,13 @@ if ($js)
 		{
 			if (!$this->getModel()->getState('filter_type'))
 			{
-				$ico_text  = \Joomla\CMS\Language\Text::_('FLEXI_TYPE_ORDER_DESC');
+				$ico_text  = JText::_('FLEXI_TYPE_ORDER_DESC');
 				$msg_icon  = '<span class="icon-notification ' . $this->popover_class . '" data-content="'.flexicontent_html::getToolTip(null, $ico_text, 0, 1) . '"></span>';
 				$msg_class = '';//'fc-mssg-inline fc-nobgimage fc-info';
 			}
 			else
 			{
-				//$ico_text  = \Joomla\CMS\Language\Text::_('FLEXI_TYPE_ORDER');
+				//$ico_text  = JText::_('FLEXI_TYPE_ORDER');
 				//$msg_icon  = '<span class="icon-question ' . $this->popover_class . '" data-content="'.flexicontent_html::getToolTip(null, $ico_text, 0, 1) . '"></span>';
 				$msg_class = '';//'fc-mssg-inline fc-nobgimage fc-success';
 			}
@@ -393,14 +393,14 @@ if ($js)
 		<div class="hidden-phone" style="z-index: 1; position: sticky; top: 30%; margin: 0 -20px;">
 			<div style="position: absolute; margin: 0; height: 0;">
 				<div style="padding: 0px; font-weight: normal; line-height: 28px; width: auto; text-align: center;">
-					<?php echo \Joomla\CMS\HTML\HTMLHelper::_($hlpname . '.saveorder_btn', $this->rows, $_config = null); ?>
+					<?php echo JHtml::_($hlpname . '.saveorder_btn', $this->rows, $_config = null); ?>
 				</div>
 			</div>
 		</div>
 		<div class="hidden-phone" style="z-index: 1; position: sticky; top: 30%; margin: 0 -20px;">
 			<div style="position: absolute; margin: 40px 0 0 0; height: 0;">
 				<div style="padding: 0px; font-weight: normal; line-height: 28px; width: auto; text-align: center;">
-					<?php echo \Joomla\CMS\HTML\HTMLHelper::_($hlpname . '.manualorder_btn', $this->rows, $_config = null); ?>
+					<?php echo JHtml::_($hlpname . '.manualorder_btn', $this->rows, $_config = null); ?>
 				</div>
 			</div>
 		</div>
@@ -417,87 +417,87 @@ if ($js)
 		<tr>
 
 			<!--th class="left hidden-phone">
-				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_NUM' ); ?>
+				<?php echo JText::_( 'FLEXI_NUM' ); ?>
 			</th-->
 
 			<th class="col_order center hidden-phone">
 				<?php
 				echo $canOrder ? $image_ordering_tip : '';
 				echo str_replace('_FLEXI_ORDER_',
-					''/*\Joomla\CMS\Language\Text::_('FLEXI_ORDER', true)*/,
+					''/*JText::_('FLEXI_ORDER', true)*/,
 					str_replace('_FLEXI_ORDER_</a>', '<span class="icon-menu-2 btn btn-micro"></span></a>',
-					\Joomla\CMS\HTML\HTMLHelper::_('grid.sort', '_FLEXI_ORDER_', (!$this->filter_type ? 'a.ordering' : 'typeordering'), $this->lists['order_Dir'], $this->lists['order']))
+					JHtml::_('grid.sort', '_FLEXI_ORDER_', (!$this->filter_type ? 'a.ordering' : 'typeordering'), $this->lists['order_Dir'], $this->lists['order']))
 				);
 				?>
-				<span class="column_toggle_lbl" style="display:none;"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_ORDER' ); ?></span>
+				<span class="column_toggle_lbl" style="display:none;"><?php echo JText::_( 'FLEXI_ORDER' ); ?></span>
 			</th>
 
 			<th class="col_cb left">
 				<div class="group-fcset">
-					<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value="" title="<?php echo \Joomla\CMS\Language\Text::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
+					<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
 					<label for="checkall-toggle" class="green single"></label>
 				</div>
 			</th>
 
 			<th class="col_status hideOnDemandClass left">
-				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_STATUS', 'a.' . $this->state_propname, $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<?php echo JHtml::_('grid.sort', 'FLEXI_STATUS', 'a.' . $this->state_propname, $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<?php /*<th style="padding:0px;"><?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_FIELD_DESCRIPTION', 'a.description', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>*/ ?>
+			<?php /*<th style="padding:0px;"><?php echo JHtml::_('grid.sort', 'FLEXI_FIELD_DESCRIPTION', 'a.description', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>*/ ?>
 
 			<th class="col_title hideOnDemandClass title" colspan="2" style="text-align:left; padding-left:18px; padding-right:18px;">
-				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_FIELD_LABEL', 'a.label', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<?php echo JHtml::_('grid.sort', 'FLEXI_FIELD_LABEL', 'a.label', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
 			<th class="col_alias hideOnDemandClass hidden-phone hidden-tablet">
-				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_FIELD_NAME', 'a.name', $this->lists['order_Dir'], $this->lists['order'] ); ?>
-				<small>(<?php echo \Joomla\CMS\Language\Text::_('FLEXI_ALIAS'); ?>)</small>
+				<?php echo JHtml::_('grid.sort', 'FLEXI_FIELD_NAME', 'a.name', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<small>(<?php echo JText::_('FLEXI_ALIAS'); ?>)</small>
 			</th>
 
 			<th class="col_fieldtype hideOnDemandClass hidden-phone" colspan="2">
-				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_FIELD_TYPE', 'a.field_type', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<?php echo JHtml::_('grid.sort', 'FLEXI_FIELD_TYPE', 'a.field_type', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
 			<th class="hideOnDemandClass center nowrap hidden-phone hidden-tablet" colspan="2">
-				<?php echo '<small class="label" style="padding: 2px 4px; border-radius: 4px;">'.\Joomla\CMS\Language\Text::_( 'Content Lists' ).'</small>'; ?><br/>
+				<?php echo '<small class="label" style="padding: 2px 4px; border-radius: 4px;">'.JText::_( 'Content Lists' ).'</small>'; ?><br/>
 				<small>
-					<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_SEARCH', 'a.issearch', $this->lists['order_Dir'], $this->lists['order'] ); ?> /
-					<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_FILTER', 'a.isfilter', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+					<?php echo JHtml::_('grid.sort', 'FLEXI_SEARCH', 'a.issearch', $this->lists['order_Dir'], $this->lists['order'] ); ?> /
+					<?php echo JHtml::_('grid.sort', 'FLEXI_FILTER', 'a.isfilter', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				</small>
-				<span class="column_toggle_lbl" style="display:none;"><?php echo '<small class="badge">'.\Joomla\CMS\Language\Text::_( 'Content Lists' ).'</small>'; ?></span>
+				<span class="column_toggle_lbl" style="display:none;"><?php echo '<small class="badge">'.JText::_( 'Content Lists' ).'</small>'; ?></span>
 			</th>
 
 			<th class="hideOnDemandClass center nowrap hidden-phone hidden-tablet" colspan="2">
-				<?php echo '<small class="label" style="padding: 2px 4px; border-radius: 4px;">'.\Joomla\CMS\Language\Text::_( 'Search view' ).'</small>'; ?><br/>
+				<?php echo '<small class="label" style="padding: 2px 4px; border-radius: 4px;">'.JText::_( 'Search view' ).'</small>'; ?><br/>
 				<small>
-					<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_SEARCH', 'a.isadvsearch', $this->lists['order_Dir'], $this->lists['order'] ); ?> /
-					<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_FILTER', 'a.isadvfilter', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+					<?php echo JHtml::_('grid.sort', 'FLEXI_SEARCH', 'a.isadvsearch', $this->lists['order_Dir'], $this->lists['order'] ); ?> /
+					<?php echo JHtml::_('grid.sort', 'FLEXI_FILTER', 'a.isadvfilter', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				</small>
-				<span class="column_toggle_lbl" style="display:none;"><?php echo '<small class="badge">'.\Joomla\CMS\Language\Text::_( 'Search view' ).'</small>'; ?></span>
+				<span class="column_toggle_lbl" style="display:none;"><?php echo '<small class="badge">'.JText::_( 'Search view' ).'</small>'; ?></span>
 			</th>
 
 			<th class="col_ntypes hideOnDemandClass left hidden-phone" colspan="2">
-				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_ASSIGNED_TYPES', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<?php echo JHtml::_('grid.sort', 'FLEXI_ASSIGNED_TYPES', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
 			<th class="col_common_props hideOnDemandClass left hidden-phone hidden-tablet">
-				<?php echo $common_properties_tip . \Joomla\CMS\Language\Text::_('FLEXI_PROPERTIES'); ?>
+				<?php echo $common_properties_tip . JText::_('FLEXI_PROPERTIES'); ?>
 			</th>
 
 			<th class="col_showin_clients hideOnDemandClass left hidden-phone hidden-tablet">
-				<?php echo $showin_clients_tip . \Joomla\CMS\Language\Text::_('FLEXI_CLIENTS'); ?>
+				<?php echo $showin_clients_tip . JText::_('FLEXI_CLIENTS'); ?>
 			</th>
 
 			<th class="col_showin_views hideOnDemandClass left hidden-phone hidden-tablet">
-				<?php echo $showin_views_tip . \Joomla\CMS\Language\Text::_('FLEXI_VIEWS'); ?>
+				<?php echo $showin_views_tip . JText::_('FLEXI_VIEWS'); ?>
 			</th>
 
 			<th class="col_access hideOnDemandClass left hidden-phone hidden-tablet">
-				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_ACCESS', 'a.access', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<?php echo JHtml::_('grid.sort', 'FLEXI_ACCESS', 'a.access', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
 			<th class="hideOnDemandClass col_id center hidden-phone hidden-tablet">
-				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order']); ?>
+				<?php echo JHtml::_('grid.sort', 'FLEXI_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order']); ?>
 			</th>
 
 		</tr>
@@ -560,7 +560,7 @@ if ($js)
 			$row->canEditState = in_array('publishfield', $rights);
 			$row->canDelete    = in_array('deletefield', $rights);
 
-			$search_filter_icons = \Joomla\CMS\HTML\HTMLHelper::_($hlpname . '.search_filter_icons', $row, $i);
+			$search_filter_icons = JHtml::_($hlpname . '.search_filter_icons', $row, $i);
 
 			$orphan_warning	= '
 				<span class="icon-warning fc-icon-orange ' . $this->tooltip_class . '" title="'. flexicontent_html::getToolTip('FLEXI_WARNING', 'FLEXI_NO_TYPES_ASSIGNED', 1, 1) .'"></span>';
@@ -612,7 +612,7 @@ if ($js)
 
 			<td class="col_cb">
 				<!--div class="adminlist-table-row"></div-->
-				<?php echo \Joomla\CMS\HTML\HTMLHelper::_($hlpname . '.grid_id', $i, $row->id); ?>
+				<?php echo JHtml::_($hlpname . '.grid_id', $i, $row->id); ?>
 			</td>
 
 			<td class="col_status">
@@ -621,23 +621,23 @@ if ($js)
 					/**
 					 * State changer button
 					 */
-					echo \Joomla\CMS\HTML\HTMLHelper::_($hlpname . '.statebutton', $row, $i, $row->id < 7);
+					echo JHtml::_($hlpname . '.statebutton', $row, $i, $row->id < 7);
 
 					/**
 					 * Create an icon having information of field participating in a group
 					 */
-					echo \Joomla\CMS\HTML\HTMLHelper::_($hlpname . '.in_group', $row, $i);
+					echo JHtml::_($hlpname . '.in_group', $row, $i);
 
 					/**
 					 * Create an icon having information about master field (if current field cascading after it)
 					 */
-					echo \Joomla\CMS\HTML\HTMLHelper::_($hlpname . '.cascade_after', $row, $i);
+					echo JHtml::_($hlpname . '.cascade_after', $row, $i);
 					?>
 				</div>
 			</td>
 
 			<td class="col_title_info">
-				<?php echo \Joomla\CMS\HTML\HTMLHelper::_($hlpname . '.info_text', $row, $i, 'description', 'FLEXI_FIELD_DESCRIPTION'); ?>
+				<?php echo JHtml::_($hlpname . '.info_text', $row, $i, 'description', 'FLEXI_FIELD_DESCRIPTION'); ?>
 			</td>
 
 			<td class="col_title smaller">
@@ -652,13 +652,13 @@ if ($js)
 				 * Display an edit pencil or a check-in button if: either (a) current user has Global
 				 * Checkin privilege OR (b) record checked out by current user, otherwise display a lock
 				 */
-				echo \Joomla\CMS\HTML\HTMLHelper::_($hlpname . '.checkedout', $row, $user, $i);
+				echo JHtml::_($hlpname . '.checkedout', $row, $user, $i);
 
 				/**
 				 * Display title with edit link ... (row editable and not checked out)
 				 * Display title with no edit link ... if row is not-editable for any reason (no ACL or checked-out by other user)
 				 */
-				echo \Joomla\CMS\HTML\HTMLHelper::_($hlpname . '.edit_link', $row, $i, $row->canEdit);
+				echo JHtml::_($hlpname . '.edit_link', $row, $i, $row->canEdit);
 				?>
 			</td>
 
@@ -702,7 +702,7 @@ if ($js)
 			</td>
 
 			<td class="col_fieldtype smaller hidden-phone">
-				<?php echo \Joomla\CMS\HTML\HTMLHelper::_($hlpname . '.fieldtype_info', $row, $i); ?>
+				<?php echo JHtml::_($hlpname . '.fieldtype_info', $row, $i); ?>
 			</td>
 
 			<td class="right hidden-phone hidden-tablet">
@@ -729,7 +729,7 @@ if ($js)
 				<?php
 				if (!count($row->content_types))
 				{
-					echo '<span class="badge bg-warning badge-warning">'.\Joomla\CMS\Language\Text::_('FLEXI_NONE').'</span>';
+					echo '<span class="badge bg-warning badge-warning">'.JText::_('FLEXI_NONE').'</span>';
 				}
 				else
 				{
@@ -744,7 +744,7 @@ if ($js)
 						$type_names[] = $this->types[$type_id]->jname;
 					}
 					echo count($row_types) > 3 ? '
-						<span class="btn btn-mini hasTooltip nowrap_box" onclick="jQuery(this).next().toggle();" title="' . flexicontent_html::getToolTip(\Joomla\CMS\Language\Text::_('FLEXI_ASSIGNED_TYPES', true), '<ul class="fc_plain"><li>'.implode('</li><li>', $type_names).'</li></ul>', 0, 1) . '">
+						<span class="btn btn-mini hasTooltip nowrap_box" onclick="jQuery(this).next().toggle();" title="' . flexicontent_html::getToolTip(JText::_('FLEXI_ASSIGNED_TYPES', true), '<ul class="fc_plain"><li>'.implode('</li><li>', $type_names).'</li></ul>', 0, 1) . '">
 							'.count($row_types).' <i class="icon-briefcase"></i>
 						</span>
 						<div class="fc_assignments_box fc_types">' : '';
@@ -759,17 +759,17 @@ if ($js)
 			<td class="col_common_props hidden-phone hidden-tablet">
 				<?php
 				echo $row->parameters->get('display_label')
-					? '<span class="icon-info" title="'.\Joomla\CMS\Language\Text::_('FLEXI_FIELD_DISPLAY_LABEL').'" style="color:black; font-size: 16px;"></span>'
-					: '<span class="icon-info" title="'.\Joomla\CMS\Language\Text::_('FLEXI_FIELD_DISPLAY_LABEL').'" style="color:lightgray; font-size: 16px;"></span>';
+					? '<span class="icon-info" title="'.JText::_('FLEXI_FIELD_DISPLAY_LABEL').'" style="color:black; font-size: 16px;"></span>'
+					: '<span class="icon-info" title="'.JText::_('FLEXI_FIELD_DISPLAY_LABEL').'" style="color:lightgray; font-size: 16px;"></span>';
 				echo $row->parameters->get('required')
-					? '<span class="icon-lock" title="'.\Joomla\CMS\Language\Text::_('FLEXI_REQUIRED').'" style="color:black; font-size: 16px;"></span>'
-					: '<span class="icon-lock" title="'.\Joomla\CMS\Language\Text::_('FLEXI_REQUIRED').'" style="color:lightgray; font-size: 16px;"></span>';
+					? '<span class="icon-lock" title="'.JText::_('FLEXI_REQUIRED').'" style="color:black; font-size: 16px;"></span>'
+					: '<span class="icon-lock" title="'.JText::_('FLEXI_REQUIRED').'" style="color:lightgray; font-size: 16px;"></span>';
 				echo $row->parameters->get('allow_multiple')
-					? '<span class="icon-items" title="'.\Joomla\CMS\Language\Text::_('FLEXI_MULTIPLE').'" style="color:black; font-size: 16px;"></span>'
-					: '<span class="icon-items" title="'.\Joomla\CMS\Language\Text::_('FLEXI_MULTIPLE').'" style="color:lightgray; font-size: 16px;"></span>';
+					? '<span class="icon-items" title="'.JText::_('FLEXI_MULTIPLE').'" style="color:black; font-size: 16px;"></span>'
+					: '<span class="icon-items" title="'.JText::_('FLEXI_MULTIPLE').'" style="color:lightgray; font-size: 16px;"></span>';
 				echo !$row->untranslatable
-					? '<span class="icon-flag" title="'.\Joomla\CMS\Language\Text::_('FLEXI_FIELD_TRANSLATION_DIFFERS') .'" style="color:black; font-size: 16px;"></span>'
-					: '<span class="icon-link" title="'.\Joomla\CMS\Language\Text::_('FLEXI_FIELD_TRANSLATION_SHARED') .'" style="color:darkred; font-size: 16px;"></span>';
+					? '<span class="icon-flag" title="'.JText::_('FLEXI_FIELD_TRANSLATION_DIFFERS') .'" style="color:black; font-size: 16px;"></span>'
+					: '<span class="icon-link" title="'.JText::_('FLEXI_FIELD_TRANSLATION_SHARED') .'" style="color:darkred; font-size: 16px;"></span>';
 				?>
 			</td>
 
@@ -778,14 +778,14 @@ if ($js)
 				$show_in_clients = FLEXIUtilities::paramToArray($row->parameters->get('show_in_clients', array('desktop', 'tablet', 'mobile')));
 				echo ' ';
 				echo in_array('desktop', $show_in_clients)
-					? '<span class="icon-screen" title="'.\Joomla\CMS\Language\Text::_('FLEXI_DESKTOP') .'" style="color:black; font-size: 16px;"></span>'
-					: '<span class="icon-screen" title="'.\Joomla\CMS\Language\Text::_('FLEXI_DESKTOP') .'" style="color:lightgray; font-size: 16px;"></span>';
+					? '<span class="icon-screen" title="'.JText::_('FLEXI_DESKTOP') .'" style="color:black; font-size: 16px;"></span>'
+					: '<span class="icon-screen" title="'.JText::_('FLEXI_DESKTOP') .'" style="color:lightgray; font-size: 16px;"></span>';
 				echo in_array('tablet', $show_in_clients)
-					? '<span class="icon-tablet" title="'.\Joomla\CMS\Language\Text::_('FLEXI_TABLET') .'" style="color:black; font-size: 16px;"></span>'
-					: '<span class="icon-tablet" title="'.\Joomla\CMS\Language\Text::_('FLEXI_TABLET') .'" style="color:lightgray; font-size: 16px;"></span>';
+					? '<span class="icon-tablet" title="'.JText::_('FLEXI_TABLET') .'" style="color:black; font-size: 16px;"></span>'
+					: '<span class="icon-tablet" title="'.JText::_('FLEXI_TABLET') .'" style="color:lightgray; font-size: 16px;"></span>';
 				echo in_array('mobile', $show_in_clients)
-					? '<span class="icon-mobile" title="'.\Joomla\CMS\Language\Text::_('FLEXI_PHONE') .'" style="color:black; font-size: 16px;"></span>'
-					: '<span class="icon-mobile" title="'.\Joomla\CMS\Language\Text::_('FLEXI_PHONE') .'" style="color:lightgray; font-size: 16px;"></span>';
+					? '<span class="icon-mobile" title="'.JText::_('FLEXI_PHONE') .'" style="color:black; font-size: 16px;"></span>'
+					: '<span class="icon-mobile" title="'.JText::_('FLEXI_PHONE') .'" style="color:lightgray; font-size: 16px;"></span>';
 				?>
 			</td>
 
@@ -794,14 +794,14 @@ if ($js)
 				$show_in_views = FLEXIUtilities::paramToArray($row->parameters->get('show_in_views', array('item', 'category', 'module', 'backend')));
 				echo ' ';
 				echo in_array('item', $show_in_views)
-					? '<span class="icon-file" title="'.\Joomla\CMS\Language\Text::_('FLEXI_ITEM') .'" style="color:black; font-size: 16px;"></span>'
-					: '<span class="icon-file" title="'.\Joomla\CMS\Language\Text::_('FLEXI_ITEM') .'" style="color:lightgray; font-size: 16px;"></span>';
+					? '<span class="icon-file" title="'.JText::_('FLEXI_ITEM') .'" style="color:black; font-size: 16px;"></span>'
+					: '<span class="icon-file" title="'.JText::_('FLEXI_ITEM') .'" style="color:lightgray; font-size: 16px;"></span>';
 				echo in_array('category', $show_in_views)
-					? '<span class="icon-menu-3" title="'.\Joomla\CMS\Language\Text::_('FLEXI_CATEGORY') .'" style="color:black; font-size: 16px;"></span>'
-					: '<span class="icon-menu-3" title="'.\Joomla\CMS\Language\Text::_('FLEXI_CATEGORY') .'" style="color:lightgray; font-size: 16px;"></span>';
+					? '<span class="icon-menu-3" title="'.JText::_('FLEXI_CATEGORY') .'" style="color:black; font-size: 16px;"></span>'
+					: '<span class="icon-menu-3" title="'.JText::_('FLEXI_CATEGORY') .'" style="color:lightgray; font-size: 16px;"></span>';
 				echo in_array('module', $show_in_views)
-					? '<span class="icon-grid-view" title="'.\Joomla\CMS\Language\Text::_('FLEXI_MODULE') .'" style="color:black; font-size: 16px;"></span>'
-					: '<span class="icon-grid-view" title="'.\Joomla\CMS\Language\Text::_('FLEXI_MODULE') .'" style="color:lightgray; font-size: 16px;"></span>';
+					? '<span class="icon-grid-view" title="'.JText::_('FLEXI_MODULE') .'" style="color:black; font-size: 16px;"></span>'
+					: '<span class="icon-grid-view" title="'.JText::_('FLEXI_MODULE') .'" style="color:lightgray; font-size: 16px;"></span>';
 				?>
 			</td>	
 
@@ -830,10 +830,10 @@ if ($js)
 	</div>
 
 	<div style="margin-top: 48px;">
-		<div class="fc-iblock" style="width: 140px; min-height:2em; vertical-align: top; padding: 6px;"><span class="icon-publish" style="font-size: 16px;"></span> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_PUBLISHED' ); ?></div>
-		<div class="fc-iblock" style="width: 140px; min-height:2em; vertical-align: top; padding: 6px;"><span class="icon-unpublish" style="font-size: 16px;"></span> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_UNPUBLISHED' ); ?></div>
-		<div class="fc-iblock" style="width: 140px; min-height:2em; vertical-align: top; padding: 6px;"><span class="icon-archive" style="font-size: 16px;"></span> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_ARCHIVED' ); ?></div>
-		<div class="fc-iblock" style="width: 140px; min-height:2em; vertical-align: top; padding: 6px;"><span class="icon-trash" style="font-size: 16px;"></span>	<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_TRASHED' ); ?></div>
+		<div class="fc-iblock" style="width: 140px; min-height:2em; vertical-align: top; padding: 6px;"><span class="icon-publish" style="font-size: 16px;"></span> <?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></div>
+		<div class="fc-iblock" style="width: 140px; min-height:2em; vertical-align: top; padding: 6px;"><span class="icon-unpublish" style="font-size: 16px;"></span> <?php echo JText::_( 'FLEXI_UNPUBLISHED' ); ?></div>
+		<div class="fc-iblock" style="width: 140px; min-height:2em; vertical-align: top; padding: 6px;"><span class="icon-archive" style="font-size: 16px;"></span> <?php echo JText::_( 'FLEXI_ARCHIVED' ); ?></div>
+		<div class="fc-iblock" style="width: 140px; min-height:2em; vertical-align: top; padding: 6px;"><span class="icon-trash" style="font-size: 16px;"></span>	<?php echo JText::_( 'FLEXI_TRASHED' ); ?></div>
 	</div>
 
 	<!-- This manager form fields -->
@@ -849,7 +849,7 @@ if ($js)
 	<input type="hidden" id="filter_order" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
 	<input type="hidden" id="filter_order_Dir" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
 	<input type="hidden" name="fcform" value="1" />
-	<?php echo \Joomla\CMS\HTML\HTMLHelper::_('form.token'); ?>
+	<?php echo JHtml::_('form.token'); ?>
 
 	<!-- fc_perf -->
 
@@ -914,7 +914,7 @@ if (sidebarState === 'closed') {
 <?php endif; ?>
 
 <?php
-\Joomla\CMS\Factory::getDocument()->addScriptDeclaration('
+JFactory::getDocument()->addScriptDeclaration('
 	function fc_edit_fcfield_modal_load( container )
 	{
 		if ( container.find("iframe").get(0).contentWindow.location.href.indexOf("view=fields") != -1 )

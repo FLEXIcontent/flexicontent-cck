@@ -20,10 +20,10 @@
 defined('_JEXEC') or die('Restricted access');
 
 jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
+jimport('cms.html.select');    // JHtmlSelect
 
-jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
-\Joomla\CMS\Form\FormHelper::loadFieldClass('list');   // \Joomla\CMS\Form\Field\ListField
+jimport('joomla.form.helper'); // JFormHelper
+JFormHelper::loadFieldClass('list');   // JFormFieldList
 
 /**
  * Renders an FLEXIcontent field ordering list
@@ -32,7 +32,7 @@ jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-class JFormFieldFcordering extends \Joomla\CMS\Form\Field\ListField
+class JFormFieldFcordering extends JFormFieldList
 {
 	/**
 	 * Element name
@@ -73,52 +73,52 @@ class JFormFieldFcordering extends \Joomla\CMS\Form\Field\ListField
 
 		if ( !empty($attributes['add_global']) )
 		{
-			$ordering[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  '', 	\Joomla\CMS\Language\Text::_( 'FLEXI_USE_GLOBAL' ) );
+			$ordering[] = JHtml::_('select.option',  '', 	JText::_( 'FLEXI_USE_GLOBAL' ) );
 		}
 
-		if ( !isset($s['date']) )      $ordering[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  $o['date'],			\Joomla\CMS\Language\Text::_( 'FLEXI_ORDER_OLDEST_FIRST' ) );         // 'addedrev'
-		if ( !isset($s['rdate']) )     $ordering[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  $o['rdate'],			\Joomla\CMS\Language\Text::_( 'FLEXI_ORDER_MOST_RECENT_FIRST' ) );    // 'added'
+		if ( !isset($s['date']) )      $ordering[] = JHtml::_('select.option',  $o['date'],			JText::_( 'FLEXI_ORDER_OLDEST_FIRST' ) );         // 'addedrev'
+		if ( !isset($s['rdate']) )     $ordering[] = JHtml::_('select.option',  $o['rdate'],			JText::_( 'FLEXI_ORDER_MOST_RECENT_FIRST' ) );    // 'added'
 
-		if ( !isset($s['modified']) )  $ordering[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  $o['modified'],	\Joomla\CMS\Language\Text::_( 'FLEXI_ORDER_LAST_MODIFIED_FIRST' ) );  // 'updated'
+		if ( !isset($s['modified']) )  $ordering[] = JHtml::_('select.option',  $o['modified'],	JText::_( 'FLEXI_ORDER_LAST_MODIFIED_FIRST' ) );  // 'updated'
 
 		if ( !empty($attributes['add_expired_scheduled']) )
 		{
-			$ordering[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  'published',        \Joomla\CMS\Language\Text::_( 'FLEXI_ORDER_RECENTLY_PUBLISHED_SCHEDULED_FIRST' ) );
-			$ordering[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  'published_oldest', \Joomla\CMS\Language\Text::_( 'FLEXI_ORDER_OLDEST_PUBLISHED_SCHEDULED_FIRST' ) );
-			$ordering[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  'expired',	         \Joomla\CMS\Language\Text::_( 'FLEXI_ORDER_RECENTLY_EXPIRING_EXPIRED_FIRST' ) );
-			$ordering[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  'expired_oldest',   \Joomla\CMS\Language\Text::_( 'FLEXI_ORDER_OLDEST_EXPIRING_EXPIRED_FIRST' ) );
+			$ordering[] = JHtml::_('select.option',  'published',        JText::_( 'FLEXI_ORDER_RECENTLY_PUBLISHED_SCHEDULED_FIRST' ) );
+			$ordering[] = JHtml::_('select.option',  'published_oldest', JText::_( 'FLEXI_ORDER_OLDEST_PUBLISHED_SCHEDULED_FIRST' ) );
+			$ordering[] = JHtml::_('select.option',  'expired',	         JText::_( 'FLEXI_ORDER_RECENTLY_EXPIRING_EXPIRED_FIRST' ) );
+			$ordering[] = JHtml::_('select.option',  'expired_oldest',   JText::_( 'FLEXI_ORDER_OLDEST_EXPIRING_EXPIRED_FIRST' ) );
 		} else {
-			$ordering[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  'published',        \Joomla\CMS\Language\Text::_( 'FLEXI_ORDER_RECENTLY_PUBLISHED_FIRST' ) );
-			$ordering[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  'published_oldest', \Joomla\CMS\Language\Text::_( 'FLEXI_ORDER_OLDEST_PUBLISHED_FIRST' ) );
+			$ordering[] = JHtml::_('select.option',  'published',        JText::_( 'FLEXI_ORDER_RECENTLY_PUBLISHED_FIRST' ) );
+			$ordering[] = JHtml::_('select.option',  'published_oldest', JText::_( 'FLEXI_ORDER_OLDEST_PUBLISHED_FIRST' ) );
 		}
 
-		if ( !isset($s['alpha']) )      $ordering[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  'alpha',      \Joomla\CMS\Language\Text::_( 'FLEXI_ORDER_TITLE_ALPHABETICAL' ) );
-		if ( !isset($s['ralpha']) )     $ordering[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  $o['ralpha'], \Joomla\CMS\Language\Text::_( 'FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE' ) );    // 'alpharev'
+		if ( !isset($s['alpha']) )      $ordering[] = JHtml::_('select.option',  'alpha',      JText::_( 'FLEXI_ORDER_TITLE_ALPHABETICAL' ) );
+		if ( !isset($s['ralpha']) )     $ordering[] = JHtml::_('select.option',  $o['ralpha'], JText::_( 'FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE' ) );    // 'alpharev'
 
-		if ( !isset($s['author']) )     $ordering[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  'author',     \Joomla\CMS\Language\Text::_( 'FLEXI_ORDER_AUTHOR_ALPHABETICAL' ) );
-		if ( !isset($s['rauthor']) )    $ordering[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  'rauthor',    \Joomla\CMS\Language\Text::_( 'FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE' ) );
+		if ( !isset($s['author']) )     $ordering[] = JHtml::_('select.option',  'author',     JText::_( 'FLEXI_ORDER_AUTHOR_ALPHABETICAL' ) );
+		if ( !isset($s['rauthor']) )    $ordering[] = JHtml::_('select.option',  'rauthor',    JText::_( 'FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE' ) );
 
-		if ( !isset($s['hits']) )       $ordering[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  $o['hits'],   \Joomla\CMS\Language\Text::_( 'FLEXI_ORDER_MOST_HITS' ) );    // 'popular'
-		if ( !isset($s['rhits']) )      $ordering[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  'rhits',      \Joomla\CMS\Language\Text::_( 'FLEXI_ORDER_LEAST_HITS' ) );
+		if ( !isset($s['hits']) )       $ordering[] = JHtml::_('select.option',  $o['hits'],   JText::_( 'FLEXI_ORDER_MOST_HITS' ) );    // 'popular'
+		if ( !isset($s['rhits']) )      $ordering[] = JHtml::_('select.option',  'rhits',      JText::_( 'FLEXI_ORDER_LEAST_HITS' ) );
 
-		if ( !isset($s['id']) )         $ordering[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  'id',         \Joomla\CMS\Language\Text::_( 'FLEXI_ORDER_HIGHEST_ITEM_ID' ) );
-		if ( !isset($s['rid']) )        $ordering[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  'rid',        \Joomla\CMS\Language\Text::_( 'FLEXI_ORDER_LOWEST_ITEM_ID' ) );
+		if ( !isset($s['id']) )         $ordering[] = JHtml::_('select.option',  'id',         JText::_( 'FLEXI_ORDER_HIGHEST_ITEM_ID' ) );
+		if ( !isset($s['rid']) )        $ordering[] = JHtml::_('select.option',  'rid',        JText::_( 'FLEXI_ORDER_LOWEST_ITEM_ID' ) );
 
-		if ( !isset($s['commented']) )  $ordering[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  'commented',  \Joomla\CMS\Language\Text::_( 'FLEXI_ORDER_MOST_COMMENTED' ) );
-		if ( !isset($s['rated']) )      $ordering[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  'rated',      \Joomla\CMS\Language\Text::_( 'FLEXI_ORDER_BEST_RATED' ) );
-		if ( !isset($s['order']) )      $ordering[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  $o['order'],  \Joomla\CMS\Language\Text::_( 'FLEXI_ORDER_CONFIGURED_ORDER' ) );    // 'catorder'
-		if ( !isset($s['rorder']) )     $ordering[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  'rorder',     \Joomla\CMS\Language\Text::_( 'FLEXI_ORDER_CONFIGURED_ORDER_REVERSE' ) );    // 'catorder reverse'
-		if ( !isset($s['jorder']) )     $ordering[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  'jorder',     \Joomla\CMS\Language\Text::_( 'FLEXI_ORDER_CONFIGURED_ORDER_JOOMLA' ) );
-		if ( !isset($s['rjorder']) )    $ordering[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  'rjorder',    \Joomla\CMS\Language\Text::_( 'FLEXI_ORDER_CONFIGURED_ORDER_JOOMLA_REVERSE' ) );
+		if ( !isset($s['commented']) )  $ordering[] = JHtml::_('select.option',  'commented',  JText::_( 'FLEXI_ORDER_MOST_COMMENTED' ) );
+		if ( !isset($s['rated']) )      $ordering[] = JHtml::_('select.option',  'rated',      JText::_( 'FLEXI_ORDER_BEST_RATED' ) );
+		if ( !isset($s['order']) )      $ordering[] = JHtml::_('select.option',  $o['order'],  JText::_( 'FLEXI_ORDER_CONFIGURED_ORDER' ) );    // 'catorder'
+		if ( !isset($s['rorder']) )     $ordering[] = JHtml::_('select.option',  'rorder',     JText::_( 'FLEXI_ORDER_CONFIGURED_ORDER_REVERSE' ) );    // 'catorder reverse'
+		if ( !isset($s['jorder']) )     $ordering[] = JHtml::_('select.option',  'jorder',     JText::_( 'FLEXI_ORDER_CONFIGURED_ORDER_JOOMLA' ) );
+		if ( !isset($s['rjorder']) )    $ordering[] = JHtml::_('select.option',  'rjorder',    JText::_( 'FLEXI_ORDER_CONFIGURED_ORDER_JOOMLA_REVERSE' ) );
 
-		if ( !isset($s['random']) )     $ordering[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  'random',     \Joomla\CMS\Language\Text::_( 'FLEXI_ORDER_RANDOM' ) . ' ' . \Joomla\CMS\Language\Text::_( 'FLEXI_PER_SESSION_PAGINATION_USABLE' ) );
-		if ( !isset($s['random_ppr']) ) $ordering[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  'random_ppr', \Joomla\CMS\Language\Text::_( 'FLEXI_ORDER_RANDOM' ) . ' ' . \Joomla\CMS\Language\Text::_( 'FLEXI_PER_VIEW_PAGINATION_NOT_USABLE' ) );
-		if ( !isset($s['alias']) )      $ordering[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  'alias',      \Joomla\CMS\Language\Text::_( 'FLEXI_ORDER_ALIAS' ) );
-		if ( !isset($s['ralias']) )     $ordering[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  'ralias',     \Joomla\CMS\Language\Text::_( 'FLEXI_ORDER_ALIAS_REVERSE' ) );
+		if ( !isset($s['random']) )     $ordering[] = JHtml::_('select.option',  'random',     JText::_( 'FLEXI_ORDER_RANDOM' ) . ' ' . JText::_( 'FLEXI_PER_SESSION_PAGINATION_USABLE' ) );
+		if ( !isset($s['random_ppr']) ) $ordering[] = JHtml::_('select.option',  'random_ppr', JText::_( 'FLEXI_ORDER_RANDOM' ) . ' ' . JText::_( 'FLEXI_PER_VIEW_PAGINATION_NOT_USABLE' ) );
+		if ( !isset($s['alias']) )      $ordering[] = JHtml::_('select.option',  'alias',      JText::_( 'FLEXI_ORDER_ALIAS' ) );
+		if ( !isset($s['ralias']) )     $ordering[] = JHtml::_('select.option',  'ralias',     JText::_( 'FLEXI_ORDER_ALIAS_REVERSE' ) );
 
 		if ( !empty($attributes['add_field_order']) )
 		{
-			$ordering[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  'field', 		\Joomla\CMS\Language\Text::_( 'FLEXI_CUSTOM_FIELD' ) );
+			$ordering[] = JHtml::_('select.option',  'field', 		JText::_( 'FLEXI_CUSTOM_FIELD' ) );
 		}
 
 		return $ordering;

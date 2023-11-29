@@ -18,14 +18,14 @@
 defined('_JEXEC') or die('Restricted access');
 
 jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
-jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
+jimport('cms.html.select');    // JHtmlSelect
+jimport('joomla.form.field');  // JFormField
 
-jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
-\Joomla\CMS\Form\FormHelper::loadFieldClass('groupedlist');   // \Joomla\CMS\Form\Field\GroupedlistField
+jimport('joomla.form.helper'); // JFormHelper
+JFormHelper::loadFieldClass('groupedlist');   // JFormFieldGroupedList
 
 
-class JFormFieldMicrodataprops extends \Joomla\CMS\Form\Field\GroupedlistField
+class JFormFieldMicrodataprops extends JFormFieldGroupedList
 {
 	protected $type = 'microdataprops';
 	
@@ -37,14 +37,14 @@ class JFormFieldMicrodataprops extends \Joomla\CMS\Form\Field\GroupedlistField
 		if ($jm_types === null)
 		{
 			jimport('joomla.microdata.microdata');
-			$jm = new \Joomla\CMS\Microdata\Microdata();
+			$jm = new JMicrodata();
 			$jm_types = $jm->getTypes();
 		}
 
 		// Prepare the grouped list
 		$groups = array();
 		$groups[0]['items'] = array(
-			\Joomla\CMS\HTML\HTMLHelper::_('select.option','', '-- '.\Joomla\CMS\Language\Text::_('FLEXI_DISABLE').' --')
+			JHtml::_('select.option','', '-- '.JText::_('FLEXI_DISABLE').' --')
 		);
 
 		foreach($jm_types as $type => $tdata)
@@ -52,18 +52,18 @@ class JFormFieldMicrodataprops extends \Joomla\CMS\Form\Field\GroupedlistField
 			$options = array();
 			foreach($tdata['properties'] as $propname => $props)
 			{
-				$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', $propname, $propname);
+				$options[] = JHtml::_('select.option', $propname, $propname);
 			}
 
 			$grp = (string) $type;
 			$groups[$grp] = array();
 			$groups[$grp]['id'] = null;
-			$groups[$grp]['text'] = \Joomla\CMS\Language\Text::_($type);
+			$groups[$grp]['text'] = JText::_($type);
 			$groups[$grp]['items'] = $options;
 		}
 
 		// Render and return the drop down select
-		return \Joomla\CMS\HTML\HTMLHelper::_('select.groupedlist', $groups, $this->name,
+		return JHtml::_('select.groupedlist', $groups, $this->name,
 			array(
 				'id' => $this->id,
 				'group.id' => 'id',

@@ -22,7 +22,7 @@ foreach ($values as $n => $value)
 	$title_attr = $desc_encoded ? $title_encoded . '::' . $desc_encoded : $title_encoded;
 	$group_str = $group_name ? 'data-mediabox-group="group['.$group_name.'];"' : '';
 	$field->{$prop}[] = $pretext.
-		'<a style="'.$style.'" href="'.\Joomla\CMS\Uri\Uri::root(true).'/'.$srcl.'"  class="fc_image_thumb jcepopup" '.$group_str.' title[' . $title_attr . ']">
+		'<a style="'.$style.'" href="'.JUri::root(true).'/'.$srcl.'"  class="fc_image_thumb jcepopup" '.$group_str.' title[' . $title_attr . ']">
 			'.$img_nolegend.'
 		</a>'
 		. $inline_info
@@ -41,7 +41,7 @@ if ( !isset(static::$js_added[$field->id][__FILE__]) )
 
 	$js = '';
 
-	if ($js) \Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+	if ($js) JFactory::getDocument()->addScriptDeclaration($js);
 
 	static::$js_added[$field->id][__FILE__] = true;
 }

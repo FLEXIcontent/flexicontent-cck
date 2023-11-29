@@ -1,7 +1,7 @@
 <?php
 // States drop down list
 $list_states = array(
-	''=>\Joomla\CMS\Language\Text::_('FLEXI_SELECT'),
+	''=>JText::_('FLEXI_SELECT'),
 	'AL'=>'Alabama',
 	'AK'=>'Alaska',
 	'AS'=>'American Samoa',

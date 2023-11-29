@@ -6,7 +6,7 @@
 	<field name="name" type="text" default="" label="FLEXI_FIELD_NAME" description="FLEXI_FIELD_FIELDNAME_DESC" labelclass="fc-prop-lbl" />
 	<field name="label" type="text" default="" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_FIELDLABEL_DESC" required="required" labelclass="fc-prop-lbl" />
 	<field name="ordering" type="fieldordering" default="999" label="Ordering" description="FLEXI_FIELD_ORDER_DESC" labelclass="fc-prop-lbl" />
-	<field name="description" type="textarea" filter="\Joomla\CMS\Component\ComponentHelper::filterText" cols="30" rows="5" default="" label="FLEXI_FIELD_DESCRIPTION" description="FLEXI_FIELD_DESCRIPTION_DESC" labelclass="fc-prop-lbl" />
+	<field name="description" type="textarea" filter="JComponentHelper::filterText" cols="30" rows="5" default="" label="FLEXI_FIELD_DESCRIPTION" description="FLEXI_FIELD_DESCRIPTION_DESC" labelclass="fc-prop-lbl" />
 	<field name="isfilter" type="fcradio" default="1" label="FLEXI_FIELD_CONTENT_LIST_FILTERABLE" description="FLEXI_FIELD_CONTENT_LIST_FILTERABLE_DESC" class="btn-group btn-group-yesno" labelclass="fc-prop-lbl">
 		<option value="0">FLEXI_NO</option>
 		<option value="1">FLEXI_YES</option>

@@ -28,7 +28,7 @@ jimport('cms.plugin.plugin');
  * @subpackage	FLEXIcontent
  * @since 		1.5.5
  */
-class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
+class plgFlexicontentFlexinotify extends JPlugin
 {
 
 	/**
@@ -46,7 +46,7 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 	{
 		parent::__construct( $subject, $params );
 
-		\Joomla\CMS\Plugin\CMSPlugin::loadLanguage( 'plg_flexicontent_flexinotify' );
+		JPlugin::loadLanguage( 'plg_flexicontent_flexinotify' );
 	}
 
 
@@ -59,13 +59,13 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 	 * @param 	boolean		Indicates if item is new
 	 */
 	/*function onBeforeSaveItem( &$item, $isnew ) {
-		$post = \Joomla\CMS\Factory::getApplication()->input->get('post');
+		$post = JFactory::getApplication()->input->get('post');
 		//echo "<pre>"; $post; echo "</pre>"; exit;
 
 		//...
 
 		if ($somethingbad) {
-			$app = &\Joomla\CMS\Factory::getApplication();
+			$app = &JFactory::getApplication();
 			$app->enqueueMessage( 'Saving cancel due to error ...', 'notice' );
 			return false;
 		}
@@ -89,10 +89,10 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 		 */
 
 		// Get Plugin parameters and send notifications
-		$plugin  = \Joomla\CMS\Plugin\PluginHelper::getPlugin('flexicontent', 'flexinotify');
-		$params  = new \Joomla\Registry\Registry($plugin->params);
-		$app     = \Joomla\CMS\Factory::getApplication();
-		$session = \Joomla\CMS\Factory::getSession();
+		$plugin  = JPluginHelper::getPlugin('flexicontent', 'flexinotify');
+		$params  = new JRegistry($plugin->params);
+		$app     = JFactory::getApplication();
+		$session = JFactory::getSession();
 
 		$debug_notifications = (int) $params->get('debug_notifications', 0);
 
@@ -143,7 +143,7 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 
 			if (empty($owners_notified[$item->id]))
 			{
-				$owner = \Joomla\CMS\Factory::getUser($item->created_by);
+				$owner = JFactory::getUser($item->created_by);
 				$this->sendOwnerNotification($item, $owner, $params);
 
 				// Set flag to avoid resending notification
@@ -209,7 +209,7 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 
 	function _getSubscribers($itemid)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 
 		$query	= 'SELECT u.* '
 				.' FROM #__flexicontent_favourites AS f'
@@ -233,7 +233,7 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 		{
 			if ($debug_notifications)
 			{
-				\Joomla\CMS\Factory::getApplication()->enqueueMessage("** Notification Plugin: &nbsp; Item owner %d could not be loaded. Notification to owner for item changes could not be sent", 'message');
+				JFactory::getApplication()->enqueueMessage("** Notification Plugin: &nbsp; Item owner %d could not be loaded. Notification to owner for item changes could not be sent", 'message');
 			}
 			return;
 		}
@@ -241,8 +241,8 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 		global $globalcats;
 
 		$categories = $globalcats;
-		$app        = \Joomla\CMS\Factory::getApplication();
-		$config     = \Joomla\CMS\Factory::getConfig();
+		$app        = JFactory::getApplication();
+		$config     = JFactory::getConfig();
 
 		// Get the route helper
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
@@ -250,7 +250,7 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 		// Import joomla mail helper class that contains the sendMail helper function
 		jimport('joomla.mail.helper');
 
-		$mailer = \Joomla\CMS\Factory::getMailer();
+		$mailer = JFactory::getMailer();
 		$mailer->Encoding = 'base64';
 
 		/**
@@ -285,8 +285,8 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 			-2 => 'FLEXI_TRASHED',
 		);
 		$itemStateName = isset($state_labels[$item->state])
-			? \Joomla\CMS\Language\Text::_($state_labels[$item->state])
-			: \Joomla\CMS\Language\Text::_('FLEXI_UNKNOWN');
+			? JText::_($state_labels[$item->state])
+			: JText::_('FLEXI_UNKNOWN');
 
 		// Create the non-SEF URL
 		$site_languages = FLEXIUtilities::getLanguages();
@@ -300,33 +300,33 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 		// Create the SEF URL
 		$item_url = $app->isClient('administrator')
 			? flexicontent_html::getSefUrl($item_url)   // ..., $_xhtml= true, $_ssl=-1);
-			: \Joomla\CMS\Router\Route::_($item_url);  // ..., $_xhtml= true, $_ssl=-1);
+			: JRoute::_($item_url);  // ..., $_xhtml= true, $_ssl=-1);
 
 		// Make URL absolute since this URL will be emailed
-		$item_url = \Joomla\CMS\Uri\Uri::getInstance()->toString(array('scheme', 'host', 'port')) . $item_url;
+		$item_url = JUri::getInstance()->toString(array('scheme', 'host', 'port')) . $item_url;
 
 
 		/**
 		 * Create parameters passed to mail helper function
 		 */
 
-		$site_info  = $app->getCfg('sitename') . ' - ' . \Joomla\CMS\Uri\Uri::root();
+		$site_info  = $app->getCfg('sitename') . ' - ' . JUri::root();
 		$sendermail	= $params->get('sendermail', $app->getCfg('mailfrom'));
-		$sendermail	= \Joomla\CMS\Mail\MailHelper::cleanAddress($sendermail);
+		$sendermail	= JMailHelper::cleanAddress($sendermail);
 
 		// Use 'sitename' as sender name
 		$sendername	= $params->get('sendername', $app->getCfg('sitename'));
 
 		// Use custom message subject if this is set
 		$subject = $params->get('mailsubject_owner', '')
-			? \Joomla\CMS\Mail\MailHelper::cleanSubject($params->get('mailsubject_owner'))
-			: \Joomla\CMS\Language\Text::_('FLEXI_SUBJECT_DEFAULT');
+			? JMailHelper::cleanSubject($params->get('mailsubject_owner'))
+			: JText::_('FLEXI_SUBJECT_DEFAULT');
 
 		$body = $params->get('mailbody_owner', '')
-			? \Joomla\CMS\Mail\MailHelper::cleanSubject($params->get('mailsubject_owner'))
-			: \Joomla\CMS\Language\Text::_('FLEXI_SUBJECT_DEFAULT');
+			? JMailHelper::cleanSubject($params->get('mailsubject_owner'))
+			: JText::_('FLEXI_SUBJECT_DEFAULT');
 
-		$message = \Joomla\CMS\Language\Text::sprintf('FLEXI_NOTIFICATION_MESSAGE_OWNER',
+		$message = JText::sprintf('FLEXI_NOTIFICATION_MESSAGE_OWNER',
 			$subname,
 			$itemid,
 			$title,
@@ -344,7 +344,7 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 
 		$to_arr = array();
 
-		$to = \Joomla\CMS\Mail\MailHelper::cleanAddress($owner->email);
+		$to = JMailHelper::cleanAddress($owner->email);
 		$to_arr[] = $to;
 		$_message = $message;
 		$_message = str_replace('__OWNER_NAME__', $owner->name, $_message);
@@ -364,7 +364,7 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 		/**
 		 * Finally give some feedback to current editor
 		 */
-		$msg = \Joomla\CMS\Language\Text::_($send_result ? 'FLEXI_NOTIFY_OWNER_SUCCESS' : 'FLEXI_NOTIFY_OWNER_FAILURE');
+		$msg = JText::_($send_result ? 'FLEXI_NOTIFY_OWNER_SUCCESS' : 'FLEXI_NOTIFY_OWNER_FAILURE');
 
 		// Include the email of owner if debug is enabled
 		$msg_receiver = !$debug_notifications ? '' : ' <br/> Owner email: ' . $to;
@@ -382,8 +382,8 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 
 		$categories = $globalcats;
 
-		$app    = \Joomla\CMS\Factory::getApplication();
-		$config = \Joomla\CMS\Factory::getConfig();
+		$app    = JFactory::getApplication();
+		$config = JFactory::getConfig();
 
 		// Get the route helper
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
@@ -391,7 +391,7 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 		// Import joomla mail helper class that contains the sendMail helper function
 		jimport('joomla.mail.helper');
 
-		$mailer = \Joomla\CMS\Factory::getMailer();
+		$mailer = JFactory::getMailer();
 		$mailer->Encoding = 'base64';
 
 		$debug_notifications = (int) $params->get('debug_notifications', 0);
@@ -424,7 +424,7 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 		 * Create variables need for subject
 		 */
 
-		$subname 	= ($send_personalized && $include_fullname) ? '__SUBSCRIBER_NAME__' : \Joomla\CMS\Language\Text::_('FLEXI_SUBSCRIBER');
+		$subname 	= ($send_personalized && $include_fullname) ? '__SUBSCRIBER_NAME__' : JText::_('FLEXI_SUBSCRIBER');
 		$itemid   = $item->id;
 		$title    = $item->title;
 		$maincat  = $categories[$item->catid]->title;
@@ -441,29 +441,29 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 		// Create the SEF URL
 		$item_url = $app->isClient('administrator')
 			? flexicontent_html::getSefUrl($item_url)   // ..., $_xhtml= true, $_ssl=-1);
-			: \Joomla\CMS\Router\Route::_($item_url);  // ..., $_xhtml= true, $_ssl=-1);
+			: JRoute::_($item_url);  // ..., $_xhtml= true, $_ssl=-1);
 
 		// Make URL absolute since this URL will be emailed
-		$item_url = \Joomla\CMS\Uri\Uri::getInstance()->toString(array('scheme', 'host', 'port')) . $item_url;
+		$item_url = JUri::getInstance()->toString(array('scheme', 'host', 'port')) . $item_url;
 
 
 		/**
 		 * Create parameters passed to mail helper function
 		 */
 
-		$site_info  = $app->getCfg('sitename') . ' - ' . \Joomla\CMS\Uri\Uri::root();
+		$site_info  = $app->getCfg('sitename') . ' - ' . JUri::root();
 		$sendermail	= $params->get('sendermail', $app->getCfg('mailfrom'));
-		$sendermail	= \Joomla\CMS\Mail\MailHelper::cleanAddress($sendermail);
+		$sendermail	= JMailHelper::cleanAddress($sendermail);
 
 		// Use 'sitename' as sender name
 		$sendername	= $params->get('sendername', $app->getCfg('sitename'));
 
 		// Use custom message subject if this is set
 		$subject	= $params->get('mailsubject', '')
-			? \Joomla\CMS\Mail\MailHelper::cleanSubject($params->get('mailsubject'))
-			: \Joomla\CMS\Language\Text::_('FLEXI_SUBJECT_DEFAULT');
+			? JMailHelper::cleanSubject($params->get('mailsubject'))
+			: JText::_('FLEXI_SUBJECT_DEFAULT');
 
-		$message = \Joomla\CMS\Language\Text::sprintf('FLEXI_NOTIFICATION_MESSAGE',
+		$message = JText::sprintf('FLEXI_NOTIFICATION_MESSAGE',
 			$subname,
 			$itemid,
 			$title,
@@ -486,7 +486,7 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 
 			foreach ($subscribers as $subscriber)
 			{
-				$to = \Joomla\CMS\Mail\MailHelper::cleanAddress($subscriber->email);
+				$to = JMailHelper::cleanAddress($subscriber->email);
 				$to_arr[] = $to;
 				$_message = $message;
 				if ($include_fullname) $_message = str_replace('__SUBSCRIBER_NAME__', $subscriber->name, $_message);
@@ -520,7 +520,7 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 
 			foreach ($subscribers as $subscriber)
 			{
-				$to = \Joomla\CMS\Mail\MailHelper::cleanAddress($subscriber->email);
+				$to = JMailHelper::cleanAddress($subscriber->email);
 				$to_arr[] = $to;
 				$to_100_arr[ intval($count/100) ][] = $to;
 				$count++;
@@ -554,8 +554,8 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 		 * Finally give some feedback to current editor
 		 */
 		$msg = $send_result ?
-			\Joomla\CMS\Language\Text::sprintf('FLEXI_NOTIFY_SUCCESS', $count_sent, count($subscribers)) :
-			\Joomla\CMS\Language\Text::sprintf('FLEXI_NOTIFY_FAILURE', count($subscribers));
+			JText::sprintf('FLEXI_NOTIFY_SUCCESS', $count_sent, count($subscribers)) :
+			JText::sprintf('FLEXI_NOTIFY_FAILURE', count($subscribers));
 
 		// Include emails of receivers if debug is enabled
 		$msg_receivers = !$debug_notifications ? '' : ' <br/> Subscribers List: ' . implode(', ', $to_arr);

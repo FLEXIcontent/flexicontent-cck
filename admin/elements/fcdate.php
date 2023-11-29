@@ -20,10 +20,10 @@
 defined('_JEXEC') or die('Restricted access');
 
 jimport('cms.html.html');      // JHtml
-jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
+jimport('joomla.form.field');  // JFormField
 
-//jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
-//\Joomla\CMS\Form\FormHelper::loadFieldClass('calendar');   // \Joomla\CMS\Form\FormField...
+//jimport('joomla.form.helper'); // JFormHelper
+//JFormHelper::loadFieldClass('calendar');   // JFormField...
 
 /**
  * Renders a date element
@@ -32,7 +32,7 @@ jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-class JFormFieldFcdate extends \Joomla\CMS\Form\FormField
+class JFormFieldFcdate extends JFormField
 {
 	/**
 	 * Element name
@@ -63,6 +63,6 @@ class JFormFieldFcdate extends \Joomla\CMS\Form\FormField
 		}
 
 		// Create JS calendar
-		return $value_holder . \Joomla\CMS\HTML\HTMLHelper::_('calendar', $value, $fieldname, $elementid, $dateFormat, $attribs);
+		return $value_holder . JHtml::_('calendar', $value, $fieldname, $elementid, $dateFormat, $attribs);
 	}
 }

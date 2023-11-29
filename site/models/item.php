@@ -58,10 +58,10 @@ class FlexicontentModelItem extends ParentClassItem
 		//echo "<pre>"; debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS); echo "</pre>";
 
 		global $globalcats;
-		$app  = \Joomla\CMS\Factory::getApplication();
-		$user	= \Joomla\CMS\Factory::getUser();
-		$session = \Joomla\CMS\Factory::getSession();
-		$uri  = \Joomla\CMS\Uri\Uri::getInstance();
+		$app  = JFactory::getApplication();
+		$user	= JFactory::getUser();
+		$session = JFactory::getSession();
+		$uri  = JUri::getInstance();
 		$aid	= (int) $user->get('aid');
 		$gid	= (int) $user->get('gid');
 		$cid	= $this->_cid;
@@ -69,10 +69,10 @@ class FlexicontentModelItem extends ParentClassItem
 		$cparams = $this->_cparams;
 
 		$referer  = @ $_SERVER['HTTP_REFERER'];                                    // The previously viewed page (refer)
-		if ( ! flexicontent_html::is_safe_url($referer) ) $referer = \Joomla\CMS\Uri\Uri::base(); // Ignore it if potentially non safe URL, e.g. non-internal
+		if ( ! flexicontent_html::is_safe_url($referer) ) $referer = JUri::base(); // Ignore it if potentially non safe URL, e.g. non-internal
 
 		// a basic item title string
-		$title_str = ' ' . \Joomla\CMS\Language\Text::_('FLEXI_ID') .' : '.$this->_record->id;
+		$title_str = ' ' . JText::_('FLEXI_ID') .' : '.$this->_record->id;
 
 
 
@@ -101,7 +101,7 @@ class FlexicontentModelItem extends ParentClassItem
 		$_cid_ = $cid ? $cid : $this->_record->catid;
 		if ( !isset($this->_record->ancestor_cats_accessible) )
 		{
-			$aid_arr = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 			$allowed_levels = array_flip($aid_arr);
 
 			$catshelper = new flexicontent_cats($_cid_);
@@ -133,7 +133,7 @@ class FlexicontentModelItem extends ParentClassItem
 				$this->_record->ancestor_cats_published = $ancestor_cats_published;
 			}
 			$ancestor_cats_published = $this->_record->ancestor_cats_published;  //$this->_record->catpublished;
-			$cats_np_err_mssg = \Joomla\CMS\Language\Text::sprintf('FLEXI_CONTENT_UNAVAILABLE_ITEM_CURRCAT_UNPUBLISHED', $cid);
+			$cats_np_err_mssg = JText::sprintf('FLEXI_CONTENT_UNAVAILABLE_ITEM_CURRCAT_UNPUBLISHED', $cid);
 		}
 		else
 		{
@@ -148,7 +148,7 @@ class FlexicontentModelItem extends ParentClassItem
 				// For J1.6+ check all ancestor categories from current one to the root
 				foreach($globalcats[$catid]->ancestorsarray as $pcid)    $ancestor_cats_published = $ancestor_cats_published && ($globalcats[$pcid]->published==1);
 			}
-			$cats_np_err_mssg = \Joomla\CMS\Language\Text::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_ALLCATS_UNPUBLISHED');
+			$cats_np_err_mssg = JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_ALLCATS_UNPUBLISHED');
 		}
 
 		// Calculate if item is active ... and viewable is also it's (current or All) categories are published
@@ -182,14 +182,14 @@ class FlexicontentModelItem extends ParentClassItem
 		// Raise error that the item is unpublished
 		else if ( !$item_is_published && !$ignore_publication )
 		{
-			$msg = \Joomla\CMS\Language\Text::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_UNPUBLISHED') . $title_str;
+			$msg = JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_UNPUBLISHED') . $title_str;
 			throw new Exception($msg, 404);
 		}
 
 		// Item edittable, set warning that ...
 		else if ( !$item_is_published && !$inactive_notice_set )
 		{
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_UNPUBLISHED'), 'notice');  // 404
+			$app->enqueueMessage(JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_UNPUBLISHED'), 'notice');  // 404
 			$inactive_notice_set = true;
 		}
 
@@ -200,14 +200,14 @@ class FlexicontentModelItem extends ParentClassItem
 		// Raise error that the item is scheduled for publication
 		if ( $item_is_expired && !$ignore_publication )
 		{
-			$msg = \Joomla\CMS\Language\Text::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_EXPIRED') . $title_str;
+			$msg = JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_EXPIRED') . $title_str;
 			throw new Exception($msg, 404);
 		}
 
 		// Item edittable, set warning that ...
 		else if ( $item_is_expired && !$inactive_notice_set )
 		{
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_EXPIRED'), 'notice');  // 404
+			$app->enqueueMessage(JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_EXPIRED'), 'notice');  // 404
 			$inactive_notice_set = true;
 		}
 
@@ -216,14 +216,14 @@ class FlexicontentModelItem extends ParentClassItem
 		// Raise error that the item is scheduled for publication
 		if ( $item_is_scheduled && !$ignore_publication )
 		{
-			$msg = \Joomla\CMS\Language\Text::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_SCHEDULED') . $title_str;
+			$msg = JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_SCHEDULED') . $title_str;
 			throw new Exception($msg, 404);
 		}
 
 		// Item edittable, set warning that ...
 		else if ( $item_is_scheduled && !$inactive_notice_set )
 		{
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_SCHEDULED'), 'notice');  // 404
+			$app->enqueueMessage(JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_SCHEDULED'), 'notice');  // 404
 			$inactive_notice_set = true;
 		}
 
@@ -267,11 +267,11 @@ class FlexicontentModelItem extends ParentClassItem
 
 			// (a) redirect user previewing a non-current item version, to either current item version or to refer if has no edit or view access
 			$app->enqueueMessage(
-				\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_PREVIEW_UNEDITABLE') . '<br />' .
-				($user->guest ? \Joomla\CMS\Language\Text::sprintf('FLEXI_LOGIN_TO_ACCESS', $url) : \Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK')) , 'warning'
+				JText::_('FLEXI_ALERTNOTAUTH_PREVIEW_UNEDITABLE') . '<br />' .
+				($user->guest ? JText::sprintf('FLEXI_LOGIN_TO_ACCESS', $url) : JText::_('FLEXI_ALERTNOTAUTH_TASK')) , 'warning'
 			);  // 403
 			$item_n_cat_active && $canviewitem
-				? $app->redirect(\Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getItemRoute($this->_record->slug, $this->_record->categoryslug, 0, $this->_record)))
+				? $app->redirect(JRoute::_(FlexicontentHelperRoute::getItemRoute($this->_record->slug, $this->_record->categoryslug, 0, $this->_record)))
 				: $app->redirect($referer);  // Item not viewable OR no view access, redirect to refer page
 		}
 
@@ -281,20 +281,20 @@ class FlexicontentModelItem extends ParentClassItem
 			// no redirect, SET message to owners, to wait for approval or to request approval of their content
 			if ( !$caneditstate && ($item_state_pending || $item_state_draft) && $isOwner )
 			{
-				$app->enqueueMessage(\Joomla\CMS\Language\Text::_( $item_state_pending ? 'FLEXI_ALERT_VIEW_OWN_PENDING_STATE' : 'FLEXI_ALERT_VIEW_OWN_DRAFT_STATE' ), 'notice');
+				$app->enqueueMessage(JText::_( $item_state_pending ? 'FLEXI_ALERT_VIEW_OWN_PENDING_STATE' : 'FLEXI_ALERT_VIEW_OWN_DRAFT_STATE' ), 'notice');
 			}
 
 			// (b) redirect item owner to previous page if user cannot access (read/edit) the item
 			else if ( !$canedititem && !$caneditstate && $isOwner )
 			{
-				$app->enqueueMessage(\Joomla\CMS\Language\Text::_($item_state_pending ? 'FLEXI_ALERTNOTAUTH_VIEW_OWN_PENDING' : 'FLEXI_ALERTNOTAUTH_VIEW_OWN_UNPUBLISHED'), 'notice');  // 403
+				$app->enqueueMessage(JText::_($item_state_pending ? 'FLEXI_ALERTNOTAUTH_VIEW_OWN_PENDING' : 'FLEXI_ALERTNOTAUTH_VIEW_OWN_UNPUBLISHED'), 'notice');  // 403
 				$app->redirect($referer);
 			}
 
 			// no redirect, SET notice to the editors, that they are viewing unreadable content because they can edit the item
 			else if ( $canedititem || $caneditstate )
 			{
-				$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_CONTENT_ACCESS_ALLOWED_BECAUSE_EDITABLE_PUBLISHABLE'), 'notice');
+				$app->enqueueMessage(JText::_('FLEXI_CONTENT_ACCESS_ALLOWED_BECAUSE_EDITABLE_PUBLISHABLE'), 'notice');
 			}
 
 			// Internal error in our code
@@ -318,16 +318,16 @@ class FlexicontentModelItem extends ParentClassItem
 					. '&fcreturn='.base64_encode($fcreturn);
 
 				$app->setHeader('status', 403);
-				$app->enqueueMessage(\Joomla\CMS\Language\Text::sprintf('FLEXI_LOGIN_TO_ACCESS', $url), 'warning');
+				$app->enqueueMessage(JText::sprintf('FLEXI_LOGIN_TO_ACCESS', $url), 'warning');
 				$app->redirect( $url );
 			}
 
 			else
 			{
-				$msg  = \Joomla\CMS\Language\Text::_( 'FLEXI_ALERTNOTAUTH_VIEW');
-				$msg .= $item->type_id && !$this->_record->has_type_access ? "<br/>".\Joomla\CMS\Language\Text::_("FLEXI_ALERTNOTAUTH_VIEW_TYPE") : '';
-				$msg .= $item->catid   && !$this->_record->has_mcat_access ? "<br/>".\Joomla\CMS\Language\Text::_("FLEXI_ALERTNOTAUTH_VIEW_MCAT") : '';
-				$msg .= $cid  && !$this->_record->ancestor_cats_accessible ? "<br/>".\Joomla\CMS\Language\Text::_("FLEXI_ALERTNOTAUTH_VIEW_MCAT") : '';
+				$msg  = JText::_( 'FLEXI_ALERTNOTAUTH_VIEW');
+				$msg .= $item->type_id && !$this->_record->has_type_access ? "<br/>".JText::_("FLEXI_ALERTNOTAUTH_VIEW_TYPE") : '';
+				$msg .= $item->catid   && !$this->_record->has_mcat_access ? "<br/>".JText::_("FLEXI_ALERTNOTAUTH_VIEW_MCAT") : '';
+				$msg .= $cid  && !$this->_record->ancestor_cats_accessible ? "<br/>".JText::_("FLEXI_ALERTNOTAUTH_VIEW_MCAT") : '';
 
 				// (d) redirect unauthorized logged user to the unauthorized page (if this is set)
 				if ($cparams->get('unauthorized_page', ''))
@@ -378,7 +378,7 @@ class FlexicontentModelItem extends ParentClassItem
 	function decideLayout($compParams, $typeParams, $itemParams, $catParams)
 	{
 		$fallback = 'grid';
-		$app      = \Joomla\CMS\Factory::getApplication();
+		$app      = JFactory::getApplication();
 
 		// Decide to use MOBILE or DESKTOP item template layout
 		$useMobile = (int) $compParams->get('use_mobile_layouts', 0);
@@ -473,7 +473,7 @@ class FlexicontentModelItem extends ParentClassItem
 			return false;
 		}
 
-		$item = \Joomla\CMS\Table\Table::getInstance('flexicontent_items', '');
+		$item = JTable::getInstance('flexicontent_items', '');
 		$item->hit($this->_id);
 
 		return true;
@@ -502,7 +502,7 @@ class FlexicontentModelItem extends ParentClassItem
 	 */
 	function getFavoured()
 	{
-		return flexicontent_db::getFavoured($type=0, $this->_id, \Joomla\CMS\Factory::getUser()->id);
+		return flexicontent_db::getFavoured($type=0, $this->_id, JFactory::getUser()->id);
 	}
 
 
@@ -515,7 +515,7 @@ class FlexicontentModelItem extends ParentClassItem
 	 */
 	function removefav()
 	{
-		return flexicontent_db::removefav($type=0, $this->_id, \Joomla\CMS\Factory::getUser()->id);
+		return flexicontent_db::removefav($type=0, $this->_id, JFactory::getUser()->id);
 	}
 
 
@@ -528,7 +528,7 @@ class FlexicontentModelItem extends ParentClassItem
 	 */
 	function addfav()
 	{
-		return flexicontent_db::addfav($type=0, $this->_id, \Joomla\CMS\Factory::getUser()->id);
+		return flexicontent_db::addfav($type=0, $this->_id, JFactory::getUser()->id);
 	}
 
 }

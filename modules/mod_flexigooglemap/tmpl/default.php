@@ -18,16 +18,14 @@ if (empty($renderedMapLocations) && (int)$params->get('hide_map_when_empty', '1'
 	return;
 }
 
-\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip');
-use \Joomla\CMS\Filesystem\Path;
-
-$document = \Joomla\CMS\Factory::getDocument();
-$document->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true) . '/modules/mod_flexigooglemap/assets/css/style.css');
+JHtml::_('bootstrap.tooltip');
+$document = JFactory::getDocument();
+$document->addStyleSheet(JUri::root(true) . '/modules/mod_flexigooglemap/assets/css/style.css');
 
 $itemmodel_name = 'FlexicontentModelItem';
 $itemmodel = new $itemmodel_name();
 
-\Joomla\CMS\Language\Text::script('MOD_FLEXIGOOGLEMAP_SECHING_TXT');
+JText::script('MOD_FLEXIGOOGLEMAP_SECHING_TXT');
 
 // Module config
 $height = $params->get('height', '300px');
@@ -42,7 +40,7 @@ $apikey    = $params->get('apikey', '');
 
 $defaut_icon_url = $mapapi === 'googlemap'
 	? 'https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi2.png'
-	: \Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/librairies/leaflet/images/marker-icon.png';
+	: JUri::root(true) . '/components/com_flexicontent/librairies/leaflet/images/marker-icon.png';
 
 $maxzoommarker = (int) $params->get('maxzoommarker', 18);
 $mappadding    = (int) $params->get('mappadding', '50');
@@ -110,10 +108,10 @@ $usescrollmouse = $params->get('usescrollmouse', 'true');
 $clustermode = $params->get('clustermode', '');
 if ($clustermode) {
 	$imgcluster = $params->get('imgcluster', '');
-	if ($imgcluster && $img_info = getimagesize(PATH::clean(JPATH_ROOT . DS . $imgcluster))) {
+	if ($imgcluster && $img_info = getimagesize(JPATH::clean(JPATH_ROOT . DS . $imgcluster))) {
 		$imgcluster_w = $img_info[0];
 		$imgcluster_h = $img_info[1];
-		$imgcluster_url  = \Joomla\CMS\Uri\Uri::root(true) . '/' . $imgcluster;
+		$imgcluster_url  = JUri::root(true) . '/' . $imgcluster;
 	} else {
 		$imgcluster_w = 53;
 		$imgcluster_h = 52;
@@ -144,19 +142,19 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 
 	<div id="map_actions_box_<?php echo $module->id; ?>" class="map_actions_box" style="display: flex; flex-direction: row; flex-wrap: wrap; gap: 16px; margin-bottom: 12px;">
 		<?php echo $geo_locate_btn ? '<span class="btn btn-primary geo-locate-me-btn">
-      ' . \Joomla\CMS\Language\Text::_('MOD_FLEXIGOOGLEMAP_FIND_NEARBY_TXT') . '
+      ' . JText::_('MOD_FLEXIGOOGLEMAP_FIND_NEARBY_TXT') . '
       </span>
       ' : ''; ?>
 		<?php if ($geo_locate_zoom_sel) : ?>
 			<div>
-				<label class="label geo-locate-zoom-level-lbl"><?php echo \Joomla\CMS\Language\Text::_('MOD_FLEXIGOOGLEMAP_ZOOM'); ?></label>&nbsp;
+				<label class="label geo-locate-zoom-level-lbl"><?php echo JText::_('MOD_FLEXIGOOGLEMAP_ZOOM'); ?></label>&nbsp;
 				<select class="form-select geo-locate-zoom-level geo-locate-zoom-level-<?php echo $module->id; ?>" style="display: inline-block; width: auto;">
 					<?php
 					$distance_lbls = array(
-						15 => \Joomla\CMS\Language\Text::_('MOD_FLEXIGOOGLEMAP_DIST_CLOSED'),
-						10 => \Joomla\CMS\Language\Text::_('MOD_FLEXIGOOGLEMAP_DIST_DISTANT'),
-						7 => \Joomla\CMS\Language\Text::_('MOD_FLEXIGOOGLEMAP_DIST_VERYDISTANT'),
-						2 => \Joomla\CMS\Language\Text::_('MOD_FLEXIGOOGLEMAP_DIST_MOSTDIST'),
+						15 => JText::_('MOD_FLEXIGOOGLEMAP_DIST_CLOSED'),
+						10 => JText::_('MOD_FLEXIGOOGLEMAP_DIST_DISTANT'),
+						7 => JText::_('MOD_FLEXIGOOGLEMAP_DIST_VERYDISTANT'),
+						2 => JText::_('MOD_FLEXIGOOGLEMAP_DIST_MOSTDIST'),
 					);
 					for ($i = 15; $i >= 2; $i--) {
 						echo '
@@ -188,9 +186,9 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 		</div>
 
 		<?php if ($use_mlist) :
-			\Joomla\CMS\Language\Text::script("MOD_FLEXIGOOGLEMAP_MARKERS_LIST_HEADER_0_ENTRIES", true);
-			\Joomla\CMS\Language\Text::script("MOD_FLEXIGOOGLEMAP_MARKERS_LIST_HEADER_1_ENTRY", true);
-			\Joomla\CMS\Language\Text::script("MOD_FLEXIGOOGLEMAP_MARKERS_LIST_HEADER_N_ENTRIES", true);
+			JText::script("MOD_FLEXIGOOGLEMAP_MARKERS_LIST_HEADER_0_ENTRIES", true);
+			JText::script("MOD_FLEXIGOOGLEMAP_MARKERS_LIST_HEADER_1_ENTRY", true);
+			JText::script("MOD_FLEXIGOOGLEMAP_MARKERS_LIST_HEADER_N_ENTRIES", true);
 		?>
 			<div class="col4">
 				<div id="fc_module_marker_list_box_<?php echo $module->id; ?>" class="fc_module_marker_list_box" style="height:<?php echo $height; ?>;">
@@ -254,7 +252,7 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 			li.appendChild(btn);*/
 
 			var btn2 = document.createElement("button");
-			btn2.innerHTML = '<?php echo \Joomla\CMS\Language\Text::_("MOD_FLEXIGOOGLEMAP_MARKER_HIGHLIGHT_ENTRY", true) ?>';
+			btn2.innerHTML = '<?php echo JText::_("MOD_FLEXIGOOGLEMAP_MARKER_HIGHLIGHT_ENTRY", true) ?>';
 			btn2.className = 'btn btn-highlight';
 			btn2._marker_ref = marker;
 			btn2.setAttribute('onclick', "new google.maps.event.trigger(this._marker_ref, 'click');");
@@ -492,7 +490,7 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 			li.innerHTML = '<img class="fc_module_marker_list_icon" src="' + marker._icon_url + '" /> ' + marker._location_info;
 
 			var btn2 = document.createElement("button");
-			btn2.innerHTML = '<?php echo \Joomla\CMS\Language\Text::_("MOD_FLEXIGOOGLEMAP_MARKER_HIGHLIGHT_ENTRY", true) ?>';
+			btn2.innerHTML = '<?php echo JText::_("MOD_FLEXIGOOGLEMAP_MARKER_HIGHLIGHT_ENTRY", true) ?>';
 			btn2.className = 'btn btn-highlight';
 			btn2._marker_ref = marker;
 
@@ -590,7 +588,7 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 			// Title display
 			L.tileLayer('<?php echo $os_tile_server_url; ?>', {
 					// Datas sources
-					attribution: '<?php echo \Joomla\CMS\Language\Text::_('OPENSTREETMAP_ATTRIBUTION_TXT'); ?>',
+					attribution: '<?php echo JText::_('OPENSTREETMAP_ATTRIBUTION_TXT'); ?>',
 					minZoom: 1,
 					maxZoom: <?php echo $maxzoom; ?>
 				})

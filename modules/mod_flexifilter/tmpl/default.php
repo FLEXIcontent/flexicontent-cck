@@ -19,7 +19,7 @@ $show_filter_labels = $params->get('show_filter_labels', 1);
 $filter_placement = $params->get( 'filter_placement', 1 );
 $filter_container_class  = $filter_placement ? 'fc_filter_line' : 'fc_filter';
 $filter_container_class .= $filter_placement==2 ? ' fc_clear_label' : '';
-$text_search_val = \Joomla\CMS\Factory::getApplication()->input->get('filter', '', 'string');
+$text_search_val = JFactory::getApplication()->input->get('filter', '', 'string');
 
 // 4. Create (print) the form
 ?>
@@ -27,7 +27,7 @@ $text_search_val = \Joomla\CMS\Factory::getApplication()->input->get('filter', '
 <div class="fcfilter_form_outer fcfilter_form_module">
 
 <?php
-$jcookie = \Joomla\CMS\Factory::getApplication()->input->cookie;
+$jcookie = JFactory::getApplication()->input->cookie;
 $cookie_name = 'fc_active_TabSlidePage';
 
 // FORM in slider
@@ -38,7 +38,7 @@ if ($ff_placement)
 	$ff_slider_id =
 		($module->id     ? '_module_' . $module->id : '')
 		;
-	$ff_toggle_search_title = \Joomla\CMS\Language\Text::_($params->get('ff_toggle_search_title', 'FLEXI_TOGGLE_SEARCH_FORM'));
+	$ff_toggle_search_title = JText::_($params->get('ff_toggle_search_title', 'FLEXI_TOGGLE_SEARCH_FORM'));
 	$ff_slider_tagid = 'fcfilter_form_slider'.$ff_slider_id;
 
 	$active_slides = $jcookie->get($cookie_name, '{}', 'string');
@@ -49,13 +49,13 @@ if ($ff_placement)
 	}
 	catch (Exception $e)
 	{
-		$jcookie->set($cookie_name, '{}', time()+60*60*24*(365*5), \Joomla\CMS\Uri\Uri::base(true), '');
+		$jcookie->set($cookie_name, '{}', time()+60*60*24*(365*5), JUri::base(true), '');
 	}
 
 	$last_active_slide = isset($active_slides->$ff_slider_tagid) ? $active_slides->$ff_slider_tagid : null;
 
-	echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.startAccordion', $ff_slider_tagid, array('active' => $last_active_slide));
-	echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addSlide', $ff_slider_tagid, $ff_toggle_search_title, $ff_slider_tagid . '_filters_slide');
+	echo JHtml::_('bootstrap.startAccordion', $ff_slider_tagid, array('active' => $last_active_slide));
+	echo JHtml::_('bootstrap.addSlide', $ff_slider_tagid, $ff_toggle_search_title, $ff_slider_tagid . '_filters_slide');
 }
 ?>
 
@@ -64,7 +64,7 @@ if ($ff_placement)
 <?php if ( !empty($cats_select_field) ) : ?>
 <fieldset class="fc_filter_set" style="padding-bottom:0px;">
 	<span class="<?php echo $filter_container_class. ' fc_odd'; ?>" style="margin-bottom:0px;">
-		<span class="fc_filter_label fc_cid_label"><?php echo \Joomla\CMS\Language\Text::_($mcats_selection ? 'FLEXI_FILTER_CATEGORIES' : 'FLEXI_FILTER_CATEGORY'); ?></span>
+		<span class="fc_filter_label fc_cid_label"><?php echo JText::_($mcats_selection ? 'FLEXI_FILTER_CATEGORIES' : 'FLEXI_FILTER_CATEGORY'); ?></span>
 		<span class="fc_filter_html fc_cid_selector"><span class="cid_loading" id="cid_loading_<?php echo $module->id; ?>"></span><?php echo $cats_select_field; ?></span>
 	</span>
 </fieldset>
@@ -81,10 +81,10 @@ if ($ff_placement)
 // FORM in slider
 if ($ff_placement)
 {
-	echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endSlide');
-	echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endAccordion');
+	echo JHtml::_('bootstrap.endSlide');
+	echo JHtml::_('bootstrap.endAccordion');
 	
-	\Joomla\CMS\Factory::getDocument()->addScriptDeclaration("
+	JFactory::getDocument()->addScriptDeclaration("
 	(function($) {
 		$(document).ready(function ()
 		{
@@ -126,7 +126,7 @@ if ($ff_placement)
 
 if ($scroll_to_anchor_tag)
 {
-	\Joomla\CMS\Factory::getDocument()->addScriptDeclaration("
+	JFactory::getDocument()->addScriptDeclaration("
 	(function($) {
 		$(document).ready(function ()
 		{

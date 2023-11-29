@@ -37,12 +37,12 @@
 			<div class="' . $box_classes . '">
 				<label class="' . $lbl_classes . $has_value_class . ' fc-lbl urllink-lbl" for="'.$elementid_n.'_link">
 					<span class="icon-link" aria-hidden="true"></span>
-					' . \Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_WEBLINK_LINK' ) . '
+					' . JText::_( 'FLEXI_FIELD_WEBLINK_LINK' ) . '
 				</label>
-				<input ' . $ff_events . ' class="urllink ' . $input_classes . ' ' . $link_classes . '" name="'.$fieldname_n.'[link]" id="'.$elementid_n.'_link" type="text" value="'.htmlspecialchars(\Joomla\CMS\String\PunycodeHelper::urlToUTF8($value['link']), ENT_COMPAT, 'UTF-8').'" ' . $link_attribs . '/>
+				<input ' . $ff_events . ' class="urllink ' . $input_classes . ' ' . $link_classes . '" name="'.$fieldname_n.'[link]" id="'.$elementid_n.'_link" type="text" value="'.htmlspecialchars(JStringPunycode::urlToUTF8($value['link']), ENT_COMPAT, 'UTF-8').'" ' . $link_attribs . '/>
 				'
 				. ($useimage && !$auto_value ? '
-				<a href="javascript:;" class="'. $tooltip_class .' btn btn-primary img_fetch_btn" title="'.\Joomla\CMS\Language\Text::_('FLEXI_AUTO').'" onclick="fcfield_weblink.fetchData(\''.$elementid_n.'\', \''.$field_name_js.'\'); return false;">
+				<a href="javascript:;" class="'. $tooltip_class .' btn btn-primary img_fetch_btn" title="'.JText::_('FLEXI_AUTO').'" onclick="fcfield_weblink.fetchData(\''.$elementid_n.'\', \''.$field_name_js.'\'); return false;">
 					<i class="icon-loop"></i>
 				</a>' : '') . '
 			</div>';
@@ -57,12 +57,12 @@
 
 			$autoprefix = '
 			<div class="' . $box_classes . ' fc-lbl-external-box">
-				<label class="' . $lbl_classes . $has_value_class . ' fc-lbl-external fc-lbl '.$tooltip_class.'" title="'.$_tip_title.'">'.\Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_WEBLINK_IS_RELATIVE' ).'</label>
+				<label class="' . $lbl_classes . $has_value_class . ' fc-lbl-external fc-lbl '.$tooltip_class.'" title="'.$_tip_title.'">'.JText::_( 'FLEXI_FIELD_WEBLINK_IS_RELATIVE' ).'</label>
 				<fieldset class="radio btn-group group-fcinfo">
 					<input ' . $ff_events . ' class="autoprefix" id="'.$elementid_n.'_autoprefix_0" name="'.$fieldname_n.'[autoprefix]" type="radio" value="0" '.( !$is_absolute ? 'checked="checked"' : '' ).'/>
-					<label class="' . $lbl_classes . ' btn" style="min-width: 48px;" for="'.$elementid_n.'_autoprefix_0">'.\Joomla\CMS\Language\Text::_('FLEXI_YES').'</label>
+					<label class="' . $lbl_classes . ' btn" style="min-width: 48px;" for="'.$elementid_n.'_autoprefix_0">'.JText::_('FLEXI_YES').'</label>
 					<input ' . $ff_events . ' class="autoprefix" id="'.$elementid_n.'_autoprefix_1" name="'.$fieldname_n.'[autoprefix]" type="radio" value="1" '.( $is_absolute ? 'checked="checked"' : '' ).'/>
-					<label class="' . $lbl_classes . ' btn" style="min-width: 48px;" for="'.$elementid_n.'_autoprefix_1">'.\Joomla\CMS\Language\Text::_('FLEXI_NO').'</label>
+					<label class="' . $lbl_classes . ' btn" style="min-width: 48px;" for="'.$elementid_n.'_autoprefix_1">'.JText::_('FLEXI_NO').'</label>
 				</fieldset>
 			</div>
 			';
@@ -83,11 +83,11 @@
 
 				$class_attribs = array(
 					'class'    => 'urlimagelist',
-					'onchange' => 'jQuery(this).closest(\'.fc-field-props-box\').find(\'.fcfield_message_box\').html(\'\'); if (this.selectedIndex > 0) { var mm_id=jQuery(this).parent().parent().find(\'.urlimage\').attr(\'id\'); jQuery(\'#\' + mm_id).data(\'basepath\', \'' . \Joomla\CMS\Uri\Uri::root() .'\'); jInsertFieldValue(this.value, mm_id); this.selectedIndex = 0; }',
+					'onchange' => 'jQuery(this).closest(\'.fc-field-props-box\').find(\'.fcfield_message_box\').html(\'\'); if (this.selectedIndex > 0) { var mm_id=jQuery(this).parent().parent().find(\'.urlimage\').attr(\'id\'); jQuery(\'#\' + mm_id).data(\'basepath\', \'' . JUri::root() .'\'); jInsertFieldValue(this.value, mm_id); this.selectedIndex = 0; }',
 					'style' => 'width: auto; margin: 0;',
 				);
-				$imagelist = '<div style="width: 36px; overflow: hidden; display: flex; border: 0; border-radius: 0; margin-bottom: 1px; margin-' . (!\Joomla\CMS\Factory::getLanguage()->isRtl() ? 'left' : 'right') .': 0px">'.
-					\Joomla\CMS\HTML\HTMLHelper::_('select.genericlist',
+				$imagelist = '<div style="width: 36px; overflow: hidden; display: flex; border: 0; border-radius: 0; margin-bottom: 1px; margin-' . (!JFactory::getLanguage()->isRtl() ? 'left' : 'right') .': 0px">'.
+					JHtml::_('select.genericlist',
 						$image_options,
 						$fieldname_n.'[imagelist]',
 						$class_attribs,
@@ -104,9 +104,9 @@
 			{
 				$mm_id    = $elementid_n.'_image';
 				$img_path = $value['image'];
-				$img_src  = ($img_path && file_exists(JPATH_ROOT . '/' . $img_path))  ?  \Joomla\CMS\Uri\Uri::root() . $img_path  :  $img_path;
+				$img_src  = ($img_path && file_exists(JPATH_ROOT . '/' . $img_path))  ?  JUri::root() . $img_path  :  $img_path;
 				$img_attr = array('id' => $mm_id . '_preview', 'class' => 'media-preview');
-				$img      = \Joomla\CMS\HTML\HTMLHelper::image($img_src ?: 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=', \Joomla\CMS\Language\Text::_('JLIB_FORM_MEDIA_PREVIEW_ALT'), $img_attr);
+				$img      = JHtml::image($img_src ?: 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=', JText::_('JLIB_FORM_MEDIA_PREVIEW_ALT'), $img_attr);
 
 				$previewImg = '
 				<div id="' . $mm_id . '_preview_img"' . ($img_src ? '' : ' style="display:none"') . '>
@@ -114,40 +114,40 @@
 				</div>';
 				$previewImgEmpty = '
 				<div id="' . $mm_id . '_preview_empty"' . ($img_src ? ' style="display:none"' : '') . '>
-					' . \Joomla\CMS\Language\Text::_('JLIB_FORM_MEDIA_PREVIEW_EMPTY') . '
+					' . JText::_('JLIB_FORM_MEDIA_PREVIEW_EMPTY') . '
 				</div>';
 
 				$tooltip = $previewImgEmpty . $previewImg;
 				$tooltip_options = array(
-					'title' => \Joomla\CMS\Language\Text::_('JLIB_FORM_MEDIA_PREVIEW_SELECTED_IMAGE'),
-					'text' => '<span class="display: block;"><span class="icon-eye" aria-hidden="true"></span><span class="icon-image" aria-hidden="true"></span>' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD_WEBLINK_URLIMAGE') . '</span>',
+					'title' => JText::_('JLIB_FORM_MEDIA_PREVIEW_SELECTED_IMAGE'),
+					'text' => '<span class="display: block;"><span class="icon-eye" aria-hidden="true"></span><span class="icon-image" aria-hidden="true"></span>' . JText::_('FLEXI_FIELD_WEBLINK_URLIMAGE') . '</span>',
 					'class' => 'hasTipPreview',
 				);
 
 				$mm_link = 'index.php?option=com_media&amp;view=images&amp;layout=default_fc&amp;tmpl=component&amp;asset=com_flexicontent&amp;author=&amp;fieldid=\'+mm_id+\'&amp;folder=';
 				$image_preview = '
-					<div style="float: '. (!\Joomla\CMS\Factory::getLanguage()->isRtl() ? 'left' : 'right') . '; max-width: 150px;">
+					<div style="float: '. (!JFactory::getLanguage()->isRtl() ? 'left' : 'right') . '; max-width: 150px;">
 						' . $previewImgEmpty . $previewImg .'
 					</div>';
 
 				$image = '
 				<div class="' . $box_classes . ' input-append">
 					<label class="media-preview ' . $lbl_classes . $has_value_class . ' fc-lbl urlimage-lbl" for="'.$elementid_n.'_image">'
-						.'<span class="icon-image" aria-hidden="true"></span>' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD_WEBLINK_URLIMAGE') . '</span>'
-						//.\Joomla\CMS\HTML\HTMLHelper::tooltip($tooltip, $tooltip_options)
+						.'<span class="icon-image" aria-hidden="true"></span>' . JText::_('FLEXI_FIELD_WEBLINK_URLIMAGE') . '</span>'
+						//.JHtml::tooltip($tooltip, $tooltip_options)
 					.'</label>
 					' . $imagelist . '
 					<input ' . $ff_events . ' type="text" name="'.$fieldname_n.'[image]" id="'.$elementid_n.'_image" value="'.htmlspecialchars($img_path, ENT_COMPAT, 'UTF-8').'" readonly="readonly"
 						style=""
 						class="urlimage field-media-input hasTipImgpath ' . $input_classes . '" onchange="fcfield_weblink.update_path_tip(this);"
-						title="'.htmlspecialchars('<span id="TipImgpath"></span>', ENT_COMPAT, 'UTF-8').'" data-basepath="" data-basepath_local="' . \Joomla\CMS\Uri\Uri::root() . '"
+						title="'.htmlspecialchars('<span id="TipImgpath"></span>', ENT_COMPAT, 'UTF-8').'" data-basepath="" data-basepath_local="' . JUri::root() . '"
 					/>
-					<a class="fc_weblink_field_mm_modal btn '.$tooltip_class.'" title="'.\Joomla\CMS\Language\Text::_('FLEXI_SELECT') . ' ' . \Joomla\CMS\Language\Text::_('FLEXI_IMAGE').'"
+					<a class="fc_weblink_field_mm_modal btn '.$tooltip_class.'" title="'.JText::_('FLEXI_SELECT') . ' ' . JText::_('FLEXI_IMAGE').'"
 						style="' . ($useimage == 2 ? 'display: none;' : '') . '"
-						onclick="var mm_id=jQuery(this).parent().find(\'.urlimage\').attr(\'id\'); fcfield_weblink.currElement[\''.$field_name_js.'\']=mm_id; SqueezeBox.open(\''.$mm_link.'\', {size:{x: ((window.innerWidth-120) > 1360 ? 1360 : (window.innerWidth-120)), y: ((window.innerHeight-220) > 800 ? 800 : (window.innerHeight-220))}, handler: \'iframe\', onClose: function() {jQuery(\'#\' + mm_id).data(\'basepath\', \'' . \Joomla\CMS\Uri\Uri::root() .'\');} });  return false;">
-						<span class="icon-upload"></span> ' /*. \Joomla\CMS\Language\Text::_('FLEXI_SELECT')*/ . '
+						onclick="var mm_id=jQuery(this).parent().find(\'.urlimage\').attr(\'id\'); fcfield_weblink.currElement[\''.$field_name_js.'\']=mm_id; SqueezeBox.open(\''.$mm_link.'\', {size:{x: ((window.innerWidth-120) > 1360 ? 1360 : (window.innerWidth-120)), y: ((window.innerHeight-220) > 800 ? 800 : (window.innerHeight-220))}, handler: \'iframe\', onClose: function() {jQuery(\'#\' + mm_id).data(\'basepath\', \'' . JUri::root() .'\');} });  return false;">
+						<span class="icon-upload"></span> ' /*. JText::_('FLEXI_SELECT')*/ . '
 					</a>
-					<a class="btn '.$tooltip_class.'" href="javascript:;" title="'.\Joomla\CMS\Language\Text::_('FLEXI_CLEAR').'" onclick="fcfield_weblink.clearImageThumb(this, {}, \''.$field_name_js.'\'); return false;" >
+					<a class="btn '.$tooltip_class.'" href="javascript:;" title="'.JText::_('FLEXI_CLEAR').'" onclick="fcfield_weblink.clearImageThumb(this, {}, \''.$field_name_js.'\'); return false;" >
 						<i class="icon-remove"></i>
 					</a>
 				</div>
@@ -163,16 +163,16 @@
 					. ' class="urlimage" />';
 
 				$xml_form = '<form><fields name="attribs"><fieldset name="attribs">'.$xml_field.'</fieldset></fields></form>';
-				$jform = new \Joomla\CMS\Form\Form('flexicontent_field.image', array('control' => '' /*'custom'*/, 'load_data' => true));
+				$jform = new JForm('flexicontent_field.image', array('control' => '' /*'custom'*/, 'load_data' => true));
 				$jform->load($xml_form);
 
-				$jfield = new \Joomla\CMS\Form\Field\MediaField($jform);
+				$jfield = new JFormFieldMedia($jform);
 				$jfield->setup(new SimpleXMLElement($xml_field), $jfvalue, '');
 
 				$image = '
 				<div class="' . $box_classes . ' input-append">
 					<label class="media-preview ' . $lbl_classes . $has_value_class . ' fc-lbl urlimage-lbl" for="'.$elementid_n.'_image">
-						<span class="icon-image" aria-hidden="true"></span>' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD_WEBLINK_URLIMAGE') . '</span>
+						<span class="icon-image" aria-hidden="true"></span>' . JText::_('FLEXI_FIELD_WEBLINK_URLIMAGE') . '</span>
 					</label>
 					' . $imagelist . '
 					' . $jfield->input . '
@@ -191,7 +191,7 @@
 
 			$title = '
 			<div class="' . $box_classes . '">
-				<label class="' . $lbl_classes . $has_value_class . ' fc-lbl urltitle-lbl" for="'.$elementid_n.'_title">'.\Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_WEBLINK_URLTITLE' ).'</label>
+				<label class="' . $lbl_classes . $has_value_class . ' fc-lbl urltitle-lbl" for="'.$elementid_n.'_title">'.JText::_( 'FLEXI_FIELD_WEBLINK_URLTITLE' ).'</label>
 				<input ' . $ff_events . ' class="urltitle ' . $input_classes . '" name="'.$fieldname_n.'[title]" id="'.$elementid_n.'_title" type="text" size="'.$size.'" value="'.htmlspecialchars($value['title'], ENT_COMPAT, 'UTF-8').'" />
 			</div>';
 		}
@@ -205,7 +205,7 @@
 
 			$linktext = '
 			<div class="' . $box_classes . '">
-				<label class="' . $lbl_classes . $has_value_class . ' fc-lbl urllinktext-lbl" for="'.$elementid_n.'_linktext">'.\Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_WEBLINK_URLLINK_TEXT' ).'</label>
+				<label class="' . $lbl_classes . $has_value_class . ' fc-lbl urllinktext-lbl" for="'.$elementid_n.'_linktext">'.JText::_( 'FLEXI_FIELD_WEBLINK_URLLINK_TEXT' ).'</label>
 				<input ' . $ff_events . ' class="urllinktext ' . $input_classes . '" name="'.$fieldname_n.'[linktext]" id="'.$elementid_n.'_linktext" type="text" size="'.$size.'" value="'.htmlspecialchars($value['linktext'], ENT_COMPAT, 'UTF-8').'" />
 			</div>';
 		}
@@ -226,8 +226,8 @@
 				);
 				$addrtype = '
 					<div class="' . $box_classes . ' fc-lbl-external-box">
-						<label class="' . $lbl_classes . $has_value_class . ' fc-lbl-external fc-lbl urladdrtype-lbl" for="'.$elementid_n.'_addrtype">'.\Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_WEBLINK_URLADDRTYPE' ).'</label>
-						'.\Joomla\CMS\HTML\HTMLHelper::_('select.genericlist',
+						<label class="' . $lbl_classes . $has_value_class . ' fc-lbl-external fc-lbl urladdrtype-lbl" for="'.$elementid_n.'_addrtype">'.JText::_( 'FLEXI_FIELD_WEBLINK_URLADDRTYPE' ).'</label>
+						'.JHtml::_('select.genericlist',
 							$addrtype_options,
 							$fieldname_n.'[addrtype]',
 							$class_attribs,
@@ -252,7 +252,7 @@
 			{
 				$class = '
 					<div class="' . $box_classes . '">
-						<label class="' . $lbl_classes . $has_value_class . ' fc-lbl urlclass-lbl" for="'.$elementid_n.'_class">'.\Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_WEBLINK_URLCLASS' ).'</label>
+						<label class="' . $lbl_classes . $has_value_class . ' fc-lbl urlclass-lbl" for="'.$elementid_n.'_class">'.JText::_( 'FLEXI_FIELD_WEBLINK_URLCLASS' ).'</label>
 						<input ' . $ff_events . ' class="urlclass ' . $input_classes . '" name="'.$fieldname_n.'[class]" id="'.$elementid_n.'_class" type="text" size="'.$size.'" value="'.htmlspecialchars($value['class'], ENT_COMPAT, 'UTF-8').'" />
 					</div>';
 			}
@@ -263,8 +263,8 @@
 				);
 				$class = '
 					<div class="' . $box_classes . ' fc-lbl-external-box">
-						<label class="' . $lbl_classes . $has_value_class . ' fc-lbl-external fc-lbl urlclass-lbl" for="'.$elementid_n.'_class">'.\Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_WEBLINK_URLCLASS' ).'</label>
-						'.\Joomla\CMS\HTML\HTMLHelper::_('select.genericlist',
+						<label class="' . $lbl_classes . $has_value_class . ' fc-lbl-external fc-lbl urlclass-lbl" for="'.$elementid_n.'_class">'.JText::_( 'FLEXI_FIELD_WEBLINK_URLCLASS' ).'</label>
+						'.JHtml::_('select.genericlist',
 							$class_options,
 							$fieldname_n.'[class]',
 							$class_attribs,
@@ -286,7 +286,7 @@
 
 			$id = '
 			<div class="' . $box_classes . '">
-				<label class="' . $lbl_classes . $has_value_class . ' fc-lbl urlid-lbl" for="'.$elementid_n.'_id">'.\Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_WEBLINK_URLID' ).'</label>
+				<label class="' . $lbl_classes . $has_value_class . ' fc-lbl urlid-lbl" for="'.$elementid_n.'_id">'.JText::_( 'FLEXI_FIELD_WEBLINK_URLID' ).'</label>
 				<input ' . $ff_events . ' class="urlid ' . $input_classes . '" name="'.$fieldname_n.'[id]" id="'.$elementid_n.'_id" type="text" size="'.$size.'" value="'.htmlspecialchars($value['id'], ENT_COMPAT, 'UTF-8').'" />
 			</div>';
 		}
@@ -301,17 +301,17 @@
 
 			$target_attribs = ' class="urltarget use_select2_lib" ';
 			$target_options = array(
-				(object) array('value'=>'', 'text'=>\Joomla\CMS\Language\Text::_('FLEXI_DEFAULT')),
-				(object) array('value'=>'_blank', 'text'=>\Joomla\CMS\Language\Text::_('FLEXI_FIELD_LINK_NEW_WIN_TAB')),
-				(object) array('value'=>'_parent', 'text'=>\Joomla\CMS\Language\Text::_('FLEXI_FIELD_LINK_PARENT_FRM')),
-				(object) array('value'=>'_self', 'text'=>\Joomla\CMS\Language\Text::_('FLEXI_FIELD_LINK_SAME_FRM_WIN_TAB')),
-				(object) array('value'=>'_top', 'text'=>\Joomla\CMS\Language\Text::_('FLEXI_FIELD_LINK_TOP_FRM')),
-				(object) array('value'=>'_modal', 'text'=>\Joomla\CMS\Language\Text::_('FLEXI_FIELD_LINK_MODAL_POPUP_WIN'))
+				(object) array('value'=>'', 'text'=>JText::_('FLEXI_DEFAULT')),
+				(object) array('value'=>'_blank', 'text'=>JText::_('FLEXI_FIELD_LINK_NEW_WIN_TAB')),
+				(object) array('value'=>'_parent', 'text'=>JText::_('FLEXI_FIELD_LINK_PARENT_FRM')),
+				(object) array('value'=>'_self', 'text'=>JText::_('FLEXI_FIELD_LINK_SAME_FRM_WIN_TAB')),
+				(object) array('value'=>'_top', 'text'=>JText::_('FLEXI_FIELD_LINK_TOP_FRM')),
+				(object) array('value'=>'_modal', 'text'=>JText::_('FLEXI_FIELD_LINK_MODAL_POPUP_WIN'))
 			);
 			$target = '
 			<div class="' . $box_classes . ' fc-lbl-external-box">
-				<label class="' . $lbl_classes . $has_value_class . ' fc-lbl-external fc-lbl urltarget-lbl" for="'.$elementid_n.'_id">'.\Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_WEBLINK_URLTARGET' ).'</label>
-				'.\Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $target_options, $fieldname_n.'[target]', $target_attribs, 'value', 'text', $value['target'], $elementid_n.'_target').'
+				<label class="' . $lbl_classes . $has_value_class . ' fc-lbl-external fc-lbl urltarget-lbl" for="'.$elementid_n.'_id">'.JText::_( 'FLEXI_FIELD_WEBLINK_URLTARGET' ).'</label>
+				'.JHtml::_('select.genericlist', $target_options, $fieldname_n.'[target]', $target_attribs, 'value', 'text', $value['target'], $elementid_n.'_target').'
 			</div>';
 		}
 
@@ -324,9 +324,9 @@
 
 			$hits = '
 				<div class="' . $input_grp_class . ' fc-xpended-row">
-					<label class="' . $add_on_class . ' fc-lbl urlhits-lbl" for="'.$elementid_n.'_hits">'.\Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_WEBLINK_POPULARITY' ).'</label>
+					<label class="' . $add_on_class . ' fc-lbl urlhits-lbl" for="'.$elementid_n.'_hits">'.JText::_( 'FLEXI_FIELD_WEBLINK_POPULARITY' ).'</label>
 					<input class="urlhits fc_hidden_value ' . $has_value_class . '" name="'.$fieldname_n.'[hits]" id="'.$elementid_n.'_hits" type="text" value="'.htmlspecialchars($value['hits'], ENT_COMPAT, 'UTF-8').'" />
-					<span class="' . $add_on_class . ' hitcount"> ' . $value['hits'] . ' ' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD_HITS') . '</span>
+					<span class="' . $add_on_class . ' hitcount"> ' . $value['hits'] . ' ' . JText::_('FLEXI_FIELD_HITS') . '</span>
 				</div>
 				';
 		}

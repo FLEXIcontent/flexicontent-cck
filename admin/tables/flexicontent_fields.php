@@ -20,16 +20,16 @@ class _flexicontent_fields_common extends flexicontent_basetable
 	/**
 	 * Get the parent asset id for the record
 	 *
-	 * @param   \Joomla\CMS\Table\Table   $table  A \Joomla\CMS\Table\Table object for the asset parent.
+	 * @param   JTable   $table  A JTable object for the asset parent.
 	 * @param   integer  $id     The id for the asset
 	 *
 	 * @return  integer  The id of the asset's parent
 	 *
 	 * @since   11.1
 	 */
-	protected function __getAssetParentId(\Joomla\CMS\Table\Table $table = null, $id = null)
+	protected function __getAssetParentId(JTable $table = null, $id = null)
 	{
-		$asset = \Joomla\CMS\Table\Table::getInstance('Asset');
+		$asset = JTable::getInstance('Asset');
 		$asset->loadByName('com_flexicontent');
 		return $asset->id;
 	}
@@ -38,7 +38,7 @@ class _flexicontent_fields_common extends flexicontent_basetable
 // This code has not removed to be an example of how to workaround adding TYPE to method parameters of parent class
 if (FLEXI_J30GE) {
 	class _flexicontent_fields extends _flexicontent_fields_common {
-		protected function _getAssetParentId(\Joomla\CMS\Table\Table $table = null, $id = null) {
+		protected function _getAssetParentId(JTable $table = null, $id = null) {
 			return parent::__getAssetParentId($table, $id);
 		}
 	}
@@ -209,13 +209,13 @@ class flexicontent_fields extends _flexicontent_fields
 	 *
 	 * @return  mixed   Null if operation was satisfactory, otherwise returns an error
 	 *
-	 * @see     \Joomla\CMS\Table\Table:bind
+	 * @see     JTable:bind
 	 * @since   11.1
 	 */
 	public function bind($array, $ignore = '')
 	{
 		if (isset($array['attribs']) && is_array($array['attribs'])) {
-			$registry = new \Joomla\Registry\Registry;
+			$registry = new JRegistry;
 			$registry->loadArray($array['attribs']);
 			$array['attribs'] = (string)$registry;
 		}
@@ -235,7 +235,7 @@ class flexicontent_fields extends _flexicontent_fields
 			}
 
 			// (b) Assign the rules
-			$rules = new \Joomla\CMS\Access\Rules($array['rules']);
+			$rules = new JAccessRules($array['rules']);
 			$this->setRules($rules);
 		}
 

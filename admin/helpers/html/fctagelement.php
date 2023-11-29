@@ -40,7 +40,7 @@ abstract class JHtmlFctagelement extends JHtmlFcbase
 	 */
 	protected static function _getPreviewUrl($row)
 	{
-		return \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('tags_using_catview', 0)
+		return JComponentHelper::getParams('com_flexicontent')->get('tags_using_catview', 0)
 			? FlexicontentHelperRoute::getCategoryRoute(0, 0, array('layout'=>'tags','tagid'=>$row->slug), $row)
 			: FlexicontentHelperRoute::getTagRoute($row->slug);
 	}

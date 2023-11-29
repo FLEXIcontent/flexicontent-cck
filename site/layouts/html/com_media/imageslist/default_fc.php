@@ -9,22 +9,22 @@
 
 defined('_JEXEC') or die;
 
-$app  = \Joomla\CMS\Factory::getApplication();
-$lang = \Joomla\CMS\Factory::getLanguage();
+$app  = JFactory::getApplication();
+$lang = JFactory::getLanguage();
 $this->viewLayout = basename(__FILE__, '.php');
 
-\Joomla\CMS\HTML\HTMLHelper::_('stylesheet', 'media/popup-imagelist.css', array('version' => 'auto', 'relative' => true));
+JHtml::_('stylesheet', 'media/popup-imagelist.css', array('version' => 'auto', 'relative' => true));
 
 if ($lang->isRtl())
 {
-	\Joomla\CMS\HTML\HTMLHelper::_('stylesheet', 'media/popup-imagelist_rtl.css', array('version' => 'auto', 'relative' => true));
+	JHtml::_('stylesheet', 'media/popup-imagelist_rtl.css', array('version' => 'auto', 'relative' => true));
 }
 
-\Joomla\CMS\Factory::getDocument()->addScriptDeclaration('var ImageManager = window.parent.ImageManager;');
+JFactory::getDocument()->addScriptDeclaration('var ImageManager = window.parent.ImageManager;');
 
 if ($lang->isRtl())
 {
-	\Joomla\CMS\Factory::getDocument()->addStyleDeclaration(
+	JFactory::getDocument()->addStyleDeclaration(
 		'
 			@media (max-width: 767px) {
 				li.imgOutline.thumbnail.height-80.width-80.center {
@@ -37,7 +37,7 @@ if ($lang->isRtl())
 }
 else
 {
-	\Joomla\CMS\Factory::getDocument()->addStyleDeclaration(
+	JFactory::getDocument()->addStyleDeclaration(
 		'
 			@media (max-width: 767px) {
 				li.imgOutline.thumbnail.height-80.width-80.center {
@@ -50,7 +50,7 @@ else
 }
 
 // Force container to body of container to full height
-\Joomla\CMS\Factory::getDocument()->addStyleDeclaration(
+JFactory::getDocument()->addStyleDeclaration(
 	'
 		body.contentpane.component {
 			height: 100%;
@@ -60,7 +60,7 @@ else
 );
 
 // Only get required documents
-$filetypes = \Joomla\CMS\Factory::getApplication()->input->getString('filetypes', false);
+$filetypes = JFactory::getApplication()->input->getString('filetypes', false);
 $filetypes = $filetypes ?: 'folders,images';
 $filetypes = explode(',', $filetypes);
 
@@ -72,7 +72,7 @@ $this->folders = in_array('folders', $filetypes) ? $this->folders : array();
 // Add image preview on click to preview icon
 if (count($this->images))
 {
-	\Joomla\CMS\Factory::getDocument()->addScriptDeclaration(
+	JFactory::getDocument()->addScriptDeclaration(
 	"
 		jQuery(document).ready(function($){
 
@@ -90,7 +90,7 @@ if (count($this->images))
 // Add video preview on click to preview icon
 if (count($this->videos))
 {
-	\Joomla\CMS\Factory::getDocument()->addScriptDeclaration(
+	JFactory::getDocument()->addScriptDeclaration(
 	"
 		jQuery(document).ready(function($){
 
@@ -133,8 +133,8 @@ if (count($this->videos))
 
 $params     = new Joomla\Registry\Registry;
 $dispatcher = JEventDispatcher::getInstance();
-$asset  = \Joomla\CMS\Factory::getApplication()->input->getCmd('asset');
-$author = \Joomla\CMS\Factory::getApplication()->input->getCmd('author');
+$asset  = JFactory::getApplication()->input->getCmd('asset');
+$author = JFactory::getApplication()->input->getCmd('author');
 
 if (count($this->images) > 0 || count($this->videos) > 0 || count($this->docs) > 0 || count($this->folders) > 0) : ?>
 	<ul class="manager thumbnails thumbnails-media">
@@ -147,7 +147,7 @@ if (count($this->images) > 0 || count($this->videos) > 0 || count($this->docs) >
 						<span class="icon-folder-2"></span>
 					</div>
 					<div class="small">
-						<?php echo \Joomla\CMS\HTML\HTMLHelper::_('string.truncate', $folder->name, 10, false); ?>
+						<?php echo JHtml::_('string.truncate', $folder->name, 10, false); ?>
 					</div>
 				</a>
 			</li>
@@ -166,11 +166,11 @@ if (count($this->images) > 0 || count($this->videos) > 0 || count($this->docs) >
 				<a class="img-preview" href="javascript:ImageManager.populateFields('<?php echo $file->path_relative; ?>')" title="<?php echo $file->name; ?>" >
 					<div class="imgThumb">
 						<div class="imgThumbInside">
-							<?php echo \Joomla\CMS\HTML\HTMLHelper::_('image', $file->icon_32, $file->name, null, true, true) ? \Joomla\CMS\HTML\HTMLHelper::_('image', $file->icon_32, $file->title, null, true) : \Joomla\CMS\HTML\HTMLHelper::_('image', 'media/con_info.png', $file->name, null, true); ?>
+							<?php echo JHtml::_('image', $file->icon_32, $file->name, null, true, true) ? JHtml::_('image', $file->icon_32, $file->title, null, true) : JHtml::_('image', 'media/con_info.png', $file->name, null, true); ?>
 						</div>
 					</div>
 					<div class="imgDetails small">
-						<?php echo \Joomla\CMS\HTML\HTMLHelper::_('string.truncate', $file->name, 10, false); ?>
+						<?php echo JHtml::_('string.truncate', $file->name, 10, false); ?>
 					</div>
 				</a>
 			</li>
@@ -193,11 +193,11 @@ if (count($this->images) > 0 || count($this->videos) > 0 || count($this->docs) >
 				<a class="img-preview" href="javascript:ImageManager.populateFields('<?php echo $file->path_relative; ?>')" title="<?php echo $file->name; ?>" >
 					<div class="imgThumb">
 						<div class="imgThumbInside">
-							<?php echo \Joomla\CMS\HTML\HTMLHelper::_('image', $file->icon_32, $file->name, null, true, true) ? \Joomla\CMS\HTML\HTMLHelper::_('image', $file->icon_32, $file->title, null, true) : \Joomla\CMS\HTML\HTMLHelper::_('image', 'media/con_info.png', $file->name, null, true); ?>
+							<?php echo JHtml::_('image', $file->icon_32, $file->name, null, true, true) ? JHtml::_('image', $file->icon_32, $file->title, null, true) : JHtml::_('image', 'media/con_info.png', $file->name, null, true); ?>
 						</div>
 					</div>
 					<div class="imgDetails small">
-						<?php echo \Joomla\CMS\HTML\HTMLHelper::_('string.truncate', $file->name, 10, false); ?>
+						<?php echo JHtml::_('string.truncate', $file->name, 10, false); ?>
 					</div>
 				</a>
 				<span class="video-preview-icon btn icon-search" style="z-index: 2; position: absolute; bottom: 0; right: 0; padding: 4px; box-sizing: content-box; margin: 0;" href="<?php echo COM_MEDIA_BASEURL, '/', $file->name; ?>" title="<?php echo $file->name; ?>"></span>
@@ -220,11 +220,11 @@ if (count($this->images) > 0 || count($this->videos) > 0 || count($this->docs) >
 				<a class="img-preview" href="javascript:ImageManager.populateFields('<?php echo $file->path_relative; ?>')" title="<?php echo $file->name; ?>" >
 					<div class="imgThumb">
 						<div class="imgThumbInside">
-						<?php echo \Joomla\CMS\HTML\HTMLHelper::_('image', $this->baseURL . '/' . $file->path_relative, \Joomla\CMS\Language\Text::sprintf('COM_MEDIA_IMAGE_TITLE', $file->title, \Joomla\CMS\HTML\HTMLHelper::_('number.bytes', $file->size)), array('width' => $file->width_60, 'height' => $file->height_60)); ?>
+						<?php echo JHtml::_('image', $this->baseURL . '/' . $file->path_relative, JText::sprintf('COM_MEDIA_IMAGE_TITLE', $file->title, JHtml::_('number.bytes', $file->size)), array('width' => $file->width_60, 'height' => $file->height_60)); ?>
 						</div>
 					</div>
 					<div class="imgDetails small">
-						<?php echo \Joomla\CMS\HTML\HTMLHelper::_('string.truncate', $file->name, 10, false); ?>
+						<?php echo JHtml::_('string.truncate', $file->name, 10, false); ?>
 					</div>
 				</a>
 				<span class="img-preview-icon btn icon-search" style="z-index: 2; position: absolute; bottom: 0; right: 0; padding: 4px; box-sizing: content-box; margin: 0;" href="<?php echo COM_MEDIA_BASEURL, '/', $file->name; ?>" title="<?php echo $file->name; ?>"></span>
@@ -239,6 +239,6 @@ if (count($this->images) > 0 || count($this->videos) > 0 || count($this->docs) >
 	</ul>
 <?php else : ?>
 	<div id="media-noimages">
-		<div class="alert alert-info"><?php echo \Joomla\CMS\Language\Text::_('NO_FILES_FOUND'); ?></div>
+		<div class="alert alert-info"><?php echo JText::_('NO_FILES_FOUND'); ?></div>
 	</div>
 <?php endif; ?>

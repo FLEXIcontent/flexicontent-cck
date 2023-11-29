@@ -26,7 +26,7 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 	public function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
-		\Joomla\CMS\Plugin\CMSPlugin::loadLanguage('plg_flexicontent_fields_relation', JPATH_ADMINISTRATOR);
+		JPlugin::loadLanguage('plg_flexicontent_fields_relation', JPATH_ADMINISTRATOR);
 	}
 
 
@@ -40,10 +40,10 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
-		$field->label = $field->parameters->get('label_form') ? \Joomla\CMS\Language\Text::_($field->parameters->get('label_form')) : \Joomla\CMS\Language\Text::_($field->label);
+		$field->label = $field->parameters->get('label_form') ? JText::_($field->parameters->get('label_form')) : JText::_($field->label);
 
 		// Initialize framework objects and other variables
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = JFactory::getUser();
 
 		// ***
 		// *** Check that relation field to be reversed was configured
@@ -51,7 +51,7 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 		$reverse_field_id = (int) $field->parameters->get('reverse_field', 0);
 		if ( !$reverse_field_id )
 		{
-			$field->html = '<div class="alert alert-warning">' . $field->label . ': ' . \Joomla\CMS\Language\Text::_('FLEXI_RIFLD_NO_FIELD_SELECTED_TO_BE_REVERSED').'</div>';
+			$field->html = '<div class="alert alert-warning">' . $field->label . ': ' . JText::_('FLEXI_RIFLD_NO_FIELD_SELECTED_TO_BE_REVERSED').'</div>';
 			return;
 		}
 
@@ -62,7 +62,7 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 		$_fields = FlexicontentFields::getFieldsByIds(array($reverse_field_id));
 		if (empty($_fields))
 		{
-			$field->html = '<div class="alert alert-warning">' . $field->label . ': ' . \Joomla\CMS\Language\Text::sprintf('FLEXI_RIFLD_FIELD_BEING_REVERSED_NOT_FOUND', $autorelation_itemid).'</div>';
+			$field->html = '<div class="alert alert-warning">' . $field->label . ': ' . JText::sprintf('FLEXI_RIFLD_FIELD_BEING_REVERSED_NOT_FOUND', $autorelation_itemid).'</div>';
 			return;
 		}
 
@@ -84,7 +84,7 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 		 * Case of autorelated item
 		 */
 
-		$autorelation_itemid = \Joomla\CMS\Factory::getApplication()->input->get('autorelation_'.$reverse_field_id, 0, 'int');
+		$autorelation_itemid = JFactory::getApplication()->input->get('autorelation_'.$reverse_field_id, 0, 'int');
 
 		if ( $autorelation_itemid )
 		{
@@ -95,7 +95,7 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 			// Check if also configuration is proper
 			if ($auto_relate_curritem && $auto_relate_menu_itemid)
 			{
-				$db = \Joomla\CMS\Factory::getDbo();
+				$db = JFactory::getDbo();
 				$db->setQuery(
 					'SELECT title, id, catid, state, alias '
 					. ' FROM #__content '
@@ -105,12 +105,12 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 
 				if (!$rel_item)
 				{
-					$field->html = '<div class="alert alert-warning">' . $field->label . ': ' . \Joomla\CMS\Language\Text::sprintf('FLEXI_RIFLD_CANNOT_AUTORELATE_ITEM', $autorelation_itemid).'</div>';
+					$field->html = '<div class="alert alert-warning">' . $field->label . ': ' . JText::sprintf('FLEXI_RIFLD_CANNOT_AUTORELATE_ITEM', $autorelation_itemid).'</div>';
 					return;
 				}
 
 				$field->html = '<input id="'.$elementid.'" name="'.$fieldname.'[]" type="hidden" value="'.(int) $rel_item->id.'" />';
-				$field->html .= '<div class="alert alert-success">'.\Joomla\CMS\Language\Text::_($auto_relate_submit_mssg).' '.$rel_item->title.'</div>';
+				$field->html .= '<div class="alert alert-success">'.JText::_($auto_relate_submit_mssg).' '.$rel_item->title.'</div>';
 				return;
 			}
 		}
@@ -132,7 +132,7 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
-		$field->label = \Joomla\CMS\Language\Text::_($field->label);
+		$field->label = JText::_($field->label);
 
 		// Set field and item objects
 		$this->setField($field);
@@ -150,8 +150,8 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 		{
 			$initialized = 1;
 
-			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$app       = JFactory::getApplication();
+			$document  = JFactory::getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -202,7 +202,7 @@ class plgFlexicontent_fieldsRelation_reverse extends FCField
 					$master_item_id = (int) reset($post);
 					if ($master_item_id)
 					{
-						$db = \Joomla\CMS\Factory::getDbo();
+						$db = JFactory::getDbo();
 						$db->setQuery(
 							'SELECT MAX(valueorder) '
 							. ' FROM #__flexicontent_fields_item_relations '

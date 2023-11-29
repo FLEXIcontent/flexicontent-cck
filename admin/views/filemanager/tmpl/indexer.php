@@ -21,7 +21,7 @@ defined('_JEXEC') or die('Restricted access');
 $records_name = 'files';
 $ctrl_task = 'task=filemanager.';
 
-$app = \Joomla\CMS\Factory::getApplication();
+$app = JFactory::getApplication();
 $indexer_name = $app->input->get('indexer', 'filemanager_stats', 'cmd');
 $rebuildmode  = $app->input->get('rebuildmode', '', 'cmd');
 $index_urls   = $app->input->get('index_urls', 0, 'int');
@@ -29,7 +29,7 @@ $index_urls   = $app->input->get('index_urls', 0, 'int');
 
 <div>&nbsp;</div>
 <div style="heading">
-	<?php echo \Joomla\CMS\Language\Text::_('FLEXI_TASK_RUNNING'); ?> ... <br/>
+	<?php echo JText::_('FLEXI_TASK_RUNNING'); ?> ... <br/>
 	
 <script>
 jQuery(document).ready(function() {
@@ -93,7 +93,7 @@ jQuery(document).ready(function() {
 	var start_time = new Date().getTime();
 
 	jQuery.ajax({
-		url: "index.php?option=com_flexicontent&format=raw&<?php echo $ctrl_task; ?>countrows&index_urls=<?php echo $index_urls;?>&indexer=<?php echo $indexer_name;?>&<?php echo \Joomla\CMS\Session\Session::getFormToken().'=1'; ?>",
+		url: "index.php?option=com_flexicontent&format=raw&<?php echo $ctrl_task; ?>countrows&index_urls=<?php echo $index_urls;?>&indexer=<?php echo $indexer_name;?>&<?php echo JSession::getFormToken().'=1'; ?>",
 		success: function(response, status, xhr) {
 			var request_time = new Date().getTime() - start_time;
 			total_time += request_time;

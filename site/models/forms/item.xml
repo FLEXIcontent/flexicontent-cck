@@ -6,7 +6,7 @@
 		<field name="title" type="text" label="FLEXI_TITLE" description="JFIELD_TITLE_DESC" class="fcfield_textval fc_form_title" maxlength="254" size="40" required="true" />
 		<field name="alias" type="text" label="FLEXI_ALIAS" description="JFIELD_ALIAS_DESC" class="fcfield_textval fc_form_alias" maxlength="254" size="40" />
 		<field name="type_id" type="fieldtypes" label="FLEXI_TYPE" description="FLEXI_TYPE_DESC" class="inputbox" />
-		<field name="text" type="editor" class="inputbox" label="COM_CONTENT_FIELD_ARTICLETEXT_LABEL" description="COM_CONTENT_FIELD_ARTICLETEXT_DESC" filter="\Joomla\CMS\Component\ComponentHelper::filterText" buttons="true" />
+		<field name="text" type="editor" class="inputbox" label="COM_CONTENT_FIELD_ARTICLETEXT_LABEL" description="COM_CONTENT_FIELD_ARTICLETEXT_DESC" filter="JComponentHelper::filterText" buttons="true" />
 		<field name="state" type="list" label="FLEXI_STATE" description="FLEXI_STATE_DESC" class="inputbox use_select2_lib" filter="intval" size="1" default="-4">
 			<option value="-4">FLEXI_TO_WRITE</option>
 			<option value="-3">FLEXI_PENDING</option>

@@ -14,27 +14,27 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-$cid = \Joomla\CMS\Factory::getApplication()->input->get('cid', array(0), 'array');
+$cid = JFactory::getApplication()->input->get('cid', array(0), 'array');
 ArrayHelper::toInteger($cid);
 
-$edit = \Joomla\CMS\Factory::getApplication()->input->get('edit', true);
+$edit = JFactory::getApplication()->input->get('edit', true);
 $text = intval($edit)
-	? \Joomla\CMS\Language\Text::_('Edit')
-	: \Joomla\CMS\Language\Text::_('New');
+	? JText::_('Edit')
+	: JText::_('New');
 
-$cparams = \Joomla\CMS\Component\ComponentHelper::getParams ('com_media');
+$cparams = JComponentHelper::getParams ('com_media');
 $date_format = FLEXI_J16GE ? 'Y-m-d H:i:s' : '%Y-%m-%d %H:%M:%S';
 
 
 if ($this->row->get('lastvisitDate') == "0000-00-00 00:00:00") {
-	$lvisit = \Joomla\CMS\Language\Text::_( 'Never' );
+	$lvisit = JText::_( 'Never' );
 } else {
-	$lvisit	= \Joomla\CMS\HTML\HTMLHelper::_('date', $this->row->get('lastvisitDate'), $date_format);
+	$lvisit	= JHtml::_('date', $this->row->get('lastvisitDate'), $date_format);
 }
 
 // Load JS tabber lib
-$this->document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
-$this->document->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
+$this->document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
+$this->document->addStyleSheet(JUri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
 $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 $js = "
 	jQuery(document).ready(function(){
@@ -60,7 +60,7 @@ $this->document->addScriptDeclaration($js);
 	<div class="span6 col-6 full_width_980" style="margin-bottom: 16px !important;">
 
 		<div class="fcsep_level_h">
-			<?php echo \Joomla\CMS\Language\Text::_('FLEXI_USER'); ?>
+			<?php echo JText::_('FLEXI_USER'); ?>
 		</div>
 	
 		<?php foreach($this->form->getFieldset('user_basic') as $field) :?>
@@ -85,7 +85,7 @@ $this->document->addScriptDeclaration($js);
 
 				// DB Query to get -mulitple- user group ids for all authors,
 				// Get user-To-usergoup mapping for users in current page
-				$db = \Joomla\CMS\Factory::getDbo();
+				$db = JFactory::getDbo();
 				
 				$query = 'SELECT group_id FROM #__user_usergroup_map WHERE user_id = '.(int) $this->form->getValue('id');
 				$user_grpids = $db->setQuery($query)->loadColumn();
@@ -114,7 +114,7 @@ $this->document->addScriptDeclaration($js);
 		<div class="fctabber" id="user_props_tabset">
 
 			<div class="tabbertab" id="fcform_tabset_user-details" data-icon-class="icon-home-2" >
-				<h3 class="tabberheading hasTooltip"> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_ACCOUNT_DETAILS' ); ?> </h3>
+				<h3 class="tabberheading hasTooltip"> <?php echo JText::_( 'FLEXI_ACCOUNT_DETAILS' ); ?> </h3>
 		
 				<table class="fc-form-tbl" id="user-details_set">
 					
@@ -131,7 +131,7 @@ $this->document->addScriptDeclaration($js);
 			
 			</div>
 			<div class="tabbertab" id="fcform_tabset_user-account" data-icon-class="icon-options" >
-				<h3 class="tabberheading hasTooltip"> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_ACCOUNT_SETTINGS' ); ?> </h3>
+				<h3 class="tabberheading hasTooltip"> <?php echo JText::_( 'FLEXI_ACCOUNT_SETTINGS' ); ?> </h3>
 			
 				<table class="fc-form-tbl">
 					
@@ -155,16 +155,16 @@ $this->document->addScriptDeclaration($js);
 
 
 			<div class="tabbertab" id="fcform_tabset_user-contact" data-icon-class="icon-envelope" >
-				<h3 class="tabberheading hasTooltip"> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_CONTACT_INFORMATION' ); ?> </h3>
+				<h3 class="tabberheading hasTooltip"> <?php echo JText::_( 'FLEXI_CONTACT_INFORMATION' ); ?> </h3>
 			
 			<?php if (!$this->contact) :?>
 				<table class="admintable" style="width:100%">
 					<tr>
 						<td>
 							<span class="fc-mssg fc-note" style="padding:16px; border:1px solid lightgray;">
-								<b><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_NO_CONTACT_INFORMATION' ); ?>:</b>
+								<b><?php echo JText::_( 'FLEXI_NO_CONTACT_INFORMATION' ); ?>:</b>
 								<br /><br />
-								<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_MANAGE_IN_CONTACT_COMPONENT' ); ?>.
+								<?php echo JText::_( 'FLEXI_MANAGE_IN_CONTACT_COMPONENT' ); ?>.
 							</span>
 						</td>
 					</tr>
@@ -173,7 +173,7 @@ $this->document->addScriptDeclaration($js);
 				<table class="admintable">
 					<tr>
 						<td class="key">
-							<?php echo \Joomla\CMS\Language\Text::_( 'Name' ); ?>
+							<?php echo JText::_( 'Name' ); ?>
 						</td>
 						<td>
 							<strong>
@@ -183,7 +183,7 @@ $this->document->addScriptDeclaration($js);
 					</tr>
 					<tr>
 						<td class="key">
-							<?php echo \Joomla\CMS\Language\Text::_( 'Position' ); ?>
+							<?php echo JText::_( 'Position' ); ?>
 						</td>
 						<td >
 							<strong>
@@ -193,7 +193,7 @@ $this->document->addScriptDeclaration($js);
 					</tr>
 					<tr>
 						<td class="key">
-							<?php echo \Joomla\CMS\Language\Text::_( 'Telephone' ); ?>
+							<?php echo JText::_( 'Telephone' ); ?>
 						</td>
 						<td >
 							<strong>
@@ -203,7 +203,7 @@ $this->document->addScriptDeclaration($js);
 					</tr>
 					<tr>
 						<td class="key">
-							<?php echo \Joomla\CMS\Language\Text::_( 'Fax' ); ?>
+							<?php echo JText::_( 'Fax' ); ?>
 						</td>
 						<td >
 							<strong>
@@ -213,7 +213,7 @@ $this->document->addScriptDeclaration($js);
 					</tr>
 					<tr>
 						<td class="key">
-							<?php echo \Joomla\CMS\Language\Text::_( 'Misc' ); ?>
+							<?php echo JText::_( 'Misc' ); ?>
 						</td>
 						<td >
 							<strong>
@@ -224,10 +224,10 @@ $this->document->addScriptDeclaration($js);
 					<?php if ($this->contact[0]->image) { ?>
 					<tr>
 						<td class="key">
-							<?php echo \Joomla\CMS\Language\Text::_( 'Image' ); ?>
+							<?php echo JText::_( 'Image' ); ?>
 						</td>
 						<td style="vertical-align:top; text-align:center;">
-							<img src="<?php echo \Joomla\CMS\Uri\Uri::root() . $cparams->get('image_path') . '/' . $this->contact[0]->image; ?>" alt="<?php echo \Joomla\CMS\Language\Text::_( 'Contact' ); ?>" />
+							<img src="<?php echo JUri::root() . $cparams->get('image_path') . '/' . $this->contact[0]->image; ?>" alt="<?php echo JText::_( 'Contact' ); ?>" />
 						</td>
 					</tr>
 					<?php } ?>
@@ -236,16 +236,16 @@ $this->document->addScriptDeclaration($js);
 						<td>
 							<div>
 								<br />
-								<input type="button" class="fc_button" value="<?php echo \Joomla\CMS\Language\Text::_( 'change Contact Details' ); ?>" onclick="gotocontact( '<?php echo $this->contact[0]->id; ?>' )" />
+								<input type="button" class="fc_button" value="<?php echo JText::_( 'change Contact Details' ); ?>" onclick="gotocontact( '<?php echo $this->contact[0]->id; ?>' )" />
 								<i>
 									<br /><br />
-									'<?php echo \Joomla\CMS\Language\Text::_( 'Components -> Contact -> Manage Contacts' ); ?>'
+									'<?php echo JText::_( 'Components -> Contact -> Manage Contacts' ); ?>'
 								</i>
 							</div>
 							
 							<?php if (0): ?>
 							<div class='fc-note fc-mssg'>
-								<?php echo \Joomla\CMS\Language\Text::_( 'Please note that we recomment using an Flexicontent Item to display Author details' ); ?>
+								<?php echo JText::_( 'Please note that we recomment using an Flexicontent Item to display Author details' ); ?>
 							</div>
 							<?php endif; ?>
 						</td>
@@ -257,16 +257,16 @@ $this->document->addScriptDeclaration($js);
 			*/ ?>
 
 			
-			<?php /*echo \Joomla\CMS\HTML\HTMLHelper::_('tabs.panel', \Joomla\CMS\Language\Text::_('FLEXI_EMAIL_NOTIFICATIONS_CONF'), 'content-notifications');*/ ?>
+			<?php /*echo JHtml::_('tabs.panel', JText::_('FLEXI_EMAIL_NOTIFICATIONS_CONF'), 'content-notifications');*/ ?>
 			<?php /* // WE HAVE NOT IMPLEMENTED THIS PER AUTHOR YET
 			<div class="tabbertab" id="fcform_tabset-author-content-notifications-tab" data-icon-class="icon-mail" >
-				<h3 class="tabberheading"> <?php echo \Joomla\CMS\Language\Text::_('FLEXI_EMAIL_NOTIFICATIONS_CONF'); ?> </h3>
+				<h3 class="tabberheading"> <?php echo JText::_('FLEXI_EMAIL_NOTIFICATIONS_CONF'); ?> </h3>
 				
 				<?php
 				$fieldSet = $this->jform_authorcat->getFieldset('cat_notifications_conf');
 				
 				if (isset($fieldSet->description) && trim($fieldSet->description)) :
-					echo '<div class="fc-mssg fc-info">'.\Joomla\CMS\Language\Text::_($fieldSet->description).'</div>';
+					echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
 				endif;
 				?>
 				
@@ -282,11 +282,11 @@ $this->document->addScriptDeclaration($js);
 			</div>
 			
 			<div class="tabbertab" id="fcform_tabset_user-groups" data-icon-class="icon-users" >
-				<h3 class="tabberheading hasTooltip"> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_ASSIGNED_GROUPS' ); ?> </h3>
+				<h3 class="tabberheading hasTooltip"> <?php echo JText::_( 'FLEXI_ASSIGNED_GROUPS' ); ?> </h3>
 				
 				<fieldset id="user-groups_set">
-					<?php \Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_ADMINISTRATOR.'/components/com_users/helpers/html'); ?>
-					<?php echo \Joomla\CMS\HTML\HTMLHelper::_('access.usergroups', 'jform[groups]', $this->usergroups, true); ?>
+					<?php JHtml::addIncludePath(JPATH_ADMINISTRATOR.'/components/com_users/helpers/html'); ?>
+					<?php echo JHtml::_('access.usergroups', 'jform[groups]', $this->usergroups, true); ?>
 				</fieldset>
 				
 			</div>
@@ -312,7 +312,7 @@ $this->document->addScriptDeclaration($js);
 
 		<?php if ($total_fsets==1) : ?>
 		<div class="fcsep_level_h">
-			<?php echo \Joomla\CMS\Language\Text::_($single_fset_label); ?>
+			<?php echo JText::_($single_fset_label); ?>
 		</div>
 		<?php endif; ?>
 
@@ -326,11 +326,11 @@ $this->document->addScriptDeclaration($js);
 			?>
 
 			<div class="tabbertab" id="fcform_tabset_<?php echo $name.'-options'; ?>" data-icon-class="icon-pencil" >
-				<h3 class="tabberheading <?php if ($total_fsets==1) echo 'hidden'; ?>"> <?php echo \Joomla\CMS\Language\Text::_( $label ); ?> </h3>
+				<h3 class="tabberheading <?php if ($total_fsets==1) echo 'hidden'; ?>"> <?php echo JText::_( $label ); ?> </h3>
 
 				<?php
 				if (isset($fieldSet->description) && trim($fieldSet->description)) :
-					echo '<div class="fc-mssg fc-info">'.\Joomla\CMS\Language\Text::_($fieldSet->description).'</div>';
+					echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
 				endif;
 
 				foreach ($this->jform_authorbasic->getFieldset($name) as $field) :
@@ -346,7 +346,7 @@ $this->document->addScriptDeclaration($js);
 
 			</div>
 			
-			<?php endforeach; ?><?php /*echo \Joomla\CMS\HTML\HTMLHelper::_('tabs.panel', \Joomla\CMS\Language\Text::_('FLEXI_META_SEO'), 'metaseo-options');*/ ?>
+			<?php endforeach; ?><?php /*echo JHtml::_('tabs.panel', JText::_('FLEXI_META_SEO'), 'metaseo-options');*/ ?>
 
 		</div><!-- fctabber -->
 			
@@ -356,7 +356,7 @@ $this->document->addScriptDeclaration($js);
 
 
 <div class="fcsep_level_h">
-	<?php echo \Joomla\CMS\Language\Text::_('FLEXI_DISPLAY_PARAMETERS'); ?>
+	<?php echo JText::_('FLEXI_DISPLAY_PARAMETERS'); ?>
 </div>
 
 
@@ -366,7 +366,7 @@ $this->document->addScriptDeclaration($js);
 				$fieldSet = $this->jform_authorbasic->getFieldset('author_override_cat_config');
 			
 					if (isset($fieldSet->description) && trim($fieldSet->description)) :
-						echo '<div class="fc-mssg fc-info">'.\Joomla\CMS\Language\Text::_($fieldSet->description).'</div>';
+						echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
 					endif;
 					?>
 
@@ -391,13 +391,13 @@ $this->document->addScriptDeclaration($js);
 			<div class="fctabber tabset_cat_params fcparams_tabset" id="tabset_cat_params">
 
 				<div class="tabbertab" id="tabset_cat_params_display_header_tab" data-icon-class="icon-info-circle fc-display-params-icon" >
-					<h3 class="tabberheading"> <?php echo \Joomla\CMS\Language\Text::_('FLEXI_CAT_DISPLAY_HEADER'); ?> </h3>
+					<h3 class="tabberheading"> <?php echo JText::_('FLEXI_CAT_DISPLAY_HEADER'); ?> </h3>
 
 					<?php
 					$fieldSet = $this->jform_authorcat->getFieldset('cats_display');
 
 					if (isset($fieldSet->description) && trim($fieldSet->description)) :
-						echo '<div class="fc-mssg fc-info">'.\Joomla\CMS\Language\Text::_($fieldSet->description).'</div>';
+						echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
 					endif;
 					?>
 
@@ -416,13 +416,13 @@ $this->document->addScriptDeclaration($js);
 
 
 				<div class="tabbertab" id="tabset_cat_params_search_filter_form_tab" data-icon-class="icon-search fc-display-params-icon" >
-					<h3 class="tabberheading"> <?php echo \Joomla\CMS\Language\Text::_('FLEXI_CAT_DISPLAY_SEARCH_FILTER_FORM'); ?> </h3>
+					<h3 class="tabberheading"> <?php echo JText::_('FLEXI_CAT_DISPLAY_SEARCH_FILTER_FORM'); ?> </h3>
 
 					<?php
 					$fieldSet = $this->jform_authorcat->getFieldset('cat_search_filter_form');
 
 					if (isset($fieldSet->description) && trim($fieldSet->description)) :
-						echo '<div class="fc-mssg fc-info">'.\Joomla\CMS\Language\Text::_($fieldSet->description).'</div>';
+						echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
 					endif;
 					?>
 
@@ -441,16 +441,16 @@ $this->document->addScriptDeclaration($js);
 
 
 				<div class="tabbertab" id="tabset_cat_params_layout_tab" data-icon-class="icon-palette fc-display-params-icon" >
-					<h3 class="tabberheading"> <?php echo \Joomla\CMS\Language\Text::_('FLEXI_LAYOUT'); ?> </h3>
+					<h3 class="tabberheading"> <?php echo JText::_('FLEXI_LAYOUT'); ?> </h3>
 
 					<span class="btn-group input-append" style="margin: 2px 0px 6px;">
-						<span id="fc-layouts-help_btn" class="btn" onclick="fc_toggle_box_via_btn('fc-layouts-help', this, 'btn-primary');" ><span class="icon-help"></span><?php echo \Joomla\CMS\Language\Text::_('JHELP'); ?></span>
+						<span id="fc-layouts-help_btn" class="btn" onclick="fc_toggle_box_via_btn('fc-layouts-help', this, 'btn-primary');" ><span class="icon-help"></span><?php echo JText::_('JHELP'); ?></span>
 					</span>
 					<div class="fcclear"></div>
 
 					<div class="fc-info fc-nobgimage fc-mssg-inline" id="fc-layouts-help" style="margin: 2px 0px!important; font-size: 12px; display: none;">
 						<h3 class="themes-title">
-							<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_PARAMETERS_LAYOUT_EXPLANATION' ); ?>
+							<?php echo JText::_( 'FLEXI_PARAMETERS_LAYOUT_EXPLANATION' ); ?>
 						</h3>
 						<b>NOTE:</b> Common method for -displaying- fields is by <b>editing the template layout</b> in template manager and placing the fields into <b>template positions</b>
 					</div>
@@ -483,31 +483,31 @@ $this->document->addScriptDeclaration($js);
 					<div class="fctabber tabset_cat_props" id="tabset_layout">
 
 						<div class="tabbertab" id="tabset_layout_params_tab" data-icon-class="icon-palette" >
-							<h3 class="tabberheading"> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_LAYOUT_PARAMETERS' ); ?> </h3>
+							<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_LAYOUT_PARAMETERS' ); ?> </h3>
 
 							<div class="fc-success fc-mssg-inline" style="font-size: 12px; margin: 8px 0 !important;" id="__category_inherited_layout__">
-								<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_TMPL_USING_INHERITED_CATEGORY_LAYOUT' ). ': <b>'. $this->params_authorcat->get('clayout') .'</b>'; ?>
+								<?php echo JText::_( 'FLEXI_TMPL_USING_INHERITED_CATEGORY_LAYOUT' ). ': <b>'. $this->params_authorcat->get('clayout') .'</b>'; ?>
 							</div>
 							<div class="fcclear"></div>
 
 							<div class="fc-sliders-plain-outer">
 								<?php
 								$slider_set_id = 'theme-sliders-'.$this->form->getValue("id");
-								//echo \Joomla\CMS\HTML\HTMLHelper::_('sliders.start','theme-sliders-'.$this->form->getValue("id"), array('useCookie'=>1,'show'=>1));
-								echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.startAccordion', $slider_set_id, array(/*'active' => ''*/));
+								//echo JHtml::_('sliders.start','theme-sliders-'.$this->form->getValue("id"), array('useCookie'=>1,'show'=>1));
+								echo JHtml::_('bootstrap.startAccordion', $slider_set_id, array(/*'active' => ''*/));
 								$groupname = 'attribs';  // Field Group name this is for name of <fields name="..." >
 								$cat_layout = $this->params_authorcat->get('clayout');
 
 								foreach ($this->tmpls as $tmpl) :
 
 									$form_layout = $tmpl->params;
-									$label = \Joomla\CMS\Language\Text::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
-									//echo \Joomla\CMS\HTML\HTMLHelper::_('sliders.panel', $label, $tmpl->name.'-'.$groupname.'-options');
-									echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addSlide', $slider_set_id, $label, $slider_id = $tmpl->name.'-'.$groupname.'-options');
+									$label = JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
+									//echo JHtml::_('sliders.panel', $label, $tmpl->name.'-'.$groupname.'-options');
+									echo JHtml::_('bootstrap.addSlide', $slider_set_id, $label, $slider_id = $tmpl->name.'-'.$groupname.'-options');
 
 									if (!$cat_layout || $tmpl->name != $cat_layout)
 									{
-										echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endSlide');
+										echo JHtml::_('bootstrap.endSlide');
 										continue;
 									}
 
@@ -517,10 +517,10 @@ $this->document->addScriptDeclaration($js);
 
 										<?php
 										if (isset($fieldSet->label) && trim($fieldSet->label)) :
-											echo '<div style="margin:0 0 12px 0; font-size: 16px; background-color: #333; float:none;" class="fcsep_level0">'.\Joomla\CMS\Language\Text::_($fieldSet->label).'</div>';
+											echo '<div style="margin:0 0 12px 0; font-size: 16px; background-color: #333; float:none;" class="fcsep_level0">'.JText::_($fieldSet->label).'</div>';
 										endif;
 										if (isset($fieldSet->description) && trim($fieldSet->description)) :
-											echo '<div class="fc-mssg fc-info">'.\Joomla\CMS\Language\Text::_($fieldSet->description).'</div>';
+											echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
 										endif;
 
 										foreach ($form_layout->getFieldset($fsname) as $field) :
@@ -566,7 +566,7 @@ $this->document->addScriptDeclaration($js);
 																)
 															)
 														) .
-														($cssprep ? ' <span class="icon-info hasTooltip" title="' . \Joomla\CMS\Language\Text::_('Used to auto-create a CSS styles file. To modify this, you can edit layout in template manager', true) . '"></span>' : '') . '
+														($cssprep ? ' <span class="icon-info hasTooltip" title="' . JText::_('Used to auto-create a CSS styles file. To modify this, you can edit layout in template manager', true) . '"></span>' : '') . '
 													</div>
 												</div>
 											';
@@ -576,11 +576,11 @@ $this->document->addScriptDeclaration($js);
 										</fieldset>
 
 									<?php endforeach; //fieldSets ?>
-									<?php echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endSlide'); ?>
+									<?php echo JHtml::_('bootstrap.endSlide'); ?>
 
 								<?php endforeach; //tmpls ?>
 
-								<?php echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endAccordion'); //echo \Joomla\CMS\HTML\HTMLHelper::_('sliders.end'); ?>
+								<?php echo JHtml::_('bootstrap.endAccordion'); //echo JHtml::_('sliders.end'); ?>
 
 							</div><!-- class="fc-sliders-plain-outer" -->
 
@@ -588,7 +588,7 @@ $this->document->addScriptDeclaration($js);
 
 
 						<div class="tabbertab" id="tabset_layout_switcher_tab" data-icon-class="icon-grid" >
-							<h3 class="tabberheading"> <?php echo \Joomla\CMS\Language\Text::_('FLEXI_CATEGORY_LAYOUT_SWITCHER'); ?> </h3>
+							<h3 class="tabberheading"> <?php echo JText::_('FLEXI_CATEGORY_LAYOUT_SWITCHER'); ?> </h3>
 
 							<?php
 							foreach($this->jform_authorcat->getGroup('templates') as $field):
@@ -622,13 +622,13 @@ $this->document->addScriptDeclaration($js);
 
 
 				<div class="tabbertab tabbertabdefault" id="tabset_cat_params_itemslist_tab" data-icon-class="icon-list-2 fc-display-params-icon" >
-					<h3 class="tabberheading"> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_AUTHOR_ITEMS_LIST' ); ?> </h3>
+					<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_AUTHOR_ITEMS_LIST' ); ?> </h3>
 
 					<?php
 					$fieldSet = $this->jform_authorcat->getFieldset('cat_items_list');
 
 					if (isset($fieldSet->description) && trim($fieldSet->description)) :
-						echo '<div class="fc-mssg fc-info">'.\Joomla\CMS\Language\Text::_($fieldSet->description).'</div>';
+						echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
 					endif;
 					?>
 
@@ -647,13 +647,13 @@ $this->document->addScriptDeclaration($js);
 
 
 				<div class="tabbertab" id="tabset_cat_params_rss_feeds_tab" data-icon-class="icon-feed fc-rss-params-icon" >
-					<h3 class="tabberheading"> <?php echo \Joomla\CMS\Language\Text::_('FLEXI_PARAMS_CAT_RSS_FEEDS'); ?> </h3>
+					<h3 class="tabberheading"> <?php echo JText::_('FLEXI_PARAMS_CAT_RSS_FEEDS'); ?> </h3>
 
 					<?php
 					$fieldSet = $this->jform_authorcat->getFieldset('cat_rss_feeds');
 
 					if (isset($fieldSet->description) && trim($fieldSet->description)) :
-						echo '<div class="fc-mssg fc-info">'.\Joomla\CMS\Language\Text::_($fieldSet->description).'</div>';
+						echo '<div class="fc-mssg fc-info">'.JText::_($fieldSet->description).'</div>';
 					endif;
 					?>
 
@@ -683,10 +683,10 @@ $this->document->addScriptDeclaration($js);
 	<input type="hidden" name="view" value="user" />
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" name="contact_id" value="" />
-	<?php if (!\Joomla\CMS\Factory::getUser()->authorise('com_users', 'email_events')) : ?>
+	<?php if (!JFactory::getUser()->authorise('com_users', 'email_events')) : ?>
 		<input type="hidden" name="sendEmail" value="0" />
 	<?php endif; ?>
-	<?php echo \Joomla\CMS\HTML\HTMLHelper::_( 'form.token' ); ?>
+	<?php echo JHtml::_( 'form.token' ); ?>
 
 </form>
 </div><!-- id:flexicontent -->

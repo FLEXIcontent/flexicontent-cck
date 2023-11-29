@@ -30,7 +30,7 @@ class UsersHelperDebug
 	static function getComponents()
 	{
 		// Initialise variable.
-		$db		= \Joomla\CMS\Factory::getDbo();
+		$db		= JFactory::getDbo();
 		$query	= $db->getQuery(true);
 
 		$query->select('name AS text, element AS value')
@@ -41,7 +41,7 @@ class UsersHelperDebug
 		$items = $db->setQuery($query)->loadObjectList();
 
 		if (count($items)) {
-			$lang = \Joomla\CMS\Factory::getLanguage();
+			$lang = JFactory::getLanguage();
 
 			foreach ($items as &$item)
 			{
@@ -52,7 +52,7 @@ class UsersHelperDebug
 				||	$lang->load("$extension.sys", $source, null, false, true);
 
 				// Translate component name
-				$item->text = \Joomla\CMS\Language\Text::_($item->text);
+				$item->text = JText::_($item->text);
 			}
 			unset($item);  // unset the variable reference to avoid trouble if variable is reused, thus overwritting last pointed variable
 
@@ -78,7 +78,7 @@ class UsersHelperDebug
 		// Try to get actions for the component
 		if (!empty($component))
 		{
-			$component_actions = \Joomla\CMS\Access\Access::getActionsFromFile(
+			$component_actions = JAccess::getActionsFromFile(
 				JPATH_ADMINISTRATOR . '/components/' . $component . '/access.xml',
 				"/access/section[@name='component']/"
 			);
@@ -124,7 +124,7 @@ class UsersHelperDebug
 				}
 
 				// Load language
-				$lang 		= \Joomla\CMS\Factory::getLanguage();
+				$lang 		= JFactory::getLanguage();
 				$extension 	= 'com_config';
 				$source 	= JPATH_ADMINISTRATOR . '/components/' . $extension;
 
@@ -145,12 +145,12 @@ class UsersHelperDebug
 	{
 		// Build the filter options.
 		$options	= array();
-		$options[]	= \Joomla\CMS\HTML\HTMLHelper::_('select.option', '1', \Joomla\CMS\Language\Text::sprintf('COM_USERS_OPTION_LEVEL_COMPONENT', 1));
-		$options[]	= \Joomla\CMS\HTML\HTMLHelper::_('select.option', '2', \Joomla\CMS\Language\Text::sprintf('COM_USERS_OPTION_LEVEL_CATEGORY', 2));
-		$options[]	= \Joomla\CMS\HTML\HTMLHelper::_('select.option', '3', \Joomla\CMS\Language\Text::sprintf('COM_USERS_OPTION_LEVEL_DEEPER', 3));
-		$options[]	= \Joomla\CMS\HTML\HTMLHelper::_('select.option', '4', '4');
-		$options[]	= \Joomla\CMS\HTML\HTMLHelper::_('select.option', '5', '5');
-		$options[]	= \Joomla\CMS\HTML\HTMLHelper::_('select.option', '6', '6');
+		$options[]	= JHtml::_('select.option', '1', JText::sprintf('COM_USERS_OPTION_LEVEL_COMPONENT', 1));
+		$options[]	= JHtml::_('select.option', '2', JText::sprintf('COM_USERS_OPTION_LEVEL_CATEGORY', 2));
+		$options[]	= JHtml::_('select.option', '3', JText::sprintf('COM_USERS_OPTION_LEVEL_DEEPER', 3));
+		$options[]	= JHtml::_('select.option', '4', '4');
+		$options[]	= JHtml::_('select.option', '5', '5');
+		$options[]	= JHtml::_('select.option', '6', '6');
 
 		return $options;
 	}

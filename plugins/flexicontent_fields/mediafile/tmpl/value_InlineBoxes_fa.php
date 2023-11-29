@@ -1,6 +1,6 @@
 <?php
 use Joomla\String\StringHelper;
-$isAdmin = \Joomla\CMS\Factory::getApplication()->isClient('administrator');
+$isAdmin = JFactory::getApplication()->isClient('administrator');
 
 // Important create a -1 "value", before any other normal values, so that it is at 1st position of the array
 $field->{$prop}[-1] = '';
@@ -48,7 +48,7 @@ foreach($values as $file_id)
 	// ***
 
 	$basePath = $file_data->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;
-	$abspath = str_replace(DS, '/', \Joomla\CMS\Filesystem\Path::clean($basePath.DS.$file_data->filename));
+	$abspath = str_replace(DS, '/', JPath::clean($basePath.DS.$file_data->filename));
 
 	$_size = '-';
 
@@ -108,10 +108,10 @@ foreach($values as $file_id)
 	{
 		$file_data = $this->addIcon( $file_data );
 		$_tooltip_title   = '';
-		$_tooltip_content = \Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_FILE_TYPE', true ) .': '. $file_data->ext;
+		$_tooltip_content = JText::_( 'FLEXI_FIELD_FILE_TYPE', true ) .': '. $file_data->ext;
 		$icon = '
 		<span class="fcfile_mime">
-			' . \Joomla\CMS\HTML\HTMLHelper::image($file_data->icon, $file_data->ext, 'class="fcicon-mime '.$tooltip_class.'" title="'.\Joomla\CMS\HTML\HTMLHelper::tooltipText($_tooltip_title, $_tooltip_content, 1, 0).'"') . '
+			' . JHtml::image($file_data->icon, $file_data->ext, 'class="fcicon-mime '.$tooltip_class.'" title="'.JHtml::tooltipText($_tooltip_title, $_tooltip_content, 1, 0).'"') . '
 		</span>';
 	}
 
@@ -128,7 +128,7 @@ foreach($values as $file_id)
 		$lang .= $display_lang == 2 || $display_lang == 3 ? '<span class="fcfile_lang_label label">' .JTEXT::_('FLEXI_LANGUAGE'). '</span> ' : '';
 		$lang .=
 		'<span class="fcfile_lang_value value">'
-			. ($file_data->language === '*' ? \Joomla\CMS\Language\Text::_('FLEXI_FIELD_FILE_ALL_LANGS') : $langs->{$file_data->language}->name) .
+			. ($file_data->language === '*' ? JText::_('FLEXI_FIELD_FILE_ALL_LANGS') : $langs->{$file_data->language}->name) .
 		'</span>';
 
 		$lang .= '</span>';
@@ -212,7 +212,7 @@ foreach($values as $file_id)
 		{
 			if ($noaccess_display != 2)
 			{
-				$descr_tip  = \Joomla\CMS\HTML\HTMLHelper::tooltipText($name_str, $file_data->description, 0, 1);
+				$descr_tip  = JHtml::tooltipText($name_str, $file_data->description, 0, 1);
 				$descr_icon = '<img src="components/com_flexicontent/assets/images/comments.png" class="hasTooltip" alt="'.$name_escaped.'" title="'. $descr_tip .'"/>';
 				$descr_inline  = '';
 			}
@@ -221,7 +221,7 @@ foreach($values as $file_id)
 		// As tooltip
 		elseif ($display_descr==1 || $prop=='namelist')
 		{
-			$descr_tip  = \Joomla\CMS\HTML\HTMLHelper::tooltipText($name_str, $file_data->description, 0, 1);
+			$descr_tip  = JHtml::tooltipText($name_str, $file_data->description, 0, 1);
 			$descr_icon = '<img src="components/com_flexicontent/assets/images/comments.png" class="hasTooltip" alt="'.$name_escaped.'" title="'. $descr_tip .'"/>';
 			$descr_inline  = '';
 		}
@@ -268,7 +268,7 @@ foreach($values as $file_id)
 	else
 	{
 		$dl_link = 'index.php?option=com_flexicontent&id='. $file_id .'&cid='.$item->id.'&fid='.$field->id.'&task=download';
-		$dl_link = $isAdmin ? flexicontent_html::getSefUrl($dl_link) : \Joomla\CMS\Router\Route::_( $dl_link );
+		$dl_link = $isAdmin ? flexicontent_html::getSefUrl($dl_link) : JRoute::_( $dl_link );
 	}
 
 	// SOME behavior FLAGS
@@ -545,16 +545,16 @@ if ($prop !== 'display_properties_only') :
 				<!--div id="fc_mediafile_current_time_' . $fnn . '" class="media_time">00:00:00</div-->
 				<div id="fc_mediafile_controls_' . $fnn . '" class="fc_mediafile_controls">
 					<a href="javascript:;" class="btn playBtn">
-						<span class="fas fa-play controls"></span><span class="btnControlsText">' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD_MEDIAFILE_PLAY') . '</span>
+						<span class="fas fa-play controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_PLAY') . '</span>
 					</a>
 					<a href="javascript:;" class="btn pauseBtn" style="display: none;">
-						<span class="fas fa-pause controls"></span><span class="btnControlsText">' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD_MEDIAFILE_PAUSE') . '</span>
+						<span class="fas fa-pause controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_PAUSE') . '</span>
 					</a>
 					<a href="javascript:;" class="btn stopBtn" style="display: none;">
-						<span class="icon-stop-circle controls"></span><span class="btnControlsText">' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD_MEDIAFILE_STOP') . '</span>
+						<span class="icon-stop-circle controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_STOP') . '</span>
 					</a>
 					<a href="javascript:;" class="btn loadBtn" style="display: none;">
-						<span class="icon-loop controls"></span><span class="btnControlsText">' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD_MEDIAFILE_LOAD') . '</span>
+						<span class="icon-loop controls"></span><span class="btnControlsText">' . JText::_('FLEXI_FIELD_MEDIAFILE_LOAD') . '</span>
 					</a>
 					' . ($allowdownloads ? $_download_btn_html : '') . '
 					' . (!$wf_zoom_slider ? '' : '
@@ -629,7 +629,7 @@ endif;   // END OF   $prop !== 'display_properties_only'
 
 			if ($md_name == 'channels')
 			{
-				$PROP_NAME = '<span class="fas fa-headphones-alt"> </span> ' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD_MEDIADATA_CHANNELS');
+				$PROP_NAME = '<span class="fas fa-headphones-alt"> </span> ' . JText::_('FLEXI_FIELD_MEDIADATA_CHANNELS');
 
 				// Only change value if it is 2 or 1
 				if ($PROP_VALUE == 2 || $PROP_VALUE == 1)
@@ -641,30 +641,30 @@ endif;   // END OF   $prop !== 'display_properties_only'
 
 			if ($md_name == 'media_format')
 			{
-				$PROP_NAME = '<span class="far fa-file-audio"> </span> ' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD_MEDIADATA_MEDIA_TYPE');
+				$PROP_NAME = '<span class="far fa-file-audio"> </span> ' . JText::_('FLEXI_FIELD_MEDIADATA_MEDIA_TYPE');
 			}
 
 			if ($md_name == 'bit_rate')
 			{
-				$PROP_NAME = '<span class="fas fa-assistive-listening-systems"> </span> ' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD_MEDIADATA_BIT_RATE');
+				$PROP_NAME = '<span class="fas fa-assistive-listening-systems"> </span> ' . JText::_('FLEXI_FIELD_MEDIADATA_BIT_RATE');
 				$PROP_VALUE = ($PROP_VALUE / 1000).' Kbps';
 			}
 
 			if ($md_name == 'bits_per_sample')
 			{
-				$PROP_NAME = '<span class="fas fa-assistive-listening-systems"> </span> ' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD_MEDIADATA_BIT_DEPTH');
+				$PROP_NAME = '<span class="fas fa-assistive-listening-systems"> </span> ' . JText::_('FLEXI_FIELD_MEDIADATA_BIT_DEPTH');
 				$PROP_VALUE = $PROP_VALUE.' Bit';
 			}
 
 			if ($md_name == 'sample_rate')
 			{
-				$PROP_NAME = '<span class="fas fa-wave-square"> </span> ' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD_MEDIADATA_SAMPLE_RATE');
+				$PROP_NAME = '<span class="fas fa-wave-square"> </span> ' . JText::_('FLEXI_FIELD_MEDIADATA_SAMPLE_RATE');
 				$PROP_VALUE = $PROP_VALUE.' Hz';
 			}
 
 			if ($md_name == 'duration')
 			{
-				$PROP_NAME = '<span class="far fa-clock"> </span> ' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD_MEDIADATA_DURATION');
+				$PROP_NAME = '<span class="far fa-clock"> </span> ' . JText::_('FLEXI_FIELD_MEDIADATA_DURATION');
 				$PROP_VALUE = gmdate("H:i:s", $PROP_VALUE);
 			}
 
@@ -705,7 +705,7 @@ endif;   // END OF   $prop !== 'display_properties_only'
 	if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 }
 
-\Joomla\CMS\Factory::getDocument()->addScriptDeclaration("
+JFactory::getDocument()->addScriptDeclaration("
 	fcview_mediafile_base_url['".$field_name_js."'] = '".$base_url."';
 
 	" . (!$per_value_js ? "" : "

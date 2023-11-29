@@ -10,7 +10,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 // first define the template name
 $tmpl = $this->tmpl;
-$user = \Joomla\CMS\Factory::getUser();
+$user = JFactory::getUser();
 
 $btn_class = 'btn';
 $tooltip_class = 'hasTooltip';
@@ -25,7 +25,7 @@ if ($this->params->get('togglable_table_cols', 1))
 		'mainChooseColBox',
 		'adminListTableFCcategory',
 		$start_html = '',
-		$end_html = '<div class="icon-arrow-up-2" title="'.\Joomla\CMS\Language\Text::_('FLEXI_HIDE').'" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/div>'
+		$end_html = '<div class="icon-arrow-up-2" title="'.JText::_('FLEXI_HIDE').'" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/div>'
 	);
 }
 
@@ -58,7 +58,7 @@ if (!$this->items)
 		echo '
 		<div class="fcclear"></div>
 		<div class="noitems group">
-			' . \Joomla\CMS\Language\Text::_( 'FLEXI_NO_ITEMS_FOUND' ) . '
+			' . JText::_( 'FLEXI_NO_ITEMS_FOUND' ) . '
 		</div>';
 	}
 	return;
@@ -101,7 +101,7 @@ foreach ($items as $item)
 }
 
 // Calculate common data outside the item loops
-$_read_more_about = \Joomla\CMS\Language\Text::_( 'FLEXI_READ_MORE_ABOUT' );
+$_read_more_about = JText::_( 'FLEXI_READ_MORE_ABOUT' );
 $_comments_container_params = 'class="fc_comments_count_nopad '.$tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_NUM_OF_COMMENTS', 'FLEXI_NUM_OF_COMMENTS_TIP', 1, 1).'"';
 
 
@@ -148,7 +148,7 @@ endif;
 
 // Check to enable show title if not other columns were configured
 if (!$show_title && !count($columns)) :
-	echo '<span style="font-weight:bold; color:red;">'.\Joomla\CMS\Language\Text::_('FLEXI_TPL_NO_COLUMNS_SELECT_FORCING_DISPLAY_ITEM_TITLE').'</span>';
+	echo '<span style="font-weight:bold; color:red;">'.JText::_('FLEXI_TPL_NO_COLUMNS_SELECT_FORCING_DISPLAY_ITEM_TITLE').'</span>';
 	$this->params->set('show_title', 1);
 endif;
 ?>
@@ -156,7 +156,7 @@ endif;
 
 <?php if ($this->params->get('togglable_table_cols', 1)) : ?>
 	<div class="btn-group" style="margin: 2px 32px 6px -3px; display:inline-block;">
-		<input type="button" id="fc_mainChooseColBox_btn" class="<?php echo $btn_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" value="<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_TMPL_DEFAULT_COLUMNS_FE' ); ?>" />
+		<input type="button" id="fc_mainChooseColBox_btn" class="<?php echo $btn_class; ?>" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" value="<?php echo JText::_( 'FLEXI_TMPL_DEFAULT_COLUMNS_FE' ); ?>" />
 	</div>
 	<div id="mainChooseColBox" class="well well-small" style="display:none;"></div>
 <?php endif; ?>
@@ -174,7 +174,7 @@ endif;
 			<?php if ($comments_non_zero || $show_title || count($item->css_markups) ) : ?>
 				<th id="flexi_title" class="hideOnDemandClass">
 				
-					<?php echo \Joomla\CMS\Language\Text::_(
+					<?php echo JText::_(
 						$this->params->get('customize_titlecol_header') && $this->params->get('titlecol_header_text') ?
 							$this->params->get('titlecol_header_text') : ($show_title ? 'FLEXI_TITLE' : '')
 						); ?>
@@ -242,7 +242,7 @@ endif;
 				<!-- BOF item title -->
 				<span class="fc_item_title" itemprop="name">
 				<?php if ($link_titles) : ?>
-					<a href="<?php echo \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>" itemprop="url"><?php echo $item->title; ?></a>
+					<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>" itemprop="url"><?php echo $item->title; ?></a>
    			<?php else : ?>
 					<?php echo $item->title; ?>
 				<?php endif; ?>

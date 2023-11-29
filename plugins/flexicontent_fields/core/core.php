@@ -28,8 +28,8 @@ class plgFlexicontent_fieldsCore extends FCField
 	public function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
-		\Joomla\CMS\Plugin\CMSPlugin::loadLanguage('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR);
-		\Joomla\CMS\Plugin\CMSPlugin::loadLanguage('plg_flexicontent_fields_textarea', JPATH_ADMINISTRATOR);
+		JPlugin::loadLanguage('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR);
+		JPlugin::loadLanguage('plg_flexicontent_fields_textarea', JPATH_ADMINISTRATOR);
 	}
 
 
@@ -78,8 +78,8 @@ class plgFlexicontent_fieldsCore extends FCField
 		{
 			$initialized = 1;
 
-			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$app       = JFactory::getApplication();
+			$document  = JFactory::getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -160,7 +160,7 @@ class plgFlexicontent_fieldsCore extends FCField
 			// Get date format
 			$customdate = $field->parameters->get( 'custom_date', 'Y-m-d' ) ;
 			$dateformat = $field->parameters->get( 'date_format', '' ) ;
-			$dateformat = $dateformat ? \Joomla\CMS\Language\Text::_($dateformat) : ($field->parameters->get( 'lang_filter_format', 0) ? \Joomla\CMS\Language\Text::_($customdate) : $customdate);
+			$dateformat = $dateformat ? JText::_($dateformat) : ($field->parameters->get( 'lang_filter_format', 0) ? JText::_($customdate) : $customdate);
 		}
 
 		// Get viewing layout
@@ -229,7 +229,7 @@ class plgFlexicontent_fieldsCore extends FCField
 					// Get date format
 					$customdate = $field->parameters->get( 'custom_date', 'Y-m-d' ) ;
 					$dateformat = $field->parameters->get( 'date_format', '' ) ;
-					$dateformat = $dateformat ? \Joomla\CMS\Language\Text::_($dateformat) : ($field->parameters->get( 'lang_filter_format', 0) ? \Joomla\CMS\Language\Text::_($customdate) : $customdate);
+					$dateformat = $dateformat ? JText::_($dateformat) : ($field->parameters->get( 'lang_filter_format', 0) ? JText::_($customdate) : $customdate);
 
 					// Create field's HTML
 					$field->{$prop} = array();
@@ -259,7 +259,7 @@ class plgFlexicontent_fieldsCore extends FCField
 
 				case 'type': // document type
 					$field->value[] = $item->type_id;
-					$field->{$prop} = $pretext.\Joomla\CMS\Language\Text::_($item->typename).$posttext;
+					$field->{$prop} = $pretext.JText::_($item->typename).$posttext;
 					break;
 
 				case 'version': // version
@@ -470,7 +470,7 @@ class plgFlexicontent_fieldsCore extends FCField
 	// Method to create field's HTML display for item form
 	public function onDisplayField(&$field, &$item)
 	{
-		$field->label = $field->parameters->get('label_form') ? \Joomla\CMS\Language\Text::_($field->parameters->get('label_form')) : \Joomla\CMS\Language\Text::_($field->label);
+		$field->label = $field->parameters->get('label_form') ? JText::_($field->parameters->get('label_form')) : JText::_($field->label);
 
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if (!isset($field->formhidden_grp)) $field->formhidden_grp = $field->formhidden;
@@ -560,7 +560,7 @@ class plgFlexicontent_fieldsCore extends FCField
 						$field->postdata[0] = $item->title = @ eval($auto_title_code);
 					}
 					catch (ParseError $e) {
-						\Joomla\CMS\Factory::getApplication()->enqueueMessage( "Automatic title custom code, failed with: <pre>" . $e->getMessage() . '</pre>', 'warning');
+						JFactory::getApplication()->enqueueMessage( "Automatic title custom code, failed with: <pre>" . $e->getMessage() . '</pre>', 'warning');
 					}
 					if (!strlen($field->postdata[0]))
 					{
@@ -631,7 +631,7 @@ class plgFlexicontent_fieldsCore extends FCField
 			? in_array($filter->field_type, array('type','state','tags','categories','created','createdby','modified','modifiedby'))
 			: false;
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 		$formfieldname = 'filter_'.$filter->id;
 
 		$_s = $isSearchView ? '_s' : '';
@@ -642,7 +642,7 @@ class plgFlexicontent_fieldsCore extends FCField
 
 		// Create first prompt option of drop-down select
 		$label_filter = $filter->parameters->get( 'display_label_filter'.$_s, 2 ) ;
-		$first_option_txt = $label_filter==2 ? $filter->label : \Joomla\CMS\Language\Text::_('FLEXI_ALL');
+		$first_option_txt = $label_filter==2 ? $filter->label : JText::_('FLEXI_ALL');
 
 		// Prepend Field's Label to filter HTML
 		//$filter->html = $label_filter==1 ? $filter->label.': ' : '';
@@ -651,7 +651,7 @@ class plgFlexicontent_fieldsCore extends FCField
 		switch ($filter->field_type)
 		{
 			case 'title':
-				$_inner_lb = $label_filter==2 ? $filter->label : \Joomla\CMS\Language\Text::_('FLEXI_TYPE_TO_LIST');
+				$_inner_lb = $label_filter==2 ? $filter->label : JText::_('FLEXI_TYPE_TO_LIST');
 				$_inner_lb = htmlspecialchars($_inner_lb, ENT_COMPAT, 'UTF-8');
 				$_label_internal = '';
 				$attribs_str = ' class="fc_field_filter '.$_label_internal.'" placeholder="'.$_inner_lb.'"';
@@ -667,7 +667,7 @@ class plgFlexicontent_fieldsCore extends FCField
 				// WARNING: we can not use column alias in from, join, where, group by, can use in having (some DB e.g. mysql) and in order-by
 				// partial SQL clauses
 				$text_col = $filter->parameters->get('name_username', 1) == 2 ? 'username' : 'name';
-				$filter->filter_valuesselect = ' i.created_by AS value, CASE WHEN usr.' . $text_col . ' IS NULL THEN CONCAT(\''.\Joomla\CMS\Language\Text::_('FLEXI_NOT_ASSIGNED').' ID:\', i.created_by) ELSE usr.' . $text_col . ' END AS text';
+				$filter->filter_valuesselect = ' i.created_by AS value, CASE WHEN usr.' . $text_col . ' IS NULL THEN CONCAT(\''.JText::_('FLEXI_NOT_ASSIGNED').' ID:\', i.created_by) ELSE usr.' . $text_col . ' END AS text';
 				$filter->filter_valuesjoin   = ' JOIN #__users AS usr ON usr.id = i.created_by';
 				$filter->filter_valueswhere  = ' AND i.created_by <> 0';
 				// full SQL clauses
@@ -682,7 +682,7 @@ class plgFlexicontent_fieldsCore extends FCField
 				// WARNING: we can not use column alias in from, join, where, group by, can use in having (some DB e.g. mysql) and in order-by
 				// partial SQL clauses
 				$text_col = $filter->parameters->get('name_username', 1) == 2 ? 'username' : 'name';
-				$filter->filter_valuesselect = ' i.modified_by AS value, CASE WHEN usr.' . $text_col . ' IS NULL THEN CONCAT(\''.\Joomla\CMS\Language\Text::_('FLEXI_NOT_ASSIGNED').' ID:\', i.modified_by) ELSE usr.' . $text_col . ' END AS text';
+				$filter->filter_valuesselect = ' i.modified_by AS value, CASE WHEN usr.' . $text_col . ' IS NULL THEN CONCAT(\''.JText::_('FLEXI_NOT_ASSIGNED').' ID:\', i.modified_by) ELSE usr.' . $text_col . ' END AS text';
 				$filter->filter_valuesjoin   = ' JOIN #__users AS usr ON usr.id = i.modified_by';
 				$filter->filter_valueswhere  = ' AND i.modified_by <> 0';
 				// full SQL clauses
@@ -713,13 +713,13 @@ class plgFlexicontent_fieldsCore extends FCField
 			case 'state':
 				$options = array();
 				//$options[] = (object) array('value' => '', '- '.$first_option_txt.' -');
-				$options[] = (object) array('value' => 'P', 'text' => \Joomla\CMS\Language\Text::_('FLEXI_PUBLISHED'));
-				$options[] = (object) array('value' => 'U', 'text' => \Joomla\CMS\Language\Text::_('FLEXI_UNPUBLISHED'));
-				$options[] = (object) array('value' => 'PE', 'text' => \Joomla\CMS\Language\Text::_('FLEXI_PENDING'));
-				$options[] = (object) array('value' => 'OQ', 'text' => \Joomla\CMS\Language\Text::_('FLEXI_TO_WRITE'));
-				$options[] = (object) array('value' => 'IP', 'text' => \Joomla\CMS\Language\Text::_('FLEXI_IN_PROGRESS'));
-				$options[] = (object) array('value' => 'A', 'text' => \Joomla\CMS\Language\Text::_('FLEXI_ARCHIVED'));
-				//$options[] = (object) array('value' => 'T', 'text' => \Joomla\CMS\Language\Text::_('FLEXI_TRASHED'));
+				$options[] = (object) array('value' => 'P', 'text' => JText::_('FLEXI_PUBLISHED'));
+				$options[] = (object) array('value' => 'U', 'text' => JText::_('FLEXI_UNPUBLISHED'));
+				$options[] = (object) array('value' => 'PE', 'text' => JText::_('FLEXI_PENDING'));
+				$options[] = (object) array('value' => 'OQ', 'text' => JText::_('FLEXI_TO_WRITE'));
+				$options[] = (object) array('value' => 'IP', 'text' => JText::_('FLEXI_IN_PROGRESS'));
+				$options[] = (object) array('value' => 'A', 'text' => JText::_('FLEXI_ARCHIVED'));
+				//$options[] = (object) array('value' => 'T', 'text' => JText::_('FLEXI_TRASHED'));
 				$filter->filter_options = $options;
 				unset($options);
 
@@ -731,7 +731,7 @@ class plgFlexicontent_fieldsCore extends FCField
 				global $globalcats;
 				$rootcatid = $filter->parameters->get( 'rootcatid'.$_s, '' ) ;
 
-				$app = \Joomla\CMS\Factory::getApplication();
+				$app = JFactory::getApplication();
 				$option = $app->input->get('option', '', 'cmd');
 				$view   = $app->input->get('view', '', 'cmd');
 
@@ -871,7 +871,7 @@ class plgFlexicontent_fieldsCore extends FCField
 				if($disable_keyboardinput)
 				{
 					$filter_ffid   = $formName.'_'.$filter->id.'_val';
-					$document =  \Joomla\CMS\Factory::getDocument();
+					$document =  JFactory::getDocument();
 					switch ($display_filter_as)
 					{
 						case 1:
@@ -897,7 +897,7 @@ class plgFlexicontent_fieldsCore extends FCField
 					$filter_as_range = in_array($display_filter_as, array(2,3,8));  // We don't want null date if using a range
 					$nullDate_quoted = $db->Quote($db->getNullDate());
 					$valuecol = sprintf(' CASE WHEN i.%s='.$nullDate_quoted.' THEN '.$nullDate_quoted.' ELSE DATE_FORMAT(i.%s, "%s") END ', $filter->field_type, $filter->field_type, $date_valformat);
-					$textcol  = sprintf(' CASE WHEN i.%s='.$nullDate_quoted.' THEN "'.\Joomla\CMS\Language\Text::_('FLEXI_NEVER').'" ELSE DATE_FORMAT(i.%s, "%s") END ', $filter->field_type, $filter->field_type, $date_txtformat);
+					$textcol  = sprintf(' CASE WHEN i.%s='.$nullDate_quoted.' THEN "'.JText::_('FLEXI_NEVER').'" ELSE DATE_FORMAT(i.%s, "%s") END ', $filter->field_type, $filter->field_type, $date_txtformat);
 
 					// WARNING: we can not use column alias in from, join, where, group by, can use in having (some DB e.g. mysql) and in order-by
 					// partial SQL clauses
@@ -930,18 +930,18 @@ class plgFlexicontent_fieldsCore extends FCField
 
 			// Add the options
 			$options = array();
-			$_inner_lb = $label_filter==2 ? $filter->label : \Joomla\CMS\Language\Text::_('FLEXI_CLICK_TO_LIST');
+			$_inner_lb = $label_filter==2 ? $filter->label : JText::_('FLEXI_CLICK_TO_LIST');
 			$_inner_lb = htmlspecialchars($_inner_lb, ENT_COMPAT, 'UTF-8');
 			if ($display_filter_as == 6)
 			{
 				if ($label_filter==2)
 				{
-					$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '', $_inner_lb, 'value', 'text', $_disabled = true);
+					$options[] = JHtml::_('select.option', '', $_inner_lb, 'value', 'text', $_disabled = true);
 				}
 			}
 			else
-				$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '', '- '.$first_option_txt.' -');
-			foreach ($lists as $list) $options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', $list->value, $list->text . ($count_column ? ' ('.$list->found.')' : '') );
+				$options[] = JHtml::_('select.option', '', '- '.$first_option_txt.' -');
+			foreach ($lists as $list) $options[] = JHtml::_('select.option', $list->value, $list->text . ($count_column ? ' ('.$list->found.')' : '') );
 		}
 
 		// b. If field filter has defined drop-down select options the create the drop-down select form field
@@ -961,7 +961,7 @@ class plgFlexicontent_fieldsCore extends FCField
 				$extra_param  = ' data-placeholder="'.$_inner_lb.'"';
 
 				// Add type to filter PROMPT (via js)
-				$extra_param .= ' data-fc_prompt_text="'.htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_TYPE_TO_FILTER'), ENT_QUOTES, 'UTF-8').'"';
+				$extra_param .= ' data-fc_prompt_text="'.htmlspecialchars(JText::_('FLEXI_TYPE_TO_FILTER'), ENT_QUOTES, 'UTF-8').'"';
 			}
 
 			// Create HTML tag attributes
@@ -985,14 +985,14 @@ class plgFlexicontent_fieldsCore extends FCField
 			// Calculate if field has value
 			$has_value = (!is_array($value) && $value !== null && strlen($value)) || (is_array($value) && count($value));
 			$filter->html	.= $label_filter==2 && $has_value
-				? ' <span class="badge fc_mobile_label" style="display:none;">'.\Joomla\CMS\Language\Text::_($filter->label).'</span> '
+				? ' <span class="badge fc_mobile_label" style="display:none;">'.JText::_($filter->label).'</span> '
 				: '';
 
 			// Create filter
 			// Need selected values: array('') instead of array(), to force selecting the "field's prompt option" (e.g. field label) thus avoid "0 selected" display in mobiles
 			$filter->html	.= $display_filter_as != 6
-				? \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $options, $filter_ffname.'[]', $attribs_str, 'value', 'text', $value, $filter_ffid)
-				: \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $options, $filter_ffname.'[]', $attribs_str, 'value', 'text', ($label_filter==2 && !count($value) ? array('') : $value), $filter_ffid);
+				? JHtml::_('select.genericlist', $options, $filter_ffname.'[]', $attribs_str, 'value', 'text', $value, $filter_ffid)
+				: JHtml::_('select.genericlist', $options, $filter_ffname.'[]', $attribs_str, 'value', 'text', ($label_filter==2 && !count($value) ? array('') : $value), $filter_ffid);
 		}
 
 		// Special CASE for some filters, do some replacements
@@ -1136,13 +1136,13 @@ class plgFlexicontent_fieldsCore extends FCField
 		if (!$state_names)
 		{
 			$state_names = array(
-				1 => \Joomla\CMS\Language\Text::_('FLEXI_PUBLISHED'),
-				-5 => \Joomla\CMS\Language\Text::_('FLEXI_IN_PROGRESS'),
-				0 => \Joomla\CMS\Language\Text::_('FLEXI_UNPUBLISHED'),
-				-3 => \Joomla\CMS\Language\Text::_('FLEXI_PENDING'),
-				-4 => \Joomla\CMS\Language\Text::_('FLEXI_TO_WRITE'),
-				2 => \Joomla\CMS\Language\Text::_('FLEXI_ARCHIVED'),
-				-2 => \Joomla\CMS\Language\Text::_('FLEXI_TRASHED')
+				1 => JText::_('FLEXI_PUBLISHED'),
+				-5 => JText::_('FLEXI_IN_PROGRESS'),
+				0 => JText::_('FLEXI_UNPUBLISHED'),
+				-3 => JText::_('FLEXI_PENDING'),
+				-4 => JText::_('FLEXI_TO_WRITE'),
+				2 => JText::_('FLEXI_ARCHIVED'),
+				-2 => JText::_('FLEXI_TRASHED')
 			);
 		}
 
@@ -1159,7 +1159,7 @@ class plgFlexicontent_fieldsCore extends FCField
 			return array();
 		}
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 		$_s = $for_advsearch ? '_s' : '';
 
 		$values = array();
@@ -1319,7 +1319,7 @@ class plgFlexicontent_fieldsCore extends FCField
 
 		if (!isset($item_reviews[$item->id]))
 		{
-			$db = \Joomla\CMS\Factory::getDbo();
+			$db = JFactory::getDbo();
 
 			$item_ids = array();
 

@@ -76,11 +76,11 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 	public function save()
 	{
 		// Check for request forgeries
-		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
 
 		// Initialize variables
-		$app     = \Joomla\CMS\Factory::getApplication();
-		$user    = \Joomla\CMS\Factory::getUser();
+		$app     = JFactory::getApplication();
+		$user    = JFactory::getUser();
 
 		$ctrl_task = 'task=' . $this->record_name_pl . '.';
 		$original_task = $this->task;
@@ -110,7 +110,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 		if (!$is_authorised)
 		{
 			$app->setHeader('status', '403 Forbidden', true);
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+			$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
 
 			// Skip redirection back to return url if inside a component-area-only view, showing error using current page, since usually we are inside a iframe modal
 			if ($this->input->getCmd('tmpl') !== 'component')
@@ -153,7 +153,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 		{
 			// Set error message and the redirect URL (back to the record form)
 			$app->setHeader('status', '500 Internal Server Error', true);
-			$this->setError($model->getError() ?: \Joomla\CMS\Language\Text::_('FLEXI_ERROR_SAVING_' . $this->_NAME));
+			$this->setError($model->getError() ?: JText::_('FLEXI_ERROR_SAVING_' . $this->_NAME));
 			$this->setMessage($this->getError(), 'error');
 
 			// Skip redirection back to return url if inside a component-area-only view, showing error using current page, since usually we are inside a iframe modal
@@ -186,12 +186,12 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 		 * Saving is done, decide where to redirect
 		 */
 
-		$msg = \Joomla\CMS\Language\Text::_('FLEXI_SAVE_FIELD_POSITIONS');
+		$msg = JText::_('FLEXI_SAVE_FIELD_POSITIONS');
 
 		switch ($this->task)
 		{
 			case 'apply_modal' :
-				$link = 'index.php?option=com_flexicontent&view=template&type=' . $type . '&folder=' . $folder . '&tmpl=component&ismodal=1&' . \Joomla\CMS\Session\Session::getFormToken() . '=1';
+				$link = 'index.php?option=com_flexicontent&view=template&type=' . $type . '&folder=' . $folder . '&tmpl=component&ismodal=1&' . JSession::getFormToken() . '=1';
 				break;
 
 			case 'apply':
@@ -227,7 +227,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 	public function cancel()
 	{
 		// Check for request forgeries
-		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
 
 		// Calculate access
 		$is_authorised = $this->canManage;
@@ -235,7 +235,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 		// Check access
 		if (!$is_authorised)
 		{
-			JError::raiseWarning(403, \Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'));
+			JError::raiseWarning(403, JText::_('FLEXI_ALERTNOTAUTH_TASK'));
 			$this->setRedirect('index.php?option=com_flexicontent', '');
 
 			return;

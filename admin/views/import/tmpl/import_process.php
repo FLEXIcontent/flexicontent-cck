@@ -31,7 +31,7 @@ $import_task = 'task=import.';
 	<input type="hidden" name="controller" value="import" />
 	<input type="hidden" name="view" value="import" />
 	<input type="hidden" name="task" value="" />
-	<?php echo \Joomla\CMS\HTML\HTMLHelper::_( 'form.token' ); ?>
+	<?php echo JHtml::_( 'form.token' ); ?>
 </form>
 
 <script>

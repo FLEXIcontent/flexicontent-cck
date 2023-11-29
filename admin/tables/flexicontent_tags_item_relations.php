@@ -11,7 +11,7 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-class flexicontent_tags_item_relations extends \Joomla\CMS\Table\Table
+class flexicontent_tags_item_relations extends JTable
 {
 	/**
 	 * Primary Key

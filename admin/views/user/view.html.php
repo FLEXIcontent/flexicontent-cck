@@ -13,7 +13,6 @@ defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
-use \Joomla\CMS\Form\Form;
 
 JLoader::register('FlexicontentViewBaseRecord', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_record.php');
 
@@ -33,12 +32,12 @@ class FlexicontentViewUser extends FlexicontentViewBaseRecord
 		 * Initialize variables, flags, etc
 		 */
 
-		$app        = \Joomla\CMS\Factory::getApplication();
+		$app        = JFactory::getApplication();
 		$jinput     = $app->input;
-		$document   = \Joomla\CMS\Factory::getDocument();
-		$user       = \Joomla\CMS\Factory::getUser();
-		$db         = \Joomla\CMS\Factory::getDbo();
-		$cparams    = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+		$document   = JFactory::getDocument();
+		$user       = JFactory::getUser();
+		$db         = JFactory::getDbo();
+		$cparams    = JComponentHelper::getParams('com_flexicontent');
 		$perms      = FlexicontentHelperPerm::getPerm();
 
 		// Get url vars and some constants
@@ -90,18 +89,18 @@ class FlexicontentViewUser extends FlexicontentViewBaseRecord
 		// Add css to document
 		if ($isAdmin)
 		{
-			!\Joomla\CMS\Factory::getLanguage()->isRtl()
-				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
-				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
-			!\Joomla\CMS\Factory::getLanguage()->isRtl()
-				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
-				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
+			!JFactory::getLanguage()->isRtl()
+				? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
+				: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
+			!JFactory::getLanguage()->isRtl()
+				? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
+				: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 		}
 		else
 		{
-			!\Joomla\CMS\Factory::getLanguage()->isRtl()
-				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
-				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
+			!JFactory::getLanguage()->isRtl()
+				? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
+				: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
 		}
 
 		// Add JS frameworks
@@ -112,33 +111,33 @@ class FlexicontentViewUser extends FlexicontentViewBaseRecord
 		flexicontent_html::loadFramework('flexi-lib-form');
 
 		// Load custom behaviours: form validation, popup tooltips
-		\Joomla\CMS\HTML\HTMLHelper::_('behavior.formvalidator');
-		\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip');
+		JHtml::_('behavior.formvalidator');
+		JHtml::_('bootstrap.tooltip');
 
 		// Add js function to overload the joomla submitform validation
-		$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
-		$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
+		$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
+		$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
 
 
 		/**
 		 * Create the toolbar
 		 */
 
-		$toolbar = \Joomla\CMS\Toolbar\Toolbar::getInstance('toolbar');
+		$toolbar = JToolbar::getInstance('toolbar');
 
 		// Creation flag used to decide if adding save and new / save as copy buttons are allowed
 		$cancreate = false;  // We will not create new users in our backend
 
 		// SET toolbar title
 		!$isnew
-			? \Joomla\CMS\Toolbar\ToolbarHelper::title(\Joomla\CMS\Language\Text::_( 'FLEXI_EDIT_USER'), 'user')
-			: \Joomla\CMS\Toolbar\ToolbarHelper::title(\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_USER'), 'user');
+			? JToolbarHelper::title(JText::_( 'FLEXI_EDIT_USER'), 'user')
+			: JToolbarHelper::title(JText::_( 'FLEXI_ADD_USER'), 'user');
 
 		$btn_name = 'apply';
 		$btn_task = $ctrl.'.apply';
 		$btn_title = !$isnew ? 'FLEXI_APPLY_N_RELOAD' : 'FLEXI_ADD';
 
-		//\Joomla\CMS\Toolbar\ToolbarHelper::apply($btn_task, $btn_title, false);
+		//JToolbarHelper::apply($btn_task, $btn_title, false);
 
 		/*$btn_arr[$btn_name] = */ flexicontent_html::addToolBarButton(
 			$btn_title, $btn_name, $full_js="Joomla.submitbutton('".$btn_task."')", $msg_alert='', $msg_confirm='',
@@ -149,7 +148,7 @@ class FlexicontentViewUser extends FlexicontentViewBaseRecord
 		$btn_name = 'save';
 		$btn_task = $ctrl.'.save';
 
-		//\Joomla\CMS\Toolbar\ToolbarHelper::save($btn_task);  //\Joomla\CMS\Toolbar\ToolbarHelper::custom( $btn_task, 'save.png', 'save.png', 'JSAVE', false );
+		//JToolbarHelper::save($btn_task);  //JToolbarHelper::custom( $btn_task, 'save.png', 'save.png', 'JSAVE', false );
 
 		/*$btn_arr[$btn_name] = */ flexicontent_html::addToolBarButton(
 			'JSAVE', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".save')", $msg_alert='', $msg_confirm='',
@@ -160,18 +159,18 @@ class FlexicontentViewUser extends FlexicontentViewBaseRecord
 		$btn_name = 'save2new';
 		$btn_task = $ctrl.'.save2new';
 
-		//\Joomla\CMS\Toolbar\ToolbarHelper::save2new($btn_task);  //\Joomla\CMS\Toolbar\ToolbarHelper::custom( $btn_task, 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
+		//JToolbarHelper::save2new($btn_task);  //JToolbarHelper::custom( $btn_task, 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
 
 		/*$btn_arr[$btn_name] = */ flexicontent_html::addToolBarButton(
 			'FLEXI_SAVE_AND_NEW', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".save2new')", $msg_alert='', $msg_confirm='',
 			$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
 			$btn_class= (FLEXI_J40GE ? ' _DDI_class_ btn-success ' : '') . ' ' . $this->tooltip_class, $btn_icon="icon-save-new",
-			'data-placement="right" title="'.\Joomla\CMS\Language\Text::_('FLEXI_SAVE_AND_NEW_INFO', true).'"', $auto_add = 1);
+			'data-placement="right" title="'.JText::_('FLEXI_SAVE_AND_NEW_INFO', true).'"', $auto_add = 1);
 
-		\Joomla\CMS\Toolbar\ToolbarHelper::cancel( $ctrl.'cancel' );
-		\Joomla\CMS\Toolbar\ToolbarHelper::help( 'screen.users.edit' );
+		JToolbarHelper::cancel( $ctrl.'cancel' );
+		JToolbarHelper::help( 'screen.users.edit' );
 
-		\Joomla\CMS\Language\Text::script("FLEXI_UPDATING_CONTENTS", true);
+		JText::script("FLEXI_UPDATING_CONTENTS", true);
 		$document->addScriptDeclaration('
 			function fc_edit_juser_modal_load( container )
 			{
@@ -187,9 +186,9 @@ class FlexicontentViewUser extends FlexicontentViewBaseRecord
 			}
 		');
 
-		$modal_title = \Joomla\CMS\Language\Text::_('FLEXI_EDIT_JUSER', true);
+		$modal_title = JText::_('FLEXI_EDIT_JUSER', true);
 		$tip_class = ' hasTooltip';
-		\Joomla\CMS\Toolbar\ToolbarHelper::divider();
+		JToolbarHelper::divider();
 		flexicontent_html::addToolBarButton(
 			'FLEXI_EDIT_JUSER', $btn_name='edit_juser',
 			$full_js="var url = jQuery(this).attr('data-href'); var the_dialog = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, fc_edit_juser_modal_close, {title:'".$modal_title."', loadFunc: fc_edit_juser_modal_load}); return false;",
@@ -212,7 +211,7 @@ class FlexicontentViewUser extends FlexicontentViewBaseRecord
 		{
 			$contact = NULL;
 			// Get the default group id for a new user
-			$config = \Joomla\CMS\Component\ComponentHelper::getParams('com_users');
+			$config = JComponentHelper::getParams('com_users');
 		}
 
 
@@ -221,15 +220,15 @@ class FlexicontentViewUser extends FlexicontentViewBaseRecord
 		// Initialise variables
 		// ********************
 
-		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+		$cparams = JComponentHelper::getParams('com_flexicontent');
 
 
 		// *************************************************************************************************
 		// Get author extended data, basic (described in author.xml) and category (described incategory.xml)
 		// *************************************************************************************************
 
-		\Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
-		$flexiauthor_extdata = \Joomla\CMS\Table\Table::getInstance('flexicontent_authors_ext', '');
+		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
+		$flexiauthor_extdata = JTable::getInstance('flexicontent_authors_ext', '');
 		$flexiauthor_extdata->load($row->get('id'));
 		//echo "<pre>"; print_r($flexiauthor_extdata); echo "</pre>"; exit;
 
@@ -240,10 +239,10 @@ class FlexicontentViewUser extends FlexicontentViewBaseRecord
 
 		// Load the DB parameter values and the XML description from file,
 		// NOTE: this is one step for J1.5 via a JParameter object, but in J1.6+ the use of XML file
-		// in JParameter is deprecated, instead we will \Joomla\CMS\Form\Form to load XML description and thus be able to render it
+		// in JParameter is deprecated, instead we will JForm to load XML description and thus be able to render it
 
 		$auth_xml = JPATH_COMPONENT.DS.'models'.DS.'forms'.DS.'author.xml';
-		$params_authorbasic = new \Joomla\Registry\Registry($flexiauthor_extdata->author_basicparams);
+		$params_authorbasic = new JRegistry($flexiauthor_extdata->author_basicparams);
 		//echo "<pre>"; print_r($params_authorbasic); echo "</pre>"; exit;
 
 		// Read XML file
@@ -251,10 +250,10 @@ class FlexicontentViewUser extends FlexicontentViewBaseRecord
 		$xml_string = file_get_contents($auth_xml);
 
 		// Load the form description from the XML string
-		$jform_authorbasic = new Form('com_flexicontent.author', array('control' => 'jform', 'load_data' => true));
+		$jform_authorbasic = new JForm('com_flexicontent.author', array('control' => 'jform', 'load_data' => true));
 		$jform_authorbasic->load($xml_string, $isFile=false);
 
-		// Set DB parameter values into the \Joomla\CMS\Form\Form object
+		// Set DB parameter values into the JForm object
 		foreach ($jform_authorbasic->getFieldset() as $fsetname => $field)
 		{
 			$jform_authorbasic->setValue($field->fieldname, $group = 'authorbasicparams', $value = $params_authorbasic->get($field->fieldname) );
@@ -267,20 +266,20 @@ class FlexicontentViewUser extends FlexicontentViewBaseRecord
 
 		// Load the DB parameter values and the XML description from file,
 		// NOTE: this is one step for J1.5 via a JParameter object, but in J1.6+ the use of XML file
-		// in JParameter is deprecated, instead we will \Joomla\CMS\Form\Form to load XML description and thus be able to render it
+		// in JParameter is deprecated, instead we will JForm to load XML description and thus be able to render it
 
 		$cat_xml = JPATH_COMPONENT.DS.'models'.DS.'forms'.DS.'category.xml';
-		$params_authorcat = new \Joomla\Registry\Registry($flexiauthor_extdata->author_catparams);
+		$params_authorcat = new JRegistry($flexiauthor_extdata->author_catparams);
 		//echo "<pre>"; print_r($params_authorcat); echo "</pre>"; exit;
 
 		// Read XML file
 		$xml_string = str_replace('name="params"', 'name="authorcatparams"', file_get_contents($cat_xml));
 
 		// Load the form description from the XML string
-		$jform_authorcat = new Form('com_flexicontent.category', array('control' => 'jform', 'load_data' => true));
+		$jform_authorcat = new JForm('com_flexicontent.category', array('control' => 'jform', 'load_data' => true));
 		$jform_authorcat->load($xml_string, $isFile=false);
 
-		// Set DB parameter values into the \Joomla\CMS\Form\Form object
+		// Set DB parameter values into the JForm object
 		foreach ($jform_authorcat->getFieldset() as $fsetname => $field)
 		{
 			$jform_authorcat->setValue($field->fieldname, $group = 'authorcatparams', $value = $params_authorcat->get($field->fieldname) );
@@ -302,12 +301,12 @@ class FlexicontentViewUser extends FlexicontentViewBaseRecord
 		$themes		= flexicontent_tmpl::getTemplates($_clayout);
 		$tmpls		= $themes->category;
 
-		// Create \Joomla\CMS\Form\Form for the layout and apply Layout parameters values into the fields
+		// Create JForm for the layout and apply Layout parameters values into the fields
 		foreach ($tmpls as $tmpl)
 		{
 			if ($tmpl->name != $_clayout) continue;
 
-			$jform = new Form('com_flexicontent.template.category', array('control' => 'jform', 'load_data' => false));
+			$jform = new JForm('com_flexicontent.template.category', array('control' => 'jform', 'load_data' => false));
 			$jform->load($tmpl->params);
 			$tmpl->params = $jform;
 			foreach ($tmpl->params->getGroup('attribs') as $field)
@@ -324,7 +323,7 @@ class FlexicontentViewUser extends FlexicontentViewBaseRecord
 
 		if (!$row->get('id'))
 		{
-			$new_usertype = \Joomla\CMS\Component\ComponentHelper::getParams('com_users')->get('new_usertype');
+			$new_usertype = JComponentHelper::getParams('com_users')->get('new_usertype');
 			$usergroups = $new_usertype ? array($new_usertype) : array();
 		}
 		else
@@ -336,10 +335,10 @@ class FlexicontentViewUser extends FlexicontentViewBaseRecord
 		}
 
 		// build the html select list
-		$lists['block'] 	= \Joomla\CMS\HTML\HTMLHelper::_('select.booleanlist',  'block', 'class="inputbox" size="1"', $row->get('block') );
+		$lists['block'] 	= JHtml::_('select.booleanlist',  'block', 'class="inputbox" size="1"', $row->get('block') );
 
 		// build the html select list
-		$lists['sendEmail'] = \Joomla\CMS\HTML\HTMLHelper::_('select.booleanlist',  'sendEmail', 'class="inputbox" size="1"', $row->get('sendEmail') );
+		$lists['sendEmail'] = JHtml::_('select.booleanlist',  'sendEmail', 'class="inputbox" size="1"', $row->get('sendEmail') );
 
 
 		/**
@@ -356,10 +355,10 @@ class FlexicontentViewUser extends FlexicontentViewBaseRecord
 
 		/**
 		 * Encode (UTF-8 charset) HTML entities form data so that they can be set as form field values
-		 * NOTE: We do NOT yet use \Joomla\CMS\Form\Form thus this is needed
+		 * NOTE: We do NOT yet use JForm thus this is needed
 		 */
 
-		\Joomla\CMS\Filter\OutputFilter::objectHTMLSafe( $row, ENT_QUOTES, $exclude_keys = '' );
+		JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES, $exclude_keys = '' );
 
 
 		/**

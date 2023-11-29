@@ -146,7 +146,7 @@ class plgSystemFlexisystem extends CMSPlugin
 						// Load Permissions from Session and send to Model
 						$model    = new ConfigModelApplication;
 						$response = $model->storePermissions($permissions);
-						//echo new \Joomla\CMS\Response\JsonResponse(json_encode($response));
+						//echo new JResponseJson(json_encode($response));
 					}
 				}
 			}
@@ -310,7 +310,7 @@ class plgSystemFlexisystem extends CMSPlugin
 				// Make sure chosen JS file is loaded before our code, but do not attach it to any elements (YET)
 				if (!FLEXI_J40GE)
 				{
-					// Do not run this in J4 , \Joomla\CMS\Document\Document not yet available, but chosen JS was replaced
+					// Do not run this in J4 , JDocument not yet available, but chosen JS was replaced
 					HTMLHelper::_('formbehavior.chosen', '#_some_iiidddd_');
 				}
 				//$js .= "\n"."jQuery.fn.chosen = function(){};"."\n";  // Suppress chosen function completely, (commented out ... we will allow it)
@@ -546,7 +546,7 @@ class plgSystemFlexisystem extends CMSPlugin
 		//*** Get article / category IDs
 		//***
 
-		// In case of form we need to use a_id instead of id, this will also be set in HTTP Request too and \Joomla\CMS\Router\Router too
+		// In case of form we need to use a_id instead of id, this will also be set in HTTP Request too and JRouter too
 		$id = $app->input->get('id', 0, 'int');
 		$id = ($view=='form') ? $app->input->get('a_id', 0, 'int') : $id;
 
@@ -1947,15 +1947,15 @@ class plgSystemFlexisystem extends CMSPlugin
 
 	private function _storeLessConf($table)
 	{
-		$xml_path  = \Joomla\CMS\Filesystem\Path::clean(JPATH_ADMINISTRATOR.'/components/com_flexicontent/config.xml');
-		$less_path = \Joomla\CMS\Filesystem\Path::clean(JPATH_ROOT.'/components/com_flexicontent/assets/less/include/mixins.less');
+		$xml_path  = JPath::clean(JPATH_ADMINISTRATOR.'/components/com_flexicontent/config.xml');
+		$less_path = JPath::clean(JPATH_ROOT.'/components/com_flexicontent/assets/less/include/mixins.less');
 
 
 		/**
-		 * Load the XML file into a \Joomla\CMS\Form\Form object
+		 * Load the XML file into a JForm object
 		 */
 		$_options = array('control' => 'jform', 'load_data' => false);
-		$jform = \Joomla\CMS\Form\Form::getInstance(
+		$jform = \JForm::getInstance(
 			'com_config.component', // Exception name, if an error occurs.
 			'config',               // The name of an XML file or string to load as the form definition.
 			$_options,              // An array of form options.
@@ -2370,7 +2370,7 @@ class plgSystemFlexisystem extends CMSPlugin
 
 		// Set item for rendering flexicontent fields
 		require_once(Path::clean(JPATH_ROOT.'/administrator/components/com_flexicontent/models/fields/fcfieldwrapper.php'));
-		\Joomla\CMS\Form\FormFieldFCFieldWrapper::$fcform_item = $fcform_item;
+		JFormFieldFCFieldWrapper::$fcform_item = $fcform_item;
 
 		// Get flexicontent fields
 		$form->load('

@@ -19,7 +19,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 $params =  $this->params;
-$db     =  \Joomla\CMS\Factory::getDbo();
+$db     =  JFactory::getDbo();
 
 // Date configuration
 $use_date   = $params->get( 'show_modify_date', 1 ) ;
@@ -40,7 +40,7 @@ if ($use_image && $image_source)
 {
 	$query = 'SELECT attribs, name FROM #__flexicontent_fields WHERE id = ' . (int) $image_source;
 	$image_dbdata = $db->setQuery($query)->loadObject();
-	//$image_dbdata->params = new \Joomla\Registry\Registry($image_dbdata->params);
+	//$image_dbdata->params = new JRegistry($image_dbdata->params);
 	
 	$img_size_map   = array('l'=>'large', 'm'=>'medium', 's'=>'small', '' => '');
 	$img_field_size = $img_size_map[ $image_size ];
@@ -57,7 +57,7 @@ if ( !strlen($fields[0]) ) unset($fields[0]);
 $page_classes  = '';
 $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 $page_classes .= ' fcfavourites';
-$menu = \Joomla\CMS\Factory::getApplication()->getMenu()->getActive();
+$menu = JFactory::getApplication()->getMenu()->getActive();
 if ($menu) $page_classes .= ' menuitem'.$menu->id; 
 ?>
 
@@ -69,11 +69,11 @@ if ($menu) $page_classes .= ' menuitem'.$menu->id;
 
 <!-- BOF buttons -->
 <?php
-if (\Joomla\CMS\Factory::getApplication()->input->getInt('print', 0)) {
+if (JFactory::getApplication()->input->getInt('print', 0)) {
 	if ($this->params->get('print_behaviour', 'auto') == 'auto') : ?>
 		<script>jQuery(document).ready(function(){ window.print(); });</script>
 	<?php	elseif ($this->params->get('print_behaviour') == 'button') : ?>
-		<input type='button' id='printBtn' name='printBtn' value='<?php echo \Joomla\CMS\Language\Text::_('Print');?>' class='btn btn-info' onclick='this.style.display="none"; window.print(); return false;'>
+		<input type='button' id='printBtn' name='printBtn' value='<?php echo JText::_('Print');?>' class='btn btn-info' onclick='this.style.display="none"; window.print(); return false;'>
 	<?php endif;
 } else {
 	$pdfbutton = '';
@@ -97,7 +97,7 @@ if (\Joomla\CMS\Factory::getApplication()->input->getInt('print', 0)) {
 	</h1>
 <?php else : ?>
 	<h2 class="contentheading">
-		<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_MY_FAVOURITES' ).' '; ?>
+		<?php echo JText::_( 'FLEXI_MY_FAVOURITES' ).' '; ?>
 	</h2>
 <?php endif; ?>
 
@@ -109,13 +109,13 @@ $items	= & $this->items;
 <?php if (!count($items)) : ?>
 
 	<div class="note">
-		<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_NO_FAVOURED_ITEMS_INFO' ); ?>
+		<?php echo JText::_( 'FLEXI_NO_FAVOURED_ITEMS_INFO' ); ?>
 	</div>
 
 <?php else : ?>
 
 <?php
-	$_read_more_about = \Joomla\CMS\Language\Text::_( 'FLEXI_READ_MORE_ABOUT' );
+	$_read_more_about = JText::_( 'FLEXI_READ_MORE_ABOUT' );
 	$tooltip_class = FLEXI_J30GE ? 'hasTooltip' : 'hasTip';
 	
 	unset($item);  // just in case there is reference
@@ -153,12 +153,12 @@ $items	= & $this->items;
 	<thead>
 		<tr>
 			<?php if ($use_image) : ?>
-			<th id="fc_image"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_IMAGE' ); ?></th>
+			<th id="fc_image"><?php echo JText::_( 'FLEXI_IMAGE' ); ?></th>
 			<?php endif; ?>
-			<th id="fc_title"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_TITLE' ); ?></th>
-			<th id="fc_desc"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_DESCRIPTION' ); ?></th>
+			<th id="fc_title"><?php echo JText::_( 'FLEXI_TITLE' ); ?></th>
+			<th id="fc_desc"><?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?></th>
 			<?php if ($use_date) : ?>
-			<th id="fc_modified"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_LAST_UPDATED' ); ?></th>
+			<th id="fc_modified"><?php echo JText::_( 'FLEXI_LAST_UPDATED' ); ?></th>
 			<?php endif; ?>
 			<?php if ($use_fields && count($fields)) : ?>
 				<?php foreach ($fields as $fieldname) : ?>
@@ -183,7 +183,7 @@ $items	= & $this->items;
 				{
 					$img_field = $item->fields[$img_field_name];
 					!$img_field_size
-						? $src = str_replace(\Joomla\CMS\Uri\Uri::root(), '',  $img_field->thumbs_src['large'][0])
+						? $src = str_replace(JUri::root(), '',  $img_field->thumbs_src['large'][0])
 						: $thumb = $img_field->thumbs_src[ $img_field_size ][0];
 				}
 			}
@@ -205,13 +205,13 @@ $items	= & $this->items;
 				$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
 				$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 				
-				$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  \Joomla\CMS\Uri\Uri::base(true).'/' : '';
-				$thumb = \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+				$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JUri::base(true).'/' : '';
+				$thumb = JUri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 			} else {
 				// Do not resize image when (a) image src path not set or (b) using image field's already created thumbnails
 			}
 		}
-		$item_link = \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item));
+		$item_link = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item));
 		
 		$fc_item_classes = 'sectiontableentry';
 		foreach ($item->categories as $item_cat) {
@@ -247,7 +247,7 @@ $items	= & $this->items;
 					<?php } ?>
 					
 				<?php else : ?>
-					<small><i><?php echo \Joomla\CMS\Language\Text::_('FLEXI_NO_IMAGE'); ?></i></small>
+					<small><i><?php echo JText::_('FLEXI_NO_IMAGE'); ?></i></small>
 				<?php endif; ?>
 			</td>
 		<?php endif; ?>
@@ -262,7 +262,7 @@ $items	= & $this->items;
 			</td>
 		<?php if ($use_date) : ?>
 			<td headers="fc_modified">
-				<?php echo \Joomla\CMS\HTML\HTMLHelper::_( 'date', ($item->modified ? $item->modified : $item->created), \Joomla\CMS\Language\Text::_($dateformat) ); ?>		
+				<?php echo JHtml::_( 'date', ($item->modified ? $item->modified : $item->created), JText::_($dateformat) ); ?>		
 			</td>
 		<?php endif; ?>
 		

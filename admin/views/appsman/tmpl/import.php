@@ -19,7 +19,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 $params = $this->cparams;
-$document	= \Joomla\CMS\Factory::getDocument();
+$document	= JFactory::getDocument();
 
 // For tabsets/tabs ids (focusing, etc)
 $tabSetCnt = -1;
@@ -28,8 +28,8 @@ $tabCnt = array();
 $tabSetStack = array();
 
 // Load JS tabber lib
-$this->document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
-$this->document->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
+$this->document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
+$this->document->addStyleSheet(JUri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
 $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
 ?>
@@ -63,20 +63,20 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 	<!-- tabber start -->
 	<div class="fctabber fields_tabset" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
 		<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-home-2">
-			<h3 class="tabberheading"><?php echo \Joomla\CMS\Language\Text::_("FLEXI_IMPORT");?></h3>
+			<h3 class="tabberheading"><?php echo JText::_("FLEXI_IMPORT");?></h3>
 			<br/>
 			
 			<form action="index.php" method="post" name="adminForm_appsman_import" id="adminForm_appsman_import" class="form-validate form-horizontal" enctype="multipart/form-data" >
 				
 				<button class="btn btn-success" onclick="this.form.elements['task'].value='appsman.initxml'; this.form.submit();">
-					<span class="icon-import"></span><?php echo \Joomla\CMS\Language\Text::_('FLEXI_IMPORT_PREPARE_TASK'); ?>
+					<span class="icon-import"></span><?php echo JText::_('FLEXI_IMPORT_PREPARE_TASK'); ?>
 				</button>
 				<br/><br/>
 				
 				<table class="fc-form-tbl align-top">
 					<tr>
 						<td class="key">
-							<label class="label" for="xmlfile"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_XMLFILE' ); ?></label>
+							<label class="label" for="xmlfile"><?php echo JText::_( 'FLEXI_XMLFILE' ); ?></label>
 						</td>
 						<td class="data">
 							<input type="file" name="xmlfile" id="xmlfile" class="required" />
@@ -89,7 +89,7 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 					<tr>
 						<td>
 							<fieldset>
-								<legend style='color: darkgreen;'><?php echo \Joomla\CMS\Language\Text::_( 'About importing configuration' ); ?></legend>
+								<legend style='color: darkgreen;'><?php echo JText::_( 'About importing configuration' ); ?></legend>
 								<div class="alert alert-info">Please select a configuration file to import</div>
 							</fieldset>
 						</td>
@@ -101,24 +101,24 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 				<input type="hidden" name="view" value="appsman" />
 				<input type="hidden" name="task" value="" />
 				<input type="hidden" name="fcform" value="1" />
-				<?php echo \Joomla\CMS\HTML\HTMLHelper::_( 'form.token' ); ?>
+				<?php echo JHtml::_( 'form.token' ); ?>
 				
 			</form>
 			
 		</div>
 		
 		<div class="tabbertab" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" data-icon-class="icon-home-2">
-			<h3 class="tabberheading"><?php echo \Joomla\CMS\Language\Text::_("FLEXI_EXPORT");?></h3>
+			<h3 class="tabberheading"><?php echo JText::_("FLEXI_EXPORT");?></h3>
 			
 			<form action="index.php" method="post" name="adminForm_appsman_export" id="adminForm_appsman_export" class="form-validate form-horizontal" enctype="multipart/form-data" >
 				
 				<br/>
 				<button class="btn btn-success" onclick="this.form.elements['task'].value='appsman.export'; this.form.submit();">
-					<span class="icon-download"></span><?php echo \Joomla\CMS\Language\Text::_('FLEXI_EXPORT_SELECTED'); ?>
+					<span class="icon-download"></span><?php echo JText::_('FLEXI_EXPORT_SELECTED'); ?>
 				</button>
 				
 				<button class="btn btn-warning" onclick="this.form.elements['task'].value='appsman.exportclear'; this.form.submit();">
-					<span class="icon-cancel"></span><?php echo \Joomla\CMS\Language\Text::_('FLEXI_EXPORT_CLEAR_LIST'); ?>
+					<span class="icon-cancel"></span><?php echo JText::_('FLEXI_EXPORT_CLEAR_LIST'); ?>
 				</button>
 				<br/><br/>
 				
@@ -138,7 +138,7 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 					'flexicontent_fields'=>'Fields', 'flexicontent_types'=>'Types', 'flexicontent_templates'=>'Templates',
 					'categories'=>'Categories', 'usergroups'=> 'User groups', 'assets'=>'Assets'
 				);
-				$session  = \Joomla\CMS\Factory::getSession();
+				$session  = JFactory::getSession();
 				$export_conf = $session->get('appsman_export', array(), 'flexicontent');
 				?>
 				
@@ -152,7 +152,7 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 						?> &nbsp;
 						<?php if ($_option_name && $_view_name): ?>
 						<a class="btn btn-small" href="index.php?option=com_<?php echo $_option_name; ?>&amp;view=<?php echo $_view_name; ?>" style="vertical-align:middle; display:inline-block;">
-							<span class="icon-box-add"></span><?php echo \Joomla\CMS\Language\Text::_('FLEXI_ADD_MORE'); ?>
+							<span class="icon-box-add"></span><?php echo JText::_('FLEXI_ADD_MORE'); ?>
 						</a>
 						<?php endif; ?>
 					</div>
@@ -170,7 +170,7 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 				<input type="hidden" name="view" value="appsman" />
 				<input type="hidden" name="task" value="" />
 				<input type="hidden" name="fcform" value="1" />
-				<?php echo \Joomla\CMS\HTML\HTMLHelper::_( 'form.token' ); ?>
+				<?php echo JHtml::_( 'form.token' ); ?>
 				
 			</form>
 		</div>

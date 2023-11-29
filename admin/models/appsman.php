@@ -21,7 +21,7 @@ jimport('legacy.model.list');
  * FLEXIcontent Component types Model
  *
  */
-class FlexicontentModelAppsman extends \Joomla\CMS\MVC\Model\ListModel
+class FlexicontentModelAppsman extends JModelList
 {
 	/**
 	 * Constructor
@@ -32,7 +32,7 @@ class FlexicontentModelAppsman extends \Joomla\CMS\MVC\Model\ListModel
 	{
 		parent::__construct($config);
 
-		$app    = \Joomla\CMS\Factory::getApplication();
+		$app    = JFactory::getApplication();
 		$jinput = $app->input;
 		$option = $jinput->get('option', '', 'cmd');
 		$view   = $jinput->get('view', '', 'cmd');
@@ -40,7 +40,7 @@ class FlexicontentModelAppsman extends \Joomla\CMS\MVC\Model\ListModel
 		$p      = $option.'.'.$view.'.';
 
 		// Parameters of the view, in our case it is only the component parameters
-		$this->cparams = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
+		$this->cparams = JComponentHelper::getParams( 'com_flexicontent' );
 
 
 		// **************
@@ -59,7 +59,7 @@ class FlexicontentModelAppsman extends \Joomla\CMS\MVC\Model\ListModel
 
 	function getTableCreateSQL($table, $backup_filename=false, $where='', $id_colname=null, $clear_id=false)
 	{
-		$app = \Joomla\CMS\Factory::getApplication();
+		$app = JFactory::getApplication();
 		$dbprefix = $app->getCfg('dbprefix');
 		$dbtype   = $app->getCfg('dbtype');
 
@@ -103,7 +103,7 @@ class FlexicontentModelAppsman extends \Joomla\CMS\MVC\Model\ListModel
 	/*** NEEDS PHP 5.5.4+ ***/
 	function create_CSV_file($rows, $table, $id_colname=null, $clear_id=false)
 	{
-		$app         = \Joomla\CMS\Factory::getApplication();
+		$app         = JFactory::getApplication();
 		$temp_stream = fopen('php://temp', 'r+');
 		if (!$temp_stream)
 		{
@@ -239,12 +239,12 @@ class FlexicontentModelAppsman extends \Joomla\CMS\MVC\Model\ListModel
 		// *****************************************************
 
 		$template_names = array();
-		$type = \Joomla\CMS\Table\Table::getInstance('flexicontent_types', '');
+		$type = JTable::getInstance('flexicontent_types', '');
 		foreach ($type_ids as $type_id)
 		{
 			$type->id = $type_id;
 			$type->load();
-			$type->params = new \Joomla\Registry\Registry($type->attribs);
+			$type->params = new JRegistry($type->attribs);
 			$ilayout = $type->params->get('ilayout', 'grid');   // template folder name
 			$related_ids['flexicontent_templates'][$ilayout] = $ilayout;
 		}

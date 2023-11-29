@@ -12,7 +12,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 
-class flexicontent_items_tmp extends \Joomla\CMS\Table\Table{
+class flexicontent_items_tmp extends JTable{
 	/* content properties
 	(a) CORE content relations that maybe used for ordering too
 	(b) other simple attributes used for ordering

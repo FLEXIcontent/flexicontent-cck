@@ -25,16 +25,16 @@ if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
 jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
-jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
+jimport('cms.html.select');    // JHtmlSelect
+jimport('joomla.form.field');  // JFormField
 
-//jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
-//\Joomla\CMS\Form\FormHelper::loadFieldClass('...');   // \Joomla\CMS\Form\FormField...
+//jimport('joomla.form.helper'); // JFormHelper
+//JFormHelper::loadFieldClass('...');   // JFormField...
 
 /**
  * Renders a checkbox-set element
  */
-class JFormFieldFccheckbox extends \Joomla\CMS\Form\FormField
+class JFormFieldFccheckbox extends JFormField
 {
 
  /**
@@ -104,7 +104,7 @@ class JFormFieldFccheckbox extends \Joomla\CMS\Form\FormField
 			}
 			$useglobal_lbl = @$attributes['useglobal_lbl'] ? $attributes['useglobal_lbl'] : 'FLEXI_USE_GLOBAL';
 			$html .= '<div><input id="'.$element_id.'_useglobal" type="checkbox" '.$check_global.' value="" onclick="fc_toggle_checkbox_group(\''.$element_id.'\', this)" />';
-			$html .= '<label for="'.$element_id.'_useglobal" ><b>'.\Joomla\CMS\Language\Text::_($useglobal_lbl).'</b></label></div>';
+			$html .= '<label for="'.$element_id.'_useglobal" ><b>'.JText::_($useglobal_lbl).'</b></label></div>';
 		}
 
 		// Create checkboxes
@@ -118,7 +118,7 @@ class JFormFieldFccheckbox extends \Joomla\CMS\Form\FormField
 			'
 			<div>
 				<input id="'.$curr_element_id.'" type="checkbox" '.$disable_all .(in_array($checkvals[$i], $values) ? ' checked="checked"' : '').' name="'.$fieldname.'" value="'.$checkvals[$i].'" />
-				<label for="'.$curr_element_id.'" >'.\Joomla\CMS\Language\Text::_($checkoptions[$i]).'</label>
+				<label for="'.$curr_element_id.'" >'.JText::_($checkoptions[$i]).'</label>
 			</div>
 		';
 		}
@@ -130,7 +130,7 @@ class JFormFieldFccheckbox extends \Joomla\CMS\Form\FormField
 		static $js_added = false;
 		if (!$js_added) {
 			$js_added = true;
-			$doc = \Joomla\CMS\Factory::getDocument();
+			$doc = JFactory::getDocument();
 			flexicontent_html::loadFramework('flexi-lib');
 			//$js = "";
 			//if ($js) $doc->addScriptDeclaration($js);

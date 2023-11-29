@@ -28,7 +28,7 @@ jimport('legacy.model.legacy');
  * @subpackage FLEXIcontent
  * @since		1.5
  */
-class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
+class FlexicontentModelFavourites extends JModelLegacy
 {
 	/**
 	 * Item list data
@@ -83,9 +83,9 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 	 */
 	protected function populateRecordState($ordering = null, $direction = null)
 	{
-		$app    = \Joomla\CMS\Factory::getApplication();
+		$app    = JFactory::getApplication();
 		$jinput = $app->input;
-		$user   = \Joomla\CMS\Factory::getUser();
+		$user   = JFactory::getUser();
 
 		$option = $jinput->getCmd('option', '');
 		$view   = $jinput->getCmd('view', '');
@@ -122,7 +122,7 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 	 */
 	function getData()
 	{
-		$app    = \Joomla\CMS\Factory::getApplication();
+		$app    = JFactory::getApplication();
 		$jinput = $app->input;
 
 		$print_logging_info = $this->_params->get('print_logging_info');
@@ -241,7 +241,7 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 	 */
 	function _buildQuery()
 	{
-		$user		= \Joomla\CMS\Factory::getUser();
+		$user		= JFactory::getUser();
 
 		// Show special state items
 		$show_noauth = $this->_params->get('show_noauth', 0);   // Show unauthorized items
@@ -257,7 +257,7 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 		// User not allowed to LIST unauthorized items
 		if ( !$show_noauth )
 		{
-			$aid_arr = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
 			$andaccess .= ' AND ty.access IN (0,'.$aid_list.')';
 			$andaccess .= ' AND  c.access IN (0,'.$aid_list.')';
@@ -268,7 +268,7 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 		// Access Flags for: content type, main category, item
 		else
 		{
-			$aid_arr = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
 			$select_access .= ', '
 				.' CASE WHEN '
@@ -386,19 +386,19 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 	 */
 	function _buildItemWhere( )
 	{
-		$app    = \Joomla\CMS\Factory::getApplication();
+		$app    = JFactory::getApplication();
 		$jinput = $app->input;
-		$user   = \Joomla\CMS\Factory::getUser();
-		$db     = \Joomla\CMS\Factory::getDbo();
+		$user   = JFactory::getUser();
+		$db     = JFactory::getDbo();
 
 		$show_owned = $this->_params->get('show_owned', 1);     // Show items owned by current user, regardless of their state
 		$show_trashed = $this->_params->get('show_trashed', 1);   // Show trashed items (to authorized users)
 
 		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
 		//  thus the items are published globally at the time the author specified in his/her local clock
-		//$app  = \Joomla\CMS\Factory::getApplication();
+		//$app  = JFactory::getApplication();
 		//$now  = FLEXI_J16GE ? $app->requestTime : $app->get('requestTime');   // NOT correct behavior it should be UTC (below)
-		//$date = \Joomla\CMS\Factory::getDate();
+		//$date = JFactory::getDate();
 		//$now  = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();              // NOT good if string passed to function that will be cached, because string continuesly different
 		$_nowDate = 'UTC_TIMESTAMP()'; //$db->Quote($now);
 		$nullDate = $db->getNullDate();
@@ -557,13 +557,13 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 	{
 		if ( $this->_params !== NULL ) return;
 
-		$app    = \Joomla\CMS\Factory::getApplication();
+		$app    = JFactory::getApplication();
 		$jinput = $app->input;
 		$menu   = $app->getMenu()->getActive();
 
 		// Get the COMPONENT only parameter
-		$params  = new \Joomla\Registry\Registry();
-		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+		$params  = new JRegistry();
+		$cparams = JComponentHelper::getParams('com_flexicontent');
 		$params->merge($cparams);
 
 		// Merge the active menu parameters

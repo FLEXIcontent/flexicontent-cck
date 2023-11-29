@@ -17,7 +17,7 @@ jimport('legacy.model.legacy');
  * FLEXIcontent Component Templates Model
  *
  */
-class FlexicontentModelTemplates extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
+class FlexicontentModelTemplates extends JModelLegacy
 {
 	/**
 	 * Record rows
@@ -95,7 +95,7 @@ class FlexicontentModelTemplates extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 
 		if (!$source || !$dest) return false;
 
-		if (!\Joomla\CMS\Filesystem\Folder::copy($source, $dest, $path)) return false;
+		if (!JFolder::copy($source, $dest, $path)) return false;
 
 		return true;
 	}
@@ -115,7 +115,7 @@ class FlexicontentModelTemplates extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 		$path 	= JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS;
 
 		if (!$dir || ($dir === 'grid') || ($dir === 'table') || ($dir === 'faq') || ($dir === 'items-tabbed')) return false;
-		if (!\Joomla\CMS\Filesystem\Folder::delete($path.$dir)) return false;
+		if (!JFolder::delete($path.$dir)) return false;
 
 		// delete old record
 		$query 	= 'DELETE FROM #__flexicontent_templates'

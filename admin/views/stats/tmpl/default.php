@@ -17,7 +17,7 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
-$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+$cparams  = JComponentHelper::getParams('com_flexicontent');
 
 $tip_class = ' hasTooltip';
 $btn_class = 'btn';
@@ -95,26 +95,26 @@ $ctrl_users = "task=users.";
 	<table class="fc-table-list fc-tbl-short" style="margin:20px 0 20px 0; width:100%; box-sizing: border-box;">
 	<tr>
 		<th style="font-size:18px;">
-			<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_TOTAL_NUM_OF' ); ?>
+			<?php echo JText::_( 'FLEXI_TOTAL_NUM_OF' ); ?>
 		</th>
 	</tr>
 	</table>
 
 	<!-- SITE TOTALS -->
-	<a href="index.php?option=com_flexicontent&amp;view=items"       class="btn btn-small"><?php echo $this->genstats[0]; ?> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_ITEMS' ) ?></a>
-	<a href="index.php?option=com_flexicontent&amp;view=categories"  class="btn btn-small"><?php echo $this->genstats[1]; ?> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_CATEGORIES' ) ?></a>
-	<a href="index.php?option=com_flexicontent&amp;view=tags"        class="btn btn-small"><?php echo $this->genstats[2]; ?> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_TAGS' ) ?></a>
-	<a href="index.php?option=com_flexicontent&amp;view=filemanager" class="btn btn-small"><?php echo $this->genstats[3]; ?> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_FILES' ) ?></a>
-	<a href="index.php?option=com_flexicontent&amp;view=types"       class="btn btn-small"><?php echo $this->genstats[4]; ?> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_TYPES' ) ?></a>
-	<a href="index.php?option=com_flexicontent&amp;view=users"       class="btn btn-small"><?php echo $this->genstats[5]; ?> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_USERS' ) ?></a>
-	<a href="index.php?option=com_flexicontent&amp;view=templates"   class="btn btn-small"><?php echo $this->genstats[6]; ?> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_TEMPLATES' ) ?></a>
-	<a href="index.php?option=com_flexicontent&amp;view=fields"      class="btn btn-small"><?php echo $this->genstats[7]; ?> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_FIELDS' ) ?></a>
+	<a href="index.php?option=com_flexicontent&amp;view=items"       class="btn btn-small"><?php echo $this->genstats[0]; ?> <?php echo JText::_( 'FLEXI_ITEMS' ) ?></a>
+	<a href="index.php?option=com_flexicontent&amp;view=categories"  class="btn btn-small"><?php echo $this->genstats[1]; ?> <?php echo JText::_( 'FLEXI_CATEGORIES' ) ?></a>
+	<a href="index.php?option=com_flexicontent&amp;view=tags"        class="btn btn-small"><?php echo $this->genstats[2]; ?> <?php echo JText::_( 'FLEXI_TAGS' ) ?></a>
+	<a href="index.php?option=com_flexicontent&amp;view=filemanager" class="btn btn-small"><?php echo $this->genstats[3]; ?> <?php echo JText::_( 'FLEXI_FILES' ) ?></a>
+	<a href="index.php?option=com_flexicontent&amp;view=types"       class="btn btn-small"><?php echo $this->genstats[4]; ?> <?php echo JText::_( 'FLEXI_TYPES' ) ?></a>
+	<a href="index.php?option=com_flexicontent&amp;view=users"       class="btn btn-small"><?php echo $this->genstats[5]; ?> <?php echo JText::_( 'FLEXI_USERS' ) ?></a>
+	<a href="index.php?option=com_flexicontent&amp;view=templates"   class="btn btn-small"><?php echo $this->genstats[6]; ?> <?php echo JText::_( 'FLEXI_TEMPLATES' ) ?></a>
+	<a href="index.php?option=com_flexicontent&amp;view=fields"      class="btn btn-small"><?php echo $this->genstats[7]; ?> <?php echo JText::_( 'FLEXI_FIELDS' ) ?></a>
 	<!-- End of SITE TOTALS -->
 
 
 	<!-- ITEM TOTALS -->
 	<hr />
-	<span class="label"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_ITEMS' ) ?></span>
+	<span class="label"><?php echo JText::_( 'FLEXI_ITEMS' ) ?></span>
 
 	<div class="row-fluid row">
 
@@ -126,7 +126,7 @@ $ctrl_users = "task=users.";
 						<?php print_r($this->totalitemspublish[0]->itemspub);  ?>
 					</span>
 				</div>
-				<small><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_TOTAL_NUM_OF_PUBLISHED_ITEMS' ) ?></small>
+				<small><?php echo JText::_( 'FLEXI_TOTAL_NUM_OF_PUBLISHED_ITEMS' ) ?></small>
 			</a>
 		</div>
 
@@ -138,7 +138,7 @@ $ctrl_users = "task=users.";
 						<?php print_r($this->totalitemsunpublish[0]->itemsunpub);  ?>
 					</span>
 				</div>
-				<small><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_TOTAL_NUM_UNPUBLISHED_ITEMS' ) ?></small>
+				<small><?php echo JText::_( 'FLEXI_TOTAL_NUM_UNPUBLISHED_ITEMS' ) ?></small>
 			</a>
 		</div>
 
@@ -150,7 +150,7 @@ $ctrl_users = "task=users.";
 						<?php print_r($this->totalitemswaiting[0]->itemswaiting);  ?>
 					</span>
 				</div>
-				<small><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_TOTAL_NUM_OF_WAITING_ITEMS' ) ?></small>
+				<small><?php echo JText::_( 'FLEXI_TOTAL_NUM_OF_WAITING_ITEMS' ) ?></small>
 			</a>
 		</div>
 
@@ -162,7 +162,7 @@ $ctrl_users = "task=users.";
 						<?php print_r($this->totalitemsprogress[0]->itemsprogress);  ?>
 					</span>
 				</div>
-				<small><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_TOTAL_NUM_OF_INPROGRESS_ITEMS' ) ?></small>
+				<small><?php echo JText::_( 'FLEXI_TOTAL_NUM_OF_INPROGRESS_ITEMS' ) ?></small>
 			</a>
 		</div>
 
@@ -174,7 +174,7 @@ $ctrl_users = "task=users.";
 						<?php print_r($this->metadescription[0]->itemsmetadesc);  ?>
 					</span>
 				</div>
-				<small><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_SEODESC_ITEMS' ) ?></small>
+				<small><?php echo JText::_( 'FLEXI_SEODESC_ITEMS' ) ?></small>
 			</a>
 		</div>
 
@@ -186,7 +186,7 @@ $ctrl_users = "task=users.";
 						<?php print_r($this->metakeywords[0]->itemsmetakey);  ?>
 					</span>
 				</div>
-				<small><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_SEOKEYWORDS_ITEMS' ) ?></small>
+				<small><?php echo JText::_( 'FLEXI_SEOKEYWORDS_ITEMS' ) ?></small>
 			</a>
 		</div>
 
@@ -199,7 +199,7 @@ $ctrl_users = "task=users.";
 	<table class="fc-table-list fc-tbl-short" style="margin:120px 0 20px 0; width:100%; box-sizing: border-box;">
 	<tr>
 		<th style="font-size:18px;">
-			<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_ITEMS' ); ?> - <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_CREATION_DATE' ); ?>
+			<?php echo JText::_( 'FLEXI_ITEMS' ); ?> - <?php echo JText::_( 'FLEXI_CREATION_DATE' ); ?>
 		</th>
 	</tr>
 	</table>
@@ -296,7 +296,7 @@ $ctrl_users = "task=users.";
 	<table class="fc-table-list fc-tbl-short" style="margin:120px 0 20px 0; width:100%; box-sizing: border-box;">
 	<tr>
 		<th style="font-size:18px;">
-			<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_ITEM_STATES_CHART' ); ?>
+			<?php echo JText::_( 'FLEXI_ITEM_STATES_CHART' ); ?>
 		</th>
 	</tr>
 	</table>
@@ -381,7 +381,7 @@ $ctrl_users = "task=users.";
 	<table class="fc-table-list fc-tbl-short" style="margin:120px 0 20px 0; width:100%; box-sizing: border-box;">
 	<tr>
 		<th style="font-size:18px;">
-			<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_GENERAL_STATS' ); ?>
+			<?php echo JText::_( 'FLEXI_GENERAL_STATS' ); ?>
 		</th>
 	</tr>
 	</table>
@@ -393,14 +393,14 @@ $ctrl_users = "task=users.";
 		<div class="span6">
 			<div class="well">
 
-				<h3><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_MOST_POPULAR' ); ?> <a href="index.php?option=com_flexicontent&amp;view=items&amp;filter_order=i.hits&amp;filter_order_Dir=desc" class="btn btn-small"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_VIEW' ); ?></a></h3>
+				<h3><?php echo JText::_( 'FLEXI_MOST_POPULAR' ); ?> <a href="index.php?option=com_flexicontent&amp;view=items&amp;filter_order=i.hits&amp;filter_order_Dir=desc" class="btn btn-small"><?php echo JText::_( 'FLEXI_VIEW' ); ?></a></h3>
 				<hr>
 				<table class="adminlist  table table-hover table-striped">
 					<thead>
 						<tr>
-							<th class="left"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_TITLE' ); ?></th>
-							<th class="center"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_HITS' ); ?></th>
-							<th class="left"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_RATING' ); ?></th>
+							<th class="left"><?php echo JText::_( 'FLEXI_TITLE' ); ?></th>
+							<th class="center"><?php echo JText::_( 'FLEXI_HITS' ); ?></th>
+							<th class="left"><?php echo JText::_( 'FLEXI_RATING' ); ?></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -412,7 +412,7 @@ $ctrl_users = "task=users.";
 						?>
 						<tr>
 							<td style="width:65%">
-								<span class="<?php echo $tip_class; ?>" title="<?php echo \Joomla\CMS\HTML\HTMLHelper::tooltipText(\Joomla\CMS\Language\Text::_( 'FLEXI_EDIT_ITEM' ), $row->title, 0, 1); ?>">
+								<span class="<?php echo $tip_class; ?>" title="<?php echo JHtml::tooltipText(JText::_( 'FLEXI_EDIT_ITEM' ), $row->title, 0, 1); ?>">
 									<a href="<?php echo $link; ?>">
 										<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 									</a>
@@ -435,14 +435,14 @@ $ctrl_users = "task=users.";
 		<div class="span6">
 			<div class="well">
 
-				<h3><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_LESS_POPULAR' ) ?> <a href="index.php?option=com_flexicontent&amp;view=items&amp;filter_order=i.hits&amp;filter_order_Dir=asc" class="btn btn-small"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_VIEW' ); ?></a></h3>
+				<h3><?php echo JText::_( 'FLEXI_LESS_POPULAR' ) ?> <a href="index.php?option=com_flexicontent&amp;view=items&amp;filter_order=i.hits&amp;filter_order_Dir=asc" class="btn btn-small"><?php echo JText::_( 'FLEXI_VIEW' ); ?></a></h3>
 				<hr>
 				<table class="adminlist  table table-hover table-striped">
 					<thead>
 						<tr>
-							<th class="left"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_TITLE' ); ?></th>
-							<th class="center"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_HITS' ); ?></th>
-							<th class="left"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_RATING' ); ?></th>
+							<th class="left"><?php echo JText::_( 'FLEXI_TITLE' ); ?></th>
+							<th class="center"><?php echo JText::_( 'FLEXI_HITS' ); ?></th>
+							<th class="left"><?php echo JText::_( 'FLEXI_RATING' ); ?></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -454,7 +454,7 @@ $ctrl_users = "task=users.";
 						?>
 						<tr>
 							<td style="width:65%">
-								<span class="<?php echo $tip_class; ?>" title="<?php echo \Joomla\CMS\HTML\HTMLHelper::tooltipText(\Joomla\CMS\Language\Text::_( 'FLEXI_EDIT_ITEM' ), $row->title, 0, 1); ?>">
+								<span class="<?php echo $tip_class; ?>" title="<?php echo JHtml::tooltipText(JText::_( 'FLEXI_EDIT_ITEM' ), $row->title, 0, 1); ?>">
 									<a href="<?php echo $link; ?>">
 										<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 									</a>
@@ -480,13 +480,13 @@ $ctrl_users = "task=users.";
 		<div class="span6">
 			<div class="well">
 
-				<h3><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_MOST_FAVOURED' ) ?> </h3>
+				<h3><?php echo JText::_( 'FLEXI_MOST_FAVOURED' ) ?> </h3>
 				<hr>
 						<table class="adminlist  table table-hover table-striped">
 					<thead>
 						<tr>
-							<th class="left"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_TITLE' ); ?></th>
-							<th class="center"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_NUM' ); ?></th>
+							<th class="left"><?php echo JText::_( 'FLEXI_TITLE' ); ?></th>
+							<th class="center"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -498,7 +498,7 @@ $ctrl_users = "task=users.";
 						?>
 						<tr>
 							<td>
-								<span class="<?php echo $tip_class; ?>" title="<?php echo \Joomla\CMS\HTML\HTMLHelper::tooltipText(\Joomla\CMS\Language\Text::_( 'FLEXI_EDIT_ITEM' ), $row->title, 0, 1); ?>">
+								<span class="<?php echo $tip_class; ?>" title="<?php echo JHtml::tooltipText(JText::_( 'FLEXI_EDIT_ITEM' ), $row->title, 0, 1); ?>">
 									<a href="<?php echo $link; ?>">
 										<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 									</a>
@@ -525,7 +525,7 @@ $ctrl_users = "task=users.";
 	<table class="fc-table-list fc-tbl-short" style="margin:120px 0 20px 0; width:100%; box-sizing: border-box;">
 	<tr>
 		<th style="font-size:18px;">
-			<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_RATING_STATS' ); ?>
+			<?php echo JText::_( 'FLEXI_RATING_STATS' ); ?>
 		</th>
 	</tr>
 	</table>
@@ -539,13 +539,13 @@ $ctrl_users = "task=users.";
 			<div class="row-fluid">
 				<div class="span12">
 					<div class="well">
-						<h3><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_BEST_RATED' ) ?></h3>
+						<h3><?php echo JText::_( 'FLEXI_BEST_RATED' ) ?></h3>
 						<hr>
 						<table class="adminlist table table-hover table-striped">
 							<thead>
 								<tr>
-									<th class="left"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_TITLE' ); ?></th>
-									<th class="left"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_RATING' ); ?></th>
+									<th class="left"><?php echo JText::_( 'FLEXI_TITLE' ); ?></th>
+									<th class="left"><?php echo JText::_( 'FLEXI_RATING' ); ?></th>
 								</tr>
 							</thead>
 							<tbody>
@@ -557,7 +557,7 @@ $ctrl_users = "task=users.";
 								?>
 								<tr>
 									<td>
-										<span class="<?php echo $tip_class; ?>" title="<?php echo \Joomla\CMS\HTML\HTMLHelper::tooltipText(\Joomla\CMS\Language\Text::_( 'FLEXI_EDIT_ITEM' ), $row->title, 0, 1); ?>">
+										<span class="<?php echo $tip_class; ?>" title="<?php echo JHtml::tooltipText(JText::_( 'FLEXI_EDIT_ITEM' ), $row->title, 0, 1); ?>">
 											<a href="<?php echo $link; ?>">
 												<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 											</a>
@@ -577,13 +577,13 @@ $ctrl_users = "task=users.";
 			<div class="row-fluid">
 				<div class="span12">
 					<div class="well">
-						<h3><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_WORST_RATED' ) ?></h3>
+						<h3><?php echo JText::_( 'FLEXI_WORST_RATED' ) ?></h3>
 						<hr>
 								<table class="adminlist table table-hover table-striped">
 									<thead>
 										<tr>
-											<th class="left"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_TITLE' ); ?></th>
-											<th class="left"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_RATING' ); ?></th>
+											<th class="left"><?php echo JText::_( 'FLEXI_TITLE' ); ?></th>
+											<th class="left"><?php echo JText::_( 'FLEXI_RATING' ); ?></th>
 										</tr>
 									</thead>
 									<tbody>
@@ -595,7 +595,7 @@ $ctrl_users = "task=users.";
 										?>
 										<tr>
 											<td>
-												<span class="<?php echo $tip_class; ?>" title="<?php echo \Joomla\CMS\HTML\HTMLHelper::tooltipText(\Joomla\CMS\Language\Text::_( 'FLEXI_EDIT_ITEM' ), $row->title, 0, 1); ?>">
+												<span class="<?php echo $tip_class; ?>" title="<?php echo JHtml::tooltipText(JText::_( 'FLEXI_EDIT_ITEM' ), $row->title, 0, 1); ?>">
 													<a href="<?php echo $link; ?>">
 														<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 													</a>
@@ -617,7 +617,7 @@ $ctrl_users = "task=users.";
 
 		<div class="span7">
 			<div class="well">
-				<h3><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_ITEM_VOTES_CHART' ) ?></h3>
+				<h3><?php echo JText::_( 'FLEXI_ITEM_VOTES_CHART' ) ?></h3>
 				<hr>
 
 
@@ -700,7 +700,7 @@ $ctrl_users = "task=users.";
 	<table class="fc-table-list fc-tbl-short" style="margin:120px 0 20px 0; width:100%; box-sizing: border-box;">
 	<tr>
 		<th style="font-size:18px;">
-			<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_USER_STATS' ); ?>
+			<?php echo JText::_( 'FLEXI_USER_STATS' ); ?>
 		</th>
 	</tr>
 	</table>
@@ -709,13 +709,13 @@ $ctrl_users = "task=users.";
 	<div class="row-fluid">
 		<div class="span5">
 			<div class="well">
-				<h3><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_TOP_EDITORS' ) ?></h3>
+				<h3><?php echo JText::_( 'FLEXI_TOP_EDITORS' ) ?></h3>
 				<hr>
 					<table class="adminlist  table table-hover table-striped">
 						<thead>
 							<tr>
-								<th class="left"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_USER' ); ?></th>
-								<th class="center"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_NUM' ); ?></th>
+								<th class="left"><?php echo JText::_( 'FLEXI_USER' ); ?></th>
+								<th class="center"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 							</tr>
 						</thead>
 						<tbody>
@@ -727,7 +727,7 @@ $ctrl_users = "task=users.";
 							?>
 							<tr>
 								<td>
-									<span class="<?php echo $tip_class; ?>" title="<?php echo \Joomla\CMS\HTML\HTMLHelper::tooltipText(\Joomla\CMS\Language\Text::_( 'FLEXI_EDIT_USER' ), $row->username, 0, 1); ?>">
+									<span class="<?php echo $tip_class; ?>" title="<?php echo JHtml::tooltipText(JText::_( 'FLEXI_EDIT_USER' ), $row->username, 0, 1); ?>">
 										<a href="<?php echo $link; ?>">
 											<?php echo htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8').' ('.htmlspecialchars($row->username, ENT_QUOTES, 'UTF-8').')'; ?>
 										</a>
@@ -746,13 +746,13 @@ $ctrl_users = "task=users.";
 
 		<div class="span7">
 			<div class="well">
-				<h3><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_TOP_CONTRIBUTORS' ) ?></h3>
+				<h3><?php echo JText::_( 'FLEXI_TOP_CONTRIBUTORS' ) ?></h3>
 				<hr>
 					<table class="adminlist table table-hover table-striped">
 						<thead>
 							<tr>
-								<th class="left"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_USER' ); ?></th>
-								<th class="center"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_NUM' ); ?></th>
+								<th class="left"><?php echo JText::_( 'FLEXI_USER' ); ?></th>
+								<th class="center"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 							</tr>
 						</thead>
 						<tbody>
@@ -764,7 +764,7 @@ $ctrl_users = "task=users.";
 							?>
 							<tr>
 								<td>
-									<span class="<?php echo $tip_class; ?>" title="<?php echo \Joomla\CMS\HTML\HTMLHelper::tooltipText(\Joomla\CMS\Language\Text::_( 'FLEXI_EDIT_USER' ), $row->username, 0, 1); ?>">
+									<span class="<?php echo $tip_class; ?>" title="<?php echo JHtml::tooltipText(JText::_( 'FLEXI_EDIT_USER' ), $row->username, 0, 1); ?>">
 										<a href="<?php echo $link; ?>">
 											<?php echo htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8').' ('.htmlspecialchars($row->username, ENT_QUOTES, 'UTF-8').')'; ?>
 										</a>

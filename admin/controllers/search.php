@@ -47,7 +47,7 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 	{
 		$model = $this->getModel('search');
 		$model->purge();
-		$msg = \Joomla\CMS\Language\Text::_('FLEXI_ITEMS_PURGED');
+		$msg = JText::_('FLEXI_ITEMS_PURGED');
 		$this->setRedirect('index.php?option=com_flexicontent&view=search', $msg);
 	}
 
@@ -55,7 +55,7 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 	function custom_order()
 	{
 		flexicontent_db::setValues_commonDataTypes(null, true);
-		$msg = \Joomla\CMS\Language\Text::_('FLEXI_CUSTOM_ORDER_INDEXES_UPDATED');
+		$msg = JText::_('FLEXI_CUSTOM_ORDER_INDEXES_UPDATED');
 		$this->setRedirect('index.php?option=com_flexicontent&view=search', $msg);
 	}
 }

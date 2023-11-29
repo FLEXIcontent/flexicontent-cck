@@ -71,7 +71,7 @@ class FlexicontentControllerCategories extends FlexicontentControllerBaseAdmin
 	 * @param   string  $prefix  The class prefix. Optional.
 	 * @param   array   $config  The array of possible config values. Optional.
 	 *
-	 * @return  \Joomla\CMS\MVC\Model\BaseDatabaseModel  The model.
+	 * @return  JModelLegacy  The model.
 	 *
 	 * @since   1.6
 	 */
@@ -96,7 +96,7 @@ class FlexicontentControllerCategories extends FlexicontentControllerBaseAdmin
 	function params( )
 	{
 		// Check for request forgeries
-		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
 
 		$task   = $this->input->getCmd('task');
 		$copyid	= $this->input->getInt('copycid', 0);
@@ -104,20 +104,20 @@ class FlexicontentControllerCategories extends FlexicontentControllerBaseAdmin
 
 		$destid = ArrayHelper::toInteger($destid);
 
-		$user   = \Joomla\CMS\Factory::getUser();
+		$user   = JFactory::getUser();
 		$model  = $this->getModel($this->record_name);
 		$params = $model->getParams($copyid);
 
 		if (!$destid)
 		{
-			echo '<div class="copyfailed">' . \Joomla\CMS\Language\Text::_('FLEXI_NO_TARGET') . '</div>';
+			echo '<div class="copyfailed">' . JText::_('FLEXI_NO_TARGET') . '</div>';
 
 			return;
 		}
 
 		if (!$copyid)
 		{
-			echo '<div class="copyfailed">' . \Joomla\CMS\Language\Text::_('FLEXI_NO_SOURCE') . '</div>';
+			echo '<div class="copyfailed">' . JText::_('FLEXI_NO_SOURCE') . '</div>';
 
 			return;
 		}
@@ -140,7 +140,7 @@ class FlexicontentControllerCategories extends FlexicontentControllerBaseAdmin
 				: $n++;
 		}
 
-		echo '<div class="copyok">' . \Joomla\CMS\Language\Text::sprintf('FLEXI_CAT_PARAMS_COPIED', $y, $n) . '</div>';
+		echo '<div class="copyok">' . JText::sprintf('FLEXI_CAT_PARAMS_COPIED', $y, $n) . '</div>';
 
 		if (count($unauthorized))
 		{

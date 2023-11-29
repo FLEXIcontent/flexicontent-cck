@@ -1,6 +1,6 @@
 <?php
 use Joomla\String\StringHelper;
-$isAdmin = \Joomla\CMS\Factory::getApplication()->isClient('administrator');
+$isAdmin = JFactory::getApplication()->isClient('administrator');
 
 // Important create a -1 "value", before any other normal values, so that it is at 1st position of the array
 $field->{$prop}[-1] = '';
@@ -40,7 +40,7 @@ foreach($values as $file_id)
 	// ***
 
 	$basePath = $file_data->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;
-	$abspath = str_replace(DS, '/', \Joomla\CMS\Filesystem\Path::clean($basePath.DS.$file_data->filename));
+	$abspath = str_replace(DS, '/', JPath::clean($basePath.DS.$file_data->filename));
 
 	$_size = '-';
 
@@ -101,10 +101,10 @@ foreach($values as $file_id)
 	{
 		$file_data = $this->addIcon( $file_data );
 		$_tooltip_title   = '';
-		$_tooltip_content = \Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_FILE_TYPE', true ) .': '. $file_data->ext;
+		$_tooltip_content = JText::_( 'FLEXI_FIELD_FILE_TYPE', true ) .': '. $file_data->ext;
 		$icon = '
 		<span class="fcfile_mime">
-			' . \Joomla\CMS\HTML\HTMLHelper::image($file_data->icon, $file_data->ext, 'class="fcicon-mime '.$tooltip_class.'" title="'.\Joomla\CMS\HTML\HTMLHelper::tooltipText($_tooltip_title, $_tooltip_content, 1, 0).'"') . '
+			' . JHtml::image($file_data->icon, $file_data->ext, 'class="fcicon-mime '.$tooltip_class.'" title="'.JHtml::tooltipText($_tooltip_title, $_tooltip_content, 1, 0).'"') . '
 		</span>';
 	}
 
@@ -121,7 +121,7 @@ foreach($values as $file_id)
 		$lang .= $display_lang == 2 || $display_lang == 3 ? '<span class="fcfile_lang_label label">' .JTEXT::_('FLEXI_LANGUAGE'). '</span> ' : '';
 		$lang .=
 		'<span class="fcfile_lang_value value">'
-			. ($file_data->language === '*' ? \Joomla\CMS\Language\Text::_('FLEXI_FIELD_FILE_ALL_LANGS') : $langs->{$file_data->language}->name) .
+			. ($file_data->language === '*' ? JText::_('FLEXI_FIELD_FILE_ALL_LANGS') : $langs->{$file_data->language}->name) .
 		'</span>';
 
 		$lang .= '</span>';
@@ -205,7 +205,7 @@ foreach($values as $file_id)
 		{
 			if ($noaccess_display != 2)
 			{
-				$descr_tip  = \Joomla\CMS\HTML\HTMLHelper::tooltipText($name_str, $file_data->description, 0, 1);
+				$descr_tip  = JHtml::tooltipText($name_str, $file_data->description, 0, 1);
 				$descr_icon = '<img src="components/com_flexicontent/assets/images/comments.png" class="hasTooltip" alt="'.$name_escaped.'" title="'. $descr_tip .'"/>';
 				$descr_inline  = '';
 			}
@@ -214,7 +214,7 @@ foreach($values as $file_id)
 		// As tooltip
 		elseif ($display_descr==1 || $prop=='namelist')
 		{
-			$descr_tip  = \Joomla\CMS\HTML\HTMLHelper::tooltipText($name_str, $file_data->description, 0, 1);
+			$descr_tip  = JHtml::tooltipText($name_str, $file_data->description, 0, 1);
 			$descr_icon = '<img src="components/com_flexicontent/assets/images/comments.png" class="hasTooltip" alt="'.$name_escaped.'" title="'. $descr_tip .'"/>';
 			$descr_inline  = '';
 		}
@@ -261,7 +261,7 @@ foreach($values as $file_id)
 	else
 	{
 		$dl_link = 'index.php?option=com_flexicontent&id='. $file_id .'&cid='.$item->id.'&fid='.$field->id.'&task=download';
-		$dl_link = $isAdmin ? flexicontent_html::getSefUrl($dl_link) : \Joomla\CMS\Router\Route::_( $dl_link );
+		$dl_link = $isAdmin ? flexicontent_html::getSefUrl($dl_link) : JRoute::_( $dl_link );
 	}
 
 	// SOME behavior FLAGS

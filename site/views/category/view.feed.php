@@ -29,7 +29,7 @@ use Joomla\String\StringHelper;
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
+class FlexicontentViewCategory extends JViewLegacy
 {
 	/**
 	 * Creates the RSS for the View
@@ -39,9 +39,9 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 	function display( $tpl = null )
 	{
 		// Initialize framework variables
-		$db       = \Joomla\CMS\Factory::getDbo();
-		$app      = \Joomla\CMS\Factory::getApplication();
-		$document = \Joomla\CMS\Factory::getDocument();
+		$db       = JFactory::getDbo();
+		$app      = JFactory::getApplication();
+		$document = JFactory::getDocument();
 
 		// Get model
 		$model  = $this->getModel();
@@ -56,7 +56,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		$params   = $category->parameters;
 
 		// Prepare query to match feed data (Force a specific limit, this will be moved to the model)
-		\Joomla\CMS\Factory::getApplication()->input->set('limit', $params->get('feed_limit'));
+		JFactory::getApplication()->input->set('limit', $params->get('feed_limit'));
 
 		// Needed by legacy non-updated plugins
 		!FLEXI_J40GE ? JRequest::setVar('limit', $params->get('feed_limit')) : null;
@@ -115,9 +115,9 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 			}
 		}
 
-		$uri = clone \Joomla\CMS\Uri\Uri::getInstance();
+		$uri = clone JUri::getInstance();
 		$domain = $uri->toString(array('scheme', 'host', 'port'));
-		$site_base_url = \Joomla\CMS\Uri\Uri::base(true).'/';
+		$site_base_url = JUri::base(true).'/';
 		foreach ($items as $item)
 		{
 			// strip html from feed item title
@@ -126,7 +126,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 
 			// url link to article
 			// & used instead of &amp; as this is converted by feed creator
-			$link = $domain . \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item));
+			$link = $domain . JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item));
 
 			// strip html from feed item description text
 			$description	= $feed_summary ? $item->introtext.$item->fulltext : $item->introtext;
@@ -138,7 +138,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 					// render method 'display_NNNN_src' to avoid CSS/JS being added to the page
 					/* $src = */FlexicontentFields::getFieldDisplay($item, $img_field_name, $values=null, $method='display_'.$img_field_size.'_src');
 					$img_field = $item->fields[$img_field_name];
-					$src = str_replace(\Joomla\CMS\Uri\Uri::root(), '', ($img_field->thumbs_src[$img_field_size][0] ?? '') );
+					$src = str_replace(JUri::root(), '', ($img_field->thumbs_src[$img_field_size][0] ?? '') );
 				} else {
 					$src = flexicontent_html::extractimagesrc($item);
 				}
@@ -157,7 +157,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 					$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 
 					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  $site_base_url : '';
-					$thumb = \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.rawurlencode($base_url.$src).$conf;
+					$thumb = JUri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.rawurlencode($base_url.$src).$conf;
 				} else {
 					// Do not resize image when (a) image src path not set or (b) using image field's already created thumbnails
 					$thumb = $src;
@@ -192,7 +192,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 			$more_text_exists = (!$feed_summary && $item->fulltext) || $item_desc_cut;
 			if ($params->get('feed_show_readmore', 0) && $more_text_exists)
 			{
-				$description .= '<p class="feed-readmore"><a target="_blank" href ="' . $link . '">' .  \Joomla\CMS\Language\Text::sprintf('FLEXI_READ_MORE', $title) . '</a></p>';
+				$description .= '<p class="feed-readmore"><a target="_blank" href ="' . $link . '">' .  JText::sprintf('FLEXI_READ_MORE', $title) . '</a></p>';
 			}
 
 
@@ -201,7 +201,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 			@ $date = ( $date ? date( 'r', strtotime($date) ) : '' );
 
 			// load individual item creator class
-			$JF_item = new \Joomla\CMS\Document\Feed\FeedItem();
+			$JF_item = new JFeedItem();
 			$JF_item->title 		  = $title;
 			$JF_item->link 		    = $link;
 			//$JF_item->image     = $thumb;  // Currently unused by Joomla, since browser support is incomplete

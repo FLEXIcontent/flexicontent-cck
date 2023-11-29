@@ -23,7 +23,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 
 	public function __construct( &$subject, $params )
 	{
-		$app = \Joomla\CMS\Factory::getApplication(); //record action in form
+		$app = JFactory::getApplication(); //record action in form
 		if ($app->isClient('site') && $app->input->get('emailtask', '', 'cmd') === 'plg.email.submit') {
 			$this->sendEmail();
 		}
@@ -41,7 +41,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
-		$field->label = $field->parameters->get('label_form') ? \Joomla\CMS\Language\Text::_($field->parameters->get('label_form')) : \Joomla\CMS\Language\Text::_($field->label);
+		$field->label = $field->parameters->get('label_form') ? JText::_($field->parameters->get('label_form')) : JText::_($field->label);
 
 		// Set field and item objects
 		$this->setField($field);
@@ -64,8 +64,8 @@ class plgFlexicontent_fieldsEmail extends FCField
 		$auto_value = $auto_value === 2 && !$auto_value_code ? 0 : $auto_value;
 
 		// Initialize framework objects and other variables
-		$document = \Joomla\CMS\Factory::getDocument();
-		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
+		$document = JFactory::getDocument();
+		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 
 		$tooltip_class = 'hasTooltip';
 		$add_on_class    = $cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
@@ -133,13 +133,13 @@ class plgFlexicontent_fieldsEmail extends FCField
 		// Email address
 		$addr_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_addr = ($item->version == 0 || $addr_usage > 0) ? $field->parameters->get( 'default_value', '' ) : '';
-		$default_addr = $default_addr ? \Joomla\CMS\Language\Text::_($default_addr) : '';
+		$default_addr = $default_addr ? JText::_($default_addr) : '';
 
 		// Email title & linking text (optional)
 		$usetitle      = $field->parameters->get( 'use_title', 0 ) ;
 		$title_usage   = $field->parameters->get( 'title_usage', 0 ) ;
-		$default_title = ($item->version == 0 || $title_usage > 0) ? \Joomla\CMS\Language\Text::_($field->parameters->get( 'default_value_title', '' )) : '';
-		$default_title = $default_title ? \Joomla\CMS\Language\Text::_($default_title) : '';
+		$default_title = ($item->version == 0 || $title_usage > 0) ? JText::_($field->parameters->get( 'default_value_title', '' )) : '';
+		$default_title = $default_title ? JText::_($default_title) : '';
 
 
 		// Initialise property with default value
@@ -190,7 +190,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 			});
 			";
 
-			if ($max_values) \Joomla\CMS\Language\Text::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
+			if ($max_values) JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
 			$js .= "
 			function addField".$field->id."(el, groupval_box, fieldval_box, params)
 			{
@@ -313,11 +313,11 @@ class plgFlexicontent_fieldsEmail extends FCField
 
 			$css .= '';
 
-			$remove_button = '<span class="' . $add_on_class . ' fcfield-delvalue ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
-			$move2 = '<span class="' . $add_on_class . ' fcfield-drag-handle ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
+			$remove_button = '<span class="' . $add_on_class . ' fcfield-delvalue ' . $font_icon_class . '" title="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
+			$move2 = '<span class="' . $add_on_class . ' fcfield-drag-handle ' . $font_icon_class . '" title="'.JText::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
 			$add_here = '';
-			$add_here .= $add_position==2 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
-			$add_here .= $add_position==1 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
+			$add_here .= $add_position==2 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.JText::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
+			$add_here .= $add_position==1 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.JText::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
 		}
 
 		// Field not multi-value
@@ -409,8 +409,8 @@ class plgFlexicontent_fieldsEmail extends FCField
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
 			if (!$add_position) $field->html .= '
 				<div class="input-append input-prepend fc-xpended-btns">
-					<span class="fcfield-addvalue ' . $font_icon_class . ' fccleared" onclick="addField'.$field->id.'(jQuery(this).closest(\'.fc-xpended-btns\').get(0));" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_TO_BOTTOM' ).'">
-						'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_VALUE' ).'
+					<span class="fcfield-addvalue ' . $font_icon_class . ' fccleared" onclick="addField'.$field->id.'(jQuery(this).closest(\'.fc-xpended-btns\').get(0));" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'">
+						'.JText::_( 'FLEXI_ADD_VALUE' ).'
 					</span>
 				</div>';
 		}
@@ -433,7 +433,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 
 		if (count($skipped_vals))
 		{
-			$app->enqueueMessage( \Joomla\CMS\Language\Text::sprintf('FLEXI_FIELD_DATE_EDIT_VALUES_SKIPPED', $field->label, implode(',',$skipped_vals)), 'notice' );
+			$app->enqueueMessage( JText::sprintf('FLEXI_FIELD_DATE_EDIT_VALUES_SKIPPED', $field->label, implode(',',$skipped_vals)), 'notice' );
 		}
 
 		// Add toggle button for: Compact values view (= multiple values per row)
@@ -441,10 +441,10 @@ class plgFlexicontent_fieldsEmail extends FCField
 		if (!$use_ingroup && $show_values_expand_btn)
 		{
 			$field->html = '
-			<button type="button" class="fcfield-expand-view-btn btn btn-small" data-expandedFieldState="0" aria-label="' . \Joomla\CMS\Language\Text::_('FLEXI_EXPAND') . '"
+			<button type="button" class="fcfield-expand-view-btn btn btn-small" data-expandedFieldState="0" aria-label="' . JText::_('FLEXI_EXPAND') . '"
 				onclick="fc_toggleCompactValuesView(this, jQuery(this).closest(\'.container_fcfield\'));"
 			>
-				<span class="fcfield-expand-view ' . $font_icon_class . '" aria-hidden="true"></span>&nbsp; ' . \Joomla\CMS\Language\Text::_('FLEXI_EXPAND', true) . '
+				<span class="fcfield-expand-view ' . $font_icon_class . '" aria-hidden="true"></span>&nbsp; ' . JText::_('FLEXI_EXPAND', true) . '
 			</button>
 			' . $field->html;
 		}
@@ -456,7 +456,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
-		$field->label = \Joomla\CMS\Language\Text::_($field->label);
+		$field->label = JText::_($field->label);
 
 		// Set field and item objects
 		$this->setField($field);
@@ -474,8 +474,8 @@ class plgFlexicontent_fieldsEmail extends FCField
 		{
 			$initialized = 1;
 
-			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$app       = JFactory::getApplication();
+			$document  = JFactory::getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -505,18 +505,18 @@ class plgFlexicontent_fieldsEmail extends FCField
 		// Email address
 		$addr_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_addr = ($addr_usage == 2) ? $field->parameters->get( 'default_value', '' ) : '';
-		$default_addr = $default_addr ? \Joomla\CMS\Language\Text::_($default_addr) : '';
+		$default_addr = $default_addr ? JText::_($default_addr) : '';
 
 		// Email title & linking text (optional)
 		$usetitle      = $field->parameters->get( 'use_title', 0 ) ;
 		$title_usage   = $field->parameters->get( 'title_usage', 0 ) ;
-		$default_title = ($title_usage == 2) ? \Joomla\CMS\Language\Text::_($field->parameters->get( 'default_value_title', '' )) : '';
-		$default_title = $default_title ? \Joomla\CMS\Language\Text::_($default_title) : '';
+		$default_title = ($title_usage == 2) ? JText::_($field->parameters->get( 'default_value_title', '' )) : '';
+		$default_title = $default_title ? JText::_($default_title) : '';
 
 		// Rendering options
 		$email_cloaking = $field->parameters->get( 'email_cloaking', 1 ) ;
 		$mailto_link    = $field->parameters->get( 'mailto_link', 1 ) ;
-		$format = \Joomla\CMS\Factory::getApplication()->input->get('format', 'html', 'cmd');
+		$format = JFactory::getApplication()->input->get('format', 'html', 'cmd');
 
 		// Get field values
 		$values = $values ? $values : $field->value;
@@ -530,8 +530,8 @@ class plgFlexicontent_fieldsEmail extends FCField
 				return;
 			}
 			$values = array(0 => array(
-				'addr' => \Joomla\CMS\Language\Text::_($default_addr),
-				'text' => \Joomla\CMS\Language\Text::_($default_title),
+				'addr' => JText::_($default_addr),
+				'text' => JText::_($default_title),
 			));
 			$values[0] = serialize($values[0]);
 		}
@@ -643,7 +643,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
 
 		// Get configuration
-		$app  = \Joomla\CMS\Factory::getApplication();
+		$app  = JFactory::getApplication();
 		$is_importcsv = $app->input->get('task', '', 'cmd') == 'importcsv';
 
 		// Server side validation
@@ -698,7 +698,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 			if ($v!==null) $post[$i] = serialize($v);
 		}
 		/*if ($use_ingroup) {
-			$app = \Joomla\CMS\Factory::getApplication();
+			$app = JFactory::getApplication();
 			$app->enqueueMessage( print_r($post, true), 'warning');
 		}*/
 	}
@@ -798,25 +798,25 @@ class plgFlexicontent_fieldsEmail extends FCField
 	public static function sendEmail()
 	{
 		// Load plugin language
-		$lang = \Joomla\CMS\Factory::getLanguage();
+		$lang = JFactory::getLanguage();
 		$lang->load('plg_flexicontent_fields_email', JPATH_ADMINISTRATOR);
 
 		// get the params from the plugin options
-		$plugin = \Joomla\CMS\Plugin\PluginHelper::getPlugin('flexicontent_fields', 'email');
-		$pluginParams = new \Joomla\Registry\Registry($plugin->params);
+		$plugin = JPluginHelper::getPlugin('flexicontent_fields', 'email');
+		$pluginParams = new JRegistry($plugin->params);
 
 		// Check for request forgeries.
-		\Joomla\CMS\Session\Session::checkToken() or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
 
 		// Get a handle to the Joomla! application object
-		$app = \Joomla\CMS\Factory::getApplication();
+		$app = JFactory::getApplication();
 
 		//get input form
-		$jinput = \Joomla\CMS\Factory::getApplication()->input;
+		$jinput = JFactory::getApplication()->input;
 		
 		// create variable for email
 		global $globalcats;
-		$config = \Joomla\CMS\Factory::getConfig();
+		$config = JFactory::getConfig();
 		$categories = & $globalcats;
 		// Get the route helper
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
@@ -832,10 +832,10 @@ class plgFlexicontent_fieldsEmail extends FCField
 		// Create the SEF URL
 		$item_url = $app->isClient('administrator')
 			? flexicontent_html::getSefUrl($item_url)   // ..., $_xhtml= true, $_ssl=-1);
-			: \Joomla\CMS\Router\Route::_($item_url);  // ..., $_xhtml= true, $_ssl=-1);
+			: JRoute::_($item_url);  // ..., $_xhtml= true, $_ssl=-1);
 		// Make URL absolute since this URL will be emailed
-		$item_url = \Joomla\CMS\Uri\Uri::getInstance()->toString(array('scheme', 'host', 'port')) . $item_url;
-		$sitename = $app->getCfg('sitename') . ' - ' . \Joomla\CMS\Uri\Uri::root();
+		$item_url = JUri::getInstance()->toString(array('scheme', 'host', 'port')) . $item_url;
+		$sitename = $app->getCfg('sitename') . ' - ' . JUri::root();
 
 		// set only form value in input
 		$datas = $jinput->post->get($formid, array(), 'array');
@@ -858,7 +858,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 			$fromname = $firstname.' '.$lastname;
 		}
 		if (empty($fromname)){
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_FIELD_EMAIL_CONFIG_ERROR'), 'error');
+			$app->enqueueMessage(JText::_('FLEXI_FIELD_EMAIL_CONFIG_ERROR'), 'error');
 		}
 		$fromemail   = flexicontent_html::dataFilter($datas['emailfrom'],   4000, 'STRING', '');
 		$emailauthor = flexicontent_html::dataFilter($_POST['emailauthor'],   4000, 'STRING', '');
@@ -870,7 +870,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 		} else{
 			$subject = $title;
 		}
-		$subjectemail = \Joomla\CMS\Language\Text::sprintf('FLEXI_FIELD_EMAIL_SUBJECT_DEFAULT', $fromname, $subject);
+		$subjectemail = JText::sprintf('FLEXI_FIELD_EMAIL_SUBJECT_DEFAULT', $fromname, $subject);
 
 		//body
 		$body = '';
@@ -878,15 +878,15 @@ class plgFlexicontent_fieldsEmail extends FCField
 				$body .= '<li>'.$field.' : ' . $value . '</li>';
 			}
 			$body = "\n\r\n\r\n" . stripslashes($body);
-			$message 	= \Joomla\CMS\Language\Text::sprintf('FLEXI_FIELD_EMAIL_MESSAGE_DEFAULT', $title, $body, '<a href="'.$item_url.'">'.$item_url.'</a>', $sitename);
+			$message 	= JText::sprintf('FLEXI_FIELD_EMAIL_MESSAGE_DEFAULT', $title, $body, '<a href="'.$item_url.'">'.$item_url.'</a>', $sitename);
 
 		// Check whether email copy function activated
 		$copy_email_user = $pluginParams->get( 'email_user_copy','' );
 			if ($copy_email_user == true)
 			{
-				$messagecopy   = \Joomla\CMS\Language\Text::sprintf('FLEXI_FIELD_EMAIL_MESSAGE_DEFAULT_COPY', $title, $body, '<a href="'.$item_url.'">'.$item_url.'</a>', $sitename);
-				$subjectcopy =  \Joomla\CMS\Language\Text::sprintf('FLEXI_FIELD_EMAIL_SUBJECT_DEFAULT_COPY', $fromname, $itemauthor, $subject);
-				$mailer = \Joomla\CMS\Factory::getMailer();
+				$messagecopy   = JText::sprintf('FLEXI_FIELD_EMAIL_MESSAGE_DEFAULT_COPY', $title, $body, '<a href="'.$item_url.'">'.$item_url.'</a>', $sitename);
+				$subjectcopy =  JText::sprintf('FLEXI_FIELD_EMAIL_SUBJECT_DEFAULT_COPY', $fromname, $itemauthor, $subject);
+				$mailer = JFactory::getMailer();
 				$mailer->isHTML(true);
 				$mailer ->setSender(array($emailauthor, $itemauthor));
 				$mailer ->addRecipient($fromemail);
@@ -898,9 +898,9 @@ class plgFlexicontent_fieldsEmail extends FCField
 			$email_admin = $pluginParams->get( 'email_admin', '' ) ;
 				if ($copy_email_admin == true)
 				{
-					$messagecopyadmin   = \Joomla\CMS\Language\Text::sprintf('FLEXI_FIELD_EMAIL_MESSAGE_ADMIN_COPY', $fromname , $title, $body, '<a href="'.$item_url.'">'.$item_url.'</a>', $sitename);
-					$subjectcopyadmin =  \Joomla\CMS\Language\Text::sprintf('FLEXI_FIELD_EMAIL_SUBJECT_ADMIN_COPY', $itemauthor, $subject);
-					$mailer = \Joomla\CMS\Factory::getMailer();
+					$messagecopyadmin   = JText::sprintf('FLEXI_FIELD_EMAIL_MESSAGE_ADMIN_COPY', $fromname , $title, $body, '<a href="'.$item_url.'">'.$item_url.'</a>', $sitename);
+					$subjectcopyadmin =  JText::sprintf('FLEXI_FIELD_EMAIL_SUBJECT_ADMIN_COPY', $itemauthor, $subject);
+					$mailer = JFactory::getMailer();
 					$mailer->isHTML(true);
 					$mailer ->setSender($from, $fromname);
 					$mailer ->addRecipient($email_admin);
@@ -911,7 +911,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 
 
 			//Prepare contact email
-			$mailer = \Joomla\CMS\Factory::getMailer();
+			$mailer = JFactory::getMailer();
 			$mailer->isHTML(true);
 			$mailer->setSender($from, $fromname);
 			$mailer->addRecipient($emailauthor);
@@ -922,7 +922,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 		$files = $jinput->files->get($formid);
 		if (isset($files))
 		{
-			\Joomla\CMS\Filesystem\Folder::create(JPATH_SITE . DS . "tmp" . DS . "upload_flexi_form". $formid);
+			JFolder::create(JPATH_SITE . DS . "tmp" . DS . "upload_flexi_form". $formid);
 
 			foreach($files as $attachements) {
 				foreach ($attachements as $file){
@@ -930,20 +930,20 @@ class plgFlexicontent_fieldsEmail extends FCField
 				jimport('joomla.filesystem.file');
 
 				// Clean up filename to get rid of strange characters like spaces etc.
-				$filename = \Joomla\CMS\Filesystem\File::makeSafe($file['name']);
+				$filename = JFile::makeSafe($file['name']);
 
 				// Set up the source and destination of the file
 				$src = $file['tmp_name'];
 				$dest = JPATH_SITE . DS . "tmp" . DS . "upload_flexi_form". $formid . DS . $filename;
 					// TODO: Add security checks. FIle extension and size maybe using flexicontent helper
 
-					if (\Joomla\CMS\Filesystem\File::upload($src, $dest))
+					if (JFile::upload($src, $dest))
 						{
         			$mailer->addAttachment($dest);
 						} 
 					else
 						{
-						$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_FIELD_EMAIL_MESSAGE_SEND_ERROR'), 'error');
+						$app->enqueueMessage(JText::_('FLEXI_FIELD_EMAIL_MESSAGE_SEND_ERROR'), 'error');
 						}
 				}
 			}
@@ -955,19 +955,19 @@ class plgFlexicontent_fieldsEmail extends FCField
 		//Message in front-end
 		if ( $send !== true )
 			{
-				$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_FIELD_EMAIL_MESSAGE_SEND_ERROR'), 'error');
+				$app->enqueueMessage(JText::_('FLEXI_FIELD_EMAIL_MESSAGE_SEND_ERROR'), 'error');
 				$destFolder= JPATH_SITE . DS . "tmp" . DS . "upload_flexi_form". $formid;
 				//Deleting file
 				if (is_dir($destFolder)) {
- 				\Joomla\CMS\Filesystem\Folder::delete($destFolder);
+ 				JFolder::delete($destFolder);
 				} 
 			} else {
 				// Message sending
-				$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_FIELD_EMAIL_MESSAGE_SEND_SUCCESS'), 'message');
+				$app->enqueueMessage(JText::_('FLEXI_FIELD_EMAIL_MESSAGE_SEND_SUCCESS'), 'message');
 				$destFolder= JPATH_SITE . DS . "tmp" . DS . "upload_flexi_form". $formid;
 				//Deleting file
 				if (is_dir($destFolder)) {
- 				\Joomla\CMS\Filesystem\Folder::delete($destFolder);
+ 				JFolder::delete($destFolder);
 				} 
 			}
 	}

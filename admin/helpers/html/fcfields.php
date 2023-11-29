@@ -49,7 +49,7 @@ abstract class JHtmlFcfields extends JHtmlFcbase
 			$onclick = '';
 
 			$title = in_array(static::$title_propname, static::$translateable_props)
-				? \Joomla\CMS\Language\Text::_($row->grouping_field->{static::$title_propname})
+				? JText::_($row->grouping_field->{static::$title_propname})
 				: $row->grouping_field->{static::$title_propname};
 
 			$icon_tip       = flexicontent_html::getToolTip('FLEXI_FIELD_GROUPED_INSIDE', $row->grouping_field->label, 1, 1);
@@ -113,7 +113,7 @@ abstract class JHtmlFcfields extends JHtmlFcbase
 			$link = 'index.php?option=com_flexicontent&amp;task=fields.edit&amp;view=field&amp;id='. $row->master_field->id;
 
 			$title = in_array(static::$title_propname, static::$translateable_props)
-				? \Joomla\CMS\Language\Text::_($row->master_field->{static::$title_propname})
+				? JText::_($row->master_field->{static::$title_propname})
 				: $row->master_field->{static::$title_propname};
 
 			$icon_tip       = flexicontent_html::getToolTip('FLEXI_VALGRP_DEPENDS_ON_MASTER_FIELD', htmlspecialchars($title, ENT_QUOTES, 'UTF-8'), 1, 1);
@@ -182,7 +182,7 @@ abstract class JHtmlFcfields extends JHtmlFcbase
 
 				return '
 				<span class="btn btn-primary" onclick="jQuery(\'#fieldgroup_fields_list_' . $row->id . '\').slideToggle();">'
-					. ucfirst($row_type) . ' ' . \Joomla\CMS\Language\Text::_('FLEXI_FIELDS') . '
+					. ucfirst($row_type) . ' ' . JText::_('FLEXI_FIELDS') . '
 				</span>
 				<div id="fieldgroup_fields_list_' . $row->id . '" style="display: none; position: absolute; width: 200px;">
 					<div class="alert alert-info" style="margin: 0; padding: 4px 12px;">
@@ -241,11 +241,11 @@ abstract class JHtmlFcfields extends JHtmlFcbase
 
 		if ($flexi_yes === null)
 		{
-			$flexi_yes       = \Joomla\CMS\Language\Text::_('FLEXI_YES');
-			$flexi_no        = \Joomla\CMS\Language\Text::_('FLEXI_NO');
-			$flexi_nosupport = \Joomla\CMS\Language\Text::_('FLEXI_PROPERTY_NOT_SUPPORTED', true);
-			$flexi_rebuild   = \Joomla\CMS\Language\Text::_('FLEXI_REBUILD_SEARCH_INDEX', true);
-			$flexi_toggle    = \Joomla\CMS\Language\Text::_('FLEXI_CLICK_TO_TOGGLE', true);
+			$flexi_yes       = JText::_('FLEXI_YES');
+			$flexi_no        = JText::_('FLEXI_NO');
+			$flexi_nosupport = JText::_('FLEXI_PROPERTY_NOT_SUPPORTED', true);
+			$flexi_rebuild   = JText::_('FLEXI_REBUILD_SEARCH_INDEX', true);
+			$flexi_toggle    = JText::_('FLEXI_CLICK_TO_TOGGLE', true);
 		}
 		
 		if ($row->issearch==0 || $row->issearch==1 || !$supportsearch)

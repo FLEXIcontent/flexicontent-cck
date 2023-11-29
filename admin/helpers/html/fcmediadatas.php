@@ -60,8 +60,8 @@ abstract class JHtmlFcmediadatas extends JHtmlFcbase
 		{
 			// Array of image, task, title, action
 			$states = array(
-				0 => array('cancel-circle', static::$ctrl . '.approved', \Joomla\CMS\HTML\HTMLHelper::tooltipText('FLEXI_MEDIADATA_UNAPPROVED'), \Joomla\CMS\HTML\HTMLHelper::tooltipText('FLEXI_TOGGLE'), 'color: #555;'),
-				1 => array('checkmark-2', static::$ctrl . '.unapproved', \Joomla\CMS\HTML\HTMLHelper::tooltipText('FLEXI_MEDIADATA_APPROVED'), \Joomla\CMS\HTML\HTMLHelper::tooltipText('FLEXI_TOGGLE'), 'color: darkgreen;'),
+				0 => array('cancel-circle', static::$ctrl . '.approved', JHtml::tooltipText('FLEXI_MEDIADATA_UNAPPROVED'), JHtml::tooltipText('FLEXI_TOGGLE'), 'color: #555;'),
+				1 => array('checkmark-2', static::$ctrl . '.unapproved', JHtml::tooltipText('FLEXI_MEDIADATA_APPROVED'), JHtml::tooltipText('FLEXI_TOGGLE'), 'color: darkgreen;'),
 			);
 		}
 		$value = (int) $row->approved;

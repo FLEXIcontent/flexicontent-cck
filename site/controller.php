@@ -24,7 +24,7 @@ JLoader::register('FlexicontentControllerItems', JPATH_BASE.DS.'components'.DS.'
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
+class FlexicontentController extends JControllerLegacy
 {
 	var $records_dbtbl  = 'content';
 	var $records_jtable = 'flexicontent_items';
@@ -52,12 +52,12 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		$this->registerTask('apply_type',   'save');
 		$this->registerTask('save_a_preview', 'save');
 
-		if (\Joomla\CMS\Factory::getApplication()->isClient('site'))
+		if (JFactory::getApplication()->isClient('site'))
 		{
 			$this->registerTask('download_tree',  'download');
 			$this->registerTask('download_file',  'download');
 
-			$this->input  = empty($this->input) ? \Joomla\CMS\Factory::getApplication()->input : $this->input;
+			$this->input  = empty($this->input) ? JFactory::getApplication()->input : $this->input;
 			$this->option = $this->input->get('option', '', 'cmd');
 			$this->task   = $this->input->get('task', '', 'cmd');
 			$this->view   = $this->input->get('view', '', 'cmd');
@@ -66,7 +66,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			// Get referer URL from HTTP request and validate it
 			$this->refererURL = !empty($_SERVER['HTTP_REFERER']) && flexicontent_html::is_safe_url($_SERVER['HTTP_REFERER'])
 				? $_SERVER['HTTP_REFERER']
-				: \Joomla\CMS\Uri\Uri::base();
+				: JUri::base();
 
 			// Get return URL from HTTP request and validate it
 			$this->returnURL = $this->_getReturnUrl();
@@ -93,8 +93,8 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 	function getsefurl()
 	{
 		// Initialize variables
-		$app  = \Joomla\CMS\Factory::getApplication();
-		$db   = \Joomla\CMS\Factory::getDbo();
+		$app  = JFactory::getApplication();
+		$db   = JFactory::getDbo();
 
 		$view = $this->input->get('view', '', 'cmd');
 		$cid  = $this->input->get('cid', 0, 'int');
@@ -106,7 +106,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				.' WHERE c.id = '.$cid;
 			$db->setQuery( $query );
 			$categoryslug = $db->loadResult();
-			echo \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getCategoryRoute($categoryslug), false);
+			echo JRoute::_(FlexicontentHelperRoute::getCategoryRoute($categoryslug), false);
 		}
 		jexit();
 	}
@@ -121,7 +121,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		$CLIENT_CACHEABLE_PUBLIC = 1;
 		$CLIENT_CACHEABLE_PRIVATE = 2;
 
-		$userid = \Joomla\CMS\Factory::getUser()->get('id');
+		$userid = JFactory::getUser()->get('id');
 		$cc     = $this->input->get('cc', null);
 		$view   = $this->input->get('view', '', 'cmd');
 		$layout = $this->input->get('layout', '', 'cmd');
@@ -192,7 +192,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			$safeurlparams = array();
 
 			// (1) Add menu URL variables
-			$menu = \Joomla\CMS\Factory::getApplication()->getMenu()->getActive();
+			$menu = JFactory::getApplication()->getMenu()->getActive();
 			if ($menu)
 			{
 				// Add menu Itemid to make sure that the menu items with --different-- parameter values, will display differently
@@ -229,19 +229,19 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 		// If component is serving different pages to logged users, this will avoid
 		// having users seeing same page after login/logout when conservative caching is used
-		if ( $userid = \Joomla\CMS\Factory::getUser()->get('id') )
+		if ( $userid = JFactory::getUser()->get('id') )
 		{
 			$this->input->set('__fc_user_id__', $userid);
 			$safeurlparams['__fc_user_id__'] = 'STRING';
 		}
 
-		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
+		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 		$use_mobile_layouts  = $cparams->get('use_mobile_layouts', 0);
 		$tabletSameAsDesktop = $cparams->get('force_desktop_layout', 0) == 1;
 
 		// If component is serving different pages for mobile devices, this will avoid
 		// having users seeing the same page regardless of being on desktop or mobile
-		$mobileDetector = flexicontent_html::getMobileDetector();  //$client = \Joomla\CMS\Factory::getApplication()->client; $isMobile = $client->mobile;
+		$mobileDetector = flexicontent_html::getMobileDetector();  //$client = JFactory::getApplication()->client; $isMobile = $client->mobile;
 		$isMobile = $mobileDetector->isMobile();
 		$isTablet = $mobileDetector->isTablet();
 		if ( $use_mobile_layouts && $isMobile && (!$isTablet || !$tabletSameAsDesktop) )
@@ -273,7 +273,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 	function vote()
 	{
 		// Initialize variables
-		$app     = \Joomla\CMS\Factory::getApplication();
+		$app     = JFactory::getApplication();
 
 		$id   = $this->input->get('id', 0, 'int');
 		$cid  = $this->input->get('cid', 0, 'int');
@@ -284,12 +284,12 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		{
 			if ($url)
 			{
-				$dolog = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' )->get('print_logging_info');
-				if ( $dolog ) \Joomla\CMS\Factory::getApplication()->enqueueMessage( 'refused redirection to possible unsafe URL: '.$url, 'notice' );
+				$dolog = JComponentHelper::getParams( 'com_flexicontent' )->get('print_logging_info');
+				if ( $dolog ) JFactory::getApplication()->enqueueMessage( 'refused redirection to possible unsafe URL: '.$url, 'notice' );
 			}
 			global $globalcats;
 			$Itemid = $this->input->get('Itemid', 0, 'int');  // maintain current menu item if this was given
-			$url = \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getItemRoute($id, $globalcats[$cid]->slug, $Itemid));
+			$url = JRoute::_(FlexicontentHelperRoute::getItemRoute($id, $globalcats[$cid]->slug, $Itemid));
 		}
 
 		// Finally store the vote
@@ -308,10 +308,10 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 	 */
 	function ajaxfav()
 	{
-		$app     = \Joomla\CMS\Factory::getApplication();
-		$user    = \Joomla\CMS\Factory::getUser();
-		//$db      = \Joomla\CMS\Factory::getDbo();
-		//$cparams = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
+		$app     = JFactory::getApplication();
+		$user    = JFactory::getUser();
+		//$db      = JFactory::getDbo();
+		//$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 
 		$id   = $this->input->get('id', 0, 'int');
 		$type = $this->input->get('type', 'item', 'cmd');
@@ -323,7 +323,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 		// Get Favourites field configuration
 		$favs_field = reset(FlexicontentFields::getFieldsByIds(array(12)));
-		$favs_field->parameters = new \Joomla\Registry\Registry($favs_field->attribs);
+		$favs_field->parameters = new JRegistry($favs_field->attribs);
 
 		$usercount = (int) $favs_field->parameters->get('display_favoured_usercount', 0);
 		$allow_guests_favs = $favs_field->parameters->get('allow_guests_favs', 1);
@@ -383,9 +383,9 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 	 */
 	function getreviewform()
 	{
-		$app  = \Joomla\CMS\Factory::getApplication();
-		$user = \Joomla\CMS\Factory::getUser();
-		$db   = \Joomla\CMS\Factory::getDbo();
+		$app  = JFactory::getApplication();
+		$user = JFactory::getUser();
+		$db   = JFactory::getDbo();
 
 		$html_tagid  = $this->input->get('tagid', '', 'cmd');
 		$content_id  = $this->input->get('content_id', 0, 'int');
@@ -474,7 +474,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 						<tr class="fcvote_review_form_title_row">
 							<td class="key">
-								<label class="fc-prop-lbl" for="fcvote_review_form_' . $item->id . '_title">' . \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_TITLE') . '</label>
+								<label class="fc-prop-lbl" for="fcvote_review_form_' . $item->id . '_title">' . JText::_('FLEXI_VOTE_REVIEW_TITLE') . '</label>
 							</td>
 							<td>
 								<input type="text" name="title" size="200"
@@ -486,7 +486,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 						<tr class="fcvote_review_form_email_row">
 							<td class="key">
-								<label class="fc-prop-lbl" for="fcvote_review_form_' . $item->id . '_email">' . \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_EMAIL') . '</label>
+								<label class="fc-prop-lbl" for="fcvote_review_form_' . $item->id . '_email">' . JText::_('FLEXI_VOTE_REVIEW_EMAIL') . '</label>
 							</td>
 							<td>' . ($user->id ? '<span class=badge>' . $user->email . '</span>' : '
 								<input required type="text" name="email" size="200"
@@ -498,7 +498,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 						<tr class="fcvote_review_form_text_row">
 							<td class="key">
-								<label class="fc-prop-lbl" for="fcvote_review_form_' . $item->id . '_text">'.\Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_TEXT').'</label>
+								<label class="fc-prop-lbl" for="fcvote_review_form_' . $item->id . '_text">'.JText::_('FLEXI_VOTE_REVIEW_TEXT').'</label>
 							</td>
 							<td class="top">
 								<textarea required name="text" rows="4" cols="200" id="fcvote_review_form_' . $item->id . '_text" >' . ($review ? $review->text : '') . '</textarea>
@@ -510,7 +510,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 							<td class="top">
 								<input type="button" class="btn btn-success fcvote_review_form_submit_btn"
 									onclick="fcvote_submit_review_form(\'' . $html_tagid . '\', this.form); return false;"
-									value="' . \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_SUMBIT') . '"
+									value="' . JText::_('FLEXI_VOTE_REVIEW_SUMBIT') . '"
 								/>
 							</td>
 						</tr>
@@ -526,9 +526,9 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 	function storereviewform()
 	{
-		$app  = \Joomla\CMS\Factory::getApplication();
-		$user = \Joomla\CMS\Factory::getUser();
-		$db   = \Joomla\CMS\Factory::getDbo();
+		$app  = JFactory::getApplication();
+		$user = JFactory::getUser();
+		$db   = JFactory::getDbo();
 
 		$review_id   = $this->input->get('review_id', 0, 'int');
 		$content_id  = $this->input->get('content_id', 0, 'int');
@@ -594,8 +594,8 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 		if (!count($errors))
 		{
-			// Get a 'flexicontent_reviews' \Joomla\CMS\Table\Table instance
-			$review = \Joomla\CMS\Table\Table::getInstance($type = 'flexicontent_reviews', $prefix = '', $config = array());
+			// Get a 'flexicontent_reviews' JTable instance
+			$review = JTable::getInstance($type = 'flexicontent_reviews', $prefix = '', $config = array());
 
 			$review_props = array('content_id' => $content_id, 'user_id' => $user->id, 'type' => $review_type);
 
@@ -673,16 +673,16 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 	 */
 	private function reviewPrepare($content_id, & $item = null, & $field = null, $errors = null, $checkSubmit = true)
 	{
-		$app  = \Joomla\CMS\Factory::getApplication();
-		$user = \Joomla\CMS\Factory::getUser();
-		$db   = \Joomla\CMS\Factory::getDbo();
+		$app  = JFactory::getApplication();
+		$user = JFactory::getUser();
+		$db   = JFactory::getDbo();
 
 
 		/**
 		 * Load content item related to the review
 		 */
 
-		$item = \Joomla\CMS\Table\Table::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
+		$item = JTable::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
 
 		if (!$item->load($content_id))
 		{
@@ -703,8 +703,8 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		FlexicontentFields::loadFieldConfig($field, $item);
 
 		// Load field's language files
-		\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, 'en-GB', true);
-		\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, null, true);
+		JFactory::getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, 'en-GB', true);
+		JFactory::getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, null, true);
 
 		// Get needed parameters
 		$allow_reviews = (int) $field->parameters->get('allow_reviews', 0);
@@ -728,7 +728,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				$logged_no_acc_msg = $field->parameters->get('logged_no_acc_msg', '');
 				$guest_no_acc_msg  = $field->parameters->get('guest_no_acc_msg', '');
 				$no_acc_msg = $user->id ? $logged_no_acc_msg : $guest_no_acc_msg;
-				$no_acc_msg = $no_acc_msg ? \Joomla\CMS\Language\Text::_($no_acc_msg) : '';
+				$no_acc_msg = $no_acc_msg ? JText::_($no_acc_msg) : '';
 
 				// Message not set create a Default Message
 				if (!$no_acc_msg)
@@ -745,7 +745,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 						}
 					}
 
-					$no_acc_msg = \Joomla\CMS\Language\Text::sprintf( 'FLEXI_NO_ACCESS_TO_VOTE' , $acclvl_name);
+					$no_acc_msg = JText::sprintf( 'FLEXI_NO_ACCESS_TO_VOTE' , $acclvl_name);
 				}
 
 				$errors[] = 'You are not authorized to submit reviews';
@@ -777,7 +777,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 	function addtag()
 	{
 		// Check for request forgeries
-		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
 
 		$name = $this->input->get('name', null, 'string');
 		$cid  = $this->input->get('id', array(0), 'array');
@@ -807,7 +807,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 		if (!FlexicontentHelperPerm::getPerm()->CanCreateTags)
 		{
-			echo "0|".\Joomla\CMS\Language\Text::_('FLEXI_NO_AUTH_CREATE_NEW_TAGS');
+			echo "0|".JText::_('FLEXI_NO_AUTH_CREATE_NEW_TAGS');
 			jexit();
 		}
 
@@ -860,11 +860,11 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		// Import and Initialize some joomla API variables
 		jimport('joomla.filesystem.file');
 
-		$app   = \Joomla\CMS\Factory::getApplication();
-		$db    = \Joomla\CMS\Factory::getDbo();
-		$user  = \Joomla\CMS\Factory::getUser();
-		$session = \Joomla\CMS\Factory::getSession();
-		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
+		$app   = JFactory::getApplication();
+		$db    = JFactory::getDbo();
+		$user  = JFactory::getUser();
+		$session = JFactory::getSession();
+		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 
 
 		$task   = $this->input->get('task', 'download', 'cmd');
@@ -921,9 +921,9 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				return;
 			}
 
-			$app = \Joomla\CMS\Factory::getApplication();
+			$app = JFactory::getApplication();
 			$tmp_ffname = 'fcmd_uid_'.$user->id.'_'.date('Y-m-d__H-i-s');
-			$targetpath = \Joomla\CMS\Filesystem\Path::clean($app->getCfg('tmp_path') .DS. $tmp_ffname);
+			$targetpath = JPath::clean($app->getCfg('tmp_path') .DS. $tmp_ffname);
 
 			$tree_files = $this->_traverseFileTree($nodes, $targetpath);
 			//echo "<pre>"; print_r($tree_files); jexit();
@@ -1021,7 +1021,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				$q = 'SELECT attribs, name, field_type FROM #__flexicontent_fields WHERE id = '.(int) $field_id;
 				$db->setQuery($q);
 				$fld = $db->loadObject();
-				$fields_conf[$field_id] = new \Joomla\Registry\Registry($fld->attribs);
+				$fields_conf[$field_id] = new JRegistry($fld->attribs);
 				$fields_props[$field_id] = $fld;
 			}
 			$field_type = $fields_props[$field_id]->field_type;
@@ -1069,17 +1069,17 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			{
 				if (empty($file))
 				{
-					$msg = \Joomla\CMS\Language\Text::_('FLEXI_FDC_FAILED_TO_FIND_DATA');     // Failed to match DB data to the download URL data
+					$msg = JText::_('FLEXI_FDC_FAILED_TO_FIND_DATA');     // Failed to match DB data to the download URL data
 				}
 
 				else
 				{
-					$msg = \Joomla\CMS\Language\Text::_( 'FLEXI_ALERTNOTAUTH' );
+					$msg = JText::_( 'FLEXI_ALERTNOTAUTH' );
 
 					if (!empty($file_node->coupon))
 					{
-						if ( $file_node->coupon->has_expired )              $msg .= \Joomla\CMS\Language\Text::_('FLEXI_FDC_COUPON_HAS_EXPIRED');         // No access and given coupon has expired
-						else if ( $file_node->coupon->has_reached_limit )   $msg .= \Joomla\CMS\Language\Text::_('FLEXI_FDC_COUPON_REACHED_USAGE_LIMIT'); // No access and given coupon has reached download limit
+						if ( $file_node->coupon->has_expired )              $msg .= JText::_('FLEXI_FDC_COUPON_HAS_EXPIRED');         // No access and given coupon has expired
+						else if ( $file_node->coupon->has_reached_limit )   $msg .= JText::_('FLEXI_FDC_COUPON_REACHED_USAGE_LIMIT'); // No access and given coupon has reached download limit
 						else $msg = "unreachable code in download coupon handling";
 					}
 
@@ -1087,13 +1087,13 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 					{
 						if (isset($file_node->coupon))
 						{
-							$msg .= "<br/> <small>".\Joomla\CMS\Language\Text::_('FLEXI_FDC_COUPON_NO_LONGER_USABLE')."</small>";
+							$msg .= "<br/> <small>".JText::_('FLEXI_FDC_COUPON_NO_LONGER_USABLE')."</small>";
 						}
 
 						// Redirect unlogged user to login
 						if ($user->guest)
 						{
-							$uri    = \Joomla\CMS\Uri\Uri::getInstance();
+							$uri    = JUri::getInstance();
 							$return	= $uri->toString();
 							$url    = $cparams->get('login_page', 'index.php?option=com_users&view=login');
 							$return = strtr(base64_encode($return), '+/=', '-_,');
@@ -1101,7 +1101,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 							$url   .= '&isfcurl=1';
 
 							$app->setHeader('status', 403, true);
-							$app->enqueueMessage(\Joomla\CMS\Language\Text::sprintf('FLEXI_LOGIN_TO_ACCESS', $url), 'error');
+							$app->enqueueMessage(JText::sprintf('FLEXI_LOGIN_TO_ACCESS', $url), 'error');
 							$app->redirect($url);
 						}
 
@@ -1116,22 +1116,22 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 						elseif(!JDEBUG)
 						{
 							$app->setHeader('status', 403, true);
-							$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_VIEW'), 'error');
+							$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_VIEW'), 'error');
 							$app->redirect('index.php');
 						}
 
 						// JDEBUG is ON, output a detailed message
 						$msg .= ''
-							.(!$file->has_content_access ? "<br/><br/> ".\Joomla\CMS\Language\Text::_('FLEXI_FDC_NO_ACCESS_TO')
-								." -- ".\Joomla\CMS\Language\Text::_('FLEXI_FDC_CONTENT_CONTAINS')." ".\Joomla\CMS\Language\Text::_('FLEXI_FDC_WEBLINK')
-								."<br/><small>(".\Joomla\CMS\Language\Text::_('FLEXI_FDC_CONTENT_EXPLANATION').")</small>"
+							.(!$file->has_content_access ? "<br/><br/> ".JText::_('FLEXI_FDC_NO_ACCESS_TO')
+								." -- ".JText::_('FLEXI_FDC_CONTENT_CONTAINS')." ".JText::_('FLEXI_FDC_WEBLINK')
+								."<br/><small>(".JText::_('FLEXI_FDC_CONTENT_EXPLANATION').")</small>"
 								: '')
-							.(!$file->has_field_access ? "<br/><br/> ".\Joomla\CMS\Language\Text::_('FLEXI_FDC_NO_ACCESS_TO')
-								." -- ".\Joomla\CMS\Language\Text::_('FLEXI_FDC_FIELD_CONTAINS')." ".\Joomla\CMS\Language\Text::_('FLEXI_FDC_WEBLINK')
+							.(!$file->has_field_access ? "<br/><br/> ".JText::_('FLEXI_FDC_NO_ACCESS_TO')
+								." -- ".JText::_('FLEXI_FDC_FIELD_CONTAINS')." ".JText::_('FLEXI_FDC_WEBLINK')
 								: '')
-							.(!$file->has_file_access ? "<br/><br/> ".\Joomla\CMS\Language\Text::_('FLEXI_FDC_NO_ACCESS_TO') ." -- ".\Joomla\CMS\Language\Text::_('FLEXI_FDC_FILE')." " : '')
+							.(!$file->has_file_access ? "<br/><br/> ".JText::_('FLEXI_FDC_NO_ACCESS_TO') ." -- ".JText::_('FLEXI_FDC_FILE')." " : '')
 						;
-						$msg .= "<br/><br/> ". \Joomla\CMS\Language\Text::sprintf('FLEXI_FDC_FILE_DATA', $file_id, $content_id, $field_id);
+						$msg .= "<br/><br/> ". JText::sprintf('FLEXI_FDC_FILE_DATA', $file_id, $content_id, $field_id);
 					}
 
 					// Enqueue the final created message
@@ -1154,11 +1154,11 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			if (!$file->url)
 			{
 				$basePath = $file->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;
-				$file->abspath = str_replace(DS, '/', \Joomla\CMS\Filesystem\Path::clean($basePath.DS.$file->filename));
+				$file->abspath = str_replace(DS, '/', JPath::clean($basePath.DS.$file->filename));
 
-				if (!\Joomla\CMS\Filesystem\File::exists($file->abspath))
+				if (!JFile::exists($file->abspath))
 				{
-					$msg = \Joomla\CMS\Language\Text::_( 'FLEXI_REQUESTED_FILE_DOES_NOT_EXIST_ANYMORE' );
+					$msg = JText::_( 'FLEXI_REQUESTED_FILE_DOES_NOT_EXIST_ANYMORE' );
 					$app->enqueueMessage($msg, 'notice');
 
 					// Only abort for single file download
@@ -1172,21 +1172,21 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			else
 			{
 				/**
-				 * We may need absolute URL path later use \Joomla\CMS\Uri\Uri::root() !! for media manager Links
+				 * We may need absolute URL path later use JUri::root() !! for media manager Links
 				 * we may use readfile(Absolute URL) to force download of a URL link !!
 				 */
 				$file->abspath = $file->url == 2
-					? \Joomla\CMS\Uri\Uri::root() . $file->filename
+					? JUri::root() . $file->filename
 					: $file->filename;
 			}
 
 
 			/**
-			 * Get item and field \Joomla\CMS\Table\Table records, and then load field's configuration
+			 * Get item and field JTable records, and then load field's configuration
 			 */
 
-			$item = \Joomla\CMS\Table\Table::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
-			$field = \Joomla\CMS\Table\Table::getInstance($type = 'flexicontent_fields', $prefix = '', $config = array());
+			$item = JTable::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
+			$field = JTable::getInstance($type = 'flexicontent_fields', $prefix = '', $config = array());
 			$item->load($file_node->contentid);
 			$field->load($file_node->fieldid);
 			FlexicontentFields::loadFieldConfig($field, $item);
@@ -1198,8 +1198,8 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			 */
 
 			ob_start();
-			\Joomla\CMS\Plugin\PluginHelper::importPlugin('system');
-			\Joomla\CMS\Plugin\PluginHelper::importPlugin('flexicontent_fields');
+			JPluginHelper::importPlugin('system');
+			JPluginHelper::importPlugin('flexicontent_fields');
 			$text = ob_get_contents();
 			ob_end_clean();
 
@@ -1236,7 +1236,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			 * Increment hits counter of file, and hits counter of file-user history
 			 */
 
-			$filetable = \Joomla\CMS\Table\Table::getInstance('flexicontent_files', '');
+			$filetable = JTable::getInstance('flexicontent_files', '');
 			$filetable->hit($file_id);
 			if ( empty($file->history_id) )
 			{
@@ -1283,7 +1283,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			{
 				// Check and prefix URL Media manager links too
 				$url = $file->url == 2
-					? \Joomla\CMS\Uri\Uri::root(true) . '/' . $file->filename
+					? JUri::root(true) . '/' . $file->filename
 					: $file->filename;
 				$ext = strtolower(flexicontent_upload::getExt($url));
 
@@ -1352,14 +1352,14 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			$result = preg_match_all("/\%\%([^%]+)\%\%/", $file->header_text, $translate_matches);
 			if (!empty($translate_matches[1])) foreach ($translate_matches[1] as $translate_string)
 			{
-				$file->header_text = str_replace('%%'.$translate_string.'%%', \Joomla\CMS\Language\Text::_($translate_string), $file->header_text);
+				$file->header_text = str_replace('%%'.$translate_string.'%%', JText::_($translate_string), $file->header_text);
 			}
 			$file->header_text = str_replace('{{current_date}}', $current_date, $file->header_text);
 
 			$result = preg_match_all("/\%\%([^%]+)\%\%/", $file->footer_text, $translate_matches);
 			if (!empty($translate_matches[1])) foreach ($translate_matches[1] as $translate_string)
 			{
-				$file->footer_text = str_replace('%%'.$translate_string.'%%', \Joomla\CMS\Language\Text::_($translate_string), $file->footer_text);
+				$file->footer_text = str_replace('%%'.$translate_string.'%%', JText::_($translate_string), $file->footer_text);
 			}
 			$file->footer_text = str_replace('{{current_date}}', $current_date, $file->footer_text);
 
@@ -1377,13 +1377,13 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				$item->access = $file->item_access;
 				$item->type_id = $file->item_type_id;
 				$item->language = $file->item_language;
-				$file->__item_url__ = \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getItemRoute($file->itemslug, $file->catslug, 0, $item));
+				$file->__item_url__ = JRoute::_(FlexicontentHelperRoute::getItemRoute($file->itemslug, $file->catslug, 0, $item));
 
 				// Parse and identify language strings and then make language replacements
 				$notification_tmpl = $fields_conf[$field_id]->get('notification_tmpl');
 				if ( empty($notification_tmpl) )
 				{
-					$notification_tmpl = \Joomla\CMS\Language\Text::_('FLEXI_HITS') .": ".$file->hits;
+					$notification_tmpl = JText::_('FLEXI_HITS') .": ".$file->hits;
 					$notification_tmpl .= '%%FLEXI_FDN_FILE_NO%% __file_id__:  "__file_title__" '."\n";
 					$notification_tmpl .= '%%FLEXI_FDN_FILE_IN_ITEM%% "__item_title__":' ."\n";
 					$notification_tmpl .= '__item_url__';
@@ -1393,7 +1393,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				$translate_strings = $result ? $translate_matches[1] : array();
 				foreach ($translate_strings as $translate_string)
 				{
-					$notification_tmpl = str_replace('%%'.$translate_string.'%%', \Joomla\CMS\Language\Text::_($translate_string), $notification_tmpl);
+					$notification_tmpl = str_replace('%%'.$translate_string.'%%', JText::_($translate_string), $notification_tmpl);
 				}
 				$file->notification_tmpl = $notification_tmpl;
 
@@ -1448,10 +1448,10 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		{
 			ob_start();
 			$sendermail	= $app->getCfg('mailfrom');
-			$sendermail	= \Joomla\CMS\Mail\MailHelper::cleanAddress($sendermail);
+			$sendermail	= JMailHelper::cleanAddress($sendermail);
 			$sendername	= $app->getCfg('sitename');
-			$subject    = \Joomla\CMS\Language\Text::_('FLEXI_FDN_FILE_DOWNLOAD_REPORT');
-			$message_header = \Joomla\CMS\Language\Text::_('FLEXI_FDN_FILE_DOWNLOAD_REPORT_BY') .': '. $user->name .' ['.$user->username .']';
+			$subject    = JText::_('FLEXI_FDN_FILE_DOWNLOAD_REPORT');
+			$message_header = JText::_('FLEXI_FDN_FILE_DOWNLOAD_REPORT_BY') .': '. $user->name .' ['.$user->username .']';
 
 
 			/**
@@ -1461,7 +1461,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			// Personalized email per subscribers
 			foreach ($email_recipients as $email_addr => $files_arr)
 			{
-				$to = \Joomla\CMS\Mail\MailHelper::cleanAddress($email_addr);
+				$to = JMailHelper::cleanAddress($email_addr);
 				$_message = $message_header;
 
 				foreach($files_arr as $filedata)
@@ -1474,7 +1474,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 					$_mssg_file = str_ireplace('__item_url__', $filedata->__item_url__, $_mssg_file);
 					$count = 0;
 					$_mssg_file = str_ireplace('__file_hits__', $filedata->hits, $_mssg_file, $count);
-					if ($count == 0) $_mssg_file = \Joomla\CMS\Language\Text::_('FLEXI_HITS') .": ".$file->hits ."\n". $_mssg_file;
+					if ($count == 0) $_mssg_file = JText::_('FLEXI_HITS') .": ".$file->hits ."\n". $_mssg_file;
 					$_message .= "\n\n" . $_mssg_file;
 				}
 				//echo "<pre>". $_message ."</pre>";
@@ -1485,7 +1485,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				$html_mode=false; $cc=null; $bcc=null;
 				$attachment=null; $replyto=null; $replytoname=null;
 
-				$send_result = \Joomla\CMS\Factory::getMailer()->sendMail( $from, $fromname, $recipient, $subject, $_message, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
+				$send_result = JFactory::getMailer()->sendMail( $from, $fromname, $recipient, $subject, $_message, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
 			}
 			ob_end_clean();
 		}
@@ -1510,10 +1510,10 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		else
 		{
 			// Create target (top level) folder
-			\Joomla\CMS\Filesystem\Folder::create($targetpath, 0755);
+			JFolder::create($targetpath, 0755);
 
 			// Copy Files
-			foreach ($valid_files as $file) \Joomla\CMS\Filesystem\File::copy($file->abspath, $file->node->targetpath);
+			foreach ($valid_files as $file) JFile::copy($file->abspath, $file->node->targetpath);
 
 			// Create text/html file with ITEM title / descriptions
 			// TODO replace this with a TEMPLATE file ...
@@ -1543,9 +1543,9 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			fclose($handle_htm);
 
 			// Get file list recursively, and calculate archive filename
-			$fileslist   = \Joomla\CMS\Filesystem\Folder::files($targetpath, '.', $recurse=true, $fullpath=true);
+			$fileslist   = JFolder::files($targetpath, '.', $recurse=true, $fullpath=true);
 			$archivename = $tmp_ffname . '.zip';
-			$archivepath = \Joomla\CMS\Filesystem\Path::clean( $app->getCfg('tmp_path').DS.$archivename );
+			$archivepath = JPath::clean( $app->getCfg('tmp_path').DS.$archivename );
 
 
 			/**
@@ -1556,7 +1556,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			$zip_result = $za->open($archivepath, ZipArchive::CREATE);
 			if ($zip_result !== true)
 			{
-				$msg = \Joomla\CMS\Language\Text::_('FLEXI_OPERATION_FAILED'). ": compressed archive could not be created";
+				$msg = JText::_('FLEXI_OPERATION_FAILED'). ": compressed archive could not be created";
 				$app->enqueueMessage($msg, 'notice');
 				$this->setRedirect('index.php', '');
 				return;
@@ -1569,27 +1569,27 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			 * Remove temporary folder structure
 			 */
 
-			if (!\Joomla\CMS\Filesystem\Folder::delete(($targetpath)) )
+			if (!JFolder::delete(($targetpath)) )
 			{
 				$msg = "Temporary folder ". $targetpath ." could not be deleted";
 				$app->enqueueMessage($msg, 'notice');
 			}
 
 			// Delete old files (they can not be deleted during download time ...)
-			$tmp_path = \Joomla\CMS\Filesystem\Path::clean($app->getCfg('tmp_path'));
-			$matched_files = \Joomla\CMS\Filesystem\Folder::files($tmp_path, 'fcmd_uid_.*', $recurse=false, $fullpath=true);
+			$tmp_path = JPath::clean($app->getCfg('tmp_path'));
+			$matched_files = JFolder::files($tmp_path, 'fcmd_uid_.*', $recurse=false, $fullpath=true);
 
 			foreach ($matched_files as $archive_file)
 			{
 				//echo "Seconds passed:". (time() - filemtime($tmp_folder)) ."<br>". "$filename was last modified: " . date ("F d Y H:i:s.", filemtime($tmp_folder)) . "<br>";
-				if (time() - filemtime($archive_file) > 3600) \Joomla\CMS\Filesystem\File::delete($archive_file);
+				if (time() - filemtime($archive_file) > 3600) JFile::delete($archive_file);
 			}
 
 			// Delete old tmp folder (in case that the some archiving procedures were interrupted thus their tmp folder were not deleted)
-			$matched_folders = \Joomla\CMS\Filesystem\Folder::folders($tmp_path, 'fcmd_uid_.*', $recurse=false, $fullpath=true);
+			$matched_folders = JFolder::folders($tmp_path, 'fcmd_uid_.*', $recurse=false, $fullpath=true);
 			foreach ($matched_folders as $tmp_folder) {
 				//echo "Seconds passed:". (time() - filemtime($tmp_folder)) ."<br>". "$filename was last modified: " . date ("F d Y H:i:s.", filemtime($tmp_folder)) . "<br>";
-				\Joomla\CMS\Filesystem\Folder::delete($tmp_folder);
+				JFolder::delete($tmp_folder);
 			}
 
 			$dlfile = new stdClass();
@@ -1792,10 +1792,10 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 	function weblink()
 	{
 		// Import and Initialize some joomla API variables
-		$app     = \Joomla\CMS\Factory::getApplication();
-		$db      = \Joomla\CMS\Factory::getDbo();
-		$user    = \Joomla\CMS\Factory::getUser();
-		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
+		$app     = JFactory::getApplication();
+		$db      = JFactory::getDbo();
+		$user    = JFactory::getUser();
+		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 
 		// Get HTTP REQUEST variables
 		$field_id    = $this->input->get('fid', 0, 'int');
@@ -1838,7 +1838,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		{
 			if (empty($link_data))
 			{
-				$msg = \Joomla\CMS\Language\Text::_('FLEXI_FDC_FAILED_TO_FIND_DATA');     // Failed to match DB data to the download URL data
+				$msg = JText::_('FLEXI_FDC_FAILED_TO_FIND_DATA');     // Failed to match DB data to the download URL data
 			}
 
 			else
@@ -1846,7 +1846,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				// Redirect unlogged user to login
 				if ($user->guest)
 				{
-					$uri    = \Joomla\CMS\Uri\Uri::getInstance();
+					$uri    = JUri::getInstance();
 					$return	= $uri->toString();
 					$url    = $cparams->get('login_page', 'index.php?option=com_users&view=login');
 					$return = strtr(base64_encode($return), '+/=', '-_,');
@@ -1854,7 +1854,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 					$url   .= '&isfcurl=1';
 
 					$app->setHeader('status', 403, true);
-					$app->enqueueMessage(\Joomla\CMS\Language\Text::sprintf('FLEXI_LOGIN_TO_ACCESS', $url), 'error');
+					$app->enqueueMessage(JText::sprintf('FLEXI_LOGIN_TO_ACCESS', $url), 'error');
 					$app->redirect($url);
 				}
 
@@ -1869,22 +1869,22 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				elseif(!JDEBUG)
 				{
 					$app->setHeader('status', 403, true);
-					$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_VIEW'), 'error');
+					$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_VIEW'), 'error');
 					$app->redirect('index.php');
 				}
 
 				// JDEBUG is ON, output a detailed message
-				$msg  = \Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH');
+				$msg  = JText::_('FLEXI_ALERTNOTAUTH');
 				$msg .= ""
-					.(!$link_data->has_content_access ? "<br/><br/> ".\Joomla\CMS\Language\Text::_('FLEXI_FDC_NO_ACCESS_TO')
-							." -- ".\Joomla\CMS\Language\Text::_('FLEXI_FDC_CONTENT_CONTAINS')." ".\Joomla\CMS\Language\Text::_('FLEXI_FDC_WEBLINK')
-							."<br/><small>(".\Joomla\CMS\Language\Text::_('FLEXI_FDC_CONTENT_EXPLANATION').")</small>"
+					.(!$link_data->has_content_access ? "<br/><br/> ".JText::_('FLEXI_FDC_NO_ACCESS_TO')
+							." -- ".JText::_('FLEXI_FDC_CONTENT_CONTAINS')." ".JText::_('FLEXI_FDC_WEBLINK')
+							."<br/><small>(".JText::_('FLEXI_FDC_CONTENT_EXPLANATION').")</small>"
 						: '')
-					.(!$link_data->has_field_access ? "<br/><br/> ".\Joomla\CMS\Language\Text::_('FLEXI_FDC_NO_ACCESS_TO')
-							." -- ".\Joomla\CMS\Language\Text::_('FLEXI_FDC_FIELD_CONTAINS')." ".\Joomla\CMS\Language\Text::_('FLEXI_FDC_WEBLINK')
+					.(!$link_data->has_field_access ? "<br/><br/> ".JText::_('FLEXI_FDC_NO_ACCESS_TO')
+							." -- ".JText::_('FLEXI_FDC_FIELD_CONTAINS')." ".JText::_('FLEXI_FDC_WEBLINK')
 						: '')
 				;
-				$msg .= "<br/><br/> ". \Joomla\CMS\Language\Text::sprintf('FLEXI_FDC_WEBLINK_DATA', $value_order, $content_id, $field_id);
+				$msg .= "<br/><br/> ". JText::sprintf('FLEXI_FDC_WEBLINK_DATA', $value_order, $content_id, $field_id);
 			}
 
 			// Enqueue the final created message
@@ -1897,11 +1897,11 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 
 		/**
-		 * Get item and field \Joomla\CMS\Table\Table records, and then load field's configuration
+		 * Get item and field JTable records, and then load field's configuration
 		 */
 
-		$item = \Joomla\CMS\Table\Table::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
-		$field = \Joomla\CMS\Table\Table::getInstance($type = 'flexicontent_fields', $prefix = '', $config = array());
+		$item = JTable::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
+		$field = JTable::getInstance($type = 'flexicontent_fields', $prefix = '', $config = array());
 		$item->load($content_id);
 		$field->load($field_id);
 		FlexicontentFields::loadFieldConfig($field, $item);
@@ -1913,8 +1913,8 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		 */
 
 		ob_start();
-		\Joomla\CMS\Plugin\PluginHelper::importPlugin('system');
-		\Joomla\CMS\Plugin\PluginHelper::importPlugin('flexicontent_fields');
+		JPluginHelper::importPlugin('system');
+		JPluginHelper::importPlugin('flexicontent_fields');
 		$text = ob_get_contents();
 		ob_end_clean();
 
@@ -1982,9 +1982,9 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 	function viewtags()
 	{
 		// Check for request forgeries
-		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
 
-		$app    = \Joomla\CMS\Factory::getApplication();
+		$app    = JFactory::getApplication();
 		$perms  = FlexicontentHelperPerm::getPerm();
 
 		@ob_end_clean();
@@ -2001,7 +2001,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		{
 			$array[] = (object) array(
 				'id' => '0',
-				'name' => \Joomla\CMS\Language\Text::_('FLEXI_FIELD_NO_ACCESS')
+				'name' => JText::_('FLEXI_FIELD_NO_ACCESS')
 			);
 		}
 		else
@@ -2027,7 +2027,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			{
 				$array[] = (object) array(
 					'id' => '0',
-					'name' => \Joomla\CMS\Language\Text::_($perms->CanCreateTags ? 'FLEXI_NEW_TAG_ENTER_TO_CREATE' : 'FLEXI_NO_TAGS_FOUND')
+					'name' => JText::_($perms->CanCreateTags ? 'FLEXI_NEW_TAG_ENTER_TO_CREATE' : 'FLEXI_NO_TAGS_FOUND')
 				);
 			}
 		}
@@ -2038,7 +2038,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 	function search()
 	{
-		$app = \Joomla\CMS\Factory::getApplication();
+		$app = JFactory::getApplication();
 
 		// Strip characters that will cause errors
 		$badchars = array('#','>','<','\\');
@@ -2063,7 +2063,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		$Itemid = $this->input->get('Itemid', 0, 'int');
 		if (!$Itemid)
 		{
-			$menus = \Joomla\CMS\Factory::getApplication()->getMenu();
+			$menus = JFactory::getApplication()->getMenu();
 			$items = $menus->getItems('link', 'index.php?option=com_flexicontent&view=search');
 
 			if(isset($items[0]))
@@ -2094,7 +2094,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 	{
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = JFactory::getUser();
 		$select_access = $joinacc = $andacc = '';
 		$aid_arr = $user->getAuthorisedViewLevels();
 		$aid_list = implode(',', $aid_arr);
@@ -2161,8 +2161,8 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			// Folder (Parent node)
 			if ($node->isParent)
 			{
-				$targetpath_node = \Joomla\CMS\Filesystem\Path::clean($targetpath.DS.$node->name);
-				\Joomla\CMS\Filesystem\Folder::create($targetpath_node, 0755);
+				$targetpath_node = JPath::clean($targetpath.DS.$node->name);
+				JFolder::create($targetpath_node, 0755);
 
 				// Folder has sub-contents
 				if (!empty($node->children))
@@ -2222,7 +2222,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		// Check return URL if empty or not safe and set a default one
 		if (empty($return) || !flexicontent_html::is_safe_url($return))
 		{
-			$app = \Joomla\CMS\Factory::getApplication();
+			$app = JFactory::getApplication();
 
 			if ($app->isClient('administrator') && ($this->view === $this->record_name || $this->view === $this->record_name_pl))
 			{
@@ -2230,7 +2230,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			}
 			else
 			{
-				$return = $app->isClient('administrator') ? 'index.php?option=com_flexicontent' : \Joomla\CMS\Uri\Uri::base();
+				$return = $app->isClient('administrator') ? 'index.php?option=com_flexicontent' : JUri::base();
 			}
 		}
 
@@ -2250,7 +2250,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 	 */
 	protected function _getRecordsQuery($cid, $cols)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 
 		$cid = ArrayHelper::toInteger($cid);
 		$cols_list = implode(',', array_filter($cols, array($db, 'quoteName')));

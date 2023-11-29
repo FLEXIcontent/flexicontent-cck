@@ -10,16 +10,15 @@
 defined('_JEXEC') or die;
 
 use Joomla\Registry\Registry;
-use \Joomla\Component\Finder\Administrator\Indexer\Adapter;
 
-//JLoader::register('FinderIndexerAdapter', JPATH_ADMINISTRATOR . '/components/com_finder/helpers/indexer/adapter.php');
+JLoader::register('FinderIndexerAdapter', JPATH_ADMINISTRATOR . '/components/com_finder/helpers/indexer/adapter.php');
 
 /**
  * Smart Search adapter for com_flexicontent.
  *
  * @since  2.5
  */
-class plgFinderFLEXIcontent extends Adapter
+class plgFinderFLEXIcontent extends FinderIndexerAdapter
 {
 	/**
 	 * The plugin identifier.
@@ -110,7 +109,7 @@ class plgFinderFLEXIcontent extends Adapter
 	 * Method to remove the link information for items that have been deleted.
 	 *
 	 * @param   string  $context  The context of the action being performed.
-	 * @param   \Joomla\CMS\Table\Table  $table    A \Joomla\CMS\Table\Table object containing the record to be deleted
+	 * @param   JTable  $table    A JTable object containing the record to be deleted
 	 *
 	 * @return  boolean  True on success.
 	 *
@@ -143,7 +142,7 @@ class plgFinderFLEXIcontent extends Adapter
 	 * category to which it belongs has changed.
 	 *
 	 * @param   string   $context  The context of the content passed to the plugin.
-	 * @param   \Joomla\CMS\Table\Table   $row      A \Joomla\CMS\Table\Table object.
+	 * @param   JTable   $row      A JTable object.
 	 * @param   boolean  $isNew    True if the content has just been created.
 	 *
 	 * @return  boolean  True on success.
@@ -185,7 +184,7 @@ class plgFinderFLEXIcontent extends Adapter
 	 * This event is fired before the data is actually saved.
 	 *
 	 * @param   string   $context  The context of the content passed to the plugin.
-	 * @param   \Joomla\CMS\Table\Table   $row      A \Joomla\CMS\Table\Table object.
+	 * @param   JTable   $row      A JTable object.
 	 * @param   boolean  $isNew    If the content is just about to be created.
 	 *
 	 * @return  boolean  True on success.
@@ -257,12 +256,12 @@ class plgFinderFLEXIcontent extends Adapter
 	 * @since   2.5
 	 * @throws  Exception on database error.
 	 */
-	protected function index(\Joomla\Component\Finder\Administrator\Indexer\Result $item, $format = 'html')
+	protected function index(FinderIndexerResult $item, $format = 'html')
 	{
 		$item->setLanguage();
 
 		// Check if the extension is enabled.
-		if (\Joomla\CMS\Component\ComponentHelper::isEnabled($this->extension) === false)
+		if (JComponentHelper::isEnabled($this->extension) === false)
 		{
 			return;
 		}
@@ -271,7 +270,7 @@ class plgFinderFLEXIcontent extends Adapter
 
 		// Initialise the item parameters.
 		$registry = new Registry($item->params);
-		$item->params = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent', true);
+		$item->params = JComponentHelper::getParams('com_flexicontent', true);
 		$item->params->merge($registry);
 
 		$item->metadata = new Registry($item->metadata);
@@ -348,18 +347,18 @@ class plgFinderFLEXIcontent extends Adapter
 	/**
 	 * Method to get the SQL query used to retrieve the list of content items.
 	 *
-	 * @param   mixed  $query  A \Joomla\Data\DataObjectbaseQuery object or null.
+	 * @param   mixed  $query  A JDatabaseQuery object or null.
 	 *
-	 * @return  \Joomla\Data\DataObjectbaseQuery  A database object.
+	 * @return  JDatabaseQuery  A database object.
 	 *
 	 * @since   2.5
 	 */
 	protected function getListQuery($query = null)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 
 		// Check if we can use the supplied SQL query.
-		$query = $query instanceof \Joomla\Data\DataObjectbaseQuery ? $query : $db->getQuery(true)
+		$query = $query instanceof JDatabaseQuery ? $query : $db->getQuery(true)
 			->select('a.id, a.title, a.alias, a.introtext AS summary, a.fulltext AS body')
 			->select('a.state, a.catid, a.created AS start_date, a.created_by')
 			->select('a.created_by_alias, a.modified, a.modified_by, a.attribs AS params')

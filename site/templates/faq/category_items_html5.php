@@ -10,7 +10,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 // first define the template name
 $tmpl = $this->tmpl;
-$user = \Joomla\CMS\Factory::getUser();
+$user = JFactory::getUser();
 
 $btn_class = 'btn';
 $tooltip_class = 'hasTooltip';
@@ -49,7 +49,7 @@ if (!$this->items)
 		echo '
 		<div class="fcclear"></div>
 		<div class="noitems group">
-			' . \Joomla\CMS\Language\Text::_( 'FLEXI_NO_ITEMS_FOUND' ) . '
+			' . JText::_( 'FLEXI_NO_ITEMS_FOUND' ) . '
 		</div>';
 	}
 	return;
@@ -138,7 +138,7 @@ if (!empty($this->items) && ($this->params->get('cols_placement', 1)==1))
 	$js .= "	
 		});
 	";
-	\Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+	JFactory::getDocument()->addScriptDeclaration($js);
 }
 ?>
 
@@ -147,8 +147,8 @@ if (!empty($this->items) && ($this->params->get('cols_placement', 1)==1))
 <?php
 $show_itemcount   = $this->params->get('show_itemcount', 1);
 $show_subcatcount = $this->params->get('show_subcatcount', 0);
-$itemcount_label   = ($show_itemcount==2   ? \Joomla\CMS\Language\Text::_('FLEXI_ITEM_S') : '');
-$subcatcount_label = ($show_subcatcount==2 ? \Joomla\CMS\Language\Text::_('FLEXI_CATEGORIES') : '');
+$itemcount_label   = ($show_itemcount==2   ? JText::_('FLEXI_ITEM_S') : '');
+$subcatcount_label = ($show_subcatcount==2 ? JText::_('FLEXI_CATEGORIES') : '');
 
 $tooltip_class = FLEXI_J30GE ? 'hasTooltip' : 'hasTip';
 $_comments_container_params = 'class="fc_comments_count_nopad '.$tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_NUM_OF_COMMENTS', 'FLEXI_NUM_OF_COMMENTS_TIP', 1, 1).'"';
@@ -180,7 +180,7 @@ foreach ($cat_items as $catid => $items) :
 				<!-- EOF subcategory image -->
 			<?php endif; ?>
 
-			<?php if ($catid!=$currcatid) { ?> <a class='fc_cat_title' href="<?php echo \Joomla\CMS\Router\Route::_( FlexicontentHelperRoute::getCategoryRoute($sub->slug) ); ?>" itemprop="url"> <?php } else { echo "<span class='fc_cat_title'>"; } ?>
+			<?php if ($catid!=$currcatid) { ?> <a class='fc_cat_title' href="<?php echo JRoute::_( FlexicontentHelperRoute::getCategoryRoute($sub->slug) ); ?>" itemprop="url"> <?php } else { echo "<span class='fc_cat_title'>"; } ?>
 				<!-- BOF subcategory title -->
 				<?php echo $sub->title; ?>
 				<!-- EOF subcategory title -->
@@ -267,7 +267,7 @@ foreach ($cat_items as $catid => $items) :
 									<!-- BOF item title -->
 									<span class="fc_item_title" itemprop="name">
 									<?php if ($this->params->get('link_titles', 0)) : ?>
-						   			<a href="<?php echo \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>" itemprop="url">
+						   			<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>" itemprop="url">
 											<?php echo $item->title; ?>
 										</a>
 					   			<?php else : ?>

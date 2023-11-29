@@ -26,7 +26,7 @@ class flexicontent_images
 			{
 				if (empty($rows[$i]->size))
 				{
-					$size = $default_text ?: filesize(str_replace(DS, '/', \Joomla\CMS\Filesystem\Path::clean($basePath.DS.$rows[$i]->filename)));
+					$size = $default_text ?: filesize(str_replace(DS, '/', JPath::clean($basePath.DS.$rows[$i]->filename)));
 				}
 				else
 				{

@@ -15,7 +15,7 @@
  */
 defined('_WF_EXT') or die('RESTRICTED');
 
-class FlexicontentlinksAuthored_items extends \Joomla\CMS\Object\CMSObject {
+class FlexicontentlinksAuthored_items extends JObject {
 
 	var $_option = 'com_flexicontent_authored_items';
 
@@ -68,7 +68,7 @@ class FlexicontentlinksAuthored_items extends \Joomla\CMS\Object\CMSObject {
 				<div class="uk-tree-row">
 					<a href="javascript:;">
 						<span class="uk-tree-icon"></span>
-						<span class="uk-tree-text">' . \Joomla\CMS\Language\Text::_('FLEXI_EDITOR_LINKS_ITEMS_BY_AUTHOR') . '</span>
+						<span class="uk-tree-text">' . JText::_('FLEXI_EDITOR_LINKS_ITEMS_BY_AUTHOR') . '</span>
 					</a>
 				</div>
 			</li>';
@@ -87,7 +87,7 @@ class FlexicontentlinksAuthored_items extends \Joomla\CMS\Object\CMSObject {
 
 		if ($layout && $layout!='author') return array();
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 
 		// Add authored items
 		$query	= $db->getQuery(true);

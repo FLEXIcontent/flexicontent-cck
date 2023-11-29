@@ -41,7 +41,7 @@ class flexicontent_state
 		{
 			return;
 		}
-		$this->records = \Joomla\CMS\Factory::getApplication()->input->cookie->get($this->ckname, '{}', 'string');
+		$this->records = JFactory::getApplication()->input->cookie->get($this->ckname, '{}', 'string');
 
 		// Parse the favourites
 		try
@@ -50,7 +50,7 @@ class flexicontent_state
 		}
 		catch (Exception $e)
 		{
-			$jcookie->set($this->ckname, '{}', time()+60*60*24*(365*5), \Joomla\CMS\Uri\Uri::base(true), '');
+			$jcookie->set($this->ckname, '{}', time()+60*60*24*(365*5), JUri::base(true), '');
 		}
 
 		// Make sure it is a class
@@ -136,11 +136,11 @@ class flexicontent_state
 	{
 		$this->loadState();
 
-		$app = \Joomla\CMS\Factory::getApplication();
+		$app = JFactory::getApplication();
 		$jcookie = $app->input->cookie;
 
 		// Clear any cookie set to current path, and set cookie at top-level folder of current joomla installation
-		$jcookie->set($this->ckname, json_encode($this->records), time()+60*60*24*(365*5), \Joomla\CMS\Uri\Uri::base(true), '');
+		$jcookie->set($this->ckname, json_encode($this->records), time()+60*60*24*(365*5), JUri::base(true), '');
 	}
 }
 

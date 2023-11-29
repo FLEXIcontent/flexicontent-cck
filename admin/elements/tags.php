@@ -20,15 +20,12 @@
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
 
-//jimport('cms.html.html');      // JHtml
-//jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
-//jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
+jimport('cms.html.html');      // JHtml
+jimport('cms.html.select');    // JHtmlSelect
+jimport('joomla.form.field');  // JFormField
 
-//jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
-//\Joomla\CMS\Form\FormHelper::loadFieldClass('...');   // \Joomla\CMS\Form\FormField...
-
-use \Joomla\CMS\Form\Field\TagField;
-use \Joomla\CMS\Form\FormField;
+//jimport('joomla.form.helper'); // JFormHelper
+//JFormHelper::loadFieldClass('...');   // JFormField...
 
 /**
  * Renders a tags element
@@ -37,7 +34,7 @@ use \Joomla\CMS\Form\FormField;
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-class TagFields extends FormField
+class JFormFieldTags extends JFormField
 {
 	/**
 	 * Element name
@@ -48,8 +45,8 @@ class TagFields extends FormField
 
 	function getInput()
 	{
-		$doc = \Joomla\CMS\Factory::getDocument();
-		$db  = \Joomla\CMS\Factory::getDbo();
+		$doc = JFactory::getDocument();
+		$db  = JFactory::getDbo();
 		
 		$node = & $this->element;
 		$attributes = get_object_vars($node->attributes());
@@ -76,7 +73,7 @@ class TagFields extends FormField
 			$attribs .= ' multiple="multiple" ';
 			$attribs .= (@$attributes['size']) ? ' size="'.$attributes['size'].'" ' : ' size="6" ';
 		} else {
-			array_unshift($tags, \Joomla\CMS\HTML\HTMLHelper::_('select.option', '', \Joomla\CMS\Language\Text::_('FLEXI_PLEASE_SELECT')));
+			array_unshift($tags, JHtml::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT')));
 		}
 		$classes = 'use_select2_lib';
 		if ($class = @$attributes['class']) {
@@ -88,6 +85,6 @@ class TagFields extends FormField
 
 		$attribs .= ' class="'.$classes.'" ';
 
-		return \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $tags, $fieldname, $attribs, 'value', 'text', $values, $element_id);
+		return JHtml::_('select.genericlist', $tags, $fieldname, $attribs, 'value', 'text', $values, $element_id);
 	}
 }

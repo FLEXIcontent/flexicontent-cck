@@ -11,7 +11,7 @@ $anyAsFirstLastValues = true;
 $showAsTooltips = false;
 
 // Component's parameters
-$cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');  // createFilter maybe called in backend too ...
+$cparams = JComponentHelper::getParams('com_flexicontent');  // createFilter maybe called in backend too ...
 $use_font_icons = $cparams->get('use_font_icons', 1);
 
 // Field's parameters
@@ -27,7 +27,7 @@ $size = $filter->parameters->get( 'text_filter_size', $isDate ? 15 : 30);       
 
 if (!$isSlider)
 {
-	$_inner_lb = $label_filter==2 ? $filter->label : \Joomla\CMS\Language\Text::_($isDate ? 'FLEXI_CLICK_CALENDAR' : ''/*'FLEXI_TYPE_TO_LIST'*/);
+	$_inner_lb = $label_filter==2 ? $filter->label : JText::_($isDate ? 'FLEXI_CLICK_CALENDAR' : ''/*'FLEXI_TYPE_TO_LIST'*/);
 	$_inner_lb = htmlspecialchars($_inner_lb, ENT_QUOTES, 'UTF-8');
 
 	$attribs_str = ' class="fc_field_filter '.($isDate ? 'fc_iscalendar' : '').'" placeholder="'.$_inner_lb.'"';
@@ -54,7 +54,7 @@ else
 		if ($anyAsFirstLastValues)
 		{
 			$step_values[] = "''";
-			$step_labels[] = \Joomla\CMS\Language\Text::_('FLEXI_ANY');
+			$step_labels[] = JText::_('FLEXI_ANY');
 			$i++;
 		}
 
@@ -87,7 +87,7 @@ else
 		if ($display_filter_as == 8 && $anyAsFirstLastValues)
 		{
 			$step_values[] = "''";
-			$step_labels[] = \Joomla\CMS\Language\Text::_('FLEXI_ANY');
+			$step_labels[] = JText::_('FLEXI_ANY');
 		}
 
 		$step_range = 
@@ -104,7 +104,7 @@ else
 		{
 			foreach ($custom_labels as $i=> $custom_label)
 			{
-				$custom_labels[$i] = \Joomla\CMS\Language\Text::_($custom_label);  // Language filter the custom labels
+				$custom_labels[$i] = JText::_($custom_label);  // Language filter the custom labels
 			}
 		}
 
@@ -199,14 +199,14 @@ else
 					if (nodeHandles.length == 2 && i == 0)
 					{
 						var sep = document.createElement('span');
-						sep.innerHTML = '<b>" . \Joomla\CMS\Language\Text::_('FLEXI_FROM') . "</b>:&nbsp;';
+						sep.innerHTML = '<b>" . JText::_('FLEXI_FROM') . "</b>:&nbsp;';
 						mssgHandle.appendChild(sep);
 					}
 
 					if (nodeHandles.length == 2 && i == 1)
 					{
 						var sep = document.createElement('span');
-						sep.innerHTML = ' &nbsp; <b>" . \Joomla\CMS\Language\Text::_('FLEXI_TO') . "</b>:&nbsp;';
+						sep.innerHTML = ' &nbsp; <b>" . JText::_('FLEXI_TO') . "</b>:&nbsp;';
 						mssgHandle.appendChild(sep);
 					}
 
@@ -312,8 +312,8 @@ else
 		});
 	";
 
-	\Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
-	//\Joomla\CMS\Factory::getDocument()->addStyleDeclaration("");
+	JFactory::getDocument()->addScriptDeclaration($js);
+	//JFactory::getDocument()->addStyleDeclaration("");
 }
 
 if ($display_filter_as==1 || $display_filter_as==7)

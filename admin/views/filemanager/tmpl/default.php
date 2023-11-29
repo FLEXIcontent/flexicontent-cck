@@ -12,16 +12,16 @@
 defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
-\Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html');
+JHtml::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html');
 
 global $globalcats;
-$app      = \Joomla\CMS\Factory::getApplication();
+$app      = JFactory::getApplication();
 $jinput   = $app->input;
-$config   = \Joomla\CMS\Factory::getConfig();
-$user     = \Joomla\CMS\Factory::getUser();
-$session  = \Joomla\CMS\Factory::getSession();
-$document = \Joomla\CMS\Factory::getDocument();
-$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+$config   = JFactory::getConfig();
+$user     = JFactory::getUser();
+$session  = JFactory::getSession();
+$document = JFactory::getDocument();
+$cparams  = JComponentHelper::getParams('com_flexicontent');
 $ctrl     = 'filemanager.';
 $hlpname  = 'fcfilemanager';
 $isAdmin  = $app->isClient('administrator');
@@ -29,13 +29,13 @@ $useAssocs= false;
 
 $ctrl_task  = 'task=filemanager.';
 $ctrl_task_authors = 'task=users.';
-$action_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&amp;' . \Joomla\CMS\Session\Session::getFormToken() . '=1&amp;' . $ctrl_task;
+$action_url = JUri::base(true) . '/index.php?option=com_flexicontent&amp;' . JSession::getFormToken() . '=1&amp;' . $ctrl_task;
 
 //$this->folder_mode = 1; // test
 //$this->CanViewAllFiles = 0; // test
 $isFilesElement = $this->view == 'fileselement';
 
-$uri      = \Joomla\CMS\Uri\Uri::getInstance();
+$uri      = JUri::getInstance();
 $base     = $uri->toString( array('scheme', 'host', 'port'));
 
 $editor   = $jinput->getCmd('editor', '');
@@ -46,7 +46,7 @@ $onclick  = $this->escape($function);
 if (!empty($editor))
 {
 	// This view is used also in com_menus. Load the xtd script only if the editor is set!
-	\Joomla\CMS\Factory::getDocument()->addScriptOptions('xtd-fcfiles', array('editor' => $editor));
+	JFactory::getDocument()->addScriptOptions('xtd-fcfiles', array('editor' => $editor));
 	$onclick = "jSelectFcfile";
 }
 
@@ -58,19 +58,19 @@ $btn_class = 'btn';
 $ico_class = 'fc-man-icon-s';
 $out_class = FLEXI_J40GE ? 'btn btn-outline-dark' : 'btn';
 
-$hint_image = '<i class="icon-info"></i>';//\Joomla\CMS\HTML\HTMLHelper::image ( 'administrator/components/com_flexicontent/assets/images/comments.png', \Joomla\CMS\Language\Text::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
-$warn_image = '<i class="icon-warning"></i>';//\Joomla\CMS\HTML\HTMLHelper::image ( 'administrator/components/com_flexicontent/assets/images/note.gif', \Joomla\CMS\Language\Text::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
+$hint_image = '<i class="icon-info"></i>';//JHtml::image ( 'administrator/components/com_flexicontent/assets/images/comments.png', JText::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
+$warn_image = '<i class="icon-warning"></i>';//JHtml::image ( 'administrator/components/com_flexicontent/assets/images/note.gif', JText::_( 'FLEXI_NOTES' ), 'style="vertical-align:top;"' );
 $conf_image = '<i class="icon-cog"></i>';
 
 $secure_folder_tip  = '<i data-placement="bottom" class="icon-info fc-man-icon-s '.$this->tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_URL_SECURE', 'FLEXI_URL_SECURE_DESC', 1, 1).'"></i>';
 $stamp_folder_tip  = '<i data-placement="bottom" class="icon-info fc-man-icon-s '.$this->tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_DOWNLOAD_STAMPING', 'FLEXI_FILE_DOWNLOAD_STAMPING_CONF_FILE_FIELD_DESC', 1, 1).'"></i>';
 
 // Common language strings
-$edit_entry = \Joomla\CMS\Language\Text::_('FLEXI_EDIT_FILE', true);
-$view_entry = \Joomla\CMS\Language\Text::_('FLEXI_VIEW', true);
-$insert_entry = \Joomla\CMS\Language\Text::_('FLEXI_INSERT', true);
-$usage_in_str = \Joomla\CMS\Language\Text::_('FLEXI_USAGE_IN', true);
-$fields_str = \Joomla\CMS\Language\Text::_('FLEXI_FIELDS', true);
+$edit_entry = JText::_('FLEXI_EDIT_FILE', true);
+$view_entry = JText::_('FLEXI_VIEW', true);
+$insert_entry = JText::_('FLEXI_INSERT', true);
+$usage_in_str = JText::_('FLEXI_USAGE_IN', true);
+$fields_str = JText::_('FLEXI_FIELDS', true);
 
 $fcfilter_attrs_row  = ' class="input-prepend fc-xpended-row" ';
 
@@ -78,8 +78,8 @@ $close_btn = FLEXI_J30GE ? '<a class="close" data-dismiss="alert">&#215;</a>' : 
 $alert_box = FLEXI_J30GE ? '<div %s class="alert alert-%s %s">'.$close_btn.'%s</div>' : '<div %s class="fc-mssg fc-%s %s">'.$close_btn.'%s</div>';
 
 // Load JS tabber lib
-$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
-$document->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
+$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
+$document->addStyleSheet(JUri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
 $document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
 
@@ -122,8 +122,8 @@ $up_sfx_n = $this->fieldid ?: '_';
 flexicontent_html::jscode_to_showhide_table(
 	'mainChooseColBox',
 	'adminListTableFC' . $this->getModel()->view_id,
-	$start_html = '',  //'<span class="badge ' . (FLEXI_J40GE ? 'badge-dark' : 'badge-inverse') . '">' . \Joomla\CMS\Language\Text::_('FLEXI_COLUMNS', true) . '<\/span> &nbsp; ',
-	$end_html = '<div id="fc-columns-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="' . \Joomla\CMS\Language\Text::_('FLEXI_HIDE') . '" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/div>'
+	$start_html = '',  //'<span class="badge ' . (FLEXI_J40GE ? 'badge-dark' : 'badge-inverse') . '">' . JText::_('FLEXI_COLUMNS', true) . '<\/span> &nbsp; ',
+	$end_html = '<div id="fc-columns-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="' . JText::_('FLEXI_HIDE') . '" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/div>'
 );
 
 
@@ -582,8 +582,8 @@ if ($enable_multi_uploader)
 	$step_labels = '["' . implode('", "', $cfg->labels) . '"]';
 
 	$upload_options = array(
-		'action' => \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&task=filemanager.uploads&history=' . ($isFilesElement ? 1 : 0)
-			. '&'.\Joomla\CMS\Session\Session::getFormToken().'=1' . '&fieldid='.$this->fieldid . '&u_item_id='.$this->u_item_id,
+		'action' => JUri::base(true) . '/index.php?option=com_flexicontent&task=filemanager.uploads&history=' . ($isFilesElement ? 1 : 0)
+			. '&'.JSession::getFormToken().'=1' . '&fieldid='.$this->fieldid . '&u_item_id='.$this->u_item_id,
 		'upload_maxcount' => 0,
 		'layout' => $this->layout,
 		'edit_properties' => true,
@@ -604,9 +604,9 @@ if ($enable_multi_uploader)
 		}"
 	);
 
-	\Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
-	$upConf = \Joomla\CMS\HTML\HTMLHelper::_('fcuploader.getUploadConf', $this->field);
-	$uploader_html = \Joomla\CMS\HTML\HTMLHelper::_('fcuploader.getUploader', $this->field, $this->u_item_id, $uploader_tag_id, $up_sfx_n, $upload_options);
+	JHtml::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
+	$upConf = JHtml::_('fcuploader.getUploadConf', $this->field);
+	$uploader_html = JHtml::_('fcuploader.getUploader', $this->field, $this->u_item_id, $uploader_tag_id, $up_sfx_n, $upload_options);
 
 	$js .= '
 		setTimeout(function(){
@@ -688,21 +688,21 @@ if ($js)
 
 <?php if ($isFilesElement): ?>
 	<div class="alert alert-info" style="display: none; width: 300px;">
-		<?php echo \Joomla\CMS\Language\Text::_('FLEXI_ASSIGNING') . ' ... ' . \Joomla\CMS\Language\Text::_('FLEXI_PLEASE_WAIT'); ?>
+		<?php echo JText::_('FLEXI_ASSIGNING') . ' ... ' . JText::_('FLEXI_PLEASE_WAIT'); ?>
 	</div>
 <?php endif; ?>
 
 
-<?php /* echo \Joomla\CMS\HTML\HTMLHelper::_('tabs.start'); */ ?>
+<?php /* echo JHtml::_('tabs.start'); */ ?>
 <!--<div class="fctabber" id="fc-fileman-addfiles">-->
 <div class="<?php echo FLEXI_J40GE ? 'row' : 'row-fluid'; ?>">
 
 	<!-- File listing -->
 
-	<?php /* echo \Joomla\CMS\HTML\HTMLHelper::_('tabs.panel', \Joomla\CMS\Language\Text::_( 'FLEXI_FILEMAN_LIST' ), 'filelist' ); */ ?>
+	<?php /* echo JHtml::_('tabs.panel', JText::_( 'FLEXI_FILEMAN_LIST' ), 'filelist' ); */ ?>
 	<!--
 	<div class="tabbertab" id="filelist_tab" data-icon-class="icon-list">
-		<h3 class="tabberheading hasTooltip" data-placement="bottom" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_FILES_REGISTRY_DESC'); ?>"> <?php echo \Joomla\CMS\Language\Text::_('FLEXI_FILES_REGISTRY'); ?> </h3>
+		<h3 class="tabberheading hasTooltip" data-placement="bottom" title="<?php echo JText::_('FLEXI_FILES_REGISTRY_DESC'); ?>"> <?php echo JText::_('FLEXI_FILES_REGISTRY'); ?> </h3>
 	-->
 	<div class="<?php echo $show_addfiles ? 'span6 col-md-6' : ''; ?> fullwidth_1270" id="fc-fileman-fileslist-col" data-icon-class="icon-list">
 		<fieldset class="fc-formbox" id="fc-fileman-formbox-0">
@@ -724,11 +724,11 @@ if ($js)
 						<?php
 							echo !empty($this->lists['scope']) ? $this->lists['scope'] : '';
 						?>
-						<input type="text" name="search" id="search" placeholder="<?php echo !empty($this->scope_title) ? $this->scope_title : \Joomla\CMS\Language\Text::_('FLEXI_SEARCH'); ?>" value="<?php echo htmlspecialchars($this->lists['search'], ENT_QUOTES, 'UTF-8'); ?>" class="fcfield_textval" />
-						<button title="" data-original-title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_SEARCH'); ?>" class="<?php echo $btn_class . (FLEXI_J40GE ? ' btn-outline-dark ' : ' ') . $this->tooltip_class; ?>" onclick="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-search"></i>' : \Joomla\CMS\Language\Text::_('FLEXI_GO'); ?></button>
+						<input type="text" name="search" id="search" placeholder="<?php echo !empty($this->scope_title) ? $this->scope_title : JText::_('FLEXI_SEARCH'); ?>" value="<?php echo htmlspecialchars($this->lists['search'], ENT_QUOTES, 'UTF-8'); ?>" class="fcfield_textval" />
+						<button title="" data-original-title="<?php echo JText::_('FLEXI_SEARCH'); ?>" class="<?php echo $btn_class . (FLEXI_J40GE ? ' btn-outline-dark ' : ' ') . $this->tooltip_class; ?>" onclick="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-search"></i>' : JText::_('FLEXI_GO'); ?></button>
 
-						<div id="fc_filters_box_btn" data-original-title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_FILTERS'); ?>" class="<?php echo $this->tooltip_class . ' ' . ($this->count_filters ? 'btn ' . $this->btn_iv_class : $out_class); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary', false, undefined, 1);">
-							<?php echo '<i class="icon-filter"></i>' . ($isFilesElement && $this->count_filters ? \Joomla\CMS\Language\Text::_('FLEXI_FILTERS') : ''); ?>
+						<div id="fc_filters_box_btn" data-original-title="<?php echo JText::_('FLEXI_FILTERS'); ?>" class="<?php echo $this->tooltip_class . ' ' . ($this->count_filters ? 'btn ' . $this->btn_iv_class : $out_class); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary', false, undefined, 1);">
+							<?php echo '<i class="icon-filter"></i>' . ($isFilesElement && $this->count_filters ? JText::_('FLEXI_FILTERS') : ''); ?>
 							<?php echo ($this->count_filters  ? ' <sup>' . $this->count_filters . '</sup>' : ''); ?>
 						</div>
 
@@ -752,10 +752,10 @@ if ($js)
 							echo $this->lists['item_id'];
 							?>
 
-							<div id="fc-filters-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
+							<div id="fc-filters-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="<?php echo JText::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
 						</div>
 
-						<button title="" data-original-title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_RESET_FILTERS'); ?>" class="<?php echo $btn_class . (FLEXI_J40GE ? ' btn-outline-dark ' : ' ') . $this->tooltip_class; ?>" onclick="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; delAllFilters(); Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-cancel"></i>' : \Joomla\CMS\Language\Text::_('FLEXI_CLEAR'); ?></button>
+						<button title="" data-original-title="<?php echo JText::_('FLEXI_RESET_FILTERS'); ?>" class="<?php echo $btn_class . (FLEXI_J40GE ? ' btn-outline-dark ' : ' ') . $this->tooltip_class; ?>" onclick="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; delAllFilters(); Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-cancel"></i>' : JText::_('FLEXI_CLEAR'); ?></button>
 					</div>
 
 				</div>
@@ -796,14 +796,14 @@ if ($js)
 							<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value=""
 								onclick="Joomla.checkAll(this); fman_set_cids(jQuery(this));" style="display: none;" />
 							<label for="checkall-toggle" class="green single" style="color: inherit;">
-								&nbsp;<?php echo \Joomla\CMS\Language\Text::_('FLEXI_ALL'); ?>
+								&nbsp;<?php echo JText::_('FLEXI_ALL'); ?>
 							</label>&nbsp;
 						</div>
 					</div>
 
 					<?php echo '
 						<span style="cursor: pointer;" class="fc_shown_1271 ' . $this->btn_sm_class . ' btn-success ' . $this->tooltip_class . '"
-							onclick="var box = document.getElementById(\'fc-fileman-addfiles\'); fc_fm_add_handle = fc_showAsDialog(box, 0, 0, null, { title: \'' . \Joomla\CMS\Language\Text::_('FLEXI_ADD_FILE',  true) . '\', visibleOnClose: 1, paddingW: 10, paddingH: 10}); return false;"
+							onclick="var box = document.getElementById(\'fc-fileman-addfiles\'); fc_fm_add_handle = fc_showAsDialog(box, 0, 0, null, { title: \'' . JText::_('FLEXI_ADD_FILE',  true) . '\', visibleOnClose: 1, paddingW: 10, paddingH: 10}); return false;"
 							data-title="' . flexicontent_html::getToolTip('', 'FLEXI_ADD_FILE', 1, 1) . '" data-placement="bottom"
 						>
 							<span class="icon-upload"></span>
@@ -831,7 +831,7 @@ if ($js)
 						<div class="fc-iblock nowrap_box" style="position: relative; vertical-align: middle;">
 							<span class="btn btn-primary <?php echo $this->btn_sm_class . ' ' . $this->tooltip_class; ?>" id="insert_selected_btn" onclick="fc_fileselement_assign_files(jQuery(this));"
 								data-title="<?php echo flexicontent_html::getToolTip('', 'FLEXI_FILEMAN_INSERT_SELECTED', 1, 1); ?>" data-placement="bottom">
-								<span class="icon-plus"></span> <?php echo \Joomla\CMS\Language\Text::_('FLEXI_INSERT'); ?>
+								<span class="icon-plus"></span> <?php echo JText::_('FLEXI_INSERT'); ?>
 							</span>
 							<span class="<?php echo $this->btn_sm_class . ' ' . $this->tooltip_class; ?>" onclick="fc_fileselement_delete_files()" data-title="<?php echo flexicontent_html::getToolTip('', 'FLEXI_DELETE', 1, 1); ?>" data-placement="bottom">
 								<span class="icon-remove" style="color: darkred;"></span>
@@ -895,78 +895,78 @@ if ($js)
 			<table id="adminListTableFC<?php echo $this->getModel()->view_id; ?>" class="adminlist table fcmanlist fman_list_element">
 			<thead>
     		<tr>
-					<th class="center hidden-phone"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_NUM' ); ?></th>
+					<th class="center hidden-phone"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 
 					<th>&nbsp;</th>
 
-					<th class="center hideOnDemandClass"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_THUMB' ); ?></th>
+					<th class="center hideOnDemandClass"><?php echo JText::_( 'FLEXI_THUMB' ); ?></th>
 					<th class="left">
 						<?php if (!$this->folder_mode) : ?>
-							<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_FILENAME', 'a.filename_displayed', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+							<?php echo JHtml::_('grid.sort', 'FLEXI_FILENAME', 'a.filename_displayed', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 							&nbsp; -- &nbsp;
-							<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_FILE_DISPLAY_TITLE', 'a.altname', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+							<?php echo JHtml::_('grid.sort', 'FLEXI_FILE_DISPLAY_TITLE', 'a.altname', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 						<?php else: ?>
-							<?php echo \Joomla\CMS\Language\Text::_('FLEXI_FILENAME'); ?>
+							<?php echo JText::_('FLEXI_FILENAME'); ?>
 						<?php endif; ?>
 					</th>
 
 				<?php if (!empty($this->cols['state'])) : ?>
 					<th class="center hideOnDemandClass">
-						<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_PUBLISHED', 'a.published', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+						<?php echo JHtml::_('grid.sort', 'FLEXI_PUBLISHED', 'a.published', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 					</th>
 				<?php endif; ?>
 				<?php if (!empty($this->cols['access'])) : ?>
 					<th class="center hideOnDemandClass hidden-phone">
-						<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_ACCESS', 'a.access', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+						<?php echo JHtml::_('grid.sort', 'FLEXI_ACCESS', 'a.access', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 					</th>
 				<?php endif; ?>
 				<?php if (!empty($this->cols['lang'])) : ?>
 					<th class="center hideOnDemandClass hidden-phone">
-						<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_LANGUAGE', 'a.language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+						<?php echo JHtml::_('grid.sort', 'FLEXI_LANGUAGE', 'a.language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 					</th>
 				<?php endif; ?>
 
 				<?php if ($this->folder_mode) : ?>
-					<th class="center hideOnDemandClass"><?php echo \Joomla\CMS\Language\Text::_('FLEXI_SIZE'); ?></th>
+					<th class="center hideOnDemandClass"><?php echo JText::_('FLEXI_SIZE'); ?></th>
 				<?php else : ?>
-					<th class="center hideOnDemandClass"><?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_SIZE', 'a.size', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+					<th class="center hideOnDemandClass"><?php echo JHtml::_('grid.sort', 'FLEXI_SIZE', 'a.size', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 				<?php endif; ?>
 
 				<?php if (!empty($this->cols['hits'])) : ?>
-					<th class="center hideOnDemandClass hidden-phone"><?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_HITS', 'a.hits', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+					<th class="center hideOnDemandClass hidden-phone"><?php echo JHtml::_('grid.sort', 'FLEXI_HITS', 'a.hits', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 				<?php endif; ?>
 
 				<?php if (!empty($this->cols['target'])) : ?>
-					<th class="center hideOnDemandClass hidden-phone"><?php echo $secure_folder_tip; ?><?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_URL_SECURE', 'a.secure', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+					<th class="center hideOnDemandClass hidden-phone"><?php echo $secure_folder_tip; ?><?php echo JHtml::_('grid.sort', 'FLEXI_URL_SECURE', 'a.secure', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 				<?php endif; ?>
 
 				<?php if (!empty($this->cols['stamp'])) : ?>
-					<th class="center hideOnDemandClass hidden-phone"><?php echo $stamp_folder_tip; ?><?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_DOWNLOAD_STAMPING', 'a.stamp', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+					<th class="center hideOnDemandClass hidden-phone"><?php echo $stamp_folder_tip; ?><?php echo JHtml::_('grid.sort', 'FLEXI_DOWNLOAD_STAMPING', 'a.stamp', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 				<?php endif; ?>
 
 				<?php if (!empty($this->cols['usage'])) : ?>
-					<th class="left hideOnDemandClass hidden-phone" colspan="2"><?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_USAGE', 'a.assignments', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+					<th class="left hideOnDemandClass hidden-phone" colspan="2"><?php echo JHtml::_('grid.sort', 'FLEXI_USAGE', 'a.assignments', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 				<?php endif; ?>
 
 				<?php if (!$isFilesElement) : ?>
-					<th class="center hideOnDemandClass hidden-phone"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_FILE_NUM_ITEMS' ); ?> </th>
+					<th class="center hideOnDemandClass hidden-phone"><?php echo JText::_( 'FLEXI_FILE_NUM_ITEMS' ); ?> </th>
 				<?php endif; ?>
 
 				<?php if (!empty($this->cols['uploader'])) : ?>
-					<th class="center hideOnDemandClass hidden-phone"><?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_UPLOADER', 'uploader', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+					<th class="center hideOnDemandClass hidden-phone"><?php echo JHtml::_('grid.sort', 'FLEXI_UPLOADER', 'uploader', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 				<?php endif; ?>
 
 				<?php if (!empty($this->cols['upload_time'])) : ?>
-					<th class="center hideOnDemandClass hidden-phone hidden-tablet"><?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_UPLOAD_TIME', 'a.uploaded', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+					<th class="center hideOnDemandClass hidden-phone hidden-tablet"><?php echo JHtml::_('grid.sort', 'FLEXI_UPLOAD_TIME', 'a.uploaded', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 				<?php endif; ?>
 
 				<?php if (!$isFilesElement) : ?>
-					<th class="center hideOnDemandClass hidden-phone"><?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'E-storage', 'estorage', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+					<th class="center hideOnDemandClass hidden-phone"><?php echo JHtml::_('grid.sort', 'E-storage', 'estorage', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 				<?php endif; ?>
 
 				<?php if (!empty($this->cols['file_id'])) : ?>
 					<th class="center hideOnDemandClass col_id hidden-phone hidden-tablet">
-						<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order']); ?>
+						<?php echo JHtml::_('grid.sort', 'FLEXI_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order']); ?>
 					</th>
 				<?php endif; ?>
 
@@ -1027,7 +1027,7 @@ if ($js)
 
 					if (!$is_img)
 					{
-						$thumb_or_icon = empty($row->icon) ? '' : \Joomla\CMS\HTML\HTMLHelper::image($row->icon, $row->filename);
+						$thumb_or_icon = empty($row->icon) ? '' : JHtml::image($row->icon, $row->filename);
 					}
 
 					if ($this->folder_mode)
@@ -1046,11 +1046,11 @@ if ($js)
 						$thumb_or_icon = 'URL';
 					}
 
-					$file_path = \Joomla\CMS\Filesystem\Path::clean($file_path);
+					$file_path = JPath::clean($file_path);
 
 					// URL or media manager link
 					$file_url = $row->url == 2
-						? \Joomla\CMS\Uri\Uri::root(true) . '/' . $file_path
+						? JUri::root(true) . '/' . $file_path
 						: $file_path;
 
 					$file_url = rawurlencode(str_replace('\\', '/', $file_url));
@@ -1064,8 +1064,8 @@ if ($js)
 					if (empty($thumb_or_icon))
 					{
 						$thumb_or_icon = file_exists($file_path)
-							? '<img class="fc-fileman-thumb" onclick="if (jQuery(this).hasClass(\'fc_zoomed\')) { fman_zoom_thumb(event, this); return false; }" src="'.\Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_url.$f. '&amp;w=800&amp;h=800&amp;zc=1&amp;q=95&amp;f=jpeg&amp;ar=x" alt="'.$filename_original.'" />'
-							: '<span class="badge badge-box badge-important">'.\Joomla\CMS\Language\Text::_('FLEXI_FILE_NOT_FOUND').'</span>';
+							? '<img class="fc-fileman-thumb" onclick="if (jQuery(this).hasClass(\'fc_zoomed\')) { fman_zoom_thumb(event, this); return false; }" src="'.JUri::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_url.$f. '&amp;w=800&amp;h=800&amp;zc=1&amp;q=95&amp;f=jpeg&amp;ar=x" alt="'.$filename_original.'" />'
+							: '<span class="badge badge-box badge-important">'.JText::_('FLEXI_FILE_NOT_FOUND').'</span>';
 					}
 
 					$row->thumb_or_icon = $thumb_or_icon;
@@ -1089,7 +1089,7 @@ if ($js)
 								{
 									$icon_name = $this->assigned_fields_icons[$field_type];
 									$tip = $row->{'assigned_'.$field_type} . ' ' . $field_label;
-									$image = \Joomla\CMS\HTML\HTMLHelper::image('administrator/components/com_flexicontent/assets/images/'.$icon_name.'.png', $tip, 'title="'.$usage_in_str.' '.$field_type.' '.$fields_str.'"' );
+									$image = JHtml::image('administrator/components/com_flexicontent/assets/images/'.$icon_name.'.png', $tip, 'title="'.$usage_in_str.' '.$field_type.' '.$fields_str.'"' );
 									$row->assigned[] = $row->{'assigned_'.$field_type} . ' ' . $image;
 								}
 							}
@@ -1098,7 +1098,7 @@ if ($js)
 						}
 						else
 						{
-							$row->assigned = \Joomla\CMS\Language\Text::_( 'FLEXI_NOT_ASSIGNED' );
+							$row->assigned = JText::_( 'FLEXI_NOT_ASSIGNED' );
 						}
 					}
 
@@ -1113,7 +1113,7 @@ if ($js)
 					{
 						// File preview icon for content form
 						$file_is_selected = isset($this->pending_file_names[$row->filename]);
-						$file_preview = !in_array($ext, $imageexts) ? '' : \Joomla\CMS\Uri\Uri::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_url.$f. '&amp;w='.$this->thumb_w.'&amp;h='.$this->thumb_h.'&amp;zc=1&amp;q=95&amp;ar=x';
+						$file_preview = !in_array($ext, $imageexts) ? '' : JUri::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_url.$f. '&amp;w='.$this->thumb_w.'&amp;h='.$this->thumb_h.'&amp;zc=1&amp;q=95&amp;ar=x';
 
 						// Link to assign file value into the content form
 						$row->file_assign_link = $this->assign_mode ?
@@ -1134,7 +1134,7 @@ if ($js)
 
 					<td class="center <?php echo ($file_is_selected ? ' is-pending-file' : ''); ?>">
 						<!--div class="adminlist-table-row"></div-->
-						<?php echo \Joomla\CMS\HTML\HTMLHelper::_($hlpname . '.grid_id', $i,
+						<?php echo JHtml::_($hlpname . '.grid_id', $i,
 							!$this->folder_mode ? $row->id : rawurlencode($filename),
 							false, 'cid', 'cb', '', 'fman_sync_cid(' . $i . ', 1);'
 						);
@@ -1155,16 +1155,16 @@ if ($js)
 							 * Display an edit pencil or a check-in button if: either (a) current user has Global
 							 * Checkin privilege OR (b) record checked out by current user, otherwise display a lock
 							 */
-							echo \Joomla\CMS\HTML\HTMLHelper::_($hlpname . '.checkedout', $row, $user, $i);
+							echo JHtml::_($hlpname . '.checkedout', $row, $user, $i);
 
 							/**
 							 * Display title with edit link ... (row editable and not checked out)
 							 * Display title with no edit link ... if row is not-editable for any reason (no ACL or checked-out by other user)
 							 */
-							echo \Joomla\CMS\HTML\HTMLHelper::_($hlpname . '.edit_link', $row, $i, $row->canEdit);
+							echo JHtml::_($hlpname . '.edit_link', $row, $i, $row->canEdit);
 
 							// Note we will pass true to canEdit parameter because we want to create an assign link
-							echo \Joomla\CMS\HTML\HTMLHelper::_($hlpname . '.edit_link', $row, $i, true, array(
+							echo JHtml::_($hlpname . '.edit_link', $row, $i, true, array(
 								'option'   => 'com_flexicontent',
 								'ctrl'     => 'mediadatas',
 								'view'     => 'mediadata',
@@ -1174,7 +1174,7 @@ if ($js)
 								'linkedPrefix' => '<span class="icon-music"></span>',
 								'attribs' => array(
 									'class'       => $this->btn_sm_class,
-									'title'       => \Joomla\CMS\Language\Text::_('FLEXI_MEDIADATA_EDIT'),
+									'title'       => JText::_('FLEXI_MEDIADATA_EDIT'),
 								),
 								'useModal' => (object) array(
 									'title'       => 'FLEXI_MEDIADATA_EDIT',
@@ -1188,7 +1188,7 @@ if ($js)
 							if ($isXtdBtn)
 							{
 								$vars = '&id='.$row->id;
-								$link = \Joomla\CMS\Uri\Uri::root(true) . '/index.php?option=com_flexicontent&task=download_file' . $vars;
+								$link = JUri::root(true) . '/index.php?option=com_flexicontent&task=download_file' . $vars;
 
 								$attribs = 'data-function="' . $this->escape($onclick) . '"'
 									. ' data-id="' . $this->escape($row->id) . '"'
@@ -1205,7 +1205,7 @@ if ($js)
 							else
 							{
 								// Note we will pass true to canEdit parameter because we want to create an assign link
-								echo \Joomla\CMS\HTML\HTMLHelper::_($hlpname . '.edit_link', $row, $i, true, array(
+								echo JHtml::_($hlpname . '.edit_link', $row, $i, true, array(
 									'linkedPrefix' => '<span class="icon-checkbox"></span><span class="icon-new"></span>',
 									'onclick' => 'if (jQuery(this).hasClass(\'striketext\')) return; ' . $row->file_assign_link,
 									'attribs' => array(
@@ -1236,7 +1236,7 @@ if ($js)
 
 				<?php if (!empty($this->cols['state'])) : ?>
 					<td class="center">
-						<?php echo \Joomla\CMS\HTML\HTMLHelper::_('jgrid.published', $row->published, $i, $ctrl); ?>
+						<?php echo JHtml::_('jgrid.published', $row->published, $i, $ctrl); ?>
 					</td>
 				<?php endif; ?>
 
@@ -1258,7 +1258,7 @@ if ($js)
 							/**
 							 * Display language
 							 */
-							echo \Joomla\CMS\HTML\HTMLHelper::_($hlpname . '.lang_display', $row, $i, $this->langs, $use_icon = 2, ''); ?>
+							echo JHtml::_($hlpname . '.lang_display', $row, $i, $this->langs, $use_icon = 2, ''); ?>
 					</td>
 				<?php endif; ?>
 
@@ -1269,11 +1269,11 @@ if ($js)
 				<?php endif; ?>
 
 				<?php if (!empty($this->cols['target'])) : ?>
-					<td class="center hidden-phone"><?php echo $row->secure ? '<span class="badge bg-info badge-info">' . \Joomla\CMS\Language\Text::_('FLEXI_YES') : '<span class="badge">' . \Joomla\CMS\Language\Text::_('FLEXI_NO'); ?></span></td>
+					<td class="center hidden-phone"><?php echo $row->secure ? '<span class="badge bg-info badge-info">' . JText::_('FLEXI_YES') : '<span class="badge">' . JText::_('FLEXI_NO'); ?></span></td>
 				<?php endif; ?>
 
 				<?php if (!empty($this->cols['stamp'])) : ?>
-					<td class="center hidden-phone"><?php echo $row->stamp ? '<span class="badge bg-info badge-info">' . \Joomla\CMS\Language\Text::_('FLEXI_YES') : '<span class="badge">' . \Joomla\CMS\Language\Text::_('FLEXI_NO'); ?></span></td>
+					<td class="center hidden-phone"><?php echo $row->stamp ? '<span class="badge bg-info badge-info">' . JText::_('FLEXI_YES') : '<span class="badge">' . JText::_('FLEXI_NO'); ?></span></td>
 				<?php endif; ?>
 
 				<?php if (!empty($this->cols['usage'])) : ?>
@@ -1305,13 +1305,13 @@ if ($js)
 
 				<?php if (!empty($this->cols['upload_time'])) : ?>
 					<td class="center hidden-phone hidden-tablet">
-						<?php echo \Joomla\CMS\HTML\HTMLHelper::Date( $row->uploaded, \Joomla\CMS\Language\Text::_( 'DATE_FORMAT_LC3' )." H:i" ); ?>
+						<?php echo JHtml::Date( $row->uploaded, JText::_( 'DATE_FORMAT_LC3' )." H:i" ); ?>
 					</td>
 				<?php endif; ?>
 
 				<?php if (!$isFilesElement) : ?>
 					<td class="center col_estorage hidden-phone hidden-tablet">
-						<?php echo !$row->estorage_fieldid ? \Joomla\CMS\Language\Text::_('FLEXI_NO') : ($row->estorage_fieldid > 0 ? \Joomla\CMS\Language\Text::_('Pending') :  \Joomla\CMS\Language\Text::_('Uploading')); ?>
+						<?php echo !$row->estorage_fieldid ? JText::_('FLEXI_NO') : ($row->estorage_fieldid > 0 ? JText::_('Pending') :  JText::_('Uploading')); ?>
 					</td>
 				<?php endif; ?>
 
@@ -1323,8 +1323,8 @@ if ($js)
 
 					<?php if ($isFilesElement) : /* Direct delete button for fileselement view */ ?>
 					<td>
-						<a class="btn btn-mini ntxt" href="javascript:;" onclick="if (confirm('<?php echo \Joomla\CMS\Language\Text::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>')) { return Joomla.listItemTask('cb<?php echo $i; ?>','filemanager.remove'); }">
-							<span class="icon-remove" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_REMOVE'); ?>"></span>
+						<a class="btn btn-mini ntxt" href="javascript:;" onclick="if (confirm('<?php echo JText::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>')) { return Joomla.listItemTask('cb<?php echo $i; ?>','filemanager.remove'); }">
+							<span class="icon-remove" title="<?php echo JText::_('FLEXI_REMOVE'); ?>"></span>
 						</a>
 					</td>
 					<?php endif; ?>
@@ -1345,14 +1345,14 @@ if ($js)
 				{
 					$icon_name = $this->assigned_fields_icons[$field_type];
 					$tip = $field_label;
-					$image = \Joomla\CMS\HTML\HTMLHelper::image('administrator/components/com_flexicontent/assets/images/'.$icon_name.'.png', $tip);
+					$image = JHtml::image('administrator/components/com_flexicontent/assets/images/'.$icon_name.'.png', $tip);
 					$field_legend[$field_type] = $image. " ".$field_label;
 				}
 				?>
 
 				<tr>
 					<td colspan="<?php echo $list_total_cols; ?>" style="text-align: center; border-top:0px solid black;">
-						<span class="label fc_legend_box <?php echo $this->tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_USAGE_LEGEND', 'FLEXI_FILE_USAGE_LEGEND_TIP', 1, 1); ?> " ><?php echo \Joomla\CMS\Language\Text::_('FLEXI_FILE_USAGE_LEGEND'); ?></span> &nbsp;
+						<span class="label fc_legend_box <?php echo $this->tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_USAGE_LEGEND', 'FLEXI_FILE_USAGE_LEGEND_TIP', 1, 1); ?> " ><?php echo JText::_('FLEXI_FILE_USAGE_LEGEND'); ?></span> &nbsp;
 						<?php echo implode(' &nbsp; &nbsp; | &nbsp; &nbsp; ', $field_legend); ?>
 					</td>
 				</tr>
@@ -1422,14 +1422,14 @@ if ($js)
 								{
 									$icon_name = $this->assigned_fields_icons[$field_type];
 									$tip = $row->{'assigned_'.$field_type} . ' ' . $field_label;
-									$image = \Joomla\CMS\HTML\HTMLHelper::image('administrator/components/com_flexicontent/assets/images/'.$icon_name.'.png', $tip, 'title="'.$usage_in_str.' '.$field_type.' '.$fields_str.'"' );
+									$image = JHtml::image('administrator/components/com_flexicontent/assets/images/'.$icon_name.'.png', $tip, 'title="'.$usage_in_str.' '.$field_type.' '.$fields_str.'"' );
 									$row->assigned[] = $row->{'assigned_'.$field_type} . ' ' . $image;
 								}
 							}
 							$row->assigned = implode('&nbsp;&nbsp;| ', $row->assigned);
 						}
 						else {
-							$row->assigned = \Joomla\CMS\Language\Text::_( 'FLEXI_NOT_ASSIGNED' );
+							$row->assigned = JText::_( 'FLEXI_NOT_ASSIGNED' );
 						}
 					}
 					?>
@@ -1441,7 +1441,7 @@ if ($js)
 					<span class="btn fc-fileman-preview-btn icon-search" onclick="fman_zoom_thumb(event, this); return false;"></span>
 					'; ?>
 					<span class="btn fc-fileman-selection-mark icon-checkmark" id="_cb<?php echo $i; ?>" ></span>
-					<span class="btn fc-fileman-delete-btn icon-remove" onclick="if (confirm('<?php echo \Joomla\CMS\Language\Text::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>')) { document.adminForm.filename.value='<?php echo rawurlencode($row->filename);?>'; return Joomla.listItemTask('cb<?php echo $i; ?>','filemanager.remove'); }"></span>
+					<span class="btn fc-fileman-delete-btn icon-remove" onclick="if (confirm('<?php echo JText::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>')) { document.adminForm.filename.value='<?php echo rawurlencode($row->filename);?>'; return Joomla.listItemTask('cb<?php echo $i; ?>','filemanager.remove'); }"></span>
 					<span class="fc-fileman-filename-box"><?php echo $row->title_cut; ?></span>
 				</div>
 				<?php
@@ -1468,14 +1468,14 @@ if ($js)
 			<input type="hidden" id="filter_order_Dir" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
 			<input type="hidden" name="fcform" value="1" />
 
-			<?php echo \Joomla\CMS\HTML\HTMLHelper::_('form.token'); ?>
+			<?php echo JHtml::_('form.token'); ?>
 			<input type="hidden" name="fieldid" value="<?php echo $this->fieldid; ?>" />
 			<input type="hidden" name="u_item_id" value="<?php echo $this->u_item_id; ?>" />
 			<input type="hidden" name="folder_mode" value="<?php echo $this->folder_mode; ?>" />
 			<input type="hidden" name="filename" value="" />
 
 			<?php /* NOTE: return URL should use & and not &amp; for variable separation as these will be re-encoded on redirect */ ?>
-			<input type="hidden" name="return" value="<?php echo base64_encode('index.php?option=com_flexicontent&view='.$this->view.($_tmpl ? '&tmpl='.$_tmpl : '').'&field='.$this->fieldid.'&layout='.$this->layout.'&'.\Joomla\CMS\Session\Session::getFormToken().'=1'.'&folder_mode='.$this->folder_mode); ?>" />
+			<input type="hidden" name="return" value="<?php echo base64_encode('index.php?option=com_flexicontent&view='.$this->view.($_tmpl ? '&tmpl='.$_tmpl : '').'&field='.$this->fieldid.'&layout='.$this->layout.'&'.JSession::getFormToken().'=1'.'&folder_mode='.$this->folder_mode); ?>" />
 		</form>
 
 		</fieldset>
@@ -1486,33 +1486,33 @@ if ($js)
 	<!-- File(s) by uploading -->
 	<div class="span6 col-md-6" id="fc-fileman-addfiles-col" <?php echo !$show_addfiles ? ' style="display: none;" ' : ''; ?> >
 
-	<?php /*echo \Joomla\CMS\HTML\HTMLHelper::_('tabs.panel', \Joomla\CMS\Language\Text::_( 'FLEXI_UPLOAD_FILES' ), 'fileupload' );*/ ?>
-	<?php /* echo \Joomla\CMS\HTML\HTMLHelper::_('tabs.start'); */ ?>
+	<?php /*echo JHtml::_('tabs.panel', JText::_( 'FLEXI_UPLOAD_FILES' ), 'fileupload' );*/ ?>
+	<?php /* echo JHtml::_('tabs.start'); */ ?>
 
 		<div class="fctabber fc_hidden_1270" id="fc-fileman-addfiles">
 
 			<div class="tabbertab" id="local_tab" data-icon2-class="icon-upload fc-icon-orange" data-icon-class="fc-icon-green">
-				<h3 class="tabberheading hasTooltip" data-placement="bottom" title="<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_UPLOAD_FILES_DESC' ); ?>"> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_UPLOAD_FILES' ); ?> </h3>
+				<h3 class="tabberheading hasTooltip" data-placement="bottom" title="<?php echo JText::_( 'FLEXI_UPLOAD_FILES_DESC' ); ?>"> <?php echo JText::_( 'FLEXI_UPLOAD_FILES' ); ?> </h3>
 
 				<?php if (!$this->CanUpload && ($this->layout != 'image' || !$isFilesElement)) : /* image layout of fileselement view is not subject to upload check */ ?>
-					<?php echo sprintf( $alert_box, '', 'note', '', \Joomla\CMS\Language\Text::_('FLEXI_YOUR_ACCOUNT_CANNOT_UPLOAD') ); ?>
+					<?php echo sprintf( $alert_box, '', 'note', '', JText::_('FLEXI_YOUR_ACCOUNT_CANNOT_UPLOAD') ); ?>
 				<?php else : ?>
 
 				<?php if ($this->require_ftp) : ?>
 				<form action="<?php echo $action_url . 'ftpValidate'; ?>" name="ftpForm" id="ftpForm" method="post">
-					<fieldset title="<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_FTP_LOGIN_DETAILS' ); ?>">
-						<legend><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_FTP_LOGIN_DETAILS' ); ?></legend>
+					<fieldset title="<?php echo JText::_( 'FLEXI_FTP_LOGIN_DETAILS' ); ?>">
+						<legend><?php echo JText::_( 'FLEXI_FTP_LOGIN_DETAILS' ); ?></legend>
 						<table class="fc-form-tbl fcinner">
 							<tbody>
 								<tr>
 									<td class="key">
-											<label class="fc-prop-lbl" for="username"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_USERNAME' ); ?></label>
+											<label class="fc-prop-lbl" for="username"><?php echo JText::_( 'FLEXI_USERNAME' ); ?></label>
 									</td>
 									<td>
 										<input type="text" id="username" name="username" class="input-xxlarge" size="70" value="" />
 									</td>
 									<td class="key">
-											<label class="fc-prop-lbl" for="password"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_PASSWORD' ); ?></label>
+											<label class="fc-prop-lbl" for="password"><?php echo JText::_( 'FLEXI_PASSWORD' ); ?></label>
 									</td>
 									<td>
 											<input type="password" id="password" name="password" class="input-xxlarge" size="70" value="" />
@@ -1545,25 +1545,25 @@ if ($js)
 					$show_server_limit = $server_limit_exceeded && ! $enable_multi_uploader;  // plupload JS overcomes server limitations so we will not display it, if using plupload
 
 					echo '
-					<span id="fc_dispInfoBox_btn" class="' . $this->btn_sm_class . '" onclick="fc_toggle_box_via_btn(\'upload_info_box\', this, \'btn-primary\');"><i class="icon-info"></i>'. \Joomla\CMS\Language\Text::_( 'FLEXI_FILES_INFO_UPLOAD' ).'</span>
+					<span id="fc_dispInfoBox_btn" class="' . $this->btn_sm_class . '" onclick="fc_toggle_box_via_btn(\'upload_info_box\', this, \'btn-primary\');"><i class="icon-info"></i>'. JText::_( 'FLEXI_FILES_INFO_UPLOAD' ).'</span>
 					'.
 					($enable_multi_uploader ? '
 						<span class="' . $this->btn_sm_class . ' ' . $this->tooltip_class.'" onclick="jQuery(\'#fc-fileman-formbox-1\').toggle(); jQuery(\'#fc-fileman-formbox-2\').toggle(); setTimeout(function(){ '.$uploader_tag_id.'.autoResize(\''.$up_sfx_n.'\'); }, 100);"
-							id="single_multi_uploader" data-title="' . flexicontent_html::getToolTip('', 'FLEXI_TOGGLE_BASIC_UPLOADER_DESC', 1, 1) . '" style="float: ' . (\Joomla\CMS\Factory::getLanguage()->isRTL() ? 'left;' : 'right;') . '"
-						data-placement="'. (\Joomla\CMS\Factory::getLanguage()->isRTL() ? 'right' : 'left') . '">
-							'.\Joomla\CMS\Language\Text::_( 'FLEXI_TOGGLE_BASIC_UPLOADER' ).'
+							id="single_multi_uploader" data-title="' . flexicontent_html::getToolTip('', 'FLEXI_TOGGLE_BASIC_UPLOADER_DESC', 1, 1) . '" style="float: ' . (JFactory::getLanguage()->isRTL() ? 'left;' : 'right;') . '"
+						data-placement="'. (JFactory::getLanguage()->isRTL() ? 'right' : 'left') . '">
+							'.JText::_( 'FLEXI_TOGGLE_BASIC_UPLOADER' ).'
 						</span>
 					' : '') . '
 
 				<div class="fcclear"></div>
 
 				<div id="upload_info_box" style="display:none; margin: 16px 0 0 0;">
-					<!--span class="label" style="font-size: 11px; margin-right:12px;" >'.\Joomla\CMS\Language\Text::_( 'FLEXI_UPLOAD_LIMITS' ).'</span-->
+					<!--span class="label" style="font-size: 11px; margin-right:12px;" >'.JText::_( 'FLEXI_UPLOAD_LIMITS' ).'</span-->
 					<div class="fc-fileman-upload-limits-box" style="font-size: 14px !important;">
 					<table class="fc_uploader_header_tbl">
 						<tr class="fc-about-size-limits">
 							<td>
-								<div class="fc-mssg fc-info fc-nobgimage fc-about-box '.$this->tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_UPLOAD_FILESIZE_MAX_DESC', '', 1, 1).'" data-placement="top">'.\Joomla\CMS\Language\Text::_( 'FLEXI_UPLOAD_FILESIZE_MAX' ).'</div>
+								<div class="fc-mssg fc-info fc-nobgimage fc-about-box '.$this->tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_UPLOAD_FILESIZE_MAX_DESC', '', 1, 1).'" data-placement="top">'.JText::_( 'FLEXI_UPLOAD_FILESIZE_MAX' ).'</div>
 							</td>
 							<td>
 								<span class="fc-sys-upload-limit-box fc-about-conf-size-limit">
@@ -1577,7 +1577,7 @@ if ($js)
 								'
 									<span class="fc-php-upload-limit-box fc-about-server-size-limit">
 										<span class="icon-database"></span>
-										<span class="'.$sys_limit_class.' '.$this->tooltip_class.'" style="margin-right: 4px;" title="'.flexicontent_html::getToolTip(\Joomla\CMS\Language\Text::_('FLEXI_SERVER_UPLOAD_MAX_LIMIT'), \Joomla\CMS\Language\Text::sprintf('FLEXI_SERVER_UPLOAD_MAX_LIMIT_DESC', $phpUploadLimit['name']), 0, 1).'">'.round($phpUploadLimit['value'] / (1024*1024), 2).'</span> MBytes
+										<span class="'.$sys_limit_class.' '.$this->tooltip_class.'" style="margin-right: 4px;" title="'.flexicontent_html::getToolTip(JText::_('FLEXI_SERVER_UPLOAD_MAX_LIMIT'), JText::sprintf('FLEXI_SERVER_UPLOAD_MAX_LIMIT_DESC', $phpUploadLimit['name']), 0, 1).'">'.round($phpUploadLimit['value'] / (1024*1024), 2).'</span> MBytes
 									</span>
 								' : '').'
 							</td>
@@ -1586,8 +1586,8 @@ if ($js)
 						'.($upConf['resize_on_upload'] ? '
 						<tr class="fc-about-dim-limits">
 							<td>
-								<div class="fc-mssg fc-info fc-nobgimage fc-about-box '.$this->tooltip_class.'" title="'.\Joomla\CMS\Language\Text::_('FLEXI_UPLOAD_IMAGE_LIMITATION').'">
-									'.\Joomla\CMS\Language\Text::_( 'FLEXI_UPLOAD_DIMENSIONS_MAX' ).'
+								<div class="fc-mssg fc-info fc-nobgimage fc-about-box '.$this->tooltip_class.'" title="'.JText::_('FLEXI_UPLOAD_IMAGE_LIMITATION').'">
+									'.JText::_( 'FLEXI_UPLOAD_DIMENSIONS_MAX' ).'
 									<span class="icon-image pull-right" style="margin:2px -4px 0px 8px"></span>
 								</div>
 							</td>
@@ -1595,23 +1595,23 @@ if ($js)
 								<span class="fc-php-upload-limit-box">
 									<span class="icon-contract-2"></span>
 									<span class="'.$sys_limit_class.'" style="margin-right: 4px;">'.$upConf['upload_max_w'].'x'.$upConf['upload_max_h'].'</span> <span class="fc_hidden_580">Pixels</span>
-									<span class="icon-info '.$this->tooltip_class.'" style="padding: 2px 4px 0px 2px;" title="'.htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_UPLOAD_DIMENSIONS_MAX_DESC'), ENT_QUOTES, 'UTF-8').'" data-placement="top"></span>
+									<span class="icon-info '.$this->tooltip_class.'" style="padding: 2px 4px 0px 2px;" title="'.htmlspecialchars(JText::_('FLEXI_UPLOAD_DIMENSIONS_MAX_DESC'), ENT_QUOTES, 'UTF-8').'" data-placement="top"></span>
 								</span>
 							</td>
 						</tr>
 
 						<tr class="fc-about-crop-quality-limits">
 							<td>
-								<div class="fc-mssg fc-info fc-nobgimage fc-about-box '.$this->tooltip_class.'" title="'.\Joomla\CMS\Language\Text::_('FLEXI_UPLOAD_IMAGE_LIMITATION').'">
-									'.\Joomla\CMS\Language\Text::_( 'FLEXI_UPLOAD_FIT_METHOD' ).'
+								<div class="fc-mssg fc-info fc-nobgimage fc-about-box '.$this->tooltip_class.'" title="'.JText::_('FLEXI_UPLOAD_IMAGE_LIMITATION').'">
+									'.JText::_( 'FLEXI_UPLOAD_FIT_METHOD' ).'
 									<span class="icon-image pull-right" style="margin:2px -4px 0px 8px"></span>
 								</div>
 							</td>
 							<td>
 								<span class="fc-php-upload-limit-box">
 									<span class="icon-scissors" style="margin-right: 4px;'.($upConf['upload_method'] ? '' : 'opacity: 0.3;').'"></span>
-									<span style="margin-right: 4px;">'.\Joomla\CMS\Language\Text::_($upConf['upload_method'] ? 'FLEXI_CROP' : 'FLEXI_SCALE').' , '.$upConf['upload_quality'].'% <span class="fc_hidden_580">'.\Joomla\CMS\Language\Text::_('FLEXI_QUALITY', true).'</span></span>
-									<span class="icon-info '.$this->tooltip_class.'" style="padding: 2px 4px 0px 2px;" title="'.htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_UPLOAD_FIT_METHOD_DESC'), ENT_QUOTES, 'UTF-8').'" data-placement="top"></span>
+									<span style="margin-right: 4px;">'.JText::_($upConf['upload_method'] ? 'FLEXI_CROP' : 'FLEXI_SCALE').' , '.$upConf['upload_quality'].'% <span class="fc_hidden_580">'.JText::_('FLEXI_QUALITY', true).'</span></span>
+									<span class="icon-info '.$this->tooltip_class.'" style="padding: 2px 4px 0px 2px;" title="'.htmlspecialchars(JText::_('FLEXI_UPLOAD_FIT_METHOD_DESC'), ENT_QUOTES, 'UTF-8').'" data-placement="top"></span>
 								</span>
 							</td>
 						</tr>
@@ -1622,7 +1622,7 @@ if ($js)
 
 					<div class="fc-mssg-inline fc-nobgimage fc-success" style="margin: 8px 0;">
 						<span class="icon-info"></span>
-						' . \Joomla\CMS\Language\Text::_('FLEXI_FILES_CLICK_TO_EDIT_PROPERTIES') . '
+						' . JText::_('FLEXI_FILES_CLICK_TO_EDIT_PROPERTIES') . '
 					</div>
 
 				</div>
@@ -1636,13 +1636,13 @@ if ($js)
 					<fieldset class="fc-formbox flexicontent" id="filePropsForm_box">
 						<form action="<?php echo $action_url . 'saveprops'; ?>&amp;format=raw" name="filePropsForm" id="filePropsForm" method="get" enctype="multipart/form-data">
 
-							<!--span class="fcsep_level0" style="margin: 16px 0 12px 0; "><?php echo \Joomla\CMS\Language\Text::_('FLEXI_FILE_PROPERTIES'); ?></span-->
+							<!--span class="fcsep_level0" style="margin: 16px 0 12px 0; "><?php echo JText::_('FLEXI_FILE_PROPERTIES'); ?></span-->
 							<table class="fc-form-tbl fcinner fcfullwidth" id="file-props-form-container">
 
 								<tr>
 									<td id="file-props-name-lbl-container" class="key <?php echo $this->tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_FILENAME', 'FLEXI_FILE_DOWNLOAD_FILENAME_DESC', 1, 1); ?>">
 										<label class="fc-prop-lbl" id="file-props-name-lbl" for="file-props-name">
-										<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_FILE_FILENAME' ); ?>
+										<?php echo JText::_( 'FLEXI_FILE_FILENAME' ); ?>
 										</label>
 									</td>
 									<td id="file-props-name-container">
@@ -1655,7 +1655,7 @@ if ($js)
 								<tr>
 									<td id="file-props-title-lbl-container" class="key <?php echo $this->tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_DISPLAY_TITLE', 'FLEXI_FILE_DISPLAY_TITLE_DESC', 1, 1); ?>">
 										<label class="fc-prop-lbl" id="file-props-title-lbl" for="file-props-title">
-										<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_FILE_DISPLAY_TITLE' ); ?>
+										<?php echo JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ); ?>
 										</label>
 									</td>
 									<td id="file-props-title-container">
@@ -1666,7 +1666,7 @@ if ($js)
 								<tr>
 									<td id="file-props-desc-lbl-container" class="key <?php echo $this->tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_DESCRIPTION', 'FLEXI_FILE_DESCRIPTION_DESC', 1, 1); ?>">
 										<label class="fc-prop-lbl" id="file-props-desc-lbl" for="file-props-desc_uploadFileForm">
-										<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_DESCRIPTION' ); ?>
+										<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
 										</label>
 									</td>
 									<td id="file-props-desc-container" style="vertical-align: top;">
@@ -1677,7 +1677,7 @@ if ($js)
 								<tr>
 									<td id="file-props-lang-lbl-container" class="key <?php echo $this->tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_LANGUAGE', 'FLEXI_FILE_LANGUAGE_DESC', 1, 1); ?>">
 										<label class="fc-prop-lbl" id="file-props-lang-lbl" for="file-props-lang">
-										<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_LANGUAGE' ); ?>
+										<?php echo JText::_( 'FLEXI_LANGUAGE' ); ?>
 										</label>
 									</td>
 									<td id="file-props-lang-container">
@@ -1688,7 +1688,7 @@ if ($js)
 								<tr>
 									<td id="file-props-access-lbl-container" class="key <?php echo $this->tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_ACCESS', 'FLEXI_FILE_ACCESS_DESC', 1, 1); ?>">
 										<label class="fc-prop-lbl" id="file-props-access-lbl" for="file-props-access">
-										<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_ACCESS' ); ?>
+										<?php echo JText::_( 'FLEXI_ACCESS' ); ?>
 										</label>
 									</td>
 									<td id="file-props-access-container">
@@ -1700,16 +1700,16 @@ if ($js)
 								<tr>
 									<td id="file-props-secure-lbl-container" class="key <?php echo $this->tooltip_class; ?>" data-placement="bottom" title="<?php echo flexicontent_html::getToolTip('FLEXI_CHOOSE_DIRECTORY', 'FLEXI_CHOOSE_DIRECTORY_DESC', 1, 1); ?>">
 										<label class="fc-prop-lbl" id="file-props-secure-lbl">
-										<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_URL_SECURE' ); ?>
+										<?php echo JText::_( 'FLEXI_URL_SECURE' ); ?>
 										</label>
 									</td>
 									<td id="file-props-secure-container">
 										<div class="group-fcset radio">
 										<?php
-										//echo \Joomla\CMS\HTML\HTMLHelper::_('select.booleanlist', 'secure', 'class="inputbox"', 1, \Joomla\CMS\Language\Text::_( 'FLEXI_SECURE' ), \Joomla\CMS\Language\Text::_( 'FLEXI_MEDIA' ), 'secure_filePropsForm' );
+										//echo JHtml::_('select.booleanlist', 'secure', 'class="inputbox"', 1, JText::_( 'FLEXI_SECURE' ), JText::_( 'FLEXI_MEDIA' ), 'secure_filePropsForm' );
 										$_options = array();
-										$_options['0'] = \Joomla\CMS\Language\Text::_( 'FLEXI_MEDIA' );
-										$_options['1'] = \Joomla\CMS\Language\Text::_( 'FLEXI_SECURE' );
+										$_options['0'] = JText::_( 'FLEXI_MEDIA' );
+										$_options['1'] = JText::_( 'FLEXI_SECURE' );
 										echo flexicontent_html::buildradiochecklist($_options, 'secure', /*selected*/1, /*type*/0, /*attribs*/'', /*tagid*/'secure_filePropsForm');
 										?>
 										</div>
@@ -1720,15 +1720,15 @@ if ($js)
 
 								<tr>
 									<td style="text-align:right; padding: 12px 4px;">
-										<input type="button" id="file-props-apply" class="btn btn-success" onclick="var up = jQuery('#<?php echo $uploader_tag_id . $up_sfx_n; ?>').data('plupload_instance'); jQuery(up).data('fc_plupload_instance').submit_props_form(this, up); return false;" value="<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_APPLY' ); ?>"/>
+										<input type="button" id="file-props-apply" class="btn btn-success" onclick="var up = jQuery('#<?php echo $uploader_tag_id . $up_sfx_n; ?>').data('plupload_instance'); jQuery(up).data('fc_plupload_instance').submit_props_form(this, up); return false;" value="<?php echo JText::_( 'FLEXI_APPLY' ); ?>"/>
 									</td>
 									<td style="text-align:left; padding: 12px 4px;">
-										<input type="button" id="file-props-close" class="btn" onclick="fc_file_props_handle.dialog('close'); return false;" value="<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_CANCEL' ); ?>"/>
+										<input type="button" id="file-props-close" class="btn" onclick="fc_file_props_handle.dialog('close'); return false;" value="<?php echo JText::_( 'FLEXI_CANCEL' ); ?>"/>
 									</td>
 								</tr>
 							</table>
 
-							<?php echo \Joomla\CMS\HTML\HTMLHelper::_('form.token'); ?>
+							<?php echo JHtml::_('form.token'); ?>
 							<input type="hidden" name="fieldid" value="<?php echo $this->fieldid; ?>" />
 							<input type="hidden" name="u_item_id" value="<?php echo $this->u_item_id; ?>" />
 							<input type="hidden" name="folder_mode" value="<?php echo $this->folder_mode; ?>" />
@@ -1747,9 +1747,9 @@ if ($js)
 							<span class="fcsep_level0" style="margin: 0 0 12px 0; background-color: #444; border-radius: 0; font-weight: normal;">
 								<span class="icon-plus" style="font-size: 36px; width: 1em; height: 1em; line-height: 1em; box-sizing: content-box; vertical-align: top;"></span>
 								<span style="display: inline-block;">
-									<span style="font-size: 16px;"><?php echo \Joomla\CMS\Language\Text::_('FLEXI_BASIC_UPLOADER'); ?></span>
+									<span style="font-size: 16px;"><?php echo JText::_('FLEXI_BASIC_UPLOADER'); ?></span>
 									<br>
-									<span style="font-size: 12px;"><?php echo \Joomla\CMS\Language\Text::_('FLEXI_TOGGLE_BASIC_UPLOADER_DESC'); ?></span>
+									<span style="font-size: 12px;"><?php echo JText::_('FLEXI_TOGGLE_BASIC_UPLOADER_DESC'); ?></span>
 								</span>
 							</span>
 							<table class="fc-form-tbl fcinner" id="file-upload-form-container">
@@ -1757,7 +1757,7 @@ if ($js)
 								<tr>
 									<td id="file-upload-lbl-container" class="key <?php echo $this->tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_CHOOSE_FILE', 'FLEXI_CHOOSE_FILE_DESC', 1, 1); ?>">
 										<label class="fc-prop-lbl" id="file-upload-lbl" for="file-upload">
-										<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_CHOOSE_FILE' ); ?>
+										<?php echo JText::_( 'FLEXI_CHOOSE_FILE' ); ?>
 										</label>
 									</td>
 									<td id="file-upload-container">
@@ -1771,7 +1771,7 @@ if ($js)
 								<tr>
 									<td id="file-title-lbl-container" class="key <?php echo $this->tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_DISPLAY_TITLE', 'FLEXI_FILE_DISPLAY_TITLE_DESC', 1, 1); ?>">
 										<label class="fc-prop-lbl" id="file-title-lbl" for="file-title">
-										<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_FILE_DISPLAY_TITLE' ); ?>
+										<?php echo JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ); ?>
 										</label>
 									</td>
 									<td id="file-title-container">
@@ -1782,7 +1782,7 @@ if ($js)
 								<tr>
 									<td id="file-desc-lbl-container" class="key <?php echo $this->tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_DESCRIPTION', 'FLEXI_FILE_DESCRIPTION_DESC', 1, 1); ?>">
 										<label class="fc-prop-lbl" id="file-desc-lbl" for="file-desc_uploadFileForm">
-										<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_DESCRIPTION' ); ?>
+										<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
 										</label>
 									</td>
 									<td id="file-desc-container" style="vertical-align: top;">
@@ -1793,7 +1793,7 @@ if ($js)
 								<tr>
 									<td id="file-lang-lbl-container" class="key <?php echo $this->tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_LANGUAGE', 'FLEXI_FILE_LANGUAGE_DESC', 1, 1); ?>">
 										<label class="fc-prop-lbl" id="file-lang-lbl" for="file-lang">
-										<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_LANGUAGE' ); ?>
+										<?php echo JText::_( 'FLEXI_LANGUAGE' ); ?>
 										</label>
 									</td>
 									<td id="file-lang-container">
@@ -1804,7 +1804,7 @@ if ($js)
 								<tr>
 									<td id="file-access-lbl-container" class="key <?php echo $this->tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_ACCESS', 'FLEXI_FILE_ACCESS_DESC', 1, 1); ?>">
 										<label class="fc-prop-lbl" id="file-access-lbl" for="file-access">
-										<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_ACCESS' ); ?>
+										<?php echo JText::_( 'FLEXI_ACCESS' ); ?>
 										</label>
 									</td>
 									<td id="file-access-container">
@@ -1816,16 +1816,16 @@ if ($js)
 								<tr>
 									<td id="secure-lbl-container" class="key <?php echo $this->tooltip_class; ?>" data-placement="bottom" title="<?php echo flexicontent_html::getToolTip('FLEXI_CHOOSE_DIRECTORY', 'FLEXI_CHOOSE_DIRECTORY_DESC', 1, 1); ?>">
 										<label class="fc-prop-lbl" id="secure-lbl">
-										<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_URL_SECURE' ); ?>
+										<?php echo JText::_( 'FLEXI_URL_SECURE' ); ?>
 										</label>
 									</td>
 									<td id="secure-container">
 										<div class="group-fcset radio">
 										<?php
-										//echo \Joomla\CMS\HTML\HTMLHelper::_('select.booleanlist', 'secure', 'class="inputbox"', 1, \Joomla\CMS\Language\Text::_( 'FLEXI_SECURE' ), \Joomla\CMS\Language\Text::_( 'FLEXI_MEDIA' ), 'secure_uploadFileForm' );
+										//echo JHtml::_('select.booleanlist', 'secure', 'class="inputbox"', 1, JText::_( 'FLEXI_SECURE' ), JText::_( 'FLEXI_MEDIA' ), 'secure_uploadFileForm' );
 										$_options = array();
-										$_options['0'] = \Joomla\CMS\Language\Text::_( 'FLEXI_MEDIA' );
-										$_options['1'] = \Joomla\CMS\Language\Text::_( 'FLEXI_SECURE' );
+										$_options['0'] = JText::_( 'FLEXI_MEDIA' );
+										$_options['1'] = JText::_( 'FLEXI_SECURE' );
 										echo flexicontent_html::buildradiochecklist($_options, 'secure', /*selected*/1, /*type*/0, /*attribs*/'', /*tagid*/'secure_uploadFileForm');
 										?>
 										</div>
@@ -1836,15 +1836,15 @@ if ($js)
 
 							</table>
 
-							<input type="submit" id="file-upload-submit" class="btn btn-success" value="<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_START_UPLOAD' ); ?>" style="margin: 16px 48px 0 48px;" />
+							<input type="submit" id="file-upload-submit" class="btn btn-success" value="<?php echo JText::_( 'FLEXI_START_UPLOAD' ); ?>" style="margin: 16px 48px 0 48px;" />
 
-							<?php echo \Joomla\CMS\HTML\HTMLHelper::_('form.token'); ?>
+							<?php echo JHtml::_('form.token'); ?>
 							<input type="hidden" name="fieldid" value="<?php echo $this->fieldid; ?>" />
 							<input type="hidden" name="u_item_id" value="<?php echo $this->u_item_id; ?>" />
 							<input type="hidden" name="folder_mode" value="<?php echo $this->folder_mode; ?>" />
 
 							<?php /* NOTE: return URL should use & and not &amp; for variable separation as these will be re-encoded on redirect */ ?>
-							<input type="hidden" name="return" value="<?php echo base64_encode('index.php?option=com_flexicontent&view='.$this->view.($_tmpl ? '&tmpl='.$_tmpl : '').'&field='.$this->fieldid.'&layout='.$this->layout.'&'.\Joomla\CMS\Session\Session::getFormToken().'=1'.'&folder_mode='.$this->folder_mode); ?>" />
+							<input type="hidden" name="return" value="<?php echo base64_encode('index.php?option=com_flexicontent&view='.$this->view.($_tmpl ? '&tmpl='.$_tmpl : '').'&field='.$this->fieldid.'&layout='.$this->layout.'&'.JSession::getFormToken().'=1'.'&folder_mode='.$this->folder_mode); ?>" />
 						</form>
 
 					</fieldset>
@@ -1863,14 +1863,14 @@ if ($js)
 			<!-- File URL by Form -->
 			<?php if ($this->layout !='image' ) : /* not applicable for LAYOUT 'image' */ ?>
 
-			<?php /*echo \Joomla\CMS\HTML\HTMLHelper::_('tabs.panel', \Joomla\CMS\Language\Text::_( 'FLEXI_ADD_URL' ), 'filebyurl' );*/ ?>
+			<?php /*echo JHtml::_('tabs.panel', JText::_( 'FLEXI_ADD_URL' ), 'filebyurl' );*/ ?>
 			<?php
 				$tab_title = $use_jmedia_man ? 'FLEXI_ADD_LINK' : 'FLEXI_ADD_URL';
 			?>
 			<div class="tabbertab" id="fileurl_tab" data-icon2-class="icon-link fc-icon-gray" data-icon-class="fc-icon-green">
-				<h3 class="tabberheading hasTooltip" data-placement="bottom" title="<?php echo \Joomla\CMS\Language\Text::_($tab_title . '_DESC'); ?>"> <?php echo \Joomla\CMS\Language\Text::_($tab_title); ?> </h3>
+				<h3 class="tabberheading hasTooltip" data-placement="bottom" title="<?php echo JText::_($tab_title . '_DESC'); ?>"> <?php echo JText::_($tab_title); ?> </h3>
 
-				<div class="fc_loading_msg alert alert-info" style="display:none;"> &nbsp; &nbsp; <?php echo \Joomla\CMS\Language\Text::_('FLEXI_LOADING') .' ... '. \Joomla\CMS\Language\Text::_('FLEXI_PLEASE_WAIT'); ?></div>
+				<div class="fc_loading_msg alert alert-info" style="display:none;"> &nbsp; &nbsp; <?php echo JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'); ?></div>
 				<form action="<?php echo $action_url . 'addurl'; ?>" class="form-validate form-horizontal" name="addUrlForm" id="addUrlForm" method="post" onsubmit="this.style.display='none'; jQuery(this).prev().show(); return true;">
 					<fieldset class="fc-fileman-tab" >
 						<fieldset class="fc-formbox" id="fc-fileman-formbox-3">
@@ -1881,15 +1881,15 @@ if ($js)
 								<tr>
 									<td id="file-link-type-lbl-container" class="key <?php echo $this->tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_URL_LINK', 'FLEXI_URL_LINK_DESC', 1, 1); ?>">
 										<label class="fc-prop-lbl" for="file-url-data">
-										<?php echo \Joomla\CMS\Language\Text::_( 'Link type' ); ?>
+										<?php echo JText::_( 'Link type' ); ?>
 										</label>
 									</td>
 									<td id="file-link-type-container">
 										<?php
-										//echo \Joomla\CMS\HTML\HTMLHelper::_('select.booleanlist', 'keep', 'class="inputbox"', 1, \Joomla\CMS\Language\Text::_( 'FLEXI_YES' ), \Joomla\CMS\Language\Text::_( 'FLEXI_NO' ) );
+										//echo JHtml::_('select.booleanlist', 'keep', 'class="inputbox"', 1, JText::_( 'FLEXI_YES' ), JText::_( 'FLEXI_NO' ) );
 										$_options = array();
-										$_options['1'] = \Joomla\CMS\Language\Text::_( 'FLEXI_URL_LINK' );
-										$_options['2'] = \Joomla\CMS\Language\Text::_( 'FLEXI_JMEDIA_LINK' );
+										$_options['1'] = JText::_( 'FLEXI_URL_LINK' );
+										$_options['2'] = JText::_( 'FLEXI_JMEDIA_LINK' );
 										echo flexicontent_html::buildradiochecklist($_options, 'file-link-type', /*selected*/1, /*type*/1, /*attribs*/'onchange="return fman_toggle_link_type(this.value);"', /*tagid*/'file-link-type');
 										?>
 									</td>
@@ -1899,7 +1899,7 @@ if ($js)
 								<tr id="file-url-data-row">
 									<td id="file-url-data-lbl-container" class="key <?php echo $this->tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_URL_LINK', 'FLEXI_URL_LINK_DESC', 1, 1); ?>">
 										<label class="fc-prop-lbl" for="file-url-data">
-										<b><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_URL_LINK' ); ?></b>
+										<b><?php echo JText::_( 'FLEXI_URL_LINK' ); ?></b>
 										</label>
 									</td>
 									<td id="file-url-data-container">
@@ -1911,7 +1911,7 @@ if ($js)
 								<tr id="file-jmedia-data-row" style="display: none;">
 									<td id="file-jmedia-data-lbl-container" class="key <?php echo $this->tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_URL', 'FLEXI_FILE_URL_DESC', 1, 1); ?>">
 										<label class="fc-prop-lbl" for="file-jmedia-data">
-										<b><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_JMEDIA_LINK' ); ?></b>
+										<b><?php echo JText::_( 'FLEXI_JMEDIA_LINK' ); ?></b>
 										</label>
 									</td>
 									<td id="file-jmedia-data-container">
@@ -1931,7 +1931,7 @@ if ($js)
 											'value' => '',
 											'folder' => '',
 										);
-										echo \Joomla\CMS\Layout\LayoutHelper::render($media_field_layout = 'joomla.form.field.media', $jMedia_file_displayData, $layouts_path = null);
+										echo JLayoutHelper::render($media_field_layout = 'joomla.form.field.media', $jMedia_file_displayData, $layouts_path = null);
 										?>
 									</td>
 								</tr>
@@ -1944,7 +1944,7 @@ if ($js)
 								<tr>
 									<td id="file-url-title-lbl-container" class="key <?php echo $this->tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_DISPLAY_TITLE', 'FLEXI_FILE_DISPLAY_TITLE_DESC', 1, 1); ?>">
 										<label class="fc-prop-lbl" for="file-url-title">
-										<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_FILE_DISPLAY_TITLE' ); ?>
+										<?php echo JText::_( 'FLEXI_FILE_DISPLAY_TITLE' ); ?>
 										</label>
 									</td>
 									<td id="file-url-title-container">
@@ -1955,7 +1955,7 @@ if ($js)
 								<tr>
 									<td id="file-url-desc-lbl-container" class="key <?php echo $this->tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_DESCRIPTION', 'FLEXI_FILE_DESCRIPTION_DESC', 1, 1); ?>">
 										<label class="fc-prop-lbl" for="file-url-desc">
-										<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_DESCRIPTION' ); ?>
+										<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
 										</label>
 									</td>
 									<td id="file-url-desc-container">
@@ -1966,7 +1966,7 @@ if ($js)
 								<tr>
 									<td id="file-url-lang-lbl-container" class="key <?php echo $this->tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_LANGUAGE', 'FLEXI_FILE_LANGUAGE_DESC', 1, 1); ?>">
 										<label class="fc-prop-lbl" id="file-url-lang-lbl" for="file-url-lang">
-										<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_LANGUAGE' ); ?>
+										<?php echo JText::_( 'FLEXI_LANGUAGE' ); ?>
 										</label>
 									</td>
 									<td id="file-url-lang-container">
@@ -1977,7 +1977,7 @@ if ($js)
 								<tr>
 									<td id="file-url-access-lbl-container" class="key <?php echo $this->tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_ACCESS', 'FLEXI_FILE_ACCESS_DESC', 1, 1); ?>">
 										<label class="fc-prop-lbl" id="file-url-access-lbl" for="file-url-access">
-										<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_ACCESS' ); ?>
+										<?php echo JText::_( 'FLEXI_ACCESS' ); ?>
 										</label>
 									</td>
 									<td id="file-url-access-container">
@@ -1988,7 +1988,7 @@ if ($js)
 								<tr>
 									<td id="file-url-ext-lbl-container" class="key <?php echo $this->tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILEEXT_MIME', 'FLEXI_FILEEXT_MIME_DESC', 1, 1); ?>">
 										<label class="fc-prop-lbl" for="file-url-ext">
-										<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_FILEEXT_MIME' ); ?>
+										<?php echo JText::_( 'FLEXI_FILEEXT_MIME' ); ?>
 										</label>
 									</td>
 									<td id="file-url-ext-container">
@@ -1999,7 +1999,7 @@ if ($js)
 								<tr>
 									<td id="file-url-size-lbl-container" class="key <?php echo $this->tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_SIZE', '', 1, 1); ?>">
 										<label class="fc-prop-lbl" for="file-url-size">
-										<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_SIZE' ); ?>
+										<?php echo JText::_( 'FLEXI_SIZE' ); ?>
 										</label>
 									</td>
 									<td id="file-url-size-container">
@@ -2015,16 +2015,16 @@ if ($js)
 
 							</table>
 
-							<input type="submit" id="file-url-submit" class="btn btn-success validate" value="<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_ADD_FILE' ); ?>" style="margin: 16px 48px 0 48px;" />
+							<input type="submit" id="file-url-submit" class="btn btn-success validate" value="<?php echo JText::_( 'FLEXI_ADD_FILE' ); ?>" style="margin: 16px 48px 0 48px;" />
 
-							<?php echo \Joomla\CMS\HTML\HTMLHelper::_('form.token'); ?>
+							<?php echo JHtml::_('form.token'); ?>
 							<input type="hidden" name="fieldid" value="<?php echo $this->fieldid; ?>" />
 
 						</fieldset>
 					</fieldset>
 
 					<?php /* NOTE: return URL should use & and not &amp; for variable separation as these will be re-encoded on redirect */ ?>
-					<input type="hidden" name="return" value="<?php echo base64_encode('index.php?option=com_flexicontent&view='.$this->view.($_tmpl ? '&tmpl='.$_tmpl : '').'&field='.$this->fieldid.'&layout='.$this->layout.'&'.\Joomla\CMS\Session\Session::getFormToken().'=1'); ?>" />
+					<input type="hidden" name="return" value="<?php echo base64_encode('index.php?option=com_flexicontent&view='.$this->view.($_tmpl ? '&tmpl='.$_tmpl : '').'&field='.$this->fieldid.'&layout='.$this->layout.'&'.JSession::getFormToken().'=1'); ?>" />
 				</form>
 
 			</div>
@@ -2035,11 +2035,11 @@ if ($js)
 			<!-- File(s) from server Form -->
 		<?php if (!$isFilesElement) : ?>
 
-			<?php /*echo \Joomla\CMS\HTML\HTMLHelper::_('tabs.panel', \Joomla\CMS\Language\Text::_( 'FLEXI_ADD_FILE_FROM_SERVER' ), 'filefromserver' );*/ ?>
+			<?php /*echo JHtml::_('tabs.panel', JText::_( 'FLEXI_ADD_FILE_FROM_SERVER' ), 'filefromserver' );*/ ?>
 			<div class="tabbertab" id="server_tab" data-icon2-class="icon-stack fc-icon-gray" data-icon-class="fc-icon-green">
-				<h3 class="tabberheading hasTooltip" data-placement="bottom" title="<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_BATCH_ADD_FILES_DESC' ); ?>"> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_BATCH_ADD_FILES' ); ?> </h3>
+				<h3 class="tabberheading hasTooltip" data-placement="bottom" title="<?php echo JText::_( 'FLEXI_BATCH_ADD_FILES_DESC' ); ?>"> <?php echo JText::_( 'FLEXI_BATCH_ADD_FILES' ); ?> </h3>
 
-				<form action="index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>addlocal&amp;<?php echo \Joomla\CMS\Session\Session::getFormToken() . '=1'; ?>" class="form-validate form-horizontal" name="addFileForm" id="addFileForm" method="post">
+				<form action="index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>addlocal&amp;<?php echo JSession::getFormToken() . '=1'; ?>" class="form-validate form-horizontal" name="addFileForm" id="addFileForm" method="post">
 					<fieldset class="fc-fileman-tab" >
 						<fieldset class="fc-formbox" id="fc-fileman-formbox-4">
 
@@ -2048,7 +2048,7 @@ if ($js)
 								<tr>
 									<td class="key <?php echo $this->tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_CHOOSE_SRC_DIR', 'FLEXI_CHOOSE_SRC_DIR_DESC', 1, 1); ?>">
 										<label class="fc-prop-lbl" for="file-dir-path">
-										<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_SRC_DIR' ); ?>
+										<?php echo JText::_( 'FLEXI_SRC_DIR' ); ?>
 										</label>
 									</td>
 									<td>
@@ -2059,7 +2059,7 @@ if ($js)
 								<tr>
 									<td class="key <?php echo $this->tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_LANGUAGE', 'FLEXI_FILE_LANGUAGE_DESC', 1, 1); ?>">
 										<label class="fc-prop-lbl" id="_file-lang-lbl" for="_file-lang">
-										<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_LANGUAGE' ); ?>
+										<?php echo JText::_( 'FLEXI_LANGUAGE' ); ?>
 										</label>
 									</td>
 									<td>
@@ -2073,7 +2073,7 @@ if ($js)
 								<tr>
 									<td class="key <?php echo $this->tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_FILTER_EXT', 'FLEXI_FILE_FILTER_EXT_DESC', 1, 1); ?>">
 										<label class="fc-prop-lbl" for="file-filter-ext">
-										<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_FILE_FILTER_EXT' ); ?>
+										<?php echo JText::_( 'FLEXI_FILE_FILTER_EXT' ); ?>
 										</label>
 									</td>
 									<td>
@@ -2084,7 +2084,7 @@ if ($js)
 								<tr>
 									<td class="key <?php echo $this->tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_DESCRIPTION', 'FLEXI_FILE_DESCRIPTION_DESC', 1, 1); ?>">
 										<label class="fc-prop-lbl" for="file-desc_addFileForm">
-										<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_DESCRIPTION' ); ?>
+										<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
 										</label>
 									</td>
 									<td>
@@ -2095,7 +2095,7 @@ if ($js)
 								<tr>
 									<td class="key <?php echo $this->tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_FILTER_REGEX', 'FLEXI_FILE_FILTER_REGEX_DESC', 1, 1); ?>">
 										<label class="fc-prop-lbl" for="file-filter-re">
-										<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_FILE_FILTER_REGEX' ); ?>
+										<?php echo JText::_( 'FLEXI_FILE_FILTER_REGEX' ); ?>
 										</label>
 									</td>
 									<td>
@@ -2106,16 +2106,16 @@ if ($js)
 								<tr>
 									<td class="key <?php echo $this->tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_KEEP_ORIGINAL_FILE', 'FLEXI_KEEP_ORIGINAL_FILE_DESC', 1, 1); ?>">
 										<label class="fc-prop-lbl">
-										<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_KEEP_ORIGINAL_FILE' ); ?>
+										<?php echo JText::_( 'FLEXI_KEEP_ORIGINAL_FILE' ); ?>
 										</label>
 									</td>
 									<td>
 										<div class="group-fcset radio">
 										<?php
-										//echo \Joomla\CMS\HTML\HTMLHelper::_('select.booleanlist', 'keep', 'class="inputbox"', 1, \Joomla\CMS\Language\Text::_( 'FLEXI_YES' ), \Joomla\CMS\Language\Text::_( 'FLEXI_NO' ) );
+										//echo JHtml::_('select.booleanlist', 'keep', 'class="inputbox"', 1, JText::_( 'FLEXI_YES' ), JText::_( 'FLEXI_NO' ) );
 										$_options = array();
-										$_options['0'] = \Joomla\CMS\Language\Text::_( 'FLEXI_NO' );
-										$_options['1'] = \Joomla\CMS\Language\Text::_( 'FLEXI_YES' );
+										$_options['0'] = JText::_( 'FLEXI_NO' );
+										$_options['1'] = JText::_( 'FLEXI_YES' );
 										echo flexicontent_html::buildradiochecklist($_options, 'keep', /*selected*/1, /*type*/0, /*attribs*/'', /*tagid*/'keep_addFileForm');
 										?>
 										</div>
@@ -2125,16 +2125,16 @@ if ($js)
 								<tr>
 									<td class="key <?php echo $this->tooltip_class; ?>" data-placement="top" title="<?php echo flexicontent_html::getToolTip('FLEXI_CHOOSE_DIRECTORY', 'FLEXI_CHOOSE_DIRECTORY_DESC', 1, 1); ?>">
 										<label class="fc-prop-lbl">
-										<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_TARGET_DIRECTORY' ); ?>
+										<?php echo JText::_( 'FLEXI_TARGET_DIRECTORY' ); ?>
 										</label>
 									</td>
 									<td>
 										<div class="group-fcset radio">
 										<?php
-										//echo \Joomla\CMS\HTML\HTMLHelper::_('select.booleanlist', 'secure', 'class="inputbox"', 1, \Joomla\CMS\Language\Text::_( 'FLEXI_SECURE' ), \Joomla\CMS\Language\Text::_( 'FLEXI_MEDIA' ), 'secure_addFileForm' );
+										//echo JHtml::_('select.booleanlist', 'secure', 'class="inputbox"', 1, JText::_( 'FLEXI_SECURE' ), JText::_( 'FLEXI_MEDIA' ), 'secure_addFileForm' );
 										$_options = array();
-										$_options['0'] = \Joomla\CMS\Language\Text::_( 'FLEXI_MEDIA' );
-										$_options['1'] = \Joomla\CMS\Language\Text::_( 'FLEXI_SECURE' );
+										$_options['0'] = JText::_( 'FLEXI_MEDIA' );
+										$_options['1'] = JText::_( 'FLEXI_SECURE' );
 										echo flexicontent_html::buildradiochecklist($_options, 'secure', /*selected*/1, /*type*/0, /*attribs*/'', /*tagid*/'secure_addFileForm');
 										?>
 										</div>
@@ -2143,7 +2143,7 @@ if ($js)
 
 							</table>
 
-							<input type="submit" id="file-dir-submit" class="btn btn-success validate" value="<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_ADD_DIR' ); ?>" style="margin: 16px 48px 0 16px;" />
+							<input type="submit" id="file-dir-submit" class="btn btn-success validate" value="<?php echo JText::_( 'FLEXI_ADD_DIR' ); ?>" style="margin: 16px 48px 0 16px;" />
 
 						</fieldset>
 					</fieldset>
@@ -2154,17 +2154,17 @@ if ($js)
 			</div>
 
 
-			<?php /*echo \Joomla\CMS\HTML\HTMLHelper::_('tabs.panel', \Joomla\CMS\Language\Text::_( 'FLEXI_FILEMAN_INFO' ), 'fileinfo' );*/ ?>
+			<?php /*echo JHtml::_('tabs.panel', JText::_( 'FLEXI_FILEMAN_INFO' ), 'fileinfo' );*/ ?>
 			<div class="tabbertab" id="fileman_info_tab" data-icon-class="icon-info fc-icon-gray">
-				<h3 class="tabberheading hasTooltip" data-placement="bottom" title="<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_FILEMAN_INFO_DESC' ); ?>"> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_FILEMAN_INFO' ); ?> </h3>
+				<h3 class="tabberheading hasTooltip" data-placement="bottom" title="<?php echo JText::_( 'FLEXI_FILEMAN_INFO_DESC' ); ?>"> <?php echo JText::_( 'FLEXI_FILEMAN_INFO' ); ?> </h3>
 				<div id="why_box" class="info-box">
-				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_FILES_INFO_ABOUT_FILES_IN_DB' ); ?>
+				<?php echo JText::_( 'FLEXI_FILES_INFO_ABOUT_FILES_IN_DB' ); ?>
 				</div>
 			</div>
 
 		<?php endif; ?>
 
-		<?php /* echo \Joomla\CMS\HTML\HTMLHelper::_('tabs.end'); */ ?>
+		<?php /* echo JHtml::_('tabs.end'); */ ?>
 		</div><!-- .fctabber end -->
 	</div><!-- .span6 end -->
 
@@ -2231,7 +2231,7 @@ if (sidebarState === 'closed') {
 <?php endif; ?>
 
 <?php
-\Joomla\CMS\Factory::getDocument()->addScriptDeclaration('
+JFactory::getDocument()->addScriptDeclaration('
 	function fc_edit_mmdata_modal_load( container )
 	{
 		if ( container.find("iframe").get(0).contentWindow.location.href.indexOf("view=mediadatas") != -1 )

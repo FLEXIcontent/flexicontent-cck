@@ -27,12 +27,12 @@ jimport('legacy.view.legacy');
  * @subpackage	FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewItems extends \Joomla\CMS\MVC\View\HtmlView
+class FlexicontentViewItems extends JViewLegacy
 {
 	function display($tpl = null)
 	{
-		$app        = \Joomla\CMS\Factory::getApplication();
-		$user       = \Joomla\CMS\Factory::getUser();
+		$app        = JFactory::getApplication();
+		$user       = JFactory::getUser();
 		$dispatcher = JEventDispatcher::getInstance();
 
 		// Initialize some variables
@@ -46,12 +46,12 @@ class FlexicontentViewItems extends \Joomla\CMS\MVC\View\HtmlView
 		$favoured = $item->favoured;
 
 		// process the new plugins
-		\Joomla\CMS\Plugin\PluginHelper::importPlugin('content', 'image');
+		JPluginHelper::importPlugin('content', 'image');
 		FLEXI_J40GE
 			? $app->triggerEvent('onContentPrepare', array ('com_content.article', &$item, &$params, 0))
 			: $dispatcher->trigger('onContentPrepare', array ('com_content.article', &$item, &$params, 0));
 
-		$document = \Joomla\CMS\Factory::getDocument();
+		$document = JFactory::getDocument();
 
 		// set document information
 		$document->setTitle($item->title);
@@ -105,7 +105,7 @@ class FlexicontentViewItems extends \Joomla\CMS\MVC\View\HtmlView
 		if ($params->get('show_author')) {
 			// Display Author name
 			$text .= "\n";
-			$text .= \Joomla\CMS\Language\Text::_( 'FLEXI_WRITTEN_BY' ).' '. ($item->created_by_alias ? $item->created_by_alias : $item->author);
+			$text .= JText::_( 'FLEXI_WRITTEN_BY' ).' '. ($item->created_by_alias ? $item->created_by_alias : $item->author);
 		}
 
 		if ($params->get('show_create_date') && $params->get('show_author')) {
@@ -116,7 +116,7 @@ class FlexicontentViewItems extends \Joomla\CMS\MVC\View\HtmlView
 		if ($params->get('show_create_date')) {
 			// Display Created Date
 			if (intval($item->created)) {
-				$create_date = \Joomla\CMS\HTML\HTMLHelper::_('date', $item->created, \Joomla\CMS\Language\Text::_( 'DATE_FORMAT_LC2' ));
+				$create_date = JHtml::_('date', $item->created, JText::_( 'DATE_FORMAT_LC2' ));
 				$text .= $create_date;
 			}
 		}
@@ -129,8 +129,8 @@ class FlexicontentViewItems extends \Joomla\CMS\MVC\View\HtmlView
 		if ($params->get('show_modify_date')) {
 			// Display Modified Date
 			if (intval($item->modified)) {
-				$mod_date = \Joomla\CMS\HTML\HTMLHelper::_('date', $item->modified);
-				$text .= \Joomla\CMS\Language\Text::_( 'FLEXI_LAST_REVISED' ).' '.$mod_date;
+				$mod_date = JHtml::_('date', $item->modified);
+				$text .= JText::_( 'FLEXI_LAST_REVISED' ).' '.$mod_date;
 			}
 		}
 		return $text;

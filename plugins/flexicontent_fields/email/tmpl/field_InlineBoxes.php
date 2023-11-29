@@ -35,8 +35,8 @@
 
 		$addr = '
 			<div class="' . $box_classes . '">
-				<label class="' . $lbl_classes . $has_value_class . ' fc-lbl emailaddr-lbl" for="'.$elementid_n.'_addr">'.\Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_EMAILADDRESS' ).'</label>
-				<input ' . $ff_events . ' class="emailaddr ' . $input_classes . ' ' . $addr_classes . '" name="'.$fieldname_n.'[addr]" id="'.$elementid_n.'_addr" type="text" value="'.htmlspecialchars(\Joomla\CMS\String\PunycodeHelper::emailToUTF8($value['addr']), ENT_COMPAT, 'UTF-8').'" ' . $addr_attribs . '/>
+				<label class="' . $lbl_classes . $has_value_class . ' fc-lbl emailaddr-lbl" for="'.$elementid_n.'_addr">'.JText::_( 'FLEXI_FIELD_EMAILADDRESS' ).'</label>
+				<input ' . $ff_events . ' class="emailaddr ' . $input_classes . ' ' . $addr_classes . '" name="'.$fieldname_n.'[addr]" id="'.$elementid_n.'_addr" type="text" value="'.htmlspecialchars(JStringPunycode::emailToUTF8($value['addr']), ENT_COMPAT, 'UTF-8').'" ' . $addr_attribs . '/>
 			</div>';
 
 		$text = '';
@@ -48,7 +48,7 @@
 
 			$text = '
 			<div class="' . $box_classes . '">
-				<label class="' . $lbl_classes . $has_value_class . ' fc-lbl emailtext-lbl" for="'.$elementid_n.'_text">'.\Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_EMAILTITLE' ).'</label>
+				<label class="' . $lbl_classes . $has_value_class . ' fc-lbl emailtext-lbl" for="'.$elementid_n.'_text">'.JText::_( 'FLEXI_FIELD_EMAILTITLE' ).'</label>
 				<input ' . $ff_events . ' class="emailtext ' . $input_classes . '" name="'.$fieldname_n.'[text]"  id="'.$elementid_n.'_text" type="text" size="'.$size.'" value="'.htmlspecialchars($value['text'], ENT_COMPAT, 'UTF-8').'" />
 			</div>';
 		}

@@ -44,18 +44,18 @@ class plgFlexicontent_fieldsComments extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
-		$document	= \Joomla\CMS\Factory::getDocument();
+		$document	= JFactory::getDocument();
 
 		//API comments
 		$comment_api 	= $field->parameters->get('comment_api');
 
 		//Current url
-		$page_url = \Joomla\CMS\Uri\Uri::getInstance();
+		$page_url = JUri::getInstance();
 
 		//language
 		$mlang 					= $field->parameters->get('comment_language');
 		$autolanguage			= $field->parameters->get('autolanguage','1');
-		$jlang					= str_replace('-', '_', \Joomla\CMS\Factory::getLanguage()->getTag());
+		$jlang					= str_replace('-', '_', JFactory::getLanguage()->getTag());
 		$comments_langs 	= array("af_ZA","gn_PY","ay_BO","az_AZ","id_ID","ms_MY","jv_ID","bs_BA","ca_ES","cs_CZ","ck_US","cy_GB","da_DK","se_NO",
 		"de_DE","et_EE","ثn_IN","en_PI",	"en_GB","en_UD","en_US","es_LA","es_CL","es_CO","es_ES","es_MX","es_VE","eo_EO","eu_ES","tl_PH",
 		"fo_FO","fr_FR","fr_CA","fy_NL","ga_IE","gl_ES","ko_KR","hr_HR","xh_ZA","zu_ZA","is_IS","it_IT","ka_GE","sw_KE","tl_ST","ku_TR",
@@ -78,7 +78,7 @@ class plgFlexicontent_fieldsComments extends FCField
 		{
 		if (!$forum_shortname) {
 					$display=  '<div class="fc-mssg fc-info fc-iblock fc-nobgimage fcfavs-isnot-subscriber">
-				'.\Joomla\CMS\Language\Text::_("PLG_FLEXICONTENT_FIELDS_DISQUS_PLEASE_ENTER_YOUR_DISQUS_SUBDOMAIN").'
+				'.JText::_("PLG_FLEXICONTENT_FIELDS_DISQUS_PLEASE_ENTER_YOUR_DISQUS_SUBDOMAIN").'
 			</div>';
 		} else {
 				$page_identifier 	= $item->id;
@@ -139,7 +139,7 @@ class plgFlexicontent_fieldsComments extends FCField
 		elseif ($comment_api == 'facebook')	{
 			if (!$fappId) {
 				$display=  '<div class="fc-mssg fc-info fc-iblock fc-nobgimage fcfavs-isnot-subscriber">
-			'.\Joomla\CMS\Language\Text::_("PLG_FLEXICONTENT_FIELDS_FACEBOOK_PLEASE_ENTER_YOUR_APPID").'
+			'.JText::_("PLG_FLEXICONTENT_FIELDS_FACEBOOK_PLEASE_ENTER_YOUR_APPID").'
 		</div>';
 }
 		//check params for FB

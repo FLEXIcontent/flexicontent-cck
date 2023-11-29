@@ -9,8 +9,8 @@
 
 defined('_JEXEC') or die;
 
-$app = \Joomla\CMS\Factory::getApplication();
-//$cparams = clone(\Joomla\CMS\Component\ComponentHelper::getComponent('com_flexicontent')->params);     // Get the COMPONENT only parameters
+$app = JFactory::getApplication();
+//$cparams = clone(JComponentHelper::getComponent('com_flexicontent')->params);     // Get the COMPONENT only parameters
 global $globalcats;
 
 // category image params
@@ -36,7 +36,7 @@ if ($show_cat_image)
 	$q		= '&amp;q=95';
 	$ar 	= '&amp;ar=x';
 	$zc		= $cat_image_method ? '&amp;zc=' . $cat_image_method : '';
-	$phpThumbURL = \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=';
+	$phpThumbURL = JUri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=';
 }
 
 
@@ -47,7 +47,7 @@ if ($show_cat_image)
 
 if ($cat_default_image)
 {
-	$src = \Joomla\CMS\Uri\Uri::base(true) ."/". $joomla_image_url . $cat_default_image;
+	$src = JUri::base(true) ."/". $joomla_image_url . $cat_default_image;
 	
 	$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 	$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
@@ -91,7 +91,7 @@ foreach ($list as $cat) :
 	}
 	
 	$cat->slug = $cat->id.':'.$cat->alias;
-	$cat->link = \Joomla\CMS\Router\Route::_( FlexicontentHelperRoute::getCategoryRoute($cat->slug) );
+	$cat->link = JRoute::_( FlexicontentHelperRoute::getCategoryRoute($cat->slug) );
 
 	$image = '';
 	$src = '';
@@ -100,16 +100,16 @@ foreach ($list as $cat) :
 	{
 		if (!is_object($cat->params))
 		{
-			$cat->params = new \Joomla\Registry\Registry($cat->params);
+			$cat->params = new JRegistry($cat->params);
 		}
 		
 		$cat->image = $cat->params->get('image');
 		$cat->introtext = & $cat->description;
 		$cat->fulltext = '';
 		
-		if ( $cat_image_source && $cat->image && \Joomla\CMS\Filesystem\File::exists( JPATH_SITE .DS. $joomla_image_path . $cat->image ) )
+		if ( $cat_image_source && $cat->image && JFile::exists( JPATH_SITE .DS. $joomla_image_path . $cat->image ) )
 		{
-			$src = \Joomla\CMS\Uri\Uri::base(true) ."/". $joomla_image_url . $cat->image;
+			$src = JUri::base(true) ."/". $joomla_image_url . $cat->image;
 			
 			$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 			$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
@@ -121,7 +121,7 @@ foreach ($list as $cat) :
 			$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
 			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 			
-			$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  \Joomla\CMS\Uri\Uri::base(true).'/' : '';
+			$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JUri::base(true).'/' : '';
 			$src = $base_url.$src;
 		}
 		
@@ -163,7 +163,7 @@ foreach ($list as $cat) :
 		</h<?php echo $item_heading + $levelup; ?>>
 
 		<?php if ($params->get('show_description', 0)) : ?>
-			<?php echo \Joomla\CMS\HTML\HTMLHelper::_('content.prepare', $cat->description, $cat->getParams(), 'mod_flexicategories.content'); ?>
+			<?php echo JHtml::_('content.prepare', $cat->description, $cat->getParams(), 'mod_flexicategories.content'); ?>
 		<?php endif; ?>
 		<?php if (
 			$params->get('show_children', 0)
@@ -173,7 +173,7 @@ foreach ($list as $cat) :
 			<?php echo '<ul>'; ?>
 			<?php $temp = $list; ?>
 			<?php $list = $cat->getChildren(); ?>
-			<?php require \Joomla\CMS\Helper\ModuleHelper::getLayoutPath('mod_flexicategories', $params->get('layout', 'default') . '_items'); ?>
+			<?php require JModuleHelper::getLayoutPath('mod_flexicategories', $params->get('layout', 'default') . '_items'); ?>
 			<?php $list = $temp; ?>
 			<?php echo '</ul>'; ?>
 		<?php endif; ?>

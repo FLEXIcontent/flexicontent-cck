@@ -35,9 +35,9 @@ if ($allow_reviews)
 				'. $reviews_text . '
 			</div>
 			<div>
-				<a class="btn btn-info" style="cursor: pointer; font-size: 120%; text-decoration: none;" href="javascript:;" onclick="' . $box_js . ' var reviews_box = fc_showAsDialog(box, 800, 600, null, { title: \'' . count($reviews) . ' ' . \Joomla\CMS\Language\Text::_('FLEXI_REVIEWS') . '\'}); return false;">
+				<a class="btn btn-info" style="cursor: pointer; font-size: 120%; text-decoration: none;" href="javascript:;" onclick="' . $box_js . ' var reviews_box = fc_showAsDialog(box, 800, 600, null, { title: \'' . count($reviews) . ' ' . JText::_('FLEXI_REVIEWS') . '\'}); return false;">
 					<span class="icon-smiley-happy-2"></span>
-					' . count($reviews) . ' ' . \Joomla\CMS\Language\Text::_('FLEXI_REVIEWS') . '
+					' . count($reviews) . ' ' . JText::_('FLEXI_REVIEWS') . '
 				</a>
 			</div>';
 	}

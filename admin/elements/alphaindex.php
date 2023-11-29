@@ -20,19 +20,11 @@
 defined('_JEXEC') or die('Restricted access');
 
 jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
-jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
+jimport('cms.html.select');    // JHtmlSelect
+jimport('joomla.form.field');  // JFormField
 
-//jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
-//\Joomla\CMS\Form\FormHelper::loadFieldClass('...');   // \Joomla\CMS\Form\FormField...
-
-/**
- * Renders an alphaindex element
- *
- * @package 	Joomla
- * @subpackage	FLEXIcontent
- * @since		1.5
- */
+//jimport('joomla.form.helper'); // JFormHelper
+//JFormHelper::loadFieldClass('...');   // JFormField...
 
 /**
  * Renders an alphaindex element
@@ -41,7 +33,15 @@ jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-class JFormFieldAlphaindex extends \Joomla\CMS\Form\FormField
+
+/**
+ * Renders an alphaindex element
+ *
+ * @package 	Joomla
+ * @subpackage	FLEXIcontent
+ * @since		1.5
+ */
+class JFormFieldAlphaindex extends JFormField
 {
 /**
 	* Element name
@@ -53,8 +53,8 @@ class JFormFieldAlphaindex extends \Joomla\CMS\Form\FormField
 
 	function getInput()
 	{
-		$doc  = \Joomla\CMS\Factory::getDocument();
-		$db   = \Joomla\CMS\Factory::getDbo();
+		$doc  = JFactory::getDocument();
+		$db   = JFactory::getDbo();
 
 		$node = & $this->element;
 		$attributes = get_object_vars($node->attributes());
@@ -64,11 +64,11 @@ class JFormFieldAlphaindex extends \Joomla\CMS\Form\FormField
 		$i=-1;
 		if (@ $attributes['use_global'])
 		{
-			$options[++$i] = new stdClass(); $options[$i]->text=\Joomla\CMS\Language\Text::_("FLEXI_USE_GLOBAL"); $options[$i]->value='';
+			$options[++$i] = new stdClass(); $options[$i]->text=JTEXT::_("FLEXI_USE_GLOBAL"); $options[$i]->value='';
 		}
-		$options[++$i] = new stdClass(); $options[$i]->text=\Joomla\CMS\Language\Text::_("FLEXI_HIDE"); $options[$i]->value=0;
-		$options[++$i] = new stdClass(); $options[$i]->text=\Joomla\CMS\Language\Text::_("FLEXI_SHOW_ALPHA_USE_LANG_DEFAULT"); $options[$i]->value=1;
-		$options[++$i] = new stdClass(); $options[$i]->text=\Joomla\CMS\Language\Text::_("FLEXI_SHOW_ALPHA_USE_CUSTOM_CHARS"); $options[$i]->value=2;
+		$options[++$i] = new stdClass(); $options[$i]->text=JTEXT::_("FLEXI_HIDE"); $options[$i]->value=0;
+		$options[++$i] = new stdClass(); $options[$i]->text=JTEXT::_("FLEXI_SHOW_ALPHA_USE_LANG_DEFAULT"); $options[$i]->value=1;
+		$options[++$i] = new stdClass(); $options[$i]->text=JTEXT::_("FLEXI_SHOW_ALPHA_USE_CUSTOM_CHARS"); $options[$i]->value=2;
 		
 		$value = $this->value;
 		
@@ -101,6 +101,6 @@ class JFormFieldAlphaindex extends \Joomla\CMS\Form\FormField
 
 		$doc->addScriptDeclaration($js);
 		
-		return \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $value, $element_id);
+		return JHtml::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $value, $element_id);
 	}
 }

@@ -34,7 +34,7 @@ defined('_JEXEC') or die('Restricted access');
 		{
 			e.preventDefault();
 			$('#log').html(ajaxloader);
-			var url = "index.php?option=com_flexicontent&tmpl=component&format=raw&<?php echo \Joomla\CMS\Session\Session::getFormToken();?>=1&task=flexicontent.createlanguagepack&code=" + lang.value;
+			var url = "index.php?option=com_flexicontent&tmpl=component&format=raw&<?php echo JSession::getFormToken();?>=1&task=flexicontent.createlanguagepack&code=" + lang.value;
 
 			jQuery.ajax({
 				type: 'GET',
@@ -50,7 +50,7 @@ defined('_JEXEC') or die('Restricted access');
 		{
 			e.preventDefault();
 			$('#log').html(ajaxloader);
-			var url = "index.php?option=com_flexicontent&tmpl=component&format=raw&<?php echo \Joomla\CMS\Session\Session::getFormToken();?>=1&task=flexicontent.createlanguagepack&method=create&code=" + lang.value;
+			var url = "index.php?option=com_flexicontent&tmpl=component&format=raw&<?php echo JSession::getFormToken();?>=1&task=flexicontent.createlanguagepack&method=create&code=" + lang.value;
 
 			jQuery.ajax({
 				type: 'GET',
@@ -81,7 +81,7 @@ defined('_JEXEC') or die('Restricted access');
 			params 		+= '&web=' + web;
 			params 		+= '&message=' + message;
 
-			var url = "index.php?option=com_flexicontent&tmpl=component&format=raw&<?php echo \Joomla\CMS\Session\Session::getFormToken();?>=1&task=flexicontent.createlanguagepack&method=zip" + params;
+			var url = "index.php?option=com_flexicontent&tmpl=component&format=raw&<?php echo JSession::getFormToken();?>=1&task=flexicontent.createlanguagepack&method=zip" + params;
 			jQuery.ajax({
 				type: 'GET',
 				url: url,
@@ -106,14 +106,14 @@ defined('_JEXEC') or die('Restricted access');
 					<tr>
 						<th colspan="2" style="text-align:left;">
 							<label class="label" style="width: auto !important; max-width: 400px !important;">
-								<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_SEND_LANGUAGE_TITLE' ); ?>
+								<?php echo JText::_( 'FLEXI_SEND_LANGUAGE_TITLE' ); ?>
 							</label>
 						</th>
 					</tr>
 					<tr>
 						<td class="key">
 							<label for="lang">
-								<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_SEND_LANGUAGE_CODE' ).':'; ?>
+								<?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CODE' ).':'; ?>
 							</label>
 						</td>
 						<td>
@@ -123,7 +123,7 @@ defined('_JEXEC') or die('Restricted access');
 					<tr>
 						<td class="key">
 							<label for="myname">
-								<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_SEND_LANGUAGE_NAME' ).':'; ?>
+								<?php echo JText::_( 'FLEXI_SEND_LANGUAGE_NAME' ).':'; ?>
 							</label>
 						</td>
 						<td>
@@ -133,7 +133,7 @@ defined('_JEXEC') or die('Restricted access');
 					<tr>
 						<td class="key">
 							<label for="myemail">
-								<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_SEND_LANGUAGE_EMAIL' ).':'; ?>
+								<?php echo JText::_( 'FLEXI_SEND_LANGUAGE_EMAIL' ).':'; ?>
 							</label>
 						</td>
 						<td>
@@ -143,7 +143,7 @@ defined('_JEXEC') or die('Restricted access');
 					<tr>
 						<td class="key">
 							<label for="website">
-								<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_SEND_LANGUAGE_WEBSITE' ).':'; ?>
+								<?php echo JText::_( 'FLEXI_SEND_LANGUAGE_WEBSITE' ).':'; ?>
 							</label>
 						</td>
 						<td>
@@ -153,7 +153,7 @@ defined('_JEXEC') or die('Restricted access');
 					<tr>
 						<td class="key">
 							<label for="message">
-								<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_SEND_LANGUAGE_MESSAGE' ).':'; ?>
+								<?php echo JText::_( 'FLEXI_SEND_LANGUAGE_MESSAGE' ).':'; ?>
 							</label>
 						</td>
 						<td>
@@ -164,12 +164,12 @@ defined('_JEXEC') or die('Restricted access');
 					<tr>
 						<td class="key">
 							<label for="published">
-								<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_SEND_LANGUAGE_COMPLETE' ).':'; ?>
+								<?php echo JText::_( 'FLEXI_SEND_LANGUAGE_COMPLETE' ).':'; ?>
 							</label>
 						</td>
 						<td>
 							<?php
-							$html = \Joomla\CMS\HTML\HTMLHelper::_('select.booleanlist', 'published', 'class="inputbox"', @$this->row->published );
+							$html = JHtml::_('select.booleanlist', 'published', 'class="inputbox"', @$this->row->published );
 							echo $html;
 							?>
 						</td>
@@ -180,8 +180,8 @@ defined('_JEXEC') or die('Restricted access');
 						<td>&nbsp;</td>
 					</tr>
 					<tr>
-						<td align="right"><input id="archive" type="button" class="fc_button" value="<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_SEND_LANGUAGE_ARCHIVE' ); ?>" /></td>
-						<td align="left"><input id="send" type="button" class="fc_button" value="<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_SEND_LANGUAGE_SEND' ); ?>" onclick="alert('NOT ALLOWED. Next revision will allow public usage or limit to authorized translators only')" /></td>
+						<td align="right"><input id="archive" type="button" class="fc_button" value="<?php echo JText::_( 'FLEXI_SEND_LANGUAGE_ARCHIVE' ); ?>" /></td>
+						<td align="left"><input id="send" type="button" class="fc_button" value="<?php echo JText::_( 'FLEXI_SEND_LANGUAGE_SEND' ); ?>" onclick="alert('NOT ALLOWED. Next revision will allow public usage or limit to authorized translators only')" /></td>
 					</tr>
 				</table>
 			</td>
@@ -190,7 +190,7 @@ defined('_JEXEC') or die('Restricted access');
 					<tr>
 						<th style="text-align:left;" colspan="2">
 							<label class="label" style="width: auto !important; max-width:400px !important;">
-								<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_SEND_LANGUAGE_MISSING_FILES_TITLE' ); ?>
+								<?php echo JText::_( 'FLEXI_SEND_LANGUAGE_MISSING_FILES_TITLE' ); ?>
 							</label>
 						</th>
 					</tr>
@@ -209,7 +209,7 @@ defined('_JEXEC') or die('Restricted access');
 									echo $missing_str;
 									?>
 									<div class="fcclear"></div>
-									<input id="missing" type="button" class="fc_button" value="<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_SEND_LANGUAGE_ADD_MISSING' ); ?>" />
+									<input id="missing" type="button" class="fc_button" value="<?php echo JText::_( 'FLEXI_SEND_LANGUAGE_ADD_MISSING' ); ?>" />
 								<?php endif; ?>
 							</div>
 						</td>
@@ -225,5 +225,5 @@ defined('_JEXEC') or die('Restricted access');
 
 <?php
 //keep session alive while editing
-\Joomla\CMS\HTML\HTMLHelper::_('behavior.keepalive');
+JHtml::_('behavior.keepalive');
 ?>

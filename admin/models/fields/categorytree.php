@@ -15,10 +15,10 @@ use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
 jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
+jimport('cms.html.select');    // JHtmlSelect
 
-jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
-\Joomla\CMS\Form\FormHelper::loadFieldClass('list');   // \Joomla\CMS\Form\Field\ListField
+jimport('joomla.form.helper'); // JFormHelper
+JFormHelper::loadFieldClass('list');   // JFormFieldList
 
 /**
  * Form Field class for the Joomla Framework.
@@ -27,7 +27,7 @@ jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
  * @subpackage	com_categories
  * @since		1.6
  */
-class JCategoryFieldtree extends \Joomla\CMS\Form\Field\ListField
+class JFormFieldCategorytree extends JFormFieldList
 {
 	/**
 	 * The form field type.
@@ -86,7 +86,7 @@ class JCategoryFieldtree extends \Joomla\CMS\Form\Field\ListField
 		// Create a regular list.
 		else {
 
-			//$html[] = \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $options, $this->name, trim($attr), 'value', 'text', $this->value, $this->id);
+			//$html[] = JHtml::_('select.genericlist', $options, $this->name, trim($attr), 'value', 'text', $this->value, $this->id);
 			$html[] = '<select name="'.$this->name.'" '.trim($attr).'>';
 			foreach($options as $opt) {
 				$disabled = '';
@@ -112,8 +112,8 @@ class JCategoryFieldtree extends \Joomla\CMS\Form\Field\ListField
 	protected function getOptions()
 	{
 		global $globalcats;
-		$jinput = \Joomla\CMS\Factory::getApplication()->input;
-		$user   = \Joomla\CMS\Factory::getUser();
+		$jinput = JFactory::getApplication()->input;
+		$user   = JFactory::getUser();
 		$cid    = $jinput->getInt('cid', 0);
 
 		$usercats = array();
@@ -129,7 +129,7 @@ class JCategoryFieldtree extends \Joomla\CMS\Form\Field\ListField
 			$obj = new stdClass;
 			$obj->value = $ROOT_CATEGORY_ID = 1;
 			$obj->level = 0;
-			$obj->text = \Joomla\CMS\Language\Text::_( 'FLEXI_TOPLEVEL' );
+			$obj->text = JText::_( 'FLEXI_TOPLEVEL' );
 			$catlist[] 	= $obj;
 		}
 		else if($top == 2)
@@ -137,7 +137,7 @@ class JCategoryFieldtree extends \Joomla\CMS\Form\Field\ListField
 			$obj = new stdClass;
 			$obj->value = '';
 			$obj->level = 0;
-			$obj->text = \Joomla\CMS\Language\Text::_( 'FLEXI_SELECT_CATEGORY' );
+			$obj->text = JText::_( 'FLEXI_SELECT_CATEGORY' );
 			$catlist[] 	= $obj;
 		}
 
@@ -158,7 +158,7 @@ class JCategoryFieldtree extends \Joomla\CMS\Form\Field\ListField
 						}
 						else
 						{
-							$catlist[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', $item->id, $item->treename, 'value', 'text', true);
+							$catlist[] = JHtml::_('select.option', $item->id, $item->treename, 'value', 'text', true);
 						}
 					}
 				}
@@ -169,13 +169,13 @@ class JCategoryFieldtree extends \Joomla\CMS\Form\Field\ListField
 						// Only disable cats in the list else don't show them at all
 						if ($viewallcats)
 						{
-							$catlist[] = \Joomla\CMS\HTML\HTMLHelper::_( 'select.option', $item->id, $item->treename, 'value', 'text', true );
+							$catlist[] = JHtml::_( 'select.option', $item->id, $item->treename, 'value', 'text', true );
 						}
 					}
 					else
 					{
 						$item->treename = str_replace("&nbsp;", "_", strip_tags($item->treename));
-						$catlist[] = \Joomla\CMS\HTML\HTMLHelper::_( 'select.option', $item->id, $item->treename );
+						$catlist[] = JHtml::_( 'select.option', $item->id, $item->treename );
 					}
 				}
 				else

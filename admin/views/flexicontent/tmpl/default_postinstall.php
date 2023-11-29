@@ -28,7 +28,7 @@ jQuery(document).ready(function() {
 <?php if(!$this->existfields) : /*@TODO must write a class for all following cases */ ?>
 	jQuery('#existfields').on('click', function(e, data)
 	{
-		var url = "index.php?option=com_flexicontent&task=flexicontent.createdefaultfields&format=raw&<?php echo \Joomla\CMS\Session\Session::getFormToken();?>=1&tmpl=component";
+		var url = "index.php?option=com_flexicontent&task=flexicontent.createdefaultfields&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
 
 		jQuery('#existfields-log').html(ajaxloader);
 		jQuery.ajax({
@@ -46,7 +46,7 @@ jQuery(document).ready(function() {
 <?php if(!$this->existcpfields) : /*@TODO must write a class for all following cases */ ?>
 	jQuery('#existcpfields').on('click', function(e, data)
 	{
-		var url = "index.php?option=com_flexicontent&task=flexicontent.createdefaultcpfields&format=raw&<?php echo \Joomla\CMS\Session\Session::getFormToken();?>=1&tmpl=component";
+		var url = "index.php?option=com_flexicontent&task=flexicontent.createdefaultcpfields&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
 
 		jQuery('#existcpfields-log').html(ajaxloader);
 		jQuery.ajax({
@@ -64,7 +64,7 @@ jQuery(document).ready(function() {
 <?php if(!$this->existmenuitems) : ?>
 	jQuery('#existmenuitems').on('click', function(e, data)
 	{
-		var url = "index.php?option=com_flexicontent&task=flexicontent.createmenuitems&format=raw&<?php echo \Joomla\CMS\Session\Session::getFormToken();?>=1&tmpl=component";
+		var url = "index.php?option=com_flexicontent&task=flexicontent.createmenuitems&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
 
 		jQuery('#existmenuitems-log').html(ajaxloader);
 		jQuery.ajax({
@@ -82,7 +82,7 @@ jQuery(document).ready(function() {
 <?php if(!$this->existtype) : ?>
 	jQuery('#existtype').on('click', function(e, data)
 	{
-		var url = "index.php?option=com_flexicontent&task=flexicontent.createdefaultype&format=raw&<?php echo \Joomla\CMS\Session\Session::getFormToken();?>=1&tmpl=component";
+		var url = "index.php?option=com_flexicontent&task=flexicontent.createdefaultype&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
 
 		jQuery('#existtype-log').html(ajaxloader);
 		jQuery.ajax({
@@ -100,7 +100,7 @@ jQuery(document).ready(function() {
 <?php if(!$this->allplgpublish) : ?>
 	jQuery('#publishplugins').on('click', function(e, data)
 	{
-		var url = "index.php?option=com_flexicontent&task=flexicontent.publishplugins&format=raw&<?php echo \Joomla\CMS\Session\Session::getFormToken();?>=1&tmpl=component";
+		var url = "index.php?option=com_flexicontent&task=flexicontent.publishplugins&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
 
 		jQuery('#publishplugins-log').html(ajaxloader);
 		jQuery.ajax({
@@ -118,7 +118,7 @@ jQuery(document).ready(function() {
 <?php if(!$this->existcats) : ?>
 	jQuery('#existcats').on('click', function(e, data)
 	{
-		var url = "index.php?option=com_flexicontent&task=flexicontent.addmcatitemrelations&format=raw&<?php echo \Joomla\CMS\Session\Session::getFormToken();?>=1&tmpl=component";
+		var url = "index.php?option=com_flexicontent&task=flexicontent.addmcatitemrelations&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
 
 		jQuery('#existcats-log').html(ajaxloader);
 		jQuery.ajax({
@@ -136,7 +136,7 @@ jQuery(document).ready(function() {
 <?php if(!$this->langsynced) : ?>
 	jQuery('#langsynced').on('click', function(e, data)
 	{
-		var url = "index.php?option=com_flexicontent&task=flexicontent.updatelanguagedata&format=raw&<?php echo \Joomla\CMS\Session\Session::getFormToken();?>=1&tmpl=component";
+		var url = "index.php?option=com_flexicontent&task=flexicontent.updatelanguagedata&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
 
 		jQuery('#langsynced-log').html(ajaxloader);
 		jQuery.ajax({
@@ -155,7 +155,7 @@ jQuery(document).ready(function() {
 <?php if(!$this->existdbindexes) : ?>
 	jQuery('#existdbindexes').on('click', function(e, data)
 	{
-		var url = "index.php?option=com_flexicontent&task=flexicontent.createdbindexes&format=raw&<?php echo \Joomla\CMS\Session\Session::getFormToken();?>=1&tmpl=component";
+		var url = "index.php?option=com_flexicontent&task=flexicontent.createdbindexes&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
 
 		jQuery('#existdbindexes-log').html(ajaxloader);
 		jQuery.ajax({
@@ -173,7 +173,7 @@ jQuery(document).ready(function() {
 <?php if(!$this->existversions) : ?>
 	jQuery('#existversions').on('click', function(e, data)
 	{
-		var url = "index.php?option=com_flexicontent&task=flexicontent.createversionstable&format=raw&<?php echo \Joomla\CMS\Session\Session::getFormToken();?>=1&tmpl=component";
+		var url = "index.php?option=com_flexicontent&task=flexicontent.createversionstable&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
 
 		jQuery('#existversions-log').html(ajaxloader);
 		jQuery.ajax({
@@ -191,7 +191,7 @@ jQuery(document).ready(function() {
 <?php if(!$this->existversionsdata) : ?>
 	jQuery('#existversionsdata').on('click', function(e, data)
 	{
-		var url = "index.php?option=com_flexicontent&task=flexicontent.populateversionstable&format=raw&<?php echo \Joomla\CMS\Session\Session::getFormToken();?>=1&tmpl=component";
+		var url = "index.php?option=com_flexicontent&task=flexicontent.populateversionstable&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
 
 		jQuery('#existversionsdata-log').html(ajaxloader);
 		jQuery.ajax({
@@ -209,7 +209,7 @@ jQuery(document).ready(function() {
 <?php if (!$this->existauthors) : ?>
 	jQuery('#existauthors').on('click', function(e, data)
 	{
-		var url = "index.php?option=com_flexicontent&task=flexicontent.createauthorstable&format=raw&<?php echo \Joomla\CMS\Session\Session::getFormToken();?>=1&tmpl=component";
+		var url = "index.php?option=com_flexicontent&task=flexicontent.createauthorstable&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
 
 		jQuery('#existauthors-log').html(ajaxloader);
 		jQuery.ajax({
@@ -227,7 +227,7 @@ jQuery(document).ready(function() {
 <?php if (!$this->cachethumb) : ?>
 	jQuery('#cachethumb').on('click', function(e, data)
 	{
-		var url = "index.php?option=com_flexicontent&task=flexicontent.setcachethumbperms&format=raw&<?php echo \Joomla\CMS\Session\Session::getFormToken();?>=1&tmpl=component";
+		var url = "index.php?option=com_flexicontent&task=flexicontent.setcachethumbperms&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
 
 		jQuery('#cachethumb-log').html(ajaxloader);
 		jQuery.ajax({
@@ -245,7 +245,7 @@ jQuery(document).ready(function() {
 <?php if (!$this->itemcountingdok) : ?>
 	jQuery('#itemcountingdok').on('click', function(e, data)
 	{
-		var url = "index.php?option=com_flexicontent&task=flexicontent.updateitemcountingdata&format=raw&<?php echo \Joomla\CMS\Session\Session::getFormToken();?>=1&tmpl=component";
+		var url = "index.php?option=com_flexicontent&task=flexicontent.updateitemcountingdata&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
 
 		jQuery('#itemcountingdok-log').html(ajaxloader);
 		jQuery.ajax({
@@ -263,7 +263,7 @@ jQuery(document).ready(function() {
 <?php if (!$this->deprecatedfiles) : ?>
 	jQuery('#deprecatedfiles').on('click', function(e, data)
 	{
-		var url = "index.php?option=com_flexicontent&task=flexicontent.deletedeprecatedfiles&format=raw&<?php echo \Joomla\CMS\Session\Session::getFormToken();?>=1&tmpl=component";
+		var url = "index.php?option=com_flexicontent&task=flexicontent.deletedeprecatedfiles&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
 
 		jQuery('#deprecatedfiles-log').html(ajaxloader);
 		jQuery.ajax({
@@ -281,7 +281,7 @@ jQuery(document).ready(function() {
 <?php if (!$this->nooldfieldsdata) : ?>
 	jQuery('#oldfieldsdata').on('click', function(e, data)
 	{
-		var url = "index.php?option=com_flexicontent&task=flexicontent.cleanupoldtables&format=raw&<?php echo \Joomla\CMS\Session\Session::getFormToken();?>=1&tmpl=component";
+		var url = "index.php?option=com_flexicontent&task=flexicontent.cleanupoldtables&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
 
 		jQuery('#oldfieldsdata-log').html(ajaxloader);
 		jQuery.ajax({
@@ -299,7 +299,7 @@ jQuery(document).ready(function() {
 <?php if (!$this->missingversion) : ?>
 	jQuery('#missingversion').on('click', function(e, data)
 	{
-		var url = "index.php?option=com_flexicontent&task=flexicontent.addcurrentversiondata&format=raw&<?php echo \Joomla\CMS\Session\Session::getFormToken();?>=1&tmpl=component";
+		var url = "index.php?option=com_flexicontent&task=flexicontent.addcurrentversiondata&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
 
 		jQuery('#missingversion-log').html(ajaxloader);
 		jQuery.ajax({
@@ -317,7 +317,7 @@ jQuery(document).ready(function() {
 <?php if(!$this->initialpermission) : ?>
 	jQuery('#initialpermission').on('click', function(e, data)
 	{
-		var url = "index.php?option=com_flexicontent&task=flexicontent.updateinitialpermission&format=raw&<?php echo \Joomla\CMS\Session\Session::getFormToken();?>=1&tmpl=component";
+		var url = "index.php?option=com_flexicontent&task=flexicontent.updateinitialpermission&format=raw&<?php echo JSession::getFormToken();?>=1&tmpl=component";
 
 		jQuery('#initialpermission-log').html(ajaxloader);
 		jQuery.ajax({
@@ -339,85 +339,85 @@ jQuery(document).ready(function() {
 
 	<thead>
 		<tr>
-			<th><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_ACTIONS' ); ?></th>
-			<th><?php echo \Joomla\CMS\Language\Text::_( 'JSTATUS' ); ?></th></th>
+			<th><?php echo JText::_( 'FLEXI_ACTIONS' ); ?></th>
+			<th><?php echo JText::_( 'JSTATUS' ); ?></th></th>
 		</tr>
 	</thead>
 
 	<tbody>
 		<tr>
 			<td class="key">
-				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_PUBLISH_ALL_PLUGINS' ); ?>
+				<?php echo JText::_( 'FLEXI_PUBLISH_ALL_PLUGINS' ); ?>
 			</td>
 			<td>
 				<div id="publishplugins-log" class="install-task">
-					<?php echo $this->allplgpublish ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="publishplugins" href="javascript:;">'.\Joomla\CMS\Language\Text::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+					<?php echo $this->allplgpublish ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="publishplugins" href="javascript:;">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
 				</div>
 			</td>
 		</tr>
 		<tr>
 			<td class="key">
-				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_INSTALL_DEFAULT_TYPE' ); ?>
+				<?php echo JText::_( 'FLEXI_INSTALL_DEFAULT_TYPE' ); ?>
 			</td>
 			<td>
 				<div id="existtype-log" class="install-task">
-					<?php echo $this->existtype ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="existtype" href="javascript:;">'.\Joomla\CMS\Language\Text::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+					<?php echo $this->existtype ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="existtype" href="javascript:;">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
 				</div>
 			</td>
 		</tr>
 		<tr>
 			<td class="key">
-				<?php echo \Joomla\CMS\Language\Text::_( 'Add/update default Menu Item for URLs' ); ?>
+				<?php echo JText::_( 'Add/update default Menu Item for URLs' ); ?>
 			</td>
 			<td>
 				<div id="existmenuitems-log" class="install-task">
-					<?php echo $this->existmenuitems ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="existmenuitems" href="javascript:;">'.\Joomla\CMS\Language\Text::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+					<?php echo $this->existmenuitems ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="existmenuitems" href="javascript:;">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
 				</div>
 			</td>
 		</tr>
 		<tr>
 			<td class="key">
-				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_INSTALL_DEFAULT_FIELDS' ); ?>
+				<?php echo JText::_( 'FLEXI_INSTALL_DEFAULT_FIELDS' ); ?>
 			</td>
 			<td>
 				<div id="existfields-log" class="install-task">
-					<?php echo $this->existfields ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="existfields" href="javascript:;">'.\Joomla\CMS\Language\Text::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+					<?php echo $this->existfields ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="existfields" href="javascript:;">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
 				</div>
 			</td>
 		</tr>
 		<tr>
 			<td class="key">
-				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_INSTALL_CORE_PROPERTY_FIELDS' ); ?>
+				<?php echo JText::_( 'FLEXI_INSTALL_CORE_PROPERTY_FIELDS' ); ?>
 			</td>
 			<td>
 				<div id="existcpfields-log" class="install-task">
-					<?php echo $this->existcpfields ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="existcpfields" href="javascript:;">'.\Joomla\CMS\Language\Text::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+					<?php echo $this->existcpfields ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="existcpfields" href="javascript:;">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
 				</div>
 			</td>
 		</tr>
 		<tr>
 			<td class="key">
-				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_INSTALL_MCATS_RELATIONS' ); ?>
+				<?php echo JText::_( 'FLEXI_INSTALL_MCATS_RELATIONS' ); ?>
 			</td>
 			<td>
 				<div id="existcats-log" class="install-task">
-					<?php echo $this->existcats ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="existcats" href="javascript:;">'.\Joomla\CMS\Language\Text::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+					<?php echo $this->existcats ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="existcats" href="javascript:;">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
 				</div>
 			</td>
 		</tr>
 		<tr>
 			<td class="key">
-				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_INSTALL_MULTILINGUAL_SUPPORT' ); ?>
+				<?php echo JText::_( 'FLEXI_INSTALL_MULTILINGUAL_SUPPORT' ); ?>
 			</td>
 			<td>
 				<div id="langsynced-log" class="install-task">
-					<?php echo $this->langsynced ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="langsynced" href="javascript:;">'.\Joomla\CMS\Language\Text::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+					<?php echo $this->langsynced ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="langsynced" href="javascript:;">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
 				</div>
 			</td>
 		</tr>
 		<tr>
 			<td class="key">
-				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_CREATE_DB_INDEXES' ); ?>
+				<?php echo JText::_( 'FLEXI_CREATE_DB_INDEXES' ); ?>
 				<?php
 					if (!$this->existdbindexes && !empty($this->missingindexes)) {
 						echo "<br/><span class='fc-mssg-inline fc-mssg fc-info'>this may take a long time on big web-sites, if it timeouts (or takes >2 min) then please refresh, and click to create remaining indexes</span>";
@@ -433,95 +433,95 @@ jQuery(document).ready(function() {
 			</td>
 			<td>
 				<div id="existdbindexes-log" class="install-task">
-					<?php echo $this->existdbindexes ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="existdbindexes" href="javascript:;">'.\Joomla\CMS\Language\Text::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+					<?php echo $this->existdbindexes ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="existdbindexes" href="javascript:;">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
 				</div>
 			</td>
 		</tr>
 		<tr>
 			<td class="key">
-				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_INSTALL_VERSIONS_TABLE' ); ?>
+				<?php echo JText::_( 'FLEXI_INSTALL_VERSIONS_TABLE' ); ?>
 			</td>
 			<td>
 				<div id="existversions-log" class="install-task">
-					<?php echo $this->existversions ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="existversions" href="javascript:;">'.\Joomla\CMS\Language\Text::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+					<?php echo $this->existversions ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="existversions" href="javascript:;">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
 				</div>
 			</td>
 		</tr>
 		<tr>
 			<td class="key">
-				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_UPDATE_VERSIONS_DATA' ); ?>
+				<?php echo JText::_( 'FLEXI_UPDATE_VERSIONS_DATA' ); ?>
 			</td>
 			<td>
 				<div id="existversionsdata-log" class="install-task">
-					<?php echo $this->existversionsdata ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="existversionsdata" href="javascript:;">'.\Joomla\CMS\Language\Text::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+					<?php echo $this->existversionsdata ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="existversionsdata" href="javascript:;">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
 				</div>
 			</td>
 		</tr>
 		<tr>
 			<td class="key">
-				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_INSTALL_AUTHORS_TABLE' ); ?>
+				<?php echo JText::_( 'FLEXI_INSTALL_AUTHORS_TABLE' ); ?>
 			</td>
 			<td id="existauthors-log">
-				<div class="install-task"><?php echo $this->existauthors ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="existauthors" href="javascript:;">'.\Joomla\CMS\Language\Text::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?></div>
+				<div class="install-task"><?php echo $this->existauthors ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="existauthors" href="javascript:;">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?></div>
 			</td>
 		</tr>
 		<tr>
 			<td class="key">
-				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_UPDATE_TEMPORARY_ITEM_DATA' ); ?>
+				<?php echo JText::_( 'FLEXI_UPDATE_TEMPORARY_ITEM_DATA' ); ?>
 			</td>
 			<td>
 				<div id="itemcountingdok-log" class="install-task">
-					<?php echo $this->itemcountingdok ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="itemcountingdok" href="javascript:;">'.\Joomla\CMS\Language\Text::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+					<?php echo $this->itemcountingdok ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="itemcountingdok" href="javascript:;">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
 				</div>
 			</td>
 		</tr>
 		<tr>
 			<td class="key">
-				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_SET_PHPTHUMB_CACHE_PERMISSIONS' ); ?>
+				<?php echo JText::_( 'FLEXI_SET_PHPTHUMB_CACHE_PERMISSIONS' ); ?>
 			</td>
 			<td>
 				<div id="cachethumb-log" class="install-task">
-					<?php echo $this->cachethumb ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="cachethumb" href="javascript:;">'.\Joomla\CMS\Language\Text::_( 'FLEXI_UPDATE' ).'</a></span>'; ?>
+					<?php echo $this->cachethumb ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="cachethumb" href="javascript:;">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>'; ?>
 				</div>
 			</td>
 		</tr>
 		<tr>
 			<td class="key">
-				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_REMOVE_DEPRECATED_FILES' ); ?>
+				<?php echo JText::_( 'FLEXI_REMOVE_DEPRECATED_FILES' ); ?>
 			</td>
 			<td>
 				<div id="deprecatedfiles-log" class="install-task">
-					<?php echo $this->deprecatedfiles ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="deprecatedfiles" href="javascript:;">'.\Joomla\CMS\Language\Text::_( 'FLEXI_UPDATE' ).'</a></span>'; ?>
+					<?php echo $this->deprecatedfiles ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="deprecatedfiles" href="javascript:;">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>'; ?>
 				</div>
 			</td>
 		</tr>
 		<tr>
 			<td class="key">
-				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_CLEANUP_TABLES' ); ?>
+				<?php echo JText::_( 'FLEXI_CLEANUP_TABLES' ); ?>
 			</td>
 			<td>
 				<div id="oldfieldsdata-log" class="install-task">
-					<?php echo $this->nooldfieldsdata ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="oldfieldsdata" href="javascript:;">'.\Joomla\CMS\Language\Text::_( 'FLEXI_UPDATE' ).'</a></span>'; ?>
+					<?php echo $this->nooldfieldsdata ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="oldfieldsdata" href="javascript:;">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>'; ?>
 				</div>
 			</td>
 		</tr>
 		<tr>
 			<td class="key">
-				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_CURRENT_VERSIONS' ); ?>
+				<?php echo JText::_( 'FLEXI_CURRENT_VERSIONS' ); ?>
 			</td>
 			<td>
 				<div id="missingversion-log" class="install-task">
-					<?php echo $this->missingversion ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="missingversion" href="javascript:;">'.\Joomla\CMS\Language\Text::_( 'FLEXI_UPDATE' ).'</a></span>'; ?>
+					<?php echo $this->missingversion ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="missingversion" href="javascript:;">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>'; ?>
 				</div>
 			</td>
 		</tr>
 		<tr>
 			<td class="key">
-				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_INITIAL_PERMISSION' ); ?>
+				<?php echo JText::_( 'FLEXI_INITIAL_PERMISSION' ); ?>
 			</td>
 			<td>
 				<div id="initialpermission-log" class="install-task">
-					<?php echo $this->initialpermission ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="initialpermission" href="javascript:;">'.\Joomla\CMS\Language\Text::_( 'FLEXI_UPDATE' ).'</a></span>'; ?>
+					<?php echo $this->initialpermission ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="initialpermission" href="javascript:;">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>'; ?>
 				</div>
 			</td>
 		</tr>

@@ -20,7 +20,7 @@ if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 
 require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
-\Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
+JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 
 /**
  * Page break plugin
@@ -39,7 +39,7 @@ require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'
  * @subpackage	Content.pagebreak
  * @since		1.6
  */
-class plgContentFlexiBreak extends \Joomla\CMS\Plugin\CMSPlugin
+class plgContentFlexiBreak extends JPlugin
 {
 	static $rowLinks = array();
 	var $pattern = '#(<hr[^>]*?class=[\"|\']system-pagebreak[\"|\'][^(>|/>)]*?/?>)#iU';
@@ -49,7 +49,7 @@ class plgContentFlexiBreak extends \Joomla\CMS\Plugin\CMSPlugin
 	{
 		parent::__construct($subject, $params);
 		$this->pluginPath = dirname(__FILE__).DS.$this->_name;
-		\Joomla\CMS\Plugin\CMSPlugin::loadLanguage('plg_'.$this->_type.'_'.$this->_name, JPATH_ADMINISTRATOR);
+		JPlugin::loadLanguage('plg_'.$this->_type.'_'.$this->_name, JPATH_ADMINISTRATOR);
 	}
 
 	/**
@@ -77,7 +77,7 @@ class plgContentFlexiBreak extends \Joomla\CMS\Plugin\CMSPlugin
 			return true;
 		}
 
-		$input = \Joomla\CMS\Factory::getApplication()->input;
+		$input = JFactory::getApplication()->input;
 
 		$print   = $input->getBool('pop') || $input->getBool('print');
 		$showall = $input->getBool('showall');
@@ -122,11 +122,11 @@ class plgContentFlexiBreak extends \Joomla\CMS\Plugin\CMSPlugin
 		}
 
 		$prev_link = !$showall && $limitstart > 0
-			? \Joomla\CMS\Router\Route::_(self::$rowLinks[$row->slug] . '&limitstart=' . ($limitstart - 1))
+			? JRoute::_(self::$rowLinks[$row->slug] . '&limitstart=' . ($limitstart - 1))
 			: '';
 
 		$next_link = !$showall && $limitstart < $textscount - 1
-			? \Joomla\CMS\Router\Route::_(self::$rowLinks[$row->slug] . '&limitstart=' . ($limitstart + 1))
+			? JRoute::_(self::$rowLinks[$row->slug] . '&limitstart=' . ($limitstart + 1))
 			: '';
 
 
@@ -148,8 +148,8 @@ class plgContentFlexiBreak extends \Joomla\CMS\Plugin\CMSPlugin
 
 
 		// Plugin base folder
-		$document = \Joomla\CMS\Factory::getDocument();
-		$plgbase  = \Joomla\CMS\Uri\Uri::root(true).'/plugins/'.$this->_type.'/'.$this->_name.'/'.$this->_name.'/'.$this->_name;
+		$document = JFactory::getDocument();
+		$plgbase  = JUri::root(true).'/plugins/'.$this->_type.'/'.$this->_name.'/'.$this->_name.'/'.$this->_name;
 
 		// Display configuration
 		$display_method = (int) $this->params->get('display_method', 1);
@@ -243,8 +243,8 @@ class plgContentFlexiBreak extends \Joomla\CMS\Plugin\CMSPlugin
 		{
 			$this->pagescount++;
 
-			$page->title = $this->params->get('introtext_title', 1) ?  $row->title  :  \Joomla\CMS\Language\Text::_($this->params->get('custom_introtext', 'FLEXIBREAK_INTRODUCTION'));
-			$page->link = \Joomla\CMS\Router\Route::_(self::$rowLinks[$row->slug]);
+			$page->title = $this->params->get('introtext_title', 1) ?  $row->title  :  JText::_($this->params->get('custom_introtext', 'FLEXIBREAK_INTRODUCTION'));
+			$page->link = JRoute::_(self::$rowLinks[$row->slug]);
 
 			$page->name = 'Page-1';
 			$page->id   = $page->name;
@@ -252,8 +252,8 @@ class plgContentFlexiBreak extends \Joomla\CMS\Plugin\CMSPlugin
 		else
 		{
 			$attrs = $this->texts[0] == ''
-				? \Joomla\CMS\Utility\Utility::parseAttributes($this->pages[$index][0])
-				: \Joomla\CMS\Utility\Utility::parseAttributes($this->pages[$index-1][0]);
+				? JUtility::parseAttributes($this->pages[$index][0])
+				: JUtility::parseAttributes($this->pages[$index-1][0]);
 
 			$_alt   = isset($attrs['alt']) ? $attrs['alt'] : null;
 			$_title = $_alt ?: (isset($attrs['title']) ? $attrs['title'] : null);
@@ -263,8 +263,8 @@ class plgContentFlexiBreak extends \Joomla\CMS\Plugin\CMSPlugin
 			 * Page Title and link
 			 * (If title not set, default title is "Page N")
 			 */
-			$page->title = $_title ?: \Joomla\CMS\Language\Text::_('FLEXIBREAK_PAGE') . ' ' . ($index + 1);
-			$page->link  = \Joomla\CMS\Router\Route::_(self::$rowLinks[$row->slug] . '&limitstart=' . $index);
+			$page->title = $_title ?: JText::_('FLEXIBREAK_PAGE') . ' ' . ($index + 1);
+			$page->link  = JRoute::_(self::$rowLinks[$row->slug] . '&limitstart=' . $index);
 
 			/**
 			 * Page Name (hastag) id, (this are transliterated using the language of the content item
@@ -281,7 +281,7 @@ class plgContentFlexiBreak extends \Joomla\CMS\Plugin\CMSPlugin
 
 	protected function _getPageText(&$row, $index, $showall)
 	{
-		$input = \Joomla\CMS\Factory::getApplication()->input;
+		$input = JFactory::getApplication()->input;
 		$limitstart = $input->getInt('limitstart', 0);
 
 		$display_method = $this->params->get('display_method', 1);
@@ -307,8 +307,8 @@ class plgContentFlexiBreak extends \Joomla\CMS\Plugin\CMSPlugin
 			// RETURN-TO-TOC LINK, current uri is needed to avoid page reloading when anchors are clicked and BASE Tags is missing query variables
 			$this->toc_return_link = !$this->params->get('multipage_toc', 1) || !$this->params->get('return_anchors', 1) ?  '' :  '
 				<br/>
-				<a class="btn returnToc'.($display_method==1 && $auto_toc_return ? ' tocReturnAll' : '').'" href="'.htmlentities( \Joomla\CMS\Uri\Uri::getInstance(), ENT_QUOTES, 'UTF-8' ).'#articleToc" >
-					'.\Joomla\CMS\Language\Text::_('FLEXIBREAK_RETURN_TO_CONTENTS').'
+				<a class="btn returnToc'.($display_method==1 && $auto_toc_return ? ' tocReturnAll' : '').'" href="'.htmlentities( JUri::getInstance(), ENT_QUOTES, 'UTF-8' ).'#articleToc" >
+					'.JText::_('FLEXIBREAK_RETURN_TO_CONTENTS').'
 				</a>';
 		}
 		switch ($display_method)
@@ -355,7 +355,7 @@ class plgContentFlexiBreak extends \Joomla\CMS\Plugin\CMSPlugin
 
 	public function loadTemplate($name = 'default')
 	{
-		$app = \Joomla\CMS\Factory::getApplication();
+		$app = JFactory::getApplication();
 		$override = JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'html'.DS.'plg_'.$this->_type.'_'.$this->_name.DS.$this->_name.DS.$name.'.php';
 		ob_start();
 		if (is_readable($override))
@@ -369,7 +369,7 @@ class plgContentFlexiBreak extends \Joomla\CMS\Plugin\CMSPlugin
 		else
 		{
 			ob_end_clean();
-			JError::raiseError(500, \Joomla\CMS\Language\Text::_('Failed to load template '.$name.'.php'));
+			JError::raiseError(500, JText::_('Failed to load template '.$name.'.php'));
 			return '';
 		}
 		return trim(ob_get_clean());
@@ -383,8 +383,8 @@ class plgContentFlexiBreak extends \Joomla\CMS\Plugin\CMSPlugin
 
 		$string = html_entity_decode($string, ENT_QUOTES, 'UTF-8');
 
-		//$table = new flexicontent_items(\Joomla\CMS\Factory::getDbo());
-		$table = \Joomla\CMS\Table\Table::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
+		//$table = new flexicontent_items(JFactory::getDbo());
+		$table = JTable::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
 
 		// Create ASCII (transliterate) hashtags
 		$force_ascii_hashtags = $this->params->get('force_ascii_hashtags', 1);

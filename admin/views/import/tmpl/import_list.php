@@ -3,7 +3,7 @@ use Joomla\String\StringHelper;
 
 $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 
-$_levels = \Joomla\CMS\HTML\HTMLHelper::_('access.assetgroups');
+$_levels = JHtml::_('access.assetgroups');
 $access_levels = array();
 foreach($_levels as $_level) {
 	$access_levels[$_level->value] = $_level->text;
@@ -47,15 +47,15 @@ foreach($_levels as $_level) {
 				</td>
 				<td class="data">
 					<?php if (!$this->conf['id_col']): ?>
-						<span class="icon-lock"></span><b><?php echo \Joomla\CMS\Language\Text::_("FLEXI_IMPORT_AUTO_NEW_ID");?></b>
+						<span class="icon-lock"></span><b><?php echo JText::_("FLEXI_IMPORT_AUTO_NEW_ID");?></b>
 					<?php elseif ($this->conf['id_col']==1): ?>
-						<span class="icon-stack"></span><b><?php echo \Joomla\CMS\Language\Text::_('FLEXI_IMPORT_USE_ID_COL') . ' <br/> ' . \Joomla\CMS\Language\Text::_("FLEXI_IMPORT_CREATE_ITEMS"); ?> </b>
+						<span class="icon-stack"></span><b><?php echo JText::_('FLEXI_IMPORT_USE_ID_COL') . ' <br/> ' . JText::_("FLEXI_IMPORT_CREATE_ITEMS"); ?> </b>
 					<?php elseif ($this->conf['id_col']==2): ?>
-						<span class="icon-stack"></span><b><?php echo \Joomla\CMS\Language\Text::_('FLEXI_IMPORT_USE_ID_COL') . ' <br/> ' . \Joomla\CMS\Language\Text::_("FLEXI_IMPORT_CREATE_UPDATE_ITEMS"); ?> </b>
+						<span class="icon-stack"></span><b><?php echo JText::_('FLEXI_IMPORT_USE_ID_COL') . ' <br/> ' . JText::_("FLEXI_IMPORT_CREATE_UPDATE_ITEMS"); ?> </b>
 					<?php elseif ($this->conf['id_col']==3): ?>
-						<span class="icon-stack"></span><b><?php echo \Joomla\CMS\Language\Text::_('FLEXI_IMPORT_USE_ID_COL') . ' <br/> ' . \Joomla\CMS\Language\Text::_("FLEXI_IMPORT_UPDATE_ITEMS"); ?> </b>
+						<span class="icon-stack"></span><b><?php echo JText::_('FLEXI_IMPORT_USE_ID_COL') . ' <br/> ' . JText::_("FLEXI_IMPORT_UPDATE_ITEMS"); ?> </b>
 					<?php else:
-						$app = \Joomla\CMS\Factory::getApplication();
+						$app = JFactory::getApplication();
 						$app->setHeader('status', 500);
 						$app->enqueueMessage('not implemented setting \'id_col\': ' . $this->conf['id_col'], 'error');
 						$app->redirect('index.php?option=com_flexicontent&view=import');
@@ -92,7 +92,7 @@ foreach($_levels as $_level) {
 				</td>
 				<td class="data">
 					<?php
-						$tmpparams = new \Joomla\Registry\Registry();
+						$tmpparams = new JRegistry();
 						$tmpparams->set('show_icons', '0');
 					?>
 					<?php if ($this->conf['state'] == -99): ?>
@@ -364,7 +364,7 @@ foreach($_levels as $_level) {
 	<input type="hidden" name="view" value="import" />
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" name="fcform" value="1" />
-	<?php echo \Joomla\CMS\HTML\HTMLHelper::_('form.token'); ?>
+	<?php echo JHtml::_('form.token'); ?>
 
 	<!-- fc_perf -->
 

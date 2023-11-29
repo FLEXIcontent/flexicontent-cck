@@ -12,7 +12,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 
-class flexicontent_items_extravote extends \Joomla\CMS\Table\Table
+class flexicontent_items_extravote extends JTable
 {
 	/**
 	 * Primary Key

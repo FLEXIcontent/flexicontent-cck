@@ -20,7 +20,7 @@ defined('_JEXEC') or die('Restricted access');
 
 jimport('joomla.form.formfield');
 
-class \Joomla\CMS\Form\FormFieldIconlist extends \Joomla\CMS\Form\FormField
+class JFormFieldIconlist extends JFormField
 {
 	protected $type = 'iconlist';
 
@@ -171,11 +171,11 @@ class \Joomla\CMS\Form\FormFieldIconlist extends \Joomla\CMS\Form\FormField
 
 		foreach($icons as $key=>$value) :
 		## Create $value ##
-		$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', $key, $value);
+		$options[] = JHtml::_('select.option', $key, $value);
 		endforeach;
 
 		## Create <select name="icons" class="inputbox"></select> ##
-		$dropdown = \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $options, $this->name, 'class="inputbox"', 'value', 'text', $this->value, $this->id);
+		$dropdown = JHtml::_('select.genericlist', $options, $this->name, 'class="inputbox"', 'value', 'text', $this->value, $this->id);
 
 		## Output created <select> list ##
 		return $dropdown;

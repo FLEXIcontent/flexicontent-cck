@@ -214,17 +214,17 @@ class FlexicontentModelType extends FCModelAdmin
 	/**
 	 * Method to preprocess the form.
 	 *
-	 * @param   \Joomla\CMS\Form\Form   $form   A \Joomla\CMS\Form\Form object.
+	 * @param   JForm   $form   A JForm object.
 	 * @param   mixed   $data   The data expected for the form.
 	 * @param   string  $plugins_group  The name of the plugin group to import and trigger
 	 *
 	 * @return  void
 	 *
-	 * @see     \Joomla\CMS\Form\FormField
+	 * @see     JFormField
 	 * @since   1.6
 	 * @throws  Exception if there is an error in the form event.
 	 */
-	protected function preprocessForm(\Joomla\CMS\Form\Form $form, $data, $plugins_group = null)
+	protected function preprocessForm(JForm $form, $data, $plugins_group = null)
 	{
 		parent::preprocessForm($form, $data, $plugins_group);
 	}
@@ -271,7 +271,7 @@ class FlexicontentModelType extends FCModelAdmin
 		}
 
 		$record  = $record ?: $this->_record;
-		$user    = $user ?: \Joomla\CMS\Factory::getUser();
+		$user    = $user ?: JFactory::getUser();
 
 		return !$record || !$record->id
 			? $this->canCreate
@@ -294,7 +294,7 @@ class FlexicontentModelType extends FCModelAdmin
 		}
 
 		$record  = $record ?: $this->_record;
-		$user    = $user ?: \Joomla\CMS\Factory::getUser();
+		$user    = $user ?: JFactory::getUser();
 
 		return $this->canManage;
 	}
@@ -310,14 +310,14 @@ class FlexicontentModelType extends FCModelAdmin
 	public function canDelete($record = null)
 	{
 		$record  = $record ?: $this->_record;
-		$user    = \Joomla\CMS\Factory::getUser();
+		$user    = JFactory::getUser();
 
 		return $this->canManage;
 	}
 
 
 	/**
-	 * Method to do some record / data preprocessing before call \Joomla\CMS\Table\Table::bind()
+	 * Method to do some record / data preprocessing before call JTable::bind()
 	 *
 	 * Note. Typically called inside this MODEL 's store()
 	 *
@@ -334,7 +334,7 @@ class FlexicontentModelType extends FCModelAdmin
 		 */
 
 		// Get RAW layout field values, validation will follow ...
-		$raw_data = \Joomla\CMS\Factory::getApplication()->input->post->get('jform', array(), 'array');
+		$raw_data = JFactory::getApplication()->input->post->get('jform', array(), 'array');
 		$data['attribs']['layouts'] = !empty($raw_data['layouts']) ? $raw_data['layouts'] : null;
 
 		// We will use mergeAttributes() instead of bind(), thus fields that are not set will maintain their current DB values,
@@ -348,7 +348,7 @@ class FlexicontentModelType extends FCModelAdmin
 		$this->mergeAttributes($record, $data, $mergeProperties, $mergeOptions);
 
 		// Unset the above handled FIELDSETs from $data, since we selectively merged them above into the RECORD,
-		// thus they will not overwrite the respective RECORD's properties during call of \Joomla\CMS\Table\Table::bind()
+		// thus they will not overwrite the respective RECORD's properties during call of JTable::bind()
 		foreach($mergeProperties as $prop)
 		{
 			unset($data[$prop]);
@@ -357,9 +357,9 @@ class FlexicontentModelType extends FCModelAdmin
 		/**
 		 * Add the parameter form layout configuration that were cleared by form validation (this should only happen in the backend)
 		 */
-		if (\Joomla\CMS\Factory::getApplication()->isClient('administrator'))
+		if (JFactory::getApplication()->isClient('administrator'))
 		{
-			$record->attribs = new \Joomla\Registry\Registry($record->attribs);
+			$record->attribs = new JRegistry($record->attribs);
 			$iflayout_params = !empty($raw_data['iflayout']) ? $raw_data['iflayout'] : array();
 			foreach($iflayout_params as $i => $v)
 			{
@@ -397,7 +397,7 @@ class FlexicontentModelType extends FCModelAdmin
 
 
 	/**
-	 * Method to do some work after record has been loaded via \Joomla\CMS\Table\Table::load()
+	 * Method to do some work after record has been loaded via JTable::load()
 	 *
 	 * Note. Typically called inside this MODEL 's store()
 	 *
@@ -448,8 +448,8 @@ class FlexicontentModelType extends FCModelAdmin
 	 */
 	private function _addCorepropsFieldFields($type_ids)
 	{
-		\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, 'en-GB', true);
-		\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, null, true);
+		JFactory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, 'en-GB', true);
+		JFactory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, null, true);
 
 		$p = 'FLEXI_COREPROPS_';
 		$coreprop_names = array
@@ -498,7 +498,7 @@ class FlexicontentModelType extends FCModelAdmin
 		foreach($coreprop_names as $prop_name => $prop_label)
 		{
 			$name  = 'form_' . $prop_name;
-			$label = \Joomla\CMS\Language\Text::_($prop_label);   // Maybe use language string
+			$label = JText::_($prop_label);   // Maybe use language string
 			if (!isset($existing[$name]))
 			{
 				$vals[$name] = ' ("coreprops","' . $name . '", ' . $this->_db->Quote($label). ',"",0,0,0,0,0,0,0,1,"",1,'

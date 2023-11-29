@@ -124,8 +124,8 @@ class FlexicontentModelReview extends FCModelAdmin
 		$this->canCreate = FlexicontentHelperPerm::getPerm()->CanCreateReviews;
 
 		// Load field's language files
-		\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, 'en-GB', true);
-		\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, null, true);
+		JFactory::getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, 'en-GB', true);
+		JFactory::getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, null, true);
 	}
 
 
@@ -192,17 +192,17 @@ class FlexicontentModelReview extends FCModelAdmin
 	/**
 	 * Method to preprocess the form.
 	 *
-	 * @param   \Joomla\CMS\Form\Form   $form   A \Joomla\CMS\Form\Form object.
+	 * @param   JForm   $form   A JForm object.
 	 * @param   mixed   $data   The data expected for the form.
 	 * @param   string  $plugins_group  The name of the plugin group to import and trigger
 	 *
 	 * @return  void
 	 *
-	 * @see     \Joomla\CMS\Form\FormField
+	 * @see     JFormField
 	 * @since   1.6
 	 * @throws  Exception if there is an error in the form event.
 	 */
-	protected function preprocessForm(\Joomla\CMS\Form\Form $form, $data, $plugins_group = null)
+	protected function preprocessForm(JForm $form, $data, $plugins_group = null)
 	{
 		$data = $data && is_array($data) ? (object) $data : $data;
 
@@ -211,7 +211,7 @@ class FlexicontentModelReview extends FCModelAdmin
 		 */
 
 		$isNew    = empty($this->_record->id);
-		$isLogged = (boolean) \Joomla\CMS\Factory::getUser()->id;
+		$isLogged = (boolean) JFactory::getUser()->id;
 		
 		$readonlyFields = array();
 		$hiddenFields   = array();
@@ -299,8 +299,8 @@ class FlexicontentModelReview extends FCModelAdmin
 		}
 
 		$record  = $record ?: $this->_record;
-		$user    = $user ?: \Joomla\CMS\Factory::getUser();
-		$app     = \Joomla\CMS\Factory::getApplication();
+		$user    = $user ?: JFactory::getUser();
+		$app     = JFactory::getApplication();
 
 		$isOwner = $record && $record->user_id == $user->id;
 		$isSite  = $app->isClient('site');
@@ -374,7 +374,7 @@ class FlexicontentModelReview extends FCModelAdmin
 		}
 
 		$record  = $record ?: $this->_record;
-		$user    = $user ?: \Joomla\CMS\Factory::getUser();
+		$user    = $user ?: JFactory::getUser();
 
 		return $this->canManage;
 	}
@@ -390,14 +390,14 @@ class FlexicontentModelReview extends FCModelAdmin
 	public function canDelete($record = null)
 	{
 		$record  = $record ?: $this->_record;
-		$user    = \Joomla\CMS\Factory::getUser();
+		$user    = JFactory::getUser();
 
 		return $this->canManage;
 	}
 
 
 	/**
-	 * Method to do some record / data preprocessing before call \Joomla\CMS\Table\Table::bind()
+	 * Method to do some record / data preprocessing before call JTable::bind()
 	 *
 	 * Note. Typically called inside this MODEL 's store()
 	 *
@@ -430,7 +430,7 @@ class FlexicontentModelReview extends FCModelAdmin
 
 
 	/**
-	 * Method to do some work after record has been loaded via \Joomla\CMS\Table\Table::load()
+	 * Method to do some work after record has been loaded via JTable::load()
 	 *
 	 * Note. Typically called inside this MODEL 's store()
 	 *
@@ -452,7 +452,7 @@ class FlexicontentModelReview extends FCModelAdmin
 	/**
 	 * Method to do extra validation on the data posted by a reviewer
 	 *
-	 * @param   array     $data  The (already \Joomla\CMS\Form\Form validated) record data
+	 * @param   array     $data  The (already JForm validated) record data
 	 *
 	 * @return  boolean   true on success, false on failure
 	 *
@@ -460,8 +460,8 @@ class FlexicontentModelReview extends FCModelAdmin
 	 */
 	public function reviewerValidation($data)
 	{
-		$user = \Joomla\CMS\Factory::getUser();
-		$db   = \Joomla\CMS\Factory::getDbo();
+		$user = JFactory::getUser();
+		$db   = JFactory::getDbo();
 
 		$review_id   = $data['id'];
 		$content_id  = $data['content_id'];
@@ -542,7 +542,7 @@ class FlexicontentModelReview extends FCModelAdmin
 
 		if (count($cid))
 		{
-			$user     = \Joomla\CMS\Factory::getUser();
+			$user     = JFactory::getUser();
 			$cid_list = implode(',', $cid);
 
 			$query = $this->_db->getQuery(true)
@@ -577,7 +577,7 @@ class FlexicontentModelReview extends FCModelAdmin
 	{
 		if (empty($this->fields[$item ? $item->type_id : 0]))
 		{
-			$db    = \Joomla\CMS\Factory::getDbo();
+			$db    = JFactory::getDbo();
 			$query = 'SELECT * FROM #__flexicontent_fields WHERE field_type = ' . $db->Quote('voting');
 			$field = $db->setQuery($query)->loadObject();
 

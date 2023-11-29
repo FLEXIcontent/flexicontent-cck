@@ -9,7 +9,7 @@ if ( $display_hits==1 || $display_hits==3 )
 	if ( !isset($hits_icon_arr[$field->id]) )
 	{
 		$_tip_class = $display_hits==1 ? ' ' . $tooltip_class : '';
-		$_hits_tip  = $display_hits==1 ? ' title="' . flexicontent_html::getToolTip(null, '%s '.\Joomla\CMS\Language\Text::_( 'FLEXI_HITS', true ), 0, 0) . '" ' : '';
+		$_hits_tip  = $display_hits==1 ? ' title="' . flexicontent_html::getToolTip(null, '%s '.JText::_( 'FLEXI_HITS', true ), 0, 0) . '" ' : '';
 		$hits_icon_arr[$field->id] = '<span class="fcweblink_icon icon-eye-open '.$_tip_class.'" '.$_hits_tip.'></span>';
 	}
 	$hits_icon = $hits_icon_arr[$field->id];
@@ -30,13 +30,13 @@ foreach ($values as $value)
 
 	// Check if link is 'internal' aka 'safer', but make it absolute before checking it !
 	$link       = $this->make_absolute_url($value['link']);
-	$isInternal = \Joomla\CMS\Uri\Uri::isInternal($link);
+	$isInternal = JUri::isInternal($link);
 	$isVideo    = $playback_videos && (strpos($value['link'], 'youtube') !== false || strpos($value['link'], 'vimeo') !== false);
 
 	// If not using property or property is empty, then use default property value
 	// NOTE: default property values have been cleared, if (propertyname_usage != 2)
-	$title    = ($usetitle  && !empty($value['title'])   )  ?  \Joomla\CMS\Language\Text::_($value['title'])    : $default_title;
-	$linktext = ($usetext   && !empty($value['linktext']))  ?  \Joomla\CMS\Language\Text::_($value['linktext']) : $default_text;
+	$title    = ($usetitle  && !empty($value['title'])   )  ?  JText::_($value['title'])    : $default_title;
+	$linktext = ($usetext   && !empty($value['linktext']))  ?  JText::_($value['linktext']) : $default_text;
 	$class    = ($useclass  && !empty($value['class'])   )  ?  $value['class']    : $default_class;
 	$id       = ($useid     && !empty($value['id'])      )  ?  $value['id']       : $default_id;
 	$target   = ($usetarget && !empty($value['target'])  )  ?  $value['target']   : $default_target;
@@ -110,13 +110,13 @@ foreach ($values as $value)
 	// Indirect access to the web-link, via calling FLEXIcontent component, thus counting hits too
 	else
 	{
-		$href = \Joomla\CMS\Router\Route::_( 'index.php?option=com_flexicontent&fid='. $field->id .'&cid='.$item->id.'&ord='.($n+1).'&task=weblink' );
+		$href = JRoute::_( 'index.php?option=com_flexicontent&fid='. $field->id .'&cid='.$item->id.'&ord='.($n+1).'&task=weblink' );
 	}
 
 	// If linking text is  URL convert from Punycode to UTF8
 	if (empty($linktext))
 	{
-		$linktext = $title ? $title : $this->cleanurl(\Joomla\CMS\String\PunycodeHelper::urlToUTF8($link));
+		$linktext = $title ? $title : $this->cleanurl(JStringPunycode::urlToUTF8($link));
 	}
 
 	// Create URL image with playback icon if it is video
@@ -125,7 +125,7 @@ foreach ($values as $value)
 	if ($display_image && $image)
 	{
 		$img_src = file_exists(JPATH_ROOT . '/' . $image)
-			? \Joomla\CMS\Uri\Uri::root() . $image
+			? JUri::root() . $image
 			: $image;
 		$img_tag = ($display_image == 1 ? '<br>' : '') . '
 			<div style="position: relative; display: inline-block;">

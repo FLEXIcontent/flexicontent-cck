@@ -38,7 +38,7 @@ class plgFlexicontent_fieldsLinkslist extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
-		$field->label = $field->parameters->get('label_form') ? \Joomla\CMS\Language\Text::_($field->parameters->get('label_form')) : \Joomla\CMS\Language\Text::_($field->label);
+		$field->label = $field->parameters->get('label_form') ? JText::_($field->parameters->get('label_form')) : JText::_($field->label);
 
 		// Set field and item objects
 		$this->setField($field);
@@ -142,9 +142,9 @@ class plgFlexicontent_fieldsLinkslist extends FCField
 		{
 			foreach ($elements as $li_title => $li_params)
 			{
-				$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', $li_title, $li_title);
+				$options[] = JHtml::_('select.option', $li_title, $li_title);
 			}
-			$field->html	= \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $options, $fieldname, 'class="use_select2_lib' . $required_class . '" multiple="multiple"', 'value', 'text', $field->value, $elementid);
+			$field->html	= JHtml::_('select.genericlist', $options, $fieldname, 'class="use_select2_lib' . $required_class . '" multiple="multiple"', 'value', 'text', $field->value, $elementid);
 		}
 
 		// Render as checkboxes
@@ -181,7 +181,7 @@ class plgFlexicontent_fieldsLinkslist extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
-		$field->label = \Joomla\CMS\Language\Text::_($field->label);
+		$field->label = JText::_($field->label);
 
 		// Set field and item objects
 		$this->setField($field);
@@ -199,8 +199,8 @@ class plgFlexicontent_fieldsLinkslist extends FCField
 		{
 			$initialized = 1;
 
-			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$app       = JFactory::getApplication();
+			$document  = JFactory::getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -295,7 +295,7 @@ class plgFlexicontent_fieldsLinkslist extends FCField
 		if ($js_code_added === null)
 		{
 			$js_code = $field->parameters->get( 'js_code', '' ) ;
-			if ($js_code)  \Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js_code);
+			if ($js_code)  JFactory::getDocument()->addScriptDeclaration($js_code);
 			$js_code_added = true;
 		}
 
@@ -304,7 +304,7 @@ class plgFlexicontent_fieldsLinkslist extends FCField
 		if ($css_code_added === null)
 		{
 			$css_code = $field->parameters->get( 'css_code', '' ) ;
-			if ($css_code) \Joomla\CMS\Factory::getDocument()->addStyleDeclaration($css_code);
+			if ($css_code) JFactory::getDocument()->addStyleDeclaration($css_code);
 			$css_code_added = true;
 		}
 
@@ -383,13 +383,13 @@ class plgFlexicontent_fieldsLinkslist extends FCField
 		$elements = $this->parseElements($filter, $field_elements);
 
 		$options = array();
-		$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '', '-'.\Joomla\CMS\Language\Text::_('FLEXI_ALL').'-');
+		$options[] = JHtml::_('select.option', '', '-'.JText::_('FLEXI_ALL').'-');
 		foreach ($elements as $title => $val)
 		{
-			$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', $title, $title);
+			$options[] = JHtml::_('select.option', $title, $title);
 		}
 
-		$filter->html	= \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $options, 'filter_'.$filter->id, ' class="fc_field_filter" onchange="document.getElementById(\''.$formName.'\').submit();"', 'value', 'text', $value);
+		$filter->html	= JHtml::_('select.genericlist', $options, 'filter_'.$filter->id, ' class="fc_field_filter" onchange="document.getElementById(\''.$formName.'\').submit();"', 'value', 'text', $value);
 	}
 
 

@@ -1,10 +1,10 @@
 <?php
 if ($params->get('display_favlist', 0))
 {
-	$document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/modules/mod_flexicontent/tmpl_common/js/favlist.js');
+	$document->addScript(JUri::base(true).'/modules/mod_flexicontent/tmpl_common/js/favlist.js');
 
 	echo '
-	<p class="news_favs_head">' . \Joomla\CMS\Language\Text::_('FLEXI_MOD_RECENTLY_ADDED_FAVOURITES') . '</p>
+	<p class="news_favs_head">' . JText::_('FLEXI_MOD_RECENTLY_ADDED_FAVOURITES') . '</p>
 	<div id="mod_fc_favlist"></div>
 	';
 
@@ -22,7 +22,7 @@ if ($params->get('display_favlist', 0))
 	echo '
 	<div class="mod_fc_favlist_favblock_template">
 		<div class="fav-block">
-			' . \Joomla\CMS\Layout\LayoutHelper::render('flexicontent_fields.favourites.favicon', $displayData, $layouts_path) .'
+			' . JLayoutHelper::render('flexicontent_fields.favourites.favicon', $displayData, $layouts_path) .'
 			<div class="fcitem_readon">
 				<a href="javascript:;" data-href="__ITEM_URL__" class="readon">
 					__ITEM_TITLE__
@@ -32,12 +32,12 @@ if ($params->get('display_favlist', 0))
 	</div>
 	';
 
-	$fav_tip_title	= \Joomla\CMS\Language\Text::_( 'FLEXI_ADDREMOVE_FAVOURITE' );
-	$fav_tip_hover	= \Joomla\CMS\Language\Text::_( 'FLEXI_ADDREMOVE_FAVOURITE_TIP' );
-	$fav_show_item	= \Joomla\CMS\Language\Text::_( 'READ MORE...' );
+	$fav_tip_title	= JText::_( 'FLEXI_ADDREMOVE_FAVOURITE' );
+	$fav_tip_hover	= JText::_( 'FLEXI_ADDREMOVE_FAVOURITE_TIP' );
+	$fav_show_item	= JText::_( 'READ MORE...' );
 	$forced_itemid = $params->get('forced_itemid');
-	$alt_add = \Joomla\CMS\Language\Text::_( 'FLEXI_FAVOURE' );
-	$alt_delete = \Joomla\CMS\Language\Text::_( 'FLEXI_REMOVE_FAVOURITE' );
+	$alt_add = JText::_( 'FLEXI_FAVOURE' );
+	$alt_delete = JText::_( 'FLEXI_REMOVE_FAVOURITE' );
 	$js = '
 		if (typeof jQuery != "undefined")
 		{

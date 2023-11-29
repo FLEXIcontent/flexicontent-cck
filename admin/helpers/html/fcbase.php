@@ -13,7 +13,7 @@ defined('_JEXEC') or die;
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
-\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip');
+JHtml::_('bootstrap.tooltip');
 
 
 /**
@@ -108,7 +108,7 @@ abstract class JHtmlFcbase
 	 */
 	public static function checkedout($row, $user, $i)
 	{
-		//return \Joomla\CMS\HTML\HTMLHelper::_('jgrid.checkedout', $i, $row->editor, $row->checked_out_time, static::$ctrl . '.', $row->canCheckin);
+		//return JHtml::_('jgrid.checkedout', $i, $row->editor, $row->checked_out_time, static::$ctrl . '.', $row->canCheckin);
 
 		if (!$row->checked_out)
 		{
@@ -117,16 +117,16 @@ abstract class JHtmlFcbase
 
 		if (!$row->canCheckin)
 		{
-			return '<span class="icon-lock ' . static::$tooltip_class . '" title="' . \Joomla\CMS\HTML\HTMLHelper::tooltipText('', 'FLEXI_RECORD_CHECKED_OUT_DIFF_USER', true, false) . '"></span> ';
+			return '<span class="icon-lock ' . static::$tooltip_class . '" title="' . JHtml::tooltipText('', 'FLEXI_RECORD_CHECKED_OUT_DIFF_USER', true, false) . '"></span> ';
 		}
 
 		$_tip_title = $row->checked_out == $user->id
-			? \Joomla\CMS\Language\Text::sprintf('FLEXI_CLICK_TO_RELEASE_YOUR_LOCK_DESC', $row->editor, $row->checked_out_time)
-			: \Joomla\CMS\Language\Text::sprintf('FLEXI_CLICK_TO_RELEASE_FOREIGN_LOCK_DESC', $row->editor, $row->checked_out_time);
+			? JText::sprintf('FLEXI_CLICK_TO_RELEASE_YOUR_LOCK_DESC', $row->editor, $row->checked_out_time)
+			: JText::sprintf('FLEXI_CLICK_TO_RELEASE_FOREIGN_LOCK_DESC', $row->editor, $row->checked_out_time);
 
 		return 
 		($row->checked_out != $user->id ? '<input id="cb'.$i.'" type="checkbox" value="'.$row->id.'" name="cid[]" style="display:none!important;">' : '') . '
-		<a class="btn btn-micro btn-outline-secondary ntxt ' . static::$tooltip_class . '" title="' . \Joomla\CMS\HTML\HTMLHelper::tooltipText('', $_tip_title, true, false) . '" href="javascript:;" onclick="var ccb=document.getElementById(\'cb'.$i.'\'); ccb.checked=1; ccb.form.task.value=\'' . static::$ctrl . '.checkin\'; ccb.form.submit();">
+		<a class="btn btn-micro btn-outline-secondary ntxt ' . static::$tooltip_class . '" title="' . JHtml::tooltipText('', $_tip_title, true, false) . '" href="javascript:;" onclick="var ccb=document.getElementById(\'cb'.$i.'\'); ccb.checked=1; ccb.form.task.value=\'' . static::$ctrl . '.checkin\'; ccb.form.submit();">
 			<span class="icon-checkedout"></span>
 		</a>
 		';
@@ -227,7 +227,7 @@ abstract class JHtmlFcbase
 	public static function edit_link($row, $i, $canEdit, $config = array())
 	{
 		$title = in_array(static::$title_propname, static::$translateable_props)
-			? \Joomla\CMS\Language\Text::_($row->{static::$title_propname})
+			? JText::_($row->{static::$title_propname})
 			: $row->{static::$title_propname};
 		$title_original = $row->{static::$title_propname};
 		$title_basic = '';
@@ -235,7 +235,7 @@ abstract class JHtmlFcbase
 		if (!empty($row->custom_title))
 		{
 			$title_basic = $title;
-			$title = \Joomla\CMS\Language\Text::_($row->custom_title);
+			$title = JText::_($row->custom_title);
 			$title_original = $row->custom_title;
 		}
 
@@ -255,7 +255,7 @@ abstract class JHtmlFcbase
 			: '';
 
 		// Display title with no edit link ... if row is not-editable for any reason (no ACL or checked-out by other user)
-		if (!$canEdit || ($row->checked_out && (int) $row->checked_out !== (int) \Joomla\CMS\Factory::getUser()->id))
+		if (!$canEdit || ($row->checked_out && (int) $row->checked_out !== (int) JFactory::getUser()->id))
 		{
 			return $title_cut . $title_untranslated;
 		}
@@ -286,7 +286,7 @@ abstract class JHtmlFcbase
 		}
 		else
 		{
-			$attrs = ' class="fc-iblock" title="' . \Joomla\CMS\Language\Text::_('FLEXI_EDIT', true) . '" ';
+			$attrs = ' class="fc-iblock" title="' . JText::_('FLEXI_EDIT', true) . '" ';
 		}
 
 		if (!empty($config['onclick']))
@@ -296,8 +296,8 @@ abstract class JHtmlFcbase
 		elseif (!empty($config['useModal']))
 		{
 			$attrs .= ' onclick="' . 'var url = jQuery(this).attr(\'data-href\'); ' .
-				'var the_dialog = fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, ' . \Joomla\CMS\Language\Text::_($config['useModal']->onclosefunc) . ', ' .
-				'{title:\'' . \Joomla\CMS\Language\Text::_($config['useModal']->title,  true) . '\', loadFunc: ' . \Joomla\CMS\Language\Text::_($config['useModal']->onloadfunc) . '}); return false;' .
+				'var the_dialog = fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, ' . JText::_($config['useModal']->onclosefunc) . ', ' .
+				'{title:\'' . JText::_($config['useModal']->title,  true) . '\', loadFunc: ' . JText::_($config['useModal']->onloadfunc) . '}); return false;' .
 			'"';
 		}
 
@@ -349,7 +349,7 @@ abstract class JHtmlFcbase
 			<div class="group-fcset">
 				<input type="checkbox" id="' . $stub . $rowNum . '" name="' . $name . '[]" value="' . $recId . '" onclick="Joomla.isChecked(this.checked);">
 				<label for="' . $stub . $rowNum . '" class="green single" ' . ($onclick ? 'onclick="' . $onclick . '"' : '') . '>
-					<span class="sr-only">' . \Joomla\CMS\Language\Text::_('JSELECT') . ' ' . htmlspecialchars($title, ENT_COMPAT, 'UTF-8') . '</span>
+					<span class="sr-only">' . JText::_('JSELECT') . ' ' . htmlspecialchars($title, ENT_COMPAT, 'UTF-8') . '</span>
 				</label>
 			</div>';
 	}
@@ -388,11 +388,11 @@ abstract class JHtmlFcbase
 
 		$layout_url = 'index.php?option=com_flexicontent&amp;view=template&amp;type=' . static::$layout_type
 			. '&amp;tmpl=component&amp;ismodal=' . ($target === '__modal__' ? '1' : '0') . '&amp;folder=' . $layout
-			. '&amp;' . \Joomla\CMS\Session\Session::getFormToken() . '=1';
+			. '&amp;' . JSession::getFormToken() . '=1';
 
 		if ($target === '__modal__')
 		{
-			$edit_title = htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', true), ENT_QUOTES, 'UTF-8');
+			$edit_title = htmlspecialchars(JText::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', true), ENT_QUOTES, 'UTF-8');
 			$target_attr = ' onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'' . $edit_title . '\'}); return false;"';
 		}
 		else
@@ -434,16 +434,16 @@ abstract class JHtmlFcbase
 		$config = (object) array(
 			'icon_class' => (!empty($config->icon_class) ? $config->icon_class: 'icon-checkbox'),
 			'custom_txt' => (!empty($config->custom_txt) ? $config->custom_txt : ''),
-			'custom_tip' => (!empty($config->custom_tip) ? $config->custom_tip : \Joomla\CMS\Language\Text::_('JLIB_HTML_SAVE_ORDER')),
+			'custom_tip' => (!empty($config->custom_tip) ? $config->custom_tip : JText::_('JLIB_HTML_SAVE_ORDER')),
 			'task_value' => (!empty($config->task_value) ? $config->task_value : static::$ctrl . '.saveorder'),
 		);
 
 		return '
 		<a href="javascript:;" onclick="var checkAllToggle = document.adminForm.elements[\'checkall-toggle\']; checkAllToggle.checked=true; Joomla.checkAll(checkAllToggle); Joomla.submitform(\'' . $config->task_value . '\');" '
 				. ' class="saveorder btn btn-small btn-primary' . ($config->custom_tip ? ' hasTooltip' : '') . '" '
-				. ' title="' . \Joomla\CMS\Language\Text::_($config->custom_tip ?: '') . '" style="padding: 6px 7px 4px 8px;">
+				. ' title="' . JText::_($config->custom_tip ?: '') . '" style="padding: 6px 7px 4px 8px;">
 			<span class="' . $config->icon_class . '"></span>
-			<span class="hidden-phone">' . \Joomla\CMS\Language\Text::_($config->custom_txt ?: '') . '</span>
+			<span class="hidden-phone">' . JText::_($config->custom_txt ?: '') . '</span>
 		</a>';
 	}
 
@@ -467,16 +467,16 @@ abstract class JHtmlFcbase
 		$config = (object) array(
 			'icon_class' => (!empty($config->icon_class) ? $config->icon_class: 'icon-cog'),
 			'custom_txt' => (!empty($config->custom_txt) ? $config->custom_txt : ''),
-			'custom_tip' => (!empty($config->custom_tip) ? $config->custom_tip : \Joomla\CMS\Language\Text::_('FLEXI_MANUAL_ORDER')),
+			'custom_tip' => (!empty($config->custom_tip) ? $config->custom_tip : JText::_('FLEXI_MANUAL_ORDER')),
 			'click_attr' => (!empty($config->click_attr) ? $config->click_attr : 'jQuery(\'.fcitem_order_no\').slideToggle();'),
 		);
 
 		return '
 		<a href="javascript:;" onclick="' . $config->click_attr . '" data-placement="bottom" '
 				. ' class="saveorder btn btn-small' . ($config->custom_tip ? ' hasTooltip' : '') . '" '
-				. ' title="' . \Joomla\CMS\Language\Text::_($config->custom_tip ?: '') . '" style="padding: 6px 4px 4px 6px;">
+				. ' title="' . JText::_($config->custom_tip ?: '') . '" style="padding: 6px 4px 4px 6px;">
 			<span class="' . $config->icon_class . '"></span>
-			<span class="hidden-phone">' . \Joomla\CMS\Language\Text::_($config->custom_txt ?: '') . '</span>
+			<span class="hidden-phone">' . JText::_($config->custom_txt ?: '') . '</span>
 		</a>';
 	}
 
@@ -495,7 +495,7 @@ abstract class JHtmlFcbase
 		$uncut_length = 0;
 
 		$title = in_array(static::$title_propname, static::$translateable_props)
-			? \Joomla\CMS\Language\Text::_($row->{static::$title_propname})
+			? JText::_($row->{static::$title_propname})
 			: $row->{static::$title_propname};
 
 		$text = !$row->$propname ? '' : flexicontent_html::striptagsandcut(
@@ -513,7 +513,7 @@ abstract class JHtmlFcbase
 
 		if (!empty($text))
 		{
-			echo '<span class="icon-info ' . static::$tooltip_class . '" title="' . flexicontent_html::getToolTip(\Joomla\CMS\Language\Text::_('FLEXI_FIELD_DESCRIPTION', true), $text, 0, 1) . '"></span>';
+			echo '<span class="icon-info ' . static::$tooltip_class . '" title="' . flexicontent_html::getToolTip(JText::_('FLEXI_FIELD_DESCRIPTION', true), $text, 0, 1) . '"></span>';
 		}
 	}
 
@@ -534,18 +534,18 @@ abstract class JHtmlFcbase
 		if ($use_icon && !empty($row->language) && !empty($langs->{$row->language}->imgsrc))
 		{
 			return '<img class="' . static::$tooltip_class . '" '.
-				' title=' . flexicontent_html::getToolTip(\Joomla\CMS\Language\Text::_('FLEXI_LANGUAGE'), ($row->language === '*' ? \Joomla\CMS\Language\Text::_('FLEXI_ALL') : (!empty($row->language) ? $langs->{$row->language}->name : '')), 0, 1) . '" ' .
+				' title=' . flexicontent_html::getToolTip(JText::_('FLEXI_LANGUAGE'), ($row->language === '*' ? JText::_('FLEXI_ALL') : (!empty($row->language) ? $langs->{$row->language}->name : '')), 0, 1) . '" ' .
 				' src="' . $langs->{$row->language}->imgsrc . '" alt="'. $row->language . '" /> ' .
 				($use_icon === 2 ? $langs->{$row->language}->name : '')
 				;
 		}
 		elseif ($row->language === '*')
 		{
-			return \Joomla\CMS\Language\Text::alt('JALL','language');
+			return JText::alt('JALL','language');
 		}
 		else
 		{
-			return !empty($row->language) ? $langs->{$row->language}->name : \Joomla\CMS\Language\Text::_($undefined);
+			return !empty($row->language) ? $langs->{$row->language}->name : JText::_($undefined);
 		}
 	}
 }

@@ -3,7 +3,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 use Joomla\String\StringHelper;
 
-$app = \Joomla\CMS\Factory::getApplication();
+$app = JFactory::getApplication();
 $caching = $app->getCfg('caching');
 
 $show_alpha = $this->params->get('show_alpha',1);
@@ -59,7 +59,7 @@ for($i=count($groupcssclasses); $i<count($groups); $i++) {
 	$groupcssclasses[$i] = 'letters';
 }
 
-$selected_letter = \Joomla\CMS\Factory::getApplication()->input->get('letter', '');
+$selected_letter = JFactory::getApplication()->input->get('letter', '');
 ?>
 
 <div id="fc_alpha">
@@ -73,7 +73,7 @@ $selected_letter = \Joomla\CMS\Factory::getApplication()->input->get('letter', '
 	?>
 	<div class="aichargrp <?php echo $groupcssclasses[$grp_no]; ?>">
 	<?php if($flag) {?>
-	<a class="fc_alpha_index" href="javascript:;" onclick="document.getElementById('alpha_index').value=''; var form=document.getElementById('adminForm'); adminFormPrepare(form, 2);"><?php echo \Joomla\CMS\Language\Text::_('FLEXI_ALL'); ?></a>
+	<a class="fc_alpha_index" href="javascript:;" onclick="document.getElementById('alpha_index').value=''; var form=document.getElementById('adminForm'); adminFormPrepare(form, 2);"><?php echo JText::_('FLEXI_ALL'); ?></a>
 	<?php $flag = false;}?>
 	<?php
 		foreach ($letters as $letter) :

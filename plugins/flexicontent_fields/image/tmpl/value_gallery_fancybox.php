@@ -42,7 +42,7 @@ foreach ($values as $n => $value)
 	}
 	else
 	{
-		$attribs = 'href="' . \Joomla\CMS\Uri\Uri::root(true).'/'.$srcl . '" ';
+		$attribs = 'href="' . JUri::root(true).'/'.$srcl . '" ';
 	}
 
 	$field->{$prop}[] = $pretext.
@@ -66,7 +66,7 @@ if ( !isset(static::$js_added[$field->id][__FILE__]) )
 
 	$js = '';
 
-	if ($js) \Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+	if ($js) JFactory::getDocument()->addScriptDeclaration($js);
 
 	static::$js_added[$field->id][__FILE__] = array();
 }
@@ -122,7 +122,7 @@ if (!isset(static::$js_added[$field->id][__FILE__][$item->id]))
 	})(jQuery);
 	";
 
-	if ($js) \Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+	if ($js) JFactory::getDocument()->addScriptDeclaration($js);
 	static::$js_added[$field->id][__FILE__][$item->id] = true;
 }
 
@@ -142,9 +142,7 @@ if ($result !== _FC_RETURN_)
 
 	$field->{$prop} = '
 		<div id="fb_gallery_' . $uid . '">
-			<ul>
-				' . $field->{$prop} . '
-			</ul>
+			' . $field->{$prop} . '
 		</div>
 	';
 

@@ -199,7 +199,7 @@ class FlexicontentControllerTags extends FlexicontentControllerBaseAdmin
 
 
 	/**
-	 * Method for extra form validation after \Joomla\CMS\Form\Form validation is executed
+	 * Method for extra form validation after JForm validation is executed
 	 *
 	 * @param   array     $validated_data  The already jform-validated data of the record
 	 * @param   object    $model            The Model object of current controller instance
@@ -241,7 +241,7 @@ class FlexicontentControllerTags extends FlexicontentControllerBaseAdmin
 
 		if ($records && count($records) > 1)
 		{
-			$this->setError(\Joomla\CMS\Language\Text::sprintf('FLEXI_NAME_IS_ALREADY_USED', $validated_data['name']));
+			$this->setError(JText::sprintf('FLEXI_NAME_IS_ALREADY_USED', $validated_data['name']));
 
 			return false;
 		}
@@ -251,7 +251,7 @@ class FlexicontentControllerTags extends FlexicontentControllerBaseAdmin
 
 			if ($record->id != $validated_data['id'])
 			{
-				$this->setError(\Joomla\CMS\Language\Text::sprintf('FLEXI_NAME_IS_ALREADY_USED', $validated_data['name']));
+				$this->setError(JText::sprintf('FLEXI_NAME_IS_ALREADY_USED', $validated_data['name']));
 
 				return false;
 			}
@@ -271,7 +271,7 @@ class FlexicontentControllerTags extends FlexicontentControllerBaseAdmin
 	public function copy()
 	{
 		// Check for request forgeries
-		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
 
 		die('copy method not implemented');
 	}

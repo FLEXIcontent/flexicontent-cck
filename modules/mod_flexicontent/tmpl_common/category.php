@@ -37,7 +37,7 @@ if ( $show_total && !$show_cat_data ) : ?>
 
 	<div class="umod_list_totals" >
 		<span class="icon-stack"></span>
-		<?php echo '<i>' . \Joomla\CMS\Language\Text::_('FLEXI_UMOD_TOTAL_ITEMS') . '</i> ' . ' (' . $total_info . ')'; ?>
+		<?php echo '<i>' . JText::_('FLEXI_UMOD_TOTAL_ITEMS') . '</i> ' . ' (' . $total_info . ')'; ?>
 	</div>
 
 
@@ -47,7 +47,7 @@ if ( $show_total && !$show_cat_data ) : ?>
 // ***
 else :
 
-	$app     = \Joomla\CMS\Factory::getApplication();
+	$app     = JFactory::getApplication();
 	$jinput  = $app->input;
 	$option  = $jinput->get('option', '', 'cmd');
 	$view    = $jinput->get('view', '', 'cmd');
@@ -86,7 +86,7 @@ else :
 		<?php if ($show_found_items === 1 && $show_total ) : ?>
 			<div class="umod_list_totals" >
 				<span class="icon-stack"></span>
-				<?php echo '<i>' . \Joomla\CMS\Language\Text::_('FLEXI_UMOD_TOTAL_ITEMS') . '</i> ' . ' (' . $total_info . ')'; ?>
+				<?php echo '<i>' . JText::_('FLEXI_UMOD_TOTAL_ITEMS') . '</i> ' . ' (' . $total_info . ')'; ?>
 			</div>
 		<?php endif; ?>
 

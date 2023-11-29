@@ -20,7 +20,7 @@ use Joomla\String\StringHelper;
  * FLEXIcontent Component Dashboard Model
  *
  */
-class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
+class FlexicontentModelFlexicontent extends JModelLegacy
 {
 	/**
 	 * Constructor
@@ -40,7 +40,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 	 */
 	function getPending(&$total=null)
 	{
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = JFactory::getUser();
 		$permission = FlexicontentHelperPerm::getPerm();
 		$allitems	= $permission->DisplayAllItems;
 
@@ -90,7 +90,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 	 */
 	function getRevised(&$total=null)
 	{
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = JFactory::getUser();
 		$permission = FlexicontentHelperPerm::getPerm();
 		$allitems	= $permission->DisplayAllItems;
 
@@ -145,7 +145,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 	 */
 	function getDraft(&$total=null)
 	{
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = JFactory::getUser();
 		$permission = FlexicontentHelperPerm::getPerm();
 		$allitems	= $permission->DisplayAllItems;
 		$requestApproval = @ $permission->RequestApproval;
@@ -196,7 +196,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 	 */
 	function getInprogress(&$total=null)
 	{
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = JFactory::getUser();
 		$permission = FlexicontentHelperPerm::getPerm();
 		$allitems	= $permission->DisplayAllItems;
 
@@ -251,10 +251,10 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		if ($return !== null) return $return;
 		$return = false;
 
-		$app = \Joomla\CMS\Factory::getApplication();
+		$app = JFactory::getApplication();
 
 		// Get 'default_menu_itemid' parameter
-		$params = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+		$params = JComponentHelper::getParams('com_flexicontent');
 		$default_menu_itemid = $params->get('default_menu_itemid', false);
 
 		// Load the default menu item
@@ -262,24 +262,24 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		$menu = $menus->getItem($default_menu_itemid);
 
 		$public_acclevel = !FLEXI_J16GE ? 0 : 1;
-		$prompt  = '<br>'.\Joomla\CMS\Language\Text::_('FLEXI_DEFAULT_MENU_ITEM_PROMPT');
+		$prompt  = '<br>'.JText::_('FLEXI_DEFAULT_MENU_ITEM_PROMPT');
 
 		// Check menu item exists
 		$config_saved = (bool) $params->get('flexi_cat_extension');
 		if ( !$menu ) {
 			if ( $config_saved ) {
-				$app->enqueueMessage( \Joomla\CMS\Language\Text::_('FLEXI_DEFAULT_MENU_ITEM_MISSING_DISABLED').$prompt, 'notice' );
+				$app->enqueueMessage( JText::_('FLEXI_DEFAULT_MENU_ITEM_MISSING_DISABLED').$prompt, 'notice' );
 			}
 			return $return = false;
 		}
 		// Check pointing to FLEXIcontent
 		if ( @$menu->query['option']!='com_flexicontent' ) {
-			$app->enqueueMessage( \Joomla\CMS\Language\Text::_('FLEXI_DEFAULT_MENU_ITEM_ISNON_FLEXI').$prompt, 'notice' );
+			$app->enqueueMessage( JText::_('FLEXI_DEFAULT_MENU_ITEM_ISNON_FLEXI').$prompt, 'notice' );
 			return $return = false;
 		}
 		// Check public access level
 		if ( $menu->access!=$public_acclevel ) {
-			$app->enqueueMessage( \Joomla\CMS\Language\Text::_('FLEXI_DEFAULT_MENU_ITEM_ISNON_PUBLIC').$prompt, 'notice' );
+			$app->enqueueMessage( JText::_('FLEXI_DEFAULT_MENU_ITEM_ISNON_PUBLIC').$prompt, 'notice' );
 			return $return = false;
 		}
 
@@ -352,8 +352,8 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		if ($return !== NULL) return $return;
 		$return = false;
 
-		//\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, 'en-GB', true);
-		//\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, null, true);
+		//JFactory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, 'en-GB', true);
+		//JFactory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, null, true);
 
 		$p = 'FLEXI_COREPROPS_';
 		$coreprop_names = array
@@ -538,7 +538,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 	 */
 	function syncItemsLang()
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 
 		// This should be match items that come from J1.5 upgrade only
 		// and copy the J1.5 language from items_ext table into the content table
@@ -572,7 +572,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 	 */
 	function setItemsDefaultLang($lang)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 
 		// Set default language for items that do not have their language set
 		$query 	= 'UPDATE #__flexicontent_items_ext'
@@ -657,23 +657,23 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		$destpath = JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'plugins';
 
 		// Check if JComments installed and active
-		if (\Joomla\CMS\Filesystem\Folder::exists($destpath) && \Joomla\CMS\Plugin\PluginHelper::isEnabled('system', 'jcomments'))
+		if (JFolder::exists($destpath) && JPluginHelper::isEnabled('system', 'jcomments'))
 		{
 			$dest   = $destpath.DS.'com_flexicontent.plugin.php';
 			$source = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'jcomments'.DS.'com_flexicontent.plugin.php';
-			$plg_exists = \Joomla\CMS\Filesystem\File::exists($dest);
+			$plg_exists = JFile::exists($dest);
 
 			if (!$plg_exists || filemtime(__FILE__) > filemtime($dest))
 			{
-				if (!\Joomla\CMS\Filesystem\Folder::exists($destpath)) {
-					if (!\Joomla\CMS\Filesystem\Folder::create($destpath)) {
-						\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::sprintf('JLIB_INSTALLER_ABORT_PLG_INSTALL_CREATE_DIRECTORY', 'jComments plugin for FLEXIcontent', $destpath), 'warning');
+				if (!JFolder::exists($destpath)) {
+					if (!JFolder::create($destpath)) {
+						JFactory::getApplication()->enqueueMessage(JText::sprintf('JLIB_INSTALLER_ABORT_PLG_INSTALL_CREATE_DIRECTORY', 'jComments plugin for FLEXIcontent', $destpath), 'warning');
 					}
 				}
-				if (!\Joomla\CMS\Filesystem\File::copy($source, $dest)) {
-					\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_FAILED_TO') . \Joomla\CMS\Language\Text::_(!$plg_exists ? 'JLIB_INSTALLER_INSTALL' : 'JLIB_INSTALLER_UPDATE') . ' jComments plugin for FLEXIcontent', 'warning');
+				if (!JFile::copy($source, $dest)) {
+					JFactory::getApplication()->enqueueMessage(JText::_('FLEXI_FAILED_TO') . JText::_(!$plg_exists ? 'JLIB_INSTALLER_INSTALL' : 'JLIB_INSTALLER_UPDATE') . ' jComments plugin for FLEXIcontent', 'warning');
 				} else {
-					\Joomla\CMS\Factory::getApplication()->enqueueMessage('<span class="badge">' . \Joomla\CMS\Language\Text::_(!$plg_exists ? 'FLEXI_INSTALLED' : 'FLEXI_UPDATED') . '</span> jComments plugin for FLEXIcontent', 'message');
+					JFactory::getApplication()->enqueueMessage('<span class="badge">' . JText::_(!$plg_exists ? 'FLEXI_INSTALLED' : 'FLEXI_UPDATED') . '</span> jComments plugin for FLEXIcontent', 'message');
 				}
 			}
 		}
@@ -685,7 +685,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 
 		$destpath = JPATH_ADMINISTRATOR.DS.'components'.DS.'com_falang'.DS.'contentelements';
 
-		if (\Joomla\CMS\Filesystem\Folder::exists($destpath) && \Joomla\CMS\Plugin\PluginHelper::isEnabled('system', 'falangdriver'))
+		if (JFolder::exists($destpath) && JPluginHelper::isEnabled('system', 'falangdriver'))
 		{
 			$sourcepath = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'joomfish';
 			$files = glob($sourcepath."/*.xml");
@@ -693,15 +693,15 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 			foreach ($files as $file)
 			{
 				$file_dest = $destpath.DS.basename($file);
-				$plg_exists = \Joomla\CMS\Filesystem\File::exists($file_dest);
+				$plg_exists = JFile::exists($file_dest);
 				if (!$plg_exists || filemtime($file) > filemtime($file_dest))
 				{
-					\Joomla\CMS\Filesystem\File::copy($file, $file_dest);
+					JFile::copy($file, $file_dest);
 					$elements_count[$plg_exists ? 1 : 0]++;
 				}
 			}
-			if ($elements_count[0]) \Joomla\CMS\Factory::getApplication()->enqueueMessage('<span class="badge">' . \Joomla\CMS\Language\Text::_('FLEXI_INSTALLED') . '</span> ' . $elements_count[0] . ' Falang elements for FLEXIcontent', 'message');
-			if ($elements_count[1]) \Joomla\CMS\Factory::getApplication()->enqueueMessage('<span class="badge">' . \Joomla\CMS\Language\Text::_('FLEXI_UPDATED')   . '</span> ' . $elements_count[1] . ' Falang elements for FLEXIcontent', 'message');
+			if ($elements_count[0]) JFactory::getApplication()->enqueueMessage('<span class="badge">' . JText::_('FLEXI_INSTALLED') . '</span> ' . $elements_count[0] . ' Falang elements for FLEXIcontent', 'message');
+			if ($elements_count[1]) JFactory::getApplication()->enqueueMessage('<span class="badge">' . JText::_('FLEXI_UPDATED')   . '</span> ' . $elements_count[1] . ' Falang elements for FLEXIcontent', 'message');
 		}
 
 
@@ -709,16 +709,16 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		// Handle JCE integration
 		// **********************
 
-		$pathDestName   = \Joomla\CMS\Filesystem\Path::clean(JPATH_ROOT.'/components/com_jce/editor/extensions/links');
-		$pathSourceName = \Joomla\CMS\Filesystem\Path::clean(JPATH_ROOT.'/components/com_flexicontent/librairies/JCE/links');
+		$pathDestName   = JPath::clean(JPATH_ROOT.'/components/com_jce/editor/extensions/links');
+		$pathSourceName = JPath::clean(JPATH_ROOT.'/components/com_flexicontent/librairies/JCE/links');
 
 		// Check if JCE installed and active
-		if (!\Joomla\CMS\Filesystem\Folder::exists($pathDestName) || !\Joomla\CMS\Plugin\PluginHelper::isEnabled('editors', 'jce'))
+		if (!JFolder::exists($pathDestName) || !JPluginHelper::isEnabled('editors', 'jce'))
 		{
 			return true; // Nothing to do, JCE not installed
 		}
 
-		$plg_exists = \Joomla\CMS\Filesystem\File::exists($pathDestName.'/flexicontentlinks.php');
+		$plg_exists = JFile::exists($pathDestName.'/flexicontentlinks.php');
 		if ($plg_exists && filemtime(__FILE__) < filemtime($pathDestName.'/flexicontentlinks.php'))
 		{
 			return true; // Nothing to do, already up-to-date
@@ -729,15 +729,15 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		foreach ($files as $file)
 		{
 			$file_dest = $pathDestName .DS. basename($file);
-			\Joomla\CMS\Filesystem\File::copy($file, $file_dest);
+			JFile::copy($file, $file_dest);
 		}
 
 		// Check DESTINATION folder
-		$pathSourceName = \Joomla\CMS\Filesystem\Path::clean($pathSourceName.'/flexicontentlinks');
-		$pathDestName   = \Joomla\CMS\Filesystem\Path::clean($pathDestName.'/flexicontentlinks');
-		if ( !\Joomla\CMS\Filesystem\Folder::exists($pathDestName) && !\Joomla\CMS\Filesystem\Folder::create($pathDestName) )
+		$pathSourceName = JPath::clean($pathSourceName.'/flexicontentlinks');
+		$pathDestName   = JPath::clean($pathDestName.'/flexicontentlinks');
+		if ( !JFolder::exists($pathDestName) && !JFolder::create($pathDestName) )
 		{
-			\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::sprintf('JLIB_INSTALLER_ABORT_PLG_INSTALL_CREATE_DIRECTORY', 'JCE Links plugin for FLEXIcontent', $pathDestName), 'warning');
+			JFactory::getApplication()->enqueueMessage(JText::sprintf('JLIB_INSTALLER_ABORT_PLG_INSTALL_CREATE_DIRECTORY', 'JCE Links plugin for FLEXIcontent', $pathDestName), 'warning');
 		}
 
 		// Copy all files
@@ -745,18 +745,18 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		foreach ($files as $file)
 		{
 			$file_dest = $pathDestName .DS. basename($file);
-			\Joomla\CMS\Filesystem\File::copy($file, $file_dest);
+			JFile::copy($file, $file_dest);
 		}
 
 		$folders = array('css', 'images');
 		foreach ($folders as $folder)
 		{
 			// Check DESTINATION folder
-			$sub_pathSourceName = \Joomla\CMS\Filesystem\Path::clean($pathSourceName.'/'.$folder);
-			$sub_pathDestName   = \Joomla\CMS\Filesystem\Path::clean($pathDestName.'/'.$folder);
-			if ( !\Joomla\CMS\Filesystem\Folder::exists($sub_pathDestName) && !\Joomla\CMS\Filesystem\Folder::create($sub_pathDestName) )
+			$sub_pathSourceName = JPath::clean($pathSourceName.'/'.$folder);
+			$sub_pathDestName   = JPath::clean($pathDestName.'/'.$folder);
+			if ( !JFolder::exists($sub_pathDestName) && !JFolder::create($sub_pathDestName) )
 			{
-				\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::sprintf('JLIB_INSTALLER_ABORT_PLG_INSTALL_CREATE_DIRECTORY', 'JCE Links plugin for FLEXIcontent', $sub_pathDestName), 'warning');
+				JFactory::getApplication()->enqueueMessage(JText::sprintf('JLIB_INSTALLER_ABORT_PLG_INSTALL_CREATE_DIRECTORY', 'JCE Links plugin for FLEXIcontent', $sub_pathDestName), 'warning');
 			}
 
 			// Copy all files
@@ -764,11 +764,11 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 			foreach ($files as $file)
 			{
 				$file_dest = $sub_pathDestName .DS. basename($file);
-				\Joomla\CMS\Filesystem\File::copy($file, $file_dest);
+				JFile::copy($file, $file_dest);
 			}
 		}
 
-		\Joomla\CMS\Factory::getApplication()->enqueueMessage('<span class="badge">' . \Joomla\CMS\Language\Text::_(!$plg_exists ? 'FLEXI_INSTALLED' : 'FLEXI_UPDATED') . '</span> JCE Links plugin for FLEXIcontent', 'message');
+		JFactory::getApplication()->enqueueMessage('<span class="badge">' . JText::_(!$plg_exists ? 'FLEXI_INSTALLED' : 'FLEXI_UPDATED') . '</span> JCE Links plugin for FLEXIcontent', 'message');
 	}
 
 
@@ -779,13 +779,13 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 	function checkCollations()
 	{
 		$db = $this->_db;
-		$session = \Joomla\CMS\Factory::getSession();
-		$app = \Joomla\CMS\Factory::getApplication();
+		$session = JFactory::getSession();
+		$app = JFactory::getApplication();
 
 		$dbprefix = $app->getCfg('dbprefix');
 		$dbname   = $app->getCfg('db');
 
-		$jversion = new \Joomla\CMS\Version;
+		$jversion = new JVersion;
 
 		$collation_version = $session->get('flexicontent.collation_version');
 		if ($collation_version == $jversion->getShortVersion())  return;
@@ -848,7 +848,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		if ($return !== NULL) return $return;
 		$return = false;
 
-		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
+		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 		//$useAssocs = flexicontent_db::useAssociations();
 
 		// Clean orphan assosiations
@@ -1014,7 +1014,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		if ($missing !== NULL) return $check_only ? empty($missing) : $missing;
 
 		jimport('joomla.filesystem.file');
-		$app = \Joomla\CMS\Factory::getApplication();
+		$app = JFactory::getApplication();
 		$dbprefix = $app->getCfg('dbprefix');
 		$dbname   = $app->getCfg('db');
 
@@ -1100,12 +1100,12 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		{
 			$indexing_started = false;
 			$file = JPATH_SITE.DS.'tmp'.DS.'tbl_indexes_'.$tblname;
-			if ( \Joomla\CMS\Filesystem\File::exists($file) )
+			if ( JFile::exists($file) )
 			{
 				$indexing_start_secs = (int) file_get_contents($file);
 				$indexing_started = $indexing_start_secs + 3600 > time();
 				if (!$indexing_started) {
-					\Joomla\CMS\Filesystem\File::delete($file);
+					JFile::delete($file);
 				}
 			}
 
@@ -1132,7 +1132,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 				if ($indexing_started)
 				{
 					if ($exists) {
-						\Joomla\CMS\Filesystem\File::delete($file);
+						JFile::delete($file);
 						continue;
 					}
 					else $missing[$tblname]['__indexing_started__'] = 1;
@@ -1214,10 +1214,10 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		jimport('joomla.filesystem.folder');
 		jimport('joomla.filesystem.path');
 
-		$conf_override_file = \Joomla\CMS\Filesystem\Path::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'phpThumb.config_OVERRIDE.php');
+		$conf_override_file = JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'phpThumb.config_OVERRIDE.php');
 
 		// CHECK phpThumb configuration override file exists and create it, if it does not exist
-		if ( !\Joomla\CMS\Filesystem\File::exists($conf_override_file) )
+		if ( !JFile::exists($conf_override_file) )
 		{
 			$file_contents =
 				'<?php'."\n".
@@ -1234,7 +1234,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 			// write .htaccess file
 			$fh = @ fopen($conf_override_file, 'w');
 			if (!$fh) {
-				\Joomla\CMS\Factory::getApplication()->enqueueMessage( 'Cannot create/write file: '.$conf_override_file, 'notice' );
+				JFactory::getApplication()->enqueueMessage( 'Cannot create/write file: '.$conf_override_file, 'notice' );
 			} else {
 				fwrite($fh, $file_contents);
 				fclose($fh);
@@ -1242,10 +1242,10 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		}
 
 
-		$phpthumbcache 	= \Joomla\CMS\Filesystem\Path::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'cache');
+		$phpthumbcache 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'cache');
 
 		// CHECK phpThumb cache exists and create the folder
-		if ( !\Joomla\CMS\Filesystem\Folder::exists($phpthumbcache) && !\Joomla\CMS\Filesystem\Folder::create($phpthumbcache) )
+		if ( !JFolder::exists($phpthumbcache) && !JFolder::create($phpthumbcache) )
 		{
 			JError::raiseWarning(100, 'Error: Unable to create phpThumb folder: '. $phpthumbcache .' image thumbnail will not work properly' );
 			$return = true;  // Cancel task !! to allow user to continue
@@ -1253,15 +1253,15 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		}
 
 		// CHECK phpThumb cache permissions
-		$perms = \Joomla\CMS\Filesystem\Path::getPermissions($phpthumbcache);
+		$perms = JPath::getPermissions($phpthumbcache);
 		$return = preg_match('/rwx....../i', $perms) ? true : false;  //'/rwxr.xr.x/i'
 		if ( $return && preg_match('/....w..w./i', $perms) )
 		{
-			\Joomla\CMS\Filesystem\Path::setPermissions($phpthumbcache, '0600', '0700');
+			JPath::setPermissions($phpthumbcache, '0600', '0700');
 		}
 
 		// If permissions not good check if we can change them
-		if ( !$return && !\Joomla\CMS\Filesystem\Path::canChmod($phpthumbcache) )
+		if ( !$return && !JPath::canChmod($phpthumbcache) )
 		{
 			JError::raiseWarning(100, 'Error: Unable to change phpThumb folder permissions: '. $phpthumbcache .' there maybe a wrong owner of the folder. Correct permissions are important for proper thumbnails and for -security-' );
 			$return = true;  // Cancel task !! to allow user to continue
@@ -1307,11 +1307,11 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		$deprecated['files'] = array();
 		$deprecated['folders'] = array();
 
-		$done_file = \Joomla\CMS\Filesystem\Path::clean(JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/deprecated_done');
-		$depr_file = \Joomla\CMS\Filesystem\Path::clean(JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/deprecated_list.php');
+		$done_file = JPath::clean(JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/deprecated_done');
+		$depr_file = JPath::clean(JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/deprecated_list.php');
 
 		// If file / folder removal already done then stop further steps
-		if (\Joomla\CMS\Filesystem\File::exists($done_file) && (filemtime($done_file) > filemtime($depr_file)))
+		if (JFile::exists($done_file) && (filemtime($done_file) > filemtime($depr_file)))
 		{
 			$finished = true;
 			return $finished;
@@ -1330,7 +1330,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 
 		foreach ($files as $file)
 		{
-			if (\Joomla\CMS\Filesystem\File::exists($file))
+			if (JFile::exists($file))
 			{
 				$deprecated['files'][] = $file;
 			}
@@ -1338,7 +1338,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 
 		foreach ($folders as $folder)
 		{
-			if (\Joomla\CMS\Filesystem\Folder::exists($folder))
+			if (JFolder::exists($folder))
 			{
 				$deprecated['folders'][] = $folder;
 			}
@@ -1514,8 +1514,8 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 	 */
 	function getExistmenu()
 	{
-		$component = \Joomla\CMS\Component\ComponentHelper::getComponent('com_flexicontent');
-		$app = \Joomla\CMS\Factory::getApplication();
+		$component = JComponentHelper::getComponent('com_flexicontent');
+		$app = JFactory::getApplication();
 
 		if(FLEXI_J16GE) {
 			$query 	=	"SELECT COUNT(*) FROM #__menu WHERE `type`='component' AND `published`=1 AND `component_id`='{$component->id}' ";
@@ -1886,33 +1886,33 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 
 		if ($method == 'zip') {
 			if (count($adminfiles))
-				\Joomla\CMS\Filesystem\Folder::create($targetfolder.DS.'admin', 0755);
+				JFolder::create($targetfolder.DS.'admin', 0755);
 			if (count($sitefiles))
-				\Joomla\CMS\Filesystem\Folder::create($targetfolder.DS.'site', 0755);
+				JFolder::create($targetfolder.DS.'site', 0755);
 		}
 
 		foreach ($adminfiles as $file) {
 			if (!$file) continue;
-			if (!\Joomla\CMS\Filesystem\File::exists($adminpath.$prefix.$file.$suffix)) {
+			if (!JFile::exists($adminpath.$prefix.$file.$suffix)) {
 				$missing['admin'][] = $file;
 				if ($method == 'create')
-					\Joomla\CMS\Filesystem\File::copy($refadminpath.'en-GB.'.$file.$suffix, $adminpath.$prefix.$file.$suffix);
+					JFile::copy($refadminpath.'en-GB.'.$file.$suffix, $adminpath.$prefix.$file.$suffix);
 			} else {
 				if ($method == 'zip') {
-					\Joomla\CMS\Filesystem\File::copy($adminpath.$prefix.$file.$suffix, $targetfolder.DS.'admin'.DS.$prefix.$file.$suffix);
+					JFile::copy($adminpath.$prefix.$file.$suffix, $targetfolder.DS.'admin'.DS.$prefix.$file.$suffix);
 					$namea .= "\n".'			            <filename>'.$prefix.$file.$suffix.'</filename>';
 				}
 			}
 		}
 		foreach ($sitefiles as $file) {
 			if (!$file) continue;
-			if (!\Joomla\CMS\Filesystem\File::exists($sitepath.$prefix.$file.$suffix)) {
+			if (!JFile::exists($sitepath.$prefix.$file.$suffix)) {
 				$missing['site'][] = $file;
 				if ($method == 'create')
-					\Joomla\CMS\Filesystem\File::copy($refsitepath.'en-GB.'.$file.$suffix, $sitepath.$prefix.$file.$suffix);
+					JFile::copy($refsitepath.'en-GB.'.$file.$suffix, $sitepath.$prefix.$file.$suffix);
 			} else {
 				if ($method == 'zip') {
-					\Joomla\CMS\Filesystem\File::copy($sitepath.$prefix.$file.$suffix, $targetfolder.DS.'site'.DS.$prefix.$file.$suffix);
+					JFile::copy($sitepath.$prefix.$file.$suffix, $targetfolder.DS.'site'.DS.$prefix.$file.$suffix);
 					$names .= "\n".'			            <filename>'.$prefix.$file.$suffix.'</filename>';
 				}
 			}
@@ -1925,7 +1925,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 			$website 	= @$params['web'] 	? $params['web'] 	: 'http://www.flexicontent.org';
 
 			// prepare the manifest of the language archive
-			$date = \Joomla\CMS\Factory::getDate();
+			$date = JFactory::getDate();
 
 			$xmlfile = $targetfolder.DS.'install.xml';
 
@@ -1951,14 +1951,14 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 			</install>'
 			   ;
 			// save xml manifest
-			\Joomla\CMS\Filesystem\File::write($xmlfile, $xml);
+			JFile::write($xmlfile, $xml);
 
 
-			$fileslist  = \Joomla\CMS\Filesystem\Folder::files($targetfolder, '.', true, true, array('.svn', 'CVS', '.DS_Store'));
+			$fileslist  = JFolder::files($targetfolder, '.', true, true, array('.svn', 'CVS', '.DS_Store'));
 			$archivename = $targetfolder.'.com_flexicontent'. (FLEXI_J16GE ? '.zip' : '.tar.gz');
 
 			// Create the archive
-			echo \Joomla\CMS\Language\Text::_('FLEXI_SEND_LANGUAGE_CREATING_ARCHIVE')."<br>";
+			echo JText::_('FLEXI_SEND_LANGUAGE_CREATING_ARCHIVE')."<br>";
 
 			$files = array();
 			foreach ($fileslist as $i => $filename) {
@@ -1971,27 +1971,27 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 			jimport('joomla.archive.archive');
 			$packager = JArchive::getAdapter('zip');
 			if (!$packager->create($archivename, $files)) {
-				echo \Joomla\CMS\Language\Text::_('FLEXI_OPERATION_FAILED');
+				echo JText::_('FLEXI_OPERATION_FAILED');
 				return false;
 			}
 
 			// Remove temporary folder structure
-			if (!\Joomla\CMS\Filesystem\Folder::delete(($targetfolder)) ) {
-				echo \Joomla\CMS\Language\Text::_('FLEXI_SEND_DELETE_TMP_FOLDER_FAILED');
+			if (!JFolder::delete(($targetfolder)) ) {
+				echo JText::_('FLEXI_SEND_DELETE_TMP_FOLDER_FAILED');
 			}
 		}
 
 		// messages
 		if ($method == 'zip') {
-			return '<h3 class="lang-success">' . \Joomla\CMS\Language\Text::_( 'FLEXI_SEND_LANGUAGE_ARCHIVE_SUCCESS' ) . '</span>';
+			return '<h3 class="lang-success">' . JText::_( 'FLEXI_SEND_LANGUAGE_ARCHIVE_SUCCESS' ) . '</span>';
 		}
-		return (count($missing) > 0) ? $missing : '<span class="fc-mssg fc-success">'. \Joomla\CMS\Language\Text::sprintf( 'FLEXI_SEND_LANGUAGE_NO_MISSING', $code ) .'</span>';
+		return (count($missing) > 0) ? $missing : '<span class="fc-mssg fc-success">'. JText::sprintf( 'FLEXI_SEND_LANGUAGE_NO_MISSING', $code ) .'</span>';
 	}
 
 
 	function checkInitialPermission()
 	{
-		$debug_initial_perms = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('debug_initial_perms');
+		$debug_initial_perms = JComponentHelper::getParams('com_flexicontent')->get('debug_initial_perms');
 
 		static $init_required = null;
 		if ( $init_required !== null ) return $init_required;
@@ -2025,15 +2025,15 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		try { $db->execute(); } catch (Exception $e) { echo $e->getMessage(); }
 
 		// CHECK that we have the same Component Actions in assets DB table with the Actions as in component's access.xml file
-		$asset	= \Joomla\CMS\Table\Table::getInstance('asset');
+		$asset	= JTable::getInstance('asset');
 		if ($comp_section = $asset->loadByName($component_name))    // Try to load component asset, if missing it returns false
 		{
 			$this->verifyExtraRules();  // Verify that com_content component asset has the extra FC specific rules
 
 			// ok, component asset not missing, proceed to cross check for deleted / added actions
-			$rules = new \Joomla\CMS\Access\Rules($asset->rules);
+			$rules = new JAccessRules($asset->rules);
 			$rules_data = $rules->getData();
-			$component_actions = \Joomla\CMS\Access\Access::getActionsFromFile(
+			$component_actions = JAccess::getActionsFromFile(
 				JPATH_ADMINISTRATOR . '/components/' . $component_name . '/access.xml',
 				"/access/section[@name='component']/"
 			);
@@ -2056,7 +2056,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		{
 			echo "Component DB Rule Count " . ( ($comp_section) ? count($rules->getData()) : 0 ) . "<br />";
 			echo "Component File Rule Count " .
-				count(\Joomla\CMS\Access\Access::getActionsFromFile(
+				count(JAccess::getActionsFromFile(
 					JPATH_ADMINISTRATOR . '/components/' . $component_name . '/access.xml',
 					"/access/section[@name='component']/"
 				)) .
@@ -2066,7 +2066,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		// Get a list com_content TOP-LEVEL categories that have wrong asset names (do not point to 'com_content' asset)
 		// (NOTE: we do not longer force category asset creation if asset is not set, so we will not check them here)
 		// !!! WARNING this query must be same like the one USED in function initialPermission()
-		$com_content_asset	= \Joomla\CMS\Table\Table::getInstance('asset');
+		$com_content_asset	= JTable::getInstance('asset');
 		$com_content_asset->loadByName('com_content');
 		$query = $db->getQuery(true)
 			->select('c.id')
@@ -2115,10 +2115,10 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 
 	function updateInitialPermission()
 	{
-		$app = \Joomla\CMS\Factory::getApplication();
+		$app = JFactory::getApplication();
 		$component_name	= $app->input->get('option', '', 'CMD');
 		$db = $this->_db;
-		$asset	= \Joomla\CMS\Table\Table::getInstance('asset');   // Create an asset object
+		$asset	= JTable::getInstance('asset');   // Create an asset object
 
 		/*** Component assets ***/
 		$asset_exists = $asset->loadByName($component_name);
@@ -2132,7 +2132,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 			// Component asset entry does not exist or is empty: We will create initial rules for all component's actions
 
 			// Get root asset
-			$root = \Joomla\CMS\Table\Table::getInstance('asset');
+			$root = JTable::getInstance('asset');
 			$root->loadByName('root.1');
 
 			// Initialize component asset
@@ -2142,7 +2142,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 
 			// Create initial component rules and set them into the asset
 			$component_rules_arr = $this->_createComponentRules($component_name);
-			$component_rules = new \Joomla\CMS\Access\Rules($component_rules_arr);
+			$component_rules = new JAccessRules($component_rules_arr);
 			$asset->rules = (string) $component_rules;
 
 			// Save the asset into the DB
@@ -2159,9 +2159,9 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 			// Component assets entry already exists and is non-empty: We will check if it has exactly the actions specified in component's access.xml file
 
 			// Get existing DB rules and component's actions from the access.xml file
-			$existing_rules = new \Joomla\CMS\Access\Rules($asset->rules);
+			$existing_rules = new JAccessRules($asset->rules);
 			$rules_data = $existing_rules->getData();
-			$component_actions = \Joomla\CMS\Access\Access::getActionsFromFile(
+			$component_actions = JAccess::getActionsFromFile(
 				JPATH_ADMINISTRATOR . '/components/' . $component_name . '/access.xml',
 				"/access/section[@name='component']/"
 			);
@@ -2183,7 +2183,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 
 				// First merge the existing component (db) rules into the initial rules
 				$component_rules_arr = $this->_createComponentRules($component_name, $added_actions);
-				$component_rules = new \Joomla\CMS\Access\Rules($component_rules_arr);
+				$component_rules = new JAccessRules($component_rules_arr);
 				$component_rules->merge($existing_rules);
 
 				// Second, check if obsolete rules are contained in the existing component (db) rules, if so create a new rules object without the obsolete rules
@@ -2194,7 +2194,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 					{
 						unset($rules_data[$action_name]);
 					}
-					$component_rules = new \Joomla\CMS\Access\Rules($rules_data);
+					$component_rules = new JAccessRules($rules_data);
 				}
 
 				// Set asset rules
@@ -2211,11 +2211,11 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		}
 
 		// Load component asset
-		$component_asset = \Joomla\CMS\Table\Table::getInstance('asset');
+		$component_asset = JTable::getInstance('asset');
 		$component_asset->loadByName($component_name);
 
 		// Load com_content asset
-		$com_content_asset = \Joomla\CMS\Table\Table::getInstance('asset');
+		$com_content_asset = JTable::getInstance('asset');
 		$com_content_asset->loadByName('com_content');
 		$com_content_name = 'com_content';
 
@@ -2319,9 +2319,9 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 					$asset->setLocation($component_asset->id, 'last-child');     // Permissions of fields are directly inheritted by component
 
 					// Set asset rules to empty, (DO NOT set any ACTIONS, just let them inherit ... from parent)
-					$asset->rules = new \Joomla\CMS\Access\Rules();
+					$asset->rules = new JAccessRules();
 					/*
-					$actions = \Joomla\CMS\Access\Access::getActionsFromFile(
+					$actions = JAccess::getActionsFromFile(
 						JPATH_ADMINISTRATOR . '/components/' . $component_name . '/access.xml',
 						"/access/section[@name='field']/"
 					);
@@ -2329,7 +2329,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 					foreach ($actions as $action) {
 						$fieldrules[$action->name] = $rules->{$action->name};
 					}
-					$asset->rules = new \Joomla\CMS\Access\Rules(json_encode($fieldrules));
+					$asset->rules = new JAccessRules(json_encode($fieldrules));
 					*/
 					$asset->rules = (string) $asset->rules;
 
@@ -2383,9 +2383,9 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 					$asset->setLocation($component_asset->id, 'last-child');     // Permissions of types are directly inheritted by component
 
 					// Set asset rules to empty, (DO NOT set any ACTIONS, just let them inherit ... from parent)
-					$asset->rules = new \Joomla\CMS\Access\Rules();
+					$asset->rules = new JAccessRules();
 					/*
-					$actions = \Joomla\CMS\Access\Access::getActionsFromFile(
+					$actions = JAccess::getActionsFromFile(
 						JPATH_ADMINISTRATOR . '/components/' . $component_name . '/access.xml',
 						"/access/section[@name='type']/"
 					);
@@ -2393,7 +2393,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 					foreach ($actions as $action) {
 						$typerules[$action->name] = $rules->{$action->name};
 					}
-					$asset->rules = new \Joomla\CMS\Access\Rules(json_encode($typerules));
+					$asset->rules = new JAccessRules(json_encode($typerules));
 					*/
 					$asset->rules = (string) $asset->rules;
 
@@ -2425,7 +2425,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		$this->cleanCache($group = 'com_flexicontent_cats', $client = 1);
 
 		// Indicate to our system plugin that its category cache needs to be cleaned
-		\Joomla\CMS\Factory::getSession()->set('clear_cats_cache', 1, 'flexicontent');
+		JFactory::getSession()->set('clear_cats_cache', 1, 'flexicontent');
 
 		return true;
 	}
@@ -2441,8 +2441,8 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 	{
 		if ( !FlexicontentHelperPerm::getPerm()->CanFields ) return;
 
-		$db  = \Joomla\CMS\Factory::getDbo();
-		$app = \Joomla\CMS\Factory::getApplication();
+		$db  = JFactory::getDbo();
+		$app = JFactory::getApplication();
 
 		/**
 		 * GET fields having dirty field properties,
@@ -2471,7 +2471,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 			echo '
 			<div class="fcclear"></div>
 			<div class="alert alert-info">' .
-				\Joomla\CMS\Language\Text::sprintf('FLEXI_ALERT_UPDATE_SINDEX_BASIC',
+				JText::sprintf('FLEXI_ALERT_UPDATE_SINDEX_BASIC',
 					$dirty_basic,
 					' href="index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=basic" '.
 					' class="btn" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 420, function(){window.location.reload(false)}); return false;" '
@@ -2483,7 +2483,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 			echo '
 			<div class="fcclear"></div>
 			<div class="alert alert-info">' .
-				\Joomla\CMS\Language\Text::sprintf('FLEXI_ALERT_UPDATE_SINDEX_ADVANCED',
+				JText::sprintf('FLEXI_ALERT_UPDATE_SINDEX_ADVANCED',
 					$dirty_advanced,
 					' href="index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced" ' .
 					' class="btn" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 420, function(){window.location.reload(false)}); return false;" '
@@ -2505,7 +2505,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		// *** Get com_flexicontent asset
 		// ***
 
-		$comp_asset = \Joomla\CMS\Table\Table::getInstance('asset');
+		$comp_asset = JTable::getInstance('asset');
 		$existing_rules = $comp_asset->loadByName('com_flexicontent') && !empty($comp_asset->rules)
 			? json_decode($comp_asset->rules, true)
 			: array();
@@ -2516,7 +2516,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		// *** Get flexicontent ACTION names
 		// ***
 
-		$flexi_actions = \Joomla\CMS\Access\Access::getActionsFromFile(
+		$flexi_actions = JAccess::getActionsFromFile(
 			JPATH_ADMINISTRATOR . '/components/' . $component . '/access.xml',
 			"/access/section[@name='component']/"
 		);
@@ -2546,7 +2546,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		// *** Get com_content asset and its rule names
 		// ***
 
-		$com_content_asset = \Joomla\CMS\Table\Table::getInstance('asset');
+		$com_content_asset = JTable::getInstance('asset');
 		$com_content_asset->loadByName('com_content');
 		$com_content_rules = json_decode($com_content_asset->rules, true);
 
@@ -2601,8 +2601,8 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 
 		foreach($groups as $group)
 		{
-			// This unlike \Joomla\CMS\User\User::authorize will not return true for super-user, (we don't need to set anything for super-user group, because its users will be authorized by default)
-			if ( \Joomla\CMS\Access\Access::checkGroup($group->id, 'core.manage') ) foreach($new_actions as $action_name => $_i)
+			// This unlike JUser::authorize will not return true for super-user, (we don't need to set anything for super-user group, because its users will be authorized by default)
+			if ( JAccess::checkGroup($group->id, 'core.manage') ) foreach($new_actions as $action_name => $_i)
 			{
 				// Set flexicontent specific rule
 				$flexi_rules[$action_name][$group->id] = 1;
@@ -2613,14 +2613,14 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		if (!$added) foreach($groups as $group)
 		{
 			// Since there is none User Group with core.manage, we will have to grant these to superadmins so that they are not empty ...
-			if ( \Joomla\CMS\Access\Access::checkGroup($group->id, 'core.admin') ) foreach($new_actions as $action_name => $_i)
+			if ( JAccess::checkGroup($group->id, 'core.admin') ) foreach($new_actions as $action_name => $_i)
 			{
 				// Set flexicontent specific rule
 				$flexi_rules[$action_name][$group->id] = 1;
 				$added = true;
 			}
 		}
-		//echo "<pre>"; print_r($flexi_rules); $component_rules = new \Joomla\CMS\Access\Rules($flexi_rules); echo $asset_rules = (string) $component_rules; echo "</pre>"; exit;
+		//echo "<pre>"; print_r($flexi_rules); $component_rules = new JAccessRules($flexi_rules); echo $asset_rules = (string) $component_rules; echo "</pre>"; exit;
 
 
 		// ***
@@ -2664,7 +2664,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 	/**
 	 * Get the parent asset id for the record
 	 *
-	 * @param   \Joomla\CMS\Table\Table   $table  A \Joomla\CMS\Table\Table object for the asset parent.
+	 * @param   JTable   $table  A JTable object for the asset parent.
 	 * @param   object  $data
 	 *
 	 * @return  integer  The id of the asset's parent
@@ -2717,14 +2717,14 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 
 	protected function verifyExtraRules()
 	{
-		$debug_initial_perms = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('debug_initial_perms');
+		$debug_initial_perms = JComponentHelper::getParams('com_flexicontent')->get('debug_initial_perms');
 
-		$fc_asset = \Joomla\CMS\Table\Table::getInstance('asset');
+		$fc_asset = JTable::getInstance('asset');
 		$fc_asset->loadByName('com_flexicontent');
 		$fc_asset_rules = json_decode($fc_asset->rules, true);
 		if ( !count($fc_asset_rules) )  return; // The asset is empty do not try anything
 
-		$com_content_asset = \Joomla\CMS\Table\Table::getInstance('asset');
+		$com_content_asset = JTable::getInstance('asset');
 		$com_content_asset->loadByName('com_content');
 		$com_content_rules = json_decode($com_content_asset->rules, true);
 
@@ -2762,16 +2762,16 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 
 		if ($save_asset)
 		{
-			$rules = new \Joomla\CMS\Access\Rules($com_content_rules);
+			$rules = new JAccessRules($com_content_rules);
 			$com_content_asset->rules = (string) $rules;
 			if (!$com_content_asset->check() || !$com_content_asset->store())
 			{
 				throw new RuntimeException($com_content_asset->getError());
 			}
-			if ($debug_initial_perms) \Joomla\CMS\Factory::getApplication()->enqueueMessage( 'Updated component asset with extra rules', 'notice' );
+			if ($debug_initial_perms) JFactory::getApplication()->enqueueMessage( 'Updated component asset with extra rules', 'notice' );
 		}
 		else {
-			if ($debug_initial_perms) \Joomla\CMS\Factory::getApplication()->enqueueMessage( 'No update needed for component asset with extra rules', 'notice' );
+			if ($debug_initial_perms) JFactory::getApplication()->enqueueMessage( 'No update needed for component asset with extra rules', 'notice' );
 		}
 	}
 }

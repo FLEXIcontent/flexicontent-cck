@@ -18,7 +18,7 @@ defined('_JEXEC') or die('Restricted access');
  * @subpackage FLEXIcontent
  * @since 1.5
  */
-class flexicontent_fields_type_relations extends \Joomla\CMS\Table\Table
+class flexicontent_fields_type_relations extends JTable
 {
 	/**
 	 * Primary Key

@@ -48,7 +48,7 @@ class plgFlexicontent_fieldsAuthoritems extends FCField
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
-		$field->label = \Joomla\CMS\Language\Text::_($field->label);
+		$field->label = JText::_($field->label);
 
 		// Set field and item objects
 		$this->setField($field);
@@ -66,8 +66,8 @@ class plgFlexicontent_fieldsAuthoritems extends FCField
 		{
 			$initialized = 1;
 
-			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$app       = JFactory::getApplication();
+			$document  = JFactory::getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -90,10 +90,10 @@ class plgFlexicontent_fieldsAuthoritems extends FCField
 			try
 			{
 				// Get user
-				$author = \Joomla\CMS\Factory::getUser($item->created_by);
+				$author = JFactory::getUser($item->created_by);
 
 				// Make sure unicode username can be used in the URL
-				$created_by_username = \Joomla\CMS\Filter\OutputFilter::stringURLUnicodeSlug($author->username);
+				$created_by_username = JFilterOutput::stringURLUnicodeSlug($author->username);
 				$authorslug = StringHelper::strtolower($created_by_username) !== StringHelper::strtolower($author->username)
 					? $item->created_by
 					: $item->created_by . ':' . $created_by_username;
@@ -103,7 +103,7 @@ class plgFlexicontent_fieldsAuthoritems extends FCField
 				$authorslug = $item->created_by;
 			}
 
-			$author_links[$item->created_by] = \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getCategoryRoute(
+			$author_links[$item->created_by] = JRoute::_(FlexicontentHelperRoute::getCategoryRoute(
 				0,
 				0,
 				array(

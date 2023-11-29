@@ -15,7 +15,7 @@
  */
 defined('_WF_EXT') or die('RESTRICTED');
 
-class FlexicontentlinksTagged_items extends \Joomla\CMS\Object\CMSObject {
+class FlexicontentlinksTagged_items extends JObject {
 
 	var $_option = 'com_flexicontent_tagged_items';
 
@@ -67,7 +67,7 @@ class FlexicontentlinksTagged_items extends \Joomla\CMS\Object\CMSObject {
 				<div class="uk-tree-row">
 					<a href="javascript:;">
 						<span class="uk-tree-icon"></span>
-						<span class="uk-tree-text">' . \Joomla\CMS\Language\Text::_('FLEXI_EDITOR_LINKS_ITEMS_BY_TAG') . '</span>
+						<span class="uk-tree-text">' . JText::_('FLEXI_EDITOR_LINKS_ITEMS_BY_TAG') . '</span>
 					</a>
 				</div>
 			</li>';
@@ -86,7 +86,7 @@ class FlexicontentlinksTagged_items extends \Joomla\CMS\Object\CMSObject {
 
 		if ($layout && $layout!='tags') return array();
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 
 		// Add tagged items
 		$query	= $db->getQuery(true);

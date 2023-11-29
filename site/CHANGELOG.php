@@ -580,12 +580,12 @@ $ -> Language fix or change
 
 # Fixes on the installer post script
 # Fix the description field that isn't displayed in category view
-# Image field inverted slashes on windows servers with \Joomla\CMS\Filesystem\Path::clean
+# Image field inverted slashes on windows servers with JPath::clean
 # Weblink field Add title attribute to links
 # Image field Chmod 777 on the created directories to allow phpTumb to write in object mode when FTP layer is activated 
 # Fix the not triggered content plugins
 # Fix the active Itemid detection route.php
-# Correct \Joomla\CMS\Router\Route in Jcomments plugin
+# Correct JRoute in Jcomments plugin
 # Correct compatibility with Jcomments 2.1.1
 # Error on category view when it contains sub-items 
 # Added FlexicontentHelperRoute to all views

@@ -12,7 +12,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 jimport('cms.plugin.plugin');
 
-class FCField extends \Joomla\CMS\Plugin\CMSPlugin
+class FCField extends JPlugin
 {
 	// ***
 	// *** ATTRIBUTES
@@ -72,15 +72,15 @@ class FCField extends \Joomla\CMS\Plugin\CMSPlugin
 			 * we load the ENGLISH language file (without forcing it, to avoid overwriting site-default), and then current language file
 			 */
 			$extension_name = 'plg_flexicontent_fields_' . $ft;
-			\Joomla\CMS\Factory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, 'en-GB', $force_reload = false, $load_default = true);  // force_reload OFF
-			\Joomla\CMS\Factory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, null, $force_reload = true, $load_default = true);  // force_reload ON
+			JFactory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, 'en-GB', $force_reload = false, $load_default = true);  // force_reload OFF
+			JFactory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, null, $force_reload = true, $load_default = true);  // force_reload ON
 
 			// Import field type if not already imported
 			$class_name = 'plgFlexicontent_fields' . ucfirst($ft);
 
 			if (!class_exists($class_name))
 			{
-				\Joomla\CMS\Plugin\PluginHelper::importPlugin('flexicontent_fields', $ft);
+				JPluginHelper::importPlugin('flexicontent_fields', $ft);
 			}
 		}
 
@@ -93,8 +93,8 @@ class FCField extends \Joomla\CMS\Plugin\CMSPlugin
 		{
 			$init = true;
 
-			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$app       = JFactory::getApplication();
+			$document  = JFactory::getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -103,7 +103,7 @@ class FCField extends \Joomla\CMS\Plugin\CMSPlugin
 			static::$isItemsManager = $app->isClient('administrator') && $realview === 'items' && $option === 'com_flexicontent';
 			static::$isHtmlViewFE   = $format === 'html' && $app->isClient('site');
 
-			static::$cparams        = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+			static::$cparams        = JComponentHelper::getParams('com_flexicontent');
 			static::$mobileDetector = flexicontent_html::getMobileDetector();
 
 			static::$isMobile  = static::$mobileDetector->isMobile();
@@ -113,7 +113,7 @@ class FCField extends \Joomla\CMS\Plugin\CMSPlugin
 				: static::$isMobile;
 
 			// Check for PRO system plugin presence
-			$plg_enabled = \Joomla\CMS\Plugin\PluginHelper::isEnabled('system', 'flexisyspro');
+			$plg_enabled = JPluginHelper::isEnabled('system', 'flexisyspro');
 			$extfolder   = 'system';
 			$extname     = 'flexisyspro';
 			$className   = 'plg' . ucfirst($extfolder) . $extname;
@@ -133,7 +133,7 @@ class FCField extends \Joomla\CMS\Plugin\CMSPlugin
 			else
 			{
 				$dispatcher     = JEventDispatcher::getInstance();
-				$plg_db_data    = \Joomla\CMS\Plugin\PluginHelper::getPlugin($extfolder, $extname);
+				$plg_db_data    = JPluginHelper::getPlugin($extfolder, $extname);
 
 				// Load class if called by CLI
 				JLoader::register($className, $plgPath);
@@ -273,7 +273,7 @@ class FCField extends \Joomla\CMS\Plugin\CMSPlugin
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
-		$field->label = $field->parameters->get('label_form') ? \Joomla\CMS\Language\Text::_($field->parameters->get('label_form')) : \Joomla\CMS\Language\Text::_($field->label);
+		$field->label = $field->parameters->get('label_form') ? JText::_($field->parameters->get('label_form')) : JText::_($field->label);
 
 		// Set field and item objects
 		$this->setField($field);
@@ -301,7 +301,7 @@ class FCField extends \Joomla\CMS\Plugin\CMSPlugin
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
-		$field->label = \Joomla\CMS\Language\Text::_($field->label);
+		$field->label = JText::_($field->label);
 
 		// Set field and item objects
 		$this->setField($field);
@@ -318,8 +318,8 @@ class FCField extends \Joomla\CMS\Plugin\CMSPlugin
 		{
 			$initialized = 1;
 
-			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$app       = JFactory::getApplication();
+			$document  = JFactory::getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -582,8 +582,8 @@ class FCField extends \Joomla\CMS\Plugin\CMSPlugin
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
 			if (!$add_position) $field->html .= '
 				<div class="input-append input-prepend fc-xpended-btns">
-					<span class="fcfield-addvalue ' . $font_icon_class . ' fccleared" onclick="addField'.$field->id.'(jQuery(this).closest(\'.fc-xpended-btns\').get(0));" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_TO_BOTTOM' ).'">
-						'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_VALUE' ).'
+					<span class="fcfield-addvalue ' . $font_icon_class . ' fccleared" onclick="addField'.$field->id.'(jQuery(this).closest(\'.fc-xpended-btns\').get(0));" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'">
+						'.JText::_( 'FLEXI_ADD_VALUE' ).'
 					</span>
 				</div>';
 		}
@@ -615,9 +615,9 @@ class FCField extends \Joomla\CMS\Plugin\CMSPlugin
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 
 		// Current view variable
-		$app      = \Joomla\CMS\Factory::getApplication();
+		$app      = JFactory::getApplication();
 		$realview = $app->input->getCmd('view', '');
-		$view     = \Joomla\CMS\Factory::getApplication()->input->getCmd('flexi_callview', ($realview ?: 'item'));
+		$view     = JFactory::getApplication()->input->getCmd('flexi_callview', ($realview ?: 'item'));
 
 		/**
 		 * Get common parameters like: itemprop, value's prefix (pretext), suffix (posttext), separator, value list open/close text (opentag, closetag)
@@ -716,7 +716,7 @@ class FCField extends \Joomla\CMS\Plugin\CMSPlugin
 		{
 			foreach ($default_values as $i => $v)
 			{
-				$default_values[$i] = strlen($v) ? \Joomla\CMS\Language\Text::_($v) : '';
+				$default_values[$i] = strlen($v) ? JText::_($v) : '';
 			}
 		}
 
@@ -763,10 +763,10 @@ class FCField extends \Joomla\CMS\Plugin\CMSPlugin
 
 		// Value Prefix - Suffix, Value List Open Text - Close Text, replacing other field values, and item properties
 		$arr = array();
-		$arr['pretext']  = FlexicontentFields::replaceFieldValue($this->field, $this->item, \Joomla\CMS\Language\Text::_($this->field->parameters->get('pretext', '')), 'pretext');
-		$arr['posttext'] = FlexicontentFields::replaceFieldValue($this->field, $this->item, \Joomla\CMS\Language\Text::_($this->field->parameters->get('posttext', '')), 'posttext');
-		$arr['opentag']  = FlexicontentFields::replaceFieldValue($this->field, $this->item, \Joomla\CMS\Language\Text::_($this->field->parameters->get('opentag', '')), 'opentag');
-		$arr['closetag'] = FlexicontentFields::replaceFieldValue($this->field, $this->item, \Joomla\CMS\Language\Text::_($this->field->parameters->get('closetag', '')), 'closetag');
+		$arr['pretext']  = FlexicontentFields::replaceFieldValue($this->field, $this->item, JText::_($this->field->parameters->get('pretext', '')), 'pretext');
+		$arr['posttext'] = FlexicontentFields::replaceFieldValue($this->field, $this->item, JText::_($this->field->parameters->get('posttext', '')), 'posttext');
+		$arr['opentag']  = FlexicontentFields::replaceFieldValue($this->field, $this->item, JText::_($this->field->parameters->get('opentag', '')), 'opentag');
+		$arr['closetag'] = FlexicontentFields::replaceFieldValue($this->field, $this->item, JText::_($this->field->parameters->get('closetag', '')), 'closetag');
 
 		// Add spaces to Value Prefix - Suffix texts
 		$arr['remove_space'] = $this->field->parameters->get('remove_space', 0);
@@ -788,7 +788,7 @@ class FCField extends \Joomla\CMS\Plugin\CMSPlugin
 
 		// No value text
 		$arr['no_value_msg'] = $this->field->parameters->get('show_no_value', 0)
-			? \Joomla\CMS\Language\Text::_($this->field->parameters->get('no_value_msg', 'FLEXI_NO_VALUE'))
+			? JText::_($this->field->parameters->get('no_value_msg', 'FLEXI_NO_VALUE'))
 			: '';
 
 		$conf[$this->field->id][$this->item->id] = $arr;
@@ -830,11 +830,11 @@ class FCField extends \Joomla\CMS\Plugin\CMSPlugin
 			return;
 		}
 
-		//\Joomla\CMS\Factory::getApplication()->enqueueMessage('Automatic field value for field  \'' . $field->label, 'notice');
+		//JFactory::getApplication()->enqueueMessage('Automatic field value for field  \'' . $field->label, 'notice');
 
 		if (!self::$fcProPlg)
 		{
-			\Joomla\CMS\Factory::getApplication()->enqueueMessage('Automatic field value for field  \'' . $field->label . '\' is only supported by FLEXIcontent PRO version, please disable this feature in field configuration', 'notice');
+			JFactory::getApplication()->enqueueMessage('Automatic field value for field  \'' . $field->label . '\' is only supported by FLEXIcontent PRO version, please disable this feature in field configuration', 'notice');
 			return;
 		}
 
@@ -877,7 +877,7 @@ class FCField extends \Joomla\CMS\Plugin\CMSPlugin
 		$options = array();
 		if ($default_option === null)
 		{
-			$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '', '-');
+			$options[] = JHtml::_('select.option', '', '-');
 		}
 		else
 		{
@@ -887,14 +887,14 @@ class FCField extends \Joomla\CMS\Plugin\CMSPlugin
 			{
 				if ($element->value === $default_option->value)
 				{
-					$default_label .= ' - (' . \Joomla\CMS\Language\Text::_($element->text) . ')';
+					$default_label .= ' - (' . JText::_($element->text) . ')';
 				}
 			}
-			$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '', $default_label);
+			$options[] = JHtml::_('select.option', '', $default_label);
 		}
 		foreach ($elements as $element)
 		{
-			$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', $element->value, \Joomla\CMS\Language\Text::_($element->text));
+			$options[] = JHtml::_('select.option', $element->value, JText::_($element->text));
 		}
 
 		return $options;
@@ -906,7 +906,7 @@ class FCField extends \Joomla\CMS\Plugin\CMSPlugin
 	 */
 	public function getExistingFieldValues()
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 		$query = $db->getQuery(true)
 			->select('value')
 			->from('#__flexicontent_fields_item_relations')
@@ -923,7 +923,7 @@ class FCField extends \Joomla\CMS\Plugin\CMSPlugin
 	function renameLegacyFieldParameters($map)
 	{
 		// Load parameters directly from DB
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = JFactory::getDbo();
 		$query = $db->getQuery(true)
 			->select('attribs')
 			->from('#__flexicontent_fields')
