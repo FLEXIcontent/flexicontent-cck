@@ -2,7 +2,7 @@
 // Add prefix / suffix
 $field->{$prop} =
 	$pretext
-		. JHtml::_( 'date', $item->modified, $dateformat ) .
+		. \Joomla\CMS\HTML\HTMLHelper::_( 'date', $item->modified, $dateformat ) .
 	$posttext;
 
 // Add microdata property

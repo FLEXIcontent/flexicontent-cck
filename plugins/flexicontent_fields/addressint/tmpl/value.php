@@ -53,7 +53,7 @@ $addr_format_tmpl = $field->parameters->get('addr_format_tmpl',	'
 ');
 
 $directions_position = $field->parameters->get('directions_position','after');
-$directions_link_label = $field->parameters->get('directions_link_label', JText::_('PLG_FC_ADDRESSINT_GET_DIRECTIONS'));
+$directions_link_label = $field->parameters->get('directions_link_label', \Joomla\CMS\Language\Text::_('PLG_FC_ADDRESSINT_GET_DIRECTIONS'));
 
 $show_map = $field->parameters->get('show_map','');
 $show_map = $show_map === 'both' || ($view !== 'item' && $show_map === 'category') || ($view === 'item' && $show_map === 'item');
@@ -69,7 +69,7 @@ $use_custom_marker      = (int) $field->parameters->get('use_custom_marker', 1);
 $custom_marker_path     = $field->parameters->get('custom_marker_path', 'modules/mod_flexigooglemap/assets/marker');
 
 $custom_marker_path_abs = JPATH::clean(JPATH_SITE . DS . $custom_marker_path. DS);
-$custom_marker_url_base = str_replace('\\', '/', JURI::root() . $custom_marker_path . '/');
+$custom_marker_url_base = str_replace('\\', '/', \Joomla\CMS\Uri\Uri::root() . $custom_marker_path . '/');
 
 $defaut_icon_url = $map_api === 'googlemap'
 	? '' //'https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi2.png'
@@ -243,7 +243,7 @@ foreach ($this->values as $n => $value)
 			}
 			else
 				$prop_val = @ $value[$match];
-			$addr = str_replace('{{'.$match.'}}', ($match === 'country' ? (!empty($value['country']) ? JText::_('PLG_FC_ADDRESSINT_CC_'.$value['country']) : '') : $prop_val), $addr);
+			$addr = str_replace('{{'.$match.'}}', ($match === 'country' ? (!empty($value['country']) ? \Joomla\CMS\Language\Text::_('PLG_FC_ADDRESSINT_CC_'.$value['country']) : '') : $prop_val), $addr);
 		}
 
 		$addr = '<div class="address">' . $addr . '</div>';
@@ -262,7 +262,7 @@ foreach ($this->values as $n => $value)
 				.($value['city'] ? $value['city'].',' : '')
 				.($value['state'] ? $value['state'].',' : ($value['province'] ? $value['province'].',' : ''))
 				.($value['zip'] ? $value['zip'].',' : '')
-				.($value['country'] ? JText::_('PLG_FC_ADDRESSINT_CC_'.$value['country']) : ''));
+				.($value['country'] ? \Joomla\CMS\Language\Text::_('PLG_FC_ADDRESSINT_CC_'.$value['country']) : ''));
 		}
 		else {
 			$map_link .= urlencode($value['lat'] . "," . $value['lon']);
@@ -480,7 +480,7 @@ if (!isset($addressint_view_js_added[$field->id]) && $map_api === 'googlemap' &&
 
 	// Load google-maps library
 	flexicontent_html::loadFramework('google-maps', '', $field->parameters);
-	JFactory::getDocument()->addScriptDeclaration($js);
+	\Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
 }
 
 // Code is WIP (work-in-progress) only for testing 1 address inside item view
@@ -507,5 +507,5 @@ if (!empty($js_perValue))
 		' . implode("\n", $js_perValue) . '
 	});
 	';
-	JFactory::getDocument()->addScriptDeclaration($js);
+	\Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
 }

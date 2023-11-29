@@ -19,7 +19,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 $params = $this->cparams;
-$document	= JFactory::getDocument();
+$document	= \Joomla\CMS\Factory::getDocument();
 
 // For tabsets/tabs ids (focusing, etc)
 $tabSetCnt = -1;
@@ -28,8 +28,8 @@ $tabCnt = array();
 $tabSetStack = array();
 
 // Load JS tabber lib
-$this->document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
-$this->document->addStyleSheet(JUri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
+$this->document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
+$this->document->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
 $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
 ?>
@@ -77,7 +77,7 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 
 	if (!$xml)
 	{
-		JFactory::getApplication()->enqueueMessage('Can not parse XML file: ' . implode('<br>', $err_msg), 'warning');
+		\Joomla\CMS\Factory::getApplication()->enqueueMessage('Can not parse XML file: ' . implode('<br>', $err_msg), 'warning');
 	}
 	
 	else foreach ($xml->rows as $table)
@@ -124,7 +124,7 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 	<input type="hidden" name="view" value="appsman" />
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" name="fcform" value="1" />
-	<?php echo JHtml::_('form.token'); ?>
+	<?php echo \Joomla\CMS\HTML\HTMLHelper::_('form.token'); ?>
 
 	<!-- fc_perf -->
 

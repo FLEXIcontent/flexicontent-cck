@@ -24,7 +24,7 @@ jimport('legacy.view.legacy');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewItem extends JViewLegacy
+class FlexicontentViewItem extends \Joomla\CMS\MVC\View\HtmlView
 {
 	var $_type = '';
 	var $_name = FLEXI_ITEMVIEW;
@@ -36,12 +36,12 @@ class FlexicontentViewItem extends JViewLegacy
 	 */
 	function display( $tpl = null )
 	{
-		$app      = JFactory::getApplication();
+		$app      = \Joomla\CMS\Factory::getApplication();
 		$jinput   = $app->input;
 
 		//initialize variables
-		$user  = JFactory::getUser();
-		$aid   = JAccess::getAuthorisedViewLevels($user->id);
+		$user  = \Joomla\CMS\Factory::getUser();
+		$aid   = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
 
 
 		// ***

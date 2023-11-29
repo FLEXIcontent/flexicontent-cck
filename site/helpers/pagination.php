@@ -19,8 +19,8 @@
 // Check to ensure this file is within the rest of the framework
 defined('JPATH_PLATFORM') or die;
 
-// Avoid problems with extensions that implement JPagination, instead of extending it, and have already load it
-if ( !class_exists('JPagination') )
+// Avoid problems with extensions that implement \Joomla\CMS\Pagination\Pagination, instead of extending it, and have already load it
+if ( !class_exists('\Joomla\CMS\Pagination\Pagination') )
 {
 	jimport('cms.pagination.pagination');
 }
@@ -33,7 +33,7 @@ if ( !class_exists('JPagination') )
  * @subpackage  HTML
  * @since       11.1
  */
-class FCPagination extends JPagination
+class FCPagination extends \Joomla\CMS\Pagination\Pagination
 {
 	public $hideEmptyLimitstart = true;
 
@@ -46,13 +46,13 @@ class FCPagination extends JPagination
 	 */
 	function getResultsCounter()
 	{
-		if ( JFactory::getApplication()->isClient('administrator') )
+		if ( \Joomla\CMS\Factory::getApplication()->isClient('administrator') )
 		{
 			return parent::getResultsCounter();
 		}
 
 		// Initialize variables
-		$app  = JFactory::getApplication();
+		$app  = \Joomla\CMS\Factory::getApplication();
 		$view = $app->input->getCmd('view', '');
 		$html = null;
 		$fromResult = $this->limitstart + 1;
@@ -81,19 +81,19 @@ class FCPagination extends JPagination
 
 			$html = '
 				<span class="flexi label item_total_label' . ($is_featured_only ? ' label-success' : '') . '">
-					' . JText::_($is_featured_only ? 'FLEXI_FEATURED' : 'FLEXI_TOTAL') . '
+					' . \Joomla\CMS\Language\Text::_($is_featured_only ? 'FLEXI_FEATURED' : 'FLEXI_TOTAL') . '
 				</span>
 
 				<span class="flexi value item_total_value">
-					' . $fc_view_total . ' ' . JText::_( $items_total_msg ) . '
+					' . $fc_view_total . ' ' . \Joomla\CMS\Language\Text::_( $items_total_msg ) . '
 				</span>
 
 				<span class="flexi label item_total_label">
-					' . JText::_('FLEXI_DISPLAYING') . '
+					' . \Joomla\CMS\Language\Text::_('FLEXI_DISPLAYING') . '
 				</span>
 
 				<span class="flexi value item_total_value">
-					' . $fromResult . ' - ' . $toResult . ' ' . JText::_('FLEXI_ITEM_S') . '
+					' . $fromResult . ' - ' . $toResult . ' ' . \Joomla\CMS\Language\Text::_('FLEXI_ITEM_S') . '
 				</span>';
 		}*/
 
@@ -109,13 +109,13 @@ class FCPagination extends JPagination
 				: '';
 
 			$html = !$items_total_msg
-				? JText::sprintf('JLIB_HTML_RESULTS_OF', $fromResult, $toResult, $fc_view_total)
-				: JText::sprintf('JLIB_HTML_RESULTS_OF', $fromResult, $toResult, $fc_view_total);// . ' (' . JText::_($items_total_msg) . ')';
+				? \Joomla\CMS\Language\Text::sprintf('JLIB_HTML_RESULTS_OF', $fromResult, $toResult, $fc_view_total)
+				: \Joomla\CMS\Language\Text::sprintf('JLIB_HTML_RESULTS_OF', $fromResult, $toResult, $fc_view_total);// . ' (' . \Joomla\CMS\Language\Text::_($items_total_msg) . ')';
 		}
 
 		else
 		{
-			$html = "\n" . JText::_('JLIB_HTML_NO_RECORDS_FOUND');
+			$html = "\n" . \Joomla\CMS\Language\Text::_('JLIB_HTML_NO_RECORDS_FOUND');
 		}
 		
 		return $html;
@@ -131,7 +131,7 @@ class FCPagination extends JPagination
 	 */
 	protected function _buildDataObject()
 	{
-		if (JFactory::getApplication()->isClient('administrator'))
+		if (\Joomla\CMS\Factory::getApplication()->isClient('administrator'))
 		{
 			return parent::_buildDataObject();
 		}
@@ -141,7 +141,7 @@ class FCPagination extends JPagination
 		// ***
 		$data = parent::_buildDataObject();
 
-		// Workaround for JRoute not allowing url-encoded ampersand %26 in values of variables
+		// Workaround for \Joomla\CMS\Router\Route not allowing url-encoded ampersand %26 in values of variables
 		if (!empty($data->pages))
 		{
 			foreach($data->pages as $i => $page)
@@ -183,7 +183,7 @@ class FCPagination extends JPagination
 	 */
 	public function getLimitBox()
 	{
-		if (!JFactory::getApplication()->isClient('administrator'))
+		if (!\Joomla\CMS\Factory::getApplication()->isClient('administrator'))
 		{
 			return parent::getLimitBox();
 		}
@@ -193,19 +193,19 @@ class FCPagination extends JPagination
 		// Make the option list.
 		for ($i = 5; $i <= 30; $i += 5)
 		{
-			$limits[] = \JHtml::_('select.option', "$i");
+			$limits[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', "$i");
 		}
 
-		$limits[] = \JHtml::_('select.option', '50', \JText::_('J50'));
-		$limits[] = \JHtml::_('select.option', '100', \JText::_('J100'));
-		$limits[] = \JHtml::_('select.option', '200', \JText::_('J200'));
-		$limits[] = \JHtml::_('select.option', '500', \JText::_('J500'));
-		$limits[] = \JHtml::_('select.option', '0', \JText::_('JALL'));
+		$limits[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '50', \Joomla\CMS\Language\Text::_('J50'));
+		$limits[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '100', \Joomla\CMS\Language\Text::_('J100'));
+		$limits[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '200', \Joomla\CMS\Language\Text::_('J200'));
+		$limits[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '500', \Joomla\CMS\Language\Text::_('J500'));
+		$limits[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '0', \Joomla\CMS\Language\Text::_('JALL'));
 
 		$selected = $this->viewall ? 0 : $this->limit;
 
 		// Build the select list.
-		return \JHtml::_(
+		return \Joomla\CMS\HTML\HTMLHelper::_(
 			'select.genericlist',
 			$limits,
 			$this->prefix . 'limit',

@@ -20,19 +20,11 @@
 defined('_JEXEC') or die('Restricted access');
 
 jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // JHtmlSelect
-jimport('joomla.form.field');  // JFormField
+jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
+jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
 
-//jimport('joomla.form.helper'); // JFormHelper
-//JFormHelper::loadFieldClass('...');   // JFormField...
-
-/**
- * Renders an alphaindex element
- *
- * @package 	Joomla
- * @subpackage	FLEXIcontent
- * @since		1.5
- */
+//jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
+//\Joomla\CMS\Form\FormHelper::loadFieldClass('...');   // \Joomla\CMS\Form\FormField...
 
 /**
  * Renders an alphaindex element
@@ -41,7 +33,15 @@ jimport('joomla.form.field');  // JFormField
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-class JFormFieldAlphaindex extends JFormField
+
+/**
+ * Renders an alphaindex element
+ *
+ * @package 	Joomla
+ * @subpackage	FLEXIcontent
+ * @since		1.5
+ */
+class JFormFieldAlphaindex extends \Joomla\CMS\Form\FormField
 {
 /**
 	* Element name
@@ -53,8 +53,8 @@ class JFormFieldAlphaindex extends JFormField
 
 	function getInput()
 	{
-		$doc  = JFactory::getDocument();
-		$db   = JFactory::getDbo();
+		$doc  = \Joomla\CMS\Factory::getDocument();
+		$db   = \Joomla\CMS\Factory::getDbo();
 
 		$node = & $this->element;
 		$attributes = get_object_vars($node->attributes());
@@ -101,6 +101,6 @@ class JFormFieldAlphaindex extends JFormField
 
 		$doc->addScriptDeclaration($js);
 		
-		return JHtml::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $value, $element_id);
+		return \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $value, $element_id);
 	}
 }

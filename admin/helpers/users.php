@@ -20,7 +20,7 @@ defined('_JEXEC') or die;
 class UsersHelper
 {
 	/**
-	 * @var    JObject  A cache for the available actions.
+	 * @var    \Joomla\CMS\Object\CMSObject  A cache for the available actions.
 	 * @since  1.6
 	 */
 	protected static $actions;
@@ -37,7 +37,7 @@ class UsersHelper
 	public static function addSubmenu($vName)
 	{
 		JSubMenuHelper::addEntry(
-			JText::_('COM_USERS_SUBMENU_USERS'),
+			\Joomla\CMS\Language\Text::_('COM_USERS_SUBMENU_USERS'),
 			'index.php?option=com_users&view=users',
 			$vName == 'users'
 		);
@@ -48,24 +48,24 @@ class UsersHelper
 		if ($canDo->get('core.admin'))
 		{
 			JSubMenuHelper::addEntry(
-				JText::_('COM_USERS_SUBMENU_GROUPS'),
+				\Joomla\CMS\Language\Text::_('COM_USERS_SUBMENU_GROUPS'),
 				'index.php?option=com_users&view=groups',
 				$vName == 'groups'
 			);
 			JSubMenuHelper::addEntry(
-				JText::_('COM_USERS_SUBMENU_LEVELS'),
+				\Joomla\CMS\Language\Text::_('COM_USERS_SUBMENU_LEVELS'),
 				'index.php?option=com_users&view=levels',
 				$vName == 'levels'
 			);
 			JSubMenuHelper::addEntry(
-				JText::_('COM_USERS_SUBMENU_NOTES'),
+				\Joomla\CMS\Language\Text::_('COM_USERS_SUBMENU_NOTES'),
 				'index.php?option=com_users&view=notes',
 				$vName == 'notes'
 			);
 
-			$extension = JFactory::getApplication()->input->getString('extension');
+			$extension = \Joomla\CMS\Factory::getApplication()->input->getString('extension');
 			JSubMenuHelper::addEntry(
-				JText::_('COM_USERS_SUBMENU_NOTE_CATEGORIES'),
+				\Joomla\CMS\Language\Text::_('COM_USERS_SUBMENU_NOTE_CATEGORIES'),
 				'index.php?option=com_categories&extension=com_users',
 				$vName == 'categories' || $extension == 'com_users'
 			);
@@ -75,7 +75,7 @@ class UsersHelper
 	/**
 	 * Gets a list of the actions that can be performed.
 	 *
-	 * @return  JObject
+	 * @return  \Joomla\CMS\Object\CMSObject
 	 *
 	 * @since   1.6
 	 * @todo    Refactor to work with notes
@@ -84,10 +84,10 @@ class UsersHelper
 	{
 		if (empty(self::$actions))
 		{
-			$user = JFactory::getUser();
-			self::$actions = new JObject;
+			$user = \Joomla\CMS\Factory::getUser();
+			self::$actions = new \Joomla\CMS\Object\CMSObject;
 
-			$actions = JAccess::getActionsFromFile(
+			$actions = \Joomla\CMS\Access\Access::getActionsFromFile(
 				JPATH_ADMINISTRATOR . '/components/' . 'com_users' . '/access.xml',
 				"/access/section[@name='component']/"
 			);
@@ -112,8 +112,8 @@ class UsersHelper
 	{
 		// Build the filter options.
 		$options = array();
-		$options[] = JHtml::_('select.option', '0', JText::_('JENABLED'));
-		$options[] = JHtml::_('select.option', '1', JText::_('JDISABLED'));
+		$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '0', \Joomla\CMS\Language\Text::_('JENABLED'));
+		$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '1', \Joomla\CMS\Language\Text::_('JDISABLED'));
 
 		return $options;
 	}
@@ -129,8 +129,8 @@ class UsersHelper
 	{
 		// Build the filter options.
 		$options = array();
-		$options[] = JHtml::_('select.option', '0', JText::_('COM_USERS_ACTIVATED'));
-		$options[] = JHtml::_('select.option', '1', JText::_('COM_USERS_UNACTIVATED'));
+		$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '0', \Joomla\CMS\Language\Text::_('COM_USERS_ACTIVATED'));
+		$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '1', \Joomla\CMS\Language\Text::_('COM_USERS_UNACTIVATED'));
 
 		return $options;
 	}
@@ -144,7 +144,7 @@ class UsersHelper
 	 */
 	static function getGroups()
 	{
-		$db = JFactory::getDbo();
+		$db = \Joomla\CMS\Factory::getDbo();
 		$db->setQuery(
 			'SELECT a.id AS value, a.title AS text, COUNT(DISTINCT b.id) AS level' .
 			' FROM #__usergroups AS a' .
@@ -174,13 +174,13 @@ class UsersHelper
 	public static function getRangeOptions()
 	{
 		$options = array(
-			JHtml::_('select.option', 'today', JText::_('COM_USERS_OPTION_RANGE_TODAY')),
-			JHtml::_('select.option', 'past_week', JText::_('COM_USERS_OPTION_RANGE_PAST_WEEK')),
-			JHtml::_('select.option', 'past_1month', JText::_('COM_USERS_OPTION_RANGE_PAST_1MONTH')),
-			JHtml::_('select.option', 'past_3month', JText::_('COM_USERS_OPTION_RANGE_PAST_3MONTH')),
-			JHtml::_('select.option', 'past_6month', JText::_('COM_USERS_OPTION_RANGE_PAST_6MONTH')),
-			JHtml::_('select.option', 'past_year', JText::_('COM_USERS_OPTION_RANGE_PAST_YEAR')),
-			JHtml::_('select.option', 'post_year', JText::_('COM_USERS_OPTION_RANGE_POST_YEAR')),
+			\Joomla\CMS\HTML\HTMLHelper::_('select.option', 'today', \Joomla\CMS\Language\Text::_('COM_USERS_OPTION_RANGE_TODAY')),
+			\Joomla\CMS\HTML\HTMLHelper::_('select.option', 'past_week', \Joomla\CMS\Language\Text::_('COM_USERS_OPTION_RANGE_PAST_WEEK')),
+			\Joomla\CMS\HTML\HTMLHelper::_('select.option', 'past_1month', \Joomla\CMS\Language\Text::_('COM_USERS_OPTION_RANGE_PAST_1MONTH')),
+			\Joomla\CMS\HTML\HTMLHelper::_('select.option', 'past_3month', \Joomla\CMS\Language\Text::_('COM_USERS_OPTION_RANGE_PAST_3MONTH')),
+			\Joomla\CMS\HTML\HTMLHelper::_('select.option', 'past_6month', \Joomla\CMS\Language\Text::_('COM_USERS_OPTION_RANGE_PAST_6MONTH')),
+			\Joomla\CMS\HTML\HTMLHelper::_('select.option', 'past_year', \Joomla\CMS\Language\Text::_('COM_USERS_OPTION_RANGE_PAST_YEAR')),
+			\Joomla\CMS\HTML\HTMLHelper::_('select.option', 'post_year', \Joomla\CMS\Language\Text::_('COM_USERS_OPTION_RANGE_POST_YEAR')),
 		);
 		return $options;
 	}

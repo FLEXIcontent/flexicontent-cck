@@ -21,7 +21,7 @@ class flexicontent_upload
 		$regex = array('#(\.){2,}#', '#[^A-Za-z0-9\(\)\.\_\-]#', '#^\.#');
 
 		// Language transliteration should include given language, and also site + admin defaults (most useful is site default)
-		$lang_params = JComponentHelper::getParams('com_languages');
+		$lang_params = \Joomla\CMS\Component\ComponentHelper::getParams('com_languages');
 		$lang_site_default  = $lang_params->get('site', '*');
 		$lang_admin_default = $lang_params->get('admin', '*');
 
@@ -37,7 +37,7 @@ class flexicontent_upload
 		{
 			if ($do)
 			{
-				$transformed = JLanguage::getInstance($language)->transliterate($file);
+				$transformed = \Joomla\CMS\Language\Language::getInstance($language)->transliterate($file);
 				$file_safe = $transformed ? preg_replace($regex, '', $transformed) : false;
 
 				// Stop trying transliterations if a complete job was done
@@ -148,7 +148,7 @@ class flexicontent_upload
 	{
 		if (!$params)
 		{
-			$params = JComponentHelper::getParams( 'com_flexicontent' );
+			$params = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
 		}
 
 
@@ -311,10 +311,10 @@ class flexicontent_upload
 		$ext  = substr( $filename, $lastdotpos + 1 );
 
 		// Make a unique filename by checking if it is already taken, if already taken keep incrementing counter till finding a new name
-		if (JFile::exists( $base_Dir . $name . '.' . $ext ))
+		if (\Joomla\CMS\Filesystem\File::exists( $base_Dir . $name . '.' . $ext ))
 		{
 			$unique_num = 1;
-			while( JFile::exists( $base_Dir . $name . '-' . $unique_num . '.' . $ext ) )
+			while( \Joomla\CMS\Filesystem\File::exists( $base_Dir . $name . '-' . $unique_num . '.' . $ext ) )
 			{
 				$unique_num++;
 			}
@@ -347,10 +347,10 @@ class flexicontent_upload
 		$foldername = $folder;
 
 		//make a unique folder name for the image and check it is not already taken
-		if (JFolder::exists( $base_Dir . $folder ))
+		if (\Joomla\CMS\Filesystem\Folder::exists( $base_Dir . $folder ))
 		{
 			$unique_num = 1;
-			while( JFolder::exists( $base_Dir . $folder . '-' . $unique_num ))
+			while( \Joomla\CMS\Filesystem\Folder::exists( $base_Dir . $folder . '-' . $unique_num ))
 			{
 				$unique_num++;
 			}

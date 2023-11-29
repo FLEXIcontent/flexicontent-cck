@@ -45,7 +45,7 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 
 	function getlineno()
 	{
-		$session = JFactory::getSession();
+		$session = \Joomla\CMS\Factory::getSession();
 		$has_zlib = function_exists("zlib_encode"); // Version_compare(PHP_VERSION, '5.4.0', '>=');
 
 		$conf   = $session->get('csvimport_config', "", 'flexicontent');
@@ -54,7 +54,7 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 
 		if (!empty($conf))
 		{
-			echo 'success|' . count($conf['contents_parsed']) . '|' . $lineno . '|' . JSession::getFormToken();
+			echo 'success|' . count($conf['contents_parsed']) . '|' . $lineno . '|' . \Joomla\CMS\Session\Session::getFormToken();
 		}
 		else
 		{

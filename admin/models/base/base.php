@@ -22,7 +22,7 @@ require_once('traitbase.php');
  * FLEXIcontent Component BASE (form) Model
  *
  */
-abstract class FCModelAdmin extends JModelAdmin
+abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 {
 	use FCModelTraitBase;
 
@@ -170,7 +170,7 @@ abstract class FCModelAdmin extends JModelAdmin
 		$this->events_context = $this->events_context ?: $this->option . '.' . $this->getName();
 		$this->type_alias     = $this->type_alias     ?: $this->option . '.' . $this->getName();
 
-		$jinput = JFactory::getApplication()->input;
+		$jinput = \Joomla\CMS\Factory::getApplication()->input;
 		$pk = null;
 
 		// Try all key in prefered order
@@ -187,7 +187,7 @@ abstract class FCModelAdmin extends JModelAdmin
 			}
 		}
 
-		// Finally try getting id from JForm submitted data
+		// Finally try getting id from \Joomla\CMS\Form\Form submitted data
 		if ($pk === null)
 		{
 			$data = $jinput->get('jform', array(), 'array');
@@ -413,7 +413,7 @@ abstract class FCModelAdmin extends JModelAdmin
 
 		else
 		{
-			// Load a JTable object with all db columns as properties, then customize some or all the properites
+			// Load a \Joomla\CMS\Table\Table object with all db columns as properties, then customize some or all the properites
 			$record = $this->getTable();
 		}
 
@@ -468,7 +468,7 @@ abstract class FCModelAdmin extends JModelAdmin
 		if ( !$pk ) return true;
 
 		// Get current user
-		$user	= JFactory::getUser();
+		$user	= \Joomla\CMS\Factory::getUser();
 		$uid	= $user->get('id');
 
 		// Lets get table record and checkout the it
@@ -476,7 +476,7 @@ abstract class FCModelAdmin extends JModelAdmin
 		if ( $tbl->checkout($uid, $this->_id) ) return true;
 
 		// Reaching this points means checkout failed
-		$this->setError( JText::_("FLEXI_ALERT_CHECKOUT_FAILED") . ' : ' . $tbl->getError() );
+		$this->setError( \Joomla\CMS\Language\Text::_("FLEXI_ALERT_CHECKOUT_FAILED") . ' : ' . $tbl->getError() );
 		return false;
 	}
 
@@ -539,7 +539,7 @@ abstract class FCModelAdmin extends JModelAdmin
 	public function save($data)
 	{
 		// Initialise variables
-		$app        = JFactory::getApplication();
+		$app        = \Joomla\CMS\Factory::getApplication();
 		$dispatcher = JEventDispatcher::getInstance();
 
 		// Note that 'data' is typically post['jform'] and it is validated by the caller e.g. the controller
@@ -557,10 +557,10 @@ abstract class FCModelAdmin extends JModelAdmin
 		// Include the plugins for the on save events.
 		if ($this->plugins_group)
 		{
-			JPluginHelper::importPlugin($this->plugins_group);
+			\Joomla\CMS\Plugin\PluginHelper::importPlugin($this->plugins_group);
 		}
 
-		// Get a JTable object
+		// Get a \Joomla\CMS\Table\Table object
 		$record = $this->getTable();
 
 		// Load data of existing record to allow maintaining any not-set properties
@@ -574,7 +574,7 @@ abstract class FCModelAdmin extends JModelAdmin
 			$record->reset();
 		}
 
-		// Extra steps after loading record, and before calling JTable::bind()
+		// Extra steps after loading record, and before calling \Joomla\CMS\Table\Table::bind()
 		if ($this->_prepareBind($record, $data) === false)
 		{
 			// Just return, the error was set already
@@ -614,7 +614,7 @@ abstract class FCModelAdmin extends JModelAdmin
 			return false;
 		}
 
-		// Saving asset was handled by the JTable:store() of this CLASS model
+		// Saving asset was handled by the \Joomla\CMS\Table\Table:store() of this CLASS model
 		// ...
 
 		$this->_record = $record;			 // Get the new / updated record object
@@ -636,7 +636,7 @@ abstract class FCModelAdmin extends JModelAdmin
 			return false;
 		}*/
 
-		// Extra steps after loading record, and before calling JTable::bind()
+		// Extra steps after loading record, and before calling \Joomla\CMS\Table\Table::bind()
 		$this->_afterStore($record, $data);
 
 		// Clear the cache
@@ -653,15 +653,15 @@ abstract class FCModelAdmin extends JModelAdmin
 	 * @param   array    $data      Data for the form.
 	 * @param   boolean  $loadData  True if the form is to load its own data (default case), false if not.
 	 *
-	 * @return  JForm|boolean  A JForm object on success, false on failure
+	 * @return  \Joomla\CMS\Form\Form|boolean  A \Joomla\CMS\Form\Form object on success, false on failure
 	 *
 	 * @since   1.6
 	 */
 	public function getForm($data = array(), $loadData = true)
 	{
 		// Set form path in case we are called form different extension
-		\JForm::addFormPath(JPATH_BASE.DS.'components'.DS.'com_flexicontent' . '/models/forms');
-		\JForm::addFieldPath(JPATH_BASE.DS.'components'.DS.'com_flexicontent' . '/models/fields');
+		\Joomla\CMS\Form\Form::addFormPath(JPATH_BASE.DS.'components'.DS.'com_flexicontent' . '/models/forms');
+		\Joomla\CMS\Form\Form::addFieldPath(JPATH_BASE.DS.'components'.DS.'com_flexicontent' . '/models/fields');
 
 		// Get the form.
 		$form_name    = $this->events_context;
@@ -690,7 +690,7 @@ abstract class FCModelAdmin extends JModelAdmin
 	protected function loadFormData()
 	{
 		// Check the session for previously entered form data.
-		$app = JFactory::getApplication();
+		$app = \Joomla\CMS\Factory::getApplication();
 		$data = $app->getUserState($this->option.'.edit.'.$this->getName().'.data', array());
 
 		// Clear form data from session
@@ -701,11 +701,11 @@ abstract class FCModelAdmin extends JModelAdmin
 			$item = $this->getItem();
 
 			/**
-			 * Because the record data are meant for JForm before any other manipulations and before any
-			 * other data is added, convert our JTable record to a JObject coping only public properies
+			 * Because the record data are meant for \Joomla\CMS\Form\Form before any other manipulations and before any
+			 * other data is added, convert our \Joomla\CMS\Table\Table record to a \Joomla\CMS\Object\CMSObject coping only public properies
 			 */
 			$_prop_arr = $item->getProperties($public_only = true);
-			$data = ArrayHelper::toObject($_prop_arr, 'JObject');
+			$data = ArrayHelper::toObject($_prop_arr, '\Joomla\CMS\Object\CMSObject');
 		}
 		else
 		{
@@ -738,7 +738,7 @@ abstract class FCModelAdmin extends JModelAdmin
 			return $items[$pk];
 		}
 
-		// Instatiate the JTable
+		// Instatiate the \Joomla\CMS\Table\Table
 		$table = $this->getTable();
 
 		if ($pk)
@@ -779,17 +779,17 @@ abstract class FCModelAdmin extends JModelAdmin
 	/**
 	 * Method to preprocess the form.
 	 *
-	 * @param   JForm   $form   A JForm object.
+	 * @param   \Joomla\CMS\Form\Form   $form   A \Joomla\CMS\Form\Form object.
 	 * @param   mixed   $data   The data expected for the form.
 	 * @param   string  $plugins_group  The name of the plugin group to import and trigger
 	 *
 	 * @return  void
 	 *
-	 * @see     JFormField
+	 * @see     \Joomla\CMS\Form\FormField
 	 * @since   1.6
 	 * @throws  Exception if there is an error in the form event.
 	 */
-	protected function preprocessForm(JForm $form, $data, $plugins_group = null)
+	protected function preprocessForm(\Joomla\CMS\Form\Form $form, $data, $plugins_group = null)
 	{
 		// Trigger the default form events.
 		$plugins_group = $plugins_group ?: $this->plugins_group;
@@ -800,14 +800,14 @@ abstract class FCModelAdmin extends JModelAdmin
 	/**
 	 * Method to validate the form data.
 	 *
-	 * @param   \JForm  $form   The form to validate against.
+	 * @param   \Joomla\CMS\Form\Form  $form   The form to validate against.
 	 * @param   array   $data   The data to validate.
 	 * @param   string  $group  The name of the field group to validate.
 	 *
 	 * @return  array|boolean  Array of filtered data if valid, false otherwise.
 	 *
-	 * @see     \JFormRule
-	 * @see     \JFilterInput
+	 * @see     \Joomla\CMS\Form\FormRule
+	 * @see     \Joomla\CMS\Filter\InputFilter
 	 * @since   3.3.0
 	 */
 	public function validate($form, $data, $group = null)
@@ -825,7 +825,7 @@ abstract class FCModelAdmin extends JModelAdmin
 	 */
 	protected function populateState()
 	{
-		$app = JFactory::getApplication();
+		$app = \Joomla\CMS\Factory::getApplication();
 
 		// Set parent_id into state (later ignored if not this record type has no such property)
 		$parentId = $app->input->getInt('parent_id');
@@ -848,7 +848,7 @@ abstract class FCModelAdmin extends JModelAdmin
 		$this->setState($this->getName().'.section', (count($parts) > 1) ? $parts[1] : null);
 
 		// Load the parameters.
-		$params	= JComponentHelper::getParams('com_flexicontent');
+		$params	= \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 		$this->setState('params', $params);
 	}
 
@@ -919,7 +919,7 @@ abstract class FCModelAdmin extends JModelAdmin
 		}
 
 		$record = $record ?: $this->_record;
-		$user   = $user ?: JFactory::getUser();
+		$user   = $user ?: \Joomla\CMS\Factory::getUser();
 
 		return false;
 	}
@@ -940,7 +940,7 @@ abstract class FCModelAdmin extends JModelAdmin
 		}
 
 		$record = $record ?: $this->_record;
-		$user   = $user ?: JFactory::getUser();
+		$user   = $user ?: \Joomla\CMS\Factory::getUser();
 
 		return false;
 	}
@@ -1027,23 +1027,23 @@ abstract class FCModelAdmin extends JModelAdmin
 		$db_data_registry = array();
 		foreach($properties as $prop)
 		{
-			$db_data_registry[$prop] = new JRegistry();
+			$db_data_registry[$prop] = new \Joomla\Registry\Registry();
 		}
 
 
 		//***
-		//*** Filter via all given JForms
+		//*** Filter via all given \Joomla\CMS\Form\Forms
 		//***
 
 		foreach($options['model_names'] as $extension_name => $model_name)
 		{
 			// Check XML file exists
-			$model_xml_filepath = JPath::clean(JPATH_BASE.DS.'components'.DS . $extension_name . DS.'models'.DS.'forms'.DS . $model_name . '.xml');
+			$model_xml_filepath = \Joomla\CMS\Filesystem\Path::clean(JPATH_BASE.DS.'components'.DS . $extension_name . DS.'models'.DS.'forms'.DS . $model_name . '.xml');
 			$file_exists = file_exists($model_xml_filepath);
 
 			if (!$file_exists && FLEXI_J40GE)
 			{
-				$model_xml_filepath = JPath::clean(JPATH_BASE.DS.'components'.DS . $extension_name . DS.'forms'.DS . $model_name . '.xml');
+				$model_xml_filepath = \Joomla\CMS\Filesystem\Path::clean(JPATH_BASE.DS.'components'.DS . $extension_name . DS.'forms'.DS . $model_name . '.xml');
 				$file_exists = file_exists($model_xml_filepath);
 			}
 
@@ -1059,8 +1059,8 @@ abstract class FCModelAdmin extends JModelAdmin
 				throw new Exception('Error parsing model \'s XML form file : ' . $model_xml_filepath, 500);
 			}
 
-			// Create a JForm object to validate EXISTIND DB data according to the XML file of the model
-			$jform = new JForm($extension_name . '.' . $model_name, array('control' => 'jform', 'load_data' => false));
+			// Create a \Joomla\CMS\Form\Form object to validate EXISTIND DB data according to the XML file of the model
+			$jform = new \Joomla\CMS\Form\Form($extension_name . '.' . $model_name, array('control' => 'jform', 'load_data' => false));
 			$xml_string = $xml->asXML();
 			$jform->load($xml_string);
 
@@ -1068,8 +1068,8 @@ abstract class FCModelAdmin extends JModelAdmin
 			{
 				if (isset($data[$prop]) && is_array($data[$prop]))
 				{
-					// Filter the existing data with the current JForm
-					$db_data = new JRegistry($item->$prop);
+					// Filter the existing data with the current \Joomla\CMS\Form\Form
+					$db_data = new \Joomla\Registry\Registry($item->$prop);
 					$db_data = array($prop => $db_data->toArray());
 					$db_data = $jform->filter($db_data);
 
@@ -1159,24 +1159,24 @@ abstract class FCModelAdmin extends JModelAdmin
 			$this->batchSet = true;
 
 			// Get current user
-			$this->user = \JFactory::getUser();
+			$this->user = \Joomla\CMS\Factory::getUser();
 
 			// Get table
-			$this->table = $this->getTable($this->records_dbtbl, 'JTable');
+			$this->table = $this->getTable($this->records_dbtbl, '\Joomla\CMS\Table\Table');
 
 			// Get table class name
 			$tc = explode('\\', get_class($this->table));
 			$this->tableClassName = end($tc);
 
 			// Get UCM Type data
-			$this->contentType = new \JUcmType;
+			$this->contentType = new \Joomla\CMS\UCM\UCMType;
 			$this->type = $this->contentType->getTypeByTable($this->tableClassName)
 				?: $this->contentType->getTypeByAlias($this->type_alias);
 
 			// Get tabs observer
 			if (!FLEXI_J38GE)
 			{
-				$this->tagsObserver = $this->table->getObserverOfClass('JTableObserverTags');
+				$this->tagsObserver = $this->table->getObserverOfClass('\Joomla\CMS\Table\TableObserverTags');
 			}
 			elseif (!FLEXI_J40GE)
 			{
@@ -1219,7 +1219,7 @@ abstract class FCModelAdmin extends JModelAdmin
 	 */
 	public function enqueueMessages($exclude = array())
 	{
-		$app = JFactory::getApplication();
+		$app = \Joomla\CMS\Factory::getApplication();
 		$messages = $this->getMessageQueue();
 
 		if ($messages)
@@ -1282,7 +1282,7 @@ abstract class FCModelAdmin extends JModelAdmin
 
 
 	/**
-	 * Method to do some record / data preprocessing before call JTable::bind()
+	 * Method to do some record / data preprocessing before call \Joomla\CMS\Table\Table::bind()
 	 *
 	 * Note. Typically called inside this MODEL 's store()
 	 *
@@ -1309,7 +1309,7 @@ abstract class FCModelAdmin extends JModelAdmin
 		}
 
 		// Handle data of the selected ilayout
-		$jinput = JFactory::getApplication()->input;
+		$jinput = \Joomla\CMS\Factory::getApplication()->input;
 		$task   = $jinput->get('task', '', 'cmd');
 
 		$parent_id  = isset($data['parent_id']) ? $data['parent_id'] : null;
@@ -1353,7 +1353,7 @@ abstract class FCModelAdmin extends JModelAdmin
 
 
 	/**
-	 * Method to do some work after record has been loaded via JTable::load()
+	 * Method to do some work after record has been loaded via \Joomla\CMS\Table\Table::load()
 	 *
 	 * Note. Typically called inside this MODEL 's store()
 	 *
@@ -1369,16 +1369,16 @@ abstract class FCModelAdmin extends JModelAdmin
 			return;
 		}
 
-		// Convert attributes to a JRegistry object
+		// Convert attributes to a \Joomla\Registry\Registry object
 		if (property_exists($record, 'attribs') && !is_object($record->attribs))
 		{
-			$record->attribs = new JRegistry($record->attribs);
+			$record->attribs = new \Joomla\Registry\Registry($record->attribs);
 		}
 
-		// Convert parameters to a JRegistry object
+		// Convert parameters to a \Joomla\Registry\Registry object
 		if (property_exists($record, 'params') && !is_object($record->params))
 		{
-			$record->params = new JRegistry($record->params);
+			$record->params = new \Joomla\Registry\Registry($record->params);
 		}
 	}
 
@@ -1386,7 +1386,7 @@ abstract class FCModelAdmin extends JModelAdmin
 	/**
 	 * Method to canonicalize the form data that should be present in the form by setting them to '' to indicate clearing their DB values
 	 *
-	 * @param   JForm   $form   A JForm object.
+	 * @param   \Joomla\CMS\Form\Form   $form   A \Joomla\CMS\Form\Form object.
 	 * @param   mixed   $data   The data expected for the form.
 	 *
 	 * @return  void
@@ -1460,7 +1460,7 @@ abstract class FCModelAdmin extends JModelAdmin
 	/**
 	 * Method to handle partial form data
 	 *
-	 * @param   JForm   $form   A JForm object.
+	 * @param   \Joomla\CMS\Form\Form   $form   A \Joomla\CMS\Form\Form object.
 	 * @param   mixed   $data   The data expected for the form.
 	 *
 	 * @return  void
@@ -1514,8 +1514,8 @@ abstract class FCModelAdmin extends JModelAdmin
 	 */
 	public function setitemstate($id, $state = 1, $cleanCache = true)
 	{
-		$app  = JFactory::getApplication();
-		$user = JFactory::getUser();
+		$app  = \Joomla\CMS\Factory::getApplication();
+		$user = \Joomla\CMS\Factory::getUser();
 
 		static $event_failed_notice_added = false;
 
@@ -1646,9 +1646,9 @@ abstract class FCModelAdmin extends JModelAdmin
 		if (empty($this->skipChangeStateEvent) && !empty($event_ids))
 		{
 			// Make sure we import flexicontent AND content plugins since we will be triggering their events
-			JPluginHelper::importPlugin('content');
+			\Joomla\CMS\Plugin\PluginHelper::importPlugin('content');
 
-			$jinput     = JFactory::getApplication()->input;
+			$jinput     = \Joomla\CMS\Factory::getApplication()->input;
 			$dispatcher = JEventDispatcher::getInstance();
 
 			// Compatibility steps, so that 3rd party plugins using the change state event work properly
@@ -1691,7 +1691,7 @@ abstract class FCModelAdmin extends JModelAdmin
 
 				// Workaround for extensions using the model but not setting correct include path
 				$component = $parts[1] === 'category' ? 'com_categories' : $parts[1];
-				JModelLegacy::addIncludePath(JPATH_BASE . '/components/' . $component . '/models');
+				\Joomla\CMS\MVC\Model\BaseDatabaseModel::addIncludePath(JPATH_BASE . '/components/' . $component . '/models');
 			}
 
 			//Trigger the event

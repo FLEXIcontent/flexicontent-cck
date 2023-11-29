@@ -20,13 +20,13 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 
 jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // JHtmlSelect
-jimport('joomla.form.field');  // JFormField
+jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
+jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
 
-//jimport('joomla.form.helper'); // JFormHelper
-//JFormHelper::loadFieldClass('...');   // JFormField...
+//jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
+//\Joomla\CMS\Form\FormHelper::loadFieldClass('...');   // \Joomla\CMS\Form\FormField...
 
-class JFormFieldMicrodatatype extends JFormField {
+class JFormFieldMicrodatatype extends \Joomla\CMS\Form\FormField {
 
 	protected $type = 'microdatatype';
 	protected $_inherited;
@@ -45,7 +45,7 @@ class JFormFieldMicrodatatype extends JFormField {
 		if ($types === null)
 		{
 			jimport('joomla.microdata.microdata');
-			$jm = new JMicrodata();
+			$jm = new \Joomla\CMS\Microdata\Microdata();
 			$jm_types = $jm->getTypes();
 			$types = array_keys($jm_types);
 		}
@@ -66,22 +66,22 @@ class JFormFieldMicrodatatype extends JFormField {
 		$first_option = @$attributes['first_option'];
 		
 		## Initialize array adding FIRST option and also indicating the inherited value
-		$prompt_text = JText::_($first_option ? $first_option : 'FLEXI_USE_GLOBAL');
+		$prompt_text = \Joomla\CMS\Language\Text::_($first_option ? $first_option : 'FLEXI_USE_GLOBAL');
 		if ( $this->_inherited!==null && !is_array($this->_inherited) && isset($jm_types[$this->_inherited]) )
 		{
 			$prompt_text = StringHelper::strtoupper($prompt_text). ' ... '. $this->_inherited;
 		}
 		$options = array();
-		$options[] = JHtml::_('select.option', '', $prompt_text);
+		$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '', $prompt_text);
 
 		foreach($types as $v) :
 			## Create $value ##
 			if (!$v) continue;
-			$options[] = JHtml::_('select.option', $v, $v);
+			$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', $v, $v);
 		endforeach;
 
 		## Create <select name="icons" class="inputbox"></select> ##
-		$dropdown = JHtml::_('select.genericlist', $options, $this->name, 'class="use_select2_lib"', 'value', 'text', $this->value, $this->id);
+		$dropdown = \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $options, $this->name, 'class="use_select2_lib"', 'value', 'text', $this->value, $this->id);
 
 		## Output created <select> list ##
 		return $dropdown;

@@ -31,7 +31,7 @@ use Joomla\CMS\Component\ComponentHelper;
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewCategory extends JViewLegacy
+class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 {
 	/**
 	 * Creates the page's display
@@ -46,17 +46,17 @@ class FlexicontentViewCategory extends JViewLegacy
 
 		//initialize variables
 		$dispatcher = JEventDispatcher::getInstance();
-		$app      = JFactory::getApplication();
-		$jinput   = JFactory::getApplication()->input;
-		$session  = JFactory::getSession();
+		$app      = \Joomla\CMS\Factory::getApplication();
+		$jinput   = \Joomla\CMS\Factory::getApplication()->input;
+		$session  = \Joomla\CMS\Factory::getSession();
 
 		$option   = $jinput->get('option', '', 'cmd');
 		$format   = $jinput->get('format', 'html', 'cmd');
 		$print    = $jinput->get('print', '', 'cmd');
 
-		$document = JFactory::getDocument();
+		$document = \Joomla\CMS\Factory::getDocument();
 
-		// Check for Joomla issue with system plugins creating JDocument in early events forcing it to be wrong type, when format as url suffix is enabled
+		// Check for Joomla issue with system plugins creating \Joomla\CMS\Document\Document in early events forcing it to be wrong type, when format as url suffix is enabled
 		if ($format && $document->getType() != strtolower($format))
 		{
 			echo '<div class="alert">WARNING: &nbsp; Document format should be: <b>'.$format.'</b> but current document is: <b>'. $document->getType().'</b> <br/>Some system plugin may have forced current document type</div>';
@@ -64,9 +64,9 @@ class FlexicontentViewCategory extends JViewLegacy
 
 		$menus    = $app->getMenu();
 		$menu     = $menus->getActive();
-		$uri      = JUri::getInstance();
-		$user     = JFactory::getUser();
-		$aid      = JAccess::getAuthorisedViewLevels($user->id);
+		$uri      = \Joomla\CMS\Uri\Uri::getInstance();
+		$user     = \Joomla\CMS\Factory::getUser();
+		$aid      = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
 
 		// Get view's Model
 		$model  = $this->getModel();
@@ -185,9 +185,9 @@ class FlexicontentViewCategory extends JViewLegacy
 		if (!$params->get('disablecss', ''))
 		{
 			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
-			!JFactory::getLanguage()->isRtl()
-				? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
-				: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
+			!\Joomla\CMS\Factory::getLanguage()->isRtl()
+				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
+				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 		}
 
 		if (FLEXI_J40GE && file_exists(JPATH_SITE.DS.'media/templates/site'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css'))
@@ -236,7 +236,7 @@ class FlexicontentViewCategory extends JViewLegacy
 			if ( in_array($parents[$p]->id, $globalnoroute) )  { $p++; continue; }
 
 			// Add current parent category
-			$pathway->addItem( $parents[$p]->title, JRoute::_(FlexicontentHelperRoute::getCategoryRoute($parents[$p]->slug)) );
+			$pathway->addItem( $parents[$p]->title, \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getCategoryRoute($parents[$p]->slug)) );
 			$p++;
 		}
 		//echo "<pre>"; print_r($pathway); echo "</pre>";
@@ -244,7 +244,7 @@ class FlexicontentViewCategory extends JViewLegacy
 
 		// *******************************************************************************************************************
 		// Bind Fields to items and RENDER their display HTML, but check for document type, due to Joomla issue with system
-		// plugins creating JDocument in early events forcing it to be wrong type, when format as url suffix is enabled
+		// plugins creating \Joomla\CMS\Document\Document in early events forcing it to be wrong type, when format as url suffix is enabled
 		// *******************************************************************************************************************
 		
 		foreach($items as $item)
@@ -301,17 +301,17 @@ class FlexicontentViewCategory extends JViewLegacy
 			switch($layout)
 			{
 				case ''        :  $default_heading = $category->title;  break;
-				case 'myitems' :  $default_heading = JText::_('FLEXI_MY_CONTENT');  break;
-				case 'author'  :  $default_heading = JText::sprintf('FLEXI_ITEMS_OF_USER', JFactory::getUser((int) $authorid)->get('name'));  break;
-				case 'tags'    :  $default_heading = JText::_('FLEXI_TAG') .': '. $tag->name;  break;
-				case 'favs'    :  $default_heading = JText::_('FLEXI_MY_FAVOURITES');  break;
-				default        :  $default_heading = JText::_('FLEXI_CONTENT_IN_CATEGORY');
+				case 'myitems' :  $default_heading = \Joomla\CMS\Language\Text::_('FLEXI_MY_CONTENT');  break;
+				case 'author'  :  $default_heading = \Joomla\CMS\Language\Text::sprintf('FLEXI_ITEMS_OF_USER', \Joomla\CMS\Factory::getUser((int) $authorid)->get('name'));  break;
+				case 'tags'    :  $default_heading = \Joomla\CMS\Language\Text::_('FLEXI_TAG') .': '. $tag->name;  break;
+				case 'favs'    :  $default_heading = \Joomla\CMS\Language\Text::_('FLEXI_MY_FAVOURITES');  break;
+				default        :  $default_heading = \Joomla\CMS\Language\Text::_('FLEXI_CONTENT_IN_CATEGORY');
 			}
 
 			// Category-based view that is limited to a specific category
 			if ($layout && $category->id)
 			{
-				$default_heading .= ', '.JText::_('FLEXI_IN_CATEGORY').': '.$category->title;
+				$default_heading .= ', '.\Joomla\CMS\Language\Text::_('FLEXI_IN_CATEGORY').': '.$category->title;
 			}
 
 			// Decide to show page heading (=J1.5 page title) only if a custom layout is used (=not a single category layout)
@@ -337,10 +337,10 @@ class FlexicontentViewCategory extends JViewLegacy
 			case 'myitems' : break;
 			case 'author'  : break;
 			case 'tags'    :
-				$pathway->addItem( JText::_('FLEXI_TAG') . ' : ' . $this->escape($tag->name), '' );
+				$pathway->addItem( \Joomla\CMS\Language\Text::_('FLEXI_TAG') . ' : ' . $this->escape($tag->name), '' );
 				break;
 			case 'favs'    :
-				$pathway->addItem( JText::_('FLEXI_MY_FAVOURITES'), '' );
+				$pathway->addItem( \Joomla\CMS\Language\Text::_('FLEXI_MY_FAVOURITES'), '' );
 				break;
 			default        : ;
 		}
@@ -450,7 +450,7 @@ class FlexicontentViewCategory extends JViewLegacy
 			$word_combination = $jinput->get('p', null, 'CMD');
 			$canonical_filters .= !empty($word_combination) ? '&p=' . $word_combination : '';
 
-			$ucanonical = JRoute::_(
+			$ucanonical = \Joomla\CMS\Router\Route::_(
 				FlexicontentHelperRoute::getCategoryRoute($category->slug, 0, $layout_vars)
 				. $canonical_filters . ($start ? "&start=".$start : '')
 			);
@@ -467,9 +467,9 @@ class FlexicontentViewCategory extends JViewLegacy
 		{
 			$link	= $non_sef_link . '&format=feed';
 			$attribs = array('type' => 'application/rss+xml', 'title' => 'RSS 2.0');
-			$document->addHeadLink(JRoute::_($link.'&type=rss'), 'alternate', 'rel', $attribs);
+			$document->addHeadLink(\Joomla\CMS\Router\Route::_($link.'&type=rss'), 'alternate', 'rel', $attribs);
 			$attribs = array('type' => 'application/atom+xml', 'title' => 'Atom 1.0');
-			$document->addHeadLink(JRoute::_($link.'&type=atom'), 'alternate', 'rel', $attribs);
+			$document->addHeadLink(\Joomla\CMS\Router\Route::_($link.'&type=atom'), 'alternate', 'rel', $attribs);
 		}
 
 
@@ -515,7 +515,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		// @TODO (possible improvement) trigger the plugin selectively, and delete the plugins tags if not active
 		if ($category->id && $params->get('trigger_onprepare_content_cat')) // just check if the parameter is active
 		{
-			JPluginHelper::importPlugin('content');
+			\Joomla\CMS\Plugin\PluginHelper::importPlugin('content');
 
 			// Allow to trigger content plugins on category description
 			$category->text = $category->description;
@@ -535,7 +535,7 @@ class FlexicontentViewCategory extends JViewLegacy
 
 		// Maybe here not to import all plugins but just those for description field or add a parameter for this
 		// Anyway these events are usually not very time consuming as is the the event onPrepareContent(J1.5)/onContentPrepare(J1.6+)
-		JPluginHelper::importPlugin('content');
+		\Joomla\CMS\Plugin\PluginHelper::importPlugin('content');
 
 		$noroute_cats = array_flip($globalnoroute);
 
@@ -547,10 +547,10 @@ class FlexicontentViewCategory extends JViewLegacy
 
 			if ( !isset($type_params[$item->type_id]) )
 			{
-				$type_params[$item->type_id] = new JRegistry($type_attribs[$item->type_id]);
+				$type_params[$item->type_id] = new \Joomla\Registry\Registry($type_attribs[$item->type_id]);
 			}
 			$item->params = clone($type_params[$item->type_id]);
-			$item->params->merge( new JRegistry($item->attribs) );
+			$item->params->merge( new \Joomla\Registry\Registry($item->attribs) );
 
 			// We must check if the current category is in the categories of the item ..
 			$item_in_category=false;
@@ -763,7 +763,7 @@ class FlexicontentViewCategory extends JViewLegacy
 
 				if ($cat_link_image && $image)
 				{
-					$image = '<a href="'.JRoute::_( FlexicontentHelperRoute::getCategoryRoute($cat->slug) ).'">'.$image.'</a>';
+					$image = '<a href="'.\Joomla\CMS\Router\Route::_( FlexicontentHelperRoute::getCategoryRoute($cat->slug) ).'">'.$image.'</a>';
 				}
 			}
 			$cat->image = $image;
@@ -818,7 +818,7 @@ class FlexicontentViewCategory extends JViewLegacy
 			{
 				if (!is_object($cat->params))
 				{
-					$cat->params = new JRegistry($cat->params);
+					$cat->params = new \Joomla\Registry\Registry($cat->params);
 				}
 
 				$cat->introtext = & $cat->description;
@@ -864,7 +864,7 @@ class FlexicontentViewCategory extends JViewLegacy
 
 				if ($cat_link_image && $image)
 				{
-					$image = '<a href="'.JRoute::_( FlexicontentHelperRoute::getCategoryRoute($cat->slug) ).'">'.$image.'</a>';
+					$image = '<a href="'.\Joomla\CMS\Router\Route::_( FlexicontentHelperRoute::getCategoryRoute($cat->slug) ).'">'.$image.'</a>';
 				}
 			}
 			$cat->image = $image;
@@ -918,7 +918,7 @@ class FlexicontentViewCategory extends JViewLegacy
 			{
 				if (!is_object($cat->params))
 				{
-					$cat->params = new JRegistry($cat->params);
+					$cat->params = new \Joomla\Registry\Registry($cat->params);
 				}
 
 				$cat->introtext = & $cat->description;
@@ -964,7 +964,7 @@ class FlexicontentViewCategory extends JViewLegacy
 
 				if ($cat_link_image && $image)
 				{
-					$image = '<a href="'.JRoute::_( FlexicontentHelperRoute::getCategoryRoute($cat->slug) ).'">'.$image.'</a>';
+					$image = '<a href="'.\Joomla\CMS\Router\Route::_( FlexicontentHelperRoute::getCategoryRoute($cat->slug) ).'">'.$image.'</a>';
 				}
 			}
 
@@ -1069,7 +1069,7 @@ class FlexicontentViewCategory extends JViewLegacy
 
 			$resultsCounter = $pageNav->getResultsCounter();  // for overriding model's result counter
 
-			$_sh404sef = defined('SH404SEF_IS_RUNNING') && JFactory::getConfig()->get('sef');
+			$_sh404sef = defined('SH404SEF_IS_RUNNING') && \Joomla\CMS\Factory::getConfig()->get('sef');
 			if ($_sh404sef)
 			{
 				$pageNav->setAdditionalUrlParam('limit', $model->getState('limit'));
@@ -1112,7 +1112,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		// It will consider things like: template exists, is allowed, client is mobile, current frontend user override, etc
 
 		// !!! The following method of loading layouts, is Joomla legacy view loading of layouts
-		// TODO: EXAMINE IF NEEDED to re-use these layouts, and use JLayout ??
+		// TODO: EXAMINE IF NEEDED to re-use these layouts, and use \Joomla\CMS\Layout\LayoutInterface ??
 
 		// Despite layout variable not being empty, there may be missing some sub-layout files,
 		// e.g. category_somefilename.php for this reason we will use a fallback layout that surely has these files

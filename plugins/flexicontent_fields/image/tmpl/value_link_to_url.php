@@ -115,7 +115,7 @@ if ( !isset(static::$js_added[$field->id][__FILE__]) )
 		flexicontent_html::loadFramework('fancybox');
 	}
 
-	if ($js) JFactory::getDocument()->addScriptDeclaration($js);
+	if ($js) \Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
 
 	static::$js_added[$field->id][__FILE__] = true;
 }

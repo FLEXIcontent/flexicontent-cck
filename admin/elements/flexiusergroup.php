@@ -20,11 +20,11 @@
 defined('_JEXEC') or die('Restricted access');
 
 jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // JHtmlSelect
-jimport('joomla.form.field');  // JFormField
+jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
+jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
 
-//jimport('joomla.form.helper'); // JFormHelper
-//JFormHelper::loadFieldClass('usergroup');   // JFormFieldUsergroup
+//jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
+//\Joomla\CMS\Form\FormHelper::loadFieldClass('usergroup');   // \Joomla\CMS\Form\Field\UserFieldgroup
 
 /**
  * Form Field class for the Joomla Platform.
@@ -35,7 +35,7 @@ jimport('joomla.form.field');  // JFormField
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-class JFormFieldFLEXIUsergroup extends JFormField  // JFormFieldUsergroup
+class JFormFieldFLEXIUsergroup extends \Joomla\CMS\Form\FormField  // \Joomla\CMS\Form\Field\UserFieldgroup
 {
 	/**
 	 * The form field type OR name
@@ -87,7 +87,7 @@ class JFormFieldFLEXIUsergroup extends JFormField  // JFormFieldUsergroup
 			$option_disabled = ((string) $option_disabled == 'true');
 			
 			// Create the extra option object
-			$tmp = JHtml::_('select.option', $option_value, $option_text, 'value', 'text', $option_disabled);
+			$tmp = \Joomla\CMS\HTML\HTMLHelper::_('select.option', $option_value, $option_text, 'value', 'text', $option_disabled);
 			
 			// Class / JS / other attributes
 			$tmp->class = (string)( FLEXI_J16GE ? $option['class'] : $option->_attributes['class']);
@@ -97,7 +97,7 @@ class JFormFieldFLEXIUsergroup extends JFormField  // JFormFieldUsergroup
 			$extra_options[] = $tmp;
 		}
 		
-		$db = JFactory::getDbo();
+		$db = \Joomla\CMS\Factory::getDbo();
 		$db->setQuery(
 			'SELECT a.id AS value, a.title AS text, COUNT(DISTINCT b.id) AS level' .
 			' FROM #__usergroups AS a' .
@@ -116,7 +116,7 @@ class JFormFieldFLEXIUsergroup extends JFormField  // JFormFieldUsergroup
 		
 		// If all usergroups is allowed, push it into the array.
 		if ($allowAll) {
-			array_unshift($options, JHtml::_('select.option', '', JText::_('JOPTION_ACCESS_SHOW_ALL_GROUPS')));
+			array_unshift($options, \Joomla\CMS\HTML\HTMLHelper::_('select.option', '', \Joomla\CMS\Language\Text::_('JOPTION_ACCESS_SHOW_ALL_GROUPS')));
 		}
 		$options = array_merge($extra_options, $options);
 		
@@ -140,7 +140,7 @@ class JFormFieldFLEXIUsergroup extends JFormField  // JFormFieldUsergroup
 		$classes .= @$attributes['class'] ? ' '.$attributes['class'] : '';
 		$attribs .= ' class="'.$classes.'"';
 		
-		return JHtml::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $values, $element_id);
+		return \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $values, $element_id);
 	}
 	
 }

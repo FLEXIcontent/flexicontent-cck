@@ -21,7 +21,7 @@ jimport('legacy.model.list');
  * FLEXIcontent Component Import Model
  *
  */
-class FlexicontentModelImport extends JModelList
+class FlexicontentModelImport extends \Joomla\CMS\MVC\Model\ListModel
 {
 	/**
 	 * Constructor
@@ -32,7 +32,7 @@ class FlexicontentModelImport extends JModelList
 	{
 		parent::__construct($config);
 
-		$app    = JFactory::getApplication();
+		$app    = \Joomla\CMS\Factory::getApplication();
 		$jinput = $app->input;
 		$option = $jinput->get('option', '', 'cmd');
 		$view   = $jinput->get('view', '', 'cmd');
@@ -40,7 +40,7 @@ class FlexicontentModelImport extends JModelList
 		$p      = $option.'.'.$view.'.';
 
 		// Parameters of the view, in our case it is only the component parameters
-		$this->cparams = JComponentHelper::getParams( 'com_flexicontent' );
+		$this->cparams = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
 
 
 		// **************

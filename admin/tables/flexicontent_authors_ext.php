@@ -12,7 +12,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 
-class flexicontent_authors_ext extends JTable
+class flexicontent_authors_ext extends \Joomla\CMS\Table\Table
 {
 	/**
 	 * Primary Key
@@ -58,7 +58,7 @@ class flexicontent_authors_ext extends JTable
 	 *
 	 * @return  mixed  Null if operation was satisfactory, otherwise returns an error string
 	 *
-	 * @see     JTable:bind
+	 * @see     \Joomla\CMS\Table\Table:bind
 	 * @since   11.1
 	 */
 	public function bind($array, $ignore = '')
@@ -111,7 +111,7 @@ class flexicontent_authors_ext extends JTable
    *
    * @return boolean          True if successful. False if row not found or on error (internal error state set in that case).
    * @access public
-   * @see    JTable:load
+   * @see    \Joomla\CMS\Table\Table:load
    */
   function load ($keys = NULL,$reset = true) {
   	return parent::load( $keys, $reset );
@@ -122,12 +122,12 @@ class flexicontent_authors_ext extends JTable
    * Overloaded save function
    *
    * @param array $source         Array or object of values to bind,check & store in the db
-   * @param string $order_filter  Filter for the order updating. See JTable/reorder
+   * @param string $order_filter  Filter for the order updating. See \Joomla\CMS\Table\Table/reorder
    * @param mixed $ignore         Array or space separated list of fields not to bind
    *
    * @return bolean               TRUE if completely successful, FALSE if partially or not succesful.
    * @access public
-   * @see    JTable:save
+   * @see    \Joomla\CMS\Table\Table:save
    */
   function save( $source, $order_filter='', $ignore='' )
   {

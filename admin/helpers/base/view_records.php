@@ -19,7 +19,7 @@ jimport('legacy.view.legacy');
 /**
  * HTML View class for backend managers (Base)
  */
-class FlexicontentViewBaseRecords extends JViewLegacy
+class FlexicontentViewBaseRecords extends \Joomla\CMS\MVC\View\HtmlView
 {
 	var $tooltip_class = FLEXI_J40GE ? 'hasTooltip' : 'hasTooltip';
 	var $popover_class = FLEXI_J40GE ? 'hasPopover' : 'hasPopover';
@@ -46,7 +46,7 @@ class FlexicontentViewBaseRecords extends JViewLegacy
 	 *
 	 * @param   string  $name  The name of the model (optional)
 	 *
-	 * @return  mixed  \JModelLegacy object
+	 * @return  mixed  \Joomla\CMS\MVC\Model\BaseDatabaseModel object
 	 *
 	 * @since   3.0
 	 */
@@ -58,7 +58,7 @@ class FlexicontentViewBaseRecords extends JViewLegacy
 		}
 		else
 		{
-			return \JModelLegacy::getInstance($name, $prefix = 'FlexicontentModel', $config = array('ignore_request' => true));
+			return \Joomla\CMS\MVC\Model\BaseDatabaseModel::getInstance($name, $prefix = 'FlexicontentModel', $config = array('ignore_request' => true));
 		}
 	}
 
@@ -135,8 +135,8 @@ class FlexicontentViewBaseRecords extends JViewLegacy
 		{
 			$drop_btn = '
 				<button id="toolbar-changestate" class="' . $this->btn_sm_class . ' dropdown-toggle btn-fcaction" data-toggle="dropdown" data-bs-toggle="dropdown">
-					<span title="'.JText::_('FLEXI_CHANGE_STATE').'" class="icon-checkmark"></span>
-					'.JText::_('FLEXI_CHANGE_STATE').'
+					<span title="'.\Joomla\CMS\Language\Text::_('FLEXI_CHANGE_STATE').'" class="icon-checkmark"></span>
+					'.\Joomla\CMS\Language\Text::_('FLEXI_CHANGE_STATE').'
 					<span class="caret"></span>
 				</button>';
 			array_unshift($btn_arr, $drop_btn);
@@ -211,7 +211,7 @@ class FlexicontentViewBaseRecords extends JViewLegacy
 					$btn_text = $s['btn_text'],
 					$btn_name = $state_name,
 					$full_js,
-					$msg_alert = JText::_('FLEXI_NO_ITEMS_SELECTED'),
+					$msg_alert = \Joomla\CMS\Language\Text::_('FLEXI_NO_ITEMS_SELECTED'),
 					$msg_confirm = '',
 					$btn_task = '',
 					$extra_js = '',
@@ -220,7 +220,7 @@ class FlexicontentViewBaseRecords extends JViewLegacy
 					$btn_confirm = false,
 					$s['btn_class'] . ' ' . $this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? '_DDI_class_ btn-info' : '') . ' ' . $this->tooltip_class,
 					$s['btn_icon'],
-					$attribs = 'data-placement="right" title="' . flexicontent_html::encodeHTML(JText::_($s['btn_desc']), 2) . '"',
+					$attribs = 'data-placement="right" title="' . flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_($s['btn_desc']), 2) . '"',
 					$auto_add = 0,
 					$tag_type='button'
 				);
@@ -245,13 +245,13 @@ class FlexicontentViewBaseRecords extends JViewLegacy
 		$cookie_name = 'fc_managers_conf';
 		$fc_man_name = $fc_man_name ?: 'fc_' . $this->view_id;
 
-		JFactory::getDocument()->addScriptDeclaration('
+		\Joomla\CMS\Factory::getDocument()->addScriptDeclaration('
 		var FCMAN_conf = {};
 		FCMAN_conf.fc_man_config_cookie = "' . $cookie_name . '";
 		FCMAN_conf.fc_man_manager_name  = "' . $fc_man_name . '";
 		');
 
-		$jinput = JFactory::getApplication()->input;
+		$jinput = \Joomla\CMS\Factory::getApplication()->input;
 
 		$FcMansConf = $jinput->cookie->get($cookie_name, '{}', 'string');
 
@@ -265,14 +265,14 @@ class FlexicontentViewBaseRecords extends JViewLegacy
 			{
 				$FcMansConf = new stdClass();
 				$FcMansConf->vhash = FLEXI_VHASH;
-				$jinput->cookie->set($cookie_name, json_encode($FcMansConf), time()+60*60*24*30, JUri::base(true), '');
+				$jinput->cookie->set($cookie_name, json_encode($FcMansConf), time()+60*60*24*30, \Joomla\CMS\Uri\Uri::base(true), '');
 			}
 		}
 		catch (Exception $e)
 		{
 			$FcMansConf = new stdClass();
 			$FcMansConf->vhash = FLEXI_VHASH;
-			$jinput->cookie->set($cookie_name, json_encode($FcMansConf), time()+60*60*24*30, JUri::base(true), '');
+			$jinput->cookie->set($cookie_name, json_encode($FcMansConf), time()+60*60*24*30, \Joomla\CMS\Uri\Uri::base(true), '');
 		}
 
 		return $FcMansConf;
@@ -294,14 +294,14 @@ class FlexicontentViewBaseRecords extends JViewLegacy
 		
 		if (!$scopes)
 		{
-			$scopes = array('-1' => '- ' . JText::_('FLEXI_ALL') . ' -');
+			$scopes = array('-1' => '- ' . \Joomla\CMS\Language\Text::_('FLEXI_ALL') . ' -');
 
 			foreach ($model->search_cols as $label => $column_name)
 			{
 				// Numeric label means do not add this search case to the scope selector
 				if (!is_numeric($label))
 				{
-					$scopes['a.' . $column_name] = JText::_($label);
+					$scopes['a.' . $column_name] = \Joomla\CMS\Language\Text::_($label);
 				}
 			}
 
@@ -317,19 +317,19 @@ class FlexicontentViewBaseRecords extends JViewLegacy
 
 		foreach ($scopes as $i => $v)
 		{
-			$options[] = JHtml::_('select.option', $i, $v);
+			$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', $i, $v);
 		}
 
-		array_unshift($options, JHtml::_('select.option', 0, JText::_('FLEXI_SEARCH_TEXT_INSIDE'), 'value', 'text', 'disabled'));
+		array_unshift($options, \Joomla\CMS\HTML\HTMLHelper::_('select.option', 0, \Joomla\CMS\Language\Text::_('FLEXI_SEARCH_TEXT_INSIDE'), 'value', 'text', 'disabled'));
 
-		return JHtml::_('select.genericlist',
+		return \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist',
 			$options,
 			$fieldname,
 			array(
 				'size' => '1',
 				'class' => $this->select_class . ' fc_is_selarrow ' . $this->tooltip_class,
 				'onchange' => 'jQuery(\'#search\').attr(\'placeholder\', jQuery(this).find(\'option:selected\').text()); jQuery(this).blur();',
-				'title' => JText::_('FLEXI_SEARCH_TEXT_INSIDE'),
+				'title' => \Joomla\CMS\Language\Text::_('FLEXI_SEARCH_TEXT_INSIDE'),
 			),
 			'value',
 			'text',
