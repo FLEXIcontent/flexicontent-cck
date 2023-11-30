@@ -150,9 +150,9 @@ class FlexicontentModelTypes extends FCModelAdminList
 	/**
 	 * Method to build the where clause of the query for the records
 	 *
-	 * @param		\Joomla\Data\DataObjectbaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
+	 * @param		\Joomla\Database\DatabaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
 	 *
-	 * @return  \Joomla\Data\DataObjectbaseQuery|array
+	 * @return  \Joomla\Database\DatabaseQuery|array
 	 *
 	 * @since   3.3.0
 	 */
@@ -161,7 +161,7 @@ class FlexicontentModelTypes extends FCModelAdminList
 		// Inherited filters : filter_state, filter_access, search
 		$where = parent::_buildContentWhere(false);
 
-		if ($q instanceof \Joomla\Data\DataObjectbaseQuery)
+		if ($q instanceof \Joomla\Database\DatabaseQuery)
 		{
 			return $where ? $q->where($where) : $q;
 		}

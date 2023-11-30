@@ -2376,7 +2376,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			$query = 'SELECT params FROM #__categories WHERE id = ' . $id;
 			$this->_db->setQuery($query);
 			$catParams = $this->_db->loadResult();
-			$catParams = $this->_new_\Joomla\Registry\Registry($catParams);
+			$catParams = $this->_new_JRegistry($catParams);
 		}
 		else
 		{
@@ -2394,12 +2394,12 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			if ($author_extdata)
 			{
 				// Merge author basic parameters
-				$_author_basicreg = $this->_new_\Joomla\Registry\Registry($author_extdata->author_basicparams);
+				$_author_basicreg = $this->_new_JRegistry($author_extdata->author_basicparams);
 				if ($_author_basicreg->get('orderbycustomfieldid')==="0") $_author_basicreg->set('orderbycustomfieldid', '');
 				$catParams->merge( $_author_basicreg );
 
 				// Merge author OVERRIDDEN category parameters
-				$_author_catreg = $this->_new_\Joomla\Registry\Registry($author_extdata->author_catparams);
+				$_author_catreg = $this->_new_JRegistry($author_extdata->author_catparams);
 				if ( $_author_basicreg->get('override_currcat_config',0) ) {
 					if ($_author_catreg->get('orderbycustomfieldid')==="0") $_author_catreg->set('orderbycustomfieldid', '');
 					$catParams->merge( $_author_catreg );
@@ -2428,7 +2428,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			{
 				foreach ($catdata as $parentcat)
 				{
-					$parentcat->params = $this->_new_\Joomla\Registry\Registry($parentcat->params);
+					$parentcat->params = $this->_new_JRegistry($parentcat->params);
 					array_push($heritage_stack, $parentcat);
 					$inheritcid = $parentcat->params->get('inheritcid', '');
 					$inherit_parent = $inheritcid==='-1' || ($inheritcid==='' && $inheritcid_comp);
@@ -2446,7 +2446,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 
 			if ($catdata)
 			{
-				$catdata->params = $this->_new_\Joomla\Registry\Registry($catdata->params);
+				$catdata->params = $this->_new_JRegistry($catdata->params);
 				array_push($heritage_stack, $catdata);
 			}
 		}
@@ -2533,7 +2533,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		// Retrieve Layout's parameters, also deciding the layout
 		$this->decideLayout($params);
 		$layoutParams = $this->getLayoutparams();
-		$layoutParams = $this->_new_\Joomla\Registry\Registry($layoutParams);  //print_r($layoutParams);
+		$layoutParams = $this->_new_JRegistry($layoutParams);  //print_r($layoutParams);
 
 		// Allow global layout parameters to be inherited properly, placing on TOP of all others
 		$this->_params = clone($layoutParams);
@@ -2948,7 +2948,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 	/**
 	 * Create a \Joomla\Registry\Registry object checking for legacy bug of bad parameter merging code in during model saving
 	 */
-	private function _new_\Joomla\Registry\Registry($params)
+	private function _new_JRegistry($params)
 	{
 		if (!is_object($params))
 		{

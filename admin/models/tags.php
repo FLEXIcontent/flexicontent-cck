@@ -191,9 +191,9 @@ class FlexicontentModelTags extends FCModelAdminList
 	/**
 	 * Method to build the where clause of the query for the records
 	 *
-	 * @param		\Joomla\Data\DataObjectbaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
+	 * @param		\Joomla\Database\DatabaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
 	 *
-	 * @return  \Joomla\Data\DataObjectbaseQuery|array
+	 * @return  \Joomla\Database\DatabaseQuery|array
 	 *
 	 * @since   3.3.0
 	 */
@@ -202,7 +202,7 @@ class FlexicontentModelTags extends FCModelAdminList
 		// Inherited filters : filter_state, search
 		$where = parent::_buildContentWhere(false);
 
-		if ($q instanceof \Joomla\Data\DataObjectbaseQuery)
+		if ($q instanceof \Joomla\Database\DatabaseQuery)
 		{
 			return $where ? $q->where($where) : $q;
 		}
@@ -216,9 +216,9 @@ class FlexicontentModelTags extends FCModelAdminList
 	/**
 	 * Method to build the having clause of the query for the files
 	 *
-	 * @param		\Joomla\Data\DataObjectbaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
+	 * @param		\Joomla\Database\DatabaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
 	 *
-	 * @return  \Joomla\Data\DataObjectbaseQuery|array
+	 * @return  \Joomla\Database\DatabaseQuery|array
 	 *
 	 * @since 1.0
 	 */
@@ -240,7 +240,7 @@ class FlexicontentModelTags extends FCModelAdminList
 				break;
 		}
 
-		if ($q instanceof \Joomla\Data\DataObjectbaseQuery)
+		if ($q instanceof \Joomla\Database\DatabaseQuery)
 		{
 			return $having ? $q->having($having) : $q;
 		}

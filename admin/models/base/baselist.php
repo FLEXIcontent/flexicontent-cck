@@ -13,7 +13,6 @@ defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
-use Joomla\CMS\Table\Table;
 
 jimport('legacy.model.list');
 require_once('traitbase.php');
@@ -408,9 +407,9 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 	/**
 	 * Method to build the orderby clause of the query for the records
 	 *
-	 * @param		\Joomla\Data\DataObjectbaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
+	 * @param		\Joomla\Database\DatabaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
 	 *
-	 * @return  \Joomla\Data\DataObjectbaseQuery|array
+	 * @return  \Joomla\Database\DatabaseQuery|array
 	 *
 	 * @since 3.3.0
 	 */
@@ -421,7 +420,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 
 		$order = $this->_db->escape($filter_order . ' ' . $filter_order_Dir);
 
-		if ($q instanceof \Joomla\Data\DataObjectbaseQuery)
+		if ($q instanceof \Joomla\Database\DatabaseQuery)
 		{
 			return $order ? $q->order($order) : $q;
 		}
@@ -435,9 +434,9 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 	/**
 	 * Method to build the where clause of the query for the records
 	 *
-	 * @param		\Joomla\Data\DataObjectbaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
+	 * @param		\Joomla\Database\DatabaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
 	 *
-	 * @return  \Joomla\Data\DataObjectbaseQuery|array
+	 * @return  \Joomla\Database\DatabaseQuery|array
 	 *
 	 * @since   3.3.0
 	 */
@@ -566,7 +565,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 			$where[] = '(' . implode(' OR ', $textwhere) . ')';
 		}
 
-		if ($q instanceof \Joomla\Data\DataObjectbaseQuery)
+		if ($q instanceof \Joomla\Database\DatabaseQuery)
 		{
 			return $where ? $q->where($where) : $q;
 		}
@@ -580,9 +579,9 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 	/**
 	 * Method to build the having clause of the query for the files
 	 *
-	 * @param		\Joomla\Data\DataObjectbaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
+	 * @param		\Joomla\Database\DatabaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
 	 *
-	 * @return  \Joomla\Data\DataObjectbaseQuery|array
+	 * @return  \Joomla\Database\DatabaseQuery|array
 	 *
 	 * @since 1.0
 	 */
@@ -590,7 +589,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 	{
 		$having = array();
 
-		if ($q instanceof \Joomla\Data\DataObjectbaseQuery)
+		if ($q instanceof \Joomla\Database\DatabaseQuery)
 		{
 			return $having ? $q->having($having) : $q;
 		}

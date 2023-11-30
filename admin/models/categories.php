@@ -160,8 +160,7 @@ class FlexicontentModelCategories extends FCModelAdminList
 	protected function getListQuery()
 	{
 		// Create a query with all its clauses: WHERE, HAVING and ORDER BY, etc
-		$query = parent::getListQuery()
-		;
+		$query = parent::getListQuery();
 
 		// Listing associated items
 		$filter_assockey = $this->getState('filter_assockey');
@@ -185,9 +184,9 @@ class FlexicontentModelCategories extends FCModelAdminList
 	/**
 	 * Method to build the where clause of the query for the records
 	 *
-	 * @param		\Joomla\Data\DataObjectbaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
+	 * @param		\Joomla\Database\DatabaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
 	 *
-	 * @return  \Joomla\Data\DataObjectbaseQuery|array
+	 * @return  \Joomla\Database\DatabaseQuery|array
 	 *
 	 * @since   3.3.0
 	 */
@@ -226,7 +225,7 @@ class FlexicontentModelCategories extends FCModelAdminList
 			$where[] = 'a.level <= ' . (int) $filter_level;
 		}
 
-		if ($q instanceof \Joomla\Data\DataObjectbaseQuery)
+		if ($q instanceof \Joomla\Database\DatabaseQuery)
 		{
 			return $where ? $q->where($where) : $q;
 		}
@@ -395,7 +394,7 @@ class FlexicontentModelCategories extends FCModelAdminList
 	 * Method to get parameters of parent categories
 	 *
 	 * @param   integer  $pk  The category id
-	 * @return	string   An array of JSON strings
+	 * @return	array   An array of JSON strings
 	 *
 	 * @since	3.3.0
 	 */
@@ -421,7 +420,7 @@ class FlexicontentModelCategories extends FCModelAdminList
 	 * Method to count assigned items for the given categories
 	 *
 	 * @access public
-	 * @return	string
+	 * @return array
 	 * @since	1.6
 	 */
 	function countItemsByState($cids)

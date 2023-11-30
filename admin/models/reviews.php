@@ -136,8 +136,7 @@ class FlexicontentModelReviews extends FCModelAdminList
 	protected function getListQuery()
 	{
 		// Create a query with all its clauses: WHERE, HAVING and ORDER BY, etc
-		$query = parent::getListQuery()
-		;
+		$query = parent::getListQuery();
 
 		return $query;
 	}
@@ -146,9 +145,9 @@ class FlexicontentModelReviews extends FCModelAdminList
 	/**
 	 * Method to build the where clause of the query for the records
 	 *
-	 * @param		\Joomla\Data\DataObjectbaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
+	 * @param		\Joomla\Database\DatabaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
 	 *
-	 * @return  \Joomla\Data\DataObjectbaseQuery|array
+	 * @return  \Joomla\Database\DatabaseQuery|array
 	 *
 	 * @since   3.3.0
 	 */
@@ -167,7 +166,7 @@ class FlexicontentModelReviews extends FCModelAdminList
 			$where[] = 'a.approved = ' . (int) $filter_approved;
 		}
 
-		if ($q instanceof \Joomla\Data\DataObjectbaseQuery)
+		if ($q instanceof \Joomla\Database\DatabaseQuery)
 		{
 			return $where ? $q->where($where) : $q;
 		}
