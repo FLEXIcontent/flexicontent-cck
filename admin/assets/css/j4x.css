@@ -1,252 +1,276 @@
+/*****************
+ADD old boostrap visibility classes
+ *****************/
 #flexicontent .hidden-desktop {
-	display: none !important;
+  display: none !important;
 }
 @media (min-width: 768px) and (max-width: 991.98px) {
-	#flexicontent .hidden-desktop {
-		display: inherit !important;
-	}
-	#flexicontent .hidden-tablet {
-		display: none !important;
-	}
+  #flexicontent .hidden-desktop {
+    display: inherit !important;
+  }
+  #flexicontent .hidden-tablet {
+    display: none !important;
+  }
 }
 @media (max-width: 767.98px) {
-	#flexicontent .hidden-desktop {
-		display: inherit !important;
-	}
-	#flexicontent .hidden-phone {
-		display: none !important;
-	}
+  #flexicontent .hidden-desktop {
+    display: inherit !important;
+  }
+  #flexicontent .hidden-phone {
+    display: none !important;
+  }
 }
+/*****************
+ * Dashboard icons
+ *****************/
 .icon-48-flexicontent {
-	background-image: url(../images/icon-48-dashboard.png);
+  background-image: url(../images/icon-48-dashboard.png);
 }
 .icon-48-items {
-	background-image: url(../images/icon-48-items.png);
+  background-image: url(../images/icon-48-items.png);
 }
 .icon-48-itemadd {
-	background-image: url(../images/icon-48-item-add.png);
+  background-image: url(../images/icon-48-item-add.png);
 }
 .icon-48-itemedit {
-	background-image: url(../images/icon-48-item-edit.png);
+  background-image: url(../images/icon-48-item-edit.png);
 }
 .icon-48-types {
-	background-image: url(../images/icon-48-types.png);
+  background-image: url(../images/icon-48-types.png);
 }
 .icon-48-typeadd {
-	background-image: url(../images/icon-48-type-add.png);
+  background-image: url(../images/icon-48-type-add.png);
 }
 .icon-48-typeedit {
-	background-image: url(../images/icon-48-type-edit.png);
+  background-image: url(../images/icon-48-type-edit.png);
 }
 .icon-48-fields {
-	background-image: url(../images/icon-48-fields.png);
+  background-image: url(../images/icon-48-fields.png);
 }
 .icon-48-fieldadd {
-	background-image: url(../images/icon-48-field-add.png);
+  background-image: url(../images/icon-48-field-add.png);
 }
 .icon-48-fieldedit {
-	background-image: url(../images/icon-48-field-edit.png);
+  background-image: url(../images/icon-48-field-edit.png);
 }
 .icon-48-tags {
-	background-image: url(../images/icon-48-tags.png);
+  background-image: url(../images/icon-48-tags.png);
 }
 .icon-48-tagadd {
-	background-image: url(../images/icon-48-tag-add.png);
+  background-image: url(../images/icon-48-tag-add.png);
 }
 .icon-48-tagedit {
-	background-image: url(../images/icon-48-tag-edit.png);
+  background-image: url(../images/icon-48-tag-edit.png);
 }
 .icon-48-fc_categories {
-	background-image: url(../images/icon-48-categories.png);
+  background-image: url(../images/icon-48-categories.png);
 }
 .icon-48-fc_categoryadd {
-	background-image: url(../images/icon-48-category-add.png);
+  background-image: url(../images/icon-48-category-add.png);
 }
 .icon-48-fc_categoryedit {
-	background-image: url(../images/icon-48-category-edit.png);
+  background-image: url(../images/icon-48-category-edit.png);
 }
 .icon-48-archive {
-	background-image: url(../images/icon-48-archive.png);
+  background-image: url(../images/icon-48-archive.png);
 }
 .icon-48-editacl {
-	background-image: url(../images/icon-48-permissions.png);
+  background-image: url(../images/icon-48-permissions.png);
 }
 .icon-48-files {
-	background-image: url(../images/icon-48-files.png);
+  background-image: url(../images/icon-48-files.png);
 }
 .icon-48-fileedit {
-	background-image: url(../images/icon-48-file-edit.png);
+  background-image: url(../images/icon-48-file-edit.png);
 }
 .icon-48-stats {
-	background-image: url(../images/icon-48-statistics.png);
+  background-image: url(../images/icon-48-statistics.png);
 }
 .icon-48-templates {
-	background-image: url(../images/icon-48-templates.png);
+  background-image: url(../images/icon-48-templates.png);
 }
 .icon-48-authors {
-	background-image: url(../images/icon-48-authors.png);
+  background-image: url(../images/icon-48-authors.png);
 }
 .icon-48-authoradd {
-	background-image: url(../images/icon-48-author-add.png);
+  background-image: url(../images/icon-48-author-add.png);
 }
 .icon-48-authoredit {
-	background-image: url(../images/icon-48-author-edit.png);
+  background-image: url(../images/icon-48-author-edit.png);
 }
 .icon-48-import {
-	background-image: url(../images/icon-48-import.png);
+  background-image: url(../images/icon-48-import.png);
 }
 .icon-48-searchindex {
-	background-image: url(../images/icon-48-searchindex.png);
+  background-image: url(../images/icon-48-searchindex.png);
 }
+/**********************
+ * Legacy Toolbar icons
+ **********************/
 .icon-32-person2 {
-	background-image: url(../images/icon-32-person2_f2.png);
+  background-image: url(../images/icon-32-person2_f2.png);
 }
 .icon-32-savenew {
-	background-image: url(../images/icon-32-savenew.png);
+  background-image: url(../images/icon-32-savenew.png);
 }
 .icon-32-translate {
-	background-image: url(../images/icon-32-country-flags.png);
+  background-image: url(../images/icon-32-country-flags.png);
 }
 .icon-32-go {
-	background-image: url(../../../../images/go_f2.png);
+  background-image: url(../../../../images/go_f2.png);
 }
 .icon-32-download {
-	background-image: url(../../../../templates/hathor/images/toolbar/icon-32-export.png);
+  background-image: url(../../../../templates/hathor/images/toolbar/icon-32-export.png);
 }
 .icon-32-language {
-	background-image: url(../../../../templates/hathor/images/toolbar/icon-32-html.png);
+  background-image: url(../../../../templates/hathor/images/toolbar/icon-32-html.png);
 }
 .icon-32-params {
-	background-image: url(../../../../templates/hathor/images/toolbar/icon-32-copy.png);
+  background-image: url(../../../../templates/hathor/images/toolbar/icon-32-copy.png);
 }
 .icon-32-import {
-	background-image: url(../../../../templates/hathor/images/toolbar/icon-32-upload.png);
+  background-image: url(../../../../templates/hathor/images/toolbar/icon-32-upload.png);
 }
 .icon-32-duplicate {
-	background-image: url(../../../../templates/hathor/images/toolbar/icon-32-copy.png);
+  background-image: url(../../../../templates/hathor/images/toolbar/icon-32-copy.png);
 }
 .icon-32-copy_wvalues {
-	background-image: url(../../../../templates/hathor/images/toolbar/icon-32-copy.png);
+  background-image: url(../../../../templates/hathor/images/toolbar/icon-32-copy.png);
 }
 .icon-32-test,
 .icon-32-preview {
-	background-image: url(../../../../templates/hathor/images/toolbar/icon-32-preview.png);
+  background-image: url(../../../../templates/hathor/images/toolbar/icon-32-preview.png);
 }
 .icon-32-advindexdirty {
-	background-image: url(../../../../templates/hathor/images/toolbar/icon-32-batch.png);
+  background-image: url(../../../../templates/hathor/images/toolbar/icon-32-batch.png);
 }
 .icon-32-advindexpurge {
-	background-image: url(../../../../templates/hathor/images/toolbar/icon-32-purge.png);
+  background-image: url(../../../../templates/hathor/images/toolbar/icon-32-purge.png);
 }
+/* preview icon */
 .icon-32-test,
 .icon-32-preview {
-	background: none;
+  background: none;
 }
 .icon-32-test:before,
 .icon-32-preview:before {
-	content: "\3c";
+  content: "\3c";
 }
+/**************
+ * Small labels
+ **************/
 .label,
 .badge,
 .flexicontent label.label {
-	margin: 0px 2px 2px 4px;
-	background: var(--template-bg-dark-40);
+  margin: 0px 2px 2px 4px;
+  background: var(--template-bg-dark-40);
 }
 .label.highlight,
 .badge.highlight {
-	color: darkred;
+  color: darkred;
 }
 .label,
 .flexicontent label.label {
-	padding: 4px;
-	border-radius: 4px;
+  padding: 4px;
+  border-radius: 4px;
 }
+/**************
+ * Other layout
+ **************/
 ul.adminformlist {
-	list-style-position: outside !important;
-	list-style-type: none !important;
-	margin: 0px !important;
-	padding: 0px !important;
+  list-style-position: outside !important;
+  list-style-type: none !important;
+  margin: 0px !important;
+  padding: 0px !important;
 }
 div.toolbar-box {
-	background: none repeat scroll 0 0 #FFFFFF;
-	border: 1px solid #C7C8B2;
-	margin-top: -1px;
-	padding: 4px 16px;
+  background: none repeat scroll 0 0 #FFFFFF;
+  border: 1px solid #C7C8B2;
+  margin-top: -1px;
+  padding: 4px 16px;
 }
+/* TODO examine making this more specific ? */
 #flexicontent select {
-	width: auto;
-	border: 1px solid var(--template-bg-dark-20);
+  width: auto;
+  border: 1px solid var(--template-bg-dark-20);
+  /*min-width: 200px;*/
 }
 #flexicontent select.form-select {
-	width: 100%;
+  width: 100%;
 }
 #user-groups legend + .control-group,
 #user-groups .control-group {
-	margin: 0px;
+  margin: 0px;
 }
+/***********************
+ * Pane TABS and SLIDERs
+ ***********************/
 #flexicontent .fc-sliders-plain-outer {
-	max-width: 1200px;
-	padding: 16px 0 0 0;
+  max-width: 1200px;
+  padding: 16px 0 0 0;
 }
 #flexicontent .fc-sliders-plain-outer .panel {
-	margin: 0;
+  margin: 0;
 }
 #flexicontent .fc-sliders-plain-outer > .pane-sliders > .panel > h3 {
-	margin-bottom: 16px;
-	border: 0 solid !important;
-	background: unset !important;
-	display: inline-block !important;
+  margin-bottom: 16px;
+  border: 0 solid !important;
+  background: unset !important;
+  display: inline-block !important;
 }
 #flexicontent .fc-sliders-plain-outer .pane-toggler-down {
-	border: 0 solid !important;
+  border: 0 solid !important;
 }
 .pane-sliders .panel {
-	margin-bottom: 3px;
+  margin-bottom: 3px;
 }
 :not(.fc-sliders-plain-outer) > .pane-sliders .panel h3 {
-	border-radius: 3px;
-	font-size: 12px;
-	font-weight: bold;
-	text-shadow: 1px 1px 1px rgba(0,0,0,0.6);
-	background-color: #9C9D9E;
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: bold;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.6);
+  background-color: #9C9D9E;
 }
 .pane-sliders .title {
-	color: #666666;
-	cursor: pointer;
-	margin: 0;
-	padding: 2px 2px 2px 5px;
+  color: #666666;
+  cursor: pointer;
+  margin: 0;
+  padding: 2px 2px 2px 5px;
 }
 .pane-sliders .content {
-	box-shadow: 0 0 4px #cccccc;
-	border-radius: 2px;
-	padding: 12px 0px 0px 12px;
-	background: none repeat scroll 0 0 white;
+  box-shadow: 0 0 4px #cccccc;
+  border-radius: 2px;
+  padding: 12px 0px 0px 12px;
+  background: none repeat scroll 0 0 white;
 }
 .pane-toggler-down a:hover,
 .pane-toggler-down a:focus,
 .pane-toggler a:hover,
 .pane-toggler a:focus {
-	text-decoration: none !important;
+  text-decoration: none !important;
 }
 .pane-toggler > a > span {
-	background: url("../images/toggle.png") no-repeat scroll 0px 0px transparent;
-	padding-right: 20px;
-	font-size: 14px;
+  background: url("../images/toggle.png") no-repeat scroll 0px 0px transparent;
+  padding-right: 20px;
+  font-size: 14px;
 }
 .pane-toggler-down {
-	border: 0 solid;
+  border: 0 solid;
 }
 .pane-toggler-down > a > span {
-	background: url("../images/toggle_up.png") no-repeat scroll 0px 0px transparent;
-	padding-right: 20px;
-	font-size: 14px;
+  background: url("../images/toggle_up.png") no-repeat scroll 0px 0px transparent;
+  padding-right: 20px;
+  font-size: 14px;
 }
+/******************
+ * Fieldsets layout
+ ******************/
 .controls fieldset.radio,
 .controls fieldset.group-fcset.fc_input_set,
 fieldset.adminform fieldset.group-fcset.fc_input_set,
 fieldset.panelform fieldset.group-fcset.fc_input_set,
 fieldset.adminform-legacy fieldset.group-fcset.fc_input_set {
-	margin: 1px 2px 1px 2px;
+  margin: 1px 2px 1px 2px;
 }
 .controls fieldset.radio,
 fieldset.adminform fieldset.radio,
@@ -256,39 +280,55 @@ fieldset.adminform-legacy fieldset.radio,
 fieldset.adminform fieldset.group-fcset.fc_input_set,
 fieldset.panelform fieldset.group-fcset.fc_input_set,
 fieldset.adminform-legacy fieldset.group-fcset.fc_input_set {
-	border: 0 none !important;
-	float: left !important;
-	padding: 0px 0px !important;
+  border: 0 none !important;
+  float: left !important;
+  padding: 0px 0px !important;
 }
 div fieldset label.radiobtn {
-	display: inline-block;
-	white-space: nowrap;
-	padding-left: 8px;
-	min-width: 0px;
-	margin: 0px 0px 0px 2px;
-	float: right;
-	clear: none;
+  display: inline-block;
+  white-space: nowrap;
+  padding-left: 8px;
+  min-width: 0px;
+  margin: 0px 0px 0px 2px;
+  float: right;
+  clear: none;
 }
 div fieldset.adminform fieldset.radio label,
 div fieldset.panelform fieldset.radio label {
-	float: right;
-	min-width: 0px;
-	margin-top: 4px;
-	width: auto !important;
+  float: right;
+  min-width: 0px;
+  margin-top: 4px;
+  width: auto !important;
 }
 div fieldset.panelform ul.adminformlist > li {
-	clear: both;
+  clear: both;
 }
 div fieldset.panelform ul.adminformlist > li .input-append,
 div fieldset.panelform ul.adminformlist > li .input-prepend {
-	margin: 0px;
+  margin: 0px;
 }
+/*#jform_tid-lbl,
+#jform_attribs_ilayout-lbl,
+div fieldset.panelform :not(.label-fcouter) label:not(.btn).hasTooltip {
+	clear: both;
+	padding: 5px 3px !important;
+	margin: 2px 4px 0px 4px !important;
+	background-color: #F2F2F2;
+	border-bottom: 1px solid #D0D0D0;
+	border-left: 1px solid #D0D0D0;
+	color: #666666;
+	font-weight: normal;
+	text-align: left;
+	width: 132px;
+	overflow: hidden;
+	display: inline-block;
+}*/
 div fieldset label:not(.btn) {
-	margin: 1px 6px 1px 2px;
-	clear: none;
+  margin: 1px 6px 1px 2px;
+  clear: none;
 }
 div fieldset label.btn {
-	margin: 0px 0px !important;
+  margin: 0px 0px !important;
 }
 div.width-20 fieldset,
 div.width-30 fieldset,
@@ -302,330 +342,373 @@ div.width-65 fieldset,
 div.width-70 fieldset,
 div.width-80 fieldset,
 div.width-100 fieldset {
-	background-color: #FFFFFF !important;
-	padding: 5px 8px 8px 5px !important;
+  background-color: #FFFFFF !important;
+  padding: 5px 8px 8px 5px !important;
 }
+/*div fieldset.panelform :not(.label-fcouter) label:not(.btn) {
+	min-width: 132px;
+	text-align: left;
+}*/
 div fieldset.panelform td {
-	border: 1px solid #e0e0e0;
-	background-color: #efefef;
+  border: 1px solid #e0e0e0;
+  background-color: #efefef;
 }
 div fieldset.panelform table {
-	width: 100%;
+  width: 100%;
 }
+/***************
+ * Tables layout
+ ***************/
 div table.adminform {
-	font-size: 11px;
-	background-color: #FFFFFF;
-	border: 1px solid #D5D5D5;
-	border-collapse: collapse;
-	margin: 8px 0 15px;
-	width: 100%;
+  font-size: 11px;
+  background-color: #FFFFFF;
+  border: 1px solid #D5D5D5;
+  border-collapse: collapse;
+  margin: 8px 0 15px;
+  width: 100%;
 }
 div table.adminform td {
-	font-size: 11px;
-	padding: 2px 2px;
-	text-align: right;
+  font-size: 11px;
+  padding: 2px 2px;
+  text-align: right;
 }
 td.key label {
-	float: none;
-	display: inline;
+  float: none;
+  display: inline;
 }
 table.admintable td .controls label {
-	float: right;
-	display: inline-block;
-	padding: 0px !important;
+  float: right;
+  display: inline-block;
+  padding: 0px !important;
 }
 div table.admintable {
-	font-size: 11px;
-	border-collapse: separate;
-	border-spacing: 2px !important;
+  font-size: 11px;
+  border-collapse: separate;
+  border-spacing: 2px !important;
 }
 div table.admintable td {
-	border: 0px solid #F0F0F0;
-	font-weight: normal;
-	text-align: left;
-	padding: 2px 4px 2px 8px;
+  border: 0px solid #F0F0F0;
+  font-weight: normal;
+  text-align: left;
+  padding: 2px 4px 2px 8px;
 }
 div table.admintable td.key,
 div table.admintable td.paramlist_key {
-	background-color: #F2F2F2;
-	border-bottom: 1px solid #D0D0D0;
-	border-left: 1px solid #D0D0D0;
-	color: #666666;
-	font-family: arial;
-	font-weight: normal;
-	font-size: 11px;
-	text-align: left;
-	width: 140px;
-	padding: 2px 4px 2px 4px;
+  background-color: #F2F2F2;
+  border-bottom: 1px solid #D0D0D0;
+  border-left: 1px solid #D0D0D0;
+  color: #666666;
+  font-family: arial;
+  font-weight: normal;
+  font-size: 11px;
+  text-align: left;
+  width: 140px;
+  padding: 2px 4px 2px 4px;
 }
 table.admintable fieldset {
-	border: 0 none;
-	float: right;
-	margin: 0 !important;
-	padding: 0 !important;
+  border: 0 none;
+  float: right;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 table.admintable .row {
-	margin-right: 0 !important;
+  margin-right: 0 !important;
 }
+/********************
+ * Joomla legacy TABs
+ ********************/
 dl.tabs {
-	float: right;
-	margin: 10px 0 -1px;
-	z-index: 50;
+  float: right;
+  margin: 10px 0 -1px;
+  z-index: 50;
 }
 dl.tabs dt {
-	background: none repeat scroll 0 0 #E9E9E9;
-	border: 1px solid #CCCCCC;
-	color: #666666;
-	float: right;
-	margin-right: 3px;
-	padding: 4px 10px;
+  background: none repeat scroll 0 0 #E9E9E9;
+  border: 1px solid #CCCCCC;
+  color: #666666;
+  float: right;
+  margin-right: 3px;
+  padding: 4px 10px;
 }
 dl.tabs dt h3 {
-	font-size: 11px !important;
-	margin: 0px !important;
-	line-height: 20px;
+  font-size: 11px !important;
+  margin: 0px !important;
+  line-height: 20px;
 }
 dl.tabs dt.open {
-	background: none repeat scroll 0 0 #F9F9F9;
-	border-bottom: 1px solid #F9F9F9;
-	color: #000000;
-	z-index: 100;
+  background: none repeat scroll 0 0 #F9F9F9;
+  border-bottom: 1px solid #F9F9F9;
+  color: #000000;
+  z-index: 100;
 }
 div.current {
-	border: 1px solid #CCCCCC;
-	clear: both;
-	padding: 10px;
+  border: 1px solid #CCCCCC;
+  clear: both;
+  padding: 10px;
 }
 div.current dd {
-	margin: 0;
-	padding: 0;
+  margin: 0;
+  padding: 0;
 }
 dl#content-pane.tabs {
-	margin: 1px 0 0;
+  margin: 1px 0 0;
 }
+/****************************
+ * Joomla legacy button links
+ ****************************/
 .blank {
-	display: inline-block;
+  display: inline-block;
 }
 .button2-right {
-	display: inline-block;
-	margin: 2px 0 0 4px;
+  display: inline-block;
+  margin: 2px 0 0 4px;
 }
+/********************
+ * Sidebar navigation
+ ********************/
 [class^="fcsbnav-"] {
-	width: 90%;
-	font-size: 16px;
-	margin: 12px 0 2px -10px;
-	padding: 4px 0 0 20px;
-	border-top: 0px dashed;
-	border-bottom: 1px dashed;
-	border-color: gray;
-	color: #555;
-	background-repeat: no-repeat;
+  width: 90%;
+  font-size: 16px;
+  margin: 12px 0 2px -10px;
+  padding: 4px 0 0 20px;
+  border-top: 0px dashed;
+  border-bottom: 1px dashed;
+  border-color: gray;
+  color: #555;
+  background-repeat: no-repeat;
 }
 .fcsbnav-content-editing {
-	color: #777;
-	margin-top: -4px;
+  color: #777;
+  margin-top: -4px;
 }
 .fcsbnav-type-fields {
-	color: #777;
+  color: #777;
 }
 .fcsbnav-content-viewing {
-	color: #777;
+  color: #777;
 }
 .fcsbnav-users {
-	color: #777;
+  color: #777;
 }
 .fcsbnav-expert {
-	color: #777;
+  color: #777;
 }
+/**************
+ * Chosen fixes
+ **************/
+/* Fix fitting issues e.g. with chosen enhanced selects */
 .form-horizontal .chzn-container {
-	width: 90% !important;
-	max-width: 500px !important;
+  width: 90% !important;
+  max-width: 500px !important;
 }
 .form-horizontal .chzn-container .chzn-drop {
-	width: 100% !important;
-	max-width: 500px !important;
+  width: 100% !important;
+  max-width: 500px !important;
 }
 .form-horizontal .chzn-container-single .chzn-single {
-	width: auto;
-	float: right;
+  width: auto;
+  float: right;
 }
 .form-horizontal .chzn-container-single .chzn-single span {
-	margin-left: 36px;
+  margin-left: 36px;
 }
+/* Fix size of prompt for choosen */
 .chzn-container-multi .chzn-choices li.search-field {
-	width: 100% !important;
+  width: 100% !important;
 }
 .chzn-container-multi .chzn-choices li.search-field input.default {
-	width: 96% !important;
-	padding: 5px 2%;
+  width: 96% !important;
+  padding: 5px 2%;
 }
+/* fix btn */
 #flexicontent .btn,
 .btn {
-	border: 1px solid var(--template-bg-dark-20);
+  border: 1px solid var(--template-bg-dark-20);
 }
 #fc-managers-header .btn-group,
 .btn-group.fc-group.fc-items {
-	background: #fff !important;
+  background: #fff !important;
 }
+/* fix iconmoon display */
 [class^="fcsb-icon-"]:before,
 [class*=" fcsb-icon-"]:before {
-	font-family: inherit;
+  font-family: inherit;
 }
+/* fix icon*/
 .icon-tags:before {
-	content: "\f02c";
+  content: "\f02c";
 }
 .icon-items:before {
-	content: "\f0c5";
+  content: "\f0c5";
 }
+/*fix icon state*/
 .flexicontent *:not(.input-append):not(.input-prepend):not(.input-group) > select:not(.custom-select) {
-	padding: 11px;
+  padding: 11px;
 }
 .flexicontent #fc-managers-header #fc-columns-slide-btn,
 .flexicontent #fc-managers-header #fc-filters-slide-btn {
-	height: inherit;
+  height: inherit;
 }
 a.fc_assoc_translation.label.label-association {
-	padding: 0px 4px 2px 4px;
+  padding: 0px 4px 2px 4px;
 }
 .flexicontent #fc-managers-header #limit {
-	min-width: inherit;
-	background: #fff;
+  min-width: inherit;
+  background: #fff;
 }
+/* fix sublist like change state */
+/* fix caret on dropdown button*/
 .com_flexicontent .dropdown-toggle:after {
-	margin-right: 11px;
+  margin-right: 11px;
 }
 .com_flexicontent .btn-outline-info:hover,
 .com_flexicontent .btn-outline-dark:hover {
-	color: var(--template-link-hover-color-15);
+  color: var(--template-link-hover-color-15);
 }
 .com_flexicontent .input-group-text {
-	border: 0;
+  border: 0;
 }
 .flexicontent #fc-filters-box .fc-filter .input-group-prepend input#filter_id {
-	border: 1px solid #aaa;
+  border: 1px solid #aaa;
 }
+/** stack icon, used for version icon, etc **/
 .flexicontent .fa-stack,
 .flexicontent .icon-stack {
-	height: initial;
-	line-height: initial;
-	width: unset;
+  height: initial;
+  line-height: initial;
+  width: unset;
 }
+/** fixs for item form **/
 div#tags #input-tags {
-	border-radius: 5px;
-	border: 1px solid #aaa;
-	padding: 6px;
+  border-radius: 5px;
+  border: 1px solid #aaa;
+  padding: 6px;
 }
 #toolbar .buttons.btn-group > .toolbar {
-	margin: auto !important;
-	margin-left: -2px !important;
+  margin: auto !important;
+  margin-left: -2px !important;
 }
 #fcform_language_container .input-append input {
-	height: 43px !important;
-	border: 1px solid #aaa;
-	border-radius: 5px;
-	margin-right: -6px;
+  height: 43px !important;
+  border: 1px solid #aaa;
+  border-radius: 5px;
+  margin-right: -6px;
 }
+/** fix fields view **/
 #flexicontent [class^="fc-xpended"] .input-group-text.fc-lbl-inverted,
 #flexicontent [class^="fc-xpended"] .add-on.fc-lbl-inverted,
 #flexicontent [class*="fc-xpended"] .input-group-text.fc-lbl-inverted,
 #flexicontent [class*="fc-xpended"] .add-on.fc-lbl-inverted {
-	font-size: inherit;
+  font-size: inherit;
 }
+#flexicontent .btn[class^="btn-outline-"],
+#flexicontent .btn[class*=" btn-outline-"] {
+  /*border-width: 2px;*/
+}
+/** fix type editing **/
 button.accordion-button.collapsed {
-	border: 1px solid;
-	border-color: var(--template-bg-dark-20);
+  border: 1px solid;
+  border-color: var(--template-bg-dark-20);
 }
+/** fix button group **/
 body .btn-group.group-fcinfo .btn:not(.btn-primary),
 body .btn-group.group-fcprimary .btn:not(.btn-primary),
 body .btn-group.group-fcsuccess .btn:not(.btn-primary),
 body .btn-group.group-fcwarning .btn:not(.btn-primary),
 body .btn-group.group-fcmethod .btn:not(.btn-primary) {
-	color: #333;
-	background-color: initial;
-	background-image: initial;
-	background-repeat: none;
-	border-color: none;
-	border-image: none;
+  color: #333;
+  background-color: initial;
+  background-image: initial;
+  background-repeat: none;
+  border-color: none;
+  border-image: none;
 }
-body *.btn-check:active+.btn-outline-secondary,
-body *.btn-check:checked+.btn-outline-secondary,
+body *.btn-check:active + .btn-outline-secondary,
+body *.btn-check:checked + .btn-outline-secondary,
 body *.btn-outline-secondary.active,
 body *.btn-outline-secondary.dropdown-toggle.show,
 body *.btn-outline-secondary:active {
-	color: #fff;
-	background-color: #495057;
-	border-color: #495057;
+  color: #fff;
+  background-color: #495057;
+  border-color: #495057;
 }
+/** save message **/
 #fc_ajax_system_messages button.close {
-	float: right;
-	border: 0;
-	background: inherit;
-	font-size: 30px;
-	color: var(--alert-accent-color);
+  float: right;
+  border: 0;
+  background: inherit;
+  font-size: 30px;
+  color: var(--alert-accent-color);
 }
 #fc_ajax_system_messages .alert.alert-success {
-	border: 1px solid #457d54;
+  border: 1px solid #457d54;
 }
 .fcrecords_title,
 .positions_title {
-	margin: 10px 0 2px !important;
-	font-weight: bold;
-	display: initial;
-	padding: 5px;
+  margin: 10px 0 2px !important;
+  font-weight: bold;
+  display: initial;
+  padding: 5px;
 }
+/** fix btn micro **/
 #flexicontent .btn.btn-micro {
-	padding: 4px;
-	background: #fff;
+  padding: 4px;
+  background: #fff;
 }
+/** fix table item **/
 table.fcmanlist tbody td {
-	padding: 4px 4px 6px 4px;
+  padding: 4px 4px 6px 4px;
 }
 table.fcmanlist tbody td.col_status .fc-group {
-	vertical-align: text-top;
+  vertical-align: text-top;
 }
 table.fcmanlist tbody td.col_status a[target="_blank"]::before {
-	content: unset;
+  content: unset;
 }
 table.fcmanlist tbody td.col_status fa,
 table.fcmanlist tbody td.col_status .fas,
 table.fcmanlist tbody td.col_status [class*=" icon-"],
 table.fcmanlist tbody td.col_status [class^="icon-"] {
-	height: 1em;
-	line-height: 1em;
+  height: 1em;
+  line-height: 1em;
 }
 table.fcmanlist tbody td.col_status div.statetoggler {
-	padding-top: 9px !important;
+  padding-top: 9px !important;
+  /*border-top-right-radius: 0;
+			border-bottom-right-radius: 0;*/
 }
 .col_common_props .fa:before,
-.col_common_props .fas:before,
-.col_common_props [class*=" icon-"]:before,
-.col_common_props [class^="icon-"]:before,
 .col_showin_clients .fa:before,
-.col_showin_clients .fas:before,
-.col_showin_clients [class*=" icon-"]:before,
-.col_showin_clients [class^="icon-"]:before,
 .col_showin_views .fa:before,
+.col_common_props .fas:before,
+.col_showin_clients .fas:before,
 .col_showin_views .fas:before,
+.col_common_props [class*=" icon-"]:before,
+.col_showin_clients [class*=" icon-"]:before,
 .col_showin_views [class*=" icon-"]:before,
+.col_common_props [class^="icon-"]:before,
+.col_showin_clients [class^="icon-"]:before,
 .col_showin_views [class^="icon-"]:before {
-	padding: 0px 2px;
+  padding: 0px 2px;
 }
+/** fix fields button **/
 .input-append .add-on,
 .input-prepend .add-on,
 #flexicontent .fc-xpended-btns > [class^="fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn),
 #flexicontent .fc-xpended-btns > [class*=" fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn),
 #flexicontent .fc-xpended-btns > .fcfield-button-add:not(.add-on):not(.input-group-addon) a {
-	border: 1px solid var(--template-bg-dark-20) !important;
-	text-align: center;
+  border: 1px solid var(--template-bg-dark-20) !important;
+  text-align: center;
 }
 #flexicontent ul.fcfield-sortables > li > * {
-	vertical-align: middle !important;
+  vertical-align: middle !important;
 }
+/** icon in button **/
 #flexicontent .fc-xpended-btns > [class^="fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn),
 #flexicontent .fc-xpended-btns > [class*=" fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn),
 #flexicontent .fc-xpended-btns > .fcfield-button-add:not(.add-on):not(.input-group-addon) a,
 #flexicontent .buttons.btn-group > ul.dropdown-menu > li > span {
-	font-family: 'Roboto' !important;
+  font-family: 'Roboto' !important;
 }
 #flexicontent div div [class^="fcfield-"].fcfont-icon:before,
 #flexicontent div div [class*=" fcfield-"].fcfont-icon:before,
@@ -640,85 +723,91 @@ table.fcmanlist tbody td.col_status div.statetoggler {
 #flexicontent div .fc_img_preview_btn.icon-search:after,
 #flexicontent div .fc_img_preview_btn.icon-search:before,
 #flexicontent div .fcfield-expand-view.fcfont-icon:before {
-	font-family: 'Font Awesome 5 Free', 'Font Awesome 6 Free' !important;
-	font-size: 1.4em;
+  font-family: 'Font Awesome 5 Free', 'Font Awesome 6 Free' !important;
+  font-size: 1.4em;
 }
 #flexicontent div .fa,
 #flexicontent div .fas,
 #flexicontent div [class*=" icon-"],
 #flexicontent div [class^="icon-"] {
-	font-family: 'Font Awesome 5 Free', 'Font Awesome 6 Free';
-	font-weight: 900;
+  font-family: 'Font Awesome 5 Free', 'Font Awesome 6 Free';
+  font-weight: 900;
 }
 #flexicontent div .fcfield-drag-handle.fcfont-icon:before {
-	content: "\f0b2";
+  content: "\f0b2";
 }
 #flexicontent div .fcfield-delvalue.fcfont-icon:before,
 #flexicontent div .fc_uploader_row_remove:before {
-	content: "\f2ed";
+  content: "\f2ed";
 }
 #flexicontent div .fcfield-disablevalue.fcfont-icon:before {
-	content: "\f146";
+  content: "\f146";
 }
 #flexicontent div .fcfield-insertvalue.fc_after.fcfont-icon:before {
-	content: "\f067";
-	font-size: 1em !important;
-	margin-right: 4px !important;
+  content: "\f067";
+  font-size: 1em !important;
+  margin-right: 4px !important;
 }
 #flexicontent div .fcfield-enablevalue.fcfont-icon:before {
-	content: "\f044";
+  content: "\f044";
 }
 #flexicontent div .fcfield-insertvalue.fc_before.fcfont-icon:before {
-	content: "\f3e5";
+  content: "\f3e5";
 }
 #flexicontent div .fcfield-insertvalue.fc_after.fcfont-icon:after {
-	content: "\f064";
+  content: "\f064";
 }
 #flexicontent div .fcfield-insertvalue.fc_before.fcfont-icon:after {
-	content: "\f067";
-	font-size: 1em !important;
-	margin-left: 4px !important;
+  content: "\f067";
+  font-size: 1em !important;
+  margin-left: 4px !important;
 }
 #flexicontent div .btn.fc_img_preview_btn.icon-search:after {
-	content: "\f00e";
-	font-size: 17px;
+  content: "\f00e";
+  font-size: 17px;
 }
 #flexicontent div .fcfield-uploadvalue.fcfont-icon:before {
-	content: "\f093";
+  content: "\f093";
 }
 #flexicontent div .fc-files-modal-link.fcfont-icon:before {
-	content: "\f002";
+  content: "\f002";
 }
 #flexicontent div .fcfield-clearvalue.fcfont-icon:before {
-	content: "\f12d";
+  content: "\f12d";
 }
 #flexicontent div .fcfield-addvalue.fcfont-icon:before {
-	content: "\f302";
+  content: "\f302";
 }
 #flexicontent div .fcfield-expand-view.fcfont-icon:before {
-	content: "\f337";
+  content: "\f337";
 }
 span.btn.btn-sm.toolbar.dropdown-toggle.dropdown-toggle-split.fcfield-addvalue.fcfont-icon.icon.icon- {
-	padding: 4px 7px 3px 4px !important;
+  padding: 4px 7px 3px 4px !important;
 }
+/**
+ * Fix input address field
+ */
 .addrint_autocomplete.pac-target-input {
-	line-height: 1.9rem !important;
-	height: 1.9rem !important;
-	padding: 0 8px;
-	border: 1px solid var(--template-bg-dark-20);
+  line-height: 1.9rem !important;
+  height: 1.9rem !important;
+  padding: 0 8px;
+  border: 1px solid var(--template-bg-dark-20);
 }
 label.add-on.fc-lbl-short.addrint_autocomplete-lbl {
-	line-height: 1.9rem !important;
-	height: 1.9rem !important;
-	padding: 0 8px;
-	border: 1px solid var(--template-bg-dark-20) !important;
+  line-height: 1.9rem !important;
+  height: 1.9rem !important;
+  padding: 0 8px;
+  border: 1px solid var(--template-bg-dark-20) !important;
 }
 #flexicontent a.saveorder.btn.btn-small fa,
 #flexicontent a.saveorder.btn.btn-small .fas,
 #flexicontent a.saveorder.btn.btn-small [class*=" icon-"],
 #flexicontent a.saveorder.btn.btn-small [class^="icon-"] {
-	width: 1.2em !important;
+  width: 1.2em !important;
 }
+/**
+ * Fix color of inputs
+ */
 #flexicontent .select2-container .select2-choice,
 #flexicontent div#tags #input-tags,
 #flexicontent .fc-field-props-box .fc_preview_msg,
@@ -729,8 +818,11 @@ label.add-on.fc-lbl-short.addrint_autocomplete-lbl {
 #flexicontent form .fcfield_selectmulval,
 #flexicontent form .fcfield_textval,
 #flexicontent .fc_filedata_txt {
-	border: 1px solid var(--template-bg-dark-20) !important;
+  border: 1px solid var(--template-bg-dark-20) !important;
 }
+/**
+ * Fix input margins
+ */
 .controls *:not(.input-append):not(.input-prepend):not(.input-group) > input[type="text"]:not(.minicolors),
 .controls textarea,
 .controls fieldset.radio,
@@ -738,44 +830,52 @@ label.add-on.fc-lbl-short.addrint_autocomplete-lbl {
 .flexicontent textarea,
 .flexicontent fieldset.radio,
 .flexicontent fieldset.checkbox {
-	margin: 0;
+  margin: 0;
 }
 #flexicontent .flexicontent :not(.input-prepend):not(.input-append) > input[type="text"]:not(.minicolors) {
-	margin: 0 !important;
+  margin: 0 !important;
 }
 #flexicontent input#input-tags {
-	margin: 0px !important;
+  margin: 0px !important;
 }
+/** fix state button in item list **/
 .statetoggler.fc_statebutton.btn.btn-sm.btn-outline-info.hasTooltip {
-	padding: 9px 12px !important;
+  padding: 9px 12px !important;
 }
+/** fix tab type in backend **/
 div#type_tab_all {
-	background: transparent;
+  background: transparent;
 }
+/** fix toggle associations button in backend **/
 #fc-toggle-assocs_btn span {
-	padding: 0 6px 0 0;
+  padding: 0 6px 0 0;
 }
+/** fix input search in item list **/
 .flexicontent #fc-managers-header #search {
-	border: 1px solid var(--template-bg-dark-20);
+  border: 1px solid var(--template-bg-dark-20);
 }
+/** fix dropdown button need review**/
 span.btn.btn-sm.toolbar.dropdown-toggle.dropdown-toggle-split.fcfield-addvalue.fcfont-icon.icon.icon- {
-	display: table-cell;
-	left: 1px;
-	top: 0px;
+  display: table-cell;
+  left: 1px;
+  top: 0px;
 }
+/** fix border input **/
 .select2-container-multi .select2-choices {
-	border: 1px solid var(--template-bg-dark-20) !important;
+  border: 1px solid var(--template-bg-dark-20) !important;
 }
+/** fix preview image field **/
 span.btn.fc_img_preview_btn.icon-search:before {
-	display: none;
+  display: none;
 }
 span.btn.fc_img_preview_btn.icon-search {
-	background: #fff;
-	width: 10px !important;
-	padding: 2px 5px !important;
+  background: #fff;
+  width: 10px !important;
+  padding: 2px 5px !important;
 }
+/** fix media field **/
 #flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox.fc-expanded .fc-xpended-btns {
-	display: flex !important;
+  display: flex !important;
 }
 #flexicontent form div fieldset.panelform > fieldset,
 #flexicontent form div fieldset.panelform > div > div.input-append,
@@ -791,8 +891,8 @@ span.btn.fc_img_preview_btn.icon-search {
 #flexicontent form div fieldset.panelform > select,
 #flexicontent form div fieldset.panelform > img,
 #flexicontent form div fieldset.panelform > span {
-	margin: 1px 2px 1px 2px;
-	float: left;
+  margin: 1px 2px 1px 2px;
+  float: left;
 }
 form div.container_fcfield > fieldset,
 form div.container_fcfield > div > div.input-append,
@@ -808,181 +908,197 @@ form div.container_fcfield > textarea,
 form div.container_fcfield > select,
 form div.container_fcfield > img,
 form div.container_fcfield > span {
-	margin: 0px !important;
+  margin: 0px !important;
 }
 form div.container_fcfield > input,
 form div.container_fcfield > button,
 form div.container_fcfield > textarea,
 form div.container_fcfield > select {
-	max-width: 96%;
+  max-width: 96%;
 }
+/**
+ * Used in component config screen
+ */
 body .form-grid {
-	grid-gap: 0.2rem;
+  grid-gap: 0.2rem;
+  /* Fix top padding being too much for 1st header of configuration section */
+  /* Fix placement of descriptions to be at the side */
 }
 body .form-grid > .fcsep_level0:nth-of-type(1),
 body .form-grid > .fcsep_level1:nth-of-type(1),
 body .form-grid > .fcsep_level1:nth-of-type(1) {
-	margin-top: 4px !important;
+  margin-top: 4px !important;
 }
 body .form-grid .control-group {
-	margin: 0.2rem 0;
+  margin: 0.2rem 0;
 }
 body .form-grid .control-group .control-label {
-	width: 180px;
-	padding: 0;
+  width: 180px;
+  padding: 0;
 }
 body .form-grid .control-group .control-label label {
-	padding: 0;
+  padding: 0;
 }
 body .form-grid .control-group .controls {
-	display: flex;
-	align-items: flex-start;
+  display: flex;
+  align-items: flex-start;
 }
 body .form-grid .control-group .controls > :nth-child(1) {
-	flex-grow: 0;
-	flex-shrink: 1;
-	flex-basis: auto;
-	display: flex;
-	flex-wrap: wrap;
-	margin: 0 0 0 2rem !important;
-	min-width: 20%;
+  flex-grow: 0;
+  flex-shrink: 1;
+  flex-basis: auto;
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 0 0 2rem !important;
+  min-width: 20%;
 }
 body .form-grid .control-group .controls > :nth-child(1) .btn-group {
-	flex-wrap: wrap;
+  flex-wrap: wrap;
 }
 body .form-grid .control-group .controls > :nth-child(1) .btn {
-	font-size: 0.9rem;
+  font-size: 0.9rem;
 }
 body .form-grid .control-group .controls > textarea {
-	height: auto !important;
-	max-width: 600px;
+  height: auto !important;
+  max-width: 600px;
 }
 body .form-grid .control-group .controls > input.form-control {
-	max-width: 600px;
+  max-width: 600px;
 }
 body .form-grid .control-group .controls > div {
-	flex-grow: 1;
-	flex-shrink: 1;
-	display: flex;
-	flex-basis: 40%;
-	margin: 0 0 0 2rem !important;
+  flex-grow: 1;
+  flex-shrink: 1;
+  display: flex;
+  flex-basis: 40%;
+  margin: 0 0 0 2rem !important;
 }
 #flexicontent .fc-xpended-btns > [class^="fcfield-"],
 #flexicontent .fc-xpended-btns > [class*=" fcfield-"],
 #flexicontent .fc-xpended-btns > .fcfield-button-add a {
-	line-height: 1.6rem !important;
+  line-height: 1.6rem !important;
 }
 #flexicontent .fc-xpended-btns {
-	height: 2.74rem;
+  height: 2.74rem;
 }
+/*** correct order filter type **/
 .input-group-text.fc-lbl-inverted.fc-lbl-short.icon-info-2.hasPopover,
 .fc-filter.nowrap_box .input-group-text.fc-lbl-inverted.fc-lbl-short {
-	font-family: inherit !important;
+  font-family: inherit !important;
 }
+/** fix table list **/
 .adminlist thead {
-	background-color: var(--table-bg);
-	border-bottom-width: 1px;
-	box-shadow: inset 0 0 0 9999px var(--table-accent-bg);
-	padding: 0.75rem 1rem;
+  background-color: var(--table-bg);
+  border-bottom-width: 1px;
+  box-shadow: inset 0 0 0 9999px var(--table-accent-bg);
+  padding: 0.75rem 1rem;
 }
 span.icon-menu-2.btn.btn-micro {
-	border: 0 !important;
+  border: 0 !important;
 }
+/** fix group button border **/
 .input-prepend.input-append .add-on:not(:last-child),
 .input-prepend.input-append .add-on:not(:last-child) > * {
-	border-top-left-radius: .25rem;
-	border-bottom-left-radius: .25rem;
+  border-top-left-radius: 0.25rem;
+  border-bottom-left-radius: 0.25rem;
 }
 #flexicontent div.input-group-addon > *:not(:first-child),
 #flexicontent div.input-prepend > *:not(:first-child),
 #flexicontent div.input-group-addon > *:not(:first-child) > *,
 #flexicontent div.input-prepend > *:not(:first-child) > * {
-	border-top-right-radius: .25rem !important;
-	border-bottom-right-radius: .25rem !important;
+  border-top-right-radius: 0.25rem !important;
+  border-bottom-right-radius: 0.25rem !important;
 }
+/** dropdown button in group **/
 span.btn.btn-sm.toolbar.dropdown-toggle.dropdown-toggle-split.fcfield-addvalue.fcfont-icon.icon.icon- {
-	height: 2.62rem !important;
+  height: 2.62rem !important;
 }
 span.btn.btn-sm.toolbar.dropdown-toggle.dropdown-toggle-split.fcfield-addvalue.fcfont-icon.icon.icon-.dropdown-toggle:after {
-	margin-top: 18px !important;
+  margin-top: 18px !important;
 }
+/*span.fcfield-disablevalue.fcfont-icon.icon.icon- {
+	height: 1.5rem !important;
+}*/
 body .ui-widget-header {
-	border: 1px solid #fff !important;
-	background: #fff !important;
-	color: var(--template-bg-dark-50) !important;
-	border-bottom: 1px solid #ccc !important;
+  border: 1px solid #fff !important;
+  background: #fff !important;
+  color: var(--template-bg-dark-50) !important;
+  border-bottom: 1px solid #ccc !important;
 }
 body .ui-widget-overlay {
-	background: #aaa;
-	opacity: .5;
+  background: #aaa;
+  opacity: 0.5;
 }
 #flexicontent .subform-repeatable-wrapper.subform-layout .btn-outline-info.active,
 .subform-repeatable-wrapper.subform-layout a.btn.btn-small,
 .subform-repeatable-wrapper.subform-layout .btn-outline-info,
 #flexicontent .subform-repeatable-wrapper.subform-layout .btn.btn-sm {
-	background: #000 !important;
+  background: #000 !important;
+  /*** need more css for good color ***/
 }
 #flexicontent .nav.nav-tabs.nav-stacked li {
-	width: 24%;
-	border: 1px solid #ccc;
-	margin: 5px;
-	padding: 1.5rem;
-	border-radius: 5px;
-	background: var(--template-bg-dark-10) !important;
-	box-shadow: 0 2px 10px -8px var(--template-bg-dark-50);
-	font-weight: bold;
+  width: 24%;
+  border: 1px solid #ccc;
+  margin: 5px;
+  padding: 1.5rem;
+  border-radius: 5px;
+  background: var(--template-bg-dark-10) !important;
+  box-shadow: 0 2px 10px -8px var(--template-bg-dark-50);
+  font-weight: bold;
 }
 #flexicontent .nav.nav-tabs.nav-stacked small.muted {
-	clear: both;
-	display: block;
+  clear: both;
+  display: block;
 }
+/*** override tabs in backend for using atumn var***/
 body .s-cblue ul.tabbernav > li.tabberactive a:before,
 #flexicontent .s-cblue ul.tabbernav > li.tabberactive a:before {
-	border-top: 4px solid var(--template-bg-dark-50) !important;
+  border-top: 4px solid var(--template-bg-dark-50) !important;
 }
 body .s-cblue ul.tabbernav > li:hover a,
 #flexicontent .s-cblue ul.tabbernav > li:hover a {
-	border-top: 1px solid var(--template-bg-dark-50) !important;
-	border-right: 1px solid var(--template-bg-dark-50) !important;
-	border-left: 1px solid var(--template-bg-dark-50) !important;
-	background-color: var(--template-bg-dark-50) !important;
-	background: var(--template-bg-dark-50) !important;
+  border-top: 1px solid var(--template-bg-dark-50) !important;
+  border-right: 1px solid var(--template-bg-dark-50) !important;
+  border-left: 1px solid var(--template-bg-dark-50) !important;
+  background-color: var(--template-bg-dark-50) !important;
+  background: var(--template-bg-dark-50) !important;
 }
 body ul.tabbernav > li.tabberactive a:before,
 #flexicontent ul.tabbernav > li.tabberactive a:before {
-	border-top: 4px solid var(--template-bg-dark-50) !important;
+  border-top: 4px solid var(--template-bg-dark-50) !important;
 }
 body ul.tabbernav > li > a,
 #flexicontent ul.tabbernav > li > a {
-	color: var(--template-bg-dark-50) !important;
+  color: var(--template-bg-dark-50) !important;
 }
 #flexicontent ul.tabbernav > li.tabberactive a {
-	border-right: 1px solid var(--template-bg-dark-50) !important;
+  border-right: 1px solid var(--template-bg-dark-50) !important;
 }
 body ul.tabbernav > li.tabberactive a:hover,
 #flexicontent ul.tabbernav > li.tabberactive a:hover,
 body ul.tabbernav > li:hover a,
 #flexicontent ul.tabbernav > li:hover a {
-	background-color: var(--template-bg-dark-50) !important;
-	background: var(--template-bg-dark-50) !important;
-	color: #fff !important;
-	border-top: 1px solid var(--template-bg-dark-50) !important;
-	border-right: 1px solid var(--template-bg-dark-50) !important;
-	border-left: 1px solid var(--template-bg-dark-50) !important;
+  background-color: var(--template-bg-dark-50) !important;
+  background: var(--template-bg-dark-50) !important;
+  color: #fff !important;
+  border-top: 1px solid var(--template-bg-dark-50) !important;
+  border-right: 1px solid var(--template-bg-dark-50) !important;
+  border-left: 1px solid var(--template-bg-dark-50) !important;
 }
 body .tabbertab,
 #flexicontent .tabbertab {
-	padding: 30px 2vw;
-	border-radius: 0.25rem;
-	box-shadow: 0 2px 10px -8px var(--template-bg-dark-50);
+  padding: 30px 2vw;
+  border-radius: 0.25rem;
+  box-shadow: 0 2px 10px -8px var(--template-bg-dark-50);
 }
+/* More compact display */
 body div .form-horizontal .control-group,
 body div .control-group {
-	margin: 0.2rem 0;
+  margin: 0.2rem 0;
 }
 div.flexicontent .sidebar-nav li a:before {
-	content: '';
+  content: '';
 }
+/*** table version **/
 table#version_tbl td.versions {
   border-bottom: 0px dotted silver;
   padding: 10px 20px;
@@ -990,6 +1106,7 @@ table#version_tbl td.versions {
 div table.fc-table-list tr:nth-child(odd) td {
   background: initial;
 }
+/*** dark mode joomla 5 ***/
 @media (prefers-color-scheme: dark) {
   div#fc-dash-boardbtns .fc-board-button {
     background-color: var(--bg-color);
@@ -1115,5 +1232,11 @@ div table.fc-table-list tr:nth-child(odd) td {
     margin: 16px;
     text-align: left;
     min-width: initial;
+  }
+  #fctoolbar.btn-toolbar > * .btn:hover,
+  #toolbar.btn-toolbar > * .btn:hover {
+    color: #ffffffe6;
+    background-color: var(--template-bg-dark-60);
+    border-color: var(--template-bg-dark-60);
   }
 }
