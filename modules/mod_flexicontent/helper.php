@@ -545,7 +545,7 @@ class modFlexicontentHelper
 						FlexicontentFields::loadFieldConfig($hitsfield, $row);
 						$lists[$ord]['featured'][$i]->hits_rendered .= $params->get('hits_label_feat') ? '<span class="hits_label_feat">'.\Joomla\CMS\Language\Text::_($hitsfield->label).'</span> ' : '';
 						$lists[$ord]['featured'][$i]->hits_rendered .= $hits_icon;
-						$lists[$ord]['featured'][$i]->hits_rendered .= ' ('.$row->hits.(!$params->get('hits_label_feat') ? ' '.JTEXT::_('FLEXI_HITS_L') : '').')';
+						$lists[$ord]['featured'][$i]->hits_rendered .= ' ('.$row->hits.(!$params->get('hits_label_feat') ? ' '. \Joomla\CMS\Language\Text::_('FLEXI_HITS_L') : '').')';
 					}
 
 					$lists[$ord]['featured'][$i]->voting = '';
@@ -564,7 +564,7 @@ class modFlexicontentHelper
 						$lists[$ord]['featured'][$i]->comments = $row->comments_total;
 						$lists[$ord]['featured'][$i]->comments_rendered = $params->get('comments_label_feat') ? '<span class="comments_label_feat">'.\Joomla\CMS\Language\Text::_('FLEXI_COMMENTS').'</span> ' : '';
 						$lists[$ord]['featured'][$i]->comments_rendered .= $comments_icon;
-						$lists[$ord]['featured'][$i]->comments_rendered .= ' ('.$row->comments_total.(!$params->get('comments_label_feat') ? ' '.JTEXT::_('FLEXI_COMMENTS_L') : '').')';
+						$lists[$ord]['featured'][$i]->comments_rendered .= ' ('.$row->comments_total.(!$params->get('comments_label_feat') ? ' '. \Joomla\CMS\Language\Text::_('FLEXI_COMMENTS_L') : '').')';
 					}
 
 					$lists[$ord]['featured'][$i]->catid = $row->catid;
@@ -737,7 +737,7 @@ class modFlexicontentHelper
 						FlexicontentFields::loadFieldConfig($hitsfield, $row);
 						$lists[$ord]['standard'][$i]->hits_rendered .= $params->get('hits_label') ? '<span class="hits_label">'.\Joomla\CMS\Language\Text::_($hitsfield->label).'</span> ' : '';
 						$lists[$ord]['standard'][$i]->hits_rendered .= $hits_icon;
-						$lists[$ord]['standard'][$i]->hits_rendered .= ' ('.$row->hits.(!$params->get('hits_label') ? ' '.JTEXT::_('FLEXI_HITS_L') : '').')';
+						$lists[$ord]['standard'][$i]->hits_rendered .= ' ('.$row->hits.(!$params->get('hits_label') ? ' '. \Joomla\CMS\Language\Text::_('FLEXI_HITS_L') : '').')';
 					}
 
 					$lists[$ord]['standard'][$i]->voting = '';
@@ -756,7 +756,7 @@ class modFlexicontentHelper
 						$lists[$ord]['standard'][$i]->comments = $row->comments_total;
 						$lists[$ord]['standard'][$i]->comments_rendered = $params->get('comments_label') ? '<span class="comments_label">'.\Joomla\CMS\Language\Text::_('FLEXI_COMMENTS').'</span> ' : '';
 						$lists[$ord]['standard'][$i]->comments_rendered .= $comments_icon;
-						$lists[$ord]['standard'][$i]->comments_rendered .= ' ('.$row->comments_total.(!$params->get('comments_label') ? ' '.JTEXT::_('FLEXI_COMMENTS_L') : '').')';
+						$lists[$ord]['standard'][$i]->comments_rendered .= ' ('.$row->comments_total.(!$params->get('comments_label') ? ' '. \Joomla\CMS\Language\Text::_('FLEXI_COMMENTS_L') : '').')';
 					}
 
 					$lists[$ord]['standard'][$i]->catid = $row->catid;

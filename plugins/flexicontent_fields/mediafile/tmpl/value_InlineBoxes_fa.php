@@ -125,7 +125,7 @@ foreach($values as $file_id)
 		$lang = '<span class="fcfile_lang fc-iblock">';
 
 		$lang .= $display_lang == 1 || $display_lang == 3 ? '<span class="icon-flag fcicon-lang"></span> ' : '';
-		$lang .= $display_lang == 2 || $display_lang == 3 ? '<span class="fcfile_lang_label label">' .JTEXT::_('FLEXI_LANGUAGE'). '</span> ' : '';
+		$lang .= $display_lang == 2 || $display_lang == 3 ? '<span class="fcfile_lang_label label">' . \Joomla\CMS\Language\Text::_('FLEXI_LANGUAGE'). '</span> ' : '';
 		$lang .=
 		'<span class="fcfile_lang_value value">'
 			. ($file_data->language === '*' ? \Joomla\CMS\Language\Text::_('FLEXI_FIELD_FILE_ALL_LANGS') : $langs->{$file_data->language}->name) .
@@ -146,7 +146,7 @@ foreach($values as $file_id)
 		<span class="fcfile_size fc-iblock">';
 
 		$sizeinfo .= $display_size == 1 || $display_size == 3 ? '<span class="icon-archive fcicon-size"></span> ' : '';
-		$sizeinfo .= $display_size == 2 || $display_size == 3 ? '<span class="fcfile_size_label label">' . JTEXT::_('FLEXI_FIELD_FILE_SIZE') . '</span> ' : '';
+		$sizeinfo .= $display_size == 2 || $display_size == 3 ? '<span class="fcfile_size_label label">' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD_FILE_SIZE') . '</span> ' : '';
 
 		if (!is_numeric($_size))
 		{
@@ -154,15 +154,15 @@ foreach($values as $file_id)
 		}
 		elseif ($_size < 1048576)
 		{
-			$sizeinfo .= '<span class="fcfile_size_value value">' . number_format($_size / 1024, 0) . '&nbsp;'.JTEXT::_('FLEXI_FIELD_FILE_KBS').'</span>';
+			$sizeinfo .= '<span class="fcfile_size_value value">' . number_format($_size / 1024, 0) . '&nbsp;'. \Joomla\CMS\Language\Text::_('FLEXI_FIELD_FILE_KBS').'</span>';
 		}
 		elseif ($_size < 1073741824)
 		{
-			$sizeinfo .= '<span class="fcfile_size_value value">' . number_format($_size / 1048576, 2) . '&nbsp;'.JTEXT::_('FLEXI_FIELD_FILE_MBS').'</span>';
+			$sizeinfo .= '<span class="fcfile_size_value value">' . number_format($_size / 1048576, 2) . '&nbsp;'. \Joomla\CMS\Language\Text::_('FLEXI_FIELD_FILE_MBS').'</span>';
 		}
 		else
 		{
-			$sizeinfo .= '<span class="fcfile_size_value value">' . number_format($_size / 1073741824, 2) . '&nbsp;'.JTEXT::_('FLEXI_FIELD_FILE_GBS').'</span>';
+			$sizeinfo .= '<span class="fcfile_size_value value">' . number_format($_size / 1073741824, 2) . '&nbsp;'. \Joomla\CMS\Language\Text::_('FLEXI_FIELD_FILE_GBS').'</span>';
 		}
 
 		$sizeinfo .= '</span>';
@@ -180,7 +180,7 @@ foreach($values as $file_id)
 		<span class="fcfile_hits fc-iblock">';
 
 		$hits .= $display_hits == 1 || $display_hits == 3 ? '<span class="icon-eye fcicon-hits"></span> ' : '';
-		$hits .= $display_hits == 2 || $display_hits == 3 ? '<span class="fcfile_hits_label label">' .JTEXT::_('FLEXI_FIELD_FILE_HITS'). '</span> ' : '';
+		$hits .= $display_hits == 2 || $display_hits == 3 ? '<span class="fcfile_hits_label label">' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD_FILE_HITS'). '</span> ' : '';
 		$hits .= '<span class="fcfile_hits_value value">'.$file_data->hits.'</span>';
 
 		$hits .= '</span>';
@@ -237,7 +237,7 @@ foreach($values as $file_id)
 			$descr_icon = '
 			<span class="fcfile_descr_tip">
 				<span class="fcfile_descr_tip_label label">
-					' .JTEXT::_('FLEXI_DESCRIPTION'). '
+					' . \Joomla\CMS\Language\Text::_('FLEXI_DESCRIPTION'). '
 				</span>
 				'. $descr_icon . '
 			</span>

@@ -360,7 +360,8 @@ class flexicontent_html
 		}
 		$_domain = $domain;  // pass it back by reference
 
-		$link = $domain . \Joomla\CMS\Router\Route::_('index.php?' . http_build_query($app->getRouter()->getVars()), false);
+        $router = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Router\SiteRouter::class);
+		$link = $domain . \Joomla\CMS\Router\Route::_('index.php?' . http_build_query($router->getVars()), false);
 
 		return $link;
 	}

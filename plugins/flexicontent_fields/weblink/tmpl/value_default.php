@@ -149,7 +149,7 @@ foreach ($values as $value)
 		$hits_html = '
 			<span class="fcweblink_hits">
 				' . ( $add_hits_img && $hits_icon ? sprintf($hits_icon, $hits) : '') . '
-				' . ( $add_hits_txt ? '(' . $hits . '&nbsp;' . JTEXT::_('FLEXI_HITS') . ')' : '') . '
+				' . ( $add_hits_txt ? '(' . $hits . '&nbsp;' . \Joomla\CMS\Language\Text::_('FLEXI_HITS') . ')' : '') . '
 			</span>';
 
 		if ($prop == 'display_hitsonly')
