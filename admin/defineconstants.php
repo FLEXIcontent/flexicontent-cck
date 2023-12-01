@@ -61,6 +61,7 @@ if (!defined('FLEXI_J30GE'))   define('FLEXI_J30GE', true );
 if (!defined('FLEXI_J37GE'))   define('FLEXI_J37GE', version_compare( $jversion->getShortVersion(), '3.6.99', '>' ) );
 if (!defined('FLEXI_J38GE'))   define('FLEXI_J38GE', version_compare( $jversion->getShortVersion(), '3.7.99', '>' ) );
 if (!defined('FLEXI_J40GE'))   define('FLEXI_J40GE', version_compare( $jversion->getShortVersion(), '3.99.99', '>' ) );
+if (!defined('FLEXI_J50GE'))   define('FLEXI_J50GE', version_compare( $jversion->getShortVersion(), '4.99.99', '>' ) );
 
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 
@@ -111,6 +112,36 @@ if (FLEXI_J40GE)
 		{
 			return self::$instance ?: (self::$instance = new static);
 		}
+	}
+}
+
+// J3 backwards compatibility fixes.
+if(FLEXI_J50GE)
+{
+    // make sure no other component has redefined these classes
+	if(!class_exists('JFormFieldSpacer'))
+	{
+	     class JFormFieldSpacer extends \Joomla\CMS\Form\Field\SpacerField{}
+	}
+
+	if(!class_exists('JFormFieldGroupedList'))
+	{
+		class JFormFieldGroupedList extends \Joomla\CMS\Form\Field\GroupedlistField {}
+	}
+
+	if(!class_exists('JFormFieldRadio'))
+	{
+		class JFormFieldRadio extends \Joomla\CMS\Form\Field\RadioField {}
+	}
+
+	if(!class_exists('JFormFieldList'))
+	{
+		class JFormFieldList extends \Joomla\CMS\Form\Field\ListField {}
+	}
+
+	if(!class_exists('JHTMLSelect'))
+	{
+		class JHTMLSelect extends \Joomla\CMS\HTML\Helpers\Select {}
 	}
 }
 

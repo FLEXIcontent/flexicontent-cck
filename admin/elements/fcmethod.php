@@ -32,7 +32,7 @@ jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-class JFormFieldFcmethod extends \Joomla\CMS\Form\Field\RadioField
+class JFormFieldFcmethod extends JFormFieldRadio
 {
 	/**
 	 * Element name

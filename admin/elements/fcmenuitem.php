@@ -35,7 +35,7 @@ require_once realpath(JPATH_ADMINISTRATOR . '/components/com_menus/helpers/menus
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-class JFormFieldFcMenuitem extends \Joomla\CMS\Form\Field\GroupedlistField
+class JFormFieldFcMenuitem extends JFormFieldGroupedList
 {
 	/**
 	 * The form field type.

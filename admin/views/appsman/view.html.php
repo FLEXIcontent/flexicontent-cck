@@ -114,7 +114,11 @@ class FlexicontentViewAppsman extends \Joomla\CMS\MVC\View\HtmlView
 		// ***
 
 		$this->setLayout('import');
-		$this->sidebar = FLEXI_J30GE ? \Joomla\CMS\HTML\Helpers\Sidebar::render() : null;
+
+		$this->sidebar = null;
+
+		if(FLEXI_J30GE && !FLEXI_J40GE) $this->sidebar = JHtmlSidebar::render();
+		if(FLEXI_J40GE) $this->sidebar = \Joomla\CMS\HTML\Helpers\Sidebar::render();
 		
 		
 		// Execute the import task, load the log-like AJAX-based layout (import_process.php), to display results including any warnings

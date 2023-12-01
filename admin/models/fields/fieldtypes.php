@@ -27,7 +27,7 @@ jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
  * @subpackage	FLEXIcontent
  * @since		1.0
  */
-class JFormFieldFieldtypes extends \Joomla\CMS\Form\Field\ListField
+class JFormFieldFieldtypes extends JFormFieldList
 {
 	/**
 	 * The form field type.

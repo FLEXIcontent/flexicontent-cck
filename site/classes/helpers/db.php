@@ -1378,14 +1378,16 @@ class flexicontent_db
 			$query = 'UPDATE #__tags SET parent_id = 1 WHERE parent_id = 0 AND id <> 1';
 			$db->setQuery($query)->execute();
 
-			$tbl = Table::getInstance('Tag', 'TagsTable');
-
-			if(FLEXI_J40GE && !$tbl)
+			if(FLEXI_J40GE)
 			{
 				$tbl = \Joomla\CMS\Factory::getApplication()
 					->bootComponent('com_tags')
 					->getMVCFactory()
 					->createTable('Tag', 'Administrator');
+			} else
+			{
+				JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tags/tables');
+				$tbl = JTable::getInstance('Tag', 'TagsTable');
 			}
 
 			$tbl->rebuild();

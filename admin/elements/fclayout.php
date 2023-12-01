@@ -38,7 +38,7 @@ jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
  * @subpackage  Form
  * @since       1.5
  */
-class JFormFieldFclayout extends \Joomla\CMS\Form\Field\GroupedlistField
+class JFormFieldFclayout extends JFormFieldGroupedList
 {
 	/**
 	 * The form field type.

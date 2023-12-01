@@ -742,7 +742,10 @@ class FLEXIUtilities
 		$view = $jinput->get('view', 'flexicontent', 'cmd');
 
 		// Create Submenu, Dashboard (HOME is always added, other will appear only if post-installation tasks are done)
-		$addEntry = array(FLEXI_J30GE ? '\Joomla\CMS\HTML\Helpers\Sidebar' : 'JSubMenuHelper', 'addEntry');
+		$addEntry = array('JSubMenuHelper', 'addEntry');
+
+		if(FLEXI_J30GE) $addEntry[0] = 'JHtmlSidebar';
+		if(FLEXI_J40GE) $addEntry[0] = '\Joomla\CMS\HTML\Helpers\Sidebar';
 
 		call_user_func($addEntry, '<h2 class="fcsbnav-content-editing">'.\Joomla\CMS\Language\Text::_( 'FLEXI_NAV_SD_CONTENT_EDITING' ).'</h2>', '', '');
 		call_user_func($addEntry, '<span class="fcsb-icon-flexicontent icon-home"></span>'.\Joomla\CMS\Language\Text::_( 'FLEXI_HOME' ), 'index.php?option=com_flexicontent', !$view || $view=='flexicontent');

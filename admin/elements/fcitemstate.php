@@ -33,7 +33,7 @@ jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-class JFormFieldFcitemstate extends \Joomla\CMS\Form\Field\ListField
+class JFormFieldFcitemstate extends JFormFieldList
 {
 	/**
 	 * Element name

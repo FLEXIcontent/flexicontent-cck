@@ -20,7 +20,7 @@ jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
  *
  * @since  3.2
  */
-class JFormFieldFcauthor extends \Joomla\CMS\Form\Field\ListField
+class JFormFieldFcauthor extends JFormFieldList
 {
 	/**
 	 * The form field type.

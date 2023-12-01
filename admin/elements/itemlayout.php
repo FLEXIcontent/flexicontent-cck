@@ -26,7 +26,7 @@ if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
 jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
+jimport('cms.html.select');    // JHTMLSelect
 
 jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 \Joomla\CMS\Form\FormHelper::loadFieldClass('list');   // \Joomla\CMS\Form\Field\ListField
@@ -43,7 +43,7 @@ jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
  * @subpackage	FLEXIcontent
  * @since		1.0
  */
-class JFormFieldItemlayout extends \Joomla\CMS\Form\Field\ListField
+class JFormFieldItemlayout extends JFormFieldList
 {
 	/**
 	 * The form field type.
@@ -339,17 +339,17 @@ jQuery(document).ready(function() {
 
 		if (@$attributes['firstoption'])
 		{
-			$layouts[] = \Joomla\CMS\HTML\Helpers\Select::option('', \Joomla\CMS\Language\Text::_($attributes['firstoption']));
+			$layouts[] = JHTMLSelect::option('', \Joomla\CMS\Language\Text::_($attributes['firstoption']));
 		}
 		elseif ($view !== 'type')
 		{
 			$type_layout = ($attributes['name'] == 'ilayout_mobile') ? $type_default_layout_mobile : $type_default_layout;
-			$layouts[] = \Joomla\CMS\HTML\Helpers\Select::option('', \Joomla\CMS\Language\Text::_( 'FLEXI_TYPE_DEFAULT' ) .' :: '. $type_layout .' ::' );
+			$layouts[] = JHTMLSelect::option('', \Joomla\CMS\Language\Text::_( 'FLEXI_TYPE_DEFAULT' ) .' :: '. $type_layout .' ::' );
 		}
 
 		foreach ($tmpls as $tmpl)
 		{
-			$layouts[] = \Joomla\CMS\HTML\Helpers\Select::option($tmpl->name, $tmpl->name);
+			$layouts[] = JHTMLSelect::option($tmpl->name, $tmpl->name);
 		}
 		
 		$fieldname	= $this->name;

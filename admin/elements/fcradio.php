@@ -34,7 +34,7 @@ jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 /**
  * Renders a radio-set element
  */
-class JFormFieldFcradio extends \Joomla\CMS\Form\Field\RadioField
+class JFormFieldFcradio extends JFormFieldRadio
 {
 
  /**

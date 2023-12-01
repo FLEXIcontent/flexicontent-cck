@@ -212,9 +212,9 @@ class FlexicontentModelGroups extends FCModelAdminList
 	/**
 	 * Method to build the where clause of the query for the records
 	 *
-	 * @param		\Joomla\Database\DatabaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
+	 * @param		JDatabaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
 	 *
-	 * @return  \Joomla\Database\DatabaseQuery|array
+	 * @return  JDatabaseQuery|array
 	 *
 	 * @since   3.3.0
 	 */
@@ -226,7 +226,7 @@ class FlexicontentModelGroups extends FCModelAdminList
 		// Various filters
 
 
-		if ($q instanceof \Joomla\Database\DatabaseQuery)
+		if ($q instanceof JDatabaseQuery || (FLEXI_J40GE && $q instanceof \Joomla\Database\DatabaseQuery))
 		{
 			return $where ? $q->where($where) : $q;
 		}

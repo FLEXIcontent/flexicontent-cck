@@ -35,7 +35,7 @@ jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-class JFormFieldSeparator extends \Joomla\CMS\Form\Field\SpacerField
+class JFormFieldSeparator extends JFormFieldSpacer
 {
 	/**
 	 * Element name

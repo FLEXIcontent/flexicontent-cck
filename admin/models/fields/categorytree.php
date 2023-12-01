@@ -27,7 +27,7 @@ jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
  * @subpackage	com_categories
  * @since		1.6
  */
-class JFormFieldCategorytree extends \Joomla\CMS\Form\Field\ListField
+class JFormFieldCategorytree extends JFormFieldList
 {
 	/**
 	 * The form field type.

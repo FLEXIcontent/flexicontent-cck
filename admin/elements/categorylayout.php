@@ -43,7 +43,7 @@ jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
  * @subpackage	FLEXIcontent
  * @since		1.0
  */
-class JFormFieldCategorylayout extends \Joomla\CMS\Form\Field\ListField
+class JFormFieldCategorylayout extends JFormFieldList
 {
 	/**
 	 * The form field type.
@@ -290,16 +290,16 @@ jQuery(document).ready(function() {
 
 		if (@$attributes['firstoption'])
 		{
-			$layouts[] = \Joomla\CMS\HTML\Helpers\Select::option('', \Joomla\CMS\Language\Text::_($attributes['firstoption']));
+			$layouts[] = JHTMLSelect::option('', \Joomla\CMS\Language\Text::_($attributes['firstoption']));
 		}
 		else
 		{
-			$layouts[] = \Joomla\CMS\HTML\Helpers\Select::option('', '-- '.\Joomla\CMS\Language\Text::_( 'FLEXI_USE_GLOBAL' ). ' --');
+			$layouts[] = JHTMLSelect::option('', '-- '.\Joomla\CMS\Language\Text::_( 'FLEXI_USE_GLOBAL' ). ' --');
 		}
 
 		foreach ($tmpls as $tmpl)
 		{
-			$layouts[] = \Joomla\CMS\HTML\Helpers\Select::option($tmpl->name, $tmpl->name);
+			$layouts[] = JHTMLSelect::option($tmpl->name, $tmpl->name);
 		}
 		
 		$fieldname	= $this->name;

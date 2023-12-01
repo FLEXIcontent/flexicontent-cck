@@ -32,7 +32,7 @@ jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-class JFormFieldFcordering extends \Joomla\CMS\Form\Field\ListField
+class JFormFieldFcordering extends JFormFieldList
 {
 	/**
 	 * Element name

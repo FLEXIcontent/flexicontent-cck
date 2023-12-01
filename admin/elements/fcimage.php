@@ -33,7 +33,7 @@ jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
- class JFormFieldFcimage extends \Joomla\CMS\Form\Field\GroupedlistField
+ class JFormFieldFcimage extends JFormFieldGroupedList
 {
 	/**
 	 * Element name

@@ -647,7 +647,7 @@ class FlexicontentModelTags extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 		{
 			// Load by module id
 			$module_id = $jinput->getInt('module', 0);
-			$module   = \Joomla\CMS\Table\Table::getInstance('Module', '\Joomla\CMS\Table\Table');
+			$module   = \Joomla\CMS\Table\Table::getInstance('Module', 'JTable');
 
 			if ($module->load($module_id))
 			{

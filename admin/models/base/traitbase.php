@@ -80,9 +80,9 @@ trait FCModelTraitBase
 	/**
 	 * Returns where conditions that must always be applied
 	 *
-	 * @param		\Joomla\Database\DatabaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
+	 * @param		JDatabaseQuery|bool   $q   DB Query object or bool to indicate returning an array or rendering the clause
 	 *
-	 * @return  \Joomla\Database\DatabaseQuery|array
+	 * @return  JDatabaseQuery|array
 	 *
 	 * @since   3.3.0
 	 */
@@ -95,7 +95,7 @@ trait FCModelTraitBase
 			$where[] = $this->_db->quoteName($n) . ' = ' .  $this->_db->Quote($v);
 		}
 
-		if ($q instanceof \Joomla\Database\DatabaseQuery)
+		if ($q instanceof JDatabaseQuery || (FLEXI_J40GE && $q instanceof \Joomla\Database\DatabaseQuery))
 		{
 			return $where ? $q->where($where) : $q;
 		}

@@ -360,7 +360,7 @@ class flexicontent_html
 		}
 		$_domain = $domain;  // pass it back by reference
 
-        $router = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Router\SiteRouter::class);
+        $router = FLEXI_J40GE ? \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Router\SiteRouter::class) : $app->getRouter();
 		$link = $domain . \Joomla\CMS\Router\Route::_('index.php?' . http_build_query($router->getVars()), false);
 
 		return $link;
@@ -6221,7 +6221,6 @@ class flexicontent_html
 			// This also works in J4 
 			// return $url = \Joomla\CMS\Router\Route::link('site', $url);
 
-//			$router = Router::getInstance('site');  // ALTERNATIVE: CMSApplication::getInstance('site')->getRouter('site');
 			$router = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Router\SiteRouter::class);
             $url = $router->build($url);
 			$url = $url->toString();

@@ -36,7 +36,7 @@ jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 * Renders a multiple select element
 *
 */
-class JFormFieldMultiList extends \Joomla\CMS\Form\Field\GroupedlistField
+class JFormFieldMultiList extends JFormFieldGroupedList
 {
 	protected $_options;
 	protected $_inherited;
