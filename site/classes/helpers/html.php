@@ -3574,7 +3574,7 @@ class flexicontent_html
 			// Given CATEGORY VIEW OBJECT may limit to specific category ids
 			$canAdd = $user->authorise('core.create', 'com_flexicontent');
 
-			if ($canAdd === NULL && $user->id)
+			if (!$canAdd && $user->id)
 			{
 				/**
 				 * Performance concern (NULL for $canAdd) means SOFT DENY, also check for logged user
@@ -3630,7 +3630,7 @@ class flexicontent_html
 		{
 			$link  = 'index.php?option=com_flexicontent' . ($menu_itemid
 				? '&amp;Itemid='.$menu_itemid
-				: '&amp;view='.FLEXI_ITEMVIEW.'&amp;task=items.add'
+				: '&amp;view='.FLEXI_ITEMVIEW.'&amp;task=items.add&amp;id=0'
 			);			
 			$link  = JRoute::_( $link);
 		}

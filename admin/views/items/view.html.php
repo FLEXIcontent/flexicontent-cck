@@ -1323,7 +1323,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 
 				$btn_title = JText::_('FLEXI_NEW', true) . ' ' . $types[$typeid]->name;
 				$btn_info  = flexicontent_html::encodeHTML(JText::_('FLEXI_ADD_ITEM_OF_CURRENT_TYPE'), 2);
-				$task_url  = JUri::base(true) . '/index.php?option=com_flexicontent&controller=items&task=items.add'
+				$task_url  = JUri::base(true) . '/index.php?option=com_flexicontent&controller=items&task=items.add&cid=0&id=0'
 					. '&typeid=' . $filter_type[0] . '&catid=' . $filter_cats . '&' . JSession::getFormToken() . '=1';
 
 				$full_js   = "window.location.replace('" . $task_url . "')";

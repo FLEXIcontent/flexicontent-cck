@@ -27,20 +27,21 @@ echo '
 		';
 		$link = 'index.php?option=com_flexicontent&amp;view=item'
 			. '&amp;task=' . $ctrl_task
+			. '&amp;id=0'
 			. '&amp;catid=' . $catid
 			. ($menu_id ? '&amp;Itemid=' . $menu_id : '')
 			. '&amp;return='.base64_encode($returnURL)
 			. '&amp;' . JSession::getFormToken() . '=1';
 		$_name = '- ' . JText::_("FLEXI_NO_TYPE") . ' -';
 		?>
-			<li>
+			<?php /*<li>
 				<a class="<?php echo $btn_class; ?>" href="<?php echo $link; ?>" target="_parent">
 					<?php echo $_name; ?>
 					<small class="muted">
 						<?php echo JText::_('FLEXI_NEW_ITEM_FORM_NO_TYPE_DESC'); ?>
 					</small>
 				</a>
-			</li>
+			</li>*/ ?>
 
 		<?php
 		foreach($types as $type)
@@ -98,6 +99,7 @@ echo '
 				{
 					$link = 'index.php?option=com_flexicontent&amp;view=item'
 						. '&amp;task=' . $ctrl_task
+						. '&amp;id=0'
 						. '&amp;typeid=' . $type->id
 						. '&amp;catid=' . $catid
 						. ($menu_id ? '&amp;Itemid=' . $menu_id : '')
