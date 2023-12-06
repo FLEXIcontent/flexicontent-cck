@@ -1325,8 +1325,8 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				$types = is_array($types) ? $types : array();
 
 				$btn_title = \Joomla\CMS\Language\Text::_('FLEXI_NEW', true) . ' ' . $types[$typeid]->name;
-				$btn_info  = flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_ADD_ITEM_OF_CURRENT_TYPE'), 2);
-				$task_url  = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&controller=items&task=items.add'
+				$btn_info  = flexicontent_html::encodeHTML(Joomla\CMS\Language\Text::_('FLEXI_ADD_ITEM_OF_CURRENT_TYPE'), 2);
+				$task_url  = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&controller=items&task=items.add&cid=0&id=0'
 					. '&typeid=' . $filter_type[0] . '&catid=' . $filter_cats . '&' . \Joomla\CMS\Session\Session::getFormToken() . '=1';
 
 				$full_js   = "window.location.replace('" . $task_url . "')";

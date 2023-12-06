@@ -452,7 +452,7 @@ class plgSystemFlexisystem extends CMSPlugin
 			switch ($task)
 			{
 				case 'add':
-					$redirectURL = 'index.php?option=' . $this->extension . '&task=items.add';
+					$redirectURL = 'index.php?option=' . $this->extension . '&task=items.add&cid=0';
 					break;
 				case 'edit':
 					$cid = $app->input->get('id', $app->input->get('cid', 0));
