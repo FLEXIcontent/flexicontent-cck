@@ -392,7 +392,7 @@ class FlexicontentViewCategory extends FlexicontentViewBaseRecord
 				$fieldname = $field->fieldname;
 				$value = $catparams->get($fieldname);
 
-				if (strlen($value))
+				if (strlen((string)$value))
 				{
 					$tmpl->params->setValue($fieldname, 'attribs', $value);
 				}
