@@ -94,7 +94,7 @@ class FlexicontentModelTagelement extends FCModelAdminList
 	 */
 	public function __construct($config = array())
 	{
-		$app    = JFactory::getApplication();
+		$app    = \Joomla\CMS\Factory::getApplication();
 		$jinput = $app->input;
 		$option = $jinput->getCmd('option', '');
 		$view   = $jinput->getCmd('view', '');
@@ -129,7 +129,7 @@ class FlexicontentModelTagelement extends FCModelAdminList
 	/**
 	 * Method to build the query for the records
 	 *
-	 * @return  JDatabaseQuery   The DB Query object
+	 * @return  \Joomla\Data\DataObjectbaseQuery   The DB Query object
 	 *
 	 * @since   3.3.0
 	 */
@@ -186,7 +186,7 @@ class FlexicontentModelTagelement extends FCModelAdminList
 		// Inherited filters : filter_state, search
 		$where = parent::_buildContentWhere(false);
 
-		if ($q instanceof \JDatabaseQuery)
+		if ($q instanceof JDatabaseQuery || (FLEXI_J40GE && $q instanceof \Joomla\Database\DatabaseQuery))
 		{
 			return $where ? $q->where($where) : $q;
 		}
@@ -224,7 +224,7 @@ class FlexicontentModelTagelement extends FCModelAdminList
 				break;
 		}
 
-		if ($q instanceof \JDatabaseQuery)
+		if ($q instanceof JDatabaseQuery || (FLEXI_J40GE && $q instanceof \Joomla\Database\DatabaseQuery))
 		{
 			return $having ? $q->having($having) : $q;
 		}

@@ -12,9 +12,6 @@
 defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
-use Joomla\Utilities\ArrayHelper;
-use Joomla\CMS\Table\Table;
-use Joomla\CMS\Table\User;
 
 require_once('base/baselist.php');
 
@@ -104,7 +101,7 @@ class FlexicontentModelItemelement extends FCModelAdminList
 	 */
 	public function __construct($config = array())
 	{
-		$app    = JFactory::getApplication();
+		$app    = \Joomla\CMS\Factory::getApplication();
 		$jinput = $app->input;
 		$option = $jinput->getCmd('option', '');
 		$view   = $jinput->getCmd('view', '');
@@ -145,12 +142,12 @@ class FlexicontentModelItemelement extends FCModelAdminList
 			$item_lang   = $app->getUserStateFromRequest($p . 'item_lang', 'item_lang', '', 'string');
 			$created_by  = $app->getUserStateFromRequest($p . 'created_by', 'created_by', 0, 'int');
 
-			$assocanytrans = JFactory::getUser()->authorise('flexicontent.assocanytrans', 'com_flexicontent');
+			$assocanytrans = \Joomla\CMS\Factory::getUser()->authorise('flexicontent.assocanytrans', 'com_flexicontent');
 
 			// Limit to creator if creator not privileged
 			if (!$assocanytrans && !$created_by)
 			{
-				$created_by = JFactory::getUser()->id;
+				$created_by = \Joomla\CMS\Factory::getUser()->id;
 
 				$this->setState('created_by', $created_by);
 				$app->setUserState($p . 'created_by', $created_by);
@@ -196,7 +193,7 @@ class FlexicontentModelItemelement extends FCModelAdminList
 	function getData()
 	{
 		// Catch case of guest user submitting in frontend
-		if (!JFactory::getUser()->id)
+		if (!\Joomla\CMS\Factory::getUser()->id)
 		{
 			return $this->_data = array();
 		}
@@ -283,7 +280,7 @@ class FlexicontentModelItemelement extends FCModelAdminList
 	public function getTotal()
 	{
 		// Catch case of guest user submitting in frontend
-		if (!JFactory::getUser()->id)
+		if (!\Joomla\CMS\Factory::getUser()->id)
 		{
 			return $this->_total = 0;
 		}
@@ -301,7 +298,7 @@ class FlexicontentModelItemelement extends FCModelAdminList
 	/**
 	 * Method to build the query for the records
 	 *
-	 * @return  JDatabaseQuery   The DB Query object
+	 * @return  \Joomla\Data\DataObjectbaseQuery   The DB Query object
 	 *
 	 * @since   3.3.0
 	 */
@@ -402,7 +399,7 @@ class FlexicontentModelItemelement extends FCModelAdminList
 			$where[] = 'ie.type_id = ' . (int) $filter_type;
 		}
 
-		if ($q instanceof \JDatabaseQuery)
+		if ($q instanceof JDatabaseQuery || (FLEXI_J40GE && $q instanceof \Joomla\Database\DatabaseQuery))
 		{
 			return $where ? $q->where($where) : $q;
 		}
@@ -431,7 +428,7 @@ class FlexicontentModelItemelement extends FCModelAdminList
 		// Create the text search clauses
 		$textwhere = array();
 
-		$search_prefix = JComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
+		$search_prefix = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
 
 		if ($search)
 		{

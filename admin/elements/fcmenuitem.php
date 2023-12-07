@@ -19,11 +19,11 @@
 defined('JPATH_PLATFORM') or die;
 
 jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // JHtmlSelect
-jimport('joomla.form.field');  // JFormField
+jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
+jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
 
-jimport('joomla.form.helper'); // JFormHelper
-JFormHelper::loadFieldClass('groupedlist');   // JFormFieldGroupedList
+jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
+\Joomla\CMS\Form\FormHelper::loadFieldClass('groupedlist');   // \Joomla\CMS\Form\Field\GroupedlistField
 
 // Import the com_menus helper.
 require_once realpath(JPATH_ADMINISTRATOR . '/components/com_menus/helpers/menus.php');
@@ -144,7 +144,7 @@ class JFormFieldFcMenuitem extends JFormFieldGroupedList
 	}
 
 	/**
-	 * Method to attach a JForm object to the field.
+	 * Method to attach a \Joomla\CMS\Form\Form object to the field.
 	 *
 	 * @param   SimpleXMLElement  $element  The SimpleXMLElement object representing the `<field>` tag for the form field object.
 	 * @param   mixed             $value    The form field value to validate.
@@ -154,7 +154,7 @@ class JFormFieldFcMenuitem extends JFormFieldGroupedList
 	 *
 	 * @return  boolean  True on success.
 	 *
-	 * @see     JFormField::setup()
+	 * @see     \Joomla\CMS\Form\FormField::setup()
 	 * @since   3.2
 	 */
 	public function setup(SimpleXMLElement $element, $value, $group = null)
@@ -243,7 +243,7 @@ class JFormFieldFcMenuitem extends JFormFieldGroupedList
 				if ($skip) continue;
 				
 				$levelPrefix = str_repeat('- ', max(0, $link->level - 1));
-				$groups[$menuType][] = JHtml::_('select.option',
+				$groups[$menuType][] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',
 								$link->value, $levelPrefix . $link->text,
 								'value',
 								'text',
@@ -274,7 +274,7 @@ class JFormFieldFcMenuitem extends JFormFieldGroupedList
 					if ($skip) continue;
 					
 					$levelPrefix = str_repeat('- ', $link->level - 1);
-					$groups[$menu->menutype][] = JHtml::_(
+					$groups[$menu->menutype][] = \Joomla\CMS\HTML\HTMLHelper::_(
 						'select.option', $link->value, $levelPrefix . $link->text, 'value', 'text',
 						in_array($link->type, $this->disable)
 					);
@@ -291,7 +291,7 @@ class JFormFieldFcMenuitem extends JFormFieldGroupedList
 
 	public static function getMenuLinks($menuType = null, $parentId = 0, $mode = 0, $published = array(), $languages = array())
 	{
-		$db = JFactory::getDbo();
+		$db = \Joomla\CMS\Factory::getDbo();
 		$query = $db->getQuery(true)
 			->select('DISTINCT a.id AS value, 
 				  a.title AS text, 
@@ -307,7 +307,7 @@ class JFormFieldFcMenuitem extends JFormFieldGroupedList
 				  a.lft')
 			->from('#__menu AS a');
 
-		if (JLanguageMultilang::isEnabled())
+		if (\Joomla\CMS\Language\Multilanguage::isEnabled())
 		{
 			$query->select('l.title AS language_title, l.image as language_image')
 				->join('LEFT', $db->quoteName('#__languages') . ' AS l ON l.lang_code = a.language');

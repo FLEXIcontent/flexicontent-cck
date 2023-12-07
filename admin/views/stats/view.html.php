@@ -37,9 +37,9 @@ class FlexicontentViewStats extends FlexicontentViewBaseRecords
 	function display( $tpl = null )
 	{
 		//initialise variables
-		$document = JFactory::getDocument();
-		$user     = JFactory::getUser();
-		$session  = JFactory::getSession();
+		$document = \Joomla\CMS\Factory::getDocument();
+		$user     = \Joomla\CMS\Factory::getUser();
+		$session  = \Joomla\CMS\Factory::getSession();
 		
 		// Get data from the model
 		$genstats   = $this->get( 'Generalstats' );
@@ -69,18 +69,18 @@ class FlexicontentViewStats extends FlexicontentViewBaseRecords
 		// Add css and js to document
 		// **************************
 		
-		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
-			: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
-		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
-			: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
+		!\Joomla\CMS\Factory::getLanguage()->isRtl()
+			? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
+			: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
+		!\Joomla\CMS\Factory::getLanguage()->isRtl()
+			? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
+			: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 
 
 
 		//*****************************************************************Adicionar as biblitecas*******************************************************************************************//
 		$document->addStyleSheet('//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css');
-		$document->addScript(JUri::root(true).'/components/com_flexicontent/librairies/esl/esl.js');
+		$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/librairies/esl/esl.js');
 		//*****************************************************************Adicionar as biblitecas*******************************************************************************************//
 		
 		
@@ -101,20 +101,20 @@ class FlexicontentViewStats extends FlexicontentViewBaseRecords
 		FLEXIUtilities::ManagerSideMenu('CanStats');
 		
 		// Create document/toolbar titles
-		$doc_title = JText::_( 'FLEXI_STATISTICS' );
+		$doc_title = \Joomla\CMS\Language\Text::_( 'FLEXI_STATISTICS' );
 		$site_title = $document->getTitle();
-		JToolbarHelper::title( $doc_title, 'icon-signal' );
+		\Joomla\CMS\Toolbar\ToolbarHelper::title( $doc_title, 'icon-signal' );
 		$document->setTitle($doc_title .' - '. $site_title);
 		
 		// Create the toolbar
-		//JToolbarHelper::Back();
+		//\Joomla\CMS\Toolbar\ToolbarHelper::Back();
 		if ($perms->CanConfig)
 		{
 			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
 			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
 			$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
 			$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
-			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
+			\Joomla\CMS\Toolbar\ToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
 		}
 		
 		$this->genstats = $genstats;
@@ -136,7 +136,11 @@ class FlexicontentViewStats extends FlexicontentViewBaseRecords
 		$this->metadescription = $metadescription;
 		$this->metakeywords = $metakeywords;
 
-		$this->sidebar = JHtmlSidebar::render();
+		$this->sidebar = null;
+
+		if(FLEXI_J30GE && !FLEXI_J40GE) $this->sidebar = JHtmlSidebar::render();
+		if(FLEXI_J40GE) $this->sidebar = \Joomla\CMS\HTML\Helpers\Sidebar::render();
+
 		parent::display($tpl);
 	}
 }

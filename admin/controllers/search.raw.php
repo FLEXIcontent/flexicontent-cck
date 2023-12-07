@@ -57,11 +57,11 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 		header("Pragma: no-cache");
 
 		// Check for request forgeries
-		JSession::checkToken('request') or jexit('fail | ' . JText::_('JINVALID_TOKEN'));
+		\Joomla\CMS\Session\Session::checkToken('request') or jexit('fail | ' . \Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
 		if (!FlexicontentHelperPerm::getPerm()->CanIndex)
 		{
-			jexit('fail | ' . JText::_('FLEXI_ALERTNOTAUTH_TASK'));
+			jexit('fail | ' . \Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'));
 		}
 
 		// Test counting with limited memory
@@ -73,9 +73,9 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 		$indexer     = $this->input->getCmd('indexer', 'advanced');
 		$rebuildmode = $this->input->getCmd('rebuildmode', '');
 
-		$session = JFactory::getSession();
-		$db      = JFactory::getDbo();
-		$app     = JFactory::getApplication();
+		$session = \Joomla\CMS\Factory::getSession();
+		$db      = \Joomla\CMS\Factory::getDbo();
+		$app     = \Joomla\CMS\Factory::getApplication();
 		$model = $this->getModel('search');
 
 		// Check indexer type
@@ -85,8 +85,8 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 		}
 
 		// Clear previous log file
-		$log_filename = 'items_search_indexer_' . \JFactory::getUser()->id . '.php';
-		$log_filename_full = JPATH::clean(\JFactory::getConfig()->get('log_path') . DS . $log_filename);
+		$log_filename = 'items_search_indexer_' . \Joomla\CMS\Factory::getUser()->id . '.php';
+		$log_filename_full = \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getConfig()->get('log_path') . DS . $log_filename);
 
 		if (file_exists($log_filename_full))
 		{
@@ -224,12 +224,12 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 		header("Pragma: no-cache");
 
 		// Check for request forgeries
-		// JSession::checkToken('request') or jexit(JText::_('JINVALID_TOKEN'));
+		// \Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 		// Not need because this task need the user session data that are set by countrows that checked for forgeries
 
 		if (!FlexicontentHelperPerm::getPerm()->CanIndex)
 		{
-			jexit('fail | ' . JText::_('FLEXI_ALERTNOTAUTH_TASK'));
+			jexit('fail | ' . \Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'));
 		}
 
 		// Test indexing with limited memory
@@ -240,12 +240,12 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 
 		$start_microtime = microtime(true);
 
-		$session = JFactory::getSession();
-		$db      = JFactory::getDbo();
-		$app     = JFactory::getApplication();
+		$session = \Joomla\CMS\Factory::getSession();
+		$db      = \Joomla\CMS\Factory::getDbo();
+		$app     = \Joomla\CMS\Factory::getApplication();
 
 		$has_zlib      = function_exists("zlib_encode"); // Version_compare(PHP_VERSION, '5.4.0', '>=');
-		$search_prefix = JComponentHelper::getParams('com_flexicontent')->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
+		$search_prefix = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
 
 		$indexer     = $this->input->getCmd('indexer', 'advanced');
 		$rebuildmode = $this->input->getCmd('rebuildmode', '');
@@ -255,12 +255,12 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 
 		$log_filename = $session->get($indexer . '_log_filename', null, 'flexicontent');
 		jimport('joomla.log.log');
-		JLog::addLogger(
+		\Joomla\CMS\Log\Log::addLogger(
 			array(
 				'text_file' => $log_filename,  // Sets the target log file
 				'text_entry_format' => '{DATETIME} {PRIORITY} {MESSAGE}'  // Sets the format of each line
 			),
-			JLog::ALL,  // Sets messages of all log levels to be sent to the file
+			\Joomla\CMS\Log\Log::ALL,  // Sets messages of all log levels to be sent to the file
 			array('com_flexicontent.search.items_indexer')  // category of logged messages
 		);
 
@@ -326,7 +326,7 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 			// Create field parameters if not already created
 			if (empty($_fields[$field_id]->parameters))
 			{
-				$_fields[$field_id]->parameters = new JRegistry($_fields[$field_id]->attribs);
+				$_fields[$field_id]->parameters = new \Joomla\Registry\Registry($_fields[$field_id]->attribs);
 			}
 		}
 
@@ -757,7 +757,7 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 	{
 		$model = $this->getModel('search');
 		$model->purge();
-		$msg = JText::_('FLEXI_ITEMS_PURGED');
+		$msg = \Joomla\CMS\Language\Text::_('FLEXI_ITEMS_PURGED');
 		$this->setRedirect('index.php?option=com_flexicontent&view=search', $msg);
 	}
 

@@ -78,7 +78,7 @@ class flexicontent_tags extends flexicontent_basetable
 
 	public function __construct(& $db)
 	{
-		JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tags/tables');
+		\Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tags/tables');
 
 		$this->_records_dbtbl  = 'flexicontent_' . $this->_record_name . 's';
 		$this->_NAME = strtoupper($this->_record_name);
@@ -329,17 +329,26 @@ class flexicontent_tags extends flexicontent_basetable
 		$updateNulls = FLEXI_J40GE ? $updateNulls : false;
 
 		/**
-		 * Create one JTable record for every DB table
+		 * Create one \Joomla\CMS\Table\Table record for every DB table
 		 */
 		$k      = $this->_tbl_key;
 		$fk_ext = $this->_frn_key_ext;
 		$tk_ext = $this->_tbl_key_ext;
 
-		$record = JTable::getInstance($this->_jtbls[$this->_tbl][0], $this->_jtbls[$this->_tbl][1]);
+		$record = \Joomla\CMS\Table\Table::getInstance($this->_jtbls[$this->_tbl][0], $this->_jtbls[$this->_tbl][1]);
 		$record->_tbl = $this->_tbl;
 		$record->_tbl_key = $k;
 
-		$record_ext = JTable::getInstance($this->_jtbls[$this->_tbl_ext][0], $this->_jtbls[$this->_tbl_ext][1]);
+		$record_ext = \Joomla\CMS\Table\Table::getInstance($this->_jtbls[$this->_tbl_ext][0], $this->_jtbls[$this->_tbl_ext][1]);
+
+		if(FLEXI_J40GE && !$record_ext)
+		{
+			$record_ext = \Joomla\CMS\Factory::getApplication()
+				->bootComponent('com_tags')
+				->getMVCFactory()
+				->createTable($this->_jtbls[$this->_tbl_ext][0], 'Administrator');
+		}
+
 		$record_ext->_tbl = $this->_tbl_ext;
 		$record_ext->_tbl_key = $fk_ext;
 
@@ -461,7 +470,7 @@ class flexicontent_tags extends flexicontent_basetable
 		$name  = $this->_getAssetName();
 		$title = $this->_getAssetTitle();
 
-		$asset = JTable::getInstance('Asset');
+		$asset = \Joomla\CMS\Table\Table::getInstance('Asset');
 		$asset->loadByName($name);
 
 		// Check for an error.
@@ -482,7 +491,7 @@ class flexicontent_tags extends flexicontent_basetable
 		$asset->name  = $name;
 		$asset->title = $title;
 
-		if ($this->_rules instanceof JAccessRules)
+		if ($this->_rules instanceof \Joomla\CMS\Access\Rules)
 		{
 			$asset->rules = (string) $this->_rules;
 		}

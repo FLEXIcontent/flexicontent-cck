@@ -15,10 +15,10 @@ use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
 jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // JHtmlSelect
+jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
 
-jimport('joomla.form.helper'); // JFormHelper
-JFormHelper::loadFieldClass('list');   // JFormFieldList
+jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
+\Joomla\CMS\Form\FormHelper::loadFieldClass('list');   // \Joomla\CMS\Form\Field\ListField
 
 /**
  * Renders a author element
@@ -38,7 +38,7 @@ class JFormFieldFieldtypes extends JFormFieldList
 	protected $type = 'Fieldtypes';
 
 	protected function getOptions() {
-		$db = JFactory::getDbo();
+		$db = \Joomla\CMS\Factory::getDbo();
 
 		$query = 'SELECT element AS value, REPLACE(name, "FLEXIcontent - ", "") AS text'
 		. ' FROM '.(FLEXI_J16GE ? '#__extensions' : '#__plugins')

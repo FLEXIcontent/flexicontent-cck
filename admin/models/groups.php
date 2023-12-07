@@ -47,7 +47,7 @@ class FlexicontentModelGroups extends FCModelAdminList
 	use FCModelTraitNestableRecord;
 
 	var $records_dbtbl  = 'usergroups';
-	var $records_jtable = 'JTableUserGroup';
+	var $records_jtable = 'JTableUsergroup';
 
 	/**
 	 * Column names
@@ -105,7 +105,7 @@ class FlexicontentModelGroups extends FCModelAdminList
 	 */
 	public function __construct($config = array())
 	{
-		$app    = JFactory::getApplication();
+		$app    = \Joomla\CMS\Factory::getApplication();
 		$jinput = $app->input;
 		$option = $jinput->getCmd('option', '');
 		$view   = $jinput->getCmd('view', '');
@@ -168,7 +168,7 @@ class FlexicontentModelGroups extends FCModelAdminList
 	/**
 	 * Method to build the query for the records
 	 *
-	 * @return  JDatabaseQuery   The DB Query object
+	 * @return  \Joomla\Data\DataObjectbaseQuery   The DB Query object
 	 *
 	 * @since   3.3.0
 	 */
@@ -226,7 +226,7 @@ class FlexicontentModelGroups extends FCModelAdminList
 		// Various filters
 
 
-		if ($q instanceof \JDatabaseQuery)
+		if ($q instanceof JDatabaseQuery || (FLEXI_J40GE && $q instanceof \Joomla\Database\DatabaseQuery))
 		{
 			return $where ? $q->where($where) : $q;
 		}
@@ -345,7 +345,7 @@ class FlexicontentModelGroups extends FCModelAdminList
 			$item->user_count      = $item->count_enabled + $item->count_disabled;
 		}
 
-		$groups = new JHelperUsergroups($groupsByKey);
+		$groups = new \Joomla\CMS\Helper\UserGroupsHelper($groupsByKey);
 
 		return array_values($groups->getAll());
 	}

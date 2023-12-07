@@ -16,10 +16,10 @@ defined('_JEXEC') or die;
  * @package		Joomla.Administrator
  * @subpackage	com_content
  */
-class flexicontent_content_frontpage extends JTable
+class flexicontent_content_frontpage extends \Joomla\CMS\Table\Table
 {
 	/**
-	 * @param	JDatabase	A database connector object
+	 * @param	\Joomla\Data\DataObjectbase	A database connector object
 	 */
 	function __construct(&$db)
 	{

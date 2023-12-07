@@ -14,7 +14,7 @@ defined('_JEXEC') or die;
  *
  * @since  1.5
  */
-class PlgButtonFcitem extends JPlugin
+class PlgButtonFcitem extends \Joomla\CMS\Plugin\CMSPlugin
 {
 	/**
 	 * Load the language file on instantiation.
@@ -29,7 +29,7 @@ class PlgButtonFcitem extends JPlugin
 	 *
 	 * @param   string  $name  The name of the button to add
 	 *
-	 * @return  JObject  The button options as JObject
+	 * @return  \Joomla\CMS\Object\CMSObject  The button options as \Joomla\CMS\Object\CMSObject
 	 *
 	 * @since   1.5
 	 */
@@ -40,9 +40,9 @@ class PlgButtonFcitem extends JPlugin
 		 */
 
 		$link = 'index.php?option=com_flexicontent&amp;view=itemelement&amp;layout=default&amp;isxtdbtn=1&amp;tmpl=component&amp;'
-			. JSession::getFormToken() . '=1&amp;editor=' . $name;
+			. \Joomla\CMS\Session\Session::getFormToken() . '=1&amp;editor=' . $name;
 
-		$button = new JObject;
+		$button = new \Joomla\CMS\Object\CMSObject;
 		$button->modal   = true;
 		$button->icon    = 'add-fcitem';
 		/*$button->iconSVG = '
@@ -82,7 +82,7 @@ class PlgButtonFcitem extends JPlugin
 			</svg>';*/
 		$button->class   = 'btn';
 		$button->link    = $link;
-		$button->text    = JText::_('PLG_EDITORS-XTD_FCITEM_BUTTON_FCITEM');
+		$button->text    = \Joomla\CMS\Language\Text::_('PLG_EDITORS-XTD_FCITEM_BUTTON_FCITEM');
 		$button->name    = FLEXI_J40GE ? 'fcitem' : 'file-2';
 		$button->options = "{handler: 'iframe', size: {x: 800, y: 500}}";
 

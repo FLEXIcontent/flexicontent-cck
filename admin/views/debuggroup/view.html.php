@@ -13,7 +13,7 @@ defined('_JEXEC') or die;
  * @subpackage	com_users
  * @since		1.6
  */
-class FlexicontentViewDebugGroup extends JViewLegacy
+class FlexicontentViewDebugGroup extends \Joomla\CMS\MVC\View\HtmlView
 {
 	protected $actions;
 	protected $items;
@@ -26,9 +26,9 @@ class FlexicontentViewDebugGroup extends JViewLegacy
 	public function display($tpl = null)
 	{
 		// Access check.
-		if (!JFactory::getUser()->authorise('core.manage', 'com_users') || !JFactory::getConfig()->get('debug'))
+		if (!\Joomla\CMS\Factory::getUser()->authorise('core.manage', 'com_users') || !\Joomla\CMS\Factory::getConfig()->get('debug'))
 		{
-			return JError::raiseWarning(404, JText::_('JERROR_ALERTNOAUTHOR'));
+			return JError::raiseWarning(404, \Joomla\CMS\Language\Text::_('JERROR_ALERTNOAUTHOR'));
 		}
 
 		$this->actions		= $this->get('DebugActions');
@@ -56,8 +56,8 @@ class FlexicontentViewDebugGroup extends JViewLegacy
 	 */
 	protected function addToolbar()
 	{
-		JToolbarHelper::title(JText::sprintf('COM_USERS_VIEW_DEBUG_GROUP_TITLE', $this->group->id, $this->group->title), 'groups');
+		\Joomla\CMS\Toolbar\ToolbarHelper::title(\Joomla\CMS\Language\Text::sprintf('COM_USERS_VIEW_DEBUG_GROUP_TITLE', $this->group->id, $this->group->title), 'groups');
 
-		JToolbarHelper::help('JHELP_USERS_DEBUG_GROUPS');
+		\Joomla\CMS\Toolbar\ToolbarHelper::help('JHELP_USERS_DEBUG_GROUPS');
 	}
 }

@@ -15,10 +15,10 @@ use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
 jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // JHtmlSelect
+jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
 
-jimport('joomla.form.helper'); // JFormHelper
-JFormHelper::loadFieldClass('list');   // JFormFieldList
+jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
+\Joomla\CMS\Form\FormHelper::loadFieldClass('list');   // \Joomla\CMS\Form\Field\ListField
 
 /**
  * Renders a fields element
@@ -57,14 +57,14 @@ class JFormFieldContenttypes extends JFormFieldList
 		$fieldname	= $this->name;
 		$element_id = $this->id;
 
-		return JHtml::_('select.genericlist', $options, $fieldname, trim($attr), 'value', 'text', $value, $element_id);
-		//return JHtmlSelect::genericList($options, $fieldname, $attr, 'value', 'text', $value, $element_id);
+		return \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $options, $fieldname, trim($attr), 'value', 'text', $value, $element_id);
+		//return \Joomla\CMS\HTML\Helpers\Select::genericList($options, $fieldname, $attr, 'value', 'text', $value, $element_id);
 	}
 
 
 	protected function getOptions()
 	{
-		$db = JFactory::getDbo();
+		$db = \Joomla\CMS\Factory::getDbo();
 		$query = 'SELECT id AS value, name AS text'
 		. ' FROM #__flexicontent_types'
 		. ' WHERE published = 1'
@@ -81,6 +81,6 @@ class JFormFieldContenttypes extends JFormFieldList
 	{
 		$this->name = $attribs['name'];
 		$this->value = $attribs['value'];
-		$this->label = JText::_($attribs['label']);
+		$this->label = \Joomla\CMS\Language\Text::_($attribs['label']);
 	}
 }

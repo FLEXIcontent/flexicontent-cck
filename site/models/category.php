@@ -31,7 +31,7 @@ jimport('legacy.model.legacy');
  * @subpackage Flexicontent
  * @since		1.0
  */
-class FlexicontentModelCategory extends JModelLegacy {
+class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel {
 	/**
 	 * Category id
 	 *
@@ -172,11 +172,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 	public function __construct()
 	{
 		// Set category id and call constrcuctor
-		$cid = JFactory::getApplication()->input->get('cid', 0, 'int');
+		$cid = \Joomla\CMS\Factory::getApplication()->input->get('cid', 0, 'int');
 
 		// Catch case that 'cid' is an array (bug or not so proper url)
 		$cid = is_array($cid) ? (int) reset($cid) : $cid;
-		JFactory::getApplication()->input->set('cid', $cid ?: null);
+		\Joomla\CMS\Factory::getApplication()->input->set('cid', $cid ?: null);
 
 		// This will set the category id and clear all member variables
 		$this->setId($cid);
@@ -196,8 +196,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 */
 	protected function populateRecordState($ordering = null, $direction = null)
 	{
-		$app    = JFactory::getApplication();
-		$user   = JFactory::getUser();
+		$app    = \Joomla\CMS\Factory::getApplication();
+		$user   = \Joomla\CMS\Factory::getUser();
 		$jinput = $app->input;
 		$option = $jinput->get('option', '', 'cmd');
 		$view   = $jinput->get('view', '', 'cmd');
@@ -270,8 +270,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$this->setState('option', $option);
 
 		// We set category parameters to component parameters, these will be full calculated when getCategory() is called
-		$this->_params = new JRegistry();
-		$cparams = JComponentHelper::getParams('com_flexicontent');
+		$this->_params = new \Joomla\Registry\Registry();
+		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 		$this->_params->merge($cparams);
 
 
@@ -285,11 +285,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$this->setState('filter_order_Dir', $jinput->get('filter_order_Dir', 'ASC', 'cmd'));
 
 		// Get minimum word search length
-		$db = JFactory::getDbo();
+		$db = \Joomla\CMS\Factory::getDbo();
 		$db->setQuery("SHOW VARIABLES LIKE '%ft_min_word_len%'");
 		$_dbvariable = $db->loadObject();
 		$min_word_len = (int) @ $_dbvariable->Value;
-		$search_prefix = JComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
+		$search_prefix = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
 		$min_word_len = !$search_prefix ?  $min_word_len : 1;
 		$app->setUserState($option.'.min_word_len', $min_word_len);
 	}
@@ -344,7 +344,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// Make sure category has been loaded
 		$this->getCategory();
 
-		$app = JFactory::getApplication();
+		$app = \Joomla\CMS\Factory::getApplication();
 
 		$print_logging_info = $this->_params->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
@@ -531,7 +531,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 */
 	function _buildQuery( $query_ids = false, $count_total = true )
 	{
-		$app     = JFactory::getApplication();
+		$app     = \Joomla\CMS\Factory::getApplication();
 		$jinput  = $app->input;
 		$option  = $this->getState('option');
 		$params  = $this->_params;
@@ -778,7 +778,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if ( $this->_data_cats!==null ) return $this->_data_cats;
 
 		global $globalcats;
-		$user     = JFactory::getUser();
+		$user     = \Joomla\CMS\Factory::getUser();
 		$ordering = 'c.lft ASC';
 
 		$show_noauth = $this->_params->get('show_noauth', 0);   // show unauthorized items
@@ -789,7 +789,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$andaccess = '';
 		if (!$show_noauth)
 		{
-			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+			$aid_arr = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
 			$andaccess .= ' AND c.access IN (0,'.$aid_list.')';
 		}
@@ -852,7 +852,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 */
 	function _buildAccessSelect()
 	{
-		$user    = JFactory::getUser();
+		$user    = \Joomla\CMS\Factory::getUser();
 		$show_noauth = $this->_params->get('show_noauth', 0);
 
 		$select_access = '';
@@ -863,7 +863,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if ($show_noauth)
 		{
 			// Access Flags for: content type, main category, item
-			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+			$aid_arr = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
 			$select_access .= ', '
 				.' CASE WHEN '
@@ -1000,17 +1000,17 @@ class FlexicontentModelCategory extends JModelLegacy {
 		global $globalcats, $fc_catview;
 		if ( isset($fc_catview[$wherepart]) ) return $fc_catview[$wherepart];
 
-		$app    = JFactory::getApplication();
+		$app    = \Joomla\CMS\Factory::getApplication();
 		$jinput = $app->input;
 		$option = $this->getState('option');
-		$user		= JFactory::getUser();
-		$db     = JFactory::getDbo();
+		$user		= \Joomla\CMS\Factory::getUser();
+		$db     = \Joomla\CMS\Factory::getDbo();
 
 		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
 		//  thus the items are published globally at the time the author specified in his/her local clock
-		//$app  = JFactory::getApplication();
+		//$app  = \Joomla\CMS\Factory::getApplication();
 		//$now  = FLEXI_J16GE ? $app->requestTime : $app->get('requestTime');   // NOT correct behavior it should be UTC (below)
-		//$date = JFactory::getDate();
+		//$date = \Joomla\CMS\Factory::getDate();
 		//$now  = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();              // NOT good if string passed to function that will be cached, because string continuesly different
 		$_nowDate = 'UTC_TIMESTAMP()'; //$db->Quote($now);
 		$nullDate = $db->getNullDate();
@@ -1090,7 +1090,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		{
 			$lta = 'i';
 			//$where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . ' OR '.$lta.'.language="*" ) ';
-			$where .= ' AND (' . $lta . ' .language = ' . $db->Quote(JFactory::getLanguage()->getTag()) . ' OR ' . $lta . '.language = ' . $db->Quote('*') . ')';
+			$where .= ' AND (' . $lta . ' .language = ' . $db->Quote(\Joomla\CMS\Factory::getLanguage()->getTag()) . ' OR ' . $lta . '.language = ' . $db->Quote('*') . ')';
 		}
 
 		$where .= !FLEXI_J16GE ? ' AND i.sectionid = ' . FLEXI_SECTION : '';
@@ -1099,7 +1099,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// Checking item, category, content type access levels
 		if (!$show_noauth && $this->_layout!='myitems')
 		{
-			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+			$aid_arr = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
 			$where .= ' AND ty.access IN (0,'.$aid_list.')';
 			$where .= ' AND  c.access IN (0,'.$aid_list.')';
@@ -1170,9 +1170,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 */
 	function _buildTextSearch($text = null, $phrase = null, $txtmode = 0, & $select_relevance = array())
 	{
-		$app    = JFactory::getApplication();
+		$app    = \Joomla\CMS\Factory::getApplication();
 		$option = $app->input->getCmd('option', '');
-		$db     = JFactory::getDbo();
+		$db     = \Joomla\CMS\Factory::getDbo();
 
 		static $text_search = null;
 
@@ -1217,7 +1217,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			: 'flexicontent_advsearch_index';
 
 		// Try to add space between words for current language using a dictionary
-		$lang_handler = FlexicontentFields::getLangHandler(JFactory::getLanguage()->getTag());
+		$lang_handler = FlexicontentFields::getLangHandler(\Joomla\CMS\Factory::getLanguage()->getTag());
 		if ($lang_handler)
 		{
 			$text = implode(' ', $lang_handler->get_segment_array($clear_previous = true, trim($text)));
@@ -1253,7 +1253,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			 */
 			if ($filter_word_like_any
 				&& in_array(flexicontent_html::getUserCurrentLang(), array('zh', 'jp', 'ja', 'th'))
-				&& ! FlexicontentFields::getLangHandler(JFactory::getLanguage()->getTag(), $_hasHandlerOnly = true)
+				&& ! FlexicontentFields::getLangHandler(\Joomla\CMS\Factory::getLanguage()->getTag(), $_hasHandlerOnly = true)
 			)
 			{
 				$_index_match = ' LOWER ('.$ts.'.search_index) LIKE '.$db->Quote( '%'.$escaped_text.'%', false );
@@ -1371,7 +1371,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	function _buildFiltersWhere()
 	{
 		global $fc_catview;
-		$app    = JFactory::getApplication();
+		$app    = \Joomla\CMS\Factory::getApplication();
 		$option = $this->getState('option');
 		$db     = $this->_db;
 
@@ -1473,7 +1473,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	function _buildAlphaIndexWhere()
 	{
 		// Get alpha index request variable and do some security checks, by removing any quotes and other non-valid characters
-		$alpha = JFactory::getApplication()->input->get('letter', '', 'string');
+		$alpha = \Joomla\CMS\Factory::getApplication()->input->get('letter', '', 'string');
 		$alpha = preg_replace ("/(\(|\)\'|\"|\\\)/u", "", $alpha);
 
 		if (StringHelper::strlen($alpha)==0) {
@@ -1563,7 +1563,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 */
 	function _buildChildsQuery($id=0)
 	{
-		$user    = JFactory::getUser();
+		$user    = \Joomla\CMS\Factory::getUser();
 		$show_noauth = $this->_params->get('show_noauth', 0);   // Show unauthorized items
 
 		// Select only categories that user has view access, if listing of unauthorized content is not enabled
@@ -1571,7 +1571,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$andaccess = '';
 		if (!$show_noauth)
 		{
-			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+			$aid_arr = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
 			$andaccess .= ' AND c.access IN (0,'.$aid_list.')';
 		}
@@ -1612,17 +1612,17 @@ class FlexicontentModelCategory extends JModelLegacy {
 	function _getassigned($id)
 	{
 		global $globalcats;
-		$user = JFactory::getUser();
-		$db   = JFactory::getDbo();
+		$user = \Joomla\CMS\Factory::getUser();
+		$db   = \Joomla\CMS\Factory::getDbo();
 
 		// Get the view's parameters
 		$use_tmp = true;
 
 		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
 		//  thus the items are published globally at the time the author specified in his/her local clock
-		//$app  = JFactory::getApplication();
+		//$app  = \Joomla\CMS\Factory::getApplication();
 		//$now  = FLEXI_J16GE ? $app->requestTime : $app->get('requestTime');   // NOT correct behavior it should be UTC (below)
-		//$date = JFactory::getDate();
+		//$date = \Joomla\CMS\Factory::getDate();
 		//$now  = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();              // NOT good if string passed to function that will be cached, because string continuesly different
 		$_nowDate = 'UTC_TIMESTAMP()'; //$db->Quote($now);
 		$nullDate = $db->getNullDate();
@@ -1647,7 +1647,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		{
 			$lta = $use_tmp ? 'i': 'ie';
 			//$where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . ' OR '.$lta.'.language="*" ) ';
-			$where .= ' AND (' . $lta . ' .language = ' . $db->Quote(JFactory::getLanguage()->getTag()) . ' OR ' . $lta . '.language = ' . $db->Quote('*') . ')';
+			$where .= ' AND (' . $lta . ' .language = ' . $db->Quote(\Joomla\CMS\Factory::getLanguage()->getTag()) . ' OR ' . $lta . '.language = ' . $db->Quote('*') . ')';
 		}
 
 		// Get privilege to view non viewable items (upublished, archived, trashed, expired, scheduled).
@@ -1680,7 +1680,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// Checking item, category, content type access level
 		if (!$show_noauth)
 		{
-			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+			$aid_arr = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
 			$where .= ' AND ty.access IN (0,'.$aid_list.')';
 			$where .= ' AND mc.access IN (0,'.$aid_list.')';
@@ -1714,7 +1714,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 */
 	function _getsubs($id)
 	{
-		$user			= JFactory::getUser();
+		$user			= \Joomla\CMS\Factory::getUser();
 		$show_noauth = $this->_params->get('show_noauth', 0);   // Show unauthorized items
 
 		// Where
@@ -1726,7 +1726,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$andaccess = '';
 		if (!$show_noauth)
 		{
-			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+			$aid_arr = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
 			$andaccess .= ' AND c.access IN (0,'.$aid_list.')';
 		}
@@ -1864,8 +1864,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 		}
 
 		// Initialize some vars
-		$app  = JFactory::getApplication();
-		$user = JFactory::getUser();
+		$app  = \Joomla\CMS\Factory::getApplication();
+		$user = \Joomla\CMS\Factory::getUser();
 
 		// Set a specific id
 		if ($pk)
@@ -1937,7 +1937,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		{
 			$err_mssg = $err_type = false;
 			if (!$_category) {
-				$err_mssg = JText::sprintf( 'FLEXI_CONTENT_CATEGORY_NOT_FOUND_OR_NOT_PUBLISHED', $this->_id );
+				$err_mssg = \Joomla\CMS\Language\Text::sprintf( 'FLEXI_CONTENT_CATEGORY_NOT_FOUND_OR_NOT_PUBLISHED', $this->_id );
 				$err_type = 404;
 			}
 
@@ -1992,7 +1992,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				case 'author':
 					if (!$this->_authorid)
 					{
-						$err_mssg = JText::_( 'FLEXI_CANNOT_LIST_CONTENT_AUTHORID_NOT_SET');
+						$err_mssg = \Joomla\CMS\Language\Text::_( 'FLEXI_CANNOT_LIST_CONTENT_AUTHORID_NOT_SET');
 						$err_type = 404;
 					}
 					break;
@@ -2000,11 +2000,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 				case 'tags':
 					if (!$this->_tagid)
 					{
-						$err_mssg = JText::_( 'FLEXI_CANNOT_LIST_CONTENT_TAGID_NOT_SET');
+						$err_mssg = \Joomla\CMS\Language\Text::_( 'FLEXI_CANNOT_LIST_CONTENT_TAGID_NOT_SET');
 						$err_type = 404;
 					} elseif (!$this->getTag())
 					{
-						$err_mssg = JText::_( 'JERROR_LAYOUT_PAGE_NOT_FOUND');
+						$err_mssg = \Joomla\CMS\Language\Text::_( 'JERROR_LAYOUT_PAGE_NOT_FOUND');
 						$err_type = 404;
 					}
 					break;
@@ -2012,7 +2012,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				case 'myitems':
 					if (!$this->_authorid)
 					{
-						$err_mssg = JText::_( 'FLEXI_LOGIN_TO_DISPLAY_YOUR_CONTENT');
+						$err_mssg = \Joomla\CMS\Language\Text::_( 'FLEXI_LOGIN_TO_DISPLAY_YOUR_CONTENT');
 						$err_type = 403;
 						$login_redirect = true;
 					}
@@ -2023,11 +2023,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 					{
 						// Get Favourites field configuration
 						$favs_field = reset(FlexicontentFields::getFieldsByIds(array(12)));
-						$favs_field->parameters = new JRegistry($favs_field->attribs);
+						$favs_field->parameters = new \Joomla\Registry\Registry($favs_field->attribs);
 						$allow_guests_favs = $favs_field->parameters->get('allow_guests_favs', 1);
 						if (!$allow_guests_favs)
 						{
-							$err_mssg = JText::_( 'FLEXI_LOGIN_TO_DISPLAY_YOUR_FAVOURED_CONTENT');
+							$err_mssg = \Joomla\CMS\Language\Text::_( 'FLEXI_LOGIN_TO_DISPLAY_YOUR_FAVOURED_CONTENT');
 							$err_type = 403;
 							$login_redirect = true;
 						}
@@ -2037,7 +2037,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				default:
 					if (!in_array($this->_layout, array('favs','tags','mcats','myitems','author')))
 					{
-						$err_mssg = JText::sprintf( 'FLEXI_CONTENT_LIST_LAYOUT_IS_NOT_SUPPORTED', $this->_layout );
+						$err_mssg = \Joomla\CMS\Language\Text::sprintf( 'FLEXI_CONTENT_LIST_LAYOUT_IS_NOT_SUPPORTED', $this->_layout );
 						$err_type = 404;
 					}
 					break;
@@ -2054,7 +2054,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				if (!empty($login_redirect))
 				{
 					// redirect unlogged user to login
-					$uri		= JUri::getInstance();
+					$uri		= \Joomla\CMS\Uri\Uri::getInstance();
 					$return	= $uri->toString();
 					$url  = $this->_params->get('login_page', 'index.php?option=com_users&view=login');
 					$return = strtr(base64_encode($return), '+/=', '-_,');
@@ -2080,7 +2080,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$this->_loadCategoryParams($force=true);
 		$this->_category->parameters = $this->_params;
 		$this->_category->metadata = $this->_category->id
-			? new JRegistry($this->_category->metadata)
+			? new \Joomla\Registry\Registry($this->_category->metadata)
 			: null;
 
 
@@ -2099,7 +2099,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// Check access level of category and of its parents
 		if ($this->_id)
 		{
-			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+			$aid_arr = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
 			$allowed_levels = array_flip($aid_arr);
 			$canread = isset($allowed_levels[$this->_category->access]);
 
@@ -2122,7 +2122,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			if ($user->guest)
 			{
 				// Redirect to login
-				$uri		= JUri::getInstance();
+				$uri		= \Joomla\CMS\Uri\Uri::getInstance();
 				$return	= $uri->toString();
 				$url  = $this->_params->get('login_page', 'index.php?option=com_users&view=login');
 				$return = strtr(base64_encode($return), '+/=', '-_,');
@@ -2130,7 +2130,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$url .= '&isfcurl=1';
 
 				$app->setHeader('status', 403, true);
-				$app->enqueueMessage(JText::sprintf('FLEXI_LOGIN_TO_ACCESS', $url), 'error');
+				$app->enqueueMessage(\Joomla\CMS\Language\Text::sprintf('FLEXI_LOGIN_TO_ACCESS', $url), 'error');
 				$app->redirect($url);
 			}
 
@@ -2142,7 +2142,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			else
 			{
 				$app->setHeader('status', 403, true);
-				$app->enqueueMessage(JText::_('FLEXI_ALERTNOTAUTH_VIEW'), 'error');
+				$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_VIEW'), 'error');
 				$app->redirect('index.php');
 			}
 		}
@@ -2203,14 +2203,14 @@ class FlexicontentModelCategory extends JModelLegacy {
 
 		// Assign tag parameters from Joomla tag params
 		$this->_tag->params = $this->_tag->jtag
-			? new JRegistry($this->_tag->jtag->params)
+			? new \Joomla\Registry\Registry($this->_tag->jtag->params)
 			: null;
 
 		// Assign tag metadata parameters from Joomla tag metadata params
 		if ($this->_tag->jtag)
 		{
 			$this->_tag->jtag->metadata = $this->_tag->jtag
-				? new JRegistry($this->_tag->jtag->metadata)
+				? new \Joomla\Registry\Registry($this->_tag->jtag->metadata)
 				: null;
 		}
 
@@ -2227,7 +2227,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	function decideLayout(&$params)
 	{
 		$fallback = 'grid';
-		$app      = JFactory::getApplication();
+		$app      = \Joomla\CMS\Factory::getApplication();
 
 		// Decide to use MOBILE or DESKTOP category template layout
 		$useMobile = (int) $params->get('use_mobile_layouts', 0 );
@@ -2261,14 +2261,14 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// Verify the category layout exists
 		if (!isset($themes->category->{$clayout}))
 		{
-			$component_default_layout = JComponentHelper::getParams('com_flexicontent')->get('clayout');
+			$component_default_layout = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('clayout');
 
 			$fixed_clayout = isset($themes->category->{$component_default_layout})
 				? $component_default_layout
 				: $fallback;
 
 			//echo "<pre>"; debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS); echo "</pre>";
-			JFactory::getApplication()->enqueueMessage('
+			\Joomla\CMS\Factory::getApplication()->enqueueMessage('
 				Current category Layout (template) is \'' . $clayout . '\' does not exist<br/>
 				- Please correct this in the URL or in Content Type configuration.<br/>
 				- Using Template Layout: \'' . $fixed_clayout . '\'
@@ -2355,13 +2355,13 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if ( $this->_params !== NULL && !$force ) return;
 		$id = (int)$this->_id;
 
-		$app  = JFactory::getApplication();
+		$app  = \Joomla\CMS\Factory::getApplication();
 		$menu = $app->getMenu()->getActive();     // Retrieve active menu item
 		if ($menu)
 			$menu_params = $menu->getParams();
 
 		// a. Clone component parameters ... we will use these as parameters base for merging
-		$compParams = clone(JComponentHelper::getComponent('com_flexicontent')->params);     // Get the COMPONENT only parameters
+		$compParams = clone(\Joomla\CMS\Component\ComponentHelper::getComponent('com_flexicontent')->params);     // Get the COMPONENT only parameters
 
 		$debug_inheritcid = $app->input->get('print', null, 'cmd') ? 0 : $compParams->get('debug_inheritcid');
 		if ($debug_inheritcid) {
@@ -2380,7 +2380,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		}
 		else
 		{
-			$catParams = new JRegistry();
+			$catParams = new \Joomla\Registry\Registry();
 		}
 
 
@@ -2459,7 +2459,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// -1. layout parameters will be placed on top at end of this code ...
 
 		// 0. Start from component parameters
-		$params = new JRegistry();
+		$params = new \Joomla\Registry\Registry();
 		$params->merge($compParams);
 
 		// 1. Merge category's inherited parameters (e.g. ancestor categories or specific category)
@@ -2695,13 +2695,13 @@ class FlexicontentModelCategory extends JModelLegacy {
 			else if ( !$return_sql )
 			{
 				//echo "<br>GET FILTERED Items (cat model) -- [".$filter->name."] using in-query ids :<br>". $query."<br>\n";
-				$db = JFactory::getDbo();
+				$db = \Joomla\CMS\Factory::getDbo();
 				$db->setQuery($query);
 				$filtered = $db->loadColumn();
 			}
 			else if ($return_sql===2)
 			{
-				$db = JFactory::getDbo();
+				$db = \Joomla\CMS\Factory::getDbo();
 				static $iids_tblname  = array();
 				if ( !isset($iids_tblname[$filter->id]) ) {
 					$iids_tblname[$filter->id] = 'fc_filter_iids_'.$filter->id;
@@ -2807,7 +2807,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$this->_comments = array();
 
 		// Check jcomments plugin is installed and enabled
-		if ( !JPluginHelper::isEnabled('system', 'jcomments') )  return $this->_comments;
+		if ( !\Joomla\CMS\Plugin\PluginHelper::isEnabled('system', 'jcomments') )  return $this->_comments;
 
 		// Normal case, item ids not given, we will retrieve comments information of cat/sub items
 		if ( empty($item_ids) )
@@ -2821,7 +2821,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			foreach ($this->_data as $item) $item_ids[] = $item->id;
 		}
 
-		$db = JFactory::getDbo();
+		$db = \Joomla\CMS\Factory::getDbo();
 		$query = 'SELECT COUNT(com.object_id) AS total, com.object_id AS item_id'
 		      . ' FROM #__jcomments AS com'
 		      . ' WHERE com.object_id in (' . implode(',',$item_ids) .')'
@@ -2863,8 +2863,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 
 	public function logSearch($search_term)
 	{
-		$db = JFactory::getDbo();
-		$params = JComponentHelper::getParams('com_search');
+		$db = \Joomla\CMS\Factory::getDbo();
+		$params = \Joomla\CMS\Component\ComponentHelper::getParams('com_search');
 		$enable_log_searches = $params->get('enabled');
 
 		$search_term_quoted = $db->Quote(trim($search_term));
@@ -2915,7 +2915,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 */
 	function getFavoured()
 	{
-		return flexicontent_db::getFavoured($type=1, $this->_id, JFactory::getUser()->id);
+		return flexicontent_db::getFavoured($type=1, $this->_id, \Joomla\CMS\Factory::getUser()->id);
 	}
 
 
@@ -2928,7 +2928,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 */
 	function removefav()
 	{
-		return flexicontent_db::removefav($type=1, $this->_id, JFactory::getUser()->id);
+		return flexicontent_db::removefav($type=1, $this->_id, \Joomla\CMS\Factory::getUser()->id);
 	}
 
 
@@ -2941,18 +2941,18 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 */
 	function addfav()
 	{
-		return flexicontent_db::addfav($type=1, $this->_id, JFactory::getUser()->id);
+		return flexicontent_db::addfav($type=1, $this->_id, \Joomla\CMS\Factory::getUser()->id);
 	}
 
 
 	/**
-	 * Create a JRegistry object checking for legacy bug of bad parameter merging code in during model saving
+	 * Create a \Joomla\Registry\Registry object checking for legacy bug of bad parameter merging code in during model saving
 	 */
 	private function _new_JRegistry($params)
 	{
 		if (!is_object($params))
 		{
-			$params = new JRegistry($params);
+			$params = new \Joomla\Registry\Registry($params);
 		}
 
 		$attribs = $params->toArray();
@@ -2969,7 +2969,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 
 		if ($err || !is_object($params))
 		{
-			$params = new JRegistry($attribs);
+			$params = new \Joomla\Registry\Registry($attribs);
 		}
 
 		return $params;

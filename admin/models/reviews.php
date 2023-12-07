@@ -94,7 +94,7 @@ class FlexicontentModelReviews extends FCModelAdminList
 	 */
 	public function __construct($config = array())
 	{
-		$app    = JFactory::getApplication();
+		$app    = \Joomla\CMS\Factory::getApplication();
 		$jinput = $app->input;
 		$option = $jinput->getCmd('option', '');
 		$view   = $jinput->getCmd('view', '');
@@ -129,15 +129,14 @@ class FlexicontentModelReviews extends FCModelAdminList
 	/**
 	 * Method to build the query for the records
 	 *
-	 * @return  JDatabaseQuery   The DB Query object
+	 * @return  \Joomla\Data\DataObjectbaseQuery   The DB Query object
 	 *
 	 * @since   3.3.0
 	 */
 	protected function getListQuery()
 	{
 		// Create a query with all its clauses: WHERE, HAVING and ORDER BY, etc
-		$query = parent::getListQuery()
-		;
+		$query = parent::getListQuery();
 
 		return $query;
 	}
@@ -167,7 +166,7 @@ class FlexicontentModelReviews extends FCModelAdminList
 			$where[] = 'a.approved = ' . (int) $filter_approved;
 		}
 
-		if ($q instanceof \JDatabaseQuery)
+		if ($q instanceof JDatabaseQuery || (FLEXI_J40GE && $q instanceof \Joomla\Database\DatabaseQuery))
 		{
 			return $where ? $q->where($where) : $q;
 		}
@@ -201,7 +200,7 @@ class FlexicontentModelReviews extends FCModelAdminList
 
 			$table->id    = 0;
 			$table->$name = $table->$name . ' [copy]';
-			$table->alias = JFilterOutput::stringURLSafe($table->$name);
+			$table->alias = \Joomla\CMS\Filter\OutputFilter::stringURLSafe($table->$name);
 
 			$table->check();
 			$table->store();

@@ -20,10 +20,10 @@
 defined('_JEXEC') or die('Restricted access');
 
 jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // JHtmlSelect
+jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
 
-jimport('joomla.form.helper'); // JFormHelper
-JFormHelper::loadFieldClass('radio');   // JFormFieldRadio
+jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
+\Joomla\CMS\Form\FormHelper::loadFieldClass('radio');   // \Joomla\CMS\Form\Field\RadioField
 
 /**
  * Renders the FC-method radio element
@@ -44,7 +44,7 @@ class JFormFieldFcmethod extends JFormFieldRadio
 
 	function getInput()
 	{
-		$doc = JFactory::getDocument();
+		$doc = \Joomla\CMS\Factory::getDocument();
 
 		$node = & $this->element;
 		$attributes = get_object_vars($node->attributes());
@@ -88,11 +88,11 @@ class JFormFieldFcmethod extends JFormFieldRadio
 		
 		// prepare the options 
 		$options = array(); 
-		$options[] = JHtml::_('select.option', '1', JText::_('FLEXI_ALL')); 
-		$options[] = JHtml::_('select.option', '2', JText::_('FLEXI_EXCLUDE')); 
-		$options[] = JHtml::_('select.option', '3', JText::_('FLEXI_INCLUDE')); 
+		$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '1', \Joomla\CMS\Language\Text::_('FLEXI_ALL')); 
+		$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '2', \Joomla\CMS\Language\Text::_('FLEXI_EXCLUDE')); 
+		$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '3', \Joomla\CMS\Language\Text::_('FLEXI_INCLUDE')); 
 		
-		$html = JHtml::_('select.radiolist', $options, $fieldname, $class, 'value', 'text', $value, $element_id);
+		$html = \Joomla\CMS\HTML\HTMLHelper::_('select.radiolist', $options, $fieldname, $class, 'value', 'text', $value, $element_id);
 		$html = '<fieldset id="'.$element_id.'" class="radio">'.$html.'</fieldset>';
 		
 		return $html;

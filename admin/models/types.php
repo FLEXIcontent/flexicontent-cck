@@ -99,7 +99,7 @@ class FlexicontentModelTypes extends FCModelAdminList
 	 */
 	public function __construct($config = array())
 	{
-		$app    = JFactory::getApplication();
+		$app    = \Joomla\CMS\Factory::getApplication();
 		$jinput = $app->input;
 		$option = $jinput->getCmd('option', '');
 		$view   = $jinput->getCmd('view', '');
@@ -128,7 +128,7 @@ class FlexicontentModelTypes extends FCModelAdminList
 	/**
 	 * Method to build the query for the records
 	 *
-	 * @return  JDatabaseQuery   The DB Query object
+	 * @return  \Joomla\Data\DataObjectbaseQuery   The DB Query object
 	 *
 	 * @since   3.3.0
 	 */
@@ -161,7 +161,7 @@ class FlexicontentModelTypes extends FCModelAdminList
 		// Inherited filters : filter_state, filter_access, search
 		$where = parent::_buildContentWhere(false);
 
-		if ($q instanceof \JDatabaseQuery)
+		if ($q instanceof JDatabaseQuery || (FLEXI_J40GE && $q instanceof \Joomla\Database\DatabaseQuery))
 		{
 			return $where ? $q->where($where) : $q;
 		}
@@ -228,7 +228,7 @@ class FlexicontentModelTypes extends FCModelAdminList
 
 			$table->id    = 0;
 			$table->$name = $table->$name . ' [copy]';
-			$table->alias = JFilterOutput::stringURLSafe($table->$name);
+			$table->alias = \Joomla\CMS\Filter\OutputFilter::stringURLSafe($table->$name);
 
 			$table->check();
 			$table->store();

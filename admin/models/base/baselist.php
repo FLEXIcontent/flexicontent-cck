@@ -13,7 +13,6 @@ defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
-use Joomla\CMS\Table\Table;
 
 jimport('legacy.model.list');
 require_once('traitbase.php');
@@ -23,7 +22,7 @@ require_once('traitlegacylist.php');
  * FLEXIcontent Component BASE (list) Model
  *
  */
-abstract class FCModelAdminList extends JModelList
+abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 {
 	use FCModelTraitBase;
 	use FCModelTraitLegacyList;
@@ -143,7 +142,7 @@ abstract class FCModelAdminList extends JModelList
 	 */
 	public function __construct($config = array())
 	{
-		$app    = JFactory::getApplication();
+		$app    = \Joomla\CMS\Factory::getApplication();
 		$jinput = $app->input;
 		$option = $jinput->getCmd('option', '');
 		$view   = $jinput->getCmd('view', '');
@@ -156,7 +155,7 @@ abstract class FCModelAdminList extends JModelList
 		$p = $this->ovid = $option . '.' . ($this->view_id ?: $view . '_' . $layout) . '.';
 
 		// Parameters of the view, in our case it is only the component parameters
-		$this->cparams = JComponentHelper::getParams('com_flexicontent');
+		$this->cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 
 		// Make sure this is correct if called from different component ...
 		$this->option = 'com_flexicontent';
@@ -270,9 +269,9 @@ abstract class FCModelAdminList extends JModelList
 
 
 	/**
-	 * Method to get a \JPagination object for the data set
+	 * Method to get a \Joomla\CMS\Pagination\Pagination object for the data set
 	 *
-	 * @return  \JPagination  A \JPagination object for the data set
+	 * @return  \Joomla\CMS\Pagination\Pagination  A \Joomla\CMS\Pagination\Pagination object for the data set
 	 *
 	 * @since	1.5
 	 */
@@ -333,7 +332,7 @@ abstract class FCModelAdminList extends JModelList
 	 *
 	 * This method ensures that the query is constructed only once for a given state of the model.
 	 *
-	 * @return  \JDatabaseQuery  A \JDatabaseQuery object
+	 * @return  \Joomla\Data\DataObjectbaseQuery  A \Joomla\Data\DataObjectbaseQuery object
 	 *
 	 * @since   1.6
 	 */
@@ -352,7 +351,7 @@ abstract class FCModelAdminList extends JModelList
 	/**
 	 * Method to build the query for the records
 	 *
-	 * @return  JDatabaseQuery   The DB Query object
+	 * @return  \Joomla\Data\DataObjectbaseQuery   The DB Query object
 	 *
 	 * @since   3.3.0
 	 */
@@ -421,7 +420,7 @@ abstract class FCModelAdminList extends JModelList
 
 		$order = $this->_db->escape($filter_order . ' ' . $filter_order_Dir);
 
-		if ($q instanceof \JDatabaseQuery)
+		if ($q instanceof JDatabaseQuery || (FLEXI_J40GE && $q instanceof \Joomla\Database\DatabaseQuery))
 		{
 			return $order ? $q->order($order) : $q;
 		}
@@ -444,7 +443,7 @@ abstract class FCModelAdminList extends JModelList
 	protected function _buildContentWhere($q = false)
 	{
 		$table = $this->getTable($this->records_jtable, '');
-		$user  = JFactory::getUser();
+		$user  = \Joomla\CMS\Factory::getUser();
 
 		// Various filters
 		$filter_state  = $this->getState('filter_state');
@@ -542,9 +541,9 @@ abstract class FCModelAdminList extends JModelList
 			}
 
 			// Filter via View Level Access, if user is not super-admin
-			if (!JFactory::getUser()->authorise('core.admin') && (JFactory::getApplication()->isClient('site') || $this->listViaAccess))
+			if (!\Joomla\CMS\Factory::getUser()->authorise('core.admin') && (\Joomla\CMS\Factory::getApplication()->isClient('site') || $this->listViaAccess))
 			{
-				$groups  = implode(',', JAccess::getAuthorisedViewLevels($user->id));
+				$groups  = implode(',', \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id));
 				$where[] = 'a.access IN (' . $groups . ')';
 			}
 		}
@@ -566,7 +565,7 @@ abstract class FCModelAdminList extends JModelList
 			$where[] = '(' . implode(' OR ', $textwhere) . ')';
 		}
 
-		if ($q instanceof \JDatabaseQuery)
+		if ($q instanceof JDatabaseQuery || (FLEXI_J40GE && $q instanceof \Joomla\Database\DatabaseQuery))
 		{
 			return $where ? $q->where($where) : $q;
 		}
@@ -590,7 +589,7 @@ abstract class FCModelAdminList extends JModelList
 	{
 		$having = array();
 
-		if ($q instanceof \JDatabaseQuery)
+		if ($q instanceof JDatabaseQuery || (FLEXI_J40GE && $q instanceof \Joomla\Database\DatabaseQuery))
 		{
 			return $having ? $q->having($having) : $q;
 		}
@@ -653,7 +652,7 @@ abstract class FCModelAdminList extends JModelList
 
 		if (count($ids))
 		{
-			$user = JFactory::getUser();
+			$user = \Joomla\CMS\Factory::getUser();
 
 			// This is already done by controller task / caller but redo
 			$ids = ArrayHelper::toInteger($ids);
@@ -847,15 +846,15 @@ abstract class FCModelAdminList extends JModelList
 
 		if ($model && $this->event_context && ($this->event_before_delete || $this->event_after_delete))
 		{
-			$app = JFactory::getApplication();
+			$app = \Joomla\CMS\Factory::getApplication();
 			$dispatcher = JEventDispatcher::getInstance();
 
 			// Load all content and flexicontent plugins for triggering their delete events
 			if ($this->event_context === 'com_content.article')
 			{
-				JPluginHelper::importPlugin('content');
+				\Joomla\CMS\Plugin\PluginHelper::importPlugin('content');
 			}
-			JPluginHelper::importPlugin('flexicontent');
+			\Joomla\CMS\Plugin\PluginHelper::importPlugin('flexicontent');
 
 			foreach ($cid as $record_id)
 			{
@@ -946,7 +945,7 @@ abstract class FCModelAdminList extends JModelList
 
 			$table->id    = 0;
 			$table->$name = $table->$name . ' [copy]';
-			$table->alias = JFilterOutput::stringURLSafe($table->$name);
+			$table->alias = \Joomla\CMS\Filter\OutputFilter::stringURLSafe($table->$name);
 
 			$table->check();
 			$table->store();
@@ -1031,7 +1030,7 @@ abstract class FCModelAdminList extends JModelList
 	 */
 	public function filterByPermission($cid, $action)
 	{
-		$user  = JFactory::getUser();
+		$user  = \Joomla\CMS\Factory::getUser();
 		$table = $this->getTable($this->records_jtable, '');
 
 		$cid   = ArrayHelper::toInteger($cid);
@@ -1129,7 +1128,7 @@ abstract class FCModelAdminList extends JModelList
 	 */
 	protected function _setStateOrder()
 	{
-		$app    = JFactory::getApplication();
+		$app    = \Joomla\CMS\Factory::getApplication();
 		$jinput = $app->input;
 		$view   = $jinput->getCmd('view', '');
 		$fcform = $jinput->getInt('fcform', 0);
@@ -1213,7 +1212,7 @@ abstract class FCModelAdminList extends JModelList
 				}
 				else
 				{
-					JFactory::getApplication()->enqueueMessage('Text search scope ' . $scope . ' is unknown, search failed', 'warning');
+					\Joomla\CMS\Factory::getApplication()->enqueueMessage('Text search scope ' . $scope . ' is unknown, search failed', 'warning');
 				}
 			}
 		}

@@ -20,10 +20,10 @@
 defined('_JEXEC') or die('Restricted access');
 
 jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // JHtmlSelect
+jimport('cms.html.select');    // JHTMLSelect
 
-jimport('joomla.form.helper'); // JFormHelper
-JFormHelper::loadFieldClass('list');   // JFormFieldList
+jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
+\Joomla\CMS\Form\FormHelper::loadFieldClass('list');   // \Joomla\CMS\Form\Field\ListField
 
 /**
  * Renders the list of the content plugins
@@ -43,8 +43,8 @@ class JFormFieldPluginlist extends JFormFieldList
 
 	function getInput()
 	{
-		$doc = JFactory::getDocument();
-		$db  = JFactory::getDbo();
+		$doc = \Joomla\CMS\Factory::getDocument();
+		$db  = \Joomla\CMS\Factory::getDbo();
 		
 		$node = & $this->element;
 		$attributes = get_object_vars($node->attributes());
@@ -78,11 +78,11 @@ class JFormFieldPluginlist extends JFormFieldList
 		$plugins = array();
 		foreach ($plgs as $plg)
 		{
-			$plugins[] = JHtmlSelect::option($plg->name, $plg->name); 
+			$plugins[] = JHTMLSelect::option($plg->name, $plg->name);
 		}
 		
 		$attribs = ' class="use_select2_lib" multiple="multiple" size="5" ';
 		
-		return JHtmlSelect::genericList($plugins, $fieldname, $attribs, 'value', 'text', $values, $element_id);
+		return JHTMLSelect::genericList($plugins, $fieldname, $attribs, 'value', 'text', $values, $element_id);
 	}
 }

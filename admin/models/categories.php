@@ -108,7 +108,7 @@ class FlexicontentModelCategories extends FCModelAdminList
 	 */
 	public function __construct($config = array())
 	{
-		$app    = JFactory::getApplication();
+		$app    = \Joomla\CMS\Factory::getApplication();
 		$jinput = $app->input;
 		$option = $jinput->getCmd('option', '');
 		$view   = $jinput->getCmd('view', '');
@@ -153,15 +153,14 @@ class FlexicontentModelCategories extends FCModelAdminList
 	/**
 	 * Method to build the query for the records
 	 *
-	 * @return  JDatabaseQuery   The DB Query object
+	 * @return  \Joomla\Data\DataObjectbaseQuery   The DB Query object
 	 *
 	 * @since   3.3.0
 	 */
 	protected function getListQuery()
 	{
 		// Create a query with all its clauses: WHERE, HAVING and ORDER BY, etc
-		$query = parent::getListQuery()
-		;
+		$query = parent::getListQuery();
 
 		// Listing associated items
 		$filter_assockey = $this->getState('filter_assockey');
@@ -226,7 +225,7 @@ class FlexicontentModelCategories extends FCModelAdminList
 			$where[] = 'a.level <= ' . (int) $filter_level;
 		}
 
-		if ($q instanceof \JDatabaseQuery)
+		if ($q instanceof JDatabaseQuery || (FLEXI_J40GE && $q instanceof \Joomla\Database\DatabaseQuery))
 		{
 			return $where ? $q->where($where) : $q;
 		}
@@ -395,7 +394,7 @@ class FlexicontentModelCategories extends FCModelAdminList
 	 * Method to get parameters of parent categories
 	 *
 	 * @param   integer  $pk  The category id
-	 * @return	string   An array of JSON strings
+	 * @return	array   An array of JSON strings
 	 *
 	 * @since	3.3.0
 	 */
@@ -421,7 +420,7 @@ class FlexicontentModelCategories extends FCModelAdminList
 	 * Method to count assigned items for the given categories
 	 *
 	 * @access public
-	 * @return	string
+	 * @return array
 	 * @since	1.6
 	 */
 	function countItemsByState($cids)

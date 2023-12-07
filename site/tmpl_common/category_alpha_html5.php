@@ -3,16 +3,16 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 use Joomla\String\StringHelper;
 
-$app = JFactory::getApplication();
+$app = \Joomla\CMS\Factory::getApplication();
 $caching = $app->getCfg('caching');
 
 $show_alpha = $this->params->get('show_alpha',1);
 if ($show_alpha == 1) {
 	// Language Default
-	$alphacharacters = JTEXT::_("FLEXI_ALPHA_INDEX_CHARACTERS");
+	$alphacharacters = \Joomla\CMS\Language\Text::_("FLEXI_ALPHA_INDEX_CHARACTERS");
 	$groups = explode("!!", $alphacharacters);
-	$groupcssclasses = explode("!!", JTEXT::_("FLEXI_ALPHA_INDEX_CSSCLASSES"));
-	$alphaaliases = explode("!!", JTEXT::_("FLEXI_ALPHA_INDEX_ALIASES"));
+	$groupcssclasses = explode("!!", \Joomla\CMS\Language\Text::_("FLEXI_ALPHA_INDEX_CSSCLASSES"));
+	$alphaaliases = explode("!!", \Joomla\CMS\Language\Text::_("FLEXI_ALPHA_INDEX_ALIASES"));
 } else {  // $show_alpha == 2
 	// Custom setting
 	$alphacharacters = $this->params->get('alphacharacters', "[default]=a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,y,z!!0,1,2,3,4,5,6,7,8,9");
@@ -31,7 +31,7 @@ if ($show_alpha == 1) {
 			$custom_lang_alpha_index = $matches[2];
 		} else {
 			// c. Use default language string from language file
-			$custom_lang_alpha_index = JTEXT::_("FLEXI_ALPHA_INDEX_CHARACTERS");
+			$custom_lang_alpha_index = \Joomla\CMS\Language\Text::_("FLEXI_ALPHA_INDEX_CHARACTERS");
 		}
 	}
 
@@ -59,7 +59,7 @@ for($i=count($groupcssclasses); $i<count($groups); $i++) {
 	$groupcssclasses[$i] = 'letters';
 }
 
-$selected_letter = JFactory::getApplication()->input->get('letter', '');
+$selected_letter = \Joomla\CMS\Factory::getApplication()->input->get('letter', '');
 ?>
 
 <div id="fc_alpha">
@@ -73,7 +73,7 @@ $selected_letter = JFactory::getApplication()->input->get('letter', '');
 	?>
 	<div class="aichargrp <?php echo $groupcssclasses[$grp_no]; ?>">
 	<?php if($flag) {?>
-	<a class="fc_alpha_index" href="javascript:;" onclick="document.getElementById('alpha_index').value=''; var form=document.getElementById('adminForm'); adminFormPrepare(form, 2);"><?php echo JText::_('FLEXI_ALL'); ?></a>
+	<a class="fc_alpha_index" href="javascript:;" onclick="document.getElementById('alpha_index').value=''; var form=document.getElementById('adminForm'); adminFormPrepare(form, 2);"><?php echo \Joomla\CMS\Language\Text::_('FLEXI_ALL'); ?></a>
 	<?php $flag = false;}?>
 	<?php
 		foreach ($letters as $letter) :

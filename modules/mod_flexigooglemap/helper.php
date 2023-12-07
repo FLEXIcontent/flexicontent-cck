@@ -28,7 +28,7 @@ class modFlexigooglemapHelper
 		$fieldaddressid = $params->get('fieldaddressid');
 
 		if (empty($fieldaddressid)) {
-			echo '<div class="alert alert-warning">' . JText::_('MOD_FLEXIGOOGLEMAP_ADDRESSFORGOT') . '</div>';
+			echo '<div class="alert alert-warning">' . \Joomla\CMS\Language\Text::_('MOD_FLEXIGOOGLEMAP_ADDRESSFORGOT') . '</div>';
 			return array();
 		}
 
@@ -78,7 +78,7 @@ class modFlexigooglemapHelper
 		 * Retrieve the items having the map locations (for the given field and the given categories)
 		 */
 
-		$db = JFactory::getDbo();
+		$db = \Joomla\CMS\Factory::getDbo();
 		$queryLoc = 'SELECT a.id, a.title, b.field_id, b.value , a.catid '
 			. ', CASE WHEN CHAR_LENGTH(a.alias) THEN CONCAT_WS(\':\', a.id, a.alias) ELSE a.id END as itemslug'
 			. ', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as catslug'
@@ -98,7 +98,7 @@ class modFlexigooglemapHelper
 		$forced_itemid = $params->get('forced_itemid', 0);
 
 		foreach ($itemsLoc as &$itemLoc) {
-			$itemLoc->link = JRoute::_(FlexicontentHelperRoute::getItemRoute($itemLoc->itemslug, $itemLoc->catslug, $forced_itemid, $itemLoc));
+			$itemLoc->link = \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getItemRoute($itemLoc->itemslug, $itemLoc->catslug, $forced_itemid, $itemLoc));
 		}
 
 		return $itemsLoc;
@@ -112,10 +112,10 @@ class modFlexigooglemapHelper
 		$useadress = $params->get('useadress', '');
 
 		$linkmode = $params->get('linkmode', '');
-		$readmore = JText::_($params->get('readmore', 'MOD_FLEXIGOOGLEMAP_READMORE_TXT'));
+		$readmore = \Joomla\CMS\Language\Text::_($params->get('readmore', 'MOD_FLEXIGOOGLEMAP_READMORE_TXT'));
 
 		$usedirection = $params->get('usedirection', '');
-		$directionname = JText::_($params->get('directionname', 'MOD_FLEXIGOOGLEMAP_DIRECTIONNAME_TXT'));
+		$directionname = \Joomla\CMS\Language\Text::_($params->get('directionname', 'MOD_FLEXIGOOGLEMAP_DIRECTIONNAME_TXT'));
 
 		$infotextmode = $params->get('infotextmode', '');
 		$relitem_html = $params->get('relitem_html', '');
@@ -131,8 +131,8 @@ class modFlexigooglemapHelper
 
 		if ($use_custom_marker) {
 			$custom_marker_path     = $field->parameters->get('custom_marker_path', 'modules/mod_flexigooglemap/assets/marker');
-			$custom_marker_path_abs = JPATH::clean(JPATH_SITE . DS . $custom_marker_path . DS);
-			$custom_marker_url_base = str_replace('\\', '/', JURI::root() . $custom_marker_path . '/');
+			$custom_marker_path_abs = \Joomla\Filesystem\Path::clean(JPATH_SITE . DS . $custom_marker_path . DS);
+			$custom_marker_url_base = str_replace('\\', '/', \Joomla\CMS\Uri\Uri::root() . $custom_marker_path . '/');
 		}
 
 		$mapLocations = array();
@@ -192,7 +192,7 @@ class modFlexigooglemapHelper
 								. ($coord['city'] ? $coord['city'] . ',' : '')
 								. ($coord['state'] ? $coord['state'] . ',' : ($coord['province'] ? $coord['province'] . ',' : ''))
 								. ($coord['zip'] ? $coord['zip'] . ',' : '')
-								. ($coord['country'] ? JText::_('PLG_FC_ADDRESSINT_CC_' . $coord['country']) : ''));
+								. ($coord['country'] ? \Joomla\CMS\Language\Text::_('PLG_FC_ADDRESSINT_CC_' . $coord['country']) : ''));
 						} else {
 							$map_link .= urlencode($coord['lat'] . "," . $coord['lon']);
 						}
@@ -326,7 +326,7 @@ class modFlexigooglemapHelper
 					 * Add item to array of know items
 					 */
 					$item = clone ($address_item);
-					$item->link = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, $forced_itemid, $item));
+					$item->link = \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, $forced_itemid, $item));
 					$mapItems[] = $item;
 
 					$title = addslashes($item->title);
@@ -361,7 +361,7 @@ class modFlexigooglemapHelper
 									. ($coord['city'] ? $coord['city'] . ',' : '')
 									. ($coord['state'] ? $coord['state'] . ',' : ($coord['province'] ? $coord['province'] . ',' : ''))
 									. ($coord['zip'] ? $coord['zip'] . ',' : '')
-									. ($coord['country'] ? JText::_('PLG_FC_ADDRESSINT_CC_' . $coord['country']) : ''));
+									. ($coord['country'] ? \Joomla\CMS\Language\Text::_('PLG_FC_ADDRESSINT_CC_' . $coord['country']) : ''));
 							} else {
 								$map_link .= urlencode($coord['lat'] . "," . $coord['lon']);
 							}
@@ -491,7 +491,7 @@ class modFlexigooglemapHelper
 				// 'Local image file' mode
 			case 0:
 				$defautmarker_path = JPATH_SITE . '/' . $markerimage;
-				$defautmarker_url  = JUri::root(true) . '/' . $markerimage;
+				$defautmarker_url  = \Joomla\CMS\Uri\Uri::root(true) . '/' . $markerimage;
 				break;
 
 				// Default marker icon
@@ -513,7 +513,7 @@ class modFlexigooglemapHelper
 		if ($defautmarker_url && $params->get('mapapi', 'googlemap') !== 'googlemap') {
 			$start_microtime = microtime(true);
 			if (FLEXI_CACHE) {
-				$cache = JFactory::getCache('com_flexicontent');
+				$cache = \Joomla\CMS\Factory::getCache('com_flexicontent');
 				$cache->setCaching(1);                  // Force cache ON
 				$cache->setLifeTime(FLEXI_CACHE_TIME);  // Set expire time (default is 1 hour)
 				list($wS, $hS) = $cache->get('getimagesize', array($defautmarker_path ?: $defautmarker_url));
@@ -526,7 +526,7 @@ class modFlexigooglemapHelper
 			$hA = $hS;
 
 			//$time_passed = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-			//JFactory::getApplication()->enqueueMessage( "recalculated default marker url dimensions AND placement: ". sprintf('%.2f s', $time_passed/1000000), 'message');
+			//\Joomla\CMS\Factory::getApplication()->enqueueMessage( "recalculated default marker url dimensions AND placement: ". sprintf('%.2f s', $time_passed/1000000), 'message');
 		}
 
 		return $defautmarker_url;
@@ -551,7 +551,7 @@ class modFlexigooglemapHelper
 
 		// Parse field parameters
 		if ($field) {
-			$field->parameters = new JRegistry($field->attribs);
+			$field->parameters = new \Joomla\Registry\Registry($field->attribs);
 		}
 
 		// Cache and return the field

@@ -11,14 +11,12 @@ defined('_JEXEC') or die;
 
 use Joomla\Registry\Registry;
 
-JLoader::register('FinderIndexerAdapter', JPATH_ADMINISTRATOR . '/components/com_finder/helpers/indexer/adapter.php');
-
 /**
  * Smart Search adapter for com_flexicontent.
  *
  * @since  2.5
  */
-class plgFinderFLEXIcontent extends FinderIndexerAdapter
+class plgFinderFLEXIcontent extends \Joomla\Component\Finder\Administrator\Indexer\Adapter
 {
 	/**
 	 * The plugin identifier.
@@ -109,7 +107,7 @@ class plgFinderFLEXIcontent extends FinderIndexerAdapter
 	 * Method to remove the link information for items that have been deleted.
 	 *
 	 * @param   string  $context  The context of the action being performed.
-	 * @param   JTable  $table    A JTable object containing the record to be deleted
+	 * @param   \Joomla\CMS\Table\Table  $table    A \Joomla\CMS\Table\Table object containing the record to be deleted
 	 *
 	 * @return  boolean  True on success.
 	 *
@@ -142,7 +140,7 @@ class plgFinderFLEXIcontent extends FinderIndexerAdapter
 	 * category to which it belongs has changed.
 	 *
 	 * @param   string   $context  The context of the content passed to the plugin.
-	 * @param   JTable   $row      A JTable object.
+	 * @param   \Joomla\CMS\Table\Table   $row      A \Joomla\CMS\Table\Table object.
 	 * @param   boolean  $isNew    True if the content has just been created.
 	 *
 	 * @return  boolean  True on success.
@@ -184,7 +182,7 @@ class plgFinderFLEXIcontent extends FinderIndexerAdapter
 	 * This event is fired before the data is actually saved.
 	 *
 	 * @param   string   $context  The context of the content passed to the plugin.
-	 * @param   JTable   $row      A JTable object.
+	 * @param   \Joomla\CMS\Table\Table   $row      A \Joomla\CMS\Table\Table object.
 	 * @param   boolean  $isNew    If the content is just about to be created.
 	 *
 	 * @return  boolean  True on success.
@@ -248,7 +246,7 @@ class plgFinderFLEXIcontent extends FinderIndexerAdapter
 	/**
 	 * Method to index an item. The item must be a FinderIndexerResult object.
 	 *
-	 * @param   FinderIndexerResult  $item    The item to index as a FinderIndexerResult object.
+	 * @param   \Joomla\Component\Finder\Administrator\Indexer\Result  $item    The item to index as a FinderIndexerResult object.
 	 * @param   string               $format  The item format.  Not used.
 	 *
 	 * @return  void
@@ -256,12 +254,12 @@ class plgFinderFLEXIcontent extends FinderIndexerAdapter
 	 * @since   2.5
 	 * @throws  Exception on database error.
 	 */
-	protected function index(FinderIndexerResult $item, $format = 'html')
+	protected function index(\Joomla\Component\Finder\Administrator\Indexer\Result $item, $format = 'html')
 	{
 		$item->setLanguage();
 
 		// Check if the extension is enabled.
-		if (JComponentHelper::isEnabled($this->extension) === false)
+		if (\Joomla\CMS\Component\ComponentHelper::isEnabled($this->extension) === false)
 		{
 			return;
 		}
@@ -270,14 +268,14 @@ class plgFinderFLEXIcontent extends FinderIndexerAdapter
 
 		// Initialise the item parameters.
 		$registry = new Registry($item->params);
-		$item->params = JComponentHelper::getParams('com_flexicontent', true);
+		$item->params = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent', true);
 		$item->params->merge($registry);
 
 		$item->metadata = new Registry($item->metadata);
 
 		// Trigger the onContentPrepare event.
-		$item->summary = FinderIndexerHelper::prepareContent($item->summary, $item->params, $item);
-		$item->body    = FinderIndexerHelper::prepareContent($item->body, $item->params, $item);
+		$item->summary = \Joomla\Component\Finder\Administrator\Indexer\Helper::prepareContent($item->summary, $item->params, $item);
+		$item->body    = \Joomla\Component\Finder\Administrator\Indexer\Helper::prepareContent($item->body, $item->params, $item);
 
 		// Create a URL as identifier to recognise items again.
 		$item->url = $this->getUrl($item->id, $this->extension, $this->layout, $item->catid);
@@ -286,7 +284,7 @@ class plgFinderFLEXIcontent extends FinderIndexerAdapter
 		$item->route = FlexicontentHelperRoute::getItemRoute($item->slug, $item->catslug, 0, $item);
 		if (!FLEXI_J40GE)
 		{
-			$item->path = FinderIndexerHelper::getContentPath($item->route);
+			$item->path = \Joomla\Component\Finder\Administrator\Indexer\Helper::getContentPath($item->route);
 		}
 
 		// Get the menu title if it exists.
@@ -302,11 +300,11 @@ class plgFinderFLEXIcontent extends FinderIndexerAdapter
 		$item->metaauthor = $item->metadata->get('author');
 
 		// Add the metadata processing instructions.
-		$item->addInstruction(FinderIndexer::META_CONTEXT, 'metakey');
-		$item->addInstruction(FinderIndexer::META_CONTEXT, 'metadesc');
-		$item->addInstruction(FinderIndexer::META_CONTEXT, 'metaauthor');
-		$item->addInstruction(FinderIndexer::META_CONTEXT, 'author');
-		$item->addInstruction(FinderIndexer::META_CONTEXT, 'created_by_alias');
+		$item->addInstruction(\Joomla\Component\Finder\Administrator\Indexer\Indexer::META_CONTEXT, 'metakey');
+		$item->addInstruction(\Joomla\Component\Finder\Administrator\Indexer\Indexer::META_CONTEXT, 'metadesc');
+		$item->addInstruction(\Joomla\Component\Finder\Administrator\Indexer\Indexer::META_CONTEXT, 'metaauthor');
+		$item->addInstruction(\Joomla\Component\Finder\Administrator\Indexer\Indexer::META_CONTEXT, 'author');
+		$item->addInstruction(\Joomla\Component\Finder\Administrator\Indexer\Indexer::META_CONTEXT, 'created_by_alias');
 
 		// Translate the state. Articles should only be published if the category is published.
 		$item->state = $this->translateState($item->state, $item->cat_state, $item->type_state);
@@ -338,7 +336,7 @@ class plgFinderFLEXIcontent extends FinderIndexerAdapter
 		$item->addTaxonomy('Language', $item->language);
 
 		// Get content extras.
-		FinderIndexerHelper::getContentExtras($item);
+		\Joomla\Component\Finder\Administrator\Indexer\Helper::getContentExtras($item);
 
 		// Index the item.
 		$this->indexer->index($item);
@@ -347,18 +345,18 @@ class plgFinderFLEXIcontent extends FinderIndexerAdapter
 	/**
 	 * Method to get the SQL query used to retrieve the list of content items.
 	 *
-	 * @param   mixed  $query  A JDatabaseQuery object or null.
+	 * @param   mixed  $query  A \Joomla\Data\DataObjectbaseQuery object or null.
 	 *
-	 * @return  JDatabaseQuery  A database object.
+	 * @return  \Joomla\Data\DataObjectbaseQuery  A database object.
 	 *
 	 * @since   2.5
 	 */
 	protected function getListQuery($query = null)
 	{
-		$db = JFactory::getDbo();
+		$db = \Joomla\CMS\Factory::getDbo();
 
 		// Check if we can use the supplied SQL query.
-		$query = $query instanceof JDatabaseQuery ? $query : $db->getQuery(true)
+		$query = $query instanceof \Joomla\Data\DataObjectbaseQuery ? $query : $db->getQuery(true)
 			->select('a.id, a.title, a.alias, a.introtext AS summary, a.fulltext AS body')
 			->select('a.state, a.catid, a.created AS start_date, a.created_by')
 			->select('a.created_by_alias, a.modified, a.modified_by, a.attribs AS params')

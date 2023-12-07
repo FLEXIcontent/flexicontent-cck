@@ -1613,9 +1613,12 @@
 			}
 
 			if (sel_EL.attr('multiple') && !sel_EL.hasClass('fc_select2_no_check'))
+			{
 				sel_EL.select2(sel2ops).addClass('select2_fc_checkboxes');
-			else
+			} else
+			{
 				sel_EL.select2(sel2ops);
+			}
 
 			// Set initially selected data (this allows setting order too)
 			if ( sel_EL.get(0).hasAttribute('data-select2-initdata') )

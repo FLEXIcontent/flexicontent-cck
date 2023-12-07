@@ -93,7 +93,7 @@ class FLEXIcontentModelSearch extends FCModelAdminList
 	 */
 	public function __construct($config = array())
 	{
-		$app    = JFactory::getApplication();
+		$app    = \Joomla\CMS\Factory::getApplication();
 		$jinput = $app->input;
 		$option = $jinput->getCmd('option', '');
 		$view   = $jinput->getCmd('view', '');
@@ -184,7 +184,7 @@ class FLEXIcontentModelSearch extends FCModelAdminList
 	{
 		if (!empty($this->_data)) return $this->_data;
 
-		$cparams = JComponentHelper::getParams('com_flexicontent');
+		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 		$print_logging_info = $cparams->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
 
@@ -470,7 +470,7 @@ class FLEXIcontentModelSearch extends FCModelAdminList
 	 */
 	public function purge($del_fieldids = null)
 	{
-		$app      = JFactory::getApplication();
+		$app      = \Joomla\CMS\Factory::getApplication();
 		$dbprefix = $app->getCfg('dbprefix');
 		$dbname   = $app->getCfg('db');
 

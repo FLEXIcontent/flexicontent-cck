@@ -10,10 +10,10 @@
 defined('JPATH_PLATFORM') or die;
 
 jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // JHtmlSelect
+jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
 
-jimport('joomla.form.helper'); // JFormHelper
-JFormHelper::loadFieldClass('list');   // JFormFieldList
+jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
+\Joomla\CMS\Form\FormHelper::loadFieldClass('list');   // \Joomla\CMS\Form\Field\ListField
 
 /**
  * Form Field to load a list of content authors
@@ -56,7 +56,7 @@ class JFormFieldFcauthor extends JFormFieldList
 
 			$options = array();
 
-			$db = JFactory::getDbo();
+			$db = \Joomla\CMS\Factory::getDbo();
 
 			// Construct the query
 			$query = $db->getQuery(true)

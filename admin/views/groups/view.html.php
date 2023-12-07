@@ -34,13 +34,13 @@ class FlexicontentViewGroups extends FlexicontentViewBaseRecords
 		 */
 
 		global $globalcats;
-		$app      = JFactory::getApplication();
+		$app      = \Joomla\CMS\Factory::getApplication();
 		$jinput   = $app->input;
-		$document = JFactory::getDocument();
-		$user     = JFactory::getUser();
-		$cparams  = JComponentHelper::getParams('com_flexicontent');
-		$session  = JFactory::getSession();
-		$db       = JFactory::getDbo();
+		$document = \Joomla\CMS\Factory::getDocument();
+		$user     = \Joomla\CMS\Factory::getUser();
+		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+		$session  = \Joomla\CMS\Factory::getSession();
+		$db       = \Joomla\CMS\Factory::getDbo();
 
 		$option   = $jinput->getCmd('option', '');
 		$view     = $jinput->getCmd('view', '');
@@ -56,8 +56,8 @@ class FlexicontentViewGroups extends FlexicontentViewBaseRecords
 		// Load Joomla language files of other extension
 		if (!empty($this->proxy_option))
 		{
-			JFactory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
-			JFactory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
+			\Joomla\CMS\Factory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
+			\Joomla\CMS\Factory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
 		}
 
 		// Get model
@@ -102,30 +102,30 @@ class FlexicontentViewGroups extends FlexicontentViewBaseRecords
 			// Add css to document
 			if ($isAdmin)
 			{
-				!JFactory::getLanguage()->isRtl()
-					? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
-					: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
-				!JFactory::getLanguage()->isRtl()
-					? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
-					: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
+				!\Joomla\CMS\Factory::getLanguage()->isRtl()
+					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
+					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
+				!\Joomla\CMS\Factory::getLanguage()->isRtl()
+					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
+					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 			}
 			else
 			{
-				!JFactory::getLanguage()->isRtl()
-					? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
-					: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
+				!\Joomla\CMS\Factory::getLanguage()->isRtl()
+					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
+					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
 			}
 
 			// Add JS frameworks
 			flexicontent_html::loadFramework('select2');
 
 			// Load custom behaviours: form validation, popup tooltips
-			JHtml::_('behavior.formvalidator');
-			JHtml::_('bootstrap.tooltip');
+			\Joomla\CMS\HTML\HTMLHelper::_('behavior.formvalidator');
+			\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip');
 
 			// Add js function to overload the joomla submitform validation
-			$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
-			$document->addScript(JUri::root(true).'/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
+			$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
+			$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
 		}
 
 		$js = '';
@@ -150,9 +150,9 @@ class FlexicontentViewGroups extends FlexicontentViewBaseRecords
 		FLEXIUtilities::ManagerSideMenu('CanGroups');
 
 		// Create document/toolbar titles
-		$doc_title = JText::_( 'FLEXI_GROUPS' );
+		$doc_title = \Joomla\CMS\Language\Text::_( 'FLEXI_GROUPS' );
 		$site_title = $document->getTitle();
-		JToolbarHelper::title( $doc_title, 'users-cog' );
+		\Joomla\CMS\Toolbar\ToolbarHelper::title( $doc_title, 'users-cog' );
 		$document->setTitle($doc_title .' - '. $site_title);
 
 		// Create the toolbar
@@ -178,7 +178,7 @@ class FlexicontentViewGroups extends FlexicontentViewBaseRecords
 		 * Add usage information notices if these are enabled
 		 */
 
-		$conf_link = '<a href="index.php?option=com_config&amp;view=component&amp;component=com_flexicontent&amp;path=" class="' . $this->btn_sm_class . ' btn-info">'.JText::_("FLEXI_CONFIG").'</a>';
+		$conf_link = '<a href="index.php?option=com_config&amp;view=component&amp;component=com_flexicontent&amp;path=" class="' . $this->btn_sm_class . ' btn-info">'.\Joomla\CMS\Language\Text::_("FLEXI_CONFIG").'</a>';
 
 		if ($cparams->get('show_usability_messages', 1))
 		{
@@ -227,7 +227,10 @@ class FlexicontentViewGroups extends FlexicontentViewBaseRecords
 
 		if (!$jinput->getCmd('nosidebar'))
 		{
-			$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
+			$this->sidebar = null;
+
+			if(FLEXI_J30GE && !FLEXI_J40GE) $this->sidebar = JHtmlSidebar::render();
+			if(FLEXI_J40GE) $this->sidebar = \Joomla\CMS\HTML\Helpers\Sidebar::render();
 		}
 
 		/**
@@ -251,11 +254,11 @@ class FlexicontentViewGroups extends FlexicontentViewBaseRecords
 	 */
 	function setToolbar()
 	{
-		$user     = JFactory::getUser();
-		$document = JFactory::getDocument();
-		$toolbar  = JToolbar::getInstance('toolbar');
+		$user     = \Joomla\CMS\Factory::getUser();
+		$document = \Joomla\CMS\Factory::getDocument();
+		$toolbar  = \Joomla\CMS\Toolbar\Toolbar::getInstance('toolbar');
 		$perms    = FlexicontentHelperPerm::getPerm();
-		$session  = JFactory::getSession();
+		$session  = \Joomla\CMS\Factory::getSession();
 		$useAssocs= flexicontent_db::useAssociations();
 		$canDo    = UsersHelper::getActions();
 
@@ -264,9 +267,9 @@ class FlexicontentViewGroups extends FlexicontentViewBaseRecords
 		$contrl = $this->ctrl . '.';
 		$contrl_s = $this->name_singular . '.';
 
-		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
+		$loading_msg = flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_LOADING') .' ... '. \Joomla\CMS\Language\Text::_('FLEXI_PLEASE_WAIT'), 2);
 
-		JText::script("FLEXI_UPDATING_CONTENTS", true);
+		\Joomla\CMS\Language\Text::script("FLEXI_UPDATING_CONTENTS", true);
 		$document->addScriptDeclaration('
 			function fc_edit_jgroup_modal_load( container )
 			{
@@ -285,10 +288,10 @@ class FlexicontentViewGroups extends FlexicontentViewBaseRecords
 
 		if ($canDo->get('core.create'))
 		{
-			//JToolbarHelper::addNew($contrl.'add');
+			//\Joomla\CMS\Toolbar\ToolbarHelper::addNew($contrl.'add');
 
-			$modal_title = JText::_('FLEXI_NEW', true);
-			JToolbarHelper::divider();
+			$modal_title = \Joomla\CMS\Language\Text::_('FLEXI_NEW', true);
+			\Joomla\CMS\Toolbar\ToolbarHelper::divider();
 			flexicontent_html::addToolBarButton(
 				'FLEXI_NEW', $btn_name='add_jgroup',
 				$full_js="var url = jQuery(this).attr('data-href'); var the_dialog = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, fc_edit_jgroup_modal_close, {title:'".$modal_title."', loadFunc: fc_edit_jgroup_modal_load}); return false;",
@@ -300,12 +303,12 @@ class FlexicontentViewGroups extends FlexicontentViewBaseRecords
 
 		if (0 && $canDo->get('core.edit'))
 		{
-			JToolbarHelper::editList($contrl_s.'edit');
+			\Joomla\CMS\Toolbar\ToolbarHelper::editList($contrl_s.'edit');
 		}
 
 		if ($canDo->get('core.delete'))
 		{
-			JToolbarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), $contrl.'delete');
+			\Joomla\CMS\Toolbar\ToolbarHelper::deleteList(\Joomla\CMS\Language\Text::_('FLEXI_ARE_YOU_SURE'), $contrl.'delete');
 		}
 
 		$appsman_path = JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'appsman';
@@ -317,7 +320,7 @@ class FlexicontentViewGroups extends FlexicontentViewBaseRecords
 			$extra_js    = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; jQuery('<input>').attr({type: 'hidden', name: 'table', value: 'usergroups'}).appendTo(jQuery(f));";
 			flexicontent_html::addToolBarButton(
 				'Export now',
-				$btn_name, $full_js='', $msg_alert='', $msg_confirm=JText::_('FLEXI_EXPORT_NOW_AS_XML'),
+				$btn_name, $full_js='', $msg_alert='', $msg_confirm=\Joomla\CMS\Language\Text::_('FLEXI_EXPORT_NOW_AS_XML'),
 				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-info", $btn_icon);
 
 			$btn_icon = 'icon-box-add';
@@ -326,17 +329,17 @@ class FlexicontentViewGroups extends FlexicontentViewBaseRecords
 			$extra_js    = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; jQuery('<input>').attr({type: 'hidden', name: 'table', value: 'usergroups'}).appendTo(jQuery(f));";
 			flexicontent_html::addToolBarButton(
 				'Add to export',
-				$btn_name, $full_js='', $msg_alert='', $msg_confirm=JText::_('FLEXI_ADD_TO_EXPORT_LIST'),
+				$btn_name, $full_js='', $msg_alert='', $msg_confirm=\Joomla\CMS\Language\Text::_('FLEXI_ADD_TO_EXPORT_LIST'),
 				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn-info", $btn_icon);
 		}
 
 		if ($canDo->get('core.admin'))
 		{
-			JToolbarHelper::preferences('com_users');
-			JToolbarHelper::divider();
+			\Joomla\CMS\Toolbar\ToolbarHelper::preferences('com_users');
+			\Joomla\CMS\Toolbar\ToolbarHelper::divider();
 		}
 
-		JToolbarHelper::help('JHELP_USERS_GROUPS');
+		\Joomla\CMS\Toolbar\ToolbarHelper::help('JHELP_USERS_GROUPS');
 
 		if ($js)
 		{

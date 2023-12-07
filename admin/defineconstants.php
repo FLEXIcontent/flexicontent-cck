@@ -13,7 +13,7 @@ defined('_JEXEC') or die('Restricted access');
 
 // Make sure that Joomla error reporting is used (some plugin may have turned it OFF)
 // Also make some changes e.g. disable E_STRICT for maximum and leave it on only for development
-switch ( JFactory::getConfig()->get('error_reporting') )
+switch ( \Joomla\CMS\Factory::getConfig()->get('error_reporting') )
 {
 	case 'default':
 	case '-1':
@@ -40,7 +40,7 @@ switch ( JFactory::getConfig()->get('error_reporting') )
 		break;
 	
 	default:
-		error_reporting( JFactory::getConfig()->get('error_reporting') );
+		error_reporting( \Joomla\CMS\Factory::getConfig()->get('error_reporting') );
 		ini_set('display_errors', 1);
 		break;
 }
@@ -48,7 +48,7 @@ switch ( JFactory::getConfig()->get('error_reporting') )
 // Joomla version variables
 if (!defined('FLEXI_J16GE') || !defined('FLEXI_J30GE'))
 {
-	$jversion = new JVersion;
+	$jversion = new \Joomla\CMS\Version;
 	
 	// J3.5.0+ added new CLASS: StringHelper, to fix name conflict with PHP7 String class, we need to define the StringHelper CLASS in the case of J3.4.x
 	if ( version_compare( $jversion->getShortVersion(), '3.5.0', 'lt' ) && !class_exists('Joomla\String\StringHelper') )
@@ -61,12 +61,13 @@ if (!defined('FLEXI_J30GE'))   define('FLEXI_J30GE', true );
 if (!defined('FLEXI_J37GE'))   define('FLEXI_J37GE', version_compare( $jversion->getShortVersion(), '3.6.99', '>' ) );
 if (!defined('FLEXI_J38GE'))   define('FLEXI_J38GE', version_compare( $jversion->getShortVersion(), '3.7.99', '>' ) );
 if (!defined('FLEXI_J40GE'))   define('FLEXI_J40GE', version_compare( $jversion->getShortVersion(), '3.99.99', '>' ) );
+if (!defined('FLEXI_J50GE'))   define('FLEXI_J50GE', version_compare( $jversion->getShortVersion(), '4.99.99', '>' ) );
 
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 
-if ( !class_exists('JControllerLegacy') )  jimport('legacy.controller.legacy');
-if ( !class_exists('JModelLegacy') )       jimport('legacy.model.legacy');
-if ( !class_exists('JViewLegacy') )        jimport('legacy.view.legacy');
+if ( !class_exists('\Joomla\CMS\MVC\Controller\BaseController') )  jimport('legacy.controller.legacy');
+if ( !class_exists('\Joomla\CMS\MVC\Model\BaseDatabaseModel') )       jimport('legacy.model.legacy');
+if ( !class_exists('\Joomla\CMS\MVC\View\HtmlView') )        jimport('legacy.view.legacy');
 
 // Set a default timezone if web server provider has not done so
 // phpversion() should be used instead of PHP_VERSION, if not inside Joomla code
@@ -76,25 +77,25 @@ if (ini_get('date.timezone') == '')
 }
 
 // Set file manager paths
-$params = JComponentHelper::getParams('com_flexicontent');
-if (!defined('COM_FLEXICONTENT_FILEPATH'))	define('COM_FLEXICONTENT_FILEPATH',		JPath::clean( JPATH_ROOT.DS.$params->get('file_path', 'components/com_flexicontent/uploads') ) );
-if (!defined('COM_FLEXICONTENT_MEDIAPATH'))	define('COM_FLEXICONTENT_MEDIAPATH',	JPath::clean( JPATH_ROOT.DS.$params->get('media_path', 'components/com_flexicontent/medias') ) );
+$params = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+if (!defined('COM_FLEXICONTENT_FILEPATH'))	define('COM_FLEXICONTENT_FILEPATH',		\Joomla\CMS\Filesystem\Path::clean( JPATH_ROOT.DS.$params->get('file_path', 'components/com_flexicontent/uploads') ) );
+if (!defined('COM_FLEXICONTENT_MEDIAPATH'))	define('COM_FLEXICONTENT_MEDIAPATH',	\Joomla\CMS\Filesystem\Path::clean( JPATH_ROOT.DS.$params->get('media_path', 'components/com_flexicontent/medias') ) );
 
 // Set the media manager paths definitions
-$jinput = JFactory::getApplication()->input;
+$jinput = \Joomla\CMS\Factory::getApplication()->input;
 $view = $jinput->get('view', '', 'cmd');
 $popup_upload = $jinput->get('pop_up', null, 'cmd');
 $path = "fleximedia_path";
 if(substr(strtolower($view),0,6) == "images" || $popup_upload == 1) $path = "image_path";
-if (!defined('COM_FLEXIMEDIA_BASE'))		define('COM_FLEXIMEDIA_BASE',		 JPath::clean(JPATH_ROOT.DS.$params->get($path, 'images'.DS.'stories')));
-if (!defined('COM_FLEXIMEDIA_BASEURL'))	define('COM_FLEXIMEDIA_BASEURL', (php_sapi_name() !== 'cli' ? JUri::root() : JPATH_ROOT . '/').$params->get($path, 'images/stories'));
+if (!defined('COM_FLEXIMEDIA_BASE'))		define('COM_FLEXIMEDIA_BASE',		 \Joomla\CMS\Filesystem\Path::clean(JPATH_ROOT.DS.$params->get($path, 'images'.DS.'stories')));
+if (!defined('COM_FLEXIMEDIA_BASEURL'))	define('COM_FLEXIMEDIA_BASEURL', (php_sapi_name() !== 'cli' ? \Joomla\CMS\Uri\Uri::root() : JPATH_ROOT . '/').$params->get($path, 'images/stories'));
 
 if (!defined('FLEXI_SECTION'))				define('FLEXI_SECTION', 0);
 
 if (!defined('FLEXI_CAT_EXTENSION'))
 {
 	define('FLEXI_CAT_EXTENSION', $params->get('flexi_cat_extension','com_content'));
-	$db = JFactory::getDbo();
+	$db = \Joomla\CMS\Factory::getDbo();
 	$query = "SELECT lft,rgt FROM #__categories WHERE id=1 ";
 	$db->setQuery($query);
 	$obj = $db->loadObject();
@@ -114,11 +115,41 @@ if (FLEXI_J40GE)
 	}
 }
 
+// J3 backwards compatibility fixes.
+if(FLEXI_J50GE)
+{
+    // make sure no other component has redefined these classes
+	if(!class_exists('JFormFieldSpacer'))
+	{
+	     class JFormFieldSpacer extends \Joomla\CMS\Form\Field\SpacerField{}
+	}
+
+	if(!class_exists('JFormFieldGroupedList'))
+	{
+		class JFormFieldGroupedList extends \Joomla\CMS\Form\Field\GroupedlistField {}
+	}
+
+	if(!class_exists('JFormFieldRadio'))
+	{
+		class JFormFieldRadio extends \Joomla\CMS\Form\Field\RadioField {}
+	}
+
+	if(!class_exists('JFormFieldList'))
+	{
+		class JFormFieldList extends \Joomla\CMS\Form\Field\ListField {}
+	}
+
+	if(!class_exists('JHTMLSelect'))
+	{
+		class JHTMLSelect extends \Joomla\CMS\HTML\Helpers\Select {}
+	}
+}
+
 // Define configuration constants
 if (!defined('FLEXI_ACCESS'))  define('FLEXI_ACCESS'	, 0);  // TO BE REMOVED
 if (!defined('FLEXI_CACHE'))   define('FLEXI_CACHE'		, $params->get('advcache', 1));
 if (!defined('FLEXI_CACHE_TIME'))	define('FLEXI_CACHE_TIME'	, $params->get('advcache_time', 3600));
-if (!defined('FLEXI_FALANG'))     define('FLEXI_FALANG'		, (JPluginHelper::isEnabled('system', 'falangdriver') ? 1 : 0));
+if (!defined('FLEXI_FALANG'))     define('FLEXI_FALANG'		, (\Joomla\CMS\Plugin\PluginHelper::isEnabled('system', 'falangdriver') ? 1 : 0));
 if (!defined('FLEXI_FISH'))       define('FLEXI_FISH'		  , ($params->get('flexi_fish', 0) && FLEXI_FALANG ? 1 : 0));
 if (!defined('FLEXI_ONDEMAND'))		define('FLEXI_ONDEMAND'	, 1 );
 if (!defined('FLEXI_ITEMVIEW'))		define('FLEXI_ITEMVIEW'	, FLEXI_J16GE ? 'item' : 'items' );

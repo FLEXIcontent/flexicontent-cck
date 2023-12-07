@@ -71,12 +71,12 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 	public function duplicate()
 	{
 		// Check for request forgeries
-		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
+		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
 		// Check access
 		if (!FlexicontentHelperPerm::getPerm()->CanTemplates)
 		{
-			jexit(JText::_('FLEXI_ALERTNOTAUTH_TASK'));
+			jexit(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'));
 		}
 
 		$source = $this->input->getString('source');
@@ -86,15 +86,15 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 
 		if (!$model->duplicate($source, $dest))
 		{
-			echo JText::sprintf('FLEXI_TEMPLATE_FAILED_CLONE', $source);
+			echo \Joomla\CMS\Language\Text::sprintf('FLEXI_TEMPLATE_FAILED_CLONE', $source);
 
 			return;
 		}
 		else
 		{
-			$tmplcache = JFactory::getCache('com_flexicontent_tmpl');
+			$tmplcache = \Joomla\CMS\Factory::getCache('com_flexicontent_tmpl');
 			$tmplcache->clean();
-			echo '<span class="copyok" style="margin-top:15px; display:block">' . JText::sprintf('FLEXI_TEMPLATE_CLONED', $source, $dest) . '</span>';
+			echo '<span class="copyok" style="margin-top:15px; display:block">' . \Joomla\CMS\Language\Text::sprintf('FLEXI_TEMPLATE_CLONED', $source, $dest) . '</span>';
 		}
 	}
 
@@ -108,12 +108,12 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 	public function remove()
 	{
 		// Check for request forgeries
-		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
+		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
 		// Check access
 		if (!FlexicontentHelperPerm::getPerm()->CanTemplates)
 		{
-			jexit(JText::_('FLEXI_ALERTNOTAUTH_TASK'));
+			jexit(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'));
 		}
 
 		$dir    = $this->input->getString('dir');
@@ -121,15 +121,15 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 
 		if (!$model->delete($dir))
 		{
-			echo JText::sprintf('FLEXI_TEMPLATE_FAILED_DELETE', $dir);
+			echo \Joomla\CMS\Language\Text::sprintf('FLEXI_TEMPLATE_FAILED_DELETE', $dir);
 
 			return;
 		}
 		else
 		{
-			$tmplcache = JFactory::getCache('com_flexicontent_tmpl');
+			$tmplcache = \Joomla\CMS\Factory::getCache('com_flexicontent_tmpl');
 			$tmplcache->clean();
-			echo '<span class="copyok">' . JText::sprintf('FLEXI_TEMPLATE_DELETED', $dir) . '</span>';
+			echo '<span class="copyok">' . \Joomla\CMS\Language\Text::sprintf('FLEXI_TEMPLATE_DELETED', $dir) . '</span>';
 		}
 	}
 
@@ -137,7 +137,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 	/**
 	 * Logic to render an XML file as form parameters
 	 * NOTE: Saving of these extra parameters requires extra handling as the are cleared during main form validation,
-	 *       These parameters must validated via an extra JForm object that represents their XML file and then re-added before DB saving step
+	 *       These parameters must validated via an extra \Joomla\CMS\Form\Form object that represents their XML file and then re-added before DB saving step
 	 *
 	 * @access public
 	 * @return void
@@ -146,7 +146,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 	public function getlayoutparams()
 	{
 		// Check for request forgeries
-		JSession::checkToken('request') or die(JText::_('JINVALID_TOKEN'));
+		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
 		// Calculate access
 		$is_authorised = $this->canManage;
@@ -154,13 +154,13 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 		// Check access
 		if (!$is_authorised)
 		{
-			jexit(JText::_('FLEXI_ALERTNOTAUTH_TASK'));
+			jexit(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'));
 		}
 
 		jimport('joomla.filesystem.file');
-		$app  = JFactory::getApplication();
-		$user = JFactory::getUser();
-		$db   = JFactory::getDbo();
+		$app  = \Joomla\CMS\Factory::getApplication();
+		$user = \Joomla\CMS\Factory::getUser();
+		$db   = \Joomla\CMS\Factory::getDbo();
 
 		// Get vars
 		$ext_option = $this->input->getCmd('ext_option', '');  // Current component name
@@ -199,7 +199,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 
 				// Load language file of the template
 				FLEXIUtilities::loadTemplateLanguageFile($ext_name);
-				$path = JPATH::clean(JPATH_SITE . DS . 'components' . DS . 'com_flexicontent' . DS . 'templates' . DS . $directory);
+				$path = \Joomla\Filesystem\Path::clean(JPATH_SITE . DS . 'components' . DS . 'com_flexicontent' . DS . 'templates' . DS . $directory);
 				$groupname = 'attribs';  // Name="..." of <fields> container
 				break;
 
@@ -210,11 +210,11 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 					return;
 				}
 
-				JFactory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, 'en-GB', true);
-				JFactory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, null, true);
-				$ext_params = JComponentHelper::getParams('com_flexicontent');
+				\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, 'en-GB', true);
+				\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, null, true);
+				$ext_params = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 				$query = '';
-				$path = JPATH::clean(JPATH_ADMINISTRATOR . '/components/com_flexicontent/views/item/tmpl');
+				$path = \Joomla\Filesystem\Path::clean(JPATH_ADMINISTRATOR . '/components/com_flexicontent/views/item/tmpl');
 
 				$groupname = 'attribs';  // when empty we use 'attribs'
 				break;
@@ -225,20 +225,20 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 				// Load item form layout
 				if ($ext_type === 'forms')
 				{
-					JFactory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, 'en-GB', true);
-					JFactory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, null, true);
-					$inh_params = JComponentHelper::getParams('com_flexicontent');
-					$path = JPATH::clean(JPATH_ADMINISTRATOR . '/components/com_flexicontent/views/item/tmpl');
+					\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, 'en-GB', true);
+					\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, null, true);
+					$inh_params = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+					$path = \Joomla\Filesystem\Path::clean(JPATH_ADMINISTRATOR . '/components/com_flexicontent/views/item/tmpl');
 				}
 				// Load item view layout
 				else
 				{
 					$inh_params = flexicontent_tmpl::getLayoutparams('items', $directory, '', true);
-					$inh_params = new JRegistry($inh_params);
+					$inh_params = new \Joomla\Registry\Registry($inh_params);
 
 					// Also Load language file of the template
 					FLEXIUtilities::loadTemplateLanguageFile($ext_name);
-					$path = JPATH::clean(JPATH_SITE . DS . 'components' . DS . 'com_flexicontent' . DS . 'templates' . DS . $directory);
+					$path = \Joomla\Filesystem\Path::clean(JPATH_SITE . DS . 'components' . DS . 'com_flexicontent' . DS . 'templates' . DS . $directory);
 				}
 
 				$groupname = 'attribs';  // Name="..." of <fields> container
@@ -256,18 +256,18 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 
 				// Load language file of the template
 				FLEXIUtilities::loadTemplateLanguageFile($ext_name);
-				$path = JPATH::clean(JPATH_SITE . DS . 'components' . DS . 'com_flexicontent' . DS . 'templates' . DS . $directory);
+				$path = \Joomla\Filesystem\Path::clean(JPATH_SITE . DS . 'components' . DS . 'com_flexicontent' . DS . 'templates' . DS . $directory);
 				$groupname = 'attribs';  // Name="..." of <fields> container
 				break;
 
 			case 'user':
 				$query = 'SELECT author_catparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $ext_id;
 				$inh_params = flexicontent_tmpl::getLayoutparams('category', $directory, '', true);
-				$inh_params = new JRegistry($inh_params);
+				$inh_params = new \Joomla\Registry\Registry($inh_params);
 
 				// Load language file of the template
 				FLEXIUtilities::loadTemplateLanguageFile($ext_name);
-				$path = JPATH::clean(JPATH_SITE . DS . 'components' . DS . 'com_flexicontent' . DS . 'templates' . DS . $directory);
+				$path = \Joomla\Filesystem\Path::clean(JPATH_SITE . DS . 'components' . DS . 'com_flexicontent' . DS . 'templates' . DS . $directory);
 				$groupname = 'attribs';  // Name="..." of <fields> container
 				break;
 
@@ -276,8 +276,8 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 
 				if ($ext_name)
 				{
-					JFactory::getLanguage()->load($ext_name, JPATH_SITE, 'en-GB', true);
-					JFactory::getLanguage()->load($ext_name, JPATH_SITE, null, true);
+					\Joomla\CMS\Factory::getLanguage()->load($ext_name, JPATH_SITE, 'en-GB', true);
+					\Joomla\CMS\Factory::getLanguage()->load($ext_name, JPATH_SITE, null, true);
 				}
 
 				$path = is_dir($directory) ? $directory : JPATH_ROOT . $directory;
@@ -289,8 +289,8 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 
 				if ($ext_name)
 				{
-					JFactory::getLanguage()->load('plg_flexicontent_fields_' . $ext_name, JPATH_ADMINISTRATOR, 'en-GB', true);
-					JFactory::getLanguage()->load('plg_flexicontent_fields_' . $ext_name, JPATH_ADMINISTRATOR, null, true);
+					\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_' . $ext_name, JPATH_ADMINISTRATOR, 'en-GB', true);
+					\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_' . $ext_name, JPATH_ADMINISTRATOR, null, true);
 				}
 
 				$path = is_dir($directory) ? $directory : JPATH_ROOT . $directory;
@@ -323,8 +323,8 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 		 */
 		if (!$app->isClient('administrator'))
 		{
-			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
-			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 		}
 
 
@@ -334,7 +334,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 		if ($query)
 		{
 			$ext_params_str = $db->setQuery($query)->loadResult();
-			$ext_params = new JRegistry($ext_params_str);
+			$ext_params = new \Joomla\Registry\Registry($ext_params_str);
 			//echo '<pre>'; print_r($ext_params); echo '</pre>'; exit;
 		}
 
@@ -348,18 +348,18 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 		{
 			$template_name = $layout_names[0];
 			$layout_name   = $layout_names[1];
-			$layoutpath    = JPATH::clean(JPATH_ROOT . DS . 'templates' . DS . $template_name . DS . 'html' . DS . $ext_name . DS . $layout_name . '.xml');
+			$layoutpath    = \Joomla\Filesystem\Path::clean(JPATH_ROOT . DS . 'templates' . DS . $template_name . DS . 'html' . DS . $ext_name . DS . $layout_name . '.xml');
 		}
 
 		if ($layout_name && (empty($layoutpath) || !file_exists($layoutpath)))
 		{
-			$layoutpath = JPATH::clean($path . DS . $layout_name . '.xml');
+			$layoutpath = \Joomla\Filesystem\Path::clean($path . DS . $layout_name . '.xml');
 		}
 
 		if (!$layout_name)
 		{
 			$layoutpath = '';
-			$layout_msg = JText::_('FLEXI_USING_DEFAULTS');
+			$layout_msg = \Joomla\CMS\Language\Text::_('FLEXI_USING_DEFAULTS');
 		}
 
 		elseif (!file_exists($layoutpath))
@@ -370,12 +370,12 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 			{
 				// Desired layout file does not exist but fallback layout parameter file exists, set layout to fallback layout
 				$layoutpath = $path . DS . '_fallback' . DS . '_fallback.xml';
-				$layout_msg = JText::sprintf('FLEXI_FIELD_ABOUT_LEGACY_LAYOUT_WITH_NO_PARAMS', $layout_name, $layoutpath_shown, $layout_name );
+				$layout_msg = \Joomla\CMS\Language\Text::sprintf('FLEXI_FIELD_ABOUT_LEGACY_LAYOUT_WITH_NO_PARAMS', $layout_name, $layoutpath_shown, $layout_name );
 			}
 			else
 			{
 				$layoutpath = '';
-				$layout_msg = JText::sprintf('FLEXI_FIELD_ABOUT_NAMED_LAYOUT_WITH_NO_PARAMS', $layout_name, $layoutpath_shown);
+				$layout_msg = \Joomla\CMS\Language\Text::sprintf('FLEXI_FIELD_ABOUT_NAMED_LAYOUT_WITH_NO_PARAMS', $layout_name, $layoutpath_shown);
 			}
 		}
 
@@ -419,7 +419,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 
 
 		// Create form object, (form name seems not to cause any problem)
-		$form_layout = new JForm('com_flexicontent.layout.' . $layout_name, array('control' => 'jform', 'load_data' => true));
+		$form_layout = new \Joomla\CMS\Form\Form('com_flexicontent.layout.' . $layout_name, array('control' => 'jform', 'load_data' => true));
 
 		// Load XML file
 		$tmpl_params = $xml->asXML();
@@ -448,12 +448,12 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 				<?php
 				if (isset($fieldSet->label) && trim($fieldSet->label))
 				{
-					echo '<div style="margin:0 0 12px 0; font-size: 16px; background-color: #333; float:none;" class="fcsep_level0">' . JText::_($fieldSet->label) . '</div>';
+					echo '<div style="margin:0 0 12px 0; font-size: 16px; background-color: #333; float:none;" class="fcsep_level0">' . \Joomla\CMS\Language\Text::_($fieldSet->label) . '</div>';
 				}
 
 				if (isset($fieldSet->description) && trim($fieldSet->description))
 				{
-					echo '<div class="fc-mssg fc-info">' . JText::_($fieldSet->description) . '</div>';
+					echo '<div class="fc-mssg fc-info">' . \Joomla\CMS\Language\Text::_($fieldSet->description) . '</div>';
 				}
 
 				foreach ($form_layout->getFieldset($fsname) as $field) :
@@ -581,7 +581,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 			echo '
 			<div class="fc_layout_box_outer">
 				<div class="alert alert-info">
-					' . JText::_('FLEXI_APPLY_TO_SEE_THE_PARAMETERS') . '
+					' . \Joomla\CMS\Language\Text::_('FLEXI_APPLY_TO_SEE_THE_PARAMETERS') . '
 				</div>
 			</div>';
 		}
@@ -595,19 +595,19 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 		// Check access
 		if (!FlexicontentHelperPerm::getPerm()->CanTemplates)
 		{
-			jexit(JText::_('FLEXI_ALERTNOTAUTH_TASK'));
+			jexit(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'));
 		}
 
 		jimport('joomla.filesystem.file');
-		$app  = JFactory::getApplication();
-		$user = JFactory::getUser();
+		$app  = \Joomla\CMS\Factory::getApplication();
+		$user = \Joomla\CMS\Factory::getUser();
 
 		$var['sysmssg'] = '';
 		$var['content'] = '';
 		$var['default_exists'] = '0';
 
 		// Check for request forgeries
-		if (!JSession::checkToken('request'))
+		if (!\Joomla\CMS\Session\Session::checkToken('request'))
 		{
 			$app->enqueueMessage('Invalid Token', 'error');
 			$var['sysmssg'] = flexicontent_html::get_system_messages_html();
@@ -645,7 +645,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 			exit();
 		}
 
-		$path = JPath::clean(JPATH_ROOT . DS . 'components' . DS . 'com_flexicontent' . DS . 'templates' . DS . $layout_name);
+		$path = \Joomla\CMS\Filesystem\Path::clean(JPATH_ROOT . DS . 'components' . DS . 'com_flexicontent' . DS . 'templates' . DS . $layout_name);
 
 		if (!is_dir($path))
 		{
@@ -655,7 +655,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 			exit();
 		}
 
-		$file_path = JPath::clean($path . DS . $file_subpath);
+		$file_path = \Joomla\CMS\Filesystem\Path::clean($path . DS . $file_subpath);
 
 		if (!file_exists($file_path))
 		{
@@ -680,9 +680,9 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 		}
 
 		// Check if default file path exists
-		$default_path = JPath::clean(JPATH_ROOT . DS . 'components' . DS . 'com_flexicontent' . DS . 'tmpl_common');
+		$default_path = \Joomla\CMS\Filesystem\Path::clean(JPATH_ROOT . DS . 'components' . DS . 'com_flexicontent' . DS . 'tmpl_common');
 		$default_file = isset($common[$file_subpath]) ? $common[$file_subpath] : $file_subpath;    // Some files do not have the same name as default file
-		$default_file_path = JPath::clean($default_path . DS . $default_file);
+		$default_file_path = \Joomla\CMS\Filesystem\Path::clean($default_path . DS . $default_file);
 		$default_file_exists = file_exists($default_file_path) ? 1 : 0;
 
 		// CASE LOADING system's default, set a different path to be read
@@ -710,18 +710,18 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 		// Check access
 		if (!FlexicontentHelperPerm::getPerm()->CanTemplates)
 		{
-			jexit(JText::_('FLEXI_ALERTNOTAUTH_TASK'));
+			jexit(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'));
 		}
 
 		jimport('joomla.filesystem.file');
-		$app  = JFactory::getApplication();
-		$user = JFactory::getUser();
+		$app  = \Joomla\CMS\Factory::getApplication();
+		$user = \Joomla\CMS\Factory::getUser();
 
 		$var['sysmssg'] = '';
 		$var['content'] = '';
 
 		// Check for request forgeries
-		if (!JSession::checkToken('request'))
+		if (!\Joomla\CMS\Session\Session::checkToken('request'))
 		{
 			$app->enqueueMessage('Invalid Token', 'error');
 			$var['sysmssg'] = flexicontent_html::get_system_messages_html();
@@ -753,7 +753,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 			exit();
 		}
 
-		$path = JPath::clean(JPATH_ROOT . DS . 'components' . DS . 'com_flexicontent' . DS . 'templates' . DS . $layout_name);
+		$path = \Joomla\CMS\Filesystem\Path::clean(JPATH_ROOT . DS . 'components' . DS . 'com_flexicontent' . DS . 'templates' . DS . $layout_name);
 
 		if (!is_dir($path))
 		{
@@ -763,7 +763,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 			exit();
 		}
 
-		$file_path = JPath::clean($path . DS . $file_subpath);
+		$file_path = \Joomla\CMS\Filesystem\Path::clean($path . DS . $file_subpath);
 
 		if (!file_exists($file_path))
 		{
@@ -779,7 +779,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 
 			if (preg_match('#\.xml#', $file_path))
 			{
-				$tmplcache = JFactory::getCache('com_flexicontent_tmpl');
+				$tmplcache = \Joomla\CMS\Factory::getCache('com_flexicontent_tmpl');
 				$tmplcache->clean();
 			}
 		}

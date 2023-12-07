@@ -18,11 +18,11 @@
 defined('_JEXEC') or die('Restricted access');
 
 jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // JHtmlSelect
-jimport('joomla.form.field');  // JFormField
+jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
+jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
 
-jimport('joomla.form.helper'); // JFormHelper
-JFormHelper::loadFieldClass('groupedlist');   // JFormFieldGroupedList
+jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
+\Joomla\CMS\Form\FormHelper::loadFieldClass('groupedlist');   // \Joomla\CMS\Form\Field\GroupedlistField
 
 
 class JFormFieldMicrodataprops extends JFormFieldGroupedList
@@ -37,14 +37,14 @@ class JFormFieldMicrodataprops extends JFormFieldGroupedList
 		if ($jm_types === null)
 		{
 			jimport('joomla.microdata.microdata');
-			$jm = new JMicrodata();
+			$jm = new \Joomla\CMS\Microdata\Microdata();
 			$jm_types = $jm->getTypes();
 		}
 
 		// Prepare the grouped list
 		$groups = array();
 		$groups[0]['items'] = array(
-			JHtml::_('select.option','', '-- '.JText::_('FLEXI_DISABLE').' --')
+			\Joomla\CMS\HTML\HTMLHelper::_('select.option','', '-- '.\Joomla\CMS\Language\Text::_('FLEXI_DISABLE').' --')
 		);
 
 		foreach($jm_types as $type => $tdata)
@@ -52,18 +52,18 @@ class JFormFieldMicrodataprops extends JFormFieldGroupedList
 			$options = array();
 			foreach($tdata['properties'] as $propname => $props)
 			{
-				$options[] = JHtml::_('select.option', $propname, $propname);
+				$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', $propname, $propname);
 			}
 
 			$grp = (string) $type;
 			$groups[$grp] = array();
 			$groups[$grp]['id'] = null;
-			$groups[$grp]['text'] = JText::_($type);
+			$groups[$grp]['text'] = \Joomla\CMS\Language\Text::_($type);
 			$groups[$grp]['items'] = $options;
 		}
 
 		// Render and return the drop down select
-		return JHtml::_('select.groupedlist', $groups, $this->name,
+		return \Joomla\CMS\HTML\HTMLHelper::_('select.groupedlist', $groups, $this->name,
 			array(
 				'id' => $this->id,
 				'group.id' => 'id',

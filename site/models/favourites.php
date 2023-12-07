@@ -28,7 +28,7 @@ jimport('legacy.model.legacy');
  * @subpackage FLEXIcontent
  * @since		1.5
  */
-class FlexicontentModelFavourites extends JModelLegacy
+class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 {
 	/**
 	 * Item list data
@@ -83,9 +83,9 @@ class FlexicontentModelFavourites extends JModelLegacy
 	 */
 	protected function populateRecordState($ordering = null, $direction = null)
 	{
-		$app    = JFactory::getApplication();
+		$app    = \Joomla\CMS\Factory::getApplication();
 		$jinput = $app->input;
-		$user   = JFactory::getUser();
+		$user   = \Joomla\CMS\Factory::getUser();
 
 		$option = $jinput->getCmd('option', '');
 		$view   = $jinput->getCmd('view', '');
@@ -122,7 +122,7 @@ class FlexicontentModelFavourites extends JModelLegacy
 	 */
 	function getData()
 	{
-		$app    = JFactory::getApplication();
+		$app    = \Joomla\CMS\Factory::getApplication();
 		$jinput = $app->input;
 
 		$print_logging_info = $this->_params->get('print_logging_info');
@@ -241,7 +241,7 @@ class FlexicontentModelFavourites extends JModelLegacy
 	 */
 	function _buildQuery()
 	{
-		$user		= JFactory::getUser();
+		$user		= \Joomla\CMS\Factory::getUser();
 
 		// Show special state items
 		$show_noauth = $this->_params->get('show_noauth', 0);   // Show unauthorized items
@@ -257,7 +257,7 @@ class FlexicontentModelFavourites extends JModelLegacy
 		// User not allowed to LIST unauthorized items
 		if ( !$show_noauth )
 		{
-			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+			$aid_arr = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
 			$andaccess .= ' AND ty.access IN (0,'.$aid_list.')';
 			$andaccess .= ' AND  c.access IN (0,'.$aid_list.')';
@@ -268,7 +268,7 @@ class FlexicontentModelFavourites extends JModelLegacy
 		// Access Flags for: content type, main category, item
 		else
 		{
-			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+			$aid_arr = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
 			$select_access .= ', '
 				.' CASE WHEN '
@@ -386,19 +386,19 @@ class FlexicontentModelFavourites extends JModelLegacy
 	 */
 	function _buildItemWhere( )
 	{
-		$app    = JFactory::getApplication();
+		$app    = \Joomla\CMS\Factory::getApplication();
 		$jinput = $app->input;
-		$user   = JFactory::getUser();
-		$db     = JFactory::getDbo();
+		$user   = \Joomla\CMS\Factory::getUser();
+		$db     = \Joomla\CMS\Factory::getDbo();
 
 		$show_owned = $this->_params->get('show_owned', 1);     // Show items owned by current user, regardless of their state
 		$show_trashed = $this->_params->get('show_trashed', 1);   // Show trashed items (to authorized users)
 
 		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
 		//  thus the items are published globally at the time the author specified in his/her local clock
-		//$app  = JFactory::getApplication();
+		//$app  = \Joomla\CMS\Factory::getApplication();
 		//$now  = FLEXI_J16GE ? $app->requestTime : $app->get('requestTime');   // NOT correct behavior it should be UTC (below)
-		//$date = JFactory::getDate();
+		//$date = \Joomla\CMS\Factory::getDate();
 		//$now  = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();              // NOT good if string passed to function that will be cached, because string continuesly different
 		$_nowDate = 'UTC_TIMESTAMP()'; //$db->Quote($now);
 		$nullDate = $db->getNullDate();
@@ -557,13 +557,13 @@ class FlexicontentModelFavourites extends JModelLegacy
 	{
 		if ( $this->_params !== NULL ) return;
 
-		$app    = JFactory::getApplication();
+		$app    = \Joomla\CMS\Factory::getApplication();
 		$jinput = $app->input;
 		$menu   = $app->getMenu()->getActive();
 
 		// Get the COMPONENT only parameter
-		$params  = new JRegistry();
-		$cparams = JComponentHelper::getParams('com_flexicontent');
+		$params  = new \Joomla\Registry\Registry();
+		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 		$params->merge($cparams);
 
 		// Merge the active menu parameters

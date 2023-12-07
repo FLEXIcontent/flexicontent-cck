@@ -15,7 +15,7 @@
  */
 defined('_WF_EXT') or die('RESTRICTED');
 
-class FlexicontentlinksItems extends JObject {
+class FlexicontentlinksItems extends \Joomla\CMS\Object\CMSObject {
 
 	var $_option = 'com_flexicontent_items';
 
@@ -66,7 +66,7 @@ class FlexicontentlinksItems extends JObject {
 				<div class="uk-tree-row">
 					<a href="javascript:;">
 						<span class="uk-tree-icon"></span>
-						<span class="uk-tree-text">' . JText::_('FLEXI_EDITOR_LINKS_ITEMS_BY_CAT_N_SINGLE_ITEMS') . '</span>
+						<span class="uk-tree-text">' . \Joomla\CMS\Language\Text::_('FLEXI_EDITOR_LINKS_ITEMS_BY_CAT_N_SINGLE_ITEMS') . '</span>
 					</a>
 				</div>
 			</li>';
@@ -89,7 +89,7 @@ class FlexicontentlinksItems extends JObject {
 
 		if ($view && $view!='category') return array();
 
-		$db = JFactory::getDbo();
+		$db = \Joomla\CMS\Factory::getDbo();
 
 		// Add categories
 		$query	= $db->getQuery(true);

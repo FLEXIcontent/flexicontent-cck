@@ -19,7 +19,7 @@ JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/compone
 /**
  * HTML View class for the FLEXIcontent (backend) dashboard screen
  */
-class FlexicontentViewFlexicontent extends JViewLegacy
+class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 {
 	/**
 	 * Creates the Entrypage
@@ -28,13 +28,13 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 	 */
 	function display( $tpl = null )
 	{
-		$app      = JFactory::getApplication();
-		$config   = JFactory::getConfig();
-		$params   = JComponentHelper::getParams('com_flexicontent');
-		$document	= JFactory::getDocument();
-		$session  = JFactory::getSession();
-		$user     = JFactory::getUser();
-		$db       = JFactory::getDbo();
+		$app      = \Joomla\CMS\Factory::getApplication();
+		$config   = \Joomla\CMS\Factory::getConfig();
+		$params   = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+		$document	= \Joomla\CMS\Factory::getDocument();
+		$session  = \Joomla\CMS\Factory::getSession();
+		$user     = \Joomla\CMS\Factory::getUser();
+		$db       = \Joomla\CMS\Factory::getDbo();
 		$print_logging_info = $params->get('print_logging_info');
 
 		// Load the file system librairies
@@ -42,7 +42,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		jimport('joomla.filesystem.file');
 
 		// activate the tooltips
-		//JHtml::_('behavior.tooltip');
+		//\Joomla\CMS\HTML\HTMLHelper::_('behavior.tooltip');
 
 		// Get model
 		$model = $this->getModel('flexicontent');
@@ -126,12 +126,12 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		// Add css and js to document
 		// **************************
 
-		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
-			: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
-		!JFactory::getLanguage()->isRtl()
-			? $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
-			: $document->addStyleSheet(JUri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
+		!\Joomla\CMS\Factory::getLanguage()->isRtl()
+			? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
+			: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
+		!\Joomla\CMS\Factory::getLanguage()->isRtl()
+			? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
+			: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 
 
 
@@ -151,51 +151,51 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		FLEXIUtilities::ManagerSideMenu(null);
 
 		// Create document/toolbar titles
-		$doc_title = JText::_( 'FLEXI_DASHBOARD' );
+		$doc_title = \Joomla\CMS\Language\Text::_( 'FLEXI_DASHBOARD' );
 		$site_title = $document->getTitle();
-		JToolbarHelper::title( $doc_title, 'home' );
+		\Joomla\CMS\Toolbar\ToolbarHelper::title( $doc_title, 'home' );
 		$document->setTitle($doc_title .' - '. $site_title);
 
 		$js = "jQuery(document).ready(function(){";
 
 		// Create the toolbar
-		$toolbar = JToolbar::getInstance('toolbar');
-		$loading_msg = flexicontent_html::encodeHTML(JText::_('FLEXI_LOADING') .' ... '. JText::_('FLEXI_PLEASE_WAIT'), 2);
+		$toolbar = \Joomla\CMS\Toolbar\Toolbar::getInstance('toolbar');
+		$loading_msg = flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_LOADING') .' ... '. \Joomla\CMS\Language\Text::_('FLEXI_PLEASE_WAIT'), 2);
 
 		if($perms->CanConfig)
 		{
 			if (0) // FLEXI_J37GE
 			{
 				$btn_task = '';
-				$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&layout=import&format=raw';
-				//$toolbar->appendButton('Popup', 'download', JText::_('FLEXI_IMPORT_JOOMLA'), str_replace('&', '&amp;', $popup_load_url), 780, 500);
+				$popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&layout=import&format=raw';
+				//$toolbar->appendButton('Popup', 'download', \Joomla\CMS\Language\Text::_('FLEXI_IMPORT_JOOMLA'), str_replace('&', '&amp;', $popup_load_url), 780, 500);
 				$js .= "
 					jQuery('#toolbar-download a.toolbar, #toolbar-download button')
 						.attr('href', '".$popup_load_url."')
 						.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 780, 500, function(){document.body.innerHTML=\'<span class=\"fc_loading_msg\">"
-							.$loading_msg."<\/span>\'; window.location.reload(false)}, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('FLEXI_IMPORT_JOOMLA'), 2)."\'}); return false;');
+							.$loading_msg."<\/span>\'; window.location.reload(false)}, {\'title\': \'".flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_IMPORT_JOOMLA'), 2)."\'}); return false;');
 				";
-				JToolbarHelper::custom( $btn_task, 'download.png', 'download_f2.png', 'FLEXI_IMPORT_JOOMLA', false );
+				\Joomla\CMS\Toolbar\ToolbarHelper::custom( $btn_task, 'download.png', 'download_f2.png', 'FLEXI_IMPORT_JOOMLA', false );
 			}
 
 			if (0) // TODO evaluate for e.g. submiting a template
 			{
 				$btn_task = '';
-				$popup_load_url = JUri::base(true) . '/index.php?option=com_flexicontent&layout=language&tmpl=component';
-				//$toolbar->appendButton('Popup', 'language', JText::_('FLEXI_SEND_LANGUAGE'), str_replace('&', '&amp;', $popup_load_url), 780, 540);
+				$popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&layout=language&tmpl=component';
+				//$toolbar->appendButton('Popup', 'language', \Joomla\CMS\Language\Text::_('FLEXI_SEND_LANGUAGE'), str_replace('&', '&amp;', $popup_load_url), 780, 540);
 				$js .= "
 					jQuery('#toolbar-language a.toolbar, #toolbar-language button')
 						.attr('href', '".$popup_load_url."')
-						.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 780, 540, false, {\'title\': \'".flexicontent_html::encodeHTML(JText::_('FLEXI_SEND_LANGUAGE'), 2)."\'}); return false;');
+						.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 780, 540, false, {\'title\': \'".flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_SEND_LANGUAGE'), 2)."\'}); return false;');
 				";
-				JToolbarHelper::custom( $btn_task, 'language.png', 'language_f2.png', 'FLEXI_SEND_LANGUAGE', false );
+				\Joomla\CMS\Toolbar\ToolbarHelper::custom( $btn_task, 'language.png', 'language_f2.png', 'FLEXI_SEND_LANGUAGE', false );
 			}
 
 			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
 			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
 			$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
 			$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
-			JToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
+			\Joomla\CMS\Toolbar\ToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
 		}
 
 		$js .= "});";
@@ -204,7 +204,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		// Add modal edit code
 		if (1)
 		{
-			JText::script("FLEXI_UPDATING_CONTENTS", true);
+			\Joomla\CMS\Language\Text::script("FLEXI_UPDATING_CONTENTS", true);
 			$document->addScriptDeclaration('
 				function fc_edit_fcitem_modal_load( container )
 				{
@@ -226,13 +226,13 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$lists 		= array();
 		$options 	= array();
 		$folder 	= JPATH_ADMINISTRATOR.DS.'language';
-		$langs 		= JFolder::folders($folder);
-		$activelang = JComponentHelper::getParams('com_languages')->get('administrator', 'en-GB');
+		$langs 		= \Joomla\CMS\Filesystem\Folder::folders($folder);
+		$activelang = \Joomla\CMS\Component\ComponentHelper::getParams('com_languages')->get('administrator', 'en-GB');
 
 		foreach ($langs as $lang) {
-			$options[] = JHtml::_('select.option', $lang, $lang);
+			$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', $lang, $lang);
 		}
-		$lists['languages'] = JHtml::_('select.genericlist', $options, 'lang', '', 'value', 'text', $activelang);
+		$lists['languages'] = \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $options, 'lang', '', 'value', 'text', $activelang);
 
 		// Missing files
 		$lists['missing_lang'] = $model->createLanguagePack();
@@ -291,7 +291,11 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$this->perms = $perms;
 		$this->document = $document;
 
-		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
+		$this->sidebar = null;
+
+		if(FLEXI_J30GE && !FLEXI_J40GE) $this->sidebar = JHtmlSidebar::render();
+		if(FLEXI_J40GE) $this->sidebar = \Joomla\CMS\HTML\Helpers\Sidebar::render();
+
 		parent::display($tpl);
 	}
 
@@ -307,9 +311,9 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 	function quickiconButton( $link, $image, $iconfont, $text, $modal = 0, $modal_create_iframe = 1, $modal_width=0, $modal_height=0, $close_function = 'false')
 	{
 		// Initialise variables
-		$lang = JFactory::getLanguage();
+		$lang = \Joomla\CMS\Factory::getLanguage();
 		$link_attribs = $modal
-			? ' onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', '.((int)(!$modal_create_iframe)).', '.$modal_width.', '.$modal_height.', ' . $close_function . ', {\'title\': \''.flexicontent_html::encodeHTML(JText::_($text), 2).'\'}); return false;"'
+			? ' onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', '.((int)(!$modal_create_iframe)).', '.$modal_width.', '.$modal_height.', ' . $close_function . ', {\'title\': \''.flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_($text), 2).'\'}); return false;"'
 			: '';
 		$img_attribs  = ' class="fc-board-btn-img"';
   	?>
@@ -319,7 +323,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 				<?php if ($link) : ?><a href="<?php echo $link; ?>" class="fc-board-button-link" <?php echo $link_attribs; ?>><?php endif; ?>
 					<?php
 						echo $image
-						? JHtml::image('administrator/components/com_flexicontent/assets/images/'.$image, $text, $img_attribs)
+						? \Joomla\CMS\HTML\HTMLHelper::image('administrator/components/com_flexicontent/assets/images/'.$image, $text, $img_attribs)
 						: '<span class="' . $iconfont . ' fc-dashboard-icon"></span>';
 					?>
 					<span class="fc-board-btn-text <?php echo $link ? '' : ' fcdisabled'; ?>"><?php echo $text; ?></span>
