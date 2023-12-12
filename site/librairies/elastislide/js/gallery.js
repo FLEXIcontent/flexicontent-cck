@@ -372,7 +372,7 @@ jQuery(function() {
 			if ($image.get(0).complete)
 				setCaption($image, title, desc);
 			else
-				$image.load(function() { setCaption($image, title, desc); });
+				$image.on('load', function(){ setCaption($image, title, desc); });
 
 			// Execute after DOM element ready aka image has finished loading (or already loaded)
 			$image.ready( function()
