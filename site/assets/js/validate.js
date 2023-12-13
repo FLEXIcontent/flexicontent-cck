@@ -534,7 +534,7 @@ var JFormValidator_FC = function()
 		validate = function(el)
 		{
 			var $el = jQuery(el);
-			var $form = !!$el.form ? jQuery($el.form) : $el.closest('form');
+			var $form = !!el.form ? jQuery(el.form) : $el.closest('form');
 			if ($form.length && $form.data('skip_validation')) return true;
 
 			var el_id = $el.attr('id');

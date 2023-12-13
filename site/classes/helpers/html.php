@@ -2025,6 +2025,7 @@ class flexicontent_html
 				\Joomla\CMS\Language\Text::script("FLEXI_INDEXED_FIELD_STATE_COL_DISABLED", true);
 				\Joomla\CMS\Language\Text::script('FLEXI_REQUIRED',true);
 				\Joomla\CMS\Language\Text::script('FLEXI_INVALID',true);
+				\Joomla\CMS\Language\Text::script('JLIB_FORM_FIELD_INVALID',true);
 				\Joomla\CMS\Language\Text::script('FLEXI_AUTO',true);
 				\Joomla\CMS\Language\Text::script('FLEXI_FIELD_SELECT_AT_LEAST_PROMPT',true);
 				\Joomla\CMS\Language\Text::script('FLEXI_FIELD_SELECT_UP_TO_PROMPT',true);
