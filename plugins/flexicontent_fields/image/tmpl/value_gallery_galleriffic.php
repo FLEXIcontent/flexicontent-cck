@@ -189,7 +189,7 @@ if ( !isset(static::$js_added[$field->id][__FILE__]) )
 	</div>
 		';
 }else{
-	$field->{$prop} = preg_replace('/<img[^>]+\>/i', '', $field->{$prop});
+	$field->{$prop} = preg_replace('/<img[^>]+\>/i', '', $field->{$prop});//TODO remove img tag and all inside juste need a link
 	var_dump($field->{$prop});
 	$thumb_display ='<div id="gf_thumbs_' . $uid . '" class="navigation' . (!$use_pages ? ' no_pagination' : '') . '" style="display: none;">
 		<ul class="thumbs noscript dot">
@@ -257,8 +257,6 @@ if ($result !== _FC_RETURN_)
 				' : '') . '
 				<div id="gf_loading_' . $uid . '" class="loader"></div>
 				<div id="gf_slideshow_' . $uid . '" class="slideshow"></div>
-				
-		
 			</div>
 		</div>
 
