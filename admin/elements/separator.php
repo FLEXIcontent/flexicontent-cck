@@ -205,8 +205,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		{
 			$this->add_tab_css_js();
 		}
-
-		$is_level = substr($level, 0, 5) == 'level';
+		$is_level = substr($level ?? '', 0, 5) == 'level';
 		$levelNum = '';
 
 		if ($is_level)
