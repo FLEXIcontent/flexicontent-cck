@@ -9,6 +9,7 @@
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
+
 defined( '_JEXEC' ) or die( 'Restricted access' );
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
@@ -429,28 +430,28 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		$adm_email_bcc  = $field->parameters->get('adm_email_bcc', 1);  // Default: send single email to admins as BCC
 
 		// Add 'salt' to password
-		$password_clear = $password;
-		$salt     = \Joomla\CMS\User\UserHelper::genRandomPassword(32);
-		$crypted  = \Joomla\CMS\User\UserHelper::getCryptedPassword($password_clear, $salt);
-		$password = $crypted.':'.$salt;
+		$password_clear  = $password;
+		$password_hashed = \Joomla\CMS\User\UserHelper::hashPassword($password);
+
+		$activation = \Joomla\CMS\Application\ApplicationHelper::getHash(\Joomla\CMS\User\UserHelper::genRandomPassword());
 
 		$instance = \Joomla\CMS\User\User::getInstance();
 		$instance->set('id',       0);
 		$instance->set('name',     $name);
 		$instance->set('username', $username);
-		$instance->set('password', $password);
+		$instance->set('password', $password_hashed);
 		$instance->set('password_clear' , $password_clear);
 		$instance->set('email',    $email);
 		$instance->set('usertype', 'deprecated');
 		$instance->set('groups',   array($new_usertype));
+		$instance->set('activation', $activation);
 
 		// Here is possible set user profile details
 		$instance->set('profile',  array('gender' =>  $gender));
 
 		// Email with activation link
-		if ($useractivation == 2 || $useractivation == 1)
+		if ($useractivation == 1)
 		{
-			$instance->set('activation', JApplication::getHash(\Joomla\CMS\User\UserHelper::genRandomPassword()));
 			$instance->set('block', 1);
 		}
 
@@ -477,8 +478,9 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		$data['fromname'] = $app->getCfg('fromname');
 		$data['mailfrom'] = $app->getCfg('mailfrom');
 		$data['sitename'] = $app->getCfg('sitename');
-		$data['siteurl'] = \Joomla\CMS\Uri\Uri::root();
+		$data['siteurl']  = \Joomla\CMS\Uri\Uri::root();
 		$data['password_clear'] = $password_clear;
+		$data['activation'] = $activation;
 
 
 		switch ($useractivation) {
@@ -496,6 +498,8 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 				$data['activate'], $data['siteurl'],
 				$data['username'], $data['password_clear']
 			);
+
+			$emailBody = str_replace('{ACTIVATE}', '<a href="' . $data['activate'] . '">' . $data['activate'] . '</a>', $emailBody);
 			break;
 
 		case 0:   // Instant account activation without verification, just notify the user of his/her account
@@ -509,6 +513,16 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 			);
 			break;
 		}
+
+		$emailSubject = str_replace('{NAME}', $data['name'], $emailSubject);
+		$emailSubject = str_replace('{SITE_NAME}', $data['sitename'], $emailSubject);
+
+		$emailBody = str_replace('{NAME}', $data['name'], $emailBody);
+		$emailBody = str_replace('{SITE_NAME}', $data['sitename'], $emailBody);
+		$emailBody = str_replace('{PASSWORD_CLEAR}', $data['password_clear'], $emailBody);
+		$emailBody = str_replace('{SITEURL}', $data['siteurl'], $emailBody);
+		$emailBody = str_replace('{USERNAME}', $data['username'], $emailBody);
+
 
 		// Clean the email data
 		//$emailSubject = \Joomla\CMS\Mail\MailHelper::cleanSubject($emailSubject);
