@@ -1165,7 +1165,9 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 				{
 					$link = 'index.php?option=com_flexicontent&' . $ctrl_task . 'edit&view=' . $this->record_name . '&id=' . (int) $model->get('id') . ($tmpl ? '&tmpl=' . $tmpl : '');
 				}
-				else
+				
+				// Only redirect to edit page if user can edit it
+				elseif ($canEdit)
 				{
 					// Create the URL, maintain current menu item if this was given
 					$Itemid = $this->input->get('Itemid', 0, 'int');
@@ -1176,6 +1178,18 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 						. ( strstr($item_url, '?') ? '&' : '?' ) . 'task=edit'
 						. '&return='.base64_encode($this->returnURL ?: $item_url)
 						. ($tmpl ? '&tmpl=' . $tmpl : '');
+				}
+
+				// User can not edit: Redirect (if this is available) to a custom page after creating a new item (e.g. a thanks page)
+				elseif ($newly_submitted_item && $submit_redirect_url_fe)
+				{
+					$link = $submit_redirect_url_fe;
+				}
+
+				// If no custom redirect url was given, then redirect to home
+				else
+				{
+					$link =  \Joomla\CMS\Router\Route::_('', false);
 				}
 				break;
 
