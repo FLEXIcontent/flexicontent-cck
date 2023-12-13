@@ -66,9 +66,8 @@ if ($client_detectable && count($show_in_clients) && count($show_in_clients) < 4
 }
 
 
-// Show via PHP rule
-
-$php_show_mod = $params->get('enable_php_rule', 0)
+// Show via PHP rule, but check if parameter is empty !
+$php_show_mod = $params->get('enable_php_rule', 0) && trim($params->get('php_rule', ''))
 	? eval($params->get('php_rule'))
 	: true;
 
