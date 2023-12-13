@@ -29,10 +29,10 @@ $slideshow_delay     = (int) $field->parameters->get( $PPFX_ . 'slideshow_delay'
 $preload_image       = (int) $field->parameters->get( $PPFX_ . 'preload_image', 10 );
 $enable_popup        = (int) $field->parameters->get( $PPFX_ . 'enable_popup', 1 );
 
-$thumb_display       = (int) $field->parameters->get( $PPFX_ . 'thumb-display', 1 ); //0:none, 1:images, 2:dots
-$thumb_position      = (int) $field->parameters->get( $PPFX_ . 'thumb-position', 0 ); //0:top, 1:bottom
+$thumb_display       = (int) $field->parameters->get( $PPFX_ . 'thumb-display', 1 ); //0:none, 1:images, 2:dots //TODO check dots and none
+$thumb_position      = (int) $field->parameters->get( $PPFX_ . 'thumb-position', 1 ); //0:top, 1:bottom
 $thumb_height        = (int) $field->parameters->get( $PPFX_ . 'thumb_height', 86 );
-$slide_height        = (int) $field->parameters->get( $PPFX_ . 'slide_height', 600 );
+$slide_height        = (int) $field->parameters->get( $PPFX_ . 'slide_height', 600 );//TODO check solution for responsive height
 
 $use_pages           = (int) $field->parameters->get( $PPFX_ . 'use_pages', 0 );
 $number_thumbs       = !$use_pages ? 9999 : (int) $field->parameters->get( $PPFX_ . 'number_thumbs', 5 );
@@ -41,7 +41,7 @@ $number_pages        = (int) $field->parameters->get( $PPFX_ . 'number_pages', 1
 $enable_top_pager    = (int) $field->parameters->get( $PPFX_ . 'enable_top_pager', 0 );
 $enable_bottom_pager = (int) $field->parameters->get( $PPFX_ . 'enable_bottom_pager', 0 );
 
-$display_playbtn = (int) $field->parameters->get( $PPFX_ . 'display_playbtn', 1 );
+$display_playbtn = (int) $field->parameters->get( $PPFX_ . 'display_playbtn', 0 );
 
 $display_title = (int) $field->parameters->get( $PPFX_ . 'display_title', 1 );
 $display_desc = (int) $field->parameters->get( $PPFX_ . 'display_desc', 1 );
@@ -113,8 +113,7 @@ $(document).ready(function()
 	var gallery = sliderBox.galleriffic({
 		unique_id:                 '".$uid."',
 		use_pages:                 ".($use_pages ? 'true' : 'false').",
-		delay:                     ".$slideshow_delay.",
-		slideHeight:               ".$slide_height.",
+		delay:                     ".$slideshow_delay.",	
 		numThumbs:                 ".$number_thumbs.",
 		preloadAhead:              ".$preload_image.",
 		enableTopPager:            ".($enable_top_pager === 2 ? 2 : ($enable_top_pager ? 'true' : 'false')).",
@@ -178,7 +177,7 @@ if ( !isset(static::$js_added[$field->id][__FILE__]) )
 	// calcul pagination display
 
 
-	if	($thumb_display == 0){
+	if	($thumb_display == 0){//TODO check to remove thumbs
 		$thumb_display ='';
 	} elseif ($thumb_display == 1) {
 		$thumb_display ='<div id="gf_thumbs_' . $uid . '" class="navigation' . (!$use_pages ? ' no_pagination' : '') . '" style="display: none;">
@@ -190,7 +189,7 @@ if ( !isset(static::$js_added[$field->id][__FILE__]) )
 	</div>
 		';
 }else{
-	//$field->{$prop} = preg_replace('/<img[^>]+\>/i', '', $field->{$prop});
+	$field->{$prop} = preg_replace('/<img[^>]+\>/i', '', $field->{$prop});
 	var_dump($field->{$prop});
 	$thumb_display ='<div id="gf_thumbs_' . $uid . '" class="navigation' . (!$use_pages ? ' no_pagination' : '') . '" style="display: none;">
 		<ul class="thumbs noscript dot">
