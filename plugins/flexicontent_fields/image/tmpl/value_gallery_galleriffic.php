@@ -41,7 +41,7 @@ $number_pages        = (int) $field->parameters->get( $PPFX_ . 'number_pages', 1
 $enable_top_pager    = (int) $field->parameters->get( $PPFX_ . 'enable_top_pager', 0 );
 $enable_bottom_pager = (int) $field->parameters->get( $PPFX_ . 'enable_bottom_pager', 0 );
 
-$display_playbtn = (int) $field->parameters->get( $PPFX_ . 'display_playbtn', 0 );
+$display_playbtn = (int) $field->parameters->get( $PPFX_ . 'display_playbtn', 1 );
 
 $display_title = (int) $field->parameters->get( $PPFX_ . 'display_title', 1 );
 $display_desc = (int) $field->parameters->get( $PPFX_ . 'display_desc', 1 );
@@ -77,9 +77,10 @@ foreach ($values as $n => $value)
 			<div id="gf_caption_' . $uid . '" class="caption-container">
 		' . ($display_title || $display_desc ? '
 				<div class="caption">
-					' . ($display_title && $title ? '<div class="image-title">' . $title .'</div>' : '') . '
-					' . ($display_desc && $desc ?  '<div class="image-desc">' . nl2br(preg_replace("/(\r\n|\r|\n){3,}/", "\n\n", $desc)) . '</div>' : '') . '
-				</div>' : '') .'		</div>	
+					' . ($display_title && $title ? '<div class="image-title">' . $title_encoded .'</div>' : '') . '
+					' . ($display_desc && $desc ?  '<div class="image-desc">' . nl2br(preg_replace("/(\r\n|\r|\n){3,}/", "\n\n", $desc_encoded)) . '</div>' : '') . '
+				</div>' : '') .'
+			</div>	
 		</a>
 ';
 }
@@ -178,7 +179,13 @@ if ( !isset(static::$js_added[$field->id][__FILE__]) )
 
 
 	if	($thumb_display == 0){//TODO check to remove thumbs
-		$thumb_display ='';
+		$thumb_display ='<div id="gf_thumbs_' . $uid . '" class="navigation' . (!$use_pages ? ' no_pagination' : '') . '" style="display: none;">
+		<ul class="thumbs noscript" style="display: none;">
+			<li>
+			'. implode("</li><li>", $field->{$prop}) .'
+			</li>
+		</ul>
+	</div>';
 	} elseif ($thumb_display == 1) {
 		$thumb_display ='<div id="gf_thumbs_' . $uid . '" class="navigation' . (!$use_pages ? ' no_pagination' : '') . '" style="display: none;">
 		<ul class="thumbs noscript">

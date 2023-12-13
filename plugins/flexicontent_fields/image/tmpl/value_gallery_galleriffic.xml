@@ -21,6 +21,13 @@
 				<option value="0" show_list="" hide_list="auto_play">FLEXI_NO</option>
 				<option value="1" show_list="auto_play" hide_list="">FLEXI_YES</option>
 			</field>
+
+			<field name="PPFX_display_playbtn" type="multilist" subtype="radio" default="0" toggle_related="1" label="FLEXI_FIELD_IMAGE_PLAYBTN" description="FLEXI_FIELD_IMAGE_PLAYBTN_DESC" class="btn-group btn-group-yesno" depend_class="">
+				<option value="0" show_list="" hide_list="auto_play">FLEXI_NO</option>
+				<option value="1" show_list="auto_play" hide_list="">FLEXI_YES</option>
+			</field>
+			
+
 			<field name="PPFX_slideshow_delay" type="number" default="2500" label="FLEXI_FIELD_IMAGE_AUTOPLAY_DELAY" description="FLEXI_FIELD_IMAGE_AUTOPLAY_DELAY_DESC" depend_class="auto_play" />
 
 			<field name="PPFX_transition_duration" type="number" default="600" label="FLEXI_FIELD_IMAGE_TRANSITION_DURATION" description="FLEXI_FIELD_IMAGE_TRANSITION_DURATION_DESC" depend_class="" />
@@ -46,8 +53,18 @@
 				<option value="1" show_list="use_pages" hide_list="no_pages">FLEXI_FIELD_IMAGE_USE_PAGE</option>
 			</field>
 
+			<field name="PPFX_thumb-display" type="multilist" subtype="radio" defaut="1" label="FLEXI_FIELD_IMAGE_THUMBS_DISPLAY" description="FLEXI_FIELD_IMAGE_THUMBS_DISPLAY_DESC" class="btn-group group-fcmethod" >
+				<option value="0">FLEXI_FIELD_DISPLAY_NONE</option>
+				<option value="1">FLEXI_FIELD_DISPLAY_THUMBS</option>
+				<option value="2">FLEXI_FIELD_DISPLAY_DOTS</option>
+			</field>
 
-			<!--field name="PPFX_number_thumbs" type="number" default="5" label="Max # thumbs per page" description="Max number of thumbnails per page. Note this number is reduced to balance the number of thumbs in the last page" depend_class="use_pages" /-->
+			<field name="PPFX_thumb-position" type="multilist" subtype="radio" defaut="1" label="FLEXI_FIELD_IMAGE_THUMBS_POSITION" description="FLEXI_FIELD_IMAGE_THUMBS_POSITION_DESC" class="btn-group group-fcmethod" >
+				<option value="0">FLEXI_FIELD_DISPLAY_TOP</option>
+				<option value="1">FLEXI_FIELD_DISPLAY_BOTTOM</option>
+			</field>
+
+			<field name="PPFX_number_thumbs" type="number" default="5" label="Max # thumbs per page" description="Max number of thumbnails per page. Note this number is reduced to balance the number of thumbs in the last page" depend_class="use_pages" />
 			<field name="PPFX_number_pages" type="number" default="10" label="FLEXI_FIELD_IMAGE_MAX_THUMB" description="FLEXI_FIELD_IMAGE_MAX_THUMB_DESC" depend_class="use_pages" />
 			<field name="PPFX_enable_top_pager" type="fcradio" default="2" label="FLEXI_FIELD_IMAGE_THUMBS_NAV" description="FLEXI_FIELD_IMAGE_THUMBS_NAV_DESC" class="group-fcset fc-cleared" depend_class="use_pages">
 				<!--option value="0">FLEXI_DISABLE</option-->
