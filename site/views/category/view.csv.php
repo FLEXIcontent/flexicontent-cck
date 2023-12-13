@@ -351,7 +351,14 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 						}
 					}
 
-					echo $this->_encodeCSVField( is_array($vals) ? implode(', ', $vals ) : $vals );
+					try {
+						if (is_array($vals))
+							echo $this->_encodeCSVField( implode(', ', $vals ) );
+						else
+							echo $this->_encodeCSVField( $vals );
+					} catch (\Throwable $e) {
+						echo '';
+					}
 				}
 
 				echo "\n";
