@@ -21,6 +21,35 @@ if ($is_ingroup)
 $uid = 'es_'.$field_name_js."_fcitem".$item->id;
 $i   = -1;
 
+// Gallery options
+
+$auto_start          = (int) $field->parameters->get( $PPFX_ . 'auto_start', 1 );
+$transition_duration = (int) $field->parameters->get( $PPFX_ . 'transition_duration', 600 );
+$slideshow_delay     = (int) $field->parameters->get( $PPFX_ . 'slideshow_delay', 2500 );
+$preload_image       = (int) $field->parameters->get( $PPFX_ . 'preload_image', 10 );
+$enable_popup        = (int) $field->parameters->get( $PPFX_ . 'enable_popup', 1 );
+
+$thumb_display       = (int) $field->parameters->get( $PPFX_ . 'thumb-display', 1 ); //0:none, 1:images, 2:dots
+$thumb_position      = (int) $field->parameters->get( $PPFX_ . 'thumb-position', 0 ); //0:top, 1:bottom
+$thumb_height        = (int) $field->parameters->get( $PPFX_ . 'thumb_height', 86 );
+$slide_height        = (int) $field->parameters->get( $PPFX_ . 'slide_height', 600 );
+
+$use_pages           = (int) $field->parameters->get( $PPFX_ . 'use_pages', 0 );
+$number_thumbs       = !$use_pages ? 9999 : (int) $field->parameters->get( $PPFX_ . 'number_thumbs', 5 );
+$number_pages        = (int) $field->parameters->get( $PPFX_ . 'number_pages', 10 );
+
+$enable_top_pager    = (int) $field->parameters->get( $PPFX_ . 'enable_top_pager', 0 );
+$enable_bottom_pager = (int) $field->parameters->get( $PPFX_ . 'enable_bottom_pager', 0 );
+
+$display_playbtn = (int) $field->parameters->get( $PPFX_ . 'display_playbtn', 1 );
+
+$display_title = (int) $field->parameters->get( $PPFX_ . 'display_title', 1 );
+$display_desc = (int) $field->parameters->get( $PPFX_ . 'display_desc', 1 );
+
+$over_image_btns     = 1;
+
+$thumb_container_height = $thumb_height + (!$use_pages ? 32 : 0) + ($use_pages && $enable_top_pager  === 0 ? 40 : 0) + ($use_pages && $enable_bottom_pager === 1 ? 40 : 0);
+
 foreach ($values as $n => $value)
 {
 	// Include common layout code for preparing values, but you may copy here to customize
@@ -45,38 +74,15 @@ foreach ($values as $n => $value)
 		<a class="gf_fancybox" href="'.\Joomla\CMS\Uri\Uri::root(true).'/'.$srcl.'" data-title="' . $title_encoded . '" data-caption="' . $desc_encoded . '"' . $group_str . '
 			onclick="if (gf_gallery_' . $uid . '.mSlider.isDragging) {event.preventDefault(); event.stopPropagation(); return false; }"; style="display: none;">
 			' . str_replace('style="', 'style="display: none;', $img_legend) . '
+			<div id="gf_caption_' . $uid . '" class="caption-container">
+		' . ($display_title || $display_desc ? '
+				<div class="caption">
+					' . ($display_title && $title ? '<div class="image-title">' . $title .'</div>' : '') . '
+					' . ($display_desc && $desc ?  '<div class="image-desc">' . nl2br(preg_replace("/(\r\n|\r|\n){3,}/", "\n\n", $desc)) . '</div>' : '') . '
+				</div>' : '') .'		</div>	
 		</a>
-		' . ($title || $desc ? '
-		<div class="caption">
-			' . ($title ? '<div class="image-title">' . $title . '</div>' : '') . '
-			' . ($desc ?  '<div class="image-desc">' . nl2br(preg_replace("/(\r\n|\r|\n){3,}/", "\n\n", $desc)) . '</div>' : '') . '
-		</div>
-		' : '');
+';
 }
-
-
-// Gallery options
-
-$auto_start          = (int) $field->parameters->get( $PPFX_ . 'auto_start', 1 );
-$transition_duration = (int) $field->parameters->get( $PPFX_ . 'transition_duration', 600 );
-$slideshow_delay     = (int) $field->parameters->get( $PPFX_ . 'slideshow_delay', 2500 );
-$preload_image       = (int) $field->parameters->get( $PPFX_ . 'preload_image', 10 );
-$enable_popup        = (int) $field->parameters->get( $PPFX_ . 'enable_popup', 1 );
-
-$thumb_height        = (int) $field->parameters->get( $PPFX_ . 'thumb_height', 86 );
-$slide_height        = (int) $field->parameters->get( $PPFX_ . 'slide_height', 600 );
-
-$use_pages           = (int) $field->parameters->get( $PPFX_ . 'use_pages', 0 );
-$number_thumbs       = !$use_pages ? 9999 : (int) $field->parameters->get( $PPFX_ . 'number_thumbs', 5 );
-$number_pages        = (int) $field->parameters->get( $PPFX_ . 'number_pages', 10 );
-
-$enable_top_pager    = (int) $field->parameters->get( $PPFX_ . 'enable_top_pager', 2 );
-$enable_bottom_pager = 0; //(int) $field->parameters->get( $PPFX_ . 'enable_bottom_pager', 0 );
-
-$over_image_btns     = 1;
-
-$thumb_container_height = $thumb_height + (!$use_pages ? 32 : 0) + ($use_pages && $enable_top_pager === 1 ? 40 : 0) + ($use_pages && $enable_bottom_pager === 1 ? 40 : 0);
-
 $js = "
 var gf_gallery_" . $uid . ";
 
@@ -115,7 +121,7 @@ $(document).ready(function()
 		enableBottomPager:         ".($enable_bottom_pager ? 'true' : 'false').",
 		maxPagesToShow:            ".$number_pages.",
 		imageContainerSel:         '#gf_slideshow_" . $uid . "',
-		ssControlsContainerSel:    '#gf_sscontrols_" . $uid . "',
+		ssControlsContainerSel:    ".($display_playbtn ? '"#gf_sscontrols_' . $uid.'"'  : '""').",
 		navControlsContainerSel:   '#gf_navcontrols_" . $uid . "',
 		captionContainerSel:       '#gf_caption_" . $uid . "',
 		loadingContainerSel:       '#gf_loading_" . $uid . "',
@@ -125,7 +131,6 @@ $(document).ready(function()
 		nextLinkText:              '". ($over_image_btns ? '&gt;' : \Joomla\CMS\Language\Text::_('FLEXI_FIELD_IMAGE_NEXT_LINK')) ."',
 		prevPageLinkText:          '". ($enable_top_pager === 2 ? '&lt;' : \Joomla\CMS\Language\Text::_('FLEXI_FIELD_IMAGE_PREV_PAGE_LINK')) ."',
 		nextPageLinkText:          '". ($enable_top_pager === 2 ? '&gt;' : \Joomla\CMS\Language\Text::_('FLEXI_FIELD_IMAGE_NEXT_PAGE_LINK')) ."',
-
 		enableHistory:             false,
 		enableFancybox:            ".($enable_popup ? 'true' : 'false').",
 		fancyOptions:              {},
@@ -170,6 +175,39 @@ if ( !isset(static::$js_added[$field->id][__FILE__]) )
 	static::$js_added[$field->id][__FILE__] = array();
 }
 
+	// calcul pagination display
+
+
+	if	($thumb_display == 0){
+		$thumb_display ='';
+	} elseif ($thumb_display == 1) {
+		$thumb_display ='<div id="gf_thumbs_' . $uid . '" class="navigation' . (!$use_pages ? ' no_pagination' : '') . '" style="display: none;">
+		<ul class="thumbs noscript">
+			<li>
+			'. implode("</li><li>", $field->{$prop}) .'
+			</li>
+		</ul>
+	</div>
+		';
+}else{
+	//$field->{$prop} = preg_replace('/<img[^>]+\>/i', '', $field->{$prop});
+	var_dump($field->{$prop});
+	$thumb_display ='<div id="gf_thumbs_' . $uid . '" class="navigation' . (!$use_pages ? ' no_pagination' : '') . '" style="display: none;">
+		<ul class="thumbs noscript dot">
+			<li>
+			'. implode("</li><li>", $field->{$prop}) .'
+			</li>
+		</ul>
+	</div>';
+	}
+
+	if ($thumb_position == 0){
+		$navigation_top = $thumb_display;
+		$navigation_bottom = '';
+	}else {
+		$navigation_top = '';
+		$navigation_bottom = $thumb_display;
+	}
 
 /**
  * Include common layout code before finalize values
@@ -181,6 +219,8 @@ if ($result !== _FC_RETURN_)
 	// ***
 	// *** Add container HTML (if required by current layout) and add value separator (if supported by current layout), then finally apply open/close tags
 	// ***
+
+	
 
 	// Add container HTML
 	$field->{$prop} = '
@@ -202,13 +242,7 @@ if ($result !== _FC_RETURN_)
 
 	<div id="gf_container_' . $uid . '" class="gf_container">
 
-		<div id="gf_thumbs_' . $uid . '" class="navigation' . (!$use_pages ? ' no_pagination' : '') . '" style="display: none;">
-			<ul class="thumbs noscript">
-				<li>
-				'. implode("</li><li>", $field->{$prop}) .'
-				</li>
-			</ul>
-		</div>
+			'. $navigation_top .'
 
 		<div class="gf_controls_box" ' . ($over_image_btns ? 'style="height: 0;"' : '') . '>
 			<div id="gf_sscontrols_' . $uid . '" class="controls ss-controls-box"></div>
@@ -224,9 +258,12 @@ if ($result !== _FC_RETURN_)
 				' : '') . '
 				<div id="gf_loading_' . $uid . '" class="loader"></div>
 				<div id="gf_slideshow_' . $uid . '" class="slideshow"></div>
-				<div id="gf_caption_' . $uid . '" class="caption-container"></div>
+				
+		
 			</div>
 		</div>
+
+		'. $navigation_bottom .'
 
 	</div>
 	<div class="fcclear"></div>
