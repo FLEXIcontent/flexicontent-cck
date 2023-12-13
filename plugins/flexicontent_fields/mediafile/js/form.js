@@ -758,7 +758,11 @@ class fc_Waveform_LazyLoad
 	{
 		// Decode php utf8_encode
 		for (const key in file) {
-			file[key] = decodeURIComponent(escape(file[key]));
+			try {
+				file[key] = decodeURIComponent(file[key]);
+			} catch(err) {
+				file[key] = file[key];
+			}
 		}
 		
 		// We use altname (aka title) that is by default (unless modified) same as 'filename_original'
