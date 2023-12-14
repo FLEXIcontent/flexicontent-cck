@@ -583,7 +583,7 @@ class FlexicontentModelItems extends FCModelAdminList
 			$filter->value = $fcform ? $jinput->get('filter_'.$filter->id, null, 'array')  :  $app->getUserStateFromRequest( $p.'filter_'.$filter->id,	'filter_'.$filter->id, null, 'array');
 
 			// Force value to be array
-			if ( !is_array($filter->value) )  $filter->value = strlen($filter->value) ? array($filter->value) : array();
+			if ( !is_array($filter->value) )  $filter->value = strlen($filter->value ?? '') ? array($filter->value) : array();
 			// Convert array having a single zero length string, to array()
 			if ( count($filter->value)==1 && !strlen(reset($filter->value)) )  $filter->value = array();
 
