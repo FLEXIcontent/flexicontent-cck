@@ -981,9 +981,11 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 
 			<?php
 				// Content display via Builder-based Layouts
+				if (!empty ($std_builder_layout)){
 				echo $std_builder_layout
 					? str_replace('{{fc-item-id}}', $item->id, $std_builder_layout)
 					: '';
+				}
 			?>
 
 
