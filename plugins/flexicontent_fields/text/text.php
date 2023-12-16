@@ -233,6 +233,9 @@ class plgFlexicontent_fieldsText extends FCField
 				theInput.attr('name', fname_pfx);
 				theInput.attr('id', element_id);
 
+				// Set field value to the 'value' attribute, clearing value if attribute is empty
+				theInput.val(theInput.attr('value')); 
+
 				// Update inputmask
 				var has_inputmask = newField.find('input.has_inputmask').length != 0;
 				if (has_inputmask)  newField.find('input.has_inputmask').inputmask();
