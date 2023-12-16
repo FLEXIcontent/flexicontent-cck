@@ -4,6 +4,8 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
+#[AllowDynamicProperties] //php8.2 compatibility
+
 class FcFormLayoutParameters
 {
 	/**

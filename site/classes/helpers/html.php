@@ -557,12 +557,12 @@ class flexicontent_html
 		$allowed_redirecturls = $cparams->get('allowed_redirecturls', 'internal_base');  // Parameter does not exist YET
 
 		// prefix the URL if needed so that parse_url will work
-		$has_prefix = preg_match("#^http|^https|^ftp|^ftps#i", $url);
+		$has_prefix = preg_match("#^http|^https|^ftp|^ftps#i", $url ?? '');
 
 		if (!$has_prefix) 
 		{
-			$is_abs_noproto = strpos($url, "//") === 0;
-			$is_abs_urlpath = strpos($url, "/") === 0;
+			$is_abs_noproto = strpos($url ?? '', "//" ) === 0;
+			$is_abs_urlpath = strpos($url ?? '', "/" ) === 0;
 
 			if ($is_abs_noproto)
 			{
@@ -2653,7 +2653,7 @@ class flexicontent_html
       	$user	= \Joomla\CMS\Factory::getUser();
 
 		// Determine if current user can export csv
-		$has_export_csv = $user->authorise('core.export', $asset);
+		$has_export_csv = $user->authorise('core.export', $asset ?? '');
 
 		// Create the delete button only if user can delete the give item
 		if (!$has_export_csv)

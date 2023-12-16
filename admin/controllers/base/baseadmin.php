@@ -17,6 +17,8 @@ use Joomla\Utilities\ArrayHelper;
 JLoader::register('FlexicontentController', JPATH_BASE . DS . 'components' . DS . 'com_flexicontent' . DS . 'controller.php');
 require_once('traitbase.php');
 
+#[AllowDynamicProperties] //php8.2 compatibility
+
 /**
  * FLEXIcontent BaseAdmin Controller
  *

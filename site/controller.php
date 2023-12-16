@@ -17,6 +17,8 @@ use Joomla\Utilities\ArrayHelper;
 jimport('legacy.controller.legacy');
 JLoader::register('FlexicontentControllerItems', JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'controllers'.DS.'items.php');  // we use JPATH_BASE since controller exists in frontend too
 
+#[AllowDynamicProperties] //php8.2 compatibility
+
 /**
  * FLEXIcontent Component Controller
  *
@@ -24,6 +26,7 @@ JLoader::register('FlexicontentControllerItems', JPATH_BASE.DS.'components'.DS.'
  * @subpackage FLEXIcontent
  * @since 1.0
  */
+
 class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 {
 	var $records_dbtbl  = 'content';
@@ -49,6 +52,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		/**
 		 * Register task aliases
 		 */
+
 		$this->registerTask('apply_type',   'save');
 		$this->registerTask('save_a_preview', 'save');
 

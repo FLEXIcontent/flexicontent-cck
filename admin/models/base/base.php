@@ -18,6 +18,8 @@ use Joomla\CMS\Table\Table;
 jimport('legacy.model.admin');
 require_once('traitbase.php');
 
+#[AllowDynamicProperties] //php8.2 compatibility
+
 /**
  * FLEXIcontent Component BASE (form) Model
  *
@@ -645,7 +647,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 
 		return true;
 	}
-
 
 	/**
 	 * Method to get the record form.

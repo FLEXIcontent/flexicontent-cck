@@ -16,6 +16,8 @@ use Joomla\Utilities\ArrayHelper;
 
 JLoader::register('FlexicontentViewBaseRecord', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_record.php');
 
+#[AllowDynamicProperties] //php8.2 compatibility
+
 /**
  * HTML View class for the Item Screen
  */
@@ -793,7 +795,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 			$pathway->addItem($doc_title, '');
 
 			// Get pageclass suffix
-			$pageclass_sfx = htmlspecialchars($page_params->get('pageclass_sfx'));
+			$pageclass_sfx = htmlspecialchars($page_params->get('pageclass_sfx') ?? '');
 		}
 
 		/**
