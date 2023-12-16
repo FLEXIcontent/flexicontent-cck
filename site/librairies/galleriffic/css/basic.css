@@ -246,13 +246,14 @@ div.gf_container ul.thumbs.dot li a {
     width: 20px !important;
     background: #ccc !important;
     border-radius: 50% !important;
+	font-size:0;
+}
+div.gf_container ul.thumbs.dot {
+    margin-top: 20px !important;
+	text-align: center;
 }
 div.gf_container ul.thumbs.dot li.selected a {
 	background:#000000 !important;
-}
-div.gf_container > div.navigation.no_pagination > ul.thumbs.dot {
-	margin-top: 20px;
-    text-align: center;
 }
 
 div.gf_container div.controls div.nav-controls a.prev {

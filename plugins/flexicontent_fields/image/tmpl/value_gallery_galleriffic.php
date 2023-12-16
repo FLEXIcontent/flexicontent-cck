@@ -43,8 +43,8 @@ $enable_bottom_pager = (int) $field->parameters->get( $PPFX_ . 'enable_bottom_pa
 
 $display_playbtn = (int) $field->parameters->get( $PPFX_ . 'display_playbtn', 1 );
 
-$display_title = (int) $field->parameters->get( $PPFX_ . 'display_title', 1 );
-$display_desc = (int) $field->parameters->get( $PPFX_ . 'display_desc', 1 );
+$display_title = (int) $field->parameters->get( 'showtitle', 0 );
+$display_desc = (int) $field->parameters->get( 'showdesc', 0 );
 
 $over_image_btns     = 1;
 
@@ -73,7 +73,6 @@ foreach ($values as $n => $value)
 		</a>
 		<a class="gf_fancybox" href="'.\Joomla\CMS\Uri\Uri::root(true).'/'.$srcl.'" data-title="' . $title_encoded . '" data-caption="' . $desc_encoded . '"' . $group_str . '
 			onclick="if (gf_gallery_' . $uid . '.mSlider.isDragging) {event.preventDefault(); event.stopPropagation(); return false; }"; style="display: none;">
-			' . str_replace('style="', 'style="display: none;', $img_legend) . '
 			<div id="gf_caption_' . $uid . '" class="caption-container">
 		' . ($display_title || $display_desc ? '
 				<div class="caption">
@@ -197,7 +196,6 @@ if ( !isset(static::$js_added[$field->id][__FILE__]) )
 		';
 }else{
 	$field->{$prop} = preg_replace('/<img[^>]+\>/i', '', $field->{$prop});//TODO remove img tag and all inside juste need a link
-	var_dump($field->{$prop});
 	$thumb_display ='<div id="gf_thumbs_' . $uid . '" class="navigation' . (!$use_pages ? ' no_pagination' : '') . '" style="display: none;">
 		<ul class="thumbs noscript dot">
 			<li>
