@@ -438,7 +438,7 @@ foreach ($this->rows as $i => $row)
 {
 	$data = new stdClass();
 	foreach($row as $j => $d) {
-		if (!is_array($d) && !is_object($d)) $data->$j = utf8_encode($d ?? '');
+		if (!is_array($d) && !is_object($d)) $data->$j = mb_convert_encoding($d ?? '' , 'UTF-8');
 	}
 	$js .= '  _file_data[' . $i . '] = ' . json_encode($data) . ";\n";
 }
