@@ -281,7 +281,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		}
 		else
 		{
-			$unique_tmp_itemid = $app->getUserState($form->option.'.edit.item.unique_tmp_itemid');
+			$unique_tmp_itemid = $app->getUserState($this->option.'.edit.item.unique_tmp_itemid');
 			$unique_tmp_itemid = $unique_tmp_itemid ? $unique_tmp_itemid : date('_Y_m_d_h_i_s_', time()) . uniqid(true);
 		}
 
@@ -670,7 +670,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		 * NOTE: Because of fieldgroup rendering other fields, this step must be done in separate loop, placed before FIELD HTML creation
 		 */
 
-		$jcustom = $app->getUserState($form->option.'.edit.item.custom');
+		$jcustom = $app->getUserState($this->option.'.edit.item.custom');
 		foreach ($fields as $field)
 		{
 			if (!$field->iscore)
@@ -980,9 +980,9 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		// *** Clear custom form data from session
 		// ***
 
-		$app->setUserState($form->option.'.edit.item.custom', false);
-		$app->setUserState($form->option.'.edit.item.jfdata', false);
-		$app->setUserState($form->option.'.edit.item.unique_tmp_itemid', false);
+		$app->setUserState($this->option.'.edit.item.custom', false);
+		$app->setUserState($this->option.'.edit.item.jfdata', false);
+		$app->setUserState($this->option.'.edit.item.unique_tmp_itemid', false);
 
 		if ( $print_logging_info ) $start_microtime = microtime(true);
 		parent::display($tpl);

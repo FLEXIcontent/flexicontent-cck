@@ -46,6 +46,8 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 	var $exitLogTexts = array();
 	var $exitSuccess  = true;
 
+	var $option = 'com_flexicontent';
+
 	/**
 	 * Constructor
 	 *
@@ -375,7 +377,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 			}
 
 			// Set the POSTed form data into the session, so that they get reloaded
-			$app->setUserState($form->option . '.edit.' . $form->context . '.data', $data);      // Save the jform data in the session
+			$app->setUserState($this->option . '.edit.' . $this->view . '.data', $data);      // Save the jform data in the session
 
 			// Validation error, reload edit form using referer URL
 			$this->setRedirect($this->refererURL);
@@ -397,7 +399,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 			$app->setHeader('status', 500, true);
 
 			// Set the POSTed form data into the session, so that they get reloaded
-			$app->setUserState($form->option . '.edit.' . $form->context . '.data', $data);      // Save the jform data in the session
+			$app->setUserState($this->option . '.edit.' . $this->view . '.data', $data);      // Save the jform data in the session
 
 			// Propably recoverable error, reload edit form using referer URL
 			$this->setRedirect($this->refererURL);
@@ -421,7 +423,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 		if (!$model->store($validated_data))
 		{
 			// Set the POSTed form data into the session, so that they get reloaded
-			$app->setUserState($form->option . '.edit.' . $form->context . '.data', $data);      // Save the jform data in the session
+			$app->setUserState($this->option . '.edit.' . $this->view . '.data', $data);      // Save the jform data in the session
 
 			// Set error message and the redirect URL (back to the record form)
 			$app->setHeader('status', '500 Internal Server Error', true);

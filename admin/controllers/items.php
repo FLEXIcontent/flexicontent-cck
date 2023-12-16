@@ -539,10 +539,10 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 						$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_CAPTCHA_FAILED') .' '. \Joomla\CMS\Language\Text::_('FLEXI_MUST_REFILL_SOME_FIELDS'), 'error');
 
 						// Set the POSTed form data into the session, so that they get reloaded
-						$app->setUserState($form->option.'.edit.item.data', $data);      // Save the jform data in the session.
-						$app->setUserState($form->option.'.edit.item.custom', $custom);  // Save the custom fields data in the session.
-						$app->setUserState($form->option.'.edit.item.jfdata', $jfdata);  // Save the falang translations into the session
-						$app->setUserState($form->option.'.edit.item.unique_tmp_itemid', $unique_tmp_itemid);  // Save temporary unique item id into the session
+						$app->setUserState($this->option.'.edit.item.data', $data);      // Save the jform data in the session.
+						$app->setUserState($this->option.'.edit.item.custom', $custom);  // Save the custom fields data in the session.
+						$app->setUserState($this->option.'.edit.item.jfdata', $jfdata);  // Save the falang translations into the session
+						$app->setUserState($this->option.'.edit.item.unique_tmp_itemid', $unique_tmp_itemid);  // Save temporary unique item id into the session
 
 						// Captcha error, reload edit form using referer URL
 						$this->setRedirect($this->refererURL);
@@ -595,10 +595,10 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			}
 
 			// Set the POSTed form data into the session, so that they get reloaded
-			$app->setUserState($form->option . '.edit.' . $form->context . '.data', $data);      // Save the jform data in the session
-			$app->setUserState($form->option . '.edit.' . $form->context . '.custom', $custom);  // Save the custom fields data in the session
-			$app->setUserState($form->option . '.edit.' . $form->context . '.jfdata', $jfdata);  // Save the falang translations into the session
-			$app->setUserState($form->option . '.edit.' . $form->context . '.unique_tmp_itemid', $unique_tmp_itemid);  // Save temporary unique item id into the session
+			$app->setUserState($this->option . '.edit.' . $this->view . '.data', $data);      // Save the jform data in the session
+			$app->setUserState($this->option . '.edit.' . $this->view . '.custom', $custom);  // Save the custom fields data in the session
+			$app->setUserState($this->option . '.edit.' . $this->view . '.jfdata', $jfdata);  // Save the falang translations into the session
+			$app->setUserState($this->option . '.edit.' . $this->view . '.unique_tmp_itemid', $unique_tmp_itemid);  // Save temporary unique item id into the session
 
 			// Validation error, reload edit form using referer URL
 			$this->setRedirect($this->refererURL);
@@ -785,10 +785,10 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			if (empty($model->abort_redirect_url))
 			{
 				// Set the POSTed form data into the session, so that they get reloaded
-				$app->setUserState($form->option . '.edit.' . $form->context . '.data', $data);      // Save the jform data in the session
-				$app->setUserState($form->option . '.edit.' . $form->context . '.custom', $custom);  // Save the custom fields data in the session
-				$app->setUserState($form->option . '.edit.' . $form->context . '.jfdata', $jfdata);  // Save the falang translations into the session
-				$app->setUserState($form->option . '.edit.' . $form->context . '.unique_tmp_itemid', $unique_tmp_itemid);  // Save temporary unique item id into the session
+				$app->setUserState($this->option . '.edit.' . $this->view . '.data', $data);      // Save the jform data in the session
+				$app->setUserState($this->option . '.edit.' . $this->view . '.custom', $custom);  // Save the custom fields data in the session
+				$app->setUserState($this->option . '.edit.' . $this->view . '.jfdata', $jfdata);  // Save the falang translations into the session
+				$app->setUserState($this->option . '.edit.' . $this->view . '.unique_tmp_itemid', $unique_tmp_itemid);  // Save temporary unique item id into the session
 			}
 
 			// Set error message and the redirect URL (back to the record form)

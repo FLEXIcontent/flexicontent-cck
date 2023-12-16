@@ -30,6 +30,7 @@ class FlexicontentViewBaseRecord extends \Joomla\CMS\MVC\View\HtmlView
 	var $select_class  = FLEXI_J40GE ? 'use_select2_lib' : 'use_select2_lib';
 	//var $txt_grp_class = FLEXI_J40GE ? 'input-group-text' : 'add-on';
 
+	var $option = 'com_flexicontent';
 
 	/**
 	 * Constructor

@@ -20,6 +20,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 {
 	static $field_types = array('relation', 'relation_reverse', 'autorelationfilters');
 	var $task_callable = array('getCategoryItems');  // Field's methods allowed to be called via AJAX
+	var $_custom_filters = null;
 
 	// ***
 	// *** CONSTRUCTOR

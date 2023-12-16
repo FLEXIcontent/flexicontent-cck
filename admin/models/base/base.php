@@ -674,9 +674,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 			return false;
 		}
 
-		$form->option = $this->option;
-		$form->context = $this->getName();
-
 		return $form;
 	}
 
