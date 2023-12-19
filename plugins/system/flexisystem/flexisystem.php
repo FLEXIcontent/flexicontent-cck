@@ -267,7 +267,7 @@ class plgSystemFlexisystem extends CMSPlugin
 		// these are typically administrators and super admins roles
 		$hasTemplates = Factory::getUser()->authorise('core.admin', 'com_templates');
 
-		if ( (!$hasTemplates || Factory::getUser()->authorise('core.admin')) && (isset($_POST['jform']['params']['php_rule']) || isset($_REQUEST['jform']['params']['php_rule']) ))
+		if ( (!$hasTemplates || !Factory::getUser()->authorise('core.admin')) && (isset($_POST['jform']['params']['php_rule']) || isset($_REQUEST['jform']['params']['php_rule']) ))
 		{
 			Factory::getApplication()->enqueueMessage('You can not edit this in frontend. Please login as a super admin');
 			Factory::getApplication()->redirect(Route::_('index.php'));
