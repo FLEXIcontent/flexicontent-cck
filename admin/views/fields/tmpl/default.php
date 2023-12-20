@@ -640,7 +640,7 @@ if ($js)
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_($hlpname . '.info_text', $row, $i, 'description', 'FLEXI_FIELD_DESCRIPTION'); ?>
 			</td>
 
-			<td class="col_title smaller">
+			<td class="col_title">
 				<?php
 				echo $padspacer;
 
@@ -662,11 +662,11 @@ if ($js)
 				?>
 			</td>
 
-			<td class="col_alias smaller hidden-phone hidden-tablet">
+			<td class="col_alias hidden-phone hidden-tablet">
 				<?php echo $row->name; ?>
 			</td>
 
-			<td class="col_fieldtype_info smaller hidden-phone">
+			<td class="col_fieldtype_info hidden-phone">
 				<?php
 					$ctype_title = '';
 					$ctype_desc = '';
@@ -701,7 +701,7 @@ if ($js)
 				?>
 			</td>
 
-			<td class="col_fieldtype smaller hidden-phone">
+			<td class="col_fieldtype  hidden-phone">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_($hlpname . '.fieldtype_info', $row, $i); ?>
 			</td>
 

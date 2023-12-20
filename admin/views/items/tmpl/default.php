@@ -784,7 +784,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				<?php echo Text::_( 'FLEXI_NUM' ); ?>
 			</th-->
 
-			<th class="col_order center hidden-phone"><?php $colposition++; ?>
+			<th class="col_order center hidden-phone "><?php $colposition++; ?>
 				<?php
 				echo $canOrder ? $image_ordering_tip : '';
 				echo str_replace('_FLEXI_ORDER_',
@@ -1137,7 +1137,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				</div>
 			</td>
 
-			<td class="col_title smaller" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td class="col_title " style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php
 				/**
 				 * Display an edit pencil or a check-in button if: either (a) current user has Global
@@ -1179,14 +1179,14 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 
 			<?php if (!isset($disable_columns['author'])) : ?>
-			<td class="col_authors small hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td class="col_authors hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo $row->author; ?>
 			</td>
 			<?php endif; ?>
 
 
 			<?php if (!isset($disable_columns['lang'])) : ?>
-			<td class="col_lang small hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td class="col_lang hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php
 					/**
 					 * Display language
@@ -1268,7 +1268,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 
 			<?php if (!$single_type || !isset($disable_columns['single_type'])): ?>
-			<td class="col_type small hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td class="col_type hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo Text::_($row->type_name); ?>
 			</td>
 			<?php endif ; ?>
@@ -1278,7 +1278,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 			<td class="col_edit_layout hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition); ?>" >
 				<?php echo HTMLHelper::_($hlpname . '.edit_layout', $row, '__modal__', $i, $this->perms->CanTemplates, $row_ilayout); ?>
 			</td>
-			<td class="col_template small hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td class="col_template hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo $row_ilayout.($row->config->get('ilayout') ? '' : '<sup>[1]</sup>') ?>
 			</td>
 			<?php endif; ?>
@@ -1305,7 +1305,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 
 			<?php if (!isset($disable_columns['cats'])): ?>
-			<td class="col_cats small hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td class="col_cats hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php
 				// Reorder categories place item's MAIN category first or ...
 				// place first the category being filtered (if order is 'FLEXIcontent')
@@ -1394,7 +1394,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 
 			<?php if (!isset($disable_columns['tags'])): ?>
-			<td class="col_tag small hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td class="col_tag hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php
 					$row_tags  = array();
 					$tag_names = array();
@@ -1421,14 +1421,14 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 
 			<?php if (!isset($disable_columns['created'])) : ?>
-			<td class="col_created small hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td class="col_created hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo HTMLHelper::_('date',  $row->created, $date_format); ?>
 			</td>
 			<?php endif; ?>
 
 
 			<?php if (!isset($disable_columns['modified'])) : ?>
-			<td class="col_revised small hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td class="col_revised hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo ($row->modified != $_NULL_DATE_ && $row->modified != $row->created) ? HTMLHelper::_('date', $row->modified, $date_format) : $_NEVER_; ?>
 			</td>
 			<?php endif; ?>

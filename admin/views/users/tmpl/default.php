@@ -452,7 +452,7 @@ if ($js)
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_($hlpname . '.grid_id', $i, $row->id); ?>
 			</td>
 
-			<td class="col_title smaller">
+			<td class="col_title">
 				<a href="<?php echo $edit_link; ?>">
 					<?php echo $row->name; ?></a>
 			</td>

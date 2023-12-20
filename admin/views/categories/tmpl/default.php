@@ -603,7 +603,7 @@ if ($js)
 				</div>
 			</td>
 
-			<td class="col_title smaller" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td class="col_title " style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php
 				echo $row->level > 1
 					? str_repeat('.&nbsp;&nbsp;', $row->level - 1) . '<sup>|_</sup>&nbsp;'
@@ -718,7 +718,7 @@ if ($js)
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_($hlpname . '.edit_layout', $row, '__modal__', $i, $this->perms->CanTemplates, $row_clayout); ?>
 			</td>
 
-			<td class="col_template small hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td class="col_template hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo $row->config->get('clayout') ? $row->config->get('clayout') : ($row_clayout ? $row_clayout : '...').'<span class="badge">inherited</span>'; ?>
 			</td>
 
@@ -764,7 +764,7 @@ if ($js)
 				?>
 			</td>
 
-			<td class="col_authors small hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td class="col_authors hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo $row->author; ?>
 			</td>
 

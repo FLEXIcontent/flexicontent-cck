@@ -368,7 +368,7 @@ if ($js)
 				</div>
 			</td>
 
-			<td class="col_title smaller">
+			<td class="col_title ">
 				<?php
 				/**
 				 * Display an edit pencil or a check-in button if: either (a) current user has Global
@@ -402,23 +402,23 @@ if ($js)
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_($hlpname . '.edit_layout', $row, '__modal__', $i, $this->perms->CanTemplates, $row_ilayout); ?>
 			</td>
 
-			<td class="col_template smaller hidden-phone hidden-tablet">
+			<td class="col_template  hidden-phone hidden-tablet">
 				<?php echo $row_ilayout; ?>
 			</td>
 
-			<td class="col_allowed_subtree smaller hidden-phone hidden-tablet">
+			<td class="col_allowed_subtree  hidden-phone hidden-tablet">
 				<?php echo isset($globalcats[$catid_allowed_parent]) ? $globalcats[$catid_allowed_parent]->title : '-'; ?>
 			</td>
 
-			<td class="col_iflayout_fe smaller center hidden-phone hidden-tablet">
+			<td class="col_iflayout_fe  center hidden-phone hidden-tablet">
 				<?php echo $row_form_ilayout_fe; ?>
 			</td>
 
-			<td class="col_iflayout_be smaller center hidden-phone hidden-tablet">
+			<td class="col_iflayout_be  center hidden-phone hidden-tablet">
 				<?php echo $row_form_ilayout_be; ?>
 			</td>
 
-			<td class="col_alias smaller hidden-phone hidden-tablet">
+			<td class="col_alias  hidden-phone hidden-tablet">
 				<?php echo StringHelper::strlen($row->alias) > 25
 					? StringHelper::substr( htmlspecialchars($row->alias, ENT_QUOTES, 'UTF-8'), 0 , 25) . '...'
 					: htmlspecialchars($row->alias, ENT_QUOTES, 'UTF-8');

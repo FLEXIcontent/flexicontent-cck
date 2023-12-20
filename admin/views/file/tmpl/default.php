@@ -166,7 +166,7 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 				</label>
 			</td>
 			<td>
-				<input type="text" id="hits" name="hits" value="<?php echo $this->row->hits; ?>" maxlength="10" class="input-small" />
+				<input type="text" id="hits" name="hits" value="<?php echo $this->row->hits; ?>" maxlength="10" class="input-" />
 			</td>
 		</tr>
 

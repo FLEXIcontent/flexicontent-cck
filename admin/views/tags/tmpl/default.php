@@ -330,7 +330,7 @@ if ($js)
 				</div>
 			</td>
 
-			<td class="col_title smaller">
+			<td class="col_title ">
 				<?php
 				/**
 				 * Display an edit pencil or a check-in button if: either (a) current user has Global
