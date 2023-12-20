@@ -100,7 +100,21 @@ $list_total_cols = 8;
 <?php endif;?>
 
 
-<div id="outer_templates">
+<div id="outer_templates" style="float: left; min-width: 50%;">
+
+	<div id="howto_box" style="margin:10px 0% 24px 0%; width: 100%;">
+		<table class="fc-table-list" style="margin: 0; min-width: unset; width: 100%;">
+			<tr>
+				<th>Configure display of your fields <span class="badge text-white bg-dark">item</span> view and <span class="badge text-white bg-dark">multi-item</span> views</th>
+			</tr>
+			<tr>
+				<td><span class="badge text-white bg-info">ITEM Layout</span> Select this in configuration of <span class="badge text-white bg-dark">types</span> and (optionally) in  <span class="badge text-white bg-dark">items</span></td>
+			</tr>
+			<tr>
+				<td><span class="badge text-white bg-info">CATEGORY Layout</span> Select this in configuration of <span class="badge text-white bg-dark">categories / content lists</span> except for <b>search view</b></td>
+			</tr>
+		</table>
+	</div>
 	
 	<!--
 	<?php $_class = FLEXI_J30GE ? ' btn' : ' fc_button fcsimple fcsmall'; ?>
@@ -214,9 +228,9 @@ $list_total_cols = 8;
 		?>
 	</tbody>
 
-	<tfoot style="background-color: transparent !important;">
+	<tfoot>
 		<tr>
-			<td colspan="<?php echo $list_total_cols; ?>" style="text-align: left;background-color: transparent !important;">
+			<td colspan="<?php echo $list_total_cols; ?>" style="text-align: left;">
 				<table class="admintable" style="margin: 0 auto !important;">
 					<tr>
 						<td>
@@ -253,19 +267,7 @@ $list_total_cols = 8;
 
 	</table>
 </div>
-<div id="howto_box" style="margin:10px 0% 24px 0%; width: 100%;">
-		<table class="fc-table-list" style="margin: 0; min-width: unset; width: 100%;">
-			<tr>
-				<th>Configure display of your fields <span class="badge text-white bg-dark">item</span> view and <span class="badge text-white bg-dark">multi-item</span> views</th>
-			</tr>
-			<tr>
-				<td><span class="badge text-white bg-info">ITEM Layout</span> Select this in configuration of <span class="badge text-white bg-dark">types</span> and (optionally) in  <span class="badge text-white bg-dark">items</span></td>
-			</tr>
-			<tr>
-				<td><span class="badge text-white bg-info">CATEGORY Layout</span> Select this in configuration of <span class="badge text-white bg-dark">categories / content lists</span> except for <b>search view</b></td>
-			</tr>
-		</table>
-	</div>
+
 
 	<div class="fcclear"></div>
 	
@@ -278,8 +280,6 @@ $list_total_cols = 8;
 	<?php echo \Joomla\CMS\HTML\HTMLHelper::_('form.token'); ?>
 
 	<!-- fc_perf -->
-
-	
 
 	</div>  <!-- j-main-container -->
 </div>  <!-- row / row-fluid-->
