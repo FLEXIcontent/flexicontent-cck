@@ -886,7 +886,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	{
 		$join = '';
 		$join .= ' LEFT JOIN #__users AS u ON u.id = a.checked_out';
-		$join .= ' LEFT JOIN #__users AS ua ON ua.id = a.uploaded_by';
+		$join .= ' JOIN #__users AS ua ON ua.id = a.uploaded_by';
 		$join .= ' LEFT JOIN #__flexicontent_mediadatas AS mm ON mm.file_id = a.id';
 
 		return $join;
