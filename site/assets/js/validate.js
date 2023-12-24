@@ -722,6 +722,7 @@ var JFormValidator_FC = function()
 					invalid_el = jQuery(invalid[i]);
 					label = invalid_el.data('label');
 					label_text = label ? label.text() : invalid_el.data('label_text');
+					if (label) label.closest('.control-group').show();
 					if (label_text && typeof added[label_text] === 'undefined')
 					{
 						//var usage_text = invalid_el.attr('title') ? ': ' + invalid_el.attr('title') : '';

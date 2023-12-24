@@ -154,8 +154,9 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 				if (typeof addField_GRP_FID_ !== 'undefined')
 				{
 					fieldval_box.find('.invalid').removeClass('invalid').attr('aria-invalid', 'false');
-					var newSubLabel = fieldval_box.prev('label.sub_label');
+					var newSubLabel = fieldval_box.closest('.control-fc_subgroup').find('label.fc_sub_label');
 					var newLabelFor = 'custom_%s_'+uniqueRowNum".$field->id.";
+					console.log(newSubLabel);
 					newSubLabel.attr('id', newLabelFor + '-lbl');
 					newSubLabel.attr('for', newLabelFor);
 					newSubLabel.attr('data-for', newLabelFor);
@@ -174,7 +175,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 						// We need to update the current grouped label of the field if this was the last element being re-added
 						var fieldval_box = groupval_box.find('.fcfieldval_container__GRP_FID_');
 						fieldval_box.find('.invalid').removeClass('invalid').attr('aria-invalid', 'false');
-						var newSubLabel = fieldval_box.prev('label.sub_label');
+						var newSubLabel = fieldval_box.closest('.control-fc_subgroup').find('label.fc_sub_label');
 						var newLabelFor = 'custom_%s_'+uniqueRowNum".$field->id.";
 						newSubLabel.attr('for', newLabelFor);
 						newSubLabel.attr('data-for', newLabelFor);
