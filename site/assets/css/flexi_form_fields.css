@@ -1074,6 +1074,7 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 	width: 100%;
 	margin: 0 4px 16px 0;
 	padding: 12px 0 12px 12px;
+	display: grid;
 }
 #flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .fc_sub_label {
 	box-sizing: border-box;

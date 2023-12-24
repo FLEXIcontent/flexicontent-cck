@@ -85,7 +85,11 @@ class plgFlexicontent_fieldsRelation extends FCField
 		 */
 
 		$multiple     = $use_ingroup || (int) $field->parameters->get('allow_multiple', 0);
+
+		$min_values   = $use_ingroup ? 0 : (int) $field->parameters->get('min_values', 0);
 		$max_values   = $use_ingroup ? 0 : (int) $field->parameters->get('max_values', 0);
+		$exact_values = $use_ingroup ? 0 : (int) $field->parameters->get('exact_values', 0);
+
 		$required     = (int) $field->parameters->get('required', 0);
 		$add_position = (int) $field->parameters->get('add_position', 3);
 
@@ -117,7 +121,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 		$selected_items_sortable = $field->parameters->get('selected_items_sortable', 0);
 
 		// Create extra HTML TAG parameters for the form field
-		$classes = 'use_select2_lib fc_select2_no_check fc_select2_noselect'
+		$classes = 'use_select2_lib fc_select2_no_check fc_select2_noselect validate-sellimitations'
 			. $required_class
 			. ($selected_items_sortable ? ' fc_select2_sortable' : '');
 		$attribs = ''
@@ -526,6 +530,15 @@ class plgFlexicontent_fieldsRelation extends FCField
 				}
 				$field->html[-1] .= implode(' - ', $custom_filters_html);
 			}
+
+			if ($exact_values)
+				$attribs .= ' data-exact_values="'.$exact_values.'" ';
+			else
+			{
+				if ($max_values)    $attribs .= ' data-max_values="'.$max_values.'" ';
+				if ($min_values)    $attribs .= ' data-min_values="'.$min_values.'" ';
+			}
+
 			$field->html[]   = '
 				' . ($use_ingroup ? '<input type="hidden" class="fcfield_value_holder" name="' . $valueholder_nm . '[' . $n . ']" id="' . $valueholder_id . '_' . $n . '" value="-">' : '') . '
 				' . (!$add_ctrl_btns ? '' : '
@@ -555,6 +568,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 						<label class="' . $add_on_class . ' fc-lbl selected_items-lbl" id="' . $elementid_n . '-lbl" for="' . $elementid_n . '">' . \Joomla\CMS\Language\Text::_($selected_items_label) . '</label>
 						<select id="' . $elementid_n . '" name="' . $fieldname_n . '" ' . ($multiple ? 'multiple="multiple" ' : '')
 							. ' class="' . $classes . ' fcfield-relation-selected_items" ' . $attribs
+							. ' data-max-related="' . $max_values . '" '
 							. ' onchange="return fcfield_relation.selected_items_modified(this);">
 							' . $items_options_select[$n] . '
 						</select>
