@@ -348,9 +348,11 @@ class plgFlexicontent_fieldsColor extends FCField
 			$classes = ' fcfield_auto_value ';
 		}
 
-		jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
-		\Joomla\CMS\Form\FormHelper::loadFieldClass('color');   // \Joomla\CMS\Form\Field\ColorField
-
+		if (!FLEXI_J40GE)
+		{
+			jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
+			\Joomla\CMS\Form\FormHelper::loadFieldClass('color');   // \Joomla\CMS\Form\Field\ColorField
+		}
 
 		/**
 		 * Create field's HTML display for item form
@@ -373,7 +375,9 @@ class plgFlexicontent_fieldsColor extends FCField
 
 			$jform = new \Joomla\CMS\Form\Form('flexicontent_field.color', array('control' => '', 'load_data' => true));
 			$jform->load($xml_form);
-			$jfield = new \Joomla\CMS\Form\Field\ColorField($jform);
+			$jfield = FLEXI_J40GE
+				? new \Joomla\CMS\Form\Field\ColorField($jform)
+				: new JFormFieldColor($jform);
 
 			$jfield->setup(new SimpleXMLElement($xml_field), $value, '');
 
