@@ -2030,12 +2030,6 @@
 				<option value="1">FLEXI_IN_SLIDER</option>
 			</field>
 
-		<field name="" type="separator" default="FLEXI_SIDEBAR_MANAGER" icon_class="icon-list" level="tab_open" box_type="1" remove_boxes="2" />
-		<field name="sidebar_state" type="fcradio" default="opened" label="FLEXI_SIDEBAR_STATE" description="FLEXI_SIDEBAR_STATE_DESC" class="btn-group btn-group-yesno">
-			<option value="closed">FLEXI_ClOSE</option>
-			<option value="opened">FLEXI_OPEN</option>
-		</field>
-		
 
 		<field name="" type="separator" default="FLEXI_ITEMS_MANAGER" icon_class="icon-list" level="tab_open" box_type="1" remove_boxes="2" />
 
