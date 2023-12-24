@@ -91,11 +91,15 @@ class FCIndexedField extends FCField
 		/**
 		 * Number of values
 		 */
-
+		
+		// Ignore multiple setting in fieldgroup
 		$multiple     = $use_ingroup || (int) $field->parameters->get('allow_multiple', 0);
-		$min_values   = $use_ingroup || !static::$valueIsArr ? 0 : (int) $field->parameters->get( 'min_values', 0 ) ;
-		$max_values   = $use_ingroup ? 0 : (int) $field->parameters->get('max_values', 0);
-		$exact_values = $use_ingroup || !static::$valueIsArr ? 0 : (int) $field->parameters->get( 'exact_values', 0 ) ;
+		
+		// Allow per value limitations when in field group, if field is multiple per value 
+		$min_values   = $use_ingroup && !static::$valueIsArr ? 0 : (int) $field->parameters->get('min_values', 0);
+		$max_values   = $use_ingroup && !static::$valueIsArr ? 0 : (int) $field->parameters->get('max_values', 0);
+		$exact_values = $use_ingroup && !static::$valueIsArr ? 0 : (int) $field->parameters->get('exact_values', 0);
+		
 		$required     = (int) $field->parameters->get('required', 0);
 		$add_position = (int) $field->parameters->get('add_position', 3);
 
