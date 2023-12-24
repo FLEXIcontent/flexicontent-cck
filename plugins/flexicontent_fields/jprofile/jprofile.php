@@ -69,6 +69,8 @@ class plgFlexicontent_fieldsJProfile extends FCField
 		// 2: is allow user selection
 		if ($displayed_user !== 2)
 		{
+			if ($displayed_user == 1) $field->html = 'Automatic, content author';
+			if ($displayed_user == 3) $field->html = 'Automatic, current user';
 			return;
 		}
 
