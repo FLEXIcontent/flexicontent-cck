@@ -275,8 +275,8 @@ class plgFinderFLEXIcontent extends FinderIndexerAdapter
 		$item->metadata = new Registry($item->metadata);
 
 		// Trigger the onContentPrepare event.
-		$item->summary = \Joomla\Component\Finder\Administrator\Indexer\Helper::prepareContent($item->summary, $item->params, $item);
-		$item->body    = \Joomla\Component\Finder\Administrator\Indexer\Helper::prepareContent($item->body, $item->params, $item);
+		$item->summary = FinderIndexerHelper::prepareContent($item->summary, $item->params, $item);
+		$item->body    = FinderIndexerHelper::prepareContent($item->body, $item->params, $item);
 
 		// Create a URL as identifier to recognise items again.
 		$item->url = $this->getUrl($item->id, $this->extension, $this->layout, $item->catid);
@@ -285,7 +285,7 @@ class plgFinderFLEXIcontent extends FinderIndexerAdapter
 		$item->route = FlexicontentHelperRoute::getItemRoute($item->slug, $item->catslug, 0, $item);
 		if (!FLEXI_J40GE)
 		{
-			$item->path = \Joomla\Component\Finder\Administrator\Indexer\Helper::getContentPath($item->route);
+			$item->path = FinderIndexerHelper::getContentPath($item->route);
 		}
 
 		// Get the menu title if it exists.
@@ -301,11 +301,11 @@ class plgFinderFLEXIcontent extends FinderIndexerAdapter
 		$item->metaauthor = $item->metadata->get('author');
 
 		// Add the metadata processing instructions.
-		$item->addInstruction(\Joomla\Component\Finder\Administrator\Indexer\Indexer::META_CONTEXT, 'metakey');
-		$item->addInstruction(\Joomla\Component\Finder\Administrator\Indexer\Indexer::META_CONTEXT, 'metadesc');
-		$item->addInstruction(\Joomla\Component\Finder\Administrator\Indexer\Indexer::META_CONTEXT, 'metaauthor');
-		$item->addInstruction(\Joomla\Component\Finder\Administrator\Indexer\Indexer::META_CONTEXT, 'author');
-		$item->addInstruction(\Joomla\Component\Finder\Administrator\Indexer\Indexer::META_CONTEXT, 'created_by_alias');
+		$item->addInstruction(FinderIndexer::META_CONTEXT, 'metakey');
+		$item->addInstruction(FinderIndexer::META_CONTEXT, 'metadesc');
+		$item->addInstruction(FinderIndexer::META_CONTEXT, 'metaauthor');
+		$item->addInstruction(FinderIndexer::META_CONTEXT, 'author');
+		$item->addInstruction(FinderIndexer::META_CONTEXT, 'created_by_alias');
 
 		// Translate the state. Articles should only be published if the category is published.
 		$item->state = $this->translateState($item->state, $item->cat_state, $item->type_state);
@@ -337,7 +337,7 @@ class plgFinderFLEXIcontent extends FinderIndexerAdapter
 		$item->addTaxonomy('Language', $item->language);
 
 		// Get content extras.
-		\Joomla\Component\Finder\Administrator\Indexer\Helper::getContentExtras($item);
+		FinderIndexerHelper::getContentExtras($item);
 
 		// Index the item.
 		$this->indexer->index($item);
