@@ -10,13 +10,14 @@
 defined('_JEXEC') or die;
 
 use Joomla\Registry\Registry;
+JLoader::register('FinderIndexerAdapter', JPATH_ADMINISTRATOR . '/components/com_finder/helpers/indexer/adapter.php');
 
 /**
  * Smart Search adapter for com_flexicontent.
  *
  * @since  2.5
  */
-class plgFinderFLEXIcontent extends \Joomla\Component\Finder\Administrator\Indexer\Adapter
+class plgFinderFLEXIcontent extends FinderIndexerAdapter
 {
 	/**
 	 * The plugin identifier.
@@ -254,7 +255,7 @@ class plgFinderFLEXIcontent extends \Joomla\Component\Finder\Administrator\Index
 	 * @since   2.5
 	 * @throws  Exception on database error.
 	 */
-	protected function index(\Joomla\Component\Finder\Administrator\Indexer\Result $item, $format = 'html')
+	protected function index(FinderIndexerResult $item, $format = 'html')
 	{
 		$item->setLanguage();
 
