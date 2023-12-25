@@ -282,7 +282,7 @@ class plgSystemFlexisystem extends CMSPlugin
 			{
 				Factory::getApplication()->enqueueMessage(
 					'In order to avoid configuration loss, form was not saved.' .
-					' Templates privilege is need to save some parts of the form', 'warning');
+					' Templates privilege is need to save php code of the form', 'warning');
 				Factory::getApplication()->redirect(Route::_('index.php'));
 			}
 		}
@@ -2387,7 +2387,7 @@ class plgSystemFlexisystem extends CMSPlugin
 
 		// Set item for rendering flexicontent fields
 		require_once(Path::clean(JPATH_ROOT.'/administrator/components/com_flexicontent/models/fields/fcfieldwrapper.php'));
-		\Joomla\CMS\Form\FormFieldFCFieldWrapper::$fcform_item = $fcform_item;
+		\JFormFieldFCFieldWrapper::$fcform_item = $fcform_item;
 
 		// Get flexicontent fields
 		$form->load('
