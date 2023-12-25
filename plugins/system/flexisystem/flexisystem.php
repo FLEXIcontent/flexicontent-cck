@@ -267,16 +267,24 @@ class plgSystemFlexisystem extends CMSPlugin
 		// these are typically administrators and super admins roles
 		$hasTemplates = Factory::getUser()->authorise('core.admin', 'com_templates');
 
-		if ( (!$hasTemplates || !Factory::getUser()->authorise('core.admin')) && (isset($_POST['jform']['params']['php_rule']) || isset($_REQUEST['jform']['params']['php_rule']) ))
+		if ( !Factory::getApplication()->isClient('administrator'))
 		{
-			Factory::getApplication()->enqueueMessage('You can not edit this in frontend. Please login as a super admin');
-			Factory::getApplication()->redirect(Route::_('index.php'));
+			if ( !Factory::getUser()->authorise('core.admin') && (isset($_POST['jform']['params']['php_rule']) || isset($_REQUEST['jform']['params']['php_rule']) ))
+			{
+				Factory::getApplication()->enqueueMessage('You can not edit this in frontend. Please login as a super admin', 'warning');
+				Factory::getApplication()->redirect(Route::_('index.php'));
+			}
 		}
 
-		if (!$hasTemplates)
+		else if (!$hasTemplates)
 		{
-			unset($_POST['jform']['params']['php_rule']);
-			unset($_REQUEST['jform']['params']['php_rule']);
+			if (isset($_POST['jform']['params']['php_rule']) || isset($_REQUEST['jform']['params']['php_rule']))
+			{
+				Factory::getApplication()->enqueueMessage(
+					'In order to avoid configuration loss, form was not saved.' .
+					' Templates privilege is need to save some parts of the form', 'warning');
+				Factory::getApplication()->redirect(Route::_('index.php'));
+			}
 		}
 
 		$format = Factory::getApplication()->input->get('format', 'html', 'cmd');
