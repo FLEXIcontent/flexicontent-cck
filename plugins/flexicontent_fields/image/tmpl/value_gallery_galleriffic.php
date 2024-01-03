@@ -174,45 +174,6 @@ if ( !isset(static::$js_added[$field->id][__FILE__]) )
 	static::$js_added[$field->id][__FILE__] = array();
 }
 
-	// calcul pagination display
-
-
-	if	($thumb_display == 0){//TODO check to remove thumbs
-		$thumb_display ='<div id="gf_thumbs_' . $uid . '" class="navigation' . (!$use_pages ? ' no_pagination' : '') . '" style="display: none;">
-		<ul class="thumbs noscript" style="display: none;">
-			<li>
-			'. implode("</li><li>", $field->{$prop}) .'
-			</li>
-		</ul>
-	</div>';
-	} elseif ($thumb_display == 1) {
-		$thumb_display ='<div id="gf_thumbs_' . $uid . '" class="navigation' . (!$use_pages ? ' no_pagination' : '') . '" style="display: none;">
-		<ul class="thumbs noscript">
-			<li>
-			'. implode("</li><li>", $field->{$prop}) .'
-			</li>
-		</ul>
-	</div>
-		';
-}else{
-	$field->{$prop} = preg_replace('/<img[^>]+\>/i', '', $field->{$prop});//TODO remove img tag and all inside juste need a link
-	$thumb_display ='<div id="gf_thumbs_' . $uid . '" class="navigation' . (!$use_pages ? ' no_pagination' : '') . '" style="display: none;">
-		<ul class="thumbs noscript dot">
-			<li>
-			'. implode("</li><li>", $field->{$prop}) .'
-			</li>
-		</ul>
-	</div>';
-	}
-
-	if ($thumb_position == 0){
-		$navigation_top = $thumb_display;
-		$navigation_bottom = '';
-	}else {
-		$navigation_top = '';
-		$navigation_bottom = $thumb_display;
-	}
-
 /**
  * Include common layout code before finalize values
  */
@@ -224,7 +185,59 @@ if ($result !== _FC_RETURN_)
 	// *** Add container HTML (if required by current layout) and add value separator (if supported by current layout), then finally apply open/close tags
 	// ***
 
-	
+	// Create the thumbs display HTML
+	if	($thumb_display == 0)
+	{
+		foreach ($field->{$prop} as $_i => $_v)
+		{
+			$field->{$prop}[$_i] = preg_replace('/<img[^>]+>/i', '.', $field->{$prop}[$_i]);
+		}
+		$thumbs_display_html ='
+	<div id="gf_thumbs_' . $uid . '" class="navigation' . (!$use_pages ? ' no_pagination' : '') . '" style="display: none;">
+		<ul class="thumbs noscript" style="display: none;">
+			<li>
+			'. implode("</li><li>", $field->{$prop}) .'
+			</li>
+		</ul>
+	</div>';
+	}
+	elseif ($thumb_display == 1)
+	{
+		$thumbs_display_html ='
+	<div id="gf_thumbs_' . $uid . '" class="navigation' . (!$use_pages ? ' no_pagination' : '') . '" style="display: none;">
+		<ul class="thumbs noscript">
+			<li>
+			'. implode("</li><li>", $field->{$prop}) .'
+			</li>
+		</ul>
+	</div>';
+	}
+	else
+	{
+		foreach ($field->{$prop} as $_i => $_v)
+		{
+			$field->{$prop}[$_i] = preg_replace('/<img[^>]+>/i', '.', $field->{$prop}[$_i]);
+		}
+		$thumbs_display_html ='
+	<div id="gf_thumbs_' . $uid . '" class="navigation' . (!$use_pages ? ' no_pagination' : '') . '" style="display: none;">
+		<ul class="thumbs noscript dot">
+			<li>
+			'. implode("</li><li>", $field->{$prop}) .'
+			</li>
+		</ul>
+	</div>';
+	}
+
+	if ($thumb_position == 0)
+	{
+		$navigation_top = $thumbs_display_html;
+		$navigation_bottom = '';
+	}
+	else
+	{
+		$navigation_top = '';
+		$navigation_bottom = $thumbs_display_html;
+	}
 
 	// Add container HTML
 	$field->{$prop} = '
