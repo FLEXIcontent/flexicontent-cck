@@ -6,11 +6,11 @@
 		<!--field name="password" type="password" autocomplete="off" class="input-xlarge" description="COM_USERS_USER_FIELD_PASSWORD_DESC" filter="raw" label="JGLOBAL_PASSWORD" size="30" labelclass="label" /-->
 		<!--field name="password2" type="password" autocomplete="off" class="input-xlarge" description="COM_USERS_USER_FIELD_PASSWORD2_DESC" filter="raw" label="COM_USERS_USER_FIELD_PASSWORD2_LABEL" size="30" labelclass="label" /-->
 		<field name="email" type="email" class="input-xxlarge" description="COM_USERS_USER_FIELD_EMAIL_DESC" label="JGLOBAL_EMAIL" required="true" size="30" validate="email" labelclass="label" disabled="disabled" />
-		<field name="registerDate" type="calendar" class="readonly" label="COM_USERS_USER_FIELD_REGISTERDATE_LABEL" description="COM_USERS_USER_FIELD_REGISTERDATE_DESC" readonly="true" format="%Y-%m-%d %H:%M:%S" size="22" filter="user_utc" labelclass="label" />
-		<field name="lastvisitDate" type="calendar" class="readonly" label="COM_USERS_USER_FIELD_LASTVISIT_LABEL" description="COM_USERS_USER_FIELD_LASTVISIT_DESC" readonly="true" format="%Y-%m-%d %H:%M:%S" size="22" filter="user_utc" labelclass="label" />
+		<field name="registerDate" type="calendar" class="readonly" label="COM_USERS_USER_FIELD_REGISTERDATE_LABEL" description="COM_USERS_USER_FIELD_REGISTERDATE_DESC" readonly="true" format="%Y-%m-%d %H:%M:%S" size="22" filter="user_utc" labelclass="label" translateformat="true"  />
+		<field name="lastvisitDate" type="calendar" class="readonly" label="COM_USERS_USER_FIELD_LASTVISIT_LABEL" description="COM_USERS_USER_FIELD_LASTVISIT_DESC" readonly="true" format="%Y-%m-%d %H:%M:%S" size="22" filter="user_utc" labelclass="label" translateformat="true" />
 	</fieldset>
 	<fieldset name="user_details">
-		<field name="lastResetTime" type="calendar" class="readonly" label="COM_USERS_USER_FIELD_LASTRESET_LABEL" description="COM_USERS_USER_FIELD_LASTRESET_DESC" readonly="true" format="%Y-%m-%d %H:%M:%S" size="22" filter="user_utc" labelclass="label" />
+		<field name="lastResetTime" type="calendar" class="readonly" label="COM_USERS_USER_FIELD_LASTRESET_LABEL" description="COM_USERS_USER_FIELD_LASTRESET_DESC" readonly="true" format="%Y-%m-%d %H:%M:%S" size="22" filter="user_utc" labelclass="label" translateformat="true" />
 		<field name="resetCount" type="text" class="readonly" label="COM_USERS_USER_FIELD_RESETCOUNT_LABEL" description ="COM_USERS_USER_FIELD_RESETCOUNT_DESC" default="0" readonly="true" labelclass="label" />
 		<field name="sendEmail" type="radio" default="0" label="COM_USERS_USER_FIELD_SENDEMAIL_LABEL" description="COM_USERS_USER_FIELD_SENDEMAIL_DESC" labelclass="label" >
 			<option value="0">JNO</option>
