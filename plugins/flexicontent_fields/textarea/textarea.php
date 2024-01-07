@@ -690,7 +690,7 @@ class plgFlexicontent_fieldsTextarea extends FCField
 			// (* BECAUSE OF THIS, the value display loop expects unserialized values)
 			foreach ($values as &$value)
 			{
-				if ( !strlen($value) ) continue;  // skip further actions
+				if ( $value === null || !strlen($value) ) continue;  // skip further actions
 
 				if ($lang_filter_values)
 				{
