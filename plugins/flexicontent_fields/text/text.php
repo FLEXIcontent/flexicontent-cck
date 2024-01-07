@@ -599,7 +599,7 @@ class plgFlexicontent_fieldsText extends FCField
 			// (* BECAUSE OF THIS, the value display loop expects unserialized values)
 			foreach ($values as &$value)
 			{
-				if ( !strlen($value) ) continue;  // skip further actions
+				if ($value === null || !strlen($value) ) continue;  // skip further actions
 
 				if ($format_output > 0)  // 1: decimal, 2: integer
 				{
