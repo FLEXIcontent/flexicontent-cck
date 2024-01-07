@@ -25,7 +25,7 @@ if ($text_or_value > 1)
 foreach ($values as $value)
 {
 	// Compatibility for serialized values
-	if ( $multiple && static::$valueIsArr )
+	if ($multiple && static::$valueIsArr)
 	{
 		if (!is_array($value))
 		{
@@ -36,7 +36,7 @@ foreach ($values as $value)
 	// Make sure value is an array
 	if (!is_array($value))
 	{
-		$value = strlen($value) ? array($value) : array();
+		$value = ($value !== null && strlen($value)) ? array($value) : array();
 	}
 
 	// Skip empty if not in field group
@@ -91,7 +91,7 @@ foreach ($values as $value)
 		foreach ($value as $v)
 		{
 			// Skip empty/invalid values but add empty display, if in field group
-			$element = !strlen($v) ? false : @$elements[ $v ];
+			$element = ($v !== null && !strlen($v)) ? false : @$elements[ $v ];
 			if ( !$element || (isset($element->state) && $element->state < 1) )   // 0: unpublished, 1: published, 2: archived
 			{
 				if ( $is_ingroup ) $html[]	= '';
