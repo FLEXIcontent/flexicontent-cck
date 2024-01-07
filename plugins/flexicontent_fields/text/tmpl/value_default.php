@@ -4,11 +4,11 @@ $n = 0;
 foreach ($values as $value)
 {
 	// Skip empty value, adding an empty placeholder if field inside in field group
-	if ( !strlen($value) )
+	if ( $value === null || !strlen($value) )
 	{
 		if ( $is_ingroup )
 		{
-			$field->{$prop}[$n++]	= '';
+			$field->{$prop}[$n++] = '';
 		}
 		continue;
 	}
@@ -20,5 +20,5 @@ foreach ($values as $value)
 	if ($is_ingroup && $itemprop) $field->{$prop}[$n] = '<div style="display:inline" itemprop="'.$itemprop.'" >' .$field->{$prop}[$n]. '</div>';
 
 	$n++;
-	if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
+	if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if they exist
 }
