@@ -4,7 +4,7 @@ $n = 0;
 foreach ($values as $value)
 {
 	// Skip empty value, adding an empty placeholder if field inside in field group
-	if ( !strlen($value) )
+	if ( $value === null || !strlen($value) )
 	{
 		if ( $is_ingroup )
 		{
