@@ -132,7 +132,7 @@ class flexicontent_html
 	static function & checkPHPLimits($required=null, $recommended=null)
 	{
 		if (!$required)    $required=array('max_input_vars'=>1000, 'suhosin.post.max_vars'=>1000, 'suhosin.request.max_vars'=>1000);
-		if (!$recommended) $recommended=array('max_input_vars'=>2000, 'suhosin.post.max_vars'=>2000, 'suhosin.request.max_vars'=>2000);
+		if (!$recommended) $recommended=array('max_input_vars'=>4000, 'suhosin.post.max_vars'=>4000, 'suhosin.request.max_vars'=>4000);
 
 		$suhosin_loaded = extension_loaded('suhosin');
 		$result = array();
