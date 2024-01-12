@@ -1004,7 +1004,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 
 		// Build CSV header selection
 		$csv_header_ops = array(
-			\Joomla\CMS\HTML\HTMLHelper::_('select.option', '', \Joomla\CMS\Language\Text::_('-')),
+			//\Joomla\CMS\HTML\HTMLHelper::_('select.option', '', \Joomla\CMS\Language\Text::_('-')),
 			\Joomla\CMS\HTML\HTMLHelper::_('select.option', '-1', \Joomla\CMS\Language\Text::_('FLEXI_DEFAULT') . ' (' . \Joomla\CMS\Language\Text::_('Component') . ' ' . \Joomla\CMS\Language\Text::_('FLEXI_CONFIG'). ')'),
 			\Joomla\CMS\HTML\HTMLHelper::_('select.option', '1', \Joomla\CMS\Language\Text::_('FLEXI_FIELD') . ' ' . \Joomla\CMS\Language\Text::_('FLEXI_LABEL')),
 			\Joomla\CMS\HTML\HTMLHelper::_('select.option', '2', \Joomla\CMS\Language\Text::_('FLEXI_FIELD') . ' ' . \Joomla\CMS\Language\Text::_('FLEXI_NAME')),
@@ -1041,7 +1041,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 
 		// Build CSV raw value (Default or Raw) selection
 		$csv_raw_export_ops = array(
-			\Joomla\CMS\HTML\HTMLHelper::_('select.option', '', \Joomla\CMS\Language\Text::_('-')),
+			//\Joomla\CMS\HTML\HTMLHelper::_('select.option', '', \Joomla\CMS\Language\Text::_('-')),
 			\Joomla\CMS\HTML\HTMLHelper::_('select.option', '1', \Joomla\CMS\Language\Text::_('FLEXI_DEFAULT') . ' (' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD') . ' ' . \Joomla\CMS\Language\Text::_('FLEXI_CONFIG'). ')'),
 			\Joomla\CMS\HTML\HTMLHelper::_('select.option', '2', \Joomla\CMS\Language\Text::_('FLEXI_FIELD_RAW_VALUES')),
 		);
