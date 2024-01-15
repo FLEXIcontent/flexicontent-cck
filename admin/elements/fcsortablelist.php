@@ -177,18 +177,18 @@ class JFormFieldFcSortableList extends \Joomla\CMS\Form\FormField
 		{
 			$classes = 'records_container' . ($attributes->class ? ' '.$attributes->class : '');
 
-			$skip_initial_list = strlen($attributes->skip_initial_list) ? (int) $attributes->skip_initial_list : ($iselements ? 1 : 0);
+			$skip_initial_list = strlen($attributes->skip_initial_list ?? '') ? (int) $attributes->skip_initial_list : ($iselements ? 1 : 0);
 
-			$add_end    = strlen($attributes->add_end)    ? (int) $attributes->add_end : 0;
-			$add_before = strlen($attributes->add_before) ? (int) $attributes->add_before : $iselements;
-			$add_after  = strlen($attributes->add_after)  ? (int) $attributes->add_after  : $iselements;
+			$add_end    = strlen($attributes->add_end ?? '')    ? (int) $attributes->add_end : 0;
+			$add_before = strlen($attributes->add_before ?? '') ? (int) $attributes->add_before : $iselements;
+			$add_after  = strlen($attributes->add_after ?? '')  ? (int) $attributes->add_after  : $iselements;
 			
-			$edit_inline = strlen($attributes->edit_inline) ? (int) $attributes->edit_inline : 0;
-			$edit_popup  = strlen($attributes->edit_popup)  ? (int) $attributes->edit_popup  : $iselements;
-			$raw_inline  = strlen($attributes->raw_inline)  ? (int) $attributes->raw_inline  : 0;
-			$raw_popup   = strlen($attributes->raw_popup)   ? (int) $attributes->raw_popup   : $iselements;
+			$edit_inline = strlen($attributes->edit_inline ?? '') ? (int) $attributes->edit_inline : 0;
+			$edit_popup  = strlen($attributes->edit_popup ?? '')  ? (int) $attributes->edit_popup  : $iselements;
+			$raw_inline  = strlen($attributes->raw_inline ?? '')  ? (int) $attributes->raw_inline  : 0;
+			$raw_popup   = strlen($attributes->raw_popup ?? '')   ? (int) $attributes->raw_popup   : $iselements;
 
-			$cascaded_prop  = strlen($attributes->cascaded_prop) ? (int) $attributes->cascaded_prop : -1;
+			$cascaded_prop  = strlen($attributes->cascaded_prop ?? '') ? (int) $attributes->cascaded_prop : -1;
 
 			$list_attrs =
 				($add_after  ? ' data-add_after="1" ' : '') .
