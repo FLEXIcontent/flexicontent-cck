@@ -18,9 +18,9 @@ JLoader::register('FlexicontentViewBaseRecord', JPATH_ADMINISTRATOR . '/componen
 
 #[AllowDynamicProperties] //php8.2 compatibility
 
-/**
- * HTML View class for the Item Screen
- */
+	/**
+	 * HTML View class for the Item Screen
+	 */
 class FlexicontentViewItem extends FlexicontentViewBaseRecord
 {
 	var $proxy_option = null;
@@ -43,7 +43,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		if ($isForm)
 		{
 			/**
-			 * In case of FRONTENT: Important set layout to be form,
+			 * In case of FRONTEND: Important set layout to be form,
 			 * since various category view SEF links may have this variable set
 			 */
 			$layout = $app->isClient('site') ? 'form' : 'default';
@@ -532,15 +532,17 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 				// Finally check if item is currently being checked-out (currently being edited)
 				if ($model->isCheckedOut($user->get('id')))
 				{
-					$msg = \Joomla\CMS\Language\Text::sprintf('FLEXI_DESCBEINGEDITTED', $model->get('title'));
-					$app->redirect(\Joomla\CMS\Router\Route::_('index.php?view='.FLEXI_ITEMVIEW.'&cid='.$model->get('catid').'&id='.$model->get('id'), false), $msg);
+					$app->setHeader('status', '400 Bad Request', true);
+					$app->enqueueMessage(\Joomla\CMS\Language\Text::sprintf('FLEXI_DESCBEINGEDITTED', $model->get('title')), 'warning');
+					$app->redirect(\Joomla\CMS\Router\Route::_('index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW.'&cid='.$model->get('catid').'&id='.$model->get('id'), false), 400);
 				}
 
 				//Checkout the item
 				if ( !$model->checkout() )
 				{
-					$app->setHeader('status', '400 Bad Request', true);
-					$app->redirect(\Joomla\CMS\Router\Route::_('index.php?view='.FLEXI_ITEMVIEW.'&cid='.$model->get('catid').'&id='.$model->get('id'), false), \Joomla\CMS\Language\Text::_('FLEXI_OPERATION_FAILED') . ' : Cannot checkout file for editing', 'error');
+					$app->setHeader('status', '500 Error', true);
+					$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_OPERATION_FAILED') . ' : Cannot checkout file for editing', 'error');
+					$app->redirect(\Joomla\CMS\Router\Route::_('index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW.'&cid='.$model->get('catid').'&id='.$model->get('id'), false), 500);
 				}
 			}
 
@@ -744,12 +746,12 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 		// Label for current item state
 		$state_labels = array(
-			 1 => 'FLEXI_PUBLISHED',
-			 0 => 'FLEXI_UNPUBLISHED',
+			1 => 'FLEXI_PUBLISHED',
+			0 => 'FLEXI_UNPUBLISHED',
 			-5 => 'FLEXI_IN_PROGRESS',
 			-3 => 'FLEXI_PENDING',
 			-4 => 'FLEXI_TO_WRITE',
-			 2 => 'FLEXI_ARCHIVED',
+			2 => 'FLEXI_ARCHIVED',
 			-2 => 'FLEXI_TRASHED',
 		);
 		$published = isset($state_labels[$item->state])
@@ -1874,9 +1876,9 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 				$lbl_txt = \Joomla\CMS\Language\Text::_($use_versioning ? 'FLEXI_PREVIEW_LATEST' :'FLEXI_PREVIEW');
 				$btn_arr['preview_current'] = str_replace('_PREVIEW_LINK_', $previewlink . '&amp;tmpl=component',
-					 str_replace('_LBL_TEXT_', $lbl_txt, $preview_btn_html));
+					str_replace('_LBL_TEXT_', $lbl_txt, $preview_btn_html));
 				$btn_arr['preview_current_insite'] = str_replace('_PREVIEW_LINK_', $previewlink,
-					 str_replace('_LBL_TEXT_', $inline_txt . $lbl_txt, $preview_btn_html));
+					str_replace('_LBL_TEXT_', $inline_txt . $lbl_txt, $preview_btn_html));
 			}
 
 			// PREVIEW for non-approved versions of the item, if they exist
@@ -1896,23 +1898,23 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 				// Add a preview button for (currently) LOADED version of the item
 				$btn_arr['preview_current'] = str_replace('_PREVIEW_LINK_', $prvlink_loaded_ver . '&amp;tmpl=component',
-					 str_replace('_LBL_TEXT_', $lbl_txt_loaded_ver, $preview_btn_html));
+					str_replace('_LBL_TEXT_', $lbl_txt_loaded_ver, $preview_btn_html));
 				// Add a preview button for currently ACTIVE version of the item
 				$btn_arr['preview_active'] = str_replace('_PREVIEW_LINK_', $prvlink_active_ver . '&amp;tmpl=component',
-					 str_replace('_LBL_TEXT_', $lbl_txt_active_ver, $preview_btn_html));
+					str_replace('_LBL_TEXT_', $lbl_txt_active_ver, $preview_btn_html));
 				// Add a preview button for currently LATEST version of the item
 				$btn_arr['preview_latest'] = str_replace('_PREVIEW_LINK_', $prvlink_last_ver . '&amp;tmpl=component',
-					 str_replace('_LBL_TEXT_', $lbl_txt_last_ver, $preview_btn_html));
+					str_replace('_LBL_TEXT_', $lbl_txt_last_ver, $preview_btn_html));
 
 				// Add a preview button for (currently) LOADED version of the item
 				$btn_arr['preview_current_insite'] = str_replace('_PREVIEW_LINK_', $prvlink_loaded_ver,
-					 str_replace('_LBL_TEXT_', $inline_txt . $lbl_txt_loaded_ver, $preview_btn_html));
+					str_replace('_LBL_TEXT_', $inline_txt . $lbl_txt_loaded_ver, $preview_btn_html));
 				// Add a preview button for currently ACTIVE version of the item
 				$btn_arr['preview_active_insite'] = str_replace('_PREVIEW_LINK_', $prvlink_active_ver,
-					 str_replace('_LBL_TEXT_', $inline_txt . $lbl_txt_active_ver, $preview_btn_html));
+					str_replace('_LBL_TEXT_', $inline_txt . $lbl_txt_active_ver, $preview_btn_html));
 				// Add a preview button for currently LATEST version of the item
 				$btn_arr['preview_latest_insite'] = str_replace('_PREVIEW_LINK_', $prvlink_last_ver,
-					 str_replace('_LBL_TEXT_', $inline_txt . $lbl_txt_last_ver, $preview_btn_html));
+					str_replace('_LBL_TEXT_', $inline_txt . $lbl_txt_last_ver, $preview_btn_html));
 
 				//$toolbar->appendButton( 'Custom', $btn_arr['preview_current'], 'preview_current' );
 				//$toolbar->appendButton( 'Custom', $btn_arr['preview_active'], 'preview_active' );
@@ -1955,7 +1957,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 					$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
 					$btn_class='btn-fcaction ' . (FLEXI_J40GE ? ' _DDI_class_ ' . $this->btn_iv_class : '') . ' ' . $this->tooltip_class, $btn_icon="icon-pencil",
 					'data-placement="right" data-href="index.php?option=com_flexicontent&amp;view=template&amp;type=items&amp;tmpl=component&amp;ismodal=1&amp;folder=' . $item->itemparams->get('ilayout', $tparams->get('ilayout', 'default'))
-						. '&amp;' . \Joomla\CMS\Session\Session::getFormToken() . '=1' .
+					. '&amp;' . \Joomla\CMS\Session\Session::getFormToken() . '=1' .
 					'" title="Edit the display layout of this item. <br/><br/>Note: this layout maybe assigned to content types or other items, thus changing it will effect them too"',
 					$auto_add = 0,$tbname
 				);
@@ -2390,8 +2392,8 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		// *** Print link ... must include layout and current filtering url vars, etc
 		// ***
 
-    $curr_url   = str_replace('&', '&amp;', $_SERVER['REQUEST_URI']);
-    $print_link = $curr_url .(strstr($curr_url, '?') ? '&amp;'  : '?').'pop=1&amp;tmpl=component&amp;print=1';
+		$curr_url   = str_replace('&', '&amp;', $_SERVER['REQUEST_URI']);
+		$print_link = $curr_url .(strstr($curr_url, '?') ? '&amp;'  : '?').'pop=1&amp;tmpl=component&amp;print=1';
 		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx', ''));
 
 		$this->item    = $item;
