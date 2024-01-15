@@ -3000,7 +3000,7 @@ class FlexicontentFields
 				}
 
 				// Check value is not empty
-				if ( !is_array($v) && !strlen($v) ) continue;
+				if ( !is_array($v) && !(is_string($v) && strlen($v)) ) continue;
 
 				// If has field 'required/search' properties, then check field is multi-property (value is array)
 				if ( !is_array($v) && (count($required_props) || count($search_props)) ) continue;
@@ -3012,7 +3012,7 @@ class FlexicontentFields
 				$required_exists = true;
 				foreach ($required_props as $cp)
 				{
-					if ( !strlen($v[$cp] ?? '') ) $required_exists = false;
+					if ( !(isset($v[$cp]) && strlen($v[$cp])) ) $required_exists = false;
 				}
 				if (!$required_exists) continue;
 
