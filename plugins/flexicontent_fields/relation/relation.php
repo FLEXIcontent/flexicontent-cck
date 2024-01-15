@@ -836,6 +836,9 @@ class plgFlexicontent_fieldsRelation extends FCField
 		// Compatibility with legacy layouts
 		$related_items = count($related_items_sets) ? reset($related_items_sets) : null;
 
+		// Expose this information to the layout
+		$field->related_items_sets = $related_items_sets;
+
 
 		/**
 		 * Get common parameters like: itemprop, value's prefix (pretext), suffix (posttext), separator, value list open/close text (opentag, closetag)
