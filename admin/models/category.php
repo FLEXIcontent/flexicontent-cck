@@ -644,20 +644,19 @@ class FlexicontentModelCategory extends FCModelAdmin
 				$fieldset->addAttribute('name', 'item_associations');
 				$fieldset->addAttribute('description', 'COM_CATEGORIES_ITEM_ASSOCIATIONS_FIELDSET_DESC');
 
-				foreach ($languages as $language)
-				{
+				foreach ($languages as $language) {
 					if ($language->lang_code == $data_language) continue;
 					$field = $fieldset->addChild('field');
 					$field->addAttribute('name', $language->lang_code);
 					$field->addAttribute('type', 'fccategory');
-					$field->addAttribute('language', $language->lang_code);
-					$field->addAttribute('label', $language->title);
+					$field->addAttribute('language', $language->lang_code ?: '');
+					$field->addAttribute('label', $language->title ?: ''); 
 					$field->addAttribute('class', 'label');
 					$field->addAttribute('translate_label', 'false');
-					$field->addAttribute('extension', $extension);
+					$field->addAttribute('extension', $extension ?: ''); 
 					$field->addAttribute('edit', 'true');
 					$field->addAttribute('clear', 'true');
-					$field->addAttribute('filter', 'INT');  // also enforced later, but better to have it here too
+					$field->addAttribute('filter', 'INT');  
 				}
 
 				$form->load($addform, false);
