@@ -17,7 +17,7 @@ JLoader::register('FinderIndexerAdapter', JPATH_ADMINISTRATOR . '/components/com
  *
  * @since  2.5
  */
-class plgFinderFLEXIcontent extends FinderIndexerAdapter
+class plgFinderFLEXIcontent extends \Joomla\Component\Finder\Administrator\Indexer\Adapter
 {
 	/**
 	 * The plugin identifier.
@@ -255,7 +255,7 @@ class plgFinderFLEXIcontent extends FinderIndexerAdapter
 	 * @since   2.5
 	 * @throws  Exception on database error.
 	 */
-	protected function index(FinderIndexerResult $item, $format = 'html')
+	protected function index(\Joomla\Component\Finder\Administrator\Indexer\Result $item, $format = 'html')
 	{
 		$item->setLanguage();
 
