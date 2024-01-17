@@ -35,7 +35,7 @@ require_once("fcsortablelist.php");
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-class JFormFieldFcMediaprops extends \Joomla\CMS\Form\FormFieldFcSortableList
+class JFormFieldFcMediaprops extends JFormFieldFcSortableList
 {
 	/**
 	 * \Joomla\CMS\Form\FormField type
