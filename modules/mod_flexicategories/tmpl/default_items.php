@@ -104,6 +104,8 @@ foreach ($list as $cat) :
 		}
 		
 		$cat->image = $cat->params->get('image');
+		$_parts  = explode('#', $cat->image ?? '');
+	    $cat->image         = $_parts[0];
 		$cat->introtext = & $cat->description;
 		$cat->fulltext = '';
 		
