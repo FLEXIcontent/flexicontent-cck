@@ -127,12 +127,14 @@ class modFlexigooglemapHelper
 		$field = modFlexigooglemapHelper::_getField($fieldaddressid);
 
 		// Get marker image configuratuon
-		$use_custom_marker = (int) $params->get('use_custom_marker', 1) && (int) $field->parameters->get('use_custom_marker', 1);
+		if (!empty($fieldaddressid)) {
+			$use_custom_marker = (int) $params->get('use_custom_marker', 1) && (int) $field->parameters->get('use_custom_marker', 1);
 
-		if ($use_custom_marker) {
-			$custom_marker_path     = $field->parameters->get('custom_marker_path', 'modules/mod_flexigooglemap/assets/marker');
-			$custom_marker_path_abs = \Joomla\Filesystem\Path::clean(JPATH_SITE . DS . $custom_marker_path . DS);
-			$custom_marker_url_base = str_replace('\\', '/', \Joomla\CMS\Uri\Uri::root() . $custom_marker_path . '/');
+			if ($use_custom_marker) {
+				$custom_marker_path     = $field->parameters->get('custom_marker_path', 'modules/mod_flexigooglemap/assets/marker');
+				$custom_marker_path_abs = \Joomla\Filesystem\Path::clean(JPATH_SITE . DS . $custom_marker_path . DS);
+				$custom_marker_url_base = str_replace('\\', '/', \Joomla\CMS\Uri\Uri::root() . $custom_marker_path . '/');
+			}
 		}
 
 		$mapLocations = array();
