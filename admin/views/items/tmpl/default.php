@@ -1254,8 +1254,8 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 							$assoc_isstale_class = $oc_item && (!$assoc_item->is_uptodate && $assoc_modified < $oc_item_modified) ? ' fc_assoc_isstale' : ' fc_assoc_isuptodate';
 
 							echo '
-							<a class="fc_assoc_translation label label-association ' . $this->popover_class . $assoc_isstale_class . $assoc_state_class . '"
-								target="_blank" href="'.$_link.'" data-placement="top" data-content="'.$_title.'"
+							<a class="fc_assoc_translation label label-association ' . $this->popover_class . $assoc_isstale_class . $assoc_state_class . ' hasTooltip"
+								target="_blank" href="'.$_link.'" data-placement="top" aria-label="'.$_title.' data-content="'.$_title.' data-bs-original-title="'.$_title.'"
 							>
 								<span>' . ($assoc_item->lang=='*' ? Text::_('FLEXI_ALL') : strtoupper($assoc_item->shortcode ?: '?')) . '</span>
 							</a>';
