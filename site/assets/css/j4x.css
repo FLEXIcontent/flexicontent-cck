@@ -88,7 +88,7 @@ button.btn.btn-highlight:hover,
 	height: var(--ctrls-inp-height) !important;
 	min-height: var(--ctrls-inp-height) !important;
 	line-height: calc(var(--ctrls-inp-height) - 1px) !important;
-	padding: 0 calc(var(--ctrls-inp-height) / 2) !important;
+	padding: 0 calc(var(--ctrls-inp-height) / 6) !important;
 }
 #flexicontent .fc-xpended-btns > [class^="fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn),
 #flexicontent .fc-xpended-btns > [class*=" fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn),
@@ -539,4 +539,16 @@ fieldset.fc_filter_set legend .fc_legend_text.hasTooltip {
 #flexicontent .item_total .fc_orderby_level_lbl,
 #flexicontent .item_total .fc_orderby_selector {
 	margin: 0 !important;
+}
+.buttons.btn-group.fc-iblock.dropdown {
+	margin-left: inherit !important;
+	width: inherit !important;
+	display: contents;
+}
+#flexicontent [class*="fc-xpended"] > .btn-group {
+	margin: 0 -8px;
+}
+.fc-form-tbl.fcinner.fccompact > div {
+	margin-top: 6px;
+	margin-bottom: 6px;
 }

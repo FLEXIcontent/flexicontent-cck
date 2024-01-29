@@ -292,10 +292,10 @@ foreach ($field->value as $index => $value)
 
 
 	if ($linkto_url) $urllink =
-		'<tr>
+		'<div>
 			<!--td class="key"><label class="fc-prop-lbl">'.\Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_LINKTO_URL' ).'</label></td-->
 			<td><input class="imgurllink" size="40" name="'.$fieldname_n.'[urllink]" value="'.htmlspecialchars(isset($value['urllink']) ? $value['urllink'] : '', ENT_COMPAT, 'UTF-8').'" type="text" placeholder="'.htmlspecialchars(\Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_LINKTO_URL' ), ENT_COMPAT, 'UTF-8').'"/></td>
-		</tr>';
+		</div>';
 	if ($usemediaurl)
 	{
 		$placeholder = htmlspecialchars(($usemediaurl === 1
@@ -303,8 +303,7 @@ foreach ($field->value as $index => $value)
 			: \Joomla\CMS\Language\Text::_('FLEXI_FIELD_MEDIA_URL')
 		), ENT_COMPAT, 'UTF-8');
 		$mediaurl =
-		'<tr>
-			<td>
+		'<div>
 				<div class="fcfield-image-mediaurl-box" ' . (empty($value['mediaurl']) ? ' style="display: none;" ' : '') . '>
 					<input class="img_mediaurl" size="40" name="'.$fieldname_n.'[mediaurl]" id="'.$elementid_n.'_mediaurl" value="'.htmlspecialchars(isset($value['mediaurl']) ? $value['mediaurl'] : $default_mediaurl, ENT_COMPAT, 'UTF-8').'" type="text" placeholder="'. $placeholder .'"/>
 					<br>
@@ -318,35 +317,34 @@ foreach ($field->value as $index => $value)
 					</div>
 					<div class="fcfield_message_box" id="fcfield_message_box_'.$elementid_n.'"></div>
 				</div>
-			</td>
-		</tr>
+		</div>
 		';
 	}
 	if ($usealt) $alt =
-		'<tr>
+		'<div>
 			<!--td class="key"><label class="fc-prop-lbl">'.\Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_ALT' ).'</label></td-->
 			<td><input class="imgalt" size="40" name="'.$fieldname_n.'[alt]" value="'.htmlspecialchars(isset($value['alt']) ? $value['alt'] : $default_alt, ENT_COMPAT, 'UTF-8').'" type="text" placeholder="'.htmlspecialchars(\Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_ALT' ), ENT_COMPAT, 'UTF-8').'"/></td>
-		</tr>';
+		</div>';
 	if ($usetitle) $title =
-		'<tr>
+		'<div>
 			<!--td class="key"><label class="fc-prop-lbl">'.\Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_TITLE' ).' <br/>('.\Joomla\CMS\Language\Text::_('FLEXI_FIELD_TOOLTIP').')</label></td-->
 			<td><input class="imgtitle" size="40" name="'.$fieldname_n.'[title]" value="'.htmlspecialchars(isset($value['title']) ? $value['title'] : $default_title, ENT_COMPAT, 'UTF-8').'" type="text" placeholder="'.htmlspecialchars(\Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_TITLE' ), ENT_COMPAT, 'UTF-8').'"/></td>
-		</tr>';
+		</div>';
 	if ($usedesc) $desc =
-		'<tr>
+		'<div>
 			<!--td class="key"><label class="fc-prop-lbl">'.\Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_DESC' ).' <br/>('.\Joomla\CMS\Language\Text::_('FLEXI_FIELD_TOOLTIP').')</label></td-->
 			<td><textarea class="imgdesc" name="'.$fieldname_n.'[desc]" rows="3" cols="24" placeholder="'.htmlspecialchars(\Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_DESC' ), ENT_COMPAT, 'UTF-8').'">'.(isset($value['desc']) ? $value['desc'] : $default_desc).'</textarea></td>
-		</tr>';
+		</div>';
 	if ($usecust1) $cust1 =
-		'<tr>
+		'<div>
 			<!--td class="key"><label class="fc-prop-lbl">'.\Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_IMG_CUST1' ).'</label></td-->
 			<td><input class="imgcust1" size="40" name="'.$fieldname_n.'[cust1]" value="'.htmlspecialchars(isset($value['cust1']) ? $value['cust1'] : $default_cust1, ENT_COMPAT, 'UTF-8').'" type="text" placeholder="'.htmlspecialchars(\Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_IMG_CUST1' ), ENT_COMPAT, 'UTF-8').'"/></td>
-		</tr>';
+		</div>';
 	if ($usecust2) $cust2 =
-		'<tr>
+		'<div>
 			<!--td class="key"><label class="fc-prop-lbl">'.\Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_IMG_CUST2' ).'</label></td-->
 			<td><input class="imgcust2" size="40" name="'.$fieldname_n.'[cust2]" value="'.htmlspecialchars(isset($value['cust2']) ? $value['cust2'] : $default_cust2, ENT_COMPAT, 'UTF-8').'" type="text" placeholder="'.htmlspecialchars(\Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_IMG_CUST2' ), ENT_COMPAT, 'UTF-8').'"/></td>
-		</tr>';
+		</div>';
 
 	// DB-mode needs a 'pick_existing_n'
 	if ($image_source === 0)
@@ -427,6 +425,7 @@ foreach ($field->value as $index => $value)
 					<li>'.$uploader_html->mediaUrlBtn.'</li>
 				</ul>
 			</div>
+			<span class="add-on fcfont-icon icon icon-  image-option" data-name="'.$elementid_n.'"><i class="fas fa-info-circle"></i></span>
 			'.$uploader_html->clearBtn.'
 			' : '') . '
 		</div>
@@ -444,21 +443,18 @@ foreach ($field->value as $index => $value)
 					' . ($use_myfiles > 0 ? $uploader_html->myFilesBtn : '') . '
 					'.$uploader_html->mediaUrlBtn.'
 					'.$uploader_html->clearBtn.'
+					<span class="add-on fcfont-icon icon icon-  image-option" data-name="'.$elementid_n.'"><i class="fas fa-info-circle"></i></span>
 				</div>
 			</div>
 			' : '') . '
-			'.$fc_preview_msg.'
-			'.$originalname.'
-			'.$existingname.'
-
-			<div class="fc-field-value-properties-box">
+			<div class="fc-field-value-properties-box" style="flex-direction: column;">
 
 				'.($image_source === -2 || $image_source === -1  ?  // Do not add image preview box if using Joomla Media Manager (or intro/full mode)
 					$select_existing.'
 					<div class="fcclear"></div>
 				' : '
 					'.(empty($uploader_html) ? '' : '
-						<div style="display: inline-block; vertical-align: top;">
+						<div style="display: inline-block; vertical-align: top;height:0;">
 							' . $uploader_html->container . '
 						</div>
 					').'
@@ -466,14 +462,18 @@ foreach ($field->value as $index => $value)
 						'.$imgpreview.'
 						<div class="fcclear"></div>
 					'.$select_existing.'
-					</div>
+					
 				').'
 				'
 
 				.(($linkto_url || $usemediaurl || $usealt || $usetitle || $usedesc || $usecust1 || $usecust2) ?
 				'
-				<div class="fcimg_value_props">
-					<table class="fc-form-tbl fcinner fccompact">
+
+				<div class="fcimg_value_props" style="display: none;" data-name="'.$elementid_n.'">
+            '.$fc_preview_msg.'
+			'.$originalname.'
+			'.$existingname.'
+					<div class="fc-form-tbl fcinner fccompact">
 						' . @ $urllink . '
 						' . @ $mediaurl . '
 						' . @ $alt . '
@@ -481,11 +481,12 @@ foreach ($field->value as $index => $value)
 						' . @ $desc . '
 						' . @ $cust1 . '
 						' . @ $cust2 . '
-					</table>
-				</div>'
+					</div>
+				'
 				: '') .'
 
-			</div><!-- EOF class="fc-field-value-properties-box" -->
+</div>			
+</div><!-- EOF class="fc-field-value-properties-box" -->
 		</div><!-- EOF class="fc-field-props-box" -->
 		';
 
@@ -510,6 +511,18 @@ $js = ""
 		" . $per_value_js . "
 	});
 ");
+
+$js .= "
+jQuery(document).ready(function()
+{
+	$('.image-option').each(function() {
+		$(this).click(function(){
+			var name = this.dataset.name;
+			$('.fcimg_value_props[data-name=\"'+ name +'\"]').toggle(150);
+		})
+	});
+});
+";
 
 if ($js) $document->addScriptDeclaration($js);
 

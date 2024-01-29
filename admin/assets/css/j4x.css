@@ -809,6 +809,7 @@ form div.container_fcfield > select,
 form div.container_fcfield > img,
 form div.container_fcfield > span {
 	margin: 0px !important;
+	vertical-align: top;
 }
 form div.container_fcfield > input,
 form div.container_fcfield > button,
@@ -1134,4 +1135,28 @@ div table.fc-table-list tr:nth-child(odd) td {
 		background-color: var(--template-bg-dark-60);
 		border-color: var(--template-bg-dark-60);
 	}
+	#flexicontent .fc-xpended-btns [class^="fcfield-"].fcfont-icon:hover,
+	#flexicontent .fc-xpended-btns [class*=" fcfield-"].fcfont-icon:hover,
+	#flexicontent .fc-xpended-btns .fcfield-button-add.fcfont-icon:hover a {
+		background-color: #595959 !important;
+		background-image: none !important;
+	}
+	#flexicontent div [class^="fcfield-"].fcfont-icon,
+	#flexicontent div [class*=" fcfield-"].fcfont-icon,
+	#flexicontent ul.fcfield-sortables > li [class^="fcfield-"].fcfont-icon,
+	#flexicontent ul.fcfield-sortables > li [class*=" fcfield-"].fcfont-icon {
+		color: #fff !important;
+	}
+}
+.buttons.btn-group.fc-iblock.dropdown {
+	margin-left: inherit !important;
+	width: inherit !important;
+	display: contents;
+}
+#flexicontent [class*="fc-xpended"] > .btn-group {
+	margin: 0 -8px;
+}
+.fc-form-tbl.fcinner.fccompact > div {
+	margin-top: 6px;
+	margin-bottom: 6px;
 }

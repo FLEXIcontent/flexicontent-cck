@@ -101,12 +101,12 @@
 			</field>
 
 			<field name="" type="separator" default="FLEXI_PREVIEW_THUMBNAILS" description="" level="level2" />
-			<field name="thumb_size_resizer" type="radio" default="2" label="FLEXI_FIELD_THUMB_RESIZER" description="FLEXI_FIELD_THUMB_RESIZER_DESC" class="btn-group btn-group-yesno">
+			<field name="thumb_size_resizer" type="radio" default="0" label="FLEXI_FIELD_THUMB_RESIZER" description="FLEXI_FIELD_THUMB_RESIZER_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_DISABLE</option>
 				<option value="1">FLEXI_DISPLAY_AS_DROP_DOWN</option>
 				<option value="2">FLEXI_DISPLAY_AS_SLIDER</option>
 			</field>
-			<field name="thumb_size_default" type="radio" default="120" label="FLEXI_FIELD_THUMB_SIZE_DEFAULT" description="FLEXI_FIELD_THUMB_SIZE_DEFAULT_DESC" class="btn-group group-fcinfo">
+			<field name="thumb_size_default" type="radio" default="250" label="FLEXI_FIELD_THUMB_SIZE_DEFAULT" description="FLEXI_FIELD_THUMB_SIZE_DEFAULT_DESC" class="btn-group group-fcinfo">
 				<option value="90">90</option>
 				<option value="120">120</option>
 				<option value="150">150</option>

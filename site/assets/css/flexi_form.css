@@ -1379,3 +1379,6 @@ input.minicolors-input {
 .field-calendar .btn.btn-secondary {
 	height: var(--ctrls-inp-height) !important;
 }
+.fc-form-tbl.fcinner.fccompact {
+	margin-top: -34px !important;
+}
