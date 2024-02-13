@@ -73,14 +73,12 @@ foreach ($values as $n => $value)
 		</a>
 		<a class="gf_fancybox" href="'.\Joomla\CMS\Uri\Uri::root(true).'/'.$srcl.'" data-title="' . $title_encoded . '" data-caption="' . $desc_encoded . '"' . $group_str . '
 			onclick="if (gf_gallery_' . $uid . '.mSlider.isDragging) {event.preventDefault(); event.stopPropagation(); return false; }"; style="display: none;">
-			<div id="gf_caption_' . $uid . '" class="caption-container">
-		' . ($display_title || $display_desc ? '
+        </a>
+			' . ($display_title || $display_desc ? '
 				<div class="caption">
 					' . ($display_title && $title ? '<div class="image-title">' . $title_encoded .'</div>' : '') . '
 					' . ($display_desc && $desc ?  '<div class="image-desc">' . nl2br(preg_replace("/(\r\n|\r|\n){3,}/", "\n\n", $desc_encoded)) . '</div>' : '') . '
 				</div>' : '') .'
-			</div>	
-		</a>
 ';
 }
 $js = "
@@ -275,6 +273,7 @@ if ($result !== _FC_RETURN_)
 				' : '') . '
 				<div id="gf_loading_' . $uid . '" class="loader"></div>
 				<div id="gf_slideshow_' . $uid . '" class="slideshow"></div>
+				<div id="gf_caption_' . $uid . '" class="caption-container"></div>
 			</div>
 		</div>
 
