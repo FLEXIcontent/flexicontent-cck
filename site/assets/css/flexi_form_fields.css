@@ -1724,3 +1724,6 @@ span.fcfield-disablevalue.fcfont-icon.icon.icon- {
 	margin-left: -20px !important;
 	width: 88px;
 }
+span.add-on.fcfont-icon.icon.icon-.image-option {
+	cursor: pointer;
+}
