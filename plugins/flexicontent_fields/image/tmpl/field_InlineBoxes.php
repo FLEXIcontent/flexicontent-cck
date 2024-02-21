@@ -209,7 +209,7 @@ foreach ($field->value as $index => $value)
 			{
 				$jfield = new \Joomla\CMS\Form\Field\MediaField($jform);
 			}
-			
+
 			$jfield->setup(new SimpleXMLElement($xml_field), $jfvalue, '');
 			$select_existing = $jfield->input;
 		}
@@ -462,7 +462,7 @@ foreach ($field->value as $index => $value)
 						'.$imgpreview.'
 						<div class="fcclear"></div>
 					'.$select_existing.'
-					
+					</div>
 				').'
 				'
 
@@ -470,9 +470,9 @@ foreach ($field->value as $index => $value)
 				'
 
 				<div class="fcimg_value_props" style="display: none;" data-name="'.$elementid_n.'">
-            '.$fc_preview_msg.'
-			'.$originalname.'
-			'.$existingname.'
+					'.$fc_preview_msg.'
+					'.$originalname.'
+					'.$existingname.'
 					<div class="fc-form-tbl fcinner fccompact">
 						' . @ $urllink . '
 						' . @ $mediaurl . '
@@ -482,11 +482,11 @@ foreach ($field->value as $index => $value)
 						' . @ $cust1 . '
 						' . @ $cust2 . '
 					</div>
+				</div>
 				'
 				: '') .'
 
-</div>			
-</div><!-- EOF class="fc-field-value-properties-box" -->
+			</div><!-- EOF class="fc-field-value-properties-box" -->
 		</div><!-- EOF class="fc-field-props-box" -->
 		';
 
