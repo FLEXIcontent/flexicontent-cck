@@ -4,7 +4,7 @@ for ($n = 0; $n < $max_count; $n++)
 {
 	$field->html[$n] = '
 		'.(!$add_ctrl_btns ? '' : '
-		<div class="'.$input_grp_class.' fc-xpended-btns">
+		<div class="'.$btn_group_class.' fc-xpended-btns">
 			'.$move2.'
 			'.$remove_button.'
 			'.$togglers.'

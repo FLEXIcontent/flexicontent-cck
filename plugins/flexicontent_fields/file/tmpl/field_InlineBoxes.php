@@ -81,7 +81,7 @@ foreach ($field->value as $file_id)
 			'refresh_on_complete' => false,
 			'thumb_size_default' => $thumb_size_default,
 			'toggle_btn' => array(
-				'class' => ($file_btns_position ? $add_on_class : '') . ' fcfield-uploadvalue dropdown-item' . $font_icon_class,
+				'class' => ($file_btns_position ? $btn_item_class : '') . ' fcfield-uploadvalue dropdown-item' . $font_icon_class,
 				'text' => (!$file_btns_position ? '&nbsp; ' . \Joomla\CMS\Language\Text::_('FLEXI_UPLOAD') : ''),
 				'onclick' => $toggleUploader_onclick,
 				'action' => null
@@ -94,7 +94,7 @@ foreach ($field->value as $file_id)
 		);
 
 		$multi_icon = $form_font_icons ? ' <span class="icon-stack"></span>' : '<span class="pages_stack"></span>';
-		$btn_classes = 'fc-files-modal-link ' . ($file_btns_position ? $add_on_class : '') . ' ' . $font_icon_class;
+		$btn_classes = 'fc-files-modal-link ' . ($file_btns_position ? $btn_item_class : '') . ' ' . $font_icon_class;
 		$uploader_html->multiUploadBtn = '';  /*'
 			<span data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" class="'.$btn_classes.' fc-up fcfield-uploadvalue multi dropdown-item" id="'.$elementid_n.'_mul_uploadvalue">
 				&nbsp; ' . $multi_icon . ' ' . (!$file_btns_position || $file_btns_position==2 ? \Joomla\CMS\Language\Text::_('FLEXI_UPLOAD') : '') . '
@@ -104,11 +104,11 @@ foreach ($field->value as $file_id)
 				' .  ($file_btns_position ? $multi_icon : '') . ' ' . (!$file_btns_position || $file_btns_position==2 ? '&nbsp; ' . \Joomla\CMS\Language\Text::_('FLEXI_MY_FILES') : '') . ' ' . (!$file_btns_position ? $multi_icon : '') .'
 			</span>';
 		$uploader_html->mediaUrlBtn = !$usemediaurl ? '' : '
-			<span class="' . ($file_btns_position ? $add_on_class : '') . ' fcfield-medialurlvalue ' . $font_icon_class . ' dropdown-item" onclick="fcfield_file.toggleMediaURL(\''.$elementid_n.'\', \''.$field_name_js.'\'); return false;">
+			<span class="' . ($file_btns_position ? $btn_item_class : '') . ' fcfield-medialurlvalue ' . $font_icon_class . ' dropdown-item" onclick="fcfield_file.toggleMediaURL(\''.$elementid_n.'\', \''.$field_name_js.'\'); return false;">
 				' . (!$file_btns_position || $file_btns_position==2 ? '&nbsp; ' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD_MEDIA_URL') : '') . '
 			</span>';
 		$uploader_html->clearBtn = '
-			<span class="' . $add_on_class . ' fcfield-clearvalue ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_('FLEXI_CLEAR').'" onclick="fcfield_file.clearField(this, {}, \''.$field_name_js.'\');">
+			 <span class="' . $btn_item_class . ' fcfield-clearvalue ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_('FLEXI_CLEAR').'" onclick="fcfield_file.clearField(this, {}, \''.$field_name_js.'\');">
 			</span>';
 	}
 

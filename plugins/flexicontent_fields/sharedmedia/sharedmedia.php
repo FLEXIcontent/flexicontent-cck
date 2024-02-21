@@ -55,6 +55,8 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 		$tooltip_class = 'hasTooltip';
 		$add_on_class    = $cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
 		$input_grp_class = $cparams->get('bootstrap_ver', 2)==2  ?  'input-append input-prepend' : 'input-group';
+		$btn_item_class  = $cparams->get('bootstrap_ver', 2)==2  ?  'btn' : 'btn';
+		$btn_group_class = $cparams->get('bootstrap_ver', 2)==2  ?  'btn-group' : 'btn-group';
 		$form_font_icons = $cparams->get('form_font_icons', 1);
 		$font_icon_class = $form_font_icons ? ' fcfont-icon' : '';
 		$font_icon_class .= FLEXI_J40GE ? ' icon icon- ' : '';
@@ -310,22 +312,22 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 			$css .= '';
 
 			$remove_button = '
-				<button type="button" class="' . $add_on_class . ' fcfield-delvalue ' . $font_icon_class . '"
+				<button type="button" class="' . $btn_item_class . ' fcfield-delvalue ' . $font_icon_class . '"
 					aria-label="' . \Joomla\CMS\Language\Text::_('FLEXI_REMOVE_VALUE') . ' ' . \Joomla\CMS\Language\Text::_('FLEXI_VALUE')  . '"
 					onclick="deleteField'.$field->id.'(this); return false;"
 				></button>';
-			$move2 = '
-				<button type="button" class="' . $add_on_class . ' fcfield-drag-handle ' . $font_icon_class . '" onclick="event.preventDefault(); return false;"
+			$move2         = '
+				<button type="button" class="' . $btn_item_class . ' fcfield-drag-handle ' . $font_icon_class . '" onclick="event.preventDefault(); return false;"
 					aria-label="' . \Joomla\CMS\Language\Text::_('FLEXI_CLICK_TO_DRAG') . '"
 				></button>';
 			$add_here = '';
 			$add_here .= $add_position==2 || $add_position==3 ? '
-				<button type="button" class="' . $add_on_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '"
+				<button type="button" class="' . $btn_item_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '"
 				 aria-label="' . \Joomla\CMS\Language\Text::_('FLEXI_ADD_BEFORE') . '"
 				 onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1}); return false;"
 				></button> ' : '';
 			$add_here .= $add_position==1 || $add_position==3 ? '
-				<button type="button" class="' . $add_on_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"
+				<button type="button" class="' . $btn_item_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"
 				 aria-label="' . \Joomla\CMS\Language\Text::_('FLEXI_ADD_AFTER') . '"
 				 onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0}); return false;"
 				></button> ' : '';
@@ -335,7 +337,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 		else
 		{
 			$remove_button = '';
-			$move2 = '';
+			$move2         = '';
 			$add_here = '';
 			$js .= '';
 			$css .= '';
@@ -439,7 +441,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 
 			$html_field = '
 				'.(!$add_ctrl_btns ? '' : '
-				<div class="'.$input_grp_class.' fc-xpended-btns">
+				<div class="'.$btn_group_class.' fc-xpended-btns">
 					'.$move2.'
 					'.$remove_button.'
 					'.(!$add_position ? '' : $add_here).'
@@ -617,7 +619,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 				'</li>';
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
 			if (!$add_position) $field->html .= '
-				<div class="input-append input-prepend fc-xpended-btns">
+				<div class="'.$btn_group_class.' fc-xpended-btns">
 					<button type="button" class="fcfield-addvalue ' . $font_icon_class . ' fccleared"
 						aria-label="' . \Joomla\CMS\Language\Text::_( 'FLEXI_ADD_VALUE' ) . '" title="' . \Joomla\CMS\Language\Text::_( 'FLEXI_ADD_VALUE' ) . '"
 						onclick="addField'.$field->id.'(jQuery(this).closest(\'.fc-xpended-btns\').get(0)); return false;"

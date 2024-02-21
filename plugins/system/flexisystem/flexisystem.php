@@ -68,6 +68,10 @@ class plgSystemFlexisystem extends CMSPlugin
 
 		$this->extension = 'com_flexicontent';
 		$this->cparams = ComponentHelper::getParams($this->extension);
+		if (!$this->cparams->get('bootstrap_ver', null))
+		{
+			$this->cparams->set('bootstrap_ver', (FLEXI_J40GE ? 5 : 2));
+		}
 
 		// Temporary workaround until code is updated
 		if (FLEXI_J40GE)

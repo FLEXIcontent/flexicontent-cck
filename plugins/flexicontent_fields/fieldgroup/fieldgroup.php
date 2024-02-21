@@ -61,8 +61,10 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 		$isAdmin = $app->isClient('administrator');
 
 		$tooltip_class = 'hasTooltip';
-		$add_on_class    = 'btn'; //$cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
-		$input_grp_class = 'btn-group'; //$cparams->get('bootstrap_ver', 2)==2  ?  'input-append input-prepend' : 'input-group';
+		$add_on_class    = $cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
+		$input_grp_class = $cparams->get('bootstrap_ver', 2)==2  ?  'input-append input-prepend' : 'input-group';
+		$btn_item_class  = $cparams->get('bootstrap_ver', 2)==2  ?  'btn' : 'btn';
+		$btn_group_class = $cparams->get('bootstrap_ver', 2)==2  ?  'btn-group' : 'btn-group';
 		$form_font_icons = $cparams->get('form_font_icons', 1);
 		$font_icon_class = $form_font_icons ? ' fcfont-icon' : '';
 		$font_icon_class .= FLEXI_J40GE ? ' icon icon- ' : '';
@@ -301,18 +303,18 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 
 			$css .= '';
 
-			$remove_button = '<span class="' . $add_on_class . ' fcfield-delvalue ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
-			$move2 = '<span class="' . $add_on_class . ' fcfield-drag-handle ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
+			$remove_button = '<span class="' . $btn_item_class . ' fcfield-delvalue ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
+			$move2         = '<span class="' . $btn_item_class . ' fcfield-drag-handle ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
 			$add_here = '';
-			$add_here .= $add_position==2 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
-			$add_here .= $add_position==1 || $add_position==3 ? '<span class="' . $add_on_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
+			$add_here .= $add_position==2 || $add_position==3 ? '<span class="' . $btn_item_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
+			$add_here .= $add_position==1 || $add_position==3 ? '<span class="' . $btn_item_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
 			$_opener = !$compact_edit ? '' : '
-				<span class="fc-toggle-group-down ' . $add_on_class . ' btn-success" style="vertical-align: top; text-shadow: unset; '.($compact_edit==2 ? 'display:none;' :'').' min-width: 120px;" onclick="fc_toggle_box_via_btn(jQuery(this).closest(\'li\').find(\'.fcfieldval_container_outer:not(.fcAlwaysVisibleField)\'), this, \'\', jQuery(this).prev(), 1); jQuery(this).prev().before(jQuery(this)); return false;">
+				<span class="fc-toggle-group-down ' . $btn_item_class . ' btn-success" style="vertical-align: top; text-shadow: unset; '.($compact_edit==2 ? 'display:none;' :'').' min-width: 120px;" onclick="fc_toggle_box_via_btn(jQuery(this).closest(\'li\').find(\'.fcfieldval_container_outer:not(.fcAlwaysVisibleField)\'), this, \'\', jQuery(this).prev(), 1); jQuery(this).prev().before(jQuery(this)); return false;">
 					<i class="icon-downarrow"></i>'.\Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_GROUP_EDIT_DETAILS' ). '
 				</span>
 			';
 			$_closer = !$compact_edit ? '' : '
-				<span class="fc-toggle-group-up ' . $add_on_class . '" style="vertical-align: top; text-shadow: unset; '.($compact_edit==1 ? 'display:none;' :'').' min-width: 120px;" onclick="fc_toggle_box_via_btn(jQuery(this).closest(\'li\').find(\'.fcfieldval_container_outer:not(.fcAlwaysVisibleField)\'), this, \'\', jQuery(this).prev(), 0); jQuery(this).prev().before(jQuery(this)); return false;">
+				<span class="fc-toggle-group-up ' . $btn_item_class . '" style="vertical-align: top; text-shadow: unset; '.($compact_edit==1 ? 'display:none;' :'').' min-width: 120px;" onclick="fc_toggle_box_via_btn(jQuery(this).closest(\'li\').find(\'.fcfieldval_container_outer:not(.fcAlwaysVisibleField)\'), this, \'\', jQuery(this).prev(), 0); jQuery(this).prev().before(jQuery(this)); return false;">
 					<i class="icon-uparrow"></i>'.\Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_GROUP_HIDE_DETAILS' ). '
 				</span>
 			';
@@ -323,7 +325,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 		else
 		{
 			$remove_button = '';
-			$move2 = '';
+			$move2         = '';
 			$togglers = '';
 			$add_here = '';
 			$js .= '';
@@ -408,8 +410,8 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 			$field->html = '';
 		}
 		if (!$add_position) $field->html .= '
-			<div class="input-append input-prepend fc-xpended-btns">
-				<span class="fcfield-addvalue ' . $font_icon_class . ' fccleared" onclick="jQuery(this).parent().prev().prev().find(\'.fc-show-vals-btn\').data(\'fc_noeffect\', 1).trigger(\'click\'); addField'.$field->id.'(jQuery(this).closest(\'.fc-xpended-btns\').get(0));" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_TO_BOTTOM' ).'">'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_VALUE' ).'</span>
+			<div class="'.$btn_group_class.' fc-xpended-btns">
+				<span class="fcfield-addvalue ' . $font_icon_class . ' ' . $btn_item_class . '" onclick="jQuery(this).parent().prev().prev().find(\'.fc-show-vals-btn\').data(\'fc_noeffect\', 1).trigger(\'click\'); addField'.$field->id.'(jQuery(this).closest(\'.fc-xpended-btns\').get(0));" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_TO_BOTTOM' ).'">'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_VALUE' ).'</span>
 			</div>
 		';
 

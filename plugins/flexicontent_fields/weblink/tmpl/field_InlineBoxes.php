@@ -333,7 +333,7 @@
 
 		$field->html[] = '
 			' . (!$add_ctrl_btns || $auto_value ? '' : '
-			<div class="'.$input_grp_class.' fc-xpended-btns">
+			<div class="'.$btn_group_class.' fc-xpended-btns">
 				'.$move2.'
 				'.$remove_button.'
 				'.(!$add_position ? '' : $add_here).'
