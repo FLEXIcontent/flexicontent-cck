@@ -382,7 +382,7 @@ foreach ($field->value as $index => $value)
 				'refresh_on_complete' => false,
 				'thumb_size_default' => $thumb_size_default,
 				'toggle_btn' => array(
-					'class' => ($file_btns_position ? $btn_item_class : '') . ' fcfield-uploadvalue dropdown-item' . $font_icon_class,
+					'class' => ($file_btns_position ? $btn_item_class : $btn_item_class) . ' fcfield-uploadvalue dropdown-item' . $font_icon_class,
 					'text' => (!$file_btns_position ? '&nbsp; ' . \Joomla\CMS\Language\Text::_('FLEXI_UPLOAD') : ''),
 					'onclick' => $toggleUploader_onclick,
 					'action' => null
@@ -395,7 +395,7 @@ foreach ($field->value as $index => $value)
 		);
 
 		$multi_icon = $form_font_icons ? ' <span class="icon-stack"></span>' : '<span class="pages_stack"></span>';
-		$btn_classes = 'fc-files-modal-link ' . ($file_btns_position ? $btn_item_class : '') . ' ' . $font_icon_class;
+		$btn_classes = 'fc-files-modal-link ' . ($file_btns_position ? $btn_item_class : $btn_item_class) . ' ' . $font_icon_class;
 		$uploader_html->multiUploadBtn = '';  /*'
 			<span data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" class="'.$btn_classes.' fc-up fcfield-uploadvalue multi dropdown-item" id="'.$elementid_n.'_mul_uploadvalue">
 				&nbsp; ' . $multi_icon . ' ' . (!$file_btns_position || $file_btns_position==2 ? \Joomla\CMS\Language\Text::_('FLEXI_UPLOAD') : '') . '
@@ -405,7 +405,7 @@ foreach ($field->value as $index => $value)
 				' .  ($file_btns_position ? $multi_icon : '') . ' ' . (!$file_btns_position || $file_btns_position==2 ? '&nbsp; ' . \Joomla\CMS\Language\Text::_('FLEXI_MY_FILES') : '') . ' ' . (!$file_btns_position ? $multi_icon : '') .'
 			</span>';
 		$uploader_html->mediaUrlBtn = !$usemediaurl ? '' : '
-			<span class="' . ($file_btns_position ? $btn_item_class : '') . ' fcfield-medialurlvalue ' . $font_icon_class . ' dropdown-item" onclick="fcfield_image.toggleMediaURL(\''.$elementid_n.'\', \''.$field_name_js.'\'); return false;">
+			<span class="' . ($file_btns_position ? $btn_item_class : $btn_item_class) . ' fcfield-medialurlvalue ' . $font_icon_class . ' dropdown-item" onclick="fcfield_image.toggleMediaURL(\''.$elementid_n.'\', \''.$field_name_js.'\'); return false;">
 				' . (!$file_btns_position || $file_btns_position==2 ? '&nbsp; ' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD_MEDIA_URL') : '') . '
 			</span>';
 		$uploader_html->clearBtn = '
@@ -415,9 +415,10 @@ foreach ($field->value as $index => $value)
 
 	$drop_btn_class =
 		(FLEXI_J40GE
-			? 'btn btn-sm toolbar dropdown-toggle dropdown-toggle-split'
-			: 'btn btn-small toolbar dropdown-toggle'
+			? 'toolbar dropdown-toggle dropdown-toggle-split'
+			: 'toolbar dropdown-toggle'
 		);
+	$drop_btn_style = 'padding: 0.4rem; box-sizing: border-box; max-height: 100%; margin: 0; height: 100%;';
 
 	$field->html[] = '
 		'.($multiple && !$none_props ? '<div class="fcclear"></div>' : '').'
@@ -427,10 +428,10 @@ foreach ($field->value as $index => $value)
 			'.$remove_button.'
 			'.(!$add_position ? '' : $add_here)
 			.($use_inline_uploaders && !$file_btns_position ?'
-			<div class="buttons btn-group fc-iblock ' . (FLEXI_J40GE ? ' dropdown ' : '') . '">
-				<span role="button" class="' . $drop_btn_class . ' fcfield-addvalue ' . $font_icon_class . '" data-toggle="dropdown" data-bs-toggle="dropdown">
+			<div class="buttons '.$btn_item_class.' fc-iblock ' . (FLEXI_J40GE ? ' dropdown ' : '') . '" style="padding:0 !important;">
+				<div role="button" class="' . $drop_btn_class . ' fcfield-addvalue ' . $font_icon_class . '" data-toggle="dropdown" data-bs-toggle="dropdown" style="'.$drop_btn_style.'">
 					<span class="caret"></span>
-				</span>
+				</div>
 				<ul class="dropdown-menu dropdown-menu-right" role="menu">
 					<li>'.$uploader_html->toggleBtn.'</li>
 					<li>'.$uploader_html->multiUploadBtn.'</li>

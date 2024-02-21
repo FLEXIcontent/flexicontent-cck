@@ -1205,17 +1205,29 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 	padding: 0px;
 	margin: 0px;
 }
-#flexicontent .buttons.btn-group .btn {
+#flexicontent .buttons.btn .btn {
 	padding: 8px 6px;
 }
-#flexicontent .buttons.btn-group .btn .caret {
+#flexicontent .buttons.btn .btn .caret {
 	margin: 2px 0 4px 0;
 	vertical-align: middle;
 }
-#flexicontent .buttons.btn-group > ul.dropdown-menu > li > span {
+#flexicontent .buttons.btn > ul.dropdown-menu {
+	margin: 4px 0 0 0;
+	padding: 0;
+	border: 0;
+}
+#flexicontent .buttons.btn > ul.dropdown-menu > li {
+	margin: 0;
+	padding: 0;
+}
+#flexicontent .buttons.btn > ul.dropdown-menu > li > span {
+	line-height: 3rem;
+	margin: 0;
 	display: block;
 	cursor: pointer;
 	user-select: none;
+	border-radius: 0;
 }
 #flexicontent .fcfield-button-add {
 	vertical-align: top !important;
@@ -1401,14 +1413,6 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 }
 #flexicontent .fcfield-uploadvalue.active {
 	background-color: #efefef;
-}
-#flexicontent .fc-xpended-btns .fcfield-uploadvalue.active.fcfont-icon,
-#flexicontent .fc-xpended-btns .fcfield-uploadvalue.active.fcfont-icon:hover,
-#flexicontent .fcfield-uploadvalue.active.fcfont-icon,
-#flexicontent .fcfield-uploadvalue.active.fcfont-icon:hover {
-	background-color: #2f96b4;
-	background-image: none;
-	color: white;
 }
 #flexicontent .fcfield-uploadvalue.fcfont-icon:before {
 	content: "\e022";

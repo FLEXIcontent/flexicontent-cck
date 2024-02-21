@@ -722,9 +722,11 @@ class plgFlexicontent_fieldsMediafile extends FCField
 
 		$drop_btn_class =
 			(FLEXI_J40GE
-				? 'btn btn-sm toolbar dropdown-toggle dropdown-toggle-split'
-				: 'btn btn-small toolbar dropdown-toggle'
+				? 'toolbar dropdown-toggle dropdown-toggle-split'
+				: 'toolbar dropdown-toggle'
 			);
+		$drop_btn_style = 'padding: 0.4rem; box-sizing: border-box; max-height: 100%; margin: 0; height: 100%;';
+
 		include(self::getFormPath($this->fieldtypes[0], $formlayout));
 
 		foreach($field->html as $n => &$_html)
@@ -737,10 +739,10 @@ class plgFlexicontent_fieldsMediafile extends FCField
 					'.$remove_button.'
 					'.(!$add_position ? '' : $add_here)
 					.($use_inline_uploaders && !$file_btns_position ? '
-					<div class="buttons btn-group fc-iblock ' . (FLEXI_J40GE ? ' dropdown ' : '') . '">
-						<span role="button" class="' . $drop_btn_class . ' fcfield-addvalue ' . $font_icon_class . '" data-toggle="dropdown" data-bs-toggle="dropdown">
+					<div class="buttons '.$btn_item_class.' fc-iblock ' . (FLEXI_J40GE ? ' dropdown ' : '') . '" style="padding:0 !important;">
+						<div role="button" class="' . $drop_btn_class . ' fcfield-addvalue ' . $font_icon_class . '" data-toggle="dropdown" data-bs-toggle="dropdown" style="'.$drop_btn_style.'">
 							<span class="caret"></span>
-						</span>
+						</div>
 						<ul class="dropdown-menu dropdown-menu-right" role="menu">
 							<li>'.$uploader_html->toggleBtn.'</li>
 							<li>'.$uploader_html->multiUploadBtn.'</li>

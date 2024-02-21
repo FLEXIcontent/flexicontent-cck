@@ -419,7 +419,7 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 		margin: 0px;
 	}
 
-	.buttons.btn-group {
+	.buttons.btn {
 		.btn {
 			padding: 8px 6px;
 			.caret {
@@ -428,10 +428,24 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 			}
 		}
 
-		> ul.dropdown-menu > li > span {
-			display: block;
-			cursor: pointer;
-			user-select: none; 
+		> ul.dropdown-menu {
+			margin: 4px 0 0 0;
+			padding: 0;
+			border: 0;
+
+			> li {
+				margin: 0;
+				padding: 0;
+
+				> span {
+					line-height: 3rem;
+					margin: 0;
+					display: block;
+					cursor: pointer;
+					user-select: none;
+					border-radius: 0;
+				}
+			}
 		}
 	}
 
@@ -651,14 +665,14 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 		background-color: #efefef;
 	}
 
-	.fc-xpended-btns .fcfield-uploadvalue.active.fcfont-icon,
+	/*.fc-xpended-btns .fcfield-uploadvalue.active.fcfont-icon,
 	.fc-xpended-btns .fcfield-uploadvalue.active.fcfont-icon:hover,
 	.fcfield-uploadvalue.active.fcfont-icon,
-	.fcfield-uploadvalue.active.fcfont-icon:hover, {
+	.fcfield-uploadvalue.active.fcfont-icon:hover {
 		background-color: #2f96b4;
 		background-image: none;
 		color: white;
-	}
+	}*/
 
 	.fcfield-uploadvalue.fcfont-icon:before {
 		content: "\e022";
