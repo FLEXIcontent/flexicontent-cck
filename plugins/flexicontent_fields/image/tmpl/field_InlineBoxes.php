@@ -425,7 +425,9 @@ foreach ($field->value as $index => $value)
 					<li>'.$uploader_html->mediaUrlBtn.'</li>
 				</ul>
 			</div>
-			<span class="add-on fcfont-icon icon icon-  image-option" data-name="'.$elementid_n.'"><i class="fas fa-info-circle"></i></span>
+			<span class="add-on fcfont-icon icon icon-  image-option"onclick="jQuery(\'.fcimg_value_props[data-name=' . $elementid_n . ']\').toggle(150);">
+			<i class="fas fa-info-circle"></i>
+		</span>
 			'.$uploader_html->clearBtn.'
 			' : '') . '
 		</div>
@@ -443,7 +445,9 @@ foreach ($field->value as $index => $value)
 					' . ($use_myfiles > 0 ? $uploader_html->myFilesBtn : '') . '
 					'.$uploader_html->mediaUrlBtn.'
 					'.$uploader_html->clearBtn.'
-					<span class="add-on fcfont-icon icon icon-  image-option" data-name="'.$elementid_n.'"><i class="fas fa-info-circle"></i></span>
+					<span class="add-on fcfont-icon icon icon-  image-option"onclick="jQuery(\'.fcimg_value_props[data-name=' . $elementid_n . ']\').toggle(150);">
+					<i class="fas fa-info-circle"></i>
+				</span>
 				</div>
 			</div>
 			' : '') . '
@@ -511,18 +515,6 @@ $js = ""
 		" . $per_value_js . "
 	});
 ");
-
-$js .= "
-jQuery(document).ready(function()
-{
-	$('.image-option').each(function() {
-		$(this).click(function(){
-			var name = this.dataset.name;
-			$('.fcimg_value_props[data-name=\"'+ name +'\"]').toggle(150);
-		})
-	});
-});
-";
 
 if ($js) $document->addScriptDeclaration($js);
 
