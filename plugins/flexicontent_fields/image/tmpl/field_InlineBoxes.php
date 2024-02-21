@@ -1,12 +1,14 @@
 <?php
 
-$use_myfiles = 1;
-$per_value_js = "";
-$i = -1;  // Count DB values (may contain invalid entries)
-$n = 0;   // Count sortable records added (the verified values or a single empty record if no good values)
-$count_vals = 0;  // Count non-empty sortable records added
-$image_added = false;
-$skipped_vals = array();
+use Joomla\CMS\Component\ComponentHelper;
+
+$use_myfiles     = 1;
+$per_value_js    = "";
+$i               = -1;  // Count DB values (may contain invalid entries)
+$n               = 0;   // Count sortable records added (the verified values or a single empty record if no good values)
+$count_vals      = 0;  // Count non-empty sortable records added
+$image_added     = false;
+$skipped_vals    = array();
 $uploadLimitsTxt = $this->getUploadLimitsTxt($field);
 
 // Handle file-ids as values
@@ -111,7 +113,7 @@ foreach ($field->value as $index => $value)
 	{
 		$fc_preview_msg = '
 			<span class="fc_preview_msg" id="'.$elementid_n.'_fc_preview_msg" name="'.$elementid_n.'_fc_preview_msg" title="'.htmlspecialchars(($value['isURL'] ? $image_subpath : ''), ENT_COMPAT, 'UTF-8').'">' . (
-				$value['isURL'] ? \Joomla\CMS\Language\Text::_('FLEXI_FIELD_MEDIA_URL') : $image_subpath
+			$value['isURL'] ? \Joomla\CMS\Language\Text::_('FLEXI_FIELD_MEDIA_URL') : $image_subpath
 			) . '</span>
 		';
 	}
@@ -180,13 +182,23 @@ foreach ($field->value as $index => $value)
 		{
 			$jfvalue = str_replace('\\', '/', !empty($value['originalname'])  ?  $value['originalname']  :  '');
 
-			$quantum_fieldupload_path = JPATH_ROOT . '/libraries/lib_fields/fields/quantumuploadimage/quantumuploadimage.php';
-			$use_quantum = file_exists($quantum_fieldupload_path) && \Joomla\CMS\Component\ComponentHelper::isEnabled('com_quantummanager');
+			$use_quantum = ComponentHelper::isEnabled('com_quantummanager');
 
 			if ($use_quantum)
 			{
-				JLoader::register('\Joomla\CMS\Form\FormFieldQuantumuploadImage', $quantum_fieldupload_path);
-				$xml_field = '<field name="'.$fieldname_n.'[existingname]" id="'.$elementid_n.'_existingname" type="QuantumUploadImage" dropAreaHidden="false" '
+				$quantum_fieldupload_path = JPATH_ROOT . '/libraries/lib_fields/fields/quantumuploadimage/quantumuploadimage.php';
+				if (file_exists($quantum_fieldupload_path)) {
+					$media_field_prefix = "\\Joomla\\CMS\\Form";
+					$media_field_class  = 'FormFieldQuantumuploadImage';
+				} else {
+					$quantum_fieldupload_path = JPATH_ROOT . '/libraries/lib_fields/fields/QuantumUploadImage/QuantumuploadimageField.php';
+					$media_field_prefix = "\\JPATHRU\\Libraries\\Fields\\QuantumUploadImage";
+					$media_field_class = 'QuantumuploadimageField';
+				}
+				require_once $quantum_fieldupload_path;
+
+				$xml_field = '<field name="'.$fieldname_n.'[existingname]" id="'.$elementid_n.'_existingname"
+                				addfieldprefix="'.$media_field_prefix.'" type="QuantumUploadImage" dropAreaHidden="false" '
 					// . 'preview_width="'.(int)$thumb_size_default.'" preview_height="'.(int)$thumb_size_default.'" '
 					. ' class="existingname" />';
 			}
@@ -203,7 +215,8 @@ foreach ($field->value as $index => $value)
 
 			if ($use_quantum)
 			{
-				$jfield = new \Joomla\CMS\Form\FormFieldQuantumUploadImage($jform);
+				$media_field_class_path = $media_field_prefix . '\\' . $media_field_class;
+				$jfield = new $media_field_class_path($jform);
 			}
 			else
 			{
@@ -303,7 +316,7 @@ foreach ($field->value as $index => $value)
 			: \Joomla\CMS\Language\Text::_('FLEXI_FIELD_MEDIA_URL')
 		), ENT_COMPAT, 'UTF-8');
 		$mediaurl =
-		'<div>
+			'<div>
 				<div class="fcfield-image-mediaurl-box" ' . (empty($value['mediaurl']) ? ' style="display: none;" ' : '') . '>
 					<input class="img_mediaurl" size="40" name="'.$fieldname_n.'[mediaurl]" id="'.$elementid_n.'_mediaurl" value="'.htmlspecialchars(isset($value['mediaurl']) ? $value['mediaurl'] : $default_mediaurl, ENT_COMPAT, 'UTF-8').'" type="text" placeholder="'. $placeholder .'"/>
 					<br>
@@ -363,26 +376,26 @@ foreach ($field->value as $index => $value)
 	{
 		$uploader_html = $uploader_html_arr[$n] = \Joomla\CMS\HTML\HTMLHelper::_('fcuploader.getUploader', $field, $u_item_id, null, $n,
 			array(
-			'container_class' => (1 || $multiple ? 'fc_inline_uploader fc_uploader_thumbs_view fc-box' : '') . ' fc_compact_uploader fc_auto_uploader thumb_'.$thumb_size_default,
-			'upload_maxcount' => 1,
-			'autostart_on_select' => true,
-			'refresh_on_complete' => false,
-			'thumb_size_default' => $thumb_size_default,
-			'toggle_btn' => array(
-				'class' => ($file_btns_position ? $add_on_class : '') . ' fcfield-uploadvalue dropdown-item' . $font_icon_class,
-				'text' => (!$file_btns_position ? '&nbsp; ' . \Joomla\CMS\Language\Text::_('FLEXI_UPLOAD') : ''),
-				'onclick' => $toggleUploader_onclick,
-				'action' => null
-			),
-			'thumb_size_slider_cfg' => ($thumb_size_resizer ? $thumb_size_slider_cfg : 0),
-			'resize_cfg' => ($thumb_size_resizer ? $resize_cfg : 0),
-			'handle_FileFiltered' => 'fcfield_FileFiltered_'.$field->id,
-			'handle_FileUploaded' => 'fcfield_FileUploaded_'.$field->id
+				'container_class' => (1 || $multiple ? 'fc_inline_uploader fc_uploader_thumbs_view fc-box' : '') . ' fc_compact_uploader fc_auto_uploader thumb_'.$thumb_size_default,
+				'upload_maxcount' => 1,
+				'autostart_on_select' => true,
+				'refresh_on_complete' => false,
+				'thumb_size_default' => $thumb_size_default,
+				'toggle_btn' => array(
+					'class' => ($file_btns_position ? $btn_item_class : '') . ' fcfield-uploadvalue dropdown-item' . $font_icon_class,
+					'text' => (!$file_btns_position ? '&nbsp; ' . \Joomla\CMS\Language\Text::_('FLEXI_UPLOAD') : ''),
+					'onclick' => $toggleUploader_onclick,
+					'action' => null
+				),
+				'thumb_size_slider_cfg' => ($thumb_size_resizer ? $thumb_size_slider_cfg : 0),
+				'resize_cfg' => ($thumb_size_resizer ? $resize_cfg : 0),
+				'handle_FileFiltered' => 'fcfield_FileFiltered_'.$field->id,
+				'handle_FileUploaded' => 'fcfield_FileUploaded_'.$field->id
 			)
 		);
 
 		$multi_icon = $form_font_icons ? ' <span class="icon-stack"></span>' : '<span class="pages_stack"></span>';
-		$btn_classes = 'fc-files-modal-link ' . ($file_btns_position ? $add_on_class : '') . ' ' . $font_icon_class;
+		$btn_classes = 'fc-files-modal-link ' . ($file_btns_position ? $btn_item_class : '') . ' ' . $font_icon_class;
 		$uploader_html->multiUploadBtn = '';  /*'
 			<span data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" class="'.$btn_classes.' fc-up fcfield-uploadvalue multi dropdown-item" id="'.$elementid_n.'_mul_uploadvalue">
 				&nbsp; ' . $multi_icon . ' ' . (!$file_btns_position || $file_btns_position==2 ? \Joomla\CMS\Language\Text::_('FLEXI_UPLOAD') : '') . '
@@ -392,11 +405,11 @@ foreach ($field->value as $index => $value)
 				' .  ($file_btns_position ? $multi_icon : '') . ' ' . (!$file_btns_position || $file_btns_position==2 ? '&nbsp; ' . \Joomla\CMS\Language\Text::_('FLEXI_MY_FILES') : '') . ' ' . (!$file_btns_position ? $multi_icon : '') .'
 			</span>';
 		$uploader_html->mediaUrlBtn = !$usemediaurl ? '' : '
-			<span class="' . ($file_btns_position ? $add_on_class : '') . ' fcfield-medialurlvalue ' . $font_icon_class . ' dropdown-item" onclick="fcfield_image.toggleMediaURL(\''.$elementid_n.'\', \''.$field_name_js.'\'); return false;">
+			<span class="' . ($file_btns_position ? $btn_item_class : '') . ' fcfield-medialurlvalue ' . $font_icon_class . ' dropdown-item" onclick="fcfield_image.toggleMediaURL(\''.$elementid_n.'\', \''.$field_name_js.'\'); return false;">
 				' . (!$file_btns_position || $file_btns_position==2 ? '&nbsp; ' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD_MEDIA_URL') : '') . '
 			</span>';
 		$uploader_html->clearBtn = '
-			<span class="' . $add_on_class . ' fcfield-clearvalue ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_('FLEXI_CLEAR').'" onclick="fcfield_image.clearField(this, {}, \''.$field_name_js.'\');">
+			 <span class="' . $btn_item_class . ' fcfield-clearvalue ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_('FLEXI_CLEAR').'" onclick="fcfield_image.clearField(this, {}, \''.$field_name_js.'\');">
 			</span>';
 	}
 
@@ -409,7 +422,7 @@ foreach ($field->value as $index => $value)
 	$field->html[] = '
 		'.($multiple && !$none_props ? '<div class="fcclear"></div>' : '').'
 		'.(!$add_ctrl_btns ? '' : '
-		<div class="'.$input_grp_class.' fc-xpended-btns">
+		<div class="'.$btn_group_class.' fc-xpended-btns">
 			'.$move2.'
 			'.$remove_button.'
 			'.(!$add_position ? '' : $add_here)
@@ -425,9 +438,7 @@ foreach ($field->value as $index => $value)
 					<li>'.$uploader_html->mediaUrlBtn.'</li>
 				</ul>
 			</div>
-			<span class="add-on fcfont-icon icon icon-  image-option"onclick="jQuery(\'.fcimg_value_props[data-name=' . $elementid_n . ']\').toggle(150);">
-			<i class="fas fa-info-circle"></i>
-		</span>
+			<span class="btn fcfont-icon icon icon-pencil fas fa-info-circle image-option" onclick="jQuery(\'.fcimg_value_props[data-name=' . $elementid_n . ']\').toggle(150);"></span>
 			'.$uploader_html->clearBtn.'
 			' : '') . '
 		</div>
@@ -439,22 +450,22 @@ foreach ($field->value as $index => $value)
 			'.($use_inline_uploaders && ($file_btns_position || !$add_ctrl_btns) ? '
 			<div class="fcclear"></div>
 			<div class="btn-group" style="margin: 4px 0 16px 0; display: inline-block;">
-				<div class="'.$input_grp_class.' fc-xpended-btns">
+				<div class="'.$btn_group_class.' fc-xpended-btns">
 					'.$uploader_html->toggleBtn.'
 					'.$uploader_html->multiUploadBtn.'
 					' . ($use_myfiles > 0 ? $uploader_html->myFilesBtn : '') . '
 					'.$uploader_html->mediaUrlBtn.'
 					'.$uploader_html->clearBtn.'
 					<span class="add-on fcfont-icon icon icon-  image-option"onclick="jQuery(\'.fcimg_value_props[data-name=' . $elementid_n . ']\').toggle(150);">
-					<i class="fas fa-info-circle"></i>
-				</span>
+						<i class="fas fa-info-circle"></i>
+					</span>
 				</div>
 			</div>
 			' : '') . '
 			<div class="fc-field-value-properties-box" style="flex-direction: column;">
 
 				'.($image_source === -2 || $image_source === -1  ?  // Do not add image preview box if using Joomla Media Manager (or intro/full mode)
-					$select_existing.'
+			$select_existing.'
 					<div class="fcclear"></div>
 				' : '
 					'.(empty($uploader_html) ? '' : '
@@ -470,8 +481,8 @@ foreach ($field->value as $index => $value)
 				').'
 				'
 
-				.(($linkto_url || $usemediaurl || $usealt || $usetitle || $usedesc || $usecust1 || $usecust2) ?
-				'
+		.(($linkto_url || $usemediaurl || $usealt || $usetitle || $usedesc || $usecust1 || $usecust2) ?
+			'
 
 				<div class="fcimg_value_props" style="display: none;" data-name="'.$elementid_n.'">
 					'.$fc_preview_msg.'
@@ -488,7 +499,7 @@ foreach ($field->value as $index => $value)
 					</div>
 				</div>
 				'
-				: '') .'
+			: '') .'
 
 			</div><!-- EOF class="fc-field-value-properties-box" -->
 		</div><!-- EOF class="fc-field-props-box" -->
@@ -509,7 +520,7 @@ foreach ($field->value as $index => $value)
 
 //document.addEventListener('DOMContentLoaded', function()
 $js = ""
-. (!$per_value_js ? "" : "
+	. (!$per_value_js ? "" : "
 	jQuery(document).ready(function()
 	{
 		" . $per_value_js . "
