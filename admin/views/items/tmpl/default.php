@@ -1024,6 +1024,10 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 			$assetName = 'com_content.article.' . $row->id;
 			$isAuthor  = $row->created_by && $row->created_by == $user->id;
 
+			// Get the type params of the item
+      $tparams = $this->tparams_array[$row->type_id];
+      $row->tparams = $tparams;
+
 			// Permissions
 			$row->canCheckin   = empty($row->checked_out) || $row->checked_out == $user->id || $canCheckinRecords;
 			$row->canEdit      = $user->authorise('core.edit', $assetName) || ($isAuthor && $user->authorise('core.edit.own', $assetName));
@@ -1128,7 +1132,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 					//echo HTMLHelper::_($hlpname . '.published', $row->state, $i, $stateIsChangeable, 'cb', $row->publish_up, $row->publish_down);
 
 					echo HTMLHelper::_($hlpname . '.statebutton', $row, $i);
-					if (!$this->tparams->get('is_subtype', 0))
+					if (!$tparams->get('is_subtype', 0))
 					{
 						echo HTMLHelper::_($hlpname . '.featured', $row, $i);
 						echo HTMLHelper::_($hlpname . '.preview', $row, '_blank', $i);

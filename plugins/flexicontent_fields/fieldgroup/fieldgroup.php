@@ -230,6 +230,18 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 					this.setAttribute('id', '_duplicated_".$field->id."_'+uniqueRowNum".$field->id."+'_'+nr);
 					nr++;
 				});
+				
+				theControls = newField.find('.control-group');
+				theControls.each(function()
+				{
+					data_showon_pattern = this.hasAttribute('data-showon-pattern') ? this.getAttribute('data-showon-pattern') : '';
+					if (data_showon_pattern)
+					{
+						data_showon_n = data_showon_pattern.replace(/\[__n__\]/g, '['+uniqueRowNum".$field->id."+']');
+						this.setAttribute('data-showon', data_showon_n);
+						this.removeAttribute('data-showon-initialised');
+					}
+				});
 				";
 
 			// Add new field to DOM
@@ -249,9 +261,17 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 				".$addField_funcs."
 				";
 
-			// Readd prettyCheckable and remove previous if so requested
+			// Remove previous if so requested
 			$js .="
 				if (remove_previous) lastField.remove();
+				";
+
+			// Initialize showon conditions if needed
+			$js .="
+				// Initialise showon conditions if needed
+				if (theControls.length) typeof Joomla.Showon != 'undefined'
+					? Joomla.Showon.initialise(newField[0])
+					: console.log('Joomla.Showon.initialise not found');
 				";
 
 			// Show new field, increment counters

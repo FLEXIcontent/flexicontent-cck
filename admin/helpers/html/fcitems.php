@@ -13,6 +13,9 @@ defined('_JEXEC') or die;
 
 require_once('fcbase.php');
 
+version_compare(JVERSION, '4.0', 'lt')
+    ? require_once JPATH_SITE . '/components/com_content/helpers/route.php'
+    : require_once JPATH_SITE . '/components/com_content/src/Helper/RouteHelper.php';
 
 /**
  * Fcitems HTML helper
@@ -40,7 +43,11 @@ abstract class JHtmlFcitems extends JHtmlFcbase
 	 */
 	protected static function _getPreviewUrl($row)
 	{
-		return FlexicontentHelperRoute::getItemRoute($row->id . ':' . $row->alias, $row->categoryslug, 0, $row);
+		$allow_jview = $row->tparams->get('allow_jview', array('allow_jview'));
+
+		return !$allow_jview
+			? FlexicontentHelperRoute::getItemRoute($row->id . ':' . $row->alias, $row->categoryslug, 0, $row)
+			: ContentHelperRoute::getArticleRoute($row->id . ':' . $row->alias, $row->categoryslug, $row->language);
 	}
 
 

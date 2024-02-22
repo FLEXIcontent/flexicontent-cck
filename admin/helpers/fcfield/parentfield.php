@@ -564,6 +564,19 @@ class FCField extends \Joomla\CMS\Plugin\CMSPlugin
 		$item   = $this->getItem();
 		$values = $this->values;
 
+		// Initialize framework objects and other variables
+		$document = \Joomla\CMS\Factory::getDocument();
+		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
+
+		$tooltip_class = 'hasTooltip';
+		$add_on_class    = $cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
+		$input_grp_class = $cparams->get('bootstrap_ver', 2)==2  ?  'input-append input-prepend' : 'input-group';
+		$btn_item_class  = $cparams->get('bootstrap_ver', 2)==2  ?  'btn' : 'btn';
+		$btn_group_class = $cparams->get('bootstrap_ver', 2)==2  ?  'btn-group' : 'btn-group';
+		$form_font_icons = $cparams->get('form_font_icons', 1);
+		$font_icon_class = $form_font_icons ? ' fcfont-icon' : '';
+		$font_icon_class .= FLEXI_J40GE ? ' icon icon- ' : '';
+
 		$field->html = array();
 
 		// Create field's form HTML, using layout file, (editing layout)
