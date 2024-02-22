@@ -447,6 +447,7 @@ body .fc-nowrap-box .nowrap_box .label,
 }
 #flexicontent .fc-xpended-btns {
 	margin: 0 0 0.3rem 0 !important;
+	padding: 0;
 	float: none;
 	display: inline-flex;
 }

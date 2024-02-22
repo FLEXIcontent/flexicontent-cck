@@ -1,6 +1,7 @@
 <?php
 
 use Joomla\CMS\Component\ComponentHelper;
+use Joomla\CMS\Language\Text;
 
 $use_myfiles     = 1;
 $per_value_js    = "";
@@ -113,7 +114,7 @@ foreach ($field->value as $index => $value)
 	{
 		$fc_preview_msg = '
 			<span class="fc_preview_msg" id="'.$elementid_n.'_fc_preview_msg" name="'.$elementid_n.'_fc_preview_msg" title="'.htmlspecialchars(($value['isURL'] ? $image_subpath : ''), ENT_COMPAT, 'UTF-8').'">' . (
-			$value['isURL'] ? \Joomla\CMS\Language\Text::_('FLEXI_FIELD_MEDIA_URL') : $image_subpath
+			$value['isURL'] ? Text::_('FLEXI_FIELD_MEDIA_URL') : $image_subpath
 			) . '</span>
 		';
 	}
@@ -123,7 +124,7 @@ foreach ($field->value as $index => $value)
 	$select_existing = '';
 	$pick_existing = '';
 	$addExistingURL = sprintf($filesElementURL, $elementid_n);
-	$addExistingURL_onclick = "fcfield_image.dialog_handle['".$field_name_js."'] = fc_field_dialog_handle_".$field->id." = fc_showDialog(jQuery(this).attr('data-href'), 'fc_modal_popup_container', 0, 0, 0, 0, {title: '".\Joomla\CMS\Language\Text::_('FLEXI_SELECT_IMAGE', true)."', paddingW: 10, paddingH: 16});";
+	$addExistingURL_onclick = "fcfield_image.dialog_handle['".$field_name_js."'] = fc_field_dialog_handle_".$field->id." = fc_showDialog(jQuery(this).attr('data-href'), 'fc_modal_popup_container', 0, 0, 0, 0, {title: '".Text::_('FLEXI_SELECT_IMAGE', true)."', paddingW: 10, paddingH: 16});";
 
 	if ($image_source >= 0)
 	{
@@ -142,7 +143,7 @@ foreach ($field->value as $index => $value)
 			$img_path = $image_subpath;
 			$img_src  = ($img_path && file_exists(JPATH_ROOT . '/' . $img_path))  ?  \Joomla\CMS\Uri\Uri::root() . $img_path  :  '';
 			$img_attr = array('id' => $mm_id . '_preview', 'class' => 'media-preview', 'style' => ' style="max-width:480px; max-height:360" ');
-			$img = \Joomla\CMS\HTML\HTMLHelper::image($img_src ?: 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=', \Joomla\CMS\Language\Text::_('JLIB_FORM_MEDIA_PREVIEW_ALT'), $img_attr);
+			$img = \Joomla\CMS\HTML\HTMLHelper::image($img_src ?: 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=', Text::_('JLIB_FORM_MEDIA_PREVIEW_ALT'), $img_attr);
 
 			$previewImg = '
 			<div id="' . $mm_id . '_preview_img"' . ($img_src ? '' : ' style="display:none"') . '>
@@ -150,12 +151,12 @@ foreach ($field->value as $index => $value)
 			</div>';
 			$previewImgEmpty = '
 			<div id="' . $mm_id . '_preview_empty"' . ($img_src ? ' style="display:none"' : '') . '>
-				' . \Joomla\CMS\Language\Text::_('JLIB_FORM_MEDIA_PREVIEW_EMPTY') . '
+				' . Text::_('JLIB_FORM_MEDIA_PREVIEW_EMPTY') . '
 			</div>';
 
 			$tooltip = $previewImgEmpty . $previewImg;
 			$tooltip_options = array(
-				'title' => \Joomla\CMS\Language\Text::_('JLIB_FORM_MEDIA_PREVIEW_SELECTED_IMAGE'),
+				'title' => Text::_('JLIB_FORM_MEDIA_PREVIEW_SELECTED_IMAGE'),
 				'text' => '<span class="icon-eye" aria-hidden="true"></span><span class="icon-image" aria-hidden="true">',
 				'class' => 'hasTipPreview'
 			);
@@ -169,10 +170,10 @@ foreach ($field->value as $index => $value)
 				<input type="text" name="'.$fieldname_n.'[existingname]" id="'.$mm_id.'" value="'.htmlspecialchars($img_path, ENT_COMPAT, 'UTF-8').'" readonly="readonly"
 					class="existingname input-large field-media-input hasTipImgpath" onchange="fcfield_image.update_path_tip(this);" title="'.htmlspecialchars('<span id="TipImgpath"></span>', ENT_COMPAT, 'UTF-8').'" data-basepath="'.\Joomla\CMS\Uri\Uri::root().'"
 				/>
-				<a class="fc_image_field_mm_modal btn '.$tooltip_class.'" title="'.\Joomla\CMS\Language\Text::_('FLEXI_SELECT_IMAGE').'" onclick="var mm_id=jQuery(this).parent().find(\'.existingname\').attr(\'id\'); fcfield_image.currElement[\''.$field_name_js.'\']=mm_id; SqueezeBox.open(\''.$mm_link.'\', {size:{x: ((window.innerWidth-120) > 1360 ? 1360 : (window.innerWidth-120)), y: ((window.innerHeight-220) > 800 ? 800 : (window.innerHeight-220))}, handler: \'iframe\', onClose: function() { fcfield_image.incrementValCnt(\''.$field_name_js.'\'); } });  return false;">
-					'.\Joomla\CMS\Language\Text::_('FLEXI_SELECT').'
+				<a class="fc_image_field_mm_modal btn '.$tooltip_class.'" title="'.Text::_('FLEXI_SELECT_IMAGE').'" onclick="var mm_id=jQuery(this).parent().find(\'.existingname\').attr(\'id\'); fcfield_image.currElement[\''.$field_name_js.'\']=mm_id; SqueezeBox.open(\''.$mm_link.'\', {size:{x: ((window.innerWidth-120) > 1360 ? 1360 : (window.innerWidth-120)), y: ((window.innerHeight-220) > 800 ? 800 : (window.innerHeight-220))}, handler: \'iframe\', onClose: function() { fcfield_image.incrementValCnt(\''.$field_name_js.'\'); } });  return false;">
+					'.Text::_('FLEXI_SELECT').'
 				</a>
-				<a class="btn '.$tooltip_class.'" href="javascript:;" title="'.\Joomla\CMS\Language\Text::_('FLEXI_CLEAR').'" onclick="var mm_id=jQuery(this).parent().find(\'.existingname\').attr(\'id\'); fcfield_image.clearField(this, {}, \''.$field_name_js.'\'); jInsertFieldValue(\'\', mm_id); return false;" >
+				<a class="btn '.$tooltip_class.'" href="javascript:;" title="'.Text::_('FLEXI_CLEAR').'" onclick="var mm_id=jQuery(this).parent().find(\'.existingname\').attr(\'id\'); fcfield_image.clearField(this, {}, \''.$field_name_js.'\'); jInsertFieldValue(\'\', mm_id); return false;" >
 					<i class="icon-remove"></i>
 				</a>
 			</div>
@@ -306,14 +307,14 @@ foreach ($field->value as $index => $value)
 
 	if ($linkto_url) $urllink =
 		'<div>
-			<!--label class="fc-prop-lbl">'.\Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_LINKTO_URL' ).'</label-->
-			<input class="imgurllink" size="40" name="'.$fieldname_n.'[urllink]" value="'.htmlspecialchars(isset($value['urllink']) ? $value['urllink'] : '', ENT_COMPAT, 'UTF-8').'" type="text" placeholder="'.htmlspecialchars(\Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_LINKTO_URL' ), ENT_COMPAT, 'UTF-8').'"/>
+			<!--label class="fc-prop-lbl">'.Text::_( 'FLEXI_FIELD_LINKTO_URL' ).'</label-->
+			<input class="imgurllink" size="40" name="'.$fieldname_n.'[urllink]" value="'.htmlspecialchars(isset($value['urllink']) ? $value['urllink'] : '', ENT_COMPAT, 'UTF-8').'" type="text" placeholder="'.htmlspecialchars(Text::_( 'FLEXI_FIELD_LINKTO_URL' ), ENT_COMPAT, 'UTF-8').'"/>
 		</div>';
 	if ($usemediaurl)
 	{
 		$placeholder = htmlspecialchars(($usemediaurl === 1
 			? 'Youtube / Vimeo URL'
-			: \Joomla\CMS\Language\Text::_('FLEXI_FIELD_MEDIA_URL')
+			: Text::_('FLEXI_FIELD_MEDIA_URL')
 		), ENT_COMPAT, 'UTF-8');
 		$mediaurl =
 			'<div>
@@ -321,11 +322,11 @@ foreach ($field->value as $index => $value)
 					<input class="img_mediaurl" size="40" name="'.$fieldname_n.'[mediaurl]" id="'.$elementid_n.'_mediaurl" value="'.htmlspecialchars(isset($value['mediaurl']) ? $value['mediaurl'] : $default_mediaurl, ENT_COMPAT, 'UTF-8').'" type="text" placeholder="'. $placeholder .'"/>
 					<br>
 					<div class="' . $input_grp_class . ' fcfield-image-mediaurl-btns">
-						<a href="javascript:;" class="'. $tooltip_class .' btn btn-primary btn-small img_fetch_btn" title="'.\Joomla\CMS\Language\Text::_('FLEXI_FETCH').'" onclick="fcfield_image.fetchData(\''.$elementid_n.'\', \''.$field_name_js.'\'); return false;">
-							<i class="icon-loop"></i> ' . \Joomla\CMS\Language\Text::_('FLEXI_FETCH') . '
+						<a href="javascript:;" class="'. $tooltip_class .' btn btn-primary btn-small img_fetch_btn" title="'.Text::_('FLEXI_FETCH').'" onclick="fcfield_image.fetchData(\''.$elementid_n.'\', \''.$field_name_js.'\'); return false;">
+							<i class="icon-loop"></i> ' . Text::_('FLEXI_FETCH') . '
 						</a>
-						<a href="javascript:;" class="'. $tooltip_class .' btn btn-warning btn-small img_clear_btn" id="'.$elementid_n.'_clear_btn" title="'.\Joomla\CMS\Language\Text::_('FLEXI_CLEAR').'" onclick="fcfield_image.clearData(\''.$elementid_n.'\', \''.$field_name_js.'\'); return false;" >
-							<i class="icon-cancel"></i> ' . \Joomla\CMS\Language\Text::_('FLEXI_CLEAR') . '
+						<a href="javascript:;" class="'. $tooltip_class .' btn btn-warning btn-small img_clear_btn" id="'.$elementid_n.'_clear_btn" title="'.Text::_('FLEXI_CLEAR').'" onclick="fcfield_image.clearData(\''.$elementid_n.'\', \''.$field_name_js.'\'); return false;" >
+							<i class="icon-cancel"></i> ' . Text::_('FLEXI_CLEAR') . '
 						</a>
 					</div>
 					<div class="fcfield_message_box" id="fcfield_message_box_'.$elementid_n.'"></div>
@@ -335,28 +336,28 @@ foreach ($field->value as $index => $value)
 	}
 	if ($usealt) $alt =
 		'<div>
-			<!--label class="fc-prop-lbl">'.\Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_ALT' ).'</label-->
-			<input class="imgalt" size="40" name="'.$fieldname_n.'[alt]" value="'.htmlspecialchars(isset($value['alt']) ? $value['alt'] : $default_alt, ENT_COMPAT, 'UTF-8').'" type="text" placeholder="'.htmlspecialchars(\Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_ALT' ), ENT_COMPAT, 'UTF-8').'"/>
+			<!--label class="fc-prop-lbl">'.Text::_( 'FLEXI_FIELD_ALT' ).'</label-->
+			<input class="imgalt" size="40" name="'.$fieldname_n.'[alt]" value="'.htmlspecialchars(isset($value['alt']) ? $value['alt'] : $default_alt, ENT_COMPAT, 'UTF-8').'" type="text" placeholder="'.htmlspecialchars(Text::_( 'FLEXI_FIELD_ALT' ), ENT_COMPAT, 'UTF-8').'"/>
 		</div>';
 	if ($usetitle) $title =
 		'<div>
-			<!--label class="fc-prop-lbl">'.\Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_TITLE' ).' <br/>('.\Joomla\CMS\Language\Text::_('FLEXI_FIELD_TOOLTIP').')</label-->
-			<input class="imgtitle" size="40" name="'.$fieldname_n.'[title]" value="'.htmlspecialchars(isset($value['title']) ? $value['title'] : $default_title, ENT_COMPAT, 'UTF-8').'" type="text" placeholder="'.htmlspecialchars(\Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_TITLE' ), ENT_COMPAT, 'UTF-8').'"/>
+			<!--label class="fc-prop-lbl">'.Text::_( 'FLEXI_FIELD_TITLE' ).' <br/>('.Text::_('FLEXI_FIELD_TOOLTIP').')</label-->
+			<input class="imgtitle" size="40" name="'.$fieldname_n.'[title]" value="'.htmlspecialchars(isset($value['title']) ? $value['title'] : $default_title, ENT_COMPAT, 'UTF-8').'" type="text" placeholder="'.htmlspecialchars(Text::_( 'FLEXI_FIELD_TITLE' ), ENT_COMPAT, 'UTF-8').'"/>
 		</div>';
 	if ($usedesc) $desc =
 		'<div>
-			<!--label class="fc-prop-lbl">'.\Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_DESC' ).' <br/>('.\Joomla\CMS\Language\Text::_('FLEXI_FIELD_TOOLTIP').')</label-->
-			<textarea class="imgdesc" name="'.$fieldname_n.'[desc]" rows="3" cols="24" placeholder="'.htmlspecialchars(\Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_DESC' ), ENT_COMPAT, 'UTF-8').'">'.(isset($value['desc']) ? $value['desc'] : $default_desc).'</textarea>
+			<!--label class="fc-prop-lbl">'.Text::_( 'FLEXI_FIELD_DESC' ).' <br/>('.Text::_('FLEXI_FIELD_TOOLTIP').')</label-->
+			<textarea class="imgdesc" name="'.$fieldname_n.'[desc]" rows="3" cols="24" placeholder="'.htmlspecialchars(Text::_( 'FLEXI_FIELD_DESC' ), ENT_COMPAT, 'UTF-8').'">'.(isset($value['desc']) ? $value['desc'] : $default_desc).'</textarea>
 		</div>';
 	if ($usecust1) $cust1 =
 		'<div>
-			<!--label class="fc-prop-lbl">'.\Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_IMG_CUST1' ).'</label-->
-			<input class="imgcust1" size="40" name="'.$fieldname_n.'[cust1]" value="'.htmlspecialchars(isset($value['cust1']) ? $value['cust1'] : $default_cust1, ENT_COMPAT, 'UTF-8').'" type="text" placeholder="'.htmlspecialchars(\Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_IMG_CUST1' ), ENT_COMPAT, 'UTF-8').'"/>
+			<!--label class="fc-prop-lbl">'.Text::_( 'FLEXI_FIELD_IMG_CUST1' ).'</label-->
+			<input class="imgcust1" size="40" name="'.$fieldname_n.'[cust1]" value="'.htmlspecialchars(isset($value['cust1']) ? $value['cust1'] : $default_cust1, ENT_COMPAT, 'UTF-8').'" type="text" placeholder="'.htmlspecialchars(Text::_( 'FLEXI_FIELD_IMG_CUST1' ), ENT_COMPAT, 'UTF-8').'"/>
 		</div>';
 	if ($usecust2) $cust2 =
 		'<div>
-			<!--label class="fc-prop-lbl">'.\Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_IMG_CUST2' ).'</label-->
-			<input class="imgcust2" size="40" name="'.$fieldname_n.'[cust2]" value="'.htmlspecialchars(isset($value['cust2']) ? $value['cust2'] : $default_cust2, ENT_COMPAT, 'UTF-8').'" type="text" placeholder="'.htmlspecialchars(\Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_IMG_CUST2' ), ENT_COMPAT, 'UTF-8').'"/>
+			<!--label class="fc-prop-lbl">'.Text::_( 'FLEXI_FIELD_IMG_CUST2' ).'</label-->
+			<input class="imgcust2" size="40" name="'.$fieldname_n.'[cust2]" value="'.htmlspecialchars(isset($value['cust2']) ? $value['cust2'] : $default_cust2, ENT_COMPAT, 'UTF-8').'" type="text" placeholder="'.htmlspecialchars(Text::_( 'FLEXI_FIELD_IMG_CUST2' ), ENT_COMPAT, 'UTF-8').'"/>
 		</div>';
 
 	// DB-mode needs a 'pick_existing_n'
@@ -382,8 +383,8 @@ foreach ($field->value as $index => $value)
 				'refresh_on_complete' => false,
 				'thumb_size_default' => $thumb_size_default,
 				'toggle_btn' => array(
-					'class' => ($file_btns_position ? $btn_item_class : $btn_item_class) . ' fcfield-uploadvalue dropdown-item' . $font_icon_class,
-					'text' => (!$file_btns_position ? '&nbsp; ' . \Joomla\CMS\Language\Text::_('FLEXI_UPLOAD') : ''),
+					'class' => ($file_btns_position ? 'dropdown-item' : '') . ' ' . $btn_item_class,
+					'text' => '<span class="fcfield-uploadvalue fcfont-icon-inline '.$font_icon_class.'"></span>' . (!$file_btns_position ? '&nbsp; ' . Text::_('FLEXI_UPLOAD') : ''),
 					'onclick' => $toggleUploader_onclick,
 					'action' => null
 				),
@@ -395,21 +396,23 @@ foreach ($field->value as $index => $value)
 		);
 
 		$multi_icon = $form_font_icons ? ' <span class="icon-stack"></span>' : '<span class="pages_stack"></span>';
-		$btn_classes = 'fc-files-modal-link ' . ($file_btns_position ? $btn_item_class : $btn_item_class) . ' ' . $font_icon_class;
+		$btn_classes = ($file_btns_position ? 'dropdown-item' : '') . ' ' . $btn_item_class;
 		$uploader_html->multiUploadBtn = '';  /*'
-			<span data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" class="'.$btn_classes.' fc-up fcfield-uploadvalue multi dropdown-item" id="'.$elementid_n.'_mul_uploadvalue">
-				&nbsp; ' . $multi_icon . ' ' . (!$file_btns_position || $file_btns_position==2 ? \Joomla\CMS\Language\Text::_('FLEXI_UPLOAD') : '') . '
+			<span data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" class="'.$btn_classes.' fc-up fcfield-uploadvalue multi" id="'.$elementid_n.'_mul_uploadvalue">
+				&nbsp; ' . $multi_icon . ' ' . (!$file_btns_position || $file_btns_position==2 ? Text::_('FLEXI_UPLOAD') : '') . '
 			</span>';*/
 		$uploader_html->myFilesBtn = '
-			<span data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" class="'.$btn_classes.' fc-sel fcfield-selectvalue multi dropdown-item" data-rowno="'.$n.'" id="'.$elementid_n.'_selectvalue">
-				' .  ($file_btns_position ? $multi_icon : '') . ' ' . (!$file_btns_position || $file_btns_position==2 ? '&nbsp; ' . \Joomla\CMS\Language\Text::_('FLEXI_MY_FILES') : '') . ' ' . (!$file_btns_position ? $multi_icon : '') .'
+			<span data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" class="'.$btn_classes.'" data-rowno="'.$n.'" id="'.$elementid_n.'_selectvalue">
+				<span class="fc-files-modal-link  fc-sel fcfield-selectvalue multi fcfont-icon-inline ' . $font_icon_class . '"></span>
+				' .  ($file_btns_position ? $multi_icon : '') . ' ' . (!$file_btns_position || $file_btns_position==2 ? '&nbsp; ' . Text::_('FLEXI_MY_FILES') : '') . ' ' .'
 			</span>';
 		$uploader_html->mediaUrlBtn = !$usemediaurl ? '' : '
-			<span class="' . ($file_btns_position ? $btn_item_class : $btn_item_class) . ' fcfield-medialurlvalue ' . $font_icon_class . ' dropdown-item" onclick="fcfield_image.toggleMediaURL(\''.$elementid_n.'\', \''.$field_name_js.'\'); return false;">
-				' . (!$file_btns_position || $file_btns_position==2 ? '&nbsp; ' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD_MEDIA_URL') : '') . '
+			<span class="' . ($file_btns_position ? 'dropdown-item' : '') . ' ' . $btn_item_class .'" onclick="fcfield_image.toggleMediaURL(\''.$elementid_n.'\', \''.$field_name_js.'\'); return false;">
+				<span class="fcfield-medialurlvalue fcfont-icon-inline ' . $font_icon_class . '"></span>
+				' . (!$file_btns_position || $file_btns_position==2 ? '&nbsp; ' . Text::_('FLEXI_FIELD_MEDIA_URL') : '') . '
 			</span>';
 		$uploader_html->clearBtn = '
-			 <span class="' . $btn_item_class . ' fcfield-clearvalue ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_('FLEXI_CLEAR').'" onclick="fcfield_image.clearField(this, {}, \''.$field_name_js.'\');">
+			 <span class="' . $btn_item_class . ' fcfield-clearvalue ' . $font_icon_class . '" title="'.Text::_('FLEXI_CLEAR').'" onclick="fcfield_image.clearField(this, {}, \''.$field_name_js.'\');">
 			</span>';
 	}
 

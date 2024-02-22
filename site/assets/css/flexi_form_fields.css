@@ -1103,6 +1103,26 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 		margin-left: 0;
 	}
 }
+#flexicontent .fcfont-icon-inline:before {
+	width: 1.4em;
+	height: 1.4em;
+	line-height: 1.4em;
+	background: none !important;
+	left: 0;
+	position: absolute !important;
+	font-size: 1em !important;
+}
+#flexicontent .fcfont-icon-inline,
+#flexicontent .fcfont-icon-inline:before,
+#flexicontent .fcfont-icon-inline:hover,
+#flexicontent .fcfont-icon-inline:hover:before {
+	width: 0 !important;
+	height: 0 !important;
+	background: none !important;
+}
+#flexicontent .fcfont-icon-inline {
+	position: relative !important;
+}
 #flexicontent div [class^="fcfield-"].fcfont-icon,
 #flexicontent div [class*=" fcfield-"].fcfont-icon,
 #flexicontent ul.fcfield-sortables > li [class^="fcfield-"].fcfont-icon,

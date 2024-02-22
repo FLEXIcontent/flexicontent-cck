@@ -1,5 +1,9 @@
 <?php
 
+use Joomla\CMS\Factory;
+use Joomla\CMS\Form\FormHelper;
+use Joomla\CMS\HTML\HTMLHelper;
+
 for ($n = 0; $n < $max_count; $n++)
 {
 	$field->html[$n] = '
@@ -58,9 +62,39 @@ for ($n = 0; $n < $max_count; $n++)
 
 		$gf_display_label_form = (int) $grouped_field->parameters->get('display_label_form', 1);
 
+		/**
+		 * Create the data-shownon attribute for the control-group container of the field
+		 */
+		$dataShowOn        = '';
+		$dataShowOnPattern = '';
+
+		$_showon = $grouped_field->parameters->get('showon', '');
+		if ($_showon)
+		{
+			$showOnConditions  = FormHelper::parseShowOnConditions($_showon, $_formControl = 'custom', $_formGroup = '');
+			$dataShowOnPattern = $_showon ? 'data-showon-pattern=\'' . json_encode($showOnConditions) . '\'' : '';
+
+			foreach($showOnConditions as $showCase)
+			{
+				// When a new field group value is added, we will use this to replace it with the correct field index and set it as data-shown, then initialize the showon script
+				$dataShowOnPattern = str_replace($showCase['field'], $showCase['field'] . '[__n__]', $dataShowOnPattern);
+			}
+			$dataShowOn = str_replace('[__n__]', '[' . $n . ']', $dataShowOnPattern);
+			$dataShowOn = str_replace('data-showon-pattern=', 'data-showon=', $dataShowOn);
+
+			static $_shown_added = false;
+			if (!$_shown_added)
+			{
+				$_shown_added = true;
+				FLEXI_J40GE
+					? Factory::getApplication()->getDocument()->getWebAssetManager()->useScript('showon')
+					: HTMLHelper::_('script', 'jui/cms.js', array('version' => 'auto', 'relative' => true));
+			}
+		}
+
 		$field->html[$n] .= (empty($isFlexBox) ? '' : '
 		<div class="fc_form_flex_box_item' . ($use_flex_grow ? ' use_flex_grow' : '') . '" style="margin: 0;">') . '
-			<div class="control-group control-fc_subgroup fcfieldval_container_outer' . $gf_compactedit . '">
+			<div class="control-group control-fc_subgroup fcfieldval_container_outer' . $gf_compactedit . '" ' . $dataShowOn . ' ' . $dataShowOnPattern . '>
 				<div
 					class="control-label ' . ($gf_display_label_form === 2 ? 'fclabel_cleared' : '') . '"
 					style="' . ($gf_display_label_form < 1 ? 'display:none;' : '') .'"
