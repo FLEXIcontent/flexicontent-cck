@@ -291,10 +291,17 @@ class FlexicontentViewItems extends \Joomla\CMS\MVC\View\HtmlView
 				foreach($item0->fields as $field_name => $field)
 				{
 					$is_coreprops_form_field = $field->field_type === 'coreprops' && substr($field->name, 0 , 5) === 'form_';
-					$include_in_csv_export = (int) $field->parameters->get('include_in_csv_export', 0);
-					$include_in_csv_export = $csv_all_fields !== 2 ? $include_in_csv_export : ($is_coreprops_form_field ? 0 : 1);
 
-					$csv_strip_html = (int) $field->parameters->get('csv_strip_html', 0);
+					$include_in_csv_export = (int) $field->parameters->get('include_in_csv_export', 0);
+					$csv_strip_html = (int) $cparams->get('csv_strip_html', 0);
+
+					$include_in_csv_export = $csv_all_fields !== 2
+						? $include_in_csv_export
+						: ($is_coreprops_form_field ? 0 : 1);
+
+					$csv_strip_html = $csv_all_fields !== 2
+						? $csv_strip_html
+						: 1;
 
 					if (!$include_in_csv_export)
 					{
@@ -350,20 +357,23 @@ class FlexicontentViewItems extends \Joomla\CMS\MVC\View\HtmlView
 					// CASE 3: RAW value display !
 					elseif (isset($item->fieldvalues[$field->id]))
 					{
-						if (is_array(reset($item->fieldvalues[$field->id])))
-						{
-							$vals = array();
+						$vals = $item->fieldvalues[$field->id];
+					}
 
-							foreach ($item->fieldvalues[$field->id] as $v)
+					// Make sure that $vals is array of strings
+					if (is_array($vals) && (is_array(reset($vals)) || is_object(reset($vals))))
+					{
+						$_vals = [];
+						foreach ($vals as $v)
+						{
+							$v = (array) $v;
+							foreach($v as $k => $v2)
 							{
-								$vals = implode(' | ', $v);
+								$v[$k] = is_string($v2) ? $v2 : json_encode($v2);
 							}
+							$_vals[] = implode(' | ', $v);
 						}
-
-						else
-						{
-							$vals = $item->fieldvalues[$field->id];
-						}
+						$vals = $_vals;
 					}
 
 					echo $this->_encodeCSVField( is_array($vals) ? implode(', ', $vals ) : $vals );
