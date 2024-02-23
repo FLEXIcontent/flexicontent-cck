@@ -1859,13 +1859,8 @@ class plgSystemFlexisystem extends CMSPlugin
 					break;
 				}
 
-				if ( !isset($point[$index]) )
+				if ( !isset($point[$index]) || !is_array($point[$index]) )
 				{
-					if (!is_array($point))
-					{
-						if (JDEBUG) Factory::getApplication()->enqueueMessage('Error: Broken fieldname detected: ' . $name . ', trying to skip');
-						continue 2;
-					}
 					$point[$index] = array();
 				}
 
