@@ -9,6 +9,8 @@
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
+use Joomla\Component\Content\Site\Helper\RouteHelper as ContentRouteHelper;
+
 defined('_JEXEC') or die;
 
 require_once('fcbase.php');
@@ -47,7 +49,7 @@ abstract class JHtmlFcitems extends JHtmlFcbase
 
 		return !$allow_jview
 			? FlexicontentHelperRoute::getItemRoute($row->id . ':' . $row->alias, $row->categoryslug, 0, $row)
-			: ContentHelperRoute::getArticleRoute($row->id . ':' . $row->alias, $row->categoryslug, $row->language);
+			: ContentRouteHelper::getArticleRoute($row->id . ':' . $row->alias, $row->categoryslug, $row->language);
 	}
 
 
