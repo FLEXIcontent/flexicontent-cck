@@ -1818,8 +1818,13 @@ if ($this->fields && $typeid) :
 			$_showon    = $field->parameters->get('showon', '');
 			if ($_showon)
 			{
-				$showOnConditions  = FormHelper::parseShowOnConditions($_showon, $_formControl = 'custom', $_formGroup = '');
-				$dataShowOn        = $_showon ? 'data-showon=\'' . json_encode($showOnConditions) . '\'' : '';
+			  /**
+			   * Single value Flexicontent fields are always an array meaning they have a 0 index
+				 * We need to append the 0 index to the fieldname of the showon condition(s)
+			   */
+				$showOnConditions = FormHelper::parseShowOnConditions($_showon, $_formControl = 'custom', $_formGroup = '');
+				foreach ($showOnConditions as $k => $v) $showOnConditions[$k]['field'] .= '[0]';
+				$dataShowOn = $_showon ? 'data-showon=\'' . json_encode($showOnConditions) . '\'' : '';
 
 				static $_shown_added = false;
 				if (!$_shown_added)
