@@ -35,6 +35,11 @@ function fc_submit_form(form, task, validate)
 	// Declare serialization related variables in current function scope, outside the submit handler
 	var sinfo = {}, sdata, sdata_count,
 		sdata_id = 'fcdata_serialized';
+	;
+  var form_id = form.hasAttribute('id') ? form.getAttribute('id') : ''
+	var force_serialization = form.hasAttribute('data-fc_force_serialization')
+		? (form.getAttribute('data-fc_force_serialization') ? 1 : 0)
+		: (form_id == 'component-form' ? 1 : 0);
 
 	if (typeof form.serialized_submit_handler_added === 'undefined' || !form.serialized_submit_handler_added)
 	{
@@ -58,7 +63,7 @@ function fc_submit_form(form, task, validate)
 			max_input_vars = typeof Joomla.fc_max_input_vars !== 'undefined' ? Joomla.fc_max_input_vars : 1000;
 			
 			// Abort serialization if number of form elements is below limitation
-			if (form.elements.length < max_input_vars)
+			if (!force_serialization && form.elements.length < max_input_vars)
 			{
 				return true;
 			}
@@ -71,7 +76,7 @@ function fc_submit_form(form, task, validate)
 			//sinfo.fields_active = jQuery(form.elements).filter( 'textarea:enabled, select:enabled, input[type="radio"]:enabled:checked, input[type="checkbox"]:enabled:checked, input:not(:button):not(:radio):not(:checkbox):enabled' );
 
 			// Abort serialization if (estimated) active form elements count is lower than max_input_vars
-			if (sinfo.fields_active.length < max_input_vars)
+			if (!force_serialization && sinfo.fields_active.length < max_input_vars)
 			{
 				return true;
 			}
