@@ -202,6 +202,7 @@
 		<plugin name="select"             folder="plugins/flexicontent_fields/select"             instfolder="flexicontent_fields">FLEXIcontent - Select</plugin>
 		<plugin name="selectmultiple"     folder="plugins/flexicontent_fields/selectmultiple"     instfolder="flexicontent_fields">FLEXIcontent - Select Multiple</plugin>
 		<plugin name="sharedmedia"        folder="plugins/flexicontent_fields/sharedmedia"        instfolder="flexicontent_fields">FLEXIcontent - Shared Video/Audio (Youtube,etc / SoundCloud,Last.fm,etc)</plugin>
+		<plugin name="subform"            folder="plugins/flexicontent_fields/subform"            instfolder="flexicontent_fields">FLEXIcontent - Subform (Joomla subform using XML definition)</plugin>
 		<plugin name="termlist"           folder="plugins/flexicontent_fields/termlist"           instfolder="flexicontent_fields">FLEXIcontent - List of terms</plugin>
 		<plugin name="text"               folder="plugins/flexicontent_fields/text"               instfolder="flexicontent_fields">FLEXIcontent - Text (number/time/etc/custom validation)</plugin>
 		<plugin name="textarea"           folder="plugins/flexicontent_fields/textarea"           instfolder="flexicontent_fields">FLEXIcontent - Textarea</plugin>

@@ -1069,7 +1069,7 @@ class flexicontent_db
 			\Joomla\CMS\Language\Text::_('FLEXI_SINGLE_PROP_FIELDS')        => array('color', 'date', 'text', 'textarea', 'textselect'),
 			\Joomla\CMS\Language\Text::_('FLEXI_MULTIPLE_PROP_FIELDS')      => array('weblink', 'email', 'phonenumbers', 'termlist'),
 			\Joomla\CMS\Language\Text::_('FLEXI_MEDIA_MINI_APPS_FIELDS')    => array('file', 'image', 'mediafile', 'sharedmedia', 'addressint'),
-			\Joomla\CMS\Language\Text::_('FLEXI_ITEM_FORM_FIELDS')          => array('fieldgroup', 'account_via_submit', 'custom_form_html', 'coreprops'),
+			\Joomla\CMS\Language\Text::_('FLEXI_ITEM_FORM_FIELDS')          => array('subform', 'fieldgroup', 'account_via_submit', 'custom_form_html', 'coreprops'),
 			\Joomla\CMS\Language\Text::_('FLEXI_DISPLAY_MANAGEMENT_FIELDS') => array('toolbar', 'fcloadmodule', 'fcpagenav', 'linkslist', 'authoritems', 'jprofile', 'comments'),
 			\Joomla\CMS\Language\Text::_('FLEXI_ITEM_RELATION_FIELDS')      => array('relation', 'relation_reverse', 'autorelationfilters')
 		);
