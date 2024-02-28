@@ -1917,19 +1917,24 @@ if ($js)
                                   <td id="file-jmedia-data-container">
 									  <?php
 									  $jMedia_file_displayData = array(
-										  'disabled' => false,
-										  'preview' => 'tooltip',
-										  'readonly' => false,
-										  'class' => 'required',
-										  'link' => 'index.php?option=com_media&amp;view=images&amp;layout=default_fc&amp;tmpl=component&amp;filetypes=' . $filetypes . '&amp;asset=',  //com_flexicontent&amp;author=&amp;fieldid=\'+mm_id+\'&amp;folder='
-										  'asset' => 'com_flexicontent',
-										  'authorId' => '',
-										  'previewWidth' => 480,
-										  'previewHeight' => 360,
-										  'name' => 'file-jmedia-data',
-										  'id' => 'file-jmedia-data',
-										  'value' => '',
-										  'folder' => '',
+									    'disabled' => false,
+									    'preview' => 'tooltip',
+									    'readonly' => false,
+									    'class' => 'required',
+									    'link' => 'index.php?option=com_media&amp;view=images&amp;layout=default_fc&amp;tmpl=component&amp;filetypes=' . $filetypes . '&amp;asset=',  //com_flexicontent&amp;author=&amp;fieldid=\'+mm_id+\'&amp;folder='
+									    'asset' => 'com_flexicontent',
+									    'authorId' => '',
+									    'previewWidth' => 480,
+									    'previewHeight' => 360,
+									    'name' => 'file-jmedia-data',
+									    'id' => 'file-jmedia-data',
+									    'value' => '',
+									    'folder' => '',
+									    'dataAttribute' => '',
+									    'imagesExt' => '',
+									    'audiosExt' => '',
+									    'videosExt' => '',
+									    'documentsExt' => '',
 									  );
 									  echo \Joomla\CMS\Layout\LayoutHelper::render($media_field_layout = 'joomla.form.field.media', $jMedia_file_displayData, $layouts_path = null);
 									  ?>

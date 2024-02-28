@@ -315,9 +315,7 @@ class FlexicontentViewFile extends FlexicontentViewBaseRecord
 				break;
 
 			case 2:
-				$path = $row->filename_original ?: $row->filename;
-				$rowdata->path = \Joomla\CMS\Filesystem\Path::clean(JPATH_ROOT . DS . $path);
-
+				$rowdata->path = \Joomla\CMS\Filesystem\Path::clean(JPATH_ROOT . DS . $row->filename);
 				$rowdata->calculated_size = file_exists($rowdata->path) ? filesize($rowdata->path) : 0;
 				break;
 		}

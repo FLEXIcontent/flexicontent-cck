@@ -68,6 +68,11 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 						'id' => 'filename',
 						'value' => $this->row->filename,
 						'folder' => '',
+						'dataAttribute' => '',
+						'imagesExt' => '',
+						'audiosExt' => '',
+						'videosExt' => '',
+						'documentsExt' => '',
 					);
 					echo \Joomla\CMS\Layout\LayoutHelper::render($media_field_layout = 'joomla.form.field.media', $jMedia_file_displayData, $layouts_path = null);
 
