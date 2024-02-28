@@ -17,6 +17,8 @@
  */
 
 // Check to ensure this file is included in Joomla!
+use Joomla\CMS\Language\Text;
+
 defined('_JEXEC') or die('Restricted access');
 
 // Load the helper classes
@@ -228,20 +230,12 @@ class JFormFieldFields extends \Joomla\CMS\Form\FormField
 			$fields = $_fields;
 		}
 
-
-		// Handle fields having the same label
-		$_keys = array_keys($fields);
-		$_total = count($fields);
-		$_dupls = array();
-		foreach($_keys as $i => $key)
+		$label_count = [];
+		foreach($fields as $field)
 		{
-			if ($i == $_total-1) continue;
-			if ($fields[$key]->label == $fields[ $_keys[$i+1] ]->label)
-			{
-				$_dupls[ $key ] = $_dupls[ $_keys[$i+1] ] = 1;
-			}
+			$label_displayed = trim(Text::_(trim($field->label)));
+			$label_count[$label_displayed] = isset($label_count[$label_displayed]) ? $label_count[$label_displayed] + 1 : 1;
 		}
-
 
 		/**
 		 * Values, form field name and id, etc
@@ -261,8 +255,9 @@ class JFormFieldFields extends \Joomla\CMS\Form\FormField
 		$options = array();
 		foreach($fields as $field)
 		{
+			$label_displayed = trim(Text::_(trim($field->label)));
 			$option = new stdClass();
-			$option->text = \Joomla\CMS\Language\Text::_($field->label) . (isset($_dupls[$field->id]) ? ' :: '.$field->name : '');
+			$option->text = $label_displayed . ' - ' . $field->id . ($label_count[$label_displayed] > 1 ? ' :: '.$field->name : '');
 			$option->value = $field->value;
 			$options[] = $option;
 			$field->option_text = & $option->text;
