@@ -164,7 +164,7 @@ var JFormValidator_FC = function()
 					}
 					existing_only = existing_only && ( jQuery.inArray(value_catid, existing_cats_fc) >= 0 );
 					if (!existing_only) {
-						alert(Joomla.JText._('FLEXI_TOO_MANY_ITEM_CATEGORIES') + max_cat_assign_fc);
+						alert(Joomla.Text._('FLEXI_TOO_MANY_ITEM_CATEGORIES') + max_cat_assign_fc);
 						return false;
 					}
 				}
@@ -196,13 +196,13 @@ var JFormValidator_FC = function()
 				// Check number of values limitations
 				var errorMessage = false;
 				if ( min_values && count < min_values) {
-					errorMessage = Joomla.JText._('FLEXI_FIELD_SELECT_AT_LEAST_PROMPT') + ': ' + min_values;
+					errorMessage = Joomla.Text._('FLEXI_FIELD_SELECT_AT_LEAST_PROMPT') + ': ' + min_values;
 				}
 				else if ( max_values && count > max_values) {
-					errorMessage = Joomla.JText._('FLEXI_FIELD_SELECT_UP_TO_PROMPT') + ': ' + max_values;
+					errorMessage = Joomla.Text._('FLEXI_FIELD_SELECT_UP_TO_PROMPT') + ': ' + max_values;
 				}
 				else if ( exact_values && count != exact_values) {
-					errorMessage = Joomla.JText._('FLEXI_FIELD_SELECT_EXACTLY_PROMPT') + ': ' + exact_values;
+					errorMessage = Joomla.Text._('FLEXI_FIELD_SELECT_EXACTLY_PROMPT') + ': ' + exact_values;
 				}
 
 				var $el = jQuery(el);
@@ -223,7 +223,7 @@ var JFormValidator_FC = function()
 					/*var $sel2box = $el.prev('.select2-container');
                     if ( $sel2box.length && !$sel2box.prev().hasClass('fc-field-invalid') )
                     {
-                        var err_msg = jQuery('<span class="fc-field-invalid alert alert-error">' + Joomla.JText._($el.val() ? 'FLEXI_INVALID' : 'FLEXI_REQUIRED') + '</span>');
+                        var err_msg = jQuery('<span class="fc-field-invalid alert alert-error">' + Joomla.Text._($el.val() ? 'FLEXI_INVALID' : 'FLEXI_REQUIRED') + '</span>');
                         !isRTL ? err_msg.insertBefore( $sel2box ) : err_msg.insertAfter( $sel2box );
                     }*/
 					return false;
@@ -714,7 +714,7 @@ var JFormValidator_FC = function()
 
 			if (!valid && invalid.length > 0)
 			{
-				message = Joomla.JText._('JLIB_FORM_FIELD_INVALID');
+				message = Joomla.Text._('JLIB_FORM_FIELD_INVALID');
 				error = {"error": []};
 				var added = [];
 				for (i = invalid.length - 1; i >= 0; i--)
@@ -771,7 +771,7 @@ var JFormValidator_FC = function()
 			if (valid)
 			{
 				// Do not set if form saving is cancelled then after form reloads 'Automatic' will be set as value, which will cause custom validators to fail
-				//jQuery('input.fcfield_auto_value, textarea.fcfield_auto_value').val(Joomla.JText._('FLEXI_AUTO'));
+				//jQuery('input.fcfield_auto_value, textarea.fcfield_auto_value').val(Joomla.Text._('FLEXI_AUTO'));
 			}
 			return valid;
 		},
@@ -849,7 +849,7 @@ var JFormValidator_FC = function()
 				{
 					if (!$el.closest('.fcfield_box.required_box').prev().hasClass('fc-field-invalid'))
 					{
-						jQuery('<span class="fc-field-invalid alert alert-error">' + Joomla.JText._($el.val() ? 'FLEXI_INVALID' : 'FLEXI_REQUIRED') + '</span>').insertBefore( $el.closest('.fcfield_box.required_box') );
+						jQuery('<span class="fc-field-invalid alert alert-error">' + Joomla.Text._($el.val() ? 'FLEXI_INVALID' : 'FLEXI_REQUIRED') + '</span>').insertBefore( $el.closest('.fcfield_box.required_box') );
 					}
 				}
 				else if ($el.parent().hasClass('fc-xpended-row'))
@@ -857,7 +857,7 @@ var JFormValidator_FC = function()
 					if (!$el.parent().next().hasClass('fc-field-invalid'))
 					{
 						$el.parent().css({'width': 'auto'});
-						jQuery('<span class="fc-field-invalid alert alert-error">' + Joomla.JText._($el.val() ? 'FLEXI_INVALID' : 'FLEXI_REQUIRED') + '</span>').insertAfter( $el.parent() );
+						jQuery('<span class="fc-field-invalid alert alert-error">' + Joomla.Text._($el.val() ? 'FLEXI_INVALID' : 'FLEXI_REQUIRED') + '</span>').insertAfter( $el.parent() );
 					}
 				}
 
@@ -865,7 +865,7 @@ var JFormValidator_FC = function()
 				{
 					var error_mssg = $el.data('error-mssg');
 					var error_css  = $el.data('error-css');
-					error_mssg = error_mssg ? error_mssg : Joomla.JText._($el.val() ? 'FLEXI_INVALID' : 'FLEXI_REQUIRED')
+					error_mssg = error_mssg ? error_mssg : Joomla.Text._($el.val() ? 'FLEXI_INVALID' : 'FLEXI_REQUIRED')
 
 					if (!$el.parent().children(':first-child').hasClass('fc-field-invalid'))
 					{
@@ -882,7 +882,7 @@ var JFormValidator_FC = function()
 				{
 					var error_mssg = $el.data('error-mssg');
 					var error_css  = $el.data('error-css');
-					error_mssg = error_mssg ? error_mssg : Joomla.JText._($el.val() ? 'FLEXI_INVALID' : 'FLEXI_REQUIRED')
+					error_mssg = error_mssg ? error_mssg : Joomla.Text._($el.val() ? 'FLEXI_INVALID' : 'FLEXI_REQUIRED')
 
 					if (!$el.next().hasClass('fc-field-invalid'))
 					{
@@ -905,7 +905,7 @@ var JFormValidator_FC = function()
 
 						if (!inputSet_NP.hasClass('fc-field-invalid'))
 						{
-							var err_msg = jQuery('<span class="fc-field-invalid alert alert-error">' + Joomla.JText._('FLEXI_INVALID') + '</span>');
+							var err_msg = jQuery('<span class="fc-field-invalid alert alert-error">' + Joomla.Text._('FLEXI_INVALID') + '</span>');
 							!isRTL ? err_msg.insertAfter( inputSet ) : err_msg.insertBefore( inputSet );
 						}
 						inputSet.addClass('invalid');
