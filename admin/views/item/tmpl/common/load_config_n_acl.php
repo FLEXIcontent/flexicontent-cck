@@ -55,7 +55,6 @@ $uselang     = (int) $this->params->get('uselang' . $CFGsfx, 1);
 $usetype     = (int) $this->params->get('usetype' . $CFGsfx, ($isSite ? 0 : 1));
 $usestate    = (int) $this->params->get('usestate' . $CFGsfx, 1);
 $useaccess   = (int) $this->params->get('useaccess' . $CFGsfx, 1);
-$usefeatured = (int) $this->params->get('usefeatured' . $CFGsfx, ($isSite ? 0 : 1));
 $usemaincat  = (int) $this->params->get('usemaincat' . $CFGsfx, 1);
 
 $use_versioning          = (int) $this->params->get('use_versioning', 1);
@@ -136,6 +135,14 @@ $usetags        = (int) $this->params->get('usetags' . $CFGsfx, 1);
 $tags_editable  = $this->perms['cantags'] && $usetags === 1;
 $tags_displayed = $typeid &&
 	( ($this->perms['cantags'] && $usetags) || (count($this->usedtagsdata) && $usetags === 2) ) ;
+
+
+/**
+ * For featured flag required more permission to change featured categories
+ */
+$usefeatured = $this->perms['canchange_featcat']
+	? (int) $this->params->get('usefeatured' . $CFGsfx, ($isSite ? 0 : 1))
+	: 0;
 
 
 /**

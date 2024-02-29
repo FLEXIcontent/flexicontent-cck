@@ -222,6 +222,9 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		if (! (int) $params->get('useaccess' . $CFGsfx, 1))
 			unset($data['access']);
 
+		if (! (int) $params->get('usefeatured' . $CFGsfx, ($isSite ? 0 : 1)))   // Below, We will clear this flag, If user can-not set featured categories
+			unset($data['featured']);
+
 		if (! (int) $params->get('usestate' . $CFGsfx, 1))
 			unset($data['state']);
 
@@ -408,6 +411,9 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		$canchange_featcat = $perms->MultiCat && $CanChangeFeatCat;
 		$canchange_seccat  = $perms->MultiCat && $CanChangeSecCat;
+
+		// Clear featured flag
+		if (!$CanChangeFeatCat) unset($data['featured']);
 
 		// Enforce featured categories if user is not allowed to changed
 		$featured_cats_parent = $params->get('featured_cats_parent', 0);
