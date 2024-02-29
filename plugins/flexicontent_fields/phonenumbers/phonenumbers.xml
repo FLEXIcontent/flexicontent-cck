@@ -41,7 +41,7 @@
 				<option value="3">FLEXI_FIELD_INLINE_BOTH_BTN</option>
 			</field>
 			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" depend_class="fieldgroupoff multivalue-mode" />
-			<field name="showon" type="text" default="" label="ShowOn" description="Shown On Conditions. Use Joomla Format 'fieldname:value' e.g album_type:2 NOTE: DO not set this field to required. Also DISABLE select2 JS in any referenced fields of type select / selectmultiple" />
+			<field name="showon" type="text" default="" label="FLEXI_FIELD_SHOWON" description="FLEXI_FIELD_SHOWON_DESC" />
 			<field name="required" type="radio" default="0" label="FLEXI_FIELD_REQUIRED" description="FLEXI_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
