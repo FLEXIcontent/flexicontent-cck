@@ -39,7 +39,7 @@ class FcFormLayoutParameters
 		$tab_fields['tab01']  = $params->get('form_tab01_fields'. $CFGsfx,  'text');
 		$tab_fields['tab02']  = $params->get('form_tab02_fields'. $CFGsfx,  'fields_manager');
 		$tab_fields['tab02a'] = $params->get('form_tab02a_fields'. $CFGsfx, 'jimages, jurls');
-		$tab_fields['tab03']  = $params->get('form_tab03_fields'. $CFGsfx,  'categories, tags, lang_assocs, perms');
+		$tab_fields['tab03']  = $params->get('form_tab03_fields'. $CFGsfx,  'featured, categories, tags, lang_assocs, perms');
 		$tab_fields['tab04']  = $params->get('form_tab04_fields'. $CFGsfx,  'timezone_info, created, created_by, created_by_alias, publish_up, publish_down, modified, modified_by, item_screen');
 		$tab_fields['tab05']  = $params->get('form_tab05_fields'. $CFGsfx,  'metadata, seoconf');
 		$tab_fields['tab06']  = $params->get('form_tab06_fields'. $CFGsfx,  'display_params');

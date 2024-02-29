@@ -25,7 +25,7 @@
 					'iflayout_form_tab01_fields_PSFX':'text',
 					'iflayout_form_tab02_fields_PSFX':'fields_manager',
 					'iflayout_form_tab02a_fields_PSFX':'jimages, jurls',
-					'iflayout_form_tab03_fields_PSFX':'categories, tags, lang_assocs, perms',
+					'iflayout_form_tab03_fields_PSFX':'featured, categories, tags, lang_assocs, perms',
 					'iflayout_form_tab04_fields_PSFX':'timezone_info, created, created_by, created_by_alias, publish_up, publish_down, modified, modified_by, item_screen',
 					'iflayout_form_tab05_fields_PSFX':'metadata, seoconf',
 					'iflayout_form_tab06_fields_PSFX':'display_params',
@@ -83,7 +83,7 @@
 			<field name="form_tab01_fields_PSFX"  type="textarea" default="" hint="text" rows="2" cols="60" label="TAB 1" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" class="input-xxlarge" />
 			<field name="form_tab02_fields_PSFX"  type="textarea" default="" hint="fields_manager" rows="2" cols="60" label="TAB 2" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" class="input-xxlarge" />
 			<field name="form_tab02a_fields_PSFX" type="textarea" default="" hint="jimages, jurls" rows="2" cols="60" label="TAB 2a" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" class="input-xxlarge" />
-			<field name="form_tab03_fields_PSFX"  type="textarea" default="" hint="categories, tags, lang_assocs, perms" rows="2" cols="60" label="TAB 3" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" class="input-xxlarge" />
+			<field name="form_tab03_fields_PSFX"  type="textarea" default="" hint="featured, categories, tags, lang_assocs, perms" rows="2" cols="60" label="TAB 3" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" class="input-xxlarge" />
 			<field name="form_tab04_fields_PSFX"  type="textarea" rows="2" cols="60" label="TAB 4" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" class="input-xxlarge"
 				default=""
 				hint="timezone_info, created, created_by, created_by_alias, publish_up, publish_down, modified, modified_by, item_screen" />

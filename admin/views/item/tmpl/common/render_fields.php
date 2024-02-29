@@ -715,6 +715,39 @@ unset($label_html); unset($input_html);
 endif;
 
 
+if ($usefeatured) : ob_start();  // featured ?>
+
+	<div class="control-group">
+		<?php
+		$field = isset($this->fields['core_featured']) ? $this->fields['core_featured'] : false;
+		$field = isset($this->fields['core_featured_' . $typeid]) ? $this->fields['core_featured_' . $typeid] : $field;
+		$field_description = $field && $field->description ? $field->description : Text::_($this->form->getField('featured')->description);
+		$label_attrs = $field
+			? 'class="' . $tip_class . $lbl_class . $lbl_extra_class . '" title="'.flexicontent_html::getToolTip(null, $field_description, 0, 1).'"'
+			: 'class="' . $lbl_class . $lbl_extra_class . '"';
+		ob_start();
+		?>
+		<div class="control-label" id="jform_featured-lbl-outer">
+			<label id="jform_featured-lbl" class="<?php echo $lbl_class; ?>  pull-left label-fcinner label-toplevel">
+				<?php echo $field ? $field->label : Text::_($this->form->getField('featured')->getAttribute('label')); ?>
+			</label>
+		</div>
+		<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
+
+		<div class="controls container_fcfield container_fcfield_name_featured">
+			<?php echo $this->lists['featured']; ?>
+			<?php //echo $this->form->getInput('featured');?>
+		</div>
+
+		<?php $input_html = ob_get_clean(); echo $input_html; ?>
+
+	</div>
+<?php $fn = 'featured';
+$captured[$fn] = ob_get_clean();
+$rendered[$fn] = (object) array('label_html' => $label_html, 'input_html' => $input_html, 'html' => $captured[$fn], 'field' => $field);
+unset($label_html); unset($input_html);
+endif;
+
 
 
 if ( $secondary_displayed || !empty($this->lists['featured_cid']) ) : ob_start();  // categories ?>
@@ -782,36 +815,6 @@ if ( $secondary_displayed || !empty($this->lists['featured_cid']) ) : ob_start()
 			</div>
 
 		<?php $fn = 'featured_cid';
-		echo $html = ob_get_clean();
-		$rendered[$fn] = (object) array('label_html' => $label_html, 'input_html' => $input_html, 'html' => $html, 'field' => false);
-		unset($label_html); unset($input_html); ?>
-		<?php endif; ?>
-
-
-		<?php if (!$isSite) : /* We do not (yet) allow modifying featured flag in frontend */ ?>
-
-		<?php ob_start(); ?>
-		<div class="control-group">
-
-			<?php ob_start(); ?>
-			<div class="control-label" id="jform_featured-lbl-outer">
-				<label id="jform_featured-lbl" class="<?php echo $lbl_class; ?>  pull-left label-fcinner label-toplevel">
-					<?php echo Text::_( 'FLEXI_FEATURED' ); ?>
-					<br>
-					<small><?php echo Text::_( 'FLEXI_JOOMLA_FEATURED_VIEW' ); ?></small>
-				</label>
-			</div>
-			<?php $label_html = ob_get_clean(); echo $label_html; ob_start(); ?>
-
-			<div class="controls container_fcfield container_fcfield_name_featured">
-				<?php echo $this->lists['featured']; ?>
-				<?php //echo $this->form->getInput('featured');?>
-			</div>
-
-			<?php $input_html = ob_get_clean(); echo $input_html; ?>
-
-		</div>
-		<?php $fn = 'featured';
 		echo $html = ob_get_clean();
 		$rendered[$fn] = (object) array('label_html' => $label_html, 'input_html' => $input_html, 'html' => $html, 'field' => false);
 		unset($label_html); unset($input_html); ?>
