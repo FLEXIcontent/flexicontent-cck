@@ -257,7 +257,7 @@ class JFormFieldFields extends \Joomla\CMS\Form\FormField
 		{
 			$label_displayed = trim(Text::_(trim($field->label)));
 			$option = new stdClass();
-			$option->text = $label_displayed . ' - ' . $field->id . ($label_count[$label_displayed] > 1 ? ' :: '.$field->name : '');
+			$option->text = $label_displayed . ($label_count[$label_displayed] > 1 ? ' :: '.$field->name : '');
 			$option->value = $field->value;
 			$options[] = $option;
 			$field->option_text = & $option->text;
