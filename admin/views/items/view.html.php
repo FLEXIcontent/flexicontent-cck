@@ -196,6 +196,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 			$this->single_type = 0;
 			$this->tparams = $cparams;
 			$this->tparams_array = $model_s->getTypeparams(0);
+			$this->tparams_array = is_array($this->tparams_array) ? $this->tparams_array : array($this->tparams_array);
 			foreach ($this->tparams_array as $_type_id => $_tparams) {
 				$tmp_params = new \Joomla\Registry\Registry();
 				$tmp_params->merge($cparams);
