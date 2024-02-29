@@ -567,6 +567,11 @@ class plgFlexicontent_fieldsSubform extends FCField
 
 		$newpost = array();
 		$new = 0;
+
+		// Preserve array KEY if not multiple !!!		
+		$multiple = (int) $field->parameters->get( 'allow_multiple', 0 );
+		if (!$multiple) $post = array($post);
+
 		foreach ($post as $n => $v)
 		{
 			/**
