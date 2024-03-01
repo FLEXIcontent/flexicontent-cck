@@ -897,12 +897,6 @@ body .ui-widget-overlay {
 	background: #aaa;
 	opacity: .5;
 }
-#flexicontent .subform-repeatable-wrapper.subform-layout .btn-outline-info.active,
-.subform-repeatable-wrapper.subform-layout a.btn.btn-small,
-.subform-repeatable-wrapper.subform-layout .btn-outline-info,
-#flexicontent .subform-repeatable-wrapper.subform-layout .btn.btn-sm {
-	background: #000 !important;
-}
 #flexicontent .nav.nav-tabs.nav-stacked li {
 	width: 24%;
 	border: 1px solid #ccc;
