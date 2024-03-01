@@ -32,14 +32,8 @@ foreach ($field->value as $i => $value)
   //display($name, $html, $width, $height, $col, $row, $buttons = true, $id = null, $asset = null, $author = null, $params = array())
   $mce_fieldname_sfx = $mce_fieldname ? '[' . $mce_fieldname . ']' : '';
   $txtarea = !$use_html ? '
-    <textarea class="txtarea ' . $classes . '"
-      id="'.$elementid_n.'" name="'.$fieldname_n.'"
-      cols="'.$cols.'" rows="'.$rows.'"
-      ' . ($maxlength ? 'maxlength="'.$maxlength.'"' : '') . '
-      ' . ($auto_value ? ' readonly="readonly" ' : '') . '
-      placeholder="'.htmlspecialchars( $placeholder, ENT_COMPAT, 'UTF-8' ).'"
-      >'
-      .htmlspecialchars( $value, ENT_COMPAT, 'UTF-8' ).
+    <textarea ' . $extra_attribs . ' id="'.$elementid_n.'" name="'.$fieldname_n.'" ' . ($auto_value ? ' readonly="readonly" ' : '') . '>'
+      . htmlspecialchars( $value, ENT_COMPAT, 'UTF-8' ) .
     '</textarea>
     ' : $editor->display(
       $fieldname_n . $mce_fieldname_sfx, htmlspecialchars( $value, ENT_COMPAT, 'UTF-8' ), $width, $height, $cols, $rows,

@@ -105,6 +105,7 @@
 
 
 			<field name="" type="separator" default="FLEXI_SIMPLE_TEXTAREA" description="FLEXI_SIMPLE_TEXTAREA_DESC" level="level2" depend_class="using-plain-area" />
+			<field name="extra_attributes" type="text" default="" label="FLEXI_FIELD_EXTRA_ATTRIBUTES" description="FLEXI_FIELD_EXTRA_ATTRIBUTES_DESC" />
 			<field name="placeholder" type="text" default="" label="FLEXI_FIELD_PLACEHOLDER" description="FLEXI_FIELD_PLACEHOLDER_DESC" depend_class="using-plain-area custom_placeholder" />
 			<field name="maxlength" type="text" default="" size="6" label="FLEXI_MAX_TXT_LEN" description="FLEXI_MAX_TXT_LEN_DESC" depend_class="using-plain-area" />
 			<field name="rows" type="text" default="3" size="3" label="FLEXI_FIELD_ROWS" description="FLEXI_FIELD_ROWS_DESC" />

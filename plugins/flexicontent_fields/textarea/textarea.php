@@ -123,8 +123,10 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		$use_html = (int) ($field->field_type == 'maintext' ? !$field->parameters->get( 'hide_html', 0 ) : $field->parameters->get( 'use_html', 0 ));
 
 		// *** Simple Textarea ***
-		$rows  = $field->parameters->get( 'rows', ($field->field_type === 'maintext' ? 6 : 3) ) ;
-		$cols  = $field->parameters->get( 'cols', 80 ) ;
+		$rows  = (int) $field->parameters->get( 'rows', ($field->field_type == 'maintext') ? 6 : 3 ) ;
+		$cols  = (int) $field->parameters->get( 'cols', 80 ) ;
+		$rows  = $rows !== -1 ? $rows : '';
+		$cols  = $cols !== -1 ? $cols : '';
 
 		// Max Length is enforced in both client & server sides when using textarea,
 		// when using HTML editor, this will be client size only (and only if editor supports it)
@@ -509,13 +511,23 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		}
 
 
-		$classes  = ' fcfield_textval' . $required_class;
+		$classes  = 'txtarea fcfield_textareaval' . $required_class;
 
 		// Set field to 'Automatic' on successful validation'
 		if ($auto_value)
 		{
 			$classes = ' fcfield_auto_value ';
 		}
+
+		// Extra attributes
+		$extra_attribs = $field->parameters->get( 'extra_attributes', '' )
+			. ($maxlength ? ' maxlength="' . $maxlength . '" ' : '')
+			. ($cols ? ' cols="' . $cols . '" ' : '')
+			. ($rows ? '  rows="' . $rows . '" ' : '')
+			. (strlen($placeholder) ? ' placeholder="'.htmlspecialchars( $placeholder, ENT_COMPAT, 'UTF-8' ).'"' : '')
+		;
+		if (strpos($extra_attribs, 'class="') === false) $extra_attribs .= ' class="'.$classes.'"';
+		else $extra_attribs = str_replace('class="', 'class="'.$classes.' ', $extra_attribs);
 
 
 		/**
@@ -1075,8 +1087,19 @@ class plgFlexicontent_fieldsTextarea extends FCField
 		$use_html  = (int) ($field->field_type == 'maintext' ? !$field->parameters->get( 'hide_html', 0 ) : $field->parameters->get( 'use_html', 0 ));
 
 		// *** Simple Textarea & HTML Editor (shared configuration) ***
-		$rows  = $field->parameters->get( 'rows', ($field->field_type == 'maintext') ? 6 : 3 ) ;
-		$cols  = $field->parameters->get( 'cols', 80 ) ;
+		$rows  = (int) $field->parameters->get( 'rows', ($field->field_type == 'maintext') ? 6 : 3 ) ;
+		$cols  = (int) $field->parameters->get( 'cols', 80 ) ;
+		$rows  = $rows !== -1 ? $rows : '';
+		$cols  = $cols !== -1 ? $cols : '';
+
+		// Extra attributes
+		$attribs = $field->parameters->get( 'extra_attributes', '' )
+			. ($maxlength ? ' maxlength="' . $maxlength . '" ' : '')
+			. ($cols ? ' cols="' . $cols . '" ' : '')
+			. ($rows ? '  rows="' . $rows . '" ' : '')
+		;
+		if (strpos($attribs, 'class="') === false) $attribs .= ' class="'.$required.'"';
+		else $attribs = str_replace('class="', 'class="'.$required.' ', $attribs);
 
 		// *** HTML Editor configuration  ***
 		$width = $field->parameters->get( 'width', '98%') ;
@@ -1180,9 +1203,10 @@ class plgFlexicontent_fieldsTextarea extends FCField
 			$elementid_t = $elementid.'_'.$ta_count;
 			$fieldname_t = $field->tab_names[$ta_count];
 
-			if (!$use_html) {
+			if (!$use_html)
+			{
 				$field->html[$ta_count] = '
-				<textarea id="'.$elementid_t.'" name="'.$fieldname_t.'" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'" '.($maxlength ? 'maxlength="'.$maxlength.'"' : '').'>'
+				<textarea id="'.$elementid_t.'" name="'.$fieldname_t.'" '.$attribs.'" >'
 					.htmlspecialchars( $tab_content, ENT_COMPAT, 'UTF-8' ).
 				'</textarea>
 				';
@@ -1229,9 +1253,10 @@ class plgFlexicontent_fieldsTextarea extends FCField
 			$elementid_t = $elementid.'_'.$ta_count;
 			$fieldname_t = $field->tab_names[$ta_count];
 
-			if (!$use_html) {
+			if (!$use_html)
+			{
 				$field->html[$ta_count]	 = '
-				<textarea id="'.$elementid_t.'" name="'.$fieldname_t.'" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'" '.($maxlength ? 'maxlength="'.$maxlength.'"' : '').'>'
+				<textarea id="'.$elementid_t.'" name="'.$fieldname_t.'" '.$attribs.'>'
 					.htmlspecialchars( $ti->aftertabs, ENT_COMPAT, 'UTF-8' ).
 				'</textarea>
 				';
