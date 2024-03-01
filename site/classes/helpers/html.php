@@ -574,7 +574,7 @@ class flexicontent_html
 			}
 			else
 			{
-				$url = 'http://' . $url;
+				$url = 'https://' . $url;
 			}
 		}
 
