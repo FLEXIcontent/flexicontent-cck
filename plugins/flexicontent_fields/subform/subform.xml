@@ -102,7 +102,6 @@
 &#x9;&#x3C;field&#13;&#10;
 &#x9;&#x9;&#x9;name=&#x22;document&#x22;&#13;&#10;
 &#x9;&#x9;&#x9;type=&#x22;media&#x22;&#13;&#10;
-&#x9;&#x9;&#x9;schemes=&#x22;http,https,ftp,ftps,data,file&#x22;&#13;&#10;
 &#x9;&#x9;&#x9;label=&#x22;Image file&#x22;&#13;&#10;
 &#x9;&#x9;&#x9;required=&#x22;false&#x22;&#13;&#10;
 &#x9;&#x9;&#x9;showon=&#x22;imageType:file&#x22;&#13;&#10;
@@ -112,7 +111,7 @@
 &#x9;&#x9;&#x9;type=&#x22;url&#x22;&#13;&#10;
 &#x9;&#x9;&#x9;label=&#x22;Image link&#x22;&#13;&#10;
 &#x9;&#x9;&#x9;required=&#x22;false&#x22;&#13;&#10;
-&#x9;&#x9;&#x9;hint=&#x22;https://&#x22;&#13;&#10;
+&#x9;&#x9;&#x9;hint=&#x22;https://...&#x22;&#13;&#10;
 &#x9;&#x9;&#x9;scheme=&#x22;https,http,ftp,ftps&#x22;&#13;&#10;
 &#x9;&#x9;&#x9;filter=&#x22;url&#x22;&#13;&#10;
 &#x9;&#x9;&#x9;validate=&#x22;url&#x22;&#13;&#10;
