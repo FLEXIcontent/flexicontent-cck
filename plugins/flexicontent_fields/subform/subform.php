@@ -35,8 +35,11 @@ class plgFlexicontent_fieldsSubform extends FCField
 	}
 	protected function createSubformField($field, $posted_values = null)
 	{
-		$multiple = (int) $field->parameters->get( 'allow_multiple', 0 );
+		$multiple   = (int) $field->parameters->get( 'allow_multiple', 0 );
+		$min_values = (int) $field->parameters->get('min_values', 0);
+		$max_values = (int) $field->parameters->get('max_values', 0);
 
+		$attribs          = $field->parameters->get( 'extra_attributes', '' ) ;
 		$subform_form_xml = $field->parameters->get( 'subform_form_xml', '' );
 		if (!$subform_form_xml)
 		{
@@ -53,10 +56,35 @@ class plgFlexicontent_fieldsSubform extends FCField
 			\Joomla\CMS\Form\FormHelper::loadFieldClass('subform');   // \Joomla\CMS\Form\Field\SubformField
 		}
 
+		// Warn user if "multiple" attribute is set in the "extra_attributes" parameter
+		if (strpos($attribs, 'multiple="') !== false) {
+			Factory::getApplication()->enqueueMessage('Please remove "multiple" attribute from "Extra attributes" parameter of the subform field: ' . $field->label . ' and set the respective parameter in field configuration' , 'warning');
+			return null;
+		}
+		if (strpos($attribs, 'min="') !== false) {
+			Factory::getApplication()->enqueueMessage('Please remove "min" attribute from "Extra attributes" parameter of the subform field: ' . $field->label . ' and set the respective parameter in field configuration' , 'warning');
+			return null;
+		}
+		if (strpos($attribs, 'max="') !== false) {
+			Factory::getApplication()->enqueueMessage('Please remove "max" attribute from "Extra attributes" parameter of the subform field: ' . $field->label . ' and set the respective parameter in field configuration' , 'warning');
+			return null;
+		}
+
+		// Add layout attribute if not already set in the "extra_attributes" parameter
+		if (strpos($attribs, 'layout="') === false) $attribs .= ' layout="joomla.form.field.subform.'. ($multiple ? 'repeatable' : 'default') . '"';
+		// Add buttons attribute if not already set in the "extra_attributes" parameter
+		if (strpos($attribs, 'buttons="') === false) $attribs .= ' buttons="add,remove,move" ';
+
+		// Add multiple, min, max attributes
+		$attribs .= ' multiple="' . ($multiple ? 'true' : 'false') . '"';
+		if ($min_values) $attribs .= ' min="'. $min_values .'"';
+		if ($max_values) $attribs .= ' max="'. $max_values .'"';
+
+		// Add label attribute if not set in the "extra_attributes" parameter
+		if (strpos($attribs, 'label') === false) $attribs .= ' label="'. $field->label .'"'; // Currently not used by item form
+
 		// Create field's XML
-		$xml_field = '<field name="'.$field->name.'"  type="subform" '
-			. 'label="Subform" multiple="'.($multiple ? 'true' : 'false').'" '
-			. 'layout="joomla.form.field.subform.'.($multiple ? 'repeatable' : 'default').'">';
+		$xml_field = '<field name="'.$field->name.'"  type="subform" ' . $attribs . '>';
 		$xml_field .= $subform_form_xml . '</field>';
 		$xml_form = '<form><fields name="attribs"><fieldset name="attribs">'.$xml_field.'</fieldset></fields></form>';
 
