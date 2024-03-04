@@ -74,10 +74,15 @@ for ($n = 0; $n < $max_count; $n++)
 			$showOnConditions  = FormHelper::parseShowOnConditions($_showon, $_formControl = 'custom', $_formGroup = '');
 			$dataShowOnPattern = $_showon ? 'data-showon-pattern=\'' . json_encode($showOnConditions) . '\'' : '';
 
+			// Cases handled
+			$cases_handled = [];
 			foreach($showOnConditions as $showCase)
 			{
 				// When a new field group value is added, we will use this to replace it with the correct field index and set it as data-shown, then initialize the showon script
-				$dataShowOnPattern = str_replace($showCase['field'], $showCase['field'] . '[__n__]', $dataShowOnPattern);
+				if (!in_array($showCase['field'], $cases_handled)) {
+					$dataShowOnPattern = str_replace($showCase['field'], $showCase['field'] . '[__n__]', $dataShowOnPattern);
+				}
+				$cases_handled[] = $showCase['field'];
 			}
 			$dataShowOn = str_replace('[__n__]', '[' . $n . ']', $dataShowOnPattern);
 			$dataShowOn = str_replace('data-showon-pattern=', 'data-showon=', $dataShowOn);
