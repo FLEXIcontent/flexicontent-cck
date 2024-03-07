@@ -34,7 +34,7 @@ if ($field->prev)
 	$tooltip = $use_tooltip ? ' title="'. flexicontent_html::getToolTip($tooltip_title_prev, $field->prevtitle, 0) .'"' : '';
 	$html .= '
 		<a class="fcpagenav-prev btn' . ($use_tooltip ? ' '.$tooltip_class : '') . '" ' . ($use_tooltip ? $tooltip : '') . ' href="'. $field->prevurl .'">
-			<i class="icon-previous"></i>
+			<i class="icon-chevron-left"></i>
 			' . ( $use_title ? $field->prevtitle : htmlspecialchars($prev_label, ENT_NOQUOTES, 'UTF-8') ).'
 			' . ( $item_use_image ? ($field->prevThumb ? '
 				<br/><img src="'.$field->prevThumb.'" alt="Previous" style="'.$img_size.'" />' : '
@@ -47,7 +47,7 @@ else
 {
 	$html .= '
 		<span class="fcpagenav-prev btn disabled">
-			<i class="icon-previous"></i>
+			<i class="icon-chevron-left"></i>
 			'.htmlspecialchars($prev_label, ENT_NOQUOTES, 'UTF-8').'
 			'.( $item_use_image ? '
 				<br/><span class="fc-pagenav-noimg" style="display:inline-block; '.$img_size.'"></span>
@@ -65,8 +65,8 @@ if ($field->next)
 	$tooltip = $use_tooltip ? ' title="'. flexicontent_html::getToolTip($tooltip_title_next, $field->nexttitle, 0) .'"' : '';
 	$html .= '
 		<a class="fcpagenav-next btn' . ($use_tooltip ? ' '.$tooltip_class : '') . '" ' . ($use_tooltip ? $tooltip : '') . ' href="'. $field->nexturl .'">
-			<i class="icon-next"></i>
 			' . ( $use_title ? $field->nexttitle : htmlspecialchars($next_label, ENT_NOQUOTES, 'UTF-8') ).'
+			<i class="icon-chevron-right"></i>
 			' . ( $item_use_image ? ($field->nextThumb ? '
 				<br/><img src="'.$field->nextThumb.'" alt="Next" style="'.$img_size.'" />' : '
 				<br/><span class="fc-pagenav-noimg" style="display:inline-block; '.$img_size.'"></span>
@@ -78,8 +78,8 @@ else
 {
 	$html .= '
 		<span class="fcpagenav-next btn disabled">
-			<i class="icon-next"></i>
 			'.htmlspecialchars($next_label, ENT_NOQUOTES, 'UTF-8').'
+			<i class="icon-chevron-right"></i>
 			'.( $item_use_image ? '
 				<br/><span class="fc-pagenav-noimg" style="display:inline-block; '.$img_size.'"></span>
 			' : '').'
