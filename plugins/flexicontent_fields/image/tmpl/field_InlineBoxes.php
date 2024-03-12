@@ -216,7 +216,10 @@ foreach ($field->value as $index => $value)
 
 			if ($use_quantum)
 			{
-				$media_field_class_path = $media_field_prefix . '\\' . $media_field_class;
+				if (class_exists('J'.$media_field_class))
+					$media_field_class_path = 'J'.$media_field_class;
+				else
+					$media_field_class_path = $media_field_prefix . '\\' . $media_field_class;
 				$jfield = new $media_field_class_path($jform);
 			}
 			else
