@@ -489,7 +489,7 @@ foreach ($field->value as $index => $value)
 		.(($linkto_url || $usemediaurl || $usealt || $usetitle || $usedesc || $usecust1 || $usecust2) ?
 			'
 
-				<div class="fcimg_value_props" style="display: none;" data-name="'.$elementid_n.'">
+				<div class="fcimg_value_props" style="" data-name="'.$elementid_n.'">
 					'.$fc_preview_msg.'
 					'.$originalname.'
 					'.$existingname.'
