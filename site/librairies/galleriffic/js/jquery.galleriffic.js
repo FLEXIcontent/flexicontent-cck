@@ -1123,7 +1123,7 @@
 			$(document).keydown(function(e) {
 				var key = e.charCode ? e.charCode : e.keyCode ? e.keyCode : 0;
 				switch(key) {
-					case 32: // space
+					case 13: // space
 						gallery.next();
 						e.preventDefault();
 						break;
