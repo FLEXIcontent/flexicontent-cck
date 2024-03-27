@@ -1166,10 +1166,12 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 			$tc = explode('\\', get_class($this->table));
 			$this->tableClassName = end($tc);
 
-			// Get UCM Type data
+			// Get UCM Type data, note: we disable error reporting temporarily in case we have types with bad json
+			$error_reporting_level = error_reporting(0);
 			$this->contentType = new \Joomla\CMS\UCM\UCMType;
 			$this->type = $this->contentType->getTypeByTable($this->tableClassName)
 				?: $this->contentType->getTypeByAlias($this->type_alias);
+			error_reporting($error_reporting_level);
 
 			// Get tabs observer
 			if (!FLEXI_J38GE)
