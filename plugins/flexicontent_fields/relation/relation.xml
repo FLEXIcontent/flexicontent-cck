@@ -69,6 +69,7 @@
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF_DESC" description="" level="level3" class="alert alert-info fcpadded" />
 
 			<field name="display_label_form" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_FLOATED_LEFT</option>
 				<option value="2">FLEXI_CLEARED</option>
 			</field>
