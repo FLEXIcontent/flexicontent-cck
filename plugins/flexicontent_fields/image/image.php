@@ -503,7 +503,10 @@ class plgFlexicontent_fieldsImage extends FCField
 				// Re-init joomla media form field element (J3 only)
 				($image_source === -2 && $use_jformfields && !FLEXI_J40GE ? "newField.find('.field-media-wrapper').fieldMedia();" : '') .
 				// Clear image preview
-				($image_source === -2 && $use_jformfields ? "newField.find('.field-media-wrapper').find('.button-clear').click();" : '')
+				($image_source === -2 && $use_jformfields ? "newField.find('.field-media-wrapper').find('.button-clear').click();" : '') .
+
+				// Re-init any Quantum manager form field element (Quantum manager)
+				($image_source === -2 && $use_jformfields  ? "if (newField.find('.quantummanager') initQuantumuploadimage(newField.get(0));" : '')
 				;
 
 			// Add new element to sortable objects (if field not in group)
