@@ -506,7 +506,7 @@ class plgFlexicontent_fieldsImage extends FCField
 				($image_source === -2 && $use_jformfields ? "newField.find('.field-media-wrapper').find('.button-clear').click();" : '') .
 
 				// Re-init any Quantum manager form field element (Quantum manager)
-				($image_source === -2 && $use_jformfields  ? "if (newField.find('.quantummanager') initQuantumuploadimage(newField.get(0));" : '')
+				($image_source === -2 && $use_jformfields  ? "if (newField.find('.quantummanager')) initQuantumuploadimage(newField.get(0));" : '')
 				;
 
 			// Add new element to sortable objects (if field not in group)
