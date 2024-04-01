@@ -370,7 +370,7 @@ div.comments {
 .news.fc-items-block .fc-item-block-featured-wrapper:hover .fc-item-block-featured-wrapper-innerbox,
 .news.fc-items-block .fc-item-block-standard-wrapper.mod_hl_hover.mod_fc_activeitem:hover .fc-item-block-standard-wrapper-innerbox,
 .news.fc-items-block .fc-item-block-standard-wrapper.mod_hl_hover:hover .fc-item-block-standard-wrapper-innerbox {
-	box-shadow: 0px 0px 20px 0px #000000;
+	box-shadow: 0px 0px 20px 0px rgba(0,0,0,0.5);
 	z-index: 2;
 	-webkit-transition: all 0.4s;
 	transition: all 0.4s;
