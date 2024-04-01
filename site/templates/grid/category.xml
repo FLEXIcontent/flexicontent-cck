@@ -63,7 +63,7 @@
 					<field name="ibox_shadow_blur" type="number" cssprep="less" default="20" label="Shadow blur" description="FLEXI_TMPL_LABEL_RADIUS_DESC" min="0" max="200" step="1" />
 					<field name="ibox_shadow_spread" type="number" cssprep="less" default="0" label="Shadow spread" description="FLEXI_TMPL_LABEL_RADIUS_DESC" min="0" max="200" step="1" />
 					<field name="ibox_shadow_color" type="color" cssprep="less" default="rgba(0,0,0,0.2)" label="FLEXI_TMPL_LABEL_BG" description="FLEXI_TMPL_LABEL_BG_DESC" format="rgba" keywords="transparent,initial,none,none"/>
-					<field name="ibox_shadow_hover" type="number" cssprep="less" default="110" label="Shadow hover effect" description="FLEXI_TMPL_LABEL_RADIUS_DESC" min="0" max="200" step="1" />
+					<field name="ibox_shadow_hover" type="number" cssprep="less" default="50" label="Shadow hover effect" description="FLEXI_TMPL_LABEL_RADIUS_DESC" min="0" max="200" step="1" />
 
 					<field name="readon_styling_grp" type="separator" default="Readon styling" description="" level="level2" />
 					<field name="readon_bg_color" type="color" cssprep="less" default="none" label="FLEXI_TMPL_LABEL_BG" description="FLEXI_TMPL_LABEL_BG_DESC" format="rgba" keywords="transparent,initial,none,none"/>
