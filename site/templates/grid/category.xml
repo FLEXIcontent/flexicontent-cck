@@ -138,6 +138,11 @@
 							<option value="0">Auto-Fit</option>
 							<option value="1">Auto-Fit and Stretch</option>
 						</field>
+						<field name="content_height_fit" type="radio" default="" hint="1" label="Height of content" description="Select yes to fix same height for each content" class="btn-group group-fcinfo">
+							<option value="">FLEXI_USE_GLOBAL</option>
+							<option value="0">Content height</option>
+							<option value="1">Force same height</option>
+						</field>
 	
 					<field name="items_tab_featured_styling" type="separator" default="FLEXI_STYLING" icon_class="icon-palette" level="tab_open" box_type="1" />
 			

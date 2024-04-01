@@ -30,6 +30,7 @@ $display_text 		= $this->params->get('display_text');
 $display_hits			= $this->params->get('display_hits');
 $display_voting		= $this->params->get('display_voting');
 $display_comments	= $this->params->get('display_comments');
+$force_content_height	= $this->params->get('content_height_fit', 0);
 
 // featured
 $display_date_feat		= $this->params->get('display_date_feat');
@@ -305,7 +306,7 @@ if ($leadnum) :
 
 	<!-- BOF DIV featured-block (featured items) -->
 
-	<div class="featured-block news fc-items-block <?php echo $classnum; ?> group row">
+	<div class="featured-block news fc-items-block <?php echo $classnum; ?> group row" >
 
 		<?php
 		if ($lead_use_image && $this->params->get('lead_image'))
@@ -488,7 +489,7 @@ if ($leadnum) :
 			?>
 
 			<!-- BOF item -->	
-			<div class="fc-item-block-featured-wrapper<?php echo $do_hlight_feat; ?><?php echo ' '.$oe_class . ($cols_class_feat ? ' '.$cols_class_feat : ''); ?>"
+			<div class="fc-item-block-featured-wrapper<?php echo $do_hlight_feat; ?><?php echo ' '.$oe_class . ($cols_class_feat ? ' '.$cols_class_feat : ''); ?> <?php echo ($force_content_height == 1) ? 'd-flex' : '' ;?>"
 				<?php echo $microdata_itemtype_code; ?>
 				id="fc_newslist_item_<?php echo $i; ?>"
 			>
@@ -1004,7 +1005,7 @@ if ($count > $leadnum) :
 			?>
 
 			<!-- BOF item -->	
-			<div class="fc-item-block-standard-wrapper<?php echo $do_hlight; ?><?php echo ' '.$oe_class . ($cols_class_std ? ' '.$cols_class_std : ''); ?>"
+			<div class="fc-item-block-standard-wrapper<?php echo $do_hlight; ?><?php echo ' '.$oe_class . ($cols_class_std ? ' '.$cols_class_std : ''); ?> <?php echo ($force_content_height == 1) ? 'd-flex' : '' ;?>"
 				<?php echo $microdata_itemtype_code; ?>
 				id="fc_newslist_item_<?php echo $i; ?>"
 			>
