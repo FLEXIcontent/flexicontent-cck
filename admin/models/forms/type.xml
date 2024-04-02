@@ -417,6 +417,7 @@
 				<option value="0">FLEXI_NONE</option>
 				<option value="1">FLEXI_TYPE_MENU_ITEM_BEFORE_CAT</option>
 				<option value="2">FLEXI_TYPE_MENU_ITEM_AFTER_CAT</option>
+				<option value="3">Currently active menu item</option>
 			</field>
 
 		</fieldset>

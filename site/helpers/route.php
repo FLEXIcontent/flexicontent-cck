@@ -140,30 +140,30 @@ class FlexicontentHelperRoute
 
 		switch ($default_menuitem_preference)
 		{
-		case 1:
-			// Try to use ACTIVE (current) menu item if pointing to Flexicontent, (if so configure in global options)
-			$menu = FlexicontentHelperRoute::_getActiveFlexiMenuitem();
+			case 1:
+				// Try to use ACTIVE (current) menu item if pointing to Flexicontent, (if so configure in global options)
+				$menu = FlexicontentHelperRoute::_getActiveFlexiMenuitem();
 
-			// Check that (a) it exists and is active (b) points to com_flexicontent
-			if ($menu)
-			{
-				// Check language, checking access is not needed as it was done already above, by the \Joomla\CMS\Menu\AbstractMenu::getItem()
-				$item_matches = $current_language === '*' || in_array($menu->language, array('*', $current_language)) || !\Joomla\CMS\Language\Multilanguage::isEnabled();
+				// Check that (a) it exists and is active (b) points to com_flexicontent
+				if ($menu)
+				{
+					// Check language, checking access is not needed as it was done already above, by the \Joomla\CMS\Menu\AbstractMenu::getItem()
+					$item_matches = $current_language === '*' || in_array($menu->language, array('*', $current_language)) || !\Joomla\CMS\Language\Multilanguage::isEnabled();
 
-				// If item matched then set it as default and return it
-				if ($item_matches)  return  $_component_default_menuitem_id = $menu->id;
-			}
+					// If item matched then set it as default and return it
+					if ($item_matches)  return  $_component_default_menuitem_id = $menu->id;
+				}
 			// DO NOT BREAK HERE !! FALLBACK to 2
 
-		case 2:
-			// Try to use (user defined) component's default menu item, (if so configure in global options)
-			$menuitem_id = $params->get('default_menu_itemid', false);
+			case 2:
+				// Try to use (user defined) component's default menu item, (if so configure in global options)
+				$menuitem_id = $params->get('default_menu_itemid', false);
 
-			// Verify the menu item, clearing it if invalid, or setting to its language associated menu item if needed
-			FlexicontentHelperRoute::verifyMenuItem($menuitem_id);
-			$_component_default_menuitem_id = $menuitem_id;
+				// Verify the menu item, clearing it if invalid, or setting to its language associated menu item if needed
+				FlexicontentHelperRoute::verifyMenuItem($menuitem_id);
+				$_component_default_menuitem_id = $menuitem_id;
 
-			return $_component_default_menuitem_id;
+				return $_component_default_menuitem_id;
 		}
 	}
 
@@ -498,11 +498,17 @@ class FlexicontentHelperRoute
 		// ***
 		// *** Finally find the menu item id (best match) to use
 		// ***
+		$active = FlexicontentHelperRoute::_getActiveFlexiMenuitem();
 
 		// USE the itemid provided, if we were given one it means it is "appropriate and relevant"
 		if ($Itemid)
 		{
 			$link .= '&Itemid='.$Itemid;
+		}
+
+		// Case of prefering currently active menu item for this item type
+		elseif ($type && ($type_menu_itemid_usage ?? 0) == 3 && $active) {
+			$link .= '&Itemid='.$active->id;
 		}
 
 		// Try to find the most appropriate/relevant menu item, using the priority set via needles array
