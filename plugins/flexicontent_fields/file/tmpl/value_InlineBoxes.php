@@ -531,10 +531,10 @@ endif;   // END OF   $prop !== 'display_properties_only'
 	$field->{$prop}[$n]	=  $pretext . $html . $posttext;
 
 	// Some extra data for developers: (absolute) file URL and (absolute) file path
-	$field->url[$use_ingroup ? $n : $i] = $dl_link;
-	$field->direct_url[$use_ingroup ? $n : $i] = $file_data->url == 2 ? Uri::root(true) . $file_data->filename : ($file_data->url == 1 ? $file_data->filename : $dl_link);
-	$field->abspath[$use_ingroup ? $n : $i] = $abspath;
-	$field->file_data[$use_ingroup ? $n : $i] = $file_data;
+	$field->url[$is_ingroup ? $n : $i] = $dl_link;
+	$field->direct_url[$is_ingroup ? $n : $i] = $file_data->url == 2 ? Uri::root(true) . $file_data->filename : ($file_data->url == 1 ? $file_data->filename : $dl_link);
+	$field->abspath[$is_ingroup ? $n : $i] = $abspath;
+	$field->file_data[$is_ingroup ? $n : $i] = $file_data;
 
 	// Add microdata to every value if field -- is -- in a field group
 	if ($is_ingroup && $itemprop) $field->{$prop}[$n] = '<div style="display:inline" itemprop="'.$itemprop.'" >' .$field->{$prop}[$n]. '</div>';
