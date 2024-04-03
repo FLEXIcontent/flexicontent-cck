@@ -976,13 +976,13 @@ class plgFlexicontent_fieldsImage extends FCField
 				// Try to check / rebuild thumbnails
 				if (plgFlexicontent_fieldsImage::rebuildThumbs($field, $value, $item))
 				{
-					$usable_values[] = $values[$index];
+					$usable_values[$index] = $values[$index];
 				}
 
 				// In case of failed thumbnailing, add empty value if in fieldgroup
 				else if ($is_ingroup)
 				{
-					$usable_values[] = array('originalname' => null);
+					$usable_values[$index] = array('originalname' => null);
 				}
 			}
 		}
