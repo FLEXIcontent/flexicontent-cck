@@ -1,4 +1,7 @@
 <?php
+
+use Joomla\CMS\Uri\Uri;
+use Joomla\Filesystem\Path;
 use Joomla\String\StringHelper;
 $isAdmin = \Joomla\CMS\Factory::getApplication()->isClient('administrator');
 
@@ -40,13 +43,22 @@ foreach($values as $file_id)
 	// ***
 
 	$basePath = $file_data->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;
-	$abspath = str_replace(DS, '/', \Joomla\CMS\Filesystem\Path::clean($basePath.DS.$file_data->filename));
+	if (!$file_data->url)
+	{
+		$abspath = str_replace(DS, '/', Path::clean($basePath.DS.$file_data->filename));
+	}
+	else
+	{
+		$abspath = $file_data->url == 2
+			? Path::clean(JPATH_ROOT.DS.$file_data->filename)
+			: $file_data->filename;
+	}
 
 	$_size = '-';
 
 	if ($display_size)
 	{
-		if ($file_data->url)
+		if ($file_data->url == 1)
 		{
 			$_size = (int)$file_data->size ? (int)$file_data->size : '-';
 		}
@@ -59,8 +71,8 @@ foreach($values as $file_id)
 		$file_data->size = (int) $_size;
 	}
 
-	// Force new window for URLs that have zero file size
-	$non_file_url = $file_data->url && !$file_data->size;
+	// Force new window for URLs that have zero file's size
+	$non_file_url = $file_data->url == 1 && !$file_data->size;
 
 
 	// ***
@@ -520,6 +532,7 @@ endif;   // END OF   $prop !== 'display_properties_only'
 
 	// Some extra data for developers: (absolute) file URL and (absolute) file path
 	$field->url[$use_ingroup ? $n : $i] = $dl_link;
+	$field->direct_url[$use_ingroup ? $n : $i] = $file_data->url == 2 ? Uri::root(true) . $file_data->filename : ($file_data->url == 1 ? $file_data->filename : $dl_link);
 	$field->abspath[$use_ingroup ? $n : $i] = $abspath;
 	$field->file_data[$use_ingroup ? $n : $i] = $file_data;
 
