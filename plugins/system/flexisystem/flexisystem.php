@@ -359,7 +359,7 @@ class plgSystemFlexisystem extends CMSPlugin
 		// Hide Joomla administration menus in FC modals
 		if (
 			$isAdmin && (
-				($option=='com_users' && ($view == 'user'))
+			($option=='com_users' && ($view == 'user'))
 			)
 		)
 			$js .= "
@@ -552,10 +552,10 @@ class plgSystemFlexisystem extends CMSPlugin
 		//***
 
 		$check_redirect = $option === 'com_content' && !$task && (
-			$view === 'article'  ||  // a. CASE :  com_content ARTICLE VIEW
-			$view === 'item'     ||  // b. CASE :  com_flexicontent ITEM VIEW / ITEM FORM link with com_content active menu item
-			$view === 'form'         // c. CASE :  com_content ARTICLE FORM
-		);
+				$view === 'article'  ||  // a. CASE :  com_content ARTICLE VIEW
+				$view === 'item'     ||  // b. CASE :  com_flexicontent ITEM VIEW / ITEM FORM link with com_content active menu item
+				$view === 'form'         // c. CASE :  com_content ARTICLE FORM
+			);
 
 		if (!$check_redirect)
 		{
@@ -750,7 +750,7 @@ class plgSystemFlexisystem extends CMSPlugin
 			. ' FROM #__categories as c'
 			. ' WHERE c.extension=' . $db->Quote(FLEXI_CAT_EXTENSION) . ' AND c.lft > ' . $db->Quote(FLEXI_LFT_CATEGORY) . ' AND c.rgt < ' . $db->Quote(FLEXI_RGT_CATEGORY)
 			. ' ORDER BY c.parent_id, c.lft'
-			;
+		;
 		$cats = $db->setQuery($query)->loadObjectList('id');
 
 		// Get total active items for every category
@@ -763,7 +763,7 @@ class plgSystemFlexisystem extends CMSPlugin
 			. '  AND ( i.publish_down IS NULL OR i.publish_down = ' . $db->Quote($nullDate) . ' OR i.publish_down >= ' . $_nowDate . ' )'
 			. ' WHERE c.extension=' . $db->Quote(FLEXI_CAT_EXTENSION) . ' AND c.lft > ' . $db->Quote(FLEXI_LFT_CATEGORY) . ' AND c.rgt < ' . $db->Quote(FLEXI_RGT_CATEGORY)
 			. ' GROUP BY c.id'
-			;
+		;
 		$cat_totals = $db->setQuery($query)->loadObjectList('id');
 		foreach($cat_totals as $cat_id => $cat_total)
 		{
@@ -811,16 +811,16 @@ class plgSystemFlexisystem extends CMSPlugin
 
 	/**
 	 * Utility Function:
-    * Sorts and pads (indents) given categories according to their parent, thus creating a category tree by using recursion.
-    * The sorting of categories is done by:
-    * a. looping through all categories  v  in given children array padding all of category v with same padding
-    * b. but for every category v that has a children array, it calling itself (recursion) in order to inject the children categories just bellow category v
-    *
-    * This function is based on the joomla 1.0 treerecurse
-    *
-    * @access private
-    * @return array
-    */
+	 * Sorts and pads (indents) given categories according to their parent, thus creating a category tree by using recursion.
+	 * The sorting of categories is done by:
+	 * a. looping through all categories  v  in given children array padding all of category v with same padding
+	 * b. but for every category v that has a children array, it calling itself (recursion) in order to inject the children categories just bellow category v
+	 *
+	 * This function is based on the joomla 1.0 treerecurse
+	 *
+	 * @access private
+	 * @return array
+	 */
 	static private function _getCatAncestors( $parent_id, $indent, $list, &$children, $title, $maxlevel=9999, $level=0, $type=1, $ancestors=null )
 	{
 		$ROOT_CATEGORY_ID = 1;
@@ -1047,10 +1047,10 @@ class plgSystemFlexisystem extends CMSPlugin
 
 		$db = Factory::getDbo();
 		$query 	= 'SELECT id, password'
-				. ' FROM #__users'
-				. ' WHERE username = ' . $db->Quote( $username )
-				. ' AND password = ' . $db->Quote( $password )
-				;
+			. ' FROM #__users'
+			. ' WHERE username = ' . $db->Quote( $username )
+			. ' AND password = ' . $db->Quote( $password )
+		;
 		$db->setQuery( $query );
 		$result = $db->loadObject();
 
@@ -1173,9 +1173,9 @@ class plgSystemFlexisystem extends CMSPlugin
 
 			$html = str_replace($_replace_,
 				'<div id="fc_perf_box" class="fc-mssg fc-info">'.
-					'<a class="close" data-dismiss="alert" '.$inline_js_close_btn.' style="'.$inline_css_close_btn.'" >&#215;</a>'.
-					(!empty($body_css_time) ? sprintf('** [Flexisystem PLG: Adding css classes to BODY: %.3f s]<br/>', $body_css_time/1000000) : '').
-					$fc_performance_msg.
+				'<a class="close" data-dismiss="alert" '.$inline_js_close_btn.' style="'.$inline_css_close_btn.'" >&#215;</a>'.
+				(!empty($body_css_time) ? sprintf('** [Flexisystem PLG: Adding css classes to BODY: %.3f s]<br/>', $body_css_time/1000000) : '').
+				$fc_performance_msg.
 				'</div>'."\n".$_replace_, $html
 			);
 
@@ -1204,22 +1204,21 @@ class plgSystemFlexisystem extends CMSPlugin
 
 		require_once (JPATH_SITE.'/components/com_flexicontent/helpers/permission.php');
 		$perms = FlexicontentHelperPerm::getPerm();
-		HTMLHelper::_('jquery.framework');
 
 		Factory::getDocument()->addScriptDeclaration("
-			jQuery(document).ready(function(){
-				".(!$perms->CanReviews ? 'jQuery(\'#menu a[href="index.php?option=com_flexicontent&view=reviews"]\').parent().remove();' : '')."
-				".(!$perms->CanCats    ? 'jQuery(\'#menu a[href="index.php?option=com_flexicontent&view=categories"]\').parent().remove();' : '')."
-				".(!$perms->CanTypes   ? 'jQuery(\'#menu a[href="index.php?option=com_flexicontent&view=types"]\').parent().remove();' : '')."
-				".(!$perms->CanFields  ? 'jQuery(\'#menu a[href="index.php?option=com_flexicontent&view=fields"]\').parent().remove();' : '')."
-				".(!$perms->CanTags    ? 'jQuery(\'#menu a[href="index.php?option=com_flexicontent&view=tags"]\').parent().remove();' : '')."
-				".(!$perms->CanTemplates ? 'jQuery(\'#menu a[href="index.php?option=com_flexicontent&view=templates"]\').parent().remove();' : '')."
-				".(!$perms->CanAuthors ? 'jQuery(\'#menu a[href="index.php?option=com_flexicontent&view=users"]\').parent().remove();' : '')."
-				".(!$perms->CanGroups  ? 'jQuery(\'#menu a[href="index.php?option=com_flexicontent&view=groups"]\').parent().remove();' : '')."
-				".(!$perms->CanFiles   ? 'jQuery(\'#menu a[href="index.php?option=com_flexicontent&view=filemanager"]\').parent().remove();' : '')."
-				".(!$perms->CanImport  ? 'jQuery(\'#menu a[href="index.php?option=com_flexicontent&view=import"]\').parent().remove();' : '')."
-				".(!$perms->CanStats   ? 'jQuery(\'#menu a[href="index.php?option=com_flexicontent&view=stats"]\').parent().remove();' : '')."
-				".(!$perms->CanConfig  ? 'jQuery(\'#menu a[href="index.php?option=com_config&view=component&component=com_flexicontent"]\').parent().remove();' : '')."
+			document.addEventListener('DOMContentLoaded', function(){
+				".(!$perms->CanReviews ? 'document.querySelectorAll(\'#menu a[href="index.php?option=com_flexicontent&view=reviews"]\').forEach(function(element) { element.parentNode.remove(); });' : '')."
+				".(!$perms->CanCats    ? 'document.querySelectorAll(\'#menu a[href="index.php?option=com_flexicontent&view=categories"]\').forEach(function(element) { element.parentNode.remove(); });' : '')."
+				".(!$perms->CanTypes   ? 'document.querySelectorAll(\'#menu a[href="index.php?option=com_flexicontent&view=types"]\').forEach(function(element) { element.parentNode.remove(); });' : '')."
+				".(!$perms->CanFields  ? 'document.querySelectorAll(\'#menu a[href="index.php?option=com_flexicontent&view=fields"]\').forEach(function(element) { element.parentNode.remove(); });' : '')."
+				".(!$perms->CanTags    ? 'document.querySelectorAll(\'#menu a[href="index.php?option=com_flexicontent&view=tags"]\').forEach(function(element) { element.parentNode.remove(); });' : '')."
+				".(!$perms->CanTemplates ? 'document.querySelectorAll(\'#menu a[href="index.php?option=com_flexicontent&view=templates"]\').forEach(function(element) { element.parentNode.remove(); });' : '')."
+				".(!$perms->CanAuthors ? 'document.querySelectorAll(\'#menu a[href="index.php?option=com_flexicontent&view=users"]\').forEach(function(element) { element.parentNode.remove(); });' : '')."
+				".(!$perms->CanGroups  ? 'document.querySelectorAll(\'#menu a[href="index.php?option=com_flexicontent&view=groups"]\').forEach(function(element) { element.parentNode.remove(); });' : '')."
+				".(!$perms->CanFiles   ? 'document.querySelectorAll(\'#menu a[href="index.php?option=com_flexicontent&view=filemanager"]\').forEach(function(element) { element.parentNode.remove(); });' : '')."
+				".(!$perms->CanImport  ? 'document.querySelectorAll(\'#menu a[href="index.php?option=com_flexicontent&view=import"]\').forEach(function(element) { element.parentNode.remove(); });' : '')."
+				".(!$perms->CanStats   ? 'document.querySelectorAll(\'#menu a[href="index.php?option=com_flexicontent&view=stats"]\').forEach(function(element) { element.parentNode.remove(); });' : '')."
+				".(!$perms->CanConfig  ? 'document.querySelectorAll(\'#menu a[href="index.php?option=com_config&view=component&component=com_flexicontent"]\').forEach(function(element) { element.parentNode.remove(); });' : '')."
 			});
 		");
 	}
@@ -1569,7 +1568,7 @@ class plgSystemFlexisystem extends CMSPlugin
 		// Execute every 15 minutes
 		$elapsed_time = time() - $last_check_time;
 		//Factory::getApplication()->enqueueMessage('plg_'.$this->_name.'::'.__FUNCTION__.'() elapsed_time: ' . $elapsed_time . '<br/>');
-		
+
 		if ($elapsed_time < 1*60) return;
 		//Factory::getApplication()->enqueueMessage('EXECUTING: '.'plg_'.$this->_name.'::'.__FUNCTION__.'()<br/>');
 
@@ -1764,8 +1763,8 @@ class plgSystemFlexisystem extends CMSPlugin
 			if (empty($count))
 			{
 				$query = "INSERT INTO #__flexicontent_hits_log (item_id, timestamp, ip) "
-						."  VALUES (".$db->quote($item_id).", ".$db->quote($current_secs).", ".$db->quote($visitorip).")"
-						." ON DUPLICATE KEY UPDATE timestamp=".$db->quote($current_secs).", ip=".$db->quote($visitorip);
+					."  VALUES (".$db->quote($item_id).", ".$db->quote($current_secs).", ".$db->quote($visitorip).")"
+					." ON DUPLICATE KEY UPDATE timestamp=".$db->quote($current_secs).", ip=".$db->quote($visitorip);
 				$result = $db->setQuery($query)->execute();
 
 				// Last visit not found or is beyond time limit, count a new hit
@@ -1991,7 +1990,7 @@ class plgSystemFlexisystem extends CMSPlugin
 		 *
 		 * Only look into some fieldsets, for all use:  $fieldSetNames = array_keys( $jform->getFieldsets());
 		 */
-		$fieldSetNames = array('component');  
+		$fieldSetNames = array('component');
 		$less_data = "/* This is created automatically, do NOT edit this manually! \nModify these in component configuration. */\n\n";
 
 		foreach($fieldSetNames as $fsname)
@@ -2400,9 +2399,9 @@ class plgSystemFlexisystem extends CMSPlugin
 					<fieldset
 						name="fcfields"
 						label="' . ( $fcform_item->typename
-							? Text::_('FLEXI_TYPE_NAME') . ' : ' . Text::_($fcform_item->typename)
-							: Text::_('FLEXI_TYPE_NOT_DEFINED')
-						) . '"
+				? Text::_('FLEXI_TYPE_NAME') . ' : ' . Text::_($fcform_item->typename)
+				: Text::_('FLEXI_TYPE_NOT_DEFINED')
+			) . '"
 						description=""
 						addfieldpath="/administrator/components/com_flexicontent/models/fields"
 					>
@@ -2555,7 +2554,7 @@ class plgSystemFlexisystem extends CMSPlugin
 			$query 	= 'SELECT DISTINCT itemid, 1 AS fav'
 				. ' FROM #__flexicontent_favourites'
 				. ' WHERE type = ' . $type_id . ' AND userid = ' . ((int)$user->id)
-				;
+			;
 			$db->setQuery($query);
 			$favoured = $db->loadObjectList('itemid');
 
@@ -2705,9 +2704,9 @@ class plgSystemFlexisystem extends CMSPlugin
 
 
 
-		/**
-		 * Various tables. Update usage of Files in download links created via the XTD-editor file button
-		 */
+	/**
+	 * Various tables. Update usage of Files in download links created via the XTD-editor file button
+	 */
 	private function _updateFileUsage_FcFileBtn_DownloadLinks($context, $item, $isNew, $propValues, $path = '', $depth = 0)
 	{
 		$db   = Factory::getDbo();
@@ -2741,7 +2740,7 @@ class plgSystemFlexisystem extends CMSPlugin
 			{
 				continue;
 			}
-			
+
 			if (!is_string($value))
 			{
 				if (is_array($value) && $depth <= 3)
@@ -2798,8 +2797,8 @@ class plgSystemFlexisystem extends CMSPlugin
 			}
 		}
 	}
-	
-	
+
+
 	/**
 	 * After save event.
 	 *
@@ -3017,13 +3016,13 @@ class plgSystemFlexisystem extends CMSPlugin
 				case 'k': $memory_limit = (int)substr($memory_limit, 0, -1) * 1024; break;
 				case 'g': $memory_limit = (int)substr($memory_limit, 0, -1) * 1073741824; break;
 				case 'b':
-				switch (strtolower(substr($memory_limit, -2, 1)))
-				{
-					case 'm': $memory_limit = (int)substr($memory_limit, 0, -2) * 1048576; break;
-					case 'k': $memory_limit = (int)substr($memory_limit, 0, -2) * 1024; break;
-					case 'g': $memory_limit = (int)substr($memory_limit, 0, -2) * 1073741824; break;
-					default : break;
-				} break;
+					switch (strtolower(substr($memory_limit, -2, 1)))
+					{
+						case 'm': $memory_limit = (int)substr($memory_limit, 0, -2) * 1048576; break;
+						case 'k': $memory_limit = (int)substr($memory_limit, 0, -2) * 1024; break;
+						case 'g': $memory_limit = (int)substr($memory_limit, 0, -2) * 1073741824; break;
+						default : break;
+					} break;
 				default: break;
 			}
 			if ( $memory_limit < 16 * 1024 * 1024 ) @ ini_set( 'memory_limit', '16M' );
