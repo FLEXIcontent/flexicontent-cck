@@ -49,7 +49,10 @@ abstract class JHtmlFcitems extends JHtmlFcbase
 
 		return !$allow_jview
 			? FlexicontentHelperRoute::getItemRoute($row->id . ':' . $row->alias, $row->categoryslug, 0, $row)
-			: ContentRouteHelper::getArticleRoute($row->id . ':' . $row->alias, $row->categoryslug, $row->language);
+			: (version_compare(JVERSION, '4.0', 'lt')
+				? ContentHelperRoute::getArticleRoute($row->id . ':' . $row->alias, $row->catid, $row->language)
+				: ContentRouteHelper::getArticleRoute($row->id . ':' . $row->alias, $row->catid, $row->language)
+			);
 	}
 
 
