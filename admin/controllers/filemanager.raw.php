@@ -243,7 +243,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		// Get models
 		$model        = $this->getModel($this->record_name_pl);
 		$record_model = $this->getModel($this->record_name);
-		
+
 		// Get mediafile fields
 		$media_fields = FlexicontentFields::getFieldsByType(array('mediafile'));
 		$_item = null;
@@ -328,6 +328,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 					$full_path     = $path . DS . $file->filename;
 					$full_path_prw = $path . DS . 'audio_preview' . DS . $_name . '.mp3';
 					$file->size    = file_exists($full_path) ? filesize($full_path) : 0;
+					$size_index[] = ' WHEN ' . $file->id . ' THEN ' . $file->size;
 
 					if (!file_exists($full_path))
 					{
@@ -352,10 +353,10 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 						}
 
 						$file->size = $filesize < 0 ? 0 : $filesize;
+						$size_index[] = ' WHEN ' . $file->id . ' THEN ' . $file->size;
 					}
 				}
 
-				$size_index[] = ' WHEN ' . $file->id . ' THEN ' . $file->size;
 
 				// Recalculate JSON peaks files
 				if ($file->url != 1 || file_exists($full_path_prw))
@@ -375,7 +376,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 								if (!$model->createAudioPreview($media_field, $file, $loggers['mediadata']))
 								{
-									$mediadata_err_count++; 
+									$mediadata_err_count++;
 								}
 								$mediadata_file_count++;
 							}
@@ -471,7 +472,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 				}
 				catch (RuntimeException $e)
 				{
-					jexit('fail | ' . $e->getMessage());
+					jexit('fail | ' . $e->getMessage()); // . ' <br> ' . $query);
 				}
 			}
 
