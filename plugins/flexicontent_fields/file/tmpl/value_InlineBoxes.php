@@ -286,9 +286,12 @@ foreach($values as $file_id)
 /**
  * ****** SKIP THIS PART IF display_properties_only
  */
-if ($prop !== 'display_properties_only') :
+$is_csv_export = $prop === 'csv_export';
 
-
+if ($is_csv_export) {
+	$html .= $abspath;
+}
+else if ($prop !== 'display_properties_only') :
 
 	// [0]: filename (if visible)
 	if ((($filename_shown && !$filename_shown_as_link) || $not_downloadable) && $display_filename != -1)
@@ -528,7 +531,9 @@ endif;   // END OF   $prop !== 'display_properties_only'
 
 
 	// Values Prefix and Suffix Texts
-	$field->{$prop}[$n]	=  $pretext . $html . $posttext;
+	$field->{$prop}[$n]	=  !$is_csv_export
+		? $pretext . $html . $posttext
+		: $html;
 
 	// Some extra data for developers: (absolute) file URL and (absolute) file path
 	$field->url[$use_ingroup ? $n : $i] = $dl_link;

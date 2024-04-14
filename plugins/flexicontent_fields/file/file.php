@@ -1117,7 +1117,8 @@ class plgFlexicontent_fieldsFile extends FCField
 				}
 			}
 
-			if ($values_list_placement)
+			$is_csv_export = $prop == 'csv_export';
+			if ($values_list_placement && !$is_csv_export)
 			{
 				$ff_slider_tagid = 'fcfile_slider_' . $item->id . '_' . $field->id;
 				$ff_slider_title = \Joomla\CMS\Language\Text::_($values_slider_title);
