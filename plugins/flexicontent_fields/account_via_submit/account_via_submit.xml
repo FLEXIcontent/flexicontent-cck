@@ -105,7 +105,7 @@
 				<option value="0" hide_list="create_acc" show_list="">FLEXI_NO</option>
 				<option value="1" hide_list="" show_list="create_acc">FLEXI_YES</option>
 			</field>
-			<field name="new_usertype" type="usergroup" default="" label="COM_USERS_CONFIG_FIELD_NEW_USER_TYPE_LABEL" description="COM_USERS_CONFIG_FIELD_NEW_USER_TYPE_DESC" depend_class="create_acc" >
+			<field name="new_usertype" type="usergrouplist"  layout="joomla.form.field.list-fancy-select" default="" label="COM_USERS_CONFIG_FIELD_NEW_USER_TYPE_LABEL" description="COM_USERS_CONFIG_FIELD_NEW_USER_TYPE_DESC" depend_class="create_acc" >
 				<option value="">FLEXI_JOOMLA_DEFAULT</option>
 			</field>
 			<field name="useractivation" type="list" default="" label="COM_USERS_CONFIG_FIELD_USERACTIVATION_LABEL" description="COM_USERS_CONFIG_FIELD_USERACTIVATION_DESC" depend_class="create_acc" >
