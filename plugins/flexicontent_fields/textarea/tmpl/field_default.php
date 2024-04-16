@@ -19,7 +19,7 @@ foreach ($field->value as $i => $value)
       return;
     }
   }
-  if ( !strlen($value) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not in field group
+  if (!strlen($value ?? '') && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not in field group
 
   $fieldname_n = $field->field_type == 'maintext' ? $fieldname : $fieldname.'['.$n.']';
   $elementid_n = $field->field_type == 'maintext' ? $elementid : $elementid.'_'.$n;

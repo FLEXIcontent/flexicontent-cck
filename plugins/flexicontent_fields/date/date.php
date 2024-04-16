@@ -425,7 +425,8 @@ class plgFlexicontent_fieldsDate extends FCField
 
 		foreach ($field->value as $value)
 		{
-			if ( !strlen($value) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not in field group
+			$value = $value ?? ''; // value maybe null
+		if (!strlen($value) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not inside a field group
 
 			$fieldname_n = $fieldname.'['.$n.']';
 			$elementid_n = $elementid.'_'.$n;
