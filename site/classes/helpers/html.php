@@ -2219,7 +2219,7 @@ class flexicontent_html
 		);
 
 		// Convert html entities to characters so that they will not be removed ... by strip_tags
-		$cleantext = html_entity_decode ($text, ENT_NOQUOTES, 'UTF-8');
+		$cleantext = html_entity_decode ($text ?? '', ENT_NOQUOTES, 'UTF-8');
 
 		// Add whitespaces at start/end of tags so that words will not be joined,
 		//$cleantext = preg_replace('/(<\/[^>]+>((?!\P{L})|(?=[0-9])))|(<[^>\/][^>]*>)/u', ' $1', $cleantext);
