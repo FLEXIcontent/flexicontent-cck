@@ -371,15 +371,14 @@ class FlexicontentViewItems extends \Joomla\CMS\MVC\View\HtmlView
 							{
 								$v[$k] = is_string($v2) ? $v2 : json_encode($v2);
 							}
-							$_vals[] = implode(' | ', $v);
+							$_vals[] = implode($cparams->get('csv_export_field_mprop_sep', '!!'), $v);
 						}
 						$vals = $_vals;
 					}
-
-					echo $this->_encodeCSVField( is_array($vals) ? implode(', ', $vals ) : $vals );
+					echo $this->_encodeCSVField( is_array($vals) ? implode($cparams->get('csv_export_field_multivalue_sep', '%%'), $vals ) : $vals );
 				}
 
-				echo "\n";
+				echo $cparams->get('csv_export_item_record_sep', '\n');
 			}
 
 			/**

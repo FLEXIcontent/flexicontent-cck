@@ -1998,10 +1998,19 @@
 				<option value="1">Field Label</option>
 				<option value="2">Field name</option>
 			</field>
+
+
+			<field name="" type="separator" default="FLEXI_IMPORT_CSV_FILE_FORMAT" label="" level="level1" />
 			<field name="csv_export_field_sep" type="text" default="," label="Field (Column) separator" description="" />
+			<field name="csv_export_item_record_sep" type="text" default="\n" size="12" label="FLEXI_CSV_ITEM_SEPARATOR" description="FLEXI_CSV_ITEM_SEPARATOR_DESC"/>
 			<field name="__exported_fields" type="list" default="0" label="Exported fields" description="">
 				<option value="0">Enable this inside every field</option>
 			</field>
+
+
+			<field name="" type="separator" default="FLEXI_IMPORT_MVAL_MPROP_FIELDS" label="" level="level2" />
+			<field name="csv_export_field_multivalue_sep" type="text" default="%%" label="Multivalue separator" description="By defaut %%" />
+			<field name="csv_export_field_mprop_sep" type="text" default="!!" size="12" label="FLEXI_CSV_MPROP_SEPARATOR" description="FLEXI_CSV_MPROP_SEPARATOR_DESC"/>
 
 	</fieldset>
 

@@ -952,7 +952,8 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		// CSV export: Create customized output and return
 		if ($prop === 'csv_export')
 		{
-			$separatorf = ' | ';
+			$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
+			$separatorf = $cparams->get('csv_export_field_mprop_sep', '!!');
 			$itemprop = false;
 
 			$csv_export_text = $field->parameters->get('csv_export_text', '{{title}} {{link}}');
