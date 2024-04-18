@@ -313,8 +313,8 @@ class plgFlexicontent_fieldsImage extends FCField
 		// URL for modal fileselement view
 		$filesElementURL =
 			\Joomla\CMS\Uri\Uri::base(true).'/index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;layout=image'
-				.'&amp;field='.$field->id.'&amp;u_item_id='.$u_item_id.'&amp;targetid=%s_existingname&amp;thumb_w='.$preview_thumb_w.'&amp;thumb_h='.$preview_thumb_h.'&amp;autoassign='.$autoassign
-				.'&amp;'.\Joomla\CMS\Session\Session::getFormToken().'=1';
+			.'&amp;field='.$field->id.'&amp;u_item_id='.$u_item_id.'&amp;targetid=%s_existingname&amp;thumb_w='.$preview_thumb_w.'&amp;thumb_h='.$preview_thumb_h.'&amp;autoassign='.$autoassign
+			.'&amp;'.\Joomla\CMS\Session\Session::getFormToken().'=1';
 
 		$js = '
 		var fc_field_dialog_handle_'.$field->id.';
@@ -503,11 +503,19 @@ class plgFlexicontent_fieldsImage extends FCField
 				// Re-init joomla media form field element (J3 only)
 				($image_source === -2 && $use_jformfields && !FLEXI_J40GE ? "newField.find('.field-media-wrapper').fieldMedia();" : '') .
 				// Clear image preview
-				($image_source === -2 && $use_jformfields ? "newField.find('.field-media-wrapper').find('.button-clear').click();" : '') .
+				($image_source === -2 && $use_jformfields ? "
+					newField.find('.field-media-wrapper').find('.button-clear').click();
+
+					newField.find('input.quantumuploadimage-input').val('');
+					newField.find('input.quantumuploadimage-input').attr('name','".$fieldname."['+uniqueRowN+'][existingname]');
+					newField.find('input.quantumuploadimage-input').attr('id', element_id + '_existingname');
+
+					setTimeout(function() { newField.find('.quantumuploadimage-delete').click(); }, 500);
+					" : '') .
 
 				// Re-init any Quantum manager form field element (Quantum manager)
 				($image_source === -2 && $use_jformfields  ? "if (newField.find('.quantummanager')) initQuantumuploadimage(newField.get(0));" : '')
-				;
+			;
 
 			// Add new element to sortable objects (if field not in group)
 			if ($add_ctrl_btns) $js .= "
@@ -523,10 +531,10 @@ class plgFlexicontent_fieldsImage extends FCField
 				// Set tooltip data placeholders
 				var _name = '_existingname';
 				newField.find('.media-preview').html('<span class=\"hasTipPreview\" title=\"&lt;strong&gt;" . \Joomla\CMS\Language\Text::_('JLIB_FORM_MEDIA_PREVIEW_SELECTED_IMAGE', true)
-					. "&lt;/strong&gt;&lt;br /&gt;&lt;span style=&quot;display: block;&quot; id=&quot;' + element_id + _name + '_preview_empty&quot; style=&quot;display:none&quot;&gt;" . \Joomla\CMS\Language\Text::_('JLIB_FORM_MEDIA_PREVIEW_EMPTY', true)
-					. "&lt;/span&gt;&lt;span style=&quot;display: block;&quot; id=&quot;' + element_id + _name + '_preview_img&quot;&gt;&lt;img src=&quot;&quot; alt=&quot;" . \Joomla\CMS\Language\Text::_('JLIB_FORM_MEDIA_PREVIEW_SELECTED_IMAGE', true)
-					. "&quot; id=&quot;' + element_id + _name + '_preview&quot; class=&quot;media-preview&quot; style=&quot; style=&quot;max-width:480px; max-height:360&quot; &quot; /&gt;&lt;/span&gt;\"><span class=\"icon-eye\" aria-hidden=\"true\"></span><span class=\"icon-image\" aria-hidden=\"true\"></span> "
-					. "</span>');
+				. "&lt;/strong&gt;&lt;br /&gt;&lt;span style=&quot;display: block;&quot; id=&quot;' + element_id + _name + '_preview_empty&quot; style=&quot;display:none&quot;&gt;" . \Joomla\CMS\Language\Text::_('JLIB_FORM_MEDIA_PREVIEW_EMPTY', true)
+				. "&lt;/span&gt;&lt;span style=&quot;display: block;&quot; id=&quot;' + element_id + _name + '_preview_img&quot;&gt;&lt;img src=&quot;&quot; alt=&quot;" . \Joomla\CMS\Language\Text::_('JLIB_FORM_MEDIA_PREVIEW_SELECTED_IMAGE', true)
+				. "&quot; id=&quot;' + element_id + _name + '_preview&quot; class=&quot;media-preview&quot; style=&quot; style=&quot;max-width:480px; max-height:360&quot; &quot; /&gt;&lt;/span&gt;\"><span class=\"icon-eye\" aria-hidden=\"true\"></span><span class=\"icon-image\" aria-hidden=\"true\"></span> "
+				. "</span>');
 
 				// Enable tooltips on new element
 				newField.find('.hasTooltip').tooltip({html: true, container: newField});
@@ -705,7 +713,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		{
 			$field->html = !count($field->html) ? '' :
 				'<li class="' . $value_classes_multiple . '">'.
-					implode('</li><li class="' . $value_classes_multiple . '">', $field->html).
+				implode('</li><li class="' . $value_classes_multiple . '">', $field->html).
 				'</li>';
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
 			if (!$add_position) $field->html .= '
@@ -722,7 +730,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			// Because of JS seeking the parent containers, use UL/LI instead of DIV
 			$field->html = !count($field->html) ? '' :
 				'<li class="' . $value_classes_single . '">'.
-					implode('</li><li class="' . $value_classes_single . '">', $field->html).
+				implode('</li><li class="' . $value_classes_single . '">', $field->html).
 				'</li>';
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
 		}
@@ -1751,9 +1759,9 @@ class plgFlexicontent_fieldsImage extends FCField
 		$post = $newpost;
 
 
-    // Remove no longer used files, if limiting existing image list to current field, or if existing image list is hidden/disabled
-    if ($image_source === 0 && ($field->parameters->get('auto_delete_unused', 1) || !$field->parameters->get('list_all_media_files', 0)))
-    {
+		// Remove no longer used files, if limiting existing image list to current field, or if existing image list is hidden/disabled
+		if ($image_source === 0 && ($field->parameters->get('auto_delete_unused', 1) || !$field->parameters->get('list_all_media_files', 0)))
+		{
 			// Get existing field values,
 			if (!isset($item->fieldvalues))
 			{
@@ -2583,17 +2591,17 @@ class plgFlexicontent_fieldsImage extends FCField
 
 			// Check if size of file is not same as parameters and recreate the thumbnail
 			if (
-					!$thumbnail_exists ||
-					( $crop==0 && (
-													(abs($filesize_w - $check_w)>1 ) &&  // scale width can be larger than it is currently
-													(abs($filesize_h - $check_h)>1 )     // scale height can be larger than it is currently
-												)
-					) ||
-					( $crop==1 && (
-													($param_w <= $origsize_w && abs($filesize_w - $param_w)>1 ) ||  // crop width can be smaller than it is currently
-													($param_h <= $origsize_h && abs($filesize_h - $param_h)>1 )     // crop height can be smaller than it is currently
-												)
+				!$thumbnail_exists ||
+				( $crop==0 && (
+						(abs($filesize_w - $check_w)>1 ) &&  // scale width can be larger than it is currently
+						(abs($filesize_h - $check_h)>1 )     // scale height can be larger than it is currently
 					)
+				) ||
+				( $crop==1 && (
+						($param_w <= $origsize_w && abs($filesize_w - $param_w)>1 ) ||  // crop width can be smaller than it is currently
+						($param_h <= $origsize_h && abs($filesize_h - $param_h)>1 )     // crop height can be smaller than it is currently
+					)
+				)
 			)
 			{
 				/*if (\Joomla\CMS\Factory::getUser()->authorise('core.admin', 'root.1'))
@@ -2625,7 +2633,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		$query = 'SELECT id'
 			. ' FROM #__flexicontent_files'
 			. ' WHERE filename='. $db->Quote($record)
-			;
+		;
 		$db->setQuery($query);
 		$file_id = $db->loadResult();
 		if (!$file_id)  return true;
@@ -2647,9 +2655,9 @@ class plgFlexicontent_fieldsImage extends FCField
 	{
 		$db = \Joomla\CMS\Factory::getDbo();
 		$query = 'SELECT value, item_id'
-				. ' FROM #__flexicontent_fields_item_relations'
-				. ' WHERE field_id = '. (int) $field->id
-				;
+			. ' FROM #__flexicontent_fields_item_relations'
+			. ' WHERE field_id = '. (int) $field->id
+		;
 		$db->setQuery($query);
 		$db_data = $db->loadObjectList();
 
@@ -2763,10 +2771,10 @@ class plgFlexicontent_fieldsImage extends FCField
 			// Only query files that are not already cached
 			$db = \Joomla\CMS\Factory::getDbo();
 			$query = 'SELECT * '. $extra_select //filename, filename_original, altname, description, ext, id'
-					. ' FROM #__flexicontent_files'
-					. ' WHERE id IN ('. implode(',', $new_ids) . ')'
-					. ($published ? '  AND published = 1' : '')
-					;
+				. ' FROM #__flexicontent_files'
+				. ' WHERE id IN ('. implode(',', $new_ids) . ')'
+				. ($published ? '  AND published = 1' : '')
+			;
 			$db->setQuery($query);
 			$new_data = $db->loadObjectList('id');
 
@@ -2912,14 +2920,14 @@ class plgFlexicontent_fieldsImage extends FCField
 		$protect_original = $field->parameters->get('protect_original', 1);
 		$htaccess_file = \Joomla\CMS\Filesystem\Path::clean( $src_path . '.htaccess' );
 		$file_contents = $protect_original
-		?
+			?
 			'# do not allow direct access and also deny scripts'."\n".
 			'<FilesMatch ".*">'."\n".
 			'  Order Allow,Deny'."\n".
 			'  Deny from all'."\n".
 			'</FilesMatch>'."\n".
 			'OPTIONS -Indexes -ExecCGI'."\n"
-		:
+			:
 			'# allow direct access but deny script'."\n".
 			'<FilesMatch ".*">'."\n".
 			'  Order Allow,Deny'."\n".
