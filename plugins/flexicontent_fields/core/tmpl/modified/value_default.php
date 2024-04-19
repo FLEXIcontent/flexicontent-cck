@@ -1,8 +1,15 @@
 <?php
+
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Language\Text;
+
 // Add prefix / suffix
 $field->{$prop} =
 	$pretext
-		. \Joomla\CMS\HTML\HTMLHelper::_( 'date', $item->modified, $dateformat ) .
+		. (!$item->modified
+			? Text::_('FLEXI_NEVER')
+			: HTMLHelper::_('date', $item->modified, $dateformat)
+	) .
 	$posttext;
 
 // Add microdata property
