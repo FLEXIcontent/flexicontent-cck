@@ -1120,7 +1120,7 @@
 
 		// Setup Keyboard Navigation
 		if (this.enableKeyboardNavigation) {
-			$(document).keydown(function(e) {
+			$(gallery).keydown(function(e) {
 				var key = e.charCode ? e.charCode : e.keyCode ? e.keyCode : 0;
 				switch(key) {
 					case 32: // space
