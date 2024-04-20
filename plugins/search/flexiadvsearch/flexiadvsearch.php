@@ -847,7 +847,7 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 				)
 			. ', CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug'
 			. ', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
-			. ', CONCAT_WS( " / ", '. $db->Quote($searchFlexicontent) .', c.title, i.title ) AS section'
+			. ', CONCAT_WS( " / ", c.title, i.title ) AS section'
 			. $select_access
 			. ' FROM #__flexicontent_items_tmp AS i'
 			. $join_clauses     // without on-join for basic text search

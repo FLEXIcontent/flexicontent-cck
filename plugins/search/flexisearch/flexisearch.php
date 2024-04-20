@@ -316,7 +316,7 @@ class plgSearchFlexisearch extends \Joomla\CMS\Plugin\CMSPlugin
 				.' fir.value as field,'
 				.' i.access, ie.type_id,'
 				.' CONCAT(i.introtext, i.fulltext) AS text,'
-				.' CONCAT_WS( " / ", '. $db->Quote( \Joomla\CMS\Language\Text::_( 'FLEXICONTENT' ) ) .', c.title, i.title ) AS section,'
+				.' CONCAT_WS( " / ", c.title, i.title ) AS section,'
 				.' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END AS slug,'
 				.' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END AS catslug,'
 				.' "2" AS browsernav'
