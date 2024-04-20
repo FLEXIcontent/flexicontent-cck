@@ -61,7 +61,7 @@ if ($fcr_use_image && $fcr_image) {
 // Get custom displayed fields to add to each FLEXIcontent result item
 // *******************************************************************
 $use_infoflds = (int)$this->params->get('use_infoflds', 1);
-$infoflds = $this->params->get('infoflds');
+$infoflds = $this->params->get('infoflds', '');
 $infoflds = preg_replace("/[\"'\\\]/u", "", $infoflds);
 $infoflds = preg_split("/\s*,\s*/u", $infoflds);
 if ( !strlen($infoflds[0]) ) unset($infoflds[0]);
