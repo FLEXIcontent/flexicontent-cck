@@ -82,6 +82,8 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 		$searchphrase   = $state->get('match');
 		$searchordering = $state->get('ordering');
 
+		$selectors_display_as = $params->get('selectors_display_as', 'select');
+
 
 		/**
 		 * Some parameter shortcuts common among search view and advanced search plugin
@@ -508,8 +510,7 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 			$attrs['data-placeholder']    = htmlspecialchars(Text::_('FLEXI_CLICK_TO_LIST', ENT_QUOTES, 'UTF-8'));
 			$attrs['data-fc_prompt_text'] = htmlspecialchars(Text::_('FLEXI_TYPE_TO_FILTER', ENT_QUOTES, 'UTF-8'));
 
-			$contenttypes_display_as = $params->get('contenttypes_display_as', 'select');
-			if ($contenttypes_display_as == 'select')
+			if ($selectors_display_as == 'select')
 			{
 				$lists['contenttypes'] = HTMLHelper::_('select.genericlist',
 					$types,
@@ -666,22 +667,27 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 				$_obj->text  = $searchphrase_name;
 				$phrases[] = $_obj;
 			}
-			$lists['searchphrase'] = HTMLHelper::_('select.genericlist', $phrases, 'p',
-				'class="fc_field_filter use_select2_lib fc_field_searchphrase"', 'value', 'text', $searchphrase, 'searchphrase', $_translate=true);
 
-			/*$lists['searchphrase']  = '<ul class="fc_field_filter fc_checkradio_group">';
-			foreach ($searchphrase_names as $searchphrase_value => $searchphrase_name) {
-				$lists['searchphrase'] .= ' <li class="fc_checkradio_option fc_checkradio_special">';
-				$checked = $searchphrase_value == $searchphrase;
-				$checked_attr = $checked ? 'checked=checked' : '';
-				$checked_class = $checked ? 'fc_highlight' : '';
-				$lists['searchphrase'] .= '  <input href="javascript:;" onclick="fc_toggleClassGrp(this.parentNode, \'fc_highlight\');" id="searchphrase_'.$searchphrase_value.'" type="radio" name="p" value="'.$searchphrase_value.'" '.$checked_attr.' />';
-				$lists['searchphrase'] .= '  <label class="'.$checked_class.'" style="display:inline-block; white-space:nowrap;" for="searchphrase_'.$searchphrase_value.'">';
-				$lists['searchphrase'] .=     Text::_($searchphrase_name);
-				$lists['searchphrase'] .= '  </label>';
-				$lists['searchphrase'] .= ' </li>';
+			if ($selectors_display_as == 'select')
+			{
+				$lists['searchphrase'] = HTMLHelper::_('select.genericlist', $phrases, 'p',
+					'class="fc_field_filter use_select2_lib fc_field_searchphrase"', 'value', 'text', $searchphrase, 'searchphrase', $_translate=true);
 			}
-			$lists['searchphrase']  .= '</ul>';*/
+			else {
+				$lists['searchphrase']  = '<ul class="fc_field_filter fc_checkradio_group">';
+				foreach ($searchphrase_names as $searchphrase_value => $searchphrase_name) {
+					$lists['searchphrase'] .= ' <li class="fc_checkradio_option fc_checkradio_special">';
+					$checked = $searchphrase_value == $searchphrase;
+					$checked_attr = $checked ? 'checked=checked' : '';
+					$checked_class = $checked ? 'fc_highlight' : '';
+					$lists['searchphrase'] .= '  <input href="javascript:;" onclick="fc_toggleClassGrp(this.parentNode, \'fc_highlight\');" id="searchphrase_'.$searchphrase_value.'" type="radio" name="p" value="'.$searchphrase_value.'" '.$checked_attr.' />';
+					$lists['searchphrase'] .= '  <label class="'.$checked_class.'" style="display:inline-block; white-space:nowrap;" for="searchphrase_'.$searchphrase_value.'">';
+					$lists['searchphrase'] .=     Text::_($searchphrase_name);
+					$lists['searchphrase'] .= '  </label>';
+					$lists['searchphrase'] .= ' </li>';
+				}
+				$lists['searchphrase']  .= '</ul>';
+			}
 		}
 		else
 		{
@@ -739,9 +745,7 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 				$area_options[] = $_area;
 			}
 
-
-			$contenttypes_display_as = $params->get('contenttypes_display_as', 'select');
-			if ($area_options && $contenttypes_display_as == 'select')
+			if ($area_options && $selectors_display_as == 'select')
 			{
 				$attribs  = ' onchange="_toggle_content_area();" multiple="multiple" size="5" class="fc_field_filter use_select2_lib fc_prompt_internal fc_is_selmultiple"';  // class="... fc_label_internal" data-fc_label_text="..."
 				$attribs .= ' data-placeholder="'.htmlspecialchars(Text::_('FLEXI_CLICK_TO_LIST', ENT_QUOTES, 'UTF-8')).'"';

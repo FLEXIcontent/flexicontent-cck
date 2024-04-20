@@ -18,6 +18,10 @@
 				<option value="1" show_list="form_placement_txt" hide_list="">FLEXI_LEFT</option>
 				<option value="2" show_list="form_placement_txt" hide_list="">FLEXI_RIGHT</option>
 			</field>
+			<field name="selectors_display_as" type="radio" default="select" label="Selector display" description="Display content types as" class="btn-group btn-group-yesno">
+				<option value="select">Dropdown Select</option>
+				<option value="checkboxes">Checkboxes list</option>
+			</field>
 
 		<field name="" type="separator" level="level2" default="Content Types" description="The content types the search will include, selecting none will include ALL. &lt;br/&gt; NOTE: You can allow user to select Content Types. If you do then the selection list will be LIMITED to display ONLY the types specified here &lt;br/&gt; NOTE: if only 1 content type is selected below, then selector will be hidden"/>
 			
@@ -30,10 +34,6 @@
 			<field name="canseltypes" type="radio" default="1" label="Allow user selection" description="Allow users to select content types they want to include in their search" class="btn-group btn-group-yesno">
 				<option value="0">No</option>
 				<option value="1">Yes</option>
-			</field>
-			<field name="contenttypes_display_as" type="radio" default="select" label="Display as" description="Display content types as" class="btn-group btn-group-yesno">
-				<option value="select">Dropdown Select</option>
-				<option value="checkboxes">Checkboxes list</option>
 			</field>
 
 			<field name="" type="separator" level="level2" default="Text Search" description="&lt;i&gt; (a) Either use BASIC Search Index (can not select individual fields) &lt;br/&gt; (b) OR use ADVANCED Search Index (the above configured fields will be used) &lt;/i&gt;"/>
