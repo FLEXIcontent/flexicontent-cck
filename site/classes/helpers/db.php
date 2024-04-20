@@ -1097,7 +1097,7 @@ class flexicontent_db
 	 * @access public
 	 * @return object
 	 */
-	static function getTypeData($contenttypes_list = false)
+	static function getTypeData($contenttypes_list = false, $state = null)
 	{
 		static $cached = null;
 
@@ -1117,6 +1117,7 @@ class flexicontent_db
 		$query = $db->getQuery(true)
 			->select('*')
 			->from('#__flexicontent_types AS t');
+		if ($state !== null) $query->where('t.published = ' . (int) $state);
 
 		if ($contenttypes_list)
 		{

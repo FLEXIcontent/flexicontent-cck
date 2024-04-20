@@ -180,7 +180,7 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 		$params->set('canseltypes', $canseltypes);  // SET "type selection FLAG" back into parameters
 
 		// Type data and configuration (parameters), if no content types specified then all will be retrieved
-		$typeData = flexicontent_db::getTypeData($contenttypes);
+		$typeData = flexicontent_db::getTypeData($contenttypes, 1);
 		$contenttypes = array();
 
 		foreach($typeData as $tdata)
