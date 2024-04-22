@@ -265,7 +265,11 @@ class FlexicontentViewItems extends \Joomla\CMS\MVC\View\HtmlView
 			$delim = $field_sep;
 			$total_fields++;
 		}
-		echo $cparams->get("csv_export_item_record_sep", "\n");
+		if ($cparams->get("csv_export_item_record_sep", "\n") == '\n'){
+			echo "\n";
+		}else{
+			echo $cparams->get("csv_export_item_record_sep", "\n");
+		}
 
 
 		// Try to create CSV export with all items
@@ -377,8 +381,11 @@ class FlexicontentViewItems extends \Joomla\CMS\MVC\View\HtmlView
 					}
 					echo $this->_encodeCSVField( is_array($vals) ? implode($cparams->get('csv_export_field_multivalue_sep', '%%'), $vals ) : $vals );
 				}
-
-				echo $cparams->get("csv_export_item_record_sep", "\n");
+				if ($cparams->get("csv_export_item_record_sep", "\n") == '\n'){
+					echo "\n";
+				}else{
+					echo $cparams->get("csv_export_item_record_sep", "\n");
+				}
 			}
 
 			/**
