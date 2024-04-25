@@ -11,6 +11,7 @@
 
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Language\Text;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
@@ -897,7 +898,9 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		else
 		{
 			$url = $this->input->get('file-jmedia-data', null, 'string');
+			$url = str_replace(' ', '__SPACE__', $url);
 			$url = flexicontent_html::dataFilter($url, 4000, 'PATH', 0);  // Validate JMedia file PATH
+			$url = str_replace('__SPACE__', ' ', $url);
 		}
 
 		$altname  = $this->input->get('file-url-title', null, 'string');
@@ -918,7 +921,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		if (!$url || !$altname)
 		{
 			$this->exitHttpHead = array( 0 => array('status' => '400 Bad Request') );
-			$this->exitMessages = array( 0 => array('error' => 'FLEXI_WARNFILEURLFORM') );
+			$this->exitMessages = array( 0 => array('error' => Text::_('FLEXI_WARNFILEURLFORM')) );
 			$this->exitLogTexts = array();
 			$this->exitSuccess  = false;
 
@@ -940,7 +943,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			}
 			else  // $linktype === 2
 			{
-				$filesize = filesize($url);
+				$filesize = filesize(JPATH_ROOT . '/' . $url);
 			}
 		}
 
@@ -1717,7 +1720,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 	/**
 	 * CONTROLLER specific Helper Methods (non-task methods)
 	 */
-	 
+
 
 	/*
 	 * Restructure a FILES array for easier usage

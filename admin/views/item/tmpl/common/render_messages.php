@@ -25,7 +25,7 @@ if ($isnew && $submit_message)
  * (Frontend only) Autopublishing a new item regardless of publish privilege via an override in submit menu item,
  * use a menu item specific message if this is set, or notify user of autopublishing with a default message
  */
-if ($is_autopublished)
+if ($is_autopublished && $approval_warning_inform)
 {
 	$approval_msg = $this->params->get('autopublished_message')
 		? $this->params->get('autopublished_message')
