@@ -1149,7 +1149,7 @@
 		var i = 0;
 		for (var cnt=0; cnt<col_selectors.length; cnt++)
 		{
-			if ( jQuery(col_selectors[cnt]).attr("checked") )
+			if ( jQuery(col_selectors[cnt]).prop("checked") )
 			{
 				col_selected[i++] = jQuery(col_selectors[cnt]).attr("data-colno");
 			}
@@ -1165,6 +1165,7 @@
 
 		var nDays = 30;
 		fclib_setCookie(cookieName, JSON.stringify(cookieValue), nDays);
+    //console.log('Updated columns selector cookie');
 
 		var totals_tag = jQuery('#columnchoose_totals');
 		if (totals_tag.length)
