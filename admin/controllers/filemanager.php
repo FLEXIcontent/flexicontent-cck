@@ -200,6 +200,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 		// Get the extension to record it in the DB
 		$ext = strtolower(flexicontent_upload::getExt($data['filename']));
+		$data['ext'] = $ext;
 
 		if (!isset($allowed_exts[$ext]))
 		{
@@ -265,8 +266,15 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			case 2:
 
 				// Validate file PATH
-				$data['filename_original'] = flexicontent_html::dataFilter($data['filename_original'], 4000, 'STRING', 0);  // Clean bad text/html
-				$data['filename'] = flexicontent_html::dataFilter($data['filename'], 4000, 'PATH', 0);  // Clean bad text/html
+				$_parts = explode('#', $data['filename']);
+				$data['filename'] = $_parts[0];
+				$data['filename'] = str_replace(' ', '__SPACE__', $data['filename']);
+				$data['filename'] = flexicontent_html::dataFilter($data['filename'], 4000, 'PATH', 0);  // Validate JMedia file PATH
+				$data['filename'] = str_replace('__SPACE__', ' ', $data['filename']);
+
+				$data['filename_original'] = str_replace(' ', '__SPACE__', $data['filename_original']);
+				$data['filename_original'] = flexicontent_html::dataFilter($data['filename_original'], 4000, 'PATH', 0);  // Validate JMedia file PATH
+				$data['filename_original'] = str_replace('__SPACE__', ' ', $data['filename_original']);
 
 				$file_path = \Joomla\CMS\Filesystem\Path::clean(JPATH_ROOT . DS . $data['filename']);
 
@@ -894,13 +902,18 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		{
 			$url = $this->input->get('file-url-data', null, 'string');
 			$url = flexicontent_html::dataFilter($url, 4000, 'URL', 0);  // Validate file URL
+			$ext = $this->input->get('file-url-ext', null, 'cmd');
 		}
 		else
 		{
 			$url = $this->input->get('file-jmedia-data', null, 'string');
+			$_parts = explode('#', $url);
+			$url = $_parts[0];
 			$url = str_replace(' ', '__SPACE__', $url);
 			$url = flexicontent_html::dataFilter($url, 4000, 'PATH', 0);  // Validate JMedia file PATH
 			$url = str_replace('__SPACE__', ' ', $url);
+			$ext = $this->input->get('file-url-ext', null, 'cmd');
+			$ext = $ext ?: pathinfo($url, PATHINFO_EXTENSION);
 		}
 
 		$altname  = $this->input->get('file-url-title', null, 'string');
@@ -911,7 +924,6 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$fileaccess = flexicontent_html::dataFilter($fileaccess, 11, 'ACCESSLEVEL', 0);  // Validate access level exists (set to public otherwise)
 
 		$fieldid   = $this->input->get('fieldid', 0, 'int');
-		$ext       = $this->input->get('file-url-ext', null, 'cmd');
 		$filesize  = $this->input->get('file-url-size', 0, 'int');
 		$size_unit = $this->input->get('size_unit', 'KBs', 'cmd');
 

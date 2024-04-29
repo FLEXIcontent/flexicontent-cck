@@ -11,6 +11,7 @@
 
 defined('_JEXEC') or die('Restricted access');
 
+use Joomla\CMS\Component\ComponentHelper;
 use Joomla\String\StringHelper;
 \Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html');
 
@@ -83,7 +84,9 @@ $document->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexic
 $document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
 
-$use_jmedia_man = !$isFilesElement || ($this->fieldid && (int) $this->field->parameters->get('use_myfiles', 0) === 2);
+$use_jmedia_man = !$isFilesElement || ($this->fieldid && in_array((int) $this->field->parameters->get('use_myfiles', 0), [2,3,4]));
+$use_links      = !$isFilesElement || ($this->fieldid && in_array((int) $this->field->parameters->get('use_myfiles', 0), [2,3]));
+$use_fc_uploads = !$isFilesElement || ($this->fieldid && in_array((int) $this->field->parameters->get('use_myfiles', 0), [0,1,2,5]));
 
 if ($use_jmedia_man)
 {
@@ -635,10 +638,10 @@ if ($enable_multi_uploader)
 	';
 }
 
-if ($use_jmedia_man)
+if ($use_jmedia_man && $use_links)
 {
 	$js .= '
-	document.getElementById("file-jmedia-data").disabled = true;
+	//document.getElementById("file-jmedia-data").disabled = true;
 	';
 }
 
@@ -1491,8 +1494,10 @@ if ($js)
 
             <div class="fctabber fc_hidden_1270" id="fc-fileman-addfiles">
 
-              <div class="tabbertab" id="local_tab" data-icon2-class="icon-upload fc-icon-orange" data-icon-class="fc-icon-green">
-                <h3 class="tabberheading hasTooltip" data-placement="bottom" title="<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_UPLOAD_FILES_DESC' ); ?>"> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_UPLOAD_FILES' ); ?> </h3>
+        <?php if ($use_fc_uploads) : ?>
+
+	            <div class="tabbertab" id="local_tab" data-icon2-class="icon-upload fc-icon-orange" data-icon-class="fc-icon-green">
+	              <h3 class="tabberheading hasTooltip" data-placement="bottom" title="<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_UPLOAD_FILES_DESC' ); ?>"> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_UPLOAD_FILES' ); ?> </h3>
 
 				  <?php if (!$this->CanUpload && ($this->layout != 'image' || !$isFilesElement)) : /* image layout of fileselement view is not subject to upload check */ ?>
 					  <?php echo sprintf( $alert_box, '', 'note', '', \Joomla\CMS\Language\Text::_('FLEXI_YOUR_ACCOUNT_CANNOT_UPLOAD') ); ?>
@@ -1538,8 +1543,8 @@ if ($js)
 						$conf_lim_image   = $server_limit_active ? $warn_image.$hint_image : $hint_image;
 						$sys_limit_class  = $server_limit_active ? 'badge badge-box badge-important' : '';
 
-						$has_field_upload_maxsize   = !empty($this->field) && strlen($this->field->parameters->get('upload_maxsize'));
-						$has_field_resize_on_upload = !empty($this->field) && strlen($this->field->parameters->get('resize_on_upload'));
+						$has_field_upload_maxsize   = !empty($this->field) && strlen($this->field->parameters->get('upload_maxsize', ''));
+						$has_field_resize_on_upload = !empty($this->field) && strlen($this->field->parameters->get('resize_on_upload', ''));
 
 						$limit_typename = $has_field_upload_maxsize ? 'FLEXI_FIELD_CONF_UPLOAD_MAX_LIMIT' : 'FLEXI_CONF_UPLOAD_MAX_LIMIT';
 						$show_server_limit = $server_limit_exceeded && ! $enable_multi_uploader;  // plupload JS overcomes server limitations so we will not display it, if using plupload
@@ -1858,10 +1863,11 @@ if ($js)
 				  <?php endif; /*CanUpload*/ ?>
 
               </div>
+				<?php endif; /* $use_fc_uploads */ ?>
 
 
               <!-- File URL by Form -->
-				<?php if ($this->layout !='image' ) : /* not applicable for LAYOUT 'image' */ ?>
+				<?php if ($this->layout !='image' && ($use_links || $use_jmedia_man)) : /* not applicable for LAYOUT 'image' */ ?>
 
 					<?php /*echo \Joomla\CMS\HTML\HTMLHelper::_('tabs.panel', \Joomla\CMS\Language\Text::_( 'FLEXI_ADD_URL' ), 'filebyurl' );*/ ?>
 					<?php
@@ -1875,9 +1881,9 @@ if ($js)
                       <fieldset class="fc-fileman-tab" >
                         <fieldset class="fc-formbox" id="fc-fileman-formbox-3">
 
-                          <table class="fc-form-tbl fcinner" id="file-url-form-container">
 
-							  <?php if ($use_jmedia_man) : ?>
+							  <?php if ($use_jmedia_man && $use_links) : ?>
+	                        <table class="fc-form-tbl fcinner" id="file-url-form-container">
                                 <tr>
                                   <td id="file-link-type-lbl-container" class="key <?php echo $this->tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_URL_LINK', 'FLEXI_URL_LINK_DESC', 1, 1); ?>">
                                     <label class="fc-prop-lbl" for="file-url-data">
@@ -1894,8 +1900,13 @@ if ($js)
 									  ?>
                                   </td>
                                 </tr>
+							  <?php else: ?>
+		                  <input type="hidden" name="file-link-type" value="<?php echo $use_links ? '1' : '2'; ?>" />
+                      <table class="fc-form-tbl fcinner" id="file-url-form-container">
 							  <?php endif; ?>
 
+
+	              <?php if ($use_links): ?>
                             <tr id="file-url-data-row">
                               <td id="file-url-data-lbl-container" class="key <?php echo $this->tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_URL_LINK', 'FLEXI_URL_LINK_DESC', 1, 1); ?>">
                                 <label class="fc-prop-lbl" for="file-url-data">
@@ -1906,9 +1917,11 @@ if ($js)
                                 <input type="text" id="file-url-data" size="44" class="required input-xxlarge" name="file-url-data" style="padding-top: 3px; padding-bottom: 3px;" />
                               </td>
                             </tr>
+								<?php endif; ?>
+
 
 							  <?php if ($use_jmedia_man) : ?>
-                                <tr id="file-jmedia-data-row" style="display: none;">
+                                <tr id="file-jmedia-data-row" style="<?php echo $use_links ? 'display:none;' : '' ?>">
                                   <td id="file-jmedia-data-lbl-container" class="key <?php echo $this->tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_URL', 'FLEXI_FILE_URL_DESC', 1, 1); ?>">
                                     <label class="fc-prop-lbl" for="file-jmedia-data">
                                       <b><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_JMEDIA_LINK' ); ?></b>
@@ -1916,27 +1929,63 @@ if ($js)
                                   </td>
                                   <td id="file-jmedia-data-container">
 									  <?php
-									  $jMedia_file_displayData = array(
-									    'disabled' => false,
-									    'preview' => 'tooltip',
-									    'readonly' => false,
-									    'class' => 'required',
-									    'link' => 'index.php?option=com_media&amp;view=images&amp;layout=default_fc&amp;tmpl=component&amp;filetypes=' . $filetypes . '&amp;asset=',  //com_flexicontent&amp;author=&amp;fieldid=\'+mm_id+\'&amp;folder='
-									    'asset' => 'com_flexicontent',
-									    'authorId' => '',
-									    'previewWidth' => 480,
-									    'previewHeight' => 360,
-									    'name' => 'file-jmedia-data',
-									    'id' => 'file-jmedia-data',
-									    'value' => '',
-									    'folder' => '',
-									    'dataAttribute' => '',
-									    'imagesExt' => '',
-									    'audiosExt' => '',
-									    'videosExt' => '',
-									    'documentsExt' => '',
-									  );
-									  echo \Joomla\CMS\Layout\LayoutHelper::render($media_field_layout = 'joomla.form.field.media', $jMedia_file_displayData, $layouts_path = null);
+									  $use_quantum = 0;//ComponentHelper::isEnabled('com_quantummanager');
+									  if ($use_quantum) {
+										  $modal_url = "index.php?option=com_ajax&view=default&tmpl=component&asset=com_content&author=&fieldid=file-jmedia-data&folder=&plugin=quantummanagermedia&format=html";
+										  $modal_title = 'Select file'; $width = 0; $height = 0;
+										  $onclick_js  = "var url = jQuery(this).attr('data-href'); "
+											  . " var the_dialog = fc_showDialog(url, 'fc_modal_popup_container', 0, {$width}, {$height}, null, "
+											  . " {title:'{$modal_title}', loadFunc: null}); return false;";
+										  $select_file_btn =
+											  '<a class="form-control btn btn-info customform-btn fit-contents"
+												   onclick="'.$onclick_js.'" href="javascript:" data-href="'.$modal_url.'"
+												><i class="icon-search"></i></a>';  // &nbsp; Select
+										  $juri_root = JURI::root(true);
+										  $file_placeholder_text = 'No file selected';
+										  $file_placeholder_src  = $juri_root . '/' .'administrator/components/com_events/assets/images/person_placeholder.jpg';
+										  $file_clear_value_js   = "jQuery(this).parent().find('input[type=text]').val(''); jQuery(this).parent().parent().find('.inline-preview-img').attr('src', '".$file_placeholder_src."'); ";
+
+										  echo <<<HTML
+										<div class="control-group">
+											<div class="controls">
+												<img alt="Preview" src="{$file_placeholder_src}" data-juri-root="{$juri_root}" class="inline-preview-img" style="max-width:100%;"/>
+												<div class="input-group">
+													<input class="form-control input-group-prepend" type="text" readonly="" style="flex-grow:20; min-width:unset" value="" id="file-jmedia-data" name="file-jmedia-data" placeholder="{$file_placeholder_text}" />
+													{$select_file_btn}
+													<button type="button" href="#" title="Clear" class="form-control btn input-group-append fit-contents" onclick="{$file_clear_value_js}"><i class="icon-cancel"></i></button>
+												</div>
+											</div>
+										</div>
+HTML;
+										} else {
+										  $modal_url = version_compare(\Joomla\CMS\Version::MAJOR_VERSION, '4', 'lt')
+											  ? 'index.php?option=com_media&amp;view=media&amp;tmpl=component&amp;filetypes=' . $filetypes . '&amp;asset='  //com_flexicontent&amp;author=&amp;fieldid=\'+mm_id+\'&amp;folder='
+											  : 'index.php?option=com_media&amp;layout=default_fc&amp;tmpl=component&amp;filetypes=' . $filetypes . '&amp;&asset=&author=&fieldid=file-jmedia-data&folder=';  //com_flexicontent&amp;author=&amp;fieldid=\'+mm_id+\'&amp;folder='
+
+										  $media_params = ComponentHelper::getParams('com_media');
+										  $jMedia_file_displayData = array(
+											  'disabled' => false,
+											  'preview' => 'tooltip',
+											  'readonly' => false,
+											  'class' => 'required',
+											  'link' => $modal_url,
+											  'asset' => 'com_flexicontent',
+											  'authorId' => '',
+											  'previewWidth' => 480,
+											  'previewHeight' => 360,
+											  'name' => 'file-jmedia-data',
+											  'id' => 'file-jmedia-data',
+											  'value' => '',
+											  'folder' => '',
+											  'dataAttribute' => '',
+											  'imagesExt'    => array_map('trim', explode(',', $media_params->get('image_extensions', 'bmp,gif,jpg,jpeg,png,webp'))),
+											  'audiosExt'    => array_map('trim', explode(',', $media_params->get('audio_extensions', 'mp3,m4a,mp4a,ogg'))),
+											  'videosExt'    => array_map('trim', explode(',', $media_params->get('video_extensions', 'mp4,mp4v,mpeg,mov,webm'))),
+											  'documentsExt' => array_map('trim', explode(',', $media_params->get('doc_extensions', 'doc,odg,odp,ods,odt,pdf,ppt,txt,xcf,xls,csv'))),
+										  );
+										  $media_field = \Joomla\CMS\Layout\LayoutHelper::render($media_field_layout = 'joomla.form.field.media', $jMedia_file_displayData, $layouts_path = null);
+										  echo str_replace('{field-media-id}', 'field-media-data' , $media_field);
+									  }
 									  ?>
                                   </td>
                                 </tr>
@@ -1968,7 +2017,11 @@ if ($js)
                               </td>
                             </tr>
 
-                            <tr>
+			                      <tr>
+				                      <td></td><td><input style="margin-top: 64px;" type="button" class="btn btn-primary" value="Advanced properties" onclick="jQuery('.advanced-file-props').toggle({ direction: 'left' }, 300);"/></td>
+			                      </tr>
+
+                            <tr class="advanced-file-props" style="display: none;">
                               <td id="file-url-lang-lbl-container" class="key <?php echo $this->tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_LANGUAGE', 'FLEXI_FILE_LANGUAGE_DESC', 1, 1); ?>">
                                 <label class="fc-prop-lbl" id="file-url-lang-lbl" for="file-url-lang">
 									<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_LANGUAGE' ); ?>
@@ -1979,7 +2032,7 @@ if ($js)
                               </td>
                             </tr>
 
-                            <tr>
+	                          <tr class="advanced-file-props" style="display: none;">
                               <td id="file-url-access-lbl-container" class="key <?php echo $this->tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_ACCESS', 'FLEXI_FILE_ACCESS_DESC', 1, 1); ?>">
                                 <label class="fc-prop-lbl" id="file-url-access-lbl" for="file-url-access">
 									<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_ACCESS' ); ?>
@@ -1990,18 +2043,18 @@ if ($js)
                               </td>
                             </tr>
 
-                            <tr>
+	                          <tr class="advanced-file-props" style="display: none;">
                               <td id="file-url-ext-lbl-container" class="key <?php echo $this->tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILEEXT_MIME', 'FLEXI_FILEEXT_MIME_DESC', 1, 1); ?>">
                                 <label class="fc-prop-lbl" for="file-url-ext">
 									<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_FILEEXT_MIME' ); ?>
                                 </label>
                               </td>
                               <td id="file-url-ext-container">
-                                <input type="text" id="file-url-ext" size="5" class="required input-xxlarge" name="file-url-ext" />
+                                <input type="text" id="file-url-ext" size="5" class="input-xxlarge" name="file-url-ext" />
                               </td>
                             </tr>
 
-                            <tr>
+	                          <tr class="advanced-file-props" style="display: none;">
                               <td id="file-url-size-lbl-container" class="key <?php echo $this->tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_SIZE', '', 1, 1); ?>">
                                 <label class="fc-prop-lbl" for="file-url-size">
 									<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_SIZE' ); ?>
@@ -2180,6 +2233,13 @@ if ($js)
 
   </div><!-- #flexicontent end -->
 
+	<style>
+	  .flexicontent .field-media-wrapper .field-media-input {
+	    width: unset;
+	    min-width: 60% !important;
+	    max-width: unset;
+	  }
+	</style>
 <?php
 \Joomla\CMS\Factory::getDocument()->addScriptDeclaration('
 	function fc_edit_mmdata_modal_load( container )
@@ -2194,4 +2254,19 @@ if ($js)
 		window.location.reload(false);
 		document.body.innerHTML = "<div>" + Joomla.JText._("FLEXI_UPDATING_CONTENTS") + \' <img id="page_loading_img" src="components/com_flexicontent/assets/images/ajax-loader.gif"></div>\';
 	}
+
+	function jInsertFieldValue_custom(value, id) {
+		var elem = jQuery(\'#\'+id).get(0);
+		console.log(elem);
+		
+		elem.value = value;
+		let preview_img = jQuery(elem).parent().parent().find(\'img.inline-preview-img\');
+		if (preview_img.length > 0) {
+			let juri_root = preview_img.attr(\'data-juri-root\');
+			preview_img.attr(\'src\', juri_root + \'/\' + value);
+		}
+		if (typeof SqueezeBox != \'undefined\') SqueezeBox.close();
+		if (typeof jQuery != \'undefined\') jQuery(\'#fc_modal_popup_container\').dialog(\'close\');
+	}
+
 ');

@@ -183,8 +183,11 @@
 
 			<field name="use_myfiles" type="multilist" subtype="list" toggle_related="1" default="1" label="FLEXI_ENABLE" description="Enable to allow selecting an existing file that was previously uploaded" class="">
 				<option value="0" show_list="use-myfiles-off" hide_list="use-myfiles-jmedia,use-myfiles-on">FLEXI_NO</option>
-				<option value="1" show_list="use-myfiles-on" hide_list="use-myfiles-off,use-myfiles-jmedia">Yes (existing files + URL links)</option>
-				<option value="2" show_list="use-myfiles-on,use-myfiles-jmedia" hide_list="use-myfiles-off">Yes (existing files + URL links + Joomla Media manager links)</option>
+				<option value="1" show_list="use-myfiles-on" hide_list="use-myfiles-off,use-myfiles-jmedia">Yes (FC manager Uploads + URL links)</option>
+				<option value="2" show_list="use-myfiles-on,use-myfiles-jmedia" hide_list="use-myfiles-off">Yes (FC manager Uploads + URL links + Joomla Media manager)</option>
+				<option value="3" show_list="use-myfiles-on,use-myfiles-jmedia" hide_list="use-myfiles-off">Yes (URL links + Joomla Media manager)</option>
+				<option value="4" show_list="use-myfiles-on,use-myfiles-jmedia" hide_list="use-myfiles-off">Yes (Joomla Media manager)</option>
+				<option value="5" show_list="use-myfiles-on" hide_list="use-myfiles-off">Yes (FC manager Uploads)</option>
 			</field>
 
 			<field name="jmedia_filetypes" type="fccheckbox" default="" display_useglobal="0"

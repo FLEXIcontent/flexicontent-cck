@@ -429,6 +429,53 @@ jQuery(document).ready(function(){
 
 </script>
 
+<style>
+	.tabbernav {
+		display: flex !important;
+		flex-wrap: wrap !important;
+	}
+
+  .tabbernav li:has(a.break-subtypes) {
+    flex-basis: 100% !important;
+	  height: 0 !important;
+	  overflow: hidden !important;
+  }
+
+  .tabbernav li:has(a.subtypes-header) {
+    margin-left: 24px !important;
+  }
+  #flexicontent .s-cblue ul.tabbernav > li:hover:has(a.subtypes-header) > a,
+  .tabbernav li:has(a.subtypes-header) {
+    background: black !important;
+  }
+  .tabbernav li a.subtypes-header {
+	  display:none !important;
+  }
+  .tabbernav li:has(a.subtypes-header) a.subtypes-header {
+    display:flex !important;
+    font-weight: bold!important;
+    padding: 4px;
+  }
+  .tabbernav li:has(a.subtypes-header) a.subtypes-header > span {
+	  color: white !important;
+  }
+  body .s-cblue ul.tabbernav > li a.fc-subtype {
+     position: relative;
+  }
+  body .s-cblue ul.tabbernav > li a.fc-subtype:after {
+    opacity: 0.4;
+    content: "s" !important;
+	  position: absolute;
+	  height: 1rem;
+	  top: 6px;
+    line-height: 11px;
+	  font-size: 11px;
+	  background-color: #000 !important;
+	  padding: 2px;
+	  border-radius: 2px;
+	  color: white;
+  }
+</style>
 
 <div id="flexicontent" class="flexicontent">
 
@@ -503,25 +550,63 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				>' . $_name . '</h3>
 			</div>
 			';
+	}
+
+	$main_types = [];
+	$sub_types  = [];
+	foreach($this->itemTypes as $itemType) {
+		if ($itemType->params->get('is_subtype', 0)) {
+			$sub_types[] = $itemType;
+		} else {
+			$main_types[] = $itemType;
 		}
+	}
+	$sorted_itemTypes = array_merge($main_types, $sub_types);
 
-	$itemType = reset($this->itemTypes);
-
+	$subtype_count = 0;
+	$itemType = reset($sorted_itemTypes);
 	do
 	{
+		if ($itemType->params->get('is_subtype', 0) && $subtype_count == 0) {
+			$type_class = ' subtypes-header';
+			echo '
+				<div class="tabbertab ' . $type_class . '" id="type_tab_break_subtype" style="padding:0; border: 0;">
+					<h3 class="tabberheading ' . $type_class . '"
+						data-data_attr_a="' . (int) $itemType->id . '"
+					> Subtypes: </h3>
+			';
+			echo '</div>';
+		}
+
 		$type_class = $single_type && in_array($itemType->id, $filter_type) ? ' tabbertabforced' : '';
 		$__tip_class = ''; //' hasTooltip';
 		$__tip_props = ''; //' data-placement="top" data-title="' . Text::_( $itemType->name ) . '" ';
-
+		if ($itemType->params->get('is_subtype', 0)) {
+			$type_class .= ' fc-subtype';
+			$subtype_count++;
+		}
 		echo '
 			<div class="tabbertab ' . $type_class . '" id="type_tab_' . (int) $itemType->id . '" style="padding-left: 0; padding-right: 0; border-left: 0; border-right: 0; border-bottom: 0;">
-				<h3 class="tabberheading ' . $__tip_class . '" ' . $__tip_props . '
+				<h3 class="tabberheading ' . $__tip_class . $type_class . '" ' . $__tip_props . '
 					data-data_attr_a="' . (int) $itemType->id . '"
 					onmouseup="jQuery(\'#filter_assockey\').removeAttr(\'checked\'); jQuery(\'#filter_type\').val([this.getAttribute(\'data-data_attr_a\')]); jQuery(\'#filter_type\').trigger(\'change\')"
 				>' . Text::_( $itemType->name ) . '</h3>
 		';
 		echo '</div>';
-	} while($itemType = next($this->itemTypes));
+
+		$itemType = next($sorted_itemTypes);
+		if (0 && $itemType && $itemType->params->get('is_subtype', 0) && $subtype_count == 0) {
+			$type_class = ' break-subtypes';
+			echo '
+				<div class="tabbertab ' . $type_class . '" id="type_tab_break_subtype" style="padding:0; border: 0;">
+					<h3 class="tabberheading ' . $type_class . '"
+						data-data_attr_a="' . (int) $itemType->id . '"
+					></h3>
+			';
+			echo '</div>';
+		}
+
+	} while($itemType);
 
 	echo '
 		</div>

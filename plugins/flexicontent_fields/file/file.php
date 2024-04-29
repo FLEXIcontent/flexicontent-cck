@@ -724,8 +724,8 @@ class plgFlexicontent_fieldsFile extends FCField
 					<div class="fcclear"></div>
 					<div class="btn-group" style="margin: 4px 0 16px 0; display: inline-block;">
 						<div class="'.$btn_group_class.' fc-xpended-btns">
-							'.$uploader_html->toggleBtn.'
-							'.$uploader_html->multiUploadBtn.'
+							'.($use_myfiles != 4 ? $uploader_html->toggleBtn : '').'
+							'.($use_myfiles != 4 ? $uploader_html->multiUploadBtn : '').'
 							' . ($use_myfiles > 0 ? $uploader_html->myFilesBtn : '') . '
 							'.$uploader_html->mediaUrlBtn.'
 							'.$uploader_html->clearBtn.'

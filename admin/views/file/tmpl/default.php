@@ -16,6 +16,8 @@
  * GNU General Public License for more details.
  */
 
+use Joomla\CMS\Component\ComponentHelper;
+
 defined('_JEXEC') or die('Restricted access');
 
 $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
@@ -54,12 +56,46 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 			<td>
 				<?php if ((int) $this->row->url === 2) :
 
+				$use_quantum = 0;//ComponentHelper::isEnabled('com_quantummanager');
+				if ($use_quantum) {
+					$modal_url = "index.php?option=com_ajax&view=default&tmpl=component&asset=com_content&author=&fieldid=filename&folder=&plugin=quantummanagermedia&format=html";
+					$modal_title = 'Select file'; $width = 0; $height = 0;
+					$onclick_js  = "var url = jQuery(this).attr('data-href'); "
+						. " var the_dialog = fc_showDialog(url, 'fc_modal_popup_container', 0, {$width}, {$height}, null, "
+						. " {title:'{$modal_title}', loadFunc: null}); return false;";
+					$select_file_btn =
+						'<a class="form-control btn btn-info customform-btn fit-contents"
+												   onclick="'.$onclick_js.'" href="javascript:" data-href="'.$modal_url.'"
+												><i class="icon-search"></i></a>';  // &nbsp; Select
+					$juri_root = JURI::root(true);
+					$file_placeholder_text = 'No file selected';
+					$file_placeholder_src  = $juri_root . '/' .'administrator/components/com_events/assets/images/person_placeholder.jpg';
+					$file_clear_value_js   = "jQuery(this).parent().find('input[type=text]').val(''); jQuery(this).parent().parent().find('.inline-preview-img').attr('src', '".$file_placeholder_src."'); ";
+
+					echo <<<HTML
+										<div class="control-group">
+											<div class="controls">
+												<img alt="Preview" src="{$file_placeholder_src}" data-juri-root="{$juri_root}" class="inline-preview-img" style="max-width:100%;"/>
+												<div class="input-group">
+													<input class="form-control input-group-prepend" type="text" readonly="" style="flex-grow:20; min-width:unset" value="" id="filename" name="filename" placeholder="{$file_placeholder_text}" />
+													{$select_file_btn}
+													<button type="button" href="#" title="Clear" class="form-control btn input-group-append fit-contents" onclick="{$file_clear_value_js}"><i class="icon-cancel"></i></button>
+												</div>
+											</div>
+										</div>
+HTML;
+				} else {
+					$modal_url = version_compare(\Joomla\CMS\Version::MAJOR_VERSION, '4', 'lt')
+						? 'index.php?option=com_media&amp;view=media&amp;tmpl=component&amp;asset='  //com_flexicontent&amp;author=&amp;fieldid=\'+mm_id+\'&amp;folder='
+						: 'index.php?option=com_media&amp;layout=default_fc&amp;tmpl=component&amp;&asset=&author=&fieldid=filename&folder=';  //com_flexicontent&amp;author=&amp;fieldid=\'+mm_id+\'&amp;folder='
+
+					$media_params = ComponentHelper::getParams('com_media');
 					$jMedia_file_displayData = array(
 						'disabled' => false,
 						'preview' => 'tooltip',
 						'readonly' => false,
 						'class' => 'required',
-						'link' => 'index.php?option=com_media&amp;view=images&amp;layout=default_fc&amp;tmpl=component&amp;filetypes=folders,images,docs,videos&amp;asset=',  //com_flexicontent&amp;author=&amp;fieldid=\'+mm_id+\'&amp;folder='
+						'link' => $modal_url,
 						'asset' => 'com_flexicontent',
 						'authorId' => '',
 						'previewWidth' => 480,
@@ -69,12 +105,14 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 						'value' => $this->row->filename,
 						'folder' => '',
 						'dataAttribute' => '',
-						'imagesExt' => '',
-						'audiosExt' => '',
-						'videosExt' => '',
-						'documentsExt' => '',
+						'imagesExt'    => array_map('trim', explode(',', $media_params->get('image_extensions', 'bmp,gif,jpg,jpeg,png,webp'))),
+						'audiosExt'    => array_map('trim', explode(',', $media_params->get('audio_extensions', 'mp3,m4a,mp4a,ogg'))),
+						'videosExt'    => array_map('trim', explode(',', $media_params->get('video_extensions', 'mp4,mp4v,mpeg,mov,webm'))),
+						'documentsExt' => array_map('trim', explode(',', $media_params->get('doc_extensions', 'doc,odg,odp,ods,odt,pdf,ppt,txt,xcf,xls,csv'))),
 					);
-					echo \Joomla\CMS\Layout\LayoutHelper::render($media_field_layout = 'joomla.form.field.media', $jMedia_file_displayData, $layouts_path = null);
+					$media_field = \Joomla\CMS\Layout\LayoutHelper::render($media_field_layout = 'joomla.form.field.media', $jMedia_file_displayData, $layouts_path = null);
+					echo str_replace('{field-media-id}', 'field-media-data' , $media_field);
+				}
 
 				else :
 
@@ -130,6 +168,10 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 		</tr>
 
 		<tr>
+			<td></td><td><input style="margin-top: 64px;" type="button" class="btn btn-primary" value="Advanced properties" onclick="jQuery('.advanced-file-props').toggle({ direction: 'left' }, 300);"/></td>
+		</tr>
+
+		<tr class="advanced-file-props" style="display: none;">
 			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_LANGUAGE', 'FLEXI_FILE_LANGUAGE_DESC', 1, 1); ?>">
 				<label class="fc-prop-lbl" for="language">
 					<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_LANGUAGE' ); ?>
@@ -142,7 +184,7 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 			</td>
 		</tr>
 
-		<tr>
+		<tr class="advanced-file-props" style="display: none;">
 			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_ACCESS', 'FLEXI_FILE_ACCESS_DESC', 1, 1); ?>">
 				<label class="fc-prop-lbl" for="access">
 					<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_ACCESS' ); ?>
@@ -153,7 +195,7 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 			</td>
 		</tr>
 
-		<tr>
+		<tr class="advanced-file-props" style="display: none;">
 			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_DOWNLOAD_STAMPING', 'FLEXI_FILE_DOWNLOAD_STAMPING_CONF_FILE_FIELD_DESC', 1, 1); ?>">
 				<label class="fc-prop-lbl" data-for="stamp">
 					<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_DOWNLOAD_STAMPING' ); ?>
@@ -164,7 +206,7 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 			</td>
 		</tr>
 
-		<tr>
+		<tr class="advanced-file-props" style="display: none;">
 			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_HITS', 'FLEXI_DOWNLOAD_HITS', 1, 1); ?>">
 				<label class="fc-prop-lbl" for="access">
 					<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_HITS' ); ?>
@@ -175,15 +217,16 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 			</td>
 		</tr>
 
-		<tr>
+		<tr class="advanced-file-props" style="display: none;">
 			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILEEXT_MIME', 'FLEXI_FILEEXT_MIME_DESC' ); ?>">
 				<label class="fc-prop-lbl" for="mime_ext">
 					<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_FILEEXT_MIME' ); ?>
 				</label>
 			</td>
 			<td>
-				<input type="text" id="mime_ext" name="ext" value="<?php echo $this->row->ext; ?>" size="5" style="max-width:100px;" maxlength="100"/>
-<select class="use_select2_lib" onchange="jQuery(this).parent().find('input').val(jQuery(this).val()); jQuery(this).val('').select2('destroy').show().select2(); ">
+				<div class="input-group">
+					<input type="text" id="mime_ext" name="ext" value="<?php echo $this->row->ext; ?>" size="5" style="max-width:100px;" maxlength="100"/>
+					<select class="use_select2_lib" onchange="jQuery(this).parent().find('input').val(jQuery(this).val()); jQuery(this).val('').select2('destroy').show().select2(); ">
 <option value=""><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_PLEASE_SELECT' ); ?></option>
 <option value="3dm">3dm :: x-world/x-3dmf</option>
 <option value="3dmf">3dmf :: x-world/x-3dmf</option>
@@ -832,6 +875,8 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 <option value="zoo">zoo :: application/octet-stream</option>
 <option value="zsh">zsh :: text/x-script.zsh</option>
 </select>
+
+				</div>
 			</td>
 		</tr>
 
@@ -839,7 +884,7 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 
 		<tr><td colspan="2"></td></tr>
 
-		<tr>
+		<tr class="advanced-file-props" style="display: none;">
 			<td class="key">
 				<span class="label text-white bg-info label-info"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_SIZE' ); ?></span> &nbsp;
 			</td>
@@ -848,7 +893,7 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 			</td>
 		</tr>
 
-		<tr>
+		<tr class="advanced-file-props" style="display: none;">
 			<td class="key">
 				<span class="label text-white bg-info label-info"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_REAL_PATH' ); ?></span> &nbsp;
 			</td>
@@ -859,20 +904,22 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 
 		<?php else: ?>
 
-		<tr>
+		<tr class="advanced-file-props" style="display: none;">
 			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_SIZE', 'FLEXI_SIZE_IN_FORM', 1, 1); ?>">
 				<label class="fc-prop-lbl" for="size">
 					<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_SIZE' ); ?>
 				</label>
 			</td>
 			<td>
-				<input type="text" id="size" name="size" value="<?php echo ceil(((int)$this->rowdata->calculated_size)/1024.0); ?>" size="10" style="max-width:200px;" maxlength="100"/>
-				<select id="size_unit" name="size_unit" class="use_select2_lib">
-					<option value="KBs" selected="selected">KBs</option>
-					<option value="MBs">MBs</option>
-					<option value="GBs">GBs</option>
-				</select>
-				<span class="hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_SIZE', 'FLEXI_SIZE_IN_FORM', 1, 1); ?>"><i class="icon-info"></i></span>
+				<div class="input-group">
+					<input type="text" id="size" name="size" value="<?php echo ceil(((int)$this->rowdata->calculated_size)/1024.0); ?>" size="10" style="max-width:200px;" maxlength="100"/>
+					<select id="size_unit" name="size_unit" class="use_select2_lib">
+						<option value="KBs" selected="selected">KBs</option>
+						<option value="MBs">MBs</option>
+						<option value="GBs">GBs</option>
+					</select>
+					<span class="hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_SIZE', 'FLEXI_SIZE_IN_FORM', 1, 1); ?>">&nbsp;  <i class="icon-info"></i></span>
+				</div>
 
 				<?php echo $this->rowdata->size_warning; ?>
 			</td>
@@ -904,3 +951,11 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 //keep session alive while editing
 \Joomla\CMS\HTML\HTMLHelper::_('behavior.keepalive');
 ?>
+
+<style>
+  .flexicontent .field-media-wrapper .field-media-input {
+    width: unset;
+    min-width: 60% !important;
+    max-width: unset;
+  }
+</style>
