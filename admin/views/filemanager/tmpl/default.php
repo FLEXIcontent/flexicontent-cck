@@ -1948,9 +1948,11 @@ if ($js)
 										  echo <<<HTML
 										<div class="control-group">
 											<div class="controls">
-												<img alt="Preview" src="{$file_placeholder_src}" data-juri-root="{$juri_root}" class="inline-preview-img" style="max-width:100%;"/>
+												<div style="display:flex; align-items:center; width:100%; flex-direction: column;">
+													<img alt="File selected" src="{$file_placeholder_src}" data-juri-root="{$juri_root}" class="inline-preview-img" style="max-width:300px"/>
+												</div>
 												<div class="input-group">
-													<input class="form-control input-group-prepend" type="text" readonly="" style="flex-grow:20; min-width:unset" value="" id="file-jmedia-data" name="file-jmedia-data" placeholder="{$file_placeholder_text}" />
+													<input class="form-control input-group-prepend" type="text" readonly="" style="flex-grow:20; min-width:unset; width: unset;" value="" id="file-jmedia-data" name="file-jmedia-data" placeholder="{$file_placeholder_text}" />
 													{$select_file_btn}
 													<button type="button" href="#" title="Clear" class="form-control btn input-group-append fit-contents" onclick="{$file_clear_value_js}"><i class="icon-cancel"></i></button>
 												</div>
@@ -2255,9 +2257,8 @@ HTML;
 		document.body.innerHTML = "<div>" + Joomla.JText._("FLEXI_UPDATING_CONTENTS") + \' <img id="page_loading_img" src="components/com_flexicontent/assets/images/ajax-loader.gif"></div>\';
 	}
 
-	function jInsertFieldValue_custom(value, id) {
+	function jInsertFieldValue(value, id) {
 		var elem = jQuery(\'#\'+id).get(0);
-		console.log(elem);
 		
 		elem.value = value;
 		let preview_img = jQuery(elem).parent().parent().find(\'img.inline-preview-img\');

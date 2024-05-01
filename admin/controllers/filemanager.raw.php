@@ -243,7 +243,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		// Get models
 		$model        = $this->getModel($this->record_name_pl);
 		$record_model = $this->getModel($this->record_name);
-
+		
 		// Get mediafile fields
 		$media_fields = FlexicontentFields::getFieldsByType(array('mediafile'));
 		$_item = null;
@@ -376,7 +376,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 								if (!$model->createAudioPreview($media_field, $file, $loggers['mediadata']))
 								{
-									$mediadata_err_count++;
+									$mediadata_err_count++; 
 								}
 								$mediadata_file_count++;
 							}

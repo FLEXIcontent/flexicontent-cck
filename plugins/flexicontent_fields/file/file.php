@@ -9,6 +9,8 @@
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
+use Joomla\CMS\Uri\Uri;
+
 defined( '_JEXEC' ) or die( 'Restricted access' );
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 JLoader::register('FlexicontentControllerFilemanager', JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'controllers'.DS.'filemanager.php');  // we use JPATH_BASE since controller exists in frontend too
@@ -381,6 +383,21 @@ class plgFlexicontent_fieldsFile extends FCField
 				theInput.attr('name', fname_pfx + '[file-id]');
 				theInput.attr('id', element_id + '_file-id');
 
+				var theInput = newField.find('input.fc_mediafile').first();
+				//theInput.val('');
+				theInput.attr('name', fname_pfx + '[mediafile]');
+				theInput.attr('id', element_id + '_mediafile');
+				//newField.find('inline-preview-img').attr('src', '');
+				
+				var theInput = newField.find('input.field-media-input').first();
+				theInput.val('');
+				theInput.attr('name', fname_pfx + '[mediafile]');
+				theInput.attr('id', element_id + '_mediafile'); 
+				
+				" .(!FLEXI_J40GE ? "newField.find('.field-media-wrapper').fieldMedia();" : '') . "
+				newField.find('.field-media-wrapper').find('.button-clear').click();
+				newField.find('.clear-btn').click();
+
 				newField.find('.fc_filedata_txt_nowrap').html('-');
 				newField.find('.fc_filedata_title').html('-');
 
@@ -691,6 +708,28 @@ class plgFlexicontent_fieldsFile extends FCField
 
 		include(self::getFormPath($this->fieldtypes[0], $formlayout));
 
+		// Use inline media field
+		if ($use_myfiles == 4) {
+			$document->addScriptDeclaration('
+	function jInsertFieldValue(value, id)
+	{	
+		var elem = jQuery(\'#\'+id).get(0);
+		elem.value = value;
+		
+		let preview_img = jQuery(elem).parent().parent().find(\'img.inline-preview-img\');
+		if (preview_img.length > 0) {
+			let juri_root = preview_img.attr(\'data-juri-root\');
+			preview_img.attr(\'src\', juri_root + \'/\' + value);
+		}
+
+		fcfield_file.assignMediaFile(id, value, \''.Uri::root().'/\' + value);
+
+		if (typeof SqueezeBox != \'undefined\') SqueezeBox.close();
+		if (typeof jQuery != \'undefined\') jQuery(\'#fc_modal_popup_container\').dialog(\'close\');
+	}
+			');
+		}
+
 		foreach($field->html as $n => &$_html)
 		{
 			$uploader_html = $uploader_html_arr[$n];
@@ -724,7 +763,7 @@ class plgFlexicontent_fieldsFile extends FCField
 					<div class="fcclear"></div>
 					<div class="btn-group" style="margin: 4px 0 16px 0; display: inline-block;">
 						<div class="'.$btn_group_class.' fc-xpended-btns">
-							'.($use_myfiles != 4 ? $uploader_html->toggleBtn : '').'
+							'.$uploader_html->toggleBtn.'
 							'.($use_myfiles != 4 ? $uploader_html->multiUploadBtn : '').'
 							' . ($use_myfiles > 0 ? $uploader_html->myFilesBtn : '') . '
 							'.$uploader_html->mediaUrlBtn.'
@@ -1309,6 +1348,55 @@ class plgFlexicontent_fieldsFile extends FCField
 				if( $new_file )
 				{
 					$v['secure']   = !$iform_dir    ? 1 : ((int) $v['secure'] ? 1 : 0);
+				}
+
+				// Support inline media file
+				if (!$file_id && !empty($v['mediafile']))
+				{
+					$_parts = explode('#', $v['mediafile']);
+					$v['mediafile'] = $_parts[0];
+					$v['mediafile'] = str_replace(' ', '__SPACE__', $v['mediafile']);
+					$v['mediafile'] = flexicontent_html::dataFilter($v['mediafile'], 4000, 'PATH', 0);  // Validate JMedia file PATH
+					$v['mediafile'] = str_replace('__SPACE__', ' ', $v['mediafile']);
+
+					// Check if file exists already in file manager
+					$db = \Joomla\CMS\Factory::getDbo();
+					$existing_file = $db->setQuery($db->getQuery(true)
+						->select('a.*')
+						->from('#__flexicontent_files AS a')
+						// filename same as en_file
+						->where('a.filename = ' . $db->quote($v['mediafile']))
+					)->loadObject();
+
+					if ($existing_file)
+					{
+						$file_id = $existing_file->id;
+					}
+					else {
+						// Add file by calling filemanager controller upload() task, which will do the data filtering too
+						$fman = new FlexicontentControllerFilemanager();
+						$fman->runMode = 'interactive';
+
+						$inp = \Joomla\CMS\Factory::getApplication()->input;
+						$inp->set('file-link-type', 2);
+						$inp->set('file-jmedia-data', $v['mediafile']);
+						$app->input->set('return', null);
+						$app->input->set('secure', 0);
+						$app->input->set('stamp', 0);
+						$app->input->set('file-url-title', $v['file-title']);
+						$app->input->set('file-url-desc', $v['file-desc']);
+						$app->input->set('file-url-lang', $v['file-lang']);
+						$app->input->set('file-url-access', $v['file-access']);
+
+						$upload_errs = null;
+						$file_id = $fman->addurl(null, $upload_errs);
+						$file_id = !empty($file_id) ? $file_id : ($use_ingroup ? null : false);
+
+						if (empty($file_id)) foreach ($upload_errs as $err_type => $upload_err)
+						{
+							\Joomla\CMS\Factory::getApplication()->enqueueMessage(print_r($upload_err, true), $err_type);
+						}
+					}
 				}
 
 				// UPDATE existing file

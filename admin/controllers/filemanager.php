@@ -199,6 +199,8 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$allowed_exts = array_flip($allowed_exts);
 
 		// Get the extension to record it in the DB
+		$_parts = explode('#', $data['filename']);
+		$data['filename'] = $_parts[0];
 		$ext = strtolower(flexicontent_upload::getExt($data['filename']));
 		$data['ext'] = $ext;
 
@@ -272,6 +274,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 				$data['filename'] = flexicontent_html::dataFilter($data['filename'], 4000, 'PATH', 0);  // Validate JMedia file PATH
 				$data['filename'] = str_replace('__SPACE__', ' ', $data['filename']);
 
+				$data['filename_original'] = $data['filename'];
 				$data['filename_original'] = str_replace(' ', '__SPACE__', $data['filename_original']);
 				$data['filename_original'] = flexicontent_html::dataFilter($data['filename_original'], 4000, 'PATH', 0);  // Validate JMedia file PATH
 				$data['filename_original'] = str_replace('__SPACE__', ' ', $data['filename_original']);
@@ -930,7 +933,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		jimport('joomla.utilities.date');
 
 		// Check if the form fields are not empty
-		if (!$url || !$altname)
+		if (!$url)
 		{
 			$this->exitHttpHead = array( 0 => array('status' => '400 Bad Request') );
 			$this->exitMessages = array( 0 => array('error' => Text::_('FLEXI_WARNFILEURLFORM')) );

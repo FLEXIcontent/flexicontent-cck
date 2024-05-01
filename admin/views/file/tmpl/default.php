@@ -71,23 +71,30 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 					$file_placeholder_text = 'No file selected';
 					$file_placeholder_src  = $juri_root . '/' .'administrator/components/com_events/assets/images/person_placeholder.jpg';
 					$file_clear_value_js   = "jQuery(this).parent().find('input[type=text]').val(''); jQuery(this).parent().parent().find('.inline-preview-img').attr('src', '".$file_placeholder_src."'); ";
+					$value_src = $this->row->filename ? $juri_root . '/' . $this->row->filename : $file_placeholder_src;
+
+					$file_is_img  = in_array(strtolower(pathinfo($this->row->filename, PATHINFO_EXTENSION)), array('jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'));
+					$filename_ext = pathinfo($this->row->filename, PATHINFO_EXTENSION);
+					$preview_alt  = 'File selected'; //strtoupper($filename_ext);
 
 					echo <<<HTML
 										<div class="control-group">
 											<div class="controls">
-												<img alt="Preview" src="{$file_placeholder_src}" data-juri-root="{$juri_root}" class="inline-preview-img" style="max-width:100%;"/>
+												<div style="display:flex; align-items:center; width:100%; flex-direction: column;">
+													<img alt="{$preview_alt}" src="{$value_src}" data-juri-root="{$juri_root}" class="inline-preview-img" style="max-width:300px"/>
+												</div>
 												<div class="input-group">
-													<input class="form-control input-group-prepend" type="text" readonly="" style="flex-grow:20; min-width:unset" value="" id="filename" name="filename" placeholder="{$file_placeholder_text}" />
+													<input class="form-control input-group-prepend" type="text" readonly="" style="min-width: min(500px, 80vw); max-width:1020px" value="{$this->row->filename}" id="filename" name="filename" placeholder="{$file_placeholder_text}" />
 													{$select_file_btn}
-													<button type="button" href="#" title="Clear" class="form-control btn input-group-append fit-contents" onclick="{$file_clear_value_js}"><i class="icon-cancel"></i></button>
+													<button type="button" href="#" title="Clear" class="form-control btn input-group-append fit-contents clear-btn" onclick="{$file_clear_value_js}"><i class="icon-cancel"></i></button>
 												</div>
 											</div>
 										</div>
 HTML;
 				} else {
 					$modal_url = version_compare(\Joomla\CMS\Version::MAJOR_VERSION, '4', 'lt')
-						? 'index.php?option=com_media&amp;view=media&amp;tmpl=component&amp;asset='  //com_flexicontent&amp;author=&amp;fieldid=\'+mm_id+\'&amp;folder='
-						: 'index.php?option=com_media&amp;layout=default_fc&amp;tmpl=component&amp;&asset=&author=&fieldid=filename&folder=';  //com_flexicontent&amp;author=&amp;fieldid=\'+mm_id+\'&amp;folder='
+						? 'index.php?option=com_media&amp;view=media&amp;tmpl=component&amp;asset='  //com_flexicontent&amp;author=&amp;fieldid='+mm_id+'&amp;folder='
+						: 'index.php?option=com_media&amp;layout=default_fc&amp;tmpl=component&amp;&asset=&author=&fieldid=filename&folder=';  //com_flexicontent&amp;author=&amp;fieldid='+mm_id+'&amp;folder='
 
 					$media_params = ComponentHelper::getParams('com_media');
 					$jMedia_file_displayData = array(
@@ -127,7 +134,7 @@ HTML;
 			</td>
 		</tr>
 
-
+		<?php if ($this->row->url != 2): ?>
 		<tr>
 			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_DOWNLOAD_FILENAME', 'FLEXI_FILE_DOWNLOAD_FILENAME_DESC', 1, 1); ?>">
 				<label class="fc-prop-lbl" for="filename_original">
@@ -144,6 +151,7 @@ HTML;
 				?>
 			</td>
 		</tr>
+		<?php endif; ?>
 
 		<tr>
 			<td class="key hasTooltip" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_DISPLAY_TITLE', 'FLEXI_FILE_DISPLAY_TITLE_DESC', 1, 1); ?>">
@@ -959,3 +967,17 @@ HTML;
     max-width: unset;
   }
 </style>
+<script>
+	function jInsertFieldValue(value, id) {
+		var elem = jQuery('#'+id).get(0);
+
+		elem.value = value;
+		let preview_img = jQuery(elem).parent().parent().find('img.inline-preview-img');
+		if (preview_img.length > 0) {
+			let juri_root = preview_img.attr('data-juri-root');
+			preview_img.attr('src', juri_root + '/' + value);
+		}
+		if (typeof SqueezeBox != 'undefined') SqueezeBox.close();
+		if (typeof jQuery != 'undefined') jQuery('#fc_modal_popup_container').dialog('close');
+	}
+</script>

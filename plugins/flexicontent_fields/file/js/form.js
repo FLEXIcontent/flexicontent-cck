@@ -75,6 +75,9 @@
 		options.hide_image = options.hide_image || false;
 		options.keep_props = options.keep_props || false;
 
+		box.find('.field-media-wrapper').find('.button-clear').click();
+		box.find('.clear-btn').click();
+
 		if (options.hide_image)
 		{
 			box.find('.fcfield_preview_box').hide();
@@ -93,6 +96,8 @@
 			box.find('.fc_preview_msg').html('');
 			box.find('.fcfield_preview_box').hide();
 
+			box.find('.fc_media_file_box').show(); // media field if it exists
+
 			if (hasValue) valcounter.value = ( valcounter.value=='' || valcounter.value=='1' )  ?  ''  :  parseInt(valcounter.value) - 1;
 			//if (window.console) window.console.log('valcounter: ' + valcounter.value);
 		}
@@ -102,6 +107,62 @@
 		}
 	}
 
+	fcfield_file.assignMediaFile = function(value_container_id, filename, file_preview)
+	{
+		var originalname = filename;
+		var displaytitle = filename;
+		var text_nowrap  = filename;
+
+		var container   = jQuery('#'+value_container_id).closest('.fcfieldval_container');
+		var config_name = jQuery('#'+value_container_id).data('config_name');
+
+		container.find('.fc_fileid').val(0);
+		container.find('.fc_filedata_storage_name').html(filename);
+		container.find('.fc_filedata_txt').val(originalname).removeClass('file_unpublished').blur();
+		container.find('.fc_filedata_txt').removeAttr('data-filename');
+		container.find('.fc_filedata_txt').data('filename', filename);
+		container.find('.fc_filedata_txt_nowrap').html(text_nowrap).show();
+		container.find('.fc_filedata_title').html(displaytitle);
+
+		container.find('.fc_preview_thumb').attr('src', file_preview);
+
+		var is_image = file_preview.match(/\.(jpeg|jpg|gif|png|webp)$/) != null;
+		if (is_image)
+		{
+			container.find('.fc_preview_text').html('');
+			//container.find('.fcfield_preview_box').show();
+			container.find('.inline-preview-img').show();
+
+		}
+		else
+		{
+			container.find('.fc_preview_text').html(filename.split('.').pop().toUpperCase());
+			container.find('.inline-preview-img').hide();
+			if (container.find('.fcfield_preview_box').hasClass('auto'))
+			{
+				container.find('.fcfield_preview_box').hide();
+			}
+		}
+
+		container.find('.fc_filetitle').val(filename).blur();
+		container.find('.fc_filelang').val('').trigger('change');
+		container.find('.fc_filedesc').val('');
+
+		// Increment value counter (which is optionally used as 'required' form element)
+		var valcounter = document.getElementById('custom_' + config_name);
+		if (valcounter)
+		{
+			valcounter.value = valcounter.value=='' ? '1' : parseInt(valcounter.value) + 1;
+		}
+
+		var remove_obj = container.find('.inlinefile-del');
+		remove_obj.removeAttr('checked').trigger('change');
+
+		// Re-validate
+		jQuery(valcounter).trigger('blur');
+		return true;
+
+	}
 
 	fcfield_file.assignFile = function(value_container_id, file, keep_modal, config_name)
 	{
