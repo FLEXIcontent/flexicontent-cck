@@ -690,7 +690,7 @@ table.fcmanlist tbody td.col_status div.statetoggler {
 	content: "\f002";
 }
 #flexicontent div .fcfield-clearvalue.fcfont-icon:before {
-	content: "\f12d";
+	content: "\f00d";
 }
 #flexicontent div .fcfield-addvalue.fcfont-icon:before {
 	content: "\f302";
