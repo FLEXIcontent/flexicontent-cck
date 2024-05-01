@@ -116,7 +116,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		$preview_thumb_w = $preview_thumb_h = 600;
 
 		// Inline uploaders flags
-		$use_inline_uploaders = 1;
+		$use_inline_uploaders = $use_myfiles != 4;
 		$usemediaurl = 0; //(int) $field->parameters->get('use_mediaurl', 0);
 		$file_btns_position = 0; //(int) $field->parameters->get('file_btns_position', 0);
 
@@ -732,7 +732,7 @@ class plgFlexicontent_fieldsFile extends FCField
 
 		foreach($field->html as $n => &$_html)
 		{
-			$uploader_html = $uploader_html_arr[$n];
+			$uploader_html = $use_inline_uploaders ? $uploader_html_arr[$n] : false;
 			$_html = '
 				'.(!$add_ctrl_btns ? '' : '
 				<div class="'.$btn_group_class.' fc-xpended-btns">
@@ -757,14 +757,14 @@ class plgFlexicontent_fieldsFile extends FCField
 				'.($fields_box_placing ? '<div class="fcclear"></div>' : '').'
 				').'
 
-				<div class="fc-field-props-box" ' . (!$multiple ? 'style="width: 96%; max-width: 1400px;"' : ''). '>
+				<div class="fc-field-props-box" style="' . (!$multiple || $use_ingroup ? 'width: 96%; max-width: 1020px;' : ''). '">
 
 					'.($use_inline_uploaders && ($file_btns_position || !$add_ctrl_btns) ? '
 					<div class="fcclear"></div>
 					<div class="btn-group" style="margin: 4px 0 16px 0; display: inline-block;">
 						<div class="'.$btn_group_class.' fc-xpended-btns">
 							'.$uploader_html->toggleBtn.'
-							'.($use_myfiles != 4 ? $uploader_html->multiUploadBtn : '').'
+							'.$uploader_html->multiUploadBtn.'
 							' . ($use_myfiles > 0 ? $uploader_html->myFilesBtn : '') . '
 							'.$uploader_html->mediaUrlBtn.'
 							'.$uploader_html->clearBtn.'
@@ -1350,17 +1350,35 @@ class plgFlexicontent_fieldsFile extends FCField
 					$v['secure']   = !$iform_dir    ? 1 : ((int) $v['secure'] ? 1 : 0);
 				}
 
-				// Support inline media file
-				if (!$file_id && !empty($v['mediafile']))
+				$db = \Joomla\CMS\Factory::getDbo();
+
+				if (!empty($v['mediafile']))
 				{
-					$_parts = explode('#', $v['mediafile']);
+					$_parts         = explode('#', $v['mediafile']);
 					$v['mediafile'] = $_parts[0];
 					$v['mediafile'] = str_replace(' ', '__SPACE__', $v['mediafile']);
 					$v['mediafile'] = flexicontent_html::dataFilter($v['mediafile'], 4000, 'PATH', 0);  // Validate JMedia file PATH
 					$v['mediafile'] = str_replace('__SPACE__', ' ', $v['mediafile']);
+				}
 
+				// Clear matched file_id if filename does not match
+				if ($file_id && !empty($v['mediafile'])) {
+					$matched_file = $db->setQuery($db->getQuery(true)
+						->select('a.*')
+						->from('#__flexicontent_files AS a')
+						// filename same as en_file
+						->where('a.id = ' . (int) $file_id)
+						->where('a.filename = ' . $db->quote($v['mediafile']))
+					)->loadObject();
+					if (!$matched_file) {
+						$file_id = 0;
+					}
+				}
+
+				// Support inline media file
+				if (!$file_id && !empty($v['mediafile']))
+				{
 					// Check if file exists already in file manager
-					$db = \Joomla\CMS\Factory::getDbo();
 					$existing_file = $db->setQuery($db->getQuery(true)
 						->select('a.*')
 						->from('#__flexicontent_files AS a')

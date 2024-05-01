@@ -121,10 +121,13 @@ foreach ($field->value as $file_id)
 			</span>';
 	}
 
-	$media_field_html = '';
+	$media_field_class = '';
 	if ($use_myfiles == 4)
 	{
+		$media_field_html = '';
+		$media_field_style = '';//($filename_original ? 'display:none' : '');
 		$use_quantum = ComponentHelper::isEnabled('com_quantummanager');
+
 		if ($use_quantum) {
 			$modal_url = "index.php?option=com_ajax&view=default&tmpl=component&asset=com_content&author=&folder=&plugin=quantummanagermedia&format=html";
 			$modal_title = 'Select file'; $width = 0; $height = 0;
@@ -138,17 +141,16 @@ foreach ($field->value as $file_id)
 			$juri_root = JURI::root(true);
 			$file_placeholder_text = 'No file selected';
 			$file_placeholder_src  = $juri_root . '/' .'administrator/components/com_events/assets/images/person_placeholder.jpg';
-			$file_clear_value_js   = "jQuery(this).parent().find('input[type=text]').val(''); jQuery(this).parent().parent().find('.inline-preview-img').attr('src', '".$file_placeholder_src."'); ";
+			$file_clear_value_js   = "jQuery(this).parent().find('input[type=text]').val(''); fcfield_file.clearMediaFile(this, '".$file_placeholder_src."');";
 
 			$value_src = $filename_original ? $juri_root . '/' . $filename_original : $file_placeholder_src;
 
 			$file_is_img  = !$filename_original ? false : in_array(strtolower(pathinfo($filename_original, PATHINFO_EXTENSION)), array('jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'));
 			$filename_ext = pathinfo($filename_original, PATHINFO_EXTENSION);
-			$preview_alt  = 'File selected'; //strtoupper($filename_ext);
+			$preview_alt  = ''; //strtoupper($filename_ext);
 
-			$media_field_style = ($filename_original ? 'display:none' : '');
 			$media_field_html = <<<HTML
-										<div class="control-group fc_media_file_box" style="{$media_field_style}">
+										<div class="control-group fc_media_file_box {$media_field_class}" style="{$media_field_style}">
 											<div class="controls">
 												<div style="display:flex; align-items:center; width:100%; flex-direction: column;">
 													<img alt="{$preview_alt}" src="{$value_src}" data-juri-root="{$juri_root}" class="inline-preview-img" style="max-width:300px"/>
@@ -189,7 +191,9 @@ HTML;
 				'documentsExt' => array_map('trim', explode(',', $media_params->get('doc_extensions', 'doc,odg,odp,ods,odt,pdf,ppt,txt,xcf,xls,csv'))),
 			);
 			$media_field = \Joomla\CMS\Layout\LayoutHelper::render($media_field_layout = 'joomla.form.field.media', $jMedia_file_displayData, $layouts_path = null);
-			$media_field_html = '<div class="fc_media_file_box" style="'.($filename_original ? 'display:none' : '').'">' . str_replace('{field-media-id}', 'field-media-data' , $media_field) . '</div>';
+			$media_field_html = str_replace('{field-media-id}', 'field-media-data' , $media_field);
+			//$media_field_html = str_replace('button-clear"', 'button-clear" onclick="fcfield_file.clearMediaFile(this, \'\');" ', $media_field);
+			$media_field_html = '<div class="fc_media_file_box '.$media_field_class.'"  style="'.$media_field_style.'">' . $media_field_html . '</div>';
 		}
 	}
 
@@ -198,13 +202,13 @@ HTML;
 
 		<span class="fc_filedata_storage_name" style="display:none;">'.$file_data->filename.'</span>
 		<div class="fc_filedata_txt_nowrap nowrap_hidden">'.$file_data->filename.'<br/>'.$file_data->altname.'</div>
-		<input class="fc_filedata_txt inlinefile-data-txt '. $info_txt_classes . $required_class .'"
+		<input class="fc_filedata_txt inlinefile-data-txt '. $info_txt_classes . $required_class .'" style="'.($use_myfiles == 4 && !$use_quantum ? 'display:none' : '').'"
 			readonly="readonly" name="'.$fieldname_n.'[file-data-txt]" id="'.$elementid_n.'_file-data-txt" '.$info_txt_tooltip.'
 			value="'.htmlspecialchars($filename_original, ENT_COMPAT, 'UTF-8').'"
 			data-label_text="'.$field->label.'"
 			data-filename="'.htmlspecialchars($file_data->filename, ENT_COMPAT, 'UTF-8').'"
 		/>
-		<input type="hidden" id="'.$elementid_n.'_file-id" name="'.$fieldname_n.'[file-id]" value="'.htmlspecialchars($file_id, ENT_COMPAT, 'UTF-8').'" class="fc_fileid" />'.'
+		<input type="hidden" class="fc-file-id" id="'.$elementid_n.'_file-id" name="'.$fieldname_n.'[file-id]" value="'.htmlspecialchars($file_id, ENT_COMPAT, 'UTF-8').'" class="fc_fileid" />'.'
 
 		'.( (!$multiple || $use_ingroup) && !$required_class && $use_myfiles != 4 ? '
 		<div class="fcclear"></div>
@@ -222,7 +226,7 @@ HTML;
 			<div class="fcclear"></div>
 		' : '')).'
 
-		'.(!$iform_title ? '
+		'.(!$iform_title && $use_myfiles != 4 ? '
 		<div class="fcclear"></div>
 		<div class="'.$input_grp_class.' fc-xpended-row">
 			<label class="' . $add_on_class . ' fc-lbl fc_filedata_title-lbl">'.Text::_( 'FLEXI_FILE_DISPLAY_TITLE' ).'</label>
@@ -233,8 +237,8 @@ HTML;
 
 		<div class="fc_uploader_n_props_box">
 
-			<div class="inlinefile-prv-box" style="flex-basis: auto;">
-				'.($form_file_preview ? '<div class="fcfield_preview_box' . ($form_file_preview === 2 ? ' auto' : '') . '" style="'.$preview_css.'">
+			<div class="inlinefile-prv-box" style="'. ($use_myfiles == 4 && $inputmode == 1 && !$use_quantum ? 'width: 100%' : 'flex-basis: auto;') . '">
+				'.($form_file_preview && $use_myfiles != 4 ? '<div class="fcfield_preview_box' . ($form_file_preview === 2 ? ' auto' : '') . '" style="'.$preview_css.'">
 					<div class="fc_preview_text">' . $preview_text . '</div>
 					<img id="'.$elementid_n.'_image_preview" src="'.$preview_src.'" class="fc_preview_thumb" alt="Preview image placeholder"/></div>' : '').'
 				'.(!$media_field_html && !empty($uploader_html) ? $uploader_html->container : $media_field_html).'

@@ -80,10 +80,12 @@
 
 		if (options.hide_image)
 		{
+			console.log('hide_image');
 			box.find('.fcfield_preview_box').hide();
 		}
 		else
 		{
+			console.log('clear_props');
 			fcfield_file.clearFieldUploader(box, config_name);
 
 			box.find('.fc_filedata_txt').val('');
@@ -107,10 +109,18 @@
 		}
 	}
 
+	fcfield_file.clearMediaFile = function(clear_btn, placeholder_path)
+	{
+		var box = jQuery(clear_btn).closest('.fcfieldval_container');
+		box.find('.fc-file-id').val('0');
+		box.find('.fc_filedata_txt').val('');
+		box.find('.inline-preview-img').attr('src', placeholder_path);
+	}
+
 	fcfield_file.assignMediaFile = function(value_container_id, filename, file_preview)
 	{
 		var originalname = filename;
-		var displaytitle = filename;
+		var displaytitle = '';
 		var text_nowrap  = filename;
 
 		var container   = jQuery('#'+value_container_id).closest('.fcfieldval_container');

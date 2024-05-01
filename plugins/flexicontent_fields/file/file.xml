@@ -186,7 +186,7 @@
 				<option value="1" show_list="use-myfiles-on" hide_list="use-myfiles-off,use-myfiles-jmedia">Yes (FC manager Uploads + URL links)</option>
 				<option value="2" show_list="use-myfiles-on,use-myfiles-jmedia" hide_list="use-myfiles-off">Yes (FC manager Uploads + URL links + Joomla Media manager)</option>
 				<option value="3" show_list="use-myfiles-on,use-myfiles-jmedia" hide_list="use-myfiles-off">Yes (URL links + Joomla Media manager)</option>
-				<option value="4" show_list="use-myfiles-on,use-myfiles-jmedia" hide_list="use-myfiles-off">Yes (Joomla Media manager)</option>
+				<option value="4" show_list="use-myfiles-on,use-myfiles-jmedia" hide_list="use-myfiles-off">No (Only inline Joomla Media manager)</option>
 				<option value="5" show_list="use-myfiles-on" hide_list="use-myfiles-off">Yes (FC manager Uploads)</option>
 			</field>
 
