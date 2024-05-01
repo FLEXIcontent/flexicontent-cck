@@ -85,6 +85,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 		/**
 		 * Number of values
 		 */
+		$multiple_per_value = (int) $field->parameters->get('multiple_per_value', 1);
 
 		$multiple     = $use_ingroup || (int) $field->parameters->get('allow_multiple', 0);
 
@@ -568,7 +569,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 
 					<div class="' . $input_grp_class . ' fc-xpended-row fcfield-relation-selected_items_box">
 						<label class="' . $add_on_class . ' fc-lbl selected_items-lbl" id="' . $elementid_n . '-lbl" for="' . $elementid_n . '">' . \Joomla\CMS\Language\Text::_($selected_items_label) . '</label>
-						<select id="' . $elementid_n . '" name="' . $fieldname_n . '" ' . ($multiple ? 'multiple="multiple" ' : '')
+						<select id="' . $elementid_n . '" name="' . $fieldname_n . '" ' . ($multiple_per_value ? 'multiple="multiple" ' : '')
 							. ' class="' . $classes . ' fcfield-relation-selected_items" ' . $attribs
 							. ' data-max-related="' . $max_values . '" '
 							. ' onchange="return fcfield_relation.selected_items_modified(this);">
