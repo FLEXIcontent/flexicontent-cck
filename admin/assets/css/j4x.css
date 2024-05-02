@@ -1141,6 +1141,40 @@ div table.fc-table-list tr:nth-child(odd) td {
 	#flexicontent ul.fcfield-sortables > li [class*=" fcfield-"].fcfont-icon {
 		color: #fff !important;
 	}
+	div#fc-dash-boardbtns .fc-board-button:hover {
+		background: #2a2a2a;
+	}
+	.view-field.layout-default.task-edit div.select2-drop.select2-drop-multi li.select2-result-selectable > .select2-result-label,
+	.group-fcset input + label,
+	input[type="checkbox"].fc_checkradio + label,
+	input[type="radio"].fc_checkradio + label {
+		color: #000 !important;
+	}
+	body .plupload_header_content,
+	body .plupload_filelist_header,
+	body .plupload_filelist_footer {
+		color: #fff !important;
+		background: #171c24 !important;
+	}
+	body .plupload_filelist li,
+	body .plupload_scroll .plupload_filelist {
+		background: var(--body-bg);
+		border-bottom: 1px solid var(--border-color);
+	}
+	.noUi-handle {
+		background: #007db0 !important;
+		box-shadow: none !important;
+	}
+	.ui-widget.ui-widget-content {
+		border: 1px solid var(--border-color);
+		background: var(--body-bg);
+	}
+	body .ui-widget-header {
+		border: 1px solid var(--body-bg) !important;
+		background: var(--body-bg) !important;
+		color: #fff !important;
+		border-bottom: 1px solid var(--border-color) !important;
+	}
 }
 .buttons.btn-group.fc-iblock.dropdown {
 	margin-left: inherit !important;
@@ -1153,4 +1187,24 @@ div table.fc-table-list tr:nth-child(odd) td {
 .fc-form-tbl.fcinner.fccompact > div {
 	margin-top: 6px;
 	margin-bottom: 6px;
+}
+.input-group input {
+	min-width: initial !important;
+}
+.plupload_button {
+	color: #fff !important;
+	font: normal 14px sans-serif !important;
+	padding: 8px !important;
+	margin-right: 4px;
+	background: #007db0 !important;
+}
+.plupload_add:before {
+	content: '\2b';
+}
+a.plupload_button.plupload_start {
+	background: #418d52 !important;
+}
+.plupload_disabled,
+a.plupload_disabled:hover {
+	background: #1F3047 !important;
 }
