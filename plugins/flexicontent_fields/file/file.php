@@ -109,7 +109,7 @@ class plgFlexicontent_fieldsFile extends FCField
 
 		$mediapath   = $cparams->get('media_path', 'components/com_flexicontent/medias');
 		$docspath    = $cparams->get('file_path', 'components/com_flexicontent/uploads');
-		$imageexts   = array('png', 'ico', 'gif', 'jpg', 'jpeg', 'webp', 'bmp');
+		$imageexts   = array('jpg', 'png', 'gif', 'xcf', 'odg', 'wbmp', 'bmp', 'ico', 'jpeg', 'webp');
 
 		$thumb_size_resizer = (int) $field->parameters->get('thumb_size_resizer', 0);
 		$thumb_size_default = (int) $field->parameters->get('thumb_size_default', 120);
@@ -378,7 +378,7 @@ class plgFlexicontent_fieldsFile extends FCField
 
 				newField.find('.inlinefile-data-lbl').first().attr('for', element_id + '_file-data-txt').attr('id', element_id + '_file-data-lbl');
 
-				var theInput = newField.find('input.fc_fileid').first();
+				var theInput = newField.find('input.fc-file-id').first();
 				theInput.val('');
 				theInput.attr('name', fname_pfx + '[file-id]');
 				theInput.attr('id', element_id + '_file-id');
@@ -716,10 +716,31 @@ class plgFlexicontent_fieldsFile extends FCField
 		var elem = jQuery(\'#\'+id).get(0);
 		elem.value = value;
 		
-		let preview_img = jQuery(elem).parent().parent().find(\'img.inline-preview-img\');
+		let file_is_image = value.match(/\.(jpg|png|gif|xcf|odg|wbmp|bmp|ico|jpeg|webp)$/i);
+		let preview_img = jQuery(elem).closest(\'.fcfieldval_container\').find(\'img.inline-preview-img\');
+		let preview_obj = jQuery(elem).closest(\'.fcfieldval_container\').find(\'object.inline-preview-obj\');
+		console.log(preview_img);
+		console.log(preview_obj);
+
 		if (preview_img.length > 0) {
-			let juri_root = preview_img.attr(\'data-juri-root\');
-			preview_img.attr(\'src\', juri_root + \'/\' + value);
+			if (file_is_image) {
+				let juri_root = preview_img.parent().attr(\'data-juri-root\');
+				preview_img.attr(\'src\', juri_root + \'/\' + value);
+				preview_img.show();
+			} else {
+				preview_img.attr(\'src\', \'\');
+				preview_img.hide();
+			}
+		}
+		if (preview_obj.length > 0) {
+			if (!file_is_image) {
+				let juri_root = preview_obj.parent().attr(\'data-juri-root\');
+				preview_obj.attr(\'data\', juri_root + \'/\' + value);
+				preview_obj.show();
+			} else {
+				preview_obj.attr(\'data\', \'\');
+				preview_obj.hide();
+			}
 		}
 
 		fcfield_file.assignMediaFile(id, value, \''.Uri::root().'/\' + value);

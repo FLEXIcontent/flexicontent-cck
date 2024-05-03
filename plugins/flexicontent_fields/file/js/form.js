@@ -115,6 +115,9 @@
 		box.find('.fc-file-id').val('0');
 		box.find('.fc_filedata_txt').val('');
 		box.find('.inline-preview-img').attr('src', placeholder_path);
+		box.find('.inline-preview-obj').attr('data', placeholder_path);
+		box.find('.inline-preview-img').hide();
+		box.find('.inline-preview-obj').hide();
 	}
 
 	fcfield_file.assignMediaFile = function(value_container_id, filename, file_preview)

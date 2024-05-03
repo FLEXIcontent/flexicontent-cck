@@ -121,11 +121,11 @@ foreach ($field->value as $file_id)
 			</span>';
 	}
 
-	$media_field_class = '';
+	$media_field_html = '';
 	if ($use_myfiles == 4)
 	{
-		$media_field_html = '';
-		$media_field_style = '';//($filename_original ? 'display:none' : '');
+		$media_field_style = '';//($file_data->filename ? 'display:none' : '');
+		$media_field_class = '';
 		$use_quantum = ComponentHelper::isEnabled('com_quantummanager');
 
 		if ($use_quantum) {
@@ -140,23 +140,29 @@ foreach ($field->value as $file_id)
 	><i class="icon-search"></i></a>';  // &nbsp; Select
 			$juri_root = JURI::root(true);
 			$file_placeholder_text = 'No file selected';
-			$file_placeholder_src  = $juri_root . '/' .'administrator/components/com_events/assets/images/person_placeholder.jpg';
+			$file_placeholder_src  = '';//$juri_root . '/' .'......./person_placeholder.jpg';
 			$file_clear_value_js   = "jQuery(this).parent().find('input[type=text]').val(''); fcfield_file.clearMediaFile(this, '".$file_placeholder_src."');";
 
-			$value_src = $filename_original ? $juri_root . '/' . $filename_original : $file_placeholder_src;
-
-			$file_is_img  = !$filename_original ? false : in_array(strtolower(pathinfo($filename_original, PATHINFO_EXTENSION)), array('jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'));
-			$filename_ext = pathinfo($filename_original, PATHINFO_EXTENSION);
+			$file_is_img  = !$file_data->filename ? false : in_array(strtolower(pathinfo($file_data->filename, PATHINFO_EXTENSION)), $imageexts);
+			$filename_ext = pathinfo($file_data->filename, PATHINFO_EXTENSION);
 			$preview_alt  = ''; //strtoupper($filename_ext);
+
+			$value_src  = $file_data->filename ? $juri_root . '/' . $file_data->filename : $file_placeholder_src;
+			$image_src  = $file_is_img ? $value_src : '';
+			$object_src = $file_is_img ? '' : $value_src;
+
+			$image_style = $file_is_img ? '' : 'display:none;';
+			$object_style = $file_is_img ? 'display:none;' : '';
 
 			$media_field_html = <<<HTML
 										<div class="control-group fc_media_file_box {$media_field_class}" style="{$media_field_style}">
 											<div class="controls">
-												<div style="display:flex; align-items:center; width:100%; flex-direction: column;">
-													<img alt="{$preview_alt}" src="{$value_src}" data-juri-root="{$juri_root}" class="inline-preview-img" style="max-width:300px"/>
+												<div style="display:flex; align-items:center; width:100%; flex-direction: column;" data-juri-root="{$juri_root}">
+													<img alt="{$preview_alt}" src="{$image_src}" class="inline-preview-img" style="{$image_style} max-width:480px"/>
+													<object data="{$object_src}" type="" width="480" height="360" class="inline-preview-obj" style="{$object_style}"></object>
 												</div>
 												<div class="input-group">
-													<input class="form-control input-group-prepend fc_mediafile" type="text" readonly="" style="flex-grow:20; min-width:unset" value="{$filename_original}" id="{$elementid_n}_mediafile" name="{$fieldname_n}[mediafile]" placeholder="{$file_placeholder_text}" data-config_name={$field_name_js}" />
+													<input class="form-control input-group-prepend fc_mediafile" type="text" readonly="" style="flex-grow:20; min-width:unset" value="{$file_data->filename}" id="{$elementid_n}_mediafile" name="{$fieldname_n}[mediafile]" placeholder="{$file_placeholder_text}" data-config_name={$field_name_js}" />
 													{$select_file_btn}
 													<button type="button" href="#" title="Clear" class="form-control btn input-group-append fit-contents clear-btn" onclick="{$file_clear_value_js}"><i class="icon-cancel"></i></button>
 												</div>
@@ -182,7 +188,7 @@ HTML;
 				'previewHeight' => 360,
 				'name' => $fieldname_n . '[mediafile]',
 				'id' => $elementid_n . '_mediafile',
-				'value' => $filename_original,
+				'value' => $file_data->filename,
 				'folder' => '',
 				'dataAttribute' => '',
 				'imagesExt'    => array_map('trim', explode(',', $media_params->get('image_extensions', 'bmp,gif,jpg,jpeg,png,webp'))),
@@ -204,7 +210,7 @@ HTML;
 		<div class="fc_filedata_txt_nowrap nowrap_hidden">'.$file_data->filename.'<br/>'.$file_data->altname.'</div>
 		<input class="fc_filedata_txt inlinefile-data-txt '. $info_txt_classes . $required_class .'" style="'.($use_myfiles == 4 && !$use_quantum ? 'display:none' : '').'"
 			readonly="readonly" name="'.$fieldname_n.'[file-data-txt]" id="'.$elementid_n.'_file-data-txt" '.$info_txt_tooltip.'
-			value="'.htmlspecialchars($filename_original, ENT_COMPAT, 'UTF-8').'"
+			value="'.htmlspecialchars($file_data->filename, ENT_COMPAT, 'UTF-8').'"
 			data-label_text="'.$field->label.'"
 			data-filename="'.htmlspecialchars($file_data->filename, ENT_COMPAT, 'UTF-8').'"
 		/>
