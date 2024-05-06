@@ -173,6 +173,15 @@ $image_source_txts = array(
 	'1' => \Joomla\CMS\Language\Text::_('FLEXI_FIELD_ITEM_SPECIFIC_FOLDER_MODE'),
 );
 
+$file_source_txts = array(
+	'0' => 'Inline uploads, No My files reuse modal',
+	'1' => 'Inline uploads & My Files reuse modal (with: Secure Uploads + URL links)',
+	'2' => 'Inline uploads & My Files reuse modal (with: Secure Uploads + URL links + Joomla Media manager)',
+	'3' => 'Inline uploads & My Files reuse modal (with: URL links + Joomla Media manager)',
+	'4' => 'Joomla Media manager',
+	'5' => 'Inline uploads & My Files reuse modal (with: Secure Uploads)',
+);
+
 $current_type = $this->filter_type ? $this->types[$this->filter_type] : false;
 if ($current_type)
 {
@@ -692,6 +701,16 @@ if ($js)
 						$row->custom_desc = $ctype_desc;
 						echo $ctype_desc
 							? '<span class="' . $this->tooltip_class . '" title="Custom image source"><span class="icon icon-images" style="font-size: 1.2em;"></span></span>'
+							: '';
+					}
+					elseif ($row->field_type === 'file')
+					{
+						//$row->custom_title = 'image <span style="font-weight: bold">(file)</span>';
+						$file_source = $row->parameters->get('use_myfiles', 1);
+						$ctype_desc = isset($file_source_txts[$file_source]) ? $file_source_txts[$file_source] : '';
+						$row->custom_desc = $ctype_desc;
+						echo $ctype_desc
+							? '<span class="' . $this->tooltip_class . '" title="Custom file source"><span class="icon icon-download" style="font-size: 1.2em;"></span></span>'
 							: '';
 					}
 					elseif ($row->iscore)

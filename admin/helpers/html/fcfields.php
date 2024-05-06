@@ -205,7 +205,7 @@ abstract class JHtmlFcfields extends JHtmlFcbase
 				if (!empty($row->custom_desc))
 				{
 					return '<b>' . $row_type . '</b><br/>' .
-						($row->custom_desc ? '<span style="color: darkcyan; font-weight: bold;">' . $row->custom_desc . '</span>' : '<small>- ' . $friendly_name .' -' . ' -</small>');
+						($row->custom_desc ? '<small style="color: darkcyan; font-weight: bold;">' . $row->custom_desc . '</small>' : '<small>- ' . $friendly_name .' -' . ' -</small>');
 				}
 				else
 				{
