@@ -1257,7 +1257,7 @@ div table.fc-table-list tr:nth-child(odd) td {
 			color: #000 !important;
 		}
 		body .plupload_header_content, body .plupload_filelist_header, body .plupload_filelist_footer {
-			color: #fff !important;
+			color: var(--body-color) !important;
 			background: #171c24 !important;
 		}
 		body .plupload_filelist li, body .plupload_scroll .plupload_filelist {
@@ -1275,8 +1275,17 @@ div table.fc-table-list tr:nth-child(odd) td {
 		body .ui-widget-header {
 			border: 1px solid var(--body-bg) !important;
 			background: var(--body-bg) !important;
-			color: #fff !important;
+			color: var(--body-color) !important;
 			border-bottom: 1px solid var(--border-color) !important;
+		}
+		.group-fcset input + label {
+			color: var(--body-color) !important;
+		}
+		.text-dark {
+			color: var(--body-color) !important;
+		}
+		table.fcmanlist tfoot td, table.fcmanlist tfoot th {
+			background-color: var(--body-bg);
 		}
 }
 .buttons.btn-group.fc-iblock.dropdown{
@@ -1311,4 +1320,8 @@ a.plupload_button.plupload_start {
 }
 .plupload_disabled, a.plupload_disabled:hover{
 	background: #1F3047 !important;
+}
+//fix width off dropdown in item form
+.btn-group .dropdown-menu {
+    width: max-content;
 }

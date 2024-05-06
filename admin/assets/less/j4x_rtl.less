@@ -1108,6 +1108,28 @@ body div .control-group {
 div.flexicontent .sidebar-nav li a:before {
 	content: '';
 }
+/*** table version **/
+table#version_tbl td.versions {
+	border-bottom: 0px dotted silver;
+	padding: 10px 20px;
+}
+div table.fc-table-list tr:nth-child(odd) td {
+	background: initial;
+}
+/*** file view ***/
+.view-filemanager span.fc_hidden_1270.fc_noeffect.btn.btn-sm.hasTooltip {
+    padding: 8px;
+}
+.view-filemanager .group-fcset {
+    padding: 7px;
+}
+.view-filemanager span.btn.btn-sm.hasTooltip {
+    padding: 8px;
+}
+.view-filemanager div#fc_mainChooseColBox_btn {
+    padding: 7px;
+}
+
 /*** dark mode joomla 5 ***/
 @media (prefers-color-scheme: dark) {
 	div#fc-dash-boardbtns .fc-board-button{
@@ -1191,4 +1213,85 @@ div.flexicontent .sidebar-nav li a:before {
     background-color: var(--template-bg-dark-60);
     border-color: var(--template-bg-dark-60);
 	}
+	#flexicontent .fc-xpended-btns [class^="fcfield-"].fcfont-icon:hover, #flexicontent .fc-xpended-btns [class*=" fcfield-"].fcfont-icon:hover, #flexicontent .fc-xpended-btns .fcfield-button-add.fcfont-icon:hover a {
+		background-color: #595959 !important;
+		background-image: none !important;
+	}
+	#flexicontent div [class^="fcfield-"].fcfont-icon, #flexicontent div [class*=" fcfield-"].fcfont-icon, #flexicontent ul.fcfield-sortables > li [class^="fcfield-"].fcfont-icon, #flexicontent ul.fcfield-sortables > li [class*=" fcfield-"].fcfont-icon {
+		color: #fff !important;
+	}
+	div#fc-dash-boardbtns .fc-board-button:hover {
+        background: #2a2a2a;
+		}
+		.view-field.layout-default.task-edit div.select2-drop.select2-drop-multi li.select2-result-selectable > .select2-result-label, .group-fcset input + label, input[type="checkbox"].fc_checkradio + label, input[type="radio"].fc_checkradio + label {
+			color: #000 !important;
+		}
+		body .plupload_header_content, body .plupload_filelist_header, body .plupload_filelist_footer {
+			color: var(--body-color) !important;
+			background: #171c24 !important;
+		}
+		body .plupload_filelist li, body .plupload_scroll .plupload_filelist {
+			background: var(--body-bg);
+			border-bottom: 1px solid var(--border-color);
+		}
+		.noUi-handle {
+			background: #007db0 !important;
+			box-shadow: none !important;
+		}
+		.ui-widget.ui-widget-content {
+			border: 1px solid var(--border-color);
+			background: var(--body-bg);
+		}
+		body .ui-widget-header {
+			border: 1px solid var(--body-bg) !important;
+			background: var(--body-bg) !important;
+			color: var(--body-color) !important;
+			border-bottom: 1px solid var(--border-color) !important;
+		}
+		.group-fcset input + label {
+			color: var(--body-color) !important;
+		}
+		.text-dark {
+			color: var(--body-color) !important;
+		}
+		table.fcmanlist tfoot td, table.fcmanlist tfoot th {
+			background-color: var(--body-bg);
+		}
+}
+.buttons.btn-group.fc-iblock.dropdown{
+	margin-left: inherit !important;
+	width: inherit !important;
+		display: contents;
+}
+#flexicontent [class*="fc-xpended"] > .btn-group {
+    margin: 0 -8px;
+}
+.fc-form-tbl.fcinner.fccompact > div {
+    margin-top: 6px;
+    margin-bottom: 6px;
+}
+//fix atum backend
+.input-group input{
+	min-width:initial !important;
+}
+// adapt plusupload to j4-5 design
+.plupload_button {
+	color:#fff !important;
+	font: normal 14px sans-serif !important;
+	padding: 8px !important;
+	margin-right: 4px;
+	background: #007db0 !important;
+}
+.plupload_add:before {
+content:'\2b';
+}
+a.plupload_button.plupload_start {
+	background: #418d52 !important;
+}
+.plupload_disabled, a.plupload_disabled:hover{
+	background: #1F3047 !important;
+}
+//fix width off dropdown in item form
+.btn-group .dropdown-menu {
+    width: max-content;
 }
