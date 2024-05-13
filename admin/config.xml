@@ -1332,8 +1332,8 @@
 			<field name="" type="separator" default="FLEXI_GENERAL_FORM_BEHAVIOR" icon_class="icon-cog" level="tab_open" box_type="1" remove_boxes="2" />
 
 			<field name="allowbuttons_fe" type="fccheckbox" default=""
-				checkoptions="FLEXI_APPLY_N_RELOAD,FLEXI_APPLY,FLEXI_SAVE_AND_NEW,FLEXI_SAVE_AS_COPY,FLEXI_SAVE_A_PREVIEW,FLEXI_PREVIEW_LATEST"
-				checkvals="apply,apply_ajax,save2new,save2copy,save_preview,preview_latest" defaultvals="apply,save_preview,preview_latest"
+				checkoptions="FLEXI_APPLY_N_RELOAD,FLEXI_APPLY,FLEXI_SAVE_AND_NEW,FLEXI_SAVE_AS_COPY,FLEXI_SAVE_A_PREVIEW,FLEXI_PREVIEW_LATEST,FLEXI_PREVIEW_LATEST_ITEM_ONLY"
+				checkvals="apply,apply_ajax,save2new,save2copy,save_preview,preview_latest,preview_latest_item_only" defaultvals="apply,save_preview,preview_latest"
 				label="FLEXI_MENU_ALLOW_BUTTONS" description="FLEXI_MENU_ALLOW_BUTTONS_DESC" cols="2" />
 			<field name="buttons_placement_fe" type="fcradio" default="0" label="FLEXI_BUTTONS_PLACEMENT" description="FLEXI_BUTTONS_PLACEMENT_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_TOP</option>
@@ -1583,8 +1583,8 @@
 			<field name="" type="separator" default="FLEXI_GENERAL_FORM_BEHAVIOR" icon_class="icon-cog" level="tab_open" box_type="1" remove_boxes="2" />
 
 			<field name="allowbuttons_be" type="fccheckbox" default=""
-				checkoptions="FLEXI_APPLY_N_RELOAD,FLEXI_APPLY,FLEXI_SAVE_AND_NEW,FLEXI_SAVE_AS_COPY,FLEXI_SAVE_A_PREVIEW,FLEXI_PREVIEW_LATEST"
-				checkvals="apply,apply_ajax,save2new,save2copy,save_preview,preview_latest" defaultvals="apply,apply_ajax,save2new,save2copy,save_preview,preview_latest"
+				checkoptions="FLEXI_APPLY_N_RELOAD,FLEXI_APPLY,FLEXI_SAVE_AND_NEW,FLEXI_SAVE_AS_COPY,FLEXI_SAVE_A_PREVIEW,FLEXI_PREVIEW_LATEST,FLEXI_PREVIEW_LATEST_ITEM_ONLY"
+				checkvals="apply,apply_ajax,save2new,save2copy,save_preview,preview_latest,preview_latest_item_only" defaultvals="apply,save_preview,preview_latest"
 				label="FLEXI_MENU_ALLOW_BUTTONS" description="FLEXI_MENU_ALLOW_BUTTONS_DESC" cols="2" />
 			<field name="buttons_placement_be" type="fcradio" default="-1" label="FLEXI_BUTTONS_PLACEMENT" description="FLEXI_BUTTONS_PLACEMENT_DESC" class="btn-group btn-group-yesno">
 				<option value="-1">JTOOLBAR</option>

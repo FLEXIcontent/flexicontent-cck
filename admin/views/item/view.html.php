@@ -1865,7 +1865,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 				<a class="toolbar ' . $this->btn_sm_class . (FLEXI_J40GE ? ' _DDI_class_ ' : '') .' btn-fcaction spaced-btn" href="javascript:;" '
 				. ' onclick="window.open(\'_PREVIEW_LINK_\', \'preview2\', \''.$link_params.'\'); return false;">'
 				. '<span class="icon-screen"></span>_LBL_TEXT_</a>';
-			$inline_txt = '(' . \Joomla\CMS\Language\Text::_('FLEXI_INLINE') . ') - ';
+			$item_only_txt = '(' . \Joomla\CMS\Language\Text::_('FLEXI_ITEM_ONLY') . ') - ';
 
 			// PREVIEW for latest version
 			$use_versioning = $page_params->get('use_versioning', 1);
@@ -1875,10 +1875,17 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 				$btn_arr['fc_actions'] = '';
 
 				$lbl_txt = \Joomla\CMS\Language\Text::_($use_versioning ? 'FLEXI_PREVIEW_LATEST' :'FLEXI_PREVIEW');
-				$btn_arr['preview_current'] = str_replace('_PREVIEW_LINK_', $previewlink . '&amp;tmpl=component',
-					str_replace('_LBL_TEXT_', $lbl_txt, $preview_btn_html));
-				$btn_arr['preview_current_insite'] = str_replace('_PREVIEW_LINK_', $previewlink,
-					str_replace('_LBL_TEXT_', $inline_txt . $lbl_txt, $preview_btn_html));
+
+				if (in_array('preview_latest_item_only', $allowbuttons))
+				{
+					$btn_arr['preview_current'] = str_replace('_PREVIEW_LINK_', $previewlink . '&amp;tmpl=component',
+						str_replace('_LBL_TEXT_', $lbl_txt . $item_only_txt, $preview_btn_html));
+				}
+				if (in_array('preview_latest', $allowbuttons))
+				{
+					$btn_arr['preview_current_insite'] = str_replace('_PREVIEW_LINK_', $previewlink,
+						str_replace('_LBL_TEXT_', $lbl_txt, $preview_btn_html));
+				}
 			}
 
 			// PREVIEW for non-approved versions of the item, if they exist
