@@ -474,7 +474,7 @@ foreach ($field->value as $index => $value)
 					<div class="fcclear"></div>
 				' : '
 					'.(empty($uploader_html) ? '' : '
-						<div style="display: inline-block; vertical-align: top;">
+						<div style="display: inline-block; vertical-align: top;height:0;">
 							' . $uploader_html->container . '
 						</div>
 					').'
