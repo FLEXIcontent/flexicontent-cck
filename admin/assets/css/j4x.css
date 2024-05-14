@@ -1221,3 +1221,9 @@ a.plupload_disabled:hover {
 .btn-group .dropdown-menu {
 	width: max-content;
 }
+#flexicontent.flexi_edit .input-group {
+	width: initial;
+}
+.fcfield_field_preview_box {
+	padding: 0 20px;
+}
