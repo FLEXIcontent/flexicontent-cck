@@ -177,12 +177,12 @@ class flexicontent_upload
 		// Check if the image file type is allowed
 		// ***************************************
 		
-		$format = strtolower(flexicontent_upload::getExt($file['name']));
+		$format = strtolower(flexicontent_upload::getExt($file['name'])?? '');
 
-		$allowed_exts = preg_split("/[\s]*,[\s]*/", strtolower($params->get('upload_extensions', 'bmp,wbmp,csv,doc,docx,webp,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,txt,xcf,xls,xlsx,zip,ics')));
+		$allowed_exts = preg_split("/[\s]*,[\s]*/", strtolower($params->get('upload_extensions', 'bmp,wbmp,csv,doc,docx,webp,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,txt,xcf,xls,xlsx,zip,ics') ?? ''));
 		$allowed_exts = array_flip($allowed_exts);
 
-		$ignored_exts = preg_split("/[\s]*,[\s]*/", strtolower($params->get('ignore_extensions')));
+		$ignored_exts = preg_split("/[\s]*,[\s]*/", strtolower($params->get('ignore_extensions') ?? ''));
 		$ignored_exts = array_flip($ignored_exts);
 
 		if (!isset($allowed_exts[$format]) && !isset($ignored_exts[$format]))
