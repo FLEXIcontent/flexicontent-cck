@@ -1257,6 +1257,13 @@ div table.fc-table-list tr:nth-child(odd) td {
 		table.fcmanlist tfoot td, table.fcmanlist tfoot th {
 			background-color: var(--body-bg);
 		}
+		div.statetoggler > div.statetoggler_inner > .options {
+			background: var(--body-bg);
+			box-shadow: none;
+		}
+		div.statetoggler > div.statetoggler_inner > .options > div, div.statetoggler > div.statetoggler_inner > .options > span {
+			color: var(--body-color);
+		}
 }
 .buttons.btn-group.fc-iblock.dropdown{
 	margin-left: inherit !important;
@@ -1298,6 +1305,6 @@ a.plupload_button.plupload_start {
 #flexicontent.flexi_edit .input-group {
     width: initial;
 }
-.fcfield_field_preview_box {
+.fcfield_field_preview_box.fcfield_addressint_map {
     padding: 0 20px;
 }

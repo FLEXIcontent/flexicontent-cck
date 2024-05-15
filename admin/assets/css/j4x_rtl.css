@@ -1165,6 +1165,14 @@ div table.fc-table-list tr:nth-child(odd) td {
 	table.fcmanlist tfoot th {
 		background-color: var(--body-bg);
 	}
+	div.statetoggler > div.statetoggler_inner > .options {
+		background: var(--body-bg);
+		box-shadow: none;
+	}
+	div.statetoggler > div.statetoggler_inner > .options > div,
+	div.statetoggler > div.statetoggler_inner > .options > span {
+		color: var(--body-color);
+	}
 }
 .buttons.btn-group.fc-iblock.dropdown {
 	margin-left: inherit !important;

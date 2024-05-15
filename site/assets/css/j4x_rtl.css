@@ -328,15 +328,11 @@ span.btn.fc_img_preview_btn.icon-search {
 header.group.tool {
 	width: 100%;
 }
+.fc_state_toggle_link,
 .fc_edit_link {
-	margin: 0px 0px;
-	background: #fff;
-	padding: 5px;
-}
-.fc_state_toggle_link {
 	margin: 0;
 	background: #fff;
-	padding: 2px;
+	padding: 5px 10px;
 }
 .statetoggler.fc_statebutton.btn.btn-small.hasTooltip {
 	padding: 0px !important;
@@ -525,4 +521,15 @@ a.plupload_disabled:hover {
 #flexicontent .fc-xpended-btns.btn,
 .btn {
 	border: 1px solid #aaa !important;
+}
+#flexicontent .group.tool .btn:hover {
+	background: #ccc;
+}
+.statetoggler.fc_statebutton.btn.btn-small.hasTooltip {
+	border: none !important;
+}
+.fcitems .statetoggler.fc_statebutton.btn.btn-small {
+	border: 1px solid #cfcfcf !important;
+	background: #ececec;
+	padding: 5px 10px !important;
 }
