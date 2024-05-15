@@ -1212,6 +1212,6 @@ a.plupload_disabled:hover {
 #flexicontent.flexi_edit .input-group {
 	width: initial;
 }
-.fcfield_field_preview_box {
+.fcfield_field_preview_box.fcfield_addressint_map {
 	padding: 0 20px;
 }

@@ -594,3 +594,19 @@ a.plupload_button.plupload_start {
     background: #ececec;
     padding: 5px 10px !important;
 }
+// fix frontend button in edit view
+.view-item.task-edit  #fctoolbar.btn-toolbar > * .btn.btn-sm {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+.view-item.task-edit #fctoolbar.btn-toolbar > *, #fctoolbar.btn-toolbar > * > * {
+    font-size: initial !important;
+}
+#fctoolbar.btn-toolbar > *, #toolbar.btn-toolbar > * {
+    margin-top: 0px !important;
+}
+.view-item.task-edit .button-cancel.btn.btn-danger, .view-item.task-edit .toolbar.btn.btn-success  {
+    margin-top: 0 !important;
+	padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+}
