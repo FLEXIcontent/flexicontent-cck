@@ -552,3 +552,33 @@ fieldset.fc_filter_set legend .fc_legend_text.hasTooltip {
 	margin-top: 6px;
 	margin-bottom: 6px;
 }
+.plupload_button {
+	color: #fff !important;
+	font: normal 14px sans-serif !important;
+	padding: 8px !important;
+	margin-right: 4px;
+	background: #007db0 !important;
+}
+.plupload_add:before {
+	content: '\2b';
+}
+a.plupload_button.plupload_start {
+	background: #418d52 !important;
+}
+.plupload_disabled,
+a.plupload_disabled:hover {
+	background: #1F3047 !important;
+}
+.btn-group .dropdown-menu {
+	width: max-content;
+}
+#flexicontent.flexi_edit .input-group {
+	width: initial;
+}
+.fcfield_field_preview_box {
+	padding: 0 20px;
+}
+#flexicontent .fc-xpended-btns.btn,
+.btn {
+	border: 1px solid #aaa !important;
+}
