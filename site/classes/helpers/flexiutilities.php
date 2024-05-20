@@ -734,7 +734,8 @@ class FLEXIUtilities
 		// Redirect to Flexicontent backend Dashboard
 		if (!$is_authorized)
 		{
-			$app->redirect('index.php?option=com_flexicontent', \Joomla\CMS\Language\Text::_('FLEXI_NO_ACCESS'), 'warning');
+			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_NO_ACCESS'), 'warning');
+			$app->redirect('index.php?option=com_flexicontent', 403);
 		}
 
 		// Get post-installation FLAG (session variable), and current view (HTTP request variable)
