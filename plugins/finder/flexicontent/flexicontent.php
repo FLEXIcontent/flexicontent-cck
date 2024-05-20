@@ -10,14 +10,24 @@
 defined('_JEXEC') or die;
 
 use Joomla\Registry\Registry;
-JLoader::register('FinderIndexerAdapter', JPATH_ADMINISTRATOR . '/components/com_finder/helpers/indexer/adapter.php');
+
+if (version_compare(JVERSION, '4.0', 'ge'))
+{
+	class _plgFinderFLEXIcontent extends \Joomla\Component\Finder\Administrator\Indexer\Adapter {}
+}
+else
+{
+	JLoader::register('FinderIndexerAdapter', JPATH_ADMINISTRATOR . '/components/com_finder/helpers/indexer/adapter.php');
+	class _plgFinderFLEXIcontent extends UsersModelUsers {}
+}
+
 
 /**
  * Smart Search adapter for com_flexicontent.
  *
  * @since  2.5
  */
-class plgFinderFLEXIcontent extends \Joomla\Component\Finder\Administrator\Indexer\Adapter
+class plgFinderFLEXIcontent extends _plgFinderFLEXIcontent
 {
 	/**
 	 * The plugin identifier.
