@@ -714,12 +714,16 @@ class fc_Waveform_LazyLoad
 		options.hide_image = options.hide_image || false;
 		options.keep_props = options.keep_props || false;
 
+		box.find('.field-media-wrapper').find('.button-clear').click();
+		box.find('.clear-btn').click();
+
 		if (options.hide_image)
 		{
 			box.find('.fcfield_preview_box').hide();
 		}
 		else
 		{
+			//console.log('clear_props');
 			fcfield_mediafile.clearFieldUploader(box, config_name);
 			box.find('.fc_mediafile_audio_spectrum').data('audio_spectrum').empty();
 
@@ -733,6 +737,8 @@ class fc_Waveform_LazyLoad
 			box.find('.fc_preview_msg').html('');
 			box.find('.fcfield_preview_box').hide();
 
+			box.find('.fc_media_file_box').show(); // media field if it exists
+
 			if (hasValue) valcounter.value = ( valcounter.value=='' || valcounter.value=='1' )  ?  ''  :  parseInt(valcounter.value) - 1;
 			//if (window.console) window.console.log('valcounter: ' + valcounter.value);
 		}
@@ -742,6 +748,120 @@ class fc_Waveform_LazyLoad
 		}
 	}
 
+	fcfield_mediafile.clearMediaFile = function(clear_btn, placeholder_path)
+	{
+		var box = jQuery(clear_btn).closest('.fcfieldval_container');
+		box.find('.fc-file-id').val('0');
+		box.find('.fc_filedata_txt').val('');
+		box.find('.inline-preview-img').attr('src', placeholder_path);
+		box.find('.inline-preview-obj').attr('data', placeholder_path);
+		box.find('.inline-preview-img').hide();
+		box.find('.inline-preview-obj').hide();
+	}
+
+	fcfield_mediafile.assignMediaFile = function(value_container_id, filename, file_preview)
+	{
+		//filename = decodeURIComponent(filename);
+		var originalname = filename;
+		var displaytitle = '';
+		var text_nowrap  = filename;
+
+		var container   = jQuery('#'+value_container_id).closest('.fcfieldval_container');
+		var config_name = jQuery('#'+value_container_id).data('config_name');
+
+		var ext      = filename ? filename.split('.').pop() : '';
+		var baseName = fcfield_mediafile.getFileBasename(filename);
+
+		var waveform_preview = !filename ? '' : filename.substr(0, filename.lastIndexOf(".")) + '.mp3';
+		var waveform_peaks   = !filename ? '' : filename.substr(0, filename.lastIndexOf(".")) + '.json';
+
+		waveform_preview = !filename ? '' : waveform_preview.replace(baseName, '/audio_preview/' + baseName);
+		waveform_peaks   = !filename ? '' : waveform_peaks.replace(baseName, '/audio_preview/' + baseName);
+
+		var _name = filename;
+		var _url = fcfield_mediafile_base_url[config_name] + '/' + filename;
+		var isURL = /^(f|ht)tps?:\/\//i.test(_name);
+
+		var mp3Preview = isURL ? waveform_preview : fcfield_mediafile_base_url[config_name] + waveform_preview;
+		var jsonPeaks  = isURL ? waveform_peaks : fcfield_mediafile_base_url[config_name] + waveform_peaks;
+
+		//window.console.log(mp3Preview);
+		//window.console.log(jsonPeaks);
+
+		container.find('.fc-file-id').val(0);
+		container.find('.fc_filedata_storage_name').html(filename);
+		container.find('.fc_filedata_txt').val(originalname).removeClass('file_unpublished').blur();
+		container.find('.fc_filedata_txt').removeAttr('data-filename');
+		container.find('.fc_filedata_txt').data('filename', filename);
+		container.find('.fc_filedata_txt_nowrap').html(text_nowrap).show();
+		container.find('.fc_filedata_title').html(displaytitle);
+		container.find('.fc_preview_thumb').attr('src', file_preview);
+
+		container.find('.fc_filedata_txt').data('wfpreview', waveform_preview);
+		container.find('.fc_filedata_txt').data('wfpeaks', waveform_peaks);
+
+		var is_image = file_preview.match(/\.(jpeg|jpg|gif|png|webp)$/) != null;
+		if (is_image)
+		{
+			container.find('.fc_preview_text').html('');
+			//container.find('.fcfield_preview_box').show();
+			container.find('.inline-preview-img').show();
+
+		}
+		else
+		{
+			container.find('.fc_preview_text').html(ext.toUpperCase());
+			container.find('.inline-preview-img').hide();
+			if (container.find('.fcfield_preview_box').hasClass('auto'))
+			{
+				container.find('.fcfield_preview_box').hide();
+			}
+		}
+
+		container.find('.fc_filetitle').val(filename).blur();
+		container.find('.fc_filelang').val('').trigger('change');
+		container.find('.fc_filedesc').val('');
+
+		// Load the audio file
+		var audio_spectrum = container.find('.fc_mediafile_audio_spectrum').data('audio_spectrum');
+		if (!!filename)
+		{
+			audio_spectrum._dummyProgress();
+
+			jQuery.ajax({
+				dataType: 'json',
+				url: jsonPeaks
+			}).success(function (response)
+			{
+				var data = response.data;
+				data.unshift(data[1]);
+
+				// Scale peaks
+				audio_spectrum.backend.peaks = data; //.map(p => p/128);
+
+				// Draw peaks
+				setTimeout(function () {
+					audio_spectrum._stopProgressBar();
+					//audio_spectrum.load(mp3Preview, data);
+					audio_spectrum.drawBuffer();
+				}, 10);
+			});
+		}
+
+		// Increment value counter (which is optionally used as 'required' form element)
+		var valcounter = document.getElementById('custom_' + config_name);
+		if (valcounter)
+		{
+			valcounter.value = valcounter.value=='' ? '1' : parseInt(valcounter.value) + 1;
+		}
+
+		var remove_obj = container.find('.inlinefile-del');
+		remove_obj.removeAttr('checked').trigger('change');
+
+		// Re-validate
+		jQuery(valcounter).trigger('blur');
+		return true;
+	}
 
 	fcfield_mediafile.getFileBasename = function(str) 
 	{
@@ -753,7 +873,6 @@ class fc_Waveform_LazyLoad
 		return base;
 	}
 
-
 	fcfield_mediafile.assignFile = function(value_container_id, file, keep_modal, config_name)
 	{
 		// Decode php utf8_encode
@@ -764,7 +883,7 @@ class fc_Waveform_LazyLoad
 				file[key] = file[key];
 			}
 		}
-		
+
 		// We use altname (aka title) that is by default (unless modified) same as 'filename_original'
 		var originalname = file.filename_original ? file.filename_original : file.filename;
 		var displaytitle = file.altname && (file.altname!=file.filename) ? file.altname : '-';
@@ -791,7 +910,7 @@ class fc_Waveform_LazyLoad
 		//window.console.log(mp3Preview);
 		//window.console.log(jsonPeaks);
 
-		container.find('.fc_fileid').val(file.id);
+		container.find('.fc-file-id').val(file.id);
 		container.find('.fc_filedata_storage_name').html(file.filename);
 		container.find('.fc_filedata_txt').val(originalname).removeClass('file_unpublished').blur();
 		container.find('.fc_filedata_txt').removeAttr('data-filename');

@@ -2,6 +2,7 @@
 
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Language\Text;
+use Joomla\Component\QuantumManager\Administrator\Field\QuantumuploadField;
 
 $use_myfiles     = 1;
 $per_value_js    = "";
@@ -161,7 +162,7 @@ foreach ($field->value as $index => $value)
 				'class' => 'hasTipPreview'
 			);
 
-			$mm_link = 'index.php?option=com_media&amp;view=images&amp;layout=default_fc&amp;tmpl=component&amp;asset=com_flexicontent&amp;author=&amp;fieldid=\'+mm_id+\'&amp;folder=';
+			$mm_link = 'index.php?option=com_media&amp;view=images&amp;folder='.$jmedia_subpath.'layout=default_fc&amp;tmpl=component&amp;asset=com_flexicontent&amp;author=&amp;fieldid=\'+mm_id+\'&amp;folder=';
 			$select_existing = '
 			<div class="'.$input_grp_class.'">
 				<div class="media-preview ' . $add_on_class . ' ">
@@ -183,7 +184,16 @@ foreach ($field->value as $index => $value)
 		{
 			$jfvalue = str_replace('\\', '/', !empty($value['originalname'])  ?  $value['originalname']  :  '');
 
-			$use_quantum = ComponentHelper::isEnabled('com_quantummanager');
+			// J3 sub-path inside JPATH_ROOT/images
+			// J4 sub-path inside JPATH_ROOT/top-level-directory, default is JPATH_ROOT/media
+			$directory_with_adapter = (version_compare(\Joomla\CMS\Version::MAJOR_VERSION, '4', 'lt')
+				? $jmedia_subpath
+				: 'local-' . $jmedia_topdir .  ':/' . $jmedia_subpath);
+
+			// Currently for quantum, specifying subpath only works properly if subpath is inside 'images'
+			$use_quantum = ComponentHelper::isEnabled('com_quantummanager')
+				//&& ($jmedia_topdir === 'images' && $jmedia_subpath === '')
+			;
 
 			if ($use_quantum)
 			{
@@ -198,15 +208,18 @@ foreach ($field->value as $index => $value)
 				}
 				require_once $quantum_fieldupload_path;
 
-				$xml_field = '<field name="'.$fieldname_n.'[existingname]" id="'.$elementid_n.'_existingname"
-                				addfieldprefix="'.$media_field_prefix.'" type="QuantumUploadImage" dropAreaHidden="false" '
-					// . 'preview_width="'.(int)$thumb_size_default.'" preview_height="'.(int)$thumb_size_default.'" '
+				$xml_field = '<field name="'.$fieldname_n.'[existingname]" id="'.$elementid_n.'_existingname" '
+          . ' addfieldprefix="'.$media_field_prefix.'" type="QuantumUploadImage" dropAreaHidden="true" copy="false" '
+					. ' directory="'.$jmedia_subpath.'" '
+					//. ' preview_width="'.(int)$thumb_size_default.'" preview_height="'.(int)$thumb_size_default.'" '
 					. ' class="existingname" />';
 			}
 			else
 			{
+
 				$xml_field = '<field name="'.$fieldname_n.'[existingname]" id="'.$elementid_n.'_existingname" type="media" preview="true" '
 					. ' preview_width="'.(int)$thumb_size_default.'" preview_height="'.(int)$thumb_size_default.'" '
+					. ' directory="'.$directory_with_adapter.'" '
 					. ' class="existingname" />';
 			}
 
@@ -229,6 +242,17 @@ foreach ($field->value as $index => $value)
 
 			$jfield->setup(new SimpleXMLElement($xml_field), $jfvalue, '');
 			$select_existing = $jfield->input;
+
+			if ($use_quantum)
+			{
+				// Workaround for Quantum not setting the default folder, we will use custom JS
+				$select_existing = str_replace('class="quantumuploadimage-input', ' data-default-scope="'.$jmedia_topdir.'" data-default-subpath="'.$jmedia_subpath.'" class="quantumuploadimage-input', $select_existing);
+				// Bug with Quantum not setting the correct path for the preview image when Joomla is installed in a subdirectory
+				if (JUri::root(true) !== '') {
+					$select_existing = str_replace('<img src="/', '<img src="', $select_existing);
+				}
+			}
+
 		}
 	}
 

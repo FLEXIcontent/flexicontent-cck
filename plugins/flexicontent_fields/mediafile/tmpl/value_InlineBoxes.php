@@ -1,6 +1,10 @@
 <?php
+
+use Joomla\CMS\Factory;
+use Joomla\CMS\Uri\Uri;
+use Joomla\Filesystem\Path;
 use Joomla\String\StringHelper;
-$isAdmin = \Joomla\CMS\Factory::getApplication()->isClient('administrator');
+$isAdmin = Factory::getApplication()->isClient('administrator');
 
 // Important create a -1 "value", before any other normal values, so that it is at 1st position of the array
 $field->{$prop}[-1] = '';
@@ -48,13 +52,22 @@ foreach($values as $file_id)
 	// ***
 
 	$basePath = $file_data->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;
-	$abspath = str_replace(DS, '/', \Joomla\CMS\Filesystem\Path::clean($basePath.DS.$file_data->filename));
+	if (!$file_data->url)
+	{
+		$abspath = str_replace(DS, '/', Path::clean($basePath.DS.$file_data->filename));
+	}
+	else
+	{
+		$abspath = $file_data->url == 2
+			? Path::clean(JPATH_ROOT.DS.$file_data->filename)
+			: $file_data->filename;
+	}
 
 	$_size = '-';
 
 	if ($display_size)
 	{
-		if ($file_data->url)
+		if ($file_data->url == 1)
 		{
 			$_size = (int)$file_data->size ? (int)$file_data->size : '-';
 		}
@@ -67,8 +80,8 @@ foreach($values as $file_id)
 		$file_data->size = (int) $_size;
 	}
 
-	// Force new window for URLs that have zero file size
-	$non_file_url = $file_data->url && !$file_data->size;
+	// Force new window for URLs that have zero file's size
+	$non_file_url = $file_data->url == 1 && !$file_data->size;
 
 
 	// ***
@@ -96,6 +109,7 @@ foreach($values as $file_id)
 
 	// Initialize CSS classes variable
 	$file_classes = !$authorized ? 'fcfile_noauth' : '';
+	$analytics_classes = ' piwik_download ';
 
 
 	// ***
@@ -281,9 +295,12 @@ foreach($values as $file_id)
 /**
  * ****** SKIP THIS PART IF display_properties_only
  */
-if ($prop !== 'display_properties_only') :
+$is_csv_export = $prop === 'csv_export';
 
-
+if ($is_csv_export) {
+	$html .= $abspath;
+}
+else if ($prop !== 'display_properties_only') :
 
 	// [0]: filename (if visible)
 	if ((($filename_shown && !$filename_shown_as_link) || $not_downloadable) && $display_filename != -1)
@@ -359,7 +376,7 @@ if ($prop !== 'display_properties_only') :
 			// The Download Button
 			$_download_btn_html = '
 				<button type="button" onclick="window.open(\''.$dl_link.'\', ' . ($non_file_url ? "''": "'_self'") . ')"
-					class="' . $file_classes . ' btn-success fcfile_downloadFile" title="'.htmlspecialchars($downloadsinfo, ENT_COMPAT, 'UTF-8').'"
+					class="' . $file_classes . ' btn-success fcfile_downloadFile ' . $analytics_classes . '" title="'.htmlspecialchars($downloadsinfo, ENT_COMPAT, 'UTF-8').'"
 				>
 					' . ($compact_display != 2 ? $downloadstext : '') . '
 					' . ($compact_display == 2 ? ' <span class="icon-download"></span>' : '') . '
@@ -453,7 +470,7 @@ if ($prop !== 'display_properties_only') :
 			// The download link, if filename/title not shown, then display a 'download' prompt text
 			$actions_arr[] =
 				($filename_shown && $link_filename ? $icon.' ' : '')
-				.'<a href="' . $dl_link . '" class="' . $file_classes . ' fcfile_downloadFile" title="' . htmlspecialchars($downloadsinfo, ENT_COMPAT, 'UTF-8') . '" ' . ($non_file_url ? 'target="_blank"' : '') . '>'
+				.'<a href="' . $dl_link . '" class="' . $file_classes . ' fcfile_downloadFile ' . $analytics_classes . '" title="' . htmlspecialchars($downloadsinfo, ENT_COMPAT, 'UTF-8') . '" ' . ($non_file_url ? 'target="_blank"' : '') . '>'
 				.($filename_shown && $link_filename ? $name_str : $downloadstext)
 				.'</a>';
 		}
@@ -683,10 +700,13 @@ endif;   // END OF   $prop !== 'display_properties_only'
 
 
 	// Values Prefix and Suffix Texts
-	$field->{$prop}[$n]	=  $pretext . $html . $posttext;
+	$field->{$prop}[$n]	=  !$is_csv_export
+		? $pretext . $html . $posttext
+		: $html;
 
 	// Some extra data for developers: (absolute) file URL and (absolute) file path
 	$field->url[$use_ingroup ? $n : $i] = $dl_link;
+	$field->direct_url[$use_ingroup ? $n : $i] = $file_data->url == 2 ? Uri::root(true) . '/' . $file_data->filename : ($file_data->url == 1 ? $file_data->filename : $dl_link);
 	$field->abspath[$use_ingroup ? $n : $i] = $abspath;
 	$field->file_data[$use_ingroup ? $n : $i] = $file_data;
 
@@ -705,7 +725,7 @@ endif;   // END OF   $prop !== 'display_properties_only'
 	if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 }
 
-\Joomla\CMS\Factory::getDocument()->addScriptDeclaration("
+Factory::getDocument()->addScriptDeclaration("
 	fcview_mediafile_base_url['".$field_name_js."'] = '".$base_url."';
 
 	" . (!$per_value_js ? "" : "

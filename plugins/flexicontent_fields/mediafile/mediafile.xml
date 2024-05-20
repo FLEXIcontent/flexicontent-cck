@@ -196,17 +196,25 @@
 			<field name="" type="separator" default="FLEXI_MY_FILES_INFO" description="" level="level3" class="alert alert-info fcpadded"/>
 
 			<field name="use_myfiles" type="multilist" subtype="list" toggle_related="1" default="1" label="FLEXI_ENABLE" description="Enable to allow selecting an existing file that was previously uploaded" class="">
-				<option value="0" show_list="use-myfiles-off" hide_list="use-myfiles-jmedia,use-myfiles-on">FLEXI_NO</option>
-				<option value="1" show_list="use-myfiles-on" hide_list="use-myfiles-off,use-myfiles-jmedia">Yes (existing files + URL links)</option>
-				<option value="2" show_list="use-myfiles-on,use-myfiles-jmedia" hide_list="use-myfiles-off">Yes (existing files + URL links + Joomla Media manager links)</option>
+				<option value="0" show_list="use-myfiles-off" hide_list="use-myfiles-jmedia,use-myfiles-on">Inline uploads, No My files reuse modal</option>
+				<option value="1" show_list="use-myfiles-on" hide_list="use-myfiles-off,use-myfiles-jmedia">Inline uploads + My Files reuse modal (with: Secure Uploads + URL links)</option>
+				<option value="2" show_list="use-myfiles-on,use-myfiles-jmedia" hide_list="use-myfiles-off">Inline uploads + My Files reuse modal (with: Secure Uploads + URL links + Joomla Media manager)</option>
+				<option value="3" show_list="use-myfiles-on,use-myfiles-jmedia" hide_list="use-myfiles-off">Inline uploads + My Files reuse modal (with: URL links + Joomla Media manager)</option>
+				<option value="4" show_list="use-myfiles-on,use-myfiles-jmedia" hide_list="use-myfiles-off">Joomla Media manager</option>
+				<option value="5" show_list="use-myfiles-on" hide_list="use-myfiles-off">Inline uploads + My Files reuse modal (with: Secure Uploads)</option>
 			</field>
 
 			<field name="jmedia_filetypes" type="fccheckbox" default="" display_useglobal="0"
-				checkoptions="Folders,Images,Documents,Videos"
-				checkvals="folders,images,docs,videos"
-				defaultvals="folders,images"
+				checkoptions="Folders,Images,Documents,Videos,Audios"
+				checkvals="folders,images,docs,videos,audios"
+				defaultvals="folders,videos,audios"
 				label="Joomla media" description="Select file types what will be allowed and selectable by the editors" depend_class="use-myfiles-jmedia" />
 
+			<field name="" type="separator" default="About top folder (J4+ only) &lt;br&gt; - You must add this folder in PLUGIN: 'FileSystem - Local', &lt;br&gt; e.g. add folder downloads. &lt;br&gt; - For quantum file manager. This is the scope name &lt;br&gt; NOTE: please add an extra custom-named scope for the folder images !! &lt;br&gt;  e.g. 'imgs' DO NOT change folder name 'images', &lt;br&gt; 'imgs' will be the name of the custom scope" level="level3" depend_class="use-myfiles-jmedia" />
+			<field name="jmedia_topdir" type="text" default="" hint="images" display_useglobal="0"
+				   label="Top folder" description="For native media file manager, this is the folder inside Joomla ROOT (that you added in Filestorage plugin, or for Quantum file manager this will be the custom scope name" depend_class="use-myfiles-jmedia" />
+			<field name="jmedia_subpath" type="text" default="" display_useglobal="0"
+				   label="Sub folder path" hint="e.g. content/news -> JPATH_ROOT/images/content/news" description="Select sub-folder to be opened" depend_class="use-myfiles-jmedia" />
 
 			<field name="" type="separator" default="FLEXI_UPLOADER" level="level3" depend_class="use-myfiles-on" />
 			<field name="autoassign" type="radio" default="1" label="FLEXI_UPLOADED_FILES_AUTO_ASSIGN" description="FLEXI_UPLOADED_FILES_AUTO_ASSIGN_DESC" depend_class="use-myfiles-on" class="btn-group btn-group-yesno">

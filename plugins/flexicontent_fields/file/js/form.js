@@ -80,12 +80,11 @@
 
 		if (options.hide_image)
 		{
-			console.log('hide_image');
 			box.find('.fcfield_preview_box').hide();
 		}
 		else
 		{
-			console.log('clear_props');
+			//console.log('clear_props');
 			fcfield_file.clearFieldUploader(box, config_name);
 
 			box.find('.fc_filedata_txt').val('');
@@ -122,6 +121,7 @@
 
 	fcfield_file.assignMediaFile = function(value_container_id, filename, file_preview)
 	{
+		//filename = decodeURIComponent(filename);
 		var originalname = filename;
 		var displaytitle = '';
 		var text_nowrap  = filename;
@@ -129,14 +129,15 @@
 		var container   = jQuery('#'+value_container_id).closest('.fcfieldval_container');
 		var config_name = jQuery('#'+value_container_id).data('config_name');
 
-		container.find('.fc_fileid').val(0);
+		var ext      = filename ? filename.split('.').pop() : '';
+		var baseName = fcfield_mediafile.getFileBasename(filename);
+		container.find('.fc-file-id').val(0);
 		container.find('.fc_filedata_storage_name').html(filename);
 		container.find('.fc_filedata_txt').val(originalname).removeClass('file_unpublished').blur();
 		container.find('.fc_filedata_txt').removeAttr('data-filename');
 		container.find('.fc_filedata_txt').data('filename', filename);
 		container.find('.fc_filedata_txt_nowrap').html(text_nowrap).show();
 		container.find('.fc_filedata_title').html(displaytitle);
-
 		container.find('.fc_preview_thumb').attr('src', file_preview);
 
 		var is_image = file_preview.match(/\.(jpeg|jpg|gif|png|webp)$/) != null;
@@ -149,7 +150,7 @@
 		}
 		else
 		{
-			container.find('.fc_preview_text').html(filename.split('.').pop().toUpperCase());
+			container.find('.fc_preview_text').html(ext.toUpperCase());
 			container.find('.inline-preview-img').hide();
 			if (container.find('.fcfield_preview_box').hasClass('auto'))
 			{
@@ -174,7 +175,16 @@
 		// Re-validate
 		jQuery(valcounter).trigger('blur');
 		return true;
+	}
 
+	fcfield_file.getFileBasename = function(str) 
+	{
+		var base = new String(str).substring(str.lastIndexOf('/') + 1); 
+		if (base.lastIndexOf(".") != -1)
+		{
+			base = base.substring(0, base.lastIndexOf("."));
+		}
+		return base;
 	}
 
 	fcfield_file.assignFile = function(value_container_id, file, keep_modal, config_name)
@@ -194,8 +204,12 @@
 		var text_nowrap  = file.altname && (file.altname!=file.filename) ? file.filename+'<br/>'+file.altname : '';
 
 		var container = jQuery('#'+value_container_id).closest('.fcfieldval_container');
+		
+		var ext      = file.filename ? file.filename.split('.').pop() : '';
+		var baseName = fcfield_file.getFileBasename(file.filename);
 
-		container.find('.fc_fileid').val(file.id);
+
+		container.find('.fc-file-id').val(file.id);
 		container.find('.fc_filedata_storage_name').html(file.filename);
 		container.find('.fc_filedata_txt').val(originalname).removeClass('file_unpublished').blur();
 		container.find('.fc_filedata_txt').removeAttr('data-filename');

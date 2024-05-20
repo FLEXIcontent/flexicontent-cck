@@ -1,9 +1,10 @@
 <?php
 
+use Joomla\CMS\Factory;
 use Joomla\CMS\Uri\Uri;
 use Joomla\Filesystem\Path;
 use Joomla\String\StringHelper;
-$isAdmin = \Joomla\CMS\Factory::getApplication()->isClient('administrator');
+$isAdmin = Factory::getApplication()->isClient('administrator');
 
 // Important create a -1 "value", before any other normal values, so that it is at 1st position of the array
 $field->{$prop}[-1] = '';
@@ -35,7 +36,6 @@ foreach($values as $file_id)
 		continue;
 	}
 	$file_data = $files_data[$file_id];
-	$FN_n      = $field_name_js.'_'.$n;
 
 
 	// ***
@@ -365,13 +365,15 @@ else if ($prop !== 'display_properties_only') :
 			}
 
 			// The Download Button
-			$actions_arr[] = '
+			$_download_btn_html = '
 				<button type="button" onclick="window.open(\''.$dl_link.'\', ' . ($non_file_url ? "''": "'_self'") . ')"
 					class="' . $file_classes . ' btn-success fcfile_downloadFile ' . $analytics_classes . '" title="'.htmlspecialchars($downloadsinfo, ENT_COMPAT, 'UTF-8').'"
 				>
 					' . ($compact_display != 2 ? $downloadstext : '') . '
 					' . ($compact_display == 2 ? ' <span class="icon-download"></span>' : '') . '
 				</button>';
+			// Add it now, optionally this can be commented out to add it a custom place
+			$actions_arr[] = $_download_btn_html;
 		}
 
 		if ($authorized && $allowview && !$file_data->url)

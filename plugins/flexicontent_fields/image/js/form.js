@@ -315,3 +315,54 @@
 		file.preview_url = jQuery(uploader.settings.container).find('.plupload_img_preview > img').attr('src');
 		fcfield_image.assignImage(file.targetid, file.filename, file.preview_url, 2, file.filename_original, config_name);
 	}
+
+
+	jQuery(document).ready(function() {
+		window.__QuantumuploadimageModalOpen = window.QuantumuploadimageModalOpen;
+		/*window.QuantumuploadimageModalOpen = function () {
+			let input = quantumuploadimageSelector.querySelector('input');
+			let clearValue = false;
+			console.log(jQuery(input));
+			if (input.value == '' && jQuery(input).data('default-subpath')) {
+				clearValue = true;
+				let defaultSubPath = jQuery(input).data('default-subpath');
+				jQuery(input).val('images/'+defaultSubPath+'/dummy.png');
+				console.log(jQuery(input).val());
+			}
+			window.__QuantumuploadimageModalOpen();
+			//if (clearValue) jQuery(input).val('');
+		}*/
+
+		window.QuantumuploadimageModalOpen = function () {
+			let input = quantumuploadimageSelector.querySelector('input');
+
+			let defaultSubPath = (typeof input !== 'undefined' ? jQuery(input).data('default-subpath') : '') || '';
+			let defaultScope   = (typeof input !== 'undefined' ? jQuery(input).data('default-scope') : '') || 'images';
+
+			// Trim leading and trailing slashes
+			defaultScope   = defaultScope.replace(/^\/+|\/+$/g, '');
+			defaultSubPath = defaultSubPath.replace(/^\/+|\/+$/g, '');
+			let backupValue = '';
+
+			console.log(input);
+			console.log(defaultSubPath);
+			console.log(defaultScope);
+
+			if (defaultScope && defaultSubPath)
+			{
+				if (input.value != '') {
+					backupValue = input.value;
+					jQuery(input).val('');
+					console.log(jQuery(input).val());
+				}
+				localStorage.setItem('quantummanagerLastDir', 'root/' + defaultSubPath);
+				console.log(localStorage.getItem('quantummanagerLastDir'));
+				localStorage.setItem('quantummanagerScope',defaultScope);
+				console.log(localStorage.getItem('quantummanagerScope'));
+			}
+			window.__QuantumuploadimageModalOpen();
+			setTimeout(function() {
+				if (backupValue) jQuery(input).val(backupValue);
+			}, 200);
+		}
+	});

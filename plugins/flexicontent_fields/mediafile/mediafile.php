@@ -9,6 +9,10 @@
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
+use Joomla\CMS\Component\ComponentHelper;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Uri\Uri;
+
 defined( '_JEXEC' ) or die( 'Restricted access' );
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 JLoader::register('FlexicontentControllerFilemanager', JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'controllers'.DS.'filemanager.php');  // we use JPATH_BASE since controller exists in frontend too
@@ -51,10 +55,10 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		if ($use_ingroup && empty($field->ingroup)) return;
 
 		// Initialize framework objects and other variables
-		$document = \Joomla\CMS\Factory::getDocument();
-		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
-		$app  = \Joomla\CMS\Factory::getApplication();
-		$user = \Joomla\CMS\Factory::getUser();
+		$document = Factory::getDocument();
+		$cparams  = ComponentHelper::getParams( 'com_flexicontent' );
+		$app  = Factory::getApplication();
+		$user = Factory::getUser();
 
 		$tooltip_class = 'hasTooltip';
 		$add_on_class    = $cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
@@ -67,7 +71,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		$tip_class     = $tooltip_class;  // Compatibility with older custom templates
 
 		// Get a unique id to use as item id if current item is new
-		$u_item_id = $item->id ? $item->id : substr(\Joomla\CMS\Factory::getApplication()->input->get('unique_tmp_itemid', '', 'string'), 0, 1000);
+		$u_item_id = $item->id ? $item->id : substr(Factory::getApplication()->input->get('unique_tmp_itemid', '', 'string'), 0, 1000);
 
 
 		/**
@@ -78,7 +82,43 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		$max_values   = $use_ingroup ? 0 : (int) $field->parameters->get('max_values', 0);
 		$required     = (int) $field->parameters->get('required', 0);
 		$add_position = (int) $field->parameters->get('add_position', 3);
-		$use_myfiles  = (int) $field->parameters->get('use_myfiles', '1');
+
+		$use_myfiles      = (int) $field->parameters->get('use_myfiles', '1');
+
+		$media_params     = ComponentHelper::getParams('com_media');
+		//$file_path        = $media_params->get('file_path', 'images');
+		$image_path       = $media_params->get('image_path', 'images');
+
+		$jmedia_topdir    = $field->parameters->get('jmedia_topdir', $image_path);
+		$jmedia_subpath   = $field->parameters->get('jmedia_subpath', '');
+		$jmedia_filetypes = array('videos', 'audios');
+
+		$imagesExt    = in_array('images', $jmedia_filetypes)
+			? array_map('trim', explode(',', $media_params->get('image_extensions', 'bmp,gif,jpg,jpeg,png,webp')))
+			: [];
+		$videosExt    = in_array('videos', $jmedia_filetypes)
+			? array_map('trim', explode(',', $media_params->get('video_extensions', 'mp4,mp4v,mpeg,mov,webm')))
+			: [];
+		$audiosExt    = in_array('audios', $jmedia_filetypes)
+			? array_map('trim', explode(',', $media_params->get('audio_extensions', 'mp3,m4a,mp4a,ogg')))
+			: [];
+		$documentsExt = in_array('docs', $jmedia_filetypes)
+			? array_map('trim', explode(',', $media_params->get('doc_extensions', 'doc,odg,odp,ods,odt,pdf,ppt,txt,xcf,xls,csv')))
+			: [];
+
+		if (version_compare(\Joomla\CMS\Version::MAJOR_VERSION, '4', 'ge'))
+		{
+			// 0: images, 1: audios, 2: videos, 3: documents * 'folders' is always included in J4
+			$mediaTypes = [];
+			if (in_array('images', $jmedia_filetypes)) $mediaTypes[] = '0';
+			if (in_array('audios', $jmedia_filetypes)) $mediaTypes[] = '1';
+			if (in_array('videos', $jmedia_filetypes)) $mediaTypes[] = '2';
+			if (in_array('docs',   $jmedia_filetypes)) $mediaTypes[] = '3';
+			$mediaTypes = implode(',', $mediaTypes);  // * 'folders' is always included in J4
+		}
+		else {
+			$fileTypes = implode(',', $jmedia_filetypes); // Supported values: 'folders,images,docs,videos' * audios will be ignored in J3
+		}
 
 		// Classes for marking field required
 		$required_class = $required ? ' required' : '';
@@ -100,14 +140,14 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		$iform_lang  = $inputmode==1 ? 0 : $field->parameters->get('iform_lang',  0);
 		$iform_access= $inputmode==1 ? 0 : $field->parameters->get('iform_access',0);
 		$iform_dir   = $inputmode==1 ? 0 : $field->parameters->get('iform_dir',   0);
-		$iform_stamp = $inputmode==1 ? 0 : $field->parameters->get('iform_stamp', 0);
+		$iform_stamp = 0; //$inputmode==1 ? 0 : $field->parameters->get('iform_stamp', 0);
 
 		$secure_default = 0; //!$iform_dir   ? 0 : (int) $field->parameters->get('iform_dir_default', 1);
 		$stamp_default  = 0; //!$iform_stamp ? 0 : (int) $field->parameters->get('iform_stamp_default', 1);
 
 		$mediapath   = $cparams->get('media_path', 'components/com_flexicontent/medias');
 		$docspath    = $cparams->get('file_path', 'components/com_flexicontent/uploads');
-		$imageexts   = array('png', 'ico', 'gif', 'jpg', 'jpeg', 'webp', 'bmp');
+		$imagesExt   = array('jpg', 'png', 'gif', 'xcf', 'odg', 'wbmp', 'bmp', 'ico', 'jpeg', 'webp');
 
 		$target_dir = $field->parameters->get('target_dir', 0);
 		$base_url   = \Joomla\CMS\Uri\Uri::root(true) . '/' . (!$target_dir ? $mediapath : $docspath);
@@ -118,7 +158,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		$preview_thumb_w = $preview_thumb_h = 600;
 
 		// Inline uploaders flags
-		$use_inline_uploaders = 1;
+		$use_inline_uploaders = $use_myfiles != 4;
 		$usemediaurl = 0; //(int) $field->parameters->get('use_mediaurl', 0);
 		$file_btns_position = 0; //(int) $field->parameters->get('file_btns_position', 0);
 
@@ -380,10 +420,25 @@ class plgFlexicontent_fieldsMediafile extends FCField
 
 				newField.find('.inlinefile-data-lbl').first().attr('for', element_id + '_file-data-txt').attr('id', element_id + '_file-data-lbl');
 
-				var theInput = newField.find('input.fc_fileid').first();
+				var theInput = newField.find('input.fc-file-id').first();
 				theInput.val('');
 				theInput.attr('name', fname_pfx + '[file-id]');
 				theInput.attr('id', element_id + '_file-id');
+
+				var theInput = newField.find('input.fc_mediafile').first();
+				//theInput.val('');
+				theInput.attr('name', fname_pfx + '[mediafile]');
+				theInput.attr('id', element_id + '_mediafile');
+				//newField.find('inline-preview-img').attr('src', '');
+				
+				var theInput = newField.find('input.field-media-input').first();
+				theInput.val('');
+				theInput.attr('name', fname_pfx + '[mediafile]');
+				theInput.attr('id', element_id + '_mediafile'); 
+				
+				" .(!FLEXI_J40GE ? "newField.find('.field-media-wrapper').fieldMedia();" : '') . "
+				newField.find('.field-media-wrapper').find('.button-clear').click();
+				newField.find('.clear-btn').click();
 
 				newField.find('.fc_filedata_txt_nowrap').html('-');
 				newField.find('.fc_filedata_title').html('-');
@@ -729,9 +784,52 @@ class plgFlexicontent_fieldsMediafile extends FCField
 
 		include(self::getFormPath($this->fieldtypes[0], $formlayout));
 
+		// Use inline media field
+		if ($use_myfiles == 4) {
+			$document->addScriptDeclaration('
+				function jInsertFieldValue(value, id)
+				{	
+					var elem = jQuery(\'#\'+id).get(0);
+					elem.value = value;
+		
+					let file_is_image = value.match(/\.(jpg|png|gif|xcf|odg|wbmp|bmp|ico|jpeg|webp)$/i);
+					let preview_img = jQuery(elem).closest(\'.fcfieldval_container\').find(\'img.inline-preview-img\');
+					let preview_obj = jQuery(elem).closest(\'.fcfieldval_container\').find(\'object.inline-preview-obj\');
+					console.log(preview_img);
+					console.log(preview_obj);
+
+					if (preview_img.length > 0) {
+						if (file_is_image) {
+							let juri_root = preview_img.parent().attr(\'data-juri-root\');
+							preview_img.attr(\'src\', juri_root + \'/\' + value);
+							preview_img.show();
+						} else {
+							preview_img.attr(\'src\', \'\');
+							preview_img.hide();
+						}
+					}
+					if (preview_obj.length > 0) {
+						if (!file_is_image) {
+							let juri_root = preview_obj.parent().attr(\'data-juri-root\');
+							preview_obj.attr(\'data\', juri_root + \'/\' + value);
+							preview_obj.show();
+						} else {
+							preview_obj.attr(\'data\', \'\');
+							preview_obj.hide();
+						}
+					}
+
+					fcfield_mediafile.assignMediaFile(id, value, \''.Uri::root().'/\' + value);
+
+					if (typeof SqueezeBox != \'undefined\') SqueezeBox.close();
+					if (typeof jQuery != \'undefined\') jQuery(\'#fc_modal_popup_container\').dialog(\'close\');
+				}
+			');
+		}
+
 		foreach($field->html as $n => &$_html)
 		{
-			$uploader_html = $uploader_html_arr[$n];
+			$uploader_html = $use_inline_uploaders ? $uploader_html_arr[$n] : false;
 			$_html = '
 				'.(!$add_ctrl_btns ? '' : '
 				<div class="'.$btn_group_class.' fc-xpended-btns">
@@ -756,7 +854,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 				'.($fields_box_placing ? '<div class="fcclear"></div>' : '').'
 				').'
 
-				<div class="fc-field-props-box" ' . (!$multiple ? 'style="width: 96%; max-width: 1400px;"' : ''). '>
+				<div class="fc-field-props-box" style="' . (!$multiple || $use_ingroup ? 'width: 96%; max-width: 1020px;' : ''). '">
 
 					'.($use_inline_uploaders && ($file_btns_position || !$add_ctrl_btns) ? '
 					<div class="fcclear"></div>
@@ -868,8 +966,8 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		{
 			$initialized = 1;
 
-			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$app       = Factory::getApplication();
+			$document  = Factory::getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -915,7 +1013,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		static $tooltips_added = array();
 		if ( empty($tooltips_added[$field->id]) )
 		{
-			$add_tooltips = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' )->get('add_tooltips', 1);
+			$add_tooltips = ComponentHelper::getParams( 'com_flexicontent' )->get('add_tooltips', 1);
 			if ($add_tooltips) \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip');
 			$tooltips_added[$field->id] = true;
 		}
@@ -1004,7 +1102,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		if ( $js_added === null )
 		{
 			$js_added = true;
-			$document = \Joomla\CMS\Factory::getDocument();
+			$document = Factory::getDocument();
 
 			\Joomla\CMS\Language\Text::script('PLG_FLEXICONTENT_FIELDS_MEDIAFILE_RESPONSE_PARSING_FAILED', false);
 			\Joomla\CMS\Language\Text::script('PLG_FLEXICONTENT_FIELDS_MEDIAFILE_FILE_NOT_FOUND', false);
@@ -1063,7 +1161,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		$noaccess_addvars      = $field->parameters->get( 'noaccess_addvars', 0);
 
 		// Select appropriate messages depending if user is logged on
-		if (\Joomla\CMS\Factory::getUser()->guest)
+		if (Factory::getUser()->guest)
 		{
 			if ($noaccess_url_unlogged)
 			{
@@ -1075,7 +1173,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 
 				$return   = strtr(base64_encode($uri->toString()), '+/=', '-_,');          // Current URL as return URL (but we will for id / cid)
 				$fcreturn = serialize( array('id' => $app->input->getInt('id'), 'cid' => $app->input->getInt('cid')) );  // a special url parameter, used by some SEF code
-				$noaccess_url = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' )->get('login_page', 'index.php?option=com_users&view=login')
+				$noaccess_url = ComponentHelper::getParams( 'com_flexicontent' )->get('login_page', 'index.php?option=com_users&view=login')
 					. '&return='.$return
 					. '&fcreturn='.base64_encode($fcreturn);
 			}
@@ -1092,15 +1190,19 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		// VERIFY downloads manager module is installed and enabled
 		static $mod_is_enabled = null;
 
-		if ($mod_is_enabled === null && $allowaddtocart && !\Joomla\CMS\Factory::getApplication()->isClient('administrator'))
+		if ($mod_is_enabled === null && $allowaddtocart && !Factory::getApplication()->isClient('administrator'))
 		{
-			$db = \Joomla\CMS\Factory::getDbo();
-			$query = "SELECT published FROM #__modules WHERE module = 'mod_flexidownloads' AND published = 1";
-			$mod_is_enabled = $db->setQuery($query)->loadResult();
+			$db = Factory::getDbo();
+			$mod_is_enabled = $db->setQuery($db->getQuery(true)
+				->select('published')
+				->from('#__modules')
+				->where('module = '.$db->quote('mod_flexidownloads'))
+				->where('published = 1')
+			)->loadResult();
 
 			if (!$mod_is_enabled)
 			{
-				\Joomla\CMS\Factory::getApplication()->enqueueMessage("FILE FIELD: please disable parameter \"Use Downloads Manager Module\", the module is not install or not published", 'message' );
+				Factory::getApplication()->enqueueMessage("FILE FIELD: please disable parameter \"Use Downloads Manager Module\", the module is not install or not published", 'message' );
 			}
 		}
 		$allowaddtocart = $allowaddtocart ? $mod_is_enabled : 0;
@@ -1118,7 +1220,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		}
 
 		// Get user access level (these are multiple for J2.5)
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = Factory::getUser();
 		$aid_arr = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
 
 		$n = 0;
@@ -1193,7 +1295,8 @@ class plgFlexicontent_fieldsMediafile extends FCField
 				}
 			}
 
-			if ($values_list_placement)
+			$is_csv_export = $prop == 'csv_export';
+			if ($values_list_placement && !$is_csv_export)
 			{
 				$ff_slider_tagid = 'fcfile_slider_' . $item->id . '_' . $field->id;
 				$ff_slider_title = \Joomla\CMS\Language\Text::_($values_slider_title);
@@ -1266,7 +1369,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
 
 		// Get configuration
-		$app  = \Joomla\CMS\Factory::getApplication();
+		$app  = Factory::getApplication();
 		$is_importcsv = $app->input->get('task', '', 'cmd') == 'importcsv';
 		$import_docs_folder = $app->input->get('import_docs_folder', '', 'string');
 
@@ -1368,7 +1471,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 						UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk',
 						UPLOAD_ERR_EXTENSION => 'A PHP extension stopped the file upload'
 					);
-					\Joomla\CMS\Factory::getApplication()->enqueueMessage("FILE FIELD: ".$err_msg[$err_code], 'warning' );
+					Factory::getApplication()->enqueueMessage("FILE FIELD: ".$err_msg[$err_code], 'warning' );
 					if ($use_ingroup) $newpost[$new++] = null;
 					continue;
 				}
@@ -1384,6 +1487,74 @@ class plgFlexicontent_fieldsMediafile extends FCField
 				if( $new_file )
 				{
 					$v['secure']   = 0; //!$iform_dir    ? 0 : ((int) $v['secure'] ? 1 : 0);
+				}
+
+				$db = Factory::getDbo();
+
+				if (!empty($v['mediafile']))
+				{
+					$_parts         = explode('#', $v['mediafile']);
+					$v['mediafile'] = $_parts[0];
+					$v['mediafile'] = str_replace('%20', '__SPACE__', $v['mediafile']);
+					$v['mediafile'] = str_replace(' ', '__SPACE__', $v['mediafile']);
+					$v['mediafile'] = flexicontent_html::dataFilter($v['mediafile'], 4000, 'PATH', 0);  // Validate JMedia file PATH
+					$v['mediafile'] = str_replace('__SPACE__', ' ', $v['mediafile']);
+				}
+
+				// Clear matched file_id if filename does not match
+				if ($file_id && !empty($v['mediafile'])) {
+					$matched_file = $db->setQuery($db->getQuery(true)
+						->select('a.*')
+						->from('#__flexicontent_files AS a')
+						// filename same as en_file
+						->where('a.id = ' . (int) $file_id)
+						->where('a.filename = ' . $db->quote($v['mediafile']))
+					)->loadObject();
+					if (!$matched_file) {
+						$file_id = 0;
+					}
+				}
+
+				// Support inline media file
+				if (!$file_id && !empty($v['mediafile']))
+				{
+					// Check if file exists already in file manager
+					$existing_file = $db->setQuery($db->getQuery(true)
+						->select('a.*')
+						->from('#__flexicontent_files AS a')
+						// filename same as en_file
+						->where('a.filename = ' . $db->quote($v['mediafile']))
+					)->loadObject();
+
+					if ($existing_file)
+					{
+						$file_id = $existing_file->id;
+					}
+					else {
+						// Add file by calling filemanager controller upload() task, which will do the data filtering too
+						$fman = new FlexicontentControllerFilemanager();
+						$fman->runMode = 'interactive';
+
+						$inp = Factory::getApplication()->input;
+						$inp->set('file-link-type', 2);
+						$inp->set('file-jmedia-data', $v['mediafile']);
+						$app->input->set('return', null);
+						$app->input->set('secure', 0);
+						$app->input->set('stamp', 0);
+						$app->input->set('file-url-title', $v['file-title']);
+						$app->input->set('file-url-desc', $v['file-desc']);
+						$app->input->set('file-url-lang', $v['file-lang']);
+						$app->input->set('file-url-access', $v['file-access']);
+
+						$upload_errs = null;
+						$file_id = $fman->addurl(null, $upload_errs);
+						$file_id = !empty($file_id) ? $file_id : ($use_ingroup ? null : false);
+
+						if (empty($file_id)) foreach ($upload_errs as $err_type => $upload_err)
+						{
+							Factory::getApplication()->enqueueMessage(print_r($upload_err, true), $err_type);
+						}
+					}
 				}
 
 				// UPDATE existing file
@@ -1410,8 +1581,8 @@ class plgFlexicontent_fieldsMediafile extends FCField
 					if ( $v['file-del'] )
 					{
 						/*!$isAssigned
-							? \Joomla\CMS\Factory::getApplication()->enqueueMessage("FILE FIELD: refusing to delete file: '".$_filename."', that is not assigned to current item", 'warning' );
-							: \Joomla\CMS\Factory::getApplication()->enqueueMessage("FILE FIELD: refusing to update file properties of a file: '".$_filename."', that is not assigned to current item", 'warning' );*/
+							? Factory::getApplication()->enqueueMessage("FILE FIELD: refusing to delete file: '".$_filename."', that is not assigned to current item", 'warning' );
+							: Factory::getApplication()->enqueueMessage("FILE FIELD: refusing to update file properties of a file: '".$_filename."', that is not assigned to current item", 'warning' );*/
 					}
 
 					// Delete existing file if so requested
@@ -1433,7 +1604,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 					// Update DB data of the file
 					if ( !$row->check() || !$row->store() )
 					{
-						\Joomla\CMS\Factory::getApplication()->enqueueMessage("FILE FIELD: " . $row->getError(), 'warning');
+						Factory::getApplication()->enqueueMessage("FILE FIELD: " . $row->getError(), 'warning');
 						if ($use_ingroup) $newpost[$new++] = null;
 						continue;
 					}
@@ -1455,7 +1626,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 							/*$row = \Joomla\CMS\Table\Table::getInstance('flexicontent_files', '');
 							$row->load( $file_id );
 							$_filename = $row->filename_original ? $row->filename_original : $row->filename;
-							\Joomla\CMS\Factory::getApplication()->enqueueMessage("FILE FIELD: refusing to delete file: '".$_filename."', that is not assigned to current item", 'warning' );*/
+							Factory::getApplication()->enqueueMessage("FILE FIELD: refusing to delete file: '".$_filename."', that is not assigned to current item", 'warning' );*/
 						}
 
 						// Delete previous file if no longer used
@@ -1497,7 +1668,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 
 					if (empty($file_id)) foreach ($upload_errs as $err_type => $upload_err)
 					{
-						\Joomla\CMS\Factory::getApplication()->enqueueMessage($upload_err, $err_type);
+						Factory::getApplication()->enqueueMessage($upload_err, $err_type);
 					}
 				}
 
@@ -1802,7 +1973,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		if (count($new_ids))
 		{
 			// Only query files that are not already cached
-			$db = \Joomla\CMS\Factory::getDbo();
+			$db = Factory::getDbo();
 			$query = 'SELECT ' . $md_select . ' f.* '. $extra_select //filename, filename_original, altname, description, ext, id'
 				. ' FROM #__flexicontent_files AS f'
 				. ' LEFT JOIN #__flexicontent_mediadatas AS md ON f.id = md.file_id'
@@ -1838,7 +2009,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 	function canDeleteFile( &$field, $file_id, &$item )
 	{
 		// Check file exists in DB
-		$db   = \Joomla\CMS\Factory::getDbo();
+		$db   = Factory::getDbo();
 		$query = 'SELECT id'
 			. ' FROM #__flexicontent_files'
 			. ' WHERE id='. $db->Quote($file_id)
@@ -1860,7 +2031,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 	function checkFileAssignment( &$field, $file_id, &$item )
 	{
 		// Check file exists in DB
-		$db   = \Joomla\CMS\Factory::getDbo();
+		$db   = Factory::getDbo();
 		$query = 'SELECT item_id '
 			. ' FROM #__flexicontent_fields_item_relations '
 			. ' WHERE '
@@ -1928,12 +2099,12 @@ class plgFlexicontent_fieldsMediafile extends FCField
 	 */
 	function share_file_form($tpl = null)
 	{
-		$user = \Joomla\CMS\Factory::getUser();
-		$db   = \Joomla\CMS\Factory::getDbo();
-		$app  = \Joomla\CMS\Factory::getApplication();
+		$user = Factory::getUser();
+		$db   = Factory::getDbo();
+		$app  = Factory::getApplication();
 
-		$session  = \Joomla\CMS\Factory::getSession();
-		$document = \Joomla\CMS\Factory::getDocument();
+		$session  = Factory::getSession();
+		$document = Factory::getDocument();
 
 		$file_id    = $app->input->get('file_id', 0, 'int');
 		$content_id = $app->input->get('content_id', 0, 'int');
@@ -2000,12 +2171,12 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		// Check for request forgeries
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
-		$user = \Joomla\CMS\Factory::getUser();
-		$db   = \Joomla\CMS\Factory::getDbo();
-		$app  = \Joomla\CMS\Factory::getApplication();
+		$user = Factory::getUser();
+		$db   = Factory::getDbo();
+		$app  = Factory::getApplication();
 
-		$session  = \Joomla\CMS\Factory::getSession();
-		$document = \Joomla\CMS\Factory::getDocument();
+		$session  = Factory::getSession();
+		$document = Factory::getDocument();
 
 		$timeout = $session->get('com_flexicontent.formtime', 0);
 		if ($timeout == 0 || time() - $timeout < 2) {
@@ -2191,7 +2362,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		$attachment=null; $replyto=null; $replytoname=null;
 
 		// Send the email
-		$send_result = \Joomla\CMS\Factory::getMailer()->sendMail( $from, $sender, $email, $subject, $body, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
+		$send_result = Factory::getMailer()->sendMail( $from, $sender, $email, $subject, $body, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
 		if ( $send_result !== true )
 		{
 			JError::raiseNotice(500, \Joomla\CMS\Language\Text:: _ ('FLEXI_FIELD_FILE_EMAIL_NOT_SENT'));
@@ -2206,7 +2377,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 	// Private common method to create join + and-where SQL CLAUSEs, for checking access of field - item pair(s), IN FUTURE maybe moved
 	function _createFieldItemAccessClause($get_select_access = false, $include_file = false )
 	{
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = Factory::getUser();
 		$select_access = $joinacc = $andacc = '';
 
 		$aid_arr = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
