@@ -1155,7 +1155,9 @@ if ($usepublicationdetails) : // timezone_info, publication_details ?>
 if ( $typeid && $usemetadata ) : ob_start(); // metadata ?>
 	<fieldset class="panelform">
 		<legend>
-			<?php echo Text::_( 'FLEXI_META' ); ?>
+			<div class="header" style="margin:24px 0; padding: 8px 16px; border-radius: 8px; display:block; font-size: 20px;">
+				<?php echo Text::_( 'FLEXI_META' ); ?>
+			</div>
 		</legend>
 
 		<?php if ( $usemetadata >= 1) : ?>
@@ -1282,7 +1284,9 @@ endif;
 if ($typeid && $useseoconf) : ob_start(); // seoconf ?>
 	<fieldset class="panelform">
 		<legend>
-			<?php echo Text::_( 'FLEXI_SEO' ); ?>
+			<div class="header" style="margin:24px 0; padding: 8px 16px; border-radius: 8px; display:block; font-size: 20px;">
+				<?php echo Text::_( 'FLEXI_SEO' ); ?>
+			</div>
 		</legend>
 
 		<?php foreach ($this->form->getFieldset('params-seoconf') as $field) :
@@ -1343,7 +1347,11 @@ if ($displayed_fieldSets) : ob_start();  // display_params ?>
 			<h3 class="tabberheading"> <?php echo Text::_($label); ?> </h3>
 		<?php else : ?>
 		<fieldset class="flexi_params panelform">
-			<legend><?php echo Text::_($label); ?></legend>
+			<legend>
+				<div class="header" style="margin:24px 0; padding: 8px 16px; border-radius: 8px; display:block; font-size: 20px;">
+					<?php echo Text::_($label); ?>
+				</div>
+			</legend>
 		<?php endif ?>
 
 
