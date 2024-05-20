@@ -220,13 +220,19 @@ $js .= (!$isXtdBtn ? "" : "
 			hreflang = ' hreflang=\"' + lang + '\"';
 		}
 
-		tag = '<a' + hreflang + ' href=\"' + link + '\">' + title + '</a>';
+		// This is file path just get filename to use if no text is selected in the editor
+		let file_path = title; 
+		title = title.replace(/^.*[\\/]/, '');
 
 		/** Use the API, if editor supports it **/
 		if (!!window.parent.Joomla.editors.instances[editor]) {
-			window.parent.Joomla.editors.instances[editor].replaceSelection(tag)
-		} else {
-			window.parent.jInsertEditorText(tag, editor);
+			let selectedText = window.parent.Joomla.editors.instances[editor].getSelection().trim() || title.trim();
+			let insertedHtml = ' <a' + hreflang + ' href=\"' + link + '\">' + selectedText + '</a> ';			
+			window.parent.Joomla.editors.instances[editor].replaceSelection(insertedHtml)
+		}
+		else {
+			insertedHtml = ' <a' + hreflang + ' href=\"' + link + '\">' + title.trim() + '</a> ';
+			window.parent.jInsertEditorText(insertedHtml, editor);
 		}
 
 		if (window.parent.Joomla.Modal) window.parent.Joomla.Modal.getCurrent().close();
