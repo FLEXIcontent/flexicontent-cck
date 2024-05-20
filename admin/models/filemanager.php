@@ -485,7 +485,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 
 		$exts = $exts ?: $cparams->get('upload_extensions', 'bmp,wbmp,csv,doc,docx,webp,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,txt,xcf,xls,xlsx,zip,ics');
-		$imageexts = array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico');  // Common image extensions
+		$imagesExt = array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico');  // Common image extensions
 		$options = array();
 		$gallery_folder = $this->getFieldFolderPath($itemid, $fieldid, $options);
 		//echo $gallery_folder ."<br />";
@@ -564,7 +564,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			$row->url = 0;
 			$row->id  = $i;
 
-			if ( in_array(strtolower($row->ext), $imageexts))
+			if ( in_array(strtolower($row->ext), $imagesExt))
 			{
 				$row->icon = \Joomla\CMS\Uri\Uri::root()."components/com_flexicontent/assets/images/mime-icon-16/image.png";
 			}
