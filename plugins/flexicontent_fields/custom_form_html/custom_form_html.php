@@ -55,6 +55,9 @@ class plgFlexicontent_fieldsCustom_form_html extends FCField
 		$cont_cssclass   = $field->parameters->get( 'cont_cssclass' ) ;
 		$custom_html_sep = $field->parameters->get( 'custom_html_sep' ) ;
 
+		$is_ingroup  = !empty($field->ingroup);
+		$use_ingroup = $field->parameters->get('use_ingroup', 0);
+
 		$field->html = '';
 		switch ($marker_type) {
 			case 'tabset_start':
@@ -92,6 +95,11 @@ class plgFlexicontent_fieldsCustom_form_html extends FCField
 			case 'custom_html':
 				$field->html .= $custom_html_sep;
 				break;
+		}
+
+		if ( $is_ingroup )
+		{
+			$field->html = [$field->html];
 		}
 	}
 
