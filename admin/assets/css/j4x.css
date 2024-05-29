@@ -1193,6 +1193,19 @@ div table.fc-table-list tr:nth-child(odd) td {
 	div.statetoggler > div.statetoggler_inner > .options > span {
 		color: var(--body-color);
 	}
+	.ui-widget-content {
+		color: #ffffff !important;
+	}
+	#fc_tagbox {
+		background: #282c33;
+	}
+	.select2-drop {
+		background: #282c33 !important;
+	}
+	.select2-container-multi .select2-choices .select2-search-field input.select2-input,
+	.select2-container-multi.select2-dropdown-open .select2-choices .select2-search-field input.select2-input {
+		background: #282c33 !important;
+	}
 }
 .buttons.btn-group.fc-iblock.dropdown {
 	margin-left: inherit !important;
@@ -1234,4 +1247,16 @@ a.plupload_disabled:hover {
 }
 .fcfield_field_preview_box.fcfield_addressint_map {
 	padding: 0 20px;
+}
+div#tags #input_new_tag {
+	display: inline-block;
+	padding: 0px;
+	margin: 0;
+	width: 0;
+	height: 0;
+	background: none;
+}
+#fc_tagbox {
+	padding: 5px;
+	border: 0;
 }
