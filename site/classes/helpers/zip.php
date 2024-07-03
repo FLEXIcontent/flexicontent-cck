@@ -6,24 +6,28 @@ class flexicontent_zip extends ZipArchive
 	/**
 	 * Add a directory with files and subdirectories to the archive
 	 *
-	 * @param string $location Full (real) pathname
-	 * @param string $name Name in Archive
+	 * @param string $pathname       Full (real) pathname of directory to add
+	 * @param string $dirname        Directory name to add (in archive) for first call this is empty
+	 *
+	 * @since 1.0
 	 **/
-	public function addDir($pathname, $name)
+	public function addDir($pathname, $dirname)
 	{
-		$this->addEmptyDir($name);
-		$this->addDirDo($pathname, $name);
+		if (!empty($dirname)) $this->addEmptyDir($dirname);
+		$this->addDirDo($pathname, $dirname);
 	}
 
 	/**
-	 * Add files & directories to archive
+	 * Add files & directories to archive for the given $dirname directory
 	 *
-	 * @param string $location Full (real) pathname
-	 * @param string $name Name in Archive
+	 * @param string     $pathname    Full (real) pathname
+	 * @param string     $dirname     Directory name to examine and recursively add to archive
+	 *
+	 * @since 1.0
 	 **/
-	private function addDirDo($pathname, $name)
+	private function addDirDo($pathname, $dirname)
 	{
-		if ($name) $name .= '/';
+		if ($dirname) $dirname .= '/';
 		$pathname .= '/';
 
 		// Read all Files in Dir
@@ -32,9 +36,9 @@ class flexicontent_zip extends ZipArchive
 		{
 			if ($file == '.' || $file == '..') continue;
 
-			// Rekursiv, If dir: FlxZipArchive::addDir(), else ::File();
+			// Recursive add contents. CASE dir: THIS::addDir(), else FlxZipArchive::addFile();
 			$do = (filetype( $pathname . $file) == 'dir') ? 'addDir' : 'addFile';
-			$this->$do($pathname . $file, $name . $file);
+			$this->$do($pathname . $file, $dirname . $file);
 		}
 	}
 }
