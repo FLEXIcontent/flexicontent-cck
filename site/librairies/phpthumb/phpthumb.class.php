@@ -1123,6 +1123,8 @@ class phpthumb {
 				// $this->new is probably set
 			}
 		}
+
+		$this->config_cache_directory = $this->config_cache_directory ?? '';
 		if (substr($this->config_cache_directory, -1) == '/') {
 			$this->config_cache_directory = substr($this->config_cache_directory, 0, -1);
 		}
