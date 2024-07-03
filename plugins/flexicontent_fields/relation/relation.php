@@ -1670,7 +1670,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 		$prepend_item_state = (int) $field->parameters->get('itemselector_prepend_item_state', 0);
 		$append_field_ids   = $field->parameters->get('itemselector_append_fields', []);
 		$append_field_ids   = FLEXIUtilities::paramToArray($append_field_ids);
-		$state_shortname    = array(1 => '', 0 => 'U', -1 => 'A', -3 => 'PE', -4 => 'OQ', -5 => 'IP');
+		$state_shortname    = array(1 => '', 0 => 'U', -1 => 'A', 2 => 'A', -3 => 'PE', -4 => 'OQ', -5 => 'IP', -22 => 'T');
 
 
 		$append_vals   = [];
@@ -1726,11 +1726,32 @@ class plgFlexicontent_fieldsRelation extends FCField
 			}
 		}
 
+		// Label for current item state
+		$state_labels = array(
+			1 => 'FLEXI_PUBLISHED',
+			0 => 'FLEXI_UNPUBLISHED',
+			-5 => 'FLEXI_IN_PROGRESS',
+			-3 => 'FLEXI_PENDING',
+			-4 => 'FLEXI_TO_WRITE',
+			2 => 'FLEXI_ARCHIVED',
+			-2 => 'FLEXI_TRASHED',
+		);
+
+
 		foreach ($items_arr as $item_id => $itemdata)
 		{
 			$itemtitle = StringHelper::strlen($itemdata->title) > $maxtitlechars
 				? StringHelper::substr($itemdata->title, 0, $maxtitlechars) . '...'
 				: $itemdata->title;
+
+			$itemdata->state = (int) $itemdata->state;
+			$state_lbl = strtoupper(isset($state_labels[$itemdata->state])
+				? \Joomla\CMS\Language\Text::_($state_labels[$itemdata->state])
+				: \Joomla\CMS\Language\Text::_('FLEXI_UNKNOWN'));
+
+			if (!in_array($itemdata->state, [1, -5])) $itemtitle .= ' [' . $state_lbl . ']';
+			//if (!in_array($itemdata->state, [1, -5])) $itemtitle .= ' [' . ($state_shortname[$itemdata->state] ?? 'U') . ']';
+
 			$append_field_text = [];
 			foreach ($append_fields as $fld_id => $append_field)
 			{
