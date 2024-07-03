@@ -59,7 +59,7 @@ class JFormFieldMultiList extends JFormFieldGroupedList
 		$split_via = ($this->element['split_str_value'] ?: '|');
 		$values = is_array($this->value)
 			? $this->value
-			: explode($split_via, $this->value);
+			: explode($split_via, $this->value ?? '');
 		$values = array_map('trim', $values);
 
 		$fieldname	= $this->name;

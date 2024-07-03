@@ -46,8 +46,9 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		'add', 'edit', 'save', 'cancel',
 		'remove', 'approval',
 		'apply_type', 'apply', 'apply_ajax',
-		'save2new', 'save2copy', 'save_a_preview', 'download', 'download_file', 'weblink' ,
-		'field_set_value', 'ajaxvote',
+		'download', 'download_file', 'download_files', 'download_tree', 'weblink',
+		'save2new', 'save2copy', 'save_a_preview',
+		'field_set_value',
 	);
 
 	/**
@@ -83,8 +84,6 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		if (\Joomla\CMS\Factory::getApplication()->isClient('site'))
 		{
-			$this->registerTask('download_tree',  'download');
-
 			$this->input  = empty($this->input) ? \Joomla\CMS\Factory::getApplication()->input : $this->input;
 			$this->option = $this->input->get('option', '', 'cmd');
 			$this->task   = $this->input->get('task', '', 'cmd');

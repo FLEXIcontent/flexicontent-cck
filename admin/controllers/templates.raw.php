@@ -491,7 +491,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 						$_xml_field = $form_layout->getFieldXml($fieldname, $field->group);
 						if ($_xml_field)
 						{
-							$field->setup($_xml_field, $_value, $field->group);
+							$field->setup($_xml_field, $_value ?? '', $field->group);
 						}
 
 						$field_input_inherited = $inh_params ? flexicontent_html::getInheritedFieldDisplay($field, $inh_params) : $field->input;
