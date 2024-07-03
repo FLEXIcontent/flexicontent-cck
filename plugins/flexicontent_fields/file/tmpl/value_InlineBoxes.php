@@ -1,9 +1,12 @@
 <?php
 
 use Joomla\CMS\Factory;
+use Joomla\CMS\Router\Route;
 use Joomla\CMS\Uri\Uri;
 use Joomla\Filesystem\Path;
 use Joomla\String\StringHelper;
+JLoader::register('FlexicontentHelperRoute', JPATH_SITE . '/components/com_flexicontent/helpers/route.php');
+
 $isAdmin = Factory::getApplication()->isClient('administrator');
 
 // Important create a -1 "value", before any other normal values, so that it is at 1st position of the array
@@ -272,8 +275,10 @@ foreach($values as $file_id)
 	}
 	else
 	{
-		$dl_link = 'index.php?option=com_flexicontent&id='. $file_id .'&cid='.$item->id.'&fid='.$field->id.'&task=download';
-		$dl_link = $isAdmin ? flexicontent_html::getSefUrl($dl_link) : \Joomla\CMS\Router\Route::_( $dl_link );
+		//$dl_link = 'index.php?option=com_flexicontent&id='. $file_id .'&cid='.$item->id.'&fid='.$field->id.'&task=download';
+		$urlvars = ['id' => $file_id, 'cid' => $item->id, 'fid' => $field->id];
+		$dl_link = FlexicontentHelperRoute::getTaskRoute($__id = $file_id, 'download', 0, $urlvars);
+		$dl_link = $isAdmin ? flexicontent_html::getSefUrl($dl_link) : Route::_( $dl_link );
 	}
 
 	// SOME behavior FLAGS
