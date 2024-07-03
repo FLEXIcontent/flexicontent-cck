@@ -12,6 +12,9 @@
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\Filesystem\File;
+use Joomla\Filesystem\Path;
+use Joomla\Filesystem\Folder;
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
@@ -536,6 +539,8 @@ class plgFlexicontent_fieldsImage extends FCField
 					newField.find('input.quantumuploadimage-input').val('');
 					newField.find('input.quantumuploadimage-input').attr('name','".$fieldname."['+uniqueRowN+'][existingname]');
 					newField.find('input.quantumuploadimage-input').attr('id', element_id + '_existingname');
+					newField.find('.quantumuploadimage-change').attr('data-modal-id', element_id + '_modal_container');
+					newField.find('.joomla-modal.modal').attr('id', element_id + '_modal_container');					 					
 
 					setTimeout(function() { newField.find('.quantumuploadimage-delete').click(); }, 500);
 					" : '') .
@@ -1312,7 +1317,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		}
 
 		// Create thumbs/image Folder and URL paths
-		$thumb_folder  = JPATH_SITE .DS. \Joomla\CMS\Filesystem\Path::clean( $dir .($extra_folder ? DS.$extra_folder : '') );
+		$thumb_folder  = JPATH_SITE .DS. Path::clean( $dir .($extra_folder ? DS.$extra_folder : '') );
 		$thumb_urlpath = $dir_url .($extra_folder ? '/'. $extra_folder : '');
 
 		if ($field->using_default_value)
@@ -1492,7 +1497,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			jimport('joomla.filesystem.path');
 			if ( $is_importcsv )
 			{
-				$srcpath_original = \Joomla\CMS\Filesystem\Path::clean( JPATH_SITE .DS. $import_media_folder .DS );
+				$srcpath_original = Path::clean( JPATH_SITE .DS. $import_media_folder .DS );
 			}
 		}
 
@@ -1517,7 +1522,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			$dir = $field->parameters->get('dir');
 			$unique_tmp_itemid = substr(Factory::getApplication()->input->get('unique_tmp_itemid', '', 'string'), 0, 1000);
 
-			$dest_path = \Joomla\CMS\Filesystem\Path::clean( JPATH_SITE .DS. $dir . DS. 'item_'.$item->id . '_field_'.$field->id .DS );
+			$dest_path = Path::clean( JPATH_SITE .DS. $dir . DS. 'item_'.$item->id . '_field_'.$field->id .DS );
 			//if ( $image_source > 1 ) ; // TODO
 
 			/**
@@ -1529,7 +1534,7 @@ class plgFlexicontent_fieldsImage extends FCField
 				{
 					$dest_path_original = $dest_path. 'original' .DS;
 
-					if (!\Joomla\CMS\Filesystem\Folder::exists($dest_path_original) && !\Joomla\CMS\Filesystem\Folder::create($dest_path_original))
+					if (!file_exists($dest_path_original) && !Folder::create($dest_path_original))
 					{
 						// Cancel item creation
 						$app->enqueueMessage('Field: ' . $field->label . ' : Unable to create folder: ' . $dest_path_original, 'error');
@@ -1545,14 +1550,14 @@ class plgFlexicontent_fieldsImage extends FCField
 			 */
 			elseif ($unique_tmp_itemid && $item->id != $unique_tmp_itemid)
 			{
-				$temppath = \Joomla\CMS\Filesystem\Path::clean(JPATH_SITE .DS. $dir .DS. 'item_' . $unique_tmp_itemid . '_field_' . $field->id .DS);
+				$temppath = Path::clean(JPATH_SITE .DS. $dir .DS. 'item_' . $unique_tmp_itemid . '_field_' . $field->id .DS);
 				$save_as_copy = $unique_tmp_itemid == (int) $unique_tmp_itemid;
 
 				if (file_exists($temppath))
 				{
 					$save_as_copy
-						? \Joomla\CMS\Filesystem\Folder::copy($temppath, $dest_path)
-						: \Joomla\CMS\Filesystem\Folder::move($temppath, $dest_path);
+						? Folder::copy($temppath, $dest_path)
+						: Folder::move($temppath, $dest_path);
 				}
 			}
 		}
@@ -1565,7 +1570,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		if ($image_source === -2)
 		{
 			$dest_path_media = 'images/';
-			$dest_path_media_full = \Joomla\CMS\Filesystem\Path::clean( JPATH_SITE .DS. $dest_path_media );
+			$dest_path_media_full = Path::clean( JPATH_SITE .DS. $dest_path_media );
 		}
 
 
@@ -1651,18 +1656,18 @@ class plgFlexicontent_fieldsImage extends FCField
 
 				if ($image_source >= 1)
 				{
-					$src_file_path  = \Joomla\CMS\Filesystem\Path::clean( $srcpath_original . $v['originalname'] );
-					$dest_file_path = \Joomla\CMS\Filesystem\Path::clean( $dest_path_original . $filename );
+					$src_file_path  = Path::clean( $srcpath_original . $v['originalname'] );
+					$dest_file_path = Path::clean( $dest_path_original . $filename );
 					$result = false;
-					if ( \Joomla\CMS\Filesystem\File::exists($src_file_path) )
+					if ( File::exists($src_file_path) )
 					{
-						$result = \Joomla\CMS\Filesystem\File::copy( $src_file_path,  $dest_file_path );
-						if ( $result && \Joomla\CMS\Filesystem\Path::canChmod($dest_file_path) )
+						$result = File::copy( $src_file_path,  $dest_file_path );
+						if ( $result && Path::canChmod($dest_file_path) )
 						{
 							chmod($dest_file_path, 0644);
 						}
 					}
-					elseif ( \Joomla\CMS\Filesystem\File::exists($dest_file_path) )
+					elseif ( File::exists($dest_file_path) )
 					{
 						$result = true;
 					}
@@ -1673,18 +1678,18 @@ class plgFlexicontent_fieldsImage extends FCField
 
 				elseif ($image_source == -2)
 				{
-					$src_file_path  = \Joomla\CMS\Filesystem\Path::clean( $srcpath_original . $v['originalname'] );
-					$dest_file_path = \Joomla\CMS\Filesystem\Path::clean( $dest_path_media_full . $filename );
+					$src_file_path  = Path::clean( $srcpath_original . $v['originalname'] );
+					$dest_file_path = Path::clean( $dest_path_media_full . $filename );
 					$result = false;
-					if ( \Joomla\CMS\Filesystem\File::exists($src_file_path) )
+					if ( File::exists($src_file_path) )
 					{
-						$result = \Joomla\CMS\Filesystem\File::copy( $src_file_path,  $dest_file_path );
-						if ( $result && \Joomla\CMS\Filesystem\Path::canChmod($dest_file_path) )
+						$result = File::copy( $src_file_path,  $dest_file_path );
+						if ( $result && Path::canChmod($dest_file_path) )
 						{
 							chmod($dest_file_path, 0644);
 						}
 					}
-					elseif (\Joomla\CMS\Filesystem\File::exists($dest_file_path))
+					elseif (File::exists($dest_file_path))
 					{
 						$result = true;
 					}
@@ -1719,7 +1724,7 @@ class plgFlexicontent_fieldsImage extends FCField
 				else
 				{
 					// keep value only cleaning it
-					$v['originalname'] = \Joomla\CMS\Filesystem\Path::clean( $v['originalname'] );
+					$v['originalname'] = Path::clean( $v['originalname'] );
 				}
 			}
 
@@ -1879,10 +1884,10 @@ class plgFlexicontent_fieldsImage extends FCField
 			jimport('joomla.filesystem.path');
 
 			// Delete image folder if it exists
-			$dest_path = \Joomla\CMS\Filesystem\Path::clean( JPATH_SITE .DS. $dir . DS. 'item_'.$item->id   . '_field_'.$field->id .DS);
+			$dest_path = Path::clean( JPATH_SITE .DS. $dir . DS. 'item_'.$item->id   . '_field_'.$field->id .DS);
 			//if ( $image_source > 1 ) ; // TODO
 
-			if (\Joomla\CMS\Filesystem\Folder::exists($dest_path) && !\Joomla\CMS\Filesystem\Folder::delete($dest_path))
+			if (file_exists($dest_path) && !Folder::delete($dest_path))
 			{
 				$app->enqueueMessage('Field: ' . $field->label . ': Notice: Unable to delete folder: ' . $dest_path, 'warning');
 				return false;
@@ -2103,7 +2108,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		\Joomla\CMS\Client\ClientHelper::setCredentialsFromRequest('ftp');
 
 		// Make the filename safe
-		$file['name'] = \Joomla\CMS\Filesystem\File::makeSafe($file['name']);
+		$file['name'] = File::makeSafe($file['name']);
 
 		$all_media    = $field->parameters->get('list_all_media_files', 0);
 		$unique_thumb_method = $field->parameters->get('unique_thumb_method', 0);
@@ -2133,7 +2138,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			 * and also return an unique filename for the given folder
 			 */
 			$filename     = flexicontent_upload::sanitize($path, $file['name']);
-			$filepath     = \Joomla\CMS\Filesystem\Path::clean($path.$filename);
+			$filepath     = Path::clean($path.$filename);
 
 			//perform security check according
 			if (!$upload_check)
@@ -2159,7 +2164,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			/**
 			 * We allow Joomla default security to execute, if user really uploads an image file, it should not be trigger anyway
 			 */
-			$upload_success = \Joomla\CMS\Filesystem\File::upload($file['tmp_name'], $filepath);
+			$upload_success = File::upload($file['tmp_name'], $filepath);
 
 			if (!$upload_success)
 			{
@@ -2259,8 +2264,8 @@ class plgFlexicontent_fieldsImage extends FCField
 
 		// Image file paths
 		$dir = $field->parameters->get('dir');
-		$src_path = $src_path ? $src_path : \Joomla\CMS\Filesystem\Path::clean(($target_dir ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH).DS);
-		$dest_path = $dest_path ? $dest_path : \Joomla\CMS\Filesystem\Path::clean( JPATH_SITE .DS. $dir .DS );
+		$src_path = $src_path ? $src_path : Path::clean(($target_dir ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH).DS);
+		$dest_path = $dest_path ? $dest_path : Path::clean( JPATH_SITE .DS. $dir .DS );
 		$prefix		= $size . '_' . $extra_prefix;
 		$filepath = $dest_path.$prefix.$filename;
 
@@ -2271,24 +2276,24 @@ class plgFlexicontent_fieldsImage extends FCField
 		$crop		= $field->parameters->get('method_' . $size);
 		$quality= $field->parameters->get('quality');
 		$usewm	= $field->parameters->get('use_watermark_' . $size);
-		$wmfile	= \Joomla\CMS\Filesystem\Path::clean(JPATH_SITE . DS . $field->parameters->get('wm_' . $size));
+		$wmfile	= Path::clean(JPATH_SITE . DS . $field->parameters->get('wm_' . $size));
 		$wmop		= $field->parameters->get('wm_opacity');
 		$wmpos	= $field->parameters->get('wm_position');
 
 		// Create destination folder if it does not exist
-		if (!\Joomla\CMS\Filesystem\Folder::exists($dest_path) && !\Joomla\CMS\Filesystem\Folder::create($dest_path))
+		if (!file_exists($dest_path) && !Folder::create($dest_path))
 		{
 			$app->enqueueMessage('Field: ' . $field->label . ' : ' . \Joomla\CMS\Language\Text::_('Error. Unable to create folders'), 'error');
 			return false;
 		}
 
 		// Make sure folder is writtable by phpthumb
-		if (!isset($dest_paths_arr[$dest_path]) && \Joomla\CMS\Filesystem\Path::canChmod($dest_path))
+		if (!isset($dest_paths_arr[$dest_path]) && Path::canChmod($dest_path))
 		{
 			/**
-			 * \Joomla\CMS\Filesystem\Path::setPermissions() is VERY SLOW, because it does chmod() on all folder / subfolder files
+			 * Path::setPermissions() is VERY SLOW, because it does chmod() on all folder / subfolder files
 			 */
-			//\Joomla\CMS\Filesystem\Path::setPermissions($dest_path, '0644', '0755');
+			//Path::setPermissions($dest_path, '0644', '0755');
 			chmod($dest_path, 0755);
 		}
 
@@ -2298,7 +2303,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		// EITHER copy original image file as current thumbnail (FLAG 'copy_original' is set)
 		if ($copy_original)
 		{
-			$result = \Joomla\CMS\Filesystem\File::copy( $src_path.$filename,  $filepath );
+			$result = File::copy( $src_path.$filename,  $filepath );
 		}
 
 		// OR Create the thumnail by calling phpthumb
@@ -2313,7 +2318,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		}
 
 		// Make sure the created thumbnail has correct permissions
-		if ($result && \Joomla\CMS\Filesystem\Path::canChmod($filepath))
+		if ($result && Path::canChmod($filepath))
 		{
 			chmod($filepath, 0644);
 		}
@@ -2394,7 +2399,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		// Catch case of bad permission for thumbnail files but good permission for containing folder ...
 		if (file_exists($output_filename))
 		{
-			\Joomla\CMS\Filesystem\File::delete($output_filename);
+			File::delete($output_filename);
 		}
 
 		if ($phpThumb->GenerateThumbnail())
@@ -2433,15 +2438,15 @@ class plgFlexicontent_fieldsImage extends FCField
 		// Folder-mode 1
 		if ($image_source >= 1)
 		{
-			$thumbfolder = \Joomla\CMS\Filesystem\Path::clean(JPATH_SITE .DS. $field->parameters->get('dir') .DS. 'item_'.$field->item_id . '_field_'.$field->id);
+			$thumbfolder = Path::clean(JPATH_SITE .DS. $field->parameters->get('dir') .DS. 'item_'.$field->item_id . '_field_'.$field->id);
 			$origfolder  = $thumbfolder .DS. 'original' .DS;
 		}
 
 		// DB-mode
 		elseif ($image_source === 0)
 		{
-			$thumbfolder = \Joomla\CMS\Filesystem\Path::clean( JPATH_SITE .DS. $field->parameters->get('dir') );
-			$origfolder  = \Joomla\CMS\Filesystem\Path::clean( ($target_dir ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH) );
+			$thumbfolder = Path::clean( JPATH_SITE .DS. $field->parameters->get('dir') );
+			$origfolder  = Path::clean( ($target_dir ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH) );
 		}
 
 		// Negative, intro-full mode, this should be unreachable, because
@@ -2458,16 +2463,16 @@ class plgFlexicontent_fieldsImage extends FCField
 		{
 			$dest_path = $thumbfolder . DS . $size . '_' . $filename;
 
-			if (\Joomla\CMS\Filesystem\File::exists($dest_path) && !\Joomla\CMS\Filesystem\File::delete($dest_path))
+			if (File::exists($dest_path) && !File::delete($dest_path))
 			{
 				$app->enqueueMessage('Field: ' . $field->label . ' : ' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD_UNABLE_TO_DELETE_FILE') .": ". $dest_path, 'warning');
 			}
 		}
 
 		// b. Delete the original image from file manager
-		$src_path = \Joomla\CMS\Filesystem\Path::clean($origfolder.DS.$filename);
+		$src_path = Path::clean($origfolder.DS.$filename);
 
-		if (!\Joomla\CMS\Filesystem\File::delete($src_path))
+		if (!File::delete($src_path))
 		{
 			$app->enqueueMessage('Field: ' . $field->label . ' : ' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD_UNABLE_TO_DELETE_FILE') . ': ' . $src_path, 'warning');
 		}
@@ -2577,7 +2582,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			$check_small = $size=='_s';
 			$size = $check_small ? 's' : $size;
 			$thumbname = $size . '_' . ($check_small ? '' : $extra_prefix) . $filename;
-			$path	= \Joomla\CMS\Filesystem\Path::clean($dest_path .DS. $thumbname);
+			$path	= Path::clean($dest_path .DS. $thumbname);
 
 			if (file_exists($path))
 			{
@@ -2856,43 +2861,43 @@ class plgFlexicontent_fieldsImage extends FCField
 		if (!empty($value['default_image']))
 		{
 			$extra_folder = '';
-			$src_path = \Joomla\CMS\Filesystem\Path::clean( (!$rel ? JPATH_SITE . DS : '') . dirname($value['default_image']) .DS );
+			$src_path = Path::clean( (!$rel ? JPATH_SITE . DS : '') . dirname($value['default_image']) .DS );
 		}
 
 		// Intro-full image mode, ('image_path' is a FILE path of an intro / full image)
 		elseif ($image_source === -1)
 		{
 			$extra_folder = 'intro_full';
-			$src_path = \Joomla\CMS\Filesystem\Path::clean( (!$rel ? JPATH_SITE . DS : '') . dirname($value['image_path']) .DS );
+			$src_path = Path::clean( (!$rel ? JPATH_SITE . DS : '') . dirname($value['image_path']) .DS );
 		}
 
 		// Media manager mode
 		elseif ($image_source === -2)
 		{
 			$extra_folder = 'mediaman';
-			$src_path = \Joomla\CMS\Filesystem\Path::clean( JPATH_SITE .DS );
+			$src_path = Path::clean( JPATH_SITE .DS );
 		}
 
 		// Folder-mode 1
 		elseif ($image_source >= 1)
 		{
 			$extra_folder = 'item_'.$u_item_id . '_field_'.$field->id;
-			$src_path = \Joomla\CMS\Filesystem\Path::clean( (!$rel ? JPATH_SITE . DS : '') . $dir .DS. $extra_folder .DS. 'original' .DS );
+			$src_path = Path::clean( (!$rel ? JPATH_SITE . DS : '') . $dir .DS. $extra_folder .DS. 'original' .DS );
 		}
 
 		// DB-mode
 		else
 		{
 			$extra_folder = '';
-			$src_path = \Joomla\CMS\Filesystem\Path::clean( ($target_dir ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH).DS );
+			$src_path = Path::clean( ($target_dir ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH).DS );
 		}
 
 		// Add value-extracted subpath to original folder
-		$src_path = \Joomla\CMS\Filesystem\Path::clean( $src_path . ($subpath ? $subpath . DS : '')  );
+		$src_path = Path::clean( $src_path . ($subpath ? $subpath . DS : '')  );
 
 		// Full path of original file  - and - Destination folder
-		$file_path = \Joomla\CMS\Filesystem\Path::clean( $src_path . $filename );
-		$dest_path = \Joomla\CMS\Filesystem\Path::clean( (!$rel ? JPATH_SITE . DS : '') . $dir .DS. ($extra_folder ? $extra_folder .DS : '') );
+		$file_path = Path::clean( $src_path . $filename );
+		$dest_path = Path::clean( (!$rel ? JPATH_SITE . DS : '') . $dir .DS. ($extra_folder ? $extra_folder .DS : '') );
 
 
 		/**
@@ -2939,13 +2944,13 @@ class plgFlexicontent_fieldsImage extends FCField
 		$image_source = (int) $field->parameters->get('image_source', 0);
 		$image_source = $image_source > 1 ? $this->nonImplementedMode($image_source, $field) : $image_source;
 
-		if ($image_source < 1  ||  !\Joomla\CMS\Filesystem\Folder::exists($src_path))
+		if ($image_source < 1  ||  !file_exists($src_path))
 		{
 			return;
 		}
 
 		$protect_original = $field->parameters->get('protect_original', 1);
-		$htaccess_file = \Joomla\CMS\Filesystem\Path::clean( $src_path . '.htaccess' );
+		$htaccess_file = Path::clean( $src_path . '.htaccess' );
 		$file_contents = $protect_original
 			?
 			'# do not allow direct access and also deny scripts'."\n".

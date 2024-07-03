@@ -344,10 +344,7 @@
 			defaultSubPath = defaultSubPath.replace(/^\/+|\/+$/g, '');
 			let backupValue = '';
 
-			console.log(input);
-			console.log(defaultSubPath);
-			console.log(defaultScope);
-
+			//console.log(input); console.log(defaultSubPath); console.log(defaultScope);
 			if (defaultScope && defaultSubPath)
 			{
 				if (input.value != '') {
