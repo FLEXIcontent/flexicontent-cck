@@ -30,7 +30,10 @@
 					'iflayout_form_tab05_fields_PSFX':'metadata, seoconf',
 					'iflayout_form_tab06_fields_PSFX':'display_params',
 					'iflayout_form_tab07_fields_PSFX':'layout_selection, layout_params',
-					'iflayout_form_tab08_fields_PSFX':'versions'
+					'iflayout_form_tab08_fields_PSFX':'versions',
+					'iflayout_form_tab09a_fields_PSFX':'_skip_',
+					'iflayout_form_tab09b_fields_PSFX':'_skip_',
+					'iflayout_form_tab09c_fields_PSFX':'_skip_'
 				}">FLEXI_LOAD_DEFAULTS_N_CUSTOMIZE</option>
 				<option value="2" fcconfigs="{
 					'iflayout_form_tab_titles_PSFX':'',
@@ -45,7 +48,10 @@
 					'iflayout_form_tab05_fields_PSFX':'',
 					'iflayout_form_tab06_fields_PSFX':'',
 					'iflayout_form_tab07_fields_PSFX':'',
-					'iflayout_form_tab08_fields_PSFX':''
+					'iflayout_form_tab08_fields_PSFX':'',
+					'iflayout_form_tab09a_fields_PSFX':'',
+					'iflayout_form_tab09b_fields_PSFX':'',
+					'iflayout_form_tab09c_fields_PSFX':''
 				}">FLEXI_USE_COMPONENT_SETTINGS_CLEAR</option>
 
 				<option value="3" fcconfigs="{
@@ -61,7 +67,10 @@
 					'iflayout_form_tab05_fields_PSFX':'_skip_',
 					'iflayout_form_tab06_fields_PSFX':'_skip_',
 					'iflayout_form_tab07_fields_PSFX':'_skip_',
-					'iflayout_form_tab08_fields_PSFX':'_skip_'
+					'iflayout_form_tab08_fields_PSFX':'_skip_',
+					'iflayout_form_tab09a_fields_PSFX':'_skip_',
+					'iflayout_form_tab09b_fields_PSFX':'_skip_',
+					'iflayout_form_tab09c_fields_PSFX':'_skip_'
 				}">FLEXI_PLACE_ALL_VIA_FIELDS_MANAGER</option>
 			</field>
 
@@ -91,6 +100,10 @@
 			<field name="form_tab06_fields_PSFX"  type="textarea" default="" hint="display_params" rows="2" cols="60" label="TAB 6" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" class="input-xxlarge" />
 			<field name="form_tab07_fields_PSFX"  type="textarea" default="" hint="layout_selection, layout_params" rows="2" cols="60" label="TAB 7" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" class="input-xxlarge" />
 			<field name="form_tab08_fields_PSFX"  type="textarea" default="" hint="versions" rows="2" cols="60" label="TAB 8" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" class="input-xxlarge" />
+
+			<field name="form_tab09a_fields_PSFX"  type="textarea" default="" hint="_skip_" rows="2" cols="60" label="TAB 9a" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" class="input-xxlarge" />
+			<field name="form_tab09b_fields_PSFX"  type="textarea" default="" hint="_skip_" rows="2" cols="60" label="TAB 9b" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" class="input-xxlarge" />
+			<field name="form_tab09c_fields_PSFX"  type="textarea" default="" hint="_skip_" rows="2" cols="60" label="TAB 9c" description="FLEXI_COMMA_LIST_OF_CORE_FIELDS_PROPS" class="input-xxlarge" />
 
 		</fieldset>
 

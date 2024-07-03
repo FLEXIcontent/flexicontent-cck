@@ -652,9 +652,14 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$toolbar = $this->setToolbar($item, $model, $page_params, $allowbuttons);
 
 		// Set toolbar title
+		$types_arr = flexicontent_html::getTypesList();
+		$type_name = isset($types_arr[$item->type_id]) ? $types_arr[$item->type_id]->name : 'FLEXI_CONTENT_TYPE';
+		$type_lbl  = \Joomla\CMS\Language\Text::_($type_name);
+		$type_lbl  = strtoupper($type_lbl);
+
 		$item->id
-			? \Joomla\CMS\Toolbar\ToolbarHelper::title( \Joomla\CMS\Language\Text::_( 'FLEXI_EDIT_ITEM' ), 'icon-pencil-alt' )   // Editing existing item
-			: \Joomla\CMS\Toolbar\ToolbarHelper::title( \Joomla\CMS\Language\Text::_( 'FLEXI_NEW_ITEM' ), 'icon-file-alt' );    // Creating new item
+			? \Joomla\CMS\Toolbar\ToolbarHelper::title( \Joomla\CMS\Language\Text::_( 'FLEXI_EDIT' ) . ' ' . $type_lbl, 'icon-pencil-alt' )   // Editing existing item
+			: \Joomla\CMS\Toolbar\ToolbarHelper::title( \Joomla\CMS\Language\Text::_( 'FLEXI_NEW' ) . ' ' . $type_lbl, 'icon-file-alt' );    // Creating new item
 
 		// Hide default toolbar
 		$buttons_placement = (int) $page_params->get('buttons_placement' . $CFGsfx, ($isSite ? 0 : -1));

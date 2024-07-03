@@ -54,6 +54,14 @@ class FcFormLayoutParameters
 		$tab_customized['tab07'] = $tab_fields['tab07'] != $defaultTabValue;
 		$tab_fields['tab08']  = $params->get('form_tab08_fields'. $CFGsfx,  $defaultTabValue = 'versions');
 		$tab_customized['tab08'] = $tab_fields['tab08'] != $defaultTabValue;
+
+		$tab_fields['tab09a']  = $params->get('form_tab09a_fields'. $CFGsfx,  $defaultTabValue = '_skip_');
+		$tab_customized['tab09a'] = $tab_fields['tab09a'] != $defaultTabValue;
+		$tab_fields['tab09b']  = $params->get('form_tab09b_fields'. $CFGsfx,  $defaultTabValue = '_skip_');
+		$tab_customized['tab09b'] = $tab_fields['tab09b'] != $defaultTabValue;
+		$tab_fields['tab09c']  = $params->get('form_tab09c_fields'. $CFGsfx,  $defaultTabValue = '_skip_');
+		$tab_customized['tab09c'] = $tab_fields['tab09c'] != $defaultTabValue;
+
 		$tab_fields['below']  = $params->get('form_tabs_below'. $CFGsfx,    '');
 
 
