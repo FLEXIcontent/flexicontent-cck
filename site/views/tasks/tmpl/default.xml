@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<metadata>
+	
+	<layout title="Tasks">
+		<help key="Menu items for tasks to make URLs e.g. of download task more SEO friendly" />
+		<message>
+			<![CDATA[Menu items for tasks]]>
+		</message>
+	</layout>
+	
+	<fields name="request">
+		<fieldset name="request" addfieldpath="/administrator/components/com_flexicontent/elements">
+			<field name="id" type="text" default="0" required="required" label="Specific task ID" description="Let this be zero for default menu item of the specific task type" />
+			<field name="task" type="list" default="" required="required" label="Task type" description="Select a specific task type to link to" class="btn-group btn-group-yesno">
+				<option value="">Please select a Task</option>
+				<option value="download">(task=download) Download via (file-based) form field </option>
+				<option value="download_file">(task=download_file) File links via 'File' XTD Editor button</option>
+				<option value="download_files">(task=download_files) Download mutliple files as a compressed archive</option>
+				<option value="weblink">(task=weblink) Web-link via a weblink form field </option>
+			</field>
+		</fieldset> 
+	</fields>
+	
+</metadata>

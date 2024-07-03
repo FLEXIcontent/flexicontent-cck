@@ -1711,9 +1711,9 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		// Get new record access
 		$accesses = $this->input->get('access', array(), 'array');
 		$accesses = ArrayHelper::toInteger($accesses);
-		$access = $accesses[$file_id];
+		//$access = $accesses[$file_id];
 
-		if (!$model->saveaccess($file_id, $access))
+		if (!$model->saveaccess($file_id, $accesses))
 		{
 			$app->setHeader('status', '500 Internal Server Error', true);
 			$this->setRedirect($this->returnURL, \Joomla\CMS\Language\Text::_('FLEXI_OPERATION_FAILED') . ' : ' . $model->getError(), 'error');
@@ -1723,6 +1723,12 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 		$cache = \Joomla\CMS\Factory::getCache('com_flexicontent');
 		$cache->clean();
+
+		$isAjax = $this->input->get('isAjax', 0, 'int');
+		if ($isAjax)
+		{
+			jexit(json_encode(array('status' => 'success')));
+		}
 
 		$this->setRedirect($this->returnURL);
 	}

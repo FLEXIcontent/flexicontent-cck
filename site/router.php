@@ -136,6 +136,26 @@ class _FlexicontentSiteRouter
 			}
 		}
 
+		if (!empty($menu) && $menu->query['view'] == 'tasks')
+		{
+			if ($menu->query['task'] === 'download')
+			{
+				$segments[] = $query['id'];
+				$segments[] = $query['cid'];
+				$segments[] = $query['fid'];
+				unset($query['id']);	// file
+				unset($query['cid']);	// content
+				unset($query['fid']);	// field
+				return $segments;
+			}
+			if ($menu->query['task'] === 'download_file')
+			{
+				$segments[] = $query['id'];
+				unset($query['id']);	// file
+				return $segments;
+			}
+		}
+
 
 		// 3. Handle known 'task'(s) formulating segments of SEF URL appropriately
 		if (isset($query['task']))
@@ -153,7 +173,7 @@ class _FlexicontentSiteRouter
 				unset($query['fid']);	// field
 			}
 
-			elseif ($query['task'] === 'download_file')
+			elseif ($query['task'] === 'download_file' || $query['task'] === 'download_files')
 			{
 				$segments[] = $query['task'];
 				$segments[] = $query['id'];
@@ -605,6 +625,25 @@ class _FlexicontentSiteRouter
 		$count = count($segments);
 
 
+		if (!empty($menu) && $menu->query['view'] == 'tasks')
+		{
+			if ($menu->query['task'] === 'download')
+			{
+				$vars['task'] = 'download';
+				$vars['id']   = isset($segments[0]) ? $segments[0] : null;
+				$vars['cid']  = isset($segments[1]) ? $segments[1] : null;
+				$vars['fid']  = isset($segments[2]) ? $segments[2] : null;
+				return $vars;
+			}
+			if ($menu->query['task'] === 'download_file')
+			{
+				$vars['task'] = 'download_file';
+				$vars['id']   = isset($segments[0]) ? $segments[0] : null;
+				return $vars;
+			}
+		}
+
+
 		/**
 		 * 1. Cases that TASK is explicitly provided
 		 */
@@ -620,10 +659,10 @@ class _FlexicontentSiteRouter
 			return $vars;
 		}
 
-		// 'download_file' task
-		if ($segments[0] === 'download_file')
+		// 'download_file', 'download_files' tasks. NOTE: for 'download_files' task, the 2nd segment ('id') is a comma separated list of file ids
+		if ($segments[0] === 'download_file' || $segments[0] === 'download_files')
 		{
-			$vars['task'] = 'download_file';
+			$vars['task'] = $segments[0];
 			$vars['id']   = isset($segments[1]) ? $segments[1] : null;
 
 			return $vars;

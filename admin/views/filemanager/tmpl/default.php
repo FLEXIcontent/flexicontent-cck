@@ -60,6 +60,17 @@ if (!empty($editor))
 	$onclick = "jSelectFcfile";
 }
 
+if (version_compare(\Joomla\CMS\Version::MAJOR_VERSION, '4', 'ge'))
+{
+	$wa  = Factory::getDocument()->getWebAssetManager();
+	$wa->registerAndUseScript('clipboard_js', Uri::base() . 'components/com_flexicontent/assets/js/clipboard_v2.0.11.min.js');
+}
+else
+{
+	HTMLHelper::_('script', Uri::base() . 'components/com_flexicontent/assets/js/clipboard_v2.0.11.min.js', ['version' => 'auto', 'relative' => false]);
+}
+HtmlHelper::_('bootstrap.modal', 'modal');
+
 /**
  * COMMON CSS classes and COMMON repeated texts
  */
@@ -708,7 +719,6 @@ if ($js)
 		jQuery.fn.themeswitcher && jQuery('#themeswitcher').themeswitcher({cookieName:''});
 	});
 </script>*/
-
 ?>
 
 	<div id="fc-fileman-overlay" onclick="jQuery('img.fc_zoomed, li.fc_zoomed .plupload_img_preview img').trigger('click');"></div>
@@ -948,6 +958,12 @@ if ($js)
 
 								<th>&nbsp;</th>
 
+								<?php if (!empty($this->cols['file_id'])) : ?>
+									<th class="center hideOnDemandClass col_id hidden-phone hidden-tablet">
+										<?php echo HTMLHelper::_('grid.sort', 'FLEXI_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order']); ?>
+									</th>
+								<?php endif; ?>
+
 								<th class="center hideOnDemandClass"><?php echo Text::_( 'FLEXI_THUMB' ); ?></th>
 								<th class="left">
 									<?php if (!$this->folder_mode) : ?>
@@ -1011,12 +1027,6 @@ if ($js)
 
 								<?php if (!$isFilesElement) : ?>
 									<th class="center hideOnDemandClass hidden-phone"><?php echo HTMLHelper::_('grid.sort', 'E-storage', 'estorage', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-								<?php endif; ?>
-
-								<?php if (!empty($this->cols['file_id'])) : ?>
-									<th class="center hideOnDemandClass col_id hidden-phone hidden-tablet">
-										<?php echo HTMLHelper::_('grid.sort', 'FLEXI_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order']); ?>
-									</th>
 								<?php endif; ?>
 
 								<?php if ($isFilesElement) : /* Direct delete button for fileselement view */ ?>
@@ -1096,7 +1106,7 @@ if ($js)
 										? JPATH_ROOT . '/' . $filename
 										: $filename;
 
-									$thumb_or_icon = 'URL';
+									$thumb_or_icon = $row->url == 1 ? 'URL' : (!$is_img ? HTMLHelper::image($row->icon, $filename) : '');
 								}
 
 								// Clean the file path
@@ -1158,6 +1168,11 @@ if ($js)
 									$row->filename_displayed = $row->filename_original ? $row->filename_original : $row->filename;
 								}
 
+								// For media manager links, display only the filename as EDIT link
+								if ($row->url == 2) {
+									$row->filename_displayed = basename($row->filename_displayed);
+								}
+
 
 								if ($isFilesElement)
 								{
@@ -1191,6 +1206,23 @@ if ($js)
 										?>
 									</td>
 
+									<?php if (!empty($this->cols['file_id'])) : ?>
+										<td class="center col_id hidden-phone hidden-tablet">
+											<?php
+											echo $row->id;
+											$urlvars = ['id' => $row->id]; // ['id' => $row->id, 'cid' => 0, 'fid' => 0];  // cid : content item id, fid : field id, id : file id
+											$link = trim(Uri::root(), '/') . flexicontent_html::getSefUrl(FlexicontentHelperRoute::getTaskRoute($row->id, 'download_file', 0, $urlvars), $xhtml = true, $ssl = null);
+											echo '
+											<a href="javascript:;" onclick="jQuery(\'#copyUrlModal\').find(\'.linkbox\').html(\''.$link.'\')"
+												class="toolbar btn btn-info btn-copy-url" data-clipboard-text="'.$link.'"
+												data-toggle="modal" data-target="#copyUrlModal" data-bs-toggle="modal" data-bs-target="#copyUrlModal">'
+												. '<span class="icon-link"></span>
+											</a>
+											';
+											?>
+										</td>
+									<?php endif; ?>
+
 									<td class="center">
 										<div class="fc-fileman-list-thumb-box thumb_<?php echo $thumb_size['fm-list'] ; ?>" onclick="fman_sync_cid(<?php echo $i; ?>, 0);">
 											<?php echo $thumb_or_icon; ?>
@@ -1214,7 +1246,13 @@ if ($js)
 											echo HTMLHelper::_($hlpname . '.edit_link', $row, $i, $row->canEdit);
 
 											// Note we will pass true to canEdit parameter because we want to create an assign link
-											echo HTMLHelper::_($hlpname . '.edit_link', $row, $i, true, array(
+											// Check if file has an audio / video extension
+
+											// Check if file is NOT an known / allowed image, and skip it if LAYOUT is 'image' otherwise display a 'type' icon
+											$mediaExt = array('mp3', 'ogg', 'wav', 'wma', 'm4a', 'flac', 'aac', 'mp4', 'm4v', 'mov', 'wmv', 'avi', 'mpg', 'mpeg', 'flv', 'webm', 'mkv', '3gp', '3g2', 'ogv', 'm3u8', 'ts', 'm3u', 'pls', 'asx', 'wpl', 'xspf', 'm3u8', 'm3u', 'pls', 'asx', 'wpl', 'xspf');
+											$ext = strtolower($row->ext);
+											$isMediaFile = in_array($ext, $mediaExt);
+											if ($isMediaFile) echo HTMLHelper::_($hlpname . '.edit_link', $row, $i, true, array(
 												'option'   => 'com_flexicontent',
 												'ctrl'     => 'mediadatas',
 												'view'     => 'mediadata',
@@ -1237,8 +1275,8 @@ if ($js)
 										{
 											if ($isXtdBtn)
 											{
-												$vars = '&id='.$row->id;
-												$link = Uri::root(true) . '/index.php?option=com_flexicontent&task=download_file' . $vars;
+												$urlvars = ['id' => $row->id]; // ['id' => $row->id, 'cid' => 0, 'fid' => 0];  // cid : content item id, fid : field id, id : file id
+												$link = flexicontent_html::getSefUrl(FlexicontentHelperRoute::getTaskRoute($row->id, 'download_file', 0, $urlvars), $xhtml = true, $ssl = null);
 
 												$attribs = 'data-function="' . $this->escape($onclick) . '"'
 													. ' data-id="' . $this->escape($row->id) . '"'
@@ -1294,7 +1332,7 @@ if ($js)
 										<td class="center hidden-phone">
 											<?php
 											echo $this->CanFiles && ($this->CanViewAllFiles || $user->id == $row->uploaded_by)
-												? flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'class="fcfield_selectval" onchange="return Joomla.listItemTask(\'cb'.$i.'\',\''.$ctrl.'access\')"')
+												? flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'class="fcfield_selectval" onchange="return setAccessLevel(this, '.$row->id.');"')
 												: (strlen($row->access_level) ? $this->escape($row->access_level) : '-');
 											?>
 										</td>
@@ -1362,12 +1400,6 @@ if ($js)
 									<?php if (!$isFilesElement) : ?>
 										<td class="center col_estorage hidden-phone hidden-tablet">
 											<?php echo !$row->estorage_fieldid ? Text::_('FLEXI_NO') : ($row->estorage_fieldid > 0 ? Text::_('Pending') :  Text::_('Uploading')); ?>
-										</td>
-									<?php endif; ?>
-
-									<?php if (!empty($this->cols['file_id'])) : ?>
-										<td class="center col_id hidden-phone hidden-tablet">
-											<?php echo $row->id; ?>
 										</td>
 									<?php endif; ?>
 
@@ -2346,6 +2378,55 @@ HTML;
       max-width: unset;
     }
 	</style>
+
+	<script>
+	  jQuery(document).ready(function() {
+		  var clipboard = new ClipboardJS('a.btn-copy-url');
+	  });
+	</script>
+
+	<!-- Modal -->
+	<div class="modal fade" id="copyUrlModal" tabindex="-1" role="dialog" aria-labelledby="copyUrlModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-lg" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title" id="copyUrlModalLabel">
+						The following URL has been copied to the clipboard.
+					</h3>
+					<button type="button" class="btn-close novalidate" data-bs-dismiss="modal"
+					        aria-label="Close"></button>
+				</div>
+				<div class="modal-body p-3">
+					<div class="linkbox">The link</div>
+					<br><br>
+					Please note that access level of the file will be checked. <br>
+					E.g. Add download links of "Public" access files to "Public" content items.
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+<script>
+		/* Submit task access for given row_id and selected level */
+	setAccessLevel = function (el, file_id) {
+		let access = {};
+		access[file_id] = jQuery(el).val();
+	  jQuery.ajax({
+		  type: "GET",
+			dataType: 'json',
+		  url: "index.php?option=com_flexicontent&task=filemanager.access&<?php echo \Joomla\CMS\Session\Session::getFormToken(); ?>=1",
+		  data: { cid: file_id, access: access, isAjax: 1, format: 'html' }
+		}).done(function( response ) {
+			var data = response.data;
+		  console.log(response);
+	  });
+	};
+</script>
+
+
 <?php
 Factory::getDocument()->addScriptDeclaration('
 	function fc_edit_mmdata_modal_load( container )

@@ -165,8 +165,48 @@ class FlexicontentHelperRoute
 
 				return $_component_default_menuitem_id;
 		}
+
+		return NULL;
 	}
 
+
+
+	/**
+	 * function to discover a default item id only once
+	 */
+	protected static function _setTaskDefaultMenuitemIds()
+	{
+		// Cache the result on multiple calls
+		static $_tasks_default_menuitem_id = null;
+		if ( $_tasks_default_menuitem_id!==null ) return $_tasks_default_menuitem_id;
+
+		// Default item not found (yet) ... set it to empty array to indicate that we tried
+		$_tasks_default_menuitem_id = array();
+
+		// Get 'current' language. This SITE Default language if we are in Backend, and Current UI language if we are in Frontend
+		$current_language = \Joomla\CMS\Factory::getApplication()->isClient('administrator')
+			? \Joomla\CMS\Component\ComponentHelper::getParams('com_languages')->get('site', 'en-GB')
+			: \Joomla\CMS\Factory::getLanguage()->getTag();
+
+		// Get preference for default menu item
+		$params = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+
+		// TODO add these in XML configuration file
+		$_tasks_default_menuitem_id = array();
+		$_tasks_default_menuitem_id['download']       = $params->get('tasks_download_default_menu_itemid', 0);
+		$_tasks_default_menuitem_id['download_file']  = $params->get('tasks_download_file_default_menu_itemid', 0);
+		$_tasks_default_menuitem_id['download_files'] = $params->get('tasks_download_files_default_menu_itemid', 0);
+		$_tasks_default_menuitem_id['weblink']        = $params->get('tasks_weblink_default_menu_itemid',  0);
+
+		foreach ($_tasks_default_menuitem_id as $task => $menuitem_id)
+		{
+			// Verify the menu item, clearing it if invalid, or setting to its language associated menu item if needed
+			FlexicontentHelperRoute::verifyMenuItem($menuitem_id);
+			$_tasks_default_menuitem_id[$task] = $menuitem_id;
+		}
+
+		return $_tasks_default_menuitem_id;
+	}
 
 
 	/**
@@ -205,7 +245,6 @@ class FlexicontentHelperRoute
 
 		return $_layouts_default_menuitem_id;
 	}
-
 
 
 	/**
@@ -536,8 +575,6 @@ class FlexicontentHelperRoute
 		return $_Itemid == -1 ? $Itemid : $link;
 	}
 
-
-
 	/**
 	 * Get routed links for categories
 	 */
@@ -822,6 +859,155 @@ class FlexicontentHelperRoute
 		return $_Itemid == -1 ? $Itemid : $link;
 	}
 
+	/**
+	 * Get routed links for tasks
+	 */
+	static function getTaskRoute($id = 0, $task = 'download', $_Itemid = 0, $urlvars = array())
+	{
+		$Itemid = $_Itemid == -1  ?  0  :  $_Itemid;  // -1 indicates to return the found menu Itemid instead of the produced link
+
+		// Calculate later only if needed
+		static $component_default_menuitem_id = null;
+		static $task_default_menuitem_ids   = null;
+
+		static $current_language = null;
+		static $use_language     = null;
+
+		if ($current_language === null)
+		{
+			// Get 'current' language. This SITE Default language if we are in Backend, and Current UI language if we are in Frontend
+			$current_language = \Joomla\CMS\Factory::getApplication()->isClient('administrator')
+				? \Joomla\CMS\Component\ComponentHelper::getParams('com_languages')->get('site', 'en-GB')
+				: \Joomla\CMS\Factory::getLanguage()->getTag();
+		}
+
+		if ($use_language === null)
+		{
+			$use_language = \Joomla\CMS\Language\Multilanguage::isEnabled();
+			if ($use_language) {
+				self::_buildLanguageLookup();
+			}
+		}
+
+		// Get language
+		$language = $current_language;
+
+		// For view = tasks
+		static $task_idvars = array
+		(
+			'download'       => 'id',
+			'download_file'  => 'id',
+			'download_files' => 'id',
+			'weblink'        => 'id',
+		);
+		// Add id variable if not already added
+		if (!isset($urlvars[$task_idvars[$task]]))
+		{
+			$urlvars[$task_idvars[$task]] = $id;
+		}
+
+		// **********************************************************
+		// Create the needles for table lookup in descending priority
+		// **********************************************************
+
+		$needles = array();
+
+		$needles['tasks'][] = $id;
+
+		// task is always set, add id: 0 (indexes: TaskID_0), -1 (indexes: 0_0) as last needles
+		$needles['tasks'][] = 0;
+		$needles['tasks'][] = -1;
+
+
+		// ***************
+		// Create the link
+		// ***************
+
+		$link = 'index.php?option=com_flexicontent';  // . '&view=tasks' . '&task='.$task;
+
+		// Other data to pass to _findTask()
+		$data = array();
+
+		// Append given variables, but exclude 'cid' if already added ('catslug')
+		foreach ($urlvars as $varname => $varval)
+		{
+			if ($varval)
+			{
+				$link .= '&' . $varname . '=' . $varval;
+			}
+		}
+
+		$data['urlvars'] = $urlvars;
+
+
+		// use SEF language code as so configured
+		$data['language'] = '*';  // Default to ALL
+		if ($use_language && $language && $language != "*")
+		{
+			if(isset(self::$lang_lookup[$language]))
+			{
+				if ( self::$add_url_lang && isset(self::$interface_langs[$language]) ) {
+					$link .= '&lang='.self::$lang_lookup[$language];
+				}
+				$data['language'] = $language;
+			}
+		}
+
+
+		// USE the itemid provided, if we were given one it means it is "appropriate and relevant"
+		$menuitem = $Itemid ? FlexicontentHelperRoute::verifyMenuItem($Itemid) : false;
+		$Itemid   = $menuitem ? $menuitem->id : 0;
+		if ($Itemid)
+		{
+			$link .= '&Itemid='.$Itemid;
+		}
+
+		// Try to find the most appropriate/relevant menu item, using the priority set via needles array
+		elseif ($menuitem = FlexicontentHelperRoute::_findTask($needles, $data, $task))
+		{
+			$Itemid = $menuitem->id;
+			$link .= '&Itemid='.$Itemid;
+		}
+
+		// Try to use component's default menu item, this is according to COMPONENT CONFIGURATION and includes ACTIVE menu item if appropriate
+		// but try task specific first
+		else
+		{
+			if ($task_default_menuitem_ids === null)
+			{
+				$task_default_menuitem_ids = FlexicontentHelperRoute::_setTaskDefaultMenuitemIds();
+			}
+
+			if (!empty($task_default_menuitem_ids[$task]))
+			{
+				$Itemid = $task_default_menuitem_ids[$task];
+			}
+			else
+			{
+				if ($component_default_menuitem_id === null)
+				{
+					$component_default_menuitem_id = FlexicontentHelperRoute::_setDefaultMenuitemId();
+				}
+
+				$Itemid = (int) $component_default_menuitem_id;  // if false (aka not set) then it will be typecasted to ZERO
+			}
+
+			if ($Itemid) {
+				$link .= '&Itemid='.$Itemid;
+				$menus = \Joomla\CMS\Factory::getApplication()->getMenu('site', array());   // this will work in J1.5 backend too !!!
+				$menuitem = $menus->getItem($Itemid);  // Try to load the menu item
+			}
+		}
+
+		// Add task URL variable to link if not already added
+		if (!$menuitem || $menuitem->query['view'] !== 'tasks' )
+		{
+			$link .= '&task=' . $task;
+		}
+
+		// Return menu Itemid or the produced link
+		return $_Itemid == -1 ? $Itemid : $link;
+	}
 
 
 	/**
@@ -1079,10 +1265,11 @@ class FlexicontentHelperRoute
 		// For 'mcats' layout, we will support specific menu match only selection for cids in same order ... for performance reasons
 		static $layout_idvars = array
 		(
-			'tags'=>'tagid',
-			'author'=>'authorid',
-			'mcats'=>'cids',
+			'tags'   => 'tagid',
+			'author' => 'authorid',
+			'mcats'  => 'cids',
 		);
+
 		static $layout_default_menuitem_ids;
 
 		// Get language, url variables
@@ -1260,6 +1447,191 @@ class FlexicontentHelperRoute
 		return $matched_menu;
 	}
 
+	protected static function _findTask($needles, &$data, $task)
+	{
+		if ( !$needles ) return false;
+
+		// For view = tasks
+		static $task_idvars = array
+		(
+			'download'       => 'id',
+			'download_file'  => 'id',
+			'download_files' => 'id',
+			'weblink'        => 'id',
+		);
+
+		static $task_default_menuitem_ids;
+
+		// Get language, url variables
+		$language = $data['language'];
+		$urlvars  = $data['urlvars'];
+
+		// Get per task id variable to use it for hashing (indexing the lookup array)
+		$i_name = @ $task_idvars[$task];
+		$i_val = $i_name && !empty($urlvars[$i_name])  ?  ((int)$urlvars[$i_name]).'_'  :  '0_';
+
+		// Get default menu items per task
+		if ($task_default_menuitem_ids === null)
+		{
+			$task_default_menuitem_ids = FlexicontentHelperRoute::_setLayoutDefaultMenuitemIds();
+		}
+
+
+		/**
+		 * Get 'current' language. This SITE Default language if we are in Backend, and Current UI language if we are in Frontend
+		 */
+		static $current_language = null;
+
+		if ($current_language === null)
+		{
+			$current_language = \Joomla\CMS\Factory::getApplication()->isClient('administrator')
+				? \Joomla\CMS\Component\ComponentHelper::getParams('com_languages')->get('site', 'en-GB')
+				: \Joomla\CMS\Factory::getLanguage()->getTag();
+		}
+
+
+		/**
+		 * Set language menu items if not already done
+		 */
+		$component_menuitems = array();
+
+		if (!isset(self::$menuitems[$current_language]))
+		{
+			FlexicontentHelperRoute::_setMenuitems($current_language);
+		}
+		$component_menuitems[$current_language] = & self::$menuitems[$current_language];
+
+		if (!isset(self::$menuitems[$language]))
+		{
+			FlexicontentHelperRoute::_setMenuitems($language);
+		}
+		$component_menuitems[$language] = & self::$menuitems[$language];
+
+
+		/**
+		 * Get current menu item, we will prefer current menu if it points to given category,
+		 * thus maintaining current menu item if multiple menu items to same category exist !!
+		 */
+		static $active = null;
+
+		if ($active === null)
+		{
+			$active = FlexicontentHelperRoute::_getActiveFlexiMenuitem();
+
+			// Get if active language menu items are allowed for language all records
+			self::$route_active_lang = self::$route_active_lang !== null ? self::$route_active_lang : (int) \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('route_active_lang', 1);
+		}
+
+		$route_active_lang = self::$route_active_lang && $language === '*';
+
+
+		/**
+		 * Done ONCE per language: Iterate through menu items pointing to FLEXIcontent component, to create a reverse lookup
+		 * table for the given language, not if given language is missing the an '*' menu item will be allowed in its place
+		 */
+		if (!isset(self::$lookup[$language]))
+		{
+			FlexicontentHelperRoute::populateLookupTable($language);
+		}
+
+		if ($route_active_lang && !isset(self::$lookup[$current_language]))
+		{
+			FlexicontentHelperRoute::populateLookupTable($current_language);
+		}
+
+
+		// Now find menu item for given needles
+		$matched_menu = false;
+
+		//echo '<pre>'; print_r($needles); echo '</pre>';
+		foreach ($needles as $view => $ids)
+		{
+			// Check if this an already appropriate menu item object
+			if (is_object($ids) && ($ids->language === '*' || $ids->language == $language))
+			{
+				return $ids;
+			}
+
+			if ($view === '_language')
+			{
+				continue;
+			}
+
+			$i_view = $view . ($task ? '_' . $task : '');
+			//echo $i_view . "<br/>";
+			//echo $language . "<br/>";
+
+			// Lookup if then given ids for the given view exists for the given language
+			if (!isset(self::$lookup[$language][$i_view]) && (!$route_active_lang || !isset(self::$lookup[$current_language][$i_view])))
+			{
+				continue;
+			}
+
+			foreach($ids as $id)
+			{
+				$i_id = (int) $id;
+
+				if ($task)
+				{
+					// Do not try to match a non-specific "task" menu item if default menu item for this task has been configured
+					if ($i_id === -1 && !empty($task_default_menuitem_ids[$task]))
+					{
+						continue;
+					}
+
+					$i_id = $i_id === -1 ? '0_0' : $i_val . $i_id;
+				}
+				//echo "i_id: ". $i_id ."<br/>";
+
+				// Check if not found and continue
+				if (isset(self::$lookup[$language][$i_view][$i_id]))
+				{
+					$lookup_language = $language;
+				}
+
+				// Otherwise if record being routed has language ALL, then try to match menus having the active language
+				elseif ($route_active_lang && isset(self::$lookup[$current_language][$i_view][(int)$id]))
+				{
+					$lookup_language = $current_language;
+				}
+
+				else
+				{
+					continue;
+				}
+
+				//echo "$language $i_view $i_id : ". self::$lookup[$language][$i_view][$i_id] ."<br/>";
+
+				$menuid = self::$lookup[$lookup_language][$i_view][$i_id];
+				$menuitem = $component_menuitems[$lookup_language][$menuid];
+
+				// menu item matched, break out
+				$matched_menu = $menuitem;
+				break;
+			}
+
+			if ($matched_menu)
+			{
+				break;
+			}
+		}
+
+		// Prefer current category menu item if also appropriate
+		if ($matched_menu && $active && @ $matched_menu->query['view'] == 'category' &&
+			@ $matched_menu->query['view'] == @ $active->query['view'] &&
+			@ $matched_menu->query['task'] == @ $active->query['task'] &&
+			@ $matched_menu->query['id'] == @ $active->query['id'] &&
+			($current_language == $language || $current_language === '*'
+				// Also allow matching menu items of any language, if record being routed has language 'ALL'
+				|| (self::$route_active_lang && $language === '*')
+			)
+		) {
+			$matched_menu = $active;
+		}
+
+		return $matched_menu;
+	}
+
 
 	protected static function _findTag($needles, &$data)
 	{
@@ -1407,12 +1779,29 @@ class FlexicontentHelperRoute
 		$component_menuitems[$language] = & self::$menuitems[$language];
 
 		// Every VIEW may have a different variable for the lookup table in which we will add the menu items
-		static $view_varnames = array(FLEXI_ITEMVIEW=>'id', 'category'=>'cid', 'tags'=>'id', 'flexicontent'=>'rootcatid');
+		static $view_varnames = [
+			FLEXI_ITEMVIEW => 'id',
+			'category' => 'cid',
+			'tags' => 'id',
+			'flexicontent' => 'rootcatid',
+			'tasks' => 'id'
+		];
 
-		static $layout_idvars = array(
-			'tags'=>'tagid',
-			'author'=>'authorid',
-			'mcats'=>'cids',
+		// For view = category
+		static $layout_idvars = array
+		(
+			'tags'   => 'tagid',
+			'author' => 'authorid',
+			'mcats'  => 'cids',
+		);
+
+		// For view = tasks
+		static $task_idvars = array
+		(
+			'download'       => 'id',
+			'download_file'  => 'id',
+			'download_files' => 'id',
+			'weblink'        => 'id',
 		);
 
 		self::$lookup[$language] = array();
@@ -1425,21 +1814,32 @@ class FlexicontentHelperRoute
 
 			$view   = $menuitem->query['view'];
 			$layout = $view=='category' && !empty($menuitem->query['layout']) ? $menuitem->query['layout'] : false;
+			$task   = $view=='tasks'    && !empty($menuitem->query['task'])   ? $menuitem->query['task']   : false;
 
 			// Create lookup table for view if it does not exist already
-			$i_view = $view . ($layout && $view=='category' ? '_'.$layout : '');
+			$i_view = $view;
+			if ($layout && $view=='category') $i_view = $view . '_' . $layout;
+			if ($task   && $view=='tasks')    $i_view = $view . '_' . $task;
 			if (!isset(self::$lookup[$language][$i_view]))  self::$lookup[$language][$i_view] = array();
 
 			// Check if view 's variable (used in lookup table) exists in the menu item
 			if ( !isset($view_varnames[$view]) ) continue;
 			$i_name = $view_varnames[$view];
 
-			if ( empty($menuitem->query[$i_name]) && ! $layout ) continue;
+			// Check if we have none case to handle, aka also no $layout and no $task
+			if ( empty($menuitem->query[$i_name]) && ! $layout && ! $task) continue;
+
 			$i_val  = !empty($menuitem->query[$i_name]) ? (int)$menuitem->query[$i_name] : 0;
 
 			if ( $layout )
 			{
 				$i_name = @ $layout_idvars[$layout];
+				$i_val  = ((int)($i_name ? @ $menuitem->query[$i_name] : '0')) . '_' . $i_val;
+			}
+
+			if ( $task )
+			{
+				$i_name = @ $task_idvars[$layout];
 				$i_val  = ((int)($i_name ? @ $menuitem->query[$i_name] : '0')) . '_' . $i_val;
 			}
 

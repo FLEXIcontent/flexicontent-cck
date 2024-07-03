@@ -11,6 +11,7 @@
 
 defined('_JEXEC') or die;
 
+use Joomla\Filesystem\Path;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
@@ -60,6 +61,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		{
 			$this->registerTask('download_tree',  'download');
 			$this->registerTask('download_file',  'download');
+			$this->registerTask('download_files',  'download');
 
 			$this->input  = empty($this->input) ? \Joomla\CMS\Factory::getApplication()->input : $this->input;
 			$this->option = $this->input->get('option', '', 'cmd');
@@ -880,6 +882,9 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			die('unknown download method:' . $method);
 		}
 
+		// Get a target path for the creating the zip file for tasks that require it
+		$tmp_ffname = 'fcmd_uid_'.$user->id.'_'.date('Y-m-d__H-i-s');
+		$targetpath = \Joomla\CMS\Filesystem\Path::clean($app->get('tmp_path') .DS. $tmp_ffname);
 
 		/**
 		 * Single file download (via HTTP request) or multi-file downloaded (via a folder structure in session or in DB table)
@@ -925,10 +930,6 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				return;
 			}
 
-			$app = \Joomla\CMS\Factory::getApplication();
-			$tmp_ffname = 'fcmd_uid_'.$user->id.'_'.date('Y-m-d__H-i-s');
-			$targetpath = \Joomla\CMS\Filesystem\Path::clean($app->getCfg('tmp_path') .DS. $tmp_ffname);
-
 			$tree_files = $this->_traverseFileTree($nodes, $targetpath);
 			//echo "<pre>"; print_r($tree_files); jexit();
 
@@ -940,12 +941,11 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			}
 		}
 
-		else//if ($task === 'download' || $task === 'download_file')
+		else // $task === 'download' || $task === 'download_file' || $task === 'download_files'
 		{
 			$file_node = new stdClass();
 			$file_node->fieldid   = $this->input->get('fid', 0, 'int');
 			$file_node->contentid = $this->input->get('cid', 0, 'int');
-			$file_node->fileid    = $this->input->get('id', 0, 'int');
 
 			$coupon_id    = $this->input->get('conid', 0, 'int');
 			$coupon_token = $this->input->get('contok', '', 'string');
@@ -980,8 +980,27 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				$file_node->coupon = !empty($coupon) ? $coupon : false;
 			}
 
-			$tree_files = array($file_node);
+			// Check for multi file download or single file download
+			$tree_files = [];
+			if ($task === 'download_files')
+			{
+				$fileids = $this->input->get('id', '', 'string');
+				$fileids = explode(',', $fileids);
+				$fileids = array_map('intval', $fileids);
+				foreach ($fileids as $fileid)
+				{
+					if (!$fileid) continue;
+					$file_node->fileid = $fileid;
+					$tree_files[] = clone $file_node;
+				}
+			}
+			else
+			{
+				$file_node->fileid = $this->input->get('id', 0, 'int');
+				$tree_files[] = $file_node;
+			}
 		}
+		//echo '<pre>'; print_r($tree_files); jexit();
 
 
 		/**
@@ -999,7 +1018,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			// note CURRENTLY multi-download feature does not use coupons
 			$access_clauses = $this->_createFieldItemAccessClause(
 				$get_select_access = true,
-				$include_file = ($task === 'download_file' ? 'fileaccess_only' : true)
+				$include_file = ($task === 'download_file' || $task === 'download_files' ? 'fileaccess_only' : true)
 			);
 		}
 
@@ -1020,7 +1039,8 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			$content_id = (int) $file_node->contentid;
 			$file_id    = (int) $file_node->fileid;
 
-			if (!isset($fields_conf[$field_id]))
+			// Try to load field configuration if a field id was given
+			if ($field_id && !isset($fields_conf[$field_id]))
 			{
 				$q = 'SELECT attribs, name, field_type FROM #__flexicontent_fields WHERE id = '.(int) $field_id;
 				$db->setQuery($q);
@@ -1028,10 +1048,10 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				$fields_conf[$field_id] = new \Joomla\Registry\Registry($fld->attribs);
 				$fields_props[$field_id] = $fld;
 			}
-			$field_type = $fields_props[$field_id]->field_type;
+			$field_type = $field_id ? $fields_props[$field_id]->field_type : '';
 
 			$query  = 'SELECT DISTINCT f.id, f.filename, f.filename_original, f.altname, f.secure, f.url, f.hits, f.stamp, f.size'
-					.($task !== 'download_file'
+					.($task !== 'download_file' && $task !== 'download_files'
 						? ', u.email as item_owner_email' .
 							', i.title as item_title, i.introtext as item_introtext, i.fulltext as item_fulltext' .
 							', i.language as item_language, ie.type_id as item_type_id, i.access as item_access' .
@@ -1043,25 +1063,37 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 					. $access_clauses['select']  // has access
 
 					.' FROM #__flexicontent_files AS f '
-					.($field_type=='file' ? ' LEFT JOIN #__flexicontent_fields_item_relations AS rel ON '
+					.($field_type=='file' || $field_type=='mediafile' ? ' LEFT JOIN #__flexicontent_fields_item_relations AS rel ON '
 						. ' rel.field_id = '. $field_id . ' AND rel.value = ' . (int) $file_id . ' AND rel.item_id = ' . (int) $content_id
 						: '')  // Only check value usage for 'file' field
-					.($task !== 'download_file' ? ' LEFT JOIN #__flexicontent_fields AS fi ON fi.id = '. $field_id : '')
-					.($task !== 'download_file' ? ' LEFT JOIN #__content AS i ON i.id = '. $content_id : '')
-					.($task !== 'download_file' ? ' LEFT JOIN #__categories AS c ON c.id = i.catid' : '')
-					.($task !== 'download_file' ? ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id' : '')
-					.($task !== 'download_file' ? ' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id' : '')
-					.($task !== 'download_file' ? ' LEFT JOIN #__users AS u ON u.id = i.created_by' : '')
+					.($task !== 'download_file' && $task !== 'download_files' ? ' LEFT JOIN #__flexicontent_fields AS fi ON fi.id = '. $field_id : '')
+					.($task !== 'download_file' && $task !== 'download_files' ? ' LEFT JOIN #__content AS i ON i.id = '. $content_id : '')
+					.($task !== 'download_file' && $task !== 'download_files' ? ' LEFT JOIN #__categories AS c ON c.id = i.catid' : '')
+					.($task !== 'download_file' && $task !== 'download_files' ? ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id' : '')
+					.($task !== 'download_file' && $task !== 'download_files' ? ' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id' : '')
+					.($task !== 'download_file' && $task !== 'download_files' ? ' LEFT JOIN #__users AS u ON u.id = i.created_by' : '')
 					.' LEFT JOIN #__flexicontent_download_history AS dh ON dh.file_id = f.id AND dh.user_id = '. (int)$user->id
 					. $access_clauses['join']
 					.' WHERE 1'
-					.($task !== 'download_file' ? ' AND i.id = ' . $content_id : '')
-					.($task !== 'download_file' ? ' AND fi.id = ' . $field_id : '')
+					.($task !== 'download_file' && $task !== 'download_files' ? ' AND i.id = ' . $content_id : '')
+					.($task !== 'download_file' && $task !== 'download_files' ? ' AND fi.id = ' . $field_id : '')
 					.' AND f.id = ' . $file_id
 					.' AND f.published= 1'
 					. $access_clauses['and']
 					;
 			$file = $db->setQuery($query)->loadObject();
+
+			// Add target path (with target filename) for case we were not provide a custom name like when using download_tree task
+			static $used_names = array();
+			if ($task !== 'download_tree')
+			{
+				$basename = basename($file->filename);
+				if (isset($used_names[$basename]))
+				{
+					$basename = $file->id . '_' . $basename;
+				}
+				$file_node->targetpath = $targetpath . DS . $basename;
+			}
 			//echo "<pre>". print_r($file, true) ."</pre>"; exit;
 
 
@@ -1143,7 +1175,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				}
 
 				// Only abort further execution for single file download
-				if ($task !== 'download_tree')
+				if ($task !== 'download_tree' && $task !== 'download_files')
 				{
 					$this->setRedirect('index.php', '');
 					return;
@@ -1166,7 +1198,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 					$app->enqueueMessage($msg, 'notice');
 
 					// Only abort for single file download
-					if ($task !== 'download_tree')
+					if ($task !== 'download_tree' && $task !== 'download_files')
 					{
 						$this->setRedirect('index.php', '');
 						return;
@@ -1179,9 +1211,10 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				 * We may need absolute URL path later use \Joomla\CMS\Uri\Uri::root() !! for media manager Links
 				 * we may use readfile(Absolute URL) to force download of a URL link !!
 				 */
-				$file->abspath = $file->url == 2
-					? \Joomla\CMS\Uri\Uri::root() . $file->filename
-					: $file->filename;
+				$file->abspath = Path::clean($file->url == 2
+					? JPATH_ROOT . '/' . $file->filename
+					: $file->filename
+				);
 			}
 
 
@@ -1217,7 +1250,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			$value_order = null;
 			$config = array(
 				'fileid' => $file_id,
-				'task' => $task,  // (string) 'download', 'download_tree'
+				'task' => $task,  // (string) 'download', 'download_tree', 'download_files', 'download_file'
 				'method' => $method,  // (string) 'view', 'download'
 				'coupon_id' => $coupon_id,  // int or null
 				'coupon_token' => $coupon_token // string or null
@@ -1289,29 +1322,53 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				$url = $file->url == 2
 					? \Joomla\CMS\Uri\Uri::root(true) . '/' . $file->filename
 					: $file->filename;
+				$abs_path = Path::clean($file->url == 2
+					? JPATH_ROOT . '/' . $file->filename
+					: $file->filename);
+
+				// For media manager links, check if the file exists
+				if ($file->url == 2 && !file_exists($abs_path))
+				{
+					$msg = 'File does not exist: ' . $file->filename;
+					if ($task === 'download_tree' || $task === 'download_files') {
+						continue;
+					}
+					else {
+						$app->enqueueMessage($msg, 'error');
+						return false;
+					}
+				}
+
 				$ext = strtolower(flexicontent_upload::getExt($url));
 
 				// Check for empty URL
 				if (empty($url))
 				{
 					$msg = "File URL is empty: ".$file->url;
-					$app->enqueueMessage($msg, 'error');
-					return false;
+					if ($task === 'download_tree' || $task === 'download_files') {
+						continue;
+					}
+					else {
+						$app->enqueueMessage($msg, 'error');
+						return false;
+					}
 				}
 
 				// skip url-based file if downloading multiple files
-				if ($task == 'download_tree')
+				if ($file->url == 1 && ($task === 'download_tree' || $task === 'download_files'))
 				{
 					$msg = "Skipped URL based file: ".$url;
 					$app->enqueueMessage($msg, 'notice');
 					continue;
 				}
-				else
+				elseif ($file->url == 1)
 				{
-					$force_url_download         = (int) $fields_conf[$field_id]->get('force_url_download', 0);
-					$force_url_download_exts    = preg_split("/[\s]*,[\s]*/", strtolower($fields_conf[$field_id]->get('force_url_download_exts', 'bmp,wbmp,gif,jpg,jpeg,png,webp,ico,wav,mp3,aiff')));
-					$force_url_download_exts    = array_flip($force_url_download_exts);
-					$force_url_download_max_kbs = (int) $fields_conf[$field_id]->get('force_url_download_max_kbs', 100000);
+					$force_url_download           = $field_id ? (int) $fields_conf[$field_id]->get('force_url_download', 0) : 0;
+					$force_url_download_exts_defs = 'bmp,wbmp,gif,jpg,jpeg,png,webp,ico,wav,mp3,aiff';
+					$force_url_download_exts      = strtolower($field_id ? $fields_conf[$field_id]->get('force_url_download_exts', $force_url_download_exts_defs) : $force_url_download_exts_defs);
+					$force_url_download_exts      = preg_split("/[\s]*,[\s]*/", $force_url_download_exts);
+					$force_url_download_exts      = array_flip($force_url_download_exts);
+					$force_url_download_max_kbs   = $field_id ? (int) $fields_conf[$field_id]->get('force_url_download_max_kbs', 100000) : 100000;
 
 					if ($force_url_download && isset($force_url_download_exts[$ext]))
 					{
@@ -1336,114 +1393,119 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				}
 			}
 
-
 			/**
 			 * Set file (tree) node and assign file into valid files for downloading
 			 */
-
 			$file->node = $file_node;
 			$valid_files[$file_id] = $file;
 
-			$file->hits++;
-			$per_downloads = $fields_conf[$field_id]->get('notifications_step', 20);
-
-			// Create current date string according to configuration
-			$current_date = flexicontent_html::getDateFieldDisplay($fields_conf[$field_id], $_date_ = '', 'stamp_');
-
-			$file->header_text = $fields_conf[$field_id]->get('pdf_header_text', '');
-			$file->footer_text = $fields_conf[$field_id]->get('pdf_footer_text', '');
-
-			$result = preg_match_all("/\%\%([^%]+)\%\%/", $file->header_text, $translate_matches);
-			if (!empty($translate_matches[1])) foreach ($translate_matches[1] as $translate_string)
-			{
-				$file->header_text = str_replace('%%'.$translate_string.'%%', \Joomla\CMS\Language\Text::_($translate_string), $file->header_text);
-			}
-			$file->header_text = str_replace('{{current_date}}', $current_date, $file->header_text);
-
-			$result = preg_match_all("/\%\%([^%]+)\%\%/", $file->footer_text, $translate_matches);
-			if (!empty($translate_matches[1])) foreach ($translate_matches[1] as $translate_string)
-			{
-				$file->footer_text = str_replace('%%'.$translate_string.'%%', \Joomla\CMS\Language\Text::_($translate_string), $file->footer_text);
-			}
-			$file->footer_text = str_replace('{{current_date}}', $current_date, $file->footer_text);
-
 			/**
-			 * Send notifications email about file download if file was download via a field that has these notifications enabled
+			 * Increment hits counter of file, and send notifications email about file download
 			 */
-			if ($task !== 'download_file' && $fields_conf[$field_id]->get('send_notifications') && ($file->hits % $per_downloads == 0) )
+			if ($field_id)
 			{
-				// Calculate (once per file) some text used for notifications
-				$file->__file_title__ = $file->altname && $file->altname != $file->filename
-					? $file->altname . ' ['.$file->filename.']'
-					: $file->filename;
+				$file->hits++;
+				$per_downloads = !$fields_conf[$field_id]->get('notifications_step', 20);
 
-				$item = new stdClass();
-				$item->access = $file->item_access;
-				$item->type_id = $file->item_type_id;
-				$item->language = $file->item_language;
-				$file->__item_url__ = \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getItemRoute($file->itemslug, $file->catslug, 0, $item));
+				// Create current date string according to configuration
+				$current_date = flexicontent_html::getDateFieldDisplay($fields_conf[$field_id], $_date_ = '', 'stamp_');
 
-				// Parse and identify language strings and then make language replacements
-				$notification_tmpl = $fields_conf[$field_id]->get('notification_tmpl');
-				if ( empty($notification_tmpl) )
+				$file->header_text = $fields_conf[$field_id]->get('pdf_header_text', '');
+				$file->footer_text = $fields_conf[$field_id]->get('pdf_footer_text', '');
+
+				$result = preg_match_all("/\%\%([^%]+)\%\%/", $file->header_text, $translate_matches);
+				if (!empty($translate_matches[1])) foreach ($translate_matches[1] as $translate_string)
 				{
-					$notification_tmpl = \Joomla\CMS\Language\Text::_('FLEXI_HITS') .": ".$file->hits;
-					$notification_tmpl .= '%%FLEXI_FDN_FILE_NO%% __file_id__:  "__file_title__" '."\n";
-					$notification_tmpl .= '%%FLEXI_FDN_FILE_IN_ITEM%% "__item_title__":' ."\n";
-					$notification_tmpl .= '__item_url__';
+					$file->header_text = str_replace('%%'.$translate_string.'%%', \Joomla\CMS\Language\Text::_($translate_string), $file->header_text);
 				}
+				$file->header_text = str_replace('{{current_date}}', $current_date, $file->header_text);
 
-				$result = preg_match_all("/\%\%([^%]+)\%\%/", $notification_tmpl, $translate_matches);
-				$translate_strings = $result ? $translate_matches[1] : array();
-				foreach ($translate_strings as $translate_string)
+				$result = preg_match_all("/\%\%([^%]+)\%\%/", $file->footer_text, $translate_matches);
+				if (!empty($translate_matches[1])) foreach ($translate_matches[1] as $translate_string)
 				{
-					$notification_tmpl = str_replace('%%'.$translate_string.'%%', \Joomla\CMS\Language\Text::_($translate_string), $notification_tmpl);
+					$file->footer_text = str_replace('%%'.$translate_string.'%%', \Joomla\CMS\Language\Text::_($translate_string), $file->footer_text);
 				}
-				$file->notification_tmpl = $notification_tmpl;
+				$file->footer_text = str_replace('{{current_date}}', $current_date, $file->footer_text);
 
-				// Send to hard-coded email list
-				$send_all_to_email = $fields_conf[$field_id]->get('send_all_to_email');
-				if ($send_all_to_email)
+				/**
+				 * Send notifications email about file download if file was download via a field that has these notifications enabled
+				 */
+				if ($task !== 'download_file' && $task !== 'download_files' && $fields_conf[$field_id]->get('send_notifications') && ($file->hits % $per_downloads == 0) )
 				{
-					$emails = preg_split("/[\s]*[;,][\s]*/", $send_all_to_email);
-					foreach($emails as $email)
+					// Calculate (once per file) some text used for notifications
+					$file->__file_title__ = $file->altname && $file->altname != $file->filename
+						? $file->altname . ' ['.$file->filename.']'
+						: $file->filename;
+
+					$item = new stdClass();
+					$item->access = $file->item_access;
+					$item->type_id = $file->item_type_id;
+					$item->language = $file->item_language;
+					$file->__item_url__ = \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getItemRoute($file->itemslug, $file->catslug, 0, $item));
+
+					// Parse and identify language strings and then make language replacements
+					$notification_tmpl = $fields_conf[$field_id]->get('notification_tmpl');
+					if ( empty($notification_tmpl) )
 					{
-						$email_recipients[trim($email)][] = $file;
+						$notification_tmpl = \Joomla\CMS\Language\Text::_('FLEXI_HITS') .": ".$file->hits;
+						$notification_tmpl .= '%%FLEXI_FDN_FILE_NO%% __file_id__:  "__file_title__" '."\n";
+						$notification_tmpl .= '%%FLEXI_FDN_FILE_IN_ITEM%% "__item_title__":' ."\n";
+						$notification_tmpl .= '__item_url__';
 					}
-				}
 
-				// Send to item owner
-				$send_to_current_item_owner = (int) $fields_conf[$field_id]->get('send_to_current_item_owner');
-				if ($send_to_current_item_owner)
-				{
-					$email_recipients[$file->item_owner_email][] = $file;
-				}
+					$result = preg_match_all("/\%\%([^%]+)\%\%/", $notification_tmpl, $translate_matches);
+					$translate_strings = $result ? $translate_matches[1] : array();
+					foreach ($translate_strings as $translate_string)
+					{
+						$notification_tmpl = str_replace('%%'.$translate_string.'%%', \Joomla\CMS\Language\Text::_($translate_string), $notification_tmpl);
+					}
+					$file->notification_tmpl = $notification_tmpl;
 
-				// Send to email assigned to email field in same content item
-				$send_to_email_field = (int) $fields_conf[$field_id]->get('send_to_email_field');
-				if ($send_to_email_field) {
-
-					$q  = 'SELECT value '
-						.' FROM #__flexicontent_fields_item_relations '
-						.' WHERE field_id = ' . $send_to_email_field .' AND item_id='.$content_id;
-					$db->setQuery($q);
-					$email_values = $db->loadColumn();
-
-					foreach ($email_values as $i => $email_value) {
-						if ( @unserialize($email_value)!== false || $email_value === 'b:0;' ) {
-							$email_values[$i] = unserialize($email_value);
-						} else {
-							$email_values[$i] = array('addr' => $email_value, 'text' => '');
+					// Send to hard-coded email list
+					$send_all_to_email = $fields_conf[$field_id]->get('send_all_to_email');
+					if ($send_all_to_email)
+					{
+						$emails = preg_split("/[\s]*[;,][\s]*/", $send_all_to_email);
+						foreach($emails as $email)
+						{
+							$email_recipients[trim($email)][] = $file;
 						}
-						$addr = @ $email_values[$i]['addr'];
-						if ( $addr ) {
-							$email_recipients[$addr][] = $file;
+					}
+
+					// Send to item owner
+					$send_to_current_item_owner = (int) $fields_conf[$field_id]->get('send_to_current_item_owner');
+					if ($send_to_current_item_owner)
+					{
+						$email_recipients[$file->item_owner_email][] = $file;
+					}
+
+					// Send to email assigned to email field in same content item
+					$send_to_email_field = (int) $fields_conf[$field_id]->get('send_to_email_field');
+					if ($send_to_email_field) {
+
+						$q  = 'SELECT value '
+							.' FROM #__flexicontent_fields_item_relations '
+							.' WHERE field_id = ' . $send_to_email_field .' AND item_id='.$content_id;
+						$db->setQuery($q);
+						$email_values = $db->loadColumn();
+
+						foreach ($email_values as $i => $email_value) {
+							if ( @unserialize($email_value)!== false || $email_value === 'b:0;' ) {
+								$email_values[$i] = unserialize($email_value);
+							} else {
+								$email_values[$i] = array('addr' => $email_value, 'text' => '');
+							}
+							$addr = @ $email_values[$i]['addr'];
+							if ( $addr ) {
+								$email_recipients[$addr][] = $file;
+							}
 						}
 					}
 				}
 			}
+
 		}
-		//echo "<pre>". print_r($valid_files, true) ."</pre>";
+		//echo "<pre>". print_r($valid_files, true) ."</pre>"; exit;
 		//echo "<pre>". print_r($email_recipients, true) ."</pre>";
 		//jexit();
 
@@ -1451,9 +1513,9 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		if (!empty($email_recipients))
 		{
 			ob_start();
-			$sendermail	= $app->getCfg('mailfrom');
+			$sendermail	= $app->get('mailfrom');
 			$sendermail	= \Joomla\CMS\Mail\MailHelper::cleanAddress($sendermail);
-			$sendername	= $app->getCfg('sitename');
+			$sendername	= $app->get('sitename');
 			$subject    = \Joomla\CMS\Language\Text::_('FLEXI_FDN_FILE_DOWNLOAD_REPORT');
 			$message_header = \Joomla\CMS\Language\Text::_('FLEXI_FDN_FILE_DOWNLOAD_REPORT_BY') .': '. $user->name .' ['.$user->username .']';
 
@@ -1501,9 +1563,8 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			ini_set('zlib.output_compression', 'Off');
 		}
 
-
 		// *** Single file download
-		if ($task != 'download_tree')
+		if ($task !== 'download_tree' && $task !== 'download_files')
 		{
 			$dlfile = reset($valid_files);
 		}
@@ -1521,10 +1582,12 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 			// Create text/html file with ITEM title / descriptions
 			// TODO replace this with a TEMPLATE file ...
-			$desc_filename = $targetpath .DS. "_descriptions";
-			$handle_txt = fopen($desc_filename.".txt", "w");
-			$handle_htm = fopen($desc_filename.".htm", "w");
-			fprintf($handle_htm, '
+			if ($task === 'download_tree')
+			{
+				$desc_filename = $targetpath .DS. "_descriptions";
+				$handle_txt = fopen($desc_filename.".txt", "w");
+				$handle_htm = fopen($desc_filename.".htm", "w");
+				fprintf($handle_htm, '
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-gb" lang="en-gb" dir="ltr" >
 <head>
@@ -1532,24 +1595,25 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 </head>
 <body>
 '
-			);
-			foreach ($valid_files as $file) {
-				fprintf($handle_txt, "%s", $file->item_title."\n\n");
-				fprintf($handle_txt, "%s", flexicontent_html::striptagsandcut($file->item_introtext) ."\n\n" );
-				if ( strlen($file->item_fulltext) ) fprintf($handle_txt, "%s", flexicontent_html::striptagsandcut($file->item_fulltext)."\n\n" );
+				);
+				foreach ($valid_files as $file) {
+					fprintf($handle_txt, "%s", $file->item_title."\n\n");
+					fprintf($handle_txt, "%s", flexicontent_html::striptagsandcut($file->item_introtext) ."\n\n" );
+					if ( strlen($file->item_fulltext) ) fprintf($handle_txt, "%s", flexicontent_html::striptagsandcut($file->item_fulltext)."\n\n" );
 
-				fprintf($handle_htm, "%s", "<h2>".$file->item_title."</h2>");
-				fprintf($handle_htm, "%s", "<blockquote>".$file->item_introtext."</blockquote><br/>");
-				if ( strlen($file->item_fulltext) ) fprintf($handle_htm, "%s", "<blockquote>".$file->item_fulltext."</blockquote><br/>");
-				fprintf($handle_htm, "<hr/><br/>");
+					fprintf($handle_htm, "%s", "<h2>".$file->item_title."</h2>");
+					fprintf($handle_htm, "%s", "<blockquote>".$file->item_introtext."</blockquote><br/>");
+					if ( strlen($file->item_fulltext) ) fprintf($handle_htm, "%s", "<blockquote>".$file->item_fulltext."</blockquote><br/>");
+					fprintf($handle_htm, "<hr/><br/>");
+				}
+				fclose($handle_txt);
+				fclose($handle_htm);
 			}
-			fclose($handle_txt);
-			fclose($handle_htm);
 
 			// Get file list recursively, and calculate archive filename
 			$fileslist   = \Joomla\CMS\Filesystem\Folder::files($targetpath, '.', $recurse=true, $fullpath=true);
 			$archivename = $tmp_ffname . '.zip';
-			$archivepath = \Joomla\CMS\Filesystem\Path::clean( $app->getCfg('tmp_path').DS.$archivename );
+			$archivepath = \Joomla\CMS\Filesystem\Path::clean( $app->get('tmp_path').DS.$archivename );
 
 
 			/**
@@ -1580,7 +1644,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			}
 
 			// Delete old files (they can not be deleted during download time ...)
-			$tmp_path = \Joomla\CMS\Filesystem\Path::clean($app->getCfg('tmp_path'));
+			$tmp_path = \Joomla\CMS\Filesystem\Path::clean($app->get('tmp_path'));
 			$matched_files = \Joomla\CMS\Filesystem\Folder::files($tmp_path, 'fcmd_uid_.*', $recurse=false, $fullpath=true);
 
 			foreach ($matched_files as $archive_file)
@@ -1597,7 +1661,13 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			}
 
 			$dlfile = new stdClass();
-			$dlfile->filename = 'cart_files_'.date('m-d-Y_H-i-s'). '.zip';   // a friendly name instead of  $archivename
+			$dlfile->url = 0;
+
+			$archive_file_title = $app->input->getString('item_title', 'files_'.date('m-d-Y_H-i-s')) . '.zip';
+			$archive_file_title = Path::clean($archive_file_title);
+
+			$dlfile->filename_original = $archive_file_title;
+			$dlfile->filename = $archive_file_title;
 			$dlfile->abspath  = $archivepath;
 		}
 
@@ -1635,7 +1705,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		$dlfile->size_tmp = false;
 
 		// Do not try to stamp URLs
-		if (!$dlfile->url && $dlfile->ext == 'pdf' && $fields_conf[$field_id]->get('stamp_pdfs', 0) && $dlfile->stamp)
+		if (!$dlfile->url && $dlfile->ext == 'pdf' && !empty($field_id) && $fields_conf[$field_id]->get('stamp_pdfs', 0) && $dlfile->stamp)
 		{
 			// Create new PDF document (initiate FPDI)
 			$TCPDF_path = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'TCPDF'.DS.'vendor'.DS.'autoload.php';

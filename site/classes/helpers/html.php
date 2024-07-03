@@ -360,8 +360,18 @@ class flexicontent_html
 		}
 		$_domain = $domain;  // pass it back by reference
 
-        $router = FLEXI_J40GE ? \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Router\SiteRouter::class) : $app->getRouter();
-		$link = $domain . \Joomla\CMS\Router\Route::_('index.php?' . http_build_query($router->getVars()), false);
+		$router = FLEXI_J40GE ? \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Router\SiteRouter::class) : $app->getRouter();
+		$vars = $router->getVars();
+
+		// Workaround for J5 router notices
+		if ($vars['view'] === 'item' && !isset($vars['id']) && isset($vars['Itemid'])) {
+			$vars['id'] = \Joomla\CMS\Factory::getApplication()->input->getInt('id', 0);
+		}
+		elseif ($vars['view'] === 'category' && !isset($vars['cid']) && isset($vars['Itemid'])) {
+			$vars['cid'] = \Joomla\CMS\Factory::getApplication()->input->getInt('cid', 0);
+		}
+
+		$link = $domain . \Joomla\CMS\Router\Route::_('index.php?' . http_build_query($vars), false);
 
 		return $link;
 	}
@@ -2206,7 +2216,7 @@ class flexicontent_html
 	 * @return 	string
 	 * @since 1.5
 	 */
-	static function striptagsandcut( $text, $chars=null, &$uncut_length=0, $options = null)
+	static function striptagsandcut($text, $chars=null, &$uncut_length=0, $options = null)
 	{
 		$options = $options ?: array(
 			'cut_at_word' => false,
@@ -6223,7 +6233,7 @@ class flexicontent_html
 			// return $url = \Joomla\CMS\Router\Route::link('site', $url);
 
 			$router = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Router\SiteRouter::class);
-            $url = $router->build($url);
+			$url = $router->build($url);
 			$url = $url->toString();
 
 			return $url;
