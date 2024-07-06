@@ -658,10 +658,11 @@ class flexicontent_cats
 	/**
 	 * Find and return extra parent/children/etc categories based on given criteria
 	 *
-	 * @param string $cids           the category ids for field object used as filter
+	 * @param array  $cids           the category ids for field object used as filter
 	 * @param string $treeinclude    which categories to include
-	 * @param string $curritemcats   categories of current item
+	 * @param array  $curritemcats   categories of current item
 	 * @return array                 an array of category ids
+	 * @since 3.0.0
 	 */
 	public static function getExtraCats($cids, $treeinclude, $curritemcats)
 	{
