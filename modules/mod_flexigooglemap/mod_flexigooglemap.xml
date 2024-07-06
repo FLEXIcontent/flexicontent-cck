@@ -51,7 +51,7 @@
 					<option value="1">FLEXI_YES</option>
 				</field>
 
-				<field name="" type="separator" default="MOD_FLEXIMAP_API" level="level1" />
+				<field name="" type="separator" default="MOD_FLEXIMAP_MAP_API" level="level1" />
 				<field
 					name="mapapi" type="radio" default="googlemap"
 					label="MOD_FLEXIMAP_APIMODE" description="MOD_FLEXIMAP_APIMODE_DESC"
@@ -109,7 +109,7 @@
 					label="MOD_FLEXIGOOGLEMAP_APIKEY" description="MOD_FLEXIGOOGLEMAP_APIKEY_DESC"
 					require="true" showon="mapapi:googlemap"
 				/>
-				<field name="" type="separator" default="MOD_FLEXIGOOGLEMAP_DISPLAY" level="level1" />
+				<field name="" type="separator" default="MOD_FLEXIGOOGLEMAP_MAP_DISPLAY" level="level1" />
 
 				<field name="" type="separator" default="External container" level="level4"
 					class="alert alert-info fcpadded" />
@@ -165,16 +165,47 @@
 					<option value="DESC LIMIT 1000">1000</option>
 				</field>
 
-				<field name="" type="separator" default="Viewport's Marker List" level="level2" />
+
+
+
+				<field name="" type="separator" default="Geo Location options" level="level2" />
 				<field
-					name="use_dynamic_marker_list" type="radio"
-					default="0" label="FLEXI_DISPLAY"
-					description="Show and dynamically update a list of markers, that currently visible according to current viewport of the map."
-					class="btn-group btn-group-yesno"
+						name="geo_locate" type="radio"
+						default="0" label="Zoom map to visitor"
+						description="On load map will be zoom to visitor's location"
+						class="btn-group btn-group-yesno"
 				>
-					<option value="0">FLEXI_NO</option>
-					<option value="1">FLEXI_YES</option>
+					<option value="0">MOD_FLEXIGOOGLEMAP_NO</option>
+					<option value="1">MOD_FLEXIGOOGLEMAP_YES</option>
 				</field>
+				<field
+						name="geo_locate_btn" type="radio"
+						default="0" label="Near Me button"
+						description="Add button to re-center map to visitor's location"
+						class="btn-group btn-group-yesno"
+				>
+					<option value="0">MOD_FLEXIGOOGLEMAP_NO</option>
+					<option value="1">MOD_FLEXIGOOGLEMAP_YES</option>
+				</field>
+				<field
+						name="geo_locate_zoom_sel" type="radio"
+						default="0" label="Near Me zoom selection"
+						description="Add selector to select map zoom level to visitor's location"
+						class="btn-group btn-group-yesno"
+				>
+					<option value="0">MOD_FLEXIGOOGLEMAP_NO</option>
+					<option value="1">MOD_FLEXIGOOGLEMAP_YES</option>
+				</field>
+				<field
+						name="geo_locate_zoom_def" type="number"
+						default="10" label="Near Me zoom default"
+						description="Default zoom level for near-me locations"
+						min="2"
+						max="15"
+						step="1"
+				/>
+
+
 
 				<field name="" type="separator" default="MOD_FLEXIGOOGLEMAP_MARKERSDISPLAY"
 					level="level2" />
@@ -289,42 +320,6 @@
 				/>
 
 
-				<field name="" type="separator" default="Geo Location options" level="level1" />
-				<field
-					name="geo_locate" type="radio"
-					default="0" label="Zoom map to visitor"
-					description="On load map will be zoom to visitor's location"
-					class="btn-group btn-group-yesno"
-				>
-					<option value="0">MOD_FLEXIGOOGLEMAP_NO</option>
-					<option value="1">MOD_FLEXIGOOGLEMAP_YES</option>
-				</field>
-				<field
-					name="geo_locate_btn" type="radio"
-					default="0" label="Near Me button"
-					description="Add button to re-center map to visitor's location"
-					class="btn-group btn-group-yesno"
-				>
-					<option value="0">MOD_FLEXIGOOGLEMAP_NO</option>
-					<option value="1">MOD_FLEXIGOOGLEMAP_YES</option>
-				</field>
-				<field
-					name="geo_locate_zoom_sel" type="radio"
-					default="0" label="Near Me zoom selection"
-					description="Add selector to select map zoom level to visitor's location"
-					class="btn-group btn-group-yesno"
-				>
-					<option value="0">MOD_FLEXIGOOGLEMAP_NO</option>
-					<option value="1">MOD_FLEXIGOOGLEMAP_YES</option>
-				</field>
-				<field
-					name="geo_locate_zoom_def" type="number"
-					default="10" label="Near Me zoom default"
-					description="Default zoom level for near-me locations"
-					min="2"
-					max="15"
-					step="1"
-				/>
 
 				<field name="" type="separator" default="Marker actions" level="level1" />
 
@@ -335,37 +330,28 @@
 					class="btn-group btn-group-yesno"
 					toggle_related="1"
 				>
-					<option value="0" show_list="" hide_list="info_windows,marker_links,mode_modal">
-						None</option>
-					<option value="1" show_list="info_windows" hide_list="marker_links,mode_modal">Info
-						window</option>
-					<option value="2" show_list="marker_links" hide_list="info_windows">Item link</option>
-					<!--option
-					value="3">Custom link</option-->
+					<option value="0">None</option>
+					<option value="1">Info window</option>
+					<option value="2">Item link</option>
 				</field>
 
 				<field
 					name="marker_clicktarget" type="multilist" subtype="list" toggle_related="1"
 					default="_popup" label="Target window"
 					description="Open link in"
-					class="marker_links use_select2_lib"
+					class="use_select2_lib" showon="info_popup:2"
 				>
 					<option value="">FLEXI_FIELD_LINK_NOTARGET</option>
-					<option value="_blank" show_list="" hide_list="mode_modal">
-						FLEXI_FIELD_LINK_NEW_WIN_TAB</option>
-					<option value="_parent" show_list="" hide_list="mode_modal">
-						FLEXI_FIELD_LINK_PARENT_FRM</option>
-					<option value="_self" show_list="" hide_list="mode_modal">
-						FLEXI_FIELD_LINK_SAME_FRM_WIN_TAB</option>
-					<option value="_top" show_list="" hide_list="mode_modal">
-						FLEXI_FIELD_LINK_TOP_FRM</option>
-					<option value="_popup" show_list="mode_modal" hide_list="info_windows">
-						FLEXI_FIELD_LINK_JS_POPUP_BOX</option>
-					<option value="_modal" show_list="mode_modal" hide_list="info_windows">
-						MOD_FLEXIGOOGLEMAP_WINDOWS_MODAL</option>
+					<option value="_blank">FLEXI_FIELD_LINK_NEW_WIN_TAB</option>
+					<option value="_parent">FLEXI_FIELD_LINK_PARENT_FRM</option>
+					<option value="_self">FLEXI_FIELD_LINK_SAME_FRM_WIN_TAB</option>
+					<option value="_top">FLEXI_FIELD_LINK_TOP_FRM</option>
+					<option value="_popup">FLEXI_FIELD_LINK_MODAL_POPUP_WIN</option>
+					<option value="_modal">MOD_FLEXIGOOGLEMAP_WINDOWS_MODAL</option>
 				</field>
+
 				<field name="" type="separator" default="MOD_FLEXIGOOGLEMAP_MODAL_OPTION"
-					level="level2" class="mode_modal"
+					level="level2" showon="info_popup:2"
 					addfieldpath="/administrator/components/com_flexicontent/elements" />
 
 				<field
@@ -374,14 +360,14 @@
 					defaut="table"
 					label="FLEXI_CHOOSE_SPECIFIC_ITEM_LAYOUT"
 					description="FLEXI_CHOOSE_SPECIFIC_ITEM_LAYOUT_DESC"
-					class="use_select2_lib mode_modal"
+					class="use_select2_lib" showon="info_popup:2"
 					labelclass="label text-white bg-warning label-warning"
 				/>
 				<field
 					name="modal_width"
 					type="number"
 					defaut="800"
-					class="mode_modal"
+					class="" showon="info_popup:2"
 					label="MOD_FLEXIGOOGLEMAP_WIDTH_MODAL"
 					description="MOD_FLEXIGOOGLEMAP_WIDTH_DESC"
 				/>
@@ -390,86 +376,131 @@
 					name="modal_height"
 					type="number"
 					defaut="600"
-					class="mode_modal"
+					class="" showon="info_popup:2"
 					label="MOD_FLEXIGOOGLEMAP_HEIGHT_MODAL"
 					description="MOD_FLEXIGOOGLEMAP_HEIGHT_MODAL_DESC"
 				/>
 
+
 				<field name="" type="separator" default="MOD_FLEXIGOOGLEMAP_INFOWINDOWS"
-					level="level2" class="info_windows" />
+					level="level2" showon="info_popup:1" />
+				<field  name="info_windows_custom_display" type="radio"
+						default="0" label="Custom display"
+						description="This is by default same as the popup windows"
+						class="btn-group group-fcinfo" showon="info_popup:1"
+				>
+					<option value="0">Same display as markers list</option>
+					<!--option value="1">Customize</option-->
+				</field>
+
+
+
+
+
+
+
+				<field name="" type="separator" default="Markers list" level="level1" />
+
 				<field
-					name="uselink" type="radio"
-					default="1" label="MOD_FLEXIGOOGLEMAP_USELINK"
-					description="MOD_FLEXIGOOGLEMAP_USELINK_DESC"
-					class="btn-group btn-group-yesno info_windows"
+						name="use_dynamic_marker_list" type="radio"
+						default="0" label="Display Markers List"
+						description="Show and dynamically update a list of markers, that currently visible according to current viewport of the map."
+						class="btn-group btn-group-yesno"
+				>
+					<option value="0">FLEXI_NO</option>
+					<option value="1">FLEXI_YES</option>
+				</field>
+
+				<field name="" type="separator" default="Markers List options" level="level2" />
+
+
+				<field
+						name="infotextmode" type="radio"
+						default="0" label="MOD_FLEXIGOOGLEMAP_MARKER_INFO_DISPLAY"
+						description="MOD_FLEXIGOOGLEMAP_MARKER_INFO_DISPLAY_DESC"
+						class="btn-group group-fcinfo"
+				>
+					<option value="0">MOD_FLEXIGOOGLEMAP_MARKER_INFO_DISPLAY_BASIC</option>
+					<option value="1">MOD_FLEXIGOOGLEMAP_MARKER_INFO_DISPLAY_CUSTOM_HTML</option>
+				</field>
+
+				<field
+						name="useadress" type="radio"
+						default="1" label="MOD_FLEXIGOOGLEMAP_USEADDRESS"
+						description="MOD_FLEXIGOOGLEMAP_USEADDRESS_DESC"
+						class="btn-group btn-group-yesno" showon="infotextmode:0"
 				>
 					<option value="0">MOD_FLEXIGOOGLEMAP_NO</option>
 					<option value="1">MOD_FLEXIGOOGLEMAP_YES</option>
 				</field>
 
 				<field
-					name="linkmode" type="radio"
-					default="" label="MOD_FLEXIGOOGLEMAP_LINKMODE"
-					description="MOD_FLEXIGOOGLEMAP_LINKMODE_DESC"
-					class="btn-group btn-group-yesno info_windows" showon="uselink:1"
+						name="custom_html_with_replacements" type="editor" editor="codemirror"
+						default="&lt;h4 class=&quot;marker-info-title&quot;&gt;{item->title}&lt;/h4&gt;&#10;&lt;p&gt;{__address__}&lt;/p&gt;"
+						label="MOD_FLEXIGOOGLEMAP_CUSTOM_HTML_WITH_FIELD_REPLACEMENTS"
+						description="MOD_FLEXIGOOGLEMAP_CUSTOM_HTML_WITH_FIELD_REPLACEMENTS_DESC"
+						showon="infotextmode:1"
+						filter="\Joomla\CMS\Component\ComponentHelper::filterText"
+				/>
+
+
+				<field name="" type="separator" default="MOD_FLEXIGOOGLEMAP_USE_READMORE_LINK" level="level3" />
+				<field
+						name="uselink" type="radio"
+						default="1" label="FLEXI_SHOW"
+						description="MOD_FLEXIGOOGLEMAP_USE_READMORE_LINK_DESC"
+						class="btn-group btn-group-yesno"
+				>
+					<option value="0">MOD_FLEXIGOOGLEMAP_NO</option>
+					<option value="1">MOD_FLEXIGOOGLEMAP_YES</option>
+				</field>
+
+				<field
+						name="linkmode" type="radio"
+						default="" label="MOD_FLEXIGOOGLEMAP_LINKMODE"
+						description="MOD_FLEXIGOOGLEMAP_LINKMODE_DESC"
+						class="btn-group btn-group-yesno" showon="uselink:1"
 				>
 					<option value="_blank">MOD_FLEXIGOOGLEMAP_BLANK</option>
 					<option value="">MOD_FLEXIGOOGLEMAP_SAME</option>
 				</field>
 
 				<field
-					name="forced_itemid" type="text"
-					default="" label="MOD_FLEXIGOOGLEMAP_FORCEITEMID"
-					description="MOD_FLEXIGOOGLEMAP_FORCEITEMID_DESC"
-					class="info_windows" showon="uselink:1"
+						name="forced_itemid" type="text"
+						default="" label="MOD_FLEXIGOOGLEMAP_FORCEITEMID"
+						description="MOD_FLEXIGOOGLEMAP_FORCEITEMID_DESC"
+						class="info_windows" showon="uselink:1"
 				/>
 
 				<field
-					name="infotextmode" type="radio"
-					default="0" label="MOD_FLEXIGOOGLEMAP_INFOTEXTMODE"
-					description="MOD_FLEXIGOOGLEMAP_INFOTEXTMODE_DESC"
-					class="btn-group group-fcinfo info_windows"
-				>
-					<option value="0">MOD_FLEXIGOOGLEMAP_INFOTEXTMODE_SIMPLE</option>
-					<option value="1">MOD_FLEXIGOOGLEMAP_INFOTEXTMODE_FULL</option>
-				</field>
+						name="readmore" type="text"
+						hint="MOD_FLEXIGOOGLEMAP_READMORE_TXT" label="MOD_FLEXIGOOGLEMAP_READMORE"
+						description="MOD_FLEXIGOOGLEMAP_READMORE_DESC"
+						class="input-xxlarge"
+				/>
 
+
+				<field name="" type="separator" default="MOD_FLEXIGOOGLEMAP_USEDIRECTION_BTN" level="level3" />
 				<field
-					name="useadress" type="radio"
-					default="1" label="MOD_FLEXIGOOGLEMAP_USEADDRESS"
-					description="MOD_FLEXIGOOGLEMAP_USEADDRESS_DESC"
-					class="btn-group btn-group-yesno info_windows" showon="infotextmode:0"
-				>
-					<option value="0">MOD_FLEXIGOOGLEMAP_NO</option>
-					<option value="1">MOD_FLEXIGOOGLEMAP_YES</option>
-				</field>
-
-
-				<field
-					name="usedirection" type="radio"
-					default="1" label="MOD_FLEXIGOOGLEMAP_USEDIRECTION"
-					description="MOD_FLEXIGOOGLEMAP_USEDIRECTION_DESC"
-					class="btn-group btn-group-yesno info_windows"
+						name="usedirection" type="radio"
+						default="1" label="FLEXI_SHOW"
+						description="MOD_FLEXIGOOGLEMAP_USEDIRECTION_BTN_DESC"
+						class="btn-group btn-group-yesno"
 				>
 					<option value="0">MOD_FLEXIGOOGLEMAP_NO</option>
 					<option value="1">MOD_FLEXIGOOGLEMAP_YES</option>
 				</field>
 
 				<field
-					name="directionname" type="text"
-					hint="MOD_FLEXIGOOGLEMAP_DIRECTIONNAME_TXT"
-					label="MOD_FLEXIGOOGLEMAP_DIRECTIONNAME"
-					description="MOD_FLEXIGOOGLEMAP_DIRECTIONNAME_DESC"
-					class="input-xxlarge info_windows"
-					showon="usedirection:1"
+						name="directionname" type="text"
+						hint="MOD_FLEXIGOOGLEMAP_DIRECTIONNAME_TXT"
+						label="MOD_FLEXIGOOGLEMAP_DIRECTIONNAME"
+						description="MOD_FLEXIGOOGLEMAP_DIRECTIONNAME_DESC"
+						class="input-xxlarge"
+						showon="usedirection:1"
 				/>
 
-				<field
-					name="readmore" type="text"
-					hint="MOD_FLEXIGOOGLEMAP_READMORE_TXT" label="MOD_FLEXIGOOGLEMAP_READMORE"
-					description="MOD_FLEXIGOOGLEMAP_READMORE_DESC"
-					class="input-xxlarge info_windows"
-				/>
+
 
 			</fieldset>
 

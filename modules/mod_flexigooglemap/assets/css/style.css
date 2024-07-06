@@ -30,16 +30,26 @@
 	height: 2.5em;
 }
 .fc_module_marker_list_box li {
-    background: #f8f8f8;
-    border: 0;
-    padding: 10px;
-    margin-bottom: 10px;
-    margin-right: 6px;
+	border-bottom: 1px solid #ccc;
+	padding: 0 !important;
+	margin: 0 !important;
 }
-.fc_module_marker_list .link, .fc_module_marker_list .directions {
-    float: left;
+.fc_module_marker_list_box .marker-info-title {
+	border-radius: 0 !important;
 }
-.fc_module_marker_list .link.btn, .fc_module_marker_list .directions .btn, .fc_module_marker_list .btn-highlight {
+
+.marker_actions,
+.fc_module_marker_list .marker_actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+.marker_link .btn,
+.marker_directions .btn,
+.marker_highlight .btn,
+.fc_module_marker_list .marker_link .btn,
+.fc_module_marker_list .marker_directions .btn,
+.fc_module_marker_list .marker_highlight .btn {
 	padding: 5px 5px;
 	margin-right: 4px;
 }
@@ -60,4 +70,79 @@
 		margin-top:20px;
 		width: 100%;
 	}
+}
+
+.gm-style-iw {
+	width: 200px !important;
+	max-width: 500px !important;
+	overflow: visible !important;
+}
+
+
+body {
+	--marker-info-bg-color: #3C61AD;
+	--marker-info-color: #fff;
+}
+
+/* Style the info window popup box*/
+.gm-style .gm-style-iw {
+	background-color: var(--marker-info-bg-color) !important;
+	color: var(--marker-info-color);
+	top: 0 !important;
+	left: 0 !important;
+	width: 100% !important;
+	/*min-height: 120px !important;*/
+	padding: 0 !important;
+	display: block !important;
+	border-radius: 8px 8px 0 0 !important;
+}
+.gm-style-iw-ch,
+.gm-style .gm-style-iw-chr {
+	padding: 0 !important;
+}
+
+
+.marker-info-contents-box {
+	padding: 1rem;
+	margin: 0;
+	top: 0;
+	background-color: var(--marker-info-bg-color) !important;
+	color: var(--marker-info-color);
+	font-size: 16px;
+	border-radius: 8px 8px 0 0; /* In accordance with the rounding of the default infowindow corners. */
+}
+.marker-info-title {
+	display: block;
+	margin: -1rem -1rem 1rem -1rem !important;
+	font-family: 'Open Sans Condensed', sans-serif;
+	font-size: 22px;
+	font-weight: 400;
+	padding: 10px;
+	background-color: #48b5e9;
+	color: white;
+	border-radius: 8px 8px 0 0; /* In accordance with the rounding of the default infowindow corners. */
+}
+
+
+/* CLOSE button */
+body div .gm-ui-hover-effect {
+	display: block!important;
+	border: 1px solid #555!important;
+	margin: 0!important;
+	padding: 0!important;
+	text-transform: none!important;
+	appearance: none!important;
+	cursor: pointer!important;
+	user-select: none!important;
+	width: 3em!important;
+	height: 3em!important;
+	position: absolute!important;
+	right: -1em!important;
+	top: -1em!important;
+	background: rgba(255, 255, 255, 1) !important;
+	border-radius: 4px!important;
+	opacity: 1 !important
+}
+body div .gm-ui-hover-effect span {
+	margin: 0 auto !important;
 }

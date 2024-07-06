@@ -13,6 +13,10 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
+
+flexicontent_html::loadFramework('jQuery');
+flexicontent_html::loadFramework('flexi-lib');
+
 // Check if having at least 1 location, otherwise skip showing the map
 if (empty($renderedMapLocations) && (int)$params->get('hide_map_when_empty', '1')) {
 	return;
@@ -238,11 +242,12 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 			navigator.geolocation.getCurrentPosition(success, error);
 		}
 
-		function fc_MapMod_addToVisibleList_<?php echo $module->id; ?>(map, marker) {
-			var ol = document.getElementById("fc_module_marker_list_<?php echo $module->id; ?>");
+		function fc_MapMod_addToVisibleList_<?php echo $module->id; ?>(map, marker)
+		{
+			let ol = document.getElementById("fc_module_marker_list_<?php echo $module->id; ?>");
 			if (!!!ol) return;
 
-			var li = document.createElement("li");
+			let li = document.createElement("li");
 			li.innerHTML = '<img class="fc_module_marker_list_icon" src="' + marker._icon_url + '" /> ' + marker._location_info;
 
 			/*var btn = document.createElement("button");
@@ -251,16 +256,20 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 			btn.setAttribute('onclick', "this._marker_ref._map_ref.setCenter(this._marker_ref.getPosition());");
 			li.appendChild(btn);*/
 
-			var btn2 = document.createElement("button");
+			let btn_div2 = document.createElement("div");
+			let btn2     = document.createElement("a");
+			btn_div2.className = 'marker_highlight';
 			btn2.innerHTML = '<?php echo \Joomla\CMS\Language\Text::_("MOD_FLEXIGOOGLEMAP_MARKER_HIGHLIGHT_ENTRY", true) ?>';
-			btn2.className = 'btn btn-highlight';
+			btn2.className = 'btn btn btn-secondary';
 			btn2._marker_ref = marker;
 			btn2.setAttribute('onclick', "new google.maps.event.trigger(this._marker_ref, 'click');");
 
 			//window.console.log(marker);
-			li.appendChild(btn2);
+			let marker_actions_box  = li.querySelector('.marker_actions');
+			btn_div2.appendChild(btn2);
+			marker_actions_box.appendChild(btn_div2);
 			ol.appendChild(li);
-		};
+		}
 
 		function fc_MapMod_updateVisibleMarkerList_<?php echo $module->id; ?>(map, markers) {
 			//window.console.log('bounds_changed');
@@ -482,16 +491,19 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 		}
 
 
-		function fc_MapMod_addToVisibleList_<?php echo $module->id; ?>(map, marker) {
-			var ol = document.getElementById("fc_module_marker_list_<?php echo $module->id; ?>");
+		function fc_MapMod_addToVisibleList_<?php echo $module->id; ?>(map, marker)
+		{
+			let ol = document.getElementById("fc_module_marker_list_<?php echo $module->id; ?>");
 			if (!!!ol) return;
 
-			var li = document.createElement("li");
+			let li = document.createElement("li");
 			li.innerHTML = '<img class="fc_module_marker_list_icon" src="' + marker._icon_url + '" /> ' + marker._location_info;
 
-			var btn2 = document.createElement("button");
+			let btn_div2 = document.createElement("div");
+			let btn2     = document.createElement("a");
+			btn_div2.className = 'marker_highlight';
 			btn2.innerHTML = '<?php echo \Joomla\CMS\Language\Text::_("MOD_FLEXIGOOGLEMAP_MARKER_HIGHLIGHT_ENTRY", true) ?>';
-			btn2.className = 'btn btn-highlight';
+			btn2.className = 'btn btn btn-secondary';
 			btn2._marker_ref = marker;
 
 			<?php /* Add single location marker */
@@ -527,9 +539,11 @@ $use_mlist = (int) $params->get('use_dynamic_marker_list', 0);
 				'; ?>
 
 			//window.console.log(marker);
-			li.appendChild(btn2);
+			let marker_actions_box  = li.querySelector('.marker_actions');
+			btn_div2.appendChild(btn2);
+			marker_actions_box.appendChild(btn_div2);
 			ol.appendChild(li);
-		};
+		}
 
 
 		function fc_MapMod_updateVisibleMarkerList_<?php echo $module->id; ?>(map, markers) {

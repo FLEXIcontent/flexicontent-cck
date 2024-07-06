@@ -122,7 +122,7 @@ $add_tooltips = 0; //(int) $params->get('add_tooltips', 1);
  * These are 2 arrays indexed with same number e.g. 25 locations, 25 items (of these items e.g. 8 are unique items)
  */
 $mapItems = null;
-$renderedMapLocations = modFlexigooglemapHelper::renderMapLocations($params, $mapItems);
+$renderedMapLocations = modFlexigooglemapHelper::renderMapLocations($params, $mapItems, $module);
 
 $mapItemData = [];
 foreach ($mapItems as $mapItem) {
