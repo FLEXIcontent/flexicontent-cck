@@ -141,7 +141,7 @@
 				<option value="0" show_list="layout-field-disp" hide_list="custom-field-disp">FLEXI_LAYOUT</option>
 				<option value="1" show_list="custom-field-disp" hide_list="layout-field-disp">FLEXI_FIELD_GROUP_CUSTOM_HTML</option>
 			</field>
-			<field name="custom_html" type="editor" editor="codemirror" syntax="html" filter="RAW" cols="40" rows="4" height="60px" class="fc-unset-width" default="" label="FLEXI_FIELD_GROUP_CUSTOM_HTML" depend_class="custom-field-disp" description="FLEXI_FIELD_GROUP_CUSTOM_HTML_DESC" />
+			<field name="custom_html" type="editor" editor="codemirror" syntax="html" filter="RAW" cols="80" rows="5" height="120px" class="fc-unset-width" default="" label="FLEXI_FIELD_GROUP_CUSTOM_HTML" depend_class="custom-field-disp" description="FLEXI_FIELD_GROUP_CUSTOM_HTML_DESC" />
 
 			<field name="" type="separator" default="Fields WITHOUT value" level="level2" />
 			<field name="hide_lbl_ifnoval" type="filters" multiple="false" groupables="1" isfilter="*" default="" label="Skip field (Label/empty html code)" description="Select fields to hide labels if they have no value. NOTE: if using 'default HTML', then this will also skip fields that produced no HTML code" />

@@ -119,7 +119,7 @@
 				<option value="0" hide_list="auto-value-code">FLEXI_NO</option>
 				<option value="2" show_list="auto-value-code">FLEXI_USE_CUSTOM_CODE</option>
 			</field>
-			<field name="auto_value_code" type="editor" editor="codemirror" syntax="php" rows="4" cols="80" height="100px" class="fc-unset-width" filter="RAW"
+			<field name="auto_value_code" type="editor" editor="codemirror" syntax="php" cols="80" rows="5" height="120px" class="fc-unset-width" filter="RAW"
 				default="&lt;?php&#13;&#10;$F = &amp; $item-&gt;fields;&#13;&#10;if ( !isset($F['fieldname01']) ) return array('fieldname01 field not found');&#13;&#10;&#13;&#10;$vals = array();&#13;&#10;foreach($F['fieldname01']-&gt;postdata as $i =&gt; $v)&#13;&#10;{&#13;&#10;  $vals[$i] = 'Auto : ' . $v;&#13;&#10;}&#13;&#10;&#13;&#10;return $vals;"
 				label="FLEXI_CREATE_VIA_CUSTOM_CODE" description="FLEXI_CREATE_VIA_CUSTOM_CODE_DESC" depend_class="auto-value-code"/>
 
@@ -194,7 +194,7 @@
 				<option value="0" hide_list="import-ccode">FLEXI_NO</option>
 				<option value="2" show_list="import-ccode">FLEXI_USE_CUSTOM_CODE</option>
 			</field>
-			<field name="import_fv_ccode" type="editor" editor="codemirror" syntax="php" rows="4" cols="80" height="100px" class="fc-unset-width" filter="RAW"
+			<field name="import_fv_ccode" type="editor" editor="codemirror" syntax="php" cols="80" rows="5" height="120px" class="fc-unset-width" filter="RAW"
 				default="&lt;?php&#13;&#10;$some_param = $field->parameters->get('some_param');&#13;&#10;&#13;&#10;foreach($values as $i => $v)&#13;&#10;{&#13;&#10;  $values[$i] = 'Example ' .  $i . ' : ' . $v;&#13;&#10;}&#13;&#10;&#13;&#10;return $values;"
 				label="FLEXI_CREATE_VIA_CUSTOM_CODE" description="FLEXI_CREATE_VIA_CUSTOM_CODE_DESC" depend_class="import-ccode" />
 

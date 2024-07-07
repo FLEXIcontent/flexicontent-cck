@@ -54,7 +54,7 @@
 			<field name="cont_label"    type="text" size="24" default="" label="FLEXI_TABS_FIELDSET_LABEL"     description="FLEXI_TABS_FIELDSET_LABEL_DESC" depend_class="tfopen" />
 
 			<field name="chtml_specific" type="separator" default="FLEXI_CUSTOM_HTML" level="level2" depend_class="chtml" />
-			<field name="custom_html_sep" type="editor" editor="codemirror" syntax="html" filter="RAW" cols="40" rows="4" height="60px" class="fc-unset-width" default="&lt;hr style='clear:both;' /&gt;" label="FLEXI_CUSTOM_HTML" description="FLEXI_CUSTOM_HTML_DESC" depend_class="chtml" />
+			<field name="custom_html_sep" type="editor" editor="codemirror" syntax="html" filter="RAW" cols="80" rows="5" height="120px" class="fc-unset-width" default="&lt;hr style='clear:both;' /&gt;" label="FLEXI_CUSTOM_HTML" description="FLEXI_CUSTOM_HTML_DESC" depend_class="chtml" />
 
 		</fieldset>
 	</fields>

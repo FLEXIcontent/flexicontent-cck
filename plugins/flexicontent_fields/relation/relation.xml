@@ -118,7 +118,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 
-			<!--field name="relitem_html_form" type="editor" editor="codemirror" syntax="html" filter="RAW" cols="40" rows="4" height="60px" class="fc-unset-width" default="__display_text__" label="Item form HTML" description="FLEXI_FIELD_ITEM_HTML_WITH_REPLACEMENTS_DESC" /-->
+			<!--field name="relitem_html_form" type="editor" editor="codemirror" syntax="html" filter="RAW" cols="40" rows="4" height="200px" class="fc-unset-width" default="__display_text__" label="Item form HTML" description="FLEXI_FIELD_ITEM_HTML_WITH_REPLACEMENTS_DESC" /-->
 
 			<field name="" type="separator" default="FLEXI_RIFLD_CATEGORY_SELECTOR" description="FLEXI_RIFLD_CATEGORY_SELECTOR_INFO" icon_class="icon-signup" level="tab_open" box_type="1" />
 			<field name="" type="separator" default="FLEXI_RIFLD_CATEGORY_SELECTOR_INFO" level="level3" class="alert alert-info fcpadded" />
@@ -293,7 +293,7 @@
 			<field name="" type="separator" default="FLEXI_FIELD_ITEM_HTML_DESC" level="level3" class="alert alert-info fcpadded" />
 			<field name="" type="separator" default="FLEXI_RIFLD_CONFIG_OVERRIDEN_INSIDE_TOTAL_COUNT_TAB_INFO" level="level4" class="alert alert-info fcpadded" />
 
-			<field name="relitem_html" type="editor" editor="codemirror" syntax="html" filter="RAW" cols="40" rows="4" height="60px" class="fc-unset-width" default="__display_text__" label="FLEXI_FIELD_ITEM_HTML_WITH_REPLACEMENTS" description="FLEXI_FIELD_ITEM_HTML_WITH_REPLACEMENTS_DESC" />
+			<field name="relitem_html" type="editor" editor="codemirror" syntax="html" filter="RAW" cols="80" rows="5" height="120px" class="fc-unset-width" default="__display_text__" label="FLEXI_FIELD_ITEM_HTML_WITH_REPLACEMENTS" description="FLEXI_FIELD_ITEM_HTML_WITH_REPLACEMENTS_DESC" />
 
 			<field name="" type="separator" default="FLEXI_RELATED_DISPLAY_TEXT_COMPOSITION" level="level2" />
 			<field name="displayway" type="list" default="1" label="FLEXI_RELATED_DISPLAY_TEXT" description="FLEXI_RELATED_DISPLAY_TEXT_DESC">
