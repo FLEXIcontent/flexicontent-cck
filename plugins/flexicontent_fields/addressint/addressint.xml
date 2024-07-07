@@ -417,6 +417,7 @@
 			<field name="algolia_edit_api_id" type="text" default="" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ALGOLIA_API_ID_EDITING" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ALGOLIA_API_KEY_EDITING_DESC" depend_class="algolia-edit-api" />
 			<field name="algolia_edit_api_key" type="text" default="" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ALGOLIA_API_KEY_EDITING" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ALGOLIA_API_KEY_EDITING_DESC" depend_class="algolia-edit-api" />
 			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ALGOLIA_GET_API_KEY_INFO" level="level3" class="alert alert-success" depend_class="algolia-edit-api" />
+			<field name="api_lang_code_edit" type="text" default="" label="Force language code (e.g. en)" description="Let this be empty to use language of current user" />
 
 			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="level2" />
 
@@ -432,6 +433,7 @@
 				label="Tile (Map) Server URL" description="Enter a custom tile server URL (of Openstreet Maps). If you are going to be having a lot of traffic it is best to setup your own tiles server for hosting your map tiles, e.g. https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png"
 				depend_class="openstreetmap-api"
 			/>
+			<field name="api_lang_code" type="text" default="" label="Force language code (e.g. en)" description="Let this be empty to use language of current user" />
 
 		</fieldset>
 		<fieldset name="group-addressint-fields" hidden="true" icon_class="icon-link" label="FLEXI_PROPERTIES_AS_FIELDS" addfieldpath="/administrator/components/com_flexicontent/elements">

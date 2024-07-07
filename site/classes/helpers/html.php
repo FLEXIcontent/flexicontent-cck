@@ -1474,8 +1474,10 @@ class flexicontent_html
 				break;
 
 			case 'google-maps':
-				//$force_language = $mode == 'form' ? '&language=' . flexicontent_html::getUserCurrentLang() : '';
-				$force_language = '&language=' . flexicontent_html::getUserCurrentLang();
+				$force_language_code  = $mode == 'form'
+					? $params->get('api_lang_code_edit', flexicontent_html::getUserCurrentLang())
+					: $params->get('api_lang_code', flexicontent_html::getUserCurrentLang());
+				$force_language_param = '&language=' . $force_language_code;
 				$apikey = trim($params->get('google_maps_js_api_key', $params->get('apikey')));
 
 				// Key is not empty
@@ -1485,7 +1487,7 @@ class flexicontent_html
 					$head_obj = $document->mergeHeadData(array(1=>1));
 
 					// Unset any previous URL that had no KEY
-					unset($head_obj->_links['https://maps.google.com/maps/api/js?libraries=geometry,places' . $force_language]);
+					unset($head_obj->_links['https://maps.google.com/maps/api/js?libraries=geometry,places' . $force_language_param]);
 				}
 
 				// Key is empty
@@ -1496,7 +1498,7 @@ class flexicontent_html
 				}
 
 				// Add map link 
-				$document->addScript('https://maps.google.com/maps/api/js?libraries=geometry,places' . ($apikey ? '&key=' . $apikey : '') . $force_language);
+				$document->addScript('https://maps.google.com/maps/api/js?libraries=geometry,places' . ($apikey ? '&key=' . $apikey : '') . $force_language_param);
 				break;
 
 			case 'openstreetmap' :
