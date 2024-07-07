@@ -243,6 +243,9 @@ foreach ($field->value as $index => $value)
 			$jfield->setup(new SimpleXMLElement($xml_field), $jfvalue, '');
 			$select_existing = $jfield->input;
 
+			// Workaround field clearing the value but not clearing the value attribute
+			$select_existing = str_replace('button-clear"', 'button-clear" onclick="jQuery(this).parent().find(\'input\').attr(\'value\', \'\');"', $select_existing);
+
 			if ($use_quantum)
 			{
 				// Workaround for Quantum not setting the default folder, we will use custom JS
