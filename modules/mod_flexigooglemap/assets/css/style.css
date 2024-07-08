@@ -106,21 +106,21 @@ body {
 	padding: 1rem;
 	margin: 0;
 	top: 0;
-	background-color: var(--marker-info-bg-color) !important;
+	/*background-color: var(--marker-info-bg-color) !important;
 	color: var(--marker-info-color);
-	font-size: 16px;
+	font-size: 16px;*/
 	border-radius: 8px 8px 0 0; /* In accordance with the rounding of the default infowindow corners. */
 }
 .marker-info-title {
 	display: block;
-	margin: -1rem -1rem 1rem -1rem !important;
+	/*margin: -1rem -1rem 1rem -1rem !important;
 	font-family: 'Open Sans Condensed', sans-serif;
 	font-size: 22px;
 	font-weight: 400;
-	padding: 10px;
 	background-color: #48b5e9;
-	color: white;
+	color: white;*/
 	border-radius: 8px 8px 0 0; /* In accordance with the rounding of the default infowindow corners. */
+	padding: 10px 0;
 }
 
 
