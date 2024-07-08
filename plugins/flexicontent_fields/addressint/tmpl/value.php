@@ -32,7 +32,7 @@ if ($map_api === 'googlemap')
 else  //  $map_api === 'openstreetmap'
 {
 	// Get OS Map TILE server
-	$os_tile_server_url = $field->parameters->get('os_tile_server_url', 'https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png');
+	$os_tile_server_url = $field->parameters->get('os_tile_server_url', 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
 }
 
 
