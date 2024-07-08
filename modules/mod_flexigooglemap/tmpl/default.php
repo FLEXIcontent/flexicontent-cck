@@ -132,7 +132,8 @@ switch ($mapapi) {
 		flexicontent_html::loadFramework('openstreetmap', '', $params);
 
 		// Get OS Map TILE server
-		$os_tile_server_url = $params->get('os_tile_server_url', 'https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png');
+		$os_tile_server_url = $params->get('os_tile_server_url', 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'); 
+
 		break;
 }
 
