@@ -1499,6 +1499,8 @@ class flexicontent_html
 
 				// Add map link 
 				$document->addScript('https://maps.google.com/maps/api/js?libraries=geometry,places' . ($apikey ? '&key=' . $apikey : '') . $force_language_param);
+				// Add JS library for markers at the same location
+				$document->addScript('https://cdnjs.cloudflare.com/ajax/libs/OverlappingMarkerSpiderfier/1.0.3/oms.min.js');
 				break;
 
 			case 'openstreetmap' :

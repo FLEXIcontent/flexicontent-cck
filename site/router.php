@@ -206,6 +206,12 @@ class _FlexicontentSiteRouter
 		switch ($view)
 		{
 			case 'item':
+				if ($remove_ids)
+				{
+					$menu = $this->_verifyItemQuery($query, ($menu ?? null), $mview);
+					$mview = !empty($menu->query['view']) ? $menu->query['view'] : null;
+				}
+
 				// Menu item is of view 'flexicontent' (directory) then use 'rootcatid' as category id
 				if ($mview === 'flexicontent')
 				{
@@ -1425,5 +1431,52 @@ class _FlexicontentSiteRouter
 		}
 
 		return $record_id;
+	}
+
+
+	private function _verifyItemQuery(& $query, $menu, $mview)
+	{
+		global $globalcats;
+
+		$db = \Joomla\CMS\Factory::getDbo();
+		$id = $query['id'] ?? null;
+		if (!$id) return $menu;
+
+
+		// Menu item is of view 'flexicontent' (directory) then use 'rootcatid' as category id
+		if ($mview === 'flexicontent')
+		{
+			$mcid = !isset($menu->query['rootcatid']) ? null : (int) $menu->query['rootcatid'];
+		}
+
+		// Menu item is of view 'category' or 'item' or other try 'cid' and 'id'
+		else
+		{
+			$mcid = !isset($menu->query['cid']) ? null : (int) $menu->query['cid'];
+		}
+
+		$sql_query = $db->getQuery(true)
+			->select('i.catid')
+			->from($db->QuoteName('#__content') . ' AS i')
+			->where('i.id = ' . (int) $id);
+
+		$cid = $db->setQuery($sql_query)->loadResult();
+		$descendants = !empty($globalcats[$mcid]) ? $globalcats[$mcid]->descendantsarray : [];
+
+		if (!empty($query['cid']) &&  (int) $cid !== (int) $query['cid'])
+		{
+			$query['cid'] = $globalcats[$cid]->slug;
+		}
+
+		if (!in_array($cid, $descendants) && (int) $cid !== (int) $mcid)
+		{
+			$menu_item_id = FlexicontentHelperRoute::getItemRoute($query['id'], $query['cid'], -1);
+
+			// Load the menu item having the given menu item ID
+			$menu = \Joomla\CMS\Factory::getApplication()->getMenu('site', array())->getItem($menu_item_id);
+			$query['Itemid'] = $menu->id;
+		}
+
+		return $menu;
 	}
 }
