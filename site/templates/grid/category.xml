@@ -150,8 +150,9 @@
 						<field name="box_background_color_feat" type="color" cssprep="less" default="none" label="background color" description="Items container's background color" class="input-small" format="rgba" keywords="transparent,initial,none,none"/>
 						<field name="box_padding_top_bottom_feat" type="text" cssprep="less" default="8px" label="padding top/bottom" description="Items container's padding applied at top and bottom of the items" class="input-small" />
 						<field name="box_padding_left_right_feat" type="text" cssprep="less" default="12px" label="padding left/right" description="Items container's padding applied at left and right of the items" class="input-small" />
-						<field name="box_margin_top_bottom_feat" type="text" cssprep="less" default="15px" label="margin top/bottom" description="Items container's margin applied at top and bottom of the items" class="input-small" />
-						<field name="box_margin_left_right_feat" type="text" cssprep="less" default="15px" label="margin left/right" description="Items container's margin applied at left and right of the items" class="input-small" />
+						<field name="box_margin_top_feat" type="text" cssprep="less" default="4rem" label="margin top" description="Items container's margin applied at top and bottom of the items" class="input-small" />
+						<field name="box_margin_bottom_feat" type="text" cssprep="less" default="4rem" label="margin bottom" description="Items container's margin applied at top and bottom of the items" class="input-small" />
+						<field name="box_margin_left_right_feat" type="text" cssprep="less" default="0" label="margin left/right" description="Items container's margin applied at left and right of the items" class="input-small" />
 			
 						<field name="featured_item_box_css" type="separator" cssprep="1" default="Item box" level="level2" />
 						<field name="ibox_background_color_feat" type="color" cssprep="less" default="none" label="background color" description="This is the background color applied at each item" class="input-small" format="rgba" keywords="transparent,initial,none,none"/>
@@ -160,8 +161,8 @@
 						<field name="ibox_border_color_feat" type="color" cssprep="less" default="transparent" label="border color" description="This is the border color applied around the items" class="input-small" format="rgba" keywords="transparent,initial,none,none" />
 						<field name="ibox_padding_top_bottom_feat" type="text" cssprep="less" default="8px" label="padding top/bottom" description="This is the padding applied at top and bottom of the items" class="input-small" />
 						<field name="ibox_padding_left_right_feat" type="text" cssprep="less" default="12px" label="padding left/right" description="This is the padding applied at left and right of the items" class="input-small" />
-						<field name="ibox_margin_top_bottom_feat" type="text" cssprep="less" default="15px" label="margin top/bottom" description="This is the margin applied at top and bottom of the items" class="input-small" />
-						<field name="ibox_margin_left_right_feat" type="text" cssprep="less" default="15px" label="margin left/right" description="This is the margin applied at left and right of the items" class="input-small" />
+						<field name="ibox_margin_top_bottom_feat" type="text" cssprep="less" default="2rem" label="margin top/bottom" description="This is the margin applied at top and bottom of the items" class="input-small" />
+						<field name="ibox_margin_left_right_feat" type="text" cssprep="less" default="2rem" label="margin left/right" description="This is the margin applied at left and right of the items" class="input-small" />
 			
 					<field name="items_tab_featured_fields" type="separator" default="FLEXI_FIELDS" icon_class="icon-list" level="tab_open" box_type="1" />
 			
@@ -317,8 +318,9 @@
 						<field name="box_background_color" type="color" cssprep="less" default="none" label="background color" description="Items container's background color" class="input-small" format="rgba" keywords="transparent,initial,none,none"/>
 						<field name="box_padding_top_bottom" type="text" cssprep="less" default="8px" label="padding top/bottom" description="Items container's padding applied at top and bottom of the items" class="input-small" />
 						<field name="box_padding_left_right" type="text" cssprep="less" default="12px" label="padding left/right" description="Items container's padding applied at left and right of the items" class="input-small" />
-						<field name="box_margin_top_bottom" type="text" cssprep="less" default="15px" label="margin top/bottom" description="Items container's margin applied at top and bottom of the items" class="input-small" />
-						<field name="box_margin_left_right" type="text" cssprep="less" default="15px" label="margin left/right" description="Items container's margin applied at left and right of the items" class="input-small" />
+						<field name="box_margin_top" type="text" cssprep="less" default="2rem" label="margin top" description="Items container's margin applied at top and bottom of the items" class="input-small" />
+						<field name="box_margin_bottom" type="text" cssprep="less" default="2rem" label="margin bottom" description="Items container's margin applied at top and bottom of the items" class="input-small" />
+						<field name="box_margin_left_right" type="text" cssprep="less" default="0" label="margin left/right" description="Items container's margin applied at left and right of the items" class="input-small" />
 			
 						<field name="standard_item_box_css" type="separator" cssprep="1" default="Item box" level="level2" />
 						<field name="ibox_background_color" type="color" cssprep="less" default="none" label="background color" description="This is the background color applied at each item" class="input-small" format="rgba" keywords="transparent,initial,none,none"/>
@@ -327,8 +329,8 @@
 						<field name="ibox_border_color" type="color" cssprep="less" default="transparent" label="border color" description="This is the border width applied around the items" class="input-small" format="rgba" keywords="transparent,initial,none,none"/>
 						<field name="ibox_padding_top_bottom" type="text" cssprep="less" default="8px" label="padding top/bottom" description="This is the padding applied at top and bottom of the items" class="input-small" />
 						<field name="ibox_padding_left_right" type="text" cssprep="less" default="12" label="padding left/right" description="This is the padding applied at left and right of the items" class="input-small" />
-						<field name="ibox_margin_top_bottom" type="text" cssprep="less" default="15px" label="margin top/bottom" description="This is the margin applied at top and bottom of the items" class="input-small" />
-						<field name="ibox_margin_left_right" type="text" cssprep="less" default="15px" label="margin left/right" description="This is the margin applied at left and right of the items" class="input-small" />
+						<field name="ibox_margin_top_bottom" type="text" cssprep="less" default="2rem" label="margin top/bottom" description="This is the margin applied at top and bottom of the items" class="input-small" />
+						<field name="ibox_margin_left_right" type="text" cssprep="less" default="2rem" label="margin left/right" description="This is the margin applied at left and right of the items" class="input-small" />
 			
 					<field name="items_tab_standard_fields" type="separator" default="FLEXI_FIELDS" icon_class="icon-list" level="tab_open" box_type="1" />
 						
