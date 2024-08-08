@@ -36,9 +36,9 @@ if ( $filter_form_html )
 {
 	echo '
 	<div class="fcclear"></div>
-	<div class="group">
+	<aside class="group">
 		' . $filter_form_html . '
-	</div>';
+	</aside>';
 }
 
 // -- Check matching items found
@@ -107,12 +107,13 @@ foreach ($items as $i => $item) :
 <?php echo '<'.$mainAreaTag; ?> id="tablist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?> group" <?php echo $microdata_itemtype_code; ?>>
 	<h3 class="tabberheading"><?php echo StringHelper::substr($item->title, 0, 20); ?></h3><!-- tab title -->
 	
+	<?php echo ( ($mainAreaTag == 'section') ? '<header>' : ''); ?>
 	
   <?php if ($item->event->beforeDisplayContent) : ?>
 	  <!-- BOF beforeDisplayContent -->
-		<div class="fc_beforeDisplayContent group">
+		<aside class="fc_beforeDisplayContent group">
 			<?php echo $item->event->beforeDisplayContent; ?>
-		</div>
+		</aside>
 		<!-- EOF beforeDisplayContent -->
 	<?php endif; ?>
 	
@@ -141,6 +142,10 @@ foreach ($items as $i => $item) :
 	<?php endif; ?>
 	
 	
+	<?php echo ( ($mainAreaTag == 'section') ? '</header>' : ''); ?>
+	
+	<?php echo ( ($mainAreaTag == 'section') ? '<article>' : ''); ?>
+	
 	<?php
 		$header_shown =
 			$this->params->get('show_comments_count', 1) ||
@@ -148,6 +153,9 @@ foreach ($items as $i => $item) :
 			isset($item->positions['subtitle1']) || isset($item->positions['subtitle2']) || isset($item->positions['subtitle3']);
 	?>
 	
+	<?php if ( $header_shown ) : ?>
+	<header class="group">
+	<?php endif; ?>
 	
 	<?php if ($this->params->get('show_comments_count')) : ?>
 		<?php if ( isset($this->comments[ $item->id ]->total) ) : ?>
@@ -229,21 +237,24 @@ foreach ($items as $i => $item) :
 		<!-- EOF subtitle3 block -->
 	<?php endif; ?>
 	
+	<?php if ( $header_shown ) : ?>
+	</header>
+	<?php endif; ?>
 	
 	
 	<div class="fcclear"></div>
 	
 	<?php if ((isset($item->positions['image'])) || (isset($item->positions['top']))) : ?>
 		<!-- BOF image/top row -->
-		<div class="flexi topblock group">  <!-- NOTE: image block is inside top block ... -->
+		<aside class="flexi topblock group row">  <!-- NOTE: image block is inside top block ... -->
 			
 			<?php if (isset($item->positions['image'])) : ?>
 				<!-- BOF image block -->
 				<?php foreach ($item->positions['image'] as $field) : ?>
-				<div class="flexi image field_<?php echo $field->name; ?>">
+				<figure class="flexi image field_<?php echo $field->name; ?> span4">
 					<?php echo $field->display; ?>
 					<div class="fcclear"></div>
-				</div>
+				</figure>
 				<?php endforeach; ?>
 				<!-- EOF image block -->
 			<?php endif; ?>
@@ -254,10 +265,10 @@ foreach ($items as $i => $item) :
 					$top_cols = $this->params->get('top_cols', 'two');
 					$span_class = $top_cols == 'one' ? 'span12' : 'span6'; // bootstrap span
 				?>
-				<div class="flexi infoblock <?php echo $top_cols; ?>cols group">
-					<ul class="flexi">
+				<div class="flexi infoblock <?php echo $top_cols; ?>cols group span8">
+					<ul class="flexi row">
 						<?php foreach ($item->positions['top'] as $field) : ?>
-						<li class="flexi lvbox <?php echo 'field_' . $field->name; ?>">
+						<li class="flexi lvbox <?php echo 'field_' . $field->name . ' ' . $span_class; ?>">
 							<div>
 								<?php if ($field->label) : ?>
 								<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
@@ -271,7 +282,7 @@ foreach ($items as $i => $item) :
 				<!-- EOF top block -->
 			<?php endif; ?>
 			
-		</div>
+		</aside>
 		<!-- EOF image/top row -->
 	<?php endif; ?>
 	
@@ -310,6 +321,9 @@ foreach ($items as $i => $item) :
 		$footer_shown = $readmore_shown || isset($item->positions['bottom']) || $item->event->afterDisplayContent;
 	?>
 	
+	<?php if ( $footer_shown ) : ?>
+	<footer class="group">
+	<?php endif; ?>
 	
 	<?php if (isset($item->positions['bottom'])) : ?>
 		<!-- BOF bottom block -->
@@ -318,9 +332,9 @@ foreach ($items as $i => $item) :
 			$span_class = $bottom_cols == 'one' ? 'span12' : 'span6'; // bootstrap span
 		?>
 		<div class="flexi infoblock <?php echo $bottom_cols; ?>cols group">
-			<ul class="flexi">
+			<ul class="flexi row">
 				<?php foreach ($item->positions['bottom'] as $field) : ?>
-				<li class="flexi lvbox <?php echo 'field_' . $field->name; ?>">
+				<li class="flexi lvbox <?php echo 'field_' . $field->name . ' ' . $span_class; ?>">
 					<div>
 						<?php if ($field->label) : ?>
 						<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
@@ -349,12 +363,17 @@ foreach ($items as $i => $item) :
 	
 	<?php if ($item->event->afterDisplayContent) : ?>
 		<!-- BOF afterDisplayContent -->
-		<div class="fc_afterDisplayContent group">
+		<aside class="fc_afterDisplayContent group">
 			<?php echo $item->event->afterDisplayContent; ?>
-		</div>
+		</aside>
 		<!-- EOF afterDisplayContent -->
 	<?php endif; ?>
 	
+	<?php if ( $footer_shown) : ?>
+	</footer>
+	<?php endif; ?>
+	
+	<?php echo $mainAreaTag == 'section' ? '</article>' : ''; ?>
 	
 	<?php if ($this->params->get('show_comments_incat') && !\Joomla\CMS\Factory::getApplication()->input->getInt('print', 0)) : /* PARAMETER MISSING */?>
 		<!-- BOF comments -->

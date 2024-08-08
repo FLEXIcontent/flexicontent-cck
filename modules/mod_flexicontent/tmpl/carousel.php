@@ -484,7 +484,7 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 
 		<!-- BOF DIV mod_flexicontent_featured (featured items) -->
 
-		<div class="mod_flexicontent_featured mod_fcitems_box_featured_<?php echo $uniq_ord_id; ?>" id="mod_fcitems_box_featured_<?php echo $uniq_ord_id; ?>">
+		<div class="mod_flexicontent_featured mod_fcitems_box_featured_<?php echo $uniq_ord_id; ?> <?php echo ($cols_class_feat ? ' '.$cols_class_feat : ''); ?>" id="mod_fcitems_box_featured_<?php echo $uniq_ord_id; ?>">
 
 			<?php
 			$oe_class = $rowtoggler ? 'odd' : 'even';
@@ -541,7 +541,7 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 			?>
 
 			<!-- BOF item -->	
-			<div class="mod_flexicontent_featured_wrapper<?php echo $mod_do_hlight_feat; ?><?php echo ' '.$oe_class .($item->is_active_item ? ' fcitem_active' : '') .($cols_class_feat ? ' '.$cols_class_feat : ''); ?>">
+			<div class="mod_flexicontent_featured_wrapper<?php echo $mod_do_hlight_feat; ?><?php echo ' '.$oe_class .($item->is_active_item ? ' fcitem_active' : ''); ?>">
 			<div class="mod_flexicontent_featured_wrapper_innerbox">
 
 
@@ -555,9 +555,9 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 						<div class="fcitem_title_box">
 							<span class="fcitem_title">
 							<?php if ($link_title_feat) : ?>
-								<a href="<?php echo $item->link; ?>"><?php echo $item->title; ?></a>
+								<a href="<?php echo $item->link; ?>"><h3><?php echo $item->title; ?></h3></a>
 							<?php else : ?>
-								<?php echo $item->title; ?>
+								<h3><?php echo $item->title; ?></h3>
 							<?php endif; ?>
 							</span>
 						</div>
@@ -669,18 +669,17 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 					</div>
 					<?php endif; ?>
 
-					<?php if ($mod_readmore_feat) : ?>
-					<div class="fc_block">
-						<div class="fcitem_readon">
-							<a href="<?php echo $item->link; ?>" class="readon"><span><?php echo \Joomla\CMS\Language\Text::_('FLEXI_MOD_READ_MORE'); ?></span></a>
-						</div>
-					</div>
-					<?php endif; ?>
-
-					<div class="clearfix"></div> 
 
 				</div> <!-- EOF item's content -->
 				<?php endif; ?>
+
+				<?php if ($mod_readmore_feat) : ?>
+					<div class="fc_block readmore">
+						<div class="fcitem_readon">
+							<a href="<?php echo $item->link; ?>" class="readon btn"><span><?php echo \Joomla\CMS\Language\Text::_('FLEXI_MOD_READ_MORE'); ?></span></a>
+						</div>
+					</div>
+					<?php endif; ?>
 
 				<?php echo $content_layout_feat==2 ? $captured_image : '';?>
 
@@ -847,9 +846,9 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 						<div class="fcitem_title_box" <?php echo !$display_title ? 'style="display:none!important;"' : ''; ?> >
 							<span class="fcitem_title">
 							<?php if ($link_title) : ?>
-								<a href="<?php echo $item->link; ?>"><?php echo $item->title; ?></a>
+								<a href="<?php echo $item->link; ?>"><h3><?php echo $item->title; ?></h3></a>
 							<?php else : ?>
-								<?php echo $item->title; ?>
+								<h3><?php echo $item->title; ?></h3>
 							<?php endif; ?>
 							</span>
 						</div>
@@ -963,7 +962,7 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 					<?php if ($mod_readmore) : ?>
 					<div class="fc_block">
 						<div class="fcitem_readon">
-							<a href="<?php echo $item->link; ?>" class="readon"><span><?php echo \Joomla\CMS\Language\Text::_('FLEXI_MOD_READ_MORE'); ?></span></a>
+							<a href="<?php echo $item->link; ?>" class="readon btn"><span><?php echo \Joomla\CMS\Language\Text::_('FLEXI_MOD_READ_MORE'); ?></span></a>
 						</div>
 					</div>
 					<?php endif; ?>

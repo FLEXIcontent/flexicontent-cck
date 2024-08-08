@@ -1,12 +1,6 @@
 <?php
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-// USE HTML5 or XHTML
-$html5 = $this->params->get('htmlmode', 0); // 0 = XHTML , 1 = HTML5
-if ($html5) {  /* BOF html5  */
-	echo $this->loadTemplate('html5');
-} else {
-
 $page_classes  = '';
 $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 $page_classes .= ' fccategory fccat'.$this->category->id;
@@ -70,6 +64,7 @@ if ($menu) $page_classes .= ' menuitem'.$menu->id;
 
 <!-- BOF page title -->
 <?php if ($this->params->get('show_page_heading', 1)) : ?>
+	<header class="">
 		<h1 class="componentheading">
 			<?php echo $this->params->get( 'page_heading' ) ?>
 		</h1>
@@ -80,6 +75,9 @@ if ($menu) $page_classes .= ' menuitem'.$menu->id;
 <?php if (@$this->authordescr_item_html) echo $this->authordescr_item_html; ?>
 <!-- EOF author description -->
 
+<?php if ($this->params->get('show_page_heading', 1)) echo '</header>'; ?>
+
+<?php if ($this->category->id || (count($this->categories) && $this->params->get('show_subcategories'))) echo '<section class="">'; ?>
 
 <!-- BOF category info -->
 <?php if ( $this->category->id > 0) : /* Category specific data may not be not available, e.g. for -author- layout view */ ?>
@@ -115,6 +113,8 @@ if ($menu) $page_classes .= ' menuitem'.$menu->id;
 <!-- EOF peer-categories info -->
 
 
+<?php if ($this->category->id || (count($this->categories) && $this->params->get('show_subcategories')))  echo '</section>'; ?>
+
 <!-- BOF item list display -->
 <?php
 	echo $this->loadTemplate('items');
@@ -138,4 +138,3 @@ if ($menu) $page_classes .= ' menuitem'.$menu->id;
 
 </div>
 
-<?php } /* EOF if html5  */ ?>

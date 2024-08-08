@@ -15,7 +15,10 @@
 }
 /*** theme update ***/
 #flexicontent .flexi .flexi.element { /*** reset margin arround field for better alignement in content ***/
-	margin: 0.2em 2% 0.2em 0% !important;
+	margin: 0.3em 0 !important;
+	display: flex;
+    flex-direction: row;
+	align-items: baseline;
 }
 /*** correct title margin **/
 .contentheading {
@@ -418,7 +421,7 @@ label#use_advsearch_options_lbl {
 
 /** pagenav correction **/
 .fcpagenav.btn-group {
-	border: 1px solid #ccc;
+	border: 0px solid #ccc;
 	border-radius: 3px;
 	width:100% !important;
 	margin: initial !important;
@@ -579,7 +582,7 @@ a.plupload_button.plupload_start {
 .fcfield_field_preview_box {
     padding: 0 20px;
 }
-#flexicontent .fc-xpended-btns.btn, .btn {
+#flexicontent .fc-xpended-btns.btn {
     border: 1px solid #aaa !important;
 }
 //add hover style on tool button in FE category view
@@ -609,4 +612,8 @@ a.plupload_button.plupload_start {
     margin-top: 0 !important;
 	padding-top: 0.5rem !important;
     padding-bottom: 0.5rem !important;
+}
+fieldset.fc_search_set, fieldset.fc_filter_set {
+    margin: 0 !important;
+    padding: 0 !important;
 }

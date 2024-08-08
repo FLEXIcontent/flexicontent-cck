@@ -18,7 +18,7 @@ file_exists(dirname(__FILE__).DS.'filters.php')
 
 // Alpha-Index
 if ($this->params->get('show_alpha', 1)) :
-	echo $this->loadTemplate('alpha');
+	echo $this->loadTemplate('alpha_html5');
 endif;
 
 $limit_selector = flexicontent_html::limit_selector( $this->params, $formname='adminForm', $autosubmit=1 );
@@ -70,7 +70,7 @@ $tooltip_class = 'hasTooltip';
 
 		<?php $_page_counter = trim($this->pageNav->getPagesCounter() ?? ''); ?>
 		<?php if ($_page_counter): ?>
-		<span class="fc_pages_counter">
+			<span class="fc_pages_counter">
 			<span class="label"><?php echo $_page_counter; ?></span>
 		</span>
 		<?php endif; ?>

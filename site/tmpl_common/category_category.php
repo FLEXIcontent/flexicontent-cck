@@ -1,19 +1,23 @@
 <?php
 defined( '_JEXEC' ) or die( 'Restricted access' );
+
+$catTitleHeaderLevel = ( $this->params->get( 'show_page_heading', 1 ) && $this->params->get('show_cat_title', 1) ) ? '2' : '1'; 
+// Note:in Some editors like Dreamweaver will automatically set a closing tag > after </h when opening the document. So look for h>  and replaced it with h
 ?>
 
-<div class="fclear"></div>
 <div class="floattext">
 	<?php if ($this->params->get('show_cat_title', 1)) : ?>
-	<h2 class="cattitle">
+    <header>
+		<?php echo "<h".$catTitleHeaderLevel; ?> class="cattitle">
 		<?php echo $this->escape($this->category->title); ?>
-	</h2>
+		<?php echo "</h". $catTitleHeaderLevel; ?>>
+    </header>
 	<?php endif; ?>
 
 	<?php if ($this->params->get('show_description_image', 1) && $this->category->image) : ?>
-	<div class="catimg">
+	<figure class="catimg">
 		<?php echo $this->category->image; ?>
-	</div>
+	</figure>
 	<?php endif; ?>
 	
 	<?php if ($this->params->get('show_description', 1) && $this->category->description) : ?>

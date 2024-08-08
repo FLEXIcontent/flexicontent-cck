@@ -40,8 +40,8 @@ $mod_do_hlight .= $hl_items_onnav == 2 || $hl_items_onnav == 3 ? ' mod_hl_hover'
 $inner_inline_css_feat = (int)$params->get($layout.'_inner_inline_css_feat', 0);
 $padding_top_bottom_feat = (int)$params->get($layout.'_padding_top_bottom_feat', 8);
 $padding_left_right_feat = (int)$params->get($layout.'_padding_left_right_feat', 12);
-$margin_top_bottom_feat = (int)$params->get($layout.'_margin_left_right_feat', 4);
-$margin_left_right_feat = (int)$params->get($layout.'_margin_left_right_feat', 4);
+$margin_top_bottom_feat = $params->get($layout.'_margin_left_right_feat', 4);
+$margin_left_right_feat = $params->get($layout.'_margin_left_right_feat', 4);
 $border_width_feat = (int)$params->get($layout.'_border_width_feat', 1);
 
 
@@ -49,8 +49,8 @@ $border_width_feat = (int)$params->get($layout.'_border_width_feat', 1);
 $inner_inline_css = (int)$params->get($layout.'_inner_inline_css', 0);
 $padding_top_bottom = (int)$params->get($layout.'_padding_top_bottom', 8);
 $padding_left_right = (int)$params->get($layout.'_padding_left_right', 12);
-$margin_top_bottom = (int)$params->get($layout.'_margin_left_right', 4);
-$margin_left_right = (int)$params->get($layout.'_margin_left_right', 4);
+$margin_top_bottom = $params->get($layout.'_margin_left_right', 4);
+$margin_left_right = $params->get($layout.'_margin_left_right', 4);
 $border_width = (int)$params->get($layout.'_border_width', 1);
 
 
@@ -358,7 +358,7 @@ if ($std_builder_layout_num)
 
 		<!-- BOF DIV mod_flexicontent_featured (featured items) -->
 
-		<div class="mod_flexicontent_featured mod_fcitems_box_featured_<?php echo $uniq_ord_id; ?>" id="mod_fcitems_box_featured_<?php echo $uniq_ord_id; ?>">
+		<div class="mod_flexicontent_featured mod_fcitems_box_featured_<?php echo $uniq_ord_id; ?> <?php echo($cols_class_feat ? ' '.$cols_class_feat : ''); ?>" id="mod_fcitems_box_featured_<?php echo $uniq_ord_id; ?>">
 
 			<?php
 			$oe_class = $rowtoggler ? 'odd' : 'even';
@@ -415,7 +415,7 @@ if ($std_builder_layout_num)
 			?>
 
 			<!-- BOF item -->	
-			<div class="mod_flexicontent_featured_wrapper<?php echo $mod_do_hlight_feat; ?><?php echo ' '.$oe_class .($item->is_active_item ? ' fcitem_active' : '') .($cols_class_feat ? ' '.$cols_class_feat : ''); ?>">
+			<div class="mod_flexicontent_featured_wrapper<?php echo $mod_do_hlight_feat; ?><?php echo ' '.$oe_class .($item->is_active_item ? ' fcitem_active' : ''); ?>">
 			<div class="mod_flexicontent_featured_wrapper_innerbox">
 
 
@@ -429,9 +429,9 @@ if ($std_builder_layout_num)
 						<div class="fcitem_title_box">
 							<span class="fcitem_title">
 							<?php if ($link_title_feat) : ?>
-								<a href="<?php echo $item->link; ?>"><?php echo $item->title; ?></a>
+								<a href="<?php echo $item->link; ?>"><h3><?php echo $item->title; ?></h3></a>
 							<?php else : ?>
-								<?php echo $item->title; ?>
+								<h3><?php echo $item->title; ?></h3>
 							<?php endif; ?>
 							</span>
 						</div>
@@ -543,22 +543,18 @@ if ($std_builder_layout_num)
 					</div>
 					<?php endif; ?>
 
-					<?php if ($mod_readmore_feat) : ?>
-					<div class="fc_block">
-						<div class="fcitem_readon">
-							<a href="<?php echo $item->link; ?>" class="readon"><span><?php echo \Joomla\CMS\Language\Text::_('FLEXI_MOD_READ_MORE'); ?></span></a>
-						</div>
-					</div>
-					<?php endif; ?>
-
-					<div class="clearfix"></div> 
-
 				</div> <!-- EOF item's content -->
 				<?php endif; ?>
 
 				<?php echo $content_layout_feat==2 ? $captured_image : '';?>
 
-
+				<?php if ($mod_readmore_feat) : ?>
+					<div class="fc_block">
+						<div class="fcitem_readon">
+							<a href="<?php echo $item->link; ?>" class="readon btn"><span><?php echo \Joomla\CMS\Language\Text::_('FLEXI_MOD_READ_MORE'); ?></span></a>
+						</div>
+					</div>
+					<?php endif; ?>
 			<?php endif; /* EOF: Content display via Parameter-based Layout */ ?>
 
 
@@ -668,7 +664,7 @@ if ($std_builder_layout_num)
 
 		<!-- BOF DIV mod_flexicontent_standard (standard items) -->
 
-		<div class="mod_flexicontent_standard mod_fcitems_box_standard_<?php echo $uniq_ord_id; ?>" id="mod_fcitems_box_standard_<?php echo $uniq_ord_id; ?>">
+		<div class="mod_flexicontent_standard mod_fcitems_box_standard_<?php echo $uniq_ord_id; ?> <?php echo ($cols_class_std ? ' '.$cols_class_std : ''); ?>" id="mod_fcitems_box_standard_<?php echo $uniq_ord_id; ?>">
 
 			<?php
 			$oe_class = $rowtoggler ? 'odd' : 'even';
@@ -725,7 +721,7 @@ if ($std_builder_layout_num)
 			?>
 
 			<!-- BOF item -->	
-			<div class="mod_flexicontent_standard_wrapper<?php echo $mod_do_hlight; ?><?php echo ' '.$oe_class .($item->is_active_item ? ' fcitem_active' : '') .($cols_class_std ? ' '.$cols_class_std : ''); ?>"
+			<div class="mod_flexicontent_standard_wrapper<?php echo $mod_do_hlight; ?><?php echo ' '.$oe_class .($item->is_active_item ? ' fcitem_active' : '') ; ?>"
 				onmouseover=""
 				onmouseout=""
 			>
@@ -742,9 +738,9 @@ if ($std_builder_layout_num)
 						<div class="fcitem_title_box">
 							<span class="fcitem_title">
 							<?php if ($link_title) : ?>
-								<a href="<?php echo $item->link; ?>"><?php echo $item->title; ?></a>
+								<a href="<?php echo $item->link; ?>"><h3><?php echo $item->title; ?></h3></a>
 							<?php else : ?>
-								<?php echo $item->title; ?>
+								<h3><?php echo $item->title; ?></h3>
 							<?php endif; ?>
 							</span>
 						</div>
@@ -855,21 +851,18 @@ if ($std_builder_layout_num)
 					</div>
 					<?php endif; ?>
 
-					<?php if ($mod_readmore) : ?>
-					<div class="fc_block">
-						<div class="fcitem_readon">
-							<a href="<?php echo $item->link; ?>" class="readon"><span><?php echo \Joomla\CMS\Language\Text::_('FLEXI_MOD_READ_MORE'); ?></span></a>
-						</div>
-					</div>
-					<?php endif; ?>
-
-					<div class="clearfix"></div> 
-
 				</div> <!-- EOF item's content -->
 				<?php endif; ?>
 
 				<?php echo $content_layout==2 ? $captured_image : '';?>
 
+				<?php if ($mod_readmore) : ?>
+					<div class="fc_block readmore">
+						<div class="fcitem_readon">
+							<a href="<?php echo $item->link; ?>" class="readon btn"><span><?php echo \Joomla\CMS\Language\Text::_('FLEXI_MOD_READ_MORE'); ?></span></a>
+						</div>
+					</div>
+					<?php endif; ?>
 
 			<?php endif; /* EOF: Content display via Parameter-based Layout */ ?>
 
@@ -990,11 +983,12 @@ if ($std_builder_layout_num)
 	#mod_fcitems_box_featured_'.$uniq_ord_id.' div.mod_flexicontent_standard_wrapper {
 	}'.
 	/* inner CONTAINER of each standard item */'
-	#mod_fcitems_box_featured_'.$uniq_ord_id.' div.mod_flexicontent_standard_wrapper_innerbox {
+	#mod_fcitems_box_featured_'.$uniq_ord_id.'.mod_flexicontent_featured {
 		'.($inner_inline_css_feat ? '
 		padding: '.$padding_top_bottom_feat.'px '.$padding_left_right_feat.'px !important;
 		border-width: '.$border_width_feat.'px!important;
-		margin: '.$margin_top_bottom_feat.'px '.$margin_left_right_feat.'px !important;
+		row-gap: '.$margin_top_bottom_feat.' !important ;
+		gap:'.$margin_left_right_feat.' !important;
 		' : '').'
 	}'.
 
@@ -1005,11 +999,12 @@ if ($std_builder_layout_num)
 	#mod_fcitems_box_standard_'.$uniq_ord_id.' div.mod_flexicontent_standard_wrapper {
 	}'.
 	/* inner CONTAINER of each standard item */'
-	#mod_fcitems_box_standard_'.$uniq_ord_id.' div.mod_flexicontent_standard_wrapper_innerbox {
+	#mod_fcitems_box_standard_'.$uniq_ord_id.'.mod_flexicontent_standard {
 		'.($inner_inline_css ? '
 		padding: '.$padding_top_bottom.'px '.$padding_left_right.'px !important;
 		border-width: '.$border_width.'px!important;
-		margin: '.$margin_top_bottom.'px '.$margin_left_right.'px !important;
+		row-gap: '.$margin_top_bottom.' !important;
+		gap:'.$margin_left_right.' !important;
 		' : '').'
 	}'.
 

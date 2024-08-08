@@ -51,12 +51,17 @@
 /* EXTERNAL ITEM CONTAINER inner container for border, padding etc */
 .carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper_innerbox,
 .carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper_innerbox {
-	position: relative;
+	/*position: relative;
 	display: block;
 	float: none;
 	width: auto;
 	height: auto;
-	overflow: hidden;
+	overflow: hidden;*/
+
+	display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    height: 100%;
 	
 	/* 
 	test remove stye
@@ -87,7 +92,7 @@
 	/*height: 100%;*/ /* problematic with masonry */
 }
 
-/* EXTERNAL ITEM CONTAINER (2-COLUMNS) */
+/* EXTERNAL ITEM CONTAINER (2-COLUMNS)
 .carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_2,
 .carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_2 {
 	width: 50% !important;
@@ -95,9 +100,10 @@
 	margin-right: 0% !important;
 	padding: 0% !important;
 	border-width: 0px !important;
-}
+	
+}*/
 
-/* EXTERNAL ITEM CONTAINER (3-COLUMNS) */
+/* EXTERNAL ITEM CONTAINER (3-COLUMNS) 
 .carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_3,
 .carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_3 {
 	width: 33.33% !important;
@@ -105,9 +111,9 @@
 	margin-right: 0% !important;
 	padding: 0% !important;
 	border-width: 0px !important;
-}
+}*/
 
-/* EXTERNAL ITEM CONTAINER (4-COLUMNS) */
+/* EXTERNAL ITEM CONTAINER (4-COLUMNS) 
 .carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_4,
 .carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_4 {
 	width: 25% !important;
@@ -115,9 +121,9 @@
 	margin-right: 0% !important;
 	padding: 0% !important;
 	border-width: 0px !important;
-}
+}*/
 
-/* EXTERNAL ITEM CONTAINER (5-COLUMNS) */
+/* EXTERNAL ITEM CONTAINER (5-COLUMNS) 
 .carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_5,
 .carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_5 {
 	width: 20% !important;
@@ -125,9 +131,9 @@
 	margin-right: 0% !important;
 	padding: 0% !important;
 	border-width: 0px !important;
-}
+}*/
 
-/* EXTERNAL ITEM CONTAINER (6-COLUMNS) */
+/* EXTERNAL ITEM CONTAINER (6-COLUMNS) 
 .carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_6,
 .carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_6 {
 	width: 16.66% !important;
@@ -135,9 +141,9 @@
 	margin-right: 0% !important;
 	padding: 0% !important;
 	border-width: 0px !important;
-}
+}*/
 
-/* EXTERNAL ITEM CONTAINER (7-COLUMNS) */
+/* EXTERNAL ITEM CONTAINER (7-COLUMNS) 
 .carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_7,
 .carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_7 {
 	width: 14.28% !important;
@@ -145,9 +151,9 @@
 	margin-right: 0% !important;
 	padding: 0% !important;
 	border-width: 0px !important;
-}
+}*/
 
-/* EXTERNAL ITEM CONTAINER (8-COLUMNS) */
+/* EXTERNAL ITEM CONTAINER (8-COLUMNS) 
 .carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_8,
 .carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_8 {
 	width: 12.5% !important;
@@ -155,10 +161,10 @@
 	margin-right: 0% !important;
 	padding: 0% !important;
 	border-width: 0px !important;
-}
+}*/
 
 @media only screen and (min-width: 1280px) and (max-width: 1399px) {
-	/* medium-sized desktops */
+	/* medium-sized desktops
 	.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_6,
 	.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_7,
 	.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_8,
@@ -169,12 +175,12 @@
 	}
 	.carousel.mod_flexicontent_wrapper .fcitem_title_box .fcitem_title,
 	.carousel.mod_flexicontent_wrapper .fcitem_title_box .fcitem_title a {
-		font-size: 115%;
-	}
+		/*font-size: 115%;
+	}*/
 }
 
 @media only screen and (min-width: 1152px) and (max-width: 1279px) {
-	/* small-sized desktops */
+	/* small-sized desktops 
 	.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_5,
 	.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_6,
 	.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_7,
@@ -187,12 +193,12 @@
 	}
 	.carousel.mod_flexicontent_wrapper .fcitem_title_box .fcitem_title,
 	.carousel.mod_flexicontent_wrapper .fcitem_title_box .fcitem_title a {
-		font-size: 110%;
-	}
+		/*font-size: 110%;
+	}*/
 }
 
 @media only screen and (min-width: 1024px) and (max-width: 1151px) {
-	/* large-sized tablets, very small-sized desktops */
+	/* large-sized tablets, very small-sized desktops
 	.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_4,
 	.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_5,
 	.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_6,
@@ -207,12 +213,12 @@
 	}
 	.carousel.mod_flexicontent_wrapper .fcitem_title_box .fcitem_title,
 	.carousel.mod_flexicontent_wrapper .fcitem_title_box .fcitem_title a {
-		font-size: 105%;
-	}
+		/*font-size: 105%;
+	}*/
 }
 
 @media only screen and (min-width: 768px) and (max-width: 1023px) {
-	/* medium-sized tablets */
+	/* medium-sized tablets
 	.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_3,
 	.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_4,
 	.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_5,
@@ -229,12 +235,12 @@
 	}
 	.carousel.mod_flexicontent_wrapper .fcitem_title_box .fcitem_title,
 	.carousel.mod_flexicontent_wrapper .fcitem_title_box .fcitem_title a {
-		font-size: 100%;
-	}
+		/*font-size: 100%;
+	}*/
 }
 
 @media only screen and (max-width: 767px) {
-	/* phones and small-sized tablets */
+	/* phones and small-sized tablets
 	.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_2,
 	.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_3,
 	.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_4,
@@ -253,8 +259,8 @@
 	}
 	.carousel.mod_flexicontent_wrapper .fcitem_title_box .fcitem_title,
 	.carousel.mod_flexicontent_wrapper .fcitem_title_box .fcitem_title a {
-		font-size: 95%;
-	}
+		/*font-size: 95%;
+	}*/
 }
 
 /* EXTERNAL CONTAINER STYLING ODD EVEN (COUNTING) */
@@ -266,7 +272,6 @@
 }
 
 /* INTERNAL ITEM-LIST CONTAINER (ONE COLUMN MODE) */
-.carousel.mod_flexicontent_wrapper .mod_flexicontent_featured,
 .carousel.mod_flexicontent_wrapper .mod_flexicontent_standard {
 	/*margin-top: 0px;
 	margin-bottom: 0px;
@@ -293,25 +298,33 @@
  */
 
 .carousel.mod_flexicontent_wrapper .content_standard {padding: 12px 12px 0 12px;}  /* container of basic elements of standard items excluding title & image */
-.carousel.mod_flexicontent_wrapper .content_featured {padding: 12px 12px 0 12px;}  /* container of basic elements of featured items excluding title & image */
+.carousel.mod_flexicontent_wrapper .content_featured {
+		display: flex;
+		flex-direction: column;
+		flex-wrap: nowrap;
+}  /* container of basic elements of featured items excluding title & image */
 
 
 /* CONTAINER of item title */
 .carousel.mod_flexicontent_wrapper .fcitem_title_box {
 	display: block;
 	/*background: transparent;
-	margin: 0;*/
-	padding: 6px;
+	margin: 0;
+	padding: 6px;*/
 }
 
-.carousel.mod_flexicontent_wrapper .fcitem_title,
-.carousel.mod_flexicontent_wrapper .fcitem_title a {
+.carousel.mod_flexicontent_wrapper .content_standard  .fcitem_title,
+.carousel.mod_flexicontent_wrapper .content_standard  .fcitem_title a {
 	color: #fff;
-	font-size: 120%;
-	/*background-color: transparent;
+	/*font-size: 120%;
+	background-color: transparent;
 	line-height: 1.2em;*/
 	width: 100%;
 	display: inline-block;
+}
+
+.carousel.mod_flexicontent_wrapper .content_featured .fcitem_title,
+.carousel.mod_flexicontent_wrapper .fcitem_title a {
 }
 
 .carousel.mod_flexicontent_wrapper .fcitem_title {
@@ -371,9 +384,9 @@
 /* CONTAINER of item description */
 .carousel.mod_flexicontent_wrapper .fcitem_text { /* for image (not contained inside) see more below */
 	/*text-align:justify;
-	margin: 0px;*/
+	margin: 0px;
 	padding: 0 12px;
-	/*line-height: 160%;*/
+	line-height: 160%;*/
 }
 
 
@@ -473,13 +486,14 @@
 	border:solid transparent;
 	border-width:1px 0px;
 	padding: 1px 6px 1px 20px;
-	margin: 3px 3px 3px 4px;*/
+	margin: 3px 3px 3px 4px;
 	display: inline-block;
 	-webkit-transition: all 0.4s; transition: all 0.4s;
-
 	/*background-color: transparent;
 	color: #08c;
 	font-size: inherit;*/
+		display: flex !important;
+		justify-content: center;
 }
 .carousel.mod_flexicontent_wrapper .fcitem_readon:hover {
 	/*background-color: rgba(255, 255, 255, 0.2);
@@ -516,7 +530,7 @@
 /* Content PLACEMENT methods */
 /*****************************/
 .carousel.mod_flexicontent_wrapper .fc_block {
-	line-height: 160%;
+	/*line-height: 160%;*/
 }
 .carousel.mod_flexicontent_wrapper .fc_overlayed {
 	/* Fallback for web browsers that don't support RGBa */
@@ -1012,7 +1026,6 @@
 	width: auto /*!important*/;
 }
 
-
 /* Customize clear box */
 .carousel.mod_flexicontent_wrapper .modclear {
 	height: 0px !important;
@@ -1030,6 +1043,55 @@
 /** invert link color of readmore template according to general style **/
 .fc_overlayed .fcitem_readon a {
     filter: invert(1);
+}
+
+.carousel .mod_flexicontent_featured {
+	display: grid !important;
+	gap:2rem;
+	row-gap: 2rem;
+}
+.carousel .mod_flexicontent_featured.cols_2 {
+	grid-template-columns: repeat(2,1fr);
+}
+.carousel .mod_flexicontent_featured.cols_3 {
+	grid-template-columns: repeat(3,1fr);
+}
+.carousel .mod_flexicontent_featured.cols_4 {
+	grid-template-columns: repeat(4,1fr);
+}
+.carousel .mod_flexicontent_featured.cols_5 {
+	grid-template-columns: repeat(5,1fr);
+}
+.carousel .mod_flexicontent_featured.cols_6 {
+	grid-template-columns: repeat(6,1fr);
+}
+.carousel .mod_flexicontent_featured.cols_7 {
+	grid-template-columns: repeat(7,1fr);
+}
+.carousel .mod_flexicontent_featured.cols_8 {
+	grid-template-columns: repeat(8,1fr);
+}
+@media only screen and (max-width: 769px) {
+	.carousel .mod_flexicontent_featured.cols_2,
+	.carousel .mod_flexicontent_featured.cols_3,
+	.carousel .mod_flexicontent_featured.cols_4,
+	.carousel .mod_flexicontent_featured.cols_5,
+	.carousel .mod_flexicontent_featured.cols_6,
+	.carousel .mod_flexicontent_featured.cols_7,
+	.carousel .mod_flexicontent_featured.cols_8 {
+		grid-template-columns: repeat(2,1fr);
+	}
+}
+@media only screen and (max-width: 481px) {
+	.carousel .mod_flexicontent_featured.cols_2,
+	.carousel .mod_flexicontent_featured.cols_3,
+	.carousel .mod_flexicontent_featured.cols_4,
+	.carousel .mod_flexicontent_featured.cols_5,
+	.carousel .mod_flexicontent_featured.cols_6,
+	.carousel .mod_flexicontent_featured.cols_7,
+	.carousel .mod_flexicontent_featured.cols_8 {
+		grid-template-columns: repeat(1,1fr);
+	}
 }
 
 

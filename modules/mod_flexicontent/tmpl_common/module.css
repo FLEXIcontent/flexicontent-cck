@@ -117,7 +117,7 @@
 .mod_flexicontent_wrapper .cat_readon a.readon span {  /* style of link */
 	padding: 0px;
 	background:none;
-	text-decoration: none!important;
+	text-decoration: none;
 	color: darkgreen;
 	cursor:pointer;
 }
@@ -126,7 +126,7 @@
 .mod_flexicontent_wrapper .cat_readon:hover a.readon span { /* style of link when hovering external container */
 	padding: 0px;
 	background:none;
-	text-decoration: none!important;
+	text-decoration: none;
 	color: darkgreen;
 }
 
@@ -134,7 +134,7 @@
 .mod_flexicontent_wrapper .module_readon a.readon span {  /* style of link */
 	padding: 0px;
 	background:none;
-	text-decoration: none!important;
+	text-decoration: none;
 	color: darkblue;
 	cursor:pointer;
 }
@@ -143,7 +143,7 @@
 .mod_flexicontent_wrapper .module_readon:hover a.readon span { /* style of link when hovering external container */
 	padding: 0px;
 	background:none;
-	text-decoration: none!important;
+	text-decoration: none;
 	color: darkblue;
 }
 
@@ -176,10 +176,11 @@ div.mod_fc_favlist_favblock_template {
 .mod_flexicontent_wrapper .fcitem_active .fcitem_title a,  /* news template, etc */
 .mod_flexicontent_wrapper .fcitem_active a.fcitem_link    /* default template, etc */
 {
-	border-radius: 8px !important;
-	background-color: darkred !important;
-	color: white !important;
-	padding: 2px 4px !important;
+	border-radius: 8px ;
+	background-color: darkred ;
+	color: white ;
+	padding: 2px 4px;
+	display:block;
 }
 
 /*******************/
