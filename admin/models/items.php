@@ -277,6 +277,11 @@ class FlexicontentModelItems extends FCModelAdminList
 
 		// File ID filter
 		$filter_fileid  = $fcform ? $jinput->get('filter_fileid', 0, 'int')  :  $app->getUserStateFromRequest( $p.'filter_fileid',  'filter_fileid',  0,  'int' );
+		if ($filter_fileid && $filter_type) {
+			$this->setState('filter_type', []);
+			$app->setUserState($p . 'filter_type', $filter_type);
+			$app->enqueueMessage('Please clear filters (specifically the File usage filter) before you can filter by specific type(s)');
+		}
 
 		$this->setState('filter_fileid', $filter_fileid);
 		$app->setUserState($p.'filter_fileid', $filter_fileid);
@@ -506,8 +511,14 @@ class FlexicontentModelItems extends FCModelAdminList
 			$filter_type = $this->getState('filter_type');
 			\Joomla\CMS\Factory::getApplication()->enqueueMessage('Extra column fieldnames: '. implode(', ',array_keys($not_found_fields)) .(!empty($filter_type) ? ' for current type ' : ''). ' were not found, please remove from '.(!empty($filter_type) ? ' type ' : ' component ').' configuration', 'warning');
 		}
+		$_fields_with_access = [];
+		foreach($extra_fields as $field)
+		{
+			if (!$field->has_access) continue;
+			$_fields_with_access[$field->id] = $field;
+		}
 
-		$this->_extra_cols = & $extra_fields;
+		$this->_extra_cols = $_fields_with_access;
 		$this->getExtraColValues();
 		return $this->_extra_cols;
 	}
