@@ -95,7 +95,7 @@ class modFlexigooglemapHelper
 		 */
 
 		$db = \Joomla\CMS\Factory::getDbo();
-		$queryLoc = 'SELECT a.id, a.title, b.field_id, b.value , a.catid '
+		$queryLoc = 'SELECT a.*, b.field_id, b.value '
 			. ', CASE WHEN CHAR_LENGTH(a.alias) THEN CONCAT_WS(\':\', a.id, a.alias) ELSE a.id END as itemslug'
 			. ', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as catslug'
 			. ', ext.type_id as type_id'
@@ -200,7 +200,7 @@ class modFlexigooglemapHelper
 			$config[$module->id]['forced_itemid'] = $params->get('forced_itemid', 0);   // A forced menu item for the links
 
 			// Map directions button (open marker in new window with map directions)
-			$config[$module->id]['usedirection']  = $params->get('usedirection', 0);   // 1: Add the button
+			$config[$module->id]['usedirection']  = (int) $params->get('usedirection', 0);   // 1: Add the button
 			$config[$module->id]['directionname'] = Text::_($params->get('directionname', 'MOD_FLEXIGOOGLEMAP_DIRECTIONNAME_TXT')); // Custom button text for the button
 
 			// The content displayed in the info popup window for the marker
@@ -260,7 +260,7 @@ class modFlexigooglemapHelper
 			$_itemIDs   = [];
 			$_options   = new stdClass();
 			FlexicontentFields::getFields($_item_list);
-			$relitem_html = FlexicontentFields::createItemsListHTML($_params, $_item_list, false, false, $_itemIDs, $_options);
+			$relitem_html = addslashes(FlexicontentFields::createItemsListHTML($_params, $_item_list, false, false, $_itemIDs, $_options));
 		}
 
 		$title = addslashes($item->title);
@@ -271,8 +271,15 @@ class modFlexigooglemapHelper
 		// Popup window: show (button) link to the item view
 		if ($uselink) {
 			$link = $item->link;
-			$link = '<div class="marker_link"><a href="' . $link . '" target="' . $linkmode . '" class="link btn btn-secondary">' . $readmore . '</a></div>';
-			$link = addslashes($link);
+			$link = '
+<div class="marker_readmore">
+	<a href="' . $link . '" target="' . $linkmode . '" class="fc-map-link btn btn-secondary">
+		<span class="fc-map-link-icon"></span>
+		<span class="fc-map-link-text">' . $readmore . '</span>
+	</a>
+</div>
+';
+			$link = addslashes(str_replace(["\r\n", "\n", "\r"], ' ', $link));
 		}
 
 		// Popup window: show address details
@@ -307,8 +314,16 @@ class modFlexigooglemapHelper
 				}
 			}
 
-			$linkdirection = '<div class="marker_directions"><a href="' . $map_link . '" target="_blank" class="direction btn btn-secondary">' . $directionname . '</a></div>';
+			$linkdirection = '
+<div class="marker_directions">
+	<a href="' . $map_link . '" target="_blank" class="fc-map-link btn btn-secondary">
+		<span class="fc-map-link-icon"></span>
+		<span class="fc-map-link-text">	' . $directionname . '</span>
+	</a>
+</div>
+';
 		}
+		$linkdirection = addslashes(str_replace(["\r\n", "\n", "\r"], ' ', $linkdirection));
 
 		// Popup window: custom HTML with replacements or default
 		$contentwindows = $infotextmode
@@ -374,6 +389,21 @@ class modFlexigooglemapHelper
 					$hA = $hS;
 					break;
 			}
+		}
+
+		// Offset the markers, commented out, instead use: overlapping-marker-spiderfier JS
+		static $same_coords_counters = [];
+		$_lat = $coord['lat'];
+		$_lon = $coord['lon'];
+		if (isset($same_coords_counters[$_lat][$_lon]))
+		{
+			$same_coords_counters[$_lat][$_lon]++;
+			$same_coords_counter = $same_coords_counters[$_lat][$_lon];
+			//$coord['lat'] += 0.0001 * $same_coords_counter * rand(-1, 1);
+			//$coord['lon'] += 0.0001 * $same_coords_counter * rand(-1, 1);
+		}
+		else {
+			$same_coords_counters[$_lat][$_lon] = 0;
 		}
 
 		$mapLocations[] = "[

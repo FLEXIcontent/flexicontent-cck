@@ -109,20 +109,12 @@
 					label="MOD_FLEXIGOOGLEMAP_APIKEY" description="MOD_FLEXIGOOGLEMAP_APIKEY_DESC"
 					require="true" showon="mapapi:googlemap"
 				/>
+
+
+
 				<field name="" type="separator" default="MOD_FLEXIGOOGLEMAP_MAP_DISPLAY" level="level1" />
 
-				<field name="" type="separator" default="External container" level="level4"
-					class="alert alert-info fcpadded" />
-				<field
-					name="maptype" type="list" default="ROADMAP"
-					label="MOD_FLEXIGOOGLEMAP_MAPTYPE" description="MOD_FLEXIGOOGLEMAP_MAPTYPE_DESC"
-					showon="mapapi:googlemap"
-				>
-					<option value="ROADMAP">MOD_FLEXIGOOGLEMAP_ROADMAP</option>
-					<option value="HYBRID">MOD_FLEXIGOOGLEMAP_HYBRID</option>
-					<option value="SATELLITE">MOD_FLEXIGOOGLEMAP_SATELLITE</option>
-					<option value="TERRAIN">MOD_FLEXIGOOGLEMAP_TERRAIN</option>
-				</field>
+				<field name="" type="separator" default="Map bounding container" level="level2" />
 				<field
 					name="width" type="text"
 					default="300px" label="MOD_FLEXIGOOGLEMAP_WIDTH"
@@ -130,9 +122,21 @@
 				/>
 				<field
 					name="height" type="text"
-					default="600px" label="MOD_FLEXIGOOGLEMAP_height"
+					default="60vh" label="MOD_FLEXIGOOGLEMAP_height"
 					description="MOD_FLEXIGOOGLEMAP_HEIGHT_DESC"
 				/>
+
+				<field name="" type="separator" default="Map basic configuration" level="level2" />
+				<field
+						name="maptype" type="list" default="ROADMAP"
+						label="MOD_FLEXIGOOGLEMAP_MAPTYPE" description="MOD_FLEXIGOOGLEMAP_MAPTYPE_DESC"
+						showon="mapapi:googlemap"
+				>
+					<option value="ROADMAP">MOD_FLEXIGOOGLEMAP_ROADMAP</option>
+					<option value="HYBRID">MOD_FLEXIGOOGLEMAP_HYBRID</option>
+					<option value="SATELLITE">MOD_FLEXIGOOGLEMAP_SATELLITE</option>
+					<option value="TERRAIN">MOD_FLEXIGOOGLEMAP_TERRAIN</option>
+				</field>
 				<field
 					name="maxzoommarker" type="number"
 					default="18" label="MOD_FLEXIGOOGLEMAP_MAXZOOMMARKER"
@@ -201,7 +205,7 @@
 						default="10" label="Near Me zoom default"
 						description="Default zoom level for near-me locations"
 						min="2"
-						max="15"
+						max="17"
 						step="1"
 				/>
 
@@ -314,7 +318,7 @@
 				/>
 				<field
 					name="maxzoom" type="text"
-					default="18" label="MOD_FLEXIGOOGLEMAP_MAXZOOM"
+					default="17" label="MOD_FLEXIGOOGLEMAP_MAXZOOM"
 					description="MOD_FLEXIGOOGLEMAP_MAXZOOM_DESC"
 					showon="clustermode:1"
 				/>
@@ -410,6 +414,34 @@
 					<option value="0">FLEXI_NO</option>
 					<option value="1">FLEXI_YES</option>
 				</field>
+
+				<field
+						name="marker_list_update_to_map_bounds" type="radio"
+						default="1" label="Sync markers List to visible markers"
+						description="Sync markers List to display only markers visible in the map bounds"
+						class="btn-group btn-group-yesno"
+				>
+					<option value="0">FLEXI_NO</option>
+					<option value="1">FLEXI_YES</option>
+				</field>
+
+				<field name="" type="separator" default="Marker list wrapping" level="level3" />
+				<field name="" type="separator" default="Limit at which marker list will be wrapped" level="level4" class="alert alert-info fcpadded" />
+				<field
+						name="marker_list_wrap_limit" type="text"
+						default="1200" label="Marker list container wrap limit (pixels)"
+						filter="int"
+						description="At this width the marker list will wrap to the bottom of the map" />
+				<field
+						name="map_height_wrapped" type="text"
+						default="45vh" label="Height when wrapped (Map)"
+						description="MOD_FLEXIGOOGLEMAP_HEIGHT_DESC"
+				/>
+				<field
+						name="marker_list_height_wrapped" type="text"
+						default="45vh" label="Height when wrapped (Marker-list)"
+						description="MOD_FLEXIGOOGLEMAP_HEIGHT_DESC"
+				/>
 
 				<field name="" type="separator" default="Markers List options" level="level2" />
 
