@@ -2381,7 +2381,9 @@ HTML;
 
 	<script>
 	  jQuery(document).ready(function() {
-		  var clipboard = new ClipboardJS('a.btn-copy-url');
+		  if (jQuery('a.btn-copy-url').length) {
+			  var clipboard = new ClipboardJS('a.btn-copy-url');
+		  }
 	  });
 	</script>
 
