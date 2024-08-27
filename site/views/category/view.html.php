@@ -246,7 +246,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		// Bind Fields to items and RENDER their display HTML, but check for document type, due to Joomla issue with system
 		// plugins creating \Joomla\CMS\Document\Document in early events forcing it to be wrong type, when format as url suffix is enabled
 		// *******************************************************************************************************************
-		
+
 		foreach($items as $item)
 		{
 			$item->force_full = (int) $params->get('force_full', 0);
@@ -277,10 +277,10 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		 * if not a author id or tag id do not match the menu item !
 		 */
 		$menu_is_specific = $menu_matches && (
-			($layout !== 'author' && $layout !== 'tags') ||
-			($layout === 'author' && $authorid == @$menu->query['authorid']) ||
-			($layout === 'tags' && $tagid == @$menu->query['tagid'])
-		);
+				($layout !== 'author' && $layout !== 'tags') ||
+				($layout === 'author' && $authorid == @$menu->query['authorid']) ||
+				($layout === 'tags' && $tagid == @$menu->query['tagid'])
+			);
 
 		// MENU ITEM matched, use its page heading (but use menu title if the former is not set)
 		if ( $menu_is_specific )
@@ -290,8 +290,8 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 			// Cross set (show_) page_heading / page_title for compatibility of J2.5+ with J1.5 template (and for J1.5 with J2.5 template)
 			$params->def('page_heading', $params->get('page_title',   $default_heading));
 			$params->def('page_title',   $params->get('page_heading', $default_heading));
-		  $params->def('show_page_heading', $params->get('show_page_title',   0));
-		  $params->def('show_page_title',   $params->get('show_page_heading', 0));
+			$params->def('show_page_heading', $params->get('show_page_title',   0));
+			$params->def('show_page_title',   $params->get('show_page_heading', 0));
 		}
 
 		// MENU ITEM did not match, clear page title (=browser window title) and page heading so that they are calculated below
@@ -320,7 +320,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 			// Set both (show_) page_heading / page_title for compatibility of J2.5+ with J1.5 template (and for J1.5 with J2.5 template)
 			$params->set('page_title',   $default_heading);
 			$params->set('page_heading', $default_heading);
-		  $params->set('show_page_heading', $show_default_heading);
+			$params->set('show_page_heading', $show_default_heading);
 			$params->set('show_page_title',   $show_default_heading);
 		}
 
@@ -347,7 +347,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 
 
 		/**
-		 * Render a basic display for filter value data 
+		 * Render a basic display for filter value data
 		 */
 		FlexicontentFields::getBasicFilterData($category, $filters);
 
@@ -664,9 +664,9 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		// *** Get some variables needed for images
 		// ***
 
-		$joomla_image_path = FLEXI_J40GE 
-            ?	ComponentHelper::getParams('com_media')->get('image_path', 'images') 
-            : $app->getCfg('image_path', '');
+		$joomla_image_path = FLEXI_J40GE
+			?	ComponentHelper::getParams('com_media')->get('image_path', 'images')
+			: $app->getCfg('image_path', '');
 		$joomla_image_path = $joomla_image_path ? $joomla_image_path.DS : '';
 		$joomla_image_url  = '';//$joomla_image_url  ? $joomla_image_url.'/' : ''; // NEED REVIEW
 		$phpThumbURL = $this->baseurl.'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=';
@@ -1012,9 +1012,21 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		{
 			$pageNav  = $this->get('pagination');
 
+			// *** Add layout vars to pagination
+			foreach($layout_vars as $i => $v)
+			{
+				if (isset($menu->query[$i]) && $menu->query[$i] === $v)
+				{
+					continue;
+				}
+				if ($v) $pageNav->setAdditionalUrlParam($i, $v);
+			}
+
+
 			// URL-encode filter values
 			$_revert = array('%21'=>'!', '%2A'=>'*', '%27'=>"'", '%28'=>'(', '%29'=>')');
 
+			// *** Add filter values to pagination
 			foreach($jinput->get->get->getArray() as $i => $v)
 			{
 				if (isset($menu->query[$i]) && $menu->query[$i] === $v)
