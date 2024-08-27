@@ -433,8 +433,8 @@ fc_plupload = function(options)
 			')
 			.prepend('\
 			<div class="btn-group" style="margin: 12px; float: right;">\
-				<button type="button" class="btn list-view hasTooltip active" id="btn-upload-list-view" onclick="fc_toggle_view_mode(jQuery(this)); jQuery(this).next().removeClass(\'active\'); jQuery(this).addClass(\'active\'); jQuery(this).closest(\'.plupload_scroll\').parent().removeClass(\'fc_uploader_thumbs_view\');" data-toggle_selector=".fc_uploader_list_element" style="width: 24px;" title="Details"><i class="icon-list-view"></i></button>\
-				<button type="button" class="btn grid-view hasTooltip" id="btn-upload-grid-view" onclick="fc_toggle_view_mode(jQuery(this)); jQuery(this).prev().removeClass(\'active\'); jQuery(this).addClass(\'active\'); jQuery(this).closest(\'.plupload_scroll\').parent().addClass(\'fc_uploader_thumbs_view\');" data-toggle_selector=".fc_uploader_grid_element" style="width: 24px;" title="Grid"><i class="icon-grid-view"></i></button>\
+				<button type="button" class="btn list-view hasTooltip active" id="btn-upload-list-view" onclick="fc_toggle_view_mode(jQuery(this)); jQuery(this).next().removeClass(\'active\'); jQuery(this).addClass(\'active\'); jQuery(this).closest(\'.plupload_scroll\').parent().removeClass(\'fc_uploader_thumbs_view\');" data-toggle_selector=".fc_uploader_list_element" style="min-width:32px;" title="Details"><i class="icon-list-view"></i></button>\
+				<button type="button" class="btn grid-view hasTooltip" id="btn-upload-grid-view" onclick="fc_toggle_view_mode(jQuery(this)); jQuery(this).prev().removeClass(\'active\'); jQuery(this).addClass(\'active\'); jQuery(this).closest(\'.plupload_scroll\').parent().addClass(\'fc_uploader_thumbs_view\');" data-toggle_selector=".fc_uploader_grid_element" style="min-width:32px;" title="Grid"><i class="icon-grid-view"></i></button>\
 			</div>\
 			');
 		}

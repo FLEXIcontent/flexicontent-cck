@@ -17,6 +17,9 @@
  */
 
 use Joomla\CMS\Component\ComponentHelper;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Uri\Uri;
 
 defined('_JEXEC') or die('Restricted access');
 
@@ -41,9 +44,20 @@ $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
 $disabled = $this->row->url ? '' : ' disabled="disabled"';
 ?>
 
-
+<script>
+	function handleFormSumbit(form)
+	{
+		if (form.file_replacement.value != '')
+		{
+			file_replacement_box_info.style.display = 'block';
+			file_replacement_box_input.style.display = 'none';
+			return false;
+		}
+		return true;
+	}
+</script>
 <div id="flexicontent" class="flexicontent">
-<form action="index.php" method="post" name="adminForm" id="adminForm" class="form-validate form-horizontal">
+<form action="index.php" method="post" name="adminForm" id="adminForm" class="form-validate form-horizontal" onsubmit="handleFormSumbit(this)" enctype="multipart/form-data">
 
 	<table class="fc-form-tbl">
 
@@ -102,7 +116,7 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 													<img alt="{$preview_alt}" src="{$value_src}" data-juri-root="{$juri_root}" class="inline-preview-img" style="max-width:300px"/>
 												</div>
 												<div class="input-group">
-													<input class="form-control input-group-prepend" type="text" readonly="" style="min-width: min(500px, 80vw); max-width:1020px" value="{$this->row->filename}" id="filename" name="filename" placeholder="{$file_placeholder_text}" />
+													<input class="form-control input-group-prepend" type="text" readonly="" style="background:#eee; border:1px solid #aaa; min-width: min(500px, 80vw); max-width:1020px" value="{$this->row->filename}" id="filename" name="filename" placeholder="{$file_placeholder_text}" />
 													{$select_file_btn}
 													<button type="button" href="#" title="Clear" class="form-control btn input-group-append fit-contents clear-btn" onclick="{$file_clear_value_js}"><i class="icon-cancel"></i></button>
 												</div>
@@ -191,8 +205,8 @@ HTML;
 				else :
 
 					echo '
-					<input type="text" id="filename" name="filename" value="' . $this->row->filename . '" class="input-xxlarge required" maxlength="4000"
-					' . ((int)$this->row->url === 0 ? ' readonly="readonly" ' : '') . '
+					<input type="text" id="filename" name="filename" value="' . $this->row->filename . '" class="input-xxlarge input-xxl required" maxlength="4000"
+					' . ((int)$this->row->url === 0 ? ' readonly="readonly" style="background:#eee; border:1px solid #aaa" ' : '') . '
 					/>
 					';
 
@@ -289,6 +303,33 @@ HTML;
 			</tr>
 
 		<?php endif; ?>
+
+
+		<?php if (!$this->row->url) : ?>
+
+		<tr><td colspan="2"></td></tr>
+
+		<tr>
+			<td class="key">
+				<span class="label text-white bg-error label-warning"><?php echo \Joomla\CMS\Language\Text::_( 'Upload & Replace' ); ?></span> &nbsp;
+			</td>
+			<td>
+				<div id="file_replacement_box">
+					<div id="file_replacement_box_input">
+						<div style="display: flex; gap: 24px;">
+							<div class="alert alert-info" style="margin:0">Maximum file size: <?php echo min(ini_get('upload_max_filesize'), ini_get('post_max_size')); ?></div>
+							<input type="file" id="file_replacement" name="file_replacement" class="input-xxlarge" />
+						</div>
+						<input type="checkbox" id="keep_uploaded_date" name="keep_uploaded_date" /> <label for="keep_uploaded_date">Keep old upload date</label><br>
+						<input type="checkbox" id="keep_uploaded_by" name="keep_uploaded_by" /> <label for="keep_uploaded_by">Keep old uploader (user)</label><br>
+					</div>
+					<div id="file_replacement_box_info" style="display:none;">
+						<div class="fc_loading_msg alert alert-info"> &nbsp; &nbsp; <?php echo Text::_('FLEXI_UPLOADING') .' ... '. Text::_('FLEXI_PLEASE_WAIT'); ?></div>
+					</div>
+				</div>
+			</td>
+		</tr>
+	<?php endif; ?>
 
 
 		<tr>

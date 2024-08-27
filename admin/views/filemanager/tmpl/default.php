@@ -1211,7 +1211,9 @@ if ($js)
 											<?php
 											echo $row->id;
 											$urlvars = ['id' => $row->id]; // ['id' => $row->id, 'cid' => 0, 'fid' => 0];  // cid : content item id, fid : field id, id : file id
-											$link = trim(Uri::root(), '/') . flexicontent_html::getSefUrl(FlexicontentHelperRoute::getTaskRoute($row->id, 'download_file', 0, $urlvars), $xhtml = true, $ssl = null);
+											$link = flexicontent_html::getSefUrl(FlexicontentHelperRoute::getTaskRoute($row->id, 'download_file', 0, $urlvars), $xhtml = true, $ssl = null);
+											$link = trim(Uri::root(), '/') . str_replace(Uri::root(true), '', $link);
+
 											echo '
 											<a href="javascript:;" onclick="jQuery(\'#copyUrlModal\').find(\'.linkbox\').html(\''.$link.'\')"
 												class="toolbar btn btn-info btn-copy-url" data-clipboard-text="'.$link.'"

@@ -11,9 +11,12 @@
 
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
+use Joomla\Filesystem\File;
+use Joomla\Filesystem\Path;
 
 JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php');
 
@@ -193,6 +196,61 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$data['secure'] = $data['secure'] ? 1 : 0;   // Only allow 1 or 0
 		$data['stamp']  = $data['stamp'] ? 1 : 0;   // only allow 1 or 0
 		$data['url']    = in_array((int) $data['url'], array(0, 1, 2)) ? (int) $data['url'] : 0;   // only allow 2 or 1 or 0
+
+		// Check if we are replacing the file with a new one
+		$Filedata = $this->input->files->get('file_replacement');
+
+		// Check if an existing file is being replaced with a new one (and current file is not a URL)
+		if (!$isnew && $Filedata && $data['url'] == 0)
+		{
+			// Prepare the handling of the uploaded file via the upload task
+			$this->runMode = 'interactive';
+			$this->input->set('file-ffname', 'file_replacement');
+			$Fobj = (object) $data;
+			$upload_errors = null;
+
+			// Find the old file path before getting new file data from $Fobj
+			$path = $data['secure'] ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;  // JPATH_ROOT . DS . <media_path | file_path>
+			$oldFilepath      = Path::clean($path . DS . $data['filename']);
+			$oldFilepath_temp = Path::clean($path . DS . $data['filename'] . '__temp.old');
+
+			// Rename the old file to a temporary name, to avoid conflicts with the new file
+			$existingWasRenamed = file_exists($oldFilepath) && !file_exists($oldFilepath_temp);
+			if ($existingWasRenamed) rename($oldFilepath, $oldFilepath_temp);
+
+			// Handle the uploaded file but without creating a new file record in the database ($Fobj (= File object) is not NULL)
+			try {
+				$__file_id = $this->upload($Fobj, $upload_errors);
+			} catch (Throwable $e) {
+				$__file_id = 0;
+				if ($existingWasRenamed) rename($oldFilepath_temp, $oldFilepath);
+				$app->enqueueMessage($e->getMessage(), 'warning');
+			}
+
+			// IF $__file_id is NOT false or zero, then the file was uploaded successfully
+			if ($__file_id)	{
+				// Get the modified file record data that now refer to the newly uploaded file
+				$data = (array) $Fobj;
+
+				$newFilepath = Path::clean($path . DS . $data['filename']);
+
+				// Delete the old file path
+				if ($newFilepath != $oldFilepath || $existingWasRenamed)
+				{
+					try {
+						$existingWasRenamed ? unlink($oldFilepath_temp) : unlink($oldFilepath);
+						$app->enqueueMessage(\Joomla\CMS\Language\Text::_('Old file was deleted. New file was assigned to file ID: '. $__file_id), 'message');
+					}
+					catch (Throwable $e) { $app->enqueueMessage($e->getMessage(), 'warning'); }
+				}
+
+			}
+			// If we failed to upload the new file, then restore the old file
+			elseif ($existingWasRenamed)
+			{
+				rename($oldFilepath_temp, $oldFilepath);
+			}
+		}
 
 		// Get extensions allowed by configuration, and intersect them with desired extensions
 		$allowed_exts = preg_split("/[\s]*,[\s]*/", strtolower($params->get('upload_extensions', 'bmp,wbmp,csv,doc,docx,webp,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,txt,xcf,xls,xlsx,zip,ics')));
@@ -432,7 +490,8 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 		// Force interactive run mode, if given parameters
 		$this->runMode = $Fobj ? 'interactive' : $this->runMode;
-		$file_id = 0;
+		$file_id  = 0;  // Set it to 0 to indicate an error if we return early
+		$field_id = 0;  // will be set below
 
 		// Force JSON format for 'uploads' task
 		$this->format = $this->format != '' ? $this->format : ($this->task === 'uploads' ? 'json' : 'html');
@@ -482,8 +541,8 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		else
 		{
 			// Default field <input type="file" is name="Filedata" ... get the file
-			$ffname = $this->input->get('file-ffname', 'Filedata', 'cmd');
-			$file   = $this->input->files->get($ffname, '', 'array');
+			$ffname = $this->input->get('file-ffname', 'Filedata', 'string');
+			$file   = $this->input->files->get($ffname, '', 'raw');
 
 			// Refactor the array swapping positions
 			$file = $this->refactorFilesArray($file);
@@ -782,13 +841,23 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		// Upload Successful
 		// *****************
 
-		$fileObj = new stdClass;
-		$fileObj->id = $file_id = 0;
+		$fileObj = $Fobj ?: new stdClass;
+		$fileObj->id = $Fobj ? $fileObj->id : 0;
+
+		// In case of existing FILE object, get the file id
+		$file_id = $fileObj->id;
 
 		$fileObj->filename          = $filename;
-		$fileObj->filename_original = $filename_original;
-		$fileObj->altname           = $filetitle ? $filetitle : $filename_original;
+		$fileObj->filename_original = $Fobj ? $fileObj->filename_original : $filename_original;
+		$fileObj->altname           = $Fobj ? $fileObj->altname : ($filetitle ?: $filename_original);
 		$fileObj->estorage_fieldid  = $estorage_mode === 'FTP' ? $fieldid : 0;
+
+		$fileObj->size        = $filesize;
+		$fileObj->uploaded    = $Fobj && $this->input->get('keep_uploaded_date') ? $Fobj->uploaded : Factory::getDate('now')->toSql();  // We reset date if file is replaced
+		$fileObj->uploaded_by = $Fobj && $this->input->get('keep_uploader_by')   ? $Fobj->uploaded_by : $user->get('id');
+
+		// File object exists, we are replacing the file
+		if ($fileObj->id) return $this->terminate($file_id, $exitMessages);
 
 		$fileObj->url         = 0;
 		$fileObj->secure      = $secure;
@@ -798,11 +867,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$fileObj->description = $filedesc;
 		$fileObj->language    = strlen($filelang) ? $filelang : '*';
 		$fileObj->access      = strlen($fileaccess) ? $fileaccess : 1;
-
 		$fileObj->hits        = 0;
-		$fileObj->size        = $filesize;
-		$fileObj->uploaded    = \Joomla\CMS\Factory::getDate('now')->toSql();
-		$fileObj->uploaded_by = $user->get('id');
 
 		// A. Database mode
 		if ($file_mode == 'db_mode')
