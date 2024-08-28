@@ -543,18 +543,20 @@ if ($std_builder_layout_num)
 					</div>
 					<?php endif; ?>
 
-				</div> <!-- EOF item's content -->
-				<?php endif; ?>
-
-				<?php echo $content_layout_feat==2 ? $captured_image : '';?>
-
-				<?php if ($mod_readmore_feat) : ?>
+					<?php if ($mod_readmore_feat) : ?>
 					<div class="fc_block">
 						<div class="fcitem_readon">
 							<a href="<?php echo $item->link; ?>" class="readon btn"><span><?php echo \Joomla\CMS\Language\Text::_('FLEXI_MOD_READ_MORE'); ?></span></a>
 						</div>
 					</div>
 					<?php endif; ?>
+
+				</div> <!-- EOF item's content -->
+				<?php endif; ?>
+
+				<?php echo $content_layout_feat==2 ? $captured_image : '';?>
+
+				
 			<?php endif; /* EOF: Content display via Parameter-based Layout */ ?>
 
 
@@ -851,18 +853,20 @@ if ($std_builder_layout_num)
 					</div>
 					<?php endif; ?>
 
-				</div> <!-- EOF item's content -->
-				<?php endif; ?>
-
-				<?php echo $content_layout==2 ? $captured_image : '';?>
-
-				<?php if ($mod_readmore) : ?>
+					<?php if ($mod_readmore) : ?>
 					<div class="fc_block readmore">
 						<div class="fcitem_readon">
 							<a href="<?php echo $item->link; ?>" class="readon btn"><span><?php echo \Joomla\CMS\Language\Text::_('FLEXI_MOD_READ_MORE'); ?></span></a>
 						</div>
 					</div>
 					<?php endif; ?>
+
+				</div> <!-- EOF item's content -->
+				<?php endif; ?>
+
+				<?php echo $content_layout==2 ? $captured_image : '';?>
+
+				
 
 			<?php endif; /* EOF: Content display via Parameter-based Layout */ ?>
 

@@ -61,11 +61,11 @@ $ibox_background_color_feat = $this->params->get('ibox_background_color_feat', '
 
 
 // Item Dimensions standard
-$ibox_inner_inline_css = (int)$this->params->get('ibox_inner_inline_css', 0);
-$ibox_padding_top_bottom = (int)$this->params->get('ibox_padding_top_bottom', 8);
-$ibox_padding_left_right = (int)$this->params->get('ibox_padding_left_right', 12);
-$ibox_margin_top_bottom = (int)$this->params->get('ibox_margin_left_right', 4);
-$ibox_margin_left_right = (int)$this->params->get('ibox_margin_left_right', 4);
+$ibox_inner_inline_css = $this->params->get('ibox_inner_inline_css', 0);
+$ibox_padding_top_bottom = $this->params->get('ibox_padding_top_bottom', 8);
+$ibox_padding_left_right = $this->params->get('ibox_padding_left_right', 12);
+$ibox_margin_top_bottom = $this->params->get('ibox_margin_left_right', 4);
+$ibox_margin_left_right = $this->params->get('ibox_margin_left_right', 4);
 $ibox_border_width = (int)$this->params->get('ibox_border_width', 1);
 $ibox_background_color = $this->params->get('ibox_background_color', '');
 
@@ -79,15 +79,15 @@ $item_img_fit_feat = $this->params->get('img_fit_feat', 1);   // 0: Auto-fit, 1:
 
 switch ($content_layout_feat) {
 	case 0: case 1:
-		$img_container_class_feat = ($content_layout_feat==0 ? 'fc_float_left' : 'fc_float_right');
+		$container_class_feat = ($content_layout_feat==0 ? 'fc_float_left' : 'fc_float_right');
 		$content_container_class_feat = 'fc_floated';
 		break;
 	case 2: case 3:
-		$img_container_class_feat = 'fc_stretch fc_clear';
+		$container_class_feat = 'fc_stretch fc_clear';
 		$content_container_class_feat = '';
 		break;
 	case 4: case 5: case 6:
-		$img_container_class_feat = 'fc_stretch';
+		$container_class_feat = 'fc_stretch';
 		$content_container_class_feat = 'fc_overlayed '
 			.($content_layout_feat==4 ? 'fc_top' : '')
 			.($content_layout_feat==5 ? 'fc_bottom' : '')
@@ -96,7 +96,7 @@ switch ($content_layout_feat) {
 		if ($content_display_feat >= 1) $content_container_class_feat .= ' fc_auto_show';
 		if ($content_display_feat == 1) $content_container_class_feat .= ' fc_show_active';
 		break;
-	default: $img_container_class_feat = '';  break;
+	default: $container_class_feat = '';  break;
 }
 
 
@@ -110,15 +110,15 @@ $item_img_fit = $this->params->get('img_fit', 1);   // 0: Auto-fit, 1: Auto-fit 
 
 switch ($content_layout) {
 	case 0: case 1:
-		$img_container_class = ($content_layout==0 ? 'fc_float_left' : 'fc_float_right');
+		$container_class = ($content_layout==0 ? 'fc_float_left' : 'fc_float_right');
 		$content_container_class = 'fc_floated';
 		break;
 	case 2: case 3:
-		$img_container_class = 'fc_stretch fc_clear';
+		$container_class = 'fc_stretch fc_clear';
 		$content_container_class = '';
 		break;
 	case 4: case 5: case 6:
-		$img_container_class = 'fc_stretch';
+		$container_class = 'fc_stretch';
 		$content_container_class = 'fc_overlayed '
 			.($content_layout==4 ? 'fc_top' : '')
 			.($content_layout==5 ? 'fc_bottom' : '')
@@ -127,7 +127,7 @@ switch ($content_layout) {
 		if ($content_display >= 1) $content_container_class .= ' fc_auto_show';
 		if ($content_display == 1) $content_container_class .= ' fc_show_active';
 		break;
-	default: $img_container_class = '';  break;
+	default: $container_class = '';  break;
 }
 
 
@@ -195,6 +195,8 @@ if ($lead_link_to_popup || $intro_link_to_popup) {
 // MICRODATA 'itemtype' for ALL items in the listing (this is the fallback if the 'itemtype' in content type / item configuration are not set)
 $microdata_itemtype_cat = $this->params->get( 'microdata_itemtype_cat', 'Article' );
 
+
+
 // ITEMS as MASONRY tiles
 if (!empty($this->items) && ($load_masonry_feat || $load_masonry_std))
 {
@@ -223,7 +225,10 @@ if (!empty($this->items) && ($load_masonry_feat || $load_masonry_std))
 			// initialize Masonry after all images have loaded
 			if (container_intro) {
 				imagesLoaded( container_intro, function() {
-					msnry_intro = new Masonry( container_intro );
+					msnry_intro = new Masonry( container_intro , {
+	 				gutter: 20,
+					percentPosition: true
+					});
 				});
 			}
 		";
@@ -487,13 +492,13 @@ if ($leadnum) :
 			?>
 
 			<!-- BOF item -->	
-			<div class="fc-item-block-featured-wrapper<?php echo $do_hlight_feat; ?> <?php echo ($force_content_height_feat == 1) ? 'd-flex' : '' ;?>"
+			<div class="fc-item-block-featured-wrapper<?php echo $do_hlight_feat; ?> <?php echo ($force_content_height_feat == 1) ? 'd-flex' : '' ;?> <?php echo ($load_masonry_feat == 1) ? 'masonry' : '';?>"
 				<?php echo $microdata_itemtype_code; ?>
 				id="fc_newslist_item_<?php echo $i; ?>"
 			>
 			<div class="fc-item-block-featured-wrapper-innerbox <?php echo $fc_item_classes; ?>" >
 
-			<article class="fc-item-article-featured">
+			<article class="fc-item-featured <?php echo $container_class_feat;?>">
 
 				<!-- BOF beforeDisplayContent -->
 				<?php if ($item->event->beforeDisplayContent) : ?>
@@ -515,6 +520,7 @@ if ($leadnum) :
 				<?php endif; ?>
 
 				<?php if ($this->params->get('show_editbutton', 1)) : ?>
+					
 
 					<?php $editbutton = flexicontent_html::editbutton( $item, $this->params ); ?>
 					<?php if ($editbutton) : ?>
@@ -585,7 +591,7 @@ if ($leadnum) :
 
 					<?php if (!empty($item->image_rendered)) : ?>
 
-						<figure class="image_featured <?php echo $img_container_class_feat;?>">
+						<figure class="image_featured">
 							<?php if ($lead_link_image) : ?>
 								<a href="<?php echo $link_url; ?>">
 									<?php echo $item->image_rendered; ?>
@@ -597,7 +603,7 @@ if ($leadnum) :
 
 					<?php elseif (!empty($item->image)) : ?>
 
-						<figure class="image_featured <?php echo $img_container_class_feat;?>">
+						<figure class="image_featured">
 							<?php if ($lead_link_image) : ?>
 								<a href="<?php echo $link_url; ?>">
 									<img style="<?php echo $img_force_dims_css_feat; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($title_encoded, 60); ?> <?php echo $lazy_loading; ?>" />
@@ -748,16 +754,40 @@ if ($leadnum) :
 					$readmore_shown  = $this->params->get('show_readmore', 1) && ($uncut_length > $lead_cut_text || strlen(trim($item->fulltext)) >= 1);
 					$readmore_shown  = $readmore_shown || $readmore_forced;
 					$footer_shown = $readmore_shown || $item->event->afterDisplayContent;
-					$readmore_align = $this->params->get('readmore_align', 'center');
+					$readmore_align_feat = $this->params->get('readmore_align_feat', 'center');
 
 					if ($lead_link_to_popup) $_tmpl_ = (strstr($link_url, '?') ? '&' : '?'). 'tmpl=component';
 					?>
 
-					<?php if ( $footer_shown ) : ?>
+					<!-- Move the 'Read More' button based on the value of placement. 0/1: floated (right/left), 2/3: cleared (above/below), 4/5/6: overlayed (top/bottom/full) -->
+
+					<?php if ( $footer_shown && $content_layout_feat == 0 || $content_layout_feat == 1 || $content_layout_feat == 4 || $content_layout_feat == 5 || $content_layout_feat == 6 ) : ?>
 					<footer class="fc_block">
 					<?php endif; ?>
+					<?php if ($readmore_shown && $content_layout_feat == 0 || $content_layout_feat == 1 || $content_layout_feat == 4 || $content_layout_feat == 5 || $content_layout_feat == 6) : ?>
+						<div class="fcitem_readon readmore <?php echo $readmore_align_feat; ?>">
+							<a href="<?php echo $link_url; ?>" class="<?php echo $readon_class; ?>" itemprop="url" <?php echo ($lead_link_to_popup ? 'onclick="var url = jQuery(this).attr(\'href\')+\''.$_tmpl_.'\'; fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;"' : '');?> >
+								<?php
+								$read_more_text = $item->params->get('readmore')  ?  $item->params->get('readmore') : \Joomla\CMS\Language\Text::sprintf('FLEXI_READ_MORE', $item->title);
+								echo $readon_type === 1
+									? '<img src="' . $readon_image . '" alt="' . \Joomla\CMS\Language\Text::sprintf('FLEXI_READ_MORE', $item->title) . '" />'
+									: '<span class="icon-chevron-right"></span> ' . $read_more_text;
+								?>
+							</a>
+						</div>
+					<?php endif; ?>
 
-					<?php if ($readmore_shown) : ?>
+
+					<?php if ( $footer_shown && $content_layout_feat == 0 || $content_layout_feat == 1 || $content_layout_feat == 4 || $content_layout_feat == 5 || $content_layout_feat == 6) : ?>
+					</footer>
+					<?php endif; ?>
+
+				</div> <!-- EOF item's content -->
+
+				<?php if ( $footer_shown && $content_layout_feat == 2 || $content_layout_feat == 3 ) : ?>
+					<footer class="fc_block">
+					<?php endif; ?>
+					<?php if ($readmore_shown && $content_layout_feat == 2 || $content_layout_feat == 3 ) : ?>
 						<div class="fcitem_readon readmore <?php echo $readmore_align; ?>">
 							<a href="<?php echo $link_url; ?>" class="<?php echo $readon_class; ?>" itemprop="url" <?php echo ($lead_link_to_popup ? 'onclick="var url = jQuery(this).attr(\'href\')+\''.$_tmpl_.'\'; fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;"' : '');?> >
 								<?php
@@ -770,19 +800,20 @@ if ($leadnum) :
 						</div>
 					<?php endif; ?>
 
-					<!-- BOF afterDisplayContent -->
-					<?php if ($item->event->afterDisplayContent) : ?>
+
+					<?php if ( $footer_shown && $content_layout_feat == 2 || $content_layout_feat == 3 ) : ?>
+					</footer>
+					<?php endif; ?>
+
+				
+
+				<!-- BOF afterDisplayContent -->
+				<?php if ($item->event->afterDisplayContent) : ?>
 						<aside class="fc_afterDisplayContent">
 							<?php echo $item->event->afterDisplayContent; ?>
 						</aside>
 					<?php endif; ?>
 					<!-- EOF afterDisplayContent -->
-
-					<?php if ( $footer_shown ) : ?>
-					</footer>
-					<?php endif; ?>
-
-				</div> <!-- EOF item's content -->
 
 				<?php echo $content_layout_feat==2 ? $captured_image : '';?>
 
@@ -1001,13 +1032,13 @@ if ($count > $leadnum) :
 			?>
 
 			<!-- BOF item -->	
-			<div class="fc-item-block-standard-wrapper<?php echo $do_hlight; ?> <?php echo ($force_content_height_stan == 1) ? 'd-flex' : '' ;?>"
+			<div class="fc-item-block-standard-wrapper<?php echo $do_hlight; ?> <?php echo ($force_content_height_stan == 1) ? 'd-flex' : '' ;?> <?php echo ($load_masonry_std == 1) ? 'masonry' : '';?>"
 				<?php echo $microdata_itemtype_code; ?>
 				id="fc_newslist_item_<?php echo $i; ?>"
 			>
-			<div class="fc-item-block-standard-wrapper-innerbox <?php echo $fc_item_classes; ?>" >
+			<div class="fc-item-block-standard-wrapper-innerbox <?php echo $fc_item_classes; ?> " >
 
-			<article class="fc-item-standard">
+			<article class="fc-item-standard <?php echo $container_class;?>">
 
 				<!-- BOF beforeDisplayContent -->
 				<?php if ($item->event->beforeDisplayContent) : ?>
@@ -1099,7 +1130,7 @@ if ($count > $leadnum) :
 
 					<?php if (!empty($item->image_rendered)) : ?>
 
-						<figure class="image_standard <?php echo $img_container_class;?>">
+						<figure class="image_standard">
 							<?php if ($intro_link_image) : ?>
 								<a href="<?php echo $link_url; ?>">
 									<?php echo $item->image_rendered; ?>
@@ -1112,7 +1143,7 @@ if ($count > $leadnum) :
 
 					<?php elseif (!empty($item->image)) : ?>
 
-						<figure class="image_standard <?php echo $img_container_class;?>">
+						<figure class="image_standard">
 							<?php if ($intro_link_image) : ?>
 								<a href="<?php echo $link_url; ?>">
 									<img style="<?php echo $img_force_dims_css; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($title_encoded, 60); ?>" <?php echo $lazy_loading; ?> />
@@ -1266,19 +1297,15 @@ if ($count > $leadnum) :
 					if ($intro_link_to_popup) $_tmpl_ = (strstr($link_url, '?') ? '&' : '?'). 'tmpl=component';
 					?>
 
-					
- 
 
-				</div> <!-- EOF item's content -->
+					<!-- Move the 'Read More' button based on the value of placement. 0/1: floated (right/left), 2/3: cleared (above/below), 4/5/6: overlayed (top/bottom/full) -->
 
-				<?php echo $content_layout==2 ? $captured_image : '';?>
-				<?php if ( $footer_shown ) : ?>
+					<?php if ( $footer_shown && $content_layout == 0 || $content_layout == 1 || $content_layout == 4 || $content_layout == 5 || $content_layout == 6) : ?>
 					<footer class="fc_block">
 					<?php endif; ?>
-
-					<?php if ($readmore_shown) : ?>
+					<?php if ($readmore_shown && $content_layout == 0 || $content_layout == 1 || $content_layout == 4 || $content_layout == 5 || $content_layout == 6) : ?>
 						<div class="fcitem_readon readmore <?php echo $readmore_align; ?>">
-							<a href="<?php echo $link_url; ?>" class="<?php echo $readon_class; ?>" itemprop="url" <?php echo ($intro_link_to_popup ? 'onclick="var url = jQuery(this).attr(\'href\')+\''.$_tmpl_.'\'; fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;"' : '');?> >
+							<a href="<?php echo $link_url; ?>" class="<?php echo $readon_class; ?>" itemprop="url" <?php echo ($lead_link_to_popup ? 'onclick="var url = jQuery(this).attr(\'href\')+\''.$_tmpl_.'\'; fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;"' : '');?> >
 								<?php
 								$read_more_text = $item->params->get('readmore')  ?  $item->params->get('readmore') : \Joomla\CMS\Language\Text::sprintf('FLEXI_READ_MORE', $item->title);
 								echo $readon_type === 1
@@ -1289,17 +1316,45 @@ if ($count > $leadnum) :
 						</div>
 					<?php endif; ?>
 
-					<!-- BOF afterDisplayContent -->
-					<?php if ($item->event->afterDisplayContent) : ?>
+
+					<?php if ( $footer_shown && $content_layout == 0 || $content_layout == 1 || $content_layout == 4 || $content_layout == 5 || $content_layout == 6) : ?>
+					</footer>
+					<?php endif; ?>
+
+				</div> <!-- EOF item's content -->
+
+				<?php if ( $footer_shown && $content_layout == 2 || $content_layout == 3) : ?>
+					<footer class="fc_block">
+					<?php endif; ?>
+					<?php if ($readmore_shown && $content_layout == 2 || $content_layout == 3) : ?>
+						<div class="fcitem_readon readmore <?php echo $readmore_align; ?>">
+							<a href="<?php echo $link_url; ?>" class="<?php echo $readon_class; ?>" itemprop="url" <?php echo ($lead_link_to_popup ? 'onclick="var url = jQuery(this).attr(\'href\')+\''.$_tmpl_.'\'; fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;"' : '');?> >
+								<?php
+								$read_more_text = $item->params->get('readmore')  ?  $item->params->get('readmore') : \Joomla\CMS\Language\Text::sprintf('FLEXI_READ_MORE', $item->title);
+								echo $readon_type === 1
+									? '<img src="' . $readon_image . '" alt="' . \Joomla\CMS\Language\Text::sprintf('FLEXI_READ_MORE', $item->title) . '" />'
+									: '<span class="icon-chevron-right"></span> ' . $read_more_text;
+								?>
+							</a>
+						</div>
+					<?php endif; ?>
+
+
+					<?php if ( $footer_shown && $content_layout == 2 || $content_layout == 3) : ?>
+					</footer>
+					<?php endif; ?>
+
+				
+
+				<!-- BOF afterDisplayContent -->
+				<?php if ($item->event->afterDisplayContent) : ?>
 						<aside class="fc_afterDisplayContent">
 							<?php echo $item->event->afterDisplayContent; ?>
 						</aside>
 					<?php endif; ?>
 					<!-- EOF afterDisplayContent -->
 
-					<?php if ( $footer_shown ) : ?>
-					</footer>
-					<?php endif; ?>
+				<?php echo $content_layout ==2 ? $captured_image : '';?>
 
 				</article>
 			</div>  <!-- EOF wrapper-innerbox -->

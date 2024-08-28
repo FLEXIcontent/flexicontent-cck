@@ -400,7 +400,7 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 
 <!-- BOF DIV mod_flexicontent_wrapper -->
 
-<div class="carousel mod_flexicontent_wrapper mod_flexicontent_wrap<?php echo $moduleclass_sfx; ?>" id="mod_flexicontent_carousel<?php echo $container_id; ?>">
+<div class="carousel mod_flexicontent_wrapper mod_flexicontent_wrap" id="mod_flexicontent_carousel<?php echo $container_id; ?>">
 
 
 	<?php

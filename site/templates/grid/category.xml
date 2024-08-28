@@ -69,11 +69,6 @@
 						<option value="0">FLEXI_TEXT</option>
 						<option value="1">FLEXI_IMAGE</option>
 					</field>
-					<field name="readon_align" type="radio" default="center" label="Readmore align" description="FLEXI_MAX_ITEM_COLS_RESPONSIVE_DESC" class="btn-group">
-						<option value="center">FLEXI_CENTER</option>
-						<option value="right">FLEXI_RIGHT</option>
-						<option value="left">FLEXI_LEFT</option>
-					</field>
 					<field name="readon_image" type="media" default="" label="Read more image" description="Select image to use instead of read more, this is maybe useful if your website is not multilingual" />
 					<field name="readon_class" type="text" default="btn btn-default" label="Read more class" description="Select class css to use instead of read more, this is maybe useful if your website is not multilingual" />
 					
@@ -89,17 +84,7 @@
 					<field name="items_tab_featured_placement" type="separator" default="FLEXI_PLACEMENT" icon_class="icon-grid" level="tab_open" box_type="1" />
 
 						<field name="items_featured_basic" type="separator" default="FLEXI_BASIC" icon_class="icon-cog" level="level2" />
-						<field name="item_columns_feat" type="list" default="" hint="1" label="FLEXI_MAX_ITEM_COLS_RESPONSIVE" description="FLEXI_MAX_ITEM_COLS_RESPONSIVE_DESC">
-							<option value="">FLEXI_USE_GLOBAL</option>
-							<option value="1">1</option>
-							<option value="2">2</option>
-							<option value="3">3</option>
-							<option value="4">4</option>
-							<option value="5">5</option>
-							<option value="6">6</option>
-							<option value="7">7</option>
-							<option value="8">8</option>
-						</field>
+						<field name="ibox_minsize_feat" type="text" cssprep="less" default="200px" label="columns size" description="min size of column" />
 						<field name="item_placement_feat" type="radio" default="" hint="0" label="FLEXI_ITEMS_PLACEMENT" description="FLEXI_ITEMS_PLACEMENT_DESC" class="btn-group group-fcinfo">
 							<option value="">FLEXI_USE_GLOBAL</option>
 							<option value="0">FLEXI_CLEARED</option>
@@ -143,13 +128,19 @@
 							<option value="0">Content height</option>
 							<option value="1">Force same height</option>
 						</field>
+						<field name="readmore_align_feat" type="radio" default="center" label="Readmore align" description="FLEXI_MAX_ITEM_COLS_RESPONSIVE_DESC" class="btn-group group-fcinfo">
+						<option value="">FLEXI_USE_GLOBAL</option>
+						<option value="left">FLEXI_LEFT</option>
+						<option value="center">FLEXI_CENTER</option>
+						<option value="right">FLEXI_RIGHT</option>
+					</field>
 	
 					<field name="items_tab_featured_styling" type="separator" default="FLEXI_STYLING" icon_class="icon-palette" level="tab_open" box_type="1" />
 			
 						<field name="featured_items_box_css" type="separator" cssprep="1" default="Items list box" level="level2" />
 						<field name="box_background_color_feat" type="color" cssprep="less" default="none" label="background color" description="Items container's background color" class="input-small" format="rgba" keywords="transparent,initial,none,none"/>
-						<field name="box_padding_top_bottom_feat" type="text" cssprep="less" default="8px" label="padding top/bottom" description="Items container's padding applied at top and bottom of the items" class="input-small" />
-						<field name="box_padding_left_right_feat" type="text" cssprep="less" default="12px" label="padding left/right" description="Items container's padding applied at left and right of the items" class="input-small" />
+						<field name="box_padding_top_bottom_feat" type="text" cssprep="less" default="0" label="padding top/bottom" description="Items container's padding applied at top and bottom of the items" class="input-small" />
+						<field name="box_padding_left_right_feat" type="text" cssprep="less" default="0" label="padding left/right" description="Items container's padding applied at left and right of the items" class="input-small" />
 						<field name="box_margin_top_feat" type="text" cssprep="less" default="4rem" label="margin top" description="Items container's margin applied at top and bottom of the items" class="input-small" />
 						<field name="box_margin_bottom_feat" type="text" cssprep="less" default="4rem" label="margin bottom" description="Items container's margin applied at top and bottom of the items" class="input-small" />
 						<field name="box_margin_left_right_feat" type="text" cssprep="less" default="0" label="margin left/right" description="Items container's margin applied at left and right of the items" class="input-small" />
@@ -159,8 +150,8 @@
 						<field name="ibox_description_color_feat" type="color" cssprep="less" default="none" label="description color" description="This is the background color applied at each item" class="input-small" format="rgba" keywords="transparent,initial,none,none"/>
 						<field name="ibox_border_width_feat" type="number" cssprep="less" default="0" label="border width" description="This is the border width applied around the items" class="input-small" />
 						<field name="ibox_border_color_feat" type="color" cssprep="less" default="transparent" label="border color" description="This is the border color applied around the items" class="input-small" format="rgba" keywords="transparent,initial,none,none" />
-						<field name="ibox_padding_top_bottom_feat" type="text" cssprep="less" default="8px" label="padding top/bottom" description="This is the padding applied at top and bottom of the items" class="input-small" />
-						<field name="ibox_padding_left_right_feat" type="text" cssprep="less" default="12px" label="padding left/right" description="This is the padding applied at left and right of the items" class="input-small" />
+						<field name="ibox_padding_top_bottom_feat" type="text" cssprep="less" default="0" label="padding top/bottom" description="This is the padding applied at top and bottom of the items" class="input-small" />
+						<field name="ibox_padding_left_right_feat" type="text" cssprep="less" default="0" label="padding left/right" description="This is the padding applied at left and right of the items" class="input-small" />
 						<field name="ibox_margin_top_bottom_feat" type="text" cssprep="less" default="2rem" label="margin top/bottom" description="This is the margin applied at top and bottom of the items" class="input-small" />
 						<field name="ibox_margin_left_right_feat" type="text" cssprep="less" default="2rem" label="margin left/right" description="This is the margin applied at left and right of the items" class="input-small" />
 			
@@ -257,17 +248,7 @@
 					<field name="items_tab_standard_placement" type="separator" default="FLEXI_PLACEMENT" icon_class="icon-grid" level="tab_open" box_type="1" />
 		
 						<field name="items_standard_basic" type="separator" default="FLEXI_BASIC" icon_class="icon-cog" level="level2" />
-						<field name="item_columns" type="list" default="" hint="2" label="FLEXI_MAX_ITEM_COLS_RESPONSIVE" description="FLEXI_MAX_ITEM_COLS_RESPONSIVE_DESC">
-							<option value="">FLEXI_USE_GLOBAL</option>
-							<option value="1">1</option>
-							<option value="2">2</option>
-							<option value="3">3</option>
-							<option value="4">4</option>
-							<option value="5">5</option>
-							<option value="6">6</option>
-							<option value="7">7</option>
-							<option value="8">8</option>
-						</field>
+						<field name="ibox_minsize_std" type="text" cssprep="less" default="200px" label="columns size" description="min size of column" />
 						<field name="item_placement" type="radio" default="" hint="1" label="FLEXI_ITEMS_PLACEMENT" description="FLEXI_ITEMS_PLACEMENT_DESC" class="btn-group group-fcinfo">
 							<option value="">FLEXI_USE_GLOBAL</option>
 							<option value="0">FLEXI_CLEARED</option>
@@ -311,13 +292,19 @@
 							<option value="0">Content height</option>
 							<option value="1">Force same height</option>
 						</field>
+						<field name="readmore_align" type="radio" default="center" label="Readmore align" description="" class="btn-group group-fcinfo">
+						<option value="">FLEXI_USE_GLOBAL</option>
+						<option value="left">FLEXI_LEFT</option>
+						<option value="center">FLEXI_CENTER</option>
+						<option value="right">FLEXI_RIGHT</option>
+					</field>
 
 					<field name="items_tab_standard_styling" type="separator" default="FLEXI_STYLING" icon_class="icon-palette" level="tab_open" box_type="1" />
 
 						<field name="standard_items_box_css" type="separator" cssprep="1" default="Items list box" level="level2" />
 						<field name="box_background_color" type="color" cssprep="less" default="none" label="background color" description="Items container's background color" class="input-small" format="rgba" keywords="transparent,initial,none,none"/>
-						<field name="box_padding_top_bottom" type="text" cssprep="less" default="8px" label="padding top/bottom" description="Items container's padding applied at top and bottom of the items" class="input-small" />
-						<field name="box_padding_left_right" type="text" cssprep="less" default="12px" label="padding left/right" description="Items container's padding applied at left and right of the items" class="input-small" />
+						<field name="box_padding_top_bottom" type="text" cssprep="less" default="0" label="padding top/bottom" description="Items container's padding applied at top and bottom of the items" class="input-small" />
+						<field name="box_padding_left_right" type="text" cssprep="less" default="0" label="padding left/right" description="Items container's padding applied at left and right of the items" class="input-small" />
 						<field name="box_margin_top" type="text" cssprep="less" default="2rem" label="margin top" description="Items container's margin applied at top and bottom of the items" class="input-small" />
 						<field name="box_margin_bottom" type="text" cssprep="less" default="2rem" label="margin bottom" description="Items container's margin applied at top and bottom of the items" class="input-small" />
 						<field name="box_margin_left_right" type="text" cssprep="less" default="0" label="margin left/right" description="Items container's margin applied at left and right of the items" class="input-small" />
@@ -327,8 +314,8 @@
 						<field name="ibox_description_color" type="color" cssprep="less" default="none" label="description color" description="This is the background color applied at each item" class="input-small" format="rgba" keywords="transparent,initial,none,none"/>
 						<field name="ibox_border_width" type="number" cssprep="less" default="0" label="border width" description="This is the border width applied around the items" class="input-small" />						
 						<field name="ibox_border_color" type="color" cssprep="less" default="transparent" label="border color" description="This is the border width applied around the items" class="input-small" format="rgba" keywords="transparent,initial,none,none"/>
-						<field name="ibox_padding_top_bottom" type="text" cssprep="less" default="8px" label="padding top/bottom" description="This is the padding applied at top and bottom of the items" class="input-small" />
-						<field name="ibox_padding_left_right" type="text" cssprep="less" default="12" label="padding left/right" description="This is the padding applied at left and right of the items" class="input-small" />
+						<field name="ibox_padding_top_bottom" type="text" cssprep="less" default="0" label="padding top/bottom" description="This is the padding applied at top and bottom of the items" class="input-small" />
+						<field name="ibox_padding_left_right" type="text" cssprep="less" default="0" label="padding left/right" description="This is the padding applied at left and right of the items" class="input-small" />
 						<field name="ibox_margin_top_bottom" type="text" cssprep="less" default="2rem" label="margin top/bottom" description="This is the margin applied at top and bottom of the items" class="input-small" />
 						<field name="ibox_margin_left_right" type="text" cssprep="less" default="2rem" label="margin left/right" description="This is the margin applied at left and right of the items" class="input-small" />
 			
