@@ -549,7 +549,7 @@ footer.fc_block {
 	grid-template-columns: repeat(auto-fill,minmax(300px,1fr));
 }
 .featured-block.fc-items-block {
-	grid-template-columns: repeat(auto-fill,minmax(200px,1fr));
+	grid-template-columns: repeat(auto-fit,minmax(200px,1fr));
 }
 @media only screen and (max-width: 769px) {
 	.news.fc-items-block .fc_float_left,

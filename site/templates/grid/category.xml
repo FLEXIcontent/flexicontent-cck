@@ -128,6 +128,11 @@
 							<option value="0">Content height</option>
 							<option value="1">Force same height</option>
 						</field>
+						<field name="content_width_fit_feat" type="radio" default="auto-fill" cssprep="less" hint="1" label="Height of content" description="Select yes to fix same height for each content" class="btn-group group-fcinfo">
+							<option value="">FLEXI_USE_GLOBAL</option>
+							<option value="auto-fill">Auto-fill</option>
+							<option value="auto-fit">Auto-fit</option>
+						</field>
 						<field name="readmore_align_feat" type="radio" default="center" label="Readmore align" description="FLEXI_MAX_ITEM_COLS_RESPONSIVE_DESC" class="btn-group group-fcinfo">
 						<option value="">FLEXI_USE_GLOBAL</option>
 						<option value="left">FLEXI_LEFT</option>
@@ -291,6 +296,11 @@
 							<option value="">FLEXI_USE_GLOBAL</option>
 							<option value="0">Content height</option>
 							<option value="1">Force same height</option>
+						</field>
+						<field name="content_width_fit" type="radio" default="auto-fill" cssprep="less" hint="1" label="Height of content" description="Select yes to fix same height for each content" class="btn-group group-fcinfo">
+							<option value="">FLEXI_USE_GLOBAL</option>
+							<option value="auto-fill">Auto-fill</option>
+							<option value="auto-fit">Auto-fit</option>
 						</field>
 						<field name="readmore_align" type="radio" default="center" label="Readmore align" description="" class="btn-group group-fcinfo">
 						<option value="">FLEXI_USE_GLOBAL</option>
