@@ -132,6 +132,9 @@ body .flexi.infoblock {
 	margin: 0%;
 	zoom: 1;
 }
+div.flexi.value {
+	padding: 0 !important;
+}
 .onecols ul li.flexi {
 	width: 100%;
 }

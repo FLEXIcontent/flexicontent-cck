@@ -53,6 +53,13 @@ $margin_top_bottom = $params->get($layout.'_margin_left_right', 4);
 $margin_left_right = $params->get($layout.'_margin_left_right', 4);
 $border_width = (int)$params->get($layout.'_border_width', 1);
 
+$readmore_align_feat = $params->get('readmore_align_feat', 'center');
+$readmore_align_std = $params->get('readmore_align_std', 'center');
+
+// Page builder
+$news_builder_layout_feat = $params->get('news_builder_layout_feat');
+$news_builder_layout = $params->get('news_builder_layout');
+
 
 // *****************************************************
 // Content placement and default image of featured items
@@ -416,7 +423,7 @@ if ($std_builder_layout_num)
 
 			<!-- BOF item -->	
 			<div class="mod_flexicontent_featured_wrapper<?php echo $mod_do_hlight_feat; ?><?php echo ' '.$oe_class .($item->is_active_item ? ' fcitem_active' : ''); ?>">
-			<div class="mod_flexicontent_featured_wrapper_innerbox">
+			<div class="mod_flexicontent_featured_wrapper_innerbox <?php echo $img_container_class_feat;?>">
 
 
 			<?php if ($feat_params_layout) : /* BOF: Content display via Parameter-based Layout */ ?>
@@ -446,7 +453,7 @@ if ($std_builder_layout_num)
 
 					<?php if ($mod_use_image_feat && $item->image_rendered) : ?>
 
-						<div class="image_featured <?php echo $img_container_class_feat;?>">
+						<div class="image_featured">
 							<?php if ($mod_link_image_feat) : ?>
 								<a href="<?php echo $item->link; ?>"><?php echo $item->image_rendered; ?></a>
 							<?php else : ?>
@@ -456,7 +463,7 @@ if ($std_builder_layout_num)
 
 					<?php elseif ($mod_use_image_feat && $item->image) : ?>
 
-						<div class="image_featured <?php echo $img_container_class_feat;?>">
+						<div class="image_featured">
 							<?php if ($mod_link_image_feat) : ?>
 								<a href="<?php echo $item->link; ?>">
 									<img <?php echo $img_size_feat; ?> style="<?php echo $img_force_dims_css_feat; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
@@ -545,7 +552,7 @@ if ($std_builder_layout_num)
 
 					<?php if ($mod_readmore_feat) : ?>
 					<div class="fc_block">
-						<div class="fcitem_readon">
+						<div class="fcitem_readon <?php echo $readmore_align_feat;?>">
 							<a href="<?php echo $item->link; ?>" class="readon btn"><span><?php echo \Joomla\CMS\Language\Text::_('FLEXI_MOD_READ_MORE'); ?></span></a>
 						</div>
 					</div>
@@ -560,11 +567,12 @@ if ($std_builder_layout_num)
 			<?php endif; /* EOF: Content display via Parameter-based Layout */ ?>
 
 
-			<?php
+			<?php if ($news_builder_layout_feat > 0){
 				// Content display via Builder-based Layouts
 				echo $feat_builder_layout
 					? str_replace('{{fc-item-id}}', $item->id, $feat_builder_layout)
 					: '';
+			}
 			?>
 
 
@@ -723,11 +731,11 @@ if ($std_builder_layout_num)
 			?>
 
 			<!-- BOF item -->	
-			<div class="mod_flexicontent_standard_wrapper<?php echo $mod_do_hlight; ?><?php echo ' '.$oe_class .($item->is_active_item ? ' fcitem_active' : '') ; ?>"
+			<div class="mod_flexicontent_standard_wrapper<?php echo $mod_do_hlight; ?><?php echo ' '.$oe_class .($item->is_active_item ? ' fcitem_active' : '') ; ?> "
 				onmouseover=""
 				onmouseout=""
 			>
-			<div class="mod_flexicontent_standard_wrapper_innerbox">
+			<div class="mod_flexicontent_standard_wrapper_innerbox <?php echo $img_container_class;?>">
 
 
 			<?php if ($std_params_layout) : /* BOF: Content display via Parameter-based Layout */ ?>
@@ -757,7 +765,7 @@ if ($std_builder_layout_num)
 
 					<?php if ($mod_use_image && $item->image_rendered) : ?>
 
-						<div class="image_standard <?php echo $img_container_class;?>">
+						<div class="image_standard">
 							<?php if ($mod_link_image) : ?>
 								<a href="<?php echo $item->link; ?>"><?php echo $item->image_rendered; ?></a>
 							<?php else : ?>
@@ -767,7 +775,7 @@ if ($std_builder_layout_num)
 
 					<?php elseif ($mod_use_image && $item->image) : ?>
 
-						<div class="image_standard <?php echo $img_container_class;?>">
+						<div class="image_standard">
 							<?php if ($mod_link_image) : ?>
 								<a href="<?php echo $item->link; ?>">
 									<img <?php echo $img_size; ?> style="<?php echo $img_force_dims_css; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
@@ -855,7 +863,7 @@ if ($std_builder_layout_num)
 
 					<?php if ($mod_readmore) : ?>
 					<div class="fc_block readmore">
-						<div class="fcitem_readon">
+						<div class="fcitem_readon <?php echo $readmore_align_std;?>">
 							<a href="<?php echo $item->link; ?>" class="readon btn"><span><?php echo \Joomla\CMS\Language\Text::_('FLEXI_MOD_READ_MORE'); ?></span></a>
 						</div>
 					</div>
@@ -871,11 +879,12 @@ if ($std_builder_layout_num)
 			<?php endif; /* EOF: Content display via Parameter-based Layout */ ?>
 
 
-			<?php
+			<?php if ($news_builder_layout > 0){
 				// Content display via Builder-based Layouts
 				echo $std_builder_layout
 					? str_replace('{{fc-item-id}}', $item->id, $std_builder_layout)
 					: '';
+			}
 			?>
 
 

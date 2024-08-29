@@ -672,6 +672,12 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 
+			<field name="readmore_align_std" type="radio" default="center" label="Readmore align" description="FLEXI_MAX_ITEM_COLS_RESPONSIVE_DESC" class="btn-group group-fcinfo">
+				<option value="left">FLEXI_LEFT</option>
+				<option value="center">FLEXI_CENTER</option>
+				<option value="right">FLEXI_RIGHT</option>
+			</field>
+
 			<field name="" type="separator" default="FLEXI_UMOD_FEAT" level="level3" />
 			<field name="display_text_feat" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_DISPLAY_TEXT" description="FLEXI_DISPLAY_TEXT_DESC" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="display_textfeat">FLEXI_NO</option>
@@ -685,6 +691,11 @@
 			<field name="mod_readmore_feat" type="radio" default="1" label="FLEXI_SHOW_READMORE" description="FLEXI_SHOW_READMORE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="readmore_align_feat" type="radio" default="center" label="Readmore align" description="FLEXI_MAX_ITEM_COLS_RESPONSIVE_DESC" class="btn-group group-fcinfo">
+				<option value="left">FLEXI_LEFT</option>
+				<option value="center">FLEXI_CENTER</option>
+				<option value="right">FLEXI_RIGHT</option>
 			</field>
 
 			<field name="" type="separator" default="FLEXI_IMAGE_PARAMS" level="level1" />
