@@ -70,6 +70,7 @@
     /*flex-direction: column;
     flex-wrap: nowrap;*/
     height: 100%;
+	position: relative;
 }
 .mod_flexicontent_featured_wrapper_innerbox.fc_float_right,
 .mod_flexicontent_standard_wrapper_innerbox.fc_float_right {
@@ -190,12 +191,12 @@
 }
 
 
-/* CONTAINER of item image (featured and standard) */
+/* CONTAINER of item image (featured and standard) 
 .news.mod_flexicontent_wrapper .image_featured,
 .news.mod_flexicontent_wrapper .image_standard {
 	float: left;
 	margin: 0;
-}
+}*/
 
 /* item image styling (link, image, etc) */
 .news.mod_flexicontent_wrapper .image_featured a:hover,

@@ -18,7 +18,7 @@ file_exists(dirname(__FILE__).DS.'filters.php')
 
 // Alpha-Index
 if ($this->params->get('show_alpha', 1)) :
-	echo $this->loadTemplate('alpha_html5');
+	echo $this->loadTemplate('alpha');
 endif;
 
 $limit_selector = flexicontent_html::limit_selector( $this->params, $formname='adminForm', $autosubmit=1 );
