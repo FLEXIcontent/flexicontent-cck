@@ -526,7 +526,3 @@
 		grid-template-columns: repeat(1,1fr);
 	}
 }
-
-.mod_flexicontent_featured_wrapper_innerbox.fc_stretch.fc_clear.masonry {
-    width: 200px !important;
-}

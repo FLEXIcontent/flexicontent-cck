@@ -1007,7 +1007,16 @@ if ($std_builder_layout_num)
 		gap:'.$margin_left_right_feat.' !important;
 		' : '').'
 	}'.
-
+	/* column size */'
+	#mod_fcitems_box_featured_'.$uniq_ord_id.' .mod_flexicontent_featured_wrapper_innerbox.fc_stretch.fc_clear.masonry {
+    width: 200px !important;
+	margin-bottom:'.$margin_top_bottom_feat.' !important ;
+	}'.
+	/* column size */'
+	#mod_fcitems_box_standard_'.$uniq_ord_id.' .mod_flexicontent_standard_wrapper_innerbox.fc_stretch.fc_clear.masonry {
+		width: 200px !important;
+		margin-bottom:'.$margin_top_bottom.' !important;
+		}'.
 	/* CONTAINER of standard items */'
 	#mod_fcitems_box_standard_'.$uniq_ord_id.' {
 	}'.
@@ -1031,15 +1040,14 @@ if ($std_builder_layout_num)
 
 	if ($item_placement_feat == 1 && $item_columns_feat > 1)
 	{
-		$margin_left_right = intval($margin_left_right);
 		$margin_left_right_feat = intval($margin_left_right_feat);
 		$js = "
 		jQuery(document).ready(function(){
-			var container = document.querySelector('div#mod_fcitems_box_featured_".$uniq_ord_id."');
+			var container_lead = document.querySelector('div#mod_fcitems_box_featured_".$uniq_ord_id."');
 			var msnry;
 			// initialize Masonry after all images have loaded
-			if (container) {
-				imagesLoaded( container, function() {
+			if (container_lead) {
+				imagesLoaded( container_lead, function() {
 					msnry = new Masonry( container_lead, {
 	 				gutter: $margin_left_right_feat,
 					percentPosition: true
@@ -1052,6 +1060,7 @@ if ($std_builder_layout_num)
 	}
 	if ($item_placement_std == 1 && $item_columns_std > 1)
 	{
+		$margin_left_right = intval($margin_left_right);
 		$js = "
 		jQuery(document).ready(function(){
 			var container = document.querySelector('div#mod_fcitems_box_standard_".$uniq_ord_id."');
