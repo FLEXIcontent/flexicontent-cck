@@ -365,7 +365,7 @@ if ($std_builder_layout_num)
 
 		<!-- BOF DIV mod_flexicontent_featured (featured items) -->
 
-		<div class="mod_flexicontent_featured mod_fcitems_box_featured_<?php echo $uniq_ord_id; ?> <?php echo($cols_class_feat ? ' '.$cols_class_feat : ''); ?>" id="mod_fcitems_box_featured_<?php echo $uniq_ord_id; ?>">
+		<div class="mod_flexicontent_featured mod_fcitems_box_featured_<?php echo $uniq_ord_id; ?> <?php echo($cols_class_feat ? ' '.$cols_class_feat : ''); ?> " id="mod_fcitems_box_featured_<?php echo $uniq_ord_id; ?>">
 
 			<?php
 			$oe_class = $rowtoggler ? 'odd' : 'even';
@@ -423,7 +423,7 @@ if ($std_builder_layout_num)
 
 			<!-- BOF item -->	
 			<div class="mod_flexicontent_featured_wrapper<?php echo $mod_do_hlight_feat; ?><?php echo ' '.$oe_class .($item->is_active_item ? ' fcitem_active' : ''); ?>">
-			<div class="mod_flexicontent_featured_wrapper_innerbox <?php echo $img_container_class_feat;?>">
+			<div class="mod_flexicontent_featured_wrapper_innerbox <?php echo $img_container_class_feat;?> <?php echo ($item_placement_feat == 1) ? 'masonry' : '';?>">
 
 
 			<?php if ($feat_params_layout) : /* BOF: Content display via Parameter-based Layout */ ?>
@@ -735,7 +735,7 @@ if ($std_builder_layout_num)
 				onmouseover=""
 				onmouseout=""
 			>
-			<div class="mod_flexicontent_standard_wrapper_innerbox <?php echo $img_container_class;?>">
+			<div class="mod_flexicontent_standard_wrapper_innerbox <?php echo $img_container_class;?> <?php echo ($item_placement_std == 1) ? 'masonry' : '';?>">
 
 
 			<?php if ($std_params_layout) : /* BOF: Content display via Parameter-based Layout */ ?>
@@ -988,6 +988,9 @@ if ($std_builder_layout_num)
 	// Module specific styling (we use names containing module ID)
 	// ***********************************************************
 
+
+	// AJOUTER LA TAILLE DES COLONNES
+
 	$css = ''.
 	/* CONTAINER of featured items */'
 	#mod_fcitems_box_featured_'.$uniq_ord_id.' {
@@ -998,8 +1001,8 @@ if ($std_builder_layout_num)
 	/* inner CONTAINER of each standard item */'
 	#mod_fcitems_box_featured_'.$uniq_ord_id.'.mod_flexicontent_featured {
 		'.($inner_inline_css_feat ? '
-		padding: '.$padding_top_bottom_feat.'px '.$padding_left_right_feat.'px !important;
-		border-width: '.$border_width_feat.'px!important;
+		padding: '.$padding_top_bottom_feat.' '.$padding_left_right_feat.' !important;
+		border-width: '.$border_width_feat.' !important;
 		row-gap: '.$margin_top_bottom_feat.' !important ;
 		gap:'.$margin_left_right_feat.' !important;
 		' : '').'
@@ -1014,8 +1017,8 @@ if ($std_builder_layout_num)
 	/* inner CONTAINER of each standard item */'
 	#mod_fcitems_box_standard_'.$uniq_ord_id.'.mod_flexicontent_standard {
 		'.($inner_inline_css ? '
-		padding: '.$padding_top_bottom.'px '.$padding_left_right.'px !important;
-		border-width: '.$border_width.'px!important;
+		padding: '.$padding_top_bottom.' '.$padding_left_right.' !important;
+		border-width: '.$border_width.' !important;
 		row-gap: '.$margin_top_bottom.' !important;
 		gap:'.$margin_left_right.' !important;
 		' : '').'
@@ -1028,6 +1031,8 @@ if ($std_builder_layout_num)
 
 	if ($item_placement_feat == 1 && $item_columns_feat > 1)
 	{
+		$margin_left_right = intval($margin_left_right);
+		$margin_left_right_feat = intval($margin_left_right_feat);
 		$js = "
 		jQuery(document).ready(function(){
 			var container = document.querySelector('div#mod_fcitems_box_featured_".$uniq_ord_id."');
@@ -1035,7 +1040,10 @@ if ($std_builder_layout_num)
 			// initialize Masonry after all images have loaded
 			if (container) {
 				imagesLoaded( container, function() {
-					msnry = new Masonry( container );
+					msnry = new Masonry( container_lead, {
+	 				gutter: $margin_left_right_feat,
+					percentPosition: true
+					});
 				});
 			}
 		});
@@ -1051,7 +1059,10 @@ if ($std_builder_layout_num)
 			// initialize Masonry after all images have loaded
 			if (container) {
 				imagesLoaded( container, function() {
-					msnry = new Masonry( container );
+					msnry = new Masonry( container, {
+	 				gutter: $margin_left_right,
+					percentPosition: true
+					});
 				});
 			}
 		});

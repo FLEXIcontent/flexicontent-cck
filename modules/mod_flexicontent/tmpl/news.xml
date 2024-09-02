@@ -85,16 +85,16 @@
 				<option value="1">Auto-Fit and Stretch</option>
 			</field>
 
-			<field name="" type="separator" default="(inline) CSS Styles for Inner Container (px)" level="level2" />
+			<field name="" type="separator" default="(inline) CSS Styles for Inner Container (px, % rem etc)" level="level2" />
 			<field name="news_inner_inline_css_feat" type="radio" default="0" label="FLEXI_ENABLE" description="Select to set styling of inner item containers" class="btn-group btn-group-yesno">
 				<option value="0">No (use default/custom CSS)</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="news_padding_top_bottom_feat" type="text" default="8" label="padding top/bottom" description="This is the padding applied at top and bottom of the items" />
-			<field name="news_padding_left_right_feat" type="text" default="12" label="padding left/right" description="This is the padding applied at left and right of the items" />
+			<field name="news_padding_top_bottom_feat" type="text" default="8px" label="padding top/bottom" description="This is the padding applied at top and bottom of the items" />
+			<field name="news_padding_left_right_feat" type="text" default="12px" label="padding left/right" description="This is the padding applied at left and right of the items" />
 			<field name="news_border_width_feat" type="text" default="1" label="border width" description="This is the border width applied around the items" />
-			<field name="news_margin_top_bottom_feat" type="text" default="4" label="margin top/bottom" description="This is the margin applied at top and bottom of the items" />
-			<field name="news_margin_left_right_feat" type="text" default="4" label="margin left/right" description="This is the margin applied at left and right of the items" />
+			<field name="news_margin_top_bottom_feat" type="text" default="2rem" label="margin top/bottom" description="This is the margin applied at top and bottom of the items" />
+			<field name="news_margin_left_right_feat" type="text" default="4rem" label="margin left/right" description="This is the margin applied at left and right of the items" />
 
 
 			<field name="item_tab_standard" type="separator" default="Standard items" icon_class="icon-list" level="tab_open" box_type="1" />
@@ -141,16 +141,16 @@
 				<option value="1">Auto-Fit and Stretch</option>
 			</field>
 
-			<field name="" type="separator" default="(inline) CSS Styles for Inner Container (px)" level="level2" />
+			<field name="" type="separator" default="(inline) CSS Styles for Inner Container (px % em rem ect)" level="level2" />
 			<field name="news_inner_inline_css" type="radio" default="0" label="FLEXI_ENABLE" description="Select to set styling of inner item containers" class="btn-group btn-group-yesno">
 				<option value="0">No (use default/custom CSS)</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="news_padding_top_bottom" type="text" default="8" label="padding top/bottom" description="This is the padding applied at top and bottom of the items" />
-			<field name="news_padding_left_right" type="text" default="12" label="padding left/right" description="This is the padding applied at left and right of the items" />
+			<field name="news_padding_top_bottom" type="text" default="8px" label="padding top/bottom" description="This is the padding applied at top and bottom of the items" />
+			<field name="news_padding_left_right" type="text" default="12px" label="padding left/right" description="This is the padding applied at left and right of the items" />
 			<field name="news_border_width" type="text" default="1" label="border width" description="This is the border width applied around the items" />
-			<field name="news_margin_top_bottom" type="text" default="4" label="margin top/bottom" description="This is the margin applied at top and bottom of the items" />
-			<field name="news_margin_left_right" type="text" default="4" label="margin left/right" description="This is the margin applied at left and right of the items" />
+			<field name="news_margin_top_bottom" type="text" default="2rem" label="margin top/bottom" description="This is the margin applied at top and bottom of the items" />
+			<field name="news_margin_left_right" type="text" default="4rem" label="margin left/right" description="This is the margin applied at left and right of the items" />
 
 		<field name="item_tabset_end" type="separator" default="ITEM_TABSET" level="tabset_close" />
 

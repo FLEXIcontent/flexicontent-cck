@@ -202,6 +202,8 @@ if (!empty($this->items) && ($load_masonry_feat || $load_masonry_std))
 {
 	flexicontent_html::loadFramework('masonry');
 	flexicontent_html::loadFramework('imagesLoaded');
+	$ibox_margin_left_right = intval($ibox_margin_left_right);
+	$ibox_margin_left_right_feat = intval($ibox_margin_left_right_feat);
 
 	$js = "
 		jQuery(document).ready(function(){
@@ -213,7 +215,10 @@ if (!empty($this->items) && ($load_masonry_feat || $load_masonry_std))
 			// initialize Masonry after all images have loaded
 			if (container_lead) {
 				imagesLoaded( container_lead, function() {
-					msnry_lead = new Masonry( container_lead );
+					msnry_lead = new Masonry( container_lead , {
+	 				gutter: $ibox_margin_left_right_feat,
+					percentPosition: true
+					});
 				});
 			}
 		";
@@ -226,7 +231,7 @@ if (!empty($this->items) && ($load_masonry_feat || $load_masonry_std))
 			if (container_intro) {
 				imagesLoaded( container_intro, function() {
 					msnry_intro = new Masonry( container_intro , {
-	 				gutter: 20,
+	 				gutter: $ibox_margin_left_right,
 					percentPosition: true
 					});
 				});
