@@ -422,8 +422,8 @@ if ($std_builder_layout_num)
 			?>
 
 			<!-- BOF item -->	
-			<div class="mod_flexicontent_featured_wrapper<?php echo $mod_do_hlight_feat; ?><?php echo ' '.$oe_class .($item->is_active_item ? ' fcitem_active' : ''); ?>">
-			<div class="mod_flexicontent_featured_wrapper_innerbox <?php echo $img_container_class_feat;?> <?php echo ($item_placement_feat == 1) ? 'masonry' : '';?>">
+			<div class="mod_flexicontent_featured_wrapper<?php echo $mod_do_hlight_feat; ?><?php echo ' '.$oe_class .($item->is_active_item ? ' fcitem_active' : ''); ?> <?php echo ($item_placement_feat == 1) ? 'masonry' : '';?>">
+			<div class="mod_flexicontent_featured_wrapper_innerbox <?php echo $img_container_class_feat;?>">
 
 
 			<?php if ($feat_params_layout) : /* BOF: Content display via Parameter-based Layout */ ?>
@@ -731,11 +731,11 @@ if ($std_builder_layout_num)
 			?>
 
 			<!-- BOF item -->	
-			<div class="mod_flexicontent_standard_wrapper<?php echo $mod_do_hlight; ?><?php echo ' '.$oe_class .($item->is_active_item ? ' fcitem_active' : '') ; ?> "
+			<div class="mod_flexicontent_standard_wrapper<?php echo $mod_do_hlight; ?><?php echo ' '.$oe_class .($item->is_active_item ? ' fcitem_active' : '') ; ?> <?php echo ($item_placement_std == 1) ? 'masonry' : '';?> "
 				onmouseover=""
 				onmouseout=""
 			>
-			<div class="mod_flexicontent_standard_wrapper_innerbox <?php echo $img_container_class;?> <?php echo ($item_placement_std == 1) ? 'masonry' : '';?>">
+			<div class="mod_flexicontent_standard_wrapper_innerbox <?php echo $img_container_class;?>">
 
 
 			<?php if ($std_params_layout) : /* BOF: Content display via Parameter-based Layout */ ?>
@@ -987,9 +987,59 @@ if ($std_builder_layout_num)
 	// ***********************************************************
 	// Module specific styling (we use names containing module ID)
 	// ***********************************************************
-
-
-	// AJOUTER LA TAILLE DES COLONNES
+	switch ($item_columns_feat) {
+		case 1:
+			$item_columns_feat_masonry = '100%';
+			break;
+		case 2:
+			$item_columns_feat_masonry = '50%';
+			break;
+		case 3:
+			$item_columns_feat_masonry = '33%';
+			break;
+		case 4:
+			$item_columns_feat_masonry = '25%';
+			break;
+		case 5:
+			$item_columns_feat_masonry = '20%';
+			break;
+		case 6:
+			$item_columns_feat_masonry = '16%';
+			break;
+		case 7:
+			$item_columns_feat_masonry = '14%';
+			break;
+		case 8:
+			$item_columns_feat_masonry = '12%';
+			break;
+	}
+	switch ($item_columns_std) {
+		case 1:
+			$item_columns_std_masonry = '100%';
+			break;
+		case 2:
+			$item_columns_std_masonry = '50%';
+			break;
+		case 3:
+			$item_columns_std_masonry = '33%';
+			break;
+		case 4:
+			$item_columns_std_masonry = '25%';
+			break;
+		case 5:
+			$item_columns_std_masonry = '20%';
+			break;
+		case 6:
+			$item_columns_std_masonry = '16%';
+			break;
+		case 7:
+			$item_columns_std_masonry = '14%';
+			break;
+		case 8:
+			$item_columns_std_masonry = '12%';
+			break;
+	}
+	
 
 	$css = ''.
 	/* CONTAINER of featured items */'
@@ -1007,16 +1057,6 @@ if ($std_builder_layout_num)
 		gap:'.$margin_left_right_feat.' !important;
 		' : '').'
 	}'.
-	/* column size */'
-	#mod_fcitems_box_featured_'.$uniq_ord_id.' .mod_flexicontent_featured_wrapper_innerbox.fc_stretch.fc_clear.masonry {
-    width: 200px !important;
-	margin-bottom:'.$margin_top_bottom_feat.' !important ;
-	}'.
-	/* column size */'
-	#mod_fcitems_box_standard_'.$uniq_ord_id.' .mod_flexicontent_standard_wrapper_innerbox.fc_stretch.fc_clear.masonry {
-		width: 200px !important;
-		margin-bottom:'.$margin_top_bottom.' !important;
-		}'.
 	/* CONTAINER of standard items */'
 	#mod_fcitems_box_standard_'.$uniq_ord_id.' {
 	}'.
@@ -1031,6 +1071,38 @@ if ($std_builder_layout_num)
 		row-gap: '.$margin_top_bottom.' !important;
 		gap:'.$margin_left_right.' !important;
 		' : '').'
+	}'.
+	/* column size for masonry */'
+	#mod_fcitems_box_featured_'.$uniq_ord_id.' .mod_flexicontent_featured_wrapper.masonry{
+	'.($inner_inline_css ? '
+		width: calc('.$item_columns_feat_masonry.' - '.$margin_left_right_feat.') !important;
+		margin-right:'.$margin_left_right_feat.' !important;
+		margin-bottom:'.$margin_top_bottom_feat.' !important ;
+		' : '
+		width: calc('.$item_columns_feat_masonry.' - 20px) !important;
+		margin-right:20px !important;
+		margin-bottom:20px !important ;
+		').'
+	}
+	#mod_fcitems_box_standard_'.$uniq_ord_id.' .mod_flexicontent_standard_wrapper.masonry {
+	'.($inner_inline_css ? '
+		width: calc('.$item_columns_std_masonry.' - '.$margin_left_right.') !important;
+		margin-right:'.$margin_left_right.' !important;
+		margin-bottom:'.$margin_top_bottom.' !important;
+		' : '
+		width: calc('.$item_columns_std_masonry.' - 20px) !important;
+		margin-right: 20px !important;
+		margin-bottom:20px !important;
+		').'
+		}'.
+	/* responsive for masonry */'
+	@media only screen and (min-device-width : 320px) and (max-device-width : 480px) {
+	#mod_fcitems_box_featured_'.$uniq_ord_id.' .mod_flexicontent_featured_wrapper.masonry{
+		width: 100% !important;
+	}
+	#mod_fcitems_box_standard_'.$uniq_ord_id.' .mod_flexicontent_standard_wrapper.masonry {
+		width: 100% !important;
+		}
 	}'.
 
 	''
@@ -1049,7 +1121,8 @@ if ($std_builder_layout_num)
 			if (container_lead) {
 				imagesLoaded( container_lead, function() {
 					msnry = new Masonry( container_lead, {
-	 				gutter: $margin_left_right_feat,
+					columnWidth: '#mod_fcitems_box_featured_$uniq_ord_id .mod_flexicontent_featured_wrapper.masonry',
+					horizontalOrder: true,
 					percentPosition: true
 					});
 				});
@@ -1069,7 +1142,8 @@ if ($std_builder_layout_num)
 			if (container) {
 				imagesLoaded( container, function() {
 					msnry = new Masonry( container, {
-	 				gutter: $margin_left_right,
+	 				columnWidth: '#mod_fcitems_box_standard_$uniq_ord_id .mod_flexicontent_standard_wrapper.masonry',
+					horizontalOrder: true,
 					percentPosition: true
 					});
 				});
