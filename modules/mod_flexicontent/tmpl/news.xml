@@ -90,6 +90,11 @@
 				<option value="0">Auto-Fit</option>
 				<option value="1">Auto-Fit and Stretch</option>
 			</field>
+				<field name="news_content_width_fit_feat" type="radio" default="auto-fill" label="fit content" description="Select yes to fix same height for each content" class="btn-group group-fcinfo">
+							<option value="">FLEXI_USE_GLOBAL</option>
+							<option value="auto-fill">Auto-fill</option>
+							<option value="auto-fit">Auto-fit</option>
+						</field>
 
 			<field name="" type="separator" default="(inline) CSS Styles for Inner Container (px, % rem etc)" level="level2" />
 			<field name="news_inner_inline_css_feat" type="radio" default="0" label="FLEXI_ENABLE" description="Select to set styling of inner item containers" class="btn-group btn-group-yesno">
@@ -151,7 +156,11 @@
 				<option value="0">Auto-Fit</option>
 				<option value="1">Auto-Fit and Stretch</option>
 			</field>
-
+				<field name="news_content_width_fit_std" type="radio" default="auto-fill" label="Fit content" description="Select yes to fix same height for each content" class="btn-group group-fcinfo">
+							<option value="">FLEXI_USE_GLOBAL</option>
+							<option value="auto-fill">Auto-fill</option>
+							<option value="auto-fit">Auto-fit</option>
+						</field>
 			<field name="" type="separator" default="(inline) CSS Styles for Inner Container (px % em rem ect)" level="level2" />
 			<field name="news_inner_inline_css" type="radio" default="0" label="FLEXI_ENABLE" description="Select to set styling of inner item containers" class="btn-group btn-group-yesno">
 				<option value="0">No (use default/custom CSS)</option>

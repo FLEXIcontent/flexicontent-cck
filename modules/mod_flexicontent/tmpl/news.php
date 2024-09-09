@@ -45,6 +45,7 @@ $margin_left_right_feat = $params->get($layout.'_margin_left_right_feat', 4);
 $border_width_feat = (int)$params->get($layout.'_border_width_feat', 1);
 $item_column_mode_feat = (int)$params->get($layout.'_item_column_mode_feat', 1);// 0 column mode old, 1 grid minmax size
 $item_width_feat = $params->get($layout.'_item_width_feat', '200px');
+$item_fit_feat = $params->get($layout.'_content_width_fit_feat', 'auto-fill');
 
 
 // Item Dimensions standard
@@ -56,6 +57,7 @@ $margin_left_right = $params->get($layout.'_margin_left_right', 4);
 $border_width = (int)$params->get($layout.'_border_width', 1);
 $item_column_mode_std = (int)$params->get($layout.'_item_column_mode_std', 1);// 0 column mode old, 1 grid minmax size
 $item_width_std = $params->get($layout.'_item_width_std', '200px');
+$item_fit_std = $params->get($layout.'_content_width_fit_std', 'auto-fill');
 
 $readmore_align_feat = $params->get('readmore_align_feat', 'center');
 $readmore_align_std = $params->get('readmore_align_std', 'center');
@@ -994,67 +996,39 @@ if ($std_builder_layout_num)
 	// ***********************************************************
 	// Module specific styling (we use names containing module ID)
 	// ***********************************************************
-	if ($item_column_mode_feat == 0 ){
-		switch ($item_columns_feat) {
+	function convertColumnsToPercentage($columns) {
+		switch ($columns) {
 			case 1:
-				$item_columns_feat_masonry = '100%';
-				break;
+				return '100%';
 			case 2:
-				$item_columns_feat_masonry = '50%';
-				break;
+				return '48%';
 			case 3:
-				$item_columns_feat_masonry = '33%';
-				break;
+				return '31%';
 			case 4:
-				$item_columns_feat_masonry = '25%';
-				break;
+				return '23%';
 			case 5:
-				$item_columns_feat_masonry = '20%';
-				break;
+				return '18%';
 			case 6:
-				$item_columns_feat_masonry = '16%';
-				break;
+				return '14%';
 			case 7:
-				$item_columns_feat_masonry = '14%';
-				break;
+				return '12%';
 			case 8:
-				$item_columns_feat_masonry = '12%';
-				break;
+				return '10%';
+			default:
+				return '100%';
 		}
-	}else{
-		$item_columns_feat_masonry = $item_width_feat;
 	}
-	if ($item_column_mode_std == 0 ){
-		switch ($item_columns_std) {
-			case 1:
-				$item_columns_std_masonry = '100%';
-				break;
-			case 2:
-				$item_columns_std_masonry = '50%';
-				break;
-			case 3:
-				$item_columns_std_masonry = '33%';
-				break;
-			case 4:
-				$item_columns_std_masonry = '25%';
-				break;
-			case 5:
-				$item_columns_std_masonry = '20%';
-				break;
-			case 6:
-				$item_columns_std_masonry = '16%';
-				break;
-			case 7:
-				$item_columns_std_masonry = '14%';
-				break;
-			case 8:
-				$item_columns_std_masonry = '12%';
-				break;
-		}
-
-	}else {
-		$item_columns_std_masonry = $item_width_std;
-
+	
+	if ($item_column_mode_feat == 0) {
+		$item_columns_feat = convertColumnsToPercentage($item_columns_feat);
+	} else {
+		$item_columns_feat = $item_width_feat;
+	}
+	
+	if ($item_column_mode_std == 0) {
+		$item_columns_std = convertColumnsToPercentage($item_columns_std);
+	} else {
+		$item_columns_std = $item_width_std;
 	}
 	
 
@@ -1073,6 +1047,7 @@ if ($std_builder_layout_num)
 		row-gap: '.$margin_top_bottom_feat.' !important ;
 		gap:'.$margin_left_right_feat.' !important;
 		' : '').'
+		grid-template-columns: repeat('.$item_fit_feat.', minmax('.$item_columns_feat.', 1fr));
 	}'.
 	/* CONTAINER of standard items */'
 	#mod_fcitems_box_standard_'.$uniq_ord_id.' {
@@ -1088,26 +1063,27 @@ if ($std_builder_layout_num)
 		row-gap: '.$margin_top_bottom.' !important;
 		gap:'.$margin_left_right.' !important;
 		' : '').'
+		grid-template-columns: repeat('.$item_fit_std.', minmax('.$item_columns_std.', 1fr));
 	}'.
 	/* column size for masonry */'
 	#mod_fcitems_box_featured_'.$uniq_ord_id.' .mod_flexicontent_featured_wrapper.masonry{
 	'.($inner_inline_css ? '
-		width: calc('.$item_columns_feat_masonry.' - '.$margin_left_right_feat.') !important;
+		width: calc('.$item_columns_feat.' - '.$margin_left_right_feat.') !important;
 		margin-right:'.$margin_left_right_feat.' !important;
 		margin-bottom:'.$margin_top_bottom_feat.' !important ;
 		' : '
-		width: calc('.$item_columns_feat_masonry.' - 20px) !important;
+		width: calc('.$item_columns_feat.' - 20px) !important;
 		margin-right:20px !important;
 		margin-bottom:20px !important ;
 		').'
 	}
 	#mod_fcitems_box_standard_'.$uniq_ord_id.' .mod_flexicontent_standard_wrapper.masonry {
 	'.($inner_inline_css ? '
-		width: calc('.$item_columns_std_masonry.' - '.$margin_left_right.') !important;
+		width: calc('.$item_columns_std.' - '.$margin_left_right.') !important;
 		margin-right:'.$margin_left_right.' !important;
 		margin-bottom:'.$margin_top_bottom.' !important;
 		' : '
-		width: calc('.$item_columns_std_masonry.' - 20px) !important;
+		width: calc('.$item_columns_std.' - 20px) !important;
 		margin-right: 20px !important;
 		margin-bottom:20px !important;
 		').'

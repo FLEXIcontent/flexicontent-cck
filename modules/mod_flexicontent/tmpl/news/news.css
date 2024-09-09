@@ -461,35 +461,6 @@
 	box-shadow: -2px 2px 5px -2px rgb(139, 139, 139), 2px -2px 5px -2px rgb(121, 121, 121);
 	z-index: 12; /* needed in cases the standard-itens outer box has z-index 10 */
 }
-
-.news .mod_flexicontent_standard.cols_2,
-.news .mod_flexicontent_featured.cols_2 {
-	grid-template-columns: repeat(2,1fr);
-}
-.news .mod_flexicontent_standard.cols_3,
-.news .mod_flexicontent_featured.cols_3 {
-	grid-template-columns: repeat(3,1fr);
-}
-.news .mod_flexicontent_standard.cols_4,
-.news .mod_flexicontent_featured.cols_4 {
-	grid-template-columns: repeat(4,1fr);
-}
-.news .mod_flexicontent_standard.cols_5,
-.news .mod_flexicontent_featured.cols_5 {
-	grid-template-columns: repeat(5,1fr);
-}
-.news .mod_flexicontent_standard.cols_6,
-.news .mod_flexicontent_featured.cols_6 {
-	grid-template-columns: repeat(6,1fr);
-}
-.news .mod_flexicontent_standard.cols_7,
-.news .mod_flexicontent_featured.cols_7 {
-	grid-template-columns: repeat(7,1fr);
-}
-.news .mod_flexicontent_standard.cols_8,
-.news .mod_flexicontent_featured.cols_8 {
-	grid-template-columns: repeat(8,1fr);
-}
 @media only screen and (max-width: 769px) {
 	.news .mod_flexicontent_standard.cols_2,
 	.news .mod_flexicontent_standard.cols_3,
@@ -505,7 +476,7 @@
 	.news .mod_flexicontent_featured.cols_6,
 	.news .mod_flexicontent_featured.cols_7,
 	.news .mod_flexicontent_featured.cols_8 {
-		grid-template-columns: repeat(2,1fr);
+		grid-template-columns: repeat(2,1fr)!important;
 	}
 }
 @media only screen and (max-width: 481px) {
@@ -523,6 +494,6 @@
 	.news .mod_flexicontent_featured.cols_6,
 	.news .mod_flexicontent_featured.cols_7,
 	.news .mod_flexicontent_featured.cols_8 {
-		grid-template-columns: repeat(1,1fr);
+		grid-template-columns: repeat(1,1fr) !important;
 	}
 }
