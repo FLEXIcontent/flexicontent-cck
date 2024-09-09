@@ -678,6 +678,10 @@
 				<option value="right">FLEXI_RIGHT</option>
 			</field>
 
+			<field name="readmore_class_std" type="text" defaut="readon btn std" hint="readon btn std" label="Btn class" description="Add your css class readon btn feat by default"/>
+
+
+
 			<field name="" type="separator" default="FLEXI_UMOD_FEAT" level="level3" />
 			<field name="display_text_feat" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_DISPLAY_TEXT" description="FLEXI_DISPLAY_TEXT_DESC" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="display_textfeat">FLEXI_NO</option>
@@ -697,6 +701,8 @@
 				<option value="center">FLEXI_CENTER</option>
 				<option value="right">FLEXI_RIGHT</option>
 			</field>
+
+			<field name="readmore_class_feat" type="text" defaut="readon btn feat" hint="readon btn feat" label="Btn class" placeholder="btn" description="Add your css class readon btn feat by default"/>
 
 			<field name="" type="separator" default="FLEXI_IMAGE_PARAMS" level="level1" />
 			<field name="mod_image" type="fcimage" valcolumn="id" default="" label="FLEXI_IMAGE_SOURCE" description="FLEXI_IMAGE_SOURCE_DESC" />

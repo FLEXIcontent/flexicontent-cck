@@ -614,3 +614,9 @@ fieldset.fc_filter_set {
 	margin: 0 !important;
 	padding: 0 !important;
 }
+.fcfile_name {
+	background: none;
+	border: 0;
+	margin: 0 !important;
+	padding: 0 !important;
+}

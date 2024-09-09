@@ -31,7 +31,7 @@
 			</field>
 
 			<field name="" type="separator" default="FLEXI_MOD_TMPL_CONTENT_VIA_LAYOUT_BUILDER" level="level2" />
-			<field name="carousel_builder_layout_feat" type="multilist" subtype="radio" default="1" label="Featured items" description="" class="btn-group group-fcmethod">
+			<field name="carousel_builder_layout_feat" type="multilist" subtype="radio" default="0" label="Featured items" description="" class="btn-group group-fcmethod">
 				<option value="0">FLEXI_DISABLE</option>
 				<option value="1">Layout 1</option>
 				<option value="2">Layout 2</option>
@@ -51,6 +51,11 @@
 				<option value="2" hide_list="items_in_cols_feat">FLEXI_TABS</option>
 				<option value="3" hide_list="items_in_cols_feat">FLEXI_ACCORDION</option>
 			</field>
+			<field name="carousel_column_mode_feat" type="multilist" subtype="radio" default="0" label="Column mode" description="Highlight currently 'active' and 'hovered' items by adding CSS classes" class="btn-group btn-group-yesno">
+				<option value="0" show_list="item_columns_feat" hide_list="item_width_feat" >Column mode</option>
+				<option value="1" show_list="item_width_feat" hide_list="item_columns_feat">Gride mode</option>
+			</field>
+			<field name="item_width_feat" type="text" defaut="200px" label="Width of columns (grid mode)" description=""/>
 			<field name="item_columns_feat" type="list" default="3" label="FLEXI_UMOD_NUM_OF_COLUMNS" description="FLEXI_UMOD_NUM_OF_COLUMNS_DESC" depend_class="items_in_cols_feat">
 				<option value="1">1</option>
 				<option value="2">2</option>

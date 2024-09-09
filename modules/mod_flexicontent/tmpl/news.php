@@ -43,6 +43,8 @@ $padding_left_right_feat = (int)$params->get($layout.'_padding_left_right_feat',
 $margin_top_bottom_feat = $params->get($layout.'_margin_left_right_feat', 4);
 $margin_left_right_feat = $params->get($layout.'_margin_left_right_feat', 4);
 $border_width_feat = (int)$params->get($layout.'_border_width_feat', 1);
+$item_column_mode_feat = (int)$params->get($layout.'_item_column_mode_feat', 1);// 0 column mode old, 1 grid minmax size
+$item_width_feat = $params->get($layout.'_item_width_feat', '200px');
 
 
 // Item Dimensions standard
@@ -52,9 +54,14 @@ $padding_left_right = (int)$params->get($layout.'_padding_left_right', 12);
 $margin_top_bottom = $params->get($layout.'_margin_left_right', 4);
 $margin_left_right = $params->get($layout.'_margin_left_right', 4);
 $border_width = (int)$params->get($layout.'_border_width', 1);
+$item_column_mode_std = (int)$params->get($layout.'_item_column_mode_std', 1);// 0 column mode old, 1 grid minmax size
+$item_width_std = $params->get($layout.'_item_width_std', '200px');
 
 $readmore_align_feat = $params->get('readmore_align_feat', 'center');
 $readmore_align_std = $params->get('readmore_align_std', 'center');
+
+$readmore_class_feat = $params->get('readmore_class_feat', 'readon btn feat');
+$readmore_class_std = $params->get('readmore_class_std', 'readon btn std');
 
 // Page builder
 $news_builder_layout_feat = $params->get('news_builder_layout_feat');
@@ -553,7 +560,7 @@ if ($std_builder_layout_num)
 					<?php if ($mod_readmore_feat) : ?>
 					<div class="fc_block">
 						<div class="fcitem_readon <?php echo $readmore_align_feat;?>">
-							<a href="<?php echo $item->link; ?>" class="readon btn"><span><?php echo \Joomla\CMS\Language\Text::_('FLEXI_MOD_READ_MORE'); ?></span></a>
+							<a href="<?php echo $item->link; ?>" class="<?php echo $readmore_class_feat; ?>"><span><?php echo \Joomla\CMS\Language\Text::_('FLEXI_MOD_READ_MORE'); ?></span></a>
 						</div>
 					</div>
 					<?php endif; ?>
@@ -864,7 +871,7 @@ if ($std_builder_layout_num)
 					<?php if ($mod_readmore) : ?>
 					<div class="fc_block readmore">
 						<div class="fcitem_readon <?php echo $readmore_align_std;?>">
-							<a href="<?php echo $item->link; ?>" class="readon btn"><span><?php echo \Joomla\CMS\Language\Text::_('FLEXI_MOD_READ_MORE'); ?></span></a>
+							<a href="<?php echo $item->link; ?>" class="<?php echo $readmore_class_std; ?>"><span><?php echo \Joomla\CMS\Language\Text::_('FLEXI_MOD_READ_MORE'); ?></span></a>
 						</div>
 					</div>
 					<?php endif; ?>
@@ -987,57 +994,67 @@ if ($std_builder_layout_num)
 	// ***********************************************************
 	// Module specific styling (we use names containing module ID)
 	// ***********************************************************
-	switch ($item_columns_feat) {
-		case 1:
-			$item_columns_feat_masonry = '100%';
-			break;
-		case 2:
-			$item_columns_feat_masonry = '50%';
-			break;
-		case 3:
-			$item_columns_feat_masonry = '33%';
-			break;
-		case 4:
-			$item_columns_feat_masonry = '25%';
-			break;
-		case 5:
-			$item_columns_feat_masonry = '20%';
-			break;
-		case 6:
-			$item_columns_feat_masonry = '16%';
-			break;
-		case 7:
-			$item_columns_feat_masonry = '14%';
-			break;
-		case 8:
-			$item_columns_feat_masonry = '12%';
-			break;
+	if ($item_column_mode_feat == 0 ){
+		switch ($item_columns_feat) {
+			case 1:
+				$item_columns_feat_masonry = '100%';
+				break;
+			case 2:
+				$item_columns_feat_masonry = '50%';
+				break;
+			case 3:
+				$item_columns_feat_masonry = '33%';
+				break;
+			case 4:
+				$item_columns_feat_masonry = '25%';
+				break;
+			case 5:
+				$item_columns_feat_masonry = '20%';
+				break;
+			case 6:
+				$item_columns_feat_masonry = '16%';
+				break;
+			case 7:
+				$item_columns_feat_masonry = '14%';
+				break;
+			case 8:
+				$item_columns_feat_masonry = '12%';
+				break;
+		}
+	}else{
+		$item_columns_feat_masonry = $item_width_feat;
 	}
-	switch ($item_columns_std) {
-		case 1:
-			$item_columns_std_masonry = '100%';
-			break;
-		case 2:
-			$item_columns_std_masonry = '50%';
-			break;
-		case 3:
-			$item_columns_std_masonry = '33%';
-			break;
-		case 4:
-			$item_columns_std_masonry = '25%';
-			break;
-		case 5:
-			$item_columns_std_masonry = '20%';
-			break;
-		case 6:
-			$item_columns_std_masonry = '16%';
-			break;
-		case 7:
-			$item_columns_std_masonry = '14%';
-			break;
-		case 8:
-			$item_columns_std_masonry = '12%';
-			break;
+	if ($item_column_mode_std == 0 ){
+		switch ($item_columns_std) {
+			case 1:
+				$item_columns_std_masonry = '100%';
+				break;
+			case 2:
+				$item_columns_std_masonry = '50%';
+				break;
+			case 3:
+				$item_columns_std_masonry = '33%';
+				break;
+			case 4:
+				$item_columns_std_masonry = '25%';
+				break;
+			case 5:
+				$item_columns_std_masonry = '20%';
+				break;
+			case 6:
+				$item_columns_std_masonry = '16%';
+				break;
+			case 7:
+				$item_columns_std_masonry = '14%';
+				break;
+			case 8:
+				$item_columns_std_masonry = '12%';
+				break;
+		}
+
+	}else {
+		$item_columns_std_masonry = $item_width_std;
+
 	}
 	
 

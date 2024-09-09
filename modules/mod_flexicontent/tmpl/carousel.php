@@ -232,6 +232,10 @@ if ($interval < $duration)
 	echo '<div class="alert">autoplay interval must not be smaller than the EFFECT (scroll/fade/etc) duration (even if autoplay is disabled), please correct in module configuration</div>';
 }
 
+$readmore_align_feat = $params->get('readmore_align_feat', 'center');
+$readmore_align_std = $params->get('readmore_align_std', 'center');
+$readmore_class_feat = $params->get('readmore_class_feat', 'readon btn feat');
+$readmore_class_std = $params->get('readmore_class_std', 'readon btn std');
 
 /**
  * Featured
@@ -675,8 +679,8 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 
 				<?php if ($mod_readmore_feat) : ?>
 					<div class="fc_block readmore">
-						<div class="fcitem_readon">
-							<a href="<?php echo $item->link; ?>" class="readon btn"><span><?php echo \Joomla\CMS\Language\Text::_('FLEXI_MOD_READ_MORE'); ?></span></a>
+						<div class="fcitem_readon <?php echo $readmore_align_feat;?>">
+							<a href="<?php echo $item->link; ?>" class="<?php echo $readmore_class_feat; ?>"><span><?php echo \Joomla\CMS\Language\Text::_('FLEXI_MOD_READ_MORE'); ?></span></a>
 						</div>
 					</div>
 					<?php endif; ?>
@@ -961,8 +965,8 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 
 					<?php if ($mod_readmore) : ?>
 					<div class="fc_block">
-						<div class="fcitem_readon">
-							<a href="<?php echo $item->link; ?>" class="readon btn"><span><?php echo \Joomla\CMS\Language\Text::_('FLEXI_MOD_READ_MORE'); ?></span></a>
+						<div class="fcitem_readon <?php echo $readmore_align_std;?>">
+							<a href="<?php echo $item->link; ?>" class="<?php echo $readmore_class_std; ?>"><span><?php echo \Joomla\CMS\Language\Text::_('FLEXI_MOD_READ_MORE'); ?></span></a>
 						</div>
 					</div>
 					<?php endif; ?>
