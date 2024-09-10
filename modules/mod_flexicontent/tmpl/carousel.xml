@@ -96,6 +96,11 @@
 					<option value="auto-fill">Auto-fill</option>
 					<option value="auto-fit">Auto-fit</option>
 			</field>
+			<field name="carousel_content_height_fit_feat" type="radio" default="" hint="1" label="Height of content" description="Select yes to fix same height for each content" class="btn-group group-fcinfo">
+							<option value="">FLEXI_USE_GLOBAL</option>
+							<option value="0">Content height</option>
+							<option value="1">Force same height</option>
+						</field>
 
 			<field name="" type="separator" default="(inline) CSS Styles for Inner Container (px)" level="level2" />
 			<field name="carousel_inner_inline_css_feat" type="radio" default="0" label="FLEXI_ENABLE" description="Select to set styling of inner item containers" class="btn-group btn-group-yesno">

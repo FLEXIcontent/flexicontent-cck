@@ -43,9 +43,10 @@ $padding_left_right_feat = $params->get($layout.'_padding_left_right_feat', '0')
 $margin_top_bottom_feat = $params->get($layout.'_margin_left_right_feat', '2rem');
 $margin_left_right_feat = $params->get($layout.'_margin_left_right_feat', '2rem');
 $border_width_feat = (int)$params->get($layout.'_border_width_feat', 1);
-$item_column_mode_feat = (int)$params->get($layout.'_item_column_mode_feat', 1);// 0 column mode old, 1 grid minmax size
+$item_column_mode_feat = (int)$params->get($layout.'_column_mode_feat', 1);// 0 column mode old, 1 grid minmax size
 $item_width_feat = $params->get($layout.'_item_width_feat', '200px');
 $item_fit_feat = $params->get($layout.'_content_width_fit_feat', 'auto-fill');
+$item_height_feat = $params->get($layout.'_content_height_fit_feat', 1); //0 Content height, 1 Force same height
 
 // Item Dimensions standard
 $inner_inline_css = (int)$params->get($layout.'_inner_inline_css', 0);
@@ -54,6 +55,7 @@ $padding_left_right = (int)$params->get($layout.'_padding_left_right', 12);
 $margin_top_bottom = (int)$params->get($layout.'_margin_left_right', 4);
 $margin_left_right = (int)$params->get($layout.'_margin_left_right', 4);
 $border_width = (int)$params->get($layout.'_border_width', 1);
+$item_height_std = $params->get($layout.'_content_height_fit_std', 1); //0 Content height, 1 Force same height
 
 
 // *****************************************************
@@ -547,7 +549,7 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 			?>
 
 			<!-- BOF item -->	
-			<div class="mod_flexicontent_featured_wrapper<?php echo $mod_do_hlight_feat; ?><?php echo ' '.$oe_class .($item->is_active_item ? ' fcitem_active' : ''); ?>">
+			<div class="mod_flexicontent_featured_wrapper<?php echo $mod_do_hlight_feat; ?><?php echo ' '.$oe_class .($item->is_active_item ? ' fcitem_active' : ''); ?> <?php echo ($item_placement_feat == 1) ? 'masonry' : '';?>">
 			<div class="mod_flexicontent_featured_wrapper_innerbox">
 
 
@@ -680,7 +682,7 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 				<?php endif; ?>
 
 				<?php if ($mod_readmore_feat) : ?>
-					<div class="fc_block readmore">
+					<div class="fc_block readmore <?php echo ($item_height_feat == 1) ? "force-height" : ""; ;?>">
 						<div class="fcitem_readon <?php echo $readmore_align_feat;?>">
 							<a href="<?php echo $item->link; ?>" class="<?php echo $readmore_class_feat; ?>"><span><?php echo \Joomla\CMS\Language\Text::_('FLEXI_MOD_READ_MORE'); ?></span></a>
 						</div>
@@ -1305,10 +1307,12 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 	/* inner CONTAINER of each standard item */'
 	#mod_fcitems_box_standard_'.$uniq_ord_id.' div.mod_flexicontent_standard_wrapper_innerbox {
 		'.($inner_inline_css ? '
-		padding: '.$padding_top_bottom.'px '.$padding_left_right.'px !important;
-		border-width: '.$border_width.'px!important;
-		margin: '.$margin_top_bottom.'px '.$margin_left_right.'px !important;
+		padding: '.$padding_top_bottom_std.' '.$padding_left_right_std.' !important;
+		border-width: '.$border_width_std.' !important;
+		row-gap: '.$margin_top_bottom_std.' !important ;
+		gap:'.$margin_left_right_std.' !important;
 		' : '').'
+		grid-template-columns: repeat('.$item_fit_std.', minmax('.$item_columns_std.', 1fr));
 	}'.
 
 	/* The MASK that contains the CAROUSEL (mask clips it) */'
@@ -1328,7 +1332,39 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 	}
 	#mod_fc_page_handles_'.$uniq_ord_id.' span.mod_fc_page_handle:hover {
 		'.($page_handle_event=='click' ? 'cursor:pointer;' : 'cursor:default;').'
-	}'
+	}'.
+		/* column size for masonry */'
+		#mod_fcitems_box_featured_'.$uniq_ord_id.' .mod_flexicontent_featured_wrapper.masonry{
+			'.($inner_inline_css_feat ? '
+				width: calc('.$item_columns_feat.' - '.$margin_left_right_feat.') !important;
+				margin-right:'.$margin_left_right_feat.' !important;
+				margin-bottom:'.$margin_top_bottom_feat.' !important ;
+				' : '
+				width: calc('.$item_columns_feat.' - 20px) !important;
+				margin-right:20px !important;
+				margin-bottom:20px !important ;
+				').'
+			}
+			#mod_fcitems_box_standard_'.$uniq_ord_id.' .mod_flexicontent_standard_wrapper.masonry {
+			'.($inner_inline_css ? '
+				width: calc('.$item_columns_std.' - '.$margin_left_right.') !important;
+				margin-right:'.$margin_left_right.' !important;
+				margin-bottom:'.$margin_top_bottom.' !important;
+				' : '
+				width: calc('.$item_columns_std.' - 20px) !important;
+				margin-right: 20px !important;
+				margin-bottom:20px !important;
+				').'
+				}'.
+			/* responsive for masonry */'
+			@media only screen and (min-device-width : 320px) and (max-device-width : 480px) {
+			#mod_fcitems_box_featured_'.$uniq_ord_id.' .mod_flexicontent_featured_wrapper.masonry{
+				width: 100% !important;
+			}
+			#mod_fcitems_box_standard_'.$uniq_ord_id.' .mod_flexicontent_standard_wrapper.masonry {
+				width: 100% !important;
+				}
+			}'
 	;
 
 	if ($css) $document->addStyleDeclaration($css);
@@ -1337,12 +1373,16 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 	{
 		$js = "
 		jQuery(document).ready(function(){
-			var container = document.querySelector('div#mod_fcitems_box_featured_".$uniq_ord_id."');
+			var container_feat = document.querySelector('div#mod_fcitems_box_featured_".$uniq_ord_id."');
 			var msnry;
 			// initialize Masonry after all images have loaded
-			if (container) {
-				imagesLoaded( container, function() {
-					msnry = new Masonry( container );
+			if (container_feat) {
+				imagesLoaded( container_feat, function() {
+					msnry = new Masonry( container_feat, {
+					columnWidth: '#mod_fcitems_box_featured_$uniq_ord_id .mod_flexicontent_featured_wrapper.masonry',
+					horizontalOrder: true,
+					percentPosition: true
+					});
 				});
 			}
 		});

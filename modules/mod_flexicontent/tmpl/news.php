@@ -740,7 +740,7 @@ if ($std_builder_layout_num)
 			?>
 
 			<!-- BOF item -->	
-			<div class="mod_flexicontent_standard_wrapper<?php echo $mod_do_hlight; ?><?php echo ' '.$oe_class .($item->is_active_item ? ' fcitem_active' : '') ; ?> <?php echo ($item_placement_std == 1) ? 'masonry' : '';?> "
+			<div class="mod_flexicontent_standard_wrapper<?php echo $mod_do_hlight; ?><?php echo ' '.$oe_class .($item->is_active_item ? ' fcitem_active' : '') ; ?> <?php echo ($item_placement_feat == 1) ? 'masonry' : '';?> "
 				onmouseover=""
 				onmouseout=""
 			>
@@ -1039,7 +1039,7 @@ if ($std_builder_layout_num)
 	/* CONTAINER of each featured item */'
 	#mod_fcitems_box_featured_'.$uniq_ord_id.' div.mod_flexicontent_standard_wrapper {
 	}'.
-	/* inner CONTAINER of each standard item */'
+	/* inner CONTAINER of each feat item */'
 	#mod_fcitems_box_featured_'.$uniq_ord_id.'.mod_flexicontent_featured {
 		'.($inner_inline_css_feat ? '
 		padding: '.$padding_top_bottom_feat.' '.$padding_left_right_feat.' !important;
@@ -1067,7 +1067,7 @@ if ($std_builder_layout_num)
 	}'.
 	/* column size for masonry */'
 	#mod_fcitems_box_featured_'.$uniq_ord_id.' .mod_flexicontent_featured_wrapper.masonry{
-	'.($inner_inline_css ? '
+	'.($inner_inline_css_feat ? '
 		width: calc('.$item_columns_feat.' - '.$margin_left_right_feat.') !important;
 		margin-right:'.$margin_left_right_feat.' !important;
 		margin-bottom:'.$margin_top_bottom_feat.' !important ;
@@ -1108,12 +1108,12 @@ if ($std_builder_layout_num)
 		$margin_left_right_feat = intval($margin_left_right_feat);
 		$js = "
 		jQuery(document).ready(function(){
-			var container_lead = document.querySelector('div#mod_fcitems_box_featured_".$uniq_ord_id."');
+			var container_feat = document.querySelector('div#mod_fcitems_box_featured_".$uniq_ord_id."');
 			var msnry;
 			// initialize Masonry after all images have loaded
-			if (container_lead) {
-				imagesLoaded( container_lead, function() {
-					msnry = new Masonry( container_lead, {
+			if (container_feat) {
+				imagesLoaded( container_feat, function() {
+					msnry = new Masonry( container_feat, {
 					columnWidth: '#mod_fcitems_box_featured_$uniq_ord_id .mod_flexicontent_featured_wrapper.masonry',
 					horizontalOrder: true,
 					percentPosition: true

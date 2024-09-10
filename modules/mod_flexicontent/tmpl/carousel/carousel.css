@@ -1049,7 +1049,11 @@
 	display: grid !important;
 	gap:2rem;
 	row-gap: 2rem;
-}/*
+}
+.force-height{
+margin-top:auto;	
+}
+/*
 .carousel .mod_flexicontent_featured.cols_2 {
 	grid-template-columns: repeat(2,1fr);
 }
