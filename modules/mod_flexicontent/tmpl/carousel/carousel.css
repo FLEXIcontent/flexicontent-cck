@@ -1049,7 +1049,7 @@
 	display: grid !important;
 	gap:2rem;
 	row-gap: 2rem;
-}
+}/*
 .carousel .mod_flexicontent_featured.cols_2 {
 	grid-template-columns: repeat(2,1fr);
 }
@@ -1081,7 +1081,7 @@
 	.carousel .mod_flexicontent_featured.cols_8 {
 		grid-template-columns: repeat(2,1fr);
 	}
-}
+}*/
 @media only screen and (max-width: 481px) {
 	.carousel .mod_flexicontent_featured.cols_2,
 	.carousel .mod_flexicontent_featured.cols_3,

@@ -38,12 +38,14 @@ $mod_do_hlight .= $hl_items_onnav == 2 || $hl_items_onnav == 3 ? ' mod_hl_hover'
 
 // Item Dimensions featured
 $inner_inline_css_feat = (int)$params->get($layout.'_inner_inline_css_feat', 0);
-$padding_top_bottom_feat = (int)$params->get($layout.'_padding_top_bottom_feat', 8);
-$padding_left_right_feat = (int)$params->get($layout.'_padding_left_right_feat', 12);
-$margin_top_bottom_feat = (int)$params->get($layout.'_margin_left_right_feat', 4);
-$margin_left_right_feat = (int)$params->get($layout.'_margin_left_right_feat', 4);
+$padding_top_bottom_feat = $params->get($layout.'_padding_top_bottom_feat', '0');
+$padding_left_right_feat = $params->get($layout.'_padding_left_right_feat', '0');
+$margin_top_bottom_feat = $params->get($layout.'_margin_left_right_feat', '2rem');
+$margin_left_right_feat = $params->get($layout.'_margin_left_right_feat', '2rem');
 $border_width_feat = (int)$params->get($layout.'_border_width_feat', 1);
-
+$item_column_mode_feat = (int)$params->get($layout.'_item_column_mode_feat', 1);// 0 column mode old, 1 grid minmax size
+$item_width_feat = $params->get($layout.'_item_width_feat', '200px');
+$item_fit_feat = $params->get($layout.'_content_width_fit_feat', 'auto-fill');
 
 // Item Dimensions standard
 $inner_inline_css = (int)$params->get($layout.'_inner_inline_css', 0);
@@ -691,11 +693,12 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 			<?php endif; /* EOF: Content display via Parameter-based Layout */ ?>
 
 
-			<?php
+			<?php if($feat_builder_layout_num > 0){
 				// Content display via Builder-based Layouts
 				echo $feat_builder_layout
 					? str_replace('{{fc-item-id}}', $item->id, $feat_builder_layout)
 					: '';
+				}
 			?>
 
 
@@ -984,7 +987,7 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 
 			<?php
 				// Content display via Builder-based Layouts
-				if (!empty ($std_builder_layout)){
+				if ($std_builder_layout > 0){
 				echo $std_builder_layout
 					? str_replace('{{fc-item-id}}', $item->id, $std_builder_layout)
 					: '';
@@ -1240,6 +1243,41 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 	// Module specific styling (we use names containing module ID)
 	// ***********************************************************
 
+	function convertColumnsToPercentage($columns) {
+		switch ($columns) {
+			case 1:
+				return '100%';
+			case 2:
+				return '48%';
+			case 3:
+				return '31%';
+			case 4:
+				return '23%';
+			case 5:
+				return '18%';
+			case 6:
+				return '14%';
+			case 7:
+				return '12%';
+			case 8:
+				return '10%';
+			default:
+				return '100%';
+		}
+	}
+	
+	if ($item_column_mode_feat == 0) {
+		$item_columns_feat = convertColumnsToPercentage($item_columns_feat);
+	} else {
+		$item_columns_feat = $item_width_feat;
+	}
+	
+	if ($item_column_mode_std == 0) {
+		$item_columns_std = convertColumnsToPercentage($item_columns_std);
+	} else {
+		$item_columns_std = $item_width_std;
+	}
+
 	$css = ''.
 	/* CONTAINER of featured items */'
 	#mod_fcitems_box_featured_'.$uniq_ord_id.' {
@@ -1248,12 +1286,14 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 	#mod_fcitems_box_featured_'.$uniq_ord_id.' div.mod_flexicontent_standard_wrapper {
 	}'.
 	/* inner CONTAINER of each standard item */'
-	#mod_fcitems_box_featured_'.$uniq_ord_id.' div.mod_flexicontent_standard_wrapper_innerbox {
+	#mod_fcitems_box_featured_'.$uniq_ord_id.'.mod_flexicontent_featured {
 		'.($inner_inline_css_feat ? '
 		padding: '.$padding_top_bottom_feat.'px '.$padding_left_right_feat.'px !important;
 		border-width: '.$border_width_feat.'px!important;
-		margin: '.$margin_top_bottom_feat.'px '.$margin_left_right_feat.'px !important;
+		row-gap: '.$margin_top_bottom_feat.' !important ;
+		gap:'.$margin_left_right_feat.' !important;
 		' : '').'
+		grid-template-columns: repeat('.$item_fit_feat.', minmax('.$item_columns_feat.', 1fr));
 	}'.
 
 	/* CONTAINER of standard items */'

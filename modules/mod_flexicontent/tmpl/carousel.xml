@@ -55,7 +55,7 @@
 				<option value="0" show_list="item_columns_feat" hide_list="item_width_feat" >Column mode</option>
 				<option value="1" show_list="item_width_feat" hide_list="item_columns_feat">Gride mode</option>
 			</field>
-			<field name="item_width_feat" type="text" defaut="200px" label="Width of columns (grid mode)" description=""/>
+			<field name="carousel_item_width_feat" type="text" defaut="200px" label="Width of columns (grid mode)" description=""/>
 			<field name="item_columns_feat" type="list" default="3" label="FLEXI_UMOD_NUM_OF_COLUMNS" description="FLEXI_UMOD_NUM_OF_COLUMNS_DESC" depend_class="items_in_cols_feat">
 				<option value="1">1</option>
 				<option value="2">2</option>
@@ -91,16 +91,22 @@
 				<option value="1">Auto-Fit and Stretch</option>
 			</field>
 
+			<field name="carousel_content_width_fit_feat" type="radio" default="auto-fill" label="fit content" description="Select yes to fix same height for each content" class="btn-group group-fcinfo">
+				<option value="">FLEXI_USE_GLOBAL</option>
+					<option value="auto-fill">Auto-fill</option>
+					<option value="auto-fit">Auto-fit</option>
+			</field>
+
 			<field name="" type="separator" default="(inline) CSS Styles for Inner Container (px)" level="level2" />
 			<field name="carousel_inner_inline_css_feat" type="radio" default="0" label="FLEXI_ENABLE" description="Select to set styling of inner item containers" class="btn-group btn-group-yesno">
 				<option value="0">No (use default/custom CSS)</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="carousel_padding_top_bottom_feat" type="text" filter="int" default="8" label="padding top/bottom" description="This is the padding applied at top and bottom of the items" />
-			<field name="carousel_padding_left_right_feat" type="text" filter="int" default="12" label="padding left/right" description="This is the padding applied at left and right of the items" />
-			<field name="carousel_border_width_feat" type="text" filter="int" default="1" label="border width" description="This is the border width applied around the items" />
-			<field name="carousel_margin_top_bottom_feat" type="text" filter="int" default="4" label="margin top/bottom" description="This is the margin applied at top and bottom of the items" />
-			<field name="carousel_margin_left_right_feat" type="text" filter="int" default="4" label="margin left/right" description="This is the margin applied at left and right of the items" />
+			<field name="carousel_padding_top_bottom_feat" type="text"  default="0" label="padding top/bottom" description="This is the padding applied at top and bottom of the items" />
+			<field name="carousel_padding_left_right_feat" type="text"  default="0" label="padding left/right" description="This is the padding applied at left and right of the items" />
+			<field name="carousel_border_width_feat" type="text" default="1" label="border width" description="This is the border width applied around the items" />
+			<field name="carousel_margin_top_bottom_feat" type="text"  default="2rem" label="margin top/bottom" description="This is the margin applied at top and bottom of the items" />
+			<field name="carousel_margin_left_right_feat" type="text"  default="2rem" label="margin left/right" description="This is the margin applied at left and right of the items" />
 
 
 			<field name="item_tab_standard" type="separator" default="Standard items" description="Placed inside the carousel" icon_class="icon-list" level="tab_open" box_type="1" />
