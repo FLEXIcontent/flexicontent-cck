@@ -18,6 +18,8 @@ fieldset.fc_filter_set {
 	flex-direction: row;
 	flex-wrap: wrap;
 	align-items: center;
+	gap: 5px;
+	row-gap: 5px;
 }
 fieldset.fc_search_set legend,
 fieldset.fc_filter_set legend {
@@ -106,19 +108,13 @@ fieldset.fc_filter_set .fc-mssg.fc-info {
 }
 .fc_filter,
 .fc_filter_line {
-	display: inline-block;
+	display: flex;
 	float: none;
 	white-space: normal;
 	border: 0px solid lightgray;
 	border-radius: 2px;
-}
-.fc_filter {
-	clear: none;
-	margin: 0px 2px 2px 0px;
-	padding: 1px 0% 1px 0%;
-	width: auto;
-	position: relative;
-	vertical-align: top;
+	flex-direction: row;
+	gap: 5px;
 }
 .fc_filter_line {
 	clear: both;
@@ -143,54 +139,13 @@ form > .fc_filter_line {
 .fc_filter_line .fc_filter_label_inline {
 	border-bottom: 1px solid #ccc;
 }
-.fc_filter .fc_filter_label,
-.fc_filter_line .fc_filter_label {
-	float: left;
-	display: inline-block;
-	color: white;
-	background-color: #909090;
-	border-width: 0px;
-	font-weight: normal;
-	font-size: 12px;
-	font-family: georgia, arial;
-	text-align: right;
-	border-radius: 3px;
-	text-shadow: 2px 4px 3px rgba(0,0,0,0.3);
-}
 .fc_filter.active .fc_filter_label,
 .fc_filter_line.active .fc_filter_label {
 	background-color: darkred;
 }
-.fc_filter .fc_filter_label .label,
-.fc_filter_line .fc_filter_label .label {
-	font-size: 11px;
-}
 .fc_filter.active .fc_filter_label .label,
 .fc_filter_line.active .fc_filter_label .label {
 	background-color: darkred;
-}
-.fc_filter .fc_filter_label {
-	clear: both;
-	width: auto;
-	max-width: 150px;
-	padding: 3px 4px;
-	margin: 2px 8px 3px 8px;
-}
-.fc_filter_line .fc_filter_label {
-	clear: none;
-	width: 15%;
-	max-width: 200px;
-	padding: 6px 1%;
-	margin: 2px 2% 0px 0px;
-	text-align: left;
-}
-.fc_filter .fc_filter_html,
-.fc_filter_line .fc_filter_html {
-	display: inline-block;
-	float: left;
-	font-size: 90%;
-	padding: 0px 0% 0px 0%;
-	margin: 0px 0% 0px 0%;
 }
 .fcfilter_with_nouislider {
 	min-width: 120px;
