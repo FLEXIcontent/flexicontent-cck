@@ -20,6 +20,8 @@ $filter_placement = $params->get( 'filter_placement', 1 );
 $filter_container_class  = $filter_placement ? 'fc_filter_line' : 'fc_filter';
 $filter_container_class .= $filter_placement==2 ? ' fc_clear_label' : '';
 $text_search_val = \Joomla\CMS\Factory::getApplication()->input->get('filter', '', 'string');
+$column_width = $params->get('column_width', '20%');
+$column_gap = $params->get('column_gap', '2rem');
 
 // 4. Create (print) the form
 ?>

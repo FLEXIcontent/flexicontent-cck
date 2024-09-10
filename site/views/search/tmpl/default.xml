@@ -14,10 +14,14 @@
 		<field name="" type="separator" level="level1" default="Search Form" />
 
 			<field name="form_placement" type="multilist" subtype="radio" toggle_related="1" default="1" label="FLEXI_SEARCH_FORM_PLACEMENT" description="FLEXI_SEARCH_FORM_PLACEMENT_DESC" class="btn-group group-fcinfo" inline_text="FLEXI_SEARCH_FORM_PLACEMENT_TIP" text_class="fc-mssg-inline fc-info fc-small form_placement_txt">
-				<option value="0" show_list="form_placement_txt" hide_list="">FLEXI_TOP</option>
-				<option value="1" show_list="form_placement_txt" hide_list="">FLEXI_LEFT</option>
-				<option value="2" show_list="form_placement_txt" hide_list="">FLEXI_RIGHT</option>
+				<option value="0" show_list="form_placement_txt" hide_list="column_width_options">FLEXI_TOP</option>
+				<option value="1" show_list="form_placement_txt,column_width_options" hide_list="">FLEXI_LEFT</option>
+				<option value="2" show_list="form_placement_txt,column_width_options" hide_list="">FLEXI_RIGHT</option>
 			</field>
+
+			<field name="column_width" type="text" default="20%" label="Column width" hint="10%" toggle_related="1" depend_class="column_width_options" description="set width of column for left and right position" />
+			<field name="column_gap" type="text" default="2rem" label="Column gap" hint="2rem or 15px or 10%" toggle_related="1" depend_class="column_width_options" description="set gapp between colum and results" />
+
 			<field name="selectors_display_as" type="radio" default="select" label="Selector display" description="Display content types as" class="btn-group btn-group-yesno">
 				<option value="select">Dropdown Select</option>
 				<option value="checkboxes">Checkboxes list</option>
