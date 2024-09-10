@@ -24,13 +24,14 @@ fieldset.fc_filter_set {   /* CATEGORY view */
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
-	gap: 5px;
-    row-gap: 5px;
+	gap: 15px;
+    row-gap: 15px;
 }
 /* TITLE OF CONTAINER of search (field) filters */
 fieldset.fc_search_set legend,
 fieldset.fc_filter_set legend {
-	width: auto;
+	width: 100%;
+	display:flex;
 	border: 0px solid;
 	padding: 0px;
 	margin: 0px;
@@ -265,7 +266,7 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 }
 .fc_filter_html {
 	position: relative;
-	display: inline-block;
+	display: flex;
 }
 .fc_search_option_cell .fc_filter_html { /* allow inner filter HTML to auto-expand */
 	width: 100%;
@@ -554,4 +555,12 @@ li.select2-search-field {
 /** accessibility placeholder **/
 .select2-default {
 	color: inherit !important;
+}
+/** set accordeon in full width **/
+div#fc_fieldfilters_tbl, .fc_filter_set .accordion {
+    width: 100%;
+}
+.mod_flexifilter_wrap .fc_filter_html {
+    flex-direction: column;
+	flex-wrap: nowrap;
 }

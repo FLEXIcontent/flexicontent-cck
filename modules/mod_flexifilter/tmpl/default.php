@@ -62,7 +62,7 @@ if ($ff_placement)
 <form id='<?php echo $form_id; ?>' action='<?php echo $form_target; ?>' data-fcform_default_action='<?php echo $form_target; ?>' method='<?php echo $form_method; ?>' role='search' >
 
 <?php if ( !empty($cats_select_field) ) : ?>
-<fieldset class="fc_filter_set" style="padding-bottom:0px;">
+<fieldset class="fc_filter_set fc_category" style="padding-bottom:0px;">
 	<span class="<?php echo $filter_container_class. ' fc_odd'; ?>" style="margin-bottom:0px;">
 		<span class="fc_filter_label fc_cid_label"><?php echo \Joomla\CMS\Language\Text::_($mcats_selection ? 'FLEXI_FILTER_CATEGORIES' : 'FLEXI_FILTER_CATEGORY'); ?></span>
 		<span class="fc_filter_html fc_cid_selector"><span class="cid_loading" id="cid_loading_<?php echo $module->id; ?>"></span><?php echo $cats_select_field; ?></span>
