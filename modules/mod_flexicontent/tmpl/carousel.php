@@ -55,6 +55,9 @@ $padding_left_right = (int)$params->get($layout.'_padding_left_right', 12);
 $margin_top_bottom = (int)$params->get($layout.'_margin_left_right', 4);
 $margin_left_right = (int)$params->get($layout.'_margin_left_right', 4);
 $border_width = (int)$params->get($layout.'_border_width', 1);
+$item_column_mode_std = (int)$params->get($layout.'_column_mode_feat', 1);// 0 column mode old, 1 grid minmax size
+$item_width_std = $params->get($layout.'_item_width_feat', '200px');
+$item_fit_std = $params->get($layout.'_content_width_fit_feat', 'auto-fill');
 $item_height_std = $params->get($layout.'_content_height_fit_std', 1); //0 Content height, 1 Force same height
 
 
