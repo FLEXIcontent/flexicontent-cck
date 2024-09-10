@@ -14,7 +14,10 @@ fieldset.fc_filter_set {
 	width: 100%;
 	box-sizing: border-box;
 	min-width: inherit !important;
-	display: block;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	align-items: center;
 }
 fieldset.fc_search_set legend,
 fieldset.fc_filter_set legend {
