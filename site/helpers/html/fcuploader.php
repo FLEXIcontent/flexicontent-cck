@@ -93,7 +93,7 @@ abstract class JHtmlFcuploader
 		}
 
 		 //Patch for front-end upload
-		if (JFactory::getApplication()->isClient('site')){
+		 if (\Joomla\CMS\Factory::getApplication()->isClient('site')){
 			$viewtask='&view=category';
 			}else{
 			$viewtask='';
