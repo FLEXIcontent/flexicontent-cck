@@ -6065,3 +6065,28 @@ button.ui-dialog-titlebar-close:after {
 .mod_flexifilter_wrapper .fc_filter_set.fc_category {
 	margin-bottom: 15px !important;
 }
+.flexi_search {
+	display: grid;
+	clear: both;
+}
+#searchForm.right {
+	order: 2;
+}
+.fc_search_results_list.right {
+	order: 1;
+}
+.fc_search_results_list.page {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 20px;
+	height: min-content;
+}
+.search-results {
+	display: flex;
+	flex-direction: column;
+}
+@media only screen and (max-width: 481px) {
+	.flexi_search.left {
+		grid-template-columns: 1fr !important;
+	}
+}
