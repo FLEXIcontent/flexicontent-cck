@@ -82,7 +82,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		}
 
 		$revert 	= \Joomla\CMS\HTML\HTMLHelper::image('administrator/components/com_flexicontent/assets/images/arrow_rotate_anticlockwise.png', \Joomla\CMS\Language\Text::_('FLEXI_REVERT'));
-		$view 		= \Joomla\CMS\HTML\HTMLHelper::image('administrator/components/com_flexicontent/assets/images/magnifier.png', \Joomla\CMS\Language\Text::_('FLEXI_VIEW'));
+		$view 		= \Joomla\CMS\HTML\HTMLHelper::image('administrator/components/com_flexicontent/assets/images/eye.png', \Joomla\CMS\Language\Text::_('FLEXI_VIEW'));
 		$comment 	= \Joomla\CMS\HTML\HTMLHelper::image('administrator/components/com_flexicontent/assets/images/comments.png', \Joomla\CMS\Language\Text::_('FLEXI_COMMENT'));
 
 		$model = $this->getModel($this->record_name);
