@@ -82,6 +82,7 @@
 	/* DO NOT OVERRIDE THESE !!! this is the placement container, override margin,padding,border of inner container only */
 	display: block;
 	float: left;
+	position: relative;
 	/*test remove style
 	margin: 0;
 	padding: 0;
@@ -315,12 +316,12 @@
 
 .carousel.mod_flexicontent_wrapper .content_standard  .fcitem_title,
 .carousel.mod_flexicontent_wrapper .content_standard  .fcitem_title a {
-	color: #fff;
-	/*font-size: 120%;
+	/*color: #fff;
+	font-size: 120%;
 	background-color: transparent;
-	line-height: 1.2em;*/
+	line-height: 1.2em;
 	width: 100%;
-	display: inline-block;
+	display: inline-block;*/
 }
 
 .carousel.mod_flexicontent_wrapper .content_featured .fcitem_title,
@@ -343,12 +344,12 @@
 /* item title styling (link, etc) */
 .carousel.mod_flexicontent_wrapper .fcitem_title a {
 	text-decoration: none;
-	-webkit-transition: all 0.4s; transition: all 0.4s;
+	/*-webkit-transition: all 0.4s; transition: all 0.4s;*/
 }
 .carousel.mod_flexicontent_wrapper .fcitem_title:hover a,
 .carousel.mod_flexicontent_wrapper .fcitem_title a:hover {
 	cursor: pointer;
-	text-shadow: 1px 1px 3px #000000;
+/*	text-shadow: 1px 1px 3px #000000;*/
 }
 .carousel.mod_flexicontent_wrapper .fc_overlayed .fcitem_title a {
 	/*text-shadow: 1px 1px 2px #000000, -1px -1px #000, 1px 1px #000000;
