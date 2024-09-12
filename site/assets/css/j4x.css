@@ -258,9 +258,6 @@ form div.container_fcfield > span {
 .input-group>:not(:first-child):not(.dropdown-menu):not(.valid-tooltip):not(.valid-feedback):not(.invalid-tooltip):not(.invalid-feedback) {
 	margin-left: -3px;
 }
-.flexicontent :not(.input-prepend):not(.input-append) > input[type="text"]:not(.minicolors) {
-	margin: 0px 2px 0px 2px;
-}
 .fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_text_filter,
 .fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_field_filter,
 .fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_text_filter:focus,

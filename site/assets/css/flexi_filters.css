@@ -62,11 +62,6 @@ fieldset.fc_filter_set legend .fc_legend_text span {
 	display: inline-block;
 	line-height: 1em;
 }
-fieldset.fc_search_set .fc-mssg.fc-info,
-fieldset.fc_filter_set .fc-mssg.fc-info {
-	margin: 4px 16px 16px 16px;
-	font-size: 12px;
-}
 .cid_loading {
 	color: darkred;
 	font-weight: bold;
@@ -318,11 +313,22 @@ span.fc_field_filter {
 .fc_filter_html.fc_text_search .fc_filter_button {
 	margin: 3px 0px;
 }
-.fc_filter_html.fc_text_search input {
+.fc_filter_html.fc_text_search input,
+input#search_searchword,
+.fc_field_filter {
 	width: unset;
 	min-height: calc(var(--form-inp-height)) !important;
 	line-height: calc(var(--form-inp-height)) !important;
 	padding: 0px 14px;
+}
+input#search_searchword {
+	border-radius: 5px;
+	border-color: #aaa;
+	width: 100%;
+}
+.fc_search_option_cell .fc_field_filter {
+	border-radius: 5px;
+	border-color: #aaa;
 }
 .fc_has_inner_label,
 .fc_has_inner_prompt {
@@ -388,4 +394,28 @@ div#fc_fieldfilters_tbl,
 .mod_flexifilter_wrap .fc_filter_html {
 	flex-direction: column;
 	flex-wrap: nowrap;
+}
+.mod_flexifilter_wrapper .fc_field_filter {
+	padding: 0;
+}
+.mod_flexifilter_wrap .fc_filter_line {
+	flex-direction: column;
+	gap: 5px;
+}
+.flexi_search.left fieldset.fc_search_set legend,
+.flexi_search.left fieldset.fc_filter_set legend,
+.flexi_search.right fieldset.fc_search_set legend,
+.flexi_search.right fieldset.fc_filter_set legend {
+	flex-direction: column;
+}
+.flexi_search.left .fc_filter_html,
+.flexi_search.right .fc_filter_html {
+	display: flex;
+	flex-direction: column;
+	flex-wrap: nowrap;
+	gap: 15px;
+}
+div#fc_textsearch_tbl {
+	margin-bottom: 20px;
+	width: 100%;
 }
