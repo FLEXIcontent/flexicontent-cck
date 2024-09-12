@@ -41,7 +41,7 @@ button.btn.btn-light,
 a.link.btn,
 a.direction.btn,
 button.btn.btn-highlight,
-.fc_filter_line.fc_clear_label.fc_filter_buttons_box .btn {
+.mod_flexiadvsearch_wrapper .fc_filter_line.fc_clear_label.fc_filter_buttons_box .btn {
 	border: 1px solid #aaa;
 	background: #ccc;
 }
@@ -254,9 +254,6 @@ form div.container_fcfield > span {
 }
 #flexicontent input#input-tags {
 	margin: 0px !important;
-}
-.input-group>:not(:first-child):not(.dropdown-menu):not(.valid-tooltip):not(.valid-feedback):not(.invalid-tooltip):not(.invalid-feedback) {
-	margin-left: -3px;
 }
 .fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_text_filter,
 .fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_field_filter,

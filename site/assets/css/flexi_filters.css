@@ -371,7 +371,9 @@ input#search_searchword {
 .fc_filter_html .select2-container-multi .select2-choices {
 	border: 1px solid #aaa;
 	border-radius: 5px;
-	display: inline-block;
+	display: flex;
+	width: 100% !important;
+	height: var(--form-inp-height) !important;
 }
 .field-calendar .btn {
 	background: #fff !important;
@@ -417,5 +419,15 @@ div#fc_fieldfilters_tbl,
 }
 div#fc_textsearch_tbl {
 	margin-bottom: 20px;
+	width: 100%;
+}
+.flexi_search #s2id_search_searchword {
+	width: 100%;
+	margin-bottom: 20px;
+}
+.flexi_search span.btn-wrapper.input-group {
+	display: block;
+}
+.flexi_search .btn-group {
 	width: 100%;
 }

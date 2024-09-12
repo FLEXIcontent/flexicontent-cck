@@ -359,11 +359,10 @@ div table.adminform td {
 #flexicontent .item_total .fc_limit_box,
 #flexicontent .item_total .fc_orderby_box,
 #flexicontent .item_total .fc_clayout_box {
-	display: inline-block;
+	display: flex;
 	float: left;
-	margin-top: 4px;
-	margin-bottom: 4px;
-	margin-left: 0px;
+	flex-direction: row;
+	align-items: center;
 }
 #flexicontent .item_total .fc_clayout_selector {
 	display: inline-block;
@@ -1259,6 +1258,13 @@ button.ui-dialog-titlebar-close:after {
 .search-results {
 	display: flex;
 	flex-direction: column;
+}
+#flexicontent .flexi_search .item_total {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: nowrap;
 }
 @media only screen and (max-width: 481px) {
 	.flexi_search.left {

@@ -476,11 +476,13 @@ div table.adminform td {
 #flexicontent .item_total .fc_limit_box,
 #flexicontent .item_total .fc_orderby_box,
 #flexicontent .item_total .fc_clayout_box {
-	display: inline-block;
+	display: flex;
 	float: left;
-	margin-top: 4px;
+	flex-direction: row;
+    align-items: center;
+	/*margin-top: 4px;
 	margin-bottom: 4px;
-	margin-left: 0px;
+	margin-left: 0px;*/
 }
 #flexicontent .item_total .fc_clayout_selector {
 	display: inline-block;
@@ -1625,6 +1627,13 @@ display: flex;
 .search-results {
     display: flex;
     flex-direction: column;
+}
+#flexicontent .flexi_search .item_total {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: nowrap;
 }
 /** mediaquery for search **/
 @media only screen and (max-width: 481px) {
