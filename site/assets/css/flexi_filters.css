@@ -431,3 +431,6 @@ div#fc_textsearch_tbl {
 .flexi_search .btn-group {
 	width: 100%;
 }
+.flexi_search input.fc_field_filter {
+	width: 100%;
+}
