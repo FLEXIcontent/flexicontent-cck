@@ -33,6 +33,9 @@
 /* EOF themes */
 /**************/
 
+.mod_flexicontent_wrapper {
+    overflow: visible;
+}
 /* separator feature and standard */
 .mod_flexicontent_featured{
 	margin-bottom:4rem;
@@ -339,7 +342,7 @@
 /*****************************/
 /* Content PLACEMENT methods */
 /*****************************/
-.news.mod_flexicontent_wrapper .fc_block {
+.news.mod_flexicontent_wrapper .fc_block.readmore {
 	line-height: 160%;
 	margin-top: auto;
 }

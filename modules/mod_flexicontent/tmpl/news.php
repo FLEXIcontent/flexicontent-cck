@@ -740,7 +740,7 @@ if ($std_builder_layout_num)
 			?>
 
 			<!-- BOF item -->	
-			<div class="mod_flexicontent_standard_wrapper<?php echo $mod_do_hlight; ?><?php echo ' '.$oe_class .($item->is_active_item ? ' fcitem_active' : '') ; ?> <?php echo ($item_placement_feat == 1) ? 'masonry' : '';?> "
+			<div class="mod_flexicontent_standard_wrapper<?php echo $mod_do_hlight; ?><?php echo ' '.$oe_class .($item->is_active_item ? ' fcitem_active' : '') ; ?> <?php echo ($item_placement_std == 1) ? 'masonry' : '';?> "
 				onmouseover=""
 				onmouseout=""
 			>
@@ -996,39 +996,67 @@ if ($std_builder_layout_num)
 	// ***********************************************************
 	// Module specific styling (we use names containing module ID)
 	// ***********************************************************
-	function convertColumnsToPercentage($columns) {
-		switch ($columns) {
+	if ($item_column_mode_feat == 0 ){
+		switch ($item_columns_feat) {
 			case 1:
-				return '100%';
+				$item_columns_feat = '100%';
+				break;
 			case 2:
-				return '48%';
+				$item_columns_feat = '50%';
+				break;
 			case 3:
-				return '31%';
+				$item_columns_feat = '33%';
+				break;
 			case 4:
-				return '23%';
+				$item_columns_feat = '25%';
+				break;
 			case 5:
-				return '18%';
+				$item_columns_feat = '20%';
+				break;
 			case 6:
-				return '14%';
+				$item_columns_feat = '16%';
+				break;
 			case 7:
-				return '12%';
+				$item_columns_feat = '14%';
+				break;
 			case 8:
-				return '10%';
-			default:
-				return '100%';
+				$item_columns_feat = '12%';
+				break;
 		}
-	}
-	
-	if ($item_column_mode_feat == 0) {
-		$item_columns_feat = convertColumnsToPercentage($item_columns_feat);
-	} else {
+	}else{
 		$item_columns_feat = $item_width_feat;
 	}
-	
-	if ($item_column_mode_std == 0) {
-		$item_columns_std = convertColumnsToPercentage($item_columns_std);
-	} else {
+	if ($item_column_mode_std == 0 ){
+		switch ($item_columns_std) {
+			case 1:
+				$item_columns_std = '100%';
+				break;
+			case 2:
+				$item_columns_std = '47%';
+				break;
+			case 3:
+				$item_columns_std = '30%';
+				break;
+			case 4:
+				$item_columns_std = '23%';
+				break;
+			case 5:
+				$item_columns_std = '18%';
+				break;
+			case 6:
+				$item_columns_std = '14%';
+				break;
+			case 7:
+				$item_columns_std = '12%';
+				break;
+			case 8:
+				$item_columns_std = '10%';
+				break;
+		}
+
+	}else {
 		$item_columns_std = $item_width_std;
+
 	}
 	
 
