@@ -1032,25 +1032,25 @@ if ($std_builder_layout_num)
 				$item_columns_std = '100%';
 				break;
 			case 2:
-				$item_columns_std = '47%';
+				$item_columns_std = '50%';
 				break;
 			case 3:
-				$item_columns_std = '30%';
+				$item_columns_std = '33%';
 				break;
 			case 4:
-				$item_columns_std = '23%';
+				$item_columns_std = '25%';
 				break;
 			case 5:
-				$item_columns_std = '18%';
+				$item_columns_std = '20%';
 				break;
 			case 6:
-				$item_columns_std = '14%';
+				$item_columns_std = '16%';
 				break;
 			case 7:
-				$item_columns_std = '12%';
+				$item_columns_std = '14%';
 				break;
 			case 8:
-				$item_columns_std = '10%';
+				$item_columns_std = '12%';
 				break;
 		}
 
@@ -1075,7 +1075,7 @@ if ($std_builder_layout_num)
 		row-gap: '.$margin_top_bottom_feat.' !important ;
 		gap:'.$margin_left_right_feat.' !important;
 		' : '').'
-		grid-template-columns: repeat('.$item_fit_feat.', minmax('.$item_columns_feat.', 1fr));
+		grid-template-columns: repeat('.$item_fit_feat.', minmax(calc('.$item_columns_feat.' - '.$margin_left_right_feat.') , 1fr));
 	}'.
 	/* CONTAINER of standard items */'
 	#mod_fcitems_box_standard_'.$uniq_ord_id.' {
@@ -1091,7 +1091,7 @@ if ($std_builder_layout_num)
 		row-gap: '.$margin_top_bottom.' !important;
 		gap:'.$margin_left_right.' !important;
 		' : '').'
-		grid-template-columns: repeat('.$item_fit_std.', minmax('.$item_columns_std.', 1fr));
+		grid-template-columns: repeat('.$item_fit_std.', minmax(calc('.$item_columns_std.' - '.$margin_left_right.'), 1fr));
 	}'.
 	/* column size for masonry */'
 	#mod_fcitems_box_featured_'.$uniq_ord_id.' .mod_flexicontent_featured_wrapper.masonry{
