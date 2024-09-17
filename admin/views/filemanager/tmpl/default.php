@@ -642,8 +642,11 @@ if ($enable_multi_uploader)
 	$step_labels = '["' . implode('", "', $cfg->labels) . '"]';
 
 	$upload_options = array(
-		'action' => Uri::base(true) . '/index.php?option=com_flexicontent&task=filemanager.uploads&history=' . ($isFilesElement ? 1 : 0)
-			. '&'.\Joomla\CMS\Session\Session::getFormToken().'=1' . '&fieldid='.$this->fieldid . '&u_item_id='.$this->u_item_id,
+		'action' => Uri::base(true) . '/index.php?option=com_flexicontent&task=filemanager.uploads'
+			. '&view='.$this->view
+			. '&history=' . ($isFilesElement ? 1 : 0)
+			. '&fieldid='.$this->fieldid . '&u_item_id='.$this->u_item_id
+			. '&'.\Joomla\CMS\Session\Session::getFormToken().'=1',
 		'upload_maxcount' => 0,
 		'layout' => $this->layout,
 		'edit_properties' => true,

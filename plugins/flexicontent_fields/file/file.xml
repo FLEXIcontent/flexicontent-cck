@@ -69,7 +69,7 @@
 			<field name="estorage_mode" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_REMOTE_STORAGE_TYPE" description="FLEXI_FIELD_REMOTE_STORAGE_TYPE_DESC" toggle_related="1" depend_class="" class="btn-group group-fcmethod fcoffactive">
 				<option value="0" show_list="" hide_list="estorage-ftp,estorage-other">FLEXI_NO</option>
 				<option value="FTP" show_list="estorage-ftp" hide_list="estorage-other">FTP</option>
-				<option value="FTP" show_list="estorage-other" hide_list="estorage-ftp">Other</option>
+				<option value="OTHER" show_list="estorage-other" hide_list="estorage-ftp">Other</option>
 			</field>
 
 			<field name="" type="separator" default="FLEXI_OTHER" description="" depend_class="estorage-other" level="level3" />
@@ -213,6 +213,12 @@
 				<option value="1">FLEXI_SECURE</option>
 				<option value="2">FLEXI_ALLOW_SELECTION</option>
 			</field>
+			<!-- Format of renamed uploaded file-->
+			<field name="uploaded_file_prefix" type="text" default="" label="FLEXI_UPLOADED_FILE_PREFIX" description="FLEXI_UPLOADED_FILE_PREFIX_DESC" depend_class="use-myfiles-on" />
+			<field name="uploaded_file_suffix" type="text" default="" label="FLEXI_UPLOADED_FILE_SUFFIX" description="FLEXI_UPLOADED_FILE_SUFFIX_DESC" depend_class="use-myfiles-on" />
+			<field name="uploaded_filename_code" type="editor" editor="codemirror" syntax="php" cols="80" rows="5" height="120px" class="fc-unset-width" filter="RAW"
+				   default="&lt;?php&#13;&#10;$F = &amp; $item-&gt;fields;&#13;&#10; return 'PREFIX_' . date('Y_m_d_H_i_s') . '_SUFFIX';&#13;&#10;?&gt;"
+				   label="FLEXI_CREATE_VIA_CUSTOM_CODE" description="FLEXI_CREATE_VIA_CUSTOM_CODE_DESC" depend_class="auto-value-code"/>
 
 			<field name="" type="separator" default="FLEXI_FILELIST_COLUMNS" description="FLEXI_FILELIST_COLUMNS_DESC" level="level3" depend_class="use-myfiles-on" />
 			<field name="filelist_cols" type="fccheckbox" default="" display_useglobal="0"

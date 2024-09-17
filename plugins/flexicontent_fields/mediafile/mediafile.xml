@@ -69,7 +69,7 @@
 			<field name="estorage_mode" type="multilist" subtype="radio" default="0" label="FLEXI_FIELD_REMOTE_STORAGE_TYPE" description="FLEXI_FIELD_REMOTE_STORAGE_TYPE_DESC" toggle_related="1" depend_class="" class="btn-group group-fcmethod fcoffactive">
 				<option value="0" show_list="" hide_list="estorage-ftp,estorage-other">FLEXI_NO</option>
 				<option value="FTP" show_list="estorage-ftp" hide_list="estorage-other">FTP</option>
-				<option value="FTP" show_list="estorage-other" hide_list="estorage-ftp">Other</option>
+				<option value="OTHER" show_list="estorage-other" hide_list="estorage-ftp">Other</option>
 			</field>
 
 			<field name="" type="separator" default="FLEXI_OTHER" description="" depend_class="estorage-other" level="level3" />
