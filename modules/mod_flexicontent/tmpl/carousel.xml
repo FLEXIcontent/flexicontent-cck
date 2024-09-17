@@ -46,17 +46,17 @@
 
 			<field name="" type="separator" default="Basic" level="level2" />
 			<field name="carousel_item_placement_feat" type="multilist" subtype="radio" default="1" toggle_related="1" label="FLEXI_ITEMS_PLACEMENT" description="FLEXI_ITEMS_PLACEMENT_DESC" class="btn-group group-fcinfo">
-				<option value="0" show_list="items_in_cols_feat">FLEXI_CLEARED</option>
-				<option value="1" show_list="items_in_cols_feat">FLEXI_AS_MASONRY_TILES</option>
-				<option value="2" hide_list="items_in_cols_feat">FLEXI_TABS</option>
-				<option value="3" hide_list="items_in_cols_feat">FLEXI_ACCORDION</option>
+				<option value="0" show_list="carousel_column_mode_feat,carousel_item_width_feat,item_columns_feat">FLEXI_CLEARED</option>
+				<option value="1" show_list="carousel_column_mode_feat,carousel_item_width_feat,item_columns_feat">FLEXI_AS_MASONRY_TILES</option>
+				<option value="2" hide_list="carousel_column_mode_feat,carousel_item_width_feat,item_columns_feat">FLEXI_TABS</option>
+				<option value="3" hide_list="carousel_column_mode_feat,carousel_item_width_feat,item_columns_feat">FLEXI_ACCORDION</option>
 			</field>
-			<field name="carousel_column_mode_feat" type="multilist" subtype="radio" default="0" label="Column mode" description="Highlight currently 'active' and 'hovered' items by adding CSS classes" class="btn-group btn-group-yesno">
-				<option value="0" show_list="item_columns_feat" hide_list="item_width_feat" >Column mode</option>
-				<option value="1" show_list="item_width_feat" hide_list="item_columns_feat">Gride mode</option>
+			<field name="carousel_column_mode_feat" type="multilist" subtype="radio" default="0" toggle_related="1" label="Column mode" depend_class="carousel_column_mode_feat" description="Highlight currently 'active' and 'hovered' items by adding CSS classes" class="btn-group btn-group-yesno">
+				<option value="0" show_list="item_columns_feat" hide_list="carousel_item_width_feat" >Column mode</option>
+				<option value="1" show_list="carousel_item_width_feat" hide_list="item_columns_feat">Grid mode</option>
 			</field>
-			<field name="carousel_item_width_feat" type="text" defaut="200px" label="Width of columns (grid mode)" description=""/>
-			<field name="item_columns_feat" type="list" default="3" label="FLEXI_UMOD_NUM_OF_COLUMNS" description="FLEXI_UMOD_NUM_OF_COLUMNS_DESC" depend_class="items_in_cols_feat">
+			<field name="carousel_item_width_feat" type="text" defaut="200px" hint="prefer to use px like 200px" label="Width of columns (grid mode)" description="" depend_class="carousel_item_width_feat"/>
+			<field name="item_columns_feat" type="list" default="3" label="FLEXI_UMOD_NUM_OF_COLUMNS" description="FLEXI_UMOD_NUM_OF_COLUMNS_DESC" depend_class="item_columns_feat">
 				<option value="1">1</option>
 				<option value="2">2</option>
 				<option value="3">3</option>

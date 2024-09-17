@@ -250,7 +250,12 @@ $readmore_class_std = $params->get('readmore_class_std', 'readon btn std');
  */
 $item_placement_feat = (int) $params->get($layout.'_item_placement_feat', 0);
 $item_columns_feat   = (int) $params->get('item_columns_feat', 3);
-$cols_class_feat     = $item_columns_feat <= 1 ? '' : 'cols_' . $item_columns_feat;
+/** add column class or no class for grid mode */
+if ($item_columns_feat  >= 1 && $item_column_mode_feat == 1 ){
+	$cols_class_feat = '';
+}else {
+	$cols_class_feat  ='cols_' .$item_columns_feat;
+}
 
 /**
  * Standard
@@ -259,7 +264,12 @@ $cols_class_feat     = $item_columns_feat <= 1 ? '' : 'cols_' . $item_columns_fe
  */
 $item_placement_std = -1;
 $item_columns_std   = 1;
-$cols_class_std     = $item_columns_std  <= 1 ? '' : 'cols_' . $item_columns_std;
+/** add column class or no class for grid mode */
+if ($item_columns_std  >= 1 && $item_column_mode_std == 1 ){
+	$cols_class_std = '';
+}else {
+	$cols_class_std ='cols_' . $item_columns_std;
+}
 
 $document = \Joomla\CMS\Factory::getDocument();
 $jcookie  = \Joomla\CMS\Factory::getApplication()->input->cookie;

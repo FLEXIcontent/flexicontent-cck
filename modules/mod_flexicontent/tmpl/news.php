@@ -151,7 +151,12 @@ $img_auto_dims_css=" width: 100%; height: auto; display: block !important; borde
  */
 $item_placement_feat = (int) $params->get($layout.'_item_placement_feat', 0);
 $item_columns_feat   = (int) $params->get('item_columns_feat', 3);
-$cols_class_feat     = $item_columns_feat <= 1 ? '' : 'cols_' . $item_columns_feat;
+/** add column class or no class for grid mode */
+if ($item_columns_feat  >= 1 && $item_column_mode_feat == 1 ){
+	$cols_class_feat = '';
+}else {
+	$cols_class_feat  ='cols_' .$item_columns_feat;
+}
 
 /**
  * Standard
@@ -159,7 +164,13 @@ $cols_class_feat     = $item_columns_feat <= 1 ? '' : 'cols_' . $item_columns_fe
  */
 $item_placement_std = (int) $params->get($layout.'_item_placement', 0);
 $item_columns_std   = (int) $params->get('item_columns', 4);
-$cols_class_std     = $item_columns_std  <= 1 ? '' : 'cols_' . $item_columns_std;
+/** add column class or no class for grid mode */
+if ($item_columns_std  >= 1 && $item_column_mode_std == 1 ){
+	$cols_class_std = '';
+}else {
+	$cols_class_std ='cols_' . $item_columns_std;
+}
+//$cols_class_std     = $item_columns_std  <= 1 ? '' : 'cols_' . $item_columns_std;
 
 $document = \Joomla\CMS\Factory::getDocument();
 $jcookie  = \Joomla\CMS\Factory::getApplication()->input->cookie;
@@ -1056,7 +1067,6 @@ if ($std_builder_layout_num)
 
 	}else {
 		$item_columns_std = $item_width_std;
-
 	}
 	
 
