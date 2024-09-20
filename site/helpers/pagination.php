@@ -136,6 +136,30 @@ class FCPagination extends \Joomla\CMS\Pagination\Pagination
 			return parent::_buildDataObject();
 		}
 
+		// Platform defaults
+		$defaultUrlParams = [
+			'format'        => 'CMD',
+			'option'        => 'CMD',
+			'controller'    => 'CMD',
+			'view'          => 'CMD',
+			'layout'        => 'STRING',
+			'task'          => 'CMD',
+			'template'      => 'CMD',
+			'templateStyle' => 'INT',
+			'tmpl'          => 'CMD',
+			'tpl'           => 'CMD',
+			'id'            => 'STRING',
+			'Itemid'        => 'INT',
+		];
+		
+		// Remove these variables from pagination URL
+		$input = \Joomla\CMS\Factory::getApplication()->input;
+		foreach ($defaultUrlParams as $param => $filter) {
+			$value = $input->get($param, '', $filter);
+
+			if ($value === null || $value === '') $input->set($param, null);
+		}
+
 		// ***
 		// *** Need to call parent function to avoid problems WITH SH404SEF as SH404SEF and other SEF components have custom pagination link creation
 		// ***

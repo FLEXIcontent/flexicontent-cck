@@ -2323,8 +2323,9 @@ class ParentClassItem extends FCModelAdmin
 		else
 		{
 			$datenow = \Joomla\CMS\Factory::getDate();
-			$item->modified    = $datenow->toSql();
-			$item->modified_by = $user->get('id');
+			$item->modified    = !empty($data['__keep_modified__']) ? $data['modified'] : $datenow->toSql();
+			$item->modified_by = !empty($data['__keep_modified__']) ? $data['modified_by'] : $user->get('id');
+			$item->modified     = $item->modified === '0000-00-00 00:00:00' && FLEXI_J40GE ? NULL : $item->modified;
 		}
 
 		// Clear up-to date marking of this item so that its modification time will be used ...
@@ -2699,8 +2700,9 @@ class ParentClassItem extends FCModelAdmin
 			}
 			// Set modifier and modification time (as if item has been saved), so that we can use this information for updating the versioning tables
 			$datenow = \Joomla\CMS\Factory::getDate();
-			$item->modified			= $datenow->toSql();
-			$item->modified_by	= $user->get('id');
+			$item->modified			= !empty($data['__keep_modified__']) ? $item->modified : $datenow->toSql();
+			$item->modified_by	= !empty($data['__keep_modified__']) ? $item->modified_by : $user->get('id');
+			$item->modified     = $item->modified === '0000-00-00 00:00:00' && FLEXI_J40GE ? NULL : $item->modified;
 		}
 
 

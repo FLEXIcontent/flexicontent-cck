@@ -94,16 +94,11 @@ abstract class JHtmlFcuploader
 
 		$initialized[$up_tag_id] = true;
 
-		 //Patch for front-end upload
-		if (\Joomla\CMS\Factory::getApplication()->isClient('site')){
-			$viewtask='&view=category';
-		}else{
-			$viewtask='';
-		}
-
 		$defaults = array(
-			'action' => \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&task=filemanager.uploads&view=category'.$viewtask
-				. '&'.\Joomla\CMS\Session\Session::getFormToken().'=1' . '&fieldid='.($field ? $field->id : ''). '&u_item_id='.$u_item_id,
+			'action' => \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&task=filemanager.uploads'
+				. '&view='.($field ? 'fileselement' : 'filemanager')
+				. '&fieldid='.($field ? $field->id : ''). '&u_item_id='.$u_item_id
+				. '&'.\Joomla\CMS\Session\Session::getFormToken().'=1',
 			'upload_maxcount' => 0,
 			'autostart_on_select' => false,
 			'layout' => 'default',

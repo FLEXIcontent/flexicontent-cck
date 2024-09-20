@@ -1518,7 +1518,10 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 			<?php if (!isset($disable_columns['modified'])) : ?>
 			<td class="col_revised hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
-				<?php echo ($row->modified != $_NULL_DATE_ && $row->modified != $row->created) ? HTMLHelper::_('date', $row->modified, $date_format) : $_NEVER_; ?>
+				<?php
+				if ($row->modified == $row->created)  echo Text::_('Same as creation');
+				else echo ($row->modified != $_NULL_DATE_) ? HTMLHelper::_('date', $row->modified, $date_format) : $_NEVER_;
+				?>
 			</td>
 			<?php endif; ?>
 

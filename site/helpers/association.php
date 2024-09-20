@@ -60,6 +60,7 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 
 		$view   = is_null($view) ? $jinput->get('view', '', 'cmd') : $view;
 		$id     = empty($id) ? $jinput->get('id', 0, 'int') : $id;
+		$return = [];
 
 		if ($view === 'item')
 		{
@@ -82,6 +83,14 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 		{
 			$cid    = $jinput->getInt('cid');
 			$layout = $jinput->getCmd('layout');
+			if ($cid)
+			{
+				$db     = version_compare(JVERSION, '4', 'lt') ? Factory::getDbo() : Factory::getContainer()->get('DatabaseDriver');
+				$category = $db->setQuery('SELECT id, language FROM #__categories WHERE id = ' . $cid)->loadObject();
+			}
+			// Assume language ALL if no current language
+			else $category = (object) array('language' => '*');
+
 			if ($layout === 'tags')
 			{
 				$tagid = $jinput->getInt('tagid', 0);
@@ -93,8 +102,10 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 
 					foreach ($associations as $tag => $assoc)
 					{
-						$lang_code    = substr($tag, 0, 2);
-						$return[$tag] = FlexicontentHelperRoute::getCategoryRoute($cid, 0, $urlvars, $assoc); // . '&lang=' . $lang_code;
+						// Language code must be added to the URL for categories of type ALL !!!
+						// to allow switching between languages filtering the category items according to their language
+						$return[$tag] = FlexicontentHelperRoute::getCategoryRoute($cid, 0, $urlvars, $assoc)
+							. ($category->language === '*' ? '&lang=' . substr($tag, 0, 2) : '');
 					}
 
 					return $return;
@@ -105,15 +116,22 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 
 			if (!$associations)
 			{
-				return self::_getMenuAssociations($view, $cid);
+				$associations = self::_getMenuAssociations($view, $cid);
+				foreach ($associations as $tag => $assoc)
+				{
+					$return[$tag] = $assoc . ($category->language === '*' ? '&lang=' . substr($tag, 0, 2) : '');
+				}
+				return $return;
 			}
 
 			$urlvars = flexicontent_html::getCatViewLayoutVars($catmodel = null, $use_slug = true);
 
 			foreach ($associations as $tag => $assoc)
 			{
-				$lang_code    = substr($tag, 0, 2);
-				$return[$tag] = FlexicontentHelperRoute::getCategoryRoute($assoc->title_slug, 0, $urlvars, $assoc); //. '&lang=' . $lang_code;
+				// Language code must be added to the URL for categories of type ALL !!!
+				// to allow switching between languages filtering the category items according to their language
+				$return[$tag] = FlexicontentHelperRoute::getCategoryRoute($assoc->title_slug, 0, $urlvars, $assoc)
+					. ($category->language === '*' ? '&lang=' . substr($tag, 0, 2) : '');
 			}
 
 			return $return;

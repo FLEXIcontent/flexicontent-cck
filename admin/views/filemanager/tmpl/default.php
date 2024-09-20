@@ -642,8 +642,11 @@ if ($enable_multi_uploader)
 	$step_labels = '["' . implode('", "', $cfg->labels) . '"]';
 
 	$upload_options = array(
-		'action' => Uri::base(true) . '/index.php?option=com_flexicontent&task=filemanager.uploads&history=' . ($isFilesElement ? 1 : 0)
-			. '&'.\Joomla\CMS\Session\Session::getFormToken().'=1' . '&fieldid='.$this->fieldid . '&u_item_id='.$this->u_item_id,
+		'action' => Uri::base(true) . '/index.php?option=com_flexicontent&task=filemanager.uploads'
+			. '&view='.$this->view
+			. '&history=' . ($isFilesElement ? 1 : 0)
+			. '&fieldid='.$this->fieldid . '&u_item_id='.$this->u_item_id
+			. '&'.\Joomla\CMS\Session\Session::getFormToken().'=1',
 		'upload_maxcount' => 0,
 		'layout' => $this->layout,
 		'edit_properties' => true,
@@ -1211,7 +1214,9 @@ if ($js)
 											<?php
 											echo $row->id;
 											$urlvars = ['id' => $row->id]; // ['id' => $row->id, 'cid' => 0, 'fid' => 0];  // cid : content item id, fid : field id, id : file id
-											$link = trim(Uri::root(), '/') . flexicontent_html::getSefUrl(FlexicontentHelperRoute::getTaskRoute($row->id, 'download_file', 0, $urlvars), $xhtml = true, $ssl = null);
+											$link = flexicontent_html::getSefUrl(FlexicontentHelperRoute::getTaskRoute($row->id, 'download_file', 0, $urlvars), $xhtml = true, $ssl = null);
+											$link = trim(Uri::root(), '/') . str_replace(Uri::root(true), '', $link);
+
 											echo '
 											<a href="javascript:;" onclick="jQuery(\'#copyUrlModal\').find(\'.linkbox\').html(\''.$link.'\')"
 												class="toolbar btn btn-info btn-copy-url" data-clipboard-text="'.$link.'"
@@ -2381,7 +2386,9 @@ HTML;
 
 	<script>
 	  jQuery(document).ready(function() {
-		  var clipboard = new ClipboardJS('a.btn-copy-url');
+		  if (jQuery('a.btn-copy-url').length) {
+			  var clipboard = new ClipboardJS('a.btn-copy-url');
+		  }
 	  });
 	</script>
 

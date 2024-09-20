@@ -169,8 +169,8 @@ $revert_image = $this->params->get('use_font_icons', 1)
 	? '<i class="icon-undo" style="color:darkgray"></i>'
 	: \Joomla\CMS\HTML\HTMLHelper::image ( 'administrator/components/com_flexicontent/assets/images/arrow_rotate_anticlockwise.png', \Joomla\CMS\Language\Text::_( 'FLEXI_REVERT' ) );
 $compare_image = $this->params->get('use_font_icons', 1)
-	? '<i class="icon-contract-2" style="color:darkgray"></i>'
-	: \Joomla\CMS\HTML\HTMLHelper::image ( 'administrator/components/com_flexicontent/assets/images/arrow-in-out.png', \Joomla\CMS\Language\Text::_( 'FLEXI_VIEW' ) );
+	? '<i class="icon-eye-open" style="color:darkgray"></i>'
+	: \Joomla\CMS\HTML\HTMLHelper::image ( 'administrator/components/com_flexicontent/assets/images/eyes.png', \Joomla\CMS\Language\Text::_( 'FLEXI_VIEW' ) );
 $comment_image = $this->params->get('use_font_icons', 1)
 	? '<i class="icon-comment" style="color:darkgray"></i>'
 	: \Joomla\CMS\HTML\HTMLHelper::image ( 'administrator/components/com_flexicontent/assets/images/comments.png', \Joomla\CMS\Language\Text::_( 'FLEXI_COMMENT' ) );

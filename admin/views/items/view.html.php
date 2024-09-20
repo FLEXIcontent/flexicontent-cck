@@ -179,6 +179,17 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		 */
 		$model_s = $this->getModel('item');
 
+		$this->tparams_array = $model_s->getTypeparams(NULL);
+		$this->tparams_array = is_array($this->tparams_array) ? $this->tparams_array : array($this->tparams_array);
+		foreach ($this->tparams_array as $_type_id => $_tparams) {
+			$tmp_params = new \Joomla\Registry\Registry();
+			$tmp_params->merge($cparams);
+
+			$tparams = new \Joomla\Registry\Registry($_tparams);
+			$tmp_params->merge($tparams);
+			$this->tparams_array[$_type_id] = $tmp_params;
+		}
+
 		if (count($filter_type) === 1)
 		{
 			$this->single_type = reset($filter_type);
@@ -188,23 +199,12 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 			$tmp_params = $model_s->getTypeparams($this->single_type);
 			$tmp_params = new \Joomla\Registry\Registry($tmp_params);
 			$this->tparams->merge($tmp_params);
-
-			$this->tparams_array = [$this->single_type => $this->tparams];
 		}
 		else
 		{
 			$this->single_type = 0;
-			$this->tparams = $cparams;
-			$this->tparams_array = $model_s->getTypeparams(NULL);
-			$this->tparams_array = is_array($this->tparams_array) ? $this->tparams_array : array($this->tparams_array);
-			foreach ($this->tparams_array as $_type_id => $_tparams) {
-				$tmp_params = new \Joomla\Registry\Registry();
-				$tmp_params->merge($cparams);
-
-				$tparams = new \Joomla\Registry\Registry($_tparams);
-				$tmp_params->merge($tparams);
-				$this->tparams_array[$_type_id] = $tmp_params;
-			}
+			$this->tparams     = new \Joomla\Registry\Registry();
+			$this->tparams->merge($cparams);
 		}
 
 
