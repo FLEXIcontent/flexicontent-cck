@@ -1,9 +1,6 @@
 /*** OUTER container of flexi MAP module ***/
 .mod_fleximap {
 	--fcmap-header-elements-height: 64px;
-	--marker-info-title-bg-color: #48b5e9;
-	--marker-info-bg-color: #3C61AD;
-	--marker-info-color: #fff;
 	--marker-actions-btn-width: 120px;
 	--marker-actions-gap: 8px;
 	--absolute-top-row-elements-counter-font-size: 16px;
@@ -93,7 +90,6 @@ select.geo-locate-zoom-level {}
 	z-index: 1;
 }
 .fc_module_marker_list .marker-info-title {
-	padding-left: 40px;
 }
 .fc_module_marker_list_box li {
 	position: relative;
@@ -102,7 +98,6 @@ select.geo-locate-zoom-level {}
 	margin: 0 !important;
 }
 .fc_module_marker_list_box .marker-info-title {
-	border-radius: 0 !important;
 }
 
 .marker_actions,
@@ -233,13 +228,11 @@ select.geo-locate-zoom-level {}
 }
 .marker-info-title {
 	display: block;
-	margin: -1rem -1rem 1rem -1rem !important;
 	font-family: 'Open Sans Condensed', sans-serif;
 	font-size: 22px;
 	font-weight: 400;
-	padding: 10px;
-	background-color: var(--marker-info-title-bg-color) !important;
-	color: white;
+	/*background-color: var(--marker-info-title-bg-color) !important;
+	color: white;*/
 	border-radius: 8px 8px 0 0; /* In accordance with the rounding of the default infowindow corners. */
 }
 
