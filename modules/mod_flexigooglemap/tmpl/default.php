@@ -179,7 +179,7 @@ if ($use_highlight_marker) $actions_btn_count++;
 	}
 	@container (width <= <?php echo ($actions_btn_count * 180 - 10) . 'px'; ?>) {
 		.fc_module_marker_list .marker_actions {
-			justify-content: center;
+			justify-content: right;
 		}
 		.fc_module_marker_list .marker_actions .fc-map-link-icon {
 			margin: 0;
@@ -188,7 +188,7 @@ if ($use_highlight_marker) $actions_btn_count++;
 			display: none;
 		}
 	}
-	@container (width < 480px) {
+	/*@container (width < 480px) {
 		.fc_module_marker_list * {
 			white-space: wrap;
 		}
@@ -202,7 +202,7 @@ if ($use_highlight_marker) $actions_btn_count++;
 			padding-left: 0.4rem;
 			padding-right: 2.5rem;
 		}
-	}
+	}*/
 </style>
 
 <?php
