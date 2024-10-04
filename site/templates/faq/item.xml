@@ -136,7 +136,7 @@
 			<field name="column_display_grp" type="separator" cssprep="1" default="FLEXI_TMPL_COLUMNS_DISPLAY" description="" level="level2" />
 			<field name="top_col_width" cssprep="less" type="text" hint="paddng-top padding-right padding-bottom padding-left in px % rem ect" default="30%" label="Top width" description="This is span1 to span12 (100% width). &lt;br&gt; Note 'Top' position is next to 'Image' position the sum of them is 12. &lt;br&gt; If one position is empty the other is expaned to 100%" />
 			<field name="top_col_gap" cssprep="less" type="text" hint="gap in px % rem etc" default="2rem" label="Gap" description="Set gap between image blcok and top block"  />
-			<!--<field name="top_cols" type="radio" default="" label="FLEXI_ITEM_TOP_COLS" description="FLEXI_ITEM_TOP_COLS_DESC" class="btn-group btn-group-yesno">
+			<field name="top_cols" type="radio" default="" label="FLEXI_ITEM_TOP_COLS" description="FLEXI_ITEM_TOP_COLS_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="one">FLEXI_1_COL</option>
 				<option value="two">FLEXI_2_COLS</option>
@@ -145,7 +145,7 @@
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="one">FLEXI_1_COL</option>
 				<option value="two">FLEXI_2_COLS</option>
-			</field> /-->
+			</field>
 
 			
 
