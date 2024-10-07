@@ -1932,6 +1932,10 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 				//$toolbar->appendButton( 'Custom', $btn_arr['preview_active'], 'preview_active' );
 				//$toolbar->appendButton( 'Custom', $btn_arr['preview_latest'], 'preview_latest' );
 			}
+			if (count($btn_arr) <= 2)
+			{
+				array_shift($btn_arr);
+			}
 
 			$drop_btn = '
 				<button type="button" class="' . $this->btn_sm_class . ' btn-info dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown">
