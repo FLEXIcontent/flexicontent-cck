@@ -50,6 +50,10 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="search_result_date_control" type="radio" default="created" label="FLEXI_STDSEARCH_DATE_CONTROL" description="FLEXI_STDSEARCH_DATE_CONTROL_DESC">
+				<option value="created">FLEXI_BY_CREATED</option>
+				<option value="modified">FLEXI_BY_MODIFIED</option>
+			</field>
 			<field name="search_types" type="text" size="40" default="" label="FLEXI_STDSEARCH_TYPES" description="FLEXI_STDSEARCH_TYPES_DESC"/>
 		</fieldset>
 	</fields>
