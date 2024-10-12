@@ -311,7 +311,7 @@ class plgSearchFlexisearch extends \Joomla\CMS\Plugin\CMSPlugin
 				.' i.language AS language,'
 				.' i.metakey AS metakey,'
 				.' i.metadesc AS metadesc,'
-				.' i.'$search_result_date_control' AS created,'
+				.' i.' .$search_result_date_control. ' AS created,'
 				.' c.title AS maincat_title, c.alias AS maincat_alias,'  // Main category data
 				.' t.name AS tagname,'
 				.' fir.value as field,'
