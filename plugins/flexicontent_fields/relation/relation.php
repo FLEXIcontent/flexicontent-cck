@@ -542,6 +542,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 				if ($min_values)    $attribs .= ' data-min_values="'.$min_values.'" ';
 			}
 
+			$load_method = (int) $field->parameters->get('load_method', 3);
 			$field->html[]   = '
 				' . ($use_ingroup ? '<input type="hidden" class="fcfield_value_holder" name="' . $valueholder_nm . '[' . $n . ']" id="' . $valueholder_id . '_' . $n . '" value="-">' : '') . '
 				' . (!$add_ctrl_btns ? '' : '
@@ -554,6 +555,8 @@ class plgFlexicontent_fieldsRelation extends FCField
 				' . ($use_ingroup ? '' : '<div class="fcclear"></div>') . '
 
 				<div class="fcfield-relation-value_box" data-elementbase="' . $elementid . '" data-elementid="' . $elementid_n . '" data-item_id="' . $item->id . '" data-field_id="' . $field->id . '" data-item_type="' . $item->type_id . '"  data-item_lang="' . $item->language . '">
+				
+					'. ($load_method === 4 ? '<div class="alert alert-info">Please select a filter to populate the selection list</div>' : '') .'
 
 					<div class="' . $input_grp_class . ' fc-xpended-row fcfield-relation-cat_selector_box" ' . $cat_selecor_box_style . '>
 						<label class="' . $add_on_class . ' fc-lbl cat_selector-lbl" id="' . $elementid_n . '_cat_selector-lbl" for="' . $elementid_n . '_cat_selector">' . \Joomla\CMS\Language\Text::_('FLEXI_CATEGORY') . '</label>
@@ -566,7 +569,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 							<option value="">-</option>
 						</select>
 					</div>
-
+					
 					<div class="' . $input_grp_class . ' fc-xpended-row fcfield-relation-selected_items_box">
 						<label class="' . $add_on_class . ' fc-lbl selected_items-lbl" id="' . $elementid_n . '-lbl" for="' . $elementid_n . '">' . \Joomla\CMS\Language\Text::_($selected_items_label) . '</label>
 						<select id="' . $elementid_n . '" name="' . $fieldname_n . '" ' . ($multiple_per_value ? 'multiple="multiple" ' : '')
@@ -583,7 +586,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 				';
 
 			// If using single category then trigger loading the items selector
-			$per_val_js .= count($allowedtree) === 1 ? "
+			$per_val_js .= count($allowedtree) === 1 && $load_method === 3 ? "
 					jQuery('#" . $elementid_n . "_cat_selector').trigger('change');
 				" : '';
 		}
@@ -1368,6 +1371,14 @@ class plgFlexicontent_fieldsRelation extends FCField
 		{
 			parse_str($customfilts,$values);
 		}
+
+		//load_method parameters
+		$load_method = (int) $field->parameters->get('load_method', 3);
+		if ($load_method === 4 && empty($filter_ids))
+	  {
+			$response['error'] = 'Load_method is set to "Load only if 1+ filters active" but no filters are configured';
+			jexit(json_encode($response));
+	  }
 
 		if (!empty($filter_ids))
 		{
