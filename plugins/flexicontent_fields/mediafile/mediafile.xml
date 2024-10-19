@@ -117,6 +117,11 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 
+			<field name="form_info_header" type="radio" label="Header info" default="3">
+				<option value="1">Server storage sub-path</option>
+				<option value="2">Original filename</option>
+				<option value="3">Both</option>
+			</field>
 			<field name="form_file_preview" type="multilist" subtype="radio" default="0" toggle_related="1" label="File preview" description="You can enable file preview box, e.g. it will show image thumbnail if selected file is an image" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="file-preview">FLEXI_DISABLE</option>
 				<option value="1" show_list="file-preview " hide_list="">FLEXI_ENABLE</option>
@@ -151,7 +156,6 @@
 				<option value="1" show_list="inline-edit-off" hide_list="inline-edit-on,client-resize">FLEXI_NO</option>
 				<option value="0" show_list="inline-edit-on,client-resize" hide_list="inline-edit-off">FLEXI_YES</option>
 			</field>
-
 			<field name="iform_title" type="radio" default="1" label="FLEXI_FILE_DISPLAY_TITLE" description="FLEXI_FILE_DISPLAY_TITLE_DESC" depend_class="inline-edit-on" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
