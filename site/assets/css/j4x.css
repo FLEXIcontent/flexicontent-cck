@@ -488,9 +488,6 @@ button.fcfield-expand-view-btn.btn.btn-small {
 	padding: 0 calc(var(--ctrls-inp-height) / 2) !important;
 	border: 1px solid var(--template-bg-dark-20,#aaa) !important;
 }
-span.add-on.fc_filedata_title {
-	margin-left: 5px !important;
-}
 .fc_buttons.btn-group {
 	display: inline-flex;
 }

@@ -126,7 +126,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		// If we are multi-value and not inside fieldgroup then add the control buttons (move, delete, add before/after)
 		$add_ctrl_btns = !$use_ingroup && $multiple;
 
-		$form_info_header = (int) $field->parameters->get('form_info_header', 1);
+		$form_info_header = (int) $field->parameters->get('form_info_header', 3);
 
 		// Inline file property editing
 		$inputmode = (int)$field->parameters->get( 'inputmode', 1 ) ;  // 1: file selection only,  0: inline file properties editing
@@ -443,7 +443,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 				newField.find('.clear-btn').click();
 
 				newField.find('.fc_filedata_txt_nowrap').html('-');
-				newField.find('.fc_filedata_title').html('-');
+				newField.find('.fc_filedata_title').value('-');
 
 				var theInput = newField.find('input.fc_filedata_txt').first();
 				theInput.attr('value', '');

@@ -1543,6 +1543,10 @@ div.fcimg_value_props select,
 div.fcimg_value_props input {
 	margin: 0;
 }
+#flexicontent .fc_filedata_title {
+	width: auto !important;
+	font-style: italic;
+}
 #flexicontent .fc_filedata_txt.invalid {
 	color: red;
 	font-weight: normal;

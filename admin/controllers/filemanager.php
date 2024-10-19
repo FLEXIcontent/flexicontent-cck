@@ -753,8 +753,6 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			// echo "-- chunk: $chunk \n-- chunks: $chunks \n-- targetDir: $targetDir \n--filePath_tmp: $filePath_tmp \n--fileName: $fileName";
 			// echo "\n"; print_r($_REQUEST);
 			$file['name'] = $fileName;
-            $file['ext'] = strtolower(flexicontent_upload::getExt($file['name']));
-            $file['name_only'] = substr($file['name'], 0, -1 * strlen($file['ext']) - 1);
 			$file['tmp_name'] = $filePath_tmp;
 			$file['size'] = filesize($filePath_tmp);
 			$file['error'] = 0;
@@ -762,10 +760,13 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			// echo "\n"; print_r($file);
 		}
 
-        // Get the file extension
-        $ext = $file['ext'];
+		$file['ext'] = strtolower(flexicontent_upload::getExt($file['name']));
+		$file['name_only'] = substr($file['name'], 0, -1 * strlen($file['ext']) - 1);
 
-        $subfolder_path = '';
+		// Get the file extension
+		$ext = $file['ext'];
+
+		$subfolder_path = '';
 		if ($fieldid)
 		{
 			$_options = array('secure' => $secure);
@@ -814,10 +815,10 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 						$old_error_reporting = error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT);
 						$old_error_handler = set_error_handler(array($this, 'custom_error_handler'));
 
-                        $theFileData = $file;  // used in eval code
+						$theFileData = $file;  // used in eval code
 						$custom_filename = eval($auto_filename_code);
-                        unset($theFileData);
-                        $custom_filename .= '.' . $ext;
+						unset($theFileData);
+						$custom_filename .= '.' . $ext;
 
 						error_reporting($old_error_reporting);
 						set_error_handler($old_error_handler);
@@ -1039,8 +1040,8 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$fileaccess = flexicontent_html::dataFilter($fileaccess, 11, 'ACCESSLEVEL', 0);  // Validate access level exists (set to public otherwise)
 
 		$fieldid   = $this->input->get('fieldid', 0, 'int');
-        $u_item_id = $this->input->get('u_item_id', 0, 'cmd');
-        $filesize  = $this->input->get('file-url-size', 0, 'int');
+		$u_item_id = $this->input->get('u_item_id', 0, 'cmd');
+		$filesize  = $this->input->get('file-url-size', 0, 'int');
 		$size_unit = $this->input->get('size_unit', 'KBs', 'cmd');
 
 		jimport('joomla.utilities.date');
@@ -1927,35 +1928,35 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		\Joomla\CMS\Client\ClientHelper::setCredentialsFromRequest('ftp');
 	}
 
-    public function custom_error_handler($errno, $errstr, $errfile, $errline)
-    {
-        if (!(error_reporting() & $errno))
-        {
-            // This error code is not included in error_reporting, so let it fall through to the standard PHP error handler
-            return false;
-        }
+	public function custom_error_handler($errno, $errstr, $errfile, $errline)
+	{
+		if (!(error_reporting() & $errno))
+		{
+			// This error code is not included in error_reporting, so let it fall through to the standard PHP error handler
+			return false;
+		}
 
-        switch ($errno) {
-            case E_NOTICE:
-            case E_USER_NOTICE:
-            case E_DEPRECATED:
-            case E_USER_DEPRECATED:
-            case E_STRICT:
-                echo("NOTICE: $errstr at line: $errline \n");
-                break;
+		switch ($errno) {
+			case E_NOTICE:
+			case E_USER_NOTICE:
+			case E_DEPRECATED:
+			case E_USER_DEPRECATED:
+			case E_STRICT:
+				echo("NOTICE: $errstr at line: $errline \n");
+				break;
 
-            case E_WARNING:
-            case E_USER_WARNING:
-                echo("WARNING: $errstr at line: $errline \n");
-                break;
+			case E_WARNING:
+			case E_USER_WARNING:
+				echo("WARNING: $errstr at line: $errline \n");
+				break;
 
-            case E_ERROR:
-            case E_USER_ERROR:
-            case E_RECOVERABLE_ERROR:
-                echo("ERROR: $errstr at line: $errline \n");
+			case E_ERROR:
+			case E_USER_ERROR:
+			case E_RECOVERABLE_ERROR:
+				echo("ERROR: $errstr at line: $errline \n");
 
-            default:
-                echo("UNKNOWN ERROR at line: $errline \n");
-        }
-    }
+			default:
+				echo("UNKNOWN ERROR at line: $errline \n");
+		}
+	}
 }

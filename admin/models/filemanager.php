@@ -617,7 +617,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	 * Method to get the file folder path being used by a field
 	 *
 	 * @access	public
-     * @since   3.0.0
+	 * @since   3.0.0
 	 */
 	function getFieldFolderPath($itemid, $fieldid, & $options = array(), & $subfolder_path = '')
 	{
