@@ -329,7 +329,7 @@
 				<option value="0" hide_list="default-image-code">FLEXI_NO</option>
 				<option value="2" show_list="default-image-code">FLEXI_USE_CUSTOM_CODE</option>
 			</field>
-			<field name="default_image_custom_code" type="editor" editor="codemirror" syntax="php" cols="80" rows="5" height="120px" class="fc-unset-width" filter="RAW"
+			<field name="default_image_custom_code" type="editor" editor="codemirror" syntax="php" rows="4" cols="80" height="100px" class="fc-unset-width" filter="RAW"
 				   default="&lt;?php&#13;&#10; return 'images/banners/' . $item-&gt;alias . '.jpg';"
 				   label="FLEXI_CREATE_VIA_CUSTOM_CODE" description="FLEXI_CREATE_VIA_CUSTOM_CODE_DESC" depend_class="default-image-code"/>
 

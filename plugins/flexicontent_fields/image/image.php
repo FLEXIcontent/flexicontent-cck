@@ -1037,6 +1037,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		 */
 		if ( !count($values))
 		{
+			//echo 'no values: '.$item->id.'<br>';
 			$image_DF = array();
 
 			// Holds complete relative path and indicates that it is default image for field
@@ -1049,8 +1050,8 @@ class plgFlexicontent_fieldsImage extends FCField
 
 			if (!$default_image)
 			{
-				$default_image = $field->parameters->get('default_image', '');
-
+				$_parts = explode('#', $field->parameters->get('default_image', ''));
+				$default_image = $_parts[0];
 			}
 
 			if ($default_image)
@@ -1076,6 +1077,7 @@ class plgFlexicontent_fieldsImage extends FCField
 					$values = array(serialize($image_DF));
 				}
 			}
+			//print_r($values); echo '<br>';
 		}
 
 
@@ -1659,7 +1661,7 @@ class plgFlexicontent_fieldsImage extends FCField
 					$src_file_path  = Path::clean( $srcpath_original . $v['originalname'] );
 					$dest_file_path = Path::clean( $dest_path_original . $filename );
 					$result = false;
-					if ( File::exists($src_file_path) )
+					if ( file_exists($src_file_path) )
 					{
 						$result = File::copy( $src_file_path,  $dest_file_path );
 						if ( $result && Path::canChmod($dest_file_path) )
@@ -1667,7 +1669,7 @@ class plgFlexicontent_fieldsImage extends FCField
 							chmod($dest_file_path, 0644);
 						}
 					}
-					elseif ( File::exists($dest_file_path) )
+					elseif ( file_exists($dest_file_path) )
 					{
 						$result = true;
 					}
@@ -1681,7 +1683,7 @@ class plgFlexicontent_fieldsImage extends FCField
 					$src_file_path  = Path::clean( $srcpath_original . $v['originalname'] );
 					$dest_file_path = Path::clean( $dest_path_media_full . $filename );
 					$result = false;
-					if ( File::exists($src_file_path) )
+					if ( file_exists($src_file_path) )
 					{
 						$result = File::copy( $src_file_path,  $dest_file_path );
 						if ( $result && Path::canChmod($dest_file_path) )
@@ -1689,7 +1691,7 @@ class plgFlexicontent_fieldsImage extends FCField
 							chmod($dest_file_path, 0644);
 						}
 					}
-					elseif (File::exists($dest_file_path))
+					elseif (file_exists($dest_file_path))
 					{
 						$result = true;
 					}
@@ -2463,7 +2465,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		{
 			$dest_path = $thumbfolder . DS . $size . '_' . $filename;
 
-			if (File::exists($dest_path) && !File::delete($dest_path))
+			if (file_exists($dest_path) && !File::delete($dest_path))
 			{
 				$app->enqueueMessage('Field: ' . $field->label . ' : ' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD_UNABLE_TO_DELETE_FILE') .": ". $dest_path, 'warning');
 			}
