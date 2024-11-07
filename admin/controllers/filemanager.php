@@ -783,6 +783,12 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			$path = ($secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH) . DS;
 		}
 
+
+		// Clean subfolder path BUT only if non-empty and make slashes be UNIX style
+		$subfolder_path = $subfolder_path ? Path::clean($subfolder_path . '/') : '';
+		$subfolder_path = str_replace('\\', '/', $subfolder_path);
+
+
 		jimport('joomla.utilities.date');
 
 		// Set FTP credentials, if given
@@ -895,7 +901,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		// In case of existing FILE object, get the file id
 		$file_id = $fileObj->id;
 
-		$fileObj->filename          = str_replace('\\', '/', Path::clean($subfolder_path ? $subfolder_path . '/' : '')) . $filename;
+		$fileObj->filename          = $subfolder_path . $filename;
 		$fileObj->filename_original = $Fobj ? $fileObj->filename_original : $filename_original;
 		$fileObj->altname           = $Fobj ? $fileObj->altname : ($filetitle ?: $filename_original);
 		$fileObj->estorage_fieldid  = $estorage_mode === 'FTP' ? $fieldid : 0;
