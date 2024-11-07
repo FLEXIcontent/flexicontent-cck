@@ -614,11 +614,12 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 
 
 	/**
-	 * Method to get the folder path defined in a field
+	 * Method to get the file folder path being used by a field
 	 *
 	 * @access	public
+	 * @since   3.0.0
 	 */
-	function getFieldFolderPath($itemid, $fieldid, & $options = array())
+	function getFieldFolderPath($itemid, $fieldid, & $options = array(), & $subfolder_path = '')
 	{
 		$field = $this->getField($fieldid);
 
@@ -638,23 +639,27 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		// Currently we only handle image_source '1'
 		if ($image_source===1)
 		{
-			$gallery_path_arr = array(
+			$field_folder_arr = array(
 				'item_' . $itemid,
 				'field_' . $fieldid
 			);
 			$options['base_path'] = \Joomla\Filesystem\Path::clean(JPATH_SITE . DS . $field->parameters->get('dir', 'images/stories/flexicontent'));
-			$gallery_path = $options['base_path'] . DS . implode('_', $gallery_path_arr) . DS . 'original' . DS;
+			$field_folder = $options['base_path'] . DS . implode('_', $field_folder_arr) . DS . 'original' . DS;
 		}
 		else if ($image_source===0 || $image_source===null)
 		{
-			$gallery_path = (!empty($options['secure']) ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH) . DS;
+			// Get 'subfolder_path' field parameter if file should be uploaded to a subfolder
+			$subfolder_path = $field->parameters->get('subfolder_path', '');
+
+			$field_folder = (!empty($options['secure']) ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH) . DS;
+			$field_folder .= ($subfolder_path ? $subfolder_path . DS : '');
 		}
 		else
 		{
 			die(__FUNCTION__.'(): image_source : $image_source for field id:' . $fieldid . ' is not implemented');
 		}
 
-		return \Joomla\Filesystem\Path::clean($gallery_path);
+		return \Joomla\Filesystem\Path::clean($field_folder);
 	}
 
 
@@ -1713,10 +1718,10 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	 */
 	public function canunpublish($cid, & $cid_noauth = null, & $cid_wassocs = null)
 	{
-		if ($checkACL)
+		/*if ($checkACL)
 		{
 			die(__FUNCTION__ . '() $checkACL = true is NOT supported');
-		}
+		}*/
 
 		if (!count($cid))
 		{

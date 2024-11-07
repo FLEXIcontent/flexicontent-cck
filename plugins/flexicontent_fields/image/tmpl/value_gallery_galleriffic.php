@@ -164,10 +164,10 @@ if ( !isset(static::$js_added[$field->id][__FILE__]) )
 	flexicontent_html::loadFramework('galleriffic');
 
 	// Load Fancybox if needed
-	if ( $enable_popup )
-	{
+	//if ( $enable_popup )
+	//{
 		flexicontent_html::loadFramework('fancybox');
-	}
+	//}
 
 	static::$js_added[$field->id][__FILE__] = array();
 }

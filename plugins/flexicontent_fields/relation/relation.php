@@ -12,6 +12,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\String\StringHelper;
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
@@ -42,7 +43,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 	{
 		if (!in_array($field->field_type, static::$field_types)) return;
 
-		$field->label = $field->parameters->get('label_form') ? \Joomla\CMS\Language\Text::_($field->parameters->get('label_form')) : \Joomla\CMS\Language\Text::_($field->label);
+		$field->label = $field->parameters->get('label_form') ? Text::_($field->parameters->get('label_form')) : Text::_($field->label);
 
 		// Set field and item objects
 		$this->setField($field);
@@ -119,6 +120,8 @@ class plgFlexicontent_fieldsRelation extends FCField
 
 		$size                    = (int) $field->parameters->get('size', 12);
 		$prepend_item_state      = $field->parameters->get('itemselector_prepend_item_state', 0);
+		$prepend_item_type       = $field->parameters->get('itemselector_prepend_item_type', 0);
+		$prepend_item_id         = $field->parameters->get('itemselector_prepend_item_id', 0);
 		$maxtitlechars           = $field->parameters->get('maxtitlechars', 40);
 		$selected_items_label    = $field->parameters->get('selected_items_label', 'FLEXI_RIFLD_SELECTED_ITEMS_LABEL');
 		$selected_items_sortable = $field->parameters->get('selected_items_sortable', 0);
@@ -169,7 +172,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 		$allowed_cats = $this->getAllowedCategories($field);
 		if (empty($allowed_cats))
 		{
-			$field->html = \Joomla\CMS\Language\Text::_('FLEXI_CANNOT_EDIT_FIELD') . ': <br/> ' . \Joomla\CMS\Language\Text::_('FLEXI_NO_ACCESS_TO_USE_CONFIGURED_CATEGORIES');
+			$field->html = Text::_('FLEXI_CANNOT_EDIT_FIELD') . ': <br/> ' . Text::_('FLEXI_NO_ACCESS_TO_USE_CONFIGURED_CATEGORIES');
 
 			return;
 		}
@@ -210,7 +213,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 			});
 			";
 
-			if ($max_values) \Joomla\CMS\Language\Text::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
+			if ($max_values) Text::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
 			$js .= "
 			function addField" . $field->id . "(el, groupval_box, fieldval_box, params)
 			{
@@ -361,11 +364,11 @@ class plgFlexicontent_fieldsRelation extends FCField
 
 			$css .= '';
 
-			$remove_button = '<span class="' . $btn_item_class . ' fcfield-delvalue ' . $font_icon_class . '" title="' . \Joomla\CMS\Language\Text::_('FLEXI_REMOVE_VALUE') . '" onclick="deleteField' . $field->id . '(this);"></span>';
-			$move2         = '<span class="' . $btn_item_class . ' fcfield-drag-handle ' . $font_icon_class . '" title="' . \Joomla\CMS\Language\Text::_('FLEXI_CLICK_TO_DRAG') . '"></span>';
+			$remove_button = '<span class="' . $btn_item_class . ' fcfield-delvalue ' . $font_icon_class . '" title="' . Text::_('FLEXI_REMOVE_VALUE') . '" onclick="deleteField' . $field->id . '(this);"></span>';
+			$move2         = '<span class="' . $btn_item_class . ' fcfield-drag-handle ' . $font_icon_class . '" title="' . Text::_('FLEXI_CLICK_TO_DRAG') . '"></span>';
 			$add_here      = '';
-			$add_here      .= $add_position == 2 || $add_position == 3 ? '<span class="' . $btn_item_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField' . $field->id . '(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="' . \Joomla\CMS\Language\Text::_('FLEXI_ADD_BEFORE') . '"></span> ' : '';
-			$add_here      .= $add_position == 1 || $add_position == 3 ? '<span class="' . $btn_item_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField' . $field->id . '(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="' . \Joomla\CMS\Language\Text::_('FLEXI_ADD_AFTER') . '"></span> ' : '';
+			$add_here      .= $add_position == 2 || $add_position == 3 ? '<span class="' . $btn_item_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField' . $field->id . '(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="' . Text::_('FLEXI_ADD_BEFORE') . '"></span> ' : '';
+			$add_here      .= $add_position == 1 || $add_position == 3 ? '<span class="' . $btn_item_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField' . $field->id . '(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="' . Text::_('FLEXI_ADD_AFTER') . '"></span> ' : '';
 		}
 
 		// Field not multi-value
@@ -403,8 +406,9 @@ class plgFlexicontent_fieldsRelation extends FCField
 		{
 			if (count($_itemids_v))
 			{
-				$query = 'SELECT i.title, i.id, i.catid, i.state, i.alias'
+				$query = 'SELECT i.title, i.id, i.catid, i.state, i.alias, e.type_id '
 					. ' FROM #__content AS i '
+					. ' INNER JOIN #__flexicontent_items_ext AS e ON i.id = e.item_id'
 					. ' WHERE i.id IN (' . implode(',', $_itemids_v) . ')'
 					. ' ORDER BY FIELD(i.id, ' . implode(',', $_itemids_v) . ')';
 				$items_arr[$n] = $db->setQuery($query)->loadObjectList();
@@ -429,7 +433,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 			$allowedtree,
 			'__ELEMENTID___cat_selector',
 			($cat_selected ? $cat_selected->id : ''),
-			$top_option = \Joomla\CMS\Language\Text::_('FLEXI_SELECT'),  // Important: Add a first option "Select", otherwise single entry in select cannot initiate onchange event
+			$top_option = Text::_('FLEXI_SELECT'),  // Important: Add a first option "Select", otherwise single entry in select cannot initiate onchange event
 			$cat_selector_attribs,
 			$check_published = true,
 			$check_perms = true,
@@ -438,6 +442,13 @@ class plgFlexicontent_fieldsRelation extends FCField
 			$skip_subtrees = array(),
 			$disable_subtrees = array()
 		);
+
+		$types_arr = flexicontent_html::getTypesList();
+		$type_lbls = [];
+		foreach ($types_arr as $type)
+		{
+			$type_lbls[$type->id] = Text::_(isset($types_arr[$type->id]) ? $types_arr[$type->id]->name : '[Other]');
+		}
 
 
 		/**
@@ -459,6 +470,14 @@ class plgFlexicontent_fieldsRelation extends FCField
 					$statestr = $statestr ? '[' . $statestr .']' : '';
 					$itemtitle = $statestr . $itemtitle . " ";
 				}
+				if ($prepend_item_type)
+				{
+					$itemtitle = '[' .$type_lbls[$itemdata->type_id] . '] ' . $itemtitle;
+				}
+				if ($prepend_item_id)
+				{
+					$itemtitle = '[' .$itemdata->id . '] ' . $itemtitle;
+				}
 				$itemid                   = $itemdata->id;
 				$items_options_select[$n] .= '<option selected="selected" value="' . htmlspecialchars($related_items_sets[$n][$itemid]->value, ENT_COMPAT, 'UTF-8') . '" >' . $itemtitle . '</option>' . "\n";
 			}
@@ -475,14 +494,24 @@ class plgFlexicontent_fieldsRelation extends FCField
 			$common_css_js_added = true;
 			flexicontent_html::loadFramework('select2');
 
-			\Joomla\CMS\Language\Text::script('FLEXI_RIFLD_ERROR', false);
-			\Joomla\CMS\Language\Text::script('FLEXI_RIFLD_NO_ITEMS', false);
-			\Joomla\CMS\Language\Text::script('FLEXI_RIFLD_ADD_ITEM', false);
+			Text::script('FLEXI_RIFLD_ERROR', false);
+			Text::script('FLEXI_RIFLD_NO_ITEMS', false);
+			Text::script('FLEXI_RIFLD_ADD_ITEM', false);
 			$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/relation/js/form.js', array('version' => FLEXI_VHASH));
 		}
 
 		$per_val_js = '';
 
+		//array(1 => '', 0 => 'U', -1 => 'A', -3 => 'PE', -4 => 'OQ', -5 => 'IP');
+		$long_names = array(
+			'(empty)' => Text::_('FLEXI_PUBLISHED', true),
+			'[U]' => Text::_('FLEXI_UNPUBLISHED', true),
+			'[IP]' => Text::_('FLEXI_IN_PROGRESS', true),
+			'[PE]' => Text::_('FLEXI_PENDING', true),
+			'[OQ]' => Text::_('FLEXI_TO_WRITE', true),
+			'[A]' => Text::_('FLEXI_ARCHIVED', true),
+			'[T]' => Text::_('FLEXI_TRASHED', true)
+		);
 
 		/**
 		 * Create field's HTML display for item form
@@ -515,16 +544,6 @@ class plgFlexicontent_fieldsRelation extends FCField
 				$field->html[-1] = '';
 				if ($prepend_item_state)
 				{
-					//array(1 => '', 0 => 'U', -1 => 'A', -3 => 'PE', -4 => 'OQ', -5 => 'IP');
-					$long_names = array(
-						'(empty)' => \Joomla\CMS\Language\Text::_('FLEXI_PUBLISHED', true),
-						'[U]' => \Joomla\CMS\Language\Text::_('FLEXI_UNPUBLISHED', true),
-						'[IP]' => \Joomla\CMS\Language\Text::_('FLEXI_IN_PROGRESS', true),
-						'[PE]' => \Joomla\CMS\Language\Text::_('FLEXI_PENDING', true),
-						'[OQ]' => \Joomla\CMS\Language\Text::_('FLEXI_TO_WRITE', true),
-						'[A]' => \Joomla\CMS\Language\Text::_('FLEXI_ARCHIVED', true),
-						'[T]' => \Joomla\CMS\Language\Text::_('FLEXI_TRASHED', true)
-					);
 					$states_lengend = [];
 					foreach ($long_names as $i => $v) $states_lengend[] = '<div><span class="badge long-state-name">' . $v . '</span>'
 						. '<small class="short-state-name">'. $i . '</small></div>';
@@ -542,6 +561,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 				if ($min_values)    $attribs .= ' data-min_values="'.$min_values.'" ';
 			}
 
+			$load_method = (int) $field->parameters->get('load_method', 3);
 			$field->html[]   = '
 				' . ($use_ingroup ? '<input type="hidden" class="fcfield_value_holder" name="' . $valueholder_nm . '[' . $n . ']" id="' . $valueholder_id . '_' . $n . '" value="-">' : '') . '
 				' . (!$add_ctrl_btns ? '' : '
@@ -554,36 +574,38 @@ class plgFlexicontent_fieldsRelation extends FCField
 				' . ($use_ingroup ? '' : '<div class="fcclear"></div>') . '
 
 				<div class="fcfield-relation-value_box" data-elementbase="' . $elementid . '" data-elementid="' . $elementid_n . '" data-item_id="' . $item->id . '" data-field_id="' . $field->id . '" data-item_type="' . $item->type_id . '"  data-item_lang="' . $item->language . '">
+				
+					'. ($load_method === 4 ? '<div class="alert alert-info">Please select a filter to populate the selection list</div>' : '') .'
 
 					<div class="' . $input_grp_class . ' fc-xpended-row fcfield-relation-cat_selector_box" ' . $cat_selecor_box_style . '>
-						<label class="' . $add_on_class . ' fc-lbl cat_selector-lbl" id="' . $elementid_n . '_cat_selector-lbl" for="' . $elementid_n . '_cat_selector">' . \Joomla\CMS\Language\Text::_('FLEXI_CATEGORY') . '</label>
+						<label class="' . $add_on_class . ' fc-lbl cat_selector-lbl" id="' . $elementid_n . '_cat_selector-lbl" for="' . $elementid_n . '_cat_selector">' . Text::_('FLEXI_CATEGORY') . '</label>
 						' . str_replace('__ELEMENTID__', $elementid_n, $cat_selector) . '
 					</div>
 
 					<div class="' . $input_grp_class . ' fc-xpended-row fcfield-relation-item_selector_box">
-						<label class="' . $add_on_class . ' fc-lbl item_selector-lbl" id="' . $elementid_n . '_item_selector-lbl" for="' . $elementid_n . '_item_selector">' . \Joomla\CMS\Language\Text::_('FLEXI_RIFLD_ITEMS') . '</label>
+						<label class="' . $add_on_class . ' fc-lbl item_selector-lbl" id="' . $elementid_n . '_item_selector-lbl" for="' . $elementid_n . '_item_selector">' . Text::_('FLEXI_RIFLD_ITEMS') . '</label>
 						<select id="' . $elementid_n . '_item_selector" name="' . $elementid_n . '_item_selector" class="use_select2_lib fcfield-relation-item_selector" onchange="return fcfield_relation.add_related(this);">
 							<option value="">-</option>
 						</select>
 					</div>
-
+					
 					<div class="' . $input_grp_class . ' fc-xpended-row fcfield-relation-selected_items_box">
-						<label class="' . $add_on_class . ' fc-lbl selected_items-lbl" id="' . $elementid_n . '-lbl" for="' . $elementid_n . '">' . \Joomla\CMS\Language\Text::_($selected_items_label) . '</label>
+						<label class="' . $add_on_class . ' fc-lbl selected_items-lbl" id="' . $elementid_n . '-lbl" for="' . $elementid_n . '">' . Text::_($selected_items_label) . '</label>
 						<select id="' . $elementid_n . '" name="' . $fieldname_n . '" ' . ($multiple_per_value ? 'multiple="multiple" ' : '')
-							. ' class="' . $classes . ' fcfield-relation-selected_items" ' . $attribs
-							. ' data-max-related="' . $max_values . '" '
-							. ' onchange="return fcfield_relation.selected_items_modified(this);">
+				. ' class="' . $classes . ' fcfield-relation-selected_items" ' . $attribs
+				. ' data-max-related="' . $max_values . '" '
+				. ' onchange="return fcfield_relation.selected_items_modified(this);">
 							' . $items_options_select[$n] . '
 						</select>
 						' . ($selected_items_sortable ? '
-						<span class="add-on"><span class="icon-info hasTooltip" title="' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD_ALLOW_SORTABLE_INFO') . '"></span>' . \Joomla\CMS\Language\Text::_('FLEXI_ORDER') . '</span>' : '') . '
+						<span class="add-on"><span class="icon-info hasTooltip" title="' . Text::_('FLEXI_FIELD_ALLOW_SORTABLE_INFO') . '"></span>' . Text::_('FLEXI_ORDER') . '</span>' : '') . '
 					</div>
 
 				</div>
 				';
 
 			// If using single category then trigger loading the items selector
-			$per_val_js .= count($allowedtree) === 1 ? "
+			$per_val_js .= count($allowedtree) === 1 && $load_method === 3 ? "
 					jQuery('#" . $elementid_n . "_cat_selector').trigger('change');
 				" : '';
 		}
@@ -625,8 +647,8 @@ class plgFlexicontent_fieldsRelation extends FCField
 			$field->html = '<ul class="fcfield-sortables" id="sortables_' . $field->id . '">' . $field->html . '</ul>';
 			if (!$add_position) $field->html .= '
 				<div class="'.$btn_group_class.' fc-xpended-btns">
-					<span class="fcfield-addvalue ' . $font_icon_class . ' ' . $btn_item_class . '" onclick="addField'.$field->id.'(jQuery(this).closest(\'.fc-xpended-btns\').get(0));" title="'.\Joomla\CMS\Language\Text::_('FLEXI_ADD_TO_BOTTOM') . '">
-						' . \Joomla\CMS\Language\Text::_('FLEXI_ADD_VALUE') . '
+					<span class="fcfield-addvalue ' . $font_icon_class . ' ' . $btn_item_class . '" onclick="addField'.$field->id.'(jQuery(this).closest(\'.fc-xpended-btns\').get(0));" title="'.Text::_('FLEXI_ADD_TO_BOTTOM') . '">
+						' . Text::_('FLEXI_ADD_VALUE') . '
 					</span>
 				</div>';
 		}
@@ -646,7 +668,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 	{
 		if (!in_array($field->field_type, static::$field_types)) return;
 
-		$field->label = \Joomla\CMS\Language\Text::_($field->label);
+		$field->label = Text::_($field->label);
 
 		// Set field and item objects
 		$this->setField($field);
@@ -783,7 +805,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 			// Check that relation field to be reversed was configured
 			if (!$relation_field_id)
 			{
-				$field->{$prop} = '<div class="alert alert-warning">' . $field->label . ': ' . \Joomla\CMS\Language\Text::_('FLEXI_RIFLD_NO_FIELD_SELECTED_TO_BE_REVERSED') . '</div>';
+				$field->{$prop} = '<div class="alert alert-warning">' . $field->label . ': ' . Text::_('FLEXI_RIFLD_NO_FIELD_SELECTED_TO_BE_REVERSED') . '</div>';
 
 				return;
 			}
@@ -1012,7 +1034,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 
 			if (!$relation_field_id)
 			{
-				echo '<div class="alert alert-warning">' . $filter->label . ': ' . \Joomla\CMS\Language\Text::_('FLEXI_RIFLD_NO_FIELD_SELECTED_TO_BE_REVERSED') . '</div>';
+				echo '<div class="alert alert-warning">' . $filter->label . ': ' . Text::_('FLEXI_RIFLD_NO_FIELD_SELECTED_TO_BE_REVERSED') . '</div>';
 
 				return null;
 			}
@@ -1240,7 +1262,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 
 	public function getCategoryItems()
 	{
-		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		\Joomla\CMS\Session\Session::checkToken('request') or jexit(Text::_('JINVALID_TOKEN'));
 
 		// Get API objects / data
 		$app  = Factory::getApplication();
@@ -1367,6 +1389,14 @@ class plgFlexicontent_fieldsRelation extends FCField
 		if ($customfilts)
 		{
 			parse_str($customfilts,$values);
+		}
+
+		//load_method parameters
+		$load_method = (int) $field->parameters->get('load_method', 3);
+		if ($load_method === 4 && empty($filter_ids))
+		{
+			$response['error'] = 'Load_method is set to "Load only if 1+ filters active" but no filters are configured';
+			jexit(json_encode($response));
 		}
 
 		if (!empty($filter_ids))
@@ -1518,7 +1548,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 		if (empty($allowed_cats))
 		{
 			jexit(json_encode(array(
-				'error' => \Joomla\CMS\Language\Text::_('FLEXI_CANNOT_EDIT_FIELD') . ': <br/> ' . \Joomla\CMS\Language\Text::_('FLEXI_NO_ACCESS_TO_USE_CONFIGURED_CATEGORIES')
+				'error' => Text::_('FLEXI_CANNOT_EDIT_FIELD') . ': <br/> ' . Text::_('FLEXI_NO_ACCESS_TO_USE_CONFIGURED_CATEGORIES')
 			)));
 		}
 
@@ -1529,7 +1559,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 		if (empty($catids))
 		{
 			jexit(json_encode(array(
-				'error' => \Joomla\CMS\Language\Text::_('FLEXI_RIFLD_CATEGORY_NOT_ALLOWED')
+				'error' => Text::_('FLEXI_RIFLD_CATEGORY_NOT_ALLOWED')
 			)));
 		}
 
@@ -1668,6 +1698,9 @@ class plgFlexicontent_fieldsRelation extends FCField
 
 		// Some configuration
 		$prepend_item_state = (int) $field->parameters->get('itemselector_prepend_item_state', 0);
+		$prepend_item_type  = $app->input->get('prepend_item_type', 0, 'int');
+		$prepend_item_id    = $app->input->get('prepend_item_id', 0, 'int');
+
 		$append_field_ids   = $field->parameters->get('itemselector_append_fields', []);
 		$append_field_ids   = FLEXIUtilities::paramToArray($append_field_ids);
 		$state_shortname    = array(1 => '', 0 => 'U', -1 => 'A', 2 => 'A', -3 => 'PE', -4 => 'OQ', -5 => 'IP', -22 => 'T');
@@ -1737,6 +1770,13 @@ class plgFlexicontent_fieldsRelation extends FCField
 			-2 => 'FLEXI_TRASHED',
 		);
 
+		$types_arr = flexicontent_html::getTypesList();
+		$type_lbls = [];
+		foreach ($types_arr as $type)
+		{
+			$type_lbls[$type->id] = Text::_(isset($types_arr[$type->id]) ? $types_arr[$type->id]->name : '[Other]');
+		}
+
 
 		foreach ($items_arr as $item_id => $itemdata)
 		{
@@ -1746,8 +1786,8 @@ class plgFlexicontent_fieldsRelation extends FCField
 
 			$itemdata->state = (int) $itemdata->state;
 			$state_lbl = strtoupper(isset($state_labels[$itemdata->state])
-				? \Joomla\CMS\Language\Text::_($state_labels[$itemdata->state])
-				: \Joomla\CMS\Language\Text::_('FLEXI_UNKNOWN'));
+				? Text::_($state_labels[$itemdata->state])
+				: Text::_('FLEXI_UNKNOWN'));
 
 			if (!in_array($itemdata->state, [1, -5])) $itemtitle .= ' [' . $state_lbl . ']';
 			//if (!in_array($itemdata->state, [1, -5])) $itemtitle .= ' [' . ($state_shortname[$itemdata->state] ?? 'U') . ']';
@@ -1773,6 +1813,14 @@ class plgFlexicontent_fieldsRelation extends FCField
 				$statestr  = $statestr ? '[' . $statestr . ']' : '';
 				$itemtitle = $statestr . $itemtitle . " ";
 			}
+			if ($prepend_item_type)
+			{
+				$itemtitle = '[' .$type_lbls[$itemdata->type_id] . '] ' . $itemtitle;
+			}
+			if ($prepend_item_id)
+			{
+				$itemtitle = '[' .$itemdata->id . '] ' . $itemtitle;
+			}
 
 			$itemid      = $itemdata->id;
 
@@ -1791,7 +1839,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 
 	public function getCategoryItems_v1()
 	{
-		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		\Joomla\CMS\Session\Session::checkToken('request') or jexit(Text::_('JINVALID_TOKEN'));
 
 		// Get API objects / data
 		$app  = Factory::getApplication();
@@ -1958,7 +2006,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 		if (empty($allowed_cats))
 		{
 			jexit(json_encode(array(
-				'error' => \Joomla\CMS\Language\Text::_('FLEXI_CANNOT_EDIT_FIELD') . ': <br/> ' . \Joomla\CMS\Language\Text::_('FLEXI_NO_ACCESS_TO_USE_CONFIGURED_CATEGORIES')
+				'error' => Text::_('FLEXI_CANNOT_EDIT_FIELD') . ': <br/> ' . Text::_('FLEXI_NO_ACCESS_TO_USE_CONFIGURED_CATEGORIES')
 			)));
 		}
 
@@ -1969,7 +2017,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 		if (empty($catids))
 		{
 			jexit(json_encode(array(
-				'error' => \Joomla\CMS\Language\Text::_('FLEXI_RIFLD_CATEGORY_NOT_ALLOWED')
+				'error' => Text::_('FLEXI_RIFLD_CATEGORY_NOT_ALLOWED')
 			)));
 		}
 
@@ -2471,13 +2519,13 @@ class plgFlexicontent_fieldsRelation extends FCField
 
 				if ($sql_mode && $item_pros > 0)
 				{
-					$filter->html = sprintf(\Joomla\CMS\Language\Text::_('FLEXI_FIELD_ITEM_SPECIFIC_AS_FILTERABLE'), $filter->label);
+					$filter->html = sprintf(Text::_('FLEXI_FIELD_ITEM_SPECIFIC_AS_FILTERABLE'), $filter->label);
 				}
 				else
 				{
 					$filter->html = $sql_mode
-						? \Joomla\CMS\Language\Text::_('FLEXI_FIELD_INVALID_QUERY')
-						: \Joomla\CMS\Language\Text::_('FLEXI_FIELD_INVALID_ELEMENTS');
+						? Text::_('FLEXI_FIELD_INVALID_QUERY')
+						: Text::_('FLEXI_FIELD_INVALID_ELEMENTS');
 				}
 				continue;
 			}

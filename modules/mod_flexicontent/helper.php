@@ -981,8 +981,8 @@ class modFlexicontentHelper
 		// custom field scope
 		$method_filt			= (int) $params->get('method_filt', 1);  // parameter added later, maybe not to break compatibility this should be INCLUDE=3 by default ?
 		$behaviour_filt		= (int) $params->get('behaviour_filt', 0);
-		$static_filters		= $params->get('static_filters', '');
-		$dynamic_filters	= $params->get('dynamic_filters', '');
+		$static_filters		= trim($params->get('static_filters', ''));
+		$dynamic_filters	= trim($params->get('dynamic_filters', ''));
 
 
 		// ***

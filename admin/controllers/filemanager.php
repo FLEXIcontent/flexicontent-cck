@@ -760,10 +760,17 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			// echo "\n"; print_r($file);
 		}
 
+		$file['ext'] = strtolower(flexicontent_upload::getExt($file['name']));
+		$file['name_only'] = substr($file['name'], 0, -1 * strlen($file['ext']) - 1);
+
+		// Get the file extension
+		$ext = $file['ext'];
+
+		$subfolder_path = '';
 		if ($fieldid)
 		{
 			$_options = array('secure' => $secure);
-			$path = $model->getFieldFolderPath($u_item_id, $fieldid, $_options);
+			$path = $model->getFieldFolderPath($u_item_id, $fieldid, $_options, $subfolder_path);
 
 			// Create field's folder if it does not exist already
 			if (!is_dir($path))
@@ -785,16 +792,60 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		// Make the filename safe
 		jimport('joomla.filesystem.file');
 
+		// Get field parameter 'auto_filename_code' which has PHP code to create the filename
+		$auto_filename_code = $field->parameters->get('auto_filename_code', '');
+		$auto_filename      = (int) $field->parameters->get('auto_filename', 0);
+		$auto_filename      = $auto_filename === 2 && !$auto_filename_code ? 0 : $auto_filename;
+		$custom_filename    = false;
+
+		if ($field && $auto_filename)
+		{
+			if ($auto_filename === 2)
+			{
+				$auto_filename_code = $field->parameters->get('auto_filename_code', '');
+				$auto_filename_code = preg_replace('/^<\?php(.*)(\?>)?$/s', '$1', $auto_filename_code);
+			}
+
+			switch($auto_filename)
+			{
+				case 2:     // AUTOMATIC value, via custom PHP code
+					try {
+						ob_start();
+
+						$old_error_reporting = error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT);
+						$old_error_handler = set_error_handler(array($this, 'custom_error_handler'));
+
+						$theFileData = $file;  // used in eval code
+						$custom_filename = eval($auto_filename_code);
+						unset($theFileData);
+						$custom_filename .= '.' . $ext;
+
+						error_reporting($old_error_reporting);
+						set_error_handler($old_error_handler);
+
+						$errors = trim(ob_get_contents());
+						ob_clean();
+
+						if ($errors) JFactory::getApplication()->enqueueMessage( 'Error renaming file of field: \'<b>' . $field->label . '</b>\' : <br/> <pre>' . $errors . '</pre>', 'notice');
+					}
+					catch (ParseError $e) {
+						JFactory::getApplication()->enqueueMessage( "Automatic filename custom code, failed with: <pre>" . $e->getMessage() . '</pre>', 'warning');
+					}
+					break;
+			}
+		}
+
 		// Sanitize filename further and make unique
 		$params = null;
 		$err_text = null;
 		$filesize = $file['size'];
 		$filename_original = strip_tags($file['name']);  // Store original filename before sanitizing the filename
 		$upload_check = flexicontent_upload::check($file, $err_text, $params);  // Check that file contents are safe, and also make the filename safe, transliterating it according to given language (this forces lowercase)
-		$filename     = flexicontent_upload::sanitize($path, $file['name']);    // Sanitize the file name (filesystem-safe, (this should have been done above already)) and also return an unique filename for the given folder
+		$filename     = $custom_filename ?:
+			flexicontent_upload::sanitize($path, $file['name']);    // Sanitize the file name (filesystem-safe, (this should have been done above already)) and also return an unique filename for the given folder
 		$filepath 	  = \Joomla\CMS\Filesystem\Path::clean($path . $filename);
 
-		// Check if uploaded file is valid
+		// Check if the uploaded file is valid
 		if (!$upload_check)
 		{
 			$this->exitHttpHead = array( 0 => array('status' => '415 Unsupported Media Type') );
@@ -804,9 +855,6 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 			return $this->terminate($file_id, $exitMessages);
 		}
-
-		// Get the extension to record it in the DB
-		$ext = strtolower(flexicontent_upload::getExt($filename));
 
 		// echo "\n". $file['tmp_name'] ." => ". $filepath ."\n";
 
@@ -847,7 +895,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		// In case of existing FILE object, get the file id
 		$file_id = $fileObj->id;
 
-		$fileObj->filename          = $filename;
+		$fileObj->filename          = str_replace('\\', '/', Path::clean($subfolder_path ? $subfolder_path . '/' : '')) . $filename;
 		$fileObj->filename_original = $Fobj ? $fileObj->filename_original : $filename_original;
 		$fileObj->altname           = $Fobj ? $fileObj->altname : ($filetitle ?: $filename_original);
 		$fileObj->estorage_fieldid  = $estorage_mode === 'FTP' ? $fieldid : 0;
@@ -992,6 +1040,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$fileaccess = flexicontent_html::dataFilter($fileaccess, 11, 'ACCESSLEVEL', 0);  // Validate access level exists (set to public otherwise)
 
 		$fieldid   = $this->input->get('fieldid', 0, 'int');
+		$u_item_id = $this->input->get('u_item_id', 0, 'cmd');
 		$filesize  = $this->input->get('file-url-size', 0, 'int');
 		$size_unit = $this->input->get('size_unit', 'KBs', 'cmd');
 
@@ -1166,7 +1215,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			$this->exitLogTexts = array();
 			$this->exitSuccess  = false;
 
-			return $this->terminate($file_id, $exitMessages);
+			return $this->terminate(null, $exitMessages);
 		}
 
 		// Different handling for folder_mode
@@ -1213,7 +1262,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			$this->exitLogTexts = array();
 			$this->exitSuccess  = count($failed_files) == 0;
 
-			return $this->terminate($file_id, $exitMessages);
+			return $this->terminate(null, $exitMessages);
 		}
 
 		// Calculate access
@@ -1234,7 +1283,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			$this->exitLogTexts = array();
 			$this->exitSuccess  = false;
 
-			return $this->terminate($file_id, $exitMessages);
+			return $this->terminate(null, $exitMessages);
 		}
 
 		$msg = '';
@@ -1307,7 +1356,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			$this->exitLogTexts = array();
 			$this->exitSuccess  = false;
 
-			return $this->terminate($file_id, $exitMessages);
+			return $this->terminate(null, $exitMessages);
 		}
 
 		if (count($allowed_cid))
@@ -1877,5 +1926,37 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		// Set FTP credentials, if given
 		jimport('joomla.client.helper');
 		\Joomla\CMS\Client\ClientHelper::setCredentialsFromRequest('ftp');
+	}
+
+	public function custom_error_handler($errno, $errstr, $errfile, $errline)
+	{
+		if (!(error_reporting() & $errno))
+		{
+			// This error code is not included in error_reporting, so let it fall through to the standard PHP error handler
+			return false;
+		}
+
+		switch ($errno) {
+			case E_NOTICE:
+			case E_USER_NOTICE:
+			case E_DEPRECATED:
+			case E_USER_DEPRECATED:
+			case E_STRICT:
+				echo("NOTICE: $errstr at line: $errline \n");
+				break;
+
+			case E_WARNING:
+			case E_USER_WARNING:
+				echo("WARNING: $errstr at line: $errline \n");
+				break;
+
+			case E_ERROR:
+			case E_USER_ERROR:
+			case E_RECOVERABLE_ERROR:
+				echo("ERROR: $errstr at line: $errline \n");
+
+			default:
+				echo("UNKNOWN ERROR at line: $errline \n");
+		}
 	}
 }

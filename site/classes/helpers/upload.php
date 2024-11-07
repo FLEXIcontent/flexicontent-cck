@@ -311,10 +311,10 @@ class flexicontent_upload
 		$ext  = substr( $filename, $lastdotpos + 1 );
 
 		// Make a unique filename by checking if it is already taken, if already taken keep incrementing counter till finding a new name
-		if (\Joomla\CMS\Filesystem\File::exists( $base_Dir . $name . '.' . $ext ))
+		if (file_exists( $base_Dir . $name . '.' . $ext ))
 		{
 			$unique_num = 1;
-			while( \Joomla\CMS\Filesystem\File::exists( $base_Dir . $name . '-' . $unique_num . '.' . $ext ) )
+			while( file_exists( $base_Dir . $name . '-' . $unique_num . '.' . $ext ) )
 			{
 				$unique_num++;
 			}

@@ -169,10 +169,10 @@
 			zoom: zoom,
 			mapTypeId: google.maps.MapTypeId[ fcfield_addrint.map_type[config_name] ],
 			zoomControl: true,
-			mapTypeControl: false,
-			scaleControl: false,
-			streetViewControl: false,
-			rotateControl: false,
+			mapTypeControl: true,
+			streetViewControl: true,
+			scaleControl: true,
+			rotateControl: true,
 		});
 
 		el.dataset = !!el.dataset ? el.dataset : {};

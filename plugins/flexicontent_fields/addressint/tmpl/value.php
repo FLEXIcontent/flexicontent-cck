@@ -39,6 +39,7 @@ else  //  $map_api === 'openstreetmap'
 // Get parameters
 $show_address = $field->parameters->get('show_address','both');
 $show_address = $show_address === 'both' || ($view !== 'item' && $show_address === 'category') || ($view === 'item' && $show_address === 'item');
+$show_address = static::$isItemsManager ? 1 : $show_address;
 
 $addr_display_mode = $field->parameters->get('addr_display_mode','plaintext');
 $addr_format_tmpl = $field->parameters->get('addr_format_tmpl',	'
@@ -57,6 +58,7 @@ $directions_link_label = $field->parameters->get('directions_link_label', \Jooml
 
 $show_map = $field->parameters->get('show_map','');
 $show_map = $show_map === 'both' || ($view !== 'item' && $show_map === 'category') || ($view === 'item' && $show_map === 'item');
+$show_map = static::$isItemsManager ? 0 : $show_map;
 
 $map_type_view = $field->parameters->get('map_type_view', $field->parameters->get('map_type', 'roadmap'));
 $map_zoom      = (int) $field->parameters->get('map_zoom', 16);

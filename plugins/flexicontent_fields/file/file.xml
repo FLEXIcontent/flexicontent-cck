@@ -103,6 +103,11 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 
+			<field name="form_info_header" type="radio" label="Header info" default="3">
+				<option value="1">Server storage sub-path</option>
+				<option value="2">Original filename</option>
+				<option value="3">Both</option>
+			</field>
 			<field name="form_file_preview" type="multilist" subtype="radio" default="0" toggle_related="1" label="File preview" description="You can enable file preview box, e.g. it will show image thumbnail if selected file is an image" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="file-preview">FLEXI_DISABLE</option>
 				<option value="1" show_list="file-preview " hide_list="">FLEXI_ENABLE</option>
@@ -137,7 +142,6 @@
 				<option value="1" show_list="inline-edit-off" hide_list="inline-edit-on,client-resize">FLEXI_NO</option>
 				<option value="0" show_list="inline-edit-on,client-resize" hide_list="inline-edit-off">FLEXI_YES</option>
 			</field>
-
 			<field name="iform_title" type="radio" default="1" label="FLEXI_FILE_DISPLAY_TITLE" description="FLEXI_FILE_DISPLAY_TITLE_DESC" depend_class="inline-edit-on" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -213,12 +217,15 @@
 				<option value="1">FLEXI_SECURE</option>
 				<option value="2">FLEXI_ALLOW_SELECTION</option>
 			</field>
-			<!-- Format of renamed uploaded file-->
-			<field name="uploaded_file_prefix" type="text" default="" label="FLEXI_UPLOADED_FILE_PREFIX" description="FLEXI_UPLOADED_FILE_PREFIX_DESC" depend_class="use-myfiles-on" />
-			<field name="uploaded_file_suffix" type="text" default="" label="FLEXI_UPLOADED_FILE_SUFFIX" description="FLEXI_UPLOADED_FILE_SUFFIX_DESC" depend_class="use-myfiles-on" />
-			<field name="uploaded_filename_code" type="editor" editor="codemirror" syntax="php" cols="80" rows="5" height="120px" class="fc-unset-width" filter="RAW"
-				   default="&lt;?php&#13;&#10;$F = &amp; $item-&gt;fields;&#13;&#10; return 'PREFIX_' . date('Y_m_d_H_i_s') . '_SUFFIX';&#13;&#10;?&gt;"
-				   label="FLEXI_CREATE_VIA_CUSTOM_CODE" description="FLEXI_CREATE_VIA_CUSTOM_CODE_DESC" depend_class="auto-value-code"/>
+
+			<field name="subfolder_path" type="text" default="" label="Sub folder path" description="Uploaded files will be moved into this sub folder path inside their SECURE or MEDIA (parent) folder" />
+			<field name="auto_filename" type="multilist" subtype="radio" toggle_related="1" default="0" label="Automatic rename" description="Create filename using PHP code" class="btn-group group-fcmethod">
+				<option value="0" hide_list="auto-filename-code">FLEXI_NO</option>
+				<option value="2" show_list="auto-filename-code">FLEXI_USE_CUSTOM_CODE</option>
+			</field>
+			<field name="auto_filename_code" type="editor" editor="codemirror" syntax="php" cols="80" rows="5" height="120px" class="fc-unset-width" filter="RAW"
+				   default="&lt;?php&#13;&#10; // $theFileData array: name, name_only, ext, size, tmp_name &#13;&#10; return 'PREFIX_' . $theFileData['name_only'] . '_' . date('Y-m-d_H-i-s') . '_SUFFIX';&#13;&#10;?&gt;"
+				   label="FLEXI_CREATE_VIA_CUSTOM_CODE" description="Note: return filename without the extension, set to empty and apply reload to see an example" depend_class="auto-filename-code"/>
 
 			<field name="" type="separator" default="FLEXI_FILELIST_COLUMNS" description="FLEXI_FILELIST_COLUMNS_DESC" level="level3" depend_class="use-myfiles-on" />
 			<field name="filelist_cols" type="fccheckbox" default="" display_useglobal="0"

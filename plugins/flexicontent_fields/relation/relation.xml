@@ -72,6 +72,8 @@
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" _description="FLEXI_FORM_FIELD_CONF_DESC" icon_class="icon-downarrow" level="tab_open" box_type="1" />
 			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF_DESC" description="" level="level3" class="alert alert-info fcpadded" />
 
+			<field name="itemcount" type="text" default="5000" label="FLEXI_RIFLD_MAX_LISTED_ITEMS" description="FLEXI_RIFLD_MAX_LISTED_ITEMS_DESC" hint="FLEXI_INT" />
+
 			<field name="display_label_form" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_FLOATED_LEFT</option>
@@ -85,6 +87,14 @@
 			<field name="" type="separator" default="FLEXI_RIFLD_RELATED_ITEMS_SELECTOR" level="level2" />
 
 			<field name="itemselector_prepend_item_state" type="radio" default="0" label="FLEXI_RIFLD_PREPEND_ITEM_STATE" description="FLEXI_RIFLD_PREPEND_ITEM_STATE_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="itemselector_prepend_item_type" type="radio" default="0" label="FLEXI_RIFLD_PREPEND_ITEM_TYPE" description="" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="itemselector_prepend_item_id" type="radio" default="0" label="FLEXI_RIFLD_PREPEND_ITEM_ID" description="" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -139,10 +149,13 @@
 			</field>
 
 			<field name="" type="separator" default="Field filters" description="Filter items list using other fields" icon_class="icon-signup" level="tab_open" box_type="1" />
-			<field name="itemselector_custom_filters" type="filters" field_type="relation,text,select,selectmultiple,radio,checkbox,radioimage,checkboximage" label="Custom filters"
+			<field name="itemselector_custom_filters" type="filters" field_type="type,date,relation,text,select,selectmultiple,radio,checkbox,radioimage,checkboximage" label="Custom filters"
 				   description="Filter items list using other fields"
 				   inline_tip="Custom filters" tip_class="" tip_img="comments.png" />
-
+			<field name="load_method" type="radio" default="3" label="Performance" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
+				<option value="3">Load initially</option>
+				<option value="4">Load only if 1+ filters active</option>
+			</field>
 
 			<field name="" type="separator" default="FLEXI_RIFLD_SELECTABLE_ITEMS" description="FLEXI_RIFLD_SELECTABLE_ITEMS_DESC" icon_class="icon-signup" level="tab_open" box_type="1" />
 			<field name="" type="separator" default="FLEXI_RIFLD_SELECTABLE_ITEMS_DESC" level="level3" class="alert alert-info fcpadded" />
@@ -222,7 +235,6 @@
 			<field name="" type="separator" default="FLEXI_RIFLD_RELATED_ITEMS_LIST" icon_class="icon-list-2" level="tab_open" box_type="1" />
 			<field name="" type="separator" default="FLEXI_RIFLD_DISPLAY_OPS_RELATED_ITEM_LIST" level="level3" class="alert alert-info fcpadded" />
 
-			<field name="itemcount" type="text" default="" label="FLEXI_RIFLD_MAX_LISTED_ITEMS" description="FLEXI_RIFLD_MAX_LISTED_ITEMS_DESC" hint="FLEXI_INT" />
 			<field name="itemslist_acclvl" type="accesslevel" default="1" label="FLEXI_RIFLD_ITEMS_LIST_ACCESS" description="FLEXI_RIFLD_ITEMS_LIST_ACCESS_DESC" depend_class="button-relation-mode" />
 
 			<field name="" type="separator" default="" level="level_br" />

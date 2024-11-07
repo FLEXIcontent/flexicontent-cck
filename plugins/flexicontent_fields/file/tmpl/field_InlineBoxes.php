@@ -249,7 +249,7 @@ HTML;
 
 		<span class="fc_filedata_storage_name" style="display:none;">'.$file_data->filename.'</span>
 		<div class="fc_filedata_txt_nowrap nowrap_hidden">'.$file_data->filename.'<br/>'.$file_data->altname.'</div>
-		<input class="fc_filedata_txt inlinefile-data-txt '. $info_txt_classes . $required_class .'" style="'.($use_myfiles == 4 && !$use_quantum ? 'display:none' : '').'"
+		<input class="fc_filedata_txt inlinefile-data-txt '. $info_txt_classes . $required_class .'" style="'.(($use_myfiles == 4 && !$use_quantum) || !in_array($form_info_header, [1,3]) ? 'display:none' : '').'"
 			readonly="readonly" name="'.$fieldname_n.'[file-data-txt]" id="'.$elementid_n.'_file-data-txt" '.$info_txt_tooltip.'
 			value="'.htmlspecialchars($file_data->filename, ENT_COMPAT, 'UTF-8').'"
 			data-label_text="'.$field->label.'"
@@ -273,11 +273,11 @@ HTML;
 			<div class="fcclear"></div>
 		' : '')).'
 
-		'.(!$iform_title && $use_myfiles != 4 ? '
+		'.(in_array($form_info_header, [2,3]) && $use_myfiles != 4 ? '
 		<div class="fcclear"></div>
 		<div class="'.$input_grp_class.' fc-xpended-row">
-			<label class="' . $add_on_class . ' fc-lbl fc_filedata_title-lbl">'.Text::_( 'FLEXI_FILE_DISPLAY_TITLE' ).'</label>
-			<span class="' . $add_on_class . ' fc_filedata_title">'. ($file_data->altname && $filename_original!=$file_data->altname ? $file_data->altname : '-').'</span>
+			<label class="' . $add_on_class . ' badge fc-lbl fc_filedata_title-lbl" style="margin:0">'.Text::_( 'FLEXI_ORIGINAL_FILENAME' ).'</label>
+			<input type="text" disabled class="' . $add_on_class . ' fc_filedata_title" value="'. htmlentities($filename_original, ENT_COMPAT, 'UTF-8') .'" />
 		</div>' : '').'
 
 		<div class="fcclear"></div>
