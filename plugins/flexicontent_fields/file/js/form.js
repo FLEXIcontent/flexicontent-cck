@@ -137,7 +137,7 @@
 		container.find('.fc_filedata_txt').removeAttr('data-filename');
 		container.find('.fc_filedata_txt').data('filename', filename);
 		container.find('.fc_filedata_txt_nowrap').html(text_nowrap).show();
-		container.find('.fc_filedata_title').value(displaytitle);
+		container.find('.fc_filedata_title').val(displaytitle);
 		container.find('.fc_preview_thumb').attr('src', file_preview);
 
 		var is_image = file_preview.match(/\.(jpeg|jpg|gif|png|webp)$/) != null;
@@ -215,7 +215,7 @@
 		container.find('.fc_filedata_txt').removeAttr('data-filename');
 		container.find('.fc_filedata_txt').data('filename', file.filename);
 		container.find('.fc_filedata_txt_nowrap').html(text_nowrap).show();
-		container.find('.fc_filedata_title').value(displaytitle);
+		container.find('.fc_filedata_title').val(displaytitle);
 
 		container.find('.fc_preview_thumb').attr('src', file.preview ? file.preview : 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=');
 

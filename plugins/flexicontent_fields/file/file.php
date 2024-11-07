@@ -441,7 +441,7 @@ class plgFlexicontent_fieldsFile extends FCField
 				newField.find('.clear-btn').click();
 
 				newField.find('.fc_filedata_txt_nowrap').html('-');
-				newField.find('.fc_filedata_title').value('-');
+				newField.find('.fc_filedata_title').val('-');
 
 				var theInput = newField.find('input.fc_filedata_txt').first();
 				theInput.attr('value', '');
