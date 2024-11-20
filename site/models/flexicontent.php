@@ -220,7 +220,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		
 		// Get privilege to view non viewable items (upublished, archived, trashed, expired, scheduled).
 		// NOTE:  ACL view level is checked at a different place
-		$ignoreState = $user->authorise('flexicontent.ignoreviewstate', 'com_flexicontent');
+		$ignoreState = $params->get('use_list_items_in_any_state_acl', 0) && $user->authorise('flexicontent.ignoreviewstate', 'com_flexicontent');
 		
 		if (!$ignoreState)
 		{
@@ -391,8 +391,8 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		
 		// Get privilege to view non viewable items (upublished, archived, trashed, expired, scheduled).
 		// NOTE:  ACL view level is checked at a different place
-		$ignoreState = $user->authorise('flexicontent.ignoreviewstate', 'com_flexicontent');
-		
+		$ignoreState = $params->get('use_list_items_in_any_state_acl', 0) && $user->authorise('flexicontent.ignoreviewstate', 'com_flexicontent');
+
 		if (!$ignoreState) {
 			// Limit by publication state. Exception: when displaying personal user items or items modified by the user
 			$where .= ' AND ( i.state IN (1, -5) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
