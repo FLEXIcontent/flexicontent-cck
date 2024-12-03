@@ -478,6 +478,9 @@ foreach ($field->value as $index => $value)
 		</div>
 		'.($fields_box_placing ? '<div class="fcclear"></div>' : '').'
 		').'
+					'.$fc_preview_msg.'
+					'.$originalname.'
+					'.$existingname.'
 
 		<div class="fc-field-props-box" ' . (!$multiple ? 'style="width: 80%; max-width: 1000px; position: relative;"' : ''). '>
 
@@ -517,9 +520,6 @@ foreach ($field->value as $index => $value)
 			'
 
 				<div class="fcimg_value_props" data-name="'.$elementid_n.'">
-					'.$fc_preview_msg.'
-					'.$originalname.'
-					'.$existingname.'
 					<div class="fc-form-tbl fcinner fccompact">
 						' . @ $urllink . '
 						' . @ $mediaurl . '
@@ -560,4 +560,3 @@ $js = ""
 ");
 
 if ($js) $document->addScriptDeclaration($js);
-
