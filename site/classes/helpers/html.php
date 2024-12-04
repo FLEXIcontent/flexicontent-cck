@@ -102,19 +102,7 @@ class flexicontent_html
 		<div id="system-message-container">
 <?php endif; ?>
 			<div id="fc_ajax_system_messages">
-			<?php if (is_array($msgsByType) && $msgsByType) : ?>
-				<?php foreach ($msgsByType as $type => $msgs) : ?>
-					<div class="alert <?php echo $alert_class[$type]; ?>">
-						<button type="button" class="close" data-dismiss="alert">&times;</button>
-						<h4 class="alert-heading"><?php echo \Joomla\CMS\Language\Text::_($type); ?></h4>
-						<?php if ($msgs) : ?>
-							<?php foreach ($msgs as $msg) : ?>
-								<div class="alert-<?php echo $type; ?>"><?php echo $msg; ?></div>
-							<?php endforeach; ?>
-						<?php endif; ?>
-					</div>
-				<?php endforeach; ?>
-			<?php endif; ?>
+				<?php echo \Joomla\CMS\Factory::getApplication()->getRenderer('message')->render(null); ?>
 			</div>
 <?php if ($add_containers) : ?>
 		</div>
