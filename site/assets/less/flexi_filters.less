@@ -12,8 +12,8 @@
 	width: 100%;
 }
 
-fieldset.fc_search_set,    /* SEARCH view */
-fieldset.fc_filter_set {   /* CATEGORY view */
+fieldset.fc_search_set,    
+fieldset.fc_filter_set {   /* CATEGORY view *//* SEARCH view */
 	border-bottom: 1px solid #cccccc; /*lighter display*/
 	margin: 12px 0 0 0;
 	padding: 1%;
@@ -160,6 +160,7 @@ fieldset.fc_filter_set .fc-mssg.fc-info {
 	border-radius: 2px;
 	flex-direction: row;
     gap: 5px;
+	align-items: center;
 }
 .fc_filter {
 	/*clear: none;
@@ -453,7 +454,7 @@ span.fc_field_filter {
 }
 
 .fc_filter > .fc_filter_html > .fc_checkradio_group_wrapper > ul.fc_field_filter.fc_checkradio_group {
-	margin: 0px 0px 0px 4px;
+	margin: -4px 0px 0px 4px;
 	padding: 3px 4px 3px 2px;
 	height: auto;
 	max-height: auto;
@@ -619,4 +620,9 @@ div#fc_textsearch_tbl {
 .flexi_search.right .fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_field_filter, 
 .flexi_search.right .fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_field_filter:focus {
     width: 100%;
+}
+/** smal fix alignement for nouslider**/
+.fcfilter_nouislider_txtbox {
+    padding-left: 14px;
+	padding-top : 2px;
 }

@@ -2413,7 +2413,7 @@ body .fc_loading_box {
 .com_flexicontent .ui-autocomplete,
 .com_flexicontent .ui-autocomplete-list {
 	max-height: 400px;
-	overflow-y: auto;
+	overflow-y: hidden;
 	overflow-x: hidden;
 	z-index: 1000 !important;
 }
@@ -5187,6 +5187,7 @@ div table.adminform td {
 	float: left;
 	flex-direction: row;
 	align-items: center;
+	gap: 10px;
 }
 #flexicontent .item_total .fc_clayout_selector {
 	display: inline-block;

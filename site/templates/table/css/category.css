@@ -50,6 +50,17 @@ table.adminlist {
 	display: inline-flex;
 	align-items: center;
 }
+#mainChooseColBox_cols ul li {
+	list-style-type: none;
+}
+#mainChooseColBox_cols ul {
+	padding-left: 0px;
+}
+#mainChooseColBox .icon-arrow-up-2 {
+	display: block;
+	text-align: center;
+	margin-top: -10px;
+}
 #fc_alpha .btn.fc_alpha_index,
 #fc_alpha .btn.fc_alpha_index_sep {
 	margin-top: 0;

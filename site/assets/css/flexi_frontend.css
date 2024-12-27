@@ -363,6 +363,7 @@ div table.adminform td {
 	float: left;
 	flex-direction: row;
 	align-items: center;
+	gap: 10px;
 }
 #flexicontent .item_total .fc_clayout_selector {
 	display: inline-block;
