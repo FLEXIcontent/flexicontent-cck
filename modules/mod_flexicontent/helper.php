@@ -1000,7 +1000,10 @@ class modFlexicontentHelper
 		$where .= FLEXI_J16GE ? '' : ' AND i.sectionid = ' . FLEXI_SECTION;
 
 		$ignore_up_down_dates = $params->get('ignore_up_down_dates', 0);  // 1: ignore publish_up, 2: ignore publish_donw, 3: ignore both
-		$ignoreState =  $params->get('use_list_items_in_any_state_acl', 0) && $user->authorise('flexicontent.ignoreviewstate', 'com_flexicontent');
+
+		$use_list_items_in_any_state_acl = $params->get('use_list_items_in_any_state_acl', $flexiparams->get('use_list_items_in_any_state_acl', 0));
+		$ignoreState =  $use_list_items_in_any_state_acl && $user->authorise('flexicontent.ignoreviewstate', 'com_flexicontent');
+
 		if (!$ignoreState && $ignore_up_down_dates != 3 && $ignore_up_down_dates != 1)
 			$where .= ' AND ( i.publish_up is NULL OR i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$db->Quote($nowDate).' )';
 		if (!$ignoreState && $ignore_up_down_dates != 3 && $ignore_up_down_dates != 2)

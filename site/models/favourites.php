@@ -418,7 +418,7 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 
 		// Get privilege to view non viewable items (upublished, archived, trashed, expired, scheduled).
 		// NOTE:  ACL view level is checked at a different place
-		$ignoreState = $user->authorise('flexicontent.ignoreviewstate', 'com_flexicontent');
+		$ignoreState = $this->_params->get('use_list_items_in_any_state_acl', 0) && $user->authorise('flexicontent.ignoreviewstate', 'com_flexicontent');
 
 		if (!$ignoreState)
 		{

@@ -362,6 +362,7 @@
 			</field>
 			<field name="item_states" type="fcitemstate" multiple="true" size="6" default="" label="FLEXI_ITEM_STATES" description="FLEXI_ITEM_STATES_DESC" showon="method_states:1,2" />
 			<field name="use_list_items_in_any_state_acl" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_UMOD_USE_LIST_ITEMS_IN_ANY_STATE_ACL" description="FLEXI_UMOD_USE_LIST_ITEMS_IN_ANY_STATE_ACL_DESC" showon="method_states:0" class="btn-group group-fcmethod" inline_text="FLEXI_UMOD_SET_TO_NO_FOR_DEFAULT_BEHAVIOUR" text_class="fc-mssg-inline fc-success fc-small method_any_state_acl_ops">
+				<option value="" show_list="method_any_state_acl_ops" hide_list="">FLEXI_USE_GLOBAL</option>
 				<option value="0" show_list="" hide_list="method_any_state_acl_ops">FLEXI_NO</option>
 				<option value="1" show_list="method_any_state_acl_ops" hide_list="">FLEXI_YES</option>
 			</field>

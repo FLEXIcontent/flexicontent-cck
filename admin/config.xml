@@ -419,6 +419,11 @@
 		<field name="" type="separator" default="FLEXI_CATEGORY_BASED_VIEWS" label="" level="level0"/>
 		<field name="" type="separator" default="FLEXI_SUPPORTED_LIST_VIEWS" class="fc-mssg fc-info" />
 
+			<field name="use_list_items_in_any_state_acl" type="multilist" subtype="radio" default="0" label="FLEXI_USE_LIST_ITEMS_IN_ANY_STATE_ACL" description="FLEXI_USE_LIST_ITEMS_IN_ANY_STATE_ACL_DESC" showon="method_states:0" class="btn-group group-fcmethod" inline_text="Please see List " text_class="fc-mssg-inline fc-success fc-small method_any_state_acl_ops">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+
 			<!--field name="" type="separator" default="FLEXI_PARAMETERS_HANDLING" label="" level="level2" /-->
 			<field name="inheritcid" type="fcradio" default="-1" label="FLEXI_CATS_INHERIT_PARAMS" description="FLEXI_CATS_INHERIT_PARAMS_DESC" class="btn-group group-fcmethod fcoffactive">
 				<option value="0">FLEXI_COMPONENT_ONLY</option>
