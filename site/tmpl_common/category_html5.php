@@ -1,6 +1,8 @@
 <?php
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.popover', '.hasTooltip', array('trigger' => 'click hover'));
+
 $page_classes  = '';
 $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 $page_classes .= ' fccategory fccat'.$this->category->id;
