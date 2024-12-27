@@ -10,6 +10,7 @@
 	padding: 4px;
 	border-radius: 4px;
 	height: auto;
+	border-color: #aaa;
 }
 .controls *:not(.input-append):not(.input-prepend):not(.input-group) > input[type="text"]:not(.minicolors),
 .controls textarea,
@@ -242,10 +243,9 @@ ul.fc_checkradio_group {
 }
 li.fc_checkradio_option {
 	white-space: nowrap;
-	display: inline-block;
+	display: inline-flex;
 	margin-top: 1px;
 	margin-bottom: 1px;
-	vertical-align: top;
 }
 input[type="checkbox"].fc_checkradio_bar + label,
 input[type="radio"].fc_checkradio_bar + label {

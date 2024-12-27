@@ -46,6 +46,10 @@ table.adminlist {
 .subcategorieslist {
 	margin: 0 0 1em;
 }
+.button-editor {
+	display: inline-flex;
+	align-items: center;
+}
 #fc_alpha .btn.fc_alpha_index,
 #fc_alpha .btn.fc_alpha_index_sep {
 	margin-top: 0;
