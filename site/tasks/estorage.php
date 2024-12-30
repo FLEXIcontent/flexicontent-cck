@@ -495,6 +495,9 @@ class FlexicontentCronTasks
 		<div id="system-message-container">
 <?php endif; ?>
 			<div id="fc_ajax_system_messages">
+			<?php if (version_compare(JVERSION, '4.0', 'ge')): ?>
+			<?php echo \Joomla\CMS\Factory::getApplication()->getRenderer('message')->render(null); ?>
+		<?php else: ?>
 			<?php if (is_array($msgsByType) && $msgsByType) : ?>
 				<?php foreach ($msgsByType as $type => $msgs) : ?>
 					<div class="alert <?php echo $alert_class[$type]; ?>">
@@ -508,6 +511,7 @@ class FlexicontentCronTasks
 					</div>
 				<?php endforeach; ?>
 			<?php endif; ?>
+		<?php endif; ?>
 			</div>
 <?php if ($add_containers) : ?>
 		</div>
