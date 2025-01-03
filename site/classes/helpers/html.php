@@ -102,7 +102,7 @@ class flexicontent_html
 		<div id="system-message-container">
 <?php endif; ?>
 			<div id="fc_ajax_system_messages">
-			<?php if (version_compare(JVERSION, '4.0', 'ge')): ?>
+		<?php if (version_compare(JVERSION, '4.0', 'ge')): ?>
 			<?php echo \Joomla\CMS\Factory::getApplication()->getRenderer('message')->render(null); ?>
 		<?php else: ?>
 			<?php if (is_array($msgsByType) && $msgsByType) : ?>

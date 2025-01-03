@@ -8,6 +8,7 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 // first define the template name
+\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.popover', '.hasTooltip', array('trigger' => 'click hover'));
 $tmpl = $this->tmpl;
 $user = \Joomla\CMS\Factory::getUser();
 
