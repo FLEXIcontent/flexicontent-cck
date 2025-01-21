@@ -105,7 +105,7 @@
 			<field name="news_padding_left_right_feat" type="text" default="12px" label="padding left/right" description="This is the padding applied at left and right of the items" />
 			<field name="news_border_width_feat" type="text" default="1" label="border width" description="This is the border width applied around the items" />
 			<field name="news_margin_top_bottom_feat" type="text" default="2rem" label="margin top/bottom" description="This is the margin applied at top and bottom of the items" />
-			<field name="news_margin_left_right_feat" type="text" default="4rem" label="margin left/right" description="This is the margin applied at left and right of the items" />
+			<field name="news_margin_left_right_feat" type="text" default="2rem" label="margin left/right" description="This is the margin applied at left and right of the items" />
 
 
 			<field name="item_tab_standard" type="separator" default="Standard items" icon_class="icon-list" level="tab_open" box_type="1" />
@@ -170,7 +170,7 @@
 			<field name="news_padding_left_right" type="text" default="12px" label="padding left/right" description="This is the padding applied at left and right of the items" />
 			<field name="news_border_width" type="text" default="1" label="border width" description="This is the border width applied around the items" />
 			<field name="news_margin_top_bottom" type="text" default="2rem" label="margin top/bottom" description="This is the margin applied at top and bottom of the items" />
-			<field name="news_margin_left_right" type="text" default="4rem" label="margin left/right" description="This is the margin applied at left and right of the items" />
+			<field name="news_margin_left_right" type="text" default="2rem" label="margin left/right" description="This is the margin applied at left and right of the items" />
 
 		<field name="item_tabset_end" type="separator" default="ITEM_TABSET" level="tabset_close" />
 
