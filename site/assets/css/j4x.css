@@ -284,10 +284,6 @@ form div.container_fcfield > span {
 .mod_flexifilter_wrapper .fc_filter_html .fc_filter_element {
 	width: 100%;
 }
-.fc_filter_html :not(.input-prepend):not(.input-append) > .fc_text_filter,
-.fc_filter_html :not(.input-prepend):not(.input-append) > .fc_field_filter {
-	font-size: 12px !important;
-}
 .fc_filter_html input.btn.btn-success {
 	margin-left: -5px;
 	border-radius: 0px 5px 5px 0;
