@@ -189,10 +189,6 @@ form > .fc_filter_line {
 	white-space: nowrap;
 	position: relative;
 }
-.fc_field_filter label,
-.flexicontent .fc_field_filter {
-	font-size: 11px;
-}
 .fc_filter_html .select2-container .select2-choices input.select2-input,
 .fc_filter_html .select2-container .select2-choice > .select2-chosen,
 .fc_filter_html .fc_text_filter,
@@ -204,7 +200,6 @@ form > .fc_filter_line {
 .fc_filter_html :not(.input-prepend):not(.input-append) > .fc_text_filter,
 .fc_filter_html :not(.input-prepend):not(.input-append) > .fc_field_filter {
 	border-radius: 5px;
-	font-size: 11px;
 }
 .fc_filter_html :not(.input-prepend):not(.input-append) > input.fc_text_filter,
 .fc_filter_html :not(.input-prepend):not(.input-append) > input.fc_field_filter,
@@ -220,7 +215,7 @@ form > .fc_filter_line {
 	min-width: 120px;
 	vertical-align: top;
 	border: 1px solid #aaa;
-	background: #fff url('../images/select2.png') no-repeat 92% -22px !important;
+	background: #fff url('../images/select2.png') no-repeat 99% -22px !important;
 }
 .fc_filter_html .input-append > input.fc_text_filter,
 .fc_filter_html .input-append > input.fc_field_filter,
@@ -326,10 +321,7 @@ input#search_searchword {
 	border-radius: 5px;
 	border-color: #aaa;
 	width: 100%;
-}
-.fc_search_option_cell .fc_field_filter {
-	border-radius: 5px;
-	border-color: #aaa;
+	border: 1px solid #aaa;
 }
 .fc_has_inner_label,
 .fc_has_inner_prompt {
@@ -444,4 +436,8 @@ div#fc_textsearch_tbl {
 .fcfilter_nouislider_txtbox {
 	padding-left: 14px;
 	padding-top: 2px;
+}
+input#searchForm_6_val {
+	border-radius: 5px;
+	border: 1px solid #aaa;
 }

@@ -322,7 +322,7 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 /* The form element(s) of each field filter inside filter's HTML */
 .fc_field_filter label,
 .flexicontent .fc_field_filter {
-	font-size: 11px;
+	/*font-size: 11px;*/
 }
 
 .fc_filter_html .select2-container .select2-choices input.select2-input::placeholder,
@@ -348,8 +348,8 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 .fc_filter_html :not(.input-prepend):not(.input-append) > .fc_field_filter {
 	border-radius: 5px;
 	/*padding: 2px 0px 2px 4px;
-	margin: 2px 0px 2px 4px;*/
-	font-size: 11px;
+	margin: 2px 0px 2px 4px;
+	font-size: 11px;*/
 }
 .fc_filter_html :not(.input-prepend):not(.input-append) > input.fc_text_filter,
 .fc_filter_html :not(.input-prepend):not(.input-append) > input.fc_field_filter,
@@ -368,7 +368,7 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 	min-width: 120px;
 	vertical-align: top;
   border: 1px solid #aaa;
-  background: #fff url('../images/select2.png') no-repeat 92% -22px !important; /* 92% is for icon alignement*/
+  background: #fff url('../images/select2.png') no-repeat 99% -22px !important; /* 92% is for icon alignement*/
 }
 
 .fc_filter_html .input-append > input.fc_text_filter,
@@ -494,11 +494,12 @@ input#search_searchword{
 	border-radius: 5px;
 	border-color:#aaa;
 	width:100%;
+	border: 1px solid #aaa;
 }
-.fc_search_option_cell .fc_field_filter{
+/*.fc_search_option_cell .fc_field_filter{
 	border-radius: 5px;
 	border-color:#aaa;
-}
+}*/
 .fc_filter_html.fc_text_search > * {
 	/*margin: 4px 0px 4px 0px;*/
 }
@@ -625,4 +626,8 @@ div#fc_textsearch_tbl {
 .fcfilter_nouislider_txtbox {
     padding-left: 14px;
 	padding-top : 2px;
+}
+input#searchForm_6_val {
+    border-radius: 5px;
+    border: 1px solid #aaa;
 }

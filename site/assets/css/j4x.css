@@ -206,7 +206,6 @@ label.add-on.fc-lbl-short.addrint_autocomplete-lbl {
 #flexicontent form .fcfield_textval,
 #flexicontent .fc_filedata_txt,
 .select2-container-multi .select2-choices {
-	border: 1px solid #aaa !important;
 	border-radius: 4px;
 	padding: 5px;
 }
@@ -340,7 +339,10 @@ header.group.tool {
 #flexicontent ::placeholder,
 .mod_flexifilter_wrapper ::placeholder {
 	color: #000;
-	font-size: 12px;
+	font-size: 16px;
+	position: absolute;
+	left: 5px;
+	top: 13px;
 }
 #flexicontent #fcfilter_form_slider_category .accordion-item {
 	display: inline-grid !important;
@@ -618,4 +620,7 @@ fieldset.fc_filter_set {
 }
 span.fcpagenav-items-cnt.btn.disabled {
 	border: 0;
+}
+.com_flexicontent .popover-header {
+	background: #fff;
 }
