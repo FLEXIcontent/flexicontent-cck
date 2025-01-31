@@ -125,16 +125,10 @@ form > .fc_filter_line {
 }
 .fc_filter .fc_filter_label_inline,
 .fc_filter_line .fc_filter_label_inline {
+	color: #000;
 	display: inline-block;
-	font-size: 10.998px;
-	line-height: 14px;
-	padding: 4px 4px;
 	vertical-align: baseline;
 	white-space: nowrap;
-}
-.fc_filter .fc_filter_label_inline,
-.fc_filter_line .fc_filter_label_inline {
-	border-bottom: 1px solid #ccc;
 }
 .fc_filter.active .fc_filter_label,
 .fc_filter_line.active .fc_filter_label {
@@ -193,6 +187,7 @@ form > .fc_filter_line {
 .fc_filter_html .select2-container .select2-choice > .select2-chosen,
 .fc_filter_html .fc_text_filter,
 .fc_filter_html .fc_field_filter {
+	color: #6a6a6a;
 	font-weight: normal;
 	display: inline-block;
 	width: auto;
@@ -285,8 +280,6 @@ span.fc_field_filter {
 	border-width: 0px;
 }
 .fc_filter > .fc_filter_html > .fc_checkradio_group_wrapper > ul.fc_field_filter.fc_checkradio_group {
-	margin: -4px 0px 0px 4px;
-	padding: 3px 4px 3px 2px;
 	height: auto;
 	max-height: auto;
 	position: static;
