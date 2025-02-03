@@ -404,7 +404,6 @@ div.comments {
 }
 .news.fc-items-block .fcitem_readon {
 	text-align: center;
-	background: url("images/readmore.png") transparent no-repeat scroll 0px 5px;
 	margin: 8px 2%;
 	display: inline-block;
 	-webkit-transition: all 0.4s;
