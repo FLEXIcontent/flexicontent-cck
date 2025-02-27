@@ -3549,7 +3549,7 @@ class FlexicontentFields
 				foreach ($value as $i => $v)
 				{
 					$value[$i] = !$filter_compare_type
-						? $db->Quote( preg_replace('(\w+)', $_search_prefix.'$0', $v) )
+						? $db->Quote( preg_replace('/(\b[^\s,\.]+\b)/u', $_search_prefix.'$0', $v) )
 						: ($filter_compare_type==1 ? intval($v) : floatval($v));
 				}
 			}
@@ -3574,7 +3574,7 @@ class FlexicontentFields
 					{
 						$value_clauses[] = $quoted
 							? '_v_=' . $val
-							: '_v_=' . $db->Quote( preg_replace('(\w+)', $_search_prefix.'$0', $val) );
+							: '_v_=' . $db->Quote( preg_replace('/(\b[^\s,\.]+\b)/u', $_search_prefix.'$0', $val) );
 					}
 					else
 					{
@@ -3582,7 +3582,7 @@ class FlexicontentFields
 						{
 							$value_clauses[] = $quoted
 								? '_v_=' . $vv
-								: '_v_=' . $db->Quote( preg_replace('(\w+)', $_search_prefix.'$0', $vv) );
+								: '_v_=' . $db->Quote( preg_replace('/(\b[^\s,\.]+\b)/u', $_search_prefix.'$0', $vv) );
 						}
 					}
 				}
@@ -3600,7 +3600,7 @@ class FlexicontentFields
 					{
 						$value_clauses[] = $quoted
 							? $val
-							: $db->Quote( preg_replace('(\w+)', $_search_prefix.'$0', $val) );
+							: $db->Quote( preg_replace('/(\b[^\s,\.]+\b)/u', $_search_prefix.'$0', $val) );
 					}
 					else
 					{
@@ -3608,7 +3608,7 @@ class FlexicontentFields
 						{
 							$value_clauses[] = $quoted
 								? $vv
-								: $db->Quote( preg_replace('(\w+)', $_search_prefix.'$0', $vv) );
+								: $db->Quote( preg_replace('/(\b[^\s,\.]+\b)/u', $_search_prefix.'$0', $vv) );
 						}
 					}
 				}
@@ -3625,12 +3625,12 @@ class FlexicontentFields
 		{
 			if (!empty($filter->filter_valueexact))
 			{
-				$valueswhere .= ' AND _v_=' . $db->Quote( preg_replace('(\w+)', $_search_prefix.'$0', $value[0]) );
+				$valueswhere .= ' AND _v_=' . $db->Quote( preg_replace('/(\b[^\s,\.]+\b)/u', $_search_prefix.'$0', $value[0]) );
 			}
 			else
 			{
 				// DO NOT put % in front of the value since this will force a full table scan instead of indexed column scan
-				$_value_like = preg_replace('(\w+)', $_search_prefix.'$0'.($is_full_text ? '*' : '%'), $value[0]);
+				$_value_like = preg_replace('/(\b[^\s,\.]+\b)/u', $_search_prefix.'$0'.($is_full_text ? '*' : '%'), $value[0]);
 				if (empty($quoted))
 				{
 					$_value_like = $db->Quote($_value_like);

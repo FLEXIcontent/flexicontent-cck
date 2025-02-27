@@ -272,13 +272,13 @@ $js .= (!$isXtdBtn ? "" : "
 		}
 
 		// This is file path just get filename to use if no text is selected in the editor
-		let file_path = title; 
+		let file_path = title;
 		title = title.replace(/^.*[\\/]/, '');
 
 		/** Use the API, if editor supports it **/
 		if (!!window.parent.Joomla.editors.instances[editor]) {
 			let selectedText = window.parent.Joomla.editors.instances[editor].getSelection().trim() || title.trim();
-			let insertedHtml = ' <a' + hreflang + ' href=\"' + link + '\">' + selectedText + '</a> ';			
+			let insertedHtml = ' <a' + hreflang + ' href=\"' + link + '\">' + selectedText + '</a> ';
 			window.parent.Joomla.editors.instances[editor].replaceSelection(insertedHtml)
 		}
 		else {
@@ -2084,48 +2084,46 @@ HTML;
 
 																		// SEE top of file: layouts/joomla/form/field/media.php
 																		$jMedia_file_displayData = [
-																			'disabled' => false,
-																			'preview' => 'tooltip',   // 'false', 'none', 'true', 'show', 'tooltip'
-																			'readonly' => false,
-																			'class' => '',
-																			'link' => $modal_url,
-																			'asset' => 'com_flexicontent',
-																			'authorId' => '',
-																			'previewWidth' => 480,
-																			'previewHeight' => 180,
-																			'name' => 'file-jmedia-data',
-																			'id' => 'file-jmedia-data',
-																			'value' => '',
+    'disabled' => false,
+    'preview' => 'tooltip',
+    'readonly' => false,
+    'class' => '',
+    'link' => $modal_url,
+    'asset' => 'com_flexicontent',
+    'authorId' => '',
+    'previewWidth' => 480,
+    'previewHeight' => 180,
+    'name' => 'file-jmedia-data',
+    'id' => 'file-jmedia-data',
+    'value' => '',
+    'folder' => is_array($jmedia_subpath) ? $jmedia_subpath : [$jmedia_subpath], // Ensures folder is an array
+];
 
-																			// J3 sub-path inside JPATH_ROOT/images
-																			// J4 sub-path inside JPATH_ROOT/top-level-directory, default is JPATH_ROOT/media
-																			'folder' => (version_compare(\Joomla\CMS\Version::MAJOR_VERSION, '4', 'lt')
-																				? $jmedia_subpath
-																				: 'local-' . $jmedia_topdir .  ':/' . $jmedia_subpath),
-																		];
+if (version_compare(\Joomla\CMS\Version::MAJOR_VERSION, '4', 'ge')) {
+    $jMedia_file_displayData += [
+        'dataAttribute' => '',
+        'mediatypes' => is_array($mediaTypes) ? $mediaTypes : explode(',', (string) $mediaTypes),
+        'imagesExt' => is_array($imagesExt) ? $imagesExt : (empty($imagesExt) ? [] : explode(',', $imagesExt)),
+        'audiosExt' => is_array($audiosExt) ? $audiosExt : (empty($audiosExt) ? [] : explode(',', $audiosExt)),
+        'videosExt' => is_array($videosExt) ? $videosExt : (empty($videosExt) ? [] : explode(',', $videosExt)),
+        'documentsExt' => is_array($documentsExt) ? $documentsExt : (empty($documentsExt) ? [] : explode(',', $documentsExt)),
+    ];
+} else {
+    $jMedia_file_displayData += [
+        'filetypes' => is_array($fileTypes) ? $fileTypes : (empty($fileTypes) ? [] : explode(',', $fileTypes)),
+    ];
+}
 
-																		if (version_compare(\Joomla\CMS\Version::MAJOR_VERSION, '4', 'ge')) {
-																			$jMedia_file_displayData += [
-																				// J4 only, Miscellaneous data attributes preprocessed for HTML output, e.g. ' data-somename1="somevalue1" data-somename2="somevalue2" '
-																				'dataAttribute' => '',
+// Ensure mediaTypeNames is always an array to prevent implode errors in media.php
+$jMedia_file_displayData['mediaTypeNames'] = is_array($jMedia_file_displayData['mediaTypeNames'] ?? null)
+    ? $jMedia_file_displayData['mediaTypeNames']
+    : explode(',', (string) $jMedia_file_displayData['mediaTypeNames']);
 
-																				// J4 only, supported media types for the Media Manager
-																				'mediatypes'   => $mediaTypes,  // e.g. '0,3' Supported values '0,1,2,3', 0: images, 1: audios, 2: videos, 3: documents * 'folders' is always included in J4
-																				'imagesExt'    => $imagesExt,
-																				'audiosExt'    => $audiosExt,
-																				'videosExt'    => $videosExt,
-																				'documentsExt' => $documentsExt,
-																			];
-																		}
-																		else {
-																			$jMedia_file_displayData += [
-																				// J3 supported media types for the Media Manager
-																				'filetypes'   => $fileTypes,    // e.g. 'folders,images,docs' Supported values: 'folders,images,docs,videos' * audios will be ignored in J3
-																			];
-																		}
+		$media_field = \Joomla\CMS\Layout\LayoutHelper::render('joomla.form.field.media', $jMedia_file_displayData, $layouts_path ?? '');
+		$media_field_html = str_replace('{field-media-id}', 'field-media-data', $media_field);
+		echo $media_field_html;
 
-																		$media_field = \Joomla\CMS\Layout\LayoutHelper::render($media_field_layout = 'joomla.form.field.media', $jMedia_file_displayData, $layouts_path = null);
-																		$media_field_html = str_replace('{field-media-id}', 'field-media-data' , $media_field);
+
 																		echo $media_field_html;
 																	}
 
@@ -2451,7 +2449,7 @@ Factory::getDocument()->addScriptDeclaration('
 
 	function jInsertFieldValue(value, id) {
 		var elem = jQuery(\'#\'+id).get(0);
-		
+
 		elem.value = value;
 		let preview_img = jQuery(elem).parent().parent().find(\'img.inline-preview-img\');
 		if (preview_img.length > 0) {
