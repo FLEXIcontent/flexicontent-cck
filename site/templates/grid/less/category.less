@@ -898,10 +898,10 @@ footer.fc_block {
     margin-top: auto;
 }
 .standard-block.fc-items-block{
-grid-template-columns: repeat( @FCC_content_width_fit, minmax( @FCC_ibox_minsize_std,1fr));
+grid-template-columns: repeat( @FCC_content_width_fit, minmax( @FCC_ibox_minsize_std - @FCC_ibox_margin_top_bottom ,1fr));
 }
 .featured-block.fc-items-block{
-grid-template-columns: repeat( @FCC_content_width_fit_feat, minmax(@FCC_ibox_minsize_feat,1fr));
+grid-template-columns: repeat( @FCC_content_width_fit_feat, minmax(@FCC_ibox_minsize_feat - @FCC_ibox_margin_top_bottom_feat ,1fr));
 }
 /*
 .standard-block.fc-items-block.cols_2,

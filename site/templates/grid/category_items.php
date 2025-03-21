@@ -851,6 +851,7 @@ if ($count > $leadnum) :
 	// bootstrap span
 	$intro_cols_spanclasses = array(1=>'span12',2=>'span6',3=>'span4',4=>'span3');
 	$classspan = $intro_cols_spanclasses[$intro_cols];
+	$oe_class ='odd' ? 'even' : 'odd';
 ?>
 
 
