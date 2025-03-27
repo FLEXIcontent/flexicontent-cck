@@ -12,6 +12,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
+use \Joomla\CMS\Language\Text;
 \Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html');
 
 global $globalcats;
@@ -37,10 +38,10 @@ $btn_class = 'btn';
 $ico_class = 'fc-man-icon-s';
 $out_class = FLEXI_J40GE ? 'btn btn-outline-dark' : 'btn';
 
-$edit_entry  = \Joomla\CMS\Language\Text::_('FLEXI_EDIT_TYPE', true);
-$edit_layout = htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', true), ENT_QUOTES, 'UTF-8');
-$view_fields = \Joomla\CMS\Language\Text::_('FLEXI_VIEW', true); //\Joomla\CMS\Language\Text::_('FLEXI_VIEW_FIELDS', true);
-$view_items  = \Joomla\CMS\Language\Text::_('FLEXI_VIEW', true); //\Joomla\CMS\Language\Text::_('FLEXI_VIEW_ITEMS', true);
+$edit_entry  = Text::_('FLEXI_EDIT_TYPE', true);
+$edit_layout = htmlspecialchars(Text::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', true), ENT_QUOTES, 'UTF-8');
+$view_fields = Text::_('FLEXI_VIEW', true); //Text::_('FLEXI_VIEW_FIELDS', true);
+$view_items  = Text::_('FLEXI_VIEW', true); //Text::_('FLEXI_VIEW_ITEMS', true);
 
 
 
@@ -51,8 +52,8 @@ $view_items  = \Joomla\CMS\Language\Text::_('FLEXI_VIEW', true); //\Joomla\CMS\L
 flexicontent_html::jscode_to_showhide_table(
 	'mainChooseColBox',
 	'adminListTableFC' . $this->view,
-	$start_html = '',  //'<span class="badge ' . (FLEXI_J40GE ? 'badge-dark' : 'badge-inverse') . '">' . \Joomla\CMS\Language\Text::_('FLEXI_COLUMNS', true) . '<\/span> &nbsp; ',
-	$end_html = '<div id="fc-columns-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="' . \Joomla\CMS\Language\Text::_('FLEXI_HIDE') . '" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/div>'
+	$start_html = '',  //'<span class="badge ' . (FLEXI_J40GE ? 'badge-dark' : 'badge-inverse') . '">' . Text::_('FLEXI_COLUMNS', true) . '<\/span> &nbsp; ',
+	$end_html = '<div id="fc-columns-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="' . Text::_('FLEXI_HIDE') . '" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/div>'
 );
 
 
@@ -82,7 +83,7 @@ $tools_state = isset($FcMansConf->$fc_man_name)
 $attribs_editlayout = ' class="fc-edit-layout-btn ntxt ' . $this->btn_sm_class . ' ' . $this->tooltip_class . '" title="'.flexicontent_html::getToolTip( 'FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', null, 1, 1).'" ';
 
 $image_editlayout = 0 ?
-	\Joomla\CMS\HTML\HTMLHelper::image('components/com_flexicontent/assets/images/'.'layout_edit.png', htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS'), ENT_QUOTES, 'UTF-8'), ' class="'.$ico_class.'"') :
+	\Joomla\CMS\HTML\HTMLHelper::image('components/com_flexicontent/assets/images/'.'layout_edit.png', htmlspecialchars(Text::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS'), ENT_QUOTES, 'UTF-8'), ' class="'.$ico_class.'"') :
 	'<span class="'.$ico_class.'"><span class="icon-edit"></span></span>' ;
 $article_viewing_tip  = '<span class="icon-info ' . $this->tooltip_class . '" data-placement="bottom" title="'.flexicontent_html::getToolTip('FLEXI_JOOMLA_ARTICLE_VIEW', 'FLEXI_ALLOW_ARTICLE_VIEW_DESC', 1, 1).'"></span>';
 $default_template_tip = '<span class="icon-info ' . $this->tooltip_class . '" data-placement="bottom" title="'.flexicontent_html::getToolTip('FLEXI_TYPE_DEFAULT_TEMPLATE', 'FLEXI_TYPE_DEFAULT_TEMPLATE_DESC', 1, 1).'"></span>';
@@ -187,11 +188,11 @@ if ($js)
 				<?php
 					echo !empty($this->lists['scope']) ? $this->lists['scope'] : '';
 				?>
-				<input type="text" name="search" id="search" placeholder="<?php echo !empty($this->scope_title) ? $this->scope_title : \Joomla\CMS\Language\Text::_('FLEXI_SEARCH'); ?>" value="<?php echo htmlspecialchars($this->lists['search'], ENT_QUOTES, 'UTF-8'); ?>" class="fcfield_textval" />
-				<button title="" data-original-title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_SEARCH'); ?>" class="<?php echo $btn_class . (FLEXI_J40GE ? ' btn-outline-dark ' : ' ') . $this->tooltip_class; ?>" onclick="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-search"></i>' : \Joomla\CMS\Language\Text::_('FLEXI_GO'); ?></button>
+				<input type="text" name="search" id="search" placeholder="<?php echo !empty($this->scope_title) ? $this->scope_title : Text::_('FLEXI_SEARCH'); ?>" value="<?php echo htmlspecialchars($this->lists['search'], ENT_QUOTES, 'UTF-8'); ?>" class="fcfield_textval" />
+				<button title="" data-original-title="<?php echo Text::_('FLEXI_SEARCH'); ?>" class="<?php echo $btn_class . (FLEXI_J40GE ? ' btn-outline-dark ' : ' ') . $this->tooltip_class; ?>" onclick="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-search"></i>' : Text::_('FLEXI_GO'); ?></button>
 
-				<div id="fc_filters_box_btn" data-original-title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_FILTERS'); ?>" class="<?php echo $this->tooltip_class . ' ' . ($this->count_filters ? 'btn ' . $this->btn_iv_class : $out_class); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary', false, undefined, 1);">
-					<?php echo FLEXI_J30GE ? '<i class="icon-filter"></i>' : \Joomla\CMS\Language\Text::_('FLEXI_FILTERS'); ?>
+				<div id="fc_filters_box_btn" data-original-title="<?php echo Text::_('FLEXI_FILTERS'); ?>" class="<?php echo $this->tooltip_class . ' ' . ($this->count_filters ? 'btn ' . $this->btn_iv_class : $out_class); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary', false, undefined, 1);">
+					<?php echo FLEXI_J30GE ? '<i class="icon-filter"></i>' : Text::_('FLEXI_FILTERS'); ?>
 					<?php echo ($this->count_filters  ? ' <sup>' . $this->count_filters . '</sup>' : ''); ?>
 				</div>
 
@@ -201,10 +202,10 @@ if ($js)
 					echo $this->lists['filter_access'];
 					?>
 
-					<div id="fc-filters-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
+					<div id="fc-filters-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="<?php echo Text::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
 				</div>
 
-				<button title="" data-original-title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_RESET_FILTERS'); ?>" class="<?php echo $btn_class . (FLEXI_J40GE ? ' btn-outline-dark ' : ' ') . $this->tooltip_class; ?>" onclick="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; delAllFilters(); Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-cancel"></i>' : \Joomla\CMS\Language\Text::_('FLEXI_CLEAR'); ?></button>
+				<button title="" data-original-title="<?php echo Text::_('FLEXI_RESET_FILTERS'); ?>" class="<?php echo $btn_class . (FLEXI_J40GE ? ' btn-outline-dark ' : ' ') . $this->tooltip_class; ?>" onclick="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; delAllFilters(); Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-cancel"></i>' : Text::_('FLEXI_CLEAR'); ?></button>
 			</div>
 
 		</div>
@@ -257,12 +258,12 @@ if ($js)
 		<tr>
 
 			<th class="col_num hidden-phone">
-				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_NUM' ); ?>
+				<?php echo Text::_( 'FLEXI_NUM' ); ?>
 			</th>
 
 			<th class="col_cb left">
 				<div class="group-fcset">
-					<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value="" title="<?php echo \Joomla\CMS\Language\Text::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
+					<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value="" title="<?php echo Text::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
 					<label for="checkall-toggle" class="green single"></label>
 				</div>
 			</th>
@@ -276,19 +277,19 @@ if ($js)
 			</th>
 
 			<th class="col_redirect hideOnDemandClass hidden-phone hidden-tablet">
-				<?php echo $article_viewing_tip . \Joomla\CMS\Language\Text::_( 'FLEXI_JOOMLA_ARTICLE_VIEW' )."<br/><small>(" . \Joomla\CMS\Language\Text::_( 'FLEXI_ALLOWED') .' / '. \Joomla\CMS\Language\Text::_( 'FLEXI_REROUTED' ) .' / '. \Joomla\CMS\Language\Text::_( 'FLEXI_REDIRECTED' ) . ")</small>"; ?>
+				<?php echo $article_viewing_tip . Text::_( 'FLEXI_JOOMLA_ARTICLE_VIEW' )."<br/><small>(" . Text::_( 'FLEXI_ALLOWED') .' / '. Text::_( 'FLEXI_REROUTED' ) .' / '. Text::_( 'FLEXI_REDIRECTED' ) . ")</small>"; ?>
 			</th>
 
 			<th class="col_template left hideOnDemandClass hidden-phone hidden-tablet" colspan="2">
-				<?php echo $default_template_tip.\Joomla\CMS\Language\Text::_( 'FLEXI_TEMPLATE' )."<br/><small>(".\Joomla\CMS\Language\Text::_( 'FLEXI_PROPERTY_DEFAULT' )." ".\Joomla\CMS\Language\Text::_( 'FLEXI_TEMPLATE_ITEM' ).")</small>"; ?>
+				<?php echo $default_template_tip.Text::_( 'FLEXI_TEMPLATE' )."<br/><small>(".Text::_( 'FLEXI_PROPERTY_DEFAULT' )." ".Text::_( 'FLEXI_TEMPLATE_ITEM' ).")</small>"; ?>
 			</th>
 
 			<th class="col_template left hideOnDemandClass hidden-phone hidden-tablet" >
-				<?php echo $limit_maincat_tip.\Joomla\CMS\Language\Text::_( 'FLEXI_MAIN_CATEGORY' ) . '<br/><small>(' . \Joomla\CMS\Language\Text::_( 'FLEXI_SUBTREE_LIMITATION' ) . ')</small>'; ?>
+				<?php echo $limit_maincat_tip.Text::_( 'FLEXI_MAIN_CATEGORY' ) . '<br/><small>(' . Text::_( 'FLEXI_SUBTREE_LIMITATION' ) . ')</small>'; ?>
 			</th>
 
 			<th class="col_iflayout center hideOnDemandClass hidden-phone hidden-tablet" colspan="2" >
-				<?php echo \Joomla\CMS\Language\Text::_( '\Joomla\CMS\Form\Form'). ' ' . \Joomla\CMS\Language\Text::_( 'FLEXI_LAYOUT' ) . '<br/><small>(' . \Joomla\CMS\Language\Text::_( 'FLEXI_FRONTEND' ) . ' ' . \Joomla\CMS\Language\Text::_( 'FLEXI_BACKEND' ) . ')</small>'; ?>
+				<?php echo Text::_( 'Form'). ' ' . Text::_( 'FLEXI_LAYOUT' ) . '<br/><small>(' . Text::_( 'FLEXI_FRONTEND' ) . ' ' . Text::_( 'FLEXI_BACKEND' ) . ')</small>'; ?>
 			</th>
 
 			<th class="col_alias hideOnDemandClass hidden-phone hidden-tablet">
@@ -462,9 +463,9 @@ if ($js)
 	</div>
 
 	<div style="margin-top: 48px;">
-		<div class="fc-iblock" style="width: 140px; min-height:2em; vertical-align: top; padding: 6px;"><span class="icon-publish" style="font-size: 16px;"></span> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_ENABLED' ); ?></div>
-		<div class="fc-iblock" style="width: 140px; min-height:2em; vertical-align: top; padding: 6px;"><span class="icon-unpublish" style="font-size: 16px;"></span> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_DISABLED' ); ?></div>
-		<div class="fc-iblock" style="width: 140px; min-height:2em; vertical-align: top; padding: 6px;"><span class="icon-trash" style="font-size: 16px;"></span>	<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_TRASHED' ); ?></div>
+		<div class="fc-iblock" style="width: 140px; min-height:2em; vertical-align: top; padding: 6px;"><span class="icon-publish" style="font-size: 16px;"></span> <?php echo Text::_( 'FLEXI_ENABLED' ); ?></div>
+		<div class="fc-iblock" style="width: 140px; min-height:2em; vertical-align: top; padding: 6px;"><span class="icon-unpublish" style="font-size: 16px;"></span> <?php echo Text::_( 'FLEXI_DISABLED' ); ?></div>
+		<div class="fc-iblock" style="width: 140px; min-height:2em; vertical-align: top; padding: 6px;"><span class="icon-trash" style="font-size: 16px;"></span>	<?php echo Text::_( 'FLEXI_TRASHED' ); ?></div>
 	</div>
 
 
