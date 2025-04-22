@@ -1,7 +1,9 @@
 <?php
 defined( '_JEXEC' ) or die( 'Restricted access' );
 /** tooltip in front */
-\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.popover', '.hasTooltip', array('trigger' => 'click hover'));
+$cparams = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
+// Load tooltips JS
+if ($cparams->get('add_tooltips', 1)) \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.popover', '.hasTooltip', array('trigger' => 'click hover'));
 // USE HTML5 or XHTML
 $html5 = $this->params->get('htmlmode', 0); // 0 = XHTML , 1 = HTML5
 if ($html5) {  /* BOF html5  */
