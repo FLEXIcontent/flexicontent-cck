@@ -855,7 +855,7 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 				onmouseover="if (!mod_fc_carousel_<?php echo $uniq_ord_id; ?>) return; mod_fc_carousel_<?php echo $uniq_ord_id; ?>.stop(); mod_fc_carousel_<?php echo $uniq_ord_id; ?>.autoPlay=false;"
 				onmouseout="if (!mod_fc_carousel_<?php echo $uniq_ord_id; ?>) return; if (mod_fc_carousel_<?php echo $uniq_ord_id; ?>_autoPlay==1) mod_fc_carousel_<?php echo $uniq_ord_id; ?>.play(<?php echo $interval; ?>,'next',true);	else if (mod_fc_carousel_<?php echo $uniq_ord_id; ?>_autoPlay==-1) mod_fc_carousel_<?php echo $uniq_ord_id; ?>.play(<?php echo $interval; ?>,'previous',true);"
 			>
-			<div class="mod_flexicontent_standard_wrapper_innerbox">
+			<div class="mod_flexicontent_standard_wrapper_innerbox <?php echo $img_container_class; ?>">
 
 
 			<?php if ($std_params_layout) : /* BOF: Content display via Parameter-based Layout */ ?>
