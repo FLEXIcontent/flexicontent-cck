@@ -42,7 +42,7 @@ $padding_top_bottom_feat = $params->get($layout.'_padding_top_bottom_feat', '0')
 $padding_left_right_feat = $params->get($layout.'_padding_left_right_feat', '0');
 $margin_top_bottom_feat = $params->get($layout.'_margin_left_right_feat', '2rem');
 $margin_left_right_feat = $params->get($layout.'_margin_left_right_feat', '2rem');
-$border_width_feat = (int)$params->get($layout.'_border_width_feat', 1);
+$border_width_feat = $params->get($layout.'_border_width_feat', 1);
 $item_column_mode_feat = (int)$params->get($layout.'_column_mode_feat', 1);// 0 column mode old, 1 grid minmax size
 $item_width_feat = $params->get($layout.'_item_width_feat', '200px');
 $item_fit_feat = $params->get($layout.'_content_width_fit_feat', 'auto-fill');
@@ -50,12 +50,12 @@ $item_height_feat = $params->get($layout.'_content_height_fit_feat', 1); //0 Con
 
 // Item Dimensions standard
 $inner_inline_css_std = (int)$params->get($layout.'_inner_inline_css', 0);
-$padding_top_bottom_std = (int)$params->get($layout.'_padding_top_bottom', 8);
-$padding_left_right_std = (int)$params->get($layout.'_padding_left_right', 12);
-$margin_top_bottom_std = (int)$params->get($layout.'_margin_left_right', 4);
-$margin_left_right_std = (int)$params->get($layout.'_margin_left_right', 4);
-$border_width_std = (int)$params->get($layout.'_border_width', 1);
-$item_column_mode_std = (int)$params->get($layout.'_column_mode_feat', 1);// 0 column mode old, 1 grid minmax size
+$padding_top_bottom_std = $params->get($layout.'_padding_top_bottom', 8);
+$padding_left_right_std = $params->get($layout.'_padding_left_right', 12);
+$margin_top_bottom_std = $params->get($layout.'_margin_left_right', 4);
+$margin_left_right_std = $params->get($layout.'_margin_left_right', 4);
+$border_width_std = $params->get($layout.'_border_width', 1);
+$item_column_mode_std = $params->get($layout.'_column_mode_feat', 1);// 0 column mode old, 1 grid minmax size
 $item_width_std = $params->get($layout.'_item_width_feat', '200px');
 $item_fit_std = $params->get($layout.'_content_width_fit_feat', 'auto-fill');
 $item_height_std = $params->get($layout.'_content_height_fit_std', 1); //0 Content height, 1 Force same height
@@ -1328,11 +1328,11 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 	/* CONTAINER of each featured item */'
 	#mod_fcitems_box_featured_'.$uniq_ord_id.' div.mod_flexicontent_standard_wrapper {
 	}'.
-	/* inner CONTAINER of each standard item */'
+	/* inner CONTAINER of each sfeatured item */'
 	#mod_fcitems_box_featured_'.$uniq_ord_id.'.mod_flexicontent_featured {
 		'.($inner_inline_css_feat ? '
-		padding: '.$padding_top_bottom_feat.'px '.$padding_left_right_feat.'px !important;
-		border-width: '.$border_width_feat.'px!important;
+		padding: '.$padding_top_bottom_feat.' '.$padding_left_right_feat.' !important;
+		border-width: '.$border_width_feat.' !important;
 		row-gap: '.$margin_top_bottom_feat.' !important ;
 		gap:'.$margin_left_right_feat.' !important;
 		' : '').'
