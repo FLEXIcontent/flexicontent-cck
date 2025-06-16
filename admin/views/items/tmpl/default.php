@@ -1273,6 +1273,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 			</td>
 			<?php endif; ?>
 
+			
 
 			<?php if (!isset($disable_columns['lang'])) : ?>
 			<td class="col_lang hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
@@ -1285,75 +1286,86 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 			<?php endif; ?>
 
 
-			<?php if ($useAssocs && !isset($disable_columns['assocs'])) : ?>
+<?php if ($useAssocs && !isset($disable_columns['assocs'])) : ?>
 
-				<td><?php $colposition++; ?>
-					<?php if (!empty($this->lang_assocs[$row->id])): ?>
-						<?php $row_assocs = $this->lang_assocs[$row->id]; ?>
-						<a href="index.php?option=com_flexicontent&amp;view=items&amp;filter_catsinstate=99&amp;filter_assockey=<?php echo reset($row_assocs)->key; ?>&amp;fcform=1&amp;filter_state=ALL&amp;limit=50"
-							class="<?php echo $this->btn_sm_class; ?> fc_assocs_count"
-						>
-							<?php echo count($row_assocs); ?>
-						</a>
-					<?php endif; ?>
-				</td>
+	<td><?php $colposition++; ?>
+		<?php if (!empty($this->lang_assocs[$row->id])): ?>
+			<?php $row_assocs = $this->lang_assocs[$row->id]; ?>
+			<a href="index.php?option=com_flexicontent&amp;view=items&amp;filter_catsinstate=99&amp;filter_assockey=<?php echo reset($row_assocs)->key; ?>&amp;fcform=1&amp;filter_state=ALL&amp;limit=50"
+				class="<?php echo $this->btn_sm_class; ?> fc_assocs_count"
+			>
+				<?php echo count($row_assocs); ?>
+			</a>
+		<?php endif; ?>
+	</td>
 
-				<td class="hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
-					<?php
-					if (!empty($this->lang_assocs[$row->id]))
-					{
-						// Find record of original content
-						$oc_item = null;
-						foreach($this->lang_assocs[$row->id] as $assoc_item)
-						{
-							if ($ocLang && $assoc_item->language === $ocLang)
-							{
-								$oc_item = $assoc_item;
-								break;
-							}
-						}
+	<td class="hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+		<?php
+		if (!empty($this->lang_assocs[$row->id]))
+		{
+			// Find record of original content
+			$oc_item = null;
+			foreach($this->lang_assocs[$row->id] as $assoc_item)
+			{
+				if ($ocLang && $assoc_item->language === $ocLang)
+				{
+					$oc_item = $assoc_item;
+					break;
+				}
+			}
 
-						if ($oc_item)
-						{
-							$oc_item_modified_date = $oc_item->modified && $oc_item->modified !== '0000-00-00 00:00:00' ? $oc_item->modified : $oc_item->created;
-							$oc_item_modified = strtotime($oc_item_modified_date);
-						}
+			if ($oc_item)
+			{
+				$oc_item_modified_date = $oc_item->modified && $oc_item->modified !== '0000-00-00 00:00:00' ? $oc_item->modified : $oc_item->created;
+				$oc_item_modified = strtotime($oc_item_modified_date);
+			}
 
-						foreach($this->lang_assocs[$row->id] as $assoc_item)
-						{
-							// Joomla article manager show also current item, so we will not skip it
-							$is_oc_item = !$oc_item || $assoc_item->id == $oc_item->id;
-							$assoc_modified_date = $assoc_item->modified && $assoc_item->modified !== '0000-00-00 00:00:00' ? $assoc_item->modified : $assoc_item->created;
-							$assoc_modified = strtotime($assoc_modified_date);
+			foreach($this->lang_assocs[$row->id] as $assoc_item)
+			{
+				// Joomla article manager show also current item, so we will not skip it
+				$is_oc_item = !$oc_item || $assoc_item->id == $oc_item->id;
+				$assoc_modified_date = $assoc_item->modified && $assoc_item->modified !== '0000-00-00 00:00:00' ? $assoc_item->modified : $assoc_item->created;
+				$assoc_modified = strtotime($assoc_modified_date);
 
-							$_link  = 'index.php?option=com_flexicontent&amp;task='.$ctrl.'edit&amp;id='. $assoc_item->id;
-							$_title = flexicontent_html::getToolTip(
-								$assoc_item->title,
-								(isset($state_icons[$assoc_item->state]) ? '<span class="' . $state_icons[$assoc_item->state] . '"></span>' : '') .
-								(isset($state_names[$assoc_item->state]) ? $state_names[$assoc_item->state] . '<br>': '') .
-								($is_oc_item ? '' : '<span class="icon-pencil"></span>' . Text::_( !$assoc_item->is_uptodate && $assoc_modified < $oc_item_modified ? 'FLEXI_TRANSLATION_IS_OUTDATED' : 'FLEXI_TRANSLATION_IS_UPTODATE')) .
-								': ' . $assoc_modified_date . '<br>'.
-								( !empty($this->langs->{$assoc_item->lang}) ? ' <img src="'.$this->langs->{$assoc_item->lang}->imgsrc.'" alt="'.$assoc_item->lang.'" /> ' : '').
-								($assoc_item->lang === '*' ? Text::_('FLEXI_ALL') : (!empty($this->langs->{$assoc_item->lang}) ? $this->langs->{$assoc_item->lang}->name: '?')).' <br/> '
-								, 0, 1
-							);
+				$_link  = 'index.php?option=com_flexicontent&amp;task='.$ctrl.'edit&amp;id='. $assoc_item->id;
+				
+				// FIXED: Safe language image handling
+				$lang_img = '';
+				if ($assoc_item->lang === '*') {
+					// For "ALL" language, use a globe icon or no image
+					$lang_img = '<i class="icon-globe"></i> ';
+				} elseif (!empty($this->langs->{$assoc_item->lang}) && isset($this->langs->{$assoc_item->lang}->imgsrc) && !empty($this->langs->{$assoc_item->lang}->imgsrc)) {
+					// Only show image if imgsrc property exists and is not empty
+					$lang_img = ' <img src="'.$this->langs->{$assoc_item->lang}->imgsrc.'" alt="'.$assoc_item->lang.'" /> ';
+				}
+				
+				$_title = flexicontent_html::getToolTip(
+					$assoc_item->title,
+					(isset($state_icons[$assoc_item->state]) ? '<span class="' . $state_icons[$assoc_item->state] . '"></span>' : '') .
+					(isset($state_names[$assoc_item->state]) ? $state_names[$assoc_item->state] . '<br>': '') .
+					($is_oc_item ? '' : '<span class="icon-pencil"></span>' . Text::_( !$assoc_item->is_uptodate && $assoc_modified < $oc_item_modified ? 'FLEXI_TRANSLATION_IS_OUTDATED' : 'FLEXI_TRANSLATION_IS_UPTODATE')) .
+					': ' . $assoc_modified_date . '<br>'.
+					$lang_img .
+					($assoc_item->lang === '*' ? Text::_('FLEXI_ALL') : (!empty($this->langs->{$assoc_item->lang}) ? $this->langs->{$assoc_item->lang}->name: '?')).' <br/> '
+					, 0, 1
+				);
 
-							$state_colors = array(1 => ' fc_assoc_ispublished', -5 => ' fc_assoc_isinprogress');
-							$assoc_state_class   = isset($state_colors[$assoc_item->state]) ? $state_colors[$assoc_item->state] : ' fc_assoc_isunpublished';
-							$assoc_isstale_class = $oc_item && (!$assoc_item->is_uptodate && $assoc_modified < $oc_item_modified) ? ' fc_assoc_isstale' : ' fc_assoc_isuptodate';
+				$state_colors = array(1 => ' fc_assoc_ispublished', -5 => ' fc_assoc_isinprogress');
+				$assoc_state_class   = isset($state_colors[$assoc_item->state]) ? $state_colors[$assoc_item->state] : ' fc_assoc_isunpublished';
+				$assoc_isstale_class = $oc_item && (!$assoc_item->is_uptodate && $assoc_modified < $oc_item_modified) ? ' fc_assoc_isstale' : ' fc_assoc_isuptodate';
 
-							echo '
-							<a class="fc_assoc_translation label label-association ' . $this->popover_class . $assoc_isstale_class . $assoc_state_class . ' hasTooltip"
-								target="_blank" href="'.$_link.'" data-placement="top" aria-label="'.$_title.' data-content="'.$_title.' data-bs-original-title="'.$_title.'"
-							>
-								<span>' . ($assoc_item->lang=='*' ? Text::_('FLEXI_ALL') : strtoupper($assoc_item->shortcode ?: '?')) . '</span>
-							</a>';
-						}
-					}
-					?>
-				</td>
+				echo '
+				<a class="fc_assoc_translation label label-association ' . $this->popover_class . $assoc_isstale_class . $assoc_state_class . ' hasTooltip"
+					target="_blank" href="'.$_link.'" data-placement="top" aria-label="'.$_title.' data-content="'.$_title.' data-bs-original-title="'.$_title.'"
+				>
+					<span>' . ($assoc_item->lang=='*' ? Text::_('FLEXI_ALL') : strtoupper($assoc_item->shortcode ?: '?')) . '</span>
+				</a>';
+			}
+		}
+		?>
+	</td>
 
-			<?php endif ; ?>
+<?php endif ; ?>
 
 
 			<?php if (!$single_type || !isset($disable_columns['single_type'])): ?>
