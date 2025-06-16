@@ -57,10 +57,22 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 	public static function getAssociations($id = 0, $view = null)
 	{
 		$jinput = \Joomla\CMS\Factory::getApplication()->input;
+		$app = \Joomla\CMS\Factory::getApplication();
 
 		$view   = is_null($view) ? $jinput->get('view', '', 'cmd') : $view;
 		$id     = empty($id) ? $jinput->get('id', 0, 'int') : $id;
 		$return = [];
+
+		// Get current language
+		$currentLang = $app->getLanguage()->getTag();
+		
+		// Get language SEF codes
+		$site_languages = array();
+		$languages = LanguageHelper::getLanguages();
+		foreach ($languages as $lang)
+		{
+			$site_languages[$lang->lang_code] = $lang->sef;
+		}
 
 		if ($view === 'item')
 		{
@@ -73,8 +85,14 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 
 			foreach ($associations as $tag => $assoc)
 			{
-				$lang_code    = substr($tag, 0, 2);
-				$return[$tag] = FlexicontentHelperRoute::getItemRoute($assoc->title_slug, $assoc->cat_slug, 0, $assoc); //. '&lang=' . $lang_code;
+				// Use proper SEF language code
+				$lang_code = isset($site_languages[$tag]) ? $site_languages[$tag] : substr($tag, 0, 2);
+				
+				// Build route without adding the language code
+				$route = FlexicontentHelperRoute::getItemRoute($assoc->title_slug, $assoc->cat_slug, 0, $assoc);
+				
+				// Explicitly add the correct language code for this association
+				$return[$tag] = $route . (strpos($route, '?') !== false ? '&' : '?') . 'lang=' . $lang_code;
 			}
 			return $return;
 		}
@@ -102,10 +120,14 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 
 					foreach ($associations as $tag => $assoc)
 					{
-						// Language code must be added to the URL for categories of type ALL !!!
-						// to allow switching between languages filtering the category items according to their language
-						$return[$tag] = FlexicontentHelperRoute::getCategoryRoute($cid, 0, $urlvars, $assoc)
-							. ($category->language === '*' ? '&lang=' . substr($tag, 0, 2) : '');
+						// Use proper SEF language code
+						$lang_code = isset($site_languages[$tag]) ? $site_languages[$tag] : substr($tag, 0, 2);
+						
+						// Build route
+						$route = FlexicontentHelperRoute::getCategoryRoute($cid, 0, $urlvars, $assoc);
+						
+						// Explicitly add the correct language code for this association
+						$return[$tag] = $route . (strpos($route, '?') !== false ? '&' : '?') . 'lang=' . $lang_code;
 					}
 
 					return $return;
@@ -119,7 +141,17 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 				$associations = self::_getMenuAssociations($view, $cid);
 				foreach ($associations as $tag => $assoc)
 				{
-					$return[$tag] = $assoc . ($category->language === '*' ? '&lang=' . substr($tag, 0, 2) : '');
+					// Use proper SEF language code
+					$lang_code = isset($site_languages[$tag]) ? $site_languages[$tag] : substr($tag, 0, 2);
+					
+					// Ensure the language parameter is set correctly
+					if (strpos($assoc, 'lang=') !== false) {
+						// Replace existing lang parameter
+						$return[$tag] = preg_replace('/lang=[^&]*/', 'lang=' . $lang_code, $assoc);
+					} else {
+						// Add lang parameter
+						$return[$tag] = $assoc . (strpos($assoc, '?') !== false ? '&' : '?') . 'lang=' . $lang_code;
+					}
 				}
 				return $return;
 			}
@@ -128,10 +160,14 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 
 			foreach ($associations as $tag => $assoc)
 			{
-				// Language code must be added to the URL for categories of type ALL !!!
-				// to allow switching between languages filtering the category items according to their language
-				$return[$tag] = FlexicontentHelperRoute::getCategoryRoute($assoc->title_slug, 0, $urlvars, $assoc)
-					. ($category->language === '*' ? '&lang=' . substr($tag, 0, 2) : '');
+				// Use proper SEF language code
+				$lang_code = isset($site_languages[$tag]) ? $site_languages[$tag] : substr($tag, 0, 2);
+				
+				// Build route
+				$route = FlexicontentHelperRoute::getCategoryRoute($assoc->title_slug, 0, $urlvars, $assoc);
+				
+				// Explicitly add the correct language code for this association
+				$return[$tag] = $route . (strpos($route, '?') !== false ? '&' : '?') . 'lang=' . $lang_code;
 			}
 
 			return $return;
@@ -258,6 +294,14 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 		$langAssociations = \Joomla\CMS\Language\Associations::getAssociations('com_menus', '#__menu', 'com_menus.item', $Itemid, 'id', '', '');
 		$associations     = array();
 
+		// Get language SEF codes
+		$site_languages = array();
+		$languages = LanguageHelper::getLanguages();
+		foreach ($languages as $lang)
+		{
+			$site_languages[$lang->lang_code] = $lang->sef;
+		}
+
 		foreach ($langAssociations as $tag => $menu_item)
 		{
 			$menu    = $menus->getItem($menu_item->id);
@@ -276,17 +320,27 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 			{
 				$title_slug = $record->id . ':' . $record->alias;
 				$cat_slug   = self::_getItemCatSlug($record, $menu);
-				$lang_code  = substr($tag, 0, 2);
+				// Use proper SEF language code
+				$lang_code = isset($site_languages[$tag]) ? $site_languages[$tag] : substr($tag, 0, 2);
 
-				$associations[$tag] = FlexicontentHelperRoute::getItemRoute($title_slug, $cat_slug, $menu_item->id, $record); // . '&lang=' . $lang_code;
+				// Build route
+				$route = FlexicontentHelperRoute::getItemRoute($title_slug, $cat_slug, $menu_item->id, $record);
+				
+				// Explicitly add the correct language code for this association
+				$associations[$tag] = $route . (strpos($route, '?') !== false ? '&' : '?') . 'lang=' . $lang_code;
 			}
 			elseif ($view === 'category')
 			{
 				$title_slug = $record->id . ':' . $record->alias;
 				$urlvars    = flexicontent_html::getCatViewLayoutVars($catmodel = null, $use_slug = true);
-				$lang_code  = substr($tag, 0, 2);
+				// Use proper SEF language code
+				$lang_code = isset($site_languages[$tag]) ? $site_languages[$tag] : substr($tag, 0, 2);
 
-				$associations[$tag] = FlexicontentHelperRoute::getCategoryRoute($title_slug, $menu_item->id, $urlvars, $record); // . '&lang=' . $lang_code;
+				// Build route
+				$route = FlexicontentHelperRoute::getCategoryRoute($title_slug, $menu_item->id, $urlvars, $record);
+				
+				// Explicitly add the correct language code for this association
+				$associations[$tag] = $route . (strpos($route, '?') !== false ? '&' : '?') . 'lang=' . $lang_code;
 			}
 			else
 			{
@@ -297,7 +351,6 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 
 		return $associations;
 	}
-
 
 
 	/**
@@ -334,4 +387,3 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 		return $matched_cid . ($cat ? ':' . $cat->alias : '');
 	}
 }
-
