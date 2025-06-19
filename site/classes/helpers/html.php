@@ -460,8 +460,15 @@ class flexicontent_html
 			$ucanonical = '';
 		}
 
-		// Add scheme, domain, port
+		// Check if the language filter is active
+		$app = \Joomla\CMS\Factory::getApplication();
+		$langfilter = $app->getLanguageFilter();
+
+		// If the language filter is active, do not add the domain as it should already be enabled
+		if (!$langfilter) {
+		// Add scheme, domain, port only if language filter is not active
 		$ucanonical = $domain . $ucanonical;
+		}
 
 		// Encode the canonical URL
 		$ucanonical_encoded = htmlspecialchars($ucanonical);
