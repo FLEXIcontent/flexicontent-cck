@@ -74,7 +74,7 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 			foreach ($associations as $tag => $assoc)
 			{
 				$lang_code    = substr($tag, 0, 2);
-				$return[$tag] = FlexicontentHelperRoute::getItemRoute($assoc->title_slug, $assoc->cat_slug, 0, $assoc); //. '&lang=' . $lang_code;
+				$return[$tag] = FlexicontentHelperRoute::getItemRoute($assoc->title_slug, $assoc->cat_slug, 0, $assoc) . '&lang=' . $lang_code;
 			}
 			return $return;
 		}
