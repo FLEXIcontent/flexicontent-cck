@@ -2171,7 +2171,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	 * @throws Exception
 	 * @since 3.3
 	 */
-	public function field_set_value(array $cid = null, array $custom = null, bool $checkACL = true)
+	public function field_set_value(?array $cid = null, ?array $custom = null, bool $checkACL = true)
 	{
 		// Check for request forgeries
 		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));

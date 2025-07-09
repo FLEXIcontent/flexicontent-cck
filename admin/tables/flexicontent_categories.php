@@ -25,7 +25,7 @@ require_once('flexicontent_basetablenested.php');
 
 class _flexicontent_categories_common extends flexicontent_basetablenested
 {
-	protected function __getAssetParentId(\Joomla\CMS\Table\Table $table = null, $id = null)
+	protected function __getAssetParentId(?\Joomla\CMS\Table\Table $table = null, $id = null)
 	{
 		// Initialise variables.
 		$assetId = null;
@@ -82,7 +82,7 @@ if (FLEXI_J30GE)
 {
 	class _flexicontent_categories extends _flexicontent_categories_common
 	{
-		protected function _getAssetParentId(\Joomla\CMS\Table\Table $table = null, $id = null)
+		protected function _getAssetParentId(?\Joomla\CMS\Table\Table $table = null, $id = null)
 		{
 			return parent::__getAssetParentId($table, $id);
 		}
