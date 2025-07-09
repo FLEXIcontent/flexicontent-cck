@@ -74,7 +74,7 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 			foreach ($associations as $tag => $assoc)
 			{
 				$lang_code    = substr($tag, 0, 2);
-				$return[$tag] = FlexicontentHelperRoute::getItemRoute($assoc->title_slug, $assoc->cat_slug, 0, $assoc); //. '&lang=' . $lang_code;
+				$return[$tag] = FlexicontentHelperRoute::getItemRoute($assoc->title_slug, $assoc->cat_slug, 0, $assoc) . '&lang=' . $lang_code;
 			}
 			return $return;
 		}
@@ -278,7 +278,7 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 				$cat_slug   = self::_getItemCatSlug($record, $menu);
 				$lang_code  = substr($tag, 0, 2);
 
-				$associations[$tag] = FlexicontentHelperRoute::getItemRoute($title_slug, $cat_slug, $menu_item->id, $record); // . '&lang=' . $lang_code;
+				$associations[$tag] = FlexicontentHelperRoute::getItemRoute($title_slug, $cat_slug, $menu_item->id, $record) . '&lang=' . $lang_code;
 			}
 			elseif ($view === 'category')
 			{
@@ -286,7 +286,7 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 				$urlvars    = flexicontent_html::getCatViewLayoutVars($catmodel = null, $use_slug = true);
 				$lang_code  = substr($tag, 0, 2);
 
-				$associations[$tag] = FlexicontentHelperRoute::getCategoryRoute($title_slug, $menu_item->id, $urlvars, $record); // . '&lang=' . $lang_code;
+				$associations[$tag] = FlexicontentHelperRoute::getCategoryRoute($title_slug, $menu_item->id, $urlvars, $record) . '&lang=' . $lang_code;
 			}
 			else
 			{

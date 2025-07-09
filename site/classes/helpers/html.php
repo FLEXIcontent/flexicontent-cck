@@ -81,55 +81,117 @@ class flexicontent_html
 		}
 	}
 
-	static function get_system_messages_html($add_containers=false)
+	public static function get_system_messages_html($add_containers = false)
 	{
-		$msgsByType = array();  // Initialise variables.
-		$messages = \Joomla\CMS\Factory::getApplication()->getMessageQueue();  // Get the message queue
-
-		// Build the sorted message list
-		if (is_array($messages) && !empty($messages)) {
-			foreach ($messages as $msg) {
-				if (isset($msg['type']) && isset($msg['message'])) $msgsByType[$msg['type']][] = $msg['message'];
+		// -----------------------------------------------------------------
+		// Collect & sort the queue (optionally clearing it as we read it)
+		// -----------------------------------------------------------------
+		$app       = \Joomla\CMS\Factory::getApplication();
+		$msgQueue  = $app->getMessageQueue(true);   // true = empty the queue
+		$msgsByType = [];
+	
+		if (!empty($msgQueue))
+		{
+			foreach ($msgQueue as $msg)
+			{
+				if (isset($msg['type'], $msg['message']))
+				{
+					$msgsByType[$msg['type']][] = $msg['message'];
+				}
 			}
 		}
-
-		$alert_class = array('error' => 'alert-error', 'warning' => 'alert-warning', 'notice' => 'alert-info', 'message' => 'alert-success');
+	
+		// -----------------------------------------------------------------
+		// Start capturing the HTML
+		// -----------------------------------------------------------------
 		ob_start();
-	?>
-<?php if ($add_containers) : ?>
-<div class="row-fluid">
-	<div class="span12">
-		<div id="system-message-container">
-<?php endif; ?>
-			<div id="fc_ajax_system_messages">
-		<?php if (version_compare(JVERSION, '4.0', 'ge')): ?>
-			<?php echo \Joomla\CMS\Factory::getApplication()->getRenderer('message')->render(null); ?>
-		<?php else: ?>
-			<?php if (is_array($msgsByType) && $msgsByType) : ?>
-				<?php foreach ($msgsByType as $type => $msgs) : ?>
-					<div class="alert <?php echo $alert_class[$type]; ?>">
-						<button type="button" class="close" data-dismiss="alert">&times;</button>
-						<h4 class="alert-heading"><?php echo \Joomla\CMS\Language\Text::_($type); ?></h4>
-						<?php if ($msgs) : ?>
-							<?php foreach ($msgs as $msg) : ?>
-								<div class="alert-<?php echo $type; ?>"><?php echo $msg; ?></div>
-							<?php endforeach; ?>
-						<?php endif; ?>
-					</div>
-				<?php endforeach; ?>
-			<?php endif; ?>
+	
+		if ($add_containers) : ?>
+			<div class="row-fluid">
+				<div class="span12">
+					<div id="system-message-container">
 		<?php endif; ?>
-			</div>
-<?php if ($add_containers) : ?>
+	
+		<div id="fc_ajax_system_messages">
+			<?php
+			// =============================================================
+			// Check Joomla version and render appropriate messages
+			// =============================================================
+			if (version_compare(JVERSION, '4.0', 'ge')) {
+				// ==========================================================
+				// Joomla 4.x and 5.x - Use joomla-alert web components
+				// ==========================================================
+				if (!empty($msgsByType)) :
+					foreach ($msgsByType as $type => $msgs) :
+						// Convert Joomla message types to standard types
+						switch ($type) {
+							case 'error':
+								$alertType = 'danger';
+								break;
+							case 'message':
+								$alertType = 'success';
+								break;
+							default:
+								$alertType = $type;
+						}
+						?>
+						<joomla-alert type="<?php echo $alertType; ?>" close-text="Close" dismiss="true">
+							<div class="alert-heading">
+								<span class="<?php echo $alertType; ?>"></span>
+								<span class="visually-hidden"><?php echo ucfirst($type); ?></span>
+							</div>
+							<div class="alert-wrapper">
+								<div class="alert-message">
+									<?php foreach ($msgs as $msg) : ?>
+										<div><?php echo $msg; ?></div>
+									<?php endforeach; ?>
+								</div>
+							</div>
+						</joomla-alert>
+					<?php
+					endforeach;
+				endif;
+			} else {
+				// ==========================================================
+				// Joomla 3.x - Use Bootstrap 2 alerts
+				// ==========================================================
+				$alert_class = [
+					'error'   => 'alert-error',
+					'warning' => 'alert-warning',
+					'notice'  => 'alert-info',
+					'message' => 'alert-success',
+					'success' => 'alert-success',
+				];
+	
+				if (!empty($msgsByType)) :
+					foreach ($msgsByType as $type => $msgs) : ?>
+						<div class="alert <?php echo $alert_class[$type] ?? 'alert-info'; ?>">
+							<button type="button" class="close" data-dismiss="alert">&times;</button>
+							<h4 class="alert-heading">
+								<?php echo \Joomla\CMS\Language\Text::_($type); ?>
+							</h4>
+	
+							<?php foreach ($msgs as $msg) : ?>
+								<div class="alert-<?php echo $type; ?>">
+									<?php echo $msg; ?>
+								</div>
+							<?php endforeach; ?>
+						</div>
+					<?php
+					endforeach;
+				endif;
+			}
+			?>
 		</div>
-	</div>
-</div>
-<?php endif; ?>
-
-		<?php
-		$msgs_html = ob_get_contents();
-		ob_end_clean();
-		return $msgs_html;
+	
+		<?php if ($add_containers) : ?>
+					</div><!-- /system-message-container -->
+				</div>
+			</div>
+		<?php endif;
+	
+	
+		return ob_get_clean();
 	}
 
 

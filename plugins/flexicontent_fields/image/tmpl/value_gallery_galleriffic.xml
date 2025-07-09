@@ -43,8 +43,8 @@
 
 			<field name="" type="separator" default="FLEXI_FIELD_IMAGE_IMG_SIZE_NOTE" level="level3 alert-info fcpadded" />
 
+			<field name="PPFX_slide_height_max" type="text" default="" label="Image max height (CSS expression)" description="" depend_class="" />
 			<field name="PPFX_thumb_height" type="number" default="86" label="FLEXI_FIELD_IMAGE_THUMBNAIL_HEIGHT_PX" description="" depend_class="" />
-			<field name="PPFX_slide_height" type="number" default="600" label="FLEXI_FIELD_IMAGE_SLIDESHOW_HEIGHT_PX" description="" depend_class="" />
 
 			<field name="" type="separator" default="FLEXI_FIELD_THUMBS_PAGES" level="level2" />
 

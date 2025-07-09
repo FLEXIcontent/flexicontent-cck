@@ -32,7 +32,7 @@ $enable_popup        = (int) $field->parameters->get( $PPFX_ . 'enable_popup', 1
 $thumb_display       = (int) $field->parameters->get( $PPFX_ . 'thumb-display', 1 ); //0:none, 1:images, 2:dots //TODO check dots and none
 $thumb_position      = (int) $field->parameters->get( $PPFX_ . 'thumb-position', 1 ); //0:top, 1:bottom
 $thumb_height        = (int) $field->parameters->get( $PPFX_ . 'thumb_height', 86 );
-$slide_height        = (int) $field->parameters->get( $PPFX_ . 'slide_height', 600 );//TODO check solution for responsive height
+$slide_height_max    = $field->parameters->get( $PPFX_ . 'slide_height_max', '' );
 
 $use_pages           = (int) $field->parameters->get( $PPFX_ . 'use_pages', 0 );
 $number_thumbs       = !$use_pages ? 9999 : (int) $field->parameters->get( $PPFX_ . 'number_thumbs', 5 );
@@ -50,6 +50,7 @@ $over_image_btns     = 1;
 
 $thumb_container_height = $thumb_height + (!$use_pages ? 32 : 0) + ($use_pages && $enable_top_pager  === 0 ? 40 : 0) + ($use_pages && $enable_bottom_pager === 1 ? 40 : 0);
 
+$firstImage = '';
 foreach ($values as $n => $value)
 {
 	// Include common layout code for preparing values, but you may copy here to customize
@@ -71,8 +72,8 @@ foreach ($values as $n => $value)
 		'<a class="thumb" name="drop" href="'.\Joomla\CMS\Uri\Uri::root(true).'/'.$srcl.'" data-width="' . $size_w_l . '" data-height="' . $size_h_l . '" title="' . $title_encoded . '">
 			'.$img_legend.'
 		</a>
-		<a class="gf_fancybox" href="'.\Joomla\CMS\Uri\Uri::root(true).'/'.$srcl.'" data-title="' . $title_encoded . '" data-caption="' . $desc_encoded . '"' . $group_str . '
-			onclick="if (gf_gallery_' . $uid . '.mSlider.isDragging) {event.preventDefault(); event.stopPropagation(); return false; }"; style="display: none;">
+		<a class="gf_fancybox" href="'.\Joomla\CMS\Uri\Uri::root(true).'/'.$srcl.'" data-title="' . $title_encoded . '" data-caption="' . $desc_encoded . '" ' . $group_str . '
+			onclick="if (gf_gallery_' . $uid . '.mSlider.isDragging) {event.preventDefault(); event.stopPropagation(); return false; }" style="display: none;">
         </a>
 			' . ($display_title || $display_desc ? '
 				<div class="caption">
@@ -80,6 +81,7 @@ foreach ($values as $n => $value)
 					' . ($display_desc && $desc ?  '<div class="image-desc">' . nl2br(preg_replace("/(\r\n|\r|\n){3,}/", "\n\n", $desc_encoded)) . '</div>' : '') . '
 				</div>' : '') .'
 ';
+	$firstImageHtml = $firstImage ?: '<img class="image-fist-image" src="'.\Joomla\CMS\Uri\Uri::root(true).'/'.$srcl.'" alt="' . $title_encoded . '" style="width: 100%; height: 100%;" />';
 }
 $js = "
 var gf_gallery_" . $uid . ";
@@ -217,7 +219,7 @@ if ($result !== _FC_RETURN_)
 			$field->{$prop}[$_i] = preg_replace('/<img[^>]+>/i', '.', $field->{$prop}[$_i]);
 		}
 		$thumbs_display_html ='
-	<div id="gf_thumbs_' . $uid . '" class="navigation' . (!$use_pages ? ' no_pagination' : '') . '" style="display: none;">
+	<div id="gf_thumbs_' . $uid . '" class="navigation' . (!$use_pages ? ' no_pagination' : '') . '">
 		<ul class="thumbs noscript dot">
 			<li>
 			'. implode("</li><li>", $field->{$prop}) .'
@@ -241,17 +243,17 @@ if ($result !== _FC_RETURN_)
 	$field->{$prop} = '
 
 	<style>
-		div#gf_thumbs_' . $uid . '{' . ($use_pages ? 'min-height: ' : 'height: ') . $thumb_container_height . 'px; }
-		div#gf_thumbs_' . $uid . ' ul.thumbs li a {
-			height:' . $thumb_height . 'px !important;
-			max-width:' . $thumb_height . 'px !important;
-		}
 		div#gf_thumbs_' . $uid . ' ul.thumbs li a img {
 			width:' . $thumb_height . 'px !important;
 		}
-		div#gf_container_' . $uid . ' div.slideshow-container .image-wrapper a,
-		div#gf_container_' . $uid . ' div.slideshow-container {
-			height: ' . $slide_height . 'px;
+		'. ($slide_height_max ? '
+		div#gf_container_' . $uid . ' div.slideshow-wrapper-first-image img,
+		div#gf_container_' . $uid . ' div.slideshow-container .image-wrapper a {
+			max-height: ' . $slide_height_max . ';
+		}' : '') . '
+		
+		div#gf_container_' . $uid . ' {
+			--transition-duration: ' . $transition_duration . 'ms;
 		}
 	</style>
 
@@ -267,6 +269,9 @@ if ($result !== _FC_RETURN_)
 		</div>
 
 		<div id="gf_content_' . $uid . '" class="content">
+			<div class="slideshow-wrapper-first-image" style="opacity: 0; height:unset; position: relative; z-index: -1;">
+				' . $firstImageHtml . '
+			</div>
 			<div class="slideshow-container">
 				' . ($over_image_btns ? '
 				<div id="gf_navcontrols_' . $uid . '" class="controls nav-controls-box"></div>
