@@ -27,7 +27,7 @@ class _flexicontent_types_common extends flexicontent_basetable
 	 *
 	 * @since   11.1
 	 */
-	protected function __getAssetParentId(\Joomla\CMS\Table\Table $table = null, $id = null)
+	protected function __getAssetParentId(?\Joomla\CMS\Table\Table $table = null, $id = null)
 	{
 		$asset = \Joomla\CMS\Table\Table::getInstance('Asset');
 		$asset->loadByName('com_flexicontent');
@@ -38,7 +38,7 @@ class _flexicontent_types_common extends flexicontent_basetable
 // This code has not removed to be an example of how to workaround adding TYPE to method parameters of parent class
 if (FLEXI_J30GE) {
 	class _flexicontent_types extends _flexicontent_types_common {
-		protected function _getAssetParentId(\Joomla\CMS\Table\Table $table = null, $id = null) {
+		protected function _getAssetParentId(?\Joomla\CMS\Table\Table $table = null, $id = null) {
 			return parent::__getAssetParentId($table, $id);
 		}
 	}
