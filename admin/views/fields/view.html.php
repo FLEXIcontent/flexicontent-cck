@@ -207,7 +207,7 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 			// Find ids of master fields (if any)
 			if ($row->field_type === 'fieldgroup')
 			{
-				$FG_fieldids[$id] = array_filter(preg_split('/[\s]*,[\s]*/', $row->parameters->get('fields')), function($v) { return (trim($v) !== ''); });
+				$FG_fieldids[$id] = array_filter(preg_split('/[\s]*,[\s]*/', $row->parameters->get('fields', '')), function($v) { return (trim((string)$v) !== ''); });
 				$FG_fieldids[$id] = ArrayHelper::toInteger($FG_fieldids[$id]);
 
 				$grouped_fids = array_merge($grouped_fids, $FG_fieldids[$id]);
