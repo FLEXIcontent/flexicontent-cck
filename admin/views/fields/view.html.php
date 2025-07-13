@@ -236,7 +236,8 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 			// Handle displaying information: FIELDGROUP feature
 			$row->parameters = new \Joomla\Registry\Registry($row->attribs);
 
-			$ingroup_fids = array_filter(preg_split('/[\s]*,[\s]*/', $row->parameters->get('fields')), function($v) { return (trim($v) !== ''); });
+			//$ingroup_fids = array_filter(preg_split('/[\s]*,[\s]*/', $row->parameters->get('fields')), function($v) { return (trim($v) !== ''); });
+			$ingroup_fids = array_filter(preg_split('/[\s]*,[\s]*/', $row->parameters->get('fields', '')), function($v) { return (trim((string)$v) !== ''); });
 			$ingroup_fids = ArrayHelper::toInteger($ingroup_fids);
 
 			// For fields of group that are included in current list, add reference to their group field
