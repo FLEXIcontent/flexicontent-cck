@@ -53,7 +53,7 @@ class JFormFieldFcradio extends JFormFieldRadio
 	
 	function getInput()
 	{
-		$class = $this->element['class'];
+		$class = (string) $this->element['class'];
 		$isBtnGroup  = strpos(trim($class), 'btn-group') !== false;
 		$isBtnYesNo  = strpos(trim($class), 'btn-group-yesno') !== false;
 		return $isBtnGroup && !$isBtnYesNo
