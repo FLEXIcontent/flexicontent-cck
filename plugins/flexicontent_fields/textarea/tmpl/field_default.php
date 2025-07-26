@@ -37,7 +37,7 @@ foreach ($field->value as $i => $value)
       . htmlspecialchars( $value, ENT_COMPAT, 'UTF-8' ) .
     '</textarea>
     ' : $editor->display(
-      $fieldname_n . $mce_fieldname_sfx, htmlspecialchars( $value, ENT_COMPAT, 'UTF-8' ), $width, $height, $cols, $rows,
+      $fieldname_n . $mce_fieldname_sfx, htmlspecialchars( $value, ENT_COMPAT, 'UTF-8' ), ($width ?: '100%'), $height, $cols, $rows,
       $skip_buttons_arr, $elementid_n, $_asset_ = '', $_author_ = null, $editor_plg_params
     );
     // NOTE asset = ''; above is to workaround an issue in image XTD button that makes strict check $asset = $asset !== '' ? $asset : $extension;
