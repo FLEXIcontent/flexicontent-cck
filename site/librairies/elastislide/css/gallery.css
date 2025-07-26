@@ -17,7 +17,7 @@
 
 	max-width: 100%;
 	/*max-height: 96vh;*/ /* Limit height set inline to viewport, moved this to JS */
-	width: 5000px;
+	width: 100%;
 
 	overflow: hidden;
 	padding: 0;
