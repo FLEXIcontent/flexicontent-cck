@@ -32,6 +32,7 @@
 
 			<field name="use_ingroup" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC" inline_tip="FLEXI_USE_IN_FIELD_GROUP_INSTRUCTIONS" tip_class="fieldgroupon" tip_img="comments.png" preview_img="insert_merge_field.png" class="btn-group group-fcinfo">
 				<option value="0" show_list="fieldgroupoff" hide_list="fieldgroupon">FLEXI_NO</option>
+				<option value="1" show_list="fieldgroupon" hide_list="fieldgroupoff">FLEXI_YES</option>
 			</field>
 
 			<field name="" type="separator" default="FLEXI_FIELD_NUMBER_OF_VALUES" description="" depend_class="fieldgroupoff" level="level2" />
