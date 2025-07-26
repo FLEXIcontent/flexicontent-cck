@@ -69,7 +69,7 @@ else
 {
 	HTMLHelper::_('script', Uri::base() . 'components/com_flexicontent/assets/js/clipboard_v2.0.11.min.js', ['version' => 'auto', 'relative' => false]);
 }
-HtmlHelper::_('bootstrap.modal', 'modal');
+HTMLHelper::_('bootstrap.modal', 'modal');
 
 /**
  * COMMON CSS classes and COMMON repeated texts
