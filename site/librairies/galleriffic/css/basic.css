@@ -27,7 +27,7 @@ div.gf_container {
 
 	height: auto;
 	max-width: 100%;
-	width: 5000px;
+	width: 100%;
 
 	overflow: hidden;
 	padding: 0;
@@ -65,7 +65,7 @@ div.gf_container > div.navigation.no_pagination {
 	overflow-y: hidden;
 	white-space: nowrap;
 	box-sizing: border-box;
-	padding: 2px;
+	padding: 0;
 	/*scroll-behavior: smooth;*/
 }
 
@@ -236,6 +236,10 @@ div.gf_container div.slideshow-container div.controls div.nav-controls a > * {
 	background-color: rgba(0,0,0, 0.2);
 	transition: all 0.4s ease-in-out;
 	border-radius: 10px;
+	justify-content: center;
+	font-size: 1em;
+	width: 2em;
+	height: 2em;
 }
 div.gf_container div.slideshow-container div.controls div.nav-controls a:hover > * {
 	color: white;
@@ -474,7 +478,7 @@ div.gf_container > .content  > div.slideshow-container > div.slideshow span.imag
 	justify-content: center; /* This is image parent. CROP vertically up and down by centering the image inside the parent */
 
 	width: 100%;
-	height: 100%;   /* Set inline to realy PIXELS to fix IE11 */
+	min-height: 100%;
 	line-height: 100%;
 	max-height: 100%;
 }

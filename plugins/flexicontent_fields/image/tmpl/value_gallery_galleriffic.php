@@ -255,13 +255,14 @@ if ($result !== _FC_RETURN_)
 		div#gf_container_' . $uid . ' {
 			--transition-duration: ' . $transition_duration . 'ms;
 		}
+		' . (!$thumb_display ? 'div#gf_thumbs_' . $uid . ' ul.thumbs { display: none!important; }' : '') . '
 	</style>
 
 	<div id="gf_container_' . $uid . '" class="gf_container">
 
 			'. $navigation_top .'
 
-		<div class="gf_controls_box" ' . ($over_image_btns ? 'style="height: 0;"' : '') . '>
+		<div class="gf_controls_box" ' . ($over_image_btns ? 'style="height: 0; overflow: hidden;"' : '') . '>
 			<div id="gf_sscontrols_' . $uid . '" class="controls ss-controls-box"></div>
 			' . (!$over_image_btns ? '
 			<div id="gf_navcontrols_' . $uid . '" class="controls nav-controls-box"></div>

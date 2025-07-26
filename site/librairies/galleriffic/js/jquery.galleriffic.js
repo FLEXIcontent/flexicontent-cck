@@ -122,8 +122,12 @@
 		onTransitionIn:            function(slide, caption, isSync)
 		{
 			const duration = this.getDefaultTransitionDuration(isSync);
-			//slide.fadeTo(duration, 1.0);
-			slide.css('opacity', 1.0);
+
+			// Delay the opacity change slightly to allow the slide element to be added to the DOM before the fade occurs
+			setTimeout(function() {
+				//slide.fadeTo(duration, 1.0);
+				slide.css('opacity', 1.0);
+			}, 20);
 
 			// Position the caption at the bottom of the image and set its opacity
 			const slideImage = slide.find('img');
@@ -352,6 +356,7 @@
 			// Initalizes the image preloader
 			preloadInit: function() {
 				if (this.preloadAhead == 0) return this;
+				if(!this.currentImage) return this;
 
 				this.preloadStartIndex = this.currentImage.index;
 				var nextIndex = this.getNextIndex(this.preloadStartIndex);
@@ -578,6 +583,7 @@
 			// This function is garaunteed to be called anytime a gallery slide changes.
 			// @param {Object} imageData An object holding the image metadata of the image to navigate to.
 			gotoImage: function(imageData) {
+				if (!imageData) return this;
 				var index = imageData.index;
 
 				// Prevent reloading same image
@@ -736,7 +742,7 @@
 				var nextIndex = this.getNextIndex(imageData.index);
 
 				// Check for already created slide
-				var newSlide = this.$imageContainer.find('.index_' + imageData.index).removeClass('previous').addClass('current').css({display: 'block', opacity: 1});
+				var newSlide = this.$imageContainer.find('.index_' + imageData.index).removeClass('previous').addClass('current').css({display: 'block', opacity: 0});
 
 				// Construct new hidden span for the image
 				if (!newSlide.length)
@@ -775,8 +781,7 @@
 					{
 						// Construct new hidden caption for the image
 						newCaption = this.$captionContainer
-							.append('<span class="image-caption current index_' + imageData.index + '"></span>')
-							.find('span.image-caption.current').css('opacity', '0')
+							.append('<span class="image-caption current index_' + imageData.index + '" style="opacity: 0"></span>')
 							.append(imageData.caption);
 					}
 
@@ -799,7 +804,6 @@
 				} else {
 					//newSlide.fadeTo(this.getDefaultTransitionDuration(isSync), 1.0);
 					//newCaption && newCaption.fadeTo(this.getDefaultTransitionDuration(isSync), 1.0);
-
 					newSlide.css('opacity', 1.0);
 					newCaption && newCaption.css('opacity', 1.0);
 				}
@@ -816,6 +820,7 @@
 
 			// Returns the current page index that should be shown for the currentImage
 			getCurrentPage: function() {
+				if(!this.currentImage) return 0;
 				return Math.floor(this.currentImage.index / this.numThumbs);
 			},
 
