@@ -2109,7 +2109,7 @@
 				label="FLEXI_IMAN_DISABLE_COLUMNS" description="FLEXI_IMAN_DISABLE_COLUMNS_DESC" cols="3" />
 
 			<field name="items_manager_extra_fields" type="textarea" default="" rows="2" cols="60" label="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS" description="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS_DESC" class="input-xxlarge" />
-			<field name="items_manager_custom_filters" type="filters" default="" isfilter="*" field_type="select,selectmutiple,radio,radioimage,checkbox,checkboximage" label="FLEXI_ITEMS_MANAGER_CUSTOM_FILTERS_LIST" description="FLEXI_ITEMS_MANAGER_CUSTOM_FILTERS_LIST_DESC" />
+			<field name="items_manager_custom_filters" type="filters" default="" isfilter="*" field_type="select,selectmultiple,radio,radioimage,checkbox,checkboximage" label="FLEXI_ITEMS_MANAGER_CUSTOM_FILTERS_LIST" description="FLEXI_ITEMS_MANAGER_CUSTOM_FILTERS_LIST_DESC" />
 			<field name="items_manager_order" type="list" default="a.id" label="FLEXI_ITEMS_MANAGER_ORDER" description="FLEXI_ITEMS_MANAGER_ORDER_DESC" class="use_select2_lib">
 				<option value="1">FLEXI_ITEMS_MANAGER_ORDER_UNORDERED</option>
 				<option value="lang">FLEXI_ITEMS_MANAGER_ORDER_LANGUAGE</option>
