@@ -85,7 +85,7 @@ table.adminlist {
 	min-width: 215px;
 	box-shadow: 0 5px 15px 0 #a1a1a1;
 	background: #fff;
-  z-index: 1;
+	z-index: 1;
 }
 @media screen and (max-width: 600px) {
 	table#adminListTableFCcategory {

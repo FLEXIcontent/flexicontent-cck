@@ -1268,7 +1268,7 @@ td.col_edit_layout {
 	border-right-width: 0;
 }
 .flexicontent #fc-filters-box .fc-filter .select2-container-multi .select2-choices .select2-search-field input.select2-input {
-	line-height: calc(var(--form-inp-height) -2px) !important;
+	line-height: calc(var(--form-inp-height) - 2px) !important;
 	min-height: calc(var(--form-inp-height) - 2px) !important;
 	box-sizing: border-box;
 	margin: 0 !important;
@@ -1285,7 +1285,7 @@ td.col_edit_layout {
 	padding: 2px 6px 2px 26px !important;
 	background: #fff url(../images/select2.png) no-repeat scroll -32px -22px !important;
 	width: 100% !important;
-	line-height: calc(var(--form-inp-height) -2px) !important;
+	line-height: calc(var(--form-inp-height) - 2px) !important;
 	min-height: calc(var(--form-inp-height) - 2px) !important;
 }
 #s2id_scope.select2-container.use_select2_lib {

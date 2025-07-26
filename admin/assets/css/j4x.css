@@ -873,9 +873,6 @@ body .form-grid .control-group .controls > div {
 #flexicontent .fc-xpended-btns > .fcfield-button-add a {
 	line-height: 1.6rem !important;
 }
-#flexicontent .fc-xpended-btns {
-	height: 2.74rem;
-}
 .input-group-text.fc-lbl-inverted.fc-lbl-short.icon-info-2.hasPopover,
 .fc-filter.nowrap_box .input-group-text.fc-lbl-inverted.fc-lbl-short {
 	font-family: inherit !important;

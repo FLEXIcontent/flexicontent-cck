@@ -1,14 +1,14 @@
 @import 'config.css';
 .flexicontent :not(.input-prepend):not(.input-append) > input[type="text"]:not(.minicolors) {
 	display: inline-block;
-	margin: 0px 2px 1px 2px;
+	margin: 0;
 }
 .flexicontent *:not(.input-append):not(.input-prepend):not(.input-group) > div.use_select2_lib {
-	margin: 0px 2px 1px 2px;
+	margin: 0;
 }
 .flexicontent *:not(.input-append):not(.input-prepend):not(.input-group) > select:not(.custom-select) {
 	display: inline-block;
-	margin: 0px 2px 1px 2px;
+	margin: 0;
 	padding: 4px;
 	border-radius: 4px;
 	height: auto;
@@ -1275,7 +1275,7 @@ td.col_edit_layout {
 	border-left-width: 0;
 }
 .flexicontent #fc-filters-box .fc-filter .select2-container-multi .select2-choices .select2-search-field input.select2-input {
-	line-height: calc(var(--form-inp-height) -2px) !important;
+	line-height: calc(var(--form-inp-height) - 2px) !important;
 	min-height: calc(var(--form-inp-height) - 2px) !important;
 	box-sizing: border-box;
 	margin: 0 !important;
@@ -1289,7 +1289,7 @@ td.col_edit_layout {
 	width: 100% !important;
 }
 .flexicontent #fc-filters-box .fc-filter .select2-container-multi.select2-dropdown-open .select2-choices .select2-search-field input.select2-input {
-	line-height: calc(var(--form-inp-height) -2px) !important;
+	line-height: calc(var(--form-inp-height) - 2px) !important;
 	min-height: calc(var(--form-inp-height) - 2px) !important;
 	padding: 2px 6px 2px 26px !important;
 	background: #fff url(../images/select2.png) no-repeat scroll -32px -22px !important;
@@ -1381,7 +1381,7 @@ input.minicolors-input {
 	height: var(--ctrls-inp-height) !important;
 }
 .fc-form-tbl.fcinner.fccompact {
-	margin-top: -34px !important;
+	margin-top: -0.6em !important;
 }
 body .fc-close {
 	color: #000000;
@@ -4477,7 +4477,7 @@ html[dir="rtl"] .select2-container .select2-choice {
 .select2-container-multi.select2-dropdown-open .select2-choices .select2-search-field input.select2-input {
 	cursor: pointer;
 	min-width: 32px !important;
-	line-height: calc(var(--form-inp-height) -2px) !important;
+	line-height: calc(var(--form-inp-height) - 2px) !important;
 	min-height: calc(var(--form-inp-height) - 2px) !important;
 	padding: 0 7px !important;
 	margin-top: 1px !important;
