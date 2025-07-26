@@ -12,6 +12,7 @@
 
 // no direct access
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Uri\Uri;
 
 defined('_JEXEC') or die('Restricted access');
 
@@ -26,8 +27,8 @@ if (empty($renderedMapLocations) && (int)$params->get('hide_map_when_empty', '1'
 
 \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip');
 $document = \Joomla\CMS\Factory::getDocument();
-$modified = filemtime(__DIR__ . '/assets/css/style.css');
-$document->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true) . '/modules/mod_flexigooglemap/assets/css/style.css?v=' . $modified);
+$modified = filemtime(__DIR__ . '/../assets/css/style.css');
+$document->addStyleSheet(Uri::root(true) . '/modules/mod_flexigooglemap/assets/css/style.css?v=' . $modified);
 
 $itemmodel_name = 'FlexicontentModelItem';
 $itemmodel = new $itemmodel_name();
@@ -47,7 +48,7 @@ $apikey    = $params->get('apikey', '');
 
 $defaut_icon_url = $mapapi === 'googlemap'
 	? 'https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi2.png'
-	: \Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/librairies/leaflet/images/marker-icon.png';
+	: Uri::root(true) . '/components/com_flexicontent/librairies/leaflet/images/marker-icon.png';
 
 $maxzoommarker = (int) $params->get('maxzoommarker', 18);
 $mappadding    = (int) $params->get('mappadding', '50');
@@ -120,7 +121,7 @@ if ($clustermode) {
 	if ($imgcluster && $img_info = getimagesize(\Joomla\Filesystem\Path::clean(JPATH_ROOT . DS . $imgcluster))) {
 		$imgcluster_w = $img_info[0];
 		$imgcluster_h = $img_info[1];
-		$imgcluster_url  = \Joomla\CMS\Uri\Uri::root(true) . '/' . $imgcluster;
+		$imgcluster_url  = Uri::root(true) . '/' . $imgcluster;
 	} else {
 		$imgcluster_w = 53;
 		$imgcluster_h = 52;

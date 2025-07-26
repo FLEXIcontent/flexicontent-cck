@@ -248,6 +248,8 @@ class modFlexigooglemapHelper
 		 * Add item to array of know items
 		 */
 		$item = clone ($address_item);
+		$item->itemslug = $item->itemslug ?? $item->id.':'.$item->alias;
+		$item->catslug = $item->catslug ?? $item->catid;
 		$item->link = \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getItemRoute($item->itemslug, $item->catslug, $forced_itemid, $item));
 		$mapItems[] = $item;
 
