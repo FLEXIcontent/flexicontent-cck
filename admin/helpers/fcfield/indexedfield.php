@@ -914,7 +914,8 @@ class FCIndexedField extends FCField
 			$_fields = FlexicontentFields::getFieldsByIds(array($cascade_after), array($item->id));
 			if (!isset($_fields[$cascade_after]))
 			{
-				return array('Master field not found');
+				$_result = ['Master field not found'];
+				return $_result;
 			}
 			$master_field = $_fields[$cascade_after];
 			FlexicontentFields::loadFieldConfig($master_field, $item);
@@ -1132,7 +1133,6 @@ class FCIndexedField extends FCField
 				$icon_color = $field->parameters->get( 'icon_color_form' ) ;
 			}
 
-			}
 			$form_image_width = $field->parameters->get( 'form_image_width', '1.2em');
 			$form_image_height = $field->parameters->get( 'form_image_height', '1.2em');
 
