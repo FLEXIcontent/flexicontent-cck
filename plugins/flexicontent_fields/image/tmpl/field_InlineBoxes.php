@@ -431,13 +431,15 @@ foreach ($field->value as $index => $value)
 			<span data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" class="'.$btn_classes.' fc-up fcfield-uploadvalue multi" id="'.$elementid_n.'_mul_uploadvalue">
 				&nbsp; ' . $multi_icon . ' ' . (!$file_btns_position || $file_btns_position==2 ? Text::_('FLEXI_UPLOAD') : '') . '
 			</span>';*/
+		// !!! CLASS: fc-files-modal-link fc-sel NEEDED BY JS !!! DO NOT REMOVE, DO NOT MOVE
 		$uploader_html->myFilesBtn = '
-			<span data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" class="'.$btn_classes.'" data-rowno="'.$n.'" id="'.$elementid_n.'_selectvalue">
-				<span class="fc-files-modal-link  fc-sel fcfield-selectvalue multi fcfont-icon-inline ' . $font_icon_class . '"></span>
+			<span data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" class="fc-files-modal-link fc-sel '.$btn_classes.'" data-rowno="'.$n.'" id="'.$elementid_n.'_selectvalue">
+				<span class="fcfield-selectvalue multi fcfont-icon-inline ' . $font_icon_class . '"></span>
 				' .  ($file_btns_position ? $multi_icon : '') . ' ' . (!$file_btns_position || $file_btns_position==2 ? '&nbsp; ' . Text::_('FLEXI_MY_FILES') : '') . ' ' .'
 			</span>';
+		// !!! CLASS: fc-files-modal-link fc-up NEEDED BY JS !!! DO NOT REMOVE, DO NOT MOVE
 		$uploader_html->mediaUrlBtn = !$usemediaurl ? '' : '
-			<span class="' . ($file_btns_position ? 'dropdown-item' : '') . ' ' . $btn_item_class .'" onclick="fcfield_image.toggleMediaURL(\''.$elementid_n.'\', \''.$field_name_js.'\'); return false;">
+			<span class="fc-files-modal-link fc-sel ' . ($file_btns_position ? 'dropdown-item' : '') . ' ' . $btn_item_class .'" onclick="fcfield_image.toggleMediaURL(\''.$elementid_n.'\', \''.$field_name_js.'\'); return false;">
 				<span class="fcfield-medialurlvalue fcfont-icon-inline ' . $font_icon_class . '"></span>
 				' . (!$file_btns_position || $file_btns_position==2 ? '&nbsp; ' . Text::_('FLEXI_FIELD_MEDIA_URL') : '') . '
 			</span>';
