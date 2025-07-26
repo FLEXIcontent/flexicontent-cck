@@ -680,7 +680,8 @@ body .fc_file_uploader .plupload_scroll ul.plupload_filelist .btn-group.fc_uploa
 body .fc_file_uploader .plupload_scroll ul.plupload_filelist .btn.fc_props_edit_btn,
 body .fc_file_uploader .plupload_scroll ul.plupload_filelist .btn.fc_img_preview_btn {
 	width: unset;
-	min-width: 20px;
+	min-width: 3em;
+	min-height: 1.9rem !important;
 	margin: 0px 0px 0px 0px;
 	padding: 8px 4px;
 	vertical-align: top;
@@ -1485,6 +1486,10 @@ div.empty_image {
 .fc-field-props-box {
 	display: flex;
 	flex-direction: column;
+}
+.fc-field-props-box .fc_preview_msg {
+	min-height: 2em;
+	margin-bottom: 1em !important;
 }
 .fc-field-props-box .fc_preview_msg,
 .fc-field-props-box input,
