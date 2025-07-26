@@ -21,6 +21,8 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('legacy.view.legacy');
 jimport('joomla.filesystem.file');
+
+use Joomla\CMS\Language\Text;
 use Joomla\String\StringHelper;
 use Joomla\CMS\Component\ComponentHelper;
 
@@ -236,7 +238,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 			if ( in_array($parents[$p]->id, $globalnoroute) )  { $p++; continue; }
 
 			// Add current parent category
-			$pathway->addItem( $parents[$p]->title, \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getCategoryRoute($parents[$p]->slug)) );
+			$pathway->addItem(Text::_($parents[$p]->title), \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getCategoryRoute($parents[$p]->slug)) );
 			$p++;
 		}
 		//echo "<pre>"; print_r($pathway); echo "</pre>";
@@ -301,17 +303,17 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 			switch($layout)
 			{
 				case ''        :  $default_heading = $category->title;  break;
-				case 'myitems' :  $default_heading = \Joomla\CMS\Language\Text::_('FLEXI_MY_CONTENT');  break;
-				case 'author'  :  $default_heading = \Joomla\CMS\Language\Text::sprintf('FLEXI_ITEMS_OF_USER', \Joomla\CMS\Factory::getUser((int) $authorid)->get('name'));  break;
-				case 'tags'    :  $default_heading = \Joomla\CMS\Language\Text::_('FLEXI_TAG') .': '. $tag->name;  break;
-				case 'favs'    :  $default_heading = \Joomla\CMS\Language\Text::_('FLEXI_MY_FAVOURITES');  break;
-				default        :  $default_heading = \Joomla\CMS\Language\Text::_('FLEXI_CONTENT_IN_CATEGORY');
+				case 'myitems' :  $default_heading =Text::_('FLEXI_MY_CONTENT');  break;
+				case 'author'  :  $default_heading =Text::sprintf('FLEXI_ITEMS_OF_USER', \Joomla\CMS\Factory::getUser((int) $authorid)->get('name'));  break;
+				case 'tags'    :  $default_heading =Text::_('FLEXI_TAG') .': '. $tag->name;  break;
+				case 'favs'    :  $default_heading =Text::_('FLEXI_MY_FAVOURITES');  break;
+				default        :  $default_heading =Text::_('FLEXI_CONTENT_IN_CATEGORY');
 			}
 
 			// Category-based view that is limited to a specific category
 			if ($layout && $category->id)
 			{
-				$default_heading .= ', '.\Joomla\CMS\Language\Text::_('FLEXI_IN_CATEGORY').': '.$category->title;
+				$default_heading .= ', '.Text::_('FLEXI_IN_CATEGORY').': '.$category->title;
 			}
 
 			// Decide to show page heading (=J1.5 page title) only if a custom layout is used (=not a single category layout)
@@ -337,10 +339,10 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 			case 'myitems' : break;
 			case 'author'  : break;
 			case 'tags'    :
-				$pathway->addItem( \Joomla\CMS\Language\Text::_('FLEXI_TAG') . ' : ' . $this->escape($tag->name), '' );
+				$pathway->addItem(Text::_('FLEXI_TAG') . ' : ' . $this->escape($tag->name), '' );
 				break;
 			case 'favs'    :
-				$pathway->addItem( \Joomla\CMS\Language\Text::_('FLEXI_MY_FAVOURITES'), '' );
+				$pathway->addItem(Text::_('FLEXI_MY_FAVOURITES'), '' );
 				break;
 			default        : ;
 		}
@@ -704,7 +706,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 
 			$default_image = $phpThumbURL.$src.$conf;
-			$default_image = '<img class="fccat_image" style="float:'.$cat_image_float.'" src="'.$default_image.'" alt="%s" title="%s"/>';
+			$default_image = '<img class="fccat_image" src="'.$default_image.'" alt="%s" title="%s"/>';
 		}
 		else
 		{
@@ -802,7 +804,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 
 			$default_image = $phpThumbURL.$src.$conf;
-			$default_image = '<img class="fccat_image" style="float:'.$cat_image_float.'" src="'.$default_image.'" alt="%s" title="%s"/>';
+			$default_image = '<img class="fccat_image" src="'.$default_image.'" alt="%s" title="%s"/>';
 		}
 		else
 		{
@@ -903,7 +905,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 
 			$default_image = $phpThumbURL.$src.$conf;
-			$default_image = '<img class="fccat_image" style="float:'.$cat_image_float.'" src="'.$default_image.'" alt="%s" title="%s"/>';
+			$default_image = '<img class="fccat_image"  src="'.$default_image.'" alt="%s" title="%s"/>';
 		}
 		else
 		{

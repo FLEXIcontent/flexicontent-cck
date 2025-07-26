@@ -11,6 +11,7 @@
 
 defined('_JEXEC') or die('Restricted access');
 
+use Joomla\CMS\Language\Text;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
@@ -2186,7 +2187,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 			if ( in_array($parents[$p]->id, $globalnoroute) )  { $p++; continue; }
 
 			// Add current parent category
-			$pathway->addItem( $parents[$p]->title, \Joomla\CMS\Router\Route::_( FlexicontentHelperRoute::getCategoryRoute($parents[$p]->slug) ) );
+			$pathway->addItem(Text::_($parents[$p]->title), \Joomla\CMS\Router\Route::_( FlexicontentHelperRoute::getCategoryRoute($parents[$p]->slug) ) );
 			$p++;
 		}
 		if ($params->get('add_item_pathway', 1)) {
