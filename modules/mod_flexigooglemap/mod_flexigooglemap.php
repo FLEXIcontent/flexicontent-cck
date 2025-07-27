@@ -11,6 +11,10 @@
  */
 
 // no direct access
+use Joomla\CMS\Helper\ModuleHelper;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Uri\Uri;
+
 defined('_JEXEC') or die('Restricted access');
 
 if (!defined('DS'))  define('DS', DIRECTORY_SEPARATOR);
@@ -119,13 +123,17 @@ $add_tooltips = 0; //(int) $params->get('add_tooltips', 1);
 
 /**
  * Render the map locations and get items having these markers
- * These are 2 arrays indexed with same number e.g. 25 locations, 25 items (of these items e.g. 8 are unique items)
+ * - These are 2 arrays indexed with the same integer e.g. 25 locations, 25 items (of these items e.g. 8 are unique items)
+ *
+ * NOTE: anonymous functions inside: LAYOUT_mapLocations.php, LAYOUT_mapLocation.php are used to render the map locations
+ *    $renderedMapLocations = function ($params, &$mapItems, $module);
  */
-$mapItems = null;
+$mapItems             = null;
 $renderedMapLocations = modFlexigooglemapHelper::renderMapLocations($params, $mapItems, $module);
 
 $mapItemData = [];
-foreach ($mapItems as $mapItem) {
+foreach ($mapItems as $mapItem)
+{
 	$mapItemData[] = (object) array(
 		'title' => $mapItem->title,
 		'link' => $mapItem->link,
@@ -149,32 +157,34 @@ $defaultMarkerURL = modFlexigooglemapHelper::getDefaultMarkerURL($params, $wS_dM
 $tMapTips      = $renderedMapLocations;
 $markerdisplay = "'" . $defaultMarkerURL . "'";
 
-
-// Add tooltips
-if ($add_tooltips) {
-	\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip');
+/**
+ * Add tooltips
+ */
+if ($add_tooltips)
+{
+	HTMLHelper::_('bootstrap.tooltip');
 }
 
 // Add css
 if ($add_ccs && $layout) {
-	// Work around for extension that capture module's HTML 
+	// Work around for extension that capture module's HTML
 	if ($add_ccs === 2) {
 		// Active module layout css (optional)
 		if (file_exists(dirname(__FILE__) . DS . 'tmpl' . DS . $layout . DS . $layout . '.css')) {
-			echo flexicontent_html::getInlineLinkOnce(\Joomla\CMS\Uri\Uri::base(true) . '/modules/' . $modulename . '/tmpl/' . $layout . '/' . $layout . '.css', array('version' => FLEXI_VHASH));
+			echo flexicontent_html::getInlineLinkOnce(Uri::base(true) . '/modules/' . $modulename . '/tmpl/' . $layout . '/' . $layout . '.css', array('version' => FLEXI_VHASH));
 		}
 
 		// Module 's core CSS
 		if (file_exists(dirname(__FILE__) . DS . 'tmpl_common' . DS . 'module.css')) {
-			echo flexicontent_html::getInlineLinkOnce(\Joomla\CMS\Uri\Uri::base(true) . '/modules/' . $modulename . '/tmpl_common/module.css', array('version' => FLEXI_VHASH));
+			echo flexicontent_html::getInlineLinkOnce(Uri::base(true) . '/modules/' . $modulename . '/tmpl_common/module.css', array('version' => FLEXI_VHASH));
 		}
 
 		// Component CSS with optional override
-		echo flexicontent_html::getInlineLinkOnce(\Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
+		echo flexicontent_html::getInlineLinkOnce(Uri::base(true) . '/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		if (FLEXI_J40GE && file_exists(JPATH_SITE . DS . 'media/templates/site' . DS . $app->getTemplate() . DS . 'css' . DS . 'flexicontent.css')) {
-			echo flexicontent_html::getInlineLinkOnce(\Joomla\CMS\Uri\Uri::base(true) . '/media/templates/site/' . $app->getTemplate() . '/css/flexicontent.css', array('version' => FLEXI_VHASH));
+			echo flexicontent_html::getInlineLinkOnce(Uri::base(true) . '/media/templates/site/' . $app->getTemplate() . '/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		} elseif (file_exists(JPATH_SITE . DS . 'templates' . DS . $app->getTemplate() . DS . 'css' . DS . 'flexicontent.css')) {
-			echo flexicontent_html::getInlineLinkOnce(\Joomla\CMS\Uri\Uri::base(true) . '/templates/' . $app->getTemplate() . '/css/flexicontent.css', array('version' => FLEXI_VHASH));
+			echo flexicontent_html::getInlineLinkOnce(Uri::base(true) . '/templates/' . $app->getTemplate() . '/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		}
 	}
 
@@ -182,29 +192,32 @@ if ($add_ccs && $layout) {
 	else {
 		// Active module layout css (optional)
 		if (file_exists(dirname(__FILE__) . DS . 'tmpl' . DS . $layout . DS . $layout . '.css')) {
-			$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true) . '/modules/' . $modulename . '/tmpl/' . $layout . '/' . $layout . '.css', array('version' => FLEXI_VHASH));
+			$document->addStyleSheet(Uri::base(true) . '/modules/' . $modulename . '/tmpl/' . $layout . '/' . $layout . '.css', array('version' => FLEXI_VHASH));
 		}
 
 		// Module 's core CSS
 		if (file_exists(dirname(__FILE__) . DS . 'tmpl_common' . DS . 'module.css')) {
-			$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true) . '/modules/' . $modulename . '/tmpl_common/module.css', array('version' => FLEXI_VHASH));
+			$document->addStyleSheet(Uri::base(true) . '/modules/' . $modulename . '/tmpl_common/module.css', array('version' => FLEXI_VHASH));
 		}
 
 		// Component CSS with optional override
-		$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
+		$document->addStyleSheet(Uri::base(true) . '/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		if (FLEXI_J40GE && file_exists(JPATH_SITE . DS . 'media/templates/site' . DS . $app->getTemplate() . DS . 'css' . DS . 'flexicontent.css')) {
-			$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true) . '/media/templates/site/' . $app->getTemplate() . '/css/flexicontent.css', array('version' => FLEXI_VHASH));
+			$document->addStyleSheet(Uri::base(true) . '/media/templates/site/' . $app->getTemplate() . '/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		} elseif (file_exists(JPATH_SITE . DS . 'templates' . DS . $app->getTemplate() . DS . 'css' . DS . 'flexicontent.css')) {
-			$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true) . '/templates/' . $app->getTemplate() . '/css/flexicontent.css');
+			$document->addStyleSheet(Uri::base(true) . '/templates/' . $app->getTemplate() . '/css/flexicontent.css');
 		}
 	}
 }
 
 // Render Layout
-require(\Joomla\CMS\Helper\ModuleHelper::getLayoutPath('mod_flexigooglemap', $layout));
+require(ModuleHelper::getLayoutPath('mod_flexigooglemap', $layout));
 
-// append performance stats to global variable
-if ($flexiparams->get('print_logging_info')) {
+/**
+ * Append performance stats to global variable
+ */
+if ($flexiparams->get('print_logging_info'))
+{
 	$modfc_jprof->mark('END: FLEXIcontent Google Maps Module');
 	$msg  = '<br/><br/>' . implode('<br/>', $modfc_jprof->getbuffer());
 	global $fc_performance_msg;
