@@ -33,7 +33,7 @@ class modFlexigooglemapHelper
 	 * @param object    $params       The module parameters
 	 * @param bool      $print_error  If true, print error messages
 	 *
-	 * @return bool
+	 * @return false|object  Returns false if configuration is not valid, otherwise returns the address field object
 	 * @since  3.0.0
 	 */
 	public static function _checkConfiguration($params, $print_error = false)
@@ -109,15 +109,19 @@ class modFlexigooglemapHelper
 		 * Retrieve the items having the map locations (for the given field and the given categories)
 		 */
 		$db = \Joomla\CMS\Factory::getDbo();
-		$queryLoc = 'SELECT a.*, b.field_id, b.value '
+		$queryLoc = 'SELECT a.*, b.field_id, b.value, b.valueorder '
 			. ', CASE WHEN CHAR_LENGTH(a.alias) THEN CONCAT_WS(\':\', a.id, a.alias) ELSE a.id END as itemslug'
 			. ', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as catslug'
+			.' GROUP_CONCAT(cc.id SEPARATOR  ",") AS catidlist, '
+			.' GROUP_CONCAT(cc.alias SEPARATOR  ",") AS  cataliaslist '
 			. ', ext.type_id as type_id'
 			. ' FROM #__content  AS a'
 			. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = a.id '
 			. ' JOIN #__categories AS c ON c.id = a.catid'
 			. ' LEFT JOIN #__flexicontent_fields_item_relations AS b ON a.id = b.item_id '
 			. ' LEFT JOIN #__flexicontent_items_ext AS ext ON a.id = ext.item_id '
+			.' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON a.id=rel.itemid '  // to get info for item's categories
+			.' LEFT JOIN #__categories AS cc ON cc.id=rel.catid '
 			. ' WHERE b.field_id = ' . $fieldAddressId . ' AND ' . $catWhere . '  AND state = 1'
 			. ' ORDER BY title ' . $count;
 		$itemsLoc = $db->setQuery($queryLoc)->loadObjectList();
@@ -159,14 +163,15 @@ class modFlexigooglemapHelper
 	 *                                     (to be used by the module layout)
 	 * @param  object[]  $mapItems        The items having these markers, to be used by the module layout
 	 * @param  object    $module          The module object
+	 * @param  int       $valueOrder      The value order of the location item, used to group-set when the address field is inside a field-group field
 	 *
 	 * @return void
 	 * @since 3.0.0
 	 */
-	public static function renderLocation($params, $locationItem, $locationCoords, &$mapLocations, &$mapItems, $module)
+	public static function renderLocation($params, $locationItem, $locationCoords, &$mapLocations, &$mapItems, $module, $valueOrder)
 	{
+		//echo $valueOrder . '<br>';
 		$layout               = $params->get('layout', 'default');
-		$renderedMapLocations = [];
 		file_exists(dirname(__FILE__) . '/tmpl/' . $layout . '_mapLocation.php')
 			? include(dirname(__FILE__) . '/tmpl/' . $layout . '_mapLocation.php')
 			: include(dirname(__FILE__) . '/tmpl/default_mapLocation.php');
@@ -294,7 +299,7 @@ class modFlexigooglemapHelper
 		 */
 		if ($field)
 		{
-			$field->parameters = new \Joomla\Registry\Registry($field->attribs);
+			$field->parameters = new Registry($field->attribs);
 		}
 
 		/**

@@ -9,35 +9,24 @@ use Joomla\Registry\Registry;
 defined('_JEXEC') or die('Restricted access');
 
 /**
+ * Render the HTML popup window display of location marker for the given item
+ *
  * Use an anonymous function to encapsulate the logic for rendering map locations
  * - this allows us to use the variables $params, $mapItems, and $module without polluting the global namespace.
  * - and also allows to have custom logic for rendering map locations via atemplate file
  *
- * @var  object   $params          see below
- * @var  object   $locationItem    see below
- * @var  string[] $locationCoords  see below
- * @var  string[] $mapLocations    see below
- * @var  object[] $mapItems        see below
- * @var  object   $module          see below
+ * @var   object    $params          The module parameters
+ * @var   object    $locationItem    The item for which the location marker is being rendered
+ * @var   string[]  $locationCoords  The coordinates of the location, indexes:
+ *                                     'lat', 'lon', 'addr1', 'city', 'province', 'state', 'zip', 'country', 'addr_display', 'url', 'custom_marker', 'marker_anchor'
+ * @var   string[]  $mapLocations    The rendered HTML of the popup window display of location marker for the given item.
+ *                                     - a new string is added for each location marker (MATCHES THE INDEX of $mapItems)
+ * @var   object[]  $mapItems        The items having these markers, to be used by the module layout
+ *                                     - a new object is added for each location marker (MATCHES THE INDEX of $mapLocations)
+ * @var   object    $module          The module object
+ * @var   int       $valueOrder      The order of the value in the module, used for ordering the markers
  */
-$renderedMapLocations = (
-	/**
-	 * Render the HTML popup window display of location marker for the given item
-	 *
-	 * @param  object    $params          The module parameters
-	 * @param  object    $locationItem    The item for which the location marker is being rendered
-	 * @param  string[]  $locationCoords  The coordinates of the location, indexes:
-	 *                                     'lat', 'lon', 'addr1', 'city', 'province', 'state', 'zip', 'country', 'addr_display', 'url', 'custom_marker', 'marker_anchor'
-	 * @param  string[]  $mapLocations    The rendered HTML of the popup window display of location marker for the given item.
-	 *                                     - a new string is added for each location marker (MATCHES THE INDEX of $mapItems)
-	 * @param  object[]  $mapItems        The items having these markers, to be used by the module layout
-	 *                                     - a new object is added for each location marker (MATCHES THE INDEX of $mapLocations)
-	 * @param  object    $module          The module object
-	 *
-	 * @return void
-	 * @since 3.0.0
-	 */
-function ($params, $locationItem, $locationCoords, &$mapLocations, &$mapItems, $module)
+(function () use ($params, $locationItem, $locationCoords, &$mapLocations, &$mapItems, $module, $valueOrder)
 {
 	/**
 	 * Get the location coordinates
@@ -80,15 +69,30 @@ function ($params, $locationItem, $locationCoords, &$mapLocations, &$mapItems, $
 		$config[$module->id]['tmpl_html']    =  $params->get('custom_html_with_replacements', '<h4 class="marker-info-title">{item->title}</h4><p>{__address__}</p>');  // The custom HTML with replacements
 
 		/**
-		 * Display address field value to the marker popup window
+		 * Display street address data to the marker popup window
 		 */
 		$config[$module->id]['useadress']    = (int) $params->get('useadress', 1);   // 1: Display the address
 		$config[$module->id]['useadress']    = !$config[$module->id]['infotextmode'] ? $config[$module->id]['useadress'] : strpos($config[$module->id]['tmpl_html'], '{__address__}') !== false;
 
 		/**
-		 * The address field (id
+		 * The address field
 		 */
-		$config[$module->id]['fieldaddressid'] = $params->get('fieldaddressid');
+		$fieldAddressId                        = (int) $params->get('fieldaddressid', 0); // The address field ID
+		$config[$module->id]['fieldaddressid'] = $fieldAddressId;
+		$config[$module->id]['fieldaddress']   = $fieldAddressId ? modFlexigooglemapHelper::getField($fieldAddressId) : null; // The address field object
+
+		/**
+		 * Check if the map-location (address) field is inside a field group, if so then get the field group fields
+		 * - This way when we render the map locations, we will only render the respective value of the current field-group !!!
+		 */
+		$fieldGroupInfo   = $fieldAddressId ? FlexicontentFields::getFieldsPerGroup() : null;
+		$fieldsOfGroupId  = $fieldGroupInfo ? ($fieldGroupInfo->field_to_grp[$fieldAddressId] ?? null) : null;
+		$fieldsOfGroup    = $fieldsOfGroupId ? $fieldGroupInfo->grp_to_field[$fieldsOfGroupId] : [];
+		$fieldsOfGroup    = array_flip(array_map('intval', $fieldsOfGroup));
+		$fNamesAllGroups  = $fieldGroupInfo ? ($fieldGroupInfo->fName_to_grp ?? null) : null;
+		$config[$module->id]['fieldsOfGroupId'] = $fieldsOfGroupId;
+		$config[$module->id]['fieldsOfGroup']   = $fieldsOfGroup;
+		$config[$module->id]['fNamesAllGroups'] = $fNamesAllGroups;
 	}
 
 	$useLink       = $config[$module->id]['uselink'];
@@ -101,14 +105,14 @@ function ($params, $locationItem, $locationCoords, &$mapLocations, &$mapItems, $
 
 	$infoTextMode = $config[$module->id]['infotextmode'];
 	$tmpl_html    = $config[$module->id]['tmpl_html'];
+	$useAddress   = $config[$module->id]['useadress'];
 
-	$useAddress     = $config[$module->id]['useadress'];
-	$fieldAddressId = $config[$module->id]['fieldaddressid'];
+	$fieldAddressId  = $config[$module->id]['fieldaddressid'];
+	$field           = $config[$module->id]['fieldaddress'];
+	$fieldsOfGroupId = $config[$module->id]['fieldsOfGroupId'];
+	$fieldsOfGroup   = $config[$module->id]['fieldsOfGroup'];
+	$fNamesAllGroups = $config[$module->id]['fNamesAllGroups'];
 
-	/**
-	 * Get address (maps) field
-	 */
-	$field = modFlexigooglemapHelper::getField($fieldAddressId);
 
 	/**
 	 * Get image configuration if using custom marker
@@ -142,6 +146,10 @@ function ($params, $locationItem, $locationCoords, &$mapLocations, &$mapItems, $
 		$_item_list = [$item->id => $item];
 		$_itemIDs   = [];
 		$_options   = new stdClass();
+		$_options->fieldsOfGroupId = $fieldsOfGroupId;
+		$_options->fieldsOfGroup   = $fieldsOfGroup;
+		$_options->fNamesAllGroups = $fNamesAllGroups;
+		$_options->valueOrder      = $valueOrder;
 		FlexicontentFields::getFields($_item_list);
 		$relatedItem_html = addslashes(FlexicontentFields::createItemsListHTML($_params, $_item_list, false, false, $_itemIDs, $_options));
 	}
@@ -330,4 +338,4 @@ function ($params, $locationItem, $locationCoords, &$mapLocations, &$mapItems, $
 					") . "
 				]
 				";
-}) ($params, $locationItem, $locationCoords, $mapLocations, $mapItems, $module);
+}) ();

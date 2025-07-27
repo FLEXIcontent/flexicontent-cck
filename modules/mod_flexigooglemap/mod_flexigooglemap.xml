@@ -451,6 +451,7 @@
 						default="0" label="MOD_FLEXIGOOGLEMAP_MARKER_INFO_DISPLAY"
 						description="MOD_FLEXIGOOGLEMAP_MARKER_INFO_DISPLAY_DESC"
 						class="btn-group group-fcinfo"
+						labelclass="label text-white bg-warning label-warning"
 				>
 					<option value="0">MOD_FLEXIGOOGLEMAP_MARKER_INFO_DISPLAY_BASIC</option>
 					<option value="1">MOD_FLEXIGOOGLEMAP_MARKER_INFO_DISPLAY_CUSTOM_HTML</option>

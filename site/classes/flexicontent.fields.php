@@ -11,6 +11,11 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Router\Route;
+use Joomla\Database\DatabaseInterface;
+use Joomla\Registry\Registry;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Plugin\PluginHelper;
@@ -621,7 +626,7 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5.5
 	 */
-	static function getFieldDisplay(&$item_arr, $fieldname, $single_item_vals=null, $method='display', $view = FLEXI_ITEMVIEW, $reload_field_params = true)
+	static function getFieldDisplay(&$item_arr, $fieldname, $single_item_vals=null, $method='display', $view = FLEXI_ITEMVIEW, $reload_field_params = true, $options = null)
 	{
 		// 1. Convert to array of items if not an array already
 		if ( empty($item_arr) ) {
@@ -646,17 +651,17 @@ class FlexicontentFields
 		$_method_html = array();
 		foreach ($items as $item)
 		{
-			// Check if we have already created the display and skip current item
-			if ( isset($item->onDemandFields[$fieldname]->{$method}) )
-			{
-				$_method_html[$item->id] = $item->onDemandFields[$fieldname]->{$method};
-				continue;
-			}
-
 			// Find the field inside item
 			foreach ($item->fields as $field)
 			{
 				if ( !empty($field->name) && $field->name==$fieldname ) break;
+			}
+
+			// Check if we have already created the display and skip current item
+			if ( isset($item->onDemandFields[$fieldname]->{$method}) )
+			{
+				$field->{$method} = $_method_html[$item->id] = $item->onDemandFields[$fieldname]->{$method};
+				continue;
 			}
 
 			// Check for not found field, and skip it, this is either due to no access or wrong name ...
@@ -687,11 +692,17 @@ class FlexicontentFields
 			// Render the (display) method of the field
 			if (!isset($field->{$method}))
 			{
+				/**
+				 * Check if field should be rendered as array because it is a field of a group, and we also have a value-order
+				 */
+				$renderAsArray = $options && isset($options->fieldsOfGroup[$field->id]) && isset($options->valueOrder);
+
+				if ($renderAsArray) $field->ingroup = true;  // Render as array, so that it can be used inside a field group
 				$field = FlexicontentFields::renderField($item, $field, $values, $method, $view, false, false, $reload_field_params);
 			}
 			if (!isset($field->{$method}))
 			{
-				$field->{$method} = '';
+				$field->{$method} = $field->ingroup ? [] : '';
 			}
 
 			// Only cache the result, only if using no values were given, thus DB values were used
@@ -709,6 +720,7 @@ class FlexicontentFields
 			// Not isset should occur only when fieldname was not found
 			$_method_html = isset($_method_html[$item_arr->id]) ? $_method_html[$item_arr->id] : '';
 		}
+
 		return $_method_html;
 	}
 
@@ -5534,12 +5546,12 @@ class FlexicontentFields
 		}
 
 		// Prefix - Suffix - Separator parameters, replacing other field values if found
-		$remove_space	= $params->get( 'remove_space', 0 ) ;
-		$pretext			= $params->get( $isform ? 'pretext_form' : 'pretext', '' ) ;
-		$posttext			= $params->get( $isform ? 'posttext_form' : 'posttext', '' ) ;
-		$separatorf		= $params->get( $isform ? 'separator' : 'separatorf' ) ;
-		$opentag			= $params->get( $isform ? 'opentag_form' : 'opentag', '' ) ;
-		$closetag			= $params->get( $isform ? 'closetag_form' : 'closetag', '' ) ;
+		$remove_space = $params->get( 'remove_space', 0 ) ;
+		$pretext      = $params->get( $isform ? 'pretext_form' : 'pretext', '' ) ;
+		$posttext     = $params->get( $isform ? 'posttext_form' : 'posttext', '' ) ;
+		$separatorf   = $params->get( $isform ? 'separator' : 'separatorf' ) ;
+		$opentag      = $params->get( $isform ? 'opentag_form' : 'opentag', '' ) ;
+		$closetag     = $params->get( $isform ? 'closetag_form' : 'closetag', '' ) ;
 
 		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
 		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
@@ -5577,10 +5589,10 @@ class FlexicontentFields
 
 		// some parameter shortcuts
 		$relitem_html_param = $params->get('relitem_html_override', $isform ? 'relitem_html_form' : 'relitem_html');
-		$relitem_html = $params->get( $relitem_html_param, '__display_text__' ) ;
-		$displayway		= $params->get( $isform ? 'displayway_form' : 'displayway', 1 ) ;
-		$addlink 			= $params->get( $isform ? 'addlink_form' : 'addlink', 1 ) ;
-		$addtooltip		= $params->get( $isform ? 'addtooltip_form' : 'addtooltip', 1 ) ;
+		$relitem_html       = $params->get( $relitem_html_param, '__display_text__' ) ;
+		$displayway	        = $params->get( $isform ? 'displayway_form' : 'displayway', 1 ) ;
+		$addlink            = $params->get( $isform ? 'addlink_form' : 'addlink', 1 ) ;
+		$addtooltip         = $params->get( $isform ? 'addtooltip_form' : 'addtooltip', 1 ) ;
 
 		// Parse and identify custom fields
 		$result = preg_match_all("/\{\{([a-zA-Z_0-9-]+)(##)?([a-zA-Z_0-9-]+)?\}\}/", $relitem_html, $field_matches);
@@ -5674,25 +5686,25 @@ class FlexicontentFields
 			if ($i_slave) $start_microtime = microtime(true);
 
 			$display_var = $custom_field_methods[$i] ? $custom_field_methods[$i] : 'display';
-			FlexicontentFields::getFieldDisplay($item_list, $custom_field_name, $custom_field_values=null, $display_var, $_view);
+			FlexicontentFields::getFieldDisplay($item_list, $custom_field_name, $custom_field_values=null, $display_var, $_view, true, $options);
 
 			if ($i_slave) $fc_run_times['render_subfields'][$i_slave] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		}
 
-		$tooltip_class = ' hasTooltip';
-		$display_html = array();
-		$read_more_about = \Joomla\CMS\Language\Text::_('FLEXI_READ_MORE_ABOUT', true);
+		$tooltip_class   = ' hasTooltip';
+		$display_html    = [];
+		$read_more_about = Text::_('FLEXI_READ_MORE_ABOUT', true);
 		foreach($item_list as $result)
 		{
 			$url_read_more = isset($itemIDs[$result->id]->url_read_more)
-				? \Joomla\CMS\Language\Text::_($itemIDs[$result->id]->url_read_more, true)
+				? Text::_($itemIDs[$result->id]->url_read_more, true)
 				: $read_more_about;
 			$url_class = isset($itemIDs[$result->id]->url_class)
 				? $itemIDs[$result->id]->url_class
 				: 'relateditem';
 
 			// a. Replace some custom made strings
-			$item_url = \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getItemRoute($result->slug, $result->categoryslug, 0, $result));
+			$item_url = Route::_(FlexicontentHelperRoute::getItemRoute($result->slug, $result->categoryslug, 0, $result));
 			$item_title_escaped = htmlspecialchars($result->title, ENT_COMPAT, 'UTF-8');
 
 			$tooltip_title = flexicontent_html::getToolTip($url_read_more, $item_title_escaped, $translate=0, $escape=0);
@@ -5715,17 +5727,26 @@ class FlexicontentFields
 			$err_mssg = 'Cannot replace field: "%s" because it is of not allowed field type: "%s", which can cause loop or other problem';
 			foreach($custom_field_names as $i => $custom_field_name)
 			{
-				$_field = @ $result->fields[$custom_field_name];
+				$_field = $result->fields[$custom_field_name] ?? false;
+
 				$custom_field_display = '';
-				if ($is_disallowed_field = isset($disallowed_fieldnames[$custom_field_name]))
+				if (isset($disallowed_fieldnames[$custom_field_name]))
 				{
-					$custom_field_display .= sprintf($err_mssg, $custom_field_name, @ $_field->field_type);
+					$custom_field_display = sprintf($err_mssg, $custom_field_name, @ $_field->field_type);
 				}
-				else
+				elseif ($_field)
 				{
-					$display_var = $custom_field_methods[$i] ? $custom_field_methods[$i] : 'display';
-					$custom_field_display .= @ $_field->{$display_var};
+					/**
+					 * Check if field should be rendered as array because it is a field of a group, and we also have a value-order
+					 */
+					$display_var   = $custom_field_methods[$i] ? $custom_field_methods[$i] : 'display';
+					$renderAsArray = $options && isset($options->fieldsOfGroup[$_field->id]) && isset($options->valueOrder);
+
+					$custom_field_display = $renderAsArray
+						? ($_field->{$display_var}[$options->valueOrder] ?? '')
+						: ($_field->{$display_var} ?? '');
 				}
+
 				$curr_relitem_html = str_replace($custom_field_reps[$i], $custom_field_display, $curr_relitem_html);
 			}
 
@@ -5815,56 +5836,63 @@ class FlexicontentFields
 	}
 
 
-
-	static function & getFieldsPerGroup()
+	/**
+	 * Get all field groups and their fields
+	 *
+	 * @return object|null
+	 * @since  3.0.0
+	 */
+	static function getFieldsPerGroup()
 	{
-		static $ginfo = null;
-		if ( $ginfo!==null ) return $ginfo;
+		static $groupInfo = null;
+		if ($groupInfo !== null) return $groupInfo;
 
-		$db = \Joomla\CMS\Factory::getDbo();
-		$query = 'SELECT f.* '
-			. ' FROM #__flexicontent_fields AS f '
-			. ' WHERE f.published = 1'
-			. ' AND f.field_type = "fieldgroup" '
-			;
-		$db->setQuery($query);
-		$field_groups = $db->loadObjectList('id');
+		$db    = FLEXI_J40GE ? Factory::getContainer()->get(DatabaseInterface::class) : Factory::getDbo();
+		$query = $db->getQuery(true)
+			->select('f.*')
+			->from($db->quoteName('#__flexicontent_fields', 'f'))
+			->where('f.published = 1')
+			->where('f.field_type = ' . $db->quote('fieldgroup'));
+		$fieldGroups = $db->setQuery($query)->loadObjectList('id');
 
-		$grp_to_field = array();
-		$field_to_grp = array();
+		$fieldsIdToFieldName = $db->setQuery($db->getQuery(true)
+			->select('id, name')
+			->from($db->quoteName('#__flexicontent_fields'))
+		)->loadObjectList('id');
 
-		foreach($field_groups as $field_id => $field_group)
+		$fields_by_groupId        = [];
+		$fieldId_to_groupId_map   = [];
+		$fieldname_to_groupId_map = [];
+
+		foreach($fieldGroups as $fieldGroup_fieldId => $fieldGroup_field)
 		{
-			// Create field parameters, if not already created, NOTEL: for 'custom' fields loadFieldConfig() is optional
-			$field_group->parameters = new \Joomla\Registry\Registry($field_group->attribs);
+			/**
+			 * Parse parameters to get the fields that belong to this field group
+			 * Also translate the label of the field group
+			 */
+			$fieldGroup_field->parameters = new Registry($fieldGroup_field->attribs);
+			$fieldGroup_field->label      = Text::_($fieldGroup_field->label);
 
-			$fieldids = $field_group->parameters->get('fields', array());
+			$fieldIds = $fieldGroup_field->parameters->get('fields', []) ?: [];
+			$fieldIds = is_array($fieldIds) ? $fieldIds : preg_split("/[\|,]/", $fieldIds);
 
-			if (empty($fieldids))
+			foreach ($fieldIds as $groupedFieldId)
 			{
-				$fieldids = array();
-			}
-
-			if (!is_array($fieldids))
-			{
-				$fieldids = preg_split("/[\|,]/", $fieldids);
-			}
-
-			$field_group->label = \Joomla\CMS\Language\Text::_($field_group->label);
-
-			foreach ($fieldids as $grouped_fieldid)
-			{
-				$grp_to_field[$field_id][] = $grouped_fieldid;
-				$field_to_grp[$grouped_fieldid] = $field_id;
+				$groupedFieldName = $fieldsIdToFieldName[$groupedFieldId]->name ?? null;
+				$fields_by_groupId[$fieldGroup_fieldId][]    = $groupedFieldId;
+				$fieldId_to_groupId_map[$groupedFieldId]     = $fieldGroup_fieldId;
+				$fieldname_to_groupId_map[$groupedFieldName] = $fieldGroup_fieldId;
 			}
 		}
 
-		$ginfo = new stdClass;
-		$ginfo->grps = $field_groups;
-		$ginfo->grp_to_field = $grp_to_field;
-		$ginfo->field_to_grp = $field_to_grp;
+		$groupInfo = (object) [
+			'grps'         => $fieldGroups,
+			'grp_to_field' => $fields_by_groupId,
+			'field_to_grp' => $fieldId_to_groupId_map,
+			'fName_to_grp' => $fieldname_to_groupId_map,
+		];
 
-		return $ginfo;
+		return $groupInfo;
 	}
 
 
