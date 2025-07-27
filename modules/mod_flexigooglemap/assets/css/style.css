@@ -4,6 +4,8 @@
 	--marker-actions-btn-width: 120px;
 	--marker-actions-gap: 8px;
 	--absolute-top-row-elements-counter-font-size: 16px;
+	--marker-info-bg-color: white;
+	--marker-info-color: black;
 	display: flex;
 	flex-direction: column;
 	gap: 12px;
@@ -86,7 +88,8 @@ select.geo-locate-zoom-level {}
 .fc_module_marker_list img.fc_module_marker_list_icon {
 	float: left;
 	margin: 0 8px 0 0;
-	height: 2.5em;
+	height: 1em;
+	width: auto;
 	z-index: 1;
 }
 .fc_module_marker_list .marker-info-title {
@@ -190,7 +193,7 @@ select.geo-locate-zoom-level {}
 }
 
 .gm-style-iw {
-	width: 200px !important;
+	width: auto !important;
 	max-width: 500px !important;
 	overflow: visible !important;
 }
@@ -217,7 +220,7 @@ select.geo-locate-zoom-level {}
 .marker-info-contents-box {
 	min-height: 100%;
 	height: unset !important;   /* to make it stretch, so that parent container will be scrollable */
-	padding: 1rem;
+	padding: 0 0.6em;
 	margin: 0;
 	top: 0;
 	background-color: var(--marker-info-bg-color) !important;
@@ -266,9 +269,10 @@ select.geo-locate-zoom-level {}
 }
 .leaflet-popup {
 	width: 80% !important;
+	background: transparent !important;
 }
 .leaflet-popup-content-wrapper {
-	height: 300px;
+	/*height: 300px;*/
 	overflow-y: auto !important;
 	padding: 0 !	important;
 }

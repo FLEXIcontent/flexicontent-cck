@@ -33,7 +33,9 @@ $document->addStyleSheet(Uri::root(true) . '/modules/mod_flexigooglemap/assets/c
 $itemmodel_name = 'FlexicontentModelItem';
 $itemmodel = new $itemmodel_name();
 
-Text::script('MOD_FLEXIGOOGLEMAP_SECHING_TXT');
+Text::script('MOD_FLEXIGOOGLEMAP_GEOLOCATION_NOT_SUPPORTED');
+Text::script('MOD_FLEXIGOOGLEMAP_SEARCHING_TXT');
+Text::script('MOD_FLEXIGOOGLEMAP_GEOLOCATION_UNABLE');
 
 // Module config
 $width  = $params->get('width', '100%');
@@ -114,6 +116,7 @@ $gridsize = $params->get('gridsize', '');
 $maxzoom  = $params->get('maxzoom', '');
 $ratiomap = $params->get('ratiomap', '');
 $usescrollmouse = $params->get('usescrollmouse', 'true');
+$marker_opacity = $params->get('marker_opacity', '0.7');
 
 $clustermode = $params->get('clustermode', '');
 if ($clustermode) {
@@ -138,7 +141,7 @@ switch ($mapapi) {
 		flexicontent_html::loadFramework('openstreetmap', '', $params);
 
 		// Get OS Map TILE server
-		$os_tile_server_url = $params->get('os_tile_server_url', 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'); 
+		$os_tile_server_url = $params->get('os_tile_server_url', 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
 
 		break;
 }
@@ -146,17 +149,27 @@ switch ($mapapi) {
 ?>
 
 <style>
-	#map-bounds-box<?php echo $module->id; ?>.map-bounds-box,
-	#fc_module_map_<?php echo $module->id; ?>.fc_module_map {
-		width: <?php echo $width; ?>;
-		height: <?php echo $height; ?>;
-	}
-	#fc_module_marker_list_box_<?php echo $module->id; ?>.fc_module_marker_list_box {
-		height: calc(<?php echo $height; ?> + var(--fcmap-header-elements-height));
-	}
-	.leaflet-popup-content-wrapper {
-		height: calc(<?php echo $height; ?> / 2) !important;
-	}
+    #map-bounds-box<?= $module->id; ?>.map-bounds-box,
+    #fc_module_map_<?= $module->id; ?>.fc_module_map {
+        width: <?php echo $width; ?>;
+        height: <?php echo $height; ?>;
+    }
+    #fc_module_marker_list_box_<?= $module->id; ?>.fc_module_marker_list_box {
+        height: calc(<?php echo $height; ?> + var(--fcmap-header-elements-height));
+    }
+    .leaflet-popup-content-wrapper {
+        /*height: calc(<?php echo $height; ?> / 2) !important;*/
+    }
+	<?php if ($mapapi === 'openstreetmap'): ?>
+    #fc_module_map_<?= $module->id; ?>.fc_module_map .leaflet-popup-pane {
+        opacity: <?= $marker_opacity ?> !important;
+    }
+	<?php elseif ($mapapi === 'googlemap'): ?>
+    #fc_module_map_<?= $module->id; ?>.fc_module_map .gm-style-iw {
+        opacity: <?= $marker_opacity ?> !important;
+    }
+	<?php endif; ?>
+
 </style>
 
 
@@ -173,23 +186,23 @@ if ($use_map_directions) $actions_btn_count++;
 if ($use_highlight_marker) $actions_btn_count++;
 ?>
 <style>
-	@container (width > <?php echo ($actions_btn_count * 180 - 10) . 'px'; ?>) {
-		.fc_module_marker_list .marker_actions * {
-			flex-wrap: nowrap;
-		}
-	}
-	@container (width <= <?php echo ($actions_btn_count * 180 - 10) . 'px'; ?>) {
-		.fc_module_marker_list .marker_actions {
-			justify-content: right;
-		}
-		.fc_module_marker_list .marker_actions .fc-map-link-icon {
-			margin: 0;
-		}
-		.fc_module_marker_list .marker_actions .fc-map-link-text {
-			display: none;
-		}
-	}
-	/*@container (width < 480px) {
+    @container (width > <?php echo ($actions_btn_count * 180 - 10) . 'px'; ?>) {
+        .fc_module_marker_list .marker_actions * {
+            flex-wrap: nowrap;
+        }
+    }
+    @container (width <= <?php echo ($actions_btn_count * 180 - 10) . 'px'; ?>) {
+        .fc_module_marker_list .marker_actions {
+            justify-content: right;
+        }
+        .fc_module_marker_list .marker_actions .fc-map-link-icon {
+            margin: 0;
+        }
+        .fc_module_marker_list .marker_actions .fc-map-link-text {
+            display: none;
+        }
+    }
+    /*@container (width < 480px) {
 		.fc_module_marker_list * {
 			white-space: wrap;
 		}
@@ -250,34 +263,34 @@ if ($use_mlist)
 		}
 
 		.leaflet-popup-content-wrapper {
-			height: calc({$map_height_wrapped} / 2) !important;
+			/*height: calc({$map_height_wrapped} / 2) !important;*/
 		}
 
 	CSS;
 	?>
 
-<style>
-@media screen and (max-width: <?php echo $marker_list_wrap_limit - 1;?>px) {  <?php /* LEGACY browsers, assume no side column ? */ ?>
-	<?php echo $_inlineCSS_WRAP_WIDTH; ?>
-}
+	<style>
+        @media screen and (max-width: <?php echo $marker_list_wrap_limit - 1;?>px) {  <?php /* LEGACY browsers, assume no side column ? */ ?>
+		<?php echo $_inlineCSS_WRAP_WIDTH; ?>
+        }
 
-@container (width < <?php echo $marker_list_wrap_limit;?>px) {  <?php /* MODERN browsers, regardless of side column */ ?>
-	<?php echo $_inlineCSS_WRAP_WIDTH; ?>
-}
+        @container (width < <?php echo $marker_list_wrap_limit;?>px) {  <?php /* MODERN browsers, regardless of side column */ ?>
+		<?php echo $_inlineCSS_WRAP_WIDTH; ?>
+        }
 
 
-</style>
+	</style>
 
-<?php
+	<?php
 }
 ?>
 
 <?php /* Module container*/ ?>
 
-<div id="mod_fleximap_default<?php echo $module->id; ?>" class="mod_fleximap map<?php echo $moduleclass_sfx ?>">
+<div id="mod_fleximap_default<?= $module->id; ?>" class="mod_fleximap map<?php echo $moduleclass_sfx ?>">
 
-	<div id="map_actions_box_<?php echo $module->id; ?>" class="map_actions_box">
-		<div id="map_mssg_box_<?php echo $module->id; ?>" class="map_mssg_box"></div>
+	<div id="map_actions_box_<?= $module->id; ?>" class="map_actions_box">
+		<div id="map_mssg_box_<?= $module->id; ?>" class="map_mssg_box"></div>
 	</div>
 
 	<?php /*
@@ -286,49 +299,49 @@ if ($use_mlist)
     'zoom' = map.getZoom()
     */ ?>
 
-	<div id="map_contents_box_<?php echo $module->id; ?>" class="map_contents_box">
+	<div id="map_contents_box_<?= $module->id; ?>" class="map_contents_box">
 
 		<div class="<?php echo $use_mlist ? 'col8' : ''; ?>">
 
 			<?php if ($geo_locate_zoom_sel) : ?>
-			<div class="geo-locate-box">
-				<?php echo $geo_locate_btn ? '<span class="btn btn-primary geo-locate-me-btn">
+				<div class="geo-locate-box">
+					<?php echo $geo_locate_btn ? '<span class="btn btn-primary geo-locate-me-btn">
 		      ' . Text::_('MOD_FLEXIGOOGLEMAP_NEARBY_LOCATIONS') . '
 		      </span>
 		      ' : ''; ?>
-				<label class="label geo-locate-zoom-level-lbl">
-					<?php echo Text::_('MOD_FLEXIGOOGLEMAP_ZOOM'); ?>
-				</label>
-				<select class="form-select geo-locate-zoom-level geo-locate-zoom-level-<?php echo $module->id; ?>" style="display: inline-block; width: auto;">
-					<?php
-					$distance_lbls = array(
-						15 => Text::_('MOD_FLEXIGOOGLEMAP_DIST_CLOSED'),
-						10 => Text::_('MOD_FLEXIGOOGLEMAP_DIST_DISTANT'),
-						7 => Text::_('MOD_FLEXIGOOGLEMAP_DIST_VERYDISTANT'),
-						2 => Text::_('MOD_FLEXIGOOGLEMAP_DIST_MOSTDIST'),
-					);
+					<label class="label geo-locate-zoom-level-lbl">
+						<?php echo Text::_('MOD_FLEXIGOOGLEMAP_ZOOM'); ?>
+					</label>
+					<select class="form-select geo-locate-zoom-level geo-locate-zoom-level-<?= $module->id; ?>" style="display: inline-block; width: auto;">
+						<?php
+						$distance_lbls = array(
+							15 => Text::_('MOD_FLEXIGOOGLEMAP_DIST_CLOSED'),
+							10 => Text::_('MOD_FLEXIGOOGLEMAP_DIST_DISTANT'),
+							7 => Text::_('MOD_FLEXIGOOGLEMAP_DIST_VERYDISTANT'),
+							2 => Text::_('MOD_FLEXIGOOGLEMAP_DIST_MOSTDIST'),
+						);
 
-					for ($i = 15; $i >= 2; $i--) {
-						$km_distance = ((40000 / pow(2, $i)) * 2) ;
-						$km_distance = round($km_distance, 1);
-						$km_distance = $km_distance == 2.4 ? 2.5 : $km_distance;
-						$km_distance = $km_distance == 4.9 ? 5 : $km_distance;
-						$km_distance = $km_distance > 5 ? ceil($km_distance) : $km_distance;
+						for ($i = 15; $i >= 2; $i--) {
+							$km_distance = ((40000 / pow(2, $i)) * 2) ;
+							$km_distance = round($km_distance, 1);
+							$km_distance = $km_distance == 2.4 ? 2.5 : $km_distance;
+							$km_distance = $km_distance == 4.9 ? 5 : $km_distance;
+							$km_distance = $km_distance > 5 ? ceil($km_distance) : $km_distance;
 
-						$distance_lbls[$i] = $km_distance . ' ' . Text::_('MOD_FLEXIGOOGLEMAP_KILOMETERS');
-						echo '
+							$distance_lbls[$i] = $km_distance . ' ' . Text::_('MOD_FLEXIGOOGLEMAP_KILOMETERS');
+							echo '
             <option value="' . $i . '"' . ($i == $geo_locate_zoom_def ? ' selected="selected"' : '')
-							. '> ' . (isset($distance_lbls[$i]) ? $distance_lbls[$i] : 'Zoom: ' . $i)
-							. '</option>';
-					}
-					?>
-				</select>
-			</div>
+								. '> ' . (isset($distance_lbls[$i]) ? $distance_lbls[$i] : 'Zoom: ' . $i)
+								. '</option>';
+						}
+						?>
+					</select>
+				</div>
 			<?php endif; ?>
 
 			<?php /* Map bounding box */ ?>
-			<div id="map-bounds-box<?php echo $module->id; ?>" class="map-bounds-box" style="max-width:100%;">
-				<div id="fc_module_map_<?php echo $module->id; ?>" class="fc_module_map" style="max-width:100%; z-index:1;"></div>
+			<div id="map-bounds-box<?= $module->id; ?>" class="map-bounds-box" style="max-width:100%;">
+				<div id="fc_module_map_<?= $module->id; ?>" class="fc_module_map" style="max-width:100%; z-index:1;"></div>
 			</div>
 
 		</div>
@@ -337,17 +350,106 @@ if ($use_mlist)
 			Text::script("MOD_FLEXIGOOGLEMAP_MARKERS_LIST_HEADER_0_ENTRIES", true);
 			Text::script("MOD_FLEXIGOOGLEMAP_MARKERS_LIST_HEADER_1_ENTRY", true);
 			Text::script("MOD_FLEXIGOOGLEMAP_MARKERS_LIST_HEADER_N_ENTRIES", true);
-		?>
+			?>
 			<div class="col4">
-				<div id="fc_module_marker_list_box_<?php echo $module->id; ?>" class="fc_module_marker_list_box">
-					<div id="fc_module_marker_list_header_<?php echo $module->id; ?>" class="fc_module_marker_list_header"></div>
-					<ol id="fc_module_marker_list_<?php echo $module->id; ?>" class="fc_module_marker_list"></ol>
+				<div id="fc_module_marker_list_box_<?= $module->id; ?>" class="fc_module_marker_list_box">
+					<div id="fc_module_marker_list_header_<?= $module->id; ?>" class="fc_module_marker_list_header"></div>
+					<ol id="fc_module_marker_list_<?= $module->id; ?>" class="fc_module_marker_list"></ol>
 				</div>
 			</div>
 		<?php endif; ?>
 	</div>
 
 </div>
+
+<script>
+	let isGoogleMap_<?= $module->id; ?>     = <?php echo $mapapi === 'googlemap' ? 'true' : 'false'; ?>;
+	let isOpenStreetMap_<?= $module->id; ?> = <?php echo $mapapi === 'openstreetmap' ? 'true' : 'false'; ?>;
+
+	function fc_MapMod_markerContained<?= $module->id; ?>(mapBounds, marker)
+	{
+		if (isGoogleMap_<?= $module->id; ?>)
+			return mapBounds.contains(marker.getPosition());
+		else if (isOpenStreetMap_<?= $module->id; ?>)
+			return marker instanceof L.Marker && mapBounds.contains(marker.getLatLng());
+		else {
+			window.console.error('Unknown map API');
+			return false;
+		}
+	}
+
+	function fc_MapMod_updateVisibleMarkerList_<?= $module->id; ?>(map, markers)
+	{
+		//window.console.log('bounds_changed');
+		/**
+		 * Get our current map view bounds.
+		 * Create a new bounds object so we don't affect the map.
+		 */
+		let ol        = document.getElementById("fc_module_marker_list_<?= $module->id; ?>");
+		let ol_header = document.getElementById("fc_module_marker_list_header_<?= $module->id; ?>");
+		if (!!!ol) return;
+
+		ol.innerHTML = "";
+
+		let mapBounds = isGoogleMap_<?= $module->id; ?>
+			? new google.maps.LatLngBounds(map.getBounds().getSouthWest(), map.getBounds().getNorthEast())
+			: map.getBounds();
+		let added     = 0;
+
+		// Loop through markers using markers array length
+		for (let i = 0; i < markers.length; i++)
+		{
+			let marker = markers[i];
+			if (fc_MapMod_markerContained<?= $module->id; ?>(mapBounds, marker))
+			{
+				added++;
+				fc_MapMod_addToVisibleList_<?= $module->id; ?>(map, marker);
+			}
+		}
+
+		let header_html = added === 1 ?
+			Joomla.Text._('MOD_FLEXIGOOGLEMAP_MARKERS_LIST_HEADER_1_ENTRY') :
+			(added === 0 ?
+				Joomla.Text._('MOD_FLEXIGOOGLEMAP_MARKERS_LIST_HEADER_0_ENTRIES') :
+				Joomla.Text._('MOD_FLEXIGOOGLEMAP_MARKERS_LIST_HEADER_N_ENTRIES'));
+		ol_header.innerHTML = header_html.replace(/%s/, added);
+	}
+
+
+	function fc_MapMad_geolocateMe_<?= $module->id; ?>(map)
+	{
+		let output     = document.getElementById('map_mssg_box_<?= $module->id; ?>');
+		let zoom_level = jQuery('select.geo-locate-zoom-level-<?= $module->id; ?>').val();
+		zoom_level     = parseInt(zoom_level) ? parseInt(zoom_level) : <?php echo $geo_locate_zoom_def; ?>;
+
+		if (!navigator.geolocation) {
+			output.innerHTML = '<span class="geo-location-no-support" style="color: darkred;">' + Joomla.Text._('MOD_FLEXIGOOGLEMAP_GEOLOCATION_NOT_SUPPORTED') + '</span>';
+			return;
+		}
+
+		function success(position) {
+			let latitude     = position.coords.latitude;
+			let longitude    = position.coords.longitude;
+			output.innerHTML = '<span class="geo-location-results" style="display:none;">Lat: ' + latitude + '° <br>Lng: ' + longitude + '°</span>';
+			if (isGoogleMap_<?= $module->id; ?>) {
+				map.panTo(new google.maps.LatLng(latitude, longitude));
+				map.setZoom(zoom_level);
+			}
+			else if (isOpenStreetMap_<?= $module->id; ?>) {
+				map.flyTo([latitude, longitude], zoom_level);
+			} else {
+				window.console.error('Unknown map API');
+			}
+		}
+		function error() {
+			output.innerHTML = '<span class="geo-location-blocked">' + Joomla.Text._('MOD_FLEXIGOOGLEMAP_GEOLOCATION_UNABLE') + '</span>';
+		}
+
+		output.innerHTML = '<span class="geo-location-trying" style="align-self: center;">'+ Joomla.Text._('MOD_FLEXIGOOGLEMAP_SEARCHING_TXT') + '</span>';
+
+		navigator.geolocation.getCurrentPosition(success, error);
+	}
+</script>
 
 
 <?php if ($mapapi === 'googlemap') : ?>
@@ -356,53 +458,26 @@ if ($use_mlist)
 	<script src="modules/mod_flexigooglemap/assets/js/markerclusterer.js"></script>
 	<script>
 		// Global reference to map
-		var module_map_<?php echo $module->id; ?>;
+		var module_map_<?= $module->id; ?>;
 
-		function fc_MapMad_geolocateMe_<?php echo $module->id; ?>(map) {
-			let output = document.getElementById('map_mssg_box_<?php echo $module->id; ?>');
-			let zoom_level = jQuery('select.geo-locate-zoom-level-<?php echo $module->id; ?>').val();
-			zoom_level = parseInt(zoom_level) ? parseInt(zoom_level) : <?php echo $geo_locate_zoom_def; ?>;
 
-			if (!navigator.geolocation) {
-				output.innerHTML = '<span class="geo-location-no-support" style="color: darkred;">Geolocation is not supported by your browser</span>';
-				return;
-			}
-
-			function success(position) {
-				var latitude = position.coords.latitude;
-				var longitude = position.coords.longitude;
-				output.innerHTML = '<span class="geo-location-results" style="display:none;">Lat: ' + latitude + '° <br>Lng: ' + longitude + '°</span>';
-				map.panTo(new google.maps.LatLng(latitude, longitude));
-				map.setZoom(zoom_level);
-			}
-
-			function error() {
-				output.innerHTML = '<span class="geo-location-blocked">Unable to retrieve your location</span>';
-			}
-
-			output.innerHTML = '<span class="geo-location-trying" style="align-self: center;">'+ Joomla.JText._('MOD_FLEXIGOOGLEMAP_SECHING_TXT') +
-			'</span>';
-
-			navigator.geolocation.getCurrentPosition(success, error);
-		}
-
-		function fc_MapMod_addToVisibleList_<?php echo $module->id; ?>(map, marker)
+		function fc_MapMod_addToVisibleList_<?= $module->id; ?>(map, marker)
 		{
-			let ol = document.getElementById("fc_module_marker_list_<?php echo $module->id; ?>");
+			let ol = document.getElementById("fc_module_marker_list_<?= $module->id; ?>");
 			if (!!!ol) return;
 
 			let li = document.createElement("li");
 			li.innerHTML = '<img class="fc_module_marker_list_icon" src="' + marker._icon_url + '" /> ' + marker._location_info;
 
-			/*var btn = document.createElement("button");
+			/*let btn = document.createElement("button");
 			btn.innerHTML = 'Center';
 			btn._marker_ref = marker;
 			btn.setAttribute('onclick', "this._marker_ref._map_ref.setCenter(this._marker_ref.getPosition());");
 			li.appendChild(btn);*/
 
-			let btn_div = document.createElement("div");
-			let btn_link     = document.createElement("a");
-			btn_div.className = 'marker_highlight';
+			let btn_div        = document.createElement("div");
+			let btn_link       = document.createElement("a");
+			btn_div.className  = 'marker_highlight';
 			btn_link.innerHTML = '<span class="fc-map-link-icon"></span> <span class="fc-map-link-text"><?php echo Text::_("MOD_FLEXIGOOGLEMAP_MARKER_HIGHLIGHT_ENTRY", true) ?></span>';
 			btn_link.className = 'fc-map-link btn btn btn-secondary';
 			btn_link._marker_ref = marker;
@@ -415,41 +490,12 @@ if ($use_mlist)
 			ol.appendChild(li);
 		}
 
-		function fc_MapMod_updateVisibleMarkerList_<?php echo $module->id; ?>(map, markers) {
-			//window.console.log('bounds_changed');
-
-			// Get our current map view bounds.
-			// Create a new bounds object so we don't affect the map.
-			var ol = document.getElementById("fc_module_marker_list_<?php echo $module->id; ?>");
-			var ol_header = document.getElementById("fc_module_marker_list_header_<?php echo $module->id; ?>");
-			if (!!!ol) return;
-
-			ol.innerHTML = "";
-
-			var mapBounds = new google.maps.LatLngBounds(map.getBounds().getSouthWest(), map.getBounds().getNorthEast());
-			var bounds = mapBounds;
-			var added = 0;
-
-			for (var i = 0, marker; marker = markers[i]; i++) {
-				if (bounds.contains(marker.getPosition())) {
-					added++;
-					fc_MapMod_addToVisibleList_<?php echo $module->id; ?>(map, marker);
-				}
-			}
-
-			var header_html = added == 1 ?
-				Joomla.JText._('MOD_FLEXIGOOGLEMAP_MARKERS_LIST_HEADER_1_ENTRY') :
-				(added == 0 ?
-					Joomla.JText._('MOD_FLEXIGOOGLEMAP_MARKERS_LIST_HEADER_0_ENTRIES') :
-					Joomla.JText._('MOD_FLEXIGOOGLEMAP_MARKERS_LIST_HEADER_N_ENTRIES'));
-			ol_header.innerHTML = header_html.replace(/%s/, added);
-		};
-
-		function fc_MapMod_autoCenter_<?php echo $module->id; ?>(map, markers) {
+		function fc_MapMod_autoCenter_<?= $module->id; ?>(map, markers)
+		{
 			//  Create a new viewpoint bound
-			var bounds = new google.maps.LatLngBounds();
+			let bounds = new google.maps.LatLngBounds();
 			//  Go through each...
-			for (var i = 0; i < markers.length; i++) {
+			for (let i = 0; i < markers.length; i++) {
 				bounds.extend(markers[i].position);
 			}
 			//  Fit these bounds to the map
@@ -457,33 +503,39 @@ if ($use_mlist)
 		}
 
 
-		function fc_MapMod_resizeMap_<?php echo $module->id; ?>(map) {
+		function fc_MapMod_resizeMap_<?= $module->id; ?>(map)
+		{
 			//window.console.log('resizing');
-			var center = map.getCenter();
+			let center = map.getCenter();
 			google.maps.event.trigger(map, "resize");
 			map.setCenter(center);
 		}
 
 
-		function fc_MapMod_on_marker_click_<?php echo $module->id; ?>(e) {
+		function fc_MapMod_on_marker_click_<?= $module->id; ?>(e)
+		{
 			<?php echo $onclick_js; ?>
-			fc_MapMod_on_marker_add_styles<?php echo $module->id; ?>();
+			fc_MapMod_on_marker_add_styles<?= $module->id; ?>();
 		}
 
-		function fc_MapMod_on_marker_add_styles<?php echo $module->id; ?>(e) {
+		function fc_MapMod_on_marker_add_styles<?= $module->id; ?>(e)
+		{
 			setTimeout(function() {
 				document.querySelectorAll('.gm-style-iw').forEach(element => element.classList.add('fc-mod-map'));
 			}, 1);
 		}
 
-		window.clusterManager_<?php echo $module->id; ?> = false;
+		window.clusterManager_<?= $module->id; ?> = false;
 
-		function fc_MapMod_initialize_<?php echo $module->id; ?>() {
-			// Define your locations: HTML content for the info window, latitude, longitude
-			var locations = [<?php echo implode(",",  $renderedMapLocations); ?>];
-			var mapItems = <?php echo json_encode($mapItemData); ?>;
+		function fc_MapMod_initialize_<?= $module->id; ?>()
+		{
+			/**
+			 * Define your locations: HTML content for the info window, latitude, longitude
+			 */
+			let locations = [<?php echo implode(",",  $renderedMapLocations); ?>];
+			let mapItems = <?php echo json_encode($mapItemData); ?>;
 
-			var map = new google.maps.Map(document.getElementById('fc_module_map_<?php echo $module->id; ?>'), {
+			let map = new google.maps.Map(document.getElementById('fc_module_map_<?= $module->id; ?>'), {
 				maxZoom: [<?php echo $maxzoommarker; ?>],
 				center: new google.maps.LatLng(-37.92, 151.25),
 				mapTypeId: google.maps.MapTypeId.<?php echo $maptype; ?>,
@@ -498,26 +550,27 @@ if ($use_mlist)
 			});
 
 			// Initialize Spiderify for overlapping markers
-			var oms = new OverlappingMarkerSpiderfier(map);
+			let oms = new OverlappingMarkerSpiderfier(map);
 
-			var infowindow = new google.maps.InfoWindow({
+			let infowindow = new google.maps.InfoWindow({
 				maxWidth: 160
 			});
 
-			var markers = new Array();
-			var defaultMarkerIcon = <?php echo !$defaultMarkerURL ? 'null;' : '{
+			let markers = new Array();
+			let defaultMarkerIcon = <?php echo !$defaultMarkerURL ? 'null;' : '{
 				url: \'' . $defaultMarkerURL . '\'' .
-										// Unlike Openstreet Map (which position top-left) Google maps will position bottom-middle, so we may have skipped calculating these ...)
-										($wS_dMU && $hS_dMU ? ',
+			// Unlike Openstreet Map (which position top-left) Google maps will position bottom-middle, so we may have skipped calculating these ...)
+			($wS_dMU && $hS_dMU ? ',
 					size: new google.maps.Size(' . $wS_dMU . ', ' . $hS_dMU . '),
 					origin: new google.maps.Point(0, 0),
 					anchor:  new google.maps.Point(' . $wA_dMU . ', ' . $hA_dMU . ')'
-											: '') . '
+				: '') . '
 			}
 			'; ?>
 
 			// Add the markers and infowindows to the map
-			for (var i = 0; i < locations.length; i++) {
+			for (let i = 0; i < locations.length; i++)
+			{
 				let customMarkerIcon = locations[i][3] == '__default__' ?
 					defaultMarkerIcon :
 					{
@@ -527,7 +580,7 @@ if ($use_mlist)
 						anchor: new google.maps.Point(locations[i][6], locations[i][7])
 					};
 
-				var marker = new google.maps.Marker({
+				let marker = new google.maps.Marker({
 					position: new google.maps.LatLng(locations[i][1], locations[i][2]),
 					map: map,
 					icon: customMarkerIcon
@@ -546,15 +599,15 @@ if ($use_mlist)
 
 				jQuery(marker).data('content_link', mapItems[i].content_link);
 				if (<?php echo strlen($onclick_js) ? 1 : 0 ?>)
-					google.maps.event.addListener(marker, 'click', fc_MapMod_on_marker_click_<?php echo $module->id; ?>);
+					google.maps.event.addListener(marker, 'click', fc_MapMod_on_marker_click_<?= $module->id; ?>);
 				else {
-					google.maps.event.addListener(marker, 'click', fc_MapMod_on_marker_add_styles<?php echo $module->id; ?>);
+					google.maps.event.addListener(marker, 'click', fc_MapMod_on_marker_add_styles<?= $module->id; ?>);
 				}
 
 				markers[i] = marker;
 
 				<?php if ($info_popup) {
-					echo "
+				echo "
 					google.maps.event.addListener(marker, 'click', (function(marker, i)
 					{
 						return function() {
@@ -564,7 +617,7 @@ if ($use_mlist)
 							{
 								let clusters = window.clusterManager_" . $module->id .".clusters_; // use the get clusters method which returns an array of objects
 		
-								if (!!clusters) for( var ii=0, ll=clusters.length; ii<ll; ii++ )
+								if (!!clusters) for( let ii=0, ll=clusters.length; ii<ll; ii++ )
 								{
 									if (clusters[ii].markers_.length <= 1) continue;
 									found_inside_cluster = clusters[ii].isMarkerInClusterBounds(marker);
@@ -583,20 +636,20 @@ if ($use_mlist)
 						}
 					})(marker, i));
 					";
-				}
+			}
 				?>
 			}
 
-			var fc_MapMod_resizeMap_debounced_<?php echo $module->id; ?> = fc_debounce_exec(fc_MapMod_resizeMap_<?php echo $module->id; ?>, 200, false, null);
-			var fc_MapMod_updateVisibleMarkerList_debounced_<?php echo $module->id; ?> = fc_debounce_exec(fc_MapMod_updateVisibleMarkerList_<?php echo $module->id; ?>, 200, false, null);
+			let fc_MapMod_resizeMap_debounced_<?= $module->id; ?> = fc_debounce_exec(fc_MapMod_resizeMap_<?= $module->id; ?>, 200, false, null);
+			let fc_MapMod_updateVisibleMarkerList_debounced_<?= $module->id; ?> = fc_debounce_exec(fc_MapMod_updateVisibleMarkerList_<?= $module->id; ?>, 200, false, null);
 
 			google.maps.event.addDomListener(window, "resize", function() {
-				fc_MapMod_resizeMap_debounced_<?php echo $module->id; ?>(map);
+				fc_MapMod_resizeMap_debounced_<?= $module->id; ?>(map);
 			});
 
 			<?php if ($clustermode) {
-				echo "
-				var mcOptions = {
+			echo "
+				let mcOptions = {
 					zoomOnClick: true,
 					gridSize:$gridsize,
 					maxZoom:$maxzoom,
@@ -608,38 +661,38 @@ if ($use_mlist)
 				};
 				window.clusterManager_" . $module->id ." = new MarkerClusterer(map, markers, mcOptions);
 				";
-			}
+		}
 			?>
 
 			// Center to markers
-			fc_MapMod_autoCenter_<?php echo $module->id; ?>(map, markers);
+			fc_MapMod_autoCenter_<?= $module->id; ?>(map, markers);
 
 			// Try to geo-locate visitor
 			if (<?php echo $geo_locate ? 1 : 0; ?>) setTimeout(function() {
-				fc_MapMad_geolocateMe_<?php echo $module->id; ?>(map);
+				fc_MapMad_geolocateMe_<?= $module->id; ?>(map);
 			}, 50);
 
 			// Assign global map reference
-			module_map_<?php echo $module->id; ?> = map;
+			module_map_<?= $module->id; ?> = map;
 
 			<?php /* Either update visible markers only once on initialization (on first triggering of bounds_changed event) or whenever the map bounds change */ ?>
-			var marker_list_update_to_map_bounds = <?php echo $marker_list_update_to_map_bounds ? 'true' : 'false'; ?>;
-			var marker_list_updates = 0;
+			let marker_list_update_to_map_bounds = <?php echo $marker_list_update_to_map_bounds ? 'true' : 'false'; ?>;
+			let marker_list_updates = 0;
 			google.maps.event.addDomListener(map, "bounds_changed", function() {
 				if (marker_list_update_to_map_bounds || marker_list_updates === 0) {
 					marker_list_updates++;
-					fc_MapMod_updateVisibleMarkerList_debounced_<?php echo $module->id; ?>(map, markers);
+					fc_MapMod_updateVisibleMarkerList_debounced_<?= $module->id; ?>(map, markers);
 				}
 			});
 		}
 
 		// Initialize the Map
-		fc_MapMod_initialize_<?php echo $module->id; ?>();
+		fc_MapMod_initialize_<?= $module->id; ?>();
 
 		// Geo locate visitor on-demand via button click
 		document.addEventListener("click", function(e) {
 			if (e.target && e.target.classList.contains("geo-locate-me-btn")) {
-				fc_MapMad_geolocateMe_<?php echo $module->id; ?>(module_map_<?php echo $module->id; ?>);
+				fc_MapMad_geolocateMe_<?= $module->id; ?>(module_map_<?= $module->id; ?>);
 			}
 		});
 	</script>
@@ -650,46 +703,19 @@ if ($use_mlist)
 
 	<script type="text/javascript">
 		// Global reference to map
-		var module_map_<?php echo $module->id; ?>;
+		var module_map_<?= $module->id; ?>;
 
-		function fc_MapMad_geolocateMe_<?php echo $module->id; ?>(map) {
-			let output = document.getElementById('map_mssg_box_<?php echo $module->id; ?>');
-			let zoom_level = jQuery('select.geo-locate-zoom-level-<?php echo $module->id; ?>').val();
-			zoom_level = parseInt(zoom_level) ? parseInt(zoom_level) : <?php echo $geo_locate_zoom_def; ?>;
-
-			if (!navigator.geolocation) {
-				output.innerHTML = '<span class="geo-location-no-support" style="color: darkred;">Geolocation is not supported by your browser</span>';
-				return;
-			}
-
-			function success(position) {
-				var latitude = position.coords.latitude;
-				var longitude = position.coords.longitude;
-				output.innerHTML = '<span class="geo-location-results" style="display:none;">Lat: ' + latitude + '° <br>Lng: ' + longitude + '°</span>';
-				map.flyTo([latitude, longitude], zoom_level);
-			}
-
-			function error() {
-				output.innerHTML = '<span class="geo-location-blocked">Unable to retrieve your location</span>';
-			}
-
-			output.innerHTML = '<span class="geo-location-trying" style="align-self: center;">Searching ...</span>';
-
-			navigator.geolocation.getCurrentPosition(success, error);
-		}
-
-
-		function fc_MapMod_addToVisibleList_<?php echo $module->id; ?>(map, marker)
+		function fc_MapMod_addToVisibleList_<?= $module->id; ?>(map, marker)
 		{
-			let ol = document.getElementById("fc_module_marker_list_<?php echo $module->id; ?>");
+			let ol = document.getElementById("fc_module_marker_list_<?= $module->id; ?>");
 			if (!!!ol) return;
 
 			let li = document.createElement("li");
 			li.innerHTML = '<img class="fc_module_marker_list_icon" src="' + marker._icon_url + '" /> ' + marker._location_info;
 
-			let btn_div = document.createElement("div");
-			let btn_link     = document.createElement("a");
-			btn_div.className = 'marker_highlight';
+			let btn_div        = document.createElement("div");
+			let btn_link       = document.createElement("a");
+			btn_div.className  = 'marker_highlight';
 			btn_link.innerHTML = '<span class="fc-map-link-icon"></span> <span class="fc-map-link-text"><?php echo Text::_("MOD_FLEXIGOOGLEMAP_MARKER_HIGHLIGHT_ENTRY", true) ?></span>';
 			btn_link.className = 'fc-map-link btn btn btn-secondary';
 			btn_link._marker_ref = marker;
@@ -697,9 +723,9 @@ if ($use_mlist)
 			<?php /* Add single location marker */
 			echo $clustermode ? '
 				btn_link.onclick = function () {
-					var marker = this._marker_ref;
-					var map    = marker._map_ref;
-					var mLayer = marker.theMarkerClusters_.getLayer(marker._leaflet_id);
+					let marker = this._marker_ref;
+					let map    = marker._map_ref;
+					let mLayer = marker.theMarkerClusters_.getLayer(marker._leaflet_id);
 
 					if (!map.hasLayer(marker))
 					{
@@ -718,9 +744,9 @@ if ($use_mlist)
 				};
 				' : '
 				btn_link.onclick = function () {
-					var marker = this._marker_ref;
-					var map    = marker._map_ref;
-					var mLayer = map._topLayerGroup_ref.getLayer(marker._leaflet_id);
+					let marker = this._marker_ref;
+					let map    = marker._map_ref;
+					let mLayer = map._topLayerGroup_ref.getLayer(marker._leaflet_id);
 					//map.setView([marker._latlng.lat, marker._latlng.lng], 9);
 					mLayer.openPopup(); //marker.fire(\'click\');
 				};
@@ -733,77 +759,45 @@ if ($use_mlist)
 			ol.appendChild(li);
 		}
 
-
-		function fc_MapMod_updateVisibleMarkerList_<?php echo $module->id; ?>(map, markers) {
-			//window.console.log('bounds_changed');
-
-			// Get our current map view bounds.
-			// Create a new bounds object so we don't affect the map.
-			var ol = document.getElementById("fc_module_marker_list_<?php echo $module->id; ?>");
-			var ol_header = document.getElementById("fc_module_marker_list_header_<?php echo $module->id; ?>");
-			if (!!!ol) return;
-
-			ol.innerHTML = "";
-
-			var mapBounds = map.getBounds();
-			var bounds = mapBounds;
-			var added = 0;
-
-			for (var i = 0, marker; marker = markers[i]; i++) {
-				if (marker instanceof L.Marker && bounds.contains(marker.getLatLng())) {
-					added++;
-					fc_MapMod_addToVisibleList_<?php echo $module->id; ?>(map, marker);
-				}
-			}
-
-			var header_html = added == 1 ?
-				Joomla.JText._('MOD_FLEXIGOOGLEMAP_MARKERS_LIST_HEADER_1_ENTRY') :
-				(added == 0 ?
-					Joomla.JText._('MOD_FLEXIGOOGLEMAP_MARKERS_LIST_HEADER_0_ENTRIES') :
-					Joomla.JText._('MOD_FLEXIGOOGLEMAP_MARKERS_LIST_HEADER_N_ENTRIES'));
-			ol_header.innerHTML = header_html.replace(/%s/, added);
-		};
-
-
-		function fc_MapMod_on_marker_click_<?php echo $module->id; ?>(e) {
+		function fc_MapMod_on_marker_click_<?= $module->id; ?>(e) {
 			<?php echo $onclick_js; ?>
 		}
 
 
-		function fc_MapMod_initialize_<?php echo $module->id; ?>() {
-			var locations = [<?php echo implode(",",  $renderedMapLocations); ?>];
-			var mapItems = <?php echo json_encode($mapItemData); ?>;
+		function fc_MapMod_initialize_<?= $module->id; ?>() {
+			let locations = [<?php echo implode(",",  $renderedMapLocations); ?>];
+			let mapItems = <?php echo json_encode($mapItemData); ?>;
 
-			var markerClusters;
-			var markers = [];
+			let markerClusters;
+			let markers = [];
 
-			var lat = 48.852969;
-			var lon = 2.349903;
+			let lat = 48.852969;
+			let lon = 2.349903;
 
-			var map = L.map('fc_module_map_<?php echo $module->id; ?>', {
+			let map = L.map('fc_module_map_<?= $module->id; ?>', {
 				scrollWheelZoom: <?php echo $usescrollmouse; ?>
 			}).setView([lat, lon], 11);
 			<?php if ($clustermode) {
-				echo "markerClusters = L.markerClusterGroup({ disableClusteringAtZoom: " . $maxzoommarker . ",removeOutsideVisibleBounds:true,animate:true, maxClusterRadius :" . $gridsize, " }); "; // create cluster and add zoom limitation
-			}
+			echo "markerClusters = L.markerClusterGroup({ disableClusteringAtZoom: " . $maxzoommarker . ",removeOutsideVisibleBounds:true,animate:true, maxClusterRadius :" . $gridsize, " }); "; // create cluster and add zoom limitation
+		}
 			?>
 			// Title display
 			L.tileLayer('<?php echo $os_tile_server_url; ?>', {
-					// Datas sources
-					attribution: '<?php echo Text::_('OPENSTREETMAP_ATTRIBUTION_TXT'); ?>',
-					minZoom: 1,
-					maxZoom: <?php echo $maxzoom; ?>
-				})
+				// Datas sources
+				attribution: '<?php echo Text::_('OPENSTREETMAP_ATTRIBUTION_TXT'); ?>',
+				minZoom: 1,
+				maxZoom: <?php echo $maxzoom; ?>
+			})
 				.addTo(map);
 
-			var defaultMarkerIcon = <?php echo !$defaultMarkerURL ? 'null' : 'L.icon({
+			let defaultMarkerIcon = <?php echo !$defaultMarkerURL ? 'null' : 'L.icon({
 				iconUrl: \'' . $defaultMarkerURL . '\',
 				iconSize: [' . $wS_dMU . ', ' . $hS_dMU . '],
 				iconAnchor: [' . $wA_dMU . ', ' . $hA_dMU . ']
 			});
 			'; ?>
 
-			for (var i = 0; i < locations.length; i++) {
+			for (let i = 0; i < locations.length; i++) {
 				<?php /* TODO Add Mapbox key and title loading for custom display */ ?>
 				let customMarkerIcon = locations[i][3] == '__default__' ?
 					defaultMarkerIcon :
@@ -824,10 +818,11 @@ if ($use_mlist)
 				marker._location_info = locations[i][0];
 				marker._icon_url = locations[i][3] == '__default__' ? '<?php echo $defaultMarkerURL ?: $defaut_icon_url; ?>' : locations[i][3];
 				marker._map_ref = map;
+				//marker.setOpacity(<?php echo $marker_opacity; ?>);
 
 				jQuery(marker).data('content_link', mapItems[i].content_link);
 				if (<?php echo strlen($onclick_js) ? 1 : 0 ?>)
-					marker.on('click', fc_MapMod_on_marker_click_<?php echo $module->id; ?>);
+					marker.on('click', fc_MapMod_on_marker_click_<?= $module->id; ?>);
 
 				marker
 				<?php /* Display information window on marker click */
@@ -846,10 +841,10 @@ if ($use_mlist)
 					'markerClusters.addLayer(marker); marker.theMarkerClusters_ = markerClusters;' : ''; ?>
 				markers.push(marker);
 			}
-			var group = new L.featureGroup(markers);
+			let group = new L.featureGroup(markers);
 
 			<?php echo $clustermode ?
-				'map.addLayer(markerClusters);' : ''; ?>
+			'map.addLayer(markerClusters);' : ''; ?>
 
 			map._topLayerGroup_ref = group;
 
@@ -860,44 +855,45 @@ if ($use_mlist)
 
 			// Try to geo-locate visitor
 			if (<?php echo $geo_locate ? 1 : 0; ?>) setTimeout(function() {
-				fc_MapMad_geolocateMe_<?php echo $module->id; ?>(map);
+				fc_MapMad_geolocateMe_<?= $module->id; ?>(map);
 			}, 50);
 
 			// Make an initial update of visible markers
-			fc_MapMod_updateVisibleMarkerList_<?php echo $module->id; ?>(map, markers);
+			fc_MapMod_updateVisibleMarkerList_<?= $module->id; ?>(map, markers);
 
-			var fc_MapMod_updateVisibleMarkerList_debounced_<?php echo $module->id; ?> = fc_debounce_exec(fc_MapMod_updateVisibleMarkerList_<?php echo $module->id; ?>, 200, false, null);
+			let fc_MapMod_updateVisibleMarkerList_debounced_<?= $module->id; ?> = fc_debounce_exec(fc_MapMod_updateVisibleMarkerList_<?= $module->id; ?>, 200, false, null);
 
 			<?php /* Either update visible markers only on initialization or when the map bounds change */ ?>
 			<?php if ($marker_list_update_to_map_bounds) : ?>
 			map.on('moveend', function(e) {
 				//window.console.log('moveend');
-				fc_MapMod_updateVisibleMarkerList_debounced_<?php echo $module->id; ?>(map, markers);
-				//fc_MapMod_updateVisibleMarkerList_<?php echo $module->id; ?>(map, markers);
+				fc_MapMod_updateVisibleMarkerList_debounced_<?= $module->id; ?>(map, markers);
+				//fc_MapMod_updateVisibleMarkerList_<?= $module->id; ?>(map, markers);
 			});
 			<?php endif; ?>
 
 			// Assign global map reference
-			module_map_<?php echo $module->id; ?> = map;
+			module_map_<?= $module->id; ?> = map;
 		}
 
 		// Initialize the Map
-		fc_MapMod_initialize_<?php echo $module->id; ?>();
+		fc_MapMod_initialize_<?= $module->id; ?>();
 
 		// Geo locate visitor on-demand via button click
 		document.addEventListener("click", function(e) {
 			if (e.target && e.target.classList.contains("geo-locate-me-btn")) {
-				fc_MapMad_geolocateMe_<?php echo $module->id; ?>(module_map_<?php echo $module->id; ?>);
+				fc_MapMad_geolocateMe_<?= $module->id; ?>(module_map_<?= $module->id; ?>);
 			}
 		});
 
 		// Geo locate visitor on-demand via button click
 		document.addEventListener("change", function(e) {
 			if (e.target && e.target.classList.contains("geo-locate-zoom-level")) {
-				fc_MapMad_geolocateMe_<?php echo $module->id; ?>(module_map_<?php echo $module->id; ?>);
+				fc_MapMad_geolocateMe_<?= $module->id; ?>(module_map_<?= $module->id; ?>);
 			}
 		});
 	</script>
 
 
 <?php endif; ?>
+
