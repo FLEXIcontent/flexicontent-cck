@@ -2061,6 +2061,7 @@ class com_flexicontentInstallerScript
 		if ($ext && $ext['id'] > 0)
 		{
 			$installer = new \Joomla\CMS\Installer\Installer();
+			$installer->setDatabase(\Joomla\CMS\Factory::getContainer()->get('DatabaseDriver'));
 
 			$msg[$n] = $installer->uninstall($ext['type'], $ext['id'], (int)$ext['client_id'])
 				? '<br/>'.$msg[$n].', uninstalling plugin: <span class="badge bg-success badge-success">success</span> <br/>'
