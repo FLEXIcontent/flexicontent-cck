@@ -481,9 +481,13 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		$start_microtime = microtime(true);
 
-		$has_zlib    = function_exists("zlib_encode"); // Version_compare(PHP_VERSION, '5.4.0', '>=');
-		$indexer     = $this->input->getCmd('indexer', 'tag_assignments');
-		$rebuildmode = $this->input->getCmd('rebuildmode', '');
+                $has_zlib    = function_exists("zlib_encode"); // Version_compare(PHP_VERSION, '5.4.0', '>=');
+                $indexer     = $this->input->getCmd('indexer', 'tag_assignments');
+                $rebuildmode = $this->input->getCmd('rebuildmode', '');
+                $selectedIds = $this->input->get('cid', array(), 'array');
+                $selectedIds = ArrayHelper::toInteger($selectedIds);
+                $selectedIds = array_values(array_filter($selectedIds));
+                $selectedMode = false;
 
 		$session = \Joomla\CMS\Factory::getSession();
 		$db      = \Joomla\CMS\Factory::getDbo();
@@ -508,21 +512,36 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			);
 		}
 
-		elseif ($indexer === 'resave')
-		{
-			$log_filename = 'resave_' . \Joomla\CMS\Factory::getUser()->id . '.php';
-			$log_category = 'com_flexicontent.items.resave_indexer';
+                elseif ($indexer === 'resave')
+                {
+                        $log_filename = 'resave_' . \Joomla\CMS\Factory::getUser()->id . '.php';
+                        $log_category = 'com_flexicontent.items.resave_indexer';
 
-			// Get ids of records to process
-			$records_total = 0;
-			$record_ids = $records_model->getAllItems(
-				$records_total, 0, self::$record_limit
-			);
-		}
-		else
-		{
-			jexit('fail | indexer: ' . $indexer . ' not supported');
-		}
+                        if (!empty($selectedIds))
+                        {
+                                // Use only the selected records
+                                $records_total = count($selectedIds);
+                                $record_ids    = $selectedIds;
+                                $selectedMode  = true;
+
+                                $_sz_selected = base64_encode($has_zlib ? zlib_encode(serialize($selectedIds), -15) : serialize($selectedIds));
+                                $session->set($indexer . '_selected_ids', $_sz_selected, 'flexicontent');
+                        }
+                        else
+                        {
+                                // Get ids of all records to process
+                                $records_total = 0;
+                                $record_ids = $records_model->getAllItems(
+                                        $records_total, 0, self::$record_limit
+                                );
+
+                                $session->set($indexer . '_selected_ids', '', 'flexicontent');
+                        }
+                }
+                else
+                {
+                        jexit('fail | indexer: ' . $indexer . ' not supported');
+                }
 
 		// Get full logfile path
 		$log_filename_full = \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getConfig()->get('log_path') . DS . $log_filename);
@@ -544,7 +563,8 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$elapsed_microseconds = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		$_total_runtime = $elapsed_microseconds;
 		$_total_queries = 0;
-		echo sprintf('|0| Server execution time: %.2f secs ', $_total_runtime / 1000000) . ' | Total DB updates: ' . $_total_queries;
+                $selection_info = $selectedMode ? ' | Selected items only' : '';
+                echo sprintf('|0| Server execution time: %.2f secs ', $_total_runtime / 1000000) . ' | Total DB updates: ' . $_total_queries . $selection_info;
 
 		$session->set($indexer . '_total_runtime', $elapsed_microseconds, 'flexicontent');
 		$session->set($indexer . '_total_queries', 0, 'flexicontent');
@@ -604,8 +624,23 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		);
 
 		// Get record ids to process, but use session to avoid recalculation
-		$record_ids = $session->get($indexer . '_records_to_index', array(), 'flexicontent');
-		$record_ids = unserialize($has_zlib ? zlib_decode(base64_decode($record_ids)) : base64_decode($record_ids));
+                $record_ids = $session->get($indexer . '_records_to_index', array(), 'flexicontent');
+                $record_ids = unserialize($has_zlib ? zlib_decode(base64_decode($record_ids)) : base64_decode($record_ids));
+
+                $selected_ids_encoded = $session->get($indexer . '_selected_ids', '', 'flexicontent');
+                $selectedMode = !empty($selected_ids_encoded);
+                $selected_ids = array();
+
+                if ($selectedMode)
+                {
+                        $selected_ids = unserialize($has_zlib ? zlib_decode(base64_decode($selected_ids_encoded)) : base64_decode($selected_ids_encoded));
+
+                        if (!is_array($selected_ids) || !count($selected_ids))
+                        {
+                                $selected_ids = array();
+                                $selectedMode = false;
+                        }
+                }
 
 		// Get total and current limit-start
 		$records_total = $session->get($indexer . '_records_total', 0, 'flexicontent');
@@ -761,21 +796,40 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		}
 
 		// Get next sub-set of items
-		elseif ($cnt >= $records_start + self::$record_limit)
-		{
-			$records_start = $records_start + self::$record_limit;
+                elseif ($cnt >= $records_start + self::$record_limit)
+                {
+                        $records_start = $records_start + self::$record_limit;
 
-			// Get next set of records
-			$record_ids = $records_model->getItemsWithTags(
-				$total, $records_start, self::$record_limit
-			);
+                        // Get next set of records
+                        if ($indexer === 'tag_assignments')
+                        {
+                                $total = 0;
+                                $record_ids = $records_model->getItemsWithTags(
+                                        $total, $records_start, self::$record_limit
+                                );
+                        }
+                        elseif ($indexer === 'resave' && $selectedMode)
+                        {
+                                $record_ids = array_slice($selected_ids, $records_start, self::$record_limit);
+                        }
+                        elseif ($indexer === 'resave')
+                        {
+                                $total = 0;
+                                $record_ids = $records_model->getAllItems(
+                                        $total, $records_start, self::$record_limit
+                                );
+                        }
+                        else
+                        {
+                                $record_ids = array();
+                        }
 
-			// Set item ids into session to avoid recalculation ...
-			$_sz_encoded = base64_encode($has_zlib ? zlib_encode(serialize($record_ids), -15) : serialize($record_ids));
-			$session->set($indexer . '_records_to_index', $_sz_encoded, 'flexicontent');
+                        // Set item ids into session to avoid recalculation ...
+                        $_sz_encoded = base64_encode($has_zlib ? zlib_encode(serialize($record_ids), -15) : serialize($record_ids));
+                        $session->set($indexer . '_records_to_index', $_sz_encoded, 'flexicontent');
 
-			$session->set($indexer . '_records_start', $records_start, 'flexicontent');
-		}
+                        $session->set($indexer . '_records_start', $records_start, 'flexicontent');
+                }
 
 		// Terminate if not processing any records
 		if (!$records_total)
@@ -811,7 +865,8 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$_total_queries += $query_count;
 		$session->set($indexer . '_total_queries', $_total_queries, 'flexicontent');
 
-		jexit(sprintf('success | ' . $cnt . ' | Server execution time: %.2f secs ', $_total_runtime / 1000000) . ' | Total DB updates: ' . $_total_queries);
+                $selection_info = $selectedMode ? ' | Selected items only' : '';
+                jexit(sprintf('success | ' . $cnt . ' | Server execution time: %.2f secs ', $_total_runtime / 1000000) . ' | Total DB updates: ' . $_total_queries . $selection_info);
 	}
 
 

@@ -18,12 +18,28 @@
 
 defined('_JEXEC') or die('Restricted access');
 
+use Joomla\Utilities\ArrayHelper;
+
 $records_name = 'items';
 $ctrl_task = 'task=items.';
 
 $app = \Joomla\CMS\Factory::getApplication();
 $indexer_name = $app->input->get('indexer', 'tag_assignments', 'cmd');
 $rebuildmode  = $app->input->get('rebuildmode', '', 'cmd');
+$selectedIds  = $app->input->get('cid', array(), 'array');
+$selectedIds  = ArrayHelper::toInteger($selectedIds);
+$selectedIds  = array_values(array_filter($selectedIds));
+
+$selectedIdsQueryParts = array();
+
+foreach ($selectedIds as $selectedId)
+{
+        $selectedIdsQueryParts[] = 'cid[]=' . (int) $selectedId;
+}
+
+$selectedIdsQuery = count($selectedIdsQueryParts)
+        ? '&' . implode('&', $selectedIdsQueryParts)
+        : '';
 ?>
 
 <div>&nbsp;</div>
@@ -32,16 +48,17 @@ $rebuildmode  = $app->input->get('rebuildmode', '', 'cmd');
 	
 <script>
 jQuery(document).ready(function() {
-	var total_time = 0;
-	var records_per_call = 1000;
-	var width = 0;
-	var looper = 0;
-	var onesector = 1000;
-	var fields_length = 0;
-	var items_length = 0;
-	var number = 0;
-	function updateprogress() {
-		if(looper>=number && looper) {
+        var total_time = 0;
+        var records_per_call = 1000;
+        var width = 0;
+        var looper = 0;
+        var onesector = 1000;
+        var fields_length = 0;
+        var items_length = 0;
+        var number = 0;
+        var selectedQuery = <?php echo json_encode($selectedIdsQuery); ?>;
+        function updateprogress() {
+                if(looper>=number && looper) {
 			jQuery('div#insideprogress').css('width', '300px');
 			jQuery('div#updatepercent').text(' 100 %');
 			jQuery('div#statuscomment').html( jQuery('div#statuscomment').html() + '<br/><br/><strong>INDEXING FINISHED</strong>. You may close this window');
@@ -51,8 +68,8 @@ jQuery(document).ready(function() {
 
 		var start_time = new Date().getTime();
 
-		jQuery.ajax({
-			url: "index.php?option=com_flexicontent&format=raw&<?php echo $ctrl_task; ?>index&records_per_call="+records_per_call+"&records_cnt="+looper+"&indexer=<?php echo $indexer_name;?>"+"&rebuildmode=<?php echo $rebuildmode; ?>",
+                jQuery.ajax({
+                        url: "index.php?option=com_flexicontent&format=raw&<?php echo $ctrl_task; ?>index&records_per_call="+records_per_call+"&records_cnt="+looper+"&indexer=<?php echo $indexer_name;?>"+"&rebuildmode=<?php echo $rebuildmode; ?>"+selectedQuery,
 			success: function(response, status2, xhr2) {
 				var request_time = new Date().getTime() - start_time;
 				total_time += request_time;
@@ -91,8 +108,8 @@ jQuery(document).ready(function() {
 
 	var start_time = new Date().getTime();
 
-	jQuery.ajax({
-		url: "index.php?option=com_flexicontent&format=raw&<?php echo $ctrl_task; ?>countrows&indexer=<?php echo $indexer_name;?>&<?php echo \Joomla\CMS\Session\Session::getFormToken().'=1'; ?>",
+        jQuery.ajax({
+                url: "index.php?option=com_flexicontent&format=raw&<?php echo $ctrl_task; ?>countrows&indexer=<?php echo $indexer_name;?>&<?php echo \Joomla\CMS\Session\Session::getFormToken().'=1'; ?>"+selectedQuery,
 		success: function(response, status, xhr) {
 			var request_time = new Date().getTime() - start_time;
 			total_time += request_time;
