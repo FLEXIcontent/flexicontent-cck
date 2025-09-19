@@ -7,6 +7,7 @@
  * @link            https://flexicontent.org
  * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
+ * Added option Recalculate aliases for selected items. 
  */
 
 defined('_JEXEC') or die;
