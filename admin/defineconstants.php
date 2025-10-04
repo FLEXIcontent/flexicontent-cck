@@ -11,9 +11,12 @@
 
 defined('_JEXEC') or die('Restricted access');
 
+use Joomla\CMS\Factory;
+use Joomla\Filesystem\Path;
+
 // Make sure that Joomla error reporting is used (some plugin may have turned it OFF)
 // Also make some changes e.g. disable E_STRICT for maximum and leave it on only for development
-switch ( \Joomla\CMS\Factory::getConfig()->get('error_reporting') )
+switch (Factory::getConfig()->get('error_reporting') )
 {
 	case 'default':
 	case '-1':
@@ -40,7 +43,7 @@ switch ( \Joomla\CMS\Factory::getConfig()->get('error_reporting') )
 		break;
 	
 	default:
-		error_reporting( \Joomla\CMS\Factory::getConfig()->get('error_reporting') );
+		error_reporting(Factory::getConfig()->get('error_reporting') );
 		ini_set('display_errors', 1);
 		break;
 }
@@ -78,16 +81,16 @@ if (ini_get('date.timezone') == '')
 
 // Set file manager paths
 $params = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
-if (!defined('COM_FLEXICONTENT_FILEPATH'))	define('COM_FLEXICONTENT_FILEPATH',		\Joomla\CMS\Filesystem\Path::clean( JPATH_ROOT.DS.$params->get('file_path', 'components/com_flexicontent/uploads') ) );
-if (!defined('COM_FLEXICONTENT_MEDIAPATH'))	define('COM_FLEXICONTENT_MEDIAPATH',	\Joomla\CMS\Filesystem\Path::clean( JPATH_ROOT.DS.$params->get('media_path', 'components/com_flexicontent/medias') ) );
+if (!defined('COM_FLEXICONTENT_FILEPATH'))	define('COM_FLEXICONTENT_FILEPATH',		Path::clean( JPATH_ROOT.DS.$params->get('file_path', 'components/com_flexicontent/uploads') ) );
+if (!defined('COM_FLEXICONTENT_MEDIAPATH'))	define('COM_FLEXICONTENT_MEDIAPATH',	Path::clean( JPATH_ROOT.DS.$params->get('media_path', 'components/com_flexicontent/medias') ) );
 
 // Set the media manager paths definitions
-$jinput = \Joomla\CMS\Factory::getApplication()->input;
+$jinput =Factory::getApplication()->input;
 $view = $jinput->get('view', '', 'cmd');
 $popup_upload = $jinput->get('pop_up', null, 'cmd');
 $path = "fleximedia_path";
 if(substr(strtolower($view),0,6) == "images" || $popup_upload == 1) $path = "image_path";
-if (!defined('COM_FLEXIMEDIA_BASE'))		define('COM_FLEXIMEDIA_BASE',		 \Joomla\CMS\Filesystem\Path::clean(JPATH_ROOT.DS.$params->get($path, 'images'.DS.'stories')));
+if (!defined('COM_FLEXIMEDIA_BASE'))		define('COM_FLEXIMEDIA_BASE',		 Path::clean(JPATH_ROOT.DS.$params->get($path, 'images'.DS.'stories')));
 if (!defined('COM_FLEXIMEDIA_BASEURL'))	define('COM_FLEXIMEDIA_BASEURL', (php_sapi_name() !== 'cli' ? \Joomla\CMS\Uri\Uri::root() : JPATH_ROOT . '/').$params->get($path, 'images/stories'));
 
 if (!defined('FLEXI_SECTION'))				define('FLEXI_SECTION', 0);
@@ -95,7 +98,7 @@ if (!defined('FLEXI_SECTION'))				define('FLEXI_SECTION', 0);
 if (!defined('FLEXI_CAT_EXTENSION'))
 {
 	define('FLEXI_CAT_EXTENSION', $params->get('flexi_cat_extension','com_content'));
-	$db = \Joomla\CMS\Factory::getDbo();
+	$db =Factory::getDbo();
 	$query = "SELECT lft,rgt FROM #__categories WHERE id=1 ";
 	$db->setQuery($query);
 	$obj = $db->loadObject();
