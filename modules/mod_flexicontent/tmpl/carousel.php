@@ -275,7 +275,7 @@ if (($item_placement_feat === 1 && $item_columns_feat > 1) || ($item_placement_s
  */
 if ($transition)
 {
-	$file_path = \Joomla\CMS\Filesystem\Path::clean(JPATH_SITE.'/components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.effect-'.$transition.'.min.js');
+	$file_path = \Joomla\Filesystem\Path::clean(JPATH_SITE.'/components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.effect-'.$transition.'.min.js');
 
 	if (file_exists($file_path))
 	{

@@ -11,6 +11,7 @@
 
 // no direct access
 defined('_JEXEC') or die('Restricted access');
+use Joomla\Database\DatabaseInterface;
 
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
@@ -471,7 +472,7 @@ if ( ($display_cat_list && $mcats_selection) || !$catid)
 // !! target (single) category view when selecting single category a category is currently selected
 else if ($catid)
 {
-	$db = \Joomla\CMS\Factory::getDbo();
+	$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 	$query 	= 'SELECT CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
 		.' FROM #__categories AS c WHERE c.id = '.$catid;
 	$db->setQuery( $query );

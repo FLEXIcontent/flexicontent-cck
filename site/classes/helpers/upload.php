@@ -347,10 +347,10 @@ class flexicontent_upload
 		$foldername = $folder;
 
 		//make a unique folder name for the image and check it is not already taken
-		if (\Joomla\CMS\Filesystem\Folder::exists( $base_Dir . $folder ))
+		if (\Joomla\Filesystem\Folder::exists( $base_Dir . $folder ))
 		{
 			$unique_num = 1;
-			while( \Joomla\CMS\Filesystem\Folder::exists( $base_Dir . $folder . '-' . $unique_num ))
+			while( \Joomla\Filesystem\Folder::exists( $base_Dir . $folder . '-' . $unique_num ))
 			{
 				$unique_num++;
 			}

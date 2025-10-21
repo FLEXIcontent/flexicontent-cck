@@ -672,7 +672,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 						Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::sprintf('JLIB_INSTALLER_ABORT_PLG_INSTALL_CREATE_DIRECTORY', 'jComments plugin for FLEXIcontent', $destpath), 'warning');
 					}
 				}
-				if (!\Joomla\CMS\Filesystem\File::copy($source, $dest)) {
+				if (!\Joomla\Filesystem\File::copy($source, $dest)) {
 					Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_FAILED_TO') . \Joomla\CMS\Language\Text::_(!$plg_exists ? 'JLIB_INSTALLER_INSTALL' : 'JLIB_INSTALLER_UPDATE') . ' jComments plugin for FLEXIcontent', 'warning');
 				} else {
 					Factory::getApplication()->enqueueMessage('<span class="badge">' . \Joomla\CMS\Language\Text::_(!$plg_exists ? 'FLEXI_INSTALLED' : 'FLEXI_UPDATED') . '</span> jComments plugin for FLEXIcontent', 'message');
@@ -698,7 +698,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 				$plg_exists = file_exists($file_dest);
 				if (!$plg_exists || filemtime($file) > filemtime($file_dest))
 				{
-					\Joomla\CMS\Filesystem\File::copy($file, $file_dest);
+					\Joomla\Filesystem\File::copy($file, $file_dest);
 					$elements_count[$plg_exists ? 1 : 0]++;
 				}
 			}
@@ -731,7 +731,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		foreach ($files as $file)
 		{
 			$file_dest = $pathDestName .DS. basename($file);
-			\Joomla\CMS\Filesystem\File::copy($file, $file_dest);
+			\Joomla\Filesystem\File::copy($file, $file_dest);
 		}
 
 		// Check DESTINATION folder
@@ -747,7 +747,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		foreach ($files as $file)
 		{
 			$file_dest = $pathDestName .DS. basename($file);
-			\Joomla\CMS\Filesystem\File::copy($file, $file_dest);
+			\Joomla\Filesystem\File::copy($file, $file_dest);
 		}
 
 		$folders = array('css', 'images');
@@ -766,7 +766,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 			foreach ($files as $file)
 			{
 				$file_dest = $sub_pathDestName .DS. basename($file);
-				\Joomla\CMS\Filesystem\File::copy($file, $file_dest);
+				\Joomla\Filesystem\File::copy($file, $file_dest);
 			}
 		}
 
@@ -1107,7 +1107,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 				$indexing_start_secs = (int) file_get_contents($file);
 				$indexing_started = $indexing_start_secs + 3600 > time();
 				if (!$indexing_started) {
-					\Joomla\CMS\Filesystem\File::delete($file);
+					\Joomla\Filesystem\File::delete($file);
 				}
 			}
 
@@ -1134,7 +1134,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 				if ($indexing_started)
 				{
 					if ($exists) {
-						\Joomla\CMS\Filesystem\File::delete($file);
+						\Joomla\Filesystem\File::delete($file);
 						continue;
 					}
 					else $missing[$tblname]['__indexing_started__'] = 1;
@@ -1898,10 +1898,10 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 			if (!file_exists($adminpath.$prefix.$file.$suffix)) {
 				$missing['admin'][] = $file;
 				if ($method == 'create')
-					\Joomla\CMS\Filesystem\File::copy($refadminpath.'en-GB.'.$file.$suffix, $adminpath.$prefix.$file.$suffix);
+					\Joomla\Filesystem\File::copy($refadminpath.'en-GB.'.$file.$suffix, $adminpath.$prefix.$file.$suffix);
 			} else {
 				if ($method == 'zip') {
-					\Joomla\CMS\Filesystem\File::copy($adminpath.$prefix.$file.$suffix, $targetfolder.DS.'admin'.DS.$prefix.$file.$suffix);
+					\Joomla\Filesystem\File::copy($adminpath.$prefix.$file.$suffix, $targetfolder.DS.'admin'.DS.$prefix.$file.$suffix);
 					$namea .= "\n".'			            <filename>'.$prefix.$file.$suffix.'</filename>';
 				}
 			}
@@ -1911,10 +1911,10 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 			if (!file_exists($sitepath.$prefix.$file.$suffix)) {
 				$missing['site'][] = $file;
 				if ($method == 'create')
-					\Joomla\CMS\Filesystem\File::copy($refsitepath.'en-GB.'.$file.$suffix, $sitepath.$prefix.$file.$suffix);
+					\Joomla\Filesystem\File::copy($refsitepath.'en-GB.'.$file.$suffix, $sitepath.$prefix.$file.$suffix);
 			} else {
 				if ($method == 'zip') {
-					\Joomla\CMS\Filesystem\File::copy($sitepath.$prefix.$file.$suffix, $targetfolder.DS.'site'.DS.$prefix.$file.$suffix);
+					\Joomla\Filesystem\File::copy($sitepath.$prefix.$file.$suffix, $targetfolder.DS.'site'.DS.$prefix.$file.$suffix);
 					$names .= "\n".'			            <filename>'.$prefix.$file.$suffix.'</filename>';
 				}
 			}
@@ -1953,10 +1953,10 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 			</install>'
 			   ;
 			// save xml manifest
-			\Joomla\CMS\Filesystem\File::write($xmlfile, $xml);
+			\Joomla\Filesystem\File::write($xmlfile, $xml);
 
 
-			$fileslist  = \Joomla\CMS\Filesystem\Folder::files($targetfolder, '.', true, true, array('.svn', 'CVS', '.DS_Store'));
+			$fileslist  = \Joomla\Filesystem\Folder::files($targetfolder, '.', true, true, array('.svn', 'CVS', '.DS_Store'));
 			$archivename = $targetfolder.'.com_flexicontent'. (FLEXI_J16GE ? '.zip' : '.tar.gz');
 
 			// Create the archive
@@ -1978,7 +1978,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 			}
 
 			// Remove temporary folder structure
-			if (!\Joomla\CMS\Filesystem\Folder::delete(($targetfolder)) ) {
+			if (!\Joomla\Filesystem\Folder::delete(($targetfolder)) ) {
 				echo \Joomla\CMS\Language\Text::_('FLEXI_SEND_DELETE_TMP_FOLDER_FAILED');
 			}
 		}

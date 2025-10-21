@@ -18,6 +18,7 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
+use Joomla\Database\DatabaseInterface;
 
 // Load the helper classes
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
@@ -77,7 +78,7 @@ class JFormFieldFcSortableList extends \Joomla\CMS\Form\FormField
 		}
 		
 		$doc	= \Joomla\CMS\Factory::getDocument();
-		$db		= \Joomla\CMS\Factory::getDbo();
+		$db		= \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$attributes = $this->element->attributes();
 
 		$iselements = $attributes->subtype =='elements';

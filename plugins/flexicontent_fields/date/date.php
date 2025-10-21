@@ -10,6 +10,7 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
+use Joomla\Database\DatabaseInterface;
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
 class plgFlexicontent_fieldsDate extends FCField
@@ -652,7 +653,7 @@ class plgFlexicontent_fieldsDate extends FCField
 			static $nullDate, $never_date;
 			if ($nullDate == null)
 			{
-				$nullDate = \Joomla\CMS\Factory::getDbo()->getNullDate();
+				$nullDate = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class)->getNullDate();
 				$never_date = ''; //\Joomla\CMS\Language\Text::_('FLEXI_NEVER');
 			}
 
@@ -1008,7 +1009,7 @@ class plgFlexicontent_fieldsDate extends FCField
 		$filter->date_valformat = $date_valformat;
 		$filter->date_txtformat = $date_txtformat;
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$nullDate_quoted = $db->Quote($db->getNullDate());
 
 		$filter_as_range = in_array($display_filter_as, array(2,3,8));  // We don't want null date if using a range
@@ -1259,7 +1260,7 @@ class plgFlexicontent_fieldsDate extends FCField
 			return true;
 		}
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 
 		foreach ($values as $v)
 		{
@@ -1404,7 +1405,7 @@ class plgFlexicontent_fieldsDate extends FCField
 		else
 		{
 			$values = array();
-			$db = \Joomla\CMS\Factory::getDbo();
+			$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 
 			if ($date_source === 1 || $date_source === 2)
 			{

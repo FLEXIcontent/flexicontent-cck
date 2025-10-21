@@ -11,13 +11,14 @@ defined('JPATH_PLATFORM') or die;
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
+use Joomla\Database\DatabaseInterface;
 
 // Load the helper classes
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
-jimport('joomla.filesystem.folder');  // \Joomla\CMS\Filesystem\Folder
-jimport('joomla.filesystem.file');    // \Joomla\CMS\Filesystem\File
+jimport('joomla.filesystem.folder');  // \Joomla\Filesystem\Folder
+jimport('joomla.filesystem.file');    // \Joomla\Filesystem\File
 
 jimport('cms.html.html');      // JHtml
 jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
@@ -248,7 +249,7 @@ class JFormFieldFclayout extends JFormFieldGroupedList
 		 * Get a list of files in the search path with the given filter.
 		 */
 
-		$files = \Joomla\CMS\Filesystem\Folder::files($path, $filter);
+		$files = \Joomla\Filesystem\Folder::files($path, $filter);
 		$files = is_array($files) ? $files : array();
 		$files = array_flip($files);
 
@@ -272,7 +273,7 @@ class JFormFieldFclayout extends JFormFieldGroupedList
 			// If the extension is to be stripped, do it.
 			if ($stripExt)
 			{
-				$file = \Joomla\CMS\Filesystem\File::stripExt($file);
+				$file = \Joomla\Filesystem\File::stripExt($file);
 			}
 
 			if (isset($core_layout_names[$file]))
@@ -504,7 +505,7 @@ jQuery(document).ready(function(){
 	 */
 	protected function getModuleLayoutsFromTemplates(& $groups, $layout_files)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 
 		// Get the client id.
 		$clientId = $this->element['client_id'];
@@ -574,10 +575,10 @@ jQuery(document).ready(function(){
 			$lang->load('tpl_' . $template->element . '.sys', $client->path, null, false, true)
 				|| $lang->load('tpl_' . $template->element . '.sys', $client->path . '/templates/' . $template->element, null, false, true);
 
-			$template_path = \Joomla\CMS\Filesystem\Path::clean($client->path . '/templates/' . $template->element . '/html/' . $module);
+			$template_path = \Joomla\Filesystem\Path::clean($client->path . '/templates/' . $template->element . '/html/' . $module);
 
 			// Add the layout options from the template path.
-			if (is_dir($template_path) && ($files = \Joomla\CMS\Filesystem\Folder::files($template_path, '^[^_]*\.php$')))
+			if (is_dir($template_path) && ($files = \Joomla\Filesystem\Folder::files($template_path, '^[^_]*\.php$')))
 			{
 				$is_override = array();
 				$display_overrides = true;

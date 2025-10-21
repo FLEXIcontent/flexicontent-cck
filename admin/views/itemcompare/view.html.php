@@ -17,7 +17,7 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
-
+use Joomla\Database\DatabaseInterface;
 jimport('legacy.view.legacy');
 
 /**
@@ -30,7 +30,7 @@ class FlexicontentViewItemcompare extends \Joomla\CMS\MVC\View\HtmlView {
 		$app      = \Joomla\CMS\Factory::getApplication();
 		$jinput   = $app->input;
 		$option   = $jinput->getCmd('option');
-		$db       = \Joomla\CMS\Factory::getDbo();
+		$db       = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$document = \Joomla\CMS\Factory::getDocument();
 
 		// Initialise variables

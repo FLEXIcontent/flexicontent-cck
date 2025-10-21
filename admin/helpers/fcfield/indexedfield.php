@@ -10,6 +10,7 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
+use Joomla\Database\DatabaseInterface;
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
 class FCIndexedField extends FCField
@@ -968,7 +969,7 @@ class FCIndexedField extends FCField
 			if ($cascade_after)
 			{
 				// Filter out values not in the the value group, this is done by modifying the SQL query
-				$db = \Joomla\CMS\Factory::getDbo();
+				$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 				$_elements = array();
 				foreach($valgrps as & $vg) $vg = $db->Quote($vg);
 				unset($vg);

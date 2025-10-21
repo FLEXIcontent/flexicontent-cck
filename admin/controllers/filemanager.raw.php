@@ -13,6 +13,7 @@ defined('_JEXEC') or die;
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
+use Joomla\Database\DatabaseInterface;
 
 JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php');
 
@@ -123,7 +124,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$index_urls  = $this->input->getInt('index_urls', 0);
 
 		$session = \Joomla\CMS\Factory::getSession();
-		$db      = \Joomla\CMS\Factory::getDbo();
+		$db      = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$app     = \Joomla\CMS\Factory::getApplication();
 
 		// Check indexer type
@@ -200,7 +201,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$start_microtime = microtime(true);
 
 		$session = \Joomla\CMS\Factory::getSession();
-		$db      = \Joomla\CMS\Factory::getDbo();
+		$db      = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$app     = \Joomla\CMS\Factory::getApplication();
 
 		$has_zlib      = function_exists("zlib_encode"); // Version_compare(PHP_VERSION, '5.4.0', '>=');

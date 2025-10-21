@@ -13,6 +13,7 @@ defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
+use Joomla\Database\DatabaseInterface;
 
 require_once('base/base.php');
 
@@ -422,7 +423,7 @@ class FlexicontentModelMediadata extends FCModelAdmin
 	public function submitterValidation($data)
 	{
 		$user = \Joomla\CMS\Factory::getUser();
-		$db   = \Joomla\CMS\Factory::getDbo();
+		$db   = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 
 		$mediadata_id   = $data['id'];
 		$content_id  = $data['content_id'];

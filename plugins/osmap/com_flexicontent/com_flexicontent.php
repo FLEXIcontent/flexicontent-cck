@@ -17,6 +17,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
+use Joomla\Database\DatabaseInterface;
 
 require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
@@ -297,7 +298,7 @@ class osmap_com_flexicontent
 		if ($initialized === null)
 		{
 			$initialized = true;
-			$db    = \Joomla\CMS\Factory::getDBO();
+			$db    = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 			$user  = \Joomla\CMS\Factory::getUser();
 			$date  = \Joomla\CMS\Factory::getDate();
 			$nullDate = $db->getNullDate();
@@ -462,7 +463,7 @@ class osmap_com_flexicontent
 		if ($initialized === null)
 		{
 			$initialized = true;
-			$db    = \Joomla\CMS\Factory::getDBO();
+			$db    = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 			$user  = \Joomla\CMS\Factory::getUser();
 			$date  = \Joomla\CMS\Factory::getDate();
 			$nullDate = $db->getNullDate();
@@ -498,7 +499,7 @@ class osmap_com_flexicontent
 		if ($initialized === null)
 		{
 			$initialized = true;
-			$db    = \Joomla\CMS\Factory::getDBO();
+			$db    = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 			$user  = \Joomla\CMS\Factory::getUser();
 			$date  = \Joomla\CMS\Factory::getDate();
 			$_nowDate = 'UTC_TIMESTAMP()'; //$this->_db->Quote( $date->toMySQL() );

@@ -1967,8 +1967,8 @@ class plgSystemFlexisystem extends CMSPlugin
 
 	private function _storeLessConf($table)
 	{
-		$xml_path  = \Joomla\CMS\Filesystem\Path::clean(JPATH_ADMINISTRATOR.'/components/com_flexicontent/config.xml');
-		$less_path = \Joomla\CMS\Filesystem\Path::clean(JPATH_ROOT.'/components/com_flexicontent/assets/less/include/mixins.less');
+		$xml_path  = \Joomla\Filesystem\Path::clean(JPATH_ADMINISTRATOR.'/components/com_flexicontent/config.xml');
+		$less_path = \Joomla\Filesystem\Path::clean(JPATH_ROOT.'/components/com_flexicontent/assets/less/include/mixins.less');
 
 
 		/**

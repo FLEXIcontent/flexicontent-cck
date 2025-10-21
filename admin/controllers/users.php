@@ -13,6 +13,7 @@ defined('_JEXEC') or die;
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
+use Joomla\Database\DatabaseInterface;
 
 JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php');
 
@@ -87,7 +88,7 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 
 		// Initialize some variables
 		$app = \Joomla\CMS\Factory::getApplication();
-		$db  = \Joomla\CMS\Factory::getDbo();
+		$db  = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$me  = \Joomla\CMS\Factory::getUser();
 		$config = \Joomla\CMS\Factory::getConfig();
 		$MailFrom	= $config->get('mailfrom');
@@ -228,7 +229,7 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$db    = \Joomla\CMS\Factory::getDbo();
+		$db    = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$me    = \Joomla\CMS\Factory::getUser();
 		$curIsSuperAdmin = $me->authorise('core.admin', 'root.1');
 
@@ -323,7 +324,7 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
 		$app = \Joomla\CMS\Factory::getApplication();
-		$db  = \Joomla\CMS\Factory::getDbo();
+		$db  = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$me  = \Joomla\CMS\Factory::getUser();
 		$curIsSuperAdmin = $me->authorise('core.admin', 'root.1');
 
@@ -421,7 +422,7 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
 		$app    = \Joomla\CMS\Factory::getApplication();
-		$db     = \Joomla\CMS\Factory::getDbo();
+		$db     = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 
 		$task   = $this->getTask();
 		$cids   = $this->input->get('cid', array(), 'array');

@@ -17,6 +17,7 @@
  */
 
 defined('JPATH_PLATFORM') or die;
+use Joomla\Database\DatabaseInterface;
 
 jimport('cms.html.html');      // JHtml
 jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
@@ -291,7 +292,7 @@ class JFormFieldFcMenuitem extends JFormFieldGroupedList
 
 	public static function getMenuLinks($menuType = null, $parentId = 0, $mode = 0, $published = array(), $languages = array())
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$query = $db->getQuery(true)
 			->select('DISTINCT a.id AS value, 
 				  a.title AS text, 

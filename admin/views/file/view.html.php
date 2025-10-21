@@ -13,6 +13,7 @@ defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
+use Joomla\Database\DatabaseInterface;
 
 JLoader::register('FlexicontentViewBaseRecord', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_record.php');
 
@@ -36,7 +37,7 @@ class FlexicontentViewFile extends FlexicontentViewBaseRecord
 		$jinput     = $app->input;
 		$document   = \Joomla\CMS\Factory::getDocument();
 		$user       = \Joomla\CMS\Factory::getUser();
-		$db         = \Joomla\CMS\Factory::getDbo();
+		$db         = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$cparams    = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 		$perms      = FlexicontentHelperPerm::getPerm();
 		//$authorparams = flexicontent_db::getUserConfig($user->id);
@@ -294,7 +295,7 @@ class FlexicontentViewFile extends FlexicontentViewBaseRecord
 		{
 			case 0:
 				$path = $row->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;  // JPATH_ROOT . DS . <media_path | file_path>
-				$rowdata->path = \Joomla\CMS\Filesystem\Path::clean($path . DS . $row->filename);
+				$rowdata->path = \Joomla\Filesystem\Path::clean($path . DS . $row->filename);
 
 				$rowdata->calculated_size = file_exists($rowdata->path) ? filesize($rowdata->path) : 0;
 				break;
@@ -315,7 +316,7 @@ class FlexicontentViewFile extends FlexicontentViewBaseRecord
 				break;
 
 			case 2:
-				$rowdata->path = \Joomla\CMS\Filesystem\Path::clean(JPATH_ROOT . DS . $row->filename);
+				$rowdata->path = \Joomla\Filesystem\Path::clean(JPATH_ROOT . DS . $row->filename);
 				$rowdata->calculated_size = file_exists($rowdata->path) ? filesize($rowdata->path) : 0;
 				break;
 		}

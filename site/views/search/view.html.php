@@ -26,6 +26,7 @@ use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
+use Joomla\Database\DatabaseInterface;
 
 require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'search.php');
 require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
@@ -54,7 +55,7 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 		$view   = $jinput->getCmd('view', '');
 
 		$document = \Joomla\CMS\Factory::getDocument();
-		$db       = \Joomla\CMS\Factory::getDbo();
+		$db       = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$menus    = $app->getMenu();
 		$menu     = $menus->getActive();
 		$uri      = \Joomla\CMS\Uri\Uri::getInstance();

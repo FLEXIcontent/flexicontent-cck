@@ -14,6 +14,7 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\CMS\Language\Text;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
+use Joomla\Database\DatabaseInterface;
 
 JLoader::register('FlexicontentViewBaseRecord', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_record.php');
 
@@ -96,7 +97,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$config     = \Joomla\CMS\Factory::getConfig();
 		$session    = \Joomla\CMS\Factory::getSession();
 		$user       = \Joomla\CMS\Factory::getUser();
-		$db         = \Joomla\CMS\Factory::getDbo();
+		$db         = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$uri        = \Joomla\CMS\Uri\Uri::getInstance();
 		$task       = $jinput->getCmd('task');
 		$cparams    = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
@@ -1008,7 +1009,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 	{
 		$app      = \Joomla\CMS\Factory::getApplication();
 		$jinput   = $app->input;
-		$db       = \Joomla\CMS\Factory::getDbo();
+		$db       = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$user     = \Joomla\CMS\Factory::getUser();	// get current user
 		$model    = $this->getModel();
 		$item     = $model->getItem(null, $check_view_access=false, $no_cache=false, $force_version=0);  // ZERO force_version means unversioned data
@@ -2065,7 +2066,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$uri   = \Joomla\CMS\Uri\Uri::getInstance();
 		$user  = \Joomla\CMS\Factory::getUser();
 		$aid   = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
-		$db    = \Joomla\CMS\Factory::getDbo();
+		$db    = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$nullDate = $db->getNullDate();
 
 

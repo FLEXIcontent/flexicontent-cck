@@ -13,6 +13,7 @@ defined('_JEXEC') or die;
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
+use Joomla\Database\DatabaseInterface;
 
 JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php');
 
@@ -160,7 +161,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 		jimport('joomla.filesystem.file');
 		$app  = \Joomla\CMS\Factory::getApplication();
 		$user = \Joomla\CMS\Factory::getUser();
-		$db   = \Joomla\CMS\Factory::getDbo();
+		$db   = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 
 		// Get vars
 		$ext_option = $this->input->getCmd('ext_option', '');  // Current component name
@@ -645,7 +646,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 			exit();
 		}
 
-		$path = \Joomla\CMS\Filesystem\Path::clean(JPATH_ROOT . DS . 'components' . DS . 'com_flexicontent' . DS . 'templates' . DS . $layout_name);
+		$path = \Joomla\Filesystem\Path::clean(JPATH_ROOT . DS . 'components' . DS . 'com_flexicontent' . DS . 'templates' . DS . $layout_name);
 
 		if (!is_dir($path))
 		{
@@ -655,7 +656,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 			exit();
 		}
 
-		$file_path = \Joomla\CMS\Filesystem\Path::clean($path . DS . $file_subpath);
+		$file_path = \Joomla\Filesystem\Path::clean($path . DS . $file_subpath);
 
 		if (!file_exists($file_path))
 		{
@@ -680,9 +681,9 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 		}
 
 		// Check if default file path exists
-		$default_path = \Joomla\CMS\Filesystem\Path::clean(JPATH_ROOT . DS . 'components' . DS . 'com_flexicontent' . DS . 'tmpl_common');
+		$default_path = \Joomla\Filesystem\Path::clean(JPATH_ROOT . DS . 'components' . DS . 'com_flexicontent' . DS . 'tmpl_common');
 		$default_file = isset($common[$file_subpath]) ? $common[$file_subpath] : $file_subpath;    // Some files do not have the same name as default file
-		$default_file_path = \Joomla\CMS\Filesystem\Path::clean($default_path . DS . $default_file);
+		$default_file_path = \Joomla\Filesystem\Path::clean($default_path . DS . $default_file);
 		$default_file_exists = file_exists($default_file_path) ? 1 : 0;
 
 		// CASE LOADING system's default, set a different path to be read
@@ -753,7 +754,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 			exit();
 		}
 
-		$path = \Joomla\CMS\Filesystem\Path::clean(JPATH_ROOT . DS . 'components' . DS . 'com_flexicontent' . DS . 'templates' . DS . $layout_name);
+		$path = \Joomla\Filesystem\Path::clean(JPATH_ROOT . DS . 'components' . DS . 'com_flexicontent' . DS . 'templates' . DS . $layout_name);
 
 		if (!is_dir($path))
 		{
@@ -763,7 +764,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 			exit();
 		}
 
-		$file_path = \Joomla\CMS\Filesystem\Path::clean($path . DS . $file_subpath);
+		$file_path = \Joomla\Filesystem\Path::clean($path . DS . $file_subpath);
 
 		if (!file_exists($file_path))
 		{

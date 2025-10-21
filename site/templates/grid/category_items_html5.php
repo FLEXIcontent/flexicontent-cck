@@ -18,7 +18,7 @@ $use_lazy_loading = (int) $this->params->get('use_lazy_loading', 1);
 $lazy_loading = $use_lazy_loading ? ' loading="lazy" decoding="async" ' : '';
 
 
-if ($readon_type && $readon_image && file_exists(\Joomla\CMS\Filesystem\Path::clean(JPATH_SITE . DS . $readon_image)))
+if ($readon_type && $readon_image && file_exists(\Joomla\Filesystem\Path::clean(JPATH_SITE . DS . $readon_image)))
 {
 	$readon_image = \Joomla\CMS\Uri\Uri::base(true) . '/' . $readon_image;
 }

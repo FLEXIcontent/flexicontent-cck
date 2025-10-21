@@ -1,5 +1,6 @@
 <?php
 use Joomla\String\StringHelper;
+use Joomla\Database\DatabaseInterface;
 //use Joomla\CMS\Application\CMSApplication;
 
 if (!defined('JPATH_BASE'))
@@ -205,7 +206,7 @@ class FlexicontentTasksCore
 		$newtext = '+' . implode( ' +', $_words ) .'*';  //print_r($_words); exit;
 
 		// Query CLAUSE for match the given text
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$quoted_text = $db->escape($newtext, true);
 		$quoted_text = $db->Quote( $quoted_text, false );
 		$_text_match  = ' MATCH (si.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
@@ -342,7 +343,7 @@ class FlexicontentTasksCore
 		// Check for request forgeries
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
-		require_once \Joomla\CMS\Filesystem\Path::clean(JPATH_SITE . '/components/com_flexicontent/helpers/permission.php');
+		require_once \Joomla\Filesystem\Path::clean(JPATH_SITE . '/components/com_flexicontent/helpers/permission.php');
 
 		$app    = \Joomla\CMS\Factory::getApplication();
 		$perms  = FlexicontentHelperPerm::getPerm();
@@ -412,7 +413,7 @@ class FlexicontentTasksCore
 		$jinput  = $app->input;
 		if ($jinput->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$quoted_word = $db->escape($word, true);
 		$query = 'SELECT '.$col
 			.' FROM #__'.$tbl
@@ -475,7 +476,7 @@ class FlexicontentTasksCore
 		$jinput  = $app->input;
 		if ($jinput->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 
 		$lang_code = $jinput->getString('item_lang');
 		$lang_code = $lang_code && $lang_code !== '*'

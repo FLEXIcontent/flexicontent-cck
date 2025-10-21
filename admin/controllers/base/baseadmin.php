@@ -13,6 +13,7 @@ defined('_JEXEC') or die;
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
+use Joomla\Database\DatabaseInterface;
 
 JLoader::register('FlexicontentController', JPATH_BASE . DS . 'components' . DS . 'com_flexicontent' . DS . 'controller.php');
 require_once('traitbase.php');
@@ -583,7 +584,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 
 		// Initialize variables
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$db    = \Joomla\CMS\Factory::getDbo();
+		$db    = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$user  = \Joomla\CMS\Factory::getUser();
 
 		// Get models
@@ -1215,7 +1216,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 	 */
 	protected function _getRecordsQuery($cid, $cols)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 
 		$cid = ArrayHelper::toInteger($cid);
 		$cols_list = implode(',', array_filter($cols, array($db, 'quoteName')));

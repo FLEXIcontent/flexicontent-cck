@@ -15,6 +15,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('cms.plugin.plugin');
 use Joomla\String\StringHelper;
+use Joomla\Database\DatabaseInterface;
 
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 
@@ -383,7 +384,7 @@ class plgContentFlexiBreak extends \Joomla\CMS\Plugin\CMSPlugin
 
 		$string = html_entity_decode($string, ENT_QUOTES, 'UTF-8');
 
-		//$table = new flexicontent_items(\Joomla\CMS\Factory::getDbo());
+		//$table = new flexicontent_items(\Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class));
 		$table = \Joomla\CMS\Table\Table::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
 
 		// Create ASCII (transliterate) hashtags

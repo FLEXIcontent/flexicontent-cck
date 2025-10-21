@@ -1393,7 +1393,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			$initialized = 1;
 			jimport('joomla.filesystem.folder');
 			jimport('joomla.filesystem.path');
-			$srcpath_original  = \Joomla\CMS\Filesystem\Path::clean( JPATH_SITE .DS. $import_docs_folder .DS );
+			$srcpath_original  = \Joomla\Filesystem\Path::clean( JPATH_SITE .DS. $import_docs_folder .DS );
 		}
 
 

@@ -13,6 +13,7 @@ defined('_JEXEC') or die;
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
+use Joomla\Database\DatabaseInterface;
 
 JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php');
 
@@ -127,7 +128,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		// Initialize variables
 		$app     = \Joomla\CMS\Factory::getApplication();
-		$db      = \Joomla\CMS\Factory::getDbo();
+		$db      = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 
 		$cid = $this->input->get('cid', array(), 'array');
 		$cid = ArrayHelper::toInteger($cid);
@@ -161,7 +162,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		// Initialize variables
 		$app     = \Joomla\CMS\Factory::getApplication();
-		$db      = \Joomla\CMS\Factory::getDbo();
+		$db      = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$user    = \Joomla\CMS\Factory::getUser();
 		$config  = \Joomla\CMS\Factory::getConfig();
 		$session = \Joomla\CMS\Factory::getSession();
@@ -1381,7 +1382,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 				}
 
 				// Get User Group / Author parameters
-				$db = \Joomla\CMS\Factory::getDbo();
+				$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 				$authorparams = flexicontent_db::getUserConfig($user->id);
 				$max_auth_limit = intval($authorparams->get('max_auth_limit', 0));  // Maximum number of content items the user can create
 
@@ -1689,7 +1690,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$db    = \Joomla\CMS\Factory::getDbo();
+		$db    = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$model = $this->getModel($this->record_name_pl);
 		$user  = \Joomla\CMS\Factory::getUser();
 
@@ -2421,7 +2422,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		// Initialize variables
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$db    = \Joomla\CMS\Factory::getDbo();
+		$db    = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$user  = \Joomla\CMS\Factory::getUser();
 
 		$cid = $this->input->get('cid', array(), 'array');

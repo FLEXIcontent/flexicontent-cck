@@ -13,6 +13,7 @@ defined('_JEXEC') or die;
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
+use Joomla\Database\DatabaseInterface;
 
 jimport('joomla.filesystem.file');
 jimport('joomla.filesystem.folder');
@@ -102,7 +103,7 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 		// Set some variables
 		$link  = 'index.php?option=com_flexicontent&view=import';  // $_SERVER['HTTP_REFERER'];
 		$task  = $jinput->get('task', '', 'cmd');
-		$db    = \Joomla\CMS\Factory::getDbo();
+		$db    = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$user  = \Joomla\CMS\Factory::getUser();
 		$session = \Joomla\CMS\Factory::getSession();
 		$has_zlib = function_exists("zlib_encode"); // Version_compare(PHP_VERSION, '5.4.0', '>=');
@@ -1118,8 +1119,8 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 		$app = \Joomla\CMS\Factory::getApplication();
 		$jinput = $app->input;
 
-		$mfolder  = \Joomla\CMS\Filesystem\Path::clean(JPATH_SITE . DS . $conf['media_folder'] . DS);
-		$dfolder  = \Joomla\CMS\Filesystem\Path::clean(JPATH_SITE . DS . $conf['docs_folder'] . DS);
+		$mfolder  = \Joomla\Filesystem\Path::clean(JPATH_SITE . DS . $conf['media_folder'] . DS);
+		$dfolder  = \Joomla\Filesystem\Path::clean(JPATH_SITE . DS . $conf['docs_folder'] . DS);
 
 		$ff_types_to_props = array('image' => 'originalname', 'file' => '_value_', 'mediafile' => '_value_');
 		$ff_types_to_paths = array('image' => $mfolder, 'file' => $dfolder, 'mediafile' => $mfolder);
@@ -1214,15 +1215,15 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 							$fext  = $path_parts['extension'];
 							$fname = $path_parts['filename'];
 
-							//echo "<pre>"; print_r(\Joomla\CMS\Filesystem\Path::clean( $srcpath_original . $filename)); echo '</pre>';
-							//echo "<pre>"; print_r(\Joomla\CMS\Filesystem\Path::clean( $srcpath_original . ($filename_LE = $fname . '.' . strtolower($fext)))); echo '</pre>';
-							//echo "<pre>"; print_r(\Joomla\CMS\Filesystem\Path::clean( $srcpath_original . ($filename_UE = $fname . '.' . strtoupper($fext)))); echo '</pre>';
+							//echo "<pre>"; print_r(\Joomla\Filesystem\Path::clean( $srcpath_original . $filename)); echo '</pre>';
+							//echo "<pre>"; print_r(\Joomla\Filesystem\Path::clean( $srcpath_original . ($filename_LE = $fname . '.' . strtolower($fext)))); echo '</pre>';
+							//echo "<pre>"; print_r(\Joomla\Filesystem\Path::clean( $srcpath_original . ($filename_UE = $fname . '.' . strtoupper($fext)))); echo '</pre>';
 
-							$_filename = \Joomla\CMS\Filesystem\File::exists( \Joomla\CMS\Filesystem\Path::clean($srcpath_original . $filename) ) ? $filename : false;
+							$_filename = \Joomla\Filesystem\File::exists( \Joomla\Filesystem\Path::clean($srcpath_original . $filename) ) ? $filename : false;
 							$_filename = $_filename ?:
-								(\Joomla\CMS\Filesystem\File::exists( \Joomla\CMS\Filesystem\Path::clean($srcpath_original . ($filename_LE = $fname . '.' . strtolower($fext))) ) ? $filename_LE : false);
+								(\Joomla\Filesystem\File::exists( \Joomla\Filesystem\Path::clean($srcpath_original . ($filename_LE = $fname . '.' . strtolower($fext))) ) ? $filename_LE : false);
 							$_filename = $_filename ?:
-								(\Joomla\CMS\Filesystem\File::exists( \Joomla\CMS\Filesystem\Path::clean($srcpath_original . ($filename_UE = $fname . '.' . strtoupper($fext))) ) ? $filename_UE : false);
+								(\Joomla\Filesystem\File::exists( \Joomla\Filesystem\Path::clean($srcpath_original . ($filename_UE = $fname . '.' . strtoupper($fext))) ) ? $filename_UE : false);
 
 							if ($_filename)
 							{

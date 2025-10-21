@@ -4,6 +4,7 @@
 require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
+use Joomla\Database\DatabaseInterface;
 
 class FlexicontentHelperPerm
 {
@@ -232,7 +233,7 @@ class FlexicontentHelperPerm
 	static function _getAllowedCats( $user_id, $actions_allowed, $require_all, $check_published, $specific_catids, $find_first)
 	{
 		global $globalcats;
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$usercats = array();
 
 		// -- passing user_id parameter to this function allows to cache per user
@@ -319,7 +320,7 @@ class FlexicontentHelperPerm
 
 		if(!isset($elements[$uid][$section][$action]) || $force) {
 			// Get database and use objects
-			$db = \Joomla\CMS\Factory::getDbo();
+			$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 			$user = \Joomla\CMS\Factory::getUser($uid);
 
 			// Query the assets table to retrieve the asset names for the specified section

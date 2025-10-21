@@ -20,6 +20,7 @@ defined('_JEXEC') or die('Restricted access');
 
 jimport('legacy.view.legacy');
 use Joomla\String\StringHelper;
+use Joomla\Database\DatabaseInterface;
 
 /**
  * View class for the FLEXIcontent appsman screen
@@ -40,7 +41,7 @@ class FlexicontentViewAppsman extends \Joomla\CMS\MVC\View\HtmlView
 
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
 		$user     = \Joomla\CMS\Factory::getUser();
-		$db       = \Joomla\CMS\Factory::getDbo();
+		$db       = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$document = \Joomla\CMS\Factory::getDocument();
 		$session  = \Joomla\CMS\Factory::getSession();
 		

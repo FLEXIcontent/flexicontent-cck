@@ -21,6 +21,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('legacy.view.legacy');
 use Joomla\String\StringHelper;
+use Joomla\Database\DatabaseInterface;
 
 /**
  * HTML View class for the FLEXIcontent View (RSS)
@@ -39,7 +40,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 	function display( $tpl = null )
 	{
 		// Initialize framework variables
-		$db       = \Joomla\CMS\Factory::getDbo();
+		$db       = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$app      = \Joomla\CMS\Factory::getApplication();
 		$document = \Joomla\CMS\Factory::getDocument();
 

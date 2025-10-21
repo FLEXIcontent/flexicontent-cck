@@ -925,7 +925,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 		$files = $jinput->files->get($formid);
 		if (isset($files))
 		{
-			\Joomla\CMS\Filesystem\Folder::create(JPATH_SITE . DS . "tmp" . DS . "upload_flexi_form". $formid);
+			\Joomla\Filesystem\Folder::create(JPATH_SITE . DS . "tmp" . DS . "upload_flexi_form". $formid);
 
 			foreach($files as $attachements) {
 				foreach ($attachements as $file){
@@ -933,14 +933,14 @@ class plgFlexicontent_fieldsEmail extends FCField
 				jimport('joomla.filesystem.file');
 
 				// Clean up filename to get rid of strange characters like spaces etc.
-				$filename = \Joomla\CMS\Filesystem\File::makeSafe($file['name']);
+				$filename = \Joomla\Filesystem\File::makeSafe($file['name']);
 
 				// Set up the source and destination of the file
 				$src = $file['tmp_name'];
 				$dest = JPATH_SITE . DS . "tmp" . DS . "upload_flexi_form". $formid . DS . $filename;
 					// TODO: Add security checks. FIle extension and size maybe using flexicontent helper
 
-					if (\Joomla\CMS\Filesystem\File::upload($src, $dest))
+					if (\Joomla\Filesystem\File::upload($src, $dest))
 						{
         			$mailer->addAttachment($dest);
 						} 
@@ -962,7 +962,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 				$destFolder= JPATH_SITE . DS . "tmp" . DS . "upload_flexi_form". $formid;
 				//Deleting file
 				if (is_dir($destFolder)) {
- 				\Joomla\CMS\Filesystem\Folder::delete($destFolder);
+ 				\Joomla\Filesystem\Folder::delete($destFolder);
 				} 
 			} else {
 				// Message sending
@@ -970,7 +970,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 				$destFolder= JPATH_SITE . DS . "tmp" . DS . "upload_flexi_form". $formid;
 				//Deleting file
 				if (is_dir($destFolder)) {
- 				\Joomla\CMS\Filesystem\Folder::delete($destFolder);
+ 				\Joomla\Filesystem\Folder::delete($destFolder);
 				} 
 			}
 	}

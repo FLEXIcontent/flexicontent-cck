@@ -455,7 +455,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			// Remove old folders
 			if ($days_diff > 2)
 			{
-				\Joomla\CMS\Filesystem\Folder::delete($subpath);
+				\Joomla\Filesystem\Folder::delete($subpath);
 			}
 
 			$it->next();
@@ -1251,7 +1251,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	{
 		// Get configuration parameters
 		$target_dir = (int) $params->get('target_dir', 1);
-		$securepath = \Joomla\CMS\Filesystem\Path::clean(($target_dir ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH).DS);
+		$securepath = \Joomla\Filesystem\Path::clean(($target_dir ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH).DS);
 
 		// Retrieve usage of images for the given field from the DB
 		$query = 'SELECT value'
@@ -1806,8 +1806,8 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			if ($file->url != 1)
 			{
 				$basepath	= $file->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;
-				$path 		= \Joomla\CMS\Filesystem\Path::clean($basepath.DS.DS.$file->filename);
-				if (!\Joomla\CMS\Filesystem\File::delete($path)) {
+				$path 		= \Joomla\Filesystem\Path::clean($basepath.DS.DS.$file->filename);
+				if (!\Joomla\Filesystem\File::delete($path)) {
 					JError::raiseWarning(100, \Joomla\CMS\Language\Text::_( 'FLEXI_UNABLE_TO_DELETE' ).$path);
 				}
 			}
@@ -2146,7 +2146,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			$filename = str_ireplace('.' . $ext, '', basename($full_path));
 
 			// Check preview folder
-			if (!\Joomla\CMS\Filesystem\Folder::exists($prv_path) && !\Joomla\CMS\Filesystem\Folder::create($prv_path))
+			if (!\Joomla\Filesystem\Folder::exists($prv_path) && !\Joomla\Filesystem\Folder::create($prv_path))
 			{
 				$error_mssg = $file->filename . ' : Failed to create preview folder: ' . $prv_path;
 				$this->setError($error_mssg);

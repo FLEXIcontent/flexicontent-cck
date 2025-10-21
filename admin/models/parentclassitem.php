@@ -14,6 +14,7 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Table\Table;
+use Joomla\Database\DatabaseInterface;
 
 require_once('base/base.php');
 
@@ -4744,7 +4745,7 @@ class ParentClassItem extends FCModelAdmin
 			return $nConf;
 		}
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$nConf = new stdClass();
 
 		// (b) Get Content Type specific notifications (that override global)
@@ -4875,7 +4876,7 @@ class ParentClassItem extends FCModelAdmin
 		if ( !count($notify_emails) ) return true;
 
 		$app     = \Joomla\CMS\Factory::getApplication();
-		$db      = \Joomla\CMS\Factory::getDbo();
+		$db      = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$user    = \Joomla\CMS\Factory::getUser();
 		$use_versioning = $this->_cparams->get('use_versioning', 1);
 

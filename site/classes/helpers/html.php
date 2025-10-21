@@ -276,7 +276,7 @@ class flexicontent_html
 			// Find if any "include" file has changed and set FLAG
 			if ( !$inc_path )
 				$_dirty = false;
-			else if ( !\Joomla\CMS\Filesystem\Folder::exists($inc_path) )
+			else if ( !\Joomla\Filesystem\Folder::exists($inc_path) )
 				$_dirty_arr[$inc_path] = $_dirty = false;
 			else
 				$_dirty = isset($_dirty_arr[$inc_path]) ? $_dirty_arr[$inc_path] : null;
@@ -289,7 +289,7 @@ class flexicontent_html
 				if (!is_array($inc_files) && $debug)Factory::getApplication()->enqueueMessage('Reading LESS folder failed: '.$inc_path, 'notice');
 				if (is_array($inc_files)) foreach ($inc_files as $confFile) {
 					//echo $confFile . " time: ".filemtime($confFile) ."<br>";
-					if (!\Joomla\CMS\Filesystem\File::exists($inc_path.'_config_fc_ts') || filemtime($confFile) > filemtime($inc_path.'_config_fc_ts')) {
+					if (!\Joomla\Filesystem\File::exists($inc_path.'_config_fc_ts') || filemtime($confFile) > filemtime($inc_path.'_config_fc_ts')) {
 						touch($inc_path.'_config_fc_ts');
 						$_dirty = true;
 						break;
@@ -344,7 +344,7 @@ class flexicontent_html
 			$nameOnly   = basename($inFilename, '.less');
 			$outFile    = 'css' .DS. $nameOnly . '.css';
 
-			if (!\Joomla\CMS\Filesystem\File::exists($path.$inFile)) {
+			if (!\Joomla\Filesystem\File::exists($path.$inFile)) {
 				if ($debug)Factory::getApplication()->enqueueMessage('Path not found: '.$path.$inFile, 'warning');
 			} else if ( $_dirty || $force || !is_file($path.$outFile) || filemtime($path.$inFile) > filemtime($path.$outFile) || (filesize($path.$outFile)===0 && is_writable($path.$outFile)) ) {
 				$stale[$inFile] = $outFile;
@@ -2430,7 +2430,7 @@ class flexicontent_html
 		// Case of local file, check that file exists
 		if (!preg_match("#^http|^https|^ftp#i", $image))
 		{
-			$image = \Joomla\CMS\Filesystem\File::exists( JPATH_SITE . DS . $image ) ? $image : '';
+			$image = \Joomla\Filesystem\File::exists( JPATH_SITE . DS . $image ) ? $image : '';
 		}
 
 		return $image;

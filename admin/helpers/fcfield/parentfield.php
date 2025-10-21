@@ -10,6 +10,7 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
+use Joomla\Database\DatabaseInterface;
 jimport('cms.plugin.plugin');
 
 class FCField extends \Joomla\CMS\Plugin\CMSPlugin
@@ -919,7 +920,7 @@ class FCField extends \Joomla\CMS\Plugin\CMSPlugin
 	 */
 	public function getExistingFieldValues()
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$query = $db->getQuery(true)
 			->select('value')
 			->from('#__flexicontent_fields_item_relations')
@@ -936,7 +937,7 @@ class FCField extends \Joomla\CMS\Plugin\CMSPlugin
 	function renameLegacyFieldParameters($map)
 	{
 		// Load parameters directly from DB
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$query = $db->getQuery(true)
 			->select('attribs')
 			->from('#__flexicontent_fields')

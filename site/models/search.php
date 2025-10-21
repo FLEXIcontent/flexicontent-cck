@@ -18,7 +18,7 @@
 
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
-
+use Joomla\Database\DatabaseInterface;
 jimport('legacy.model.legacy');
 
 /**
@@ -134,7 +134,7 @@ class FLEXIcontentModelSearch extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 		$option = $app->input->getCmd('option');
 
 		//if ( !$app->getUserState( $option.'.min_word_len', 0 ) ) {  // Do not cache to allow configuration changes
-			$db = \Joomla\CMS\Factory::getDbo();
+			$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 			$db->setQuery("SHOW VARIABLES LIKE '%ft_min_word_len%'");
 			$_dbvariable = $db->loadObject();
 			$min_word_len = (int) @ $_dbvariable->Value;

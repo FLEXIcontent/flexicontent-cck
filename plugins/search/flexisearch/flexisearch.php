@@ -18,6 +18,7 @@
 
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
+use Joomla\Database\DatabaseInterface;
 
 jimport('cms.plugin.plugin');
 
@@ -91,7 +92,7 @@ class plgSearchFlexisearch extends \Joomla\CMS\Plugin\CMSPlugin
 		}
 		$whereTypes =  $wheres ? '(' . implode(') OR (', $wheres) . ')' : '';
 		
-		$db		= \Joomla\CMS\Factory::getDbo();
+		$db		= \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$query	= $db->getQuery(true);
 		$query->clear();
 		$query->select('t.id, t.name ');
@@ -146,7 +147,7 @@ class plgSearchFlexisearch extends \Joomla\CMS\Plugin\CMSPlugin
 	 */
 	function onContentSearch( $text, $phrase='', $ordering='', $areas=null )
 	{
-		$db		= \Joomla\CMS\Factory::getDbo();
+		$db		= \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$app	= \Joomla\CMS\Factory::getApplication();
 		$user	= \Joomla\CMS\Factory::getUser();
 		

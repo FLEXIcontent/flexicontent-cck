@@ -18,6 +18,7 @@
 
 // Check to ensure this file is included in Joomla!
 use Joomla\CMS\Language\Text;
+use Joomla\Database\DatabaseInterface;
 
 defined('_JEXEC') or die('Restricted access');
 
@@ -63,7 +64,7 @@ class JFormFieldFields extends \Joomla\CMS\Form\FormField
 
 		$app  = \Joomla\CMS\Factory::getApplication();
 		$doc	= \Joomla\CMS\Factory::getDocument();
-		$db		= \Joomla\CMS\Factory::getDbo();
+		$db		= \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 
 		$node = & $this->element;

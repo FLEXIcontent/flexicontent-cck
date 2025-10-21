@@ -48,7 +48,7 @@ foreach($values as $file_id)
 	// ***
 
 	$basePath = $file_data->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;
-	$abspath = str_replace(DS, '/', \Joomla\CMS\Filesystem\Path::clean($basePath.DS.$file_data->filename));
+	$abspath = str_replace(DS, '/', \Joomla\Filesystem\Path::clean($basePath.DS.$file_data->filename));
 
 	$_size = '-';
 
