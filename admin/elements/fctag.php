@@ -13,6 +13,7 @@ defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
+use Joomla\CMS\Factory;
 
 jimport('cms.html.html');      // JHtml
 jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
@@ -109,11 +110,11 @@ class JFormFieldFctag extends \Joomla\CMS\Form\FormField
 				fc_field_dialog_handle_record.dialog('close');
 			}
 			";
-			\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration($js);
+			Factory::getApplication()->getDocument()->addScriptDeclaration($js);
 			flexicontent_html::loadFramework('flexi-lib');
 		}
 
-		$app    = \Joomla\CMS\Factory::getApplication();
+		$app    = Factory::getApplication();
 		$jinput = $app->input;
 		$option = $jinput->get('option', '', 'CMD');
 		$view   = $jinput->get('view', '', 'CMD');

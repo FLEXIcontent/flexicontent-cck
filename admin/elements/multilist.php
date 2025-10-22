@@ -20,6 +20,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
+use Joomla\CMS\Factory;
 
 // Load the helper classes
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
@@ -194,7 +195,7 @@ class JFormFieldMultiList extends JFormFieldGroupedList
 			self::$css_js_added = true;
 			flexicontent_html::loadFramework('flexi-lib');
 
-			if ( \Joomla\CMS\Factory::getApplication()->input->get('option', '', 'cmd') != 'com_flexicontent' )
+			if ( Factory::getApplication()->input->get('option', '', 'cmd') != 'com_flexicontent' )
 			{
 				$js = "
 				jQuery(document).ready(function(){
@@ -204,7 +205,7 @@ class JFormFieldMultiList extends JFormFieldGroupedList
 					)."
 				});
 				";
-				\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration($js);
+				Factory::getApplication()->getDocument()->addScriptDeclaration($js);
 			}
 		}
 

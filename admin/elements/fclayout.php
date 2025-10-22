@@ -21,7 +21,6 @@ use Joomla\CMS\Session\Session;
 use Joomla\CMS\Uri\Uri;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Utilities\ArrayHelper;
-use Joomla\Database\DatabaseInterface;
 
 // Load the helper classes
 require_once JPATH_ROOT . '/components/com_flexicontent/classes/flexicontent.helper.php';
