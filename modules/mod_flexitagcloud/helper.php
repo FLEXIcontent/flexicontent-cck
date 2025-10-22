@@ -27,7 +27,7 @@ class modFlexiTagCloudHelper
 		// Initialize
 		$app  = \Joomla\CMS\Factory::getApplication();
 		$db   = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
 
 		//$now    = FLEXI_J16GE ? \Joomla\CMS\Factory::getDate()->toSql() : \Joomla\CMS\Factory::getDate()->toMySQL();

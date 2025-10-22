@@ -65,7 +65,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 	function saveprops()
 	{
 		// Set tree data into session
-		$session = \Joomla\CMS\Factory::getSession();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 		$file_row_id = $this->input->get('file_row_id', '', 'string');
 		$uploader_file_data = $session->get('uploader_file_data', array(), 'flexicontent');
 		$props = array();
@@ -123,7 +123,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$rebuildmode = $this->input->getCmd('rebuildmode', '');
 		$index_urls  = $this->input->getInt('index_urls', 0);
 
-		$session = \Joomla\CMS\Factory::getSession();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 		$db      = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$app     = \Joomla\CMS\Factory::getApplication();
 
@@ -134,8 +134,8 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		}
 
 		// Clear previous log file
-		$log_filename      = 'filemanager_stats_indexer_' . \Joomla\CMS\Factory::getUser()->id . '.php';
-		$log_filename_full = \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getConfig()->get('log_path') . DS . $log_filename);
+		$log_filename      = 'filemanager_stats_indexer_' . \Joomla\CMS\Factory::getApplication()->getIdentity()->id . '.php';
+		$log_filename_full = \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getApplication()->getConfig()->get('log_path') . DS . $log_filename);
 
 		if (file_exists($log_filename_full))
 		{
@@ -200,7 +200,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 		$start_microtime = microtime(true);
 
-		$session = \Joomla\CMS\Factory::getSession();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 		$db      = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$app     = \Joomla\CMS\Factory::getApplication();
 
@@ -411,7 +411,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			}
 			if ($mediadata_err_count || $mediadata_file_count)
 			{
-				$session->set('mediadata_stats_log_filename', 'mediadata_stats_indexer_' . \Joomla\CMS\Factory::getUser()->id . '.php', 'flexicontent');
+				$session->set('mediadata_stats_log_filename', 'mediadata_stats_indexer_' . \Joomla\CMS\Factory::getApplication()->getIdentity()->id . '.php', 'flexicontent');
 			}
 
 

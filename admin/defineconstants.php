@@ -13,10 +13,12 @@ defined('_JEXEC') or die('Restricted access');
 
 use Joomla\CMS\Factory;
 use Joomla\Filesystem\Path;
+use Joomla\Database\DatabaseInterface;
+
 
 // Make sure that Joomla error reporting is used (some plugin may have turned it OFF)
 // Also make some changes e.g. disable E_STRICT for maximum and leave it on only for development
-switch (Factory::getConfig()->get('error_reporting') )
+switch (Factory::getApplication()->getConfig()->get('error_reporting') )
 {
 	case 'default':
 	case '-1':
@@ -33,7 +35,7 @@ switch (Factory::getConfig()->get('error_reporting') )
 		break;
 	
 	case 'maximum':
-		error_reporting(E_ALL & ~E_STRICT);
+		error_reporting(E_ALL);
 		ini_set('display_errors',1);
 		break;
 	
@@ -43,7 +45,7 @@ switch (Factory::getConfig()->get('error_reporting') )
 		break;
 	
 	default:
-		error_reporting(Factory::getConfig()->get('error_reporting') );
+		error_reporting(Factory::getApplication()->getConfig()->get('error_reporting') );
 		ini_set('display_errors', 1);
 		break;
 }
@@ -98,7 +100,7 @@ if (!defined('FLEXI_SECTION'))				define('FLEXI_SECTION', 0);
 if (!defined('FLEXI_CAT_EXTENSION'))
 {
 	define('FLEXI_CAT_EXTENSION', $params->get('flexi_cat_extension','com_content'));
-	$db =Factory::getDbo();
+	$db =Factory::getContainer()->get(DatabaseInterface::class);
 	$query = "SELECT lft,rgt FROM #__categories WHERE id=1 ";
 	$db->setQuery($query);
 	$obj = $db->loadObject();

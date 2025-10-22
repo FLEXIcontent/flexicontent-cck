@@ -201,8 +201,8 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 
 		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 
-		\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, 'en-GB', true);
-		\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, null, true);
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, 'en-GB', true);
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, null, true);
 		
 		// !! IMPORTANT core fields have specific fields ID, ranging from 1 - 14
 		// !! Make sure these have been creating before trying to add any other fields into the flexicontent_fields DB table

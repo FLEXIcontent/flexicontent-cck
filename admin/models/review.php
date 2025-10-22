@@ -125,8 +125,8 @@ class FlexicontentModelReview extends FCModelAdmin
 		$this->canCreate = FlexicontentHelperPerm::getPerm()->CanCreateReviews;
 
 		// Load field's language files
-		\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, 'en-GB', true);
-		\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, null, true);
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, 'en-GB', true);
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, null, true);
 	}
 
 
@@ -212,7 +212,7 @@ class FlexicontentModelReview extends FCModelAdmin
 		 */
 
 		$isNew    = empty($this->_record->id);
-		$isLogged = (boolean) \Joomla\CMS\Factory::getUser()->id;
+		$isLogged = (boolean) \Joomla\CMS\Factory::getApplication()->getIdentity()->id;
 		
 		$readonlyFields = array();
 		$hiddenFields   = array();
@@ -300,7 +300,7 @@ class FlexicontentModelReview extends FCModelAdmin
 		}
 
 		$record  = $record ?: $this->_record;
-		$user    = $user ?: \Joomla\CMS\Factory::getUser();
+		$user    = $user ?: \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$app     = \Joomla\CMS\Factory::getApplication();
 
 		$isOwner = $record && $record->user_id == $user->id;
@@ -375,7 +375,7 @@ class FlexicontentModelReview extends FCModelAdmin
 		}
 
 		$record  = $record ?: $this->_record;
-		$user    = $user ?: \Joomla\CMS\Factory::getUser();
+		$user    = $user ?: \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		return $this->canManage;
 	}
@@ -391,7 +391,7 @@ class FlexicontentModelReview extends FCModelAdmin
 	public function canDelete($record = null)
 	{
 		$record  = $record ?: $this->_record;
-		$user    = \Joomla\CMS\Factory::getUser();
+		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		return $this->canManage;
 	}
@@ -461,7 +461,7 @@ class FlexicontentModelReview extends FCModelAdmin
 	 */
 	public function reviewerValidation($data)
 	{
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$db   = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 
 		$review_id   = $data['id'];
@@ -543,7 +543,7 @@ class FlexicontentModelReview extends FCModelAdmin
 
 		if (count($cid))
 		{
-			$user     = \Joomla\CMS\Factory::getUser();
+			$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 			$cid_list = implode(',', $cid);
 
 			$query = $this->_db->getQuery(true)

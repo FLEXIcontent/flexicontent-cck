@@ -16,7 +16,7 @@
  * GNU General Public License for more details.
  */
 
-defined('JPATH_PLATFORM') or die;
+defined('_JEXEC') or die;
 use Joomla\Database\DatabaseInterface;
 
 jimport('cms.html.html');      // JHtml

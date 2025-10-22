@@ -147,7 +147,7 @@ class JFormFieldItem extends FormField
 				fc_field_dialog_handle_record.dialog('close');
 			}
 			";
-			Factory::getDocument()->addScriptDeclaration($js);
+			Factory::getApplication()->getDocument()->addScriptDeclaration($js);
 			flexicontent_html::loadFramework('flexi-lib');
 		}
 

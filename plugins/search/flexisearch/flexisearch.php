@@ -149,10 +149,10 @@ class plgSearchFlexisearch extends \Joomla\CMS\Plugin\CMSPlugin
 	{
 		$db		= \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$app	= \Joomla\CMS\Factory::getApplication();
-		$user	= \Joomla\CMS\Factory::getUser();
+		$user	= \Joomla\CMS\Factory::getApplication()->getIdentity();
 		
 		// Get language
-		$cntLang = substr(\Joomla\CMS\Factory::getLanguage()->getTag(), 0,2);  // Current Content language (Can be natively switched in J2.5)
+		$cntLang = substr(\Joomla\CMS\Factory::getApplication()->getLanguage()->getTag(), 0,2);  // Current Content language (Can be natively switched in J2.5)
 		$urlLang  = \Joomla\CMS\Factory::getApplication()->input->getWord('lang', '' );                 // Language from URL (Can be switched via Joomfish in J1.5)
 		$lang = (FLEXI_J16GE || empty($urlLang)) ? $cntLang : $urlLang;
 		

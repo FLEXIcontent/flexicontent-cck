@@ -54,10 +54,10 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 		$form_empty_fields_text = \Joomla\CMS\Language\Text::_($field->parameters->get('form_empty_fields_text', 'FLEXI_NA'));
 
 		// Initialize framework objects and other variables
-		$document = \Joomla\CMS\Factory::getDocument();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
 		$db   = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$app  = \Joomla\CMS\Factory::getApplication();
 		$isAdmin = $app->isClient('administrator');
 
@@ -487,7 +487,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 			$initialized = 1;
 
 			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$document  = \Joomla\CMS\Factory::getApplication()->getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');

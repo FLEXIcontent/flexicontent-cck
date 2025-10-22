@@ -31,7 +31,7 @@ class FLEXIadvsearchHelper
 	static function santiseSearchWord(&$searchword, $searchphrase, $min=2)
 	{
 		$ignored = false;
-		$lang = \Joomla\CMS\Factory::getLanguage();
+		$lang = \Joomla\CMS\Factory::getApplication()->getLanguage();
 		$lang_tag = $lang->getTag();
 		$search_prefix = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
 

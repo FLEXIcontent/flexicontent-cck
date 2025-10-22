@@ -250,7 +250,7 @@ $item_placement_std = -1;
 $item_columns_std   = 1;
 $cols_class_std     = $item_columns_std  <= 1 ? '' : 'cols_' . $item_columns_std;
 
-$document = \Joomla\CMS\Factory::getDocument();
+$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 $jcookie  = \Joomla\CMS\Factory::getApplication()->input->cookie;
 
 // Add Carousel JS
@@ -720,7 +720,7 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 					? \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endTabSet')
 					: \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endAccordion');
 
-				\Joomla\CMS\Factory::getDocument()->addScriptDeclaration("
+				\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration("
 				(function($) {
 					$(document).ready(function ()
 					{

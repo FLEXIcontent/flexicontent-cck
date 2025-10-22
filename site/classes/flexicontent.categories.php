@@ -330,7 +330,7 @@ class flexicontent_cats
 		if (!$globalcats) $globalcats = array();
 
 		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$app  = \Joomla\CMS\Factory::getApplication();
 		$controller = $app->input->get('controller', '', 'cmd');
 		$task = $app->input->get('task', '', 'cmd');
@@ -669,7 +669,7 @@ class flexicontent_cats
 	{
 		global $globalcats;
 		$app     = \Joomla\CMS\Factory::getApplication();
-		$user    = \Joomla\CMS\Factory::getUser();
+		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$fparams = $app->getParams('com_flexicontent');
 		$show_noauth = $fparams->get('show_noauth', 0);
 

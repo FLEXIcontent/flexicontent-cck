@@ -10,6 +10,7 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
+use Joomla\CMS\Mail\MailerFactoryInterface;
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
 class plgFlexicontent_fieldsEmail extends FCField
@@ -64,7 +65,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 		$auto_value = $auto_value === 2 && !$auto_value_code ? 0 : $auto_value;
 
 		// Initialize framework objects and other variables
-		$document = \Joomla\CMS\Factory::getDocument();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
 
 		$tooltip_class = 'hasTooltip';
@@ -477,7 +478,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 			$initialized = 1;
 
 			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$document  = \Joomla\CMS\Factory::getApplication()->getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -801,7 +802,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 	public static function sendEmail()
 	{
 		// Load plugin language
-		$lang = \Joomla\CMS\Factory::getLanguage();
+		$lang = \Joomla\CMS\Factory::getApplication()->getLanguage();
 		$lang->load('plg_flexicontent_fields_email', JPATH_ADMINISTRATOR);
 
 		// get the params from the plugin options
@@ -819,7 +820,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 		
 		// create variable for email
 		global $globalcats;
-		$config = \Joomla\CMS\Factory::getConfig();
+		$config = \Joomla\CMS\Factory::getApplication()->getConfig();
 		$categories = & $globalcats;
 		// Get the route helper
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
@@ -889,7 +890,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 			{
 				$messagecopy   = \Joomla\CMS\Language\Text::sprintf('FLEXI_FIELD_EMAIL_MESSAGE_DEFAULT_COPY', $title, $body, '<a href="'.$item_url.'">'.$item_url.'</a>', $sitename);
 				$subjectcopy =  \Joomla\CMS\Language\Text::sprintf('FLEXI_FIELD_EMAIL_SUBJECT_DEFAULT_COPY', $fromname, $itemauthor, $subject);
-				$mailer = \Joomla\CMS\Factory::getMailer();
+				$mailer = \Joomla\CMS\Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();
 				$mailer->isHTML(true);
 				$mailer ->setSender(array($emailauthor, $itemauthor));
 				$mailer ->addRecipient($fromemail);
@@ -903,7 +904,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 				{
 					$messagecopyadmin   = \Joomla\CMS\Language\Text::sprintf('FLEXI_FIELD_EMAIL_MESSAGE_ADMIN_COPY', $fromname , $title, $body, '<a href="'.$item_url.'">'.$item_url.'</a>', $sitename);
 					$subjectcopyadmin =  \Joomla\CMS\Language\Text::sprintf('FLEXI_FIELD_EMAIL_SUBJECT_ADMIN_COPY', $itemauthor, $subject);
-					$mailer = \Joomla\CMS\Factory::getMailer();
+					$mailer = \Joomla\CMS\Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();
 					$mailer->isHTML(true);
 					$mailer ->setSender($from, $fromname);
 					$mailer ->addRecipient($email_admin);
@@ -914,7 +915,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 
 
 			//Prepare contact email
-			$mailer = \Joomla\CMS\Factory::getMailer();
+			$mailer = \Joomla\CMS\Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();
 			$mailer->isHTML(true);
 			$mailer->setSender($from, $fromname);
 			$mailer->addRecipient($emailauthor);

@@ -115,7 +115,7 @@ class FlexicontentFields
 		if (!is_array($_items))  $items = array( & $_items );  else  $items = & $_items ;
 
 		$jinput    = \Joomla\CMS\Factory::getApplication()->input;
-		$user      = \Joomla\CMS\Factory::getUser();
+		$user      = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$cparams   = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 		$print_logging_info = $cparams->get('print_logging_info');
 
@@ -206,7 +206,7 @@ class FlexicontentFields
 		}
 
 		$db   = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		$field_types_quoted = array();
 
@@ -253,7 +253,7 @@ class FlexicontentFields
 		}
 
 		$db   = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		$field_ids = ArrayHelper::toInteger($field_ids);
 
@@ -349,7 +349,7 @@ class FlexicontentFields
 
 		$dispatcher = JEventDispatcher::getInstance();
 		$db   = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$nullDate = $db->getNulldate();
 
 		// This is optimized regarding the use of SINGLE QUERY to retrieve the core item data
@@ -753,7 +753,7 @@ class FlexicontentFields
 		static $aid;
 		if ($aid === null)
 		{
-			$aid = \Joomla\CMS\Access\Access::getAuthorisedViewLevels(\Joomla\CMS\Factory::getUser()->id);
+			$aid = \Joomla\CMS\Access\Access::getAuthorisedViewLevels(\Joomla\CMS\Factory::getApplication()->getIdentity()->id);
 		}
 
 		if (is_array($_item) && is_string($_field)) ;  // ok
@@ -867,7 +867,7 @@ class FlexicontentFields
 
 			if ($show_acc_msg == 2 && $login_link === null)
 			{
-				if (\Joomla\CMS\Factory::getUser()->guest)
+				if (\Joomla\CMS\Factory::getApplication()->getIdentity()->guest)
 				{
 					$uri      = \Joomla\CMS\Uri\Uri::getInstance();
 					$return   = strtr(base64_encode($uri->toString()), '+/=', '-_,');          // Current URL as return URL (but we will for id / cid)
@@ -1678,7 +1678,7 @@ class FlexicontentFields
 	 */
 	static function _getFavoured(&$items, $view = FLEXI_ITEMVIEW)
 	{
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 
 		$cids = array();
@@ -2015,7 +2015,7 @@ class FlexicontentFields
 	{
 		//--. Get a 2 character language tag
 		static $lang = null;
-		$lang = substr(\Joomla\CMS\Factory::getLanguage()->getTag(), 0,2);
+		$lang = substr(\Joomla\CMS\Factory::getApplication()->getLanguage()->getTag(), 0,2);
 
 		// --. SET a type specific label for the current field
 
@@ -3904,7 +3904,7 @@ class FlexicontentFields
 		static $faceted_overlimit_msg = null;
 
 		$app = \Joomla\CMS\Factory::getApplication();
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');  // createFilter maybe called in backend too ...
 		$print_logging_info = $cparams->get('print_logging_info');
 
@@ -4034,7 +4034,7 @@ class FlexicontentFields
 			$createFilterValues = !$isSearchView ? 'createFilterValues' : 'createFilterValuesSearch';
 
 			// Decide if filter display depends on language too
-			$lang_code = $isDate && !empty($filter->date_txtformat)? \Joomla\CMS\Factory::getLanguage()->getTag() : null;
+			$lang_code = $isDate && !empty($filter->date_txtformat)? \Joomla\CMS\Factory::getApplication()->getLanguage()->getTag() : null;
 
 			// This is hack for filter core properties to be filterable in search view without being added to the adv search index
 			if ($filter->field_type == 'coreprops' &&  $view=='search')
@@ -5081,7 +5081,7 @@ class FlexicontentFields
 		// array_flip to get unique filter ids as KEYS (due to flipping) ... and then array_keys to get filter_ids in 0,1,2, ... array
 		$filter_ids = array_keys(array_flip($filter_ids));
 
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$db   = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 
 		// None selected filters means ALL
@@ -5277,7 +5277,7 @@ class FlexicontentFields
 	static function createItemsListSQL($params, $itemIDs, $field, $item, $options)
 	{
 		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		// Options
 		$reverse_field_id = (int) $params->get('reverse_field', 0);
@@ -5298,7 +5298,7 @@ class FlexicontentFields
 			if ($samelangonly)
 			{
 				$language = !$item->language || $item->language === '*'
-					? \Joomla\CMS\Factory::getLanguage()->getTag()
+					? \Joomla\CMS\Factory::getApplication()->getLanguage()->getTag()
 					: $item->language;
 				$scopes_where[] = ' (ext.language = ' . $db->Quote($language) . ' OR ext.language = ' . $db->Quote('*') . ') ';
 			}
@@ -5847,7 +5847,7 @@ class FlexicontentFields
 		static $groupInfo = null;
 		if ($groupInfo !== null) return $groupInfo;
 
-		$db    = FLEXI_J40GE ? Factory::getContainer()->get(DatabaseInterface::class) : Factory::getDbo();
+		$db    = FLEXI_J40GE ? Factory::getContainer()->get(DatabaseInterface::class) : Factory::getContainer()->get(DatabaseInterface::class);
 		$query = $db->getQuery(true)
 			->select('f.*')
 			->from($db->quoteName('#__flexicontent_fields', 'f'))

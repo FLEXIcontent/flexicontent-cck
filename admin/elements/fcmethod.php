@@ -44,7 +44,7 @@ class JFormFieldFcmethod extends JFormFieldRadio
 
 	function getInput()
 	{
-		$doc = \Joomla\CMS\Factory::getDocument();
+		$doc = \Joomla\CMS\Factory::getApplication()->getDocument();
 
 		$node = & $this->element;
 		$attributes = get_object_vars($node->attributes());

@@ -32,7 +32,7 @@ class FlexicontentViewItems extends \Joomla\CMS\MVC\View\HtmlView
 	function display($tpl = null)
 	{
 		$app        = \Joomla\CMS\Factory::getApplication();
-		$user       = \Joomla\CMS\Factory::getUser();
+		$user       = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$dispatcher = JEventDispatcher::getInstance();
 
 		// Initialize some variables
@@ -51,7 +51,7 @@ class FlexicontentViewItems extends \Joomla\CMS\MVC\View\HtmlView
 			? $app->triggerEvent('onContentPrepare', array ('com_content.article', &$item, &$params, 0))
 			: $dispatcher->trigger('onContentPrepare', array ('com_content.article', &$item, &$params, 0));
 
-		$document = \Joomla\CMS\Factory::getDocument();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 
 		// set document information
 		$document->setTitle($item->title);

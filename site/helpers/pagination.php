@@ -17,7 +17,7 @@
  */
 
 // Check to ensure this file is within the rest of the framework
-defined('JPATH_PLATFORM') or die;
+defined('_JEXEC') or die;
 
 // Avoid problems with extensions that implement \Joomla\CMS\Pagination\Pagination, instead of extending it, and have already load it
 if ( !class_exists('\Joomla\CMS\Pagination\Pagination') )

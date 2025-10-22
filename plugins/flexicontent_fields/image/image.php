@@ -15,6 +15,8 @@ use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\Filesystem\File;
 use Joomla\Filesystem\Path;
 use Joomla\Filesystem\Folder;
+use Joomla\Database\DatabaseInterface;
+
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
@@ -73,10 +75,10 @@ class plgFlexicontent_fieldsImage extends FCField
 		$is_ingroup  = !empty($field->ingroup);
 
 		// Initialize framework objects and other variables
-		$document = Factory::getDocument();
+		$document = Factory::getApplication()->getDocument();
 		$cparams  = ComponentHelper::getParams( 'com_flexicontent' );
 		$app  = Factory::getApplication();
-		$user = Factory::getUser();
+		$user = Factory::getApplication()->getIdentity();
 
 		// Execute once
 		static $initialized = null;
@@ -818,7 +820,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			$initialized = 1;
 
 			$app       = Factory::getApplication();
-			$document  = Factory::getDocument();
+			$document  = Factory::getApplication()->getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -2184,9 +2186,9 @@ class plgFlexicontent_fieldsImage extends FCField
 			}
 			else
 			{
-				$db     = Factory::getDbo();
-				$user   = Factory::getUser();
-				$config = Factory::getConfig();
+				$db     = Factory::getContainer()->get(DatabaseInterface::class);
+				$user   = Factory::getApplication()->getIdentity();
+				$config = Factory::getApplication()->getConfig();
 
 				$timezone = $config->get('offset');
 				$date = Factory::getDate('now');
@@ -2428,7 +2430,7 @@ class plgFlexicontent_fieldsImage extends FCField
 	public function removeOriginalFile($field, $filename)
 	{
 		$app = Factory::getApplication();
-		$db  = Factory::getDbo();
+		$db  = Factory::getContainer()->get(DatabaseInterface::class);
 
 		jimport('joomla.filesystem.file');
 		jimport('joomla.filesystem.path');
@@ -2638,7 +2640,7 @@ class plgFlexicontent_fieldsImage extends FCField
 				)
 			)
 			{
-				/*if (Factory::getUser()->authorise('core.admin', 'root.1'))
+				/*if (Factory::getApplication()->getIdentity()->authorise('core.admin', 'root.1'))
 				{
 					echo "FILENAME: ".$thumbname.", ".($crop ? "CROP" : "SCALE").", ".($thumbnail_exists ? "OLDSIZE(w,h): $filesize_w,$filesize_h" : "")
 						."  NEWSIZE(w,h): $param_w,$param_h <br />"
@@ -2663,7 +2665,7 @@ class plgFlexicontent_fieldsImage extends FCField
 	function canDeleteImage( &$field, $record, &$item )
 	{
 		// Retrieve available (and appropriate) images from the DB
-		$db   = Factory::getDbo();
+		$db   = Factory::getContainer()->get(DatabaseInterface::class);
 		$query = 'SELECT id'
 			. ' FROM #__flexicontent_files'
 			. ' WHERE filename='. $db->Quote($record)
@@ -2687,7 +2689,7 @@ class plgFlexicontent_fieldsImage extends FCField
 
 	function listImageUses($field, $record)
 	{
-		$db = Factory::getDbo();
+		$db = Factory::getContainer()->get(DatabaseInterface::class);
 		$query = 'SELECT value, item_id'
 			. ' FROM #__flexicontent_fields_item_relations'
 			. ' WHERE field_id = '. (int) $field->id
@@ -2803,7 +2805,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		if ( count($new_ids) )
 		{
 			// Only query files that are not already cached
-			$db = Factory::getDbo();
+			$db = Factory::getContainer()->get(DatabaseInterface::class);
 			$query = 'SELECT * '. $extra_select //filename, filename_original, altname, description, ext, id'
 				. ' FROM #__flexicontent_files'
 				. ' WHERE id IN ('. implode(',', $new_ids) . ')'

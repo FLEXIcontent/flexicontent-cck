@@ -14,6 +14,7 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\Database\DatabaseInterface;
+use Joomla\CMS\Toolbar\ToolbarFactoryInterface;
 
 JLoader::register('FlexicontentViewBaseRecord', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_record.php');
 jimport('joomla.filesystem.file');
@@ -36,8 +37,8 @@ class FlexicontentViewField extends FlexicontentViewBaseRecord
 
 		$app        = \Joomla\CMS\Factory::getApplication();
 		$jinput     = $app->input;
-		$document   = \Joomla\CMS\Factory::getDocument();
-		$user       = \Joomla\CMS\Factory::getUser();
+		$document   = \Joomla\CMS\Factory::getApplication()->getDocument();
+		$user       = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$db         = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$cparams    = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 		$perms      = FlexicontentHelperPerm::getPerm();
@@ -107,16 +108,16 @@ class FlexicontentViewField extends FlexicontentViewBaseRecord
 		// Add css to document
 		if ($isAdmin)
 		{
-			!\Joomla\CMS\Factory::getLanguage()->isRtl()
+			!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
 				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
-			!\Joomla\CMS\Factory::getLanguage()->isRtl()
+			!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 		}
 		else
 		{
-			!\Joomla\CMS\Factory::getLanguage()->isRtl()
+			!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
 				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
 		}
@@ -148,7 +149,7 @@ class FlexicontentViewField extends FlexicontentViewBaseRecord
 		 * Create the toolbar
 		 */
 
-		$toolbar = \Joomla\CMS\Toolbar\Toolbar::getInstance('toolbar');
+		$toolbar = \Joomla\CMS\Factory::getApplication()->getDocument()->getToolbar('toolbar');
 
 		// Creation flag used to decide if adding save and new / save as copy buttons are allowed
 		$cancreate = true;
@@ -324,8 +325,8 @@ class FlexicontentViewField extends FlexicontentViewBaseRecord
 		// Because 'site-default' language file may not have all needed language strings, or it may be syntactically broken
 		// we load the ENGLISH language file (without forcing it, to avoid overwritting site-default), and then current language file
 		$extension_name = 'plg_flexicontent_fields_'. ($row->iscore ? 'core' : $row->field_type);
-		\Joomla\CMS\Factory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, 'en-GB', $force_reload = false, $load_default = true);  // force_reload OFF
-		\Joomla\CMS\Factory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, null, $force_reload = true, $load_default = true);
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, 'en-GB', $force_reload = false, $load_default = true);  // force_reload OFF
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, null, $force_reload = true, $load_default = true);
 
 
 

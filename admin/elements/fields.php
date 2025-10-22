@@ -63,7 +63,7 @@ class JFormFieldFields extends \Joomla\CMS\Form\FormField
 		}
 
 		$app  = \Joomla\CMS\Factory::getApplication();
-		$doc	= \Joomla\CMS\Factory::getDocument();
+		$doc	= \Joomla\CMS\Factory::getApplication()->getDocument();
 		$db		= \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 
@@ -352,7 +352,7 @@ class JFormFieldFields extends \Joomla\CMS\Form\FormField
 			<div class="fcclear"></div>';
 
 			$js = "";
-			if ($js) \Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+			if ($js) \Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration($js);
 
 			$attribs .= ' class="use_select2_lib" ';
 			flexicontent_html::loadFramework('select2');

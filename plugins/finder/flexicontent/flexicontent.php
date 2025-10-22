@@ -25,6 +25,8 @@ use Joomla\Database\DatabaseDriver;
 use Joomla\Database\DatabaseQuery;
 use Joomla\Event\SubscriberInterface;
 use Joomla\Registry\Registry;
+use Joomla\Database\DatabaseInterface;
+
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
@@ -332,7 +334,7 @@ class Flexicontent extends _Flexicontent
         if (!isset($item->category) || !isset($item->cat_state) || !isset($item->cat_access))
         {
             /** @var DatabaseDriver $db */
-            $db = version_compare(JVERSION, '4', 'ge') ? Factory::getContainer()->get('DatabaseDriver') : Factory::getDbo();
+            $db = version_compare(JVERSION, '4', 'ge') ? Factory::getContainer()->get('DatabaseDriver') : Factory::getContainer()->get(DatabaseInterface::class);
             $category = self::$isJ4GE
                 ? $this->getApplication()->bootComponent('com_content')->getCategory(['published' => false, 'access' => false])->get($item->catid)
                 : $db->setQuery($db->getQuery(true)
@@ -352,7 +354,7 @@ class Flexicontent extends _Flexicontent
         if (!isset($item->type_state))
         {
             /** @var DatabaseDriver $db */
-            $db = version_compare(JVERSION, '4', 'ge') ? Factory::getContainer()->get('DatabaseDriver') : Factory::getDbo();
+            $db = version_compare(JVERSION, '4', 'ge') ? Factory::getContainer()->get('DatabaseDriver') : Factory::getContainer()->get(DatabaseInterface::class);
             $type = $db->setQuery($db->getQuery(true)
                     ->select('t.*')
                     ->from('#__flexicontent_types AS t')
@@ -460,7 +462,7 @@ class Flexicontent extends _Flexicontent
     protected function getListQuery($query = null)
     {
         /** @var DatabaseDriver $db */
-        $db = version_compare(JVERSION, '4', 'ge') ? Factory::getContainer()->get('DatabaseDriver') : Factory::getDbo();
+        $db = version_compare(JVERSION, '4', 'ge') ? Factory::getContainer()->get('DatabaseDriver') : Factory::getContainer()->get(DatabaseInterface::class);
 
         // Check if we can use the supplied SQL query.
         /** @var DatabaseQuery $query */

@@ -52,7 +52,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		self::$css_js_added = true;
 
 		$app = \Joomla\CMS\Factory::getApplication();
-		$document = \Joomla\CMS\Factory::getDocument();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$jinput = $app->input;
 		$option = $jinput->get('option', '', 'cmd');
 		$view = $jinput->get('view', '', 'cmd');
@@ -63,7 +63,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		{
 			$isAdmin = $app->isClient('administrator');
 
-			if (!\Joomla\CMS\Factory::getLanguage()->isRtl())
+			if (!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl())
 			{
 				!$isAdmin ?
 					$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH)) :
@@ -76,7 +76,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
 			}
 
-			!\Joomla\CMS\Factory::getLanguage()->isRtl()
+			!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 
@@ -101,7 +101,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 	function add_tab_css_js()
 	{
 		self::$tab_css_js_added = true;
-		$document = \Joomla\CMS\Factory::getDocument();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		
 		// Load JS tabber lib
 		$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
@@ -112,7 +112,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 
 	function add_comp_acl_headers()
 	{
-		\Joomla\CMS\Factory::getDocument()->addScriptDeclaration('
+		\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration('
 			jQuery(document).ready(function()
 			{
 				jQuery("div.control-group > div").each(function(i, el) {

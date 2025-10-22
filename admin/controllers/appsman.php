@@ -100,9 +100,9 @@ class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 	{
 		$app   = \Joomla\CMS\Factory::getApplication();
 		$model = $this->getModel($this->record_name);
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
-		$session  = \Joomla\CMS\Factory::getSession();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 
 		// Calculate ACL access
 		$is_authorised = $this->canManage;
@@ -207,8 +207,8 @@ class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 	public function exportclear()
 	{
 		$app      = \Joomla\CMS\Factory::getApplication();
-		$user     = \Joomla\CMS\Factory::getUser();
-		$session  = \Joomla\CMS\Factory::getSession();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 
 		// Calculate access
 		$is_authorised = $this->canManage;
@@ -238,9 +238,9 @@ class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 	public function import()
 	{
 		$app      = \Joomla\CMS\Factory::getApplication();
-		$user     = \Joomla\CMS\Factory::getUser();
-		$session  = \Joomla\CMS\Factory::getSession();
-		$document = \Joomla\CMS\Factory::getDocument();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$has_zlib = version_compare(PHP_VERSION, '5.4.0', '>=');
 
 		$this->input->set('view', $this->record_name);
@@ -492,9 +492,9 @@ class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 	public function export()
 	{
 		$app      = \Joomla\CMS\Factory::getApplication();
-		$user     = \Joomla\CMS\Factory::getUser();
-		$session  = \Joomla\CMS\Factory::getSession();
-		$document = \Joomla\CMS\Factory::getDocument();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 
 		$this->input->set('view', $this->record_name);
 		$this->input->set('hidemainmenu', 1);

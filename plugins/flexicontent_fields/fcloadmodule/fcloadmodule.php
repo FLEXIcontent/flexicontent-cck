@@ -46,7 +46,7 @@ class plgFlexicontent_fieldsFcloadmodule extends FCField
 			$field->value[0] = '';
 		}
 
-		$document	= \Joomla\CMS\Factory::getDocument();
+		$document	= \Joomla\CMS\Factory::getApplication()->getDocument();
 
 		$fieldname = 'custom['.$field->name.']';
 		$elementid = 'custom_'.$field->name;
@@ -114,7 +114,7 @@ class plgFlexicontent_fieldsFcloadmodule extends FCField
 			$initialized = 1;
 
 			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$document  = \Joomla\CMS\Factory::getApplication()->getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -163,7 +163,7 @@ class plgFlexicontent_fieldsFcloadmodule extends FCField
 		$position		= $field->parameters->get('position', '');
 		$style 			= $field->parameters->get('style', -2);
 
-		$document		= \Joomla\CMS\Factory::getDocument();
+		$document		= \Joomla\CMS\Factory::getApplication()->getDocument();
 		$display 		= array();
 		$renderer		= $document->loadRenderer('module');
 		$mparams		= array('style'=>$style);

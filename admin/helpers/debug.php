@@ -42,7 +42,7 @@ class UsersHelperDebug
 		$items = $db->setQuery($query)->loadObjectList();
 
 		if (count($items)) {
-			$lang = \Joomla\CMS\Factory::getLanguage();
+			$lang = \Joomla\CMS\Factory::getApplication()->getLanguage();
 
 			foreach ($items as &$item)
 			{
@@ -125,7 +125,7 @@ class UsersHelperDebug
 				}
 
 				// Load language
-				$lang 		= \Joomla\CMS\Factory::getLanguage();
+				$lang 		= \Joomla\CMS\Factory::getApplication()->getLanguage();
 				$extension 	= 'com_config';
 				$source 	= JPATH_ADMINISTRATOR . '/components/' . $extension;
 

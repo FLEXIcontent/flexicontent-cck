@@ -73,7 +73,7 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 			$initialized = 1;
 
 			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$document  = \Joomla\CMS\Factory::getApplication()->getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');

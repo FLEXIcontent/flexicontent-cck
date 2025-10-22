@@ -22,7 +22,7 @@ class flexicontent_db
 		// static variable (array) so that we load overrides only once per language
 		static $lang_overrides_site;
 		static $lang_overrides_admin;
-		$oLang = $oLang ?: \Joomla\CMS\Factory::getLanguage()->getTag();
+		$oLang = $oLang ?: \Joomla\CMS\Factory::getApplication()->getLanguage()->getTag();
 
 		// Check if we have loaded the override file already, (aka we load it only once)
 		if ($oLang && (!isset($lang_overrides_site[$oLang]) || !isset($lang_overrides_site[$oLang])))
@@ -782,7 +782,7 @@ class flexicontent_db
 				break;
 			case 'random':
 				// Convert session id to array of hex strings (4 bytes each)
-				$sid = \Joomla\CMS\Factory::getSession()->getId();
+				$sid = \Joomla\CMS\Factory::getApplication()->getSession()->getId();
 				$sid = str_split(md5($sid), 8);
 				// Create a SEED doing a XOR operation on session-ID to keep SEED to 4 bytes
 				$seed = null;
@@ -922,7 +922,7 @@ class flexicontent_db
 				break;
 			case 'random':
 				// Convert session id to array of hex strings (4 bytes each)
-				$sid = \Joomla\CMS\Factory::getSession()->getId();
+				$sid = \Joomla\CMS\Factory::getApplication()->getSession()->getId();
 				$sid = str_split(md5($sid), 8);
 				// Create a SEED doing a XOR operation on session-ID to keep SEED to 4 bytes
 				$seed = null;
@@ -961,7 +961,7 @@ class flexicontent_db
 		$cid = \Joomla\CMS\Factory::getApplication()->input->get('cid', array(0), 'array');
 		$cid = ArrayHelper::toInteger($cid);
 
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$controller->setRedirect($redirect_url, '');
 
 		static $canCheckinRecords = null;
@@ -1431,7 +1431,7 @@ class flexicontent_db
 				->createTable('Tag', 'Administrator');
 		}
 
-		$canCreate = \Joomla\CMS\Factory::getUser()->authorise('core.create', 'com_tags');
+		$canCreate = \Joomla\CMS\Factory::getApplication()->getIdentity()->authorise('core.create', 'com_tags');
 
 		foreach ($tags as $key => $tag)
 		{

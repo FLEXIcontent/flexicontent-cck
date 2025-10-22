@@ -38,7 +38,7 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 	function display( $tpl = null )
 	{
 		$db  = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
-		$doc = \Joomla\CMS\Factory::getDocument();
+		$doc = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$app = \Joomla\CMS\Factory::getApplication();
 		$params = $this->get('Params');
 

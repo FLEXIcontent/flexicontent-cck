@@ -130,7 +130,7 @@ class JFormFieldFccheckbox extends \Joomla\CMS\Form\FormField
 		static $js_added = false;
 		if (!$js_added) {
 			$js_added = true;
-			$doc = \Joomla\CMS\Factory::getDocument();
+			$doc = \Joomla\CMS\Factory::getApplication()->getDocument();
 			flexicontent_html::loadFramework('flexi-lib');
 			//$js = "";
 			//if ($js) $doc->addScriptDeclaration($js);

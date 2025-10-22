@@ -49,7 +49,7 @@ class JFormFieldFclanguage extends \Joomla\CMS\Form\FormField
 
 	function getInput()
 	{
-		$doc	= \Joomla\CMS\Factory::getDocument();
+		$doc	= \Joomla\CMS\Factory::getApplication()->getDocument();
 		$db		= \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		
 		// Get field configuration

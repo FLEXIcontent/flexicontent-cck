@@ -15,6 +15,7 @@ use Joomla\Filesystem\Path;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\Database\DatabaseInterface;
+use Joomla\CMS\Mail\MailerFactoryInterface;
 
 jimport('legacy.controller.legacy');
 JLoader::register('FlexicontentControllerItems', JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'controllers'.DS.'items.php');  // we use JPATH_BASE since controller exists in frontend too
@@ -128,7 +129,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		$CLIENT_CACHEABLE_PUBLIC = 1;
 		$CLIENT_CACHEABLE_PRIVATE = 2;
 
-		$userid = \Joomla\CMS\Factory::getUser()->get('id');
+		$userid = \Joomla\CMS\Factory::getApplication()->getIdentity()->get('id');
 		$cc     = $this->input->get('cc', null);
 		$view   = $this->input->get('view', '', 'cmd');
 		$layout = $this->input->get('layout', '', 'cmd');
@@ -236,7 +237,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 		// If component is serving different pages to logged users, this will avoid
 		// having users seeing same page after login/logout when conservative caching is used
-		if ( $userid = \Joomla\CMS\Factory::getUser()->get('id') )
+		if ( $userid = \Joomla\CMS\Factory::getApplication()->getIdentity()->get('id') )
 		{
 			$this->input->set('__fc_user_id__', $userid);
 			$safeurlparams['__fc_user_id__'] = 'STRING';
@@ -316,7 +317,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 	function ajaxfav()
 	{
 		$app     = \Joomla\CMS\Factory::getApplication();
-		$user    = \Joomla\CMS\Factory::getUser();
+		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		//$db      = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		//$cparams = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
 
@@ -391,7 +392,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 	function getreviewform()
 	{
 		$app  = \Joomla\CMS\Factory::getApplication();
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$db   = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 
 		$html_tagid  = $this->input->get('tagid', '', 'cmd');
@@ -534,7 +535,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 	function storereviewform()
 	{
 		$app  = \Joomla\CMS\Factory::getApplication();
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$db   = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 
 		$review_id   = $this->input->get('review_id', 0, 'int');
@@ -681,7 +682,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 	private function reviewPrepare($content_id, & $item = null, & $field = null, $errors = null, $checkSubmit = true)
 	{
 		$app  = \Joomla\CMS\Factory::getApplication();
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$db   = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 
 
@@ -710,8 +711,8 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		FlexicontentFields::loadFieldConfig($field, $item);
 
 		// Load field's language files
-		\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, 'en-GB', true);
-		\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, null, true);
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, 'en-GB', true);
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, null, true);
 
 		// Get needed parameters
 		$allow_reviews = (int) $field->parameters->get('allow_reviews', 0);
@@ -869,8 +870,8 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 		$app   = \Joomla\CMS\Factory::getApplication();
 		$db    = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
-		$user  = \Joomla\CMS\Factory::getUser();
-		$session = \Joomla\CMS\Factory::getSession();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
 
 
@@ -1552,7 +1553,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				$html_mode=false; $cc=null; $bcc=null;
 				$attachment=null; $replyto=null; $replytoname=null;
 
-				$send_result = \Joomla\CMS\Factory::getMailer()->sendMail( $from, $fromname, $recipient, $subject, $_message, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
+				$send_result = \Joomla\CMS\Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer()->sendMail( $from, $fromname, $recipient, $subject, $_message, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
 			}
 			ob_end_clean();
 		}
@@ -1869,7 +1870,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		// Import and Initialize some joomla API variables
 		$app     = \Joomla\CMS\Factory::getApplication();
 		$db      = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
-		$user    = \Joomla\CMS\Factory::getUser();
+		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
 
 		// Get HTTP REQUEST variables
@@ -2169,7 +2170,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 	{
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$select_access = $joinacc = $andacc = '';
 		$aid_arr = $user->getAuthorisedViewLevels();
 		$aid_list = implode(',', $aid_arr);

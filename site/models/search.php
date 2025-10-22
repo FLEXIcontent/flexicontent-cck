@@ -268,7 +268,7 @@ class FLEXIcontentModelSearch extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 		if (empty($this->_pagination))
 		{
 			//jimport('cms.pagination.pagination');
-			require_once (JPATH_COMPONENT.DS.'helpers'.DS.'pagination.php');
+			require_once (JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'pagination.php');
 			$this->_pagination = new FCPagination($this->getTotal(), $this->getState('limitstart'), $this->getState('limit') );
 		}
 		return $this->_pagination;

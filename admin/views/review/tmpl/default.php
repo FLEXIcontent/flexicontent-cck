@@ -10,7 +10,7 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
-
+use Joomla\CMS\Toolbar\ToolbarFactoryInterface;
 $form = $this->form;
 ?>
 
@@ -20,7 +20,7 @@ $form = $this->form;
 	<?php
 	if (!\Joomla\CMS\Factory::getApplication()->isClient('administrator') || \Joomla\CMS\Factory::getApplication()->input->getCmd('tmpl') === 'component')
 	{
-		echo \Joomla\CMS\Toolbar\Toolbar::getInstance('toolbar')->render();
+		echo \Joomla\CMS\Factory::getApplication()->getDocument()->getToolbar('toolbar')->render();
 		echo '<div class="fcclear"></div><br><br>';
 	}
 

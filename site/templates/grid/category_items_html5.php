@@ -9,7 +9,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 // first define the template name
 $tmpl = $this->tmpl;
-$user = \Joomla\CMS\Factory::getUser();
+$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 $readon_type  = (int) $this->params->get('readon_type', 0);
 $readon_image = $this->params->get('readon_image', '');
@@ -167,7 +167,7 @@ $item_placement_std = $this->params->get('item_placement', 0);  // -1: other, 0:
 $item_columns_std = $this->params->get('item_columns', 2);
 $cols_class_std  = ($item_columns_std  <= 1)  ?  ''  :  'cols_'.$item_columns_std;
 
-$document = \Joomla\CMS\Factory::getDocument();
+$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 
 // Add masonry JS
 $load_masonry_feat = $item_placement_feat == 1 && $item_columns_feat > 1;
@@ -230,7 +230,7 @@ if (!empty($this->items) && ($load_masonry_feat || $load_masonry_std))
 	$js .= "	
 		});
 	";
-	\Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+	\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration($js);
 }
 ?>
 

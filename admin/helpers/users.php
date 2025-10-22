@@ -85,7 +85,7 @@ class UsersHelper
 	{
 		if (empty(self::$actions))
 		{
-			$user = \Joomla\CMS\Factory::getUser();
+			$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 			self::$actions = new \Joomla\CMS\Object\CMSObject;
 
 			$actions = \Joomla\CMS\Access\Access::getActionsFromFile(

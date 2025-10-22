@@ -311,7 +311,7 @@ class FlexicontentModelMediadata extends FCModelAdmin
 		}
 
 		$record  = $record ?: $this->_record;
-		$user    = $user ?: \Joomla\CMS\Factory::getUser();
+		$user    = $user ?: \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		$isOwner = $record && $record->user_id == $user->id;
 
@@ -336,7 +336,7 @@ class FlexicontentModelMediadata extends FCModelAdmin
 		}
 
 		$record  = $record ?: $this->_record;
-		$user    = $user ?: \Joomla\CMS\Factory::getUser();
+		$user    = $user ?: \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		return $this->canManage;
 	}
@@ -352,7 +352,7 @@ class FlexicontentModelMediadata extends FCModelAdmin
 	public function canDelete($record = null)
 	{
 		$record  = $record ?: $this->_record;
-		$user    = \Joomla\CMS\Factory::getUser();
+		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		return $this->canManage;
 	}
@@ -422,7 +422,7 @@ class FlexicontentModelMediadata extends FCModelAdmin
 	 */
 	public function submitterValidation($data)
 	{
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$db   = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 
 		$mediadata_id   = $data['id'];

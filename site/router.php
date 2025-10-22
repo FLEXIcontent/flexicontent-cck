@@ -13,6 +13,8 @@ use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Version;
+use Joomla\Database\DatabaseInterface;
+
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
@@ -1057,8 +1059,8 @@ class _FlexicontentSiteRouter
 						if (!$record_id)
 						{
 							// Make sure our language file has been loaded
-							Factory::getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', true);
-							Factory::getLanguage()->load('com_flexicontent', JPATH_SITE, null, true);
+							Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', true);
+							Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_SITE, null, true);
 
 							throw new Exception(Text::sprintf('FLEXI_REQUESTED_CONTENT_OR_VIEW_NOT_FOUND', $explicit_view), 404);
 						}
@@ -1105,9 +1107,9 @@ class _FlexicontentSiteRouter
 		$tbl = '#__categories', $alias_col = 'alias'
 	)
 	{
-		$language = !$language /*&& !$parent_id*/ ? Factory::getLanguage()->getTag() : $language;
+		$language = !$language /*&& !$parent_id*/ ? Factory::getApplication()->getLanguage()->getTag() : $language;
 
-		$db = Factory::getDbo();
+		$db = Factory::getContainer()->get(DatabaseInterface::class);
 		$query = $db->getQuery(true)
 			->select('i.id')
 			->from($db->QuoteName($tbl) . ' AS i')
@@ -1202,8 +1204,8 @@ class _FlexicontentSiteRouter
 		if (count($records) > 1)
 		{
 			// Make sure our language file has been loaded
-			Factory::getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', true);
-			Factory::getLanguage()->load('com_flexicontent', JPATH_SITE, null, true);
+			Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', true);
+			Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_SITE, null, true);
 
 			throw new Exception(Text::sprintf('FLEXI_DUPLICATE_ALIAS_FAILED_TO_FIND_UNIQUE_PAGE', ($tbl === '#__categories' ? 'category' : 'item'), $alias), 404);
 		}
@@ -1326,7 +1328,7 @@ class _FlexicontentSiteRouter
 		// If current category id not given then use item's main category
 		if (!isset($globalcats[$cid]))
 		{
-			$db = Factory::getDbo();
+			$db = Factory::getContainer()->get(DatabaseInterface::class);
 
 			$query = $db->getQuery(true)
 				->select('i.catid')
@@ -1425,8 +1427,8 @@ class _FlexicontentSiteRouter
 			if (!$record_id)
 			{
 				// Make sure our language file has been loaded
-				Factory::getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', true);
-				Factory::getLanguage()->load('com_flexicontent', JPATH_SITE, null, true);
+				Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', true);
+				Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_SITE, null, true);
 
 				throw new Exception(Text::sprintf('FLEXI_REQUESTED_CONTENT_OR_VIEW_NOT_FOUND', $expected_view), 404);
 			}
@@ -1470,7 +1472,7 @@ class _FlexicontentSiteRouter
 			$cid = $item->catid;
 		}
 		else {
-			$db = version_compare(JVERSION, '4', 'lt') ? Factory::getDbo() : Factory::getContainer()->get('DatabaseDriver');
+			$db = version_compare(JVERSION, '4', 'lt') ? Factory::getContainer()->get(DatabaseInterface::class) : Factory::getContainer()->get('DatabaseDriver');
 			$sql_query = $db->getQuery(true)
 				->select('i.catid')
 				->from($db->QuoteName('#__content') . ' AS i')

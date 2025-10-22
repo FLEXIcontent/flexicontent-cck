@@ -76,11 +76,11 @@ class plgFlexicontent_fieldsDate extends FCField
 		}
 
 		// Initialize framework objects and other variables
-		$document = \Joomla\CMS\Factory::getDocument();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
-		$config   = \Joomla\CMS\Factory::getConfig();
+		$config   = \Joomla\CMS\Factory::getApplication()->getConfig();
 		$app      = \Joomla\CMS\Factory::getApplication();
-		$user     = \Joomla\CMS\Factory::getUser();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		$tooltip_class = 'hasTooltip';
 		$add_on_class    = $cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
@@ -610,7 +610,7 @@ class plgFlexicontent_fieldsDate extends FCField
 			$initialized = 1;
 
 			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$document  = \Joomla\CMS\Factory::getApplication()->getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -633,8 +633,8 @@ class plgFlexicontent_fieldsDate extends FCField
 		$is_ingroup  = !empty($field->ingroup);
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		$multiple    = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
-		$config = \Joomla\CMS\Factory::getConfig();
-		$user = \Joomla\CMS\Factory::getUser();
+		$config = \Joomla\CMS\Factory::getApplication()->getConfig();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		// Value handling parameters
 		$lang_filter_values = 0;
@@ -834,8 +834,8 @@ class plgFlexicontent_fieldsDate extends FCField
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
 
-		$config = \Joomla\CMS\Factory::getConfig();
-		$user = \Joomla\CMS\Factory::getUser();
+		$config = \Joomla\CMS\Factory::getApplication()->getConfig();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		$date_allowtime = (int) $field->parameters->get( 'date_allowtime', 1 ) ;
 		$use_editor_tz  = (int) $field->parameters->get( 'use_editor_tz', 0 ) ;

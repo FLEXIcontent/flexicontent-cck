@@ -7,7 +7,7 @@
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
-defined('JPATH_PLATFORM') or die;
+defined('_JEXEC') or die;
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
@@ -28,9 +28,9 @@ jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 \Joomla\CMS\Form\FormHelper::loadFieldClass('groupedlist');   // \Joomla\CMS\Form\Field\GroupedlistField
 
 // Load JS tabber lib
-\Joomla\CMS\Factory::getDocument()->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
-\Joomla\CMS\Factory::getDocument()->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
-\Joomla\CMS\Factory::getDocument()->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
+\Joomla\CMS\Factory::getApplication()->getDocument()->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
+\Joomla\CMS\Factory::getApplication()->getDocument()->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
+\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
 /**
  * Renders an HTML select list of FLEXIcontent layouts
@@ -349,7 +349,7 @@ flexicontent_html::loadJQuery();
 
 if ( ! @$attributes['skipparams'] )
 {
-		$doc 	= \Joomla\CMS\Factory::getDocument();
+		$doc 	= \Joomla\CMS\Factory::getApplication()->getDocument();
 		$js 	= "
 
 ".($params_source=="file" ? "
@@ -564,7 +564,7 @@ jQuery(document).ready(function(){
 		$templates = $db->setQuery($query)->loadObjectList('element');
 
 		// Load 'sys' language file of current module
-		$lang = \Joomla\CMS\Factory::getLanguage();
+		$lang = \Joomla\CMS\Factory::getApplication()->getLanguage();
 		$lang->load($module . '.sys', $client->path, null, false, true)
 			|| $lang->load($module . '.sys', $client->path . '/modules/' . $module, null, false, true);
 

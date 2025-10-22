@@ -75,7 +75,7 @@ abstract class JHtmlFcitems extends JHtmlFcbase
 			$nullDate = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class)->getNullDate();
 			$nowDate = \Joomla\CMS\Factory::getDate()->toUnix();
 
-			$tz = \Joomla\CMS\Factory::getUser()->getTimezone();
+			$tz = \Joomla\CMS\Factory::getApplication()->getIdentity()->getTimezone();
 		}
 
 		// Check publication START/FINISH dates on if item has state: publised / in-progress / archived

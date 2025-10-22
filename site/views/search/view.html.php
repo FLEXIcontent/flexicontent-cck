@@ -54,7 +54,7 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 		$option = $jinput->getCmd('option', '');
 		$view   = $jinput->getCmd('view', '');
 
-		$document = \Joomla\CMS\Factory::getDocument();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$db       = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$menus    = $app->getMenu();
 		$menu     = $menus->getActive();
@@ -117,7 +117,7 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 		{
 			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
 			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexi_filters.css', array('version' => FLEXI_VHASH));
-			!\Joomla\CMS\Factory::getLanguage()->isRtl()
+			!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 		}
@@ -867,7 +867,7 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 				}
 			}
 
-			$_sh404sef = defined('SH404SEF_IS_RUNNING') && \Joomla\CMS\Factory::getConfig()->get('sef');
+			$_sh404sef = defined('SH404SEF_IS_RUNNING') && \Joomla\CMS\Factory::getApplication()->getConfig()->get('sef');
 			if ($_sh404sef)
 			{
 				$pageNav->setAdditionalUrlParam('limit', $model->getState('limit'));
@@ -924,7 +924,7 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 					 */
 					if ($filter_word_like_any
 						&& in_array(flexicontent_html::getUserCurrentLang(), array('zh', 'jp', 'ja', 'th'))
-						&& ! FlexicontentFields::getLangHandler(\Joomla\CMS\Factory::getLanguage()->getTag(), $_hasHandlerOnly = true)
+						&& ! FlexicontentFields::getLangHandler(\Joomla\CMS\Factory::getApplication()->getLanguage()->getTag(), $_hasHandlerOnly = true)
 					)
 					{
 						// Do not highlight too small words, since we do not consider spaces

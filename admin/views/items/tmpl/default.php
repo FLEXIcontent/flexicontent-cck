@@ -19,16 +19,18 @@ use Joomla\CMS\Component\ComponentHelper;
 use Joomla\Registry\Registry;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\CMS\Uri\Uri;
+use Joomla\Database\DatabaseInterface;
+
 
 HTMLHelper::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html');
 
 global $globalcats;
 $app      = Factory::getApplication();
 $jinput   = $app->input;
-$config   = Factory::getConfig();
-$user     = Factory::getUser();
-$session  = Factory::getSession();
-$document = Factory::getDocument();
+$config   = Factory::getApplication()->getConfig();
+$user     = Factory::getApplication()->getIdentity();
+$session  = Factory::getApplication()->getSession();
+$document = Factory::getApplication()->getDocument();
 $cparams  = ComponentHelper::getParams('com_flexicontent');
 $ctrl     = 'items.';
 $hlpname  = 'fcitems';
@@ -53,7 +55,7 @@ $edit_cat_title  = Text::_('FLEXI_EDIT_CATEGORY', true);
 $rem_filt_txt    = Text::_('FLEXI_REMOVE_FILTER', true);
 $rem_filt_tip    = ' class="' . $this->tooltip_class . ' filterdel" title="'.flexicontent_html::getToolTip('FLEXI_ACTIVE_FILTER', 'FLEXI_CLICK_TO_REMOVE_THIS_FILTER', 1, 1).'" ';
 $_NEVER_         = Text::_('FLEXI_NEVER');
-$_NULL_DATE_     = Factory::getDbo()->getNullDate();
+$_NULL_DATE_     = Factory::getContainer()->get(DatabaseInterface::class)->getNullDate();
 
 
 
@@ -1625,7 +1627,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 </div><!-- #flexicontent end -->
 
 <?php
-Factory::getDocument()->addScriptDeclaration('
+Factory::getApplication()->getDocument()->addScriptDeclaration('
 	function fc_edit_jarticle_modal_load( container )
 	{
 		if ( container.find("iframe").get(0).contentWindow.location.href.indexOf("view=articles") != -1 )

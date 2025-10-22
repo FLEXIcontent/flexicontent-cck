@@ -17,6 +17,8 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
+\Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html');
+
 $cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 
 $tip_class = ' hasTooltip';
@@ -83,21 +85,17 @@ $ctrl_users = "task=users.";
 
 <?php else : ?>
 
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/2.2.0/echarts.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/2.2.0/chart/line.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/2.2.0/chart/bar.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/2.2.0/chart/pie.js"></script>
-	<script src="	https://cdnjs.cloudflare.com/ajax/libs/zrender/2.0.7/zrender.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/6.0.0/echarts.min.js" integrity="sha512-4/g9GAdOdTpUP2mKClpKsEzaK7FQNgMjq+No0rX8XZlfrCGtbi4r+T/p5fnacsEC3zIAmHKLJUL7sh3/yVA4OQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 <?php endif; ?>
 
 
 	<table class="fc-table-list fc-tbl-short" style="margin:20px 0 20px 0; width:100%; box-sizing: border-box;">
-	<tr>
-		<th style="font-size:18px;">
-			<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_TOTAL_NUM_OF' ); ?>
-		</th>
-	</tr>
+		<tr>
+			<th style="font-size:18px;">
+				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_TOTAL_NUM_OF' ); ?>
+			</th>
+		</tr>
 	</table>
 
 	<!-- SITE TOTALS -->
@@ -197,15 +195,26 @@ $ctrl_users = "task=users.";
 	<hr>
 
 	<table class="fc-table-list fc-tbl-short" style="margin:120px 0 20px 0; width:100%; box-sizing: border-box;">
-	<tr>
-		<th style="font-size:18px;">
-			<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_ITEMS' ); ?> - <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_CREATION_DATE' ); ?>
-		</th>
-	</tr>
+		<tr>
+			<th style="font-size:18px;">
+				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_ITEMS' ); ?> - <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_CREATION_DATE' ); ?>
+			</th>
+		</tr>
+		<tr>
+			<td>
+				<div class="row-fluid">
+					<div class="span12">
+						<div class="">
+							<div id="main" style="height:400px;width:100%"></div>
+						</div>
+					</div>
+				</div>
+			</td>
+		</tr>
 	</table>
 
 
-<?php
+	<?php
 	$stasts          = $this->itemsgraph[0];
 	$months          = array();
 	$monthslist      = '';
@@ -222,72 +231,56 @@ $ctrl_users = "task=users.";
 		$totalitemslist   = json_encode($totalitems);
 	}
 
- ?>
+ 	?>
 
-	<div class="row-fluid">
-		<div class="span12">
-			<div class="">
-				<div id="main" style="height:400px;width:100%"></div>
-			</div>
-		</div>
-	</div>
 
 	<script>
 		var option = {
-	            tooltip : {
-	                trigger: 'axis'
-	            },
-	            legend: {
-	                data:['Total Items']
-	            },
-	            toolbox: {
-	                show : true,
-	                feature : {
-						          //mark : {show: true},
-						          //dataView : {show: true, readOnly: false},
-						          restore : {
-						          	show: true,
-						          	title: 'Refresh'
-						          },
-						          saveAsImage : {
-						          	show: true,
-						          	title: 'Export'
-						          }
-						        }
-	            },
-	            calculable : true,
-	            xAxis : [
-	                {
-	                    type : 'category',
-	                    data : <?php echo $monthslist; ?>
-	                }
-	            ],
-	            yAxis : [
-	                {
-	                    type : 'value',
-	                    splitArea : {show : true}
-	                }
-	            ],
-	            series : [
-	                {
-	                    name:'Total Items by Month',
-	                    type:'bar',
-	                    data:<?php echo $totalitemslist; ?>
-	                }
-	            ]
-	        };
+			tooltip : {
+				trigger: 'axis'
+			},
+			legend: {
+				data:['Total Items']
+			},
+			toolbox: {
+				show : true,
+				feature : {
+								//mark : {show: true},
+								//dataView : {show: true, readOnly: false},
+								restore : {
+								show: true,
+								title: 'Refresh'
+								},
+								saveAsImage : {
+								show: true,
+								title: 'Export'
+								}
+							}
+			},
+			calculable : true,
+			xAxis : [
+				{
+					type : 'category',
+					data : <?php echo $monthslist; ?>
+				}
+			],
+			yAxis : [
+				{
+					type : 'value',
+					splitArea : {show : true}
+				}
+			],
+			series : [
+				{
+					name:'Total Items by Month',
+					type:'bar',
+					data:<?php echo $totalitemslist; ?>
+				}
+			]
+		};
 
-	        require(
-	            [
-	                'echarts',
-	                'echarts/chart/line',
-	                'echarts/chart/bar'
-	            ],
-	            function (ec) {
-	                var myChart = ec.init(document.getElementById('main'));
-	                myChart.setOption(option);
-	            }
-	        )
+		var myChart = echarts.init(document.getElementById('main'));
+		myChart.setOption(option);
 
 	</script>
 
@@ -299,91 +292,86 @@ $ctrl_users = "task=users.";
 			<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_ITEM_STATES_CHART' ); ?>
 		</th>
 	</tr>
-	</table>
-
-
+	<tr>
+		<td>
 	<div class="row-fluid">
 		<div class="span11">
 
 			<div id="pie" style="height:525px; 1px solid #ccc; padding: 10px;"></div>
+				</div>
+			</div>
+		</td>
+	</tr>
+	</table>
 
-			<?php
+	<?php
 
-			$workflow          = $this->statestats;
-			$typeslabel        = explode('|',$workflow['labels']);
-			$typeslabellist    = json_encode($typeslabel);
-			$valuesitems       = explode(',',$workflow['values']);
-			$datalist          = '';
+	$workflow          = $this->statestats;
+	$typeslabel        = explode('|',$workflow['labels']);
+	$typeslabellist    = json_encode($typeslabel);
+	$valuesitems       = explode(',',$workflow['values']);
+	$datalist          = '';
 
-			foreach ($typeslabel  as $key=>$label) {
-					$datalist.= '{value:'.$valuesitems[$key].', name:"'.$label.'"},';
-			}
-		 ?>
+	foreach ($typeslabel  as $key=>$label) {
+			$datalist.= '{value:'.$valuesitems[$key].', name:"'.$label.'"},';
+	}
+	?>
+	<script>
 
-	    <script>
+		var optionpie = {
+			tooltip : {
+				trigger: 'item',
+				formatter: "{a} <br/>{b} : {c} ({d}%)"
+			},
+			legend: {
+				orient : 'vertical',
+				x : 'left',
+				data:<?php echo $typeslabellist; ?>
+			},
+			toolbox: {
+				show : true,
+				feature : {
+					//mark : {show: true},
+					//dataView : {show: true, readOnly: false},
+					restore : {
+						show: true,
+						title: 'Refresh'
+					},
+					saveAsImage : {
+						show: true,
+						title: 'Export'
+					}
+				}
+			},
+			calculable : false,
+			series : [
+				{
+					name:'Workflow',
+					type:'pie',
+					radius : '75%',
+					center: ['60%', '60%'],
+					data:[
+						<?php echo $datalist; ?>
+					]
+				}
+			]
+		};
 
-			var optionpie = {
-			      tooltip : {
-			        trigger: 'item',
-			        formatter: "{a} <br/>{b} : {c} ({d}%)"
-			      },
-			      legend: {
-			        orient : 'vertical',
-			        x : 'left',
-			        data:<?php echo $typeslabellist; ?>
-			      },
-			      toolbox: {
-			        show : true,
-			        feature : {
-		          //mark : {show: true},
-		          //dataView : {show: true, readOnly: false},
-		          restore : {
-		          	show: true,
-		          	title: 'Refresh'
-		          },
-		          saveAsImage : {
-		          	show: true,
-		          	title: 'Export'
-		          }
-		        }
-			      },
-			      calculable : false,
-			      series : [
-			        {
-			          name:'Workflow',
-			          type:'pie',
-			          radius : '75%',
-			          center: ['60%', '60%'],
-			          data:[
-			               <?php echo $datalist; ?>
-			           ]
-			        }
-			      ]
-			    };
-		        require(
-		            [
-		                'echarts',
-		                'echarts/chart/pie'
-		            ],
-		            function (ec) {
-		                var myChart = ec.init(document.getElementById('pie'));
-		                myChart.setOption(optionpie);
-		            }
-		        )
+		var myChartPie = echarts.init(document.getElementById('pie'));
+		myChartPie.setOption(optionpie);
 
-	        </script>
-		</div>
-	</div>
+	</script>
+
 
 
 
 	<hr>
 	<table class="fc-table-list fc-tbl-short" style="margin:120px 0 20px 0; width:100%; box-sizing: border-box;">
-	<tr>
-		<th style="font-size:18px;">
-			<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_GENERAL_STATS' ); ?>
-		</th>
-	</tr>
+		<tr>
+			<th style="font-size:18px;">
+				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_GENERAL_STATS' ); ?>
+			</th>
+		</tr>
 	</table>
 
 
@@ -579,35 +567,35 @@ $ctrl_users = "task=users.";
 					<div class="well">
 						<h3><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_WORST_RATED' ) ?></h3>
 						<hr>
-								<table class="adminlist table table-hover table-striped">
-									<thead>
-										<tr>
-											<th class="left"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_TITLE' ); ?></th>
-											<th class="left"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_RATING' ); ?></th>
-										</tr>
-									</thead>
-									<tbody>
-										<?php
-										$k = 0;
-										for ($i=0, $n=count($this->worstrating); $i < $n; $i++) {
-										$row = $this->worstrating[$i];
-										$link = 'index.php?option=com_flexicontent&amp;'.$ctrl_items.'edit&amp;cid='. $row->id;
-										?>
-										<tr>
-											<td>
-												<span class="<?php echo $tip_class; ?>" title="<?php echo \Joomla\CMS\HTML\HTMLHelper::tooltipText(\Joomla\CMS\Language\Text::_( 'FLEXI_EDIT_ITEM' ), $row->title, 0, 1); ?>">
-													<a href="<?php echo $link; ?>">
-														<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
-													</a>
-												</span>
-											</td>
-											<td>
-												<strong><?php echo flexicontent_html::ratingbar( $row ); ?></strong>
-											</td>
-										</tr>
-										<?php $k = 1 - $k; } ?>
-									</tbody>
-								</table>
+						<table class="adminlist table table-hover table-striped">
+							<thead>
+								<tr>
+									<th class="left"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_TITLE' ); ?></th>
+									<th class="left"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_RATING' ); ?></th>
+								</tr>
+							</thead>
+							<tbody>
+								<?php
+								$k = 0;
+								for ($i=0, $n=count($this->worstrating); $i < $n; $i++) {
+								$row = $this->worstrating[$i];
+								$link = 'index.php?option=com_flexicontent&amp;'.$ctrl_items.'edit&amp;cid='. $row->id;
+								?>
+								<tr>
+									<td>
+										<span class="<?php echo $tip_class; ?>" title="<?php echo \Joomla\CMS\HTML\HTMLHelper::tooltipText(\Joomla\CMS\Language\Text::_( 'FLEXI_EDIT_ITEM' ), $row->title, 0, 1); ?>">
+											<a href="<?php echo $link; ?>">
+												<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
+											</a>
+										</span>
+									</td>
+									<td>
+										<strong><?php echo flexicontent_html::ratingbar( $row ); ?></strong>
+									</td>
+								</tr>
+								<?php $k = 1 - $k; } ?>
+							</tbody>
+						</table>
 					</div>
 				</div>
 			</div>
@@ -677,16 +665,9 @@ $ctrl_users = "task=users.";
 				        }
 				      ]
 				    };
-			        require(
-			            [
-			                'echarts',
-			                'echarts/chart/pie'
-			            ],
-			            function (ec) {
-			                var myChart = ec.init(document.getElementById('pie2'));
-			                myChart.setOption(optionpie2);
-			            }
-			        )
+
+					var myChartPie2 = echarts.init(document.getElementById('pie2'));
+					myChartPie2.setOption(optionpie2);
 
 		        </script>
 			</div>

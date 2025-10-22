@@ -221,7 +221,7 @@ class FlexicontentTasksCore
 		{
 			$lta = 'i';
 			$lang_where .= ' AND (' . $lta . '.language LIKE ' . $db->Quote( $lang .'%' ) . ' OR ' . $lta . '.language="*" ) ';
-			//$lang_where .= ' AND (' . $lta . '.language = ' . $db->Quote(\Joomla\CMS\Factory::getLanguage()->getTag()) . ' OR ' . $lta . '.language = ' . $db->Quote('*') . ')';
+			//$lang_where .= ' AND (' . $lta . '.language = ' . $db->Quote(\Joomla\CMS\Factory::getApplication()->getLanguage()->getTag()) . ' OR ' . $lta . '.language = ' . $db->Quote('*') . ')';
 		}
 
 		$access_where = '';
@@ -229,7 +229,7 @@ class FlexicontentTasksCore
 
 		/*if (!$show_noauth)
 		{
-			$user = \Joomla\CMS\Factory::getUser();
+			$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 			$aid_arr = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
 			$access_where .= ' AND ty.access IN (0,'.$aid_list.')';
@@ -481,7 +481,7 @@ class FlexicontentTasksCore
 		$lang_code = $jinput->getString('item_lang');
 		$lang_code = $lang_code && $lang_code !== '*'
           ? $lang_code
-          : $jinput->getString('lang', \Joomla\CMS\Factory::getLanguage()->getTag());
+          : $jinput->getString('lang', \Joomla\CMS\Factory::getApplication()->getLanguage()->getTag());
 
 		$query = $db->getQuery(true)
 			->select('la.*')
@@ -534,7 +534,7 @@ class FlexicontentTasksCore
 		if ($jinput->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
 
 		// Load english language file for 'com_flexicontent' component then override with current language file
-		\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
-		\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 	}
 }

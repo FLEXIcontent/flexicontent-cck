@@ -82,8 +82,8 @@ class FlexicontentControllerCategories extends FlexicontentControllerBaseAdmin
 		$this->msg_records_deleted         = 'FLEXI_CATEGORIES_DELETED';
 
 		// Load Joomla 'com_categories' language files
-		\Joomla\CMS\Factory::getLanguage()->load('com_categories', JPATH_ADMINISTRATOR, 'en-GB', true);
-		\Joomla\CMS\Factory::getLanguage()->load('com_categories', JPATH_ADMINISTRATOR, null, true);
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_categories', JPATH_ADMINISTRATOR, 'en-GB', true);
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_categories', JPATH_ADMINISTRATOR, null, true);
 	}
 
 
@@ -209,7 +209,7 @@ class FlexicontentControllerCategories extends FlexicontentControllerBaseAdmin
 
 		// Initialize variables
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		// Get model
 		$model = $this->getModel($this->record_name_pl);

@@ -64,7 +64,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 			$initialized = 1;
 
 			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$document  = \Joomla\CMS\Factory::getApplication()->getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -85,7 +85,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 
 		global $globalcats;
 		$db   = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$print  = $app->input->get('print', '', 'cmd');
 		$add_tooltips = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('add_tooltips', 1);
 
@@ -294,7 +294,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		}
 		if ($load_css)
 		{
-			\Joomla\CMS\Factory::getDocument()->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/plugins/flexicontent_fields/fcpagenav/'.(FLEXI_J16GE ? 'fcpagenav/' : '').'fcpagenav.css');
+			\Joomla\CMS\Factory::getApplication()->getDocument()->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/plugins/flexicontent_fields/fcpagenav/'.(FLEXI_J16GE ? 'fcpagenav/' : '').'fcpagenav.css');
 		}
 
 		// $html variable , should be set by the layout file
@@ -481,7 +481,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 	{
 		global $globalcats;
 		$db   = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$ordering = 'c.lft ASC';
 
 		$show_noauth = $cparams->get('show_noauth', 0);   // show unauthorized items

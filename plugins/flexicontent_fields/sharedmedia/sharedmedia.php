@@ -49,7 +49,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 		if ($use_ingroup && empty($field->ingroup)) return;
 
 		// Initialize framework objects and other variables
-		$document = \Joomla\CMS\Factory::getDocument();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
 
 		$tooltip_class = 'hasTooltip';
@@ -693,7 +693,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 			$initialized = 1;
 
 			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$document  = \Joomla\CMS\Factory::getApplication()->getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');

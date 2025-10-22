@@ -24,7 +24,7 @@ class modFlexicontentHelper
 
 		$forced_itemid = $params->get('forced_itemid');
 		$db   = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$app  = \Joomla\CMS\Factory::getApplication();
 
 		$jinput  = $app->input;
@@ -853,7 +853,7 @@ class modFlexicontentHelper
 
 		// Initialize variables
 		$db   = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$app  = \Joomla\CMS\Factory::getApplication();
 
 		$jinput  = $app->input;
@@ -2747,7 +2747,7 @@ class modFlexicontentHelper
 		 */
 		flexicontent_html::loadframework('grapesjs_view');
 
-		\Joomla\CMS\Factory::getDocument()->addStyleSheet(
+		\Joomla\CMS\Factory::getApplication()->getDocument()->addStyleSheet(
 			\Joomla\CMS\Uri\Uri::base(true) . $location . $css_file,
 			array('version' => $params->get($layout_name . '_hash'))
 		);

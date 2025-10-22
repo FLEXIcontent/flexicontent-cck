@@ -45,7 +45,7 @@ class JFormFieldFcpositions extends \Joomla\CMS\Form\FormField
 	
 	protected function getInput()
 	{
-		$doc = \Joomla\CMS\Factory::getDocument();
+		$doc = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$db  = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 
 		$node = & $this->element;

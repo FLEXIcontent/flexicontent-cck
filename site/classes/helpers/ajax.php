@@ -87,8 +87,8 @@ class flexicontent_ajax
 			$extension_name = 'mod_'.strtolower($extname);
 		else
 			$extension_name = 'plg_'.strtolower($extname);
-		\Joomla\CMS\Factory::getLanguage()->load($extension_name, JPATH_SITE, 'en-GB', true);
-		\Joomla\CMS\Factory::getLanguage()->load($extension_name, JPATH_SITE, null, true);
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load($extension_name, JPATH_SITE, 'en-GB', true);
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load($extension_name, JPATH_SITE, null, true);
 		
 		// Call the method
 		$obj->$extfunc();

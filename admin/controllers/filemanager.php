@@ -94,7 +94,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 		// Initialize variables
 		$app     = \Joomla\CMS\Factory::getApplication();
-		$user    = \Joomla\CMS\Factory::getUser();
+		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$params  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 
 		$original_task = $this->task;
@@ -485,9 +485,9 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$db    = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
-		$session = \Joomla\CMS\Factory::getSession();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 
 		// Force interactive run mode, if given parameters
 		$this->runMode = $Fobj ? 'interactive' : $this->runMode;
@@ -1010,7 +1010,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 		// Initialize variables
 		$app     = \Joomla\CMS\Factory::getApplication();
-		$session = \Joomla\CMS\Factory::getSession();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 		$model = $this->getModel($this->record_name);
 
 		// Force interactive run mode, if given parameters
@@ -1105,7 +1105,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		}
 
 		$db 	= \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
-		$user	= \Joomla\CMS\Factory::getUser();
+		$user	= \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$field  = false;
 
 		if ($fieldid)
@@ -1199,7 +1199,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 		// Initialize variables
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$db     = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 
 		$fieldid    = $this->input->get('fieldid', 0, 'int');
@@ -1393,7 +1393,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$db    = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 
 		// Calculate access
@@ -1499,7 +1499,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 		$app    = \Joomla\CMS\Factory::getApplication();
 		$db 		= \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
-		$user		= \Joomla\CMS\Factory::getUser();
+		$user		= \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$params = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 
 		$is_importcsv = $this->task === 'importcsv';
@@ -1678,9 +1678,9 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 	public function edit()
 	{
 		$app      = \Joomla\CMS\Factory::getApplication();
-		$user     = \Joomla\CMS\Factory::getUser();
-		$session  = \Joomla\CMS\Factory::getSession();
-		$document = \Joomla\CMS\Factory::getDocument();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 
 		$this->input->set('view', $this->record_name);
 		$this->input->set('hidemainmenu', 1);
@@ -1792,7 +1792,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 		// Initialize variables
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		// Get model
 		$model = $this->getModel($this->record_name_pl);

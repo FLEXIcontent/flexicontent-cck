@@ -73,8 +73,8 @@ class FCField extends \Joomla\CMS\Plugin\CMSPlugin
 			 * we load the ENGLISH language file (without forcing it, to avoid overwriting site-default), and then current language file
 			 */
 			$extension_name = 'plg_flexicontent_fields_' . $ft;
-			\Joomla\CMS\Factory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, 'en-GB', $force_reload = false, $load_default = true);  // force_reload OFF
-			\Joomla\CMS\Factory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, null, $force_reload = true, $load_default = true);  // force_reload ON
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, 'en-GB', $force_reload = false, $load_default = true);  // force_reload OFF
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, null, $force_reload = true, $load_default = true);  // force_reload ON
 
 			// Import field type if not already imported
 			$class_name = 'plgFlexicontent_fields' . ucfirst($ft);
@@ -95,7 +95,7 @@ class FCField extends \Joomla\CMS\Plugin\CMSPlugin
 			$init = true;
 
 			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$document  = \Joomla\CMS\Factory::getApplication()->getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -320,7 +320,7 @@ class FCField extends \Joomla\CMS\Plugin\CMSPlugin
 			$initialized = 1;
 
 			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$document  = \Joomla\CMS\Factory::getApplication()->getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -566,7 +566,7 @@ class FCField extends \Joomla\CMS\Plugin\CMSPlugin
 		$values = $this->values;
 
 		// Initialize framework objects and other variables
-		$document = \Joomla\CMS\Factory::getDocument();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
 
 		$tooltip_class = 'hasTooltip';

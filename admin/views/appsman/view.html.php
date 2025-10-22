@@ -21,6 +21,7 @@ defined('_JEXEC') or die('Restricted access');
 jimport('legacy.view.legacy');
 use Joomla\String\StringHelper;
 use Joomla\Database\DatabaseInterface;
+use Joomla\CMS\Toolbar\ToolbarFactoryInterface;
 
 /**
  * View class for the FLEXIcontent appsman screen
@@ -40,10 +41,10 @@ class FlexicontentViewAppsman extends \Joomla\CMS\MVC\View\HtmlView
 		$task    = $jinput->get('task', '', 'cmd');
 
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
-		$user     = \Joomla\CMS\Factory::getUser();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$db       = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
-		$document = \Joomla\CMS\Factory::getDocument();
-		$session  = \Joomla\CMS\Factory::getSession();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 		
 		// Get model
 		$model = $this->getModel();
@@ -63,10 +64,10 @@ class FlexicontentViewAppsman extends \Joomla\CMS\MVC\View\HtmlView
 		// *** Add css and js to document
 		// ***
 		
-		!\Joomla\CMS\Factory::getLanguage()->isRtl()
+		!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 			? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
 			: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
-		!\Joomla\CMS\Factory::getLanguage()->isRtl()
+		!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 			? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 			: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 
@@ -270,19 +271,19 @@ class FlexicontentViewAppsman extends \Joomla\CMS\MVC\View\HtmlView
 	 */
 	function setToolbar($conf, $task)
 	{
-		$user     = \Joomla\CMS\Factory::getUser();
-		$document = \Joomla\CMS\Factory::getDocument();
-		$toolbar  = \Joomla\CMS\Toolbar\Toolbar::getInstance('toolbar');
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
+		$toolbar  = \Joomla\CMS\Factory::getApplication()->getDocument()->getToolbar('toolbar');
 		$perms    = FlexicontentHelperPerm::getPerm();
-		$session  = \Joomla\CMS\Factory::getSession();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 
 		$js = '';
 
 		$contrl = "appsman.";
 		$contrl_s = null;
 
-		$document = \Joomla\CMS\Factory::getDocument();
-		$toolbar = \Joomla\CMS\Toolbar\Toolbar::getInstance('toolbar');
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
+		$toolbar = \Joomla\CMS\Factory::getApplication()->getDocument()->getToolbar('toolbar');
 		$loading_msg = flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_LOADING') .' ... '. \Joomla\CMS\Language\Text::_('FLEXI_PLEASE_WAIT'), 2);
 
 	

@@ -14,6 +14,7 @@ defined('_JEXEC') or die('Restricted access');
 jimport('legacy.view.legacy');
 use Joomla\String\StringHelper;
 use Joomla\Database\DatabaseInterface;
+use Joomla\CMS\Toolbar\ToolbarFactoryInterface;
 
 /**
  * View class for the FLEXIcontent templates screen
@@ -28,8 +29,8 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 		$jinput   = $app->input;
 		$option   = $jinput->getCmd('option');
 		$db       = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
-		$document = \Joomla\CMS\Factory::getDocument();
-		$user     = \Joomla\CMS\Factory::getUser();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		$use_jquery_sortable = true;
 
@@ -186,10 +187,10 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 		// ***
 
 		// Add css to document
-		!\Joomla\CMS\Factory::getLanguage()->isRtl()
+		!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 			? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
 			: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
-		!\Joomla\CMS\Factory::getLanguage()->isRtl()
+		!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 			? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 			: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 
@@ -230,7 +231,7 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 		FLEXIUtilities::ManagerSideMenu('CanTemplates');
 
 		//create the toolbar
-		$bar = \Joomla\CMS\Toolbar\Toolbar::getInstance('toolbar');
+		$bar = \Joomla\CMS\Factory::getApplication()->getDocument()->getToolbar('toolbar');
 		\Joomla\CMS\Toolbar\ToolbarHelper::title( \Joomla\CMS\Language\Text::_( 'FLEXI_EDIT_TEMPLATE' ), 'eye' );
 		if (!$ismodal) {
 			\Joomla\CMS\Toolbar\ToolbarHelper::apply('templates.apply');

@@ -148,8 +148,8 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		 */
 		if ($app->isClient('site'))
 		{
-			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
-			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 		}
 
 
@@ -330,7 +330,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			// These can be used by the items manager without need to recalculate
 			if ($this->sess_assignments)
 			{
-				$session = \Joomla\CMS\Factory::getSession();
+				$session = \Joomla\CMS\Factory::getApplication()->getSession();
 
 				$fileid_to_itemids = $session->get('fileid_to_itemids', array(),'flexicontent');
 				foreach ($this->_data as $row)
@@ -413,7 +413,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		// Create pagination object if it doesn't already exist
 		if (empty($this->_pagination))
 		{
-			require_once (JPATH_COMPONENT_SITE.DS.'helpers'.DS.'pagination.php');
+			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'pagination.php');
 			$this->_pagination = new FCPagination( $this->getTotal(), $this->getState('limitstart'), $this->getState('limit') );
 		}
 
@@ -508,7 +508,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 				return array();
 			}
 			$upload_context = 'fc_upload_history.item_' . $itemid . '_field_' . $fieldid;
-			$session_files = \Joomla\CMS\Factory::getSession()->get($upload_context, array());
+			$session_files = \Joomla\CMS\Factory::getApplication()->getSession()->get($upload_context, array());
 
 			$names_pending = isset($session_files['names_pending'])
 				? $session_files['names_pending']
@@ -695,7 +695,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 
 			$app    = \Joomla\CMS\Factory::getApplication();
 			$jinput = $app->input;
-			$user   = \Joomla\CMS\Factory::getUser();
+			$user   = \Joomla\CMS\Factory::getApplication()->getIdentity();
 			$option = $jinput->get('option', '', 'cmd');
 			$view   = $jinput->get('view', '', 'cmd');
 			$p      = $this->ovid;
@@ -874,7 +874,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		}
 
 		$upload_context = 'fc_upload_history.item_' . $field->item_id . '_field_' . $field->id;
-		$session_files = \Joomla\CMS\Factory::getSession()->get($upload_context, array());
+		$session_files = \Joomla\CMS\Factory::getApplication()->getSession()->get($upload_context, array());
 
 		$file_ids = isset($session_files['ids_pending'])
 			? $session_files['ids_pending']
@@ -915,7 +915,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		}
 
 		$upload_context = 'fc_upload_history.item_' . $field->item_id . '_field_' . $field->id;
-		$session_files = \Joomla\CMS\Factory::getSession()->get($upload_context, array());
+		$session_files = \Joomla\CMS\Factory::getApplication()->getSession()->get($upload_context, array());
 
 		$file_ids = isset($session_files['ids_pending'])
 			? $session_files['ids_pending']
@@ -941,7 +941,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		$table = $this->getTable($this->records_jtable, '');
 
 		$app    = \Joomla\CMS\Factory::getApplication();
-		$user   = \Joomla\CMS\Factory::getUser();
+		$user   = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$jinput = $app->input;
 		$option = $jinput->get('option', '', 'cmd');
 
@@ -1068,7 +1068,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			}
 
 			// Filter via View Level Access, if user is not super-admin
-			if (!\Joomla\CMS\Factory::getUser()->authorise('core.admin') && (\Joomla\CMS\Factory::getApplication()->isClient('site') || $this->listViaAccess))
+			if (!\Joomla\CMS\Factory::getApplication()->getIdentity()->authorise('core.admin') && (\Joomla\CMS\Factory::getApplication()->isClient('site') || $this->listViaAccess))
 			{
 				$groups  = implode(',', \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id));
 				$where[] = 'a.access IN (' . $groups . ')';
@@ -1312,7 +1312,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		if ($field->item_id)
 		{
 			$upload_context = 'fc_upload_history.item_' . $field->item_id . '_field_' . $field->id;
-			$session_files = \Joomla\CMS\Factory::getSession()->get($upload_context, array());
+			$session_files = \Joomla\CMS\Factory::getApplication()->getSession()->get($upload_context, array());
 
 			$new_file_ids = isset($session_files['ids'])
 				? $session_files['ids']
@@ -1387,7 +1387,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	function getCustomLinksFileUsage($file_ids=array(), $count_items=false, $ignored=false)
 	{
 		$app    = \Joomla\CMS\Factory::getApplication();
-		$user   = \Joomla\CMS\Factory::getUser();
+		$user   = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$jinput = $app->input;
 		$option = $jinput->get('option', '', 'cmd');
 
@@ -1471,7 +1471,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	function getItemsSingleprop( $field_types=array('file', 'mediafile'), $file_ids=array(), $count_items=false, $ignored=false )
 	{
 		$app    = \Joomla\CMS\Factory::getApplication();
-		$user   = \Joomla\CMS\Factory::getUser();
+		$user   = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$jinput = $app->input;
 		$option = $jinput->get('option', '', 'cmd');
 
@@ -1559,7 +1559,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	function getItemsMultiprop( $field_props=array('image'=>array('originalname', 'existingname')), $value_props=array('image'=>array('filename', 'filename')) , $file_ids=array(), $count_items=false, $ignored=false )
 	{
 		$app    = \Joomla\CMS\Factory::getApplication();
-		$user   = \Joomla\CMS\Factory::getUser();
+		$user   = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$jinput = $app->input;
 		$option = $jinput->get('option', '', 'cmd');
 
@@ -2013,7 +2013,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	 */
 	function publish($cid = array(), $publish = 1)
 	{
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		if (count( $cid ))
 		{

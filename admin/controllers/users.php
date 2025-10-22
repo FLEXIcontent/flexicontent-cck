@@ -14,6 +14,7 @@ defined('_JEXEC') or die;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\Database\DatabaseInterface;
+use Joomla\CMS\Mail\MailerFactoryInterface;
 
 JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php');
 
@@ -89,8 +90,8 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 		// Initialize some variables
 		$app = \Joomla\CMS\Factory::getApplication();
 		$db  = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
-		$me  = \Joomla\CMS\Factory::getUser();
-		$config = \Joomla\CMS\Factory::getConfig();
+		$me  = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$config = \Joomla\CMS\Factory::getApplication()->getConfig();
 		$MailFrom	= $config->get('mailfrom');
 		$FromName	= $config->get('fromname');
 		$SiteName	= $config->get('sitename');
@@ -190,7 +191,7 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 				$adminEmail = $MailFrom;
 			}
 
-			\Joomla\CMS\Factory::getMailer()->sendMail($adminEmail, $adminName, $user->get('email'), $subject, $message);
+			\Joomla\CMS\Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer()->sendMail($adminEmail, $adminName, $user->get('email'), $subject, $message);
 		}
 
 		$ctrl = 'users.';
@@ -230,7 +231,7 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 
 		$app   = \Joomla\CMS\Factory::getApplication();
 		$db    = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
-		$me    = \Joomla\CMS\Factory::getUser();
+		$me    = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$curIsSuperAdmin = $me->authorise('core.admin', 'root.1');
 
 		$cid = $this->input->get('cid', array(), 'array');
@@ -325,7 +326,7 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 
 		$app = \Joomla\CMS\Factory::getApplication();
 		$db  = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
-		$me  = \Joomla\CMS\Factory::getUser();
+		$me  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$curIsSuperAdmin = $me->authorise('core.admin', 'root.1');
 
 		if (!$check_uids)

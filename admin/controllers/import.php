@@ -86,7 +86,7 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 		{
 			\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 			echo '<link rel="stylesheet" href="' . \Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/css/flexicontentbackend.css?' . FLEXI_VHASH . '" />';
-			$rtl_sfx = !\Joomla\CMS\Factory::getLanguage()->isRtl() ? '' : '_rtl';
+			$rtl_sfx = !\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl() ? '' : '_rtl';
 			$fc_css = \Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x' . $rtl_sfx . '.css' : 'j3x' . $rtl_sfx . '.css');
 			echo '<link rel="stylesheet" href="' . $fc_css . '?' . FLEXI_VHASH . '" />';
 		}
@@ -104,8 +104,8 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 		$link  = 'index.php?option=com_flexicontent&view=import';  // $_SERVER['HTTP_REFERER'];
 		$task  = $jinput->get('task', '', 'cmd');
 		$db    = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
-		$user  = \Joomla\CMS\Factory::getUser();
-		$session = \Joomla\CMS\Factory::getSession();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 		$has_zlib = function_exists("zlib_encode"); // Version_compare(PHP_VERSION, '5.4.0', '>=');
 
 		$parse_log = "\n\n\n" . '<b>please click</b> <a href="' . $link . '">here</a> to return previous page' . "\n\n\n";

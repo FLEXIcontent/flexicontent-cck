@@ -5,7 +5,7 @@
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright © 2020, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright ï¿½ 2020, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
@@ -200,7 +200,7 @@ class plgFlexicontent_fieldsLinkslist extends FCField
 			$initialized = 1;
 
 			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$document  = \Joomla\CMS\Factory::getApplication()->getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -295,7 +295,7 @@ class plgFlexicontent_fieldsLinkslist extends FCField
 		if ($js_code_added === null)
 		{
 			$js_code = $field->parameters->get( 'js_code', '' ) ;
-			if ($js_code)  \Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js_code);
+			if ($js_code)  \Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration($js_code);
 			$js_code_added = true;
 		}
 
@@ -304,7 +304,7 @@ class plgFlexicontent_fieldsLinkslist extends FCField
 		if ($css_code_added === null)
 		{
 			$css_code = $field->parameters->get( 'css_code', '' ) ;
-			if ($css_code) \Joomla\CMS\Factory::getDocument()->addStyleDeclaration($css_code);
+			if ($css_code) \Joomla\CMS\Factory::getApplication()->getDocument()->addStyleDeclaration($css_code);
 			$css_code_added = true;
 		}
 
