@@ -975,7 +975,7 @@ class FlexicontentModelFields extends FCModelAdminList
 	 */
 	public function toggleprop($cid = array(), $propname = null, &$unsupported = 0, &$locked = 0, $toggle_value = null)
 	{
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		$affected = 0;
 

@@ -10,7 +10,7 @@
  * @license GNU/GPL: http://www.gnu.org/copyleft/gpl.html
  **/
 (defined('_VALID_MOS') OR defined('_JEXEC')) or die('Direct Access to this location is not allowed.');
-
+use Joomla\Database\DatabaseInterface;
 class jc_com_flexicontent extends JCommentsPlugin
 {
 	function getObjectInfo($id, $language = null)
@@ -21,7 +21,7 @@ class jc_com_flexicontent extends JCommentsPlugin
 		if (is_file($routerHelper)) {
 			require_once($routerHelper);
 
-			$db = \Joomla\CMS\Factory::getDbo();
+			$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 			$lta = FLEXI_J16GE ? 'i' : 'ie';
 			$query = 'SELECT i.id, i.title, i.access, i.created_by, ie.type_id, '.$lta.'.language'
 				. ' , CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug'

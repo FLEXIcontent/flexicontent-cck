@@ -3,6 +3,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 use Joomla\String\StringHelper;
 use Joomla\CMS\Factory;
 use Joomla\Filesystem\Path;
+use Joomla\Database\DatabaseInterface;
 
 class flexicontent_tmpl
 {
@@ -71,7 +72,7 @@ class flexicontent_tmpl
 		{
 			// Parse & Load the XML file of the current layout
 			$tmplxml = Path::clean($tmpldir.DS.$tmplname.DS.$view.'.xml');
-			if ( file_exists($tmplxml) && empty($themes->$layout_type->$tmplname) )
+			if ( \Joomla\Filesystem\File::exists($tmplxml) && empty($themes->$layout_type->$tmplname) )
 			{
 				// Parse the XML file
 				// About load addition XML file, please see: https://github.com/FLEXIcontent/flexicontent-cck/pull/961
@@ -319,7 +320,7 @@ class flexicontent_tmpl
 		{
 			foreach($_tmpls as $tmpl)
 			{
-				if (!file_exists($tmpl->xmlpath) || filemtime($tmpl->xmlpath) > $tmpl->xmlmtime)
+				if (!\Joomla\Filesystem\File::exists($tmpl->xmlpath) || filemtime($tmpl->xmlpath) > $tmpl->xmlmtime)
 				{
 					$modified_files[$tmpl->name][$layout_type] = $tmpl->xmlpath;
 				}
@@ -403,7 +404,7 @@ class flexicontent_tmpl
 		static $layout_params = array();
 		if ( !$force && isset($layout_params[$type][$folder][$cfgname]) ) return $layout_params[$type][$folder][$cfgname];
 		
-		$db = Factory::getDbo();
+		$db = Factory::getContainer()->get(DatabaseInterface::class);
 		$query = 'SELECT template as folder, cfgname, attribs, layout as type'
 			. ' FROM #__flexicontent_layouts_conf';
 		$db->setQuery($query);
@@ -479,7 +480,7 @@ class flexicontent_tmpl
 	{
 		jimport('joomla.filesystem.folder');
 		$tmpldir = $tmpldir ? $tmpldir : JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates';
-		$themes = scandir($tmpldir);  // Get specific template folder
+		$themes = \Joomla\Filesystem\Folder::folders($tmpldir);  // Get specific template folder
 
 		return $themes;
 	}
@@ -498,7 +499,7 @@ class flexicontent_tmpl
 			$templates[$folder] = array();
 		}
 		if(!isset($templates[$folder][$type])) {
-			$db = Factory::getDbo();
+			$db = Factory::getContainer()->get(DatabaseInterface::class);
 			$query  = 'SELECT *'
 					. ' FROM #__flexicontent_templates'
 					. ' WHERE template = ' . $db->Quote($folder)

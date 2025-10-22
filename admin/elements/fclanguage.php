@@ -18,6 +18,7 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
+use Joomla\Database\DatabaseInterface;
 
 // Load the helper classes
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
@@ -48,8 +49,8 @@ class JFormFieldFclanguage extends \Joomla\CMS\Form\FormField
 
 	function getInput()
 	{
-		$doc	= \Joomla\CMS\Factory::getDocument();
-		$db		= \Joomla\CMS\Factory::getDbo();
+		$doc	= \Joomla\CMS\Factory::getApplication()->getDocument();
+		$db		= \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		
 		// Get field configuration
 		$node = & $this->element;

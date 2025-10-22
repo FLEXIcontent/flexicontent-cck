@@ -2,8 +2,8 @@
 defined('_JEXEC') or die('Restricted access');
 
 $app     = \Joomla\CMS\Factory::getApplication();
-$user    = \Joomla\CMS\Factory::getUser();
-$session = \Joomla\CMS\Factory::getSession();
+$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
+$session = \Joomla\CMS\Factory::getApplication()->getSession();
 $isSite  = $app->isClient('site');
 $CFGsfx  = $isSite ? '_fe' : '_be';
 
@@ -278,7 +278,7 @@ if ($tags_editable || (!$isSite && $this->perms['canversion']))
 							q: term,
 							task: 'viewtags',
 							item_lang: jQuery('#jform_language').val(),
-							lang: '". \Joomla\CMS\Factory::getLanguage()->getTag() . "',
+							lang: '". \Joomla\CMS\Factory::getApplication()->getLanguage()->getTag() . "',
 							format: 'json'
 						},
 						success: function(data)

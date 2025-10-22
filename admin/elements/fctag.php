@@ -109,7 +109,7 @@ class JFormFieldFctag extends \Joomla\CMS\Form\FormField
 				fc_field_dialog_handle_record.dialog('close');
 			}
 			";
-			\Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+			\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration($js);
 			flexicontent_html::loadFramework('flexi-lib');
 		}
 

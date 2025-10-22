@@ -126,7 +126,7 @@ class JFormFieldFlexicategories extends \Joomla\CMS\Form\FormField
 				document.getElementById(\'a_id_\' + name).value = value_list;
 			}';
 
-			\Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+			\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration($js);
 		}
 		
 		$html = '';

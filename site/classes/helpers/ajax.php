@@ -30,7 +30,7 @@ class flexicontent_ajax
 		if ($exttype=='modules')
 		{
 			// Import module helper file
-			$helper_path = \Joomla\CMS\Filesystem\Path::clean(JPATH_SITE.DS.$exttype.DS.'mod_'.$extname.DS.'helper.php');
+			$helper_path = \Joomla\Filesystem\Path::clean(JPATH_SITE.DS.$exttype.DS.'mod_'.$extname.DS.'helper.php');
 			if ( !file_exists($helper_path) )
 			{
 				jexit("no helper file found at expected path, filepath is ".$helper_path);
@@ -87,8 +87,8 @@ class flexicontent_ajax
 			$extension_name = 'mod_'.strtolower($extname);
 		else
 			$extension_name = 'plg_'.strtolower($extname);
-		\Joomla\CMS\Factory::getLanguage()->load($extension_name, JPATH_SITE, 'en-GB', true);
-		\Joomla\CMS\Factory::getLanguage()->load($extension_name, JPATH_SITE, null, true);
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load($extension_name, JPATH_SITE, 'en-GB', true);
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load($extension_name, JPATH_SITE, null, true);
 		
 		// Call the method
 		$obj->$extfunc();

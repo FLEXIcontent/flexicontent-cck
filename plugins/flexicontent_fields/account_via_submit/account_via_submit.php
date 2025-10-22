@@ -11,6 +11,8 @@
 
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
+use Joomla\Database\DatabaseInterface;
+use Joomla\CMS\Mail\MailerFactoryInterface;
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
 class plgFlexicontent_fieldsAccount_via_submit extends FCField
@@ -42,7 +44,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		$field->label = $field->parameters->get('label_form') ? \Joomla\CMS\Language\Text::_($field->parameters->get('label_form')) : \Joomla\CMS\Language\Text::_($field->label);
 
 		// initialize framework objects and other variables
-		$document = \Joomla\CMS\Factory::getDocument();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
 
 		$tooltip_class = 'hasTooltip';
@@ -133,7 +135,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 
 		$field->html = array();
 
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		if ($item->id)
 		{
@@ -258,7 +260,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		if (!$isnew) return;
 
 		// Check if user is logged, if so then nothing to do
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		if ($user->id)
 		{
 			$post = array();
@@ -315,7 +317,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		$this->initialize($field);
 
 		// Check email already used
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$db->setQuery("SELECT id FROM #__users WHERE email='$email'");
 		$existingUserID = $db->loadResult();
 
@@ -407,7 +409,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		$attribs->initialized = 1;
 		$attribs = json_encode($attribs);
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$query = "UPDATE #__flexicontent_fields SET attribs=".$db->Quote($attribs) ." WHERE id = ".$field->id;
 		$result = $db->setQuery($query)->execute();
 	}
@@ -419,11 +421,11 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		jimport('joomla.user.user');
 		jimport('joomla.user.helper');
 		jimport('cms.component.helper');
-		\Joomla\CMS\Factory::getLanguage()->load('com_users', JPATH_SITE, 'en-GB', false);
-		\Joomla\CMS\Factory::getLanguage()->load('com_users', JPATH_SITE, null, true);
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_users', JPATH_SITE, 'en-GB', false);
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_users', JPATH_SITE, null, true);
 
 		$app = \Joomla\CMS\Factory::getApplication();
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$usersConf = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_users' );
 
 		$useractivation = $field->parameters->get('useractivation', $usersConf->get('useractivation', 2)); // Default: use Joomla com_users setting (2=user self-activation)
@@ -537,7 +539,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 
 		// Send the email
 		try {
-			$send_result = \Joomla\CMS\Factory::getMailer()->sendMail(
+			$send_result = \Joomla\CMS\Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer()->sendMail(
 				$data['mailfrom'], $data['fromname'], $recipient, $emailSubject, $emailBody,
 				$html_mode, $cc, $bcc, $attachment, $replyto, $replytoname
 			);
@@ -587,7 +589,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 
 			// Send the email
 			try {
-				$send_result = \Joomla\CMS\Factory::getMailer()->sendMail(
+				$send_result = \Joomla\CMS\Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer()->sendMail(
 					$data['mailfrom'], $data['fromname'], $recipient, $emailSubject, $emailBody,
 					$html_mode, $cc, $bcc, $attachment, $replyto, $replytoname
 				);
@@ -608,7 +610,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 
 	function sendEditCoupon(&$item, &$field, $email, $token)
 	{
-		$db  = \Joomla\CMS\Factory::getDbo();
+		$db  = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$app = \Joomla\CMS\Factory::getApplication();
 
 		$SiteName	= $app->getCfg('sitename');
@@ -646,7 +648,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 
 		// Send the email
 		try {
-			$send_result = \Joomla\CMS\Factory::getMailer()->sendMail(
+			$send_result = \Joomla\CMS\Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer()->sendMail(
 				$mailfrom, $fromname, $recipient, $emailSubject, $emailBody,
 				$html_mode, $cc, $bcc, $attachment, $replyto, $replytoname
 			);

@@ -13,6 +13,7 @@ defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
+use Joomla\Database\DatabaseInterface;
 
 $cid = \Joomla\CMS\Factory::getApplication()->input->get('cid', array(0), 'array');
 ArrayHelper::toInteger($cid);
@@ -26,10 +27,10 @@ $cparams = \Joomla\CMS\Component\ComponentHelper::getParams ('com_media');
 $date_format = FLEXI_J16GE ? 'Y-m-d H:i:s' : '%Y-%m-%d %H:%M:%S';
 
 
-if ($this->row->get('lastvisitDate') == "0000-00-00 00:00:00") {
+if ($this->row->lastvisitDate == "0000-00-00 00:00:00") {
 	$lvisit = \Joomla\CMS\Language\Text::_( 'Never' );
 } else {
-	$lvisit	= \Joomla\CMS\HTML\HTMLHelper::_('date', $this->row->get('lastvisitDate'), $date_format);
+	$lvisit	= \Joomla\CMS\HTML\HTMLHelper::_('date', $this->row->lastvisitDate, $date_format);
 }
 
 // Load JS tabber lib
@@ -85,7 +86,7 @@ $this->document->addScriptDeclaration($js);
 
 				// DB Query to get -mulitple- user group ids for all authors,
 				// Get user-To-usergoup mapping for users in current page
-				$db = \Joomla\CMS\Factory::getDbo();
+				$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 				
 				$query = 'SELECT group_id FROM #__user_usergroup_map WHERE user_id = '.(int) $this->form->getValue('id');
 				$user_grpids = $db->setQuery($query)->loadColumn();
@@ -677,13 +678,13 @@ $this->document->addScriptDeclaration($js);
 	<div class="fcclear"></div>
 
 	<input type="hidden" name="option" value="com_flexicontent" />
-	<input type="hidden" name="id" value="<?php echo $this->row->get('id'); ?>" />
-	<input type="hidden" name="cid[]" value="<?php echo $this->row->get('id'); ?>" />
+	<input type="hidden" name="id" value="<?php echo $this->row->id; ?>" />
+	<input type="hidden" name="cid[]" value="<?php echo $this->row->id; ?>" />
 	<input type="hidden" name="controller" value="users" />
 	<input type="hidden" name="view" value="user" />
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" name="contact_id" value="" />
-	<?php if (!\Joomla\CMS\Factory::getUser()->authorise('com_users', 'email_events')) : ?>
+	<?php if (!\Joomla\CMS\Factory::getApplication()->getIdentity()->authorise('com_users', 'email_events')) : ?>
 		<input type="hidden" name="sendEmail" value="0" />
 	<?php endif; ?>
 	<?php echo \Joomla\CMS\HTML\HTMLHelper::_( 'form.token' ); ?>

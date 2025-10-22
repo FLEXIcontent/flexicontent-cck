@@ -154,7 +154,7 @@ $(document).ready(function()
 })(jQuery);
 ";
 
-if ($js) \Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+if ($js) \Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration($js);
 
 
 /**
