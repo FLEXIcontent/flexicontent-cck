@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: fccheckbox.php 967 2011-11-21 00:01:36Z ggppdk $
+ * @version 2.0 stable - Joomla 6 compatible
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -20,131 +20,166 @@
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
 
+use Joomla\CMS\Factory;
+use Joomla\CMS\Form\FormField;
+use Joomla\CMS\Language\Text;
+
 // Load the helper classes
-if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
-require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
-
-jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
-jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
-
-//jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
-//\Joomla\CMS\Form\FormHelper::loadFieldClass('...');   // \Joomla\CMS\Form\FormField...
+require_once JPATH_ROOT . '/components/com_flexicontent/classes/flexicontent.helper.php';
 
 /**
  * Renders a checkbox-set element
  */
-class JFormFieldFccheckbox extends \Joomla\CMS\Form\FormField
+class JFormFieldFccheckbox extends FormField
 {
-
- /**
-	* Element name
-	*
-	* @access	protected
-	* @var		string
-	*/
-  var $type = 'Fccheckbox';
+	/**
+	 * Element name
+	 *
+	 * @var    string
+	 */
+	protected $type = 'Fccheckbox';
 	
-	function getInput()
+	/**
+	 * Method to get the field input markup.
+	 *
+	 * @return  string  The field input markup.
+	 *
+	 * @since   2.0
+	 */
+	protected function getInput()
 	{
-		$node = & $this->element;
+		$node = $this->element;
 		$attributes = get_object_vars($node->attributes());
 		$attributes = $attributes['@attributes'];
 
 		$values = $this->value;
-		if ( empty($values) )							$values = array();
-		else if ( ! is_array($values) )		$values = explode("|", $values);
+		if (empty($values))
+		{
+			$values = array();
+		}
+		elseif (!is_array($values))
+		{
+			$values = explode("|", $values);
+		}
 		$split_char = ",";
 		
 		// Get options and values
-		$checkoptions = preg_split("/[\s]*".$split_char."[\s]*/", $attributes['checkoptions'] ?? '');
-		$checkvals = preg_split("/[\s]*".$split_char."[\s]*/", $attributes['checkvals'] ?? '');
-		$defaultvals = preg_split("/[\s]*".$split_char."[\s]*/", @$attributes['defaultvals'] ?? '');
+		$checkoptions = preg_split("/[\s]*" . $split_char . "[\s]*/", $attributes['checkoptions'] ?? '');
+		$checkvals = preg_split("/[\s]*" . $split_char . "[\s]*/", $attributes['checkvals'] ?? '');
+		$defaultvals = preg_split("/[\s]*" . $split_char . "[\s]*/", $attributes['defaultvals'] ?? '');
 		
 		// Verify defaultvals option
-		if ( count($defaultvals)==1 && empty($defaultvals[0]) ) $defaultvals = array();
-		if ( count($defaultvals) && @$attributes['display_useglobal'] ) {
+		if (count($defaultvals) == 1 && empty($defaultvals[0]))
+		{
+			$defaultvals = array();
+		}
+		
+		if (count($defaultvals) && ($attributes['display_useglobal'] ?? false))
+		{
 			$defaultvals = array();
 			echo "Cannot use field option 'defaultvals' together with 'display_useglobal' 'defaultvals' cleared";
 		}
 
 		// Make value an array if value is not already array, also load defaults, if field parameter never saved
-		if ( count($values)==0 )  $values = $defaultvals;
+		if (count($values) == 0)
+		{
+			$values = $defaultvals;
+		}
 
 		// Sanity check
-		if (count($checkoptions)!=count($checkvals))
+		if (count($checkoptions) != count($checkvals))
+		{
 			return "Number of check options not equal to number of check values";
+		}
 
-		$fieldname	= $this->name;
+		$fieldname = $this->name;
 		$element_id = $this->id;
 
 		// This field is always multiple, we will add '[]' WHILE checking for the attribute ... so that we do not add twice
-		$is_multiple = @$attributes['multiple']=='multiple' || @$attributes['multiple']=='true';
+		$is_multiple = ($attributes['multiple'] ?? '') == 'multiple' || ($attributes['multiple'] ?? '') == 'true';
 		if (!$is_multiple)
 		{
 			$fieldname .= '[]';
 		}
 
-		$class = @ $attributes['class'];
+		$class = $attributes['class'] ?? '';
 		$classes = ($class ? $class : '') . ' group-fcset fc_input_set';
 
-		$cols = (float) @ $attributes['cols'];
-		if ($cols) $t = ceil(count($checkoptions ) / $cols);
-		if ($cols) $classes .= ' fc-columned';
+		$cols = (float) ($attributes['cols'] ?? 0);
+		if ($cols)
+		{
+			$t = ceil(count($checkoptions) / $cols);
+		}
+		if ($cols)
+		{
+			$classes .= ' fc-columned';
+		}
 		
-		$attribs = ' class="'.$classes.'"';
-		$html = '<fieldset id="'.$element_id.'" '.$attribs.'>';
+		$attribs = ' class="' . $classes . '"';
+		$html = '<fieldset id="' . $element_id . '" ' . $attribs . '>';
 
 		$disable_all = '';
-		if ( @$attributes['display_useglobal'] ) {
-			$check_global='';
-			if (count($values) == 0) {
+		if ($attributes['display_useglobal'] ?? false)
+		{
+			$check_global = '';
+			if (count($values) == 0)
+			{
 				$check_global = ' checked="checked" ';
-				$disable_all  = ' disabled="disabled" ';
+				$disable_all = ' disabled="disabled" ';
 			}
-			$useglobal_lbl = @$attributes['useglobal_lbl'] ? $attributes['useglobal_lbl'] : 'FLEXI_USE_GLOBAL';
-			$html .= '<div><input id="'.$element_id.'_useglobal" type="checkbox" '.$check_global.' value="" onclick="fc_toggle_checkbox_group(\''.$element_id.'\', this)" />';
-			$html .= '<label for="'.$element_id.'_useglobal" ><b>'.\Joomla\CMS\Language\Text::_($useglobal_lbl).'</b></label></div>';
+			$useglobal_lbl = $attributes['useglobal_lbl'] ?? 'FLEXI_USE_GLOBAL';
+			$html .= '<div><input id="' . $element_id . '_useglobal" type="checkbox" ' . $check_global . ' value="" onclick="fc_toggle_checkbox_group(\'' . $element_id . '\', this)" />';
+			$html .= '<label for="' . $element_id . '_useglobal" ><b>' . Text::_($useglobal_lbl) . '</b></label></div>';
 		}
 
 		// Create checkboxes
-		
-		if ($cols) $html .= '<div style="margin-bottom: 12px;">';
-		foreach($checkoptions as $i => $o)
+		if ($cols)
 		{
-			$curr_element_id = $element_id.$i;
+			$html .= '<div style="margin-bottom: 12px;">';
+		}
+		
+		foreach ($checkoptions as $i => $o)
+		{
+			$curr_element_id = $element_id . $i;
 			$html .= 
-			($cols && $i && ((($i) % $t) == 0) ? '</div><div>' : '').
-			'
+				($cols && $i && ((($i) % $t) == 0) ? '</div><div>' : '') .
+				'
 			<div>
-				<input id="'.$curr_element_id.'" type="checkbox" '.$disable_all .(in_array($checkvals[$i], $values) ? ' checked="checked"' : '').' name="'.$fieldname.'" value="'.$checkvals[$i].'" />
-				<label for="'.$curr_element_id.'" >'.\Joomla\CMS\Language\Text::_($checkoptions[$i]).'</label>
+				<input id="' . $curr_element_id . '" type="checkbox" ' . $disable_all . (in_array($checkvals[$i], $values) ? ' checked="checked"' : '') . ' name="' . $fieldname . '" value="' . $checkvals[$i] . '" />
+				<label for="' . $curr_element_id . '" >' . Text::_($checkoptions[$i]) . '</label>
 			</div>
 		';
 		}
-		if ($cols) $html .= '</div>';
+		
+		if ($cols)
+		{
+			$html .= '</div>';
+		}
 
-		$html .= '<input id="'.$element_id.'9999" type="hidden"  name="'.$fieldname.'" value="__SAVED__" '.$disable_all.'/> ';
+		$html .= '<input id="' . $element_id . '9999" type="hidden"  name="' . $fieldname . '" value="__SAVED__" ' . $disable_all . '/> ';
 		$html .= '</fieldset>';
 		
 		static $js_added = false;
-		if (!$js_added) {
+		if (!$js_added)
+		{
 			$js_added = true;
-			$doc = \Joomla\CMS\Factory::getDocument();
+			$doc = Factory::getDocument();
 			flexicontent_html::loadFramework('flexi-lib');
-			//$js = "";
-			//if ($js) $doc->addScriptDeclaration($js);
 		}
 		
 		return $html;
 	}
 
-
-	function getLabel()
+	/**
+	 * Method to get the field label markup.
+	 *
+	 * @return  string  The field label markup.
+	 *
+	 * @since   2.0
+	 */
+	protected function getLabel()
 	{
 		// Valid HTML ... you can not have for LABEL attribute for fieldset
 		return str_replace(' for="', ' data-for="', parent::getLabel());
 	}
 }
-
-?>
