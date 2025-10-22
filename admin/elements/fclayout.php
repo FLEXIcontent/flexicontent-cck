@@ -3,34 +3,33 @@
  * @package     Joomla.Platform
  * @subpackage  Form
  *
- * @copyright   Copyright (C) 2005 - 2013 Open Source Matters, Inc. All rights reserved.
+ * @copyright   Copyright (C) 2005 - 2024 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
 defined('_JEXEC') or die;
 
-use Joomla\String\StringHelper;
+use Joomla\CMS\Application\ApplicationHelper;
+use Joomla\CMS\Factory;
+use Joomla\Filesystem\File;
+use Joomla\Filesystem\Folder;
+use Joomla\Filesystem\Path;
+use Joomla\CMS\Form\Field\GroupedlistField;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Session\Session;
+use Joomla\CMS\Uri\Uri;
+use Joomla\Database\DatabaseInterface;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\Database\DatabaseInterface;
 
 // Load the helper classes
-if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
-require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
-
-jimport('joomla.filesystem.folder');  // \Joomla\Filesystem\Folder
-jimport('joomla.filesystem.file');    // \Joomla\Filesystem\File
-
-jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
-jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
-
-jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
-\Joomla\CMS\Form\FormHelper::loadFieldClass('groupedlist');   // \Joomla\CMS\Form\Field\GroupedlistField
+require_once JPATH_ROOT . '/components/com_flexicontent/classes/flexicontent.helper.php';
 
 // Load JS tabber lib
-\Joomla\CMS\Factory::getApplication()->getDocument()->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
-\Joomla\CMS\Factory::getApplication()->getDocument()->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
-\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
+Factory::getDocument()->addScript(Uri::root(true) . '/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
+Factory::getDocument()->addStyleSheet(Uri::root(true) . '/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
+Factory::getDocument()->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');
 
 /**
  * Renders an HTML select list of FLEXIcontent layouts
@@ -39,7 +38,7 @@ jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
  * @subpackage  Form
  * @since       1.5
  */
-class JFormFieldFclayout extends JFormFieldGroupedList
+class JFormFieldFclayout extends GroupedlistField
 {
 	/**
 	 * The form field type.
@@ -51,88 +50,84 @@ class JFormFieldFclayout extends JFormFieldGroupedList
 
 	/**
 	 * Method to get the list of files for the field options.
-	 * Specify the target directory with a directory attribute
-	 * Attributes allow an exclude mask and stripping of extensions from file name.
-	 * Default attribute may optionally be set to null (no file) or -1 (use a default).
 	 *
-	 * @return  array  The field option objects.
+	 * @return  string  The field input markup.
 	 *
 	 * @since   1.5
 	 */
 	protected function getInput()
 	{
 		// Element params
-		$node = & $this->element;
+		$node = $this->element;
 		$attributes = get_object_vars($node->attributes());
 		$attributes = $attributes['@attributes'];
 
 		// Get value
 		$value = $this->value;
-		$value = $value ? $value : $attributes['default'];
+		$value = $value ?: ($attributes['default'] ?? '');
 
 		// Get current extension and id being edited
-		$app    = \Joomla\CMS\Factory::getApplication();
+		$app = Factory::getApplication();
 		$jinput = $app->input;
-		$task   = $jinput->get('task', '', 'CMD');
+		$task = $jinput->get('task', '', 'CMD');
 
 		$ext_option = $jinput->get('option', '', 'CMD');
-		$ext_view   = $jinput->get('view', '', 'CMD');
+		$ext_view = $jinput->get('view', '', 'CMD');
 
 		if (
 			$ext_option == 'com_modules' ||
 			$ext_option == 'com_advancedmodules' ||
-			($ext_option == 'com_falang' && $jinput->get('catid', '', 'CMD')=='modules')
-		) $ext_view = 'module';
+			($ext_option == 'com_falang' && $jinput->get('catid', '', 'CMD') == 'modules')
+		)
+		{
+			$ext_view = 'module';
+		}
 
 		// Get RECORD id of current view
 		$cid = $jinput->get('cid', array(0), 'array');
 		$cid = ArrayHelper::toInteger($cid);
 		$pk = (int) $cid[0];
-		if (!$pk) $pk = $jinput->get('id', 0, 'int');
-
-
-		// Initialize variables.
-		//$options = array();
+		if (!$pk)
+		{
+			$pk = $jinput->get('id', 0, 'int');
+		}
 
 		// Initialize some field attributes.
-		$filter   = (string) @ $attributes['filter'];
-		$exclude  = (string) @ $attributes['exclude'];
-		$stripExt = (string) @ $attributes['stripext'];
-		$stripPrefix = (string) @ $attributes['stripprefix'];
-		$hideNone    = (string) @ $attributes['hide_none'];
-		$hideDefault = (string) @ $attributes['hide_default'];
-		$class       = (string) @ $attributes['class'];
-		$class       = $class ?: (FLEXI_J40GE ? 'form-select' : '');
+		$filter = (string) ($attributes['filter'] ?? '');
+		$exclude = (string) ($attributes['exclude'] ?? '');
+		$stripExt = (string) ($attributes['stripext'] ?? '');
+		$stripPrefix = (string) ($attributes['stripprefix'] ?? '');
+		$hideNone = (string) ($attributes['hide_none'] ?? '');
+		$hideDefault = (string) ($attributes['hide_default'] ?? '');
+		$class = (string) ($attributes['class'] ?? '');
+		$class = $class ?: 'form-select';
 
-		// e.g. 'gallery_' in image-gallery field (e.g. layout filename: value_gallery_multibox.php)
-		$trimDisplayname = (string) @ $attributes['trim_displayname'];
+		// e.g. 'gallery_' in image-gallery field
+		$trimDisplayname = (string) ($attributes['trim_displayname'] ?? '');
 
-		$icon_class = (string) @ $attributes['icon_class'];
+		$icon_class = (string) ($attributes['icon_class'] ?? '');
 		$icon_class = $icon_class ?: 'icon-palette';
 
-		$icon_class2 = (string) @ $attributes['icon_class2'];
+		$icon_class2 = (string) ($attributes['icon_class2'] ?? '');
 
-		$custom_layouts_label  = (string) @ $attributes['custom_layouts_label'];
-		$use_default_label  = (string) @ $attributes['use_default_label'];
-		$use_default_label  = $use_default_label ?: 'JOPTION_USE_DEFAULT';
+		$custom_layouts_label = (string) ($attributes['custom_layouts_label'] ?? '');
+		$use_default_label = (string) ($attributes['use_default_label'] ?? '');
+		$use_default_label = $use_default_label ?: 'JOPTION_USE_DEFAULT';
 
-		$layout_label = (string) @ $attributes['layout_label'];
-		$layout_label = \Joomla\CMS\Language\Text::_($layout_label ?: 'FLEXI_LAYOUT');
+		$layout_label = (string) ($attributes['layout_label'] ?? '');
+		$layout_label = Text::_($layout_label ?: 'FLEXI_LAYOUT');
 
 		// Get the path which contains layouts
-		$ext_name   = (string) @ $attributes['ext_name'];
-		$ext_type   = (string) @ $attributes['ext_type'];
-		$directory  = (string) @ $attributes['directory'];
-		$path = @is_dir($directory)  ?  $directory  :  JPATH_ROOT . $directory;
+		$ext_name = (string) ($attributes['ext_name'] ?? '');
+		$ext_type = (string) ($attributes['ext_type'] ?? '');
+		$directory = (string) ($attributes['directory'] ?? '');
+		$path = @is_dir($directory) ? $directory : JPATH_ROOT . $directory;
 
 		/**
 		 * A prefix and/or a suffix to distinguish multiple loading of same layout in the same page
-		 * (This is typically the name of the layout parameter)
-		 * Typically the layouts will either use prefix 'PPFX_' or suffix '_PSFX', e.g. to distiguish between
-		 * 'desktop_' and 'mobile_' or '_fe' and '_be' for (frontend and backend)
 		 */
-		$layout_pfx = (string) @ $attributes['name']; //
-		$layout_sfx = (string) @ $attributes['layout_sfx'];
+		$layout_pfx = (string) ($attributes['name'] ?? '');
+		$layout_sfx = (string) ($attributes['layout_sfx'] ?? '');
 
 		// For using directory in url
 		$directory = str_replace('\\', '/', $directory);
@@ -151,27 +146,18 @@ class JFormFieldFclayout extends JFormFieldGroupedList
 		if ($ext_view === 'module')
 		{
 			$groups[$grp_index]['id'] = $this->id . '__';
-			$groups[$grp_index]['text'] = $ext_view === 'module' ? \Joomla\CMS\Language\Text::sprintf('JOPTION_FROM_MODULE') : '';
+			$groups[$grp_index]['text'] = $ext_view === 'module' ? Text::sprintf('JOPTION_FROM_MODULE') : '';
 		}
 
 		// Prepend some default options based on field attributes.
-		if (!$hideNone)   $groups[$grp_index]['items'][] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '-1', \Joomla\CMS\Language\Text::alt('JOPTION_DO_NOT_USE', preg_replace('/[^a-zA-Z0-9_\-]/', '_', $this->fieldname)));
-		if (!$hideDefault) $groups[$grp_index]['items'][] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '', \Joomla\CMS\Language\Text::alt($use_default_label, preg_replace('/[^a-zA-Z0-9_\-]/', '_', $this->fieldname)));
-
-		// ***
-		// *** Get any additional options in the XML definition.
-		// ***
-
-		/*
-		$options = parent::getOptions();
-		if (count($options)>0)
+		if (!$hideNone)
 		{
-			$groups['extended'] = array();
-			$groups['extended']['id'] = $this->id . '_extended';
-			$groups['extended']['text'] =  \Joomla\CMS\Language\Text::_('Built-in');
-			$groups['extended']['items'] = $options;
+			$groups[$grp_index]['items'][] = HTMLHelper::_('select.option', '-1', Text::alt('JOPTION_DO_NOT_USE', preg_replace('/[^a-zA-Z0-9_\-]/', '_', $this->fieldname)));
 		}
-		*/
+		if (!$hideDefault)
+		{
+			$groups[$grp_index]['items'][] = HTMLHelper::_('select.option', '', Text::alt($use_default_label, preg_replace('/[^a-zA-Z0-9_\-]/', '_', $this->fieldname)));
+		}
 
 		$core_layout_names = array();
 
@@ -179,33 +165,33 @@ class JFormFieldFclayout extends JFormFieldGroupedList
 		$last_was_grp = false;
 		foreach ($this->element->children() as $option)
 		{
-			$name = $option->getName();   //echo 'Name: ' . $name . '<pre>' . print_r($option, true) .'</pre>'; exit;
+			$name = $option->getName();
 
-			// If current option is group then iterrate through its children, otherwise create single value array
-			$children = $name=="group"
+			// If current option is group then iterate through its children, otherwise create single value array
+			$children = $name == "group"
 				? $option->children()
-				: array( & $option );
+				: array($option);
 
 			$_options = array();
 			foreach ($children as $sub_option)
 			{
-				$val  = (string) $sub_option->attributes()->value;
-				$text = \Joomla\CMS\Language\Text::_( (string) $sub_option );
+				$val = (string) $sub_option->attributes()->value;
+				$text = Text::_((string) $sub_option);
 				$attr_arr = array();
 
-				// When filename cannot be calculated from 'value' e.g. value is an integer (legacy parameter value)
+				// When filename cannot be calculated from 'value'
 				if (isset($sub_option->attributes()->filename))
 				{
 					$filename = (string) $sub_option->attributes()->filename;
-					$attr_arr['data-filename']  = $filename;
+					$attr_arr['data-filename'] = $filename;
 					$core_layout_names[$filename] = $val;
 				}
 
-				// Custom displayname, displayname will not be calculated from 'filename' or 'value'
+				// Custom displayname
 				if (isset($sub_option->attributes()->displayname))
 				{
 					$displayname = (string) $sub_option->attributes()->displayname;
-					$attr_arr['data-displayname']  = \Joomla\CMS\Language\Text::_($displayname);
+					$attr_arr['data-displayname'] = Text::_($displayname);
 				}
 
 				$disable = $sub_option->attributes()->disable ? true : false;
@@ -217,22 +203,21 @@ class JFormFieldFclayout extends JFormFieldGroupedList
 
 				$_options[] = (object) array(
 					'value' => $val,
-					'text'  => $text,
+					'text' => $text,
 					'disable' => $disable,
-					'attr'  => $attr_arr
+					'attr' => $attr_arr
 				);
 				$V2L[$val] = $text;
-				//print_r($attr_arr);
 			}
 
 			// Check for current option is a GROUP
-			if ($name=="group")
+			if ($name == "group")
 			{
 				$grp = $option->attributes()->name ?: $option->attributes()->label;
 				$grp = (string) $grp;
 				$groups[$grp] = array();
 				$groups[$grp]['id'] = null;
-				$groups[$grp]['text'] = \Joomla\CMS\Language\Text::_($option->attributes()->label);
+				$groups[$grp]['text'] = Text::_($option->attributes()->label);
 				$groups[$grp]['items'] = $_options;
 				$last_was_grp = true;
 			}
@@ -244,12 +229,10 @@ class JFormFieldFclayout extends JFormFieldGroupedList
 			}
 		}
 
-
 		/**
 		 * Get a list of files in the search path with the given filter.
 		 */
-
-		$files = \Joomla\Filesystem\Folder::files($path, $filter);
+		$files = Folder::files($path, $filter);
 		$files = is_array($files) ? $files : array();
 		$files = array_flip($files);
 
@@ -257,15 +240,15 @@ class JFormFieldFclayout extends JFormFieldGroupedList
 		$groups['custom'] = array();
 		$groups['custom']['id'] = $this->id . '_custom';
 		$groups['custom']['text'] = $ext_view === 'module'
-			? \Joomla\CMS\Language\Text::sprintf('JOPTION_FROM_MODULE')
-			: \Joomla\CMS\Language\Text::_($custom_layouts_label ?: 'FLEXI_LAYOUTS');
+			? Text::sprintf('JOPTION_FROM_MODULE')
+			: Text::_($custom_layouts_label ?: 'FLEXI_LAYOUTS');
 		$groups['custom']['items'] = array();
 
 		$layout_files = array();
 		foreach ($files as $file => $index)
 		{
 			// Check to see if the file is in the exclude mask.
-			if ( $exclude && preg_match(chr(1) . $exclude . chr(1), $file) )
+			if ($exclude && preg_match(chr(1) . $exclude . chr(1), $file))
 			{
 				continue;
 			}
@@ -273,7 +256,7 @@ class JFormFieldFclayout extends JFormFieldGroupedList
 			// If the extension is to be stripped, do it.
 			if ($stripExt)
 			{
-				$file = \Joomla\Filesystem\File::stripExt($file);
+				$file = File::stripExt($file);
 			}
 
 			if (isset($core_layout_names[$file]))
@@ -286,7 +269,6 @@ class JFormFieldFclayout extends JFormFieldGroupedList
 
 			$groups['custom']['items'][] = (object) array('text' => $txt, 'value' => $val);
 			$layout_files[] = $file;
-
 		}
 
 		// If none non core files were found then remove the group
@@ -295,73 +277,73 @@ class JFormFieldFclayout extends JFormFieldGroupedList
 			unset($groups['custom']);
 		}
 
-
 		/**
 		 * Case of module, also get custom layouts from templates
-		 * Note: layout overrides are excluded from being listed
 		 */
 		if ($ext_view === 'module')
 		{
 			$this->getModuleLayoutsFromTemplates($groups, $layout_files);
 		}
 
-
 		// Element name and id
-		$_name	= $this->fieldname;
-		$fieldname	= $this->name;
+		$_name = $this->fieldname;
+		$fieldname = $this->name;
 		$element_id = $this->id;
 
 		// Add tag attributes
 		$attribs = '';
-		if (@$attributes['multiple']=='multiple' || @$attributes['multiple']=='true' )
+		if (($attributes['multiple'] ?? '') == 'multiple' || ($attributes['multiple'] ?? '') == 'true')
 		{
 			$attribs .= ' multiple="multiple" ';
-			$attribs .= (@$attributes['size']) ? ' size="'.@$attributes['size'].'" ' : ' size="6" ';
+			$attribs .= ($attributes['size'] ?? false) ? ' size="' . $attributes['size'] . '" ' : ' size="6" ';
 		}
-		$attribs .= ' class="fc-element-auto-init '.$class.'"';
-		$attribs .= ' onchange="fc_getLayout_'.$_name.'(this);"';
-
+		$attribs .= ' class="fc-element-auto-init ' . $class . '"';
+		$attribs .= ' onchange="fc_getLayout_' . $_name . '(this);"';
 
 		// Container of parameters
-		$tmpl_container = (string) @ $attributes['tmpl_container'];
+		$tmpl_container = (string) ($attributes['tmpl_container'] ?? '');
 
 		/**
-		 * Add JS code to display parameters, either via 'file' or 'inline'
-		 * 'file' means make an AJAX call to read the respective XML file, then set the the target in the same container (TAB)
-		 * 'inline' means parameters of all layout were specified inside the main XML, thus just hide all containers (TABs) and display only the appropriate one
+		 * Add JS code to display parameters
 		 */
-
-		$params_source = (string) @ $attributes['params_source'];
-
+		$params_source = (string) ($attributes['params_source'] ?? '');
 
 		/**
 		 * Find the fieldset group of current form
 		 */
 		switch ($ext_view)
 		{
-			case 'field': $fld_groupname = 'attribs_'; break;
-			case 'type' : $fld_groupname = in_array($task, array('edit', 'add')) ? 'attribs_' : 'params_'; break;
-			case 'component': $fld_groupname = ''; break;
-			default: $fld_groupname = 'params_'; break;
+			case 'field':
+				$fld_groupname = 'attribs_';
+				break;
+			case 'type':
+				$fld_groupname = in_array($task, array('edit', 'add')) ? 'attribs_' : 'params_';
+				break;
+			case 'component':
+				$fld_groupname = '';
+				break;
+			default:
+				$fld_groupname = 'params_';
+				break;
 		}
 
-flexicontent_html::loadJQuery();
+		flexicontent_html::loadJQuery();
 
-if ( ! @$attributes['skipparams'] )
+		if (!($attributes['skipparams'] ?? false))
+		{
+			$doc = Factory::getDocument();
+			$js = "
+
+" . ($params_source == "file" ? "
+
+function fc_getLayout_" . $_name . "(el, initial)
 {
-		$doc 	= \Joomla\CMS\Factory::getApplication()->getDocument();
-		$js 	= "
-
-".($params_source=="file" ? "
-
-function fc_getLayout_".$_name."(el, initial)
-{
- 	var bs_tab_handle = jQuery('a[href=\"#attrib-".$tmpl_container."\"]');
- 	var fc_tab_handle = jQuery('#".$tmpl_container."');
+	var bs_tab_handle = jQuery('a[href=\"#attrib-" . $tmpl_container . "\"]');
+	var fc_tab_handle = jQuery('#" . $tmpl_container . "');
 
 	// First try Joomla bootstrap TAB handle with 'attrib-' prefix for its ID
 	var panel_header = bs_tab_handle;
-	var panel_id     = 'attrib-".$tmpl_container."';
+	var panel_id     = 'attrib-" . $tmpl_container . "';
 	var panel_sel    = '#'+panel_id;
 	var panel        = jQuery('#'+panel_id);
 
@@ -380,37 +362,37 @@ function fc_getLayout_".$_name."(el, initial)
 
 	if (!panel_header.length)
 	{
-		//alert('Layout container: ".$tmpl_container." not found');
+		//alert('Layout container: " . $tmpl_container . " not found');
 		return;
 	}
 
 	// Panel found, abort if this should only run once
- 	if (initial && jQuery(el).data('fc-layout-first-run'))
- 	{
- 		return;
- 	}
- 	jQuery(el).data('fc-layout-first-run', 1);
+	if (initial && jQuery(el).data('fc-layout-first-run'))
+	{
+		return;
+	}
+	jQuery(el).data('fc-layout-first-run', 1);
 
 	var selected_option = jQuery(el).find(':selected');
 	var filename        = selected_option.data('filename');
 	var display_name    = selected_option.data('displayname');
-	var layout_name     = filename ? filename.replace(/^(".$stripPrefix.")/, '') : selected_option.val();
+	var layout_name     = filename ? filename.replace(/^(" . $stripPrefix . ")/, '') : selected_option.val();
 
 	// Trim '$trimDisplayname' if not using custom display name
-	display_name = display_name ? display_name : layout_name.replace(/^(".$trimDisplayname.")/, '');
+	display_name = display_name ? display_name : layout_name.replace(/^(" . $trimDisplayname . ")/, '');
 
-	// Construct filename by prefixing value wiht '$stripPrefix'
-	filename     = filename ? filename : '".$stripPrefix."' + layout_name;
+	// Construct filename by prefixing value with '$stripPrefix'
+	filename     = filename ? filename : '" . $stripPrefix . "' + layout_name;
 
 	var _loading_img = '<img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" style=\"vertical-align: middle;\">';
 	bs_tab_handle.length
 		? panel_header.html('<a href=\"javascript:void(0);\"><span> " . $layout_label . ": '+_loading_img+'</span></a>')
-		: panel_header.html('" . '<i class="'.$icon_class.'"></i> ' . $layout_label . ": " . "' + _loading_img);
+		: panel_header.html('" . '<i class="' . $icon_class . '"></i> ' . $layout_label . ": " . "' + _loading_img);
 	panel.html('');
 
 	jQuery.ajax({
 		type: 'GET',
-		url: 'index.php?option=com_flexicontent&task=templates.getlayoutparams&ext_option=".$ext_option."&ext_view=".$ext_view."&ext_type=".$ext_type."&ext_name=".$ext_name."&layout_pfx=".$layout_pfx."&ext_id=".$pk."&directory=".$directory."&layout_sfx=".$layout_sfx."&layout_name='+filename+'&format=raw&" . \Joomla\CMS\Session\Session::getFormToken() . "=1',
+		url: 'index.php?option=com_flexicontent&task=templates.getlayoutparams&ext_option=" . $ext_option . "&ext_view=" . $ext_view . "&ext_type=" . $ext_type . "&ext_name=" . $ext_name . "&layout_pfx=" . $layout_pfx . "&ext_id=" . $pk . "&directory=" . $directory . "&layout_sfx=" . $layout_sfx . "&layout_name='+filename+'&format=raw&" . Session::getFormToken() . "=1',
 		success: function(str) {
 			if (bs_tab_handle.length)
 			{
@@ -420,8 +402,8 @@ function fc_getLayout_".$_name."(el, initial)
 			else
 			{
 				display_name = display_name.replace('_', ' ').replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
-				panel_header.html('" . '<i class="'.$icon_class.'"></i> ' . $layout_label . ": " . "' + display_name);
-		 	}
+				panel_header.html('" . '<i class="' . $icon_class . '"></i> ' . $layout_label . ": " . "' + display_name);
+			}
 
 			// Initialize JS and CSS of the layout
 			fc_initDynamicLayoutJsCss(panel_id, ['subform-row-add'], str);
@@ -429,83 +411,80 @@ function fc_getLayout_".$_name."(el, initial)
 	});
 }
 
-":"
+" : "
 
-function fc_getLayout_".$_name."(el, initial)
+function fc_getLayout_" . $_name . "(el, initial)
 {
- 	if (initial && jQuery(el).data('fc-layout-first-run'))
- 	{
- 		return;
- 	}
- 	jQuery(el).data('fc-layout-first-run', 1);
+	if (initial && jQuery(el).data('fc-layout-first-run'))
+	{
+		return;
+	}
+	jQuery(el).data('fc-layout-first-run', 1);
 
-  // *** Hide default container
- 	var container = jQuery('a[href=\"#attrib-".$tmpl_container."\"]');
- 	if (container) container.parent().css('display', 'none');
+	// *** Hide default container
+	var container = jQuery('a[href=\"#attrib-" . $tmpl_container . "\"]');
+	if (container) container.parent().css('display', 'none');
 
 	var filename = jQuery(el).find(':selected').data('filename');
 	var layout_name = filename ? filename : el.value;
 
-  // *** Hide ALL containers
-	var layouts = new Array('".implode("','", $layout_files)."');
+	// *** Hide ALL containers
+	var layouts = new Array('" . implode("','", $layout_files) . "');
 	for (i=0; i<layouts.length; i++)
 	{
 		if (layouts[i] == layout_name) continue;
 
-  	var container = jQuery('a[href=\"#attrib-".$tmpl_container."_' + layouts[i] + '\"]');
-  	if (container) {container.parent().css('display', 'none');}
-  }
+		var container = jQuery('a[href=\"#attrib-" . $tmpl_container . "_' + layouts[i] + '\"]');
+		if (container) {container.parent().css('display', 'none');}
+	}
 
 	// *** Show current container
-	var container = jQuery('a[href=\"#attrib-".$tmpl_container."_' + layout_name + '\"]');
+	var container = jQuery('a[href=\"#attrib-" . $tmpl_container . "_' + layout_name + '\"]');
 	if (container) container.parent().css('display', '');
 }
 
-")."
+") . "
 
 jQuery(document).ready(function(){
-	var el = document.getElementById('jform_".$fld_groupname.$_name."');
-	fc_getLayout_".$_name."(el, 1);
+	var el = document.getElementById('jform_" . $fld_groupname . $_name . "');
+	fc_getLayout_" . $_name . "(el, 1);
 
-	// In case on DOM ready the element is intialized, retry on this custom event
+	// In case on DOM ready the element is initialized, retry on this custom event
 	el.addEventListener('initialize-fc-element', function() {
-		fc_getLayout_".$_name."(el, 1);
+		fc_getLayout_" . $_name . "(el, 1);
 	});
 });
 
 ";
-		echo '<script>' . $js . '</script>';  // Add JS inline so that it works when changing flexicontent field type too
-		//$doc->addScriptDeclaration($js);
-}
+			echo '<script>' . $js . '</script>';
+		}
+
 		// Compute the current selected values
 		$selected = array($this->value);
 
 		// Create form element
-		return \Joomla\CMS\HTML\HTMLHelper::_('select.groupedlist', $groups, $fieldname,
+		return HTMLHelper::_('select.groupedlist', $groups, $fieldname,
 			array(
-				'id' =>  $element_id,
+				'id' => $element_id,
 				'group.id' => 'id',
 				'list.attr' => $attribs,
 				'list.select' => $selected,
-				'option.attr' => 'attr'  // need to set the name we use for options attributes
+				'option.attr' => 'attr'
 			)
 		);
 	}
 
-
-
 	/**
 	 * Get custom layouts from templates for current module
-	 * Update $groups with the custom layouts and list layout overrides as disabled
 	 *
-	 * param   $groups         array
-	 * param   $layout_files   array
+	 * @param   array  $groups        Groups array
+	 * @param   array  $layout_files  Layout files array
 	 *
-	 * @return  array  The updated groups of options
+	 * @return  void
 	 */
-	protected function getModuleLayoutsFromTemplates(& $groups, $layout_files)
+	protected function getModuleLayoutsFromTemplates(&$groups, $layout_files)
 	{
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = Factory::getContainer()->get(DatabaseInterface::class);
 
 		// Get the client id.
 		$clientId = $this->element['client_id'];
@@ -516,7 +495,7 @@ jQuery(document).ready(function(){
 		}
 		$clientId = (int) $clientId;
 
-		$client = \Joomla\CMS\Application\ApplicationHelper::getClientInfo($clientId);
+		$client = ApplicationHelper::getClientInfo($clientId);
 
 		// Get the module.
 		$module = (string) $this->element['module'];
@@ -543,7 +522,7 @@ jQuery(document).ready(function(){
 		// Build the query.
 		$query = $db->getQuery(true)
 			->select('element, name')
-			->from('#__extensions as e')
+			->from($db->quoteName('#__extensions', 'e'))
 			->where('e.client_id = ' . (int) $clientId)
 			->where('e.type = ' . $db->quote('template'))
 			->where('e.enabled = 1');
@@ -556,15 +535,15 @@ jQuery(document).ready(function(){
 		if ($template_style_id)
 		{
 			$query
-				->join('LEFT', '#__template_styles as s on s.template=e.element')
-				->where('s.id=' . (int) $template_style_id);
+				->join('LEFT', $db->quoteName('#__template_styles', 's'), 's.template = e.element')
+				->where('s.id = ' . (int) $template_style_id);
 		}
 
 		// Set the query and load the templates.
 		$templates = $db->setQuery($query)->loadObjectList('element');
 
 		// Load 'sys' language file of current module
-		$lang = \Joomla\CMS\Factory::getApplication()->getLanguage();
+		$lang = Factory::getLanguage();
 		$lang->load($module . '.sys', $client->path, null, false, true)
 			|| $lang->load($module . '.sys', $client->path . '/modules/' . $module, null, false, true);
 
@@ -575,10 +554,10 @@ jQuery(document).ready(function(){
 			$lang->load('tpl_' . $template->element . '.sys', $client->path, null, false, true)
 				|| $lang->load('tpl_' . $template->element . '.sys', $client->path . '/templates/' . $template->element, null, false, true);
 
-			$template_path = \Joomla\Filesystem\Path::clean($client->path . '/templates/' . $template->element . '/html/' . $module);
+			$template_path = Path::clean($client->path . '/templates/' . $template->element . '/html/' . $module);
 
 			// Add the layout options from the template path.
-			if (is_dir($template_path) && ($files = \Joomla\Filesystem\Folder::files($template_path, '^[^_]*\.php$')))
+			if (is_dir($template_path) && ($files = Folder::files($template_path, '^[^_]*\.php$')))
 			{
 				$is_override = array();
 				$display_overrides = true;
@@ -593,7 +572,7 @@ jQuery(document).ready(function(){
 							$is_override[$i] = true;
 							continue;
 						}
-					 unset($files[$i]);
+						unset($files[$i]);
 					}
 				}
 
@@ -602,7 +581,7 @@ jQuery(document).ready(function(){
 					// Create the group for the template
 					$groups[$template->element] = array();
 					$groups[$template->element]['id'] = $this->id . '_' . $template->element;
-					$groups[$template->element]['text'] = \Joomla\CMS\Language\Text::sprintf('JOPTION_FROM_TEMPLATE', $template->name);
+					$groups[$template->element]['text'] = Text::sprintf('JOPTION_FROM_TEMPLATE', $template->name);
 					$groups[$template->element]['items'] = array();
 
 					foreach ($files as $i => $file)
@@ -610,20 +589,18 @@ jQuery(document).ready(function(){
 						// Add an option to the template group
 						$value = basename($file, '.php');
 						$text = $lang->hasKey($key = strtoupper('TPL_' . $template->element . '_' . $module . '_LAYOUT_' . $value))
-							? \Joomla\CMS\Language\Text::_($key)
+							? Text::_($key)
 							: $value;
 
-						//$groups[$template->element]['items'][] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', $template->element . ':' . $value, $text);
 						$groups[$template->element]['items'][] = (object) array(
 							'value' => $template->element . ':' . $value,
-							'text'  => $text . (!empty($is_override[$i]) ? '  -- overrides builtin automatically' : ''),
+							'text' => $text . (!empty($is_override[$i]) ? '  -- overrides builtin automatically' : ''),
 							'disable' => !empty($is_override[$i]),
-							'attr'  => array()
+							'attr' => array()
 						);
 					}
 				}
 			}
 		}
 	}
-
 }

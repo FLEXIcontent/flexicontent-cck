@@ -234,9 +234,11 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 		$langs 		= \Joomla\Filesystem\Folder::folders($folder);
 		$activelang = \Joomla\CMS\Component\ComponentHelper::getParams('com_languages')->get('administrator', 'en-GB');
 
-		foreach ($langs as $lang) {
-			$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', $lang, $lang);
-		}
+if (is_array($langs)) {
+    foreach ($langs as $lang) {
+        $options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', $lang, $lang);
+    }
+}
 		$lists['languages'] = \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $options, 'lang', '', 'value', 'text', $activelang);
 
 		// Missing files

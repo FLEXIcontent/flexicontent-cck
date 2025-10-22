@@ -12,13 +12,14 @@
 defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
+use Joomla\CMS\Factory;
 \Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html');
 
-$app      = \Joomla\CMS\Factory::getApplication();
+$app      = Factory::getApplication();
 $option   = $app->input->get('option', '', 'CMD');
-$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
+$user     = Factory::getUser();
 $template = $app->getTemplate();
-$session  = \Joomla\CMS\Factory::getApplication()->getSession();
+$session  = Factory::getSession();
 $hlpname  = 'fcbase';
 
 $btn_class = 'btn';
@@ -135,7 +136,7 @@ $items_task = 'task=items.';
 					For more information on changing these limitations, please see this article: %s',
 					'<a href="http://www.flexicontent.org/documentation/faq/78-installation-upgrade/591">PHP/DB Requirements</a>'
 				);
-				\Joomla\CMS\Factory::getApplication()->enqueueMessage($mssg, 'warning', '');
+				Factory::getApplication()->enqueueMessage($mssg, 'warning', '');
 			}
 		}
 
@@ -343,7 +344,7 @@ $items_task = 'task=items.';
 				$add_sep = true;
 			}
 
-			$CanSeeSearchLogs = \Joomla\CMS\Factory::getApplication()->getIdentity()->authorise('core.manage', 'com_search');
+			$CanSeeSearchLogs = Factory::getUser()->authorise('core.manage', 'com_search');
 
 			if ($CanSeeSearchLogs)
 			{
