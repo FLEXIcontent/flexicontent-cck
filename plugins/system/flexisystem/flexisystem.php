@@ -359,22 +359,26 @@ class plgSystemFlexisystem extends CMSPlugin
 			";
 		}
 
-		// Hide Joomla administration menus in FC modals
-		if (
-			$isAdmin && (
-			($option=='com_users' && ($view == 'user'))
-			)
-		)
-			$js .= "
-				jQuery(document).ready(function() {
-					var el = parent.document.getElementById('fc_modal_popup_container');
-					if (el) {
-						jQuery('.navbar').hide();
-						jQuery('body').css('padding-top', 0);
-					}
-				});
-			";
-		if ($js) $document->addScriptDeclaration($js);
+// Hide Joomla administration menus in FC modals
+if (
+    $isAdmin && (
+    ($option=='com_users' && ($view == 'user'))
+    )
+)
+    $js .= "
+        jQuery(document).ready(function() {
+            var el = parent.document.getElementById('fc_modal_popup_container');
+            if (el) {
+                jQuery('.navbar').hide();
+                jQuery('body').css('padding-top', 0);
+            }
+        });
+    ";
+
+// Vérification que $document existe et que $js n'est pas vide
+if ($js && $document !== null && method_exists($document, 'addScriptDeclaration')) {
+    $document->addScriptDeclaration($js);
+}
 
 
 		// Detect resolution we will do this regardless of ... using mobile layouts
