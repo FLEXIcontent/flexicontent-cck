@@ -10,12 +10,56 @@
 	<version>2.5.0</version>
 	<description>PLG_FINDER_FLEXICONTENT_XML_DESCRIPTION</description>
 	<scriptfile>script.php</scriptfile>
+	<namespace>Joomla\Plugin\Finder\Flexicontent</namespace>
 	<files>
 		<file plugin="flexicontent">flexicontent.php</file>
-    	<filename>index.html</filename>
+		<filename>index.html</filename>
 	</files>
 	<languages>
 		<language tag="en-GB">en-GB.plg_finder_flexicontent.ini</language>
 		<language tag="en-GB">en-GB.plg_finder_flexicontent.sys.ini</language>
 	</languages>
+    <config>
+        <fields name="params">
+            <fieldset name="basic" addfieldprefix="Joomla\Component\Finder\Administrator\Field">
+                <field
+                        name="search_archived"
+                        type="radio"
+                        layout="joomla.form.field.radio.switcher"
+                        label="Index archived items"
+                        description="PLG_FINDER_CONTENT_FIELD_SEARCH_ARCHIVED_DESC"
+                        default="1"
+                        filter="integer"
+                >
+                    <option value="0">JNO</option>
+                    <option value="1">JYES</option>
+                </field>
+                <field
+                        name="taxonomies"
+                        type="taxonomytypes"
+                        label="Select which taxonomies (filters) to create"
+                        default="type,category,language,author"
+                        multiple="true"
+                >
+                    <option value="author">Author</option>
+                    <option value="category">Category</option>
+                    <option value="language">Language</option>
+                    <option value="type">Type</option>
+                </field>
+                <field
+                        name="types_to_index"
+                        query="SELECT id, name FROM #__flexicontent_types ORDER BY name ASC"
+                        key_field="id"
+                        value_field="name"
+                        multiple="true"
+                        layout="joomla.form.field.list-fancy-select"
+                        type="sql"
+                        label="Types to Index (aka searchable)"
+                        hint="Leave empty to index all types"
+                        description="Select FLEXIcontent types to be indexed by Finder. (Leave empty to index all types)."
+                />
+
+            </fieldset>
+        </fields>
+    </config>
 </extension>

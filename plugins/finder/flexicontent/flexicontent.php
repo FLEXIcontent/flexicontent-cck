@@ -10,19 +10,22 @@
 
 namespace Joomla\Plugin\Finder\Flexicontent\Extension;
 
-defined('_JEXEC') or die;
-
 use Exception;
+use Joomla\CMS\Application\CMSApplicationInterface;
+use Joomla\CMS\Event\AbstractImmutableEvent;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Event\Finder as FinderEvent;
+use Joomla\CMS\Table\Table;
 use Joomla\Component\Finder\Administrator\Indexer\Adapter as _FinderIndexerAdapter;
 use Joomla\Component\Finder\Administrator\Indexer\Helper as _FinderIndexerHelper;
 use Joomla\Component\Finder\Administrator\Indexer\Indexer as _FinderIndexer;
 use Joomla\Component\Finder\Administrator\Indexer\Result as _FinderIndexerResult;
 use Joomla\Database\DatabaseAwareTrait;
 use Joomla\Database\DatabaseDriver;
+use Joomla\Database\DatabaseInterface;
 use Joomla\Database\DatabaseQuery;
+use Joomla\Event\DispatcherInterface;
 use Joomla\Event\SubscriberInterface;
 use Joomla\Registry\Registry;
 use Joomla\Database\DatabaseInterface;
@@ -31,6 +34,9 @@ use Joomla\Database\DatabaseInterface;
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
 // phpcs:enable PSR1.Files.SideEffects
+
+/// **** !!!! REMOVE CLASS ALIAS when this file is converted to FULLY use J6 API **** ///
+/// (at the end of this file remove) class_alias(Flexicontent::class, 'PlgFinderFlexicontent');
 
 if (version_compare(JVERSION, '4.0', 'ge'))
 {
@@ -41,6 +47,28 @@ if (version_compare(JVERSION, '4.0', 'ge'))
     abstract class _Flexicontent extends Adapter implements SubscriberInterface {
         use DatabaseAwareTrait;
         protected static bool $isJ4GE = false;
+
+        /**
+         * Constructor
+         *
+         * @param   DispatcherInterface  $dispatcher
+         * @param   array                $config
+         * @param   DatabaseInterface    $database
+         */
+        public function __construct(DispatcherInterface $dispatcher, array $config)
+        {
+            // Call the parent constructor.
+            if ($config instanceof DispatcherInterface) {
+                $dispatcher = $config;
+                $config     = \func_num_args() > 1 ? func_get_arg(1) : [];
+
+                parent::__construct($dispatcher, $config);
+            } else {
+                parent::__construct($config);
+            }
+
+            $this->setDatabase(Factory::getContainer()->get(DatabaseInterface::class));
+        }
     }
 }
 else
@@ -73,7 +101,7 @@ class Flexicontent extends _Flexicontent
      * @var    string
      * @since  2.5
      */
-    protected $context = 'FLEXIcontent';
+    protected $context = 'Flexicontent';
 
     /**
      * The extension name.
@@ -124,13 +152,13 @@ class Flexicontent extends _Flexicontent
      */
     public static function getSubscribedEvents(): array
     {
-        return array_merge([
+        return array_merge(parent::getSubscribedEvents(), [
             'onFinderCategoryChangeState' => 'onFinderCategoryChangeState',
             'onFinderChangeState'         => 'onFinderChangeState',
             'onFinderAfterDelete'         => 'onFinderAfterDelete',
             'onFinderBeforeSave'          => 'onFinderBeforeSave',
             'onFinderAfterSave'           => 'onFinderAfterSave',
-        ], parent::getSubscribedEvents());
+        ]);
     }
 
     /**
@@ -153,7 +181,7 @@ class Flexicontent extends _Flexicontent
      * changed. This is fired when the item category is published or unpublished
      * from the list view.
      *
-     * @param   string   $extension  The extension whose category has been updated.
+     * @param   string   $extension  The extension whose category has been updated. (or $event FinderEvent\AfterCategoryChangeStateEvent)
      * @param   array    $pks        A list of primary key ids of the content that has changed state.
      * @param   integer  $value      The value of the state that the content has been changed to.
      *
@@ -161,10 +189,18 @@ class Flexicontent extends _Flexicontent
      *
      * @since   2.5
      */
-    public function onFinderCategoryChangeState($extension, $pks, $value)
+    public function onFinderCategoryChangeState($extension, $pks = null, $value = null)
     {
+        if ($extension instanceof FinderEvent\AfterCategoryChangeStateEvent)
+        {
+            $event     = $extension;
+            $extension = $event->getExtension();
+            $pks       = $event->getPks();
+            $value     = $event->getValue();
+        }
+
         // Make sure we're handling com_content categories.
-        if ($extension === 'com_content')
+        if ($extension === 'com_content' || $extension === 'com_flexicontent')
         {
             $this->categoryStateChange($pks, $value);
         }
@@ -174,16 +210,23 @@ class Flexicontent extends _Flexicontent
      * Method to remove the link information for items that have been deleted.
      *
      * @param   string  $context  The context of the action being performed.
-     * @param   \Joomla\CMS\Table\Table  $table    A \Joomla\CMS\Table\Table object containing the record to be deleted
+     * @param   Table  $table     A Table object containing the record to be deleted
      *
      * @return  void
      *
      * @since   2.5
-     * @throws  Exception on database error.
+     * @throws  \Exception on database error.
      */
-    public function onFinderAfterDelete($context, $table)
+    public function onFinderAfterDelete($context, $table = null)
     {
-        if ($context === 'com_content.article') {
+        if ($context instanceof FinderEvent\AfterDeleteEvent)
+        {
+            $event   = $context;
+            $context = $event->getContext();
+            $table   = $event->getItem();
+        }
+
+        if ($context === 'com_content.article' || $context === 'com_content.form' || $context === 'com_flexicontent.form') {
             $id = $table->id;
         } elseif ($context === 'com_finder.index') {
             $id = $table->link_id;
@@ -201,9 +244,9 @@ class Flexicontent extends _Flexicontent
      * It also makes adjustments if the access level of an item or the
      * category to which it belongs has changed.
      *
-     * @param   string   $context  The context of the content passed to the plugin.
-     * @param   \Joomla\CMS\Table\Table   $row      A \Joomla\CMS\Table\Table object.
-     * @param   boolean  $isNew    True if the content has just been created.
+     * @param   string    $context   The context of the content passed to the plugin.
+     * @param   Table     $row       A \Joomla\CMS\Table\Table object.
+     * @param   boolean   $isNew     True if the content has just been created.
      *
      * @return  boolean  True on success.
      *
@@ -213,7 +256,7 @@ class Flexicontent extends _Flexicontent
     public function onFinderAfterSave($context, $row = null, $isNew = null)
     {
         $event = $context;
-        if ($event instanceof \Joomla\CMS\Event\Model\SaveEvent)
+        if ($event instanceof FinderEvent\AfterSaveEvent)
         {
             $context = $event->getContext();
             $row     = $event->getItem();
@@ -221,7 +264,7 @@ class Flexicontent extends _Flexicontent
         }
 
         // We only want to handle articles here.
-        if ($context === 'com_content.article' || $context === 'com_flexicontent.form')
+        if ($context === 'com_content.article' || $context === 'com_content.form' || $context === 'com_flexicontent.form')
         {
             // Check if the access levels are different.
             if (!$isNew && $this->old_access != $row->access)
@@ -252,7 +295,7 @@ class Flexicontent extends _Flexicontent
      * This event is fired before the data is actually saved.
      *
      * @param   string   $context  The context of the content passed to the plugin.
-     * @param   \Joomla\CMS\Table\Table   $row      A \Joomla\CMS\Table\Table object.
+     * @param   Table    $row      A \Joomla\CMS\Table\Table object.
      * @param   boolean  $isNew    If the content is just about to be created.
      *
      * @return  boolean  True on success.
@@ -263,7 +306,7 @@ class Flexicontent extends _Flexicontent
     public function onFinderBeforeSave($context, $row = null, $isNew = null)
     {
         $event = $context;
-        if ($event instanceof \Joomla\CMS\Event\Model\SaveEvent)
+        if ($event instanceof FinderEvent\BeforeSaveEvent)
         {
             $context = $event->getContext();
             $row     = $event->getItem();
@@ -271,7 +314,7 @@ class Flexicontent extends _Flexicontent
         }
 
         // We only want to handle articles here.
-        if ($context === 'com_content.article' || $context === 'com_flexicontent.form') {
+        if ($context === 'com_content.article' || $context === 'com_content.form' || $context === 'com_flexicontent.form') {
             // Query the database for the old access level if the item isn't new.
             if (!$isNew) {
                 $this->checkItemAccess($row);
@@ -294,18 +337,27 @@ class Flexicontent extends _Flexicontent
      * from outside the edit screen. This is fired when the item is published,
      * unpublished, archived, or unarchived from the list view.
      *
-     * @param   string   $context  The context for the content passed to the plugin.
-     * @param   array    $pks      An array of primary key ids of the content that has changed state.
-     * @param   integer  $value    The value of the state that the content has been changed to.
+     * @param   string    $context  The context for the content passed to the plugin.
+     * @param   array     $pks      An array of primary key ids of the content that has changed state.
+     * @param   integer   $value    The value of the state that the content has been changed to.
      *
      * @return  void
      *
      * @since   2.5
      */
-    public function onFinderChangeState($context, $pks, $value)
+    public function onFinderChangeState($context, $pks = null, $value = null)
     {
+        $event = null;
+        if ($context instanceof FinderEvent\AfterSaveEvent)
+        {
+            $event   = $context;
+            $context = $event->getContext();
+            $pks     = $event->getPks();
+            $value   = $event->getValue();
+        }
+
         // We only want to handle articles here.
-        if ($context === 'com_content.article' || $context === 'com_flexicontent.form') {
+        if ($context === 'com_content.article' || $context === 'com_content.form' || $context === 'com_flexicontent.form') {
             $this->itemStateChange($pks, $value);
         }
 
@@ -347,8 +399,34 @@ class Flexicontent extends _Flexicontent
             $item->cat_access = $item->cat_access ?? $category->access;
         }
 
-        // Type ID is required for the item. Assume 'Article' if not set.
-        $item->type_id = $item->type_id ?? 1;
+        /**
+         * Check if type is allowed to be indexed
+         */
+        $typesToIndex = $this->params->get('types_to_index', []);
+        if (!isset($item->fc_type_id))
+        {
+            $fc_type_id= $this->db->setQuery($this->db->getQuery(true)
+                ->select('type_id')
+                ->from('#__flexicontent_items_ext')
+                ->where('item_id = ' . (int) $item->id)
+            )->loadResult();
+            $item->fc_type_id = $fc_type_id ? (int) $fc_type_id : 1;
+        }
+
+        if ($typesToIndex && !in_array($item->fc_type_id, $typesToIndex))
+        {
+            return;
+        }
+
+        // Load the types if not already loaded
+        static $fcTypes = null;
+        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $fcTypes = $fcTypes ?: $db->setQuery($db->getQuery(true)
+            ->select('*')
+            ->from('#__flexicontent_types')
+        )->loadObjectList('id');
+
+        $itemType = $fcTypes[$item->fc_type_id] ?? null;
 
         // Get the item's type information.
         if (!isset($item->type_state))
@@ -376,7 +454,7 @@ class Flexicontent extends _Flexicontent
 
         // Initialise the item parameters.
         $registry     = new Registry($item->params);
-        $item->params = ComponentHelper::getParams('com_flexicontent', true);
+        $item->params = clone ComponentHelper::getParams('com_flexicontent', true);
         $item->params->merge($registry);
 
         $item->metadata = new Registry($item->metadata);
@@ -415,12 +493,18 @@ class Flexicontent extends _Flexicontent
 
         // Translate the state. Articles should only be published if the category is published.
         $item->state = $this->translateState($item->state, $item->cat_state, $item->type_state);
+        //$item->publised = $item->state;
+        //if (!$item->state) return;
 
         // Get taxonomies to display
         $taxonomies = $this->params->get('taxonomies', ['type', 'author', 'category', 'language']);
 
         // Add the type taxonomy data.
-        $item->addTaxonomy('Type', 'Item');  // TODO MORE ! this must be the item's content TYPE !!
+        if (\in_array('type', $taxonomies)) {
+            //$item->addTaxonomy('Type', 'Content Item');
+	        //$item->addTaxonomy('ContentType', $itemType ? $itemType->name : 'Item');
+	        $item->addTaxonomy('Type', $itemType ? $itemType->name : 'Content Item');
+        }
 
         // Add the author taxonomy data.
         if (\in_array('author', $taxonomies) && (!empty($item->author) || !empty($item->created_by_alias))) {
@@ -455,7 +539,7 @@ class Flexicontent extends _Flexicontent
      *
      * @param   mixed  $query  A DatabaseQuery object or null.
      *
-     * @return  DatabaseQuery  A database object.
+     * @return  QueryInterface  A database object.
      *
      * @since   2.5
      */
@@ -465,26 +549,25 @@ class Flexicontent extends _Flexicontent
         $db = version_compare(JVERSION, '4', 'ge') ? Factory::getContainer()->get('DatabaseDriver') : Factory::getContainer()->get(DatabaseInterface::class);
 
         // Check if we can use the supplied SQL query.
-        /** @var DatabaseQuery $query */
-        $query = $query instanceof DatabaseQuery ? $query : $db->getQuery(true)
+        /** @var QueryInterface $query */
+        $query = $query instanceof QueryInterface ? $query : $db->getQuery(true)
             ->select('a.id, a.title, a.alias, a.introtext AS summary, a.fulltext AS body')
             ->select('a.images')
             ->select('a.state, a.catid, a.created AS start_date, a.created_by')
             ->select('a.created_by_alias, a.modified, a.modified_by, a.attribs AS params')
             ->select('a.metakey, a.metadesc, a.metadata, a.language, a.access, a.version, a.ordering')
             ->select('a.publish_up AS publish_start_date, a.publish_down AS publish_end_date')
-            ->select('c.title AS category, c.published AS cat_state, c.access AS cat_access')
+            ->select('c.title AS category, c.published AS cat_state, c.access AS cat_access');
 
-            ->select('u.name AS author')
-            ->from('#__content AS a')
-            ->join('LEFT', '#__categories AS c ON c.id = a.catid')
-            ->join('LEFT', '#__users AS u ON u.id = a.created_by');
+        $query->select('e.type_id AS fc_type_id');
 
         // Handle the alias CASE WHEN portion of the query
         $case_when_item_alias = ' CASE WHEN ';
         $case_when_item_alias .= $query->charLength('a.alias', '!=', '0');
         $case_when_item_alias .= ' THEN ';
-        $a_id = $query->castAsChar('a.id');
+        $a_id = static::$isJ4GE
+            ? $query->castAs('CHAR', 'a.id')
+            : $query->castAsChar('a.id');
         $case_when_item_alias .= $query->concatenate([$a_id, 'a.alias'], ':');
         $case_when_item_alias .= ' ELSE ';
         $case_when_item_alias .= $a_id . ' END as slug';
@@ -493,12 +576,20 @@ class Flexicontent extends _Flexicontent
         $case_when_category_alias = ' CASE WHEN ';
         $case_when_category_alias .= $query->charLength('c.alias', '!=', '0');
         $case_when_category_alias .= ' THEN ';
-        $c_id = $query->castAsChar('c.id');
+        $c_id = static::$isJ4GE
+            ? $query->castAs('CHAR', 'c.id')
+            : $query->castAsChar('c.id');
         $case_when_category_alias .= $query->concatenate([$c_id, 'c.alias'], ':');
         $case_when_category_alias .= ' ELSE ';
         $case_when_category_alias .= $c_id . ' END as catslug';
 
-        $query->select($case_when_category_alias);
+        $query->select($case_when_category_alias)
+
+            ->select('u.name AS author')
+            ->from('#__content AS a')
+            ->join('LEFT', '#__categories AS c ON c.id = a.catid')
+            ->join('LEFT', '#__flexicontent_items_ext AS e ON e.item_id = a.id')
+            ->join('LEFT', '#__users AS u ON u.id = a.created_by');
 
         return $query;
     }
@@ -515,10 +606,10 @@ class Flexicontent extends _Flexicontent
     protected function translateState($item, $category = null, $type = null)
     {
         // If category is present, factor in its states as well
-        if ($category !== null && $category == 0) $item = 0;
+        if ($category !== null && $category != 1) $item = 0;
 
         // If type is present, factor in its states as well
-        if ($type !== null && $type == 0) $item = 0;
+        if ($type !== null && $type != 1) $item = 0;
 
         // Translate the state
         switch ($item)
@@ -581,10 +672,10 @@ class Flexicontent extends _Flexicontent
 }
 
 // J3.x compatibility
-if (version_compare(JVERSION, '4.0', 'lt'))
-{
-    class_alias(Flexicontent::class, 'PlgFinderFlexicontent');
-}
+//if (version_compare(JVERSION, '4.0', 'lt'))
+//{
+class_alias(Flexicontent::class, 'PlgFinderFlexicontent');
+//}
 
 // J4.x/J5.x compatibility
 //else {}
