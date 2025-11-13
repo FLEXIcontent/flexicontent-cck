@@ -138,7 +138,7 @@ class FlexicontentControllerCategory extends \Joomla\CMS\MVC\Controller\FormCont
 	 */
 	protected function allowAdd($data = array())
 	{
-		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user = \Joomla\CMS\Factory::getUser();
 
 		if ($user->authorise('core.create', $this->extension))
 		{
@@ -172,7 +172,7 @@ class FlexicontentControllerCategory extends \Joomla\CMS\MVC\Controller\FormCont
 	{
 		// Initialise variables.
 		$recordId = (int) isset($data[$key]) ? $data[$key] : 0;
-		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user = \Joomla\CMS\Factory::getUser();
 		$_extension = 'com_content';
 
 		// Zero record (id:0), return component edit permission by calling parent controller method

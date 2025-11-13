@@ -48,7 +48,7 @@ foreach($values as $file_id)
 	// ***
 
 	$basePath = $file_data->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;
-	$abspath = str_replace(DS, '/', \Joomla\Filesystem\Path::clean($basePath.DS.$file_data->filename));
+	$abspath = str_replace(DS, '/', \Joomla\CMS\Filesystem\Path::clean($basePath.DS.$file_data->filename));
 
 	$_size = '-';
 
@@ -705,7 +705,7 @@ endif;   // END OF   $prop !== 'display_properties_only'
 	if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 }
 
-\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration("
+\Joomla\CMS\Factory::getDocument()->addScriptDeclaration("
 	fcview_mediafile_base_url['".$field_name_js."'] = '".$base_url."';
 
 	" . (!$per_value_js ? "" : "

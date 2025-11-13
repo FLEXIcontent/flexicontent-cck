@@ -11,7 +11,6 @@ defined('_JEXEC') or die;
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
-use Joomla\Database\DatabaseInterface;
 
 /**
  * Users component debugging helper.
@@ -31,7 +30,7 @@ class UsersHelperDebug
 	static function getComponents()
 	{
 		// Initialise variable.
-		$db		= \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db		= \Joomla\CMS\Factory::getDbo();
 		$query	= $db->getQuery(true);
 
 		$query->select('name AS text, element AS value')
@@ -42,7 +41,7 @@ class UsersHelperDebug
 		$items = $db->setQuery($query)->loadObjectList();
 
 		if (count($items)) {
-			$lang = \Joomla\CMS\Factory::getApplication()->getLanguage();
+			$lang = \Joomla\CMS\Factory::getLanguage();
 
 			foreach ($items as &$item)
 			{
@@ -125,7 +124,7 @@ class UsersHelperDebug
 				}
 
 				// Load language
-				$lang 		= \Joomla\CMS\Factory::getApplication()->getLanguage();
+				$lang 		= \Joomla\CMS\Factory::getLanguage();
 				$extension 	= 'com_config';
 				$source 	= JPATH_ADMINISTRATOR . '/components/' . $extension;
 

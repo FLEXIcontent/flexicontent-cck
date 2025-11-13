@@ -14,8 +14,6 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Table\Table;
-use Joomla\Database\DatabaseInterface;
-use Joomla\CMS\Mail\MailerFactoryInterface;
 
 require_once('base/base.php');
 
@@ -529,7 +527,7 @@ class ParentClassItem extends FCModelAdmin
 
 		$db   = $this->_db;
 		$app  = \Joomla\CMS\Factory::getApplication();
-		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user = \Joomla\CMS\Factory::getUser();
 		$cparams = $this->_cparams;
 		$jinput  = $app->input;
 		$task    = $jinput->get('task', false, 'cmd');
@@ -1456,8 +1454,8 @@ class ParentClassItem extends FCModelAdmin
 	{
 		$iparams_extra = new \Joomla\Registry\Registry();
 
-		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
-		$session = \Joomla\CMS\Factory::getApplication()->getSession();
+		$user    = \Joomla\CMS\Factory::getUser();
+		$session = \Joomla\CMS\Factory::getSession();
 		$asset   = $this->type_alias . '.' . $this->_id;
 
 		// Check if item was editable, but was rendered non-editable
@@ -1586,7 +1584,7 @@ class ParentClassItem extends FCModelAdmin
 	protected function itemAllowedInCats($data = array())
 	{
 		// Initialise variables.
-		$user		= \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user		= \Joomla\CMS\Factory::getUser();
 
 		$cats = isset($data['cid']) ? $data['cid'] : array();
 		if ( !empty($data['catid']) && !in_array($data['catid'], $cats) )
@@ -1633,7 +1631,7 @@ class ParentClassItem extends FCModelAdmin
 		$types = $this->getTypeslist ( $type_ids );
 		if ( empty($types) ) return false;
 
-		$user	= \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user	= \Joomla\CMS\Factory::getUser();
 		$canCreate = $any ? false : true;
 
 		foreach ($types as $type)
@@ -1662,7 +1660,7 @@ class ParentClassItem extends FCModelAdmin
 
 		// Get some variables
 		$app     = \Joomla\CMS\Factory::getApplication();
-		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user    = \Joomla\CMS\Factory::getUser();
 
 
 		// ***
@@ -1733,7 +1731,7 @@ class ParentClassItem extends FCModelAdmin
 		$params = !empty($record->parameters) ? $record->parameters : $this->_cparams;
 
 		$app    = \Joomla\CMS\Factory::getApplication();
-		$user   = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user   = \Joomla\CMS\Factory::getUser();
 		$CFGsfx = $app->isClient('site') ? '_fe' : '_be';
 
 		$default_lang = $params->get('default_language' . $CFGsfx, '_author_lang_');
@@ -1762,7 +1760,7 @@ class ParentClassItem extends FCModelAdmin
 	protected function setDefaults($record)
 	{
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user  = \Joomla\CMS\Factory::getUser();
 
 		// Default -- Dates: current and null.
 		$currentdate = \Joomla\CMS\Factory::getDate();
@@ -1873,7 +1871,7 @@ class ParentClassItem extends FCModelAdmin
 
 		$db     = $this->_db;
 		$app    = \Joomla\CMS\Factory::getApplication();
-		$user   = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user   = \Joomla\CMS\Factory::getUser();
 		$isSite = $app->isClient('site');
 		$CFGsfx = $isSite ? '_fe' : '_be';
 
@@ -2057,7 +2055,7 @@ class ParentClassItem extends FCModelAdmin
 			if ($isSite && $isNew && !empty($data['submit_conf']))
 			{
 				$h = $data['submit_conf'];
-				$session = \Joomla\CMS\Factory::getApplication()->getSession();
+				$session = \Joomla\CMS\Factory::getSession();
 				$item_submit_conf = $session->get('item_submit_conf', array(),'flexicontent');
 				$submit_conf = !empty($item_submit_conf[$h]) ? $item_submit_conf[$h] : null;
 
@@ -2799,7 +2797,7 @@ class ParentClassItem extends FCModelAdmin
 		}
 
 		$app     = \Joomla\CMS\Factory::getApplication();
-		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user    = \Joomla\CMS\Factory::getUser();
 		$isSite  = $app->isClient('site');
 		$isAdmin = !$isSite;  // Treat non-site (e.g. CLI) as if being admin
 		
@@ -3502,7 +3500,7 @@ class ParentClassItem extends FCModelAdmin
 	function applyCurrentVersion(&$item, &$data, $createonly=false)
 	{
 		$app     = \Joomla\CMS\Factory::getApplication();
-		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user    = \Joomla\CMS\Factory::getUser();
 		$cparams = $this->_cparams;
 		$isNew   = !$item->id;
 
@@ -4008,7 +4006,7 @@ class ParentClassItem extends FCModelAdmin
 			return array();
 		}
 
-		$lang_code = !empty($this->_record->language) ? $this->_record->language : \Joomla\CMS\Factory::getApplication()->getLanguage()->getTag();
+		$lang_code = !empty($this->_record->language) ? $this->_record->language : \Joomla\CMS\Factory::getLanguage()->getTag();
 
 		$query = $this->_db->getQuery(true)
 			->select('la.*')
@@ -4746,7 +4744,7 @@ class ParentClassItem extends FCModelAdmin
 			return $nConf;
 		}
 
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 		$nConf = new stdClass();
 
 		// (b) Get Content Type specific notifications (that override global)
@@ -4877,8 +4875,8 @@ class ParentClassItem extends FCModelAdmin
 		if ( !count($notify_emails) ) return true;
 
 		$app     = \Joomla\CMS\Factory::getApplication();
-		$db      = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
-		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$db      = \Joomla\CMS\Factory::getDbo();
+		$user    = \Joomla\CMS\Factory::getUser();
 		$use_versioning = $this->_cparams->get('use_versioning', 1);
 
 		// Get category titles of categories add / removed from the item
@@ -5131,7 +5129,7 @@ class ParentClassItem extends FCModelAdmin
 			if ( isset($_bcc_[$from]) ) unset($bcc[$_bcc_[$from]]);
 		}
 
-		$send_result = \Joomla\CMS\Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer()->sendMail( $from, $fromname, $recipient, $subject, $body, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
+		$send_result = \Joomla\CMS\Factory::getMailer()->sendMail( $from, $fromname, $recipient, $subject, $body, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
 
 		$debug_str = ""
 			."<br/>FROM: $from"
@@ -5171,7 +5169,7 @@ class ParentClassItem extends FCModelAdmin
 	 */
 	function isUserDraft($cid)
 	{
-		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user = \Joomla\CMS\Factory::getUser();
 
 		if ($cid)
 		{
@@ -5223,7 +5221,7 @@ class ParentClassItem extends FCModelAdmin
 	function approval($cid)
 	{
 		$db = $this->_db;
-		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user = \Joomla\CMS\Factory::getUser();
 		$approvables = $this->isUserDraft($cid);
 
 		$requestApproval = $user->authorise('flexicontent.requestapproval',	'com_flexicontent');
@@ -5553,7 +5551,7 @@ class ParentClassItem extends FCModelAdmin
 		// *** Retrieve author configuration, and apply category limitations
 		// ***
 
-		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user = \Joomla\CMS\Factory::getUser();
 		$authorparams = flexicontent_db::getUserConfig($user->get('id'));
 
 		// At least one category needs to be assigned
@@ -5732,8 +5730,8 @@ class ParentClassItem extends FCModelAdmin
 	public function canEdit($record = null, $user = null)
 	{
 		$record  = $record ?: $this->_record;
-		$user    = $user ?: \Joomla\CMS\Factory::getApplication()->getIdentity();
-		$session = \Joomla\CMS\Factory::getApplication()->getSession();
+		$user    = $user ?: \Joomla\CMS\Factory::getUser();
+		$session = \Joomla\CMS\Factory::getSession();
 		$isOwner = !empty($record->created_by) && ( $record->created_by == $user->get('id') );
 
 		// Check if item was editable, but was rendered non-editable
@@ -5785,8 +5783,8 @@ class ParentClassItem extends FCModelAdmin
 	public function canEditState($record = null, $user = null)
 	{
 		$record  = $record ?: $this->_record;
-		$user    = $user ?: \Joomla\CMS\Factory::getApplication()->getIdentity();
-		$session = \Joomla\CMS\Factory::getApplication()->getSession();
+		$user    = $user ?: \Joomla\CMS\Factory::getUser();
+		$session = \Joomla\CMS\Factory::getSession();
 		$isOwner = !empty($record->created_by) && ( $record->created_by == $user->get('id') );
 
 		$hasCoupon = false;
@@ -5841,7 +5839,7 @@ class ParentClassItem extends FCModelAdmin
 	public function canDelete($record = null)
 	{
 		$record  = $record ?: $this->_record;
-		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user    = \Joomla\CMS\Factory::getUser();
 		$isOwner = !empty($record->created_by) && ( $record->created_by == $user->get('id') );
 
 		// Existing item, use item specific permissions
@@ -5871,8 +5869,8 @@ class ParentClassItem extends FCModelAdmin
 	function canView($record=null)
 	{
 		$record = $record ?: $this->_record;
-		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
-		$session = \Joomla\CMS\Factory::getApplication()->getSession();
+		$user = \Joomla\CMS\Factory::getUser();
+		$session = \Joomla\CMS\Factory::getSession();
 		$isOwner = !empty($this->_record->created_by) && $this->_record->created_by == $user->get('id');
 
 		// The access filter has been set, we already know current user can view this item or we should not check access
@@ -6058,7 +6056,7 @@ class ParentClassItem extends FCModelAdmin
 		// For new item, if creator id is empty, then set it to current user id
 		if ( !$record->id && !$record->created_by )
 		{
-			$record->created_by = \Joomla\CMS\Factory::getApplication()->getIdentity()->id;
+			$record->created_by = \Joomla\CMS\Factory::getUser()->id;
 		}
 
 		if ( !$record->created_by )
@@ -6176,7 +6174,6 @@ class ParentClassItem extends FCModelAdmin
 							'subject'     => $this->table,
 							'newTags'     => $jtag_ids,
 							'replaceTags' => $replaceTags,
-							'removeTags'  => false
 						)
 					);
 

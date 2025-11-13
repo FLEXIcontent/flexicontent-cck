@@ -97,7 +97,7 @@ class plgSystemFlexiadvroute extends \Joomla\CMS\Plugin\CMSPlugin
 		$menu = \Joomla\CMS\Factory::getApplication()->getMenu();
 		if ($menu)
 		{
-			$lang = \Joomla\CMS\Factory::getApplication()->getLanguage();
+			$lang = \Joomla\CMS\Factory::getLanguage();
 			$isHomePage = $menu->getActive() == $menu->getDefault($lang->getTag());
 		}
 		else

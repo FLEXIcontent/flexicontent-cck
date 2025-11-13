@@ -450,7 +450,7 @@ class FlexicontentModelItems extends FCModelAdminList
 	 */
 	function getExtraCols()
 	{
-		$user   = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user   = \Joomla\CMS\Factory::getUser();
 
 		// Check if extra columns already calculated
 		if ( $this->_extra_cols !== null) return $this->_extra_cols;
@@ -527,7 +527,7 @@ class FlexicontentModelItems extends FCModelAdminList
 	function getCustomFilts()
 	{
 		$app     = \Joomla\CMS\Factory::getApplication();
-		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user    = \Joomla\CMS\Factory::getUser();
 		$jinput  = $app->input;
 		$option  = $jinput->get('option', '', 'cmd');
 		$view    = $jinput->get('view', '', 'cmd');
@@ -763,7 +763,7 @@ class FlexicontentModelItems extends FCModelAdminList
 	{
 		if (!$checkNoExtData && !$checkInvalidCat) return $count_only ? 0 : array();
 
-		$session = \Joomla\CMS\Factory::getApplication()->getSession();
+		$session = \Joomla\CMS\Factory::getSession();
 		$configured = FLEXI_J16GE ? FLEXI_CAT_EXTENSION : FLEXI_SECTION;
 		if ( !$configured ) return null;
 
@@ -847,7 +847,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$default_lang = flexicontent_html::getSiteDefaultLang();
 
 		// Get invalid cats, to avoid using them during binding, this is only done once
-		$session = \Joomla\CMS\Factory::getApplication()->getSession();
+		$session = \Joomla\CMS\Factory::getSession();
 		$badcats_fixed = $session->get('badcats', null, 'flexicontent');
 		if ( $badcats_fixed === null ) {
 			// Correct non-existent main category in content table
@@ -1274,8 +1274,8 @@ class FlexicontentModelItems extends FCModelAdminList
 	 */
 	function _buildContentJoinsWhere(& $extra_joins = '', $tmp_only = false)
 	{
-		$session = \Joomla\CMS\Factory::getApplication()->getSession();
-		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$session = \Joomla\CMS\Factory::getSession();
+		$user    = \Joomla\CMS\Factory::getUser();
 		$perms   = FlexicontentHelperPerm::getPerm();
 
 
@@ -2333,13 +2333,13 @@ class FlexicontentModelItems extends FCModelAdminList
 	 */
 	function sendNotification($users, $item)
 	{
-		$sender = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$sender = \Joomla\CMS\Factory::getUser();
 
 		// messaging for new items
 		require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_messages'.DS.'tables'.DS.'message.php');
 
 		// load language for messaging
-		$lang = \Joomla\CMS\Factory::getApplication()->getLanguage();
+		$lang = \Joomla\CMS\Factory::getLanguage();
 		$lang->load('com_messages');
 
 		$ctrl_task = FLEXI_J16GE ? '&task=items.edit' : '&controller=items&task=edit';
@@ -3228,7 +3228,7 @@ class FlexicontentModelItems extends FCModelAdminList
 
 		// Get the category default parameters in a string
 		$xml = new JSimpleXML;
-		$xml->loadFile(JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'category.xml');
+		$xml->loadFile(JPATH_COMPONENT.DS.'models'.DS.'category.xml');
 		$catparams = new \Joomla\Registry\Registry();
 
 		foreach ($xml->document->params as $paramGroup) {

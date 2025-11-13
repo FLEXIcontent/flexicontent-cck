@@ -18,8 +18,6 @@
 
 // Check to ensure this file is included in Joomla!
 defined( '_JEXEC' ) or die( 'Restricted access' );
-use Joomla\Database\DatabaseInterface;
-use Joomla\CMS\Mail\MailerFactoryInterface;
 
 jimport('cms.plugin.plugin');
 
@@ -94,7 +92,7 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 		$plugin  = \Joomla\CMS\Plugin\PluginHelper::getPlugin('flexicontent', 'flexinotify');
 		$params  = new \Joomla\Registry\Registry($plugin->params);
 		$app     = \Joomla\CMS\Factory::getApplication();
-		$session = \Joomla\CMS\Factory::getApplication()->getSession();
+		$session = \Joomla\CMS\Factory::getSession();
 
 		$debug_notifications = (int) $params->get('debug_notifications', 0);
 
@@ -211,7 +209,7 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 
 	function _getSubscribers($itemid)
 	{
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 
 		$query	= 'SELECT u.* '
 				.' FROM #__flexicontent_favourites AS f'
@@ -244,7 +242,7 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 
 		$categories = $globalcats;
 		$app        = \Joomla\CMS\Factory::getApplication();
-		$config     = \Joomla\CMS\Factory::getApplication()->getConfig();
+		$config     = \Joomla\CMS\Factory::getConfig();
 
 		// Get the route helper
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
@@ -252,7 +250,7 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 		// Import joomla mail helper class that contains the sendMail helper function
 		jimport('joomla.mail.helper');
 
-		$mailer = \Joomla\CMS\Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();
+		$mailer = \Joomla\CMS\Factory::getMailer();
 		$mailer->Encoding = 'base64';
 
 		/**
@@ -385,7 +383,7 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 		$categories = $globalcats;
 
 		$app    = \Joomla\CMS\Factory::getApplication();
-		$config = \Joomla\CMS\Factory::getApplication()->getConfig();
+		$config = \Joomla\CMS\Factory::getConfig();
 
 		// Get the route helper
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
@@ -393,7 +391,7 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 		// Import joomla mail helper class that contains the sendMail helper function
 		jimport('joomla.mail.helper');
 
-		$mailer = \Joomla\CMS\Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();
+		$mailer = \Joomla\CMS\Factory::getMailer();
 		$mailer->Encoding = 'base64';
 
 		$debug_notifications = (int) $params->get('debug_notifications', 0);

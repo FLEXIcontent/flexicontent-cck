@@ -21,7 +21,6 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
-use Joomla\Database\DatabaseInterface;
 
 jimport('legacy.model.legacy');
 
@@ -198,7 +197,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 	protected function populateRecordState($ordering = null, $direction = null)
 	{
 		$app    = \Joomla\CMS\Factory::getApplication();
-		$user   = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user   = \Joomla\CMS\Factory::getUser();
 		$jinput = $app->input;
 		$option = $jinput->get('option', '', 'cmd');
 		$view   = $jinput->get('view', '', 'cmd');
@@ -286,7 +285,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		$this->setState('filter_order_Dir', $jinput->get('filter_order_Dir', 'ASC', 'cmd'));
 
 		// Get minimum word search length
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 		$db->setQuery("SHOW VARIABLES LIKE '%ft_min_word_len%'");
 		$_dbvariable = $db->loadObject();
 		$min_word_len = (int) @ $_dbvariable->Value;
@@ -505,7 +504,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			$limitstart = (int) $this->getState('limitstart');
 
 			//jimport('cms.pagination.pagination');
-			require_once (JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'pagination.php');
+			require_once (JPATH_COMPONENT.DS.'helpers'.DS.'pagination.php');
 			$this->_pagination = new FCPagination($this->getTotal(), $limitstart, $limit);
 		}
 		return $this->_pagination;
@@ -779,7 +778,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		if ( $this->_data_cats!==null ) return $this->_data_cats;
 
 		global $globalcats;
-		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user     = \Joomla\CMS\Factory::getUser();
 		$ordering = 'c.lft ASC';
 
 		$show_noauth = $this->_params->get('show_noauth', 0);   // show unauthorized items
@@ -853,7 +852,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 	 */
 	function _buildAccessSelect()
 	{
-		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user    = \Joomla\CMS\Factory::getUser();
 		$show_noauth = $this->_params->get('show_noauth', 0);
 
 		$select_access = '';
@@ -1004,8 +1003,8 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		$app    = \Joomla\CMS\Factory::getApplication();
 		$jinput = $app->input;
 		$option = $this->getState('option');
-		$user		= \Joomla\CMS\Factory::getApplication()->getIdentity();
-		$db     = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$user		= \Joomla\CMS\Factory::getUser();
+		$db     = \Joomla\CMS\Factory::getDbo();
 
 		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
 		//  thus the items are published globally at the time the author specified in his/her local clock
@@ -1091,7 +1090,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		{
 			$lta = 'i';
 			//$where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . ' OR '.$lta.'.language="*" ) ';
-			$where .= ' AND (' . $lta . ' .language = ' . $db->Quote(\Joomla\CMS\Factory::getApplication()->getLanguage()->getTag()) . ' OR ' . $lta . '.language = ' . $db->Quote('*') . ')';
+			$where .= ' AND (' . $lta . ' .language = ' . $db->Quote(\Joomla\CMS\Factory::getLanguage()->getTag()) . ' OR ' . $lta . '.language = ' . $db->Quote('*') . ')';
 		}
 
 		$where .= !FLEXI_J16GE ? ' AND i.sectionid = ' . FLEXI_SECTION : '';
@@ -1173,7 +1172,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 	{
 		$app    = \Joomla\CMS\Factory::getApplication();
 		$option = $app->input->getCmd('option', '');
-		$db     = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db     = \Joomla\CMS\Factory::getDbo();
 
 		static $text_search = null;
 
@@ -1218,7 +1217,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			: 'flexicontent_advsearch_index';
 
 		// Try to add space between words for current language using a dictionary
-		$lang_handler = FlexicontentFields::getLangHandler(\Joomla\CMS\Factory::getApplication()->getLanguage()->getTag());
+		$lang_handler = FlexicontentFields::getLangHandler(\Joomla\CMS\Factory::getLanguage()->getTag());
 		if ($lang_handler)
 		{
 			$text = implode(' ', $lang_handler->get_segment_array($clear_previous = true, trim($text)));
@@ -1254,7 +1253,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			 */
 			if ($filter_word_like_any
 				&& in_array(flexicontent_html::getUserCurrentLang(), array('zh', 'jp', 'ja', 'th'))
-				&& ! FlexicontentFields::getLangHandler(\Joomla\CMS\Factory::getApplication()->getLanguage()->getTag(), $_hasHandlerOnly = true)
+				&& ! FlexicontentFields::getLangHandler(\Joomla\CMS\Factory::getLanguage()->getTag(), $_hasHandlerOnly = true)
 			)
 			{
 				$_index_match = ' LOWER ('.$ts.'.search_index) LIKE '.$db->Quote( '%'.$escaped_text.'%', false );
@@ -1564,7 +1563,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 	 */
 	function _buildChildsQuery($id=0)
 	{
-		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user    = \Joomla\CMS\Factory::getUser();
 		$show_noauth = $this->_params->get('show_noauth', 0);   // Show unauthorized items
 
 		// Select only categories that user has view access, if listing of unauthorized content is not enabled
@@ -1613,8 +1612,8 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 	function _getassigned($id)
 	{
 		global $globalcats;
-		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
-		$db   = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$user = \Joomla\CMS\Factory::getUser();
+		$db   = \Joomla\CMS\Factory::getDbo();
 
 		// Get the view's parameters
 		$use_tmp = true;
@@ -1648,7 +1647,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		{
 			$lta = $use_tmp ? 'i': 'ie';
 			//$where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . ' OR '.$lta.'.language="*" ) ';
-			$where .= ' AND (' . $lta . ' .language = ' . $db->Quote(\Joomla\CMS\Factory::getApplication()->getLanguage()->getTag()) . ' OR ' . $lta . '.language = ' . $db->Quote('*') . ')';
+			$where .= ' AND (' . $lta . ' .language = ' . $db->Quote(\Joomla\CMS\Factory::getLanguage()->getTag()) . ' OR ' . $lta . '.language = ' . $db->Quote('*') . ')';
 		}
 
 		// Get privilege to view non viewable items (upublished, archived, trashed, expired, scheduled).
@@ -1715,7 +1714,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 	 */
 	function _getsubs($id)
 	{
-		$user			= \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user			= \Joomla\CMS\Factory::getUser();
 		$show_noauth = $this->_params->get('show_noauth', 0);   // Show unauthorized items
 
 		// Where
@@ -1866,7 +1865,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 
 		// Initialize some vars
 		$app  = \Joomla\CMS\Factory::getApplication();
-		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user = \Joomla\CMS\Factory::getUser();
 
 		// Set a specific id
 		if ($pk)
@@ -2696,13 +2695,13 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			else if ( !$return_sql )
 			{
 				//echo "<br>GET FILTERED Items (cat model) -- [".$filter->name."] using in-query ids :<br>". $query."<br>\n";
-				$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+				$db = \Joomla\CMS\Factory::getDbo();
 				$db->setQuery($query);
 				$filtered = $db->loadColumn();
 			}
 			else if ($return_sql===2)
 			{
-				$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+				$db = \Joomla\CMS\Factory::getDbo();
 				static $iids_tblname  = array();
 				if ( !isset($iids_tblname[$filter->id]) ) {
 					$iids_tblname[$filter->id] = 'fc_filter_iids_'.$filter->id;
@@ -2822,7 +2821,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			foreach ($this->_data as $item) $item_ids[] = $item->id;
 		}
 
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 		$query = 'SELECT COUNT(com.object_id) AS total, com.object_id AS item_id'
 		      . ' FROM #__jcomments AS com'
 		      . ' WHERE com.object_id in (' . implode(',',$item_ids) .')'
@@ -2864,7 +2863,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 
 	public function logSearch($search_term)
 	{
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 		$params = \Joomla\CMS\Component\ComponentHelper::getParams('com_search');
 		$enable_log_searches = $params->get('enabled');
 
@@ -2916,7 +2915,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 	 */
 	function getFavoured()
 	{
-		return flexicontent_db::getFavoured($type=1, $this->_id, \Joomla\CMS\Factory::getApplication()->getIdentity()->id);
+		return flexicontent_db::getFavoured($type=1, $this->_id, \Joomla\CMS\Factory::getUser()->id);
 	}
 
 
@@ -2929,7 +2928,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 	 */
 	function removefav()
 	{
-		return flexicontent_db::removefav($type=1, $this->_id, \Joomla\CMS\Factory::getApplication()->getIdentity()->id);
+		return flexicontent_db::removefav($type=1, $this->_id, \Joomla\CMS\Factory::getUser()->id);
 	}
 
 
@@ -2942,7 +2941,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 	 */
 	function addfav()
 	{
-		return flexicontent_db::addfav($type=1, $this->_id, \Joomla\CMS\Factory::getApplication()->getIdentity()->id);
+		return flexicontent_db::addfav($type=1, $this->_id, \Joomla\CMS\Factory::getUser()->id);
 	}
 
 

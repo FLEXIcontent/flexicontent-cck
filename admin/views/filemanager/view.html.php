@@ -13,8 +13,6 @@ defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
-use Joomla\Database\DatabaseInterface;
-use Joomla\CMS\Toolbar\ToolbarFactoryInterface;
 
 JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_records.php');
 
@@ -38,11 +36,11 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 		global $globalcats;
 		$app      = \Joomla\CMS\Factory::getApplication();
 		$jinput   = $app->input;
-		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
-		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$document = \Joomla\CMS\Factory::getDocument();
+		$user     = \Joomla\CMS\Factory::getUser();
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
-		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
-		$db       = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$session  = \Joomla\CMS\Factory::getSession();
+		$db       = \Joomla\CMS\Factory::getDbo();
 
 		$option   = $jinput->getCmd('option', '');
 		$view     = $jinput->getCmd('view', '');
@@ -58,8 +56,8 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 		// Load Joomla language files of other extension
 		if (!empty($this->proxy_option))
 		{
-			\Joomla\CMS\Factory::getApplication()->getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
-			\Joomla\CMS\Factory::getApplication()->getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
+			\Joomla\CMS\Factory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
+			\Joomla\CMS\Factory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
 		}
 
 		// Get model
@@ -242,16 +240,16 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 			// Add css to document
 			if ($isAdmin)
 			{
-				!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
+				!\Joomla\CMS\Factory::getLanguage()->isRtl()
 					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
 					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
-				!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
+				!\Joomla\CMS\Factory::getLanguage()->isRtl()
 					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 			}
 			else
 			{
-				!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
+				!\Joomla\CMS\Factory::getLanguage()->isRtl()
 					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
 					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
 			}
@@ -700,11 +698,11 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 	 */
 	function setToolbar()
 	{
-		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
-		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
-		$toolbar  = \Joomla\CMS\Factory::getApplication()->getDocument()->getToolbar('toolbar');
+		$user     = \Joomla\CMS\Factory::getUser();
+		$document = \Joomla\CMS\Factory::getDocument();
+		$toolbar  = \Joomla\CMS\Toolbar\Toolbar::getInstance('toolbar');
 		$perms    = FlexicontentHelperPerm::getPerm();
-		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
+		$session  = \Joomla\CMS\Factory::getSession();
 		$useAssocs= flexicontent_db::useAssociations();
 
 		$js = '';
@@ -816,7 +814,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 
 			if ($log_filename = $session->get('filemanager_stats_log_filename', null, 'flexicontent'))
 			{
-				\Joomla\CMS\Factory::getApplication()->enqueueMessage('You may see log file : <b>' . \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getApplication()->getConfig()->get('log_path') . DS . $log_filename) . '</b> for messages and errors', 'warning');
+				\Joomla\CMS\Factory::getApplication()->enqueueMessage('You may see log file : <b>' . \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getConfig()->get('log_path') . DS . $log_filename) . '</b> for messages and errors', 'warning');
 			}
 		}
 		$session->set('filemanager_stats_log_filename', null, 'flexicontent');
@@ -837,7 +835,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 			{
 				\Joomla\CMS\Factory::getApplication()->enqueueMessage(
 					($error_count ? '' : 'Please see mediadata logfile. Processed all ' . $file_count . '  preview files') .
-					' You may see log file : <b>' . \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getApplication()->getConfig()->get('log_path') . DS . $log_filename) . '</b>' .
+					' You may see log file : <b>' . \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getConfig()->get('log_path') . DS . $log_filename) . '</b>' .
 					($error_count ? ' for messages and errors' : ' for more information'),
 					$error_count ? 'warning' : 'message'
 				);

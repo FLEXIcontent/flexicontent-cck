@@ -14,7 +14,7 @@
  * Based on "joomlalinks" found in JCE's core distribution, and flexicontentlinks by Emmanuel Dannan and Ryan Demmer
  */
 defined('_WF_EXT') or die('RESTRICTED');
-use Joomla\Database\DatabaseInterface;
+
 class FlexicontentlinksAuthored_items extends \Joomla\CMS\Object\CMSObject {
 
 	var $_option = 'com_flexicontent_authored_items';
@@ -87,7 +87,7 @@ class FlexicontentlinksAuthored_items extends \Joomla\CMS\Object\CMSObject {
 
 		if ($layout && $layout!='author') return array();
 
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 
 		// Add authored items
 		$query	= $db->getQuery(true);

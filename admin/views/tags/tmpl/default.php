@@ -17,10 +17,10 @@ use Joomla\String\StringHelper;
 global $globalcats;
 $app      = \Joomla\CMS\Factory::getApplication();
 $jinput   = $app->input;
-$config   = \Joomla\CMS\Factory::getApplication()->getConfig();
-$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
-$session  = \Joomla\CMS\Factory::getApplication()->getSession();
-$document = \Joomla\CMS\Factory::getApplication()->getDocument();
+$config   = \Joomla\CMS\Factory::getConfig();
+$user     = \Joomla\CMS\Factory::getUser();
+$session  = \Joomla\CMS\Factory::getSession();
+$document = \Joomla\CMS\Factory::getDocument();
 $cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 $ctrl     = 'tags.';
 $hlpname  = 'fctags';
@@ -432,7 +432,7 @@ if ($js)
 
 
 <?php
-\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration('
+\Joomla\CMS\Factory::getDocument()->addScriptDeclaration('
 	function fc_edit_jtag_modal_load( container )
 	{
 		if ( container.find("iframe").get(0).contentWindow.location.href.indexOf("view=tags") != -1 )

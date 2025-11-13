@@ -52,7 +52,7 @@ foreach ($values as $value)
 	}
 
 	// Add styles for label position
-	$document = \Joomla\CMS\Factory::getApplication()->getDocument();
+	$document = \Joomla\CMS\Factory::getDocument();
 	$styleurl = \Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/email/css/style.css';
 	$document->addStyleSheet($styleurl);
 

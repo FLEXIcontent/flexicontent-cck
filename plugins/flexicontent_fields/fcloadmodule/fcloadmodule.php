@@ -5,12 +5,11 @@
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright ï¿½ 2020, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright © 2020, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-use Joomla\Database\DatabaseInterface;
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
 class plgFlexicontent_fieldsFcloadmodule extends FCField
@@ -46,7 +45,7 @@ class plgFlexicontent_fieldsFcloadmodule extends FCField
 			$field->value[0] = '';
 		}
 
-		$document	= \Joomla\CMS\Factory::getApplication()->getDocument();
+		$document	= \Joomla\CMS\Factory::getDocument();
 
 		$fieldname = 'custom['.$field->name.']';
 		$elementid = 'custom_'.$field->name;
@@ -114,7 +113,7 @@ class plgFlexicontent_fieldsFcloadmodule extends FCField
 			$initialized = 1;
 
 			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getApplication()->getDocument();
+			$document  = \Joomla\CMS\Factory::getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -163,7 +162,7 @@ class plgFlexicontent_fieldsFcloadmodule extends FCField
 		$position		= $field->parameters->get('position', '');
 		$style 			= $field->parameters->get('style', -2);
 
-		$document		= \Joomla\CMS\Factory::getApplication()->getDocument();
+		$document		= \Joomla\CMS\Factory::getDocument();
 		$display 		= array();
 		$renderer		= $document->loadRenderer('module');
 		$mparams		= array('style'=>$style);
@@ -297,7 +296,7 @@ class plgFlexicontent_fieldsFcloadmodule extends FCField
 
 	function _getModuleObject($id)
 	{
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 
 		$query 	= 'SELECT * FROM #__modules'
 				. ' WHERE id = ' . (int)$id

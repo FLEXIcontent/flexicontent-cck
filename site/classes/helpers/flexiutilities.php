@@ -1,7 +1,5 @@
 <?php
 defined( '_JEXEC' ) or die( 'Restricted access' );
-use Joomla\Database\DatabaseInterface;
-use Joomla\CMS\Cache\CacheControllerFactoryInterface;
 
 class FLEXIUtilities
 {
@@ -76,7 +74,7 @@ class FLEXIUtilities
 		//$extension = $extension ? $extension : 'com_flexicontent';
 
 		// Get current UI language, because language file paths use LL-CC (language-country)
-		$language_tag = $language_tag ? $language_tag : \Joomla\CMS\Factory::getApplication()->getLanguage()->getTag();
+		$language_tag = $language_tag ? $language_tag : \Joomla\CMS\Factory::getLanguage()->getTag();
 
 		// We will use template folder as BASE of language files instead of joomla's language folder
 		// Since FLEXIcontent templates are meant to be user-editable it makes sense to place language files inside them
@@ -84,8 +82,8 @@ class FLEXIUtilities
 		$base_dir = $tmpldir.DS.$tmplname;
 
 		// Final use joomla's API to load our template's language files -- (load english template language file then override with current language file)
-		\Joomla\CMS\Factory::getApplication()->getLanguage()->load($extension, $base_dir, 'en-GB', $reload=true);        // Fallback to english language template file
-		\Joomla\CMS\Factory::getApplication()->getLanguage()->load($extension, $base_dir, $language_tag, $reload=true);  // User's current language template file
+		\Joomla\CMS\Factory::getLanguage()->load($extension, $base_dir, 'en-GB', $reload=true);        // Fallback to english language template file
+		\Joomla\CMS\Factory::getLanguage()->load($extension, $base_dir, $language_tag, $reload=true);  // User's current language template file
 
 		if ($print_logging_info) $fc_run_times['templates_parsing_ini'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 	}
@@ -100,7 +98,7 @@ class FLEXIUtilities
 	static function getlanguageslist($published_only=false, $add_all = true)
 	{
 		$app = \Joomla\CMS\Factory::getApplication();
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 		static $langs_cache = array();
 		//static $pub_languages = array();
 		//static $all_languages = array();
@@ -225,7 +223,7 @@ class FLEXIUtilities
 		) {
 			if (!$id) $all_retrieved = true;
 			$g_lastversions =  array();
-			$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+			$db = \Joomla\CMS\Factory::getDbo();
 			$query = "SELECT item_id as id, max(version_id) as version"
 									." FROM #__flexicontent_versions"
 									." WHERE 1"
@@ -259,7 +257,7 @@ class FLEXIUtilities
 
 		if( $g_currentversions==NULL || $force )
 		{
-			$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+			$db = \Joomla\CMS\Factory::getDbo();
 			if (!FLEXI_J16GE) {
 				$query = "SELECT i.id, i.version FROM #__content AS i"
 					." WHERE i.sectionid=".FLEXI_SECTION
@@ -297,7 +295,7 @@ class FLEXIUtilities
 
 	static function &getLastItemVersion($id)
 	{
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 		$query = 'SELECT max(version) as version'
 				.' FROM #__flexicontent_items_versions'
 				.' WHERE item_id = ' . (int)$id
@@ -315,7 +313,7 @@ class FLEXIUtilities
 
 		if ($status === null)
 		{
-			$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+			$db = \Joomla\CMS\Factory::getDbo();
 			$query = "SELECT c.id,c.version,iv.version as iversion FROM #__content as c "
 				." LEFT JOIN #__flexicontent_items_versions as iv ON c.id=iv.item_id AND c.version=iv.version"
 				." JOIN #__categories as cat ON c.catid=cat.id"
@@ -340,7 +338,7 @@ class FLEXIUtilities
 	 */
 	static function &getFirstVersion($id, $max, $current_version)
 	{
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 		$query = 'SELECT version_id'
 				.' FROM #__flexicontent_versions'
 				.' WHERE item_id = ' . (int)$id
@@ -361,7 +359,7 @@ class FLEXIUtilities
 	 */
 	static function &getVersionsCount($id)
 	{
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 		$query = 'SELECT COUNT(*)'
 				.' FROM #__flexicontent_versions'
 				.' WHERE item_id = ' . (int)$id
@@ -375,7 +373,7 @@ class FLEXIUtilities
 
 	static function getCache($group='', $client=0)
 	{
-		$conf = \Joomla\CMS\Factory::getApplication()->getConfig();
+		$conf = \Joomla\CMS\Factory::getConfig();
 
 		//$client = 0;//0 is site, 1 is admin
 		$options = array(
@@ -386,7 +384,7 @@ class FLEXIUtilities
 		);
 
 		jimport('joomla.cache.cache');
-		$cache = \Joomla\CMS\Factory::getContainer()->get(CacheControllerFactoryInterface::class)->createCacheController('', $options);
+		$cache = \Joomla\CMS\Cache\Cache::getInstance('', $options);
 
 		return $cache;
 	}
@@ -583,7 +581,7 @@ class FLEXIUtilities
 	 */
 	static function isSqlValidDate($date)
 	{
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 		$q = "SELECT day(".$db->Quote($date).")";
 		$db->setQuery($q);
 		$num = $db->loadResult();
@@ -720,8 +718,8 @@ class FLEXIUtilities
 		$perms   = FlexicontentHelperPerm::getPerm();
 		$app     = \Joomla\CMS\Factory::getApplication();
 		$jinput  = $app->input;
-		$db      = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
-		$session = \Joomla\CMS\Factory::getApplication()->getSession();
+		$db      = \Joomla\CMS\Factory::getDbo();
+		$session = \Joomla\CMS\Factory::getSession();
 		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
 
 		// Redirect to Joomla backend
@@ -852,7 +850,7 @@ class FLEXIUtilities
 			$perms->CanIndex
 				? call_user_func($addEntry, '<span class="fcsb-icon-search icon-search"></span>'.\Joomla\CMS\Language\Text::_( 'FLEXI_SEARCH_INDEXES' ), 'index.php?option=com_flexicontent&view=search', $view=='search') : null;
 
-			$CanSeeSearchLogs = !FLEXI_J40GE && \Joomla\CMS\Factory::getApplication()->getIdentity()->authorise('core.admin', 'com_search');
+			$CanSeeSearchLogs = !FLEXI_J40GE && \Joomla\CMS\Factory::getUser()->authorise('core.admin', 'com_search');
 
 			if ($CanSeeSearchLogs)
 			{

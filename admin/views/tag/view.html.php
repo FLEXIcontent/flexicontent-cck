@@ -13,8 +13,6 @@ defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
-use Joomla\Database\DatabaseInterface;
-use Joomla\CMS\Toolbar\ToolbarFactoryInterface;
 
 JLoader::register('FlexicontentViewBaseRecord', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_record.php');
 
@@ -36,9 +34,9 @@ class FlexicontentViewTag extends FlexicontentViewBaseRecord
 
 		$app        = \Joomla\CMS\Factory::getApplication();
 		$jinput     = $app->input;
-		$document   = \Joomla\CMS\Factory::getApplication()->getDocument();
-		$user       = \Joomla\CMS\Factory::getApplication()->getIdentity();
-		$db         = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$document   = \Joomla\CMS\Factory::getDocument();
+		$user       = \Joomla\CMS\Factory::getUser();
+		$db         = \Joomla\CMS\Factory::getDbo();
 		$cparams    = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 		$perms      = FlexicontentHelperPerm::getPerm();
 
@@ -107,16 +105,16 @@ class FlexicontentViewTag extends FlexicontentViewBaseRecord
 		// Add css to document
 		if ($isAdmin)
 		{
-			!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
+			!\Joomla\CMS\Factory::getLanguage()->isRtl()
 				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
 				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
-			!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
+			!\Joomla\CMS\Factory::getLanguage()->isRtl()
 				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 		}
 		else
 		{
-			!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
+			!\Joomla\CMS\Factory::getLanguage()->isRtl()
 				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
 				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
 		}
@@ -139,7 +137,7 @@ class FlexicontentViewTag extends FlexicontentViewBaseRecord
 		 * Create the toolbar
 		 */
 
-		$toolbar = \Joomla\CMS\Factory::getApplication()->getDocument()->getToolbar('toolbar');
+		$toolbar = \Joomla\CMS\Toolbar\Toolbar::getInstance('toolbar');
 
 		// Creation flag used to decide if adding save and new / save as copy buttons are allowed
 		$cancreate = true;

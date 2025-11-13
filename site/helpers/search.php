@@ -17,7 +17,6 @@ defined('_JEXEC') or die( 'Restricted access' );
 
 use Joomla\String\StringHelper;
 use Joomla\CMS\Language\LanguageHelper;
-use Joomla\Database\DatabaseInterface;
 
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
@@ -31,7 +30,7 @@ class FLEXIadvsearchHelper
 	static function santiseSearchWord(&$searchword, $searchphrase, $min=2)
 	{
 		$ignored = false;
-		$lang = \Joomla\CMS\Factory::getApplication()->getLanguage();
+		$lang = \Joomla\CMS\Factory::getLanguage();
 		$lang_tag = $lang->getTag();
 		$search_prefix = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
 
@@ -97,7 +96,7 @@ class FLEXIadvsearchHelper
 
 	static function logSearch( $search_term )
 	{
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 		$params = \Joomla\CMS\Component\ComponentHelper::getParams('com_search');
 		$enable_log_searches = $params->get('enabled');
 

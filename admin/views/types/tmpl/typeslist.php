@@ -1,5 +1,5 @@
 <?php
-$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+$user = \Joomla\CMS\Factory::getUser();
 $app  = \Joomla\CMS\Factory::getApplication();
 $isAdmin = $app->isClient('administrator');
 

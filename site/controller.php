@@ -14,8 +14,6 @@ defined('_JEXEC') or die;
 use Joomla\Filesystem\Path;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
-use Joomla\Database\DatabaseInterface;
-use Joomla\CMS\Mail\MailerFactoryInterface;
 
 jimport('legacy.controller.legacy');
 JLoader::register('FlexicontentControllerItems', JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'controllers'.DS.'items.php');  // we use JPATH_BASE since controller exists in frontend too
@@ -102,7 +100,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 	{
 		// Initialize variables
 		$app  = \Joomla\CMS\Factory::getApplication();
-		$db   = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db   = \Joomla\CMS\Factory::getDbo();
 
 		$view = $this->input->get('view', '', 'cmd');
 		$cid  = $this->input->get('cid', 0, 'int');
@@ -129,7 +127,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		$CLIENT_CACHEABLE_PUBLIC = 1;
 		$CLIENT_CACHEABLE_PRIVATE = 2;
 
-		$userid = \Joomla\CMS\Factory::getApplication()->getIdentity()->get('id');
+		$userid = \Joomla\CMS\Factory::getUser()->get('id');
 		$cc     = $this->input->get('cc', null);
 		$view   = $this->input->get('view', '', 'cmd');
 		$layout = $this->input->get('layout', '', 'cmd');
@@ -237,7 +235,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 		// If component is serving different pages to logged users, this will avoid
 		// having users seeing same page after login/logout when conservative caching is used
-		if ( $userid = \Joomla\CMS\Factory::getApplication()->getIdentity()->get('id') )
+		if ( $userid = \Joomla\CMS\Factory::getUser()->get('id') )
 		{
 			$this->input->set('__fc_user_id__', $userid);
 			$safeurlparams['__fc_user_id__'] = 'STRING';
@@ -317,8 +315,8 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 	function ajaxfav()
 	{
 		$app     = \Joomla\CMS\Factory::getApplication();
-		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
-		//$db      = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$user    = \Joomla\CMS\Factory::getUser();
+		//$db      = \Joomla\CMS\Factory::getDbo();
 		//$cparams = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
 
 		$id   = $this->input->get('id', 0, 'int');
@@ -392,8 +390,8 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 	function getreviewform()
 	{
 		$app  = \Joomla\CMS\Factory::getApplication();
-		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
-		$db   = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$user = \Joomla\CMS\Factory::getUser();
+		$db   = \Joomla\CMS\Factory::getDbo();
 
 		$html_tagid  = $this->input->get('tagid', '', 'cmd');
 		$content_id  = $this->input->get('content_id', 0, 'int');
@@ -535,8 +533,8 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 	function storereviewform()
 	{
 		$app  = \Joomla\CMS\Factory::getApplication();
-		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
-		$db   = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$user = \Joomla\CMS\Factory::getUser();
+		$db   = \Joomla\CMS\Factory::getDbo();
 
 		$review_id   = $this->input->get('review_id', 0, 'int');
 		$content_id  = $this->input->get('content_id', 0, 'int');
@@ -682,8 +680,8 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 	private function reviewPrepare($content_id, & $item = null, & $field = null, $errors = null, $checkSubmit = true)
 	{
 		$app  = \Joomla\CMS\Factory::getApplication();
-		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
-		$db   = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$user = \Joomla\CMS\Factory::getUser();
+		$db   = \Joomla\CMS\Factory::getDbo();
 
 
 		/**
@@ -711,8 +709,8 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		FlexicontentFields::loadFieldConfig($field, $item);
 
 		// Load field's language files
-		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, 'en-GB', true);
-		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, null, true);
+		\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, 'en-GB', true);
+		\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, null, true);
 
 		// Get needed parameters
 		$allow_reviews = (int) $field->parameters->get('allow_reviews', 0);
@@ -869,9 +867,9 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		jimport('joomla.filesystem.file');
 
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$db    = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
-		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
-		$session = \Joomla\CMS\Factory::getApplication()->getSession();
+		$db    = \Joomla\CMS\Factory::getDbo();
+		$user  = \Joomla\CMS\Factory::getUser();
+		$session = \Joomla\CMS\Factory::getSession();
 		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
 
 
@@ -886,7 +884,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 		// Get a target path for the creating the zip file for tasks that require it
 		$tmp_ffname = 'fcmd_uid_'.$user->id.'_'.date('Y-m-d__H-i-s');
-		$targetpath = \Joomla\Filesystem\Path::clean($app->get('tmp_path') .DS. $tmp_ffname);
+		$targetpath = \Joomla\CMS\Filesystem\Path::clean($app->get('tmp_path') .DS. $tmp_ffname);
 
 		/**
 		 * Single file download (via HTTP request) or multi-file downloaded (via a folder structure in session or in DB table)
@@ -1192,9 +1190,9 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			if (!$file->url)
 			{
 				$basePath = $file->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;
-				$file->abspath = str_replace(DS, '/', \Joomla\Filesystem\Path::clean($basePath.DS.$file->filename));
+				$file->abspath = str_replace(DS, '/', \Joomla\CMS\Filesystem\Path::clean($basePath.DS.$file->filename));
 
-				if (!\Joomla\Filesystem\File::exists($file->abspath))
+				if (!\Joomla\CMS\Filesystem\File::exists($file->abspath))
 				{
 					$msg = \Joomla\CMS\Language\Text::_( 'FLEXI_REQUESTED_FILE_DOES_NOT_EXIST_ANYMORE' );
 					$app->enqueueMessage($msg, 'notice');
@@ -1553,7 +1551,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				$html_mode=false; $cc=null; $bcc=null;
 				$attachment=null; $replyto=null; $replytoname=null;
 
-				$send_result = \Joomla\CMS\Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer()->sendMail( $from, $fromname, $recipient, $subject, $_message, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
+				$send_result = \Joomla\CMS\Factory::getMailer()->sendMail( $from, $fromname, $recipient, $subject, $_message, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
 			}
 			ob_end_clean();
 		}
@@ -1577,10 +1575,10 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		else
 		{
 			// Create target (top level) folder
-			\Joomla\Filesystem\Folder::create($targetpath, 0755);
+			\Joomla\CMS\Filesystem\Folder::create($targetpath, 0755);
 
 			// Copy Files
-			foreach ($valid_files as $file) \Joomla\Filesystem\File::copy($file->abspath, $file->node->targetpath);
+			foreach ($valid_files as $file) \Joomla\CMS\Filesystem\File::copy($file->abspath, $file->node->targetpath);
 
 			// Create text/html file with ITEM title / descriptions
 			// TODO replace this with a TEMPLATE file ...
@@ -1613,9 +1611,9 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			}
 
 			// Get file list recursively, and calculate archive filename
-			$fileslist   = \Joomla\Filesystem\Folder::files($targetpath, '.', $recurse=true, $fullpath=true);
+			$fileslist   = \Joomla\CMS\Filesystem\Folder::files($targetpath, '.', $recurse=true, $fullpath=true);
 			$archivename = $tmp_ffname . '.zip';
-			$archivepath = \Joomla\Filesystem\Path::clean( $app->get('tmp_path').DS.$archivename );
+			$archivepath = \Joomla\CMS\Filesystem\Path::clean( $app->get('tmp_path').DS.$archivename );
 
 
 			/**
@@ -1639,27 +1637,27 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			 * Remove temporary folder structure
 			 */
 
-			if (!\Joomla\Filesystem\Folder::delete(($targetpath)) )
+			if (!\Joomla\CMS\Filesystem\Folder::delete(($targetpath)) )
 			{
 				$msg = "Temporary folder ". $targetpath ." could not be deleted";
 				$app->enqueueMessage($msg, 'notice');
 			}
 
 			// Delete old files (they can not be deleted during download time ...)
-			$tmp_path = \Joomla\Filesystem\Path::clean($app->get('tmp_path'));
-			$matched_files = \Joomla\Filesystem\Folder::files($tmp_path, 'fcmd_uid_.*', $recurse=false, $fullpath=true);
+			$tmp_path = \Joomla\CMS\Filesystem\Path::clean($app->get('tmp_path'));
+			$matched_files = \Joomla\CMS\Filesystem\Folder::files($tmp_path, 'fcmd_uid_.*', $recurse=false, $fullpath=true);
 
 			foreach ($matched_files as $archive_file)
 			{
 				//echo "Seconds passed:". (time() - filemtime($tmp_folder)) ."<br>". "$filename was last modified: " . date ("F d Y H:i:s.", filemtime($tmp_folder)) . "<br>";
-				if (time() - filemtime($archive_file) > 3600) \Joomla\Filesystem\File::delete($archive_file);
+				if (time() - filemtime($archive_file) > 3600) \Joomla\CMS\Filesystem\File::delete($archive_file);
 			}
 
 			// Delete old tmp folder (in case that the some archiving procedures were interrupted thus their tmp folder were not deleted)
-			$matched_folders = \Joomla\Filesystem\Folder::folders($tmp_path, 'fcmd_uid_.*', $recurse=false, $fullpath=true);
+			$matched_folders = \Joomla\CMS\Filesystem\Folder::folders($tmp_path, 'fcmd_uid_.*', $recurse=false, $fullpath=true);
 			foreach ($matched_folders as $tmp_folder) {
 				//echo "Seconds passed:". (time() - filemtime($tmp_folder)) ."<br>". "$filename was last modified: " . date ("F d Y H:i:s.", filemtime($tmp_folder)) . "<br>";
-				\Joomla\Filesystem\Folder::delete($tmp_folder);
+				\Joomla\CMS\Filesystem\Folder::delete($tmp_folder);
 			}
 
 			$dlfile = new stdClass();
@@ -1869,8 +1867,8 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 	{
 		// Import and Initialize some joomla API variables
 		$app     = \Joomla\CMS\Factory::getApplication();
-		$db      = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
-		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$db      = \Joomla\CMS\Factory::getDbo();
+		$user    = \Joomla\CMS\Factory::getUser();
 		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
 
 		// Get HTTP REQUEST variables
@@ -2170,7 +2168,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 	{
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 
-		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user = \Joomla\CMS\Factory::getUser();
 		$select_access = $joinacc = $andacc = '';
 		$aid_arr = $user->getAuthorisedViewLevels();
 		$aid_list = implode(',', $aid_arr);
@@ -2237,8 +2235,8 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			// Folder (Parent node)
 			if ($node->isParent)
 			{
-				$targetpath_node = \Joomla\Filesystem\Path::clean($targetpath.DS.$node->name);
-				\Joomla\Filesystem\Folder::create($targetpath_node, 0755);
+				$targetpath_node = \Joomla\CMS\Filesystem\Path::clean($targetpath.DS.$node->name);
+				\Joomla\CMS\Filesystem\Folder::create($targetpath_node, 0755);
 
 				// Folder has sub-contents
 				if (!empty($node->children))
@@ -2326,7 +2324,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 	 */
 	protected function _getRecordsQuery($cid, $cols)
 	{
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 
 		$cid = ArrayHelper::toInteger($cid);
 		$cols_list = implode(',', array_filter($cols, array($db, 'quoteName')));

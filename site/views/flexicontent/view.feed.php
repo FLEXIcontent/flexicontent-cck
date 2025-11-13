@@ -18,7 +18,7 @@
 
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
-use Joomla\Database\DatabaseInterface;
+
 jimport('legacy.view.legacy');
 
 /**
@@ -37,8 +37,8 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 	 */
 	function display( $tpl = null )
 	{
-		$db  = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
-		$doc = \Joomla\CMS\Factory::getApplication()->getDocument();
+		$db  = \Joomla\CMS\Factory::getDbo();
+		$doc = \Joomla\CMS\Factory::getDocument();
 		$app = \Joomla\CMS\Factory::getApplication();
 		$params = $this->get('Params');
 
@@ -126,7 +126,7 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 					$cat->introtext = & $cat->description;
 					$cat->fulltext = "";
 
-					if ( $cat_image_source && $cat->image && \Joomla\Filesystem\File::exists( JPATH_SITE .DS. $joomla_image_path . $cat->image ) ) {
+					if ( $cat_image_source && $cat->image && \Joomla\CMS\Filesystem\File::exists( JPATH_SITE .DS. $joomla_image_path . $cat->image ) ) {
 						$src = \Joomla\CMS\Uri\Uri::base(true) ."/". $joomla_image_url . $cat->image;
 
 						$h		= '&amp;h=' . $cat_image_height;

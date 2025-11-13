@@ -10,7 +10,6 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-use Joomla\Database\DatabaseInterface;
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
 class plgFlexicontent_fieldsFieldgroup extends FCField
@@ -54,10 +53,10 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 		$form_empty_fields_text = \Joomla\CMS\Language\Text::_($field->parameters->get('form_empty_fields_text', 'FLEXI_NA'));
 
 		// Initialize framework objects and other variables
-		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
+		$document = \Joomla\CMS\Factory::getDocument();
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
-		$db   = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
-		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$db   = \Joomla\CMS\Factory::getDbo();
+		$user = \Joomla\CMS\Factory::getUser();
 		$app  = \Joomla\CMS\Factory::getApplication();
 		$isAdmin = $app->isClient('administrator');
 
@@ -487,7 +486,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 			$initialized = 1;
 
 			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getApplication()->getDocument();
+			$document  = \Joomla\CMS\Factory::getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -862,7 +861,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 			return $grouped_fields[$field->id] = array();
 		}
 
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 		$query = 'SELECT f.* '
 			. ' FROM #__flexicontent_fields AS f '
 			. ' WHERE f.published = 1'

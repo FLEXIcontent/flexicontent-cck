@@ -21,7 +21,6 @@ defined('_JEXEC') or die('Restricted access');
 
 jimport('cms.html.html');      // JHtml
 jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
-use Joomla\CMS\Factory;
 
 jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 \Joomla\CMS\Form\FormHelper::loadFieldClass('radio');   // \Joomla\CMS\Form\Field\RadioField
@@ -45,7 +44,7 @@ class JFormFieldFcmethod extends JFormFieldRadio
 
 	function getInput()
 	{
-		$doc = Factory::getApplication()->getDocument();
+		$doc = \Joomla\CMS\Factory::getDocument();
 
 		$node = & $this->element;
 		$attributes = get_object_vars($node->attributes());

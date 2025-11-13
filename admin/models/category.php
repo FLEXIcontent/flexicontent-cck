@@ -469,7 +469,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 		$categoryId = $jinput->get('id');
 		$assetKey   = $categoryId ? $this->extension_proxy . '.category.' . $categoryId : $this->extension_proxy;
 
-		if (!\Joomla\CMS\Factory::getApplication()->getIdentity()->authorise('core.edit.state', $assetKey))
+		if (!\Joomla\CMS\Factory::getUser()->authorise('core.edit.state', $assetKey))
 		{
 			// Disable fields for display.
 			$form->setFieldAttribute('ordering', 'disabled', 'true');
@@ -522,7 +522,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 			jimport('joomla.utilities.date');
 
 			$site_zone = \Joomla\CMS\Factory::getApplication()->getCfg('offset');
-			$user_zone = \Joomla\CMS\Factory::getApplication()->getIdentity()->getParam('timezone', $site_zone);
+			$user_zone = \Joomla\CMS\Factory::getUser()->getParam('timezone', $site_zone);
 			$tz_string = $user_zone;
 			$tz = new DateTimeZone( $tz_string );
 
@@ -589,7 +589,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 	{
 		jimport('joomla.filesystem.path');
 
-		$lang = \Joomla\CMS\Factory::getApplication()->getLanguage();
+		$lang = \Joomla\CMS\Factory::getLanguage();
 		$component = $this->getState($this->getName().'.component', '');
 		$section   = $this->getState($this->getName().'.section', '');
 		$extension = \Joomla\CMS\Factory::getApplication()->input->get('extension', null);
@@ -599,7 +599,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 
 		// Try to find the component helper.
 		$eName = str_replace('com_', '', $component);
-		$path = \Joomla\Filesystem\Path::clean(JPATH_ADMINISTRATOR . "/components/$component/helpers/category.php");
+		$path = \Joomla\CMS\Filesystem\Path::clean(JPATH_ADMINISTRATOR . "/components/$component/helpers/category.php");
 
 		if (file_exists($path))
 		{
@@ -696,7 +696,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 	public function canEdit($record = null, $user = null)
 	{
 		$record  = $record ?: $this->_record;
-		$user    = $user ?: \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user    = $user ?: \Joomla\CMS\Factory::getUser();
 		$asset   = $record && !$record->id ? $this->type_alias . '.' . $record->id : $this->option;
 		$isOwner = $record && $user->id && $record->created_user_id == $user->id;
 
@@ -717,7 +717,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 	public function canEditState($record = null, $user = null)
 	{
 		$record  = $record ?: $this->_record;
-		$user    = $user ?: \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user    = $user ?: \Joomla\CMS\Factory::getUser();
 		$asset   = $record && !$record->id ? $this->type_alias . '.' . $record->id : $this->option;
 		$isOwner = $record && $user->id && $record->created_user_id == $user->id;
 
@@ -738,7 +738,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 	public function canDelete($record = null)
 	{
 		$record  = $record ?: $this->_record;
-		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user    = \Joomla\CMS\Factory::getUser();
 		$asset   = $record && !$record->id ? $this->type_alias . '.' . $record->id : $this->option;
 		$isOwner = $record && $user->id && $record->created_user_id == $user->id;
 
@@ -909,7 +909,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 			parent::cleanCache('com_flexicontent_cats', $client_id);
 
 			// Indicate to our system plugin that its category cache needs to be cleaned
-			\Joomla\CMS\Factory::getApplication()->getSession()->set('clear_cats_cache', 1, 'flexicontent');
+			\Joomla\CMS\Factory::getSession()->set('clear_cats_cache', 1, 'flexicontent');
 		}
 	}
 

@@ -869,7 +869,7 @@
 				inline_tip="FLEXI_HOW_TO_CUSTOMIZE_LAYOUT_CONF" tip_class="" tip_img="comments.png" class="use_select2_lib" />
 			<field name="clayout_mobile" type="categorylayout" skipparams="1" enableparam="use_mobile_layouts" firstoption="FLEXI_USE_DESKTOP" default="" label="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT_DESC" />
 
-			<field name="less_folders" type="textarea" default="JPATH_SITE/components/com_flexicontent/assets/less/ ::&#10;JTEMPLATE_SITE/less/com_flexicontent/ ::&#10;" cols="60" rows="3" label="FLEXI_LESS_GLOBAL_INC_FOLDERS" description="FLEXI_LESS_GLOBAL_INC_FOLDERS_DESC" class="input-xxlarge" />
+			<field name="less_folders" type="textarea" default="JPATH_COMPONENT_SITE/assets/less/ ::&#10;JTEMPLATE_SITE/less/com_flexicontent/ ::&#10;" cols="60" rows="3" label="FLEXI_LESS_GLOBAL_INC_FOLDERS" description="FLEXI_LESS_GLOBAL_INC_FOLDERS_DESC" class="input-xxlarge" />
 
 			<field name="" type="separator" default="FLEXI_CATEGORY_LAYOUT_SWITCHER" description="" level="level1" />
 			<field name="clayout_switcher" type="multilist" subtype="radio" default="1" toggle_related="0" label="FLEXI_DISPLAY" description="FLEXI_CATEGORY_LAYOUT_SWITCHER_DESC" class="btn-group btn-group-yesno">

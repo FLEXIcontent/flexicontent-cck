@@ -13,7 +13,6 @@ defined('_JEXEC') or die;
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
-use Joomla\Database\DatabaseInterface;
 
 JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php');
 
@@ -314,7 +313,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			header("Cache-Control: no-cache");
 			header("Pragma: no-cache");
 
-			$rtl_sfx = !\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl() ? '' : '_rtl';
+			$rtl_sfx = !\Joomla\CMS\Factory::getLanguage()->isRtl() ? '' : '_rtl';
 			$fc_css = \Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x' . $rtl_sfx . '.css' : 'j3x' . $rtl_sfx . '.css');
 			echo '
 			<link rel="stylesheet" href="' . \Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/css/flexicontentbackend.css?' . FLEXI_VHASH . '" />
@@ -422,7 +421,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	{
 		// Need to recheck post-installation / integrity tasks after,
 		// this should NOT effect RAW HTTP requests, used by AJAX ITEM binding
-		// \Joomla\CMS\Factory::getApplication()->getSession()->set('flexicontent.recheck_aftersave', true);
+		// \Joomla\CMS\Factory::getSession()->set('flexicontent.recheck_aftersave', true);
 
 		$bind_limit = $this->input->getInt('bind_limit', 25000);
 
@@ -486,8 +485,8 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$indexer     = $this->input->getCmd('indexer', 'tag_assignments');
 		$rebuildmode = $this->input->getCmd('rebuildmode', '');
 
-		$session = \Joomla\CMS\Factory::getApplication()->getSession();
-		$db      = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$session = \Joomla\CMS\Factory::getSession();
+		$db      = \Joomla\CMS\Factory::getDbo();
 		$app     = \Joomla\CMS\Factory::getApplication();
 
 		// Get records model to call needed methods
@@ -499,7 +498,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		if ($indexer === 'tag_assignments')
 		{
-			$log_filename = 'tag_assignments_' . \Joomla\CMS\Factory::getApplication()->getIdentity()->id . '.php';
+			$log_filename = 'tag_assignments_' . \Joomla\CMS\Factory::getUser()->id . '.php';
 			$log_category = 'com_flexicontent.items.tag_assignments_indexer';
 
 			// Get ids of records to process
@@ -511,7 +510,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		elseif ($indexer === 'resave')
 		{
-			$log_filename = 'resave_' . \Joomla\CMS\Factory::getApplication()->getIdentity()->id . '.php';
+			$log_filename = 'resave_' . \Joomla\CMS\Factory::getUser()->id . '.php';
 			$log_category = 'com_flexicontent.items.resave_indexer';
 
 			// Get ids of records to process
@@ -526,7 +525,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		}
 
 		// Get full logfile path
-		$log_filename_full = \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getApplication()->getConfig()->get('log_path') . DS . $log_filename);
+		$log_filename_full = \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getConfig()->get('log_path') . DS . $log_filename);
 
 		// Clear previous log file
 		if (file_exists($log_filename_full))
@@ -579,8 +578,8 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		$start_microtime = microtime(true);
 
-		$session = \Joomla\CMS\Factory::getApplication()->getSession();
-		$db      = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$session = \Joomla\CMS\Factory::getSession();
+		$db      = \Joomla\CMS\Factory::getDbo();
 		$app     = \Joomla\CMS\Factory::getApplication();
 
 		$has_zlib      = function_exists("zlib_encode"); // Version_compare(PHP_VERSION, '5.4.0', '>=');

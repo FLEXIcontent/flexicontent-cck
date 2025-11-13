@@ -113,7 +113,7 @@ class JFormFieldCategorytree extends JFormFieldList
 	{
 		global $globalcats;
 		$jinput = \Joomla\CMS\Factory::getApplication()->input;
-		$user   = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user   = \Joomla\CMS\Factory::getUser();
 		$cid    = $jinput->getInt('cid', 0);
 
 		$usercats = array();

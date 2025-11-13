@@ -8,7 +8,7 @@
  */
 
 // Check to ensure this file is within the rest of the framework
-defined('_JEXEC') or die;
+defined('JPATH_PLATFORM') or die;
 jimport('joomla.event.dispatcher');
 
 

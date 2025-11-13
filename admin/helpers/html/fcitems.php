@@ -10,7 +10,7 @@
  */
 
 use Joomla\Component\Content\Site\Helper\RouteHelper as ContentRouteHelper;
-use Joomla\Database\DatabaseInterface;
+
 defined('_JEXEC') or die;
 
 require_once('fcbase.php');
@@ -72,10 +72,10 @@ abstract class JHtmlFcitems extends JHtmlFcbase
 
 		if ($tz === null)
 		{
-			$nullDate = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class)->getNullDate();
+			$nullDate = \Joomla\CMS\Factory::getDbo()->getNullDate();
 			$nowDate = \Joomla\CMS\Factory::getDate()->toUnix();
 
-			$tz = \Joomla\CMS\Factory::getApplication()->getIdentity()->getTimezone();
+			$tz = \Joomla\CMS\Factory::getUser()->getTimezone();
 		}
 
 		// Check publication START/FINISH dates on if item has state: publised / in-progress / archived

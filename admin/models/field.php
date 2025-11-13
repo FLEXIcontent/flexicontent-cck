@@ -237,9 +237,9 @@ class FlexicontentModelField extends FCModelAdmin
 		/**
 		 * Try to load plugin file: /plugins/folder/element/element.xml
 		 */
-		$plugin_path = \Joomla\Filesystem\Path::clean(JPATH_PLUGINS . DS . 'flexicontent_fields' . DS . $plugin_name . DS . $plugin_name . '.xml');
+		$plugin_path = \Joomla\CMS\Filesystem\Path::clean(JPATH_PLUGINS . DS . 'flexicontent_fields' . DS . $plugin_name . DS . $plugin_name . '.xml');
 
-		if (!\Joomla\Filesystem\File::exists($plugin_path))
+		if (!\Joomla\CMS\Filesystem\File::exists($plugin_path))
 		{
 			throw new Exception('Error field XML file for field type: - ' . $plugin_name . '- was not found');
 		}
@@ -355,7 +355,7 @@ class FlexicontentModelField extends FCModelAdmin
 		}
 
 		$record  = $record ?: $this->_record;
-		$user    = $user ?: \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user    = $user ?: \Joomla\CMS\Factory::getUser();
 
 		return !$record || !$record->id
 			? $this->canCreate
@@ -378,7 +378,7 @@ class FlexicontentModelField extends FCModelAdmin
 		}
 
 		$record  = $record ?: $this->_record;
-		$user    = $user ?: \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user    = $user ?: \Joomla\CMS\Factory::getUser();
 
 		return $record->id < 7
 			?	false
@@ -396,7 +396,7 @@ class FlexicontentModelField extends FCModelAdmin
 	public function canDelete($record = null)
 	{
 		$record  = $record ?: $this->_record;
-		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user    = \Joomla\CMS\Factory::getUser();
 
 		return $record->id < 7
 			?	false

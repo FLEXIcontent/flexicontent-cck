@@ -57,8 +57,8 @@ class FlexicontentViewBaseRecord extends \Joomla\CMS\MVC\View\HtmlView
 		 */
 		if (!empty($this->proxy_option))
 		{
-			\Joomla\CMS\Factory::getApplication()->getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
-			\Joomla\CMS\Factory::getApplication()->getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
+			\Joomla\CMS\Factory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, 'en-GB', true);
+			\Joomla\CMS\Factory::getLanguage()->load($this->proxy_option, JPATH_ADMINISTRATOR, null, true);
 		}
 
 		/**
@@ -68,12 +68,12 @@ class FlexicontentViewBaseRecord extends \Joomla\CMS\MVC\View\HtmlView
 		if (!$isAdmin)
 		{
 			// Load english language file for 'com_content' component then override with current language file
-			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_content', JPATH_ADMINISTRATOR, 'en-GB', true);
-			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_content', JPATH_ADMINISTRATOR, null, true);
+			\Joomla\CMS\Factory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR, 'en-GB', true);
+			\Joomla\CMS\Factory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR, null, true);
 
 			// Load english language file for 'com_flexicontent' component then override with current language file
-			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
-			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 
 			// Frontend form layout is named 'form' instead of 'default', 'default' in frontend is typically used for viewing would be used for
 			$this->setLayout('form');

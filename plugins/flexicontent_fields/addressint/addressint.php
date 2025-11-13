@@ -50,7 +50,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 
 
 		// Initialize framework objects and other variables
-		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
+		$document = \Joomla\CMS\Factory::getDocument();
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
 
 		$tooltip_class = 'hasTooltip';
@@ -246,7 +246,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 				$custom_marker_default = 'https://unpkg.com/leaflet@1.5.1/dist/images/marker-icon.png';
 			}
 
-			$imgs = \Joomla\Filesystem\Folder::files($custom_marker_path_abs);
+			$imgs = \Joomla\CMS\Filesystem\Folder::files($custom_marker_path_abs);
 
 			if ($imgs)
 			{
@@ -976,7 +976,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			$initialized = 1;
 
 			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getApplication()->getDocument();
+			$document  = \Joomla\CMS\Factory::getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');

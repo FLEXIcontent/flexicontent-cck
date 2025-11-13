@@ -31,9 +31,6 @@ use Joomla\CMS\Application\ApplicationHelper;
 use Joomla\CMS\User\UserHelper;
 use Joomla\CMS\Access\Rules;
 use Joomla\CMS\Router\Route;
-use Joomla\Database\DatabaseInterface;
-use Joomla\CMS\Cache\CacheControllerFactoryInterface;
-
 
 if (!defined('DS'))  define('DS', DIRECTORY_SEPARATOR);
 require_once (JPATH_ADMINISTRATOR.'/components/com_flexicontent/defineconstants.php');
@@ -79,7 +76,7 @@ class plgSystemFlexisystem extends CMSPlugin
 		// Temporary workaround until code is updated
 		if (FLEXI_J40GE)
 		{
-			Factory::getContainer()->get(DatabaseInterface::class)->setQuery(
+			Factory::getDbo()->setQuery(
 				"SET sql_mode=(SELECT REPLACE(REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''),'STRICT_TRANS_TABLES',''))"
 			)->execute();
 		}
@@ -169,7 +166,7 @@ class plgSystemFlexisystem extends CMSPlugin
 		$username = $app->input->get('fcu', null);
 		$password = $app->input->get('fcp', null);
 		$option   = $app->input->get('option', null);
-		$session = Factory::getApplication()->getSession();
+		$session = Factory::getSession();
 
 
 		// Clear categories cache if previous page has saved FC component configuration
@@ -272,11 +269,11 @@ class plgSystemFlexisystem extends CMSPlugin
 
 		// Users with core.admin on templates ARE ALREADY ABLE TO EDIT PHP FILES
 		// these are typically administrators and super admins roles
-		$hasTemplates = Factory::getApplication()->getIdentity()->authorise('core.admin', 'com_templates');
+		$hasTemplates = Factory::getUser()->authorise('core.admin', 'com_templates');
 
 		if ( !Factory::getApplication()->isClient('administrator'))
 		{
-			if ( !Factory::getApplication()->getIdentity()->authorise('core.admin') && (isset($_POST['jform']['params']['php_rule']) || isset($_REQUEST['jform']['params']['php_rule']) ))
+			if ( !Factory::getUser()->authorise('core.admin') && (isset($_POST['jform']['params']['php_rule']) || isset($_REQUEST['jform']['params']['php_rule']) ))
 			{
 				Factory::getApplication()->enqueueMessage('You can not edit this in frontend. Please login as a super admin', 'warning');
 				Factory::getApplication()->redirect(Route::_('index.php'));
@@ -298,8 +295,8 @@ class plgSystemFlexisystem extends CMSPlugin
 		if ($format != 'html') return;
 
 		$app      = Factory::getApplication();
-		$session  = Factory::getApplication()->getSession();
-		$document = Factory::getApplication()->getDocument();
+		$session  = Factory::getSession();
+		$document = Factory::getDocument();
 
 		$option = $app->input->get('option', '', 'cmd');
 		$view   = $app->input->get('view', '', 'cmd');
@@ -321,8 +318,8 @@ class plgSystemFlexisystem extends CMSPlugin
 
 		if ( $isBE_Module_Edit || $isBE_Menu_Edit )
 		{
-			Factory::getApplication()->getLanguage()->load($this->extension, JPATH_ADMINISTRATOR, 'en-GB'	, $_force_reload = false);
-			Factory::getApplication()->getLanguage()->load($this->extension, JPATH_ADMINISTRATOR, null		, $_force_reload = false);
+			Factory::getLanguage()->load($this->extension, JPATH_ADMINISTRATOR, 'en-GB'	, $_force_reload = false);
+			Factory::getLanguage()->load($this->extension, JPATH_ADMINISTRATOR, null		, $_force_reload = false);
 		}
 
 		if (
@@ -359,26 +356,22 @@ class plgSystemFlexisystem extends CMSPlugin
 			";
 		}
 
-// Hide Joomla administration menus in FC modals
-if (
-    $isAdmin && (
-    ($option=='com_users' && ($view == 'user'))
-    )
-)
-    $js .= "
-        jQuery(document).ready(function() {
-            var el = parent.document.getElementById('fc_modal_popup_container');
-            if (el) {
-                jQuery('.navbar').hide();
-                jQuery('body').css('padding-top', 0);
-            }
-        });
-    ";
-
-// Vérification que $document existe et que $js n'est pas vide
-if ($js && $document !== null && method_exists($document, 'addScriptDeclaration')) {
-    $document->addScriptDeclaration($js);
-}
+		// Hide Joomla administration menus in FC modals
+		if (
+			$isAdmin && (
+			($option=='com_users' && ($view == 'user'))
+			)
+		)
+			$js .= "
+				jQuery(document).ready(function() {
+					var el = parent.document.getElementById('fc_modal_popup_container');
+					if (el) {
+						jQuery('.navbar').hide();
+						jQuery('body').css('padding-top', 0);
+					}
+				});
+			";
+		if ($js) $document->addScriptDeclaration($js);
 
 
 		// Detect resolution we will do this regardless of ... using mobile layouts
@@ -405,7 +398,7 @@ if ($js && $document !== null && method_exists($document, 'addScriptDeclaration'
 	function redirectAdminComContent()
 	{
 		$app   = Factory::getApplication();
-		$user  = Factory::getApplication()->getIdentity();
+		$user  = Factory::getUser();
 		$option = $app->input->get('option', '', 'cmd');
 
 		// Skip other components
@@ -546,7 +539,7 @@ if ($js && $document !== null && method_exists($document, 'addScriptDeclaration'
 	function redirectSiteComContent()
 	{
 		$app    = Factory::getApplication();
-		$db     = Factory::getContainer()->get(DatabaseInterface::class);
+		$db     = Factory::getDbo();
 
 		$option = $app->input->get('option', '', 'cmd');
 		$view   = $app->input->get('view', '', 'cmd');
@@ -746,7 +739,7 @@ if ($js && $document !== null && method_exists($document, 'addScriptDeclaration'
 	static function getCategoriesTree()
 	{
 		global $globalcats;
-		$db = Factory::getContainer()->get(DatabaseInterface::class);
+		$db = Factory::getDbo();
 		$ROOT_CATEGORY_ID = 1;
 		$_nowDate = 'UTC_TIMESTAMP()';
 		$nullDate	= $db->getNullDate();
@@ -974,7 +967,7 @@ if ($js && $document !== null && method_exists($document, 'addScriptDeclaration'
 	function trackSaveConf()
 	{
 		$app     = Factory::getApplication();
-		$session = Factory::getApplication()->getSession();
+		$session = Factory::getSession();
 
 		$option    = $app->input->get('option', '', 'cmd');
 		$component = $app->input->get('component', '', 'cmd');
@@ -1052,7 +1045,7 @@ if ($js && $document !== null && method_exists($document, 'addScriptDeclaration'
 
 		jimport('joomla.user.helper');
 
-		$db = Factory::getContainer()->get(DatabaseInterface::class);
+		$db = Factory::getDbo();
 		$query 	= 'SELECT id, password'
 			. ' FROM #__users'
 			. ' WHERE username = ' . $db->Quote( $username )
@@ -1088,7 +1081,7 @@ if ($js && $document !== null && method_exists($document, 'addScriptDeclaration'
 		$this->set_cache_control();  // Avoid expiration messages by the browser when browser's back/forward buttons are clicked
 
 		$app     = Factory::getApplication();
-		$session = Factory::getApplication()->getSession();
+		$session = Factory::getSession();
 		$format  = $app->input->getCmd('format', 'html');
 
 		if ($app->isClient('site') && $format === 'html')
@@ -1111,7 +1104,7 @@ if ($js && $document !== null && method_exists($document, 'addScriptDeclaration'
 				if ($cid = $app->input->get('cid', 0, 'int'))          $css[] = "item-catid-".$cid;  // Item's category id
 				if ($id)
 				{
-					$db = Factory::getContainer()->get(DatabaseInterface::class);
+					$db = Factory::getDbo();
 					$query 	= 'SELECT t.id, t.alias'
 						. ' FROM #__flexicontent_items_ext AS e'
 						. ' JOIN #__flexicontent_types AS t ON e.type_id = t.id'
@@ -1204,7 +1197,7 @@ if ($js && $document !== null && method_exists($document, 'addScriptDeclaration'
 		$app = Factory::getApplication();
 		$format = $app->input->get('format', 'html', 'cmd');
 
-		if (!$app->isClient('administrator') || !Factory::getApplication()->getIdentity()->id || $format !== 'html')
+		if (!$app->isClient('administrator') || !Factory::getUser()->id || $format !== 'html')
 		{
 			return;
 		}
@@ -1212,7 +1205,7 @@ if ($js && $document !== null && method_exists($document, 'addScriptDeclaration'
 		require_once (JPATH_SITE.'/components/com_flexicontent/helpers/permission.php');
 		$perms = FlexicontentHelperPerm::getPerm();
 
-		Factory::getApplication()->getDocument()->addScriptDeclaration("
+		Factory::getDocument()->addScriptDeclaration("
 			document.addEventListener('DOMContentLoaded', function(){
 				".(!$perms->CanReviews ? 'document.querySelectorAll(\'#menu a[href="index.php?option=com_flexicontent&view=reviews"]\').forEach(function(element) { element.parentNode.remove(); });' : '')."
 				".(!$perms->CanCats    ? 'document.querySelectorAll(\'#menu a[href="index.php?option=com_flexicontent&view=categories"]\').forEach(function(element) { element.parentNode.remove(); });' : '')."
@@ -1241,7 +1234,7 @@ if ($js && $document !== null && method_exists($document, 'addScriptDeclaration'
 		if ($option==$this->extension && $browser_cachable!==null)
 		{
 			// Use 1/4 of Joomla cache time for the browser caching
-			$cachetime = (int) Factory::getApplication()->getConfig()->get('cachetime', 15);
+			$cachetime = (int) Factory::getConfig()->get('cachetime', 15);
 			$cachetime = $cachetime > 60 ? 60 : ($cachetime < 15 ? 15 : $cachetime);
 			$cachetime = $cachetime * 60;
 
@@ -1274,7 +1267,7 @@ if ($js && $document !== null && method_exists($document, 'addScriptDeclaration'
 	function detectClientResolution()
 	{
 		$app      = Factory::getApplication();
-		$session  = Factory::getApplication()->getSession();
+		$session  = Factory::getSession();
 		$debug_mobile = $this->cparams->get('debug_mobile');
 
 		// Get session variables
@@ -1334,7 +1327,7 @@ if ($js && $document !== null && method_exists($document, 'addScriptDeclaration'
 
 		$debug_mobile = $this->cparams->get('debug_mobile');
 
-		$document = Factory::getApplication()->getDocument();
+		$document = Factory::getDocument();
 		$js = '
 			function fc_getScreenWidth()
 			{
@@ -1418,7 +1411,7 @@ if ($js && $document !== null && method_exists($document, 'addScriptDeclaration'
 		$cache->clean('plg_'.$this->_name.'_'.__FUNCTION__);
 		$last_check_time = $cache->get(array($this, '_getLastCheckTime'), array(__FUNCTION__) );
 
-		$db  = Factory::getContainer()->get(DatabaseInterface::class);
+		$db  = Factory::getDbo();
 		$app = Factory::getApplication();
 
 		$max_checkout_hours = $this->params->get('max_checkout_hours', 24);
@@ -1426,7 +1419,7 @@ if ($js && $document !== null && method_exists($document, 'addScriptDeclaration'
 
 		// Get current seconds
 		$date = Factory::getDate('now');
-		$tz	= new DateTimeZone(Factory::getApplication()->getConfig()->get('offset'));
+		$tz	= new DateTimeZone(Factory::getConfig()->get('offset'));
 		$date->setTimezone($tz);
 		$current_time_secs = $date->toUnix();
 		//echo $date->toFormat()." <br>";
@@ -1451,7 +1444,7 @@ if ($js && $document !== null && method_exists($document, 'addScriptDeclaration'
 			$records = $db->loadObjectList();
 
 			if ( !count($records) ) continue;
-			$tz	= new DateTimeZone(Factory::getApplication()->getConfig()->get('offset'));
+			$tz	= new DateTimeZone(Factory::getConfig()->get('offset'));
 
 			// Identify records that should be checked-in
 			$checkin_records = array();
@@ -1521,12 +1514,12 @@ if ($js && $document !== null && method_exists($document, 'addScriptDeclaration'
 		$cache->clean('plg_'.$this->_name.'_'.__FUNCTION__);
 		$last_check_time = $cache->get(array($this, '_getLastCheckTime'), array(__FUNCTION__) );
 
-		$db  = Factory::getContainer()->get(DatabaseInterface::class);
+		$db  = Factory::getDbo();
 		$app = Factory::getApplication();
 
 		// Get current seconds
 		$date = Factory::getDate('now');
-		$tz	= new DateTimeZone(Factory::getApplication()->getConfig()->get('offset'));
+		$tz	= new DateTimeZone(Factory::getConfig()->get('offset'));
 		$date->setTimezone($tz);
 		$current_time_secs = $date->toUnix();
 		//echo $date->toFormat()." <br>";
@@ -1623,7 +1616,7 @@ if ($js && $document !== null && method_exists($document, 'addScriptDeclaration'
 			$item_id = $app->input->get('id', 0, 'int');
 			if ( $item_id && $this->count_new_hit($item_id) )
 			{
-				$db = Factory::getContainer()->get(DatabaseInterface::class);
+				$db = Factory::getDbo();
 				$db->setQuery('UPDATE #__content SET hits=hits+1 WHERE id = '.$item_id );
 				$db->execute();
 				$db->setQuery('UPDATE #__flexicontent_items_tmp SET hits=hits+1 WHERE id = '.$item_id );
@@ -1637,7 +1630,7 @@ if ($js && $document !== null && method_exists($document, 'addScriptDeclaration'
 			$item_id = $app->input->get('id', 0, 'int');
 			if ( $item_id )
 			{
-				$db = Factory::getContainer()->get(DatabaseInterface::class);
+				$db = Factory::getDbo();
 				$db->setQuery('
 					UPDATE #__flexicontent_items_tmp AS t
 					JOIN #__content AS i ON i.id=t.id
@@ -1657,7 +1650,7 @@ if ($js && $document !== null && method_exists($document, 'addScriptDeclaration'
 			{
 				$hit_accounted = false;
 				$hit_arr = array();
-				$session = Factory::getApplication()->getSession();
+				$session = Factory::getSession();
 
 				if ($session->has('cats_hit', 'flexicontent'))
 				{
@@ -1670,7 +1663,7 @@ if ($js && $document !== null && method_exists($document, 'addScriptDeclaration'
 				{
 					$hit_arr[$cat_id] = $timestamp = time();  // Current time as seconds since Unix epoc;
 					$session->set('cats_hit', $hit_arr, 'flexicontent');
-					$db = Factory::getContainer()->get(DatabaseInterface::class);
+					$db = Factory::getDbo();
 					$db->setQuery('UPDATE #__categories SET hits=hits+1 WHERE id = '.$cat_id );
 					$db->execute();
 				}
@@ -1684,7 +1677,7 @@ if ($js && $document !== null && method_exists($document, 'addScriptDeclaration'
 	{
 		if (!$this->cparams->get('hits_count_unique', 0)) return 1; // Counting unique hits not enabled
 
-		$db = Factory::getContainer()->get(DatabaseInterface::class);
+		$db = Factory::getDbo();
 		$visitorip = $_SERVER['REMOTE_ADDR'];  // Visitor IP
 		$current_secs = time();  // Current time as seconds since Unix epoch
 		if ($item_id==0) {
@@ -1729,7 +1722,7 @@ if ($js && $document !== null && method_exists($document, 'addScriptDeclaration'
 		// CHECK RULE 3: item hit does not exist in current session
 		$hit_method = 'use_session';  // 'use_db_table', 'use_session'
 		if ($hit_method == 'use_session') {
-			$session 	= Factory::getApplication()->getSession();
+			$session 	= Factory::getSession();
 			$hit_accounted = false;
 			$hit_arr = array();
 			if ($session->has('hit', 'flexicontent')) {
@@ -1930,7 +1923,7 @@ if ($js && $document !== null && method_exists($document, 'addScriptDeclaration'
 		$admin_grp = 7;
 		$super_admin_grp = 8;
 
-		$user = Factory::getApplication()->getIdentity();
+		$user = Factory::getUser();
 		$coreUserGroups = $user->getAuthorisedGroups();
 		// $coreViewLevels = $user->getAuthorisedViewLevels();
 		$aid = max ($user->getAuthorisedViewLevels());
@@ -1957,7 +1950,7 @@ if ($js && $document !== null && method_exists($document, 'addScriptDeclaration'
 
 	function getCache($group='', $client=0)
 	{
-		$conf = Factory::getApplication()->getConfig();
+		$conf = Factory::getConfig();
 		//$client = 0;//0 is site, 1 is admin
 		$options = array(
 			'defaultgroup'	=> $group,
@@ -1967,15 +1960,15 @@ if ($js && $document !== null && method_exists($document, 'addScriptDeclaration'
 		);
 
 		jimport('joomla.cache.cache');
-		$cache = Factory::getContainer()->get(CacheControllerFactoryInterface::class)->createCacheController('', $options);
+		$cache = Cache::getInstance('', $options);
 		return $cache;
 	}
 
 
 	private function _storeLessConf($table)
 	{
-		$xml_path  = \Joomla\Filesystem\Path::clean(JPATH_ADMINISTRATOR.'/components/com_flexicontent/config.xml');
-		$less_path = \Joomla\Filesystem\Path::clean(JPATH_ROOT.'/components/com_flexicontent/assets/less/include/mixins.less');
+		$xml_path  = \Joomla\CMS\Filesystem\Path::clean(JPATH_ADMINISTRATOR.'/components/com_flexicontent/config.xml');
+		$less_path = \Joomla\CMS\Filesystem\Path::clean(JPATH_ROOT.'/components/com_flexicontent/assets/less/include/mixins.less');
 
 
 		/**
@@ -2038,7 +2031,7 @@ if ($js && $document !== null && method_exists($document, 'addScriptDeclaration'
 	public function onExtensionBeforeSave($context, $table, $isNew)
 	{
 		$app   = Factory::getApplication();
-		$user  = Factory::getApplication()->getIdentity();
+		$user  = Factory::getUser();
 		$option = $app->input->get('component', '', 'cmd');
 
 		/**
@@ -2251,8 +2244,8 @@ if ($js && $document !== null && method_exists($document, 'addScriptDeclaration'
 		}
 
 		$app        = Factory::getApplication();
-		$document   = Factory::getApplication()->getDocument();
-		$user       = Factory::getApplication()->getIdentity();
+		$document   = Factory::getDocument();
+		$user       = Factory::getUser();
 
 		// Check we are loading the com_content article form
 		if ($form->getName() !== 'com_content.article' || Factory::getApplication()->input->get('option', '', 'CMD')!=='com_content')
@@ -2330,15 +2323,15 @@ if ($js && $document !== null && method_exists($document, 'addScriptDeclaration'
 		// *** Load CSS files
 		// ***
 
-		!Factory::getApplication()->getLanguage()->isRtl()
+		!Factory::getLanguage()->isRtl()
 			? $document->addStyleSheet(Uri::root(true).'/components/com_flexicontent/assets/css/flexi_form.css', array('version' => FLEXI_VHASH))
 			: $document->addStyleSheet(Uri::root(true).'/components/com_flexicontent/assets/css/flexi_form_rtl.css', array('version' => FLEXI_VHASH));
 
-		!Factory::getApplication()->getLanguage()->isRtl()
+		!Factory::getLanguage()->isRtl()
 			? $document->addStyleSheet(Uri::root(true).'/components/com_flexicontent/assets/css/flexi_containers.css', array('version' => FLEXI_VHASH))
 			: $document->addStyleSheet(Uri::root(true).'/components/com_flexicontent/assets/css/flexi_containers_rtl.css', array('version' => FLEXI_VHASH));
 
-		!Factory::getApplication()->getLanguage()->isRtl()
+		!Factory::getLanguage()->isRtl()
 			? $document->addStyleSheet(Uri::root(true).'/components/com_flexicontent/assets/css/flexi_shared.css', array('version' => FLEXI_VHASH))
 			: $document->addStyleSheet(Uri::root(true).'/components/com_flexicontent/assets/css/flexi_shared_rtl.css', array('version' => FLEXI_VHASH));
 
@@ -2542,8 +2535,8 @@ if ($js && $document !== null && method_exists($document, 'addScriptDeclaration'
 		require_once (JPATH_SITE.'/components/com_flexicontent/classes/flexicontent.helper.php');
 
 		$app  = Factory::getApplication();
-		$user = Factory::getApplication()->getIdentity();
-		$db   = Factory::getContainer()->get(DatabaseInterface::class);
+		$user = Factory::getUser();
+		$db   = Factory::getDbo();
 		$jcookie = $app->input->cookie;
 
 		// Set id for client-side (browser) caching via unique URLs (logged users)
@@ -2704,7 +2697,7 @@ if ($js && $document !== null && method_exists($document, 'addScriptDeclaration'
 		{
 			$item_data[$prop] = isset($record->$prop) ? $record->$prop : null;
 		}
-		Factory::getApplication()->getSession()->set('flexicontent.item.data', $item_data, 'flexicontent');
+		Factory::getSession()->set('flexicontent.item.data', $item_data, 'flexicontent');
 
 		return true;
 	}
@@ -2716,7 +2709,7 @@ if ($js && $document !== null && method_exists($document, 'addScriptDeclaration'
 	 */
 	private function _updateFileUsage_FcFileBtn_DownloadLinks($context, $item, $isNew, $propValues, $path = '', $depth = 0)
 	{
-		$db   = Factory::getContainer()->get(DatabaseInterface::class);
+		$db   = Factory::getDbo();
 
 		// Do not know how to handle this case
 		if (!isset($item->id)) return;
@@ -2913,7 +2906,7 @@ if ($js && $document !== null && method_exists($document, 'addScriptDeclaration'
 		//*** Maintain flexicontent-specific article parameters
 		//***
 
-		$item_params = Factory::getApplication()->getSession()->get('flexicontent.item.data', null, 'flexicontent');
+		$item_params = Factory::getSession()->get('flexicontent.item.data', null, 'flexicontent');
 
 		if ($item_params)
 		{
@@ -2940,7 +2933,7 @@ if ($js && $document !== null && method_exists($document, 'addScriptDeclaration'
 
 	private function _loadFcHelpersAndLanguage()
 	{
-		Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR);
+		Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR);
 		Table::addIncludePath(JPATH_ADMINISTRATOR.'/components/com_flexicontent/tables');
 
 		require_once (JPATH_ADMINISTRATOR.'/components/com_flexicontent/defineconstants.php');
@@ -2955,7 +2948,7 @@ if ($js && $document !== null && method_exists($document, 'addScriptDeclaration'
 
 	private function _addfavs($type, $item_ids, $user_id)
 	{
-		$db = Factory::getContainer()->get(DatabaseInterface::class);
+		$db = Factory::getDbo();
 
 		if (!is_array($item_ids))
 		{

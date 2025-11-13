@@ -14,7 +14,6 @@ use Joomla\CMS\Language\Associations;
 use Joomla\CMS\Language\LanguageHelper;
 use Joomla\CMS\Language\Multilanguage;
 use Joomla\Component\Categories\Administrator\Helper\CategoryAssociationHelper as J4_CategoryAssociationHelper;
-use Joomla\Database\DatabaseInterface;
 
 JLoader::register('FlexicontentHelperRoute', JPATH_SITE . '/components/com_flexicontent/helpers/route.php');
 \Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
@@ -153,7 +152,7 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 			return array();
 		}
 
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 		$query = 'SELECT i.language, ie.type_id, i.id, i.catid, '
 			. '  CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(":", i.id, i.alias) ELSE i.id END as title_slug, '
 			. '  CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(":", c.id, c.alias) ELSE c.id END as cat_slug '
@@ -178,7 +177,7 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 			return array();
 		}
 
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 		if (!FLEXI_FALANG) return array();
 
 		$query  =
@@ -219,7 +218,7 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 			return array();
 		}
 
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 		$query = 'SELECT c.language, c.id, '
 			. '  CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(":", c.id, c.alias) ELSE c.id END as title_slug '
 			. ' FROM #__associations AS a'
@@ -306,7 +305,7 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 	 */
 	private static function _getItemCatSlug($record, $menu)
 	{
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 
 		$moption = isset($menu->query['option']) ? $menu->query['option'] : '';
 		$mview   = isset($menu->query['view']) ? $menu->query['view'] : '';

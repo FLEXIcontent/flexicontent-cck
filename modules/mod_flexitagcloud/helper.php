@@ -18,7 +18,6 @@
 
 // no direct access
 defined('_JEXEC') or die('Restricted access');
-use Joomla\Database\DatabaseInterface;
 
 class modFlexiTagCloudHelper
 {
@@ -26,8 +25,8 @@ class modFlexiTagCloudHelper
 	{
 		// Initialize
 		$app  = \Joomla\CMS\Factory::getApplication();
-		$db   = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
-		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$db   = \Joomla\CMS\Factory::getDbo();
+		$user = \Joomla\CMS\Factory::getUser();
 		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
 
 		//$now    = FLEXI_J16GE ? \Joomla\CMS\Factory::getDate()->toSql() : \Joomla\CMS\Factory::getDate()->toMySQL();

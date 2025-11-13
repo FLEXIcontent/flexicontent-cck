@@ -89,7 +89,7 @@ if ($ff_placement)
 	echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endSlide');
 	echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endAccordion');
 	
-	\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration("
+	\Joomla\CMS\Factory::getDocument()->addScriptDeclaration("
 	(function($) {
 		$(document).ready(function ()
 		{

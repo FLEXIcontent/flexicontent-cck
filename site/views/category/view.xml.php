@@ -38,7 +38,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 	 */
 	function display( $tpl = null )
 	{
-		$doc = \Joomla\CMS\Factory::getApplication()->getDocument();
+		$doc = \Joomla\CMS\Factory::getDocument();
 		$doc->setMimeEncoding('application/xml'); 
 		$domain = $_SERVER['HTTP_HOST'];
 		$dm = new DOMDocument('1.0', 'UTF-8');

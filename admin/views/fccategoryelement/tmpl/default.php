@@ -17,10 +17,10 @@ use Joomla\String\StringHelper;
 global $globalcats;
 $app      = \Joomla\CMS\Factory::getApplication();
 $jinput   = $app->input;
-$config   = \Joomla\CMS\Factory::getApplication()->getConfig();
-$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
-$session  = \Joomla\CMS\Factory::getApplication()->getSession();
-$document = \Joomla\CMS\Factory::getApplication()->getDocument();
+$config   = \Joomla\CMS\Factory::getConfig();
+$user     = \Joomla\CMS\Factory::getUser();
+$session  = \Joomla\CMS\Factory::getSession();
+$document = \Joomla\CMS\Factory::getDocument();
 $cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 $ctrl     = 'categories.';
 $hlpname  = 'fccategoryelement';
@@ -35,7 +35,7 @@ $onclick  = $this->escape($function);
 if (!empty($editor))
 {
 	// This view is used also in com_menus. Load the xtd script only if the editor is set!
-	\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptOptions('xtd-fccats', array('editor' => $editor));
+	\Joomla\CMS\Factory::getDocument()->addScriptOptions('xtd-fccats', array('editor' => $editor));
 	$onclick = "jSelectFccategory";
 }
 

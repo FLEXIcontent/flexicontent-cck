@@ -19,7 +19,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 $params = $this->cparams;
-$document	= \Joomla\CMS\Factory::getApplication()->getDocument();
+$document	= \Joomla\CMS\Factory::getDocument();
 
 // For tabsets/tabs ids (focusing, etc)
 $tabSetCnt = -1;
@@ -138,7 +138,7 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 					'flexicontent_fields'=>'Fields', 'flexicontent_types'=>'Types', 'flexicontent_templates'=>'Templates',
 					'categories'=>'Categories', 'usergroups'=> 'User groups', 'assets'=>'Assets'
 				);
-				$session  = \Joomla\CMS\Factory::getApplication()->getSession();
+				$session  = \Joomla\CMS\Factory::getSession();
 				$export_conf = $session->get('appsman_export', array(), 'flexicontent');
 				?>
 				

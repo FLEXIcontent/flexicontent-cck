@@ -11,7 +11,7 @@ static $allow_guests_favs, $users_counter;  // Favourites field configuration
 static $js_and_css_added = false;
 if (!$js_and_css_added)
 {
-	$document = \Joomla\CMS\Factory::getApplication()->getDocument();
+	$document = \Joomla\CMS\Factory::getDocument();
 	$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 	$use_font = $cparams->get('use_font_icons', 1);
 
@@ -56,8 +56,8 @@ if (!$js_and_css_added)
 	$allow_guests_favs = (int) $favs_field->parameters->get('allow_guests_favs', 1);
 	$users_counter     = (int) $favs_field->parameters->get('display_favoured_usercount', 0);
 
-	$text 		= \Joomla\CMS\Factory::getApplication()->getIdentity()->id || $allow_guests_favs ? 'FLEXI_ADDREMOVE_FAVOURITE' : 'FLEXI_FAVOURE';
-	$overlib 	= \Joomla\CMS\Factory::getApplication()->getIdentity()->id || $allow_guests_favs ? 'FLEXI_ADDREMOVE_FAVOURITE_TIP' : 'FLEXI_FAVOURE_LOGIN_TIP';
+	$text 		= \Joomla\CMS\Factory::getUser()->id || $allow_guests_favs ? 'FLEXI_ADDREMOVE_FAVOURITE' : 'FLEXI_FAVOURE';
+	$overlib 	= \Joomla\CMS\Factory::getUser()->id || $allow_guests_favs ? 'FLEXI_ADDREMOVE_FAVOURITE_TIP' : 'FLEXI_FAVOURE_LOGIN_TIP';
 	$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 1, 1);
 
 	// Load JS / CSS
@@ -97,7 +97,7 @@ if (!$js_and_css_added)
 $icon_class = 'fcfavs-icon_box';
 
 // Favs for guests disabled
-if (!\Joomla\CMS\Factory::getApplication()->getIdentity()->id && !$allow_guests_favs)
+if (!\Joomla\CMS\Factory::getUser()->id && !$allow_guests_favs)
 {
 	echo '
 		<span class="' . $icon_class . '">

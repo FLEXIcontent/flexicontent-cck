@@ -258,7 +258,7 @@ class FlexicontentModelTag extends FCModelAdmin
 		}
 
 		$record  = $record ?: $this->_record;
-		$user    = $user ?: \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user    = $user ?: \Joomla\CMS\Factory::getUser();
 
 		return !$record || !$record->id
 			? $this->canCreate
@@ -281,7 +281,7 @@ class FlexicontentModelTag extends FCModelAdmin
 		}
 
 		$record  = $record ?: $this->_record;
-		$user    = $user ?: \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user    = $user ?: \Joomla\CMS\Factory::getUser();
 
 		return $this->canManage;
 	}
@@ -297,7 +297,7 @@ class FlexicontentModelTag extends FCModelAdmin
 	public function canDelete($record = null)
 	{
 		$record  = $record ?: $this->_record;
-		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user    = \Joomla\CMS\Factory::getUser();
 
 		return $this->canManage;
 	}
