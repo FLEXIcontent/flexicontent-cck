@@ -4,6 +4,7 @@
 require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
+use Joomla\Database\DatabaseInterface;
 
 class FlexicontentHelperPerm
 {
@@ -23,7 +24,7 @@ class FlexicontentHelperPerm
 		static $permission = null;
 		if ($permission && !$force) return $permission;
 
-		$user_id = \Joomla\CMS\Factory::getUser()->id;
+		$user_id = \Joomla\CMS\Factory::getApplication()->getIdentity()->id;
 
 		// Return cached data
 		if ( FLEXI_CACHE ) {
@@ -58,7 +59,7 @@ class FlexicontentHelperPerm
 		$Komento_Installed = \Joomla\CMS\Plugin\PluginHelper::isEnabled('system', 'komento') && \Joomla\CMS\Plugin\PluginHelper::isEnabled('content', 'komento');
 
 		// Find permissions for given user id
-		$user = $user_id ? \Joomla\CMS\Factory::getUser($user_id) : \Joomla\CMS\Factory::getUser();  // no user id given, use current user)
+		$user = $user_id ? \Joomla\CMS\Factory::getUser($user_id) : \Joomla\CMS\Factory::getApplication()->getIdentity();  // no user id given, use current user)
 		$user_id = $user->id;
 		$permission = new stdClass;
 
@@ -211,7 +212,7 @@ class FlexicontentHelperPerm
 	static function getAllowedCats( &$user, $actions_allowed=array('core.create', 'core.edit', 'core.edit.own'), $require_all=true, $check_published = false, $specific_catids=false, $find_first = false )
 	{
 		// Return cached data
-		$user_id = $user ? $user->id : \Joomla\CMS\Factory::getUser()->id;
+		$user_id = $user ? $user->id : \Joomla\CMS\Factory::getApplication()->getIdentity()->id;
 		if (FLEXI_CACHE) {
 			$catscache = \Joomla\CMS\Factory::getCache('com_flexicontent_cats');  // Get desired cache group
 			$catscache->setCaching(1); 		              // Force cache ON
@@ -232,7 +233,7 @@ class FlexicontentHelperPerm
 	static function _getAllowedCats( $user_id, $actions_allowed, $require_all, $check_published, $specific_catids, $find_first)
 	{
 		global $globalcats;
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$usercats = array();
 
 		// -- passing user_id parameter to this function allows to cache per user
@@ -319,7 +320,7 @@ class FlexicontentHelperPerm
 
 		if(!isset($elements[$uid][$section][$action]) || $force) {
 			// Get database and use objects
-			$db = \Joomla\CMS\Factory::getDbo();
+			$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 			$user = \Joomla\CMS\Factory::getUser($uid);
 
 			// Query the assets table to retrieve the asset names for the specified section
@@ -459,7 +460,7 @@ class FlexicontentHelperPerm
 	static function getPermAny($action = null, $user_id = null, $assetname='com_flexicontent')
 	{
 		// Find permissions for given user id
-		$user = $user_id ? \Joomla\CMS\Factory::getUser($user_id) : \Joomla\CMS\Factory::getUser();  // no user id given, use current user)
+		$user = $user_id ? \Joomla\CMS\Factory::getUser($user_id) : \Joomla\CMS\Factory::getApplication()->getIdentity();  // no user id given, use current user)
 		$user_id = $user->id;
 
 		// Return already calculated data

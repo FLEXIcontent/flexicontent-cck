@@ -22,6 +22,7 @@ defined('_JEXEC') or die('Restricted access');
 jimport('cms.html.html');      // JHtml
 jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
 jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
+use Joomla\CMS\Factory;
 
 //jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 //\Joomla\CMS\Form\FormHelper::loadFieldClass('...');   // \Joomla\CMS\Form\FormField...
@@ -126,7 +127,7 @@ class JFormFieldFlexicategories extends \Joomla\CMS\Form\FormField
 				document.getElementById(\'a_id_\' + name).value = value_list;
 			}';
 
-			\Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+			Factory::getApplication()->getDocument()->addScriptDeclaration($js);
 		}
 		
 		$html = '';

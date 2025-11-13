@@ -12,7 +12,7 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
-require_once JPATH_COMPONENT.'/helpers/debug.php';
+require_once JPATH_BASE . '/components/com_flexicontent/helpers/debug.php';
 
 /**
  * FLEXIcontent Component Debug User Model

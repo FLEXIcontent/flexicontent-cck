@@ -13,6 +13,7 @@ defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
+use Joomla\Database\DatabaseInterface;
 
 require_once('base/base.php');
 
@@ -225,7 +226,7 @@ class FlexicontentModelTemplate extends FCModelAdmin
 		}
 
 		$record = $record ?: $this->_record;
-		$user   = $user ?: \Joomla\CMS\Factory::getUser();
+		$user   = $user ?: \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		return $this->canManage;
 	}
@@ -246,7 +247,7 @@ class FlexicontentModelTemplate extends FCModelAdmin
 		}
 
 		$record = $record ?: $this->_record;
-		$user    = $user ?: \Joomla\CMS\Factory::getUser();
+		$user    = $user ?: \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		return $this->canManage;
 	}
@@ -262,7 +263,7 @@ class FlexicontentModelTemplate extends FCModelAdmin
 	public function canDelete($record = null)
 	{
 		$record = $record ?: $this->_record;
-		$user   = \Joomla\CMS\Factory::getUser();
+		$user   = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		return $this->canManage;
 	}
@@ -481,7 +482,7 @@ class FlexicontentModelTemplate extends FCModelAdmin
 	 */
 	function getFieldTypesList()
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 
 		$query = 'SELECT element AS type_name, REPLACE(name, "FLEXIcontent - ", "") AS field_name '
 		. ' FROM #__extensions'
@@ -647,8 +648,8 @@ class FlexicontentModelTemplate extends FCModelAdmin
 		$jform->load($this->_getLayout()->params);   // params is the XML file contents as a string
 
 		$layout_type = $layout=='items' ? 'item' : 'category';
-		$tmpldir = \Joomla\CMS\Filesystem\Path::clean(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates');
-		$less_path = \Joomla\CMS\Filesystem\Path::clean($tmpldir.DS.$folder.DS.'less/include/config_auto_'.$layout_type.'.less');
+		$tmpldir = \Joomla\Filesystem\Path::clean(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates');
+		$less_path = \Joomla\Filesystem\Path::clean($tmpldir.DS.$folder.DS.'less/include/config_auto_'.$layout_type.'.less');
 		//echo "<pre>".$less_path."<br/>";
 
 		$_FCLL = '@FC'. ($layout == 'items' ? 'I' : 'C').'_';

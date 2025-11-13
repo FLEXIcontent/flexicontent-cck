@@ -145,7 +145,7 @@ $item_placement_std = (int) $params->get($layout.'_item_placement', 0);
 $item_columns_std   = (int) $params->get('item_columns', 4);
 $cols_class_std     = $item_columns_std  <= 1 ? '' : 'cols_' . $item_columns_std;
 
-$document = \Joomla\CMS\Factory::getDocument();
+$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 $jcookie  = \Joomla\CMS\Factory::getApplication()->input->cookie;
 
 
@@ -594,7 +594,7 @@ if ($std_builder_layout_num)
 					? \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endTabSet')
 					: \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endAccordion');
 
-				\Joomla\CMS\Factory::getDocument()->addScriptDeclaration("
+				\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration("
 				(function($) {
 					$(document).ready(function ()
 					{
@@ -907,7 +907,7 @@ if ($std_builder_layout_num)
 					? \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endTabSet')
 					: \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endAccordion');
 
-				\Joomla\CMS\Factory::getDocument()->addScriptDeclaration("
+				\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration("
 				(function($) {
 					$(document).ready(function ()
 					{

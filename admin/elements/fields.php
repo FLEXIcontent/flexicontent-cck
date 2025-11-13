@@ -18,6 +18,8 @@
 
 // Check to ensure this file is included in Joomla!
 use Joomla\CMS\Language\Text;
+use Joomla\Database\DatabaseInterface;
+use Joomla\CMS\Factory;
 
 defined('_JEXEC') or die('Restricted access');
 
@@ -61,9 +63,9 @@ class JFormFieldFields extends \Joomla\CMS\Form\FormField
 			$js_css_added = true;
 		}
 
-		$app  = \Joomla\CMS\Factory::getApplication();
-		$doc	= \Joomla\CMS\Factory::getDocument();
-		$db		= \Joomla\CMS\Factory::getDbo();
+		$app  = Factory::getApplication();
+		$doc	= Factory::getApplication()->getDocument();
+		$db		= Factory::getContainer()->get(DatabaseInterface::class);
 		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 
 		$node = & $this->element;
@@ -351,7 +353,7 @@ class JFormFieldFields extends \Joomla\CMS\Form\FormField
 			<div class="fcclear"></div>';
 
 			$js = "";
-			if ($js) \Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+			if ($js) Factory::getApplication()->getDocument()->addScriptDeclaration($js);
 
 			$attribs .= ' class="use_select2_lib" ';
 			flexicontent_html::loadFramework('select2');

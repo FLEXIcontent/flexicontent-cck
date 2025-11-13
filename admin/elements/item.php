@@ -17,6 +17,7 @@ use Joomla\CMS\Table\Table;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Form\FormField;
 
+
 // Load the helper classes
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once(JPATH_ROOT.'/components/com_flexicontent/classes/flexicontent.helper.php');
@@ -147,7 +148,7 @@ class JFormFieldItem extends FormField
 				fc_field_dialog_handle_record.dialog('close');
 			}
 			";
-			Factory::getDocument()->addScriptDeclaration($js);
+			Factory::getApplication()->getDocument()->addScriptDeclaration($js);
 			flexicontent_html::loadFramework('flexi-lib');
 		}
 

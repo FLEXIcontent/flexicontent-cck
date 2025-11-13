@@ -140,7 +140,7 @@ if (!isset(static::$js_added[$field->id][__FILE__][$item->id]))
 	$carousel_speed        = (int) $field->parameters->get( $PPFX_ . 'carousel_speed', 600 );
 
 
-	\Joomla\CMS\Factory::getDocument()->addScriptDeclaration('
+	\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration('
 	jQuery(document).ready(function()
 	{
 		var elastislide_options_'.$uid.' = {
@@ -168,7 +168,7 @@ if (!isset(static::$js_added[$field->id][__FILE__][$item->id]))
 	});
 	');
 
-	\Joomla\CMS\Factory::getDocument()->addCustomTag('
+	\Joomla\CMS\Factory::getApplication()->getDocument()->addCustomTag('
 	<script id="img-wrapper-tmpl_'.$uid.'" type="text/x-jquery-tmpl">
 		<div class="rg-image-wrapper">
 			{{if itemsCount > 1}}

@@ -12,6 +12,9 @@
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Uri\Uri;
+use Joomla\Database\DatabaseInterface;
+use Joomla\CMS\Mail\MailerFactoryInterface;
+
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
@@ -55,10 +58,10 @@ class plgFlexicontent_fieldsFile extends FCField
 		if ($use_ingroup && empty($field->ingroup)) return;
 
 		// Initialize framework objects and other variables
-		$document = Factory::getDocument();
+		$document = Factory::getApplication()->getDocument();
 		$cparams  = ComponentHelper::getParams( 'com_flexicontent' );
 		$app  = Factory::getApplication();
-		$user = Factory::getUser();
+		$user = Factory::getApplication()->getIdentity();
 
 		$tooltip_class = 'hasTooltip';
 		$add_on_class    = $cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
@@ -934,7 +937,7 @@ class plgFlexicontent_fieldsFile extends FCField
 			$initialized = 1;
 
 			$app       = Factory::getApplication();
-			$document  = Factory::getDocument();
+			$document  = Factory::getApplication()->getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -1090,7 +1093,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		$noaccess_addvars      = $field->parameters->get( 'noaccess_addvars', 0);
 
 		// Select appropriate messages depending if user is logged on
-		if (Factory::getUser()->guest)
+		if (Factory::getApplication()->getIdentity()->guest)
 		{
 			if ($noaccess_url_unlogged)
 			{
@@ -1121,7 +1124,7 @@ class plgFlexicontent_fieldsFile extends FCField
 
 		if ($mod_is_enabled === null && $allowaddtocart && !Factory::getApplication()->isClient('administrator'))
 		{
-			$db = Factory::getDbo();
+			$db = Factory::getContainer()->get(DatabaseInterface::class);
 			$mod_is_enabled = $db->setQuery($db->getQuery(true)
 				->select('published')
 				->from('#__modules')
@@ -1149,7 +1152,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		}
 
 		// Get user access level (these are multiple for J2.5)
-		$user = Factory::getUser();
+		$user = Factory::getApplication()->getIdentity();
 		$aid_arr = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
 
 		$n = 0;
@@ -1320,7 +1323,7 @@ class plgFlexicontent_fieldsFile extends FCField
 			$initialized = 1;
 			jimport('joomla.filesystem.folder');
 			jimport('joomla.filesystem.path');
-			$srcpath_original  = \Joomla\CMS\Filesystem\Path::clean( JPATH_SITE .DS. $import_docs_folder .DS );
+			$srcpath_original  = \Joomla\Filesystem\Path::clean( JPATH_SITE .DS. $import_docs_folder .DS );
 		}
 
 
@@ -1418,7 +1421,7 @@ class plgFlexicontent_fieldsFile extends FCField
 					$v['secure']   = !$iform_dir    ? 1 : ((int) $v['secure'] ? 1 : 0);
 				}
 
-				$db = Factory::getDbo();
+				$db = Factory::getContainer()->get(DatabaseInterface::class);
 
 				if (!empty($v['mediafile']))
 				{
@@ -1755,7 +1758,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		if (count($new_ids))
 		{
 			// Only query files that are not already cached
-			$db = Factory::getDbo();
+			$db = Factory::getContainer()->get(DatabaseInterface::class);
 			$query = 'SELECT ' . $md_select . ' f.* '. $extra_select //filename, filename_original, altname, description, ext, id'
 				. ' FROM #__flexicontent_files AS f'
 				. ' WHERE f.id IN ('. implode(',', $new_ids) . ')'
@@ -1790,7 +1793,7 @@ class plgFlexicontent_fieldsFile extends FCField
 	function canDeleteFile( &$field, $file_id, &$item )
 	{
 		// Check file exists in DB
-		$db   = Factory::getDbo();
+		$db   = Factory::getContainer()->get(DatabaseInterface::class);
 		$query = 'SELECT id'
 			. ' FROM #__flexicontent_files'
 			. ' WHERE id='. $db->Quote($file_id)
@@ -1812,7 +1815,7 @@ class plgFlexicontent_fieldsFile extends FCField
 	function checkFileAssignment( &$field, $file_id, &$item )
 	{
 		// Check file exists in DB
-		$db   = Factory::getDbo();
+		$db   = Factory::getContainer()->get(DatabaseInterface::class);
 		$query = 'SELECT item_id '
 			. ' FROM #__flexicontent_fields_item_relations '
 			. ' WHERE '
@@ -1880,12 +1883,12 @@ class plgFlexicontent_fieldsFile extends FCField
 	 */
 	function share_file_form($tpl = null)
 	{
-		$user = Factory::getUser();
-		$db   = Factory::getDbo();
+		$user = Factory::getApplication()->getIdentity();
+		$db   = Factory::getContainer()->get(DatabaseInterface::class);
 		$app  = Factory::getApplication();
 
-		$session  = Factory::getSession();
-		$document = Factory::getDocument();
+		$session  = Factory::getApplication()->getSession();
+		$document = Factory::getApplication()->getDocument();
 
 		$file_id    = $app->input->get('file_id', 0, 'int');
 		$content_id = $app->input->get('content_id', 0, 'int');
@@ -1952,12 +1955,12 @@ class plgFlexicontent_fieldsFile extends FCField
 		// Check for request forgeries
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
-		$user = Factory::getUser();
-		$db   = Factory::getDbo();
+		$user = Factory::getApplication()->getIdentity();
+		$db   = Factory::getContainer()->get(DatabaseInterface::class);
 		$app  = Factory::getApplication();
 
-		$session  = Factory::getSession();
-		$document = Factory::getDocument();
+		$session  = Factory::getApplication()->getSession();
+		$document = Factory::getApplication()->getDocument();
 
 		$timeout = $session->get('com_flexicontent.formtime', 0);
 		if ($timeout == 0 || time() - $timeout < 2) {
@@ -2143,7 +2146,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		$attachment=null; $replyto=null; $replytoname=null;
 
 		// Send the email
-		$send_result = Factory::getMailer()->sendMail( $from, $sender, $email, $subject, $body, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
+		$send_result = Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer()->sendMail( $from, $sender, $email, $subject, $body, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
 		if ( $send_result !== true )
 		{
 			JError::raiseNotice(500, \Joomla\CMS\Language\Text:: _ ('FLEXI_FIELD_FILE_EMAIL_NOT_SENT'));
@@ -2158,7 +2161,7 @@ class plgFlexicontent_fieldsFile extends FCField
 	// Private common method to create join + and-where SQL CLAUSEs, for checking access of field - item pair(s), IN FUTURE maybe moved
 	function _createFieldItemAccessClause($get_select_access = false, $include_file = false )
 	{
-		$user  = Factory::getUser();
+		$user  = Factory::getApplication()->getIdentity();
 		$select_access = $joinacc = $andacc = '';
 
 		$aid_arr = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);

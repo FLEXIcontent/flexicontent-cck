@@ -13,6 +13,8 @@ defined('_JEXEC') or die;
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
+use Joomla\Database\DatabaseInterface;
+use Joomla\CMS\Mail\MailerFactoryInterface;
 
 JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php');
 
@@ -87,9 +89,9 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 
 		// Initialize some variables
 		$app = \Joomla\CMS\Factory::getApplication();
-		$db  = \Joomla\CMS\Factory::getDbo();
-		$me  = \Joomla\CMS\Factory::getUser();
-		$config = \Joomla\CMS\Factory::getConfig();
+		$db  = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$me  = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$config = \Joomla\CMS\Factory::getApplication()->getConfig();
 		$MailFrom	= $config->get('mailfrom');
 		$FromName	= $config->get('fromname');
 		$SiteName	= $config->get('sitename');
@@ -189,7 +191,7 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 				$adminEmail = $MailFrom;
 			}
 
-			\Joomla\CMS\Factory::getMailer()->sendMail($adminEmail, $adminName, $user->get('email'), $subject, $message);
+			\Joomla\CMS\Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer()->sendMail($adminEmail, $adminName, $user->get('email'), $subject, $message);
 		}
 
 		$ctrl = 'users.';
@@ -228,8 +230,8 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$db    = \Joomla\CMS\Factory::getDbo();
-		$me    = \Joomla\CMS\Factory::getUser();
+		$db    = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$me    = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$curIsSuperAdmin = $me->authorise('core.admin', 'root.1');
 
 		$cid = $this->input->get('cid', array(), 'array');
@@ -323,8 +325,8 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
 		$app = \Joomla\CMS\Factory::getApplication();
-		$db  = \Joomla\CMS\Factory::getDbo();
-		$me  = \Joomla\CMS\Factory::getUser();
+		$db  = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$me  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$curIsSuperAdmin = $me->authorise('core.admin', 'root.1');
 
 		if (!$check_uids)
@@ -421,7 +423,7 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
 		$app    = \Joomla\CMS\Factory::getApplication();
-		$db     = \Joomla\CMS\Factory::getDbo();
+		$db     = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 
 		$task   = $this->getTask();
 		$cids   = $this->input->get('cid', array(), 'array');

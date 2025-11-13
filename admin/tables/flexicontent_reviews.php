@@ -46,7 +46,7 @@ class flexicontent_reviews extends flexicontent_basetable
 		}
 
 		// If edited by review submitter then also set the update_date
-		if ( $this->id && $this->user_id == \Joomla\CMS\Factory::getUser()->id )
+		if ( $this->id && $this->user_id == \Joomla\CMS\Factory::getApplication()->getIdentity()->id )
 		{
 			$datenow = \Joomla\CMS\Factory::getDate();
 			$this->update_date = $datenow->toSql();

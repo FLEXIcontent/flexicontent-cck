@@ -1,6 +1,6 @@
 <?php
 defined('JPATH_BASE') or die;
-
+use Joomla\Database\DatabaseInterface;
 extract($displayData);
 
 // Get Favourites field configuration (if FIELD is empty then retrieve it)
@@ -26,7 +26,7 @@ if ( $users_list_type )
 {
   $uname = $users_list_type==1 ? "u.username" : "u.name";
 
-  $db	= \Joomla\CMS\Factory::getDbo();
+  $db	= \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
   $query = 'SELECT '.($users_list_type==1 ? "u.username" : "u.name")
     .' FROM #__flexicontent_favourites AS ff'
     .' LEFT JOIN #__users AS u ON u.id=ff.userid '

@@ -80,7 +80,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 
 		// Initialize variables
 		$app     = \Joomla\CMS\Factory::getApplication();
-		$user    = \Joomla\CMS\Factory::getUser();
+		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		$ctrl_task = 'task=' . $this->record_name_pl . '.';
 		$original_task = $this->task;

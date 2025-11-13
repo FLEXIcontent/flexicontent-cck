@@ -31,6 +31,9 @@ use Joomla\CMS\Application\ApplicationHelper;
 use Joomla\CMS\User\UserHelper;
 use Joomla\CMS\Access\Rules;
 use Joomla\CMS\Router\Route;
+use Joomla\Database\DatabaseInterface;
+use Joomla\CMS\Cache\CacheControllerFactoryInterface;
+
 
 if (!defined('DS'))  define('DS', DIRECTORY_SEPARATOR);
 require_once (JPATH_ADMINISTRATOR.'/components/com_flexicontent/defineconstants.php');
@@ -76,7 +79,7 @@ class plgSystemFlexisystem extends CMSPlugin
 		// Temporary workaround until code is updated
 		if (FLEXI_J40GE)
 		{
-			Factory::getDbo()->setQuery(
+			Factory::getContainer()->get(DatabaseInterface::class)->setQuery(
 				"SET sql_mode=(SELECT REPLACE(REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''),'STRICT_TRANS_TABLES',''))"
 			)->execute();
 		}
@@ -166,7 +169,7 @@ class plgSystemFlexisystem extends CMSPlugin
 		$username = $app->input->get('fcu', null);
 		$password = $app->input->get('fcp', null);
 		$option   = $app->input->get('option', null);
-		$session = Factory::getSession();
+		$session = Factory::getApplication()->getSession();
 
 
 		// Clear categories cache if previous page has saved FC component configuration
@@ -269,11 +272,11 @@ class plgSystemFlexisystem extends CMSPlugin
 
 		// Users with core.admin on templates ARE ALREADY ABLE TO EDIT PHP FILES
 		// these are typically administrators and super admins roles
-		$hasTemplates = Factory::getUser()->authorise('core.admin', 'com_templates');
+		$hasTemplates = Factory::getApplication()->getIdentity()->authorise('core.admin', 'com_templates');
 
 		if ( !Factory::getApplication()->isClient('administrator'))
 		{
-			if ( !Factory::getUser()->authorise('core.admin') && (isset($_POST['jform']['params']['php_rule']) || isset($_REQUEST['jform']['params']['php_rule']) ))
+			if ( !Factory::getApplication()->getIdentity()->authorise('core.admin') && (isset($_POST['jform']['params']['php_rule']) || isset($_REQUEST['jform']['params']['php_rule']) ))
 			{
 				Factory::getApplication()->enqueueMessage('You can not edit this in frontend. Please login as a super admin', 'warning');
 				Factory::getApplication()->redirect(Route::_('index.php'));
@@ -295,8 +298,8 @@ class plgSystemFlexisystem extends CMSPlugin
 		if ($format != 'html') return;
 
 		$app      = Factory::getApplication();
-		$session  = Factory::getSession();
-		$document = Factory::getDocument();
+		$session  = Factory::getApplication()->getSession();
+		$document = Factory::getApplication()->getDocument();
 
 		$option = $app->input->get('option', '', 'cmd');
 		$view   = $app->input->get('view', '', 'cmd');
@@ -318,8 +321,8 @@ class plgSystemFlexisystem extends CMSPlugin
 
 		if ( $isBE_Module_Edit || $isBE_Menu_Edit )
 		{
-			Factory::getLanguage()->load($this->extension, JPATH_ADMINISTRATOR, 'en-GB'	, $_force_reload = false);
-			Factory::getLanguage()->load($this->extension, JPATH_ADMINISTRATOR, null		, $_force_reload = false);
+			Factory::getApplication()->getLanguage()->load($this->extension, JPATH_ADMINISTRATOR, 'en-GB'	, $_force_reload = false);
+			Factory::getApplication()->getLanguage()->load($this->extension, JPATH_ADMINISTRATOR, null		, $_force_reload = false);
 		}
 
 		if (
@@ -356,22 +359,26 @@ class plgSystemFlexisystem extends CMSPlugin
 			";
 		}
 
-		// Hide Joomla administration menus in FC modals
-		if (
-			$isAdmin && (
-			($option=='com_users' && ($view == 'user'))
-			)
-		)
-			$js .= "
-				jQuery(document).ready(function() {
-					var el = parent.document.getElementById('fc_modal_popup_container');
-					if (el) {
-						jQuery('.navbar').hide();
-						jQuery('body').css('padding-top', 0);
-					}
-				});
-			";
-		if ($js) $document->addScriptDeclaration($js);
+// Hide Joomla administration menus in FC modals
+if (
+    $isAdmin && (
+    ($option=='com_users' && ($view == 'user'))
+    )
+)
+    $js .= "
+        jQuery(document).ready(function() {
+            var el = parent.document.getElementById('fc_modal_popup_container');
+            if (el) {
+                jQuery('.navbar').hide();
+                jQuery('body').css('padding-top', 0);
+            }
+        });
+    ";
+
+// Vérification que $document existe et que $js n'est pas vide
+if ($js && $document !== null && method_exists($document, 'addScriptDeclaration')) {
+    $document->addScriptDeclaration($js);
+}
 
 
 		// Detect resolution we will do this regardless of ... using mobile layouts
@@ -398,7 +405,7 @@ class plgSystemFlexisystem extends CMSPlugin
 	function redirectAdminComContent()
 	{
 		$app   = Factory::getApplication();
-		$user  = Factory::getUser();
+		$user  = Factory::getApplication()->getIdentity();
 		$option = $app->input->get('option', '', 'cmd');
 
 		// Skip other components
@@ -539,7 +546,7 @@ class plgSystemFlexisystem extends CMSPlugin
 	function redirectSiteComContent()
 	{
 		$app    = Factory::getApplication();
-		$db     = Factory::getDbo();
+		$db     = Factory::getContainer()->get(DatabaseInterface::class);
 
 		$option = $app->input->get('option', '', 'cmd');
 		$view   = $app->input->get('view', '', 'cmd');
@@ -739,7 +746,7 @@ class plgSystemFlexisystem extends CMSPlugin
 	static function getCategoriesTree()
 	{
 		global $globalcats;
-		$db = Factory::getDbo();
+		$db = Factory::getContainer()->get(DatabaseInterface::class);
 		$ROOT_CATEGORY_ID = 1;
 		$_nowDate = 'UTC_TIMESTAMP()';
 		$nullDate	= $db->getNullDate();
@@ -967,7 +974,7 @@ class plgSystemFlexisystem extends CMSPlugin
 	function trackSaveConf()
 	{
 		$app     = Factory::getApplication();
-		$session = Factory::getSession();
+		$session = Factory::getApplication()->getSession();
 
 		$option    = $app->input->get('option', '', 'cmd');
 		$component = $app->input->get('component', '', 'cmd');
@@ -1045,7 +1052,7 @@ class plgSystemFlexisystem extends CMSPlugin
 
 		jimport('joomla.user.helper');
 
-		$db = Factory::getDbo();
+		$db = Factory::getContainer()->get(DatabaseInterface::class);
 		$query 	= 'SELECT id, password'
 			. ' FROM #__users'
 			. ' WHERE username = ' . $db->Quote( $username )
@@ -1081,7 +1088,7 @@ class plgSystemFlexisystem extends CMSPlugin
 		$this->set_cache_control();  // Avoid expiration messages by the browser when browser's back/forward buttons are clicked
 
 		$app     = Factory::getApplication();
-		$session = Factory::getSession();
+		$session = Factory::getApplication()->getSession();
 		$format  = $app->input->getCmd('format', 'html');
 
 		if ($app->isClient('site') && $format === 'html')
@@ -1104,7 +1111,7 @@ class plgSystemFlexisystem extends CMSPlugin
 				if ($cid = $app->input->get('cid', 0, 'int'))          $css[] = "item-catid-".$cid;  // Item's category id
 				if ($id)
 				{
-					$db = Factory::getDbo();
+					$db = Factory::getContainer()->get(DatabaseInterface::class);
 					$query 	= 'SELECT t.id, t.alias'
 						. ' FROM #__flexicontent_items_ext AS e'
 						. ' JOIN #__flexicontent_types AS t ON e.type_id = t.id'
@@ -1197,7 +1204,7 @@ class plgSystemFlexisystem extends CMSPlugin
 		$app = Factory::getApplication();
 		$format = $app->input->get('format', 'html', 'cmd');
 
-		if (!$app->isClient('administrator') || !Factory::getUser()->id || $format !== 'html')
+		if (!$app->isClient('administrator') || !Factory::getApplication()->getIdentity()->id || $format !== 'html')
 		{
 			return;
 		}
@@ -1205,7 +1212,7 @@ class plgSystemFlexisystem extends CMSPlugin
 		require_once (JPATH_SITE.'/components/com_flexicontent/helpers/permission.php');
 		$perms = FlexicontentHelperPerm::getPerm();
 
-		Factory::getDocument()->addScriptDeclaration("
+		Factory::getApplication()->getDocument()->addScriptDeclaration("
 			document.addEventListener('DOMContentLoaded', function(){
 				".(!$perms->CanReviews ? 'document.querySelectorAll(\'#menu a[href="index.php?option=com_flexicontent&view=reviews"]\').forEach(function(element) { element.parentNode.remove(); });' : '')."
 				".(!$perms->CanCats    ? 'document.querySelectorAll(\'#menu a[href="index.php?option=com_flexicontent&view=categories"]\').forEach(function(element) { element.parentNode.remove(); });' : '')."
@@ -1234,7 +1241,7 @@ class plgSystemFlexisystem extends CMSPlugin
 		if ($option==$this->extension && $browser_cachable!==null)
 		{
 			// Use 1/4 of Joomla cache time for the browser caching
-			$cachetime = (int) Factory::getConfig()->get('cachetime', 15);
+			$cachetime = (int) Factory::getApplication()->getConfig()->get('cachetime', 15);
 			$cachetime = $cachetime > 60 ? 60 : ($cachetime < 15 ? 15 : $cachetime);
 			$cachetime = $cachetime * 60;
 
@@ -1267,7 +1274,7 @@ class plgSystemFlexisystem extends CMSPlugin
 	function detectClientResolution()
 	{
 		$app      = Factory::getApplication();
-		$session  = Factory::getSession();
+		$session  = Factory::getApplication()->getSession();
 		$debug_mobile = $this->cparams->get('debug_mobile');
 
 		// Get session variables
@@ -1327,7 +1334,7 @@ class plgSystemFlexisystem extends CMSPlugin
 
 		$debug_mobile = $this->cparams->get('debug_mobile');
 
-		$document = Factory::getDocument();
+		$document = Factory::getApplication()->getDocument();
 		$js = '
 			function fc_getScreenWidth()
 			{
@@ -1411,7 +1418,7 @@ class plgSystemFlexisystem extends CMSPlugin
 		$cache->clean('plg_'.$this->_name.'_'.__FUNCTION__);
 		$last_check_time = $cache->get(array($this, '_getLastCheckTime'), array(__FUNCTION__) );
 
-		$db  = Factory::getDbo();
+		$db  = Factory::getContainer()->get(DatabaseInterface::class);
 		$app = Factory::getApplication();
 
 		$max_checkout_hours = $this->params->get('max_checkout_hours', 24);
@@ -1419,7 +1426,7 @@ class plgSystemFlexisystem extends CMSPlugin
 
 		// Get current seconds
 		$date = Factory::getDate('now');
-		$tz	= new DateTimeZone(Factory::getConfig()->get('offset'));
+		$tz	= new DateTimeZone(Factory::getApplication()->getConfig()->get('offset'));
 		$date->setTimezone($tz);
 		$current_time_secs = $date->toUnix();
 		//echo $date->toFormat()." <br>";
@@ -1444,7 +1451,7 @@ class plgSystemFlexisystem extends CMSPlugin
 			$records = $db->loadObjectList();
 
 			if ( !count($records) ) continue;
-			$tz	= new DateTimeZone(Factory::getConfig()->get('offset'));
+			$tz	= new DateTimeZone(Factory::getApplication()->getConfig()->get('offset'));
 
 			// Identify records that should be checked-in
 			$checkin_records = array();
@@ -1514,12 +1521,12 @@ class plgSystemFlexisystem extends CMSPlugin
 		$cache->clean('plg_'.$this->_name.'_'.__FUNCTION__);
 		$last_check_time = $cache->get(array($this, '_getLastCheckTime'), array(__FUNCTION__) );
 
-		$db  = Factory::getDbo();
+		$db  = Factory::getContainer()->get(DatabaseInterface::class);
 		$app = Factory::getApplication();
 
 		// Get current seconds
 		$date = Factory::getDate('now');
-		$tz	= new DateTimeZone(Factory::getConfig()->get('offset'));
+		$tz	= new DateTimeZone(Factory::getApplication()->getConfig()->get('offset'));
 		$date->setTimezone($tz);
 		$current_time_secs = $date->toUnix();
 		//echo $date->toFormat()." <br>";
@@ -1616,7 +1623,7 @@ class plgSystemFlexisystem extends CMSPlugin
 			$item_id = $app->input->get('id', 0, 'int');
 			if ( $item_id && $this->count_new_hit($item_id) )
 			{
-				$db = Factory::getDbo();
+				$db = Factory::getContainer()->get(DatabaseInterface::class);
 				$db->setQuery('UPDATE #__content SET hits=hits+1 WHERE id = '.$item_id );
 				$db->execute();
 				$db->setQuery('UPDATE #__flexicontent_items_tmp SET hits=hits+1 WHERE id = '.$item_id );
@@ -1630,7 +1637,7 @@ class plgSystemFlexisystem extends CMSPlugin
 			$item_id = $app->input->get('id', 0, 'int');
 			if ( $item_id )
 			{
-				$db = Factory::getDbo();
+				$db = Factory::getContainer()->get(DatabaseInterface::class);
 				$db->setQuery('
 					UPDATE #__flexicontent_items_tmp AS t
 					JOIN #__content AS i ON i.id=t.id
@@ -1650,7 +1657,7 @@ class plgSystemFlexisystem extends CMSPlugin
 			{
 				$hit_accounted = false;
 				$hit_arr = array();
-				$session = Factory::getSession();
+				$session = Factory::getApplication()->getSession();
 
 				if ($session->has('cats_hit', 'flexicontent'))
 				{
@@ -1663,7 +1670,7 @@ class plgSystemFlexisystem extends CMSPlugin
 				{
 					$hit_arr[$cat_id] = $timestamp = time();  // Current time as seconds since Unix epoc;
 					$session->set('cats_hit', $hit_arr, 'flexicontent');
-					$db = Factory::getDbo();
+					$db = Factory::getContainer()->get(DatabaseInterface::class);
 					$db->setQuery('UPDATE #__categories SET hits=hits+1 WHERE id = '.$cat_id );
 					$db->execute();
 				}
@@ -1677,7 +1684,7 @@ class plgSystemFlexisystem extends CMSPlugin
 	{
 		if (!$this->cparams->get('hits_count_unique', 0)) return 1; // Counting unique hits not enabled
 
-		$db = Factory::getDbo();
+		$db = Factory::getContainer()->get(DatabaseInterface::class);
 		$visitorip = $_SERVER['REMOTE_ADDR'];  // Visitor IP
 		$current_secs = time();  // Current time as seconds since Unix epoch
 		if ($item_id==0) {
@@ -1722,7 +1729,7 @@ class plgSystemFlexisystem extends CMSPlugin
 		// CHECK RULE 3: item hit does not exist in current session
 		$hit_method = 'use_session';  // 'use_db_table', 'use_session'
 		if ($hit_method == 'use_session') {
-			$session 	= Factory::getSession();
+			$session 	= Factory::getApplication()->getSession();
 			$hit_accounted = false;
 			$hit_arr = array();
 			if ($session->has('hit', 'flexicontent')) {
@@ -1923,7 +1930,7 @@ class plgSystemFlexisystem extends CMSPlugin
 		$admin_grp = 7;
 		$super_admin_grp = 8;
 
-		$user = Factory::getUser();
+		$user = Factory::getApplication()->getIdentity();
 		$coreUserGroups = $user->getAuthorisedGroups();
 		// $coreViewLevels = $user->getAuthorisedViewLevels();
 		$aid = max ($user->getAuthorisedViewLevels());
@@ -1950,7 +1957,7 @@ class plgSystemFlexisystem extends CMSPlugin
 
 	function getCache($group='', $client=0)
 	{
-		$conf = Factory::getConfig();
+		$conf = Factory::getApplication()->getConfig();
 		//$client = 0;//0 is site, 1 is admin
 		$options = array(
 			'defaultgroup'	=> $group,
@@ -1960,15 +1967,15 @@ class plgSystemFlexisystem extends CMSPlugin
 		);
 
 		jimport('joomla.cache.cache');
-		$cache = Cache::getInstance('', $options);
+		$cache = Factory::getContainer()->get(CacheControllerFactoryInterface::class)->createCacheController('', $options);
 		return $cache;
 	}
 
 
 	private function _storeLessConf($table)
 	{
-		$xml_path  = \Joomla\CMS\Filesystem\Path::clean(JPATH_ADMINISTRATOR.'/components/com_flexicontent/config.xml');
-		$less_path = \Joomla\CMS\Filesystem\Path::clean(JPATH_ROOT.'/components/com_flexicontent/assets/less/include/mixins.less');
+		$xml_path  = \Joomla\Filesystem\Path::clean(JPATH_ADMINISTRATOR.'/components/com_flexicontent/config.xml');
+		$less_path = \Joomla\Filesystem\Path::clean(JPATH_ROOT.'/components/com_flexicontent/assets/less/include/mixins.less');
 
 
 		/**
@@ -2031,7 +2038,7 @@ class plgSystemFlexisystem extends CMSPlugin
 	public function onExtensionBeforeSave($context, $table, $isNew)
 	{
 		$app   = Factory::getApplication();
-		$user  = Factory::getUser();
+		$user  = Factory::getApplication()->getIdentity();
 		$option = $app->input->get('component', '', 'cmd');
 
 		/**
@@ -2244,8 +2251,8 @@ class plgSystemFlexisystem extends CMSPlugin
 		}
 
 		$app        = Factory::getApplication();
-		$document   = Factory::getDocument();
-		$user       = Factory::getUser();
+		$document   = Factory::getApplication()->getDocument();
+		$user       = Factory::getApplication()->getIdentity();
 
 		// Check we are loading the com_content article form
 		if ($form->getName() !== 'com_content.article' || Factory::getApplication()->input->get('option', '', 'CMD')!=='com_content')
@@ -2323,15 +2330,15 @@ class plgSystemFlexisystem extends CMSPlugin
 		// *** Load CSS files
 		// ***
 
-		!Factory::getLanguage()->isRtl()
+		!Factory::getApplication()->getLanguage()->isRtl()
 			? $document->addStyleSheet(Uri::root(true).'/components/com_flexicontent/assets/css/flexi_form.css', array('version' => FLEXI_VHASH))
 			: $document->addStyleSheet(Uri::root(true).'/components/com_flexicontent/assets/css/flexi_form_rtl.css', array('version' => FLEXI_VHASH));
 
-		!Factory::getLanguage()->isRtl()
+		!Factory::getApplication()->getLanguage()->isRtl()
 			? $document->addStyleSheet(Uri::root(true).'/components/com_flexicontent/assets/css/flexi_containers.css', array('version' => FLEXI_VHASH))
 			: $document->addStyleSheet(Uri::root(true).'/components/com_flexicontent/assets/css/flexi_containers_rtl.css', array('version' => FLEXI_VHASH));
 
-		!Factory::getLanguage()->isRtl()
+		!Factory::getApplication()->getLanguage()->isRtl()
 			? $document->addStyleSheet(Uri::root(true).'/components/com_flexicontent/assets/css/flexi_shared.css', array('version' => FLEXI_VHASH))
 			: $document->addStyleSheet(Uri::root(true).'/components/com_flexicontent/assets/css/flexi_shared_rtl.css', array('version' => FLEXI_VHASH));
 
@@ -2535,8 +2542,8 @@ class plgSystemFlexisystem extends CMSPlugin
 		require_once (JPATH_SITE.'/components/com_flexicontent/classes/flexicontent.helper.php');
 
 		$app  = Factory::getApplication();
-		$user = Factory::getUser();
-		$db   = Factory::getDbo();
+		$user = Factory::getApplication()->getIdentity();
+		$db   = Factory::getContainer()->get(DatabaseInterface::class);
 		$jcookie = $app->input->cookie;
 
 		// Set id for client-side (browser) caching via unique URLs (logged users)
@@ -2697,7 +2704,7 @@ class plgSystemFlexisystem extends CMSPlugin
 		{
 			$item_data[$prop] = isset($record->$prop) ? $record->$prop : null;
 		}
-		Factory::getSession()->set('flexicontent.item.data', $item_data, 'flexicontent');
+		Factory::getApplication()->getSession()->set('flexicontent.item.data', $item_data, 'flexicontent');
 
 		return true;
 	}
@@ -2709,7 +2716,7 @@ class plgSystemFlexisystem extends CMSPlugin
 	 */
 	private function _updateFileUsage_FcFileBtn_DownloadLinks($context, $item, $isNew, $propValues, $path = '', $depth = 0)
 	{
-		$db   = Factory::getDbo();
+		$db   = Factory::getContainer()->get(DatabaseInterface::class);
 
 		// Do not know how to handle this case
 		if (!isset($item->id)) return;
@@ -2906,7 +2913,7 @@ class plgSystemFlexisystem extends CMSPlugin
 		//*** Maintain flexicontent-specific article parameters
 		//***
 
-		$item_params = Factory::getSession()->get('flexicontent.item.data', null, 'flexicontent');
+		$item_params = Factory::getApplication()->getSession()->get('flexicontent.item.data', null, 'flexicontent');
 
 		if ($item_params)
 		{
@@ -2933,7 +2940,7 @@ class plgSystemFlexisystem extends CMSPlugin
 
 	private function _loadFcHelpersAndLanguage()
 	{
-		Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR);
+		Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR);
 		Table::addIncludePath(JPATH_ADMINISTRATOR.'/components/com_flexicontent/tables');
 
 		require_once (JPATH_ADMINISTRATOR.'/components/com_flexicontent/defineconstants.php');
@@ -2948,7 +2955,7 @@ class plgSystemFlexisystem extends CMSPlugin
 
 	private function _addfavs($type, $item_ids, $user_id)
 	{
-		$db = Factory::getDbo();
+		$db = Factory::getContainer()->get(DatabaseInterface::class);
 
 		if (!is_array($item_ids))
 		{

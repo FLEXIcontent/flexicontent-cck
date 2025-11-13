@@ -12,6 +12,7 @@
 defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
+use Joomla\CMS\Language\LanguageFactoryInterface;
 
 trait flexicontent_basetable_trait
 {
@@ -185,7 +186,7 @@ trait flexicontent_basetable_trait
 	public function stringURLSafe($string, $language, $force_ascii)
 	{
 		// Return a cleaned unicode alias
-		if (\Joomla\CMS\Factory::getConfig()->get('unicodeslugs') && !$force_ascii)
+		if (\Joomla\CMS\Factory::getApplication()->getConfig()->get('unicodeslugs') && !$force_ascii)
 		{
 			return \Joomla\CMS\Filter\OutputFilter::stringURLUnicodeSlug($string);
 		}
@@ -208,7 +209,7 @@ trait flexicontent_basetable_trait
 			 * If language does not have (ll_CC)Localise::transliterate()
 			 * then run our own transliterate method
 			 */
-			if (!\Joomla\CMS\Language\Language::getInstance($language)->getTransliterator())
+			if (!\Joomla\CMS\Factory::getContainer()->get(LanguageFactoryInterface::class)->createLanguage($language, false)->getTransliterator())
 			{
 				// Remove any '-' from the string since they will be used as concatenaters
 				$string = str_replace('-', ' ', $string);
@@ -224,7 +225,7 @@ trait flexicontent_basetable_trait
 			else
 			{
 				// Detect that unicode aliases are enabled but this ascii alias is forced for this record
-				$unicodeslugs_override = \Joomla\CMS\Factory::getConfig()->get('unicodeslugs') && $force_ascii;
+				$unicodeslugs_override = \Joomla\CMS\Factory::getApplication()->getConfig()->get('unicodeslugs') && $force_ascii;
 
 				// Detect old joomla versions (Joomla <=3.5.x) that will not run the transliterator element's language
 				$r = new ReflectionMethod('\Joomla\CMS\Application\ApplicationHelper', 'stringURLSafe');
@@ -236,7 +237,7 @@ trait flexicontent_basetable_trait
 					$this->$alias = str_replace('-', ' ', $this->$alias);
 
 					// Do the transliteration according to ELEMENT's language transliterator: (ll_CC)Localise::transliterate()
-					$this->$alias = \Joomla\CMS\Language\Language::getInstance($language)->transliterate($this->$alias);
+					$this->$alias = \Joomla\CMS\Factory::getContainer()->get(LanguageFactoryInterface::class)->createLanguage($language, false)->transliterate($this->$alias);
 				}
 			}
 		}

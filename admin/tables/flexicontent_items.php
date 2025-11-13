@@ -26,7 +26,7 @@ require_once('flexicontent_basetable.php');
 
 class _flexicontent_items_common extends flexicontent_basetable
 {
-	protected function __getAssetParentId(Table $table = null, $id = null)
+	protected function __getAssetParentId(?Table $table = null, $id = null)
 	{
 		// Initialise variables.
 		$assetId = null;
@@ -68,7 +68,7 @@ if (FLEXI_J30GE)
 {
 	class _flexicontent_items extends _flexicontent_items_common
 	{
-		protected function _getAssetParentId(Table $table = null, $id = null)
+		protected function _getAssetParentId(?Table $table = null, $id = null)
 		{
 			return parent::__getAssetParentId($table, $id);
 		}

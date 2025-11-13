@@ -312,8 +312,8 @@ else
 		});
 	";
 
-	\Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
-	//\Joomla\CMS\Factory::getDocument()->addStyleDeclaration("");
+	\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration($js);
+	//\Joomla\CMS\Factory::getApplication()->getDocument()->addStyleDeclaration("");
 }
 
 if ($display_filter_as==1 || $display_filter_as==7)

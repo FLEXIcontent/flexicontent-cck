@@ -17,9 +17,10 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
+use Joomla\Database\DatabaseInterface;
 
 $params =  $this->params;
-$db     =  \Joomla\CMS\Factory::getDbo();
+$db     =  \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 
 // Date configuration
 $use_date   = $params->get( 'show_modify_date', 1 ) ;
