@@ -25,19 +25,22 @@ defined('_JEXEC') or die('Restricted access');
 
 $jmedia_filetypes = array('folders', 'images', 'docs', 'videos', 'audios');
 
+$mediaTypes = [];
+$mediaTypeNames = [];
 if (version_compare(\Joomla\CMS\Version::MAJOR_VERSION, '4', 'ge'))
 {
 	// 0: images, 1: audios, 2: videos, 3: documents * 'folders' is always included in J4
 	$mediaTypes = [];
-	if (in_array('images', $jmedia_filetypes)) $mediaTypes[] = '0';
-	if (in_array('audios', $jmedia_filetypes)) $mediaTypes[] = '1';
-	if (in_array('videos', $jmedia_filetypes)) $mediaTypes[] = '2';
-	if (in_array('docs',   $jmedia_filetypes)) $mediaTypes[] = '3';
-	$mediaTypes = implode(',', $mediaTypes);  // * 'folders' is always included in J4
+	if (in_array('images', $jmedia_filetypes)) { $mediaTypes[] = '0'; $mediaTypeNames[] = 'Images'; }
+	if (in_array('audios', $jmedia_filetypes)) { $mediaTypes[] = '1'; $mediaTypeNames[] = 'Audios'; }
+	if (in_array('videos', $jmedia_filetypes)) { $mediaTypes[] = '2'; $mediaTypeNames[] = 'Videos'; }
+	if (in_array('docs',   $jmedia_filetypes)) { $mediaTypes[] = '3'; $mediaTypeNames[] = 'Documents'; }
 }
 else {
 	$fileTypes = implode(',', $jmedia_filetypes); // Supported values: 'folders,images,docs,videos' * audios will be ignored in J3
 }
+// Only implode the mediaTypes array , but not the mediaTypeNames array, since it is not used in the layout file as an array
+$mediaTypes = implode(',', $mediaTypes);  // * 'folders' is always included in J4
 
 $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
@@ -183,7 +186,8 @@ HTML;
 												  'dataAttribute' => '',
 
 												  // J4 only, supported media types for the Media Manager
-												  'mediatypes'   => $mediaTypes,  // e.g. '0,3' Supported values '0,1,2,3', 0: images, 1: audios, 2: videos, 3: documents * 'folders' is always included in J4
+												  'mediaTypes'   => $mediaTypes,  // e.g. '0,3' Supported values '0,1,2,3', 0: images, 1: audios, 2: videos, 3: documents * 'folders' is always included in J4
+												  'mediaTypeNames' => $mediaTypeNames,  // Layout expects the types names as an array and not as an comma separated string
 												  'imagesExt'    => $imagesExt,
 												  'audiosExt'    => $audiosExt,
 												  'videosExt'    => $videosExt,

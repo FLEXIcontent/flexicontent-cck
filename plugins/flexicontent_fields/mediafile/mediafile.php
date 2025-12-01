@@ -106,19 +106,22 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			? array_map('trim', explode(',', $media_params->get('doc_extensions', 'doc,odg,odp,ods,odt,pdf,ppt,txt,xcf,xls,csv')))
 			: [];
 
+		$mediaTypes = [];
+		$mediaTypeNames = [];
 		if (version_compare(\Joomla\CMS\Version::MAJOR_VERSION, '4', 'ge'))
 		{
 			// 0: images, 1: audios, 2: videos, 3: documents * 'folders' is always included in J4
 			$mediaTypes = [];
-			if (in_array('images', $jmedia_filetypes)) $mediaTypes[] = '0';
-			if (in_array('audios', $jmedia_filetypes)) $mediaTypes[] = '1';
-			if (in_array('videos', $jmedia_filetypes)) $mediaTypes[] = '2';
-			if (in_array('docs',   $jmedia_filetypes)) $mediaTypes[] = '3';
-			$mediaTypes = implode(',', $mediaTypes);  // * 'folders' is always included in J4
+			if (in_array('images', $jmedia_filetypes)) { $mediaTypes[] = '0'; $mediaTypeNames[] = 'Images'; }
+			if (in_array('audios', $jmedia_filetypes)) { $mediaTypes[] = '1'; $mediaTypeNames[] = 'Audios'; }
+			if (in_array('videos', $jmedia_filetypes)) { $mediaTypes[] = '2'; $mediaTypeNames[] = 'Videos'; }
+			if (in_array('docs',   $jmedia_filetypes)) { $mediaTypes[] = '3'; $mediaTypeNames[] = 'Documents'; }
 		}
 		else {
 			$fileTypes = implode(',', $jmedia_filetypes); // Supported values: 'folders,images,docs,videos' * audios will be ignored in J3
 		}
+		// Only implode the mediaTypes array , but not the mediaTypeNames array, since it is not used in the layout file as an array
+		$mediaTypes = implode(',', $mediaTypes);  // * 'folders' is always included in J4
 
 		// Classes for marking field required
 		$required_class = $required ? ' required' : '';

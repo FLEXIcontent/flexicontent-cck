@@ -224,7 +224,8 @@ HTML;
 					'dataAttribute' => '',
 
 					// J4 only, supported media types for the Media Manager
-					'mediatypes'   => $mediaTypes,  // e.g. '0,3' Supported values '0,1,2,3', 0: images, 1: audios, 2: videos, 3: documents * 'folders' is always included in J4
+					'mediaTypes'   => $mediaTypes,  // e.g. '0,3' Supported values '0,1,2,3', 0: images, 1: audios, 2: videos, 3: documents * 'folders' is always included in J4
+					'mediaTypeNames' => $mediaTypeNames,  // Layout expects the types names as an array and not as an comma separated string
 					'imagesExt'    => $imagesExt,
 					'audiosExt'    => $audiosExt,
 					'videosExt'    => $videosExt,
