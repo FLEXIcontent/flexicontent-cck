@@ -1430,6 +1430,8 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				/**
 				 * Send notifications email about file download if file was download via a field that has these notifications enabled
 				 */
+				$per_downloads = !empty($per_downloads) && $per_downloads > 0 ? $per_downloads : 1;
+				
 				if ($task !== 'download_file' && $task !== 'download_files' && $fields_conf[$field_id]->get('send_notifications') && ($file->hits % $per_downloads == 0) )
 				{
 					// Calculate (once per file) some text used for notifications
