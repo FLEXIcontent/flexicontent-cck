@@ -10,7 +10,7 @@
 defined('_JEXEC') or die;
 
 $app  = \Joomla\CMS\Factory::getApplication();
-$lang = \Joomla\CMS\Factory::getApplication()->getLanguage();
+$lang = \Joomla\CMS\Factory::getLanguage();
 $this->viewLayout = basename(__FILE__, '.php');
 
 \Joomla\CMS\HTML\HTMLHelper::_('stylesheet', 'media/popup-imagelist.css', array('version' => 'auto', 'relative' => true));
@@ -20,11 +20,11 @@ if ($lang->isRtl())
 	\Joomla\CMS\HTML\HTMLHelper::_('stylesheet', 'media/popup-imagelist_rtl.css', array('version' => 'auto', 'relative' => true));
 }
 
-\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration('var ImageManager = window.parent.ImageManager;');
+\Joomla\CMS\Factory::getDocument()->addScriptDeclaration('var ImageManager = window.parent.ImageManager;');
 
 if ($lang->isRtl())
 {
-	\Joomla\CMS\Factory::getApplication()->getDocument()->addStyleDeclaration(
+	\Joomla\CMS\Factory::getDocument()->addStyleDeclaration(
 		'
 			@media (max-width: 767px) {
 				li.imgOutline.thumbnail.height-80.width-80.center {
@@ -37,7 +37,7 @@ if ($lang->isRtl())
 }
 else
 {
-	\Joomla\CMS\Factory::getApplication()->getDocument()->addStyleDeclaration(
+	\Joomla\CMS\Factory::getDocument()->addStyleDeclaration(
 		'
 			@media (max-width: 767px) {
 				li.imgOutline.thumbnail.height-80.width-80.center {
@@ -50,7 +50,7 @@ else
 }
 
 // Force container to body of container to full height
-\Joomla\CMS\Factory::getApplication()->getDocument()->addStyleDeclaration(
+\Joomla\CMS\Factory::getDocument()->addStyleDeclaration(
 	'
 		body.contentpane.component {
 			height: 100%;
@@ -72,7 +72,7 @@ $this->folders = in_array('folders', $filetypes) ? $this->folders : array();
 // Add image preview on click to preview icon
 if (count($this->images))
 {
-	\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration(
+	\Joomla\CMS\Factory::getDocument()->addScriptDeclaration(
 	"
 		jQuery(document).ready(function($){
 
@@ -90,7 +90,7 @@ if (count($this->images))
 // Add video preview on click to preview icon
 if (count($this->videos))
 {
-	\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration(
+	\Joomla\CMS\Factory::getDocument()->addScriptDeclaration(
 	"
 		jQuery(document).ready(function($){
 

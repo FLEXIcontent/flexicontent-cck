@@ -18,8 +18,6 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
-use Joomla\Database\DatabaseInterface;
-use Joomla\CMS\Factory;
 
 // Load the helper classes
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
@@ -63,7 +61,7 @@ class JFormFieldFcSortableList extends \Joomla\CMS\Form\FormField
 	{
 		flexicontent_html::loadJQuery();
 
-		$document = Factory::getApplication()->getDocument();
+		$document = \Joomla\CMS\Factory::getDocument();
 		$js = "";
 		if ($js) $document->addScriptDeclaration($js);
 	}
@@ -78,8 +76,8 @@ class JFormFieldFcSortableList extends \Joomla\CMS\Form\FormField
 			$js_css_added = true;
 		}
 		
-		$doc	= Factory::getApplication()->getDocument();
-		$db		= Factory::getContainer()->get(DatabaseInterface::class);
+		$doc	= \Joomla\CMS\Factory::getDocument();
+		$db		= \Joomla\CMS\Factory::getDbo();
 		$attributes = $this->element->attributes();
 
 		$iselements = $attributes->subtype =='elements';
@@ -321,7 +319,7 @@ class JFormFieldFcSortableList extends \Joomla\CMS\Form\FormField
 			<div class="fcclear"></div>';
 			
 			$js = "";
-			if ($js) Factory::getApplication()->getDocument()->addScriptDeclaration($js);
+			if ($js) \Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
 		}
 
 		return

@@ -18,7 +18,7 @@
 
 // no direct access
 defined('_JEXEC') or die('Restricted access');
-use Joomla\Database\DatabaseInterface;
+
 jimport('legacy.view.legacy');
 
 /**
@@ -34,12 +34,12 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 	function display( $tpl = null )
 	{
 		$app      = \Joomla\CMS\Factory::getApplication();
-		$config   = \Joomla\CMS\Factory::getApplication()->getConfig();
+		$config   = \Joomla\CMS\Factory::getConfig();
 		$params   = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
-		$document	= \Joomla\CMS\Factory::getApplication()->getDocument();
-		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
-		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();		
-		$db       = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$document	= \Joomla\CMS\Factory::getDocument();
+		$session  = \Joomla\CMS\Factory::getSession();
+		$user     = \Joomla\CMS\Factory::getUser();		
+		$db       = \Joomla\CMS\Factory::getDbo();
 		$print_logging_info = $params->get('print_logging_info');
 		
 		// Special displaying when getting flexicontent version

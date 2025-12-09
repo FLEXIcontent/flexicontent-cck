@@ -14,8 +14,6 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\CMS\Language\Text;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
-use Joomla\Database\DatabaseInterface;
-use Joomla\CMS\Toolbar\ToolbarFactoryInterface;
 
 JLoader::register('FlexicontentViewBaseRecord', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_record.php');
 
@@ -77,12 +75,12 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 			// TODO: remove this need by moving common language string to different file ?
 
 			// Load english language file for 'com_content' component then override with current language file
-			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_content', JPATH_ADMINISTRATOR, 'en-GB', true);
-			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_content', JPATH_ADMINISTRATOR, null, true);
+			\Joomla\CMS\Factory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR, 'en-GB', true);
+			\Joomla\CMS\Factory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR, null, true);
 
 			// Load english language file for 'com_flexicontent' component then override with current language file
-			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
-			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 		}
 
 		/**
@@ -94,11 +92,11 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$app        = \Joomla\CMS\Factory::getApplication();
 		$jinput     = $app->input;
 		$dispatcher = JEventDispatcher::getInstance();
-		$document   = \Joomla\CMS\Factory::getApplication()->getDocument();
-		$config     = \Joomla\CMS\Factory::getApplication()->getConfig();
-		$session    = \Joomla\CMS\Factory::getApplication()->getSession();
-		$user       = \Joomla\CMS\Factory::getApplication()->getIdentity();
-		$db         = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$document   = \Joomla\CMS\Factory::getDocument();
+		$config     = \Joomla\CMS\Factory::getConfig();
+		$session    = \Joomla\CMS\Factory::getSession();
+		$user       = \Joomla\CMS\Factory::getUser();
+		$db         = \Joomla\CMS\Factory::getDbo();
 		$uri        = \Joomla\CMS\Uri\Uri::getInstance();
 		$task       = $jinput->getCmd('task');
 		$cparams    = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
@@ -347,11 +345,11 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		// Add css to document
 		if ($isAdmin)
 		{
-			!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
+			!\Joomla\CMS\Factory::getLanguage()->isRtl()
 				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
 				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
 		}
-		!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
+		!\Joomla\CMS\Factory::getLanguage()->isRtl()
 			? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 			: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 
@@ -1010,12 +1008,12 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 	{
 		$app      = \Joomla\CMS\Factory::getApplication();
 		$jinput   = $app->input;
-		$db       = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
-		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();	// get current user
+		$db       = \Joomla\CMS\Factory::getDbo();
+		$user     = \Joomla\CMS\Factory::getUser();	// get current user
 		$model    = $this->getModel();
 		$item     = $model->getItem(null, $check_view_access=false, $no_cache=false, $force_version=0);  // ZERO force_version means unversioned data
-		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
-		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
+		$document = \Joomla\CMS\Factory::getDocument();
+		$session  = \Joomla\CMS\Factory::getSession();
 		$option   = $jinput->get('option', '', 'cmd');
 		$isAdmin  = $app->isClient('administrator');
 		$isSite   = $app->isClient('site');
@@ -1590,7 +1588,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 		// Get user, user's global permissions
 		$permission = FlexicontentHelperPerm::getPerm();
-		$user       = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user       = \Joomla\CMS\Factory::getUser();
 
 		$perms = array();
 		$perms['isSuperAdmin'] = $permission->SuperAdmin;
@@ -1661,8 +1659,8 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$categories = & $globalcats;
 
 		$app     = \Joomla\CMS\Factory::getApplication();
-		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
-		$session = \Joomla\CMS\Factory::getApplication()->getSession();
+		$user    = \Joomla\CMS\Factory::getUser();
+		$session = \Joomla\CMS\Factory::getSession();
 
 		$perms   = $this->_getItemPerms();
 		$tparams = $model->getTypeparams();
@@ -1687,7 +1685,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		}
 
 		$tbname  = $buttons_placement === -1 ? 'toolbar' : 'fctoolbar';  // -1 : Place at page header
-		$toolbar = \Joomla\CMS\Factory::getApplication()->getDocument()->getToolbar($tbname);
+		$toolbar = \Joomla\CMS\Toolbar\Toolbar::getInstance($tbname);
 
 		$isSideBtns = in_array($buttons_placement, array(2,3));  // Side placement (left, right)
 		$add_inline = false; // $isSideBtns
@@ -1849,8 +1847,8 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		 * Add a preview button(s)
 		 */
 
-		//$_sh404sef = \Joomla\CMS\Plugin\PluginHelper::isEnabled('system', 'sh404sef') && \Joomla\CMS\Factory::getApplication()->getConfig()->get('sef');
-		$_sh404sef = defined('SH404SEF_IS_RUNNING') && \Joomla\CMS\Factory::getApplication()->getConfig()->get('sef');
+		//$_sh404sef = \Joomla\CMS\Plugin\PluginHelper::isEnabled('system', 'sh404sef') && \Joomla\CMS\Factory::getConfig()->get('sef');
+		$_sh404sef = defined('SH404SEF_IS_RUNNING') && \Joomla\CMS\Factory::getConfig()->get('sef');
 		if ( !$isnew && in_array( 'preview_latest', $allowbuttons) )
 		{
 			// Create the non-SEF URL
@@ -2060,14 +2058,14 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$jinput = $app->input;
 
 		$dispatcher = JEventDispatcher::getInstance();
-		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
-		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
+		$session  = \Joomla\CMS\Factory::getSession();
+		$document = \Joomla\CMS\Factory::getDocument();
 		$menus = $app->getMenu();
 		$menu  = $menus->getActive();
 		$uri   = \Joomla\CMS\Uri\Uri::getInstance();
-		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user  = \Joomla\CMS\Factory::getUser();
 		$aid   = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
-		$db    = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db    = \Joomla\CMS\Factory::getDbo();
 		$nullDate = $db->getNullDate();
 
 
@@ -2138,7 +2136,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		if (!$params->get('disablecss', ''))
 		{
 			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
-			!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
+			!\Joomla\CMS\Factory::getLanguage()->isRtl()
 				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 		}
@@ -2435,11 +2433,11 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		// e.g. item_somefilename.php for this reason we will use a fallback layout that surely has these files
 		$fallback_layout = $params->get('item_fallback_layout', 'grid');  // parameter does not exist yet
 		if ($ilayout != $fallback_layout) {
-			$this->addTemplatePath(JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$fallback_layout);
+			$this->addTemplatePath(JPATH_COMPONENT.DS.'templates'.DS.$fallback_layout);
 			$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$fallback_layout);
 		}
 
-		$this->addTemplatePath(JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$ilayout);
+		$this->addTemplatePath(JPATH_COMPONENT.DS.'templates'.DS.$ilayout);
 		$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$ilayout);
 
 
@@ -2593,7 +2591,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		);
 		$submit_conf_hash = md5(serialize($submit_conf));
 
-		$session = \Joomla\CMS\Factory::getApplication()->getSession();
+		$session = \Joomla\CMS\Factory::getSession();
 		$item_submit_conf = $session->get('item_submit_conf', array(),'flexicontent');
 		$item_submit_conf[$submit_conf_hash] = $submit_conf;
 		$session->set('item_submit_conf', $item_submit_conf, 'flexicontent');

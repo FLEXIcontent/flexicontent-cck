@@ -18,7 +18,6 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
-use Joomla\CMS\Factory;
 
 // Load the helper classes
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
@@ -52,8 +51,8 @@ class JFormFieldSeparator extends JFormFieldSpacer
 	{
 		self::$css_js_added = true;
 
-		$app = Factory::getApplication();
-		$document = Factory::getApplication()->getDocument();
+		$app = \Joomla\CMS\Factory::getApplication();
+		$document = \Joomla\CMS\Factory::getDocument();
 		$jinput = $app->input;
 		$option = $jinput->get('option', '', 'cmd');
 		$view = $jinput->get('view', '', 'cmd');
@@ -64,7 +63,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		{
 			$isAdmin = $app->isClient('administrator');
 
-			if (!Factory::getApplication()->getLanguage()->isRtl())
+			if (!\Joomla\CMS\Factory::getLanguage()->isRtl())
 			{
 				!$isAdmin ?
 					$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH)) :
@@ -77,7 +76,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
 			}
 
-			!Factory::getApplication()->getLanguage()->isRtl()
+			!\Joomla\CMS\Factory::getLanguage()->isRtl()
 				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 
@@ -102,7 +101,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 	function add_tab_css_js()
 	{
 		self::$tab_css_js_added = true;
-		$document = Factory::getApplication()->getDocument();
+		$document = \Joomla\CMS\Factory::getDocument();
 		
 		// Load JS tabber lib
 		$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
@@ -113,7 +112,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 
 	function add_comp_acl_headers()
 	{
-		Factory::getApplication()->getDocument()->addScriptDeclaration('
+		\Joomla\CMS\Factory::getDocument()->addScriptDeclaration('
 			jQuery(document).ready(function()
 			{
 				jQuery("div.control-group > div").each(function(i, el) {
@@ -184,7 +183,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		{
 			$this->add_css_js();
 			
-			$jinput = Factory::getApplication()->input;
+			$jinput = \Joomla\CMS\Factory::getApplication()->input;
 			$is_fc = $jinput->get('option', '', 'cmd') == 'com_flexicontent';
 		}
 		

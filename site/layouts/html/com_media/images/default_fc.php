@@ -3,10 +3,10 @@
 
 defined('_JEXEC') or die;
 
-$user       = \Joomla\CMS\Factory::getApplication()->getIdentity();
+$user       = \Joomla\CMS\Factory::getUser();
 $input      = \Joomla\CMS\Factory::getApplication()->input;
 $params     = \Joomla\CMS\Component\ComponentHelper::getParams('com_media');
-$lang       = \Joomla\CMS\Factory::getApplication()->getLanguage();
+$lang       = \Joomla\CMS\Factory::getLanguage();
 $onClick    = '';
 $fieldInput = $this->state->get('field.id');
 $isMoo      = $input->getInt('ismoo', 1);
@@ -33,7 +33,7 @@ if ($lang->isRtl())
 	\Joomla\CMS\HTML\HTMLHelper::_('stylesheet', 'media/popup-imagemanager_rtl.css', array('version' => 'auto', 'relative' => true));
 }
 
-\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptOptions(
+\Joomla\CMS\Factory::getDocument()->addScriptOptions(
 	'mediamanager', array(
 		'base'   => $params->get('image_path', 'images') . '/',
 		'asset'  => $asset,
@@ -42,7 +42,7 @@ if ($lang->isRtl())
 	)
 );
 
-\Joomla\CMS\Factory::getApplication()->getDocument()->addStyleDeclaration('
+\Joomla\CMS\Factory::getDocument()->addStyleDeclaration('
 	@media (min-width: 480px) {
 		#folderlist_chzn {
 			min-width: 320px;
@@ -123,7 +123,7 @@ if ($lang->isRtl())
 	}
 ');
 
-\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration(
+\Joomla\CMS\Factory::getDocument()->addScriptDeclaration(
 "
 	jQuery(document).ready(function($){
 		if (!!window.parent.fc_dialog_resize_now)
@@ -332,7 +332,7 @@ else // XTD Image plugin
 						</div>
 					</div>
 				</fieldset>
-				<?php \Joomla\CMS\Factory::getApplication()->getSession()->set('com_media.return_url', 'index.php?option=com_media&view=images&tmpl=component&fieldid=' . $input->getCmd('fieldid', '') . '&e_name=' . $input->getCmd('e_name') . '&asset=' . $asset . '&author=' . $author); ?>
+				<?php \Joomla\CMS\Factory::getSession()->set('com_media.return_url', 'index.php?option=com_media&view=images&tmpl=component&fieldid=' . $input->getCmd('fieldid', '') . '&e_name=' . $input->getCmd('e_name') . '&asset=' . $asset . '&author=' . $author); ?>
 			</div>
 		</form>
 	</div>

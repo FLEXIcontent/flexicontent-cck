@@ -19,7 +19,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 $params = $this->cparams;
-$document	= \Joomla\CMS\Factory::getApplication()->getDocument();
+$document	= \Joomla\CMS\Factory::getDocument();
 $cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 
 if (FLEXI_J40GE) \Joomla\CMS\Toolbar\ToolbarHelper::inlinehelp();

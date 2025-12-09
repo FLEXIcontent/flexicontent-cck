@@ -18,7 +18,7 @@
 
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
-use Joomla\Database\DatabaseInterface;
+
 jimport('legacy.model.legacy');
 
 /**
@@ -85,7 +85,7 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 	{
 		$app    = \Joomla\CMS\Factory::getApplication();
 		$jinput = $app->input;
-		$user   = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user   = \Joomla\CMS\Factory::getUser();
 
 		$option = $jinput->getCmd('option', '');
 		$view   = $jinput->getCmd('view', '');
@@ -225,7 +225,7 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 		if (empty($this->_pagination))
 		{
 			//jimport('cms.pagination.pagination');
-			require_once (JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'pagination.php');
+			require_once (JPATH_COMPONENT.DS.'helpers'.DS.'pagination.php');
 			$this->_pagination = new FCPagination($this->getTotal(), $this->getState('limitstart'), $this->getState('limit') );
 		}
 
@@ -241,7 +241,7 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 	 */
 	function _buildQuery()
 	{
-		$user		= \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user		= \Joomla\CMS\Factory::getUser();
 
 		// Show special state items
 		$show_noauth = $this->_params->get('show_noauth', 0);   // Show unauthorized items
@@ -388,8 +388,8 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 	{
 		$app    = \Joomla\CMS\Factory::getApplication();
 		$jinput = $app->input;
-		$user   = \Joomla\CMS\Factory::getApplication()->getIdentity();
-		$db     = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$user   = \Joomla\CMS\Factory::getUser();
+		$db     = \Joomla\CMS\Factory::getDbo();
 
 		$show_owned = $this->_params->get('show_owned', 1);     // Show items owned by current user, regardless of their state
 		$show_trashed = $this->_params->get('show_trashed', 1);   // Show trashed items (to authorized users)

@@ -1,6 +1,5 @@
 <?php
 use Joomla\String\StringHelper;
-use Joomla\Database\DatabaseInterface;
 //use Joomla\CMS\Application\CMSApplication;
 
 if (!defined('JPATH_BASE'))
@@ -206,7 +205,7 @@ class FlexicontentTasksCore
 		$newtext = '+' . implode( ' +', $_words ) .'*';  //print_r($_words); exit;
 
 		// Query CLAUSE for match the given text
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 		$quoted_text = $db->escape($newtext, true);
 		$quoted_text = $db->Quote( $quoted_text, false );
 		$_text_match  = ' MATCH (si.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
@@ -221,7 +220,7 @@ class FlexicontentTasksCore
 		{
 			$lta = 'i';
 			$lang_where .= ' AND (' . $lta . '.language LIKE ' . $db->Quote( $lang .'%' ) . ' OR ' . $lta . '.language="*" ) ';
-			//$lang_where .= ' AND (' . $lta . '.language = ' . $db->Quote(\Joomla\CMS\Factory::getApplication()->getLanguage()->getTag()) . ' OR ' . $lta . '.language = ' . $db->Quote('*') . ')';
+			//$lang_where .= ' AND (' . $lta . '.language = ' . $db->Quote(\Joomla\CMS\Factory::getLanguage()->getTag()) . ' OR ' . $lta . '.language = ' . $db->Quote('*') . ')';
 		}
 
 		$access_where = '';
@@ -229,7 +228,7 @@ class FlexicontentTasksCore
 
 		/*if (!$show_noauth)
 		{
-			$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+			$user = \Joomla\CMS\Factory::getUser();
 			$aid_arr = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
 			$aid_list = implode(",", $aid_arr);
 			$access_where .= ' AND ty.access IN (0,'.$aid_list.')';
@@ -343,7 +342,7 @@ class FlexicontentTasksCore
 		// Check for request forgeries
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
-		require_once \Joomla\Filesystem\Path::clean(JPATH_SITE . '/components/com_flexicontent/helpers/permission.php');
+		require_once \Joomla\CMS\Filesystem\Path::clean(JPATH_SITE . '/components/com_flexicontent/helpers/permission.php');
 
 		$app    = \Joomla\CMS\Factory::getApplication();
 		$perms  = FlexicontentHelperPerm::getPerm();
@@ -413,7 +412,7 @@ class FlexicontentTasksCore
 		$jinput  = $app->input;
 		if ($jinput->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
 
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 		$quoted_word = $db->escape($word, true);
 		$query = 'SELECT '.$col
 			.' FROM #__'.$tbl
@@ -476,12 +475,12 @@ class FlexicontentTasksCore
 		$jinput  = $app->input;
 		if ($jinput->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
 
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 
 		$lang_code = $jinput->getString('item_lang');
 		$lang_code = $lang_code && $lang_code !== '*'
           ? $lang_code
-          : $jinput->getString('lang', \Joomla\CMS\Factory::getApplication()->getLanguage()->getTag());
+          : $jinput->getString('lang', \Joomla\CMS\Factory::getLanguage()->getTag());
 
 		$query = $db->getQuery(true)
 			->select('la.*')
@@ -534,7 +533,7 @@ class FlexicontentTasksCore
 		if ($jinput->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
 
 		// Load english language file for 'com_flexicontent' component then override with current language file
-		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
-		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+		\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+		\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 	}
 }

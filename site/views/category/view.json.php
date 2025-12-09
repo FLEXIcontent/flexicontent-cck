@@ -41,7 +41,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		// Initialize framework variables
 		$app      = \Joomla\CMS\Factory::getApplication();
 		$jinput   = $app->input;
-		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user     = \Joomla\CMS\Factory::getUser();
 		$aid      = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
 
 		// Get model

@@ -19,7 +19,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 $params = $this->cparams;
-$document	= \Joomla\CMS\Factory::getApplication()->getDocument();
+$document	= \Joomla\CMS\Factory::getDocument();
 
 // For tabsets/tabs ids (focusing, etc)
 $tabSetCnt = -1;

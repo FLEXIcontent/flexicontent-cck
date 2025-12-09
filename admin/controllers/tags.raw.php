@@ -13,7 +13,6 @@ defined('_JEXEC') or die;
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
-use Joomla\Database\DatabaseInterface;
 
 JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php');
 
@@ -203,8 +202,8 @@ class FlexicontentControllerTags extends FlexicontentControllerBaseAdmin
 		$indexer     = $this->input->getCmd('indexer', 'tag_mappings');
 		$rebuildmode = $this->input->getCmd('rebuildmode', '');
 
-		$session = \Joomla\CMS\Factory::getApplication()->getSession();
-		$db      = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$session = \Joomla\CMS\Factory::getSession();
+		$db      = \Joomla\CMS\Factory::getDbo();
 		$app     = \Joomla\CMS\Factory::getApplication();
 
 		// Check indexer type
@@ -214,8 +213,8 @@ class FlexicontentControllerTags extends FlexicontentControllerBaseAdmin
 		}
 
 		// Clear previous log file
-		$log_filename = 'tag_mappings_checker_' . \Joomla\CMS\Factory::getApplication()->getIdentity()->id . '.php';
-		$log_filename_full = \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getApplication()->getConfig()->get('log_path') . DS . $log_filename);
+		$log_filename = 'tag_mappings_checker_' . \Joomla\CMS\Factory::getUser()->id . '.php';
+		$log_filename_full = \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getConfig()->get('log_path') . DS . $log_filename);
 
 		if (file_exists($log_filename_full))
 		{
@@ -275,8 +274,8 @@ class FlexicontentControllerTags extends FlexicontentControllerBaseAdmin
 
 		$start_microtime = microtime(true);
 
-		$session = \Joomla\CMS\Factory::getApplication()->getSession();
-		$db      = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$session = \Joomla\CMS\Factory::getSession();
+		$db      = \Joomla\CMS\Factory::getDbo();
 		$app     = \Joomla\CMS\Factory::getApplication();
 
 		$has_zlib      = function_exists("zlib_encode"); // Version_compare(PHP_VERSION, '5.4.0', '>=');

@@ -18,7 +18,6 @@
 
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
-use Joomla\Database\DatabaseInterface;
 
 jimport('cms.plugin.plugin');
 
@@ -92,7 +91,7 @@ class plgSearchFlexisearch extends \Joomla\CMS\Plugin\CMSPlugin
 		}
 		$whereTypes =  $wheres ? '(' . implode(') OR (', $wheres) . ')' : '';
 		
-		$db		= \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db		= \Joomla\CMS\Factory::getDbo();
 		$query	= $db->getQuery(true);
 		$query->clear();
 		$query->select('t.id, t.name ');
@@ -147,12 +146,12 @@ class plgSearchFlexisearch extends \Joomla\CMS\Plugin\CMSPlugin
 	 */
 	function onContentSearch( $text, $phrase='', $ordering='', $areas=null )
 	{
-		$db		= \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db		= \Joomla\CMS\Factory::getDbo();
 		$app	= \Joomla\CMS\Factory::getApplication();
-		$user	= \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user	= \Joomla\CMS\Factory::getUser();
 		
 		// Get language
-		$cntLang = substr(\Joomla\CMS\Factory::getApplication()->getLanguage()->getTag(), 0,2);  // Current Content language (Can be natively switched in J2.5)
+		$cntLang = substr(\Joomla\CMS\Factory::getLanguage()->getTag(), 0,2);  // Current Content language (Can be natively switched in J2.5)
 		$urlLang  = \Joomla\CMS\Factory::getApplication()->input->getWord('lang', '' );                 // Language from URL (Can be switched via Joomfish in J1.5)
 		$lang = (FLEXI_J16GE || empty($urlLang)) ? $cntLang : $urlLang;
 		

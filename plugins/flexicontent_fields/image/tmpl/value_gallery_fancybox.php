@@ -66,7 +66,7 @@ if ( !isset(static::$js_added[$field->id][__FILE__]) )
 
 	$js = '';
 
-	if ($js) \Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration($js);
+	if ($js) \Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
 
 	static::$js_added[$field->id][__FILE__] = array();
 }
@@ -122,7 +122,7 @@ if (!isset(static::$js_added[$field->id][__FILE__][$item->id]))
 	})(jQuery);
 	";
 
-	if ($js) \Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration($js);
+	if ($js) \Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
 	static::$js_added[$field->id][__FILE__][$item->id] = true;
 }
 

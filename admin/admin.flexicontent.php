@@ -25,7 +25,7 @@ $is_fc_component = 1;
 
 $cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 $app     = \Joomla\CMS\Factory::getApplication();
-$document= \Joomla\CMS\Factory::getApplication()->getDocument();
+$document= \Joomla\CMS\Factory::getDocument();
 $jinput  = $app->input;
 $format  = $jinput->get('format', 'html', 'cmd');
 
@@ -38,7 +38,7 @@ $force_print = false || JDEBUG;
 
 // Force post-install check for testing purposes
 /*if ( $format == "html" ) {
-	$session = \Joomla\CMS\Factory::getApplication()->getSession();
+	$session = \Joomla\CMS\Factory::getSession();
 	$postinst_integrity_ok = $session->get('flexicontent.postinstall');
 	$recheck_aftersave = $session->get('flexicontent.recheck_aftersave');
 	$force_print = $postinst_integrity_ok===NULL || $postinst_integrity_ok===false || $recheck_aftersave;
@@ -89,26 +89,26 @@ if (!FLEXI_ONDEMAND)
  */
 
 // Load language file of 'com_content' component
-\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_content', JPATH_ADMINISTRATOR);
+\Joomla\CMS\Factory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR);
 
-if ( \Joomla\CMS\Factory::getApplication()->getLanguage()->getDefault() != 'en-GB' )
+if ( \Joomla\CMS\Factory::getLanguage()->getDefault() != 'en-GB' )
 {
 	// If site default language is not english then load english language file for 'com_flexicontent' component, and the override (forcing a reload) with current language file
 	// We make sure that 'english' file has been loaded, because we need it as fallback for language strings that do not exist in current language
-	\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', $force_reload = false, $load_default = true);
-	\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, $force_reload = true, $load_default = true);
+	\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', $force_reload = false, $load_default = true);
+	\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, $force_reload = true, $load_default = true);
 }
 
 else
 	// No force loading needed, save some time, and do not force language file reload
-	\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR);
+	\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR);
 
 // Load language overrides, just before executing the component (DONE manually for J1.5)
 /*if (!FLEXI_J16GE)
 {
 	$overrideDir = JPATH_ADMINISTRATOR . '/languages/overrides/';
-	\Joomla\CMS\Factory::getApplication()->getLanguage()->load('override', $overrideDir, 'en-GB', $force_reload = true, $load_default = true);
-	\Joomla\CMS\Factory::getApplication()->getLanguage()->load('override', $overrideDir, null, $force_reload = true, $load_default = true);
+	\Joomla\CMS\Factory::getLanguage()->load('override', $overrideDir, 'en-GB', $force_reload = true, $load_default = true);
+	\Joomla\CMS\Factory::getLanguage()->load('override', $overrideDir, null, $force_reload = true, $load_default = true);
 }*/
 
 
@@ -153,7 +153,7 @@ if ( isset($forced_views[$controller]) )
 // ***
 
 // CASE 1: Use (if it exists) controller named as current view name
-if ( file_exists(JPATH_BASE . '/components/com_flexicontent/controllers/'.$view . ($format !== 'html' ? '.' . $format : '') . '.php') )
+if ( file_exists(JPATH_COMPONENT.'/controllers/'.$view . ($format !== 'html' ? '.' . $format : '') . '.php') )
 {
 	if ($controller !== 'group')
 	{
@@ -163,7 +163,7 @@ if ( file_exists(JPATH_BASE . '/components/com_flexicontent/controllers/'.$view 
 
 
 // CASE 2: Singular views do not (usually) have a controller, use (if it exists) the 'Plural' controller by appending 's' to view name
-else if ( file_exists( JPATH_BASE . '/components/com_flexicontent/controllers/'.$view.'s' . ($format !== 'html' ? '.' . $format : '') . '.php' ) )
+else if ( file_exists( JPATH_COMPONENT.'/controllers/'.$view.'s' . ($format !== 'html' ? '.' . $format : '') . '.php' ) )
 {
 	$controller = $view.'s';
 	$task = $task ?: 'edit';  // Default task for singular views is 'edit', set it if task is empty
@@ -214,8 +214,8 @@ if (
 )
 {
 	// Load english language file for 'com_users' component then override with current language file
-	\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_users', JPATH_ADMINISTRATOR, 'en-GB', true);
-	\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_users', JPATH_ADMINISTRATOR, null, true);
+	\Joomla\CMS\Factory::getLanguage()->load('com_users', JPATH_ADMINISTRATOR, 'en-GB', true);
+	\Joomla\CMS\Factory::getLanguage()->load('com_users', JPATH_ADMINISTRATOR, null, true);
 	// users helper file
 	require_once (JPATH_ADMINISTRATOR.'/components/com_flexicontent/helpers/users.php');
 }
@@ -287,8 +287,8 @@ if ($format === 'html')
 		\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip');
 	}
 	// Add flexi-lib JS
-	\Joomla\CMS\Factory::getApplication()->getDocument()->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', array('version' => FLEXI_VHASH));  // Frontend/backend script
-	\Joomla\CMS\Factory::getApplication()->getDocument()->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/js/flexi-lib.js', array('version' => FLEXI_VHASH));  // Backend only script
+	\Joomla\CMS\Factory::getDocument()->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', array('version' => FLEXI_VHASH));  // Frontend/backend script
+	\Joomla\CMS\Factory::getDocument()->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/js/flexi-lib.js', array('version' => FLEXI_VHASH));  // Backend only script
 
 	// Validate when Joomla.submitForm() is called, NOTE: for non-FC views this is done before the method is called
 	$js = '

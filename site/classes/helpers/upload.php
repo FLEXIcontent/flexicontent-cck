@@ -1,6 +1,5 @@
 <?php
 defined( '_JEXEC' ) or die( 'Restricted access' );
-use Joomla\CMS\Language\LanguageFactoryInterface;
 
 class flexicontent_upload
 {
@@ -38,7 +37,7 @@ class flexicontent_upload
 		{
 			if ($do)
 			{
-				$transformed = \Joomla\CMS\Factoryget::getContainer()->get(LanguageFactoryInterface::class)->createLanguage($language, false)->transliterate($file);
+				$transformed = \Joomla\CMS\Language\Language::getInstance($language)->transliterate($file);
 				$file_safe = $transformed ? preg_replace($regex, '', $transformed) : false;
 
 				// Stop trying transliterations if a complete job was done
@@ -348,10 +347,10 @@ class flexicontent_upload
 		$foldername = $folder;
 
 		//make a unique folder name for the image and check it is not already taken
-		if (\Joomla\Filesystem\Folder::exists( $base_Dir . $folder ))
+		if (\Joomla\CMS\Filesystem\Folder::exists( $base_Dir . $folder ))
 		{
 			$unique_num = 1;
-			while( \Joomla\Filesystem\Folder::exists( $base_Dir . $folder . '-' . $unique_num ))
+			while( \Joomla\CMS\Filesystem\Folder::exists( $base_Dir . $folder . '-' . $unique_num ))
 			{
 				$unique_num++;
 			}

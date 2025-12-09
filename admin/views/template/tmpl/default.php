@@ -17,7 +17,6 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
-use Joomla\Database\DatabaseInterface;
 
 //adding inline help
 if (FLEXI_J40GE) \Joomla\CMS\Toolbar\ToolbarHelper::inlinehelp();
@@ -37,7 +36,7 @@ $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
 
 $app = \Joomla\CMS\Factory::getApplication();
-$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+$db = \Joomla\CMS\Factory::getDbo();
 \Joomla\CMS\Factory::getApplication()->setUserState('editor.source.syntax', 'css');
 
 $code_btn_lbls = array(

@@ -13,8 +13,6 @@ defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
-use Joomla\Database\DatabaseInterface;
-use Joomla\CMS\Toolbar\ToolbarFactoryInterface;
 
 JLoader::register('FlexicontentViewBaseRecord', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_record.php');
 
@@ -36,9 +34,9 @@ class FlexicontentViewUser extends FlexicontentViewBaseRecord
 
 		$app        = \Joomla\CMS\Factory::getApplication();
 		$jinput     = $app->input;
-		$document   = \Joomla\CMS\Factory::getApplication()->getDocument();
-		$user       = \Joomla\CMS\Factory::getApplication()->getIdentity();
-		$db         = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$document   = \Joomla\CMS\Factory::getDocument();
+		$user       = \Joomla\CMS\Factory::getUser();
+		$db         = \Joomla\CMS\Factory::getDbo();
 		$cparams    = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 		$perms      = FlexicontentHelperPerm::getPerm();
 
@@ -91,16 +89,16 @@ class FlexicontentViewUser extends FlexicontentViewBaseRecord
 		// Add css to document
 		if ($isAdmin)
 		{
-			!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
+			!\Joomla\CMS\Factory::getLanguage()->isRtl()
 				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
 				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
-			!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
+			!\Joomla\CMS\Factory::getLanguage()->isRtl()
 				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 		}
 		else
 		{
-			!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
+			!\Joomla\CMS\Factory::getLanguage()->isRtl()
 				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
 				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
 		}
@@ -125,7 +123,7 @@ class FlexicontentViewUser extends FlexicontentViewBaseRecord
 		 * Create the toolbar
 		 */
 
-		$toolbar = \Joomla\CMS\Factory::getApplication()->getDocument()->getToolbar('toolbar');
+		$toolbar = \Joomla\CMS\Toolbar\Toolbar::getInstance('toolbar');
 
 		// Creation flag used to decide if adding save and new / save as copy buttons are allowed
 		$cancreate = false;  // We will not create new users in our backend
@@ -196,16 +194,16 @@ class FlexicontentViewUser extends FlexicontentViewBaseRecord
 			$full_js="var url = jQuery(this).attr('data-href'); var the_dialog = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, fc_edit_juser_modal_close, {title:'".$modal_title."', loadFunc: fc_edit_juser_modal_load}); return false;",
 			$msg_alert='', $msg_confirm='',
 			$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="spaced-btn btn-info".$tip_class, $btn_icon="icon-pencil",
-			'data-placement="bottom" data-href="index.php?option=com_users&task=user.edit&id='.$row->id.'" title="Edit all details of joomla user"'
+			'data-placement="bottom" data-href="index.php?option=com_users&task=user.edit&id='.$row->get('id').'" title="Edit all details of joomla user"'
 		);
 
 
 		// Get contact data
-		if ($row->id)
+		if ($row->get('id'))
 		{
 			$query = 'SELECT *'
 				. ' FROM #__contact_details'
-				. ' WHERE user_id = ' . (int) $row->id;
+				. ' WHERE user_id = ' . (int) $row->get('id');
 			$contact = $db->setQuery($query)->loadObjectList();
 		}
 
@@ -231,7 +229,7 @@ class FlexicontentViewUser extends FlexicontentViewBaseRecord
 
 		\Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 		$flexiauthor_extdata = \Joomla\CMS\Table\Table::getInstance('flexicontent_authors_ext', '');
-		$flexiauthor_extdata->load($row->id);
+		$flexiauthor_extdata->load($row->get('id'));
 		//echo "<pre>"; print_r($flexiauthor_extdata); echo "</pre>"; exit;
 
 
@@ -243,7 +241,7 @@ class FlexicontentViewUser extends FlexicontentViewBaseRecord
 		// NOTE: this is one step for J1.5 via a JParameter object, but in J1.6+ the use of XML file
 		// in JParameter is deprecated, instead we will \Joomla\CMS\Form\Form to load XML description and thus be able to render it
 
-		$auth_xml = JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'forms'.DS.'author.xml';
+		$auth_xml = JPATH_COMPONENT.DS.'models'.DS.'forms'.DS.'author.xml';
 		$params_authorbasic = new \Joomla\Registry\Registry($flexiauthor_extdata->author_basicparams);
 		//echo "<pre>"; print_r($params_authorbasic); echo "</pre>"; exit;
 
@@ -270,7 +268,7 @@ class FlexicontentViewUser extends FlexicontentViewBaseRecord
 		// NOTE: this is one step for J1.5 via a JParameter object, but in J1.6+ the use of XML file
 		// in JParameter is deprecated, instead we will \Joomla\CMS\Form\Form to load XML description and thus be able to render it
 
-		$cat_xml = JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'forms'.DS.'category.xml';
+		$cat_xml = JPATH_COMPONENT.DS.'models'.DS.'forms'.DS.'category.xml';
 		$params_authorcat = new \Joomla\Registry\Registry($flexiauthor_extdata->author_catparams);
 		//echo "<pre>"; print_r($params_authorcat); echo "</pre>"; exit;
 
@@ -323,7 +321,7 @@ class FlexicontentViewUser extends FlexicontentViewBaseRecord
 			}
 		}
 
-		if (!$row->id)
+		if (!$row->get('id'))
 		{
 			$new_usertype = \Joomla\CMS\Component\ComponentHelper::getParams('com_users')->get('new_usertype');
 			$usergroups = $new_usertype ? array($new_usertype) : array();
@@ -331,16 +329,16 @@ class FlexicontentViewUser extends FlexicontentViewBaseRecord
 		else
 		{
 			$ugrps_qtmpl = 'SELECT group_id FROM #__user_usergroup_map AS ug WHERE ug.user_id = %d';
-			$query = sprintf($ugrps_qtmpl, (int) $row->id);
+			$query = sprintf($ugrps_qtmpl, (int) $row->get('id'));
 
 			$usergroups = $db->setQuery($query)->loadColumn();
 		}
 
 		// build the html select list
-		$lists['block'] 	= \Joomla\CMS\HTML\HTMLHelper::_('select.booleanlist',  'block', 'class="inputbox" size="1"', $row->block );
+		$lists['block'] 	= \Joomla\CMS\HTML\HTMLHelper::_('select.booleanlist',  'block', 'class="inputbox" size="1"', $row->get('block') );
 
 		// build the html select list
-		$lists['sendEmail'] = \Joomla\CMS\HTML\HTMLHelper::_('select.booleanlist',  'sendEmail', 'class="inputbox" size="1"', $row->sendEmail );
+		$lists['sendEmail'] = \Joomla\CMS\HTML\HTMLHelper::_('select.booleanlist',  'sendEmail', 'class="inputbox" size="1"', $row->get('sendEmail') );
 
 
 		/**

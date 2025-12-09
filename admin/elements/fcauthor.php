@@ -7,9 +7,7 @@
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
-defined('_JEXEC') or die;
-use Joomla\Database\DatabaseInterface;
-use Joomla\CMS\Factory;
+defined('JPATH_PLATFORM') or die;
 
 jimport('cms.html.html');      // JHtml
 jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
@@ -58,7 +56,7 @@ class JFormFieldFcauthor extends JFormFieldList
 
 			$options = array();
 
-			$db = Factory::getContainer()->get(DatabaseInterface::class);
+			$db = \Joomla\CMS\Factory::getDbo();
 
 			// Construct the query
 			$query = $db->getQuery(true)

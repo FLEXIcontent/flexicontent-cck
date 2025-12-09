@@ -280,7 +280,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 		// Create pagination object if it doesn't already exist
 		if (empty($this->_pagination))
 		{
-			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent' . DS . 'helpers' . DS . 'pagination.php');
+			require_once (JPATH_COMPONENT_SITE . DS . 'helpers' . DS . 'pagination.php');
 			$this->_pagination = new FCPagination($this->getTotal(), $this->getState('limitstart'), $this->getState('limit'));
 		}
 
@@ -443,7 +443,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 	protected function _buildContentWhere($q = false)
 	{
 		$table = $this->getTable($this->records_jtable, '');
-		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user  = \Joomla\CMS\Factory::getUser();
 
 		// Various filters
 		$filter_state  = $this->getState('filter_state');
@@ -541,7 +541,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 			}
 
 			// Filter via View Level Access, if user is not super-admin
-			if (!\Joomla\CMS\Factory::getApplication()->getIdentity()->authorise('core.admin') && (\Joomla\CMS\Factory::getApplication()->isClient('site') || $this->listViaAccess))
+			if (!\Joomla\CMS\Factory::getUser()->authorise('core.admin') && (\Joomla\CMS\Factory::getApplication()->isClient('site') || $this->listViaAccess))
 			{
 				$groups  = implode(',', \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id));
 				$where[] = 'a.access IN (' . $groups . ')';
@@ -652,7 +652,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 
 		if (count($ids))
 		{
-			$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+			$user = \Joomla\CMS\Factory::getUser();
 
 			// This is already done by controller task / caller but redo
 			$ids = ArrayHelper::toInteger($ids);
@@ -1030,7 +1030,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 	 */
 	public function filterByPermission($cid, $action)
 	{
-		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user  = \Joomla\CMS\Factory::getUser();
 		$table = $this->getTable($this->records_jtable, '');
 
 		$cid   = ArrayHelper::toInteger($cid);

@@ -46,7 +46,7 @@ class flexicontent_mediadatas extends flexicontent_basetable
 		}*/
 
 		// If edited by mediadata submitter then also set the update_date
-		/*if ( $this->id && $this->user_id == \Joomla\CMS\Factory::getApplication()->getIdentity()->id )
+		/*if ( $this->id && $this->user_id == \Joomla\CMS\Factory::getUser()->id )
 		{
 			$datenow = \Joomla\CMS\Factory::getDate();
 			$this->update_date = $datenow->toSql();

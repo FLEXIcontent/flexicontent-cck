@@ -29,7 +29,7 @@ JLoader::register('\Joomla\CMS\Form\FormFieldFclayoutbuilder', JPATH_ADMINISTRAT
 
 // Decide whether to show module contents
 $app     = \Joomla\CMS\Factory::getApplication();
-$config  = \Joomla\CMS\Factory::getApplication()->getConfig();
+$config  = \Joomla\CMS\Factory::getConfig();
 $jinput  = $app->input;
 $option  = $jinput->get('option', '', 'cmd');
 $view    = $jinput->get('view', '', 'cmd');
@@ -106,7 +106,7 @@ if ($mod_initialized === null)
 
 // Initialize various variables
 global $globalcats;
-$document = \Joomla\CMS\Factory::getApplication()->getDocument();
+$document = \Joomla\CMS\Factory::getDocument();
 $flexiparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 
 // Include the helper only once

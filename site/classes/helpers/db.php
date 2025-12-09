@@ -4,7 +4,6 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Table\Table;
-use Joomla\Database\DatabaseInterface;
 
 /*
  * CLASS with common methods for handling interaction with DB
@@ -22,7 +21,7 @@ class flexicontent_db
 		// static variable (array) so that we load overrides only once per language
 		static $lang_overrides_site;
 		static $lang_overrides_admin;
-		$oLang = $oLang ?: \Joomla\CMS\Factory::getApplication()->getLanguage()->getTag();
+		$oLang = $oLang ?: \Joomla\CMS\Factory::getLanguage()->getTag();
 
 		// Check if we have loaded the override file already, (aka we load it only once)
 		if ($oLang && (!isset($lang_overrides_site[$oLang]) || !isset($lang_overrides_site[$oLang])))
@@ -68,7 +67,7 @@ class flexicontent_db
 	 */
 	static function setValues_commonDataTypes($obj, $all=false)
 	{
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 		$query = 'UPDATE IGNORE #__flexicontent_fields_item_relations'
 			. ' SET value_integer = CAST(value AS SIGNED), value_decimal = CAST(value AS DECIMAL(65,15)), value_datetime = CAST(value AS DATETIME) '
 			. (!$all ? ' WHERE item_id = ' . (int) $obj->item_id . ' AND field_id = ' . (int) $obj->field_id . ' AND valueorder = ' . (int) $obj->valueorder. ' AND suborder = ' . (int) $obj->suborder : '');
@@ -85,7 +84,7 @@ class flexicontent_db
 	 */
 	static function check_fix_JSON_column($colname, $tblname, $idname, $id, & $attribs=null)
 	{
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 
 		// This extra may seem redudant, but it is to avoid clearing valid data, due to coding or other errors
 		$db->setQuery('SELECT '.$colname.' FROM #__'.$tblname.' WHERE '.$idname.' = ' . $db->Quote($id));
@@ -119,7 +118,7 @@ class flexicontent_db
 	 */
 	static function assign_default_WF($pk, $record = null, $extension = 'com_content.article', $stage_id = 0)
 	{
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 		if (!FLEXI_J40GE || !$pk) return;
 
 		// This extra may seem redudant, but it is to avoid clearing valid data, due to coding or other errors
@@ -173,7 +172,7 @@ class flexicontent_db
 
 		if ( $accessid!==null && isset($access_names[$accessid]) ) return $access_names[$accessid];
 
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 		$db->setQuery('SELECT id, title FROM #__viewlevels');
 		$_arr = $db->loadObjectList();
 		$access_names = array(0=>'Public');  // zero does not exist in J2.5+ but we set it for compatibility
@@ -207,7 +206,7 @@ class flexicontent_db
 			return $typeparams[$typeid];
 		}
 
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 		$query	= 'SELECT t.id, t.attribs'
 			. ' FROM #__flexicontent_types AS t'
 			. ($itemid ? ' JOIN #__flexicontent_items_ext as ie ON ie.type_id = t.id' : '')
@@ -267,7 +266,7 @@ class flexicontent_db
 	 */
 	static function getFavourites($type, $item_id)
 	{
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 
 		$query = '
 			SELECT COUNT(id) AS favs
@@ -288,7 +287,7 @@ class flexicontent_db
 	 */
 	static function getFavoured($type, $item_id, $user_id)
 	{
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 
 		$query = '
 			SELECT COUNT(id) AS fav
@@ -311,7 +310,7 @@ class flexicontent_db
 	 */
 	static function removefav($type, $item_id, $user_id)
 	{
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 
 		$query = '
 			DELETE FROM #__flexicontent_favourites
@@ -333,7 +332,7 @@ class flexicontent_db
 	 */
 	static function addfav($type, $item_id, $user_id)
 	{
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 
 		$obj = new stdClass();
 		$obj->itemid = (int)$item_id;
@@ -359,7 +358,7 @@ class flexicontent_db
 			return $userConfig[$user_id];
 		}
 
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 		$query = 'SELECT author_basicparams'
 			. ' FROM #__flexicontent_authors_ext'
 			. ' WHERE user_id = ' . $user_id;
@@ -379,7 +378,7 @@ class flexicontent_db
 	 */
 	static function removeInvalidWords($words, &$stopwords, &$shortwords, $tbl='flexicontent_items_ext', $col='search_index', $isprefix=1)
 	{
-		$db     = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db     = \Joomla\CMS\Factory::getDbo();
 		$app    = \Joomla\CMS\Factory::getApplication();
 		$option = $app->input->get('option', '', 'cmd');
 		$min_word_len = $app->getUserState( $option.'.min_word_len', 0 );
@@ -428,7 +427,7 @@ class flexicontent_db
 		$queries = file_get_contents( $sql_file );
 		$queries = preg_split("/;+(?=([^'|^\\\']*['|\\\'][^'|^\\\']*['|\\\'])*[^'|^\\\']*[^'|^\\\']$)/", $queries);
 
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 
 		foreach ($queries as $query)
 		{
@@ -448,7 +447,7 @@ class flexicontent_db
 	 */
 	static function & directQuery($query, $assoc = false, $unbuffered = false)
 	{
-		$db   = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db   = \Joomla\CMS\Factory::getDbo();
 		$app  = \Joomla\CMS\Factory::getApplication();
 		$dbprefix = $app->getCfg('dbprefix');
 		$dbtype   = $app->getCfg('dbtype');
@@ -782,7 +781,7 @@ class flexicontent_db
 				break;
 			case 'random':
 				// Convert session id to array of hex strings (4 bytes each)
-				$sid = \Joomla\CMS\Factory::getApplication()->getSession()->getId();
+				$sid = \Joomla\CMS\Factory::getSession()->getId();
 				$sid = str_split(md5($sid), 8);
 				// Create a SEED doing a XOR operation on session-ID to keep SEED to 4 bytes
 				$seed = null;
@@ -922,7 +921,7 @@ class flexicontent_db
 				break;
 			case 'random':
 				// Convert session id to array of hex strings (4 bytes each)
-				$sid = \Joomla\CMS\Factory::getApplication()->getSession()->getId();
+				$sid = \Joomla\CMS\Factory::getSession()->getId();
 				$sid = str_split(md5($sid), 8);
 				// Create a SEED doing a XOR operation on session-ID to keep SEED to 4 bytes
 				$seed = null;
@@ -961,7 +960,7 @@ class flexicontent_db
 		$cid = \Joomla\CMS\Factory::getApplication()->input->get('cid', array(0), 'array');
 		$cid = ArrayHelper::toInteger($cid);
 
-		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user = \Joomla\CMS\Factory::getUser();
 		$controller->setRedirect($redirect_url, '');
 
 		static $canCheckinRecords = null;
@@ -1044,7 +1043,7 @@ class flexicontent_db
 	 */
 	static function getFieldTypes($group=false, $usage=false, $published=false)
 	{
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 		$query = 'SELECT plg.element AS field_type, plg.name as title'
 			.($usage ? ', count(f.id) as assigned' : '')
 			.' FROM #__extensions AS plg'
@@ -1114,7 +1113,7 @@ class flexicontent_db
 		}
 
 		// Retrieve item's Content Type parameters
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 		$query = $db->getQuery(true)
 			->select('*')
 			->from('#__flexicontent_types AS t');
@@ -1153,7 +1152,7 @@ class flexicontent_db
 		}
 
 		// Get associated translations
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 		$query = 'SELECT a.id as id, k.id as original_id'
 			. ' FROM #__associations AS a'
 			. ' JOIN #__associations AS k ON a.`key`=k.`key`'
@@ -1182,7 +1181,7 @@ class flexicontent_db
 			'modified' => 'modified',
 		);
 
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 		$query = 'SELECT a.id as item_id, i.id as id, i.title, i.' . $config->created . ' as created, i.' . $config->modified . ' as modified, '
 			. ' i.language as language, i.language as lang, ' . $db->qn('a.key') . ' as ' . $db->qn('key') 
 			. (!empty($config->state) ?', i.' . $config->state . ' AS state ' : '')
@@ -1250,7 +1249,7 @@ class flexicontent_db
 		// Make sure associations ids are integers
 		$associations = ArrayHelper::toInteger($associations);
 
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 		$query = $db->getQuery(true)
 			->select($db->qn('key'))
 			->from('#__associations')
@@ -1369,7 +1368,7 @@ class flexicontent_db
 			return;
 		}
 
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 
 		$query = 'SELECT COUNT(*) FROM #__tags WHERE parent_id = 0 AND id <> 1';
 		$tags_table_fix_needed = (boolean) $db->setQuery($query)->loadResult();
@@ -1431,7 +1430,7 @@ class flexicontent_db
 				->createTable('Tag', 'Administrator');
 		}
 
-		$canCreate = \Joomla\CMS\Factory::getApplication()->getIdentity()->authorise('core.create', 'com_tags');
+		$canCreate = \Joomla\CMS\Factory::getUser()->authorise('core.create', 'com_tags');
 
 		foreach ($tags as $key => $tag)
 		{
@@ -1600,7 +1599,7 @@ class flexicontent_db
 	 */
 	private static function _getUserGroupIDs()
 	{
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 
 		$query = $db->getQuery(true);
 		$query
@@ -1627,7 +1626,7 @@ class flexicontent_db
 		}
 
 		// Find usergroups with Super Admin privilege
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 		$groupIDs = flexicontent_db::_getUserGroupIDs();
 		$suGroupIDs = array();
 

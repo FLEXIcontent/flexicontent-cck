@@ -14,7 +14,7 @@
  * Based on "joomlalinks" found in JCE's core distribution, and flexicontentlinks by Emmanuel Dannan and Ryan Demmer
  */
 defined('_WF_EXT') or die('RESTRICTED');
-use Joomla\Database\DatabaseInterface;
+
 class FlexicontentlinksTags extends \Joomla\CMS\Object\CMSObject {
 
 	var $_option = 'com_flexicontent_tags';
@@ -79,7 +79,7 @@ class FlexicontentlinksTags extends \Joomla\CMS\Object\CMSObject {
 		$view = isset($args->view) ? $args->view : '';
 		if ($view && $view!='tags') return array();
 
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 
 		// Add tags
 		$query	= $db->getQuery(true);

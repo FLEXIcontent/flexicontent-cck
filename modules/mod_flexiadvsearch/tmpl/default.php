@@ -20,7 +20,7 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 $app = \Joomla\CMS\Factory::getApplication();
-$doc = \Joomla\CMS\Factory::getApplication()->getDocument();
+$doc = \Joomla\CMS\Factory::getDocument();
 $tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 
 require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
@@ -408,7 +408,7 @@ $doc->addScriptDeclaration($js);
 
 		$output[] = '
 			<input type="'.($search_autocomplete==2 ? 'hidden' : 'text').'"
-				data-txt_ac_lang="' . \Joomla\CMS\Factory::getApplication()->getLanguage()->getTag() . '"
+				data-txt_ac_lang="' . \Joomla\CMS\Factory::getLanguage()->getTag() . '"
 				id="mod_search_searchword-'.$module->id.'" class="'.$text_search_class.'"
 				placeholder="'.$search_inner_prompt.'" label="'.$search_inner_prompt.'"  name="q" '.($search_autocomplete==2 ? '' : ' size="'.$search_inner_width.'" maxlength="'.$maxchars.'"').' value="'.$searchword.'" aria-label="'.$search_inner_prompt.'"  />';
 

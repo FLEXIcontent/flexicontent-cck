@@ -23,10 +23,10 @@ HTMLHelper::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_flexicontent/h
 global $globalcats;
 $app      = Factory::getApplication();
 $jinput   = $app->input;
-$config   = Factory::getApplication()->getConfig();
-$user     = Factory::getApplication()->getIdentity();
-$session  = Factory::getApplication()->getSession();
-$document = Factory::getApplication()->getDocument();
+$config   = Factory::getConfig();
+$user     = Factory::getUser();
+$session  = Factory::getSession();
+$document = Factory::getDocument();
 $cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 $ctrl     = 'filemanager.';
 $hlpname  = 'fcfilemanager';
@@ -56,13 +56,13 @@ $onclick  = $this->escape($function);
 if (!empty($editor))
 {
 	// This view is used also in com_menus. Load the xtd script only if the editor is set!
-	Factory::getApplication()->getDocument()->addScriptOptions('xtd-fcfiles', array('editor' => $editor));
+	Factory::getDocument()->addScriptOptions('xtd-fcfiles', array('editor' => $editor));
 	$onclick = "jSelectFcfile";
 }
 
 if (version_compare(\Joomla\CMS\Version::MAJOR_VERSION, '4', 'ge'))
 {
-	$wa  = Factory::getApplication()->getDocument()->getWebAssetManager();
+	$wa  = Factory::getDocument()->getWebAssetManager();
 	$wa->registerAndUseScript('clipboard_js', Uri::base() . 'components/com_flexicontent/assets/js/clipboard_v2.0.11.min.js');
 }
 else
@@ -1638,8 +1638,8 @@ if ($js)
 					'.
 												($enable_multi_uploader ? '
 						<span class="' . $this->btn_sm_class . ' ' . $this->tooltip_class.'" onclick="jQuery(\'#fc-fileman-formbox-1\').toggle(); jQuery(\'#fc-fileman-formbox-2\').toggle(); setTimeout(function(){ '.$uploader_tag_id.'.autoResize(\''.$up_sfx_n.'\'); }, 100);"
-							id="single_multi_uploader" data-title="' . flexicontent_html::getToolTip('', 'FLEXI_TOGGLE_BASIC_UPLOADER_DESC', 1, 1) . '" style="float: ' . (Factory::getApplication()->getLanguage()->isRTL() ? 'left;' : 'right;') . '"
-						data-placement="'. (Factory::getApplication()->getLanguage()->isRTL() ? 'right' : 'left') . '">
+							id="single_multi_uploader" data-title="' . flexicontent_html::getToolTip('', 'FLEXI_TOGGLE_BASIC_UPLOADER_DESC', 1, 1) . '" style="float: ' . (Factory::getLanguage()->isRTL() ? 'left;' : 'right;') . '"
+						data-placement="'. (Factory::getLanguage()->isRTL() ? 'right' : 'left') . '">
 							'.Text::_( 'FLEXI_TOGGLE_BASIC_UPLOADER' ).'
 						</span>
 					' : '') . '
@@ -2433,7 +2433,7 @@ $jMedia_file_displayData['mediaTypeNames'] = is_array($jMedia_file_displayData['
 
 
 <?php
-Factory::getApplication()->getDocument()->addScriptDeclaration('
+Factory::getDocument()->addScriptDeclaration('
 	function fc_edit_mmdata_modal_load( container )
 	{
 		if ( container.find("iframe").get(0).contentWindow.location.href.indexOf("view=mediadatas") != -1 )

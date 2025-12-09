@@ -14,7 +14,6 @@
 defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
-use Joomla\Database\DatabaseInterface;
 
 class modFlexicontentHelper
 {
@@ -23,8 +22,8 @@ class modFlexicontentHelper
 		global $modfc_jprof, $mod_fc_run_times;
 
 		$forced_itemid = $params->get('forced_itemid');
-		$db   = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
-		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$db   = \Joomla\CMS\Factory::getDbo();
+		$user = \Joomla\CMS\Factory::getUser();
 		$app  = \Joomla\CMS\Factory::getApplication();
 
 		$jinput  = $app->input;
@@ -852,8 +851,8 @@ class modFlexicontentHelper
 		}
 
 		// Initialize variables
-		$db   = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
-		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$db   = \Joomla\CMS\Factory::getDbo();
+		$user = \Joomla\CMS\Factory::getUser();
 		$app  = \Joomla\CMS\Factory::getApplication();
 
 		$jinput  = $app->input;
@@ -2439,7 +2438,7 @@ class modFlexicontentHelper
 	{
 		if (!$params->get('apply_config_per_category', 0)) return false;
 
-		$db   = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db   = \Joomla\CMS\Factory::getDbo();
 		$app  = \Joomla\CMS\Factory::getApplication();
 
 		$jinput  = $app->input;
@@ -2563,7 +2562,7 @@ class modFlexicontentHelper
 				$catdata->introtext = & $catdata->description;
 				$catdata->fulltext = "";
 
-				if ($catconf->image_source && $catdata->image && \Joomla\Filesystem\File::exists(JPATH_SITE .DS. $joomla_image_path .DS. $catdata->image))
+				if ($catconf->image_source && $catdata->image && \Joomla\CMS\Filesystem\File::exists(JPATH_SITE .DS. $joomla_image_path .DS. $catdata->image))
 				{
 					$src = \Joomla\CMS\Uri\Uri::base(true)."/".$joomla_image_path."/".$catdata->image;
 
@@ -2668,7 +2667,7 @@ class modFlexicontentHelper
 	 */
 	public static function getComments($params, &$items)
 	{
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 
 		$list_comments = $params->get('list_comments');
 		$list_comments_feat = $params->get('list_comments_feat');
@@ -2747,7 +2746,7 @@ class modFlexicontentHelper
 		 */
 		flexicontent_html::loadframework('grapesjs_view');
 
-		\Joomla\CMS\Factory::getApplication()->getDocument()->addStyleSheet(
+		\Joomla\CMS\Factory::getDocument()->addStyleSheet(
 			\Joomla\CMS\Uri\Uri::base(true) . $location . $css_file,
 			array('version' => $params->get($layout_name . '_hash'))
 		);

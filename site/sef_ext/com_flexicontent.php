@@ -14,14 +14,14 @@
  */
 
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
-use Joomla\Database\DatabaseInterface;
+
 if ( !class_exists('sh404_fc_helper') )
 {
 	class sh404_fc_helper
 	{
 		function getCats($ids = false)
 		{
-			$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+			$db = \Joomla\CMS\Factory::getDbo();
 			$query = 'SELECT id, title, alias'
 				. ' FROM #__categories'
 				. (empty($ids) ? '' : ' WHERE id IN (' . implode(', ', $ids) . ')');

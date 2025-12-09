@@ -1,6 +1,6 @@
 <?php
 $app    = \Joomla\CMS\Factory::getApplication();
-$document = \Joomla\CMS\Factory::getApplication()->getDocument();
+$document = \Joomla\CMS\Factory::getDocument();
 
 // Form (text search / filters) configuration
 $show_search_go = $params->get('show_search_go', 1);
@@ -152,7 +152,7 @@ if ( $use_search || $use_filters ) : /* BOF search and filters block */
 
 					<div class="fc_filter_html fc_text_search">
 						<input type="text" class="<?php echo $text_search_class; ?>"
-							<?php echo 'data-txt_ac_lang="'.\Joomla\CMS\Factory::getApplication()->getLanguage()->getTag().'"'; ?>
+							<?php echo 'data-txt_ac_lang="'.\Joomla\CMS\Factory::getLanguage()->getTag().'"'; ?>
 							<?php echo 'data-txt_ac_cid="'.$txt_ac_cid.'"'; ?>
 							<?php echo 'data-txt_ac_cids="'. implode(',', $txt_ac_cids) .'"'; ?>
 							<?php echo 'data-txt_ac_usesubs="'. $txt_ac_usesubs .'"'; ?>

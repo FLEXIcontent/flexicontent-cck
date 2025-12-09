@@ -20,8 +20,6 @@ defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
-use Joomla\Database\DatabaseInterface;
-use Joomla\CMS\Factory;
 
 // Load the helper classes
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
@@ -34,9 +32,9 @@ jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 \Joomla\CMS\Form\FormHelper::loadFieldClass('list');   // \Joomla\CMS\Form\Field\ListField
 
 // Load JS tabber lib
-Factory::getApplication()->getDocument()->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
-Factory::getApplication()->getDocument()->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
-Factory::getApplication()->getDocument()->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
+\Joomla\CMS\Factory::getDocument()->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
+\Joomla\CMS\Factory::getDocument()->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
+\Joomla\CMS\Factory::getDocument()->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
 /**
  * Renders a categorylayout element
@@ -68,8 +66,8 @@ class JFormFieldCategorylayout extends JFormFieldList
 		//$value = $value ? $value : @$attributes['default'];
 		
 		// Get current extension and id being edited
-		$app    = Factory::getApplication();
-		$db     = Factory::getContainer()->get(DatabaseInterface::class);
+		$app    = \Joomla\CMS\Factory::getApplication();
+		$db     = \Joomla\CMS\Factory::getDbo();
 		$jinput = $app->input;
 		$option = $jinput->get('option', '', 'CMD');
 		$view   = $jinput->get('view', '', 'CMD');
@@ -118,7 +116,7 @@ if (!@$attributes['skipparams'])
 {
 		$ext_option = 'com_flexicontent';
 		$ext_view   = $view;
-		$doc 	= Factory::getApplication()->getDocument();
+		$doc 	= \Joomla\CMS\Factory::getDocument();
 		$js 	= "
 var clayout_names = ['".$lays."'];
 

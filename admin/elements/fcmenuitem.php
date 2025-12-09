@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 2.0 stable - Joomla 6 compatible
+ * @version 1.5 stable $Id: types.php 1260 2012-04-25 17:43:21Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -16,13 +16,17 @@
  * GNU General Public License for more details.
  */
 
-defined('_JEXEC') or die;
+defined('JPATH_PLATFORM') or die;
 
-use Joomla\CMS\Factory;
-use Joomla\CMS\Form\Field\GroupedlistField;
-use Joomla\CMS\HTML\HTMLHelper;
-use Joomla\CMS\Language\Multilanguage;
-use Joomla\Database\DatabaseInterface;
+jimport('cms.html.html');      // JHtml
+jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
+jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
+
+jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
+\Joomla\CMS\Form\FormHelper::loadFieldClass('groupedlist');   // \Joomla\CMS\Form\Field\GroupedlistField
+
+// Import the com_menus helper.
+require_once realpath(JPATH_ADMINISTRATOR . '/components/com_menus/helpers/menus.php');
 
 /**
  * Supports an HTML grouped select list of menu item grouped by menu
@@ -31,7 +35,7 @@ use Joomla\Database\DatabaseInterface;
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-class JFormFieldFcMenuitem extends GroupedlistField
+class JFormFieldFcMenuitem extends JFormFieldGroupedList
 {
 	/**
 	 * The form field type.
@@ -52,7 +56,7 @@ class JFormFieldFcMenuitem extends GroupedlistField
 	/**
 	 * The client id.
 	 *
-	 * @var    int
+	 * @var    string
 	 * @since  3.2
 	 */
 	protected $clientId;
@@ -140,17 +144,20 @@ class JFormFieldFcMenuitem extends GroupedlistField
 	}
 
 	/**
-	 * Method to attach a Form object to the field.
+	 * Method to attach a \Joomla\CMS\Form\Form object to the field.
 	 *
-	 * @param   \SimpleXMLElement  $element  The SimpleXMLElement object representing the `<field>` tag for the form field object.
-	 * @param   mixed              $value    The form field value to validate.
-	 * @param   string             $group    The field name group control value.
+	 * @param   SimpleXMLElement  $element  The SimpleXMLElement object representing the `<field>` tag for the form field object.
+	 * @param   mixed             $value    The form field value to validate.
+	 * @param   string            $group    The field name group control value. This acts as an array container for the field.
+	 *                                      For example if the field has name="foo" and the group value is set to "bar" then the
+	 *                                      full field name would end up being "bar[foo]".
 	 *
 	 * @return  boolean  True on success.
 	 *
+	 * @see     \Joomla\CMS\Form\FormField::setup()
 	 * @since   3.2
 	 */
-	public function setup(\SimpleXMLElement $element, $value, $group = null)
+	public function setup(SimpleXMLElement $element, $value, $group = null)
 	{
 		$result = parent::setup($element, $value, $group);
 
@@ -188,6 +195,7 @@ class JFormFieldFcMenuitem extends GroupedlistField
 		}
 		else
 		{
+			//$items = MenusHelper::getMenuLinks($menuType, 0, 0, $this->published, $this->language);
 			$items = $this->getMenuLinks($menuType, 0, 0, $this->published, $this->language);
 			
 			// Cache component menu items
@@ -197,7 +205,7 @@ class JFormFieldFcMenuitem extends GroupedlistField
 				$comp_items[$component] = array();
 				foreach ($items as $menu)
 				{
-					$_menu = new \stdClass();
+					$_menu = new stdClass();
 					foreach ($menu as $prop_name => $prop_val) {
 						if (!is_object($prop_val) && !is_array($prop_val)) $_menu->$prop_name = $prop_val;
 					}
@@ -235,7 +243,7 @@ class JFormFieldFcMenuitem extends GroupedlistField
 				if ($skip) continue;
 				
 				$levelPrefix = str_repeat('- ', max(0, $link->level - 1));
-				$groups[$menuType][] = HTMLHelper::_('select.option',
+				$groups[$menuType][] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',
 								$link->value, $levelPrefix . $link->text,
 								'value',
 								'text',
@@ -266,7 +274,7 @@ class JFormFieldFcMenuitem extends GroupedlistField
 					if ($skip) continue;
 					
 					$levelPrefix = str_repeat('- ', $link->level - 1);
-					$groups[$menu->menutype][] = HTMLHelper::_(
+					$groups[$menu->menutype][] = \Joomla\CMS\HTML\HTMLHelper::_(
 						'select.option', $link->value, $levelPrefix . $link->text, 'value', 'text',
 						in_array($link->type, $this->disable)
 					);
@@ -281,22 +289,9 @@ class JFormFieldFcMenuitem extends GroupedlistField
 		return $groups;
 	}
 
-	/**
-	 * Get menu links
-	 *
-	 * @param   string|null  $menuType   Menu type
-	 * @param   int          $parentId   Parent ID
-	 * @param   int          $mode       Mode
-	 * @param   array        $published  Published states
-	 * @param   array        $languages  Languages
-	 *
-	 * @return  array|bool  Array of menu items or false on error
-	 *
-	 * @since   2.0
-	 */
-	public function getMenuLinks($menuType = null, $parentId = 0, $mode = 0, $published = array(), $languages = array())
+	public static function getMenuLinks($menuType = null, $parentId = 0, $mode = 0, $published = array(), $languages = array())
 	{
-		$db = Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 		$query = $db->getQuery(true)
 			->select('DISTINCT a.id AS value, 
 				  a.title AS text, 
@@ -310,12 +305,12 @@ class JFormFieldFcMenuitem extends GroupedlistField
 				  a.checked_out, 
 				  a.language, 
 				  a.lft')
-			->from($db->quoteName('#__menu', 'a'));
+			->from('#__menu AS a');
 
-		if (Multilanguage::isEnabled())
+		if (\Joomla\CMS\Language\Multilanguage::isEnabled())
 		{
 			$query->select('l.title AS language_title, l.image as language_image')
-				->join('LEFT', $db->quoteName('#__languages', 'l'), 'l.lang_code = a.language');
+				->join('LEFT', $db->quoteName('#__languages') . ' AS l ON l.lang_code = a.language');
 		}
 
 		// Filter by the type
@@ -329,7 +324,7 @@ class JFormFieldFcMenuitem extends GroupedlistField
 			if ($mode == 2)
 			{
 				// Prevent the parent and children from showing.
-				$query->join('LEFT', $db->quoteName('#__menu', 'p'), 'p.id = ' . (int) $parentId)
+				$query->join('LEFT', '#__menu AS p ON p.id = ' . (int) $parentId)
 					->where('(a.lft <= p.lft OR a.rgt >= p.rgt)');
 			}
 		}
@@ -365,9 +360,9 @@ class JFormFieldFcMenuitem extends GroupedlistField
 		{
 			$links = $db->loadObjectList();
 		}
-		catch (\RuntimeException $e)
+		catch (RuntimeException $e)
 		{
-			Factory::getApplication()->enqueueMessage($e->getMessage(), 'warning');
+			JError::raiseWarning(500, $e->getMessage());
 
 			return false;
 		}
@@ -377,7 +372,7 @@ class JFormFieldFcMenuitem extends GroupedlistField
 			// If the menutype is empty, group the items by menutype.
 			$query->clear()
 				->select('*')
-				->from($db->quoteName('#__menu_types'))
+				->from('#__menu_types')
 				->where('menutype <> ' . $db->quote(''))
 				->order('title, menutype');
 			$db->setQuery($query);
@@ -386,9 +381,9 @@ class JFormFieldFcMenuitem extends GroupedlistField
 			{
 				$menuTypes = $db->loadObjectList();
 			}
-			catch (\RuntimeException $e)
+			catch (RuntimeException $e)
 			{
-				Factory::getApplication()->enqueueMessage($e->getMessage(), 'warning');
+				JError::raiseWarning(500, $e->getMessage());
 
 				return false;
 			}

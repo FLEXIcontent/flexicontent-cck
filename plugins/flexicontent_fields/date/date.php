@@ -10,7 +10,6 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-use Joomla\Database\DatabaseInterface;
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
 class plgFlexicontent_fieldsDate extends FCField
@@ -76,11 +75,11 @@ class plgFlexicontent_fieldsDate extends FCField
 		}
 
 		// Initialize framework objects and other variables
-		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
+		$document = \Joomla\CMS\Factory::getDocument();
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
-		$config   = \Joomla\CMS\Factory::getApplication()->getConfig();
+		$config   = \Joomla\CMS\Factory::getConfig();
 		$app      = \Joomla\CMS\Factory::getApplication();
-		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$user     = \Joomla\CMS\Factory::getUser();
 
 		$tooltip_class = 'hasTooltip';
 		$add_on_class    = $cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
@@ -610,7 +609,7 @@ class plgFlexicontent_fieldsDate extends FCField
 			$initialized = 1;
 
 			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getApplication()->getDocument();
+			$document  = \Joomla\CMS\Factory::getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -633,8 +632,8 @@ class plgFlexicontent_fieldsDate extends FCField
 		$is_ingroup  = !empty($field->ingroup);
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		$multiple    = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
-		$config = \Joomla\CMS\Factory::getApplication()->getConfig();
-		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$config = \Joomla\CMS\Factory::getConfig();
+		$user = \Joomla\CMS\Factory::getUser();
 
 		// Value handling parameters
 		$lang_filter_values = 0;
@@ -653,7 +652,7 @@ class plgFlexicontent_fieldsDate extends FCField
 			static $nullDate, $never_date;
 			if ($nullDate == null)
 			{
-				$nullDate = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class)->getNullDate();
+				$nullDate = \Joomla\CMS\Factory::getDbo()->getNullDate();
 				$never_date = ''; //\Joomla\CMS\Language\Text::_('FLEXI_NEVER');
 			}
 
@@ -834,8 +833,8 @@ class plgFlexicontent_fieldsDate extends FCField
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
 
-		$config = \Joomla\CMS\Factory::getApplication()->getConfig();
-		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$config = \Joomla\CMS\Factory::getConfig();
+		$user = \Joomla\CMS\Factory::getUser();
 
 		$date_allowtime = (int) $field->parameters->get( 'date_allowtime', 1 ) ;
 		$use_editor_tz  = (int) $field->parameters->get( 'use_editor_tz', 0 ) ;
@@ -1009,7 +1008,7 @@ class plgFlexicontent_fieldsDate extends FCField
 		$filter->date_valformat = $date_valformat;
 		$filter->date_txtformat = $date_txtformat;
 
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 		$nullDate_quoted = $db->Quote($db->getNullDate());
 
 		$filter_as_range = in_array($display_filter_as, array(2,3,8));  // We don't want null date if using a range
@@ -1260,7 +1259,7 @@ class plgFlexicontent_fieldsDate extends FCField
 			return true;
 		}
 
-		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$db = \Joomla\CMS\Factory::getDbo();
 
 		foreach ($values as $v)
 		{
@@ -1405,7 +1404,7 @@ class plgFlexicontent_fieldsDate extends FCField
 		else
 		{
 			$values = array();
-			$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+			$db = \Joomla\CMS\Factory::getDbo();
 
 			if ($date_source === 1 || $date_source === 2)
 			{
