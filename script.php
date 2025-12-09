@@ -297,13 +297,34 @@ class com_flexicontentInstallerScript
 		}
 
 
+
 		// Install discovered extensions
 		foreach ($extensions as $i => $extension)
 		{
-			//$jinstaller = & $extensions[$i]['installer'];    // new Installer();
-			$extensions[$i]['installer'] = new Installer();
+			// Try to get Installer instance via Container (J4+)
+			try {
+				$container = Factory::getContainer();
+				// Use the interface/class name key if possible, or try 'installer' service
+				if ($container->has(Installer::class)) {
+					$extensions[$i]['installer'] = $container->get(Installer::class);
+				} else {
+					$extensions[$i]['installer'] = new Installer();
+				}
+			} catch (\Exception $e) {
+				$extensions[$i]['installer'] = new Installer();
+			}
+			
 			$jinstaller = & $extensions[$i]['installer'];
-			$jinstaller->setDb($db);
+
+			// Ensure DB is set (fix for "Database not set" error)
+			if (method_exists($jinstaller, 'setDb')) {
+				$jinstaller->setDb($db);
+			} elseif (method_exists($jinstaller, 'setDbo')) {
+				$jinstaller->setDbo($db);
+			} elseif (property_exists($jinstaller, 'db')) {
+				// Fallback for legacy classes where property might be public
+				$jinstaller->db = $db;
+			}
 
 			// J1.6+ installer requires that we explicit set override/upgrade options
 			$jinstaller->setOverwrite(true);
