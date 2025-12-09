@@ -18,16 +18,20 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Version;
+use Joomla\CMS\Installer\Installer;
 
 // Joomla version variables
 if (!defined('FLEXI_J16GE') || !defined('FLEXI_J30GE'))
 {
-	jimport('cms.version.version');
-	$jversion = new \Joomla\CMS\Version;
+	$jversion = new Version;
 }
 if (!defined('FLEXI_J16GE'))   define('FLEXI_J16GE', version_compare( $jversion->getShortVersion(), '1.6.0', 'ge' ) );
 if (!defined('FLEXI_J30GE'))   define('FLEXI_J30GE', version_compare( $jversion->getShortVersion(), '3.0.0', 'ge' ) );
 if (!defined('FLEXI_J40GE'))   define('FLEXI_J40GE', version_compare( $jversion->getShortVersion(), '4.0.0', 'ge' ) );
+if (!defined('FLEXI_J50GE'))   define('FLEXI_J50GE', version_compare( $jversion->getShortVersion(), '5.0.0', 'ge' ) );
 
 class com_flexicontentInstallerScript
 {
@@ -40,8 +44,8 @@ class com_flexicontentInstallerScript
 	function preflight( $type, $parent )
 	{
 		// Display fatal errors, warnings, notices
-		error_reporting(E_ERROR || E_WARNING || E_NOTICE);
-		ini_set('display_errors',1);
+		// error_reporting(E_ERROR || E_WARNING || E_NOTICE);
+		// ini_set('display_errors',1);
 
 		// Try to increment some limits
 		@ set_time_limit( 150 );   // try to set execution time 2.5 minutes
@@ -73,14 +77,14 @@ class com_flexicontentInstallerScript
 		}
 
 		// First check PHP minimum version is running
-		$PHP_VERSION_NEEDED = '5.4.0';
+		$PHP_VERSION_NEEDED = '8.1.0';
 		if (version_compare(PHP_VERSION, $PHP_VERSION_NEEDED, '<'))
 		{
 			// load english language file for 'com_flexicontent' component then override with current language file
-			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
-			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+			Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+			Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 
-			\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::sprintf('FLEXI_UPGRADE_PHP_VERSION_GE', $PHP_VERSION_NEEDED), 'warning');
+			Factory::getApplication()->enqueueMessage(Text::sprintf('FLEXI_UPGRADE_PHP_VERSION_GE', $PHP_VERSION_NEEDED), 'warning');
 			return false;
 		}
 
@@ -88,7 +92,7 @@ class com_flexicontentInstallerScript
 		$existing_manifest = $this->getExistingManifest();
 
 		// Get Joomla version
-		$jversion = new \Joomla\CMS\Version();
+		$jversion = new Version();
 
 		// File version of new manifest file
 		$this->release = $parent->getManifest()->version;
@@ -109,7 +113,7 @@ class com_flexicontentInstallerScript
 		    	<img src="<?php echo 'components/com_flexicontent/assets/images/logo.png'; ?>" style="width:300px; margin: 0px 48px 0px 0px;" alt="FLEXIcontent Logo" />
 				</td>
 				<td valign="top">
-	     	 	<span><?php echo \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_DESCRIPTION'); ?></></span><br />
+	     	 	<span><?php echo Text::_('COM_FLEXICONTENT_DESCRIPTION'); ?></></span><br />
 	      	<font class="small">by <a href="http://www.flexicontent.org" target="_blank">Emmanuel Danan</a>,
 	      	<font class="small">by <a href="http://www.flexicontent.org" target="_blank">Georgios Papadakis</a>,
 	      	<font class="small">by <a href="http://www.flexicontent.org" target="_blank">Berges Yannick</a>,
@@ -123,13 +127,13 @@ class com_flexicontentInstallerScript
 
 		<?php
 		echo '
-		<div class="alert alert-info" style="margin:32px 0px 0px 0px;">' .\Joomla\CMS\Language\Text::_('Performing prior to installation tasks ... '). '
+		<div class="alert alert-info" style="margin:32px 0px 0px 0px;">' .Text::_('Performing prior to installation tasks ... '). '
 		<br/>
 		<ul>
 			<li>
-				' . \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_REQUIRED_PHPVER') . '
-				' . \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_MIN').': <span class="badge bg-info badge-info">' . $PHP_VERSION_NEEDED . '</span>
-				' . \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_CURRENT').': <span class="badge bg-success badge-success">' . PHP_VERSION . '</span>
+				' . Text::_('COM_FLEXICONTENT_REQUIRED_PHPVER') . '
+				' . Text::_('COM_FLEXICONTENT_MIN').': <span class="badge bg-info badge-info">' . $PHP_VERSION_NEEDED . '</span>
+				' . Text::_('COM_FLEXICONTENT_CURRENT').': <span class="badge bg-success badge-success">' . PHP_VERSION . '</span>
 			</li>
 		';
 
@@ -137,7 +141,7 @@ class com_flexicontentInstallerScript
 		if ( version_compare($jversion->getShortVersion(), $this->minimum_joomla_release, 'lt') )
 		{
 			echo '</ul>';
-			\Joomla\CMS\Factory::getApplication()->enqueueMessage('Cannot install com_flexicontent in a Joomla release prior to ' . $this->minimum_joomla_release, 'warning');
+			Factory::getApplication()->enqueueMessage('Cannot install com_flexicontent in a Joomla release prior to ' . $this->minimum_joomla_release, 'warning');
 			return false;
 		}
 		else
@@ -517,92 +521,42 @@ class com_flexicontentInstallerScript
 		);
 
 		// Get DB table information
+		$tables_list = $db->getTableList();
 
-		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_fields_item_relations"';
-		$db->setQuery($query);
-		$fi_rels_tbl_exists = (boolean) count($db->loadObjectList());
-
-		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_items_versions"';
-		$db->setQuery($query);
-		$fi_vers_tbl_exists = (boolean) count($db->loadObjectList());
-
-		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_favourites"';
-		$db->setQuery($query);
-		$favs_tbl_exists = (boolean) count($db->loadObjectList());
-
-		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_files"';
-		$db->setQuery($query);
-		$files_tbl_exists = (boolean) count($db->loadObjectList());
-
-		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_fields"';
-		$db->setQuery($query);
-		$fields_tbl_exists = (boolean) count($db->loadObjectList());
-
-		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_types"';
-		$db->setQuery($query);
-		$types_tbl_exists = (boolean) count($db->loadObjectList());
-
-		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_tags"';
-		$db->setQuery($query);
-		$tags_tbl_exists = (boolean) count($db->loadObjectList());
-
-		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_items_ext"';
-		$db->setQuery($query);
-		$iext_tbl_exists = (boolean) count($db->loadObjectList());
-
-		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_advsearch_index"';
-		$db->setQuery($query);
-		$advsearch_index_tbl_exists = (boolean) count($db->loadObjectList());
-
-		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_authors_ext"';
-		$db->setQuery($query);
-		$authors_ext_tbl_exists = (boolean) count($db->loadObjectList());
+		$fi_rels_tbl_exists = in_array($dbprefix . 'flexicontent_fields_item_relations', $tables_list);
+		$fi_vers_tbl_exists = in_array($dbprefix . 'flexicontent_items_versions', $tables_list);
+		$favs_tbl_exists    = in_array($dbprefix . 'flexicontent_favourites', $tables_list);
+		$files_tbl_exists   = in_array($dbprefix . 'flexicontent_files', $tables_list);
+		$fields_tbl_exists  = in_array($dbprefix . 'flexicontent_fields', $tables_list);
+		$types_tbl_exists   = in_array($dbprefix . 'flexicontent_types', $tables_list);
+		$tags_tbl_exists    = in_array($dbprefix . 'flexicontent_tags', $tables_list);
+		$iext_tbl_exists    = in_array($dbprefix . 'flexicontent_items_ext', $tables_list);
+		$advsearch_index_tbl_exists = in_array($dbprefix . 'flexicontent_advsearch_index', $tables_list);
+		$authors_ext_tbl_exists     = in_array($dbprefix . 'flexicontent_authors_ext', $tables_list);
 
 		// BETA table
-		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_reviews_dev"';
-		$db->setQuery($query);
-		$reviews_beta_tbl_exists = (boolean) count($db->loadObjectList());
+		$reviews_beta_tbl_exists = in_array($dbprefix . 'flexicontent_reviews_dev', $tables_list);
 
-		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_reviews"';
-		$db->setQuery($query);
-		$reviews_tbl_exists = (boolean) count($db->loadObjectList());
-
-		$query = 'SHOW TABLES LIKE "' . $dbprefix . '__flexicontent_mediadatas"';
-		$db->setQuery($query);
-		$mediadatas_tbl_exists = (boolean) count($db->loadObjectList());
-
-		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_templates"';
-		$db->setQuery($query);
-		$templates_tbl_exists = (boolean) count($db->loadObjectList());
-
-		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_layouts_conf"';
-		$db->setQuery($query);
-		$layouts_conf_tbl_exists = (boolean) count($db->loadObjectList());
-
-		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_items_tmp"';
-		$db->setQuery($query);
-		$content_cache_tbl_exists = (boolean) count($db->loadObjectList());
-
-		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_download_history"';
-		$db->setQuery($query);
-		$dl_history_tbl_exists = (boolean) count($db->loadObjectList());
-
-		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_download_coupons"';
-		$db->setQuery($query);
-		$dl_coupons_tbl_exists = (boolean) count($db->loadObjectList());
-
-		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_file_usage"';
-		$db->setQuery($query);
-		$file_usage_tbl_exists = (boolean) count($db->loadObjectList());
+		$reviews_tbl_exists    = in_array($dbprefix . 'flexicontent_reviews', $tables_list);
+		$mediadatas_tbl_exists = in_array($dbprefix . '__flexicontent_mediadatas', $tables_list);
+		$templates_tbl_exists  = in_array($dbprefix . 'flexicontent_templates', $tables_list);
+		$layouts_conf_tbl_exists  = in_array($dbprefix . 'flexicontent_layouts_conf', $tables_list);
+		$content_cache_tbl_exists = in_array($dbprefix . 'flexicontent_items_tmp', $tables_list);
+		$dl_history_tbl_exists    = in_array($dbprefix . 'flexicontent_download_history', $tables_list);
+		$dl_coupons_tbl_exists    = in_array($dbprefix . 'flexicontent_download_coupons', $tables_list);
+		$file_usage_tbl_exists    = in_array($dbprefix . 'flexicontent_file_usage', $tables_list);
 
 		// Data Types of columns
 		$tbl_names_arr = array('flexicontent_files', 'flexicontent_fields', 'flexicontent_types');
 		foreach ($tbl_names_arr as $tbl_name)
 		{
 			$full_tbl_name = $dbprefix . $tbl_name;
-			$query = "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '".$dbname."' AND TABLE_NAME = '".$full_tbl_name."'";// ." AND COLUMN_NAME = 'attribs'";
-			$db->setQuery($query);
-			$tbl_datatypes[$tbl_name] = $db->loadAssocList('COLUMN_NAME');
+			if (in_array($full_tbl_name, $tables_list))
+			{
+				$query = "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '".$dbname."' AND TABLE_NAME = '".$full_tbl_name."'";
+				$db->setQuery($query);
+				$tbl_datatypes[$tbl_name] = $db->loadAssocList('COLUMN_NAME');
+			}
 		}
 		?>
 
