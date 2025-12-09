@@ -28,7 +28,6 @@ use Joomla\Database\DatabaseQuery;
 use Joomla\Event\DispatcherInterface;
 use Joomla\Event\SubscriberInterface;
 use Joomla\Registry\Registry;
-use Joomla\Database\DatabaseInterface;
 
 
 // phpcs:disable PSR1.Files.SideEffects

@@ -1386,7 +1386,10 @@ if ($js && $document !== null && method_exists($document, 'addScriptDeclaration'
 			' . /*($debug_mobile ? 'alert("Detected screen resolution: " + fc_screen_resolution + " this info will be used on next load");' : '') .*/ '
 			' . /*'window.location="'.$_SERVER["REQUEST_URI"].'"; ' .*/ '
 		';
-		$document->addScriptDeclaration($js);
+		if ($document && method_exists($document, 'addScriptDeclaration'))
+		{
+			$document->addScriptDeclaration($js);
+		}
 		$screenSizeCookieAdded = true;
 	}
 
