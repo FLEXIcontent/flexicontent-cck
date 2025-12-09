@@ -1221,12 +1221,12 @@
 			// 7. Create column checkbox and append it to str
 			var ffieldid   = 'columnchoose_' + data_tbl_id + '_' + col;
 			var ffieldname = 'columnchoose_' + data_tbl_id + '[' + col + ']';
-			str = str + '<input id="' + ffieldid + '" name="' + ffieldname + '" type="checkbox" data-colno="' + col + '" ' + checked_str + ' onclick="fc_tbl_toggle_column(\''+container_div_id+'\', \''+data_tbl_id+'\', '+col+', 0);">'
-			+ '<label id="' + ffieldid + '_label" style="color:'+fontcolor_str+';" for="' + ffieldid + '">' + col_display_name + '</label>';
+			str = str + '<li><input id="' + ffieldid + '" name="' + ffieldname + '" type="checkbox" data-colno="' + col + '" ' + checked_str + ' onclick="fc_tbl_toggle_column(\''+container_div_id+'\', \''+data_tbl_id+'\', '+col+', 0);">'
+			+ '<label id="' + ffieldid + '_label" style="color:'+fontcolor_str+';" for="' + ffieldid + '">' + col_display_name + '</label></li>';
 		}
 
 		// 8. Fill in 'column choose box'
-		str = '<span id="'+container_div_id+'_cols">' + str + '</span>' + end_text;
+		str = '<span id="'+container_div_id+'_cols"><ul>' + str + '</ul></span>' + end_text;
 		document.getElementById(container_div_id).innerHTML=str;
 
 		// 9. Update cookie data and display data

@@ -1,6 +1,6 @@
 body #flexicontent .fc_item_title,
 body #flexicontent .fc_item_title a {
-	color: inherit;
+	color: #ad2121;
 	background-color: inherit;
 	padding-top: 0px;
 	padding-right: 0px;
@@ -45,6 +45,21 @@ table.adminlist {
 }
 .subcategorieslist {
 	margin: 0 0 1em;
+}
+.button-editor {
+	display: inline-flex;
+	align-items: center;
+}
+#mainChooseColBox_cols ul li {
+	list-style-type: none;
+}
+#mainChooseColBox_cols ul {
+	padding-left: 0px;
+}
+#mainChooseColBox .icon-arrow-up-2 {
+	display: block;
+	text-align: center;
+	margin-top: -10px;
 }
 #fc_alpha .btn.fc_alpha_index,
 #fc_alpha .btn.fc_alpha_index_sep {

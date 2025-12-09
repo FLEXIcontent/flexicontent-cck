@@ -10,19 +10,6 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 use Joomla\String\StringHelper;
 
-// USE 1: HTML5 or 0: XHTML
-$html5 = $this->params->get('htmlmode', 0);
-
-if ($html5)
-{
-	// Load html5 layout
-	echo $this->loadTemplate('html5');
-}
-
-// BOF XHTML
-else
-{
-
 // first define the template name
 $tmpl = $this->tmpl;
 $item = $this->item;
@@ -68,7 +55,9 @@ $page_heading_shown =
 	$this->params->get('show_title', 1);
 
 // Main container
-$mainAreaTag = 'div';
+$mainAreaTag = $page_heading_shown
+	? 'section'
+	: 'article';
 
 // SEO, header level of title tag
 $itemTitleHeaderLevel = $page_heading_shown ? '2' : '1';
@@ -94,9 +83,9 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 
   <?php if ($item->event->beforeDisplayContent) : ?>
 		<!-- BOF beforeDisplayContent -->
-		<div class="fc_beforeDisplayContent  ">
+		<aside class="fc_beforeDisplayContent  ">
 			<?php echo $item->event->beforeDisplayContent; ?>
-		</div>
+		</aside>
 		<!-- EOF beforeDisplayContent -->
 	<?php endif; ?>
 
@@ -175,6 +164,9 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 			isset($item->positions['subtitle1']) || isset($item->positions['subtitle2']) || isset($item->positions['subtitle3']);
 	?>
 
+	<?php if ( $header_shown ) : ?>
+	<header class=" ">
+	<?php endif; ?>
 
 	<?php if ($this->params->get('show_title', 1)) : ?>
 		<!-- BOF item title -->
@@ -246,6 +238,9 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 		<!-- EOF subtitle3 block -->
 	<?php endif; ?>
 
+	<?php if ( $header_shown ) : ?>
+	</header>
+	<?php endif; ?>
 
 
 	<div class="fcclear"></div>
@@ -259,6 +254,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 	?>
 
 	<?php if ($createtabs) :?>
+	<section>
 		<!-- tabber start -->
 		<div id="fc_subtitle_tabset" class="fctabber  ">
 
@@ -293,6 +289,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 
 		</div>
 		<!-- tabber end -->
+	<section>
 	<?php endif; ?>
 
 
@@ -300,8 +297,8 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 
 
 	<?php if ((isset($item->positions['image'])) || (isset($item->positions['top']))) : ?>
-		<!-- BOF image/top row -->
-		<div class="flexi topblock  ">  <!-- NOTE: image block is inside same outer block as position 'top' -->
+		<!-- BOF image/top  -->
+		<aside class="flexi topblock  ">  <!-- NOTE: image block is inside top block ... -->
 
 			<?php
 				$has_output_image = false;
@@ -323,30 +320,33 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 					}
 				}
 
-				$top_span_cols_params = (int) $this->params->get('top_span_cols_params', '8');
-				$top_span_cols = $top_span_cols_params < 1 || $top_span_cols_params > 12 ? 8 : $top_span_cols_params;
+				$top_span_col_params = (int) $this->params->get('top_col_width', '30%');
+				
+				/*$top_span_cols = $top_span_cols_params < 1 || $top_span_cols_params > 12 ? 8 : $top_span_cols_params;
+				$img_span_cols = 12 - $top_span_cols > 0 ? 12 - $top_span_cols : 12;
 
-				$img_span_cols     = 12 - $top_span_cols > 0 ? 12 - $top_span_cols : 12;
-
-				$imgPos_widthClass = 'span' . $img_span_cols;
-				$topPos_widthClass = 'span' . $top_span_cols;
+				$imgPos_widthClass = 'span' . $img_span_cols . ' col-lg-' . $img_span_cols . ' col-md-' .$img_span_cols;
+				$topPos_widthClass = 'span' . $top_span_cols . ' col-lg-' . $top_span_cols . ' col-md-' .$top_span_cols;
 
 				$box_class_image .= (!$has_output_top ? ' span12' : ' ' . $imgPos_widthClass);
-				$box_class_top   .= (!$has_output_image ? ' span12' : ' '. $topPos_widthClass);
+				$box_class_top   .= (!$has_output_image ? ' span12' : ' '. $topPos_widthClass);*/
 			?>
 
-			<?php if (isset($item->positions['image'])) : ?>
-				<div class="<?php echo $box_class_image; ?>">
-					<!-- BOF image block -->
-					<?php foreach ($item->positions['image'] as $field) : ?>
-					<div class=" field_<?php echo $field->name; ?>">
-						<?php echo $field->display; ?>
-						<div class="fcclear"></div>
-					</div>
-				</div>
-				<?php endforeach; ?>
-				<!-- EOF image block -->
-			<?php endif; ?>
+          
+          <?php if (isset($item->positions['image'])) : ?>
+		<!-- BOF image block -->
+		<div class="<?php echo $box_class_image; ?>">
+			<?php foreach ($item->positions['image'] as $field) : ?>
+			<div class="flexi element field_<?php echo $field->name; ?>">
+				<?php if ($field->label) : ?>
+				<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
+				<?php endif; ?>
+				<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+			</div>
+			<?php endforeach; ?>
+		</div>
+		<!-- EOF image block -->
+	<?php endif; ?>
 
 			<?php if (isset($item->positions['top'])) : ?>
 				<!-- BOF top block -->
@@ -355,7 +355,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 					$span_class = ''; //$top_cols == 'one' ? 'span8' : 'span4'; // commented out: bootstrap spanNN is not responsive to width !
 				?>
 				<div class="<?php echo $box_class_top; ?> <?php echo $top_cols; ?>cols">
-					<ul class="flexi">
+					<ul class="flexi ">
 						<?php foreach ($item->positions['top'] as $field) : ?>
 						<li class="flexi lvbox <?php echo 'field_' . $field->name . ' ' . $span_class; ?>">
 							<div>
@@ -371,8 +371,8 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 				<!-- EOF top block -->
 			<?php endif; ?>
 
-		</div>
-		<!-- EOF image/top row -->
+		</aside>
+		<!-- EOF image/top  -->
 	<?php endif; ?>
 
 
@@ -405,6 +405,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 	?>
 
 	<?php if ($createtabs) :?>
+	<section>
 		<!-- tabber start -->
 		<div id="fc_bottom_tabset" class="fctabber  ">
 
@@ -438,6 +439,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 
 		</div>
 		<!-- tabber end -->
+	</section>
 	<?php endif; ?>
 
 
@@ -449,6 +451,9 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 			isset($item->positions['bottom']) || $item->event->afterDisplayContent;
 	?>
 
+	<?php if ( $footer_shown ) : ?>
+	<footer class="bottomblock">
+	<?php endif; ?>
 
 	<?php if (isset($item->positions['bottom'])) : ?>
 		<!-- BOF bottom block -->
@@ -457,7 +462,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 			$span_class = $bottom_cols == 'one' ? 'span12' : 'span6'; // bootstrap span
 		?>
 		<div class="<?php echo $box_class_bottom; ?> <?php echo $bottom_cols; ?>cols  ">
-			<ul class="flexi">
+			<ul class="flexi ">
 				<?php foreach ($item->positions['bottom'] as $field) : ?>
 				<li class="flexi lvbox <?php echo 'field_' . $field->name . ' ' . $span_class; ?>">
 					<div>
@@ -478,19 +483,21 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 
 	<?php if ($item->event->afterDisplayContent) : ?>
 		<!-- BOF afterDisplayContent -->
-		<div class="fc_afterDisplayContent  ">
+		<aside class="fc_afterDisplayContent  ">
 			<?php echo $item->event->afterDisplayContent; ?>
-		</div>
+		</aside>
 		<!-- EOF afterDisplayContent -->
 	<?php endif; ?>
 
-
+	<?php if ( $footer_shown) : ?>
+	</footer>
+	<?php endif; ?>
 
 	<?php echo $mainAreaTag == 'section' ? '</article>' : ''; ?>
 
 	<?php if ($this->params->get('comments') && !\Joomla\CMS\Factory::getApplication()->input->getInt('print', 0)) : ?>
 		<!-- BOF comments -->
-		<div class="comments  ">
+		<section class="comments  ">
 		<?php
 			if ($this->params->get('comments') == 1) :
 				if (file_exists(JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'jcomments.php')) :
@@ -506,11 +513,8 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 				endif;
 			endif;
 		?>
-		</div>
+		</section>
 		<!-- EOF comments -->
 	<?php endif; ?>
 
 <?php echo '</'.$mainAreaTag.'>'; ?>
-
-<?php
-} // EOF XHTML

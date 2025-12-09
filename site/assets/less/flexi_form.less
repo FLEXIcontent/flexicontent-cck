@@ -4,19 +4,20 @@
 
 .flexicontent :not(.input-prepend):not(.input-append) > input[type="text"]:not(.minicolors) {
 	display: inline-block;
-	margin: 0;
+	/*margin: 0px 2px 1px 2px;*/
 	/*padding: 4px 2px 5px;*/
 	/*border-radius: 4px;*/
 }
 .flexicontent *:not(.input-append):not(.input-prepend):not(.input-group) > div.use_select2_lib {
-	margin: 0;
+	margin: 0px 2px 1px 2px;
 }
 .flexicontent *:not(.input-append):not(.input-prepend):not(.input-group) > select:not(.custom-select) {
 	display: inline-block;
-	margin: 0;
+	margin: 0px 2px 1px 2px;
 	padding: 4px;
 	border-radius: 4px;
 	height: auto;
+	border-color: #aaa; /** unify color of input**/
 }
 
 .controls *:not(.input-append):not(.input-prepend):not(.input-group) > input[type="text"]:not(.minicolors),
@@ -297,10 +298,10 @@ ul.fc_checkradio_group {
 }
 li.fc_checkradio_option {
 	white-space: nowrap;
-	display: inline-block; /* auto-hide do not force display */
+	display: inline-flex;
 	margin-top: 1px;
 	margin-bottom: 1px;
-	vertical-align: top;
+	/*vertical-align: top;*/
 }
 
 
@@ -1502,7 +1503,7 @@ td.col_edit_layout {
 					border-left-width: 0;
 				}
 				.select2-search-field input.select2-input {
-					line-height: calc(var(--form-inp-height) - 2px) !important;
+					line-height: calc(var(--form-inp-height) -2px) !important;
           min-height: calc(var(--form-inp-height) - 2px) !important;
 					box-sizing: border-box;
 					margin: 0 !important;
@@ -1522,7 +1523,7 @@ td.col_edit_layout {
 				width: 100% !important;
 
 				input.select2-input {
-					line-height: calc(var(--form-inp-height) - 2px) !important;
+					line-height: calc(var(--form-inp-height) -2px) !important;
           min-height: calc(var(--form-inp-height) - 2px) !important;
 					padding: 2px 6px 2px 26px !important;
 					background: #fff url(../images/select2.png) no-repeat scroll -32px -22px !important;
@@ -1633,5 +1634,5 @@ input.minicolors-input {
 	height: var(--ctrls-inp-height) !important;
 }
 .fc-form-tbl.fcinner.fccompact {
-		margin-top: -0.6em !important;
+		margin-top: -34px !important;
 }

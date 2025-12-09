@@ -14,11 +14,17 @@ fieldset.fc_filter_set {
 	width: 100%;
 	box-sizing: border-box;
 	min-width: inherit !important;
-	display: block;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 15px;
+	row-gap: 15px;
 }
 fieldset.fc_search_set legend,
 fieldset.fc_filter_set legend {
-	width: auto;
+	width: 100%;
+	display: flex;
 	border: 0px solid;
 	padding: 0px;
 	margin: 0px;
@@ -55,11 +61,6 @@ fieldset.fc_filter_set legend .fc_legend_text span {
 	margin: 0px;
 	display: inline-block;
 	line-height: 1em;
-}
-fieldset.fc_search_set .fc-mssg.fc-info,
-fieldset.fc_filter_set .fc-mssg.fc-info {
-	margin: 4px 16px 16px 16px;
-	font-size: 12px;
 }
 .cid_loading {
 	color: darkred;
@@ -103,19 +104,14 @@ fieldset.fc_filter_set .fc-mssg.fc-info {
 }
 .fc_filter,
 .fc_filter_line {
-	display: inline-block;
+	display: flex;
 	float: none;
 	white-space: normal;
 	border: 0px solid lightgray;
 	border-radius: 2px;
-}
-.fc_filter {
-	clear: none;
-	margin: 0px 2px 2px 0px;
-	padding: 1px 0% 1px 0%;
-	width: auto;
-	position: relative;
-	vertical-align: top;
+	flex-direction: row;
+	gap: 5px;
+	align-items: center;
 }
 .fc_filter_line {
 	clear: both;
@@ -129,72 +125,25 @@ form > .fc_filter_line {
 }
 .fc_filter .fc_filter_label_inline,
 .fc_filter_line .fc_filter_label_inline {
+	color: #000;
 	display: inline-block;
-	font-size: 10.998px;
-	line-height: 14px;
-	padding: 4px 4px;
 	vertical-align: baseline;
 	white-space: nowrap;
-}
-.fc_filter .fc_filter_label_inline,
-.fc_filter_line .fc_filter_label_inline {
-	border-bottom: 1px solid #ccc;
-}
-.fc_filter .fc_filter_label,
-.fc_filter_line .fc_filter_label {
-	float: left;
-	display: inline-block;
-	color: white;
-	background-color: #909090;
-	border-width: 0px;
-	font-weight: normal;
-	font-size: 12px;
-	font-family: georgia, arial;
-	text-align: right;
-	border-radius: 3px;
-	text-shadow: 2px 4px 3px rgba(0,0,0,0.3);
 }
 .fc_filter.active .fc_filter_label,
 .fc_filter_line.active .fc_filter_label {
 	background-color: darkred;
 }
-.fc_filter .fc_filter_label .label,
-.fc_filter_line .fc_filter_label .label {
-	font-size: 11px;
-}
 .fc_filter.active .fc_filter_label .label,
 .fc_filter_line.active .fc_filter_label .label {
 	background-color: darkred;
-}
-.fc_filter .fc_filter_label {
-	clear: both;
-	width: auto;
-	max-width: 150px;
-	padding: 3px 4px;
-	margin: 2px 8px 3px 8px;
-}
-.fc_filter_line .fc_filter_label {
-	clear: none;
-	width: 15%;
-	max-width: 200px;
-	padding: 6px 1%;
-	margin: 2px 2% 0px 0px;
-	text-align: left;
-}
-.fc_filter .fc_filter_html,
-.fc_filter_line .fc_filter_html {
-	display: inline-block;
-	float: left;
-	font-size: 90%;
-	padding: 0px 0% 0px 0%;
-	margin: 0px 0% 0px 0%;
 }
 .fcfilter_with_nouislider {
 	min-width: 120px;
 }
 .fc_filter_html {
 	position: relative;
-	display: inline-block;
+	display: flex;
 }
 .fc_search_option_cell .fc_filter_html {
 	width: 100%;
@@ -234,14 +183,11 @@ form > .fc_filter_line {
 	white-space: nowrap;
 	position: relative;
 }
-.fc_field_filter label,
-.flexicontent .fc_field_filter {
-	font-size: 11px;
-}
 .fc_filter_html .select2-container .select2-choices input.select2-input,
 .fc_filter_html .select2-container .select2-choice > .select2-chosen,
 .fc_filter_html .fc_text_filter,
 .fc_filter_html .fc_field_filter {
+	color: #6a6a6a;
 	font-weight: normal;
 	display: inline-block;
 	width: auto;
@@ -249,7 +195,6 @@ form > .fc_filter_line {
 .fc_filter_html :not(.input-prepend):not(.input-append) > .fc_text_filter,
 .fc_filter_html :not(.input-prepend):not(.input-append) > .fc_field_filter {
 	border-radius: 5px;
-	font-size: 11px;
 }
 .fc_filter_html :not(.input-prepend):not(.input-append) > input.fc_text_filter,
 .fc_filter_html :not(.input-prepend):not(.input-append) > input.fc_field_filter,
@@ -265,7 +210,7 @@ form > .fc_filter_line {
 	min-width: 120px;
 	vertical-align: top;
 	border: 1px solid #aaa;
-	background: #fff url('../images/select2.png') no-repeat 92% -22px !important;
+	background: #fff url('../images/select2.png') no-repeat 99% -22px !important;
 }
 .fc_filter_html .input-append > input.fc_text_filter,
 .fc_filter_html .input-append > input.fc_field_filter,
@@ -335,8 +280,6 @@ span.fc_field_filter {
 	border-width: 0px;
 }
 .fc_filter > .fc_filter_html > .fc_checkradio_group_wrapper > ul.fc_field_filter.fc_checkradio_group {
-	margin: 0px 0px 0px 4px;
-	padding: 3px 4px 3px 2px;
 	height: auto;
 	max-height: auto;
 	position: static;
@@ -359,11 +302,19 @@ span.fc_field_filter {
 .fc_filter_html.fc_text_search .fc_filter_button {
 	margin: 3px 0px;
 }
-.fc_filter_html.fc_text_search input {
+.fc_filter_html.fc_text_search input,
+input#search_searchword,
+.fc_field_filter {
 	width: unset;
 	min-height: calc(var(--form-inp-height)) !important;
 	line-height: calc(var(--form-inp-height)) !important;
 	padding: 0px 14px;
+}
+input#search_searchword {
+	border-radius: 5px;
+	border-color: #aaa;
+	width: 100%;
+	border: 1px solid #aaa;
 }
 .fc_has_inner_label,
 .fc_has_inner_prompt {
@@ -406,7 +357,9 @@ span.fc_field_filter {
 .fc_filter_html .select2-container-multi .select2-choices {
 	border: 1px solid #aaa;
 	border-radius: 5px;
-	display: inline-block;
+	display: flex;
+	width: 100% !important;
+	height: var(--form-inp-height) !important;
 }
 .field-calendar .btn {
 	background: #fff !important;
@@ -421,4 +374,63 @@ li.select2-search-field {
 }
 .select2-default {
 	color: inherit !important;
+}
+div#fc_fieldfilters_tbl,
+.fc_filter_set .accordion {
+	width: 100%;
+}
+.mod_flexifilter_wrap .fc_filter_html {
+	flex-direction: column;
+	flex-wrap: nowrap;
+}
+.mod_flexifilter_wrapper .fc_field_filter {
+	padding: 0;
+}
+.mod_flexifilter_wrap .fc_filter_line {
+	flex-direction: column;
+	gap: 5px;
+}
+.flexi_search.left fieldset.fc_search_set legend,
+.flexi_search.left fieldset.fc_filter_set legend,
+.flexi_search.right fieldset.fc_search_set legend,
+.flexi_search.right fieldset.fc_filter_set legend {
+	flex-direction: column;
+}
+.flexi_search.left .fc_filter_html,
+.flexi_search.right .fc_filter_html {
+	display: flex;
+	flex-direction: column;
+	flex-wrap: nowrap;
+	gap: 15px;
+}
+div#fc_textsearch_tbl {
+	margin-bottom: 20px;
+	width: 100%;
+}
+.flexi_search #s2id_search_searchword {
+	width: 100%;
+	margin-bottom: 20px;
+}
+.flexi_search span.btn-wrapper.input-group {
+	display: block;
+}
+.flexi_search .btn-group {
+	width: 100%;
+}
+.flexi_search input.fc_field_filter {
+	width: 100%;
+}
+.flexi_search.left .fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_field_filter,
+.flexi_search.left .fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_field_filter:focus,
+.flexi_search.right .fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_field_filter,
+.flexi_search.right .fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_field_filter:focus {
+	width: 100%;
+}
+.fcfilter_nouislider_txtbox {
+	padding-left: 14px;
+	padding-top: 2px;
+}
+input#searchForm_6_val {
+	border-radius: 5px;
+	border: 1px solid #aaa;
 }

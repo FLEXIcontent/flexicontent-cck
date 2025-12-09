@@ -409,7 +409,7 @@ div table.adminform td {
 
 #flexicontent .item_total {
 	border: 0px solid lightgray; /*less border to be more clear*/
-	margin: 0px 0px 12px 0px;
+	margin: 40px 0px 12px 0px;
 	padding: 0px;
 	width: 100%;
 	clear: both;
@@ -476,11 +476,14 @@ div table.adminform td {
 #flexicontent .item_total .fc_limit_box,
 #flexicontent .item_total .fc_orderby_box,
 #flexicontent .item_total .fc_clayout_box {
-	display: inline-block;
+	display: flex;
 	float: left;
-	margin-top: 4px;
+	flex-direction: row;
+    align-items: center;
+    gap: 10px;
+	/*margin-top: 4px;
 	margin-bottom: 4px;
-	margin-left: 0px;
+	margin-left: 0px;*/
 }
 #flexicontent .item_total .fc_clayout_selector {
 	display: inline-block;
@@ -1605,4 +1608,44 @@ display: flex;
 }
 .view-search .select2-container.select2-container-multi.fc_index_complete_tlike.fc_adv_complete {
     height: 0px;
+}
+.mod_flexifilter_wrapper .fc_filter_set.fc_category {
+    margin-bottom: 15px !important;
+}
+/** result page **/
+.flexi_search {
+		display: grid;
+		clear:both;
+}
+#searchForm.right { order: 2;}
+.fc_search_results_list.right { order: 1;}
+.fc_search_results_list.page {
+    display: grid;
+    grid-template-columns: 1fr; // user can override column
+    gap: 20px;
+	height: min-content;
+}
+.search-results {
+    display: flex;
+    flex-direction: column;
+}
+#flexicontent .flexi_search .item_total {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+}
+/** mediaquery for search **/
+@media only screen and (max-width: 481px) {
+.flexi_search.left {
+    grid-template-columns: 1fr!important;
+}
+}
+h2.fc_search_result_title a {
+    text-decoration: none;
+}
+/** module calendar field correction **/
+.mod_flexifilter_wrapper  .field-calendar .btn-primary {
+    height: calc(var(--ctrls-inp-height) + 2px) !important;
 }

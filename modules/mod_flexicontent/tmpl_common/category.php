@@ -72,7 +72,7 @@ else :
 				<div class="fc_block cattitle">
 					<?php	if ($catdata->conf->link_title) : ?>
 						<a class="cattitle_link" href="<?php echo $catdata->titlelink; ?>">
-							<?php echo $catdata->title; ?>
+							<h4><?php echo $catdata->title; ?></h4>
 							<?php echo $show_found_items === 2 && $show_total ? '<span class="umod_title_list_totals fc-nowrap-box"><span class="icon-stack"></span> (' . $total_info . ')</span>' : ''; ?>
 						</a>
 					<?php else : ?>

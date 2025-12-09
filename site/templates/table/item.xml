@@ -4,8 +4,8 @@
 	<website>www.flexicontent.org</website>
 	<email>emmanuel@vistamedia.fr</email>
 	<license>GPLv3</license>
-	<version>1.3</version>
-	<release>20 May 2014</release>
+	<version>2</version>
+	<release>08/08/2024</release>
 	<microdata_support>1</microdata_support>
 
 	<defaulttitle>FLEXI_TMPL_ITEMSTABBED_ITEM_DEFAULT_TITLE</defaulttitle>
@@ -16,13 +16,14 @@
 
 			<field name="custom_layout_title" type="text" size="3" not_inherited="1" default="" label="FLEXI_LAYOUT_CUSTOM_DISPLAY_TITLE" description="FLEXI_LAYOUT_CUSTOM_DISPLAY_TITLE_DESC" />
 
-			<!--field name="templatehtmlmode" type="separator" default="FLEXI_TEMPLATE_HTML_MODE" level="level2" /-->
+			<!--field name="templatehtmlmode" type="separator" default="FLEXI_TEMPLATE_HTML_MODE" level="level2" 
 
 			<field name="htmlmode" type="multilist" subtype="radio" default="" label="FLEXI_HTML_MODE" description="FLEXI_HTML_MODE_DESC" filter="int" class="btn-group group-fcinfo">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_XHTML</option>
 				<option value="1">FLEXI_HTML5</option>
 			</field>
+			/-->
 
 			<field name="params_above_tabset_spacer" type="separator" default="" level="none" class="fcspacer-16" />
 
@@ -35,16 +36,16 @@
 			<field name="item_text_color" type="color" cssprep="less" default="inherit" label="FLEXI_TMPL_COLOR" description="FLEXI_TMPL_COLOR_DESC" format="rgba" keywords="transparent,initial,inherit"/>
 
 			<field name="item_pad_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_PADDING" description="" level="level3" />
-			<field name="item_pad_top" type="number" cssprep="less" hint="0" default="0" required="true" label="FLEXI_TMPL_PADDING_TOP" description="FLEXI_TMPL_ITEM_PADDINGTOP_DESC" min="0" max="80" step="1" />
-			<field name="item_pad_left" type="number" cssprep="less" hint="0" default="0" required="true" label="FLEXI_TMPL_PADDING_LEFT" description="FLEXI_TMPL_PADDING_LEFT_DESC" min="0" max="80" step="1" />
-			<field name="item_pad_right" type="number" cssprep="less" hint="0" default="0" required="true" label="FLEXI_TMPL_PADDING_RIGHT" description="FLEXI_TMPL_ITEM_PADDINGRIGHT_DESC" min="0" max="80" step="1" />
-			<field name="item_pad_bottom" type="number" cssprep="less" hint="0" default="0" required="true" label="FLEXI_TMPL_PADDING_BOTTOM" description="FLEXI_TMPL_PADDING_BOTTOMT_DESC" min="0" max="80" step="1" />
+			<field name="item_pad_top" type="number" cssprep="less" hint="0" default="0"  label="FLEXI_TMPL_PADDING_TOP" description="FLEXI_TMPL_ITEM_PADDINGTOP_DESC" min="0" max="80" step="1" />
+			<field name="item_pad_left" type="number" cssprep="less" hint="0" default="0"  label="FLEXI_TMPL_PADDING_LEFT" description="FLEXI_TMPL_PADDING_LEFT_DESC" min="0" max="80" step="1" />
+			<field name="item_pad_right" type="number" cssprep="less" hint="0" default="0"  label="FLEXI_TMPL_PADDING_RIGHT" description="FLEXI_TMPL_ITEM_PADDINGRIGHT_DESC" min="0" max="80" step="1" />
+			<field name="item_pad_bottom" type="number" cssprep="less" hint="0" default="0"  label="FLEXI_TMPL_PADDING_BOTTOM" description="FLEXI_TMPL_PADDING_BOTTOMT_DESC" min="0" max="80" step="1" />
 
 			<field name="item_border_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_BORDER" description="" level="level3" />
-			<field name="item_border_radius" type="number" cssprep="less" hint="0" default="0" required="true" label="FLEXI_TMPL_BORDER_RADIUS" description="FLEXI_TMPL_BORDER_RADIUS_DESC" min="0" max="80" step="1" />
+			<field name="item_border_radius" type="number" cssprep="less" hint="0" default="0"  label="FLEXI_TMPL_BORDER_RADIUS" description="FLEXI_TMPL_BORDER_RADIUS_DESC" min="0" max="80" step="1" />
 			<field name="item_border_color" type="color" cssprep="less" default="#cccccc" label="FLEXI_TMPL_BORDER_COLOR" description="FLEXI_TMPL_BORDER_COLOR_DESC" format="rgba" keywords="transparent,initial,inherit"/>
-			<field name="item_border_size" type="number" cssprep="less" hint="0" default="0" required="true" label="FLEXI_TMPL_BORDER_WIDTH" description="FLEXI_TMPL_BORDER_WIDTH_DESC" min="0" max="80" step="1" />
-			<field name="item_border_type" type="list" cssprep="less" hint="solid" default="solid" required="true" label="FLEXI_TMPL_BORDER_TYPE" description="FLEXI_TMPL_BORDER_TYPE_DESC" >
+			<field name="item_border_size" type="number" cssprep="less" hint="0" default="0"  label="FLEXI_TMPL_BORDER_WIDTH" description="FLEXI_TMPL_BORDER_WIDTH_DESC" min="0" max="80" step="1" />
+			<field name="item_border_type" type="list" cssprep="less" hint="solid" default="solid"  label="FLEXI_TMPL_BORDER_TYPE" description="FLEXI_TMPL_BORDER_TYPE_DESC" >
 				<option value="solid">FLEXI_SOLID</option>
 				<option value="dotted">FLEXI_DOTTED</option>
 				<option value="dashed">FLEXI_DASHED</option>
@@ -64,29 +65,23 @@
 			<field name="title_bg_color" type="color" cssprep="less" default="inherit" label="FLEXI_TMPL_BACKGROUND" description="FLEXI_TMPL_BACKGROUND_DESC" format="rgba" keywords="transparent,initial,inherit"/>
 
 			<field name="item_title_pad_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_PADDING" description="" level="level3" />
-			<field name="title_pad_top" type="number" cssprep="less" hint="0" default="0" required="true" label="FLEXI_TMPL_PADDING_TOP" description="FLEXI_TMPL_PADDING_TOP_DESC" min="0" max="80" step="1" />
-			<field name="title_pad_left" type="number" cssprep="less" hint="0" default="0" required="true" label="FLEXI_TMPL_PADDING_LEFT" description="FLEXI_TMPL_PADDING_LEFT_DESC" min="0" max="80" step="1" />
-			<field name="title_pad_right" type="number" cssprep="less" hint="0" default="0" required="true" label="FLEXI_TMPL_PADDING_RIGHT" description="FLEXI_TMPL_PADDING_RIGHT_DESC" min="0" max="80" step="1" />
-			<field name="title_pad_bottom" type="number" cssprep="less" hint="0" default="0" required="true" label="FLEXI_TMPL_PADDING_BOTTOM" description="FLEXI_TMPL_PADDING_BOTTOM_DESC" min="0" max="80" step="1" />
+			<field name="title_pad" type="text" cssprep="less" hint="paddng-top padding-right padding-bottom padding-left in px % rem ect" default="0"  label="FLEXI_TMPL_PADDING" description="FLEXI_TMPL_PADDING_TOP_DESC" min="0" max="80" step="1" />
 
 			<field name="item_title_border_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_BORDER" description="" level="level3" />
-			<field name="title_border_radius" type="number" cssprep="less" hint="0" default="0" required="true" label="FLEXI_TMPL_BORDER_RADIUS" description="FLEXI_TMPL_BORDER_RADIUS_DESC" min="0" max="80" step="1" />
+			<field name="title_border_radius" type="number" cssprep="less" hint="0" default="0"  label="FLEXI_TMPL_BORDER_RADIUS" description="FLEXI_TMPL_BORDER_RADIUS_DESC" min="0" max="80" step="1" />
 
 			<field name="params_tab_labels" type="separator" default="FLEXI_TMPL_LABELS_TAB" description="" icon_class="icon-checkbox" level="tab_open" box_type="1" />
 			<field name="params_tab_labels_info" type="separator" cssprep="1" default="FLEXI_STYLING" description="" level="level2" class="alert alert-info" />
 
 			<field name="label_colors_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_COLORS" description="" level="level3" />
-			<field name="label_txt_color" type="color" cssprep="less" hint="#000000" default="#000000" required="true" label="FLEXI_TMPL_COLOR" description="FLEXI_TMPL_COLOR_DESC" format="rgba" keywords="transparent,initial,inherit"/>
-			<field name="label_bg_color" type="color" cssprep="less" hint="rgba(255, 255, 255, 0)" default="rgba(255, 255, 255, 0)" required="true" label="FLEXI_TMPL_BACKGROUND" description="FLEXI_TMPL_BACKGROUND_DESC" format="rgba" keywords="transparent,initial,inherit"/>
+			<field name="label_txt_color" type="color" cssprep="less" hint="#000000" default="#000000"  label="FLEXI_TMPL_COLOR" description="FLEXI_TMPL_COLOR_DESC" format="rgba" keywords="transparent,initial,inherit"/>
+			<field name="label_bg_color" type="color" cssprep="less" hint="rgba(255, 255, 255, 0)" default="rgba(255, 255, 255, 0)"  label="FLEXI_TMPL_BACKGROUND" description="FLEXI_TMPL_BACKGROUND_DESC" format="rgba" keywords="transparent,initial,inherit"/>
 
 			<field name="label_pad_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_PADDING" description="" level="level3" />
-			<field name="label_pad_top" type="number" cssprep="less" hint="0" default="0" required="true" label="FLEXI_TMPL_PADDING_TOP" description="FLEXI_TMPL_PADDING_TOP_DESC" min="0" max="80" step="1" />
-			<field name="label_pad_left" type="number" cssprep="less" hint="0" default="0" required="true" label="FLEXI_TMPL_PADDING_LEFT" description="FLEXI_TMPL_PADDING_LEFT_DESC" min="10" max="80" step="1" />
-			<field name="label_pad_right" type="number" cssprep="less" hint="0" default="0" required="true" label="FLEXI_TMPL_PADDING_RIGHT" description="FLEXI_TMPL_PADDING_RIGHT_DESC" min="0" max="80" step="1" />
-			<field name="label_pad_bottom" type="number" cssprep="less" hint="0" default="0" required="true" label="FLEXI_TMPL_PADDING_BOTTOM" description="FLEXI_TMPL_PADDING_BOTTOM_DESC" min="0" max="80" step="1" />
+			<field name="label_pad" type="text" cssprep="less" hint="paddng-top padding-right padding-bottom padding-left in px % rem ect" default="0"  label="FLEXI_TMPL_PADDING" description="FLEXI_TMPL_PADDING_TOP_DESC"  />
 
 			<field name="label_border_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_BORDER" description="" level="level3" />
-			<field name="label_radius" type="number" cssprep="less" hint="0" default="0" required="true" label="FLEXI_TMPL_BORDER_RADIUS" description="FLEXI_TMPL_BORDER_RADIUS_DESC" min="0" max="80" step="1" />
+			<field name="label_radius" type="number" cssprep="less" hint="0" default="0"  label="FLEXI_TMPL_BORDER_RADIUS" description="FLEXI_TMPL_BORDER_RADIUS_DESC" min="0" max="80" step="1" />
 
 
 			<field name="item_layout_positions_tab" type="separator" default="FLEXI_TMPL_FIELDS_PLACEMENT_POSITIONS" description="" icon_class="icon-grid" level="tab_open" box_type="1" />			
@@ -97,13 +92,13 @@
 
 			<field name="tab_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_TABS_STYLING" description="" level="level2" />
 			<field name="tab_handles_grp" type="separator" cssprep="1" default="FLEXI_TMPL_TABS_HANDLES" description="" level="level3" />
-			<field name="tab_bg_color_start" type="color" cssprep="less" hint="#3093c7" default="#3093c7" required="true" label="FLEXI_TMPL_TAB_BG_START" description="FLEXI_TMPL_TAB_BG_START_DESC" format="rgba" keywords="transparent,initial,inherit"/>
-			<field name="tab_title_color" type="color" cssprep="less" hint="#ffffff" default="#ffffff" required="true" label="FLEXI_TMPL_TAB_TITLE_COLOR" description="FLEXI_TMPL_TAB_TITLE_COLOR_DESC" format="rgba" keywords="transparent,initial,inherit"/>
+			<field name="tab_bg_color_start" type="color" cssprep="less" hint="#3093c7" default="#3093c7"  label="FLEXI_TMPL_TAB_BG_START" description="FLEXI_TMPL_TAB_BG_START_DESC" format="rgba" keywords="transparent,initial,inherit"/>
+			<field name="tab_title_color" type="color" cssprep="less" hint="#3093c7" default="#3093c7"  label="FLEXI_TMPL_TAB_TITLE_COLOR" description="FLEXI_TMPL_TAB_TITLE_COLOR_DESC" format="rgba" keywords="transparent,initial,inherit"/>
 
 			<field name="tab_content_grp" type="separator" cssprep="1" default="FLEXI_TMPL_TABS_CONTENT_BOX" description="" level="level3" />
-			<field name="tab_content_bg_color" type="color" cssprep="less" hint="#ffffff" default="#ffffff" required="true" label="FLEXI_TMPL_COLOR" description="FLEXI_TMPL_COLOR_DESC" format="rgba" keywords="transparent,initial,inherit" />
-			<field name="tab_content_border_radius" type="number" cssprep="less" hint="0" default="0" required="true" label="FLEXI_TMPL_BORDER_RADIUS" description="FLEXI_TMPL_BORDER_RADIUS_DESC" format="rgba" keywords="transparent,initial,inherit"/>
-			<field name="tab_content_border_size_top" type="number" cssprep="less" hint="1" default="1" required="true" label="FLEXI_TMPL_TAB_CONTENT_TOP_SIZE" description="FLEXI_TMPL_TAB_CONTENT_TOP_SIZE_DESC" />
+			<field name="tab_content_bg_color" type="color" cssprep="less" hint="#ffffff" default="#ffffff"  label="FLEXI_TMPL_COLOR" description="FLEXI_TMPL_COLOR_DESC" format="rgba" keywords="transparent,initial,inherit" />
+			<field name="tab_content_border_radius" type="number" cssprep="less" hint="0" default="0"  label="FLEXI_TMPL_BORDER_RADIUS" description="FLEXI_TMPL_BORDER_RADIUS_DESC" format="rgba" keywords="transparent,initial,inherit"/>
+			<field name="tab_content_border_size_top" type="number" cssprep="less" hint="1" default="1"  label="FLEXI_TMPL_TAB_CONTENT_TOP_SIZE" description="FLEXI_TMPL_TAB_CONTENT_TOP_SIZE_DESC" />
 			<field name="tab_content_border_color_top" type="color" cssprep="less" default="#cccccc" label="FLEXI_TMPL_TAB_CONTENT_TOP_COLOR" description="FLEXI_TMPL_TAB_CONTENT_TOP_COLOR_DESC" format="rgba" keywords="transparent,initial,inherit"/>
 
 			<field name="tabs_labels_grp" type="separator" default="FLEXI_TMPL_TAB_TITLES" description="" level="level2" />
@@ -139,7 +134,8 @@
 			<field name="layout_pos_tab_top_bottom_positions" type="separator" default="FLEXI_TMPL_TOP_BOTTOM_POS_TAB" description="" icon_class="" level="tab_open" box_type="1" />
 
 			<field name="column_display_grp" type="separator" cssprep="1" default="FLEXI_TMPL_COLUMNS_DISPLAY" description="" level="level2" />
-			<field name="top_span_cols_params" type="number" default="4" label="Top width" description="This is span1 to span12 (100% width). &lt;br&gt; Note 'Top' position is next to 'Image' position the sum of them is 12. &lt;br&gt; If one position is empty the other is expaned to 100%" min="1" max="12" step="1" />
+			<field name="top_col_width" cssprep="less" type="text" hint="paddng-top padding-right padding-bottom padding-left in px % rem ect" default="30%" label="Top width" description="This is span1 to span12 (100% width). &lt;br&gt; Note 'Top' position is next to 'Image' position the sum of them is 12. &lt;br&gt; If one position is empty the other is expaned to 100%" />
+			<field name="top_col_gap" cssprep="less" type="text" hint="gap in px % rem etc" default="2rem" label="Gap" description="Set gap between image blcok and top block"  />
 			<field name="top_cols" type="radio" default="" label="FLEXI_ITEM_TOP_COLS" description="FLEXI_ITEM_TOP_COLS_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="one">FLEXI_1_COL</option>
@@ -154,18 +150,13 @@
 			
 
 			<field name="column_padding_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_INFOBOX_TOP" description="" level="level3" />
-			<field name="column_pad_top" type="number" cssprep="less" hint="10" default="10" required="true" label="FLEXI_TMPL_PADDING_TOP" description="FLEXI_TMPL_PADDING_TOP_DESC" min="0" max="80" step="1" />
-			<field name="column_pad_left" type="number" cssprep="less" hint="10" default="10" required="true" label="FLEXI_TMPL_PADDING_LEFT" description="FLEXI_TMPL_PADDING_LEFT_DESC" min="10" max="80" step="1" />
-			<field name="column_pad_right" type="number" cssprep="less" hint="0" default="0" required="true" label="FLEXI_TMPL_PADDING_RIGHT" description="FLEXI_TMPL_PADDING_RIGHT_DESC" min="0" max="80" step="1" />
-			<field name="column_pad_bottom" type="number" cssprep="less" hint="10" default="10" required="true" label="FLEXI_TMPL_PADDING_BOTTOM" description="FLEXI_TMPL_PADDING_BOTTOM_DESC" min="0" max="80" step="1" />
-
-			<field name="column_border_styling_grp_top" type="separator" cssprep="1" default="FLEXI_TMPL_BORDER_TOP" description="" level="level3" />
+			<field name="column_pad_top" type="text" cssprep="less" hint="paddng-top padding-right padding-bottom padding-left in px % rem ect"  default="10px 10px 10px 10px"  label="FLEXI_TMPL_PADDING_TOP" description="FLEXI_TMPL_PADDING_TOP_DESC" />
 			<field name="column_color_top" type="color" cssprep="less" default="inherit" label="FLEXI_TMPL_COLOR" description="FLEXI_TMPL_COLOR_DESC" format="rgba" keywords="transparent,initial,inherit"/>
 			<field name="column_bg_color_top" type="color" cssprep="less" default="transparent" label="FLEXI_TMPL_BACKGROUND" description="FLEXI_TMPL_BACKGROUND_DESC" format="rgba" keywords="transparent,initial,inherit"/>
-			<field name="column_border_radius_top" type="number" cssprep="less" hint="0" default="0" required="true" label="FLEXI_TMPL_BORDER_RADIUS" description="FLEXI_TMPL_BORDER_RADIUS_DESC" min="0" max="80" step="1" />
-			<field name="column_border_size_top" type="number" cssprep="less" hint="1" default="1" required="true" label="FLEXI_TMPL_BORDER_WIDTH" description="FLEXI_TMPL_BORDER_WIDTH_DESC" />
+			<field name="column_border_radius_top" type="number" cssprep="less" hint="0" default="05"  label="FLEXI_TMPL_BORDER_RADIUS" description="FLEXI_TMPL_BORDER_RADIUS_DESC" min="0" max="80" step="1" />
+			<field name="column_border_size_top" type="number" cssprep="less" hint="1" default="1"  label="FLEXI_TMPL_BORDER_WIDTH" description="FLEXI_TMPL_BORDER_WIDTH_DESC" />
 			<field name="column_border_color_top" type="color" cssprep="less" default="#cccccc" label="FLEXI_TMPL_BORDER_COLOR" description="FLEXI_TMPL_BORDER_COLOR_DESC" format="rgba" keywords="transparent,initial,inherit"/>
-			<field name="column_border_type_top" type="list" cssprep="less" hint="solid" default="solid" required="true" label="FLEXI_TMPL_BORDER_TYPE" description="FLEXI_TMPL_BORDER_TYPE_DESC" >
+			<field name="column_border_type_top" type="list" cssprep="less" hint="solid" default="solid"  label="FLEXI_TMPL_BORDER_TYPE" description="FLEXI_TMPL_BORDER_TYPE_DESC" >
 				<option value="solid">FLEXI_SOLID</option>
 				<option value="dotted">FLEXI_DOTTED</option>
 				<option value="dashed">FLEXI_DASHED</option>
@@ -177,12 +168,13 @@
 			</field>
 
 			<field name="column_border_styling_grp_bottom" type="separator" cssprep="1" default="FLEXI_TMPL_INFOBOX_BOTTOM" description="" level="level3" />
+			<field name="column_pad_bottom" type="text" cssprep="less"  hint="paddng-top padding-right padding-bottom padding-left in px % rem ect" default="0"  label="FLEXI_TMPL_PADDING_BOTTOM" description="FLEXI_TMPL_PADDING_TOP_DESC" />
 			<field name="column_color_bottom" type="color" cssprep="less" default="#cccccc" label="FLEXI_TMPL_COLOR" description="FLEXI_TMPL_COLOR_DESC" format="rgba" keywords="transparent,initial,inherit"/>
 			<field name="column_bg_color_bottom" type="color" cssprep="less" default="#ffffff" label="FLEXI_TMPL_BACKGROUND" description="FLEXI_TMPL_BACKGROUND_DESC" format="rgba" keywords="transparent,initial,inherit"/>
-			<field name="column_border_radius_bottom" type="number" cssprep="less" hint="0" default="0" required="true" label="FLEXI_TMPL_BORDER_RADIUS" description="FLEXI_TMPL_BORDER_RADIUS_DESC" min="0" max="80" step="1" />
-			<field name="column_border_size_bottom" type="number" cssprep="less" hint="1" default="1" required="true" label="FLEXI_TMPL_BORDER_WIDTH" description="FLEXI_TMPL_BORDER_WIDTH_DESC" />
+			<field name="column_border_radius_bottom" type="number" cssprep="less" hint="0" default="0"  label="FLEXI_TMPL_BORDER_RADIUS" description="FLEXI_TMPL_BORDER_RADIUS_DESC" min="0" max="80" step="1" />
+			<field name="column_border_size_bottom" type="number" cssprep="less" hint="1" default="0"  label="FLEXI_TMPL_BORDER_WIDTH" description="FLEXI_TMPL_BORDER_WIDTH_DESC" />
 			<field name="column_border_color_bottom" type="color" cssprep="less" default="#cccccc" label="FLEXI_TMPL_BORDER_COLOR" description="FLEXI_TMPL_BORDER_COLOR_DESC" format="rgba" keywords="transparent,initial,inherit"/>
-			<field name="column_border_type_bottom" type="list" cssprep="less" hint="solid" default="solid" required="true" label="FLEXI_TMPL_BORDER_TYPE" description="FLEXI_TMPL_BORDER_TYPE_DESC" >
+			<field name="column_border_type_bottom" type="list" cssprep="less" hint="solid" default="solid"  label="FLEXI_TMPL_BORDER_TYPE" description="FLEXI_TMPL_BORDER_TYPE_DESC" >
 				<option value="solid">FLEXI_SOLID</option>
 				<option value="dotted">FLEXI_DOTTED</option>
 				<option value="dashed">FLEXI_DASHED</option>

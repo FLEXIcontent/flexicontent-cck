@@ -20,6 +20,8 @@ $filter_placement = $params->get( 'filter_placement', 1 );
 $filter_container_class  = $filter_placement ? 'fc_filter_line' : 'fc_filter';
 $filter_container_class .= $filter_placement==2 ? ' fc_clear_label' : '';
 $text_search_val = \Joomla\CMS\Factory::getApplication()->input->get('filter', '', 'string');
+$column_width = $params->get('column_width', '20%');
+$column_gap = $params->get('column_gap', '2rem');
 
 // 4. Create (print) the form
 ?>
@@ -62,7 +64,7 @@ if ($ff_placement)
 <form id='<?php echo $form_id; ?>' action='<?php echo $form_target; ?>' data-fcform_default_action='<?php echo $form_target; ?>' method='<?php echo $form_method; ?>' role='search' >
 
 <?php if ( !empty($cats_select_field) ) : ?>
-<fieldset class="fc_filter_set" style="padding-bottom:0px;">
+<fieldset class="fc_filter_set fc_category" style="padding-bottom:0px;">
 	<span class="<?php echo $filter_container_class. ' fc_odd'; ?>" style="margin-bottom:0px;">
 		<span class="fc_filter_label fc_cid_label"><?php echo \Joomla\CMS\Language\Text::_($mcats_selection ? 'FLEXI_FILTER_CATEGORIES' : 'FLEXI_FILTER_CATEGORY'); ?></span>
 		<span class="fc_filter_html fc_cid_selector"><span class="cid_loading" id="cid_loading_<?php echo $module->id; ?>"></span><?php echo $cats_select_field; ?></span>

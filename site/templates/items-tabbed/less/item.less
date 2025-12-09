@@ -9,10 +9,7 @@ body #flexicontent .fc_item_title,
 body #flexicontent .fc_item_title a {
 	color: @FCI_title_color;
 	background-color: @FCI_title_bg_color;
-	padding-top: @FCI_title_pad_top + px ;
-	padding-right: @FCI_title_pad_right + px;
-	padding-left: @FCI_title_pad_left + px;
-	padding-bottom: @FCI_title_pad_bottom + px;
+	padding : @FCI_title_pad  ;
 	border-radius: @FCI_title_border_radius + px;
 }
 
@@ -35,10 +32,8 @@ body #flexicontent .desc-title.label {
 	background-color: @FCI_label_bg_color;
 	color: @FCI_label_txt_color;
 	border-radius: @FCI_label_radius*1px;
-	padding-top: @FCI_label_pad_top + px ;
-	padding-right: @FCI_label_pad_right + px;
-	padding-left: @FCI_label_pad_left + px;
-	padding-bottom: @FCI_label_pad_bottom + px;
+	padding: @FCI_label_pad ;
+    font-weight:bold;
 }
 
 /* TAB styling */
@@ -80,10 +75,7 @@ div#fc_subtitle_tabset, div#fc_bottom_tabset  {
 /* infoblock styling */
 
 body .flexi.infoblock{
-	padding-top: @FCI_column_pad_top + px ;
-	padding-right: @FCI_column_pad_right + px;
-	padding-left: @FCI_column_pad_left + px;
-	padding-bottom: @FCI_column_pad_bottom + px;
+	padding: @FCI_column_pad_top;
 }
 
 // ***
@@ -91,11 +83,9 @@ body .flexi.infoblock{
 // ***
 
 .flexi.lineinfo {
-	display: block;
-	padding: 0;
+	display: flex;
 	margin: 0 0 1em;
-	overflow: hidden;
-	clear: both;
+	flex-direction: column;
 }
 
 
@@ -133,38 +123,39 @@ body .flexi.infoblock{
 	overflow: hidden;
 	width: 100%;
 	margin-bottom: 10px;
+	display: grid;
+    grid-template-columns: 1fr  @FCI_top_col_width;
+    column-gap: @FCI_top_col_gap;
+}
+@media (max-width: 768px) {
+	.flexi.topblock {
+		grid-template-columns: 1fr;
+}
 }
 .topblock .flexi.image {
-	display: block;
-	float: left;
-	max-width: 99% !important;  /* Allow responsive width while floating */
-	padding: 0% !important;  /* Allow responsive width while floating */
-	margin-right: 0%;
-	margin-left: 0%;
-	line-height: 0px;
-	border: 0px solid silver;
+    display: flex;
+    flex-direction: column;
 }
 .topblock .flexi.image a {
 	outline: none;
 }
 .topblock .flexi.infoblock {
-	overflow: hidden;
   	border-radius: @FCI_column_border_radius_top + px;
 	border : @FCI_column_border_size_top + px @FCI_column_border_type_top @FCI_column_border_color_top;
   	color: @FCI_column_color_top;
 	background-color: @FCI_column_bg_color_top;
 }
+.flexi.topblock ul { /* remove bottstrap padding */
+    padding: 0;
+    margin: 0;
+}
 
 .flexi.bottomblock.infoblock {
-	overflow: hidden;
   	border-radius: @FCI_column_border_radius_bottom + px;
 	border : @FCI_column_border_size_bottom + px @FCI_column_border_type_bottom @FCI_column_border_color_bottom;
   	color: @FCI_column_color_bottom;
 	background-color: @FCI_column_bg_color_bottom;
-}
-.flexi.topblock ul { /* remove bottstrap padding */
-    padding: 0;
-    margin: 0;
+	padding: @FCI_column_pad_bottom;
 }
 
 
@@ -190,15 +181,14 @@ body .flexi.infoblock{
 
 /* center value vs label */
 div.flexi.value{
-	padding-bottom: @FCI_label_pad_bottom + px!important;
-	padding-top: @FCI_label_pad_top + px!important ;
+	padding: @FCI_label_pad !important;
 	}
 
 /* Field values into 1 column */
 .onecols ul li.flexi {
 	width: 100%;
 }
-.onecols .flexi.label {
+/*.onecols .flexi.label {
 	min-width: 25%;
 	margin-right: 4%;
 	margin-bottom: 6px;

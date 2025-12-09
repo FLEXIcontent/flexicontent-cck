@@ -26,6 +26,7 @@ ob_start();
 file_exists(dirname(__FILE__).DS.'listings_filter_form.php')
     ? include(dirname(__FILE__).DS.'listings_filter_form.php')
     : include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS.'listings_filter_form.php');
+
 $filter_form_html = trim(ob_get_contents());
 ob_end_clean();
 
@@ -33,9 +34,9 @@ if ( $filter_form_html )
 {
 	echo '
 	<div class="fcclear"></div>
-	<div class="group">
+	<aside class="group">
 		' . $filter_form_html . '
-	</div>';
+	</aside>';
 }
 
 // -- Check matching items found
@@ -165,17 +166,17 @@ foreach ($cat_items as $catid => $items) :
 <ul class="faqblock <?php echo $classnum; ?> masonryblock group">
 <?php endif; ?>
 
-<li class="<?php echo $catid==$currcatid ? 'full' : ($count_cat%2 ? 'even' : 'odd'); ?>">
+<li class="<?php echo $catid==$currcatid ? 'full' : ($count_cat%2 ? 'even' : 'odd'); ?> <?php echo $classspan; ?>">
 	
-	<div class="group">	
+	<section class="group">	
 		
-		<div class="flexi-cat group">
+		<header class="flexi-cat group">
 
 			<?php if (!empty($sub->image) && $this->params->get(($catid!=$currcatid? 'show_description_image_subcat' : 'show_description_image'), 1)) : ?>
 				<!-- BOF subcategory image -->
-				<div class="catimg">
+				<figure class="catimg">
 					<?php echo $sub->image; ?>
-				</div>
+				</figure>
 				<!-- EOF subcategory image -->
 			<?php endif; ?>
 
@@ -204,7 +205,7 @@ foreach ($cat_items as $catid => $items) :
 				<!-- EOF subcategory description -->
 			<?php endif; ?>
 			
-		</div>
+		</header>
 
 
 		<?php if ( $items ) : ?>
@@ -238,15 +239,16 @@ foreach ($cat_items as $catid => $items) :
 						
 					  <?php if ($item->event->beforeDisplayContent) : ?>
 					  <!-- BOF beforeDisplayContent -->
-						<div class="fc_beforeDisplayContent group">
+						<aside class="fc_beforeDisplayContent group">
 							<?php echo $item->event->beforeDisplayContent; ?>
-						</div>
+						</aside>
 					  <!-- EOF beforeDisplayContent -->
 						<?php endif; ?>
 
 					
 						<ul class="flexi-fieldlist">
 				   		<li class="flexi-field flexi-title">
+								<i class="icon-arrow-right" style="position:absolute; left:0; padding:2px;"></i>
 
 								<?php echo @ $item->editbutton; ?>
 								<?php echo @ $item->statebutton; ?>
@@ -367,9 +369,9 @@ foreach ($cat_items as $catid => $items) :
 
 						<?php if ($item->event->afterDisplayContent) : ?>
 							<!-- BOF afterDisplayContent -->
-							<div class="fc_afterDisplayContent group">
+							<aside class="fc_afterDisplayContent group">
 								<?php echo $item->event->afterDisplayContent; ?>
-							</div>
+							</aside>
 							<!-- EOF afterDisplayContent -->
 						<?php endif; ?>
 
@@ -381,7 +383,7 @@ foreach ($cat_items as $catid => $items) :
 			<!-- EOF subcategory items -->
 		<?php endif; ?>
 
-	</div>
+	</section>
 </li>
 
 		

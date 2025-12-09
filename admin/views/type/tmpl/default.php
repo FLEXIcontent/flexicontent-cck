@@ -14,6 +14,8 @@ defined('_JEXEC') or die('Restricted access');
 //adding inline help
 if (FLEXI_J40GE) \Joomla\CMS\Toolbar\ToolbarHelper::inlinehelp();
 
+use \Joomla\CMS\Language\Text;
+
 // Load JS tabber lib
 $this->document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
 $this->document->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
@@ -88,7 +90,7 @@ $this->document->addScriptDeclaration($js);
 		<div class="span6 col-6 full_width_980">
 
 			<div class="fc-info fc-nobgimage fc-mssg" style="display:block; float:left; clear:both; margin: 32px 0px 32px 0px !important; font-size:12px;">
-				<?php echo str_replace('<br/>', ' ', \Joomla\CMS\Language\Text::_('FLEXI_ITEM_PARAM_OVERRIDE_ORDER_DETAILS')); ?>
+				<?php echo str_replace('<br/>', ' ', Text::_('FLEXI_ITEM_PARAM_OVERRIDE_ORDER_DETAILS')); ?>
 			</div>
 
 		</div>
@@ -99,16 +101,16 @@ $this->document->addScriptDeclaration($js);
 	<div class="fctabber fields_tabset" id="field_specific_props_tabset">
 
 		<div class="tabbertab" id="core_fields-options" data-icon-class="icon-paragraph-justify" >
-			<h3 class="tabberheading"> <?php echo \Joomla\CMS\Language\Text::_('FLEXI_DESCRIPTION'); ?> </h3>
+			<h3 class="tabberheading"> <?php echo Text::_('FLEXI_DESCRIPTION'); ?> </h3>
 			<div class="alert alert-success" style="display: inline-block;">
-				<?php echo \Joomla\CMS\Language\Text::_('FLEXI_REGARDING_ITEM_TYPE_DESCRIPTION_TEXT_USAGE'); ?>
+				<?php echo Text::_('FLEXI_REGARDING_ITEM_TYPE_DESCRIPTION_TEXT_USAGE'); ?>
 			</div>
 			<?php echo $this->form->getInput('description'); ?>
 
 			</div>
 
 		<div class="tabbertab" id="core_fields-options" data-icon-class="icon-cogs" >
-			<h3 class="tabberheading"> <?php echo \Joomla\CMS\Language\Text::_('FLEXI_CORE_FIELDS'); ?> </h3>
+			<h3 class="tabberheading"> <?php echo Text::_('FLEXI_CORE_FIELDS'); ?> </h3>
 
 			<?php
 			//echo \Joomla\CMS\HTML\HTMLHelper::_('sliders.start','basic-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));
@@ -118,9 +120,9 @@ $this->document->addScriptDeclaration($js);
 				if ( substr($fsname, 0, $prefix_len)!='customize_field-' ) continue;
 
 				$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.strtoupper($fsname).'_FIELDSET_LABEL';
-				//echo \Joomla\CMS\HTML\HTMLHelper::_('sliders.panel', \Joomla\CMS\Language\Text::_($label), $fsname.'-options');
+				//echo \Joomla\CMS\HTML\HTMLHelper::_('sliders.panel', Text::_($label), $fsname.'-options');
 				if (isset($fieldSet->description) && trim($fieldSet->description)) :
-					echo '<div class="fc-mssg fc-info">'.\Joomla\CMS\Language\Text::_($fieldSet->description).'</div>';
+					echo '<div class="fc-mssg fc-info">'.Text::_($fieldSet->description).'</div>';
 				endif;
 
 				foreach ($this->form->getFieldset($fsname) as $field) :
@@ -149,11 +151,11 @@ $this->document->addScriptDeclaration($js);
 			$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.strtoupper($fsname).'_FIELDSET_LABEL';
 ?>
 		<div class="tabbertab" id="<?php echo $fsname; ?>-options" data-icon-class="<?php echo isset($fieldSet->icon_class) ? $fieldSet->icon_class : 'icon-pencil';?>" >
-			<h3 class="tabberheading"> <?php echo \Joomla\CMS\Language\Text::_($label); ?> </h3>
+			<h3 class="tabberheading"> <?php echo Text::_($label); ?> </h3>
 <?php
-			//echo \Joomla\CMS\HTML\HTMLHelper::_('sliders.panel', \Joomla\CMS\Language\Text::_($label), $fsname.'-options');
+			//echo \Joomla\CMS\HTML\HTMLHelper::_('sliders.panel', Text::_($label), $fsname.'-options');
 			if (isset($fieldSet->description) && trim($fieldSet->description)) :
-				echo '<div class="fc-mssg fc-info">'.\Joomla\CMS\Language\Text::_($fieldSet->description).'</div>';
+				echo '<div class="fc-mssg fc-info">'.Text::_($fieldSet->description).'</div>';
 			endif;
 
 			foreach ($this->form->getFieldset($fsname) as $field) :
@@ -181,18 +183,18 @@ $this->document->addScriptDeclaration($js);
 
 	<!-- Template tab -->
 	<div class="tabbertab" id="themes-options" data-icon-class="icon-palette">
-		<h3 class="tabberheading"> <?php echo \Joomla\CMS\Language\Text::_('FLEXI_LAYOUT'); ?> </h3>
+		<h3 class="tabberheading"> <?php echo Text::_('FLEXI_LAYOUT'); ?> </h3>
 
 		<div class="fc_tabset_inner">
 
 			<span class="btn-group input-append" style="margin: 2px 0px 6px;">
-				<span id="fc-layouts-help_btn" class="btn" onclick="fc_toggle_box_via_btn('fc-layouts-help', this, 'btn-primary');" ><span class="icon-help"></span><?php echo \Joomla\CMS\Language\Text::_('JHELP'); ?></span>
+				<span id="fc-layouts-help_btn" class="btn" onclick="fc_toggle_box_via_btn('fc-layouts-help', this, 'btn-primary');" ><span class="icon-help"></span><?php echo Text::_('JHELP'); ?></span>
 			</span>
 			<div class="fcclear"></div>
 
 			<div class="fc-info fc-nobgimage fc-mssg-inline" id="fc-layouts-help" style="margin: 2px 0px!important; font-size: 12px; display: none;">
 				<h3 class="themes-title">
-					<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_PARAMETERS_LAYOUT_EXPLANATION' ); ?>
+					<?php echo Text::_( 'FLEXI_PARAMETERS_LAYOUT_EXPLANATION' ); ?>
 				</h3>
 				<b>NOTE:</b> Common method for -displaying- fields is by <b>editing the template layout</b> in template manager and placing the fields into <b>template positions</b>
 			</div>
@@ -234,7 +236,7 @@ $this->document->addScriptDeclaration($js);
 					$form_layout = $tmpl->params;
 					$slider_title = '
 						<span class="btn"><i class="icon-edit"></i>
-							' . \Joomla\CMS\Language\Text::_('FLEXI_PARAMETERS_THEMES_SPECIFIC') . ' : ' . $tmpl->name . '
+							' . Text::_('FLEXI_PARAMETERS_THEMES_SPECIFIC') . ' : ' . $tmpl->name . '
 						</span>';
 					$slider_id = $tmpl->name . '-' . $groupname . '-options';
 
@@ -257,10 +259,10 @@ $this->document->addScriptDeclaration($js);
 
 						<?php
 						if (isset($fieldSet->label) && trim($fieldSet->label)) :
-							echo '<div style="margin:0 0 12px 0; font-size: 16px; background-color: #333; float:none;" class="fcsep_level0">'.\Joomla\CMS\Language\Text::_($fieldSet->label).'</div>';
+							echo '<div style="margin:0 0 12px 0; font-size: 16px; background-color: #333; float:none;" class="fcsep_level0">'.Text::_($fieldSet->label).'</div>';
 						endif;
 						if (isset($fieldSet->description) && trim($fieldSet->description)) :
-							echo '<div class="fc-mssg fc-info">'.\Joomla\CMS\Language\Text::_($fieldSet->description).'</div>';
+							echo '<div class="fc-mssg fc-info">'.Text::_($fieldSet->description).'</div>';
 						endif;
 
 						foreach ($form_layout->getFieldset($fsname) as $field) :
@@ -308,7 +310,7 @@ $this->document->addScriptDeclaration($js);
 												)
 											)
 										) .
-										($cssprep ? ' <span class="icon-info hasTooltip" title="' . \Joomla\CMS\Language\Text::_('Used to auto-create a CSS styles file. To modify this, you can edit layout in template manager', true) . '"></span>' : '') . '
+										($cssprep ? ' <span class="icon-info hasTooltip" title="' . Text::_('Used to auto-create a CSS styles file. To modify this, you can edit layout in template manager', true) . '"></span>' : '') . '
 									</div>
 								</div>
 							';
@@ -333,7 +335,7 @@ $this->document->addScriptDeclaration($js);
 
 	<!-- Permissions tab -->
 	<div class="tabbertab" id="permissions-options" data-icon-class="icon-power-cord">
-		<h3 class="tabberheading"> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_PERMISSIONS' ); ?> </h3>
+		<h3 class="tabberheading"> <?php echo Text::_( 'FLEXI_PERMISSIONS' ); ?> </h3>
 
 		<div class="fc_tabset_inner">
 			<div id="access"><?php echo $this->form->getInput('rules'); ?></div>

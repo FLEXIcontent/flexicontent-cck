@@ -1261,3 +1261,6 @@ div#tags #input_new_tag {
 .icon-test:before {
 	content: "\f0ae";
 }
+.fc_gm_marker_anchor_row button.btn.btn-small.btn-sm.hasPopover {
+	display: none;
+}

@@ -18,12 +18,6 @@
 
 			<!--field name="templatehtmlmode" type="separator" default="FLEXI_TEMPLATE_HTML_MODE" level="level2" /-->
 
-			<field name="htmlmode" type="multilist" subtype="radio" default="" label="FLEXI_HTML_MODE" description="FLEXI_HTML_MODE_DESC" filter="int" class="btn-group group-fcinfo">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_XHTML</option>
-				<option value="1">FLEXI_HTML5</option>
-			</field>
-
 			<field name="item_tabset_start" type="separator" default="ITEM_TABSET" level="tabset_start" />
 
 			<field name="item_tab_standard" type="separator" default="FLEXI_TMPL_BASIC_TAB" description="" icon_class="icon-list" level="tab_open" box_type="1" />
