@@ -15,7 +15,10 @@
 }
 /*** theme update ***/
 #flexicontent .flexi .flexi.element { /*** reset margin arround field for better alignement in content ***/
-	margin: 0.2em 2% 0.2em 0% !important;
+	margin: 0.3em 0 !important;
+	display: flex;
+    flex-direction: row;
+	align-items: flex-start;
 }
 /*** correct title margin **/
 .contentheading {
@@ -49,7 +52,7 @@ button.btn.btn-light,
 a.link.btn,
 a.direction.btn,
 button.btn.btn-highlight,
-.fc_filter_line.fc_clear_label.fc_filter_buttons_box .btn {
+.mod_flexiadvsearch_wrapper .fc_filter_line.fc_clear_label.fc_filter_buttons_box .btn {
     border: 1px solid #aaa;
     background: #ccc;
 }
@@ -222,7 +225,7 @@ label.add-on.fc-lbl-short.addrint_autocomplete-lbl {
 #flexicontent form .fcfield_textval,
 #flexicontent .fc_filedata_txt,
 .select2-container-multi .select2-choices {
-	border: 1px solid #aaa !important;
+	/*border: 1px solid #aaa !important;*/
 	border-radius: 4px;
 	padding: 5px;
 }
@@ -250,11 +253,11 @@ label.add-on.fc-lbl-short.addrint_autocomplete-lbl {
 }
 
 /** fix filter **/
-.input-group>:not(:first-child):not(.dropdown-menu):not(.valid-tooltip):not(.valid-feedback):not(.invalid-tooltip):not(.invalid-feedback) {
+/*.input-group>:not(:first-child):not(.dropdown-menu):not(.valid-tooltip):not(.valid-feedback):not(.invalid-tooltip):not(.invalid-feedback) {
     margin-left: -3px;
-}
+}*/
 .flexicontent :not(.input-prepend):not(.input-append) > input[type="text"]:not(.minicolors) {
-    margin: 0px 2px 0px 2px;
+  /*  margin: 0px 2px 0px 2px;*/
 }
 .fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_text_filter, .fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_field_filter, .fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_text_filter:focus, .fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_field_filter:focus {
     border: 1px solid #aaa !important;
@@ -280,9 +283,9 @@ label.add-on.fc-lbl-short.addrint_autocomplete-lbl {
 .mod_flexifilter_wrapper .fc_filter_html .fc_filter_element{
 	width:100%
 }
-.fc_filter_html :not(.input-prepend):not(.input-append) > .fc_text_filter, .fc_filter_html :not(.input-prepend):not(.input-append) > .fc_field_filter {
+/*.fc_filter_html :not(.input-prepend):not(.input-append) > .fc_text_filter, .fc_filter_html :not(.input-prepend):not(.input-append) > .fc_field_filter {
 	font-size: 12px !important;
-}
+}*/
 
 /** fix search module **/
 .fc_filter_html input.btn.btn-success {
@@ -340,7 +343,11 @@ header.group.tool {
 /** placeholder fix **/
 #flexicontent ::placeholder,
 .mod_flexifilter_wrapper ::placeholder {
-	color:#000;font-size:12px;
+	color:#6a6a6a;
+	font-size:16px;
+/*	position:absolute;
+  left: 5px;
+  top: 13px;*/
 }
 /** slider accordeon on category view **/
 #flexicontent #fcfilter_form_slider_category .accordion-item {
@@ -418,7 +425,7 @@ label#use_advsearch_options_lbl {
 
 /** pagenav correction **/
 .fcpagenav.btn-group {
-	border: 1px solid #ccc;
+	border: 0px solid #ccc;
 	border-radius: 3px;
 	width:100% !important;
 	margin: initial !important;
@@ -447,7 +454,7 @@ label#use_advsearch_options_lbl {
 	display: block;
 	flex-wrap: wrap;
 	position: relative;
-	width: 83%;
+	width: 87%;
 }
 
 /* More compact display */
@@ -515,7 +522,6 @@ button.fcfield-expand-view-btn.btn.btn-small {
 	height:var(--ctrls-inp-height) !important;
 	min-height: var(--ctrls-inp-height) !important;
 	line-height: calc(var(--ctrls-inp-height) - 1px) !important;
-	padding: 0px 0px 0px 8px!important;
 }
 fieldset.fc_search_set legend .fc_legend_text.hasTooltip, fieldset.fc_filter_set legend .fc_legend_text.hasTooltip {
     min-height: calc(var(--ctrls-inp-height) + 2px) !important;
@@ -575,7 +581,7 @@ a.plupload_button.plupload_start {
 .fcfield_field_preview_box {
     padding: 0 20px;
 }
-#flexicontent .fc-xpended-btns.btn, .btn {
+#flexicontent .fc-xpended-btns.btn {
     border: 1px solid #aaa !important;
 }
 //add hover style on tool button in FE category view
@@ -605,4 +611,37 @@ a.plupload_button.plupload_start {
     margin-top: 0 !important;
 	padding-top: 0.5rem !important;
     padding-bottom: 0.5rem !important;
+}
+fieldset.fc_search_set, fieldset.fc_filter_set {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+/** simplier display of file **/
+.fcfile_name {
+    background: none;
+    border: 0;
+    margin: 0!important;
+  padding: 0!important;
+}
+.fc_gm_marker_anchor_row button.btn.btn-small.btn-sm.hasPopover {
+    display: none;
+}
+/** responsive filter in module search **/
+.mod_flexiadvsearch_wrapper .fc_filter_html {
+    flex-wrap: wrap;
+}
+/** color correction on filter module
+.fc_search_option_cell .fc_field_filter {
+    border-radius: 5px;
+    border-color: #aaa !important;
+    border: 1px solid;
+} **/
+/** pagination correction **/
+span.fcpagenav-items-cnt.btn.disabled {
+    border: 0;
+}
+
+/** fix for popup over **/
+.com_flexicontent .popover-header{
+	background: #fff;
 }

@@ -70,7 +70,7 @@ $tooltip_class = 'hasTooltip';
 
 		<?php $_page_counter = trim($this->pageNav->getPagesCounter() ?? ''); ?>
 		<?php if ($_page_counter): ?>
-		<span class="fc_pages_counter">
+			<span class="fc_pages_counter">
 			<span class="label"><?php echo $_page_counter; ?></span>
 		</span>
 		<?php endif; ?>

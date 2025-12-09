@@ -1,10 +1,29 @@
 @import 'include/config.less';
 
-/* Blog Theme : item template CSS file */
+/* Items-Tabbed Theme : item template CSS file */
 
 
-/* CSS rules for fields display via Template parameters */
 /* LESS EXAMPLE variable name: 'FCI_' + parameter name */
+/* e.g. 'FCI_' + 'title_color' =>  'FCI_title_color' */
+body #flexicontent .fc_item_title,
+body #flexicontent .fc_item_title a {
+	color: @FCI_title_color;
+	background-color: @FCI_title_bg_color;
+	padding : @FCI_title_pad  ;
+	border-radius: @FCI_title_border_radius + px;
+}
+
+/* background item */
+.fcitems {
+	background-color: @FCI_item_bg_color;
+	padding-top: @FCI_item_pad_top + px ;
+	padding-right: @FCI_item_pad_right + px;
+	padding-left: @FCI_item_pad_left + px;
+	padding-bottom: @FCI_item_pad_bottom + px;
+	border-radius: @FCI_item_border_radius + px;
+	border: @FCI_item_border_size + px @FCI_item_border_type @FCI_item_border_color;
+	color:@FCI_item_text_color;
+}
 
 /* Label styling */
 
@@ -13,308 +32,60 @@ body #flexicontent .desc-title.label {
 	background-color: @FCI_label_bg_color;
 	color: @FCI_label_txt_color;
 	border-radius: @FCI_label_radius*1px;
+	padding: @FCI_label_pad ;
+    font-weight:bold;
 }
 
-/* e.g. 'FCI_' + 'title_color' =>  'FCI_title_color' */
+/* TAB styling */
 
-/* CONTAINER of item title */
-.news.fc-item-block .fcitem_title_box {
-	display: block;
-	background: @FCI_title_background;
-	margin: 0;
-	padding: 6px;
-}
-
-/* e.g. 'FCI_' + 'title_color' =>  'FCI_title_color' */
-.news.fc-item-block .fcitem_title,
-.news.fc-item-block .fcitem_title a {
-	color: @FCI_title_color;
-	font-size: @FCI_title_font_size;
-	background-color: transparent;
-	line-height: 1.2em;
-	width: 100%;
-	display: inline-block;
+body #flexicontent ul.tabbernav > li a {
+	/*border: 1px solid lighten(@FCI_tab_bg_color_start,50%) + !important;*/
+	background-color: lighten(@FCI_tab_bg_color_start,45%);
+	/*background-image: linear-gradient(to bottom, @FCI_tab_bg_color_start , @FCI_tab_bg_color_end );*/
+	color: @FCI_tab_title_color;
 }
 
-.news.fc-item-block .fcitem_title {
-	text-shadow: 1px 1px 1px black;
-	height: 2.4em;
-	display: table-cell;
-	vertical-align: middle;
-	padding: 1px 4px;
-	margin: 2px 0px;
-	/*border: 1px dashed #bbbbbb;*/
-	font-size: 120%;
+body #flexicontent ul.tabbernav > li.tabberactive a::before {
+	border-top: 4px solid @FCI_tab_bg_color_start;
 }
-.news.fc-item-block .fcitem_title:hover {
-	/*border: 1px dashed black;*/
+body ul.tabbernav > li.tabberactive a, body ul.tabbernav > li.tabberactive a:hover, #flexicontent ul.tabbernav > li.tabberactive a, #flexicontent ul.tabbernav > li.tabberactive a:hover {
+    border-bottom: 1px solid white !important;
+    border-left: 1px solid #D0D0D0 !important;
+    border-top: 1px solid #D0D0D0 !important;
+    border-right: 1px solid #D0D0D0 !important;
 }
-
-/* item title styling (link, etc) */
-.news.fc-item-block .fcitem_title a {
-	text-decoration: none;
-	-webkit-transition: all 0.4s;transition: all 0.4s;
-	
+body #flexicontent ul.tabbernav > li:hover a {
+	border: 1px solid darken(@FCI_tab_bg_color_start, 20%);
+	background: darken(@FCI_tab_bg_color_start, 20%);
+	color: #fff;
 }
-.news.fc-item-block .fcitem_title:hover a,
-.news.fc-item-block .fcitem_title a:hover {
-	cursor: pointer;
-	text-shadow: 1px 1px 3px black;
+body .tabbertab, #flexicontent .tabbertab {
+	background-color: @FCI_tab_content_bg_color;
+	border-radius : @FCI_tab_content_border_radius + px;
 }
-.news.fc-item-block .fc_overlayed .fcitem_title a {
-	/*text-shadow: 1px 1px 2px #000, -1px -1px #000, 1px 1px #000;*/
-	text-shadow: 1px 1px 1px black;
+body ul.tabbernav, #flexicontent ul.tabbernav {
+	border-bottom: @FCI_tab_content_border_size_top + px solid @FCI_tab_content_border_color_top !important;
 }
-
-.iteminfo .createdline,
-.iteminfo .modifiedline {
-	font-size: 90%;
-	display: block;
-}
-
-.iteminfo .createdby,
-.iteminfo .modifiedby {
-	font-size: 90%;
-	font-weight: normal;
-	display: inline-block;
-}
-
-.iteminfo .created,
-.iteminfo .modified {
-	font-size: 90%;
-	font-weight: bold;
-	display: inline-block;
-}
-
-.itemactions,
-.iteminfo,
-.itemadditionnal,
-.description {
-	margin: 1em 0 1em 0;
-}
-.iteminfo {
-	margin: 1em 0 1em 0.4em;
-}
-.description {
-	clear: both;
-}
-.itemactions span {
-	margin: 0 0 0.5em;
-}
-.itemactions .voting,
-.itemactions .favourites {
-	margin-right: 32px;
-	float: left;
-}
-
-.itemadditionnal span {
-	margin: 0 0 0.3em;
-}
-.itemadditionnal .categories {
-	display: block;
-}
-.itemadditionnal .tags {
-	display: block;
+div#fc_subtitle_tabset, div#fc_bottom_tabset  {
+    margin-top: 40px !important;
+    margin-bottom: 40px !important;
 }
 
 
+/* infoblock styling */
 
-/*******************************************************************/
-/*** Part 2, CSS rules for fields display via Template positions ***/
-/*******************************************************************/
-
-
-/* Rule for customblock used to display fields via template positions */
-.customblock {
-	width: 98% !important;
-	padding: 2px 1% !important;
-	margin: 8px 0px !important;
-	display: block;
-	float: left;
-	border: 1px solid #dddddd;
-	border-radius: 4px;
+body .flexi.infoblock{
+	padding: @FCI_column_pad_top;
 }
-
-
-/* Default rule for elements: Use auto columns, via min-width we can have full row automaticaly for larger elements (pseudo colspan=2 via css) */
-.customblock .element {
-	max-width: 100% !important;
-	min-width: 50% !important;
-	padding: 3px 0% 3px 0% !important;
-	margin: 0% !important;
-	display: block;
-	float: left;
-	border-width: 0%;
-}
-
-/* Force 1 column for all elements */
-.customblock .element.singlecol {
-	width: 100% !important;
-	padding: 0% !important;
-}
-
-/* Force 2 columns for all elements */
-.customblock .element.doublecol {
-	width: 48% !important;
-	overflow: hidden;
-}
-
-
-/* Field label inside the custom blocks */
-.customblock .flexi.label {}
-
-/* Field value inside the custom blocks */
-.customblock .flexi.value {}
-
-/* Field value when having no label */
-.customblock .flexi.value.nolabel {
-	width: 100% !important;
-}
-
-
-
-.news.fc-item-block .table.fc-tbl-featured {
-	border-collapse: separate;
-	border-spacing: 2px;
-	border: 0px solid grey;
-	width: 100%;
-	max-width: 1200px;
-	background-color: @FCI_featured_row_bgcolor;
-	color: @FCI_featured_row_text_color;
-	font-size: @FCI_featured_row_font_size;
-	
-	th, td {
-		border: 0px solid grey;
-	}
-	
-	th {
-		font-weight: normal;
-		font-size: 120%;
-		text-transform: capitalize;
-	}
-	td {
-		font-weight: normal;
-		font-size: 140%;
-		padding: 8px;
-	}
-
-	td.fc-tbl-row-title {
-		vertical-align: middle;
-	}
-
-	td.fc-tbl-row-logo {
-	}
-}
-
-
-@media only screen and (max-width: 767px) {
-	/* phones and small-sized tablets */
-	.news.fc-item-block .table.fc-tbl-featured {
-		th {
-			font-size: 110%;
-		}
-		td {
-			font-size: 120%;
-		}
-	}
-}
-
-
-.news.fc-item-block .tabberlive.fc-tabber-styled {
-	div.tabbertab {
-		padding: 24px !important;
-		border: 0 !important;
-		background: #F1ECE2 !important;
-	}
-
-	ul.tabbernav {
-		width: 100% !important;
-		background: #555 !important;
-		padding: 0 !important;
-		border: 0 !important;
-		
-		> li {
-			margin: 0 !important;
-			border: 0 !important;
-			border-right: 1px solid white !important;
-
-			> a.tabberheading {
-				border: 0 !important;
-				border-radius: 0 !important;
-				font-family: verdana !important;
-				font-weight: bold !important;
-				padding: 4px 96px 4px 48px !important;
-				background: transparent !important;
-				color: #FFF !important;
-				font-weight: bold !important;
-				font-size: 16px !important;
-			}
-		}
-		> li.tabberactive {
-			> a:before {
-				border: 0 !important;
-			}
-
-			> a.tabberheading {
-				background: #F1ECE2 !important;
-				color: #555 !important;
-				border: 0 !important;
-				border-radius: 0 !important;
-			}
-		}
-	}
-}
-
-
-@media only screen and (min-width: 1280px) and (max-width: 1399px) {
-	/* medium-sized desktops */
-}
-@media only screen and (min-width: 1152px) and (max-width: 1279px) {
-	/* small-sized desktops */
-}
-@media only screen and (min-width: 1024px) and (max-width: 1151px) {
-	/* large-sized tablets */
-}
-
-@media only screen and (min-width: 768px) and (max-width: 1023px) {
-	/* medium-sized tablets */
-	.news.fc-item-block .tabberlive.fc-tabber-styled {
-		ul.tabbernav {			
-			> li {
-				> a.tabberheading {
-					padding: 4px 32px 4px 16px !important;
-					font-size: 14px !important;
-				}
-			}
-		}
-	}
-}
-
-@media only screen and (max-width: 767px) {
-	/* phones and small-sized tablets */
-	.news.fc-item-block .tabberlive.fc-tabber-styled {
-		ul.tabbernav {			
-			> li {
-				> a.tabberheading {
-					padding: 4px 12px 4px 6px !important;
-					font-size: 12px !important;
-				}
-			}
-		}
-	}
-}
-
 
 // ***
 // *** A row of content
 // ***
 
 .flexi.lineinfo {
-	display: block;
-	padding: 0;
+	display: flex;
 	margin: 0 0 1em;
-	overflow: hidden;
-	clear: both;
+	flex-direction: column;
 }
 
 
@@ -352,25 +123,39 @@ body #flexicontent .desc-title.label {
 	overflow: hidden;
 	width: 100%;
 	margin-bottom: 10px;
+	display: grid;
+    grid-template-columns: 1fr  @FCI_top_col_width;
+    column-gap: @FCI_top_col_gap;
+}
+@media (max-width: 768px) {
+	.flexi.topblock {
+		grid-template-columns: 1fr;
+}
 }
 .topblock .flexi.image {
-	display: block;
-	float: left;
-	max-width: 99% !important;  /* Allow responsive width while floating */
-	padding: 0% !important;  /* Allow responsive width while floating */
-	margin-right: 1%;
-	margin-left: 0%;
-	line-height: 0px;
-	border: 0px solid silver;
+    display: flex;
+    flex-direction: column;
 }
 .topblock .flexi.image a {
 	outline: none;
 }
-.topblock .flexi.image img {
-	border: 1px solid white;
-}
 .topblock .flexi.infoblock {
-	overflow: hidden;
+  	border-radius: @FCI_column_border_radius_top + px;
+	border : @FCI_column_border_size_top + px @FCI_column_border_type_top @FCI_column_border_color_top;
+  	color: @FCI_column_color_top;
+	background-color: @FCI_column_bg_color_top;
+}
+.flexi.topblock ul { /* remove bottstrap padding */
+    padding: 0;
+    margin: 0;
+}
+
+.flexi.bottomblock.infoblock {
+  	border-radius: @FCI_column_border_radius_bottom + px;
+	border : @FCI_column_border_size_bottom + px @FCI_column_border_type_bottom @FCI_column_border_color_bottom;
+  	color: @FCI_column_color_bottom;
+	background-color: @FCI_column_bg_color_bottom;
+	padding: @FCI_column_pad_bottom;
 }
 
 
@@ -394,20 +179,24 @@ body #flexicontent .desc-title.label {
 	zoom: 1;
 }
 
+/* center value vs label */
+div.flexi.value{
+	padding: @FCI_label_pad !important;
+	}
 
 /* Field values into 1 column */
 .onecols ul li.flexi {
 	width: 100%;
 }
-.onecols .flexi.label {
-	min-width: 20%;
+/*.onecols .flexi.label {
+	min-width: 25%;
 	margin-right: 4%;
 	margin-bottom: 6px;
 }
-.onecols .flexi.value {
+/*.onecols .flexi.value {
 	min-width: 74%;
 	margin-right: 1%;
-}
+}*/
 
 
 /* Field values into 2 columns */
@@ -424,6 +213,7 @@ body #flexicontent .desc-title.label {
 	margin: 2px 4% 6px 0;
 	box-sizing: border-box;
 }
+
 
 /*
  * clearfix, for clearing a block that contains floated elements

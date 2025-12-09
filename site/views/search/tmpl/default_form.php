@@ -18,7 +18,7 @@ $show_searchordering = $this->params->get('show_searchordering', 1);
 $default_searchordering = $this->params->get('default_searchordering', 'newest');
 
 $disp_slide_filter = $this->params->get('disp_slide_filter', 0);
-$form_placement = (int) $this->params->get('form_placement', 0);
+$form_placement = (int) $this->params->get('form_placement', 0); //
 $buttons_position = (int) $this->params->get('buttons_position', 0);//1 after search 0 before advanced search
 $append_buttons =  (int) $this->params->get('append_buttons', 0);
 $show_search_reset = $this->params->get('show_search_reset', 1);
@@ -29,10 +29,13 @@ $flexi_button_class_go =  ($this->params->get('flexi_button_class_go' ,'') != '-
 	$this->params->get('flexi_button_class_go', 'btn btn-success')   :
 	$this->params->get('flexi_button_class_go_custom', 'btn btn-success')  ;
 
+$column_width = $this->params->get('column_width', '20%');
+$column_gap = $this->params->get('column_gap', '20px');
+
 if ($form_placement)
 {
-	$form_placement_class = $form_placement ? 'col-search span3 col-md-3' : 'top-search';
-	$form_placement_style = $form_placement === 1 ? 'float: left; margin: 0 0 1rem 0;' : 'float: right; margin: 0 0 1rem 0;';
+	$form_placement_class = $form_placement ? 'flexi_search' : 'top-search';
+	$form_placement_style = $form_placement === 1 ? 'left' : 'right';
 }
 else
 {
@@ -134,13 +137,12 @@ if ($disp_slide_filter)
 	$last_active_slide = isset($active_slides->$ff_slider_tagid) ? $active_slides->$ff_slider_tagid : null;
 }
 ?>
-
-	<div class="fcclear"></div>
+	<div class="flexi_search <?php echo $form_placement_style;?>">
 
 	<form
 		action="<?php echo $this->action; ?>" method="POST"
 		id="<?php echo $form_id; ?>" name="<?php echo $form_name; ?>" onsubmit=""
-		class="<?php echo $form_placement_class;?>" style="<?php echo $form_placement_style;?>"
+		class="<?php echo $form_placement_style;?>" style=""
 	>
 
 		<?php if ($this->params->get('canseltypes', 1) && isset($this->lists['contenttypes'])) : ?>
@@ -659,3 +661,17 @@ if ($disp_slide_filter)
 	})(jQuery);
 	");
 }
+// Adding CSS
+$css = '
+.flexi_search {
+		column-gap: '.$column_gap.';
+}
+.flexi_search.left {
+	grid-template-columns: '.$column_width.' 1fr;
+}
+.flexi_search.right {
+	grid-template-columns: 1fr '.$column_width.';
+}
+';
+
+if ($css) $document->addStyleDeclaration($css);

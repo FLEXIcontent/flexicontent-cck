@@ -77,8 +77,8 @@ $form_placement = (int) $this->params->get('form_placement', 0);
 
 if ($form_placement)
 {
-	$results_placement_class = 'span8 col-md-8';
-	$results_placement_style = $form_placement === 1 ? 'float: right; margin: 0;' : 'float: left; margin: 0;';
+	$results_placement_class = '';
+	$results_placement_style = $form_placement === 1 ? 'right' : 'left';
 }
 else
 {
@@ -89,13 +89,12 @@ else
 ?>
 
 <div
-	class="fc_search_results_list <?php echo $results_placement_class; ?> page<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>"
-	style="<?php echo $results_placement_style; ?>"
+	class="fc_search_results_list <?php echo $results_placement_style; ?> page<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>"
+	style=""
 >
 
 	<?php $count = -1; ?>
 	<?php foreach($this->results as $i => $result) : ?>
-		<div class="fcclear"></div>
 		<?php
 		$count++;
 		$fc_item_classes = 'fc_search_result '.($count%2 ? 'fcodd' : 'fceven');
@@ -138,7 +137,6 @@ else
 
 
 				<?php if ( @ $result->fc_item_id ) echo $markup_tags; ?>
-				<div class="fcclear"></div>
 
 
 				<?php if ($this->params->get('show_date', 1)) : ?>
@@ -248,7 +246,7 @@ else
 	<?php endforeach; ?>
 
 </div>
-<div class="fcclear"></div>
+</div>
 
 
 <!-- BOF pagination (After Results) -->

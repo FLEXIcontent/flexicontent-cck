@@ -33,8 +33,13 @@
 /* EOF themes */
 /**************/
 
-
-
+.mod_flexicontent_wrapper {
+    overflow: visible;
+}
+/* separator feature and standard */
+.mod_flexicontent_featured{
+	margin-bottom:4rem;
+}
 
 /* CONTAINER OF EACH ORDERING GROUP */
 .news.mod_flexicontent_wrapper .mod_flexicontent {
@@ -50,14 +55,13 @@
 /* EXTERNAL ITEM CONTAINER inner container for border, padding etc */
 .news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper_innerbox,
 .news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper_innerbox {
-	position: relative;
+	/*position: relative;
 	display: block;
 	float: none;
 	width: auto;
 	height: auto;
 	overflow: hidden;
-	
-	/* can be overriden via user 's CSS 
+	 can be overriden via user 's CSS 
 	margin: 0px;
 	padding: 0px;
 	border-width: 0px;
@@ -65,192 +69,25 @@
 	border-color: #dfdfdf #9f9f9f #9f9f9f #dfdfdf;
 	border-radius: 0px;
 	background-color: unset;*/
+	display: flex;
+    /*flex-direction: column;
+    flex-wrap: nowrap;*/
+    height: 100%;
+	position: relative;
+}
+.mod_flexicontent_featured_wrapper_innerbox.fc_float_right,
+.mod_flexicontent_standard_wrapper_innerbox.fc_float_right {
+    flex-direction: row;
+}
+.mod_flexicontent_featured_wrapper_innerbox.fc_float_left,
+.mod_flexicontent_standard_wrapper_innerbox.fc_float_left {
+    flex-direction: row-reverse;
+}
+.mod_flexicontent_featured_wrapper_innerbox.fc_stretch.fc_clear,
+.mod_flexicontent_standard_wrapper_innerbox.fc_stretch.fc_clear {
+    flex-direction: column;
 }
 
-
-/* EXTERNAL ITEM CONTAINER (ONE COLUMNS) */
-.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper,
-.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper {
-	/* DO NOT OVERRIDE THESE !!! this is the placement container, override margin,padding,border of inner container only */
-	display: block;
-	float: left;
-	margin: 0;
-	padding: 0;
-	border-width: 0;
-	border-style: solid;
-	width: 100%;
-	/*height: 100%;*/ /* problematic with masonry */
-}
-
-/* EXTERNAL ITEM CONTAINER (2-COLUMNS) */
-.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_2,
-.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_2 {
-	width: 50% !important;
-	margin-left: 0% !important;
-	margin-right: 0% !important;
-	padding: 0% !important;
-	border-width: 0px !important;
-}
-
-/* EXTERNAL ITEM CONTAINER (3-COLUMNS) */
-.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_3,
-.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_3 {
-	width: 33.33% !important;
-	margin-left: 0% !important;
-	margin-right: 0% !important;
-	padding: 0% !important;
-	border-width: 0px !important;
-}
-
-/* EXTERNAL ITEM CONTAINER (4-COLUMNS) */
-.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_4,
-.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_4 {
-	width: 25% !important;
-	margin-left: 0% !important;
-	margin-right: 0% !important;
-	padding: 0% !important;
-	border-width: 0px !important;
-}
-
-/* EXTERNAL ITEM CONTAINER (5-COLUMNS) */
-.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_5,
-.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_5 {
-	width: 20% !important;
-	margin-left: 0% !important;
-	margin-right: 0% !important;
-	padding: 0% !important;
-	border-width: 0px !important;
-}
-
-/* EXTERNAL ITEM CONTAINER (6-COLUMNS) */
-.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_6,
-.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_6 {
-	width: 16.66% !important;
-	margin-left: 0% !important;
-	margin-right: 0% !important;
-	padding: 0% !important;
-	border-width: 0px !important;
-}
-
-/* EXTERNAL ITEM CONTAINER (7-COLUMNS) */
-.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_7,
-.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_7 {
-	width: 14.28% !important;
-	margin-left: 0% !important;
-	margin-right: 0% !important;
-	padding: 0% !important;
-	border-width: 0px !important;
-}
-
-/* EXTERNAL ITEM CONTAINER (8-COLUMNS) */
-.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_8,
-.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_8 {
-	width: 12.5% !important;
-	margin-left: 0% !important;
-	margin-right: 0% !important;
-	padding: 0% !important;
-	border-width: 0px !important;
-}
-
-@media only screen and (min-width: 1280px) and (max-width: 1399px) {
-	/* medium-sized desktops */
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_6,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_7,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_8,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_6,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_7,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_8 {
-		width: 20% !important;
-	}
-	.news.mod_flexicontent_wrapper .fcitem_title_box .fcitem_title,
-	.news.mod_flexicontent_wrapper .fcitem_title_box .fcitem_title a {
-		font-size: 115%;
-	}
-}
-
-@media only screen and (min-width: 1152px) and (max-width: 1279px) {
-	/* small-sized desktops */
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_5,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_6,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_7,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_8,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_5,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_6,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_7,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_8 {
-		width: 25% !important;
-	}
-	.news.mod_flexicontent_wrapper .fcitem_title_box .fcitem_title,
-	.news.mod_flexicontent_wrapper .fcitem_title_box .fcitem_title a {
-		font-size: 110%;
-	}
-}
-
-@media only screen and (min-width: 1024px) and (max-width: 1151px) {
-	/* large-sized tablets, very small-sized desktops */
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_4,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_5,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_6,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_7,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_8,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_4,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_5,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_6,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_7,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_8 {
-		width: 33.33% !important;
-	}
-	.news.mod_flexicontent_wrapper .fcitem_title_box .fcitem_title,
-	.news.mod_flexicontent_wrapper .fcitem_title_box .fcitem_title a {
-		font-size: 105%;
-	}
-}
-
-@media only screen and (min-width: 768px) and (max-width: 1023px) {
-	/* medium-sized tablets */
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_3,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_4,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_5,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_6,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_7,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_8,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_3,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_4,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_5,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_6,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_7,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_8 {
-		width: 50% !important;
-	}
-	.news.mod_flexicontent_wrapper .fcitem_title_box .fcitem_title,
-	.news.mod_flexicontent_wrapper .fcitem_title_box .fcitem_title a {
-		font-size: 100%;
-	}
-}
-
-@media only screen and (max-width: 767px) {
-	/* phones and small-sized tablets */
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_2,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_3,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_4,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_5,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_6,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_7,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_8,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_2,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_3,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_4,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_5,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_6,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_7,
-	.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_8 {
-		width: 100% !important;
-	}
-	.news.mod_flexicontent_wrapper .fcitem_title_box .fcitem_title,
-	.news.mod_flexicontent_wrapper .fcitem_title_box .fcitem_title a {
-		font-size: 95%;
-	}
-}
 
 /* EXTERNAL CONTAINER STYLING ODD EVEN (COUNTING) */
 .news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.odd,
@@ -260,53 +97,38 @@
 .news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.even {
 }
 
-/* INTERNAL ITEM-LIST CONTAINER (ONE COLUMN MODE) */
 .news.mod_flexicontent_wrapper .mod_flexicontent_featured,
 .news.mod_flexicontent_wrapper .mod_flexicontent_standard {
-	margin-top: 0px;
-	margin-bottom: 0px;
-	margin-left: 0%;
-	margin-right: 0%;
-	
-	padding-top: 0px;
-	padding-bottom: 0px;
-	padding-left: 0%;
-	padding-right: 0%;
-	
-	float: left;
-	width: 100%;
-	display: block;
-	position: relative;
-	top: 0px;
-	left: 0px;
+	display: grid;
+	gap:2rem;
+	row-gap: 2rem;
 }
-
-
 
 /*
  * ITEM BASIC FIELDS STYLES (FOR CUSTOM FIELDS see below, FOR IMAGE AND DATE see more below)
  */
-
-.news.mod_flexicontent_wrapper .content_standard {padding: 12px 0px 0 0px;}  /* container of basic elements of standard items excluding title & image */
-.news.mod_flexicontent_wrapper .content_featured {padding: 12px 0px 0 0px;}  /* container of basic elements of featured items excluding title & image */
+/*
+.news.mod_flexicontent_wrapper .content_standard {padding: 12px 0px 0 0px;}  /* container of basic elements of standard items excluding title & image 
+.news.mod_flexicontent_wrapper .content_featured {padding: 12px 0px 0 0px;}  /* container of basic elements of featured items excluding title & image 
+*/
 
 
 /* CONTAINER of item title */
 .news.mod_flexicontent_wrapper .fcitem_title_box {
-	display: block;
+	/*display: block;
 	background: transparent;
 	margin: 0;
-	padding: 6px 0px;
+	padding: 6px 0px;*/
 }
 
 .news.mod_flexicontent_wrapper .fcitem_title,
 .news.mod_flexicontent_wrapper .fcitem_title a {
 	/*color: #08c;
-	font-size: 120%;
-	background-color: transparent;*/
+	font-size: initial;
+	/*background-color: transparent;
 	line-height: 1.2em;
 	width: 100%;
-	display: inline-block;
+	display: inline-block;*/
 }
 
 .news.mod_flexicontent_wrapper .fcitem_title {
@@ -367,17 +189,17 @@
 .news.mod_flexicontent_wrapper .fcitem_text { /* for image (not contained inside) see more below */
 	/*text-align:justify;*/
 	margin: 0px;
-	padding: 0 12px;
+	/*padding: 0 12px;*/
 	line-height: 160%;
 }
 
 
-/* CONTAINER of item image (featured and standard) */
+/* CONTAINER of item image (featured and standard) 
 .news.mod_flexicontent_wrapper .image_featured,
 .news.mod_flexicontent_wrapper .image_standard {
 	float: left;
 	margin: 0;
-}
+}*/
 
 /* item image styling (link, image, etc) */
 .news.mod_flexicontent_wrapper .image_featured a:hover,
@@ -463,45 +285,56 @@
 
 /* CONTAINER of item read more */
 .news.mod_flexicontent_wrapper .fcitem_readon {
-	float:left;
-	/*background: url("images/readmore.png") transparent no-repeat scroll 0px 5px;
+	/*float:left;
+	background: url("images/readmore.png") transparent no-repeat scroll 0px 5px;
 	border:solid transparent;
 	border-width:1px 0px;
 	padding: 1px 6px 1px 20px;
 	margin: 3px 3px 3px 4px;
-	display: inline-block;*/
+	display: inline-block;
 	-webkit-transition: all 0.4s; transition: all 0.4s;
-	background-color: transparent;
+	background-color: transparent;*/
+	display: flex;
 	/*color: #08c;
 	font-size: inherit;*/
 }
-.news.mod_flexicontent_wrapper .fcitem_readon:hover {
+.news.mod_flexicontent_wrapper .fcitem_readon.center {
+	justify-content: center;
+}
+.news.mod_flexicontent_wrapper .fcitem_readon.left {
+	justify-content: left;
+}
+.news.mod_flexicontent_wrapper .fcitem_readon.right {
+	justify-content: right;
+}
+
+/*.news.mod_flexicontent_wrapper .fcitem_readon:hover {
 	background-color: rgba(255, 255, 255, 0.2);
 	border-color: gray;
 	border-width: 1px 0px;
 	border-radius: 0px;
-}
+}*/
 
 /* item read more styling (link, etc) */
 .news.mod_flexicontent_wrapper .fcitem_readon a.readon,
 .news.mod_flexicontent_wrapper .fcitem_readon a.readon span {
-	font-weight: bold;
+	/*font-weight: bold;
 	line-height: 160%;
 	padding: 0px;
-	background: transparent;
+	background: transparent;*/
 	text-decoration: none !important;
-	cursor: pointer;
+	/*cursor: pointer;
 	-webkit-transition: all 0.4s; transition: all 0.4s;
 	vertical-align: top;
 	color: inherit;
-	font-size: inherit;
+	font-size: inherit;*/
 }
 .news.mod_flexicontent_wrapper .fcitem_readon:hover a.readon,
 .news.mod_flexicontent_wrapper .fcitem_readon:hover a.readon span {
-	padding: 0px;
-	/*background: none;*/
+	/*padding: 0px;
+	background: none;
 	text-decoration: none !important;
-	/*color: gray;*/
+	color: gray;*/
 }
 
 
@@ -509,9 +342,17 @@
 /*****************************/
 /* Content PLACEMENT methods */
 /*****************************/
-.news.mod_flexicontent_wrapper .fc_block {
+.news.mod_flexicontent_wrapper .fc_block.readmore {
 	line-height: 160%;
+	margin-top: auto;
 }
+.news.mod_flexicontent_wrapper .content_featured,
+.news.mod_flexicontent_wrapper .content_standard {
+    display: flex;
+    flex-direction: column;
+	height: 100%;
+}
+	
 .news.mod_flexicontent_wrapper .fc_overlayed {
 	/* Fallback for web browsers that don't support RGBa */
 	background-color: rgb(0, 0, 0);
@@ -549,7 +390,7 @@
 	float: none !important;
 	display: block;
 }
-.news.mod_flexicontent_wrapper .fc_float_left {
+/*.news.mod_flexicontent_wrapper .fc_float_left {
 	float: left !important;
 	margin: 0px 12px 8px 0;
 	display: block;
@@ -558,8 +399,10 @@
 	float: right !important;
 	margin: 0px 0 8px 12px;
 	display: block;
+}*/
+.news.mod_flexicontent_wrapper .fc_floated {
+	padding: 0 1rem;
 }
-.news.mod_flexicontent_wrapper .fc_floated {}
 
 .news.mod_flexicontent_wrapper .image_featured.fc_float_left img,
 .news.mod_flexicontent_wrapper .image_featured.fc_float_right img,
@@ -605,6 +448,7 @@
 }
 
 
+
 /*
  * HIGHLIGHT HOVERED item container (if highlight-on-hover enabled in configuration)
  *
@@ -617,7 +461,42 @@
 .news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.mod_hl_hover.mod_fc_activeitem:hover .mod_flexicontent_standard_wrapper_innerbox,
 .news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.mod_hl_hover:hover .mod_flexicontent_standard_wrapper_innerbox {
 	background-color: #D0D0D0;
-	border-color: #888 #555 #555 #888;
-	box-shadow: -2px 2px 5px -2px black, 2px -2px 5px -2px black;
+	box-shadow: -2px 2px 5px -2px rgb(139, 139, 139), 2px -2px 5px -2px rgb(121, 121, 121);
 	z-index: 12; /* needed in cases the standard-itens outer box has z-index 10 */
+}
+@media only screen and (max-width: 769px) {
+	.news .mod_flexicontent_standard.cols_2,
+	.news .mod_flexicontent_standard.cols_3,
+	.news .mod_flexicontent_standard.cols_4,
+	.news .mod_flexicontent_standard.cols_5,
+	.news .mod_flexicontent_standard.cols_6,
+	.news .mod_flexicontent_standard.cols_7,
+	.news .mod_flexicontent_standard.cols_8,
+	.news .mod_flexicontent_featured.cols_2,
+	.news .mod_flexicontent_featured.cols_3,
+	.news .mod_flexicontent_featured.cols_4,
+	.news .mod_flexicontent_featured.cols_5,
+	.news .mod_flexicontent_featured.cols_6,
+	.news .mod_flexicontent_featured.cols_7,
+	.news .mod_flexicontent_featured.cols_8 {
+		grid-template-columns: repeat(2,1fr)!important;
+	}
+}
+@media only screen and (max-width: 481px) {
+	.news .mod_flexicontent_standard.cols_2,
+	.news .mod_flexicontent_standard.cols_3,
+	.news .mod_flexicontent_standard.cols_4,
+	.news .mod_flexicontent_standard.cols_5,
+	.news .mod_flexicontent_standard.cols_6,
+	.news .mod_flexicontent_standard.cols_7,
+	.news .mod_flexicontent_standard.cols_8,
+	.news .mod_flexicontent_featured.cols_2,
+	.news .mod_flexicontent_featured.cols_3,
+	.news .mod_flexicontent_featured.cols_4,
+	.news .mod_flexicontent_featured.cols_5,
+	.news .mod_flexicontent_featured.cols_6,
+	.news .mod_flexicontent_featured.cols_7,
+	.news .mod_flexicontent_featured.cols_8 {
+		grid-template-columns: repeat(1,1fr) !important;
+	}
 }

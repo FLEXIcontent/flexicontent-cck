@@ -1,17 +1,17 @@
 @import 'config.css';
 .flexicontent :not(.input-prepend):not(.input-append) > input[type="text"]:not(.minicolors) {
 	display: inline-block;
-	margin: 0;
 }
 .flexicontent *:not(.input-append):not(.input-prepend):not(.input-group) > div.use_select2_lib {
-	margin: 0;
+	margin: 0px 2px 1px 2px;
 }
 .flexicontent *:not(.input-append):not(.input-prepend):not(.input-group) > select:not(.custom-select) {
 	display: inline-block;
-	margin: 0;
+	margin: 0px 2px 1px 2px;
 	padding: 4px;
 	border-radius: 4px;
 	height: auto;
+	border-color: #aaa;
 }
 .controls *:not(.input-append):not(.input-prepend):not(.input-group) > input[type="text"]:not(.minicolors),
 .controls textarea,
@@ -244,10 +244,9 @@ ul.fc_checkradio_group {
 }
 li.fc_checkradio_option {
 	white-space: nowrap;
-	display: inline-block;
+	display: inline-flex;
 	margin-top: 1px;
 	margin-bottom: 1px;
-	vertical-align: top;
 }
 input[type="checkbox"].fc_checkradio_bar + label,
 input[type="radio"].fc_checkradio_bar + label {
@@ -1275,7 +1274,7 @@ td.col_edit_layout {
 	border-left-width: 0;
 }
 .flexicontent #fc-filters-box .fc-filter .select2-container-multi .select2-choices .select2-search-field input.select2-input {
-	line-height: calc(var(--form-inp-height) - 2px) !important;
+	line-height: calc(var(--form-inp-height) -2px) !important;
 	min-height: calc(var(--form-inp-height) - 2px) !important;
 	box-sizing: border-box;
 	margin: 0 !important;
@@ -1289,7 +1288,7 @@ td.col_edit_layout {
 	width: 100% !important;
 }
 .flexicontent #fc-filters-box .fc-filter .select2-container-multi.select2-dropdown-open .select2-choices .select2-search-field input.select2-input {
-	line-height: calc(var(--form-inp-height) - 2px) !important;
+	line-height: calc(var(--form-inp-height) -2px) !important;
 	min-height: calc(var(--form-inp-height) - 2px) !important;
 	padding: 2px 6px 2px 26px !important;
 	background: #fff url(../images/select2.png) no-repeat scroll -32px -22px !important;
@@ -1381,7 +1380,7 @@ input.minicolors-input {
 	height: var(--ctrls-inp-height) !important;
 }
 .fc-form-tbl.fcinner.fccompact {
-	margin-top: -0.6em !important;
+	margin-top: -34px !important;
 }
 body .fc-close {
 	color: #000000;
@@ -2414,7 +2413,7 @@ body .fc_loading_box {
 .com_flexicontent .ui-autocomplete,
 .com_flexicontent .ui-autocomplete-list {
 	max-height: 400px;
-	overflow-y: auto;
+	overflow-y: hidden;
 	overflow-x: hidden;
 	z-index: 1000 !important;
 }
@@ -4477,7 +4476,7 @@ html[dir="rtl"] .select2-container .select2-choice {
 .select2-container-multi.select2-dropdown-open .select2-choices .select2-search-field input.select2-input {
 	cursor: pointer;
 	min-width: 32px !important;
-	line-height: calc(var(--form-inp-height) - 2px) !important;
+	line-height: calc(var(--form-inp-height) -2px) !important;
 	min-height: calc(var(--form-inp-height) - 2px) !important;
 	padding: 0 7px !important;
 	margin-top: 1px !important;
@@ -5123,7 +5122,7 @@ div table.adminform td {
 }
 #flexicontent .item_total {
 	border: 0px solid lightgray;
-	margin: 0px 0px 12px 0px;
+	margin: 40px 0px 12px 0px;
 	padding: 0px;
 	width: 100%;
 	clear: both;
@@ -5184,11 +5183,11 @@ div table.adminform td {
 #flexicontent .item_total .fc_limit_box,
 #flexicontent .item_total .fc_orderby_box,
 #flexicontent .item_total .fc_clayout_box {
-	display: inline-block;
+	display: flex;
 	float: left;
-	margin-top: 4px;
-	margin-bottom: 4px;
-	margin-left: 0px;
+	flex-direction: row;
+	align-items: center;
+	gap: 10px;
 }
 #flexicontent .item_total .fc_clayout_selector {
 	display: inline-block;
@@ -6061,4 +6060,45 @@ button.ui-dialog-titlebar-close:after {
 }
 .view-search .select2-container.select2-container-multi.fc_index_complete_tlike.fc_adv_complete {
 	height: 0px;
+}
+.mod_flexifilter_wrapper .fc_filter_set.fc_category {
+	margin-bottom: 15px !important;
+}
+.flexi_search {
+	display: grid;
+	clear: both;
+}
+#searchForm.right {
+	order: 2;
+}
+.fc_search_results_list.right {
+	order: 1;
+}
+.fc_search_results_list.page {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 20px;
+	height: min-content;
+}
+.search-results {
+	display: flex;
+	flex-direction: column;
+}
+#flexicontent .flexi_search .item_total {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: nowrap;
+}
+@media only screen and (max-width: 481px) {
+	.flexi_search.left {
+		grid-template-columns: 1fr !important;
+	}
+}
+h2.fc_search_result_title a {
+	text-decoration: none;
+}
+.mod_flexifilter_wrapper  .field-calendar .btn-primary {
+	height: calc(var(--ctrls-inp-height) + 2px) !important;
 }

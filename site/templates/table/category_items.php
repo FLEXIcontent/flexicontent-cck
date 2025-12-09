@@ -33,9 +33,9 @@ if ($this->params->get('togglable_table_cols', 1))
 // If customizing via CSS rules or JS scripts is not enough, then please copy the following file here to customize the HTML too
 
 ob_start();
-file_exists(dirname(__FILE__).DS.'listings_filter_form.php')
-    ? include(dirname(__FILE__).DS.'listings_filter_form.php')
-    : include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS.'listings_filter_form.php');
+file_exists(dirname(__FILE__).DS.'listings_filter_form_html.php')
+    ? include(dirname(__FILE__).DS.'listings_filter_form_html.php')
+    : include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS.'listings_filter_form_html.php');
 $filter_form_html = trim(ob_get_contents());
 ob_end_clean();
 
@@ -43,9 +43,9 @@ if ( $filter_form_html )
 {
 	echo '
 	<div class="fcclear"></div>
-	<div class="group">
+	<aside class="group">
 		' . $filter_form_html . '
-	</div>';
+	</aside>';
 }
 
 // -- Check matching items found
@@ -168,7 +168,7 @@ endif;
 		<tr>
 		<?php if ( $buttons_exists) : ?>
 			<th id="flexi_edit">
-				
+
 			</th>
 			<?php endif; ?>
 			<?php if ($comments_non_zero || $show_title || count($item->css_markups) ) : ?>
@@ -220,15 +220,16 @@ endif;
 		
 		<?php if ( $buttons_exists) : ?>
 			<td class="fc_edit_col">
-			<?php echo @ $item->editbutton; ?>
-			<?php echo @ $item->statebutton; ?>
-			<?php echo @ $item->deletebutton; ?>
-			<?php echo @ $item->approvalbutton; ?>
+				<div class="button-editor">
+					<?php echo @ $item->editbutton; ?>
+					<?php echo @ $item->statebutton; ?>
+					<?php echo @ $item->deletebutton; ?>
+					<?php echo @ $item->approvalbutton; ?>
+				</div>
 			</td>
 			<?php endif; ?>
 			<?php if ($comments_non_zero || $show_title || count($item->css_markups) ) : ?>
 			<td class="fc_title_col">
-			
 			<?php if ($this->params->get('show_comments_count')) : ?>
 				<?php if ( isset($this->comments[ $item->id ]->total) ) : ?>
 				<div <?php echo $_comments_container_params; ?> >

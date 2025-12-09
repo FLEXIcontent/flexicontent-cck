@@ -4,8 +4,8 @@
 	<website>www.flexicontent.org</website>
 	<email>info@flexicontent.org</email>
 	<license>GPLv3</license>
-	<version>1.0</version>
-	<release>15 November 2017</release>
+	<version>2</version>
+	<release>08 08 2024</release>
 	<microdata_support>1</microdata_support>
 
 	<defaulttitle>FLEXI_TMPL_CORE-NEWS_ITEM_DEFAULT_TITLE</defaulttitle>
@@ -14,77 +14,228 @@
 	<fields name="attribs">
 		<fieldset name="attribs" addfieldpath="/administrator/components/com_flexicontent/elements">
 
-			<field name="item_head_break" type="separator" level="level_br" />
+			<field name="custom_layout_title" type="text" size="3" not_inherited="1" default="" label="FLEXI_LAYOUT_CUSTOM_DISPLAY_TITLE" description="FLEXI_LAYOUT_CUSTOM_DISPLAY_TITLE_DESC" />
 
-			<!--field name="templatehtmlmode" type="separator" default="FLEXI_TEMPLATE_HTML_MODE" level="level2" /-->
-			<field name="htmlmode" type="radio" default="" label="FLEXI_HTML_MODE" description="FLEXI_HTML_MODE_DESC" filter="int" class="btn-group btn-group-yesno">
+			<!--field name="templatehtmlmode" type="separator" default="FLEXI_TEMPLATE_HTML_MODE" level="level2" 
+
+			<field name="htmlmode" type="multilist" subtype="radio" default="" label="FLEXI_HTML_MODE" description="FLEXI_HTML_MODE_DESC" filter="int" class="btn-group group-fcinfo">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_XHTML</option>
 				<option value="1">FLEXI_HTML5</option>
 			</field>
-	
-			<field name="item_head_break2" type="separator" level="level_br" />
+			/-->
 
-				<field name="item_tabset_start" type="separator" default="ITEM_TABSET" level="tabset_start" />
+			<field name="params_above_tabset_spacer" type="separator" default="" level="none" class="fcspacer-16" />
 
-					<field name="item_tab_styling" type="separator" default="FLEXI_STYLING" icon_class="icon-palette" level="tab_open" box_type="1" />
+			<field name="params_tabset_start" type="separator" default="ITEM_TABSET" level="tabset_start" />
+			<field name="params_tab_item_container" type="separator" cssprep="1" default="FLEXI_TMPL_ITEM_CONTAINER_STYLING" description="" icon_class="icon-checkbox-unchecked" level="tab_open" box_type="1" />
+			<field name="params_tab_item_container_info" type="separator" cssprep="1" default="FLEXI_STYLING" description="" level="level2" class="alert alert-info" />
 
-					<field name="custom_layout_title" type="text" size="3" not_inherited="1" default="" label="FLEXI_LAYOUT_CUSTOM_DISPLAY_TITLE" description="FLEXI_LAYOUT_CUSTOM_DISPLAY_TITLE_DESC" />
+			<field name="item_colors_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_COLORS" description="" level="level3" />
+			<field name="item_bg_color" type="color" cssprep="less" default="inherit" label="FLEXI_TMPL_BACKGROUND" description="FLEXI_TMPL_BACKGROUND_DESC" format="rgba" keywords="transparent,initial,inherit"/>
+			<field name="item_text_color" type="color" cssprep="less" default="inherit" label="FLEXI_TMPL_COLOR" description="FLEXI_TMPL_COLOR_DESC" format="rgba" keywords="transparent,initial,inherit"/>
 
-					<field name="title_grp" type="separator" cssprep="1" default="FLEXI_TMPL_ITEM_TITLE" description="" level="level2" />
-					<field name="title_color" type="color" cssprep="less" default="inherit" label="Title text color" description="Color of title text" format="rgba" keywords="transparent,initial,inherit" />
-					<field name="title_background" type="color" cssprep="less" default="inherit" label="Title background" description="Color of title background" format="rgba" keywords="transparent,initial,inherit"/>
-					<field name="title_font_size" type="text" cssprep="less" default="inherit" label="Title font size" description="Size of title text" />
-					<field name="title_cut_text" type="text" size="3" default="" label="FLEXI_TITLE_MAXLEN" description="FLEXI_TITLE_MAXLEN_DESC" />
+			<field name="item_pad_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_PADDING" description="" level="level3" />
+			<field name="item_pad_top" type="number" cssprep="less" hint="0" default="0"  label="FLEXI_TMPL_PADDING_TOP" description="FLEXI_TMPL_ITEM_PADDINGTOP_DESC" min="0" max="80" step="1" />
+			<field name="item_pad_left" type="number" cssprep="less" hint="0" default="0"  label="FLEXI_TMPL_PADDING_LEFT" description="FLEXI_TMPL_PADDING_LEFT_DESC" min="0" max="80" step="1" />
+			<field name="item_pad_right" type="number" cssprep="less" hint="0" default="0"  label="FLEXI_TMPL_PADDING_RIGHT" description="FLEXI_TMPL_ITEM_PADDINGRIGHT_DESC" min="0" max="80" step="1" />
+			<field name="item_pad_bottom" type="number" cssprep="less" hint="0" default="0"  label="FLEXI_TMPL_PADDING_BOTTOM" description="FLEXI_TMPL_PADDING_BOTTOMT_DESC" min="0" max="80" step="1" />
 
-					<field name="label_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_LABEL_STYLING" description="" level="level2" />
-					<field name="label_bg_color" type="color" cssprep="less" default="rgba(255, 255, 255, 0)" label="FLEXI_TMPL_LABEL_BG" description="FLEXI_TMPL_LABEL_BG_DESC" format="rgba" keywords="transparent,initial,inherit"/>
-					<field name="label_txt_color" type="color" cssprep="less" default="#000000" label="FLEXI_TMPL_LABEL_TXT_COLOR" description="FLEXI_TMPL_LABEL_TXT_COLOR_DESC" format="rgba" keywords="transparent,initial,inherit"/>
-					<field name="label_radius" type="number" cssprep="less" default="0" label="FLEXI_TMPL_LABEL_RADIUS" description="FLEXI_TMPL_LABEL_RADIUS_DESC" min="0" max="80" step="1" />
+			<field name="item_border_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_BORDER" description="" level="level3" />
+			<field name="item_border_radius" type="number" cssprep="less" hint="0" default="0"  label="FLEXI_TMPL_BORDER_RADIUS" description="FLEXI_TMPL_BORDER_RADIUS_DESC" min="0" max="80" step="1" />
+			<field name="item_border_color" type="color" cssprep="less" default="#cccccc" label="FLEXI_TMPL_BORDER_COLOR" description="FLEXI_TMPL_BORDER_COLOR_DESC" format="rgba" keywords="transparent,initial,inherit"/>
+			<field name="item_border_size" type="number" cssprep="less" hint="0" default="0"  label="FLEXI_TMPL_BORDER_WIDTH" description="FLEXI_TMPL_BORDER_WIDTH_DESC" min="0" max="80" step="1" />
+			<field name="item_border_type" type="list" cssprep="less" hint="solid" default="solid"  label="FLEXI_TMPL_BORDER_TYPE" description="FLEXI_TMPL_BORDER_TYPE_DESC" >
+				<option value="solid">FLEXI_SOLID</option>
+				<option value="dotted">FLEXI_DOTTED</option>
+				<option value="dashed">FLEXI_DASHED</option>
+				<option value="double">FLEXI_DOUBLE</option>
+				<option value="groove">FLEXI_GROOVE</option>
+				<option value="ridge">FLEXI_RIDGE</option>
+				<option value="inset">FLEXI_INSET</option>
+				<option value="outset">FLEXI_OUTSET</option>
+			</field>
+
+			<field name="params_tab_item_title" type="separator" default="FLEXI_TMPL_ITEM_TITLE_TAB" description="" icon_class="icon-checkmark-2" level="tab_open" box_type="1" />
+			<field name="params_tab_item_title_info" type="separator" cssprep="1" default="FLEXI_STYLING" description="" level="level2" class="alert alert-info" />
+
+			<field name="title_cut_text" type="text" size="3" default="" label="FLEXI_TITLE_MAXLEN" description="FLEXI_TITLE_MAXLEN_DESC" />
+			<field name="item_title_colors_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_COLORS" description="" level="level3" />
+			<field name="title_color" type="color" cssprep="less" default="inherit" label="FLEXI_TMPL_COLOR" description="FLEXI_TMPL_COLOR_DESC" format="rgba" keywords="transparent,initial,inherit"/>
+			<field name="title_bg_color" type="color" cssprep="less" default="inherit" label="FLEXI_TMPL_BACKGROUND" description="FLEXI_TMPL_BACKGROUND_DESC" format="rgba" keywords="transparent,initial,inherit"/>
+
+			<field name="item_title_pad_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_PADDING" description="" level="level3" />
+			<field name="title_pad" type="text" cssprep="less" hint="paddng-top padding-right padding-bottom padding-left in px % rem ect" default="0"  label="FLEXI_TMPL_PADDING" description="FLEXI_TMPL_PADDING_TOP_DESC" min="0" max="80" step="1" />
+
+			<field name="item_title_border_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_BORDER" description="" level="level3" />
+			<field name="title_border_radius" type="number" cssprep="less" hint="0" default="0"  label="FLEXI_TMPL_BORDER_RADIUS" description="FLEXI_TMPL_BORDER_RADIUS_DESC" min="0" max="80" step="1" />
+
+			<field name="params_tab_labels" type="separator" default="FLEXI_TMPL_LABELS_TAB" description="" icon_class="icon-checkbox" level="tab_open" box_type="1" />
+			<field name="params_tab_labels_info" type="separator" cssprep="1" default="FLEXI_STYLING" description="" level="level2" class="alert alert-info" />
+
+			<field name="label_colors_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_COLORS" description="" level="level3" />
+			<field name="label_txt_color" type="color" cssprep="less" hint="#000000" default="#000000"  label="FLEXI_TMPL_COLOR" description="FLEXI_TMPL_COLOR_DESC" format="rgba" keywords="transparent,initial,inherit"/>
+			<field name="label_bg_color" type="color" cssprep="less" hint="rgba(255, 255, 255, 0)" default="rgba(255, 255, 255, 0)"  label="FLEXI_TMPL_BACKGROUND" description="FLEXI_TMPL_BACKGROUND_DESC" format="rgba" keywords="transparent,initial,inherit"/>
+
+			<field name="label_pad_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_PADDING" description="" level="level3" />
+			<field name="label_pad" type="text" cssprep="less" hint="paddng-top padding-right padding-bottom padding-left in px % rem ect" default="0"  label="FLEXI_TMPL_PADDING" description="FLEXI_TMPL_PADDING_TOP_DESC"  />
+
+			<field name="label_border_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_BORDER" description="" level="level3" />
+			<field name="label_radius" type="number" cssprep="less" hint="0" default="0"  label="FLEXI_TMPL_BORDER_RADIUS" description="FLEXI_TMPL_BORDER_RADIUS_DESC" min="0" max="80" step="1" />
+
+
+			<field name="item_layout_positions_tab" type="separator" default="FLEXI_TMPL_FIELDS_PLACEMENT_POSITIONS" description="" icon_class="icon-grid" level="tab_open" box_type="1" />			
+			<field name="item_layout_positions_tab_info" type="separator" default="FLEXI_TMPL_FIELDS_PLACEMENT_POSITIONS_INFO" description="" level="level2" class="alert alert-info" />
 			
-					<field name="tab_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_TABS_STYLING" description="" level="level2" />
-					<field name="tab_handles_grp" type="separator" cssprep="1" default="FLEXI_TMPL_TABS_HANDLES" description="" level="level3" />
-					<field name="tab_bg_color_start" type="color" cssprep="less" default="#3093c7" label="FLEXI_TMPL_TAB_BG_START" description="FLEXI_TMPL_TAB_BG_START_DESC" format="rgba" keywords="transparent,initial,inherit"/>
-					<field name="tab_bg_color_end" type="color" cssprep="less" default="#1c5a85" label="FLEXI_TMPL_TAB_BG_END" description="FLEXI_TMPL_TAB_BG_END_DESC" />
-					<field name="tab_title_color" type="color" cssprep="less" default="#ffffff" label="FLEXI_TMPL_TAB_TITLE_COLOR" description="FLEXI_TMPL_TAB_TITLE_COLOR_DESC" format="rgba" keywords="transparent,initial,inherit"/>
+			<field name="layout_pos_tabset_start" type="separator" default="ITEM_TABSET" level="tabset_start" />
+			<field name="layout_pos_tab_tabbed_positions" type="separator" default="FLEXI_TMPL_TABBED_POS_TAB" description="" icon_class="" level="tab_open" box_type="1" />
+
+			<field name="tab_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_TABS_STYLING" description="" level="level2" />
+			<field name="tab_handles_grp" type="separator" cssprep="1" default="FLEXI_TMPL_TABS_HANDLES" description="" level="level3" />
+			<field name="tab_bg_color_start" type="color" cssprep="less" hint="#3093c7" default="#3093c7"  label="FLEXI_TMPL_TAB_BG_START" description="FLEXI_TMPL_TAB_BG_START_DESC" format="rgba" keywords="transparent,initial,inherit"/>
+			<field name="tab_title_color" type="color" cssprep="less" hint="#3093c7" default="#3093c7"  label="FLEXI_TMPL_TAB_TITLE_COLOR" description="FLEXI_TMPL_TAB_TITLE_COLOR_DESC" format="rgba" keywords="transparent,initial,inherit"/>
+
+			<field name="tab_content_grp" type="separator" cssprep="1" default="FLEXI_TMPL_TABS_CONTENT_BOX" description="" level="level3" />
+			<field name="tab_content_bg_color" type="color" cssprep="less" hint="#ffffff" default="#ffffff"  label="FLEXI_TMPL_COLOR" description="FLEXI_TMPL_COLOR_DESC" format="rgba" keywords="transparent,initial,inherit" />
+			<field name="tab_content_border_radius" type="number" cssprep="less" hint="0" default="0"  label="FLEXI_TMPL_BORDER_RADIUS" description="FLEXI_TMPL_BORDER_RADIUS_DESC" format="rgba" keywords="transparent,initial,inherit"/>
+			<field name="tab_content_border_size_top" type="number" cssprep="less" hint="1" default="1"  label="FLEXI_TMPL_TAB_CONTENT_TOP_SIZE" description="FLEXI_TMPL_TAB_CONTENT_TOP_SIZE_DESC" />
+			<field name="tab_content_border_color_top" type="color" cssprep="less" default="#cccccc" label="FLEXI_TMPL_TAB_CONTENT_TOP_COLOR" description="FLEXI_TMPL_TAB_CONTENT_TOP_COLOR_DESC" format="rgba" keywords="transparent,initial,inherit"/>
+
+			<field name="tabs_labels_grp" type="separator" default="FLEXI_TMPL_TAB_TITLES" description="" level="level2" />
+
+			<field name="subtitle_tabs_grp" type="separator" default="Subtitle Tabset" description="" level="level3" />
+			<field name="subtitle_tab1_label" type="text" default="" label="Tab 1" description="FLEXI_TMPL_LABEL_IS_LANG_STRING" />
+			<field name="subtitle_tab2_label" type="text" default="" label="Tab 2" description="FLEXI_TMPL_LABEL_IS_LANG_STRING" />
+			<field name="subtitle_tab3_label" type="text" default="" label="Tab 3" description="FLEXI_TMPL_LABEL_IS_LANG_STRING" />
+			<field name="subtitle_tab4_label" type="text" default="" label="Tab 4" description="FLEXI_TMPL_LABEL_IS_LANG_STRING" />
+			<field name="subtitle_tab5_label" type="text" default="" label="Tab 5" description="FLEXI_TMPL_LABEL_IS_LANG_STRING" />
+			<field name="subtitle_tab6_label" type="text" default="" label="Tab 6" description="FLEXI_TMPL_LABEL_IS_LANG_STRING" />
+			<field name="subtitle_tab7_label" type="text" default="" label="Tab 7" description="FLEXI_TMPL_LABEL_IS_LANG_STRING" />
+			<field name="subtitle_tab8_label" type="text" default="" label="Tab 8" description="FLEXI_TMPL_LABEL_IS_LANG_STRING" />
+			<field name="subtitle_tab9_label" type="text" default="" label="Tab 9" description="FLEXI_TMPL_LABEL_IS_LANG_STRING" />
+			<field name="subtitle_tab10_label" type="text" default="" label="Tab 10" description="FLEXI_TMPL_LABEL_IS_LANG_STRING" />
+			<field name="subtitle_tab11_label" type="text" default="" label="Tab 11" description="FLEXI_TMPL_LABEL_IS_LANG_STRING" />
+			<field name="subtitle_tab12_label" type="text" default="" label="Tab 12" description="FLEXI_TMPL_LABEL_IS_LANG_STRING" />
+
+			<field name="bottom_tabs_grp" type="separator" default="Bottom Tabset" description="" level="level3" />
+			<field name="bottom_tab1_label" type="text" default="" label="Tab 1" description="FLEXI_TMPL_LABEL_IS_LANG_STRING" />
+			<field name="bottom_tab2_label" type="text" default="" label="Tab 2" description="FLEXI_TMPL_LABEL_IS_LANG_STRING" />
+			<field name="bottom_tab3_label" type="text" default="" label="Tab 3" description="FLEXI_TMPL_LABEL_IS_LANG_STRING" />
+			<field name="bottom_tab4_label" type="text" default="" label="Tab 4" description="FLEXI_TMPL_LABEL_IS_LANG_STRING" />
+			<field name="bottom_tab5_label" type="text" default="" label="Tab 5" description="FLEXI_TMPL_LABEL_IS_LANG_STRING" />
+			<field name="bottom_tab6_label" type="text" default="" label="Tab 6" description="FLEXI_TMPL_LABEL_IS_LANG_STRING" />
+			<field name="bottom_tab7_label" type="text" default="" label="Tab 7" description="FLEXI_TMPL_LABEL_IS_LANG_STRING" />
+			<field name="bottom_tab8_label" type="text" default="" label="Tab 8" description="FLEXI_TMPL_LABEL_IS_LANG_STRING" />
+			<field name="bottom_tab9_label" type="text" default="" label="Tab 9" description="FLEXI_TMPL_LABEL_IS_LANG_STRING" />
+			<field name="bottom_tab10_label" type="text" default="" label="Tab 10" description="FLEXI_TMPL_LABEL_IS_LANG_STRING" />
+			<field name="bottom_tab11_label" type="text" default="" label="Tab 11" description="FLEXI_TMPL_LABEL_IS_LANG_STRING" />
+			<field name="bottom_tab12_label" type="text" default="" label="Tab 12" description="FLEXI_TMPL_LABEL_IS_LANG_STRING" />
+
+			<field name="layout_pos_tab_top_bottom_positions" type="separator" default="FLEXI_TMPL_TOP_BOTTOM_POS_TAB" description="" icon_class="" level="tab_open" box_type="1" />
+
+			<field name="column_display_grp" type="separator" cssprep="1" default="FLEXI_TMPL_COLUMNS_DISPLAY" description="" level="level2" />
+			<field name="top_col_width" cssprep="less" type="text" hint="paddng-top padding-right padding-bottom padding-left in px % rem ect" default="30%" label="Top width" description="This is span1 to span12 (100% width). &lt;br&gt; Note 'Top' position is next to 'Image' position the sum of them is 12. &lt;br&gt; If one position is empty the other is expaned to 100%" />
+			<field name="top_col_gap" cssprep="less" type="text" hint="gap in px % rem etc" default="2rem" label="Gap" description="Set gap between image blcok and top block"  />
+			<field name="top_cols" type="radio" default="" label="FLEXI_ITEM_TOP_COLS" description="FLEXI_ITEM_TOP_COLS_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="one">FLEXI_1_COL</option>
+				<option value="two">FLEXI_2_COLS</option>
+			</field>
+			<field name="bottom_cols" type="radio" default="" label="FLEXI_ITEM_BOTTOM_COLS" description="FLEXI_ITEM_BOTTOM_COLS_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="one">FLEXI_1_COL</option>
+				<option value="two">FLEXI_2_COLS</option>
+			</field>
+
 			
-					<field name="item_tab_placement" type="separator" default="FLEXI_PLACEMENT" icon_class="icon-grid" level="tab_open" box_type="1" />
 
+			<field name="column_padding_styling_grp" type="separator" cssprep="1" default="FLEXI_TMPL_INFOBOX_TOP" description="" level="level3" />
+			<field name="column_pad_top" type="text" cssprep="less" hint="paddng-top padding-right padding-bottom padding-left in px % rem ect"  default="10px 10px 10px 10px"  label="FLEXI_TMPL_PADDING_TOP" description="FLEXI_TMPL_PADDING_TOP_DESC" />
+			<field name="column_color_top" type="color" cssprep="less" default="inherit" label="FLEXI_TMPL_COLOR" description="FLEXI_TMPL_COLOR_DESC" format="rgba" keywords="transparent,initial,inherit"/>
+			<field name="column_bg_color_top" type="color" cssprep="less" default="transparent" label="FLEXI_TMPL_BACKGROUND" description="FLEXI_TMPL_BACKGROUND_DESC" format="rgba" keywords="transparent,initial,inherit"/>
+			<field name="column_border_radius_top" type="number" cssprep="less" hint="0" default="05"  label="FLEXI_TMPL_BORDER_RADIUS" description="FLEXI_TMPL_BORDER_RADIUS_DESC" min="0" max="80" step="1" />
+			<field name="column_border_size_top" type="number" cssprep="less" hint="1" default="1"  label="FLEXI_TMPL_BORDER_WIDTH" description="FLEXI_TMPL_BORDER_WIDTH_DESC" />
+			<field name="column_border_color_top" type="color" cssprep="less" default="#cccccc" label="FLEXI_TMPL_BORDER_COLOR" description="FLEXI_TMPL_BORDER_COLOR_DESC" format="rgba" keywords="transparent,initial,inherit"/>
+			<field name="column_border_type_top" type="list" cssprep="less" hint="solid" default="solid"  label="FLEXI_TMPL_BORDER_TYPE" description="FLEXI_TMPL_BORDER_TYPE_DESC" >
+				<option value="solid">FLEXI_SOLID</option>
+				<option value="dotted">FLEXI_DOTTED</option>
+				<option value="dashed">FLEXI_DASHED</option>
+				<option value="double">FLEXI_DOUBLE</option>
+				<option value="groove">FLEXI_GROOVE</option>
+				<option value="ridge">FLEXI_RIDGE</option>
+				<option value="inset">FLEXI_INSET</option>
+				<option value="outset">FLEXI_OUTSET</option>
+			</field>
 
-					<field name="column_display_grp" type="separator" cssprep="1" default="FLEXI_TMPL_COLUMNS_DISPLAY" description="" level="level2" />
-					<field name="top_cols" type="radio" default="" label="FLEXI_ITEM_TOP_COLS" description="FLEXI_ITEM_TOP_COLS_DESC" class="btn-group btn-group-yesno">
-						<option value="">FLEXI_USE_GLOBAL</option>
-						<option value="one">FLEXI_1_COL</option>
-						<option value="two">FLEXI_2_COLS</option>
-					</field>
-					<field name="bottom_cols" type="radio" default="" label="FLEXI_ITEM_BOTTOM_COLS" description="FLEXI_ITEM_BOTTOM_COLS_DESC" class="btn-group btn-group-yesno">
-						<option value="">FLEXI_USE_GLOBAL</option>
-						<option value="one">FLEXI_1_COL</option>
-						<option value="two">FLEXI_2_COLS</option>
-					</field>
+			<field name="column_border_styling_grp_bottom" type="separator" cssprep="1" default="FLEXI_TMPL_INFOBOX_BOTTOM" description="" level="level3" />
+			<field name="column_pad_bottom" type="text" cssprep="less"  hint="paddng-top padding-right padding-bottom padding-left in px % rem ect" default="0"  label="FLEXI_TMPL_PADDING_BOTTOM" description="FLEXI_TMPL_PADDING_TOP_DESC" />
+			<field name="column_color_bottom" type="color" cssprep="less" default="#cccccc" label="FLEXI_TMPL_COLOR" description="FLEXI_TMPL_COLOR_DESC" format="rgba" keywords="transparent,initial,inherit"/>
+			<field name="column_bg_color_bottom" type="color" cssprep="less" default="#ffffff" label="FLEXI_TMPL_BACKGROUND" description="FLEXI_TMPL_BACKGROUND_DESC" format="rgba" keywords="transparent,initial,inherit"/>
+			<field name="column_border_radius_bottom" type="number" cssprep="less" hint="0" default="0"  label="FLEXI_TMPL_BORDER_RADIUS" description="FLEXI_TMPL_BORDER_RADIUS_DESC" min="0" max="80" step="1" />
+			<field name="column_border_size_bottom" type="number" cssprep="less" hint="1" default="0"  label="FLEXI_TMPL_BORDER_WIDTH" description="FLEXI_TMPL_BORDER_WIDTH_DESC" />
+			<field name="column_border_color_bottom" type="color" cssprep="less" default="#cccccc" label="FLEXI_TMPL_BORDER_COLOR" description="FLEXI_TMPL_BORDER_COLOR_DESC" format="rgba" keywords="transparent,initial,inherit"/>
+			<field name="column_border_type_bottom" type="list" cssprep="less" hint="solid" default="solid"  label="FLEXI_TMPL_BORDER_TYPE" description="FLEXI_TMPL_BORDER_TYPE_DESC" >
+				<option value="solid">FLEXI_SOLID</option>
+				<option value="dotted">FLEXI_DOTTED</option>
+				<option value="dashed">FLEXI_DASHED</option>
+				<option value="double">FLEXI_DOUBLE</option>
+				<option value="groove">FLEXI_GROOVE</option>
+				<option value="ridge">FLEXI_RIDGE</option>
+				<option value="inset">FLEXI_INSET</option>
+				<option value="outset">FLEXI_OUTSET</option>
+			</field>
 
-					<field name="featured_row_grp" type="separator" default="Featured row" description="" level="level2" />
-					<field name="featured_row_title" type="text" default="" hint="JFeatured" filter="raw" label="Row title" description="Title will be displayed (typically) at the start of the row. This can be a language string" />
+			<field name="layout_pos_tab_customclass" type="separator" default="FLEXI_TMPL_POSITIONS_CSS_CLASSES" description="" icon_class="icon-palette" level="tab_open" box_type="1" />
+			<field name="layout_pos_tab_customclass_info" type="separator" cssprep="1" default="FLEXI_TMPL_POSITIONS_CSS_CLASSES_INFO" description="" level="level2" class="alert alert-info" />
 
-					<field name="featured_row_grp_styles" type="separator" cssprep="1" default="Styles" description="" level="level3" />
-					<field name="featured_row_text_color" type="color" cssprep="less" default="#ffffff" label="Text Color" description="..." format="rgba" keywords="transparent,initial,inherit"/>
-					<field name="featured_row_bgcolor" type="color" cssprep="less" default="#B46410" label="Background color" description="..." format="rgba" keywords="transparent,initial,inherit"/>
-					<field name="featured_row_font_size" type="text" cssprep="less" default="12px" label="Font size" description="..." class="input-xsmall" />
+			<field name="custom_class_grp_subtitle_containers" type="separator" cssprep="1" default="Subtitle" description="" level="level3" />
+      <field name="box_class_subtitle1" type="text" size="3" hint="flexi group lineinfo subtitle1" default="" label="Subtitle 1" description="FLEXI_SUBTITLE1_CLASS_DESC" />
+      <field name="box_class_subtitle2" type="text" size="3" hint="flexi group lineinfo subtitle2" default="" label="Subtitle 2" description="FLEXI_SUBTITLE2_CLASS_DESC" />
+      <field name="box_class_subtitle3" type="text" size="3" hint="flexi group lineinfo subtitle3" default="" label="Subtitle 3" description="FLEXI_SUBTITLE2_CLASS_DESC" />
 
-					<field name="subtitle_tabs_grp" type="separator" default="SubTitle Tabs" description="" level="level2" />
-					<field name="subtitle_tab_titles" type="textarea" default="" hint="Tab1 ,, Tab2 ,, Tab3 ,, Tab4 ,, Tab5 ,, Tab6 ,, Tab7 ,, Tab8 ,, Tab9 ,, Tab10 ,, Tab11 ,, Tab12" label="Tab titles  (language strings)" description="Tab titles seperated via ,, (double comma)" />
+			<field name="custom_class_grp_subtitle_tabs" type="separator" cssprep="1" default="Subtitle Tabset" description="" level="level3" />
+			<field name="box_class_subtitle_tab1" type="text" size="3" hint="flexi lineinfo" default="" label="Tab 1" description="FLEXI_TAB_CLASS_DESC" />
+			<field name="box_class_subtitle_tab2" type="text" size="3" hint="flexi lineinfo" default="" label="Tab 2" description="FLEXI_TAB_CLASS_DESC" />
+			<field name="box_class_subtitle_tab3" type="text" size="3" hint="flexi lineinfo" default="" label="Tab 3" description="FLEXI_TAB_CLASS_DESC" />
+			<field name="box_class_subtitle_tab4" type="text" size="3" hint="flexi lineinfo" default="" label="Tab 4" description="FLEXI_TAB_CLASS_DESC" />
+			<field name="box_class_subtitle_tab5" type="text" size="3" hint="flexi lineinfo" default="" label="Tab 5" description="FLEXI_TAB_CLASS_DESC" />
+			<field name="box_class_subtitle_tab6" type="text" size="3" hint="flexi lineinfo" default="" label="Tab 6" description="FLEXI_TAB_CLASS_DESC" />
+			<field name="box_class_subtitle_tab7" type="text" size="3" hint="flexi lineinfo" default="" label="Tab 7" description="FLEXI_TAB_CLASS_DESC" />
+			<field name="box_class_subtitle_tab8" type="text" size="3" hint="flexi lineinfo" default="" label="Tab 8" description="FLEXI_TAB_CLASS_DESC" />
+			<field name="box_class_subtitle_tab9" type="text" size="3" hint="flexi lineinfo" default="" label="Tab 9" description="FLEXI_TAB_CLASS_DESC" />
+			<field name="box_class_subtitle_tab10" type="text" size="3" hint="flexi lineinfo" default="" label="Tab 10" description="FLEXI_TAB_CLASS_DESC" />
+			<field name="box_class_subtitle_tab11" type="text" size="3" hint="flexi lineinfo" default="" label="Tab 11" description="FLEXI__TAB_CLASS_DESC" />
+			<field name="box_class_subtitle_tab12" type="text" size="3" hint="flexi lineinfo" default="" label="Tab 12" description="FLEXI_TAB_CLASS_DESC" />
 
-					<field name="bottom_tabs_grp" type="separator" default="Bottom Tabs" description="" level="level2" />
-					<field name="bottom_tab_titles" type="textarea" default="" hint="Tab1 ,, Tab2 ,, Tab3 ,, Tab4 ,, Tab5 ,, Tab6 ,, Tab7 ,, Tab8 ,, Tab9 ,, Tab10 ,, Tab11 ,, Tab12" label="Tab titles  (language strings)" description="Tab titles seperated via ,, (double comma)" />
+			<field name="custom_class_grp_content_containers" type="separator" cssprep="1" default="Main Content" description="" level="level3" />
+			<field name="box_class_image" type="text" size="3" hint="flexi group image" default="" label="FLEXI_IMAGE" description="FLEXI_IMAGE_CLASS_DESC" />
+			<field name="box_class_top" type="text" size="3" hint="flexi group infoblock" default="" label="FLEXI_TOP" description="FLEXI_TOP_CLASS_DESC" />
+			<field name="box_class_descr" type="text" size="3" hint="flexi group description" default="" label="FLEXI_DESCRIPTION" description="FLEXI_DESCRIPTION_CLASS_DESC" />
 
-				<field name="item_tabset_end" type="separator" default="ITEM_TABSET" level="tabset_close" />
+			<field name="custom_class_grp_bottom_tabs" type="separator" cssprep="1" default="Bottom Tabset" description="" level="level3" />
+			<field name="box_class_bottom_tab1" type="text" size="3" hint="flexi lineinfo" default="" label="Tab 1" description="FLEXI_TAB1_CLASS_DESC" />
+			<field name="box_class_bottom_tab2" type="text" size="3" hint="flexi lineinfo" default="" label="Tab 2" description="FLEXI_TAB_CLASS_DESC" />
+			<field name="box_class_bottom_tab3" type="text" size="3" hint="flexi lineinfo" default="" label="Tab 3" description="FLEXI_TAB_CLASS_DESC" />
+			<field name="box_class_bottom_tab4" type="text" size="3" hint="flexi lineinfo" default="" label="Tab 4" description="FLEXI_TAB_CLASS_DESC" />
+			<field name="box_class_bottom_tab5" type="text" size="3" hint="flexi lineinfo" default="" label="Tab 5" description="FLEXI_TAB_CLASS_DESC" />
+			<field name="box_class_bottom_tab6" type="text" size="3" hint="flexi lineinfo" default="" label="Tab 6" description="FLEXI_TAB_CLASS_DESC" />
+			<field name="box_class_bottom_tab7" type="text" size="3" hint="flexi lineinfo" default="" label="Tab 7" description="FLEXI_TAB_CLASS_DESC" />
+			<field name="box_class_bottom_tab8" type="text" size="3" hint="flexi lineinfo" default="" label="Tab 8" description="FLEXI_TAB_CLASS_DESC" />
+			<field name="box_class_bottom_tab9" type="text" size="3" hint="flexi lineinfo" default="" label="Tab 9" description="FLEXI_TAB_CLASS_DESC" />
+			<field name="box_class_bottom_tab10" type="text" size="3" hint="flexi lineinfo" default="" label="Tab 10" description="FLEXI_TAB_CLASS_DESC" />
+			<field name="box_class_bottom_tab11" type="text" size="3" hint="flexi lineinfo" default="" label="Tab 11" description="FLEXI_TAB_CLASS_DESC" />
+			<field name="box_class_bottom_tab12" type="text" size="3" hint="flexi lineinfo" default="" label="Tab 12" description="FLEXI_TAB_CLASS_DESC" />
+
+			<field name="custom_class_grp_bottom_container" type="separator" cssprep="1" default="Bottom" description="" level="level3" />
+			<field name="box_class_bottom" type="text" size="3" hint="flexi group infoblock" default="" label="FLEXI_BOTTOM" description="FLEXI_BOTTOMFIELD_CLASS_DESC" />
+
+			<field name="layout_pos_tabset_end" type="separator" default="ITEM_TABSET" level="tabset_close" />
+			<field name="params_tabset_end" type="separator" default="ITEM_TABSET" level="tabset_close" />
 
 		</fieldset>
 	</fields>
 
 	<fieldgroups>
-
-		<group posrow="slideshow" tcolor="#3A2459" title="Slideshow top" >slideshow_top</group>
 
 		<group tcolor="darkcyan" title="After Title row 1">subtitle1</group>
 		<group tcolor="darkcyan" title="After Title row 2">subtitle2</group>
@@ -105,10 +256,7 @@
 
 		<group posrow="img_top" tcolor="#3A2459" title="Image">image</group>
 		<group posrow="img_top" tcolor="#3A2459" title="Top">top</group>
-		<group posrow="description" tcolor="black" title="Description">description</group>
-
-		<group posrow="featured_row" tcolor="#B46410" title="Featured row info">featured_row_info</group>
-		<group posrow="featured_row" tcolor="#B46410" title="Featured row logo">featured_row_logo</group>
+		<group tcolor="#000000" title="Description">description</group>
 
 		<group posrow="bottom" tcolor="darkgreen" title="Bottom Tab 1">bottom_tab1</group>
 		<group posrow="bottom" tcolor="darkgreen" title="Bottom Tab 2">bottom_tab2</group>

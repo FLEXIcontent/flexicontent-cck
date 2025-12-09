@@ -31,7 +31,7 @@
 			</field>
 
 			<field name="" type="separator" default="FLEXI_MOD_TMPL_CONTENT_VIA_LAYOUT_BUILDER" level="level2" />
-			<field name="carousel_builder_layout_feat" type="multilist" subtype="radio" default="1" label="Featured items" description="" class="btn-group group-fcmethod">
+			<field name="carousel_builder_layout_feat" type="multilist" subtype="radio" default="0" label="Featured items" description="" class="btn-group group-fcmethod">
 				<option value="0">FLEXI_DISABLE</option>
 				<option value="1">Layout 1</option>
 				<option value="2">Layout 2</option>
@@ -46,12 +46,17 @@
 
 			<field name="" type="separator" default="Basic" level="level2" />
 			<field name="carousel_item_placement_feat" type="multilist" subtype="radio" default="1" toggle_related="1" label="FLEXI_ITEMS_PLACEMENT" description="FLEXI_ITEMS_PLACEMENT_DESC" class="btn-group group-fcinfo">
-				<option value="0" show_list="items_in_cols_feat">FLEXI_CLEARED</option>
-				<option value="1" show_list="items_in_cols_feat">FLEXI_AS_MASONRY_TILES</option>
-				<option value="2" hide_list="items_in_cols_feat">FLEXI_TABS</option>
-				<option value="3" hide_list="items_in_cols_feat">FLEXI_ACCORDION</option>
+				<option value="0" show_list="carousel_column_mode_feat,carousel_item_width_feat,item_columns_feat">FLEXI_CLEARED</option>
+				<option value="1" show_list="carousel_column_mode_feat,carousel_item_width_feat,item_columns_feat">FLEXI_AS_MASONRY_TILES</option>
+				<option value="2" hide_list="carousel_column_mode_feat,carousel_item_width_feat,item_columns_feat">FLEXI_TABS</option>
+				<option value="3" hide_list="carousel_column_mode_feat,carousel_item_width_feat,item_columns_feat">FLEXI_ACCORDION</option>
 			</field>
-			<field name="item_columns_feat" type="list" default="3" label="FLEXI_UMOD_NUM_OF_COLUMNS" description="FLEXI_UMOD_NUM_OF_COLUMNS_DESC" depend_class="items_in_cols_feat">
+			<field name="carousel_column_mode_feat" type="multilist" subtype="radio" default="0" toggle_related="1" label="Column mode" depend_class="carousel_column_mode_feat" description="Highlight currently 'active' and 'hovered' items by adding CSS classes" class="btn-group btn-group-yesno">
+				<option value="0" show_list="item_columns_feat" hide_list="carousel_item_width_feat" >Column mode</option>
+				<option value="1" show_list="carousel_item_width_feat" hide_list="item_columns_feat">Grid mode</option>
+			</field>
+			<field name="carousel_item_width_feat" type="text" defaut="200px" hint="prefer to use px like 200px" label="Width of columns (grid mode)" description="" depend_class="carousel_item_width_feat"/>
+			<field name="item_columns_feat" type="list" default="3" label="FLEXI_UMOD_NUM_OF_COLUMNS" description="FLEXI_UMOD_NUM_OF_COLUMNS_DESC" depend_class="item_columns_feat">
 				<option value="1">1</option>
 				<option value="2">2</option>
 				<option value="3">3</option>
@@ -86,16 +91,27 @@
 				<option value="1">Auto-Fit and Stretch</option>
 			</field>
 
+			<field name="carousel_content_width_fit_feat" type="radio" default="auto-fill" label="fit content" description="Select yes to fix same height for each content" class="btn-group group-fcinfo">
+				<option value="">FLEXI_USE_GLOBAL</option>
+					<option value="auto-fill">Auto-fill</option>
+					<option value="auto-fit">Auto-fit</option>
+			</field>
+			<field name="carousel_content_height_fit_feat" type="radio" default="" hint="1" label="Height of content" description="Select yes to fix same height for each content" class="btn-group group-fcinfo">
+							<option value="">FLEXI_USE_GLOBAL</option>
+							<option value="0">Content height</option>
+							<option value="1">Force same height</option>
+						</field>
+
 			<field name="" type="separator" default="(inline) CSS Styles for Inner Container (px)" level="level2" />
 			<field name="carousel_inner_inline_css_feat" type="radio" default="0" label="FLEXI_ENABLE" description="Select to set styling of inner item containers" class="btn-group btn-group-yesno">
 				<option value="0">No (use default/custom CSS)</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="carousel_padding_top_bottom_feat" type="text" filter="int" default="8" label="padding top/bottom" description="This is the padding applied at top and bottom of the items" />
-			<field name="carousel_padding_left_right_feat" type="text" filter="int" default="12" label="padding left/right" description="This is the padding applied at left and right of the items" />
-			<field name="carousel_border_width_feat" type="text" filter="int" default="1" label="border width" description="This is the border width applied around the items" />
-			<field name="carousel_margin_top_bottom_feat" type="text" filter="int" default="4" label="margin top/bottom" description="This is the margin applied at top and bottom of the items" />
-			<field name="carousel_margin_left_right_feat" type="text" filter="int" default="4" label="margin left/right" description="This is the margin applied at left and right of the items" />
+			<field name="carousel_padding_top_bottom_feat" type="text"  default="0" label="padding top/bottom" description="This is the padding applied at top and bottom of the items" />
+			<field name="carousel_padding_left_right_feat" type="text"  default="0" label="padding left/right" description="This is the padding applied at left and right of the items" />
+			<field name="carousel_border_width_feat" type="text" default="1" label="border width" description="This is the border width applied around the items" />
+			<field name="carousel_margin_top_bottom_feat" type="text"  default="2rem" label="margin top/bottom" description="This is the margin applied at top and bottom of the items" />
+			<field name="carousel_margin_left_right_feat" type="text"  default="2rem" label="margin left/right" description="This is the margin applied at left and right of the items" />
 
 
 			<field name="item_tab_standard" type="separator" default="Standard items" description="Placed inside the carousel" icon_class="icon-list" level="tab_open" box_type="1" />

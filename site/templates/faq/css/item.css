@@ -2,10 +2,7 @@ body #flexicontent .fc_item_title,
 body #flexicontent .fc_item_title a {
 	color: inherit;
 	background-color: inherit;
-	padding-top: 0px;
-	padding-right: 0px;
-	padding-left: 0px;
-	padding-bottom: 0px;
+	padding: 0;
 	border-radius: 0px;
 }
 .fcitems {
@@ -20,13 +17,11 @@ body #flexicontent .fc_item_title a {
 }
 body #flexicontent .flexi.label,
 body #flexicontent .desc-title.label {
-	background-color: rgba(255,255,255,0);
-	color: #000000;
+	background-color: #999999;
+	color: #ffffff;
 	border-radius: 3px;
-	padding-top: 0px;
-	padding-right: 0px;
-	padding-left: 0px;
-	padding-bottom: 0px;
+	padding: 0;
+	font-weight: bold;
 }
 body #flexicontent ul.tabbernav > li a {
 	background-color: #e4f1f8;
@@ -64,17 +59,12 @@ div#fc_bottom_tabset {
 	margin-bottom: 40px !important;
 }
 body .flexi.infoblock {
-	padding-top: 10px;
-	padding-right: 0px;
-	padding-left: 10px;
-	padding-bottom: 10px;
+	padding: 10;
 }
 .flexi.lineinfo {
-	display: block;
-	padding: 0;
+	display: flex;
 	margin: 0 0 1em;
-	overflow: hidden;
-	clear: both;
+	flex-direction: column;
 }
 .tabbertab .flexi.element,
 .subtitle1 .flexi.element,
@@ -91,24 +81,25 @@ body .flexi.infoblock {
 	overflow: hidden;
 	width: 100%;
 	margin-bottom: 10px;
+	display: grid;
+	grid-template-columns: 1fr 30%;
+	column-gap: 2rem;
+}
+@media (max-width: 768px) {
+	.flexi.topblock {
+		grid-template-columns: 1fr;
+	}
 }
 .topblock .flexi.image {
-	display: block;
-	float: left;
-	max-width: 99% !important;
-	padding: 0% !important;
-	margin-right: 0%;
-	margin-left: 0%;
-	line-height: 0px;
-	border: 0px solid silver;
+	display: flex;
+	flex-direction: column;
 }
 .topblock .flexi.image a {
 	outline: none;
 }
 .topblock .flexi.infoblock {
-	overflow: hidden;
 	border-radius: 0px;
-	border: 1px solid #cccccc;
+	border: 1px solid inherit;
 	color: inherit;
 	background-color: inherit;
 }
@@ -117,11 +108,11 @@ body .flexi.infoblock {
 	margin: 0;
 }
 .flexi.bottomblock.infoblock {
-	overflow: hidden;
 	border-radius: 0px;
 	border: 1px solid inherit;
 	color: inherit;
 	background-color: inherit;
+	padding: 10;
 }
 .flexi.infoblock {
 	border: 1px solid silver;
@@ -141,17 +132,8 @@ body .flexi.infoblock {
 	margin: 0%;
 	zoom: 1;
 }
-div.flexi.value {
-	padding-bottom: 0px !important;
-	padding-top: 0px !important;
-}
 .onecols ul li.flexi {
 	width: 100%;
-}
-.onecols .flexi.label {
-	min-width: 25%;
-	margin-right: 4%;
-	margin-bottom: 6px;
 }
 .twocols ul li.flexi {
 	min-width: 48%;

@@ -30,7 +30,7 @@
 			</field>
 
 			<field name="" type="separator" default="FLEXI_MOD_TMPL_CONTENT_VIA_LAYOUT_BUILDER" level="level2" />
-			<field name="news_builder_layout_feat" type="multilist" subtype="radio" default="1" label="Featured items" description="" class="btn-group group-fcmethod">
+			<field name="news_builder_layout_feat" type="multilist" subtype="radio" default="0" label="Featured items" description="" class="btn-group group-fcmethod">
 				<option value="0">FLEXI_DISABLE</option>
 				<option value="1">Layout 1</option>
 				<option value="2">Layout 2</option>
@@ -45,12 +45,18 @@
 
 			<field name="" type="separator" default="Basic" level="level2" />
 			<field name="news_item_placement_feat" type="multilist" subtype="radio" default="1" toggle_related="1" label="FLEXI_ITEMS_PLACEMENT" description="FLEXI_ITEMS_PLACEMENT_DESC" class="btn-group group-fcinfo">
-				<option value="0" show_list="items_in_cols_feat">FLEXI_CLEARED</option>
-				<option value="1" show_list="items_in_cols_feat">FLEXI_AS_MASONRY_TILES</option>
-				<option value="2" hide_list="items_in_cols_feat">FLEXI_TABS</option>
-				<option value="3" hide_list="items_in_cols_feat">FLEXI_ACCORDION</option>
+				<option value="0" show_list="news_item_column_mode_feat,news_item_width_feat,item_columns_feat">FLEXI_CLEARED</option>
+				<option value="1" show_list="news_item_column_mode_feat,news_item_width_feat,item_columns_feat">FLEXI_AS_MASONRY_TILES</option>
+				<option value="2" hide_list="news_item_column_mode_feat,news_item_width_feat,item_columns_feat">FLEXI_TABS</option>
+				<option value="3" hide_list="news_item_column_mode_feat,news_item_width_feat,item_columns_feat">FLEXI_ACCORDION</option>
 			</field>
-			<field name="item_columns_feat" type="list" default="3" label="FLEXI_UMOD_NUM_OF_COLUMNS" description="FLEXI_UMOD_NUM_OF_COLUMNS_DESC" depend_class="items_in_cols_feat">
+
+			<field name="news_item_column_mode_feat" type="multilist" subtype="radio" toggle_related="1" default="0" label="Column mode" depend_class="news_item_column_mode_feat" description="Highlight currently 'active' and 'hovered' items by adding CSS classes" class="btn-group btn-group-yesno">
+				<option value="0" show_list="news_item_columns_feat" hide_list="news_item_width_feat" >Column mode</option>
+				<option value="1" show_list="news_item_width_feat" hide_list="news_item_columns_feat">Grid mode</option>
+			</field>
+			<field name="news_item_width_feat" type="text" defaut="200px" hint="prefer to use px like 200px" label="Width of columns (grid mode)" description="" depend_class="news_item_width_feat" />
+			<field name="item_columns_feat" type="list" default="3" label="FLEXI_UMOD_NUM_OF_COLUMNS" description="FLEXI_UMOD_NUM_OF_COLUMNS_DESC" depend_class="news_item_columns_feat">
 				<option value="1">1</option>
 				<option value="2">2</option>
 				<option value="3">3</option>
@@ -84,29 +90,39 @@
 				<option value="0">Auto-Fit</option>
 				<option value="1">Auto-Fit and Stretch</option>
 			</field>
+				<field name="news_content_width_fit_feat" type="radio" default="auto-fill" label="fit content" description="Select yes to fix same height for each content" class="btn-group group-fcinfo">
+							<option value="">FLEXI_USE_GLOBAL</option>
+							<option value="auto-fill">Auto-fill</option>
+							<option value="auto-fit">Auto-fit</option>
+						</field>
 
-			<field name="" type="separator" default="(inline) CSS Styles for Inner Container (px)" level="level2" />
+			<field name="" type="separator" default="(inline) CSS Styles for Inner Container (px, % rem etc)" level="level2" />
 			<field name="news_inner_inline_css_feat" type="radio" default="0" label="FLEXI_ENABLE" description="Select to set styling of inner item containers" class="btn-group btn-group-yesno">
 				<option value="0">No (use default/custom CSS)</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="news_padding_top_bottom_feat" type="text" default="8" label="padding top/bottom" description="This is the padding applied at top and bottom of the items" />
-			<field name="news_padding_left_right_feat" type="text" default="12" label="padding left/right" description="This is the padding applied at left and right of the items" />
+			<field name="news_padding_top_bottom_feat" type="text" default="8px" label="padding top/bottom" description="This is the padding applied at top and bottom of the items" />
+			<field name="news_padding_left_right_feat" type="text" default="12px" label="padding left/right" description="This is the padding applied at left and right of the items" />
 			<field name="news_border_width_feat" type="text" default="1" label="border width" description="This is the border width applied around the items" />
-			<field name="news_margin_top_bottom_feat" type="text" default="4" label="margin top/bottom" description="This is the margin applied at top and bottom of the items" />
-			<field name="news_margin_left_right_feat" type="text" default="4" label="margin left/right" description="This is the margin applied at left and right of the items" />
+			<field name="news_margin_top_bottom_feat" type="text" default="2rem" label="margin top/bottom" description="This is the margin applied at top and bottom of the items" />
+			<field name="news_margin_left_right_feat" type="text" default="2rem" label="margin left/right" description="This is the margin applied at left and right of the items" />
 
 
 			<field name="item_tab_standard" type="separator" default="Standard items" icon_class="icon-list" level="tab_open" box_type="1" />
 
 			<field name="" type="separator" default="Basic" level="level2" />
 			<field name="news_item_placement" type="multilist" subtype="radio" default="1" toggle_related="1" label="FLEXI_ITEMS_PLACEMENT" description="FLEXI_ITEMS_PLACEMENT_DESC" class="btn-group group-fcinfo">
-				<option value="0" show_list="items_in_cols">FLEXI_CLEARED</option>
-				<option value="1" show_list="items_in_cols">FLEXI_AS_MASONRY_TILES</option>
-				<option value="2" hide_list="items_in_cols">FLEXI_TABS</option>
-				<option value="3" hide_list="items_in_cols">FLEXI_ACCORDION</option>
+				<option value="0" show_list="item_column_mode,news_item_width,item_columns">FLEXI_CLEARED</option>
+				<option value="1" show_list="item_column_mode,news_item_width,item_columns">FLEXI_AS_MASONRY_TILES</option>
+				<option value="2" hide_list="item_column_mode,news_item_width,item_columns">FLEXI_TABS</option>
+				<option value="3" hide_list="item_column_mode,news_item_width,item_columns">FLEXI_ACCORDION</option>
 			</field>
-			<field name="item_columns" type="list" default="3" label="FLEXI_UMOD_NUM_OF_COLUMNS" description="FLEXI_UMOD_NUM_OF_COLUMNS_DESC" depend_class="items_in_cols">
+			<field name="news_item_column_mode_std" type="multilist" subtype="radio" toggle_related="1" default="0" label="Column mode" depend_class="item_column_mode" description="Highlight currently 'active' and 'hovered' items by adding CSS classes" class="btn-group btn-group-yesno">
+				<option value="0" show_list="item_columns" hide_list="news_item_width" >Column mode</option>
+				<option value="1" show_list="news_item_width" hide_list="item_columns">Grid mode</option>
+			</field>
+			<field name="news_item_width_std" type="text" defaut="200px" hint="prefer to use px like 200px" label="Width of columns (grid mode)" description="" depend_class="news_item_width" />
+			<field name="item_columns" type="list" default="3" label="FLEXI_UMOD_NUM_OF_COLUMNS" description="FLEXI_UMOD_NUM_OF_COLUMNS_DESC" depend_class="item_columns">
 				<option value="1">1</option>
 				<option value="2">2</option>
 				<option value="3">3</option>
@@ -140,17 +156,21 @@
 				<option value="0">Auto-Fit</option>
 				<option value="1">Auto-Fit and Stretch</option>
 			</field>
-
-			<field name="" type="separator" default="(inline) CSS Styles for Inner Container (px)" level="level2" />
+				<field name="news_content_width_fit_std" type="radio" default="auto-fill" label="Fit content" description="Select yes to fix same height for each content" class="btn-group group-fcinfo">
+							<option value="">FLEXI_USE_GLOBAL</option>
+							<option value="auto-fill">Auto-fill</option>
+							<option value="auto-fit">Auto-fit</option>
+						</field>
+			<field name="" type="separator" default="(inline) CSS Styles for Inner Container (px % em rem ect)" level="level2" />
 			<field name="news_inner_inline_css" type="radio" default="0" label="FLEXI_ENABLE" description="Select to set styling of inner item containers" class="btn-group btn-group-yesno">
 				<option value="0">No (use default/custom CSS)</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="news_padding_top_bottom" type="text" default="8" label="padding top/bottom" description="This is the padding applied at top and bottom of the items" />
-			<field name="news_padding_left_right" type="text" default="12" label="padding left/right" description="This is the padding applied at left and right of the items" />
+			<field name="news_padding_top_bottom" type="text" default="8px" label="padding top/bottom" description="This is the padding applied at top and bottom of the items" />
+			<field name="news_padding_left_right" type="text" default="12px" label="padding left/right" description="This is the padding applied at left and right of the items" />
 			<field name="news_border_width" type="text" default="1" label="border width" description="This is the border width applied around the items" />
-			<field name="news_margin_top_bottom" type="text" default="4" label="margin top/bottom" description="This is the margin applied at top and bottom of the items" />
-			<field name="news_margin_left_right" type="text" default="4" label="margin left/right" description="This is the margin applied at left and right of the items" />
+			<field name="news_margin_top_bottom" type="text" default="2rem" label="margin top/bottom" description="This is the margin applied at top and bottom of the items" />
+			<field name="news_margin_left_right" type="text" default="2rem" label="margin left/right" description="This is the margin applied at left and right of the items" />
 
 		<field name="item_tabset_end" type="separator" default="ITEM_TABSET" level="tabset_close" />
 

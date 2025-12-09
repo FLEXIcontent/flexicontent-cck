@@ -32,12 +32,12 @@
 /* ORDERING GROUPs TITLE */
 .mod_flexicontent_wrapper .order_group_title {
  color: #d04764;
- font-family: 'Lobster', cursive;
+/* font-family: 'Lobster', cursive;*/
  font-size: 36px;
- font-weight: normal;
+/* font-weight: normal;
  line-height: 48px;
  margin: 0 0 18px;
- text-shadow: 1px 0 0 #fff;
+ text-shadow: 1px 0 0 #fff;*/
 }
 
 
@@ -48,11 +48,11 @@
 }
 
 .mod_flexicontent_wrapper .catdata .cattitle {  /* the category title */
-	padding: 1px 8px 1px 10px;
+	/*padding: 1px 8px 1px 10px;
 	margin: 2px 0px 8px 0px;
 	font-size: 16px;
 	background: #d0d0d0;
-	border-radius: 3px;
+	border-radius: 3px;*/
 }
 .mod_flexicontent_wrapper .catdata.fccat_active .cattitle,  /* title of active category */
 .mod_flexicontent_wrapper .catdata.fcitemcat_active .cattitle {  /* title of category of active item */
@@ -61,16 +61,16 @@
 .mod_flexicontent_wrapper .catdata .cattitle:hover {  /* the category title hover */
 }
 .mod_flexicontent_wrapper .catdata .cattitle a.cattitle_link {  /* the link to category title */
-	background-color: transparent; color: black;
+	/*background-color: transparent; color: black;*/
 	text-decoration:none;
 }
 .mod_flexicontent_wrapper .catdata.fccat_active .cattitle a.cattitle_link,        /* the link of active category */
 .mod_flexicontent_wrapper .catdata.fcitemcat_active .cattitle a.cattitle_link {   /* the link of category of active item */
-	color: darkred;
+	/*color: darkred;*/
 }
 .mod_flexicontent_wrapper .catdata .cattitle:hover a.cattitle_link,
 .mod_flexicontent_wrapper .catdata .cattitle a.cattitle_link:hover {  /* the link to category title on mouse over */
-	background-color: transparent;  color: darkred;
+	/*background-color: transparent;  color: darkred;*/
 	text-decoration: none;
 }
 
@@ -79,13 +79,13 @@
 	margin: 0 5px 5px 0;
 }
 .mod_flexicontent_wrapper .catdata .catimage img.catimage_thumb {  /* the category image */
-  padding:1px; border:1px solid #dddddd;  
+ /* padding:1px; border:1px solid #dddddd;  */
 }
 
 .mod_flexicontent_wrapper .catdata .catdescr {  /* the category description */
-	font-size: 11px;
+	/*font-size: 11px;
 	font-weight: normal;
-	text-align: justify;
+	text-align: justify;*/
 }
 
 
@@ -93,7 +93,7 @@
 /* THE (OPTIONAL) LINK AT THE BOTTOM OF MODULE */
 .mod_flexicontent_wrapper .cat_readon,
 .mod_flexicontent_wrapper .module_readon {  /* style of external container of link */
-	font-size: 12px;
+	/*font-size: 12px;
 	float:left;
 	font-weight:normal;
 	
@@ -101,58 +101,58 @@
 	border:solid transparent;
 	border-width:1px 0px;
 	padding: 1px 6px 1px 20px;
-	margin: 0px 0px 3px 4px;
+	margin: 0px 0px 3px 4px;*/
 }
 
 .mod_flexicontent_wrapper .cat_readon:hover,
 .mod_flexicontent_wrapper .module_readon:hover { /* style of external container of link */
-	background: url("../tmpl/news/images/readmore.png") lightgray no-repeat scroll 0px 3px;
+	/*background: url("../tmpl/news/images/readmore.png") lightgray no-repeat scroll 0px 3px;
 	border: solid gray;
 	border-width:1px 0px;
 	padding: 1px 6px 1px 20px;
-	margin: 0px 0px 3px 4px;
+	margin: 0px 0px 3px 4px;*/
 }
 
 .mod_flexicontent_wrapper .cat_readon a.readon,
 .mod_flexicontent_wrapper .cat_readon a.readon span {  /* style of link */
-	padding: 0px;
+	/*padding: 0px;
 	background:none;
-	text-decoration: none!important;
+	text-decoration: none;
 	color: darkgreen;
-	cursor:pointer;
+	cursor:pointer;*/
 }
 
 .mod_flexicontent_wrapper .cat_readon:hover a.readon,
 .mod_flexicontent_wrapper .cat_readon:hover a.readon span { /* style of link when hovering external container */
-	padding: 0px;
+	/*padding: 0px;
 	background:none;
-	text-decoration: none!important;
-	color: darkgreen;
+	text-decoration: none;
+	color: darkgreen;*/
 }
 
 .mod_flexicontent_wrapper .module_readon a.readon,
 .mod_flexicontent_wrapper .module_readon a.readon span {  /* style of link */
-	padding: 0px;
+	/*padding: 0px;
 	background:none;
-	text-decoration: none!important;
+	text-decoration: none;
 	color: darkblue;
-	cursor:pointer;
+	cursor:pointer;*/
 }
 
 .mod_flexicontent_wrapper .module_readon:hover a.readon,
 .mod_flexicontent_wrapper .module_readon:hover a.readon span { /* style of link when hovering external container */
-	padding: 0px;
+/*	padding: 0px;
 	background:none;
-	text-decoration: none!important;
-	color: darkblue;
+	text-decoration: none;
+	color: darkblue;*/
 }
 
 /* fav_list*/
 .mod_flexicontent_wrapper .news_favs_head { /* for label and value (contained inside) see more below */
-	font-size:12px;
+	/*font-size:12px;
 	border: 1px dashed gray;
 	font-weight: bold;
-	text-align: center;
+	text-align: center;*/
 }
 
 .mod_flexicontent_wrapper #mod_fc_favlist {
@@ -176,10 +176,11 @@ div.mod_fc_favlist_favblock_template {
 .mod_flexicontent_wrapper .fcitem_active .fcitem_title a,  /* news template, etc */
 .mod_flexicontent_wrapper .fcitem_active a.fcitem_link    /* default template, etc */
 {
-	border-radius: 8px !important;
-	background-color: darkred !important;
-	color: white !important;
-	padding: 2px 4px !important;
+	border-radius: 8px ;
+	background-color: darkred ;
+	color: white ;
+	padding: 2px 4px;
+	display:block;
 }
 
 /*******************/

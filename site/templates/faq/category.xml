@@ -39,13 +39,6 @@
 				<option value="1">FLEXI_AS_MASONRY_TILES</option>
 			</field>
 			
-			<field name="templatehtmlmode" type="separator" default="FLEXI_TEMPLATE_HTML_MODE" level="level2" />
-			<field name="htmlmode" type="multilist" subtype="radio" default="" label="FLEXI_HTML_MODE" description="FLEXI_HTML_MODE_DESC" filter="int" class="btn-group group-fcinfo">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_XHTML</option>
-				<option value="1">FLEXI_HTML5</option>
-			</field>
-			
 		</fieldset>
 	</fields>
 	

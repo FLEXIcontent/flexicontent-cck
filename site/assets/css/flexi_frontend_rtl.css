@@ -298,7 +298,7 @@ div table.adminform td {
 }
 #flexicontent .item_total {
 	border: 1px solid lightgray;
-	margin: 0px 0px 12px 0px;
+	margin: 40px 0px 12px 0px;
 	padding: 0px;
 	width: 100%;
 	clear: both;
@@ -1111,4 +1111,10 @@ div.fc-field-box {
 #flexicontent .fc_markup.mu_ru_timeframe.mu_has_text {
 	padding-right: 28px;
 	background: url(../images/calendar-select-days-span.png) 6px 50% no-repeat lightskyblue;
+}
+.mod_flexifilter_wrapper .fc_filter_set.fc_category {
+	margin-bottom: 15px !important;
+}
+h2.fc_search_result_title a {
+	text-decoration: none;
 }
