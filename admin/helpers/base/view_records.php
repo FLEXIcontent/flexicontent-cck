@@ -246,7 +246,7 @@ class FlexicontentViewBaseRecords extends \Joomla\CMS\MVC\View\HtmlView
 		$cookie_name = 'fc_managers_conf';
 		$fc_man_name = $fc_man_name ?: 'fc_' . $this->view_id;
 
-		\Joomla\CMS\Factory::getDocument()->addScriptDeclaration('
+		\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration('
 		var FCMAN_conf = {};
 		FCMAN_conf.fc_man_config_cookie = "' . $cookie_name . '";
 		FCMAN_conf.fc_man_manager_name  = "' . $fc_man_name . '";

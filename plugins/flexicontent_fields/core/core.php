@@ -13,6 +13,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
+use Joomla\Database\DatabaseInterface;
 
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
@@ -79,7 +80,7 @@ class plgFlexicontent_fieldsCore extends FCField
 			$initialized = 1;
 
 			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$document  = \Joomla\CMS\Factory::getApplication()->getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -631,7 +632,7 @@ class plgFlexicontent_fieldsCore extends FCField
 			? in_array($filter->field_type, array('type','state','tags','categories','created','createdby','modified','modifiedby'))
 			: false;
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$formfieldname = 'filter_'.$filter->id;
 
 		$_s = $isSearchView ? '_s' : '';
@@ -871,7 +872,7 @@ class plgFlexicontent_fieldsCore extends FCField
 				if($disable_keyboardinput)
 				{
 					$filter_ffid   = $formName.'_'.$filter->id.'_val';
-					$document =  \Joomla\CMS\Factory::getDocument();
+					$document =  \Joomla\CMS\Factory::getApplication()->getDocument();
 					switch ($display_filter_as)
 					{
 						case 1:
@@ -1159,7 +1160,7 @@ class plgFlexicontent_fieldsCore extends FCField
 			return array();
 		}
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$_s = $for_advsearch ? '_s' : '';
 
 		$values = array();
@@ -1319,7 +1320,7 @@ class plgFlexicontent_fieldsCore extends FCField
 
 		if (!isset($item_reviews[$item->id]))
 		{
-			$db = \Joomla\CMS\Factory::getDbo();
+			$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 
 			$item_ids = array();
 

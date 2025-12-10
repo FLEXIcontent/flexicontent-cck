@@ -211,7 +211,7 @@ if ($disp_slide_filter)
 							$append_button_classes = FLEXI_J30GE ? 'input-group' : ' input-append';
 							echo $append_buttons ? '<span class="btn-wrapper '.$append_button_classes.'">' : ''; ?>
 							<input type="<?php echo $search_autocomplete==2 ? 'hidden' : 'text'; ?>" class="<?php echo $text_search_class; ?>"
-							       data-txt_ac_lang="<?php echo Factory::getLanguage()->getTag(); ?>"
+							       data-txt_ac_lang="<?php echo Factory::getApplication()->getLanguage()->getTag(); ?>"
 							       placeholder="<?php echo $text_search_prompt; ?>" name="q" size="30" maxlength="120"
 							       id="search_searchword" value="<?php echo $this->escape($this->searchword);?>" style="" />
 
@@ -615,14 +615,14 @@ $js .= '
 			});
 		});
 	';
-$document = Factory::getDocument();
+$document = Factory::getApplication()->getDocument();
 $document->addScriptDeclaration($js);
 
 
 // FORM in slider
 if ($disp_slide_filter)
 {
-	Factory::getDocument()->addScriptDeclaration("
+	Factory::getApplication()->getDocument()->addScriptDeclaration("
 	(function($) {
 		$(document).ready(function ()
 		{

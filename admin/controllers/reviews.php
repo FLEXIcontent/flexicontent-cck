@@ -13,6 +13,7 @@ defined('_JEXEC') or die;
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
+use Joomla\Database\DatabaseInterface;
 
 JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php');
 
@@ -193,7 +194,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		\Joomla\CMS\Session\Session::checkToken() or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		$cid    = $this->input->get('cid', array(), 'array');
 		$values = array('approved' => 1, 'unapproved' => 0);
@@ -246,9 +247,9 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 	public function edit()
 	{
 		$app      = \Joomla\CMS\Factory::getApplication();
-		$user     = \Joomla\CMS\Factory::getUser();
-		$session  = \Joomla\CMS\Factory::getSession();
-		$document = \Joomla\CMS\Factory::getDocument();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 
 		$this->input->set('view', $this->record_name);
 		$this->input->set('hidemainmenu', 1);
@@ -478,7 +479,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 
 		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
-		$user    = \Joomla\CMS\Factory::getUser();
+		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$user_id = (int) $user->id;
 		$isNew   = !$model->get('id');
 		$item  = (object) array('type_id' => empty($record->item_type_id) ? 0 : $record->item_type_id);
@@ -561,7 +562,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$field = $model->getVotingReviewsField($item, $setAsDefault = true);
 
 		/**
@@ -601,9 +602,9 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 	public function ajaxvote()
 	{
 		$app  = \Joomla\CMS\Factory::getApplication();
-		$user = \Joomla\CMS\Factory::getUser();
-		$db   = \Joomla\CMS\Factory::getDbo();
-		$session = \Joomla\CMS\Factory::getSession();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$db   = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
 
 		$no_ajax     = $this->input->get('no_ajax', 0, 'int');
@@ -646,8 +647,8 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		FlexicontentFields::loadFieldConfig($field, $item);
 
 		// Load field's language files
-		\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, 'en-GB', true);
-		\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, null, true);
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, 'en-GB', true);
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, null, true);
 
 		// Get needed parameters
 		$rating_resolution = (int) $field->parameters->get('rating_resolution', 5);

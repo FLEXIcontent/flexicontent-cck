@@ -229,7 +229,7 @@ class FlexicontentModelFile extends FCModelAdmin
 	public function canEdit($record = null, $user = null)
 	{
 		$record  = $record ?: $this->_record;
-		$user    = $user ?: \Joomla\CMS\Factory::getUser();
+		$user    = $user ?: \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$isOwner = $record && $user->id && $record->uploaded_by == $user->id;
 
 		if ($record->id && $record->estorage_fieldid < 0)
@@ -257,7 +257,7 @@ class FlexicontentModelFile extends FCModelAdmin
 	public function canEditState($record = null, $user = null)
 	{
 		$record  = $record ?: $this->_record;
-		$user    = $user ?: \Joomla\CMS\Factory::getUser();
+		$user    = $user ?: \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$isOwner = $record && $user->id && $record->uploaded_by == $user->id;
 
 		$canpublish = $user->authorise('flexicontent.publishfile', 'com_flexicontent');
@@ -278,7 +278,7 @@ class FlexicontentModelFile extends FCModelAdmin
 	public function canDelete($record = null)
 	{
 		$record  = $record ?: $this->_record;
-		$user    = \Joomla\CMS\Factory::getUser();
+		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$isOwner = $record && $user->id && $record->uploaded_by == $user->id;
 
 		$candelete = $user->authorise('flexicontent.deletefile', 'com_flexicontent');

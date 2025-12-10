@@ -21,6 +21,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Uri\Uri;
 use Joomla\Filesystem\Path;
 use Joomla\Registry\Registry;
+use Joomla\Database\DatabaseInterface;
 
 defined('_JEXEC') or die('Restricted access');
 
@@ -108,7 +109,7 @@ class modFlexigooglemapHelper
 		/**
 		 * Retrieve the items having the map locations (for the given field and the given categories)
 		 */
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$queryLoc = 'SELECT a.*, b.field_id, b.value, b.valueorder '
 			. ', CASE WHEN CHAR_LENGTH(a.alias) THEN CONCAT_WS(\':\', a.id, a.alias) ELSE a.id END as itemslug'
 			. ', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as catslug'

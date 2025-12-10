@@ -13,6 +13,7 @@ defined('_JEXEC') or die;
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
+use Joomla\Database\DatabaseInterface;
 
 JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php');
 
@@ -75,7 +76,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		// Check for request forgeries
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 
 		$existing = $db->setQuery($db->getQuery(true)
             ->select('id')
@@ -198,10 +199,10 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		// Check for request forgeries
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 
-		\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, 'en-GB', true);
-		\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, null, true);
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, 'en-GB', true);
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, null, true);
 		
 		// !! IMPORTANT core fields have specific fields ID, ranging from 1 - 14
 		// !! Make sure these have been creating before trying to add any other fields into the flexicontent_fields DB table
@@ -335,7 +336,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		// Check for request forgeries
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$db->setQuery("SELECT extension_id FROM #__extensions WHERE element='com_flexicontent' AND type='component' ");
 		$flexi_comp_id = $db->loadResult();
 
@@ -408,7 +409,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		// Check for request forgeries
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 
 		$query 	= '
 		INSERT INTO `#__flexicontent_types`
@@ -462,7 +463,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
 		$format = strtolower($this->input->get('format', 'html', 'CMD'));
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 
 		$query	= 'UPDATE #__extensions'
 			. ' SET enabled = 1'
@@ -516,7 +517,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 	 */
 	function addMcatItemRelations()
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 
 		// 1st: remove orphan relations
 		$query = "DELETE rel.*"
@@ -568,7 +569,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		// Check for request forgeries
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$nullDate	= $db->getNullDate();
 
 		// Add language column
@@ -684,7 +685,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		// Check for request forgeries
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$nullDate	= $db->getNullDate();
 
 		$model  = $this->getModel('flexicontent');
@@ -751,7 +752,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 				{
 					$file = JPATH_SITE . DS . 'tmp' . DS . 'tbl_indexes_' . $tblname;
 					$file_contents = "" . time();
-					\Joomla\CMS\Filesystem\File::write($file, $file_contents);
+					\Joomla\Filesystem\File::write($file, $file_contents);
 
 					if (isset($update_queries[$tblname]))
 					{
@@ -787,7 +788,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 						}
 					}
 
-					\Joomla\CMS\Filesystem\File::delete($file);
+					\Joomla\Filesystem\File::delete($file);
 				}
 			}
 		}
@@ -808,7 +809,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		// Check for request forgeries
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$nullDate	= $db->getNullDate();
 
 		$query 	= " CREATE TABLE IF NOT EXISTS #__flexicontent_versions (
@@ -849,7 +850,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		// Check for request forgeries
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$nullDate	= $db->getNullDate();
 
 		$query 	= 'SELECT item_id, version FROM #__flexicontent_items_versions'
@@ -922,7 +923,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		// Check for request forgeries
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$nullDate	= $db->getNullDate();
 
 		$query 	= " CREATE TABLE IF NOT EXISTS #__flexicontent_authors_ext (
@@ -968,8 +969,8 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		$format = strtolower($this->input->get('format', 'html', 'CMD'));
 
 		// PhpThumb cache directory
-		$phpthumbcache 	= \Joomla\CMS\Filesystem\Path::clean(JPATH_SITE . DS . 'components' . DS . 'com_flexicontent' . DS . 'librairies' . DS . 'phpthumb' . DS . 'cache');
-		$success = \Joomla\CMS\Filesystem\Path::setPermissions($phpthumbcache, '0600', '0700');
+		$phpthumbcache 	= \Joomla\Filesystem\Path::clean(JPATH_SITE . DS . 'components' . DS . 'com_flexicontent' . DS . 'librairies' . DS . 'phpthumb' . DS . 'cache');
+		$success = \Joomla\Filesystem\Path::setPermissions($phpthumbcache, '0600', '0700');
 
 		if (!$success)
 		{
@@ -1009,7 +1010,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		// Check for request forgeries
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$cache_tbl = "#__flexicontent_items_tmp";
 
 		// Truncate the table, this will handle redudant columns too
@@ -1052,7 +1053,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		// Delete deprecated files that were found
 		foreach ($deprecated['files'] as $file)
 		{
-			if (!\Joomla\CMS\Filesystem\File::delete($file))
+			if (!\Joomla\Filesystem\File::delete($file))
 			{
 				echo 'Cannot delete legacy file: ' . $file . '<br />';
 			}
@@ -1061,7 +1062,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		// Delete deprecated folders that were found
 		foreach ($deprecated['folders'] as $folder)
 		{
-			if (!\Joomla\CMS\Filesystem\Folder::delete($folder))
+			if (!\Joomla\Filesystem\Folder::delete($folder))
 			{
 				echo 'Cannot delete legacy folder: ' . $folder . '<br />';
 			}
@@ -1095,7 +1096,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		// Check for request forgeries
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
-		$db  = \Joomla\CMS\Factory::getDbo();
+		$db  = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$app = \Joomla\CMS\Factory::getApplication();
 
 		$queries 	= array();

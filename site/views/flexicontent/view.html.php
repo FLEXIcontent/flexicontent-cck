@@ -39,7 +39,7 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 	{
 		//initialize variables
 		$app      = \Joomla\CMS\Factory::getApplication();
-		$document = \Joomla\CMS\Factory::getDocument();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$menus = $app->getMenu();
 		$menu  = $menus->getActive();
 		$uri   = \Joomla\CMS\Uri\Uri::getInstance();
@@ -66,7 +66,7 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 		if (!$params->get('disablecss', ''))
 		{
 			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
-			!\Joomla\CMS\Factory::getLanguage()->isRtl()
+			!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 		}

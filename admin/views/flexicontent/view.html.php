@@ -13,6 +13,11 @@ defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
+use Joomla\CMS\Factory;
+use Joomla\Filesystem\Path;
+use Joomla\Database\DatabaseInterface;
+use Joomla\CMS\Toolbar\ToolbarFactoryInterface;
+
 
 JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_records.php');
 
@@ -28,13 +33,13 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 	 */
 	function display( $tpl = null )
 	{
-		$app      = \Joomla\CMS\Factory::getApplication();
-		$config   = \Joomla\CMS\Factory::getConfig();
+		$app      = Factory::getApplication();
+		$config   = Factory::getApplication()->getConfig();
 		$params   = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
-		$document	= \Joomla\CMS\Factory::getDocument();
-		$session  = \Joomla\CMS\Factory::getSession();
-		$user     = \Joomla\CMS\Factory::getUser();
-		$db       = \Joomla\CMS\Factory::getDbo();
+		$document	= Factory::getApplication()->getDocument();
+		$session  = Factory::getApplication()->getSession();
+		$user     = Factory::getApplication()->getIdentity();
+		$db       = Factory::getContainer()->get(DatabaseInterface::class);
 		$print_logging_info = $params->get('print_logging_info');
 
 		// Load the file system librairies
@@ -126,10 +131,10 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 		// Add css and js to document
 		// **************************
 
-		!\Joomla\CMS\Factory::getLanguage()->isRtl()
+		!Factory::getApplication()->getLanguage()->isRtl()
 			? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
 			: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
-		!\Joomla\CMS\Factory::getLanguage()->isRtl()
+		!Factory::getApplication()->getLanguage()->isRtl()
 			? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 			: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 
@@ -159,7 +164,7 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 		$js = "jQuery(document).ready(function(){";
 
 		// Create the toolbar
-		$toolbar = \Joomla\CMS\Toolbar\Toolbar::getInstance('toolbar');
+		$toolbar = \Joomla\CMS\Factory::getApplication()->getDocument()->getToolbar('toolbar');
 		$loading_msg = flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_LOADING') .' ... '. \Joomla\CMS\Language\Text::_('FLEXI_PLEASE_WAIT'), 2);
 
 		if($perms->CanConfig)
@@ -226,12 +231,14 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 		$lists 		= array();
 		$options 	= array();
 		$folder 	= JPATH_ADMINISTRATOR.DS.'language';
-		$langs 		= \Joomla\CMS\Filesystem\Folder::folders($folder);
+		$langs 		= \Joomla\Filesystem\Folder::folders($folder);
 		$activelang = \Joomla\CMS\Component\ComponentHelper::getParams('com_languages')->get('administrator', 'en-GB');
 
-		foreach ($langs as $lang) {
-			$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', $lang, $lang);
-		}
+if (is_array($langs)) {
+    foreach ($langs as $lang) {
+        $options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', $lang, $lang);
+    }
+}
 		$lists['languages'] = \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $options, 'lang', '', 'value', 'text', $activelang);
 
 		// Missing files
@@ -311,7 +318,7 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 	function quickiconButton( $link, $image, $iconfont, $text, $modal = 0, $modal_create_iframe = 1, $modal_width=0, $modal_height=0, $close_function = 'false')
 	{
 		// Initialise variables
-		$lang = \Joomla\CMS\Factory::getLanguage();
+		$lang = Factory::getApplication()->getLanguage();
 		$link_attribs = $modal
 			? ' onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', '.((int)(!$modal_create_iframe)).', '.$modal_width.', '.$modal_height.', ' . $close_function . ', {\'title\': \''.flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_($text), 2).'\'}); return false;"'
 			: '';

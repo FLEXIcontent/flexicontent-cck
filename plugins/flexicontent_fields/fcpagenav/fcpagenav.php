@@ -5,11 +5,12 @@
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright © 2020, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright ï¿½ 2020, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
+use Joomla\Database\DatabaseInterface;
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
 class plgFlexicontent_fieldsFcpagenav extends FCField
@@ -63,7 +64,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 			$initialized = 1;
 
 			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$document  = \Joomla\CMS\Factory::getApplication()->getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -83,8 +84,8 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		$isMatchedItemView = static::$itemViewId === (int) $item->id;
 
 		global $globalcats;
-		$db   = \Joomla\CMS\Factory::getDbo();
-		$user = \Joomla\CMS\Factory::getUser();
+		$db   = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$print  = $app->input->get('print', '', 'cmd');
 		$add_tooltips = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('add_tooltips', 1);
 
@@ -293,7 +294,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		}
 		if ($load_css)
 		{
-			\Joomla\CMS\Factory::getDocument()->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/plugins/flexicontent_fields/fcpagenav/'.(FLEXI_J16GE ? 'fcpagenav/' : '').'fcpagenav.css');
+			\Joomla\CMS\Factory::getApplication()->getDocument()->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/plugins/flexicontent_fields/fcpagenav/'.(FLEXI_J16GE ? 'fcpagenav/' : '').'fcpagenav.css');
 		}
 
 		// $html variable , should be set by the layout file
@@ -376,7 +377,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		$cat->introtext = & $cat->description;
 		$cat->fulltext = "";
 
-		if ( $cat_image_source && $cat->image && \Joomla\CMS\Filesystem\File::exists( JPATH_SITE .DS. $joomla_image_path . $cat->image ) ) {
+		if ( $cat_image_source && $cat->image && \Joomla\Filesystem\File::exists( JPATH_SITE .DS. $joomla_image_path . $cat->image ) ) {
 			$src = \Joomla\CMS\Uri\Uri::base(true) ."/". $joomla_image_url . $cat->image;
 
 			$w		= '&amp;w=' . $params->get($rprefix.'_width', 200);
@@ -413,7 +414,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 	function getItemList(&$ids=null, $cid=null, &$userid=0)
 	{
 		$app = \Joomla\CMS\Factory::getApplication();
-		$db  = \Joomla\CMS\Factory::getDbo();
+		$db  = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 
 		if ($ids===null)
 		{
@@ -479,8 +480,8 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 	function &_getDataCats($id_arr, &$cparams)
 	{
 		global $globalcats;
-		$db   = \Joomla\CMS\Factory::getDbo();
-		$user = \Joomla\CMS\Factory::getUser();
+		$db   = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$ordering = 'c.lft ASC';
 
 		$show_noauth = $cparams->get('show_noauth', 0);   // show unauthorized items

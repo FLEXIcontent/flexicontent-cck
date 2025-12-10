@@ -86,7 +86,7 @@ if ($ff_placement)
 	echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endSlide');
 	echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endAccordion');
 	
-	\Joomla\CMS\Factory::getDocument()->addScriptDeclaration("
+	\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration("
 	(function($) {
 		$(document).ready(function ()
 		{
@@ -128,7 +128,7 @@ if ($ff_placement)
 
 if ($scroll_to_anchor_tag)
 {
-	\Joomla\CMS\Factory::getDocument()->addScriptDeclaration("
+	\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration("
 	(function($) {
 		$(document).ready(function ()
 		{

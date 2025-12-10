@@ -90,3 +90,11 @@ site/uploads/*
 site/medias/*
 !site/uploads/.htaccess
 !site/medias/.htaccess
+site/templates/faq/category_items_html5.php
+site/templates/faq/category_items_html5.php
+site/templates/grid/category_items_html5.php
+site/templates/grid/item_html5.php
+site/templates/items-tabbed/category_items_html5.php
+site/templates/table/category_items_html5.php
+site/tmpl_common/item_layouts/modular_html5.php
+site/tmpl_common/listings_filter_form_html5.php

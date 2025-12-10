@@ -26,7 +26,7 @@ if (empty($renderedMapLocations) && (int)$params->get('hide_map_when_empty', '1'
 }
 
 \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip');
-$document = \Joomla\CMS\Factory::getDocument();
+$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 $modified = filemtime(__DIR__ . '/../assets/css/style.css');
 $document->addStyleSheet(Uri::root(true) . '/modules/mod_flexigooglemap/assets/css/style.css?v=' . $modified);
 

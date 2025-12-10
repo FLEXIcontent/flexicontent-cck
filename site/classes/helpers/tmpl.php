@@ -1,6 +1,9 @@
 <?php
 defined( '_JEXEC' ) or die( 'Restricted access' );
 use Joomla\String\StringHelper;
+use Joomla\CMS\Factory;
+use Joomla\Filesystem\Path;
+use Joomla\Database\DatabaseInterface;
 
 class flexicontent_tmpl
 {
@@ -68,15 +71,15 @@ class flexicontent_tmpl
 		foreach ($layout_types as $layout_type => $view)
 		{
 			// Parse & Load the XML file of the current layout
-			$tmplxml = \Joomla\CMS\Filesystem\Path::clean($tmpldir.DS.$tmplname.DS.$view.'.xml');
-			if ( \Joomla\CMS\Filesystem\File::exists($tmplxml) && empty($themes->$layout_type->$tmplname) )
+			$tmplxml = Path::clean($tmpldir.DS.$tmplname.DS.$view.'.xml');
+			if ( \Joomla\Filesystem\File::exists($tmplxml) && empty($themes->$layout_type->$tmplname) )
 			{
 				// Parse the XML file
 				// About load addition XML file, please see: https://github.com/FLEXIcontent/flexicontent-cck/pull/961
 				$doc = @simplexml_load_file($tmplxml, null, LIBXML_NOENT);
 				if (!$doc)
 				{
-					if (\Joomla\CMS\Factory::getApplication()->isClient('administrator')) \Joomla\CMS\Factory::getApplication()->enqueueMessage('Syntax error(s) in template XML file: '. $tmplxml, 'notice');
+					if (Factory::getApplication()->isClient('administrator')) Factory::getApplication()->enqueueMessage('Syntax error(s) in template XML file: '. $tmplxml, 'notice');
 					continue;
 				}
 				
@@ -136,7 +139,7 @@ class flexicontent_tmpl
 					$t->less_files = array();
 					for ($n=0; $n<count($cssfiles); $n++) {
 						$t->css->$n = $tmpl_path. (string)$cssfiles[$n];
-						$less_file = \Joomla\CMS\Filesystem\Path::clean( preg_replace('/^css|css$/', 'less', (string)$cssfiles[$n]) );
+						$less_file = Path::clean( preg_replace('/^css|css$/', 'less', (string)$cssfiles[$n]) );
 						$t->less_files[] = $less_file;
 					}
 				}
@@ -171,7 +174,7 @@ class flexicontent_tmpl
 		if ( $apply_cache )
 		{
 			// Get template XML data from cache
-			$tmplcache = \Joomla\CMS\Factory::getCache('com_flexicontent_tmpl');  // Get Joomla Cache of '...tmpl' Caching Group
+			$tmplcache = Factory::getCache('com_flexicontent_tmpl');  // Get Joomla Cache of '...tmpl' Caching Group
 			$tmplcache->setCaching(1); 		              // Force cache ON
 			$tmplcache->setLifeTime(FLEXI_CACHE_TIME); 	// Set expire time (default is 1 hour)
 			$tmpls = $tmplcache->get(
@@ -239,9 +242,9 @@ class flexicontent_tmpl
 				// This call only sets non-changed templates so that they are not reparsed
 				flexicontent_tmpl::parseTemplates_checked($tmpldir, $tmpls);
 				
-				if ($debug && !empty($modified) )        \Joomla\CMS\Factory::getApplication()->enqueueMessage("Re-parsing XMLs, XML file modified: ".$modified_file_list, 'message');
-				if ($debug && !empty($new_layouts) )     \Joomla\CMS\Factory::getApplication()->enqueueMessage("Parsing new templates: ".implode(', ', $new_layouts), 'message');
-				if ($debug && !empty($deleted_layouts) ) \Joomla\CMS\Factory::getApplication()->enqueueMessage("Cleaned cache from deleted templates: ".implode(', ', $deleted_layouts), 'message');
+				if ($debug && !empty($modified) )        Factory::getApplication()->enqueueMessage("Re-parsing XMLs, XML file modified: ".$modified_file_list, 'message');
+				if ($debug && !empty($new_layouts) )     Factory::getApplication()->enqueueMessage("Parsing new templates: ".implode(', ', $new_layouts), 'message');
+				if ($debug && !empty($deleted_layouts) ) Factory::getApplication()->enqueueMessage("Cleaned cache from deleted templates: ".implode(', ', $deleted_layouts), 'message');
 				
 				// Clean and update caching re-parsing only new or changed XML files
 				$tmplcache->clean();
@@ -265,7 +268,7 @@ class flexicontent_tmpl
 		jimport('joomla.filesystem.path' );
 		jimport('joomla.filesystem.file');
 		
-		$templates_path = \Joomla\CMS\Filesystem\Path::clean(JPATH_SITE.DS.'components/com_flexicontent/templates/');
+		$templates_path = Path::clean(JPATH_SITE.DS.'components/com_flexicontent/templates/');
 		
 		foreach($checked_layouts as $tmplname)
 		{
@@ -317,7 +320,7 @@ class flexicontent_tmpl
 		{
 			foreach($_tmpls as $tmpl)
 			{
-				if (!\Joomla\CMS\Filesystem\File::exists($tmpl->xmlpath) || filemtime($tmpl->xmlpath) > $tmpl->xmlmtime)
+				if (!\Joomla\Filesystem\File::exists($tmpl->xmlpath) || filemtime($tmpl->xmlpath) > $tmpl->xmlmtime)
 				{
 					$modified_files[$tmpl->name][$layout_type] = $tmpl->xmlpath;
 				}
@@ -339,7 +342,7 @@ class flexicontent_tmpl
 		$apply_cache = 1;//FLEXI_CACHE;
 		if ( $apply_cache )
 		{
-			$tmplcache = \Joomla\CMS\Factory::getCache('com_flexicontent_tmpl');  // Get Joomla Cache of '...tmpl' Caching Group
+			$tmplcache = Factory::getCache('com_flexicontent_tmpl');  // Get Joomla Cache of '...tmpl' Caching Group
 			$tmplcache->setCaching(1); 		              // Force cache ON
 			$tmplcache->setLifeTime(FLEXI_CACHE_TIME); 	// Set expire time (default is 1 hour)
 			$layout_texts = $tmplcache->get(
@@ -401,7 +404,7 @@ class flexicontent_tmpl
 		static $layout_params = array();
 		if ( !$force && isset($layout_params[$type][$folder][$cfgname]) ) return $layout_params[$type][$folder][$cfgname];
 		
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = Factory::getContainer()->get(DatabaseInterface::class);
 		$query = 'SELECT template as folder, cfgname, attribs, layout as type'
 			. ' FROM #__flexicontent_layouts_conf';
 		$db->setQuery($query);
@@ -477,7 +480,7 @@ class flexicontent_tmpl
 	{
 		jimport('joomla.filesystem.folder');
 		$tmpldir = $tmpldir ? $tmpldir : JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates';
-		$themes = \Joomla\CMS\Filesystem\Folder::folders($tmpldir);  // Get specific template folder
+		$themes = \Joomla\Filesystem\Folder::folders($tmpldir);  // Get specific template folder
 
 		return $themes;
 	}
@@ -496,7 +499,7 @@ class flexicontent_tmpl
 			$templates[$folder] = array();
 		}
 		if(!isset($templates[$folder][$type])) {
-			$db = \Joomla\CMS\Factory::getDbo();
+			$db = Factory::getContainer()->get(DatabaseInterface::class);
 			$query  = 'SELECT *'
 					. ' FROM #__flexicontent_templates'
 					. ' WHERE template = ' . $db->Quote($folder)
@@ -532,7 +535,7 @@ class flexicontent_tmpl
 		$layout = !is_object($layout) ? (object) $layout : $layout;
 
 		// Check layout file exists
-		$layout->path = \Joomla\CMS\Filesystem\Path::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS. $layout->name .DS. $layout->type .'.xml');
+		$layout->path = Path::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS. $layout->name .DS. $layout->type .'.xml');
 		if ( !$layout->path || !file_exists($layout->path) )
 		{
 			return $layout_data;
@@ -542,7 +545,7 @@ class flexicontent_tmpl
 		$xml = simplexml_load_file($layout->path);
 		if (!$xml)
 		{
-			\Joomla\CMS\Factory::getApplication()->enqueueMessage('Error parsing layout file of "' . $layout->name . '". Layout parameters were not saved', 'warning');
+			Factory::getApplication()->enqueueMessage('Error parsing layout file of "' . $layout->name . '". Layout parameters were not saved', 'warning');
 			return $layout_data;
 		}
 
@@ -574,7 +577,7 @@ class flexicontent_tmpl
 
 		if (!$isValid)
 		{
-			\Joomla\CMS\Factory::getApplication()->enqueueMessage('Skipped saving of layout parameters. <br/> Error during their validation (invalid field value or required field value missing).', 'warning');
+			Factory::getApplication()->enqueueMessage('Skipped saving of layout parameters. <br/> Error during their validation (invalid field value or required field value missing).', 'warning');
 		}
 
 		return $layout_data[$layout->fset];

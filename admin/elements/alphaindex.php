@@ -18,6 +18,8 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
+use Joomla\Database\DatabaseInterface;
+use Joomla\CMS\Factory;
 
 jimport('cms.html.html');      // JHtml
 jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
@@ -53,8 +55,8 @@ class JFormFieldAlphaindex extends \Joomla\CMS\Form\FormField
 
 	function getInput()
 	{
-		$doc  = \Joomla\CMS\Factory::getDocument();
-		$db   = \Joomla\CMS\Factory::getDbo();
+		$doc  = Factory::getApplication()->getDocument();
+		$db   = Factory::getContainer()->get(DatabaseInterface::class);
 
 		$node = & $this->element;
 		$attributes = get_object_vars($node->attributes());

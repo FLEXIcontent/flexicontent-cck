@@ -303,7 +303,7 @@ class flexicontent_categories extends _flexicontent_categories
 	{
 		$updateNulls = FLEXI_J40GE ? $updateNulls : false;
 		$date	= \Joomla\CMS\Factory::getDate();
-		$user	= \Joomla\CMS\Factory::getUser();
+		$user	= \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		// Existing category
 		if ($this->id)

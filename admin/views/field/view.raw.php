@@ -33,7 +33,7 @@ class FlexicontentViewField extends \Joomla\CMS\MVC\View\HtmlView
 
 		$app      = \Joomla\CMS\Factory::getApplication();
 		$jinput   = $app->input;
-		$user     = \Joomla\CMS\Factory::getUser();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		// Get url vars and some constants
 		$cid = $jinput->getInt('cid', 0);

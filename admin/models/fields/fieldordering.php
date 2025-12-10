@@ -13,6 +13,7 @@ defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
+use Joomla\Database\DatabaseInterface;
 
 jimport('cms.html.html');      // JHtml
 jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
@@ -61,7 +62,7 @@ class JFormFieldFieldordering extends \Joomla\CMS\Form\FormField
 		// Initialize JavaScript field attributes.
 		$attr .= $this->element['onchange'] ? ' onchange="'.(string) $this->element['onchange'].'"' : '';
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 
 		// Build the query for the ordering list.
 		$query = 'SELECT ordering AS value, label AS text'

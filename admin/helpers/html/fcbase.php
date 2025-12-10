@@ -255,7 +255,7 @@ abstract class JHtmlFcbase
 			: '';
 
 		// Display title with no edit link ... if row is not-editable for any reason (no ACL or checked-out by other user)
-		if (!$canEdit || ($row->checked_out && (int) $row->checked_out !== (int) \Joomla\CMS\Factory::getUser()->id))
+		if (!$canEdit || ($row->checked_out && (int) $row->checked_out !== (int) \Joomla\CMS\Factory::getApplication()->getIdentity()->id))
 		{
 			return $title_cut . $title_untranslated;
 		}

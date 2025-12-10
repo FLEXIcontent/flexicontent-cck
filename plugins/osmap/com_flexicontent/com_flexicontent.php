@@ -17,6 +17,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
+use Joomla\Database\DatabaseInterface;
 
 require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
@@ -297,8 +298,8 @@ class osmap_com_flexicontent
 		if ($initialized === null)
 		{
 			$initialized = true;
-			$db    = \Joomla\CMS\Factory::getDBO();
-			$user  = \Joomla\CMS\Factory::getUser();
+			$db    = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+			$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 			$date  = \Joomla\CMS\Factory::getDate();
 			$nullDate = $db->getNullDate();
 			$now = 'UTC_TIMESTAMP()'; //$this->_db->Quote( $date->toMySQL() );
@@ -462,8 +463,8 @@ class osmap_com_flexicontent
 		if ($initialized === null)
 		{
 			$initialized = true;
-			$db    = \Joomla\CMS\Factory::getDBO();
-			$user  = \Joomla\CMS\Factory::getUser();
+			$db    = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+			$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 			$date  = \Joomla\CMS\Factory::getDate();
 			$nullDate = $db->getNullDate();
 			$now = 'UTC_TIMESTAMP()'; //$this->_db->Quote( $date->toMySQL() );
@@ -498,8 +499,8 @@ class osmap_com_flexicontent
 		if ($initialized === null)
 		{
 			$initialized = true;
-			$db    = \Joomla\CMS\Factory::getDBO();
-			$user  = \Joomla\CMS\Factory::getUser();
+			$db    = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+			$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 			$date  = \Joomla\CMS\Factory::getDate();
 			$_nowDate = 'UTC_TIMESTAMP()'; //$this->_db->Quote( $date->toMySQL() );
 			$nullDate = $db->getNullDate();
@@ -569,7 +570,7 @@ class osmap_com_flexicontent
 		// CASE A: Select content according to CURRENT USER ACCESS Level
 		if (!$params['show_noauth'])
 		{
-			$user = \Joomla\CMS\Factory::getUser();
+			$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 			$aid_arr = $user->getAuthorisedViewLevels();
 			$aid_list = implode(",", $aid_arr);

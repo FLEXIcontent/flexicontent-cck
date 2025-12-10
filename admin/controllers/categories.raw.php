@@ -104,7 +104,7 @@ class FlexicontentControllerCategories extends FlexicontentControllerBaseAdmin
 
 		$destid = ArrayHelper::toInteger($destid);
 
-		$user   = \Joomla\CMS\Factory::getUser();
+		$user   = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$model  = $this->getModel($this->record_name);
 		$params = $model->getParams($copyid);
 

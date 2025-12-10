@@ -18,6 +18,8 @@
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
+use Joomla\Database\DatabaseInterface;
+use Joomla\CMS\Factory;
 
 jimport('cms.html.html');      // JHtml
 jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
@@ -97,7 +99,7 @@ class JFormFieldFLEXIUsergroup extends \Joomla\CMS\Form\FormField  // \Joomla\CM
 			$extra_options[] = $tmp;
 		}
 		
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = Factory::getContainer()->get(DatabaseInterface::class);
 		$db->setQuery(
 			'SELECT a.id AS value, a.title AS text, COUNT(DISTINCT b.id) AS level' .
 			' FROM #__usergroups AS a' .

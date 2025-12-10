@@ -75,7 +75,7 @@ class plgFlexicontent_fieldsJProfile extends FCField
 		}
 
 		// Initialize framework objects and other variables
-		$document = \Joomla\CMS\Factory::getDocument();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
 		$app      = \Joomla\CMS\Factory::getApplication();
 		$isSite   = $app->isClient('site');
@@ -496,7 +496,7 @@ class plgFlexicontent_fieldsJProfile extends FCField
 			$initialized = 1;
 
 			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$document  = \Joomla\CMS\Factory::getApplication()->getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -517,8 +517,8 @@ class plgFlexicontent_fieldsJProfile extends FCField
 		{
 			$users = array();
 			jimport('joomla.user.helper');
-			\Joomla\CMS\Factory::getLanguage()->load('com_users', JPATH_SITE, 'en-GB', $force_reload = false);
-			\Joomla\CMS\Factory::getLanguage()->load('com_users', JPATH_SITE, null, $force_reload = false);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_users', JPATH_SITE, 'en-GB', $force_reload = false);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_users', JPATH_SITE, null, $force_reload = false);
 		}
 
 
@@ -542,7 +542,7 @@ class plgFlexicontent_fieldsJProfile extends FCField
 		{
 			// Current user
 			case 3:
-				$values = array((int) \Joomla\CMS\Factory::getUser()->id);
+				$values = array((int) \Joomla\CMS\Factory::getApplication()->getIdentity()->id);
 				break;
 
 			// Values (user ids) selected in item form

@@ -470,7 +470,7 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 		if ( !$pk ) return true;
 
 		// Get current user
-		$user	= \Joomla\CMS\Factory::getUser();
+		$user	= \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$uid	= $user->get('id');
 
 		// Lets get table record and checkout the it
@@ -917,7 +917,7 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 		}
 
 		$record = $record ?: $this->_record;
-		$user   = $user ?: \Joomla\CMS\Factory::getUser();
+		$user   = $user ?: \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		return false;
 	}
@@ -938,7 +938,7 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 		}
 
 		$record = $record ?: $this->_record;
-		$user   = $user ?: \Joomla\CMS\Factory::getUser();
+		$user   = $user ?: \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		return false;
 	}
@@ -1036,12 +1036,12 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 		foreach($options['model_names'] as $extension_name => $model_name)
 		{
 			// Check XML file exists
-			$model_xml_filepath = \Joomla\CMS\Filesystem\Path::clean(JPATH_BASE.DS.'components'.DS . $extension_name . DS.'models'.DS.'forms'.DS . $model_name . '.xml');
+			$model_xml_filepath = \Joomla\Filesystem\Path::clean(JPATH_BASE.DS.'components'.DS . $extension_name . DS.'models'.DS.'forms'.DS . $model_name . '.xml');
 			$file_exists = file_exists($model_xml_filepath);
 
 			if (!$file_exists && FLEXI_J40GE)
 			{
-				$model_xml_filepath = \Joomla\CMS\Filesystem\Path::clean(JPATH_BASE.DS.'components'.DS . $extension_name . DS.'forms'.DS . $model_name . '.xml');
+				$model_xml_filepath = \Joomla\Filesystem\Path::clean(JPATH_BASE.DS.'components'.DS . $extension_name . DS.'forms'.DS . $model_name . '.xml');
 				$file_exists = file_exists($model_xml_filepath);
 			}
 
@@ -1157,7 +1157,7 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 			$this->batchSet = true;
 
 			// Get current user
-			$this->user = \Joomla\CMS\Factory::getUser();
+			$this->user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 			// Get table
 			$this->table = $this->getTable($this->records_dbtbl, 'JTable');
@@ -1515,7 +1515,7 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 	public function setitemstate($id, $state = 1, $cleanCache = true)
 	{
 		$app  = \Joomla\CMS\Factory::getApplication();
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		static $event_failed_notice_added = false;
 

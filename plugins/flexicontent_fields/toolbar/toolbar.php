@@ -10,6 +10,7 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
+use Joomla\Database\DatabaseInterface;
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
 
@@ -64,7 +65,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 			$initialized = 1;
 
 			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$document  = \Joomla\CMS\Factory::getApplication()->getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -83,7 +84,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 		if ($app->input->get('print', '', 'cmd')) return;
 
 		//$scheme = \Joomla\CMS\Uri\Uri::getInstance()->getScheme();  // we replaced http(s):// with //
-		$document	= \Joomla\CMS\Factory::getDocument();
+		$document	= \Joomla\CMS\Factory::getApplication()->getDocument();
 
 		$lang = $document->getLanguage();
 		$lang = $item->parameters->get('language', $lang);
@@ -260,7 +261,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 
 	private function _getCommentsCount($id)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		static $jcomment_installed = null;
 
 		if ($jcomment_installed===null) {
