@@ -48,6 +48,43 @@ $files = array(
 	JPATH_SITE . '/components/com_flexicontent/librairies/jquery/css/ui-lightness/jquery-ui-1.13.0.css',
 	JPATH_SITE . '/components/com_flexicontent/librairies/jquery/css/ui-lightness/jquery-ui-1.13.0.min.css',
 	JPATH_SITE . '/components/com_flexicontent/librairies/jquery/js/jquery-ui-1.13.1/package.json',
+	//clean html5 file in common
+	JPATH_SITE . '/components/com_flexicontent/tmpl_common/category_alpha_html5.php',
+	JPATH_SITE . '/components/com_flexicontent/tmpl_common/category_category_html5.php',
+	JPATH_SITE . '/components/com_flexicontent/tmpl_common/category_html5.php',
+	JPATH_SITE . '/components/com_flexicontent/tmpl_common/category_peercategories_html5.php',
+	JPATH_SITE . '/components/com_flexicontent/tmpl_common/category_subcategories_html5.php',
+	JPATH_SITE . '/components/com_flexicontent/tmpl_common/listing_filter_form_body_html5.php',
+	JPATH_SITE . '/components/com_flexicontent/tmpl_common/listing_filter_form_html5.php',
+	JPATH_SITE . '/components/com_flexicontent/tmpl_common/item_layouts/modular_html5.php',
+	//clean html5 file in grid
+	JPATH_SITE . '/components/com_flexicontent/templates/grid/category_alpha_html5.php',
+	JPATH_SITE . '/components/com_flexicontent/templates/grid/category_category_html5.php',
+	JPATH_SITE . '/components/com_flexicontent/templates/grid/category_html5.php',
+	JPATH_SITE . '/components/com_flexicontent/templates/grid/category_peercategories_html5.php',
+	JPATH_SITE . '/components/com_flexicontent/templates/grid/category_subcategories_html5.php',
+	JPATH_SITE . '/components/com_flexicontent/templates/grid/item_html5.php',
+	//clean html5 file in table
+	JPATH_SITE . '/components/com_flexicontent/templates/table/category_alpha_html5.php',
+	JPATH_SITE . '/components/com_flexicontent/templates/table/category_category_html5.php',
+	JPATH_SITE . '/components/com_flexicontent/templates/table/category_html5.php',
+	JPATH_SITE . '/components/com_flexicontent/templates/table/category_peercategories_html5.php',
+	JPATH_SITE . '/components/com_flexicontent/templates/table/category_subcategories_html5.php',
+	JPATH_SITE . '/components/com_flexicontent/templates/table/item_html5.php',
+	//clean html5 file in faq
+	JPATH_SITE . '/components/com_flexicontent/templates/faq/category_alpha_html5.php',
+	JPATH_SITE . '/components/com_flexicontent/templates/faq/category_category_html5.php',
+	JPATH_SITE . '/components/com_flexicontent/templates/faq/category_html5.php',
+	JPATH_SITE . '/components/com_flexicontent/templates/faq/category_peercategories_html5.php',
+	JPATH_SITE . '/components/com_flexicontent/templates/faq/category_subcategories_html5.php',
+	JPATH_SITE . '/components/com_flexicontent/templates/faq/item_html5.php',
+	//clean html5 file in item_tabbed
+	JPATH_SITE . '/components/com_flexicontent/templates/item_tabbed/category_alpha_html5.php',
+	JPATH_SITE . '/components/com_flexicontent/templates/item_tabbed/category_category_html5.php',
+	JPATH_SITE . '/components/com_flexicontent/templates/item_tabbed/category_html5.php',
+	JPATH_SITE . '/components/com_flexicontent/templates/item_tabbed/category_peercategories_html5.php',
+	JPATH_SITE . '/components/com_flexicontent/templates/item_tabbed/category_subcategories_html5.php',
+	JPATH_SITE . '/components/com_flexicontent/templates/item_tabbed/item_html5.php',
 );
 
 $folders = array(
