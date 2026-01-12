@@ -155,7 +155,7 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 			$target_dir = $field->parameters->get('target_dir', '');
 			$filter_secure = !strlen($target_dir) || $target_dir!=2  ?  ''  :  $filter_secure;
 
-			$filelist_cols = FLEXIUtilities::paramToArray( $field->parameters->get('filelist_cols', array('upload_time', 'hits')) );
+			$filelist_cols = FLEXIUtilities::paramToArray( $field->parameters->get('filelist_cols', array('upload_time', 'access', 'hits')) );
 
 		}
 
@@ -163,6 +163,8 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 		/**
 		 * Column selection of optional columns given
 		 */
+		$filelist_cols = $filelist_cols ?? false;
+		$filelist_cols = $filelist_cols ?: array('upload_time', 'access', 'size');
 
 		if (!empty($filelist_cols))
 		{
