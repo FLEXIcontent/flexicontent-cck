@@ -320,6 +320,7 @@ class FlexicontentModelAppsman extends \Joomla\CMS\MVC\Model\ListModel
 
 	function doImport_flexicontent_fields_type_relations($rows, $remap)
 	{
+		$db = \Joomla\CMS\Factory::getDbo();
 		$table_name = 'flexicontent_fields_type_relations';
 		foreach ($rows as $row)
 		{
@@ -333,11 +334,13 @@ class FlexicontentModelAppsman extends \Joomla\CMS\MVC\Model\ListModel
 					default: $obj->$col = $val;  break;
 				}
 			}
-			echo $table_name." <br/><pre>";	print_r($obj); echo "</pre>";
-			exit;
+
+			echo 'Added relation to table: ' . $table_name." <br/>";
+			//echo '<pre>' ; print_r($obj); echo "</pre>";
+			//exit;
 
 			// Insert record in DB
-			//$db->insertObject('#__'.$table_name, $obj);
+			$db->insertObject('#__'.$table_name, $obj);
 		}
 		return;
 	}

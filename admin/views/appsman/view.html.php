@@ -296,7 +296,7 @@ class FlexicontentViewAppsman extends \Joomla\CMS\MVC\View\HtmlView
 				$btn_task    = ''; //'appsman.processxml';
 				$extra_js    = "";
 				flexicontent_html::addToolBarButton(
-					$import_btn_title, $btn_name, $full_js='', $msg_alert='', $msg_confirm='Current version does not allow import',
+					$import_btn_title, $btn_name, $full_js='Joomla.submitbutton(\'appsman.processxml\')', $msg_alert='', $msg_confirm='Click OK to start the import process.',
 					$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=true, $btn_class="btn", $btn_icon);
 
 			}

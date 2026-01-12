@@ -353,15 +353,54 @@ class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 						continue;
 					}
 
+					echo "Doing table: " . $table_name . "<br/>";
+
 					$id_colname = self::$table_idcols[$table_name];
+
+					if ($table_name === 'flexicontent_fields')
+					{
+						$corePropsFields = $db->setQuery($db->getQuery(true)
+							->select('*')
+							->from('#__flexicontent_fields')
+							->where('field_type = ' . $db->quote('coreprops'))
+							->where('name LIKE ' . $db->quote('form_%'))
+						)->loadObjectList('name');
+						//echo '<pre>'; print_r($corePropsFields); exit;
+					}
 
 					foreach ($rows as $row)
 					{
 						$obj = new stdClass;
+						$__idColVal     = isset($row->id)
+							? (int) trim((string) $row->id, '"')
+							: 0;
+						$__nameColVal   = isset($row->name)
+							? trim((string) $row->name, '"')
+							: '';
+						$__isCoreColVal = isset($row->iscore)
+							? (int) trim((string) $row->iscore, '"')
+							: 0;
+
+						if ($table_name === 'flexicontent_fields' && $__nameColVal && isset($corePropsFields[$__nameColVal]))
+						{
+							/**
+							 * Skip coreprops field columns, doing a remap of the existing 'coreprops' field in current website installation
+							 */
+							$remap[$table_name][(string)$__idColVal] = (int) $corePropsFields[$__nameColVal]->id;
+							continue;
+						}
+						else if ($table_name === 'flexicontent_fields' && (int) $__isCoreColVal)
+						{
+							/**
+							 * Skip core field columns, and maintain the ID (remapping to same ID)
+							 */
+							$remap[$table_name][(string)$__idColVal] = (int) $__idColVal;
+							continue;
+						}
 
 						foreach ($row as $col => $val)
 						{
-							$val = trim((string) $val, '"');
+							$val = stripslashes(trim((string) $val, '"'));
 
 							if ($col == $id_colname)
 							{
@@ -378,21 +417,24 @@ class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 							}
 							else
 							{
-								$obj->$col = ($col == $id_colname && $table_name !== 'flexicontent_templates') ? 0 : $val;
+								$obj->$col = ($col == $id_colname && $table_name !== 'flexicontent_templates')
+									? 0
+									: $val;
 							}
 						}
 
-						echo $table_name . '<br/>';
-						echo '<pre>' . print_r($obj, true) . '</pre>';
+						//echo 'Doing: ' . $table_name . ' row<br/>';
+						//echo '<pre>' . print_r($obj, true) . '</pre>';
 
 						// Insert record in DB
-						// $db->insertObject('#__'.$table_name, $obj);
+						$db->insertObject('#__'.$table_name, $obj);
 
 						// Get id of the new record
 						$new_id = (int) $db->insertid();
-						$remap[$table_name][$old_id] = $new_id;
+						$remap[$table_name][(string) $old_id] = $new_id;
 					}
 				}
+				//echo "<pre>"; print_r($remap); exit;
 
 				// Special handling tables
 				foreach ($xml->rows as $table)
