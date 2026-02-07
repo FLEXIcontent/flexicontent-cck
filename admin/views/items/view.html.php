@@ -1240,6 +1240,19 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		// build the secondary categories select list
 		$lists['seccats'] = flexicontent_cats::buildcatselect($categories, 'seccats[]', '', 0, 'class="use_select2_lib" multiple="multiple" size="10"', false, false);
 
+		// build tags selection list for batch operations
+		$lists['tags'] = flexicontent_html::buildtagsselect(
+			'tags[]',
+			array(
+				'id' => 'tags',
+				'class' => 'use_select2_lib',
+				'multiple' => 'multiple',
+				'size' => '10',
+			),
+			array(),
+			$displaytype = 0
+		);
+
 		// build language selection
 		$lists['language'] = flexicontent_html::buildlanguageslist(
 			'language',
@@ -1604,39 +1617,39 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 			);
 		}
 
-                if ($perms->CanConfig)
-                {
-                        $popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&amp;view=items&amp;layout=indexer&amp;tmpl=component&amp;indexer=resave';
-                        $btn_name = 'recalculate_alias';
-                        $full_js="if (!confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('Recalculate item aliases. <br>Only for new websites <br>as this can destroy your existing SEO ranks'), 2)) . "')) return false; var url = jQuery(this).data('taskurl'); fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
-                                                .$loading_msg."<\/span>'; window.location.reload(false)}, {'title': '".flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('Recalculate aliases for all items'), 2)."'}); return false;";
-                        $btn_arr[] = flexicontent_html::addToolBarButton(
-                                'Recalculate aliases for all items', $btn_name, $full_js,
-                                $msg_alert = \Joomla\CMS\Language\Text::_('FLEXI_NO_ITEMS_SELECTED'), $msg_confirm = '',
-                                $btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
-                                $this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? '_DDI_class_ ' . $this->btn_iv_class : '') . ' ' . $this->tooltip_class, 'icon-loop',
-                                'data-placement="right" data-taskurl="' . $popup_load_url .'" data-title="' . flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('Clear the aliases of items and recalculates them according to current Joomla settings'), 2) . '"', $auto_add = 0, $tag_type='button'
-                        );
+				if ($perms->CanConfig)
+				{
+						$popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&amp;view=items&amp;layout=indexer&amp;tmpl=component&amp;indexer=resave';
+						$btn_name = 'recalculate_alias';
+						$full_js="if (!confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('Recalculate item aliases. <br>Only for new websites <br>as this can destroy your existing SEO ranks'), 2)) . "')) return false; var url = jQuery(this).data('taskurl'); fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
+												.$loading_msg."<\/span>'; window.location.reload(false)}, {'title': '".flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('Recalculate aliases for all items'), 2)."'}); return false;";
+						$btn_arr[] = flexicontent_html::addToolBarButton(
+								'Recalculate aliases for all items', $btn_name, $full_js,
+								$msg_alert = \Joomla\CMS\Language\Text::_('FLEXI_NO_ITEMS_SELECTED'), $msg_confirm = '',
+								$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
+								$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? '_DDI_class_ ' . $this->btn_iv_class : '') . ' ' . $this->tooltip_class, 'icon-loop',
+								'data-placement="right" data-taskurl="' . $popup_load_url .'" data-title="' . flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('Clear the aliases of items and recalculates them according to current Joomla settings'), 2) . '"', $auto_add = 0, $tag_type='button'
+						);
 
-                        $btn_name = 'recalculate_alias_selected';
-                        $no_selection_alert = \Joomla\CMS\Language\Text::_('FLEXI_NO_ITEMS_SELECTED', true);
-                        $confirm_msg = str_replace('<br>', '\\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('Recalculate item aliases. <br>Only for new websites <br>as this can destroy your existing SEO ranks'), 2));
-                        $modal_title = flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('Recalculate aliases for selected items'), 2);
-                        $full_js = "var cid = []; jQuery.each(jQuery(\"input[name='cid[]']:checked\"), function(){ cid.push(jQuery(this).val()); }); "
-                                . "if (!cid.length) { alert('" . $no_selection_alert . "'); return false; } "
-                                . "if (!confirm('" . $confirm_msg . "')) return false; "
-                                . "var url = jQuery(this).data('taskurl'); "
-                                . "url += '&' + cid.map(function(el){ return 'cid[]=' + el; }).join('&'); "
-                                . "fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\\\"fc_loading_msg\\\">"
-                                . $loading_msg . "<\\/span>'; window.location.reload(false)}, {'title': '" . $modal_title . "'}); return false;";
-                        $btn_arr[] = flexicontent_html::addToolBarButton(
-                                'Recalculate aliases for selected items', $btn_name, $full_js,
-                                $msg_alert = \Joomla\CMS\Language\Text::_('FLEXI_NO_ITEMS_SELECTED'), $msg_confirm = '',
-                                $btn_task='', $extra_js='', $btn_list=true, $btn_menu=true, $btn_confirm=false,
-                                $this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? '_DDI_class_ ' . $this->btn_iv_class : '') . ' ' . $this->tooltip_class, 'icon-loop',
-                                'data-placement="right" data-taskurl="' . $popup_load_url .'" data-title="' . flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('Clear the aliases of items and recalculates them according to current Joomla settings'), 2) . '"', $auto_add = 0, $tag_type='button'
-                        );
-                }
+						$btn_name = 'recalculate_alias_selected';
+						$no_selection_alert = \Joomla\CMS\Language\Text::_('FLEXI_NO_ITEMS_SELECTED', true);
+						$confirm_msg = str_replace('<br>', '\\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('Recalculate item aliases. <br>Only for new websites <br>as this can destroy your existing SEO ranks'), 2));
+						$modal_title = flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('Recalculate aliases for selected items'), 2);
+						$full_js = "var cid = []; jQuery.each(jQuery(\"input[name='cid[]']:checked\"), function(){ cid.push(jQuery(this).val()); }); "
+								. "if (!cid.length) { alert('" . $no_selection_alert . "'); return false; } "
+								. "if (!confirm('" . $confirm_msg . "')) return false; "
+								. "var url = jQuery(this).data('taskurl'); "
+								. "url += '&' + cid.map(function(el){ return 'cid[]=' + el; }).join('&'); "
+								. "fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\\\"fc_loading_msg\\\">"
+								. $loading_msg . "<\\/span>'; window.location.reload(false)}, {'title': '" . $modal_title . "'}); return false;";
+						$btn_arr[] = flexicontent_html::addToolBarButton(
+								'Recalculate aliases for selected items', $btn_name, $full_js,
+								$msg_alert = \Joomla\CMS\Language\Text::_('FLEXI_NO_ITEMS_SELECTED'), $msg_confirm = '',
+								$btn_task='', $extra_js='', $btn_list=true, $btn_menu=true, $btn_confirm=false,
+								$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? '_DDI_class_ ' . $this->btn_iv_class : '') . ' ' . $this->tooltip_class, 'icon-loop',
+								'data-placement="right" data-taskurl="' . $popup_load_url .'" data-title="' . flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('Clear the aliases of items and recalculates them according to current Joomla settings'), 2) . '"', $auto_add = 0, $tag_type='button'
+						);
+				}
 
 		if (count($btn_arr))
 		{

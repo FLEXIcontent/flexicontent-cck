@@ -1744,12 +1744,13 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		$method   = $this->input->get('method', 1, 'int');
 		$keeepcats = $this->input->get('keeepcats', 1, 'int');
-		$keeptags = $this->input->get('keeptags', 1, 'int');
+		$keeptags = $this->input->get('keeptags', 2, 'int');
 		$prefix   = $this->input->get('prefix', 1, 'string');
 		$suffix   = $this->input->get('suffix', 1, 'string');
 		$copynr   = $this->input->get('copynr', 1, 'int');
 		$maincat  = $this->input->get('maincat', '', 'int');
 		$seccats  = $this->input->get('seccats', array(), 'array');
+		$tags     = $this->input->get('tags', array(), 'array');
 		$keepseccats = $this->input->get('keepseccats', 0, 'int');
 
 		$state   = $this->input->get('state', '', 'string');
@@ -1762,6 +1763,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		// Set $seccats to --null-- to indicate that we will maintain secondary categories
 		$seccats = $keepseccats ? null : $seccats;
+		$tags    = ArrayHelper::toInteger($tags);
 
 		// Access check
 		$copytask_allow_uneditable = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('copytask_allow_uneditable', 1);
@@ -1828,7 +1830,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		{
 			// Copy CASE
 			case 1:
-				if ($model->copyitems($auth_cid, $keeptags, $prefix, $suffix, $copynr, $lang, $state))
+				if ($model->copyitems($auth_cid, $keeptags, $prefix, $suffix, $copynr, $lang, $state, $method, null, null, null, null, $tags))
 				{
 					$msg = \Joomla\CMS\Language\Text::sprintf('FLEXI_ITEMS_COPY_SUCCESS', count($auth_cid));
 					$clean_cache_flag = true;
@@ -1847,7 +1849,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 				foreach ($auth_cid as $itemid)
 				{
-					if (!$model->moveitem($itemid, $maincat, $seccats, $lang, $state, $type_id, $access))
+					if (!$model->moveitem($itemid, $maincat, $seccats, $lang, $state, $type_id, $access, $tags, $keeptags))
 					{
 						$app->setHeader('status', 500);
 						$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ERROR_MOVE_ITEMS') . " " . $model->getError(), 'error');
@@ -1869,7 +1871,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			// Copy and update CASE (optionally moving) 
 			case 3:
 				$languages = $lang_arr ?: array($lang);
-				$total_cnt = $model->copyitems($auth_cid, $keeptags, $prefix, $suffix, $copynr, $languages, $state, $method, $maincat, $seccats, $type_id, $access);
+				$total_cnt = $model->copyitems($auth_cid, $keeptags, $prefix, $suffix, $copynr, $languages, $state, $method, $maincat, $seccats, $type_id, $access, $tags);
 				if ($total_cnt)
 				{
 					$msg = \Joomla\CMS\Language\Text::sprintf('FLEXI_ITEMS_COPYMOVE_SUCCESS', $total_cnt);   //count($auth_cid)

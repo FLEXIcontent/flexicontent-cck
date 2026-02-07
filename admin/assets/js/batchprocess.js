@@ -16,8 +16,9 @@ function moveonly() {
 	jQuery('#keepseccats1').attr('checked', 'checked');
 	jQuery('#keepseccats1').trigger('click');
 	
-	jQuery('#keeptags0').attr('disabled', 'disabled'); jQuery('#row_keeptags').slideUp(600);
-	jQuery('#keeptags1').attr('disabled', 'disabled');
+	jQuery('#row_keeptags').slideDown(600); jQuery('#row_tags').slideDown(600);
+	jQuery('#keeptags0').removeAttr('disabled'); jQuery('#keeptags1').removeAttr('disabled'); jQuery('#keeptags2').removeAttr('disabled');
+	jQuery('#keeptags2').attr('checked', 'checked'); jQuery('#keeptags2').trigger('click');
 	jQuery('#prefix').attr('disabled', 'disabled'); jQuery('#row_prefix').slideUp(600);
 	jQuery('#suffix').attr('disabled', 'disabled'); jQuery('#row_suffix').slideUp(600);
 	jQuery('#copynr').attr('disabled', 'disabled'); jQuery('#row_copynr').slideUp(600);
@@ -39,8 +40,9 @@ function copymove() {
 	jQuery('#keepseccats1').attr('checked', 'checked');
 	jQuery('#keepseccats1').trigger('click');
 	
-	jQuery('#keeptags0').removeAttr('disabled'); jQuery('#row_keeptags').slideDown(600);
-	jQuery('#keeptags1').removeAttr('disabled');
+	jQuery('#row_keeptags').slideDown(600); jQuery('#row_tags').slideDown(600);
+	jQuery('#keeptags0').removeAttr('disabled'); jQuery('#keeptags1').removeAttr('disabled'); jQuery('#keeptags2').removeAttr('disabled');
+	jQuery('#keeptags2').attr('checked', 'checked'); jQuery('#keeptags2').trigger('click');
 	jQuery('#prefix').removeAttr('disabled'); jQuery('#row_prefix').slideDown(600);
 	jQuery('#suffix').removeAttr('disabled'); jQuery('#row_suffix').slideDown(600);
 	jQuery('#copynr').removeAttr('disabled'); jQuery('#row_copynr').slideDown(600);
@@ -60,8 +62,9 @@ function copyonly() {
 	jQuery('#keepseccats0').attr('disabled', 'disabled');
 	jQuery('#keepseccats1').attr('disabled', 'disabled');
 	
-	jQuery('#keeptags0').removeAttr('disabled'); jQuery('#row_keeptags').slideDown(600);
-	jQuery('#keeptags1').removeAttr('disabled');
+	jQuery('#row_keeptags').slideDown(600); jQuery('#row_tags').slideDown(600);
+	jQuery('#keeptags0').removeAttr('disabled'); jQuery('#keeptags1').removeAttr('disabled'); jQuery('#keeptags2').removeAttr('disabled');
+	jQuery('#keeptags2').attr('checked', 'checked'); jQuery('#keeptags2').trigger('click');
 	jQuery('#prefix').removeAttr('disabled'); jQuery('#row_prefix').slideDown(600);
 	jQuery('#suffix').removeAttr('disabled'); jQuery('#row_suffix').slideDown(600);
 	jQuery('#copynr').removeAttr('disabled'); jQuery('#row_copynr').slideDown(600);
@@ -78,6 +81,23 @@ function seccats_on() {
 function seccats_off() {
 	jQuery('#seccats').attr('disabled', 'disabled');
 }
+function tags_on() {
+	jQuery('#tags').removeAttr('disabled');
+}
+function tags_off() {
+	jQuery('#tags').attr('disabled', 'disabled');
+	jQuery('#tags').val(null).trigger('change');
+}
+function tags_update() {
+	var keeptags = jQuery('input[name=keeptags]:checked').val();
+	if (keeptags === '0') {
+		// Remove only - tags field can be disabled or enabled (won't be used anyway)
+		jQuery('#tags').removeAttr('disabled');
+	} else {
+		// Replace or Add - tags field must be enabled
+		jQuery('#tags').removeAttr('disabled');
+	}
+}
 
 jQuery(document).ready(function(){
 	var initial_behaviour = jQuery('input[name=initial_behaviour]').val();
@@ -85,6 +105,9 @@ jQuery(document).ready(function(){
 	else if (initial_behaviour=='copymove') copymove();
 	else if (initial_behaviour=='moveonly') moveonly();
 	
+	// Initialize tags field based on selected keeptags option
+	jQuery('input[name=keeptags]').on('change', tags_update);
+	tags_update();
 
 	jQuery('#type_id').change(function() {
 		if (jQuery(this).val() != '')
