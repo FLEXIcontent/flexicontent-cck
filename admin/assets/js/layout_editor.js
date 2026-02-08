@@ -95,13 +95,17 @@ function save_layout_file(formid) {
 		}
 	}
 
-	// Collect data from the form itself AND any external fields linked via form="formid"
-	var formData = form.find(':input').add('[form="' + formid + '"]').serialize();
+	// Manually construct data object to avoid issues with fields outside the form tag
+	var postData = {};
+	postData[jformToken] = 1;
+	postData['layout_name'] = jQuery('#editor__layout_name').val();
+	postData['file_subpath'] = jQuery('#editor__file_subpath').val();
+	postData['file_contents'] = txtarea.val();
 
 	jQuery.ajax({
 		type: "POST",
 		url: "index.php?option=com_flexicontent&task=templates.savelayoutfile&format=raw",
-		data: formData,
+		data: postData,
 		success: function (data) {
 			jQuery('#fc_doajax_loading').remove();
 			var theData = jQuery.parseJSON(data);
