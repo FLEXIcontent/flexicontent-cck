@@ -301,12 +301,6 @@ class com_flexicontentInstallerScript
 			$jinstaller->setOverwrite(true);
 			$jinstaller->setUpgrade(true);
 			$jinstaller->setDatabase($db);
-			try {
-				$jinstaller->setApplication(\Joomla\CMS\Factory::getApplication());
-			} catch (\Exception $e) {
-				// Ignore if application cannot be set or method doesn't exist in older versions, 
-				// though this fix is for newer versions where it should exist.
-			}
 
 			if ($jinstaller->install($extensions[$i]['folder']))
 			{
