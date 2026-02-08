@@ -95,10 +95,13 @@ function save_layout_file(formid) {
 		}
 	}
 
+	// Collect data from the form itself AND any external fields linked via form="formid"
+	var formData = form.find(':input').add('[form="' + formid + '"]').serialize();
+
 	jQuery.ajax({
 		type: "POST",
 		url: "index.php?option=com_flexicontent&task=templates.savelayoutfile&format=raw",
-		data: form.serialize(),
+		data: formData,
 		success: function (data) {
 			jQuery('#fc_doajax_loading').remove();
 			var theData = jQuery.parseJSON(data);
