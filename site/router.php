@@ -1240,6 +1240,55 @@ class _FlexicontentSiteRouter
 		{
 			if ($add_item_sef_segment !== 2)
 			{
+				// Strict alias validation: verify that the alias in URL matches the DB alias
+				$slug = str_replace(':', '-', $segments[$i]);
+
+				// Check if segment contains an ID (format: id-alias)
+				if (stripos($slug, '-') !== false)
+				{
+					$record_id_from_url    = (int) substr($slug, 0, stripos($slug, '-'));
+					$record_alias_from_url = substr($slug, stripos($slug, '-') + 1);
+
+					// Only validate if we have an ID
+					if ($record_id_from_url > 0)
+					{
+						$db = Factory::getContainer()->get(DatabaseInterface::class);
+
+						// Try each table to find the correct alias
+						foreach ($tbls as $_tbl)
+						{
+							$query = $db->getQuery(true)
+								->select('i.' . $db->quoteName($alias_col))
+								->from($db->quoteName($_tbl) . ' AS i')
+								->where('i.id = ' . (int) $record_id_from_url);
+
+							// Limit to com_content categories
+							if ($_tbl === '#__categories')
+							{
+								$query->where($db->quoteName('extension') . ' = ' . $db->quote('com_content'));
+							}
+
+							$real_alias = $db->setQuery($query)->loadResult();
+
+							// If we found the record, validate the alias
+							if ($real_alias !== null && $real_alias !== false)
+							{
+								// Strict comparison: URL alias must match DB alias exactly
+								if ($real_alias !== $record_alias_from_url)
+								{
+									// Make sure our language file has been loaded
+									Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', true);
+									Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_SITE, null, true);
+
+									throw new Exception(Text::_('JERROR_PAGE_NOT_FOUND'), 404);
+								}
+
+								break;
+							}
+						}
+					}
+				}
+
 				return $segments[$i];
 			}
 			else
