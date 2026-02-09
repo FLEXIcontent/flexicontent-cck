@@ -1304,6 +1304,9 @@ class _FlexicontentSiteRouter
 			$record_id_from_url    = 0;
 		}
 
+		// Initialize variables to prevent undefined errors
+		$record_id_from_alias = null;
+
 		/**
 		 * Try finding the alias in the DB tables in the order they were given
 		 */
