@@ -17,6 +17,7 @@ use Joomla\CMS\Factory;
 use Joomla\Filesystem\Path;
 use Joomla\Database\DatabaseInterface;
 use Joomla\CMS\Toolbar\ToolbarFactoryInterface;
+use Joomla\CMS\Toolbar\Toolbar;
 
 
 JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_records.php');

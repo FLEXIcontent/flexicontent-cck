@@ -22,6 +22,7 @@ jimport('legacy.view.legacy');
 use Joomla\String\StringHelper;
 use Joomla\Database\DatabaseInterface;
 use Joomla\CMS\Toolbar\ToolbarFactoryInterface;
+use Joomla\CMS\Toolbar\Toolbar;
 
 /**
  * View class for the FLEXIcontent appsman screen

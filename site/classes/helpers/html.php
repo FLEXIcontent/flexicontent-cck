@@ -9,6 +9,7 @@ use Joomla\CMS\Factory;
 use Joomla\Filesystem\Path;
 use Joomla\Database\DatabaseInterface;
 use Joomla\CMS\Toolbar\ToolbarFactoryInterface;
+use Joomla\CMS\Toolbar\Toolbar;
 
 class flexicontent_html
 {
