@@ -575,7 +575,7 @@ class FlexicontentViewUsers extends FlexicontentViewBaseRecords
 	{
 		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
-		$toolbar  = \Joomla\CMS\Factory::getApplication()->getDocument()->getToolbar('toolbar');
+		$toolbar  = $toolbar = \Joomla\CMS\Toolbar\Toolbar::getInstance('toolbar');
 		$perms    = FlexicontentHelperPerm::getPerm();
 		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 		$useAssocs= flexicontent_db::useAssociations();

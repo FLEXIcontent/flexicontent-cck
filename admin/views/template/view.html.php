@@ -231,7 +231,7 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 		FLEXIUtilities::ManagerSideMenu('CanTemplates');
 
 		//create the toolbar
-		$bar = \Joomla\CMS\Factory::getApplication()->getDocument()->getToolbar('toolbar');
+		$bar = $toolbar = \Joomla\CMS\Toolbar\Toolbar::getInstance('toolbar');
 		\Joomla\CMS\Toolbar\ToolbarHelper::title( \Joomla\CMS\Language\Text::_( 'FLEXI_EDIT_TEMPLATE' ), 'eye' );
 		if (!$ismodal) {
 			\Joomla\CMS\Toolbar\ToolbarHelper::apply('templates.apply');
