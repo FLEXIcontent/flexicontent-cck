@@ -298,7 +298,7 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 		$view = $layout->view;
 		$less_data = "/* This is created automatically, do NOT edit this manually! \nThis is used by _layout_type_ layout to save parameters as less variables. \nNOTE: Make sure that this is imported by 'config.less' \n to make a parameter be a LESS variable, edit parameter in _layout_type_.xml and add cssprep=\"less\" \n created parameters will be like: @FCLL_parameter_name: value; */\n\n";
 		$_less_auto = false;
-		if ( !\Joomla\Filesystem\File::exists($tmpldir . '/less/include/config_auto_'.$view.'.less') || filemtime($tmpldir . '/less/include/config_auto_'.$view.'.less') < filemtime($tmpldir . '/'.$view.'.xml') ) {
+		if ( !file_exists($tmpldir . '/less/include/config_auto_'.$view.'.less') || filemtime($tmpldir . '/less/include/config_auto_'.$view.'.less') < filemtime($tmpldir . '/'.$view.'.xml') ) {
 			$_less_auto = $tmpldir . '/less/include/config_auto_'.$view.'.less';
 			file_put_contents($_less_auto, str_replace("FCLL_", "FCI_", str_replace("_layout_type_", $view, $less_data)));
 		}
@@ -328,18 +328,18 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 		$tmpldir = JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$folder;
 
 		// Create less folders if they do not exist already
-		if ( !\Joomla\Filesystem\Folder::exists( $tmpldir . '/less' ) ) if ( !\Joomla\Filesystem\Folder::create( $tmpldir . '/less') )  JError::raiseWarning(100, \Joomla\CMS\Language\Text::_('Unable to create "/less/" folder'));
+		if ( !is_dir( $tmpldir . '/less' ) ) if ( !mkdir( $tmpldir . '/less') )  JError::raiseWarning(100, \Joomla\CMS\Language\Text::_('Unable to create "/less/" folder'));
 
 		// Abort if directory creation failed
-		if ( ! \Joomla\Filesystem\Folder::exists( $tmpldir . '/less' ) ) return;
+		if ( ! is_dir( $tmpldir . '/less' ) ) return;
 
 
 		// ***********************************************************************
 		// Create CUSTOM config.less, that is include by item.less / category.less
 		// ************************************************************ ***********
 
-		if ( !\Joomla\Filesystem\Folder::exists( $tmpldir . '/less/include' ) ) if ( !\Joomla\Filesystem\Folder::create( $tmpldir . '/less/include') )  JError::raiseWarning(100, \Joomla\CMS\Language\Text::_('Unable to create "/less/include" folder'));
-		if ( !\Joomla\Filesystem\File::exists($tmpldir . '/less/include/config.less') ) {
+		if ( !is_dir( $tmpldir . '/less/include' ) ) if ( !mkdir( $tmpldir . '/less/include') )  JError::raiseWarning(100, \Joomla\CMS\Language\Text::_('Unable to create "/less/include" folder'));
+		if ( !file_exists($tmpldir . '/less/include/config.less') ) {
 			file_put_contents($tmpldir . '/less/include/config.less', "/* Place your less variables, mixins, etc, here \n1. This is commonly imported by files: item.less and category.less, \n2. If you add extra less file imports, then place files \ninside same folder for automatic compiling to be triggered */\n\n@import 'config_auto_item.less';\n@import 'config_auto_category.less';\n");
 		}
 
@@ -350,8 +350,8 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 
 		$less_files = array('/css/item.css'=>'/less/item.less', '/css/category.css'=>'/less/category.less');
 		foreach($less_files as $css_name => $less_name) {
-			if ( !\Joomla\Filesystem\File::exists($tmpldir . $css_name) )  continue;  // Do not try to copy CSS file that does not exist
-			if ( !\Joomla\Filesystem\File::exists($tmpldir . $less_name) ) {
+			if ( !file_exists($tmpldir . $css_name) )  continue;  // Do not try to copy CSS file that does not exist
+			if ( !file_exists($tmpldir . $less_name) ) {
 				if ( !\Joomla\Filesystem\File::copy($tmpldir.$css_name, $tmpldir.$less_name) ) {
 					JError::raiseWarning(100, \Joomla\CMS\Language\Text::_('Unable to create file: "'.$tmpldir.$less_name.'"'));
 				} else {

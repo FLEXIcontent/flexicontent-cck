@@ -239,7 +239,7 @@ class FlexicontentModelField extends FCModelAdmin
 		 */
 		$plugin_path = \Joomla\Filesystem\Path::clean(JPATH_PLUGINS . DS . 'flexicontent_fields' . DS . $plugin_name . DS . $plugin_name . '.xml');
 
-		if (!\Joomla\Filesystem\File::exists($plugin_path))
+		if (!file_exists($plugin_path))
 		{
 			throw new Exception('Error field XML file for field type: - ' . $plugin_name . '- was not found');
 		}

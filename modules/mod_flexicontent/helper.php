@@ -2563,7 +2563,7 @@ class modFlexicontentHelper
 				$catdata->introtext = & $catdata->description;
 				$catdata->fulltext = "";
 
-				if ($catconf->image_source && $catdata->image && \Joomla\Filesystem\File::exists(JPATH_SITE .DS. $joomla_image_path .DS. $catdata->image))
+				if ($catconf->image_source && $catdata->image && file_exists(JPATH_SITE .DS. $joomla_image_path .DS. $catdata->image))
 				{
 					$src = \Joomla\CMS\Uri\Uri::base(true)."/".$joomla_image_path."/".$catdata->image;
 

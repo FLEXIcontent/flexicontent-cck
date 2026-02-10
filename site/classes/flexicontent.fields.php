@@ -2866,7 +2866,7 @@ class FlexicontentFields
 		jimport('joomla.filesystem.file');
 		$segmenter_path = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'THSplitLib'.DS.'segment.php';
 
-		if (!\Joomla\Filesystem\File::exists($segmenter_path))
+		if (!file_exists($segmenter_path))
 		{
 			return false;
 		}

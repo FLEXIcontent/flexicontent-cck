@@ -87,7 +87,7 @@ class mod_flexigooglemapInstallerScript
 		$pathDestName   = \Joomla\Filesystem\Path::clean(JPATH_ROOT.'/images/mod_flexigooglemap/marker');
 
 		// 1. Check DESTINATION folder
-		if ( !\Joomla\Filesystem\Folder::exists($pathDestName) && !\Joomla\Filesystem\Folder::create($pathDestName) )
+		if ( !is_dir($pathDestName) && !mkdir($pathDestName) )
 		{
 			echo '<span class="alert alert-warning"> Error, unable to create folder: '. $pathDestName.'</span>';
 		}
@@ -106,7 +106,7 @@ class mod_flexigooglemapInstallerScript
 		$pathDestName2   = \Joomla\Filesystem\Path::clean(JPATH_ROOT.'/images/mod_flexigooglemap/cluster');
 
 		// 1. Check DESTINATION folder
-		if ( !\Joomla\Filesystem\Folder::exists($pathDestName2) && !\Joomla\Filesystem\Folder::create($pathDestName2) )
+		if ( !is_dir($pathDestName2) && !mkdir($pathDestName2) )
 		{
 			echo '<span class="alert alert-warning"> Error, unable to create folder: '. $pathDestName2.'</span>';
 		}

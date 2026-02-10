@@ -661,16 +661,16 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		$destpath = JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'plugins';
 
 		// Check if JComments installed and active
-		if (\Joomla\Filesystem\Folder::exists($destpath) && \Joomla\CMS\Plugin\PluginHelper::isEnabled('system', 'jcomments'))
+		if (is_dir($destpath) && \Joomla\CMS\Plugin\PluginHelper::isEnabled('system', 'jcomments'))
 		{
 			$dest   = $destpath.DS.'com_flexicontent.plugin.php';
 			$source = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'jcomments'.DS.'com_flexicontent.plugin.php';
-			$plg_exists = \Joomla\Filesystem\File::exists($dest);
+			$plg_exists = file_exists($dest);
 
 			if (!$plg_exists || filemtime(__FILE__) > filemtime($dest))
 			{
-				if (!\Joomla\Filesystem\Folder::exists($destpath)) {
-					if (!\Joomla\Filesystem\Folder::create($destpath)) {
+				if (!is_dir($destpath)) {
+					if (!mkdir($destpath)) {
 						Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::sprintf('JLIB_INSTALLER_ABORT_PLG_INSTALL_CREATE_DIRECTORY', 'jComments plugin for FLEXIcontent', $destpath), 'warning');
 					}
 				}
@@ -689,7 +689,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 
 		$destpath = JPATH_ADMINISTRATOR.DS.'components'.DS.'com_falang'.DS.'contentelements';
 
-		if (\Joomla\Filesystem\Folder::exists($destpath) && \Joomla\CMS\Plugin\PluginHelper::isEnabled('system', 'falangdriver'))
+		if (is_dir($destpath) && \Joomla\CMS\Plugin\PluginHelper::isEnabled('system', 'falangdriver'))
 		{
 			$sourcepath = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'joomfish';
 			$files = glob($sourcepath."/*.xml");
@@ -697,7 +697,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 			foreach ($files as $file)
 			{
 				$file_dest = $destpath.DS.basename($file);
-				$plg_exists = \Joomla\Filesystem\File::exists($file_dest);
+				$plg_exists = file_exists($file_dest);
 				if (!$plg_exists || filemtime($file) > filemtime($file_dest))
 				{
 					\Joomla\Filesystem\File::copy($file, $file_dest);
@@ -717,12 +717,12 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		$pathSourceName = Path::clean(JPATH_ROOT.'/components/com_flexicontent/librairies/JCE/links');
 
 		// Check if JCE installed and active
-		if (!\Joomla\Filesystem\Folder::exists($pathDestName) || !\Joomla\CMS\Plugin\PluginHelper::isEnabled('editors', 'jce'))
+		if (!is_dir($pathDestName) || !\Joomla\CMS\Plugin\PluginHelper::isEnabled('editors', 'jce'))
 		{
 			return true; // Nothing to do, JCE not installed
 		}
 
-		$plg_exists = \Joomla\Filesystem\File::exists($pathDestName.'/flexicontentlinks.php');
+		$plg_exists = file_exists($pathDestName.'/flexicontentlinks.php');
 		if ($plg_exists && filemtime(__FILE__) < filemtime($pathDestName.'/flexicontentlinks.php'))
 		{
 			return true; // Nothing to do, already up-to-date
@@ -739,7 +739,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		// Check DESTINATION folder
 		$pathSourceName = Path::clean($pathSourceName.'/flexicontentlinks');
 		$pathDestName   = Path::clean($pathDestName.'/flexicontentlinks');
-		if ( !\Joomla\Filesystem\Folder::exists($pathDestName) && !\Joomla\Filesystem\Folder::create($pathDestName) )
+		if ( !is_dir($pathDestName) && !mkdir($pathDestName) )
 		{
 			Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::sprintf('JLIB_INSTALLER_ABORT_PLG_INSTALL_CREATE_DIRECTORY', 'JCE Links plugin for FLEXIcontent', $pathDestName), 'warning');
 		}
@@ -758,7 +758,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 			// Check DESTINATION folder
 			$sub_pathSourceName = Path::clean($pathSourceName.'/'.$folder);
 			$sub_pathDestName   = Path::clean($pathDestName.'/'.$folder);
-			if ( !\Joomla\Filesystem\Folder::exists($sub_pathDestName) && !\Joomla\Filesystem\Folder::create($sub_pathDestName) )
+			if ( !is_dir($sub_pathDestName) && !mkdir($sub_pathDestName) )
 			{
 				Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::sprintf('JLIB_INSTALLER_ABORT_PLG_INSTALL_CREATE_DIRECTORY', 'JCE Links plugin for FLEXIcontent', $sub_pathDestName), 'warning');
 			}
@@ -1104,7 +1104,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		{
 			$indexing_started = false;
 			$file = JPATH_SITE.DS.'tmp'.DS.'tbl_indexes_'.$tblname;
-			if ( \Joomla\Filesystem\File::exists($file) )
+			if ( file_exists($file) )
 			{
 				$indexing_start_secs = (int) file_get_contents($file);
 				$indexing_started = $indexing_start_secs + 3600 > time();
@@ -1221,7 +1221,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		$conf_override_file = Path::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'phpThumb.config_OVERRIDE.php');
 
 		// CHECK phpThumb configuration override file exists and create it, if it does not exist
-		if ( !\Joomla\Filesystem\File::exists($conf_override_file) )
+		if ( !file_exists($conf_override_file) )
 		{
 			$file_contents =
 				'<?php'."\n".
@@ -1249,7 +1249,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		$phpthumbcache 	= Path::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'cache');
 
 		// CHECK phpThumb cache exists and create the folder
-		if ( !\Joomla\Filesystem\Folder::exists($phpthumbcache) && !\Joomla\Filesystem\Folder::create($phpthumbcache) )
+		if ( !is_dir($phpthumbcache) && !mkdir($phpthumbcache) )
 		{
 			JError::raiseWarning(100, 'Error: Unable to create phpThumb folder: '. $phpthumbcache .' image thumbnail will not work properly' );
 			$return = true;  // Cancel task !! to allow user to continue
@@ -1315,7 +1315,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		$depr_file = Path::clean(JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/deprecated_list.php');
 
 		// If file / folder removal already done then stop further steps
-		if (\Joomla\Filesystem\File::exists($done_file) && (filemtime($done_file) > filemtime($depr_file)))
+		if (file_exists($done_file) && (filemtime($done_file) > filemtime($depr_file)))
 		{
 			$finished = true;
 			return $finished;
@@ -1334,7 +1334,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 
 		foreach ($files as $file)
 		{
-			if (\Joomla\Filesystem\File::exists($file))
+			if (file_exists($file))
 			{
 				$deprecated['files'][] = $file;
 			}
@@ -1342,7 +1342,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 
 		foreach ($folders as $folder)
 		{
-			if (\Joomla\Filesystem\Folder::exists($folder))
+			if (is_dir($folder))
 			{
 				$deprecated['folders'][] = $folder;
 			}
@@ -1890,14 +1890,14 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 
 		if ($method == 'zip') {
 			if (count($adminfiles))
-				\Joomla\Filesystem\Folder::create($targetfolder.DS.'admin', 0755);
+				mkdir($targetfolder.DS.'admin', 0755);
 			if (count($sitefiles))
-				\Joomla\Filesystem\Folder::create($targetfolder.DS.'site', 0755);
+				mkdir($targetfolder.DS.'site', 0755);
 		}
 
 		foreach ($adminfiles as $file) {
 			if (!$file) continue;
-			if (!\Joomla\Filesystem\File::exists($adminpath.$prefix.$file.$suffix)) {
+			if (!file_exists($adminpath.$prefix.$file.$suffix)) {
 				$missing['admin'][] = $file;
 				if ($method == 'create')
 					\Joomla\Filesystem\File::copy($refadminpath.'en-GB.'.$file.$suffix, $adminpath.$prefix.$file.$suffix);
@@ -1910,7 +1910,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		}
 		foreach ($sitefiles as $file) {
 			if (!$file) continue;
-			if (!\Joomla\Filesystem\File::exists($sitepath.$prefix.$file.$suffix)) {
+			if (!file_exists($sitepath.$prefix.$file.$suffix)) {
 				$missing['site'][] = $file;
 				if ($method == 'create')
 					\Joomla\Filesystem\File::copy($refsitepath.'en-GB.'.$file.$suffix, $sitepath.$prefix.$file.$suffix);

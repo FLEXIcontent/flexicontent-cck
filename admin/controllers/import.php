@@ -1219,11 +1219,11 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 							//echo "<pre>"; print_r(\Joomla\Filesystem\Path::clean( $srcpath_original . ($filename_LE = $fname . '.' . strtolower($fext)))); echo '</pre>';
 							//echo "<pre>"; print_r(\Joomla\Filesystem\Path::clean( $srcpath_original . ($filename_UE = $fname . '.' . strtoupper($fext)))); echo '</pre>';
 
-							$_filename = \Joomla\Filesystem\File::exists( \Joomla\Filesystem\Path::clean($srcpath_original . $filename) ) ? $filename : false;
+							$_filename = file_exists( \Joomla\Filesystem\Path::clean($srcpath_original . $filename) ) ? $filename : false;
 							$_filename = $_filename ?:
-								(\Joomla\Filesystem\File::exists( \Joomla\Filesystem\Path::clean($srcpath_original . ($filename_LE = $fname . '.' . strtolower($fext))) ) ? $filename_LE : false);
+								(file_exists( \Joomla\Filesystem\Path::clean($srcpath_original . ($filename_LE = $fname . '.' . strtolower($fext))) ) ? $filename_LE : false);
 							$_filename = $_filename ?:
-								(\Joomla\Filesystem\File::exists( \Joomla\Filesystem\Path::clean($srcpath_original . ($filename_UE = $fname . '.' . strtoupper($fext))) ) ? $filename_UE : false);
+								(file_exists( \Joomla\Filesystem\Path::clean($srcpath_original . ($filename_UE = $fname . '.' . strtoupper($fext))) ) ? $filename_UE : false);
 
 							if ($_filename)
 							{

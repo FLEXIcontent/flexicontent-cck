@@ -109,7 +109,7 @@ foreach ($list as $cat) :
 		$cat->introtext = & $cat->description;
 		$cat->fulltext = '';
 		
-		if ( $cat_image_source && $cat->image && \Joomla\Filesystem\File::exists( JPATH_SITE .DS. $joomla_image_path . $cat->image ) )
+		if ( $cat_image_source && $cat->image && file_exists( JPATH_SITE .DS. $joomla_image_path . $cat->image ) )
 		{
 			$src = \Joomla\CMS\Uri\Uri::base(true) ."/". $joomla_image_url . $cat->image;
 			

@@ -1194,7 +1194,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				$basePath = $file->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;
 				$file->abspath = str_replace(DS, '/', \Joomla\Filesystem\Path::clean($basePath.DS.$file->filename));
 
-				if (!\Joomla\Filesystem\File::exists($file->abspath))
+				if (!file_exists($file->abspath))
 				{
 					$msg = \Joomla\CMS\Language\Text::_( 'FLEXI_REQUESTED_FILE_DOES_NOT_EXIST_ANYMORE' );
 					$app->enqueueMessage($msg, 'notice');
@@ -1579,7 +1579,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		else
 		{
 			// Create target (top level) folder
-			\Joomla\Filesystem\Folder::create($targetpath, 0755);
+			mkdir($targetpath, 0755);
 
 			// Copy Files
 			foreach ($valid_files as $file) \Joomla\Filesystem\File::copy($file->abspath, $file->node->targetpath);
@@ -2240,7 +2240,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			if ($node->isParent)
 			{
 				$targetpath_node = \Joomla\Filesystem\Path::clean($targetpath.DS.$node->name);
-				\Joomla\Filesystem\Folder::create($targetpath_node, 0755);
+				mkdir($targetpath_node, 0755);
 
 				// Folder has sub-contents
 				if (!empty($node->children))

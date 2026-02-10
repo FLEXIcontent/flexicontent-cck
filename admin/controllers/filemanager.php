@@ -1548,9 +1548,9 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		// Create the folder if it does not exists
 		$destpath = ($secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH) . DS;
 
-		if (!\Joomla\Filesystem\Folder::exists($destpath))
+		if (!is_dir($destpath))
 		{
-			if (!\Joomla\Filesystem\Folder::create($destpath))
+			if (!mkdir($destpath))
 			{
 				$this->exitHttpHead = array( 0 => array('status' => '500 Internal Server Error') );
 				$this->exitMessages = array( 0 => array('error' => 'Error. Unable to create folders') );

@@ -72,7 +72,7 @@ class flexicontent_tmpl
 		{
 			// Parse & Load the XML file of the current layout
 			$tmplxml = Path::clean($tmpldir.DS.$tmplname.DS.$view.'.xml');
-			if ( \Joomla\Filesystem\File::exists($tmplxml) && empty($themes->$layout_type->$tmplname) )
+			if ( file_exists($tmplxml) && empty($themes->$layout_type->$tmplname) )
 			{
 				// Parse the XML file
 				// About load addition XML file, please see: https://github.com/FLEXIcontent/flexicontent-cck/pull/961
@@ -320,7 +320,7 @@ class flexicontent_tmpl
 		{
 			foreach($_tmpls as $tmpl)
 			{
-				if (!\Joomla\Filesystem\File::exists($tmpl->xmlpath) || filemtime($tmpl->xmlpath) > $tmpl->xmlmtime)
+				if (!file_exists($tmpl->xmlpath) || filemtime($tmpl->xmlpath) > $tmpl->xmlmtime)
 				{
 					$modified_files[$tmpl->name][$layout_type] = $tmpl->xmlpath;
 				}

@@ -14,11 +14,11 @@ if ($ext_installed === null)
 
 	// Check if Communit Builder is installed and active
 	$destpath = JPATH_SITE.DS.'components'.DS.'com_profiler';
-	$ext_installed['com_comprofiler'] = \Joomla\Filesystem\Folder::exists($destpath); // && \Joomla\CMS\Plugin\PluginHelper::isEnabled('system', 'comprofiler');
+	$ext_installed['com_comprofiler'] = is_dir($destpath); // && \Joomla\CMS\Plugin\PluginHelper::isEnabled('system', 'comprofiler');
 
 	// Check if Jomsocial is installed and active
 	$destpath = JPATH_SITE.DS.'components'.DS.'com_community';
-	$ext_installed['com_community'] = \Joomla\Filesystem\Folder::exists($destpath); // && \Joomla\CMS\Plugin\PluginHelper::isEnabled('system', 'community');
+	$ext_installed['com_community'] = is_dir($destpath); // && \Joomla\CMS\Plugin\PluginHelper::isEnabled('system', 'community');
 }
 
 

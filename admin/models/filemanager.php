@@ -2146,7 +2146,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			$filename = str_ireplace('.' . $ext, '', basename($full_path));
 
 			// Check preview folder
-			if (!\Joomla\Filesystem\Folder::exists($prv_path) && !\Joomla\Filesystem\Folder::create($prv_path))
+			if (!is_dir($prv_path) && !mkdir($prv_path))
 			{
 				$error_mssg = $file->filename . ' : Failed to create preview folder: ' . $prv_path;
 				$this->setError($error_mssg);

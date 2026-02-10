@@ -365,7 +365,7 @@ ob_start(); ?>
 									<label for="method-usejoomfish"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_USE_JF_FL_DATA' ); ?> *</label>
 								</div>
 
-								<?php if ( \Joomla\Filesystem\File::exists(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'translator.php') ) :
+								<?php if ( file_exists(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'translator.php') ) :
 								/* if automatic translator installed ... */ ?>
 
 									<div>

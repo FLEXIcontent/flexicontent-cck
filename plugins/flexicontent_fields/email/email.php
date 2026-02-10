@@ -926,7 +926,7 @@ class plgFlexicontent_fieldsEmail extends FCField
 		$files = $jinput->files->get($formid);
 		if (isset($files))
 		{
-			\Joomla\Filesystem\Folder::create(JPATH_SITE . DS . "tmp" . DS . "upload_flexi_form". $formid);
+			mkdir(JPATH_SITE . DS . "tmp" . DS . "upload_flexi_form". $formid);
 
 			foreach($files as $attachements) {
 				foreach ($attachements as $file){
