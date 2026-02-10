@@ -164,7 +164,7 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 		$js = "jQuery(document).ready(function(){";
 
 		// Create the toolbar
-		$toolbar = \Joomla\CMS\Factory::getApplication()->getDocument()->getToolbar('toolbar');
+		$toolbar = Toolbar::getInstance('toolbar');
 		$loading_msg = flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_LOADING') .' ... '. \Joomla\CMS\Language\Text::_('FLEXI_PLEASE_WAIT'), 2);
 
 		if($perms->CanConfig)

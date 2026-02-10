@@ -5705,7 +5705,7 @@ class flexicontent_html
 		static $i = 0;
 
 		$btn_name = 'fc_toolbar_spacer_' . ($i++);
-		$toolbar = \Joomla\CMS\Factory::getApplication()->getDocument()->getToolbar('toolbar');
+		$toolbar = Toolbar::getInstance('toolbar');
 		$toolbar->appendButton('Custom', '<span style="width: ' . (int) $width. 'px; height: 1px; display: inline-block;"></span>', $btn_name);
 	}
 

@@ -283,7 +283,7 @@ class FlexicontentViewAppsman extends \Joomla\CMS\MVC\View\HtmlView
 		$contrl_s = null;
 
 		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
-		$toolbar = \Joomla\CMS\Factory::getApplication()->getDocument()->getToolbar('toolbar');
+		$toolbar = Toolbar::getInstance('toolbar');
 		$loading_msg = flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_LOADING') .' ... '. \Joomla\CMS\Language\Text::_('FLEXI_PLEASE_WAIT'), 2);
 
 	

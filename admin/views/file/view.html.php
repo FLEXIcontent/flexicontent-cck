@@ -152,7 +152,7 @@ class FlexicontentViewFile extends FlexicontentViewBaseRecord
 		 * Create the toolbar
 		 */
 
-		$toolbar = \Joomla\CMS\Factory::getApplication()->getDocument()->getToolbar('toolbar');
+		$toolbar = Toolbar::getInstance('toolbar');
 
 		// Creation flag used to decide if adding save and new / save as copy buttons are allowed
 		$cancreate = false;
