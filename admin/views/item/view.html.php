@@ -1687,7 +1687,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		}
 
 		$tbname  = $buttons_placement === -1 ? 'toolbar' : 'fctoolbar';  // -1 : Place at page header
-		$toolbar = \Joomla\CMS\Factory::getApplication()->getDocument()->getToolbar($tbname);
+		$toolbar = \Joomla\CMS\Toolbar\Toolbar::getInstance($tbname);
 
 		$isSideBtns = in_array($buttons_placement, array(2,3));  // Side placement (left, right)
 		$add_inline = false; // $isSideBtns

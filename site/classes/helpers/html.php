@@ -5718,7 +5718,7 @@ class flexicontent_html
 		$tbname = 'toolbar'
 	)
 	{
-		$toolbar = \Joomla\CMS\Factory::getApplication()->getDocument()->getToolbar($tbname);
+		$toolbar = \Joomla\CMS\Toolbar\Toolbar::getInstance($tbname);
 		$text  = \Joomla\CMS\Language\Text::_($text);
 		$class = $btn_icon ? $btn_icon : 'icon-32-'.$btn_name;
 		$btn_sm_class = FLEXI_J40GE ? 'btn btn-sm' : 'btn btn-small';
@@ -5770,7 +5770,7 @@ class flexicontent_html
 	static function addToolBarDropMenu($btn_arr, $btn_group_name, $drop_btn = null, $ops = array(), $tbname = 'toolbar')
 	{
 		\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.dropdown');
-		$toolbar = \Joomla\CMS\Factory::getApplication()->getDocument()->getToolbar($tbname);
+		$toolbar = \Joomla\CMS\Toolbar\Toolbar::getInstance($tbname);
 		static $btngroup_id = 0;
 		$btngroup_id++;
 
