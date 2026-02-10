@@ -1,4 +1,5 @@
 <?php
+use Joomla\Database\DatabaseInterface;
 
 // Display parameters
 $link_to_profile       = (int) $field->parameters->get('link_to_profile', 1);
@@ -13,11 +14,11 @@ if ($ext_installed === null)
 
 	// Check if Communit Builder is installed and active
 	$destpath = JPATH_SITE.DS.'components'.DS.'com_profiler';
-	$ext_installed['com_comprofiler'] = \Joomla\CMS\Filesystem\Folder::exists($destpath); // && \Joomla\CMS\Plugin\PluginHelper::isEnabled('system', 'comprofiler');
+	$ext_installed['com_comprofiler'] = is_dir($destpath); // && \Joomla\CMS\Plugin\PluginHelper::isEnabled('system', 'comprofiler');
 
 	// Check if Jomsocial is installed and active
 	$destpath = JPATH_SITE.DS.'components'.DS.'com_community';
-	$ext_installed['com_community'] = \Joomla\CMS\Filesystem\Folder::exists($destpath); // && \Joomla\CMS\Plugin\PluginHelper::isEnabled('system', 'community');
+	$ext_installed['com_community'] = is_dir($destpath); // && \Joomla\CMS\Plugin\PluginHelper::isEnabled('system', 'community');
 }
 
 
@@ -39,7 +40,7 @@ if ($link_to_profile === 1)
 	if ($uids)
 	{
 		$query = 'SELECT * FROM #__contact_details WHERE user_id IN (' . implode(',', $uids) . ')';
-		$contacts = \Joomla\CMS\Factory::getDbo()->setQuery($query)->loadObjectList('user_id');
+		$contacts = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class)->setQuery($query)->loadObjectList('user_id');
 
 		foreach ($uids as $uid)
 		{

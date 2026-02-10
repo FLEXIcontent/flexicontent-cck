@@ -17,6 +17,7 @@ use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\Filesystem\File;
 use Joomla\Filesystem\Path;
+use Joomla\Database\DatabaseInterface;
 
 JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php');
 
@@ -93,7 +94,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 		// Initialize variables
 		$app     = \Joomla\CMS\Factory::getApplication();
-		$user    = \Joomla\CMS\Factory::getUser();
+		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$params  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 
 		$original_task = $this->task;
@@ -288,7 +289,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			// CASE local file
 			case 0:
 				$path = ($data['secure'] ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH) . DS;  // JPATH_ROOT . DS . <media_path | file_path> . DS
-				$file_path = \Joomla\CMS\Filesystem\Path::clean($path . $data['filename']);
+				$file_path = \Joomla\Filesystem\Path::clean($path . $data['filename']);
 
 				// Get file size from filesystem (local file)
 				$data['size'] = file_exists($file_path) ? filesize($file_path) : 0;
@@ -337,7 +338,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 				$data['filename_original'] = flexicontent_html::dataFilter($data['filename_original'], 4000, 'PATH', 0);  // Validate JMedia file PATH
 				$data['filename_original'] = str_replace('__SPACE__', ' ', $data['filename_original']);
 
-				$file_path = \Joomla\CMS\Filesystem\Path::clean(JPATH_ROOT . DS . $data['filename']);
+				$file_path = \Joomla\Filesystem\Path::clean(JPATH_ROOT . DS . $data['filename']);
 
 				// Get file size from filesystem (local file)
 				$data['size'] = file_exists($file_path) ? filesize($file_path) : 0;
@@ -484,9 +485,9 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$user  = \Joomla\CMS\Factory::getUser();
-		$db    = \Joomla\CMS\Factory::getDbo();
-		$session = \Joomla\CMS\Factory::getSession();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$db    = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 
 		// Force interactive run mode, if given parameters
 		$this->runMode = $Fobj ? 'interactive' : $this->runMode;
@@ -849,7 +850,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$upload_check = flexicontent_upload::check($file, $err_text, $params);  // Check that file contents are safe, and also make the filename safe, transliterating it according to given language (this forces lowercase)
 		$filename     = $custom_filename ?:
 			flexicontent_upload::sanitize($path, $file['name']);    // Sanitize the file name (filesystem-safe, (this should have been done above already)) and also return an unique filename for the given folder
-		$filepath 	  = \Joomla\CMS\Filesystem\Path::clean($path . $filename);
+		$filepath 	  = \Joomla\Filesystem\Path::clean($path . $filename);
 
 		// Check if the uploaded file is valid
 		if (!$upload_check)
@@ -871,7 +872,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		}
 		else
 		{
-			$move_success = \Joomla\CMS\Filesystem\File::upload($file['tmp_name'], $filepath, false, false,
+			$move_success = \Joomla\Filesystem\File::upload($file['tmp_name'], $filepath, false, false,
 				// - Valid extensions are checked by our helper function
 				// - also we allow all extensions and php inside content, FLEXIcontent will never execute "include" files evening when doing "in-browser viewing"
 				array('null_byte' => true, 'forbidden_extensions' => array('_fake_ext_'), 'php_tag_in_content' => true, 'shorttag_in_content' => true, 'shorttag_extensions' => array(), 'fobidden_ext_in_content' => false, 'php_ext_content_extensions' => array() )
@@ -1009,7 +1010,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 		// Initialize variables
 		$app     = \Joomla\CMS\Factory::getApplication();
-		$session = \Joomla\CMS\Factory::getSession();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 		$model = $this->getModel($this->record_name);
 
 		// Force interactive run mode, if given parameters
@@ -1103,8 +1104,8 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			$url	= 'http://' . $url;
 		}
 
-		$db 	= \Joomla\CMS\Factory::getDbo();
-		$user	= \Joomla\CMS\Factory::getUser();
+		$db 	= \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$user	= \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$field  = false;
 
 		if ($fieldid)
@@ -1198,8 +1199,8 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 		// Initialize variables
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$user  = \Joomla\CMS\Factory::getUser();
-		$db     = \Joomla\CMS\Factory::getDbo();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$db     = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 
 		$fieldid    = $this->input->get('fieldid', 0, 'int');
 		$u_item_id  = $this->input->get('u_item_id', 0, 'cmd');
@@ -1392,8 +1393,8 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$user  = \Joomla\CMS\Factory::getUser();
-		$db    = \Joomla\CMS\Factory::getDbo();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$db    = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 
 		// Calculate access
 		/**
@@ -1497,8 +1498,8 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$file_ids = array();
 
 		$app    = \Joomla\CMS\Factory::getApplication();
-		$db 		= \Joomla\CMS\Factory::getDbo();
-		$user		= \Joomla\CMS\Factory::getUser();
+		$db 		= \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$user		= \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$params = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 
 		$is_importcsv = $this->task === 'importcsv';
@@ -1541,15 +1542,15 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		jimport('joomla.filesystem.folder');
 
 		// Get files
-		$filesdir = \Joomla\CMS\Filesystem\Path::clean(JPATH_SITE . $filesdir . DS);
-		$filenames = \Joomla\CMS\Filesystem\Folder::files($filesdir, $regexp);
+		$filesdir = \Joomla\Filesystem\Path::clean(JPATH_SITE . $filesdir . DS);
+		$filenames = \Joomla\Filesystem\Folder::files($filesdir, $regexp);
 
 		// Create the folder if it does not exists
 		$destpath = ($secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH) . DS;
 
-		if (!\Joomla\CMS\Filesystem\Folder::exists($destpath))
+		if (!is_dir($destpath))
 		{
-			if (!\Joomla\CMS\Filesystem\Folder::create($destpath))
+			if (!mkdir($destpath))
 			{
 				$this->exitHttpHead = array( 0 => array('status' => '500 Internal Server Error') );
 				$this->exitMessages = array( 0 => array('error' => 'Error. Unable to create folders') );
@@ -1598,7 +1599,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 				}
 
 				// Copy or move the file
-				$success = $keep ? \Joomla\CMS\Filesystem\File::copy($source, $destination) : \Joomla\CMS\Filesystem\File::move($source, $destination);
+				$success = $keep ? \Joomla\Filesystem\File::copy($source, $destination) : \Joomla\Filesystem\File::move($source, $destination);
 
 				if ($success)
 				{
@@ -1677,9 +1678,9 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 	public function edit()
 	{
 		$app      = \Joomla\CMS\Factory::getApplication();
-		$user     = \Joomla\CMS\Factory::getUser();
-		$session  = \Joomla\CMS\Factory::getSession();
-		$document = \Joomla\CMS\Factory::getDocument();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 
 		$this->input->set('view', $this->record_name);
 		$this->input->set('hidemainmenu', 1);
@@ -1791,7 +1792,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 		// Initialize variables
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		// Get model
 		$model = $this->getModel($this->record_name_pl);

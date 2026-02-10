@@ -365,7 +365,7 @@ ob_start(); ?>
 									<label for="method-usejoomfish"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_USE_JF_FL_DATA' ); ?> *</label>
 								</div>
 
-								<?php if ( \Joomla\CMS\Filesystem\File::exists(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'translator.php') ) :
+								<?php if ( file_exists(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'translator.php') ) :
 								/* if automatic translator installed ... */ ?>
 
 									<div>
@@ -535,31 +535,17 @@ ob_start(); ?>
 			<div class="control-group" id="row_keeptags">
 				<div class="control-label">
 					<label class="label-fcinner">
-						<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_TAGS_ACTION' ); ?>
+						<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_KEEP_TAGS' ); ?>
 					</label>
 				</div>
 				<div class="controls">
 					<div class="group-fcset fc_input_set">
-						<input id="keeptags0" type="radio" name="keeptags" value="0" onclick="tags_update();" />
-						<label for="keeptags0"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_TAGS_REMOVE_ONLY' ); ?></label>
+						<input id="keeptags0" type="radio" name="keeptags" value="0"/>
+						<label for="keeptags0"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_NO' ); ?></label>
 
-						<input id="keeptags1" type="radio" name="keeptags" value="1" onclick="tags_update();" />
-						<label for="keeptags1"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_TAGS_REPLACE' ); ?></label>
-
-						<input id="keeptags2" type="radio" name="keeptags" value="2" checked="checked" onclick="tags_update();" />
-						<label for="keeptags2"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_TAGS_ADD_NO_DUPLICATES' ); ?></label>
+						<input id="keeptags1" type="radio" name="keeptags" value="1" checked="checked" />
+						<label for="keeptags1"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_YES' ); ?></label>
 					</div>
-				</div>
-			</div>
-
-			<div class="control-group" id="row_tags">
-				<div class="control-label">
-					<label class="label-fcinner">
-						<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_TAGS' ); ?>
-					</label>
-				</div>
-				<div class="controls">
-					<?php echo $this->lists['tags']; ?>
 				</div>
 			</div>
 
