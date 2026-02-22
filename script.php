@@ -300,6 +300,7 @@ class com_flexicontentInstallerScript
 			// J1.6+ installer requires that we explicit set override/upgrade options
 			$jinstaller->setOverwrite(true);
 			$jinstaller->setUpgrade(true);
+			$jinstaller->setDatabase($db);
 
 			if ($jinstaller->install($extensions[$i]['folder']))
 			{
