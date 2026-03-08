@@ -1238,6 +1238,31 @@ class _FlexicontentSiteRouter
 		{
 			if ($add_item_sef_segment !== 2)
 			{
+				// User Fix: Enforce strict alias matching when add_item_sef_segment is 0 or 1
+				$slug = str_replace(':', '-', $segments[$i]);
+				if (strpos($slug, '-') !== false)
+				{
+					$record_alias_from_url = substr($slug, stripos($slug, '-') + 1);
+					$record_id_from_url    = (int) substr($slug, 0, stripos($slug, '-'));
+
+					if ($record_id_from_url)
+					{
+						$db = Factory::getDbo();
+						$query = $db->getQuery(true)
+							->select($db->quoteName($alias_col))
+							->from($db->quoteName($tbls[0]))
+							->where($db->quoteName('id') . ' = ' . (int) $record_id_from_url);
+						$db->setQuery($query);
+						$real_alias = $db->loadResult();
+
+						if ($real_alias && $real_alias !== $record_alias_from_url)
+						{
+							Factory::getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', true);
+							Factory::getLanguage()->load('com_flexicontent', JPATH_SITE, null, true);
+							throw new Exception(Text::sprintf('FLEXI_REQUESTED_CONTENT_OR_VIEW_NOT_FOUND', 'Item'), 404);
+						}
+					}
+				}
 				return $segments[$i];
 			}
 			else
