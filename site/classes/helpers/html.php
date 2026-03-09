@@ -2080,20 +2080,22 @@ class flexicontent_html
 					'overlay_box'  => 'background-color: ' . $overlay_bg_color . ';',
 				);
 
-				$js .= '
-					jQuery( document ).ready(function() {
-						jQuery("body").prepend(\'\\
-							<div id="fc_filter_form_blocker" style="display: none;">\\
-								<div class="fc_blocker_overlay" style="' . $styles->overlay_box . '"></div>\\
-								<div class="fc_blocker_content" style="' . $styles->content_box . '">\\
-									' . ($logo_imgsrc  ? '<div class="fc_blocker_logo" style="' . $styles->logo_box . '" ><img src="' . $logo_imgsrc . '" alt="' . $mssg_text . '"></div>' : '') . '\\
-									' . ($mssg_display ? '<div class="fc_blocker_mssg" style="' . $styles->mssg_box . '" >' . \Joomla\CMS\Language\Text::_($mssg_text, true) . '</div>' : '') . '\\
-									' . ($pbar_display ? '<div class="fc_blocker_bar"><div style="' . $styles->progress_bar . '"></div></div>' : '') . '\\
+				if ( $cparams->get('page_reloading_enable', 1) ) :
+					$js .= '
+						jQuery( document ).ready(function() {
+							jQuery("body").prepend(\'\\
+								<div id="fc_filter_form_blocker" style="display: none;">\\
+									<div class="fc_blocker_overlay" style="' . $styles->overlay_box . '"></div>\\
+									<div class="fc_blocker_content" style="' . $styles->content_box . '">\\
+										' . ($logo_imgsrc  ? '<div class="fc_blocker_logo" style="' . $styles->logo_box . '" ><img src="' . $logo_imgsrc . '" alt="' . $mssg_text . '"></div>' : '') . '\\
+										' . ($mssg_display ? '<div class="fc_blocker_mssg" style="' . $styles->mssg_box . '" >' . \Joomla\CMS\Language\Text::_($mssg_text, true) . '</div>' : '') . '\\
+										' . ($pbar_display ? '<div class="fc_blocker_bar"><div style="' . $styles->progress_bar . '"></div></div>' : '') . '\\
+									</div>\\
 								</div>\\
-							</div>\\
-						\');
-					});
-				';
+							\');
+						});
+					';
+				endif;
 				break;
 
 			// Used only by content / configuration forms, that have form elements needing this

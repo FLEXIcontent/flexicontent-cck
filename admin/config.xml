@@ -78,6 +78,11 @@
 		<field name="" type="separator" default="FLEXI_PAGE_RELOADING_FE_BE" label="" level="level0" />
 		<field name="" type="separator" default="FLEXI_PAGE_RELOADING_FE_BE_ABOUT" label="" level="level3" class="alert alert-info fcpadded" />
 
+			<field name="page_reloading_enable" type="radio" default="1" label="FLEXI_PAGE_RELOADING_ENABLE" description="FLEXI_PAGE_RELOADING_ENABLE_DESC" class="btn-group btn-group-yesno" labelclass="label label-success">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+
 			<field name="" type="separator" default="FLEXI_PAGE_RELOADING_OVERLAY_BOX" label="" level="level2" />
 			<field name="page_reloading_overlay_bg_color" type="color" label="FLEXI_BACKGROUND" default="rgba(0, 0, 0, 0.3)" format="rgba" keywords="transparent,initial,inherit" />
 
