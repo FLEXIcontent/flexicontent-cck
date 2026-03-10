@@ -10,8 +10,8 @@
 //                                                         ///
 //////////////////////////////////////////////////////////////
 
-error_reporting(E_ALL);
-ini_set('display_errors', '1');
+//error_reporting(E_ALL);
+//ini_set('display_errors', '1');
 
 // check for magic quotes in PHP < 7.4.0 (when these functions became deprecated)
 if (version_compare(PHP_VERSION, '7.4.0', '<')) {
