@@ -11,6 +11,7 @@
 
 defined('_JEXEC') or die('Restricted access');
 
+use Joomla\CMS\Factory;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
@@ -1036,8 +1037,10 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 		$cid   = ArrayHelper::toInteger($cid);
 		$rule  = is_int($action) ? 'core.edit.state' : $action;
 
-		// If cannot manage then all records are not changeable
-		if (!$this->canManage)
+		/**
+		 * In backend, if user cannot manage then all records are not changeable
+		 */
+		if (!$this->canManage && Factory::getApplication()->isClient('administrator'))
 		{
 			return $cid;
 		}
