@@ -2093,6 +2093,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			// These are needed in case we are in item view and we need to redirect to a different URL after deletion (to deleted item's category)
 			$catid = $this->input->getInt('cid');
 			$isitemview = $this->input->getInt('isitemview');
+			$returnURL = $this->input->getString('returnURL', '');
 
 			// Get item ID from 'id' URL variable and set it back to 'cid' URL variable
 			$cid = $this->input->get('id', array(), 'array');
@@ -2102,8 +2103,14 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		$result = parent::remove();
 
-		// FRONTEND: Check if we cannot redirect back to the deleted item
-		if ($isSite && $result && reset($cid) === $this->input->getInt('id') && $isitemview)
+		/**
+		 * FRONTEND: Check if we cannot redirect back to the deleted item
+		 */
+		if ($isSite && $result && $returnURL)
+		{
+			$this->setRedirect(base64_decode($returnURL));
+		}
+		elseif ($isSite && $result && reset($cid) === $this->input->getInt('id') && $isitemview)
 		{
 			$non_sef_link = FlexicontentHelperRoute::getCategoryRoute($catid, $Itemid = 0, $urlvars = array());
 			$category_link = \Joomla\CMS\Router\Route::_($non_sef_link);
