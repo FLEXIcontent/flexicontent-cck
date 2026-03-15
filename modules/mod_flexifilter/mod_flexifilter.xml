@@ -88,6 +88,10 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="filter_ajax" type="radio" default="0" label="FLEXI_FILTER_AJAX" description="FLEXI_FILTER_AJAX_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			<field name="filter_instructions" type="radio" default="1" label="FLEXI_SEARCH_FILTER_INSTRUCTIONS" description="FLEXI_SEARCH_FILTER_INSTRUCTIONS_DESC" class="btn-group btn-group-yesno" >
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_YES_AS_TIP</option>
