@@ -360,11 +360,9 @@ if ($use_mlist)
 		<?php endif; ?>
 	</div>
 
-</div>
-
-<script>
-	let isGoogleMap_<?= $module->id; ?>     = <?php echo $mapapi === 'googlemap' ? 'true' : 'false'; ?>;
-	let isOpenStreetMap_<?= $module->id; ?> = <?php echo $mapapi === 'openstreetmap' ? 'true' : 'false'; ?>;
+	<script>
+		var isGoogleMap_<?= $module->id; ?>     = <?php echo $mapapi === 'googlemap' ? 'true' : 'false'; ?>;
+		var isOpenStreetMap_<?= $module->id; ?> = <?php echo $mapapi === 'openstreetmap' ? 'true' : 'false'; ?>;
 
 	function fc_MapMod_markerContained<?= $module->id; ?>(mapBounds, marker)
 	{
@@ -896,3 +894,5 @@ if ($use_mlist)
 
 
 <?php endif; ?>
+
+</div>

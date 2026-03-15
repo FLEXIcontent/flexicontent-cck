@@ -263,7 +263,9 @@ if ($params->get('filter_ajax', 0)) :
 				type: 'POST',
 				data: queryString, 
 				success: function(response) {
-					var parsedDoc = $($.parseHTML(response, document, true));
+					var parser = new DOMParser();
+					var doc = parser.parseFromString(response, 'text/html');
+					var parsedDoc = $(doc);
 					
 					if (targetContainer.length) {
 						var \$newContent = parsedDoc.find('#flexicontent');
@@ -279,6 +281,7 @@ if ($params->get('filter_ajax', 0)) :
 					if (moduleContainers.length) {
 						moduleContainers.each(function() {
 							var \$modWrapper = $(this);
+							if (!document.body.contains(\$modWrapper[0])) return;
 							var modId = \$modWrapper.attr('id');
 							if (modId) {
 								var \$newMod = parsedDoc.find('#' + modId);
@@ -363,3 +366,4 @@ endif;
 </div>
 
 </div> <!-- mod_flexifilter_wrap -->
+
