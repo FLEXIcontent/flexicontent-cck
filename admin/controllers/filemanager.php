@@ -800,8 +800,8 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		jimport('joomla.filesystem.file');
 
 		// Get field parameter 'auto_filename_code' which has PHP code to create the filename
-		$auto_filename_code = $field->parameters->get('auto_filename_code', '');
-		$auto_filename      = (int) $field->parameters->get('auto_filename', 0);
+		$auto_filename_code = $field->params->auto_filename_code ?? 0;
+		$auto_filename      = (int)($field->params->auto_filename ?? 0);
 		$auto_filename      = $auto_filename === 2 && !$auto_filename_code ? 0 : $auto_filename;
 		$custom_filename    = false;
 
@@ -809,7 +809,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		{
 			if ($auto_filename === 2)
 			{
-				$auto_filename_code = $field->parameters->get('auto_filename_code', '');
+				$auto_filename_code = $field->params->auto_filename_code ?? 0;
 				$auto_filename_code = preg_replace('/^<\?php(.*)(\?>)?$/s', '$1', $auto_filename_code);
 			}
 

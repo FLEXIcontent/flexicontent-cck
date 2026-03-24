@@ -2474,7 +2474,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		// b. Delete the original image from file manager
 		$src_path = Path::clean($origfolder.DS.$filename);
 
-		if (!File::delete($src_path))
+		if (file_exists($src_path) && !File::delete($src_path))
 		{
 			$app->enqueueMessage('Field: ' . $field->label . ' : ' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD_UNABLE_TO_DELETE_FILE') . ': ' . $src_path, 'warning');
 		}
