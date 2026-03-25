@@ -1829,9 +1829,9 @@ class com_flexicontentInstallerScript
 						{
 							foreach($tmpl_override_files as $file)
 							{
-								if (\Joomla\CMS\Filesystem\File::exists($file))
+								if (\Joomla\Filesystem\File::exists($file))
 								{
-									if (!\Joomla\CMS\Filesystem\File::delete($file))
+									if (!\Joomla\Filesystem\File::delete($file))
 									{
 										echo 'Cannot delete legacy file: ' . $file . '<br />';
 									}

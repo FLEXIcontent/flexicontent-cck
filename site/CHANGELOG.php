@@ -580,7 +580,7 @@ $ -> Language fix or change
 
 # Fixes on the installer post script
 # Fix the description field that isn't displayed in category view
-# Image field inverted slashes on windows servers with \Joomla\CMS\Filesystem\Path::clean
+# Image field inverted slashes on windows servers with \Joomla\Filesystem\Path::clean
 # Weblink field Add title attribute to links
 # Image field Chmod 777 on the created directories to allow phpTumb to write in object mode when FTP layer is activated 
 # Fix the not triggered content plugins

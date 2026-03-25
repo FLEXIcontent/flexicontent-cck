@@ -342,7 +342,7 @@ class FlexicontentTasksCore
 		// Check for request forgeries
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
-		require_once \Joomla\CMS\Filesystem\Path::clean(JPATH_SITE . '/components/com_flexicontent/helpers/permission.php');
+		require_once \Joomla\Filesystem\Path::clean(JPATH_SITE . '/components/com_flexicontent/helpers/permission.php');
 
 		$app    = \Joomla\CMS\Factory::getApplication();
 		$perms  = FlexicontentHelperPerm::getPerm();

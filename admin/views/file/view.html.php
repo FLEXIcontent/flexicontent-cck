@@ -294,7 +294,7 @@ class FlexicontentViewFile extends FlexicontentViewBaseRecord
 		{
 			case 0:
 				$path = $row->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;  // JPATH_ROOT . DS . <media_path | file_path>
-				$rowdata->path = \Joomla\CMS\Filesystem\Path::clean($path . DS . $row->filename);
+				$rowdata->path = \Joomla\Filesystem\Path::clean($path . DS . $row->filename);
 
 				$rowdata->calculated_size = file_exists($rowdata->path) ? filesize($rowdata->path) : 0;
 				break;
@@ -315,7 +315,7 @@ class FlexicontentViewFile extends FlexicontentViewBaseRecord
 				break;
 
 			case 2:
-				$rowdata->path = \Joomla\CMS\Filesystem\Path::clean(JPATH_ROOT . DS . $row->filename);
+				$rowdata->path = \Joomla\Filesystem\Path::clean(JPATH_ROOT . DS . $row->filename);
 				$rowdata->calculated_size = file_exists($rowdata->path) ? filesize($rowdata->path) : 0;
 				break;
 		}

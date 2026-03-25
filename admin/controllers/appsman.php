@@ -705,7 +705,7 @@ class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 
 			$tmp_ffname = 'fcmd_uid_' . $user->id . '_' . date('Y-m-d__H-i-s');
 			$archivename = $tmp_ffname . '.zip';
-			$archivepath = \Joomla\CMS\Filesystem\Path::clean($app->getCfg('tmp_path') . DS . $archivename);
+			$archivepath = \Joomla\Filesystem\Path::clean($app->getCfg('tmp_path') . DS . $archivename);
 
 			/**
 			 * Create a new Zip archive on the server disk

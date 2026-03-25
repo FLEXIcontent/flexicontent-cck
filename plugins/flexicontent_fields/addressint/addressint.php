@@ -246,7 +246,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 				$custom_marker_default = 'https://unpkg.com/leaflet@1.5.1/dist/images/marker-icon.png';
 			}
 
-			$imgs = \Joomla\CMS\Filesystem\Folder::files($custom_marker_path_abs);
+			$imgs = \Joomla\Filesystem\Folder::files($custom_marker_path_abs);
 
 			if ($imgs)
 			{

@@ -647,8 +647,8 @@ class FlexicontentModelTemplate extends FCModelAdmin
 		$jform->load($this->_getLayout()->params);   // params is the XML file contents as a string
 
 		$layout_type = $layout=='items' ? 'item' : 'category';
-		$tmpldir = \Joomla\CMS\Filesystem\Path::clean(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates');
-		$less_path = \Joomla\CMS\Filesystem\Path::clean($tmpldir.DS.$folder.DS.'less/include/config_auto_'.$layout_type.'.less');
+		$tmpldir = \Joomla\Filesystem\Path::clean(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates');
+		$less_path = \Joomla\Filesystem\Path::clean($tmpldir.DS.$folder.DS.'less/include/config_auto_'.$layout_type.'.less');
 		//echo "<pre>".$less_path."<br/>";
 
 		$_FCLL = '@FC'. ($layout == 'items' ? 'I' : 'C').'_';

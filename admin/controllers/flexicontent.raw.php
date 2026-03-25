@@ -751,7 +751,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 				{
 					$file = JPATH_SITE . DS . 'tmp' . DS . 'tbl_indexes_' . $tblname;
 					$file_contents = "" . time();
-					\Joomla\CMS\Filesystem\File::write($file, $file_contents);
+					\Joomla\Filesystem\File::write($file, $file_contents);
 
 					if (isset($update_queries[$tblname]))
 					{
@@ -787,7 +787,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 						}
 					}
 
-					\Joomla\CMS\Filesystem\File::delete($file);
+					\Joomla\Filesystem\File::delete($file);
 				}
 			}
 		}
@@ -968,8 +968,8 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		$format = strtolower($this->input->get('format', 'html', 'CMD'));
 
 		// PhpThumb cache directory
-		$phpthumbcache 	= \Joomla\CMS\Filesystem\Path::clean(JPATH_SITE . DS . 'components' . DS . 'com_flexicontent' . DS . 'librairies' . DS . 'phpthumb' . DS . 'cache');
-		$success = \Joomla\CMS\Filesystem\Path::setPermissions($phpthumbcache, '0600', '0700');
+		$phpthumbcache 	= \Joomla\Filesystem\Path::clean(JPATH_SITE . DS . 'components' . DS . 'com_flexicontent' . DS . 'librairies' . DS . 'phpthumb' . DS . 'cache');
+		$success = \Joomla\Filesystem\Path::setPermissions($phpthumbcache, '0600', '0700');
 
 		if (!$success)
 		{
@@ -1052,7 +1052,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		// Delete deprecated files that were found
 		foreach ($deprecated['files'] as $file)
 		{
-			if (!\Joomla\CMS\Filesystem\File::delete($file))
+			if (!\Joomla\Filesystem\File::delete($file))
 			{
 				echo 'Cannot delete legacy file: ' . $file . '<br />';
 			}
@@ -1061,7 +1061,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		// Delete deprecated folders that were found
 		foreach ($deprecated['folders'] as $folder)
 		{
-			if (!\Joomla\CMS\Filesystem\Folder::delete($folder))
+			if (!\Joomla\Filesystem\Folder::delete($folder))
 			{
 				echo 'Cannot delete legacy folder: ' . $folder . '<br />';
 			}

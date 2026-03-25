@@ -226,7 +226,7 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 		$lists 		= array();
 		$options 	= array();
 		$folder 	= JPATH_ADMINISTRATOR.DS.'language';
-		$langs 		= \Joomla\CMS\Filesystem\Folder::folders($folder);
+		$langs 		= \Joomla\Filesystem\Folder::folders($folder);
 		$activelang = \Joomla\CMS\Component\ComponentHelper::getParams('com_languages')->get('administrator', 'en-GB');
 
 		foreach ($langs as $lang) {

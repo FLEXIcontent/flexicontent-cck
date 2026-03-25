@@ -9,8 +9,8 @@
 
 defined('JPATH_PLATFORM') or die;
 
-jimport('joomla.filesystem.folder');  // \Joomla\CMS\Filesystem\Folder
-jimport('joomla.filesystem.file');    // \Joomla\CMS\Filesystem\File
+jimport('joomla.filesystem.folder');  // \Joomla\Filesystem\Folder
+jimport('joomla.filesystem.file');    // \Joomla\Filesystem\File
 
 jimport('cms.html.html');      // JHtml
 jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
@@ -232,7 +232,7 @@ class JFormFieldFcFileList extends JFormFieldList
 		}
 
 		// Get a list of files in the search path with the given filter.
-		$files = \Joomla\CMS\Filesystem\Folder::files($path, $this->filter);
+		$files = \Joomla\Filesystem\Folder::files($path, $this->filter);
 
 		// Build the options list from the list of files.
 		if (is_array($files))
@@ -259,7 +259,7 @@ class JFormFieldFcFileList extends JFormFieldList
 				// If the extension is to be stripped, do it.
 				if ($this->stripExt)
 				{
-					$text = $value = \Joomla\CMS\Filesystem\File::stripExt($value);
+					$text = $value = \Joomla\Filesystem\File::stripExt($value);
 				}
 
 				// Handle case of (default) file name being exact the stripPrefix

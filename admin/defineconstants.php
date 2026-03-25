@@ -78,8 +78,8 @@ if (ini_get('date.timezone') == '')
 
 // Set file manager paths
 $params = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
-if (!defined('COM_FLEXICONTENT_FILEPATH'))	define('COM_FLEXICONTENT_FILEPATH',		\Joomla\CMS\Filesystem\Path::clean( JPATH_ROOT.DS.$params->get('file_path', 'components/com_flexicontent/uploads') ) );
-if (!defined('COM_FLEXICONTENT_MEDIAPATH'))	define('COM_FLEXICONTENT_MEDIAPATH',	\Joomla\CMS\Filesystem\Path::clean( JPATH_ROOT.DS.$params->get('media_path', 'components/com_flexicontent/medias') ) );
+if (!defined('COM_FLEXICONTENT_FILEPATH'))	define('COM_FLEXICONTENT_FILEPATH',		\Joomla\Filesystem\Path::clean( JPATH_ROOT.DS.$params->get('file_path', 'components/com_flexicontent/uploads') ) );
+if (!defined('COM_FLEXICONTENT_MEDIAPATH'))	define('COM_FLEXICONTENT_MEDIAPATH',	\Joomla\Filesystem\Path::clean( JPATH_ROOT.DS.$params->get('media_path', 'components/com_flexicontent/medias') ) );
 
 // Set the media manager paths definitions
 $jinput = \Joomla\CMS\Factory::getApplication()->input;
@@ -87,7 +87,7 @@ $view = $jinput->get('view', '', 'cmd');
 $popup_upload = $jinput->get('pop_up', null, 'cmd');
 $path = "fleximedia_path";
 if(substr(strtolower($view),0,6) == "images" || $popup_upload == 1) $path = "image_path";
-if (!defined('COM_FLEXIMEDIA_BASE'))		define('COM_FLEXIMEDIA_BASE',		 \Joomla\CMS\Filesystem\Path::clean(JPATH_ROOT.DS.$params->get($path, 'images'.DS.'stories')));
+if (!defined('COM_FLEXIMEDIA_BASE'))		define('COM_FLEXIMEDIA_BASE',		 \Joomla\Filesystem\Path::clean(JPATH_ROOT.DS.$params->get($path, 'images'.DS.'stories')));
 if (!defined('COM_FLEXIMEDIA_BASEURL'))	define('COM_FLEXIMEDIA_BASEURL', (php_sapi_name() !== 'cli' ? \Joomla\CMS\Uri\Uri::root() : JPATH_ROOT . '/').$params->get($path, 'images/stories'));
 
 if (!defined('FLEXI_SECTION'))				define('FLEXI_SECTION', 0);

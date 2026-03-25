@@ -51,7 +51,7 @@ abstract class JHtmlFclayoutbuilder
 		static $cnt = -1;
 		$cnt++;
 		
-		$path        = \Joomla\CMS\Filesystem\Path::clean(JPATH_ROOT . $config->location);
+		$path        = \Joomla\Filesystem\Path::clean(JPATH_ROOT . $config->location);
 		$css_prefix  = $config->css_prefix;
 		$layout_name = $config->layout_name;
 
@@ -88,7 +88,7 @@ abstract class JHtmlFclayoutbuilder
 
 		//echo '<pre>' . $less_code . '</pre>';
 		$less_file  = 'less/' . $layout_name . '_' . $module->id . '.less';
-		$less_path  = \Joomla\CMS\Filesystem\Path::clean($path . $less_file);
+		$less_path  = \Joomla\Filesystem\Path::clean($path . $less_file);
 
 		// Create LESS file
 		if (!file_exists($less_path))
@@ -126,7 +126,7 @@ abstract class JHtmlFclayoutbuilder
 		{
 			$path = $file_path;
 			$path = str_replace('{{id}}', $id, $path);
-			$path = \Joomla\CMS\Filesystem\Path::clean(JPATH_ROOT . $path . '.less');
+			$path = \Joomla\Filesystem\Path::clean(JPATH_ROOT . $path . '.less');
 
 			if (file_exists($path))
 			{
@@ -184,7 +184,7 @@ abstract class JHtmlFclayoutbuilder
 			}
 
 			//\Joomla\CMS\Factory::getApplication()->enqueueMessage($lessfile);
-			//unlink(\Joomla\CMS\Filesystem\Path::clean(JPATH_ROOT . '/' . $lessfile));
+			//unlink(\Joomla\Filesystem\Path::clean(JPATH_ROOT . '/' . $lessfile));
 		}
 
 		static $framework_added = null;

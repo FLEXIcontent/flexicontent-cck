@@ -599,7 +599,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 
 		// Try to find the component helper.
 		$eName = str_replace('com_', '', $component);
-		$path = \Joomla\CMS\Filesystem\Path::clean(JPATH_ADMINISTRATOR . "/components/$component/helpers/category.php");
+		$path = \Joomla\Filesystem\Path::clean(JPATH_ADMINISTRATOR . "/components/$component/helpers/category.php");
 
 		if (file_exists($path))
 		{

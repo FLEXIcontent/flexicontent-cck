@@ -360,7 +360,7 @@ class FlexicontentCronTasks
 				? $file->source_path
 				:	($file->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH);  // JPATH_ROOT . DS . <media_path | file_path>
 
-			$source_file  = \Joomla\CMS\Filesystem\Path::clean($file->source_path . DS . $file->filename);
+			$source_file  = \Joomla\Filesystem\Path::clean($file->source_path . DS . $file->filename);
 			$dest_file    = basename($source_file);
 
 			/*$contents_on_server = ftp_nlist($ftpConnID[$field_id], $efs_ftp_path); //Returns an array of filenames from the specified directory on success or FALSE on error. 

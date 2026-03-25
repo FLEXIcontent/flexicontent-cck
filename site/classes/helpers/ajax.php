@@ -30,7 +30,7 @@ class flexicontent_ajax
 		if ($exttype=='modules')
 		{
 			// Import module helper file
-			$helper_path = \Joomla\CMS\Filesystem\Path::clean(JPATH_SITE.DS.$exttype.DS.'mod_'.$extname.DS.'helper.php');
+			$helper_path = \Joomla\Filesystem\Path::clean(JPATH_SITE.DS.$exttype.DS.'mod_'.$extname.DS.'helper.php');
 			if ( !file_exists($helper_path) )
 			{
 				jexit("no helper file found at expected path, filepath is ".$helper_path);
