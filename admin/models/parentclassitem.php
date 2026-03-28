@@ -1420,21 +1420,20 @@ class ParentClassItem extends FCModelAdmin
 		}
 		else
 		{
-			// Split text to introtext & fulltext
-			if ( !StringHelper::strlen(StringHelper::trim(@$data['introtext'])) && !StringHelper::strlen(StringHelper::trim(@$data['fulltext'])) )
-			{
-				$this->splitText($data);
-			}
-
-			if ($this->_record)
-			{
-				if ( StringHelper::strlen(StringHelper::trim(@$data['text'])) )      $this->_record->text      = $data['text'];
-				if ( StringHelper::strlen(StringHelper::trim(@$data['introtext'])) ) $this->_record->introtext = $data['introtext'];
-				if ( StringHelper::strlen(StringHelper::trim(@$data['fulltext'])) )  $this->_record->fulltext  = $data['fulltext'];
-				if ( isset($data['language']) )  $this->_record->language  = $data['language'];
-				if ( isset($data['catid']) )     $this->_record->catid  = $data['catid'];
-			}
-		}
+   			// Split text to introtext & fulltext
+    		if ( !StringHelper::strlen(StringHelper::trim((string)($data['introtext'] ?? ''))) && !StringHelper::strlen(StringHelper::trim((string)($data['fulltext'] ?? ''))) )
+    	{
+        	$this->splitText($data);
+   		 }
+    		if ($this->_record)
+    	{
+        if ( StringHelper::strlen(StringHelper::trim((string)($data['text'] ?? ''))) )      $this->_record->text      = $data['text'];
+        if ( StringHelper::strlen(StringHelper::trim((string)($data['introtext'] ?? ''))) ) $this->_record->introtext = $data['introtext'];
+        if ( StringHelper::strlen(StringHelper::trim((string)($data['fulltext'] ?? ''))) )  $this->_record->fulltext  = $data['fulltext'];
+        if ( isset($data['language']) )  $this->_record->language  = $data['language'];
+        if ( isset($data['catid']) )     $this->_record->catid  = $data['catid'];
+    }
+}
 
 		$events_context = $this->events_context ?: $this->option.'.'.$this->getName();
 		$this->preprocessData($events_context, $data);
