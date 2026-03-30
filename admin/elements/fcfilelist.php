@@ -3,27 +3,25 @@
  * @package     Joomla.Platform
  * @subpackage  Form
  *
- * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
+ * @copyright   Copyright (C) 2005 - 2024 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
-defined('JPATH_PLATFORM') or die;
+// Compatible Joomla 4, 5 et 6
+defined('_JEXEC') or die;
 
-jimport('joomla.filesystem.folder');  // \Joomla\Filesystem\Folder
-jimport('joomla.filesystem.file');    // \Joomla\Filesystem\File
-
-jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
-
-jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
-\Joomla\CMS\Form\FormHelper::loadFieldClass('list');   // \Joomla\CMS\Form\Field\ListField
+use Joomla\CMS\Form\Field\ListField;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Language\Text;
+use Joomla\Filesystem\File;
+use Joomla\Filesystem\Folder;
 
 /**
  * Supports an HTML select list of files
  *
  * @since  11.1
  */
-class JFormFieldFcFileList extends JFormFieldList
+class JFormFieldFcFileList extends ListField
 {
 	/**
 	 * The form field type.
@@ -39,7 +37,7 @@ class JFormFieldFcFileList extends JFormFieldList
 	 * @var    string
 	 * @since  3.2
 	 */
-	protected $filter;
+	protected $filter = '';
 
 	/**
 	 * The exclude.
@@ -47,7 +45,7 @@ class JFormFieldFcFileList extends JFormFieldList
 	 * @var    string
 	 * @since  3.2
 	 */
-	protected $exclude;
+	protected $exclude = '';
 
 	/**
 	 * The hideNone.
@@ -64,15 +62,15 @@ class JFormFieldFcFileList extends JFormFieldList
 	 * @since  3.2
 	 */
 	protected $hideDefault = false;
-	
+
 	/**
 	 * The defaultLabel.
 	 *
-	 * @var    boolean
+	 * @var    string|false
 	 * @since  3.2
 	 */
 	protected $defaultLabel = false;
-	
+
 	/**
 	 * The stripExt.
 	 *
@@ -84,7 +82,7 @@ class JFormFieldFcFileList extends JFormFieldList
 	/**
 	 * The stripPrefix.
 	 *
-	 * @var    boolean
+	 * @var    string|false
 	 * @since  3.2
 	 */
 	protected $stripPrefix = false;
@@ -95,12 +93,12 @@ class JFormFieldFcFileList extends JFormFieldList
 	 * @var    string
 	 * @since  3.2
 	 */
-	protected $directory;
+	protected $directory = '';
 
 	/**
 	 * Method to get certain otherwise inaccessible properties from the form field object.
 	 *
-	 * @param   string  $name  The property name for which to the the value.
+	 * @param   string  $name  The property name for which to get the value.
 	 *
 	 * @return  mixed  The property value or null.
 	 *
@@ -127,7 +125,7 @@ class JFormFieldFcFileList extends JFormFieldList
 	/**
 	 * Method to set certain otherwise inaccessible properties of the form field object.
 	 *
-	 * @param   string  $name   The property name for which to the the value.
+	 * @param   string  $name   The property name for which to set the value.
 	 * @param   mixed   $value  The value of the property.
 	 *
 	 * @return  void
@@ -149,7 +147,7 @@ class JFormFieldFcFileList extends JFormFieldList
 			case 'defaultLabel':
 			case 'stripPrefix':
 			case 'stripExt':
-				$value = (string) $value;
+				$value       = (string) $value;
 				$this->$name = ($value === 'true' || $value === $name || $value === '1');
 				break;
 
@@ -159,40 +157,36 @@ class JFormFieldFcFileList extends JFormFieldList
 	}
 
 	/**
-	 * Method to attach a \Joomla\CMS\Form\Form object to the field.
+	 * Method to attach a JForm object to the field.
 	 *
-	 * @param   SimpleXMLElement  $element  The SimpleXMLElement object representing the <field /> tag for the form field object.
-	 * @param   mixed             $value    The form field value to validate.
-	 * @param   string            $group    The field name group control value. This acts as as an array container for the field.
-	 *                                      For example if the field has name="foo" and the group value is set to "bar" then the
-	 *                                      full field name would end up being "bar[foo]".
+	 * @param   \SimpleXMLElement  $element  The SimpleXMLElement object representing the <field /> tag.
+	 * @param   mixed              $value    The form field value to validate.
+	 * @param   string|null        $group    The field name group control value.
 	 *
 	 * @return  boolean  True on success.
 	 *
-	 * @see     \Joomla\CMS\Form\FormField::setup()
 	 * @since   3.2
 	 */
-	public function setup(SimpleXMLElement $element, $value, $group = null)
+	public function setup(\SimpleXMLElement $element, $value, $group = null): bool
 	{
 		$return = parent::setup($element, $value, $group);
 
 		if ($return)
 		{
-			$this->filter  = (string) $this->element['filter'];
-			$this->exclude = (string) $this->element['exclude'];
+			$this->filter      = (string) $this->element['filter'];
+			$this->exclude     = (string) $this->element['exclude'];
 			$this->stripPrefix = (string) $this->element['stripprefix'];
 			$this->defaultLabel = (string) $this->element['defaultlabel'];
-			
+
 			$hideNone       = (string) $this->element['hide_none'];
-			$this->hideNone = ($hideNone == 'true' || $hideNone == 'hideNone' || $hideNone == '1');
+			$this->hideNone = ($hideNone === 'true' || $hideNone === 'hideNone' || $hideNone === '1');
 
 			$hideDefault       = (string) $this->element['hide_default'];
-			$this->hideDefault = ($hideDefault == 'true' || $hideDefault == 'hideDefault' || $hideDefault == '1');
-			
-			$stripExt       = (string) $this->element['stripext'];
-			$this->stripExt = ($stripExt == 'true' || $stripExt == 'stripExt' || $stripExt == '1');
+			$this->hideDefault = ($hideDefault === 'true' || $hideDefault === 'hideDefault' || $hideDefault === '1');
 
-			// Get the path in which to search for file options.
+			$stripExt       = (string) $this->element['stripext'];
+			$this->stripExt = ($stripExt === 'true' || $stripExt === 'stripExt' || $stripExt === '1');
+
 			$this->directory = (string) $this->element['directory'];
 		}
 
@@ -201,7 +195,7 @@ class JFormFieldFcFileList extends JFormFieldList
 
 	/**
 	 * Method to get the list of files for the field options.
-	 * Specify the target directory with a directory attribute
+	 * Specify the target directory with a directory attribute.
 	 * Attributes allow an exclude mask and stripping of extensions from file name.
 	 * Default attribute may optionally be set to null (no file) or -1 (use a default).
 	 *
@@ -209,70 +203,75 @@ class JFormFieldFcFileList extends JFormFieldList
 	 *
 	 * @since   11.1
 	 */
-	protected function getOptions()
+	protected function getOptions(): array
 	{
-		$options = array();
+		$options = [];
 
 		$path = $this->directory;
 
 		if (!is_dir($path))
 		{
-			$path = JPATH_ROOT . '/' . $path;
+			$path = JPATH_ROOT . '/' . ltrim($path, '/');
 		}
 
-		// Prepend some default options based on field attributes.
+		// Sanitize fieldname for use as language key suffix
+		$fieldKey = preg_replace('/[^a-zA-Z0-9_\-]/', '_', $this->fieldname);
+
+		// Prepend default options based on field attributes.
 		if (!$this->hideNone)
 		{
-			$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '-1', \Joomla\CMS\Language\Text::alt('JOPTION_DO_NOT_USE', preg_replace('/[^a-zA-Z0-9_\-]/', '_', $this->fieldname)));
+			$options[] = HTMLHelper::_('select.option', '-1', Text::alt('JOPTION_DO_NOT_USE', $fieldKey));
 		}
 
 		if (!$this->hideDefault)
 		{
-			$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '', ($this->defaultLabel ? \Joomla\CMS\Language\Text::_($this->defaultLabel) : \Joomla\CMS\Language\Text::alt('JOPTION_USE_DEFAULT', preg_replace('/[^a-zA-Z0-9_\-]/', '_', $this->fieldname))));
+			$label     = $this->defaultLabel
+				? Text::_($this->defaultLabel)
+				: Text::alt('JOPTION_USE_DEFAULT', $fieldKey);
+			$options[] = HTMLHelper::_('select.option', '', $label);
 		}
 
 		// Get a list of files in the search path with the given filter.
-		$files = \Joomla\Filesystem\Folder::files($path, $this->filter);
-
-		// Build the options list from the list of files.
-		if (is_array($files))
+		if (is_dir($path))
 		{
-			foreach ($files as $file)
+			$files = Folder::files($path, $this->filter);
+
+			if (is_array($files))
 			{
-				// Check to see if the file is in the exclude mask.
-				if ($this->exclude)
+				foreach ($files as $file)
 				{
-					if (preg_match(chr(1) . $this->exclude . chr(1), $file))
+					// Check to see if the file matches the exclude mask.
+					if ($this->exclude && preg_match(chr(1) . $this->exclude . chr(1), $file))
 					{
 						continue;
 					}
-				}
 
-				$text = $value = $file;
-				
-				// If the extension is to be stripped, do it.
-				if ($this->stripPrefix)
-				{
-					$text = $value = str_replace($this->stripPrefix, '', $value);
-				}
-				
-				// If the extension is to be stripped, do it.
-				if ($this->stripExt)
-				{
-					$text = $value = \Joomla\Filesystem\File::stripExt($value);
-				}
+					$text = $value = $file;
 
-				// Handle case of (default) file name being exact the stripPrefix
-				if ($this->stripPrefix && $text == rtrim($this->stripPrefix, '_'))
-				{
-					$text = '- ' . \Joomla\CMS\Language\Text::_('FLEXI_DEFAULT') . ' -';
-				}
+					// Strip prefix if set.
+					if ($this->stripPrefix)
+					{
+						$text = $value = str_replace($this->stripPrefix, '', $value);
+					}
 
-				$options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', $value, $text);
+					// Strip extension if set.
+					if ($this->stripExt)
+					{
+						$text = $value = File::stripExt($value);
+					}
+
+					// Handle case where file name equals the stripped prefix (i.e. the "default" file).
+					if ($this->stripPrefix && $text === rtrim($this->stripPrefix, '_'))
+					{
+						$text = '- ' . Text::_('FLEXI_DEFAULT') . ' -';
+					}
+
+					$options[] = HTMLHelper::_('select.option', $value, $text);
+				}
 			}
 		}
 
-		// Merge any additional options in the XML definition.
+		// Merge any additional options defined in XML.
 		$options = array_merge(parent::getOptions(), $options);
 
 		return $options;
