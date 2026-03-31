@@ -1337,8 +1337,8 @@ if ($js)
 										<td class="center hidden-phone">
 											<?php
 											echo $this->CanFiles && ($this->CanViewAllFiles || $user->id == $row->uploaded_by)
-												? flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'class="fcfield_selectval" onchange="return setAccessLevel(this, '.$row->id.');"')
-												: (strlen($row->access_level) ? $this->escape($row->access_level) : '-');
+												? flexicontent_html::userlevel('access['.$row->id.']', $row->access ?? 1, 'class="fcfield_selectval" onchange="return setAccessLevel(this, '.$row->id.');"')
+												: (strlen($row->access_level ?? '') ? $this->escape($row->access_level) : '-');
 											?>
 										</td>
 									<?php endif; ?>
