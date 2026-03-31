@@ -97,7 +97,7 @@ button.btn.btn-highlight:hover,
 #flexicontent .fc-xpended-btns > [class*=" fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn),
 #flexicontent .fc-xpended-btns > .fcfield-button-add:not(.add-on):not(.input-group-addon) a,
 #flexicontent .buttons.btn-group > ul.dropdown-menu > li > span {
-	font-family: 'Roboto' !important;
+	font-family: inherit !important;
 }
 #flexicontent div div [class^="fcfield-"].fcfont-icon:before,
 #flexicontent div div [class*=" fcfield-"].fcfont-icon:before,

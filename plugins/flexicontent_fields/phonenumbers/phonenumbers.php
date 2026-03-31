@@ -55,7 +55,7 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 		$tooltip_class = 'hasTooltip';
 		$add_on_class    = $cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
 		$input_grp_class = $cparams->get('bootstrap_ver', 2)==2  ?  'input-append input-prepend' : 'input-group';
-		$btn_item_class  = $cparams->get('bootstrap_ver', 2)==2  ?  'btn' : 'btn btn-outline-primary';
+		$btn_item_class  = $cparams->get('bootstrap_ver', 2)==2  ?  'btn' : 'btn btn-outline-secondary';
 		$btn_group_class = $cparams->get('bootstrap_ver', 2)==2  ?  'btn-group' : 'btn-group';
 		$form_font_icons = $cparams->get('form_font_icons', 1);
 		$font_icon_class = $form_font_icons ? ' fcfont-icon' : '';
@@ -379,8 +379,7 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 
 			$phonecc = (!$use_cc ? '' : '
 				<tr><td class="key">' .\Joomla\CMS\Language\Text::_( 'PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_COUNTRY_CODE' ). '</td><td>
-					' . \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $allowed_countries, $fieldname_n.'[cc]', $countries_attribs . ' class="use_select2_lib phonecc"', 'value', 'text', ($value['cc'] ? $value['cc'] : $ac_country_default), $elementid_n.'_cc') . '
-				</td></tr>');
+' . \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $allowed_countries, $fieldname_n.'[cc]', $countries_attribs . ' class="use_select2_lib phonecc"', 'value', 'text', ($value['cc'] ?? $ac_country_default), $elementid_n.'_cc') . '				</td></tr>');
 
 			$phone = '
 				<tr><td class="key">' .\Joomla\CMS\Language\Text::_( 'PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_PHONE_NUMBER' ). '</td><td>

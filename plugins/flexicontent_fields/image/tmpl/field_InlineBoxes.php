@@ -474,7 +474,7 @@ foreach ($field->value as $index => $value)
 					<li>'.$uploader_html->mediaUrlBtn.'</li>
 				</ul>
 			</div>
-			<span class="btn fcfont-icon icon icon-pencil fas fa-info-circle image-option" onclick="jQuery(\'.fcimg_value_props[data-name=' . $elementid_n . ']\').toggle(150);"></span>
+			<span class="btn btn-outline-secondary fcfont-icon icon icon-pencil fas fa-info-circle image-option" onclick="jQuery(\'.fcimg_value_props[data-name=' . $elementid_n . ']\').toggle(150);"></span>
 			'.$uploader_html->clearBtn.'
 			' : '') . '
 		</div>
@@ -495,7 +495,7 @@ foreach ($field->value as $index => $value)
 					' . ($use_myfiles > 0 ? $uploader_html->myFilesBtn : '') . '
 					'.$uploader_html->mediaUrlBtn.'
 					'.$uploader_html->clearBtn.'
-					<span class="btn fcfont-icon icon icon-pencil fas fa-info-circle image-option" onclick="jQuery(\'.fcimg_value_props[data-name=' . $elementid_n . ']\').toggle(150);"></span>
+					<span class="btn btn-outline-secondary fcfont-icon icon icon-pencil fas fa-info-circle image-option" onclick="jQuery(\'.fcimg_value_props[data-name=' . $elementid_n . ']\').toggle(150);"></span>
 				</div>
 			</div>
 			' : '') . '

@@ -3150,6 +3150,11 @@ class FlexicontentFields
 			 */
 			if ( !$for_advsearch )
 			{
+				// Ensure search is an array before assigning
+				if (!is_array($field->search)) {
+					$field->search = array();
+				}
+				
 				// Do not add (yet) search prefix to the words, it will be added by controller
 				$field->search[$itemid] = implode(' | ', $searchindex);
 			}

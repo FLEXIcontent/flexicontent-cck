@@ -1020,6 +1020,9 @@ table.fc_uploader_header_tbl td:last-child {
 }
 #flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox {
 	list-style: none !important;
+	display: flex;
+	gap: 10px;
+	align-items: flex-start;
 }
 #flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox.floated {
 	display: inline-block;
@@ -1423,7 +1426,7 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 	background: url(../images/magnifier.png) 50% 50% no-repeat;
 }
 #flexicontent .fcfield-selectvalue.fcfont-icon:before {
-	content: "\53";
+	content: "\f002";
 }
 #flexicontent .fcfield-selectvalue:before {
 	color: black;
