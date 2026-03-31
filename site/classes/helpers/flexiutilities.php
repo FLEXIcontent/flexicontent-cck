@@ -419,8 +419,7 @@ class FLEXIUtilities
 			// 2. Create a plugin instance, also pass the parameters so that $this->params are created too
 			$dispatcher  = JEventDispatcher::getInstance();
 			$plg_db_data = \Joomla\CMS\Plugin\PluginHelper::getPlugin('flexicontent_fields', $fieldtype);
-			$fc_plgs[$fieldtype] = new $className($dispatcher, array('type'=>'flexicontent_fields', 'name'=>$fieldtype, 'params'=>$plg_db_data->params));
-		}
+$fc_plgs[$fieldtype] = new $className($dispatcher, array('type'=>'flexicontent_fields', 'name'=>$fieldtype, 'params'=> is_object($plg_db_data) ? $plg_db_data->params : ($plg_db_data['params'] ?? '')));		}
 
 		// 3. Execute only if it exists
 		if(in_array($func, get_class_methods($className)))
