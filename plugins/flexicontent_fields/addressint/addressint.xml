@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension version="1.6" type="plugin" group="flexicontent_fields" method="upgrade">
-	<name>FLEXIcontent - International Address / Google Maps</name>
+	<n>FLEXIcontent - International Address / Google Maps</n>
 	<author>Lyquix, ggppdk</author>
 	<creationDate>July 2013</creationDate>
 	<copyright>Copyright (C) Lyquix, ggppdk</copyright>
@@ -76,24 +76,6 @@
 				label="User selection" description="Select which types of autocomplete search will be allowed to the user"
 				depend_class="google-maps-edit-api" />
 
-			<field name="ac_types_default_algolia" type="radio" default="" toggle_related="1" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_DEFAULT_TYPE" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_DEFAULT_TYPE_DESC" class="btn-group group-fcmethod" depend_class="algolia-edit-api">
-				<option value="">FLEXI_ALL</option>
-				<option value="address">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_ADDRESS</option>
-				<option value="busStop">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_BUS_STOP</option>
-				<option value="trainStation">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_TRAIN_STATION</option>
-				<option value="townhall">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_TOWN_HALL</option>
-				<option value="airport">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_AIRPORT</option>
-				<option value="country">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_COUNTRY</option>
-				<option value="city">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_CITY_OR_AREA</option>
-			</field>
-			<field name="ac_type_allowed_list_algolia" type="fccheckbox" default="" display_useglobal="1" useglobal_lbl="FLEXI_SHOW_ALL"
-				checkoptions="FLEXI_ALL,PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_ADDRESS,PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_BUS_STOP,PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_TRAIN_STATION,
-				PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_TOWN_HALL,PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_AIRPORT,PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_COUNTRY,PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_CITY_OR_AREA"
-				checkvals=",address,busStop,trainStation,townhall,airport,country,city"
-				defaultvals=""
-				label="User selection" description="Select which types of autocomplete search will be allowed to the user"
-				depend_class="algolia-edit-api" />
-
 			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_LIMITATIONS_COUNTRY" level="level4" />
 			<field name="ac_country_default" type="fccountries" subtype="singular" default="" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_DEFAULT_COUNTRY" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_DEFAULT_COUNTRY_DESC" />
 			<field name="ac_country_allowed_list" type="fccountries" subtype="sortable" default="" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ALLOWED_COUNTRIES" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ALLOWED_COUNTRIES_DESC" />
@@ -112,12 +94,6 @@
 			<field name="" type="separator" default="FLEXI_LAYOUT" description="" level="level2" />
 			<field name="formlayout" type="fcfilelist" default="" label="FLEXI_FIELD_SELECT_FORM_LAYOUT" description="FLEXI_FIELD_SELECT_FORM_LAYOUT_DESC" directory="plugins/flexicontent_fields/addressint/tmpl/" filter="^field_.*\.php$" exclude="field.php" stripext="1" stripprefix="field_" hide_none="1" hide_default="" defaultlabel="Table (Default)" labelclass="" />
 
-			<!--field name="simple_form_layout" type="radio" default="0" label="FLEXI_FIELD_SIMPLE_FORM_DESIGN" description="FLEXI_FIELD_SIMPLE_FORM_DESIGN_DESC" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field-->
-
-			<!--field name="" type="separator" default="FLEXI_BASIC" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_FORM_SETTINGS" level="level2" /-->
 			<field name="edit_latlon" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_EDIT_LATLON" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_EDIT_LATLON_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="2">FLEXI_READONLY</option>
@@ -201,11 +177,6 @@
 				<option value="0" show_list="" hide_list="use_custom_marker">FLEXI_DISABLE</option>
 				<option value="1" show_list="use_custom_marker" hide_list="">FLEXI_ENABLE</option>
 			</field>
-			<!--field name="custom_marker_path" type="folderlist"
-				default="mod_flexigooglemap/assets/marker" hide_default="false" hide_none="true"
-				label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKERS_FOLDER" directory="images"
-				recursive="true"
-				filter="" exclude="" stripext="" depend_class="use_custom_marker"/-->
 			<field name="custom_marker_path" type="text" default="modules/mod_flexigooglemap/assets/marker" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKERS_FOLDER" depend_class="use_custom_marker"/>
 			<field name="default_marker_file" type="text" default="" hint="e.g. icon-blue.png" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_DEFAULT_MARKER_ICON" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_DEFAULT_MARKER_ICON_DESC" />
 
@@ -408,16 +379,17 @@
 			<field name="" type="separator" default="FLEXI_FIELD_EDITING" level="level2" />
 
 			<field name="mapapi_edit" type="multilist" subtype="radio" toggle_related="1" default="googlemap" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_ENGINE" description="" class="btn-group group-fcinfo">
-				<option value="googlemap" show_list="google-maps-edit-api" hide_list="algolia-edit-api">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_ENGINE_GOOGLEMAP</option>
-				<option value="algolia" show_list="algolia-edit-api" hide_list="google-maps-edit-api">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_ENGINE_ALGOLIA</option>
+				<option value="googlemap" show_list="google-maps-edit-api" hide_list="nominatim-edit-api">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_ENGINE_GOOGLEMAP</option>
+				<option value="nominatim" show_list="nominatim-edit-api"   hide_list="google-maps-edit-api">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_ENGINE_NOMINATIM</option>
 			</field>
 
 			<field name="google_maps_js_api_key" type="text" default="" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_API_KEY_EDITING" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_API_KEY_EDITING_DESC" depend_class="google-maps-edit-api" />
 			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_GET_API_KEY_INFO" level="level3" class="alert alert-success" depend_class="google-maps-edit-api" />
 
-			<field name="algolia_edit_api_id" type="text" default="" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ALGOLIA_API_ID_EDITING" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ALGOLIA_API_KEY_EDITING_DESC" depend_class="algolia-edit-api" />
-			<field name="algolia_edit_api_key" type="text" default="" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ALGOLIA_API_KEY_EDITING" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ALGOLIA_API_KEY_EDITING_DESC" depend_class="algolia-edit-api" />
-			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ALGOLIA_GET_API_KEY_INFO" level="level3" class="alert alert-success" depend_class="algolia-edit-api" />
+			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_NOMINATIM_INFO" level="level3" class="alert alert-info fcpadded" depend_class="nominatim-edit-api" />
+
+			<field name="nominatim_tile_url" type="text" default="" hint="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_NOMINATIM_TILE_URL" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_NOMINATIM_TILE_URL_DESC" depend_class="nominatim-edit-api" />
+
 			<field name="api_lang_code_edit" type="text" default="" label="Force language code (e.g. en)" description="Let this be empty to use language of current user" />
 
 			<field name="" type="separator" default="FLEXI_FIELD_VIEWING" level="level2" />

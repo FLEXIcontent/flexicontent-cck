@@ -114,8 +114,8 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		$this->values = & $values;
 
 
-		// MAP Engine to use in item form
-		$mapapi_edit    = $field->parameters->get('mapapi_edit', 'googlemap');
+		// MAP Engine to use in item form: 'googlemap' or 'nominatim'
+		$mapapi_edit = $field->parameters->get('mapapi_edit', 'googlemap');
 
 		// Some parameter shortcuts
 		$addr_edit_mode = $field->parameters->get('addr_edit_mode', 'plaintext');
@@ -149,42 +149,28 @@ class plgFlexicontent_fieldsAddressint extends FCField
 
 		// Google autocomplete search types drop down list (for geolocation)
 		$list_ac_types = array(
-			//''=>'PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_ALL_SEARCH_TYPES',
 			''=>'FLEXI_ALL',
 			'address'=>'PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_ADDRESS',
-
 			'geocode'=>'PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_GEOCODE',
 			'establishment'=>'PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_BUSINESS',
 			'(regions)'=>'PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_REGION',
 			'(cities)'=>'PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_CITY',
-
-			'busStop'=>'PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_BUS_STOP',
-			'trainStation'=>'PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_TRAIN_STATION',
-			'townhall'=>'PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_TOWN_HALL',
-			'airport'=>'PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_AIRPORT',
-			'country'=>'PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_COUNTRY',
-			'city'=>'PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AC_CITY_OR_AREA',
 		);
 
 
 		// Load Countries ($list_countries) and US states ($list_states)
 		include('tmpl_common' . DS . 'areas.php');
 
-		$api_sfx = $mapapi_edit === 'googlemap' ? '' : '_algolia';
-
-		// GET ALLOWED ac search types, note 'false' may have been saved for 'ac_type_allowed_list' due to legacy bug, so do not use heritage directly
-		$ac_types_default     = $field->parameters->get('ac_types_default' . $api_sfx, '');
-		$ac_type_allowed_list = $field->parameters->get('ac_type_allowed_list' . $api_sfx, false);
+		// GET ALLOWED ac search types
+		$ac_types_default     = $field->parameters->get('ac_types_default', '');
+		$ac_type_allowed_list = $field->parameters->get('ac_type_allowed_list', false);
 
 		$ac_type_allowed_list = $ac_type_allowed_list ?:
-			($mapapi_edit === 'googlemap'
-				? array('','geocode','address','establishment','(regions)','(cities)')
-				: array('','address','busStop','trainStation','townhall','airport','country','city')
-			);
+			array('','geocode','address','establishment','(regions)','(cities)');
 		$ac_type_allowed_list = FLEXIUtilities::paramToArray($ac_type_allowed_list, false, false, true);
 
 
-		// CET ALLOWED countries, with special check for single country
+		// GET ALLOWED countries, with special check for single country
 		$ac_country_default      = trim($field->parameters->get('ac_country_default', ''));
 		$ac_country_allowed_list = trim($field->parameters->get('ac_country_allowed_list', ''));
 
@@ -225,7 +211,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		}
 		$countries_attribs = ''
 			. ($single_country ? ' disabled="disabled" readonly="readonly"' : '')
-			. ($mapapi_edit === 'googlemap' ? ' onchange="fcfield_addrint.toggle_USA_state(this);" ' : '');
+			. ' onchange="fcfield_addrint.toggle_USA_state(this);" ';
 
 
 		/**
@@ -236,15 +222,10 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			$custom_marker_path_abs = \Joomla\Filesystem\Path::clean(JPATH_SITE . DS . $custom_marker_path. DS);
 			$custom_marker_url_base = str_replace('\\', '/', \Joomla\CMS\Uri\Uri::root() . $custom_marker_path . '/');
 
-			// Default marker
-			if ($mapapi_edit === 'googlemap')
-			{
-				$custom_marker_default = 'https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi2.png';
-			}
-			elseif ($mapapi_edit === 'algolia')
-			{
-				$custom_marker_default = 'https://unpkg.com/leaflet@1.5.1/dist/images/marker-icon.png';
-			}
+			// Default marker icon (depends on map engine)
+			$custom_marker_default = $mapapi_edit === 'nominatim'
+				? 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png'
+				: 'https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi2.png';
 
 			$imgs = \Joomla\Filesystem\Folder::files($custom_marker_path_abs);
 
@@ -293,71 +274,43 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		$field_name_js = str_replace('-', '_', $field->name);
 
 		// JS & CSS of current field
+		$js = '
+			fcfield_addrint.allowed_countries["'.$field_name_js.'"] = new Array('.(count($ac_country_allowed_list) ? '"' . implode('", "', $ac_country_allowed_list) . '"' : '').');
+			fcfield_addrint.single_country["'.$field_name_js.'"] = "' . $single_country . '";
+
+			fcfield_addrint.map_zoom["'.$field_name_js.'"] = ' . $map_zoom . ';
+			fcfield_addrint.map_type["'.$field_name_js.'"] = "' . strtoupper($map_type) . '";
+		';
+
+		// Google Maps: pass component restrictions via configure()
 		if ($mapapi_edit === 'googlemap')
 		{
 			$conf_ops = array();
-
 			if (count($ac_country_allowed_list))
 			{
 				$conf_ops[] = 'country:[\'' . implode("', '", $ac_country_allowed_list) . '\']';
 			}
-
-			$js = '
-				fcfield_addrint.allowed_countries["'.$field_name_js.'"] = new Array('.(count($ac_country_allowed_list) ? '"' . implode('", "', $ac_country_allowed_list) . '"' : '').');
-				fcfield_addrint.single_country["'.$field_name_js.'"] = "' . $single_country . '";
-
-				fcfield_addrint.map_zoom["'.$field_name_js.'"] = ' . $map_zoom . ';
-				fcfield_addrint.map_type["'.$field_name_js.'"] = "' . strtoupper($map_type) . '";
-
-				fcfield_addrint.configure["' . $field_name_js . '"] = function(placesAutocomplete)
-				{
-					if (' . ($conf_ops ? 1 : 0)  . ') placesAutocomplete.setComponentRestrictions({' . implode(', ', $conf_ops) . '});
-				}
-			';
-			$css = '';
-		}
-		else // ($mapapi_edit === 'algolia')
-		{
-			$algolia_api_id  = $field->parameters->get('algolia_edit_api_id', '');
-			$algolia_api_key = $field->parameters->get('algolia_edit_api_key', '');
-
-			$js = '
-				fcfield_addrint.algolia_api_id["'.$field_name_js.'"]  = "' . $algolia_api_id . '";
-				fcfield_addrint.algolia_api_key["'.$field_name_js.'"] = "' . $algolia_api_key . '";
-			';
-
-			$conf_ops = array();
-			$ac_types_default = $field->parameters->get('ac_types_default_algolia', '');
-
-			if (count($ac_country_allowed_list))
-			{
-				$conf_ops[] = 'countries:[\'' . implode("', '", $ac_country_allowed_list) . '\']';
-			}
-
-			if (!$ac_types_default)
-			{
-				$conf_ops[] = 'type:[\'' . implode("', '", array_filter($ac_type_allowed_list)) . '\']';
-			}
-			else
-			{
-				$conf_ops[] = 'type:\'' . $ac_types_default . '\'';
-			}
-
 			$js .= '
-				fcfield_addrint.configure["' . $field_name_js . '"] = function(placesAutocomplete)
-				{
-					placesAutocomplete.configure({' . implode(', ', $conf_ops) . '});
-				}
-			';
-
-			$css = '
-			body .ap-suggestion {
-				height: 2em !important;
-				font-size: 12px !important;
-				line-height: 1em !important;
+			fcfield_addrint.configure["' . $field_name_js . '"] = function(placesAutocomplete)
+			{
+				if (' . ($conf_ops ? 1 : 0)  . ') placesAutocomplete.setComponentRestrictions({' . implode(', ', $conf_ops) . '});
 			}
 			';
 		}
+
+		// Nominatim: pass optional tile server URL
+		if ($mapapi_edit === 'nominatim')
+		{
+			$nominatim_tile_url = trim($field->parameters->get('nominatim_tile_url', ''));
+			if ($nominatim_tile_url)
+			{
+				$js .= '
+			fcfield_addrint.tile_url["'.$field_name_js.'"] = "' . addslashes($nominatim_tile_url) . '";
+				';
+			}
+		}
+
+		$css = '';
 
 		// Handle multiple records
 		if ($multiple)
@@ -586,16 +539,6 @@ class plgFlexicontent_fieldsAddressint extends FCField
 				theInput.attr('id', element_id + '_autocomplete');
 				newField.find('.addrint_autocomplete-lbl').first().attr('for', element_id + '_autocomplete');
 
-				" . ($mapapi_edit === 'algolia' ? "
-				// Remove previous autocomplete algolia container
-				theParent = theInput.parent('.algolia-places');
-				if (theParent.length)
-				{
-					theInput.insertAfter(theParent);
-					theParent.remove();
-				}
-				" : "") . "
-
 				theSelect = newField.find('select.addrint_ac_type').first();
 				theSelect.val('');
 				theSelect.attr('name', fname_pfx + '[ac_type]');
@@ -638,8 +581,8 @@ class plgFlexicontent_fieldsAddressint extends FCField
 				newField.find('.hasTooltip').tooltip({html: true, container: newField});
 				newField.find('.hasPopover').popover({html: true, container: newField, trigger : 'hover focus'});
 
-				// Initialize maps search autocomplete
-				fcfield_addrint.initAutoComplete" . ($mapapi_edit === 'googlemap' ? "" : "_OS") . "(element_id, '" . $field_name_js . "');
+				// Initialize maps search autocomplete (Google Maps)
+				fcfield_addrint.initAutoComplete(element_id, '" . $field_name_js . "');
 
 				// Initialize marker selector
 				fcfield_addrint.initMarkerSelector(element_id, '" . $field_name_js . "');
@@ -736,14 +679,15 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		' : '';
 
 
-		// Add needed JS/CSS
+		// Add needed JS/CSS (once per engine, supports mixed usage on same page)
 		static $js_added = array();
 		if (!isset($js_added[$mapapi_edit]))
 		{
 			$js_added[$mapapi_edit] = true;
 
-			if (count($js_added) < 2)
+			if (count($js_added) === 1)
 			{
+				// Load translation strings once (shared by both engines)
 				\Joomla\CMS\Language\Text::script('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ADDRESS_NOT_FOUND_WITHIN_TOLERANCE', false);
 				\Joomla\CMS\Language\Text::script('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ADDRESS_FOUND_WITHIN_TOLERANCE', false);
 				\Joomla\CMS\Language\Text::script('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ADDRESS_NOT_FOUND_AT_MARKER', false);
@@ -752,22 +696,19 @@ class plgFlexicontent_fieldsAddressint extends FCField
 				\Joomla\CMS\Language\Text::script('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_PLEASE_USE_COUNTRIES', false);
 			}
 
-			// Load form.js (google maps)
-			$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/addressint/js/form.js', array('version' => FLEXI_VHASH));
-
-			// Load google maps library
 			if ($mapapi_edit === 'googlemap')
 			{
+				// Load form.js (Google Maps autocomplete + map)
+				$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/addressint/js/form.js', array('version' => FLEXI_VHASH));
+
+				// Load Google Maps JS API
 				flexicontent_html::loadFramework('google-maps', 'form', $field->parameters);
 			}
-
-			// Load leaflet & form_algolia.js
-			// TODO: move js in field to a framework call to support multi values
-			elseif ($mapapi_edit === 'algolia')
+			elseif ($mapapi_edit === 'nominatim')
 			{
-				$document->addStyleSheet('https://cdn.jsdelivr.net/leaflet/1/leaflet.css');
-				$document->addScript('https://cdn.jsdelivr.net/leaflet/1/leaflet.js');
-				$document->addScript('https://cdn.jsdelivr.net/npm/places.js@1.17.1');
+				// Load form_osm.js (Nominatim autocomplete + Leaflet map)
+				// Leaflet itself is loaded dynamically by form_osm.js if not already present
+				$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/addressint/js/form_osm.js', array('version' => FLEXI_VHASH));
 			}
 		}
 
@@ -791,10 +732,6 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		// Render form field
 		$formlayout = $field->parameters->get('formlayout', '');
 		$formlayout = $formlayout ? 'field_'.$formlayout : 'field';
-
-		//$this->setField($field);
-		//$this->setItem($item);
-		//$this->displayField( $formlayout );
 
 		include(self::getFormPath($this->fieldtypes[0], $formlayout));
 
@@ -1031,10 +968,6 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			return;
 		}
 
-		// TODO Implement a static image for google maps "img" display
-		//$this->getCachedStaticMapImage();
-
-
 		// Get layout name
 		$viewlayout = $field->parameters->get('viewlayout', '');
 		$viewlayout = $viewlayout && $viewlayout !== 'value' ? 'value_'.$viewlayout : 'value';
@@ -1087,7 +1020,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		// Get Map Engine
 		$map_api = $field->parameters->get('mapapi', 'googlemap');
 
-		// Get Embeed type
+		// Get Embed type
 		$map_embed_type = $field->parameters->get('map_embed_type','img'); // defaults to img for backward compatibility
 
 		if ($map_api !== 'googlemap' || $map_embed_type !== 'int')
@@ -1133,8 +1066,6 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		$map_height = (int) $field->parameters->get('map_height', 150);
 
 		$use_custom_marker = (int) $field->parameters->get('use_custom_marker', 1);
-		$defaut_icon_url   = $map_api === 'googlemap'
-			? 'https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi2.png'
-			: 'https://unpkg.com/leaflet@1.5.1/dist/images/marker-icon.png';
+		$defaut_icon_url   = 'https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi2.png';
 	}
 }

@@ -4,6 +4,9 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 $dom_ready_js = '';
 
+// MAP Engine: 'googlemap' or 'nominatim' (read from field parameters)
+$mapapi_edit = $field->parameters->get('mapapi_edit', 'googlemap');
+
 $n = 0;
 foreach ($values as $value)
 {
@@ -54,16 +57,11 @@ foreach ($values as $value)
 	$disabled_attr          = $value_is_disabled ? ' disabled="disabled" ' : '';
 
 	$google_maps_js_api_key = $field->parameters->get('google_maps_js_api_key', '');
-	$mapapi_edit            = $field->parameters->get('mapapi_edit', 'googlemap');
 
-	// Missing API key error
+	// Missing API key warning — only relevant for Google Maps engine
 	if ($mapapi_edit === 'googlemap' && $google_maps_js_api_key == '')
 	{
 		$message_error = 'PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GOOGLE_MAPS_EMPTY_API_KEY_WARNING';
-	}
-	elseif ($mapapi_edit === "algolia" && ($algolia_api_id == '' || $algolia_api_key == ''))
-	{
-		$message_error = 'PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ALGOLIA_EMPTY_API_KEY_WARNING';
 	}
 	else
 	{
@@ -88,7 +86,7 @@ foreach ($values as $value)
 					<div class="'.$input_grp_class . ' fc-xpended-row">
 						<label class="' . $add_on_class . ' fc-lbl-short addrint_autocomplete-lbl" for="'.$elementid_n.'_autocomplete" style="float: none;"><span class="icon-search"></span></label>
 						<input id="'.$elementid_n.'_autocomplete" class="addrint_autocomplete" name="'.$fieldname_n.'[autocomplete]" type="text" autocomplete="off" spellcheck="false" />
-						<select id="'.$elementid_n.'_ac_type" class="addrint_ac_type use_select2_lib" name="'.$fieldname_n.'[ac_type]" onchange="fcfield_addrint.changeAutoCompleteType' . ($mapapi_edit === 'googlemap' ? '' : '_OS') . '(this.id.replace(\'_ac_type\', \'\'), \''.$field_name_js.'\');">
+						<select id="'.$elementid_n.'_ac_type" class="addrint_ac_type use_select2_lib" name="'.$fieldname_n.'[ac_type]" onchange="fcfield_addrint.changeAutoCompleteType(this.id.replace(\'_ac_type\', \'\'), \''.$field_name_js.'\');"' . ($mapapi_edit === 'nominatim' ? ' style="display:none;"' : '') . '>
 							'.$ac_type_options.'
 						</select>
 					</div>
@@ -195,7 +193,7 @@ foreach ($values as $value)
 				<td>' .
 					\Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $custom_markers, $fieldname_n.'[custom_marker]',
 						' class="fc_gm_custom_marker has_select2_lib" data-marker-base-url = "' . $custom_marker_url_base . '" ' .
-						' onchange="fcfield_addrint.updateMarkerIcon' . ($mapapi_edit === 'googlemap' ? '' : '_OS') . '(this.id.replace(\'_custom_marker\', \'\'), \''.$field_name_js.'\');" ',
+						' onchange="fcfield_addrint.updateMarkerIcon(this.id.replace(\'_custom_marker\', \'\'), \''.$field_name_js.'\');" ',
 						'value', 'text', $value['custom_marker'], $elementid_n.'_custom_marker') . '
 				</td>
 			</tr>
@@ -203,7 +201,7 @@ foreach ($values as $value)
 			<td class="key"><label class="fc-prop-lbl fc_gm_marker_anchor-lbl" for="'.$elementid_n.'_marker_anchor">'.\Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ANCHOR').'</label></td>
 				<td style="position: relative;">' .
 					\Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $marker_anchors, $fieldname_n.'[marker_anchor]',
-						' class="fc_gm_marker_anchor use_select2_lib" onchange="fcfield_addrint.updateMarkerIcon' . ($mapapi_edit === 'googlemap' ? '' : '_OS') . '(this.id.replace(\'_marker_anchor\', \'\'), \''.$field_name_js.'\');" ',
+						' class="fc_gm_marker_anchor use_select2_lib" onchange="fcfield_addrint.updateMarkerIcon(this.id.replace(\'_marker_anchor\', \'\'), \''.$field_name_js.'\');" ',
 						'value', 'text', $value['marker_anchor'], $elementid_n.'_marker_anchor') . '
 						<button type="button" class="btn btn-small btn-sm hasPopover" data-toggle="popover" title="' .  \Joomla\CMS\Language\Text::_('FLEXI_EXAMPLES', true) . '" data-content="' .  \Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ANCHOR_INFO', true) . '"><span class="icon-info"></span>' .  \Joomla\CMS\Language\Text::_('FLEXI_ABOUT', true) . '</button>
 				</td>
@@ -218,13 +216,11 @@ foreach ($values as $value)
 
 	<div id="'.$elementid_n.'_addressint_map" class="fcfield_field_preview_box fcfield_addressint_map" style="display: none;">
 		<div>
-			' . ($mapapi_edit === "googlemap" ? '
 			<div class="'.$input_grp_class.' fc-xpended" class="addrint_marker_tolerance_box">
 				<label class="' . $add_on_class . ' fc-lbl-short addrint_marker_tolerance-lbl" for="'.$elementid_n.'_marker_tolerance">'.\Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_TOLERANCE').'</label>
 				<input type="text" class="fcfield_textval inlineval addrint_marker_tolerance" id="'.$elementid_n.'_marker_tolerance" name="'.$fieldname_n.'[marker_tolerance]" value="50" size="7" maxlength="7" />
 			</div>
 			&nbsp;
-			' : '') . '
 			<div class="'.$input_grp_class.' fc-xpended" class="addrint_zoom_box">
 				<label class="' . $add_on_class . ' fc-lbl-short addrint_zoom-lbl" for="'.$elementid_n.'_zoom" >'.\Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ZOOM_LEVEL').'</label>
 				<input type="text" class="fcfield_textval inlineval addrint_zoom" id="'.$elementid_n.'_zoom" name="'.$fieldname_n.'[zoom]" value="'.htmlspecialchars($value['zoom'], ENT_COMPAT, 'UTF-8').'" readonly="readonly" size="2" />
@@ -280,37 +276,21 @@ foreach ($values as $value)
 
 
 	/**
-	 * Initialize GOOGLEMAP 's (1) Autocomplete search box and (2) MAP display
+	 * Initialize autocomplete search box and MAP display
+	 * Same JS function names for both engines (googlemap & nominatim)
+	 * — the loaded script (form.js or form_osm.js) provides the implementation.
 	 */
 
-	if ($mapapi_edit === 'googlemap')
-	{
-		$js .= '
-		fcfield_addrint.LatLon["'.$elementid_n.'"] = {lat: '.($value['lat'] ? $value['lat'] : '0').', lng: '.($value['lon'] ? $value['lon'] : '0').'};
-		';
+	$js .= '
+	fcfield_addrint.LatLon["'.$elementid_n.'"] = {lat: '.($value['lat'] ? $value['lat'] : '0').', lng: '.($value['lon'] ? $value['lon'] : '0').'};
+	';
 
-		$dom_ready_js .= '
-			fcfield_addrint.initAutoComplete("'.$elementid_n.'", "'.$field_name_js.'");' . /* autocomplete search */'
-			' . (!$coords_are_empty ? '
-				fcfield_addrint.initMap("'.$elementid_n.'", "'.$field_name_js.'");'
-			: '')
-		;
-	}
-
-
-	/**
-	 * Initialize Algolia autocomplete ENGINE
-	 */
-
-	elseif ($mapapi_edit === 'algolia')
-	{
-		$dom_ready_js .= '
-			setTimeout(function()
-			{
-				fcfield_addrint.initAutoComplete_OS("'.$elementid_n.'", "'.$field_name_js.'");
-			}, 100);
-		';
-	}
+	$dom_ready_js .= '
+		fcfield_addrint.initAutoComplete("'.$elementid_n.'", "'.$field_name_js.'");'
+		. (!$coords_are_empty ? '
+		fcfield_addrint.initMap("'.$elementid_n.'", "'.$field_name_js.'");'
+		: '')
+	;
 
 	$field->html[$n] = '
 		<div class="fc-field-value-properties-box ' . ($value_is_disabled ? ' fc-field-value-disabled' : '') . '">
