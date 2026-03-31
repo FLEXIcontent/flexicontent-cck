@@ -134,7 +134,7 @@ button.btn.btn-highlight:hover,
 }
 #flexicontent div .fcfield-insertvalue.fc_after.fcfont-icon:before {
 	content: "\f067";
-	font-size: 1em !important;
+	font-size: 0.8em !important;
 	margin-right: 4px !important;
 }
 #flexicontent div .fcfield-enablevalue.fcfont-icon:before {
