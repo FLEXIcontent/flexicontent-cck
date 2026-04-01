@@ -114,7 +114,7 @@ class FlexicontentFields
 		if (!$_items) return $_items;
 		if (!is_array($_items))  $items = array( & $_items );  else  $items = & $_items ;
 
-		$jinput    = \Joomla\CMS\Factory::getApplication()->input;
+		$jinput    = \Joomla\CMS\Factory::getApplication()->getInput();
 		$user      = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$cparams   = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 		$print_logging_info = $cparams->get('print_logging_info');
@@ -347,10 +347,10 @@ class FlexicontentFields
 
 		static $type_fields = array();
 
-		$dispatcher = JEventDispatcher::getInstance();
+		$dispatcher = \Joomla\CMS\Factory::getApplication()->getDispatcher();
 		$db   = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
-		$nullDate = $db->getNulldate();
+		$nullDate = $db->getNullDate();
 
 		// This is optimized regarding the use of SINGLE QUERY to retrieve the core item data
 		if ($vars==null)
@@ -739,10 +739,10 @@ class FlexicontentFields
 		static $_trigger_plgs_ft = array();
 		static $_created = array();
 		$app = \Joomla\CMS\Factory::getApplication();
-		$request_view = $app->input->get('view', '', 'cmd');
+		$request_view = $app->getInput()->get('view', '', 'cmd');
 
 		// Field's source code, can use this HTTP request variable, to detect who rendered the fields (e.g. they can detect rendering from 'module')
-		$app->input->set('flexi_callview', $view);
+		$app->getInput()->set('flexi_callview', $view);
 
 		static $cparams = null;
 		if ($cparams === null)
@@ -871,7 +871,7 @@ class FlexicontentFields
 				{
 					$uri      = \Joomla\CMS\Uri\Uri::getInstance();
 					$return   = strtr(base64_encode($uri->toString()), '+/=', '-_,');          // Current URL as return URL (but we will for id / cid)
-					$fcreturn = serialize( array('id' => $app->input->getInt('id'), 'cid' => $app->input->getInt('cid')) );  // a special url parameter, used by some SEF code
+					$fcreturn = serialize( array('id' => $app->getInput()->getInt('id'), 'cid' => $app->getInput()->getInt('cid')) );  // a special url parameter, used by some SEF code
 					$login_link = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' )->get('login_page', 'index.php?option=com_users&view=login')
 						. '&return='.$return
 						. '&fcreturn='.base64_encode($fcreturn);
@@ -972,7 +972,7 @@ class FlexicontentFields
 		}
 
 		// DOES NOT support multiple items, do it 1 at a time
-		if ( !$skip_trigger_plgs && $_trigger_plgs_ft[$field_name] )
+		if ( !$skip_trigger_plgs && !isset($_trigger_plgs_ft[$field_name]) )
 		{
 			foreach($items as $item)
 			{
@@ -1012,7 +1012,7 @@ class FlexicontentFields
 		static $_layout, $_view, $_option;
 		static $dispatcher, $fcdispatcher;
 
-		$jinput = \Joomla\CMS\Factory::getApplication()->input;
+		$jinput = \Joomla\CMS\Factory::getApplication()->getInput();
 
 		//$flexiparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 		//$print_logging_info = $flexiparams->get('print_logging_info');
@@ -1039,7 +1039,7 @@ class FlexicontentFields
 			// We use a custom Dispatcher to allow selective Content Plugin triggering
 			// ***********************************************************************
 			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'dispatcher.php');
-			$dispatcher   = JEventDispatcher::getInstance();
+			$dispatcher = \Joomla\CMS\Factory::getApplication()->getDispatcher();
 			$fcdispatcher = FCDispatcher::getInstance_FC($debug);
 		}
 
@@ -1057,7 +1057,9 @@ class FlexicontentFields
 		  $context = 'com_content.article';
 
 			// Needed by legacy non-updated plugins
-			!FLEXI_J40GE ? JRequest::setVar('view', 'article') : null;
+			//if (!FLEXI_J40GE) $jinput->set('view', 'article');
+			if (!FLEXI_J40GE) $jinput->set('view', 'article');
+			
 		}
 
 		// ALL OTHER CASES: (FLEXIcontent category, FLEXIcontent module, etc),
@@ -1069,7 +1071,8 @@ class FlexicontentFields
 		  $context = 'com_content.category';
 
 			// Needed by legacy non-updated plugins
-			!FLEXI_J40GE ? JRequest::setVar('view', 'category') : null;
+			//!FLEXI_J40GE ? JRequest::setVar('view', 'category') : null;
+			if (!FLEXI_J40GE) $jinput->set('view', 'category');
 		}
 
 		// Set the 'option' to 'com_content' but set a flag 'isflexicontent' to indicate triggering from inside FLEXIcontent ... code
@@ -1078,7 +1081,8 @@ class FlexicontentFields
 		$jinput->set('layout_fc', $_layout);
 
 		// Needed by legacy non-updated plugins
-		!FLEXI_J40GE ? JRequest::setVar('option', 'com_content') : null;
+		//!FLEXI_J40GE ? JRequest::setVar('option', 'com_content') : null;
+		if (!FLEXI_J40GE) $jinput->set('option', 'com_content');
 
 
 		if ($debug) echo "<br><br>Executing plugins for <b>".$field->name."</b>:<br>";
@@ -1205,9 +1209,12 @@ class FlexicontentFields
 		$jinput->set('option', $_option);
 
 		// Needed by legacy non-updated plugins
-		!FLEXI_J40GE ? JRequest::setVar('layout', $_layout) : null;
-		!FLEXI_J40GE ? JRequest::setVar('view', $_view) : null;
-		!FLEXI_J40GE ? JRequest::setVar('option', $_option) : null;
+		//!FLEXI_J40GE ? JRequest::setVar('layout', $_layout) : null;
+		//!FLEXI_J40GE ? JRequest::setVar('view', $_view) : null;
+		//!FLEXI_J40GE ? JRequest::setVar('option', $_option) : null;
+		if (!FLEXI_J40GE) $jinput->set('layout', $_layout);
+		if (!FLEXI_J40GE) $jinput->set('view', $_view);
+		if (!FLEXI_J40GE) $jinput->set('option', $_option);
 	}
 
 
@@ -1227,10 +1234,10 @@ class FlexicontentFields
 		if ($view == FLEXI_ITEMVIEW)	$layout = 'ilayout';
 
 		$app = \Joomla\CMS\Factory::getApplication();
-		$request_view = $app->input->get('view', '', 'cmd');
+		$request_view = $app->getInput()->get('view', '', 'cmd');
 
 		// Field's source code, can use this HTTP request variable, to detect who rendered the fields (e.g. they can detect rendering from 'module')
-		$app->input->set('flexi_callview', $view);
+		$app->getInput()->set('flexi_callview', $view);
 
 		if ( $use_tmpl && ($view == 'category' || $view == FLEXI_ITEMVIEW) )
 		{
@@ -1850,13 +1857,13 @@ class FlexicontentFields
 		if ($is_form===null)
 		{
 			$is_form = (
-				in_array($app->input->getCmd('task', ''), array('add', 'edit')) &&
-				$app->input->getCmd('view', '') === 'item' &&
-				$app->input->getCmd('option', '') === 'com_flexicontent'
+				in_array($app->getInput()->getCmd('task', ''), array('add', 'edit')) &&
+				$app->getInput()->getCmd('view', '') === 'item' &&
+				$app->getInput()->getCmd('option', '') === 'com_flexicontent'
 			) || (
-				$app->input->getCmd('layout', '') === 'form' &&
-				$app->input->getCmd('view', '') === 'article' &&
-				$app->input->getCmd('option', '') === 'com_content'
+				$app->getInput()->getCmd('layout', '') === 'form' &&
+				$app->getInput()->getCmd('view', '') === 'article' &&
+				$app->getInput()->getCmd('option', '') === 'com_content'
 			);
 		}
 
@@ -3508,7 +3515,7 @@ class FlexicontentFields
 				}
 
 				// Update filter value to calculated value
-				\Joomla\CMS\Factory::getApplication()->input->set('filter_'.$filter->id, $value);
+				\Joomla\CMS\Factory::getApplication()->getInput()->set('filter_'.$filter->id, $value);
 			}
 		}
 
@@ -3913,8 +3920,8 @@ class FlexicontentFields
 		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');  // createFilter maybe called in backend too ...
 		$print_logging_info = $cparams->get('print_logging_info');
 
-		$option = $app->input->get('option', '', 'cmd');
-		$view   = $app->input->get('view', '', 'cmd');
+		$option = $app->getInput()->get('option', '', 'cmd');
+		$view   = $app->getInput()->get('view', '', 'cmd');
 
 		$isFC = $option === 'com_flexicontent';
 		$isCategoryView = $isFC && $view === 'category';
@@ -4936,7 +4943,7 @@ class FlexicontentFields
 	 */
 	static function setFilterValues( &$cparams, $mfilter_name='persistent_filters', $is_persistent=1, $set_method="httpReq" )
 	{
-		$jinput = \Joomla\CMS\Factory::getApplication()->input;
+		$jinput = \Joomla\CMS\Factory::getApplication()->getInput();
 
 		$field_filters = array();   // Used when set_method is 'array' instead of 'httpReq'
 		$is_persistent =            // Non-httpReq method does not have initial filters
@@ -5168,7 +5175,7 @@ class FlexicontentFields
 		flexicontent_html::loadFramework('flexi_tmpl_common');
 
 		// Make the filter compatible with Joomla standard cache
-		$jinput = \Joomla\CMS\Factory::getApplication()->input;
+		$jinput = \Joomla\CMS\Factory::getApplication()->getInput();
 
 		$filter_prefix = ($form_name == 'item_form' ? 'iform_' : '') .'filter_';
 
@@ -6018,7 +6025,7 @@ class FlexicontentFields
 	 */
 	public static function getBasicFilterData($category, $filters)
 	{
-		$jinput = \Joomla\CMS\Factory::getApplication()->input;
+		$jinput = \Joomla\CMS\Factory::getApplication()->getInput();
 
 		foreach ($filters as $fn => $filter)
 		{
