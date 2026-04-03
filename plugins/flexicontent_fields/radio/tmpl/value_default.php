@@ -91,7 +91,7 @@ foreach ($values as $value)
 		foreach ($value as $v)
 		{
 			// Skip empty/invalid values but add empty display, if in field group
-			$element = !strlen($v) ? false : @$elements[ $v ];
+			$element = !strlen((string) $v) ? false : @$elements[ $v ];
 			if ( !$element || (isset($element->state) && $element->state < 1) )   // 0: unpublished, 1: published, 2: archived
 			{
 				if ( $is_ingroup ) $html[]	= '';
