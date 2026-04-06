@@ -4860,11 +4860,12 @@ hr.fcclearline {
 	float: none;
 }
 #flexicontent .buttons {
-	display: inline-block;
+	display: flex;
 	margin: 0px;
 	padding: 0px;
-	float: right;
 	position: relative;
+	align-items: center;
+	justify-content: flex-end;
 }
 #flexicontent .buttons.fcleft {
 	float: left;
