@@ -6429,7 +6429,7 @@ class flexicontent_html
 			$pathSourceFolder = $pathSourceFolder_arr[$i];
 
 			// 1. Check DESTINATION folder
-			if ( !is_dir($pathDestFolder) && !mkdir($pathDestFolder) )
+			if ( !is_dir($pathDestFolder) && !mkdir($pathDestFolder, 0755, true) )
 			{
 				echo '<span class="alert alert-warning"> Error, unable to create folder: '. $pathDestFolder.'</span>';
 			}
