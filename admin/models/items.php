@@ -1779,23 +1779,57 @@ class FlexicontentModelItems extends FCModelAdminList
 		$total_cnt = 0;
 		global $globalcats;
 
+		$items = array();
+		$assoc_data_map = array();
+		$cat_assoc_ids_map = array();
+
 		foreach ($cid_reverse as $itemid)
 		{
-			// Associations added to current item
-			$assoc_data = null;
-			$cat_assoc_ids = null;
-
-			// (a) Get existing item
 			$item = \Joomla\CMS\Table\Table::getInstance('flexicontent_items', '');
 			$item->load($itemid);
 
-			// Note: an empty $lang_arr means maintain item language
-			$langs = $lang_arr ?: array($item->language);
+			$items[$itemid] = $item;
+			$assoc_data_map[$itemid] = null;
+			$cat_assoc_ids_map[$itemid] = null;
+		}
 
-			foreach($langs as $lang)
+		$processing_pairs = array();
+		$loop_by_language = $method == 99 && is_array($lang_arr) && count($lang_arr) > 1;
+
+		if ($loop_by_language)
+		{
+			foreach ($lang_arr as $lang)
 			{
-				for( $nr=0; $nr < $copynr; $nr++ )  // Number of copies to create, meaningful only when copying without TRANSLATING items
+				foreach ($cid_reverse as $itemid)
 				{
+					$processing_pairs[] = array($itemid, $lang);
+				}
+			}
+		}
+		else
+		{
+			foreach ($cid_reverse as $itemid)
+			{
+				$item = $items[$itemid];
+				$langs = $lang_arr ?: array($item->language);
+
+				foreach ($langs as $lang)
+				{
+					$processing_pairs[] = array($itemid, $lang);
+				}
+			}
+		}
+
+		foreach ($processing_pairs as $processing_pair)
+		{
+			list($itemid, $lang) = $processing_pair;
+			$item = $items[$itemid];
+
+			for( $nr=0; $nr < $copynr; $nr++ )  // Number of copies to create, meaningful only when copying without TRANSLATING items
+			{
+				$assoc_data = & $assoc_data_map[$itemid];
+				$cat_assoc_ids = & $cat_assoc_ids_map[$itemid];
+
 					// Some shortcuts
 					$sourceid 	= (int)$item->id;
 					$curversion = (int)$item->version;
@@ -2141,16 +2175,18 @@ class FlexicontentModelItems extends FCModelAdminList
 						$assoc_data['associations'][$row->language]  = $row->id;  // Add new item itself
 						$assoc_data['associations'][$item->language] = $item->id; // Add current item (needed if association group is empty)
 					}
-					$total_cnt++;
-				}
-			}
-
-			// Save new associations for current item
-			if ($assoc_data)
-			{
-				flexicontent_db::saveAssociations($item, $assoc_data, $_context = 'com_content.item');
+				$total_cnt++;
 			}
 		}
+
+		foreach ($items as $itemid => $item)
+		{
+			if ($assoc_data_map[$itemid])
+			{
+				flexicontent_db::saveAssociations($item, $assoc_data_map[$itemid], $_context = 'com_content.item');
+			}
+		}
+
 		return $total_cnt;
 	}
 
