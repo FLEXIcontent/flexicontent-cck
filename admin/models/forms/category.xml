@@ -430,10 +430,16 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="filter_ajax" type="fcradio" default="" label="Use AJAX Filtering" description="Submit filters and update results without reloading the page" class="btn-group btn-group-yesno">
+			<field name="filter_ajax" type="fcradio" default="" label="FLEXI_USE_AJAX_FILTERING" description="FLEXI_USE_AJAX_FILTERING_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="badge_position" type="fcradio" default="" label="FLEXI_BADGE_FILTER" description="FLEXI_BADGE_FILTER_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_TOP</option>
+            <option value="2">FLEXI_BOTTOM</option>
 			</field>
 			<field name="filter_instructions" type="fcradio" default="" label="FLEXI_SEARCH_FILTER_INSTRUCTIONS" description="FLEXI_SEARCH_FILTER_INSTRUCTIONS_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
