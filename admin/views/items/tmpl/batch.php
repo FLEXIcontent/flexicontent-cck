@@ -11,6 +11,10 @@
 
 defined('_JEXEC') or die('Restricted access');
 
+$isQuicktranslateSingle = $this->task === 'quicktranslate';
+$isQuicktranslateAll = $this->task === 'quicktranslateall';
+$isQuicktranslateMode = $isQuicktranslateSingle || $isQuicktranslateAll;
+
 
 $state_names = array(
 	 1  => \Joomla\CMS\Language\Text::_('FLEXI_PUBLISHED'),
@@ -53,12 +57,15 @@ foreach($all_langs as $lang)
 /**
  * Handle special translate of 'quicktranslate' to multiple languages (add multiple associations)
  */
-if ($this->task === 'quicktranslate')
+if ($isQuicktranslateMode)
 {
 	// Helper
 	\Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html');
 	$hlpname  = 'fcitems';
+}
 
+if ($isQuicktranslateSingle)
+{
 	// \Joomla\CMS\Table\Table
 	\Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 	$record = \Joomla\CMS\Table\Table::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
@@ -127,7 +134,7 @@ if ($this->task === 'quicktranslate')
 
 
 // We will have either 3 or 2 columns ...
-$box_span_classes = $this->task !== 'quicktranslate' || count($this->rows) === 1
+$box_span_classes = !$isQuicktranslateMode || count($this->rows) === 1
 	? 'span6 col-6 '
 	: 'span4 col-4 ';
 ?>
@@ -230,7 +237,7 @@ ob_start(); ?>
 <form action="index.php" method="post"  name="adminForm" id="adminForm" class="form-validate form-horizontal">
 
 
-<?php if ($this->task === 'quicktranslate'): ?>
+<?php if ($isQuicktranslateMode): ?>
 	<input type="submit" value="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_ADD_TRANSLATIONS') ?>" class="btn btn-success" onclick="this.form.task.value='batchprocess';" />
 	<div class="fcclear"></div>
 
@@ -255,7 +262,7 @@ ob_start(); ?>
 
 
 
-	<?php if ($this->task === 'quicktranslate'):?>
+<?php if ($isQuicktranslateSingle):?>
 
 	<div class="<?php echo $box_span_classes; ?> full_width_980" style="margin-bottom: 16px !important;">
 		<fieldset>
@@ -322,13 +329,49 @@ ob_start(); ?>
 		</fieldset>
 	</div>
 
+	<?php elseif ($isQuicktranslateAll): ?>
+
+	<div class="<?php echo $box_span_classes; ?> full_width_980" style="margin-bottom: 16px !important;">
+		<fieldset>
+			<legend><?php echo \Joomla\CMS\Language\Text::_('FLEXI_LANGUAGES'); ?></legend>
+
+			<table class="adminlist table fcmanlist" style="margin-top: 0px;">
+				<thead>
+					<tr>
+						<th class="col_cb left">
+							<div class="group-fcset">
+								<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value="" title="<?php echo \Joomla\CMS\Language\Text::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
+								<label for="checkall-toggle" class="green single"></label>
+							</div>
+						</th>
+						<th><?php echo \Joomla\CMS\Language\Text::_('FLEXI_LANGUAGE'); ?></th>
+						<th><?php echo \Joomla\CMS\Language\Text::_('FLEXI_CODE'); ?></th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php $i = 1; ?>
+					<?php foreach ($all_langs as $lang): ?>
+						<?php if ($lang->code === '*') continue; ?>
+						<tr>
+							<td>
+								<?php echo \Joomla\CMS\HTML\HTMLHelper::_($hlpname . '.grid_id', $i++, $lang->code, $_checkedOut = false, $_name = 'languages'); ?>
+							</td>
+							<td><?php echo $lang->name; ?></td>
+							<td><?php echo $lang->code; ?></td>
+						</tr>
+					<?php endforeach; ?>
+				</tbody>
+			</table>
+		</fieldset>
+	</div>
+
 	<?php endif; ?>
 
 
 
 	<div class="<?php echo $box_span_classes; ?> full_width_980" style="margin-bottom: 16px !important;">
 
-		<fieldset id="advanced_ops_box" style="<?php echo $this->task === 'quicktranslate' ? 'display: none;' : ''; ?>">
+		<fieldset id="advanced_ops_box" style="<?php echo $isQuicktranslateMode ? 'display: none;' : ''; ?>">
 
 			<legend><?php echo \Joomla\CMS\Language\Text::_( $this->behaviour == 'translate' ? 'FLEXI_TRANSLATE_OPTIONS' : 'FLEXI_BATCH_OPTIONS' ); ?></legend>
 
@@ -358,7 +401,7 @@ ob_start(); ?>
 								<label for="method-useempty"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_EMPTY' ); ?></label>
 							</div>
 
-							<?php if ($this->task !== 'quicktranslate') : ?>
+							<?php if (!$isQuicktranslateMode) : ?>
 
 								<div>
 									<input id="method-usejoomfish" type="radio" name="translate_method" value="2" onclick="copymove();" />
@@ -468,7 +511,7 @@ ob_start(); ?>
 			</fieldset>
 
 
-			<?php if ($this->task !== 'quicktranslate') : ?>
+			<?php if (!$isQuicktranslateMode) : ?>
 
 				<div class="control-group" id="row_language">
 					<div class="control-label">
@@ -611,7 +654,7 @@ ob_start(); ?>
 
 
 
-	<?php if ($this->task !== 'quicktranslate' || count($this->rows) > 1): ?>
+	<?php if (!$isQuicktranslateSingle || count($this->rows) > 1): ?>
 	<div class="<?php echo $box_span_classes; ?> full_width_980" style="margin-bottom: 16px !important;">
 
 		<fieldset>

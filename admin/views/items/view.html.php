@@ -76,13 +76,13 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		 * Batch task variable
 		 */
 
-		if ($task === 'batch' || $task === 'copy' || $task === 'translate' || $task === 'quicktranslate')
+		if ($task === 'batch' || $task === 'copy' || $task === 'translate' || $task === 'quicktranslate' || $task === 'quicktranslateall')
 		{
 			//$model_s = $this->getModel('item');
 			//$this->model_s = $model_s;
 			$this->task    = $task;
 
-			$behaviour = $task === 'translate' || $task === 'quicktranslate'
+			$behaviour = $task === 'translate' || $task === 'quicktranslate' || $task === 'quicktranslateall'
 				? 'translate'
 				: ($task === 'copy' ? 'copyonly' : 'copymove');
 			$this->setLayout('batch');
@@ -1500,6 +1500,24 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 					$btn_task='quicktranslate', $extra_js='', $btn_list=true, $btn_menu=true, $btn_confirm=false,
 					$this->btn_sm_class . ' btn-fcaction ' . ($newBtn_in_dropdown && FLEXI_J40GE ? '_DDI_class_ ' : '') .(FLEXI_J40GE ? $this->btn_iv_class : '') . ' ' . $this->tooltip_class, $btn_icon='icon-flag',
 					'data-placement="right" data-taskurl="' . $popup_load_url .'" data-title="' . flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_ADD_TRANSLATIONS'), 2) . '"', $auto_add = 0, $tag_type='button'
+				);
+
+				/**
+				 * Add translations for multiple items to multiple languages
+				 */
+				$popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&view=items&tmpl=component&task=quicktranslateall';
+				$btn_name = 'quicktranslateall';
+				$full_js = "" .
+					"var url = jQuery(this).data('taskurl'); " .
+					"var cid = []; jQuery.each(jQuery(\"input[name='cid[]']:checked\"), function(){ cid.push(jQuery(this).val()); }); " .
+					"url += '&' + cid.map(function(el, idx) { return 'cid[' + ']=' + el; }).join('&'); " .
+					"fc_showDialog(url, 'fc_modal_popup_container', 0, 1200, 0, fc_edit_batch_modal_close, {'title': '".flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_TRANSLATE_SELECTED_ITEMS_ALL_LANGUAGES'), 2)."'}); return false;";
+				$btn_arr[] = flexicontent_html::addToolBarButton(
+					'FLEXI_TRANSLATE_SELECTED_ITEMS_ALL_LANGUAGES', $btn_name, $full_js,
+					$msg_alert = \Joomla\CMS\Language\Text::_("FLEXI_NO_ITEMS_SELECTED", true), $msg_confirm = '',
+					$btn_task='quicktranslateall', $extra_js='', $btn_list=true, $btn_menu=true, $btn_confirm=false,
+					$this->btn_sm_class . ' btn-fcaction ' . ($newBtn_in_dropdown && FLEXI_J40GE ? '_DDI_class_ ' : '') .(FLEXI_J40GE ? $this->btn_iv_class : '') . ' ' . $this->tooltip_class, $btn_icon='icon-flag',
+					'data-placement="right" data-taskurl="' . $popup_load_url .'" data-title="' . flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_TRANSLATE_SELECTED_ITEMS_ALL_LANGUAGES'), 2) . '"', $auto_add = 0, $tag_type='button'
 				);
 
 				/**
