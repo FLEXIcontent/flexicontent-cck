@@ -14,6 +14,7 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\CMS\Language\Text;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
+use Joomla\CMS\Component\ComponentHelper;
 
 JLoader::register('FlexicontentViewBaseRecord', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_record.php');
 
@@ -91,7 +92,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 		$app        = \Joomla\CMS\Factory::getApplication();
 		$jinput     = $app->input;
-		$dispatcher = JEventDispatcher::getInstance();
+		$dispatcher = $app->getDispatcher();
 		$document   = \Joomla\CMS\Factory::getDocument();
 		$config     = \Joomla\CMS\Factory::getConfig();
 		$session    = \Joomla\CMS\Factory::getSession();
@@ -2057,7 +2058,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$app    = \Joomla\CMS\Factory::getApplication();
 		$jinput = $app->input;
 
-		$dispatcher = JEventDispatcher::getInstance();
+		$dispatcher = $app->getDispatcher();
 		$session  = \Joomla\CMS\Factory::getSession();
 		$document = \Joomla\CMS\Factory::getDocument();
 		$menus = $app->getMenu();

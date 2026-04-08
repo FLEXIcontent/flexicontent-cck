@@ -972,7 +972,7 @@ class FlexicontentFields
 		}
 
 		// DOES NOT support multiple items, do it 1 at a time
-		if ( !$skip_trigger_plgs && !isset($_trigger_plgs_ft[$field_name]) )
+		if ( !$skip_trigger_plgs && !empty($_trigger_plgs_ft[$field_name]) )
 		{
 			foreach($items as $item)
 			{
@@ -1034,7 +1034,6 @@ class FlexicontentFields
 			$_view   = $jinput->get('view', '', 'cmd');
 			$_option = $jinput->get('option', '', 'cmd');
 			$_initialize = true;
-
 			// ***********************************************************************
 			// We use a custom Dispatcher to allow selective Content Plugin triggering
 			// ***********************************************************************
@@ -1042,7 +1041,6 @@ class FlexicontentFields
 			$dispatcher = \Joomla\CMS\Factory::getApplication()->getDispatcher();
 			$fcdispatcher = FCDispatcher::getInstance_FC($debug);
 		}
-
 		// Use limitstart only for maintext core field
 		$is_maintext = $field->iscore && $field->field_type === 'maintext';
 		$limitstart = $is_maintext

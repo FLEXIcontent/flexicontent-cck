@@ -8,9 +8,9 @@
  */
 
 // Check to ensure this file is within the rest of the framework
-defined('JPATH_PLATFORM') or die;
-jimport('joomla.event.dispatcher');
 
+defined( '_JEXEC' ) or die( 'Restricted access' );
+jimport('joomla.event.dispatcher');
 
 /**
  * Class to handle dispatching of events.
@@ -45,12 +45,10 @@ class FCDispatcher extends JEventDispatcher
 		
 		if ( !$this->prepContentFuncs ) {
 			$plgs = \Joomla\CMS\Plugin\PluginHelper::getPlugin('content');
-			$this->prepContentFuncs = array();
-			
+			$this->prepContentFuncs = array();		
 			if ($this->debug) {
 				echo "<b>Finding custom method names for content events</b>:<br>";
 			}
-			
 			foreach ($plgs as $plg) {
 				$content_plgs[] = $plg->name;
 				$this->findPrepContFuncs($plg);
