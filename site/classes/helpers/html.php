@@ -1392,17 +1392,6 @@ class flexicontent_html
 		$js = "";
 		$css = "";
 
-		static $specific_browser_support = null;
-		if ( $specific_browser_support === null )
-		{
-			if ( method_exists($document, 'addCustomTag') ) $document->addCustomTag('
-				<!--[if IE 8]>
-				<link href="'.\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/css/ie8.css?' . FLEXI_VHASH . '" rel="stylesheet" />
-				<![endif]-->
-			');
-			$specific_browser_support = true;
-		}
-
 		static $shared_js_added = null;
 		if ( $shared_js_added === null )
 		{
