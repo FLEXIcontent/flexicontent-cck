@@ -4,13 +4,6 @@ if ( \Joomla\CMS\Factory::getApplication()->input->getInt('print', 0) ) return;
 
 ob_start();
 
-/**
- * Body of form for (a) Text search, Field Filters, Alpha-Index, Items Total Statistics, Selectors(e.g. per page, orderby)
- * If customizing via CSS rules or JS scripts is not enough, then please copy the following file here to customize the HTML too
- *
- * First try current folder, otherwise load from common folder
- */
-
 file_exists(dirname(__FILE__).DS.'listings_filter_form_body.php')
 	? include(dirname(__FILE__).DS.'listings_filter_form_body.php')
 	: include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS.'listings_filter_form_body.php');
@@ -26,7 +19,6 @@ if ( empty($filter_form_body) ) return;
 $jcookie = \Joomla\CMS\Factory::getApplication()->input->cookie;
 $cookie_name = 'fc_active_TabSlidePage';
 
-// FORM in slider
 $ff_placement = $this->params->get('ff_placement', 0);
 
 if ($ff_placement)
@@ -83,7 +75,6 @@ if ($ff_placement)
 </form>
 
 <?php
-// FORM in slider
 if ($ff_placement)
 {
 	echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endSlide');
@@ -97,31 +88,23 @@ if ($ff_placement)
 			{
 				var active_slides = fclib_getCookie('" . $cookie_name ."');
 				try { active_slides = JSON.parse(active_slides); } catch(e) { active_slides = {}; }
-
 				active_slides['" . $ff_slider_tagid ."'] = $('#" . $ff_slider_tagid ." .in').attr('id');
 				fclib_setCookie('" . $cookie_name ."', JSON.stringify(active_slides), 7);
-				//window.console.log(JSON.stringify(active_slides));
 			});
 
 			$('#" . $ff_slider_tagid ."').on('hidden', function ()
 			{
 				var active_slides = fclib_getCookie('" . $cookie_name ."');
 				try { active_slides = JSON.parse(active_slides); } catch(e) { active_slides = {}; }
-
 				active_slides['" . $ff_slider_tagid ."'] = null;
 				fclib_setCookie('" . $cookie_name ."', JSON.stringify(active_slides), 7);
-				//window.console.log(JSON.stringify(active_slides));
 			});
 
 			var active_slides = fclib_getCookie('" . $cookie_name ."');
 			try { active_slides = JSON.parse(active_slides); } catch(e) { active_slides = {}; }
-
-			// Hide default active slide
 			$('#" . $ff_slider_tagid ." .collapse').removeClass('in');
-
 			if (!!active_slides['" . $ff_slider_tagid ."'])
 			{
-				// Show the last active slide
 				$('#' + active_slides['" . $ff_slider_tagid ."']).addClass('in');
 			}
 		});
@@ -140,7 +123,6 @@ if ($listall_selector) : ?>
 <?php endif; ?>
 
 <?php
-// Custom AJAX Form Submission for Flexicontent
 if ($this->params->get('filter_ajax', 0)) :
 \Joomla\CMS\Factory::getDocument()->addScriptDeclaration("
 	jQuery(document).ready(function($) {
@@ -148,33 +130,24 @@ if ($this->params->get('filter_ajax', 0)) :
 		if (window.fc_ajax_filter_bound) return;
 		window.fc_ajax_filter_bound = true;
 
-		// 1. Monkey-patch adminFormPrepare
 		if (typeof window.adminFormPrepare === 'function' && !window._original_adminFormPrepare) {
 			window._original_adminFormPrepare = window.adminFormPrepare;
 			window.adminFormPrepare = function(form, postprep, task) {
 				var \$form = $(form);
-
-				// Clean the base internally so it doesn't accumulate 
 				var currentAction = \$form.attr('data-fcform_action') || \$form.attr('action') || '';
 				if (currentAction.indexOf('?') !== -1) {
 					var cleanBase = currentAction.split('?')[0];
 					\$form.attr('action', cleanBase);
 					\$form.attr('data-fcform_action', cleanBase);
 				}
-
-				// We execute the original function which correctly builds the query string and puts it in form.action
 				window._original_adminFormPrepare(form, 0, task);
-				
 				if (postprep == 2) {
-					// Add task manually to the form if it was passed 
 					if (task) {
 						var taskInput = \$form.find('input[name=\"task\"]');
 						if (taskInput.length) taskInput.val(task);
 						else \$form.append('<input type=\"hidden\" name=\"task\" value=\"'+task+'\" />');
 					}
-
 					\$form.trigger('submit');
-					
 					var fc_filter_form_blocker = $('#fc_filter_form_blocker');
 					if (fc_filter_form_blocker.length) {
 						fc_filter_form_blocker.css('display', 'block');
@@ -185,7 +158,6 @@ if ($this->params->get('filter_ajax', 0)) :
 			};
 		}
 
-		// Helper to override native submit on a specific form
 		window.fcOverrideNativeSubmit = function(formId) {
 			var nativeForm = document.getElementById(formId);
 			if (nativeForm && !nativeForm._originalSubmit) {
@@ -202,24 +174,18 @@ if ($this->params->get('filter_ajax', 0)) :
 			}
 		};
 
-		// 2. Override native submit for known forms on initial load
 		window.fcOverrideNativeSubmit('adminForm');
 		$('form[id^=\"moduleFCform_\"]').each(function() {
 			window.fcOverrideNativeSubmit(this.id);
 		});
 
-		// 3. The main AJAX submission logic
 		$(document).on('submit', 'form', function(e) {
 			var \$form = $(this);
-			
-			// Only apply AJAX to the flexicontent filter form
-			var isFlexiForm = \$form.attr('id') === 'adminForm' || \$form.closest('.mod_flexifilter_wrapper').length > 0;
+			var isFlexiForm = \$form.attr('id') === 'adminForm' || \$form.attr('id').indexOf('default_form_') === 0 || \$form.closest('.mod_flexifilter_wrapper').length > 0 || \$form.closest('.fcfilter_form_component').length > 0;
 			if (!isFlexiForm) return;
 
-			// Prevent standard page reload
 			e.preventDefault();
 
-			// Main container to replace
 			var targetContainer = $('#flexicontent');
 			var moduleContainers = $('.mod_flexifilter_wrapper, .mod_fleximap');
 
@@ -229,18 +195,14 @@ if ($this->params->get('filter_ajax', 0)) :
 				return;
 			}
 
-			// We need to use the final action string generated by adminFormPrepare 
 			var fullActionUrl = \$form.attr('action') || '';
-			
 			var urlParts = fullActionUrl.split('?');
 			var baseUrl = urlParts[0];
 			var queryString = urlParts.length > 1 ? urlParts[1] : \$form.serialize();
 
-			// Add a simple loading state
 			if (targetContainer.length) targetContainer.css('opacity', '0.5');
 			if (moduleContainers.length) moduleContainers.css('opacity', '0.5');
 
-			// Snag the autosubmitType from the old form before we destroy it
 			var oldAutosubmits = {};
 			if (targetContainer.length) {
 				var oldForm = document.getElementById('adminForm');
@@ -256,7 +218,16 @@ if ($this->params->get('filter_ajax', 0)) :
 				fc_filter_form_blocker.css('display', 'block');
 			}
 
-			// Send AJAX POST request to fetch the updated page
+			// Détruire les instances noUiSlider AVANT le remplacement DOM
+			if (typeof noUiSlider !== 'undefined') {
+				var toDestroy = document.querySelectorAll('[id*=\"_nouislider\"]');
+				for (var di = 0; di < toDestroy.length; di++) {
+					if (toDestroy[di].noUiSlider) {
+						try { toDestroy[di].noUiSlider.destroy(); } catch(eD) {}
+					}
+				}
+			}
+
 			$.ajax({
 				url: baseUrl, 
 				type: 'POST',
@@ -299,13 +270,59 @@ if ($this->params->get('filter_ajax', 0)) :
 						fc_filter_form_blocker.css('display', 'none');
 					}
 
-					// Restore plugins (e.g. Select2 if flexicontent uses it)
 					if (typeof $.fn.select2 !== 'undefined') {
 						if (targetContainer.length) targetContainer.find('select.use_select2_lib').select2();
 						if (moduleContainers.length) moduleContainers.find('select.use_select2_lib').select2();
 					}
 
-					// Re-bind FLEXIcontent auto-submit events that were lost during DOM replacement
+					//allow to update nouislider with search is to ajaxed, as nouislider does not support dynamic content, we need to reinit it
+					parsedDoc.find('script:not([src])').each(function() {
+						var scriptContent = $(this).html();
+						if (scriptContent.indexOf('noUiSlider') === -1 && scriptContent.indexOf('_nouislider') === -1) return;
+						var allSliderEls = document.querySelectorAll('[id*=\"_nouislider\"]');
+						for (var si = 0; si < allSliderEls.length; si++) {
+							var se = allSliderEls[si];
+							if (scriptContent.indexOf(se.id) !== -1 && se.noUiSlider) {
+								try { se.noUiSlider.destroy(); } catch(eD) {}
+							}
+						}
+						var innerContent = scriptContent;
+						var readyMatch = scriptContent.indexOf('document).ready(function()');
+						if (readyMatch !== -1) {
+							var firstBrace = scriptContent.indexOf('{', readyMatch);
+							if (firstBrace !== -1) {
+								// Compter les accolades pour trouver la fermeture correcte du ready
+								var depth = 1;
+								var pos = firstBrace + 1;
+								while (pos < scriptContent.length && depth > 0) {
+									var ch = scriptContent[pos];
+									if (ch === '{') depth++;
+									else if (ch === '}') depth--;
+									pos++;
+								}
+								// pos pointe maintenant après le } fermant du ready
+								// on extrait entre firstBrace+1 et pos-1
+								innerContent = scriptContent.substring(firstBrace + 1, pos - 1);
+							}
+						}
+						try {
+							eval(innerContent);
+							console.log('[FC Slider] réinitialisé');
+						} catch(eE) {
+							console.log('[FC Slider] erreur reinit:', eE.message);
+						}
+					});
+
+					// update JoomlaCalendar with ajax search, as it does not support dynamic content, we need to reinit it
+					if (typeof JoomlaCalendar === 'function') {
+						var calContainers = document.querySelectorAll('.field-calendar');
+						for (var ci = 0; ci < calContainers.length; ci++) {
+							try { JoomlaCalendar.init(calContainers[ci]); } catch(eC) {
+								console.log('[FC Calendar] erreur init:', eC.message);
+							}
+						}
+					}
+
 					var formsToRebind = [];
 					var newAdminForm = document.getElementById('adminForm');
 					if (newAdminForm) formsToRebind.push(newAdminForm);
@@ -317,34 +334,25 @@ if ($this->params->get('filter_ajax', 0)) :
 						var fId = newForm.id;
 						if (oldAutosubmits[fId]) {
 							$(newForm).attr('data-fc-autosubmit', oldAutosubmits[fId]);
-							
 							$(newForm.elements).filter('input:not(.fc_autosubmit_exclude):not(.select2-input), select:not(.fc_autosubmit_exclude)').on('change', function() {
 								if (window.adminFormPrepare) window.adminFormPrepare(newForm, oldAutosubmits[fId]);
 							});
 						}
-						
-						// Re-bind reset button to clear select2
 						$(newForm).find('.fc_button.button_reset').on('click', function() {
 							$(newForm).find('.use_select2_lib').select2('val', '');
 						});
-
-						// Override native submit again for new form
 						if (window.fcOverrideNativeSubmit) {
 							window.fcOverrideNativeSubmit(fId);
 						}
-
-						// Fix action url
-						var currentAction = $(newForm).attr(\"data-fcform_action\") || $(newForm).attr(\"action\") || baseUrl;
+						var currentAction = $(newForm).attr('data-fcform_action') || $(newForm).attr('action') || baseUrl;
 						var cleanBase = currentAction.split('?')[0];
 						$(newForm).attr('action', cleanBase);
 						$(newForm).attr('data-fcform_action', cleanBase);
 					});
 
-					// Update browser URL
 					if (window.history && window.history.pushState) {
 						window.history.pushState(null, '', fullActionUrl);
 					}
-
 				},
 				error: function() {
 					if (targetContainer.length) targetContainer.css('opacity', '1');
