@@ -112,18 +112,18 @@ class modFlexigooglemapHelper
 		$queryLoc = 'SELECT a.*, b.field_id, b.value, b.valueorder '
 			. ', CASE WHEN CHAR_LENGTH(a.alias) THEN CONCAT_WS(\':\', a.id, a.alias) ELSE a.id END as itemslug'
 			. ', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as catslug'
-			.' GROUP_CONCAT(cc.id SEPARATOR  ",") AS catidlist, '
-			.' GROUP_CONCAT(cc.alias SEPARATOR  ",") AS  cataliaslist '
+			. ', GROUP_CONCAT(cc.id SEPARATOR ",") AS catidlist'
+			. ', GROUP_CONCAT(cc.alias SEPARATOR ",") AS cataliaslist'
 			. ', ext.type_id as type_id'
-			. ' FROM #__content  AS a'
-			. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = a.id '
+			. ' FROM #__content AS a'
 			. ' JOIN #__categories AS c ON c.id = a.catid'
-			. ' LEFT JOIN #__flexicontent_fields_item_relations AS b ON a.id = b.item_id '
-			. ' LEFT JOIN #__flexicontent_items_ext AS ext ON a.id = ext.item_id '
-			.' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON a.id=rel.itemid '  // to get info for item's categories
-			.' LEFT JOIN #__categories AS cc ON cc.id=rel.catid '
-			. ' WHERE b.field_id = ' . $fieldAddressId . ' AND ' . $catWhere . '  AND state = 1'
-			. ' ORDER BY title ' . $count;
+			. ' LEFT JOIN #__flexicontent_fields_item_relations AS b ON a.id = b.item_id'
+			. ' LEFT JOIN #__flexicontent_items_ext AS ext ON a.id = ext.item_id'
+			. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON a.id = rel.itemid'
+			. ' LEFT JOIN #__categories AS cc ON cc.id = rel.catid'
+			. ' WHERE b.field_id = ' . $fieldAddressId . ' AND ' . $catWhere . ' AND a.state = 1'
+			. ' GROUP BY a.id, b.field_id, b.value, b.valueorder, c.id, ext.type_id'
+			. ' ORDER BY a.title ' . $count;
 		$itemsLoc = $db->setQuery($queryLoc)->loadObjectList();
 
 		return $itemsLoc;
