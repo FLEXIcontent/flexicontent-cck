@@ -409,7 +409,7 @@ $doc->addScriptDeclaration($js);
 		$output[] = '
 			<input type="'.($search_autocomplete==2 ? 'hidden' : 'text').'"
 				data-txt_ac_lang="' . \Joomla\CMS\Factory::getLanguage()->getTag() . '"
-				id="mod_search_searchword-'.$module->id.'" class="'.$text_search_class.'"
+id="mod_search_searchword-'.$module->id.'" class="'.($isJ4 ? 'form-control ' : '').$text_search_class.'"
 				placeholder="'.$search_inner_prompt.'" label="'.$search_inner_prompt.'"  name="q" '.($search_autocomplete==2 ? '' : ' size="'.$search_inner_width.'" maxlength="'.$maxchars.'"').' value="'.$searchword.'" aria-label="'.$search_inner_prompt.'"  />';
 
 		// Search's GO button
@@ -481,8 +481,15 @@ $doc->addScriptDeclaration($js);
 		}
 
 		// If using button in same row try to create bootstrap btn input append
-		$txt_grp_class = $params->get('bootstrap_ver', 2)==2  ?  (($prependToText ? ' input-prepend' : '') . ($appendToText ? ' input-append' : '')) : 'input-group';
-		$input_grp_class = $params->get('bootstrap_ver', 2)==2  ?  'input-prepend  input-append' : 'input-group';
+$isJ4 = defined('FLEXI_J40GE') && FLEXI_J40GE;
+
+$txt_grp_class = !$isJ4
+    ? (($prependToText ? ' input-prepend' : '') . ($appendToText ? ' input-append' : ''))
+    : 'input-group';
+
+$input_grp_class = !$isJ4
+    ? 'input-prepend input-append'
+    : 'input-group';
 
 		$output =
 			(count($top_html) > 1 ? '<span class="btn-wrapper '.$input_grp_class.'">'.implode("\n", $top_html).'</span>' : implode("\n", $top_html)).
