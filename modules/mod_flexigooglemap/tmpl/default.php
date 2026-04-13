@@ -220,68 +220,75 @@ if ($use_highlight_marker) $actions_btn_count++;
 </style>
 
 <?php
-
 if ($use_mlist)
 {
-	/**
-	 * When using markers list and markers list is wrapped after the map box
-	 * because of the outer container width reaching the configured width limit
-	 */
-	$marker_list_wrap_limit = (int) $params->get('marker_list_wrap_limit', 1200);
-	$marker_list_wrap_limit = $marker_list_wrap_limit >= 0 ? $marker_list_wrap_limit : 1200;
+    $marker_list_wrap_limit = (int) $params->get('marker_list_wrap_limit', 1200);
+    $marker_list_wrap_limit = $marker_list_wrap_limit >= 0 ? $marker_list_wrap_limit : 1200;
 
-	$map_height_wrapped = $params->get('map_height_wrapped', '45vh');
-	$map_height_wrapped = is_numeric($map_height_wrapped) ? $map_height_wrapped . 'px' : $map_height_wrapped;
+    $map_height_wrapped = $params->get('map_height_wrapped', '45vh');
+    $map_height_wrapped = is_numeric($map_height_wrapped) ? $map_height_wrapped . 'px' : $map_height_wrapped;
 
-	$marker_list_height_wrapped = $params->get('marker_list_height_wrapped', '45vh');
-	$marker_list_height_wrapped = is_numeric($marker_list_height_wrapped) ? $marker_list_height_wrapped . 'px' : $marker_list_height_wrapped;
+    $marker_list_height_wrapped = $params->get('marker_list_height_wrapped', '45vh');
+    $marker_list_height_wrapped = is_numeric($marker_list_height_wrapped) ? $marker_list_height_wrapped . 'px' : $marker_list_height_wrapped;
 
-	$_inlineCSS_WRAP_WIDTH = <<<CSS
+    // ← C'était manquant
+    $map_list_width = $params->get('map_list_width', '320px');
+    $map_list_width = is_numeric($map_list_width) ? $map_list_width . 'px' : $map_list_width;
 
-		#map-bounds-box{$module->id}.map-bounds-box,
-		#fc_module_map_{$module->id}.fc_module_map {
-			height: {$map_height_wrapped};
-		}
-		#fc_module_marker_list_box_{$module->id}.fc_module_marker_list_box {
-			height: calc({$marker_list_height_wrapped});
-			margin-top: calc(var(--absolute-top-row-elements-counter-font-size) * 1.5); 
-		}
-	
-		#map_contents_box_{$module->id}.map_contents_box {
-			flex-wrap: wrap;
-			min-height: fit-content;
-		}
-		#map_contents_box_{$module->id}.map_contents_box .col8 {
-			height: unset;
-			width: 100%;
-			flex-basis: 100%;
-		}
-		#map_contents_box_{$module->id}.map_contents_box .col4 {
-			height: unset;
-			width: 100%;
-			flex-basis: 100%;
-		}
+    $mid = $module->id;
 
-		.leaflet-popup-content-wrapper {
-			/*height: calc({$map_height_wrapped} / 2) !important;*/
-		}
+    $_inlineCSS_WRAP_WIDTH = <<<CSS
+#map-bounds-box{$mid}.map-bounds-box,
+#fc_module_map_{$mid}.fc_module_map {
+    height: {$map_height_wrapped};
+}
+#fc_module_marker_list_box_{$mid}.fc_module_marker_list_box {
+    height: {$marker_list_height_wrapped};
+    margin-top: calc(var(--absolute-top-row-elements-counter-font-size) * 1.5);
+}
+#map_contents_box_{$mid}.map_contents_box {
+    flex-wrap: wrap;
+    min-height: fit-content;
+}
+#map_contents_box_{$mid}.map_contents_box .col8,
+#map_contents_box_{$mid}.map_contents_box .col4 {
+    flex: 1 1 100% !important;
+    max-width: 100%;
+    height: unset;
+}
+CSS;
+    ?>
 
-	CSS;
-	?>
-
-	<style>
-        @media screen and (max-width: <?php echo $marker_list_wrap_limit - 1;?>px) {  <?php /* LEGACY browsers, assume no side column ? */ ?>
-		<?php echo $_inlineCSS_WRAP_WIDTH; ?>
+    <style>
+        /* ── Layout côte-à-côte (grand écran, défaut) ── */
+        #map_contents_box_<?= $mid ?>.map_contents_box {
+            display: flex;
+            flex-wrap: nowrap;
+            align-items: stretch;
+        }
+        #map_contents_box_<?= $mid ?>.map_contents_box .col8 {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+        #map_contents_box_<?= $mid ?>.map_contents_box .col4 {
+            flex: 0 0 <?= $map_list_width ?>;
+            width: <?= $map_list_width ?>;
+            max-width: <?= $map_list_width ?>;
+            overflow-y: auto;
         }
 
-        @container (width < <?php echo $marker_list_wrap_limit;?>px) {  <?php /* MODERN browsers, regardless of side column */ ?>
-		<?php echo $_inlineCSS_WRAP_WIDTH; ?>
+        /* ── Bascule responsive : navigateurs modernes ── */
+        @container (width < <?= $marker_list_wrap_limit ?>px) {
+            <?= $_inlineCSS_WRAP_WIDTH ?>
         }
 
+        /* ── Bascule responsive : fallback anciens navigateurs ── */
+        @media screen and (max-width: <?= $marker_list_wrap_limit - 1 ?>px) {
+            <?= $_inlineCSS_WRAP_WIDTH ?>
+        }
+    </style>
 
-	</style>
-
-	<?php
+    <?php
 }
 ?>
 
@@ -685,7 +692,31 @@ if ($use_mlist)
 		}
 
 		// Initialize the Map
-		fc_MapMod_initialize_<?= $module->id; ?>();
+		// Initialize the Map — attendre que le DOM soit prêt et le CSS appliqué
+(function() {
+    function doInit_<?= $module->id; ?>() {
+        var el = document.getElementById('fc_module_map_<?= $module->id; ?>');
+        if (!el || el.offsetHeight === 0) {
+            // Hauteur pas encore calculée, on réessaie au prochain frame
+            requestAnimationFrame(doInit_<?= $module->id; ?>);
+            return;
+        }
+        fc_MapMod_initialize_<?= $module->id; ?>();
+
+        // Sécurité supplémentaire : invalider après rendu complet
+        setTimeout(function() {
+            if (module_map_<?= $module->id; ?>) {
+                module_map_<?= $module->id; ?>.invalidateSize(true);
+            }
+        }, 300);
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', doInit_<?= $module->id; ?>);
+    } else {
+        requestAnimationFrame(doInit_<?= $module->id; ?>);
+    }
+})();
 
 		// Geo locate visitor on-demand via button click
 		document.addEventListener("click", function(e) {
@@ -693,6 +724,10 @@ if ($use_mlist)
 				fc_MapMad_geolocateMe_<?= $module->id; ?>(module_map_<?= $module->id; ?>);
 			}
 		});
+      // Correction zone grise au redimensionnement de la fenêtre
+window.addEventListener('resize', function() {
+    map.invalidateSize();
+});
 	</script>
 
 
