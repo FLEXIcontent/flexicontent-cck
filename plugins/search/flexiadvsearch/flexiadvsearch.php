@@ -47,6 +47,20 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 	var $autoloadLanguage = false;
 
 	/**
+	 * Merged FLEXIcontent component and active menu parameters.
+	 *
+	 * @var \Joomla\Registry\Registry|null
+	 */
+	protected $_params = null;
+
+	/**
+	 * Current active search string.
+	 *
+	 * @var string|null
+	 */
+	protected $_active_search = null;
+
+	/**
 	 * Constructor
 	 *
 	 * @access      public
