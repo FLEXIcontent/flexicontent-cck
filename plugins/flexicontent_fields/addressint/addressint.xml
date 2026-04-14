@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension version="1.6" type="plugin" group="flexicontent_fields" method="upgrade">
-	<n>FLEXIcontent - International Address / Google Maps</n>
+	<name>FLEXIcontent - International Address / Google Maps</name>
 	<author>Lyquix, ggppdk</author>
 	<creationDate>July 2013</creationDate>
 	<copyright>Copyright (C) Lyquix, ggppdk</copyright>
