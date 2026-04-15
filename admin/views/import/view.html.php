@@ -19,9 +19,35 @@ JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/compone
 /**
  * HTML View class for the FLEXIcontent import screen
  */
+#[AllowDynamicProperties]
 class FlexicontentViewImport extends FlexicontentViewBaseRecords
 {
-	public function display($tpl = null)
+		/** @var mixed $categories */
+	public mixed $categories = null;
+	/** @var mixed $conf */
+	public mixed $conf = null;
+	/** @var mixed $cparams */
+	public mixed $cparams = null;
+	/** @var mixed $file_fields */
+	public mixed $file_fields = null;
+	/** @var mixed $formvals */
+	public mixed $formvals = null;
+	/** @var mixed $languages */
+	public mixed $languages = null;
+	/** @var mixed $lineno */
+	public mixed $lineno = null;
+	/** @var mixed $lists */
+	public mixed $lists = null;
+	/** @var mixed $model */
+	public mixed $model = null;
+	/** @var mixed $sidebar */
+	public mixed $sidebar = null;
+	/** @var mixed $types */
+	public mixed $types = null;
+	/** @var mixed $user */
+	public mixed $user = null;
+
+public function display($tpl = null)
 	{
 		/**
 		 * Initialise variables

@@ -29,8 +29,17 @@ if (!defined('FLEXI_J16GE'))   define('FLEXI_J16GE', version_compare( $jversion-
 if (!defined('FLEXI_J30GE'))   define('FLEXI_J30GE', version_compare( $jversion->getShortVersion(), '3.0.0', 'ge' ) );
 if (!defined('FLEXI_J40GE'))   define('FLEXI_J40GE', version_compare( $jversion->getShortVersion(), '4.0.0', 'ge' ) );
 
+#[AllowDynamicProperties]
 class com_flexicontentInstallerScript
 {
+	/** @var mixed $minimum_joomla_release */
+	public mixed $minimum_joomla_release = null;
+	/** @var mixed $release */
+	public mixed $release = null;
+	/** @var mixed $release_existing */
+	public mixed $release_existing = null;
+
+
 	/*
 	* $parent is the class calling this method.
 	* $type is the type of change (install, update or discover_install, not uninstall).

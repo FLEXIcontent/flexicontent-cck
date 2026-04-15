@@ -40,7 +40,14 @@ else
 	}
 }
 
-//class FlexicontentModelGroups extends _FlexicontentModelGroups {}
+//class FlexicontentModelGroups extends _FlexicontentModelGroups {
+	/** @var mixed $canManage */
+	public mixed $canManage = null;
+	/** @var mixed $view_id */
+	public mixed $view_id = null;
+
+}
+#[AllowDynamicProperties]
 class FlexicontentModelGroups extends FCModelAdminList
 {
 

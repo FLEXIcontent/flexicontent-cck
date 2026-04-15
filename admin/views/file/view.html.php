@@ -19,9 +19,29 @@ JLoader::register('FlexicontentViewBaseRecord', JPATH_ADMINISTRATOR . '/componen
 /**
  * HTML View class for the File screen
  */
+#[AllowDynamicProperties]
 class FlexicontentViewFile extends FlexicontentViewBaseRecord
 {
-	var $proxy_option = null;
+		/** @var mixed $controller */
+	public mixed $controller = null;
+	/** @var mixed $cparams */
+	public mixed $cparams = null;
+	/** @var mixed $document */
+	public mixed $document = null;
+	/** @var mixed $form */
+	public mixed $form = null;
+	/** @var mixed $lists */
+	public mixed $lists = null;
+	/** @var mixed $perms */
+	public mixed $perms = null;
+	/** @var mixed $row */
+	public mixed $row = null;
+	/** @var mixed $rowdata */
+	public mixed $rowdata = null;
+	/** @var mixed $view */
+	public mixed $view = null;
+
+var $proxy_option = null;
 
 	/**
 	 * Display the view

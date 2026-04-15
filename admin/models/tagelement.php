@@ -21,8 +21,15 @@ require_once('base/baselist.php');
  * Flexicontent Component Tagelement Model
  *
  */
+#[AllowDynamicProperties]
 class FlexicontentModelTagelement extends FCModelAdminList
 {
+	/** @var mixed $canManage */
+	public mixed $canManage = null;
+	/** @var mixed $view_id */
+	public mixed $view_id = null;
+
+
 	/**
 	 * Record database table
 	 *

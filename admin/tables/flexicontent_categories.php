@@ -101,8 +101,17 @@ else
 }
 
 
+#[AllowDynamicProperties]
 class flexicontent_categories extends _flexicontent_categories
 {
+	/** @var mixed $_NAME */
+	public mixed $_NAME = null;
+	/** @var mixed $_error */
+	public mixed $_error = null;
+	/** @var mixed $_records_dbtbl */
+	public mixed $_records_dbtbl = null;
+
+
 	/** @var int Primary key */
 	var $id					= null;
 	/** @var int */

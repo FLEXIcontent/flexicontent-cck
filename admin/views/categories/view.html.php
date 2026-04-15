@@ -19,9 +19,37 @@ JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/compone
 /**
  * HTML View class for the categories backend manager
  */
+#[AllowDynamicProperties]
 class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 {
-	var $proxy_option   = 'com_categories';
+		/** @var mixed $count_filters */
+	public mixed $count_filters = null;
+	/** @var mixed $lang_assocs */
+	public mixed $lang_assocs = null;
+	/** @var mixed $langs */
+	public mixed $langs = null;
+	/** @var mixed $lists */
+	public mixed $lists = null;
+	/** @var mixed $option */
+	public mixed $option = null;
+	/** @var mixed $orderingx */
+	public mixed $orderingx = null;
+	/** @var mixed $pagination */
+	public mixed $pagination = null;
+	/** @var mixed $perms */
+	public mixed $perms = null;
+	/** @var mixed $rows */
+	public mixed $rows = null;
+	/** @var mixed $scope_title */
+	public mixed $scope_title = null;
+	/** @var mixed $sidebar */
+	public mixed $sidebar = null;
+	/** @var mixed $state */
+	public mixed $state = null;
+	/** @var mixed $view */
+	public mixed $view = null;
+
+var $proxy_option   = 'com_categories';
 	var $title_propname = 'title';
 	var $state_propname = 'published';
 	var $db_tbl         = 'categories';

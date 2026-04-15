@@ -21,8 +21,19 @@ require_once('base/baselist.php');
  * FLEXIcontent Component Items Model
  *
  */
+#[AllowDynamicProperties]
 class FlexicontentModelItems extends FCModelAdminList
 {
+	/** @var mixed $_catids */
+	public mixed $_catids = null;
+	/** @var mixed $_tagids */
+	public mixed $_tagids = null;
+	/** @var mixed $canManage */
+	public mixed $canManage = null;
+	/** @var mixed $view_id */
+	public mixed $view_id = null;
+
+
 	/**
 	 * Record database table
 	 *

@@ -26,8 +26,13 @@ require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' .
  *
  * @since 3.3
  */
+#[AllowDynamicProperties]
 class FlexicontentControllerGroups extends FlexicontentControllerBaseAdmin
 {
+	/** @var mixed $canManage */
+	public mixed $canManage = null;
+
+
 
 	/**
 	 * @var     string  The prefix to use with controller messages.

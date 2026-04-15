@@ -26,7 +26,92 @@ JLoader::register('FlexicontentViewBaseRecord', JPATH_ADMINISTRATOR . '/componen
 	 */
 class FlexicontentViewItem extends FlexicontentViewBaseRecord
 {
-	var $proxy_option = null;
+		/** @var mixed $action */
+	public mixed $action = null;
+	/** @var mixed $allowbuttons */
+	public mixed $allowbuttons = null;
+	/** @var mixed $allowlangmods */
+	public mixed $allowlangmods = null;
+	/** @var mixed $captcha_errmsg */
+	public mixed $captcha_errmsg = null;
+	/** @var mixed $captcha_field */
+	public mixed $captcha_field = null;
+	/** @var mixed $current_page */
+	public mixed $current_page = null;
+	/** @var mixed $document */
+	public mixed $document = null;
+	/** @var mixed $fields */
+	public mixed $fields = null;
+	/** @var mixed $form */
+	public mixed $form = null;
+	/** @var mixed $input */
+	public mixed $input = null;
+	/** @var mixed $iparams */
+	public mixed $iparams = null;
+	/** @var mixed $item */
+	public mixed $item = null;
+	/** @var mixed $itemlang */
+	public mixed $itemlang = null;
+	/** @var mixed $lang_assocs */
+	public mixed $lang_assocs = null;
+	/** @var mixed $langs */
+	public mixed $langs = null;
+	/** @var mixed $lists */
+	public mixed $lists = null;
+	/** @var mixed $menuCats */
+	public mixed $menuCats = null;
+	/** @var mixed $nullDate */
+	public mixed $nullDate = null;
+	/** @var mixed $ownerCanEdit */
+	public mixed $ownerCanEdit = null;
+	/** @var mixed $ownerCanEditState */
+	public mixed $ownerCanEditState = null;
+	/** @var mixed $pageclass_sfx */
+	public mixed $pageclass_sfx = null;
+	/** @var mixed $pagecount */
+	public mixed $pagecount = null;
+	/** @var mixed $params */
+	public mixed $params = null;
+	/** @var mixed $parents */
+	public mixed $parents = null;
+	/** @var mixed $perms */
+	public mixed $perms = null;
+	/** @var mixed $placeViaLayout */
+	public mixed $placeViaLayout = null;
+	/** @var mixed $placementConf */
+	public mixed $placementConf = null;
+	/** @var mixed $placementMsgs */
+	public mixed $placementMsgs = null;
+	/** @var mixed $print_link */
+	public mixed $print_link = null;
+	/** @var mixed $published */
+	public mixed $published = null;
+	/** @var mixed $quicktagsdata */
+	public mixed $quicktagsdata = null;
+	/** @var mixed $ratings */
+	public mixed $ratings = null;
+	/** @var mixed $referer */
+	public mixed $referer = null;
+	/** @var mixed $submitConf */
+	public mixed $submitConf = null;
+	/** @var mixed $subscribers */
+	public mixed $subscribers = null;
+	/** @var mixed $tmpls */
+	public mixed $tmpls = null;
+	/** @var mixed $toolbar */
+	public mixed $toolbar = null;
+	/** @var mixed $tparams */
+	public mixed $tparams = null;
+	/** @var mixed $typeselected */
+	public mixed $typeselected = null;
+	/** @var mixed $usedtagsdata */
+	public mixed $usedtagsdata = null;
+	/** @var mixed $user */
+	public mixed $user = null;
+	/** @var mixed $versions */
+	public mixed $versions = null;
+
+var $proxy_option = null;
 
 	/**
 	 * Creates the item view or item form

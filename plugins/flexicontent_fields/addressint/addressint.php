@@ -14,6 +14,10 @@ JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent
 #[AllowDynamicProperties] //php8.2 compatibility
 class plgFlexicontent_fieldsAddressint extends FCField
 {
+	/** @var mixed $values */
+	public mixed $values = null;
+
+
 	static $field_types = null; // Automatic, do not remove since needed for proper late static binding, define explicitely when a field can render other field types
 	var $task_callable = null;  // Field's methods allowed to be called via AJAX
 

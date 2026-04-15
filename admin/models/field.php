@@ -20,8 +20,21 @@ require_once('base/base.php');
  * FLEXIcontent Component Field Model
  *
  */
+#[AllowDynamicProperties]
 class FlexicontentModelField extends FCModelAdmin
 {
+	/** @var mixed $canCreate */
+	public mixed $canCreate = null;
+	/** @var mixed $canManage */
+	public mixed $canManage = null;
+	/** @var mixed $helpModal */
+	public mixed $helpModal = null;
+	/** @var mixed $helpTitle */
+	public mixed $helpTitle = null;
+	/** @var mixed $helpURL */
+	public mixed $helpURL = null;
+
+
 	/**
 	 * Record name, (parent class property), this is used for: naming session data, XML file of class, etc
 	 *

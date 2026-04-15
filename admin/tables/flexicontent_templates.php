@@ -13,8 +13,15 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 require_once('flexicontent_basetable.php');
 
+#[AllowDynamicProperties]
 class flexicontent_templates extends flexicontent_basetable
 {
+	/** @var mixed $_NAME */
+	public mixed $_NAME = null;
+	/** @var mixed $_records_dbtbl */
+	public mixed $_records_dbtbl = null;
+
+
 	// Non-table (private) properties
 	var $_record_name = 'template';
 	var $_title = 'template';

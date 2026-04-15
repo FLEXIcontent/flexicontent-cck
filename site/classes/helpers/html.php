@@ -10,8 +10,25 @@ use Joomla\Filesystem\Path;
 use Joomla\Database\DatabaseInterface;
 use Joomla\CMS\Toolbar\ToolbarFactoryInterface;
 
+#[AllowDynamicProperties]
 class flexicontent_html
 {
+	/** @var mixed $fields */
+	public mixed $fields = null;
+	/** @var mixed $item */
+	public mixed $item = null;
+	/** @var mixed $pageclass_sfx */
+	public mixed $pageclass_sfx = null;
+	/** @var mixed $params */
+	public mixed $params = null;
+	/** @var mixed $params_saved */
+	public mixed $params_saved = null;
+	/** @var mixed $print_link */
+	public mixed $print_link = null;
+	/** @var mixed $tmpl */
+	public mixed $tmpl = null;
+
+
 	static $use_bootstrap = true;
 	static $icon_classes = null;
 	static $option = 'com_flexicontent';

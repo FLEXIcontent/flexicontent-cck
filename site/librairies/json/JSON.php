@@ -112,8 +112,13 @@ define('SERVICES_JSON_SUPPRESS_ERRORS', 32);
  * $value = $json->decode($input);
  * </code>
  */
+#[AllowDynamicProperties]
 class Services_JSON
 {
+	/** @var mixed $use */
+	public mixed $use = null;
+
+
    /**
     * constructs a new JSON instance
     *

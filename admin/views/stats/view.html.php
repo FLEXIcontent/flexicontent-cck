@@ -27,8 +27,47 @@ JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/compone
 /**
  * HTML View class for the Stats View
  */
+#[AllowDynamicProperties]
 class FlexicontentViewStats extends FlexicontentViewBaseRecords
 {
+	/** @var mixed $creators */
+	public mixed $creators = null;
+	/** @var mixed $editors */
+	public mixed $editors = null;
+	/** @var mixed $favoured */
+	public mixed $favoured = null;
+	/** @var mixed $genstats */
+	public mixed $genstats = null;
+	/** @var mixed $itemsgraph */
+	public mixed $itemsgraph = null;
+	/** @var mixed $metadescription */
+	public mixed $metadescription = null;
+	/** @var mixed $metakeywords */
+	public mixed $metakeywords = null;
+	/** @var mixed $popular */
+	public mixed $popular = null;
+	/** @var mixed $rating */
+	public mixed $rating = null;
+	/** @var mixed $sidebar */
+	public mixed $sidebar = null;
+	/** @var mixed $statestats */
+	public mixed $statestats = null;
+	/** @var mixed $totalitemsprogress */
+	public mixed $totalitemsprogress = null;
+	/** @var mixed $totalitemspublish */
+	public mixed $totalitemspublish = null;
+	/** @var mixed $totalitemsunpublish */
+	public mixed $totalitemsunpublish = null;
+	/** @var mixed $totalitemswaiting */
+	public mixed $totalitemswaiting = null;
+	/** @var mixed $unpopular */
+	public mixed $unpopular = null;
+	/** @var mixed $votesstats */
+	public mixed $votesstats = null;
+	/** @var mixed $worstrating */
+	public mixed $worstrating = null;
+
+
 	/**
 	 * Creates the Entrypage
 	 *

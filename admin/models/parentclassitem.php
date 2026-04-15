@@ -21,8 +21,23 @@ require_once('base/base.php');
  * FLEXIcontent Component (Common) Item Model (FrontEnd / BackEnd)
  *
  */
+#[AllowDynamicProperties]
 class ParentClassItem extends FCModelAdmin
 {
+	/** @var mixed $abort_redirect_url */
+	public mixed $abort_redirect_url = null;
+	/** @var mixed $debug_tags */
+	public mixed $debug_tags = null;
+	/** @var mixed $menu_matches */
+	public mixed $menu_matches = null;
+	/** @var mixed $option */
+	public mixed $option = null;
+	/** @var mixed $record_keys */
+	public mixed $record_keys = null;
+	/** @var mixed $use_jtable_publishing */
+	public mixed $use_jtable_publishing = null;
+
+
 	/**
 	 * Record name, (parent class property), this is used for: naming session data, XML file of class, etc
 	 *

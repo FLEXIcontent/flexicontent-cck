@@ -19,9 +19,45 @@ JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/compone
 /**
  * HTML View class for the FLEXIcontent itemelement screen
  */
+#[AllowDynamicProperties]
 class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 {
-	var $proxy_option   = 'com_content';
+		/** @var mixed $assocs_id */
+	public mixed $assocs_id = null;
+	/** @var mixed $count_filters */
+	public mixed $count_filters = null;
+	/** @var mixed $filter_cats */
+	public mixed $filter_cats = null;
+	/** @var mixed $lang_assocs */
+	public mixed $lang_assocs = null;
+	/** @var mixed $langs */
+	public mixed $langs = null;
+	/** @var mixed $lists */
+	public mixed $lists = null;
+	/** @var mixed $option */
+	public mixed $option = null;
+	/** @var mixed $ordering */
+	public mixed $ordering = null;
+	/** @var mixed $pagination */
+	public mixed $pagination = null;
+	/** @var mixed $perms */
+	public mixed $perms = null;
+	/** @var mixed $rows */
+	public mixed $rows = null;
+	/** @var mixed $scope_title */
+	public mixed $scope_title = null;
+	/** @var mixed $sidebar */
+	public mixed $sidebar = null;
+	/** @var mixed $single_type */
+	public mixed $single_type = null;
+	/** @var mixed $state */
+	public mixed $state = null;
+	/** @var mixed $tparams */
+	public mixed $tparams = null;
+	/** @var mixed $view */
+	public mixed $view = null;
+
+var $proxy_option   = 'com_content';
 	var $title_propname = 'title';
 	var $state_propname = 'state';
 	var $db_tbl         = 'content';

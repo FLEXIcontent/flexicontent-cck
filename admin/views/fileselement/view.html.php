@@ -19,9 +19,81 @@ JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/compone
 /**
  * HTML View class for the Fileselement View
  */
+#[AllowDynamicProperties]
 class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 {
-	var $proxy_option   = null;
+		/** @var mixed $CanFiles */
+	public mixed $CanFiles = null;
+	/** @var mixed $CanUpload */
+	public mixed $CanUpload = null;
+	/** @var mixed $CanViewAllFiles */
+	public mixed $CanViewAllFiles = null;
+	/** @var mixed $assign_mode */
+	public mixed $assign_mode = null;
+	/** @var mixed $assigned_fields_icons */
+	public mixed $assigned_fields_icons = null;
+	/** @var mixed $assigned_fields_labels */
+	public mixed $assigned_fields_labels = null;
+	/** @var mixed $cols */
+	public mixed $cols = null;
+	/** @var mixed $count_filters */
+	public mixed $count_filters = null;
+	/** @var mixed $ctrl */
+	public mixed $ctrl = null;
+	/** @var mixed $ffields */
+	public mixed $ffields = null;
+	/** @var mixed $field */
+	public mixed $field = null;
+	/** @var mixed $fieldid */
+	public mixed $fieldid = null;
+	/** @var mixed $folder_mode */
+	public mixed $folder_mode = null;
+	/** @var mixed $img_folder */
+	public mixed $img_folder = null;
+	/** @var mixed $is_pending */
+	public mixed $is_pending = null;
+	/** @var mixed $langs */
+	public mixed $langs = null;
+	/** @var mixed $layout */
+	public mixed $layout = null;
+	/** @var mixed $lists */
+	public mixed $lists = null;
+	/** @var mixed $option */
+	public mixed $option = null;
+	/** @var mixed $optional_cols */
+	public mixed $optional_cols = null;
+	/** @var mixed $pagination */
+	public mixed $pagination = null;
+	/** @var mixed $params */
+	public mixed $params = null;
+	/** @var mixed $pending_file_names */
+	public mixed $pending_file_names = null;
+	/** @var mixed $perms */
+	public mixed $perms = null;
+	/** @var mixed $require_ftp */
+	public mixed $require_ftp = null;
+	/** @var mixed $rows */
+	public mixed $rows = null;
+	/** @var mixed $scope_title */
+	public mixed $scope_title = null;
+	/** @var mixed $sidebar */
+	public mixed $sidebar = null;
+	/** @var mixed $state */
+	public mixed $state = null;
+	/** @var mixed $target_dir */
+	public mixed $target_dir = null;
+	/** @var mixed $targetid */
+	public mixed $targetid = null;
+	/** @var mixed $thumb_h */
+	public mixed $thumb_h = null;
+	/** @var mixed $thumb_w */
+	public mixed $thumb_w = null;
+	/** @var mixed $u_item_id */
+	public mixed $u_item_id = null;
+	/** @var mixed $view */
+	public mixed $view = null;
+
+var $proxy_option   = null;
 	var $title_propname = 'filename';
 	var $state_propname = 'published';
 	var $db_tbl         = 'flexicontent_files';

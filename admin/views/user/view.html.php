@@ -19,9 +19,39 @@ JLoader::register('FlexicontentViewBaseRecord', JPATH_ADMINISTRATOR . '/componen
 /**
  * HTML View class for the User screen
  */
+#[AllowDynamicProperties]
 class FlexicontentViewUser extends FlexicontentViewBaseRecord
 {
-	var $proxy_option = 'com_users';
+		/** @var mixed $contact */
+	public mixed $contact = null;
+	/** @var mixed $cparams */
+	public mixed $cparams = null;
+	/** @var mixed $document */
+	public mixed $document = null;
+	/** @var mixed $form */
+	public mixed $form = null;
+	/** @var mixed $iparams */
+	public mixed $iparams = null;
+	/** @var mixed $jform_authorbasic */
+	public mixed $jform_authorbasic = null;
+	/** @var mixed $jform_authorcat */
+	public mixed $jform_authorcat = null;
+	/** @var mixed $lists */
+	public mixed $lists = null;
+	/** @var mixed $params_authorbasic */
+	public mixed $params_authorbasic = null;
+	/** @var mixed $params_authorcat */
+	public mixed $params_authorcat = null;
+	/** @var mixed $perms */
+	public mixed $perms = null;
+	/** @var mixed $row */
+	public mixed $row = null;
+	/** @var mixed $tmpls */
+	public mixed $tmpls = null;
+	/** @var mixed $usergroups */
+	public mixed $usergroups = null;
+
+var $proxy_option = 'com_users';
 
 	/**
 	 * Display the view

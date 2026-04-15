@@ -24,9 +24,15 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
  * @see         \Joomla\CMS\Plugin\CMSPlugin
  * @since       11.1
  */
+#[AllowDynamicProperties]
 class FCDispatcher extends JEventDispatcher
 {
-	protected $prepContentFuncs = null;
+		/** @var mixed $_methods */
+	public mixed $_methods = null;
+	/** @var mixed $_observers */
+	public mixed $_observers = null;
+
+protected $prepContentFuncs = null;
 	protected $debug = false;
 	
 	/**

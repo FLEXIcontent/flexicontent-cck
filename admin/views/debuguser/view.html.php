@@ -14,9 +14,17 @@ defined('_JEXEC') or die;
  * @subpackage	com_users
  * @since		1.6
  */
+#[AllowDynamicProperties]
 class FlexicontentViewDebugUser extends UsersViewDebugUser
 {
-	protected $actions;
+		/** @var mixed $components */
+	public mixed $components = null;
+	/** @var mixed $levels */
+	public mixed $levels = null;
+	/** @var mixed $user */
+	public mixed $user = null;
+
+protected $actions;
 	protected $items;
 	protected $pagination;
 	protected $state;

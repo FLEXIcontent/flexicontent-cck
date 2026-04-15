@@ -21,8 +21,13 @@ require_once('base/base.php');
  * FLEXIcontent Template Model
  *
  */
+#[AllowDynamicProperties]
 class FlexicontentModelTemplate extends FCModelAdmin
 {
+	/** @var mixed $canManage */
+	public mixed $canManage = null;
+
+
 	/**
 	 * Record name, (parent class property), this is used for: naming session data, XML file of class, etc
 	 *

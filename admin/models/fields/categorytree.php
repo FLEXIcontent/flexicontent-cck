@@ -27,8 +27,13 @@ use Joomla\Utilities\ArrayHelper;
  * @subpackage	com_categories
  * @since		1.6
  */
+#[AllowDynamicProperties]
 class JFormFieldCategorytree extends JFormFieldList
 {
+	/** @var mixed $value */
+	public mixed $value = null;
+
+
 	/**
 	 * The form field type.
 	 *

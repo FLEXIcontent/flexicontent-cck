@@ -19,9 +19,23 @@ JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/compone
 /**
  * View class for the FLEXIcontent templates screen
  */
+#[AllowDynamicProperties]
 class FlexicontentViewTemplates extends FlexicontentViewBaseRecords
 {
-	var $proxy_option   = null;
+		/** @var mixed $dest */
+	public mixed $dest = null;
+	/** @var mixed $lists */
+	public mixed $lists = null;
+	/** @var mixed $rows */
+	public mixed $rows = null;
+	/** @var mixed $sidebar */
+	public mixed $sidebar = null;
+	/** @var mixed $source */
+	public mixed $source = null;
+	/** @var mixed $tmpldirectory */
+	public mixed $tmpldirectory = null;
+
+var $proxy_option   = null;
 	var $title_propname = null;
 	var $state_propname = null;
 	var $db_tbl         = 'flexicontent_templates';

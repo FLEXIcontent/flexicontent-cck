@@ -19,9 +19,27 @@ JLoader::register('FlexicontentViewBaseRecord', JPATH_ADMINISTRATOR . '/componen
 /**
  * HTML View class for the Review screen
  */
+#[AllowDynamicProperties]
 class FlexicontentViewReview extends FlexicontentViewBaseRecord
 {
-	var $proxy_option = null;
+		/** @var mixed $_tmpl */
+	public mixed $_tmpl = null;
+	/** @var mixed $controller */
+	public mixed $controller = null;
+	/** @var mixed $cparams */
+	public mixed $cparams = null;
+	/** @var mixed $document */
+	public mixed $document = null;
+	/** @var mixed $form */
+	public mixed $form = null;
+	/** @var mixed $perms */
+	public mixed $perms = null;
+	/** @var mixed $row */
+	public mixed $row = null;
+	/** @var mixed $view */
+	public mixed $view = null;
+
+var $proxy_option = null;
 
 	/**
 	 * Display the view

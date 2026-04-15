@@ -27,9 +27,13 @@ require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' .
  *
  * @since 3.3
  */
+#[AllowDynamicProperties]
 class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 {
-	var $records_dbtbl  = 'flexicontent_fields';
+		/** @var mixed $canManage */
+	public mixed $canManage = null;
+
+var $records_dbtbl  = 'flexicontent_fields';
 	var $records_jtable = 'flexicontent_fields';
 
 	var $record_name = 'field';

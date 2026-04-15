@@ -19,9 +19,39 @@ JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/compone
 /**
  * HTML View class for the FLEXIcontent fields screen
  */
+#[AllowDynamicProperties]
 class FlexicontentViewFields extends FlexicontentViewBaseRecords
 {
-	var $proxy_option   = null;
+		/** @var mixed $count_filters */
+	public mixed $count_filters = null;
+	/** @var mixed $filter_type */
+	public mixed $filter_type = null;
+	/** @var mixed $lists */
+	public mixed $lists = null;
+	/** @var mixed $minihelp */
+	public mixed $minihelp = null;
+	/** @var mixed $option */
+	public mixed $option = null;
+	/** @var mixed $pagination */
+	public mixed $pagination = null;
+	/** @var mixed $perms */
+	public mixed $perms = null;
+	/** @var mixed $reOrderingActive */
+	public mixed $reOrderingActive = null;
+	/** @var mixed $rows */
+	public mixed $rows = null;
+	/** @var mixed $scope_title */
+	public mixed $scope_title = null;
+	/** @var mixed $sidebar */
+	public mixed $sidebar = null;
+	/** @var mixed $state */
+	public mixed $state = null;
+	/** @var mixed $types */
+	public mixed $types = null;
+	/** @var mixed $view */
+	public mixed $view = null;
+
+var $proxy_option   = null;
 	var $title_propname = 'label';
 	var $state_propname = 'published';
 	var $db_tbl         = 'flexicontent_fields';

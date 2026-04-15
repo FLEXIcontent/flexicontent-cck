@@ -13,8 +13,13 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 use Joomla\Database\DatabaseInterface;
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
+#[AllowDynamicProperties]
 class plgFlexicontent_fieldsFcpagenav extends FCField
 {
+	/** @var mixed $_data_cats */
+	public mixed $_data_cats = null;
+
+
 	static $field_types = null; // Automatic, do not remove since needed for proper late static binding, define explicitely when a field can render other field types
 	var $task_callable = null;  // Field's methods allowed to be called via AJAX
 

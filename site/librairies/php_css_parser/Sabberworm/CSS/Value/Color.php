@@ -2,9 +2,13 @@
 
 namespace Sabberworm\CSS\Value;
 
+#[AllowDynamicProperties]
 class Color extends CSSFunction {
 
-	public function __construct($aColor, $iLineNo = 0) {
+		/** @var mixed $aComponents */
+	public mixed $aComponents = null;
+
+public function __construct($aColor, $iLineNo = 0) {
 		parent::__construct(implode('', array_keys($aColor)), $aColor, ',', $iLineNo);
 	}
 

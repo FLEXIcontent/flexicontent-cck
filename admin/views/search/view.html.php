@@ -19,9 +19,35 @@ JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/compone
 /**
  * View class for the FLEXIcontent search indexes screen
  */
+#[AllowDynamicProperties]
 class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 {
-	var $proxy_option   = null;
+		/** @var mixed $count_filters */
+	public mixed $count_filters = null;
+	/** @var mixed $f_active */
+	public mixed $f_active = null;
+	/** @var mixed $isADV */
+	public mixed $isADV = null;
+	/** @var mixed $lists */
+	public mixed $lists = null;
+	/** @var mixed $option */
+	public mixed $option = null;
+	/** @var mixed $pagination */
+	public mixed $pagination = null;
+	/** @var mixed $perms */
+	public mixed $perms = null;
+	/** @var mixed $rows */
+	public mixed $rows = null;
+	/** @var mixed $scope_title */
+	public mixed $scope_title = null;
+	/** @var mixed $sidebar */
+	public mixed $sidebar = null;
+	/** @var mixed $state */
+	public mixed $state = null;
+	/** @var mixed $view */
+	public mixed $view = null;
+
+var $proxy_option   = null;
 	var $title_propname = null;
 	var $state_propname = null;
 	var $db_tbl         = null;

@@ -23,9 +23,27 @@ JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 
  *
  * @since 3.3
  */
+#[AllowDynamicProperties]
 class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 {
-	var $records_dbtbl  = 'content';
+		/** @var mixed $canManage */
+	public mixed $canManage = null;
+	/** @var mixed $format */
+	public mixed $format = null;
+	/** @var mixed $input */
+	public mixed $input = null;
+	/** @var mixed $option */
+	public mixed $option = null;
+	/** @var mixed $refererURL */
+	public mixed $refererURL = null;
+	/** @var mixed $returnURL */
+	public mixed $returnURL = null;
+	/** @var mixed $task */
+	public mixed $task = null;
+	/** @var mixed $view */
+	public mixed $view = null;
+
+var $records_dbtbl  = 'content';
 	var $records_jtable = 'flexicontent_items';
 
 	var $record_name = 'item';

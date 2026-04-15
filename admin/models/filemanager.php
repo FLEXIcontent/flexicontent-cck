@@ -25,8 +25,19 @@ require_once('base/baselist.php');
  * FLEXIcontent Component Filemanager Model
  *
  */
+#[AllowDynamicProperties]
 class FlexicontentModelFilemanager extends FCModelAdminList
 {
+	/** @var mixed $_id */
+	public mixed $_id = null;
+	/** @var mixed $canManage */
+	public mixed $canManage = null;
+	/** @var mixed $fieldid */
+	public mixed $fieldid = null;
+	/** @var mixed $view_id */
+	public mixed $view_id = null;
+
+
 	/**
 	 * Record database table
 	 *

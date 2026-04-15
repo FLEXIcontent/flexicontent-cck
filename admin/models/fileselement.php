@@ -19,9 +19,13 @@ JLoader::register('FlexicontentModelFilemanager', JPATH_ADMINISTRATOR.DS.'compon
  * FLEXIcontent Component Fileselement Model
  *
  */
+#[AllowDynamicProperties]
 class FlexicontentModelFileselement extends FlexicontentModelFilemanager
 {
-	public function __construct($config = array())
+		/** @var mixed $sess_assignments */
+	public mixed $sess_assignments = null;
+
+public function __construct($config = array())
 	{
 		parent::__construct($config);
 		$this->sess_assignments = false;
