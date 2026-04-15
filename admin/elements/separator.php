@@ -115,13 +115,13 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		\Joomla\CMS\Factory::getDocument()->addScriptDeclaration('
 			jQuery(document).ready(function()
 			{
-				jQuery("div.control-group > div")./* TODO-J5: each() removed */ current(function(i, el) {
+				jQuery("div.control-group > div").each(function(i, el) {
 					if ( jQuery(el).html().trim() == "" && ( jQuery(el).attr("class") == "control-label" || jQuery(el).attr("class") == "controls" ))
 					{
 						jQuery(el).remove();
 					}
 				});
-				jQuery("div.control-group")./* TODO-J5: each() removed */ current(function(i, el) {
+				jQuery("div.control-group").each(function(i, el) {
 					if (jQuery(el).html().trim() == "")
 					{
 						jQuery(el).remove();

@@ -48,7 +48,7 @@ if ( !isset(static::$js_added[$field->id][__FILE__]) )
 		{
 			var juxtapose = $('.juxtapose_" . $field->id . "');
 
-			juxtapose./* TODO-J5: each() removed */ current(function(index, element) {
+			juxtapose.each(function(index, element) {
 				var juxtaposeContainer = juxtapose.parent();
 				var juxtaposeRatio;
 			

@@ -196,7 +196,7 @@ function ilayout_disablePanel(element)
 	}
 
 	var form_fields_active = panel.find('textarea:enabled, select:enabled, input[type=\"radio\"]:enabled:checked, input[type=\"checkbox\"]:enabled:checked, input:not(:button):not(:radio):not(:checkbox):enabled');
-	form_fields_active./* TODO-J5: each() removed */ current(function(index)
+	form_fields_active.each(function(index)
 	{
 		el = jQuery(this);
 		//if ( el.is(':disabled') ) return;  // no need, because above we selected only enabled elements

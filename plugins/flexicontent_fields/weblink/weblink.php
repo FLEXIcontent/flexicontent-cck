@@ -362,7 +362,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 
 			if ($allow_relative_addrs === 2) $js .= "
 				var nr = 0;
-				newField.find('input.autoprefix')./* TODO-J5: each() removed */ current(function() {
+				newField.find('input.autoprefix').each(function() {
 					var elem = jQuery(this);
 					elem.attr('name', fname_pfx + '[autoprefix]');
 					elem.attr('id', element_id + '_autoprefix_'+nr);
@@ -527,7 +527,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 
 				// Show tooltips
 				var tipped_elements = newField.find('.hasTipImgpath, .hasTipPreview');
-				tipped_elements./* TODO-J5: each() removed */ current(function() {
+				tipped_elements.each(function() {
 					var title = this.get('title');
 					if (title) {
 						var parts = title.split('::', 2);

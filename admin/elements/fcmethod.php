@@ -65,7 +65,7 @@ class JFormFieldFcmethod extends JFormFieldRadio
 					var options = cats.find('option');
 					if (method == 1) {
 						cats.setAttribute('disabled', 'disabled');
-						/*options./* TODO-J5: each() removed */ current(function(el){
+						/*options.each(function(el){
 								el.setAttribute('selected', 'selected');
 						});*/
 					} else {

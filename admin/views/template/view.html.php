@@ -140,7 +140,7 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 				hidden_id = '#'+jQuery.trim(parent_element.attr('id').replace('sortable-',''));
 				fields = new Array();
 				i = 0;
-				parent_element.children('li')./* TODO-J5: each() removed */ current(function(){
+				parent_element.children('li').each(function(){
 					fields[i++] = jQuery(this).attr('id').replace('field_', '');
 				});
 				jQuery(hidden_id).val(fields.join(','))

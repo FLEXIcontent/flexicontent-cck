@@ -1571,7 +1571,7 @@ var $proxy_option   = 'com_content';
 				$btn_name = 'quicktranslate';
 				$full_js = "" .
 					"var url = jQuery(this).data('taskurl'); " .
-					"var cid = []; jQuery./* TODO-J5: each() removed */ current(jQuery(\"input[name='cid[]']:checked\"), function(){ cid.push(jQuery(this).val()); }); " .
+					"var cid = []; jQuery.each(jQuery(\"input[name='cid[]']:checked\"), function(){ cid.push(jQuery(this).val()); }); " .
 					"url += '&' + cid.map(function(el, idx) { return 'cid[' + ']=' + el; }).join('&'); " .
 					"fc_showDialog(url, 'fc_modal_popup_container', 0, 1200, 0, fc_edit_batch_modal_close, {'title': '".flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('Add translations'), 2)."'}); return false;";
 				$btn_arr[] = flexicontent_html::addToolBarButton(
@@ -1589,7 +1589,7 @@ var $proxy_option   = 'com_content';
 				$btn_name = 'quicktranslateall';
 				$full_js = "" .
 					"var url = jQuery(this).data('taskurl'); " .
-					"var cid = []; jQuery./* TODO-J5: each() removed */ current(jQuery(\"input[name='cid[]']:checked\"), function(){ cid.push(jQuery(this).val()); }); " .
+					"var cid = []; jQuery.each(jQuery(\"input[name='cid[]']:checked\"), function(){ cid.push(jQuery(this).val()); }); " .
 					"url += '&' + cid.map(function(el, idx) { return 'cid[' + ']=' + el; }).join('&'); " .
 					"fc_showDialog(url, 'fc_modal_popup_container', 0, 1200, 0, fc_edit_batch_modal_close, {'title': '".flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_TRANSLATE_SELECTED_ITEMS_ALL_LANGUAGES'), 2)."'}); return false;";
 				$btn_arr[] = flexicontent_html::addToolBarButton(
@@ -1733,7 +1733,7 @@ var $proxy_option   = 'com_content';
 						$no_selection_alert = \Joomla\CMS\Language\Text::_('FLEXI_NO_ITEMS_SELECTED', true);
 						$confirm_msg = str_replace('<br>', '\\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('Recalculate item aliases. <br>Only for new websites <br>as this can destroy your existing SEO ranks'), 2));
 						$modal_title = flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('Recalculate aliases for selected items'), 2);
-						$full_js = "var cid = []; jQuery./* TODO-J5: each() removed */ current(jQuery(\"input[name='cid[]']:checked\"), function(){ cid.push(jQuery(this).val()); }); "
+						$full_js = "var cid = []; jQuery.each(jQuery(\"input[name='cid[]']:checked\"), function(){ cid.push(jQuery(this).val()); }); "
 								. "if (!cid.length) { alert('" . $no_selection_alert . "'); return false; } "
 								. "if (!confirm('" . $confirm_msg . "')) return false; "
 								. "var url = jQuery(this).data('taskurl'); "

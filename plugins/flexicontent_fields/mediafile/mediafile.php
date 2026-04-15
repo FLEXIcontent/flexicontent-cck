@@ -495,7 +495,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 				var nr = 0;
 				newField.find('.inlinefile-secure-info').remove();
 				newField.find('.inlinefile-secure-data').show();
-				newField.find('input.fc_filedir')./* TODO-J5: each() removed */ current(function() {
+				newField.find('input.fc_filedir').each(function() {
 					var elem = jQuery(this);
 					elem.removeAttr('disabled');
 					elem.attr('name', fname_pfx + '[secure]');
@@ -519,7 +519,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 				var nr = 0;
 				newField.find('.inlinefile-stamp-info').remove();
 				newField.find('.inlinefile-stamp-data').show();
-				newField.find('input.fc_filestamp')./* TODO-J5: each() removed */ current(function() {
+				newField.find('input.fc_filestamp').each(function() {
 					var elem = jQuery(this);
 					elem.removeAttr('disabled');
 					elem.attr('name', fname_pfx + '[stamp]');

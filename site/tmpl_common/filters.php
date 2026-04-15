@@ -179,7 +179,7 @@ window.fcRemoveSingleFilter = function(fieldName, el) {
         '[name=\"'+fieldName+'[2]\"]'
     );
     if (field.length) {
-        field./* TODO-J5: each() removed */ current(function() {
+        field.each(function() {
             var f = jQuery(this);
             if (f.is('select')) {
                 f.prop('selectedIndex', 0);

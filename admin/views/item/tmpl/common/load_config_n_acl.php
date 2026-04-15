@@ -405,7 +405,7 @@ if ($tags_editable || (!$isSite && $this->perms['canversion']))
 				jQuery('#version_tbl').find('.hasPopover').popover({html: true, container: jQuery('#version_tbl'), trigger : 'hover focus'});
 
 				// Attach click event to version compare links of the newly created page
-				jQuery(this).find('a.modal-versions')./* TODO-J5: each() removed */ current(function(index, value) {
+				jQuery(this).find('a.modal-versions').each(function(index, value) {
 					jQuery(this).on('click', function() {
 						// Load given URL in an popup dialog
 						var url = jQuery(this).attr('href');
@@ -422,7 +422,7 @@ if ($tags_editable || (!$isSite && $this->perms['canversion']))
 		jQuery(document).ready(function()
 		{
 			// For the initially displayed versions page:  Add onclick event that opens compare in popup
-			jQuery('a.modal-versions')./* TODO-J5: each() removed */ current(function(index, value) {
+			jQuery('a.modal-versions').each(function(index, value) {
 				jQuery(this).on('click', function() {
 					// Load given URL in an popup dialog
 					var url = jQuery(this).attr('href');

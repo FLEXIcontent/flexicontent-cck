@@ -249,7 +249,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 				var defvals = elem.attr('data-defvals');
 				if ( defvals && defvals.length )
 				{
-					jQuery./* TODO-J5: each() removed */ current(defvals.split('|||'), function(i, val){
+					jQuery.each(defvals.split('|||'), function(i, val){
 						elem.find('option[value=\"' + val + '\"]').attr('selected', 'selected');
 					});
 				}

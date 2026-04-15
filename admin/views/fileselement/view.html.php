@@ -548,7 +548,7 @@ var $proxy_option   = null;
 				{
 					fcfiles_keep_modal = 1;
 					var row_count = 0;
-					rows./* TODO-J5: each() removed */ current(function(index, value)
+					rows.each(function(index, value)
 					{
 						var row = jQuery(this).closest('tr');
 						var assign_file_btn = row.find('.fc_set_file_assignment');
@@ -559,7 +559,7 @@ var $proxy_option   = null;
 								window.parent.addField".$fieldid."(null, null, jQuery('#'+fcfiles_targetid, parent.document).closest('li.fcfieldval_container'), {insert_before: 0, scroll_visible: 0, animate_visible: 0}) :
 								window.parent.addField".$fieldid."(null);
 						}
-						if (fcfiles_targetid == 'cancel')  return false;  // Stop ./* TODO-J5: each() removed */ current() loop
+						if (fcfiles_targetid == 'cancel')  return false;  // Stop .each() loop
 						row_count++;
 						assign_file_btn.trigger('click');
 					});

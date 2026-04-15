@@ -132,7 +132,7 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 				let count = 0;
 				let contenttypes_filter_list = jQuery('#contenttypes_filter_list');
 				if (contenttypes_filter_list.length) {
-					contenttypes_filter_list.find('input')./* TODO-J5: each() removed */ current(function() {
+					contenttypes_filter_list.find('input').each(function() {
 						if (jQuery(this).prop('checked')) count++;
 					});
 					console.log(count);

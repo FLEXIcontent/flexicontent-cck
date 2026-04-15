@@ -1628,7 +1628,7 @@ class flexicontent_html
 					jQuery.fn.chosen = function(){
 						var args = arguments;
 						var result;
-						jQuery(this)./* TODO-J5: each() removed */ current(function() {
+						jQuery(this).each(function() {
 							if (jQuery(this).hasClass('use_select2_lib') || jQuery(this).hasClass('fc_no_js_attach')) return;
 							result = jQuery(this).chosen_fc(args);
 						});
@@ -1787,10 +1787,10 @@ class flexicontent_html
 							}
 						});
 
-						jQuery('input.has_inputmask')./* TODO-J5: each() removed */ current(function() {
+						jQuery('input.has_inputmask').each(function() {
 							jQuery(this).inputmask();
 						});
-						jQuery('input.inputmask-regex')./* TODO-J5: each() removed */ current(function() {
+						jQuery('input.inputmask-regex').each(function() {
 							jQuery(this).inputmask('Regex');
 						});
 					});
@@ -1805,7 +1805,7 @@ class flexicontent_html
 				/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('prettyCheckable', $framework_path.'/dist/prettyCheckable.css');
 				$js .= "
 					jQuery(document).ready(function(){
-						jQuery('input.use_prettycheckable')./* TODO-J5: each() removed */ current(function() {
+						jQuery('input.use_prettycheckable').each(function() {
 							var elem = jQuery(this);
 							var lbl = elem.next('label');
 							var lbl_html = elem.next('label').html();
@@ -6348,7 +6348,7 @@ class flexicontent_html
 			$useSiteApp = $isAdmin; // && $isSH404SEF;
 
 			$site_instance = $useSiteApp
-				? JApplication::getInstance('site')   // In J4 use CMSApplication::getInstance('site')
+				? CMSApplication /* J5-compat */::getInstance('site')   // In J4 use CMSApplication::getInstance('site')
 				:Factory::getApplication();
 			$site_router = $site_instance->getRouter('site');
 		}

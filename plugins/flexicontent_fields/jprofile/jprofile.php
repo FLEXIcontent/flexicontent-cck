@@ -304,7 +304,7 @@ class plgFlexicontent_fieldsJProfile extends FCField
 			{
 				 jQuery('#' + tagid).on('show.bs.modal', function() {
 						 jQuery('body').addClass('modal-open');
-						 jQuery('.modalTooltip')./* TODO-J5: each() removed */ current(function(){;
+						 jQuery('.modalTooltip').each(function(){;
 								 var attr = jQuery(this).attr('data-placement');
 								 if ( attr === undefined || attr === false ) jQuery(this).attr('data-placement', 'auto-dir top-left')
 						 });

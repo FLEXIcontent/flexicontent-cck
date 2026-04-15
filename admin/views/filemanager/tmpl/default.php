@@ -482,7 +482,7 @@ function fman_set_cids(el)
 	var val = el.prop('checked');
 	val ? el.closest('.btn').addClass('".$this->btn_iv_class."') : el.closest('.btn').removeClass('".$this->btn_iv_class."');
 
-	jQuery('div.adminthumbs.fcmanthumbs').children('.fc-fileman-grid-thumb-box')./* TODO-J5: each() removed */ current(function(index, value)
+	jQuery('div.adminthumbs.fcmanthumbs').children('.fc-fileman-grid-thumb-box').each(function(index, value)
 	{
 		fman_toggle_thumb_selection(jQuery(value), val);
 	});

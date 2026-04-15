@@ -474,7 +474,7 @@ if (!isset($addressint_view_js_added[$field->id]) && $map_api === 'googlemap' &&
 	}
 
 	jQuery(document).ready(function(){
-		jQuery(".fc_addressint_container_' . $field->id . ' .fc_addressint_map_canvas")./* TODO-J5: each() removed */ current( function() {
+		jQuery(".fc_addressint_container_' . $field->id . ' .fc_addressint_map_canvas").each( function() {
 			fc_addressint_initMap_' . $field->id . '(jQuery(this));
   	});
 	});

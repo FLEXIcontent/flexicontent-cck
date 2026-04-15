@@ -220,7 +220,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 				// Need to at least change FORM field names and HTML tag IDs before adding the container to the DOM
 				var theSet = newField.find('input, select, textarea, button');
 				var nr = 0;
-				theSet./* TODO-J5: each() removed */ current(function()
+				theSet.each(function()
 				{
 					if (!!this.id)
 					{
@@ -232,7 +232,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 				});
 				
 				theControls = newField.find('.control-group');
-				theControls./* TODO-J5: each() removed */ current(function()
+				theControls.each(function()
 				{
 					data_showon_pattern = this.hasAttribute('data-showon-pattern') ? this.getAttribute('data-showon-pattern') : '';
 					if (data_showon_pattern)

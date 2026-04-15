@@ -567,7 +567,7 @@ class plgFlexicontent_fieldsImage extends FCField
 
 				// Show tooltips
 				var tipped_elements = newField.find('.hasTipImgpath, .hasTipPreview');
-				tipped_elements./* TODO-J5: each() removed */ current(function() {
+				tipped_elements.each(function() {
 					var title = this.get('title');
 					if (title) {
 						var parts = title.split('::', 2);
