@@ -30,8 +30,6 @@ class FlexicontentModelFields extends FCModelAdminList
 	public mixed $canManage = null;
 	/** @var mixed $rules_map */
 	public mixed $rules_map = null;
-	/** @var mixed $view_id */
-	public mixed $view_id = null;
 
 
 	/**

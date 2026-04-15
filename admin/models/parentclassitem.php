@@ -32,8 +32,6 @@ class ParentClassItem extends FCModelAdmin
 	public mixed $menu_matches = null;
 	/** @var mixed $option */
 	public mixed $option = null;
-	/** @var mixed $record_keys */
-	public mixed $record_keys = null;
 	/** @var mixed $use_jtable_publishing */
 	public mixed $use_jtable_publishing = null;
 

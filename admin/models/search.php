@@ -24,8 +24,6 @@ require_once('base/baselist.php');
 #[AllowDynamicProperties]
 class FLEXIcontentModelSearch extends FCModelAdminList
 {
-	/** @var mixed $view_id */
-	public mixed $view_id = null;
 
 
 	/**

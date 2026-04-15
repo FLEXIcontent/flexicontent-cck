@@ -26,8 +26,6 @@ class FlexicontentModelTags extends FCModelAdminList
 {
 	/** @var mixed $canManage */
 	public mixed $canManage = null;
-	/** @var mixed $view_id */
-	public mixed $view_id = null;
 
 
 	/**

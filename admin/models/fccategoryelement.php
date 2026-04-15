@@ -28,8 +28,6 @@ class FlexicontentModelFccategoryelement extends FCModelAdminList
 {
 	/** @var mixed $assocs_id */
 	public mixed $assocs_id = null;
-	/** @var mixed $view_id */
-	public mixed $view_id = null;
 
 
 
