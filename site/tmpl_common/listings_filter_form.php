@@ -175,7 +175,7 @@ if ($this->params->get('filter_ajax', 0)) :
 		};
 
 		window.fcOverrideNativeSubmit('adminForm');
-		$('form[id^=\"moduleFCform_\"]').each(function() {
+		$('form[id^=\"moduleFCform_\"]')./* TODO-J5: each() removed */ current(function() {
 			window.fcOverrideNativeSubmit(this.id);
 		});
 
@@ -208,7 +208,7 @@ if ($this->params->get('filter_ajax', 0)) :
 				var oldForm = document.getElementById('adminForm');
 				if (oldForm) oldAutosubmits['adminForm'] = $(oldForm).attr('data-fc-autosubmit') || '2';
 			}
-			moduleContainers.each(function() {
+			moduleContainers./* TODO-J5: each() removed */ current(function() {
 				var modForm = $(this).find('form')[0];
 				if (modForm && modForm.id) oldAutosubmits[modForm.id] = $(modForm).attr('data-fc-autosubmit') || '2';
 			});
@@ -249,7 +249,7 @@ if ($this->params->get('filter_ajax', 0)) :
 					}
 
 					if (moduleContainers.length) {
-						moduleContainers.each(function() {
+						moduleContainers./* TODO-J5: each() removed */ current(function() {
 							var \$modWrapper = $(this);
 							if (!document.body.contains(\$modWrapper[0])) return;
 							var modId = \$modWrapper.attr('id');
@@ -276,7 +276,7 @@ if ($this->params->get('filter_ajax', 0)) :
 					}
 
 					//allow to update nouislider with search is to ajaxed, as nouislider does not support dynamic content, we need to reinit it
-					parsedDoc.find('script:not([src])').each(function() {
+					parsedDoc.find('script:not([src])')./* TODO-J5: each() removed */ current(function() {
 						var scriptContent = $(this).html();
 						if (scriptContent.indexOf('noUiSlider') === -1 && scriptContent.indexOf('_nouislider') === -1) return;
 						var allSliderEls = document.querySelectorAll('[id*=\"_nouislider\"]');
@@ -326,7 +326,7 @@ if ($this->params->get('filter_ajax', 0)) :
 					var formsToRebind = [];
 					var newAdminForm = document.getElementById('adminForm');
 					if (newAdminForm) formsToRebind.push(newAdminForm);
-					$('.mod_flexifilter_wrapper form').each(function() {
+					$('.mod_flexifilter_wrapper form')./* TODO-J5: each() removed */ current(function() {
 						formsToRebind.push(this);
 					});
 

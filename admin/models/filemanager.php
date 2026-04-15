@@ -11,9 +11,10 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-jimport('joomla.filesystem.file');
-jimport('joomla.filesystem.folder');
-jimport('joomla.filesystem.path');
+// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
+// jimport removed J5: use Joomla\CMS\Filesystem\Folder; // TODO: add use statement at top
+// jimport removed J5: use Joomla\CMS\Filesystem\Path; // TODO: add use statement at top
+use Joomla\CMS\Factory;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Table\Table;
@@ -1788,8 +1789,8 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	{
 		if ( !count( $cid ) ) return false;
 
-		jimport('joomla.filesystem.path');
-		jimport('joomla.filesystem.file');
+		// jimport removed J5: use Joomla\CMS\Filesystem\Path; // TODO: add use statement at top
+		// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
 
 		// This is already done by controller task / caller but redo
 		$cid = ArrayHelper::toInteger($cid);
@@ -1808,7 +1809,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 				$basepath	= $file->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;
 				$path 		= \Joomla\Filesystem\Path::clean($basepath.DS.DS.$file->filename);
 				if (!\Joomla\Filesystem\File::delete($path)) {
-					JError::raiseWarning(100, \Joomla\CMS\Language\Text::_( 'FLEXI_UNABLE_TO_DELETE' ).$path);
+					Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_( 'FLEXI_UNABLE_TO_DELETE' , 'warning').$path);
 				}
 			}
 		}
@@ -2372,7 +2373,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			return;
 		}
 
-		jimport('joomla.log.log');
+		// jimport removed J5: use Joomla\CMS\...  /* joomla.log.log */; // TODO: add use statement at top
 		\Joomla\CMS\Log\Log::addLogger(
 			array(
 				'text_file' => $logger->filename,  // Sets the target log file

@@ -20,7 +20,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 use Joomla\String\StringHelper;
 
-jimport('legacy.controller.legacy');
+// jimport removed J5: use Joomla\CMS\...  /* legacy.controller.legacy */; // TODO: add use statement at top
 
 /**
  * FLEXIcontent Component Controller

@@ -11,6 +11,7 @@
 
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
@@ -206,7 +207,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 			{
 				// Prune items that you can't change.
 				unset($cid[$i]);
-				JError::raiseNotice(403, \Joomla\CMS\Language\Text::_('JLIB_APPLICATION_ERROR_EDITSTATE_NOT_PERMITTED'));
+				Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_('JLIB_APPLICATION_ERROR_EDITSTATE_NOT_PERMITTED', 'notice'));
 			}
 		}
 

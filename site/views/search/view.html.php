@@ -19,7 +19,7 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('legacy.view.legacy');
+// jimport removed J5: use Joomla\CMS\...  /* legacy.view.legacy */; // TODO: add use statement at top
 
 use Joomla\CMS\Filter\InputFilter;
 use Joomla\CMS\HTML\HTMLHelper;
@@ -114,20 +114,20 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 		// Add css files to the document <head> section (also load CSS joomla template override)
 		if (!$params->get('disablecss', ''))
 		{
-			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
-			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexi_filters.css', array('version' => FLEXI_VHASH));
+			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('flexicontent', $this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
+			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('flexi_filters', $this->baseurl.'/components/com_flexicontent/assets/css/flexi_filters.css', array('version' => FLEXI_VHASH));
 			!\Joomla\CMS\Factory::getLanguage()->isRtl()
-				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
-				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
+				? /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
+				: /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 		}
 
 		if (FLEXI_J40GE && file_exists(JPATH_SITE.DS.'media/templates/site'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css'))
 		{
-			$document->addStyleSheet($this->baseurl.'/media/templates/site/'.$app->getTemplate().'/css/flexicontent.css', array('version' => FLEXI_VHASH));
+			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', $this->baseurl.'/media/templates/site/'.$app->getTemplate().'/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		}
 		elseif (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css'))
 		{
-			$document->addStyleSheet($this->baseurl.'/templates/'.$app->getTemplate().'/css/flexicontent.css', array('version' => FLEXI_VHASH));
+			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', $this->baseurl.'/templates/'.$app->getTemplate().'/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		}
 
 		// Auto-disable "Flexicontent" search AREA if no type are clicked
@@ -137,7 +137,7 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 				let count = 0;
 				let contenttypes_filter_list = jQuery('#contenttypes_filter_list');
 				if (contenttypes_filter_list.length) {
-					contenttypes_filter_list.find('input').each(function() {
+					contenttypes_filter_list.find('input')./* TODO-J5: each() removed */ current(function() {
 						if (jQuery(this).prop('checked')) count++;
 					});
 					console.log(count);

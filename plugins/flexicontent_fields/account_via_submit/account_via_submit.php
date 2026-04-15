@@ -416,9 +416,9 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 	public static function registerUser($name, $username, $email, $password, $gender, &$field)
 	{
 		// Initialize new usertype setting
-		jimport('joomla.user.user');
-		jimport('joomla.user.helper');
-		jimport('cms.component.helper');
+		// jimport removed J5: use Joomla\CMS\...  /* joomla.user.user */; // TODO: add use statement at top
+		// jimport removed J5: use Joomla\CMS\User\UserHelper; // TODO: add use statement at top
+		// jimport removed J5: use Joomla\CMS\...  /* cms.component.helper */; // TODO: add use statement at top
 		\Joomla\CMS\Factory::getLanguage()->load('com_users', JPATH_SITE, 'en-GB', false);
 		\Joomla\CMS\Factory::getLanguage()->load('com_users', JPATH_SITE, null, true);
 

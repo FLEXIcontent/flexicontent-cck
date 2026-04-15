@@ -519,7 +519,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 			$item->metadata = $registry->toArray();
 
 			// Convert the created and modified dates to local user time for display in the form.
-			jimport('joomla.utilities.date');
+			// jimport removed J5: use Joomla\CMS\Date\Date; // TODO: add use statement at top
 
 			$site_zone = \Joomla\CMS\Factory::getApplication()->getCfg('offset');
 			$user_zone = \Joomla\CMS\Factory::getUser()->getParam('timezone', $site_zone);
@@ -587,7 +587,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 	 */
 	protected function preprocessForm(\Joomla\CMS\Form\Form $form, $data, $plugins_group = null)
 	{
-		jimport('joomla.filesystem.path');
+		// jimport removed J5: use Joomla\CMS\Filesystem\Path; // TODO: add use statement at top
 
 		$lang = \Joomla\CMS\Factory::getLanguage();
 		$component = $this->getState($this->getName().'.component', '');

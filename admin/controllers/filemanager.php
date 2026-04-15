@@ -790,14 +790,14 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$subfolder_path = str_replace('\\', '/', $subfolder_path);
 
 
-		jimport('joomla.utilities.date');
+		// jimport removed J5: use Joomla\CMS\Date\Date; // TODO: add use statement at top
 
 		// Set FTP credentials, if given
-		jimport('joomla.client.helper');
+		// jimport removed J5: use Joomla\CMS\...  /* joomla.client.helper */; // TODO: add use statement at top
 		\Joomla\CMS\Client\ClientHelper::setCredentialsFromRequest('ftp');
 
 		// Make the filename safe
-		jimport('joomla.filesystem.file');
+		// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
 
 		// Get field parameter 'auto_filename_code' which has PHP code to create the filename
 		$auto_filename_code = $field->params->auto_filename_code ?? 0;
@@ -833,10 +833,10 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 						$errors = trim(ob_get_contents());
 						ob_clean();
 
-						if ($errors) JFactory::getApplication()->enqueueMessage( 'Error renaming file of field: \'<b>' . $field->label . '</b>\' : <br/> <pre>' . $errors . '</pre>', 'notice');
+						if ($errors) Factory::getApplication()->enqueueMessage( 'Error renaming file of field: \'<b>' . $field->label . '</b>\' : <br/> <pre>' . $errors . '</pre>', 'notice');
 					}
 					catch (ParseError $e) {
-						JFactory::getApplication()->enqueueMessage( "Automatic filename custom code, failed with: <pre>" . $e->getMessage() . '</pre>', 'warning');
+						Factory::getApplication()->enqueueMessage( "Automatic filename custom code, failed with: <pre>" . $e->getMessage() . '</pre>', 'warning');
 					}
 					break;
 			}
@@ -1051,7 +1051,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$filesize  = $this->input->get('file-url-size', 0, 'int');
 		$size_unit = $this->input->get('size_unit', 'KBs', 'cmd');
 
-		jimport('joomla.utilities.date');
+		// jimport removed J5: use Joomla\CMS\Date\Date; // TODO: add use statement at top
 
 		// Check if the form fields are not empty
 		if (!$url)
@@ -1537,9 +1537,9 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$allowed_exts = $filter_ext ? array_intersect($filter_ext, $allowed_exts) : $allowed_exts;
 		$allowed_exts = array_flip($allowed_exts);
 
-		jimport('joomla.utilities.date');
-		jimport('joomla.filesystem.file');
-		jimport('joomla.filesystem.folder');
+		// jimport removed J5: use Joomla\CMS\Date\Date; // TODO: add use statement at top
+		// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
+		// jimport removed J5: use Joomla\CMS\Filesystem\Folder; // TODO: add use statement at top
 
 		// Get files
 		$filesdir = \Joomla\Filesystem\Path::clean(JPATH_SITE . $filesdir . DS);
@@ -1931,7 +1931,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 
 		// Set FTP credentials, if given
-		jimport('joomla.client.helper');
+		// jimport removed J5: use Joomla\CMS\...  /* joomla.client.helper */; // TODO: add use statement at top
 		\Joomla\CMS\Client\ClientHelper::setCredentialsFromRequest('ftp');
 	}
 

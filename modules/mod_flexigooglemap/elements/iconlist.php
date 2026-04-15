@@ -18,7 +18,7 @@
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
 
-jimport('joomla.form.formfield');
+// jimport removed J5: use Joomla\CMS\...  /* joomla.form.formfield */; // TODO: add use statement at top
 
 class JFormFieldIconlist extends \Joomla\CMS\Form\FormField
 {

@@ -31,8 +31,8 @@ require_once JPATH_ROOT . DIRECTORY_SEPARATOR . 'components' . DIRECTORY_SEPARAT
 
 // Load JS tabber lib
 $doc = Factory::getDocument();
-$doc->addScript(Uri::root(true) . '/components/com_flexicontent/assets/js/tabber-minimized.js', ['version' => FLEXI_VHASH]);
-$doc->addStyleSheet(Uri::root(true) . '/components/com_flexicontent/assets/css/tabber.css', ['version' => FLEXI_VHASH]);
+/* J5/J6 WebAsset: */ $doc->getWebAssetManager()->registerAndUseScript('fc-script', Uri::root(true) . '/components/com_flexicontent/assets/js/tabber-minimized.js', ['version' => FLEXI_VHASH]);
+/* J5/J6 WebAsset: */ $doc->getWebAssetManager()->registerAndUseStyle('fc-style', Uri::root(true) . '/components/com_flexicontent/assets/css/tabber.css', ['version' => FLEXI_VHASH]);
 $doc->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');
 
 /**

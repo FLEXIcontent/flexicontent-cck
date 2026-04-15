@@ -249,7 +249,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 				var defvals = elem.attr('data-defvals');
 				if ( defvals && defvals.length )
 				{
-					jQuery.each(defvals.split('|||'), function(i, val){
+					jQuery./* TODO-J5: each() removed */ current(defvals.split('|||'), function(i, val){
 						elem.find('option[value=\"' + val + '\"]').attr('selected', 'selected');
 					});
 				}
@@ -497,7 +497,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 			Text::script('FLEXI_RIFLD_ERROR', false);
 			Text::script('FLEXI_RIFLD_NO_ITEMS', false);
 			Text::script('FLEXI_RIFLD_ADD_ITEM', false);
-			$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/relation/js/form.js', array('version' => FLEXI_VHASH));
+			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/relation/js/form.js', array('version' => FLEXI_VHASH));
 		}
 
 		$per_val_js = '';

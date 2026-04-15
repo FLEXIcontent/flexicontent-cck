@@ -682,7 +682,7 @@ class Mobile_Detect_FC
      *                          from the $headers array instead.
      */
     public function __construct(
-        array $headers = null,
+        ?array $headers = null,
         $userAgent = null
     ) {
         $this->setHttpHeaders($headers);
@@ -1409,8 +1409,7 @@ class Mobile_Detect_FC
             // UC Browser - Tested on Android 2.3 device
             ( ($this->is('UC Browser') || $this->is('Dolfin')) && $this->version('Android', self::VERSION_TYPE_FLOAT) >= 2.3 ) ||
 
-            // Kindle 3 and Fire  - Tested on the built-in WebKit browser for each
-            ( $this->match('Kindle Fire') ||
+            // Kindle 3 and Fire  - Tested on the built-in WebKit browser for /* TODO-J5: each() removed */ current( $this->match('Kindle Fire') ||
             $this->is('Kindle') && $this->version('Kindle', self::VERSION_TYPE_FLOAT) >= 3.0 ) ||
 
             // Nook Color 1.4.1 - Tested on original Nook Color, not Nook Tablet

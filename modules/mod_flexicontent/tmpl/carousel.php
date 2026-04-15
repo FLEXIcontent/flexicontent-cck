@@ -300,8 +300,8 @@ if ($transition)
 
 	if (file_exists($file_path))
 	{
-		$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.effect.min.js');
-		$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.effect-'.$transition.'.min.js');
+		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.effect.min.js');
+		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.effect-'.$transition.'.min.js');
 	}
 }
 
@@ -1243,7 +1243,7 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 
 			// Alternative to use computed style, requires ie9+
 			//var maxHeight_withpx = getComputedStyle(jQuery("#mod_fcitems_box_standard_'.$uniq_ord_id.'")[0], null).getPropertyValue("height")
-			//mod_fc_carousel_'.$uniq_ord_id.'.items.each(function() {
+			//mod_fc_carousel_'.$uniq_ord_id.'.items./* TODO-J5: each() removed */ current(function() {
 			//	this.style.height = maxHeight_withpx;
 			//});
 			'

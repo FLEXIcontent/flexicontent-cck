@@ -17,7 +17,7 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-jimport('joomla.filesystem.file');
+// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
 ?>
 
 <?php

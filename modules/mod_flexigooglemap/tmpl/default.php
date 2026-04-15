@@ -28,7 +28,7 @@ if (empty($renderedMapLocations) && (int)$params->get('hide_map_when_empty', '1'
 \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip');
 $document = \Joomla\CMS\Factory::getDocument();
 $modified = filemtime(__DIR__ . '/../assets/css/style.css');
-$document->addStyleSheet(Uri::root(true) . '/modules/mod_flexigooglemap/assets/css/style.css?v=' . $modified);
+/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', Uri::root(true) . '/modules/mod_flexigooglemap/assets/css/style.css?v=' . $modified);
 
 $itemmodel_name = 'FlexicontentModelItem';
 $itemmodel = new $itemmodel_name();

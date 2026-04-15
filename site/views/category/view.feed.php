@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\Factory; // J5-compat added
 /**
  * @version 1.5 stable $Id: view.feed.php 1848 2014-02-16 12:03:55Z ggppdk $
  * @package Joomla
@@ -19,7 +20,7 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('legacy.view.legacy');
+// jimport removed J5: use Joomla\CMS\...  /* legacy.view.legacy */; // TODO: add use statement at top
 use Joomla\String\StringHelper;
 
 /**
@@ -59,7 +60,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		\Joomla\CMS\Factory::getApplication()->input->set('limit', $params->get('feed_limit'));
 
 		// Needed by legacy non-updated plugins
-		!FLEXI_J40GE ? JRequest::setVar('limit', $params->get('feed_limit')) : null;
+		!FLEXI_J40GE ? Factory::getApplication()->input->set('limit', $params->get('feed_limit')) : null;
 
 		$params->set('orderby', $params->get('feed_orderby', 'rdate'));
 		$params->set('orderbycustomfield'   , $params->get('feed_orderbycustomfield' , 1));

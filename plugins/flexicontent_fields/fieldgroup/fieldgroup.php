@@ -220,7 +220,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 				// Need to at least change FORM field names and HTML tag IDs before adding the container to the DOM
 				var theSet = newField.find('input, select, textarea, button');
 				var nr = 0;
-				theSet.each(function()
+				theSet./* TODO-J5: each() removed */ current(function()
 				{
 					if (!!this.id)
 					{
@@ -232,7 +232,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 				});
 				
 				theControls = newField.find('.control-group');
-				theControls.each(function()
+				theControls./* TODO-J5: each() removed */ current(function()
 				{
 					data_showon_pattern = this.hasAttribute('data-showon-pattern') ? this.getAttribute('data-showon-pattern') : '';
 					if (data_showon_pattern)
@@ -576,7 +576,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 
 				// Set 'value' and 'ingroup' properties
 				$grouped_field->value = $_grouped_field->value;
-				$grouped_field->ingroup = 1;  // render as array
+				$grouped_field->ingroup = 1;  // render as ?array
 				$_values = null;
 
 				// Backup display method of the field in cases it is displayed outside of fieldgroup too
@@ -719,7 +719,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 				// Get item's field object, set 'value' and 'ingroup' properties
 				$grouped_field = $item->fields[$_grouped_field->name];
 				$grouped_field->value = $_grouped_field->value;
-				$grouped_field->ingroup = 1;  // render as array
+				$grouped_field->ingroup = 1;  // render as ?array
 				$_values = null;
 				$_rendered_fields[$pos] = $grouped_field;
 

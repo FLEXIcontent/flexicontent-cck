@@ -11,6 +11,7 @@
 
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
@@ -122,8 +123,8 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 		// Bind posted data
 		if (!$user->bind($data))
 		{
-			JError::raiseWarning(0, \Joomla\CMS\Language\Text::_('CANNOT SAVE THE USER INFORMATION'));
-			JError::raiseWarning(0, $user->getError());
+			Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_('CANNOT SAVE THE USER INFORMATION', 'warning'));
+			Factory::getApplication()->enqueueMessage($user->getError(, 'warning'));
 
 			// $app->redirect('index.php?option=com_flexicontent&controller=users&view=users', $user->getError());
 			// return false;
@@ -149,8 +150,8 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 		// Save the \Joomla\CMS\User\User object, creating the new user if it does not exist
 		if (!$user->save())
 		{
-			JError::raiseWarning(0, \Joomla\CMS\Language\Text::_('CANNOT SAVE THE USER INFORMATION'));
-			JError::raiseWarning(0, $user->getError());
+			Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_('CANNOT SAVE THE USER INFORMATION', 'warning'));
+			Factory::getApplication()->enqueueMessage($user->getError(, 'warning'));
 
 			return $this->execute('edit');
 		}
@@ -166,8 +167,8 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 		// Bind data, Check data & Store the data to the database table
 		if (!$flexiauthor_extdata->save($author_postdata))
 		{
-			JError::raiseWarning(0, \Joomla\CMS\Language\Text::_('CANNOT SAVE THE AUTHOR EXTENDED INFORMATION'));
-			JError::raiseWarning(0, $flexiauthor_extdata->getError());
+			Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_('CANNOT SAVE THE AUTHOR EXTENDED INFORMATION', 'warning'));
+			Factory::getApplication()->enqueueMessage($flexiauthor_extdata->getError(, 'warning'));
 
 			return $this->execute('edit');
 		}

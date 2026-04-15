@@ -1046,8 +1046,8 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		$deprecated = null;
 		$model->getDeprecatedFiles($deprecated);
 
-		jimport('joomla.filesystem.file');
-		jimport('joomla.filesystem.folder');
+		// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
+		// jimport removed J5: use Joomla\CMS\Filesystem\Folder; // TODO: add use statement at top
 
 		// Delete deprecated files that were found
 		foreach ($deprecated['files'] as $file)

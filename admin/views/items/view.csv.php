@@ -19,8 +19,8 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
-jimport('legacy.view.legacy');
-jimport('joomla.filesystem.file');
+// jimport removed J5: use Joomla\CMS\...  /* legacy.view.legacy */; // TODO: add use statement at top
+// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
 
 /**
  * HTML View class for the Category View

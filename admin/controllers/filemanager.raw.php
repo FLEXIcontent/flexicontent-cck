@@ -530,7 +530,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 	 */
 	private function _setUpLoggers($log_filename, $log_namespace)
 	{
-		jimport('joomla.log.log');
+		// jimport removed J5: use Joomla\CMS\...  /* joomla.log.log */; // TODO: add use statement at top
 
 		// Currently default logger plus only 1 custom logger, we may add more custom logger if doing more distinct tasks
 		$custom_loggers = array(

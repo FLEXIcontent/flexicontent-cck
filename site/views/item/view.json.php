@@ -5,7 +5,7 @@
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright ï¿½ 2018, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
@@ -15,7 +15,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-jimport('legacy.view.legacy');
+// jimport removed J5: use Joomla\CMS\...  /* legacy.view.legacy */; // TODO: add use statement at top
 
 /**
  * HTML View class for the Item View

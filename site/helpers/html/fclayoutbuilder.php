@@ -1469,11 +1469,11 @@ abstract class JHtmlFclayoutbuilder
 
 			const categories = editor.BlockManager.getCategories();
 
-			categories.each(category =>
+			categories./* TODO-J5: each() removed */ current(category =>
 			{
 				category.set(\'open\', false).on(\'change:open\', opened =>
 				{
-					opened.get(\'open\') && categories.each(category =>
+					opened.get(\'open\') && categories./* TODO-J5: each() removed */ current(category =>
 					{
 						category !== opened && category.set(\'open\', false)
 					});

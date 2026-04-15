@@ -699,7 +699,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			if ($mapapi_edit === 'googlemap')
 			{
 				// Load form.js (Google Maps autocomplete + map)
-				$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/addressint/js/form.js', array('version' => FLEXI_VHASH));
+				/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/addressint/js/form.js', array('version' => FLEXI_VHASH));
 
 				// Load Google Maps JS API
 				flexicontent_html::loadFramework('google-maps', 'form', $field->parameters);
@@ -708,7 +708,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			{
 				// Load form_osm.js (Nominatim autocomplete + Leaflet map)
 				// Leaflet itself is loaded dynamically by form_osm.js if not already present
-				$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/addressint/js/form_osm.js', array('version' => FLEXI_VHASH));
+				/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/addressint/js/form_osm.js', array('version' => FLEXI_VHASH));
 			}
 		}
 

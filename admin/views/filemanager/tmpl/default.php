@@ -99,8 +99,8 @@ $close_btn = FLEXI_J30GE ? '<a class="close" data-dismiss="alert">&#215;</a>' : 
 $alert_box = FLEXI_J30GE ? '<div %s class="alert alert-%s %s">'.$close_btn.'%s</div>' : '<div %s class="fc-mssg fc-%s %s">'.$close_btn.'%s</div>';
 
 // Load JS tabber lib
-$document->addScript(Uri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
-$document->addStyleSheet(Uri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
+/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', Uri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
+/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', Uri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
 $document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
 
@@ -482,7 +482,7 @@ function fman_set_cids(el)
 	var val = el.prop('checked');
 	val ? el.closest('.btn').addClass('".$this->btn_iv_class."') : el.closest('.btn').removeClass('".$this->btn_iv_class."');
 
-	jQuery('div.adminthumbs.fcmanthumbs').children('.fc-fileman-grid-thumb-box').each(function(index, value)
+	jQuery('div.adminthumbs.fcmanthumbs').children('.fc-fileman-grid-thumb-box')./* TODO-J5: each() removed */ current(function(index, value)
 	{
 		fman_toggle_thumb_selection(jQuery(value), val);
 	});

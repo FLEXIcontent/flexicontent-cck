@@ -83,9 +83,9 @@ class plgFlexicontent_fieldsImage extends FCField
 		if ( !$initialized )
 		{
 			$initialized = 1;
-			jimport('joomla.filesystem.file');
-			jimport('joomla.filesystem.folder');
-			jimport('joomla.filesystem.path');
+			// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
+			// jimport removed J5: use Joomla\CMS\Filesystem\Folder; // TODO: add use statement at top
+			// jimport removed J5: use Joomla\CMS\Filesystem\Path; // TODO: add use statement at top
 			$this->_load_phpthumb();
 		}
 
@@ -249,7 +249,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			}
 			else
 			{
-				jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
+				// jimport removed J5: use Joomla\CMS\...  /* joomla.form.helper */; // TODO: add use statement at top // \Joomla\CMS\Form\FormHelper
 				\Joomla\CMS\Form\FormHelper::loadFieldClass('media');   // \Joomla\CMS\Form\Field\MediaField
 			}
 
@@ -574,7 +574,7 @@ class plgFlexicontent_fieldsImage extends FCField
 
 				// Show tooltips
 				var tipped_elements = newField.find('.hasTipImgpath, .hasTipPreview');
-				tipped_elements.each(function() {
+				tipped_elements./* TODO-J5: each() removed */ current(function() {
 					var title = this.get('title');
 					if (title) {
 						var parts = title.split('::', 2);
@@ -707,7 +707,7 @@ class plgFlexicontent_fieldsImage extends FCField
 
 			flexicontent_html::loadFramework('flexi-lib');
 			\Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
-			$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/image/js/form.js', array('version' => FLEXI_VHASH));
+			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/image/js/form.js', array('version' => FLEXI_VHASH));
 		}
 
 		// Add field's CSS / JS
@@ -1494,9 +1494,9 @@ class plgFlexicontent_fieldsImage extends FCField
 		if ( !$initialized )
 		{
 			$initialized = 1;
-			jimport('joomla.filesystem.file');
-			jimport('joomla.filesystem.folder');
-			jimport('joomla.filesystem.path');
+			// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
+			// jimport removed J5: use Joomla\CMS\Filesystem\Folder; // TODO: add use statement at top
+			// jimport removed J5: use Joomla\CMS\Filesystem\Path; // TODO: add use statement at top
 			if ( $is_importcsv )
 			{
 				$srcpath_original = Path::clean( JPATH_SITE .DS. $import_media_folder .DS );
@@ -1881,9 +1881,9 @@ class plgFlexicontent_fieldsImage extends FCField
 
 		if ($image_source >= 1)
 		{
-			jimport('joomla.filesystem.file');
-			jimport('joomla.filesystem.folder');
-			jimport('joomla.filesystem.path');
+			// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
+			// jimport removed J5: use Joomla\CMS\Filesystem\Folder; // TODO: add use statement at top
+			// jimport removed J5: use Joomla\CMS\Filesystem\Path; // TODO: add use statement at top
 
 			// Delete image folder if it exists
 			$dest_path = Path::clean( JPATH_SITE .DS. $dir . DS. 'item_'.$item->id   . '_field_'.$field->id .DS);
@@ -2102,9 +2102,9 @@ class plgFlexicontent_fieldsImage extends FCField
 		$fparams = $field->parameters;
 		$params->merge($fparams);
 
-		jimport('joomla.utilities.date');
-		jimport('joomla.filesystem.file');
-		jimport('joomla.client.helper');
+		// jimport removed J5: use Joomla\CMS\Date\Date; // TODO: add use statement at top
+		// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
+		// jimport removed J5: use Joomla\CMS\...  /* joomla.client.helper */; // TODO: add use statement at top
 
 		// Set FTP credentials, if given
 		\Joomla\CMS\Client\ClientHelper::setCredentialsFromRequest('ftp');
@@ -2147,7 +2147,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			{
 				if ($format === 'json')
 				{
-					jimport('joomla.error.log');
+					// jimport removed J5: use Joomla\CMS\...  /* joomla.error.log */; // TODO: add use statement at top
 					$log = \Joomla\CMS\Log\Log::getInstance('com_flexicontent.error.php');
 					$log->addEntry(array(
 						'comment' => 'Invalid: ' . $filepath . ': ' . $err_text
@@ -2172,7 +2172,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			{
 				if ($format === 'json')
 				{
-					jimport('joomla.error.log');
+					// jimport removed J5: use Joomla\CMS\...  /* joomla.error.log */; // TODO: add use statement at top
 					$log = \Joomla\CMS\Log\Log::getInstance('com_flexicontent.error.php');
 					$log->addEntry(array('comment' => 'Cannot upload: '.$filepath));
 					header('HTTP/1.0 409 Conflict');
@@ -2205,7 +2205,7 @@ class plgFlexicontent_fieldsImage extends FCField
 
 				if ($format === 'json')
 				{
-					jimport('joomla.error.log');
+					// jimport removed J5: use Joomla\CMS\...  /* joomla.error.log */; // TODO: add use statement at top
 					$log = \Joomla\CMS\Log\Log::getInstance();
 					$log->addEntry(array('comment' => $filepath));
 
@@ -2254,9 +2254,9 @@ class plgFlexicontent_fieldsImage extends FCField
 		if (!$initialized)
 		{
 			$initialized = 1;
-			jimport('joomla.filesystem.file');
-			jimport('joomla.filesystem.folder');
-			jimport('joomla.filesystem.path');
+			// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
+			// jimport removed J5: use Joomla\CMS\Filesystem\Folder; // TODO: add use statement at top
+			// jimport removed J5: use Joomla\CMS\Filesystem\Path; // TODO: add use statement at top
 		}
 
 		// (DB/Folder/Other) Mode of image field
@@ -2430,8 +2430,8 @@ class plgFlexicontent_fieldsImage extends FCField
 		$app = Factory::getApplication();
 		$db  = Factory::getDbo();
 
-		jimport('joomla.filesystem.file');
-		jimport('joomla.filesystem.path');
+		// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
+		// jimport removed J5: use Joomla\CMS\Filesystem\Path; // TODO: add use statement at top
 
 		$image_source = (int) $field->parameters->get('image_source', 0);
 		$image_source = $image_source > 1 ? $this->nonImplementedMode($image_source, $field) : $image_source;
@@ -2504,9 +2504,9 @@ class plgFlexicontent_fieldsImage extends FCField
 		if ( !$initialized )
 		{
 			$initialized = 1;
-			jimport('joomla.filesystem.file');
-			jimport('joomla.filesystem.folder');
-			jimport('joomla.filesystem.path');
+			// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
+			// jimport removed J5: use Joomla\CMS\Filesystem\Folder; // TODO: add use statement at top
+			// jimport removed J5: use Joomla\CMS\Filesystem\Path; // TODO: add use statement at top
 		}
 
 		// Unseriaze value if not already done

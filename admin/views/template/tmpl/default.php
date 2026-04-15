@@ -21,15 +21,15 @@ defined('_JEXEC') or die('Restricted access');
 //adding inline help
 if (FLEXI_J40GE) \Joomla\CMS\Toolbar\ToolbarHelper::inlinehelp();
 
-jimport('joomla.filesystem.folder');
-jimport('joomla.filesystem.file');
-jimport('joomla.filesystem.path');
+// jimport removed J5: use Joomla\CMS\Filesystem\Folder; // TODO: add use statement at top
+// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
+// jimport removed J5: use Joomla\CMS\Filesystem\Path; // TODO: add use statement at top
 
 if ( !$this->layout->name ) die('Template folder does not exist');
 
 // Load JS tabber lib
-$this->document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
-$this->document->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
+/* J5/J6 WebAsset: */ $this->document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
+/* J5/J6 WebAsset: */ $this->document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
 $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
 $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
@@ -152,7 +152,7 @@ if (!$use_editor)  $app->enqueueMessage(\Joomla\CMS\Language\Text::_('Codemirror
 </script>
 
 <?php
-$this->document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/js/layout_editor.js', array('version' => FLEXI_VHASH));
+/* J5/J6 WebAsset: */ $this->document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/js/layout_editor.js', array('version' => FLEXI_VHASH));
 ?>
 
 <div id="flexicontent" class="flexicontent fcconfig-form">

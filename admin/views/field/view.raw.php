@@ -18,7 +18,7 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-jimport('legacy.view.legacy');
+// jimport removed J5: use Joomla\CMS\...  /* legacy.view.legacy */; // TODO: add use statement at top
 
 /**
  * View class for the FLEXIcontent field screen

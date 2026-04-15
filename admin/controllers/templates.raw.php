@@ -157,7 +157,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 			jexit(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'));
 		}
 
-		jimport('joomla.filesystem.file');
+		// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
 		$app  = \Joomla\CMS\Factory::getApplication();
 		$user = \Joomla\CMS\Factory::getUser();
 		$db   = \Joomla\CMS\Factory::getDbo();
@@ -598,7 +598,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 			jexit(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'));
 		}
 
-		jimport('joomla.filesystem.file');
+		// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
 		$app  = \Joomla\CMS\Factory::getApplication();
 		$user = \Joomla\CMS\Factory::getUser();
 
@@ -713,7 +713,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 			jexit(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'));
 		}
 
-		jimport('joomla.filesystem.file');
+		// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
 		$app  = \Joomla\CMS\Factory::getApplication();
 		$user = \Joomla\CMS\Factory::getUser();
 

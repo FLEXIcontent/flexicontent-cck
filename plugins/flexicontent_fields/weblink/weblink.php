@@ -280,7 +280,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			}
 			else
 			{
-				jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
+				// jimport removed J5: use Joomla\CMS\...  /* joomla.form.helper */; // TODO: add use statement at top // \Joomla\CMS\Form\FormHelper
 				\Joomla\CMS\Form\FormHelper::loadFieldClass('media');   // \Joomla\CMS\Form\Field\MediaField
 			}
 
@@ -288,7 +288,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			\Joomla\CMS\Language\Text::script("FLEXI_FIELD_WEBLINK_ENTER_MEDIA_URL_WARNING", true);
 			\Joomla\CMS\Language\Text::script("FLEXI_FIELD_MEDIA_URL", true);
 			\Joomla\CMS\Language\Text::script("FLEXI_ERROR", true);
-			$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/weblink/js/form.js', array('version' => FLEXI_VHASH));
+			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/weblink/js/form.js', array('version' => FLEXI_VHASH));
 
 			$mm_mode_common_js_added = true;
 		}
@@ -362,7 +362,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 
 			if ($allow_relative_addrs === 2) $js .= "
 				var nr = 0;
-				newField.find('input.autoprefix').each(function() {
+				newField.find('input.autoprefix')./* TODO-J5: each() removed */ current(function() {
 					var elem = jQuery(this);
 					elem.attr('name', fname_pfx + '[autoprefix]');
 					elem.attr('id', element_id + '_autoprefix_'+nr);
@@ -527,7 +527,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 
 				// Show tooltips
 				var tipped_elements = newField.find('.hasTipImgpath, .hasTipPreview');
-				tipped_elements.each(function() {
+				tipped_elements./* TODO-J5: each() removed */ current(function() {
 					var title = this.get('title');
 					if (title) {
 						var parts = title.split('::', 2);

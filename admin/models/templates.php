@@ -11,7 +11,7 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-jimport('legacy.model.legacy');
+// jimport removed J5: use Joomla\CMS\...  /* legacy.model.legacy */; // TODO: add use statement at top
 
 /**
  * FLEXIcontent Component Templates Model
@@ -88,7 +88,7 @@ class FlexicontentModelTemplates extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 	 */
 	function duplicate($source, $dest)
 	{
-		jimport('joomla.filesystem.folder');
+		// jimport removed J5: use Joomla\CMS\Filesystem\Folder; // TODO: add use statement at top
 
 		$path 	= JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS;
 		$dest	= $dest ? flexicontent_upload::sanitizedir($path, $dest) : '';
@@ -110,7 +110,7 @@ class FlexicontentModelTemplates extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 	 */
 	function delete($dir)
 	{
-		jimport('joomla.filesystem.folder');
+		// jimport removed J5: use Joomla\CMS\Filesystem\Folder; // TODO: add use statement at top
 
 		$path 	= JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS;
 

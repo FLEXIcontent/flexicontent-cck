@@ -383,7 +383,7 @@ class FLEXIUtilities
 			'cachebase' => ($client == 1 ? JPATH_ADMINISTRATOR . '/cache' : $conf->get('cache_path', JPATH_SITE . '/cache'))
 		);
 
-		jimport('joomla.cache.cache');
+		// jimport removed J5: use Joomla\CMS\...  /* joomla.cache.cache */; // TODO: add use statement at top
 		$cache = \Joomla\CMS\Cache\Cache::getInstance('', $options);
 
 		return $cache;

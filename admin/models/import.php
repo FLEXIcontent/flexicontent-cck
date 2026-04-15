@@ -15,7 +15,7 @@ use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Table\Table;
 
-jimport('legacy.model.list');
+// jimport removed J5: use Joomla\CMS\...  /* legacy.model.list */; // TODO: add use statement at top
 
 /**
  * FLEXIcontent Component Import Model

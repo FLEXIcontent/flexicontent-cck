@@ -19,11 +19,11 @@ defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
 
-jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
-jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
+// jimport removed J5: use Joomla\CMS\HTML\HTMLHelper; // TODO: add use statement at top      // JHtml
+// jimport removed J5: use Joomla\CMS\...  /* cms.html.select */; // TODO: add use statement at top    // \Joomla\CMS\HTML\Helpers\Select
+// jimport removed J5: use Joomla\CMS\...  /* joomla.form.field */; // TODO: add use statement at top  // \Joomla\CMS\Form\FormField
 
-//jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
+//// jimport removed J5: use Joomla\CMS\...  /* joomla.form.helper */; // TODO: add use statement at top // \Joomla\CMS\Form\FormHelper
 //\Joomla\CMS\Form\FormHelper::loadFieldClass('...');   // \Joomla\CMS\Form\FormField...
 
 class JFormFieldMicrodatatype extends \Joomla\CMS\Form\FormField {
@@ -44,7 +44,7 @@ class JFormFieldMicrodatatype extends \Joomla\CMS\Form\FormField {
 		
 		if ($types === null)
 		{
-			jimport('joomla.microdata.microdata');
+			// jimport removed J5: use Joomla\CMS\...  /* joomla.microdata.microdata */; // TODO: add use statement at top
 			$jm = new \Joomla\CMS\Microdata\Microdata();
 			$jm_types = $jm->getTypes();
 			$types = array_keys($jm_types);

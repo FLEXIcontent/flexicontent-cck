@@ -11,7 +11,8 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-jimport('legacy.view.legacy');
+// jimport removed J5: use Joomla\CMS\...  /* legacy.view.legacy */; // TODO: add use statement at top
+use Joomla\CMS\Factory;
 use Joomla\String\StringHelper;
 use Joomla\Database\DatabaseInterface;
 use Joomla\CMS\Toolbar\ToolbarFactoryInterface;
@@ -142,7 +143,7 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 				hidden_id = '#'+jQuery.trim(parent_element.attr('id').replace('sortable-',''));
 				fields = new Array();
 				i = 0;
-				parent_element.children('li').each(function(){
+				parent_element.children('li')./* TODO-J5: each() removed */ current(function(){
 					fields[i++] = jQuery(this).attr('id').replace('field_', '');
 				});
 				jQuery(hidden_id).val(fields.join(','))
@@ -188,11 +189,11 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 
 		// Add css to document
 		!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
-			? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
-			: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
+			? /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
+			: /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
 		!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
-			? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
-			: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
+			? /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
+			: /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 
 		// Add JS frameworks
 		flexicontent_html::loadJQuery();
@@ -207,8 +208,8 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 		\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip');
 
 		// Add js function to overload the joomla submitform validation
-		$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
-		$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
+		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
+		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
 
 
 		// *****************************
@@ -328,7 +329,7 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 		$tmpldir = JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$folder;
 
 		// Create less folders if they do not exist already
-		if ( !is_dir( $tmpldir . '/less' ) ) if ( !mkdir( $tmpldir . '/less') )  JError::raiseWarning(100, \Joomla\CMS\Language\Text::_('Unable to create "/less/" folder'));
+		if ( !is_dir( $tmpldir . '/less' ) ) if ( !mkdir( $tmpldir . '/less') )  Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_('Unable to create "/less/" folder', 'warning'));
 
 		// Abort if directory creation failed
 		if ( ! is_dir( $tmpldir . '/less' ) ) return;
@@ -338,7 +339,7 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 		// Create CUSTOM config.less, that is include by item.less / category.less
 		// ************************************************************ ***********
 
-		if ( !is_dir( $tmpldir . '/less/include' ) ) if ( !mkdir( $tmpldir . '/less/include') )  JError::raiseWarning(100, \Joomla\CMS\Language\Text::_('Unable to create "/less/include" folder'));
+		if ( !is_dir( $tmpldir . '/less/include' ) ) if ( !mkdir( $tmpldir . '/less/include') )  Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_('Unable to create "/less/include" folder', 'warning'));
 		if ( !file_exists($tmpldir . '/less/include/config.less') ) {
 			file_put_contents($tmpldir . '/less/include/config.less', "/* Place your less variables, mixins, etc, here \n1. This is commonly imported by files: item.less and category.less, \n2. If you add extra less file imports, then place files \ninside same folder for automatic compiling to be triggered */\n\n@import 'config_auto_item.less';\n@import 'config_auto_category.less';\n");
 		}
@@ -353,7 +354,7 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 			if ( !file_exists($tmpldir . $css_name) )  continue;  // Do not try to copy CSS file that does not exist
 			if ( !file_exists($tmpldir . $less_name) ) {
 				if ( !\Joomla\Filesystem\File::copy($tmpldir.$css_name, $tmpldir.$less_name) ) {
-					JError::raiseWarning(100, \Joomla\CMS\Language\Text::_('Unable to create file: "'.$tmpldir.$less_name.'"'));
+					Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_('Unable to create file: "'.$tmpldir.$less_name.'"', 'warning'));
 				} else {
 					$file_data = "@import 'include/config.less';\n\n";
 					$file_data .= preg_replace("/[ \t]*\*zoom[\s]*:[\s]*expression[^\r\n]+[\r\n]+/u", "", file_get_contents($tmpldir.$less_name));  // copy and replace old invalid code

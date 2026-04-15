@@ -19,7 +19,7 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('legacy.model.legacy');
+// jimport removed J5: use Joomla\CMS\...  /* legacy.model.legacy */; // TODO: add use statement at top
 JLoader::register('ParentClassItem', JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'parentclassitem.php');
 
 /**

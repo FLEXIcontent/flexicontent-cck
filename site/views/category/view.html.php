@@ -19,8 +19,8 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('legacy.view.legacy');
-jimport('joomla.filesystem.file');
+// jimport removed J5: use Joomla\CMS\...  /* legacy.view.legacy */; // TODO: add use statement at top
+// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
 
 use Joomla\CMS\Language\Text;
 use Joomla\String\StringHelper;
@@ -186,19 +186,19 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		// Add css files to the document <head> section (also load CSS joomla template override)
 		if (!$params->get('disablecss', ''))
 		{
-			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
+			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('flexicontent', $this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
 			!\Joomla\CMS\Factory::getLanguage()->isRtl()
-				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
-				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
+				? /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
+				: /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 		}
 
 		if (FLEXI_J40GE && file_exists(JPATH_SITE.DS.'media/templates/site'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css'))
 		{
-			$document->addStyleSheet($this->baseurl.'/media/templates/site/'.$app->getTemplate().'/css/flexicontent.css', array('version' => FLEXI_VHASH));
+			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', $this->baseurl.'/media/templates/site/'.$app->getTemplate().'/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		}
 		elseif (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css'))
 		{
-			$document->addStyleSheet($this->baseurl.'/templates/'.$app->getTemplate().'/css/flexicontent.css', array('version' => FLEXI_VHASH));
+			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', $this->baseurl.'/templates/'.$app->getTemplate().'/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		}
 
 
@@ -497,13 +497,13 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 			// Add the templates css files if availables
 			if (isset($themes->category->{$clayout}->css)) {
 				foreach ($themes->category->{$clayout}->css as $css) {
-					$document->addStyleSheet($this->baseurl.'/'.$css);
+					/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', $this->baseurl.'/'.$css);
 				}
 			}
 			// Add the templates js files if availables
 			if (isset($themes->category->{$clayout}->js)) {
 				foreach ($themes->category->{$clayout}->js as $js) {
-					$document->addScript($this->baseurl.'/'.$js);
+					/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', $this->baseurl.'/'.$js);
 				}
 			}
 			// Set the template var

@@ -205,7 +205,7 @@ if ($params->get('filter_ajax', 0)) :
 
 		// 2. Override native submit for known forms on initial load
 		window.fcOverrideNativeSubmit('adminForm');
-		$('form[id^=\"moduleFCform_\"]').each(function() {
+		$('form[id^=\"moduleFCform_\"]')./* TODO-J5: each() removed */ current(function() {
 			window.fcOverrideNativeSubmit(this.id);
 		});
 
@@ -247,7 +247,7 @@ if ($params->get('filter_ajax', 0)) :
 				var oldForm = document.getElementById('adminForm');
 				if (oldForm) oldAutosubmits['adminForm'] = $(oldForm).attr('data-fc-autosubmit') || '2';
 			}
-			moduleContainers.each(function() {
+			moduleContainers./* TODO-J5: each() removed */ current(function() {
 				var modForm = $(this).find('form')[0];
 				if (modForm && modForm.id) oldAutosubmits[modForm.id] = $(modForm).attr('data-fc-autosubmit') || '2';
 			});
@@ -279,7 +279,7 @@ if ($params->get('filter_ajax', 0)) :
 					}
 
 					if (moduleContainers.length) {
-						moduleContainers.each(function() {
+						moduleContainers./* TODO-J5: each() removed */ current(function() {
 							var \$modWrapper = $(this);
 							if (!document.body.contains(\$modWrapper[0])) return;
 							var modId = \$modWrapper.attr('id');
@@ -310,7 +310,7 @@ if ($params->get('filter_ajax', 0)) :
 					var formsToRebind = [];
 					var newAdminForm = document.getElementById('adminForm');
 					if (newAdminForm) formsToRebind.push(newAdminForm);
-					$('.mod_flexifilter_wrapper form').each(function() {
+					$('.mod_flexifilter_wrapper form')./* TODO-J5: each() removed */ current(function() {
 						formsToRebind.push(this);
 					});
 

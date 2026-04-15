@@ -38,8 +38,8 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 		$print_logging_info = $params->get('print_logging_info');
 
 		// Load the file system librairies
-		jimport('joomla.filesystem.folder');
-		jimport('joomla.filesystem.file');
+		// jimport removed J5: use Joomla\CMS\Filesystem\Folder; // TODO: add use statement at top
+		// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
 
 		// activate the tooltips
 		//\Joomla\CMS\HTML\HTMLHelper::_('behavior.tooltip');
@@ -127,11 +127,11 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 		// **************************
 
 		!\Joomla\CMS\Factory::getLanguage()->isRtl()
-			? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
-			: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
+			? /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
+			: /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
 		!\Joomla\CMS\Factory::getLanguage()->isRtl()
-			? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
-			: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
+			? /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
+			: /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 
 
 
@@ -222,7 +222,7 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 		}
 
 		// Lists
-		jimport('joomla.filesystem.folder');
+		// jimport removed J5: use Joomla\CMS\Filesystem\Folder; // TODO: add use statement at top
 		$lists 		= array();
 		$options 	= array();
 		$folder 	= JPATH_ADMINISTRATOR.DS.'language';

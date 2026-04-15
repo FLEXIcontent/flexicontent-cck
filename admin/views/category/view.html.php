@@ -11,6 +11,7 @@
 
 defined('_JEXEC') or die('Restricted access');
 
+use Joomla\CMS\Factory;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
@@ -127,7 +128,7 @@ class FlexicontentViewCategory extends FlexicontentViewBaseRecord
 		// Check no privilege to create new category under any category
 		if ( $isnew && (!$perms->CanCats || !FlexicontentHelperPerm::getPermAny('core.create')) )
 		{
-			JError::raiseWarning( 403, \Joomla\CMS\Language\Text::_( 'FLEXI_NO_ACCESS_CREATE' ) );
+			Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_( 'FLEXI_NO_ACCESS_CREATE' , 'warning') );
 			$app->redirect( 'index.php?option=com_flexicontent' );
 		}
 
@@ -161,7 +162,7 @@ class FlexicontentViewCategory extends FlexicontentViewBaseRecord
 		if ( $isnew && !$cancreate_cat )
 		{
 			$acc_msg = \Joomla\CMS\Language\Text::_( 'FLEXI_NO_ACCESS_CREATE' ) ."<br/>". (FLEXI_J16GE ? \Joomla\CMS\Language\Text::_( 'FLEXI_CANNOT_ADD_CATEGORY_REASON' ) : "");
-			JError::raiseWarning( 403, $acc_msg);
+			Factory::getApplication()->enqueueMessage($acc_msg, 'warning');
 			$app->redirect('index.php?option=com_flexicontent&view=categories');
 		}
 
@@ -169,7 +170,7 @@ class FlexicontentViewCategory extends FlexicontentViewBaseRecord
 		if ( !$isnew && !$canedit_cat )
 		{
 			$acc_msg = \Joomla\CMS\Language\Text::_( 'FLEXI_NO_ACCESS_EDIT' ) ."<br/>". \Joomla\CMS\Language\Text::_( 'FLEXI_CANNOT_EDIT_CATEGORY_REASON' );
-			JError::raiseWarning( 403, $acc_msg);
+			Factory::getApplication()->enqueueMessage($acc_msg, 'warning');
 			$app->redirect( 'index.php?option=com_flexicontent&view=categories' );
 		}
 
@@ -182,17 +183,17 @@ class FlexicontentViewCategory extends FlexicontentViewBaseRecord
 		if ($isAdmin)
 		{
 			!\Joomla\CMS\Factory::getLanguage()->isRtl()
-				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
-				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
+				? /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
+				: /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
 			!\Joomla\CMS\Factory::getLanguage()->isRtl()
-				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
-				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
+				? /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
+				: /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 		}
 		else
 		{
 			!\Joomla\CMS\Factory::getLanguage()->isRtl()
-				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
-				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
+				? /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
+				: /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
 		}
 
 		// Add JS frameworks
@@ -207,8 +208,8 @@ class FlexicontentViewCategory extends FlexicontentViewBaseRecord
 		\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip');
 
 		// Add js function to overload the joomla submitform validation
-		$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
-		$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
+		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
+		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
 
 
 		/**

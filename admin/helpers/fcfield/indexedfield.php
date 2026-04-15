@@ -432,7 +432,7 @@ class FCIndexedField extends FCField
 			".(!$display_as_select ? "
 				// Remove HTML added by prettyCheckable JS, from the dupicate new INPUT SET
 				var prettyContainers = newField.find('.prettyradio, .prettycheckbox');
-				prettyContainers.find('input, label').each(function() {
+				prettyContainers.find('input, label')./* TODO-J5: each() removed */ current(function() {
 					var el = jQuery(this);
 					el.insertAfter(el.parent());
 				});
@@ -445,7 +445,7 @@ class FCIndexedField extends FCField
 				var theSet = newField.find('input:radio, input:checkbox');
 				//if(window.console) window.console.log('theSet.length: ' + theSet.length);
 				var nr = 0;
-				theSet.each(function() {
+				theSet./* TODO-J5: each() removed */ current(function() {
 					var elem = jQuery(this);
 					elem.attr('name', '".$fieldname."['+uniqueRowNum".$field->id."+']".(static::$valueIsArr ? '[]' : '')."');
 					elem.attr('id', '".$elementid."_'+uniqueRowNum".$field->id."+'_'+nr);
@@ -465,7 +465,7 @@ class FCIndexedField extends FCField
 				});
 
 				// Reapply prettyCheckable JS
-				newField.find('.use_prettycheckable').each(function() {
+				newField.find('.use_prettycheckable')./* TODO-J5: each() removed */ current(function() {
 					var elem = jQuery(this);
 					var lbl = elem.prev('label');
 					var lbl_html = lbl.html();
@@ -480,7 +480,7 @@ class FCIndexedField extends FCField
 				var defvals = elem.attr('data-defvals');
 				if ( defvals && defvals.length )
 				{
-					jQuery.each(defvals.split('|||'), function(i, val){
+					jQuery./* TODO-J5: each() removed */ current(defvals.split('|||'), function(i, val){
 						elem.find('option[value=\"' + val + '\"]').attr('selected', 'selected');
 					});
 				}
@@ -535,7 +535,7 @@ class FCIndexedField extends FCField
 			else
 			{
 				$js .= "
-				jQuery('#".$elementid."_'+uniqueRowNum".$field->id.").each(function() {
+				jQuery('#".$elementid."_'+uniqueRowNum".$field->id.")./* TODO-J5: each() removed */ current(function() {
 					var el = jQuery(this);
 					setTimeout(function(){
 						el.trigger('change');

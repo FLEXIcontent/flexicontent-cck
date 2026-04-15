@@ -1043,7 +1043,7 @@ class plgSystemFlexisystem extends CMSPlugin
 		$username  = $app->input->get('fcu', null);
 		$password  = $app->input->get('fcp', null);
 
-		jimport('joomla.user.helper');
+		// jimport removed J5: use Joomla\CMS\User\UserHelper; // TODO: add use statement at top
 
 		$db = Factory::getDbo();
 		$query 	= 'SELECT id, password'
@@ -1592,7 +1592,7 @@ class plgSystemFlexisystem extends CMSPlugin
 			if ($output)
 			{
 				$log_filename = 'cron_estorage.php';
-				jimport('joomla.log.log');
+				// jimport removed J5: use Joomla\CMS\...  /* joomla.log.log */; // TODO: add use statement at top
 				Log::addLogger(
 					array(
 						'text_file' => $log_filename,  // Sets the target log file
@@ -1962,7 +1962,7 @@ class plgSystemFlexisystem extends CMSPlugin
 			'cachebase'		=> ($client == 1) ? JPATH_ADMINISTRATOR . '/cache' : $conf->get('cache_path', JPATH_SITE . '/cache')
 		);
 
-		jimport('joomla.cache.cache');
+		// jimport removed J5: use Joomla\CMS\...  /* joomla.cache.cache */; // TODO: add use statement at top
 		$cache = Cache::getInstance('', $options);
 		return $cache;
 	}
@@ -2327,19 +2327,19 @@ class plgSystemFlexisystem extends CMSPlugin
 		// ***
 
 		!Factory::getLanguage()->isRtl()
-			? $document->addStyleSheet(Uri::root(true).'/components/com_flexicontent/assets/css/flexi_form.css', array('version' => FLEXI_VHASH))
-			: $document->addStyleSheet(Uri::root(true).'/components/com_flexicontent/assets/css/flexi_form_rtl.css', array('version' => FLEXI_VHASH));
+			? /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', Uri::root(true).'/components/com_flexicontent/assets/css/flexi_form.css', array('version' => FLEXI_VHASH))
+			: /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', Uri::root(true).'/components/com_flexicontent/assets/css/flexi_form_rtl.css', array('version' => FLEXI_VHASH));
 
 		!Factory::getLanguage()->isRtl()
-			? $document->addStyleSheet(Uri::root(true).'/components/com_flexicontent/assets/css/flexi_containers.css', array('version' => FLEXI_VHASH))
-			: $document->addStyleSheet(Uri::root(true).'/components/com_flexicontent/assets/css/flexi_containers_rtl.css', array('version' => FLEXI_VHASH));
+			? /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', Uri::root(true).'/components/com_flexicontent/assets/css/flexi_containers.css', array('version' => FLEXI_VHASH))
+			: /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', Uri::root(true).'/components/com_flexicontent/assets/css/flexi_containers_rtl.css', array('version' => FLEXI_VHASH));
 
 		!Factory::getLanguage()->isRtl()
-			? $document->addStyleSheet(Uri::root(true).'/components/com_flexicontent/assets/css/flexi_shared.css', array('version' => FLEXI_VHASH))
-			: $document->addStyleSheet(Uri::root(true).'/components/com_flexicontent/assets/css/flexi_shared_rtl.css', array('version' => FLEXI_VHASH));
+			? /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', Uri::root(true).'/components/com_flexicontent/assets/css/flexi_shared.css', array('version' => FLEXI_VHASH))
+			: /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', Uri::root(true).'/components/com_flexicontent/assets/css/flexi_shared_rtl.css', array('version' => FLEXI_VHASH));
 
 		// Fields common CSS
-		$document->addStyleSheet(Uri::root(true).'/components/com_flexicontent/assets/css/flexi_form_fields.css', array('version' => FLEXI_VHASH));
+		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', Uri::root(true).'/components/com_flexicontent/assets/css/flexi_form_fields.css', array('version' => FLEXI_VHASH));
 
 
 		// ***
@@ -2355,11 +2355,11 @@ class plgSystemFlexisystem extends CMSPlugin
 
 		// Add js function to overload the joomla submitform validation
 		HTMLHelper::_('behavior.formvalidator');  // load default validation JS to make sure it is overriden
-		$document->addScript(Uri::root(true).'/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
-		$document->addScript(Uri::root(true).'/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
+		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', Uri::root(true).'/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
+		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', Uri::root(true).'/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
 
 		// Add js function for custom code used by FLEXIcontent item form
-		$document->addScript(Uri::root(true).'/components/com_flexicontent/assets/js/itemscreen.js', array('version' => FLEXI_VHASH));
+		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', Uri::root(true).'/components/com_flexicontent/assets/js/itemscreen.js', array('version' => FLEXI_VHASH));
 
 
 		// ***

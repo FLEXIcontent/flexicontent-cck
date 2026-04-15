@@ -25,10 +25,10 @@ use Joomla\Utilities\ArrayHelper;
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
-jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // JHTMLSelect
+// jimport removed J5: use Joomla\CMS\HTML\HTMLHelper; // TODO: add use statement at top      // JHtml
+// jimport removed J5: use Joomla\CMS\...  /* cms.html.select */; // TODO: add use statement at top    // JHTMLSelect
 
-jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
+// jimport removed J5: use Joomla\CMS\...  /* joomla.form.helper */; // TODO: add use statement at top // \Joomla\CMS\Form\FormHelper
 \Joomla\CMS\Form\FormHelper::loadFieldClass('list');   // \Joomla\CMS\Form\Field\ListField
 
 // Load JS tabber lib
@@ -198,7 +198,7 @@ function ilayout_disablePanel(element)
 	}
 
 	var form_fields_active = panel.find('textarea:enabled, select:enabled, input[type=\"radio\"]:enabled:checked, input[type=\"checkbox\"]:enabled:checked, input:not(:button):not(:radio):not(:checkbox):enabled');
-	form_fields_active.each(function(index)
+	form_fields_active./* TODO-J5: each() removed */ current(function(index)
 	{
 		el = jQuery(this);
 		//if ( el.is(':disabled') ) return;  // no need, because above we selected only enabled elements

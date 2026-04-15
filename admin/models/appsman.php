@@ -15,7 +15,7 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-jimport('legacy.model.list');
+// jimport removed J5: use Joomla\CMS\...  /* legacy.model.list */; // TODO: add use statement at top
 
 /**
  * FLEXIcontent Component types Model

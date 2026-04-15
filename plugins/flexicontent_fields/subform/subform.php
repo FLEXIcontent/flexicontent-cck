@@ -52,7 +52,7 @@ class plgFlexicontent_fieldsSubform extends FCField
 		// Load the subform field if earlier than Joomla 4
 		if (!FLEXI_J40GE)
 		{
-			jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
+			// jimport removed J5: use Joomla\CMS\...  /* joomla.form.helper */; // TODO: add use statement at top // \Joomla\CMS\Form\FormHelper
 			\Joomla\CMS\Form\FormHelper::loadFieldClass('subform');   // \Joomla\CMS\Form\Field\SubformField
 		}
 

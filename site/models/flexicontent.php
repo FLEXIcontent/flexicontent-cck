@@ -19,7 +19,7 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('legacy.model.legacy');
+// jimport removed J5: use Joomla\CMS\...  /* legacy.model.legacy */; // TODO: add use statement at top
 
 /**
  * FLEXIcontent Component Model
@@ -341,7 +341,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		// Load the content if it doesn't already exist
 		if (empty($this->_pagination))
 		{
-			//jimport('cms.pagination.pagination');
+			//// jimport removed J5: use Joomla\CMS\...  /* cms.pagination.pagination */; // TODO: add use statement at top
 			require_once (JPATH_COMPONENT.DS.'helpers'.DS.'pagination.php');
 			$this->_pagination = new FCPagination($this->getTotal(), $this->getState('limitstart'), $this->getState('limit') );
 		}

@@ -10,8 +10,8 @@ class flexicontent_images
 	 */
 	static function BuildIcons($rows, $default_text = null)
 	{
-		jimport('joomla.filesystem.path' );
-		jimport('joomla.filesystem.file');
+		// jimport removed J5: use Joomla\CMS\Filesystem\Path; // TODO: add use statement at top
+		// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
 		$NA = '-';
 
 		for ($i=0, $n=count($rows); $i < $n; $i++)

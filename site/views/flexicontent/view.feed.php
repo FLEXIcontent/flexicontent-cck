@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\Factory; // J5-compat added
 /**
  * @version 1.5 stable $Id: view.feed.php 1577 2012-12-02 15:10:44Z ggppdk $
  * @package Joomla
@@ -19,7 +20,7 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 use Joomla\Database\DatabaseInterface;
-jimport('legacy.view.legacy');
+// jimport removed J5: use Joomla\CMS\...  /* legacy.view.legacy */; // TODO: add use statement at top
 
 /**
  * HTML View class for the FLEXIcontent View (RSS)
@@ -48,7 +49,7 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 		\Joomla\CMS\Factory::getApplication()->input->set('limit', $params->get('feed_limit'));
 
 		// Needed by legacy non-updated plugins
-		!FLEXI_J40GE ? JRequest::setVar('limit', $params->get('feed_limit')) : null;
+		!FLEXI_J40GE ? Factory::getApplication()->input->set('limit', $params->get('feed_limit')) : null;
 
 
 		// ***********************

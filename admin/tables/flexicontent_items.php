@@ -21,7 +21,7 @@ use Joomla\Event\DispatcherAwareTrait;
 use Joomla\Event\DispatcherInterface;
 use \Joomla\CMS\Table\Table;
 
-jimport('joomla.access.rules');
+// jimport removed J5: use Joomla\CMS\...  /* joomla.access.rules */; // TODO: add use statement at top
 require_once('flexicontent_basetable.php');
 
 class _flexicontent_items_common extends flexicontent_basetable

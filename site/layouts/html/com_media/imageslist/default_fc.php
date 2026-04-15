@@ -76,7 +76,7 @@ if (count($this->images))
 	"
 		jQuery(document).ready(function($){
 
-			$('.img-preview-icon').each(function(index, value) {
+			$('.img-preview-icon')./* TODO-J5: each() removed */ current(function(index, value) {
 				$(this).on('click', function(e) {
 					window.parent.jQuery('#imagePreviewSrc').attr('src', $(this).attr('href'));
 					window.parent.jQuery('#imagePreview').modal('show');
@@ -94,14 +94,14 @@ if (count($this->videos))
 	"
 		jQuery(document).ready(function($){
 
-			$('.img-preview-icon').each(function(index, value) {
+			$('.img-preview-icon')./* TODO-J5: each() removed */ current(function(index, value) {
 				$(this).on('click', function(e) {
 					window.parent.jQuery('#imagePreviewSrc').attr('src', $(this).attr('href'));
 					window.parent.jQuery('#imagePreview').modal('show');
 					return false;
 				});
 			});
-			$('.video-preview-icon').each(function(index, value) {
+			$('.video-preview-icon')./* TODO-J5: each() removed */ current(function(index, value) {
 				$(this).unbind('click');
 				$(this).on('click', function(e) {
 					e.preventDefault();

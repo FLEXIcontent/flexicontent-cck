@@ -19,10 +19,11 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+use Joomla\CMS\Factory;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-jimport('legacy.model.legacy');
+// jimport removed J5: use Joomla\CMS\...  /* legacy.model.legacy */; // TODO: add use statement at top
 
 /**
  * FLEXIcontent Component Model
@@ -208,7 +209,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		// Force layout to be have proper value
 		if ( $this->_layout && !in_array($this->_layout, array('favs','tags','mcats','myitems','author')) )
 		{
-			//JError::raiseNotice(0, "'layout' variable is ".$this->_layout.", acceptable are: 'favs','tags','mcats','myitems','author', this may be due to some 3rd party plugin");
+			//Factory::getApplication()->enqueueMessage("'layout' variable is ".$this->_layout.", acceptable are: 'favs','tags','mcats','myitems','author', this may be due to some 3rd party plugin", 'notice');
 			$this->_layout = '';
 			$app->input->set('layout', '');
 		}
@@ -503,7 +504,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			$limit = (int) $this->getState('limit');
 			$limitstart = (int) $this->getState('limitstart');
 
-			//jimport('cms.pagination.pagination');
+			//// jimport removed J5: use Joomla\CMS\...  /* cms.pagination.pagination */; // TODO: add use statement at top
 			require_once (JPATH_COMPONENT.DS.'helpers'.DS.'pagination.php');
 			$this->_pagination = new FCPagination($this->getTotal(), $limitstart, $limit);
 		}

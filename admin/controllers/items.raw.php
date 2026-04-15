@@ -614,7 +614,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$log_filename = $session->get($indexer . '_log_filename', null, 'flexicontent');
 		$log_category = $session->get($indexer . '_log_category', null, 'flexicontent');
 
-		jimport('joomla.log.log');
+		// jimport removed J5: use Joomla\CMS\...  /* joomla.log.log */; // TODO: add use statement at top
 		\Joomla\CMS\Log\Log::addLogger(
 			array(
 				'text_file' => $log_filename,  // Sets the target log file

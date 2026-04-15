@@ -10,7 +10,7 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-jimport('cms.plugin.plugin');
+// jimport removed J5: use Joomla\CMS\...  /* cms.plugin.plugin */; // TODO: add use statement at top
 
 class FCField extends \Joomla\CMS\Plugin\CMSPlugin
 {

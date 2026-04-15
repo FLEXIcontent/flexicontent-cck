@@ -22,7 +22,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-jimport('cms.plugin.plugin');
+// jimport removed J5: use Joomla\CMS\...  /* cms.plugin.plugin */; // TODO: add use statement at top
 
 require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 

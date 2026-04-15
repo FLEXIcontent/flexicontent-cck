@@ -12,8 +12,8 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
-jimport('legacy.model.legacy');
-jimport('joomla.access.rules');
+// jimport removed J5: use Joomla\CMS\...  /* legacy.model.legacy */; // TODO: add use statement at top
+// jimport removed J5: use Joomla\CMS\...  /* joomla.access.rules */; // TODO: add use statement at top
 use Joomla\String\StringHelper;
 use Joomla\CMS\Factory;
 use Joomla\Filesystem\Path;
@@ -650,9 +650,9 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 	// Check and if needed install 3rd party plugins that do not use Joomla plugin system
 	function install_3rdParty_plugins()
 	{
-		jimport('joomla.filesystem.path' );
-		jimport('joomla.filesystem.folder');
-		jimport('joomla.filesystem.file');
+		// jimport removed J5: use Joomla\CMS\Filesystem\Path; // TODO: add use statement at top
+		// jimport removed J5: use Joomla\CMS\Filesystem\Folder; // TODO: add use statement at top
+		// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
 
 		// ****************************
 		// Handle jcomments integration
@@ -1017,7 +1017,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		static $missing;
 		if ($missing !== NULL) return $check_only ? empty($missing) : $missing;
 
-		jimport('joomla.filesystem.file');
+		// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
 		$app = Factory::getApplication();
 		$dbprefix = $app->getCfg('dbprefix');
 		$dbname   = $app->getCfg('db');
@@ -1214,9 +1214,9 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		static $return;
 		if ($return!==null) return $return;
 
-		jimport('joomla.filesystem.file');
-		jimport('joomla.filesystem.folder');
-		jimport('joomla.filesystem.path');
+		// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
+		// jimport removed J5: use Joomla\CMS\Filesystem\Folder; // TODO: add use statement at top
+		// jimport removed J5: use Joomla\CMS\Filesystem\Path; // TODO: add use statement at top
 
 		$conf_override_file = Path::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'phpThumb.config_OVERRIDE.php');
 
@@ -1251,7 +1251,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		// CHECK phpThumb cache exists and create the folder
 		if ( !is_dir($phpthumbcache) && !mkdir($phpthumbcache) )
 		{
-			JError::raiseWarning(100, 'Error: Unable to create phpThumb folder: '. $phpthumbcache .' image thumbnail will not work properly' );
+			Factory::getApplication()->enqueueMessage('Error: Unable to create phpThumb folder: '. $phpthumbcache .' image thumbnail will not work properly' , 'warning');
 			$return = true;  // Cancel task !! to allow user to continue
 			return;
 		}
@@ -1267,7 +1267,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		// If permissions not good check if we can change them
 		if ( !$return && !Path::canChmod($phpthumbcache) )
 		{
-			JError::raiseWarning(100, 'Error: Unable to change phpThumb folder permissions: '. $phpthumbcache .' there maybe a wrong owner of the folder. Correct permissions are important for proper thumbnails and for -security-' );
+			Factory::getApplication()->enqueueMessage('Error: Unable to change phpThumb folder permissions: '. $phpthumbcache .' there maybe a wrong owner of the folder. Correct permissions are important for proper thumbnails and for -security-' , 'warning');
 			$return = true;  // Cancel task !! to allow user to continue
 			return;
 		}
@@ -1305,8 +1305,8 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 
 		$finished = false;
 
-		jimport('joomla.filesystem.file');
-		jimport('joomla.filesystem.folder');
+		// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
+		// jimport removed J5: use Joomla\CMS\Filesystem\Folder; // TODO: add use statement at top
 
 		$deprecated['files'] = array();
 		$deprecated['folders'] = array();
@@ -1817,7 +1817,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 
 	function createLanguagePack($code = 'en-GB', $method = '', $params = array())
 	{
-		jimport('joomla.filesystem.file');
+		// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
 
 		$prefix 	= $code . '.';
 		$suffix 	= '.ini';
@@ -1972,7 +1972,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 				$files[$i]['time'] = time();
 			}
 
-			jimport('joomla.archive.archive');
+			// jimport removed J5: use Joomla\CMS\...  /* joomla.archive.archive */; // TODO: add use statement at top
 			$packager = JArchive::getAdapter('zip');
 			if (!$packager->create($archivename, $files)) {
 				echo \Joomla\CMS\Language\Text::_('FLEXI_OPERATION_FAILED');

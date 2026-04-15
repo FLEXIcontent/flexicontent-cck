@@ -11,8 +11,8 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-jimport('cms.component.helper');
-jimport('cms.plugin.helper');
+// jimport removed J5: use Joomla\CMS\...  /* cms.component.helper */; // TODO: add use statement at top
+// jimport removed J5: use Joomla\CMS\...  /* cms.plugin.helper */; // TODO: add use statement at top
 
 
 
@@ -50,7 +50,7 @@ if ($print_logging_info && $format === 'html')
 {
 	$start_microtime = microtime(true);
 	global $fc_jprof;
-	jimport('joomla.profiler.profiler');
+	// jimport removed J5: use Joomla\CMS\...  /* joomla.profiler.profiler */; // TODO: add use statement at top
 	$fc_jprof = new \Joomla\CMS\Profiler\Profiler();
 	$fc_jprof->mark('START: FLEXIcontent component');
 }

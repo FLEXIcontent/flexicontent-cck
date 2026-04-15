@@ -125,7 +125,7 @@ class FlexicontentCronTasks
 	public function transferFiles()
 	{
 		$log_filename = 'cron_estorage.php';
-		jimport('joomla.log.log');
+		// jimport removed J5: use Joomla\CMS\...  /* joomla.log.log */; // TODO: add use statement at top
 		\Joomla\CMS\Log\Log::addLogger(
 			array(
 				'text_file' => $log_filename,  // Sets the target log file

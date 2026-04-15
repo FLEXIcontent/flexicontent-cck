@@ -87,7 +87,7 @@ if ( !$show_mod )  return;
 
 
 global $modfc_jprof;
-jimport('joomla.profiler.profiler');
+// jimport removed J5: use Joomla\CMS\...  /* joomla.profiler.profiler */; // TODO: add use statement at top
 $modfc_jprof = new \Joomla\CMS\Profiler\Profiler();
 $modfc_jprof->mark('START: FLEXIcontent Tags Cloud Module');
 
@@ -152,21 +152,21 @@ if ($add_ccs && $layout)
 		// Active module layout css (optional)
 		if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css'))
 		{
-			$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/modules/'.$modulename.'/tmpl/'.$layout.'/'.$layout.'.css', array('version' => FLEXI_VHASH));
+			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::base(true).'/modules/'.$modulename.'/tmpl/'.$layout.'/'.$layout.'.css', array('version' => FLEXI_VHASH));
 		}
 
 		// Module 's core CSS
-		$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/modules/'.$modulename.'/tmpl/'.$modulename.'.css', array('version' => FLEXI_VHASH));
+		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::base(true).'/modules/'.$modulename.'/tmpl/'.$modulename.'.css', array('version' => FLEXI_VHASH));
 
 		// Component CSS with optional override
-		$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
+		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		if (FLEXI_J40GE && file_exists(JPATH_SITE.DS.'media/templates/site'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css'))
 		{
-			$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/media/templates/site/'.$app->getTemplate().'/css/flexicontent.css', array('version' => FLEXI_VHASH));
+			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::base(true).'/media/templates/site/'.$app->getTemplate().'/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		}
 		elseif (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css'))
 		{
-			$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css');
+			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css');
 		}
 	}
 }

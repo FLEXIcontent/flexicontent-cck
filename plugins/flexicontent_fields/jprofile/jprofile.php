@@ -302,7 +302,7 @@ class plgFlexicontent_fieldsJProfile extends FCField
 			{
 				 jQuery('#' + tagid).on('show.bs.modal', function() {
 						 jQuery('body').addClass('modal-open');
-						 jQuery('.modalTooltip').each(function(){;
+						 jQuery('.modalTooltip')./* TODO-J5: each() removed */ current(function(){;
 								 var attr = jQuery(this).attr('data-placement');
 								 if ( attr === undefined || attr === false ) jQuery(this).attr('data-placement', 'auto-dir top-left')
 						 });
@@ -357,7 +357,7 @@ class plgFlexicontent_fieldsJProfile extends FCField
 		}
 
 		// Load \Joomla\CMS\Form\FormHelper
-		jimport('joomla.form.helper');
+		// jimport removed J5: use Joomla\CMS\...  /* joomla.form.helper */; // TODO: add use statement at top
 
 		// Load \Joomla\CMS\Form\Field\UserField
 		\Joomla\CMS\Form\FormHelper::loadFieldClass('user');
@@ -516,7 +516,7 @@ class plgFlexicontent_fieldsJProfile extends FCField
 		if (empty(static::$users))
 		{
 			$users = array();
-			jimport('joomla.user.helper');
+			// jimport removed J5: use Joomla\CMS\User\UserHelper; // TODO: add use statement at top
 			\Joomla\CMS\Factory::getLanguage()->load('com_users', JPATH_SITE, 'en-GB', $force_reload = false);
 			\Joomla\CMS\Factory::getLanguage()->load('com_users', JPATH_SITE, null, $force_reload = false);
 		}

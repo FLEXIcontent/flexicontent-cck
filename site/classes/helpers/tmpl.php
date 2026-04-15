@@ -58,10 +58,10 @@ class flexicontent_tmpl
 		static $initialized;
 		if ($initialized===null)
 		{
-			jimport('joomla.filesystem.path' );
-			jimport('joomla.filesystem.folder');
-			jimport('joomla.filesystem.file');
-			jimport('joomla.form.form');
+			// jimport removed J5: use Joomla\CMS\Filesystem\Path; // TODO: add use statement at top
+			// jimport removed J5: use Joomla\CMS\Filesystem\Folder; // TODO: add use statement at top
+			// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
+			// jimport removed J5: use Joomla\CMS\...  /* joomla.form.form */; // TODO: add use statement at top
 			$initialized = 1;
 		}
 		
@@ -265,8 +265,8 @@ class flexicontent_tmpl
 	
 	static function checkCompileLess($tmpls, $force, $checked_layouts=array())
 	{
-		jimport('joomla.filesystem.path' );
-		jimport('joomla.filesystem.file');
+		// jimport removed J5: use Joomla\CMS\Filesystem\Path; // TODO: add use statement at top
+		// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
 		
 		$templates_path = Path::clean(JPATH_SITE.DS.'components/com_flexicontent/templates/');
 		
@@ -288,7 +288,7 @@ class flexicontent_tmpl
 	
 	static function checkXmlModified($tmpls, $checked_layouts=array())
 	{
-		jimport('joomla.filesystem.file');
+		// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
 		
 		$checked_tmpls = array();
 		
@@ -478,7 +478,7 @@ class flexicontent_tmpl
 	
 	static function getThemes($tmpldir='')
 	{
-		jimport('joomla.filesystem.folder');
+		// jimport removed J5: use Joomla\CMS\Filesystem\Folder; // TODO: add use statement at top
 		$tmpldir = $tmpldir ? $tmpldir : JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates';
 		$themes = \Joomla\Filesystem\Folder::folders($tmpldir);  // Get specific template folder
 
