@@ -27,8 +27,6 @@ JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 
 #[AllowDynamicProperties]
 class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 {
-	/** @var mixed $canManage */
-	public mixed $canManage = null;
 
 
 	/**

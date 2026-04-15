@@ -1314,8 +1314,18 @@ class flexicontent_html
 			{
 				if (FLEXI_J40GE)
 				{
-					// J5/J6: use HTMLHelper to load Joomla's built-in jQuery UI
-					\Joomla\CMS\HTML\HTMLHelper::_('jquery.ui', array('core', 'sortable', 'draggable', 'droppable', 'resizable', 'autocomplete', 'dialog'));
+					// J5/J6: jQuery UI via Joomla WebAsset Manager
+					// Joomla 5/6 ships jQuery UI in media/vendor/jui/
+					$wa = $document->getWebAssetManager();
+					$jui_base = \Joomla\CMS\Uri\Uri::root(true) . '/media/vendor/jui/js/';
+					$jui_components = array('jquery.ui.core', 'jquery.ui.widget', 'jquery.ui.mouse',
+						'jquery.ui.sortable', 'jquery.ui.draggable', 'jquery.ui.droppable',
+						'jquery.ui.resizable', 'jquery.ui.autocomplete', 'jquery.ui.dialog',
+						'jquery.ui.position', 'jquery.ui.effect');
+					foreach ($jui_components as $jui_comp) {
+						$jui_file = $jui_base . $jui_comp . '.min.js';
+						$wa->registerAndUseScript($jui_comp, $jui_file, array(), array('defer' => true));
+					}
 				}
 				elseif (FLEXI_J30GE)
 				{

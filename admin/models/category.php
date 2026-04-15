@@ -27,8 +27,6 @@ require_once('base/traitnestable.php');
 #[AllowDynamicProperties]
 class FlexicontentModelCategory extends FCModelAdmin
 {
-	/** @var mixed $option */
-	public mixed $option = null;
 
 
 

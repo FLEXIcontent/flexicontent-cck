@@ -27,8 +27,6 @@ class FlexicontentModelType extends FCModelAdmin
 	public mixed $canCreate = null;
 	/** @var mixed $canManage */
 	public mixed $canManage = null;
-	/** @var mixed $option */
-	public mixed $option = null;
 
 
 	/**

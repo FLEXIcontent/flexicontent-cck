@@ -31,19 +31,7 @@ require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' .
 #[AllowDynamicProperties]
 class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 {
-		/** @var mixed $canManage */
-	public mixed $canManage = null;
-	/** @var mixed $err_locked_recs_changestate */
-	public mixed $err_locked_recs_changestate = null;
-	/** @var mixed $err_locked_recs_delete */
-	public mixed $err_locked_recs_delete = null;
-	/** @var mixed $msg_relations_deleted */
-	public mixed $msg_relations_deleted = null;
-	/** @var mixed $warn_locked_recs_skipped */
-	public mixed $warn_locked_recs_skipped = null;
-	/** @var mixed $warn_noauth_recs_skipped */
-	public mixed $warn_noauth_recs_skipped = null;
-
+	
 var $records_dbtbl  = 'flexicontent_fields';
 	var $records_jtable = 'flexicontent_fields';
 

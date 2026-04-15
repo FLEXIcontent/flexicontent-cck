@@ -29,8 +29,6 @@ require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' .
 #[AllowDynamicProperties]
 class FlexicontentControllerGroups extends FlexicontentControllerBaseAdmin
 {
-	/** @var mixed $canManage */
-	public mixed $canManage = null;
 
 
 
