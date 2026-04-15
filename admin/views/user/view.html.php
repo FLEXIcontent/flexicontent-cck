@@ -26,8 +26,6 @@ class FlexicontentViewUser extends FlexicontentViewBaseRecord
 	public mixed $contact = null;
 	/** @var mixed $cparams */
 	public mixed $cparams = null;
-	/** @var mixed $document */
-	public mixed $document = null;
 	/** @var mixed $form */
 	public mixed $form = null;
 	/** @var mixed $iparams */

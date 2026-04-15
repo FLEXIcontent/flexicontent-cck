@@ -26,8 +26,6 @@ class FlexicontentViewType extends FlexicontentViewBaseRecord
 	public mixed $controller = null;
 	/** @var mixed $cparams */
 	public mixed $cparams = null;
-	/** @var mixed $document */
-	public mixed $document = null;
 	/** @var mixed $form */
 	public mixed $form = null;
 	/** @var mixed $perms */

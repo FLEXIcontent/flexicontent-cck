@@ -20,8 +20,6 @@ class flexicontent_tags extends flexicontent_basetable
 {
 	/** @var mixed $_NAME */
 	public mixed $_NAME = null;
-	/** @var mixed $_errors */
-	public mixed $_errors = null;
 	/** @var mixed $_records_dbtbl */
 	public mixed $_records_dbtbl = null;
 	/** @var mixed $_tbl_fields */

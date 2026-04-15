@@ -1303,60 +1303,21 @@ class flexicontent_html
 		if ($add_jquery_ui && !$jquery_ui_added)
 		{
 			// Load all components of jQuery-UI (add and "override" it)
-			if ($add_remote_forced_jquery_ui)
-			{
-				!FLEXI_J40GE
-					? \Joomla\CMS\HTML\HTMLHelper::_('jquery.ui', array())
-					: false;
-				$document->getWebAssetManager()->registerAndUseScript('min', '//code.jquery.com/ui/'.$JQUERY_UI_VER.'/jquery-ui.min.js');
-			}
-			else
-			{
-				if (FLEXI_J40GE)
-				{
-					// J5/J6: jQuery UI via Joomla WebAsset Manager
-					// Joomla 5/6 ships jQuery UI in media/vendor/jui/
-					$wa = $document->getWebAssetManager();
-					$jui_base = \Joomla\CMS\Uri\Uri::root(true) . '/media/vendor/jui/js/';
-					$jui_components = array('jquery.ui.core', 'jquery.ui.widget', 'jquery.ui.mouse',
-						'jquery.ui.sortable', 'jquery.ui.draggable', 'jquery.ui.droppable',
-						'jquery.ui.resizable', 'jquery.ui.autocomplete', 'jquery.ui.dialog',
-						'jquery.ui.position', 'jquery.ui.effect');
-					foreach ($jui_components as $jui_comp) {
-						$jui_file = $jui_base . $jui_comp . '.min.js';
-						$wa->registerAndUseScript($jui_comp, $jui_file, array(), array('defer' => true));
-					}
-				}
-				elseif (FLEXI_J30GE)
-				{
-					\Joomla\CMS\HTML\HTMLHelper::_('jquery.ui', array('core', 'sortable'));   // 'core' in J3+ includes all parts of jQuery-UI CORE component: Core, Widget, Mouse, Position
-					if ( !$params || $params->get('load-ui-dialog', 1) )        $document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.dialog.min.js');
-					if ( !$params || $params->get('load-ui-menu', 1) )          $document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.menu.min.js');
-					if ( !$params || $params->get('load-ui-autocomplete', 1) )  $document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.autocomplete.min.js');
-					if ( !$params || $params->get('load-ui-progressbar', 1) )   $document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.progressbar.min.js');
-				}
-				else
-				{
-					$document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/jquery/js/jquery-ui-'.$JQUERY_UI_VER.'.js');
-				}
-			}
-
-			$jquery_ui_added = 1;
-		}
-
-		// Add jQuery UI theme, this is included in J3+ when executing jQuery-UI framework is called
-		if ( $add_jquery_ui_css && !$jquery_ui_css_added )
-		{
-			// FLEXI_JQUERY_UI_CSS_STYLE:  'ui-lightness', 'smoothness', ...
 			if ($add_remote_forced_jquery_ui) {
-				// Remote CDN jQuery UI CSS
 				$document->getWebAssetManager()->registerAndUseStyle('jquery-ui-cdn',
 					'https://code.jquery.com/ui/'.$JQUERY_UI_VER.'/themes/'.$JQUERY_UI_THEME.'/jquery-ui.css');
 			} elseif (FLEXI_J40GE) {
-				// J5/J6: jQuery UI CSS is loaded automatically by HTMLHelper::_('jquery.ui') above
+				// J5/J6: CSS comes with jQuery UI CDN fallback above or Joomla vendor
+				$wa = $document->getWebAssetManager();
+				if ($wa->assetExists('style', 'jquery-ui-theme')) {
+					$wa->useStyle('jquery-ui-theme');
+				} elseif (!$wa->assetExists('script', 'jquery-ui-sortable')) {
+					// CDN CSS for fallback case
+					$wa->registerAndUseStyle('jquery-ui-theme-cdn',
+						'https://code.jquery.com/ui/1.13.2/themes/smoothness/jquery-ui.css');
+				}
 			} else {
-				// Legacy J3: load local CSS file
-				$document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/jquery/css/'.$JQUERY_UI_THEME.'/jquery-ui-'.$JQUERY_UI_VER.'.css');
+				$document->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).$lib_path.'/jquery/css/'.$JQUERY_UI_THEME.'/jquery-ui-'.$JQUERY_UI_VER.'.css');
 			}
 			$jquery_ui_css_added = 1;
 		}

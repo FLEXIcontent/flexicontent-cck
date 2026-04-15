@@ -38,8 +38,6 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 	public mixed $captcha_field = null;
 	/** @var mixed $current_page */
 	public mixed $current_page = null;
-	/** @var mixed $document */
-	public mixed $document = null;
 	/** @var mixed $fields */
 	public mixed $fields = null;
 	/** @var mixed $form */
