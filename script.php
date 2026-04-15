@@ -489,9 +489,9 @@ class com_flexicontentInstallerScript
 		);*/
 
 		echo FLEXI_J40GE
-			? '<link type="text/css" href="components/com_flexicontent/assets/css/j3x.css" rel="stylesheet">'
-			: '<link type="text/css" href="components/com_flexicontent/assets/css/j4x.css" rel="stylesheet">';
-		echo '<link type="text/css" href="components/com_flexicontent/assets/css/flexicontentbackend.css" rel="stylesheet">';
+			? '<link type="text/css" href="administrator/components/com_flexicontent/assets/css/j3x.css" rel="stylesheet">'
+			: '<link type="text/css" href="administrator/components/com_flexicontent/assets/css/j4x.css" rel="stylesheet">';
+		echo '<link type="text/css" href="administrator/components/com_flexicontent/assets/css/flexicontentbackend.css" rel="stylesheet">';
 
 		//echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.startAccordion', 'upgrade-tasks', array());
 		//echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addSlide', 'upgrade-tasks', \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_LOG') . ' : ' . \Joomla\CMS\Language\Text::_( 'COM_FLEXICONTENT_UPGRADE_TASKS' ), 'upgrade-tasks-slide0' );
@@ -1558,8 +1558,8 @@ class com_flexicontentInstallerScript
 
 		// Extra CSS needed for J3.x+
 		echo FLEXI_J40GE
-			? '<link type="text/css" href="components/com_flexicontent/assets/css/j3x.css" rel="stylesheet">'
-			: '<link type="text/css" href="components/com_flexicontent/assets/css/j4x.css" rel="stylesheet">';
+			? '<link type="text/css" href="administrator/components/com_flexicontent/assets/css/j3x.css" rel="stylesheet">'
+			: '<link type="text/css" href="administrator/components/com_flexicontent/assets/css/j4x.css" rel="stylesheet">';
 
 		// Installed component manifest file version
 		$this->release = $parent->getManifest()->version;

@@ -163,11 +163,11 @@ var $proxy_option   = 'com_categories';
 			if ($isAdmin)
 			{
 				!\Joomla\CMS\Factory::getLanguage()->isRtl()
-					? /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexicontentbackend', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
-					: /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexicontentbackend_rtl', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
+					? /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexicontentbackend', \Joomla\CMS\Uri\Uri::root().'administrator/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
+					: /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexicontentbackend_rtl', \Joomla\CMS\Uri\Uri::root().'administrator/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
 				!\Joomla\CMS\Factory::getLanguage()->isRtl()
-					? /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
-					: /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
+					? /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::root().'administrator/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
+					: /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::root().'administrator/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 			}
 			else
 			{
@@ -184,8 +184,8 @@ var $proxy_option   = 'com_categories';
 			\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip');
 
 			// Add js function to overload the joomla submitform validation
-			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-admin', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
-			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-validate', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
+			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-admin', \Joomla\CMS\Uri\Uri::root().'administrator/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
+			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-validate', \Joomla\CMS\Uri\Uri::root().'administrator/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
 		}
 
 
