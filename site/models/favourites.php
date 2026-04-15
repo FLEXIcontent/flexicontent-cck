@@ -215,7 +215,7 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 		// Load the content if it doesn't already exist
 		if (empty($this->_pagination))
 		{
-			//			require_once (JPATH_COMPONENT.DS.'helpers'.DS.'pagination.php');
+			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'pagination.php');
 			$this->_pagination = new FCPagination($this->getTotal(), $this->getState('limitstart'), $this->getState('limit') );
 		}
 

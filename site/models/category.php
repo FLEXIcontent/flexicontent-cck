@@ -490,7 +490,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			$limit = (int) $this->getState('limit');
 			$limitstart = (int) $this->getState('limitstart');
 
-			//			require_once (JPATH_COMPONENT.DS.'helpers'.DS.'pagination.php');
+			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'pagination.php');
 			$this->_pagination = new FCPagination($this->getTotal(), $limitstart, $limit);
 		}
 		return $this->_pagination;
