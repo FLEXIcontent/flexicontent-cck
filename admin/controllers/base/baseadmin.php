@@ -45,8 +45,6 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 	public mixed $refererURL = null;
 	/** @var mixed $returnURL */
 	public mixed $returnURL = null;
-	/** @var mixed $task */
-	public mixed $task = null;
 	/** @var mixed $view */
 	public mixed $view = null;
 	/** @var mixed $warn_locked_recs_skipped */
