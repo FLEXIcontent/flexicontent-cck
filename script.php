@@ -446,6 +446,16 @@ class com_flexicontentInstallerScript
 	*/
 	function postflight( $type, $parent )
 	{
+		// Check max_input_vars
+		$max_iv = (int) ini_get('max_input_vars');
+		if ($max_iv < 3000) {
+			\Joomla\CMS\Factory::getApplication()->enqueueMessage(
+				'<strong>FLEXIcontent:</strong> PHP <code>max_input_vars</code> = ' . $max_iv .
+				'. Please set it to <strong>5000+</strong> in php.ini.',
+				'warning'
+			);
+		}
+
 		// Only execute during install / update not during uninstallation (J4 will run post flight during uninstall too)
 		if ($type != 'install' && $type != 'update')
 		{

@@ -15,6 +15,7 @@
 	<!-- The description is optional and defaults to the name -->
 	<description>COM_FLEXICONTENT_DESCRIPTION</description>
 	<!-- Compatibility: Joomla 4.4+ / 5.x / 6.x · PHP 8.1-8.4 -->
+	<!-- Requires: max_input_vars >= 5000 in php.ini -->
 	
 	<!-- Runs on install/uninstall/update -->
 	<scriptfile>script.php</scriptfile>
