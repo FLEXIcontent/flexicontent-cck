@@ -1310,9 +1310,17 @@ class flexicontent_html
 			else
 			{
 				if (FLEXI_J40GE)
-				{
-					/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/jquery/js/jquery-ui-'.$JQUERY_UI_VER.'/jquery-ui.min.js');
-				}
+			{
+				// J5/J6: use Joomla's built-in jQuery UI vendor asset (available in media/vendor/jui/)
+				$wa = $document->getWebAssetManager();
+				$wa->useScript('jquery-ui.core');
+				$wa->useScript('jquery-ui.sortable');
+				$wa->useScript('jquery-ui.draggable');
+				$wa->useScript('jquery-ui.droppable');
+				$wa->useScript('jquery-ui.resizable');
+				$wa->useScript('jquery-ui.autocomplete');
+				$wa->useScript('jquery-ui.dialog');
+			}
 				elseif (FLEXI_J30GE)
 				{
 					\Joomla\CMS\HTML\HTMLHelper::_('jquery.ui', array('core', 'sortable'));   // 'core' in J3+ includes all parts of jQuery-UI CORE component: Core, Widget, Mouse, Position

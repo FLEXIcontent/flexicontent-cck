@@ -62,6 +62,7 @@ if (!defined('FLEXI_J37GE'))   define('FLEXI_J37GE', version_compare( $jversion-
 if (!defined('FLEXI_J38GE'))   define('FLEXI_J38GE', version_compare( $jversion->getShortVersion(), '3.7.99', '>' ) );
 if (!defined('FLEXI_J40GE'))   define('FLEXI_J40GE', version_compare( $jversion->getShortVersion(), '3.99.99', '>' ) );
 if (!defined('FLEXI_J50GE'))   define('FLEXI_J50GE', version_compare( $jversion->getShortVersion(), '4.99.99', '>' ) );
+if (!defined('FLEXI_J60GE'))   define('FLEXI_J60GE', version_compare( $jversion->getShortVersion(), '5.99.99', '>' ) );
 
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 
