@@ -256,9 +256,32 @@ if ($format === 'html')
 		// J3.0+ tooltips (bootstrap based)
 		\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip');
 	}
-	// Add flexi-lib JS
-	\Joomla\CMS\Factory::getDocument()->addScript(\Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/flexi-lib.js', array('version' => FLEXI_VHASH));  // Frontend/backend script
-	\Joomla\CMS\Factory::getDocument()->addScript(\Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/flexi-lib.js', array('version' => FLEXI_VHASH));  // Backend only script
+	// Add flexi-lib JS — must load AFTER jQuery UI
+	// Use WebAssetManager so jQuery UI CDN loads first via proper ordering
+	$wa = \Joomla\CMS\Factory::getDocument()->getWebAssetManager();
+	// Register jQuery UI first, then flexi-lib with explicit dependency
+	if (FLEXI_J40GE) {
+		// jQuery UI CDN — registerAndUseScript ensures it appears in <head>
+		$wa->registerAndUseScript(
+			'jquery-ui',
+			'https://code.jquery.com/ui/1.13.2/jquery-ui.min.js',
+			array('version' => '1.13.2'),
+			array()
+		);
+		// jQuery UI CSS
+		$wa->registerAndUseStyle(
+			'jquery-ui-theme',
+			'https://code.jquery.com/ui/1.13.2/themes/smoothness/jquery-ui.min.css'
+		);
+	}
+	// flexi-lib depends on jquery-ui → WAM guarantees load order
+	$wa->registerAndUseScript(
+		'flexi-lib',
+		\Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/flexi-lib.js',
+		array('version' => FLEXI_VHASH),
+		array(),
+		FLEXI_J40GE ? array('jquery-ui') : array()
+	);
 
 	// Validate when Joomla.submitForm() is called, NOTE: for non-FC views this is done before the method is called
 	$js = '

@@ -1302,15 +1302,40 @@ class flexicontent_html
 
 		if ($add_jquery_ui && !$jquery_ui_added)
 		{
-			// Load all components of jQuery-UI (add and "override" it)
-						if ($add_remote_forced_jquery_ui || FLEXI_J40GE) {
-				// J5/J6: jQuery UI CSS from CDN (matches JS version above)
-				$jui_css_theme = FLEXI_J40GE ? 'smoothness' : $JQUERY_UI_THEME;
-				$jui_css_ver   = FLEXI_J40GE ? '1.13.2' : $JQUERY_UI_VER;
+			if (FLEXI_J40GE)
+			{
+				// J5/J6: Load jQuery UI 1.13.2 full bundle from CDN
+				// Must load BEFORE flexi-lib.js which calls .dialog()/.sortable()
+				$document->getWebAssetManager()->registerAndUseScript(
+					'jquery-ui',
+					'https://code.jquery.com/ui/1.13.2/jquery-ui.min.js',
+					array('version' => '1.13.2')
+				);
+			}
+			else
+			{
+				// Legacy J3: remote CDN or local
+				if ($add_remote_forced_jquery_ui) {
+					$document->getWebAssetManager()->registerAndUseScript('min',
+						'//code.jquery.com/ui/'.$JQUERY_UI_VER.'/jquery-ui.min.js');
+				} else {
+					\Joomla\CMS\HTML\HTMLHelper::_('jquery.ui', array('core', 'sortable', 'dialog', 'draggable', 'resizable', 'autocomplete'));
+				}
+			}
+			$jquery_ui_added = 1;
+		}
+
+		// jQuery UI CSS
+		if ($add_jquery_ui_css && !$jquery_ui_css_added)
+		{
+			if (FLEXI_J40GE) {
 				$document->getWebAssetManager()->registerAndUseStyle(
 					'jquery-ui-theme',
-					'https://code.jquery.com/ui/' . $jui_css_ver . '/themes/' . $jui_css_theme . '/jquery-ui.min.css'
+					'https://code.jquery.com/ui/1.13.2/themes/smoothness/jquery-ui.min.css'
 				);
+			} elseif ($add_remote_forced_jquery_ui) {
+				$document->getWebAssetManager()->registerAndUseStyle('jquery-ui-cdn',
+					'//code.jquery.com/ui/'.$JQUERY_UI_VER.'/themes/'.$JQUERY_UI_THEME.'/jquery-ui.css');
 			} else {
 				$document->addStyleSheet(\Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/librairies/jquery/css/'.$JQUERY_UI_THEME.'/jquery-ui-'.$JQUERY_UI_VER.'.css');
 			}
@@ -2018,7 +2043,28 @@ class flexicontent_html
 
 				$js .= "";
 
-				$document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/flexi-lib.js', array('version' => FLEXI_VHASH));
+				// Load jQuery UI CDN THEN flexi-lib with explicit dependency
+				if (FLEXI_J40GE) {
+					// Step 1: Register+Use jQuery UI (will appear before flexi-lib in output)
+					$document->getWebAssetManager()->registerAndUseScript(
+						'jquery-ui',
+						'https://code.jquery.com/ui/1.13.2/jquery-ui.min.js',
+						array('version' => '1.13.2'),
+						array()
+					);
+					// Step 2: Register+Use flexi-lib (dependency ensures order)
+					$document->getWebAssetManager()->registerAndUseScript(
+						'flexi-lib',
+						\Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/flexi-lib.js',
+						array('version' => FLEXI_VHASH),
+						array(),
+						array('jquery-ui')
+					);
+				} else {
+					$document->getWebAssetManager()->registerAndUseScript('fc-script',
+						\Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/flexi-lib.js',
+						array('version' => FLEXI_VHASH));
+				}
 				\Joomla\CMS\Language\Text::script("FLEXI_NOT_AN_IMAGE_FILE", true);
 				\Joomla\CMS\Language\Text::script("FLEXI_IMAGE", true);
 				\Joomla\CMS\Language\Text::script('FLEXI_LOADING_IMAGES',true);
