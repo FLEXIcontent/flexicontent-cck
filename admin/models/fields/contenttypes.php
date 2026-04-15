@@ -28,12 +28,6 @@ use Joomla\Utilities\ArrayHelper;
 #[AllowDynamicProperties]
 class JFormFieldContenttypes extends JFormFieldList
 {
-	/** @var mixed $label */
-	public mixed $label = null;
-	/** @var mixed $name */
-	public mixed $name = null;
-	/** @var mixed $value */
-	public mixed $value = null;
 
 	/**
 	 * The form field type.

@@ -316,9 +316,9 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			header("Pragma: no-cache");
 
 			$rtl_sfx = !\Joomla\CMS\Factory::getLanguage()->isRtl() ? '' : '_rtl';
-			$fc_css = \Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x' . $rtl_sfx . '.css' : 'j3x' . $rtl_sfx . '.css');
+			$fc_css = \Joomla\CMS\Uri\Uri::root() . 'components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x' . $rtl_sfx . '.css' : 'j3x' . $rtl_sfx . '.css');
 			echo '
-			<link rel="stylesheet" href="' . \Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/css/flexicontentbackend.css?' . FLEXI_VHASH . '" />
+			<link rel="stylesheet" href="' . \Joomla\CMS\Uri\Uri::root() . 'components/com_flexicontent/assets/css/flexicontentbackend.css?' . FLEXI_VHASH . '" />
 			<link rel="stylesheet" href="' . $fc_css . '?' . FLEXI_VHASH . '" />
 			<link rel="stylesheet" href="' . \Joomla\CMS\Uri\Uri::root(true) . '/media/jui/css/bootstrap.min.css" />
 			';

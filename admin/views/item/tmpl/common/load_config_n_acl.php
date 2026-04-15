@@ -272,7 +272,7 @@ if ($tags_editable || (!$isSite && $this->perms['canversion']))
 					//window.console.log(jQuery('#jform_language').val());
 
 					jQuery.ajax({
-						url: '".\Joomla\CMS\Uri\Uri::base(true)."/components/com_flexicontent/tasks/core.php?". \Joomla\CMS\Session\Session::getFormToken() ."=1',
+						url: '".\Joomla\CMS\Uri\Uri::root()."components/com_flexicontent/tasks/core.php?". \Joomla\CMS\Session\Session::getFormToken() ."=1',
 						dataType: 'json',
 						data: {
 							q: term,

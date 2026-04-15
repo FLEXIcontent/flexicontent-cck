@@ -1303,21 +1303,16 @@ class flexicontent_html
 		if ($add_jquery_ui && !$jquery_ui_added)
 		{
 			// Load all components of jQuery-UI (add and "override" it)
-			if ($add_remote_forced_jquery_ui) {
-				$document->getWebAssetManager()->registerAndUseStyle('jquery-ui-cdn',
-					'https://code.jquery.com/ui/'.$JQUERY_UI_VER.'/themes/'.$JQUERY_UI_THEME.'/jquery-ui.css');
-			} elseif (FLEXI_J40GE) {
-				// J5/J6: CSS comes with jQuery UI CDN fallback above or Joomla vendor
-				$wa = $document->getWebAssetManager();
-				if ($wa->assetExists('style', 'jquery-ui-theme')) {
-					$wa->useStyle('jquery-ui-theme');
-				} elseif (!$wa->assetExists('script', 'jquery-ui-sortable')) {
-					// CDN CSS for fallback case
-					$wa->registerAndUseStyle('jquery-ui-theme-cdn',
-						'https://code.jquery.com/ui/1.13.2/themes/smoothness/jquery-ui.css');
-				}
+						if ($add_remote_forced_jquery_ui || FLEXI_J40GE) {
+				// J5/J6: jQuery UI CSS from CDN (matches JS version above)
+				$jui_css_theme = FLEXI_J40GE ? 'smoothness' : $JQUERY_UI_THEME;
+				$jui_css_ver   = FLEXI_J40GE ? '1.13.2' : $JQUERY_UI_VER;
+				$document->getWebAssetManager()->registerAndUseStyle(
+					'jquery-ui-theme',
+					'https://code.jquery.com/ui/' . $jui_css_ver . '/themes/' . $jui_css_theme . '/jquery-ui.min.css'
+				);
 			} else {
-				$document->addStyleSheet(\Joomla\CMS\Uri\Uri::root().$lib_path.'/jquery/css/'.$JQUERY_UI_THEME.'/jquery-ui-'.$JQUERY_UI_VER.'.css');
+				$document->addStyleSheet(\Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/librairies/jquery/css/'.$JQUERY_UI_THEME.'/jquery-ui-'.$JQUERY_UI_VER.'.css');
 			}
 			$jquery_ui_css_added = 1;
 		}
@@ -5170,7 +5165,7 @@ class flexicontent_html
 			$state_ids[] = -2;  // trashed
 			$state_colors= array(1=>'darkgreen', -5=>'darkgreen', 0=>'darkred', -3=>'darkred', -4=>'darkred', 2=>'darkblue', -2=>'gray');
 
-			$img_path = \Joomla\CMS\Uri\Uri::root()."/components/com_flexicontent/assets/images/";
+			$img_path = \Joomla\CMS\Uri\Uri::root()."components/com_flexicontent/assets/images/";
 
 			$list = '<div class="group-fcset fc_input_set">';
 

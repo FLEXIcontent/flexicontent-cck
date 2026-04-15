@@ -456,7 +456,7 @@ if ($leadnum) :
 					$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 
 					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  \Joomla\CMS\Uri\Uri::base(true).'/' : '';
-					$item->image = \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+					$item->image = \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 
 					$item->image_w = $this->params->get('lead_width', 200);
 					$item->image_h = $this->params->get('lead_height', 200);
@@ -993,7 +993,7 @@ if ($count > $leadnum) :
 					$conf	= $w . $h . $aoe . $q . $zc . $f;
 
 					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  \Joomla\CMS\Uri\Uri::base(true).'/' : '';
-					$item->image = \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+					$item->image = \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 
 					$item->image_w = $this->params->get('intro_width', 200);
 					$item->image_h = $this->params->get('intro_height', 200);

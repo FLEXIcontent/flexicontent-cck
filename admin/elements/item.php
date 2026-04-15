@@ -35,8 +35,6 @@ Table::addIncludePath(JPATH_ADMINISTRATOR.'/components/com_flexicontent/tables')
 #[AllowDynamicProperties]
 class JFormFieldItem extends FormField
 {
-	/** @var mixed $value */
-	public mixed $value = null;
 
 
 	/**

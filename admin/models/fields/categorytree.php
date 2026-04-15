@@ -28,8 +28,6 @@ use Joomla\Utilities\ArrayHelper;
 #[AllowDynamicProperties]
 class JFormFieldCategorytree extends JFormFieldList
 {
-	/** @var mixed $value */
-	public mixed $value = null;
 
 	/**
 	 * The form field type.

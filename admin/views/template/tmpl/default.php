@@ -152,7 +152,7 @@ if (!$use_editor)  $app->enqueueMessage(\Joomla\CMS\Language\Text::_('Codemirror
 </script>
 
 <?php
-/* J5/J6 WebAsset: */ $this->document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/js/layout_editor.js', array('version' => FLEXI_VHASH));
+/* J5/J6 WebAsset: */ $this->document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/layout_editor.js', array('version' => FLEXI_VHASH));
 ?>
 
 <div id="flexicontent" class="flexicontent fcconfig-form">
