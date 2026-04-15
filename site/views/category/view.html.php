@@ -19,7 +19,7 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-use Joomla\CMS\Filesystem\File;
+use Joomla\Filesystem\File;
 use Joomla\CMS\Language\Text;
 use Joomla\String\StringHelper;
 use Joomla\CMS\Component\ComponentHelper;

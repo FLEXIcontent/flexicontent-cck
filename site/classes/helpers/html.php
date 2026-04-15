@@ -1,9 +1,8 @@
 <?php
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-use Joomla\CMS\Filesystem\File;
-use Joomla\CMS\Filesystem\Folder;
-use Joomla\CMS\Filesystem\Path;
+use Joomla\Filesystem\File;
+use Joomla\Filesystem\Folder;
 use Joomla\CMS\Mail\MailHelper;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;

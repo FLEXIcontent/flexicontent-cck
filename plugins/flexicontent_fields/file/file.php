@@ -9,8 +9,8 @@
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-use Joomla\CMS\Filesystem\Folder;
-use Joomla\CMS\Filesystem\Path;
+use Joomla\Filesystem\Folder;
+use Joomla\Filesystem\Path;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Uri\Uri;

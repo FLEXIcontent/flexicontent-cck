@@ -12,7 +12,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 use Joomla\CMS\Date\Date;
-use Joomla\CMS\Filesystem\Path;
+use Joomla\Filesystem\Path;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\Component\Categories\Administrator\Helper\CategoriesHelper;

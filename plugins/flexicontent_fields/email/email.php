@@ -10,7 +10,7 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-use Joomla\CMS\Filesystem\File;
+use Joomla\Filesystem\File;
 use Joomla\CMS\Mail\MailerFactoryInterface;
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 

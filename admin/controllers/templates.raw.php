@@ -11,7 +11,7 @@
 
 defined('_JEXEC') or die;
 
-use Joomla\CMS\Filesystem\File;
+use Joomla\Filesystem\File;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 

@@ -1,6 +1,6 @@
 <?php
-use Joomla\CMS\Filesystem\File;
-use Joomla\CMS\Filesystem\Folder;
+use Joomla\Filesystem\File;
+use Joomla\Filesystem\Folder;
 
 /**
  * @package   	JCE

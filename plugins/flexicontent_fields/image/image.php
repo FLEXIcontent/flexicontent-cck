@@ -10,9 +10,6 @@
  */
 
 use Joomla\CMS\Date\Date;
-use Joomla\CMS\Filesystem\File;
-use Joomla\CMS\Filesystem\Folder;
-use Joomla\CMS\Filesystem\Path;
 use Joomla\CMS\Form\FormHelper;
 use Joomla\CMS\Log\Log;
 use Joomla\CMS\Component\ComponentHelper;

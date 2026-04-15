@@ -11,8 +11,8 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-use Joomla\CMS\Filesystem\File;
-use Joomla\CMS\Filesystem\Folder;
+use Joomla\Filesystem\File;
+use Joomla\Filesystem\Folder;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 

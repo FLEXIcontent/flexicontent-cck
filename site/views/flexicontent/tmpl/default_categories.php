@@ -1,5 +1,5 @@
 <?php
-use Joomla\CMS\Filesystem\File;
+use Joomla\Filesystem\File;
 /**
  * @version 1.5 stable $Id: default_categories.php 1764 2013-09-16 08:00:21Z ggppdk $
  * @package Joomla

@@ -11,8 +11,8 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-use Joomla\CMS\Filesystem\File;
-use Joomla\CMS\Filesystem\Path;
+use Joomla\Filesystem\File;
+use Joomla\Filesystem\Path;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;

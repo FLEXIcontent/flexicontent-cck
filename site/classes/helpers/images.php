@@ -1,6 +1,6 @@
 <?php
-use Joomla\CMS\Filesystem\File;
-use Joomla\CMS\Filesystem\Path;
+use Joomla\Filesystem\File;
+use Joomla\Filesystem\Path;
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 class flexicontent_images

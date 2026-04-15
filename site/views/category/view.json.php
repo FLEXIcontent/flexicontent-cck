@@ -1,5 +1,5 @@
 <?php
-use Joomla\CMS\Filesystem\File;
+use Joomla\Filesystem\File;
 /**
  * @version 1.5 stable $Id: view.html.php 1959 2014-09-18 00:15:15Z ggppdk $
  * @package Joomla

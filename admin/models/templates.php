@@ -1,5 +1,5 @@
 <?php
-use Joomla\CMS\Filesystem\Folder;
+use Joomla\Filesystem\Folder;
 /**
  * @package         FLEXIcontent
  * @version         3.3
