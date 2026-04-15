@@ -3336,7 +3336,7 @@ class FlexicontentModelItems extends FCModelAdminList
 
 	function import()
 	{
-		// jimport removed J5: use Joomla\CMS\...  /* joomla.utilities.simplexml */; // TODO: add use statement at top  // Deprecated J2.5, removed J3.x
+	// TODO-J5: jimport("joomla.utilities.simplexml") — find J5 equivalent
 		// Get the site default language
 		$lang = flexicontent_html::getSiteDefaultLang();
 

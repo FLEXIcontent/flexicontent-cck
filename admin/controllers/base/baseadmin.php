@@ -11,6 +11,7 @@
 
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Log\Log;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
@@ -202,7 +203,6 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 			if (!empty($this->exitLogTexts))
 			{
 				$log_filename = 'filemanager_upload_' . ($user->id) . '.php';
-				// jimport removed J5: use Joomla\CMS\...  /* joomla.log.log */; // TODO: add use statement at top
 				\Joomla\CMS\Log\Log::addLogger(
 					array(
 						'text_file' => $log_filename,  // Sets the target log file

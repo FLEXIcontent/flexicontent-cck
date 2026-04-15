@@ -1,4 +1,6 @@
 <?php
+use Joomla\CMS\Filesystem\File;
+use Joomla\CMS\Filesystem\Folder;
 
 /**
  * @package   	JCE
@@ -26,8 +28,6 @@ class WFLinkBrowser_Flexicontentlinks {
 	* @access	protected
 	*/
 	public function __construct($options = array()) {
-		// jimport removed J5: use Joomla\CMS\Filesystem\Folder; // TODO: add use statement at top
-		// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
 
 		$path = dirname( __FILE__ ) . '/flexicontentlinks';
 

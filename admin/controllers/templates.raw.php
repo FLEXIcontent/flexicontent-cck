@@ -11,6 +11,7 @@
 
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Filesystem\File;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
@@ -161,7 +162,6 @@ var $records_dbtbl = 'flexicontent_templates';
 			jexit(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'));
 		}
 
-		// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
 		$app  = \Joomla\CMS\Factory::getApplication();
 		$user = \Joomla\CMS\Factory::getUser();
 		$db   = \Joomla\CMS\Factory::getDbo();
@@ -602,7 +602,6 @@ var $records_dbtbl = 'flexicontent_templates';
 			jexit(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'));
 		}
 
-		// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
 		$app  = \Joomla\CMS\Factory::getApplication();
 		$user = \Joomla\CMS\Factory::getUser();
 
@@ -717,7 +716,6 @@ var $records_dbtbl = 'flexicontent_templates';
 			jexit(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'));
 		}
 
-		// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
 		$app  = \Joomla\CMS\Factory::getApplication();
 		$user = \Joomla\CMS\Factory::getUser();
 

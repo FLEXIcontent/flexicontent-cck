@@ -12,8 +12,12 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
-// jimport removed J5: use Joomla\CMS\...  /* legacy.model.legacy */; // TODO: add use statement at top
-// jimport removed J5: use Joomla\CMS\...  /* joomla.access.rules */; // TODO: add use statement at top
+	// TODO-J5: jimport("legacy.model.legacy") — find J5 equivalent
+use Joomla\CMS\Access\Rules;
+use Joomla\CMS\Filesystem\Archive;
+use Joomla\CMS\Filesystem\File;
+use Joomla\CMS\Filesystem\Folder;
+use Joomla\CMS\Filesystem\Path;
 use Joomla\String\StringHelper;
 use Joomla\CMS\Factory;
 use Joomla\Filesystem\Path;
@@ -650,9 +654,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 	// Check and if needed install 3rd party plugins that do not use Joomla plugin system
 	function install_3rdParty_plugins()
 	{
-		// jimport removed J5: use Joomla\CMS\Filesystem\Path; // TODO: add use statement at top
-		// jimport removed J5: use Joomla\CMS\Filesystem\Folder; // TODO: add use statement at top
-		// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
 
 		// ****************************
 		// Handle jcomments integration
@@ -1017,7 +1018,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		static $missing;
 		if ($missing !== NULL) return $check_only ? empty($missing) : $missing;
 
-		// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
 		$app = Factory::getApplication();
 		$dbprefix = $app->getCfg('dbprefix');
 		$dbname   = $app->getCfg('db');
@@ -1214,9 +1214,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		static $return;
 		if ($return!==null) return $return;
 
-		// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
-		// jimport removed J5: use Joomla\CMS\Filesystem\Folder; // TODO: add use statement at top
-		// jimport removed J5: use Joomla\CMS\Filesystem\Path; // TODO: add use statement at top
 
 		$conf_override_file = Path::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'phpThumb.config_OVERRIDE.php');
 
@@ -1305,8 +1302,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 
 		$finished = false;
 
-		// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
-		// jimport removed J5: use Joomla\CMS\Filesystem\Folder; // TODO: add use statement at top
 
 		$deprecated['files'] = array();
 		$deprecated['folders'] = array();
@@ -1817,7 +1812,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 
 	function createLanguagePack($code = 'en-GB', $method = '', $params = array())
 	{
-		// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
 
 		$prefix 	= $code . '.';
 		$suffix 	= '.ini';
@@ -1972,7 +1966,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 				$files[$i]['time'] = time();
 			}
 
-			// jimport removed J5: use Joomla\CMS\...  /* joomla.archive.archive */; // TODO: add use statement at top
 			$packager = JArchive::getAdapter('zip');
 			if (!$packager->create($archivename, $files)) {
 				echo \Joomla\CMS\Language\Text::_('FLEXI_OPERATION_FAILED');

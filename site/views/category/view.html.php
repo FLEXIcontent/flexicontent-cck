@@ -19,9 +19,9 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-// jimport removed J5: use Joomla\CMS\...  /* legacy.view.legacy */; // TODO: add use statement at top
-// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
+	// TODO-J5: jimport("legacy.view.legacy") — find J5 equivalent
 
+use Joomla\CMS\Filesystem\File;
 use Joomla\CMS\Language\Text;
 use Joomla\String\StringHelper;
 use Joomla\CMS\Component\ComponentHelper;

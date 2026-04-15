@@ -15,7 +15,7 @@ use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
 // Import parent controller
-// jimport removed J5: use Joomla\CMS\...  /* legacy.controller.form */; // TODO: add use statement at top
+	// TODO-J5: jimport("legacy.controller.form") — find J5 equivalent
 
 /**
  * FLEXIcontent (User) Group Controller

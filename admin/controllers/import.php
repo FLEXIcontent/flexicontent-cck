@@ -11,13 +11,14 @@
 
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Filesystem\File;
+use Joomla\CMS\Filesystem\Folder;
+use Joomla\CMS\Filesystem\Path;
+use Joomla\CMS\Log\Log;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\Database\DatabaseInterface;
 
-// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
-// jimport removed J5: use Joomla\CMS\Filesystem\Folder; // TODO: add use statement at top
-// jimport removed J5: use Joomla\CMS\Filesystem\Path; // TODO: add use statement at top
 
 JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php');
 
@@ -111,7 +112,6 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 		$parse_log = "\n\n\n" . '<b>please click</b> <a href="' . $link . '">here</a> to return previous page' . "\n\n\n";
 		$log_filename = 'importcsv_' . ($user->id) . '.php';
 
-		// jimport removed J5: use Joomla\CMS\...  /* joomla.log.log */; // TODO: add use statement at top
 		\Joomla\CMS\Log\Log::addLogger(
 			array(
 				'text_file' => $log_filename,  // Sets the target log file

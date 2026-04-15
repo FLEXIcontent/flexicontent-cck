@@ -11,11 +11,11 @@
 
 defined('_JEXEC') or die('Restricted access');
 
+use Joomla\CMS\Filesystem\File;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
 JLoader::register('FlexicontentViewBaseRecord', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_record.php');
-// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
 
 /**
  * HTML View class for the Field screen

@@ -1,4 +1,8 @@
 <?php
+use Joomla\CMS\Form\FormField;
+use Joomla\CMS\Form\FormHelper;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Microdata\Microdata;
 /**
  * @version 0.6.0 stable $Id: default.php yannick berges
  * @package Joomla
@@ -17,11 +21,8 @@
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
 
-// jimport removed J5: use Joomla\CMS\HTML\HTMLHelper; // TODO: add use statement at top      // JHtml
-// jimport removed J5: use Joomla\CMS\...  /* cms.html.select */; // TODO: add use statement at top    // \Joomla\CMS\HTML\Helpers\Select
-// jimport removed J5: use Joomla\CMS\...  /* joomla.form.field */; // TODO: add use statement at top  // \Joomla\CMS\Form\FormField
+	// TODO-J5: jimport("cms.html.select") — find J5 equivalent
 
-// jimport removed J5: use Joomla\CMS\...  /* joomla.form.helper */; // TODO: add use statement at top // \Joomla\CMS\Form\FormHelper
 \Joomla\CMS\Form\FormHelper::loadFieldClass('groupedlist');   // \Joomla\CMS\Form\Field\GroupedlistField
 
 
@@ -36,7 +37,6 @@ class JFormFieldMicrodataprops extends JFormFieldGroupedList
 		
 		if ($jm_types === null)
 		{
-			// jimport removed J5: use Joomla\CMS\...  /* joomla.microdata.microdata */; // TODO: add use statement at top
 			$jm = new \Joomla\CMS\Microdata\Microdata();
 			$jm_types = $jm->getTypes();
 		}

@@ -87,7 +87,7 @@ if ( !$show_mod )  return;
 
 
 global $modfc_jprof;
-// jimport removed J5: use Joomla\CMS\...  /* joomla.profiler.profiler */; // TODO: add use statement at top
+	// TODO-J5: jimport("joomla.profiler.profiler") — find J5 equivalent
 $modfc_jprof = new \Joomla\CMS\Profiler\Profiler();
 $modfc_jprof->mark('START: FLEXIcontent Search Module');
 

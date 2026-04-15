@@ -11,9 +11,10 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
-// jimport removed J5: use Joomla\CMS\Filesystem\Folder; // TODO: add use statement at top
-// jimport removed J5: use Joomla\CMS\Filesystem\Path; // TODO: add use statement at top
+use Joomla\CMS\Filesystem\File;
+use Joomla\CMS\Filesystem\Folder;
+use Joomla\CMS\Filesystem\Path;
+use Joomla\CMS\Log\Log;
 use Joomla\CMS\Factory;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
@@ -1800,8 +1801,6 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	{
 		if ( !count( $cid ) ) return false;
 
-		// jimport removed J5: use Joomla\CMS\Filesystem\Path; // TODO: add use statement at top
-		// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
 
 		// This is already done by controller task / caller but redo
 		$cid = ArrayHelper::toInteger($cid);
@@ -2384,7 +2383,6 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			return;
 		}
 
-		// jimport removed J5: use Joomla\CMS\...  /* joomla.log.log */; // TODO: add use statement at top
 		\Joomla\CMS\Log\Log::addLogger(
 			array(
 				'text_file' => $logger->filename,  // Sets the target log file

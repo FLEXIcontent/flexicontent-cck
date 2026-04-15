@@ -11,13 +11,14 @@
 
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Filesystem\File;
 use Joomla\Filesystem\Path;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\Database\DatabaseInterface;
 use Joomla\CMS\Mail\MailerFactoryInterface;
 
-// jimport removed J5: use Joomla\CMS\...  /* legacy.controller.legacy */; // TODO: add use statement at top
+	// TODO-J5: jimport("legacy.controller.legacy") — find J5 equivalent
 JLoader::register('FlexicontentControllerItems', JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'controllers'.DS.'items.php');  // we use JPATH_BASE since controller exists in frontend too
 
 #[AllowDynamicProperties] //php8.2 compatibility
@@ -866,7 +867,6 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 	public function download()
 	{
 		// Import and Initialize some joomla API variables
-		// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
 
 		$app   = \Joomla\CMS\Factory::getApplication();
 		$db    = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
@@ -2231,7 +2231,6 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 	{
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 
-		// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
 		$all_files = array();
 
 		foreach ($nodes as $node)

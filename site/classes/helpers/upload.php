@@ -1,5 +1,7 @@
 <?php
 defined( '_JEXEC' ) or die( 'Restricted access' );
+use Joomla\CMS\Filesystem\File;
+use Joomla\CMS\Filesystem\Folder;
 use Joomla\CMS\Language\LanguageFactoryInterface;
 
 class flexicontent_upload
@@ -163,7 +165,6 @@ class flexicontent_upload
 			return false;
 		}
 
-		// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
 
 
 		// ***************************************************************
@@ -297,7 +298,6 @@ class flexicontent_upload
 	*/
 	static function sanitize($base_Dir, $filename)
 	{
-		// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
 
 		// Check for any trailing dots and remove them (trailing shouldn't be possible cause of the getExt check)
 		$filename = rtrim($filename, '.');
@@ -340,7 +340,6 @@ class flexicontent_upload
 	*/
 	static function sanitizedir($base_Dir, $folder)
 	{
-		// jimport removed J5: use Joomla\CMS\Filesystem\Folder; // TODO: add use statement at top
 
 		// Replace invalid characters with dash, if makeSafe has been called then this has already been done
 		$regex = array('#(\.){2,}#', '#[^A-Za-z0-9\.\_\- ]#', '#^\.#');

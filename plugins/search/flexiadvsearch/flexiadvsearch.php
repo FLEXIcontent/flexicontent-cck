@@ -19,10 +19,10 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+use Joomla\CMS\Plugin\CMSPlugin;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-// jimport removed J5: use Joomla\CMS\...  /* cms.plugin.plugin */; // TODO: add use statement at top
 
 require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 

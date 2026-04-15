@@ -1,4 +1,7 @@
 <?php
+use Joomla\CMS\Filesystem\File;
+use Joomla\CMS\Filesystem\Folder;
+use Joomla\CMS\Filesystem\Path;
 /**
  * @version 1.5 stable $Id: default.php 1832 2014-01-17 00:17:27Z ggppdk $
  * @package Joomla
@@ -21,9 +24,6 @@ defined('_JEXEC') or die('Restricted access');
 //adding inline help
 if (FLEXI_J40GE) \Joomla\CMS\Toolbar\ToolbarHelper::inlinehelp();
 
-// jimport removed J5: use Joomla\CMS\Filesystem\Folder; // TODO: add use statement at top
-// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
-// jimport removed J5: use Joomla\CMS\Filesystem\Path; // TODO: add use statement at top
 
 if ( !$this->layout->name ) die('Template folder does not exist');
 

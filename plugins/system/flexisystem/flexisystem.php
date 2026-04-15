@@ -1043,7 +1043,6 @@ class plgSystemFlexisystem extends CMSPlugin
 		$username  = $app->input->get('fcu', null);
 		$password  = $app->input->get('fcp', null);
 
-		// jimport removed J5: use Joomla\CMS\User\UserHelper; // TODO: add use statement at top
 
 		$db = Factory::getDbo();
 		$query 	= 'SELECT id, password'
@@ -1592,7 +1591,6 @@ class plgSystemFlexisystem extends CMSPlugin
 			if ($output)
 			{
 				$log_filename = 'cron_estorage.php';
-				// jimport removed J5: use Joomla\CMS\...  /* joomla.log.log */; // TODO: add use statement at top
 				Log::addLogger(
 					array(
 						'text_file' => $log_filename,  // Sets the target log file
@@ -1962,7 +1960,6 @@ class plgSystemFlexisystem extends CMSPlugin
 			'cachebase'		=> ($client == 1) ? JPATH_ADMINISTRATOR . '/cache' : $conf->get('cache_path', JPATH_SITE . '/cache')
 		);
 
-		// jimport removed J5: use Joomla\CMS\...  /* joomla.cache.cache */; // TODO: add use statement at top
 		$cache = Cache::getInstance('', $options);
 		return $cache;
 	}

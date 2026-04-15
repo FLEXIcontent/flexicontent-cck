@@ -10,6 +10,7 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
+use Joomla\CMS\Filesystem\File;
 use Joomla\CMS\Mail\MailerFactoryInterface;
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
@@ -931,7 +932,6 @@ class plgFlexicontent_fieldsEmail extends FCField
 			foreach($files as $attachements) {
 				foreach ($attachements as $file){
 				// Import filesystem libraries. Perhaps not necessary, but does not hurt.
-				// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
 
 				// Clean up filename to get rid of strange characters like spaces etc.
 				$filename = \Joomla\Filesystem\File::makeSafe($file['name']);

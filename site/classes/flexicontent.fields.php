@@ -11,6 +11,8 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+use Joomla\CMS\Filesystem\File;
+use Joomla\CMS\Filesystem\Path;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
@@ -2805,7 +2807,6 @@ class FlexicontentFields
 		 */
 		/*
 		$pdfparser_path = $cparams->get('pdfparser_path', 'components/com_flexicontent/librairies/pdfparser');
-		// jimport removed J5: use Joomla\CMS\Filesystem\Path; // TODO: add use statement at top
 		$pdfparser_path = \Joomla\Filesystem\Path::clean($pdfparser_path);
 
 		if (!$pdfparser_path)
@@ -2868,7 +2869,6 @@ class FlexicontentFields
 			return false;
 		}*/
 
-		// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
 		$segmenter_path = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'THSplitLib'.DS.'segment.php';
 
 		if (!file_exists($segmenter_path))

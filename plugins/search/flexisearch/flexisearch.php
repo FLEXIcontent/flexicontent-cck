@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\Plugin\CMSPlugin;
 /**
  * @version 1.0 $Id: flexisearch.php 1353 2012-06-23 20:47:30Z ggppdk $
  * @package Joomla
@@ -19,7 +20,6 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-// jimport removed J5: use Joomla\CMS\...  /* cms.plugin.plugin */; // TODO: add use statement at top
 
 require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 

@@ -15,7 +15,7 @@ use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Table\Table;
 
-// jimport removed J5: use Joomla\CMS\...  /* legacy.model.admin */; // TODO: add use statement at top
+	// TODO-J5: jimport("legacy.model.admin") — find J5 equivalent
 require_once('traitbase.php');
 
 #[AllowDynamicProperties] //php8.2 compatibility

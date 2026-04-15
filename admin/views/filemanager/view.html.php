@@ -687,7 +687,7 @@ var $proxy_option   = null;
 		$lists['order']     = $filter_order;
 
 		// Uploadstuff
-		// jimport removed J5: use Joomla\CMS\...  /* joomla.client.helper */; // TODO: add use statement at top
+	// TODO-J5: jimport("joomla.client.helper") — find J5 equivalent
 
 		$require_ftp = !\Joomla\CMS\Client\ClientHelper::hasCredentials('ftp');
 

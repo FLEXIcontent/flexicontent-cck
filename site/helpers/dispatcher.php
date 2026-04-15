@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\Event\AbstractEvent;
 /**
  * @package     Joomla.Platform
  * @subpackage  Event
@@ -10,7 +11,6 @@
 // Check to ensure this file is within the rest of the framework
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-// jimport removed J5: use Joomla\CMS\...  /* joomla.event.dispatcher */; // TODO: add use statement at top
 
 /**
  * Class to handle dispatching of events.

@@ -14,7 +14,7 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\Registry\Registry;
 use Joomla\Utilities\ArrayHelper;
 
-// jimport removed J5: use Joomla\CMS\...  /* legacy.model.admin */; // TODO: add use statement at top
+	// TODO-J5: jimport("legacy.model.admin") — find J5 equivalent
 
 if (FLEXI_J40GE)
 {

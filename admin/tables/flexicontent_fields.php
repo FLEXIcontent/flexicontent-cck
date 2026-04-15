@@ -11,7 +11,7 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-// jimport removed J5: use Joomla\CMS\...  /* joomla.access.rules */; // TODO: add use statement at top
+use Joomla\CMS\Access\Rules;
 use Joomla\String\StringHelper;
 require_once('flexicontent_basetable.php');
 

@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\Filesystem\File;
 /**
  * @version 1.5 stable $Id: default_categories.php 1764 2013-09-16 08:00:21Z ggppdk $
  * @package Joomla
@@ -17,7 +18,6 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
 ?>
 
 <?php

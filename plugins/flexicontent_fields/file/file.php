@@ -9,6 +9,8 @@
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
+use Joomla\CMS\Filesystem\Folder;
+use Joomla\CMS\Filesystem\Path;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Uri\Uri;
@@ -1321,8 +1323,6 @@ class plgFlexicontent_fieldsFile extends FCField
 		if ( !$initialized )
 		{
 			$initialized = 1;
-			// jimport removed J5: use Joomla\CMS\Filesystem\Folder; // TODO: add use statement at top
-			// jimport removed J5: use Joomla\CMS\Filesystem\Path; // TODO: add use statement at top
 			$srcpath_original  = \Joomla\Filesystem\Path::clean( JPATH_SITE .DS. $import_docs_folder .DS );
 		}
 

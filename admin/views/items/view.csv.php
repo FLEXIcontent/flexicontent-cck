@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\Filesystem\File;
 /**
  * @version 1.5 stable $Id: view.html.php 1959 2014-09-18 00:15:15Z ggppdk $
  * @package Joomla
@@ -19,8 +20,7 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
-// jimport removed J5: use Joomla\CMS\...  /* legacy.view.legacy */; // TODO: add use statement at top
-// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
+	// TODO-J5: jimport("legacy.view.legacy") — find J5 equivalent
 
 /**
  * HTML View class for the Category View

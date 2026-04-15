@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\Form\FormHelper;
 /**
  * @package         FLEXIcontent
  * @version         3.4
@@ -352,7 +353,6 @@ class plgFlexicontent_fieldsColor extends FCField
 
 		if (!FLEXI_J40GE)
 		{
-			// jimport removed J5: use Joomla\CMS\...  /* joomla.form.helper */; // TODO: add use statement at top // \Joomla\CMS\Form\FormHelper
 			\Joomla\CMS\Form\FormHelper::loadFieldClass('color');   // \Joomla\CMS\Form\Field\ColorField
 		}
 

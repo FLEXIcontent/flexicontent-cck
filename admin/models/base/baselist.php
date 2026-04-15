@@ -15,7 +15,7 @@ use Joomla\CMS\Factory;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-// jimport removed J5: use Joomla\CMS\...  /* legacy.model.list */; // TODO: add use statement at top
+	// TODO-J5: jimport("legacy.model.list") — find J5 equivalent
 require_once('traitbase.php');
 require_once('traitlegacylist.php');
 

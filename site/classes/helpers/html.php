@@ -1,6 +1,10 @@
 <?php
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+use Joomla\CMS\Filesystem\File;
+use Joomla\CMS\Filesystem\Folder;
+use Joomla\CMS\Filesystem\Path;
+use Joomla\CMS\Mail\MailHelper;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Application\CMSApplication;
@@ -335,9 +339,6 @@ class flexicontent_html
 		static $initialized;
 		if ($initialized===null)
 		{
-			// jimport removed J5: use Joomla\CMS\Filesystem\Path; // TODO: add use statement at top
-			// jimport removed J5: use Joomla\CMS\Filesystem\Folder; // TODO: add use statement at top
-			// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
 			$initialized = 1;
 		}
 
@@ -2282,7 +2283,6 @@ class flexicontent_html
 
 			case 'EMAIL':
 				// Use the Joomla mail helper to validate emails
-				// jimport removed J5: use Joomla\CMS\...  /* joomla.mail.helper */; // TODO: add use statement at top
 				if ( !\Joomla\CMS\Mail\MailHelper::isEmailAddress($v) ) $v = '';
 				break;
 
@@ -2427,7 +2427,6 @@ class flexicontent_html
 	 */
 	static function extractimagesrc( $row )
 	{
-		// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
 
 		$regex = '#<\s*img [^\>]*src\s*=\s*(["\'])(.*?)\1#im';
 
@@ -6414,9 +6413,6 @@ class flexicontent_html
 	// Check and if needed install Joomla template overrides into current Joomla template
 	public static function install_template_overrides($display_mssg = false)
 	{
-		// jimport removed J5: use Joomla\CMS\Filesystem\Path; // TODO: add use statement at top
-		// jimport removed J5: use Joomla\CMS\Filesystem\Folder; // TODO: add use statement at top
-		// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
 		$app =Factory::getApplication();
 
 		$pathDestFolder_arr = array(

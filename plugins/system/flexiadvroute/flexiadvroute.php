@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\Plugin\CMSPlugin;
 /**
  * @version 1.5 stable $Id$
  * @plugin 1.0.2
@@ -20,7 +21,6 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-// jimport removed J5: use Joomla\CMS\...  /* cms.plugin.plugin */; // TODO: add use statement at top
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 //require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');

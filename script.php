@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\Version;
 /**
  * @version 1.5 stable $Id: install.php 1789 2013-10-15 02:25:46Z ggppdk $
  * @package Joomla
@@ -22,7 +23,6 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 // Joomla version variables
 if (!defined('FLEXI_J16GE') || !defined('FLEXI_J30GE'))
 {
-	// jimport removed J5: use Joomla\CMS\...  /* cms.version.version */; // TODO: add use statement at top
 	$jversion = new \Joomla\CMS\Version;
 }
 if (!defined('FLEXI_J16GE'))   define('FLEXI_J16GE', version_compare( $jversion->getShortVersion(), '1.6.0', 'ge' ) );

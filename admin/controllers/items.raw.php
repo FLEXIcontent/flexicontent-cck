@@ -12,6 +12,7 @@
 
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Log\Log;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
@@ -614,7 +615,6 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$log_filename = $session->get($indexer . '_log_filename', null, 'flexicontent');
 		$log_category = $session->get($indexer . '_log_category', null, 'flexicontent');
 
-		// jimport removed J5: use Joomla\CMS\...  /* joomla.log.log */; // TODO: add use statement at top
 		\Joomla\CMS\Log\Log::addLogger(
 			array(
 				'text_file' => $log_filename,  // Sets the target log file

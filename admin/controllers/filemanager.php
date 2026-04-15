@@ -11,6 +11,9 @@
 
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Date\Date;
+use Joomla\CMS\Filesystem\File;
+use Joomla\CMS\Filesystem\Folder;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\String\StringHelper;
@@ -802,14 +805,12 @@ var $records_dbtbl  = 'flexicontent_files';
 		$subfolder_path = str_replace('\\', '/', $subfolder_path);
 
 
-		// jimport removed J5: use Joomla\CMS\Date\Date; // TODO: add use statement at top
 
 		// Set FTP credentials, if given
-		// jimport removed J5: use Joomla\CMS\...  /* joomla.client.helper */; // TODO: add use statement at top
+	// TODO-J5: jimport("joomla.client.helper") — find J5 equivalent
 		\Joomla\CMS\Client\ClientHelper::setCredentialsFromRequest('ftp');
 
 		// Make the filename safe
-		// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
 
 		// Get field parameter 'auto_filename_code' which has PHP code to create the filename
 		$auto_filename_code = $field->params->auto_filename_code ?? 0;
@@ -1063,7 +1064,6 @@ var $records_dbtbl  = 'flexicontent_files';
 		$filesize  = $this->input->get('file-url-size', 0, 'int');
 		$size_unit = $this->input->get('size_unit', 'KBs', 'cmd');
 
-		// jimport removed J5: use Joomla\CMS\Date\Date; // TODO: add use statement at top
 
 		// Check if the form fields are not empty
 		if (!$url)
@@ -1549,9 +1549,6 @@ var $records_dbtbl  = 'flexicontent_files';
 		$allowed_exts = $filter_ext ? array_intersect($filter_ext, $allowed_exts) : $allowed_exts;
 		$allowed_exts = array_flip($allowed_exts);
 
-		// jimport removed J5: use Joomla\CMS\Date\Date; // TODO: add use statement at top
-		// jimport removed J5: use Joomla\CMS\Filesystem\File; // TODO: add use statement at top
-		// jimport removed J5: use Joomla\CMS\Filesystem\Folder; // TODO: add use statement at top
 
 		// Get files
 		$filesdir = \Joomla\Filesystem\Path::clean(JPATH_SITE . $filesdir . DS);
@@ -1943,7 +1940,7 @@ var $records_dbtbl  = 'flexicontent_files';
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 
 		// Set FTP credentials, if given
-		// jimport removed J5: use Joomla\CMS\...  /* joomla.client.helper */; // TODO: add use statement at top
+	// TODO-J5: jimport("joomla.client.helper") — find J5 equivalent
 		\Joomla\CMS\Client\ClientHelper::setCredentialsFromRequest('ftp');
 	}
 

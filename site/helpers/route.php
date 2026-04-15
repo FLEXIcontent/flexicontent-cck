@@ -13,11 +13,11 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+use Joomla\CMS\Component\ComponentHelper;
 use Joomla\Registry\Registry;
 use Joomla\CMS\Language\LanguageHelper;
 
 // Component Helper
-// jimport removed J5: use Joomla\CMS\...  /* cms.component.helper */; // TODO: add use statement at top
 
 //include constants file
 require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
