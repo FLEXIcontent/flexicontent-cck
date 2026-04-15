@@ -28,8 +28,6 @@ class FlexicontentModelItems extends FCModelAdminList
 	public mixed $_catids = null;
 	/** @var mixed $_tagids */
 	public mixed $_tagids = null;
-	/** @var mixed $canManage */
-	public mixed $canManage = null;
 
 	/**
 	 * Record database table

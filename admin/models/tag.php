@@ -26,8 +26,6 @@ class FlexicontentModelTag extends FCModelAdmin
 {
 	/** @var mixed $canCreate */
 	public mixed $canCreate = null;
-	/** @var mixed $canManage */
-	public mixed $canManage = null;
 	/** @var mixed $use_jtable_publishing */
 	public mixed $use_jtable_publishing = null;
 

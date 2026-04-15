@@ -19,6 +19,8 @@ use Joomla\Utilities\ArrayHelper;
  */
 class FlexicontentViewBaseRecord extends \Joomla\CMS\MVC\View\HtmlView
 {
+	/** @var mixed $scope_title */
+	public mixed $scope_title = null;
 	public $tooltip_class = FLEXI_J40GE ? 'hasTooltip' : 'hasTooltip';
 	public $popover_class = FLEXI_J40GE ? 'hasPopover' : 'hasPopover';
 	public $btn_sm_class  = FLEXI_J40GE ? 'btn btn-sm' : 'btn btn-small';

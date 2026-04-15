@@ -24,8 +24,6 @@ require_once('base/base.php');
 #[AllowDynamicProperties]
 class FlexicontentModelTemplate extends FCModelAdmin
 {
-	/** @var mixed $canManage */
-	public mixed $canManage = null;
 
 
 	/**

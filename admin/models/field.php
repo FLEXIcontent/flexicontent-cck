@@ -27,8 +27,6 @@ class FlexicontentModelField extends FCModelAdmin
 {
 	/** @var mixed $canCreate */
 	public mixed $canCreate = null;
-	/** @var mixed $canManage */
-	public mixed $canManage = null;
 	/** @var mixed $helpModal */
 	public mixed $helpModal = null;
 	/** @var mixed $helpTitle */

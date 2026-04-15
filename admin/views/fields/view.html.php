@@ -38,8 +38,6 @@ class FlexicontentViewFields extends FlexicontentViewBaseRecords
 	public mixed $reOrderingActive = null;
 	/** @var mixed $rows */
 	public mixed $rows = null;
-	/** @var mixed $scope_title */
-	public mixed $scope_title = null;
 	/** @var mixed $sidebar */
 	public mixed $sidebar = null;
 	/** @var mixed $state */

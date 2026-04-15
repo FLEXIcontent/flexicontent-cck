@@ -24,6 +24,8 @@ require_once('traitlegacylist.php');
  */
 abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 {
+	/** @var mixed $scope_title */
+	public mixed $scope_title = null;
 	use FCModelTraitBase;
 	use FCModelTraitLegacyList;
 

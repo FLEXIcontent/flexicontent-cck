@@ -25,8 +25,6 @@ require_once('base/baselist.php');
 #[AllowDynamicProperties]
 class FlexicontentModelUsers extends FCModelAdminList
 {
-	/** @var mixed $canManage */
-	public mixed $canManage = null;
 
 
 	/**

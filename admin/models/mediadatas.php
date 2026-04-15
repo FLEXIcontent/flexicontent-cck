@@ -24,8 +24,6 @@ require_once('base/baselist.php');
 #[AllowDynamicProperties]
 class FlexicontentModelMediadatas extends FCModelAdminList
 {
-	/** @var mixed $canManage */
-	public mixed $canManage = null;
 
 
 	/**

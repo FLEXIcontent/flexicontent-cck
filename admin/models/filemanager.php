@@ -29,8 +29,6 @@ require_once('base/baselist.php');
 #[AllowDynamicProperties]
 class FlexicontentModelFilemanager extends FCModelAdminList
 {
-	/** @var mixed $canManage */
-	public mixed $canManage = null;
 	/** @var mixed $fieldid */
 	public mixed $fieldid = null;
 

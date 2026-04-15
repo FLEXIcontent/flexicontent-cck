@@ -26,8 +26,6 @@ require_once('base/traitnestable.php');
 #[AllowDynamicProperties]
 class FlexicontentModelCategories extends FCModelAdminList
 {
-	/** @var mixed $canManage */
-	public mixed $canManage = null;
 
 
 

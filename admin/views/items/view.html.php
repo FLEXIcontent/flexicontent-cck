@@ -77,8 +77,6 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 	public mixed $rows = null;
 	/** @var mixed $scope */
 	public mixed $scope = null;
-	/** @var mixed $scope_title */
-	public mixed $scope_title = null;
 	/** @var mixed $sidebar */
 	public mixed $sidebar = null;
 	/** @var mixed $single_type */

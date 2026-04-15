@@ -32,8 +32,6 @@ class FlexicontentViewTagelement extends FlexicontentViewBaseRecords
 	public mixed $perms = null;
 	/** @var mixed $rows */
 	public mixed $rows = null;
-	/** @var mixed $scope_title */
-	public mixed $scope_title = null;
 	/** @var mixed $state */
 	public mixed $state = null;
 	/** @var mixed $view */
