@@ -56,8 +56,6 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 	public mixed $layout = null;
 	/** @var mixed $lists */
 	public mixed $lists = null;
-	/** @var mixed $option */
-	public mixed $option = null;
 	/** @var mixed $optional_cols */
 	public mixed $optional_cols = null;
 	/** @var mixed $pagination */

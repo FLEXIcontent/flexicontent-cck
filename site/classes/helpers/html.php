@@ -1311,15 +1311,16 @@ class flexicontent_html
 			{
 				if (FLEXI_J40GE)
 			{
-				// J5/J6: use Joomla's built-in jQuery UI vendor asset (available in media/vendor/jui/)
+				// J5/J6: use Joomla's built-in jQuery UI (registered in Joomla core jui.asset.php)
 				$wa = $document->getWebAssetManager();
-				$wa->useScript('jquery-ui.core');
-				$wa->useScript('jquery-ui.sortable');
-				$wa->useScript('jquery-ui.draggable');
-				$wa->useScript('jquery-ui.droppable');
-				$wa->useScript('jquery-ui.resizable');
-				$wa->useScript('jquery-ui.autocomplete');
-				$wa->useScript('jquery-ui.dialog');
+				// 'jquery-ui' asset in Joomla 5/6 loads full jQuery UI bundle
+				if ($wa->assetExists('script', 'jquery-ui')) {
+					$wa->useScript('jquery-ui');
+				} else {
+					// Fallback: load from Joomla media/vendor/jui
+					$jui_path = \Joomla\CMS\Uri\Uri::root(true) . '/media/vendor/jui/js/jquery.ui.core.min.js';
+					$wa->registerAndUseScript('jui-core', $jui_path);
+				}
 			}
 				elseif (FLEXI_J30GE)
 				{

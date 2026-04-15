@@ -32,8 +32,6 @@ class FlexicontentViewUsers extends FlexicontentViewBaseRecords
 	public mixed $lists = null;
 	/** @var mixed $minihelp */
 	public mixed $minihelp = null;
-	/** @var mixed $option */
-	public mixed $option = null;
 	/** @var mixed $pagination */
 	public mixed $pagination = null;
 	/** @var mixed $perms */

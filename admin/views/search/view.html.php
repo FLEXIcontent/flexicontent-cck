@@ -30,8 +30,6 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 	public mixed $isADV = null;
 	/** @var mixed $lists */
 	public mixed $lists = null;
-	/** @var mixed $option */
-	public mixed $option = null;
 	/** @var mixed $pagination */
 	public mixed $pagination = null;
 	/** @var mixed $perms */

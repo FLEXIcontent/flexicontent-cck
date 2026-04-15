@@ -67,8 +67,6 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 	public mixed $minihelp = null;
 	/** @var mixed $model_s */
 	public mixed $model_s = null;
-	/** @var mixed $option */
-	public mixed $option = null;
 	/** @var mixed $pagination */
 	public mixed $pagination = null;
 	/** @var mixed $perms */

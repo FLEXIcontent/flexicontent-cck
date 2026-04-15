@@ -26,8 +26,6 @@ class FlexicontentViewTags extends FlexicontentViewBaseRecords
 	public mixed $count_filters = null;
 	/** @var mixed $lists */
 	public mixed $lists = null;
-	/** @var mixed $option */
-	public mixed $option = null;
 	/** @var mixed $pagination */
 	public mixed $pagination = null;
 	/** @var mixed $perms */

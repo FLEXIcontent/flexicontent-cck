@@ -38,8 +38,6 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 	public mixed $cols = null;
 	/** @var mixed $count_filters */
 	public mixed $count_filters = null;
-	/** @var mixed $ctrl */
-	public mixed $ctrl = null;
 	/** @var mixed $ffields */
 	public mixed $ffields = null;
 	/** @var mixed $field */
@@ -58,8 +56,6 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 	public mixed $layout = null;
 	/** @var mixed $lists */
 	public mixed $lists = null;
-	/** @var mixed $option */
-	public mixed $option = null;
 	/** @var mixed $optional_cols */
 	public mixed $optional_cols = null;
 	/** @var mixed $pagination */

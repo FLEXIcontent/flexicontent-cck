@@ -34,8 +34,6 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 	public mixed $langs = null;
 	/** @var mixed $lists */
 	public mixed $lists = null;
-	/** @var mixed $option */
-	public mixed $option = null;
 	/** @var mixed $ordering */
 	public mixed $ordering = null;
 	/** @var mixed $pagination */

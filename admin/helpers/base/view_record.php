@@ -19,16 +19,15 @@ use Joomla\Utilities\ArrayHelper;
  */
 class FlexicontentViewBaseRecord extends \Joomla\CMS\MVC\View\HtmlView
 {
-	var $tooltip_class = FLEXI_J40GE ? 'hasTooltip' : 'hasTooltip';
-	var $popover_class = FLEXI_J40GE ? 'hasPopover' : 'hasPopover';
-	var $btn_sm_class  = FLEXI_J40GE ? 'btn btn-sm' : 'btn btn-small';
-	var $btn_iv_class  = FLEXI_J40GE ? 'btn-dark' : 'btn-inverse';
-	var $ina_grp_class = FLEXI_J40GE ? 'input-group' : 'input-append';
-	var $inp_grp_class = FLEXI_J40GE ? 'input-group' : 'input-prepend';
-	var $select_class  = FLEXI_J40GE ? 'use_select2_lib' : 'use_select2_lib';
+	public $tooltip_class = FLEXI_J40GE ? 'hasTooltip' : 'hasTooltip';
+	public $popover_class = FLEXI_J40GE ? 'hasPopover' : 'hasPopover';
+	public $btn_sm_class  = FLEXI_J40GE ? 'btn btn-sm' : 'btn btn-small';
+	public $btn_iv_class  = FLEXI_J40GE ? 'btn-dark' : 'btn-inverse';
+	public $ina_grp_class = FLEXI_J40GE ? 'input-group' : 'input-append';
+	public $inp_grp_class = FLEXI_J40GE ? 'input-group' : 'input-prepend';
+	public $select_class  = FLEXI_J40GE ? 'use_select2_lib' : 'use_select2_lib';
 	//var $txt_grp_class = FLEXI_J40GE ? 'input-group-text' : 'add-on';
 
-	var $option = 'com_flexicontent';
 
 	/**
 	 * Constructor
