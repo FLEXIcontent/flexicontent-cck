@@ -21,8 +21,11 @@ require_once('base/baselist.php');
  * FLEXIcontent Component Types Model
  *
  */
+#[AllowDynamicProperties]
 class FlexicontentModelTypes extends FCModelAdminList
 {
+
+
 	/**
 	 * Record database table
 	 *

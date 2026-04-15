@@ -192,8 +192,8 @@ if ($this->params->get('form_extra_js'))     $this->document->addScriptDeclarati
 if ($this->params->get('form_extra_js' . $CFGsfx))  $this->document->addScriptDeclaration($this->params->get('form_extra_js' . $CFGsfx));
 
 // Load JS tabber lib
-$this->document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
-$this->document->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
+/* J5/J6 WebAsset: */ $this->document->getWebAssetManager()->registerAndUseScript('fc-tabber-minimized', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
+/* J5/J6 WebAsset: */ $this->document->getWebAssetManager()->registerAndUseStyle('fc-tabber', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
 $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
 
@@ -202,13 +202,13 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
  */
 if ($tags_editable || (!$isSite && $this->perms['canversion']))
 {
-	//$this->document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.bgiframe.min.js', array('version' => FLEXI_VHASH));
-	//$this->document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.ajaxQueue.js', array('version' => FLEXI_VHASH));
-	//$this->document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.min.js', array('version' => FLEXI_VHASH));
-	$this->document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/jquery.pager.js', array('version' => FLEXI_VHASH));     // e.g. pagination for item versions
-	$this->document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/jquery.autogrow.js', array('version' => FLEXI_VHASH));  // e.g. autogrow version comment textarea
+	///* J5/J6 WebAsset: */ $this->document->getWebAssetManager()->registerAndUseScript('fc-jquery-bgiframe-min', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/librairies/jquery-autocomplete/jquery.bgiframe.min.js', array('version' => FLEXI_VHASH));
+	///* J5/J6 WebAsset: */ $this->document->getWebAssetManager()->registerAndUseScript('fc-jquery-ajaxQueue', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/librairies/jquery-autocomplete/jquery.ajaxQueue.js', array('version' => FLEXI_VHASH));
+	///* J5/J6 WebAsset: */ $this->document->getWebAssetManager()->registerAndUseScript('fc-jquery-autocomplete-min', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.min.js', array('version' => FLEXI_VHASH));
+	/* J5/J6 WebAsset: */ $this->document->getWebAssetManager()->registerAndUseScript('fc-jquery-pager', \Joomla\CMS\Uri\Uri::root().'administrator/components/com_flexicontent/assets/js/jquery.pager.js', array('version' => FLEXI_VHASH));     // e.g. pagination for item versions
+	/* J5/J6 WebAsset: */ $this->document->getWebAssetManager()->registerAndUseScript('fc-jquery-autogrow', \Joomla\CMS\Uri\Uri::root().'administrator/components/com_flexicontent/assets/js/jquery.autogrow.js', array('version' => FLEXI_VHASH));  // e.g. autogrow version comment textarea
 
-	//$this->document->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.css', array('version' => FLEXI_VHASH));
+	///* J5/J6 WebAsset: */ $this->document->getWebAssetManager()->registerAndUseStyle('fc-jquery-autocomplete', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.css', array('version' => FLEXI_VHASH));
 
 	\Joomla\CMS\Language\Text::script("FLEXI_DELETE_TAG", true);
 	\Joomla\CMS\Language\Text::script("FLEXI_ENTER_TAG", true);
@@ -272,7 +272,7 @@ if ($tags_editable || (!$isSite && $this->perms['canversion']))
 					//window.console.log(jQuery('#jform_language').val());
 
 					jQuery.ajax({
-						url: '".\Joomla\CMS\Uri\Uri::base(true)."/components/com_flexicontent/tasks/core.php?". \Joomla\CMS\Session\Session::getFormToken() ."=1',
+						url: '".\Joomla\CMS\Uri\Uri::root()."components/com_flexicontent/tasks/core.php?". \Joomla\CMS\Session\Session::getFormToken() ."=1',
 						dataType: 'json',
 						data: {
 							q: term,

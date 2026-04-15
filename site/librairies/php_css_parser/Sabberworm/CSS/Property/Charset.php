@@ -9,9 +9,13 @@ namespace Sabberworm\CSS\Property;
  * • May only appear at the very top of a Document’s contents.
  * • Must not appear more than once.
  */
+#[AllowDynamicProperties]
 class Charset implements AtRule {
 
-	private $sCharset;
+		/** @var mixed $aComments */
+	public mixed $aComments = null;
+
+private $sCharset;
 	protected $iLineNo;
 	protected $aComment;
 

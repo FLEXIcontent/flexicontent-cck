@@ -9,6 +9,7 @@
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
+use Joomla\CMS\Form\FormHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 
@@ -52,7 +53,6 @@ class plgFlexicontent_fieldsSubform extends FCField
 		// Load the subform field if earlier than Joomla 4
 		if (!FLEXI_J40GE)
 		{
-			jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 			\Joomla\CMS\Form\FormHelper::loadFieldClass('subform');   // \Joomla\CMS\Form\Field\SubformField
 		}
 

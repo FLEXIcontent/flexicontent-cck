@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\Form\FormHelper;
 /**
  * @package         FLEXIcontent
  * @version         3.4
@@ -280,7 +281,6 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			}
 			else
 			{
-				jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 				\Joomla\CMS\Form\FormHelper::loadFieldClass('media');   // \Joomla\CMS\Form\Field\MediaField
 			}
 
@@ -288,7 +288,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			\Joomla\CMS\Language\Text::script("FLEXI_FIELD_WEBLINK_ENTER_MEDIA_URL_WARNING", true);
 			\Joomla\CMS\Language\Text::script("FLEXI_FIELD_MEDIA_URL", true);
 			\Joomla\CMS\Language\Text::script("FLEXI_ERROR", true);
-			$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/weblink/js/form.js', array('version' => FLEXI_VHASH));
+			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-form', \Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/weblink/js/form.js', array('version' => FLEXI_VHASH));
 
 			$mm_mode_common_js_added = true;
 		}

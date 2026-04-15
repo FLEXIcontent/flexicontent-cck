@@ -1,6 +1,7 @@
 <?php
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+use Joomla\CMS\Factory;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Table\Table;
@@ -1237,7 +1238,7 @@ class flexicontent_db
 		$all_language = $item->language == '*';
 		if ($all_language && !empty($associations))
 		{
-			JError::raiseNotice(403, \Joomla\CMS\Language\Text::_('FLEXI_ERROR_ALL_LANGUAGE_ASSOCIATED'));
+			Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ERROR_ALL_LANGUAGE_ASSOCIATED', 'notice'));
 		}
 
 		// Add current item to associations if this is desired

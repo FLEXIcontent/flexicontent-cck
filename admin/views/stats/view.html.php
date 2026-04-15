@@ -27,8 +27,47 @@ JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/compone
 /**
  * HTML View class for the Stats View
  */
+#[AllowDynamicProperties]
 class FlexicontentViewStats extends FlexicontentViewBaseRecords
 {
+	/** @var mixed $creators */
+	public mixed $creators = null;
+	/** @var mixed $editors */
+	public mixed $editors = null;
+	/** @var mixed $favoured */
+	public mixed $favoured = null;
+	/** @var mixed $genstats */
+	public mixed $genstats = null;
+	/** @var mixed $itemsgraph */
+	public mixed $itemsgraph = null;
+	/** @var mixed $metadescription */
+	public mixed $metadescription = null;
+	/** @var mixed $metakeywords */
+	public mixed $metakeywords = null;
+	/** @var mixed $popular */
+	public mixed $popular = null;
+	/** @var mixed $rating */
+	public mixed $rating = null;
+	/** @var mixed $sidebar */
+	public mixed $sidebar = null;
+	/** @var mixed $statestats */
+	public mixed $statestats = null;
+	/** @var mixed $totalitemsprogress */
+	public mixed $totalitemsprogress = null;
+	/** @var mixed $totalitemspublish */
+	public mixed $totalitemspublish = null;
+	/** @var mixed $totalitemsunpublish */
+	public mixed $totalitemsunpublish = null;
+	/** @var mixed $totalitemswaiting */
+	public mixed $totalitemswaiting = null;
+	/** @var mixed $unpopular */
+	public mixed $unpopular = null;
+	/** @var mixed $votesstats */
+	public mixed $votesstats = null;
+	/** @var mixed $worstrating */
+	public mixed $worstrating = null;
+
+
 	/**
 	 * Creates the Entrypage
 	 *
@@ -70,17 +109,17 @@ class FlexicontentViewStats extends FlexicontentViewBaseRecords
 		// **************************
 		
 		!\Joomla\CMS\Factory::getLanguage()->isRtl()
-			? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
-			: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
+			? /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexicontentbackend', \Joomla\CMS\Uri\Uri::root().'administrator/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
+			: /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexicontentbackend_rtl', \Joomla\CMS\Uri\Uri::root().'administrator/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
 		!\Joomla\CMS\Factory::getLanguage()->isRtl()
-			? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
-			: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
+			? /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::root().'administrator/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
+			: /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::root().'administrator/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 
 
 
 		//*****************************************************************Adicionar as biblitecas*******************************************************************************************//
-		$document->addStyleSheet('//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css');
-		$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/librairies/esl/esl.js');
+		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('font-awesome', '//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css');
+		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-esl', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/librairies/esl/esl.js');
 		//*****************************************************************Adicionar as biblitecas*******************************************************************************************//
 		
 		

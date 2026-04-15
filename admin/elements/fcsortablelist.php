@@ -1,4 +1,6 @@
 <?php
+use Joomla\CMS\Form\FormHelper;
+use Joomla\CMS\HTML\HTMLHelper;
 /**
  * @version 1.5 stable $Id: filters.php 1829 2014-01-05 22:18:17Z ggppdk $
  * @package Joomla
@@ -23,12 +25,7 @@ defined('_JEXEC') or die('Restricted access');
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
-jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
-
-jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 \Joomla\CMS\Form\FormHelper::loadFieldClass('list');   // \Joomla\CMS\Form\Field\ListField
-
 
 /**
  * Renders a filter element
@@ -100,7 +97,6 @@ class JFormFieldFcSortableList extends \Joomla\CMS\Form\FormField
 		}
 		//echo "<pre>"; print_r($values); echo "</pre>";
 
-
 		$fieldname  = $this->name;
 		$element_id = $this->id;
 		
@@ -127,7 +123,6 @@ class JFormFieldFcSortableList extends \Joomla\CMS\Form\FormField
 			$fieldname_selector = $fieldname;
 			$element_id_selector = $element_id;
 		}
-
 
 		$attribs = '';
 		$selector_classes = array();

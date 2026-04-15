@@ -13,7 +13,8 @@
 // No direct access.
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('cms.plugin.plugin');
+use Joomla\CMS\Plugin\CMSPlugin;
+use Joomla\CMS\Factory;
 use Joomla\String\StringHelper;
 
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
@@ -149,7 +150,7 @@ class plgContentFlexiBreak extends \Joomla\CMS\Plugin\CMSPlugin
 
 		// Plugin base folder
 		$document = \Joomla\CMS\Factory::getDocument();
-		$plgbase  = \Joomla\CMS\Uri\Uri::root(true).'/plugins/'.$this->_type.'/'.$this->_name.'/'.$this->_name.'/'.$this->_name;
+		$plgbase  = \Joomla\CMS\Uri\Uri::root().'plugins/'.$this->_type.'/'.$this->_name.'/'.$this->_name.'/'.$this->_name;
 
 		// Display configuration
 		$display_method = (int) $this->params->get('display_method', 1);
@@ -167,11 +168,11 @@ class plgContentFlexiBreak extends \Joomla\CMS\Plugin\CMSPlugin
 				flexicontent_html::loadFramework('jQuery');
 			}
 
-			$document->addScript($plgbase.'.js');
+			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', $plgbase.'.js');
 		}
 
 		// Add CSS
-		$document->addStyleSheet($plgbase.'.css');
+		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', $plgbase.'.css');
 
 		// Clear article's text (and toc), so that we re-construct with appropriate containers
 		$row->text = '';
@@ -369,7 +370,7 @@ class plgContentFlexiBreak extends \Joomla\CMS\Plugin\CMSPlugin
 		else
 		{
 			ob_end_clean();
-			JError::raiseError(500, \Joomla\CMS\Language\Text::_('Failed to load template '.$name.'.php'));
+			throw new \RuntimeException(\Joomla\CMS\Language\Text::_('Failed to load template '.$name.'.php'));
 			return '';
 		}
 		return trim(ob_get_clean());

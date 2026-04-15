@@ -11,6 +11,7 @@
 
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Log\Log;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
@@ -26,6 +27,36 @@ require_once('traitbase.php');
  */
 class FlexicontentControllerBaseAdmin extends FlexicontentController
 {
+	/** @var mixed $canManage */
+	public mixed $canManage = null;
+	/** @var mixed $err_locked_recs_changestate */
+	public mixed $err_locked_recs_changestate = null;
+	/** @var mixed $err_locked_recs_delete */
+	public mixed $err_locked_recs_delete = null;
+	/** @var mixed $err_noauth_recs_changestate */
+	public mixed $err_noauth_recs_changestate = null;
+	/** @var mixed $err_noauth_recs_delete */
+	public mixed $err_noauth_recs_delete = null;
+	/** @var mixed $format */
+	public mixed $format = null;
+	/** @var mixed $msg_relations_deleted */
+	public mixed $msg_relations_deleted = null;
+	/** @var mixed $refererURL */
+	public mixed $refererURL = null;
+	/** @var mixed $returnURL */
+	public mixed $returnURL = null;
+	/** @var mixed $view */
+	public mixed $view = null;
+	/** @var mixed $warn_locked_recs_skipped */
+	public mixed $warn_locked_recs_skipped = null;
+	/** @var mixed $warn_locked_recs_skipped_del */
+	public mixed $warn_locked_recs_skipped_del = null;
+	/** @var mixed $warn_noauth_recs_skipped */
+	public mixed $warn_noauth_recs_skipped = null;
+	/** @var mixed $warn_noauth_recs_skipped_del */
+	public mixed $warn_noauth_recs_skipped_del = null;
+
+
 	use FCControllerTraitBase;
 
 	static $record_limit = 100000;
@@ -170,7 +201,6 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 			if (!empty($this->exitLogTexts))
 			{
 				$log_filename = 'filemanager_upload_' . ($user->id) . '.php';
-				jimport('joomla.log.log');
 				\Joomla\CMS\Log\Log::addLogger(
 					array(
 						'text_file' => $log_filename,  // Sets the target log file

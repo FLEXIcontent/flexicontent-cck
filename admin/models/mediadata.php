@@ -20,8 +20,13 @@ require_once('base/base.php');
  * FLEXIcontent Component Mediadata Model
  *
  */
+#[AllowDynamicProperties]
 class FlexicontentModelMediadata extends FCModelAdmin
 {
+	/** @var mixed $canCreate */
+	public mixed $canCreate = null;
+
+
 	/**
 	 * Record name, (parent class property), this is used for: naming session data, XML file of class, etc
 	 *

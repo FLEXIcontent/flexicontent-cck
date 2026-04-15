@@ -20,9 +20,85 @@ JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/compone
 /**
  * HTML View class for the items backend manager
  */
+#[AllowDynamicProperties]
 class FlexicontentViewItems extends FlexicontentViewBaseRecords
 {
-	var $proxy_option   = 'com_content';
+		/** @var mixed $badcatitems */
+	public mixed $badcatitems = null;
+	/** @var mixed $behaviour */
+	public mixed $behaviour = null;
+	/** @var mixed $cid */
+	public mixed $cid = null;
+	/** @var mixed $count_filters */
+	public mixed $count_filters = null;
+	/** @var mixed $custom_filts */
+	public mixed $custom_filts = null;
+	/** @var mixed $date */
+	public mixed $date = null;
+	/** @var mixed $enddate */
+	public mixed $enddate = null;
+	/** @var mixed $extra_fields */
+	public mixed $extra_fields = null;
+	/** @var mixed $filter_catsinstate */
+	public mixed $filter_catsinstate = null;
+	/** @var mixed $filter_order */
+	public mixed $filter_order = null;
+	/** @var mixed $filter_order_type */
+	public mixed $filter_order_type = null;
+	/** @var mixed $isMobile */
+	public mixed $isMobile = null;
+	/** @var mixed $isTablet */
+	public mixed $isTablet = null;
+	/** @var mixed $itemCats */
+	public mixed $itemCats = null;
+	/** @var mixed $itemTags */
+	public mixed $itemTags = null;
+	/** @var mixed $itemTypes */
+	public mixed $itemTypes = null;
+	/** @var mixed $lang_assocs */
+	public mixed $lang_assocs = null;
+	/** @var mixed $langs */
+	public mixed $langs = null;
+	/** @var mixed $lists */
+	public mixed $lists = null;
+	/** @var mixed $max_tab_types */
+	public mixed $max_tab_types = null;
+	/** @var mixed $minihelp */
+	public mixed $minihelp = null;
+	/** @var mixed $model_s */
+	public mixed $model_s = null;
+	/** @var mixed $pagination */
+	public mixed $pagination = null;
+	/** @var mixed $perms */
+	public mixed $perms = null;
+	/** @var mixed $reOrderingActive */
+	public mixed $reOrderingActive = null;
+	/** @var mixed $rows */
+	public mixed $rows = null;
+	/** @var mixed $scope */
+	public mixed $scope = null;
+	/** @var mixed $sidebar */
+	public mixed $sidebar = null;
+	/** @var mixed $single_type */
+	public mixed $single_type = null;
+	/** @var mixed $startdate */
+	public mixed $startdate = null;
+	/** @var mixed $state */
+	public mixed $state = null;
+	/** @var mixed $task */
+	public mixed $task = null;
+	/** @var mixed $tparams */
+	public mixed $tparams = null;
+	/** @var mixed $tparams_array */
+	public mixed $tparams_array = null;
+	/** @var mixed $unassociated */
+	public mixed $unassociated = null;
+	/** @var mixed $user */
+	public mixed $user = null;
+	/** @var mixed $view */
+	public mixed $view = null;
+
+var $proxy_option   = 'com_content';
 	var $title_propname = 'title';
 	var $state_propname = 'state';
 	var $db_tbl         = 'content';
@@ -219,17 +295,17 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 			if ($isAdmin)
 			{
 				!\Joomla\CMS\Factory::getLanguage()->isRtl()
-					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
-					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
+					? /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexicontentbackend', \Joomla\CMS\Uri\Uri::root().'administrator/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
+					: /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexicontentbackend_rtl', \Joomla\CMS\Uri\Uri::root().'administrator/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
 				!\Joomla\CMS\Factory::getLanguage()->isRtl()
-					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
-					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
+					? /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::root().'administrator/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
+					: /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::root().'administrator/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 			}
 			else
 			{
 				!\Joomla\CMS\Factory::getLanguage()->isRtl()
-					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
-					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
+					? /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexicontent', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
+					: /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexicontent_rtl', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
 			}
 
 			// Add JS frameworks
@@ -240,8 +316,8 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 			\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip');
 
 			// Add js function to overload the joomla submitform validation
-			$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
-			$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
+			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-admin', \Joomla\CMS\Uri\Uri::root().'administrator/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
+			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-validate', \Joomla\CMS\Uri\Uri::root().'administrator/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
 		}
 
 		$js = '';
@@ -1189,24 +1265,24 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 
 		// Add css to document
 		!\Joomla\CMS\Factory::getLanguage()->isRtl()
-			? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
-			: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
+			? /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexicontentbackend', \Joomla\CMS\Uri\Uri::root().'administrator/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
+			: /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexicontentbackend_rtl', \Joomla\CMS\Uri\Uri::root().'administrator/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
 		!\Joomla\CMS\Factory::getLanguage()->isRtl()
-			? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
-			: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
+			? /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::root().'administrator/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
+			: /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::root().'administrator/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 
 		// Add js to document
 		//\Joomla\CMS\HTML\HTMLHelper::_('behavior.tooltip');
 		flexicontent_html::loadFramework('select2');
-		$document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/js/batchprocess.js', array('version' => FLEXI_VHASH));
+		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-batchprocess', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/batchprocess.js', array('version' => FLEXI_VHASH));
 
 		flexicontent_html::loadFramework('flexi-lib');
 		flexicontent_html::loadFramework('flexi-lib-form');
 
 		// Add js function to overload the joomla submitform validation
 		\Joomla\CMS\HTML\HTMLHelper::_('behavior.formvalidator');  // load default validation JS to make sure it is overriden
-		$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
-		$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
+		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-admin', \Joomla\CMS\Uri\Uri::root().'administrator/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
+		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-validate', \Joomla\CMS\Uri\Uri::root().'administrator/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
 
 		// Create document/toolbar titles
 		$doc_title = $behaviour === 'translate'

@@ -19,8 +19,6 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('legacy.view.legacy');
-
 /**
  * HTML View class for the Favourites View
  *
@@ -55,15 +53,12 @@ class FlexicontentViewFavourites extends \Joomla\CMS\MVC\View\HtmlView
 		// Get parameters via model
 		$params  = $model->getParams();
 
-
-
 		// ***
 		// *** Get data from the model
 		// ***
 
 		$items   = $this->get('Data');
 		$total   = $this->get('Total');
-
 
 		// ***
 		// *** Bind Fields to items and RENDER their display HTML, but check for document type, due to Joomla issue with system
@@ -72,13 +67,11 @@ class FlexicontentViewFavourites extends \Joomla\CMS\MVC\View\HtmlView
 
 		$items 	= FlexicontentFields::getFields($items, $view, $params);
 
-
 		// ************************************************************************
 		// Calculate CSS classes needed to add special styling markups to the items
 		// ************************************************************************
 
 		flexicontent_html::calculateItemMarkups($items, $params);
-
 
 		// ***
 		// *** Load needed JS libs & CSS styles
@@ -90,21 +83,20 @@ class FlexicontentViewFavourites extends \Joomla\CMS\MVC\View\HtmlView
 		// Add css files to the document <head> section (also load CSS joomla template override)
 		if (!$params->get('disablecss', ''))
 		{
-			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
+			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('flexicontent', $this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
 			!\Joomla\CMS\Factory::getLanguage()->isRtl()
-				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
-				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
+				? /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
+				: /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 		}
 
 		if (FLEXI_J40GE && file_exists(JPATH_SITE.DS.'media/templates/site'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css'))
 		{
-			$document->addStyleSheet($this->baseurl.'/media/templates/site/'.$app->getTemplate().'/css/flexicontent.css', array('version' => FLEXI_VHASH));
+			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexicontent', $this->baseurl.'/media/templates/site/'.$app->getTemplate().'/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		}
 		elseif (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css'))
 		{
-			$document->addStyleSheet($this->baseurl.'/templates/'.$app->getTemplate().'/css/flexicontent.css', array('version' => FLEXI_VHASH));
+			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexicontent', $this->baseurl.'/templates/'.$app->getTemplate().'/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		}
-
 
 		// **********************************************************
 		// Calculate a (browser window) page title and a page heading
@@ -164,8 +156,6 @@ class FlexicontentViewFavourites extends \Joomla\CMS\MVC\View\HtmlView
 			$params->set('show_page_title',   0);
 		}
 
-
-
 		// ************************************************************
 		// Create the document title, by from page title and other data
 		// ************************************************************
@@ -185,7 +175,6 @@ class FlexicontentViewFavourites extends \Joomla\CMS\MVC\View\HtmlView
 
 		// Finally, set document title
 		$document->setTitle($doc_title);
-
 
 		// ************************
 		// Set document's META tags
@@ -214,8 +203,6 @@ class FlexicontentViewFavourites extends \Joomla\CMS\MVC\View\HtmlView
 		$lists['filter_order']     = $jinput->get('filter_order', 'i.title', 'cmd');
 		$lists['filter_order_Dir'] = $jinput->get('filter_order_Dir', 'ASC', 'cmd');
 		$lists['filter']           = $jinput->get('filter', '', 'string');
-
-
 
 		// ***
 		// *** Create the pagination object
@@ -279,7 +266,6 @@ class FlexicontentViewFavourites extends \Joomla\CMS\MVC\View\HtmlView
 					$pageNav->setAdditionalUrlParam($i, $v);
 				}
 			}
-
 
 			$_sh404sef = defined('SH404SEF_IS_RUNNING') && \Joomla\CMS\Factory::getConfig()->get('sef');
 			if ($_sh404sef)

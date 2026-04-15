@@ -2,16 +2,20 @@
 <extension type="component" version="3.7.0" method="upgrade">
 	<name>FLEXIcontent</name>
 	<!-- The following elements are optional and free of formatting constraints -->
-	<creationDate>15 July 2023</creationDate>
+	<creationDate>15 April 2026</creationDate>
 	<author>Emmanuel Danan, Georgios Papadakis, Yannick Berges, FLEXIcontent Team</author>
 	<authorEmail>noreply@flexicontent.org</authorEmail>
 	<authorUrl>http://www.flexicontent.org</authorUrl>
 	<copyright>(C) 2009-2022 Emmanuel Danan, Georgios Papadakis</copyright>
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 	<!--  The version string is recorded in the components table -->
-	<version>4.2.1</version>
+	<version>6.1.0</version>
+	<php_minimum>8.1</php_minimum>
+	<!-- supported_db: MySQL 8.0.13+ / MariaDB 10.4+ -->
 	<!-- The description is optional and defaults to the name -->
 	<description>COM_FLEXICONTENT_DESCRIPTION</description>
+	<!-- Compatibility: Joomla 4.4+ / 5.x / 6.x · PHP 8.1-8.4 -->
+	<!-- Requires: max_input_vars >= 5000 in php.ini -->
 	
 	<!-- Runs on install/uninstall/update -->
 	<scriptfile>script.php</scriptfile>
@@ -19,14 +23,12 @@
 	<install> <!-- Runs on install -->
 		<sql>
 			<file driver="mysql" charset="utf8">installation/install.mysql.utf8.sql</file>
-			<file driver="mysql">installation/install.mysql.nonutf8.sql</file>
 		</sql>
 	</install>
 	
 	<uninstall> <!-- Runs on uninstall -->
 		<sql>
 			<file driver="mysql" charset="utf8">installation/uninstall.mysql.utf8.sql</file>
-			<file driver="mysql">installation/uninstall.mysql.nonutf8.sql</file>
 		</sql>
 	</uninstall>
 	

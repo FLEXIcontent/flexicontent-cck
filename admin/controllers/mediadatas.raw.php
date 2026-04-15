@@ -27,9 +27,11 @@ require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' .
  *
  * @since 3.3
  */
+#[AllowDynamicProperties]
 class FlexicontentControllerMediadatas extends FlexicontentControllerBaseAdmin
 {
-	var $records_dbtbl = 'flexicontent_mediadatas';
+	
+var $records_dbtbl = 'flexicontent_mediadatas';
 	var $records_jtable = 'flexicontent_mediadatas';
 
 	var $record_name = 'mediadata';

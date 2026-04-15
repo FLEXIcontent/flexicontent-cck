@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\Plugin\CMSPlugin;
 /**
  * @package         FLEXIcontent
  * @version         3.4
@@ -10,7 +11,6 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-jimport('cms.plugin.plugin');
 
 class FCField extends \Joomla\CMS\Plugin\CMSPlugin
 {

@@ -31,7 +31,6 @@ require_once(JPATH_SITE . DS . 'components' . DS . 'com_flexicontent' . DS . 'mo
 //\Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 JLoader::register('\Joomla\CMS\Form\FormFieldFclayoutbuilder', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'elements' . DS . 'fclayoutbuilder.php');
 
-
 // Decide whether to show module contents
 $app     = \Joomla\CMS\Factory::getApplication();
 $config  = \Joomla\CMS\Factory::getConfig();
@@ -39,14 +38,12 @@ $jinput  = $app->input;
 $option  = $jinput->get('option', '', 'cmd');
 $view    = $jinput->get('view', '', 'cmd');
 
-
 // Show in view
 
 $_view   = $option == 'com_flexicontent' ? $view : 'others';
 $show_in_views = $params->get('show_in_views', array());
 $show_in_views = !is_array($show_in_views) ? array($show_in_views) : $show_in_views;
 $views_show_mod = !count($show_in_views) || in_array($_view, $show_in_views);
-
 
 // Show in client
 $caching = $params->get('cache', '0') ? $config->get('caching', '0') : 0;
@@ -69,28 +66,22 @@ if ($client_detectable && count($show_in_clients) && count($show_in_clients) < 4
 	$clients_show_mod = true;
 }
 
-
 // Show via PHP rule, but check if parameter is empty !
 $php_show_mod = $params->get('enable_php_rule', 0) && trim($params->get('php_rule', ''))
 	? eval($params->get('php_rule'))
 	: true;
-
 
 // Combine rules
 $show_mod = $params->get('combine_show_rules', 'AND') == 'AND'
 	? ($views_show_mod && $clients_show_mod && $php_show_mod)
 	: ($views_show_mod || $clients_show_mod || $php_show_mod);
 
-
 // ***
 // *** TERMINATE if not assigned to current view
 // ***
 if (!$show_mod)  return;
 
-
-
 global $modfc_jprof;
-jimport('joomla.profiler.profiler');
 $modfc_jprof = new \Joomla\CMS\Profiler\Profiler();
 $modfc_jprof->mark('START: FLEXIcontent Google Maps Module');
 
@@ -140,7 +131,6 @@ foreach ($mapItems as $mapItem)
 	);
 }
 
-
 /**
  * Default marker URL is used in map locations that do not include a custom marker (via item form)
  * or if the usage of custom marker icon per location has not been enabled in module configuration
@@ -180,7 +170,7 @@ if ($add_ccs && $layout) {
 		}
 
 		// Component CSS with optional override
-		echo flexicontent_html::getInlineLinkOnce(Uri::base(true) . '/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
+		echo flexicontent_html::getInlineLinkOnce(Uri::root() . 'components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		if (FLEXI_J40GE && file_exists(JPATH_SITE . DS . 'media/templates/site' . DS . $app->getTemplate() . DS . 'css' . DS . 'flexicontent.css')) {
 			echo flexicontent_html::getInlineLinkOnce(Uri::base(true) . '/media/templates/site/' . $app->getTemplate() . '/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		} elseif (file_exists(JPATH_SITE . DS . 'templates' . DS . $app->getTemplate() . DS . 'css' . DS . 'flexicontent.css')) {
@@ -192,20 +182,20 @@ if ($add_ccs && $layout) {
 	else {
 		// Active module layout css (optional)
 		if (file_exists(dirname(__FILE__) . DS . 'tmpl' . DS . $layout . DS . $layout . '.css')) {
-			$document->addStyleSheet(Uri::base(true) . '/modules/' . $modulename . '/tmpl/' . $layout . '/' . $layout . '.css', array('version' => FLEXI_VHASH));
+			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', Uri::base(true) . '/modules/' . $modulename . '/tmpl/' . $layout . '/' . $layout . '.css', array('version' => FLEXI_VHASH));
 		}
 
 		// Module 's core CSS
 		if (file_exists(dirname(__FILE__) . DS . 'tmpl_common' . DS . 'module.css')) {
-			$document->addStyleSheet(Uri::base(true) . '/modules/' . $modulename . '/tmpl_common/module.css', array('version' => FLEXI_VHASH));
+			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-module', Uri::base(true) . '/modules/' . $modulename . '/tmpl_common/module.css', array('version' => FLEXI_VHASH));
 		}
 
 		// Component CSS with optional override
-		$document->addStyleSheet(Uri::base(true) . '/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
+		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexicontent', Uri::root() . 'components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		if (FLEXI_J40GE && file_exists(JPATH_SITE . DS . 'media/templates/site' . DS . $app->getTemplate() . DS . 'css' . DS . 'flexicontent.css')) {
-			$document->addStyleSheet(Uri::base(true) . '/media/templates/site/' . $app->getTemplate() . '/css/flexicontent.css', array('version' => FLEXI_VHASH));
+			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexicontent', Uri::base(true) . '/media/templates/site/' . $app->getTemplate() . '/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		} elseif (file_exists(JPATH_SITE . DS . 'templates' . DS . $app->getTemplate() . DS . 'css' . DS . 'flexicontent.css')) {
-			$document->addStyleSheet(Uri::base(true) . '/templates/' . $app->getTemplate() . '/css/flexicontent.css');
+			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexicontent', Uri::base(true) . '/templates/' . $app->getTemplate() . '/css/flexicontent.css');
 		}
 	}
 }

@@ -19,8 +19,6 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
-jimport('legacy.view.legacy');
-
 /**
  * HTML View class for the FLEXIcontent View
  */
@@ -53,7 +51,6 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 		// Raw output
 		parent::display($tpl);
 	}
-
 
 	/**
 	 * Fetch the version from the flexicontent.org server
@@ -161,7 +158,6 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 		
 		return $check;
 	}
-
 
 	function fversion(&$params)
 	{

@@ -11,6 +11,7 @@
 
 defined('_JEXEC') or die('Restricted access');
 
+use Joomla\CMS\Access\Rules;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Event\AbstractEvent;
@@ -21,7 +22,6 @@ use Joomla\Event\DispatcherAwareTrait;
 use Joomla\Event\DispatcherInterface;
 use \Joomla\CMS\Table\Table;
 
-jimport('joomla.access.rules');
 require_once('flexicontent_basetable.php');
 
 class _flexicontent_items_common extends flexicontent_basetable
@@ -87,8 +87,19 @@ else
 }
 
 
+#[AllowDynamicProperties]
 class flexicontent_items extends _flexicontent_items
 {
+	/** @var mixed $_NAME */
+	public mixed $_NAME = null;
+	/** @var mixed $_records_dbtbl */
+	public mixed $_records_dbtbl = null;
+	/** @var mixed $_tbl_fields */
+	public mixed $_tbl_fields = null;
+	/** @var mixed $asset_id */
+	public mixed $asset_id = null;
+
+
 	/** @var int Primary key */
 	var $id					= null;
 	/** @var string */

@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\Cache\Cache;
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 class FLEXIUtilities
@@ -383,7 +384,6 @@ class FLEXIUtilities
 			'cachebase' => ($client == 1 ? JPATH_ADMINISTRATOR . '/cache' : $conf->get('cache_path', JPATH_SITE . '/cache'))
 		);
 
-		jimport('joomla.cache.cache');
 		$cache = \Joomla\CMS\Cache\Cache::getInstance('', $options);
 
 		return $cache;

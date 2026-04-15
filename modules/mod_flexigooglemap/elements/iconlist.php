@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\Form\FormField;
 /**
  * @version 0.6.0 stable $Id: default.php yannick berges
  * @package Joomla
@@ -18,7 +19,6 @@
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
 
-jimport('joomla.form.formfield');
 
 class JFormFieldIconlist extends \Joomla\CMS\Form\FormField
 {

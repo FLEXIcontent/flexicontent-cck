@@ -11,6 +11,8 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+use Joomla\Filesystem\File;
+use Joomla\Filesystem\Path;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
@@ -1069,7 +1071,7 @@ class FlexicontentFields
 		  $context = 'com_content.category';
 
 			// Needed by legacy non-updated plugins
-			//!FLEXI_J40GE ? JRequest::setVar('view', 'category') : null;
+			//!FLEXI_J40GE ? Factory::getApplication()->input->set('view', 'category') : null;
 			if (!FLEXI_J40GE) $jinput->set('view', 'category');
 		}
 
@@ -1079,7 +1081,7 @@ class FlexicontentFields
 		$jinput->set('layout_fc', $_layout);
 
 		// Needed by legacy non-updated plugins
-		//!FLEXI_J40GE ? JRequest::setVar('option', 'com_content') : null;
+		//!FLEXI_J40GE ? Factory::getApplication()->input->set('option', 'com_content') : null;
 		if (!FLEXI_J40GE) $jinput->set('option', 'com_content');
 
 
@@ -1207,9 +1209,9 @@ class FlexicontentFields
 		$jinput->set('option', $_option);
 
 		// Needed by legacy non-updated plugins
-		//!FLEXI_J40GE ? JRequest::setVar('layout', $_layout) : null;
-		//!FLEXI_J40GE ? JRequest::setVar('view', $_view) : null;
-		//!FLEXI_J40GE ? JRequest::setVar('option', $_option) : null;
+		//!FLEXI_J40GE ? Factory::getApplication()->input->set('layout', $_layout) : null;
+		//!FLEXI_J40GE ? Factory::getApplication()->input->set('view', $_view) : null;
+		//!FLEXI_J40GE ? Factory::getApplication()->input->set('option', $_option) : null;
 		if (!FLEXI_J40GE) $jinput->set('layout', $_layout);
 		if (!FLEXI_J40GE) $jinput->set('view', $_view);
 		if (!FLEXI_J40GE) $jinput->set('option', $_option);
@@ -2805,7 +2807,6 @@ class FlexicontentFields
 		 */
 		/*
 		$pdfparser_path = $cparams->get('pdfparser_path', 'components/com_flexicontent/librairies/pdfparser');
-		jimport('joomla.filesystem.path');
 		$pdfparser_path = \Joomla\Filesystem\Path::clean($pdfparser_path);
 
 		if (!$pdfparser_path)
@@ -2868,7 +2869,6 @@ class FlexicontentFields
 			return false;
 		}*/
 
-		jimport('joomla.filesystem.file');
 		$segmenter_path = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'THSplitLib'.DS.'segment.php';
 
 		if (!file_exists($segmenter_path))

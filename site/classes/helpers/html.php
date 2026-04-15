@@ -1,6 +1,10 @@
 <?php
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+use Joomla\Filesystem\File;
+use Joomla\Filesystem\Folder;
+use Joomla\CMS\Mail\MailHelper;
+
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Application\CMSApplication;
@@ -10,8 +14,24 @@ use Joomla\Filesystem\Path;
 use Joomla\Database\DatabaseInterface;
 use Joomla\CMS\Toolbar\ToolbarFactoryInterface;
 
+#[AllowDynamicProperties]
 class flexicontent_html
 {
+	/** @var mixed $fields */
+	public mixed $fields = null;
+	/** @var mixed $item */
+	public mixed $item = null;
+	/** @var mixed $pageclass_sfx */
+	public mixed $pageclass_sfx = null;
+	/** @var mixed $params */
+	public mixed $params = null;
+	/** @var mixed $params_saved */
+	public mixed $params_saved = null;
+	/** @var mixed $print_link */
+	public mixed $print_link = null;
+	/** @var mixed $tmpl */
+	public mixed $tmpl = null;
+
 	static $use_bootstrap = true;
 	static $icon_classes = null;
 	static $option = 'com_flexicontent';
@@ -1223,7 +1243,7 @@ class flexicontent_html
 
 		$document =Factory::getApplication()->getDocument();
 		$flexiparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
-		$lib_path = '/components/com_flexicontent/librairies';
+		$lib_path = 'components/com_flexicontent/librairies';
 
 		$add_remote_forced_jquery = $add_remote === 2;
 		$add_remote_forced_jquery_ui = $add_remote === 2;
@@ -1258,19 +1278,19 @@ class flexicontent_html
 			if ($add_remote_forced_jquery)
 			{
 				\Joomla\CMS\HTML\HTMLHelper::_('jquery.framework');   // add and "override" it
-				$document->addScript('//code.jquery.com/jquery-'.$JQUERY_VER.'.min.js', null, $JQUERY_VER_URL_ATTRS);
+				$document->getWebAssetManager()->registerAndUseScript('min', '//code.jquery.com/jquery-'.$JQUERY_VER.'.min.js', null, $JQUERY_VER_URL_ATTRS);
 			}
 			else
 			{
 				FLEXI_J30GE
 					? \Joomla\CMS\HTML\HTMLHelper::_('jquery.framework')
-					: $document->addScript(\Joomla\CMS\Uri\Uri::root(true).$lib_path.'/jquery/js/jquery-'.$JQUERY_VER.'.min.js');
+					: $document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root().$lib_path.'/jquery/js/jquery-'.$JQUERY_VER.'.min.js');
 			}
 
 			// The 'noConflict()' statement must be inside a js file, to make sure it executed immediately
 			if (!FLEXI_J30GE)
 			{
-				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).$lib_path.'/jquery/js/jquery-no-conflict.js');
+				$document->getWebAssetManager()->registerAndUseScript('fc-jquery-no-conflict', \Joomla\CMS\Uri\Uri::root().$lib_path.'/jquery/js/jquery-no-conflict.js');
 			}
 			//$document->addCustomTag('<script>jQuery.noConflict();</script>');  // not placed in proper place
 			$jquery_added = 1;
@@ -1282,44 +1302,43 @@ class flexicontent_html
 
 		if ($add_jquery_ui && !$jquery_ui_added)
 		{
-			// Load all components of jQuery-UI (add and "override" it)
-			if ($add_remote_forced_jquery_ui)
+			if (FLEXI_J40GE)
 			{
-				!FLEXI_J40GE
-					? \Joomla\CMS\HTML\HTMLHelper::_('jquery.ui', array())
-					: false;
-				$document->addScript('//code.jquery.com/ui/'.$JQUERY_UI_VER.'/jquery-ui.min.js');
+				// J5/J6: Load jQuery UI 1.13.2 full bundle from CDN
+				// Must load BEFORE flexi-lib.js which calls .dialog()/.sortable()
+				$document->getWebAssetManager()->registerAndUseScript(
+					'jquery-ui',
+					'https://code.jquery.com/ui/1.13.2/jquery-ui.min.js',
+					array('version' => '1.13.2')
+				);
 			}
 			else
 			{
-				if (FLEXI_J40GE)
-				{
-					$document->addScript(\Joomla\CMS\Uri\Uri::root(true).$lib_path.'/jquery/js/jquery-ui-'.$JQUERY_UI_VER.'/jquery-ui.min.js');
-				}
-				elseif (FLEXI_J30GE)
-				{
-					\Joomla\CMS\HTML\HTMLHelper::_('jquery.ui', array('core', 'sortable'));   // 'core' in J3+ includes all parts of jQuery-UI CORE component: Core, Widget, Mouse, Position
-					if ( !$params || $params->get('load-ui-dialog', 1) )        $document->addScript(\Joomla\CMS\Uri\Uri::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.dialog.min.js');
-					if ( !$params || $params->get('load-ui-menu', 1) )          $document->addScript(\Joomla\CMS\Uri\Uri::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.menu.min.js');
-					if ( !$params || $params->get('load-ui-autocomplete', 1) )  $document->addScript(\Joomla\CMS\Uri\Uri::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.autocomplete.min.js');
-					if ( !$params || $params->get('load-ui-progressbar', 1) )   $document->addScript(\Joomla\CMS\Uri\Uri::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.progressbar.min.js');
-				}
-				else
-				{
-					$document->addScript(\Joomla\CMS\Uri\Uri::root(true).$lib_path.'/jquery/js/jquery-ui-'.$JQUERY_UI_VER.'.js');
+				// Legacy J3: remote CDN or local
+				if ($add_remote_forced_jquery_ui) {
+					$document->getWebAssetManager()->registerAndUseScript('min',
+						'//code.jquery.com/ui/'.$JQUERY_UI_VER.'/jquery-ui.min.js');
+				} else {
+					\Joomla\CMS\HTML\HTMLHelper::_('jquery.ui', array('core', 'sortable', 'dialog', 'draggable', 'resizable', 'autocomplete'));
 				}
 			}
-
 			$jquery_ui_added = 1;
 		}
 
-		// Add jQuery UI theme, this is included in J3+ when executing jQuery-UI framework is called
-		if ( $add_jquery_ui_css && !$jquery_ui_css_added )
+		// jQuery UI CSS
+		if ($add_jquery_ui_css && !$jquery_ui_css_added)
 		{
-			// FLEXI_JQUERY_UI_CSS_STYLE:  'ui-lightness', 'smoothness', ...
-			$add_remote_forced_jquery_ui
-				? $document->addStyleSheet('//code.jquery.com/ui/'.$JQUERY_UI_VER.'/themes/'.$JQUERY_UI_THEME.'/jquery-ui.css')
-				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).$lib_path.'/jquery/css/'.$JQUERY_UI_THEME.'/jquery-ui-'.$JQUERY_UI_VER.'.css');
+			if (FLEXI_J40GE) {
+				$document->getWebAssetManager()->registerAndUseStyle(
+					'jquery-ui-theme',
+					'https://code.jquery.com/ui/1.13.2/themes/smoothness/jquery-ui.min.css'
+				);
+			} elseif ($add_remote_forced_jquery_ui) {
+				$document->getWebAssetManager()->registerAndUseStyle('jquery-ui-cdn',
+					'//code.jquery.com/ui/'.$JQUERY_UI_VER.'/themes/'.$JQUERY_UI_THEME.'/jquery-ui.css');
+			} else {
+				$document->addStyleSheet(\Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/librairies/jquery/css/'.$JQUERY_UI_THEME.'/jquery-ui-'.$JQUERY_UI_VER.'.css');
+			}
 			$jquery_ui_css_added = 1;
 		}
 	}
@@ -1388,7 +1407,7 @@ class flexicontent_html
 
 		// Load Framework
 		$document =Factory::getApplication()->getDocument();
-		$lib_path = '/components/com_flexicontent/librairies';
+		$lib_path = 'components/com_flexicontent/librairies';
 		$js = "";
 		$css = "";
 
@@ -1412,9 +1431,9 @@ class flexicontent_html
 			case 'bootstrap-toggle':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
-				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/bootstrap-toggle';
-				$document->addScript($framework_path.'/js/bootstrap2-toggle.min.js');
-				$document->addStyleSheet($framework_path.'/css/bootstrap2-toggle.min.css');
+				$framework_path = \Joomla\CMS\Uri\Uri::root().$lib_path.'/bootstrap-toggle';
+				$document->getWebAssetManager()->registerAndUseScript('min', $framework_path.'/js/bootstrap2-toggle.min.js');
+				$document->getWebAssetManager()->registerAndUseStyle('min', $framework_path.'/css/bootstrap2-toggle.min.css');
 
 				$js .= "
 					jQuery(document).ready(function(){
@@ -1430,46 +1449,46 @@ class flexicontent_html
 				if ($isMobile)
 				{
 					if ($load_jquery) flexicontent_html::loadJQuery();
-					$document->addScript(\Joomla\CMS\Uri\Uri::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.touch-punch.min.js');
+					$document->getWebAssetManager()->registerAndUseScript('fc-jquery-ui-touch-punch-min', \Joomla\CMS\Uri\Uri::root().$lib_path.'/jquery/js/jquery-ui/jquery.ui.touch-punch.min.js');
 				}
 				break;
 
 			case 'grapejs':
 
-				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/grapesjs';
+				$framework_path = \Joomla\CMS\Uri\Uri::root().$lib_path.'/grapesjs';
 
 				$grapjs_vers = '0.16.22'; // need to update
 				$url_grapjs_css = 'https://unpkg.com/grapesjs@' . $grapjs_vers . '/dist/css/grapes.min.css';
 				$url_grapjs_js = 'https://unpkg.com/grapesjs@' . $grapjs_vers . '/dist/grapes.min.js';
 
-				$document->addStyleSheet($framework_path.'/stylesheets/toastr.min.css');
-				$document->addStyleSheet($url_grapjs_css);
-				$document->addStyleSheet($framework_path.'/stylesheets/grapesjs-preset-webpage.min.css?0.1.10');
-				$document->addStyleSheet($framework_path.'/stylesheets/tooltip.css');
-				$document->addStyleSheet($framework_path.'/stylesheets/grapesjs-plugin-filestack.css');
-				$document->addStyleSheet($framework_path.'/stylesheets/demos.css');
+				$document->getWebAssetManager()->registerAndUseStyle('min', $framework_path.'/stylesheets/toastr.min.css');
+				$document->getWebAssetManager()->registerAndUseStyle('fc-style', $url_grapjs_css);
+				$document->getWebAssetManager()->registerAndUseStyle('min', $framework_path.'/stylesheets/grapesjs-preset-webpage.min.css?0.1.10');
+				$document->getWebAssetManager()->registerAndUseStyle('tooltip', $framework_path.'/stylesheets/tooltip.css');
+				$document->getWebAssetManager()->registerAndUseStyle('grapesjs-plugin-filestack', $framework_path.'/stylesheets/grapesjs-plugin-filestack.css');
+				$document->getWebAssetManager()->registerAndUseStyle('demos', $framework_path.'/stylesheets/demos.css');
 
-				$document->addScript('https://static.filestackapi.com/v3/filestack.js');
-				$document->addScript($framework_path.'/js/toastr.min.js');
-				$document->addScript($url_grapjs_js);
+				$document->getWebAssetManager()->registerAndUseScript('filestack', 'https://static.filestackapi.com/v3/filestack.js');
+				$document->getWebAssetManager()->registerAndUseScript('min', $framework_path.'/js/toastr.min.js');
+				$document->getWebAssetManager()->registerAndUseScript('fc-script', $url_grapjs_js);
 
 
 				// GrapesJS Plugins
-				//$document->addScript('https://unpkg.com/grapesjs-blocks-basic');
-				$document->addScript($framework_path.'/js/grapesjs-preset-webpage.min.js?0.1.10');
-				$document->addScript($framework_path.'/js/grapesjs-lory-slider.min.js?0.1.5');
-				$document->addScript($framework_path.'/js/grapesjs-tabs.min.js?0.1.1');
-				$document->addScript($framework_path.'/js/grapesjs-custom-code.min.js?0.1.1');
-				$document->addScript($framework_path.'/js/grapesjs-touch.min.js?0.1.1');
-				$document->addScript($framework_path.'/js/grapesjs-parser-postcss.min.js?0.1.1');
-				$document->addScript($framework_path.'/js/grapesjs-tooltip.min.js?0.1.1');
+				//$document->getWebAssetManager()->registerAndUseScript('fc-script', 'https://unpkg.com/grapesjs-blocks-basic');
+				$document->getWebAssetManager()->registerAndUseScript('min', $framework_path.'/js/grapesjs-preset-webpage.min.js?0.1.10');
+				$document->getWebAssetManager()->registerAndUseScript('min', $framework_path.'/js/grapesjs-lory-slider.min.js?0.1.5');
+				$document->getWebAssetManager()->registerAndUseScript('min', $framework_path.'/js/grapesjs-tabs.min.js?0.1.1');
+				$document->getWebAssetManager()->registerAndUseScript('min', $framework_path.'/js/grapesjs-custom-code.min.js?0.1.1');
+				$document->getWebAssetManager()->registerAndUseScript('min', $framework_path.'/js/grapesjs-touch.min.js?0.1.1');
+				$document->getWebAssetManager()->registerAndUseScript('min', $framework_path.'/js/grapesjs-parser-postcss.min.js?0.1.1');
+				$document->getWebAssetManager()->registerAndUseScript('min', $framework_path.'/js/grapesjs-tooltip.min.js?0.1.1');
 				//shapedivider module
-				//$document->addScript('https://unpkg.com/grapesjs-shape-divider');  
+				//$document->getWebAssetManager()->registerAndUseScript('fc-script', 'https://unpkg.com/grapesjs-shape-divider');  
 				//ckeditor for graps
-				$document->addScript($framework_path.'/js/grapesjs-plugin-ckeditor.min.js?0.0.9');
-				$document->addScript('https://cdn.ckeditor.com/4.14.1/standard-all/ckeditor.js');
+				$document->getWebAssetManager()->registerAndUseScript('min', $framework_path.'/js/grapesjs-plugin-ckeditor.min.js?0.0.9');
+				$document->getWebAssetManager()->registerAndUseScript('ckeditor', 'https://cdn.ckeditor.com/4.14.1/standard-all/ckeditor.js');
 				//bs4
-				//$document->addScript($framework_path.'/js/grapesjs-blocks-bootstrap4.min');
+				//$document->getWebAssetManager()->registerAndUseScript('fc-script', $framework_path.'/js/grapesjs-blocks-bootstrap4.min');
 				break;
 
 			case 'grapesjs_view':
@@ -1493,23 +1512,23 @@ class flexicontent_html
 			case 'mousewheel':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
-				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/mousewheel';
-				$document->addScript($framework_path.'/jquery.mousewheel.min.js');
+				$framework_path = \Joomla\CMS\Uri\Uri::root().$lib_path.'/mousewheel';
+				$document->getWebAssetManager()->registerAndUseScript('min', $framework_path.'/jquery.mousewheel.min.js');
 				break;
 
 			case 'mCSB':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
-				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/mCSB';
+				$framework_path = \Joomla\CMS\Uri\Uri::root().$lib_path.'/mCSB';
 
 				// Load jQuery mouse wheel as this JS can make use of it
 				flexicontent_html::loadFramework('mousewheel');
 
 				// Add mousewheel plugin (this is optional)
-				//$document->addScript($framework_path.'/jquery.mousewheel.min.js');
+				//$document->getWebAssetManager()->registerAndUseScript('min', $framework_path.'/jquery.mousewheel.min.js');
 
-				$document->addScript($framework_path.'/jquery.mCustomScrollbar.min.js');
-				$document->addStyleSheet($framework_path.'/jquery.mCustomScrollbar.min.css');
+				$document->getWebAssetManager()->registerAndUseScript('min', $framework_path.'/jquery.mCustomScrollbar.min.js');
+				$document->getWebAssetManager()->registerAndUseStyle('min', $framework_path.'/jquery.mCustomScrollbar.min.css');
 
 				$js .= "
 					jQuery(document).ready(function(){
@@ -1529,14 +1548,14 @@ class flexicontent_html
 			case 'image-picker':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
-				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/image-picker';
-				$document->addScript($framework_path.'/image-picker.min.js');
-				$document->addStyleSheet($framework_path.'/image-picker.css');
+				$framework_path = \Joomla\CMS\Uri\Uri::root().$lib_path.'/image-picker';
+				$document->getWebAssetManager()->registerAndUseScript('min', $framework_path.'/image-picker.min.js');
+				$document->getWebAssetManager()->registerAndUseStyle('image-picker', $framework_path.'/image-picker.css');
 				break;
 
 			case 'masonry':
-				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/masonry';
-				$document->addScript($framework_path.'/masonry.pkgd.min.js');
+				$framework_path = \Joomla\CMS\Uri\Uri::root().$lib_path.'/masonry';
+				$document->getWebAssetManager()->registerAndUseScript('min', $framework_path.'/masonry.pkgd.min.js');
 				break;
 
 			case 'google-maps':
@@ -1564,24 +1583,24 @@ class flexicontent_html
 				}
 
 				// Add map link 
-				$document->addScript('https://maps.google.com/maps/api/js?libraries=geometry,places' . ($apikey ? '&key=' . $apikey : '') . $force_language_param);
+				$document->getWebAssetManager()->registerAndUseScript('fc-script', 'https://maps.google.com/maps/api/js?libraries=geometry,places' . ($apikey ? '&key=' . $apikey : '') . $force_language_param);
 				// Add JS library for markers at the same location
-				$document->addScript('https://cdnjs.cloudflare.com/ajax/libs/OverlappingMarkerSpiderfier/1.0.3/oms.min.js');
+				$document->getWebAssetManager()->registerAndUseScript('min', 'https://cdnjs.cloudflare.com/ajax/libs/OverlappingMarkerSpiderfier/1.0.3/oms.min.js');
 				break;
 
 			case 'openstreetmap' :
-				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/leaflet';
-				$document->addStyleSheet($framework_path.'/leaflet.css');
-				$document->addStyleSheet($framework_path.'/MarkerCluster.css');
-				$document->addStyleSheet($framework_path.'/MarkerCluster.Default.css');
-				$document->addScript($framework_path.'/leaflet.js');
-				$document->addScript($framework_path.'/leaflet.markercluster.js');
+				$framework_path = \Joomla\CMS\Uri\Uri::root().$lib_path.'/leaflet';
+				$document->getWebAssetManager()->registerAndUseStyle('leaflet', $framework_path.'/leaflet.css');
+				$document->getWebAssetManager()->registerAndUseStyle('MarkerCluster', $framework_path.'/MarkerCluster.css');
+				$document->getWebAssetManager()->registerAndUseStyle('Default', $framework_path.'/MarkerCluster.Default.css');
+				$document->getWebAssetManager()->registerAndUseScript('leaflet', $framework_path.'/leaflet.js');
+				$document->getWebAssetManager()->registerAndUseScript('markercluster', $framework_path.'/leaflet.markercluster.js');
 				break;
 
 
 			case 'pannellum' :
-				$document->addStyleSheet('https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css');
-				$document->addScript('https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js');
+				$document->getWebAssetManager()->registerAndUseStyle('pannellum', 'https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css');
+				$document->getWebAssetManager()->registerAndUseScript('cdn', 'https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js');
 				break;
 
 			case 'select2':
@@ -1620,32 +1639,32 @@ class flexicontent_html
 				";
 
 				$ver = '3.5.4';
-				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/select2';
+				$framework_path = \Joomla\CMS\Uri\Uri::root().$lib_path.'/select2';
 				$framework_folder = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'select2';
-				$document->addScript($framework_path.'/select2.min.js', array('version' => $ver));
-				$document->addScript($framework_path.'/select2.sortable.js', array('version' => $ver));
-				$document->addStyleSheet($framework_path.'/select2.css', array('version' => $ver));
+				$document->getWebAssetManager()->registerAndUseScript('min', $framework_path.'/select2.min.js', array('version' => $ver));
+				$document->getWebAssetManager()->registerAndUseScript('sortable', $framework_path.'/select2.sortable.js', array('version' => $ver));
+				$document->getWebAssetManager()->registerAndUseStyle('select2', $framework_path.'/select2.css', array('version' => $ver));
 
 				$lang_code = flexicontent_html::getUserCurrentLang();
 				if ( $lang_code && $lang_code!='en' )
 				{
 					// Try language shortcode
 					if ( file_exists($framework_folder.DS.'select2_locale_'.$lang_code.'.js') ) {
-						$document->addScript($framework_path.'/select2_locale_'.$lang_code.'.js', array('version' => $ver));
+						$document->getWebAssetManager()->registerAndUseScript('fc-script', $framework_path.'/select2_locale_'.$lang_code.'.js', array('version' => $ver));
 					}
 					// select2 JS 4.0.0+
 					/*if ( file_exists($framework_folder.DS.'select2'.DS.'i18n'.DS.$lang_code.'.js') ) {
-						$document->addScript($framework_path.'/select2/i18n/'.$lang_code.'.js', array('version' => $ver));
+						$document->getWebAssetManager()->registerAndUseScript('fc-script', $framework_path.'/select2/i18n/'.$lang_code.'.js', array('version' => $ver));
 					}*/
 					// Try country language code
 					else {
 						$country_code = flexicontent_html::getUserCurrentLang($short_tag=false);
 						if ( $country_code && file_exists($framework_folder.DS.'select2_locale_'.$country_code.'.js') ) {
-							$document->addScript($framework_path.'/select2_locale_'.$country_code.'.js', array('version' => $ver));
+							$document->getWebAssetManager()->registerAndUseScript('fc-script', $framework_path.'/select2_locale_'.$country_code.'.js', array('version' => $ver));
 						}
 						// select2 JS 4.0.0+
 						/*if ( $country_code && file_exists($framework_folder.DS.'select2'.DS.'i18n'.DS.$country_code.'.js') ) {
-							$document->addScript($framework_path.'/select2/i18n/'.$country_code.'.js', array('version' => $ver));
+							$document->getWebAssetManager()->registerAndUseScript('fc-script', $framework_path.'/select2/i18n/'.$country_code.'.js', array('version' => $ver));
 						}*/
 					}
 				}
@@ -1663,8 +1682,8 @@ class flexicontent_html
 			case 'inputmask':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
-				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/inputmask';
-				$document->addScript($framework_path.'/jquery.inputmask.bundle.min.js');
+				$framework_path = \Joomla\CMS\Uri\Uri::root().$lib_path.'/inputmask';
+				$document->getWebAssetManager()->registerAndUseScript('min', $framework_path.'/jquery.inputmask.bundle.min.js');
 
 				// Extra inputmask declarations definitions, e.g. ...
 				$js .= "";
@@ -1782,9 +1801,9 @@ class flexicontent_html
 			case 'prettyCheckable':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
-				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/prettyCheckable';
-				$document->addScript($framework_path.'/dev/prettyCheckable.js');
-				$document->addStyleSheet($framework_path.'/dist/prettyCheckable.css');
+				$framework_path = \Joomla\CMS\Uri\Uri::root().$lib_path.'/prettyCheckable';
+				$document->getWebAssetManager()->registerAndUseScript('prettyCheckable', $framework_path.'/dev/prettyCheckable.js');
+				$document->getWebAssetManager()->registerAndUseStyle('prettyCheckable', $framework_path.'/dist/prettyCheckable.css');
 				$js .= "
 					jQuery(document).ready(function(){
 						jQuery('input.use_prettycheckable').each(function() {
@@ -1805,17 +1824,17 @@ class flexicontent_html
 			case 'jmultibox':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
-				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/jmultibox';
+				$framework_path = \Joomla\CMS\Uri\Uri::root().$lib_path.'/jmultibox';
 
 				// Add JS
-				$document->addScript($framework_path.'/js/jmultibox.js');
-				$document->addScript($framework_path.'/js/jquery.vegas.js');
+				$document->getWebAssetManager()->registerAndUseScript('jmultibox', $framework_path.'/js/jmultibox.js');
+				$document->getWebAssetManager()->registerAndUseScript('vegas', $framework_path.'/js/jquery.vegas.js');
 
 				// Add CSS
-				$document->addStyleSheet($framework_path.'/styles/multibox.css');
-				$document->addStyleSheet($framework_path.'/styles/jquery.vegas.css');
+				$document->getWebAssetManager()->registerAndUseStyle('multibox', $framework_path.'/styles/multibox.css');
+				$document->getWebAssetManager()->registerAndUseStyle('vegas', $framework_path.'/styles/jquery.vegas.css');
 				if (substr($_SERVER['HTTP_USER_AGENT'],0,34)=="Mozilla/4.0 (compatible; MSIE 6.0;") {
-					$document->addStyleSheet($framework_path.'/styles/multibox-ie6.css');
+					$document->getWebAssetManager()->registerAndUseStyle('multibox-ie6', $framework_path.'/styles/multibox-ie6.css');
 				}
 
 				// Attach multibox to ... this will be left to the caller so that it will create a multibox object with custom options
@@ -1824,16 +1843,16 @@ class flexicontent_html
 
 			case 'fancybox':
 				if ($load_jquery) flexicontent_html::loadJQuery();
-				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js');
+				$document->getWebAssetManager()->registerAndUseScript('fc-jquery-easing', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/jquery-easing.js');
 
-				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/fancybox';
+				$framework_path = \Joomla\CMS\Uri\Uri::root().$lib_path.'/fancybox';
 
 				// Load jQuery mouse wheel as this JS can make use of it
 				flexicontent_html::loadFramework('mousewheel');
 
 				// Add fancyBox CSS / JS
-				$document->addStyleSheet($framework_path.'/dist/jquery.fancybox.min.css');
-				$document->addScript($framework_path.'/dist/jquery.fancybox.min.js');
+				$document->getWebAssetManager()->registerAndUseStyle('min', $framework_path.'/dist/jquery.fancybox.min.css');
+				$document->getWebAssetManager()->registerAndUseScript('min', $framework_path.'/dist/jquery.fancybox.min.js');
 
 				// Attach fancybox to all elements having a specific CSS class
 				$js .= "
@@ -1852,37 +1871,37 @@ class flexicontent_html
 			case 'galleriffic':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
-				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/galleriffic';
-				$document->addStyleSheet($framework_path.'/css/basic.css');
-				$document->addScript($framework_path.'/js/jquery.galleriffic.js');
+				$framework_path = \Joomla\CMS\Uri\Uri::root().$lib_path.'/galleriffic';
+				$document->getWebAssetManager()->registerAndUseStyle('basic', $framework_path.'/css/basic.css');
+				$document->getWebAssetManager()->registerAndUseScript('galleriffic', $framework_path.'/js/jquery.galleriffic.js');
 
 				break;
 
 			case 'elastislide':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
-				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/elastislide';
-				$document->addStyleSheet($framework_path.'/css/gallery.css');
+				$framework_path = \Joomla\CMS\Uri\Uri::root().$lib_path.'/elastislide';
+				$document->getWebAssetManager()->registerAndUseStyle('gallery', $framework_path.'/css/gallery.css');
 
-				$document->addScript($framework_path.'/js/jquery.tmpl.min.js');
-				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js', array('version' => FLEXI_VHASH));
+				$document->getWebAssetManager()->registerAndUseScript('min', $framework_path.'/js/jquery.tmpl.min.js');
+				$document->getWebAssetManager()->registerAndUseScript('fc-jquery-easing', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/jquery-easing.js', array('version' => FLEXI_VHASH));
 
-				$document->addScript($framework_path.'/js/jquery.elastislide.js');
-				$document->addScript($framework_path.'/js/gallery.js');
+				$document->getWebAssetManager()->registerAndUseScript('elastislide', $framework_path.'/js/jquery.elastislide.js');
+				$document->getWebAssetManager()->registerAndUseScript('gallery', $framework_path.'/js/gallery.js');
 				break;
 
 			case 'photoswipe':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
-				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/photoswipe';
+				$framework_path = \Joomla\CMS\Uri\Uri::root().$lib_path.'/photoswipe';
 
-				//$document->addStyleSheet($framework_path.'/lib/jquery.mobile/jquery.mobile.css');
-				$document->addStyleSheet($framework_path.'/photoswipe.css');
+				//$document->getWebAssetManager()->registerAndUseStyle('mobile', $framework_path.'/lib/jquery.mobile/jquery.mobile.css');
+				$document->getWebAssetManager()->registerAndUseStyle('photoswipe', $framework_path.'/photoswipe.css');
 
-				//$document->addScript($framework_path.'/lib/jquery.mobile/jquery.mobile.js');
-				$document->addScript($framework_path.'/lib/simple-inheritance.min.js');
-				//$document->addScript($framework_path.'/lib/jquery.animate-enhanced.min.js');
-				$document->addScript($framework_path.'/code.photoswipe.min.js');
+				//$document->getWebAssetManager()->registerAndUseScript('mobile', $framework_path.'/lib/jquery.mobile/jquery.mobile.js');
+				$document->getWebAssetManager()->registerAndUseScript('min', $framework_path.'/lib/simple-inheritance.min.js');
+				//$document->getWebAssetManager()->registerAndUseScript('min', $framework_path.'/lib/jquery.animate-enhanced.min.js');
+				$document->getWebAssetManager()->registerAndUseScript('min', $framework_path.'/code.photoswipe.min.js');
 
 				$js .= "
 					jQuery(document).ready(function() {
@@ -1894,43 +1913,43 @@ class flexicontent_html
 			case 'fcxSlide':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
-				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/fcxSlide';
-				$document->addScript($framework_path.'/class.fcxSlide.js', array('version' => FLEXI_VHASH));
-				$document->addStyleSheet($framework_path.'/fcxSlide.css', array('version' => FLEXI_VHASH));
-				//$document->addScript($framework_path.'/class.fcxSlide.packed.js', array('version' => FLEXI_VHASH));
+				$framework_path = \Joomla\CMS\Uri\Uri::root().$lib_path.'/fcxSlide';
+				$document->getWebAssetManager()->registerAndUseScript('fcxSlide', $framework_path.'/class.fcxSlide.js', array('version' => FLEXI_VHASH));
+				$document->getWebAssetManager()->registerAndUseStyle('fcxSlide', $framework_path.'/fcxSlide.css', array('version' => FLEXI_VHASH));
+				//$document->getWebAssetManager()->registerAndUseScript('packed', $framework_path.'/class.fcxSlide.packed.js', array('version' => FLEXI_VHASH));
 				break;
 
 			case 'imagesLoaded':
-				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/imagesLoaded';
-				$document->addScript($framework_path.'/imagesloaded.pkgd.min.js');
+				$framework_path = \Joomla\CMS\Uri\Uri::root().$lib_path.'/imagesLoaded';
+				$document->getWebAssetManager()->registerAndUseScript('min', $framework_path.'/imagesloaded.pkgd.min.js');
 				break;
 
 			case 'zTree':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
-				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/zTree';
-				$document->addStyleSheet($framework_path.'/css/flexi_ztree.css');
-				$document->addStyleSheet($framework_path.'/css/zTreeStyle/zTreeStyle.css');
-				$document->addScript($framework_path.'/js/jquery.ztree.all-3.5.min.js');
-				//$document->addScript($framework_path.'/js/jquery.ztree.core-3.5.js');
-				//$document->addScript($framework_path.'/js/jquery.ztree.excheck-3.5.js');
-				//$document->addScript($framework_path.'/js/jquery.ztree.exedit-3.5.js');
+				$framework_path = \Joomla\CMS\Uri\Uri::root().$lib_path.'/zTree';
+				$document->getWebAssetManager()->registerAndUseStyle('flexi_ztree', $framework_path.'/css/flexi_ztree.css');
+				$document->getWebAssetManager()->registerAndUseStyle('zTreeStyle', $framework_path.'/css/zTreeStyle/zTreeStyle.css');
+				$document->getWebAssetManager()->registerAndUseScript('min', $framework_path.'/js/jquery.ztree.all-3.5.min.js');
+				//$document->getWebAssetManager()->registerAndUseScript('5', $framework_path.'/js/jquery.ztree.core-3.5.js');
+				//$document->getWebAssetManager()->registerAndUseScript('5', $framework_path.'/js/jquery.ztree.excheck-3.5.js');
+				//$document->getWebAssetManager()->registerAndUseScript('5', $framework_path.'/js/jquery.ztree.exedit-3.5.js');
 				break;
 
 			case 'plupload':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
-				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/plupload';
+				$framework_path = \Joomla\CMS\Uri\Uri::root().$lib_path.'/plupload';
 				$framework_folder = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'plupload';
-				$document->addScript($framework_path.'/js/plupload.full.min.js');
+				$document->getWebAssetManager()->registerAndUseScript('min', $framework_path.'/js/plupload.full.min.js');
 
 				if ($mode=='ui') {
-					$document->addStyleSheet($framework_path.'/js/jquery.ui.plupload/css/jquery.ui.plupload.css');
-					$document->addScript($framework_path.'/js/jquery.ui.plupload/jquery.ui.plupload.min.js');
-					//$document->addScript($framework_path.'/js/themeswitcher.js');
+					$document->getWebAssetManager()->registerAndUseStyle('plupload', $framework_path.'/js/jquery.ui.plupload/css/jquery.ui.plupload.css');
+					$document->getWebAssetManager()->registerAndUseScript('min', $framework_path.'/js/jquery.ui.plupload/jquery.ui.plupload.min.js');
+					//$document->getWebAssetManager()->registerAndUseScript('themeswitcher', $framework_path.'/js/themeswitcher.js');
 				} else {
-					$document->addStyleSheet($framework_path.'/js/jquery.plupload.queue/css/jquery.plupload.queue.css');
-					$document->addScript($framework_path.'/js/jquery.plupload.queue/jquery.plupload.queue.js');
+					$document->getWebAssetManager()->registerAndUseStyle('queue', $framework_path.'/js/jquery.plupload.queue/css/jquery.plupload.queue.css');
+					$document->getWebAssetManager()->registerAndUseScript('queue', $framework_path.'/js/jquery.plupload.queue/jquery.plupload.queue.js');
 				}
 
 				$lang_code = flexicontent_html::getUserCurrentLang();
@@ -1938,27 +1957,27 @@ class flexicontent_html
 				{
 					// Try language shortcode
 					if ( file_exists($framework_folder.DS.'js'.DS.'i18n'.DS.$lang_code.'.js') ) {
-						$document->addScript($framework_path.'/js/i18n/'.$lang_code.'.js');
+						$document->getWebAssetManager()->registerAndUseScript('fc-script', $framework_path.'/js/i18n/'.$lang_code.'.js');
 					}
 					// Try country language code
 					else {
 						$country_code = flexicontent_html::getUserCurrentLang($short_tag=false);
 						$country_code = str_replace('-', '_', $country_code);    // Files for this library use underscore ...
 						if ( $country_code && file_exists($framework_folder.DS.'js'.DS.'i18n'.DS.$country_code.'.js') ) {
-							$document->addScript($framework_path.'/js/i18n/'.$country_code.'.js');
+							$document->getWebAssetManager()->registerAndUseScript('fc-script', $framework_path.'/js/i18n/'.$country_code.'.js');
 						}
 					}
 				}
 				// For debugging
-				//$document->addScript($framework_path.'/js/moxie.min.js');
-				//$document->addScript($framework_path.'/js/plupload.dev.js');
+				//$document->getWebAssetManager()->registerAndUseScript('min', $framework_path.'/js/moxie.min.js');
+				//$document->getWebAssetManager()->registerAndUseScript('dev', $framework_path.'/js/plupload.dev.js');
 				break;
 
 			case 'nouislider':
 
-				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/nouislider';
-				$document->addStyleSheet($framework_path.'/nouislider.min.css');
-				$document->addScript($framework_path.'/nouislider.min.js');
+				$framework_path = \Joomla\CMS\Uri\Uri::root().$lib_path.'/nouislider';
+				$document->getWebAssetManager()->registerAndUseStyle('min', $framework_path.'/nouislider.min.css');
+				$document->getWebAssetManager()->registerAndUseScript('min', $framework_path.'/nouislider.min.js');
 				break;
 
 			case 'flexi_js_common':
@@ -2002,8 +2021,8 @@ class flexicontent_html
 					$jcookie->set( 'fc_uid', $hashedUA, 0);
 				}
 
-				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/tmpl-common.js', array('version' => FLEXI_VHASH));
-				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js', array('version' => FLEXI_VHASH));
+				$document->getWebAssetManager()->registerAndUseScript('fc-tmpl-common', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/tmpl-common.js', array('version' => FLEXI_VHASH));
+				$document->getWebAssetManager()->registerAndUseScript('fc-jquery-easing', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/jquery-easing.js', array('version' => FLEXI_VHASH));
 				\Joomla\CMS\Language\Text::script("FLEXI_APPLYING_FILTERING", true);
 				\Joomla\CMS\Language\Text::script("FLEXI_TYPE_TO_LIST", true);
 				\Joomla\CMS\Language\Text::script("FLEXI_TYPE_TO_FILTER", true);
@@ -2024,7 +2043,28 @@ class flexicontent_html
 
 				$js .= "";
 
-				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', array('version' => FLEXI_VHASH));
+				// Load jQuery UI CDN THEN flexi-lib with explicit dependency
+				if (FLEXI_J40GE) {
+					// Step 1: Register+Use jQuery UI (will appear before flexi-lib in output)
+					$document->getWebAssetManager()->registerAndUseScript(
+						'jquery-ui',
+						'https://code.jquery.com/ui/1.13.2/jquery-ui.min.js',
+						array('version' => '1.13.2'),
+						array()
+					);
+					// Step 2: Register+Use flexi-lib (dependency ensures order)
+					$document->getWebAssetManager()->registerAndUseScript(
+						'flexi-lib',
+						\Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/flexi-lib.js',
+						array('version' => FLEXI_VHASH),
+						array(),
+						array('jquery-ui')
+					);
+				} else {
+					$document->getWebAssetManager()->registerAndUseScript('fc-script',
+						\Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/flexi-lib.js',
+						array('version' => FLEXI_VHASH));
+				}
 				\Joomla\CMS\Language\Text::script("FLEXI_NOT_AN_IMAGE_FILE", true);
 				\Joomla\CMS\Language\Text::script("FLEXI_IMAGE", true);
 				\Joomla\CMS\Language\Text::script('FLEXI_LOADING_IMAGES',true);
@@ -2091,7 +2131,7 @@ class flexicontent_html
 			case 'flexi-lib-form':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
-				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/flexi-lib-form.js', array('version' => FLEXI_VHASH));
+				$document->getWebAssetManager()->registerAndUseScript('fc-flexi-lib-form', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/flexi-lib-form.js', array('version' => FLEXI_VHASH));
 				\Joomla\CMS\Language\Text::script("FLEXI_EDIT", true);
 				\Joomla\CMS\Language\Text::script("FLEXI_ADD", true);
 				\Joomla\CMS\Language\Text::script("FLEXI_NA", true);
@@ -3185,7 +3225,7 @@ class flexicontent_html
 			flexicontent_html::loadFramework('flexi_tmpl_common');
 
 			$doc =Factory::getApplication()->getDocument();
-			$doc->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/stateselector.js', array('version' => FLEXI_VHASH));
+			$doc->getWebAssetManager()->registerAndUseScript('fc-stateselector', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/stateselector.js', array('version' => FLEXI_VHASH));
 			$js = '
 				var fc_statehandler_singleton = new fc_statehandler({
 					task: ' . json_encode($isAdmin ? $config->controller . '.setitemstate' : 'setitemstate') . ',
@@ -4331,11 +4371,11 @@ class flexicontent_html
 			flexicontent_html::loadFramework('flexi_tmpl_common');
 
 			$document =Factory::getApplication()->getDocument();
-			$document->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/css/fcvote.css', array('version' => FLEXI_VHASH));
-			$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/fcvote.js', array('version' => FLEXI_VHASH));
+			$document->getWebAssetManager()->registerAndUseStyle('fc-fcvote', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/fcvote.css', array('version' => FLEXI_VHASH));
+			$document->getWebAssetManager()->registerAndUseScript('fc-fcvote', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/fcvote.js', array('version' => FLEXI_VHASH));
 
 			$image = $field->parameters->get( 'main_image', 'components/com_flexicontent/assets/images/star-medium.png' );
-			$img_path	= \Joomla\CMS\Uri\Uri::root(true).'/'.$image;
+			$img_path	= \Joomla\CMS\Uri\Uri::root().'/'.$image;
 
 			$dim = $field->parameters->get( 'main_dimension', 24 );
 			$element_width = $rating_resolution * $dim;
@@ -4364,7 +4404,7 @@ class flexicontent_html
 
 			// Always add image configuration for composite (extra) votes in case some type is using them
 			$image = $field->parameters->get( 'extra_image', 'components/com_flexicontent/assets/images/star-medium.png' );
-			$img_path	= \Joomla\CMS\Uri\Uri::root(true).'/'.$image;
+			$img_path	= \Joomla\CMS\Uri\Uri::root().'/'.$image;
 
 			$dim = $field->parameters->get( 'extra_dimension', 24 );
 			$element_width = $rating_resolution * $dim;
@@ -5171,7 +5211,7 @@ class flexicontent_html
 			$state_ids[] = -2;  // trashed
 			$state_colors= array(1=>'darkgreen', -5=>'darkgreen', 0=>'darkred', -3=>'darkred', -4=>'darkred', 2=>'darkblue', -2=>'gray');
 
-			$img_path = \Joomla\CMS\Uri\Uri::root(true)."/components/com_flexicontent/assets/images/";
+			$img_path = \Joomla\CMS\Uri\Uri::root()."components/com_flexicontent/assets/images/";
 
 			$list = '<div class="group-fcset fc_input_set">';
 

@@ -208,7 +208,7 @@ $items	= & $this->items;
 				$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 				
 				$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  \Joomla\CMS\Uri\Uri::base(true).'/' : '';
-				$thumb = \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+				$thumb = \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 			} else {
 				// Do not resize image when (a) image src path not set or (b) using image field's already created thumbnails
 			}

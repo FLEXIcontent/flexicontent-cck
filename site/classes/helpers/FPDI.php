@@ -4,9 +4,19 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'TCPDF'.DS.'vendor'.DS.'autoload.php');
 
 
+#[AllowDynamicProperties]
 class flexicontent_FPDI extends FPDI
 {
-	var $header_conf = array();
+		/** @var mixed $lMargin */
+	public mixed $lMargin = null;
+	/** @var mixed $original_lMargin */
+	public mixed $original_lMargin = null;
+	/** @var mixed $original_rMargin */
+	public mixed $original_rMargin = null;
+	/** @var mixed $rMargin */
+	public mixed $rMargin = null;
+
+var $header_conf = array();
 	var $footer_conf = array();
 	var $all_pages_header_text = null;
 	var $all_pages_footer_text = null;

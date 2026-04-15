@@ -11,6 +11,8 @@
 
 defined('_JEXEC') or die;
 
+use Joomla\Filesystem\File;
+use Joomla\Filesystem\Folder;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
@@ -1046,8 +1048,6 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		$deprecated = null;
 		$model->getDeprecatedFiles($deprecated);
 
-		jimport('joomla.filesystem.file');
-		jimport('joomla.filesystem.folder');
 
 		// Delete deprecated files that were found
 		foreach ($deprecated['files'] as $file)

@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\Factory; // J5-compat added
 /**
  * @version 1.5 stable $Id: view.feed.php 1848 2014-02-16 12:03:55Z ggppdk $
  * @package Joomla
@@ -19,7 +20,6 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('legacy.view.legacy');
 use Joomla\String\StringHelper;
 
 /**
@@ -59,7 +59,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		\Joomla\CMS\Factory::getApplication()->input->set('limit', $params->get('feed_limit'));
 
 		// Needed by legacy non-updated plugins
-		!FLEXI_J40GE ? JRequest::setVar('limit', $params->get('feed_limit')) : null;
+		!FLEXI_J40GE ? Factory::getApplication()->input->set('limit', $params->get('feed_limit')) : null;
 
 		$params->set('orderby', $params->get('feed_orderby', 'rdate'));
 		$params->set('orderbycustomfield'   , $params->get('feed_orderbycustomfield' , 1));
@@ -74,7 +74,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		$params->set('orderbycustomfieldint_2nd', $params->get('feed_orderbycustomfieldint_2nd', 0));
 
 		$model->setState('limit', $params->get('feed_limit', $model->getState('limit')));
-
 
 		// ***********************
 		// Get data from the model
@@ -157,7 +156,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 					$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 
 					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  $site_base_url : '';
-					$thumb = \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.rawurlencode($base_url.$src).$conf;
+					$thumb = \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.rawurlencode($base_url.$src).$conf;
 				} else {
 					// Do not resize image when (a) image src path not set or (b) using image field's already created thumbnails
 					$thumb = $src;
@@ -187,14 +186,12 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 				}
 			}
 
-
 			// Add readmore link to description if introtext is shown, show_readmore is true and fulltext exists
 			$more_text_exists = (!$feed_summary && $item->fulltext) || $item_desc_cut;
 			if ($params->get('feed_show_readmore', 0) && $more_text_exists)
 			{
 				$description .= '<p class="feed-readmore"><a target="_blank" href ="' . $link . '">' .  \Joomla\CMS\Language\Text::sprintf('FLEXI_READ_MORE', $title) . '</a></p>';
 			}
-
 
 			$author = !empty($item->created_by_alias)  ?  $item->created_by_alias  :  (!empty($item->author) ? $item->author : '');
 			$date = $item->publish_up ? $item->publish_up : $item->created;
@@ -213,7 +210,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 			// add item data into FEEDs array
 			$document->addItem( $JF_item );
 		}
-
 
 		// *****************
 		// Set document data

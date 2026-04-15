@@ -2,9 +2,13 @@
 
 namespace Sabberworm\CSS\Value;
 
+#[AllowDynamicProperties]
 class CSSFunction extends ValueList {
 
-	protected $sName;
+		/** @var mixed $iLineNo */
+	public mixed $iLineNo = null;
+
+protected $sName;
 
 	public function __construct($sName, $aArguments, $sSeparator = ',', $iLineNo = 0) {
 		if($aArguments instanceof RuleValueList) {

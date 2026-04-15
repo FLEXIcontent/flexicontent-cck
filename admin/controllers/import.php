@@ -11,13 +11,14 @@
 
 defined('_JEXEC') or die;
 
+use Joomla\Filesystem\File;
+use Joomla\Filesystem\Folder;
+use Joomla\Filesystem\Path;
+use Joomla\CMS\Log\Log;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\Database\DatabaseInterface;
 
-jimport('joomla.filesystem.file');
-jimport('joomla.filesystem.folder');
-jimport('joomla.filesystem.path');
 
 JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php');
 
@@ -85,9 +86,9 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 		if ($this->input->getCmd('task') !== 'importcsv')
 		{
 			\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
-			echo '<link rel="stylesheet" href="' . \Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/css/flexicontentbackend.css?' . FLEXI_VHASH . '" />';
+			echo '<link rel="stylesheet" href="' . \Joomla\CMS\Uri\Uri::root() . 'administrator/components/com_flexicontent/assets/css/flexicontentbackend.css?' . FLEXI_VHASH . '" />';
 			$rtl_sfx = !\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl() ? '' : '_rtl';
-			$fc_css = \Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x' . $rtl_sfx . '.css' : 'j3x' . $rtl_sfx . '.css');
+			$fc_css = \Joomla\CMS\Uri\Uri::root() . 'components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x' . $rtl_sfx . '.css' : 'j3x' . $rtl_sfx . '.css');
 			echo '<link rel="stylesheet" href="' . $fc_css . '?' . FLEXI_VHASH . '" />';
 		}
 		else
@@ -111,7 +112,6 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 		$parse_log = "\n\n\n" . '<b>please click</b> <a href="' . $link . '">here</a> to return previous page' . "\n\n\n";
 		$log_filename = 'importcsv_' . ($user->id) . '.php';
 
-		jimport('joomla.log.log');
 		\Joomla\CMS\Log\Log::addLogger(
 			array(
 				'text_file' => $log_filename,  // Sets the target log file

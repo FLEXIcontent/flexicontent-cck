@@ -11,8 +11,6 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-jimport('legacy.model.legacy');
-
 /**
  * FLEXIcontent Component stats Model
  *
@@ -57,7 +55,6 @@ class FlexicontentModelStats extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 		$this->_db->SetQuery($query);
 		$_items[] = $this->_db->loadResult();
 
-
 		// Get nr of all categories
 		$query = 'SELECT count(id)'
 			. ' FROM #__categories as c'
@@ -66,12 +63,10 @@ class FlexicontentModelStats extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 		$this->_db->SetQuery($query);
 		$_items[] = $this->_db->loadResult();
 
-
 		// Get nr of all tags
 		$query = 'SELECT count(id) FROM #__flexicontent_tags';
 		$this->_db->SetQuery($query);
 		$_items[] = $this->_db->loadResult();
-
 
 		// Get nr of all files
 		$query = 'SELECT count(id) FROM #__flexicontent_files';
@@ -88,7 +83,6 @@ class FlexicontentModelStats extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 		$this->_db->SetQuery($query);
 		$_items[] = $this->_db->loadResult();
 
-
 		// Get nr of templates
 		$query = 'SELECT count(DISTINCT template) FROM #__flexicontent_templates';
 		$this->_db->SetQuery($query);
@@ -101,7 +95,6 @@ class FlexicontentModelStats extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 
 		return $_items;
 	}
-
 
 	/**
 	* Method to get items counts per month
@@ -130,7 +123,6 @@ class FlexicontentModelStats extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 
 		return $_items;
 	}
-
 
 	/**
 	 * Method to get popular data

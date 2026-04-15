@@ -114,7 +114,7 @@ foreach ($values as $n => $value)
 	<script>
 		pannellum.viewer(\'panorama_' . $uniqueid . '\', {
 			"type": "equirectangular",
-			"panorama": "' . \Joomla\CMS\Uri\Uri::root(true).'/'.$srco . '",
+			"panorama": "' . \Joomla\CMS\Uri\Uri::root().'/'.$srco . '",
 			"preview": "' . $ABS_SRC . '",
 			"title": "' . $title_encoded . '",
 			' . $hots_spots_list . '

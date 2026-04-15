@@ -18,8 +18,6 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('legacy.view.legacy');
-
 /**
  * HTML Item View class for the FLEXIcontent component
  *

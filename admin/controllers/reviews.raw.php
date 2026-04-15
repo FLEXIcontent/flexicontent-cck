@@ -27,9 +27,11 @@ require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' .
  *
  * @since 3.3
  */
+#[AllowDynamicProperties]
 class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 {
-	var $records_dbtbl = 'flexicontent_reviews';
+	
+var $records_dbtbl = 'flexicontent_reviews';
 	var $records_jtable = 'flexicontent_reviews';
 
 	var $record_name = 'review';

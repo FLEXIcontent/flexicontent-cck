@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\Pagination\Pagination;
 /**
  * @version 1.5 stable $Id: favourites.php 1848 2014-02-16 12:03:55Z ggppdk $
  * @package Joomla
@@ -18,8 +19,6 @@
 
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
-
-jimport('legacy.model.legacy');
 
 /**
  * FLEXIcontent Component Model
@@ -74,7 +73,6 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 		$this->populateRecordState();
 	}
 
-
 	/**
 	 * Method to populate the category model state.
 	 *
@@ -96,7 +94,6 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 		$this->setState('filter_order_Dir', $jinput->getCmd('filter_order_Dir', 'DESC'));
 	}
 
-
 	/**
 	 * Method to set initialize data, setting an element id for the view
 	 *
@@ -113,7 +110,6 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 		$this->_loadParams();
 	}
 
-
 	/**
 	 * Method to get Data
 	 *
@@ -127,7 +123,6 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 
 		$print_logging_info = $this->_params->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
-
 
 		// Get limit from http request OR use default category parameters
 		$this->_listall = $jinput->get('listall', 0, 'int');
@@ -143,7 +138,6 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 		{
 			return $this->_data;
 		}
-
 
 		if ( $print_logging_info )  $start_microtime = microtime(true);
 
@@ -181,7 +175,6 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 
 		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
-
 		// This is used in places that item data need to be retrieved again because item object was not given
 		global $fc_list_items;
 
@@ -192,7 +185,6 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 
 		return $this->_data;
 	}
-
 
 	/**
 	 * Method to get the total number of items
@@ -212,7 +204,6 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 		return $this->_total;
 	}
 
-
 	/**
 	 * Method to get the pagination object
 	 *
@@ -224,14 +215,12 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 		// Load the content if it doesn't already exist
 		if (empty($this->_pagination))
 		{
-			//jimport('cms.pagination.pagination');
-			require_once (JPATH_COMPONENT.DS.'helpers'.DS.'pagination.php');
+			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'pagination.php');
 			$this->_pagination = new FCPagination($this->getTotal(), $this->getState('limitstart'), $this->getState('limit') );
 		}
 
 		return $this->_pagination;
 	}
-
 
 	/**
 	 * Method to build the query
@@ -355,7 +344,6 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 		return $query;
 	}
 
-
 	/**
 	 * Build the order clause
 	 *
@@ -376,7 +364,6 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 			$default_order, $default_order_dir, $sfx='', $support_2nd_lvl=true
 		);
 	}
-
 
 	/**
 	 * Method to build the WHERE clause
@@ -545,7 +532,6 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 		return $where;
 	}
 
-
 	/**
 	 * Method to load parameters
 	 *
@@ -574,7 +560,6 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 
 		$this->_params = $params;
 	}
-
 
 	/**
 	 * Method to get view's parameters

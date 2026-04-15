@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\Factory; // J5-compat added
 /**
  * @version 1.5 stable $Id: view.feed.php 1577 2012-12-02 15:10:44Z ggppdk $
  * @package Joomla
@@ -19,7 +20,6 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 use Joomla\Database\DatabaseInterface;
-jimport('legacy.view.legacy');
 
 /**
  * HTML View class for the FLEXIcontent View (RSS)
@@ -48,8 +48,7 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 		\Joomla\CMS\Factory::getApplication()->input->set('limit', $params->get('feed_limit'));
 
 		// Needed by legacy non-updated plugins
-		!FLEXI_J40GE ? JRequest::setVar('limit', $params->get('feed_limit')) : null;
-
+		!FLEXI_J40GE ? Factory::getApplication()->input->set('limit', $params->get('feed_limit')) : null;
 
 		// ***********************
 		// Get data from the model
@@ -97,7 +96,6 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 			$description	= $cat->description; //$feed_summary ? $cat->description : '';
 			$description = flexicontent_html::striptagsandcut( $description, $feed_summary_cut);
 
-
 	  	if ($feed_use_image) {  // feed image is enabled
 
 				// Get some variables
@@ -139,7 +137,7 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 						$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
 						$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 
-						$thumb = \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
+						$thumb = \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
 					} else if ( $cat_image_source!=1 && $src = flexicontent_html::extractimagesrc($cat) ) {
 
 						$h		= '&amp;h=' . $feed_image_height;
@@ -155,7 +153,7 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 						$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  \Joomla\CMS\Uri\Uri::base(true).'/' : '';
 						$src = $base_url.$src;
 
-						$thumb = \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
+						$thumb = \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
 					}
 				}
 	  		if ($thumb) {

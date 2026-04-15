@@ -14,24 +14,20 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-jimport('legacy.view.legacy');
-
 /**
  * HTML View class for backend managers (Base)
  */
 class FlexicontentViewBaseRecords extends \Joomla\CMS\MVC\View\HtmlView
 {
-	var $tooltip_class = FLEXI_J40GE ? 'hasTooltip' : 'hasTooltip';
-	var $popover_class = FLEXI_J40GE ? 'hasPopover' : 'hasPopover';
-	var $btn_sm_class  = FLEXI_J40GE ? 'btn btn-sm' : 'btn btn-small';
-	var $btn_iv_class  = FLEXI_J40GE ? 'btn-dark' : 'btn-inverse';
-	var $ina_grp_class = FLEXI_J40GE ? 'input-group' : 'input-append';
-	var $inp_grp_class = FLEXI_J40GE ? 'input-group' : 'input-prepend';
-	var $select_class  = FLEXI_J40GE ? 'use_select2_lib' : 'use_select2_lib';
+	public $tooltip_class = FLEXI_J40GE ? 'hasTooltip' : 'hasTooltip';
+	public $popover_class = FLEXI_J40GE ? 'hasPopover' : 'hasPopover';
+	public $btn_sm_class  = FLEXI_J40GE ? 'btn btn-sm' : 'btn btn-small';
+	public $btn_iv_class  = FLEXI_J40GE ? 'btn-dark' : 'btn-inverse';
+	public $ina_grp_class = FLEXI_J40GE ? 'input-group' : 'input-append';
+	public $inp_grp_class = FLEXI_J40GE ? 'input-group' : 'input-prepend';
+	public $select_class  = FLEXI_J40GE ? 'use_select2_lib' : 'use_select2_lib';
 	//var $txt_grp_class = FLEXI_J40GE ? 'input-group-text' : 'add-on';
 	var $ctrl;
-	var $option = 'com_flexicontent';
-
 
 	public function __construct($config = array())
 	{
@@ -40,7 +36,6 @@ class FlexicontentViewBaseRecords extends \Joomla\CMS\MVC\View\HtmlView
 		// Default controller is same name as the view
 		$this->ctrl = $this->getName();
 	}
-
 
 	/**
 	 * Method to get the model object
@@ -108,7 +103,6 @@ class FlexicontentViewBaseRecords extends \Joomla\CMS\MVC\View\HtmlView
 		}
 	}
 
-
 	/**
 	 * Method to get the CSS for backend management listings
 	 *
@@ -119,7 +113,6 @@ class FlexicontentViewBaseRecords extends \Joomla\CMS\MVC\View\HtmlView
 	public function addCssJs()
 	{
 	}
-
 
 	/**
 	 * Method to add the state changing buttons for setting a new state for multiple records as a dropdown
@@ -144,7 +137,6 @@ class FlexicontentViewBaseRecords extends \Joomla\CMS\MVC\View\HtmlView
 			flexicontent_html::addToolBarDropMenu($btn_arr, 'action_btns_group', ' ');
 		}
 	}
-
 
 	/**
 	 * Method to create state changing buttons for setting a new state for multiple records
@@ -231,7 +223,6 @@ class FlexicontentViewBaseRecords extends \Joomla\CMS\MVC\View\HtmlView
 		return $btn_arr;
 	}
 
-
 	/**
 	 * Method to get configuration state of FC managers for current user (from cookie)
 	 *
@@ -278,7 +269,6 @@ class FlexicontentViewBaseRecords extends \Joomla\CMS\MVC\View\HtmlView
 
 		return $FcMansConf;
 	}
-
 
 	/**
 	 * Method to get the display of text search scope selector
@@ -339,7 +329,6 @@ class FlexicontentViewBaseRecords extends \Joomla\CMS\MVC\View\HtmlView
 			$translate = false
 		);
 	}
-
 
 	/**
 	 * Method to get CSS for hidding a table cell because its column is currently hidden

@@ -12,6 +12,7 @@
 
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Log\Log;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
@@ -315,9 +316,9 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			header("Pragma: no-cache");
 
 			$rtl_sfx = !\Joomla\CMS\Factory::getLanguage()->isRtl() ? '' : '_rtl';
-			$fc_css = \Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x' . $rtl_sfx . '.css' : 'j3x' . $rtl_sfx . '.css');
+			$fc_css = \Joomla\CMS\Uri\Uri::root() . 'components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x' . $rtl_sfx . '.css' : 'j3x' . $rtl_sfx . '.css');
 			echo '
-			<link rel="stylesheet" href="' . \Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/css/flexicontentbackend.css?' . FLEXI_VHASH . '" />
+			<link rel="stylesheet" href="' . \Joomla\CMS\Uri\Uri::root() . 'administrator/components/com_flexicontent/assets/css/flexicontentbackend.css?' . FLEXI_VHASH . '" />
 			<link rel="stylesheet" href="' . $fc_css . '?' . FLEXI_VHASH . '" />
 			<link rel="stylesheet" href="' . \Joomla\CMS\Uri\Uri::root(true) . '/media/jui/css/bootstrap.min.css" />
 			';
@@ -614,7 +615,6 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$log_filename = $session->get($indexer . '_log_filename', null, 'flexicontent');
 		$log_category = $session->get($indexer . '_log_category', null, 'flexicontent');
 
-		jimport('joomla.log.log');
 		\Joomla\CMS\Log\Log::addLogger(
 			array(
 				'text_file' => $log_filename,  // Sets the target log file

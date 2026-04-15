@@ -32,8 +32,11 @@ Table::addIncludePath(JPATH_ADMINISTRATOR.'/components/com_flexicontent/tables')
  * @since 1.0
  */
 
+#[AllowDynamicProperties]
 class JFormFieldItem extends FormField
 {
+
+
 	/**
 	 * Element name
 	 *

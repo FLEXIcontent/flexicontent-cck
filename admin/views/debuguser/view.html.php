@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\Factory;
 /**
  * @copyright	Copyright (C) 2005 - 2014 Open Source Matters, Inc. All rights reserved.
  * @license		GNU General Public License version 2 or later; see LICENSE.txt
@@ -13,9 +14,17 @@ defined('_JEXEC') or die;
  * @subpackage	com_users
  * @since		1.6
  */
+#[AllowDynamicProperties]
 class FlexicontentViewDebugUser extends UsersViewDebugUser
 {
-	protected $actions;
+		/** @var mixed $components */
+	public mixed $components = null;
+	/** @var mixed $levels */
+	public mixed $levels = null;
+	/** @var mixed $user */
+	public mixed $user = null;
+
+protected $actions;
 	protected $items;
 	protected $pagination;
 	protected $state;
@@ -28,7 +37,7 @@ class FlexicontentViewDebugUser extends UsersViewDebugUser
 		// Access check.
 		if (!\Joomla\CMS\Factory::getUser()->authorise('core.manage', 'com_users') || !\Joomla\CMS\Factory::getConfig()->get('debug'))
 		{
-			return JError::raiseWarning(404, \Joomla\CMS\Language\Text::_('JERROR_ALERTNOAUTHOR'));
+			return Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_('JERROR_ALERTNOAUTHOR', 'warning'));
 		}
 
 		$this->actions		= $this->get('DebugActions');
@@ -41,7 +50,7 @@ class FlexicontentViewDebugUser extends UsersViewDebugUser
 
 		// Check for errors.
 		if (count($errors = $this->get('Errors'))) {
-			JError::raiseError(500, implode("\n", $errors));
+			throw new \RuntimeException(implode("\n", $errors));
 			return false;
 		}
 

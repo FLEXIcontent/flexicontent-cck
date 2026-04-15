@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\Version;
 /**
  * @version 1.5 stable $Id: install.php 1789 2013-10-15 02:25:46Z ggppdk $
  * @package Joomla
@@ -22,15 +23,23 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 // Joomla version variables
 if (!defined('FLEXI_J16GE') || !defined('FLEXI_J30GE'))
 {
-	jimport('cms.version.version');
 	$jversion = new \Joomla\CMS\Version;
 }
 if (!defined('FLEXI_J16GE'))   define('FLEXI_J16GE', version_compare( $jversion->getShortVersion(), '1.6.0', 'ge' ) );
 if (!defined('FLEXI_J30GE'))   define('FLEXI_J30GE', version_compare( $jversion->getShortVersion(), '3.0.0', 'ge' ) );
 if (!defined('FLEXI_J40GE'))   define('FLEXI_J40GE', version_compare( $jversion->getShortVersion(), '4.0.0', 'ge' ) );
 
+#[AllowDynamicProperties]
 class com_flexicontentInstallerScript
 {
+	/** @var mixed $minimum_joomla_release */
+	public mixed $minimum_joomla_release = null;
+	/** @var mixed $release */
+	public mixed $release = null;
+	/** @var mixed $release_existing */
+	public mixed $release_existing = null;
+
+
 	/*
 	* $parent is the class calling this method.
 	* $type is the type of change (install, update or discover_install, not uninstall).
@@ -437,6 +446,16 @@ class com_flexicontentInstallerScript
 	*/
 	function postflight( $type, $parent )
 	{
+		// Check max_input_vars
+		$max_iv = (int) ini_get('max_input_vars');
+		if ($max_iv < 3000) {
+			\Joomla\CMS\Factory::getApplication()->enqueueMessage(
+				'<strong>FLEXIcontent:</strong> PHP <code>max_input_vars</code> = ' . $max_iv .
+				'. Please set it to <strong>5000+</strong> in php.ini.',
+				'warning'
+			);
+		}
+
 		// Only execute during install / update not during uninstallation (J4 will run post flight during uninstall too)
 		if ($type != 'install' && $type != 'update')
 		{
@@ -470,9 +489,9 @@ class com_flexicontentInstallerScript
 		);*/
 
 		echo FLEXI_J40GE
-			? '<link type="text/css" href="components/com_flexicontent/assets/css/j3x.css" rel="stylesheet">'
-			: '<link type="text/css" href="components/com_flexicontent/assets/css/j4x.css" rel="stylesheet">';
-		echo '<link type="text/css" href="components/com_flexicontent/assets/css/flexicontentbackend.css" rel="stylesheet">';
+			? '<link type="text/css" href="administrator/components/com_flexicontent/assets/css/j3x.css" rel="stylesheet">'
+			: '<link type="text/css" href="administrator/components/com_flexicontent/assets/css/j4x.css" rel="stylesheet">';
+		echo '<link type="text/css" href="administrator/components/com_flexicontent/assets/css/flexicontentbackend.css" rel="stylesheet">';
 
 		//echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.startAccordion', 'upgrade-tasks', array());
 		//echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addSlide', 'upgrade-tasks', \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_LOG') . ' : ' . \Joomla\CMS\Language\Text::_( 'COM_FLEXICONTENT_UPGRADE_TASKS' ), 'upgrade-tasks-slide0' );
@@ -1539,8 +1558,8 @@ class com_flexicontentInstallerScript
 
 		// Extra CSS needed for J3.x+
 		echo FLEXI_J40GE
-			? '<link type="text/css" href="components/com_flexicontent/assets/css/j3x.css" rel="stylesheet">'
-			: '<link type="text/css" href="components/com_flexicontent/assets/css/j4x.css" rel="stylesheet">';
+			? '<link type="text/css" href="administrator/components/com_flexicontent/assets/css/j3x.css" rel="stylesheet">'
+			: '<link type="text/css" href="administrator/components/com_flexicontent/assets/css/j4x.css" rel="stylesheet">';
 
 		// Installed component manifest file version
 		$this->release = $parent->getManifest()->version;

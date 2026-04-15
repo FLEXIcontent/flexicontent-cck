@@ -1,4 +1,5 @@
 <?php
+use Joomla\Filesystem\File;
 /**
  * @version 1.5 stable $Id: view.html.php 1959 2014-09-18 00:15:15Z ggppdk $
  * @package Joomla
@@ -18,9 +19,6 @@
 
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
-
-jimport('legacy.view.legacy');
-jimport('joomla.filesystem.file');
 
 /**
  * HTML View class for the Category View
@@ -52,7 +50,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 
 		// Get category parameters as VIEW's parameters (category parameters are merged parameters in order: layout(template-manager)/component/ancestors-cats/category/author/menu)
 		$params   = $category->parameters;
-
 
 		/**
 		 * Get configuration parameters
@@ -159,7 +156,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 			}
 		}
 
-
 		/**
 		 * Get first set of items
 		 */
@@ -212,8 +208,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 			$app->redirect($this->_getSafeReferer());
 		}
 
-
-
 		/**
 		 * 1. Output HTTP HEADERS
 		 */
@@ -227,7 +221,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		header('Content-Disposition: attachment; filename=EXPORT-'.rand().'.csv');
 		//header("Content-Transfer-Encoding: binary");
 		echo "\xEF\xBB\xBF"; // UTF-8 BOM
-
 
 		/**
 		 * 2. Output HEADERS row
@@ -251,7 +244,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 			$total_fields++;
 		}
 		echo "\n";
-
 
 		// Try to create CSV export with all items
 		$limitstart = 0;
@@ -400,7 +392,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		jexit();
 	}
 
-
 	protected function _encodeCSVField($string)
 	{
 		if (strpos($string, ',') !== false || strpos($string, '"') !== false || strpos($string, "\n") !== false) 
@@ -411,7 +402,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		//return mb_convert_encoding($string, 'UTF-16LE', 'UTF-8');
 		return $string;
 	}
-
 
 	protected function _getSafeReferer()
 	{

@@ -11,6 +11,7 @@
 
 defined('_JEXEC') or die;
 
+use Joomla\Filesystem\File;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
@@ -27,9 +28,11 @@ require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' .
  *
  * @since 3.3
  */
+#[AllowDynamicProperties]
 class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 {
-	var $records_dbtbl = 'flexicontent_templates';
+	
+var $records_dbtbl = 'flexicontent_templates';
 	var $records_jtable = 'flexicontent_templates';
 
 	var $record_name = 'template';
@@ -157,7 +160,6 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 			jexit(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'));
 		}
 
-		jimport('joomla.filesystem.file');
 		$app  = \Joomla\CMS\Factory::getApplication();
 		$user = \Joomla\CMS\Factory::getUser();
 		$db   = \Joomla\CMS\Factory::getDbo();
@@ -598,7 +600,6 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 			jexit(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'));
 		}
 
-		jimport('joomla.filesystem.file');
 		$app  = \Joomla\CMS\Factory::getApplication();
 		$user = \Joomla\CMS\Factory::getUser();
 
@@ -713,7 +714,6 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 			jexit(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'));
 		}
 
-		jimport('joomla.filesystem.file');
 		$app  = \Joomla\CMS\Factory::getApplication();
 		$user = \Joomla\CMS\Factory::getUser();
 

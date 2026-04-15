@@ -11,6 +11,7 @@
 
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
@@ -27,9 +28,11 @@ require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' .
  *
  * @since 3.3
  */
+#[AllowDynamicProperties]
 class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 {
-	var $records_dbtbl = 'flexicontent_reviews';
+	
+var $records_dbtbl = 'flexicontent_reviews';
 	var $records_jtable = 'flexicontent_reviews';
 
 	var $record_name = 'review';
@@ -206,7 +209,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 			{
 				// Prune items that you can't change.
 				unset($cid[$i]);
-				JError::raiseNotice(403, \Joomla\CMS\Language\Text::_('JLIB_APPLICATION_ERROR_EDITSTATE_NOT_PERMITTED'));
+				Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_('JLIB_APPLICATION_ERROR_EDITSTATE_NOT_PERMITTED', 'notice'));
 			}
 		}
 

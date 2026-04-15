@@ -13,8 +13,13 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 use Joomla\Database\DatabaseInterface;
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
+#[AllowDynamicProperties]
 class plgFlexicontent_fieldsFcpagenav extends FCField
 {
+	/** @var mixed $_data_cats */
+	public mixed $_data_cats = null;
+
+
 	static $field_types = null; // Automatic, do not remove since needed for proper late static binding, define explicitely when a field can render other field types
 	var $task_callable = null;  // Field's methods allowed to be called via AJAX
 
@@ -294,7 +299,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		}
 		if ($load_css)
 		{
-			\Joomla\CMS\Factory::getApplication()->getDocument()->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/plugins/flexicontent_fields/fcpagenav/'.(FLEXI_J16GE ? 'fcpagenav/' : '').'fcpagenav.css');
+			\Joomla\CMS\Factory::getApplication()->getDocument()->addStyleSheet(\Joomla\CMS\Uri\Uri::root().'plugins/flexicontent_fields/fcpagenav/'.(FLEXI_J16GE ? 'fcpagenav/' : '').'fcpagenav.css');
 		}
 
 		// $html variable , should be set by the layout file
@@ -348,7 +353,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 				$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 
 				$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  \Joomla\CMS\Uri\Uri::base(true).'/' : '';
-				$thumb = \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+				$thumb = \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 			} else {
 				// Do not resize image when (a) image src path not set or (b) using image field's already created thumbnails
 				$thumb = $src;
@@ -390,7 +395,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 			$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
 			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 
-			$image_src = \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
+			$image_src = \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
 		} else if ( $cat_image_source!=1 && $src = flexicontent_html::extractimagesrc($cat) ) {
 			// Resize image when src path is set and RESIZE_FLAG: (a) using image extracted from item main text OR (b) not using image field's already created thumbnails
 			$w		= '&amp;w=' . $params->get($rprefix.'_width', 200);
@@ -404,7 +409,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
 
 			$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  \Joomla\CMS\Uri\Uri::base(true).'/' : '';
-			$image_src = \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+			$image_src = \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 		}
 		$cat->image_src = $image_src;
 		return $image_src;

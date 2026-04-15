@@ -1,4 +1,5 @@
 <?php
+use Joomla\Filesystem\File;
 /**
  * @version 1.5 stable $Id: view.html.php 1959 2014-09-18 00:15:15Z ggppdk $
  * @package Joomla
@@ -18,9 +19,6 @@
 
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
-
-jimport('legacy.view.legacy');
-jimport('joomla.filesystem.file');
 
 /**
  * HTML View class for the Category View
@@ -52,8 +50,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 
 		// Get category parameters as VIEW's parameters (category parameters are merged parameters in order: layout(template-manager)/component/ancestors-cats/category/author/menu)
 		$params   = $category->parameters;
-
-
 
 		// ***********************
 		// Get data from the model

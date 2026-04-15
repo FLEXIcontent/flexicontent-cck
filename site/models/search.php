@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\Pagination\Pagination;
 /**
  * @version 1.5 stable $Id: favourites.php 1548 2012-11-13 02:24:26Z ggppdk $
  * @package Joomla
@@ -18,8 +19,6 @@
 
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
-
-jimport('legacy.model.legacy');
 
 /**
  * FLEXIcontent Component Model
@@ -93,7 +92,6 @@ class FLEXIcontentModelSearch extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 		$this->setState('limit', $limit);
 		$this->setState('limitstart', $limitstart);
 
-
 		// *************************
 		// Set the search parameters
 		// *************************
@@ -111,7 +109,6 @@ class FLEXIcontentModelSearch extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 
 		$this->setSearch($keyword, $match, $ordering);
 
-
 		/**
 		 * Set the search areas
 		 */
@@ -126,7 +123,6 @@ class FLEXIcontentModelSearch extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 		}
 
 		$this->setAreas($areas);
-
 
 		/**
 		 * Get minimum word search length
@@ -145,7 +141,6 @@ class FLEXIcontentModelSearch extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 		//}
 	}
 
-
 	/**
 	 * Method to set initialize data, setting an element id for the view
 	 *
@@ -161,7 +156,6 @@ class FLEXIcontentModelSearch extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 		$this->_params  = null;
 		$this->_loadParams();
 	}
-
 
 	/**
 	 * Method to set the search parameters
@@ -243,7 +237,6 @@ class FLEXIcontentModelSearch extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 		return $this->_data;
 	}
 
-
 	/**
 	 * Method to get the total number of items
 	 *
@@ -254,7 +247,6 @@ class FLEXIcontentModelSearch extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 	{
 		return $this->_total;
 	}
-
 
 	/**
 	 * Method to get the pagination object
@@ -267,13 +259,11 @@ class FLEXIcontentModelSearch extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 		// Load the content if it doesn't already exist
 		if (empty($this->_pagination))
 		{
-			//jimport('cms.pagination.pagination');
-			require_once (JPATH_COMPONENT.DS.'helpers'.DS.'pagination.php');
+			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'pagination.php');
 			$this->_pagination = new FCPagination($this->getTotal(), $this->getState('limitstart'), $this->getState('limit') );
 		}
 		return $this->_pagination;
 	}
-
 
 	/**
 	 * Method to get the search areas
@@ -324,7 +314,6 @@ class FLEXIcontentModelSearch extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 		return $this->_areas;
 	}
 
-
 	/**
 	 * Method to load parameters
 	 *
@@ -352,7 +341,6 @@ class FLEXIcontentModelSearch extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 
 		$this->_params = $params;
 	}
-
 
 	/**
 	 * Method to get view's parameters

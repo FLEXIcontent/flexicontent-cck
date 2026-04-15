@@ -11,6 +11,8 @@
 
 defined('_JEXEC') or die('Restricted access');
 
+use Joomla\Filesystem\File;
+use Joomla\Filesystem\Folder;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
@@ -20,8 +22,19 @@ require_once('base/base.php');
  * FLEXIcontent Component Field Model
  *
  */
+#[AllowDynamicProperties]
 class FlexicontentModelField extends FCModelAdmin
 {
+	/** @var mixed $canCreate */
+	public mixed $canCreate = null;
+	/** @var mixed $helpModal */
+	public mixed $helpModal = null;
+	/** @var mixed $helpTitle */
+	public mixed $helpTitle = null;
+	/** @var mixed $helpURL */
+	public mixed $helpURL = null;
+
+
 	/**
 	 * Record name, (parent class property), this is used for: naming session data, XML file of class, etc
 	 *
@@ -217,8 +230,6 @@ class FlexicontentModelField extends FCModelAdmin
 	{
 		$data_obj = $data && is_array($data) ? (object) $data : $data;
 
-		jimport('joomla.filesystem.file');
-		jimport('joomla.filesystem.folder');
 
 		// Initialise variables.
 		$client = \Joomla\CMS\Application\ApplicationHelper::getClientInfo(0);

@@ -18,6 +18,8 @@
 
 defined('_JEXEC') or die('Restricted access');
 
+use Joomla\CMS\Form\FormHelper;
+use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
@@ -25,15 +27,11 @@ use Joomla\Utilities\ArrayHelper;
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
-jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // JHTMLSelect
-
-jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 \Joomla\CMS\Form\FormHelper::loadFieldClass('list');   // \Joomla\CMS\Form\Field\ListField
 
 // Load JS tabber lib
-\Joomla\CMS\Factory::getDocument()->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
-\Joomla\CMS\Factory::getDocument()->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
+\Joomla\CMS\Factory::getDocument()->addScript(\Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
+\Joomla\CMS\Factory::getDocument()->addStyleSheet(\Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
 \Joomla\CMS\Factory::getDocument()->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
 /**
@@ -303,7 +301,6 @@ function ilayout_loadPanel(element)
 	}
 }
 
-
 function ilayout_activatePanel(active_layout_name)
 {
 	var inactives = jQuery.grep(ilayout_names, function( layout_name, index )
@@ -326,7 +323,6 @@ function ilayout_activatePanel(active_layout_name)
 		jQuery('#__content_type_default_layout__').show();
 	}
 }
-
 
 jQuery(document).ready(function() {
 	ilayout_activatePanel('".$value."');

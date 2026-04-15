@@ -19,8 +19,13 @@ require_once('base/baselist.php');
  * Flexicontent Component Itemelement Model
  *
  */
+#[AllowDynamicProperties]
 class FlexicontentModelItemelement extends FCModelAdminList
 {
+	/** @var mixed $assocs_id */
+	public mixed $assocs_id = null;
+
+
 	/**
 	 * Record database table
 	 *

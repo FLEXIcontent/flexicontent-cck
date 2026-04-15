@@ -11,6 +11,8 @@
 
 defined('_JEXEC') or die('Restricted access');
 
+use Joomla\CMS\Date\Date;
+use Joomla\Filesystem\Path;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\Component\Categories\Administrator\Helper\CategoriesHelper;
@@ -22,8 +24,11 @@ require_once('base/traitnestable.php');
  * FLEXIcontent Component Category Model
  *
  */
+#[AllowDynamicProperties]
 class FlexicontentModelCategory extends FCModelAdmin
 {
+
+
 
 	use FCModelTraitNestableRecord;
 
@@ -519,7 +524,6 @@ class FlexicontentModelCategory extends FCModelAdmin
 			$item->metadata = $registry->toArray();
 
 			// Convert the created and modified dates to local user time for display in the form.
-			jimport('joomla.utilities.date');
 
 			$site_zone = \Joomla\CMS\Factory::getApplication()->getCfg('offset');
 			$user_zone = \Joomla\CMS\Factory::getUser()->getParam('timezone', $site_zone);
@@ -587,7 +591,6 @@ class FlexicontentModelCategory extends FCModelAdmin
 	 */
 	protected function preprocessForm(\Joomla\CMS\Form\Form $form, $data, $plugins_group = null)
 	{
-		jimport('joomla.filesystem.path');
 
 		$lang = \Joomla\CMS\Factory::getLanguage();
 		$component = $this->getState($this->getName().'.component', '');

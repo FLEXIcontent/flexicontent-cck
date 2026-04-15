@@ -11,6 +11,7 @@
 
 defined('_JEXEC') or die('Restricted access');
 
+use Joomla\CMS\Factory;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
@@ -20,8 +21,11 @@ require_once('base/base.php');
  * FLEXIcontent Template Model
  *
  */
+#[AllowDynamicProperties]
 class FlexicontentModelTemplate extends FCModelAdmin
 {
+
+
 	/**
 	 * Record name, (parent class property), this is used for: naming session data, XML file of class, etc
 	 *
@@ -411,7 +415,7 @@ class FlexicontentModelTemplate extends FCModelAdmin
 		$this->_db->setQuery($query);
 		$layoutConf = $this->_db->loadObject();
 		if ($layoutConf===false) {
-			JError::raiseWarning( 500, $this->_db->getError() );
+			Factory::getApplication()->enqueueMessage($this->_db->getError() );
 		}
 		if (!$layoutConf) {
 			$layoutConf = new stdClass();

@@ -19,17 +19,15 @@
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
 
+use Joomla\CMS\Form\FormField;
+use Joomla\CMS\Form\FormHelper;
+use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\String\StringHelper;
 
 // Load the helper classes
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
-jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
-jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
-
-jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 \Joomla\CMS\Form\FormHelper::loadFieldClass('groupedlist');   // \Joomla\CMS\Form\Field\GroupedlistField
 
 /**
@@ -79,7 +77,6 @@ class JFormFieldMultiList extends JFormFieldGroupedList
 	    'list.select'=>$values, // value of the SELECTED field
 		);
 
-
 		// ***
 		// *** HTML Tag parameters
 		// ***
@@ -122,7 +119,6 @@ class JFormFieldMultiList extends JFormFieldGroupedList
 		}
 
 		$attribs['list.attr']['class'] = implode(' ', $attribs['list.attr']['class']);
-
 
 		// ***
 		// *** Construct an array of the HTML OPTION statements.
@@ -208,7 +204,6 @@ class JFormFieldMultiList extends JFormFieldGroupedList
 			}
 		}
 
-
 		// ***
 		// *** SUBTYPE: radio
 		// ***
@@ -282,7 +277,6 @@ class JFormFieldMultiList extends JFormFieldGroupedList
 				';
 		}
 
-
 		// ***
 		// *** SUBTYPE: drop-down select
 		// ***
@@ -297,7 +291,6 @@ class JFormFieldMultiList extends JFormFieldGroupedList
 			}
 			$html = \Joomla\CMS\HTML\HTMLHelper::_('select.groupedlist', $this->_options, $fieldname, $attribs);
 		}
-
 
 		// ***
 		// *** inline tooltips and texts
@@ -343,7 +336,6 @@ class JFormFieldMultiList extends JFormFieldGroupedList
 				</span>';
 		}
 
-
 		// ***
 		// *** Inherited value display
 		// ***
@@ -363,18 +355,15 @@ class JFormFieldMultiList extends JFormFieldGroupedList
 		return $html . $inherited_info . $tip_text . $tip_text2;
 	}
 
-
 	function getListOptions()
 	{
 		return $this->_options;
 	}
 
-
 	function setInherited($values)
 	{
 		$this->_inherited = $values;
 	}
-
 
 	function getLabel()
 	{

@@ -18,8 +18,7 @@ defined('_JEXEC') or die('Restricted access');
  * @subpackage	Table
  * @since		1.0
  */
-jimport('joomla.database.tablenested');
-jimport('joomla.access.rules');
+use Joomla\CMS\Access\Rules;
 use Joomla\String\StringHelper;
 require_once('flexicontent_basetablenested.php');
 
@@ -100,9 +99,16 @@ else
 	}
 }
 
-
+#[AllowDynamicProperties]
 class flexicontent_categories extends _flexicontent_categories
 {
+	/** @var mixed $_NAME */
+	public mixed $_NAME = null;
+	/** @var mixed $_error */
+	public mixed $_error = null;
+	/** @var mixed $_records_dbtbl */
+	public mixed $_records_dbtbl = null;
+
 	/** @var int Primary key */
 	var $id					= null;
 	/** @var int */
@@ -171,7 +177,6 @@ class flexicontent_categories extends _flexicontent_categories
 		//$this->setColumnAlias('published', 'published');
 	}
 
-
 	/**
 	 * Method to compute the default name of the asset.
 	 * The default name is in the form `table_name.id` (which we will override)
@@ -187,7 +192,6 @@ class flexicontent_categories extends _flexicontent_categories
 		return 'com_content.category.'.(int) $this->$k;
 	}
 
-
 	/**
 	 * Get the parent asset id for the record
 	 *
@@ -199,7 +203,6 @@ class flexicontent_categories extends _flexicontent_categories
 	 * @since   11.1
 	 */
 	// see (above) parent class method: _getAssetParentId($table = null, $id = null)
-
 
 	/**
 	 * Method to perform sanity checks on the Table instance properties to ensure they are safe to store in the database.
@@ -246,7 +249,6 @@ class flexicontent_categories extends _flexicontent_categories
 		return true;
 	}
 
-
 	/**
 	 * Overloaded bind function
 	 *
@@ -288,7 +290,6 @@ class flexicontent_categories extends _flexicontent_categories
 
 		return parent::bind($array, $ignore);
 	}
-
 
 	/**
 	 * Overloaded \Joomla\CMS\Table\Table::store

@@ -1,4 +1,5 @@
 <?php
+use Joomla\CMS\Log\Log;
 use Joomla\String\StringHelper;
 
 /**
@@ -125,7 +126,6 @@ class FlexicontentCronTasks
 	public function transferFiles()
 	{
 		$log_filename = 'cron_estorage.php';
-		jimport('joomla.log.log');
 		\Joomla\CMS\Log\Log::addLogger(
 			array(
 				'text_file' => $log_filename,  // Sets the target log file

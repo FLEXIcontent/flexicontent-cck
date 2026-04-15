@@ -6,9 +6,13 @@
  * Email: suwichalala@gmail.com
  * Website: http://www.projecka.com
  */
+#[AllowDynamicProperties]
 class Segment {
 
-    private $_input_string;
+    	/** @var mixed $_input_string_exploded */
+	public mixed $_input_string_exploded = null;
+
+private $_input_string;
     private static $_dictionary_array = array();
     private $_thcharacter_obj;
     private $_unicode_obj;
