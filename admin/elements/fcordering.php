@@ -21,8 +21,6 @@ use Joomla\CMS\HTML\HTMLHelper;
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
 
-	// TODO-J5: jimport("cms.html.select") — find J5 equivalent
-
 \Joomla\CMS\Form\FormHelper::loadFieldClass('list');   // \Joomla\CMS\Form\Field\ListField
 
 /**
@@ -57,7 +55,6 @@ class JFormFieldFcordering extends JFormFieldList
 		'hits'=>'popular',
 		'order'=>'catorder'
 	);
-
 
 	function getOptions()
 	{

@@ -21,8 +21,6 @@ use Joomla\Utilities\ArrayHelper;
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
-	// TODO-J5: jimport("cms.html.select") — find J5 equivalent
-
 ////\Joomla\CMS\Form\FormHelper::loadFieldClass('...');   // \Joomla\CMS\Form\FormField...
 
 /**
@@ -90,7 +88,6 @@ class JFormFieldFCFieldWrapper extends \Joomla\CMS\Form\FormField
 		return '';
 	}
 
-
 	/*
 	* Create editing HTML of a field
 	*/
@@ -126,20 +123,17 @@ class JFormFieldFCFieldWrapper extends \Joomla\CMS\Form\FormField
 				continue;
 			}
 
-
 			else if ($field->field_type=='coreprops')
 			{
 				// not used in backend (yet?)
 				continue;
 			}
 
-
 			else if ($field->field_type=='maintext')
 			{
 				// placed in separate TAB
 				continue;
 			}
-
 
 			else if ($field->field_type=='image')
 			{
@@ -151,7 +145,6 @@ class JFormFieldFCFieldWrapper extends \Joomla\CMS\Form\FormField
 				}
 			}
 
-
 			else if ($field->field_type=='weblink')
 			{
 				if ($field->parameters->get('link_source')==-1)
@@ -161,7 +154,6 @@ class JFormFieldFCFieldWrapper extends \Joomla\CMS\Form\FormField
 					$field->html = str_replace('_JOOMLA_ARTICLE_LINKS_HTML_', $replace_txt, $field->html);
 				}
 			}
-
 
 			// field has tooltip
 			$edithelp = $field->edithelp ? $field->edithelp : 1;

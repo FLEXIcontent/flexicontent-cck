@@ -18,8 +18,6 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-	// TODO-J5: jimport("legacy.view.legacy") — find J5 equivalent
-
 /**
  * HTML Item View class for the FLEXIcontent component
  *

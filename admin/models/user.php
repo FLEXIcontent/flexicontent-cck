@@ -14,8 +14,6 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\Registry\Registry;
 use Joomla\Utilities\ArrayHelper;
 
-	// TODO-J5: jimport("legacy.model.admin") — find J5 equivalent
-
 if (FLEXI_J40GE)
 {
 	require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_users'.DS.'src'.DS.'Model'.DS.'UserModel.php');

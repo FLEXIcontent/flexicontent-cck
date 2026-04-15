@@ -27,8 +27,6 @@ use Joomla\Utilities\ArrayHelper;
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
-	// TODO-J5: jimport("cms.html.select") — find J5 equivalent
-
 \Joomla\CMS\Form\FormHelper::loadFieldClass('list');   // \Joomla\CMS\Form\Field\ListField
 
 // Load JS tabber lib
@@ -303,7 +301,6 @@ function ilayout_loadPanel(element)
 	}
 }
 
-
 function ilayout_activatePanel(active_layout_name)
 {
 	var inactives = jQuery.grep(ilayout_names, function( layout_name, index )
@@ -326,7 +323,6 @@ function ilayout_activatePanel(active_layout_name)
 		jQuery('#__content_type_default_layout__').show();
 	}
 }
-
 
 jQuery(document).ready(function() {
 	ilayout_activatePanel('".$value."');

@@ -65,10 +65,6 @@ if (!defined('FLEXI_J50GE'))   define('FLEXI_J50GE', version_compare( $jversion-
 
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 
-if ( !class_exists('\Joomla\CMS\MVC\Controller\BaseController') )	// TODO-J5: jimport("legacy.controller.legacy") — find J5 equivalent
-if ( !class_exists('\Joomla\CMS\MVC\Model\BaseDatabaseModel') )	// TODO-J5: jimport("legacy.model.legacy") — find J5 equivalent
-if ( !class_exists('\Joomla\CMS\MVC\View\HtmlView') )	// TODO-J5: jimport("legacy.view.legacy") — find J5 equivalent
-
 // Set a default timezone if web server provider has not done so
 // phpversion() should be used instead of PHP_VERSION, if not inside Joomla code
 if (ini_get('date.timezone') == '')

@@ -11,7 +11,6 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-	// TODO-J5: jimport("legacy.view.legacy") — find J5 equivalent
 use Joomla\CMS\Factory;
 use Joomla\String\StringHelper;
 use Joomla\Database\DatabaseInterface;
@@ -74,7 +73,6 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 		$attribs = ' onchange="filterFieldList(\'%s\', \'%s\', \'%s\');" class="use_select2_lib" ';
 		$content_type_select = \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', '', $elementid );
 
-
 		// Create FIELD TYPE SELECTOR
 		//$ALL = StringHelper::strtoupper(\Joomla\CMS\Language\Text::_( 'FLEXI_ALL' )) . ' : ';
 		$fftypes = array();
@@ -97,7 +95,6 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 		$fieldname = $elementid = 'field_type__au__';
 		$attribs = ' class="use_select2_lib" onchange="filterFieldList(\'%s\', \'%s\', \'%s\');"';
 		$field_type_select = flexicontent_html::buildfieldtypeslist($fftypes, $fieldname, '', ($_grouped ? 1 : 0), $attribs, $elementid);
-
 
 		if (isset($layout->positions)) {
 			$sort = array();
@@ -181,8 +178,6 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 			$document->addScriptDeclaration( $js );
 		}
 
-
-
 		// ***
 		// *** Load JS/CSS files
 		// ***
@@ -211,7 +206,6 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
 		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
 
-
 		// *****************************
 		// Get user's global permissions
 		// *****************************
@@ -221,8 +215,6 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 		if (!$perms->CanTemplates) {
 			$app->redirect('index.php?option=com_flexicontent', \Joomla\CMS\Language\Text::_( 'FLEXI_NO_ACCESS' ));
 		}
-
-
 
 		// ************************
 		// Create Submenu & Toolbar
@@ -242,7 +234,6 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 			\Joomla\CMS\Toolbar\ToolbarHelper::apply('templates.apply_modal');
 			echo $bar->render();
 		}
-
 
 		// Check that less files for all layouts of current template (=folder) exist and are up-to-date
 		$this->check_less_files($folder);
@@ -282,8 +273,6 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 
 		parent::display($tpl);
 	}
-
-
 
 	/*
 	 * Check that the LESS layout file that stores parameter values exists and is up to date (its modification time after XML file modification)
@@ -334,7 +323,6 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 		// Abort if directory creation failed
 		if ( ! is_dir( $tmpldir . '/less' ) ) return;
 
-
 		// ***********************************************************************
 		// Create CUSTOM config.less, that is include by item.less / category.less
 		// ************************************************************ ***********
@@ -343,7 +331,6 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 		if ( !file_exists($tmpldir . '/less/include/config.less') ) {
 			file_put_contents($tmpldir . '/less/include/config.less', "/* Place your less variables, mixins, etc, here \n1. This is commonly imported by files: item.less and category.less, \n2. If you add extra less file imports, then place files \ninside same folder for automatic compiling to be triggered */\n\n@import 'config_auto_item.less';\n@import 'config_auto_category.less';\n");
 		}
-
 
 		// *************************************************************************
 		// Create files item.less / category.less by COPYING item.css / category.css
@@ -362,7 +349,6 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 				}
 			}
 		}
-
 
 		// Check that the LESS layout files that stores parameter values exist
 		// and they are up to date (their modification time after XML file modification)

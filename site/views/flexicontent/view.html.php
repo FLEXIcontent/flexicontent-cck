@@ -19,8 +19,6 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-	// TODO-J5: jimport("legacy.view.legacy") — find J5 equivalent
-
 /**
  * HTML View class for the FLEXIcontent View
  *
@@ -56,7 +54,6 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 		
 		// Make sure categories is and array
 		$categories = !is_array($categories) ? array() : $categories;
-
 
 		// ***
 		// *** Load needed JS libs & CSS styles

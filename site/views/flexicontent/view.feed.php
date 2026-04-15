@@ -20,7 +20,6 @@ use Joomla\CMS\Factory; // J5-compat added
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 use Joomla\Database\DatabaseInterface;
-	// TODO-J5: jimport("legacy.view.legacy") — find J5 equivalent
 
 /**
  * HTML View class for the FLEXIcontent View (RSS)
@@ -50,7 +49,6 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 
 		// Needed by legacy non-updated plugins
 		!FLEXI_J40GE ? Factory::getApplication()->input->set('limit', $params->get('feed_limit')) : null;
-
 
 		// ***********************
 		// Get data from the model
@@ -97,7 +95,6 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 			// strip html from feed item description text
 			$description	= $cat->description; //$feed_summary ? $cat->description : '';
 			$description = flexicontent_html::striptagsandcut( $description, $feed_summary_cut);
-
 
 	  	if ($feed_use_image) {  // feed image is enabled
 

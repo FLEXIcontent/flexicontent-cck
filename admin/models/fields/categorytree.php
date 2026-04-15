@@ -16,8 +16,6 @@ use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-	// TODO-J5: jimport("cms.html.select") — find J5 equivalent
-
 \Joomla\CMS\Form\FormHelper::loadFieldClass('list');   // \Joomla\CMS\Form\Field\ListField
 
 /**
@@ -32,7 +30,6 @@ class JFormFieldCategorytree extends JFormFieldList
 {
 	/** @var mixed $value */
 	public mixed $value = null;
-
 
 	/**
 	 * The form field type.

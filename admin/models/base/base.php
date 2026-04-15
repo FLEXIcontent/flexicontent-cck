@@ -15,7 +15,6 @@ use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Table\Table;
 
-	// TODO-J5: jimport("legacy.model.admin") — find J5 equivalent
 require_once('traitbase.php');
 
 #[AllowDynamicProperties] //php8.2 compatibility
@@ -152,7 +151,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 	 */
 	var $mergeableGroups = array();
 
-
 	/**
 	 * Constructor
 	 *
@@ -200,7 +198,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 		$this->setId($pk);
 	}
 
-
 	/**
 	 * Method to set the record identifier
 	 *
@@ -219,7 +216,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 		}
 	}
 
-
 	/**
 	 * Method to get the record identifier
 	 *
@@ -229,7 +225,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 	{
 		return $this->_id;
 	}
-
 
 	/**
 	 * Overridden get method to get properties from the record
@@ -253,7 +248,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 		return $default;
 	}
 
-
 	/**
 	 * Overridden set method to pass properties on to the record
 	 *
@@ -275,7 +269,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 		return false;
 	}
 
-
 	/**
 	 * Set method to pass properties on to the model object
 	 *
@@ -290,7 +283,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 	{
 		$this->$property = $value;
 	}
-
 
 	/**
 	 * Method to get a record via an alternative way that allows using multiple property values
@@ -311,7 +303,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 
 		return $this->_record;
 	}
-
 
 	/**
 	 * Method to load record data
@@ -392,7 +383,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 		return (boolean) $this->_record;
 	}
 
-
 	/**
 	 * Method to initialise the record data
 	 *
@@ -433,7 +423,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 		return true;
 	}
 
-
 	/**
 	 * Method to checkin/unlock the record
 	 *
@@ -453,7 +442,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 		}
 		return false;
 	}
-
 
 	/**
 	 * Method to checkout/lock the record
@@ -481,7 +469,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 		$this->setError( \Joomla\CMS\Language\Text::_("FLEXI_ALERT_CHECKOUT_FAILED") . ' : ' . $tbl->getError() );
 		return false;
 	}
-
 
 	/**
 	 * Tests if the record is checked out
@@ -513,7 +500,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 		}
 	}
 
-
 	/**
 	 * Legacy method to store the record, use save() instead
 	 *
@@ -527,7 +513,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 	{
 		return $this->save($data);
 	}
-
 
 	/**
 	 * Method to save the record
@@ -677,7 +662,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 		return $form;
 	}
 
-
 	/**
 	 * Method to get the data that should be injected in the form.
 	 *
@@ -713,7 +697,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 
 		return $data;
 	}
-
 
 	/**
 	 * Method to get a record.
@@ -773,7 +756,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 		return $this->_record;
 	}
 
-
 	/**
 	 * Method to preprocess the form.
 	 *
@@ -794,7 +776,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 		parent::preprocessForm($form, $data, $plugins_group);
 	}
 
-
 	/**
 	 * Method to validate the form data.
 	 *
@@ -812,7 +793,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 	{
 		return parent::validate($form, $data, $group);
 	}
-
 
 	/**
 	 * Auto-populate the model state.
@@ -850,7 +830,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 		$this->setState('params', $params);
 	}
 
-
 	/**
 	 * Method to change the title & alias.
 	 *
@@ -876,7 +855,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 		return array($title, $alias);
 	}
 
-
 	/**
 	 * Method to save language associations
 	 *
@@ -890,7 +868,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 		return flexicontent_db::saveAssociations($record, $data, $this->associations_context, $add_current);
 	}
 
-
 	/**
 	 * Method to determine if J3.1+ associations should be used
 	 *
@@ -900,7 +877,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 	{
 		return flexicontent_db::useAssociations();
 	}
-
 
 	/**
 	 * Method to check if the user can edit the record
@@ -922,7 +898,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 		return false;
 	}
 
-
 	/**
 	 * Method to check if the user can edit record 's state
 	 *
@@ -943,7 +918,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 		return false;
 	}
 
-
 	/**
 	 * Method to check if the user can delete the record
 	 *
@@ -957,7 +931,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 
 		return false;
 	}
-
 
 	/**
 	 * Helper method to format a value as array
@@ -977,7 +950,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 		}
 		return is_array($value) ? $value : array($value);
 	}
-
 
 	/**
 	 * Helper method to PARTLY bind LAYOUT and other ARRAY properties
@@ -1002,7 +974,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 		 */
 		$this->_canonicalData($form, $data);
 
-
 		/**
 		 * Filter layout parameters if the were given, and merge them into existing layout parameters (in DB)
 		 */
@@ -1017,7 +988,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 			unset($data[$options['params_fset']]['layouts']);
 		}
 
-
 		/**
 		 * Create one Registry object for every existing data property
 		 */
@@ -1027,7 +997,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 		{
 			$db_data_registry[$prop] = new \Joomla\Registry\Registry();
 		}
-
 
 		//***
 		//*** Filter via all given \Joomla\CMS\Form\Forms
@@ -1080,7 +1049,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 			}
 		}
 
-
 		//***
 		//*** Add to existing data the new data and the layout data
 		//***
@@ -1105,7 +1073,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 			}
 		}
 	}
-
 
 	/**
 	 * Method to get the records having the given name
@@ -1141,7 +1108,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 
 		return false;
 	}
-
 
 	/**
 	 * Method to initialize member variables used by batch methods and other methods like saveorder()
@@ -1185,7 +1151,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 		}
 	}
 
-
 	/**
 	 * Method to get the enqueued message array
 	 *
@@ -1195,7 +1160,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 	{
 		return $this->_messages;
 	}
-
 
 	/**
 	 * Method to register a message to the message Queue
@@ -1208,7 +1172,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 	{
 		$this->_messages[] = $message;
 	}
-
 
 	/**
 	 * Method to add a message to the message Queue
@@ -1235,7 +1198,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 			}
 		}
 	}
-
 
 	/**
 	 * Method to modify specific attributes of a record saving them into the DB
@@ -1279,7 +1241,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 
 		return true;
 	}
-
 
 	/**
 	 * Method to do some record / data preprocessing before call \Joomla\CMS\Table\Table::bind()
@@ -1336,7 +1297,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 		}
 	}
 
-
 	/**
 	 * Method to do some work after record has been stored
 	 *
@@ -1350,7 +1310,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 	protected function _afterStore($record, & $data)
 	{
 	}
-
 
 	/**
 	 * Method to do some work after record has been loaded via \Joomla\CMS\Table\Table::load()
@@ -1381,7 +1340,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 			$record->params = new \Joomla\Registry\Registry($record->params);
 		}
 	}
-
 
 	/**
 	 * Method to canonicalize the form data that should be present in the form by setting them to '' to indicate clearing their DB values
@@ -1419,7 +1377,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 		}
 	}
 
-
 	/**
 	 * Method to maintain database values if posted specific data are missing (or validation cleared them) from the posted form (value is === false)
 	 *
@@ -1456,7 +1413,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 		return $db_data;
 	}
 
-
 	/**
 	 * Method to handle partial form data
 	 *
@@ -1470,7 +1426,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 	protected function handlePartialForm($form, & $data)
 	{
 	}
-
 
 	/**
 	 * Custom clean the cache
@@ -1503,7 +1458,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 			}
 		}
 	}
-
 
 	/**
 	 * Method to change the state of given record (used by AJAX calls)
@@ -1576,7 +1530,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 			$event_ids = $cid;
 		}
 
-
 		/**
 		 * First update records
 		 */
@@ -1621,7 +1574,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 			}
 		}
 
-
 		/**
 		 * Update version table
 		 */
@@ -1638,7 +1590,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 			;
 			$this->_db->setQuery($query)->execute();
 		}
-
 
 		/**
 		 * Trigger Event 'onContentChangeState' of Joomla's Content plugins

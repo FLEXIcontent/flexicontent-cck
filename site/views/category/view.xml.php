@@ -20,8 +20,6 @@ use Joomla\CMS\Filesystem\File;
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-	// TODO-J5: jimport("legacy.view.legacy") — find J5 equivalent
-
 /**
  * HTML View class for the Category View
  *

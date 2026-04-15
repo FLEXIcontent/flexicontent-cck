@@ -20,8 +20,6 @@ use Joomla\CMS\Pagination\Pagination;
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-	// TODO-J5: jimport("legacy.model.legacy") — find J5 equivalent
-
 /**
  * FLEXIcontent Component Model
  *

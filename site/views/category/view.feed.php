@@ -20,7 +20,6 @@ use Joomla\CMS\Factory; // J5-compat added
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-	// TODO-J5: jimport("legacy.view.legacy") — find J5 equivalent
 use Joomla\String\StringHelper;
 
 /**
@@ -75,7 +74,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		$params->set('orderbycustomfieldint_2nd', $params->get('feed_orderbycustomfieldint_2nd', 0));
 
 		$model->setState('limit', $params->get('feed_limit', $model->getState('limit')));
-
 
 		// ***********************
 		// Get data from the model
@@ -188,14 +186,12 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 				}
 			}
 
-
 			// Add readmore link to description if introtext is shown, show_readmore is true and fulltext exists
 			$more_text_exists = (!$feed_summary && $item->fulltext) || $item_desc_cut;
 			if ($params->get('feed_show_readmore', 0) && $more_text_exists)
 			{
 				$description .= '<p class="feed-readmore"><a target="_blank" href ="' . $link . '">' .  \Joomla\CMS\Language\Text::sprintf('FLEXI_READ_MORE', $title) . '</a></p>';
 			}
-
 
 			$author = !empty($item->created_by_alias)  ?  $item->created_by_alias  :  (!empty($item->author) ? $item->author : '');
 			$date = $item->publish_up ? $item->publish_up : $item->created;
@@ -214,7 +210,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 			// add item data into FEEDs array
 			$document->addItem( $JF_item );
 		}
-
 
 		// *****************
 		// Set document data

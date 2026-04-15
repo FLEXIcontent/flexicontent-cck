@@ -13,9 +13,6 @@ use Joomla\CMS\Plugin\PluginHelper;
 
 defined('_JEXEC') or die('Restricted access');
 
-
-
-
 /**
  * Initialize some variables
  */
@@ -51,12 +48,9 @@ if ($print_logging_info && $format === 'html')
 {
 	$start_microtime = microtime(true);
 	global $fc_jprof;
-	// TODO-J5: jimport("joomla.profiler.profiler") — find J5 equivalent
 	$fc_jprof = new \Joomla\CMS\Profiler\Profiler();
 	$fc_jprof->mark('START: FLEXIcontent component');
 }
-
-
 
 /**
  * Load needed helper/classes files
@@ -81,8 +75,6 @@ if (!FLEXI_ONDEMAND)
 	\Joomla\CMS\Plugin\PluginHelper::importPlugin('flexicontent_fields');
 }
 \Joomla\CMS\Plugin\PluginHelper::importPlugin('flexicontent');
-
-
 
 /**
  * Language handling
@@ -111,8 +103,6 @@ else
 	\Joomla\CMS\Factory::getLanguage()->load('override', $overrideDir, null, $force_reload = true, $load_default = true);
 }*/
 
-
-
 /**
  * Prepare calling the controller task
  */
@@ -131,7 +121,6 @@ if (count($_ct) > 1)
 	$controller = $_ct[0];
 }
 
-
 // Cases that view variable must be ignored, and instead use the controller name as view
 $forced_views = array(
 	'category' => 1,
@@ -141,8 +130,6 @@ if ( isset($forced_views[$controller]) )
 	$view = $controller;
 	$jinput->set('view', $view);
 }
-
-
 
 // ***
 // *** Force variables: controller AND/OR task,
@@ -161,14 +148,12 @@ if ( file_exists(JPATH_COMPONENT.'/controllers/'.$view . ($format !== 'html' ? '
 	}
 }
 
-
 // CASE 2: Singular views do not (usually) have a controller, use (if it exists) the 'Plural' controller by appending 's' to view name
 else if ( file_exists( JPATH_COMPONENT.'/controllers/'.$view.'s' . ($format !== 'html' ? '.' . $format : '') . '.php' ) )
 {
 	$controller = $view.'s';
 	$task = $task ?: 'edit';  // Default task for singular views is 'edit', set it if task is empty
 }
-
 
 else
 {
@@ -190,9 +175,7 @@ else
 	}
 }
 
-
 //echo "$controller -- $task <br/>\n";
-
 
 // d. Set changes to controller/task variables back to HTTP REQUEST
 $controller_task = $controller && $task  ?  $controller.'.'.$task  :  $task;
@@ -200,8 +183,6 @@ $controller_name = $controller;
 
 $jinput->set('controller', $controller_name);
 $jinput->set('task', $controller_task);
-
-
 
 /**
  * Files needed for user groups manager
@@ -224,14 +205,9 @@ if ( $view=='debuggroup' || $controller_name=='debuggroup' ) {
 	require_once (JPATH_ADMINISTRATOR.'/components/com_flexicontent/helpers/debug.php');
 }
 
-
-
 // initialization done ... log stats for initialization
 if ($print_logging_info && $format === 'html')
 	@$fc_run_times['initialize_component'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-
-
-
 
 /**
  * (If needed) Re-compile LESS files as CSS (call the less proprocessor)
@@ -247,15 +223,11 @@ if ( $cparams->get('recompile_core_less', 0) && $format == 'html' )
 		@$fc_run_times['core_less_recompile'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 }
 
-
-
 /**
  * Create a controller instance
  */
 
 $controller	= \Joomla\CMS\MVC\Controller\BaseController::getInstance('Flexicontent');
-
-
 
 /**
  * Perform the requested task
@@ -265,8 +237,6 @@ $controller->execute( $task );
 
 // Redirect if set by the controller
 $controller->redirect();
-
-
 
 /**
  * Load common js libs / frameworks
@@ -301,8 +271,6 @@ if ($format === 'html')
 		\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.loadCss', true);
 }
 
-
-
 /**
  * Enqueue PERFORMANCE statistics as a message BUT NOT if in RAW FORMAT or COMPONENT only views
  */
@@ -316,7 +284,6 @@ if ( $print_logging_info && $jinput->get('tmpl', '', 'cmd')!='component' && $for
 	$_msg = $task
 		? ' (TASK: ' . $controller_name . '.' . $task . ')'
 		: ' (VIEW: ' . $view . ($layout ? ' -- LAYOUT: ' . $layout : '') . ')';
-
 
 	/*
 	 * Various Partial time performance stats
@@ -469,7 +436,6 @@ if ( $print_logging_info && $jinput->get('tmpl', '', 'cmd')!='component' && $for
 	}
 
 	$msg .= '</div>';
-
 
 	// SYSTEM PLGs
 	if (isset($fc_run_times['auto_checkin_auto_state']))

@@ -18,8 +18,6 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-	// TODO-J5: jimport("legacy.view.legacy") — find J5 equivalent
-
 /**
  * View class for the FLEXIcontent item comparison screen
  */
@@ -68,7 +66,6 @@ class FlexicontentViewItemcompare extends \Joomla\CMS\MVC\View\HtmlView {
 				font-style: italic;
 			}
 		');
-
 
 		$allow_versioncomparing = (int) $cparams->get('allow_versioncomparing', 1);
 		if (!$allow_versioncomparing)

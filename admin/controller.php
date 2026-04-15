@@ -20,8 +20,6 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 use Joomla\String\StringHelper;
 
-	// TODO-J5: jimport("legacy.controller.legacy") — find J5 equivalent
-
 /**
  * FLEXIcontent Component Controller
  *
@@ -125,7 +123,6 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\AdminController
 			}
 		}
 	}
-
 
 	function getPostinstallState()
 	{
@@ -265,7 +262,6 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\AdminController
 		return $postinst_integrity_ok;
 	}
 
-
 	/**
 	 * Method to display a view.
 	 *
@@ -285,7 +281,6 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\AdminController
 		$class = get_parent_class('\Joomla\CMS\MVC\Controller\AdminController');
 		return $class::display($cachable, $urlparams);
 	}
-
 
 	function call_extfunc()
 	{

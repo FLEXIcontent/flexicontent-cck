@@ -19,8 +19,6 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-	// TODO-J5: jimport("legacy.view.legacy") — find J5 equivalent
-
 use Joomla\CMS\Filesystem\File;
 use Joomla\CMS\Language\Text;
 use Joomla\String\StringHelper;
@@ -84,7 +82,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		// Get Tag data if current layout is 'tags'
 		$tag = $model->getTag();
 
-
 		/**
 		 * Get category parameters as VIEW's parameters
 		 * Category parameters are merged parameters in order: layout(template-manager)/component/ancestors-cats/category/author/menu
@@ -92,7 +89,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 
 		// View's parameters (OVERRIDE)
 		$params = $category->parameters;
-
 
 		// View's metadata parameters (clone category meta parameters)
 		$meta_params = $category->metadata ? clone($category->metadata) : null;
@@ -104,7 +100,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		$metakey = $category->id && $category->metakey
 			? $category->metakey
 			: '';
-
 
 		/**
 		 * Override with tag's metadata and prepend with tag's metadesc, metakey
@@ -127,7 +122,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 			$tag->name = $tag->jtag->title !== $tag->name ? $tag->jtag->title : $tag->name;
 		}
 
-
 		// ***
 		// *** Get data from the model
 		// ***
@@ -143,7 +137,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		// Request variables, WARNING, must be loaded after retrieving items, because limitstart may have been modified
 		$limitstart = $jinput->get('limitstart', 0, 'int');
 
-
 		// ***
 		// *** CATEGORY LAYOUT handling
 		// ***
@@ -153,7 +146,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 
 		// Get cached template data, re-parsing XML/LESS files, also loading any template language files of a specific template
 		$themes = flexicontent_tmpl::getTemplates(  array($clayout) );
-
 
 		/**
 		 * Get URL variables
@@ -173,8 +165,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		{
 			$authordescr_itemid = $params->get('authordescr_itemid');
 		}
-
-
 
 		// ***
 		// *** Load needed JS libs & CSS styles
@@ -200,7 +190,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		{
 			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', $this->baseurl.'/templates/'.$app->getTemplate().'/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		}
-
 
 		// ********************************************************************************************
 		// Create pathway, if automatic pathways is enabled, then path will be cleared before populated
@@ -243,7 +232,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		}
 		//echo "<pre>"; print_r($pathway); echo "</pre>";
 
-
 		// *******************************************************************************************************************
 		// Bind Fields to items and RENDER their display HTML, but check for document type, due to Joomla issue with system
 		// plugins creating \Joomla\CMS\Document\Document in early events forcing it to be wrong type, when format as url suffix is enabled
@@ -259,13 +247,11 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 			$items 	= FlexicontentFields::getFields($items, 'category', $params, $aid);
 		}
 
-
 		// ************************************************************************
 		// Calculate CSS classes needed to add special styling markups to the items
 		// ************************************************************************
 
 		flexicontent_html::calculateItemMarkups($items, $params);
-
 
 		// **********************************************************
 		// Calculate a (browser window) page title and a page heading
@@ -347,12 +333,10 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 			default        : ;
 		}
 
-
 		/**
 		 * Render a basic display for filter value data
 		 */
 		FlexicontentFields::getBasicFilterData($category, $filters);
-
 
 		/**
 		 * Create the document title, by from page title and other data
@@ -366,7 +350,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 			include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS.'seo'.DS.'category'.DS.'layouts'.DS.'title.php');
 		}
 
-
 		/**
 		 * Set document's META tags
 		 */
@@ -379,8 +362,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 			include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS.'seo'.DS.'category'.DS.'layouts'.DS.'meta.php');
 		}
 
-
-
 		/**
 		 * Create category link, but also consider current 'layout', and use the
 		 * layout specific variables so that filtering form will work properly
@@ -388,7 +369,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 
 		$non_sef_link = null;
 		$category_link = flexicontent_html::createCatLink($category->slug, $non_sef_link, $model);
-
 
 		// ***
 		// *** Add canonical link (if needed and different than current URL), also preventing Joomla default (SEF plugin)
@@ -460,7 +440,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 			flexicontent_html::setRelCanonical($ucanonical);
 		}
 
-
 		// ***
 		// *** Add feed link
 		// ***
@@ -474,7 +453,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 			$document->addHeadLink(\Joomla\CMS\Router\Route::_($link.'&type=atom'), 'alternate', 'rel', $attribs);
 		}
 
-
 		// ***
 		// *** Author "profile" item
 		// ***
@@ -486,7 +464,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 			$authordescr_item_html = $flexi_html_helper->renderItem($authordescr_itemid);
 		}
 		//echo $authordescr_item_html; exit();
-
 
 		// ***
 		// *** Load template css/js and set template data variable
@@ -638,7 +615,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 
 		}
 
-
 		// ***
 		// *** Remove unroutable categories from sub/peer categories
 		// ***
@@ -661,7 +637,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		}
 		$peercats = $_categories;
 
-
 		// ***
 		// *** Get some variables needed for images
 		// ***
@@ -672,7 +647,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		$joomla_image_path = $joomla_image_path ? $joomla_image_path.DS : '';
 		$joomla_image_url  = '';//$joomla_image_url  ? $joomla_image_url.'/' : ''; // NEED REVIEW
 		$phpThumbURL = $this->baseurl.'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=';
-
 
 		// ***
 		// *** CATEGORY IMAGE
@@ -712,7 +686,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		{
 			$default_image = '';
 		}
-
 
 		// Create category image/description/etc data
 		$cat = $category;
@@ -771,7 +744,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 			$cat->image = $image;
 		}
 
-
 		// ***
 		// *** SUBCATEGORIES (some templates)
 		// ***
@@ -810,7 +782,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		{
 			$default_image = '';
 		}
-
 
 		// Create sub-category image/description/etc data
 		foreach ($categories as $cat)
@@ -871,7 +842,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 			}
 			$cat->image = $image;
 		}
-
 
 		// ***
 		// *** PEERCATEGORIES (some templates)
@@ -973,7 +943,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 			$cat->image = $image;
 		}
 
-
 		// remove previous alpha index filter
 		//$uri->delVar('letter');
 
@@ -1005,7 +974,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 			$model->logSearch($lists['filter']);
 		}
 
-
 		// ***
 		// *** Create the pagination object
 		// ***
@@ -1023,7 +991,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 				}
 				if ($v) $pageNav->setAdditionalUrlParam($i, $v);
 			}
-
 
 			// URL-encode filter values
 			$_revert = array('%21'=>'!', '%2A'=>'*', '%27'=>"'", '%28'=>'(', '%29'=>')');
@@ -1121,7 +1088,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		$this->alpha = $alpha;
 		$this->tmpl = $tmpl;
 
-
 		// NOTE: Moved decision of layout into the model, function decideLayout() layout variable should never be empty
 		// It will consider things like: template exists, is allowed, client is mobile, current frontend user override, etc
 
@@ -1143,8 +1109,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		// Set layout
 		$this->isInfinite = 0;
 		$this->setLayout('category');
-
-
 
 		// ***
 		// *** Increment the hit counter ONLY once per user visit

@@ -12,7 +12,6 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
-	// TODO-J5: jimport("legacy.model.legacy") — find J5 equivalent
 use Joomla\CMS\Access\Rules;
 use Joomla\CMS\Filesystem\Archive;
 use Joomla\CMS\Filesystem\File;
@@ -22,7 +21,6 @@ use Joomla\String\StringHelper;
 use Joomla\CMS\Factory;
 use Joomla\Filesystem\Path;
 use Joomla\Database\DatabaseInterface;
-
 
 /**
  * FLEXIcontent Component Dashboard Model
@@ -246,7 +244,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		return $genstats;
 	}
 
-
 	/**
 	 * Method to check if default Flexi Menu Items exist
 	 *
@@ -323,7 +320,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		return $return;
 	}
 
-
 	/**
 	 * Method to check if there is at least the default fields in the FLEXIcontent fields TABLE
 	 *
@@ -346,7 +342,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 
 		return $return;
 	}
-
 
 	/**
 	 * Method to check if there is at least the default fields in the FLEXIcontent fields TABLE
@@ -411,7 +406,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		$return = count($coreprop_names) ? false : true;
 		return $return;
 	}
-
 
 	/**
 	 * Method to check if there is at least the default flexicontent_fields PLUGINs
@@ -535,8 +529,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		return $return;
 	}
 
-
-
 	/**
 	 * Method to sync language between Joomla and FLEXIcontent tables
 	 *
@@ -569,7 +561,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		$db->setQuery($query);
 		$result1 = $db->execute();
 	}
-
 
 	/**
 	 * Method to set the default site language the items with no language
@@ -607,7 +598,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		return $result1 && $result1a && $result2;
 	}
 
-
 	/**
 	 * Method to get if main category of items exists in both category table and in flexicontent category-items relation table
 	 *
@@ -643,13 +633,11 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		return $return;
 	}
 
-
 	// Check and if needed install Joomla template overrides into current Joomla template
 	function install_template_overrides()
 	{
 		flexicontent_html::install_template_overrides(true);
 	}
-
 
 	// Check and if needed install 3rd party plugins that do not use Joomla plugin system
 	function install_3rdParty_plugins()
@@ -683,7 +671,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 			}
 		}
 
-
 		// *************************
 		// Handle falang integration
 		// *************************
@@ -708,7 +695,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 			if ($elements_count[0]) Factory::getApplication()->enqueueMessage('<span class="badge">' . \Joomla\CMS\Language\Text::_('FLEXI_INSTALLED') . '</span> ' . $elements_count[0] . ' Falang elements for FLEXIcontent', 'message');
 			if ($elements_count[1]) Factory::getApplication()->enqueueMessage('<span class="badge">' . \Joomla\CMS\Language\Text::_('FLEXI_UPDATED')   . '</span> ' . $elements_count[1] . ' Falang elements for FLEXIcontent', 'message');
 		}
-
 
 		// **********************
 		// Handle JCE integration
@@ -776,7 +762,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		Factory::getApplication()->enqueueMessage('<span class="badge">' . \Joomla\CMS\Language\Text::_(!$plg_exists ? 'FLEXI_INSTALLED' : 'FLEXI_UPDATED') . '</span> JCE Links plugin for FLEXIcontent', 'message');
 	}
 
-
 	/**
 	 * Method to fix collations
 	 *
@@ -838,7 +823,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 
 		$session->set('flexicontent.collation_version', $jversion->getShortVersion());
 	}
-
 
 	/**
 	 * Method to get if language of items is initialized properly
@@ -905,7 +889,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		return $return;
 	}
 
-
 	/**
 	 * Method to get if temporary item data table is up-to-date
 	 *
@@ -971,7 +954,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		return $return;
 	}
 
-
 	/**
 	 * Method to check if the versions table is created
 	 *
@@ -1005,7 +987,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		}
 		return $return;
 	}
-
 
 	/**
 	 * Method to check if the versions table is created
@@ -1176,7 +1157,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 			: $missing;
 	}
 
-
 	/**
 	 * Method to check if the system plugin is installed
 	 *
@@ -1214,7 +1194,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		static $return;
 		if ($return!==null) return $return;
 
-
 		$conf_override_file = Path::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'phpThumb.config_OVERRIDE.php');
 
 		// CHECK phpThumb configuration override file exists and create it, if it does not exist
@@ -1241,7 +1220,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 				fclose($fh);
 			}
 		}
-
 
 		$phpthumbcache 	= Path::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'cache');
 
@@ -1302,7 +1280,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 
 		$finished = false;
 
-
 		$deprecated['files'] = array();
 		$deprecated['folders'] = array();
 
@@ -1355,7 +1332,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 
 		return $finished;
 	}
-
 
 	/**
 	 * Method to check if the field positions were converted
@@ -1460,7 +1436,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		return $return;
 	}
 
-
 	/**
 	 * Method to check if there are still old core fields data in the fields_items_relations table
 	 *
@@ -1482,7 +1457,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		return $return;
 	}
 
-
 	/**
 	 * Method to check if there is at least one category created
 	 *
@@ -1503,7 +1477,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		}
 		return false;
 	}
-
 
 	/**
 	 * Method to check if there is at list one menu item is created
@@ -1532,7 +1505,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		return false;
 	}
 
-
 	function getDiffVersions($current_versions=array(), $last_versions=array())
 	{
 		// check if the category was chosen to avoid adding data on static contents
@@ -1556,7 +1528,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		return $difference;
 	}
 
-
 	function checkCurrentVersionData() {
 		// verify that every current version is in the versions table and it's data in the flexicontent_items_versions table
 		//$and = "";
@@ -1565,7 +1536,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		if (!FLEXI_CAT_EXTENSION) return false;
 		return FLEXIUtilities::currentMissing();
 	}
-
 
 	function addCurrentVersionData($item_id = null, $clean_database = false)
 	{
@@ -1721,7 +1691,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		}
 		return true;
 	}
-
 
 	function formatFlexiPlugins()
 	{
@@ -1951,7 +1920,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 			// save xml manifest
 			\Joomla\Filesystem\File::write($xmlfile, $xml);
 
-
 			$fileslist  = \Joomla\Filesystem\Folder::files($targetfolder, '.', true, true, array('.svn', 'CVS', '.DS_Store'));
 			$archivename = $targetfolder.'.com_flexicontent'. (FLEXI_J16GE ? '.zip' : '.tar.gz');
 
@@ -1985,7 +1953,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		return (count($missing) > 0) ? $missing : '<span class="fc-mssg fc-success">'. \Joomla\CMS\Language\Text::sprintf( 'FLEXI_SEND_LANGUAGE_NO_MISSING', $code ) .'</span>';
 	}
 
-
 	function checkInitialPermission()
 	{
 		$debug_initial_perms = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('debug_initial_perms');
@@ -1995,7 +1962,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 
 		$db = $this->_db;
 		$component_name = 'com_flexicontent';
-
 
 		// DELETE old namespace (flexicontent.*) permissions of v2.0beta, we do not try to rename them ... instead we will use com_content (for some of them),
 		$query = $db->getQuery(true)->delete('#__assets')->where('name LIKE ' . $db->quote('flexicontent.%'));
@@ -2108,7 +2074,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		$init_required = $comp_section && $category_section && $field_section && $type_section;
 		return $init_required;
 	}
-
 
 	function updateInitialPermission()
 	{
@@ -2282,7 +2247,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 			</div>';
 		}
 
-
 		/*** FLEXIcontent FIELDS assets ***/
 
 		// Get a list flexicontent fields that do not have assets
@@ -2347,7 +2311,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 				try { $db->execute(); } catch (Exception $e) { echo $e->getMessage(); }
 			}
 		}
-
 
 		/*** FLEXIcontent TYPES assets ***/
 
@@ -2427,7 +2390,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		return true;
 	}
 
-
 	/**
 	 * Method to check if search indexes need to be updated because of changing publication state or search flags of fields
 	 *
@@ -2489,7 +2451,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		}
 	}
 
-
 	/**
 	 * Creates initial component actions based on global config and on some ... logic
 	 *
@@ -2507,7 +2468,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 			? json_decode($comp_asset->rules, true)
 			: array();
 		$asset_is_empty = !count($existing_rules);
-
 
 		// ***
 		// *** Get flexicontent ACTION names
@@ -2538,7 +2498,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 				: $flexi_rules[$action_name];
 		}
 
-
 		// ***
 		// *** Get com_content asset and its rule names
 		// ***
@@ -2552,7 +2511,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 			$joomla_action_names[$action_name] = 1;
 		}
 		//echo "<pre>"; print_r($com_content_rules); echo "</pre>"; exit;
-
 
 		// ***
 		// *** If com_flexicontent ASSET was empty then copy rules from com_content asset
@@ -2588,7 +2546,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 			//$flexi_rules['flexicontent.editfieldvalues'] = $flexi_rules['core.edit'];  // can EditFieldValues
 		}
 
-
 		// ***
 		// *** Grant FLEXIcontent specific rules to user having GLOBAL "core.manage"
 		// ***
@@ -2619,7 +2576,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		}
 		//echo "<pre>"; print_r($flexi_rules); $component_rules = new \Joomla\CMS\Access\Rules($flexi_rules); echo $asset_rules = (string) $component_rules; echo "</pre>"; exit;
 
-
 		// ***
 		// *** Rules that should be allowed by default, give these to the "Public" and "Registered" user groups
 		// ***
@@ -2634,7 +2590,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 
 		return $flexi_rules;
 	}
-
 
 	/**
 	 * Get a list of the user groups.
@@ -2710,7 +2665,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 			return parent::_getAssetParentId($table, $id);
 		}*/
 	}
-
 
 	protected function verifyExtraRules()
 	{

@@ -28,9 +28,6 @@ defined('_JEXEC') or die('Restricted access');
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
-	// TODO-J5: jimport("cms.html.select") — find J5 equivalent
-
-
 /**
  * Renders a fields element
  *
@@ -47,7 +44,6 @@ class JFormFieldFields extends \Joomla\CMS\Form\FormField
 	* @var      string
 	*/
 	protected	$type = 'Fields';
-
 
 	function getInput()
 	{
@@ -70,7 +66,6 @@ class JFormFieldFields extends \Joomla\CMS\Form\FormField
 		$attributes = get_object_vars($node->attributes());
 		$attributes = $attributes['@attributes'];
 
-
 		/**
 		 * Option labels and option values (for the created SELECT form field)
 		 */
@@ -82,7 +77,6 @@ class JFormFieldFields extends \Joomla\CMS\Form\FormField
 		$ovalue = ((boolean) @ $attributes['fieldnameasvalue']) ?
 			'name' :
 			'id' ;
-
 
 		/**
 		 * Field selection limiting FLAGs
@@ -130,7 +124,6 @@ class JFormFieldFields extends \Joomla\CMS\Form\FormField
 		$issortable = strlen(@$attributes['issortable'] ?? '') ?
 			(boolean) $attributes['issortable'] :
 			($this->type=='Filters' ? true : false);
-
 
 		/**
 		 * INCLUDE/EXCLUDE some field types
@@ -191,7 +184,6 @@ class JFormFieldFields extends \Joomla\CMS\Form\FormField
 			$and .= " AND field_type NOT IN (". implode(",", $non_orderable_quoted).")";
 		}
 
-
 		/**
 		 * Retrieve field data for DB
 		 */
@@ -213,7 +205,6 @@ class JFormFieldFields extends \Joomla\CMS\Form\FormField
 			$fields_q[$query] = $fields;
 		}
 		else $fields = $fields_q[$query];
-
 
 		// Get only fields that are configured to be in a fieldgroup (we will need to render parameters for this)
 		if ($groupables)
@@ -250,7 +241,6 @@ class JFormFieldFields extends \Joomla\CMS\Form\FormField
 		}
 		//print_r($values);
 
-
 		$v2f = array();
 		$options = array();
 		foreach($fields as $field)
@@ -263,7 +253,6 @@ class JFormFieldFields extends \Joomla\CMS\Form\FormField
 			$field->option_text = & $option->text;
 			$v2f[$field->value] = $field;
 		}
-
 
 		/**
 		 * HTML Tag parameters parameters, and styling
@@ -378,7 +367,6 @@ class JFormFieldFields extends \Joomla\CMS\Form\FormField
 			$previewimage = $preview_img ? \Joomla\CMS\HTML\HTMLHelper::image ( 'administrator/components/com_flexicontent/assets/images/'.$preview_img, \Joomla\CMS\Language\Text::_( 'FLEXI_NOTES' ), ' style="vertical-align:middle; max-height:24px; padding:0px; margin:0 0 0 12px;" ' ) : '';
 			$tip_text = '<span class="'.$tip_class.'" style="float:left;" title="'.flexicontent_html::getToolTip(null, $inline_tip, 1, 1).'">'.$hintmage.$previewimage.'</span>';
 		}
-
 
 		/**
 		 * Create the field's HTML

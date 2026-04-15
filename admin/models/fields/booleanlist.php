@@ -17,8 +17,6 @@ use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-	// TODO-J5: jimport("cms.html.select") — find J5 equivalent
-
 ////\Joomla\CMS\Form\FormHelper::loadFieldClass('...');   // \Joomla\CMS\Form\FormField...
 
 /**

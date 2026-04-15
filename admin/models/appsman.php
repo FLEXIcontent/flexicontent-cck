@@ -15,8 +15,6 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-	// TODO-J5: jimport("legacy.model.list") — find J5 equivalent
-
 /**
  * FLEXIcontent Component types Model
  *
@@ -42,7 +40,6 @@ class FlexicontentModelAppsman extends \Joomla\CMS\MVC\Model\ListModel
 		// Parameters of the view, in our case it is only the component parameters
 		$this->cparams = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
 
-
 		// **************
 		// Form variables
 		// **************
@@ -54,8 +51,6 @@ class FlexicontentModelAppsman extends \Joomla\CMS\MVC\Model\ListModel
 
 		$app->setUserState($p.'table', $table);
 	}
-
-
 
 	function getTableCreateSQL($table, $backup_filename=false, $where='', $id_colname=null, $clear_id=false)
 	{
@@ -71,8 +66,6 @@ class FlexicontentModelAppsman extends \Joomla\CMS\MVC\Model\ListModel
 
 		return $tableCreation;
 	}
-
-
 
 	function getTableRows($table, $id_colname, $ids, $id_is_unique=true, $fid_colname=null, $fids=array())
 	{
@@ -97,8 +90,6 @@ class FlexicontentModelAppsman extends \Joomla\CMS\MVC\Model\ListModel
 		$rows = $id_is_unique ? $this->_db->loadAssocList($id_colname) : $this->_db->loadAssocList();
 		return $rows;
 	}
-
-
 
 	/*** NEEDS PHP 5.5.4+ ***/
 	function create_CSV_file($rows, $table, $id_colname=null, $clear_id=false)
@@ -125,9 +116,6 @@ class FlexicontentModelAppsman extends \Joomla\CMS\MVC\Model\ListModel
 		$content = stream_get_contents($temp_stream);
 		return $content;
 	}
-
-
-
 
 	function create_SQL_file($rows, $table, $id_colname=null, $clear_id=false)
 	{
@@ -173,8 +161,6 @@ class FlexicontentModelAppsman extends \Joomla\CMS\MVC\Model\ListModel
 		return $content;
 	}
 
-
-
 	function create_XML_records($rows, $table, $id_colname=null, $clear_id=false)
 	{
 		if (!count($rows)) return '';
@@ -214,7 +200,6 @@ class FlexicontentModelAppsman extends \Joomla\CMS\MVC\Model\ListModel
 		return $content;
 	}
 
-
 	function getRelatedIds_flexicontent_types($type_ids)
 	{
 		if (empty($type_ids)) return array();
@@ -233,7 +218,6 @@ class FlexicontentModelAppsman extends \Joomla\CMS\MVC\Model\ListModel
 			$field_ids[] = $field_id;
 		}
 
-
 		// *****************************************************
 		// Get templates, (we need to load type's configuration)
 		// *****************************************************
@@ -248,7 +232,6 @@ class FlexicontentModelAppsman extends \Joomla\CMS\MVC\Model\ListModel
 			$ilayout = $type->params->get('ilayout', 'grid');   // template folder name
 			$related_ids['flexicontent_templates'][$ilayout] = $ilayout;
 		}
-
 
 		// ****************************************
 		// Get asset records of types and of fields
@@ -271,7 +254,6 @@ class FlexicontentModelAppsman extends \Joomla\CMS\MVC\Model\ListModel
 		return $related_ids;
 	}
 
-
 	function getExtraData_flexicontent_types($rows)
 	{
 		if (!count($rows)) return '';
@@ -292,7 +274,6 @@ class FlexicontentModelAppsman extends \Joomla\CMS\MVC\Model\ListModel
 
 		return $content;
 	}
-
 
 	function getExtraFiles_flexicontent_templates($rows, $zip)
 	{
@@ -316,7 +297,6 @@ class FlexicontentModelAppsman extends \Joomla\CMS\MVC\Model\ListModel
 		echo 'doImport_assets<br/>';
 		return;
 	}
-
 
 	function doImport_flexicontent_fields_type_relations($rows, $remap)
 	{

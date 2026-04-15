@@ -25,10 +25,7 @@ defined('_JEXEC') or die('Restricted access');
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
-	// TODO-J5: jimport("cms.html.select") — find J5 equivalent
-
 \Joomla\CMS\Form\FormHelper::loadFieldClass('list');   // \Joomla\CMS\Form\Field\ListField
-
 
 /**
  * Renders a filter element
@@ -100,7 +97,6 @@ class JFormFieldFcSortableList extends \Joomla\CMS\Form\FormField
 		}
 		//echo "<pre>"; print_r($values); echo "</pre>";
 
-
 		$fieldname  = $this->name;
 		$element_id = $this->id;
 		
@@ -127,7 +123,6 @@ class JFormFieldFcSortableList extends \Joomla\CMS\Form\FormField
 			$fieldname_selector = $fieldname;
 			$element_id_selector = $element_id;
 		}
-
 
 		$attribs = '';
 		$selector_classes = array();

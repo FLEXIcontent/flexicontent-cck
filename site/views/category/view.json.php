@@ -20,8 +20,6 @@ use Joomla\CMS\Filesystem\File;
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-	// TODO-J5: jimport("legacy.view.legacy") — find J5 equivalent
-
 /**
  * HTML View class for the Category View
  *
@@ -52,8 +50,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 
 		// Get category parameters as VIEW's parameters (category parameters are merged parameters in order: layout(template-manager)/component/ancestors-cats/category/author/menu)
 		$params   = $category->parameters;
-
-
 
 		// ***********************
 		// Get data from the model

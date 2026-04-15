@@ -19,8 +19,6 @@ defined('_JEXEC') or die('Restricted access');
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
-	// TODO-J5: jimport("cms.html.select") — find J5 equivalent
-
 //\Joomla\CMS\Form\FormHelper::loadFieldClass('radio');   // \Joomla\CMS\Form\Field\RadioField
 
 /**
@@ -42,7 +40,6 @@ class JFormFieldFclayoutbuilder extends \Joomla\CMS\Form\FormField
 		// Valid HTML ... you can not have for LABEL attribute for fieldset
 		return str_replace(' for="', ' data-for="', parent::getLabel());
 	}
-
 
 	function getInput()
 	{

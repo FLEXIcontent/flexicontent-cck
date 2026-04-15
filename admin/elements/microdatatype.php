@@ -23,8 +23,6 @@ use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Microdata\Microdata;
 use Joomla\String\StringHelper;
 
-	// TODO-J5: jimport("cms.html.select") — find J5 equivalent
-
 ////\Joomla\CMS\Form\FormHelper::loadFieldClass('...');   // \Joomla\CMS\Form\FormField...
 
 class JFormFieldMicrodatatype extends \Joomla\CMS\Form\FormField {

@@ -16,8 +16,6 @@ use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-	// TODO-J5: jimport("cms.html.select") — find J5 equivalent
-
 \Joomla\CMS\Form\FormHelper::loadFieldClass('list');   // \Joomla\CMS\Form\Field\ListField
 
 /**
@@ -36,7 +34,6 @@ class JFormFieldContenttypes extends JFormFieldList
 	public mixed $name = null;
 	/** @var mixed $value */
 	public mixed $value = null;
-
 
 	/**
 	 * The form field type.
@@ -70,7 +67,6 @@ class JFormFieldContenttypes extends JFormFieldList
 		//return \Joomla\CMS\HTML\Helpers\Select::genericList($options, $fieldname, $attr, 'value', 'text', $value, $element_id);
 	}
 
-
 	protected function getOptions()
 	{
 		$db = \Joomla\CMS\Factory::getDbo();
@@ -84,7 +80,6 @@ class JFormFieldContenttypes extends JFormFieldList
 		$types = $db->loadObjectList();
 		return $types;
 	}
-
 
 	public function setAttributes($attribs = array())
 	{

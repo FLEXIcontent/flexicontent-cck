@@ -12,8 +12,6 @@ use Joomla\CMS\Filesystem\Folder;
 
 defined('_JEXEC') or die('Restricted access');
 
-	// TODO-J5: jimport("legacy.model.legacy") — find J5 equivalent
-
 /**
  * FLEXIcontent Component Templates Model
  *
@@ -54,7 +52,6 @@ class FlexicontentModelTemplates extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 		return $this->_data;
 	}
 
-
 	/**
 	 * Method to get the template list and their properties
 	 *
@@ -79,7 +76,6 @@ class FlexicontentModelTemplates extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 		return $themes;
 	}
 
-
 	/**
 	 * Method to duplicate a template folder
 	 *
@@ -99,7 +95,6 @@ class FlexicontentModelTemplates extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 
 		return true;
 	}
-
 
 	/**
 	 * Method to remove a template folder

@@ -14,8 +14,6 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-	// TODO-J5: jimport("legacy.view.legacy") — find J5 equivalent
-
 /**
  * HTML View class for backend record screens (Base)
  */
@@ -41,7 +39,6 @@ class FlexicontentViewBaseRecord extends \Joomla\CMS\MVC\View\HtmlView
 	{
 		parent::__construct($config);
 	}
-
 
 	/**
 	 * Constructor
@@ -93,7 +90,6 @@ class FlexicontentViewBaseRecord extends \Joomla\CMS\MVC\View\HtmlView
 		}
 	}
 
-
 	/**
 	 * Method to get the CSS for backend record screens (typically edit forms)
 	 *
@@ -104,7 +100,6 @@ class FlexicontentViewBaseRecord extends \Joomla\CMS\MVC\View\HtmlView
 	public function addCssJs()
 	{
 	}
-
 
 	/**
 	 * Method to get the display of field while showing the inherited value

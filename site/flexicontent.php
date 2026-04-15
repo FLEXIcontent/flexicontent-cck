@@ -13,9 +13,6 @@ use Joomla\CMS\Plugin\PluginHelper;
 
 defined('_JEXEC') or die('Restricted access');
 
-
-
-
 /**
  * Initialize some variables
  */
@@ -50,12 +47,9 @@ if ($print_logging_info && $format === 'html')
 {
 	$start_microtime = microtime(true);
 	global $fc_jprof;
-	// TODO-J5: jimport("joomla.profiler.profiler") — find J5 equivalent
 	$fc_jprof = new \Joomla\CMS\Profiler\Profiler();
 	$fc_jprof->mark('START: FLEXIcontent component');
 }
-
-
 
 /**
  * Load needed helper/classes files
@@ -81,12 +75,9 @@ if (!FLEXI_ONDEMAND)
 }
 \Joomla\CMS\Plugin\PluginHelper::importPlugin('flexicontent');
 
-
-
 /**
  * Language handling
  */
-
 
 if ( \Joomla\CMS\Factory::getLanguage()->getDefault() != 'en-GB' )
 {
@@ -107,8 +98,6 @@ else
 	\Joomla\CMS\Factory::getLanguage()->load('override', $overrideDir, 'en-GB', $force_reload = true, $load_default = true);
 	\Joomla\CMS\Factory::getLanguage()->load('override', $overrideDir, null, $force_reload = true, $load_default = true);
 }*/
-
-
 
 /**
  * Prepare calling the controller task
@@ -158,8 +147,6 @@ if ( isset($forced_views[$controller]) )
 	$jinput->set('view', $view);
 }
 
-
-
 // ***
 // *** Force variables: controller AND/OR task,
 // *** (thus ignoring controller set in HTTP REQUEST)
@@ -174,13 +161,11 @@ if ( file_exists(JPATH_COMPONENT.'/controllers/'.$view . ($format !== 'html' ? '
 	$controller = $view;
 }
 
-
 // CASE 2: Singular views do not (usually) have a controller, use (if it exists) the 'Plural' controller by appending 's' to view name
 else if ( file_exists( JPATH_COMPONENT.'/controllers/'.$view.'s' . ($format !== 'html' ? '.' . $format : '') . '.php' ) )
 {
 	$controller = $view.'s';
 }
-
 
 else
 {
@@ -199,9 +184,7 @@ else
 	}
 }
 
-
 //echo "$controller -- $task <br/>\n";
-
 
 // d. Set changes to controller/task variables back to HTTP REQUEST
 $controller_task = $controller && $task  ?  $controller.'.'.$task  :  $task;
@@ -209,8 +192,6 @@ $controller_name = $controller;
 
 $jinput->set('controller', $controller_name);
 $jinput->set('task', $controller_task);
-
-
 
 // **************************************************************************
 // The view-specific controller is included automatically \Joomla\CMS\MVC\Controller\BaseController,
@@ -231,13 +212,9 @@ if ($controller) {
 	}
 }*/
 
-
 // initialization done ... log stats for initialization
 if ($print_logging_info && $format === 'html')
 	@$fc_run_times['initialize_component'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-
-
-
 
 /**
  * (If needed) Re-compile LESS files as CSS (call the less proprocessor)
@@ -253,15 +230,11 @@ if ( $cparams->get('recompile_core_less', 0) && $format == 'html' )
 		@$fc_run_times['core_less_recompile'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 }
 
-
-
 /**
  * Create a controller instance
  */
 
 $controller	= \Joomla\CMS\MVC\Controller\BaseController::getInstance('Flexicontent');
-
-
 
 /**
  * Perform the requested task
@@ -288,8 +261,6 @@ if ( $cparams->get('default_menuitem_nopathway',1) )
 		}
 	}
 }
-
-
 
 /**
  * Load common js libs / frameworks
@@ -328,8 +299,6 @@ if ($format === 'html')
 		\Joomla\CMS\Factory::getDocument()->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/media/jui/css/icomoon.css');
 }
 
-
-
 /**
  * Enqueue PERFORMANCE statistics as a message BUT NOT if in RAW FORMAT or COMPONENT only views
  */
@@ -342,7 +311,6 @@ if ( $print_logging_info && $jinput->get('tmpl', '', 'cmd')!='component' && $for
 
 	if ($task) $_msg = ' (TASK: '.$controller_name.'.'.$task.')';
 	else       $_msg = ' (VIEW: ' .$view. ($layout ? ' -- LAYOUT: '.$layout : '') .')';
-
 
 	/*
 	 * Various Partial time performance stats
@@ -460,7 +428,6 @@ if ( $print_logging_info && $jinput->get('tmpl', '', 'cmd')!='component' && $for
 	if (isset($fc_run_times['template_render']))
 		$msg .= sprintf('<br/>-- [FC "%s" view Template Rendering: %.2f s] ', $view, $fc_run_times['template_render']/1000000);
 
-
 	// **********************
 	// Fields rendering times
 	// **********************
@@ -499,7 +466,6 @@ if ( $print_logging_info && $jinput->get('tmpl', '', 'cmd')!='component' && $for
 	}
 
 	$msg .= '</div>';
-
 
 	// SYSTEM PLGs
 	if (isset($fc_run_times['auto_checkin_auto_state']))

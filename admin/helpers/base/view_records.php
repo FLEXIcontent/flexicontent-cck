@@ -14,8 +14,6 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-	// TODO-J5: jimport("legacy.view.legacy") — find J5 equivalent
-
 /**
  * HTML View class for backend managers (Base)
  */
@@ -32,7 +30,6 @@ class FlexicontentViewBaseRecords extends \Joomla\CMS\MVC\View\HtmlView
 	var $ctrl;
 	var $option = 'com_flexicontent';
 
-
 	public function __construct($config = array())
 	{
 		parent::__construct($config);
@@ -40,7 +37,6 @@ class FlexicontentViewBaseRecords extends \Joomla\CMS\MVC\View\HtmlView
 		// Default controller is same name as the view
 		$this->ctrl = $this->getName();
 	}
-
 
 	/**
 	 * Method to get the model object
@@ -108,7 +104,6 @@ class FlexicontentViewBaseRecords extends \Joomla\CMS\MVC\View\HtmlView
 		}
 	}
 
-
 	/**
 	 * Method to get the CSS for backend management listings
 	 *
@@ -119,7 +114,6 @@ class FlexicontentViewBaseRecords extends \Joomla\CMS\MVC\View\HtmlView
 	public function addCssJs()
 	{
 	}
-
 
 	/**
 	 * Method to add the state changing buttons for setting a new state for multiple records as a dropdown
@@ -144,7 +138,6 @@ class FlexicontentViewBaseRecords extends \Joomla\CMS\MVC\View\HtmlView
 			flexicontent_html::addToolBarDropMenu($btn_arr, 'action_btns_group', ' ');
 		}
 	}
-
 
 	/**
 	 * Method to create state changing buttons for setting a new state for multiple records
@@ -231,7 +224,6 @@ class FlexicontentViewBaseRecords extends \Joomla\CMS\MVC\View\HtmlView
 		return $btn_arr;
 	}
 
-
 	/**
 	 * Method to get configuration state of FC managers for current user (from cookie)
 	 *
@@ -278,7 +270,6 @@ class FlexicontentViewBaseRecords extends \Joomla\CMS\MVC\View\HtmlView
 
 		return $FcMansConf;
 	}
-
 
 	/**
 	 * Method to get the display of text search scope selector
@@ -339,7 +330,6 @@ class FlexicontentViewBaseRecords extends \Joomla\CMS\MVC\View\HtmlView
 			$translate = false
 		);
 	}
-
 
 	/**
 	 * Method to get CSS for hidding a table cell because its column is currently hidden

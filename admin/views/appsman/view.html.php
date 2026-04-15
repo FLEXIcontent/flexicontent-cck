@@ -18,7 +18,6 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-	// TODO-J5: jimport("legacy.view.legacy") — find J5 equivalent
 use Joomla\String\StringHelper;
 
 /**
@@ -79,8 +78,6 @@ class FlexicontentViewAppsman extends \Joomla\CMS\MVC\View\HtmlView
 		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
 		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
 
-
-
 		// ***
 		// *** Create Submenu & Toolbar
 		// ***
@@ -96,7 +93,6 @@ class FlexicontentViewAppsman extends \Joomla\CMS\MVC\View\HtmlView
 
 		// Create the toolbar
 		$this->setToolbar($conf, $task);
-
 
 		// Get types
 		$types = flexicontent_html::getTypesList( $_type_ids=false, $_check_perms = false, $_published=true);
@@ -259,8 +255,6 @@ class FlexicontentViewAppsman extends \Joomla\CMS\MVC\View\HtmlView
 		parent::display($tpl);
 	}
 
-
-
 	/**
 	 * Method to configure the toolbar for this view.
 	 *
@@ -310,7 +304,6 @@ class FlexicontentViewAppsman extends \Joomla\CMS\MVC\View\HtmlView
 			//$ctrl_task = 'appsman.initxml';
 			//\Joomla\CMS\Toolbar\ToolbarHelper::custom( $ctrl_task, 'import.png', 'import.png', 'FLEXI_IMPORT_PREPARE_TASK', $list_check = false );
 		}
-
 
 		/*
 		$btn_icon = 'icon-download';
