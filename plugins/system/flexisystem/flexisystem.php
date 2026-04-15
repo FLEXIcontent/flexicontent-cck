@@ -328,13 +328,20 @@ class plgSystemFlexisystem extends CMSPlugin
 			// WORKAROUNDs for slow chosen JS in component configuration form
 			if ($isFC_Config)
 			{
-				// Make sure chosen JS file is loaded before our code, but do not attach it to any elements (YET)
-				if (!FLEXI_J40GE)
+				if (FLEXI_J40GE)
 				{
-					// Do not run this in J4 , \Joomla\CMS\Document\Document not yet available, but chosen JS was replaced
+					// J5/J6: Load admin.js for config form to enable serialized submit workaround
+					$document->getWebAssetManager()->registerAndUseScript(
+						'fc-admin-js',
+						\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/admin.js',
+						array('version' => FLEXI_VHASH)
+					);
+				}
+				else
+				{
+					// J3 legacy: chosen workaround
 					HTMLHelper::_('formbehavior.chosen', '#_some_iiidddd_');
 				}
-				//$js .= "\n"."jQuery.fn.chosen = function(){};"."\n";  // Suppress chosen function completely, (commented out ... we will allow it)
 			}
 
 			// Add information for PHP 5.3.9+ 'max_input_vars' limit
@@ -351,6 +358,7 @@ class plgSystemFlexisystem extends CMSPlugin
 					Joomla.fc_max_input_vars = ".$max_input_vars.";
 					".((JDEBUG || $fcdebug) ? 'Joomla.fc_debug = 1;' : '')."
 					jQuery(document.forms['adminForm']).attr('data-fc_doserialized_submit', '1');
+					jQuery(document.forms['component-form']).attr('data-fc_doserialized_submit', '1');
 					". /*(($option=='com_flexicontent' && $view='category') ? "jQuery(document.forms['adminForm']).attr('data-fc_force_apply_ajax', '1');" : "") .*/"
 				});
 			";
