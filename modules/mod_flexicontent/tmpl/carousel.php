@@ -1458,4 +1458,3 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 </div>
 
 <!-- EOF DIV mod_flexicontent_wrapper -->
-

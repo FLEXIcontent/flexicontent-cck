@@ -505,7 +505,7 @@ var $records_dbtbl  = 'flexicontent_fields';
 		if (!$ids_map)
 		{
 			$msg = \Joomla\CMS\Language\Text::_('FLEXI_FIELDS_COPY_FAILED');
-			Factory::getApplication()->enqueueMessage($model->getError(, 'warning'));
+			Factory::getApplication()->enqueueMessage($model->getError());
 		}
 		else
 		{

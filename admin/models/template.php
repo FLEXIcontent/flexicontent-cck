@@ -417,7 +417,7 @@ class FlexicontentModelTemplate extends FCModelAdmin
 		$this->_db->setQuery($query);
 		$layoutConf = $this->_db->loadObject();
 		if ($layoutConf===false) {
-			Factory::getApplication()->enqueueMessage($this->_db->getError(, 'warning') );
+			Factory::getApplication()->enqueueMessage($this->_db->getError() );
 		}
 		if (!$layoutConf) {
 			$layoutConf = new stdClass();

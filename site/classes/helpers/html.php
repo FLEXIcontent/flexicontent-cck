@@ -1652,7 +1652,7 @@ class flexicontent_html
 					}
 					// select2 JS 4.0.0+
 					/*if ( file_exists($framework_folder.DS.'select2'.DS.'i18n'.DS.$lang_code.'.js') ) {
-						/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', $framework_path.'/select2/i18n/'.$lang_code.'.js', array('version' => $ver));
+						// J5/J6 WebAsset (commented-out block): $document->getWebAssetManager()->registerAndUseScript('fc-script', $framework_path.'/select2/i18n/'.$lang_code.'.js', array('version' => $ver));
 					}*/
 					// Try country language code
 					else {
@@ -1662,7 +1662,7 @@ class flexicontent_html
 						}
 						// select2 JS 4.0.0+
 						/*if ( $country_code && file_exists($framework_folder.DS.'select2'.DS.'i18n'.DS.$country_code.'.js') ) {
-							/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', $framework_path.'/select2/i18n/'.$country_code.'.js', array('version' => $ver));
+							// J5/J6 WebAsset (commented-out block): $document->getWebAssetManager()->registerAndUseScript('fc-script', $framework_path.'/select2/i18n/'.$country_code.'.js', array('version' => $ver));
 						}*/
 					}
 				}

@@ -129,7 +129,7 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 		if (!$user->bind($data))
 		{
 			Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_('CANNOT SAVE THE USER INFORMATION', 'warning'));
-			Factory::getApplication()->enqueueMessage($user->getError(, 'warning'));
+			Factory::getApplication()->enqueueMessage($user->getError());
 
 			// $app->redirect('index.php?option=com_flexicontent&controller=users&view=users', $user->getError());
 			// return false;
@@ -156,7 +156,7 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 		if (!$user->save())
 		{
 			Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_('CANNOT SAVE THE USER INFORMATION', 'warning'));
-			Factory::getApplication()->enqueueMessage($user->getError(, 'warning'));
+			Factory::getApplication()->enqueueMessage($user->getError());
 
 			return $this->execute('edit');
 		}
@@ -173,7 +173,7 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 		if (!$flexiauthor_extdata->save($author_postdata))
 		{
 			Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_('CANNOT SAVE THE AUTHOR EXTENDED INFORMATION', 'warning'));
-			Factory::getApplication()->enqueueMessage($flexiauthor_extdata->getError(, 'warning'));
+			Factory::getApplication()->enqueueMessage($flexiauthor_extdata->getError());
 
 			return $this->execute('edit');
 		}

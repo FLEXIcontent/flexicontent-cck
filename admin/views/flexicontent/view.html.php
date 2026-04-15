@@ -333,4 +333,3 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 		<?php
 	}
 }
-
