@@ -150,7 +150,7 @@ class plgContentFlexiBreak extends \Joomla\CMS\Plugin\CMSPlugin
 
 		// Plugin base folder
 		$document = \Joomla\CMS\Factory::getDocument();
-		$plgbase  = \Joomla\CMS\Uri\Uri::root(true).'/plugins/'.$this->_type.'/'.$this->_name.'/'.$this->_name.'/'.$this->_name;
+		$plgbase  = \Joomla\CMS\Uri\Uri::root().'plugins/'.$this->_type.'/'.$this->_name.'/'.$this->_name.'/'.$this->_name;
 
 		// Display configuration
 		$display_method = (int) $this->params->get('display_method', 1);

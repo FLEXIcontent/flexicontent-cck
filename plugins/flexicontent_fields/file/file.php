@@ -791,7 +791,7 @@ class plgFlexicontent_fieldsFile extends FCField
 						}
 					}
 
-					fcfield_file.assignMediaFile(id, value, \''.Uri::root().'/\' + value);
+					fcfield_file.assignMediaFile(id, value, \''.Uri::root().'\' + value);
 
 					if (typeof SqueezeBox != \'undefined\') SqueezeBox.close();
 					if (typeof jQuery != \'undefined\') jQuery(\'#fc_modal_popup_container\').dialog(\'close\');

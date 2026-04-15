@@ -70,10 +70,10 @@ foreach ($values as $n => $value)
 	$img_size_attrs .= ' width="' . $w . '" height="' . $h . '" style="height: auto; max-width: 100%;" ';
 
 	$img_legend_custom ='
-		<img src="'.\Joomla\CMS\Uri\Uri::root(true).'/'.$src.'" alt="' . $alt_encoded . '"' . $legend . ' class="' . $class . '"
+		<img src="'.\Joomla\CMS\Uri\Uri::root().'/'.$src.'" alt="' . $alt_encoded . '"' . $legend . ' class="' . $class . '"
 			' . $img_size_attrs . '
-			data-medium="' . \Joomla\CMS\Uri\Uri::root(true).'/'.$srcm . '"
-			data-large="' . \Joomla\CMS\Uri\Uri::root(true).'/'.$srcl . '"
+			data-medium="' . \Joomla\CMS\Uri\Uri::root().'/'.$srcm . '"
+			data-large="' . \Joomla\CMS\Uri\Uri::root().'/'.$srcl . '"
 			data-title="' . $title_encoded . '"
 			data-description="' . $desc_encoded . '" itemprop="image"/>
 	';

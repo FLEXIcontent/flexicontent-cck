@@ -119,7 +119,7 @@ class FlexicontentViewStats extends FlexicontentViewBaseRecords
 
 		//*****************************************************************Adicionar as biblitecas*******************************************************************************************//
 		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('font-awesome', '//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css');
-		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/librairies/esl/esl.js');
+		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/librairies/esl/esl.js');
 		//*****************************************************************Adicionar as biblitecas*******************************************************************************************//
 		
 		

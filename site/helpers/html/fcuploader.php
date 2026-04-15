@@ -123,7 +123,7 @@ abstract class JHtmlFcuploader
 		// *** Load plupload JS framework
 		// ***
 
-		$pluploadlib = \Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/librairies/plupload/';
+		$pluploadlib = \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/librairies/plupload/';
 		$plupload_mode = 'runtime';  // 'runtime,ui'
 		flexicontent_html::loadFramework('plupload', $plupload_mode);
 		flexicontent_html::loadFramework('flexi-lib');
@@ -136,7 +136,7 @@ abstract class JHtmlFcuploader
 		\Joomla\CMS\Language\Text::script("FLEXI_PLEASE_WAIT", true);
 		\Joomla\CMS\Language\Text::script("FLEXI_FILE_PROPERTIES", true);
 		\Joomla\CMS\Language\Text::script("FLEXI_APPLYING_DOT", true);
-		\Joomla\CMS\Factory::getDocument()->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/plupload-extend.js', array('version' => FLEXI_VHASH));
+		\Joomla\CMS\Factory::getDocument()->addScript(\Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/plupload-extend.js', array('version' => FLEXI_VHASH));
 
 		// Add plupload Queue handling functions and initialize a plupload Queue
 		$js = '

@@ -122,7 +122,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 		if ($load_css && !$css_loaded)
 		{
 			$css_loaded = true;
-			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::root(true).'/plugins/flexicontent_fields/toolbar/toolbar/toolbar.css');
+			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::root().'plugins/flexicontent_fields/toolbar/toolbar/toolbar.css');
 		}
 
 
@@ -306,9 +306,9 @@ class plgFlexicontent_fieldsToolbar extends FCField
 					$paths[] = $folder;
 				}
 				$imageurl = '/'.implode('/', $paths);
-				$imageurl = \Joomla\CMS\Uri\Uri::root(true).$imageurl;
+				$imageurl = \Joomla\CMS\Uri\Uri::root().$imageurl;
 			}elseif(substr($imageurl, 0, 7)=='images/') {
-				$imageurl = \Joomla\CMS\Uri\Uri::root(true).'/'.$imageurl;
+				$imageurl = \Joomla\CMS\Uri\Uri::root().'/'.$imageurl;
 			}
 		}
 		return $imageurl;

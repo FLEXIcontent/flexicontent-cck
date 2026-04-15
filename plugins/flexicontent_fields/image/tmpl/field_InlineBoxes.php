@@ -268,7 +268,7 @@ foreach ($field->value as $index => $value)
 	if ($image_source === -2 || $image_source === -1)
 	{
 		$img_link = false;
-		//$img_link  = \Joomla\CMS\Uri\Uri::root(true).'/'.$image_subpath;
+		//$img_link  = \Joomla\CMS\Uri\Uri::root().'/'.$image_subpath;
 	}
 
 	// $image_source >= 0, if 'existingname' is set then it is propably a form reload

@@ -137,12 +137,12 @@
 	}
 
 
-	$abs_srcb = $isURL ? $srcb : \Joomla\CMS\Uri\Uri::root(true).'/'.$srcb;
-	$abs_srcs = $isURL ? $srcs : \Joomla\CMS\Uri\Uri::root(true).'/'.$srcs;
-	$abs_srcm = $isURL ? $srcm : \Joomla\CMS\Uri\Uri::root(true).'/'.$srcm;
-	$abs_srcl = $isURL ? $srcl : \Joomla\CMS\Uri\Uri::root(true).'/'.$srcl;
-	$abs_srco = $isURL ? $srco : \Joomla\CMS\Uri\Uri::root(true).'/'.$srco;
-	$abs_src  = $isURL ? $src  : \Joomla\CMS\Uri\Uri::root(true).'/'.$src;
+	$abs_srcb = $isURL ? $srcb : \Joomla\CMS\Uri\Uri::root().'/'.$srcb;
+	$abs_srcs = $isURL ? $srcs : \Joomla\CMS\Uri\Uri::root().'/'.$srcs;
+	$abs_srcm = $isURL ? $srcm : \Joomla\CMS\Uri\Uri::root().'/'.$srcm;
+	$abs_srcl = $isURL ? $srcl : \Joomla\CMS\Uri\Uri::root().'/'.$srcl;
+	$abs_srco = $isURL ? $srco : \Joomla\CMS\Uri\Uri::root().'/'.$srco;
+	$abs_src  = $isURL ? $src  : \Joomla\CMS\Uri\Uri::root().'/'.$src;
 
 
 	// ADD some extra (display) properties that point to all sizes, currently SINGLE IMAGE only (for consistency use 'use_ingroup' of 'ingroup')
