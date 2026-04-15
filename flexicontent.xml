@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<extension type="component" version="4.0.0" method="upgrade">
+<extension type="component" version="3.7.0" method="upgrade">
 	<name>FLEXIcontent</name>
 	<!-- The following elements are optional and free of formatting constraints -->
 	<creationDate>15 April 2026</creationDate>
@@ -11,11 +11,7 @@
 	<!--  The version string is recorded in the components table -->
 	<version>6.1.0</version>
 	<php_minimum>8.1</php_minimum>
-	<supported_db_levels>
-		<db type="mysql" version="8.0.13"/>
-		<db type="mysqli" version="8.0.13"/>
-		<db type="pdomysql" version="8.0.13"/>
-	</supported_db_levels>
+	<!-- supported_db: MySQL 8.0.13+ / MariaDB 10.4+ -->
 	<!-- The description is optional and defaults to the name -->
 	<description>COM_FLEXICONTENT_DESCRIPTION</description>
 	<!-- Compatibility: Joomla 4.4+ / 5.x / 6.x · PHP 8.1-8.4 -->
@@ -26,14 +22,12 @@
 	<install> <!-- Runs on install -->
 		<sql>
 			<file driver="mysql" charset="utf8">installation/install.mysql.utf8.sql</file>
-			<file driver="mysql">installation/install.mysql.nonutf8.sql</file>
 		</sql>
 	</install>
 	
 	<uninstall> <!-- Runs on uninstall -->
 		<sql>
 			<file driver="mysql" charset="utf8">installation/uninstall.mysql.utf8.sql</file>
-			<file driver="mysql">installation/uninstall.mysql.nonutf8.sql</file>
 		</sql>
 	</uninstall>
 	
