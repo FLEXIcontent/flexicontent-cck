@@ -77,7 +77,7 @@ if (!$js_and_css_added)
 		var fcfav_toggle_info = " . $toggle_info . ";
 	");
 
-	/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/fcfav.js', array('version' => FLEXI_VHASH));
+	/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-fcfav', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/fcfav.js', array('version' => FLEXI_VHASH));
 
 	\Joomla\CMS\Language\Text::script('FLEXI_YOUR_BROWSER_DOES_NOT_SUPPORT_AJAX',true);
 	\Joomla\CMS\Language\Text::script('FLEXI_LOADING',true);

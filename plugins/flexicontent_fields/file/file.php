@@ -719,7 +719,7 @@ class plgFlexicontent_fieldsFile extends FCField
 
 			flexicontent_html::loadFramework('flexi-lib');
 			\Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
-			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/file/js/form.js', array('version' => FLEXI_VHASH));
+			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-form', \Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/file/js/form.js', array('version' => FLEXI_VHASH));
 		}
 
 		// Add field's CSS / JS
@@ -1938,7 +1938,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		$data->desc    = $desc;
 		$data->mailto  = $mailto;
 
-		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
+		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexicontent', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		include('file'.DS.'share_form.php');
 		$session->set('com_flexicontent.formtime', time());
 	}
@@ -2153,7 +2153,7 @@ class plgFlexicontent_fieldsFile extends FCField
 			return $this->share_file_form();
 		}
 
-		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
+		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexicontent', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		include('file'.DS.'share_result.php');
 	}
 

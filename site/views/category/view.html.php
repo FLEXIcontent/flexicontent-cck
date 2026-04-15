@@ -184,11 +184,11 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 
 		if (FLEXI_J40GE && file_exists(JPATH_SITE.DS.'media/templates/site'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css'))
 		{
-			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', $this->baseurl.'/media/templates/site/'.$app->getTemplate().'/css/flexicontent.css', array('version' => FLEXI_VHASH));
+			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexicontent', $this->baseurl.'/media/templates/site/'.$app->getTemplate().'/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		}
 		elseif (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css'))
 		{
-			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', $this->baseurl.'/templates/'.$app->getTemplate().'/css/flexicontent.css', array('version' => FLEXI_VHASH));
+			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexicontent', $this->baseurl.'/templates/'.$app->getTemplate().'/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		}
 
 		// ********************************************************************************************

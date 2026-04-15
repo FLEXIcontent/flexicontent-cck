@@ -1290,7 +1290,7 @@ class flexicontent_html
 			// The 'noConflict()' statement must be inside a js file, to make sure it executed immediately
 			if (!FLEXI_J30GE)
 			{
-				$document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root().$lib_path.'/jquery/js/jquery-no-conflict.js');
+				$document->getWebAssetManager()->registerAndUseScript('fc-jquery-no-conflict', \Joomla\CMS\Uri\Uri::root().$lib_path.'/jquery/js/jquery-no-conflict.js');
 			}
 			//$document->addCustomTag('<script>jQuery.noConflict();</script>');  // not placed in proper place
 			$jquery_added = 1;
@@ -1449,7 +1449,7 @@ class flexicontent_html
 				if ($isMobile)
 				{
 					if ($load_jquery) flexicontent_html::loadJQuery();
-					$document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root().$lib_path.'/jquery/js/jquery-ui/jquery.ui.touch-punch.min.js');
+					$document->getWebAssetManager()->registerAndUseScript('fc-jquery-ui-touch-punch-min', \Joomla\CMS\Uri\Uri::root().$lib_path.'/jquery/js/jquery-ui/jquery.ui.touch-punch.min.js');
 				}
 				break;
 
@@ -1843,7 +1843,7 @@ class flexicontent_html
 
 			case 'fancybox':
 				if ($load_jquery) flexicontent_html::loadJQuery();
-				$document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/jquery-easing.js');
+				$document->getWebAssetManager()->registerAndUseScript('fc-jquery-easing', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/jquery-easing.js');
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root().$lib_path.'/fancybox';
 
@@ -1884,7 +1884,7 @@ class flexicontent_html
 				$document->getWebAssetManager()->registerAndUseStyle('gallery', $framework_path.'/css/gallery.css');
 
 				$document->getWebAssetManager()->registerAndUseScript('min', $framework_path.'/js/jquery.tmpl.min.js');
-				$document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/jquery-easing.js', array('version' => FLEXI_VHASH));
+				$document->getWebAssetManager()->registerAndUseScript('fc-jquery-easing', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/jquery-easing.js', array('version' => FLEXI_VHASH));
 
 				$document->getWebAssetManager()->registerAndUseScript('elastislide', $framework_path.'/js/jquery.elastislide.js');
 				$document->getWebAssetManager()->registerAndUseScript('gallery', $framework_path.'/js/gallery.js');
@@ -2021,8 +2021,8 @@ class flexicontent_html
 					$jcookie->set( 'fc_uid', $hashedUA, 0);
 				}
 
-				$document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/tmpl-common.js', array('version' => FLEXI_VHASH));
-				$document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/jquery-easing.js', array('version' => FLEXI_VHASH));
+				$document->getWebAssetManager()->registerAndUseScript('fc-tmpl-common', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/tmpl-common.js', array('version' => FLEXI_VHASH));
+				$document->getWebAssetManager()->registerAndUseScript('fc-jquery-easing', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/jquery-easing.js', array('version' => FLEXI_VHASH));
 				\Joomla\CMS\Language\Text::script("FLEXI_APPLYING_FILTERING", true);
 				\Joomla\CMS\Language\Text::script("FLEXI_TYPE_TO_LIST", true);
 				\Joomla\CMS\Language\Text::script("FLEXI_TYPE_TO_FILTER", true);
@@ -2131,7 +2131,7 @@ class flexicontent_html
 			case 'flexi-lib-form':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
-				$document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/flexi-lib-form.js', array('version' => FLEXI_VHASH));
+				$document->getWebAssetManager()->registerAndUseScript('fc-flexi-lib-form', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/flexi-lib-form.js', array('version' => FLEXI_VHASH));
 				\Joomla\CMS\Language\Text::script("FLEXI_EDIT", true);
 				\Joomla\CMS\Language\Text::script("FLEXI_ADD", true);
 				\Joomla\CMS\Language\Text::script("FLEXI_NA", true);
@@ -3225,7 +3225,7 @@ class flexicontent_html
 			flexicontent_html::loadFramework('flexi_tmpl_common');
 
 			$doc =Factory::getApplication()->getDocument();
-			$doc->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/stateselector.js', array('version' => FLEXI_VHASH));
+			$doc->getWebAssetManager()->registerAndUseScript('fc-stateselector', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/stateselector.js', array('version' => FLEXI_VHASH));
 			$js = '
 				var fc_statehandler_singleton = new fc_statehandler({
 					task: ' . json_encode($isAdmin ? $config->controller . '.setitemstate' : 'setitemstate') . ',
@@ -4371,8 +4371,8 @@ class flexicontent_html
 			flexicontent_html::loadFramework('flexi_tmpl_common');
 
 			$document =Factory::getApplication()->getDocument();
-			$document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/fcvote.css', array('version' => FLEXI_VHASH));
-			$document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/fcvote.js', array('version' => FLEXI_VHASH));
+			$document->getWebAssetManager()->registerAndUseStyle('fc-fcvote', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/fcvote.css', array('version' => FLEXI_VHASH));
+			$document->getWebAssetManager()->registerAndUseScript('fc-fcvote', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/fcvote.js', array('version' => FLEXI_VHASH));
 
 			$image = $field->parameters->get( 'main_image', 'components/com_flexicontent/assets/images/star-medium.png' );
 			$img_path	= \Joomla\CMS\Uri\Uri::root().'/'.$image;

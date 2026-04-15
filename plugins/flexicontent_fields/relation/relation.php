@@ -497,7 +497,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 			Text::script('FLEXI_RIFLD_ERROR', false);
 			Text::script('FLEXI_RIFLD_NO_ITEMS', false);
 			Text::script('FLEXI_RIFLD_ADD_ITEM', false);
-			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/relation/js/form.js', array('version' => FLEXI_VHASH));
+			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-form', \Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/relation/js/form.js', array('version' => FLEXI_VHASH));
 		}
 
 		$per_val_js = '';

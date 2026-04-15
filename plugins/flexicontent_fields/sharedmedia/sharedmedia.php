@@ -354,7 +354,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 			\Joomla\CMS\Language\Text::script('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_RESPONSE_PARSING_FAILED', false);
 			\Joomla\CMS\Language\Text::script('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_SERVER_RESPONDED_WITH_ERROR', false);
 			\Joomla\CMS\Language\Text::script('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_REASON', false);
-			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/sharedmedia/js/form.js', array('version' => FLEXI_VHASH));
+			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-form', \Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/sharedmedia/js/form.js', array('version' => FLEXI_VHASH));
 		}
 
 		// JS CODE to handle fetching media DATA
@@ -770,7 +770,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 			///* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', 'https://www.youtube.com/iframe_api');
 			///* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('plyr', 'https://cdn.plyr.io/3.6.2/plyr.js');
 			///* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('plyr', 'https://cdn.plyr.io/3.6.2/plyr.css');
-			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/sharedmedia/js/view.js', array('version' => FLEXI_VHASH));
+			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-view', \Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/sharedmedia/js/view.js', array('version' => FLEXI_VHASH));
 		}
 
 		if ($js)  $document->addScriptDeclaration($js);

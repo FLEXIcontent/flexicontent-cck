@@ -737,7 +737,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			\Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
 			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('wavesurfer', 'https://unpkg.com/wavesurfer.js/dist/wavesurfer.min.js');
 			///* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('wavesurfer', 'https://unpkg.com/wavesurfer.js/dist/plugin/wavesurfer.cursor.js');
-			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/mediafile/js/form.js', array('version' => FLEXI_VHASH));
+			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-form', \Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/mediafile/js/form.js', array('version' => FLEXI_VHASH));
 
 			$js .= "
 			jQuery(document).ready(function()
@@ -1119,10 +1119,10 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			\Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
 			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('wavesurfer', 'https://unpkg.com/wavesurfer.js/dist/wavesurfer.min.js');
 			///* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('wavesurfer', 'https://unpkg.com/wavesurfer.js/dist/plugin/wavesurfer.cursor.js');
-			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/mediafile/js/view.js', array('version' => FLEXI_VHASH));
-			///* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/assets/js/pako.min.js', array('version' => FLEXI_VHASH));
-			///* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/assets/js/pako_deflate.min.js', array('version' => FLEXI_VHASH));
-			///* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/assets/js/pako_inflate.min.js', array('version' => FLEXI_VHASH));
+			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-view', \Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/mediafile/js/view.js', array('version' => FLEXI_VHASH));
+			///* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-pako-min', \Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/assets/js/pako.min.js', array('version' => FLEXI_VHASH));
+			///* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-pako_deflate-min', \Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/assets/js/pako_deflate.min.js', array('version' => FLEXI_VHASH));
+			///* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-pako_inflate-min', \Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/assets/js/pako_inflate.min.js', array('version' => FLEXI_VHASH));
 
 			$document->addScriptDeclaration("
 			jQuery(document).ready(function()
@@ -2159,7 +2159,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		$data->desc    = $desc;
 		$data->mailto  = $mailto;
 
-		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
+		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexicontent', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		include('file'.DS.'share_form.php');
 		$session->set('com_flexicontent.formtime', time());
 	}
@@ -2374,7 +2374,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			return $this->share_file_form();
 		}
 
-		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
+		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexicontent', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		include('file'.DS.'share_result.php');
 	}
 

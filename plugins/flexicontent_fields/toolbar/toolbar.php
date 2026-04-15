@@ -122,7 +122,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 		if ($load_css && !$css_loaded)
 		{
 			$css_loaded = true;
-			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::root().'plugins/flexicontent_fields/toolbar/toolbar/toolbar.css');
+			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-toolbar', \Joomla\CMS\Uri\Uri::root().'plugins/flexicontent_fields/toolbar/toolbar/toolbar.css');
 		}
 
 

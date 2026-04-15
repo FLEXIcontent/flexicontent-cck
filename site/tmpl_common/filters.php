@@ -21,8 +21,8 @@ $filter_container_class  = $filters_in_lines ? 'fc_filter_line' : 'fc_filter';
 $filter_container_class .= $filter_placement==2 ? ' fc_clear_label' : '';
 
 if ($filter_placement==3) {
-	/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
-	/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
+	/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-tabber', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
+	/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-tabber-minimized', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/tabber-minimized.js', array('version' => FLEXI_VHASH));
 	static $_filter_TABsetCnt = null;
 	if ($_filter_TABsetCnt === null) $_filter_TABsetCnt = -1;
 }
@@ -71,7 +71,7 @@ if ($badge_position > 0 && $use_filters) {
 
 if ( $use_search || $use_filters ) : 
 	if (!$params->get('disablecss', '')) {
-		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/flexi_filters.css', array('version' => FLEXI_VHASH));
+		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexi_filters', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/flexi_filters.css', array('version' => FLEXI_VHASH));
 	}
 	$searchphrase_selector = flexicontent_html::searchphrase_selector($params, $form_name);
 

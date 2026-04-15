@@ -295,8 +295,8 @@ var $proxy_option   = 'com_content';
 			if ($isAdmin)
 			{
 				!\Joomla\CMS\Factory::getLanguage()->isRtl()
-					? /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
-					: /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
+					? /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexicontentbackend', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
+					: /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexicontentbackend_rtl', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
 				!\Joomla\CMS\Factory::getLanguage()->isRtl()
 					? /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 					: /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
@@ -304,8 +304,8 @@ var $proxy_option   = 'com_content';
 			else
 			{
 				!\Joomla\CMS\Factory::getLanguage()->isRtl()
-					? /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
-					: /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
+					? /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexicontent', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
+					: /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexicontent_rtl', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
 			}
 
 			// Add JS frameworks
@@ -316,8 +316,8 @@ var $proxy_option   = 'com_content';
 			\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip');
 
 			// Add js function to overload the joomla submitform validation
-			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
-			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
+			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-admin', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
+			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-validate', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
 		}
 
 		$js = '';
@@ -1265,8 +1265,8 @@ var $proxy_option   = 'com_content';
 
 		// Add css to document
 		!\Joomla\CMS\Factory::getLanguage()->isRtl()
-			? /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
-			: /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
+			? /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexicontentbackend', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
+			: /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexicontentbackend_rtl', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
 		!\Joomla\CMS\Factory::getLanguage()->isRtl()
 			? /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 			: /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
@@ -1274,15 +1274,15 @@ var $proxy_option   = 'com_content';
 		// Add js to document
 		//\Joomla\CMS\HTML\HTMLHelper::_('behavior.tooltip');
 		flexicontent_html::loadFramework('select2');
-		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/batchprocess.js', array('version' => FLEXI_VHASH));
+		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-batchprocess', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/batchprocess.js', array('version' => FLEXI_VHASH));
 
 		flexicontent_html::loadFramework('flexi-lib');
 		flexicontent_html::loadFramework('flexi-lib-form');
 
 		// Add js function to overload the joomla submitform validation
 		\Joomla\CMS\HTML\HTMLHelper::_('behavior.formvalidator');  // load default validation JS to make sure it is overriden
-		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
-		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
+		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-admin', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
+		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-validate', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
 
 		// Create document/toolbar titles
 		$doc_title = $behaviour === 'translate'
