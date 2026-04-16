@@ -1,5 +1,4 @@
 <?php
-use Joomla\CMS\Pagination\Pagination;
 /**
  * @version 1.5 stable $Id: flexicontent.php 1876 2014-03-24 03:24:41Z ggppdk $
  * @package Joomla
@@ -19,6 +18,8 @@ use Joomla\CMS\Pagination\Pagination;
 
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
+
+jimport('legacy.model.legacy');
 
 /**
  * FLEXIcontent Component Model
@@ -340,7 +341,8 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		// Load the content if it doesn't already exist
 		if (empty($this->_pagination))
 		{
-			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'pagination.php');
+			//jimport('cms.pagination.pagination');
+			require_once (JPATH_COMPONENT.DS.'helpers'.DS.'pagination.php');
 			$this->_pagination = new FCPagination($this->getTotal(), $this->getState('limitstart'), $this->getState('limit') );
 		}
 		return $this->_pagination;

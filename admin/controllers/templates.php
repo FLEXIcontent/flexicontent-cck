@@ -11,7 +11,6 @@
 
 defined('_JEXEC') or die;
 
-use Joomla\CMS\Factory;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
@@ -28,11 +27,9 @@ require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' .
  *
  * @since 3.3
  */
-#[AllowDynamicProperties]
 class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 {
-	
-var $records_dbtbl = 'flexicontent_templates';
+	var $records_dbtbl = 'flexicontent_templates';
 	var $records_jtable = 'flexicontent_templates';
 
 	var $record_name = 'template';
@@ -238,7 +235,7 @@ var $records_dbtbl = 'flexicontent_templates';
 		// Check access
 		if (!$is_authorised)
 		{
-			Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK', 'warning'));
+			JError::raiseWarning(403, \Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'));
 			$this->setRedirect('index.php?option=com_flexicontent', '');
 
 			return;

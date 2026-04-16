@@ -18,6 +18,8 @@
 
 defined('_JEXEC') or die('Restricted access');
 
+jimport('legacy.view.legacy');
+
 /**
  * View class for the FLEXIcontent field screen
  */
@@ -36,6 +38,7 @@ class FlexicontentViewField extends \Joomla\CMS\MVC\View\HtmlView
 		// Get url vars and some constants
 		$cid = $jinput->getInt('cid', 0);
 		$field_type = $jinput->getCmd('field_type', null);
+
 
 		// ***
 		// *** Get record data, and check if record is already checked out

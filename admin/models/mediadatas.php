@@ -21,11 +21,8 @@ require_once('base/baselist.php');
  * FLEXIcontent Component Mediadatas Model
  *
  */
-#[AllowDynamicProperties]
 class FlexicontentModelMediadatas extends FCModelAdminList
 {
-
-
 	/**
 	 * Record database table
 	 *

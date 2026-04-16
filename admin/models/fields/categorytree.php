@@ -11,11 +11,13 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-use Joomla\CMS\Form\FormHelper;
-use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
+jimport('cms.html.html');      // JHtml
+jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
+
+jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 \Joomla\CMS\Form\FormHelper::loadFieldClass('list');   // \Joomla\CMS\Form\Field\ListField
 
 /**
@@ -25,10 +27,8 @@ use Joomla\Utilities\ArrayHelper;
  * @subpackage	com_categories
  * @since		1.6
  */
-#[AllowDynamicProperties]
 class JFormFieldCategorytree extends JFormFieldList
 {
-
 	/**
 	 * The form field type.
 	 *

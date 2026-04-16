@@ -1,5 +1,4 @@
 <?php
-use Joomla\Filesystem\Folder;
 /**
  * @package         FLEXIcontent
  * @version         3.3
@@ -11,6 +10,8 @@ use Joomla\Filesystem\Folder;
  */
 
 defined('_JEXEC') or die('Restricted access');
+
+jimport('legacy.model.legacy');
 
 /**
  * FLEXIcontent Component Templates Model
@@ -52,6 +53,7 @@ class FlexicontentModelTemplates extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 		return $this->_data;
 	}
 
+
 	/**
 	 * Method to get the template list and their properties
 	 *
@@ -76,6 +78,7 @@ class FlexicontentModelTemplates extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 		return $themes;
 	}
 
+
 	/**
 	 * Method to duplicate a template folder
 	 *
@@ -85,6 +88,7 @@ class FlexicontentModelTemplates extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 	 */
 	function duplicate($source, $dest)
 	{
+		jimport('joomla.filesystem.folder');
 
 		$path 	= JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS;
 		$dest	= $dest ? flexicontent_upload::sanitizedir($path, $dest) : '';
@@ -96,6 +100,7 @@ class FlexicontentModelTemplates extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 		return true;
 	}
 
+
 	/**
 	 * Method to remove a template folder
 	 *
@@ -105,6 +110,7 @@ class FlexicontentModelTemplates extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 	 */
 	function delete($dir)
 	{
+		jimport('joomla.filesystem.folder');
 
 		$path 	= JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS;
 

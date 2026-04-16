@@ -1,7 +1,4 @@
 <?php
-use Joomla\CMS\Form\FormField;
-use Joomla\CMS\Form\FormHelper;
-use Joomla\CMS\HTML\HTMLHelper;
 /**
  * @package         FLEXIcontent
  * @version         3.3
@@ -19,6 +16,11 @@ defined('_JEXEC') or die('Restricted access');
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
+jimport('cms.html.html');      // JHtml
+jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
+jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
+
+jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 //\Joomla\CMS\Form\FormHelper::loadFieldClass('radio');   // \Joomla\CMS\Form\Field\RadioField
 
 /**
@@ -40,6 +42,7 @@ class JFormFieldFclayoutbuilder extends \Joomla\CMS\Form\FormField
 		// Valid HTML ... you can not have for LABEL attribute for fieldset
 		return str_replace(' for="', ' data-for="', parent::getLabel());
 	}
+
 
 	function getInput()
 	{

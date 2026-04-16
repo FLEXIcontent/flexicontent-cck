@@ -42,7 +42,7 @@ foreach ($values as $n => $value)
 	}
 	else
 	{
-		$attribs = 'href="' . \Joomla\CMS\Uri\Uri::root().'/'.$srcl . '" ';
+		$attribs = 'href="' . \Joomla\CMS\Uri\Uri::root(true).'/'.$srcl . '" ';
 	}
 
 	$field->{$prop}[] = $pretext.

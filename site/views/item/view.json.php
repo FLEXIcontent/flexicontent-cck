@@ -5,7 +5,7 @@
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright ï¿½ 2018, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright © 2018, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
@@ -14,6 +14,8 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
+
+jimport('legacy.view.legacy');
 
 /**
  * HTML View class for the Item View
@@ -40,6 +42,7 @@ class FlexicontentViewItem extends \Joomla\CMS\MVC\View\HtmlView
 		//initialize variables
 		$user  = \Joomla\CMS\Factory::getUser();
 		$aid   = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
+
 
 		// ***
 		// *** Get item, model and create form (that loads item data)
@@ -77,6 +80,7 @@ class FlexicontentViewItem extends \Joomla\CMS\MVC\View\HtmlView
 
 		// Indicate to model to merge menu parameters if menu matches
 		$model->mergeMenuParams = true;
+
 
 		/**
 		 * Try to load existing item, an 404 error will be raised if item is not found. Also value 2 for check_view_access

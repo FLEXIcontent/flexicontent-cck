@@ -21,11 +21,8 @@ require_once('base/baselist.php');
  * FLEXIcontent Component Reviews Model
  *
  */
-#[AllowDynamicProperties]
 class FlexicontentModelReviews extends FCModelAdminList
 {
-
-
 	/**
 	 * Record database table
 	 *

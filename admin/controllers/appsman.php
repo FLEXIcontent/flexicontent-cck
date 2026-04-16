@@ -24,11 +24,9 @@ require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' .
  *
  * @since 3.3
  */
-#[AllowDynamicProperties]
 class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 {
-	
-var $records_dbtbl = null;
+	var $records_dbtbl = null;
 	var $records_jtable = null;
 
 	var $record_name = 'appsman';

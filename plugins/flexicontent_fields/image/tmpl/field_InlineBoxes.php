@@ -1,6 +1,5 @@
 <?php
 
-use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\Component\QuantumManager\Administrator\Field\QuantumuploadField;
@@ -252,7 +251,7 @@ foreach ($field->value as $index => $value)
 				// Workaround for Quantum not setting the default folder, we will use custom JS
 				$select_existing = str_replace('class="quantumuploadimage-input', ' data-default-scope="'.$jmedia_topdir.'" data-default-subpath="'.$jmedia_subpath.'" class="quantumuploadimage-input', $select_existing);
 				// Bug with Quantum not setting the correct path for the preview image when Joomla is installed in a subdirectory
-				if (Uri::root(true) !== '') {
+				if (JUri::root(true) !== '') {
 					$select_existing = str_replace('<img src="/', '<img src="', $select_existing);
 				}
 			}
@@ -268,7 +267,7 @@ foreach ($field->value as $index => $value)
 	if ($image_source === -2 || $image_source === -1)
 	{
 		$img_link = false;
-		//$img_link  = \Joomla\CMS\Uri\Uri::root().'/'.$image_subpath;
+		//$img_link  = \Joomla\CMS\Uri\Uri::root(true).'/'.$image_subpath;
 	}
 
 	// $image_source >= 0, if 'existingname' is set then it is propably a form reload

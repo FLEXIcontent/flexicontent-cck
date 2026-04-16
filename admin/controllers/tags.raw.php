@@ -11,7 +11,6 @@
 
 defined('_JEXEC') or die;
 
-use Joomla\CMS\Log\Log;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
@@ -28,11 +27,9 @@ require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' .
  *
  * @since 3.3
  */
-#[AllowDynamicProperties]
 class FlexicontentControllerTags extends FlexicontentControllerBaseAdmin
 {
-	
-var $records_dbtbl = 'flexicontent_tags';
+	var $records_dbtbl = 'flexicontent_tags';
 
 	var $records_jtable = 'flexicontent_tags';
 
@@ -290,6 +287,7 @@ var $records_dbtbl = 'flexicontent_tags';
 		$records_cnt      = $this->input->getInt('records_cnt', 0);        // Counter of items indexed so far, this is given via HTTP request
 
 		$log_filename = $session->get($indexer . '_log_filename', null, 'flexicontent');
+		jimport('joomla.log.log');
 		\Joomla\CMS\Log\Log::addLogger(
 			array(
 				'text_file' => $log_filename,  // Sets the target log file

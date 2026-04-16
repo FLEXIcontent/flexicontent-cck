@@ -17,13 +17,14 @@
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
 
-use Joomla\CMS\Form\FormField;
-use Joomla\CMS\Form\FormHelper;
-use Joomla\CMS\HTML\HTMLHelper;
-use Joomla\CMS\Microdata\Microdata;
 use Joomla\String\StringHelper;
 
-////\Joomla\CMS\Form\FormHelper::loadFieldClass('...');   // \Joomla\CMS\Form\FormField...
+jimport('cms.html.html');      // JHtml
+jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
+jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
+
+//jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
+//\Joomla\CMS\Form\FormHelper::loadFieldClass('...');   // \Joomla\CMS\Form\FormField...
 
 class JFormFieldMicrodatatype extends \Joomla\CMS\Form\FormField {
 
@@ -43,6 +44,7 @@ class JFormFieldMicrodatatype extends \Joomla\CMS\Form\FormField {
 		
 		if ($types === null)
 		{
+			jimport('joomla.microdata.microdata');
 			$jm = new \Joomla\CMS\Microdata\Microdata();
 			$jm_types = $jm->getTypes();
 			$types = array_keys($jm_types);

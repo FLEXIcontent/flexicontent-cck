@@ -22,11 +22,8 @@ require_once('base/baselist.php');
  * FLEXIcontent Component Users Model
  *
  */
-#[AllowDynamicProperties]
 class FlexicontentModelUsers extends FCModelAdminList
 {
-
-
 	/**
 	 * Record database table
 	 *

@@ -1,6 +1,4 @@
 <?php
-use Joomla\CMS\Form\FormHelper;
-use Joomla\CMS\HTML\HTMLHelper;
 /**
  * @version 1.5 beta 5 $Id: fcordering.php 567 2011-04-13 11:06:52Z emmanuel.danan@gmail.com $
  * @package Joomla
@@ -21,6 +19,10 @@ use Joomla\CMS\HTML\HTMLHelper;
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
 
+jimport('cms.html.html');      // JHtml
+jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
+
+jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 \Joomla\CMS\Form\FormHelper::loadFieldClass('list');   // \Joomla\CMS\Form\Field\ListField
 
 /**
@@ -55,6 +57,7 @@ class JFormFieldFcordering extends JFormFieldList
 		'hits'=>'popular',
 		'order'=>'catorder'
 	);
+
 
 	function getOptions()
 	{

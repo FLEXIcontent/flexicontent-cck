@@ -1,6 +1,4 @@
 <?php
-use Joomla\Filesystem\File;
-use Joomla\Filesystem\Folder;
 
 /**
  * @package   	JCE
@@ -28,6 +26,8 @@ class WFLinkBrowser_Flexicontentlinks {
 	* @access	protected
 	*/
 	public function __construct($options = array()) {
+		jimport('joomla.filesystem.folder');
+		jimport('joomla.filesystem.file');
 
 		$path = dirname( __FILE__ ) . '/flexicontentlinks';
 
@@ -57,7 +57,7 @@ class WFLinkBrowser_Flexicontentlinks {
 	public function display() {
 		// Load css
 		$document = WFDocument::getInstance();
-		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', array('flexicontentlinks'), 'extensions/links/flexicontentlinks/css');
+		$document->addStyleSheet(array('flexicontentlinks'), 'extensions/links/flexicontentlinks/css');
 	}
 
 	public function isEnabled() {

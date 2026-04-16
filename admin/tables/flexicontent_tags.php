@@ -15,19 +15,8 @@ use Joomla\CMS\Event\AbstractEvent;
 use Joomla\String\StringHelper;
 require_once('flexicontent_basetable.php');
 
-#[AllowDynamicProperties]
 class flexicontent_tags extends flexicontent_basetable
 {
-	/** @var mixed $_NAME */
-	public mixed $_NAME = null;
-	/** @var mixed $_records_dbtbl */
-	public mixed $_records_dbtbl = null;
-	/** @var mixed $_tbl_fields */
-	public mixed $_tbl_fields = null;
-	/** @var mixed $asset_id */
-	public mixed $asset_id = null;
-
-
 	/**
 	 * Primary Key
 	 * @var int

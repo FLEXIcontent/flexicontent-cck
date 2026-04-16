@@ -1,5 +1,4 @@
 <?php
-use Joomla\Filesystem\File;
 /**
  * @version 1.5 stable $Id: view.html.php 1959 2014-09-18 00:15:15Z ggppdk $
  * @package Joomla
@@ -19,6 +18,9 @@ use Joomla\Filesystem\File;
 
 // no direct access
 defined('_JEXEC') or die('Restricted access');
+
+jimport('legacy.view.legacy');
+jimport('joomla.filesystem.file');
 
 /**
  * HTML View class for the Category View
@@ -51,11 +53,13 @@ class FlexicontentViewItems extends \Joomla\CMS\MVC\View\HtmlView
 		$app     = \Joomla\CMS\Factory::getApplication();
 		$jinput  = $app->input;
 
+
 		// Get model
 		$model  = $this->getModel();
 
 		// Indicate to model (if frontend) to merge menu parameters if menu matches
 		$model->mergeMenuParams = !$app->isClient('administrator');
+
 
 		/**
 		 * Get configuration parameters
@@ -192,6 +196,7 @@ class FlexicontentViewItems extends \Joomla\CMS\MVC\View\HtmlView
 		$_vars = null;
 		FlexicontentFields::getItemFields($items, $_vars, $_view = 'category', $aid);
 
+
 		/**
 		 * Find fields that will be added to CSV export
 		 */
@@ -222,6 +227,8 @@ class FlexicontentViewItems extends \Joomla\CMS\MVC\View\HtmlView
 			$app->redirect($this->_getSafeReferer());
 		}
 
+
+
 		/**
 		 * 1. Output HTTP HEADERS
 		 */
@@ -235,6 +242,7 @@ class FlexicontentViewItems extends \Joomla\CMS\MVC\View\HtmlView
 		header('Content-Disposition: attachment; filename=EXPORT-'.rand().'.csv');
 		//header("Content-Transfer-Encoding: binary");
 		echo "\xEF\xBB\xBF"; // UTF-8 BOM
+
 
 		/**
 		 * 2. Output HEADERS row
@@ -262,6 +270,7 @@ class FlexicontentViewItems extends \Joomla\CMS\MVC\View\HtmlView
 		}else{
 			echo $cparams->get("csv_export_item_record_sep", "\n");
 		}
+
 
 		// Try to create CSV export with all items
 		$limitstart = 0;
@@ -415,6 +424,7 @@ class FlexicontentViewItems extends \Joomla\CMS\MVC\View\HtmlView
 		jexit();
 	}
 
+
 	protected function _encodeCSVField($string)
 	{
 		if (strpos($string, ',') !== false || strpos($string, '"') !== false || strpos($string, "\n") !== false) 
@@ -425,6 +435,7 @@ class FlexicontentViewItems extends \Joomla\CMS\MVC\View\HtmlView
 		//return mb_convert_encoding($string, 'UTF-16LE', 'UTF-8');
 		return $string;
 	}
+
 
 	protected function _getSafeReferer()
 	{

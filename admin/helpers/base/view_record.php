@@ -14,22 +14,23 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
+jimport('legacy.view.legacy');
+
 /**
  * HTML View class for backend record screens (Base)
  */
 class FlexicontentViewBaseRecord extends \Joomla\CMS\MVC\View\HtmlView
 {
-	/** @var mixed $scope_title */
-	public mixed $scope_title = null;
-	public $tooltip_class = FLEXI_J40GE ? 'hasTooltip' : 'hasTooltip';
-	public $popover_class = FLEXI_J40GE ? 'hasPopover' : 'hasPopover';
-	public $btn_sm_class  = FLEXI_J40GE ? 'btn btn-sm' : 'btn btn-small';
-	public $btn_iv_class  = FLEXI_J40GE ? 'btn-dark' : 'btn-inverse';
-	public $ina_grp_class = FLEXI_J40GE ? 'input-group' : 'input-append';
-	public $inp_grp_class = FLEXI_J40GE ? 'input-group' : 'input-prepend';
-	public $select_class  = FLEXI_J40GE ? 'use_select2_lib' : 'use_select2_lib';
+	var $tooltip_class = FLEXI_J40GE ? 'hasTooltip' : 'hasTooltip';
+	var $popover_class = FLEXI_J40GE ? 'hasPopover' : 'hasPopover';
+	var $btn_sm_class  = FLEXI_J40GE ? 'btn btn-sm' : 'btn btn-small';
+	var $btn_iv_class  = FLEXI_J40GE ? 'btn-dark' : 'btn-inverse';
+	var $ina_grp_class = FLEXI_J40GE ? 'input-group' : 'input-append';
+	var $inp_grp_class = FLEXI_J40GE ? 'input-group' : 'input-prepend';
+	var $select_class  = FLEXI_J40GE ? 'use_select2_lib' : 'use_select2_lib';
 	//var $txt_grp_class = FLEXI_J40GE ? 'input-group-text' : 'add-on';
 
+	var $option = 'com_flexicontent';
 
 	/**
 	 * Constructor
@@ -40,6 +41,7 @@ class FlexicontentViewBaseRecord extends \Joomla\CMS\MVC\View\HtmlView
 	{
 		parent::__construct($config);
 	}
+
 
 	/**
 	 * Constructor
@@ -91,6 +93,7 @@ class FlexicontentViewBaseRecord extends \Joomla\CMS\MVC\View\HtmlView
 		}
 	}
 
+
 	/**
 	 * Method to get the CSS for backend record screens (typically edit forms)
 	 *
@@ -101,6 +104,7 @@ class FlexicontentViewBaseRecord extends \Joomla\CMS\MVC\View\HtmlView
 	public function addCssJs()
 	{
 	}
+
 
 	/**
 	 * Method to get the display of field while showing the inherited value

@@ -19,6 +19,7 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+jimport('legacy.model.legacy');
 JLoader::register('ParentClassItem', JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'parentclassitem.php');
 
 /**
@@ -39,6 +40,7 @@ class FlexicontentModelItem extends ParentClassItem
 	{
 		parent::__construct();
 	}
+
 
 	/**
 	 * Method to CHECK item's -VIEWING- ACCESS, this could be moved to the controller,
@@ -71,6 +73,8 @@ class FlexicontentModelItem extends ParentClassItem
 
 		// a basic item title string
 		$title_str = ' ' . \Joomla\CMS\Language\Text::_('FLEXI_ID') .' : '.$this->_record->id;
+
+
 
 		//*************************************************************
 		// STEP A: Calculate ownership, edit permission and read access
@@ -109,6 +113,7 @@ class FlexicontentModelItem extends ParentClassItem
 			$this->_record->ancestor_cats_accessible = $ancestor_cats_accessible;
 		}
 		$canviewitem = $params->get('access-view') && $this->_record->ancestor_cats_accessible;
+
 
 		// *********************************************************************************************
 		// STEP B: Calculate SOME ITEM PUBLICATION STATE FLAGS, used to decide if current item is active
@@ -154,6 +159,7 @@ class FlexicontentModelItem extends ParentClassItem
 		$inactive_notice_set = false;
 		$item_state_pending   = $this->_record->state == -3;
 		$item_state_draft			= $this->_record->state == -4;
+
 
 		//***********************************************************************************************************************
 		// STEP C: CHECK item state, if publication state is not ignored terminate with 404 NOT found, otherwise add a notice
@@ -236,6 +242,7 @@ class FlexicontentModelItem extends ParentClassItem
 			$app->enqueueMessage($cats_np_err_mssg, 'notice');  //404
 			$inactive_notice_set = true;
 		}
+
 
 		//*******************************************************************************************
 		// STEP D: CHECK viewing access in relation to if user being logged and being owner / editor
@@ -342,6 +349,7 @@ class FlexicontentModelItem extends ParentClassItem
 		}
 	}
 
+
 	/**
 	 * Method to build the WHERE clause of the query to select a content item
 	 *
@@ -359,6 +367,7 @@ class FlexicontentModelItem extends ParentClassItem
 
 		return $where;
 	}
+
 
 	/**
 	 * Method to decide which item layout to use
@@ -449,6 +458,7 @@ class FlexicontentModelItem extends ParentClassItem
 		$app->input->set('ilayout', $ilayout);
 	}
 
+
 	/**
 	 * Method to increment the hit counter for the item
 	 *
@@ -469,6 +479,7 @@ class FlexicontentModelItem extends ParentClassItem
 		return true;
 	}
 
+
 	/**
 	 * Method to get the nr of favourites of anitem
 	 *
@@ -480,6 +491,7 @@ class FlexicontentModelItem extends ParentClassItem
 	{
 		return flexicontent_db::getFavourites($type=0, $this->_id);
 	}
+
 
 	/**
 	 * Method to get the nr of favourites of an user
@@ -493,6 +505,7 @@ class FlexicontentModelItem extends ParentClassItem
 		return flexicontent_db::getFavoured($type=0, $this->_id, \Joomla\CMS\Factory::getUser()->id);
 	}
 
+
 	/**
 	 * Method to remove a favourite
 	 *
@@ -504,6 +517,7 @@ class FlexicontentModelItem extends ParentClassItem
 	{
 		return flexicontent_db::removefav($type=0, $this->_id, \Joomla\CMS\Factory::getUser()->id);
 	}
+
 
 	/**
 	 * Method to add a favourite

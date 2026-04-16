@@ -1,7 +1,4 @@
 <?php
-use Joomla\CMS\Component\ComponentHelper;
-use Joomla\CMS\User\User;
-use Joomla\CMS\User\UserHelper;
 /**
  * @package         FLEXIcontent
  * @version         3.4
@@ -419,6 +416,9 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 	public static function registerUser($name, $username, $email, $password, $gender, &$field)
 	{
 		// Initialize new usertype setting
+		jimport('joomla.user.user');
+		jimport('joomla.user.helper');
+		jimport('cms.component.helper');
 		\Joomla\CMS\Factory::getLanguage()->load('com_users', JPATH_SITE, 'en-GB', false);
 		\Joomla\CMS\Factory::getLanguage()->load('com_users', JPATH_SITE, null, true);
 

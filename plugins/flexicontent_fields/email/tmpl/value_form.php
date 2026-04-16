@@ -54,7 +54,7 @@ foreach ($values as $value)
 	// Add styles for label position
 	$document = \Joomla\CMS\Factory::getDocument();
 	$styleurl = \Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/email/css/style.css';
-	/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', $styleurl);
+	$document->addStyleSheet($styleurl);
 
 	// Use paremeters to decide if email should be cloaked and if we need a mailto: link
 

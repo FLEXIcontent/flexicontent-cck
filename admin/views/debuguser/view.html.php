@@ -1,5 +1,4 @@
 <?php
-use Joomla\CMS\Factory;
 /**
  * @copyright	Copyright (C) 2005 - 2014 Open Source Matters, Inc. All rights reserved.
  * @license		GNU General Public License version 2 or later; see LICENSE.txt
@@ -14,17 +13,9 @@ defined('_JEXEC') or die;
  * @subpackage	com_users
  * @since		1.6
  */
-#[AllowDynamicProperties]
 class FlexicontentViewDebugUser extends UsersViewDebugUser
 {
-		/** @var mixed $components */
-	public mixed $components = null;
-	/** @var mixed $levels */
-	public mixed $levels = null;
-	/** @var mixed $user */
-	public mixed $user = null;
-
-protected $actions;
+	protected $actions;
 	protected $items;
 	protected $pagination;
 	protected $state;
@@ -37,7 +28,7 @@ protected $actions;
 		// Access check.
 		if (!\Joomla\CMS\Factory::getUser()->authorise('core.manage', 'com_users') || !\Joomla\CMS\Factory::getConfig()->get('debug'))
 		{
-			return Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_('JERROR_ALERTNOAUTHOR', 'warning'));
+			return JError::raiseWarning(404, \Joomla\CMS\Language\Text::_('JERROR_ALERTNOAUTHOR'));
 		}
 
 		$this->actions		= $this->get('DebugActions');
@@ -50,7 +41,7 @@ protected $actions;
 
 		// Check for errors.
 		if (count($errors = $this->get('Errors'))) {
-			throw new \RuntimeException(implode("\n", $errors));
+			JError::raiseError(500, implode("\n", $errors));
 			return false;
 		}
 

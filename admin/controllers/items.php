@@ -23,11 +23,9 @@ JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 
  *
  * @since 3.3
  */
-#[AllowDynamicProperties]
 class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 {
-	
-var $records_dbtbl  = 'content';
+	var $records_dbtbl  = 'content';
 	var $records_jtable = 'flexicontent_items';
 
 	var $record_name = 'item';

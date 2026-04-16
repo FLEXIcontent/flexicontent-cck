@@ -8,10 +8,6 @@ use Joomla\Utilities\ArrayHelper;
 
 class FcFormLayoutParameters
 {
-	/** @var mixed $type_lbl */
-	public mixed $type_lbl = null;
-
-
 	/**
 	 * Parse form's layout configuration (of parameters in XML file of layout)
 	 *

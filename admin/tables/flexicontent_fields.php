@@ -11,7 +11,7 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-use Joomla\CMS\Access\Rules;
+jimport('joomla.access.rules');
 use Joomla\String\StringHelper;
 require_once('flexicontent_basetable.php');
 
@@ -54,15 +54,8 @@ else {
 
 
 
-#[AllowDynamicProperties]
 class flexicontent_fields extends _flexicontent_fields
 {
-	/** @var mixed $_NAME */
-	public mixed $_NAME = null;
-	/** @var mixed $_records_dbtbl */
-	public mixed $_records_dbtbl = null;
-
-
 	/**
 	 * Primary Key
 	 * @var int

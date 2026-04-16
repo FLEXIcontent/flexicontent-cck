@@ -1,8 +1,4 @@
 <?php
-use Joomla\CMS\Form\FormField;
-use Joomla\CMS\Form\FormHelper;
-use Joomla\CMS\HTML\HTMLHelper;
-use Joomla\CMS\Microdata\Microdata;
 /**
  * @version 0.6.0 stable $Id: default.php yannick berges
  * @package Joomla
@@ -21,7 +17,13 @@ use Joomla\CMS\Microdata\Microdata;
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
 
+jimport('cms.html.html');      // JHtml
+jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
+jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
+
+jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 \Joomla\CMS\Form\FormHelper::loadFieldClass('groupedlist');   // \Joomla\CMS\Form\Field\GroupedlistField
+
 
 class JFormFieldMicrodataprops extends JFormFieldGroupedList
 {
@@ -34,6 +36,7 @@ class JFormFieldMicrodataprops extends JFormFieldGroupedList
 		
 		if ($jm_types === null)
 		{
+			jimport('joomla.microdata.microdata');
 			$jm = new \Joomla\CMS\Microdata\Microdata();
 			$jm_types = $jm->getTypes();
 		}

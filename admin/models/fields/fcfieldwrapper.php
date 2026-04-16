@@ -11,9 +11,6 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-use Joomla\CMS\Form\FormField;
-use Joomla\CMS\Form\FormHelper;
-use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
@@ -21,7 +18,12 @@ use Joomla\Utilities\ArrayHelper;
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
-////\Joomla\CMS\Form\FormHelper::loadFieldClass('...');   // \Joomla\CMS\Form\FormField...
+jimport('cms.html.html');      // JHtml
+jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
+jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
+
+//jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
+//\Joomla\CMS\Form\FormHelper::loadFieldClass('...');   // \Joomla\CMS\Form\FormField...
 
 /**
 * Renders a multiple select element
@@ -88,6 +90,7 @@ class JFormFieldFCFieldWrapper extends \Joomla\CMS\Form\FormField
 		return '';
 	}
 
+
 	/*
 	* Create editing HTML of a field
 	*/
@@ -123,17 +126,20 @@ class JFormFieldFCFieldWrapper extends \Joomla\CMS\Form\FormField
 				continue;
 			}
 
+
 			else if ($field->field_type=='coreprops')
 			{
 				// not used in backend (yet?)
 				continue;
 			}
 
+
 			else if ($field->field_type=='maintext')
 			{
 				// placed in separate TAB
 				continue;
 			}
+
 
 			else if ($field->field_type=='image')
 			{
@@ -145,6 +151,7 @@ class JFormFieldFCFieldWrapper extends \Joomla\CMS\Form\FormField
 				}
 			}
 
+
 			else if ($field->field_type=='weblink')
 			{
 				if ($field->parameters->get('link_source')==-1)
@@ -154,6 +161,7 @@ class JFormFieldFCFieldWrapper extends \Joomla\CMS\Form\FormField
 					$field->html = str_replace('_JOOMLA_ARTICLE_LINKS_HTML_', $replace_txt, $field->html);
 				}
 			}
+
 
 			// field has tooltip
 			$edithelp = $field->edithelp ? $field->edithelp : 1;

@@ -576,7 +576,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 
 				// Set 'value' and 'ingroup' properties
 				$grouped_field->value = $_grouped_field->value;
-				$grouped_field->ingroup = 1;  // render as ?array
+				$grouped_field->ingroup = 1;  // render as array
 				$_values = null;
 
 				// Backup display method of the field in cases it is displayed outside of fieldgroup too
@@ -719,7 +719,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 				// Get item's field object, set 'value' and 'ingroup' properties
 				$grouped_field = $item->fields[$_grouped_field->name];
 				$grouped_field->value = $_grouped_field->value;
-				$grouped_field->ingroup = 1;  // render as ?array
+				$grouped_field->ingroup = 1;  // render as array
 				$_values = null;
 				$_rendered_fields[$pos] = $grouped_field;
 

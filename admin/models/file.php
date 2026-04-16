@@ -20,11 +20,8 @@ require_once('base/base.php');
  * FLEXIcontent Component File Model
  *
  */
-#[AllowDynamicProperties]
 class FlexicontentModelFile extends FCModelAdmin
 {
-
-
 	/**
 	 * Record name, (parent class property), this is used for: naming session data, XML file of class, etc
 	 *

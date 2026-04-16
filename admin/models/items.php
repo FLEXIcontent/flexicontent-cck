@@ -21,14 +21,8 @@ require_once('base/baselist.php');
  * FLEXIcontent Component Items Model
  *
  */
-#[AllowDynamicProperties]
 class FlexicontentModelItems extends FCModelAdminList
 {
-	/** @var mixed $_catids */
-	public mixed $_catids = null;
-	/** @var mixed $_tagids */
-	public mixed $_tagids = null;
-
 	/**
 	 * Record database table
 	 *
@@ -124,6 +118,7 @@ class FlexicontentModelItems extends FCModelAdminList
 	 */
 	var $_cats = null;
 
+
 	/**
 	 * Tag Data of listed items
 	 *
@@ -137,6 +132,7 @@ class FlexicontentModelItems extends FCModelAdminList
 	 * @var array
 	 */
 	var $_translations = null;
+
 
 	/**
 	 * Constructor
@@ -159,6 +155,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		parent::__construct($config);
 
 		$p = $this->ovid;
+
 
 		/**
 		 * View's Filters
@@ -211,6 +208,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$app->setUserState($p.'filter_catsinstate', $filter_catsinstate);
 		$app->setUserState($p.'filter_featured', $filter_featured);
 
+
 		// Various filters
 		$filter_tag     = $fcform ? $jinput->get('filter_tag',     false, 'array')  :  $app->getUserStateFromRequest( $p.'filter_tag',     'filter_tag',     false, 'array');
 		$filter_lang	  = $fcform ? $jinput->get('filter_lang',    false, 'array')  :  $app->getUserStateFromRequest( $p.'filter_lang',    'filter_lang',    false, 'array');
@@ -222,6 +220,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$csv_header     = $fcform ? $jinput->get('csv_header',     '',    'int')    :  $app->getUserStateFromRequest( $p.'csv_header',     'csv_header',     '',    'int');
 		$csv_raw_export = $fcform ? $jinput->get('csv_raw_export', '',    'int')    :  $app->getUserStateFromRequest( $p.'csv_raw_export', 'csv_raw_export', '',    'int');
 		$csv_all_fields = $fcform ? $jinput->get('csv_all_fields', '1',    'int')    :  $app->getUserStateFromRequest( $p.'csv_all_fields', 'csv_all_fields', '1',    'int');
+
 
 		if (!is_array($filter_tag))    $filter_tag    = strlen($filter_tag)    ? array($filter_tag)    : array();
 		if (!is_array($filter_lang))   $filter_lang   = strlen($filter_lang)   ? array($filter_lang)   : array();
@@ -253,6 +252,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$app->setUserState($p . 'csv_raw_export', $csv_raw_export);
 		$app->setUserState($p . 'csv_all_fields', $csv_all_fields);
 
+
 		// Date filters
 		$date	 				= $fcform ? $jinput->get('date',      1,  'int')  :  $app->getUserStateFromRequest( $p.'date',      'date',      1,   'int' );
 		$startdate	 	= $fcform ? $jinput->get('startdate', '', 'cmd')  :  $app->getUserStateFromRequest( $p.'startdate', 'startdate', '',  'cmd' );
@@ -266,12 +266,14 @@ class FlexicontentModelItems extends FCModelAdminList
 		$app->setUserState($p.'startdate', $startdate);
 		$app->setUserState($p.'enddate', $enddate);
 
+
 		// Record ID filter
 		$filter_id = $fcform ? $jinput->get('filter_id', '', 'int') : $app->getUserStateFromRequest($p . 'filter_id', 'filter_id', '', 'int');
 		$filter_id = $filter_id ? $filter_id : '';  // needed to make text input field be empty
 
 		$this->setState('filter_id', $filter_id);
 		$app->setUserState($p . 'filter_id', $filter_id);
+
 
 		// File ID filter
 		$filter_fileid  = $fcform ? $jinput->get('filter_fileid', 0, 'int')  :  $app->getUserStateFromRequest( $p.'filter_fileid',  'filter_fileid',  0,  'int' );
@@ -294,6 +296,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$this->canManage = FlexicontentHelperPerm::getPerm()->CanManage;
 	}
 
+
 	/**
 	 * Method to set the record identifier (for singular operations) and clear record rows
 	 *
@@ -312,6 +315,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		}
 	}
 
+
 	/**
 	 * Method to set which record identifier that should be loaded when getItems() is called
 	 *
@@ -325,6 +329,7 @@ class FlexicontentModelItems extends FCModelAdminList
 
 		$this->_extra_cols = null;
 	}
+
 
 	/**
 	 * Method to get records data
@@ -436,6 +441,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		return $this->_data;
 	}
 
+
 	/**
 	 * Method to get fields used as extra columns of the item list
 	 *
@@ -516,6 +522,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$this->getExtraColValues();
 		return $this->_extra_cols;
 	}
+
 
 	function getCustomFilts()
 	{
@@ -605,6 +612,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		return $this->_custom_filters;
 	}
 
+
 	/**
 	 * Method to get fields values of the fields used as extra columns of the item list
 	 *
@@ -674,6 +682,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$jinput->set('view', $view);
 	}
 
+
 	/**
 	 * Method to get fields values of the fields used as extra columns of the item list
 	 *
@@ -723,6 +732,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		unset($item);
 	}
 
+
 	/**
 	 * Method to set the default site language to an item with no language
 	 *
@@ -741,6 +751,7 @@ class FlexicontentModelItems extends FCModelAdminList
 
 		return $lang;
 	}
+
 
 	/**
 	 * Method to get items not having extended data associations
@@ -792,6 +803,8 @@ class FlexicontentModelItems extends FCModelAdminList
 		return $count_only ? $unbounded_count : $unbounded;
 	}
 
+
+
 	function fixMainCat($default_cat)
 	{
 		// Correct non-existent main category in content table
@@ -810,6 +823,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$this->_db->setQuery($query);
 		$this->_db->execute();
 	}
+
 
 	/**
 	 * Method to add flexi extended datas to standard content
@@ -867,6 +881,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$this->_db->setQuery($query);
 		$this->_db->execute();
 
+
 		$query = "SHOW VARIABLES LIKE 'max_allowed_packet'";
 		$this->_db->setQuery($query);
 		$_dbvariable = $this->_db->loadObject();
@@ -923,6 +938,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$this->updateItemCountingData($rows);
 	}
 
+
 	function updateItemCountingData($rows = false, $catid = 0)
 	{
 		$app = \Joomla\CMS\Factory::getApplication();
@@ -974,6 +990,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		return $result;
 	}
 
+
 	/**
 	 * Method to get the total nr of the records
 	 *
@@ -991,6 +1008,9 @@ class FlexicontentModelItems extends FCModelAdminList
 
 		return $this->_total;
 	}
+
+
+
 
 	/**
 	 * Method to build the query for the records
@@ -1201,6 +1221,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		return $query;
 	}
 
+
 	/**
 	 * Method to build the orderby clause of the query for the records
 	 *
@@ -1243,6 +1264,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		return $orderby;
 	}
 
+
 	/**
 	 * Method to build the where clause of the query for the Items
 	 *
@@ -1256,6 +1278,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$user    = \Joomla\CMS\Factory::getUser();
 		$perms   = FlexicontentHelperPerm::getPerm();
 
+
 		/**
 		 * FLAGs to decide which items to list
 		 */
@@ -1264,6 +1287,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$allitems	= $perms->DisplayAllItems;
 		$viewable_items = $this->cparams->get('iman_viewable_items', 1);
 		$editable_items = $this->cparams->get('iman_editable_items', 0);
+
 
 		/**
 		 * SPECIAL item listing CASES, item ids are already calculated and provided,
@@ -1282,6 +1306,7 @@ class FlexicontentModelItems extends FCModelAdminList
 				? ' WHERE 0 '
 				: ' WHERE a.id IN ('. implode(',', $itemids) .') ';
 		}
+
 
 		/**
 		 * Get item list filters
@@ -1318,6 +1343,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$startdate = StringHelper::trim( StringHelper::strtolower( $startdate ) );
 		$enddate   = StringHelper::trim( StringHelper::strtolower( $enddate ) );
 
+
 		/**
 		 * Start building the AND parts of where clause
 		 */
@@ -1327,6 +1353,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		// Limit items to the children of the FLEXI_CATEGORY, currently FLEXI_CATEGORY is root category (id:1) ...
 		//$where[] = ' (cat.lft > ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND cat.rgt < ' . $this->_db->Quote(FLEXI_RGT_CATEGORY) . ')';
 		//$where[] = ' cat.extension = ' . $this->_db->Quote(FLEXI_CAT_EXTENSION);
+
 
 		/**
 		 * IF items viewable: default is enabled
@@ -1344,6 +1371,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		}
 
 		$extra_joins .= $joinaccess;
+
 
 		/**
 		 * IF items in an editable (main) category: default is disabled
@@ -1379,6 +1407,7 @@ class FlexicontentModelItems extends FCModelAdminList
 				$where[] = $_edit_where .' )';
 			}
 		}
+
 
 		/**
 		 * Limit using the category filter
@@ -1438,6 +1467,7 @@ class FlexicontentModelItems extends FCModelAdminList
 			}
 		}
 
+
 		/**
 		 * Limit using the featured filter
 		 */
@@ -1446,6 +1476,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		{
 			$where[] = 'a.featured = ' . $filter_featured;
 		}
+
 
 		/**
 		 * Limit using state or group of states (e.g. published states)
@@ -1499,6 +1530,7 @@ class FlexicontentModelItems extends FCModelAdminList
 			}
 		}
 
+
 		/**
 		 * Limit using simpler filtering, (item) type, author, (item) id, language, access
 		 */
@@ -1549,6 +1581,7 @@ class FlexicontentModelItems extends FCModelAdminList
 			$where[] = 'a.access IN (' . implode( ',', $filter_access) .')';
 		}
 
+
 		if (!empty($filter_meta))
 		{
 			switch($filter_meta)
@@ -1565,6 +1598,7 @@ class FlexicontentModelItems extends FCModelAdminList
 			}
 		}
 
+
 		/**
 		 * Listing associated items
 		 */
@@ -1575,6 +1609,7 @@ class FlexicontentModelItems extends FCModelAdminList
 			$extra_joins .= ' JOIN #__associations AS assoc ON a.id = assoc.id AND assoc.context = ' . $this->_db->quote('com_content.item');
 			$where[] = 'assoc.key = ' . $this->_db->quote($filter_assockey);
 		}
+
 
 		/**
 		 * CUSTOM filters
@@ -1598,6 +1633,7 @@ class FlexicontentModelItems extends FCModelAdminList
 			$where[] = ' (' . implode(' OR ', $_filts_vals_clause).' )';
 		}
 
+
 		/**
 		 * Filter according to search text and search scope
 		 */
@@ -1607,6 +1643,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		{
 			$where[] = '(' . implode(' OR ', $textwhere) . ')';
 		}
+
 
 		/**
 		 * Date range filtering (creation and/or modification)
@@ -1647,6 +1684,7 @@ class FlexicontentModelItems extends FCModelAdminList
 			}
 		}
 
+
 		/**
 		 * Finally create the AND clause of the WHERE clause
 		 */
@@ -1657,6 +1695,7 @@ class FlexicontentModelItems extends FCModelAdminList
 
 		return $where;
 	}
+
 
 	/**
 	 * Method to copy items 
@@ -1675,6 +1714,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$dbprefix = $app->getCfg('dbprefix');
 
 		$use_versioning = $this->cparams->get('use_versioning', 1);
+
 
 		/**
 		 * Try to find Falang/Joomfish, to import translation data, if so requested
@@ -1710,6 +1750,7 @@ class FlexicontentModelItems extends FCModelAdminList
 
 		$_NEW_LANG_TBL = FLEXI_J16GE || $_FISH22GE;
 
+
 		// Get if translation is to be performed, 1: FLEXI_DUPLICATEORIGINAL,  2: FLEXI_USE_JF_DATA,  3: FLEXI_AUTO_TRANSLATION,  4: FLEXI_FIRST_JF_THEN_AUTO
 		$translate_method = $method == 99
 			? $jinput->getInt('translate_method', 1)
@@ -1729,6 +1770,7 @@ class FlexicontentModelItems extends FCModelAdminList
 			$desc_field = \Joomla\CMS\Table\Table::getInstance('flexicontent_fields', '');
 			$desc_field->load($desc_field_id);
 		}
+
 
 		/**
 		 * Loop through the items, copying, moving, or translating them
@@ -1881,6 +1923,7 @@ class FlexicontentModelItems extends FCModelAdminList
 						}
 					}
 
+
 					// Try to do automatic translation from the item, if autotranslate is SET and --NOT found-- or --NOT using-- JoomFish Data
 					if ($translate_method == 3 || $translate_method == 4)
 					{
@@ -1938,6 +1981,7 @@ class FlexicontentModelItems extends FCModelAdminList
 						$row->lang_parent_id = 0; //$row->id;
 						$row->store();
 					}
+
 
 					/**
 					 * Copy custom fields, translating the fields if so configured
@@ -2146,6 +2190,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		return $total_cnt;
 	}
 
+
 	function translateFieldValues( &$fields, &$row, $lang_from, $lang_to )
 	{
 		// Translate 'text' TYPE fields
@@ -2266,6 +2311,8 @@ class FlexicontentModelItems extends FCModelAdminList
 		}
 
 	}
+
+
 
 	/**
 	 * Method to copy items
@@ -2408,6 +2455,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		return true;
 	}
 
+
 	/**
 	 * Method to notification to the validators for an item
 	 *
@@ -2438,6 +2486,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		}
 		return true;
 	}
+
 
 	/**
 	 * Method to move a record upwards or downwards
@@ -2502,6 +2551,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		// Correct direction according to current value of the 'direction' filter
 		$direction = strtolower($this->getState('filter_order_Dir')) == 'desc' ? - $direction : $direction;
 
+
 		/**
 		 * CASE 1
 		 *
@@ -2530,6 +2580,7 @@ class FlexicontentModelItems extends FCModelAdminList
 
 			return true;
 		}
+
 
 		/**
 		 * CASE 2
@@ -2625,6 +2676,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		}
 	}
 
+
 	/**
 	 * Saves the manually set order of records.
 	 *
@@ -2659,6 +2711,7 @@ class FlexicontentModelItems extends FCModelAdminList
 			'archived'    => 'state = 2',
 			''            => 'state NOT IN (2, 1, 0, -2, -3, -4, -5)',
 		);
+
 
 		/**
 		 * CASE 1
@@ -2742,6 +2795,7 @@ class FlexicontentModelItems extends FCModelAdminList
 
 			return true;
 		}
+
 
 		/**
 		 * CASE 2
@@ -2880,6 +2934,9 @@ class FlexicontentModelItems extends FCModelAdminList
 		}
 	}
 
+
+
+
 	/**
 	 * Method to remove records
 	 *
@@ -2951,6 +3008,7 @@ class FlexicontentModelItems extends FCModelAdminList
 			$this->_db->setQuery($query)->execute();
 		}
 
+
 		// ***
 		// *** Retrieve asset before deleting the items
 		// ***
@@ -2962,6 +3020,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$assetids = $this->_db->setQuery($query)->loadColumn();
 		$assetidslist = implode(',', $assetids );
 
+
 		// ***
 		// *** Remove basic item data
 		// ***
@@ -2969,6 +3028,7 @@ class FlexicontentModelItems extends FCModelAdminList
 			. ' WHERE id IN ('. $cid_list .')'
 		;
 		$this->_db->setQuery($query)->execute();
+
 
 		// ***
 		// *** Remove extended item data
@@ -2978,6 +3038,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		;
 		$this->_db->setQuery($query)->execute();
 
+
 		// ***
 		// *** Remove temporary item data
 		// ***
@@ -2986,6 +3047,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		;
 		$this->_db->setQuery($query)->execute();
 
+
 		// ***
 		// *** Remove assigned tag references
 		// ***
@@ -2993,6 +3055,7 @@ class FlexicontentModelItems extends FCModelAdminList
 			.' WHERE itemid IN ('. $cid_list .')'
 		;
 		$this->_db->setQuery($query)->execute();
+
 
 		// ***
 		// *** Remove Joomla Tag assignments
@@ -3003,6 +3066,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		;
 		$this->_db->setQuery($query)->execute();
 
+
 		// ***
 		// *** Remove assigned category references
 		// ***
@@ -3010,6 +3074,7 @@ class FlexicontentModelItems extends FCModelAdminList
 			.' WHERE itemid IN ('. $cid_list .')'
 		;
 		$this->_db->setQuery($query)->execute();
+
 
 		// ***
 		// *** Delete field data in flexicontent_fields_item_relations DB Table
@@ -3019,6 +3084,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		;
 		$this->_db->setQuery($query)->execute();
 
+
 		// ***
 		// *** Delete VERSIONED field data in flexicontent_fields_item_relations DB Table
 		// ***
@@ -3026,6 +3092,7 @@ class FlexicontentModelItems extends FCModelAdminList
 			. ' WHERE item_id IN ('. $cid_list .')'
 		;
 		$this->_db->setQuery($query)->execute();
+
 
 		// ***
 		// *** Delete item version METADATA
@@ -3035,6 +3102,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		;
 		$this->_db->setQuery($query)->execute();
 
+
 		// ***
 		// *** Delete favoured records of the item
 		// ***
@@ -3043,6 +3111,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		;
 		$this->_db->setQuery($query)->execute();
 
+
 		// ***
 		// *** Delete item asset/ACL records
 		// ***
@@ -3050,6 +3119,7 @@ class FlexicontentModelItems extends FCModelAdminList
 			. ' WHERE id in ('.$assetidslist.')'
 		;
 		//$this->_db->setQuery($query)->execute();
+
 
 		/**
 		 * Trigger onAfterDelete event
@@ -3064,6 +3134,7 @@ class FlexicontentModelItems extends FCModelAdminList
 
 		return true;
 	}
+
 
 	/**
 	 * Method to fetch the assigned categories
@@ -3091,6 +3162,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		return $this->_cats;
 	}
 
+
 	/**
 	 * Method to fetch the assigned categories
 	 *
@@ -3116,6 +3188,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		return $this->_tags;
 	}
 
+
 	/**
 	 * Method to get ids of all files
 	 *
@@ -3138,6 +3211,8 @@ class FlexicontentModelItems extends FCModelAdminList
 		return $item_ids;
 	}
 
+
+
 	/**
 	 * Method to get ids of all files
 	 *
@@ -3159,6 +3234,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		return $item_ids;
 	}
 
+
 	/**
 	 * Method to get the name of the author of an item
 	 *
@@ -3178,6 +3254,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		return $this->_db->loadResult();
 	}
 
+
 	/**
 	 * Method to get types list
 	 *
@@ -3188,6 +3265,7 @@ class FlexicontentModelItems extends FCModelAdminList
 	{
 		return flexicontent_html::getTypesList($type_ids, $check_perms, $published);
 	}
+
 
 	/**
 	 * Method to get attributes and other data of types in types filter
@@ -3215,6 +3293,8 @@ class FlexicontentModelItems extends FCModelAdminList
 		return $types;
 	}
 
+
+
 	/**
 	 * Method to get author list for filtering
 	 *
@@ -3234,6 +3314,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		return $this->_db->loadObjectList();
 	}
 
+
 	/**
 	 * Method to import Joomla! com_content datas and structure
 	 * this is UNUSED in J2.5+, it may be used in the future
@@ -3244,6 +3325,7 @@ class FlexicontentModelItems extends FCModelAdminList
 
 	function import()
 	{
+		jimport('joomla.utilities.simplexml');  // Deprecated J2.5, removed J3.x
 		// Get the site default language
 		$lang = flexicontent_html::getSiteDefaultLang();
 
@@ -3389,6 +3471,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		return $logs;
 	}
 
+
 	/**
 	 * Method to get a list of items (ids) that have value for the given fields
 	 *
@@ -3442,8 +3525,10 @@ class FlexicontentModelItems extends FCModelAdminList
 			}
 		}
 
+
 		// NOTE: Must include all items regardless of state to avoid problems when
 		// (a) item changes state and (b) to allow privileged users to search any item
+
 
 		// Return all items, since we included a core field other than tag
 		if ($use_all_items == true)
@@ -3499,6 +3584,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		return array_values(array_unique($item_list));
 	}
 
+
 	/**
 	 * Method to get an array of DB file data for the given file ids
 	 *
@@ -3513,6 +3599,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$filedata= $this->_db->loadObjectList();
 		return $filedata;
 	}
+
 
 	/**
 	 * Method to find which records are not authorized
@@ -3540,6 +3627,7 @@ class FlexicontentModelItems extends FCModelAdminList
 
 		return parent::filterByPermission($cid, $action);
 	}
+
 
 	/**
 	 * Method to find which records having assignments blocking a state change
@@ -3570,6 +3658,7 @@ class FlexicontentModelItems extends FCModelAdminList
 
 		return $cid_wassocs;
 	}
+
 
 	/**
 	 * Method to set order into state
@@ -3622,6 +3711,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$app->setUserState($p . 'filter_order_Dir', $filter_order_Dir);
 	}
 
+
 	/**
 	 * Method to get Text Search clause according to search scope
 	 *
@@ -3673,6 +3763,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		return $textwhere;
 	}
 
+
 	/**
 	 * Method to get item (language) associations
 	 *
@@ -3699,6 +3790,7 @@ class FlexicontentModelItems extends FCModelAdminList
 
 		return parent::getLangAssocs($ids, $config);
 	}
+
 
 	/**
 	 * START OF MODEL SPECIFIC METHODS

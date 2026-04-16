@@ -1,6 +1,4 @@
 <?php
-use Joomla\CMS\Mail\MailHelper;
-use Joomla\CMS\Plugin\CMSPlugin;
 /**
  * @version 1.5 stable $Id: flexinotify.php 1806 2013-11-10 01:38:20Z ggppdk $
  * @package Joomla
@@ -21,6 +19,7 @@ use Joomla\CMS\Plugin\CMSPlugin;
 // Check to ensure this file is included in Joomla!
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+jimport('cms.plugin.plugin');
 
 /**
  * Flexicontent Notification Plugin
@@ -249,6 +248,7 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
 
 		// Import joomla mail helper class that contains the sendMail helper function
+		jimport('joomla.mail.helper');
 
 		$mailer = \Joomla\CMS\Factory::getMailer();
 		$mailer->Encoding = 'base64';
@@ -389,6 +389,7 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
 
 		// Import joomla mail helper class that contains the sendMail helper function
+		jimport('joomla.mail.helper');
 
 		$mailer = \Joomla\CMS\Factory::getMailer();
 		$mailer->Encoding = 'base64';

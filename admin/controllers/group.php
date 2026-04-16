@@ -15,6 +15,7 @@ use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
 // Import parent controller
+jimport('legacy.controller.form');
 
 /**
  * FLEXIcontent (User) Group Controller
@@ -45,6 +46,7 @@ class FlexicontentControllerGroup extends \Joomla\CMS\MVC\Controller\FormControl
 
 		// Register task aliases
 	}
+
 
 	/**
 	 * Method to check if you can save a new or existing record.

@@ -15,6 +15,7 @@ use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
 // Import parent controller
+jimport('legacy.controller.form');
 
 /**
  * FLEXIcontent Category Controller
@@ -53,6 +54,7 @@ class FlexicontentControllerCategory extends \Joomla\CMS\MVC\Controller\FormCont
 		$this->registerTask('save2copy',	'save');
 	}
 
+
 	/**
 	 * Method to add a new record.
 	 *
@@ -64,6 +66,7 @@ class FlexicontentControllerCategory extends \Joomla\CMS\MVC\Controller\FormCont
 	{
 		return parent::add();
 	}
+
 
 	/**
 	 * Method to edit an existing record.
@@ -80,6 +83,7 @@ class FlexicontentControllerCategory extends \Joomla\CMS\MVC\Controller\FormCont
 	{
 		return parent::edit($key, $urlVar);
 	}
+
 
 	/**
 	 * Method to save a record.
@@ -106,6 +110,7 @@ class FlexicontentControllerCategory extends \Joomla\CMS\MVC\Controller\FormCont
 		return $result;
 	}
 
+
 	/**
 	 * Method to cancel an edit.
 	 *
@@ -119,6 +124,7 @@ class FlexicontentControllerCategory extends \Joomla\CMS\MVC\Controller\FormCont
 	{
 		return parent::cancel($key);
 	}
+
 
 	/**
 	 * Method to check if you can add a new record.

@@ -69,10 +69,10 @@ foreach ($values as $n => $value)
 	$group_str = $group_name ? 'data-fancybox="' . $group_name . '"' : '';
 
 	$field->{$prop}[] =
-		'<a class="thumb" name="drop" href="'.\Joomla\CMS\Uri\Uri::root().'/'.$srcl.'" data-width="' . $size_w_l . '" data-height="' . $size_h_l . '" title="' . $title_encoded . '">
+		'<a class="thumb" name="drop" href="'.\Joomla\CMS\Uri\Uri::root(true).'/'.$srcl.'" data-width="' . $size_w_l . '" data-height="' . $size_h_l . '" title="' . $title_encoded . '">
 			'.$img_legend.'
 		</a>
-		<a class="gf_fancybox" href="'.\Joomla\CMS\Uri\Uri::root().'/'.$srcl.'" data-title="' . $title_encoded . '" data-caption="' . $desc_encoded . '" ' . $group_str . '
+		<a class="gf_fancybox" href="'.\Joomla\CMS\Uri\Uri::root(true).'/'.$srcl.'" data-title="' . $title_encoded . '" data-caption="' . $desc_encoded . '" ' . $group_str . '
 			onclick="if (gf_gallery_' . $uid . '.mSlider.isDragging) {event.preventDefault(); event.stopPropagation(); return false; }" style="display: none;">
         </a>
 			' . ($display_title || $display_desc ? '
@@ -81,7 +81,7 @@ foreach ($values as $n => $value)
 					' . ($display_desc && $desc ?  '<div class="image-desc">' . nl2br(preg_replace("/(\r\n|\r|\n){3,}/", "\n\n", $desc_encoded)) . '</div>' : '') . '
 				</div>' : '') .'
 ';
-	$firstImageHtml = $firstImage ?: '<img class="image-fist-image" src="'.\Joomla\CMS\Uri\Uri::root().'/'.$srcl.'" alt="' . $title_encoded . '" style="width: 100%; height: 100%;" />';
+	$firstImageHtml = $firstImage ?: '<img class="image-fist-image" src="'.\Joomla\CMS\Uri\Uri::root(true).'/'.$srcl.'" alt="' . $title_encoded . '" style="width: 100%; height: 100%;" />';
 }
 $js = "
 var gf_gallery_" . $uid . ";

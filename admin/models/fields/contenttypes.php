@@ -11,11 +11,13 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-use Joomla\CMS\Form\FormHelper;
-use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
+jimport('cms.html.html');      // JHtml
+jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
+
+jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 \Joomla\CMS\Form\FormHelper::loadFieldClass('list');   // \Joomla\CMS\Form\Field\ListField
 
 /**
@@ -25,10 +27,8 @@ use Joomla\Utilities\ArrayHelper;
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-#[AllowDynamicProperties]
 class JFormFieldContenttypes extends JFormFieldList
 {
-
 	/**
 	 * The form field type.
 	 *
@@ -61,6 +61,7 @@ class JFormFieldContenttypes extends JFormFieldList
 		//return \Joomla\CMS\HTML\Helpers\Select::genericList($options, $fieldname, $attr, 'value', 'text', $value, $element_id);
 	}
 
+
 	protected function getOptions()
 	{
 		$db = \Joomla\CMS\Factory::getDbo();
@@ -74,6 +75,7 @@ class JFormFieldContenttypes extends JFormFieldList
 		$types = $db->loadObjectList();
 		return $types;
 	}
+
 
 	public function setAttributes($attribs = array())
 	{

@@ -11,8 +11,6 @@
 
 defined('_JEXEC') or die;
 
-use Joomla\CMS\Date\Date;
-use Joomla\Filesystem\Folder;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\String\StringHelper;
@@ -34,11 +32,9 @@ require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' .
  *
  * @since 3.3
  */
-#[AllowDynamicProperties]
 class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 {
-	
-var $records_dbtbl  = 'flexicontent_files';
+	var $records_dbtbl  = 'flexicontent_files';
 	var $records_jtable = 'flexicontent_files';
 
 	var $record_name = 'file';
@@ -82,6 +78,7 @@ var $records_dbtbl  = 'flexicontent_files';
 		// Can manage ACL
 		$this->canManage = FlexicontentHelperPerm::getPerm()->CanFiles;
 	}
+
 
 	/**
 	 * Logic to save a record
@@ -389,6 +386,7 @@ var $records_dbtbl  = 'flexicontent_files';
 		// Check in the record and get record id in case of new item
 		$model->checkin();
 
+
 		/**
 		 * Saving is done, decide where to redirect
 		 */
@@ -425,6 +423,7 @@ var $records_dbtbl  = 'flexicontent_files';
 		}
 	}
 
+
 	/**
 	 * Check in a record
 	 *
@@ -434,6 +433,7 @@ var $records_dbtbl  = 'flexicontent_files';
 	{
 		parent::checkin();
 	}
+
 
 	/**
 	 * Cancel the edit, check in the record and return to the records manager
@@ -447,6 +447,7 @@ var $records_dbtbl  = 'flexicontent_files';
 		return parent::cancel();
 	}
 
+
 	/**
 	 * Logic to publish records, this WRAPPER for changestate method
 	 *
@@ -459,6 +460,7 @@ var $records_dbtbl  = 'flexicontent_files';
 		$this->changestate(1);   // Security checks are done by the called method
 	}
 
+
 	/**
 	 * * Logic to unpublish records, this WRAPPER for changestate method
 	 *
@@ -470,6 +472,7 @@ var $records_dbtbl  = 'flexicontent_files';
 	{
 		$this->changestate(0);   // Security checks are done by the called method
 	}
+
 
 	/**
 	 * Upload files
@@ -630,6 +633,7 @@ var $records_dbtbl  = 'flexicontent_files';
 			? $field->parameters->get('estorage_mode', '0')
 			: '0';
 
+
 		// *****************************************
 		// Check that a file was provided / uploaded
 		// *****************************************
@@ -780,14 +784,20 @@ var $records_dbtbl  = 'flexicontent_files';
 			$path = ($secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH) . DS;
 		}
 
+
 		// Clean subfolder path BUT only if non-empty and make slashes be UNIX style
 		$subfolder_path = $subfolder_path ? Path::clean($subfolder_path . '/') : '';
 		$subfolder_path = str_replace('\\', '/', $subfolder_path);
 
+
+		jimport('joomla.utilities.date');
+
 		// Set FTP credentials, if given
+		jimport('joomla.client.helper');
 		\Joomla\CMS\Client\ClientHelper::setCredentialsFromRequest('ftp');
 
 		// Make the filename safe
+		jimport('joomla.filesystem.file');
 
 		// Get field parameter 'auto_filename_code' which has PHP code to create the filename
 		$auto_filename_code = $field->params->auto_filename_code ?? 0;
@@ -823,10 +833,10 @@ var $records_dbtbl  = 'flexicontent_files';
 						$errors = trim(ob_get_contents());
 						ob_clean();
 
-						if ($errors) Factory::getApplication()->enqueueMessage( 'Error renaming file of field: \'<b>' . $field->label . '</b>\' : <br/> <pre>' . $errors . '</pre>', 'notice');
+						if ($errors) JFactory::getApplication()->enqueueMessage( 'Error renaming file of field: \'<b>' . $field->label . '</b>\' : <br/> <pre>' . $errors . '</pre>', 'notice');
 					}
 					catch (ParseError $e) {
-						Factory::getApplication()->enqueueMessage( "Automatic filename custom code, failed with: <pre>" . $e->getMessage() . '</pre>', 'warning');
+						JFactory::getApplication()->enqueueMessage( "Automatic filename custom code, failed with: <pre>" . $e->getMessage() . '</pre>', 'warning');
 					}
 					break;
 			}
@@ -879,6 +889,8 @@ var $records_dbtbl  = 'flexicontent_files';
 
 			return $this->terminate($file_id, $exitMessages);
 		}
+
+
 
 		// *****************
 		// Upload Successful
@@ -985,6 +997,7 @@ var $records_dbtbl  = 'flexicontent_files';
 		return $this->terminate($file_id, $exitMessages, $fileObj);
 	}
 
+
 	/**
 	 * Upload a file by url
 	 *
@@ -1037,6 +1050,8 @@ var $records_dbtbl  = 'flexicontent_files';
 		$u_item_id = $this->input->get('u_item_id', 0, 'cmd');
 		$filesize  = $this->input->get('file-url-size', 0, 'int');
 		$size_unit = $this->input->get('size_unit', 'KBs', 'cmd');
+
+		jimport('joomla.utilities.date');
 
 		// Check if the form fields are not empty
 		if (!$url)
@@ -1168,6 +1183,7 @@ var $records_dbtbl  = 'flexicontent_files';
 
 		return $this->terminate($file_id, $exitMessages);
 	}
+
 
 	/**
 	 * Logic to delete records
@@ -1362,6 +1378,8 @@ var $records_dbtbl  = 'flexicontent_files';
 		$this->setRedirect($this->returnURL, $msg);
 	}
 
+
+
 	/**
 	 * Logic to modify the state of records, other state modifications tasks are wrappers to this task
 	 *
@@ -1465,6 +1483,7 @@ var $records_dbtbl  = 'flexicontent_files';
 		$this->setRedirect($this->returnURL, $msg);
 	}
 
+
 	/**
 	 * Upload a file from a server directory
 	 *
@@ -1517,6 +1536,10 @@ var $records_dbtbl  = 'flexicontent_files';
 		$allowed_exts = preg_split("/[\s]*,[\s]*/", strtolower($params->get('upload_extensions', 'bmp,wbmp,csv,doc,docx,webp,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,txt,xcf,xls,xlsx,zip,ics')));
 		$allowed_exts = $filter_ext ? array_intersect($filter_ext, $allowed_exts) : $allowed_exts;
 		$allowed_exts = array_flip($allowed_exts);
+
+		jimport('joomla.utilities.date');
+		jimport('joomla.filesystem.file');
+		jimport('joomla.filesystem.folder');
 
 		// Get files
 		$filesdir = \Joomla\Filesystem\Path::clean(JPATH_SITE . $filesdir . DS);
@@ -1644,6 +1667,7 @@ var $records_dbtbl  = 'flexicontent_files';
 		return $this->terminate($file_ids, $exitMessages);
 	}
 
+
 	/**
 	 * Logic to create the view for record editing
 	 *
@@ -1737,6 +1761,7 @@ var $records_dbtbl  = 'flexicontent_files';
 		$view->display();
 	}
 
+
 	/**
 	 * Method for clearing cache of data depending on records type
 	 *
@@ -1751,6 +1776,7 @@ var $records_dbtbl  = 'flexicontent_files';
 		$cache = \Joomla\CMS\Factory::getCache('com_flexicontent');
 		$cache->clean();
 	}
+
 
 	/**
 	 * Logic to set the access level of the records
@@ -1828,6 +1854,7 @@ var $records_dbtbl  = 'flexicontent_files';
 		$this->setRedirect($this->returnURL);
 	}
 
+
 	/**
 	 * START OF CONTROLLER SPECIFIC METHODS
 	 */
@@ -1835,6 +1862,7 @@ var $records_dbtbl  = 'flexicontent_files';
 	/**
 	 * CONTROLLER specific Helper Methods (non-task methods)
 	 */
+
 
 	/*
 	 * Restructure a FILES array for easier usage
@@ -1894,6 +1922,7 @@ var $records_dbtbl  = 'flexicontent_files';
 		}
 	}
 
+
 	/**
 	 * Set credentials for using FTP layer for file handling
 	 */
@@ -1902,6 +1931,7 @@ var $records_dbtbl  = 'flexicontent_files';
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 
 		// Set FTP credentials, if given
+		jimport('joomla.client.helper');
 		\Joomla\CMS\Client\ClientHelper::setCredentialsFromRequest('ftp');
 	}
 

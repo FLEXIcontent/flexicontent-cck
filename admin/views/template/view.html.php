@@ -11,7 +11,7 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-use Joomla\CMS\Factory;
+jimport('legacy.view.legacy');
 use Joomla\String\StringHelper;
 use Joomla\Database\DatabaseInterface;
 use Joomla\CMS\Toolbar\ToolbarFactoryInterface;
@@ -73,6 +73,7 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 		$attribs = ' onchange="filterFieldList(\'%s\', \'%s\', \'%s\');" class="use_select2_lib" ';
 		$content_type_select = \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', '', $elementid );
 
+
 		// Create FIELD TYPE SELECTOR
 		//$ALL = StringHelper::strtoupper(\Joomla\CMS\Language\Text::_( 'FLEXI_ALL' )) . ' : ';
 		$fftypes = array();
@@ -95,6 +96,7 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 		$fieldname = $elementid = 'field_type__au__';
 		$attribs = ' class="use_select2_lib" onchange="filterFieldList(\'%s\', \'%s\', \'%s\');"';
 		$field_type_select = flexicontent_html::buildfieldtypeslist($fftypes, $fieldname, '', ($_grouped ? 1 : 0), $attribs, $elementid);
+
 
 		if (isset($layout->positions)) {
 			$sort = array();
@@ -178,17 +180,19 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 			$document->addScriptDeclaration( $js );
 		}
 
+
+
 		// ***
 		// *** Load JS/CSS files
 		// ***
 
 		// Add css to document
 		!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
-			? /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexicontentbackend', \Joomla\CMS\Uri\Uri::root().'administrator/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
-			: /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexicontentbackend_rtl', \Joomla\CMS\Uri\Uri::root().'administrator/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
+			? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
+			: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
 		!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
-			? /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::root().'administrator/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
-			: /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::root().'administrator/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
+			? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
+			: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 
 		// Add JS frameworks
 		flexicontent_html::loadJQuery();
@@ -203,8 +207,9 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 		\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip');
 
 		// Add js function to overload the joomla submitform validation
-		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-admin', \Joomla\CMS\Uri\Uri::root().'administrator/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
-		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-validate', \Joomla\CMS\Uri\Uri::root().'administrator/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
+		$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
+		$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
+
 
 		// *****************************
 		// Get user's global permissions
@@ -215,6 +220,8 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 		if (!$perms->CanTemplates) {
 			$app->redirect('index.php?option=com_flexicontent', \Joomla\CMS\Language\Text::_( 'FLEXI_NO_ACCESS' ));
 		}
+
+
 
 		// ************************
 		// Create Submenu & Toolbar
@@ -234,6 +241,7 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 			\Joomla\CMS\Toolbar\ToolbarHelper::apply('templates.apply_modal');
 			echo $bar->render();
 		}
+
 
 		// Check that less files for all layouts of current template (=folder) exist and are up-to-date
 		$this->check_less_files($folder);
@@ -273,6 +281,8 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 
 		parent::display($tpl);
 	}
+
+
 
 	/*
 	 * Check that the LESS layout file that stores parameter values exists and is up to date (its modification time after XML file modification)
@@ -318,19 +328,21 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 		$tmpldir = JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$folder;
 
 		// Create less folders if they do not exist already
-		if ( !is_dir( $tmpldir . '/less' ) ) if ( !mkdir( $tmpldir . '/less') )  Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_('Unable to create "/less/" folder', 'warning'));
+		if ( !is_dir( $tmpldir . '/less' ) ) if ( !mkdir( $tmpldir . '/less') )  JError::raiseWarning(100, \Joomla\CMS\Language\Text::_('Unable to create "/less/" folder'));
 
 		// Abort if directory creation failed
 		if ( ! is_dir( $tmpldir . '/less' ) ) return;
+
 
 		// ***********************************************************************
 		// Create CUSTOM config.less, that is include by item.less / category.less
 		// ************************************************************ ***********
 
-		if ( !is_dir( $tmpldir . '/less/include' ) ) if ( !mkdir( $tmpldir . '/less/include') )  Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_('Unable to create "/less/include" folder', 'warning'));
+		if ( !is_dir( $tmpldir . '/less/include' ) ) if ( !mkdir( $tmpldir . '/less/include') )  JError::raiseWarning(100, \Joomla\CMS\Language\Text::_('Unable to create "/less/include" folder'));
 		if ( !file_exists($tmpldir . '/less/include/config.less') ) {
 			file_put_contents($tmpldir . '/less/include/config.less', "/* Place your less variables, mixins, etc, here \n1. This is commonly imported by files: item.less and category.less, \n2. If you add extra less file imports, then place files \ninside same folder for automatic compiling to be triggered */\n\n@import 'config_auto_item.less';\n@import 'config_auto_category.less';\n");
 		}
+
 
 		// *************************************************************************
 		// Create files item.less / category.less by COPYING item.css / category.css
@@ -341,7 +353,7 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 			if ( !file_exists($tmpldir . $css_name) )  continue;  // Do not try to copy CSS file that does not exist
 			if ( !file_exists($tmpldir . $less_name) ) {
 				if ( !\Joomla\Filesystem\File::copy($tmpldir.$css_name, $tmpldir.$less_name) ) {
-					Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_('Unable to create file: "'.$tmpldir.$less_name.'"', 'warning'));
+					JError::raiseWarning(100, \Joomla\CMS\Language\Text::_('Unable to create file: "'.$tmpldir.$less_name.'"'));
 				} else {
 					$file_data = "@import 'include/config.less';\n\n";
 					$file_data .= preg_replace("/[ \t]*\*zoom[\s]*:[\s]*expression[^\r\n]+[\r\n]+/u", "", file_get_contents($tmpldir.$less_name));  // copy and replace old invalid code
@@ -349,6 +361,7 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 				}
 			}
 		}
+
 
 		// Check that the LESS layout files that stores parameter values exist
 		// and they are up to date (their modification time after XML file modification)

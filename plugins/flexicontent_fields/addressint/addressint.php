@@ -14,10 +14,6 @@ JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent
 #[AllowDynamicProperties] //php8.2 compatibility
 class plgFlexicontent_fieldsAddressint extends FCField
 {
-	/** @var mixed $values */
-	public mixed $values = null;
-
-
 	static $field_types = null; // Automatic, do not remove since needed for proper late static binding, define explicitely when a field can render other field types
 	var $task_callable = null;  // Field's methods allowed to be called via AJAX
 
@@ -703,7 +699,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			if ($mapapi_edit === 'googlemap')
 			{
 				// Load form.js (Google Maps autocomplete + map)
-				/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-form', \Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/addressint/js/form.js', array('version' => FLEXI_VHASH));
+				$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/addressint/js/form.js', array('version' => FLEXI_VHASH));
 
 				// Load Google Maps JS API
 				flexicontent_html::loadFramework('google-maps', 'form', $field->parameters);
@@ -712,7 +708,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			{
 				// Load form_osm.js (Nominatim autocomplete + Leaflet map)
 				// Leaflet itself is loaded dynamically by form_osm.js if not already present
-				/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-form_osm', \Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/addressint/js/form_osm.js', array('version' => FLEXI_VHASH));
+				$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/addressint/js/form_osm.js', array('version' => FLEXI_VHASH));
 			}
 		}
 

@@ -26,6 +26,7 @@ require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'
 //\Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 JLoader::register('\Joomla\CMS\Form\FormFieldFclayoutbuilder', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'elements' . DS . 'fclayoutbuilder.php');
 
+
 // Decide whether to show module contents
 $app     = \Joomla\CMS\Factory::getApplication();
 $config  = \Joomla\CMS\Factory::getConfig();
@@ -33,12 +34,14 @@ $jinput  = $app->input;
 $option  = $jinput->get('option', '', 'cmd');
 $view    = $jinput->get('view', '', 'cmd');
 
+
 // Show in view
 
 $_view   = $option=='com_flexicontent' ? $view : 'others';
 $show_in_views = $params->get('show_in_views', array());
 $show_in_views = !is_array($show_in_views) ? array($show_in_views) : $show_in_views;
 $views_show_mod = !count($show_in_views) || in_array($_view,$show_in_views);
+
 
 // Show in client
 $caching = $params->get('cache', '0') ? $config->get('caching', '0') : 0;
@@ -63,22 +66,28 @@ else
 	$clients_show_mod = true;
 }
 
+
 // Show via PHP rule, but check if parameter is empty !
 $php_show_mod = $params->get('enable_php_rule', 0) && trim($params->get('php_rule', ''))
 	? eval($params->get('php_rule'))
 	: true;
+
 
 // Combine rules
 $show_mod = $params->get('combine_show_rules', 'AND') == 'AND'
 	? ($views_show_mod && $clients_show_mod && $php_show_mod)
 	: ($views_show_mod || $clients_show_mod || $php_show_mod);
 
+
 // ***
 // *** TERMINATE if not assigned to current view
 // ***
 if ( !$show_mod )  return;
 
+
+
 global $modfc_jprof;
+jimport('joomla.profiler.profiler');
 $modfc_jprof = new \Joomla\CMS\Profiler\Profiler();
 $modfc_jprof->mark('START: FLEXIcontent Categories Module');
 

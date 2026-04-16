@@ -726,7 +726,7 @@ if ($js)
 							$custom_path  = '<span class="' . $this->tooltip_class . '" title="Custom file path"><span class="icon icon-folder-open" style="font-size: 1.2em;"></span></span> ';
 							$custom_path .= $jmedia_topdir !== 'images' || $jmedia_subpath
 								? $jmedia_topdir .'/'. $jmedia_subpath
-								: '('.Text::_('JDEFAULT') . '): ' . $jmedia_topdir;
+								: '('.JText::_('JDEFAULT') . '): ' . $jmedia_topdir;
 							$custom_path  = '<div style="color: #777;">'. $custom_path . '</div>';
 
 							$jmedia_filetypes  = $row->parameters->get('jmedia_filetypes', array('folders', 'images', 'docs', 'videos', 'audios'));

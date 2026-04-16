@@ -14,19 +14,8 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 require_once('flexicontent_basetable.php');
 
-#[AllowDynamicProperties]
 class flexicontent_mediadatas extends flexicontent_basetable
 {
-	/** @var mixed $_NAME */
-	public mixed $_NAME = null;
-	/** @var mixed $_records_dbtbl */
-	public mixed $_records_dbtbl = null;
-	/** @var mixed $submit_date */
-	public mixed $submit_date = null;
-	/** @var mixed $update_date */
-	public mixed $update_date = null;
-
-
 	// Non-table (private) properties
 	var $_record_name = 'mediadata';
 	var $_title = 'title';

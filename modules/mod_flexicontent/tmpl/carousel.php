@@ -300,8 +300,8 @@ if ($transition)
 
 	if (file_exists($file_path))
 	{
-		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-jquery-ui-effect-min', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.effect.min.js');
-		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-script', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.effect-'.$transition.'.min.js');
+		$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.effect.min.js');
+		$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.effect-'.$transition.'.min.js');
 	}
 }
 
@@ -1458,3 +1458,4 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 </div>
 
 <!-- EOF DIV mod_flexicontent_wrapper -->
+

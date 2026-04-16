@@ -11,7 +11,6 @@
 
 defined('_JEXEC') or die;
 
-use Joomla\CMS\Log\Log;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
@@ -28,11 +27,9 @@ require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' .
  *
  * @since 3.3
  */
-#[AllowDynamicProperties]
 class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 {
-	
-var $records_dbtbl  = 'flexicontent_files';
+	var $records_dbtbl  = 'flexicontent_files';
 	var $records_jtable = 'flexicontent_files';
 
 	var $record_name = 'file';
@@ -533,6 +530,7 @@ var $records_dbtbl  = 'flexicontent_files';
 	 */
 	private function _setUpLoggers($log_filename, $log_namespace)
 	{
+		jimport('joomla.log.log');
 
 		// Currently default logger plus only 1 custom logger, we may add more custom logger if doing more distinct tasks
 		$custom_loggers = array(

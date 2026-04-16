@@ -1,6 +1,4 @@
 <?php
-use Joomla\CMS\Component\ComponentHelper;
-use Joomla\CMS\Plugin\PluginHelper;
 /**
  * @package         FLEXIcontent
  * @version         3.3
@@ -12,6 +10,11 @@ use Joomla\CMS\Plugin\PluginHelper;
  */
 
 defined('_JEXEC') or die('Restricted access');
+
+jimport('cms.component.helper');
+jimport('cms.plugin.helper');
+
+
 
 /**
  * Initialize some variables
@@ -48,9 +51,12 @@ if ($print_logging_info && $format === 'html')
 {
 	$start_microtime = microtime(true);
 	global $fc_jprof;
+	jimport('joomla.profiler.profiler');
 	$fc_jprof = new \Joomla\CMS\Profiler\Profiler();
 	$fc_jprof->mark('START: FLEXIcontent component');
 }
+
+
 
 /**
  * Load needed helper/classes files
@@ -75,6 +81,8 @@ if (!FLEXI_ONDEMAND)
 	\Joomla\CMS\Plugin\PluginHelper::importPlugin('flexicontent_fields');
 }
 \Joomla\CMS\Plugin\PluginHelper::importPlugin('flexicontent');
+
+
 
 /**
  * Language handling
@@ -103,6 +111,8 @@ else
 	\Joomla\CMS\Factory::getLanguage()->load('override', $overrideDir, null, $force_reload = true, $load_default = true);
 }*/
 
+
+
 /**
  * Prepare calling the controller task
  */
@@ -121,6 +131,7 @@ if (count($_ct) > 1)
 	$controller = $_ct[0];
 }
 
+
 // Cases that view variable must be ignored, and instead use the controller name as view
 $forced_views = array(
 	'category' => 1,
@@ -130,6 +141,8 @@ if ( isset($forced_views[$controller]) )
 	$view = $controller;
 	$jinput->set('view', $view);
 }
+
+
 
 // ***
 // *** Force variables: controller AND/OR task,
@@ -148,12 +161,14 @@ if ( file_exists(JPATH_COMPONENT.'/controllers/'.$view . ($format !== 'html' ? '
 	}
 }
 
+
 // CASE 2: Singular views do not (usually) have a controller, use (if it exists) the 'Plural' controller by appending 's' to view name
 else if ( file_exists( JPATH_COMPONENT.'/controllers/'.$view.'s' . ($format !== 'html' ? '.' . $format : '') . '.php' ) )
 {
 	$controller = $view.'s';
 	$task = $task ?: 'edit';  // Default task for singular views is 'edit', set it if task is empty
 }
+
 
 else
 {
@@ -175,7 +190,9 @@ else
 	}
 }
 
+
 //echo "$controller -- $task <br/>\n";
+
 
 // d. Set changes to controller/task variables back to HTTP REQUEST
 $controller_task = $controller && $task  ?  $controller.'.'.$task  :  $task;
@@ -183,6 +200,8 @@ $controller_name = $controller;
 
 $jinput->set('controller', $controller_name);
 $jinput->set('task', $controller_task);
+
+
 
 /**
  * Files needed for user groups manager
@@ -205,9 +224,14 @@ if ( $view=='debuggroup' || $controller_name=='debuggroup' ) {
 	require_once (JPATH_ADMINISTRATOR.'/components/com_flexicontent/helpers/debug.php');
 }
 
+
+
 // initialization done ... log stats for initialization
 if ($print_logging_info && $format === 'html')
 	@$fc_run_times['initialize_component'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+
+
+
 
 /**
  * (If needed) Re-compile LESS files as CSS (call the less proprocessor)
@@ -223,11 +247,15 @@ if ( $cparams->get('recompile_core_less', 0) && $format == 'html' )
 		@$fc_run_times['core_less_recompile'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 }
 
+
+
 /**
  * Create a controller instance
  */
 
 $controller	= \Joomla\CMS\MVC\Controller\BaseController::getInstance('Flexicontent');
+
+
 
 /**
  * Perform the requested task
@@ -237,6 +265,8 @@ $controller->execute( $task );
 
 // Redirect if set by the controller
 $controller->redirect();
+
+
 
 /**
  * Load common js libs / frameworks
@@ -256,32 +286,9 @@ if ($format === 'html')
 		// J3.0+ tooltips (bootstrap based)
 		\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip');
 	}
-	// Add flexi-lib JS — must load AFTER jQuery UI
-	// Use WebAssetManager so jQuery UI CDN loads first via proper ordering
-	$wa = \Joomla\CMS\Factory::getDocument()->getWebAssetManager();
-	// Register jQuery UI first, then flexi-lib with explicit dependency
-	if (FLEXI_J40GE) {
-		// jQuery UI CDN — registerAndUseScript ensures it appears in <head>
-		$wa->registerAndUseScript(
-			'jquery-ui',
-			'https://code.jquery.com/ui/1.13.2/jquery-ui.min.js',
-			array('version' => '1.13.2'),
-			array()
-		);
-		// jQuery UI CSS
-		$wa->registerAndUseStyle(
-			'jquery-ui-theme',
-			'https://code.jquery.com/ui/1.13.2/themes/smoothness/jquery-ui.min.css'
-		);
-	}
-	// flexi-lib depends on jquery-ui → WAM guarantees load order
-	$wa->registerAndUseScript(
-		'flexi-lib',
-		\Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/js/flexi-lib.js',
-		array('version' => FLEXI_VHASH),
-		array(),
-		FLEXI_J40GE ? array('jquery-ui') : array()
-	);
+	// Add flexi-lib JS
+	\Joomla\CMS\Factory::getDocument()->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', array('version' => FLEXI_VHASH));  // Frontend/backend script
+	\Joomla\CMS\Factory::getDocument()->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/js/flexi-lib.js', array('version' => FLEXI_VHASH));  // Backend only script
 
 	// Validate when Joomla.submitForm() is called, NOTE: for non-FC views this is done before the method is called
 	$js = '
@@ -293,6 +300,8 @@ if ($format === 'html')
 	if ( 0 )  // Let backend template decide to load bootstrap CSS
 		\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.loadCss', true);
 }
+
+
 
 /**
  * Enqueue PERFORMANCE statistics as a message BUT NOT if in RAW FORMAT or COMPONENT only views
@@ -307,6 +316,7 @@ if ( $print_logging_info && $jinput->get('tmpl', '', 'cmd')!='component' && $for
 	$_msg = $task
 		? ' (TASK: ' . $controller_name . '.' . $task . ')'
 		: ' (VIEW: ' . $view . ($layout ? ' -- LAYOUT: ' . $layout : '') . ')';
+
 
 	/*
 	 * Various Partial time performance stats
@@ -459,6 +469,7 @@ if ( $print_logging_info && $jinput->get('tmpl', '', 'cmd')!='component' && $for
 	}
 
 	$msg .= '</div>';
+
 
 	// SYSTEM PLGs
 	if (isset($fc_run_times['auto_checkin_auto_state']))

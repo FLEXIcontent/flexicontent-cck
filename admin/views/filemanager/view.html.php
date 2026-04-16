@@ -19,73 +19,9 @@ JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/compone
 /**
  * HTML View class for the Filemanager View
  */
-#[AllowDynamicProperties]
 class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 {
-		/** @var mixed $CanFiles */
-	public mixed $CanFiles = null;
-	/** @var mixed $CanUpload */
-	public mixed $CanUpload = null;
-	/** @var mixed $CanViewAllFiles */
-	public mixed $CanViewAllFiles = null;
-	/** @var mixed $assign_mode */
-	public mixed $assign_mode = null;
-	/** @var mixed $assigned_fields_icons */
-	public mixed $assigned_fields_icons = null;
-	/** @var mixed $assigned_fields_labels */
-	public mixed $assigned_fields_labels = null;
-	/** @var mixed $cols */
-	public mixed $cols = null;
-	/** @var mixed $count_filters */
-	public mixed $count_filters = null;
-	/** @var mixed $ffields */
-	public mixed $ffields = null;
-	/** @var mixed $field */
-	public mixed $field = null;
-	/** @var mixed $fieldid */
-	public mixed $fieldid = null;
-	/** @var mixed $folder_mode */
-	public mixed $folder_mode = null;
-	/** @var mixed $img_folder */
-	public mixed $img_folder = null;
-	/** @var mixed $is_pending */
-	public mixed $is_pending = null;
-	/** @var mixed $langs */
-	public mixed $langs = null;
-	/** @var mixed $lists */
-	public mixed $lists = null;
-	/** @var mixed $optional_cols */
-	public mixed $optional_cols = null;
-	/** @var mixed $pagination */
-	public mixed $pagination = null;
-	/** @var mixed $params */
-	public mixed $params = null;
-	/** @var mixed $pending_file_names */
-	public mixed $pending_file_names = null;
-	/** @var mixed $perms */
-	public mixed $perms = null;
-	/** @var mixed $require_ftp */
-	public mixed $require_ftp = null;
-	/** @var mixed $rows */
-	public mixed $rows = null;
-	/** @var mixed $sidebar */
-	public mixed $sidebar = null;
-	/** @var mixed $state */
-	public mixed $state = null;
-	/** @var mixed $target_dir */
-	public mixed $target_dir = null;
-	/** @var mixed $targetid */
-	public mixed $targetid = null;
-	/** @var mixed $thumb_h */
-	public mixed $thumb_h = null;
-	/** @var mixed $thumb_w */
-	public mixed $thumb_w = null;
-	/** @var mixed $u_item_id */
-	public mixed $u_item_id = null;
-	/** @var mixed $view */
-	public mixed $view = null;
-
-var $proxy_option   = null;
+	var $proxy_option   = null;
 	var $title_propname = 'filename';
 	var $state_propname = 'published';
 	var $db_tbl         = 'flexicontent_files';
@@ -143,6 +79,7 @@ var $proxy_option   = null;
 		$allowed_langs = null;
 		$display_file_lang_as = $cparams->get('display_file_lang_as', 3);
 
+
 		// Get user's global permissions
 		$perms = FlexicontentHelperPerm::getPerm();
 
@@ -178,6 +115,7 @@ var $proxy_option   = null;
 
 		$_view = $view . $fieldid;
 
+
 		/**
 		 * Get filters and ordering
 		 */
@@ -204,6 +142,7 @@ var $proxy_option   = null;
 		$optional_cols = array('state', 'access', 'lang', 'hits', 'target', 'stamp', 'usage', 'uploader', 'upload_time', 'file_id');
 		$cols = array();
 
+
 		// Column disabling only applicable for FILESELEMENT view, with field in DB mode (folder_mode==0)
 		if (!$folder_mode && $fieldid)
 		{
@@ -214,6 +153,7 @@ var $proxy_option   = null;
 			$filelist_cols = FLEXIUtilities::paramToArray( $field->parameters->get('filelist_cols', array('upload_time', 'hits')) );
 
 		}
+
 
 		/**
 		 * Column selection of optional columns given
@@ -271,10 +211,12 @@ var $proxy_option   = null;
 
 		$u_item_id = $view === 'fileselement' ? $app->getUserStateFromRequest( $option.'.'.$_view.'.u_item_id', 'u_item_id', 0, 'string' ) : null;
 
+
 		// Text search
 		$scope  = $model->getState('scope');
 		$search = $model->getState('search');
 		$search = StringHelper::trim(StringHelper::strtolower($search));
+
 
 		// *** TODO: (enhancement) get recently deleted file(s), and remove their assignments from current form
 		$delfilename = $app->getUserState('delfilename', null);
@@ -288,6 +230,7 @@ var $proxy_option   = null;
 
 		$pending_file_names = array_flip($pending_file_names);
 
+
 		/**
 		 * Add css and js to document
 		 */
@@ -298,21 +241,21 @@ var $proxy_option   = null;
 			if ($isAdmin)
 			{
 				!\Joomla\CMS\Factory::getLanguage()->isRtl()
-					? /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexicontentbackend', \Joomla\CMS\Uri\Uri::root().'administrator/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
-					: /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexicontentbackend_rtl', \Joomla\CMS\Uri\Uri::root().'administrator/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
+					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
+					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
 				!\Joomla\CMS\Factory::getLanguage()->isRtl()
-					? /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::root().'administrator/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
-					: /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::root().'administrator/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
+					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
+					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 			}
 			else
 			{
 				!\Joomla\CMS\Factory::getLanguage()->isRtl()
-					? /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexicontent', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
-					: /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexicontent_rtl', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
+					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH))
+					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent_rtl.css', array('version' => FLEXI_VHASH));
 			}
 
 			// Fields common CSS
-			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexi_form_fields', \Joomla\CMS\Uri\Uri::root().'administrator/components/com_flexicontent/assets/css/flexi_form_fields.css', array('version' => FLEXI_VHASH));
+			$document->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/css/flexi_form_fields.css', array('version' => FLEXI_VHASH));
 
 			// Add JS frameworks
 			flexicontent_html::loadFramework('select2');
@@ -325,9 +268,10 @@ var $proxy_option   = null;
 			\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip');
 
 			// Add js function to overload the joomla submitform validation
-			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-admin', \Joomla\CMS\Uri\Uri::root().'administrator/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
-			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-validate', \Joomla\CMS\Uri\Uri::root().'administrator/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
+			$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
+			$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
 		}
+
 
 		/**
 		 * Create Submenu & Toolbar
@@ -352,6 +296,7 @@ var $proxy_option   = null;
 
 		// Create the toolbar
 		$this->setToolbar();
+
 
 		/**
 		 * Get data from the model, note data retrieval must be before 
@@ -386,6 +331,7 @@ var $proxy_option   = null;
 			$img_folder = $model->getFieldFolderPath($u_item_id, $fieldid);
 		}
 
+
 		// Clear pending
 		unset($session_files['ids_pending']);
 		unset($session_files['names_pending']);
@@ -397,7 +343,9 @@ var $proxy_option   = null;
 		$assigned_fields_labels = array('image'=>'image/gallery', 'file'=>'file', /*'minigallery'=>'minigallery'*/);
 		$assigned_fields_icons = array('image'=>'picture_link', 'file'=>'page_link', /*'minigallery'=>'film_link'*/);
 
+
 		// *** BOF FOLDER MODE specific ***
+
 
 		/**
 		 * FILE UPLOAD FORM
@@ -420,6 +368,7 @@ var $proxy_option   = null;
 			$published_only = false
 		);
 
+
 		// Access level form field
 		$elementid = 'file-access';
 		$fieldname = 'file-access';
@@ -439,11 +388,13 @@ var $proxy_option   = null;
 			$translate = true
 		);
 
+
 		/**
 		 * Create List Filters
 		 */
 
 		$lists = array();
+
 
 		// Build publication state filter
 		//$options = \Joomla\CMS\HTML\HTMLHelper::_('jgrid.publishedOptions');
@@ -477,6 +428,7 @@ var $proxy_option   = null;
 			),
 		));
 
+
 		// Build access level filter
 		$options = \Joomla\CMS\HTML\HTMLHelper::_('access.assetgroups');
 		array_unshift($options, \Joomla\CMS\HTML\HTMLHelper::_('select.option', '', '-'/*'JOPTION_SELECT_ACCESS'*/));
@@ -503,6 +455,7 @@ var $proxy_option   = null;
 			),
 		));
 
+
 		// Build language filter
 		$lists['filter_lang'] = $this->getFilterDisplay(array(
 			'label' => \Joomla\CMS\Language\Text::_('FLEXI_LANGUAGE'),
@@ -517,6 +470,7 @@ var $proxy_option   = null;
 				'-'
 			)
 		));
+
 
 		if ($layout !== 'image' || $view !== 'fileselement')
 		{
@@ -542,6 +496,7 @@ var $proxy_option   = null;
 				)
 			));
 
+
 			// Build stamp filter
 			$stamp 	= array();
 			$stamp[] 	= \Joomla\CMS\HTML\HTMLHelper::_('select.option',  '', '-'/*\Joomla\CMS\Language\Text::_( 'FLEXI_ALL_FILES' )*/ );
@@ -565,11 +520,13 @@ var $proxy_option   = null;
 			));
 		}
 
+
 		// Build content item id filter
 		$lists['item_id'] = $this->getFilterDisplay(array(
 			'label' => \Joomla\CMS\Language\Text::_('Item id'),
 			'html' => '<input type="text" name="item_id" size="1" class="inputbox" onchange="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform()" value="'.$filter_item.'" />',
 		));
+
 
 		// Build target folder (secure / media) filter
 		$_secure_info = '<i data-placement="bottom" class="icon-info hasTooltip" title="'.flexicontent_html::getToolTip('FLEXI_URL_SECURE', 'FLEXI_URL_SECURE_DESC', 1, 1).'"></i>';
@@ -605,6 +562,7 @@ var $proxy_option   = null;
 			));
 		}
 
+
 		// Build extension filter
 		$lists['filter_ext'] = $this->getFilterDisplay(array(
 			'label' => \Joomla\CMS\Language\Text::_('FLEXI_ALL_EXT'),
@@ -619,6 +577,7 @@ var $proxy_option   = null;
 				'-'
 			)
 		));
+
 
 		// Build uploader filter
 		if ($perms->CanViewAllFiles)
@@ -638,6 +597,7 @@ var $proxy_option   = null;
 			));
 		}
 
+
 		// Build text search scope
 		$scopes = !$folder_mode ? null : array(
 			'a.filename' => \Joomla\CMS\Language\Text::_('FLEXI_FILENAME'),
@@ -647,16 +607,20 @@ var $proxy_option   = null;
 		$lists['scope'] = $this->getScopeSelectorDisplay($scopes, $scope);
 		$this->scope_title = isset($scopes[$scope]) ? $scopes[$scope] : reset($scopes);
 
+
 		// Text search filter value
 		$lists['search'] = $search;
+
 
 		// Table ordering
 		$lists['order_Dir'] = $filter_order_Dir;
 		$lists['order']     = $filter_order;
 
 		// Uploadstuff
+		jimport('joomla.client.helper');
 
 		$require_ftp = !\Joomla\CMS\Client\ClientHelper::hasCredentials('ftp');
+
 
 		/**
 		 * Assign data to template
@@ -724,6 +688,8 @@ var $proxy_option   = null;
 		if ( $print_logging_info ) @$fc_run_times['template_render'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 	}
 
+
+
 	/**
 	 * Method to configure the toolbar for this view.
 	 *
@@ -756,6 +722,7 @@ var $proxy_option   = null;
 		$hasEditState = $perms->CanFiles;
 		$hasDelete    = $perms->CanFiles;
 		$hasCopy      = $perms->CanFiles;
+
 
 		if ($hasCreate)
 		{
@@ -828,6 +795,7 @@ var $proxy_option   = null;
 			flexicontent_html::addToolBarDropMenu($btn_arr, 'maintenance-btns-group', ' ');
 		}
 
+
 		/*$stats_indexer_errors = $session->get('filemanager.stats_indexer_errors', null, 'flexicontent');
 		if ($stats_indexer_errors !== null)
 		{
@@ -850,6 +818,7 @@ var $proxy_option   = null;
 			}
 		}
 		$session->set('filemanager_stats_log_filename', null, 'flexicontent');
+
 
 		$error_count = $session->get('mediadata.stats_indexer.error_count', 0, 'flexicontent');
 		$file_count = $session->get('mediadata.stats_indexer.file_count', 0, 'flexicontent');
@@ -874,6 +843,7 @@ var $proxy_option   = null;
 		}
 		$session->set('mediadata_stats_log_filename', null, 'flexicontent');
 
+
 		if ($perms->CanConfig)
 		{
 			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
@@ -882,6 +852,7 @@ var $proxy_option   = null;
 			$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
 			\Joomla\CMS\Toolbar\ToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
 		}
+
 
 		if ($js)
 		{

@@ -19,10 +19,10 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-use Joomla\CMS\Pagination\Pagination;
-use Joomla\CMS\Factory;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
+
+jimport('legacy.model.legacy');
 
 /**
  * FLEXIcontent Component Model
@@ -143,6 +143,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 	 */
 	var $_tag = null;
 
+
 	/**
 	 * Current / active search elements
 	 *
@@ -151,6 +152,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 	var $_active_filts  = null;
 	var $_active_search = null;
 	var $_active_ai     = null;
+
 
 	/**
 	 * Array of supported state conditions of the record
@@ -185,6 +187,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		$this->populateRecordState();
 	}
 
+
 	/**
 	 * Method to populate the category model state.
 	 *
@@ -205,7 +208,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		// Force layout to be have proper value
 		if ( $this->_layout && !in_array($this->_layout, array('favs','tags','mcats','myitems','author')) )
 		{
-			//Factory::getApplication()->enqueueMessage("'layout' variable is ".$this->_layout.", acceptable are: 'favs','tags','mcats','myitems','author', this may be due to some 3rd party plugin", 'notice');
+			//JError::raiseNotice(0, "'layout' variable is ".$this->_layout.", acceptable are: 'favs','tags','mcats','myitems','author', this may be due to some 3rd party plugin");
 			$this->_layout = '';
 			$app->input->set('layout', '');
 		}
@@ -271,6 +274,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 		$this->_params->merge($cparams);
 
+
 		// ***
 		// *** Set state EXCEPT: limit and limitstart that will be calculated at getData()
 		// *** and after getCategory() has been called thus parameters have been loaded fully
@@ -289,6 +293,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		$min_word_len = !$search_prefix ?  $min_word_len : 1;
 		$app->setUserState($option.'.min_word_len', $min_word_len);
 	}
+
 
 	/**
 	 * Method to set the category id
@@ -314,6 +319,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		$this->_id = $cid;
 	}
 
+
 	/**
 	 * Method to set & override item's layout
 	 *
@@ -325,6 +331,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		$this->_clayout = $name;
 		$this->setState('clayout', $this->_clayout);
 	}
+
 
 	/**
 	 * Method to get Data
@@ -342,11 +349,13 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		$print_logging_info = $this->_params->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
 
+
 		// Get limit from http request OR use default category parameters
 		$this->_listall = $app->input->get('listall', 0, 'int');
 		$this->_active_limit = strlen( $app->input->get('limit', '', 'string') );
 		$limit = $this->_active_limit ? $app->input->get('limit', 0, 'int') : $this->_params->get('limit');
 		$this->setState('limit', $limit);
+
 
 		// Allow limit zero to achieve a category view without items
 		if ($limit <= 0)
@@ -359,6 +368,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		{
 			return $this->_data;
 		}
+
 
 		if ( $print_logging_info )  $start_microtime = microtime(true);
 
@@ -424,6 +434,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			}
 		}
 
+
 		// Assign total number of items found this will be used to decide whether to do item counting per filter value
 		global $fc_catview;
 		$fc_catview['view_total']  = $this->_total;
@@ -446,6 +457,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		flexicontent_db::getOriginalContentItemids($this->_data);
 
 		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+
 
 		// This is used in places that item data need to be retrieved again because item object was not given
 		global $fc_list_items;
@@ -476,6 +488,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		return $this->_total;
 	}
 
+
 	/**
 	 * Method to get the pagination object
 	 *
@@ -490,11 +503,13 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			$limit = (int) $this->getState('limit');
 			$limitstart = (int) $this->getState('limitstart');
 
-			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'pagination.php');
+			//jimport('cms.pagination.pagination');
+			require_once (JPATH_COMPONENT.DS.'helpers'.DS.'pagination.php');
 			$this->_pagination = new FCPagination($this->getTotal(), $limitstart, $limit);
 		}
 		return $this->_pagination;
 	}
+
 
 	/**
 	 * Returns category parameters (merged in order: component, menu item, category and author overidden params)
@@ -506,6 +521,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 	{
 		return $this->_params;
 	}
+
 
 	/**
 	 * Builds the query
@@ -749,6 +765,8 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		return $query;
 	}
 
+
+
 	/**
 	 * Retrieve subcategory ids of a given category
 	 *
@@ -824,6 +842,8 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		return $this->_data_cats;
 	}
 
+
+
 	/**
 	 * Method to build the part of SELECT clause that calculates item access
 	 *
@@ -860,6 +880,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		return $select_access;
 	}
 
+
 	/**
 	 * Build the order clause for item listing
 	 *
@@ -880,6 +901,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			$default_order, $default_order_dir, $sfx='', $support_2nd_lvl=true
 		);
 	}
+
 
 	/**
 	 * Build the order clause for subcategory listing
@@ -902,6 +924,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			$default_order, $default_order_dir
 		);
 	}
+
 
 	/**
 	 * Method to build the WHERE clause
@@ -964,6 +987,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 
 		return $fromjoin[$counting];
 	}
+
 
 	/**
 	 * Method to build the WHERE clause
@@ -1082,12 +1106,15 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			$where .= ' AND  i.access IN (0,'.$aid_list.')';
 		}
 
+
 		// Calculate filters and alphaindex WHERE clauses
 		$filters_where = $this->_buildFiltersWhere();
 		$alpha_where   = $this->_buildAlphaIndexWhere();
 
+
 		// All items / Normal only / Featured only
 		$flag_featured = (int) $this->_params->get('display_flag_featured', 0);
+
 
 		// Check if doing a before FORM SUBMIT, "FEATURED ONLY" item list  --  then check if Text Search / Filters / AI are NOT active and LIST-ALL Flag not present
 		$use_limit_before = (int) $this->_params->get('use_limit_before_search_filt', 0);
@@ -1101,6 +1128,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 				if ($use_limit_before==2) $flag_featured = 2;
 			}
 		}
+
 
 		// Now include featured items according to state calculated above
 		if ( !$app->getUserState('use_limit_before_search_filt', 0) )
@@ -1118,6 +1146,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 				default: break;  // 0: both normal and featured
 			}
 
+
 		$fc_catview['filters_where'] = $filters_where;
 		$fc_catview['alpha_where'] = $alpha_where;
 
@@ -1131,6 +1160,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 
 		return $fc_catview[$wherepart];
 	}
+
 
 	/**
 	 * Method to build the part of WHERE clause related to Alpha Index
@@ -1152,6 +1182,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		}
 
 		$text_search = '';
+
 
 		/**
 		 * Create query CLAUSE for Text Search
@@ -1330,6 +1361,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		return $text_search;
 	}
 
+
 	/**
 	 * Method to build the part of WHERE clause related to Alpha Index
 	 *
@@ -1420,6 +1452,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		return $filters_where;
 	}
 
+
 	/**
 	 * Method to get the visible category filters according to category parameters
 	 *
@@ -1429,6 +1462,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 	function &getFilters() {
 		return FlexicontentFields::getFilters('filters', 'use_filters', $this->_params, $check_access=true);
 	}
+
 
 	/**
 	 * Method to build the part of WHERE clause related to Alpha Index
@@ -1520,6 +1554,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		return $where;
 	}
 
+
 	/**
 	 * Method to build the childs categories query
 	 *
@@ -1566,6 +1601,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			;
 		return $query;
 	}
+
 
 	/**
 	 * Method to get the assigned items for a category
@@ -1668,6 +1704,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		return $assigneditems;
 	}
 
+
 	/**
 	 * Method to return sub categories of the give category id
 	 * todo: see above and merge
@@ -1762,6 +1799,8 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		return $this->_childs;
 	}
 
+
+
 	/**
 	 * Method to get the children of a category
 	 *
@@ -1808,6 +1847,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 
 		return $this->_peers;
 	}
+
 
 	/**
 	 * Method to load the Category
@@ -1887,6 +1927,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			$_category = false;
 		}
 
+
 		/**
 		 * Check category was found / is published, and throw an error. Note that an empty
 		 * layout means single category view, so raise an error if category id is missing
@@ -1907,6 +1948,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 				throw new Exception($err_mssg, $err_type);
 			}
 		}
+
 
 		/**
 		 * Some layouts optionally limit to a specific category, for these
@@ -1935,6 +1977,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		{
 			$this->_category = $_category;
 		}
+
 
 		/**
 		 * Check for proper layout configuration and throw error
@@ -2029,6 +2072,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			}
 		}
 
+
 		/**
 		 * Force loading of category parameters
 		 */
@@ -2038,6 +2082,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		$this->_category->metadata = $this->_category->id
 			? new \Joomla\Registry\Registry($this->_category->metadata)
 			: null;
+
 
 		/**
 		 * Check whether category access level allows access and throw errors
@@ -2105,6 +2150,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		return $this->_category;
 	}
 
+
 	/**
 	 * Method to load the Tags Data, when layout is 'tags'
 	 *
@@ -2171,6 +2217,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		return $this->_tag;
 	}
 
+
 	/**
 	 * Method to decide which item layout to use
 	 *
@@ -2232,6 +2279,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			FLEXIUtilities::loadTemplateLanguageFile($clayout);
 		}
 
+
 		/**
 		 * Finally set the clayout (template name) into model / category's parameters / HTTP Request
 		 */
@@ -2242,6 +2290,8 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		$params->set('clayout', $clayout);
 		$app->input->set('clayout', $clayout);
 	}
+
+
 
 	/**
 	 * Function to check if current menu is a good match of current view,
@@ -2292,6 +2342,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		return $matched;
 	}
 
+
 	/**
 	 * Method to load content article parameters
 	 *
@@ -2332,6 +2383,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			$catParams = new \Joomla\Registry\Registry();
 		}
 
+
 		// c. Retrieve author parameters if using displaying AUTHOR/MYITEMS layouts, and merge them into category parameters
 		if ($this->_authorid!=0)
 		{
@@ -2354,6 +2406,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 				}
 			}
 		}
+
 
 		// d. Retrieve inherited parameter and create parameter objects
 		global $globalcats;
@@ -2397,6 +2450,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 				array_push($heritage_stack, $catdata);
 			}
 		}
+
 
 		// *******************************************************************************************************************
 		// Start merging of parameters, OVERRIDE ORDER: layout(template-manager)/component/ancestors-cats/category/author/menu
@@ -2450,6 +2504,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			$params->set( 'pageclass_sfx', $menu_params->get('pageclass_sfx') );
 		}
 
+
 		// Parameters meant for lists
 		$params->set('show_editbutton', $params->get('show_editbutton_lists', 1));
 		$params->set('show_deletebutton', $params->get('show_deletebutton_lists', 0));
@@ -2473,6 +2528,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			$app->enqueueMessage("The login url seems to be wrongly set in the FLEXIcontent component configuration.<br /> Please replace: <u>option=com_user</u> with <u>option=com_users</u>", 'notice');
 			$params->set('login_page', str_replace("com_user&", "com_users&", $params->get('login_page', '')));
 		}
+
 
 		// Retrieve Layout's parameters, also deciding the layout
 		$this->decideLayout($params);
@@ -2502,6 +2558,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		global $fc_catview;
 		$fc_catview['params'] = $this->_params;
 	}
+
 
 	/**
 	 * Method to get the active filter result
@@ -2692,6 +2749,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		return $filter_query;
 	}
 
+
 	/**
 	 * Method to get the layout parameters of an item
 	 *
@@ -2702,6 +2760,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 	{
 		return $this->_clayout ? flexicontent_tmpl::getLayoutparams('category', $this->_clayout, '', $force) : '';
 	}
+
 
 	/**
 	 * Method to build the alphabetical index
@@ -2740,6 +2799,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		return $alpha;
 	}
 
+
 	function &getCommentsInfo ( $item_ids = false)
 	{
 		// Return existing data and initialize array
@@ -2777,6 +2837,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		return $comments;
 	}
 
+
 	/**
 	 * Increment the hit counter for the category.
 	 * @param   int  $pk  Optional primary key of the category to increment.
@@ -2798,6 +2859,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 
 		return true;
 	}
+
 
 	public function logSearch($search_term)
 	{
@@ -2830,6 +2892,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		}
 	}
 
+
 	/**
 	 * Method to get the nr of favourites of anitem
 	 *
@@ -2841,6 +2904,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 	{
 		return flexicontent_db::getFavourites($type=1, $this->_id);
 	}
+
 
 	/**
 	 * Method to get the nr of favourites of an user
@@ -2854,6 +2918,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		return flexicontent_db::getFavoured($type=1, $this->_id, \Joomla\CMS\Factory::getUser()->id);
 	}
 
+
 	/**
 	 * Method to remove a favourite
 	 *
@@ -2866,6 +2931,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		return flexicontent_db::removefav($type=1, $this->_id, \Joomla\CMS\Factory::getUser()->id);
 	}
 
+
 	/**
 	 * Method to add a favourite
 	 *
@@ -2877,6 +2943,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 	{
 		return flexicontent_db::addfav($type=1, $this->_id, \Joomla\CMS\Factory::getUser()->id);
 	}
+
 
 	/**
 	 * Create a \Joomla\Registry\Registry object checking for legacy bug of bad parameter merging code in during model saving

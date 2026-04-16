@@ -36,7 +36,7 @@ if ($show_cat_image)
 	$q		= '&amp;q=95';
 	$ar 	= '&amp;ar=x';
 	$zc		= $cat_image_method ? '&amp;zc=' . $cat_image_method : '';
-	$phpThumbURL = \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=';
+	$phpThumbURL = \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=';
 }
 
 

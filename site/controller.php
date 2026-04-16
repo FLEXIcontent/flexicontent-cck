@@ -11,13 +11,13 @@
 
 defined('_JEXEC') or die;
 
-use Joomla\Filesystem\File;
 use Joomla\Filesystem\Path;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\Database\DatabaseInterface;
 use Joomla\CMS\Mail\MailerFactoryInterface;
 
+jimport('legacy.controller.legacy');
 JLoader::register('FlexicontentControllerItems', JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'controllers'.DS.'items.php');  // we use JPATH_BASE since controller exists in frontend too
 
 #[AllowDynamicProperties] //php8.2 compatibility
@@ -90,6 +90,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		}
 	}
 
+
 	/**
 	 * Logic to create category SEF urls via AJAX requests
 	 *
@@ -118,6 +119,8 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		jexit();
 	}
 
+
+
 	/**
 	 * Display the view
 	 */
@@ -131,8 +134,10 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		$view   = $this->input->get('view', '', 'cmd');
 		$layout = $this->input->get('layout', '', 'cmd');
 
+
 		// Access checking for --items-- viewing, will be handled by the items model, this is because THIS display() TASK is used by other views too
 		// in future it maybe moved here to the controller, e.g. create a special task item_display() for item viewing, or insert some IF bellow
+
 
 		// ///////////////////////
 		// Display case: ITEM FORM
@@ -148,9 +153,12 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			return;
 		}
 
+
+
 		// //////////////////////////////////////////////////////////////////////////
 		// Display case: FLEXIcontent frontend view (category, item, favourites, etc)
 		// //////////////////////////////////////////////////////////////////////////
+
 
 		// *******************
 		// Handle SERVER Cache
@@ -170,6 +178,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			}
 		}
 
+
 		// ********************
 		// Handle browser Cache
 		// ********************
@@ -180,6 +189,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		} else {
 			$browser_cachable = 0;
 		}
+
 
 		// CASE: urlparams were explicitely given
 		if (!empty($urlparams)) $safeurlparams = & $urlparams;
@@ -224,6 +234,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			}
 		}
 
+
 		// If component is serving different pages to logged users, this will avoid
 		// having users seeing same page after login/logout when conservative caching is used
 		if ( $userid = \Joomla\CMS\Factory::getApplication()->getIdentity()->get('id') )
@@ -260,6 +271,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		parent::display($cachable, $safeurlparams);
 	}
 
+
 	/**
 	 * Method of the voting without AJAX. Exists for compatibility reasons, since it can be called by Joomla's content vote plugin.
 	 *
@@ -294,6 +306,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 		$this->setRedirect($url);
 	}
+
 
 	/**
 	 *  Ajax favourites
@@ -369,6 +382,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		jexit();
 	}
 
+
 	/**
 	 *  Ajax review form
 	 *
@@ -387,6 +401,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 		$errors = array();
 
+
 		/**
 		 * Check for validation failures on posted data
 		 */
@@ -400,6 +415,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		{
 			$errors[] = 'review_type <> "item" is not yet supported';
 		}
+
 
 		/**
 		 * Do voting / reviewing permissions check
@@ -515,6 +531,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		jexit(json_encode($result));
 	}
 
+
 	function storereviewform()
 	{
 		$app  = \Joomla\CMS\Factory::getApplication();
@@ -535,6 +552,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 		// Validate text
 		$text = flexicontent_html::dataFilter($this->input->get('text', '', 'string'), $maxlength=10000, 'STRING', 0);  // Validate text only: decode entities and strip HTML
+
 
 		/**
 		 * Check for validation failures on posted data
@@ -569,6 +587,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		{
 			$errors[] = 'review_type <> item is not yet supported';
 		}
+
 
 		/**
 		 * Do voting / reviewing permissions check
@@ -647,6 +666,8 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		jexit(json_encode($result));
 	}
 
+
+
 	/**
 	 * Method to do prechecks for loading / saving review forms
 	 *
@@ -664,6 +685,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$db   = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 
+
 		/**
 		 * Load content item related to the review
 		 */
@@ -675,6 +697,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			$errors[] = 'ID: ' . $content_id . ': ' . $item->getError();
 			return;
 		}
+
 
 		/**
 		 * Do voting / reviewing permissions check
@@ -738,6 +761,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		}
 	}
 
+
 	/**
 	 *  Method for voting (ajax)
 	 *
@@ -752,6 +776,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		$rman = new FlexicontentControllerReviews();
 		$rman->ajaxvote();
 	}
+
 
 	/**
 	 *  Add new Tag from item screen
@@ -810,6 +835,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		jexit();
 	}
 
+
 	/**
 	 * Logic to change the state of an item
 	 *
@@ -823,11 +849,13 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		flexicontent_html::setitemstate($this, 'json');
 	}
 
+
 	function call_extfunc()
 	{
 		// Helper method also checks access, since each plugin needs to explicitely declare URL callable methods, which methods also implement access checks
 		flexicontent_ajax::call_extfunc();
 	}
+
 
 	/**
 	 * Download logic
@@ -838,12 +866,14 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 	public function download()
 	{
 		// Import and Initialize some joomla API variables
+		jimport('joomla.filesystem.file');
 
 		$app   = \Joomla\CMS\Factory::getApplication();
 		$db    = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
+
 
 		$task   = $this->input->get('task', 'download', 'cmd');
 		$method = $this->input->get('method', 'download', 'cmd');
@@ -892,6 +922,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				$cart_token_matches = $cart_token==$cart->token;  // no access will be checked
 				$nodes = json_decode($cart->json);
 			}
+
 
 			// Some validation check
 			if (!is_array($nodes))
@@ -973,6 +1004,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		}
 		//echo '<pre>'; print_r($tree_files); jexit();
 
+
 		/**
 		 * Create and Execute SQL query to retrieve file info
 		 */
@@ -991,6 +1023,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				$include_file = ($task === 'download_file' || $task === 'download_files' ? 'fileaccess_only' : true)
 			);
 		}
+
 
 		/**
 		 * Get file data for all files
@@ -1064,6 +1097,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				$file_node->targetpath = $targetpath . DS . $basename;
 			}
 			//echo "<pre>". print_r($file, true) ."</pre>"; exit;
+
 
 			/**
 			 * Check if file was found AND IF user has required Access Levels
@@ -1150,6 +1184,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				}
 			}
 
+
 			/**
 			 * (for non-URL) Create file path and check file exists
 			 */
@@ -1184,6 +1219,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				);
 			}
 
+
 			/**
 			 * Get item and field \Joomla\CMS\Table\Table records, and then load field's configuration
 			 */
@@ -1193,6 +1229,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			$item->load($file_node->contentid);
 			$field->load($file_node->fieldid);
 			FlexicontentFields::loadFieldConfig($field, $item);
+
 
 			/**
 			 * Trigger pluging event 'onFieldValueAction_FC'
@@ -1210,6 +1247,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			{
 				die('Aborting, plugin output detected: ' . $text);
 			}
+
 
 			$value_order = null;
 			$config = array(
@@ -1231,6 +1269,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				$this->setRedirect($this->refererURL);
 				return;
 			}
+
 
 			/**
 			 * Increment hits counter of file, and hits counter of file-user history
@@ -1257,6 +1296,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			}
 			$db->setQuery($query)->execute();
 
+
 			/**
 			 * Increment hits on download coupon or delete the coupon if it has expired due to date or hits limit
 			 */
@@ -1272,6 +1312,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 					$db->setQuery($query)->execute();
 				}
 			}
+
 
 			/**
 			 * Special case file is a URL
@@ -1472,6 +1513,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		//echo "<pre>". print_r($email_recipients, true) ."</pre>";
 		//jexit();
 
+
 		if (!empty($email_recipients))
 		{
 			ob_start();
@@ -1480,6 +1522,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			$sendername	= $app->get('sitename');
 			$subject    = \Joomla\CMS\Language\Text::_('FLEXI_FDN_FILE_DOWNLOAD_REPORT');
 			$message_header = \Joomla\CMS\Language\Text::_('FLEXI_FDN_FILE_DOWNLOAD_REPORT_BY') .': '. $user->name .' ['.$user->username .']';
+
 
 			/**
 			 * Send email notifications about file being downloaded
@@ -1516,6 +1559,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			}
 			ob_end_clean();
 		}
+
 
 		// * Required for IE, otherwise Content-disposition is ignored
 		if (ini_get('zlib.output_compression'))
@@ -1575,6 +1619,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			$archivename = $tmp_ffname . '.zip';
 			$archivepath = \Joomla\Filesystem\Path::clean( $app->get('tmp_path').DS.$archivename );
 
+
 			/**
 			 * Create the archive
 			 */
@@ -1590,6 +1635,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			}
 			$za->addDir($targetpath, "");
 			$za->close();
+
 
 			/**
 			 * Remove temporary folder structure
@@ -1652,6 +1698,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				? substr($_url, strrpos($_url, '/') + 1)
 				: $_url;
 		}
+
 
 		/**
 		 * Handle PDF time-stamping
@@ -1739,6 +1786,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		}
 		//echo '<pre>'; print_r($dlfile); exit;
 
+
 		// *****************************************
 		// Output an appropriate Content-Type header
 		// *****************************************
@@ -1756,6 +1804,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 		header("Content-Transfer-Encoding: binary");
 		header("Content-Length: " . ($dlfile->size_tmp ?: $dlfile->size));
+
 
 		// *******************************
 		// Finally read file and output it
@@ -1801,6 +1850,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			readfile($dlfile->abspath_tmp ?: $dlfile->abspath);
 		}
 
+
 		// ****************************************************
 		// In case of multi-download clear the session variable
 		// ****************************************************
@@ -1809,6 +1859,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		// Done ... terminate execution
 		$app->close();
 	}
+
 
 	/**
 	 * External link logic
@@ -1828,6 +1879,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		$field_id    = $this->input->get('fid', 0, 'int');
 		$content_id  = $this->input->get('cid', 0, 'int');
 		$value_order = $this->input->get('ord', 0, 'int');
+
 
 		/**
 		 * Create and Execute SQL query to retrieve file info
@@ -1854,6 +1906,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				. $access_clauses['and']
 				;
 		$link_data = $db->setQuery($query)->loadObject();
+
 
 		/**
 		 * Check if web link value was found AND IF user has required Access Levels
@@ -1920,6 +1973,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			return;
 		}
 
+
 		/**
 		 * Get item and field \Joomla\CMS\Table\Table records, and then load field's configuration
 		 */
@@ -1929,6 +1983,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		$item->load($content_id);
 		$field->load($field_id);
 		FlexicontentFields::loadFieldConfig($field, $item);
+
 
 		/**
 		 * Trigger pluging event 'onFieldValueAction_FC'
@@ -1963,6 +2018,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			return;
 		}
 
+
 		/*
 		 * Increment hits counter
 		 */
@@ -1986,6 +2042,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				;
 		$db->setQuery($query)->execute();
 
+
 		/**
 		 * Finally redirect to the URL
 		 */
@@ -1993,6 +2050,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		@header("Location: ".$url."","target=blank");
 		$app->close();
 	}
+
 
 	/**
 	 * Method to fetch the tags for selecting in item form
@@ -2055,6 +2113,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		jexit(json_encode($array/*, JSON_UNESCAPED_UNICODE*/));
 	}
 
+
 	function search()
 	{
 		$app = \Joomla\CMS\Factory::getApplication();
@@ -2096,9 +2155,12 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		$this->display();
 	}
 
+
+
 	// **************
 	// Helper methods
 	// **************
+
 
 	/**
 	 * Method to create join + and-where SQL CLAUSEs, for checking access of field - item pair(s), IN FUTURE maybe moved
@@ -2158,6 +2220,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		return $clauses;
 	}
 
+
 	/**
 	 * Traverse Tree to create folder structure and get/prepare file objects
 	 *
@@ -2168,6 +2231,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 	{
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 
+		jimport('joomla.filesystem.file');
 		$all_files = array();
 
 		foreach ($nodes as $node)
@@ -2204,6 +2268,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 		return $all_files;
 	}
+
 
 	/**
 	 * Get return URL via a client request variable, checking if it is safe (otherwise home page will be used)
@@ -2250,6 +2315,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		return $return;
 	}
 
+
 	/**
 	 * Method to create a query object for getting record data (specific columns) of multiple records
 	 *
@@ -2274,6 +2340,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 		return $query;
 	}
+
 
 	/**
 	 * START OF CONTROLLER SPECIFIC METHODS

@@ -21,11 +21,8 @@ require_once('base/baselist.php');
  * FLEXIcontent Component Search Model
  *
  */
-#[AllowDynamicProperties]
 class FLEXIcontentModelSearch extends FCModelAdminList
 {
-
-
 	/**
 	 * Record database table
 	 *

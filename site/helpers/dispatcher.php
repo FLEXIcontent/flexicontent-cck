@@ -1,5 +1,4 @@
 <?php
-use Joomla\CMS\Event\AbstractEvent;
 /**
  * @package     Joomla.Platform
  * @subpackage  Event
@@ -11,6 +10,7 @@ use Joomla\CMS\Event\AbstractEvent;
 // Check to ensure this file is within the rest of the framework
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
+jimport('joomla.event.dispatcher');
 
 /**
  * Class to handle dispatching of events.
@@ -24,15 +24,9 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
  * @see         \Joomla\CMS\Plugin\CMSPlugin
  * @since       11.1
  */
-#[AllowDynamicProperties]
 class FCDispatcher extends JEventDispatcher
 {
-		/** @var mixed $_methods */
-	public mixed $_methods = null;
-	/** @var mixed $_observers */
-	public mixed $_observers = null;
-
-protected $prepContentFuncs = null;
+	protected $prepContentFuncs = null;
 	protected $debug = false;
 	
 	/**

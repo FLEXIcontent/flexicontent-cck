@@ -93,9 +93,9 @@ if ($display_print)
 //{
 //	if ($lang=='th') {
 // Special case language case, maybe la=laos, and Bhutan languages in the future (NECTEC support these languages)
-//		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-th', \Joomla\CMS\Uri\Uri::root().'plugins/flexicontent_fields/toolbar/toolbar/th.js');
+//		$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/plugins/flexicontent_fields/toolbar/toolbar/th.js');
 //	} else {
-//		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('get_text', '//vozme.com/get_text.js');
+//		$document->addScript('//vozme.com/get_text.js');
 //	}
 
 //	$ops[] = '

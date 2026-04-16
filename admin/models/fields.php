@@ -21,15 +21,8 @@ require_once('base/baselist.php');
  * FLEXIcontent Component Fields Model
  *
  */
-#[AllowDynamicProperties]
 class FlexicontentModelFields extends FCModelAdminList
 {
-	/** @var mixed $_typeids */
-	public mixed $_typeids = null;
-	/** @var mixed $rules_map */
-	public mixed $rules_map = null;
-
-
 	/**
 	 * Record database table
 	 *

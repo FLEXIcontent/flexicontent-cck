@@ -9,8 +9,6 @@
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
-use Joomla\Filesystem\Folder;
-use Joomla\Filesystem\Path;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Uri\Uri;
@@ -719,7 +717,7 @@ class plgFlexicontent_fieldsFile extends FCField
 
 			flexicontent_html::loadFramework('flexi-lib');
 			\Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
-			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-form', \Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/file/js/form.js', array('version' => FLEXI_VHASH));
+			$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/file/js/form.js', array('version' => FLEXI_VHASH));
 		}
 
 		// Add field's CSS / JS
@@ -791,7 +789,7 @@ class plgFlexicontent_fieldsFile extends FCField
 						}
 					}
 
-					fcfield_file.assignMediaFile(id, value, \''.Uri::root().'\' + value);
+					fcfield_file.assignMediaFile(id, value, \''.Uri::root().'/\' + value);
 
 					if (typeof SqueezeBox != \'undefined\') SqueezeBox.close();
 					if (typeof jQuery != \'undefined\') jQuery(\'#fc_modal_popup_container\').dialog(\'close\');
@@ -1323,6 +1321,8 @@ class plgFlexicontent_fieldsFile extends FCField
 		if ( !$initialized )
 		{
 			$initialized = 1;
+			jimport('joomla.filesystem.folder');
+			jimport('joomla.filesystem.path');
 			$srcpath_original  = \Joomla\Filesystem\Path::clean( JPATH_SITE .DS. $import_docs_folder .DS );
 		}
 
@@ -1938,7 +1938,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		$data->desc    = $desc;
 		$data->mailto  = $mailto;
 
-		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexicontent', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
+		$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		include('file'.DS.'share_form.php');
 		$session->set('com_flexicontent.formtime', time());
 	}
@@ -1964,7 +1964,7 @@ class plgFlexicontent_fieldsFile extends FCField
 
 		$timeout = $session->get('com_flexicontent.formtime', 0);
 		if ($timeout == 0 || time() - $timeout < 2) {
-			Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text:: _ ('FLEXI_FIELD_FILE_EMAIL_NOT_SENT', 'notice'));
+			JError::raiseNotice(500, \Joomla\CMS\Language\Text:: _ ('FLEXI_FIELD_FILE_EMAIL_NOT_SENT'));
 			return $this->share_file_form();
 		}
 
@@ -2066,7 +2066,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		if (!$link || !\Joomla\CMS\Uri\Uri::isInternal($link))
 		{
 			//Non-local url...
-			Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text:: _ ('FLEXI_FIELD_FILE_EMAIL_NOT_SENT', 'notice'));
+			JError::raiseNotice(500, \Joomla\CMS\Language\Text:: _ ('FLEXI_FIELD_FILE_EMAIL_NOT_SENT'));
 			return $this->share_file_form();
 		}
 
@@ -2096,7 +2096,7 @@ class plgFlexicontent_fieldsFile extends FCField
 			{
 				if (strpos($_POST[$field], $header) !== false)
 				{
-					throw new \RuntimeException('');
+					JError::raiseError(403, '');
 				}
 			}
 		}
@@ -2118,14 +2118,14 @@ class plgFlexicontent_fieldsFile extends FCField
 		if (! $email  || ! \Joomla\CMS\Mail\MailHelper::isEmailAddress($email))
 		{
 			$error	= \Joomla\CMS\Language\Text::sprintf('FLEXI_FIELD_FILE_EMAIL_INVALID', $email);
-			Factory::getApplication()->enqueueMessage($error, 'warning');
+			JError::raiseWarning(0, $error);
 		}
 
 		// Check for a valid from address
 		if (! $from || ! \Joomla\CMS\Mail\MailHelper::isEmailAddress($from))
 		{
 			$error	= \Joomla\CMS\Language\Text::sprintf('FLEXI_FIELD_FILE_EMAIL_INVALID', $from);
-			Factory::getApplication()->enqueueMessage($error, 'warning');
+			JError::raiseWarning(0, $error);
 		}
 
 		if ($error)
@@ -2149,11 +2149,11 @@ class plgFlexicontent_fieldsFile extends FCField
 		$send_result = Factory::getMailer()->sendMail( $from, $sender, $email, $subject, $body, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
 		if ( $send_result !== true )
 		{
-			Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text:: _ ('FLEXI_FIELD_FILE_EMAIL_NOT_SENT', 'notice'));
+			JError::raiseNotice(500, \Joomla\CMS\Language\Text:: _ ('FLEXI_FIELD_FILE_EMAIL_NOT_SENT'));
 			return $this->share_file_form();
 		}
 
-		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexicontent', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
+		$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		include('file'.DS.'share_result.php');
 	}
 

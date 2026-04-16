@@ -26,6 +26,7 @@ require_once (JPATH_SITE.DS.'modules'.DS.'mod_flexicontent'.DS.'classes'.DS.'dat
 //\Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 JLoader::register('\Joomla\CMS\Form\FormFieldFclayoutbuilder', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'elements' . DS . 'fclayoutbuilder.php');
 
+
 // Decide whether to show module contents
 $app     = \Joomla\CMS\Factory::getApplication();
 $config  = \Joomla\CMS\Factory::getConfig();
@@ -33,12 +34,14 @@ $jinput  = $app->input;
 $option  = $jinput->get('option', '', 'cmd');
 $view    = $jinput->get('view', '', 'cmd');
 
+
 // Show in view
 
 $_view   = $option=='com_flexicontent' ? $view : 'others';
 $show_in_views = $params->get('show_in_views', array());
 $show_in_views = !is_array($show_in_views) ? array($show_in_views) : $show_in_views;
 $views_show_mod = !count($show_in_views) || in_array($_view,$show_in_views);
+
 
 // Show in client
 $caching = $params->get('cache', '0') ? $config->get('caching', '0') : 0;
@@ -63,22 +66,28 @@ else
 	$clients_show_mod = true;
 }
 
+
 // Show via PHP rule, but check if parameter is empty !
 $php_show_mod = $params->get('enable_php_rule', 0) && trim($params->get('php_rule', ''))
 	? eval($params->get('php_rule'))
 	: true;
+
 
 // Combine rules
 $show_mod = $params->get('combine_show_rules', 'AND') == 'AND'
 	? ($views_show_mod && $clients_show_mod && $php_show_mod)
 	: ($views_show_mod || $clients_show_mod || $php_show_mod);
 
+
 // ***
 // *** TERMINATE if not assigned to current view
 // ***
 if ( !$show_mod )  return;
 
+
+
 global $modfc_jprof;
+jimport('joomla.profiler.profiler');
 $modfc_jprof = new \Joomla\CMS\Profiler\Profiler();
 $modfc_jprof->mark('START: FLEXIcontent Universal Content Module');
 global $mod_fc_run_times;
@@ -144,6 +153,7 @@ $add_tooltips = (int) $params->get('add_tooltips', (int) $flexiparams->get('add_
 $width 					= $params->get('width');
 $height 				= $params->get('height');
 
+
 /**
  * Get module basic fields parameters
  */
@@ -171,6 +181,7 @@ $display_comments_feat= $params->get('display_comments_feat');
 $mod_readmore_feat		= $params->get('mod_readmore_feat');
 $mod_use_image_feat 	= $params->get('mod_use_image_feat');
 $mod_link_image_feat 	= $params->get('mod_link_image_feat');
+
 
 /**
  * Get module custom fields parameters
@@ -202,6 +213,7 @@ $custom2 				= $params->get('custom2');
 $custom3 				= $params->get('custom3');
 $custom4 				= $params->get('custom4');
 $custom5 				= $params->get('custom5');
+
 
 /**
  * Create Item List Data
@@ -252,7 +264,7 @@ if ($add_ccs && $layout)
 		}
 
 		// Component CSS with optional override
-		echo flexicontent_html::getInlineLinkOnce(\Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/flexicontent.css', array('version'=>FLEXI_VHASH));
+		echo flexicontent_html::getInlineLinkOnce(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version'=>FLEXI_VHASH));
 
 		if (FLEXI_J40GE && file_exists(JPATH_SITE.DS.'media/templates/site'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css'))
 		{
@@ -270,27 +282,28 @@ if ($add_ccs && $layout)
 		// Active module layout css (optional)
 		if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css'))
 		{
-			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::base(true).'/modules/'.$modulename.'/tmpl/'.$layout.'/'.$layout.'.css', array('version' => FLEXI_VHASH));
+			$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/modules/'.$modulename.'/tmpl/'.$layout.'/'.$layout.'.css', array('version' => FLEXI_VHASH));
 		}
 
 		// Module 's core CSS
 		if (file_exists(dirname(__FILE__).DS.'tmpl_common'.DS.'module.css'))
 		{
-			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-module', \Joomla\CMS\Uri\Uri::base(true).'/modules/'.$modulename.'/tmpl_common/module.css', array('version' => FLEXI_VHASH));
+			$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/modules/'.$modulename.'/tmpl_common/module.css', array('version' => FLEXI_VHASH));
 		}
 
 		// Component CSS with optional override
-		/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexicontent', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
+		$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		if (FLEXI_J40GE && file_exists(JPATH_SITE.DS.'media/templates/site'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css'))
 		{
-			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexicontent', \Joomla\CMS\Uri\Uri::base(true).'/media/templates/site/'.$app->getTemplate().'/css/flexicontent.css', array('version' => FLEXI_VHASH));
+			$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/media/templates/site/'.$app->getTemplate().'/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		}
 		elseif (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css'))
 		{
-			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexicontent', \Joomla\CMS\Uri\Uri::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css');
+			$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css');
 		}
 	}
 }
+
 
 /**
  * Initialize content variables (used to create module's output) to empty
@@ -298,6 +311,7 @@ if ($add_ccs && $layout)
 $header_html = '';
 $main_html   = '';
 $footer_html = '';
+
 
 /**
  * Include module header, but make sure that file exists, because otherwise the Joomla module helper will include ... 'default.php'
@@ -310,6 +324,7 @@ if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.'header.php'))
 	$header_html = ob_get_contents();
 	ob_end_clean();
 }
+
 
 // Render Layout, (once per category if apply per category is enabled ...)
 foreach ($catdata_arr as $catid => $catdata)
@@ -349,6 +364,7 @@ foreach ($catdata_arr as $catid => $catdata)
 	ob_end_clean();
 }
 
+
 /**
  * Include module footer, e.g. includes module's Read More, because otherwise the Joomla module helper will include ... 'default.php'
  * module template ! thus a Joomla override template header is allowed only if template header.php file exists locally too !!
@@ -360,6 +376,7 @@ if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.'footer.php'))
 	$footer_html = ob_get_contents();
 	ob_end_clean();
 }
+
 
 /**
  * Output header_html, main_html, footer_html, adding a container DIV
@@ -374,6 +391,7 @@ if ($main_html)
 		' . $footer_html . '
 	';
 }
+
 
 $mod_fc_run_times['rendering_template'] = microtime(1) - $mod_fc_run_times['rendering_template'];
 

@@ -62,9 +62,12 @@ if (!defined('FLEXI_J37GE'))   define('FLEXI_J37GE', version_compare( $jversion-
 if (!defined('FLEXI_J38GE'))   define('FLEXI_J38GE', version_compare( $jversion->getShortVersion(), '3.7.99', '>' ) );
 if (!defined('FLEXI_J40GE'))   define('FLEXI_J40GE', version_compare( $jversion->getShortVersion(), '3.99.99', '>' ) );
 if (!defined('FLEXI_J50GE'))   define('FLEXI_J50GE', version_compare( $jversion->getShortVersion(), '4.99.99', '>' ) );
-if (!defined('FLEXI_J60GE'))   define('FLEXI_J60GE', version_compare( $jversion->getShortVersion(), '5.99.99', '>' ) );
 
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
+
+if ( !class_exists('\Joomla\CMS\MVC\Controller\BaseController') )  jimport('legacy.controller.legacy');
+if ( !class_exists('\Joomla\CMS\MVC\Model\BaseDatabaseModel') )       jimport('legacy.model.legacy');
+if ( !class_exists('\Joomla\CMS\MVC\View\HtmlView') )        jimport('legacy.view.legacy');
 
 // Set a default timezone if web server provider has not done so
 // phpversion() should be used instead of PHP_VERSION, if not inside Joomla code

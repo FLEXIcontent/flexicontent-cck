@@ -15,6 +15,8 @@ use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Table\Table;
 
+jimport('legacy.model.list');
+
 /**
  * FLEXIcontent Component Import Model
  *
@@ -40,6 +42,7 @@ class FlexicontentModelImport extends \Joomla\CMS\MVC\Model\ListModel
 		// Parameters of the view, in our case it is only the component parameters
 		$this->cparams = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
 
+
 		// **************
 		// Form variables
 		// **************
@@ -63,6 +66,7 @@ class FlexicontentModelImport extends \Joomla\CMS\MVC\Model\ListModel
 		$app->setUserState($p.'state', $state);
 		$app->setUserState($p.'access', $access);
 
+
 		// Main and secondary categories, tags
 		$maincat     = $fcform ? $jinput->get('maincat', 0, 'int')      :  $app->getUserStateFromRequest( $p.'maincat', 'maincat', 0, 'int');
 		$maincat_col = $fcform ? $jinput->get('maincat_col', 0, 'int')  :  $app->getUserStateFromRequest( $p.'maincat_col', 'maincat_col', 0, 'int');
@@ -84,6 +88,7 @@ class FlexicontentModelImport extends \Joomla\CMS\MVC\Model\ListModel
 		$app->setUserState($p.'seccats_col', $seccats_col);
 		$app->setUserState($p.'tags_col', $tags_col);
 
+
 		// Publication: Author/modifier
 		$created_by_col  = $fcform ? $jinput->get('created_by_col', 0, 'int')   :  $app->getUserStateFromRequest( $p.'created_by_col', 'created_by_col', $this->cparams->get('import_created_by_col', 0), 'int');
 		$modified_by_col = $fcform ? $jinput->get('modified_by_col', 0, 'int')  :  $app->getUserStateFromRequest( $p.'modified_by_col', 'modified_by_col', $this->cparams->get('import_modified_by_col', 0), 'int');
@@ -93,6 +98,7 @@ class FlexicontentModelImport extends \Joomla\CMS\MVC\Model\ListModel
 
 		$app->setUserState($p.'created_by_col', $created_by_col);
 		$app->setUserState($p.'modified_by_col', $modified_by_col);
+
 
 		// Publication: META data
 		$metadesc_col = $fcform ? $jinput->get('metadesc_col', 0, 'int')  :  $app->getUserStateFromRequest( $p.'metadesc_col', 'metadesc_col', $this->cparams->get('import_metadesc_col', 0), 'int');
@@ -106,6 +112,7 @@ class FlexicontentModelImport extends \Joomla\CMS\MVC\Model\ListModel
 		$app->setUserState($p.'metadesc_col', $metadesc_col);
 		$app->setUserState($p.'metakey_col', $metakey_col);
 		$app->setUserState($p.'custom_ititle_col', $custom_ititle_col);
+
 
 		// Publication: dates
 		$modified_col = $fcform ? $jinput->get('modified_col', 0, 'int')  :  $app->getUserStateFromRequest( $p.'modified_col', 'modified_col', $this->cparams->get('import_modified_col', 0), 'int');
@@ -123,6 +130,7 @@ class FlexicontentModelImport extends \Joomla\CMS\MVC\Model\ListModel
 		$app->setUserState($p.'publish_up_col', $publish_up_col);
 		$app->setUserState($p.'publish_down_col', $publish_down_col);
 
+
 		// Advanced configuration
 		$ignore_unused_cols = $fcform ? $jinput->get('ignore_unused_cols', 0, 'int')  :  $app->getUserStateFromRequest( $p.'ignore_unused_cols', 'ignore_unused_cols', $this->cparams->get('import_ignore_unused_cols', 0), 'int');
 		$items_per_step     = $fcform ? $jinput->get('items_per_step', 0, 'int')      :  $app->getUserStateFromRequest( $p.'items_per_step', 'items_per_step', $this->cparams->get('import_items_per_step', 5), 'int');
@@ -135,6 +143,7 @@ class FlexicontentModelImport extends \Joomla\CMS\MVC\Model\ListModel
 
 		$app->setUserState($p.'ignore_unused_cols', $ignore_unused_cols);
 		$app->setUserState($p.'items_per_step', $items_per_step);
+
 
 		// CSV file format
 		$mval_separator   = $fcform ? $jinput->get('mval_separator',   '', 'string')  :  $app->getUserStateFromRequest( $p.'mval_separator', 'mval_separator', $this->cparams->get('csv_field_mval_sep', '%%'), 'string');

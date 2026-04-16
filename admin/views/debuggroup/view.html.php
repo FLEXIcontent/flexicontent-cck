@@ -1,5 +1,4 @@
 <?php
-use Joomla\CMS\Factory;
 /**
  * @copyright	Copyright (C) 2005 - 2014 Open Source Matters, Inc. All rights reserved.
  * @license		GNU General Public License version 2 or later; see LICENSE.txt
@@ -29,7 +28,7 @@ class FlexicontentViewDebugGroup extends \Joomla\CMS\MVC\View\HtmlView
 		// Access check.
 		if (!\Joomla\CMS\Factory::getUser()->authorise('core.manage', 'com_users') || !\Joomla\CMS\Factory::getConfig()->get('debug'))
 		{
-			return Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_('JERROR_ALERTNOAUTHOR', 'warning'));
+			return JError::raiseWarning(404, \Joomla\CMS\Language\Text::_('JERROR_ALERTNOAUTHOR'));
 		}
 
 		$this->actions		= $this->get('DebugActions');
@@ -42,7 +41,7 @@ class FlexicontentViewDebugGroup extends \Joomla\CMS\MVC\View\HtmlView
 
 		// Check for errors.
 		if (count($errors = $this->get('Errors'))) {
-			throw new \RuntimeException(implode("\n", $errors));
+			JError::raiseError(500, implode("\n", $errors));
 			return false;
 		}
 

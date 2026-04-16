@@ -19,6 +19,8 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+jimport('legacy.view.legacy');
+
 use Joomla\CMS\Filter\InputFilter;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
@@ -69,6 +71,7 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 		// Get parameters via model
 		$params  = $model->getParams();
 
+
 		/**
 		 * Get data from the model
 		 */
@@ -80,6 +83,7 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 		$searchordering = $state->get('ordering');
 
 		$selectors_display_as = $params->get('selectors_display_as', 'select');
+
 
 		/**
 		 * Some parameter shortcuts common among search view and advanced search plugin
@@ -99,6 +103,7 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 		$type_based_search = $show_filters === 1 || $show_txtfields === 1;
 		$canseltypes = $type_based_search ? 1 : $canseltypes;
 
+
 		/**
 		 * Load needed JS libs & CSS styles
 		 */
@@ -109,20 +114,20 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 		// Add css files to the document <head> section (also load CSS joomla template override)
 		if (!$params->get('disablecss', ''))
 		{
-			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('flexicontent', $this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
-			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('flexi_filters', $this->baseurl.'/components/com_flexicontent/assets/css/flexi_filters.css', array('version' => FLEXI_VHASH));
+			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
+			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexi_filters.css', array('version' => FLEXI_VHASH));
 			!\Joomla\CMS\Factory::getLanguage()->isRtl()
-				? /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
-				: /* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-style', \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
+				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
+				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 		}
 
 		if (FLEXI_J40GE && file_exists(JPATH_SITE.DS.'media/templates/site'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css'))
 		{
-			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexicontent', $this->baseurl.'/media/templates/site/'.$app->getTemplate().'/css/flexicontent.css', array('version' => FLEXI_VHASH));
+			$document->addStyleSheet($this->baseurl.'/media/templates/site/'.$app->getTemplate().'/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		}
 		elseif (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css'))
 		{
-			/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseStyle('fc-flexicontent', $this->baseurl.'/templates/'.$app->getTemplate().'/css/flexicontent.css', array('version' => FLEXI_VHASH));
+			$document->addStyleSheet($this->baseurl.'/templates/'.$app->getTemplate().'/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		}
 
 		// Auto-disable "Flexicontent" search AREA if no type are clicked
@@ -197,6 +202,7 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 			$params->set('show_page_title',   0);
 		}
 
+
 		/**
 		 * Create the document title, by from page title and other data
 		 */
@@ -217,6 +223,7 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 		// Finally, set document title
 		$document->setTitle($doc_title);
 
+
 		/**
 		 * Set document's META tags
 		 */
@@ -233,6 +240,8 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 			if (($_mp=$menu->getParams()->get('robots')))                 $document->setMetadata('robots', $_mp);
 			if (($_mp=$menu->getParams()->get('secure')))                 $document->setMetadata('secure', $_mp);
 		}
+
+
 
 		/**
 		 * Get Content Types allowed for user selection in the Search Form
@@ -312,6 +321,8 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 			$single_contenttype = false;
 		}
 
+
+
 		/**
 		 * Text Search Fields of the search form
 		 */
@@ -363,6 +374,7 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 			}
 		}
 
+
 		/**
 		 * Filter Fields of the search form
 		 */
@@ -395,6 +407,7 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 
 		// Create a comma list of them
 		$filtflds_list = count($filtflds) ? "'" . implode("','", $filtflds) . "'" : '';
+
 
 		/**
 		 * Retrieve field properties/parameters, verifying they support to be used as Filter Fields
@@ -434,6 +447,7 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 			unset($filters_tmp);
 		}
 
+
 		/**
 		 * If configured filters were either not found or were invalid for the current content type(s)
 		 * then retrieve all fields marked as filterable for the give content type(s)
@@ -456,6 +470,7 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 					: array();
 			}
 		}
+
 
 		/**
 		 * Create Form Elements (the 'lists' array)
@@ -542,6 +557,7 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 			}
 		}
 
+
 		// *** Selector of Fields for text searching
 		// THIS is wrong value 1 means hide the fields and use the configured fields
 		// if( in_array($txtmode, array(1,2)) && count($fields_text) )
@@ -605,6 +621,7 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 			*/
 		}
 
+
 		// *** Selector of FLEXIcontent Results Ordering
 		$lists['orderby'] = flexicontent_html::orderby_selector( $params, $form_id, $autosubmit=1, $extra_order_types=array(), $sfx='' );
 
@@ -613,6 +630,7 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 
 		// *** Selector of Pagination Limit
 		$lists['limit'] = flexicontent_html::limit_selector( $params, $form_id, $autosubmit=0 );
+
 
 		// *** Selector of non-FLEXIcontent Results Ordering
 		if($show_searchordering = $params->get('show_searchordering', 1))
@@ -627,6 +645,7 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 			$lists['ordering'] = HTMLHelper::_('select.genericlist', $orders, 'o',
 				'class="fc_field_filter use_select2_lib"', 'value', 'text', $searchordering, 'ordering' );
 		}
+
 
 		// *** Selector for usage of Search Text
 		$show_searchphrase = $params->get('show_searchphrase', 1);
@@ -675,6 +694,7 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 			$lists['searchphrase'] = '<input type="hidden" name="p" value="' . $searchphrase . '" />';
 		}
 
+
 		// *** Selector for filter combination
 		/*
 		if ($show_filtersop = $params->get('show_filtersop', 1))
@@ -687,6 +707,7 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 			$lists['filtersop']= HTMLHelper::_('select.radiolist',  $filtersop_arr, 'filtersop', '', 'value', 'text', $filtersop );
 		}
 		*/
+
 
 		// *** Selector of Search Areas
 		// If showing this is disabled, then FLEXIcontent (advanced) search model will not use all search areas,
@@ -959,6 +980,7 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 			}
 		}
 		$this->result	= Text::sprintf( 'FLEXI_TOTALRESULTSFOUND', $total );
+
 
 		/**
 		 * Create HTML of filters (-AFTER- getData of model have been called)

@@ -1,7 +1,4 @@
 <?php
-use Joomla\CMS\Form\FormField;
-use Joomla\CMS\Form\FormHelper;
-use Joomla\CMS\HTML\HTMLHelper;
 /**
  * @version 1.5 stable $Id: types.php 1260 2012-04-25 17:43:21Z ggppdk $
  * @package Joomla
@@ -22,7 +19,12 @@ use Joomla\CMS\HTML\HTMLHelper;
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
 
-////\Joomla\CMS\Form\FormHelper::loadFieldClass('...');   // \Joomla\CMS\Form\FormField...
+jimport('cms.html.html');      // JHtml
+jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
+jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
+
+//jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
+//\Joomla\CMS\Form\FormHelper::loadFieldClass('...');   // \Joomla\CMS\Form\FormField...
 
 /**
  * Renders a types element

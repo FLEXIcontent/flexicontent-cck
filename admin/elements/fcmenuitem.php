@@ -25,7 +25,7 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Form\Field\GroupedlistField;  // Remplace JFormFieldGroupedList (alias J3 supprimé en J6)
 use Joomla\CMS\HTML\HTMLHelper;              // Remplace JHtml (alias J3 supprimé en J6)
 use Joomla\CMS\Language\Multilanguage;
-use Joomla\CMS\Log\Log;                      // Remplace /* TODO-J5: JError removed */ /* TODO-J5: JError removed */ JError::raiseWarning() (supprimé en J4)
+use Joomla\CMS\Log\Log;                      // Remplace JError::raiseWarning() (supprimé en J4)
 
 // jimport() supprimé en J6 → les use statements ci-dessus suffisent
 // require_once com_menus helper supprimé en J4 → getMenuLinks() est réécrit localement
@@ -418,7 +418,7 @@ class JFormFieldFcMenuitem extends GroupedlistField
 		}
 		catch (\RuntimeException $e)
 		{
-			// J4+ : Log::add() remplace /* TODO-J5: JError removed */ /* TODO-J5: JError removed */ JError::raiseWarning() (supprimé en J4)
+			// J4+ : Log::add() remplace JError::raiseWarning() (supprimé en J4)
 			Log::add($e->getMessage(), Log::WARNING, 'flexicontent');
 
 			return false;

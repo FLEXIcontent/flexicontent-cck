@@ -15,6 +15,7 @@ use Joomla\CMS\Factory;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
+jimport('legacy.model.list');
 require_once('traitbase.php');
 require_once('traitlegacylist.php');
 
@@ -24,8 +25,6 @@ require_once('traitlegacylist.php');
  */
 abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 {
-	/** @var mixed $scope_title */
-	public mixed $scope_title = null;
 	use FCModelTraitBase;
 	use FCModelTraitLegacyList;
 
@@ -56,6 +55,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 	 */
 	protected $listViaAccess = false;
 	protected $copyRelations = true;
+
 
 	/**
 	 * Supported Features Flags
@@ -135,6 +135,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 	 */
 	var $view_id = null;
 
+
 	/**
 	 * Constructor
 	 *
@@ -159,6 +160,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 
 		// Make sure this is correct if called from different component ...
 		$this->option = 'com_flexicontent';
+
 
 		/**
 		 * View's Filters
@@ -198,11 +200,13 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 		$this->setState('search', $search);
 		$app->setUserState($p . 'search', $search);
 
+
 		/**
 		 * Ordering: filter_order, filter_order_Dir
 		 */
 
 		$this->_setStateOrder();
+
 
 		/**
 		 * Pagination: limit, limitstart
@@ -221,6 +225,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 		$app->setUserState($p . 'limit', $limit);
 		$app->setUserState($p . 'limitstart', $limitstart);
 
+
 		// For some model function that use single id
 		$array = $jinput->get('cid', array(0), 'array');
 		$this->setId((int) $array[0]);
@@ -228,6 +233,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 		// Manage view permission
 		$this->canManage = false;
 	}
+
 
 	/**
 	 * Method to set the record identifier (for singular operations) and clear record rows
@@ -247,6 +253,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 		}
 	}
 
+
 	/**
 	 * Method to set which record identifier that should be loaded when getItems() is called
 	 *
@@ -260,6 +267,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 		$this->_data  = null;
 		$this->_total = null;
 	}
+
 
 	/**
 	 * Method to get a \Joomla\CMS\Pagination\Pagination object for the data set
@@ -280,6 +288,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 		return $this->_pagination;
 	}
 
+
 	/**
 	 * Method to get records data
 	 *
@@ -299,6 +308,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 		return $this->_data;
 	}
 
+
 	/**
 	 * Method to get the total nr of the records
 	 *
@@ -316,6 +326,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 
 		return $this->_total;
 	}
+
 
 	/**
 	 * Method to cache the last query constructed.
@@ -336,6 +347,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 
 		return $this->query;
 	}
+
 
 	/**
 	 * Method to build the query for the records
@@ -392,6 +404,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 		return $query;
 	}
 
+
 	/**
 	 * Method to build the orderby clause of the query for the records
 	 *
@@ -417,6 +430,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 			? ' ORDER BY ' . $order
 			: $order;
 	}
+
 
 	/**
 	 * Method to build the where clause of the query for the records
@@ -562,6 +576,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 			: $where;
 	}
 
+
 	/**
 	 * Method to build the having clause of the query for the files
 	 *
@@ -584,6 +599,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 			? ' HAVING ' . (count($having) ? implode(' AND ', $having) : ' 1 ')
 			: $having;
 	}
+
 
 	/**
 	 * Method to publish / unpublish / etc a record, also checking ACL and assignments
@@ -608,6 +624,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 
 		return $this->changestate($cid, $state) !== false;
 	}
+
 
 	/**
 	 * Method to change publication state a record (assumes ACL / assignments already checked)
@@ -673,6 +690,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 		return 0;
 	}
 
+
 	/**
 	 * Method to get SET-clause to set new values to columns related to the changing state of the records
 	 *
@@ -689,6 +707,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 
 		return $set_properties;
 	}
+
 
 	/**
 	 * Method to move a record upwards or downwards
@@ -723,6 +742,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 
 		return true;
 	}
+
 
 	/**
 	 * Method to check if a set of records can not have the provided action performed due to assignments or due to permissions
@@ -792,6 +812,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 		return !count($cid_noauth) && !count($cid_wassocs);
 	}
 
+
 	/**
 	 * Method to remove records
 	 *
@@ -817,6 +838,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 				$ids[] = $id;
 			}
 		}
+
 
 		/**
 		 * Get records using the model, we need an array of records to use for calling the events
@@ -853,6 +875,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 				: $dispatcher->trigger($this->event_before_delete, array($this->event_context, $record));
 		}
 
+
 		if (count($ids))
 		{
 			// This is already done by controller task / caller but redo
@@ -884,6 +907,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 		return true;
 	}
 
+
 	/**
 	 * Method to delete records relations like record assignments
 	 *
@@ -897,6 +921,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 	{
 		return true;
 	}
+
 
 	/**
 	 * Method to copy records
@@ -939,6 +964,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 		return $ids_map;
 	}
 
+
 	/**
 	 * Method to copy assignments and other related data of records
 	 *
@@ -949,6 +975,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 	protected function _copyRelatedData($ids_map)
 	{
 	}
+
 
 	/**
 	 * Method to set the access level of the records
@@ -990,6 +1017,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 
 		return true;
 	}
+
 
 	/**
 	 * Method to find which records are not authorized
@@ -1062,6 +1090,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 		return $cid_noauth;
 	}
 
+
 	/**
 	 * Method to find which records having assignments blocking a state change
 	 *
@@ -1091,6 +1120,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 
 		return $cid_wassocs;
 	}
+
 
 	/**
 	 * Method to set order into state
@@ -1130,6 +1160,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 		$app->setUserState($p . 'filter_order', $filter_order);
 		$app->setUserState($p . 'filter_order_Dir', $filter_order_Dir);
 	}
+
 
 	/**
 	 * Method to get Text Search clause according to search scope
@@ -1192,6 +1223,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 		return $textwhere;
 	}
 
+
 	/**
 	 * Method to get records matching specific conditions (SQL query clauses)
 	 *
@@ -1232,6 +1264,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 		return $this->_db->setQuery($query)->loadObjectList('id');
 	}
 
+
 	/**
 	 * Method to get author list for filtering
 	 *
@@ -1250,6 +1283,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 
 		return $this->_db->setQuery($query)->loadObjectList();
 	}
+
 
 	/**
 	 * Method to get item (language) associations
@@ -1290,6 +1324,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 		return $this->_translations;
 	}
 
+
 	/**
 	 * Method to save the reordered nested set tree.
 	 * First we save the new order values in the lft values of the changed ids.
@@ -1319,6 +1354,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 
 		return true;
 	}
+
 
 	/**
 	 * START OF MODEL SPECIFIC METHODS

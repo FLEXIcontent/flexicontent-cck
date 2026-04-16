@@ -1,7 +1,7 @@
 <?php
 if ($params->get('display_favlist', 0))
 {
-	/* J5/J6 WebAsset: */ $document->getWebAssetManager()->registerAndUseScript('fc-favlist', \Joomla\CMS\Uri\Uri::base(true).'/modules/mod_flexicontent/tmpl_common/js/favlist.js');
+	$document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/modules/mod_flexicontent/tmpl_common/js/favlist.js');
 
 	echo '
 	<p class="news_favs_head">' . \Joomla\CMS\Language\Text::_('FLEXI_MOD_RECENTLY_ADDED_FAVOURITES') . '</p>

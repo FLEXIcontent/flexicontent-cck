@@ -1,7 +1,4 @@
 <?php
-use Joomla\CMS\Form\FormField;
-use Joomla\CMS\Form\FormHelper;
-use Joomla\CMS\HTML\HTMLHelper;
 /**
  * @version 1.5 beta 4 $Id: fcdate.php 967 2011-11-21 00:01:36Z ggppdk $
  * @package Joomla
@@ -22,8 +19,11 @@ use Joomla\CMS\HTML\HTMLHelper;
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
 
+jimport('cms.html.html');      // JHtml
+jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
 
-////\Joomla\CMS\Form\FormHelper::loadFieldClass('calendar');   // \Joomla\CMS\Form\FormField...
+//jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
+//\Joomla\CMS\Form\FormHelper::loadFieldClass('calendar');   // \Joomla\CMS\Form\FormField...
 
 /**
  * Renders a date element

@@ -23,11 +23,8 @@ require_once('base/traitnestable.php');
  * FLEXIcontent Component Categories Model
  *
  */
-#[AllowDynamicProperties]
 class FlexicontentModelCategories extends FCModelAdminList
 {
-
-
 
 	use FCModelTraitNestableRecord;
 
