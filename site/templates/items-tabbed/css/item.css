@@ -12,20 +12,20 @@ body #flexicontent .fc_item_title a {
 	padding-left: 0px;
 	padding-bottom: 0px;
 	border-radius: 0px;
-	border: 0px solid inherit;
+	border: 0px solid #cccccc;
 	color: inherit;
 }
 body #flexicontent .flexi.label,
 body #flexicontent .desc-title.label {
-	background-color: #999999;
-	color: #ffffff;
-	border-radius: 3px;
+	background-color: rgba(255,255,255,0);
+	color: #000000;
+	border-radius: 0px;
 	padding: 0;
 	font-weight: bold;
 }
 body #flexicontent ul.tabbernav > li a {
 	background-color: #e4f1f8;
-	color: #ffffff;
+	color: #3093c7;
 }
 body #flexicontent ul.tabbernav > li.tabberactive a::before {
 	border-top: 4px solid #3093c7;
@@ -51,7 +51,7 @@ body .tabbertab,
 }
 body ul.tabbernav,
 #flexicontent ul.tabbernav {
-	border-bottom: 1px solid inherit !important;
+	border-bottom: 1px solid #cccccc !important;
 }
 div#fc_subtitle_tabset,
 div#fc_bottom_tabset {
@@ -59,7 +59,7 @@ div#fc_bottom_tabset {
 	margin-bottom: 40px !important;
 }
 body .flexi.infoblock {
-	padding: 10;
+	padding: 10px 10px 10px 10px;
 }
 .flexi.lineinfo {
 	display: flex;
@@ -98,10 +98,10 @@ body .flexi.infoblock {
 	outline: none;
 }
 .topblock .flexi.infoblock {
-	border-radius: 0px;
-	border: 1px solid inherit;
+	border-radius: 5px;
+	border: 1px solid #cccccc;
 	color: inherit;
-	background-color: inherit;
+	background-color: transparent;
 }
 .flexi.topblock ul {
 	padding: 0;
@@ -109,10 +109,10 @@ body .flexi.infoblock {
 }
 .flexi.bottomblock.infoblock {
 	border-radius: 0px;
-	border: 1px solid inherit;
-	color: inherit;
-	background-color: inherit;
-	padding: 10;
+	border: 0px solid #cccccc;
+	color: #cccccc;
+	background-color: #ffffff;
+	padding: 0;
 }
 .flexi.infoblock {
 	border: 1px solid silver;

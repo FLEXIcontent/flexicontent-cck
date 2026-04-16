@@ -1,37 +1,46 @@
+/**************
+ * Small labels
+ **************/
 .flexicontent .label,
 .flexicontent .badge,
 .flexicontent span.label,
 .flexicontent label.label {
-	margin: 0px 0px 2px 2px;
-	display: inline-block;
+  margin: 0px 0px 2px 2px;
+  display: inline-block;
 }
 .label.highlight,
 .badge.highlight {
-	color: darkred;
+  color: darkred;
 }
+/*** theme update ***/
 #flexicontent .flexi .flexi.element {
-	margin: 0.2em 2% 0.2em 0% !important;
+  /*** reset margin arround field for better alignement in content ***/
+  margin: 0.2em 2% 0.2em 0% !important;
 }
+/*** correct title margin **/
 .contentheading {
-	display: inherit;
-	margin: 0 0 0.5em 0px;
+  display: inherit;
+  margin: 0 0 0.5em 0px;
 }
+/** markup **/
 #flexicontent .fc_markup.mu_has_text {
-	border-bottom: 0px solid #AAA;
-	border-right: 0px solid #AAA;
-	padding: 10px;
+  border-bottom: 0px solid #AAA;
+  border-right: 0px solid #AAA;
+  padding: 10px;
 }
 #flexicontent .fc_markup {
-	max-width: initial;
-	border-radius: 5px;
-	line-height: 100%;
-	border-width: 0px;
-	margin: 0px 6px 6px 0px;
-	padding: 0px;
-	background-color: #F2F2F2;
-	color: #555;
-	box-shadow: none;
+  max-width: initial;
+  border-radius: 5px;
+  line-height: 100%;
+  border-width: 0px;
+  margin: 0px 6px 6px 0px;
+  padding: 0px;
+  background-color: #F2F2F2;
+  color: #555;
+  box-shadow: none;
 }
+/*** end theme update ***/
+/** fix btn in front **/
 .fc_filter_html .btn[type="button"],
 .fcitem_readon .btn,
 button.btn.btn-light,
@@ -39,8 +48,8 @@ a.link.btn,
 a.direction.btn,
 button.btn.btn-highlight,
 .fc_filter_line.fc_clear_label.fc_filter_buttons_box .btn {
-	border: 1px solid #aaa;
-	background: #ccc;
+  border: 1px solid #aaa;
+  background: #ccc;
 }
 .fc_filter_html .btn[type="button"]:hover,
 .fcitem_readon .btn:hover,
@@ -49,52 +58,55 @@ a.link.btn:hover,
 a.direction.btn:hover,
 button.btn.btn-highlight:hover,
 .fc_filter_line.fc_clear_label.fc_filter_buttons_box .btn:hover {
-	border: 1px solid #797979;
-	background: #797979;
+  border: 1px solid #797979;
+  background: #797979;
 }
+/** fix form in front **/
+/** fix fields button **/
 .input-append .add-on,
 .input-prepend .add-on,
 #flexicontent .fc-xpended-btns > [class^="fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn),
 #flexicontent .fc-xpended-btns > [class*=" fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn),
 #flexicontent .fc-xpended-btns > .fcfield-button-add:not(.add-on):not(.input-group-addon) a {
-	height: 18px;
-	min-width: 16px;
-	border: 2px solid var(--template-bg-dark-20) !important;
-	text-align: center;
+  height: 18px;
+  min-width: 16px;
+  border: 2px solid var(--template-bg-dark-20) !important;
+  text-align: center;
 }
 .input-prepend.input-append .add-on:first-child,
 .input-prepend.input-append .btn:first-child {
-	margin-right: -6px !important;
-	border-radius: 3px 0 0 3px;
+  margin-right: -6px !important;
+  border-radius: 3px 0 0 3px;
 }
 .input-prepend.input-append .add-on:not(:first-child),
 .input-prepend.input-append .add-on:not(:first-child) > * {
-	border-top-right-radius: 3px !important;
-	border-bottom-right-radius: 3px !important;
+  border-top-right-radius: 3px !important;
+  border-bottom-right-radius: 3px !important;
 }
-#flexicontent #adminForm  div.input-append > *:not(:first-child):not(:last-child):not(.select2-container) {
-	margin-right: -6px !important;
+#flexicontent #adminForm div.input-append > *:not(:first-child):not(:last-child):not(.select2-container) {
+  margin-right: -6px !important;
 }
 #flexicontent div [class^="fcfield-"].fcfont-icon,
 #flexicontent div [class*=" fcfield-"].fcfont-icon,
 #flexicontent ul.fcfield-sortables > li [class^="fcfield-"].fcfont-icon,
 #flexicontent ul.fcfield-sortables > li [class*=" fcfield-"].fcfont-icon {
-	margin: 0px -6px -1px 0px !important;
-	background: none;
+  margin: 0px -6px -1px 0px !important;
+  background: none;
 }
 #flexicontent ul.fcfield-sortables > li > * {
-	vertical-align: middle !important;
+  vertical-align: middle !important;
 }
 #adminForm label.add-on.fc-lbl-short.addrint_autocomplete-lbl,
 #adminForm label.add-on.fc-lbl-short.addrint_marker_tolerance-lbl,
 #adminForm label.add-on.fc-lbl-short.addrint_zoom-lbl {
-	height: 42px !important;
+  height: 42px !important;
 }
+/** icon in button **/
 #flexicontent .fc-xpended-btns > [class^="fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn),
 #flexicontent .fc-xpended-btns > [class*=" fcfield-"]:not(.add-on):not(.input-group-addon):not(.btn),
 #flexicontent .fc-xpended-btns > .fcfield-button-add:not(.add-on):not(.input-group-addon) a,
 #flexicontent .buttons.btn-group > ul.dropdown-menu > li > span {
-	font-family: 'Roboto' !important;
+  font-family: 'Roboto' !important;
 }
 #flexicontent div div [class^="fcfield-"].fcfont-icon:before,
 #flexicontent div div [class*=" fcfield-"].fcfont-icon:before,
@@ -109,86 +121,93 @@ button.btn.btn-highlight:hover,
 #flexicontent div .fc_img_preview_btn.icon-search:after,
 #flexicontent div .fc_img_preview_btn.icon-search:before,
 #flexicontent div .fcfield-expand-view.fcfont-icon:before {
-	font-family: 'Font Awesome 5 Free', 'Font Awesome 6 Free' !important;
-	font-size: 1.4em;
+  font-family: 'Font Awesome 5 Free', 'Font Awesome 6 Free' !important;
+  font-size: 1.4em;
 }
 #flexicontent div .fa,
 #flexicontent div .fas,
 #flexicontent div [class*=" icon-"],
 #flexicontent div [class^="icon-"] {
-	font-family: 'Font Awesome 5 Free', 'Font Awesome 6 Free';
-	font-weight: 900;
+  font-family: 'Font Awesome 5 Free', 'Font Awesome 6 Free';
+  font-weight: 900;
 }
 #flexicontent div .fcfield-drag-handle.fcfont-icon:before {
-	content: "\f0b2";
+  content: "\f0b2";
 }
 #flexicontent div .fcfield-delvalue.fcfont-icon:before,
 #flexicontent div .fc_uploader_row_remove:before {
-	content: "\f2ed";
+  content: "\f2ed";
 }
 #flexicontent div .fcfield-disablevalue.fcfont-icon:before {
-	content: "\f146";
+  content: "\f146";
 }
 #flexicontent div .fcfield-insertvalue.fc_after.fcfont-icon:before {
-	content: "\f067";
-	font-size: 1em !important;
-	margin-right: 4px !important;
+  content: "\f067";
+  font-size: 1em !important;
+  margin-right: 4px !important;
 }
 #flexicontent div .fcfield-enablevalue.fcfont-icon:before {
-	content: "\f044";
+  content: "\f044";
 }
 #flexicontent div .fcfield-insertvalue.fc_before.fcfont-icon:before {
-	content: "\f3e5";
+  content: "\f3e5";
 }
 #flexicontent div .fcfield-insertvalue.fc_after.fcfont-icon:after {
-	content: "\f064";
+  content: "\f064";
 }
 #flexicontent div .fcfield-insertvalue.fc_before.fcfont-icon:after {
-	content: "\f067";
-	font-size: 1em !important;
-	margin-left: 4px !important;
+  content: "\f067";
+  font-size: 1em !important;
+  margin-left: 4px !important;
 }
 #flexicontent div .btn.fc_img_preview_btn.icon-search:after {
-	content: "\f00e";
-	font-size: 17px;
+  content: "\f00e";
+  font-size: 17px;
 }
 #flexicontent div .fcfield-uploadvalue.fcfont-icon:before {
-	content: "\f093";
+  content: "\f093";
 }
 #flexicontent div .fc-files-modal-link.fcfont-icon:before {
-	content: "\f002";
+  content: "\f002";
 }
 #flexicontent div .fcfield-clearvalue.fcfont-icon:before {
-	content: "\f00d";
+  content: "\f00d";
 }
 #flexicontent div .fcfield-addvalue.fcfont-icon:before {
-	content: "\f302";
+  content: "\f302";
 }
 #flexicontent div .fcfield-expand-view.fcfont-icon:before {
-	content: "\f337";
+  content: "\f337";
 }
 span.btn.btn-sm.toolbar.dropdown-toggle.dropdown-toggle-split.fcfield-addvalue.fcfont-icon.icon.icon- {
-	padding: 4px 7px 3px 4px !important;
+  padding: 4px 7px 3px 4px !important;
 }
+/*** fix calendar bouton **/
 .field-calendar .btn-primary {
-	margin-left: -5px !important;
-	margin-top: 0px !important;
+  /*border: 0 !important;*/
+  margin-left: -5px !important;
+  margin-top: 0px !important;
 }
+/** fix label in field **/
 label.add-on {
-	padding-right: 14px !important;
+  padding-right: 14px !important;
 }
+/** fix input address field **/
 .addrint_autocomplete.pac-target-input {
-	border: 1px solid var(--template-bg-dark-20);
+  border: 1px solid var(--template-bg-dark-20);
 }
 label.add-on.fc-lbl-short.addrint_autocomplete-lbl {
-	border: 1px solid var(--template-bg-dark-20) !important;
+  border: 1px solid var(--template-bg-dark-20) !important;
 }
 #flexicontent a.saveorder.btn.btn-small fa,
 #flexicontent a.saveorder.btn.btn-small .fas,
 #flexicontent a.saveorder.btn.btn-small [class*=" icon-"],
 #flexicontent a.saveorder.btn.btn-small [class^="icon-"] {
-	width: 1.2em !important;
+  width: 1.2em !important;
 }
+/**
+ * Fix color of inputs
+ */
 #flexicontent .select2-container .select2-choice,
 #flexicontent div#tags #input-tags,
 #flexicontent .fc-field-props-box .fc_preview_msg,
@@ -200,10 +219,13 @@ label.add-on.fc-lbl-short.addrint_autocomplete-lbl {
 #flexicontent form .fcfield_textval,
 #flexicontent .fc_filedata_txt,
 .select2-container-multi .select2-choices {
-	border: 1px solid #aaa !important;
-	border-radius: 4px;
-	padding: 5px;
+  border: 1px solid #aaa !important;
+  border-radius: 4px;
+  padding: 5px;
 }
+/**
+ * Fix input margins
+ */
 .controls *:not(.input-append):not(.input-prepend):not(.input-group) > input[type="text"]:not(.minicolors),
 .controls textarea,
 .controls fieldset.radio,
@@ -211,10 +233,10 @@ label.add-on.fc-lbl-short.addrint_autocomplete-lbl {
 .flexicontent textarea,
 .flexicontent fieldset.radio,
 .flexicontent fieldset.checkbox {
-	margin: 0;
+  margin: 0;
 }
 #flexicontent .flexicontent :not(.input-prepend):not(.input-append) > input[type="text"]:not(.minicolors) {
-	margin: 0 !important;
+  margin: 0 !important;
 }
 #flexicontent form div fieldset.panelform > fieldset,
 #flexicontent form div fieldset.panelform > div > div.input-append,
@@ -244,321 +266,340 @@ form div.container_fcfield > textarea,
 form div.container_fcfield > select,
 form div.container_fcfield > img,
 form div.container_fcfield > span {
-	margin: 0px !important;
+  margin: 0px !important;
 }
 #flexicontent input#input-tags {
-	margin: 0px !important;
+  margin: 0px !important;
 }
-.input-group>:not(:first-child):not(.dropdown-menu):not(.valid-tooltip):not(.valid-feedback):not(.invalid-tooltip):not(.invalid-feedback) {
-	margin-left: -3px;
+/** fix filter **/
+.input-group > :not(:first-child):not(.dropdown-menu):not(.valid-tooltip):not(.valid-feedback):not(.invalid-tooltip):not(.invalid-feedback) {
+  margin-left: -3px;
 }
 .flexicontent :not(.input-prepend):not(.input-append) > input[type="text"]:not(.minicolors) {
-	margin: 0px 2px 0px 2px;
+  margin: 0px 2px 0px 2px;
 }
 .fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_text_filter,
 .fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_field_filter,
 .fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_text_filter:focus,
 .fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_field_filter:focus {
-	border: 1px solid #aaa !important;
+  border: 1px solid #aaa !important;
 }
+/*/ fix filter module **/
 .mod_flexifilter_wrapper .fc_filter_html .select2-container-multi .select2-choices {
-	width: 100% !important;
+  width: 100% !important;
 }
 .mod_flexifilter_wrapper .select2-container-multi .select2-choices > li:first-child input.select2-input,
 .mod_flexifilter_wrapper .select2-container-multi.select2-dropdown-open .select2-choices > li:first-child input.select2-input,
 .select2-container-multi.select2-dropdown-open .select2-choices .select2-search-field input.select2-input.select2-focused {
-	min-width: 100% !important;
+  min-width: 100% !important;
 }
 .mod_flexifilter_wrapper .fc_filter_html .fc_text_filter,
 .mod_flexifilter_wrapper .fc_filter_html .fc_field_filter {
-	min-width: 100%;
-	width: 100%;
+  min-width: 100%;
+  width: 100%;
 }
 .mod_flexifilter_wrapper .fc_filter_html :not(.input-append):not(.input-prepend) > input.fc_field_filter {
-	border: 1px solid #aaa !important;
-	background-position-x: 100% !important;
+  border: 1px solid #aaa !important;
+  background-position-x: 100% !important;
 }
 .mod_flexifilter_wrapper .fc_filter_html .fc_text_filter.fc_iscalendar,
 .mod_flexifilter_wrapper .fc_filter_html .fc_field_filter.fc_iscalendar {
-	min-width: 80% !important;
+  min-width: 80% !important;
 }
 .mod_flexifilter_wrapper .fc_filter_html .fc_filter_element {
-	width: 100%;
+  width: 100%;
 }
 .fc_filter_html :not(.input-prepend):not(.input-append) > .fc_text_filter,
 .fc_filter_html :not(.input-prepend):not(.input-append) > .fc_field_filter {
-	font-size: 12px !important;
+  font-size: 12px !important;
 }
+/** fix search module **/
 .fc_filter_html input.btn.btn-success {
-	margin-left: -5px;
-	border-radius: 0px 5px 5px 0;
+  margin-left: -5px;
+  border-radius: 0px 5px 5px 0;
 }
 .mod_flexiadvsearch_wrapper input {
-	border-radius: 5px 0 0 5px;
-	border: 0;
+  border-radius: 5px 0 0 5px;
+  border: 0;
 }
 .fc_filter_html.fc_text_search input {
-	padding-left: 10px;
+  padding-left: 10px;
 }
 .fc_filter_html input.btn {
-	border-radius: 5px;
+  border-radius: 5px;
 }
 .fc_filter_html .select2-container .select2-search-field {
-	width: 100%;
+  width: 100%;
 }
+/** fix dropdown button need review**/
 span.btn.btn-sm.toolbar.dropdown-toggle.dropdown-toggle-split.fcfield-addvalue.fcfont-icon.icon.icon- {
-	display: table-cell;
-	left: 1px;
-	top: 0px;
+  display: table-cell;
+  left: 1px;
+  top: 0px;
 }
+/** fix selector relation field **/
 label#custom_agent_item_selector-lbl {
-	height: 36px !important;
+  height: 36px !important;
 }
+/** fix preview image field **/
 span.btn.fc_img_preview_btn.icon-search:before {
-	display: none;
+  display: none;
 }
 span.btn.fc_img_preview_btn.icon-search {
-	background: #fff;
-	width: 10px !important;
-	padding: 2px 5px !important;
+  background: #fff;
+  width: 10px !important;
+  padding: 2px 5px !important;
 }
+/** fix media field **/
 #flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox.fc-expanded .fc-xpended-btns {
-	display: flex !important;
+  display: flex !important;
 }
+/** fix edit button in front **/
 header.group.tool {
-	width: 100%;
+  width: 100%;
 }
 .fc_state_toggle_link,
 .fc_edit_link {
-	margin: 0;
-	background: #fff;
-	padding: 5px 10px;
+  margin: 0;
+  background: #fff;
+  padding: 5px 10px;
 }
 .statetoggler.fc_statebutton.btn.btn-small.hasTooltip {
-	padding: 0px !important;
+  padding: 0px !important;
 }
+/** placeholder fix **/
 #flexicontent ::placeholder,
 .mod_flexifilter_wrapper ::placeholder {
-	color: #000;
-	font-size: 12px;
+  color: #000;
+  font-size: 12px;
 }
+/** slider accordeon on category view **/
 #flexicontent #fcfilter_form_slider_category .accordion-item {
-	display: inline-grid !important;
-	border: 1px solid #ccc;
-	border-radius: 5px;
+  display: inline-grid !important;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
 .top-search #menu-sliders-filter .collapse,
 .fccategory .fc_filter_box .collapse {
-	position: initial;
-	z-index: 5;
+  position: initial;
+  z-index: 5;
 }
+/** form correction **/
 div#fc_approval_msg {
-	color: #084298;
-	background-color: #cfe2ff;
+  color: #084298;
+  background-color: #cfe2ff;
 }
 a.close {
-	float: right;
-	margin-top: -23px;
-	font-size: 26px !important;
-	text-decoration: none !important;
-	margin-right: -10px;
+  float: right;
+  margin-top: -23px;
+  font-size: 26px !important;
+  text-decoration: none !important;
+  margin-right: -10px;
 }
 .buttons.btn-group.dropdown {
-	background: #448344;
-	border-radius: 5px;
+  background: #448344;
+  border-radius: 5px;
 }
 fctoolbar.toolbar.btn.btn-sm.dropdown-item.btn-success.hasTooltip {
-	color: #fff;
+  color: #fff;
 }
 #fctoolbar joomla-toolbar-button > .toolbar + .dropdown-toggle,
 #toolbar joomla-toolbar-button > .toolbar + .dropdown-toggle,
 #fctoolbar .buttons.btn-group > .toolbar + .dropdown-toggle,
 #toolbar .buttons.btn-group > .toolbar + .dropdown-toggle {
-	margin-left: -5px !important;
+  margin-left: -5px !important;
 }
 .fctoolbar_side_placement #fctoolbar.btn-toolbar > *,
 #toolbar.btn-toolbar > * {
-	width: 100%;
+  width: 100%;
 }
 ul.dropdown-menu {
-	background: #fff !important;
-	color: #22262a !important;
-	box-shadow: 0 0 9px 0px #00000047 !important;
+  background: #fff !important;
+  color: #22262a !important;
+  box-shadow: 0 0 9px 0px #00000047 !important;
 }
 li fctoolbar.toolbar.btn.btn-sm.dropdown-item.btn-success.hasTooltip {
-	color: #22262a;
+  color: #22262a;
 }
 div#fctoolbar .buttons {
-	margin-right: 5px;
+  margin-right: 5px;
 }
 .fctoolbar_side_placement div#fctoolbar .buttons {
-	margin-bottom: 5px;
+  margin-bottom: 5px;
 }
 label#use_advsearch_options_lbl {
-	background: #ccc;
+  background: #ccc;
 }
+/*** filter view on column mode ***/
 #flexicontent .col-search .select2-container,
 .select2-container {
-	width: 100%;
-	min-width: 100%;
+  width: 100%;
+  min-width: 100%;
 }
 #flexicontent .fc_filter_html .input-append .select2-container .select2-choices {
-	display: flex;
-	width: 100% !important;
-	min-width: 100% !important;
-	max-width: 100% !important;
-	margin-bottom: 15px !important;
+  display: flex;
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+  margin-bottom: 15px !important;
 }
 #flexicontent .col-search button.btn.btn-success.button_go {
-	width: 50%;
+  width: 50%;
 }
 .fcfilter_form_module .fc_filter_line.fc_clear_label.fc_filter_buttons_box {
-	margin-top: 1rem;
+  margin-top: 1rem;
 }
+/** pagenav correction **/
 .fcpagenav.btn-group {
-	border: 0px solid #ccc;
-	border-radius: 3px;
-	width: 100% !important;
-	margin: initial !important;
-	padding-top: 10px !important;
-	display: flex;
-	flex-direction: row;
-	flex-wrap: wrap;
+  border: 0px solid #ccc;
+  border-radius: 3px;
+  width: 100% !important;
+  margin: initial !important;
+  padding-top: 10px !important;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
 }
 #flexicontent .fcpagenav.btn-group .btn {
-	line-height: inherit;
+  line-height: inherit;
 }
 .buttons.btn-group.fc-iblock.dropdown {
-	background: #fff;
-	border: 2px solid var(--template-bg-dark-20) !important;
+  background: #fff;
+  border: 2px solid var(--template-bg-dark-20) !important;
 }
+/*** correct input width ***/
 .fc_filter_line {
-	padding: 0px !important;
-	width: 100% !important;
+  padding: 0px !important;
+  width: 100% !important;
 }
+/** calendar in filter module **/
 .mod_flexifilter_wrapper .field-calendar .input-group {
-	align-items: stretch;
-	display: block;
-	flex-wrap: wrap;
-	position: relative;
-	width: 87%;
+  align-items: stretch;
+  display: block;
+  flex-wrap: wrap;
+  position: relative;
+  width: 87%;
 }
+/* More compact display */
 body div .form-horizontal .control-group,
 body div .control-group {
-	margin: 0 0 0 0;
+  margin: 0 0 0 0;
 }
+/** correction button group **/
 .fc_buttons.btn-group {
-	display: inline-flex;
+  display: inline-flex;
 }
+/** front filter **/
 .fc_filter .fc_filter_label,
 .fc_filter_line .fc_filter_label {
-	float: left !important;
-	display: initial !important;
-	color: initial !important;
-	background-color: initial !important;
-	border-width: 0px !important;
-	font-weight: normal !important;
-	font-size: initial !important;
-	text-align: initial !important;
-	border-radius: initial !important;
-	text-shadow: initial !important;
-	font-family: unset !important;
-	height: var(--ctrls-inp-height) !important;
-	min-height: var(--ctrls-inp-height) !important;
-	line-height: calc(var(--ctrls-inp-height) - 1px) !important;
-	padding: 0px 0px 0px 8px !important;
+  float: left !important;
+  display: initial !important;
+  color: initial !important;
+  background-color: initial !important;
+  border-width: 0px !important;
+  font-weight: normal !important;
+  font-size: initial !important;
+  text-align: initial !important;
+  border-radius: initial !important;
+  text-shadow: initial !important;
+  font-family: unset !important;
+  height: var(--ctrls-inp-height) !important;
+  min-height: var(--ctrls-inp-height) !important;
+  line-height: calc(var(--ctrls-inp-height) - 1px) !important;
+  padding: 0px 0px 0px 8px!important;
 }
 fieldset.fc_search_set legend .fc_legend_text.hasTooltip,
 fieldset.fc_filter_set legend .fc_legend_text.hasTooltip {
-	min-height: calc(var(--ctrls-inp-height) + 2px) !important;
-	top: 1px;
+  min-height: calc(var(--ctrls-inp-height) + 2px) !important;
+  top: 1px;
 }
 #flexicontent .item_total .fc_item_total_data {
-	padding: 0 8px 0px 0px !important;
-	line-height: var(--ctrls-inp-height) !important;
+  padding: 0 8px 0px 0px !important;
+  line-height: var(--ctrls-inp-height) !important;
 }
 .label.fc_orderby_level_lbl {
-	line-height: var(--ctrls-inp-height) !important;
-	padding-left: 10px !important;
+  line-height: var(--ctrls-inp-height) !important;
+  padding-left: 10px !important;
 }
 #flexicontent .item_total .fc_limit_box,
 #flexicontent .item_total .fc_orderby_box,
 #flexicontent .item_total .fc_clayout_box {
-	margin-top: 0px !important;
-	margin-bottom: 0px !important;
-	margin-left: 0px !important;
+  margin-top: 0px !important;
+  margin-bottom: 0px !important;
+  margin-left: 0px !important;
 }
 #flexicontent .item_total .fc_orderby_level_lbl,
 #flexicontent .item_total .fc_orderby_selector {
-	margin: 0 !important;
+  margin: 0 !important;
 }
 .plupload_button {
-	color: #fff !important;
-	font: normal 14px sans-serif !important;
-	padding: 8px !important;
-	margin-right: 4px;
-	background: #007db0 !important;
+  color: #fff !important;
+  font: normal 14px sans-serif !important;
+  padding: 8px !important;
+  margin-right: 4px;
+  background: #007db0 !important;
 }
 .plupload_add:before {
-	content: '\2b';
+  content: '\2b';
 }
 a.plupload_button.plupload_start {
-	background: #418d52 !important;
+  background: #418d52 !important;
 }
 .plupload_disabled,
 a.plupload_disabled:hover {
-	background: #1F3047 !important;
+  background: #1F3047 !important;
 }
 .btn-group .dropdown-menu {
-	width: max-content;
+  width: max-content;
 }
 #flexicontent.flexi_edit .input-group {
-	width: initial;
+  width: initial;
 }
 .fcfield_field_preview_box {
-	padding: 0 20px;
+  padding: 0 20px;
 }
 #flexicontent .fc-xpended-btns.btn,
 .btn {
-	border: 1px solid #aaa !important;
+  border: 1px solid #aaa !important;
 }
 #flexicontent .group.tool .btn:hover {
-	background: #ccc;
+  background: #ccc;
 }
 .statetoggler.fc_statebutton.btn.btn-small.hasTooltip {
-	border: none !important;
+  border: none !important;
 }
 .fcitems .statetoggler.fc_statebutton.btn.btn-small {
-	border: 1px solid #cfcfcf !important;
-	background: #ececec;
-	padding: 5px 10px !important;
+  border: 1px solid #cfcfcf !important;
+  background: #ececec;
+  padding: 5px 10px !important;
 }
-.view-item.task-edit  #fctoolbar.btn-toolbar > * .btn.btn-sm {
-	padding-top: 0 !important;
-	padding-bottom: 0 !important;
+.view-item.task-edit #fctoolbar.btn-toolbar > * .btn.btn-sm {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
 }
 .view-item.task-edit #fctoolbar.btn-toolbar > *,
 #fctoolbar.btn-toolbar > * > * {
-	font-size: initial !important;
+  font-size: initial !important;
 }
 #fctoolbar.btn-toolbar > *,
 #toolbar.btn-toolbar > * {
-	margin-top: 0px !important;
+  margin-top: 0px !important;
 }
 .view-item.task-edit .button-cancel.btn.btn-danger,
 .view-item.task-edit .toolbar.btn.btn-success {
-	margin-top: 0 !important;
-	padding-top: 0.5rem !important;
-	padding-bottom: 0.5rem !important;
+  margin-top: 0 !important;
+  padding-top: 0.5rem !important;
+  padding-bottom: 0.5rem !important;
 }
 fieldset.fc_search_set,
 fieldset.fc_filter_set {
-	margin: 0 !important;
-	padding: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
+/** simplier display of file **/
 .fcfile_name {
-	background: none;
-	border: 0;
-	margin: 0 !important;
-	padding: 0 !important;
+  background: none;
+  border: 0;
+  margin: 0!important;
+  padding: 0!important;
 }

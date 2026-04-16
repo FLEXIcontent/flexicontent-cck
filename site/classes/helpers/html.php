@@ -364,28 +364,34 @@ class flexicontent_html
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'lessphp'.DS.'lessc.inc.php');
 		$compiled = array();
 		$msg = ''; $error = false;
+		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
+		$compressLess = $cparams->get('compress_core_less', 1);
 
 		foreach ($stale as $in => $out)
 		{
 			// *** WARNING: Always create new object on every call, otherwise files needed more than one place, will may NOT be include
-			$less = new \FLEXIcontent\lessc();  // JLess($fname = null, new JLessFormatterJoomla);
-			$formater = new \FLEXIcontent\lessc_formatter_classic();
-			$formater->disableSingle = true;
-			$formater->breakSelectors = true;
-			$formater->assignSeparator = ": ";
-			$formater->selectorSeparator = ",";
-			$formater->indentChar="\t";
-			$less->setFormatter($formater);
+			$less = new \lessc();
+			if ($compressLess) {
+				$less->setFormatter('compressed');
+			}
+
+			// wikimedia/less.php nécessite les répertoires d'import explicites
+			$importDirs = array_merge(
+				array(dirname($path . $in) . DS),
+				$inc_paths,
+				array(JPATH_SITE . DS . 'components' . DS . 'com_flexicontent' . DS . 'assets' . DS . 'less' . DS)
+			);
+			$less->setImportDir($importDirs);
 
 			try
 			{
-				$wasCompiled = $less->compileFile($path.$in, $path.$out);  // $less->checkedCompile($path.$in, $path.$out);   // consider modification times
-				if ($wasCompiled)  $compiled[$in] = $out;
+				$wasCompiled = $less->compileFile($path.$in, $path.$out);
+				if ($wasCompiled) $compiled[$in] = $out;
 			}
 			catch (Exception $e)
 			{
 				$error = true;
-				if ($debug ||Factory::getApplication()->isClient('administrator'))Factory::getApplication()->enqueueMessage(
+				if ($debug || Factory::getApplication()->isClient('administrator')) Factory::getApplication()->enqueueMessage(
 					'- LESS to CSS halted ... CSS file was not changed ... please edit LESS file(s) find offending <strong>lines</strong> and fix or remove<br>'. str_replace($path.$in, '<br><strong>'.$path.$in.'</strong>', $e->getMessage()), 'notice'
 				);
 				continue;

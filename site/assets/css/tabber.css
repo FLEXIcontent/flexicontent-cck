@@ -1,263 +1,298 @@
+/*--------------------------------------------------
+  REQUIRED to hide the non-active tab content.
+  But do not hide them in the print stylesheet!
+  --------------------------------------------------*/
 .tabberlive .tabbertab {
-	transition: opacity 0.2s ease-in-out;
-	opacity: 1;
+  transition: opacity 0.2s ease-in-out;
+  opacity: 1;
 }
 .tabberlive .tabbertab.tabbertabhide {
-	display: none;
-	opacity: 0;
+  display: none;
+  opacity: 0;
 }
 .tabberlive .tabbertab.tabbertablow {
-	opacity: 1;
+  opacity: 1;
+  /*0.5*/
 }
+/*--------------------------------------------------
+  .fctabber = before the tabber interface is set up
+  .tabberlive = after the tabber interface is set up
+  --------------------------------------------------*/
 .tabberlive {
-	margin-top: 1em;
+  margin-top: 1em;
 }
+/* Tab handles list (Tab navigation list) */
 ul.tabbernav {
-	margin: 0;
-	padding: 3px 0;
-	border-bottom: 1px solid #778;
-	font: bold 12px Verdana, sans-serif;
+  margin: 0;
+  padding: 3px 0;
+  border-bottom: 1px solid #778;
+  font: bold 12px Verdana, sans-serif;
 }
+/* Tab handle container */
 ul.tabbernav > li {
-	list-style: none;
-	margin: 10px 2px 0px 2px;
-	display: inline-block;
-	white-space: nowrap;
+  list-style: none;
+  margin: 10px 2px 0px 2px;
+  display: inline-block;
+  white-space: nowrap;
 }
+/* Tab handle */
 ul.tabbernav > li > a {
-	padding: 3px 0.5em;
-	margin-left: 3px;
-	border: 1px solid #778;
-	border-bottom: none;
-	background: #DDE;
-	text-decoration: none;
-	font-size: 11px;
+  padding: 3px 0.5em;
+  margin-left: 3px;
+  border: 1px solid #778;
+  border-bottom: none;
+  background: #DDE;
+  text-decoration: none;
+  font-size: 11px;
 }
 ul.tabbernav > li > a [class^="icon-"],
 ul.tabbernav > li > a [class*=" icon-"] {
-	font-size: 18px;
-	padding-top: 8px;
-	vertical-align: top;
+  font-size: 18px;
+  padding-top: 8px;
+  vertical-align: top;
 }
+/* Tab handle active */
 ul.tabbernav > li.tabberactive a {
-	background-color: #fff;
-	border-bottom: 1px solid #fff;
+  background-color: #fff;
+  border-bottom: 1px solid #fff;
 }
+/* Tab active handle (hover) */
 ul.tabbernav > li.tabberactive a:hover {
-	color: #000;
-	background-color: #fff;
-	border-bottom: 1px solid white;
+  color: #000;
+  background-color: #fff;
+  border-bottom: 1px solid white;
 }
+/* Tab contents container */
 .tabberlive .tabbertab {
-	background: #fff;
-	padding: 5px;
-	border: 1px solid #aaa;
-	border-left: 1px solid #b2bfcd;
-	border-right: 1px solid #b2bfcd;
-	border-bottom: 1px solid #b2bfcd;
-	border-top: 0;
-	opacity: 1;
-	transition: opacity 0.29s;
-	transition-timing-function: ease-in;
+  background: #fff;
+  padding: 5px;
+  border: 1px solid #aaa;
+  border-left: 1px solid #b2bfcd;
+  border-right: 1px solid #b2bfcd;
+  border-bottom: 1px solid #b2bfcd;
+  border-top: 0;
+  opacity: 1;
+  transition: opacity 0.29s;
+  transition-timing-function: ease-in;
 }
+/* Hide the heading since a heading is provided by the tab handle (navigation) */
 .tabberlive .tabbertab h2.tabberheading,
 .tabberlive .tabbertab h3.tabberheading,
 .tabberlive .tabbernav .tabberheading.hidden {
-	display: none !important;
+  display: none !important;
+  /* strict (FORCED) hidding */
 }
+/* Example of using an ID to set different styles for the tabs on the page */
+/***********************************************
+ * Rules for basic tabbing in flexicontent views
+ ***********************************************/
 body .tabberlive,
 #flexicontent .tabberlive {
-	margin: 0px 0px 6px 0px;
-	padding: 0px;
-	width: 100%;
-	float: none;
-	border-width: 0px;
+  margin: 0px 0px 6px 0px;
+  padding: 0px;
+  width: 100%;
+  float: none;
+  border-width: 0px;
 }
 body .tabbertab,
 #flexicontent .tabbertab {
-	margin: 0px;
-	padding: 5px 1% 3px 1%;
-	width: 100%;
-	box-sizing: border-box;
-	float: none;
+  margin: 0px;
+  padding: 5px 1% 3px 1%;
+  width: 100%;
+  box-sizing: border-box;
+  float: none;
 }
 body .fctabber,
 #flexicontent .fctabber {
-	overflow: visible;
-	width: 5000px;
+  overflow: visible;
+  width: 5000px;
 }
 body ul.tabbernav,
 #flexicontent ul.tabbernav {
-	line-height: 100%;
-	border-bottom: 1px solid #cccccc;
-	border-left: 0px solid transparent;
-	border-right: 2px solid transparent;
-	font: bold 11px Verdana, sans-serif;
-	margin: 0;
-	padding: 0px 1% 0px 0%;
-	width: 100%;
-	box-sizing: border-box;
-	display: inline-block;
-	float: none;
+  line-height: 100%;
+  border-bottom: 1px solid #cccccc;
+  border-left: 0px solid transparent;
+  border-right: 2px solid transparent;
+  font: bold 11px Verdana, sans-serif;
+  margin: 0;
+  padding: 0px 1% 0px 0%;
+  width: 100%;
+  box-sizing: border-box;
+  display: inline-block;
+  float: none;
 }
 body ul.tabbernav > li,
 #flexicontent ul.tabbernav > li {
-	line-height: 100%;
-	padding: 0px;
-	margin: 0px 0px -1px 0px;
-	overflow: visible;
-	display: inline-block;
-	float: none;
-	background: #83838326;
+  line-height: 100%;
+  padding: 0px;
+  margin: 0px 0px -1px 0px;
+  overflow: visible;
+  display: inline-block;
+  float: none;
+  background: #83838326;
 }
 body ul.tabbernav > li > a,
 #flexicontent ul.tabbernav > li > a {
-	font-family: arial, helvetica, sans-serif;
-	text-decoration: none;
-	line-height: 220%;
-	font-size: 14px;
-	margin: 0px;
-	padding: .5rem 1rem !important;
-	display: inline-block;
-	border-radius: 0px;
-	border-left: 1px solid #D0D0D0;
-	border-top: 1px solid #B0B0B0;
-	border-right: 1px solid #808080;
-	border-bottom: 1px solid #808080;
-	font-weight: normal;
-	color: #3071a9;
-	border: 1px solid #25729a;
-	border-color: transparent;
-	background-color: transparent;
-	border-bottom-width: 0;
+  font-family: arial, helvetica, sans-serif;
+  text-decoration: none;
+  line-height: 220%;
+  font-size: 14px;
+  margin: 0px;
+  padding: 0.5rem 1rem !important;
+  display: inline-block;
+  border-radius: 0px;
+  border-left: 1px solid #D0D0D0;
+  border-top: 1px solid #B0B0B0;
+  border-right: 1px solid #808080;
+  border-bottom: 1px solid #808080;
+  /*text-shadow: -1px -1px 0 rgba(0,0,0,0.3);*/
+  font-weight: normal;
+  color: #3071a9;
+  /*#FFFFFF;*/
+  border: 1px solid #25729a;
+  border-color: transparent;
+  background-color: transparent;
+  /*background-color: #3093c7;
+	background-image: linear-gradient(to bottom,#3093c7,#1c5a85);*/
+  border-bottom-width: 0;
 }
 body ul.tabbernav > li:hover a,
 #flexicontent ul.tabbernav > li:hover a {
-	opacity: 1;
-	color: #FFFFFF;
-	border: 1px solid #1c5675;
-	background-color: #26759e;
-	background-image: linear-gradient(to bottom,#26759e,#133d5b);
-	border-bottom-width: 0;
+  opacity: 1;
+  color: #FFFFFF;
+  border: 1px solid #1c5675;
+  background-color: #26759e;
+  background-image: linear-gradient(to bottom, #26759e, #133d5b);
+  border-bottom-width: 0;
 }
 body ul.tabbernav > li.tabberactive a,
 body ul.tabbernav > li.tabberactive a:hover,
 #flexicontent ul.tabbernav > li.tabberactive a,
 #flexicontent ul.tabbernav > li.tabberactive a:hover {
-	color: black;
-	background-color: white;
-	background-image: none;
-	border-bottom: 0px solid white;
-	border-left: 1px solid #D0D0D0;
-	border-top: 1px solid #B0B0B0;
-	border-right: 1px solid #808080;
-	text-shadow: none;
-	position: relative;
+  color: black;
+  background-color: white;
+  background-image: none;
+  border-bottom: 0px solid white;
+  border-left: 1px solid #D0D0D0;
+  border-top: 1px solid #B0B0B0;
+  border-right: 1px solid #808080;
+  text-shadow: none;
+  position: relative;
 }
 body ul.tabbernav > li.tabberactive a:before,
 #flexicontent ul.tabbernav > li.tabberactive a:before {
-	content: "";
-	position: absolute;
-	height: 0px;
-	border-top: 4px solid #26759e;
-	top: 0;
-	left: 0px;
-	width: 100%;
-	border-radius: 0px;
+  content: "";
+  position: absolute;
+  height: 0px;
+  border-top: 4px solid #26759e;
+  top: 0;
+  left: 0px;
+  width: 100%;
+  border-radius: 0px;
 }
+/* Inline tabber, e.g. multi-language properties in tabs */
 body .tabber-inline ul.tabbernav > li > a,
 #flexicontent .tabber-inline ul.tabbernav > li > a {
-	padding-top: 0px;
-	padding-bottom: 1px;
+  padding-top: 0px;
+  padding-bottom: 1px;
 }
+/* Gray tabber */
 body .s-gray ul.tabbernav > li > a,
 #flexicontent .s-gray ul.tabbernav > li > a {
-	color: #808080;
-	border: 1px solid #838383;
-	border-color: transparent;
-	border-bottom-width: 0;
+  color: #808080;
+  /*#FFFFFF;*/
+  border: 1px solid #838383;
+  border-color: transparent;
+  /*background-color: #909090;
+	background-image: linear-gradient(to bottom,#909090,#707070);*/
+  border-bottom-width: 0;
 }
 body .s-gray ul.tabbernav > li:hover a,
 #flexicontent .s-gray ul.tabbernav > li:hover a {
-	color: #FFFFFF;
-	border: 1px solid #707070;
-	background-color: #7a7a7a;
-	background-image: linear-gradient(to bottom,#7a7a7a,#5a5a5a);
-	border-bottom-width: 0;
+  color: #FFFFFF;
+  border: 1px solid #707070;
+  background-color: #7a7a7a;
+  background-image: linear-gradient(to bottom, #7a7a7a, #5a5a5a);
+  border-bottom-width: 0;
 }
 body .s-gray ul.tabbernav > li.tabberactive a,
 body .s-gray ul.tabbernav > li.tabberactive a:hover,
 #flexicontent .s-gray ul.tabbernav > li.tabberactive a,
 #flexicontent .s-gray ul.tabbernav > li.tabberactive a:hover {
-	color: black;
-	background-color: white;
-	background-image: none;
-	border-bottom: 0px solid white;
-	border-left: 1px solid #909090;
-	border-top: 1px solid #757575;
-	border-right: 1px solid #5a5a5a;
-	text-shadow: none;
-	position: relative;
+  color: black;
+  background-color: white;
+  background-image: none;
+  border-bottom: 0px solid white;
+  border-left: 1px solid #909090;
+  border-top: 1px solid #757575;
+  border-right: 1px solid #5a5a5a;
+  text-shadow: none;
+  position: relative;
 }
 body .s-gray ul.tabbernav > li.tabberactive a:before,
 #flexicontent .s-gray ul.tabbernav > li.tabberactive a:before {
-	content: "";
-	position: absolute;
-	height: 1px;
-	border-top: 4px solid #808080;
-	top: 0;
-	left: 0px;
-	width: 100%;
-	border-radius: 2px;
+  content: "";
+  position: absolute;
+  height: 1px;
+  border-top: 4px solid #808080;
+  top: 0;
+  left: 0px;
+  width: 100%;
+  border-radius: 2px;
 }
+/* C-blue tabber */
 body .s-cblue ul.tabbernav > li > a,
 #flexicontent .s-cblue ul.tabbernav > li > a {
-	color: #3071a9;
-	border: 1px solid #3377bb;
-	border-color: transparent;
-	border-bottom-width: 0;
+  color: #3071a9;
+  /*#FFFFFF;*/
+  border: 1px solid #3377bb;
+  border-color: transparent;
+  /*background-color: #5599dd;
+	background-image: linear-gradient(to bottom,#5599dd,#3377bb);*/
+  border-bottom-width: 0;
 }
 body .s-cblue ul.tabbernav > li:hover a,
 #flexicontent .s-cblue ul.tabbernav > li:hover a {
-	color: #FFFFFF;
-	border: 1px solid #225599;
-	background-color: #3377bb;
-	background-image: linear-gradient(to bottom,#3377bb,#225599);
-	border-bottom-width: 0;
+  color: #FFFFFF;
+  border: 1px solid #225599;
+  background-color: #3377bb;
+  background-image: linear-gradient(to bottom, #3377bb, #225599);
+  border-bottom-width: 0;
 }
 body .s-cblue ul.tabbernav > li.tabberactive a,
 body .s-cblue ul.tabbernav > li.tabberactive a:hover,
 #flexicontent .s-cblue ul.tabbernav > li.tabberactive a,
 #flexicontent .s-cblue ul.tabbernav > li.tabberactive a:hover {
-	color: black;
-	background-color: white;
-	background-image: none;
-	border-bottom: 0px solid white;
-	border-left: 1px solid #b2bfcd;
-	border-top: 1px solid #b2bfcd;
-	border-right: 1px solid #b2bfcd;
-	text-shadow: none;
-	position: relative;
+  color: black;
+  background-color: white;
+  background-image: none;
+  border-bottom: 0px solid white;
+  border-left: 1px solid #b2bfcd;
+  border-top: 1px solid #b2bfcd;
+  border-right: 1px solid #b2bfcd;
+  text-shadow: none;
+  position: relative;
 }
 body .s-cblue ul.tabbernav > li.tabberactive a:before,
 #flexicontent .s-cblue ul.tabbernav > li.tabberactive a:before {
-	content: "";
-	position: absolute;
-	height: 1px;
-	border-top: 4px solid #5599dd;
-	top: 0;
-	left: 0px;
-	width: 100%;
-	border-radius: 0px;
+  content: "";
+  position: absolute;
+  height: 1px;
+  border-top: 4px solid #5599dd;
+  top: 0;
+  left: 0px;
+  width: 100%;
+  border-radius: 0px;
 }
+/* Customize tabber containers */
 body div.tabberlive:not(.tabber-inline):not(.fcparams_tabset) {
-	margin-top: 10px;
+  margin-top: 10px;
 }
 body div.tabberlive.fcparams_tabset,
 body .tab-pane.active > div > div.tabberlive:not(.tabber-inline) {
-	margin-top: 0px;
+  margin-top: 0px;
 }
 body .tabberlive.fcparams_tabset .tabbertab:not(.fcperms_tab),
 body #flexicontent .tabberlive.fcparams_tabset .tabbertab:not(.fcperms_tab) {
-	padding: 16px;
+  padding: 16px;
 }

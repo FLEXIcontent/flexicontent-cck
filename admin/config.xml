@@ -190,6 +190,11 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 
+			<field name="compress_core_less" type="fcradio" default="0" label="FLEXI_COMPRESS_CORE_LESS" description="FLEXI_COMPRESS_CORE_LESS_DESC" class="btn-group btn-group-yesno">
+    			<option value="0">FLEXI_NO</option>
+    			<option value="1">FLEXI_YES</option>
+			</field>
+
 
 		<field name="" type="separator" default="FLEXI_USAGE_DEBUG" label="" level="level0" />
 

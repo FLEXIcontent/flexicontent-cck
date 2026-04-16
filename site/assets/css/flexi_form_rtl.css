@@ -1,16 +1,21 @@
+/*******************************
+ * Input / select / form styling
+ *******************************/
 .flexicontent :not(.input-prepend):not(.input-append) > input[type="text"]:not(.minicolors) {
-	display: inline-block;
-	margin: 0px 2px 1px 2px;
+  display: inline-block;
+  margin: 0px 2px 1px 2px;
+  /*padding: 4px 2px 5px;*/
+  /*border-radius: 4px;*/
 }
 .flexicontent *:not(.input-append):not(.input-prepend):not(.input-group) > div.use_select2_lib {
-	margin: 0px 2px 1px 2px;
+  margin: 0px 2px 1px 2px;
 }
 .flexicontent *:not(.input-append):not(.input-prepend):not(.input-group) > select:not(.custom-select) {
-	display: inline-block;
-	margin: 0px 2px 1px 2px;
-	padding: 4px;
-	border-radius: 4px;
-	height: auto;
+  display: inline-block;
+  margin: 0px 2px 1px 2px;
+  padding: 4px;
+  border-radius: 4px;
+  height: auto;
 }
 .controls *:not(.input-append):not(.input-prepend):not(.input-group) > input[type="text"]:not(.minicolors),
 .controls textarea,
@@ -19,490 +24,548 @@
 .flexicontent textarea,
 .flexicontent fieldset.radio,
 .flexicontent fieldset.checkbox {
-	margin: 1px 2px 1px 2px;
+  margin: 1px 2px 1px 2px;
 }
 .flexicontent form {
-	margin: 0px;
-	padding: 0px;
+  margin: 0px;
+  padding: 0px;
 }
 body #flexicontent .control-label {
-	padding-top: 0 !important;
-	max-width: 160px;
+  padding-top: 0 !important;
+  max-width: 160px;
 }
 body #flexicontent .control-label > label {
-	white-space: initial;
+  white-space: initial;
 }
 body #flexicontent .control-label.fclabel_cleared {
-	float: none;
-	margin: 0;
+  float: none;
+  margin: 0;
 }
 body #flexicontent .control-label.fclabel_cleared > label {
-	display: inline;
-	text-align: right;
+  display: inline;
+  text-align: right;
 }
 body label.fc-prop-lbl,
 body span.fc-prop-lbl,
 body #flexicontent label.fc-prop-lbl,
 body #flexicontent span.fc-prop-lbl {
-	font-family: "Trebuchet MS", Verdana, Helvetica, Arial;
-	font-size: 13px;
-	color: #040507;
+  font-family: "Trebuchet MS", Verdana, Helvetica, Arial;
+  font-size: 13px;
+  color: #040507;
 }
 .fc-label-num1:after {
-	content: " 1";
+  content: " 1";
 }
 .fc-label-num2:after {
-	content: " 2";
+  content: " 2";
 }
 .fc-label-num3:after {
-	content: " 3";
+  content: " 3";
 }
 .fc-label-num4:after {
-	content: " 4";
+  content: " 4";
 }
 .fc-label-num5:after {
-	content: " 5";
+  content: " 5";
 }
 .fc-label-num6:after {
-	content: " 6";
+  content: " 6";
 }
 .fc-label-num7:after {
-	content: " 7";
+  content: " 7";
 }
 .fc-label-num8:after {
-	content: " 8";
+  content: " 8";
 }
 .fc-label-num9:after {
-	content: " 9";
+  content: " 9";
 }
 .fc-label-num10:after {
-	content: " 10";
+  content: " 10";
 }
+/*****************************************
+ * Checkbox / Radio styling (and hide them)
+ *****************************************/
+/* Labels with these classes must have input/select placed inside them */
 #flexicontent .fcradiocheckimage label.fccheckradio_lbl {
-	vertical-align: unset !important;
+  vertical-align: unset !important;
 }
 label.fccheckradio_lbl,
 span.fcselect_lbl {
-	display: inline-block;
-	white-space: nowrap;
-	padding-left: 8px;
-	min-width: 0px;
-	margin: 0px 0px 0px 2px;
-	float: none;
-	clear: none;
+  display: inline-block;
+  white-space: nowrap;
+  padding-left: 8px;
+  min-width: 0px;
+  margin: 0px 0px 0px 2px;
+  float: none;
+  clear: none;
 }
+/* J3.x styles for radio button sets */
 .flexicontent span.radio {
-	white-space: normal !important;
-	display: inline-block !important;
-	padding: 0px !important;
+  white-space: normal !important;
+  display: inline-block !important;
+  padding: 0px !important;
 }
 .flexicontent label.radio {
-	white-space: nowrap !important;
-	width: auto !important;
-	display: inline-block !important;
-	padding: 0px 4px 0px 0px !important;
-	margin: 0px !important;
+  white-space: nowrap !important;
+  width: auto !important;
+  display: inline-block !important;
+  padding: 0px 4px 0px 0px !important;
+  margin: 0px !important;
 }
+/* Hide input field, but exclude input inside labels (graceful fallback for older browsers) */
 .group-fcset input,
 input[type="checkbox"].fc_checkradio,
 input[type="radio"].fc_checkradio {
-	width: 24px !important;
-	margin: 0 !important;
-	padding: 0 !important;
-	opacity: 0 !important;
-	display: none !important;
+  width: 24px !important;
+  /*width: 19px !important;*/
+  margin: 0 !important;
+  padding: 0 !important;
+  opacity: 0 !important;
+  display: none !important;
 }
 .group-fcset label input,
 label input[type="checkbox"].fc_checkradio,
 label input[type="radio"].fc_checkradio {
-	width: auto !important;
-	margin: 3px 3px 0px 0px !important;
-	padding: unset !important;
-	opacity: inherit !important;
-	display: inline !important;
-	vertical-align: bottom !important;
+  width: auto !important;
+  margin: 3px 3px 0px 0px !important;
+  padding: unset !important;
+  opacity: inherit !important;
+  display: inline !important;
+  vertical-align: bottom !important;
 }
+/* Style the label to also include the checkbox, radio */
 div.select2-drop.select2-drop-multi li.select2-result-selectable > .select2-result-label,
 .group-fcset input + label,
 input[type="checkbox"].fc_checkradio + label,
 input[type="radio"].fc_checkradio + label {
-	display: inline-block !important;
-	margin: 1px 12px 1px 0px;
-	padding: 0px 24px 0px 0px !important;
-	line-height: 22px !important;
-	height: 22px !important;
-	text-align: right !important;
-	min-width: 1px !important;
-	cursor: pointer !important;
-	color: #333;
+  display: inline-block !important;
+  margin: 1px 12px 1px 0px;
+  padding: 0px 24px 0px 0px !important;
+  line-height: 22px !important;
+  height: 22px !important;
+  text-align: right !important;
+  min-width: 1px !important;
+  cursor: pointer !important;
+  color: #333;
+  /*margin-right: -19px !important;
+	padding-right: 19px !important;
+	line-height: 19px !important;
+	height: 19px !important;*/
 }
 div.select2-drop.select2-drop-multi li.select2-result-selectable > .select2-result-label {
-	width: 100% !important;
-	box-sizing: border-box !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
 div.select2-drop.select2-drop-multi li.select2-result.select2-disabled > .select2-result-label,
 .group-fcset input[type="checkbox"]:disabled + label,
 input[type="checkbox"].fc_checkradio:disabled + label {
-	background-position: 100% 0 !important;
-	font-style: italic !important;
-	cursor: default !important;
-	opacity: 0.6 !important;
+  background-position: 100% 0 !important;
+  font-style: italic !important;
+  cursor: default !important;
+  opacity: 0.6 !important;
 }
 .group-fcset input[type="radio"]:disabled + label,
 input[type="radio"].fc_checkradio:disabled + label {
-	background-position: 100% -72px !important;
-	font-style: italic !important;
-	color: gray !important;
-	cursor: default !important;
-	opacity: 0.6 !important;
+  background-position: 100% -72px !important;
+  font-style: italic !important;
+  color: gray !important;
+  cursor: default !important;
+  opacity: 0.6 !important;
 }
 div.select2-drop.select2-drop-multi li.select2-result-selectable > .select2-result-label,
 .group-fcset input[type="checkbox"] + label,
 input[type="checkbox"].fc_checkradio + label {
-	background: url(../images/checks2.png) no-repeat 100% 0 !important;
+  background: url(../images/checks2.png) no-repeat 100% 0 !important;
 }
 .group-fcset input[type="radio"] + label,
 input[type="radio"].fc_checkradio + label {
-	background: url(../images/checks2.png) no-repeat 100% -72px !important;
+  background: url(../images/checks2.png) no-repeat 100% -72px !important;
 }
 .group-fcset input[type="checkbox"] + label.green,
 input[type="checkbox"].fc_checkradio + label.green {
-	background: url(../images/checks3.png) no-repeat 100% 0 !important;
+  background: url(../images/checks3.png) no-repeat 100% 0 !important;
 }
 .group-fcset input[type="radio"] + label.green,
 input[type="radio"].fc_checkradio + label.green {
-	background: url(../images/checks3.png) no-repeat 100% -72px !important;
+  background: url(../images/checks3.png) no-repeat 100% -72px !important;
 }
 .group-fcset label.green.single,
 .fc_checkradio + label.green.single {
-	padding-right: 18px !important;
-	margin: 0px !important;
+  padding-right: 18px !important;
+  margin: 0px !important;
 }
+/* Style the checked versions of checkbox,radio */
 div.select2-drop.select2-drop-multi li.select2-result.select2-selected-visible > .select2-result-label,
 .group-fcset input[type="checkbox"]:checked + label,
 input[type="checkbox"].fc_checkradio:checked + label {
-	background-position: 100% -24px !important;
+  background-position: 100% -24px !important;
+  /*background-position: 100% -19px !important;*/
 }
 .group-fcset input[type="radio"]:checked + label,
 input[type="radio"].fc_checkradio:checked + label {
-	background-position: 100% -48px !important;
+  background-position: 100% -48px !important;
+  /*background-position: 100% -57px !important;*/
 }
 .group-fcset input,
 input[type="checkbox"].fc_checkradio,
 input[type="checkbox"].fc_checkradio:focus,
 input[type="radio"].fc_checkradio,
 input[type="radio"].fc_checkradio:focus {
-	border: 0px !important;
+  border: 0px !important;
 }
+/* Styling for radio/checkboxes , for browser not supporting above, e.g. ie8,ie9) */
 .group-fcset input,
 input.fc_checkradio {
-	margin: 0px 4px 3px 4px;
-	padding: 0px;
-	vertical-align: bottom;
-	position: relative;
-	top: -1px;
+  margin: 0px 4px 3px 4px;
+  padding: 0px;
+  vertical-align: bottom;
+  position: relative;
+  top: -1px;
 }
+/* Fix CSS rule that assumes input is always inside the label */
 .flexicontent input[type="radio"] + label:not(.btn),
 .flexicontent input[type="checkbox"] + label:not(.btn) {
-	display: unset;
-	margin-left: 0.5em;
+  display: unset;
+  margin-left: 0.5em;
 }
+/* Styling for radio/checkboxes lists */
 .fc_input_set {
-	display: inline-block;
-	vertical-align: top;
-	padding: 2px;
-	border: 1px solid rgba(255,255,255,0.01);
-	-webkit-background-clip: padding-box;
-	background-clip: padding-box;
+  display: inline-block;
+  vertical-align: top;
+  padding: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.01);
+  -webkit-background-clip: padding-box;
+  /* for Safari */
+  background-clip: padding-box;
+  /* for IE9+, Firefox 4+, Opera, Chrome */
 }
 .fc_input_set.fc_prompt {
-	float: right;
-	font-weight: normal;
+  float: right;
+  font-weight: normal;
 }
 div.fc_checkradio_group_wrapper {
-	display: inline-block;
-	float: right;
-	clear: both;
-	margin: 0px;
-	padding: 0px;
-	overflow-y: auto;
-	overflow-x: visible;
-	height: auto;
-	max-height: 220px;
+  display: inline-block;
+  float: right;
+  clear: both;
+  margin: 0px;
+  padding: 0px;
+  overflow-y: auto;
+  overflow-x: visible;
+  height: auto;
+  max-height: 220px;
 }
 ul.fc_checkradio_group,
 li.fc_checkradio_option {
-	padding: 0px;
-	margin: 0px;
-	background: none transparent;
+  padding: 0px;
+  margin: 0px;
+  background: none transparent;
 }
 ul.fc_checkradio_group {
-	list-style-type: none;
-	display: block;
-	clear: both;
+  list-style-type: none;
+  display: block;
+  clear: both;
 }
 li.fc_checkradio_option {
-	white-space: nowrap;
-	display: inline-block;
-	margin-top: 1px;
-	margin-bottom: 1px;
-	vertical-align: top;
+  white-space: nowrap;
+  display: inline-block;
+  /* auto-hide do not force display */
+  margin-top: 1px;
+  margin-bottom: 1px;
+  vertical-align: top;
 }
+/**********************************************************
+ * ALTERNATIVE display like a bar (use 'fc_checkradio_bar')
+/**********************************************************/
+/* Style the label to also include the checkbox, radio */
 input[type="checkbox"].fc_checkradio_bar + label,
 input[type="radio"].fc_checkradio_bar + label {
-	display: inline-block !important;
-	margin: -2px !important;
-	padding: 4px 12px !important;
-	margin-bottom: 0 !important;
-	font-size: 14px !important;
-	line-height: 20px !important;
-	color: #333 !important;
-	text-align: center !important;
-	text-shadow: 0 1px 1px rgba(255,255,255,0.75) !important;
-	vertical-align: middle !important;
-	cursor: pointer !important;
-	background-color: #f5f5f5 !important;
-	background-image: linear-gradient(to bottom,#fff,#e6e6e6) !important;
-	background-repeat: repeat-x !important;
-	border: 1px solid #ccc !important;
-	border-color: #e6e6e6 #e6e6e6 #bfbfbf !important;
-	border-color: rgba(0,0,0,0.1) rgba(0,0,0,0.1) rgba(0,0,0,0.25) !important;
-	border-bottom-color: #b3b3b3 !important;
-	box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 1px 2px rgba(0,0,0,0.05) !important;
+  display: inline-block !important;
+  margin: -2px !important;
+  padding: 4px 12px !important;
+  margin-bottom: 0 !important;
+  font-size: 14px !important;
+  line-height: 20px !important;
+  color: #333 !important;
+  text-align: center !important;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75) !important;
+  vertical-align: middle !important;
+  cursor: pointer !important;
+  background-color: #f5f5f5 !important;
+  background-image: linear-gradient(to bottom, #fff, #e6e6e6) !important;
+  background-repeat: repeat-x !important;
+  border: 1px solid #ccc !important;
+  border-color: #e6e6e6 #e6e6e6 #bfbfbf !important;
+  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25) !important;
+  border-bottom-color: #b3b3b3 !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05) !important;
 }
+/* Style the checked versions of checkbox,radio */
 input[type="checkbox"].fc_checkradio_bar:checked + label,
 input[type="radio"].fc_checkradio_bar:checked + label {
-	background-image: none !important;
-	outline: 0 !important;
-	box-shadow: inset 0 2px 4px rgba(0,0,0,0.15), 0 1px 2px rgba(0,0,0,0.05) !important;
-	background-color: #e0e0e0 !important;
+  background-image: none !important;
+  outline: 0 !important;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+  background-color: #e0e0e0 !important;
 }
+/********************************
+ * Flexicontent buttons for Forms
+ *******************************/
 div.fc_filter_line.fc_filter_buttons_box > .fc_buttons.btn-group {
-	width: 100%;
-	max-width: 1200px;
-	box-sizing: border-box;
-	margin-right: 0;
-	margin-left: 0;
+  width: 100%;
+  max-width: 1200px;
+  box-sizing: border-box;
+  margin-right: 0;
+  margin-left: 0;
 }
 div.fc_filter_line.fc_filter_buttons_box > .fc_buttons.btn-group > button {
-	margin-right: 0;
-	margin-left: 0;
+  margin-right: 0;
+  margin-left: 0;
 }
 div .listall-lbl {
-	max-width: 1200px;
-	width: 100%;
-	box-sizing: border-box;
-	margin: 8px 0;
+  max-width: 1200px;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 8px 0;
 }
 div .flexi_buttons,
 div .fc_buttons {
-	margin: 0px;
-	padding: 0px 2px 0px 2px;
-	display: inline-block;
+  margin: 0px;
+  padding: 0px 2px 0px 2px;
+  display: inline-block;
 }
 div .fc_button:not(.btn),
 div .fc_buttons button:not(.btn),
 div .flexi_buttons button:not(.btn) {
-	float: none !important;
-	height: auto !important;
-	border: 1px solid #cccccc;
-	border-radius: 4px;
-	line-height: 1.5em;
-	font-size: 12px;
-	font-family: arial, helvetica, sans-serif;
-	padding: 4px 8px;
-	margin: 2px 2px 2px 2px;
-	text-decoration: none;
-	text-transform: none;
-	display: inline-block;
-	font-weight: bold;
-	color: black;
-	background-color: #eeeeee;
-	background-image: linear-gradient(to bottom,#eeeeee,#dddddd);
+  float: none !important;
+  height: auto !important;
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+  line-height: 1.5em;
+  font-size: 12px;
+  font-family: arial, helvetica, sans-serif;
+  padding: 4px 8px;
+  margin: 2px 2px 2px 2px;
+  text-decoration: none;
+  text-transform: none;
+  display: inline-block;
+  font-weight: bold;
+  color: black;
+  background-color: #eeeeee;
+  background-image: linear-gradient(to bottom, #eeeeee, #dddddd);
 }
 div .fc_button.fcsimple:not(.btn) {
-	background-color: #f5f5f5;
-	background-image: linear-gradient(to bottom,#fff,#e6e6e6);
-	background-repeat: repeat-x;
-	border-color: rgba(0,0,0,0.1) rgba(0,0,0,0.1) #b3b3b3;
-	border-image: none;
-	border-radius: 4px;
-	border-style: solid;
-	border-width: 1px;
-	box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 1px 2px rgba(0,0,0,0.05);
-	color: #333;
-	cursor: pointer;
-	display: inline-block;
-	line-height: 20px;
-	margin: 0;
-	padding: 4px 12px;
-	text-align: center;
-	text-shadow: 0 1px 1px rgba(255,255,255,0.75);
-	vertical-align: middle;
+  background-color: #f5f5f5;
+  background-image: linear-gradient(to bottom, #fff, #e6e6e6);
+  background-repeat: repeat-x;
+  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) #b3b3b3;
+  border-image: none;
+  border-radius: 4px;
+  border-style: solid;
+  border-width: 1px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+  color: #333;
+  cursor: pointer;
+  display: inline-block;
+  line-height: 20px;
+  margin: 0;
+  padding: 4px 12px;
+  text-align: center;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
+  vertical-align: middle;
 }
 div .fc_button.fcsimple:not(.btn):hover,
 div .fc_button.fcsimple:not(.btn):focus {
-	border-color: rgba(0,0,0,0.1) rgba(0,0,0,0.1) #b3b3b3;
-	color: #333333;
-	background-image: linear-gradient(to bottom,#fff,#e6e6e6);
-	background-color: #e6e6e6;
-	text-decoration: none;
-	background-position: 0 -15px;
-	transition: background-position 0.1s linear;
+  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) #b3b3b3;
+  color: #333333;
+  background-image: linear-gradient(to bottom, #fff, #e6e6e6);
+  background-color: #e6e6e6;
+  text-decoration: none;
+  background-position: 0 -15px;
+  transition: background-position 0.1s linear;
 }
 div .fc_button:not(.btn):hover,
 div .fc_buttons button:not(.btn):hover,
 div .flexi_buttons button:not(.btn):hover {
-	border: 1px solid #bbbbbb;
-	background-color: #dddddd;
-	background-image: linear-gradient(to bottom,#dddddd,#cccccc);
+  border: 1px solid #bbbbbb;
+  background-color: #dddddd;
+  background-image: linear-gradient(to bottom, #dddddd, #cccccc);
 }
+/*
+.fcbutton_apply, .fcbutton_save, .fcbutton_cancel,
+.fcbutton_preview, .fcbutton_preview_save,
+.fcbutton_go, .fcbutton_reset { padding-right: 20px !important; }
+.fcbutton_apply { background: url(../images/accept.png) no-repeat !important; }
+.fcbutton_save { background: url(../images/accept.png) no-repeat !important; }
+.fcbutton_preview_save { background: url(../images/monitor_go.png) no-repeat !important; }
+.fcbutton_preview { background: url(../images/monitor.png) no-repeat !important; }
+.fcbutton_cancel { background: url(../images/cancel.png) no-repeat !important; }
+.fcbutton_go { background: url(../images/accept.png) no-repeat !important; }
+.fcbutton_reset { background: url(../images/cancel.png) no-repeat !important; }
+*/
+/***********************************
+ * Flexicontent form submit handling
+ ***********************************/
+/* Form submit handling */
 #flexi_form_submit_msg {
-	font-size: 11px;
-	display: none;
-	padding: 4px 0px 4px 30px;
-	background: transparent url(../images/ajax-loader.gif) 0px 3px no-repeat;
+  font-size: 11px;
+  display: none;
+  padding: 4px 0px 4px 30px;
+  background: transparent url(../images/ajax-loader.gif) 0px 3px no-repeat;
 }
 .fc_loading_msg {
-	font-size: 14px;
-	font-family: times;
-	padding: 4px 0px 4px 30px;
-	background: transparent url(../images/ajax-loader.gif) 6px 5px no-repeat;
-	display: inline-block;
-	min-height: 1em;
-	line-height: 1.1em;
-	min-width: 2em;
-	box-sizing: unset;
-	margin: 0;
-	vertical-align: top;
+  font-size: 14px;
+  font-family: times;
+  padding: 4px 0px 4px 30px;
+  background: transparent url(../images/ajax-loader.gif) 6px 5px no-repeat;
+  display: inline-block;
+  min-height: 1em;
+  line-height: 1.1em;
+  min-width: 2em;
+  box-sizing: unset;
+  margin: 0;
+  vertical-align: top;
 }
 #flexi_form_submit_btns {
-	font-size: 11px;
+  font-size: 11px;
 }
 .ajax-loader {
-	background: url("../images/ajax-loader.gif") no-repeat scroll right center transparent;
-	height: 16px;
-	padding: 0 0 0 20px;
-	display: inline-block;
+  background: url("../images/ajax-loader.gif") no-repeat scroll right center transparent;
+  height: 16px;
+  padding: 0 0 0 20px;
+  display: inline-block;
 }
 .ajax-loader_bar {
-	background: url("../images/ajax-loader_bar.gif") no-repeat scroll right center transparent;
-	height: 15px;
-	padding: 0 0 0 128px;
-	display: inline-block;
-	margin: 4px;
+  background: url("../images/ajax-loader_bar.gif") no-repeat scroll right center transparent;
+  height: 15px;
+  padding: 0 0 0 128px;
+  display: inline-block;
+  margin: 4px;
 }
 .ajax-loader_bar2 {
-	background: url("../images/ajax-loader_bar2.gif") no-repeat scroll right center transparent;
-	height: 21px;
-	padding: 0 0 0 140px;
-	display: inline-block;
-	margin: 4px;
+  background: url("../images/ajax-loader_bar2.gif") no-repeat scroll right center transparent;
+  height: 21px;
+  padding: 0 0 0 140px;
+  display: inline-block;
+  margin: 4px;
 }
+/**********************************************
+ * Form field separator element CSS for forms *
+ **********************************************/
 .fcsep_level_h,
 .fcsep_level0,
 .fcsep_level1,
 .fcsep_level2,
 .fcsep_level3 {
-	display: block;
-	position: relative;
-	border-radius: 5px;
-	clear: both;
-	float: right;
-	font-size: 12px;
-	line-height: 1.5em;
+  display: block;
+  position: relative;
+  border-radius: 5px;
+  clear: both;
+  float: right;
+  font-size: 12px;
+  line-height: 1.5em;
 }
 .fcsep_level_h {
-	margin: 0 0 12px 0;
-	width: 100%;
-	box-sizing: border-box;
-	background-color: #123973;
-	color: white;
-	font-size: 14px;
-	padding: 6px 16px;
-	font-family: Verdana, "Lucida Console";
+  margin: 0 0 12px 0;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #123973;
+  color: white;
+  font-size: 14px;
+  padding: 6px 16px;
+  font-family: Verdana, "Lucida Console";
 }
 .fcsep_level0 {
-	background-color: #0066AA;
-	color: white;
-	padding: 0.8em 1%;
-	margin: 48px 0% 4px 0%;
-	width: 100%;
-	box-sizing: border-box;
-	font-weight: bold;
-	font-size: 1.2em;
+  background-color: #0066AA;
+  color: white;
+  padding: 0.8em 1%;
+  margin: 48px 0% 4px 0%;
+  width: 100%;
+  box-sizing: border-box;
+  font-weight: bold;
+  font-size: 1.2em;
 }
 .fcsep_level1 {
-	background-color: #2096C9;
-	color: white;
-	padding: 0.8em 1%;
-	margin: 20px 0% 4px 0%;
-	width: 100%;
-	box-sizing: border-box;
-	font-weight: bold;
-	font-size: 1em;
+  background-color: #2096C9;
+  color: white;
+  padding: 0.8em 1%;
+  margin: 20px 0% 4px 0%;
+  width: 100%;
+  box-sizing: border-box;
+  font-weight: bold;
+  font-size: 1em;
 }
 .fcsep_level2 {
-	background-color: #7fc1ff;
-	color: #3a57ad;
-	padding: 0.4em 1%;
-	margin: 4px 0% 3px 0%;
-	width: 100%;
-	box-sizing: border-box;
-	font-weight: normal;
-	font-size: 1em;
+  background-color: #7fc1ff;
+  color: #3a57ad;
+  padding: 0.4em 1%;
+  margin: 4px 0% 3px 0%;
+  width: 100%;
+  box-sizing: border-box;
+  font-weight: normal;
+  font-size: 1em;
 }
 .fcsep_level3 {
-	background-color: #9fe1ff;
-	border: 1px solid #96c7ef;
-	color: #3a579d;
-	padding: 0.3em 2em;
-	margin: 4px 5% 3px;
-	width: auto;
-	font-weight: normal;
-	font-size: 1em;
+  background-color: #9fe1ff;
+  border: 1px solid #96c7ef;
+  color: #3a579d;
+  padding: 0.3em 2em;
+  margin: 4px 5% 3px;
+  width: auto;
+  font-weight: normal;
+  font-size: 1em;
 }
 .fcsep_level4 {
-	background: #f7f7f7;
-	color: #333;
-	float: right;
-	font-weight: normal;
-	font-style: italic;
-	font-size: 0.8em;
-	border: 1px solid #777;
-	padding: 2px 16px 2px 16px;
-	margin: 5px 10% 2px;
-	display: block;
-	border-radius: 5px;
-	clear: both;
-	max-width: 60%;
+  background: #f7f7f7;
+  color: #333;
+  float: right;
+  font-style: italic;
+  font-size: 0.8em;
+  border: 1px solid #777;
+  padding: 2px 16px 2px 16px;
+  margin: 5px 10% 2px;
+  display: block;
+  border-radius: 5px;
+  clear: both;
+  max-width: 60%;
+  font-weight: normal;
 }
 body .fcsep_level4.fc-mssg,
 body .fcsep_level4.fc-mssg-inline,
 body .fcsep_level4.alert,
 body .fcsep_level4.alert.fcpadded {
-	padding-top: 2px;
-	padding-bottom: 2px;
-	max-width: 90%;
-	margin-right: 5%;
-	margin-left: 5%;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  max-width: 90%;
+  margin-right: 5%;
+  margin-left: 5%;
 }
 .fcsep_level_br {
-	line-height: 16px;
-	height: 16px;
-	margin: 0;
-	padding: 0;
-	width: 100%;
-	display: block;
+  line-height: 16px;
+  height: 16px;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  display: block;
 }
 body .alert.fcpadded {
-	padding: 4px;
-	margin-top: 4px;
-	margin-bottom: 4px;
-	box-sizing: border-box;
-	float: right;
-	clear: both;
+  padding: 4px;
+  margin-top: 4px;
+  margin-bottom: 4px;
+  box-sizing: border-box;
+  float: right;
+  clear: both;
 }
+/*body .control-group .alert.fcpadded,
+.control-group .fcsep_level0,
+.control-group .fcsep_level1,
+.control-group .fcsep_level2,
+.control-group .fcsep_level3,
+.control-group .fcsep_level4 {
+	float: right;
+	margin-bottom: -3px;
+}*/
+/* prevent margin when parameter list starts */
 table.paramlist.flexi > tbody > tr:nth-child(2) > td > .fcsep_level0,
 table.paramlist.flexi > tbody > tr:nth-child(2) > td > .fcsep_level1,
 table.paramlist.flexi > tbody > tr:nth-child(2) > td > .fcsep_level2,
@@ -527,7 +590,7 @@ div.fc_empty_box + div.control-group:nth-of-type(2) > div > .fcsep_level2,
 div.tab-pane.active > .fcsep_level0:nth-of-type(1),
 div.tab-pane.active > .fcsep_level1:nth-of-type(1),
 div.tab-pane.active > .fcsep_level2:nth-of-type(1) {
-	margin-top: 4px !important;
+  margin-top: 4px !important;
 }
 .fcsep_level0.fc-nomargin,
 .fcsep_level1.fc-nomargin,
@@ -535,841 +598,890 @@ div.tab-pane.active > .fcsep_level2:nth-of-type(1) {
 .fc-nomargin > .fcsep_level0,
 .fc-nomargin > .fcsep_level1,
 .fc-nomargin > .fcsep_level2 {
-	margin-top: 4px !important;
+  margin-top: 4px !important;
 }
 .fcsep_level0.fc-ngmargin,
 .fcsep_level1.fc-ngmargin,
 .fcsep_level2.fc-ngmargin {
-	margin-top: -12px !important;
+  margin-top: -12px !important;
 }
 div.control-group:first-of-type > div > .fcsep_level0,
 div.control-group:first-of-type > div > .fcsep_level1,
 div.control-group:first-of-type > div > .fcsep_level2 {
-	margin-top: 0px;
+  margin-top: 0px;
 }
 body .nowrap_hidden {
-	display: block;
-	visibility: hidden;
-	height: 1px;
-	overflow: hidden;
-	padding: 0;
-	margin: -1px 0 0 0;
-	white-space: nowrap;
+  display: block;
+  visibility: hidden;
+  height: 1px;
+  overflow: hidden;
+  padding: 0;
+  margin: -1px 0 0 0;
+  white-space: nowrap;
+}
+#flexicontent {
+  /* EXTRA START */
+  /* EXTRA END */
 }
 #flexicontent input.form-control,
 #flexicontent select.form-select,
 #flexicontent .btn-group > *,
 #flexicontent .fc-xpended > *,
 #flexicontent .fc-xpended-row > * {
-	min-height: var(--form-inp-height) !important;
-	line-height: calc(var(--form-inp-height) - 4px) !important;
-	box-sizing: border-box !important;
-	padding: 0 8px;
+  min-height: var(--form-inp-height) !important;
+  line-height: calc(var(--form-inp-height) - 4px) !important;
+  box-sizing: border-box !important;
+  padding: 0 8px;
 }
 #flexicontent .btn-group .input-group > *,
-#flexicontent .btn-group .input-group-append > *,
-#flexicontent .btn-group .input-group-prepend > *,
-#flexicontent .btn-group .input-group-addon > *,
-#flexicontent .btn-group .input-append > *,
-#flexicontent .btn-group .input-prepend > *,
 #flexicontent .fc-xpended .input-group > *,
-#flexicontent .fc-xpended .input-group-append > *,
-#flexicontent .fc-xpended .input-group-prepend > *,
-#flexicontent .fc-xpended .input-group-addon > *,
-#flexicontent .fc-xpended .input-append > *,
-#flexicontent .fc-xpended .input-prepend > *,
 #flexicontent .fc-xpended-row .input-group > *,
+#flexicontent .btn-group .input-group-append > *,
+#flexicontent .fc-xpended .input-group-append > *,
 #flexicontent .fc-xpended-row .input-group-append > *,
+#flexicontent .btn-group .input-group-prepend > *,
+#flexicontent .fc-xpended .input-group-prepend > *,
 #flexicontent .fc-xpended-row .input-group-prepend > *,
+#flexicontent .btn-group .input-group-addon > *,
+#flexicontent .fc-xpended .input-group-addon > *,
 #flexicontent .fc-xpended-row .input-group-addon > *,
+#flexicontent .btn-group .input-append > *,
+#flexicontent .fc-xpended .input-append > *,
 #flexicontent .fc-xpended-row .input-append > *,
+#flexicontent .btn-group .input-prepend > *,
+#flexicontent .fc-xpended .input-prepend > *,
 #flexicontent .fc-xpended-row .input-prepend > * {
-	min-height: var(--form-inp-height) !important;
-	line-height: calc(var(--form-inp-height) - 4px) !important;
-	box-sizing: border-box !important;
-	padding-top: 0 !important;
-	padding-bottom: 0 !important;
+  min-height: var(--form-inp-height) !important;
+  line-height: calc(var(--form-inp-height) - 4px) !important;
+  box-sizing: border-box !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
 }
 #flexicontent .btn-group select.fcfield_selectval,
-#flexicontent .btn-group select,
-#flexicontent .btn-group button,
 #flexicontent .fc-xpended select.fcfield_selectval,
-#flexicontent .fc-xpended select,
-#flexicontent .fc-xpended button,
 #flexicontent .fc-xpended-row select.fcfield_selectval,
+#flexicontent .btn-group select,
+#flexicontent .fc-xpended select,
 #flexicontent .fc-xpended-row select,
+#flexicontent .btn-group button,
+#flexicontent .fc-xpended button,
 #flexicontent .fc-xpended-row button {
-	min-height: var(--form-inp-height) !important;
+  min-height: var(--form-inp-height) !important;
 }
 #flexicontent .btn-group .select2-container,
 #flexicontent .fc-xpended .select2-container,
 #flexicontent .fc-xpended-row .select2-container {
-	height: unset !important;
-	min-height: var(--form-inp-height) !important;
-	line-height: var(--form-inp-height) !important;
-	box-sizing: border-box !important;
-	padding: 0 !important;
-	margin-top: 0 !important;
-	margin-bottom: 0 !important;
+  height: unset !important;
+  min-height: var(--form-inp-height) !important;
+  line-height: var(--form-inp-height) !important;
+  box-sizing: border-box !important;
+  padding: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
 }
 #flexicontent .btn-group .select2-container input.select2-input,
 #flexicontent .fc-xpended .select2-container input.select2-input,
 #flexicontent .fc-xpended-row .select2-container input.select2-input {
-	height: unset !important;
-	min-height: calc(var(--form-inp-height) - 2px) !important;
-	line-height: calc(var(--form-inp-height) - 2px) !important;
-	padding: 0 4px !important;
-	margin-top: 0 !important;
-	margin-bottom: 0 !important;
+  height: unset !important;
+  min-height: calc(var(--form-inp-height) - 2px) !important;
+  line-height: calc(var(--form-inp-height) - 2px) !important;
+  padding: 0 4px !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
 }
 #flexicontent .btn-group .select2-container a.select2-choice,
 #flexicontent .fc-xpended .select2-container a.select2-choice,
 #flexicontent .fc-xpended-row .select2-container a.select2-choice {
-	height: unset !important;
-	min-height: calc(var(--form-inp-height) - 2px) !important;
-	line-height: calc(var(--form-inp-height) - 2px) !important;
-	padding-top: 0 !important;
-	padding-bottom: 0 !important;
-	margin-top: 0 !important;
-	margin-bottom: 0 !important;
+  height: unset !important;
+  min-height: calc(var(--form-inp-height) - 2px) !important;
+  line-height: calc(var(--form-inp-height) - 2px) !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
 }
 #flexicontent .btn-group .select2-container a.select2-choice .select2-chosen,
 #flexicontent .fc-xpended .select2-container a.select2-choice .select2-chosen,
 #flexicontent .fc-xpended-row .select2-container a.select2-choice .select2-chosen {
-	height: unset !important;
-	min-height: calc(var(--form-inp-height) - 4px) !important;
-	line-height: calc(var(--form-inp-height) - 4px) !important;
-	padding-top: 0 !important;
-	padding-bottom: 0 !important;
-	margin-top: 0 !important;
-	margin-bottom: 0 !important;
+  height: unset !important;
+  min-height: calc(var(--form-inp-height) - 4px) !important;
+  line-height: calc(var(--form-inp-height) - 4px) !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
 }
 #flexicontent .btn-group .select2-container ul.select2-choices,
 #flexicontent .fc-xpended .select2-container ul.select2-choices,
 #flexicontent .fc-xpended-row .select2-container ul.select2-choices {
-	height: unset !important;
-	min-height: calc(var(--form-inp-height)) !important;
-	line-height: calc(var(--form-inp-height)) !important;
-	padding-top: 0 !important;
-	padding-bottom: 0 !important;
-	margin-top: 0 !important;
-	margin-bottom: 0 !important;
+  height: unset !important;
+  min-height: calc(var(--form-inp-height)) !important;
+  line-height: calc(var(--form-inp-height)) !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
 }
 #flexicontent #j-main-container select.fcfield_selectval,
 #flexicontent #j-main-container select {
-	height: var(--fcman-inp-height) !important;
-	min-height: var(--fcman-inp-height) !important;
-	line-height: calc(var(--fcman-inp-height) - 2px) !important;
-	padding-top: 0 !important;
-	padding-bottom: 0 !important;
-	background: white;
-	margin: 0 6px 0 0;
+  height: var(--fcman-inp-height) !important;
+  min-height: var(--fcman-inp-height) !important;
+  line-height: calc(var(--fcman-inp-height) - 2px) !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  background: white;
+  margin: 0 6px 0 0;
 }
 #flexicontent #j-main-container .btn-group > *,
 #flexicontent #j-main-container .fc-xpended > *,
 #flexicontent #j-main-container .fc-xpended-row > * {
-	min-height: var(--fcman-inp-height) !important;
-	line-height: calc(var(--fcman-inp-height) - 4px) !important;
-	box-sizing: border-box !important;
-	padding: 0 8px;
+  min-height: var(--fcman-inp-height) !important;
+  line-height: calc(var(--fcman-inp-height) - 4px) !important;
+  box-sizing: border-box !important;
+  padding: 0 8px;
 }
 #flexicontent #j-main-container .btn-group .input-group > *,
-#flexicontent #j-main-container .btn-group .input-group-append > *,
-#flexicontent #j-main-container .btn-group .input-group-prepend > *,
-#flexicontent #j-main-container .btn-group .input-group-addon > *,
-#flexicontent #j-main-container .btn-group .input-append > *,
-#flexicontent #j-main-container .btn-group .input-prepend > *,
 #flexicontent #j-main-container .fc-xpended .input-group > *,
-#flexicontent #j-main-container .fc-xpended .input-group-append > *,
-#flexicontent #j-main-container .fc-xpended .input-group-prepend > *,
-#flexicontent #j-main-container .fc-xpended .input-group-addon > *,
-#flexicontent #j-main-container .fc-xpended .input-append > *,
-#flexicontent #j-main-container .fc-xpended .input-prepend > *,
 #flexicontent #j-main-container .fc-xpended-row .input-group > *,
+#flexicontent #j-main-container .btn-group .input-group-append > *,
+#flexicontent #j-main-container .fc-xpended .input-group-append > *,
 #flexicontent #j-main-container .fc-xpended-row .input-group-append > *,
+#flexicontent #j-main-container .btn-group .input-group-prepend > *,
+#flexicontent #j-main-container .fc-xpended .input-group-prepend > *,
 #flexicontent #j-main-container .fc-xpended-row .input-group-prepend > *,
+#flexicontent #j-main-container .btn-group .input-group-addon > *,
+#flexicontent #j-main-container .fc-xpended .input-group-addon > *,
 #flexicontent #j-main-container .fc-xpended-row .input-group-addon > *,
+#flexicontent #j-main-container .btn-group .input-append > *,
+#flexicontent #j-main-container .fc-xpended .input-append > *,
 #flexicontent #j-main-container .fc-xpended-row .input-append > *,
+#flexicontent #j-main-container .btn-group .input-prepend > *,
+#flexicontent #j-main-container .fc-xpended .input-prepend > *,
 #flexicontent #j-main-container .fc-xpended-row .input-prepend > * {
-	min-height: var(--fcman-inp-height) !important;
-	line-height: calc(var(--fcman-inp-height) - 4px) !important;
+  min-height: var(--fcman-inp-height) !important;
+  line-height: calc(var(--fcman-inp-height) - 4px) !important;
 }
 #flexicontent #j-main-container .btn-group select.fcfield_selectval,
-#flexicontent #j-main-container .btn-group select,
-#flexicontent #j-main-container .btn-group button,
 #flexicontent #j-main-container .fc-xpended select.fcfield_selectval,
-#flexicontent #j-main-container .fc-xpended select,
-#flexicontent #j-main-container .fc-xpended button,
 #flexicontent #j-main-container .fc-xpended-row select.fcfield_selectval,
+#flexicontent #j-main-container .btn-group select,
+#flexicontent #j-main-container .fc-xpended select,
 #flexicontent #j-main-container .fc-xpended-row select,
+#flexicontent #j-main-container .btn-group button,
+#flexicontent #j-main-container .fc-xpended button,
 #flexicontent #j-main-container .fc-xpended-row button {
-	height: var(--fcman-inp-height) !important;
-	min-height: var(--fcman-inp-height) !important;
+  height: var(--fcman-inp-height) !important;
+  min-height: var(--fcman-inp-height) !important;
 }
 #flexicontent #j-main-container .btn-group .select2-container,
 #flexicontent #j-main-container .fc-xpended .select2-container,
 #flexicontent #j-main-container .fc-xpended-row .select2-container {
-	min-height: var(--fcman-inp-height) !important;
-	line-height: var(--fcman-inp-height) !important;
+  min-height: var(--fcman-inp-height) !important;
+  line-height: var(--fcman-inp-height) !important;
 }
 #flexicontent #j-main-container .btn-group .select2-container input.select2-input,
 #flexicontent #j-main-container .fc-xpended .select2-container input.select2-input,
 #flexicontent #j-main-container .fc-xpended-row .select2-container input.select2-input {
-	min-height: calc(var(--fcman-inp-height) - 2px) !important;
-	line-height: calc(var(--fcman-inp-height) - 2px) !important;
+  min-height: calc(var(--fcman-inp-height) - 2px) !important;
+  line-height: calc(var(--fcman-inp-height) - 2px) !important;
 }
 #flexicontent #j-main-container .btn-group .select2-container a.select2-choice,
 #flexicontent #j-main-container .fc-xpended .select2-container a.select2-choice,
 #flexicontent #j-main-container .fc-xpended-row .select2-container a.select2-choice {
-	min-height: calc(var(--fcman-inp-height) - 2px) !important;
-	line-height: calc(var(--fcman-inp-height) - 2px) !important;
+  min-height: calc(var(--fcman-inp-height) - 2px) !important;
+  line-height: calc(var(--fcman-inp-height) - 2px) !important;
 }
 #flexicontent #j-main-container .btn-group .select2-container a.select2-choice .select2-chosen,
 #flexicontent #j-main-container .fc-xpended .select2-container a.select2-choice .select2-chosen,
 #flexicontent #j-main-container .fc-xpended-row .select2-container a.select2-choice .select2-chosen {
-	min-height: calc(var(--fcman-inp-height) - 4px) !important;
-	line-height: calc(var(--fcman-inp-height) - 4px) !important;
+  min-height: calc(var(--fcman-inp-height) - 4px) !important;
+  line-height: calc(var(--fcman-inp-height) - 4px) !important;
 }
 #flexicontent #j-main-container .btn-group .select2-container ul.select2-choices,
 #flexicontent #j-main-container .fc-xpended .select2-container ul.select2-choices,
 #flexicontent #j-main-container .fc-xpended-row .select2-container ul.select2-choices {
-	min-height: calc(var(--fcman-inp-height)) !important;
-	line-height: calc(var(--fcman-inp-height)) !important;
+  min-height: calc(var(--fcman-inp-height)) !important;
+  line-height: calc(var(--fcman-inp-height)) !important;
 }
+/* bootstrap INPUT groups */
 #flexicontent div.input-group-addon > *:not(:first-child):not(:last-child):not(.select2-container),
 #flexicontent div.input-append > *:not(:first-child):not(:last-child):not(.select2-container),
 #flexicontent div.input-group-addon > *:not(:first-child):not(:last-child) > *,
 #flexicontent div.input-append > *:not(:first-child):not(:last-child) > * {
-	border-top-left-radius: 0px !important;
-	border-bottom-left-radius: 0px !important;
-	margin-left: 0 !important;
+  border-top-left-radius: 0px !important;
+  border-bottom-left-radius: 0px !important;
+  margin-left: 0 !important;
 }
 #flexicontent div.input-group-addon > *:not(:first-child),
 #flexicontent div.input-prepend > *:not(:first-child),
 #flexicontent div.input-group-addon > *:not(:first-child) > *,
 #flexicontent div.input-prepend > *:not(:first-child) > * {
-	border-top-right-radius: 0px !important;
-	border-bottom-right-radius: 0px !important;
+  border-top-right-radius: 0px !important;
+  border-bottom-right-radius: 0px !important;
 }
 .input-prepend.input-append .add-on:not(:last-child),
 .input-prepend.input-append .add-on:not(:last-child) > * {
-	border-top-left-radius: 0;
-	border-bottom-left-radius: 0;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
 }
 .input-prepend.input-append .add-on:not(:first-child),
 .input-prepend.input-append .add-on:not(:first-child) > * {
-	border-top-right-radius: 0;
-	border-bottom-right-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
 }
+/* media manager image field */
 .flexicontent .field-media-wrapper,
 .flexicontent .field-media-wrapper > div:not(.modal) {
-	min-width: 50%;
-	box-sizing: border-box;
+  min-width: 50%;
+  box-sizing: border-box;
 }
 .flexicontent .field-media-wrapper .field-media-input {
-	width: unset;
-	min-width: 60%;
-	max-width: unset;
+  width: unset;
+  min-width: 60%;
+  max-width: unset;
 }
 .flexicontent iframe.seamless {
-	background-color: transparent;
-	border: 0px none transparent;
-	padding: 0px;
-	overflow: hidden;
+  background-color: transparent;
+  border: 0px none transparent;
+  padding: 0px;
+  overflow: hidden;
 }
 .flexicontent :not(.fc_less_parameter) > .fc_less_parameter::before {
-	background-color: black;
-	color: white;
-	font-size: 12px;
-	font-weight: bold;
-	border-radius: 4px;
-	content: "css";
-	padding: 2px 4px;
-	box-sizing: content-box;
-	height: 1em;
-	line-height: 1em;
+  background-color: black;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 4px;
+  content: "css";
+  padding: 2px 4px;
+  box-sizing: content-box;
+  height: 1em;
+  line-height: 1em;
 }
 .flexicontent label.fc_less_parameter::before {
-	float: right;
-	position: relative;
-	top: -4px;
-	right: -4px;
+  float: right;
+  position: relative;
+  top: -4px;
+  right: -4px;
 }
 #flexicontent .fc-floated-labels-box.fc-lbl-external-box {
-	padding-top: 18px;
+  padding-top: 18px;
 }
 #flexicontent .fcfield-group .fc-floated-labels-box {
-	display: inline-block;
-	position: relative;
-	margin: 0px;
-	width: 100%;
+  display: inline-block;
+  position: relative;
+  margin: 0px;
+  width: 100%;
 }
 #flexicontent .fc-floated-labels-box {
-	display: inline-block;
-	position: relative;
-	margin: 0px 0px 0.2rem 0.4rem;
+  display: inline-block;
+  position: relative;
+  margin: 0px 0px 0.2rem 0.4rem;
+  /*> input.fc-floated-lbl-input.invalid {
+		border-left: 1px solid transparent !important;
+		border-right: 1px solid transparent !important;
+	}*/
 }
 #flexicontent .fc-floated-labels-box > div.use_select2_lib {
-	width: 100% !important;
+  width: 100% !important;
 }
 #flexicontent .fc-floated-labels-box > div.use_select2_lib .select2-choice {
-	border-radius: 0 !important;
-	border: 1px solid transparent;
-	border-bottom: 1px solid gray;
-	padding: 0 0 0 0px !important;
+  border-radius: 0 !important;
+  border: 1px solid transparent;
+  border-bottom: 1px solid gray;
+  padding: 0 0 0 0px !important;
 }
 #flexicontent .fc-floated-labels-box > div.use_select2_lib .select2-choice .select2-arrow {
-	border-radius: 0 !important;
-	background: transparent !important;
-	border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
 }
 #flexicontent .fc-floated-labels-box select,
 #flexicontent .fc-floated-labels-box > div.use_select2_lib:not(.select2-container-active) {
-	width: 100% !important;
+  width: 100% !important;
 }
 #flexicontent .fc-floated-labels-box select .select2-choice,
 #flexicontent .fc-floated-labels-box > div.use_select2_lib:not(.select2-container-active) .select2-choice {
-	background: transparent !important;
-	box-shadow: unset !important;
+  background: transparent !important;
+  box-shadow: unset !important;
 }
 #flexicontent .fc-floated-labels-box > input.fc-floated-lbl-input {
-	border: 1px solid gray;
-	border-radius: 4px;
-	text-align: left;
-	margin: 0.6rem;
+  /* this is used together with fcfield_textval */
+  border: 1px solid gray;
+  border-radius: 4px;
+  text-align: left;
+  margin: 0.6rem;
+  /* this is used together with fcfield_textval */
 }
 #flexicontent .fc-floated-labels-box > label.fc-floated-lbl {
-	font-family: "Trebuchet MS", Verdana, Helvetica, Arial;
-	font-size: 1em;
-	position: absolute;
-	pointer-events: none;
-	top: 0.6rem;
-	left: 0.6rem;
-	transition: 0.2s ease all;
-	z-index: 10;
-	color: gray;
-	opacity: 0.7;
-	padding: 0 4px 0 4px;
+  font-family: "Trebuchet MS", Verdana, Helvetica, Arial;
+  font-size: 1em;
+  position: absolute;
+  pointer-events: none;
+  top: 0.6rem;
+  left: 0.6rem;
+  transition: 0.2s ease all;
+  z-index: 10;
+  color: gray;
+  opacity: 0.7;
+  padding: 0 4px 0 4px;
 }
 #flexicontent .fc-floated-labels-box > label.fc-floated-lbl.media-preview {
-	top: 0px;
+  top: 0px;
 }
 #flexicontent .fc-floated-labels-box > label.fc-floated-lbl.fc-has-value {
-	background: #ffffff;
-	color: black;
-	top: -0.8rem;
-	left: 0.5rem;
-	font-size: 1.2rem;
-	line-height: 1rem;
-	opacity: 1;
-	padding: 0.2rem 0.3rem 0.3rem 0.3rem;
-	border-radius: 4px;
+  background: #ffffff;
+  color: black;
+  top: -0.8rem;
+  left: 0.5rem;
+  font-size: 1.2rem;
+  line-height: 1rem;
+  opacity: 1;
+  padding: 0.2rem 0.3rem 0.3rem 0.3rem;
+  border-radius: 4px;
 }
 #flexicontent .fc-floated-labels-box > label.fc-floated-lbl.fc-lbl-external {
-	top: -2px;
-	right: 2px;
-	font-size: 12px;
-	opacity: 1;
+  top: -2px;
+  right: 2px;
+  font-size: 12px;
+  opacity: 1;
 }
 body .fcsubform-compact div.container_fcfield div.row-fluid {
-	width: 300px;
+  width: 300px;
 }
 div table.fc-table-list.fc-tbl-short .label {
-	min-width: 100px;
+  min-width: 100px;
 }
 div table.fc-table-list.fc-tbl-short {
-	min-width: 400px;
-	float: right;
+  min-width: 400px;
+  float: right;
 }
 div table.fc-table-list {
-	font: 100%/30px 'Helvetica Neue', helvetica, arial, sans-serif;
-	text-shadow: 0 1px 0 #fff;
-	background: #f5f5f5;
-	border-collapse: separate;
-	box-shadow: inset 0 1px 0 #fff;
-	font-size: 12px;
-	line-height: 24px;
-	margin: 16px;
-	text-align: right;
-	min-width: 50%;
+  font: 100%/30px 'Helvetica Neue', helvetica, arial, sans-serif;
+  text-shadow: 0 1px 0 #fff;
+  background: #f5f5f5;
+  border-collapse: separate;
+  box-shadow: inset 0 1px 0 #fff;
+  font-size: 12px;
+  line-height: 24px;
+  margin: 16px;
+  text-align: right;
+  min-width: 50%;
 }
 div table.fc-table-list th {
-	background-color: #444444;
-	background-image: url(../images/noise1.png), linear-gradient(#777777,#444444);
-	border-right: 1px solid #555;
-	border-left: 1px solid #777;
-	border-top: 1px solid #555;
-	border-bottom: 1px solid #333;
-	box-shadow: inset 0 1px 0 #999;
-	color: #fff;
-	font-weight: bold;
-	padding: 6px 12px;
-	position: relative;
-	text-shadow: 0 1px 0 #000;
+  background-color: #444444;
+  background-image: url(../images/noise1.png), linear-gradient(#777777, #444444);
+  border-right: 1px solid #555;
+  border-left: 1px solid #777;
+  border-top: 1px solid #555;
+  border-bottom: 1px solid #333;
+  box-shadow: inset 0 1px 0 #999;
+  color: #fff;
+  font-weight: bold;
+  padding: 6px 12px;
+  position: relative;
+  text-shadow: 0 1px 0 #000;
 }
 div table.fc-table-list th:after {
-	background: linear-gradient(rgba(255,255,255,0),rgba(255,255,255,0.08));
-	content: '';
-	display: block;
-	height: 25%;
-	right: 0;
-	margin: 1px 0 0 0;
-	position: absolute;
-	top: 25%;
-	width: 100%;
+  background: linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.08));
+  content: '';
+  display: block;
+  height: 25%;
+  right: 0;
+  margin: 1px 0 0 0;
+  position: absolute;
+  top: 25%;
+  width: 100%;
 }
 div table.fc-table-list th:first-child {
-	border-right: 1px solid #777;
-	box-shadow: inset 1px 1px 0 #999;
+  border-right: 1px solid #777;
+  box-shadow: inset 1px 1px 0 #999;
 }
 div table.fc-table-list th:last-child {
-	box-shadow: inset -1px 1px 0 #999;
+  box-shadow: inset -1px 1px 0 #999;
 }
 div table.fc-table-list td {
-	border-left: 1px solid #fff;
-	border-right: 1px solid #e8e8e8;
-	border-top: 1px solid #fff;
-	border-bottom: 1px solid #e8e8e8;
-	padding: 10px 15px;
-	position: relative;
-	transition: all 300ms;
+  border-left: 1px solid #fff;
+  border-right: 1px solid #e8e8e8;
+  border-top: 1px solid #fff;
+  border-bottom: 1px solid #e8e8e8;
+  padding: 10px 15px;
+  position: relative;
+  transition: all 300ms;
 }
 div table.fc-table-list.fc-tbl-short td {
-	padding: 0px 15px;
-	text-align: right;
+  padding: 0px 15px;
+  text-align: right;
 }
 div table.fc-table-list.fc-tbl-short td:first-child {
-	text-align: left;
+  text-align: left;
 }
 div table.fc-table-list td a:not(.btn) {
-	text-decoration: none;
-	color: #0088cc;
-	font-weight: bold;
+  text-decoration: none;
+  color: #0088cc;
+  font-weight: bold;
 }
 div table.fc-table-list td:first-child {
-	box-shadow: inset 1px 0 0 #fff;
+  box-shadow: inset 1px 0 0 #fff;
 }
 div table.fc-table-list td:last-child {
-	border-left: 1px solid #e8e8e8;
-	box-shadow: inset -1px 0 0 #fff;
+  border-left: 1px solid #e8e8e8;
+  box-shadow: inset -1px 0 0 #fff;
 }
 div table.fc-table-list tr {
-	background: url(../images/noise1.png);
+  background: url(../images/noise1.png);
 }
 div table.fc-table-list tr:nth-child(odd) td {
-	background: #f1f1f1 url(../images/noise1.png);
+  background: #f1f1f1 url(../images/noise1.png);
 }
 div table.fc-table-list tr:last-of-type td {
-	box-shadow: inset 0 -1px 0 #fff;
+  box-shadow: inset 0 -1px 0 #fff;
 }
 div table.fc-table-list tr:last-of-type td:first-child {
-	box-shadow: inset 1px -1px 0 #fff;
+  box-shadow: inset 1px -1px 0 #fff;
 }
 div table.fc-table-list tr:last-of-type td:last-child {
-	box-shadow: inset -1px -1px 0 #fff;
+  box-shadow: inset -1px -1px 0 #fff;
 }
 div table.fc-table-list thead tr:hover th {
-	color: white;
-	background-color: #ffffdd;
+  color: white;
+  /*text-shadow: 2px 2px 3px #777 !important;*/
+  background-color: #ffffdd;
 }
 div table.fc-table-list tbody tr:hover td {
-	color: black;
-	background-color: #dddddd;
+  color: black;
+  /*text-shadow: 2px 2px 2px #888;*/
+  background-color: #dddddd;
 }
 div table.fc-table-list tbody tr:hover td a:not(.btn) {
-	color: #0088cc;
+  color: #0088cc;
+  /*text-shadow: 1px 1px 2px #888;*/
+}
+#j-main-container {
+  /* Make border between buttons in toolbar be single line */
+  /* More compact select elements */
 }
 #j-main-container .smaller {
-	font-size: 0.95em !important;
+  font-size: 0.95em !important;
 }
 #j-main-container div .btn-group > *:not(:first-child),
 #j-main-container div .input-append > *:not(:first-child) {
-	margin-left: -1px;
+  margin-left: -1px;
 }
 #j-main-container select.fcfield_selectval {
-	min-width: unset !important;
-	background: #fff !important;
-	font-size: 0.9rem !important;
+  min-width: unset !important;
+  background: #fff !important;
+  font-size: 0.9rem !important;
 }
+/* rows table */
 table.adminlist.fcmanlist {
-	margin-top: 12px;
-	width: 100%;
+  margin-top: 12px;
+  width: 100%;
 }
 div.adminthumbs.fcmanthumbs {
-	margin-top: 12px;
-	margin-bottom: 12px;
+  margin-top: 12px;
+  margin-bottom: 12px;
 }
 .column_toggle_lbl {
-	display: none;
+  /* hidden label */
+  display: none;
 }
 td.col_created,
 td.col_revised {
-	white-space: nowrap;
+  white-space: nowrap;
 }
 td.col_created .input-append,
 td.col_revised .input-append {
-	margin: 0px;
+  margin: 0px;
 }
 td.col_title {
-	text-align: right;
-	min-width: 120px;
+  text-align: right;
+  min-width: 120px;
 }
 td.col_template {
-	text-align: right;
+  text-align: right;
 }
 td.col_edit_layout {
-	text-align: left;
-	width: 2em;
+  text-align: left;
+  width: 2em;
 }
+/* Common CSS of containers */
 .flexicontent #fc-filters-box,
 .flexicontent #mainChooseColBox,
 .flexicontent #itemusage-filters {
-	padding: 4px 8px 4px 4px;
-	margin: 4px 0px;
-	vertical-align: top;
-	min-height: 34px;
-	background: #fff;
-	box-shadow: 0px 5px 16px 0px #939393;
+  padding: 4px 8px 4px 4px;
+  margin: 4px 0px;
+  vertical-align: top;
+  min-height: 34px;
+  background: #fff;
+  box-shadow: 0px 5px 16px 0px #939393;
 }
 .flexicontent #fc-mini-help,
 .flexicontent #fc-filters-box.fcman-abs,
 .flexicontent #mainChooseColBox.fcman-abs {
-	position: absolute;
-	box-shadow: 0px 5px 16px 0px #939393;
-	background: #fff;
-	z-index: 100;
-	right: 0;
-	top: 100%;
-	text-align: right;
-	padding: 6px;
+  position: absolute;
+  box-shadow: 0px 5px 16px 0px #939393;
+  background: #fff;
+  z-index: 100;
+  right: 0;
+  top: 100%;
+  text-align: right;
+  padding: 6px;
 }
 .flexicontent #fc-filters-box.fcman-abs {
-	min-width: 359px;
-	max-width: 100%;
+  min-width: 359px;
+  max-width: 100%;
 }
 .flexicontent #fc-filters-box.fcman-abs,
 .flexicontent #mainChooseColBox.fcman-abs {
-	right: unset;
-	left: 0;
-	box-sizing: border-box;
+  right: unset;
+  left: 0;
+  box-sizing: border-box;
 }
 .flexicontent #mainChooseColBox > #mainChooseColBox_cols {
-	display: inline-block;
+  display: inline-block;
 }
 .flexicontent #mainChooseColBox > #mainChooseColBox_cols > * {
-	display: inline-block;
-	float: right;
-	clear: both;
+  display: inline-block;
+  float: right;
+  clear: both;
 }
 #flexicontent input.fcitem_order_no {
-	text-align: center;
+  text-align: center;
+}
+.flexicontent #fc-managers-header {
+  /* Manager Sliders close button (Filters, columns, other ?) */
 }
 .flexicontent #fc-managers-header div.fc_is_selarrow .select2-chosen {
-	width: 0 !important;
+  width: 0 !important;
 }
 .flexicontent #fc-managers-header select.fc_is_selarrow {
-	max-width: 25px !important;
+  max-width: 25px !important;
 }
 .flexicontent #fc-managers-header select.fc_is_selarrow:hover,
 .flexicontent #fc-managers-header select.fc_is_selarrow:focus {
-	max-width: unset !important;
+  max-width: unset !important;
 }
 .flexicontent #fc-managers-header select.fc_is_selarrow + #search {
-	margin-right: 25px !important;
+  margin-right: 25px !important;
 }
 .flexicontent #fc-managers-header #search {
-	margin: 0px !important;
-	padding: 0 0.6rem;
-	min-width: 200px;
-	border: 1px solid #aaa;
+  margin: 0px !important;
+  padding: 0 0.6rem;
+  min-width: 200px;
+  border: 1px solid #aaa;
 }
 .flexicontent #fc-managers-header #search::placeholder {
-	color: #ccc;
-	opacity: 1;
+  /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: #ccc;
+  opacity: 1;
+  /* Firefox */
 }
 .flexicontent #fc-managers-header #search:-ms-input-placeholder {
-	color: #ccc;
+  /* Internet Explorer 10-11 */
+  color: #ccc;
 }
 .flexicontent #fc-managers-header #search::-ms-input-placeholder {
-	color: #ccc;
+  /* Microsoft Edge */
+  color: #ccc;
 }
 .flexicontent #fc-managers-header #limit {
-	padding: 3px 6px !important;
+  padding: 3px 6px !important;
 }
 .flexicontent #fc-managers-header .fc-filter-head-box {
-	vertical-align: middle;
-	border: 0px;
-	padding: 0px;
-	margin: 2px 0 6px 24px;
-	width: unset;
-	position: relative;
+  vertical-align: middle;
+  border: 0px;
+  padding: 0px;
+  margin: 2px 0 6px 24px;
+  width: unset;
+  position: relative;
 }
 .flexicontent #fc-managers-header .fc-filter-head-box .label {
-	font-size: 11px;
-	padding: 4px 4px;
-	margin: 0px 4px;
+  font-size: 11px;
+  padding: 4px 4px;
+  margin: 0px 4px;
 }
 .flexicontent #fc-managers-header .fc-filter-head-box .input-group-append,
 .flexicontent #fc-managers-header .fc-filter-head-box .input-group-prepend,
 .flexicontent #fc-managers-header .fc-filter-head-box .input-append,
 .flexicontent #fc-managers-header .fc-filter-head-box .input-prepend {
-	margin: 0px;
+  margin: 0px;
+  /* do not set font-size !*/
 }
 .flexicontent #fc-managers-header .fc-filter-head-box .input-group-append > *,
 .flexicontent #fc-managers-header .fc-filter-head-box .input-group-prepend > *,
 .flexicontent #fc-managers-header .fc-filter-head-box .input-append > *,
 .flexicontent #fc-managers-header .fc-filter-head-box .input-prepend > * {
-	display: inline-block;
+  display: inline-block;
 }
 .flexicontent #fc-managers-header #fc-columns-slide-btn,
 .flexicontent #fc-managers-header #fc-filters-slide-btn {
-	width: 100%;
-	display: block;
-	box-sizing: border-box;
-	margin: 8px 0 0 0;
-	height: 24px;
-	padding: 4px;
-	float: none;
-	clear: both;
+  width: 100%;
+  display: block;
+  box-sizing: border-box;
+  margin: 8px 0 0 0;
+  height: 24px;
+  padding: 4px;
+  float: none;
+  clear: both;
 }
+/* Very small screens ... (mobile phones) */
 @media only screen and (max-width: 480px) {
-	.flexicontent #fc-managers-header #search {
-		width: 112px;
-		min-width: 112px;
-	}
+  .flexicontent #fc-managers-header #search {
+    width: 112px;
+    min-width: 112px;
+  }
 }
 .flexicontent #fc-filters-box {
-	padding-right: 0px;
+  padding-right: 0px;
+  /* Icons customization */
+  /* Filter container */
 }
 .flexicontent #fc-filters-box [class^="icon-arrow-"] {
-	vertical-align: middle;
-	font-size: 18px;
+  vertical-align: middle;
+  font-size: 18px;
 }
 .flexicontent #fc-filters-box .fc-filter {
-	border: 0px solid;
-	margin: 4px 2px 4px 2px;
-	padding: 0px;
-	vertical-align: top;
-	min-width: 310px;
-	min-height: 30px;
-	float: none;
-	display: block;
+  border: 0px solid;
+  margin: 4px 2px 4px 2px;
+  padding: 0px;
+  vertical-align: top;
+  min-width: 310px;
+  min-height: 30px;
+  float: none;
+  display: block;
+  /* Filter container (double size) */
+  /* Filter labels */
+  /* First level childs */
+  /* SELECT2 */
+  /* Single-choice */
+  /* Multi-choises */
 }
 .flexicontent #fc-filters-box .fc-filter.fc-filter-double {
-	min-width: 628px;
+  min-width: 628px;
 }
 .flexicontent #fc-filters-box .fc-filter.fc-filter-double .select2-container .select2-choice {
-	width: 482px !important;
+  width: 482px !important;
 }
 .flexicontent #fc-filters-box .fc-filter.fc-filter-double .select2-container-multi {
-	width: 490px !important;
+  width: 490px !important;
 }
 .flexicontent #fc-filters-box .fc-filter .fc-xpended-row .input-group-text:first-child,
 .flexicontent #fc-filters-box .fc-filter .fc-xpended-row .add-on:first-child {
-	min-width: 130px;
-	max-width: 130px;
-	white-space: normal;
-	word-wrap: break-word;
-	text-align: right;
-	display: inline-block;
+  min-width: 130px;
+  max-width: 130px;
+  white-space: normal;
+  /* allow wrap */
+  word-wrap: break-word;
+  /* allow wrap */
+  text-align: right;
+  display: inline-block;
 }
 .flexicontent #fc-filters-box .fc-filter .fc-xpended-row .add-on:not(.fc-lbl-inverted),
 .flexicontent #fc-filters-box .fc-filter .fc-xpended .add-on:not(.fc-lbl-inverted) {
-	color: black;
+  color: black;
+  /* because we place inside a ... btn ... */
 }
 .flexicontent #fc-filters-box .fc-filter .has-inverted-date-lbl + button {
-	background: #555 none repeat scroll 0 0;
-	color: white;
+  background: #555 none repeat scroll 0 0;
+  color: white;
 }
 .flexicontent #fc-filters-box .fc-filter #s2id_date.select2-container.use_select2_lib .select2-choice {
-	width: 90px !important;
-	min-width: 90px !important;
+  width: 90px !important;
+  min-width: 90px !important;
 }
 .flexicontent #fc-filters-box .fc-filter #s2id_date.select2-container.use_select2_lib .select2-choice .select2-arrow {
-	border-radius: 0px !important;
+  border-radius: 0px !important;
 }
 .flexicontent #fc-filters-box .fc-filter #startdate_img,
 .flexicontent #fc-filters-box .fc-filter #enddate_img {
-	padding-right: 2px !important;
-	padding-left: 2px !important;
+  padding-right: 2px !important;
+  padding-left: 2px !important;
 }
 .flexicontent #fc-filters-box .fc-filter #startdate_btn,
 .flexicontent #fc-filters-box .fc-filter #enddate_btn {
-	padding: 0px 4px !important;
-	box-sizing: border-box;
-	vertical-align: top;
+  /*font-size: 14px !important;
+			height: 36px !important;*/
+  padding: 0px 4px !important;
+  box-sizing: border-box;
+  vertical-align: top;
 }
 .flexicontent #fc-filters-box .fc-filter #startdate_btn {
-	border-radius: 0;
+  border-radius: 0;
 }
 .flexicontent #fc-filters-box .fc-filter #startdate,
 .flexicontent #fc-filters-box .fc-filter #enddate {
-	font-size: 11px !important;
-	min-width: 93px;
-	max-width: 93px;
-	line-height: 1.9rem !important;
-	height: 1.9rem !important;
-	vertical-align: baseline;
-	padding: 0px 8px !important;
-	box-sizing: border-box;
-	border-radius: 0;
+  font-size: 11px !important;
+  min-width: 93px;
+  max-width: 93px;
+  line-height: 1.9rem !important;
+  height: 1.9rem !important;
+  vertical-align: baseline;
+  padding: 0px 8px !important;
+  box-sizing: border-box;
+  border-radius: 0;
 }
 .flexicontent #fc-filters-box .fc-filter > * {
-	vertical-align: middle !important;
-	float: right;
-	margin: 2px 4px !important;
+  vertical-align: middle !important;
+  float: right;
+  margin: 2px 4px !important;
 }
 .flexicontent #fc-filters-box .fc-filter > *:not(.fc-xpended):not(.fc-xpended-row) {
-	margin: 0 6px 0 2px !important;
+  margin: 0 6px 0 2px !important;
 }
 .flexicontent #fc-filters-box .fc-filter [class^="fc-xpended"] div.select2-container .select2-choice > .select2-chosen,
 .flexicontent #fc-filters-box .fc-filter [class*="fc-xpended"] div.select2-container .select2-choice > .select2-chosen {
-	white-space: nowrap !important;
+  white-space: nowrap !important;
 }
 .flexicontent #fc-filters-box .fc-filter .label {
-	font-size: 11px;
-	padding: 4px 4px;
-	margin: 0px 4px;
+  font-size: 11px;
+  padding: 4px 4px;
+  margin: 0px 4px;
 }
 .flexicontent #fc-filters-box .fc-filter *:not(.input-append):not(.input-prepend) > input[type="text"] {
-	padding: 2px 2px 3px !important;
-	margin: 0px !important;
+  padding: 2px 2px 3px !important;
+  margin: 0px !important;
 }
 .flexicontent #fc-filters-box .fc-filter .field-calendar > div > button {
-	width: 25px;
-	padding-left: 0;
-	padding-right: 4px;
+  width: 25px;
+  padding-left: 0;
+  padding-right: 4px;
 }
 .flexicontent #fc-filters-box .fc-filter .input-group-prepend > .input-group-text + input,
 .flexicontent #fc-filters-box .fc-filter .input-prepend > .add-on + input {
-	width: 212px !important;
-	padding: 0 8px;
-	border-radius: 0 4px 4px 0;
-	box-sizing: border-box;
-	min-width: unset;
+  width: 212px !important;
+  padding: 0 8px;
+  border-radius: 0 4px 4px 0;
+  box-sizing: border-box;
+  min-width: unset;
 }
 .flexicontent #fc-filters-box .fc-filter .input-prepend > input,
 .flexicontent #fc-filters-box .fc-filter .input-append > input {
-	margin: 0 !important;
+  margin: 0 !important;
 }
 .flexicontent #fc-filters-box .fc-filter .select2-container .select2-choice {
-	width: 196px !important;
+  width: 196px !important;
 }
 .flexicontent #fc-filters-box .fc-filter .select2-container-multi {
-	width: 206px !important;
+  width: 206px !important;
 }
 .flexicontent #fc-filters-box .fc-filter .select2-container-multi .select2-choices {
-	box-sizing: border-box;
-	margin: 0 !important;
+  box-sizing: border-box;
+  margin: 0 !important;
 }
 .flexicontent #fc-filters-box .fc-filter .select2-container-multi .select2-choices .select2-search-field {
-	float: left !important;
-	margin: 0 !important;
-	border-right-width: 0;
+  float: left !important;
+  margin: 0 !important;
+  border-right-width: 0;
 }
 .flexicontent #fc-filters-box .fc-filter .select2-container-multi .select2-choices .select2-search-field input.select2-input {
-	line-height: calc(var(--form-inp-height) - 2px) !important;
-	min-height: calc(var(--form-inp-height) - 2px) !important;
-	box-sizing: border-box;
-	margin: 0 !important;
-	width: 22px !important;
-	cursor: pointer !important;
-	border-width: 0px !important;
-	background: #fff url(../images/select2.png) no-repeat scroll -60% -22px !important;
-	font-size: 13px;
+  line-height: calc(var(--form-inp-height) - 2px) !important;
+  min-height: calc(var(--form-inp-height) - 2px) !important;
+  box-sizing: border-box;
+  margin: 0 !important;
+  width: 22px !important;
+  cursor: pointer !important;
+  border-width: 0px !important;
+  background: #fff url(../images/select2.png) no-repeat scroll -60% -22px !important;
+  font-size: 13px;
+}
+.flexicontent #fc-filters-box .fc-filter .select2-container-multi .select2-choices .select2-search-choice {
+  /*color: darkorange !important;*/
 }
 .flexicontent #fc-filters-box .fc-filter .select2-container-multi.select2-dropdown-open .select2-choices .select2-search-field {
-	width: 100% !important;
+  width: 100% !important;
 }
 .flexicontent #fc-filters-box .fc-filter .select2-container-multi.select2-dropdown-open .select2-choices .select2-search-field input.select2-input {
-	padding: 2px 6px 2px 26px !important;
-	background: #fff url(../images/select2.png) no-repeat scroll -32px -22px !important;
-	width: 100% !important;
-	line-height: calc(var(--form-inp-height) - 2px) !important;
-	min-height: calc(var(--form-inp-height) - 2px) !important;
+  padding: 2px 6px 2px 26px !important;
+  background: #fff url(../images/select2.png) no-repeat scroll -32px -22px !important;
+  width: 100% !important;
+  line-height: calc(var(--form-inp-height) - 2px) !important;
+  min-height: calc(var(--form-inp-height) - 2px) !important;
 }
 #s2id_scope.select2-container.use_select2_lib {
-	margin: 0;
-	display: inherit;
+  margin: 0;
+  display: inherit;
 }
 #s2id_scope.select2-container.use_select2_lib .select2-choice {
-	width: 10px !important;
-	margin: 0 !important;
-	border-top-left-radius: 0;
-	border-bottom-left-radius: 0;
+  width: 10px !important;
+  margin: 0 !important;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
 }
 #s2id_scope.select2-container.use_select2_lib .select2-choice .select2-chosen {
-	white-space: nowrap !important;
+  white-space: nowrap !important;
 }
 #s2id_scope.select2-container.use_select2_lib .select2-choice .select2-arrow {
-	border-radius: 0px;
+  border-radius: 0px;
 }
 #s2id_scope.select2-container.use_select2_lib .select2-choice .select2-arrow > * {
-	background-position-y: 0.5em;
+  background-position-y: 0.5em;
 }
 .admin.com_flexicontent .select2-drop .select2-results {
-	max-height: 400px !important;
+  max-height: 400px !important;
 }
 @media (max-width: 1580px) {
-	body .fc_hidden_1580,
-	#flexicontent .fc_hidden_1580 {
-		display: none;
-	}
+  body .fc_hidden_1580,
+  #flexicontent .fc_hidden_1580 {
+    display: none;
+  }
 }
 @media (max-width: 1360px) {
-	body .fc_hidden_1360,
-	#flexicontent .fc_hidden_1360 {
-		display: none;
-	}
+  body .fc_hidden_1360,
+  #flexicontent .fc_hidden_1360 {
+    display: none;
+  }
 }
 @media (max-width: 1270px) {
-	body .fc_hidden_1270,
-	#flexicontent .fc_hidden_1270 {
-		display: none;
-	}
+  body .fc_hidden_1270,
+  #flexicontent .fc_hidden_1270 {
+    display: none;
+  }
 }
 @media (max-width: 960px) {
-	body .fc_hidden_960,
-	#flexicontent .fc_hidden_960 {
-		display: none;
-	}
+  body .fc_hidden_960,
+  #flexicontent .fc_hidden_960 {
+    display: none;
+  }
 }
 @media (max-width: 720px) {
-	body .fc_hidden_720,
-	#flexicontent .fc_hidden_720 {
-		display: none;
-	}
+  body .fc_hidden_720,
+  #flexicontent .fc_hidden_720 {
+    display: none;
+  }
 }
 @media (max-width: 640px) {
-	body .fc_hidden_640,
-	#flexicontent .fc_hidden_640 {
-		display: none;
-	}
+  body .fc_hidden_640,
+  #flexicontent .fc_hidden_640 {
+    display: none;
+  }
 }
 @media (max-width: 580px) {
-	body .fc_hidden_580,
-	#flexicontent .fc_hidden_580 {
-		display: none;
-	}
+  body .fc_hidden_580,
+  #flexicontent .fc_hidden_580 {
+    display: none;
+  }
 }
 div#fc-filters-slide-btn {
-	border: 0;
-	background: none;
-	box-shadow: none;
+  border: 0;
+  background: none;
+  box-shadow: none;
 }
 #fc-filters-box input[type="text"] {
-	padding: 8px 6px !important;
-	min-width: unset;
+  padding: 8px 6px !important;
+  min-width: unset;
 }
 .fc_elements_listed_small {
-	font-weight: bold;
-	display: inline-block;
-	max-width: 420px;
+  font-weight: bold;
+  display: inline-block;
+  max-width: 420px;
 }
+/** color input correction **/
 input.minicolors-input {
-	padding: 0px 44px 8px !important;
+  padding: 0px 44px 8px !important;
 }
+/** calendar correction **/
 .field-calendar .btn-primary,
 .field-calendar .btn.btn-secondary {
-	height: var(--ctrls-inp-height) !important;
+  height: var(--ctrls-inp-height) !important;
 }

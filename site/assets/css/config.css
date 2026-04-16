@@ -1,6 +1,10 @@
+/* This is created automatically, do NOT edit this manually! 
+Modify these in component configuration. */
+/* CSS Variables */
 :root {
-	--form-inp-height: 42px;
-	--ctrls-inp-height: 42px;
-	--fcman-inp-height: 42px;
-	--filts-inp-height: 42px;
+  --form-inp-height: 42+px;
+  --ctrls-inp-height: 42+px;
+  --fcman-inp-height: 42+px;
+  --filts-inp-height: 42+px;
 }
+/* LESS functions */
