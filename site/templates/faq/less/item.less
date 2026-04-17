@@ -10,18 +10,18 @@ body #flexicontent .fc_item_title a {
 	color: @FCI_title_color;
 	background-color: @FCI_title_bg_color;
 	padding : @FCI_title_pad  ;
-	border-radius: @FCI_title_border_radius + px;
+	border-radius: unit(@FCI_title_border_radius, px);
 }
 
 /* background item */
 .fcitems {
 	background-color: @FCI_item_bg_color;
-	padding-top: @FCI_item_pad_top + px ;
-	padding-right: @FCI_item_pad_right + px;
-	padding-left: @FCI_item_pad_left + px;
-	padding-bottom: @FCI_item_pad_bottom + px;
-	border-radius: @FCI_item_border_radius + px;
-	border: @FCI_item_border_size + px @FCI_item_border_type @FCI_item_border_color;
+	padding-top: unit(@FCI_item_pad_top, px) ;
+	padding-right: unit(@FCI_item_pad_right, px);
+	padding-left: unit(@FCI_item_pad_left, px);
+	padding-bottom: unit(@FCI_item_pad_bottom, px);
+	border-radius: unit(@FCI_item_border_radius, px);
+	border: unit(@FCI_item_border_size, px) @FCI_item_border_type @FCI_item_border_color;
 	color:@FCI_item_text_color;
 }
 
@@ -31,7 +31,7 @@ body #flexicontent .flexi.label,
 body #flexicontent .desc-title.label {
 	background-color: @FCI_label_bg_color;
 	color: @FCI_label_txt_color;
-	border-radius: @FCI_label_radius*1px;
+	border-radius: unit(@FCI_label_radius, px);
 	padding: @FCI_label_pad ;
     font-weight:bold;
 }
@@ -61,10 +61,10 @@ body #flexicontent ul.tabbernav > li:hover a {
 }
 body .tabbertab, #flexicontent .tabbertab {
 	background-color: @FCI_tab_content_bg_color;
-	border-radius : @FCI_tab_content_border_radius + px;
+	border-radius : unit(@FCI_tab_content_border_radius, px);
 }
 body ul.tabbernav, #flexicontent ul.tabbernav {
-	border-bottom: @FCI_tab_content_border_size_top + px solid @FCI_tab_content_border_color_top !important;
+	border-bottom: unit(@FCI_tab_content_border_size_top, px) solid @FCI_tab_content_border_color_top !important;
 }
 div#fc_subtitle_tabset, div#fc_bottom_tabset  {
     margin-top: 40px !important;
@@ -140,8 +140,8 @@ body .flexi.infoblock{
 	outline: none;
 }
 .topblock .flexi.infoblock {
-  	border-radius: @FCI_column_border_radius_top + px;
-	border : @FCI_column_border_size_top + px @FCI_column_border_type_top @FCI_column_border_color_top;
+  	border-radius: unit(@FCI_column_border_radius_top, px);
+	border : unit(@FCI_column_border_size_top, px) @FCI_column_border_type_top @FCI_column_border_color_top;
   	color: @FCI_column_color_top;
 	background-color: @FCI_column_bg_color_top;
 }
@@ -151,8 +151,8 @@ body .flexi.infoblock{
 }
 
 .flexi.bottomblock.infoblock {
-  	border-radius: @FCI_column_border_radius_bottom + px;
-	border : @FCI_column_border_size_bottom + px @FCI_column_border_type_bottom @FCI_column_border_color_bottom;
+  	border-radius: unit(@FCI_column_border_radius_bottom, px);
+	border : unit(@FCI_column_border_size_bottom, px) @FCI_column_border_type_bottom @FCI_column_border_color_bottom;
   	color: @FCI_column_color_bottom;
 	background-color: @FCI_column_bg_color_bottom;
 	padding: @FCI_column_pad_bottom;

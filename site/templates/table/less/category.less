@@ -9,11 +9,11 @@ body #flexicontent .fc_item_title,
 body #flexicontent .fc_item_title a {
 	color: @FCC_title_color;
 	background-color: @FCC_title_bg_color;
-	padding-top: @FCC_title_pad_top + px ;
-	padding-right: @FCC_title_pad_right + px;
-	padding-left: @FCC_title_pad_left + px;
-	padding-bottom: @FCC_title_pad_bottom + px;
-	border-radius: @FCC_title_border_radius + px;
+	padding-top: unit(@FCC_title_pad_top, px) ;
+	padding-right: unit(@FCC_title_pad_right, px);
+	padding-left: unit(@FCC_title_pad_left, px);
+	padding-bottom: unit(@FCC_title_pad_bottom, px);
+	border-radius: unit(@FCC_title_border_radius, px);
 }
 td.fc_title_col {
 	background-color: @FCC_title_bg_color !important;
@@ -26,7 +26,7 @@ body table.adminlist tbody tr.row0:hover td, table.adminlist tbody tr.row1:hover
 	background-color: @FCC_td_bg_hoverbgcolor !important;
 }
 body table.adminlist tbody tr {
-	border-top: @FCC_td_border_size + px solid @FCC_td_border_color !important;
+	border-top: unit(@FCC_td_border_size, px) solid @FCC_td_border_color !important;
 	text-align: @FCC_td_txt_align;
 }
 
@@ -36,11 +36,11 @@ body #flexicontent .flexi.label,
 body #flexicontent .desc-title.label {
 	background-color: @FCC_label_bg_color;
 	color: @FCC_label_txt_color;
-	border-radius: @FCC_label_radius*1px;
-	padding-top: @FCC_label_pad_top + px ;
-	padding-right: @FCC_label_pad_right + px;
-	padding-left: @FCC_label_pad_left + px;
-	padding-bottom: @FCC_label_pad_bottom + px;
+	border-radius: unit(@FCC_label_radius, px);
+	padding-top: unit(@FCC_label_pad_top, px) ;
+	padding-right: unit(@FCC_label_pad_right, px);
+	padding-left: unit(@FCC_label_pad_left, px);
+	padding-bottom: unit(@FCC_label_pad_bottom, px);
 }
 
 table.adminlist tbody tr.row0 td {
