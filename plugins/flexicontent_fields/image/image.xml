@@ -320,6 +320,15 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 
+
+			<field name="" type="separator" default="FLEXI_BACKEND_VIEW" level="level2" />
+			<field name="backend_view_appearance" type="multilist" subtype="radio" default="0" label="FLEXI_BACKEND_VIEW_APPEARANCE" description="FLEXI_BACKEND_VIEW_APPEARANCE_DESC" toggle_related="1" class="btn-group group-fcmethod">
+				<option value="0" show_list="" hide_list="backend-view-trim-chars">FLEXI_DEFAULT</option>
+				<option value="1" show_list="" hide_list="backend-view-trim-chars">FLEXI_CHECK_MARK</option>
+				<option value="2" show_list="backend-view-trim-chars" hide_list="">FLEXI_CLEAN_HTML_AND_TRIM</option>
+			</field>
+			<field name="backend_view_trim_chars" type="text" default="100" label="FLEXI_TRIM_LENGTH" description="FLEXI_TRIM_LENGTH_DESC" depend_class="backend-view-trim-chars" />
+
 			<field name="" type="separator" default="FLEXI_THUMBNAILS" icon_class="icon-image" level="tab_open" box_type="1" />
 
 			<field name="" type="separator" default="FLEXI_IMGFIELD_THUMBNAIL_CREATION" description="FLEXI_IMGFIELD_THUMBNAIL_CREATION_DESC" level="level1" />
