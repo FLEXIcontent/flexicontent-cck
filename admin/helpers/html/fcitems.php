@@ -181,4 +181,15 @@ abstract class JHtmlFcitems extends JHtmlFcbase
 				<span class="icon-' . $state[0] . '"></span>
 			</a>';
 	}
+
+	public static function col_field_value($raw_value, $appearance, $trim_chars = 100)
+	{
+		if ($appearance === 1)
+		{
+			return ($raw_value !== '' && strip_tags($raw_value) !== '') ? '<span class="icon-checkmark"></span>' : '';
+		}
+
+		$clean = trim(strip_tags($raw_value));
+		return htmlspecialchars(mb_substr($clean, 0, $trim_chars, 'UTF-8'), ENT_QUOTES, 'UTF-8');
+	}
 }

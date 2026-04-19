@@ -308,6 +308,15 @@
 			<field name="noaccess_msg_logged" type="text" default="" size="40" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_MSG" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_MSG_LOGGED_DESC" />
 
 
+
+			<field name="" type="separator" default="FLEXI_BACKEND_VIEW" level="level2" />
+			<field name="backend_view_appearance" type="multilist" subtype="radio" default="0" label="FLEXI_BACKEND_VIEW_APPEARANCE" description="FLEXI_BACKEND_VIEW_APPEARANCE_DESC" toggle_related="1" class="btn-group group-fcmethod">
+				<option value="0" show_list="" hide_list="backend-view-trim-chars">FLEXI_DEFAULT</option>
+				<option value="1" show_list="" hide_list="backend-view-trim-chars">FLEXI_CHECK_MARK</option>
+				<option value="2" show_list="backend-view-trim-chars" hide_list="">FLEXI_CLEAN_HTML_AND_TRIM</option>
+			</field>
+			<field name="backend_view_trim_chars" type="text" default="100" label="FLEXI_TRIM_LENGTH" description="FLEXI_TRIM_LENGTH_DESC" depend_class="backend-view-trim-chars" />
+
 			<field name="" type="separator" default="FLEXI_FIELD_FILE_FILE_ACTIONS" description="" icon_class="icon-menu-3" level="tab_open" box_type="1" />
 
 			<field name="" type="separator" default="Button configuration for actions such as: download, view, share, add-to-cart" level="level3" class="alert alert-info fcpadded" />
