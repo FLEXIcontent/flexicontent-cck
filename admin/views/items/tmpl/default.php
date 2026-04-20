@@ -30,6 +30,8 @@ $user     = Factory::getUser();
 $session  = Factory::getSession();
 $document = Factory::getDocument();
 $cparams  = ComponentHelper::getParams('com_flexicontent');
+$global_col_appearance  = (int) $cparams->get('items_manager_cols_appearance', 0);
+$global_trim_chars      = (int) $cparams->get('items_manager_trim_chars', 100);
 $ctrl     = 'items.';
 $hlpname  = 'fcitems';
 $isAdmin  = $app->isClient('administrator');
@@ -1389,8 +1391,15 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 			<td class="hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 		    <?php
-				// Output the field's display HTML
-				echo isset( $row->fields[$field->name]->{$field->methodname} ) ? $row->fields[$field->name]->{$field->methodname} : '';
+				$raw_value        = isset($row->fields[$field->name]->{$field->methodname}) ? $row->fields[$field->name]->{$field->methodname} : '';
+				$field_appearance = (int) $field->parameters->get('backend_view_appearance', 0);
+				$appearance       = $field_appearance ?: $global_col_appearance;
+				if ($appearance === 0) {
+					echo $raw_value;
+				} else {
+					$trim_chars = $field_appearance ? (int) $field->parameters->get('backend_view_trim_chars', 100) : $global_trim_chars;
+					echo HTMLHelper::_($hlpname . '.col_field_value', $raw_value, $appearance, $trim_chars);
+				}
 		    ?>
 			</td>
 		<?php endforeach; ?>

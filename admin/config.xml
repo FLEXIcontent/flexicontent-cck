@@ -2129,6 +2129,14 @@
 				label="FLEXI_IMAN_DISABLE_COLUMNS" description="FLEXI_IMAN_DISABLE_COLUMNS_DESC" cols="3" />
 
 			<field name="items_manager_extra_fields" type="textarea" default="" rows="2" cols="60" label="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS" description="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS_DESC" class="input-xxlarge" />
+
+			<field name="items_manager_cols_appearance" type="multilist" subtype="radio" default="0" label="FLEXI_ITEMS_MANAGER_COLS_APPEARANCE" description="FLEXI_ITEMS_MANAGER_COLS_APPEARANCE_DESC" toggle_related="1" class="btn-group group-fcmethod">
+				<option value="0" show_list="" hide_list="items-manager-trim-chars">FLEXI_DEFAULT</option>
+				<option value="1" show_list="" hide_list="items-manager-trim-chars">FLEXI_CHECK_MARK</option>
+				<option value="2" show_list="items-manager-trim-chars" hide_list="">FLEXI_CLEAN_HTML_AND_TRIM</option>
+			</field>
+			<field name="items_manager_trim_chars" type="text" default="100" label="FLEXI_TRIM_LENGTH" description="FLEXI_TRIM_LENGTH_DESC" depend_class="items-manager-trim-chars" />
+
 			<field name="items_manager_custom_filters" type="filters" default="" isfilter="*" field_type="select,selectmultiple,radio,radioimage,checkbox,checkboximage" label="FLEXI_ITEMS_MANAGER_CUSTOM_FILTERS_LIST" description="FLEXI_ITEMS_MANAGER_CUSTOM_FILTERS_LIST_DESC" />
 			<field name="items_manager_order" type="list" default="a.id" label="FLEXI_ITEMS_MANAGER_ORDER" description="FLEXI_ITEMS_MANAGER_ORDER_DESC" class="use_select2_lib">
 				<option value="1">FLEXI_ITEMS_MANAGER_ORDER_UNORDERED</option>
