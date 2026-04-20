@@ -33,6 +33,9 @@ class plgFlexicontent_fieldsImage extends FCField
 	static $default_widths  = array('l' => 800,'m' => 400,'s' => 120,'b' => 40);
 	static $default_heights = array('l' => 600,'m' => 300,'s' => 90,'b' => 30);
 
+	// Tailles pour lesquelles une variante .webp est générée (pas 'b' = backend)
+	static $webp_sizes = array('l', 'm', 's');
+
 	static $display_to_thumb_size = array(
 		'display_backend_src' => 'b', 'display_small_src' => 's', 'display_medium_src' => 'm', 'display_large_src' => 'l', 'display_original_src' => 'o',
 		'display_backend_thumb' => 'b', 'display_small_thumb' => 's', 'display_medium_thumb' => 'm', 'display_large_thumb' => 'l', 'display_original_thumb' => 'o',
@@ -2325,6 +2328,14 @@ class plgFlexicontent_fieldsImage extends FCField
 			chmod($filepath, 0644);
 		}
 
+		// --- Génération WebP (option 1 : lazy) après création du thumbnail classique ---
+		if ($result && (int) $field->parameters->get('generate_webp', 0) && in_array($size, static::$webp_sizes))
+		{
+			$webp_quality = max(1, min(100, (int) $field->parameters->get('webp_quality', 80)));
+			$dest_no_ext  = $dest_path . $prefix . preg_replace('/\.[^.]+$/', '', $filename);
+			$this->generateWebpVariant($filepath, $dest_no_ext, $webp_quality);
+		}
+
 		return $result;
 	}
 
@@ -2344,6 +2355,91 @@ class plgFlexicontent_fieldsImage extends FCField
 			// WE HAVE PATCHED configuration not to double define CONSTANTS and FUNCTIONS
 			include ( JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'phpThumb.config.php' );
 		}
+	}
+
+
+	/**
+	 * Génère une variante .webp d'un thumbnail déjà créé.
+	 * Utilise GD en priorité (PHP natif), puis ImageMagick via exec() en fallback.
+	 *
+	 * @param  string  $src_path     Chemin absolu du fichier source (jpg/png/gif)
+	 * @param  string  $dest_no_ext  Chemin absolu de destination SANS extension
+	 * @param  int     $quality      Qualité WebP 1-100
+	 * @return bool    true si le fichier WebP a été créé ou était déjà à jour
+	 */
+	protected function generateWebpVariant($src_path, $dest_no_ext, $quality = 80)
+	{
+		$webp_path = $dest_no_ext . '.webp';
+		$quality   = max(1, min(100, (int) $quality));
+
+		// Ne pas régénérer si le webp est déjà à jour par rapport à la source
+		if (file_exists($webp_path) && filemtime($webp_path) >= filemtime($src_path))
+		{
+			return true;
+		}
+
+		// --- Méthode 1 : GD natif (PHP >= 5.5 compilé avec --with-webp) ---
+		if (function_exists('imagewebp'))
+		{
+			$ext = strtolower(pathinfo($src_path, PATHINFO_EXTENSION));
+			$img = null;
+
+			switch ($ext)
+			{
+				case 'jpg':
+				case 'jpeg':
+					$img = @imagecreatefromjpeg($src_path);
+					break;
+				case 'png':
+					$img = @imagecreatefrompng($src_path);
+					if ($img)
+					{
+						imagealphablending($img, false);
+						imagesavealpha($img, true);
+					}
+					break;
+				case 'gif':
+					$img = @imagecreatefromgif($src_path);
+					break;
+				case 'webp':
+					// Source déjà en webp : copie directe
+					return @copy($src_path, $webp_path);
+			}
+
+			if ($img)
+			{
+				$ok = @imagewebp($img, $webp_path, $quality);
+				imagedestroy($img);
+
+				if ($ok && file_exists($webp_path))
+				{
+					@chmod($webp_path, 0644);
+					return true;
+				}
+			}
+		}
+
+		// --- Méthode 2 : ImageMagick via exec() (fallback) ---
+		$disabled_funcs = array_map('trim', explode(',', (string) ini_get('disable_functions')));
+
+		if (function_exists('exec') && !in_array('exec', $disabled_funcs))
+		{
+			$cmd = 'convert '
+				. escapeshellarg($src_path)
+				. ' -quality ' . (int) $quality
+				. ' ' . escapeshellarg($webp_path)
+				. ' 2>&1';
+			exec($cmd, $output, $return_code);
+
+			if ($return_code === 0 && file_exists($webp_path))
+			{
+				@chmod($webp_path, 0644);
+				return true;
+			}
+		}
+
+		// Échec silencieux : la génération WebP ne bloque pas le reste
+		return false;
 	}
 
 
@@ -2457,7 +2553,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			echo '<div class="alert alert-warning">image field id: ' . $field->id . ' is in intro-full mode, removeOriginalFile() should not have been called</div>';
 		}
 
-		// a. Delete the thumbnails
+		// a. Delete the thumbnails (and associated WebP variants)
 		$errors = array();
 		$sizes  = array('l','m','s','b');
 
@@ -2468,6 +2564,13 @@ class plgFlexicontent_fieldsImage extends FCField
 			if (file_exists($dest_path) && !File::delete($dest_path))
 			{
 				$app->enqueueMessage('Field: ' . $field->label . ' : ' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD_UNABLE_TO_DELETE_FILE') .": ". $dest_path, 'warning');
+			}
+
+			// Supprimer le .webp associé si il existe
+			$webp_dest = $thumbfolder . DS . $size . '_' . preg_replace('/\.[^.]+$/', '', $filename) . '.webp';
+			if (file_exists($webp_dest))
+			{
+				File::delete($webp_dest);
 			}
 		}
 
@@ -2608,6 +2711,21 @@ class plgFlexicontent_fieldsImage extends FCField
 			if ($thumbnail_exists && $check_small)
 			{
 				continue;
+			}
+
+			// --- Option 1 (lazy) : thumbnail classique existe, WebP peut-être absent → générer à la volée ---
+			// On ne tente la génération WebP que si :
+			// 1. le thumbnail classique est déjà présent sur disque (sinon create_thumb s'en chargera)
+			// 2. generate_webp est activé dans les paramètres du champ
+			// 3. la taille fait partie des tailles WebP gérées (s, m, l)
+			if ($thumbnail_exists && !$check_small
+				&& (int) $field->parameters->get('generate_webp', 0)
+				&& in_array($size, static::$webp_sizes))
+			{
+				$webp_quality = max(1, min(100, (int) $field->parameters->get('webp_quality', 80)));
+				$thumb_prefix = $size . '_' . $extra_prefix;
+				$dest_no_ext  = Path::clean($dest_path . DS . $thumb_prefix . preg_replace('/\.[^.]+$/', '', $filename));
+				$this->generateWebpVariant($path, $dest_no_ext, $webp_quality);
 			}
 
 			$param_w = $field->parameters->get('w_' . $size, self::$default_widths[$size]);
@@ -3062,4 +3180,134 @@ class plgFlexicontent_fieldsImage extends FCField
 				echo("UNKNOWN ERROR at line: $errline \n");
 		}
 	}
+
+
+	/**
+	 * Option 2 — Régénération en lot de tous les WebP manquants.
+	 *
+	 * Parcourt tous les thumbnails classiques (l_, m_, s_) déjà présents sur disque
+	 * et génère le .webp correspondant s'il est absent ou plus ancien que la source.
+	 *
+	 * Utilisation via CLI (depuis la racine Joomla) :
+	 *   php cli/rebuild_webp.php
+	 *   php cli/rebuild_webp.php --field=12   (limiter à un champ)
+	 *   php cli/rebuild_webp.php --quality=85
+	 *   php cli/rebuild_webp.php --dry-run    (simulation sans écriture)
+	 *   php cli/rebuild_webp.php --force      (régénérer même si webp existe)
+	 *
+	 * Utilisation programmatique (back-office) :
+	 *   $field_plugin = new plgFlexicontent_fieldsImage(...);
+	 *   $result = $field_plugin->rebuildAllWebp($field, array('quality' => 85));
+	 *
+	 * @param  object  $field    Objet champ FLEXIcontent (paramètres lus si null)
+	 * @param  array   $options  dry_run, force, quality, verbose
+	 * @return array   Statistiques : generated, skipped, errors, dirs_scanned
+	 */
+	public function rebuildAllWebp($field = null, array $options = array())
+	{
+		$dry_run = !empty($options['dry_run']);
+		$force   = !empty($options['force']);
+		$verbose = !empty($options['verbose']);
+		$quality = isset($options['quality']) ? max(1, min(100, (int) $options['quality'])) : 80;
+
+		// Si un champ est fourni, lire la qualité depuis ses paramètres
+		if ($field && !isset($options['quality']))
+		{
+			$quality = max(1, min(100, (int) $field->parameters->get('webp_quality', 80)));
+		}
+
+		$stats = array('generated' => 0, 'skipped' => 0, 'errors' => 0, 'dirs_scanned' => 0);
+
+		// Déterminer le(s) dossier(s) à scanner
+		if ($field)
+		{
+			$dirs = array(Path::clean(JPATH_SITE . DS . $field->parameters->get('dir')));
+		}
+		else
+		{
+			// Sans champ spécifique : scanner le dossier racine des médias FLEXIcontent
+			$dirs = array(
+				Path::clean(COM_FLEXICONTENT_FILEPATH),
+				Path::clean(COM_FLEXICONTENT_MEDIAPATH),
+			);
+			// Ajouter les dossiers images si défini
+			$fc_dir = Path::clean(JPATH_SITE . DS . 'images' . DS . 'flexicontent');
+			if (is_dir($fc_dir)) $dirs[] = $fc_dir;
+		}
+
+		// Extensions sources acceptées
+		$valid_exts = array('jpg', 'jpeg', 'png', 'gif');
+
+		// Préfixes des thumbnails générés par FLEXIcontent (l_, m_, s_)
+		$thumb_prefixes = static::$webp_sizes; // array('l', 'm', 's')
+
+		foreach ($dirs as $base_dir)
+		{
+			if (!is_dir($base_dir)) continue;
+
+			$iterator = new RecursiveIteratorIterator(
+				new RecursiveDirectoryIterator($base_dir, RecursiveDirectoryIterator::SKIP_DOTS),
+				RecursiveIteratorIterator::SELF_FIRST
+			);
+
+			foreach ($iterator as $file_obj)
+			{
+				if (!$file_obj->isFile()) continue;
+
+				$ext = strtolower($file_obj->getExtension());
+				if (!in_array($ext, $valid_exts)) continue;
+
+				$basename = $file_obj->getBasename('.' . $ext); // nom sans extension
+				$src_path = $file_obj->getRealPath();
+
+				// Vérifier que le fichier est bien un thumbnail FLEXIcontent (préfixe l_, m_ ou s_)
+				$is_thumb = false;
+				foreach ($thumb_prefixes as $pref)
+				{
+					if (strpos($file_obj->getFilename(), $pref . '_') === 0)
+					{
+						$is_thumb = true;
+						break;
+					}
+				}
+				if (!$is_thumb) continue;
+
+				$stats['dirs_scanned']++;
+
+				$dest_no_ext = $file_obj->getPath() . DS . $basename;
+				$webp_path   = $dest_no_ext . '.webp';
+
+				// Sauter si webp déjà à jour et pas de --force
+				if (!$force && file_exists($webp_path) && filemtime($webp_path) >= filemtime($src_path))
+				{
+					$stats['skipped']++;
+					if ($verbose) echo "SKIP : " . $src_path . "\n";
+					continue;
+				}
+
+				if ($dry_run)
+				{
+					$stats['generated']++;
+					if ($verbose) echo "DRY  : " . $src_path . " -> " . $webp_path . "\n";
+					continue;
+				}
+
+				$ok = $this->generateWebpVariant($src_path, $dest_no_ext, $quality);
+
+				if ($ok)
+				{
+					$stats['generated']++;
+					if ($verbose) echo "OK   : " . $webp_path . "\n";
+				}
+				else
+				{
+					$stats['errors']++;
+					if ($verbose) echo "ERR  : " . $src_path . "\n";
+				}
+			}
+		}
+
+		return $stats;
+	}
+
 }

@@ -320,7 +320,6 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 
-
 			<field name="" type="separator" default="FLEXI_BACKEND_VIEW" level="level2" />
 			<field name="backend_view_appearance" type="multilist" subtype="radio" default="0" label="FLEXI_BACKEND_VIEW_APPEARANCE" description="FLEXI_BACKEND_VIEW_APPEARANCE_DESC" toggle_related="1" class="btn-group group-fcmethod">
 				<option value="0" show_list="" hide_list="backend-view-trim-chars">FLEXI_DEFAULT</option>
@@ -348,6 +347,21 @@
 				<option value="1">FLEXI_FIELD_UNIQUE_THUMB_FOLDER_SET_ABOVE</option>
 			</field>
 			<field name="quality" type="text" default="90" size="4" label="FLEXI_FIELD_IMAGE_QUALITY" description="FLEXI_FIELD_IMAGE_QUALITY_DESC" />
+			<field name="" type="separator" default="FLEXI_IMGFIELD_WEBP_GENERATION" description="FLEXI_IMGFIELD_WEBP_GENERATION_DESC" level="level2" />
+			<field name="" type="separator" default="FLEXI_IMGFIELD_WEBP_NOTE" level="level3" class="alert alert-info fcpadded" />
+			<field name="generate_webp" type="radio" default="0"
+				label="FLEXI_IMGFIELD_GENERATE_WEBP"
+				description="FLEXI_IMGFIELD_GENERATE_WEBP_DESC"
+				class="btn-group btn-group-yesno"
+				toggle_related="1">
+				<option value="0" hide_list="webp-options">FLEXI_NO</option>
+				<option value="1" show_list="webp-options">FLEXI_YES</option>
+			</field>
+			<field name="webp_quality" type="text" default="80" size="4"
+				label="FLEXI_IMGFIELD_WEBP_QUALITY"
+				description="FLEXI_IMGFIELD_WEBP_QUALITY_DESC"
+				depend_class="webp-options" />
+			<field name="" type="separator" default="FLEXI_FIELD_IMAGE_WM" description="FLEXI_FIELD_IMAGE_WM_DESC" level="level2" />
 			<field name="wm_opacity" type="text" default="100" size="4" label="FLEXI_FIELD_IMAGE_WM_TRANS" description="FLEXI_FIELD_IMAGE_WM_TRANS_DESC" />
 			<field name="wm_position" type="list" default="BR" label="FLEXI_FIELD_IMAGE_WM_POS" description="FLEXI_FIELD_IMAGE_WM_POS_DESC">
 				<option value="*">FLEXI_FIELD_REPEAT</option>

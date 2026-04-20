@@ -45,18 +45,18 @@ foreach ($values as $n => $value)
 	if ($size === 'l')
 	{
 		$w_l = $size_w_l ?: $field->parameters->get('w_l', self::$default_widths['l']);
-		$srcset[] = \Joomla\CMS\Uri\Uri::root() . $srcl . ' ' . $w_l . 'w';
+		$srcset[] = \Joomla\CMS\Uri\Uri::root(true).'/' . $srcl . ' ' . $w_l . 'w';
 		$_sizes[] = '(min-width: ' . $w_l . 'px) ' . $w_l . 'px';
 	}
 
 	if ($size === 'l' || $size === 'm')
 	{
 		$w_m = $size_w_m ?: $field->parameters->get('w_m', self::$default_widths['m']);
-		$srcset[] = \Joomla\CMS\Uri\Uri::root() . $srcm . ' ' . $w_m . 'w';
+		$srcset[] = \Joomla\CMS\Uri\Uri::root(true).'/' . $srcm . ' ' . $w_m . 'w';
 		$_sizes[] = '(min-width: ' . $w_m . 'px) ' . $w_m . 'px';
 
 		$w_s = $size_w_s ?: $field->parameters->get('w_s', self::$default_widths['s']);
-		$srcset[] = \Joomla\CMS\Uri\Uri::root() . $srcs . ' ' . $w_s . 'w';
+		$srcset[] = \Joomla\CMS\Uri\Uri::root(true).'/' . $srcs . ' ' . $w_s . 'w';
 		$_sizes[] = $w_s . 'px';
 	}
 
@@ -69,14 +69,45 @@ foreach ($values as $n => $value)
 	// Inform browser of real images sizes and of desired image size
 	$img_size_attrs .= ' width="' . $w . '" height="' . $h . '" style="height: auto; max-width: 100%;" ';
 
-	$img_legend_custom ='
-		<img src="'.\Joomla\CMS\Uri\Uri::root(true).'/'.$src.'" alt="' . $alt_encoded . '"' . $legend . ' class="' . $class . '"
+	// --- WebP srcset : dérivé de $srcset en remplaçant l'extension par .webp ---
+	$srcset_webp_es = array();
+	$sizes_str_es   = count($_sizes) ? implode(', ', $_sizes) : '';
+	if (!empty($generate_webp) && count($srcset))
+	{
+		$srcset_webp_es = array_map(function($entry) {
+			return preg_replace('/\.([^.\ ]+)( \d+w)$/', '.webp$2', $entry);
+		}, $srcset);
+	}
+
+	// Vérifier existence des WebP sur disque pour data-medium-webp et data-large-webp
+	$_srcm_webp_disk = !empty($srcm_webp) ? JPATH_SITE . DS . $srcm_webp : '';
+	$_srcl_webp_disk = !empty($srcl_webp) ? JPATH_SITE . DS . $srcl_webp : '';
+	$has_srcm_webp   = $_srcm_webp_disk && file_exists($_srcm_webp_disk);
+	$has_srcl_webp   = $_srcl_webp_disk && file_exists($_srcl_webp_disk);
+
+	// Construire le <img> interne avec ses data-attributes
+	$_img_inner = '<img src="'.\Joomla\CMS\Uri\Uri::root(true).'/'.$src.'" alt="' . $alt_encoded . '"' . $legend . ' class="' . $class . '"
 			' . $img_size_attrs . '
 			data-medium="' . \Joomla\CMS\Uri\Uri::root(true).'/'.$srcm . '"
 			data-large="' . \Joomla\CMS\Uri\Uri::root(true).'/'.$srcl . '"
+			' . ($has_srcm_webp ? 'data-medium-webp="' . \Joomla\CMS\Uri\Uri::root(true).'/'.$srcm_webp . '"' : '') . '
+			' . ($has_srcl_webp ? 'data-large-webp="' . \Joomla\CMS\Uri\Uri::root(true).'/'.$srcl_webp . '"' : '') . '
 			data-title="' . $title_encoded . '"
-			data-description="' . $desc_encoded . '" itemprop="image"/>
-	';
+			data-description="' . $desc_encoded . '" itemprop="image"/>';
+
+	// Envelopper dans <picture> si WebP srcset disponible
+	if (!empty($srcset_webp_es))
+	{
+		$_source_sizes = $sizes_str_es ? ' sizes="' . $sizes_str_es . '"' : '';
+		$img_legend_custom = '<picture>'
+			. '<source srcset="' . implode(', ', $srcset_webp_es) . '"' . $_source_sizes . ' type="image/webp">'
+			. $_img_inner
+			. '</picture>';
+	}
+	else
+	{
+		$img_legend_custom = $_img_inner;
+	}
 	$group_str = $group_name ? 'rel="['.$group_name.']"' : '';
 	$field->{$prop}[] =
 		'<li><a href="javascript:;" class="fc_image_thumb">

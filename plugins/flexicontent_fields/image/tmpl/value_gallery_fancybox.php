@@ -42,7 +42,21 @@ foreach ($values as $n => $value)
 	}
 	else
 	{
+		// Href pointe vers le JPEG large (fallback universel)
 		$attribs = 'href="' . \Joomla\CMS\Uri\Uri::root(true).'/'.$srcl . '" ';
+
+		// Option B : si WebP large existe sur disque, l'ajouter en data-src pour Fancybox 3+
+		// Fancybox utilise data-src en priorité sur href — les vieux navigateurs tombent sur href JPEG
+		if (!empty($srcl_webp))
+		{
+			$_srcl_webp_rel  = ltrim(str_replace(\Joomla\CMS\Uri\Uri::root(), '', $abs_srcl_webp), '/');
+			$_srcl_webp_rel  = $_srcl_webp_rel ?: ltrim(str_replace(\Joomla\CMS\Uri\Uri::root(true).'/', '', $abs_srcl_webp), '/');
+			$_srcl_webp_disk = JPATH_SITE . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $_srcl_webp_rel);
+			if (file_exists($_srcl_webp_disk))
+			{
+				$attribs .= 'data-src="' . \Joomla\CMS\Uri\Uri::root(true).'/'.$srcl_webp . '" ';
+			}
+		}
 	}
 
 	$field->{$prop}[] = $pretext.

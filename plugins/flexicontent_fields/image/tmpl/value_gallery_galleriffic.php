@@ -68,11 +68,19 @@ foreach ($values as $n => $value)
 
 	$group_str = $group_name ? 'data-fancybox="' . $group_name . '"' : '';
 
+	// WebP large : vérifier existence sur disque
+	$_srcl_webp_disk_gf = !empty($srcl_webp) ? JPATH_SITE . DS . $srcl_webp : '';
+	$_has_srcl_webp_gf  = $_srcl_webp_disk_gf && file_exists($_srcl_webp_disk_gf);
+	// data-webp sur le lien .thumb (data-src est réservé à Galleriffic pour charger le slideshow)
+	$_data_webp_thumb_gf   = $_has_srcl_webp_gf ? ' data-webp="' . \Joomla\CMS\Uri\Uri::root(true).'/'.$srcl_webp . '"' : '';
+	// data-src sur le lien .gf_fancybox (Fancybox l'utilise en priorité sur href)
+	$_data_src_fancybox_gf = $_has_srcl_webp_gf ? ' data-src="' . \Joomla\CMS\Uri\Uri::root(true).'/'.$srcl_webp . '"' : '';
+
 	$field->{$prop}[] =
-		'<a class="thumb" name="drop" href="'.\Joomla\CMS\Uri\Uri::root(true).'/'.$srcl.'" data-width="' . $size_w_l . '" data-height="' . $size_h_l . '" title="' . $title_encoded . '">
+		'<a class="thumb" name="drop" href="'.\Joomla\CMS\Uri\Uri::root(true).'/'.$srcl.'"' . $_data_webp_thumb_gf . ' data-width="' . $size_w_l . '" data-height="' . $size_h_l . '" title="' . $title_encoded . '">
 			'.$img_legend.'
 		</a>
-		<a class="gf_fancybox" href="'.\Joomla\CMS\Uri\Uri::root(true).'/'.$srcl.'" data-title="' . $title_encoded . '" data-caption="' . $desc_encoded . '" ' . $group_str . '
+		<a class="gf_fancybox" href="'.\Joomla\CMS\Uri\Uri::root(true).'/'.$srcl.'"' . $_data_src_fancybox_gf . ' data-title="' . $title_encoded . '" data-caption="' . $desc_encoded . '" ' . $group_str . '
 			onclick="if (gf_gallery_' . $uid . '.mSlider.isDragging) {event.preventDefault(); event.stopPropagation(); return false; }" style="display: none;">
         </a>
 			' . ($display_title || $display_desc ? '

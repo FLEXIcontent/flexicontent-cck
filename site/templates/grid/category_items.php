@@ -18,6 +18,23 @@ $readon_class = $this->params->get('readon_class', 'btn btn-default');
 $use_lazy_loading = (int) $this->params->get('use_lazy_loading', 1);
 $lazy_loading = $use_lazy_loading ? ' loading="lazy" decoding="async" ' : '';
 
+// Helper WebP : construit un <picture> avec source WebP si dispo, sinon un simple <img>
+if (!function_exists('fc_cat_make_picture')) {
+	function fc_cat_make_picture($src_webp, $src, $alt, $style, $lazy_loading, $img_w = 0, $img_h = 0) {
+		$size_attrs = '';
+		if ($img_w) $size_attrs .= ' width="' . (int)$img_w . '"';
+		if ($img_h) $size_attrs .= ' height="' . (int)$img_h . '"';
+		$img_tag = '<img style="' . $style . '" src="' . $src . '" alt="' . $alt . '" ' . $size_attrs . ' ' . $lazy_loading . ' />';
+		if ($src_webp) {
+			return '<picture>'
+				. '<source srcset="' . $src_webp . '" type="image/webp">'
+				. $img_tag
+				. '</picture>';
+		}
+		return $img_tag;
+	}
+}
+
 
 if ($readon_type && $readon_image && file_exists(\Joomla\Filesystem\Path::clean(JPATH_SITE . DS . $readon_image)))
 {
@@ -443,6 +460,8 @@ if ($leadnum) :
 					if (!$src && isset($lead_type_default_imgs['_OTHER_']))         $src = $lead_type_default_imgs['_OTHER_'];
 				}
 				$RESIZE_FLAG = !$this->params->get('lead_image') || !$this->params->get('lead_image_size');
+				$item->image_webp = ''; // URL WebP (vide si non disponible)
+
 				if ( $src && $RESIZE_FLAG ) {
 					// Resize image when src path is set and RESIZE_FLAG: (a) using image extracted from item main text OR (b) not using image field's already created thumbnails
 					$w		= '&amp;w=' . $this->params->get('lead_width', 200);
@@ -460,9 +479,21 @@ if ($leadnum) :
 
 					$item->image_w = $this->params->get('lead_width', 200);
 					$item->image_h = $this->params->get('lead_height', 200);
+
+					// WebP via phpThumb : même paramètres mais f=webp
+					$conf_webp = $w . $h . $aoe . $q . $ar . $zc . '&amp;f=webp';
+					$item->image_webp = \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf_webp;
+
 				} else {
 					// Do not resize image when (a) image src path not set or (b) using image field's already created thumbnails
 					$item->image = $src ?: $thumb_rendered;
+
+					// Source C (thumbnails field) : chercher le .webp sur disque
+					if ($src && !$thumb_rendered) {
+						$_webp_src  = preg_replace('/\.([^.]+)$/', '.webp', $src);
+						$_webp_disk = JPATH_SITE . DS . ltrim($_webp_src, '/');
+						$item->image_webp = file_exists($_webp_disk) ? $_webp_src : '';
+					}
 				}
 
 				// Instead of empty image
@@ -612,10 +643,10 @@ if ($leadnum) :
 						<figure class="image_featured">
 							<?php if ($lead_link_image) : ?>
 								<a href="<?php echo $link_url; ?>">
-									<img style="<?php echo $img_force_dims_css_feat; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($title_encoded, 60); ?> <?php echo $lazy_loading; ?>" />
+									<?php echo fc_cat_make_picture(!empty($item->image_webp) ? $item->image_webp : '', $item->image, flexicontent_html::striptagsandcut($title_encoded, 60), $img_force_dims_css_feat, $lazy_loading, $item->image_w, $item->image_h); ?>
 								</a>
 							<?php else : ?>
-								<img style="<?php echo $img_force_dims_css_feat; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($title_encoded, 60); ?> <?php echo $lazy_loading; ?>" />
+								<?php echo fc_cat_make_picture(!empty($item->image_webp) ? $item->image_webp : '', $item->image, flexicontent_html::striptagsandcut($title_encoded, 60), $img_force_dims_css_feat, $lazy_loading, $item->image_w, $item->image_h); ?>
 							<?php endif; ?>
 						</figure>
 
@@ -981,6 +1012,8 @@ if ($count > $leadnum) :
 					if (!$src && isset($intro_type_default_imgs['_OTHER_']))         $src = $intro_type_default_imgs['_OTHER_'];
 				}
 				$RESIZE_FLAG = !$this->params->get('intro_image') || !$this->params->get('intro_image_size');
+				$item->image_webp = ''; // URL WebP (vide si non disponible)
+
 				if ( $src && $RESIZE_FLAG ) {
 					// Resize image when src path is set and RESIZE_FLAG: (a) using image extracted from item main text OR (b) not using image field's already created thumbnails
 					$w		= '&amp;w=' . $this->params->get('intro_width', 200);
@@ -997,9 +1030,21 @@ if ($count > $leadnum) :
 
 					$item->image_w = $this->params->get('intro_width', 200);
 					$item->image_h = $this->params->get('intro_height', 200);
+
+					// WebP via phpThumb : même paramètres mais f=webp
+					$conf_webp = $w . $h . $aoe . $q . $zc . '&amp;f=webp';
+					$item->image_webp = \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf_webp;
+
 				} else {
 					// Do not resize image when (a) image src path not set or (b) using image field's already created thumbnails
 					$item->image = $src ?: $thumb_rendered;
+
+					// Source C (thumbnails field) : chercher le .webp sur disque
+					if ($src && !$thumb_rendered) {
+						$_webp_src  = preg_replace('/\.([^.]+)$/', '.webp', $src);
+						$_webp_disk = JPATH_SITE . DS . ltrim($_webp_src, '/');
+						$item->image_webp = file_exists($_webp_disk) ? $_webp_src : '';
+					}
 				}
 
 				// Instead of empty image
@@ -1153,10 +1198,10 @@ if ($count > $leadnum) :
 						<figure class="image_standard">
 							<?php if ($intro_link_image) : ?>
 								<a href="<?php echo $link_url; ?>">
-									<img style="<?php echo $img_force_dims_css; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($title_encoded, 60); ?>" <?php echo $lazy_loading; ?> />
+									<?php echo fc_cat_make_picture(!empty($item->image_webp) ? $item->image_webp : '', $item->image, flexicontent_html::striptagsandcut($title_encoded, 60), $img_force_dims_css, $lazy_loading, $item->image_w, $item->image_h); ?>
 								</a>
 							<?php else : ?>
-								<img style="<?php echo $img_force_dims_css; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($title_encoded, 60); ?>" <?php echo $lazy_loading; ?> />
+								<?php echo fc_cat_make_picture(!empty($item->image_webp) ? $item->image_webp : '', $item->image, flexicontent_html::striptagsandcut($title_encoded, 60), $img_force_dims_css, $lazy_loading, $item->image_w, $item->image_h); ?>
 							<?php endif; ?>
 						</figure>
 
