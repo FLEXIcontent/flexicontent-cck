@@ -491,7 +491,8 @@ if ($leadnum) :
 					// Source C (thumbnails field) : chercher le .webp sur disque
 					if ($src && !$thumb_rendered) {
 						$_webp_src  = preg_replace('/\.([^.]+)$/', '.webp', $src);
-						$_webp_disk = JPATH_SITE . DS . ltrim($_webp_src, '/');
+					$_webp_rel  = ltrim(str_replace(\Joomla\CMS\Uri\Uri::root(true), '', $_webp_src), '/');
+					$_webp_disk = JPATH_SITE . DS . str_replace('/', DS, $_webp_rel);
 						$item->image_webp = file_exists($_webp_disk) ? $_webp_src : '';
 					}
 				}
@@ -1042,7 +1043,8 @@ if ($count > $leadnum) :
 					// Source C (thumbnails field) : chercher le .webp sur disque
 					if ($src && !$thumb_rendered) {
 						$_webp_src  = preg_replace('/\.([^.]+)$/', '.webp', $src);
-						$_webp_disk = JPATH_SITE . DS . ltrim($_webp_src, '/');
+					$_webp_rel  = ltrim(str_replace(\Joomla\CMS\Uri\Uri::root(true), '', $_webp_src), '/');
+					$_webp_disk = JPATH_SITE . DS . str_replace('/', DS, $_webp_rel);
 						$item->image_webp = file_exists($_webp_disk) ? $_webp_src : '';
 					}
 				}

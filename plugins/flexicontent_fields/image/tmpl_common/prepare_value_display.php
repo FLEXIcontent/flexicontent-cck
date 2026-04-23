@@ -93,6 +93,12 @@
 	$abs_srcm_webp = $generate_webp ? \Joomla\CMS\Uri\Uri::root(true).'/'.$srcm_webp : '';
 	$abs_srcl_webp = $generate_webp ? \Joomla\CMS\Uri\Uri::root(true).'/'.$srcl_webp : '';
 
+	// Vérifier l'existence des WebP sur disque en utilisant les chemins relatifs purs
+	// $srcm_webp est relatif à JPATH_SITE (ex: images/stories/.../m_.webp) — fiable quel que soit le sous-dossier Joomla
+	$webp_exists_s = $srcs_webp && file_exists(JPATH_SITE . DS . str_replace('/', DS, $srcs_webp));
+	$webp_exists_m = $srcm_webp && file_exists(JPATH_SITE . DS . str_replace('/', DS, $srcm_webp));
+	$webp_exists_l = $srcl_webp && file_exists(JPATH_SITE . DS . str_replace('/', DS, $srcl_webp));
+
 	// Create a popup url link
 	$urllink = isset($value['urllink']) ? $value['urllink'] : '';
 	//if ($urllink && false === strpos($urllink, '://')) $urllink = 'http://' . $urllink;
@@ -285,15 +291,19 @@
 			$img_size_attrs .= ' sizes="' . implode(', ', $_sizes) . '"';
 		}
 
-		// --- WebP srcset : dérivé de $srcset en remplaçant simplement l'extension par .webp ---
-		// Même logique, même tailles, même conditions — juste les URLs pointent vers les .webp
+		// --- WebP srcset : dérivé de $srcset, filtré selon les .webp existants sur disque ---
 		$srcset_webp_str = '';
 		$sizes_str       = count($_sizes) ? implode(', ', $_sizes) : '';
 		if ($generate_webp && count($srcset))
 		{
-			$srcset_webp = array_map(function($entry) {
-				return preg_replace('/\.([^.\ ]+)( \d+w)$/', '.webp$2', $entry);
-			}, $srcset);
+			$srcset_webp = array();
+			foreach ($srcset as $entry) {
+				$entry_webp = preg_replace('/\.([^.\ ]+)( \d+w)$/', '.webp$2', $entry);
+				// N'inclure que si le .webp correspondant existe réellement
+				if ($srcs && strpos($entry, $srcs) !== false && $webp_exists_s) { $srcset_webp[] = $entry_webp; }
+				elseif ($srcm && strpos($entry, $srcm) !== false && $webp_exists_m) { $srcset_webp[] = $entry_webp; }
+				elseif ($srcl && strpos($entry, $srcl) !== false && $webp_exists_l) { $srcset_webp[] = $entry_webp; }
+			}
 			$srcset_webp_str = implode(', ', $srcset_webp);
 		}
 
@@ -309,15 +319,10 @@
 	// Helper : construit une balise <picture> avec source WebP si disponible, sinon un simple <img>
 	// Le <source> WebP reçoit le même srcset/sizes que le <img> — juste les URLs pointent vers .webp
 	if (!function_exists('fc_img_make_picture')) {
-		function fc_img_make_picture($abs_src_webp, $abs_src, $alt, $legend, $class, $img_size_attrs, $lazy_loading, $srcset_webp_str = '', $sizes_str = '') {
-			// Vérifier que le fichier .webp principal existe sur disque avant de l'exposer
-			$_webp_rel  = ltrim(str_replace(\Joomla\CMS\Uri\Uri::root(), '', $abs_src_webp), '/');
-			$_webp_rel  = $_webp_rel ?: ltrim(str_replace(\Joomla\CMS\Uri\Uri::root(true).'/', '', $abs_src_webp), '/');
-			$_webp_disk = JPATH_SITE . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $_webp_rel);
-			$webp_exists = $abs_src_webp && file_exists($_webp_disk);
-			if ($webp_exists) {
+		// $webp_exists : booléen précalculé en amont via file_exists sur chemin relatif pur
+		function fc_img_make_picture($abs_src_webp, $abs_src, $alt, $legend, $class, $img_size_attrs, $lazy_loading, $srcset_webp_str = '', $sizes_str = '', $webp_exists = false) {
+			if ($webp_exists && $abs_src_webp) {
 				// Construire les attributs srcset/sizes du <source> WebP
-				// Si on a un srcset multi-tailles WebP on l'utilise, sinon juste l'URL principale
 				$source_srcset = $srcset_webp_str ?: $abs_src_webp;
 				$source_sizes  = $sizes_str ? ' sizes="' . $sizes_str . '"' : '';
 				return '<picture>'
@@ -340,20 +345,20 @@
 
 		case 'display_small':
 		case 'display_small_thumb':
-			$img_legend   = fc_img_make_picture($abs_srcs_webp, $abs_srcs, $alt_encoded, $legend, $class, $img_size_attrs, $lazy_loading, $srcset_webp_str, $sizes_str);
-			$img_nolegend = fc_img_make_picture($abs_srcs_webp, $abs_srcs, $alt_encoded, '', $class, $img_size_attrs, $lazy_loading, $srcset_webp_str, $sizes_str);
+			$img_legend   = fc_img_make_picture($abs_srcs_webp, $abs_srcs, $alt_encoded, $legend, $class, $img_size_attrs, $lazy_loading, $srcset_webp_str, $sizes_str, $webp_exists_s);
+			$img_nolegend = fc_img_make_picture($abs_srcs_webp, $abs_srcs, $alt_encoded, '', $class, $img_size_attrs, $lazy_loading, $srcset_webp_str, $sizes_str, $webp_exists_s);
 			break;
 
 		case 'display_medium':
 		case 'display_medium_thumb':
-			$img_legend   = fc_img_make_picture($abs_srcm_webp, $abs_srcm, $alt_encoded, $legend, $class, $img_size_attrs, $lazy_loading, $srcset_webp_str, $sizes_str);
-			$img_nolegend = fc_img_make_picture($abs_srcm_webp, $abs_srcm, $alt_encoded, '', $class, $img_size_attrs, $lazy_loading, $srcset_webp_str, $sizes_str);
+			$img_legend   = fc_img_make_picture($abs_srcm_webp, $abs_srcm, $alt_encoded, $legend, $class, $img_size_attrs, $lazy_loading, $srcset_webp_str, $sizes_str, $webp_exists_m);
+			$img_nolegend = fc_img_make_picture($abs_srcm_webp, $abs_srcm, $alt_encoded, '', $class, $img_size_attrs, $lazy_loading, $srcset_webp_str, $sizes_str, $webp_exists_m);
 			break;
 
 		case 'display_large':
 		case 'display_large_thumb':
-			$img_legend   = fc_img_make_picture($abs_srcl_webp, $abs_srcl, $alt_encoded, $legend, $class, $img_size_attrs, $lazy_loading, $srcset_webp_str, $sizes_str);
-			$img_nolegend = fc_img_make_picture($abs_srcl_webp, $abs_srcl, $alt_encoded, '', $class, $img_size_attrs, $lazy_loading, $srcset_webp_str, $sizes_str);
+			$img_legend   = fc_img_make_picture($abs_srcl_webp, $abs_srcl, $alt_encoded, $legend, $class, $img_size_attrs, $lazy_loading, $srcset_webp_str, $sizes_str, $webp_exists_l);
+			$img_nolegend = fc_img_make_picture($abs_srcl_webp, $abs_srcl, $alt_encoded, '', $class, $img_size_attrs, $lazy_loading, $srcset_webp_str, $sizes_str, $webp_exists_l);
 			break;
 
 		case 'display_original':
@@ -367,8 +372,8 @@
 		default:
 			// Pour 'display' générique, on détermine la WebP src selon la taille calculée plus haut
 			$abs_src_webp_default = ($size === 's') ? $abs_srcs_webp : (($size === 'm') ? $abs_srcm_webp : (($size === 'l') ? $abs_srcl_webp : ''));
-			$img_legend   = fc_img_make_picture($abs_src_webp_default, $abs_src, $alt_encoded, $legend, $class, $img_size_attrs, $lazy_loading, $srcset_webp_str, $sizes_str);
-			$img_nolegend = fc_img_make_picture($abs_src_webp_default, $abs_src, $alt_encoded, '', $class, $img_size_attrs, $lazy_loading, $srcset_webp_str, $sizes_str);
+			$img_legend   = fc_img_make_picture($abs_src_webp_default, $abs_src, $alt_encoded, $legend, $class, $img_size_attrs, $lazy_loading, $srcset_webp_str, $sizes_str, ($size === 's' ? $webp_exists_s : ($size === 'm' ? $webp_exists_m : ($size === 'l' ? $webp_exists_l : false))));
+			$img_nolegend = fc_img_make_picture($abs_src_webp_default, $abs_src, $alt_encoded, '', $class, $img_size_attrs, $lazy_loading, $srcset_webp_str, $sizes_str, ($size === 's' ? $webp_exists_s : ($size === 'm' ? $webp_exists_m : ($size === 'l' ? $webp_exists_l : false))));
 			break;
 	}
 
