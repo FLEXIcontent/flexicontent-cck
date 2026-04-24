@@ -18,14 +18,52 @@ $readon_class = $this->params->get('readon_class', 'btn btn-default');
 $use_lazy_loading = (int) $this->params->get('use_lazy_loading', 1);
 $lazy_loading = $use_lazy_loading ? ' loading="lazy" decoding="async" ' : '';
 
-// Helper WebP : construit un <picture> avec source WebP si dispo, sinon un simple <img>
+// Adding WebP support : define breakpoints for responsive srcset generation via phpThumb (if raw_src is available)
+// Format : 'viewport_width' => 'image_width_for_that_viewport'
+$_fc_cat_breakpoints = [480 => 480, 768 => 768]; // desktop = $img_w (taille configurée)
+
+// Helper : generate <picture> tag with WebP support and responsive srcset (if raw_src is available)
 if (!function_exists('fc_cat_make_picture')) {
-	function fc_cat_make_picture($src_webp, $src, $alt, $style, $lazy_loading, $img_w = 0, $img_h = 0) {
+	function fc_cat_make_picture($src_webp, $src, $alt, $style, $lazy_loading, $img_w = 0, $img_h = 0, $use_webp = 1, $raw_src = '', $base_url = '') {
+		global $_fc_cat_breakpoints;
+
 		$size_attrs = '';
 		if ($img_w) $size_attrs .= ' width="' . (int)$img_w . '"';
 		if ($img_h) $size_attrs .= ' height="' . (int)$img_h . '"';
+
+		// f raw_src is available, we can generate srcset for responsive images and WebP support via phpThumb
+		if ($raw_src && $img_w) {
+			$ratio      = ($img_w > 0 && $img_h > 0) ? ($img_h / $img_w) : 0;
+			$phpthumb   = \Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $base_url . $raw_src;
+			$srcset_webp = $srcset_jpeg = $sizes_parts = [];
+
+			foreach ($_fc_cat_breakpoints as $vp => $lw) {
+				$lh = $ratio > 0 ? (int) round($lw * $ratio) : 0;
+				$_cf = '&amp;w=' . $lw . ($lh ? '&amp;h=' . $lh : '') . '&amp;aoe=1&amp;q=95&amp;zc=1';
+				if ($use_webp) $srcset_webp[] = $phpthumb . $_cf . '&amp;f=webp ' . $lw . 'w';
+				$srcset_jpeg[]  = $phpthumb . $_cf . '&amp;f=jpg ' . $lw . 'w';
+				$sizes_parts[]  = '(max-width:' . $vp . 'px) ' . $lw . 'px';
+			}
+			// Desktop
+			$dw = (int) $img_w; $dh = $ratio > 0 ? (int) round($dw * $ratio) : 0;
+			$_cf_desk = '&amp;w=' . $dw . ($dh ? '&amp;h=' . $dh : '') . '&amp;aoe=1&amp;q=95&amp;zc=1';
+			if ($use_webp) $srcset_webp[] = $phpthumb . $_cf_desk . '&amp;f=webp ' . $dw . 'w';
+			$srcset_jpeg[]  = $phpthumb . $_cf_desk . '&amp;f=jpg ' . $dw . 'w';
+			$sizes_parts[]  = $dw . 'px';
+
+			$sizes_str  = implode(', ', $sizes_parts);
+			$img_tag    = '<img style="' . $style . '" src="' . $src . '" alt="' . $alt . '" ' . $size_attrs . ' sizes="' . $sizes_str . '" srcset="' . implode(', ', $srcset_jpeg) . '" ' . $lazy_loading . ' />';
+
+			$webp_source = $use_webp && $srcset_webp
+				? '<source type="image/webp" sizes="' . $sizes_str . '" srcset="' . implode(', ', $srcset_webp) . '">'
+				: '';
+
+			return '<picture>' . $webp_source . '<source type="image/jpeg" sizes="' . $sizes_str . '" srcset="' . implode(', ', $srcset_jpeg) . '">' . $img_tag . '</picture>';
+		}
+
+		// Fallback to simple <img> tag with WebP support if available
 		$img_tag = '<img style="' . $style . '" src="' . $src . '" alt="' . $alt . '" ' . $size_attrs . ' ' . $lazy_loading . ' />';
-		if ($src_webp) {
+		if ($src_webp && $use_webp) {
 			return '<picture>'
 				. '<source srcset="' . $src_webp . '" type="image/webp">'
 				. $img_tag
@@ -460,40 +498,45 @@ if ($leadnum) :
 					if (!$src && isset($lead_type_default_imgs['_OTHER_']))         $src = $lead_type_default_imgs['_OTHER_'];
 				}
 				$RESIZE_FLAG = !$this->params->get('lead_image') || !$this->params->get('lead_image_size');
-				$item->image_webp = ''; // URL WebP (vide si non disponible)
+				$item->image_webp = '';
+				$item->image_raw_src  = ''; // src original pour srcset responsive
+				$item->image_base_url = '';
+				// Lire generate_webp depuis les paramètres du champ image
+				$_lead_use_webp = isset($img_field) && $img_field
+					? (int) $img_field->parameters->get('generate_webp', 0)
+					: 0;
 
 				if ( $src && $RESIZE_FLAG ) {
-					// Resize image when src path is set and RESIZE_FLAG: (a) using image extracted from item main text OR (b) not using image field's already created thumbnails
-					$w		= '&amp;w=' . $this->params->get('lead_width', 200);
-					$h		= '&amp;h=' . $this->params->get('lead_height', 200);
-					$aoe	= '&amp;aoe=1';
-					$q		= '&amp;q=95';
-					$ar 	= '&amp;ar=x';
-					$zc		= $this->params->get('lead_method') ? '&amp;zc=' . $this->params->get('lead_method') : '';
-					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-					$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
-					$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
+					// Resize image via phpThumb
+					$_lw   = (int) $this->params->get('lead_width', 200);
+					$_lh   = (int) $this->params->get('lead_height', 200);
+					$_zc   = $this->params->get('lead_method') ? '&amp;zc=' . $this->params->get('lead_method') : '';
+					$_conf = '&amp;w=' . $_lw . '&amp;h=' . $_lh . '&amp;aoe=1&amp;q=95&amp;ar=x' . $_zc . '&amp;f=jpg';
+					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ? \Joomla\CMS\Uri\Uri::base(true).'/' : '';
+					$_phpthumb = \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src;
 
-					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  \Joomla\CMS\Uri\Uri::base(true).'/' : '';
-					$item->image = \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+					$item->image          = $_phpthumb . $_conf;
+					$item->image_w        = $_lw;
+					$item->image_h        = $_lh;
+					$item->image_raw_src  = $src;
+					$item->image_base_url = $base_url;
 
-					$item->image_w = $this->params->get('lead_width', 200);
-					$item->image_h = $this->params->get('lead_height', 200);
-
-					// WebP via phpThumb : même paramètres mais f=webp
-					$conf_webp = $w . $h . $aoe . $q . $ar . $zc . '&amp;f=webp';
-					$item->image_webp = \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf_webp;
+					if ($_lead_use_webp) {
+						$item->image_webp = $_phpthumb . '&amp;w=' . $_lw . '&amp;h=' . $_lh . '&amp;aoe=1&amp;q=95&amp;ar=x' . $_zc . '&amp;f=webp';
+					}
 
 				} else {
-					// Do not resize image when (a) image src path not set or (b) using image field's already created thumbnails
+					// Thumbnails pré-générés par le champ
 					$item->image = $src ?: $thumb_rendered;
 
-					// Source C (thumbnails field) : chercher le .webp sur disque
 					if ($src && !$thumb_rendered) {
-						$_webp_src  = preg_replace('/\.([^.]+)$/', '.webp', $src);
-					$_webp_rel  = ltrim(str_replace(\Joomla\CMS\Uri\Uri::root(true), '', $_webp_src), '/');
-					$_webp_disk = JPATH_SITE . DS . str_replace('/', DS, $_webp_rel);
-						$item->image_webp = file_exists($_webp_disk) ? $_webp_src : '';
+						$item->image_raw_src  = $src;
+						$item->image_base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ? \Joomla\CMS\Uri\Uri::base(true).'/' : '';
+						if ($_lead_use_webp) {
+							$_webp_src  = preg_replace('/\.([^.]+)$/', '.webp', $src);
+							$_webp_disk = JPATH_SITE . DS . ltrim($_webp_src, '/');
+							$item->image_webp = file_exists($_webp_disk) ? $_webp_src : '';
+						}
 					}
 				}
 
@@ -644,10 +687,10 @@ if ($leadnum) :
 						<figure class="image_featured">
 							<?php if ($lead_link_image) : ?>
 								<a href="<?php echo $link_url; ?>">
-									<?php echo fc_cat_make_picture(!empty($item->image_webp) ? $item->image_webp : '', $item->image, flexicontent_html::striptagsandcut($title_encoded, 60), $img_force_dims_css_feat, $lazy_loading, $item->image_w, $item->image_h); ?>
+									<?php echo fc_cat_make_picture(!empty($item->image_webp) ? $item->image_webp : '', $item->image, flexicontent_html::striptagsandcut($title_encoded, 60), $img_force_dims_css_feat, $lazy_loading, $item->image_w, $item->image_h, !empty($item->image_webp) ? 1 : 0, $item->image_raw_src ?? '', $item->image_base_url ?? ''); ?>
 								</a>
 							<?php else : ?>
-								<?php echo fc_cat_make_picture(!empty($item->image_webp) ? $item->image_webp : '', $item->image, flexicontent_html::striptagsandcut($title_encoded, 60), $img_force_dims_css_feat, $lazy_loading, $item->image_w, $item->image_h); ?>
+								<?php echo fc_cat_make_picture(!empty($item->image_webp) ? $item->image_webp : '', $item->image, flexicontent_html::striptagsandcut($title_encoded, 60), $img_force_dims_css_feat, $lazy_loading, $item->image_w, $item->image_h, !empty($item->image_webp) ? 1 : 0, $item->image_raw_src ?? '', $item->image_base_url ?? ''); ?>
 							<?php endif; ?>
 						</figure>
 
@@ -1013,39 +1056,42 @@ if ($count > $leadnum) :
 					if (!$src && isset($intro_type_default_imgs['_OTHER_']))         $src = $intro_type_default_imgs['_OTHER_'];
 				}
 				$RESIZE_FLAG = !$this->params->get('intro_image') || !$this->params->get('intro_image_size');
-				$item->image_webp = ''; // URL WebP (vide si non disponible)
+				$item->image_webp = '';
+				$item->image_raw_src  = '';
+				$item->image_base_url = '';
+				$_intro_use_webp = isset($img_field) && $img_field
+					? (int) $img_field->parameters->get('generate_webp', 0)
+					: 0;
 
 				if ( $src && $RESIZE_FLAG ) {
-					// Resize image when src path is set and RESIZE_FLAG: (a) using image extracted from item main text OR (b) not using image field's already created thumbnails
-					$w		= '&amp;w=' . $this->params->get('intro_width', 200);
-					$h		= '&amp;h=' . $this->params->get('intro_height', 200);
-					$aoe	= '&amp;aoe=1';
-					$q		= '&amp;q=95';
-					$zc		= $this->params->get('intro_method') ? '&amp;zc=' . $this->params->get('intro_method') : '';
-					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-					$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
-					$conf	= $w . $h . $aoe . $q . $zc . $f;
+					$_iw   = (int) $this->params->get('intro_width', 200);
+					$_ih   = (int) $this->params->get('intro_height', 200);
+					$_zc   = $this->params->get('intro_method') ? '&amp;zc=' . $this->params->get('intro_method') : '';
+					$_conf = '&amp;w=' . $_iw . '&amp;h=' . $_ih . '&amp;aoe=1&amp;q=95' . $_zc . '&amp;f=jpg';
+					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ? \Joomla\CMS\Uri\Uri::base(true).'/' : '';
+					$_phpthumb = \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src;
 
-					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  \Joomla\CMS\Uri\Uri::base(true).'/' : '';
-					$item->image = \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+					$item->image          = $_phpthumb . $_conf;
+					$item->image_w        = $_iw;
+					$item->image_h        = $_ih;
+					$item->image_raw_src  = $src;
+					$item->image_base_url = $base_url;
 
-					$item->image_w = $this->params->get('intro_width', 200);
-					$item->image_h = $this->params->get('intro_height', 200);
-
-					// WebP via phpThumb : même paramètres mais f=webp
-					$conf_webp = $w . $h . $aoe . $q . $zc . '&amp;f=webp';
-					$item->image_webp = \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf_webp;
+					if ($_intro_use_webp) {
+						$item->image_webp = $_phpthumb . '&amp;w=' . $_iw . '&amp;h=' . $_ih . '&amp;aoe=1&amp;q=95' . $_zc . '&amp;f=webp';
+					}
 
 				} else {
-					// Do not resize image when (a) image src path not set or (b) using image field's already created thumbnails
 					$item->image = $src ?: $thumb_rendered;
 
-					// Source C (thumbnails field) : chercher le .webp sur disque
 					if ($src && !$thumb_rendered) {
-						$_webp_src  = preg_replace('/\.([^.]+)$/', '.webp', $src);
-					$_webp_rel  = ltrim(str_replace(\Joomla\CMS\Uri\Uri::root(true), '', $_webp_src), '/');
-					$_webp_disk = JPATH_SITE . DS . str_replace('/', DS, $_webp_rel);
-						$item->image_webp = file_exists($_webp_disk) ? $_webp_src : '';
+						$item->image_raw_src  = $src;
+						$item->image_base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ? \Joomla\CMS\Uri\Uri::base(true).'/' : '';
+						if ($_intro_use_webp) {
+							$_webp_src  = preg_replace('/\.([^.]+)$/', '.webp', $src);
+							$_webp_disk = JPATH_SITE . DS . ltrim($_webp_src, '/');
+							$item->image_webp = file_exists($_webp_disk) ? $_webp_src : '';
+						}
 					}
 				}
 
@@ -1200,10 +1246,10 @@ if ($count > $leadnum) :
 						<figure class="image_standard">
 							<?php if ($intro_link_image) : ?>
 								<a href="<?php echo $link_url; ?>">
-									<?php echo fc_cat_make_picture(!empty($item->image_webp) ? $item->image_webp : '', $item->image, flexicontent_html::striptagsandcut($title_encoded, 60), $img_force_dims_css, $lazy_loading, $item->image_w, $item->image_h); ?>
+									<?php echo fc_cat_make_picture(!empty($item->image_webp) ? $item->image_webp : '', $item->image, flexicontent_html::striptagsandcut($title_encoded, 60), $img_force_dims_css, $lazy_loading, $item->image_w, $item->image_h, !empty($item->image_webp) ? 1 : 0, $item->image_raw_src ?? '', $item->image_base_url ?? ''); ?>
 								</a>
 							<?php else : ?>
-								<?php echo fc_cat_make_picture(!empty($item->image_webp) ? $item->image_webp : '', $item->image, flexicontent_html::striptagsandcut($title_encoded, 60), $img_force_dims_css, $lazy_loading, $item->image_w, $item->image_h); ?>
+								<?php echo fc_cat_make_picture(!empty($item->image_webp) ? $item->image_webp : '', $item->image, flexicontent_html::striptagsandcut($title_encoded, 60), $img_force_dims_css, $lazy_loading, $item->image_w, $item->image_h, !empty($item->image_webp) ? 1 : 0, $item->image_raw_src ?? '', $item->image_base_url ?? ''); ?>
 							<?php endif; ?>
 						</figure>
 

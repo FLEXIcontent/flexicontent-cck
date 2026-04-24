@@ -604,12 +604,14 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 					<?php elseif ($mod_use_image_feat && $item->image) : ?>
 
 						<div class="image_featured <?php echo $img_container_class_feat;?>">
+							<?php
+							$_alt_f = flexicontent_html::striptagsandcut($item->fulltitle, 60);
+							$_pic_f = modFlexicontentHelper::makeWebpPicture($item->image, '', '', '', $_alt_f, $mod_width_feat, $mod_height_feat);
+							?>
 							<?php if ($mod_link_image_feat) : ?>
-								<a href="<?php echo $item->link; ?>">
-									<img <?php echo $img_size_feat; ?> style="<?php echo $img_force_dims_css_feat; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
-								</a>
+								<a href="<?php echo $item->link; ?>"><?php echo $_pic_f; ?></a>
 							<?php else : ?>
-								<img <?php echo $img_size_feat; ?> style="<?php echo $img_force_dims_css_feat; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
+								<?php echo $_pic_f; ?>
 							<?php endif; ?>
 						</div>
 
@@ -896,12 +898,14 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 					<?php elseif ($mod_use_image && $item->image) : ?>
 
 						<div class="image_standard <?php echo $img_container_class_std;?>">
+							<?php
+							$_alt_s = flexicontent_html::striptagsandcut($item->fulltitle, 60);
+							$_pic_s = modFlexicontentHelper::makeWebpPicture($item->image, '', '', '', $_alt_s, $mod_width, $mod_height);
+							?>
 							<?php if ($mod_link_image) : ?>
-								<a href="<?php echo $item->link; ?>">
-									<img <?php echo $img_size; ?> style="<?php echo $img_force_dims_css; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
-								</a>
+								<a href="<?php echo $item->link; ?>"><?php echo $_pic_s; ?></a>
 							<?php else : ?>
-								<img <?php echo $img_size; ?> style="<?php echo $img_force_dims_css; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
+								<?php echo $_pic_s; ?>
 							<?php endif; ?>
 						</div>
 
@@ -1107,7 +1111,33 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 						$classes = $handle_classes . ($tip_html ? $tooltip_class : '');
 					?>
 						<span class="<?php echo $classes; ?>" title="<?php echo $tip_html; ?>" >
-							<img alt="" src="<?php echo @ $item->image ? $item->image : $img_path.$mod_default_img_path; ?>" style="<?php echo 'width:'.$item_handle_width.'px; height:'.$item_handle_height.'px'; ?>" />
+							<?php
+							// Pour les handles : extraire le src depuis image_rendered (<picture>) ou image (URL directe)
+							$_handle_raw = '';
+							if (@ $item->image_rendered && preg_match('/src=["\'](.*?)["\' ]/i', $item->image_rendered, $_hm)) {
+								// Extraire l'URL src du fallback JPEG dans le <picture> généré par le helper
+								$_raw = html_entity_decode($_hm[1]);
+								// Récupérer le paramètre src= de phpThumb si c'est une URL phpThumb
+								if (strpos($_raw, 'phpThumb.php') !== false && preg_match('/[?&]src=([^&]+)/', $_raw, $_sm)) {
+									$_handle_raw = urldecode($_sm[1]);
+								} else {
+									$_handle_raw = $_raw;
+								}
+							} elseif (@ $item->image) {
+								$_handle_raw = $item->image;
+							}
+							if (!$_handle_raw) $_handle_raw = $img_path.$mod_default_img_path;
+							$_hw = (int) $item_handle_width;
+							$_hh = (int) $item_handle_height;
+							$_hb = (!preg_match("#^http|^https|^ftp|^/#i", $_handle_raw)) ? \Joomla\CMS\Uri\Uri::base(true).'/' : '';
+							$_hconf = '&amp;w='.$_hw.'&amp;h='.$_hh.'&amp;aoe=1&amp;q=85&amp;zc=1';
+							$_hbase = \Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$_hb.$_handle_raw;
+							$_style_h = 'width:'.$_hw.'px; height:'.$_hh.'px; display:block; object-fit:cover;';
+							echo '<picture>'
+								. '<source type="image/webp" srcset="'.$_hbase.$_hconf.'&amp;f=webp">'
+								. '<img src="'.$_hbase.$_hconf.'&amp;f=jpg" alt="" width="'.$_hw.'" height="'.$_hh.'" style="'.$_style_h.'" loading="lazy" decoding="async" />'
+								. '</picture>';
+							?>
 						</span>
 					<?php endforeach; ?>
 
