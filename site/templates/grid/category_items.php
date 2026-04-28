@@ -26,6 +26,10 @@ $_fc_cat_breakpoints = [480 => 480, 768 => 768]; // desktop = $img_w (taille con
 if (!function_exists('fc_cat_make_picture')) {
 	function fc_cat_make_picture($src_webp, $src, $alt, $style, $lazy_loading, $img_w = 0, $img_h = 0, $use_webp = 1, $raw_src = '', $base_url = '') {
 		global $_fc_cat_breakpoints;
+		// Encoder les espaces dans les URLs (noms de fichiers avec espaces) + décoder &amp; pour srcset
+		$src      = str_replace([' ', '&amp;'], ['%20', '&'], $src);
+		$src_webp = str_replace([' ', '&amp;'], ['%20', '&'], $src_webp);
+		$raw_src  = str_replace(' ', '%20', $raw_src);
 
 		$size_attrs = '';
 		if ($img_w) $size_attrs .= ' width="' . (int)$img_w . '"';
@@ -39,16 +43,17 @@ if (!function_exists('fc_cat_make_picture')) {
 
 			foreach ($_fc_cat_breakpoints as $vp => $lw) {
 				$lh = $ratio > 0 ? (int) round($lw * $ratio) : 0;
-				$_cf = '&amp;w=' . $lw . ($lh ? '&amp;h=' . $lh : '') . '&amp;aoe=1&amp;q=95&amp;zc=1';
-				if ($use_webp) $srcset_webp[] = $phpthumb . $_cf . '&amp;f=webp ' . $lw . 'w';
-				$srcset_jpeg[]  = $phpthumb . $_cf . '&amp;f=jpg ' . $lw . 'w';
+				// Note: & (pas &amp;) car srcset est lu par le navigateur, pas parsé comme HTML
+				$_cf = '&w=' . $lw . ($lh ? '&h=' . $lh : '') . '&aoe=1&q=95&zc=1';
+				if ($use_webp) $srcset_webp[] = $phpthumb . $_cf . '&f=webp ' . $lw . 'w';
+				$srcset_jpeg[]  = $phpthumb . $_cf . '&f=jpg ' . $lw . 'w';
 				$sizes_parts[]  = '(max-width:' . $vp . 'px) ' . $lw . 'px';
 			}
 			// Desktop
 			$dw = (int) $img_w; $dh = $ratio > 0 ? (int) round($dw * $ratio) : 0;
-			$_cf_desk = '&amp;w=' . $dw . ($dh ? '&amp;h=' . $dh : '') . '&amp;aoe=1&amp;q=95&amp;zc=1';
-			if ($use_webp) $srcset_webp[] = $phpthumb . $_cf_desk . '&amp;f=webp ' . $dw . 'w';
-			$srcset_jpeg[]  = $phpthumb . $_cf_desk . '&amp;f=jpg ' . $dw . 'w';
+			$_cf_desk = '&w=' . $dw . ($dh ? '&h=' . $dh : '') . '&aoe=1&q=95&zc=1';
+			if ($use_webp) $srcset_webp[] = $phpthumb . $_cf_desk . '&f=webp ' . $dw . 'w';
+			$srcset_jpeg[]  = $phpthumb . $_cf_desk . '&f=jpg ' . $dw . 'w';
 			$sizes_parts[]  = $dw . 'px';
 
 			$sizes_str  = implode(', ', $sizes_parts);

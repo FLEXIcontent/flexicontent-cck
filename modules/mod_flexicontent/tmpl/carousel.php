@@ -1130,11 +1130,13 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 							$_hw = (int) $item_handle_width;
 							$_hh = (int) $item_handle_height;
 							$_hb = (!preg_match("#^http|^https|^ftp|^/#i", $_handle_raw)) ? \Joomla\CMS\Uri\Uri::base(true).'/' : '';
-							$_hconf = '&amp;w='.$_hw.'&amp;h='.$_hh.'&amp;aoe=1&amp;q=85&amp;zc=1';
-							$_hbase = \Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$_hb.$_handle_raw;
+							// Encoder les espaces (noms de fichiers) ; & pas &amp; car srcset est lu directement par le navigateur
+							$_handle_raw_enc = str_replace(' ', '%20', $_handle_raw);
+							$_hconf = '&w='.$_hw.'&h='.$_hh.'&aoe=1&q=85&zc=1';
+							$_hbase = \Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$_hb.$_handle_raw_enc;
 							$_style_h = 'width:'.$_hw.'px; height:'.$_hh.'px; display:block; object-fit:cover;';
 							echo '<picture>'
-								. '<source type="image/webp" srcset="'.$_hbase.$_hconf.'&amp;f=webp">'
+								. '<source type="image/webp" srcset="'.$_hbase.$_hconf.'&f=webp">'
 								. '<img src="'.$_hbase.$_hconf.'&amp;f=jpg" alt="" width="'.$_hw.'" height="'.$_hh.'" style="'.$_style_h.'" loading="lazy" decoding="async" />'
 								. '</picture>';
 							?>

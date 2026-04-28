@@ -52,12 +52,16 @@ class modFlexicontentHelper
 			return '<img src="' . $thumb_url . '" alt="' . $alt . '" style="' . $_style . '"' . $_size . ' loading="lazy" decoding="async" />';
 		}
 
+		// Encoder les espaces dans le chemin source (noms de fichiers avec espaces)
+		// et décoder &amp; → & car srcset est lu directement par le navigateur
+		$src        = str_replace(' ', '%20', $src);
+		$conf_base  = preg_replace('/&(?:amp;)?[wh]=\d+/', '', str_replace('&amp;', '&', $conf_noformat));
+
 		$phpthumb_base = \Joomla\CMS\Uri\Uri::root(true)
 			. '/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='
 			. $base_url . $src;
 
-		$ratio      = ($w > 0 && $h > 0) ? ($h / $w) : 0;
-		$conf_base  = preg_replace('/&amp;[wh]=\d+/', '', $conf_noformat);
+		$ratio = ($w > 0 && $h > 0) ? ($h / $w) : 0;
 
 		$levels = self::SRCSET_BREAKPOINTS;
 		$levels[] = ['viewport' => 0, 'img_w' => $w ?: 800];
@@ -68,9 +72,9 @@ class modFlexicontentHelper
 		foreach ($levels as $level) {
 			$lw = (int) $level['img_w'];
 			$lh = $ratio > 0 ? (int) round($lw * $ratio) : 0;
-			$conf_level = '&amp;w=' . $lw . ($lh ? '&amp;h=' . $lh : '') . $conf_base;
-			$url_webp = $phpthumb_base . $conf_level . '&amp;f=webp';
-			$url_jpeg = $phpthumb_base . $conf_level . '&amp;f=jpg';
+			$conf_level = '&w=' . $lw . ($lh ? '&h=' . $lh : '') . $conf_base;
+			$url_webp = $phpthumb_base . $conf_level . '&f=webp';
+			$url_jpeg = $phpthumb_base . $conf_level . '&f=jpg';
 			$srcset_webp[] = $url_webp . ' ' . $lw . 'w';
 			$srcset_jpeg[] = $url_jpeg . ' ' . $lw . 'w';
 			if ($level['viewport'] > 0) {
