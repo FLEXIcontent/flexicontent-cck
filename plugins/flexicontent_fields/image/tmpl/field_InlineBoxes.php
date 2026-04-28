@@ -243,8 +243,9 @@ foreach ($field->value as $index => $value)
 			$jfield->setup(new SimpleXMLElement($xml_field), $jfvalue, '');
 			$select_existing = $jfield->input;
 
-			// Workaround field clearing the value but not clearing the value attribute
+			// Workaround field to clear both existingname and originalname input fields
 			$select_existing = str_replace('button-clear"', 'button-clear" onclick="jQuery(this).parent().find(\'input\').attr(\'value\', \'\');"', $select_existing);
+			$select_existing = str_replace('quantumuploadimage-delete only-icon"', 'quantumuploadimage-delete only-icon" onclick="let el = jQuery(this).closest(\'.fcfieldval_container\').find(\'input\'); if (el.length) { el.attr(\'value\', \'\'); el.val(\'\'); }"', $select_existing);
 
 			if ($use_quantum)
 			{
