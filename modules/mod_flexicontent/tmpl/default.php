@@ -69,8 +69,7 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 			<?php foreach ($list[$ord]['featured'] as $item) : ?>
 			<li class="<?php echo $item->is_active_item ? 'fcitem_active' : ''; ?>" >
 				<a href="<?php echo $item->link; ?>"
-						class="fcitem_link <?php echo $tooltip_class; ?>"
-						title="<?php echo flexicontent_html::getToolTip($item->fulltitle, $item->text, 0, 1); ?>">
+						class="fcitem_link <?php echo $tooltip_class; ?>">
 					<?php echo $item->title; ?>
 				</a>
 			</li>
@@ -90,8 +89,7 @@ $container_id = $module->id . (count($catdata_arr)>1 && $catdata ? '_'.$catdata-
 			<?php foreach ($list[$ord]['standard'] as $item) : ?>
 			<li class="<?php echo $item->is_active_item ? 'fcitem_active' : ''; ?>" >
 				<a href="<?php echo $item->link; ?>"
-						class="fcitem_link <?php echo $tooltip_class; ?>"
-						title="<?php echo flexicontent_html::getToolTip($item->fulltitle, $item->text, 0, 1); ?>">
+						class="fcitem_link <?php echo $tooltip_class; ?>">
 					<?php echo $item->title; ?>
 				</a>
 			</li>
