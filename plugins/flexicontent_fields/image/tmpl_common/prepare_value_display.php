@@ -89,9 +89,9 @@
 	$srcs_webp = $generate_webp ? preg_replace('/\.([^.]+)$/', '.webp', $srcs) : '';
 	$srcm_webp = $generate_webp ? preg_replace('/\.([^.]+)$/', '.webp', $srcm) : '';
 	$srcl_webp = $generate_webp ? preg_replace('/\.([^.]+)$/', '.webp', $srcl) : '';
-	$abs_srcs_webp = $generate_webp ? \Joomla\CMS\Uri\Uri::root(true).'/'.$srcs_webp : '';
-	$abs_srcm_webp = $generate_webp ? \Joomla\CMS\Uri\Uri::root(true).'/'.$srcm_webp : '';
-	$abs_srcl_webp = $generate_webp ? \Joomla\CMS\Uri\Uri::root(true).'/'.$srcl_webp : '';
+	$abs_srcs_webp = $generate_webp ? str_replace(' ', '%20', \Joomla\CMS\Uri\Uri::root(true).'/'.$srcs_webp) : '';
+	$abs_srcm_webp = $generate_webp ? str_replace(' ', '%20', \Joomla\CMS\Uri\Uri::root(true).'/'.$srcm_webp) : '';
+	$abs_srcl_webp = $generate_webp ? str_replace(' ', '%20', \Joomla\CMS\Uri\Uri::root(true).'/'.$srcl_webp) : '';
 
 	// Vérifier l'existence des WebP sur disque en utilisant les chemins relatifs purs
 	// $srcm_webp est relatif à JPATH_SITE (ex: images/stories/.../m_.webp) — fiable quel que soit le sous-dossier Joomla
@@ -262,7 +262,7 @@
 			{
 				$minmax_prefix  = ! (int) $field->parameters->get( 'l_thumb_width_as_min_or_max', 0) ? 'min' : 'max';
 				$w_l = $size_w_l ?: $field->parameters->get('w_l', self::$default_widths['l']);
-				$srcset[] = (!$isURL ? \Joomla\CMS\Uri\Uri::root(true).'/' : '') . $srcl . ' ' . $w_l . 'w';
+				$srcset[] = (!$isURL ? \Joomla\CMS\Uri\Uri::root(true).'/' : '') . str_replace(' ', '%20', $srcl) . ' ' . $w_l . 'w';
 				$_sizes[] = '(' . $minmax_prefix . '-width: ' . $w_l . 'px) ' . $w_l . 'px';
 			}
 		}
@@ -273,14 +273,14 @@
 			{
 				$minmax_prefix  = ! (int) $field->parameters->get( 'm_thumb_width_as_min_or_max', 0) ? 'min' : 'max';
 				$w_m = $size_w_m ?: $field->parameters->get('w_m', self::$default_widths['m']);
-				$srcset[] = (!$isURL ? \Joomla\CMS\Uri\Uri::root(true).'/' : '') . $srcm . ' ' . $w_m . 'w';
+				$srcset[] = (!$isURL ? \Joomla\CMS\Uri\Uri::root(true).'/' : '') . str_replace(' ', '%20', $srcm) . ' ' . $w_m . 'w';
 				$_sizes[] = '(' . $minmax_prefix . '-width: ' . $w_m . 'px) ' . $w_m . 'px';
 			}
 			if ($srcs)
 			{
 				$minmax_prefix  = ! (int) $field->parameters->get( 's_thumb_width_as_min_or_max', 0) ? 'min' : 'max';
 				$w_s = $size_w_s ?: $field->parameters->get('w_s', self::$default_widths['s']);
-				$srcset[] = (!$isURL ? \Joomla\CMS\Uri\Uri::root(true).'/' : '') . $srcs . ' ' . $w_s . 'w';
+				$srcset[] = (!$isURL ? \Joomla\CMS\Uri\Uri::root(true).'/' : '') . str_replace(' ', '%20', $srcs) . ' ' . $w_s . 'w';
 				$_sizes[] = '(' . $minmax_prefix . '-width: ' . $w_s . 'px) ' . $w_s . 'px';
 			}
 		}
