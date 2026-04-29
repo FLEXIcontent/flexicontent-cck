@@ -162,6 +162,11 @@
 			</field>
 			<field name="cat_default_image" type="media" default="" label="MOD_FLEXICATEGORIES_DEFAULT_CATIMAGE" description="MOD_FLEXICATEGORIES_DEFAULT_CATIMAGE_DESC" class="disp_cat_img" />
 
+			<field name="cat_image_webp" type="radio" default="0" label="MOD_FLEXICATEGORIES_IMAGE_WEBP" description="MOD_FLEXICATEGORIES_IMAGE_WEBP_DESC" class="btn-group btn-group-yesno disp_cat_img">
+				<option value="0">JNO</option>
+				<option value="1">JYES</option>
+			</field>
+
 		</fieldset>
 
 		<fieldset name="FLEXI_MODULE_DISPLAYING_RULES" label="FLEXI_MODULE_DISPLAYING_RULES" description="FLEXI_MODULE_DISPLAYING_RULES_DESC">
