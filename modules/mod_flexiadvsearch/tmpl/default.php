@@ -17,11 +17,15 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
+use Joomla\CMS\Factory;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 $app = \Joomla\CMS\Factory::getApplication();
 $doc = \Joomla\CMS\Factory::getDocument();
 $tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+
+$wa = Factory::getApplication()->getDocument()->getWebAssetManager();
+$wa->useScript('jquery');
 
 require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
 $action = \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getSearchRoute(0, $itemid), true);
@@ -325,7 +329,7 @@ if ($autodisplayadvoptions)
 	';
 }
 
-$doc->addScriptDeclaration($js);
+$wa->addInlineScript($js);
 ?>
 
 <div class="mod_flexiadvsearch_wrapper mod_flexiadvsearch_wrap<?php echo $moduleclass_sfx; ?>" id="mod_flexiadvsearch_default<?php echo $module->id ?>">
@@ -531,5 +535,5 @@ $js = '
 		});
 	});
 ';
-$doc->addScriptDeclaration($js);
+$wa->addInlineScript($js);
 ?>

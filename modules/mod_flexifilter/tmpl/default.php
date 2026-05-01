@@ -1,5 +1,10 @@
 <?php // no direct access
 defined('_JEXEC') or die('Restricted access');
+use Joomla\CMS\Factory;
+
+$wa = Factory::getApplication()->getDocument()->getWebAssetManager();
+$wa->useScript('jquery');
+$wa->useScript('bootstrap.collapse'); // pour accordion Joomla
 
 // use css class fc_nnnnn_clear to override wrapping
 
@@ -86,7 +91,7 @@ if ($ff_placement)
 	echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endSlide');
 	echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endAccordion');
 	
-	\Joomla\CMS\Factory::getDocument()->addScriptDeclaration("
+	$wa->addInlineScript("
 	(function($) {
 		$(document).ready(function ()
 		{
@@ -128,7 +133,7 @@ if ($ff_placement)
 
 if ($scroll_to_anchor_tag)
 {
-	\Joomla\CMS\Factory::getDocument()->addScriptDeclaration("
+	$wa->addInlineScript("
 	(function($) {
 		$(document).ready(function ()
 		{
@@ -143,7 +148,7 @@ if ($scroll_to_anchor_tag)
 }
 
 if ($params->get('filter_ajax', 0)) :
-\Joomla\CMS\Factory::getDocument()->addScriptDeclaration("
+$wa->addInlineScript("
 	jQuery(document).ready(function($) {
 		
 		if (window.fc_ajax_filter_bound) return;

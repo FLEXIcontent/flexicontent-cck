@@ -7,10 +7,14 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
+
+use Joomla\CMS\Factory;
 // first define the template name
 \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.popover', '.hasTooltip', array('trigger' => 'click hover'));
 $tmpl = $this->tmpl;
 $user = \Joomla\CMS\Factory::getUser();
+
+$wa = Factory::getApplication()->getDocument()->getWebAssetManager();
 
 $readon_type  = (int) $this->params->get('readon_type', 0);
 $readon_image = $this->params->get('readon_image', '');
@@ -1484,7 +1488,7 @@ if ($count > $leadnum) :
 	// have multiple container (1 item list container per order) being effected by JS
 	$js = ''
 		;
-	if ($js) $document->addScriptDeclaration($js);
+	if ($js) $wa->addInline('script', $js);
 
 	// ***********************************************************
 	// Module specific styling (we use names containing module ID)
@@ -1492,4 +1496,4 @@ if ($count > $leadnum) :
 
 	$css = '';
 
-	if ($css) $document->addStyleDeclaration($css);
+	if ($css) $wa->addInline('css', $css);

@@ -15,6 +15,10 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
+use Joomla\CMS\Factory;
+
+$wa = Factory::getApplication()->getDocument()->getWebAssetManager();
+
 $tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 
 $mod_width_feat 	= (int)$params->get('mod_width_feat', 110);
@@ -1002,7 +1006,7 @@ if ($std_builder_layout_num)
 	// have multiple container (1 item list container per order) being effected by JS
 	$js = ''
 		;
-	if ($js) $document->addScriptDeclaration($js);
+	if ($js) $wa->addInlineScript($js);
 
 	// ***********************************************************
 	// Module specific styling (we use names containing module ID)
@@ -1139,7 +1143,7 @@ if ($std_builder_layout_num)
 	''
 	;
 
-	if ($css) $document->addStyleDeclaration($css);
+	if ($css) $wa->addInlineStyle($css);
 
 	if ($item_placement_feat == 1 && $item_columns_feat > 1)
 	{
@@ -1160,7 +1164,7 @@ if ($std_builder_layout_num)
 			}
 		});
 		";
-		if ($js) $document->addScriptDeclaration($js);
+		if ($js) $wa->addInlineScript($js);
 	}
 	if ($item_placement_std == 1 && $item_columns_std > 1)
 	{
@@ -1181,7 +1185,7 @@ if ($std_builder_layout_num)
 			}
 		});
 		";
-		if ($js) $document->addScriptDeclaration($js);
+		if ($js) $wa->addInlineScript($js);
 	}
 	?>
 

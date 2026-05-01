@@ -1,6 +1,10 @@
 <?php
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
+
+$wa = Factory::getApplication()->getDocument()->getWebAssetManager();
+
 $app    = \Joomla\CMS\Factory::getApplication();
 $document = \Joomla\CMS\Factory::getDocument();
 
@@ -218,6 +222,6 @@ jQuery(document).ready(function($) {
         }
     });
 });";
-$document->addScriptDeclaration($js);
+$wa->addInline('script', $js);
 
 endif; ?>
