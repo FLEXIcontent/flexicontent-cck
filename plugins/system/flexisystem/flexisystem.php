@@ -346,7 +346,6 @@ class plgSystemFlexisystem extends CMSPlugin
 				$suhosin_lim = ini_get('suhosin.request.max_vars');
 				if ($suhosin_lim < $max_input_vars) $max_input_vars = $suhosin_lim;
 			}
-			HTMLHelper::_('jquery.framework');
 			$js .= "
 				jQuery(document).ready(function() {
 					Joomla.fc_max_input_vars = ".$max_input_vars.";
@@ -362,8 +361,7 @@ class plgSystemFlexisystem extends CMSPlugin
 			$isAdmin && (
 			($option=='com_users' && ($view == 'user'))
 			)
-		) {
-			HTMLHelper::_('jquery.framework');
+		)
 			$js .= "
 				jQuery(document).ready(function() {
 					var el = parent.document.getElementById('fc_modal_popup_container');
@@ -373,7 +371,6 @@ class plgSystemFlexisystem extends CMSPlugin
 					}
 				});
 			";
-		}
 		if ($js) $document->addScriptDeclaration($js);
 
 
@@ -1973,8 +1970,8 @@ class plgSystemFlexisystem extends CMSPlugin
 
 	private function _storeLessConf($table)
 	{
-		$xml_path  = \Joomla\CMS\Filesystem\Path::clean(JPATH_ADMINISTRATOR.'/components/com_flexicontent/config.xml');
-		$less_path = \Joomla\CMS\Filesystem\Path::clean(JPATH_ROOT.'/components/com_flexicontent/assets/less/include/mixins.less');
+		$xml_path  = \Joomla\Filesystem\Path::clean(JPATH_ADMINISTRATOR.'/components/com_flexicontent/config.xml');
+		$less_path = \Joomla\Filesystem\Path::clean(JPATH_ROOT.'/components/com_flexicontent/assets/less/include/mixins.less');
 
 
 		/**
