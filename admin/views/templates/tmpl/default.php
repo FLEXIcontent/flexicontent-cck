@@ -254,8 +254,8 @@ $list_total_cols = 8;
 	</table>
 </div>
 
-<div id="howto_box" style="margin:10px 0% 24px 0%; width: 100%;">
-		<table class="fc-table-list" style="margin: 0; min-width: unset; width: 100%;">
+<div id="howto_box" >
+		<table class="adminlist table fcmanlist" >
 			<tr>
 				<th>Configure display of your fields <span class="badge text-white bg-dark">item</span> view and <span class="badge text-white bg-dark">multi-item</span> views</th>
 			</tr>
