@@ -35,7 +35,7 @@ if ($this->params->get('togglable_table_cols', 1))
 ob_start();
 file_exists(dirname(__FILE__).DS.'listings_filter_form_html.php')
     ? include(dirname(__FILE__).DS.'listings_filter_form_html.php')
-    : include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS.'listings_filter_form_html.php');
+    : include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS.'listings_filter_form.php');
 $filter_form_html = trim(ob_get_contents());
 ob_end_clean();
 
