@@ -733,9 +733,8 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			//flexicontent_html::loadFramework('wavesurfer');
 			flexicontent_html::loadFramework('flexi-lib');
 			\Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
-			$document->addScript('https://unpkg.com/wavesurfer.js/dist/wavesurfer.min.js');
-			//$document->addScript('https://unpkg.com/wavesurfer.js/dist/plugin/wavesurfer.cursor.js');
-			$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/mediafile/js/form.js', array('version' => FLEXI_VHASH));
+			$document->addScript('https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js');
+			$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/mediafile/js/form.js', array('version' => filemtime(JPATH_ROOT . '/plugins/flexicontent_fields/mediafile/js/form.js')));
 
 			$js .= "
 			jQuery(document).ready(function()
@@ -1115,9 +1114,8 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			//flexicontent_html::loadFramework('wavesurfer');
 			flexicontent_html::loadFramework('flexi-lib');
 			\Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
-			$document->addScript('https://unpkg.com/wavesurfer.js/dist/wavesurfer.min.js');
-			//$document->addScript('https://unpkg.com/wavesurfer.js/dist/plugin/wavesurfer.cursor.js');
-			$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/mediafile/js/view.js', array('version' => FLEXI_VHASH));
+			$document->addScript('https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js');
+			$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/mediafile/js/view.js', array('version' => filemtime(JPATH_ROOT . '/plugins/flexicontent_fields/mediafile/js/view.js')));
 			//$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/assets/js/pako.min.js', array('version' => FLEXI_VHASH));
 			//$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/assets/js/pako_deflate.min.js', array('version' => FLEXI_VHASH));
 			//$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/assets/js/pako_inflate.min.js', array('version' => FLEXI_VHASH));
