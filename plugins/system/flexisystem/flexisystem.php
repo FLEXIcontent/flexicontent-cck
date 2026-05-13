@@ -332,12 +332,17 @@ class plgSystemFlexisystem extends CMSPlugin
 				if ($suhosin_lim < $max_input_vars) $max_input_vars = $suhosin_lim;
 			}
 
-			$wa = Factory::getApplication()
-				->getDocument()
-				->getWebAssetManager();
+$app = Factory::getApplication();
+$document = $app->getDocument();
 
-			$wa->useScript('jquery');
-			$wa->useScript('jquery-noconflict');
+// Guard compatible J4/J5/J6 : getDocument() peut retourner null
+// hors contexte web (CLI, API, tâches planifiées, etc.)
+if ($document !== null && method_exists($document, 'getWebAssetManager')) {
+    $wa = $document->getWebAssetManager();
+    $wa->useScript('jquery');
+    $wa->useScript('jquery-noconflict');
+    $document->addScriptDeclaration($js);
+}
 
 
 			$js .= "
@@ -367,7 +372,9 @@ class plgSystemFlexisystem extends CMSPlugin
 				});
 			";
 		}
-		if ($js) $document->addScriptDeclaration($js);
+		if ($js && $document !== null && method_exists($document, 'addScriptDeclaration')) {
+    $document->addScriptDeclaration($js);
+}
 
 
 		// Detect resolution we will do this regardless of ... using mobile layouts

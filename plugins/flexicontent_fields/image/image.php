@@ -790,7 +790,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			}
 		}
 
-		if ( count($skipped_vals) )
+		if ( !empty($skipped_vals) )
 		{
 			$app->enqueueMessage( \Joomla\CMS\Language\Text::sprintf('FLEXI_FIELD_IMAGE_EDIT_VALUES_SKIPPED', $field->label, implode(',',$skipped_vals)), 'notice' );
 		}
