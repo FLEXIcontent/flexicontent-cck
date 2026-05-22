@@ -1835,7 +1835,6 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			while(!feof($handle))
 			{
 				print(@fread($handle, $chunksize));
-				ob_flush();
 				flush();
 			}
 			fclose($handle);
