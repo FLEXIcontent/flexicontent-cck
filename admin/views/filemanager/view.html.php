@@ -780,6 +780,26 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 				'btn btn-fcaction ' . (FLEXI_J40GE ? '_DDI_class_ ' : '') . $this->tooltip_class, 'icon-loop',
 				'data-placement="right" data-taskurl="' . $popup_load_url .'" title="' . flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_INDEX_FILE_STATISTICS_DESC'), 'd') . '"', $auto_add = 0, $tag_type='button')
 				;
+
+			$popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&amp;view=filemanager&amp;layout=indexer&amp;tmpl=component&amp;indexer=filemanager_stats&amp;index_urls=1';
+			$btn_text = \Joomla\CMS\Language\Text::_('FLEXI_RECALCULATE_SIZES_SELECTED');
+			$btn_name = 'recalc_sizes_selected';
+			$no_selection_msg = flexicontent_html::escapeJsText(\Joomla\CMS\Language\Text::_('FLEXI_NO_ITEMS_SELECTED'), 'd');
+			$confirm_msg      = flexicontent_html::escapeJsText(\Joomla\CMS\Language\Text::_('FLEXI_RECALCULATE_SIZES_SELECTED_DESC'), 'd');
+			$dialog_title     = flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_RECALCULATE_SIZES_SELECTED'), 'd');
+			$full_js = "var cid = jQuery('[name=\"cid[]\"]').filter(':checked').map(function(){ return this.value; }).get();"
+				. " if (!cid.length) { alert('" . $no_selection_msg . "'); return false; }"
+				. " if (!confirm('" . $confirm_msg . "')) return false;"
+				. " var url = jQuery(this).data('taskurl') + '&selected_ids=' + cid.join(',');"
+				. " fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">" . $loading_msg . "<\\/span>'; window.location.reload(false)}, {'title': '" . $dialog_title . "'});"
+				. " return false;";
+			$btn_arr[] = flexicontent_html::addToolBarButton(
+				$btn_text, $btn_name, $full_js,
+				$msg_alert = '', $msg_confirm = '',
+				$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
+				'btn btn-fcaction ' . (FLEXI_J40GE ? '_DDI_class_ ' : '') . $this->tooltip_class, 'icon-loop',
+				'data-placement="right" data-taskurl="' . $popup_load_url . '" title="' . flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_RECALCULATE_SIZES_SELECTED_DESC'), 'd') . '"', $auto_add = 0, $tag_type='button')
+				;
 		}
 
 		if (count($btn_arr))
