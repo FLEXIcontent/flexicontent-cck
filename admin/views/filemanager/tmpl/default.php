@@ -1355,7 +1355,7 @@ if ($js)
 										</td>
 									<?php endif; ?>
 
-									<td class="center"><?php echo $row->url != 1 ? (file_exists($file_abspath) ? $row->size : '<span class="badge badge-box badge-important">'.Text::_('FLEXI_FILE_NOT_FOUND').'</span>') : '-'; ?></td>
+									<td class="center"><?php echo $row->url != 1 ? (file_exists($file_abspath) ? $row->size : '<span class="badge badge-box badge-important">'.Text::_('FLEXI_FILE_NOT_FOUND').'</span>') : $row->size; ?></td>
 
 									<?php if (!empty($this->cols['hits'])) : ?>
 										<td class="center hidden-phone"><span class="badge"><?php echo empty($row->hits) ? 0 : $row->hits; ?></span></td>

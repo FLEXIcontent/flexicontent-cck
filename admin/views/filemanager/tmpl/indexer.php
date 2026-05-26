@@ -25,6 +25,11 @@ $app = \Joomla\CMS\Factory::getApplication();
 $indexer_name = $app->input->get('indexer', 'filemanager_stats', 'cmd');
 $rebuildmode  = $app->input->get('rebuildmode', '', 'cmd');
 $index_urls   = $app->input->get('index_urls', 0, 'int');
+
+// Sanitize: allow only comma-separated integers
+$_selected_ids_raw = $app->input->getString('selected_ids', '');
+$_selected_ids_arr = array_filter(array_map('intval', explode(',', $_selected_ids_raw)));
+$selected_ids = implode(',', $_selected_ids_arr);
 ?>
 
 <div>&nbsp;</div>
@@ -93,7 +98,7 @@ jQuery(document).ready(function() {
 	var start_time = new Date().getTime();
 
 	jQuery.ajax({
-		url: "index.php?option=com_flexicontent&format=raw&<?php echo $ctrl_task; ?>countrows&index_urls=<?php echo $index_urls;?>&indexer=<?php echo $indexer_name;?>&<?php echo \Joomla\CMS\Session\Session::getFormToken().'=1'; ?>",
+		url: "index.php?option=com_flexicontent&format=raw&<?php echo $ctrl_task; ?>countrows&index_urls=<?php echo $index_urls;?>&indexer=<?php echo $indexer_name;?>&selected_ids=<?php echo $selected_ids; ?>&<?php echo \Joomla\CMS\Session\Session::getFormToken().'=1'; ?>",
 		success: function(response, status, xhr) {
 			var request_time = new Date().getTime() - start_time;
 			total_time += request_time;

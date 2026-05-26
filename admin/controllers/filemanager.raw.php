@@ -152,9 +152,20 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 		// Get ids of records to process
 		$records_total = 0;
-		$record_ids = $records_model->getFileIds($skip_urls = false,
-			$records_total, 0, self::$record_limit
-		);
+		$selected_ids_raw = $this->input->getString('selected_ids', '');
+
+		if ($selected_ids_raw !== '')
+		{
+			// Sanitize and use only the explicitly selected file IDs
+			$record_ids    = array_values(array_filter(array_map('intval', explode(',', $selected_ids_raw))));
+			$records_total = count($record_ids);
+		}
+		else
+		{
+			$record_ids = $records_model->getFileIds($skip_urls = false,
+				$records_total, 0, self::$record_limit
+			);
+		}
 
 		// Set record ids into session to avoid recalculation ...
 		$_sz_encoded = base64_encode($has_zlib ? zlib_encode(serialize($record_ids), -15) : serialize($record_ids));
