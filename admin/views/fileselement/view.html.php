@@ -175,6 +175,17 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 
 			unset($cols['_SAVED_']);
 		}
+
+		// Folder-mode rows come from the filesystem, not #__flexicontent_files.
+		// Hide DB-backed columns so the shared filemanager template does not
+		// render controls for properties that do not exist on these rows.
+		if ($folder_mode)
+		{
+			foreach(array('state', 'access', 'lang', 'hits', 'target', 'stamp', 'usage', 'uploader', 'file_id') as $col)
+			{
+				unset($cols[$col]);
+			}
+		}
 		
 		/*
 		 * Column selection of optional columns not given)

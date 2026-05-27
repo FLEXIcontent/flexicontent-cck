@@ -329,7 +329,9 @@ if ($autodisplayadvoptions)
 	';
 }
 
-$wa->addInlineScript($js);
+if (!empty($js)) {
+    $wa->addInlineScript($js);
+}
 ?>
 
 <div class="mod_flexiadvsearch_wrapper mod_flexiadvsearch_wrap<?php echo $moduleclass_sfx; ?>" id="mod_flexiadvsearch_default<?php echo $module->id ?>">

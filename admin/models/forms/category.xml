@@ -796,6 +796,14 @@
 			<field name="" type="separator" default="FLEXI_LIMIT_SUPPRESS_ITEMS_LIST_VIA_CUSTOM_FIELDS" level="level3" class="alert alert-info fcpadded"/>
 			
 			<field name="" type="separator" default="FLEXI_PAGINATION" description="FLEXI_PAGINATION_DESC" level="level1" />
+
+			<field name="infinite_scroll" type="fcradio" default="" label="FLEXI_INFINITE_SCROLL" description="FLEXI_INFINITE_SCROLL_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_CLASSIC_PAGINATION</option>
+				<option value="1">FLEXI_INFINITE_LOAD_MORE_BUTTON</option>
+				<option value="2">FLEXI_INFINITE_SCROLL</option>
+			</field>
+
 			<field name="show_item_total" type="fcradio" default="" label="FLEXI_SHOW_ITEM_TOTAL" description="FLEXI_SHOW_ITEM_TOTAL_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>

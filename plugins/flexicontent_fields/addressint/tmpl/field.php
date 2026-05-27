@@ -83,9 +83,9 @@ foreach ($values as $value)
 			<tr>
 				<td colspan="2" class="">
 					' . $message_error . '
-					<div class="'.$input_grp_class . ' fc-xpended-row">
-						<label class="' . $add_on_class . ' fc-lbl-short addrint_autocomplete-lbl" for="'.$elementid_n.'_autocomplete" style="float: none;"><span class="icon-search"></span></label>
-						<input id="'.$elementid_n.'_autocomplete" class="addrint_autocomplete" name="'.$fieldname_n.'[autocomplete]" type="text" autocomplete="off" spellcheck="false" />
+					<div class="'.$input_grp_class . ' fc-xpended-row" style="width:100%;">
+						<label class="' . $add_on_class . ' fc-lbl-short addrint_autocomplete-lbl" for="'.$elementid_n.'_autocomplete" style="float: none;min-width: 114px;text-align: right;"><span class="icon-search"></span></label>
+						<input id="'.$elementid_n.'_autocomplete" class="addrint_autocomplete" style="border: 1px solid var(--template-bg-dark-20) !important;" name="'.$fieldname_n.'[autocomplete]" type="text" autocomplete="off" spellcheck="false" />
 						<select id="'.$elementid_n.'_ac_type" class="addrint_ac_type use_select2_lib" name="'.$fieldname_n.'[ac_type]" onchange="fcfield_addrint.changeAutoCompleteType(this.id.replace(\'_ac_type\', \'\'), \''.$field_name_js.'\');"' . ($mapapi_edit === 'nominatim' ? ' style="display:none;"' : '') . '>
 							'.$ac_type_options.'
 						</select>
