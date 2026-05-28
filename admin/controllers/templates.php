@@ -137,8 +137,19 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 		$positions = explode(',', $positions);
 
 		// Default filtering will remove HTML
-		$post = $this->input->get->post->getArray();
-		$attribs = $post['jform']['layouts'][$folder];
+		$post    = $this->input->get->post->getArray();
+		$attribs = isset($post['jform']['layouts'][$folder]) ? $post['jform']['layouts'][$folder] : array();
+
+		// layout_json est du JSON brut — getArray() le filtre et le detruit.
+		// Le JS l'envoie en base64 dans un champ separe 'layout_json_raw' (hors jform).
+		// On le lit avec getString() qui ne filtre rien, puis on l'injecte dans $attribs.
+		$layout_json_b64 = $this->input->getString('layout_json_raw', '');
+		if ($layout_json_b64) {
+			$decoded = base64_decode($layout_json_b64, true);
+			if ($decoded !== false && json_decode($decoded) !== null) {
+				$attribs['layout_json'] = $decoded;
+			}
+		}
 
 		// Set templates configuration
 		$model->setConfig($positions, $attribs);
