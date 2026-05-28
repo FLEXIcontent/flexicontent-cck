@@ -252,7 +252,7 @@ foreach ($field->value as $index => $value)
 				// Workaround for Quantum not setting the default folder, we will use custom JS
 				$select_existing = str_replace('class="quantumuploadimage-input', ' data-default-scope="'.$jmedia_topdir.'" data-default-subpath="'.$jmedia_subpath.'" class="quantumuploadimage-input', $select_existing);
 				// Bug with Quantum not setting the correct path for the preview image when Joomla is installed in a subdirectory
-				if (JUri::root(true) !== '') {
+				if (\Joomla\CMS\Uri\Uri::root(true) !== '') {
 					$select_existing = str_replace('<img src="/', '<img src="', $select_existing);
 				}
 			}

@@ -76,7 +76,7 @@ $baseUrl = rtrim($baseUrl, '?&');
 		<button id="fc-load-more-btn"
 				class="btn btn-outline-primary fc-load-more-btn"
 				type="button">
-			<?php echo JText::sprintf('COM_FLEXICONTENT_LOAD_MORE_X', $nextBatch); ?>
+			<?php echo \Joomla\CMS\Language\Text::sprintf('COM_FLEXICONTENT_LOAD_MORE_X', $nextBatch); ?>
 		</button>
 	</div>
 	<?php endif; ?>
@@ -85,7 +85,7 @@ $baseUrl = rtrim($baseUrl, '?&');
 	<!-- Sentinel element for IntersectionObserver (auto-scroll mode) -->
 	<div id="fc-scroll-sentinel" class="fc-scroll-sentinel" aria-hidden="true">
 		<div class="fc-spinner spinner-border text-secondary" role="status" style="display:none">
-			<span class="visually-hidden"><?php echo JText::_('COM_FLEXICONTENT_LOADING'); ?></span>
+			<span class="visually-hidden"><?php echo \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_LOADING'); ?></span>
 		</div>
 	</div>
 	<?php endif; ?>
@@ -329,7 +329,7 @@ $baseUrl = rtrim($baseUrl, '?&');
 			limit    : <?php echo $itemsPerPage; ?>,
 			nextStart: <?php echo $nextStart; ?>,
 			total    : <?php echo $totalItems; ?>,
-			labelTpl : <?php echo json_encode(JText::_('COM_FLEXICONTENT_LOAD_MORE_X')); ?>
+			labelTpl : <?php echo json_encode(\Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_LOAD_MORE_X')); ?>
 		});
 	});
 
