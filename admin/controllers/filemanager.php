@@ -833,10 +833,10 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 						$errors = trim(ob_get_contents());
 						ob_clean();
 
-						if ($errors) JFactory::getApplication()->enqueueMessage( 'Error renaming file of field: \'<b>' . $field->label . '</b>\' : <br/> <pre>' . $errors . '</pre>', 'notice');
+						if ($errors) \Joomla\CMS\Factory::getApplication()->enqueueMessage( 'Error renaming file of field: \'<b>' . $field->label . '</b>\' : <br/> <pre>' . $errors . '</pre>', 'notice');
 					}
 					catch (ParseError $e) {
-						JFactory::getApplication()->enqueueMessage( "Automatic filename custom code, failed with: <pre>" . $e->getMessage() . '</pre>', 'warning');
+						\Joomla\CMS\Factory::getApplication()->enqueueMessage( "Automatic filename custom code, failed with: <pre>" . $e->getMessage() . '</pre>', 'warning');
 					}
 					break;
 			}

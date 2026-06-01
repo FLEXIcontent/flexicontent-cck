@@ -2029,7 +2029,7 @@ if ($js)
 																			'<a class="form-control btn btn-info customform-btn fit-contents"
 													onclick="'.$onclick_js.'" href="javascript:" data-href="'.$modal_url.'"
 												><i class="icon-search"></i></a>';  // &nbsp; Select
-																		$juri_root = JURI::root(true);
+																		$juri_root = \Joomla\CMS\Uri\Uri::root(true);
 																		$file_placeholder_text = 'No file selected';
 																		$file_placeholder_src  = $juri_root . '/' .'administrator/components/com_events/assets/images/person_placeholder.jpg';
 																		$file_clear_value_js   = "jQuery(this).parent().find('input[type=text]').val(''); jQuery(this).parent().parent().find('.inline-preview-img').attr('src', '".$file_placeholder_src."'); ";
