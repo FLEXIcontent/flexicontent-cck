@@ -1443,6 +1443,43 @@ class plgFlexicontent_fieldsMediafile extends FCField
 					$v = !empty($file_ids) ? reset($file_ids) : ($use_ingroup ? null : false);
 					$v = $v ?: ($use_ingroup ? null : false);
 					//$_filetitle = key($file_ids);  // This is the cleaned up filename, currently not needed
+
+					// Run media processing for newly added file (skipped by addlocal)
+					if (!empty($v) && is_numeric($v))
+					{
+						try
+						{
+							$_file_id = (int) $v;
+							$_db = Factory::getDbo();
+							$_fileObj = $_db->setQuery('SELECT * FROM #__flexicontent_files WHERE id = ' . $_file_id)->loadObject();
+
+							if ($_fileObj)
+							{
+								$_destpath = $_fileObj->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;
+								$_fileObj->full_path = $_destpath . DS . $_fileObj->filename;
+
+								$_fmodel = new FlexicontentModelFilemanager();
+
+								$_res = $_fmodel->createMediaData($field, $_fileObj);
+
+								if ($_res && !empty($_fileObj->mediaData))
+								{
+									$_fmodel->createAudioPreview($field, $_fileObj);
+								}
+
+								// Schedule FTP transfer if field uses remote storage
+								$_estorage_mode = $field->parameters->get('estorage_mode', '0');
+								if ($_estorage_mode === 'FTP' && !empty($field->id))
+								{
+									$_db->setQuery('UPDATE #__flexicontent_files SET estorage_fieldid = ' . (int) $field->id . ' WHERE id = ' . $_file_id)->execute();
+								}
+							}
+						}
+						catch (\Exception $_e)
+						{
+							Factory::getApplication()->enqueueMessage('mediafile import post-processing error (file id ' . (int) $v . '): ' . $_e->getMessage(), 'warning');
+						}
+					}
 				}
 			}
 

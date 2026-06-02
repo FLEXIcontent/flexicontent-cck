@@ -54,11 +54,13 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 
 		if (!empty($conf))
 		{
-			echo 'success|' . count($conf['contents_parsed']) . '|' . $lineno . '|' . \Joomla\CMS\Session\Session::getFormToken();
+			$parsed_count = count($conf['contents_parsed'] ?? []);
+			echo 'success|' . $parsed_count . '|' . $lineno . '|' . \Joomla\CMS\Session\Session::getFormToken();
 		}
 		else
 		{
-			echo 'fail|0|0';
+			$has_raw = $session->get('csvimport_config', '', 'flexicontent');
+			echo 'fail|conf_empty:raw_len=' . strlen($has_raw) . '|0';
 		}
 
 		jexit();

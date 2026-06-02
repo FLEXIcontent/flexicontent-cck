@@ -153,16 +153,19 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 			case 'importcsv':
 
 				$conf   = $session->get('csvimport_config', "", 'flexicontent');
+				$conf_raw_len = strlen($conf);
 				$conf		= unserialize($conf ? ($has_zlib ? zlib_decode(base64_decode($conf)) : base64_decode($conf)) : "");
 
 				$lineno = $session->get('csvimport_lineno', 999999, 'flexicontent');
 
+				echo '<b>DEBUG session:</b> conf_raw_len=' . $conf_raw_len
+					. ' conf=' . (empty($conf) ? '<span style="color:red">EMPTY</span>' : '<span style="color:green">OK (' . count($conf['contents_parsed'] ?? []) . ' parsed records)</span>')
+					. ' lineno=' . $lineno . '<br/>';
+
 				if (empty($conf))
 				{
-					$app->enqueueMessage('Can not continue import, import task not initialized or already finished', 'error');
-					$this->setRedirect($link);
-
-					return;
+					echo '<b style="color:red">ERROR:</b> Session conf is empty &mdash; import task not initialized or session expired.<br/>';
+					jexit();
 				}
 
 				// CONTINUE to do the import
@@ -743,7 +746,7 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 		$linelim = $items_per_call ? $lineno + $items_per_call - 1 : $itemcount;
 		$linelim = $linelim > $itemcount ? $itemcount : $linelim;
 
-		// echo "lineno: $lineno -- linelim: $linelim<br/>";
+		echo '<b>DEBUG loop:</b> task=' . $task . ' lineno=' . $lineno . ' linelim=' . $linelim . ' itemcount=' . $itemcount . ' items_per_call=' . $items_per_call . '<br/>';
 
 		for (; $lineno <= $linelim; $lineno++)
 		{
@@ -839,7 +842,7 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 						{
 							// Get tag ids from comma separated list, filtering out bad characters
 							$_tis_list = preg_replace("/[\"'\\\]/u", "", $field_values);
-							$_tis = array_unique(array_map('intval', $_tis));
+							$_tis = array_unique(array_map('intval', explode(',', $_tis_list)));
 							$_tis = array_flip($_tis);
 
 							// Check to use only existing tag ids

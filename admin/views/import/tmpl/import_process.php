@@ -46,6 +46,11 @@ jQuery(document).ready(function()
 	var number = 0;
 	var form_token = '';
 
+	function debugLog(msg) {
+		console.log('[FC Import] ' + msg);
+		jQuery('div#debuglog').append('<div>' + msg + '</div>');
+	}
+
 	function updateprogress()
 	{
 		//alert(' ' +looper + '>=' + number);
@@ -55,13 +60,24 @@ jQuery(document).ready(function()
 			return;
 		}
 
+		var ajax_url = "index.php?option=com_flexicontent&<?php echo $import_task; ?>importcsv&items_per_call="
+			+items_per_call+"&itemcnt="+looper+'&'+form_token+'=1';
+
+		debugLog('importcsv AJAX call: looper=' + looper + ' number=' + number + ' token=' + form_token);
+
 		jQuery.ajax({
-			url: "index.php?option=com_flexicontent&<?php echo $import_task; ?>importcsv&items_per_call="
-				+items_per_call+"&itemcnt="+looper+'&'+form_token+'=1',
+			url: ajax_url,
 			success: function(response, status2, xhr2) {
+				var preview = response.substring(0, 300).replace(/</g,'&lt;').replace(/>/g,'&gt;');
+				debugLog('importcsv response HTTP=' + xhr2.status + ' length=' + response.length + ' preview: ' + preview);
 				var arr = response.split('||||');
 				if(arr[0]=='fail') {
 					jQuery('div#statuscomment').html(arr[1]);
+					looper = number;
+					return;
+				} else if(arr[0] !== 'success') {
+					debugLog('<span style="color:red">Unexpected importcsv response (not success/fail). First 200 chars: ' + preview.substring(0,200) + '</span>');
+					jQuery('div#statuscomment').html('<span style="color:red">Unexpected server response &mdash; check debuglog below</span>');
 					looper = number;
 					return;
 				} else {
@@ -75,30 +91,36 @@ jQuery(document).ready(function()
 				jQuery('div#statuscomment').html((looper<number?looper:number)+' / '+number+' items ');
 				jQuery('div#statuslog').append(arr[2]);
 				setTimeout(updateprogress, 20);  // milliseconds to delay updating the HTML display
+			},
+			error: function(xhr, status, error) {
+				debugLog('<span style="color:red">importcsv AJAX ERROR: HTTP=' + xhr.status + ' status=' + status + ' error=' + error + '</span>');
+				debugLog('Response: ' + xhr.responseText.substring(0, 500).replace(/</g,'&lt;').replace(/>/g,'&gt;'));
+				jQuery('div#statuscomment').html('<span style="color:red">AJAX error: ' + status + ' (HTTP ' + xhr.status + ') &mdash; check debuglog below</span>');
 			}
 		});
 		looper=looper+items_per_call;
 	}
 
+	debugLog('Calling getlineno...');
+
 	jQuery.ajax({
 		url: "index.php?option=com_flexicontent&<?php echo $import_task; ?>getlineno&format=raw",
 		success: function(response, status, xhr) {
-			//alert(response);
+			debugLog('getlineno response HTTP=' + xhr.status + ' raw=[' + response + ']');
 			var arr = response.split('|');
 			if(arr[0]=='fail') {
-				jQuery('div#statuscomment').html(arr[1]);
+				debugLog('<span style="color:red">getlineno FAIL: session conf not found or empty</span>');
+				jQuery('div#statuscomment').html('<span style="color:red">Session error: import config not found. Please go back and re-initialize the import.</span>');
 				return;
 			}
-			//items = jQuery.parseJSON(arr[1]);
-			//fields = jQuery.parseJSON(arr[2]);
-			//number = fields.length*items.length;
-			
+
 			items_length = arr[1];
 			items_lineno = arr[2];
 			form_token = arr[3];
 			number = parseInt(items_length);
 			onesector = (number==0)?300:(300/number);
 			looper = parseInt(items_lineno);
+			debugLog('getlineno OK: items=' + number + ' lineno=' + looper);
 			if(looper>=number && looper) {
 				var msg = 'IMPORT already FINISHED. Please RESET import process';
 				alert(msg);
@@ -107,6 +129,11 @@ jQuery(document).ready(function()
 			} else {
 				updateprogress();
 			}
+		},
+		error: function(xhr, status, error) {
+			debugLog('<span style="color:red">getlineno AJAX ERROR: HTTP=' + xhr.status + ' status=' + status + ' error=' + error + '</span>');
+			debugLog('Response: ' + xhr.responseText.substring(0, 500).replace(/</g,'&lt;').replace(/>/g,'&gt;'));
+			jQuery('div#statuscomment').html('<span style="color:red">AJAX error on getlineno: ' + status + ' &mdash; check debuglog below</span>');
 		}
 	});
 });
@@ -157,4 +184,9 @@ jQuery(document).ready(function()
 <div class="fcclear"></div>
 <div id="statuscomment"></div>
 <div id="statuslog"></div>
+<div class="fcclear" style="margin-top:16px;"></div>
+<details style="margin-top:8px;">
+	<summary style="cursor:pointer; font-weight:bold; color:#666;">Debug log (click to expand)</summary>
+	<div id="debuglog" style="font-family:monospace; font-size:12px; background:#f8f8f8; border:1px solid #ccc; padding:8px; max-height:300px; overflow:auto; margin-top:4px;"></div>
+</details>
 <div class="fcclear"></div>
