@@ -557,11 +557,15 @@ if ($js)
 
 					<?php if ($isXtdBtn): ?>
 
-						<?php $attribs = 'data-function="' . $this->escape($onclick) . '"'
+						<?php
+							$item_slug = strlen($row->alias) ? $row->id . ':' . $row->alias : $row->id;
+							$cat_slug  = isset($globalcats[$row->catid]) ? $globalcats[$row->catid]->slug : $row->catid;
+
+							$attribs = 'data-function="' . $this->escape($onclick) . '"'
 							. ' data-id="' . $this->escape($row->id) . '"'
 							. ' data-title="' . $this->escape($row->title) . '"'
 							. ' data-cat-id="' . $this->escape($row->catid) . '"'
-							. ' data-uri="' . $this->escape(FlexicontentHelperRoute::getItemRoute($row->id, $row->catid, $_Itemid = 0, $row)) . '"'
+							. ' data-uri="' . $this->escape(FlexicontentHelperRoute::getItemRoute($item_slug, $cat_slug, $_Itemid = 0, $row)) . '"'
 							. ' data-language="' . $this->escape($row->language) . '"';
 						?>
 					<span class="<?php echo $this->tooltip_class; ?>" title="<?php echo HTMLHelper::tooltipText(Text::_('FLEXI_SELECT'), $row->title . '<br/><br/>' . $pcpath, 0, 1); ?>">

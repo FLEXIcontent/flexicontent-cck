@@ -133,7 +133,7 @@ class FlexicontentlinksItems extends \Joomla\CMS\Object\CMSObject {
 		{
 			$url = FlexicontentHelperRoute::getItemRoute($content->slug, $content->catslug, 0, $content);
 			$items[] = array(
-				'id'	=>  'index.php?option=com_flexicontent&view=item&cid='.$content->catid.'&id='.$content->id,
+				'id'	=>  'index.php?option=com_flexicontent&view=item&cid='.$content->catslug.'&id='.$content->slug,
 				'url'	=>	self::route($url),
 				'name'	=>	$content->ititle.'(id='.$content->id.')',
 				'class'	=>	'file flexiitem'
