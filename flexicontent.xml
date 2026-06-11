@@ -240,8 +240,10 @@
 		<module name="mod_flexigooglemap"  folder="modules/mod_flexigooglemap">FLEXIcontent - Google Maps</module>
 	</additional>
 
-	<updateservers>
-		<server type="extension" priority="1" name="FLEXIcontent CCK update">https://raw.githubusercontent.com/FLEXIcontent/flexicontent-cck/master/update.xml</server>
-	</updateservers>
+<updateservers>
+    <server type="extension" priority="1" name="FLEXIcontent CCK update">
+        https://flexicontent.org/updates/update.php?channel=stable
+    </server>
+</updateservers>
 		
 </extension>
