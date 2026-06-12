@@ -554,6 +554,17 @@ class flexicontent_items extends _flexicontent_items
 		{
 			// Bind the object with the row and return.
 			$result = $this->bind($row);
+
+			// No #__flexicontent_items_ext row was found (LEFT JOIN returned NULL for "e.*"),
+			// so type_id is still NULL here. Fall back to the value cached in
+			// #__flexicontent_items_tmp, if any, instead of leaving it NULL, so that store()
+			// does not end up (re)creating the items_ext row with type_id = 0.
+			if ($this->type_id === null)
+			{
+				$this->type_id = (int) $this->_db->setQuery(
+					'SELECT type_id FROM ' . $this->_tbl_tmp . ' WHERE ' . $this->_tbl_key_tmp . ' = ' . (int) $this->{$this->_tbl_key}
+				)->loadResult();
+			}
 		}
 
 		if (FLEXI_J40GE)
@@ -787,6 +798,23 @@ class flexicontent_items extends _flexicontent_items
 		if (!empty($record_tmp->$fk_tmp))
 		{
 			$tmp_exists = (boolean) $this->_db->setQuery('SELECT COUNT(*) FROM ' . $this->_tbl_tmp . ' WHERE ' . $fk_tmp . '=' . (int) $record_tmp->$fk_tmp)->loadResult();
+		}
+
+		// Properties that were never loaded/set (e.g. type_id, is_uptodate, when the items_ext
+		// row was missing during load()) are still NULL here. For NOT NULL columns, updateObject()
+		// would emit "SET col = NULL", which MySQL silently coerces to 0/'', wiping out any
+		// existing value in items_ext/items_tmp. Drop such properties so existing values are kept.
+		foreach (array($record_ext, $record_tmp) as $record_obj)
+		{
+			$record_tbl = $record_obj->_tbl;
+
+			foreach (get_object_vars($record_obj) as $p => $v)
+			{
+				if ($v === null && isset($this->_tbl_fields[$record_tbl][$p]) && $this->_tbl_fields[$record_tbl][$p]->Null === 'NO')
+				{
+					unset($record_obj->$p);
+				}
+			}
 		}
 
 		// Update extended data record
