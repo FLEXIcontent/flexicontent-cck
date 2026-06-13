@@ -1970,8 +1970,10 @@ class flexicontent_html
 			case 'flexi_js_common':
 
 				$site_languages = FLEXIUtilities::getLanguages();
-				$default_lang_code = flexicontent_html::getSiteDefaultLang();
-				$sef_lang_code = isset($site_languages->{$default_lang_code}) ? $site_languages->{$default_lang_code}->sef : '';
+  				$current_lang_code = flexicontent_html::getUserCurrentLang(false);
+  				$default_lang_code = flexicontent_html::getSiteDefaultLang();
+				$lang_code = isset($site_languages->{$current_lang_code}) ? $current_lang_code : $default_lang_code;
+				$sef_lang_code = isset($site_languages->{$lang_code}) ? $site_languages->{$lang_code}->sef : '';
 
 				$needed_vars = array('cid', 'cids', 'cc');
 				$FC_URL_VARS = array();
