@@ -1349,29 +1349,74 @@ class plgFlexicontent_fieldsFile extends FCField
 			{
 				if ( !is_numeric($v) )
 				{
-					$filename = basename($v);
-					$sub_folder = dirname($v);
-					$sub_folder = $sub_folder && $sub_folder!='.' ? DS.$sub_folder : '';
+					// Detect URL value: {URL}...{/URL} structured format or bare http(s):// / ftp:// URL
+					if (preg_match('#^\{URL\}(.*?)\{/URL\}#s', $v) || preg_match('#^(?:https?|ftp)://#i', $v))
+					{
+						// Parse structured export format: {URL}...{/URL}{Altname}...{/Altname}{Desc}...{/Desc}{Ext}...{/Ext}
+						if (preg_match('#^\{URL\}(.*?)\{/URL\}#s', $v, $_m))
+						{
+							$_url     = trim($_m[1]);
+							$_altname = preg_match('#\{Altname\}(.*?)\{/Altname\}#s', $v, $_m2) ? trim($_m2[1]) : '';
+							$_desc    = preg_match('#\{Desc\}(.*?)\{/Desc\}#s',       $v, $_m3) ? trim($_m3[1]) : '';
+							$_ext     = preg_match('#\{Ext\}(.*?)\{/Ext\}#s',         $v, $_m4) ? trim($_m4[1]) : '';
+						}
+						else
+						{
+							$_url = $v;  $_altname = '';  $_desc = '';  $_ext = '';
+						}
 
-					// Add by calling the filemanager upload() task in interactive mode
-					$fman = new FlexicontentControllerFilemanager();
-					$fman->runMode = 'interactive';
+						// Create URL-type file record directly (mirrors addurl() without CSRF requirement)
+						$_db   = Factory::getDbo();
+						$_user = Factory::getApplication()->getIdentity();
+						$_target_dir = $field->parameters->get('target_dir', 1);
+						$_secure = (strlen((string) $_target_dir) && (int) $_target_dir != 2) ? (int) $_target_dir : 1;
 
-					$Fobj = new stdClass();
-					$Fobj->return_url     = null;
-					$Fobj->file_dir_path  = DS. $import_docs_folder . $sub_folder;
-					$Fobj->file_filter_re = preg_quote($filename);
-					$Fobj->secure = (int) $field->parameters->get('iform_dir_default', 1);
-					$Fobj->stamp  = (int) $field->parameters->get('iform_stamp_default', 1);
-					$Fobj->keep   = 1;
+						$_fo = new stdClass;
+						$_fo->filename          = $_url;
+						$_fo->filename_original = $_url;
+						$_fo->altname           = $_altname ?: basename(parse_url($_url, PHP_URL_PATH));
+						$_fo->url               = 1;
+						$_fo->secure            = $_secure;
+						$_fo->stamp             = 0;
+						$_fo->ext               = $_ext ?: strtolower(pathinfo($_url, PATHINFO_EXTENSION));
+						$_fo->description       = $_desc;
+						$_fo->language          = '*';
+						$_fo->access            = 1;
+						$_fo->hits              = 0;
+						$_fo->size              = 0;
+						$_fo->uploaded          = Factory::getDate('now')->toSql();
+						$_fo->uploaded_by       = $_user->get('id');
 
-					$upload_errs = null;
-					$file_ids = $fman->addlocal($Fobj, $upload_errs);
+						$_db->insertObject('#__flexicontent_files', $_fo);
+						$v = (int) $_db->insertid();
+						$v = $v ?: ($use_ingroup ? null : false);
+					}
+					else
+					{
+						$filename = basename($v);
+						$sub_folder = dirname($v);
+						$sub_folder = $sub_folder && $sub_folder!='.' ? DS.$sub_folder : '';
 
-					// Get fist element
-					$v = !empty($file_ids) ? reset($file_ids) : ($use_ingroup ? null : false);
-					$v = $v ?: ($use_ingroup ? null : false);
-					//$_filetitle = key($file_ids);  // This is the cleaned up filename, currently not needed
+						// Add by calling the filemanager upload() task in interactive mode
+						$fman = new FlexicontentControllerFilemanager();
+						$fman->runMode = 'interactive';
+
+						$Fobj = new stdClass();
+						$Fobj->return_url     = null;
+						$Fobj->file_dir_path  = DS. $import_docs_folder . $sub_folder;
+						$Fobj->file_filter_re = preg_quote($filename);
+						$Fobj->secure = (int) $field->parameters->get('iform_dir_default', 1);
+						$Fobj->stamp  = (int) $field->parameters->get('iform_stamp_default', 1);
+						$Fobj->keep   = 1;
+
+						$upload_errs = null;
+						$file_ids = $fman->addlocal($Fobj, $upload_errs);
+
+						// Get fist element
+						$v = !empty($file_ids) ? reset($file_ids) : ($use_ingroup ? null : false);
+						$v = $v ?: ($use_ingroup ? null : false);
+						//$_filetitle = key($file_ids);  // This is the cleaned up filename, currently not needed
+					}
 				}
 			}
 

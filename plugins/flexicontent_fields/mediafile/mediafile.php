@@ -1475,9 +1475,9 @@ class plgFlexicontent_fieldsMediafile extends FCField
 								}
 							}
 						}
-						catch (\Exception $_e)
+						catch (\Throwable $_e)
 						{
-							Factory::getApplication()->enqueueMessage('mediafile import post-processing error (file id ' . (int) $v . '): ' . $_e->getMessage(), 'warning');
+							Factory::getApplication()->enqueueMessage('mediafile import post-processing error (file id ' . (int) $v . '): ' . $_e->getMessage() . ' in ' . $_e->getFile() . ' on line ' . $_e->getLine(), 'warning');
 						}
 					}
 				}
