@@ -1230,9 +1230,19 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 
 							if ($_filename)
 							{
-								$col_no = array_search($fld_name, $ff_fields);
-								$conf['contents'][$lineno][$col_no] = $_filename;
-								//print_r($conf['contents'][$lineno][$col_no]); echo '<br>';
+								// Update value in-place within the multi-value array instead of overwriting the entire cell
+								if (!isset($prop_arr))
+								{
+									$vals[$i] = $_filename;
+								}
+								else
+								{
+									$vals[$i] = str_replace(
+										'[-' . $prop_name . '-]=' . $filename,
+										'[-' . $prop_name . '-]=' . $_filename,
+										$val
+									);
+								}
 							}
 
 							if (!$_filename)
@@ -1240,6 +1250,10 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 								$filenames_missing[$fld_name][$filename][] = $lineno;
 							}
 						}
+
+						// Reconstruct the full cell value with all corrected filenames
+						$col_no = array_search($fld_name, $ff_fields);
+						$conf['contents'][$lineno][$col_no] = implode($conf['mval_separator'], $vals);
 					}
 				}
 			}
