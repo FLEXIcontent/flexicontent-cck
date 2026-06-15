@@ -4107,7 +4107,9 @@ class flexicontent_html
 		// Add main voting option
 		if ($xid === 'main' || $xid === 'all')
 		{
-			$vote_label = \Joomla\CMS\Language\Text::_($field->parameters->get('main_label', 'FLEXI_VOTE_AVERAGE_RATING'));
+			$vote_label = $field->parameters->get('main_label_show', 1)
+				? \Joomla\CMS\Language\Text::_($field->parameters->get('main_label', 'FLEXI_VOTE_AVERAGE_RATING'))
+				: '';
 			$counter_show_label = $field->parameters->get('main_counter_show_label', 1);
 			$add_review_form = (int) $field->parameters->get('allow_reviews', 0);
 			$html .= flexicontent_html::ItemVoteDisplay(
@@ -4342,57 +4344,41 @@ class flexicontent_html
 			$document->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/css/fcvote.css', array('version' => FLEXI_VHASH));
 			$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/fcvote.js', array('version' => FLEXI_VHASH));
 
-			$image = $field->parameters->get( 'main_image', 'components/com_flexicontent/assets/images/star-medium.png' );
-			$img_path	= \Joomla\CMS\Uri\Uri::root(true).'/'.$image;
+			// Star size and colors, via voting field parameters (Viewing -> Basic)
+			$star_size = (int) $field->parameters->get('stars_size', 24) ?: 24;
 
-			$dim = $field->parameters->get( 'main_dimension', 24 );
-			$element_width = $rating_resolution * $dim;
-			if ($rating_stars) $element_width = (int) $element_width * ($rating_stars / $rating_resolution);
+			$star_color       = trim($field->parameters->get('stars_color', '#FFB400'));
+			$star_color_empty = trim($field->parameters->get('stars_color_empty', '#CCCCCC'));
+
+			// Sanitize colors, allowing HEX notation or CSS color names
+			$star_color = preg_match('/^(#([0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})|[a-z]+)$/i', $star_color)
+				? $star_color
+				: '#FFB400';
+			$star_color_empty = preg_match('/^(#([0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})|[a-z]+)$/i', $star_color_empty)
+				? $star_color_empty
+				: '#CCCCCC';
+
+			$stars_shown = $rating_stars ?: $rating_resolution;
+			$element_width = $stars_shown * $star_size;
 
 			$css = '
 			/* This is via voting field parameter, please edit field configuration to override them */
-			.'.$class.' div.fcvote.fcvote-box-main {
-				line-height:'.$dim.'px!important;
-			}
-			.'.$class.' div.fcvote.fcvote-box-main > ul.fcvote_list {
-				height:'.$dim.'px!important;
-				width:'.$element_width.'px!important;
-			}
-			.'.$class.' div.fcvote.fcvote-box-main > ul.fcvote_list > li.voting-links a,
-			.'.$class.' div.fcvote.fcvote-box-main > ul.fcvote_list > li.current-rating {
-				height:'.$dim.'px!important;
-				line-height:'.$dim.'px!important;
-			}
-			.'.$class.' div.fcvote.fcvote-box-main > ul.fcvote_list,
-			.'.$class.' div.fcvote.fcvote-box-main > ul.fcvote_list > li.voting-links a:hover,
-			.'.$class.' div.fcvote.fcvote-box-main > ul.fcvote_list > li.current-rating {
-				background-image:url('.$img_path.')!important;
-			}
-			';
-
-			// Always add image configuration for composite (extra) votes in case some type is using them
-			$image = $field->parameters->get( 'extra_image', 'components/com_flexicontent/assets/images/star-medium.png' );
-			$img_path	= \Joomla\CMS\Uri\Uri::root(true).'/'.$image;
-
-			$dim = $field->parameters->get( 'extra_dimension', 24 );
-			$element_width = $rating_resolution * $dim;
-			if ($rating_stars) $element_width = (int) $element_width * ($rating_stars / $rating_resolution);
-
-			$css .= '
-			/* This is via voting field parameter, please edit field configuration to override them */
 			.'.$class.' div.fcvote > ul.fcvote_list {
-				height:'.$dim.'px!important;
+				height:'.$star_size.'px!important;
 				width:'.$element_width.'px!important;
 			}
-			.'.$class.' div.fcvote > ul.fcvote_list > li.voting-links a,
-			.'.$class.' div.fcvote > ul.fcvote_list > li.current-rating {
-				height:'.$dim.'px!important;
-				line-height:'.$dim.'px!important;
+			.'.$class.' div.fcvote > ul.fcvote_list svg.fcvote-star {
+				width:'.$star_size.'px!important;
+				height:'.$star_size.'px!important;
 			}
-			.'.$class.' div.fcvote > ul.fcvote_list,
-			.'.$class.' div.fcvote > ul.fcvote_list > li.voting-links a:hover,
-			.'.$class.' div.fcvote > ul.fcvote_list > li.current-rating {
-				background-image:url('.$img_path.')!important;
+			.'.$class.' div.fcvote > ul.fcvote_list .fcvote-stars-fill {
+				width:'.$element_width.'px!important;
+			}
+			.'.$class.' div.fcvote > ul.fcvote_list svg.fcvote-star-empty {
+				color:'.$star_color_empty.'!important;
+			}
+			.'.$class.' div.fcvote > ul.fcvote_list svg.fcvote-star-full {
+				color:'.$star_color.'!important;
 			}
 			';
 
@@ -4512,6 +4498,18 @@ class flexicontent_html
 			}
 		}
 
+		/**
+		 * Build the star icons HTML, stars are inline SVG icons (Font Awesome 'star' shapes),
+		 * an in-flow layer of empty stars plus 2 clipped overlay layers of filled stars:
+		 * 'current-rating' (the average rating) and 'hover-rating' (JS-driven vote preview)
+		 */
+		$star_svg_empty = '<svg class="fcvote-star fcvote-star-empty" viewBox="0 0 576 512" aria-hidden="true" focusable="false"><path fill="currentColor" d="M287.9 0c9.2 0 17.6 5.2 21.6 13.5l68.6 141.3 153.2 22.6c9 1.3 16.5 7.6 19.3 16.3s.5 18.1-5.9 24.5L433.6 328.4l26.2 155.6c1.5 9-2.2 18.1-9.7 23.5s-17.3 6-25.3 1.7l-137-73.2L151 509.1c-8.1 4.3-17.9 3.7-25.3-1.7s-11.2-14.5-9.7-23.5l26.2-155.6L31.1 218.2c-6.5-6.4-8.7-15.9-5.9-24.5s10.3-14.9 19.3-16.3l153.2-22.6L266.3 13.5C270.4 5.2 278.7 0 287.9 0zm0 79l-52.5 108.2c-3.5 7.1-10.2 12.1-18.1 13.3l-118.3 17.5L184 301.5c5.5 5.5 8.1 13.3 6.8 21l-20.3 119.7 105.9-56.6c7.1-3.8 15.6-3.8 22.7 0l105.9 56.6L384.8 322.4c-1.3-7.7 1.2-15.5 6.8-21l85.9-83.5-118.3-17.5c-7.9-1.2-14.6-6.1-18.1-13.3L287.9 79z"/></svg>';
+		$star_svg_full  = '<svg class="fcvote-star fcvote-star-full" viewBox="0 0 576 512" aria-hidden="true" focusable="false"><path fill="currentColor" d="M316.9 18C311.6 7 300.4 0 288.1 0s-23.4 7-28.8 18L195 150.3 51.4 171.5c-12 1.8-22 10.2-25.7 21.7s-.7 24.2 7.9 32.7L137.8 327 113.2 469.7c-2 12 3 24.2 12.9 31.3s23 8 33.8 2.3l128.3-68.5 128.3 68.5c10.8 5.7 23.9 4.9 33.8-2.3s14.9-19.3 12.9-31.3L438.5 327 542.7 225.9c8.6-8.5 11.7-21.2 7.9-32.7s-13.7-19.9-25.7-21.7L381.2 150.3 316.9 18z"/></svg>';
+
+		$stars_shown = $rating_stars ?: $rating_resolution;
+		$stars_html_empty = str_repeat($star_svg_empty, $stars_shown);
+		$stars_html_full  = str_repeat($star_svg_full, $stars_shown);
+
 		return '
 		<div class="'.$class.' '.$class.'_'.$xid.'">
 			<div class="fcvote fcvote-box-'.$xid.'">
@@ -4534,7 +4532,9 @@ class flexicontent_html
 					</span>').'
 				</div>
 				<ul class="fcvote_list">
-					<li class="current-rating" style="width:'.(int)$percent.'%;'.$nocursor.'"></li>
+					<li class="fcvote-stars">'.$stars_html_empty.'</li>
+					<li class="current-rating" style="width:'.(float)$percent.'%;'.$nocursor.'"><span class="fcvote-stars-fill">'.$stars_html_full.'</span></li>
+					<li class="hover-rating"><span class="fcvote-stars-fill">'.$stars_html_full.'</span></li>
 					'.$html_vote_links.'
 				</ul>
 
