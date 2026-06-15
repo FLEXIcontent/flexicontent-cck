@@ -51,6 +51,24 @@ jQuery(document).ready(function()
 		jQuery('div#debuglog').append('<div>' + msg + '</div>');
 	}
 
+	// Extract readable error text (title + body text) from a server error page (e.g. Joomla error page)
+	function extractServerError(html) {
+		try {
+			var doc = new DOMParser().parseFromString(html, 'text/html');
+			var title = (doc.title || '').trim();
+			var text = doc.body ? doc.body.innerText.replace(/\n{3,}/g, '\n\n').trim() : '';
+			return (title ? 'PAGE TITLE: ' + title + '\n' : '') + text.substring(0, 4000);
+		} catch (e) {
+			return html.substring(0, 4000);
+		}
+	}
+
+	function debugLogServerError(responseText) {
+		debugLog('Server error page text:<br/><pre style="white-space:pre-wrap; color:#900;">'
+			+ extractServerError(responseText).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+			+ '</pre>');
+	}
+
 	function updateprogress()
 	{
 		//alert(' ' +looper + '>=' + number);
@@ -94,7 +112,7 @@ jQuery(document).ready(function()
 			},
 			error: function(xhr, status, error) {
 				debugLog('<span style="color:red">importcsv AJAX ERROR: HTTP=' + xhr.status + ' status=' + status + ' error=' + error + '</span>');
-				debugLog('Response: ' + xhr.responseText.substring(0, 500).replace(/</g,'&lt;').replace(/>/g,'&gt;'));
+				debugLogServerError(xhr.responseText);
 				jQuery('div#statuscomment').html('<span style="color:red">AJAX error: ' + status + ' (HTTP ' + xhr.status + ') &mdash; check debuglog below</span>');
 			}
 		});
@@ -132,7 +150,7 @@ jQuery(document).ready(function()
 		},
 		error: function(xhr, status, error) {
 			debugLog('<span style="color:red">getlineno AJAX ERROR: HTTP=' + xhr.status + ' status=' + status + ' error=' + error + '</span>');
-			debugLog('Response: ' + xhr.responseText.substring(0, 500).replace(/</g,'&lt;').replace(/>/g,'&gt;'));
+			debugLogServerError(xhr.responseText);
 			jQuery('div#statuscomment').html('<span style="color:red">AJAX error on getlineno: ' + status + ' &mdash; check debuglog below</span>');
 		}
 	});

@@ -1218,13 +1218,14 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			}
 
 			// Validate other value properties
-			$newpost[$new]['image']    = !$useimage    ? '' : flexicontent_html::dataFilter(@$v['image'], 200, 'STRING', 0);
-			$newpost[$new]['title']    = !$usetitle    ? '' : flexicontent_html::dataFilter(@$v['title'], 4000, 'STRING', 0);
-			$newpost[$new]['linktext'] = !$usetext     ? '' : flexicontent_html::dataFilter(@$v['linktext'], 4000, 'STRING', 0);
-			$newpost[$new]['addrtype'] = !$useaddrtype ? '' : flexicontent_html::dataFilter(@$v['addrtype'], 4000, 'URL', 0);
-			$newpost[$new]['class']    = !$useclass    ? '' : flexicontent_html::dataFilter(@$v['class'], 200, 'STRING', 0);
-			$newpost[$new]['id']       = !$useid       ? '' : flexicontent_html::dataFilter(@$v['id'], 200, 'STRING', 0);
-			$newpost[$new]['target']   = !$usetarget   ? '' : flexicontent_html::dataFilter(@$v['target'], 200, 'STRING', 0);
+			// During CSV import, bypass use_* feature gates so that all exported properties are restored regardless of current field config
+			$newpost[$new]['image']    = (!$useimage    && !$is_importcsv) ? '' : flexicontent_html::dataFilter(@$v['image'], 200, 'STRING', 0);
+			$newpost[$new]['title']    = (!$usetitle    && !$is_importcsv) ? '' : flexicontent_html::dataFilter(@$v['title'], 4000, 'STRING', 0);
+			$newpost[$new]['linktext'] = (!$usetext     && !$is_importcsv) ? '' : flexicontent_html::dataFilter(@$v['linktext'], 4000, 'STRING', 0);
+			$newpost[$new]['addrtype'] = (!$useaddrtype && !$is_importcsv) ? '' : flexicontent_html::dataFilter(@$v['addrtype'], 4000, 'URL', 0);
+			$newpost[$new]['class']    = (!$useclass    && !$is_importcsv) ? '' : flexicontent_html::dataFilter(@$v['class'], 200, 'STRING', 0);
+			$newpost[$new]['id']       = (!$useid       && !$is_importcsv) ? '' : flexicontent_html::dataFilter(@$v['id'], 200, 'STRING', 0);
+			$newpost[$new]['target']   = (!$usetarget   && !$is_importcsv) ? '' : flexicontent_html::dataFilter(@$v['target'], 200, 'STRING', 0);
 
 			// Hits come only from DB and not via posted data
 			$newpost[$new]['hits']    = isset($db_values[$prefixed_link]) ? (int) @ $db_values[$prefixed_link]['hits'] : 0;

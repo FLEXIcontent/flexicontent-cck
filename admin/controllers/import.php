@@ -748,329 +748,342 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 
 		echo '<b>DEBUG loop:</b> task=' . $task . ' lineno=' . $lineno . ' linelim=' . $linelim . ' itemcount=' . $itemcount . ' items_per_call=' . $items_per_call . '<br/>';
 
+		// Try to prevent PHP timeouts, item saving can be slow when fields post-process media files
+		@set_time_limit(300);
+
 		for (; $lineno <= $linelim; $lineno++)
 		{
-			$_d = & $conf['contents_parsed'][$lineno];
-			$data = array();
-			$data['custom'] = array();
-			$data['attribs']  = array();
-			$data['metadata'] = array();
-
-			// Prepare request variable used by the item's Model
-			if ($task !== 'testcsv')
+			try
 			{
-				$q = $db->getQuery(true)
-					->select('fi.*')
-					->from('#__flexicontent_fields AS fi')
-					->join('INNER', '#__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id AND ftrel.type_id = ' . (int) $conf['type_id'])
-					;
-				$custom_fields = $db->setQuery($q)->loadObjectList('name');
+				$_d = & $conf['contents_parsed'][$lineno];
+				$data = array();
+				$data['custom'] = array();
+				$data['attribs']  = array();
+				$data['metadata'] = array();
 
-				$_item = (object) array('type_id' => $conf['type_id']);
-
-				foreach($custom_fields as $field)
+				// Prepare request variable used by the item's Model
+				if ($task !== 'testcsv')
 				{
-					FlexicontentFields::loadFieldConfig($field, $_item);
-				}
+					$q = $db->getQuery(true)
+						->select('fi.*')
+						->from('#__flexicontent_fields AS fi')
+						->join('INNER', '#__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id AND ftrel.type_id = ' . (int) $conf['type_id'])
+						;
+					$custom_fields = $db->setQuery($q)->loadObjectList('name');
 
+					$_item = (object) array('type_id' => $conf['type_id']);
 
-				/**
-				 * Assign field values to appropriates index of $data array
-				 * so that they are used for binding / and by custom field saving
-				 */
-				foreach ($_d as $fieldname => $field_values)
-				{
-					// Manipulate the imported field values according to fields configuration (Pro feature)
-					if (isset($custom_fields[$fieldname]))
+					foreach($custom_fields as $field)
 					{
-						$errors = null;
-						$field_values = $this->manipulateImportFieldValues($custom_fields[$fieldname], $field_values, $errors);
-
-						foreach ($errors as $err)
-						{
-							echo '<div>' . $err . '</div>';
-						}
+						FlexicontentFields::loadFieldConfig($field, $_item);
 					}
 
-					if ($fieldname === 'tags_names')
-					{
-						if ($conf['tags_col'] == 1)
-						{
-							// Get tag names from comma separated list, filtering out bad characters
-							$remove = array("\n", "\r\n", "\r");
-							$tns_list = str_replace($remove, ' ', $field_values);
-							$tns_list = strip_tags($tns_list);
-							$tns_list = preg_replace("/[\"\\\]/u", "", $tns_list);  //  "/[\"'\\\]/u"
-							$tns = array_unique(preg_split("/\s*,\s*/u", $tns_list));
-							$tns_quoted = array();
 
-							foreach ($tns as $tindex => $tname)
+					/**
+					 * Assign field values to appropriates index of $data array
+					 * so that they are used for binding / and by custom field saving
+					 */
+					foreach ($_d as $fieldname => $field_values)
+					{
+						// Manipulate the imported field values according to fields configuration (Pro feature)
+						if (isset($custom_fields[$fieldname]))
+						{
+							$errors = null;
+							$field_values = $this->manipulateImportFieldValues($custom_fields[$fieldname], $field_values, $errors);
+
+							foreach ($errors as $err)
 							{
-								if ($tname)
+								echo '<div>' . $err . '</div>';
+							}
+						}
+
+						if ($fieldname === 'tags_names')
+						{
+							if ($conf['tags_col'] == 1)
+							{
+								// Get tag names from comma separated list, filtering out bad characters
+								$remove = array("\n", "\r\n", "\r");
+								$tns_list = str_replace($remove, ' ', $field_values);
+								$tns_list = strip_tags($tns_list);
+								$tns_list = preg_replace("/[\"\\\]/u", "", $tns_list);  //  "/[\"'\\\]/u"
+								$tns = array_unique(preg_split("/\s*,\s*/u", $tns_list));
+								$tns_quoted = array();
+
+								foreach ($tns as $tindex => $tname)
 								{
-									$tns_quoted[] = $db->Quote($tname);
+									if ($tname)
+									{
+										$tns_quoted[] = $db->Quote($tname);
+									}
+								}
+
+								if (count($tns_quoted))
+								{
+									$tns_list_quoted = implode(",", $tns_quoted);
+									$q = "SELECT name FROM #__flexicontent_tags WHERE name IN (" . $tns_list_quoted . ")";
+									$db->setQuery($q);
+									$tns_e = $db->loadColumn();
+									$tns_m = array_diff($tns, $tns_e);
+
+									if (count($tns_m))
+									{
+										// Create a newline separated list of tag names and then import missing tags,
+										// thus making sure they are inserted into the tags DB table if not already present
+										$tns_list_m = implode("\n", $tns_m);
+										$tags_model->importList($tns_list_m);
+									}
+
+									// Get tag ids
+									$q = "SELECT id FROM #__flexicontent_tags WHERE name IN (" . $tns_list_quoted . ")";
+									$db->setQuery($q);
+									$data['tag'] = $db->loadColumn();
 								}
 							}
+						}
 
-							if (count($tns_quoted))
+						elseif ($fieldname === 'tags_raw')
+						{
+							if ($conf['tags_col'] == 2)
 							{
-								$tns_list_quoted = implode(",", $tns_quoted);
-								$q = "SELECT name FROM #__flexicontent_tags WHERE name IN (" . $tns_list_quoted . ")";
-								$db->setQuery($q);
-								$tns_e = $db->loadColumn();
-								$tns_m = array_diff($tns, $tns_e);
+								// Get tag ids from comma separated list, filtering out bad characters
+								$_tis_list = preg_replace("/[\"'\\\]/u", "", $field_values);
+								$_tis = array_unique(array_map('intval', explode(',', $_tis_list)));
+								$_tis = array_flip($_tis);
 
-								if (count($tns_m))
-								{
-									// Create a newline separated list of tag names and then import missing tags,
-									// thus making sure they are inserted into the tags DB table if not already present
-									$tns_list_m = implode("\n", $tns_m);
-									$tags_model->importList($tns_list_m);
-								}
-
-								// Get tag ids
-								$q = "SELECT id FROM #__flexicontent_tags WHERE name IN (" . $tns_list_quoted . ")";
+								// Check to use only existing tag ids
+								$_tis_list = implode(",", array_keys($_tis));
+								$q = "SELECT id FROM #__flexicontent_tags WHERE id IN (" . $_tis_list . ")";
 								$db->setQuery($q);
 								$data['tag'] = $db->loadColumn();
 							}
 						}
-					}
 
-					elseif ($fieldname === 'tags_raw')
-					{
-						if ($conf['tags_col'] == 2)
+						elseif (isset($conf['core_props'][$fieldname]))
 						{
-							// Get tag ids from comma separated list, filtering out bad characters
-							$_tis_list = preg_replace("/[\"'\\\]/u", "", $field_values);
-							$_tis = array_unique(array_map('intval', explode(',', $_tis_list)));
-							$_tis = array_flip($_tis);
+							$data[$fieldname] = $field_values;
+						}
 
-							// Check to use only existing tag ids
-							$_tis_list = implode(",", array_keys($_tis));
-							$q = "SELECT id FROM #__flexicontent_tags WHERE id IN (" . $_tis_list . ")";
-							$db->setQuery($q);
-							$data['tag'] = $db->loadColumn();
+						elseif ($fieldname === 'attribs')
+						{
+							$data['attribs'] = $field_values;
+						}
+
+						elseif ($fieldname === 'metadata')
+						{
+							$data['metadata'] = $field_values;
+						}
+
+						else
+						{
+							$data['custom'][$fieldname] = $field_values;
+						}
+					}
+				}
+
+				// Before setting any new values try to load item if item ID was given
+				$c_item_id = $conf['id_col'] && !empty($data['id'])
+					? $data['id']
+					: 0;
+
+				// ***
+				// *** CREATE CASE with / without ID column --OR-- item ID not given --OR-- item ID does not exist
+				// *** NOTE: we already check above,
+				// ***  that for create-only, none of the given item ID exists in the DB
+				// ***  that for update-only, all given item IDs exist in the DB
+				// ***
+
+				if ($conf['id_col'] <= 1 || empty($c_item_id) || !isset($conf['existing_ids'][$c_item_id]))
+				{
+					$data['id'] = 0;
+				}
+
+				$data['vstate']  = 2;
+
+				if (!$data['id'])
+				{
+					$data['type_id'] = isset($data['type_id'])  ? $data['type_id']  : $conf['type_id'];
+					$data['language']= isset($data['language']) ? $data['language'] : $conf['language'];
+					$data['state']   = isset($data['state'])    ? $data['state']    : $conf['state'];
+					$data['access']  = isset($data['access'])   ? $data['access']   : $conf['access'];
+
+					$data['catid']   = isset($data['catid'])    ? $data['catid']    : $conf['maincat'];
+					$data['cid']     = isset($data['cid'])      ? $data['cid']      : $conf['seccats'];
+				}
+
+				// ***
+				// *** CREATE / UPDATE --OR-- UPDATE-only CASEs with item ID given
+				// ***
+
+				if ($data['id'] && $c_item_id)
+				{
+					// Try to Load existing item into the ITEM model
+					$item = $itemmodel->getItem($c_item_id, $check_view_access = false, $no_cache = true, $force_version = 0);
+
+					if ($item)
+					{
+						// Maintain content type for existing items
+						$data['type_id'] = $item->type_id;
+
+						// IMPORTANT: Get existing field values for the item
+						$items = array($item);
+						$items_custom_values = FlexicontentFields::getCustomFieldValues($items, 'item');
+						$data_custom = $data['custom'];  // Backup field values from file
+						$data['custom'] = reset($items_custom_values); // Get data of first item
+
+						// Override existing item field values with those from file
+						foreach ($data_custom as $i => $v)
+						{
+							$data['custom'][$i] = $v;
+						}
+
+						// Backup attribs from file
+						$data_attribs = $data['attribs'];
+
+						if (!is_array($item->attribs) && !is_object($item->attribs))
+						{
+							$item->attribs = new \Joomla\Registry\Registry($item->attribs);
+						}
+
+						$data['attribs'] = is_object($item->attribs) ? $item->attribs->toArray() : $item->attribs;
+
+						// Override existing item attribs with those from file
+						foreach ($data_attribs as $i => $v)
+						{
+							$data['attribs'][$i] = $v;
+						}
+
+						$data_metadata = $data['metadata'];  // Backup metadata from file
+
+						if (!is_array($item->metadata) && !is_object($item->metadata))
+						{
+							$item->metadata = new \Joomla\Registry\Registry($item->metadata);
+						}
+
+						$data['metadata'] = is_object($item->metadata) ? $item->metadata->toArray() : $item->metadata;
+
+						// Override existing item metadata with those from file
+						foreach ($data_metadata as $i => $v)
+						{
+							$data['metadata'][$i] = $v;
 						}
 					}
 
-					elseif (isset($conf['core_props'][$fieldname]))
-					{
-						$data[$fieldname] = $field_values;
-					}
-
-					elseif ($fieldname === 'attribs')
-					{
-						$data['attribs'] = $field_values;
-					}
-
-					elseif ($fieldname === 'metadata')
-					{
-						$data['metadata'] = $field_values;
-					}
-
+					// INTERNAL ERROR, item could not be loaded, but we have checked above that it does exist, so this indicates a bug in our code
 					else
 					{
-						$data['custom'][$fieldname] = $field_values;
+						$data['id'] = -1;
 					}
 				}
-			}
+				//echo '<pre>'; print_r($data); echo '</pre>'; exit;
 
-			// Before setting any new values try to load item if item ID was given
-			$c_item_id = $conf['id_col'] && !empty($data['id'])
-				? $data['id']
-				: 0;
+				$isNew = $data['id'] == 0;
 
-			// ***
-			// *** CREATE CASE with / without ID column --OR-- item ID not given --OR-- item ID does not exist
-			// *** NOTE: we already check above,
-			// ***  that for create-only, none of the given item ID exists in the DB
-			// ***  that for update-only, all given item IDs exist in the DB
-			// ***
+				$session->set('csvimport_lineno', $lineno, 'flexicontent');
 
-			if ($conf['id_col'] <= 1 || empty($c_item_id) || !isset($conf['existing_ids'][$c_item_id]))
-			{
-				$data['id'] = 0;
-			}
-
-			$data['vstate']  = 2;
-
-			if (!$data['id'])
-			{
-				$data['type_id'] = isset($data['type_id'])  ? $data['type_id']  : $conf['type_id'];
-				$data['language']= isset($data['language']) ? $data['language'] : $conf['language'];
-				$data['state']   = isset($data['state'])    ? $data['state']    : $conf['state'];
-				$data['access']  = isset($data['access'])   ? $data['access']   : $conf['access'];
-
-				$data['catid']   = isset($data['catid'])    ? $data['catid']    : $conf['maincat'];
-				$data['cid']     = isset($data['cid'])      ? $data['cid']      : $conf['seccats'];
-			}
-
-			// ***
-			// *** CREATE / UPDATE --OR-- UPDATE-only CASEs with item ID given
-			// ***
-
-			if ($data['id'] && $c_item_id)
-			{
-				// Try to Load existing item into the ITEM model
-				$item = $itemmodel->getItem($c_item_id, $check_view_access = false, $no_cache = true, $force_version = 0);
-
-				if ($item)
+				// If testing format then output some information
+				if ($task === 'testcsv')
 				{
-					// Maintain content type for existing items
-					$data['type_id'] = $item->type_id;
-
-					// IMPORTANT: Get existing field values for the item
-					$items = array($item);
-					$items_custom_values = FlexicontentFields::getCustomFieldValues($items, 'item');
-					$data_custom = $data['custom'];  // Backup field values from file
-					$data['custom'] = reset($items_custom_values); // Get data of first item
-
-					// Override existing item field values with those from file
-					foreach ($data_custom as $i => $v)
+					if ($lineno == 1)
 					{
-						$data['custom'][$i] = $v;
+						$parse_log .= '
+							<span class="fc-mssg fc-info">
+							Testing file format <br/>
+							COLUMNS: ' . implode(', ', $conf['columns']) . '<br/>
+							</span><hr/>
+						';
 					}
 
-					// Backup attribs from file
-					$data_attribs = $data['attribs'];
-
-					if (!is_array($item->attribs) && !is_object($item->attribs))
+					foreach ($_d as $i => $flddata)
 					{
-						$item->attribs = new \Joomla\Registry\Registry($item->attribs);
-					}
-
-					$data['attribs'] = is_object($item->attribs) ? $item->attribs->toArray() : $item->attribs;
-
-					// Override existing item attribs with those from file
-					foreach ($data_attribs as $i => $v)
-					{
-						$data['attribs'][$i] = $v;
-					}
-
-					$data_metadata = $data['metadata'];  // Backup metadata from file
-
-					if (!is_array($item->metadata) && !is_object($item->metadata))
-					{
-						$item->metadata = new \Joomla\Registry\Registry($item->metadata);
-					}
-
-					$data['metadata'] = is_object($item->metadata) ? $item->metadata->toArray() : $item->metadata;
-
-					// Override existing item metadata with those from file
-					foreach ($data_metadata as $i => $v)
-					{
-						$data['metadata'][$i] = $v;
-					}
-				}
-
-				// INTERNAL ERROR, item could not be loaded, but we have checked above that it does exist, so this indicates a bug in our code
-				else
-				{
-					$data['id'] = -1;
-				}
-			}
-			//echo '<pre>'; print_r($data); echo '</pre>'; exit;
-
-			$isNew = $data['id'] == 0;
-
-			$session->set('csvimport_lineno', $lineno, 'flexicontent');
-
-			// If testing format then output some information
-			if ($task === 'testcsv')
-			{
-				if ($lineno == 1)
-				{
-					$parse_log .= '
-						<span class="fc-mssg fc-info">
-						Testing file format <br/>
-						COLUMNS: ' . implode(', ', $conf['columns']) . '<br/>
-						</span><hr/>
-					';
-				}
-
-				foreach ($_d as $i => $flddata)
-				{
-					if (is_string($_d[$i]))
-					{
-						if (StringHelper::strlen($_d[$i]) > 80)
+						if (is_string($_d[$i]))
 						{
-							$_d[$i] = StringHelper::substr(strip_tags($_d[$i]), 0, 80) . ' ... ';
+							if (StringHelper::strlen($_d[$i]) > 80)
+							{
+								$_d[$i] = StringHelper::substr(strip_tags($_d[$i]), 0, 80) . ' ... ';
+							}
 						}
 					}
+
+					if ($lineno <= $conf['debug_records'])
+					{
+						$parse_log .= "<pre><b>Item no $lineno:</b>\n" . print_r($_d, true) . "</pre><hr/>";
+					}
+					else
+					{
+						$parse_log .= "<b>Item no $lineno:</b> <br/>" .
+						"<u>TITLE</u>: " . $_d['title'] . "<br/>" .
+						"<u>TEXT</u>: " . $_d['text'] . "<hr/>";
+					}
 				}
 
-				if ($lineno <= $conf['debug_records'])
+				// Internal error, this should not happen anyway, but continue with other items
+				elseif ($data['id'] == -1)
 				{
-					$parse_log .= "<pre><b>Item no $lineno:</b>\n" . print_r($_d, true) . "</pre><hr/>";
+					$msg = 'Internal Error item with ID: "' . $c_item_id . " could not be loaded in order to be updated";
+					\Joomla\CMS\Log\Log::add($msg, \Joomla\CMS\Log\Log::WARNING, 'com_flexicontent.importcsv');
+					echo $msg . "<br/>";
 				}
+
+				// Otherwise (if not testing) try to create / update the item by using Item Model's store() method
+				elseif (!$itemmodel->store($data))
+				{
+					$conf['failure_count']++;
+					$msg = 'Failed item no: ' . $lineno . ". titled as: '" . $data['title'] . "' : " . $itemmodel->getError();
+					\Joomla\CMS\Log\Log::add($msg, \Joomla\CMS\Log\Log::WARNING, 'com_flexicontent.importcsv');
+					echo $msg . "<br/>";
+				}
+
+				// Item record successfully stored
 				else
 				{
-					$parse_log .= "<b>Item no $lineno:</b> <br/>" .
-					"<u>TITLE</u>: " . $_d['title'] . "<br/>" .
-					"<u>TEXT</u>: " . $_d['text'] . "<hr/>";
+					$conf['success_count']++;
+					$msg = 'Imported item no: ' . $lineno . ". titled as: '" . $data['title'] . "'";
+					\Joomla\CMS\Log\Log::add($msg, \Joomla\CMS\Log\Log::INFO, 'com_flexicontent.importcsv');
+					echo $msg . "<br/>";
+
+					// Remap 'ID' of item (when 'id' column is being used)
+					if (in_array($conf['id_col'], array(1, 2)) && $c_item_id && $isNew)
+					{
+						$item_id = $itemmodel->getId();
+
+						$q = "UPDATE #__content SET id='" . (int) $c_item_id . "' WHERE id='" . (int) $item_id . "'";
+						$db->setQuery($q)->execute();
+
+						$q = "UPDATE #__flexicontent_items_ext SET item_id='" . (int) $c_item_id . "' WHERE item_id='" . (int) $item_id . "'";
+						$db->setQuery($q)->execute();
+
+						$q = "UPDATE #__flexicontent_items_tmp SET id='" . (int) $c_item_id . "' WHERE id='" . (int) $item_id . "'";
+						$db->setQuery($q)->execute();
+
+						$q = "UPDATE #__flexicontent_tags_item_relations SET itemid='" . (int) $c_item_id . "' WHERE itemid='" . (int) $item_id . "'";
+						$db->setQuery($q)->execute();
+
+						$q = "UPDATE #__flexicontent_cats_item_relations SET itemid='" . (int) $c_item_id . "' WHERE itemid='" . (int) $item_id . "'";
+						$db->setQuery($q)->execute();
+
+						$q = "UPDATE #__flexicontent_fields_item_relations SET item_id='" . (int) $c_item_id . "' WHERE item_id='" . (int) $item_id . "'";
+						$db->setQuery($q)->execute();
+
+						$q = "UPDATE #__flexicontent_items_versions SET item_id='" . (int) $c_item_id . "' WHERE item_id='" . (int) $item_id . "'";
+						$db->setQuery($q)->execute();
+
+						$q = "UPDATE #__flexicontent_versions SET item_id='" . (int) $c_item_id . "' WHERE item_id='" . (int) $item_id . "'";
+						$db->setQuery($q)->execute();
+
+						$q = "UPDATE #__flexicontent_favourites SET itemid='" . (int) $c_item_id . "' WHERE itemid='" . (int) $item_id . "'";
+						$db->setQuery($q)->execute();
+
+						$q = "UPDATE #__assets SET id='" . (int) $c_item_id . "' WHERE id='" . (int) $item_id . "'";
+						$db->setQuery($q)->execute();
+					}
 				}
 			}
-
-			// Internal error, this should not happen anyway, but continue with other items
-			elseif ($data['id'] == -1)
-			{
-				$msg = 'Internal Error item with ID: "' . $c_item_id . " could not be loaded in order to be updated";
-				\Joomla\CMS\Log\Log::add($msg, \Joomla\CMS\Log\Log::WARNING, 'com_flexicontent.importcsv');
-				echo $msg . "<br/>";
-			}
-
-			// Otherwise (if not testing) try to create / update the item by using Item Model's store() method
-			elseif (!$itemmodel->store($data))
+			catch (\Throwable $e)
 			{
 				$conf['failure_count']++;
-				$msg = 'Failed item no: ' . $lineno . ". titled as: '" . $data['title'] . "' : " . $itemmodel->getError();
+				$msg = 'Failed item no: ' . $lineno . ' : UNCAUGHT ERROR: ' . $e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine();
 				\Joomla\CMS\Log\Log::add($msg, \Joomla\CMS\Log\Log::WARNING, 'com_flexicontent.importcsv');
 				echo $msg . "<br/>";
-			}
-
-			// Item record successfully stored
-			else
-			{
-				$conf['success_count']++;
-				$msg = 'Imported item no: ' . $lineno . ". titled as: '" . $data['title'] . "'";
-				\Joomla\CMS\Log\Log::add($msg, \Joomla\CMS\Log\Log::INFO, 'com_flexicontent.importcsv');
-				echo $msg . "<br/>";
-
-				// Remap 'ID' of item (when 'id' column is being used)
-				if (in_array($conf['id_col'], array(1, 2)) && $c_item_id && $isNew)
-				{
-					$item_id = $itemmodel->getId();
-
-					$q = "UPDATE #__content SET id='" . (int) $c_item_id . "' WHERE id='" . (int) $item_id . "'";
-					$db->setQuery($q)->execute();
-
-					$q = "UPDATE #__flexicontent_items_ext SET item_id='" . (int) $c_item_id . "' WHERE item_id='" . (int) $item_id . "'";
-					$db->setQuery($q)->execute();
-
-					$q = "UPDATE #__flexicontent_items_tmp SET id='" . (int) $c_item_id . "' WHERE id='" . (int) $item_id . "'";
-					$db->setQuery($q)->execute();
-
-					$q = "UPDATE #__flexicontent_tags_item_relations SET itemid='" . (int) $c_item_id . "' WHERE itemid='" . (int) $item_id . "'";
-					$db->setQuery($q)->execute();
-
-					$q = "UPDATE #__flexicontent_cats_item_relations SET itemid='" . (int) $c_item_id . "' WHERE itemid='" . (int) $item_id . "'";
-					$db->setQuery($q)->execute();
-
-					$q = "UPDATE #__flexicontent_fields_item_relations SET item_id='" . (int) $c_item_id . "' WHERE item_id='" . (int) $item_id . "'";
-					$db->setQuery($q)->execute();
-
-					$q = "UPDATE #__flexicontent_items_versions SET item_id='" . (int) $c_item_id . "' WHERE item_id='" . (int) $item_id . "'";
-					$db->setQuery($q)->execute();
-
-					$q = "UPDATE #__flexicontent_versions SET item_id='" . (int) $c_item_id . "' WHERE item_id='" . (int) $item_id . "'";
-					$db->setQuery($q)->execute();
-
-					$q = "UPDATE #__flexicontent_favourites SET itemid='" . (int) $c_item_id . "' WHERE itemid='" . (int) $item_id . "'";
-					$db->setQuery($q)->execute();
-
-					$q = "UPDATE #__assets SET id='" . (int) $c_item_id . "' WHERE id='" . (int) $item_id . "'";
-					$db->setQuery($q)->execute();
-				}
 			}
 		}
 
@@ -1230,9 +1243,19 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 
 							if ($_filename)
 							{
-								$col_no = array_search($fld_name, $ff_fields);
-								$conf['contents'][$lineno][$col_no] = $_filename;
-								//print_r($conf['contents'][$lineno][$col_no]); echo '<br>';
+								// Update value in-place within the multi-value array instead of overwriting the entire cell
+								if (!isset($prop_arr))
+								{
+									$vals[$i] = $_filename;
+								}
+								else
+								{
+									$vals[$i] = str_replace(
+										'[-' . $prop_name . '-]=' . $filename,
+										'[-' . $prop_name . '-]=' . $_filename,
+										$val
+									);
+								}
 							}
 
 							if (!$_filename)
@@ -1240,6 +1263,10 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 								$filenames_missing[$fld_name][$filename][] = $lineno;
 							}
 						}
+
+						// Reconstruct the full cell value with all corrected filenames
+						$col_no = array_search($fld_name, $ff_fields);
+						$conf['contents'][$lineno][$col_no] = implode($conf['mval_separator'], $vals);
 					}
 				}
 			}
