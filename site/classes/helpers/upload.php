@@ -6,7 +6,7 @@ class flexicontent_upload
 {
 	static function makeSafe($file, $language = null)
 	{
-		// Replace [] with () and multiple space with a single hyphen '-', but firest remove any leading / trailing spaces
+		// Replace [] with () and multiple spaces with a single hyphen.
 		$file = trim($file);
 		$file = str_replace('[', '(', $file);
 		$file = str_replace(']', ')', $file);
@@ -18,7 +18,7 @@ class flexicontent_upload
 		// Remove any trailing dots, as those aren't ever valid file names
 		$file = rtrim($file, '.');
 
-		// Regex for replacing non safe characters
+		// Regex for removing non-safe characters after transliteration.
 		$regex = array('#(\.){2,}#', '#[^A-Za-z0-9\(\)\.\_\-]#', '#^\.#');
 
 		// Language transliteration should include given language, and also site + admin defaults (most useful is site default)
@@ -39,6 +39,7 @@ class flexicontent_upload
 			if ($do)
 			{
 				$transformed = \Joomla\CMS\Factory::getContainer()->get(LanguageFactoryInterface::class)->createLanguage($language, false)->transliterate($file);
+				$transformed = $transformed ? preg_replace('![\s]+!', '-', trim($transformed)) : '';
 				$file_safe = $transformed ? preg_replace($regex, '', $transformed) : false;
 
 				// Stop trying transliterations if a complete job was done
@@ -62,9 +63,12 @@ class flexicontent_upload
 			}
 			else
 			{
-				$file_safe = $transformed;
+				$file_safe = preg_replace($regex, '', preg_replace('![\s]+!', '-', trim($transformed)));
 			}
 		}
+
+		$file_safe = preg_replace('/-+/', '-', $file_safe);
+		$file_safe = trim($file_safe, '-');
 
 		// Return filename that is filesystem safe
 		return $file_safe;
@@ -302,9 +306,10 @@ class flexicontent_upload
 		// Check for any trailing dots and remove them (trailing shouldn't be possible cause of the getExt check)
 		$filename = rtrim($filename, '.');
 
-		// Replace invalid characters with dash, if makeSafe has been called then this has already been done
-		$regex = array('#(\.){2,}#', '#[^A-Za-z0-9\.\_\- ]#', '#^\.#');
-		$filename = trim(preg_replace($regex, '-', $filename));
+		// Replace whitespace and invalid characters with a single dash.
+		$regex = array('#(\.){2,}#', '#[\s]+#', '#[^A-Za-z0-9\.\_\-]#', '#^\.#');
+		$filename = trim(preg_replace($regex, '-', $filename), '-');
+		$filename = preg_replace('/-+/', '-', $filename);
 
 		// Get name part and extension part from the file name
 		$lastdotpos = strrpos( $filename, '.' );
