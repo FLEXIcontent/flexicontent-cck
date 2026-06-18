@@ -2097,6 +2097,84 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 		 * Various tables. Update usage of Files in download links created via the XTD-editor file button
 		 */
 		$this->_updateFileUsage_FcFileBtn_DownloadLinks($context, $table, $isNew, $table);
+
+		/**
+		 * Switcher du canal de mise à jour (stable / beta)
+		 * Déclenché quand la configuration de com_flexicontent est sauvegardée
+		 */
+		if (
+			$context === 'com_config.component'
+			&& isset($table->type) && $table->type === 'component'
+			&& isset($table->element) && $table->element === 'com_flexicontent'
+		) {
+			$this->_switchUpdateChannel($table);
+		}
+	}
+
+
+	/**
+	 * Met à jour l'URL de l'update server Joomla selon le canal choisi (stable/beta)
+	 * et purge le cache des updates pour forcer un rechargement immédiat.
+	 *
+	 * @param   Table  $table  Table instance de l'extension sauvegardée
+	 * @return  void
+	 */
+	private function _switchUpdateChannel($table)
+	{
+		try {
+			$params = $table->params instanceof \Joomla\Registry\Registry
+				? $table->params
+				: new \Joomla\Registry\Registry($table->params);
+
+			$channel = $params->get('update_channel', 'stable');
+
+			$urls = [
+				'stable' => 'https://flexicontent.org/updates/update.php?channel=stable',
+				'beta'   => 'https://flexicontent.org/updates/update.php?channel=beta',
+			];
+			$newUrl = $urls[$channel] ?? $urls['stable'];
+
+			$db = Factory::getDbo();
+
+			// Mettre à jour l'URL dans #__update_sites
+			$db->setQuery(
+				$db->getQuery(true)
+					->update($db->qn('#__update_sites'))
+					->set($db->qn('location') . ' = ' . $db->q($newUrl))
+					->where($db->qn('name') . ' = ' . $db->q('FLEXIcontent CCK update'))
+			)->execute();
+
+			// Forcer last_check_timestamp à 0 pour déclencher un nouveau check immédiat
+			$db->setQuery(
+				$db->getQuery(true)
+					->update($db->qn('#__update_sites'))
+					->set($db->qn('last_check_timestamp') . ' = 0')
+					->where($db->qn('name') . ' = ' . $db->q('FLEXIcontent CCK update'))
+			)->execute();
+
+			// Purger les updates en cache pour com_flexicontent
+			$db->setQuery(
+				$db->getQuery(true)
+					->delete($db->qn('#__updates'))
+					->where($db->qn('element') . ' = ' . $db->q('com_flexicontent'))
+			)->execute();
+
+			// Message de confirmation en debug
+			if (JDEBUG) {
+				Factory::getApplication()->enqueueMessage(
+					'FLEXIcontent update channel switched to: <strong>' . $channel . '</strong> → ' . $newUrl,
+					'message'
+				);
+			}
+
+		} catch (\Exception $e) {
+			// Ne pas planter le backend pour une erreur de switcher
+			if (JDEBUG) {
+				Factory::getApplication()->enqueueMessage(
+					'FLEXIcontent _switchUpdateChannel error: ' . $e->getMessage(), 'error'
+				);
+			}
+		}
 	}
 
 
