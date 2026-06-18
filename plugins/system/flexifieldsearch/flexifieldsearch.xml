@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="plugin" group="system" method="upgrade">
+
+    <name>flexifieldsearch</name>
+    <author>Yannick Berges</author>
+    <creationDate>2026-06-01</creationDate>
+    <copyright>Copyright (C) 2026. Tous droits réservés.</copyright>
+    <license>GNU General Public License version 2 or later</license>
+    <version>1.0.0</version>
+    <description>PLG_SYSTEM_FLEXICONTENT_FIELDSEARCH_DESC</description>
+
+    <files>
+        <filename plugin="flexifieldsearch">flexifieldsearch.php</filename>
+    </files>
+
+    <languages>
+        <language tag="en-GB">language/en-GB/flexifieldsearch.ini</language>
+    </languages>
+
+    <config>
+        <fields name="params">
+            <fieldset name="basic">
+
+                <field
+                    name="highlight_color"
+                    type="color"
+                    label="PLG_SYSTEM_FLEXICONTENT_FIELDSEARCH_HIGHLIGHT_COLOR_LABEL"
+                    description="PLG_SYSTEM_FLEXICONTENT_FIELDSEARCH_HIGHLIGHT_COLOR_DESC"
+                    default="#fff176"
+                />
+
+                <field
+                    name="search_placeholder"
+                    type="text"
+                    label="PLG_SYSTEM_FLEXICONTENT_FIELDSEARCH_PLACEHOLDER_LABEL"
+                    description="PLG_SYSTEM_FLEXICONTENT_FIELDSEARCH_PLACEHOLDER_DESC"
+                    default="Chercher dans les options (label, description)..."
+                    size="60"
+                />
+
+            </fieldset>
+        </fields>
+    </config>
+
+</extension>

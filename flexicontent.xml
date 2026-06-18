@@ -227,6 +227,7 @@
 		<!-- Plugins: system -->
 		<plugin name="flexisystem"        folder="plugins/system/flexisystem"       instfolder="system">System - Flexisystem, core tasks</plugin>
 		<plugin name="flexiadvroute"      folder="plugins/system/flexiadvroute"     instfolder="system">System - Flexiadvroute, routing tasks</plugin>
+		<plugin name="flexifieldsearch"      folder="plugins/system/flexifieldsearch"     instfolder="system">System - Flexifieldsearch, field value search helper</plugin>
 
 		<!-- Plugins: osmap -->
 		<plugin name="com_flexicontent"   folder="plugins/osmap/com_flexicontent"   instfolder="osmap">OSMap - FLEXIcontent Plugin</plugin>
