@@ -46,7 +46,7 @@ if ($installedDate)
 }
 ?>
 
-<table class="fc-table-list fc-tbl-short" style="margin: 4px 16px 13px 4px;">
+<table class="table" >
 	<thead>
 		<tr>
 			<th colspan="2" style="height:0px; padding:0px; border:0px;"></th>
@@ -65,7 +65,7 @@ if ($installedDate)
 		<!-- Version installée -->
 		<tr>
 			<td>
-				<span class="label"><?php echo \Joomla\CMS\Language\Text::_('FLEXI_INSTALLED_VERSION'); ?></span>
+				<span><?php echo \Joomla\CMS\Language\Text::_('FLEXI_INSTALLED_VERSION'); ?></span>
 			</td>
 			<td>
 				<span class="badge <?php echo $hasUpdate ? 'bg-warning badge-warning' : 'bg-success badge-success'; ?>">
@@ -83,7 +83,7 @@ if ($installedDate)
 		<!-- Canal configuré -->
 		<tr>
 			<td>
-				<span class="label"><?php echo \Joomla\CMS\Language\Text::_('FLEXI_UPDATE_CHANNEL_CURRENT'); ?></span>
+				<span><?php echo \Joomla\CMS\Language\Text::_('FLEXI_UPDATE_CHANNEL_CURRENT'); ?></span>
 			</td>
 			<td>
 				<span class="badge <?php echo $isBeta ? 'bg-warning text-dark' : 'bg-success'; ?>">
@@ -112,7 +112,7 @@ if ($installedDate)
 		<?php if ($connected && $remoteVersion) : ?>
 		<tr>
 			<td>
-				<span class="label">
+				<span>
 					<?php echo $isBeta
 						? \Joomla\CMS\Language\Text::_('FLEXI_LATEST_BETA_VERSION')
 						: \Joomla\CMS\Language\Text::_('FLEXI_LATEST_VERSION'); ?>
