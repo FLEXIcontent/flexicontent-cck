@@ -814,7 +814,7 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 		<?php	$rowcount = 0; ?>
 
 		<div id="mod_fc_carousel_mask_<?php echo $uniq_ord_id; ?>_loading" class="mod_fc_carousel_mask_loading">
-			... <?php echo  \Joomla\CMS\Language\Text::_('FLEXI_MOD_CAROUSEL_LOADING_IMAGES'); ?> <img alt="" src="<?php echo \Joomla\CMS\Uri\Uri::root(true); ?>/components/com_flexicontent/assets/images/ajax-loader.gif"/>
+			... <?php echo  \Joomla\CMS\Language\Text::_('FLEXI_MOD_CAROUSEL_LOADING_IMAGES'); ?> <img src="<?php echo \Joomla\CMS\Uri\Uri::root(true); ?>/components/com_flexicontent/assets/images/ajax-loader.gif"/>
 		</div>
 
 
