@@ -1139,7 +1139,7 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 		$dfolder  = \Joomla\Filesystem\Path::clean(JPATH_SITE . DS . $conf['docs_folder'] . DS);
 
 		$ff_types_to_props = array('image' => 'originalname', 'file' => '_value_', 'mediafile' => '_value_');
-		$ff_types_to_paths = array('image' => $mfolder, 'file' => $dfolder, 'mediafile' => $mfolder);
+		$ff_types_to_paths = array('image' => $mfolder, 'file' => $dfolder, 'mediafile' => $dfolder);
 		$ff_names_to_types = array();
 
 		foreach ($conf['custom_fields'] as $_fld)

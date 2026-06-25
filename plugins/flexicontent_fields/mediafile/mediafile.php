@@ -1439,6 +1439,15 @@ class plgFlexicontent_fieldsMediafile extends FCField
 					$upload_errs = null;
 					$file_ids = $fman->addlocal($Fobj, $upload_errs);
 
+					if (empty($file_ids))
+					{
+						\Joomla\CMS\Log\Log::add(
+							'mediafile import: file "' . $filename . '" not found in folder "' . $import_docs_folder . $sub_folder . '"',
+							\Joomla\CMS\Log\Log::WARNING,
+							'com_flexicontent.importcsv'
+						);
+					}
+
 					// Get fist element
 					$v = !empty($file_ids) ? reset($file_ids) : ($use_ingroup ? null : false);
 					$v = $v ?: ($use_ingroup ? null : false);
