@@ -46,24 +46,29 @@ $mod_do_hlight .= $hl_items_onnav == 2 || $hl_items_onnav == 3 ? ' mod_hl_hover'
 $inner_inline_css_feat = (int)$params->get($layout.'_inner_inline_css_feat', 0);
 $padding_top_bottom_feat = $params->get($layout.'_padding_top_bottom_feat', '0');
 $padding_left_right_feat = $params->get($layout.'_padding_left_right_feat', '0');
-$margin_top_bottom_feat = $params->get($layout.'_margin_left_right_feat', '2rem');
+$margin_top_bottom_feat = $params->get($layout.'_margin_top_bottom_feat', '2rem');
 $margin_left_right_feat = $params->get($layout.'_margin_left_right_feat', '2rem');
-$border_width_feat = $params->get($layout.'_border_width_feat', 1);
-$item_column_mode_feat = (int)$params->get($layout.'_column_mode_feat', 1);// 0 column mode old, 1 grid minmax size
+$border_width_feat = $params->get($layout.'_border_width_feat', '1px');
+$border_style_feat = $params->get($layout.'_border_style_feat', 'solid');
+$border_color_feat = $params->get($layout.'_border_color_feat', '#cccccc');
+$border_radius_feat = $params->get($layout.'_border_radius_feat', '0');
+$item_column_mode_feat = (int)$params->get($layout.'_column_mode_feat', 0);// 0 column mode old, 1 grid minmax size
 $item_width_feat = $params->get($layout.'_item_width_feat', '200px');
 $item_fit_feat = $params->get($layout.'_content_width_fit_feat', 'auto-fill');
 $item_height_feat = $params->get($layout.'_content_height_fit_feat', 1); //0 Content height, 1 Force same height
 
 // Item Dimensions standard
+// NOTE: standard items are positioned by the carousel JS (fcxSlide), not via CSS Grid,
+// so there is no column-mode/grid-width equivalent for them (no matching XML fields either).
 $inner_inline_css_std = (int)$params->get($layout.'_inner_inline_css', 0);
-$padding_top_bottom_std = $params->get($layout.'_padding_top_bottom', 8);
-$padding_left_right_std = $params->get($layout.'_padding_left_right', 12);
-$margin_top_bottom_std = $params->get($layout.'_margin_left_right', 4);
-$margin_left_right_std = $params->get($layout.'_margin_left_right', 4);
-$border_width_std = $params->get($layout.'_border_width', 1);
-$item_column_mode_std = $params->get($layout.'_column_mode_feat', 1);// 0 column mode old, 1 grid minmax size
-$item_width_std = $params->get($layout.'_item_width_feat', '200px');
-$item_fit_std = $params->get($layout.'_content_width_fit_feat', 'auto-fill');
+$padding_top_bottom_std = $params->get($layout.'_padding_top_bottom', '8px');
+$padding_left_right_std = $params->get($layout.'_padding_left_right', '12px');
+$margin_top_bottom_std = $params->get($layout.'_margin_top_bottom', '0');
+$margin_left_right_std = $params->get($layout.'_margin_left_right', '0');
+$border_width_std = $params->get($layout.'_border_width', '0');
+$border_style_std = $params->get($layout.'_border_style', 'solid');
+$border_color_std = $params->get($layout.'_border_color', '#cccccc');
+$border_radius_std = $params->get($layout.'_border_radius', '0');
 $item_height_std = $params->get($layout.'_content_height_fit_std', 1); //0 Content height, 1 Force same height
 
 
@@ -237,8 +242,14 @@ if ($transition=='fold')
 $_fcx_fxOptions    = '{ '.$_fcx_fxOptions.' }';
 
 $_fcx_responsive   = $responsive;  // 0: px, 1: percentage
-$_fcx_item_size    = $item_size_px;  // item width (horizontal) OR height (vertical) in case of fixed item size
-$_fcx_items_per_page = $items_per_page;  // ZERO for horizontal, this value will be overwritten by auto-calulation, after page load ends
+// Parse margin_left_right_std as integer px (strip unit suffix if any).
+// $_fcx_item_size must be the TOTAL space per item (visual width + margin-right),
+// because the JS uses it for both item width AND scroll step.
+// We pass item_size_px as the visual width, and add the margin for the scroll step.
+// The JS sets width = item_size on each item, so we override it via CSS to item_size_px.
+$_fcx_margin_std     = (int) $margin_left_right_std;  // strips unit suffix e.g. "10px" → 10
+$_fcx_item_size      = $item_size_px + $_fcx_margin_std;  // total space = visual width + right margin
+$_fcx_items_per_page = $items_per_page;
 
 if ($interval < $duration)
 {
@@ -265,17 +276,12 @@ if ($item_columns_feat  >= 1 && $item_column_mode_feat == 1 ){
 
 /**
  * Standard
- * Note: these are ignored / unsed since we items are place inside the carousel
- * item placement 0: cleared, 1: as masonry tiles, 2: tabs, 3: accordion (sliders)
+ * Note: standard items are placed inside the carousel and positioned by its JS (fcxSlide),
+ * not via CSS Grid/masonry/tabs/accordion, so item_placement_std is fixed and the
+ * column-mode/class logic that exists for featured items does not apply here.
  */
 $item_placement_std = -1;
 $item_columns_std   = 1;
-/** add column class or no class for grid mode */
-if ($item_columns_std  >= 1 && $item_column_mode_std == 1 ){
-	$cols_class_std = '';
-}else {
-	$cols_class_std ='cols_' . $item_columns_std;
-}
 
 $document = \Joomla\CMS\Factory::getDocument();
 $jcookie  = \Joomla\CMS\Factory::getApplication()->input->cookie;
@@ -1212,6 +1218,7 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 				responsive: '.$_fcx_responsive.',
 				items_per_page: '.$_fcx_items_per_page.',
 				item_size: '.$_fcx_item_size.',
+				item_margin: '.$_fcx_margin_std.',
 
 				'.( !$show_page_handles ? '' : '
 				page_handles: jQuery("#mod_fc_page_handles_'.$uniq_ord_id.'").find("span.mod_fc_page_handle"),
@@ -1326,38 +1333,8 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 	}else{
 		$item_columns_feat = $item_width_feat;
 	}
-	if ($item_column_mode_std == 0 ){
-		switch ($item_columns_std) {
-			case 1:
-				$item_columns_std = '100%';
-				break;
-			case 2:
-				$item_columns_std = '47%';
-				break;
-			case 3:
-				$item_columns_std = '30%';
-				break;
-			case 4:
-				$item_columns_std = '23%';
-				break;
-			case 5:
-				$item_columns_std = '18%';
-				break;
-			case 6:
-				$item_columns_std = '14%';
-				break;
-			case 7:
-				$item_columns_std = '12%';
-				break;
-			case 8:
-				$item_columns_std = '10%';
-				break;
-		}
-
-	}else {
-		$item_columns_std = $item_width_std;
-
-	}
+	// NOTE: no equivalent switch for standard items: they have no column-mode/grid-width
+	// parameter (no XML fields), as they are positioned by the carousel JS, not CSS Grid.
 
 	$css = ''.
 	/* CONTAINER of featured items */'
@@ -1366,32 +1343,49 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 	/* CONTAINER of each featured item */'
 	#mod_fcitems_box_featured_'.$uniq_ord_id.' div.mod_flexicontent_standard_wrapper {
 	}'.
-	/* inner CONTAINER of each sfeatured item */'
+	/* inner CONTAINER (grid parent) of feat items: gap & column sizing apply here */'
 	#mod_fcitems_box_featured_'.$uniq_ord_id.'.mod_flexicontent_featured {
 		'.($inner_inline_css_feat ? '
-		padding: '.$padding_top_bottom_feat.' '.$padding_left_right_feat.' !important;
-		border-width: '.$border_width_feat.' !important;
 		row-gap: '.$margin_top_bottom_feat.' !important ;
 		gap:'.$margin_left_right_feat.' !important;
 		' : '').'
 		grid-template-columns: repeat('.$item_fit_feat.', minmax('.$item_columns_feat.', 1fr));
 	}'.
+	/* contour (padding/border) of EACH feat item, not the grid container */'
+	#mod_fcitems_box_featured_'.$uniq_ord_id.' .mod_flexicontent_featured_wrapper_innerbox {
+		'.($inner_inline_css_feat ? '
+		padding: '.$padding_top_bottom_feat.' '.$padding_left_right_feat.' !important;
+		border-width: '.$border_width_feat.' !important;
+		border-style: '.$border_style_feat.' !important;
+		border-color: '.$border_color_feat.' !important;
+		border-radius: '.$border_radius_feat.' !important;
+		' : '').'
+		'.($inner_inline_css_feat && trim($border_radius_feat) !== '' && trim($border_radius_feat) !== '0' ? '
+		overflow: hidden !important;
+		' : '').'
+	}'.
 
 	/* CONTAINER of standard items */'
 	#mod_fcitems_box_standard_'.$uniq_ord_id.' {
 	}'.
-	/* CONTAINER of each standard item */'
+	/* contour (padding/border) of EACH standard item — items are positioned by carousel JS (float:left), margin applies on wrapper */'
 	#mod_fcitems_box_standard_'.$uniq_ord_id.' div.mod_flexicontent_standard_wrapper {
+		'.($inner_inline_css_std && $_fcx_margin_std > 0 ? '
+		margin-right: '.$_fcx_margin_std.'px !important;
+		' : '').'
 	}'.
-	/* inner CONTAINER of each standard item */'
+	/* inner box: border, padding, radius */'
 	#mod_fcitems_box_standard_'.$uniq_ord_id.' div.mod_flexicontent_standard_wrapper_innerbox {
 		'.($inner_inline_css_std ? '
 		padding: '.$padding_top_bottom_std.' '.$padding_left_right_std.' !important;
 		border-width: '.$border_width_std.' !important;
-		row-gap: '.$margin_top_bottom_std.' !important ;
-		gap:'.$margin_left_right_std.' !important;
+		border-style: '.$border_style_std.' !important;
+		border-color: '.$border_color_std.' !important;
+		border-radius: '.$border_radius_std.' !important;
 		' : '').'
-		grid-template-columns: repeat('.$item_fit_std.', minmax('.$item_columns_std.', 1fr));
+		'.($inner_inline_css_std && trim($border_radius_std) !== '' && trim($border_radius_std) !== '0' ? '
+		overflow: hidden !important;
+		' : '').'
 	}'.
 
 	/* The MASK that contains the CAROUSEL (mask clips it) */'
@@ -1412,7 +1406,7 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 	#mod_fc_page_handles_'.$uniq_ord_id.' span.mod_fc_page_handle:hover {
 		'.($page_handle_event=='click' ? 'cursor:pointer;' : 'cursor:default;').'
 	}'.
-		/* column size for masonry */'
+		/* column size for masonry (featured only — standard items are positioned by the carousel JS, never get the .masonry class) */'
 		#mod_fcitems_box_featured_'.$uniq_ord_id.' .mod_flexicontent_featured_wrapper.masonry{
 			'.($inner_inline_css_feat ? '
 				width: calc('.$item_columns_feat.' - '.$margin_left_right_feat.') !important;
@@ -1423,27 +1417,13 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 				margin-right:20px !important;
 				margin-bottom:20px !important ;
 				').'
-			}
-			#mod_fcitems_box_standard_'.$uniq_ord_id.' .mod_flexicontent_standard_wrapper.masonry {
-			'.($inner_inline_css_std ? '
-				width: calc('.$item_columns_std.' - '.$margin_left_right_std.') !important;
-				margin-right:'.$margin_left_right_std.' !important;
-				margin-bottom:'.$margin_top_bottom_std.' !important;
-				' : '
-				width: calc('.$item_columns_std.' - 20px) !important;
-				margin-right: 20px !important;
-				margin-bottom:20px !important;
-				').'
-				}'.
-			/* responsive for masonry */'
-			@media only screen and (min-device-width : 320px) and (max-device-width : 480px) {
-			#mod_fcitems_box_featured_'.$uniq_ord_id.' .mod_flexicontent_featured_wrapper.masonry{
-				width: 100% !important;
-			}
-			#mod_fcitems_box_standard_'.$uniq_ord_id.' .mod_flexicontent_standard_wrapper.masonry {
-				width: 100% !important;
-				}
-			}'
+			}'.
+		/* responsive for masonry */'
+		@media only screen and (min-device-width : 320px) and (max-device-width : 480px) {
+		#mod_fcitems_box_featured_'.$uniq_ord_id.' .mod_flexicontent_featured_wrapper.masonry{
+			width: 100% !important;
+		}
+		}'
 	;
 
 	if ($css) $wa->addInlineStyle($css);
@@ -1496,4 +1476,3 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 </div>
 
 <!-- EOF DIV mod_flexicontent_wrapper -->
-

@@ -55,7 +55,7 @@
 				<option value="0" show_list="item_columns_feat" hide_list="carousel_item_width_feat" >Column mode</option>
 				<option value="1" show_list="carousel_item_width_feat" hide_list="item_columns_feat">Grid mode</option>
 			</field>
-			<field name="carousel_item_width_feat" type="text" defaut="200px" hint="prefer to use px like 200px" label="Width of columns (grid mode)" description="" depend_class="carousel_item_width_feat"/>
+			<field name="carousel_item_width_feat" type="text" default="200px" hint="prefer to use px like 200px" label="Width of columns (grid mode)" description="" depend_class="carousel_item_width_feat"/>
 			<field name="item_columns_feat" type="list" default="3" label="FLEXI_UMOD_NUM_OF_COLUMNS" description="FLEXI_UMOD_NUM_OF_COLUMNS_DESC" depend_class="item_columns_feat">
 				<option value="1">1</option>
 				<option value="2">2</option>
@@ -109,7 +109,16 @@
 			</field>
 			<field name="carousel_padding_top_bottom_feat" type="text"  default="0" label="padding top/bottom" description="This is the padding applied at top and bottom of the items" />
 			<field name="carousel_padding_left_right_feat" type="text"  default="0" label="padding left/right" description="This is the padding applied at left and right of the items" />
-			<field name="carousel_border_width_feat" type="text" default="1" label="border width" description="This is the border width applied around the items" />
+			<field name="carousel_border_width_feat" type="text" default="1px" label="border width" description="This is the border width applied around the items" />
+			<field name="carousel_border_style_feat" type="list" default="solid" label="border style" description="This is the border style applied around the items">
+				<option value="none">None</option>
+				<option value="solid">Solid</option>
+				<option value="dashed">Dashed</option>
+				<option value="dotted">Dotted</option>
+				<option value="double">Double</option>
+			</field>
+			<field name="carousel_border_color_feat" type="color" default="#cccccc" label="border color" description="This is the border color applied around the items" />
+			<field name="carousel_border_radius_feat" type="text" default="0" label="border radius" description="e.g. 4px, 0.5rem, 50% for circle" />
 			<field name="carousel_margin_top_bottom_feat" type="text"  default="2rem" label="margin top/bottom" description="This is the margin applied at top and bottom of the items" />
 			<field name="carousel_margin_left_right_feat" type="text"  default="2rem" label="margin left/right" description="This is the margin applied at left and right of the items" />
 
@@ -142,11 +151,20 @@
 				<option value="0">No (use default/custom CSS)</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="carousel_padding_top_bottom" type="text" default="8" label="padding top/bottom" description="This is the padding applied at top and bottom of the items" />
-			<field name="carousel_padding_left_right" type="text" default="12" label="padding left/right" description="This is the padding applied at left and right of the items" />
+			<field name="carousel_padding_top_bottom" type="text" default="8px" label="padding top/bottom" description="This is the padding applied at top and bottom of the items" />
+			<field name="carousel_padding_left_right" type="text" default="12px" label="padding left/right" description="This is the padding applied at left and right of the items" />
 			<field name="carousel_border_width" type="text" default="0" label="border width" description="This is the border width applied around the items" />
+			<field name="carousel_border_style" type="list" default="solid" label="border style" description="This is the border style applied around the items">
+				<option value="none">None</option>
+				<option value="solid">Solid</option>
+				<option value="dashed">Dashed</option>
+				<option value="dotted">Dotted</option>
+				<option value="double">Double</option>
+			</field>
+			<field name="carousel_border_color" type="color" default="#cccccc" label="border color" description="This is the border color applied around the items" />
+			<field name="carousel_border_radius" type="text" default="0" label="border radius" description="e.g. 4px, 0.5rem, 50% for circle" />
 			<field name="carousel_margin_top_bottom" type="text" default="0" label="margin top/bottom" description="This is the margin applied at top and bottom of the items" />
-			<field name="carousel_margin_left_right" type="text" default="0" label="margin left/right" description="This is the margin applied at left and right of the items" />
+			<field name="carousel_margin_left_right" type="text" default="0" hint="px only e.g. 10px — used by carousel JS" label="margin left/right" description="This is the margin applied between items (px only, used by the carousel JS to compute item spacing)" />
 
 			<field name="item_tab_carousel_ops" type="separator" default="Carousel options" description="..." icon_class="icon-refresh" level="tab_open" box_type="1" />
 

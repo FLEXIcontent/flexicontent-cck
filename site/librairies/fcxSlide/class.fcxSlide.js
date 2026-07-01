@@ -209,6 +209,7 @@ var fcxSlide = function(params)
 
 		this.item_size = params.item_size || 240;
 		this.item_size_min = this.item_size;
+		this.item_margin = params.item_margin || 0;  // right margin between items (px), subtracted from visual item width
 
 		this.touch_walk = params.touch_walk || 1;
 		this.mouse_walk = params.mouse_walk || 0;
@@ -413,7 +414,7 @@ var fcxSlide = function(params)
 			}
 			if (width_changed) {
 				for(i=0; i<this.items.length; i++) {
-					jQuery(this.items[i]).css('width', this.item_size);
+					jQuery(this.items[i]).css('width', this.item_size - this.item_margin);
 				}
 			}
 		}
