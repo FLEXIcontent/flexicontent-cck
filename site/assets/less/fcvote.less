@@ -1,288 +1,323 @@
 /*
-Tried hard to remove !important rules,
-but too many stupid CSS rules ... exist !! that twice as terrible as using !important
-
-e.g.  #my_template_box  ul { ... }
-e.g.  #my_template_box  li { ... }
-
-the above should have been (to minimize conflicts):
-e.g.  #header > ul { ... }
-e.g.  #header ul.specificclass { ... }
-
-- and we cannot always prepend an HTML tag ID to override the above
-- anyone that wants to override this: Please just -copy- the full rule and -prepend- a 'body' ...
-- note the last part of this CSS should not be overriden via CSS,
-instead use voting field parameters !!
-*/
-
-/* fcvote standard css */
+ * Voting field (rating stars) of the FLEXIcontent 'core' fields plugin
+ *
+ * Stars are inline SVG icons (Font Awesome 'star' shapes), colored via CSS 'currentColor'.
+ * Star size and colors are configurable via voting field parameters: the field display
+ * code adds inline CSS rules (with !important) overriding the defaults of this file.
+ * Please use the field configuration instead of overriding these rules via CSS.
+ */
 
 /* container of all voting types */
 div.voting-group {
-	display: inline-block;
-	float: none;
-	margin: 0;
-	padding: 0;
+  display: inline-block;
+  float: none;
+  margin: 0;
+  padding: 0;
 }
+
 /* outer container of 1 vote type: main or extra */
 div.voting-row {
- 	box-sizing: border-box;
-	display: inline-block;
-	float: left;
-	padding: 0;
-	margin: 0;
-	padding: 0 24px 0 0;
+  box-sizing: border-box;
+  display: inline-block;
+  float: left;
+  margin: 0;
+  padding: 0 24px 0 0;
 }
 div.voting-row.voting-row_main {
-	box-sizing: border-box;
- 	clear: both;
+  box-sizing: border-box;
+  clear: both;
 }
 div.voting-row:nth-child(2n) {
-	clear: both;
+  clear: both;
 }
-#flexicontent
-div.voting-row .ajax-loader,
+#flexicontent div.voting-row .ajax-loader,
 div.voting-row .ajax-loader {
-	vertical-align: top;
-	margin: 6px 6px 10px 12px;
+  vertical-align: top;
+  margin: 6px 6px 10px 12px;
 }
 
 /* inner container of 1 vote type: main or extra */
 div.fcvote {
-	display: inline-block;
-	vertical-align: unset;
-	margin: 0;
-	padding: 0;
+  position: relative;
+  display: inline-block;
+  vertical-align: unset;
+  margin: 0;
+  padding: 0;
 }
 
-div.fcvote > ul.fcvote_list, 
-div.fcvote > ul.fcvote_list > li.voting-links a:hover, 
-div.fcvote > ul.fcvote_list > li.current-rating {
-	background-color: transparent !important;
-	background-position: left -1000px !important;
-	background-repeat: repeat-x !important;
-}
-
+/* the star list */
 div.fcvote > ul.fcvote_list {
-	background-position: left top !important;
-	list-style-image: none !important;
-	list-style-position: outside !important;
-	list-style-type: none !important;
-	margin: 4px 0 !important;
-	padding: 0 !important;
-	overflow: hidden !important;
-	position: relative !important;
-	float: left !important;
-	clear: both !important;
+  list-style: none !important;
+  list-style-image: none !important;
+  margin: 4px 0 !important;
+  padding: 0 !important;
+  position: relative !important;
+  float: left !important;
+  clear: both !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  background: none !important;
+}
+div.fcvote > ul.fcvote_list > li {
+  list-style: none !important;
+  background: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
+/* star layers: empty stars (base, in-flow) and filled stars (clipped overlays) */
+div.fcvote > ul.fcvote_list > li.fcvote-stars,
+div.fcvote > ul.fcvote_list .fcvote-stars-fill {
+  display: block;
+  white-space: nowrap;
+  font-size: 0;
+  line-height: 0;
+}
+div.fcvote > ul.fcvote_list svg.fcvote-star {
+  display: inline-block;
+  vertical-align: top;
+  width: 24px;   /* overridable via field configuration */
+  height: 24px;  /* overridable via field configuration */
+}
+div.fcvote > ul.fcvote_list svg.fcvote-star-empty {
+  color: #cccccc; /* overridable via field configuration */
+}
+div.fcvote > ul.fcvote_list svg.fcvote-star-full {
+  color: #ffb400; /* overridable via field configuration */
+}
 div.fcvote > ul.fcvote_list > li.current-rating,
-div.fcvote > ul.fcvote_list > li.voting-links {
-	display: inline !important;
-	background-image: none !important;
-	background-position: 0 !important;
-	margin: 0 !important;
-	padding: 0 !important;
+div.fcvote > ul.fcvote_list > li.hover-rating {
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  height: 100% !important;
+  overflow: hidden !important;
+  z-index: 1 !important;
+  cursor: pointer;
+}
+div.fcvote > ul.fcvote_list > li.hover-rating {
+  width: 0;
+}
+/* while previewing a vote on mouse over, hide the current rating layer */
+div.fcvote > ul.fcvote_list.fcvote-hovering > li.current-rating {
+  visibility: hidden;
 }
 
-div.fcvote > ul.fcvote_list > li.voting-links a, 
-div.fcvote > ul.fcvote_list > li.current-rating {
-	background-color: transparent !important;
-	border: medium none !important;
-	cursor: pointer !important;
-	outline-color: initial !important;
-	outline-style: none !important;
-	outline-width: medium !important;
-	overflow: hidden !important;
-	position: absolute !important;
-	text-indent: -1000em !important;
-	left: 0pt !important;
-	top: 0pt !important;
-	margin: 0 !important;
-	padding: 0 !important;
-	transition: none !important;
+/* transparent click / hover areas, 1 per rating value, stacked via z-index */
+div.fcvote > ul.fcvote_list > li.voting-links a {
+  display: block !important;
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: medium none !important;
+  outline: none !important;
+  background: transparent !important;
+  overflow: hidden !important;
+  text-indent: -1000em !important;
+  cursor: pointer !important;
+  transition: none !important;
 }
-
-div.fcvote > ul.fcvote_list > li.voting-links a:hover {
-	background-position: left bottom !important;
-}
-
-div.fcvote > ul.fcvote_list > li.current-rating {
-	background-position: left center !important;
-	z-index: 0 !important;
-}
-
 
 /*
  * Non-critical part not using !important
  */
-
 /* Labels: main vote */
-#flexicontent
-div.fcvote-label-outer,
+#flexicontent div.fcvote-label-outer,
 div.fcvote-label-outer {
-	float: left;
-	clear:both;
+  float: left;
+  clear: both;
 }
-
-#flexicontent
-div.fcvote-label,
+#flexicontent div.fcvote-label,
 div.fcvote-label {
-	float: left;
-	padding: 0 4px 0 0;
-	margin-right: 6px;
-	font-weight:normal;
-	font-size: 100%;
-	text-align:right;
-	border-bottom:1px dashed gray;
-	font-style:italic;
+  float: left;
+  padding: 0 4px 0 0;
+  margin-right: 6px;
+  font-weight: normal;
+  font-size: 100%;
+  text-align: right;
+  border-bottom: 1px dashed gray;
+  font-style: italic;
 }
-
 /* Labels: extra votes */
-#flexicontent
-div.fcvote-label.xid-main,
+#flexicontent div.fcvote-label.xid-main,
 div.fcvote-label.xid-main {
-	color: darkorange;
-	font-size: 120%;
-	font-style:normal;
-	font-weight:bold;
+  color: darkorange;
+  font-size: 120%;
+  font-style: normal;
+  font-weight: bold;
 }
 
-/* Vote message, desc, counter */
-#flexicontent
-div.fcvote_message,
-div.fcvote_message {
-	float: left;
-	margin: 0;
-	padding: 0;
-	clear:both;
+/* Vote message: a small bubble (cloud) above the stars, shown for a short time after voting */
+#flexicontent div.fcvote > div.fcvote_message,
+div.fcvote > div.fcvote_message {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%) translateY(6px);
+  z-index: 1050;
+  box-sizing: border-box;
+  width: max-content;
+  max-width: ~"min(280px, 86vw)"; /* escaped: the LESS compiler must not evaluate CSS min() */
+  margin: 0;
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: rgba(40, 40, 40, 0.95);
+  color: #fff;
+  font-size: 13px;
+  font-style: normal;
+  line-height: 1.45;
+  text-align: center;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s ease;
 }
-#flexicontent
-div.fcvote-count,
+#flexicontent div.fcvote > div.fcvote_message::after,
+div.fcvote > div.fcvote_message::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -6px;
+  border: 6px solid transparent;
+  border-top-color: rgba(40, 40, 40, 0.95);
+}
+#flexicontent div.fcvote > div.fcvote_message.fcvote_message-visible,
+div.fcvote > div.fcvote_message.fcvote_message-visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+#flexicontent div.fcvote > div.fcvote_message.fcvote_message--success,
+div.fcvote > div.fcvote_message.fcvote_message--success {
+  background: rgba(37, 99, 235, 0.95);
+}
+#flexicontent div.fcvote > div.fcvote_message.fcvote_message--success::after,
+div.fcvote > div.fcvote_message.fcvote_message--success::after {
+  border-top-color: rgba(37, 99, 235, 0.95);
+}
+#flexicontent div.fcvote > div.fcvote_message.fcvote_message--warning,
+div.fcvote > div.fcvote_message.fcvote_message--warning {
+  background: rgba(176, 86, 8, 0.95);
+}
+#flexicontent div.fcvote > div.fcvote_message.fcvote_message--warning::after,
+div.fcvote > div.fcvote_message.fcvote_message--warning::after {
+  border-top-color: rgba(176, 86, 8, 0.95);
+}
+#flexicontent div.fcvote > div.fcvote_message .fc-mssg,
+div.fcvote > div.fcvote_message .fc-mssg,
+#flexicontent div.fcvote > div.fcvote_message p,
+div.fcvote > div.fcvote_message p {
+  margin: 0;
+  padding: 0;
+  background: none;
+  border: none;
+  color: inherit;
+}
+@media (max-width: 575px) {
+  #flexicontent div.fcvote > div.fcvote_message,
+  div.fcvote > div.fcvote_message {
+    font-size: 12px;
+    padding: 6px 10px;
+    max-width: calc(100vw - 24px);
+  }
+}
+
+/* Vote counter */
+#flexicontent div.fcvote-count,
 div.fcvote-count {
-	float: left;
-	margin: 0px 0 0 2px;
-	padding: 0 4px 0 4px;
-	text-align: center;
-	position: relative;
-	border-radius: 3px;
+  float: left;
+  margin: 0px 0 0 2px;
+  padding: 0 4px 0 4px;
+  text-align: center;
+  position: relative;
+  border-radius: 3px;
 }
-#flexicontent
-div.fcvote-box-main div.fcvote-count,
+#flexicontent div.fcvote-box-main div.fcvote-count,
 div.fcvote-box-main div.fcvote-count {
-	margin-top: 4px;
-	max-width: unset;
+  margin-top: 4px;
+  max-width: unset;
 }
-#flexicontent
-div.fcvote-desc,
+#flexicontent div.fcvote-desc,
 div.fcvote-desc {
-	margin: 2px 4px 4px 4px;
-	padding: 0px 4px;
-	float:left;
-	clear:both;
+  margin: 2px 4px 4px 4px;
+  padding: 0px 4px;
+  float: left;
+  clear: both;
 }
 
-/* Vote being submitted */
-#flexicontent
+/* Vote / review form being submitted: spinning SVG loader (Font Awesome 'spinner' shape) */
+#flexicontent div.fcvote .ajax-loader,
 div.fcvote .ajax-loader,
-div.fcvote .ajax-loader {
-	background: url("../images/ajax-loader.gif") no-repeat scroll left center transparent;
-	height: 16px;
-	padding: 0 0 0 20px;
+#flexicontent div.voting-row .ajax-loader,
+div.voting-row .ajax-loader {
+  position: relative;
+  min-height: 16px;
+  padding: 0 0 0 20px;
+}
+#flexicontent div.fcvote .ajax-loader::before,
+div.fcvote .ajax-loader::before,
+#flexicontent div.voting-row .ajax-loader::before,
+div.voting-row .ajax-loader::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  margin-top: -8px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%23999999' d='M304 48a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zm0 416a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zM48 304a48 48 0 1 0 0-96 48 48 0 1 0 0 96zm464-48a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zM142.9 437A48 48 0 1 0 75 369.1 48 48 0 1 0 142.9 437zm0-294.2A48 48 0 1 0 75 75a48 48 0 1 0 67.9 67.9zM369.1 437A48 48 0 1 0 437 369.1 48 48 0 1 0 369.1 437z'/%3E%3C/svg%3E") center / 16px 16px no-repeat;
+  animation: fcvote-spin 1s steps(8) infinite;
+}
+@keyframes fcvote-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Review form */
-#flexicontent
-.fcvote_toggle_review_form {
-	clear: both;
-	float: left;
-	margin: 2px 0 2px 0;
-	vertical-align: top;
-	width: 100%;
+#flexicontent .fcvote_toggle_review_form {
+  clear: both;
+  float: left;
+  margin: 2px 0 2px 0;
+  vertical-align: top;
+  width: 100%;
 }
-#flexicontent
-.fcvote_review_form_box_loading {
-	float: left;
-	display: inline-block;
-	vertical-align: top;
+#flexicontent .fcvote_review_form_box_loading {
+  float: left;
+  display: inline-block;
+  vertical-align: top;
 }
-#flexicontent
-.fcvote_review_form_box label ,
+#flexicontent .fcvote_review_form_box label,
 .fcvote_review_form_box label {
-	font-size:12px;
+  font-size: 12px;
 }
-#flexicontent
-.fcvote_review_form_box table td,
+#flexicontent .fcvote_review_form_box table td,
 .fcvote_review_form_box table td {
-	font-size:120%;
+  font-size: 120%;
 }
-
-#flexicontent
-.fcvote_review_form_box table tr td {
-	padding-left: 2px;
-	padding-right: 2px;
+#flexicontent .fcvote_review_form_box table tr td {
+  padding-left: 2px;
+  padding-right: 2px;
 }
-#flexicontent
-.fcvote_review_form_box table td input.fcvote_review_form_submit_btn {
-	min-width: 33%;
-	float: right;
+#flexicontent .fcvote_review_form_box table td input.fcvote_review_form_submit_btn {
+  min-width: 33%;
+  float: right;
 }
-
-#flexicontent
-.fcvote_review_form_box table.fc-form-tbl td.key,
+#flexicontent .fcvote_review_form_box table.fc-form-tbl td.key,
 .fcvote_review_form_box table.fc-form-tbl td.key {
-	max-width: 300px;
+  max-width: 300px;
 }
-
-#flexicontent
+#flexicontent .fcvote_review_form_box table.fc-form-tbl td input[type=text],
 .fcvote_review_form_box table.fc-form-tbl td input[type=text],
-.fcvote_review_form_box table.fc-form-tbl td input[type=text],
-#flexicontent
-.fcvote_review_form_box table.fc-form-tbl td textarea,
+#flexicontent .fcvote_review_form_box table.fc-form-tbl td textarea,
 .fcvote_review_form_box table.fc-form-tbl td textarea {
-	width: 100%;
-	box-sizing: border-box;
-	height: unset;
-	padding: 6px 12px;
+  width: 100%;
+  box-sizing: border-box;
+  height: unset;
+  padding: 6px 12px;
 }
-
-
-/*
- * fcvote CSS, that is OVERRIDABLE by inline CSS rules (!important)
- * that are created according to voting field configuration,
- *
- * DO NOT OVERRIDE these by using CSS,
- * instead please use field configuration
- */
-
-/*****************************************/
-/* overridable voting image and its size */
-/*****************************************/
-
-div.fcvote > ul.fcvote_list {
-	height: 24px !important;
-	width: 120px !important; /* overridable number of stars */
-}
-
-div.fcvote > ul.fcvote_list > li.voting-links a, 
-div.fcvote > ul.fcvote_list > li.current-rating {
-	height: 24px !important;
-	line-height: 24px !important;
-}
-
-div.fcvote > ul.fcvote_list, 
-div.fcvote > ul.fcvote_list > li.voting-links a:hover, 
-div.fcvote > ul.fcvote_list > li.current-rating {
-	background-image: url(../images/star-medium.png) !important;
-}
-
-
-/*********************************************************************/
-/* For overridable number of stars, mouse-over needs to be overriden */
-/*********************************************************************/
-
-div.fcvote > ul.fcvote_list > li.voting-links:nth-child(2) a { width: 20%  !important;  z-index: 6; }
-div.fcvote > ul.fcvote_list > li.voting-links:nth-child(3) a { width: 40%  !important;  z-index: 5; }
-div.fcvote > ul.fcvote_list > li.voting-links:nth-child(4) a { width: 60%  !important;  z-index: 4; }
-div.fcvote > ul.fcvote_list > li.voting-links:nth-child(5) a { width: 80%  !important;  z-index: 3; }
-div.fcvote > ul.fcvote_list > li.voting-links:nth-child(6) a { width: 100% !important;  z-index: 2; }

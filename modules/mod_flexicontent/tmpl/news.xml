@@ -103,7 +103,16 @@
 			</field>
 			<field name="news_padding_top_bottom_feat" type="text" default="8px" label="padding top/bottom" description="This is the padding applied at top and bottom of the items" />
 			<field name="news_padding_left_right_feat" type="text" default="12px" label="padding left/right" description="This is the padding applied at left and right of the items" />
-			<field name="news_border_width_feat" type="text" default="1" label="border width" description="This is the border width applied around the items" />
+			<field name="news_border_width_feat" type="text" default="1px" label="border width" description="This is the border width applied around the items" />
+			<field name="news_border_style_feat" type="list" default="solid" label="border style" description="This is the border style applied around the items">
+				<option value="none">None</option>
+				<option value="solid">Solid</option>
+				<option value="dashed">Dashed</option>
+				<option value="dotted">Dotted</option>
+				<option value="double">Double</option>
+			</field>
+			<field name="news_border_color_feat" type="color" default="#cccccc" label="border color" description="This is the border color applied around the items" />
+			<field name="news_border_radius_feat" type="text" default="0" label="border radius" description="e.g. 4px, 0.5rem, 50% for circle" />
 			<field name="news_margin_top_bottom_feat" type="text" default="2rem" label="margin top/bottom" description="This is the margin applied at top and bottom of the items" />
 			<field name="news_margin_left_right_feat" type="text" default="2rem" label="margin left/right" description="This is the margin applied at left and right of the items" />
 
@@ -168,7 +177,16 @@
 			</field>
 			<field name="news_padding_top_bottom" type="text" default="8px" label="padding top/bottom" description="This is the padding applied at top and bottom of the items" />
 			<field name="news_padding_left_right" type="text" default="12px" label="padding left/right" description="This is the padding applied at left and right of the items" />
-			<field name="news_border_width" type="text" default="1" label="border width" description="This is the border width applied around the items" />
+			<field name="news_border_width" type="text" default="1px" label="border width" description="This is the border width applied around the items" />
+			<field name="news_border_style" type="list" default="solid" label="border style" description="This is the border style applied around the items">
+				<option value="none">None</option>
+				<option value="solid">Solid</option>
+				<option value="dashed">Dashed</option>
+				<option value="dotted">Dotted</option>
+				<option value="double">Double</option>
+			</field>
+			<field name="news_border_color" type="color" default="#cccccc" label="border color" description="This is the border color applied around the items" />
+			<field name="news_border_radius" type="text" default="0" label="border radius" description="e.g. 4px, 0.5rem, 50% for circle" />
 			<field name="news_margin_top_bottom" type="text" default="2rem" label="margin top/bottom" description="This is the margin applied at top and bottom of the items" />
 			<field name="news_margin_left_right" type="text" default="2rem" label="margin left/right" description="This is the margin applied at left and right of the items" />
 

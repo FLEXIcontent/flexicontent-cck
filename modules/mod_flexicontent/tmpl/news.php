@@ -42,24 +42,30 @@ $mod_do_hlight .= $hl_items_onnav == 2 || $hl_items_onnav == 3 ? ' mod_hl_hover'
 
 // Item Dimensions featured
 $inner_inline_css_feat = (int)$params->get($layout.'_inner_inline_css_feat', 0);
-$padding_top_bottom_feat = (int)$params->get($layout.'_padding_top_bottom_feat', '8px');
-$padding_left_right_feat = (int)$params->get($layout.'_padding_left_right_feat', '12px');
-$margin_top_bottom_feat = $params->get($layout.'_margin_left_right_feat', '2rem');
+$padding_top_bottom_feat = $params->get($layout.'_padding_top_bottom_feat', '8px');
+$padding_left_right_feat = $params->get($layout.'_padding_left_right_feat', '12px');
+$margin_top_bottom_feat = $params->get($layout.'_margin_top_bottom_feat', '2rem');
 $margin_left_right_feat = $params->get($layout.'_margin_left_right_feat', '2rem');
-$border_width_feat = (int)$params->get($layout.'_border_width_feat', 1);
-$item_column_mode_feat = (int)$params->get($layout.'_item_column_mode_feat', 1);// 0 column mode old, 1 grid minmax size
+$border_width_feat = $params->get($layout.'_border_width_feat', '1px');
+$border_style_feat = $params->get($layout.'_border_style_feat', 'solid');
+$border_color_feat = $params->get($layout.'_border_color_feat', '#cccccc');
+$border_radius_feat = $params->get($layout.'_border_radius_feat', '0');
+$item_column_mode_feat = (int)$params->get($layout.'_item_column_mode_feat', 0);// 0 column mode old, 1 grid minmax size
 $item_width_feat = $params->get($layout.'_item_width_feat', '200px');
 $item_fit_feat = $params->get($layout.'_content_width_fit_feat', 'auto-fill');
 
 
 // Item Dimensions standard
 $inner_inline_css = (int)$params->get($layout.'_inner_inline_css', 0);
-$padding_top_bottom = (int)$params->get($layout.'_padding_top_bottom', '8px');
-$padding_left_right = (int)$params->get($layout.'_padding_left_right', '12px');
-$margin_top_bottom = $params->get($layout.'_margin_left_right', '2rem');
+$padding_top_bottom = $params->get($layout.'_padding_top_bottom', '8px');
+$padding_left_right = $params->get($layout.'_padding_left_right', '12px');
+$margin_top_bottom = $params->get($layout.'_margin_top_bottom', '2rem');
 $margin_left_right = $params->get($layout.'_margin_left_right', '2rem');
-$border_width = (int)$params->get($layout.'_border_width', 1);
-$item_column_mode_std = (int)$params->get($layout.'_item_column_mode_std', 1);// 0 column mode old, 1 grid minmax size
+$border_width = $params->get($layout.'_border_width', '1px');
+$border_style = $params->get($layout.'_border_style', 'solid');
+$border_color = $params->get($layout.'_border_color', '#cccccc');
+$border_radius = $params->get($layout.'_border_radius', '0');
+$item_column_mode_std = (int)$params->get($layout.'_item_column_mode_std', 0);// 0 column mode old, 1 grid minmax size
 $item_width_std = $params->get($layout.'_item_width_std', '200px');
 $item_fit_std = $params->get($layout.'_content_width_fit_std', 'auto-fill');
 
@@ -1081,15 +1087,26 @@ if ($std_builder_layout_num)
 	/* CONTAINER of each featured item */'
 	#mod_fcitems_box_featured_'.$uniq_ord_id.' div.mod_flexicontent_standard_wrapper {
 	}'.
-	/* inner CONTAINER of each feat item */'
+	/* inner CONTAINER (grid parent) of feat items: gap & column sizing apply here */'
 	#mod_fcitems_box_featured_'.$uniq_ord_id.'.mod_flexicontent_featured {
 		'.($inner_inline_css_feat ? '
-		padding: '.$padding_top_bottom_feat.' '.$padding_left_right_feat.' !important;
-		border-width: '.$border_width_feat.' !important;
 		row-gap: '.$margin_top_bottom_feat.' !important ;
 		gap:'.$margin_left_right_feat.' !important;
 		' : '').'
-		grid-template-columns: repeat('.$item_fit_feat.', minmax(calc('.$item_columns_feat.' - '.$margin_left_right_feat.') , 1fr));
+		grid-template-columns: repeat('.$item_fit_feat.', minmax(min(calc('.$item_columns_feat.' - '.$margin_left_right_feat.'), 100%), 1fr));
+	}'.
+	/* contour (padding/border) of EACH feat item, not the grid container */'
+	#mod_fcitems_box_featured_'.$uniq_ord_id.' .mod_flexicontent_featured_wrapper_innerbox {
+		'.($inner_inline_css_feat ? '
+		padding: '.$padding_top_bottom_feat.' '.$padding_left_right_feat.' !important;
+		border-width: '.$border_width_feat.' !important;
+		border-style: '.$border_style_feat.' !important;
+		border-color: '.$border_color_feat.' !important;
+		border-radius: '.$border_radius_feat.' !important;
+		' : '').'
+		'.($inner_inline_css_feat && trim($border_radius_feat) !== '' && trim($border_radius_feat) !== '0' ? '
+		overflow: hidden !important;
+		' : '').'
 	}'.
 	/* CONTAINER of standard items */'
 	#mod_fcitems_box_standard_'.$uniq_ord_id.' {
@@ -1097,15 +1114,26 @@ if ($std_builder_layout_num)
 	/* CONTAINER of each standard item */'
 	#mod_fcitems_box_standard_'.$uniq_ord_id.' div.mod_flexicontent_standard_wrapper {
 	}'.
-	/* inner CONTAINER of each standard item */'
+	/* inner CONTAINER (grid parent) of standard items: gap & column sizing apply here */'
 	#mod_fcitems_box_standard_'.$uniq_ord_id.'.mod_flexicontent_standard {
 		'.($inner_inline_css ? '
-		padding: '.$padding_top_bottom.' '.$padding_left_right.' !important;
-		border-width: '.$border_width.' !important;
 		row-gap: '.$margin_top_bottom.' !important;
 		gap:'.$margin_left_right.' !important;
 		' : '').'
-		grid-template-columns: repeat('.$item_fit_std.', minmax(calc('.$item_columns_std.' - '.$margin_left_right.'), 1fr));
+		grid-template-columns: repeat('.$item_fit_std.', minmax(min(calc('.$item_columns_std.' - '.$margin_left_right.'), 100%), 1fr));
+	}'.
+	/* contour (padding/border) of EACH standard item, not the grid container */'
+	#mod_fcitems_box_standard_'.$uniq_ord_id.' .mod_flexicontent_standard_wrapper_innerbox {
+		'.($inner_inline_css ? '
+		padding: '.$padding_top_bottom.' '.$padding_left_right.' !important;
+		border-width: '.$border_width.' !important;
+		border-style: '.$border_style.' !important;
+		border-color: '.$border_color.' !important;
+		border-radius: '.$border_radius.' !important;
+		' : '').'
+		'.($inner_inline_css && trim($border_radius) !== '' && trim($border_radius) !== '0' ? '
+		overflow: hidden !important;
+		' : '').'
 	}'.
 	/* column size for masonry */'
 	#mod_fcitems_box_featured_'.$uniq_ord_id.' .mod_flexicontent_featured_wrapper.masonry{
@@ -1199,4 +1227,3 @@ if ($std_builder_layout_num)
 </div>
 
 <!-- EOF DIV mod_flexicontent_wrapper -->
-

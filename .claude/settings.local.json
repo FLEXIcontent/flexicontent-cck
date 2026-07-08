@@ -1,7 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(grep -B 5 -A 15 'cid = $this->input->get\\\\\\('\\\\''cid'\\\\''' /Users/lipatovroman/Library/CloudStorage/Dropbox/Projects/flexicontent-cck/admin/controllers/filemanager.php)"
-    ]
-  }
-}

@@ -6,8 +6,64 @@ jQuery(document).ready(function(){
 
 	var under_vote = false;
 
+	/**
+	 * Show given message HTML as a small bubble (tooltip-like cloud) above the stars,
+	 * automatically hidden after 2 seconds
+	 */
+	function fcvote_show_message(msg, html)
+	{
+		if (!html || !msg || !msg.length) return;
+		msg = msg.first();
+
+		// Strip wrapper and the alert-close button of the server-side message HTML
+		var content = jQuery('<div></div>').html(html);
+		content.find('button.close').remove();
+
+		var is_warning = content.find('.fc-warning').length > 0;
+		var mssg_inner = content.find('.fc-mssg');
+		var inner_html = mssg_inner.length ? mssg_inner.html() : content.html();
+
+		msg.css('margin-left', '')
+			.html(inner_html)
+			.removeClass('fcvote_message--success fcvote_message--warning')
+			.addClass(is_warning ? 'fcvote_message--warning' : 'fcvote_message--success')
+			.addClass('fcvote_message-visible');
+
+		// Keep the bubble inside the viewport (important on mobile screens)
+		var pad = 8;
+		var rect = msg[0].getBoundingClientRect();
+		var win_width = window.innerWidth || jQuery(window).width();
+		var shift = 0;
+		if (rect.left < pad)                    shift = pad - rect.left;
+		else if (rect.right > win_width - pad)  shift = (win_width - pad) - rect.right;
+		if (shift) msg.css('margin-left', Math.round(shift) + 'px');
+
+		clearTimeout(msg.data('fcvote_hide_timer'));
+		msg.data('fcvote_hide_timer', setTimeout(function() {
+			msg.removeClass('fcvote_message-visible');
+		}, 2000));
+	}
+
 	if (jQuery('.fcvote').length)
 	{
+		// Preview (on mouse over) the rating that would be submitted
+		jQuery('.fcvote a.fc_dovote').on('mouseenter', function()
+		{
+			var vote_list = jQuery(this).closest('.fcvote_list');
+			var total  = vote_list.find('li.voting-links').length;
+			var rating = parseInt(jQuery(this).text(), 10);
+			if (!total || !rating) return;
+
+			vote_list.addClass('fcvote-hovering')
+				.find('li.hover-rating').css('width', (100 * rating / total) + '%');
+		});
+
+		jQuery('.fcvote ul.fcvote_list').on('mouseleave', function()
+		{
+			jQuery(this).removeClass('fcvote-hovering')
+				.find('li.hover-rating').css('width', 0);
+		});
+
 		jQuery('.fcvote a.fc_dovote').on('click', function(e)
 		{
 			if (under_vote) return;
@@ -27,6 +83,7 @@ jQuery(document).ready(function(){
 
 			var xid_msg  = jQuery(this).closest('.fcvote').find('.fcvote_message');
 			var main_msg = voting_group.find('.voting-row_main').find('.fcvote_message');
+			if (!main_msg.length) main_msg = xid_msg;
 
 			var xid_cnt  = jQuery(this).closest('.fcvote').find('.fcvote-count');
 			var main_cnt = voting_group.find('.voting-row_main').find('.fcvote-count');
@@ -36,9 +93,6 @@ jQuery(document).ready(function(){
 
 			var _htmlrating_main = main_cnt.length ? main_cnt.html() : '';
 			var _htmlrating = xid_cnt.html();
-
-			xid_cnt.empty().hide();//.addClass('ajax-loader');
-			xid_msg.empty().show().addClass('ajax-loader');
 
 			var rating = jQuery(this).text();
 
@@ -71,7 +125,9 @@ jQuery(document).ready(function(){
 						_htmlrating_main = data.htmlrating_main;
 					}
 
-					if (typeof(data.html) && data.html)
+					// Show counter flash only if the counter is enabled in field configuration,
+					// (server sends empty 'htmlrating' when the counter is disabled)
+					if (data.html && data.htmlrating)
 					{
 						xid_cnt.html(data.html).show();
 
@@ -90,14 +146,14 @@ jQuery(document).ready(function(){
 							//else xid_cnt.html('').hide();
 						}, 3000);
 					}
-					else
+					else if (_htmlrating && _htmlrating.trim())
 					{
-						xid_cnt.html(_htmlrating).removeClass('ajax-loader');
+						xid_cnt.html(_htmlrating).show();
 					}
 
 					if (main_cnt.length) {
-						if (typeof(data.html_main) && data.html_main) {
-							main_cnt.html(data.html_main).removeClass('ajax-loader');
+						if (data.html_main && data.htmlrating_main) {
+							main_cnt.html(data.html_main).show();
 							setTimeout(function() { main_cnt.animate({opacity: "0.5"}, 900);  }, 2000);
 							setTimeout(function() {
 								main_cnt.css('opacity', 'unset');
@@ -106,19 +162,22 @@ jQuery(document).ready(function(){
 								else
 									main_cnt.html('').hide();
 							}, 3000);
-						} else {
-							main_cnt.html(_htmlrating_main).removeClass('ajax-loader');
+						} else if (_htmlrating_main && _htmlrating_main.trim()) {
+							main_cnt.html(_htmlrating_main);
 						}
 					}
 
-					xid_msg.removeClass('ajax-loader');
-
+					// Show vote messages as auto-hiding bubbles above the stars
 					if (typeof(data.message)!="undefined" && data.message) {
-						xid_msg.css('display', '').html(data.message);
+						fcvote_show_message(xid_msg, data.message);
 					}
 					if (typeof(data.message_main)!="undefined" && data.message_main) {
-						main_msg.css('display', '').html(data.message_main);
+						fcvote_show_message(main_msg, data.message_main);
 					}
+
+					// Clear hover preview (e.g. touch devices do not fire mouseleave)
+					voting_group.find('ul.fcvote_list').removeClass('fcvote-hovering')
+						.find('li.hover-rating').css('width', 0);
 
 					under_vote = false;
 					voting_group.css('opacity', '');

@@ -1543,7 +1543,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 		// Get files
 		$filesdir = \Joomla\Filesystem\Path::clean(JPATH_SITE . $filesdir . DS);
-		$filenames = \Joomla\Filesystem\Folder::files($filesdir, $regexp);
+		$filenames = is_dir($filesdir) ? \Joomla\Filesystem\Folder::files($filesdir, $regexp) : array();
 
 		// Create the folder if it does not exists
 		$destpath = ($secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH) . DS;
@@ -1606,8 +1606,9 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 					$filesize = filesize($destination);
 
 					$fileObj = new stdClass;
-					$fileObj->filename    = $filename;
-					$fileObj->altname     = $filename;
+					$fileObj->filename          = $filename;
+					$fileObj->filename_original = $filenames[$n];
+					$fileObj->altname           = $filename;
 
 					$fileObj->url         = 0;
 					$fileObj->secure      = $secure;

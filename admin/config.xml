@@ -2327,6 +2327,19 @@
 		<field name="" type="separator" default="FLEXI_FILES_CONF" level="tabset_close" box_type="1" remove_boxes="2" />
 	</fieldset>
 
+			<field name="" type="separator" default="FLEXI_UPDATES" label="" level="level0" />
+
+		<fieldset name="update" label="Flexi update" description="FLEXI_UPDATE_CHANNEL_DESC">
+		<field name="update_channel"
+			type="radio"
+			label="FLEXI_UPDATE_CHANNEL"
+			description="FLEXI_UPDATE_CHANNEL_DESC"
+			default="stable"
+			class="btn-group btn-group-yesno">
+			<option value="stable">FLEXI_UPDATE_CHANNEL_STABLE</option>
+			<option value="beta">FLEXI_UPDATE_CHANNEL_BETA</option>
+		</field>
+</fieldset>
 
 	<fieldset name="permissions" label="JCONFIG_PERMISSIONS_LABEL" description="JCONFIG_PERMISSIONS_DESC">
 		<field name="rules" type="rules" label="JCONFIG_PERMISSIONS_LABEL" filter="rules" component="com_flexicontent" section="component" />

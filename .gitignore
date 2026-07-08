@@ -90,3 +90,6 @@ site/uploads/*
 site/medias/*
 !site/uploads/.htaccess
 !site/medias/.htaccess
+
+# Local development tool settings
+.claude/

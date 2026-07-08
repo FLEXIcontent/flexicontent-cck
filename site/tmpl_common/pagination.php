@@ -14,7 +14,6 @@ defined('_JEXEC') or die;
 // ── Infinite scroll parameters ───────────────────────────────────────────────
 $infiniteMode   = (int) $this->params->get('infinite_scroll', 0);
 // 0 = classique, 1 = bouton "Charger plus", 2 = auto-scroll
-$infiniteMode   = 1;
 
 $showPagination = (int) $this->params->get('show_pagination', 2);
 
