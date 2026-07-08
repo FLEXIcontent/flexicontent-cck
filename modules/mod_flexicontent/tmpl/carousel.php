@@ -930,7 +930,7 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 
 				<!-- BOF item's content -->
 				<?php if ($hasTitle || $display_date || $display_text || $display_hits || $display_voting || $display_comments || $mod_readmore || ($use_fields && @$item->fields && $fields)) : ?>
-				<div class="content_standard <?php echo $content_container_class;?>">
+				<div class="content_standard <?php echo $content_container_class_std;?>">
 
 					<?php echo $captured_title; ?>
 

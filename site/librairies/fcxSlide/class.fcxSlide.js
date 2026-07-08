@@ -407,7 +407,8 @@ var fcxSlide = function(params)
 		if (this.mode=='horizontal') {
 			if (this.responsive==1) {
 				var forcedWidth = 0;
-				if (this.items_mask) forcedWidth = box_width / this.items_per_page;
+				var actual_per_page = Math.min(this.items_per_page, this.items.length);
+				if (this.items_mask) forcedWidth = box_width / actual_per_page;
 				forcedWidth = forcedWidth ? forcedWidth : 240;  // if detection fails, use default
 				// Round to closest lower integer (aka 'floor') to avoid problems while scrolling, also since is this less than items container, it should not be a problem
 				this.item_size = forcedWidth;
@@ -458,7 +459,8 @@ var fcxSlide = function(params)
 		// Set appropriate size for the items box
 		this.mode_to_css = {horizontal:['left','width'], vertical:['top','height']};
 		jQuery(this.items_box).css(this.mode_to_css[this.mode][1],(this.item_size*this.items.length)+'px');
-		jQuery(this.items_mask).css(this.mode_to_css[this.mode][1],(this.item_size*this.items_per_page)+'px');
+		var visible_items = Math.min(this.items_per_page, this.items.length);
+		jQuery(this.items_mask).css(this.mode_to_css[this.mode][1],(this.item_size*visible_items)+'px');
 
 
 		/* Detect number of pages, current page and position of 1st item at last page */

@@ -237,7 +237,17 @@
  * ITEM BASIC FIELDS STYLES (FOR CUSTOM FIELDS see below, FOR IMAGE AND DATE see more below)
  */
 
-.carousel.mod_flexicontent_wrapper .content_standard {padding: 12px 12px 0 12px;}  /* container of basic elements of standard items excluding title & image */
+.carousel.mod_flexicontent_wrapper .content_standard {
+	padding: 12px 12px 0 12px;
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+}  /* container of basic elements of standard items excluding title & image */
+
+/* Push the block containing the readmore to the bottom */
+.carousel.mod_flexicontent_wrapper .content_standard > .fc_block:has(.fcitem_readon) {
+	margin-top: auto;
+}
 .carousel.mod_flexicontent_wrapper .content_featured {
 		display: flex;
 		flex-direction: column;
@@ -857,6 +867,9 @@
 	left: 0;
 	width: 100%;
 	margin: 0 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
 /* SVG chevrons via mask-image — change background-color to recolor the arrow */
@@ -866,14 +879,14 @@
 	mask-repeat: no-repeat !important;
 	-webkit-mask-position: center center !important;
 	mask-position: center center !important;
-	-webkit-mask-size: 20px 20px !important;
-	mask-size: 20px 20px !important;
+	-webkit-mask-size: 32px 32px !important;
+	mask-size: 32px 32px !important;
 
 	height: 100% !important;
 	margin: 0px !important;
 	position: absolute !important;
 	top: 0;
-	width: 28px;
+	width: 44px;
 	z-index: 11;
 }
 
@@ -951,7 +964,6 @@
 }
 
 .carousel.mod_flexicontent_wrapper .mod_fc_carousel_mask.fc_has_nav.fc_horizontal {
-	margin: 0px 0px /*!important*/;
 	width: auto /*!important*/;
 }
 
