@@ -2635,7 +2635,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			return true;
 		}
 
-		$filename = basename($value['originalname']);
+		$filename = urldecode(basename($value['originalname']));
 
 
 		// Extra thumbnails sub-folder
@@ -3049,7 +3049,12 @@ class plgFlexicontent_fieldsImage extends FCField
 		$multiple_image_usages = $multiple_image_usages || !empty($value['default_image']);
 		$extra_prefix = $multiple_image_usages  ?  'fld' . $field->id . '_'  :  '';
 
-		//echo 'file_path: ' . $file_path ."<br/>" . 'dest_path: ' . $dest_path ."<br/><br/>";
+		$file_path = urldecode($file_path);
+		$src_path = urldecode($src_path);
+		$dest_path = urldecode($dest_path);
+
+		// echo 'file_path: ' . $file_path ."<br/>" . 'dest_path: ' . $dest_path ."<br/><br/>";
+
 		return array($file_path, $src_path, $dest_path, $field_index, $extra_prefix);
 	}
 
