@@ -1604,9 +1604,13 @@ class flexicontent_html
 				$isMobile = $mobileDetector->isMobile() || $mobileDetector->isTablet();
 
 				// Load chosen function (if not loaded already) and target specific selector
-				if ($isMobile)
-				{
-					\Joomla\CMS\HTML\HTMLHelper::_('formbehavior.chosen', '.use_chosen_lib');
+				if ($isMobile) {
+    				try {
+        				JHtml::_('formbehavior.chosen', '.use_chosen_lib');
+    					} catch (\Throwable $e) {
+       			 // 'chosen' WebAsset preset removed in Joomla 6 core — safe to ignore,
+        		// Tom Select already handles mobile/touch correctly.
+   					 }
 				}
 
 				// Regardless if we loaded chosen JS or some other code loaded it, prevent it from ... attaching to elements meant for select2
