@@ -522,7 +522,7 @@ foreach ($field->value as $index => $value)
 		.(($linkto_url || $usemediaurl || $usealt || $usetitle || $usedesc || $usecust1 || $usecust2) ?
 			'
 
-				<div class="fcimg_value_props" data-name="'.$elementid_n.'" style="display: none;><!-- init form with compact mode !-->
+				<div class="fcimg_value_props" data-name="'.$elementid_n.'" style="display: none;"><!-- init form with compact mode !-->
     						'.$fc_preview_msg.'
 					<div class="fc-form-tbl fcinner fccompact">
 						' . @ $urllink . '
