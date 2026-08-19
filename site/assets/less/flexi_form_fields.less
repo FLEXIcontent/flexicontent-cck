@@ -775,6 +775,7 @@ table.fcimg_dbfile_tbl {
 	.fc_preview_msg {
 		min-height: 2em;
 		margin-bottom: 1em !important;
+		max-width: 300px;
 	}
 
 	/* FIELDs: (image field) filename text */
@@ -834,7 +835,9 @@ table.fcimg_dbfile_tbl {
 	}
 }
 div.fcimg_value_props {
-	display: inline-block;
+	    display: flex;
+    flex-direction: column;
+    gap: 20px;
 	select, input {
 		margin: 0;
 	}

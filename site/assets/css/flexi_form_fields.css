@@ -1697,6 +1697,7 @@ div.empty_image {
 .fc-field-props-box .fc_preview_msg {
   min-height: 2em;
   margin-bottom: 1em !important;
+  max-width: 300px;
 }
 .fc-field-props-box .fc_preview_msg,
 .fc-field-props-box input,
@@ -1749,7 +1750,9 @@ div.empty_image {
   display: none;
 }
 div.fcimg_value_props {
-  display: inline-block;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 div.fcimg_value_props select,
 div.fcimg_value_props input {

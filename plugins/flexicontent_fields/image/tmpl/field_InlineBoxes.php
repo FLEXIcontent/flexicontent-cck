@@ -507,7 +507,7 @@ foreach ($field->value as $index => $value)
 					<div class="fcclear"></div>
 				' : '
 					'.(empty($uploader_html) ? '' : '
-						<div style="display: inline-block; vertical-align: top;">
+						<div style="display: contents; vertical-align: top; height:0;">
 							' . $uploader_html->container . '
 						</div>
 					').'
@@ -522,7 +522,7 @@ foreach ($field->value as $index => $value)
 		.(($linkto_url || $usemediaurl || $usealt || $usetitle || $usedesc || $usecust1 || $usecust2) ?
 			'
 
-				<div class="fcimg_value_props" data-name="'.$elementid_n.'">
+				<div class="fcimg_value_props" data-name="'.$elementid_n.'" style="display: none;><!-- init form with compact mode !-->
     						'.$fc_preview_msg.'
 					<div class="fc-form-tbl fcinner fccompact">
 						' . @ $urllink . '
