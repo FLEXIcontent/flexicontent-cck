@@ -687,6 +687,11 @@ return $html;
 			else
 			{
 				$rows = & $filtered_rows;
+
+				// Batch-load field values (no rendering) so that the per-row
+				// getFieldDisplay() calls further below do not each trigger a
+				// separate single-item getFields() (~11 queries per item).
+				FlexicontentFields::getFields($rows, 'module');
 			}
 
 			$lists = array();
