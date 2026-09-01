@@ -1,6 +1,12 @@
 <?php
+/**
+ * @package     FLEXIcontent
+ * @subpackage  Tasks Core Component (Direct Access Protected & Universal Security Patched)
+ * @copyright   Copyright (C) FLEXIcontent. All rights reserved.
+ * @license     GNU/GPL v2 or later
+ */
+
 use Joomla\String\StringHelper;
-//use Joomla\CMS\Application\CMSApplication;
 
 if (!defined('JPATH_BASE'))
 {
@@ -17,7 +23,7 @@ if (!defined('JPATH_BASE'))
 	}
 	else
 	{
-		define('JPATH_BASE', realpath(__DIR__.'/../../..'));
+		define('JPATH_BASE', realpath(__DIR__ . '/../../..'));
 	}
 }
 
@@ -29,14 +35,24 @@ class FlexicontentTasksCore
 
 	/**
 	 * Constructor
-	 *
-	 * @since 3.1.2
 	 */
 	function __construct()
 	{
-		// Saves the start time and memory usage.
-		//$start_time = microtime(true);
-		//$start_mem  = memory_get_usage();
+		// [SECURITY]: ป้องกัน Direct Access จาก Browser / Scanner
+		// อนุญาตเฉพาะ AJAX Request ที่ส่งมาจาก Domain ของเว็บไซต์ตัวเองเท่านั้น
+		$is_ajax = (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_REQUESTED_WITH']) === 'xmlhttprequest');
+		
+		$http_host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
+		$referer   = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
+		$is_valid_origin = (!empty($referer) && parse_url($referer, PHP_URL_HOST) === $http_host);
+
+		// หากเปิดผ่าน URL Browser ตรงๆ โดยไม่มี AJAX Header หรือมาจากเว็บภายนอก ให้ปฏิเสธทันที
+		if (!$is_ajax || !$is_valid_origin)
+		{
+			header('HTTP/1.1 403 Forbidden');
+			header('Content-Type: text/plain; charset=utf-8');
+			exit('Access Denied: Direct browser requests to this endpoint are strictly forbidden.');
+		}
 
 		require_once JPATH_BASE . '/includes/defines.php';
 		require_once JPATH_BASE . '/includes/framework.php';
@@ -46,25 +62,31 @@ class FlexicontentTasksCore
 
 		if (!defined('FLEXI_J40GE'))
 		{
-			$jversion = new \Joomla\CMS\Version;
-			define('FLEXI_J40GE', version_compare( $jversion->getShortVersion(), '3.99.99', '>' ) );
+			if (class_exists('\\Joomla\\CMS\\Version'))
+			{
+				$jversion = new \Joomla\CMS\Version;
+				define('FLEXI_J40GE', version_compare($jversion->getShortVersion(), '3.99.99', '>'));
+			}
+			elseif (class_exists('JVersion'))
+			{
+				$jversion = new JVersion;
+				define('FLEXI_J40GE', version_compare($jversion->getShortVersion(), '3.99.99', '>'));
+			}
+			else
+			{
+				define('FLEXI_J40GE', false);
+			}
 		}
 
-		/**
-		 * Instantiate the application.
-		 */
 		if (!FLEXI_J40GE)
 		{
-			$app = \Joomla\CMS\Factory::getApplication($client_name);
+			$app = class_exists('\\Joomla\\CMS\\Factory')
+				? \Joomla\CMS\Factory::getApplication($client_name)
+				: JFactory::getApplication($client_name);
 			$app->initialise();
 		}
 		else
 		{
-			// Alternative is (untested)
-			//$app = CMSApplication::getInstance($client_name);
-			//$app->initialise();
-
-			// Boot the DI container
 			$container = \Joomla\CMS\Factory::getContainer();
 
 			$container->alias('session.web', 'session.web.' . $client_name)
@@ -74,79 +96,74 @@ class FlexicontentTasksCore
 				->alias(\Joomla\Session\Session::class, 'session.web.' . $client_name)
 				->alias(\Joomla\Session\SessionInterface::class, 'session.web.' . $client_name);
 
-			// Instantiate the application.
 			$app = $is_admin
 				? $container->get(\Joomla\CMS\Application\AdministratorApplication::class)
 				: $container->get(\Joomla\CMS\Application\SiteApplication::class);
 
-			// Set the application as global app
 			\Joomla\CMS\Factory::$application = $app;
 		}
 
-		// Call the task
+		// [FIX 1 - Broken Access Control]: Task Whitelisting
 		$jinput = $app->input;
 		$task   = $jinput->get('task', '', 'cmd');
-		$this->$task();
 
-		//$diff = round(1000000 * 10 * (microtime(true) - $start_time)) / 10;  echo sprintf('<br/>Time: %.3f s<br/>', $diff/1000000);  echo sprintf('<br/>Time: %.3f s<br/>', memory_get_usage() - $start_mem);
+		$allowed_tasks = array('txtautocomplete', 'viewtags');
+
+		if (in_array($task, $allowed_tasks) && method_exists($this, $task))
+		{
+			$this->$task();
+		}
+		else
+		{
+			header('HTTP/1.1 403 Forbidden');
+			jexit('Invalid task or access denied.');
+		}
 	}
 
 
 	/**
-	 * Logic to get text search autocomplete strings
-	 *
-	 * @access public
-	 * @return void
-	 * @since 3.1.2
+	 * Search Autocomplete Logic
 	 */
 	public function txtautocomplete()
 	{
-		// Call plugin, (e.g. to load category data)
 		$this->_callPlugins();
 		global $globalcats;
 
-		$app     = \Joomla\CMS\Factory::getApplication();
+		$app = $this->_getApp();
 		$jinput  = $app->input;
-		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams($this->option);
+		
+		$cparams = class_exists('\\Joomla\\CMS\\Component\\ComponentHelper')
+			? \Joomla\CMS\Component\ComponentHelper::getParams($this->option)
+			: JComponentHelper::getParams($this->option);
+		
 		$use_tmp = true;
 
-		// Get request variables
-		$type    = $jinput->get('type', '', 'cmd');
-		$text    = $jinput->get('text', '', 'string');
-		$lang    = $jinput->get('lang', '', 'cmd');
-		$lang    = substr($lang, 0,2);
+		$type = $jinput->get('type', '', 'cmd');
+		$text = $jinput->get('text', '', 'string');
+		$lang = $jinput->get('lang', '', 'cmd');
+		$lang = substr($lang, 0, 2);
 
-		$pageSize = $jinput->get('pageSize', 20, 'int');
-		$pageNum  = $jinput->get('pageNum', 1, 'int');
-		
-		// Make sure the pageNum start with 1 to avoid SQL errors
-		if ($pageNum < 1)
-		{
-			$pageNum = 1;
-		}
-		
+		// [FIX 2 - Strict Integer Constraints]
+		$pageSize = max(1, $jinput->get('pageSize', 20, 'int'));
+		$pageNum  = max(1, $jinput->get('pageNum', 1, 'int'));
 		$usesubs  = $jinput->get('usesubs', 1, 'int');
 
-		$min_word_len = $app->getUserState( $this->option.'.min_word_len', 0 );
-		$filtercat    = $cparams->get('filtercat', 0);      // Filter items using currently selected language
-		$show_noauth  = $cparams->get('show_noauth', 0);   // Show unauthorized items
+		$min_word_len = $app->getUserState($this->option . '.min_word_len', 0);
+		$filtercat    = $cparams->get('filtercat', 0);
+		$show_noauth  = $cparams->get('show_noauth', 0);
 
-		// Get category ID(s)
 		$cid  = $jinput->get('cid', 0, 'int');
 		$cids = $jinput->get('cids', '', 'string');
 
-		// CASE 1: Single category view, zero or string means ignore and use 'cids'
 		if ($cid)
 		{
 			$_cids = array($cid);
 		}
-
-		// CASE 2: Multi category view
 		elseif (!empty($cids))
 		{
 			if (!is_array($cids))
 			{
-				$_cids = preg_replace( '/[^0-9,]/i', '', (string) $cids );
+				$_cids = preg_replace('/[^0-9,]/i', '', (string) $cids);
 				$_cids = explode(',', $_cids);
 			}
 			else
@@ -154,162 +171,131 @@ class FlexicontentTasksCore
 				$_cids = $cids;
 			}
 		}
-
-		// No category id was given
 		else
 		{
 			$_cids = array();
 		}
 
-
-		// Make sure given data are integers ...
+		// [FIX 3 - Blind SQL Injection Prevention]
 		$cids = array();
-
-		foreach ($_cids as $i => $_id)
+		foreach ($_cids as $_id)
 		{
-			if ((int) $_id)
+			$clean_id = (int) $_id;
+			if ($clean_id > 0)
 			{
-				$cids[] = (int) $_id;
+				$cids[] = $clean_id;
 			}
 		}
 
-		// Sub - cats
-		if ($usesubs)
+		if ($usesubs && !empty($cids))
 		{
-			// Find descendants of the categories
 			$subcats = array();
 			foreach ($cids as $_id)
 			{
-				if ( !isset($globalcats[$_id]) ) continue;
+				if (!isset($globalcats[$_id])) continue;
 				$subcats = array_merge($subcats, $globalcats[$_id]->descendantsarray);
 			}
-			$cids = array_unique($subcats);
+			$cids = array_unique(array_map('intval', $subcats));
 		}
 
-		$cid_list = implode(',', $cids);
+		$cid_list = !empty($cids) ? implode(',', $cids) : '';
 
-		// Nothing to do
-		if ( $type!='basic_index' && $type!='adv_index' ) jexit();
-		if ( !strlen($text) ) jexit();
+		if ($type != 'basic_index' && $type != 'adv_index') jexit();
+		if (!strlen($text)) jexit();
 
-
-		// All starting words are exact words but last word is a ... word prefix
-		$search_prefix = $cparams->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
+		$search_prefix = $cparams->get('add_search_prefix') ? 'vvv' : '';
 		$words = preg_split('/\s\s*/u', $text);
 
 		$_words = array();
 		foreach ($words as & $_w)
 		{
-			$_words[] = !$search_prefix  ?  trim($_w)  :  preg_replace('/(\b[^\s,\.]+\b)/u', $search_prefix.'$0', trim($_w));
+			$_words[] = !$search_prefix ? trim($_w) : preg_replace('/(\b[^\s,\.]+\b)/u', $search_prefix . '$0', trim($_w));
 		}
-		$newtext = '+' . implode( ' +', $_words ) .'*';  //print_r($_words); exit;
+		$newtext = '+' . implode(' +', $_words) . '*';
 
-		// Query CLAUSE for match the given text
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = $this->_getDbo();
 		$quoted_text = $db->escape($newtext, true);
-		$quoted_text = $db->Quote( $quoted_text, false );
-		$_text_match  = ' MATCH (si.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
+		$quoted_text = $db->Quote($quoted_text, false);
+		$_text_match = ' MATCH (si.search_index) AGAINST (' . $quoted_text . ' IN BOOLEAN MODE) ';
 
-		// Query retieval limits
-		$limitstart = $pageSize * ($pageNum - 1);
-		$limit      = $pageSize;
+		$limitstart = (int) ($pageSize * ($pageNum - 1));
+		$limit      = (int) $pageSize;
 
 		$lang_where = '';
 
 		if ($filtercat)
 		{
 			$lta = 'i';
-			$lang_where .= ' AND (' . $lta . '.language LIKE ' . $db->Quote( $lang .'%' ) . ' OR ' . $lta . '.language="*" ) ';
-			//$lang_where .= ' AND (' . $lta . '.language = ' . $db->Quote(\Joomla\CMS\Factory::getLanguage()->getTag()) . ' OR ' . $lta . '.language = ' . $db->Quote('*') . ')';
+			$current_lang_tag = $this->_getLanguageTag();
+			$lang_where .= ' AND (' . $lta . '.language LIKE ' . $db->Quote($lang . '%') . ' OR ' . $lta . '.language = ' . $db->Quote($current_lang_tag) . ' OR ' . $lta . '.language="*" ) ';
 		}
 
 		$access_where = '';
-		$joinaccess = '';
+		$joinaccess   = '';
 
-		/*if (!$show_noauth)
-		{
-			$user = \Joomla\CMS\Factory::getUser();
-			$aid_arr = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
-			$aid_list = implode(",", $aid_arr);
-			$access_where .= ' AND ty.access IN (0,'.$aid_list.')';
-			$access_where .= ' AND mc.access IN (0,'.$aid_list.')';
-			$access_where .= ' AND  i.access IN (0,'.$aid_list.')';
-		}*/
+		$_nowDate  = 'UTC_TIMESTAMP()';
+		$nullDate  = $db->getNullDate();
 
-		// Dates for publish up / down
-		$_nowDate = 'UTC_TIMESTAMP()'; //$db->Quote($now);
-		$nullDate = $db->getNullDate();
-
-		// Do query ...
-		$tbl = $type=='basic_index' ? 'flexicontent_items_ext' : 'flexicontent_advsearch_index';
-		$query 	= 'SELECT si.item_id, si.search_index'    //.', '. $_text_match. ' AS score'  // THIS MAYBE SLOW
-			.' FROM #__' . $tbl . ' AS si'
-			.' JOIN '. ($use_tmp ? '#__flexicontent_items_tmp' : '#__content') .' AS i ON i.id = si.item_id'
-			.(($access_where && !$use_tmp) || ($filtercat && !$use_tmp) || $type !== 'basic_index' ?
+		$tbl = ($type == 'basic_index') ? 'flexicontent_items_ext' : 'flexicontent_advsearch_index';
+		$query = 'SELECT si.item_id, si.search_index'
+			. ' FROM #__' . $tbl . ' AS si'
+			. ' JOIN ' . ($use_tmp ? '#__flexicontent_items_tmp' : '#__content') . ' AS i ON i.id = si.item_id'
+			. (($access_where && !$use_tmp) || ($filtercat && !$use_tmp) || $type !== 'basic_index' ?
 				' JOIN #__flexicontent_items_ext AS ie ON i.id = ie.item_id ' : '')
-			.($access_where ? ' JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id' : '')
-			.($access_where ? ' JOIN #__categories AS mc ON mc.id = i.catid' : '')
-			.($cid_list ? ' JOIN #__flexicontent_cats_item_relations AS rel ON i.id = rel.itemid AND rel.catid IN ('.$cid_list.')' : '')
-			.$joinaccess
-			.' WHERE '. $_text_match
-			.'   AND i.state IN (1,-5) '   //(FLEXI_J16GE ? 2:-1) // TODO search archived
-			.'   AND ( i.publish_up is NULL OR i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' ) '
-			.'   AND ( i.publish_down is NULL OR i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' ) '
+			. ($access_where ? ' JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id' : '')
+			. ($access_where ? ' JOIN #__categories AS mc ON mc.id = i.catid' : '')
+			. ($cid_list ? ' JOIN #__flexicontent_cats_item_relations AS rel ON i.id = rel.itemid AND rel.catid IN (' . $cid_list . ')' : '')
+			. $joinaccess
+			. ' WHERE ' . $_text_match
+			. '   AND i.state IN (1,-5) '
+			. '   AND ( i.publish_up is NULL OR i.publish_up = ' . $db->Quote($nullDate) . ' OR i.publish_up <= ' . $_nowDate . ' ) '
+			. '   AND ( i.publish_down is NULL OR i.publish_down = ' . $db->Quote($nullDate) . ' OR i.publish_down >= ' . $_nowDate . ' ) '
 			. $lang_where
 			. $access_where
-			//.' ORDER BY score DESC'  // THIS MAYBE SLOW
-			.' LIMIT '.$limitstart.', '.$limit
-			;
+			. ' LIMIT ' . $limitstart . ', ' . $limit;
+
 		$data = $db->setQuery($query)->loadAssocList();
-		//print_r($data); exit;
 
-		// Get last word (this is a word prefix) and remove it from words array
 		$word_prefix = array_pop($words);
-
-		// Reconstruct search text with complete words (not including last)
 		$complete_words = implode(' ', $words);
 
-		// Find out the words that matched
 		$words_found = array();
-		$regex = '/(\b)('.$search_prefix.$word_prefix.'\w*)(\b)/iu';
+		// [FIX 4 - ReDoS Protection]
+		$regex = '/(\b)(' . preg_quote($search_prefix, '/') . preg_quote($word_prefix, '/') . '\w*)(\b)/iu';
 
-		foreach ($data as $_d)
+		if (!empty($data))
 		{
-			//echo $_d['item_id'] . ' ';
-			if (preg_match_all($regex, $_d['search_index'], $matches) )
+			foreach ($data as $_d)
 			{
-				//print_r($matches[2]); exit;
-				foreach ($matches[2] as $_m)
+				if (preg_match_all($regex, $_d['search_index'], $matches))
 				{
-					if ($search_prefix)
+					foreach ($matches[2] as $_m)
 					{
-						$_m = preg_replace('/\b'.$search_prefix.'/u', '', $_m);
+						if ($search_prefix)
+						{
+							$_m = preg_replace('/\b' . $search_prefix . '/u', '', $_m);
+						}
+						$_m_low = StringHelper::strtolower($_m, 'UTF-8');
+						$words_found[$_m_low] = 1;
 					}
-					$_m_low = StringHelper::strtolower($_m, 'UTF-8');
-					$words_found[$_m_low] = 1;
 				}
 			}
 		}
-		//print_r($words_found); exit;
 
-		// Pagination not appropriate when using autocomplete ...
 		$options = array();
 		$options['Total'] = count($words_found);
-
-		// Create responce and JSON encode it
 		$options['Matches'] = array();
 		$n = 0;
+
 		foreach ($words_found as $_w => $i)
 		{
 			if (!$search_prefix)
 			{
-				// Word too short
-				if (StringHelper::strlen($_w) < $min_word_len )
+				if (StringHelper::strlen($_w) < $min_word_len)
 				{
 					continue;
 				}
 
-				// Stopword or too common
 				if ($this->_isStopWord($_w, $tbl))
 				{
 					continue;
@@ -317,8 +303,8 @@ class FlexicontentTasksCore
 			}
 
 			$options['Matches'][] = array(
-				'text' => $complete_words.($complete_words ? ' ' : '').$_w,
-				'id' => $complete_words.($complete_words ? ' ' : '').$_w
+				'text' => $complete_words . ($complete_words ? ' ' : '') . $_w,
+				'id'   => $complete_words . ($complete_words ? ' ' : '') . $_w
 			);
 			++$n;
 
@@ -333,23 +319,39 @@ class FlexicontentTasksCore
 
 
 	/**
-	 * Method to fetch the tags for selecting in item form
-	 *
-	 * @since 1.5
+	 * Method to fetch tags
 	 */
 	public function viewtags()
 	{
-		// Check for request forgeries
-		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		$token_valid = false;
+		if (class_exists('\\Joomla\\CMS\\Session\\Session'))
+		{
+			$token_valid = \Joomla\CMS\Session\Session::checkToken('request');
+		}
+		elseif (class_exists('JSession'))
+		{
+			$token_valid = JSession::checkToken('request');
+		}
 
-		require_once \Joomla\Filesystem\Path::clean(JPATH_SITE . '/components/com_flexicontent/helpers/permission.php');
+		if (!$token_valid)
+		{
+			$invalid_token_msg = class_exists('\\Joomla\\CMS\\Language\\Text')
+				? \Joomla\CMS\Language\Text::_('JINVALID_TOKEN')
+				: (class_exists('JText') ? JText::_('JINVALID_TOKEN') : 'Invalid Token');
+			jexit($invalid_token_msg);
+		}
 
-		$app    = \Joomla\CMS\Factory::getApplication();
-		$perms  = FlexicontentHelperPerm::getPerm();
+		$permission_helper = JPATH_SITE . '/components/com_flexicontent/helpers/permission.php';
+		if (file_exists($permission_helper))
+		{
+			require_once $permission_helper;
+		}
+
+		$app   = $this->_getApp();
+		$perms = class_exists('FlexicontentHelperPerm') ? FlexicontentHelperPerm::getPerm() : (object) array('CanUseTags' => true, 'CanCreateTags' => true);
 
 		@ob_end_clean();
 
-		//header('Content-type: application/json; charset=utf-8');
 		header('Content-type: application/json');
 		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 		header("Cache-Control: no-cache");
@@ -357,32 +359,35 @@ class FlexicontentTasksCore
 
 		$array = array();
 
-		if (!$perms->CanUseTags)
+		if (isset($perms->CanUseTags) && !$perms->CanUseTags)
 		{
 			$this->_loadLanguage();
+			$no_access_msg = class_exists('\\Joomla\\CMS\\Language\\Text')
+				? \Joomla\CMS\Language\Text::_('FLEXI_FIELD_NO_ACCESS')
+				: (class_exists('JText') ? JText::_('FLEXI_FIELD_NO_ACCESS') : 'No Access');
+
 			$array[] = (object) array(
-				'id' => '0',
-				'name' => \Joomla\CMS\Language\Text::_('FLEXI_FIELD_NO_ACCESS')
+				'id'   => '0',
+				'name' => $no_access_msg
 			);
 		}
 		else
 		{
-			// If (search) text is just whitespace then set limit to a much higher value
 			$q = $app->input->getString('q', '');
 			$q = $q !== parse_url(@$_SERVER["REQUEST_URI"], PHP_URL_PATH) ? $q : '';
 
 			$limit = $q && !trim($q) ? 10000 : 500;
 
-			$tagobjs = $this->_gettags($q, $limit);
+			$tagobjs = $this->_getTags($q, $limit);
 
 			if ($tagobjs)
 			{
 				foreach ($tagobjs as $tag)
 				{
 					$array[] = (object) array(
-						'id' => $tag->id,
-						'name' => $tag->name,
-						'translated_text' => $tag->fa_text,
+						'id'              => $tag->id,
+						'name'            => $tag->name,
+						'translated_text' => isset($tag->fa_text) ? $tag->fa_text : ''
 					);
 				}
 			}
@@ -390,103 +395,128 @@ class FlexicontentTasksCore
 			if (empty($array))
 			{
 				$this->_loadLanguage();
+				$can_create = isset($perms->CanCreateTags) && $perms->CanCreateTags;
+				$tag_key = $can_create ? 'FLEXI_NEW_TAG_ENTER_TO_CREATE' : 'FLEXI_NO_TAGS_FOUND';
+				
+				$empty_msg = class_exists('\\Joomla\\CMS\\Language\\Text')
+					? \Joomla\CMS\Language\Text::_($tag_key)
+					: (class_exists('JText') ? JText::_($tag_key) : ($can_create ? 'New tag: enter to create' : 'No tags found'));
+
 				$array[] = (object) array(
-					'id' => '0',
-					'name' => \Joomla\CMS\Language\Text::_($perms->CanCreateTags ? 'FLEXI_NEW_TAG_ENTER_TO_CREATE' : 'FLEXI_NO_TAGS_FOUND'),
-					'translated_text' => '',
+					'id'              => '0',
+					'name'            => $empty_msg,
+					'translated_text' => ''
 				);
 			}
 		}
 
-		jexit(json_encode($array/*, JSON_UNESCAPED_UNICODE*/));
+		jexit(json_encode($array));
 	}
 
 
-	// ***
-	// *** Helper methods
-	// ***
-
-	private function _isStopWord($word, $tbl='flexicontent_items_ext', $col='search_index')
+	// Private & Compatibility Helpers
+	private function _isStopWord($word, $tbl = 'flexicontent_items_ext', $col = 'search_index')
 	{
-		$app     = \Joomla\CMS\Factory::getApplication();
-		$jinput  = $app->input;
+		$app = $this->_getApp();
+		$jinput = $app->input;
 		if ($jinput->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = $this->_getDbo();
 		$quoted_word = $db->escape($word, true);
-		$query = 'SELECT '.$col
-			.' FROM #__'.$tbl
-			.' WHERE MATCH ('.$col.') AGAINST ("+'.$quoted_word.'")'
-			.' LIMIT 1';
+		$query = 'SELECT ' . $col
+			. ' FROM #__' . $tbl
+			. ' WHERE MATCH (' . $col . ') AGAINST ("+' . $quoted_word . '")'
+			. ' LIMIT 1';
 		$result = $db->setQuery($query)->loadAssocList();
 
-		return !empty($return) ? true : false;
+		return !empty($result) ? true : false;
 	}
 
 
 	private function _callPlugins()
 	{
-		$app     = \Joomla\CMS\Factory::getApplication();
-		$jinput  = $app->input;
+		$app = $this->_getApp();
+		$jinput = $app->input;
 		if ($jinput->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
 
-		// Call system plugin
 		$extfolder = 'system';
 		$extname   = 'flexisystem';
-		$className = 'plg'. ucfirst($extfolder).$extname;
+		$className = 'plg' . ucfirst($extfolder) . $extname;
 
-		require_once JPATH_SITE . '/plugins/'.$extfolder.'/'.$extname.'/'.$extname.'.php';
-
-		$dispatcher   = JEventDispatcher::getInstance();
-		$plg_db_data  = \Joomla\CMS\Plugin\PluginHelper::getPlugin($extfolder, $extname);
-		$plg = new $className($dispatcher, array('type'=>$extfolder, 'name'=>$extname, 'params'=>$plg_db_data->params));
-
-		// Load cached category data
-		global $globalcats;
-		if (FLEXI_CACHE)
+		$plugin_path = JPATH_SITE . '/plugins/' . $extfolder . '/' . $extname . '/' . $extname . '.php';
+		if (!file_exists($plugin_path))
 		{
-			// Add the category tree to categories cache
-			$catscache = \Joomla\CMS\Factory::getCache('com_flexicontent_cats');
-			$catscache->setCaching(1);                  // Force cache ON
-			$catscache->setLifeTime(FLEXI_CACHE_TIME);  // Set expire time (default is 1 hour)
+			return;
+		}
+		require_once $plugin_path;
+
+		$plg_db_data = class_exists('\\Joomla\\CMS\\Plugin\\PluginHelper')
+			? \Joomla\CMS\Plugin\PluginHelper::getPlugin($extfolder, $extname)
+			: (class_exists('JPluginHelper') ? JPluginHelper::getPlugin($extfolder, $extname) : (object) array('params' => ''));
+
+		if (class_exists('JEventDispatcher'))
+		{
+			$dispatcher = JEventDispatcher::getInstance();
+			$plg = new $className($dispatcher, array('type' => $extfolder, 'name' => $extname, 'params' => isset($plg_db_data->params) ? $plg_db_data->params : ''));
+		}
+		elseif (class_exists('\\Joomla\\CMS\\Factory'))
+		{
+			$dispatcher = \Joomla\CMS\Factory::getApplication();
+			$plg = new $className($dispatcher, array('type' => $extfolder, 'name' => $extname, 'params' => isset($plg_db_data->params) ? $plg_db_data->params : ''));
+		}
+
+		global $globalcats;
+		$cache_enabled = defined('FLEXI_CACHE') && FLEXI_CACHE;
+		$cache_time    = defined('FLEXI_CACHE_TIME') ? FLEXI_CACHE_TIME : 3600;
+
+		if ($cache_enabled && isset($plg))
+		{
+			$catscache = class_exists('\\Joomla\\CMS\\Factory')
+				? \Joomla\CMS\Factory::getCache('com_flexicontent_cats')
+				: JFactory::getCache('com_flexicontent_cats');
+
+			$catscache->setCaching(1);
+			$catscache->setLifeTime($cache_time);
 			$globalcats = $catscache->get(
 				array($plg, 'getCategoriesTree'),
 				array()
 			);
 		}
-		else
+		elseif (isset($plg) && method_exists($plg, 'getCategoriesTree'))
 		{
 			$globalcats = $plg->getCategoriesTree();
 		}
 	}
 
 
-	/**
-	 * Method to fetch tags according to a given text
-	 *
-	 * @return object
-	 * @since 1.0
-	 */
 	private function _getTags($text = '', $limit = 500)
 	{
-		if (!defined('FLEXI_FISH'))    define('FLEXI_FISH'		, ($params->get('flexi_fish', 0) && (\Joomla\CMS\Plugin\PluginHelper::isEnabled('system', 'falangdriver' ))) ? 1 : 0);
-
-		$app     = \Joomla\CMS\Factory::getApplication();
-		$jinput  = $app->input;
+		$app = $this->_getApp();
+		$jinput = $app->input;
 		if ($jinput->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$cparams = class_exists('\\Joomla\\CMS\\Component\\ComponentHelper')
+			? \Joomla\CMS\Component\ComponentHelper::getParams($this->option)
+			: JComponentHelper::getParams($this->option);
+
+		$falang_enabled = class_exists('\\Joomla\\CMS\\Plugin\\PluginHelper')
+			? \Joomla\CMS\Plugin\PluginHelper::isEnabled('system', 'falangdriver')
+			: (class_exists('JPluginHelper') ? JPluginHelper::isEnabled('system', 'falangdriver') : false);
+
+		if (!defined('FLEXI_FISH'))   define('FLEXI_FISH', ($cparams->get('flexi_fish', 0) && $falang_enabled) ? 1 : 0);
+		if (!defined('FLEXI_FALANG')) define('FLEXI_FALANG', defined('FLEXI_FISH') && FLEXI_FISH);
+
+		$db = $this->_getDbo();
 
 		$lang_code = $jinput->getString('item_lang');
 		$lang_code = $lang_code && $lang_code !== '*'
-          ? $lang_code
-          : $jinput->getString('lang', \Joomla\CMS\Factory::getLanguage()->getTag());
+			? $lang_code
+			: $jinput->getString('lang', $this->_getLanguageTag());
 
 		$query = $db->getQuery(true)
 			->select('la.*')
 			->from('#__languages AS la')
-			->where('la.lang_code = ' . $db->quote($lang_code))
-			;
+			->where('la.lang_code = ' . $db->quote($lang_code));
 
 		$lang = $db->setQuery($query)->loadObject();
 
@@ -494,24 +524,31 @@ class FlexicontentTasksCore
 			->select('ft.*')
 			->from('#__flexicontent_tags AS ft')
 			->where('ft.published = 1')
-			->order('ft.name')
-			;
+			->order('ft.name');
 
-		!FLEXI_FALANG
-			? $query->select('"" AS fa_text')
-			:	$query
-					->select('fa.value AS fa_text')
-					->leftjoin('#__falang_content AS fa ON fa.reference_table = "tags" AND fa.reference_field = "title" AND fa.reference_id = ft.jtag_id'
-						. ' AND fa.language_id = ' . (int) $lang->lang_id);
+		if (defined('FLEXI_FALANG') && FLEXI_FALANG && $lang)
+		{
+			$query->select('fa.value AS fa_text')
+				->leftjoin('#__falang_content AS fa ON fa.reference_table = "tags" AND fa.reference_field = "title" AND fa.reference_id = ft.jtag_id AND fa.language_id = ' . (int) $lang->lang_id);
+		}
+		else
+		{
+			$query->select('"" AS fa_text');
+		}
 
 		if (trim($text))
 		{
 			$escaped_text = $db->escape($text, true);
 			$quoted_text  = $db->Quote('%' . $escaped_text . '%', false);
 
-			!FLEXI_FALANG
-				? $query->where('name LIKE ' . $quoted_text)
-				: $query->where('ft.name LIKE ' . $quoted_text . ' OR fa.value LIKE ' . $quoted_text);
+			if (defined('FLEXI_FALANG') && FLEXI_FALANG)
+			{
+				$query->where('ft.name LIKE ' . $quoted_text . ' OR fa.value LIKE ' . $quoted_text);
+			}
+			else
+			{
+				$query->where('name LIKE ' . $quoted_text);
+			}
 		}
 
 		$tags = $db->setQuery($query, 0, (int) $limit)->loadObjectlist();
@@ -520,20 +557,49 @@ class FlexicontentTasksCore
 	}
 
 
-	/**
-	 * Method to load language files
-	 *
-	 * @return object
-	 * @since 3.2.1.4
-	 */
 	private function _loadLanguage()
 	{
-		$app     = \Joomla\CMS\Factory::getApplication();
-		$jinput  = $app->input;
+		$app = $this->_getApp();
+		$jinput = $app->input;
 		if ($jinput->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
 
-		// Load english language file for 'com_flexicontent' component then override with current language file
-		\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
-		\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+		if (class_exists('\\Joomla\\CMS\\Factory'))
+		{
+			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+		}
+		elseif (class_exists('JFactory'))
+		{
+			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+		}
+	}
+
+
+	private function _getApp()
+	{
+		return class_exists('\\Joomla\\CMS\\Factory')
+			? \Joomla\CMS\Factory::getApplication()
+			: JFactory::getApplication();
+	}
+
+	private function _getDbo()
+	{
+		return class_exists('\\Joomla\\CMS\\Factory')
+			? \Joomla\CMS\Factory::getDbo()
+			: JFactory::getDbo();
+	}
+
+	private function _getLanguageTag()
+	{
+		if (class_exists('\\Joomla\\CMS\\Factory'))
+		{
+			return \Joomla\CMS\Factory::getLanguage()->getTag();
+		}
+		elseif (class_exists('JFactory'))
+		{
+			return JFactory::getLanguage()->getTag();
+		}
+		return 'en-GB';
 	}
 }
