@@ -40,7 +40,7 @@ class FlexicontentTasksCore
 	{
 		// [SECURITY]: ป้องกัน Direct Access จาก Browser / Scanner
 		// อนุญาตเฉพาะ AJAX Request ที่ส่งมาจาก Domain ของเว็บไซต์ตัวเองเท่านั้น
-		$is_ajax = (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_REQUESTED_WITH']) === 'xmlhttprequest');
+		$is_ajax = (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest');
 		
 		$http_host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
 		$referer   = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
