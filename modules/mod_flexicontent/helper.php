@@ -91,7 +91,7 @@ class modFlexicontentHelper
 			// On encode chaque composant du path séparément pour préserver les slashes
 			$parts = parse_url($decoded);
 			$path  = implode('/', array_map('rawurlencode', explode('/', $parts['path'] ?? '')));
-			$encoded = ($parts['scheme'] ?? '') . ($parts['scheme'] ? '://' : '') 
+			$encoded = ($parts['scheme'] ?? '') . (!empty($parts['scheme']) ? '://' : '')
 				. ($parts['host'] ?? '') 
 				. $path 
 				. (isset($parts['query']) ? '?' . $parts['query'] : '');
