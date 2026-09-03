@@ -450,7 +450,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		{
 			$query = $db->getQuery(true)
 				->select('*')
-				->from('#__flexicontent_reviews_dev AS r')
+				->from('#__flexicontent_reviews AS r')
 				->where('r.content_id = ' . (int) $content_id)
 				->where('r.type = ' . $db->Quote($review_type))
 				->where('r.user_id = ' . (int) $user->id);
@@ -477,6 +477,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 					<input type="hidden" name="review_id"  value="'. ($review ? $review->id : '').'" form="fcvote_review_form_' . $item->id . '" />
 					<input type="hidden" name="content_id"  value="' . $item->id . '" />
 					<input type="hidden" name="review_type" value="' . $review_type . '" />
+					<input type="hidden" name="' . \Joomla\CMS\Session\Session::getFormToken() . '" value="1" />
 
 					<table class="fc-form-tbl fcinner">
 
@@ -534,11 +535,13 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 	function storereviewform()
 	{
+		// Check for request forgeries
+		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+
 		$app  = \Joomla\CMS\Factory::getApplication();
 		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$db   = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 
-		$review_id   = $this->input->get('review_id', 0, 'int');
 		$content_id  = $this->input->get('content_id', 0, 'int');
 		$review_type = $this->input->get('review_type', 'item', 'cmd');
 
@@ -604,16 +607,29 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		{
 			// Get a 'flexicontent_reviews' \Joomla\CMS\Table\Table instance
 			$review = \Joomla\CMS\Table\Table::getInstance($type = 'flexicontent_reviews', $prefix = '', $config = array());
+			$review_id = 0;
 
-			$review_props = array('content_id' => $content_id, 'user_id' => $user->id, 'type' => $review_type);
-
-			if ($review_id)
+			// Logged-in users may update only the review found by their server-side
+			// identity. Guest submissions always create a new review; accepting a
+			// caller-supplied ID would let one guest overwrite another guest's review.
+			if ($user->id)
 			{
-				$review_props['id'] = $review_id;
-			}
+				$review_props = array(
+					'content_id' => $content_id,
+					'user_id'    => (int) $user->id,
+					'type'       => $review_type,
+				);
 
-			// Try to find existing review and delete
-			if (!$review->load($review_props))
+				if ($review->load($review_props))
+				{
+					$review_id = (int) $review->id;
+				}
+				else
+				{
+					$review->reset();
+				}
+			}
+			else
 			{
 				$review->reset();
 			}
@@ -679,7 +695,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 	 *
 	 * @since   3.3.0
 	 */
-	private function reviewPrepare($content_id, & $item = null, & $field = null, $errors = null, $checkSubmit = true)
+	private function reviewPrepare($content_id, & $item = null, & $field = null, & $errors = null, $checkSubmit = true)
 	{
 		$app  = \Joomla\CMS\Factory::getApplication();
 		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
