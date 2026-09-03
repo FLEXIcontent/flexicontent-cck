@@ -14,7 +14,7 @@
     </files>
 
     <languages>
-        <language tag="en-GB">language/en-GB/flexifieldsearch.ini</language>
+        <language tag="en-GB">language/en-GB/en-GB.plg_system_flexifieldsearch.ini</language>
     </languages>
 
     <config>
