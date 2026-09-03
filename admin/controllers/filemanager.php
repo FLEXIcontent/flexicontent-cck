@@ -300,9 +300,10 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 				// Validate file URL
 				$data['filename_original'] = flexicontent_html::dataFilter($data['filename_original'], 4000, 'STRING', 0);  // Clean bad text/html
-				$data['filename'] = $url = flexicontent_html::dataFilter($data['filename'], 4000, 'URL', 0);  // Clean bad text/html
+				$data['filename'] = flexicontent_html::dataFilter($data['filename'], 4000, 'URL', 0);  // Clean bad text/html
 
-				// Get file size from submitted field (file URL), set to zero if no size unit specified
+				// Use the submitted file size when present. Do not probe an untrusted
+				// remote URL from the server merely to calculate optional metadata.
 				if (!empty($data['size']))
 				{
 					$arr_sizes = array('KBs' => 1024, 'MBs' => (1024 * 1024), 'GBs' => (1024 * 1024 * 1024));
@@ -312,14 +313,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 				else
 				{
-					$data['size'] = $model->get_file_size_from_url($url);
-
-					if ($data['size'] === -999)
-					{
-						$app->enqueueMessage($url . ' -- ' . $model->getError(), 'warning');
-					}
-
-					$data['size'] = $data['size'] < 0 ? 0 : $data['size'];
+					$data['size'] = 0;
 				}
 				break;
 
