@@ -949,9 +949,6 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 
 			//parse_str($_POST['fcdata_serialized'], $form_data);  // Combined with "jQuery.serialize()", but cannot be used to overcome 'max_input_vars'
 
-			//$total_vars_e = null;
-			//$form_data_e = $this->parse_json_decode_eval( $_POST['fcdata_serialized'], $total_vars_e );
-
 			$total_vars = null;
 			$form_data = $this->parse_json_decode($_POST['fcdata_serialized'], $total_vars);
 
@@ -1683,54 +1680,6 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 
 		// Last visit within time limit, do not count new hit
 		return 0;
-	}
-
-
-	/*
-	 * Function to restore serialized form data with:  JSON.stringify( jform.serializeArray() )
-	 * This is currently UNUSED, because we use an alternative without eval ...
-	 */
-	private function parse_json_decode_eval($string, &$count)
-	{
-		$parsed = array();    // Decompressed data to be returned
-
-		$pairs = json_decode($string, true);
-		$count = count($pairs);
-		//echo "<pre>"; print_r($pairs); exit;
-
-		foreach ($pairs as $pair) {
-			$name = $pair['name'];
-			$value = $pair['value'];
-
-			// Escape name and value strings
-			$name = str_replace('\\', '\\\\', $name);
-			$value = str_replace('\\', '\\\\', $value);
-
-			// Always quote the value even if it is numeric, this is proper as parameters in Joomla are treated as strings
-			$value = '"' . str_replace('"', '\"', $value) . '"';
-
-			// CASE: name is an array,  some'var[index1][inde'x2]=value    -->   ][\'some\\\'var\'][\'index1\'][\'index2\']=\'value\';
-			if (strpos($name, '[') !== false) {
-				// we prepend an the 'result' array so replace first [ with ][
-				$name = preg_replace('|\[|', '][', $name, 1);
-				// Add double slashes to all multi-level index names of the array to handles slashes and Quote them thus treating indexes as strings
-				$name = str_replace(array('\'', '[', ']'), array('\\\'', '[\'', '\']'), $name);
-				// WHEN no index name, remove the empty string being used as index, thus an integer auto-incremented index will be used (e.g. checkbox values)
-				$name = str_replace("['']", '[]', $name);
-				// Final create the assignment to be evaluated:  $parsed['na']['me'] = 'value';
-				eval('$parsed[\'' . $name . ' = ' . $value . "; \n");
-			}
-
-			// CASE name is not an array, a single variable assignment
-			else {
-				// Add double slashes to index name
-				$name = str_replace('\'', '\\\'', $name);
-				// Finally quote the name, thus treating index as string and create assignment to be evaluated: $parsed['name'] = 'value';
-				eval('$parsed[\'' . $name . '\'] = ' . $value . "; \n");
-			}
-		}
-		//echo "<pre>"; print_r($parsed);  echo "</pre>"; exit;
-		return $parsed;
 	}
 
 

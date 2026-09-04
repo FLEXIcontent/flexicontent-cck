@@ -314,6 +314,7 @@ class FlexicontentTasksCore
 			}
 		}
 
+		header('Content-Type: application/json; charset=utf-8');
 		jexit(json_encode($options));
 	}
 

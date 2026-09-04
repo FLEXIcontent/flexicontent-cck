@@ -1094,7 +1094,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		// Print link ... must include layout and current filtering url vars, etc
 		// **********************************************************************
 
-		$curr_url   = str_replace('&', '&amp;', $_SERVER['REQUEST_URI']);
+		$curr_url   = htmlspecialchars($_SERVER['REQUEST_URI'], ENT_QUOTES, 'UTF-8');
 		$print_link = $curr_url .(strstr($curr_url, '?') ? '&amp;'  : '?').'pop=1&amp;tmpl=component&amp;print=1';
 		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx', ''));
 
