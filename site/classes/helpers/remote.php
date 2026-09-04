@@ -98,11 +98,15 @@ class flexicontent_remote
 		{
 			$host = '';
 
-			if (class_exists('\Joomla\CMS\Uri\Uri'))
+			// Prefer an administrator-configured canonical URL. Uri::root() is based
+			// on request data on many servers, so it must not define an SSRF trust
+			// exception by itself.
+			if (class_exists('\Joomla\CMS\Factory'))
 			{
 				try
 				{
-					$host = (string) parse_url(\Joomla\CMS\Uri\Uri::root(), PHP_URL_HOST);
+					$live_site = (string) \Joomla\CMS\Factory::getApplication()->get('live_site', '');
+					$host = $live_site ? (string) parse_url($live_site, PHP_URL_HOST) : '';
 				}
 				catch (\Throwable $e)
 				{
@@ -110,7 +114,12 @@ class flexicontent_remote
 				}
 			}
 
-			self::$site_host = strtolower(trim($host, '.'));
+			if ($host === '' && !empty($_SERVER['SERVER_NAME']))
+			{
+				$host = (string) $_SERVER['SERVER_NAME'];
+			}
+
+			self::$site_host = strtolower(trim($host, '.[]'));
 		}
 
 		return self::$site_host;
@@ -224,6 +233,20 @@ class flexicontent_remote
 				return self::isPublicIp(long2ip((int) hexdec(substr($hex, 24, 8))));
 			}
 
+			// 6to4 and Teredo also embed an IPv4 endpoint. Refuse the IPv6 form
+			// whenever that endpoint is not globally routable.
+			if (substr($hex, 0, 4) === '2002')
+			{
+				return self::isPublicIp(long2ip((int) hexdec(substr($hex, 4, 8))));
+			}
+
+			if (substr($hex, 0, 8) === '20010000')
+			{
+				$embedded = ((int) hexdec(substr($hex, 24, 8))) ^ 0xffffffff;
+
+				return self::isPublicIp(long2ip($embedded));
+			}
+
 			if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false)
 			{
 				return false;
@@ -332,6 +355,49 @@ class flexicontent_remote
 
 
 	/**
+	 * Confirm that a private resolution of the site hostname points back to the
+	 * current web server. Public resolutions do not need this exception.
+	 */
+	protected static function isSiteResolution($ips)
+	{
+		$server_ip = isset($_SERVER['SERVER_ADDR']) ? trim((string) $_SERVER['SERVER_ADDR'], '[]') : '';
+
+		if (filter_var($server_ip, FILTER_VALIDATE_IP) === false)
+		{
+			return false;
+		}
+
+		$matched = false;
+		$has_private = false;
+
+		foreach ($ips as $ip)
+		{
+			$ip = trim((string) $ip, '[]');
+
+			if (self::isPublicIp($ip))
+			{
+				continue;
+			}
+
+			$has_private = true;
+
+			$same_ip = @inet_pton($ip) === @inet_pton($server_ip);
+			$both_loopback = ($ip === '::1' || strpos($ip, '127.') === 0)
+				&& ($server_ip === '::1' || strpos($server_ip, '127.') === 0);
+
+			if (!$same_ip && !$both_loopback)
+			{
+				return false;
+			}
+
+			$matched = true;
+		}
+
+		return !$has_private || $matched;
+	}
+
+
+	/**
 	 * Validate a remote file URL
 	 *
 	 * @param   string  $url    The URL (a missing scheme is normalized to http://)
@@ -403,21 +469,21 @@ class flexicontent_remote
 			return false;
 		}
 
-		$is_site = $host === self::getSiteHost() && $host !== '';
-		$trusted = self::isTrustedHost($host, $port);
-
-		if ($port !== $default_port && !$trusted && !$is_site)
-		{
-			$error = 'Only the default HTTP / HTTPS ports are allowed for hosts that are not trusted';
-
-			return false;
-		}
-
 		$ips = self::resolveHost($host);
 
 		if (!$ips)
 		{
 			$error = 'Host could not be resolved';
+
+			return false;
+		}
+
+		$is_site = $host === self::getSiteHost() && $host !== '' && self::isSiteResolution($ips);
+		$trusted = self::isTrustedHost($host, $port);
+
+		if ($port !== $default_port && !$trusted && !$is_site)
+		{
+			$error = 'Only the default HTTP / HTTPS ports are allowed for hosts that are not trusted';
 
 			return false;
 		}
@@ -485,6 +551,11 @@ class flexicontent_remote
 		$base   = parse_url($target['url']);
 		$origin = $base['scheme'] . '://' . $base['host'] . (isset($base['port']) ? ':' . $base['port'] : '');
 
+		if (substr($location, 0, 1) === '?')
+		{
+			return $origin . (isset($base['path']) ? $base['path'] : '/') . $location;
+		}
+
 		if (substr($location, 0, 1) === '/')
 		{
 			return $origin . self::normalizePath($location);
@@ -549,6 +620,7 @@ class flexicontent_remote
 		$status  = 0;
 		$headers = array();
 		$sent    = 0;
+		$expected_abort = false;
 
 		if (!function_exists('curl_init'))
 		{
@@ -560,6 +632,7 @@ class flexicontent_remote
 		$options = array(
 			CURLOPT_URL            => $target['url'],
 			CURLOPT_RESOLVE        => array($target['pin']),
+			CURLOPT_PROXY          => '',
 			CURLOPT_FOLLOWLOCATION => false,
 			CURLOPT_MAXREDIRS      => 0,
 			CURLOPT_CONNECTTIMEOUT => self::CONNECT_TIMEOUT,
@@ -602,6 +675,14 @@ class flexicontent_remote
 			$options[CURLOPT_HTTPGET]     = true;
 			$options[CURLOPT_RANGE]       = '0-0';
 			$options[CURLOPT_MAXFILESIZE] = 1024 * 1024;
+			$options[CURLOPT_WRITEFUNCTION] = function ($ch, $data) use (& $expected_abort)
+			{
+				// Headers are all a range probe needs. Abort before buffering a body if
+				// the server ignores Range or uses an unknown-length response.
+				$expected_abort = true;
+
+				return 0;
+			};
 		}
 		else
 		{
@@ -637,7 +718,14 @@ class flexicontent_remote
 		$error = curl_error($ch);
 		curl_close($ch);
 
-		return array('status' => $status, 'headers' => $headers, 'errno' => $errno, 'error' => $error, 'sent' => $sent);
+		return array(
+			'status'         => $status,
+			'headers'        => $headers,
+			'errno'          => $errno,
+			'error'          => $error,
+			'sent'           => $sent,
+			'expected_abort' => $expected_abort,
+		);
 	}
 
 
@@ -645,11 +733,12 @@ class flexicontent_remote
 	 * Follow redirects manually (validating and pinning every hop) until a final response is received
 	 *
 	 * @param   string  $url
-	 * @param   string  $error
+	 * @param   string   $error
+	 * @param   boolean  $trusted_only  Require every hop to match the proxy trusted-host policy
 	 *
 	 * @return  array|boolean  false on failure, otherwise: target, status, headers, size (-1 if unknown)
 	 */
-	public static function resolveFinal($url, & $error = null)
+	public static function resolveFinal($url, & $error = null, $trusted_only = false)
 	{
 		$error = '';
 
@@ -667,6 +756,13 @@ class flexicontent_remote
 			return false;
 		}
 
+		if ($trusted_only && self::hasTrustedHosts() && !$target['trusted'] && !$target['is_site'])
+		{
+			$error = 'Host is not in the trusted remote hosts list';
+
+			return false;
+		}
+
 		for ($hop = 0; $hop <= self::MAX_REDIRECTS; $hop++)
 		{
 			$res = self::request('HEAD', $target);
@@ -678,7 +774,7 @@ class flexicontent_remote
 			}
 
 			// The filesize limit of the ranged GET being exceeded still gives us the headers
-			if ($res['errno'] && $res['errno'] !== CURLE_FILESIZE_EXCEEDED)
+			if ($res['errno'] && $res['errno'] !== CURLE_FILESIZE_EXCEEDED && empty($res['expected_abort']))
 			{
 				$error = 'Connection failed: ' . $res['error'];
 
@@ -702,6 +798,13 @@ class flexicontent_remote
 				if (!$target)
 				{
 					$error = 'Redirect target was rejected: ' . $error;
+
+					return false;
+				}
+
+				if ($trusted_only && self::hasTrustedHosts() && !$target['trusted'] && !$target['is_site'])
+				{
+					$error = 'Redirect target host is not in the trusted remote hosts list';
 
 					return false;
 				}
@@ -768,7 +871,7 @@ class flexicontent_remote
 		// No length in the response headers: try a GET of the first byte (no redirects are followed)
 		$res = self::request('RANGE', $final['target']);
 
-		if ((!$res['errno'] || $res['errno'] === CURLE_FILESIZE_EXCEEDED) && $res['status'] >= 200 && $res['status'] < 300)
+		if ((!$res['errno'] || $res['errno'] === CURLE_FILESIZE_EXCEEDED || !empty($res['expected_abort'])) && $res['status'] >= 200 && $res['status'] < 300)
 		{
 			if ($res['status'] === 206 && !empty($res['headers']['content-range']) && preg_match('#/\s*(\d+)\s*$#', $res['headers']['content-range'], $m))
 			{
@@ -806,31 +909,10 @@ class flexicontent_remote
 			return false;
 		}
 
-		$first = self::validateUrl($url, $error);
-
-		if (!$first)
-		{
-			return false;
-		}
-
-		if (self::hasTrustedHosts() && !$first['trusted'] && !$first['is_site'])
-		{
-			$error = 'Host is not in the trusted remote hosts list';
-
-			return false;
-		}
-
-		$final = self::resolveFinal($url, $error);
+		$final = self::resolveFinal($url, $error, true);
 
 		if (!$final)
 		{
-			return false;
-		}
-
-		if (self::hasTrustedHosts() && !$final['target']['trusted'] && !$final['target']['is_site'])
-		{
-			$error = 'Redirect target host is not in the trusted remote hosts list';
-
 			return false;
 		}
 

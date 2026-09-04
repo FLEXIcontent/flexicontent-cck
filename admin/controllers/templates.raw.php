@@ -847,9 +847,26 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 			return false;
 		}
 
-		$path = realpath(\Joomla\Filesystem\Path::clean(JPATH_ROOT . DS . 'components' . DS . 'com_flexicontent' . DS . 'templates' . DS . $layout_name));
+		$templates_root = realpath(\Joomla\Filesystem\Path::clean(JPATH_ROOT . DS . 'components' . DS . 'com_flexicontent' . DS . 'templates'));
+		$path = $templates_root === false
+			? false
+			: realpath(\Joomla\Filesystem\Path::clean($templates_root . DS . $layout_name));
 
-		return $path !== false && is_dir($path) ? $path : false;
+		if ($path === false || !is_dir($path))
+		{
+			return false;
+		}
+
+		$compare_root = rtrim($templates_root, '/\\') . DIRECTORY_SEPARATOR;
+		$compare_path = rtrim($path, '/\\') . DIRECTORY_SEPARATOR;
+
+		if (DIRECTORY_SEPARATOR === '\\')
+		{
+			$compare_root = strtolower($compare_root);
+			$compare_path = strtolower($compare_path);
+		}
+
+		return strpos($compare_path, $compare_root) === 0 ? $path : false;
 	}
 
 
@@ -877,7 +894,14 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 
 		// The resolved file must be inside the layout folder (this also protects against symlinks pointing outside of it)
 		$prefix = rtrim($layout_path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+		$compare_file = $file_path;
 
-		return strpos($file_path, $prefix) === 0 ? $file_path : false;
+		if (DIRECTORY_SEPARATOR === '\\')
+		{
+			$prefix = strtolower($prefix);
+			$compare_file = strtolower($compare_file);
+		}
+
+		return strpos($compare_file, $prefix) === 0 ? $file_path : false;
 	}
 }
