@@ -850,7 +850,7 @@ if ($js)
 
 										<div class="fcclear"></div>
 
-										<div class="nowrap_box" style="margin: 6px 0;">
+										<div class="nowrap_box" style="margin: 6px 0; display: flex;">
 											<div class="<?php echo $this->btn_sm_class . ' ' . $this->tooltip_class; ?>" style="padding: 0 0 0 4px;"
 											     data-title="<?php echo flexicontent_html::getToolTip('', 'JGLOBAL_CHECK_ALL', 1, 1); ?>" data-placement="bottom"
 											>
