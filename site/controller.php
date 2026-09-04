@@ -1532,8 +1532,9 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 						$email_values = $db->loadColumn();
 
 						foreach ($email_values as $i => $email_value) {
-							if ( @unserialize($email_value)!== false || $email_value === 'b:0;' ) {
-								$email_values[$i] = unserialize($email_value);
+							$unserialized = @unserialize($email_value, array('allowed_classes' => false));
+							if ( $unserialized !== false || $email_value === 'b:0;' ) {
+								$email_values[$i] = $unserialized;
 							} else {
 								$email_values[$i] = array('addr' => $email_value, 'text' => '');
 							}
@@ -1940,6 +1941,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				.' WHERE rel.item_id = ' . $content_id
 				.' AND rel.field_id = ' . $field_id
 				.' AND rel.valueorder = ' . $value_order
+				.' AND fi.field_type = ' . $db->Quote('weblink')
 				. $access_clauses['and']
 				;
 		$link_data = $db->setQuery($query)->loadObject();
@@ -2060,8 +2062,15 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		 * Increment hits counter
 		 */
 
-		// Recover the link array (url|title|hits)
-		$link = unserialize($link_data->value);
+		// Recover the link array (url|title|hits), never allow object instantiation from the stored value
+		$link = @unserialize($link_data->value, array('allowed_classes' => false));
+
+		if (!is_array($link) || empty($link['link']) || !is_string($link['link']))
+		{
+			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_FDC_FAILED_TO_FIND_DATA'), 'warning');
+			$this->setRedirect($this->refererURL);
+			return;
+		}
 
 		// Force an absolute URL, if relative URL prepend Joomla root uri
 		$url = flexicontent_html::make_absolute_url($link['link']);
@@ -2550,7 +2559,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		// Work-around with content length missing during 1st try, just retry once more
 		if (!isset($headers["Content-Length"]) && $retry)
 		{
-			return $this->get_file_size_from_url($original_url, --$retry);
+			return $this->_get_file_size_from_url($original_url, --$retry);
 		}
 
 		$headers["Content-Length"] = is_array($headers["Content-Length"]) ? end($headers["Content-Length"]) : $headers["Content-Length"];
