@@ -283,6 +283,12 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		// Initialize variables
 		$app     = \Joomla\CMS\Factory::getApplication();
 
+		// Check for request forgeries (votes of logged users are stored in the DB per user)
+		if ($app->getIdentity()->id)
+		{
+			\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		}
+
 		$id   = $this->input->get('id', 0, 'int');
 		$cid  = $this->input->get('cid', 0, 'int');
 		$url  = $this->input->get('url', '', 'string');
@@ -318,6 +324,12 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 	{
 		$app     = \Joomla\CMS\Factory::getApplication();
 		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
+
+		// Check for request forgeries (favourites of logged users are stored in the DB per user)
+		if ($user->id)
+		{
+			\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		}
 		//$db      = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		//$cparams = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
 

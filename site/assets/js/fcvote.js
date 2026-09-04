@@ -96,8 +96,10 @@ jQuery(document).ready(function(){
 
 			var rating = jQuery(this).text();
 
+			var fc_csrf_token = (typeof Joomla !== 'undefined' && Joomla.getOptions) ? (Joomla.getOptions('csrf.token') || '') : '';
 			var voteurl = base_url
-				+ 'index.php?option=com_flexicontent&task=reviews.ajaxvote&user_rating=' + rating + '&cid=' + itemID + '&xid=' + xid;
+				+ 'index.php?option=com_flexicontent&task=reviews.ajaxvote&user_rating=' + rating + '&cid=' + itemID + '&xid=' + xid
+				+ (fc_csrf_token ? '&' + fc_csrf_token + '=1' : '');
 
 			jQuery.ajax({
 				url: voteurl,

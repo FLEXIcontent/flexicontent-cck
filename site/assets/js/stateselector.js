@@ -29,6 +29,7 @@ var fc_statehandler = function(options)
 		id: '',
 		script_url: base_url + 'index.php?option=com_flexicontent&format=raw',
 		task: '',
+		token: '',
 		state: '',
 		font_icons: true,
 		refresh_on_success: false
@@ -50,7 +51,7 @@ var fc_statehandler = function(options)
 		row.empty().addClass('ajax-loader');
 
 		jQuery.ajax({
-			url: this.options.script_url + '&task=' + this.options.task + '&id=' + id + '&state=' + state,
+			url: this.options.script_url + '&task=' + this.options.task + '&id=' + id + '&state=' + state + (this.options.token ? '&' + this.options.token + '=1' : ''),
 			dataType: 'json',
 			data: {
 				lang: (typeof fc_sef_lang != 'undefined' ? fc_sef_lang : '')

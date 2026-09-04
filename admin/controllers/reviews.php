@@ -619,6 +619,12 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		$cid = $this->input->get('cid', 0, 'int');
 		$xid = $this->input->get('xid', '', 'cmd');
 
+		// Check for request forgeries (votes of logged users are stored in the DB per user)
+		if ($user->id && !\Joomla\CMS\Session\Session::checkToken('request'))
+		{
+			return $this->_ajaxvote_error(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'), $xid ?: 'main', $no_ajax);
+		}
+
 		// Compatibility in case the voting originates from joomla's voting plugin
 		if ($no_ajax && !$cid)
 		{
