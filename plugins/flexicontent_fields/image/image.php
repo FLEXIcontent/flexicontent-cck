@@ -2529,6 +2529,16 @@ class plgFlexicontent_fieldsImage extends FCField
 		jimport('joomla.filesystem.file');
 		jimport('joomla.filesystem.path');
 
+		// Only a plain filename is accepted, refuse directory separators, parent-folder references and NULL bytes
+		$filename = (string) $filename;
+
+		if ($filename === '' || $filename !== basename($filename) || strpos($filename, '..') !== false || preg_match('#[/\\\\\x00]#', $filename))
+		{
+			$app->enqueueMessage('Field: ' . $field->label . ' : ' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD_UNABLE_TO_DELETE_FILE') . ': invalid filename', 'warning');
+
+			return false;
+		}
+
 		$image_source = (int) $field->parameters->get('image_source', 0);
 		$image_source = $image_source > 1 ? $this->nonImplementedMode($image_source, $field) : $image_source;
 		$target_dir   = (int) $field->parameters->get('target_dir', 1);
@@ -2551,6 +2561,8 @@ class plgFlexicontent_fieldsImage extends FCField
 		else
 		{
 			echo '<div class="alert alert-warning">image field id: ' . $field->id . ' is in intro-full mode, removeOriginalFile() should not have been called</div>';
+
+			return false;
 		}
 
 		// a. Delete the thumbnails (and associated WebP variants)

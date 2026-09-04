@@ -283,6 +283,12 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		// Initialize variables
 		$app     = \Joomla\CMS\Factory::getApplication();
 
+		// Check for request forgeries (votes of logged users are stored in the DB per user)
+		if ($app->getIdentity()->id)
+		{
+			\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		}
+
 		$id   = $this->input->get('id', 0, 'int');
 		$cid  = $this->input->get('cid', 0, 'int');
 		$url  = $this->input->get('url', '', 'string');
@@ -318,6 +324,12 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 	{
 		$app     = \Joomla\CMS\Factory::getApplication();
 		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
+
+		// Check for request forgeries (favourites of logged users are stored in the DB per user)
+		if ($user->id)
+		{
+			\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		}
 		//$db      = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
 		//$cparams = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
 
@@ -1068,11 +1080,12 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			}
 			$field_type = $field_id ? $fields_props[$field_id]->field_type : '';
 
-			$query  = 'SELECT DISTINCT f.id, f.filename, f.filename_original, f.altname, f.secure, f.url, f.hits, f.stamp, f.size'
+			$query  = 'SELECT DISTINCT f.id, f.filename, f.filename_original, f.altname, f.secure, f.url, f.hits, f.stamp, f.size, f.uploaded_by'
 					.($task !== 'download_file' && $task !== 'download_files'
 						? ', u.email as item_owner_email' .
 							', i.title as item_title, i.introtext as item_introtext, i.fulltext as item_fulltext' .
 							', i.language as item_language, ie.type_id as item_type_id, i.access as item_access' .
+							', i.state as item_state, i.created_by as item_created_by' .
 							// item and current category slugs (for URL in notifications)
 							', CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as itemslug' .
 							', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as catslug'
@@ -1100,6 +1113,23 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 					. $access_clauses['and']
 					;
 			$file = $db->setQuery($query)->loadObject();
+
+			/**
+			 * Complete the access checks that are not done via the SQL query
+			 * - direct file downloads (no content item / field in the URL): the file must be reachable via content that the user can view
+			 * - downloads via a content item: the item must be in a viewable state, unless user can edit it
+			 */
+			if (!empty($file) && $using_access)
+			{
+				if ($task === 'download_file' || $task === 'download_files')
+				{
+					$file->has_content_access = $this->_checkDirectFileAccess($file, $user) ? 1 : 0;
+				}
+				elseif ($file->has_content_access && !$this->_canViewItemState($content_id, $file->item_state, $file->item_created_by, $user))
+				{
+					$file->has_content_access = 0;
+				}
+			}
 
 			// Add target path (with target filename) for case we were not provide a custom name like when using download_tree task
 			static $used_names = array();
@@ -1192,12 +1222,14 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 					$app->enqueueMessage($msg, 'warning');
 				}
 
-				// Only abort further execution for single file download
+				// Abort further execution for single file download, for multi-file downloads skip the file
 				if ($task !== 'download_tree' && $task !== 'download_files')
 				{
 					$this->setRedirect('index.php', '');
 					return;
 				}
+
+				continue;
 			}
 
 
@@ -1208,19 +1240,21 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			if (!$file->url)
 			{
 				$basePath = $file->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;
-				$file->abspath = str_replace(DS, '/', \Joomla\Filesystem\Path::clean($basePath.DS.$file->filename));
+				$file->abspath = $this->_getSafeDownloadPath($basePath, $file->filename);
 
-				if (!file_exists($file->abspath))
+				if ($file->abspath === false || !is_file($file->abspath))
 				{
 					$msg = \Joomla\CMS\Language\Text::_( 'FLEXI_REQUESTED_FILE_DOES_NOT_EXIST_ANYMORE' );
 					$app->enqueueMessage($msg, 'notice');
 
-					// Only abort for single file download
+					// Abort for single file download, for multi-file downloads skip the file
 					if ($task !== 'download_tree' && $task !== 'download_files')
 					{
 						$this->setRedirect('index.php', '');
 						return;
 					}
+
+					continue;
 				}
 			}
 			else
@@ -1229,10 +1263,22 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				 * We may need absolute URL path later use \Joomla\CMS\Uri\Uri::root() !! for media manager Links
 				 * we may use readfile(Absolute URL) to force download of a URL link !!
 				 */
-				$file->abspath = Path::clean($file->url == 2
-					? JPATH_ROOT . '/' . $file->filename
-					: $file->filename
-				);
+				$file->abspath = $file->url == 2
+					? $this->_getSafeJMediaDownloadPath($file->filename)
+					: $file->filename;
+
+				if ($file->url == 2 && ($file->abspath === false || !is_file($file->abspath)))
+				{
+					$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_REQUESTED_FILE_DOES_NOT_EXIST_ANYMORE'), 'notice');
+
+					if ($task !== 'download_tree' && $task !== 'download_files')
+					{
+						$this->setRedirect('index.php', '');
+						return;
+					}
+
+					continue;
+				}
 			}
 
 
@@ -1340,9 +1386,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				$url = $file->url == 2
 					? \Joomla\CMS\Uri\Uri::root(true) . '/' . $file->filename
 					: $file->filename;
-				$abs_path = Path::clean($file->url == 2
-					? JPATH_ROOT . '/' . $file->filename
-					: $file->filename);
+				$abs_path = $file->abspath;
 
 				// For media manager links, check if the file exists
 				if ($file->url == 2 && !file_exists($abs_path))
@@ -1357,7 +1401,8 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 					}
 				}
 
-				$ext = strtolower(flexicontent_upload::getExt($url));
+				$extension_source = $file->url == 1 ? (string) parse_url($url, PHP_URL_PATH) : $url;
+				$ext = strtolower(flexicontent_upload::getExt($extension_source));
 
 				// Check for empty URL
 				if (empty($url))
@@ -1390,19 +1435,32 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 					if ($force_url_download && isset($force_url_download_exts[$ext]))
 					{
-						$size = $this->_get_file_size_from_url($url, $retry = true);
+						$proxy_limit = max(0, $force_url_download_max_kbs) * 1024;
+						$proxy_limit = $proxy_limit ? min($proxy_limit, 100 * (1024 * 1024)) : 0;
+						$remote_error = '';
+						$remote_download = $proxy_limit
+							? flexicontent_remote::prepareDownload($url, $proxy_limit, $remote_error)
+							: false;
 
-						if ($size != $file->size)
+						if ($remote_download && $remote_download['size'] >= 0)
 						{
-							$file->size = $size;
+							$file->size = $remote_download['size'];
 						}
+
+						$file->remote_download = $remote_download;
 					}
 
 					/**
 					 * Just redirect to the file URL. If force URL download is disabled, or does not match criteria.
 					 * Also do not force is file size is suspiciously small, propably it was calculated correctly !!
 					 */
-					if (!$force_url_download || !isset($force_url_download_exts[$ext]) || $file->size < 2048 || $file->size > ($force_url_download_max_kbs * 1024))
+					if (
+						!$force_url_download
+						|| !isset($force_url_download_exts[$ext])
+						|| empty($file->remote_download)
+						|| $file->size < 2048
+						|| $file->size > ($force_url_download_max_kbs * 1024)
+					)
 					{
 						// Redirect to the file download link
 						@header("Location: ".$url."","target=blank");
@@ -1509,14 +1567,21 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 						$db->setQuery($q);
 						$email_values = $db->loadColumn();
 
-						foreach ($email_values as $i => $email_value) {
-							if ( @unserialize($email_value)!== false || $email_value === 'b:0;' ) {
-								$email_values[$i] = unserialize($email_value);
-							} else {
-								$email_values[$i] = array('addr' => $email_value, 'text' => '');
+						foreach ($email_values as $email_value) {
+							$unserialized = @unserialize($email_value, array('allowed_classes' => false));
+							$addr = is_array($unserialized) && isset($unserialized['addr'])
+								? $unserialized['addr']
+								: $email_value;
+
+							if (!is_scalar($addr))
+							{
+								continue;
 							}
-							$addr = @ $email_values[$i]['addr'];
-							if ( $addr ) {
+
+							$addr = trim((string) $addr);
+
+							if ($addr && \Joomla\CMS\Mail\MailHelper::isEmailAddress($addr))
+							{
 								$email_recipients[$addr][] = $file;
 							}
 						}
@@ -1803,6 +1868,22 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		//echo '<pre>'; print_r($dlfile); exit;
 
 
+		/**
+		 * Remote (URL) files are only fetched through the validated, pinned remote client (flexicontent_remote),
+		 * which also applies the trusted hosts policy and a size limit. If the file cannot or must not be proxied,
+		 * redirect the browser to the URL instead (no server-side request is made in that case)
+		 */
+		$remote_download = !empty($dlfile->remote_download) ? $dlfile->remote_download : false;
+
+		if ($dlfile->url == 1)
+		{
+			if (!$remote_download)
+			{
+				@header("Location: " . $dlfile->filename, true);
+				$app->close();
+			}
+		}
+
 		// *****************************************
 		// Output an appropriate Content-Type header
 		// *****************************************
@@ -1819,7 +1900,10 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			: header("Content-Disposition: attachment; filename=\"".$dlfile->download_filename."\";" );
 
 		header("Content-Transfer-Encoding: binary");
-		header("Content-Length: " . ($dlfile->size_tmp ?: $dlfile->size));
+		if (($dlfile->size_tmp ?: $dlfile->size) > 0)
+		{
+			header("Content-Length: " . ($dlfile->size_tmp ?: $dlfile->size));
+		}
 
 
 		// *******************************
@@ -1831,20 +1915,17 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		$chunksize = 1 * (1024 * 1024); // 1MB, highest possible for fread should be 8MB
 		$filesize  = $dlfile->size_tmp ?: $dlfile->size;
 
-		// Do not try to read too big file URL files
-		if ($dlfile->url && $filesize > 100 * (1024 * 1024))
+		// Remote (URL) file: stream it through the validated, pinned remote client (the HTTP headers were already sent)
+		if ($remote_download)
 		{
-			@header("Location: ".$url."","target=blank");
-			$app->close();
+			flexicontent_remote::streamDownload($remote_download);
 		}
 		elseif ($filesize > $chunksize)
 		{
 			$handle = @fopen($dlfile->abspath_tmp ?: $dlfile->abspath, 'rb');
 
-			// Redirect to the exteral file download link if we failed to open the URL
-			if (!$handle && $dlfile->url)
+			if (!$handle)
 			{
-				@header("Location: ".$url."","target=blank");
 				$app->close();
 			}
 
@@ -1918,6 +1999,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				.' WHERE rel.item_id = ' . $content_id
 				.' AND rel.field_id = ' . $field_id
 				.' AND rel.valueorder = ' . $value_order
+				.' AND fi.field_type = ' . $db->Quote('weblink')
 				. $access_clauses['and']
 				;
 		$link_data = $db->setQuery($query)->loadObject();
@@ -2038,8 +2120,15 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		 * Increment hits counter
 		 */
 
-		// Recover the link array (url|title|hits)
-		$link = unserialize($link_data->value);
+		// Recover the link array (url|title|hits), never allow object instantiation from the stored value
+		$link = @unserialize($link_data->value, array('allowed_classes' => false));
+
+		if (!is_array($link) || empty($link['link']) || !is_string($link['link']))
+		{
+			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_FDC_FAILED_TO_FIND_DATA'), 'warning');
+			$this->setRedirect($this->refererURL);
+			return;
+		}
 
 		// Force an absolute URL, if relative URL prepend Joomla root uri
 		$url = flexicontent_html::make_absolute_url($link['link']);
@@ -2237,6 +2326,297 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 
 	/**
+	 * Resolve a relative download path below an allowed root and reject path or
+	 * symlink escapes (including legacy database rows).
+	 *
+	 * @return  string|boolean
+	 */
+	protected function _getSafeDownloadPath($root, $filename)
+	{
+		$filename = str_replace('\\', '/', (string) $filename);
+
+		if (
+			$filename === ''
+			|| strpos($filename, "\0") !== false
+			|| $filename[0] === '/'
+			|| preg_match('#^[a-zA-Z]:/#', $filename)
+			|| preg_match('#(^|/)\.\.(/|$)#', $filename)
+		)
+		{
+			return false;
+		}
+
+		$root_real = realpath($root);
+
+		if ($root_real === false)
+		{
+			return false;
+		}
+
+		$candidate = Path::clean($root_real . DS . str_replace('/', DS, $filename));
+
+		if (!$this->_isDownloadPathInside($candidate, $root_real))
+		{
+			return false;
+		}
+
+		if (file_exists($candidate) || is_link($candidate))
+		{
+			$resolved = realpath($candidate);
+
+			if ($resolved === false || !$this->_isDownloadPathInside($resolved, $root_real))
+			{
+				return false;
+			}
+		}
+
+		return str_replace(DS, '/', $candidate);
+	}
+
+
+	/**
+	 * Resolve a Joomla Media path below com_media's configured roots.
+	 *
+	 * @return  string|boolean
+	 */
+	protected function _getSafeJMediaDownloadPath($filename)
+	{
+		$filename = ltrim(str_replace('\\', '/', (string) $filename), '/');
+		$media_params = \Joomla\CMS\Component\ComponentHelper::getParams('com_media');
+		$media_roots = array_unique(array_filter(array(
+			trim((string) $media_params->get('file_path', 'images'), '/\\'),
+			trim((string) $media_params->get('image_path', 'images'), '/\\'),
+		)));
+
+		foreach ($media_roots as $relative_root)
+		{
+			$relative_root = str_replace('\\', '/', $relative_root);
+
+			if ($filename !== $relative_root && strpos($filename, $relative_root . '/') !== 0)
+			{
+				continue;
+			}
+
+			$relative_file = ltrim(substr($filename, strlen($relative_root)), '/');
+			$resolved = $this->_getSafeDownloadPath(JPATH_ROOT . DS . str_replace('/', DS, $relative_root), $relative_file);
+
+			if ($resolved !== false)
+			{
+				return $resolved;
+			}
+		}
+
+		return false;
+	}
+
+
+	protected function _isDownloadPathInside($path, $root)
+	{
+		$path = rtrim(Path::clean($path), '/\\');
+		$root = rtrim(Path::clean($root), '/\\');
+
+		if (DS === '\\')
+		{
+			$path = strtolower($path);
+			$root = strtolower($root);
+		}
+
+		return $path === $root || strpos($path, $root . DS) === 0;
+	}
+
+
+	/**
+	 * Check that a directly downloaded file (no content item / field given in the URL) is reachable by the given user
+	 *
+	 * A file is reachable if:
+	 *  - user is a file manager (can view all files) or is the uploader of the file, or
+	 *  - the file is not assigned to any content item (direct-link file), or
+	 *  - the file is assigned to at least one content item that the user can view (item, category, type and field access
+	 *    levels, and item being in a viewable state)
+	 *
+	 * @param   object  $file  The file record (needs properties: id, uploaded_by)
+	 * @param   object  $user  The user object
+	 *
+	 * @return  boolean
+	 */
+	protected function _checkDirectFileAccess($file, $user)
+	{
+		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
+
+		// File managers and the uploader of the file always have access
+		if ($user->authorise('core.admin', 'com_flexicontent')
+			|| $user->authorise('flexicontent.viewallfiles', 'com_flexicontent')
+			|| ($user->id && (int) $file->uploaded_by === (int) $user->id)
+		)
+		{
+			return true;
+		}
+
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$escaped_filename = $db->escape((string) $file->filename, true);
+		$quoted_filename  = $db->Quote($escaped_filename, false);
+
+		// Cover every supported assignment mechanism. Image fields store the file
+		// name inside a serialized multi-property value, while editor-button links
+		// are tracked in #__flexicontent_file_usage.
+		$image_match = '('
+			. 'rel.value LIKE CONCAT(' . $db->Quote('%"originalname";s:%:"') . ', ' . $quoted_filename . ', ' . $db->Quote('"%') . ')'
+			. ' OR rel.value LIKE CONCAT(' . $db->Quote('%"existingname";s:%:"') . ', ' . $quoted_filename . ', ' . $db->Quote('"%') . ')'
+			. ')';
+
+		$query = 'SELECT rel.item_id, fi.access AS field_access'
+			. ' FROM #__flexicontent_fields_item_relations AS rel'
+			. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id'
+			. ' WHERE ('
+			. '   (fi.field_type IN (' . $db->Quote('file') . ', ' . $db->Quote('mediafile') . ') AND rel.value = ' . $db->Quote((string) (int) $file->id) . ')'
+			. '   OR (fi.field_type = ' . $db->Quote('image') . ' AND fi.attribs LIKE ' . $db->Quote('%"image_source":"0"%') . ' AND ' . $image_match . ')'
+			. ' )'
+			. ' UNION ALL'
+			. ' SELECT usage_row.id AS item_id, 0 AS field_access'
+			. ' FROM #__flexicontent_file_usage AS usage_row'
+			. ' WHERE usage_row.file_id = ' . (int) $file->id
+			. ' AND usage_row.context = ' . $db->Quote('com_content.article');
+		$items = $db->setQuery($query)->loadObjectList();
+
+		// File is not assigned to any content item, thus file level access (already checked) is the only requirement
+		if (!$items)
+		{
+			return true;
+		}
+
+		foreach ($items as $item)
+		{
+			if ($this->_canViewAssignedItem($item->item_id, $item->field_access, $user))
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+
+	/**
+	 * Check that a content item is in a state that is viewable by the given user
+	 *
+	 * Published (1), in-progress (-5) and archived (2) items are viewable by everyone,
+	 * items in other states only by their owner or by users that can edit them / change their state
+	 *
+	 * @param   integer  $item_id     The item id
+	 * @param   integer  $state       The item state
+	 * @param   integer  $created_by  The item owner
+	 * @param   object   $user        The user object
+	 *
+	 * @return  boolean
+	 */
+	protected function _canViewItemState($item_id, $state, $created_by, $user)
+	{
+		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
+
+		return $this->_canViewAssignedItem($item_id, 0, $user);
+	}
+
+
+	/**
+	 * Check item, type, field and complete category-chain access and publication
+	 * for a file assignment.
+	 */
+	protected function _canViewAssignedItem($item_id, $field_access, $user)
+	{
+		$item_id = (int) $item_id;
+
+		if (!$item_id)
+		{
+			return false;
+		}
+
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$view_levels = array_values(array_unique(array_map('intval', $user->getAuthorisedViewLevels())));
+		$allowed_levels = array_flip(array_merge(array(0), $view_levels));
+
+		if (!isset($allowed_levels[(int) $field_access]))
+		{
+			return false;
+		}
+
+		$query = 'SELECT i.id, i.state, i.created_by, i.access, i.catid, i.publish_up, i.publish_down, ty.access AS type_access'
+			. ' FROM #__content AS i'
+			. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
+			. ' LEFT JOIN #__flexicontent_types AS ty ON ty.id = ie.type_id'
+			. ' WHERE i.id = ' . $item_id;
+		$item = $db->setQuery($query)->loadObject();
+
+		if (!$item || !isset($item->type_access) || !isset($allowed_levels[(int) $item->access]) || !isset($allowed_levels[(int) $item->type_access]))
+		{
+			return false;
+		}
+
+		$category_ids = $db->setQuery(
+			'SELECT catid FROM #__flexicontent_cats_item_relations WHERE itemid = ' . $item_id
+		)->loadColumn();
+		$category_ids[] = (int) $item->catid;
+		$category_ids = array_values(array_unique(array_filter(array_map('intval', $category_ids))));
+
+		if (!$category_ids)
+		{
+			return false;
+		}
+
+		$aid_list = implode(',', array_keys($allowed_levels));
+		$query = 'SELECT c.id'
+			. ', SUM(CASE WHEN parent.id IS NOT NULL AND parent.access NOT IN (' . $aid_list . ') THEN 1 ELSE 0 END) AS blocked_access'
+			. ', SUM(CASE WHEN parent.id IS NOT NULL AND parent.published <> 1 THEN 1 ELSE 0 END) AS blocked_publication'
+			. ' FROM #__categories AS c'
+			. ' LEFT JOIN #__categories AS parent ON parent.lft <= c.lft AND parent.rgt >= c.rgt AND parent.extension = c.extension'
+			. ' WHERE c.id IN (' . implode(',', $category_ids) . ')'
+			. ' GROUP BY c.id';
+		$categories = $db->setQuery($query)->loadObjectList();
+		$has_accessible_category = false;
+		$has_published_category = false;
+
+		foreach ($categories as $category)
+		{
+			if ((int) $category->blocked_access === 0)
+			{
+				$has_accessible_category = true;
+
+				if ((int) $category->blocked_publication === 0)
+				{
+					$has_published_category = true;
+				}
+			}
+		}
+
+		if (!$has_accessible_category)
+		{
+			return false;
+		}
+
+		$asset = 'com_content.article.' . $item_id;
+		$ignore_publication = $user->id && (
+			(int) $item->created_by === (int) $user->id
+			|| $user->authorise('core.edit', $asset)
+			|| $user->authorise('core.edit.state', $asset)
+		);
+
+		if ($ignore_publication)
+		{
+			return true;
+		}
+
+		$now = \Joomla\CMS\Factory::getDate('now')->toSql();
+		$null_date = $db->getNullDate();
+		$publish_up = (string) $item->publish_up;
+		$publish_down = (string) $item->publish_down;
+		$is_scheduled = $publish_up && $publish_up !== $null_date && $publish_up > $now;
+		$is_expired = $publish_down && $publish_down !== $null_date && $publish_down < $now;
+		$is_published = in_array((int) $item->state, array(1, -5, 2), true);
+
+		return $is_published && !$is_scheduled && !$is_expired && $has_published_category;
+	}
+
+
+	/**
 	 * Traverse Tree to create folder structure and get/prepare file objects
 	 *
 	 * @access private
@@ -2362,78 +2742,25 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 	 */
 
 	/**
-	 * Returns the size of a file without downloading it, or -1 if the file size could not be determined.
+	 * Returns the size of a remote file without downloading it, or -1 if the file size could not be determined
 	 *
-	 * @param $url - The location of the remote file to download. Cannot be null or empty.
+	 * All remote requests go through flexicontent_remote (validated URL, pinned connection, no automatic redirects)
 	 *
-	 * @return The size of the file referenced by $url,
-	 * or -1 if the size could not be determined
-	 * or -999 if there was an error
+	 * @param   string   $url    The URL of the remote file
+	 * @param   boolean  $retry  Unused, kept for backwards compatibility
+	 *
+	 * @return  integer  The size of the file, -1 if it could not be determined, -999 on error (see getError())
 	 */
 	private function _get_file_size_from_url($url, $retry = true)
 	{
-		$original_url = $url;
-		$retry = $retry === true ? 6 : 0;
+		$error = '';
+		$size  = flexicontent_remote::headSize($url, $error);
 
-		// clear last error
-		$ignore_last_error = error_get_last();
-
-		try {
-			$headers = array('Location' => $url);
-
-			// Follow the Location headers until the actual file URL is known
-			while (isset($headers['Location']))
-			{
-				$url = is_array($headers['Location'])
-					? end($headers['Location'])
-					: $headers['Location'];
-
-				$headers = @ get_headers($url, 1);
-
-				// Check for get headers failing to execute
-				if ($headers === false)
-				{
-					$error = error_get_last();
-
-					$error_message = is_array($error) && isset($error['message'])
-						? $error['message']
-						: 'Error retrieving headers of URL';
-					$this->setError($error_message);
-
-					return -999;
-				}
-
-				// Check for bad response from server, e.g. not found 404 , or 403 no access
-				$n = 0;
-				while(isset($headers[$n]))
-				{
-					$code = (int) substr($headers[$n], 9, 3);
-					if ($code < 200 || $code >= 400 )
-					{
-						$this->setError($headers[$n]);
-						return -999;
-					}
-					$n++;
-				}
-			}
-		}
-
-		catch (RuntimeException $e) {
-			$this->setError($e->getMessage());
-			return -999;  // indicate a fatal error
-		}
-
-		// Work-around with content length missing during 1st try, just retry once more
-		if (!isset($headers["Content-Length"]) && $retry)
+		if ($size === -999)
 		{
-			return $this->get_file_size_from_url($original_url, --$retry);
+			$this->setError($error ?: 'Error retrieving headers of URL');
 		}
 
-		$headers["Content-Length"] = is_array($headers["Content-Length"]) ? end($headers["Content-Length"]) : $headers["Content-Length"];
-
-		// Get file size, -1 indicates that the size could not be determined
-		return isset($headers["Content-Length"])
-			? $headers["Content-Length"]
-			: -1;
+		return $size;
 	}
 }

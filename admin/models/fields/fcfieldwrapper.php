@@ -73,6 +73,27 @@ class JFormFieldFCFieldWrapper extends \Joomla\CMS\Form\FormField
 		$app->input->set('unique_tmp_itemid', $unique_tmp_itemid);
 		$app->setUserState($option.'.edit.item.unique_tmp_itemid', $unique_tmp_itemid);  // Save temporary unique item id into the session
 
+		if (preg_match('/^_\d{4}_\d{2}_\d{2}_\d{2}_\d{2}_\d{2}_[0-9a-f.]{13,}$/', $unique_tmp_itemid))
+		{
+			$registry_key = $option . '.edit.item.active_tmp_itemids';
+			$active_tmp_ids = (array) $app->getUserState($registry_key, array());
+			$cutoff = time() - 7200;
+
+			$active_tmp_ids = array_filter($active_tmp_ids, function ($issued_at) use ($cutoff) {
+				return (int) $issued_at >= $cutoff;
+			});
+
+			$active_tmp_ids[$unique_tmp_itemid] = time();
+
+			if (count($active_tmp_ids) > 20)
+			{
+				asort($active_tmp_ids);
+				$active_tmp_ids = array_slice($active_tmp_ids, -20, null, true);
+			}
+
+			$app->setUserState($registry_key, $active_tmp_ids);
+		}
+
 		// Create containers for the already rendered the fields
 		$html = $this->renderFieldsForm(static::$fcform_item);
 		$html = $html ?: '<span class="alert alert-info">' . \Joomla\CMS\Language\Text::_( 'FLEXI_NO_FIELDS_TO_TYPE' ) .' </span>';

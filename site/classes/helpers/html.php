@@ -2454,6 +2454,14 @@ class flexicontent_html
 		$app =Factory::getApplication();
 		$jinput = $app->input;
 
+		// Check for request forgeries
+		if (!\Joomla\CMS\Session\Session::checkToken('request'))
+		{
+			$type === 'json'
+				? jexit(json_encode(array('error' => \Joomla\CMS\Language\Text::_('JINVALID_TOKEN'), 'html' => '---', 'title' => \Joomla\CMS\Language\Text::_('Aborted'))))
+				: jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		}
+
 		$id = $jinput->get('id', 0, 'int');
 		$jinput->set('cid', $id);
 
@@ -3201,6 +3209,7 @@ class flexicontent_html
 			$js = '
 				var fc_statehandler_singleton = new fc_statehandler({
 					task: ' . json_encode($isAdmin ? $config->controller . '.setitemstate' : 'setitemstate') . ',
+					token: ' . json_encode(\Joomla\CMS\Session\Session::getFormToken()) . ',
 					img_path: ' . json_encode($img_path) . ',
 					font_icons: ' . ($use_font_icons ? 'true' : 'false') . ',
 					refresh_on_success: ' . $refresh_on_success . '
@@ -4036,7 +4045,7 @@ class flexicontent_html
 			$tip_vote_down = flexicontent_html::getToolTip('FLEXI_VOTE_DOWN', 'FLEXI_VOTE_DOWN_TIP', 1, 1);
 		}
 
-		$item_url = \Joomla\CMS\Router\Route::_('index.php?task=vote&vote=1&cid='.$item->categoryslug.'&id='.$item->slug.'&layout='.$params->get('ilayout'));
+		$item_url = \Joomla\CMS\Router\Route::_('index.php?task=vote&vote=1&cid='.$item->categoryslug.'&id='.$item->slug.'&layout='.$params->get('ilayout') . '&' . \Joomla\CMS\Session\Session::getFormToken() . '=1');
 		$link = $item_url . (strpos($item_url, '?') !== false ? '&' : '?');
 		$output = '<a href="'.$link.'vote=1" class="fc_vote_up'.$tooltip_class.'" title="'.$tip_vote_up.'">'.$voteup.'</a>';
 		$output .= ' - ';
@@ -4347,6 +4356,9 @@ class flexicontent_html
 			$document =Factory::getApplication()->getDocument();
 			$document->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/css/fcvote.css', array('version' => FLEXI_VHASH));
 			$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/fcvote.js', array('version' => FLEXI_VHASH));
+
+			// Make the CSRF token available to the JS, via: Joomla.getOptions('csrf.token')
+			\Joomla\CMS\HTML\HTMLHelper::_('form.csrf');
 
 			// Star size and colors, via voting field parameters (Viewing -> Basic)
 			$star_size = (int) $field->parameters->get('stars_size', 24) ?: 24;

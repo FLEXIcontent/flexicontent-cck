@@ -51,7 +51,8 @@ function FCFav(id, type, add_counter)
 	window.root_url = !!jroot_url_fc ? jroot_url_fc : '';
 	window.base_url = !!jbase_url_fc ? jbase_url_fc : '';
 
-	var favurl = root_url + 'index.php?option=com_flexicontent&format=raw&task=ajaxfav&id=' + id + '&type=' + type;
+	var fc_csrf_token = (typeof Joomla !== 'undefined' && Joomla.getOptions) ? (Joomla.getOptions('csrf.token') || '') : '';
+	var favurl = root_url + 'index.php?option=com_flexicontent&format=raw&task=ajaxfav&id=' + id + '&type=' + type + (fc_csrf_token ? '&' + fc_csrf_token + '=1' : '');
 
 	var onote_msg_box_start = '<div class="fc-mssg fc-note fc-iblock fc-nobgimage fcfavs-result-mssg" style="position: relative;">';
 	var osucc_msg_box_start = '<div class="fc-mssg fc-success fc-iblock fc-nobgimage fcfavs-result-mssg" style="z-index:1000; position: relative;">';

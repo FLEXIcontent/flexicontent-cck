@@ -625,9 +625,11 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 		$layout_name = $this->input->getString('layout_name', '');
 
 		$file_subpath = $this->input->getString('file_subpath', '');
-		$file_subpath = preg_replace("/\.\.\//", "", $file_subpath);
 
-		// $file_subpath = preg_replace("#\\#", DS, $file_subpath);
+		// Validate layout name (plain folder name) and file sub-path (relative, no parent-folder references)
+		$layout_name  = $this->_isValidLayoutName($layout_name) ? $layout_name : '';
+		$file_subpath = $this->_isValidLayoutSubpath($file_subpath) ? $file_subpath : '';
+
 		if (!$layout_name)
 		{
 			$app->enqueueMessage('Layout name is empty / invalid', 'warning');
@@ -645,21 +647,22 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 			exit();
 		}
 
-		$path = \Joomla\Filesystem\Path::clean(JPATH_ROOT . DS . 'components' . DS . 'com_flexicontent' . DS . 'templates' . DS . $layout_name);
+		$path = $this->_getLayoutPath($layout_name);
 
-		if (!is_dir($path))
+		if (!$path)
 		{
-			$app->enqueueMessage('Path: ' . $path . ' was not found', 'warning');
+			$app->enqueueMessage('Path: ' . htmlspecialchars($layout_name, ENT_QUOTES, 'UTF-8') . ' was not found', 'warning');
 			$var['sysmssg'] = flexicontent_html::get_system_messages_html();
 			echo json_encode($var);
 			exit();
 		}
 
-		$file_path = \Joomla\Filesystem\Path::clean($path . DS . $file_subpath);
+		// Resolve the real path of the file, it must be inside the layout folder
+		$file_path = $this->_getLayoutFilePath($path, $file_subpath);
 
-		if (!file_exists($file_path))
+		if (!$file_path)
 		{
-			$app->enqueueMessage('File: ' . $file_path . ' was not found', 'warning');
+			$app->enqueueMessage('File: ' . htmlspecialchars($file_subpath, ENT_QUOTES, 'UTF-8') . ' was not found', 'warning');
 			$var['sysmssg'] = flexicontent_html::get_system_messages_html();
 			echo json_encode($var);
 			exit();
@@ -734,7 +737,10 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 		$layout_name  = $this->input->getString('layout_name', '');
 
 		$file_subpath = $this->input->getString('file_subpath', '');
-		$file_subpath = preg_replace("/\.\.\//", "", $file_subpath);
+
+		// Validate layout name (plain folder name) and file sub-path (relative, no parent-folder references)
+		$layout_name  = $this->_isValidLayoutName($layout_name) ? $layout_name : '';
+		$file_subpath = $this->_isValidLayoutSubpath($file_subpath) ? $file_subpath : '';
 
 		if (!$layout_name)
 		{
@@ -753,21 +759,22 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 			exit();
 		}
 
-		$path = \Joomla\Filesystem\Path::clean(JPATH_ROOT . DS . 'components' . DS . 'com_flexicontent' . DS . 'templates' . DS . $layout_name);
+		$path = $this->_getLayoutPath($layout_name);
 
-		if (!is_dir($path))
+		if (!$path)
 		{
-			$app->enqueueMessage('Layout: ' . $layout_name . ' was not found', 'warning');
+			$app->enqueueMessage('Layout: ' . htmlspecialchars($layout_name, ENT_QUOTES, 'UTF-8') . ' was not found', 'warning');
 			$var['sysmssg'] = flexicontent_html::get_system_messages_html();
 			echo json_encode($var);
 			exit();
 		}
 
-		$file_path = \Joomla\Filesystem\Path::clean($path . DS . $file_subpath);
+		// Resolve the real path of the file, it must already exist and be inside the layout folder
+		$file_path = $this->_getLayoutFilePath($path, $file_subpath);
 
-		if (!file_exists($file_path))
+		if (!$file_path)
 		{
-			$app->enqueueMessage('Layout: ' . $layout_name . ' was not found', 'warning');
+			$app->enqueueMessage('Layout file: ' . htmlspecialchars($file_subpath, ENT_QUOTES, 'UTF-8') . ' was not found', 'warning');
 			$var['sysmssg'] = flexicontent_html::get_system_messages_html();
 			echo json_encode($var);
 			exit();
@@ -792,5 +799,109 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 		$var['sysmssg'] = flexicontent_html::get_system_messages_html();
 		$var['content'] = file_get_contents($file_path);
 		echo json_encode($var);
+	}
+
+
+	/**
+	 * Check that a layout name is a plain folder name: no path separators, no parent-folder references
+	 *
+	 * @param   string  $layout_name  The layout (template) folder name
+	 *
+	 * @return  boolean
+	 */
+	protected function _isValidLayoutName($layout_name)
+	{
+		return is_string($layout_name) && $layout_name !== ''
+			&& strpos($layout_name, '..') === false
+			&& preg_match('/^[A-Za-z0-9][A-Za-z0-9_\-\.]*$/', $layout_name) === 1;
+	}
+
+
+	/**
+	 * Check that a layout file sub-path is relative and has no parent-folder references or NULL bytes
+	 *
+	 * @param   string  $file_subpath  The file path relative to the layout folder
+	 *
+	 * @return  boolean
+	 */
+	protected function _isValidLayoutSubpath($file_subpath)
+	{
+		return is_string($file_subpath) && $file_subpath !== ''
+			&& strpos($file_subpath, "\0") === false
+			&& !preg_match('#(^|[/\\\\])\.\.([/\\\\]|$)#', $file_subpath)
+			&& !preg_match('#^([/\\\\]|[A-Za-z]:)#', $file_subpath);
+	}
+
+
+	/**
+	 * Get the real path of a layout folder
+	 *
+	 * @param   string  $layout_name  The layout (template) folder name
+	 *
+	 * @return  string|boolean  The real path of the layout folder, or false if it is invalid / does not exist
+	 */
+	protected function _getLayoutPath($layout_name)
+	{
+		if (!$this->_isValidLayoutName($layout_name))
+		{
+			return false;
+		}
+
+		$templates_root = realpath(\Joomla\Filesystem\Path::clean(JPATH_ROOT . DS . 'components' . DS . 'com_flexicontent' . DS . 'templates'));
+		$path = $templates_root === false
+			? false
+			: realpath(\Joomla\Filesystem\Path::clean($templates_root . DS . $layout_name));
+
+		if ($path === false || !is_dir($path))
+		{
+			return false;
+		}
+
+		$compare_root = rtrim($templates_root, '/\\') . DIRECTORY_SEPARATOR;
+		$compare_path = rtrim($path, '/\\') . DIRECTORY_SEPARATOR;
+
+		if (DIRECTORY_SEPARATOR === '\\')
+		{
+			$compare_root = strtolower($compare_root);
+			$compare_path = strtolower($compare_path);
+		}
+
+		return strpos($compare_path, $compare_root) === 0 ? $path : false;
+	}
+
+
+	/**
+	 * Get the real path of an existing file inside a layout folder
+	 *
+	 * @param   string  $layout_path   The real path of the layout folder
+	 * @param   string  $file_subpath  The file path relative to the layout folder
+	 *
+	 * @return  string|boolean  The real path of the file, or false if it is invalid, does not exist or is outside the layout folder
+	 */
+	protected function _getLayoutFilePath($layout_path, $file_subpath)
+	{
+		if (!$layout_path || !$this->_isValidLayoutSubpath($file_subpath))
+		{
+			return false;
+		}
+
+		$file_path = realpath(\Joomla\Filesystem\Path::clean($layout_path . DS . $file_subpath));
+
+		if ($file_path === false || !is_file($file_path))
+		{
+			return false;
+		}
+
+		// The resolved file must be inside the layout folder (this also protects against symlinks pointing outside of it)
+		$prefix = rtrim($layout_path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+		$compare_file = $file_path;
+
+		if (DIRECTORY_SEPARATOR === '\\')
+		{
+			$prefix = strtolower($prefix);
+			$compare_file = strtolower($compare_file);
+		}
+
+		return strpos($compare_file, $prefix) === 0 ? $file_path : false;
 	}
 }

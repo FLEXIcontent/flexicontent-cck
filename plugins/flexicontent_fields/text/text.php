@@ -613,8 +613,10 @@ class plgFlexicontent_fieldsText extends FCField
 				}
 				else if ($format_output === -1)
 				{
+					// Make $item_link and $value available to the custom code as variables,
+					// never interpolate their contents into the evaluated PHP source
 					$item_link = empty($item->slug) ? '' : \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item));
-					$value = eval( "\$item_link= \"{$item_link}\";" . "\$value= \"{$value}\";" . $output_custom_func);
+					$value = eval($output_custom_func);
 				}
 
 				if ($lang_filter_values)

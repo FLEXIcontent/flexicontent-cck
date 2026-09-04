@@ -289,6 +289,29 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		//print_r($unique_tmp_itemid);
 		$jinput->set('unique_tmp_itemid', $unique_tmp_itemid);
 
+		// Keep a short-lived server-side registry of temporary ids issued to this
+		// session. Folder-mode deletion must never trust the id's format alone.
+		if (!$item->id && preg_match('/^_\d{4}_\d{2}_\d{2}_\d{2}_\d{2}_\d{2}_[0-9a-f.]{13,}$/', $unique_tmp_itemid))
+		{
+			$registry_key = $this->option . '.edit.item.active_tmp_itemids';
+			$active_tmp_ids = (array) $app->getUserState($registry_key, array());
+			$cutoff = time() - 7200;
+
+			$active_tmp_ids = array_filter($active_tmp_ids, function ($issued_at) use ($cutoff) {
+				return (int) $issued_at >= $cutoff;
+			});
+
+			$active_tmp_ids[$unique_tmp_itemid] = time();
+
+			if (count($active_tmp_ids) > 20)
+			{
+				asort($active_tmp_ids);
+				$active_tmp_ids = array_slice($active_tmp_ids, -20, null, true);
+			}
+
+			$app->setUserState($registry_key, $active_tmp_ids);
+		}
+
 
 		/**
 		 * Get Associated Translations and languages

@@ -76,7 +76,9 @@ class flexicontent_tmpl
 			{
 				// Parse the XML file
 				// About load addition XML file, please see: https://github.com/FLEXIcontent/flexicontent-cck/pull/961
-				$doc = @simplexml_load_file($tmplxml, null, LIBXML_NOENT);
+				// Do not expand document entities from template metadata. Network access
+				// remains disabled and ordinary XML parsing is sufficient here.
+				$doc = @simplexml_load_file($tmplxml, null, LIBXML_NONET);
 				if (!$doc)
 				{
 					if (Factory::getApplication()->isClient('administrator')) Factory::getApplication()->enqueueMessage('Syntax error(s) in template XML file: '. $tmplxml, 'notice');

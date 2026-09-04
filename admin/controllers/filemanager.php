@@ -99,11 +99,20 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 		$original_task = $this->task;
 
-		// Retrieve form data these are subject to basic filtering
-		$data  = $this->input->get('jform', array(), 'array');  // Unfiltered data, validation will follow via jform
+		// Read the payload once. Older forms also submit the id inside jform, so
+		// accept that value only when it agrees with the top-level record id.
+		$data       = $this->input->post->getArray();
+		$form_data  = $this->input->get('jform', array(), 'array');
+		$request_id = isset($data['id']) ? max(0, (int) $data['id']) : 0;
+		$form_id    = isset($form_data['id']) ? max(0, (int) $form_data['id']) : 0;
 
-		// Set into model: id (needed for loading correct item), and type id (e.g. needed for getting correct type parameters for new items)
-		$data['id'] = $data ? (int) $data['id'] : $this->input->get('id', 0, 'int');
+		if ($request_id && $form_id && $request_id !== $form_id)
+		{
+			return $this->_abortFileSave($app, 'Conflicting file record ids', '400 Bad Request');
+		}
+
+		$data['id'] = $request_id ?: $form_id;
+		unset($data['jform']);
 		$isnew = $data['id'] == 0;
 
 		// Extra steps before creating the model
@@ -118,6 +127,15 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		// Make sure Primary Key is correctly set into the model ... (needed for loading correct item)
 		$model->setId($data['id']);
 		$record = $model->getItem();
+		$authorised_id = (int) $data['id'];
+
+		// Authorise the exact record id that will later be stored. Previously the
+		// controller authorised jform[id], then replaced the payload with a second
+		// POST read, allowing a different top-level id to reach model::store().
+		if (!$model->canEdit($record))
+		{
+			return $this->_abortFileSave($app, \Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'));
+		}
 
 		// The save2copy task needs to be handled slightly differently.
 		if ($this->task === 'save2copy')
@@ -165,33 +183,33 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			$this->task = 'apply';
 		}
 
-		// Calculate access
-		$is_authorised = $model->canEdit($record);
+		// Keep the already-authorised identity pinned after save2copy handling.
+		$data['id'] = $isnew ? 0 : $authorised_id;
 
-		// Check access
-		if (!$is_authorised)
+		// Uploader, upload date, lock and external storage data are never accepted from the request
+		unset($data['checked_out'], $data['checked_out_time'], $data['estorage_fieldid']);
+
+		if (!$isnew)
 		{
-			$app->setHeader('status', '403 Forbidden', true);
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+			$data['id']          = $authorised_id;
+			$data['uploaded_by'] = $record->uploaded_by;
+			$data['uploaded']    = $record->uploaded;
 
-			// Skip redirection back to return url if inside a component-area-only view, showing error using current page, since usually we are inside a iframe modal
-			if ($this->input->getCmd('tmpl') !== 'component')
+			$requested_state = isset($data['published']) ? (int) $data['published'] : (int) $record->published;
+
+			if ($requested_state !== (int) $record->published && !$model->canEditState($record))
 			{
-				$this->setRedirect($this->returnURL);
+				return $this->_abortFileSave($app, \Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'));
 			}
 
-			if ($this->input->get('fc_doajax_submit'))
-			{
-				jexit(flexicontent_html::get_system_messages_html());
-			}
-			else
-			{
-				return false;
-			}
+			$data['published'] = $requested_state;
+		}
+		else
+		{
+			$data['uploaded_by'] = $user->id;
+			$data['uploaded']    = \Joomla\CMS\Factory::getDate('now')->toSql();
 		}
 
-		// Validation with \Joomla\CMS\Form\Form
-		$data = $this->input->post->getArray();  // Default filtering will remove HTML
 		$data['description'] = flexicontent_html::dataFilter($data['description'], 32000, 'STRING', 0);  // Limit description to 32000 characters
 		$data['hits'] = (int) $data['hits'];
 		$data['secure'] = $data['secure'] ? 1 : 0;   // Only allow 1 or 0
@@ -210,10 +228,17 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			$Fobj = (object) $data;
 			$upload_errors = null;
 
-			// Find the old file path before getting new file data from $Fobj
-			$path = $data['secure'] ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;  // JPATH_ROOT . DS . <media_path | file_path>
-			$oldFilepath      = Path::clean($path . DS . $data['filename']);
-			$oldFilepath_temp = Path::clean($path . DS . $data['filename'] . '__temp.old');
+			// The old path must come from the authorised database record, never from
+			// request-controlled secure / filename values.
+			$old_root = $record->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;
+			$oldFilepath = $this->_getSafeLocalFilePath($old_root, $record->filename);
+
+			if ($oldFilepath === false)
+			{
+				return $this->_abortFileSave($app, 'Invalid existing file path', '400 Bad Request');
+			}
+
+			$oldFilepath_temp = $oldFilepath . '__temp.old';
 
 			// Rename the old file to a temporary name, to avoid conflicts with the new file
 			$existingWasRenamed = file_exists($oldFilepath) && !file_exists($oldFilepath_temp);
@@ -232,14 +257,31 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			if ($__file_id)	{
 				// Get the modified file record data that now refer to the newly uploaded file
 				$data = (array) $Fobj;
+				$data['id'] = $isnew ? 0 : $authorised_id;
 
-				$newFilepath = Path::clean($path . DS . $data['filename']);
+				$new_root = !empty($data['secure']) ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;
+				$newFilepath = $this->_getSafeLocalFilePath($new_root, $data['filename']);
+
+				if ($newFilepath === false)
+				{
+					if ($existingWasRenamed && file_exists($oldFilepath_temp))
+					{
+						rename($oldFilepath_temp, $oldFilepath);
+					}
+
+					return $this->_abortFileSave($app, 'Invalid replacement file path', '400 Bad Request');
+				}
 
 				// Delete the old file path
 				if ($newFilepath != $oldFilepath || $existingWasRenamed)
 				{
 					try {
-						$existingWasRenamed ? unlink($oldFilepath_temp) : unlink($oldFilepath);
+						$path_to_delete = $existingWasRenamed ? $oldFilepath_temp : $oldFilepath;
+
+						if (file_exists($path_to_delete))
+						{
+							unlink($path_to_delete);
+						}
 						$app->enqueueMessage(\Joomla\CMS\Language\Text::_('Old file was deleted. New file was assigned to file ID: '. $__file_id), 'message');
 					}
 					catch (Throwable $e) { $app->enqueueMessage($e->getMessage(), 'warning'); }
@@ -253,43 +295,48 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			}
 		}
 
-		// Get extensions allowed by configuration, and intersect them with desired extensions
-		$allowed_exts = preg_split("/[\s]*,[\s]*/", strtolower($params->get('upload_extensions', 'bmp,wbmp,csv,doc,docx,webp,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,txt,xcf,xls,xlsx,zip,ics')));
-		$allowed_exts = array_flip($allowed_exts);
-
-		// Get the extension to record it in the DB
-		$_parts = explode('#', $data['filename']);
-		$data['filename'] = $_parts[0];
-		$ext = strtolower(flexicontent_upload::getExt($data['filename']));
-		$data['ext'] = $ext;
-
-		if (!isset($allowed_exts[$ext]))
-		{
-			$app->setHeader('status', '403 Forbidden', true);
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('File extension not allowed'), 'error');
-
-			// Skip redirection back to return url if inside a component-area-only view, showing error using current page, since usually we are inside a iframe modal
-			if ($this->input->getCmd('tmpl') !== 'component')
-			{
-				$this->setRedirect($this->returnURL);
-			}
-
-			if ($this->input->get('fc_doajax_submit'))
-			{
-				jexit(flexicontent_html::get_system_messages_html());
-			}
-			else
-			{
-				return false;
-			}
-		}
-
 		switch ($data['url'])
 		{
 			// CASE local file
 			case 0:
-				$path = ($data['secure'] ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH) . DS;  // JPATH_ROOT . DS . <media_path | file_path> . DS
-				$file_path = \Joomla\Filesystem\Path::clean($path . $data['filename']);
+				// The filename of an existing local file can only change via the file replacement upload (handled above)
+				if (!$isnew && (int) $record->url === 0 && empty($__file_id))
+				{
+					$data['filename'] = $record->filename;
+					$data['secure']   = (int) $record->secure;
+				}
+
+				// Validate the (relative) filename, it may include a subfolder but not parent-folder references or NULL bytes
+				$data['filename'] = ltrim(preg_replace('#[/\\\\]+#', '/', (string) $data['filename']), '/');
+
+				if ($data['filename'] === '' || strpos($data['filename'], "\0") !== false || preg_match('#(^|/)\.\.(/|$)#', $data['filename']))
+				{
+					$app->setHeader('status', '403 Forbidden', true);
+					$app->enqueueMessage(\Joomla\CMS\Language\Text::_('Invalid filename'), 'error');
+
+					// Skip redirection back to return url if inside a component-area-only view, showing error using current page, since usually we are inside a iframe modal
+					if ($this->input->getCmd('tmpl') !== 'component')
+					{
+						$this->setRedirect($this->returnURL);
+					}
+
+					if ($this->input->get('fc_doajax_submit'))
+					{
+						jexit(flexicontent_html::get_system_messages_html());
+					}
+					else
+					{
+						return false;
+					}
+				}
+
+				$path = $data['secure'] ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;
+				$file_path = $this->_getSafeLocalFilePath($path, $data['filename']);
+
+				if ($file_path === false)
+				{
+					return $this->_abortFileSave($app, 'Invalid filename', '400 Bad Request');
+				}
 
 				// Get file size from filesystem (local file)
 				$data['size'] = file_exists($file_path) ? filesize($file_path) : 0;
@@ -301,6 +348,36 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 				// Validate file URL
 				$data['filename_original'] = flexicontent_html::dataFilter($data['filename_original'], 4000, 'STRING', 0);  // Clean bad text/html
 				$data['filename'] = flexicontent_html::dataFilter($data['filename'], 4000, 'URL', 0);  // Clean bad text/html
+
+				// Validate a new or changed remote file URL like addurl() does (the URL is validated again whenever it is accessed)
+				if ($isnew || empty($record->filename) || (string) $data['filename'] !== (string) $record->filename)
+				{
+					$url_error = '';
+					$url_valid = flexicontent_remote::validateUrl($data['filename'], $url_error);
+
+					if (!$url_valid)
+					{
+						$app->setHeader('status', '400 Bad Request', true);
+						$app->enqueueMessage('Invalid remote file URL: ' . $url_error, 'error');
+
+						// Skip redirection back to return url if inside a component-area-only view, showing error using current page, since usually we are inside a iframe modal
+						if ($this->input->getCmd('tmpl') !== 'component')
+						{
+							$this->setRedirect($this->returnURL);
+						}
+
+						if ($this->input->get('fc_doajax_submit'))
+						{
+							jexit(flexicontent_html::get_system_messages_html());
+						}
+						else
+						{
+							return false;
+						}
+					}
+
+					$data['filename'] = $url_valid['url'];
+				}
 
 				// Use the submitted file size when present. Do not probe an untrusted
 				// remote URL from the server merely to calculate optional metadata.
@@ -332,11 +409,34 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 				$data['filename_original'] = flexicontent_html::dataFilter($data['filename_original'], 4000, 'PATH', 0);  // Validate JMedia file PATH
 				$data['filename_original'] = str_replace('__SPACE__', ' ', $data['filename_original']);
 
-				$file_path = \Joomla\Filesystem\Path::clean(JPATH_ROOT . DS . $data['filename']);
+				$file_path = $this->_getSafeJMediaPath($data['filename']);
+
+				if ($file_path === false)
+				{
+					return $this->_abortFileSave($app, 'JMedia file is outside the configured media folders', '400 Bad Request');
+				}
 
 				// Get file size from filesystem (local file)
 				$data['size'] = file_exists($file_path) ? filesize($file_path) : 0;
 				break;
+		}
+
+		// Validate the extension after normalizing the value. For remote URLs the
+		// extension belongs to the URL path, not its query string or fragment.
+		$extension_source = $data['filename'];
+
+		if ((int) $data['url'] === 1)
+		{
+			$extension_source = (string) parse_url($data['filename'], PHP_URL_PATH);
+		}
+
+		$allowed_exts = preg_split('/[\s]*,[\s]*/', strtolower($params->get('upload_extensions', 'bmp,wbmp,csv,doc,docx,webp,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,txt,xcf,xls,xlsx,zip,ics')));
+		$allowed_exts = array_flip($allowed_exts);
+		$data['ext'] = strtolower(flexicontent_upload::getExt($extension_source));
+
+		if (!isset($allowed_exts[$data['ext']]))
+		{
+			return $this->_abortFileSave($app, \Joomla\CMS\Language\Text::_('File extension not allowed'));
 		}
 
 		// Validate access level exists (set to public otherwise)
@@ -1029,6 +1129,17 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			$url = str_replace('__SPACE__', ' ', $url);
 			$ext = $this->input->get('file-url-ext', null, 'cmd');
 			$ext = $ext ?: pathinfo($url, PATHINFO_EXTENSION);
+			$jmedia_path = $this->_getSafeJMediaPath($url);
+
+			if ($jmedia_path === false)
+			{
+				$this->exitHttpHead = array(0 => array('status' => '400 Bad Request'));
+				$this->exitMessages = array(0 => array('error' => 'JMedia file is outside the configured media folders'));
+				$this->exitLogTexts = array();
+				$this->exitSuccess  = false;
+
+				return $this->terminate($file_id, $exitMessages);
+			}
 		}
 
 		$altname  = $this->input->get('file-url-title', null, 'string');
@@ -1056,69 +1167,24 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			return $this->terminate($file_id, $exitMessages);
 		}
 
-		// Remote URL records may only use HTTP(S). Normalize a missing scheme
-		// before storing the URL so non-network stream wrappers are never accepted.
+		// Remote URL records must pass the shared remote URL validation (flexicontent_remote): HTTP(S) only,
+		// no credentials, host resolving (IPv4 and IPv6) to public addresses unless it is the site itself or a trusted host
 		if ($linktype === 1)
 		{
-			if (!preg_match('#^[a-z][a-z0-9+.-]*://#i', $url))
-			{
-				$url = 'http://' . ltrim($url, '/');
-			}
+			$url_error = '';
+			$url_valid = flexicontent_remote::validateUrl($url, $url_error);
 
-			$url_scheme = strtolower((string) parse_url($url, PHP_URL_SCHEME));
-			$url_host   = (string) parse_url($url, PHP_URL_HOST);
-
-			if (!in_array($url_scheme, array('http', 'https'), true) || $url_host === '')
+			if (!$url_valid)
 			{
 				$this->exitHttpHead = array(0 => array('status' => '400 Bad Request'));
-				$this->exitMessages = array(0 => array('error' => 'Only valid HTTP and HTTPS URLs are supported.'));
+				$this->exitMessages = array(0 => array('error' => 'Invalid remote file URL: ' . $url_error));
 				$this->exitLogTexts = array();
 				$this->exitSuccess  = false;
 
 				return $this->terminate($file_id, $exitMessages);
 			}
 
-			/**
-			 * Reject hosts resolving to private, loopback, link-local or otherwise
-			 * reserved addresses, so this cannot be used to probe the internal network.
-			 *
-			 * The site's own hostname is exempt on purpose: behind a proxy, a load
-			 * balancer or on shared hosting it legitimately resolves to a private
-			 * address, and attaching a file from your own site is a normal action.
-			 *
-			 * addurl() stores the URL but does not dereference it. Avoiding a server-side
-			 * request here also prevents redirects and DNS rebinding from changing the
-			 * validated destination.
-			 */
-			$site_host = strtolower((string) parse_url(\Joomla\CMS\Uri\Uri::root(), PHP_URL_HOST));
-
-			if (strtolower($url_host) !== $site_host)
-			{
-				$candidate_ips = filter_var($url_host, FILTER_VALIDATE_IP)
-					? array($url_host)
-					: array_filter((array) @gethostbynamel($url_host));
-
-				$host_is_blocked = empty($candidate_ips);
-
-				foreach ($candidate_ips as $candidate_ip)
-				{
-					if (!filter_var($candidate_ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE))
-					{
-						$host_is_blocked = true;
-						break;
-					}
-				}
-
-				if ($host_is_blocked)
-				{
-					$this->exitHttpHead = array(0 => array('status' => '400 Bad Request'));
-					$this->exitMessages = array(0 => array('error' => 'This URL host could not be resolved to a permitted public address.'));
-					$this->exitLogTexts = array();
-					$this->exitSuccess  = false;
-
-					return $this->terminate($file_id, $exitMessages);
-				}
-			}
+			$url = $url_valid['url'];
 		}
 
 		if (empty($filesize))
@@ -1131,7 +1197,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			}
 			else  // $linktype === 2
 			{
-				$filesize = filesize(JPATH_ROOT . '/' . $url);
+				$filesize = is_file($jmedia_path) ? filesize($jmedia_path) : 0;
 			}
 		}
 
@@ -1232,6 +1298,208 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 
 	/**
+	 * Abort a file-record save using the response mode expected by the caller.
+	 *
+	 * @param   object  $app      Joomla application
+	 * @param   string  $message  Error message
+	 * @param   string  $status   HTTP status
+	 *
+	 * @return  boolean
+	 */
+	protected function _abortFileSave($app, $message, $status = '403 Forbidden')
+	{
+		$app->setHeader('status', $status, true);
+		$app->enqueueMessage($message, 'error');
+
+		if ($this->input->getCmd('tmpl') !== 'component')
+		{
+			$this->setRedirect($this->returnURL);
+		}
+
+		if ($this->input->get('fc_doajax_submit'))
+		{
+			jexit(flexicontent_html::get_system_messages_html());
+		}
+
+		return false;
+	}
+
+
+	/**
+	 * Resolve a relative file name below an allowed root and reject traversal,
+	 * absolute paths and symlinks that escape that root.
+	 *
+	 * @param   string  $root      Allowed filesystem root
+	 * @param   string  $filename  Relative file name
+	 *
+	 * @return  string|boolean
+	 */
+	protected function _getSafeLocalFilePath($root, $filename)
+	{
+		$filename = str_replace('\\', '/', (string) $filename);
+
+		if (
+			$filename === ''
+			|| strpos($filename, "\0") !== false
+			|| $filename[0] === '/'
+			|| preg_match('#^[a-zA-Z]:/#', $filename)
+			|| preg_match('#(^|/)\.\.(/|$)#', $filename)
+		)
+		{
+			return false;
+		}
+
+		$root_real = realpath($root);
+
+		if ($root_real === false)
+		{
+			return false;
+		}
+
+		$candidate = Path::clean($root_real . DS . str_replace('/', DS, $filename));
+
+		if (!$this->_isPathInside($candidate, $root_real))
+		{
+			return false;
+		}
+
+		// Existing files (including symlinks) must resolve below the same root.
+		if (file_exists($candidate) || is_link($candidate))
+		{
+			$resolved = realpath($candidate);
+
+			if ($resolved === false || !$this->_isPathInside($resolved, $root_real))
+			{
+				return false;
+			}
+		}
+
+		return $candidate;
+	}
+
+
+	/**
+	 * Resolve a Joomla Media path below one of com_media's configured roots.
+	 *
+	 * @param   string  $filename  Root-relative JMedia path
+	 *
+	 * @return  string|boolean
+	 */
+	protected function _getSafeJMediaPath($filename)
+	{
+		$filename = ltrim(str_replace('\\', '/', (string) $filename), '/');
+		$media_params = \Joomla\CMS\Component\ComponentHelper::getParams('com_media');
+		$media_roots = array_unique(array_filter(array(
+			trim((string) $media_params->get('file_path', 'images'), '/\\'),
+			trim((string) $media_params->get('image_path', 'images'), '/\\'),
+		)));
+
+		foreach ($media_roots as $relative_root)
+		{
+			$relative_root = str_replace('\\', '/', $relative_root);
+
+			if ($filename !== $relative_root && strpos($filename, $relative_root . '/') !== 0)
+			{
+				continue;
+			}
+
+			$relative_file = ltrim(substr($filename, strlen($relative_root)), '/');
+			$resolved = $this->_getSafeLocalFilePath(JPATH_ROOT . DS . str_replace('/', DS, $relative_root), $relative_file);
+
+			if ($resolved !== false)
+			{
+				return $resolved;
+			}
+		}
+
+		return false;
+	}
+
+
+	/**
+	 * Test canonical path containment, case-insensitively on Windows.
+	 */
+	protected function _isPathInside($path, $root)
+	{
+		$path = rtrim(Path::clean($path), '/\\');
+		$root = rtrim(Path::clean($root), '/\\');
+
+		if (DS === '\\')
+		{
+			$path = strtolower($path);
+			$root = strtolower($root);
+		}
+
+		return $path === $root || strpos($path, $root . DS) === 0;
+	}
+
+
+	/**
+	 * Check if current user can remove folder-mode files of the given (unique) item id
+	 *
+	 * - saved items: user must have edit privilege on the content item
+	 * - unsaved items: the temporary item id must have been issued to this session
+	 *
+	 * @param   string  $u_item_id  The item id, or the temporary unique item id of an unsaved item
+	 * @param   object  $user       The user object
+	 *
+	 * @return  boolean
+	 *
+	 * @since 5.0.3
+	 */
+	protected function _canRemoveFolderModeFiles($u_item_id, $user)
+	{
+		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
+
+		$u_item_id = (string) $u_item_id;
+
+		if ($u_item_id === '' || $u_item_id === '0')
+		{
+			return false;
+		}
+
+		// CASE: saved item, check edit privilege on the item
+		if (ctype_digit($u_item_id))
+		{
+			$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+			$item_id = (int) $u_item_id;
+			$created_by = $db->setQuery('SELECT created_by FROM #__content WHERE id = ' . $item_id)->loadResult();
+
+			if ($created_by === null)
+			{
+				return false;
+			}
+
+			$asset = 'com_content.article.' . $item_id;
+
+			return $user->authorise('core.edit', $asset)
+				|| ($user->id && (int) $created_by === (int) $user->id && $user->authorise('core.edit.own', $asset));
+		}
+
+		// CASE: unsaved item, the temporary item id of the item form is kept in the session
+		$app = \Joomla\CMS\Factory::getApplication();
+		$tmp_item_id = (string) $app->getUserState('com_flexicontent.edit.item.unique_tmp_itemid');
+
+		if ($tmp_item_id !== '' && $tmp_item_id === $u_item_id)
+		{
+			return true;
+		}
+
+		$registry_key = 'com_flexicontent.edit.item.active_tmp_itemids';
+		$active_tmp_ids = (array) $app->getUserState($registry_key, array());
+		$cutoff = time() - 7200;
+
+		$active_tmp_ids = array_filter($active_tmp_ids, function ($issued_at) use ($cutoff) {
+			return (int) $issued_at >= $cutoff;
+		});
+
+		$app->setUserState($registry_key, $active_tmp_ids);
+
+		return isset($active_tmp_ids[$u_item_id]);
+	}
+
+
+	/**
 	 * Logic to delete records
 	 *
 	 * @return void
@@ -1271,21 +1539,71 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			return $this->terminate(null, $exitMessages);
 		}
 
+		// Calculate access
+		/**
+		 * Because we do not have ACL for individual files, we will abort here if both of 'flexicontent.deletefile' or 'flexicontent.deleteownfile' are not granted at component level
+		 *
+		 * Note later we check: 'flexicontent.deletefile' or (ownership + 'flexicontent.deleteownfile') by using $model->getDeletable($cid)
+		 */
+		$candelete     = $user->authorise('flexicontent.deletefile', 'com_flexicontent');
+		$candeleteown  = $user->authorise('flexicontent.deleteownfile', 'com_flexicontent');
+
 		// Different handling for folder_mode
 		if ($file_mode == 'folder_mode')
 		{
-			$field = $db->setQuery('SELECT * FROM #__flexicontent_fields WHERE id=' . $fieldid)->loadObject();
-			$field->parameters = new \Joomla\Registry\Registry($field->attribs);
-			$field->item_id = $u_item_id;
+			$field = $fieldid
+				? $db->setQuery('SELECT * FROM #__flexicontent_fields WHERE id = ' . (int) $fieldid)->loadObject()
+				: null;
+
+			/**
+			 * Folder-mode removal is only valid for image fields that store their files in per-item folders (image_source = 1).
+			 * Refuse anything else, e.g. DB-mode fields, because the given (file)names would be used to delete shared file manager files
+			 */
+			if ($field && $field->field_type === 'image')
+			{
+				$field->parameters = new \Joomla\Registry\Registry($field->attribs);
+				$field->item_id = $u_item_id;
+			}
+
+			if (!$field || $field->field_type !== 'image' || (int) $field->parameters->get('image_source', 0) !== 1)
+			{
+				$this->exitHttpHead = array( 0 => array('status' => '400 Bad Request') );
+				$this->exitMessages = array( 0 => array('error' => 'Field is not an image field in folder mode') );
+				$this->exitLogTexts = array();
+				$this->exitSuccess  = false;
+
+				return $this->terminate(null, $exitMessages);
+			}
+
+			/**
+			 * Folder-mode files belong to a specific content item, thus unless user can delete any file,
+			 * require edit privilege on the item (or for unsaved items, a valid temporary item id)
+			 */
+			if (!$candelete && !$this->_canRemoveFolderModeFiles($u_item_id, $user))
+			{
+				$this->exitHttpHead = array( 0 => array('status' => '403 Forbidden') );
+				$this->exitMessages = array( 0 => array('error' => 'FLEXI_ALERTNOTAUTH_TASK') );
+				$this->exitLogTexts = array();
+				$this->exitSuccess  = false;
+
+				return $this->terminate(null, $exitMessages);
+			}
 
 			$failed_files = array();
 
 			foreach ($cid as $filename)
 			{
-				$filename = rawurldecode($filename);
+				$filename = rawurldecode((string) $filename);
 
 				// Default 'CMD' filtering is maybe too aggressive, but allowing UTF8 will not work in all filesystems, so we do not allow
 				// $filename_original = iconv(mb_detect_encoding($filename, mb_detect_order(), true), "UTF-8", $filename);
+
+				// Only plain filenames are accepted, refuse directory separators, parent-folder references and NULL bytes
+				if ($filename === '' || $filename !== basename($filename) || strpos($filename, '..') !== false || preg_match('#[/\\\\\x00]#', $filename))
+				{
+					$failed_files[] = $filename;
+					continue;
+				}
 
 				if (!FLEXIUtilities::call_FC_Field_Func($field->field_type, 'removeOriginalFile', array(&$field, $filename)))
 				{
@@ -1318,21 +1636,13 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			return $this->terminate(null, $exitMessages);
 		}
 
-		// Calculate access
-		/**
-		 * Because we do not have ACL for individual files, we will abort here if both of 'flexicontent.deletefile' or 'flexicontent.deleteownfile' are not granted at component level
-		 *
-		 * Note later we check: 'flexicontent.deleteownfile' or (ownership + 'flexicontent.deleteownfile') by using $model->getDeletable($cid)
-		 */
-		$candelete     = $user->authorise('flexicontent.deletefile', 'com_flexicontent');
-		$candeleteown  = $user->authorise('flexicontent.deleteownfile', 'com_flexicontent');
-		$is_authorised = $candelete || $candeleteown;
-
-		// Check access
-		if (!$is_authorised)
+		// DB-mode deletion uses the component-level file permissions. Folder-mode
+		// files were authorised against their owning item above so frontend authors
+		// do not lose cleanup of images belonging to items they can edit.
+		if (!$candelete && !$candeleteown)
 		{
-			$this->exitHttpHead = array( 0 => array('status' => '403 Forbidden') );
-			$this->exitMessages = array( 0 => array('error' => 'FLEXI_ALERTNOTAUTH_TASK') );
+			$this->exitHttpHead = array(0 => array('status' => '403 Forbidden'));
+			$this->exitMessages = array(0 => array('error' => 'FLEXI_ALERTNOTAUTH_TASK'));
 			$this->exitLogTexts = array();
 			$this->exitSuccess  = false;
 

@@ -1019,7 +1019,7 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 		// Create links
 		$link = \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getSearchRoute(0, $menu_matches ? $menu->id : 0));
 
-    $curr_url   = str_replace('&', '&amp;', $_SERVER['REQUEST_URI']);
+    $curr_url   = htmlspecialchars($_SERVER['REQUEST_URI'], ENT_QUOTES, 'UTF-8');
     $print_link = $curr_url .(strstr($curr_url, '?') ? '&amp;'  : '?').'pop=1&amp;tmpl=component&amp;print=1';
 
 		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx', ''));

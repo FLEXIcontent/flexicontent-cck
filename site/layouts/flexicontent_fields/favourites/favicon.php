@@ -79,6 +79,9 @@ if (!$js_and_css_added)
 
 	$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/fcfav.js', array('version' => FLEXI_VHASH));
 
+	// Make the CSRF token available to the JS, via: Joomla.getOptions('csrf.token')
+	\Joomla\CMS\HTML\HTMLHelper::_('form.csrf');
+
 	\Joomla\CMS\Language\Text::script('FLEXI_YOUR_BROWSER_DOES_NOT_SUPPORT_AJAX',true);
 	\Joomla\CMS\Language\Text::script('FLEXI_LOADING',true);
 	\Joomla\CMS\Language\Text::script('FLEXI_ADDED_TO_YOUR_FAVOURITES',true);
