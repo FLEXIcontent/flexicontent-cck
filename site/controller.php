@@ -1068,11 +1068,12 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			}
 			$field_type = $field_id ? $fields_props[$field_id]->field_type : '';
 
-			$query  = 'SELECT DISTINCT f.id, f.filename, f.filename_original, f.altname, f.secure, f.url, f.hits, f.stamp, f.size'
+			$query  = 'SELECT DISTINCT f.id, f.filename, f.filename_original, f.altname, f.secure, f.url, f.hits, f.stamp, f.size, f.uploaded_by'
 					.($task !== 'download_file' && $task !== 'download_files'
 						? ', u.email as item_owner_email' .
 							', i.title as item_title, i.introtext as item_introtext, i.fulltext as item_fulltext' .
 							', i.language as item_language, ie.type_id as item_type_id, i.access as item_access' .
+							', i.state as item_state, i.created_by as item_created_by' .
 							// item and current category slugs (for URL in notifications)
 							', CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as itemslug' .
 							', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as catslug'
@@ -1100,6 +1101,23 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 					. $access_clauses['and']
 					;
 			$file = $db->setQuery($query)->loadObject();
+
+			/**
+			 * Complete the access checks that are not done via the SQL query
+			 * - direct file downloads (no content item / field in the URL): the file must be reachable via content that the user can view
+			 * - downloads via a content item: the item must be in a viewable state, unless user can edit it
+			 */
+			if (!empty($file) && $using_access)
+			{
+				if ($task === 'download_file' || $task === 'download_files')
+				{
+					$file->has_content_access = $this->_checkDirectFileAccess($file, $user) ? 1 : 0;
+				}
+				elseif ($file->has_content_access && !$this->_canViewItemState($content_id, $file->item_state, $file->item_created_by, $user))
+				{
+					$file->has_content_access = 0;
+				}
+			}
 
 			// Add target path (with target filename) for case we were not provide a custom name like when using download_tree task
 			static $used_names = array();
@@ -1192,12 +1210,14 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 					$app->enqueueMessage($msg, 'warning');
 				}
 
-				// Only abort further execution for single file download
+				// Abort further execution for single file download, for multi-file downloads skip the file
 				if ($task !== 'download_tree' && $task !== 'download_files')
 				{
 					$this->setRedirect('index.php', '');
 					return;
 				}
+
+				continue;
 			}
 
 
@@ -1215,12 +1235,14 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 					$msg = \Joomla\CMS\Language\Text::_( 'FLEXI_REQUESTED_FILE_DOES_NOT_EXIST_ANYMORE' );
 					$app->enqueueMessage($msg, 'notice');
 
-					// Only abort for single file download
+					// Abort for single file download, for multi-file downloads skip the file
 					if ($task !== 'download_tree' && $task !== 'download_files')
 					{
 						$this->setRedirect('index.php', '');
 						return;
 					}
+
+					continue;
 				}
 			}
 			else
@@ -2233,6 +2255,108 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		$clauses['join']   = $joinacc;
 		$clauses['and']    = $andacc;
 		return $clauses;
+	}
+
+
+	/**
+	 * Check that a directly downloaded file (no content item / field given in the URL) is reachable by the given user
+	 *
+	 * A file is reachable if:
+	 *  - user is a file manager (can view all files) or is the uploader of the file, or
+	 *  - the file is not assigned to any content item (direct-link file), or
+	 *  - the file is assigned to at least one content item that the user can view (item, category, type and field access
+	 *    levels, and item being in a viewable state)
+	 *
+	 * @param   object  $file  The file record (needs properties: id, uploaded_by)
+	 * @param   object  $user  The user object
+	 *
+	 * @return  boolean
+	 */
+	protected function _checkDirectFileAccess($file, $user)
+	{
+		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
+
+		// File managers and the uploader of the file always have access
+		if ($user->authorise('core.admin', 'com_flexicontent')
+			|| $user->authorise('flexicontent.viewallfiles', 'com_flexicontent')
+			|| ($user->id && (int) $file->uploaded_by === (int) $user->id)
+		)
+		{
+			return true;
+		}
+
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$aid_list = implode(',', $user->getAuthorisedViewLevels());
+
+		// Find content items that the file is assigned to (via file-type fields)
+		$query = 'SELECT i.id, i.state, i.created_by'
+			. ', CASE WHEN'
+			. '   fi.access IN (0,' . $aid_list . ') AND ty.access IN (0,' . $aid_list . ')'
+			. '   AND c.access IN (0,' . $aid_list . ') AND i.access IN (0,' . $aid_list . ')'
+			. '  THEN 1 ELSE 0 END AS has_access'
+			. ' FROM #__flexicontent_fields_item_relations AS rel'
+			. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type IN (' . $db->Quote('file') . ', ' . $db->Quote('mediafile') . ')'
+			. ' JOIN #__content AS i ON i.id = rel.item_id'
+			. ' LEFT JOIN #__categories AS c ON c.id = i.catid'
+			. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
+			. ' LEFT JOIN #__flexicontent_types AS ty ON ty.id = ie.type_id'
+			. ' WHERE rel.value = ' . $db->Quote((string) (int) $file->id)
+			;
+		$items = $db->setQuery($query)->loadObjectList();
+
+		// File is not assigned to any content item, thus file level access (already checked) is the only requirement
+		if (!$items)
+		{
+			return true;
+		}
+
+		foreach ($items as $item)
+		{
+			if ($item->has_access && $this->_canViewItemState($item->id, $item->state, $item->created_by, $user))
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+
+	/**
+	 * Check that a content item is in a state that is viewable by the given user
+	 *
+	 * Published (1), in-progress (-5) and archived (2) items are viewable by everyone,
+	 * items in other states only by their owner or by users that can edit them / change their state
+	 *
+	 * @param   integer  $item_id     The item id
+	 * @param   integer  $state       The item state
+	 * @param   integer  $created_by  The item owner
+	 * @param   object   $user        The user object
+	 *
+	 * @return  boolean
+	 */
+	protected function _canViewItemState($item_id, $state, $created_by, $user)
+	{
+		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
+
+		if (in_array((int) $state, array(1, -5, 2), true))
+		{
+			return true;
+		}
+
+		if (!$user->id)
+		{
+			return false;
+		}
+
+		if ((int) $created_by === (int) $user->id)
+		{
+			return true;
+		}
+
+		$asset = 'com_content.article.' . (int) $item_id;
+
+		return $user->authorise('core.edit', $asset) || $user->authorise('core.edit.state', $asset);
 	}
 
 
