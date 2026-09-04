@@ -1232,6 +1232,63 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 
 	/**
+	 * Check if current user can remove folder-mode files of the given (unique) item id
+	 *
+	 * - saved items: user must have edit privilege on the content item
+	 * - unsaved items: the temporary item id must be the one of the item form being edited (session data),
+	 *   or at least have the format of a generated temporary item id (these are not guessable)
+	 *
+	 * @param   string  $u_item_id  The item id, or the temporary unique item id of an unsaved item
+	 * @param   object  $user       The user object
+	 *
+	 * @return  boolean
+	 *
+	 * @since 5.0.3
+	 */
+	protected function _canRemoveFolderModeFiles($u_item_id, $user)
+	{
+		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
+
+		$u_item_id = (string) $u_item_id;
+
+		if ($u_item_id === '' || $u_item_id === '0')
+		{
+			return false;
+		}
+
+		// CASE: saved item, check edit privilege on the item
+		if (ctype_digit($u_item_id))
+		{
+			$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+			$item_id = (int) $u_item_id;
+			$created_by = $db->setQuery('SELECT created_by FROM #__content WHERE id = ' . $item_id)->loadResult();
+
+			if ($created_by === null)
+			{
+				return false;
+			}
+
+			$asset = 'com_content.article.' . $item_id;
+
+			return $user->authorise('core.edit', $asset)
+				|| ($user->id && (int) $created_by === (int) $user->id && $user->authorise('core.edit.own', $asset));
+		}
+
+		// CASE: unsaved item, the temporary item id of the item form is kept in the session
+		$app = \Joomla\CMS\Factory::getApplication();
+		$tmp_item_id = (string) $app->getUserState('com_flexicontent.edit.item.unique_tmp_itemid');
+
+		if ($tmp_item_id !== '' && $tmp_item_id === $u_item_id)
+		{
+			return true;
+		}
+
+		// Otherwise accept only the format of generated temporary item ids, see: date('_Y_m_d_h_i_s_', time()) . uniqid(true)
+		return preg_match('/^_\d{4}_\d{2}_\d{2}_\d{2}_\d{2}_\d{2}_[0-9a-f.]{13,}$/', $u_item_id) === 1;
+	}
+
+
+	/**
 	 * Logic to delete records
 	 *
 	 * @return void
@@ -1271,21 +1328,83 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			return $this->terminate(null, $exitMessages);
 		}
 
+		// Calculate access
+		/**
+		 * Because we do not have ACL for individual files, we will abort here if both of 'flexicontent.deletefile' or 'flexicontent.deleteownfile' are not granted at component level
+		 *
+		 * Note later we check: 'flexicontent.deletefile' or (ownership + 'flexicontent.deleteownfile') by using $model->getDeletable($cid)
+		 */
+		$candelete     = $user->authorise('flexicontent.deletefile', 'com_flexicontent');
+		$candeleteown  = $user->authorise('flexicontent.deleteownfile', 'com_flexicontent');
+		$is_authorised = $candelete || $candeleteown;
+
+		// Check access
+		if (!$is_authorised)
+		{
+			$this->exitHttpHead = array( 0 => array('status' => '403 Forbidden') );
+			$this->exitMessages = array( 0 => array('error' => 'FLEXI_ALERTNOTAUTH_TASK') );
+			$this->exitLogTexts = array();
+			$this->exitSuccess  = false;
+
+			return $this->terminate(null, $exitMessages);
+		}
+
 		// Different handling for folder_mode
 		if ($file_mode == 'folder_mode')
 		{
-			$field = $db->setQuery('SELECT * FROM #__flexicontent_fields WHERE id=' . $fieldid)->loadObject();
-			$field->parameters = new \Joomla\Registry\Registry($field->attribs);
-			$field->item_id = $u_item_id;
+			$field = $fieldid
+				? $db->setQuery('SELECT * FROM #__flexicontent_fields WHERE id = ' . (int) $fieldid)->loadObject()
+				: null;
+
+			/**
+			 * Folder-mode removal is only valid for image fields that store their files in per-item folders (image_source = 1).
+			 * Refuse anything else, e.g. DB-mode fields, because the given (file)names would be used to delete shared file manager files
+			 */
+			if ($field && $field->field_type === 'image')
+			{
+				$field->parameters = new \Joomla\Registry\Registry($field->attribs);
+				$field->item_id = $u_item_id;
+			}
+
+			if (!$field || $field->field_type !== 'image' || (int) $field->parameters->get('image_source', 0) !== 1)
+			{
+				$this->exitHttpHead = array( 0 => array('status' => '400 Bad Request') );
+				$this->exitMessages = array( 0 => array('error' => 'Field is not an image field in folder mode') );
+				$this->exitLogTexts = array();
+				$this->exitSuccess  = false;
+
+				return $this->terminate(null, $exitMessages);
+			}
+
+			/**
+			 * Folder-mode files belong to a specific content item, thus unless user can delete any file,
+			 * require edit privilege on the item (or for unsaved items, a valid temporary item id)
+			 */
+			if (!$candelete && !$this->_canRemoveFolderModeFiles($u_item_id, $user))
+			{
+				$this->exitHttpHead = array( 0 => array('status' => '403 Forbidden') );
+				$this->exitMessages = array( 0 => array('error' => 'FLEXI_ALERTNOTAUTH_TASK') );
+				$this->exitLogTexts = array();
+				$this->exitSuccess  = false;
+
+				return $this->terminate(null, $exitMessages);
+			}
 
 			$failed_files = array();
 
 			foreach ($cid as $filename)
 			{
-				$filename = rawurldecode($filename);
+				$filename = rawurldecode((string) $filename);
 
 				// Default 'CMD' filtering is maybe too aggressive, but allowing UTF8 will not work in all filesystems, so we do not allow
 				// $filename_original = iconv(mb_detect_encoding($filename, mb_detect_order(), true), "UTF-8", $filename);
+
+				// Only plain filenames are accepted, refuse directory separators, parent-folder references and NULL bytes
+				if ($filename === '' || $filename !== basename($filename) || strpos($filename, '..') !== false || preg_match('#[/\\\\\x00]#', $filename))
+				{
+					$failed_files[] = $filename;
+					continue;
+				}
 
 				if (!FLEXIUtilities::call_FC_Field_Func($field->field_type, 'removeOriginalFile', array(&$field, $filename)))
 				{
@@ -1314,27 +1433,6 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 			$this->exitLogTexts = array();
 			$this->exitSuccess  = count($failed_files) == 0;
-
-			return $this->terminate(null, $exitMessages);
-		}
-
-		// Calculate access
-		/**
-		 * Because we do not have ACL for individual files, we will abort here if both of 'flexicontent.deletefile' or 'flexicontent.deleteownfile' are not granted at component level
-		 *
-		 * Note later we check: 'flexicontent.deleteownfile' or (ownership + 'flexicontent.deleteownfile') by using $model->getDeletable($cid)
-		 */
-		$candelete     = $user->authorise('flexicontent.deletefile', 'com_flexicontent');
-		$candeleteown  = $user->authorise('flexicontent.deleteownfile', 'com_flexicontent');
-		$is_authorised = $candelete || $candeleteown;
-
-		// Check access
-		if (!$is_authorised)
-		{
-			$this->exitHttpHead = array( 0 => array('status' => '403 Forbidden') );
-			$this->exitMessages = array( 0 => array('error' => 'FLEXI_ALERTNOTAUTH_TASK') );
-			$this->exitLogTexts = array();
-			$this->exitSuccess  = false;
 
 			return $this->terminate(null, $exitMessages);
 		}
