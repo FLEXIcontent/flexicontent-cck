@@ -2294,6 +2294,9 @@
 			<field name="upload_maxsize" type="text" size="50" default="10000000" label="FLEXI_MAXIMUM_SIZE_LABEL" description="FLEXI_MAXIMUM_SIZE_DESC" />
 			<field name="upload_extensions" type="textarea" rows="2" default="bmp,wbmp,csv,doc,docx,webp,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,txt,xcf,xls,xlsx,zip,ics" label="FLEXI_ALLOWED_EXTENSIONS" description="FLEXI_ALLOWED_EXTENSIONS_DESC" class="input-xxlarge" />
 
+			<field name="" type="separator" default="FLEXI_REMOTE_FILES" label="" level="level3" />
+			<field name="remote_trusted_hosts" type="textarea" rows="3" default="" label="FLEXI_REMOTE_TRUSTED_HOSTS" description="FLEXI_REMOTE_TRUSTED_HOSTS_DESC" class="input-xxlarge" />
+
 			<field name="" type="separator" default="FLEXI_AUTO_RESIZE_ORIGINAL_IMAGES" description="" level="level3" />
 			<field name="" type="separator" default="FLEXI_AUTO_RESIZE_ORIGINAL_IMAGES_INFO" description="" level="level3" class="alert alert-info fcpadded"/>
 			<field name="resize_on_upload" type="radio" default="1" label="FLEXI_RESIZE_ON_UPLOADED_IMAGE" description="FLEXI_RESIZE_ON_UPLOADED_IMAGE_DESC" class="btn-group btn-group-yesno">

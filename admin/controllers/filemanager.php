@@ -347,6 +347,36 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 				$data['filename_original'] = flexicontent_html::dataFilter($data['filename_original'], 4000, 'STRING', 0);  // Clean bad text/html
 				$data['filename'] = flexicontent_html::dataFilter($data['filename'], 4000, 'URL', 0);  // Clean bad text/html
 
+				// Validate a new or changed remote file URL like addurl() does (the URL is validated again whenever it is accessed)
+				if ($isnew || empty($record->filename) || (string) $data['filename'] !== (string) $record->filename)
+				{
+					$url_error = '';
+					$url_valid = flexicontent_remote::validateUrl($data['filename'], $url_error);
+
+					if (!$url_valid)
+					{
+						$app->setHeader('status', '400 Bad Request', true);
+						$app->enqueueMessage('Invalid remote file URL: ' . $url_error, 'error');
+
+						// Skip redirection back to return url if inside a component-area-only view, showing error using current page, since usually we are inside a iframe modal
+						if ($this->input->getCmd('tmpl') !== 'component')
+						{
+							$this->setRedirect($this->returnURL);
+						}
+
+						if ($this->input->get('fc_doajax_submit'))
+						{
+							jexit(flexicontent_html::get_system_messages_html());
+						}
+						else
+						{
+							return false;
+						}
+					}
+
+					$data['filename'] = $url_valid['url'];
+				}
+
 				// Use the submitted file size when present. Do not probe an untrusted
 				// remote URL from the server merely to calculate optional metadata.
 				if (!empty($data['size']))
@@ -1101,69 +1131,24 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			return $this->terminate($file_id, $exitMessages);
 		}
 
-		// Remote URL records may only use HTTP(S). Normalize a missing scheme
-		// before storing the URL so non-network stream wrappers are never accepted.
+		// Remote URL records must pass the shared remote URL validation (flexicontent_remote): HTTP(S) only,
+		// no credentials, host resolving (IPv4 and IPv6) to public addresses unless it is the site itself or a trusted host
 		if ($linktype === 1)
 		{
-			if (!preg_match('#^[a-z][a-z0-9+.-]*://#i', $url))
-			{
-				$url = 'http://' . ltrim($url, '/');
-			}
+			$url_error = '';
+			$url_valid = flexicontent_remote::validateUrl($url, $url_error);
 
-			$url_scheme = strtolower((string) parse_url($url, PHP_URL_SCHEME));
-			$url_host   = (string) parse_url($url, PHP_URL_HOST);
-
-			if (!in_array($url_scheme, array('http', 'https'), true) || $url_host === '')
+			if (!$url_valid)
 			{
 				$this->exitHttpHead = array(0 => array('status' => '400 Bad Request'));
-				$this->exitMessages = array(0 => array('error' => 'Only valid HTTP and HTTPS URLs are supported.'));
+				$this->exitMessages = array(0 => array('error' => 'Invalid remote file URL: ' . $url_error));
 				$this->exitLogTexts = array();
 				$this->exitSuccess  = false;
 
 				return $this->terminate($file_id, $exitMessages);
 			}
 
-			/**
-			 * Reject hosts resolving to private, loopback, link-local or otherwise
-			 * reserved addresses, so this cannot be used to probe the internal network.
-			 *
-			 * The site's own hostname is exempt on purpose: behind a proxy, a load
-			 * balancer or on shared hosting it legitimately resolves to a private
-			 * address, and attaching a file from your own site is a normal action.
-			 *
-			 * addurl() stores the URL but does not dereference it. Avoiding a server-side
-			 * request here also prevents redirects and DNS rebinding from changing the
-			 * validated destination.
-			 */
-			$site_host = strtolower((string) parse_url(\Joomla\CMS\Uri\Uri::root(), PHP_URL_HOST));
-
-			if (strtolower($url_host) !== $site_host)
-			{
-				$candidate_ips = filter_var($url_host, FILTER_VALIDATE_IP)
-					? array($url_host)
-					: array_filter((array) @gethostbynamel($url_host));
-
-				$host_is_blocked = empty($candidate_ips);
-
-				foreach ($candidate_ips as $candidate_ip)
-				{
-					if (!filter_var($candidate_ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE))
-					{
-						$host_is_blocked = true;
-						break;
-					}
-				}
-
-				if ($host_is_blocked)
-				{
-					$this->exitHttpHead = array(0 => array('status' => '400 Bad Request'));
-					$this->exitMessages = array(0 => array('error' => 'This URL host could not be resolved to a permitted public address.'));
-					$this->exitLogTexts = array();
-					$this->exitSuccess  = false;
-
-					return $this->terminate($file_id, $exitMessages);
-				}
-			}
+			$url = $url_valid['url'];
 		}
 
 		if (empty($filesize))

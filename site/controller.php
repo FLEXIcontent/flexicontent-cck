@@ -1838,6 +1838,31 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		//echo '<pre>'; print_r($dlfile); exit;
 
 
+		/**
+		 * Remote (URL) files are only fetched through the validated, pinned remote client (flexicontent_remote),
+		 * which also applies the trusted hosts policy and a size limit. If the file cannot or must not be proxied,
+		 * redirect the browser to the URL instead (no server-side request is made in that case)
+		 */
+		$remote_download = false;
+
+		if ($dlfile->url == 1)
+		{
+			$remote_error    = '';
+			$remote_download = flexicontent_remote::prepareDownload($dlfile->filename, 100 * (1024 * 1024), $remote_error);
+
+			if (!$remote_download)
+			{
+				@header("Location: " . $dlfile->filename, true);
+				$app->close();
+			}
+
+			// Prefer the size reported by the remote server for the Content-Length header
+			if ($remote_download['size'] >= 0)
+			{
+				$dlfile->size = $remote_download['size'];
+			}
+		}
+
 		// *****************************************
 		// Output an appropriate Content-Type header
 		// *****************************************
@@ -1854,7 +1879,10 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			: header("Content-Disposition: attachment; filename=\"".$dlfile->download_filename."\";" );
 
 		header("Content-Transfer-Encoding: binary");
-		header("Content-Length: " . ($dlfile->size_tmp ?: $dlfile->size));
+		if (($dlfile->size_tmp ?: $dlfile->size) > 0)
+		{
+			header("Content-Length: " . ($dlfile->size_tmp ?: $dlfile->size));
+		}
 
 
 		// *******************************
@@ -1866,20 +1894,17 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		$chunksize = 1 * (1024 * 1024); // 1MB, highest possible for fread should be 8MB
 		$filesize  = $dlfile->size_tmp ?: $dlfile->size;
 
-		// Do not try to read too big file URL files
-		if ($dlfile->url && $filesize > 100 * (1024 * 1024))
+		// Remote (URL) file: stream it through the validated, pinned remote client (the HTTP headers were already sent)
+		if ($remote_download)
 		{
-			@header("Location: ".$url."","target=blank");
-			$app->close();
+			flexicontent_remote::streamDownload($remote_download);
 		}
 		elseif ($filesize > $chunksize)
 		{
 			$handle = @fopen($dlfile->abspath_tmp ?: $dlfile->abspath, 'rb');
 
-			// Redirect to the exteral file download link if we failed to open the URL
-			if (!$handle && $dlfile->url)
+			if (!$handle)
 			{
-				@header("Location: ".$url."","target=blank");
 				$app->close();
 			}
 
@@ -2507,78 +2532,25 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 	 */
 
 	/**
-	 * Returns the size of a file without downloading it, or -1 if the file size could not be determined.
+	 * Returns the size of a remote file without downloading it, or -1 if the file size could not be determined
 	 *
-	 * @param $url - The location of the remote file to download. Cannot be null or empty.
+	 * All remote requests go through flexicontent_remote (validated URL, pinned connection, no automatic redirects)
 	 *
-	 * @return The size of the file referenced by $url,
-	 * or -1 if the size could not be determined
-	 * or -999 if there was an error
+	 * @param   string   $url    The URL of the remote file
+	 * @param   boolean  $retry  Unused, kept for backwards compatibility
+	 *
+	 * @return  integer  The size of the file, -1 if it could not be determined, -999 on error (see getError())
 	 */
 	private function _get_file_size_from_url($url, $retry = true)
 	{
-		$original_url = $url;
-		$retry = $retry === true ? 6 : 0;
+		$error = '';
+		$size  = flexicontent_remote::headSize($url, $error);
 
-		// clear last error
-		$ignore_last_error = error_get_last();
-
-		try {
-			$headers = array('Location' => $url);
-
-			// Follow the Location headers until the actual file URL is known
-			while (isset($headers['Location']))
-			{
-				$url = is_array($headers['Location'])
-					? end($headers['Location'])
-					: $headers['Location'];
-
-				$headers = @ get_headers($url, 1);
-
-				// Check for get headers failing to execute
-				if ($headers === false)
-				{
-					$error = error_get_last();
-
-					$error_message = is_array($error) && isset($error['message'])
-						? $error['message']
-						: 'Error retrieving headers of URL';
-					$this->setError($error_message);
-
-					return -999;
-				}
-
-				// Check for bad response from server, e.g. not found 404 , or 403 no access
-				$n = 0;
-				while(isset($headers[$n]))
-				{
-					$code = (int) substr($headers[$n], 9, 3);
-					if ($code < 200 || $code >= 400 )
-					{
-						$this->setError($headers[$n]);
-						return -999;
-					}
-					$n++;
-				}
-			}
-		}
-
-		catch (RuntimeException $e) {
-			$this->setError($e->getMessage());
-			return -999;  // indicate a fatal error
-		}
-
-		// Work-around with content length missing during 1st try, just retry once more
-		if (!isset($headers["Content-Length"]) && $retry)
+		if ($size === -999)
 		{
-			return $this->_get_file_size_from_url($original_url, --$retry);
+			$this->setError($error ?: 'Error retrieving headers of URL');
 		}
 
-		$headers["Content-Length"] = is_array($headers["Content-Length"]) ? end($headers["Content-Length"]) : $headers["Content-Length"];
-
-		// Get file size, -1 indicates that the size could not be determined
-		return isset($headers["Content-Length"])
-			? $headers["Content-Length"]
-			: -1;
+		return $size;
 	}
 }
