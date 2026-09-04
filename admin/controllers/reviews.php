@@ -196,17 +196,25 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		$user  = \Joomla\CMS\Factory::getUser();
 
 		$cid    = $this->input->get('cid', array(), 'array');
+		$cid    = ArrayHelper::toInteger($cid);
 		$values = array('approved' => 1, 'unapproved' => 0);
 		$value  = ArrayHelper::getValue($values, $this->task, 0, 'int');
 
-		// Access checks.
+		// Access checks, these are done against the content item that is being reviewed
+		$db = \Joomla\CMS\Factory::getDbo();
+		$content_ids = count($cid)
+			? $db->setQuery('SELECT id, content_id FROM #__' . $this->records_dbtbl . ' WHERE id IN (' . implode(',', $cid) . ')')->loadAssocList('id', 'content_id')
+			: array();
+
 		foreach ($cid as $i => $id)
 		{
-			if (!$user->authorise('core.edit.state', 'com_content.article.' . (int) $id))
+			$content_id = isset($content_ids[$id]) ? (int) $content_ids[$id] : 0;
+
+			if (!$content_id || !$user->authorise('core.edit.state', 'com_content.article.' . $content_id))
 			{
 				// Prune items that you can't change.
 				unset($cid[$i]);
-				JError::raiseNotice(403, \Joomla\CMS\Language\Text::_('JLIB_APPLICATION_ERROR_EDITSTATE_NOT_PERMITTED'));
+				$app->enqueueMessage(\Joomla\CMS\Language\Text::_('JLIB_APPLICATION_ERROR_EDITSTATE_NOT_PERMITTED'), 'warning');
 			}
 		}
 

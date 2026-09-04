@@ -192,6 +192,21 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 		// Validation with \Joomla\CMS\Form\Form
 		$data = $this->input->post->getArray();  // Default filtering will remove HTML
+
+		// Uploader, upload date, lock and external storage data are never accepted from the request
+		unset($data['checked_out'], $data['checked_out_time'], $data['estorage_fieldid']);
+
+		if (!$isnew)
+		{
+			$data['uploaded_by'] = $record->uploaded_by;
+			$data['uploaded']    = $record->uploaded;
+		}
+		else
+		{
+			$data['uploaded_by'] = $user->id;
+			$data['uploaded']    = \Joomla\CMS\Factory::getDate('now')->toSql();
+		}
+
 		$data['description'] = flexicontent_html::dataFilter($data['description'], 32000, 'STRING', 0);  // Limit description to 32000 characters
 		$data['hits'] = (int) $data['hits'];
 		$data['secure'] = $data['secure'] ? 1 : 0;   // Only allow 1 or 0
@@ -288,6 +303,36 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		{
 			// CASE local file
 			case 0:
+				// The filename of an existing local file can only change via the file replacement upload (handled above)
+				if (!$isnew && empty($__file_id) && !empty($record->filename) && (string) $data['filename'] !== (string) $record->filename)
+				{
+					$data['filename'] = $record->filename;
+				}
+
+				// Validate the (relative) filename, it may include a subfolder but not parent-folder references or NULL bytes
+				$data['filename'] = ltrim(preg_replace('#[/\\\\]+#', '/', (string) $data['filename']), '/');
+
+				if ($data['filename'] === '' || strpos($data['filename'], "\0") !== false || preg_match('#(^|/)\.\.(/|$)#', $data['filename']))
+				{
+					$app->setHeader('status', '403 Forbidden', true);
+					$app->enqueueMessage(\Joomla\CMS\Language\Text::_('Invalid filename'), 'error');
+
+					// Skip redirection back to return url if inside a component-area-only view, showing error using current page, since usually we are inside a iframe modal
+					if ($this->input->getCmd('tmpl') !== 'component')
+					{
+						$this->setRedirect($this->returnURL);
+					}
+
+					if ($this->input->get('fc_doajax_submit'))
+					{
+						jexit(flexicontent_html::get_system_messages_html());
+					}
+					else
+					{
+						return false;
+					}
+				}
+
 				$path = ($data['secure'] ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH) . DS;  // JPATH_ROOT . DS . <media_path | file_path> . DS
 				$file_path = \Joomla\Filesystem\Path::clean($path . $data['filename']);
 

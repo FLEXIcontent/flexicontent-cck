@@ -132,6 +132,34 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$cid = $this->input->get('cid', array(), 'array');
 		$cid = ArrayHelper::toInteger($cid);
 
+		// Check access: only items that the user can edit
+		$record_model = $this->getModel($this->record_name);
+		$cid_noauth = array();
+
+		foreach ($cid as $i => $_id)
+		{
+			$record = $_id ? $record_model->getRecord($_id) : null;
+
+			if (!$record || empty($record->id) || !$record_model->canEdit($record))
+			{
+				$cid_noauth[] = $_id;
+				unset($cid[$i]);
+			}
+		}
+
+		if (count($cid_noauth))
+		{
+			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK') . ': ' . implode(',', $cid_noauth), 'warning');
+		}
+
+		if (!count($cid))
+		{
+			$app->setHeader('status', '403 Forbidden', true);
+			$this->setRedirect($this->returnURL);
+
+			return;
+		}
+
 		$values = array('set_uptodate' => 1, 'clear_uptodate' => 0);
 		$value  = ArrayHelper::getValue($values, $this->task, 0, 'int');
 
@@ -2131,13 +2159,35 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		// Check for request forgeries
 		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
+		$app  = \Joomla\CMS\Factory::getApplication();
+		$user = \Joomla\CMS\Factory::getUser();
+
 		$id			= $this->input->getInt('id', 0);
 		$version	= $this->input->getInt('version', 0);
 		$record_model = $this->getModel($this->record_name);
 
-		// First checkin the open item
+		// Check access: user must be able to edit the item
+		$record = $id ? $record_model->getRecord($id) : null;
+
+		if (!$record || empty($record->id) || !$record_model->canEdit($record))
+		{
+			$app->setHeader('status', '403 Forbidden', true);
+			$this->setRedirect($this->returnURL, \Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+
+			return;
+		}
+
+		// First checkin the open item, but do not force check-in of items locked by other users
 		$item = \Joomla\CMS\Table\Table::getInstance($this->records_jtable, '');
 		$item->load($id);
+
+		if ($item->checked_out && $item->checked_out != $user->id && !$user->authorise('core.manage', 'com_checkin'))
+		{
+			$this->setRedirect($this->returnURL, \Joomla\CMS\Language\Text::_('JLIB_APPLICATION_ERROR_CHECKIN_USER_MISMATCH'), 'error');
+
+			return;
+		}
+
 		$item->checkin();
 
 		if ($version)
