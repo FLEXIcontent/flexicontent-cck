@@ -416,7 +416,7 @@ if (!empty($js)) {
 			<input type="'.($search_autocomplete==2 ? 'hidden' : 'text').'"
 				data-txt_ac_lang="' . \Joomla\CMS\Factory::getLanguage()->getTag() . '"
 id="mod_search_searchword-'.$module->id.'" class="'.($isJ4 ? 'form-control ' : '').$text_search_class.'"
-				placeholder="'.$search_inner_prompt.'" label="'.$search_inner_prompt.'"  name="q" '.($search_autocomplete==2 ? '' : ' size="'.$search_inner_width.'" maxlength="'.$maxchars.'"').' value="'.$searchword.'" aria-label="'.$search_inner_prompt.'"  />';
+				placeholder="'.$search_inner_prompt.'" label="'.$search_inner_prompt.'"  name="q" '.($search_autocomplete==2 ? '' : ' size="'.$search_inner_width.'" maxlength="'.$maxchars.'"').' value="'.htmlspecialchars($searchword, ENT_QUOTES, 'UTF-8').'" aria-label="'.$search_inner_prompt.'"  />';
 
 		// Search's GO button
 		if ($button) :

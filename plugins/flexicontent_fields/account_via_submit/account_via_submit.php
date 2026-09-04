@@ -316,7 +316,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 
 		// Check email already used
 		$db = \Joomla\CMS\Factory::getDbo();
-		$db->setQuery("SELECT id FROM #__users WHERE email='$email'");
+		$db->setQuery('SELECT id FROM #__users WHERE email = ' . $db->Quote($email));
 		$existingUserID = $db->loadResult();
 
 		// HANDLE existing user
@@ -462,14 +462,14 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		if (!$instance->save())
 		{
 			// Email already used!!!
-			$db->setQuery("SELECT id FROM #__users WHERE email='$email'");
+			$db->setQuery('SELECT id FROM #__users WHERE email = ' . $db->Quote($email));
 			$existingUserID = $db->loadResult();
 			if ($existingUserID) return -$existingUserID;
 			else return false;
 		}
 
 		// Make sure user was created
-		$db->setQuery("SELECT id FROM #__users WHERE email='$email'");
+		$db->setQuery('SELECT id FROM #__users WHERE email = ' . $db->Quote($email));
 		$newUserID = $db->loadResult();
 		$user = \Joomla\CMS\Factory::getUser($newUserID);
 
