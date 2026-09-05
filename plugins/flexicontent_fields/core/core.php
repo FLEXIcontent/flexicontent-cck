@@ -542,7 +542,14 @@ class plgFlexicontent_fieldsCore extends FCField
 			$auto_title = (int) $item->parameters->get('auto_title', 0);
 
 			// Check if using 'auto_title_code', clear 'auto_title', if function not set
-			$auto_title_code = $item->parameters->get('auto_title_code', '');
+			// PHP comes only from the persisted type, never submitted item attributes.
+            $auto_title_code = '';
+            if ($auto_title === 2)
+            {
+                $db = \Joomla\CMS\Factory::getDbo();
+                $typeParams = new \Joomla\Registry\Registry($db->setQuery('SELECT attribs FROM #__flexicontent_types WHERE id = ' . (int) $item->type_id)->loadResult());
+                $auto_title_code = (int) $typeParams->get('auto_title', 0) === 2 ? $typeParams->get('auto_title_code', '') : '';
+            }
 			$auto_title = $auto_title === 2 && !$auto_title_code ? 0 : $auto_title;
 
 			if ($auto_title)

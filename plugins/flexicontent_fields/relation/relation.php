@@ -1315,6 +1315,10 @@ class plgFlexicontent_fieldsRelation extends FCField
 			$response['error'] = 'field not found';
 		}
 
+		elseif (!$field->published || !isset($uacc[(int) $field->access]) && (int) $field->access !== 0)
+		{
+			$response['error'] = 'field is not accessible';
+		}
 		elseif ($field->field_type !== 'relation')
 		{
 			$response['error'] = 'field id is not a relation field';
@@ -1531,6 +1535,10 @@ class plgFlexicontent_fieldsRelation extends FCField
 		 * Item retrieving query ... CREATE WHERE CLAUSE according to configured limitations SCOPEs
 		 */
 		$where = array();
+		$viewLevels = implode(',', array_map('intval', array_keys($uacc)));
+		$where[] = ' i.access IN (0,' . $viewLevels . ')';
+		$where[] = ' EXISTS (SELECT 1 FROM #__categories AS vc WHERE vc.id = i.catid AND vc.published = 1 AND vc.access IN (0,' . $viewLevels . ') AND NOT EXISTS (SELECT 1 FROM #__categories AS vp WHERE vp.lft <= vc.lft AND vp.rgt >= vc.rgt AND vp.id <> 1 AND (vp.published <> 1 OR vp.access NOT IN (0,' . $viewLevels . '))))';
+		$where[] = ' EXISTS (SELECT 1 FROM #__flexicontent_items_ext AS ve JOIN #__flexicontent_types AS vt ON vt.id = ve.type_id WHERE ve.item_id = i.id AND vt.published = 1 AND vt.access IN (0,' . $viewLevels . '))';
 
 		// Exclude currently edited item
 		if ($item_id)
@@ -1680,7 +1688,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 			? ''
 			: ' WHERE ' . implode(' AND ', $where);
 
-		$query = 'SELECT i.id, i.catid, i.title, i.state, i.alias'
+		$query = 'SELECT i.id, i.catid, i.title, i.state, i.alias, i.created_by, i.publish_up, i.publish_down'
 			. ' FROM #__content AS i '
 			. $types_join
 			. ' JOIN #__flexicontent_cats_item_relations AS rel on i.id=rel.itemid '
@@ -1729,6 +1737,11 @@ class plgFlexicontent_fieldsRelation extends FCField
 			$indexed_field_types = array_flip(array('select', 'selectmultiple', 'radio', 'radioimage', 'checkbox', 'checkboximage'));
 			foreach ($append_fields as $fld_id => $append_field)
 			{
+				if (!$append_field->published || !$append_field->has_access)
+				{
+					unset($append_fields[$fld_id]);
+					continue;
+				}
 				// Load config
 				$item_instance = null;
 				FlexicontentFields::loadFieldConfig($append_field, $item_instance);
@@ -1780,6 +1793,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 
 		foreach ($items_arr as $item_id => $itemdata)
 		{
+			if (!flexicontent_security::canViewItemState($itemdata, $user)) continue;
 			$itemtitle = StringHelper::strlen($itemdata->title) > $maxtitlechars
 				? StringHelper::substr($itemdata->title, 0, $maxtitlechars) . '...'
 				: $itemdata->title;

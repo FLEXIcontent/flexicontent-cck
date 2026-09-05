@@ -275,43 +275,11 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		// IS new FLAG
 		$isnew   = ! $item->id;
 
-		// Create and set (into HTTP request) a unique item id for plugins that needed it
-		if ($item->id)
-		{
-			$unique_tmp_itemid = $item->id;
-		}
-		else
-		{
-			$unique_tmp_itemid = $app->getUserState($this->option.'.edit.item.unique_tmp_itemid');
-			$unique_tmp_itemid = $unique_tmp_itemid ? $unique_tmp_itemid : date('_Y_m_d_h_i_s_', time()) . uniqid(true);
-		}
-
-		//print_r($unique_tmp_itemid);
+		// Saved items retain their item id; new forms use a session-issued upload id.
+		$unique_tmp_itemid = $item->id
+			? $item->id
+			: flexicontent_security::getOrCreateTemporaryItemId($app, $this->option);
 		$jinput->set('unique_tmp_itemid', $unique_tmp_itemid);
-
-		// Keep a short-lived server-side registry of temporary ids issued to this
-		// session. Folder-mode deletion must never trust the id's format alone.
-		if (!$item->id && preg_match('/^_\d{4}_\d{2}_\d{2}_\d{2}_\d{2}_\d{2}_[0-9a-f.]{13,}$/', $unique_tmp_itemid))
-		{
-			$registry_key = $this->option . '.edit.item.active_tmp_itemids';
-			$active_tmp_ids = (array) $app->getUserState($registry_key, array());
-			$cutoff = time() - 7200;
-
-			$active_tmp_ids = array_filter($active_tmp_ids, function ($issued_at) use ($cutoff) {
-				return (int) $issued_at >= $cutoff;
-			});
-
-			$active_tmp_ids[$unique_tmp_itemid] = time();
-
-			if (count($active_tmp_ids) > 20)
-			{
-				asort($active_tmp_ids);
-				$active_tmp_ids = array_slice($active_tmp_ids, -20, null, true);
-			}
-
-			$app->setUserState($registry_key, $active_tmp_ids);
-		}
-
 
 		/**
 		 * Get Associated Translations and languages
@@ -501,7 +469,8 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 						if ($tbl_exists)
 						{
 							$query = 'SELECT * FROM #__flexicontent_edit_coupons '
-								. ' WHERE token = ' . $db->Quote($edittok) . ' AND id = ' . $model->get('id')	;
+								. ' WHERE token = ' . $db->Quote($edittok) . ' AND id = ' . (int) $model->get('id')
+								. ' AND CHAR_LENGTH(token) = 64 AND timestamp >= ' . (time() - 7 * 86400);
 							$db->setQuery( $query );
 							$tokdata = $db->loadObject();
 							if ($tokdata)

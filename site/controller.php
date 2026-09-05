@@ -11,6 +11,9 @@
 
 defined('_JEXEC') or die;
 
+// Public handlers may run before the database helper is autoloaded.
+require_once JPATH_SITE . '/components/com_flexicontent/classes/helpers/security.php';
+
 use Joomla\Filesystem\Path;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
@@ -1030,6 +1033,14 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				$tree_files[] = $file_node;
 			}
 		}
+		// A coupon grants access only to its own file, never arbitrary IDs or a batch.
+		if (!empty($slink_valid_coupon))
+		{
+			if (count($tree_files) !== 1 || !flexicontent_security::couponMatchesFile($coupon, $tree_files[0]->fileid))
+			{
+				throw new \RuntimeException('Download coupon does not authorize this file', 403);
+			}
+		}
 		//echo '<pre>'; print_r($tree_files); jexit();
 
 
@@ -1568,7 +1579,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 						$email_values = $db->loadColumn();
 
 						foreach ($email_values as $email_value) {
-							$unserialized = @unserialize($email_value, array('allowed_classes' => false));
+							$unserialized = flexicontent_db::unserialize($email_value);
 							$addr = is_array($unserialized) && isset($unserialized['addr'])
 								? $unserialized['addr']
 								: $email_value;
@@ -2121,7 +2132,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		 */
 
 		// Recover the link array (url|title|hits), never allow object instantiation from the stored value
-		$link = @unserialize($link_data->value, array('allowed_classes' => false));
+		$link = flexicontent_db::unserialize($link_data->value);
 
 		if (!is_array($link) || empty($link['link']) || !is_string($link['link']))
 		{

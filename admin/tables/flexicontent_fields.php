@@ -17,6 +17,15 @@ require_once('flexicontent_basetable.php');
 
 class _flexicontent_fields_common extends flexicontent_basetable
 {
+    public function store($updateNulls = false)
+    {
+        require_once JPATH_SITE . '/components/com_flexicontent/classes/helpers/security.php';
+        $db = $this->getDbo();
+        $old = $this->id ? $db->setQuery('SELECT attribs FROM #__flexicontent_fields WHERE id = ' . (int) $this->id)->loadResult() : '';
+        flexicontent_security::assertTrustedConfigurationChange($old, $this->attribs, \Joomla\CMS\Factory::getUser());
+        return parent::store($updateNulls);
+    }
+
 	/**
 	 * Get the parent asset id for the record
 	 *

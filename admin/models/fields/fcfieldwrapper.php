@@ -59,40 +59,13 @@ class JFormFieldFCFieldWrapper extends \Joomla\CMS\Form\FormField
 		$control_name = str_replace($name, '', $element_id);
 
 		$app = \Joomla\CMS\Factory::getApplication();
-		$option = $app->input->get('option');
-		if (!empty($this->element['item_id']))
-		{
-			$unique_tmp_itemid = $this->element['item_id'];
-		}
-		else
-		{
-			$unique_tmp_itemid = $app->getUserState($option.'.edit.item.unique_tmp_itemid');
-			$unique_tmp_itemid = $unique_tmp_itemid ? $unique_tmp_itemid : date('_Y_m_d_h_i_s_', time()) . uniqid(true);
-		}
-		$unique_tmp_itemid = substr($unique_tmp_itemid, 0, 1000);
+		$option = $app->input->getCmd('option', 'com_flexicontent');
+		$item_id = (int) $this->element['item_id'];
+		$unique_tmp_itemid = $item_id > 0
+			? (string) $item_id
+			: flexicontent_security::getOrCreateTemporaryItemId($app, $option);
 		$app->input->set('unique_tmp_itemid', $unique_tmp_itemid);
-		$app->setUserState($option.'.edit.item.unique_tmp_itemid', $unique_tmp_itemid);  // Save temporary unique item id into the session
-
-		if (preg_match('/^_\d{4}_\d{2}_\d{2}_\d{2}_\d{2}_\d{2}_[0-9a-f.]{13,}$/', $unique_tmp_itemid))
-		{
-			$registry_key = $option . '.edit.item.active_tmp_itemids';
-			$active_tmp_ids = (array) $app->getUserState($registry_key, array());
-			$cutoff = time() - 7200;
-
-			$active_tmp_ids = array_filter($active_tmp_ids, function ($issued_at) use ($cutoff) {
-				return (int) $issued_at >= $cutoff;
-			});
-
-			$active_tmp_ids[$unique_tmp_itemid] = time();
-
-			if (count($active_tmp_ids) > 20)
-			{
-				asort($active_tmp_ids);
-				$active_tmp_ids = array_slice($active_tmp_ids, -20, null, true);
-			}
-
-			$app->setUserState($registry_key, $active_tmp_ids);
-		}
+		$app->setUserState($option . '.edit.item.unique_tmp_itemid', $unique_tmp_itemid);
 
 		// Create containers for the already rendered the fields
 		$html = $this->renderFieldsForm(static::$fcform_item);

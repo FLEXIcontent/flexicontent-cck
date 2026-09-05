@@ -14,6 +14,9 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Uri\Uri;
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
+
+// Public handlers may run before the database helper is autoloaded.
+require_once JPATH_SITE . '/components/com_flexicontent/classes/helpers/security.php';
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 JLoader::register('FlexicontentControllerFilemanager', JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'controllers'.DS.'filemanager.php');  // we use JPATH_BASE since controller exists in frontend too
 JLoader::register('FlexicontentModelFilemanager', JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'filemanager.php');  // we use JPATH_BASE since model exists in frontend too
@@ -2218,7 +2221,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 	function share_file_email()
 	{
 		// Check for request forgeries
-		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		flexicontent_security::requirePostToken();
 
 		$user = Factory::getUser();
 		$db   = Factory::getDbo();
@@ -2266,11 +2269,19 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		$access_clauses = $this->_createFieldItemAccessClause( $get_select_access = false, $include_file = true );
 
 
+		// Also enforce publication and item/type membership for direct handler calls.
+		flexicontent_security::loadItemField($content_id, $field_id, 'mediafile');
+
 		// Get field's configuration
 		$q = 'SELECT attribs, name FROM #__flexicontent_fields WHERE id = '.(int) $field_id;
 		$db->setQuery($q);
 		$fld = $db->loadObject();
+		if (!$fld) throw new \RuntimeException('Field not found', 404);
 		$field_params = new \Joomla\Registry\Registry($fld->attribs);
+		if (!(int) $field_params->get('allowshare', 0))
+		{
+			throw new \RuntimeException('File sharing is disabled', 403);
+		}
 
 		// Get all needed data related to the given file
 		$query  = 'SELECT f.id, f.filename, f.altname, f.secure, f.stamp, f.url,'
@@ -2303,11 +2314,13 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			jexit( \Joomla\CMS\Language\Text::_( 'FLEXI_ALERTNOTAUTH' ). "File data not found OR no access for file #: ". $file_id ." of content #: ". $content_id ." in field #: ".$field_id );
 		}
 
+		flexicontent_security::consumeMailQuota('field-mail');
+		$session->set('com_flexicontent.formtime', 0);
 		$coupon_vars = '';
 		if ( $field_params->get('enable_coupons', 0) )
 		{
 			// Insert new download coupon into the DB, in the case the file is sent to a user with no ACCESS
-			$coupon_token = uniqid();  // create coupon token
+			$coupon_token = bin2hex(random_bytes(32));  // cryptographically random bearer token
 			$query = ' INSERT #__flexicontent_download_coupons '
 				. 'SET user_id = ' . (int)$user->id
 				. ', file_id = ' . $file_id
@@ -2411,7 +2424,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		$attachment=null; $replyto=null; $replytoname=null;
 
 		// Send the email
-		$send_result = Factory::getMailer()->sendMail( $from, $sender, $email, $subject, $body, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
+		$send_result = Factory::getMailer()->sendMail( $MailFrom, $FromName, $email, $subject, $body, $html_mode, $cc, $bcc, $attachment, $from, $sender );
 		if ( $send_result !== true )
 		{
 			JError::raiseNotice(500, \Joomla\CMS\Language\Text:: _ ('FLEXI_FIELD_FILE_EMAIL_NOT_SENT'));

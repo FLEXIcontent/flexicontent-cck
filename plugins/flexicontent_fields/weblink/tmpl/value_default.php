@@ -29,7 +29,9 @@ foreach ($values as $value)
 	}
 
 	// Check if link is 'internal' aka 'safer', but make it absolute before checking it !
-	$link       = $this->make_absolute_url($value['link']);
+	$safe_link = flexicontent_security::safeUrl($value['link'], true, array('http', 'https', 'ftp', 'ftps', 'mailto', 'tel', 'sms'));
+	if ($safe_link === '') continue;
+	$link = $this->make_absolute_url($safe_link);
 	$isInternal = \Joomla\CMS\Uri\Uri::isInternal($link);
 	$isVideo    = $playback_videos && (strpos($value['link'], 'youtube') !== false || strpos($value['link'], 'vimeo') !== false);
 
@@ -92,13 +94,13 @@ foreach ($values as $value)
 	}
 	else
 	{
-		$link_params .= $target ? ' target="'.$target.'"' : '';
+		$link_params .= $target ? ' target="'.htmlspecialchars((string) $target, ENT_QUOTES, 'UTF-8').'"' : '';
 	}
 
 	$link_params .= ''
 		. ($title  ? ' title="' . htmlspecialchars($title, ENT_COMPAT, 'UTF-8') . '"' : '')
-		. ($id     ? ' id="' . $id . '"' : '')
-		. ($class ? ' class="' . $class . '"' : '')
+		. ($id     ? ' id="' . htmlspecialchars((string) $id, ENT_QUOTES, 'UTF-8') . '"' : '')
+		. ($class ? ' class="' . htmlspecialchars((string) $class, ENT_QUOTES, 'UTF-8') . '"' : '')
 		. ($rel    ? ' rel="' . $rel . '" ' : '');
 
 	// Direct access to the web-link, hits counting not possible
@@ -124,20 +126,21 @@ foreach ($values as $value)
 
 	if ($display_image && $image)
 	{
-		$img_src = file_exists(JPATH_ROOT . '/' . $image)
+		$image = flexicontent_security::safeUrl($image);
+		$img_src = $image !== '' && file_exists(JPATH_ROOT . '/' . $image)
 			? \Joomla\CMS\Uri\Uri::root() . $image
 			: $image;
 		$img_tag = ($display_image == 1 ? '<br>' : '') . '
 			<div style="position: relative; display: inline-block;">
-				<img src="' . $img_src . '" alt="' . htmlspecialchars($title, ENT_COMPAT, 'UTF-8') . '" width="' . $image_w . '" height="' . $image_h . '" style="width: ' . $image_w . 'px; width: ' . $image_h . 'px; "/>
+				<img src="' . htmlspecialchars($img_src, ENT_QUOTES, 'UTF-8') . '" alt="' . htmlspecialchars($title, ENT_COMPAT, 'UTF-8') . '" width="' . $image_w . '" height="' . $image_h . '" style="width: ' . $image_w . 'px; width: ' . $image_h . 'px; "/>
 				' . $playbackicon . '
 			</div>
 		';
 	}
 
 	// Create indirect link to web-link address with custom displayed text
-	$html = '<a href="' .$href. '" '.$link_params.' itemprop="url">'
-		. ($img_tag && $display_image == 2 ? '' : $linktext)
+	$html = '<a href="' .htmlspecialchars($href, ENT_QUOTES, 'UTF-8'). '" '.$link_params.' itemprop="url">'
+		. ($img_tag && $display_image == 2 ? '' : htmlspecialchars((string) $linktext, ENT_QUOTES, 'UTF-8'))
 		. $img_tag
 	. '</a>';
 

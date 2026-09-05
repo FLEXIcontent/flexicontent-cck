@@ -900,7 +900,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 			// Validate other value properties
 			$newpost[$new]['api_type']    = flexicontent_html::dataFilter(@$v['api_type'], 0, 'STRING', 100);
 			$newpost[$new]['media_id']    = flexicontent_html::dataFilter(@$v['media_id'], 0, 'STRING', 1000);
-			$newpost[$new]['embed_url']   = flexicontent_html::dataFilter(@$v['embed_url'], 0, 'STRING', 1000);  // 'URL' strips needed characters ?
+			$newpost[$new]['embed_url']   = flexicontent_security::safeUrl(flexicontent_html::dataFilter(@$v['embed_url'], 1000, 'STRING', 0));  // 'URL' strips needed characters ?
 			$newpost[$new]['thumb']       = flexicontent_html::dataFilter(@$v['thumb'], 0, 'STRING', 1000);  // 'URL' strips needed characters ?
 			$newpost[$new]['title']       = flexicontent_html::dataFilter(@$v['title'], 0, 'STRING', 1000);
 			$newpost[$new]['author']      = flexicontent_html::dataFilter(@$v['author'], 0, 'STRING', 1000);

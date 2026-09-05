@@ -615,7 +615,7 @@ if ($leadnum) :
 						$src = str_replace(\Joomla\CMS\Uri\Uri::root(), '', ($img_field->thumbs_src[$img_field_size][0] ?? '') );
 						if ( $lead_link_image_to && isset($img_field->value[0]) )
 						{
-							$custom_link = ($v = unserialize($img_field->value[0])) !== false ? @ $v['link'] : ($img_field->value[0]['link'] ?? '');
+							$custom_link = ($v = flexicontent_db::unserialize($img_field->value[0])) !== false ? @ $v['link'] : ($img_field->value[0]['link'] ?? '');
 						}
 
 						$item->image_w = $src ? $img_field->parameters->get('w_'.$img_field_size[0], 120) : 0;
@@ -1184,7 +1184,7 @@ if ($count > $leadnum) :
 						$src = str_replace(\Joomla\CMS\Uri\Uri::root(), '', ($img_field->thumbs_src[$img_field_size][0] ?? '') );
 						if ( $intro_link_image_to && isset($img_field->value[0]) )
 						{
-							$custom_link = ($v = unserialize($img_field->value[0])) !== false ? @ $v['link'] : ($img_field->value[0]['link'] ?? '');
+							$custom_link = ($v = flexicontent_db::unserialize($img_field->value[0])) !== false ? @ $v['link'] : ($img_field->value[0]['link'] ?? '');
 						}
 
 						$item->image_w = $src ? $img_field->parameters->get('w_'.$img_field_size[0], 120) : 0;

@@ -11,6 +11,8 @@
 
 defined('_JEXEC') or die;
 
+require_once JPATH_ROOT . '/components/com_flexicontent/classes/helpers/security.php';
+
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\String\StringHelper;
@@ -1465,7 +1467,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			$item_id = (int) $u_item_id;
 			$created_by = $db->setQuery('SELECT created_by FROM #__content WHERE id = ' . $item_id)->loadResult();
 
-			if ($created_by === null)
+			if ($created_by === null || $created_by === false)
 			{
 				return false;
 			}
@@ -1476,26 +1478,11 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 				|| ($user->id && (int) $created_by === (int) $user->id && $user->authorise('core.edit.own', $asset));
 		}
 
-		// CASE: unsaved item, the temporary item id of the item form is kept in the session
-		$app = \Joomla\CMS\Factory::getApplication();
-		$tmp_item_id = (string) $app->getUserState('com_flexicontent.edit.item.unique_tmp_itemid');
-
-		if ($tmp_item_id !== '' && $tmp_item_id === $u_item_id)
-		{
-			return true;
-		}
-
-		$registry_key = 'com_flexicontent.edit.item.active_tmp_itemids';
-		$active_tmp_ids = (array) $app->getUserState($registry_key, array());
-		$cutoff = time() - 7200;
-
-		$active_tmp_ids = array_filter($active_tmp_ids, function ($issued_at) use ($cutoff) {
-			return (int) $issued_at >= $cutoff;
-		});
-
-		$app->setUserState($registry_key, $active_tmp_ids);
-
-		return isset($active_tmp_ids[$u_item_id]);
+		// Retry state can contain a client-chosen value after a failed POST.
+		// Only the server-issued registry grants access to unsaved upload folders.
+		return flexicontent_security::isIssuedTemporaryItemId(
+			\Joomla\CMS\Factory::getApplication(), $u_item_id
+		);
 	}
 
 
