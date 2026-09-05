@@ -319,19 +319,13 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		$db->setQuery('SELECT id FROM #__users WHERE email = ' . $db->Quote($email));
 		$existingUserID = $db->loadResult();
 
-		// HANDLE existing user
-		if ( $existingUserID )
-		{
-			// Fail if auto-using existing email not enabled
-			if ( $field->parameters->get('handle_existing_email', 0)==0 )
-			{
-				$error = \Joomla\CMS\Language\Text::sprintf('FLEXI_ACCOUNT_V_SUBMIT_EMAIL_EXISTS', $email);
-				\Joomla\CMS\Factory::getApplication()->enqueueMessage($error, 'error');
-				return false;
-			}
-			// Account with given email exists, set as item's author
-			$item->created_by = $existingUserID;
-		}
+        // Supplying an existing email address is not proof of account ownership.
+        if ($existingUserID)
+        {
+            $app = \Joomla\CMS\Factory::getApplication();
+            $app->enqueueMessage(\Joomla\CMS\Language\Text::sprintf('FLEXI_ACCOUNT_V_SUBMIT_EMAIL_EXISTS', $email), 'error');
+            return false;
+        }
 
 		// CREATE new user
 		else if ( $field->parameters->get('create_accounts', 0) )
@@ -357,7 +351,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		$create_coupons = $field->parameters->get( 'create_coupons', 0 ) ;
 		if ($create_coupons)
 		{
-			$token = uniqid();
+			$token = bin2hex(random_bytes(32));
 			$query = 'INSERT #__flexicontent_edit_coupons '
 				. 'SET timestamp = '.time()
 				. ', email = '.$db->Quote($email)
@@ -426,8 +420,11 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		$db = \Joomla\CMS\Factory::getDbo();
 		$usersConf = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_users' );
 
-		$useractivation = $field->parameters->get('useractivation', $usersConf->get('useractivation', 2)); // Default: use Joomla com_users setting (2=user self-activation)
-		$new_usertype   = $field->parameters->get('new_usertype',  $usersConf->get('useractivation', 2));  // Default: use Joomla com_users setting (2=registered)
+		$useractivation = $field->parameters->get('useractivation', '');
+		$useractivation = (int) ($useractivation === '' ? $usersConf->get('useractivation', 2) : $useractivation);
+		if (!in_array($useractivation, array(0, 1, 2), true)) $useractivation = 2;
+		$new_usertype = $field->parameters->get('new_usertype', '');
+		$new_usertype = (int) ($new_usertype === '' ? $usersConf->get('new_usertype', 2) : $new_usertype);
 		$mail_to_admin  = $field->parameters->get('mail_to_admin', $usersConf->get('mail_to_admin', 1));  // Default: use Joomla com_users setting (1=enabled)
 		$adm_email_bcc  = $field->parameters->get('adm_email_bcc', 1);  // Default: send single email to admins as BCC
 
@@ -452,7 +449,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		$instance->set('profile',  array('gender' =>  $gender));
 
 		// Email with activation link
-		if ($useractivation == 1)
+		if ($useractivation === 1 || $useractivation === 2)
 		{
 			$instance->set('block', 1);
 		}
@@ -464,8 +461,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 			// Email already used!!!
 			$db->setQuery('SELECT id FROM #__users WHERE email = ' . $db->Quote($email));
 			$existingUserID = $db->loadResult();
-			if ($existingUserID) return -$existingUserID;
-			else return false;
+			return false;
 		}
 
 		// Make sure user was created
@@ -486,8 +482,8 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 
 
 		switch ($useractivation) {
-		case 2:  // self-activate via link in email
-		case 1:  // verify via link in email, then admin is notified and activates the account
+		case 2:  // Verify email, then require administrator activation
+		case 1:  // Self-activate via link in email
 			// Set the link to confirm the user email (activation URL)
 			$uri = \Joomla\CMS\Uri\Uri::getInstance();
 			$base = $uri->toString(array('scheme', 'user', 'pass', 'host', 'port'));

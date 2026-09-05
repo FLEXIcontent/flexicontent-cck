@@ -1555,14 +1555,55 @@ class plgFlexicontent_fieldsImage extends FCField
 			 */
 			elseif ($unique_tmp_itemid && $item->id != $unique_tmp_itemid)
 			{
-				$temppath = Path::clean(JPATH_SITE .DS. $dir .DS. 'item_' . $unique_tmp_itemid . '_field_' . $field->id .DS);
-				$save_as_copy = $unique_tmp_itemid == (int) $unique_tmp_itemid;
-
-				if (file_exists($temppath))
+				try
 				{
-					$save_as_copy
-						? Folder::copy($temppath, $dest_path)
-						: Folder::move($temppath, $dest_path);
+					// Only issued temporary IDs or an authorized existing source item are accepted.
+					$save_as_copy = ctype_digit((string) $unique_tmp_itemid);
+					$user = Factory::getUser();
+					if ($save_as_copy)
+					{
+						$sourceId = (int) $unique_tmp_itemid;
+						$sourceOwner = Factory::getDbo()->setQuery('SELECT created_by FROM #__content WHERE id = ' . $sourceId)->loadResult();
+						$sourceAsset = 'com_content.article.' . $sourceId;
+						$authorized = $sourceOwner !== null && $sourceOwner !== false && ($user->authorise('core.edit', $sourceAsset)
+							|| ((int) $sourceOwner === (int) $user->id && !$user->guest && $user->authorise('core.edit.own', $sourceAsset)));
+					}
+					else
+					{
+						$option = $app->input->getCmd('option', 'com_flexicontent');
+						$authorized = flexicontent_security::isIssuedTemporaryItemId($app, $unique_tmp_itemid, $option);
+					}
+					if (!$authorized) throw new \RuntimeException('The image upload session has expired or the source is not editable. Please reselect the images and try again.', 403);
+					$base = realpath(JPATH_SITE . DS . $dir);
+					if ($base === false)
+					{
+						// A new folder-mode field may not have received any uploads yet.
+						if (!Folder::create(JPATH_SITE . DS . $dir) || ($base = realpath(JPATH_SITE . DS . $dir)) === false)
+						{
+							throw new \RuntimeException('The configured image directory could not be created', 400);
+						}
+					}
+					$temppath = $base . DS . 'item_' . $unique_tmp_itemid . '_field_' . (int) $field->id;
+					$resolved = realpath($temppath);
+					if ($resolved !== false && (!flexicontent_security::isContainedPath($resolved, $base) || is_link($temppath)))
+					{
+						throw new \RuntimeException('Image source is outside its directory', 403);
+					}
+					if (is_link(rtrim($dest_path, '/\\'))) throw new \RuntimeException('Invalid image destination', 403);
+
+					if (file_exists($temppath))
+					{
+						$folder_saved = $save_as_copy
+							? Folder::copy($temppath, $dest_path)
+							: Folder::move($temppath, $dest_path);
+						if (!$folder_saved) throw new \RuntimeException('The image folder could not be saved', 400);
+					}
+				}
+				catch (\Exception $error)
+				{
+					// Return through the normal validation path so posted form data is retained.
+					$app->enqueueMessage(htmlspecialchars($error->getMessage(), ENT_QUOTES, 'UTF-8'), 'error');
+					return false;
 				}
 			}
 		}
@@ -1932,7 +1973,7 @@ class plgFlexicontent_fieldsImage extends FCField
 
 			if ($p && reset($p))
 			{
-				$value = unserialize(reset($p));
+				$value = flexicontent_db::unserialize(reset($p));
 				//Factory::getApplication()->enqueueMessage(print_r($value, true), 'notice');
 				list($file_path, $src_path, $dest_path, $field_index, $extra_prefix) = $this->getThumbPaths($field, $item, $value, $relative = true);
 				$thumb_M = $dest_path . 'm_' . $extra_prefix . $value['originalname'];

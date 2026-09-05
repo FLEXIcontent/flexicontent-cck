@@ -2175,6 +2175,13 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 
 		$this->_loadFcHelpersAndLanguage();
 
+		// Field plugins build upload URLs before the wrapper itself renders.
+		// Establish the same verified ID before any field HTML uses it.
+		$upload_item_id = !empty($data->id)
+			? (int) $data->id
+			: flexicontent_security::getOrCreateTemporaryItemId($app, 'com_content');
+		$app->input->set('unique_tmp_itemid', $upload_item_id);
+
 
 		// ***
 		// *** Load item and its fields and its type parameters

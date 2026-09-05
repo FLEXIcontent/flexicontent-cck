@@ -11,6 +11,8 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 use Joomla\CMS\Mail\MailerFactoryInterface;
+require_once JPATH_SITE . '/components/com_flexicontent/classes/helpers/security.php';
+require_once __DIR__ . '/security.php';
 JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
 class plgFlexicontent_fieldsEmail extends FCField
@@ -799,180 +801,68 @@ class plgFlexicontent_fieldsEmail extends FCField
 	 * Helper for sendemail
 	 */
 
-	public static function sendEmail()
-	{
-		// Load plugin language
-		$lang = \Joomla\CMS\Factory::getApplication()->getLanguage();
-		$lang->load('plg_flexicontent_fields_email', JPATH_ADMINISTRATOR);
-
-		// get the params from the plugin options
-		$plugin = \Joomla\CMS\Plugin\PluginHelper::getPlugin('flexicontent_fields', 'email');
-		$pluginParams = new \Joomla\Registry\Registry($plugin->params);
-
-		// Check for request forgeries.
-		\Joomla\CMS\Session\Session::checkToken() or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
-
-		// Get a handle to the Joomla! application object
-		$app = \Joomla\CMS\Factory::getApplication();
-
-		//get input form
-		$jinput = \Joomla\CMS\Factory::getApplication()->input;
-		
-		// create variable for email
-		global $globalcats;
-		$config = \Joomla\CMS\Factory::getApplication()->getConfig();
-		$categories = & $globalcats;
-		// Get the route helper
-		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
-		$itemid   = $jinput->post->get('itemid', '', 'int');
-		$title    = $jinput->post->get('itemtitle', '', 'STRING');
-		$alias    = $jinput->post->get('itemalias', '');
-		$maincat  = $jinput->post->get('catid', '', 'int');
-		$itemauthor  = $jinput->post->get('itemauthor', '', '');
-		$formid = $jinput->post->get('formid', '', '');
-
-		// Create the non-SEF URL
-		$item_url = FlexicontentHelperRoute::getItemRoute($itemid.':'.$alias, $maincat);
-		// Create the SEF URL
-		$item_url = $app->isClient('administrator')
-			? flexicontent_html::getSefUrl($item_url)   // ..., $_xhtml= true, $_ssl=-1);
-			: \Joomla\CMS\Router\Route::_($item_url);  // ..., $_xhtml= true, $_ssl=-1);
-		// Make URL absolute since this URL will be emailed
-		$item_url = \Joomla\CMS\Uri\Uri::getInstance()->toString(array('scheme', 'host', 'port')) . $item_url;
-		$sitename = $app->getCfg('sitename') . ' - ' . \Joomla\CMS\Uri\Uri::root();
-
-		// set only form value in input
-		$datas = $jinput->post->get($formid, array(), 'array');
-		
-		if (isset($datas['name'])){
-			$name = $datas['name'];
-		}
-		if (isset($datas['firstname'])){
-			$firstname = $datas['firstname'];
-		}
-		if (isset($datas['lastname'])){
-			$lastname = $datas['lastname'];
-		}
-		// Create header email
-		if (!empty($name)){ // check if user use 1 name field or 2 separeate field
-			$fromname = $datas['name'];
-		} elseif (!empty($firstname) && !empty($lastname)){
-			$firstname = $datas['firstname'];
-			$lastname = $datas['lastname'];
-			$fromname = $firstname.' '.$lastname;
-		}
-		if (empty($fromname)){
-			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_FIELD_EMAIL_CONFIG_ERROR'), 'error');
-		}
-		$fromemail   = flexicontent_html::dataFilter($datas['emailfrom'],   4000, 'STRING', '');
-		$emailauthor = flexicontent_html::dataFilter($_POST['emailauthor'],   4000, 'STRING', '');
-		$from = array($fromemail , $fromname);
-
-		//subject
-		if (isset($datas['subject'])){
-			$subject = $datas['subject'];
-		} else{
-			$subject = $title;
-		}
-		$subjectemail = \Joomla\CMS\Language\Text::sprintf('FLEXI_FIELD_EMAIL_SUBJECT_DEFAULT', $fromname, $subject);
-
-		//body
-		$body = '';
-		foreach ($datas as $field => $value) {
-				$body .= '<li>'.$field.' : ' . $value . '</li>';
-			}
-			$body = "\n\r\n\r\n" . stripslashes($body);
-			$message 	= \Joomla\CMS\Language\Text::sprintf('FLEXI_FIELD_EMAIL_MESSAGE_DEFAULT', $title, $body, '<a href="'.$item_url.'">'.$item_url.'</a>', $sitename);
-
-		// Check whether email copy function activated
-		$copy_email_user = $pluginParams->get( 'email_user_copy','' );
-			if ($copy_email_user == true)
-			{
-				$messagecopy   = \Joomla\CMS\Language\Text::sprintf('FLEXI_FIELD_EMAIL_MESSAGE_DEFAULT_COPY', $title, $body, '<a href="'.$item_url.'">'.$item_url.'</a>', $sitename);
-				$subjectcopy =  \Joomla\CMS\Language\Text::sprintf('FLEXI_FIELD_EMAIL_SUBJECT_DEFAULT_COPY', $fromname, $itemauthor, $subject);
-				$mailer = \Joomla\CMS\Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();
-				$mailer->isHTML(true);
-				$mailer ->setSender(array($emailauthor, $itemauthor));
-				$mailer ->addRecipient($fromemail);
-				$mailer ->setSubject($subjectcopy);
-				$mailer ->setBody($messagecopy);
-				$send = $mailer->Send();
-			}
-			$copy_email_admin = $pluginParams->get( 'email_admin_copy', 0 );
-			$email_admin = $pluginParams->get( 'email_admin', '' ) ;
-				if ($copy_email_admin == true)
-				{
-					$messagecopyadmin   = \Joomla\CMS\Language\Text::sprintf('FLEXI_FIELD_EMAIL_MESSAGE_ADMIN_COPY', $fromname , $title, $body, '<a href="'.$item_url.'">'.$item_url.'</a>', $sitename);
-					$subjectcopyadmin =  \Joomla\CMS\Language\Text::sprintf('FLEXI_FIELD_EMAIL_SUBJECT_ADMIN_COPY', $itemauthor, $subject);
-					$mailer = \Joomla\CMS\Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();
-					$mailer->isHTML(true);
-					$mailer ->setSender($from, $fromname);
-					$mailer ->addRecipient($email_admin);
-					$mailer ->setSubject($subjectcopyadmin);
-					$mailer ->setBody($messagecopyadmin);
-					$send = $mailer->Send();
-				}
-
-
-			//Prepare contact email
-			$mailer = \Joomla\CMS\Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();
-			$mailer->isHTML(true);
-			$mailer->setSender($from, $fromname);
-			$mailer->addRecipient($emailauthor);
-			$mailer->setSubject($subjectemail);
-			$mailer->setBody($message);
-
-		//upload attachement
-		$files = $jinput->files->get($formid);
-		if (isset($files))
-		{
-			mkdir(JPATH_SITE . DS . "tmp" . DS . "upload_flexi_form". $formid);
-
-			foreach($files as $attachements) {
-				foreach ($attachements as $file){
-				// Import filesystem libraries. Perhaps not necessary, but does not hurt.
-				jimport('joomla.filesystem.file');
-
-				// Clean up filename to get rid of strange characters like spaces etc.
-				$filename = \Joomla\Filesystem\File::makeSafe($file['name']);
-
-				// Set up the source and destination of the file
-				$src = $file['tmp_name'];
-				$dest = JPATH_SITE . DS . "tmp" . DS . "upload_flexi_form". $formid . DS . $filename;
-					// TODO: Add security checks. FIle extension and size maybe using flexicontent helper
-
-					if (\Joomla\Filesystem\File::upload($src, $dest))
-						{
-        			$mailer->addAttachment($dest);
-						} 
-					else
-						{
-						$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_FIELD_EMAIL_MESSAGE_SEND_ERROR'), 'error');
-						}
-				}
-			}
-		}
-
-		//Sendemail
-		$send = $mailer->Send();
-
-		//Message in front-end
-		if ( $send !== true )
-			{
-				$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_FIELD_EMAIL_MESSAGE_SEND_ERROR'), 'error');
-				$destFolder= JPATH_SITE . DS . "tmp" . DS . "upload_flexi_form". $formid;
-				//Deleting file
-				if (is_dir($destFolder)) {
- 				\Joomla\Filesystem\Folder::delete($destFolder);
-				} 
-			} else {
-				// Message sending
-				$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_FIELD_EMAIL_MESSAGE_SEND_SUCCESS'), 'message');
-				$destFolder= JPATH_SITE . DS . "tmp" . DS . "upload_flexi_form". $formid;
-				//Deleting file
-				if (is_dir($destFolder)) {
- 				\Joomla\Filesystem\Folder::delete($destFolder);
-				} 
-			}
-	}
+    public static function sendEmail()
+    {
+        flexicontent_security::requirePostToken();
+        $app = \Joomla\CMS\Factory::getApplication();
+        $app->getLanguage()->load('plg_flexicontent_fields_email', JPATH_ADMINISTRATOR);
+        $input = $app->input->post;
+        list($item, $field) = flexicontent_security::loadItemField($input->getInt('itemid'), $input->getInt('fieldid'), 'email');
+        $params = $field->parameters;
+        if ($params->get('viewlayout', '') !== 'form') throw new \RuntimeException('Contact form is disabled', 403);
+        $formid = $input->get('formid', '', 'raw');
+        if (!is_string($formid) || !preg_match('/^fcemail_[a-f0-9]{16}$/D', $formid)) throw new \RuntimeException('Invalid contact form', 400);
+        $db = \Joomla\CMS\Factory::getDbo();
+        $values = $db->setQuery('SELECT value FROM #__flexicontent_fields_item_relations WHERE item_id = ' . (int) $item->id
+            . ' AND field_id = ' . (int) $field->id . ' ORDER BY valueorder')->loadColumn();
+        $recipient = flexicontent_email_security::recipient($item->id, $field, $values, $input->get('recipient_key', '', 'raw'), $app->get('secret'));
+        flexicontent_security::consumeMailQuota('field-mail');
+        if ((int) $params->get('viewlayout_display_captcha', 0))
+        {
+            $plugin = $app->get('captcha');
+            $captcha = $plugin && $plugin !== '0' ? \Joomla\CMS\Captcha\Captcha::getInstance($plugin) : null;
+            if (!$captcha || !$captcha->checkAnswer($input->getString('captcha', ''))) throw new \RuntimeException('CAPTCHA validation failed', 403);
+        }
+        if ((int) $params->get('viewlayout_display_consent', 1) && $input->getString('consent') !== 'consent') throw new \RuntimeException('Consent is required', 400);
+        $schema = flexicontent_email_security::schema($params);
+        $data = flexicontent_email_security::validateData($input->get($formid, array(), 'array'), $schema);
+        $fromemail = $data['emailfrom'] ?? '';
+        $fromname = $data['name'] ?? trim(($data['firstname'] ?? '') . ' ' . ($data['lastname'] ?? ''));
+        if (!filter_var($fromemail, FILTER_VALIDATE_EMAIL) || strlen($fromemail) > 254 || $fromname === '' || strlen($fromname) > 200 || preg_match('/[\r\n]/', $fromname))
+            throw new \RuntimeException('A valid sender name and email are required', 400);
+        $subject = $data['subject'] ?? $item->title;
+        if (strlen($subject) > 500 || preg_match('/[\r\n]/', $subject)) throw new \RuntimeException('Invalid message subject', 400);
+        $attachments = flexicontent_email_security::attachments($app->input->files->get($formid, array(), 'raw'), $schema);
+        $escape = array('flexicontent_email_security', 'escape');
+        require_once JPATH_SITE . '/components/com_flexicontent/helpers/route.php';
+        $url = \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getItemRoute($item->id . ':' . $item->alias, $item->catid), false);
+        if (strpos($url, 'http://') !== 0 && strpos($url, 'https://') !== 0) $url = rtrim(\Joomla\CMS\Uri\Uri::root(), '/') . '/' . ltrim($url, '/');
+        $body = '';
+        foreach ($data as $name => $value)
+        {
+            $label = \Joomla\CMS\Language\Text::_($schema[$name]->field_label ?? $name);
+            $body .= '<li>' . $escape($label) . ' : ' . nl2br($escape($value)) . '</li>';
+        }
+        $message = \Joomla\CMS\Language\Text::sprintf('FLEXI_FIELD_EMAIL_MESSAGE_DEFAULT', $escape($item->title), $body,
+            '<a href="' . $escape($url) . '">' . $escape($url) . '</a>', $escape($app->get('sitename') . ' - ' . \Joomla\CMS\Uri\Uri::root()));
+        $subjectemail = \Joomla\CMS\Language\Text::sprintf('FLEXI_FIELD_EMAIL_SUBJECT_DEFAULT', $fromname, $subject);
+        $mailer = \Joomla\CMS\Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();
+        $mailer->isHTML(true);
+        $mailer->setSender(array($app->get('mailfrom'), $app->get('fromname')));
+        $mailer->addReplyTo($fromemail, $fromname);
+        $mailer->addRecipient($recipient);
+        $mailer->setSubject($subjectemail);
+        $mailer->setBody($message);
+        foreach ($attachments as $attachment) $mailer->addAttachment($attachment[0], $attachment[1]);
+        $plugin = \Joomla\CMS\Plugin\PluginHelper::getPlugin('flexicontent_fields', 'email');
+        $pluginParams = new \Joomla\Registry\Registry($plugin->params);
+        if ($pluginParams->get('email_admin_copy', 0) && filter_var($pluginParams->get('email_admin', ''), FILTER_VALIDATE_EMAIL))
+            $mailer->addBCC($pluginParams->get('email_admin'));
+        // An anonymous copy address would reintroduce an arbitrary-recipient relay.
+        $user = \Joomla\CMS\Factory::getUser();
+        if ($pluginParams->get('email_user_copy', 0) && !$user->guest && !$user->block && strcasecmp($user->email, $fromemail) === 0)
+            $mailer->addBCC($user->email);
+        $sent = $mailer->Send();
+        $app->enqueueMessage(\Joomla\CMS\Language\Text::_($sent === true ? 'FLEXI_FIELD_EMAIL_MESSAGE_SEND_SUCCESS' : 'FLEXI_FIELD_EMAIL_MESSAGE_SEND_ERROR'), $sent === true ? 'message' : 'error');
+    }
 }

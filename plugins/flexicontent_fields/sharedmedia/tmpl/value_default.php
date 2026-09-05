@@ -43,10 +43,10 @@ foreach ($values as $value)
 
 	// Create field's html
 	$html_meta = '
-		'.($display_title  && !empty($value['title'])  ? '<h'.$headinglevel.'>' . $value['title']  . '</h'.$headinglevel.'>' : '') .'
-		'.($display_author && !empty($value['author']) ? '<span class="label text-white bg-info label-info label-small fc_sm_author-lbl">'.\Joomla\CMS\Language\Text::_('Author').'</span> <b class="fc_sm_author">' . $value['author'] . '</b> ' : '') .'
+		'.($display_title  && !empty($value['title'])  ? '<h'.$headinglevel.'>' . htmlspecialchars((string) $value['title'], ENT_QUOTES, 'UTF-8') . '</h'.$headinglevel.'>' : '') .'
+		'.($display_author && !empty($value['author']) ? '<span class="label text-white bg-info label-info label-small fc_sm_author-lbl">'.\Joomla\CMS\Language\Text::_('Author').'</span> <b class="fc_sm_author">' . htmlspecialchars((string) $value['author'], ENT_QUOTES, 'UTF-8') . '</b> ' : '') .'
 		'.($duration_str ? '<span class="label text-white bg-info label-info label-small fc_sm_duration-lbl">'.\Joomla\CMS\Language\Text::_('Duration').'</span> <b class="fc_sm_duration">'.$duration_str.'</b> ' : '') .'
-		'.($display_description && !empty($value['description']) ? '<div class="description">' . $value['description'] . '</div>' : '');
+		'.($display_description && !empty($value['description']) ? '<div class="description">' . htmlspecialchars((string) $value['description'], ENT_QUOTES, 'UTF-8') . '</div>' : '');
 
 	$player_id     = 'player-' . $field->name . '_' . $item->id . '_' . $n;
 	$player_params = '';//'&origin=http://localhost';
@@ -54,13 +54,14 @@ foreach ($values as $value)
 
 	if (!empty($value['embed_url']) && (empty($value['media_id']) || empty($value['api_type'])))
 	{
-		$embed_url = $value['embed_url'];
+		$embed_url = flexicontent_security::safeUrl($value['embed_url']);
 		$_show_related = '';
 		$_show_srvlogo = '';
 	}
 	else
 	{
-		$content_id = $value['media_id'];
+		$content_id = (string) $value['media_id'];
+		if (in_array($value['api_type'], array('youtube', 'vimeo', 'dailymotion'), true) && !preg_match('/^[a-zA-Z0-9_-]+$/D', $content_id)) continue;
 		switch($value['api_type'])
 		{
 			case 'youtube':
@@ -83,7 +84,7 @@ foreach ($values as $value)
 				$_show_srvlogo = '&amp;logo=0';
 				break;
 			default:  // For embed.ly , the full URL is inside content ID
-				$embed_url = $content_id;
+				$embed_url = flexicontent_security::safeUrl($content_id);
 				$_show_related = '';
 				$_show_srvlogo = '';
 				break;
@@ -104,7 +105,9 @@ foreach ($values as $value)
 	}
 	else
 	{
-		$player_url = $embed_url ? $embed_url : 'about:blank';
+		$embed_url = flexicontent_security::safeUrl($embed_url);
+		if ($embed_url === '') continue;
+		$player_url = $embed_url;
 		$player_url .= (strstr($player_url, '?') ? '&'  : '?') . 'autoplay=' . $autostart . $player_params . $_show_related . $_show_srvlogo;
 
 		$player_html = '
@@ -113,7 +116,7 @@ foreach ($values as $value)
 		>
 			<iframe id="' . $player_id . '"
 				class="fc_sharedmedia_player_frame seamless"
-				src="' . $player_url . '"
+				src="' . htmlspecialchars($player_url, ENT_QUOTES, 'UTF-8') . '"
 				style="min-width:' . $_width . 'px; min-height:' . $_height . 'px; border: none; overflow:hidden;"
 				allowfullscreen allowtransparency allow="autoplay"
 			>

@@ -1,5 +1,6 @@
 <?php
 defined( '_JEXEC' ) or die( 'Restricted access' );
+require_once __DIR__ . '/security.php';
 
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
@@ -1537,57 +1538,29 @@ class flexicontent_db
 	 *
 	 * @return  array or empty array if invalid data (serialized inner object is found)
 	 */
+	/** Decode legacy serialized data without constructing any PHP objects. */
+	static function unserialize($value)
+	{
+		return flexicontent_security::unserialize($value);
+	}
+
 	static function unserialize_array($v, $force_array=false, $force_value = true)
 	{
-		static $pattern_obj_inner = '/o:\d+:"[a-z0-9_]+":\d+:{.*?}/i';
-		static $pattern_array_outer = '/^a:\d+:{.*?}$/is';
-
-		// ***
-		// *** SANITY CHECKs
-		// ***
-
-		// Already an array, return it
 		if (is_array($v))
 		{
-			return $v;
+			return flexicontent_security::isDataValue($v) ? $v : ($force_array ? array() : false);
 		}
+		if ($v === null || $v === '') return $force_array ? array() : false;
+		if (is_object($v) || is_resource($v)) return $force_array ? array() : false;
+		if ($v === false) return $force_array ? array() : false;
+		if (!is_string($v)) return $force_value ? ($force_array ? array($v) : $v) : false;
 
-		// Zero length value, return empty array or false (error)
-		if ($v === null || !strlen($v))
-		{
-			return $force_array ? array() : false;
-		}
-
-		// ***
-		// *** Unserialize
-		// ***
-
-		// Check if value contains a serialized (inner) object, (and set error)
-		if (preg_match($pattern_obj_inner, $v))
-		{
-			if (JDEBUG) \Joomla\CMS\Factory::getApplication()->enqueueMessage('Object not allowed inside serialized user-data', 'error');
-			$result = false;
-		}
-		// Check if value is as expected a serialized array, (and unserialize or set error)
-		else
-		{
-			$result = preg_match($pattern_array_outer, $v) ? @ unserialize($v) : false;
-		}
-
-		//***
-		// *** Return result of unserialization
-		//***
-
-		if ($result!==false)
+		$result = preg_match('/^a:\d+:{.*}$/s', $v) ? self::unserialize($v) : false;
+		if ($result !== false)
 		{
 			return $force_array && !is_array($result) ? array($result) : $result;
 		}
-		else if ($force_value)
-		{
-			return $force_array ? array($v) : $v;
-		}
-
-		return false;
+		return $force_value ? ($force_array ? array($v) : $v) : false;
 	}
 
 

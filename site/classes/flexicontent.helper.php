@@ -62,6 +62,7 @@ if (!function_exists('json_encode'))  // PHP < 5.2 lack support for json
 JLoader::register('flexicontent_html', JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'html.php');
 JLoader::register('flexicontent_upload', JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'upload.php');
 JLoader::register('flexicontent_tmpl', JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'tmpl.php');
+JLoader::register('flexicontent_security', JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'security.php');
 JLoader::register('flexicontent_db', JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'db.php');
 JLoader::register('flexicontent_ajax', JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'ajax.php');
 JLoader::register('flexicontent_favs', JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'favs.php');

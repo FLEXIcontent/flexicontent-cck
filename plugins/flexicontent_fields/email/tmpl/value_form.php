@@ -88,7 +88,8 @@ foreach ($values as $value)
 	// Fake id form, cut email on @ use start of email plus add a random id
 	// so that if we have 2 forms in same page but with same email author
 	$eparts =  explode('@', $addr);
-	$formid = $eparts[0] . '_' . random_int(100, 1000000);
+	$formid = 'fcemail_' . bin2hex(random_bytes(8));
+    $recipient_key = flexicontent_email_security::recipientKey($item->id, $field->id, $addr, $app->get('secret'));
 
 
 	if (
@@ -98,8 +99,8 @@ foreach ($values as $value)
 	)
 	{
 		$modal_header = "
-		<button id='modal_info' $datatoggle='modal' $datatarget='#myModal'$formid' class='$modal_button_class' >$modal_button_text</button>
-		<div id='myModal'$formid' class='modal hide fade' role='dialog'  tabindex='-1' role='dialog' aria-labelledby='contact' aria-hidden='true'>
+		<button id='modal_info' $datatoggle='modal' $datatarget='#myModal$formid' class='$modal_button_class' >$modal_button_text</button>
+		<div id='myModal$formid' class='modal hide fade' role='dialog'  tabindex='-1' role='dialog' aria-labelledby='contact' aria-hidden='true'>
 		<div class='modal-dialog modal-dialog-centered modal-fullscreen-sm-down' style='max-width:$modal_width;max-height:$modal_width;'>
 		<div class='modal-content'>
 			<div class='modal-header'>
@@ -144,24 +145,27 @@ foreach ($values as $value)
 	$captcha_plgname = $display_captcha ? $app->getCfg('captcha') : '0';
 	$captcha_html    = '';
 
-	if ($captcha_plgname)
-	{
-		\Joomla\CMS\Plugin\PluginHelper::importPlugin('captcha');
-		$dispatcher = JEventDispatcher::getInstance();
-
-		// This will put the code to load reCAPTCHA's JavaScript file into your <head>
-		$results = FLEXI_J40GE
-			? $app->triggerEvent('onInit', array('dynamic_recaptcha_1'))
-			: $dispatcher->trigger('onInit', array('dynamic_recaptcha_1'));
-
-		// This will return the array of HTML code.
-		$recaptcha = $dispatcher->trigger('onDisplay', array(null, 'dynamic_recaptcha_1', 'class="required"'));
-
-		if (!empty($recaptcha[0]))
-		{
-			$captcha_html= '<div class="captcha form-group control-group">'.$recaptcha[0].'</div>';
-		}
-	}
+    if ($display_captcha)
+    {
+        // Fail closed for this form without breaking the rest of the item page.
+        try
+        {
+            $captcha = $captcha_plgname && $captcha_plgname !== '0' ? \Joomla\CMS\Captcha\Captcha::getInstance($captcha_plgname) : null;
+            $captcha_display = $captcha ? $captcha->display('captcha', 'captcha_' . $formid, 'required') : '';
+        }
+        catch (\Exception $error)
+        {
+            $captcha_display = '';
+        }
+        if (!is_string($captcha_display) || trim($captcha_display) === '')
+        {
+            $field->{$prop}[$n++] = '<p class="alert alert-warning fc-contact-unavailable">'
+                . htmlspecialchars(\Joomla\CMS\Language\Text::_('Contact form temporarily unavailable. Please try again later.'), ENT_QUOTES, 'UTF-8') . '</p>';
+            if (!$multiple) break;
+            continue;
+        }
+        $captcha_html = '<div class="captcha form-group control-group">' . $captcha_display . '</div>';
+    }
 
 
 	$fields_display = '';
@@ -226,7 +230,7 @@ foreach ($values as $value)
 					foreach ($values_field as $value_field)
 					{
 						$value =  \Joomla\CMS\Language\Text::_($value_field);
-						$fields_display .= '<input type="radio" value="'.$value.'" name="'.$formid.'['.$value.']'.'" aria-label="'.$value.'" style="margin:0" class="form-control"><label for="'.$field_id.'">'.$value.'</label>';
+						$fields_display .= '<input type="radio" value="'.$value.'" name="'.$field_name.'" aria-label="'.$value.'" style="margin:0" class="form-control"><label for="'.$field_id.'">'.$value.'</label>';
 					}
 
 					$fields_display .='</div>';
@@ -239,7 +243,7 @@ foreach ($values as $value)
 					foreach ($values_field as $value_field)
 					{
 						$value = \Joomla\CMS\Language\Text::_($value_field);
-						$fields_display .= '<input type="checkbox" value="'.$value.'" name="'.$value.'" class="form-control" aria-label="'.$value.'" style="margin:0" ><label for="'.$field_id.'">'.$value.'</label>'; //TODO add required system
+						$fields_display .= '<input type="checkbox" value="'.$value.'" name="'.$field_name.'[]" class="form-control" aria-label="'.$value.'" style="margin:0" ><label for="'.$field_id.'">'.$value.'</label>'; //TODO add required system
 					}
 					$fields_display .='</div>';
 					break;
@@ -316,34 +320,32 @@ foreach ($values as $value)
 				</div>
 				<input type="hidden" name="emailtask" value="plg.email.submit" />
 				<input type="hidden" name="formid" value="'.$formid.'" />
-				<input type="hidden" name="emailauthor" value="'.$addr.'" />
-				<input type="hidden" name="itemid" value="'.$item->id.'" />
-				<input type="hidden" name="itemtitle" value="'.$item->title.'" />
-				<input type="hidden" name="itemalias" value="'.$item->alias.'" />
-				<input type="hidden" name="itemauthor" value="'.$item->author.'" />
-				<input type="hidden" name="catid" value="'.$item->catid.'" />
+                <input type="hidden" name="recipient_key" value="'.$recipient_key.'" />
+                <input type="hidden" name="itemid" value="'.(int) $item->id.'" />
+                <input type="hidden" name="fieldid" value="'.(int) $field->id.'" />
 				<input type="hidden" name="return" value="" />
 				'.\Joomla\CMS\HTML\HTMLHelper::_("form.token").'
 			</fieldset>
 		</form>
 		'.$modal_footer.'
-		<script>
-			const qsa=(s,o)=>[...(o||document).querySelectorAll(s)],
-				qs=(s,o)=>qsa(s,o)[0];
-
-			qs("input[type=submit]").addEventListener(\'click\',function(e)
-			{
-				qsa("input[type=\'file\']").forEach(inp=>
-				{
-					if (inp.files.length > inp.dataset.max)
-					{
-						alert(`'.\Joomla\CMS\Language\Text::_("FLEXI_ALLOWED_NUM_FILES").' ${inp.dataset.max} '.\Joomla\CMS\Language\Text::_("FLEXI_FILES_FOR").' ${inp.placeholder}`);
-						e.preventDefault();
-					}
-				});
-			});
-		</script>
-	';
+        <script>
+        (function () {
+            const form = document.getElementById("contact-form-'.$formid.'");
+            form.addEventListener(\'submit\', function (event) {
+                form.querySelectorAll("input[type=file]").forEach(function (input) {
+                    const maximum = Number(input.dataset.max || 1);
+                    if (input.files.length > maximum) {
+                        event.preventDefault();
+                        input.setCustomValidity("Too many attachments");
+                        input.reportValidity();
+                    } else {
+                        input.setCustomValidity("");
+                    }
+                });
+            });
+        })();
+        </script>
+    ';
 
 	// Add prefix / suffix
 	$field->{$prop}[$n]	= $pretext . $html . $posttext;
