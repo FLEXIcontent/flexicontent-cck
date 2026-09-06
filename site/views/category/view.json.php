@@ -68,15 +68,51 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		// Zero unneeded search index text
 		foreach ($items as $item) $item->search_index = '';
 
-		// Nullify some data for JSON view:
-		//   Items Creator / Modifier emails,
-		//   Items attributes, and fields attributes
+		// Keep private account data, internal configuration and inaccessible fields out of public JSON.
 		foreach ($items as $item)
 		{
-			$item->cmail = null;
-			$item->mmail = null;
-			$item->attribs = null;
-			foreach($item->fields as $field) $field->attribs = null;
+			foreach (array(
+				'asset_id', 'created_by', 'modified_by', 'checked_out',
+				'creatoremail', 'modifieremail', 'cmail', 'cuname', 'mmail', 'muname',
+				'attribs', 'parameters', 'params'
+			) as $property)
+			{
+				unset($item->$property);
+			}
+
+			$allowed_field_ids = array();
+			if (isset($item->fields) && is_array($item->fields))
+			{
+				foreach ($item->fields as $field_name => $field)
+				{
+					if (!is_object($field) || empty($field->has_access) || empty($field->id))
+					{
+						unset($item->fields[$field_name]);
+						continue;
+					}
+
+					$allowed_field_ids[(string) (int) $field->id] = true;
+					$item->fields[$field_name] = (object) array(
+						'id' => (int) $field->id,
+						'field_type' => $field->field_type,
+						'name' => $field->name,
+						'label' => $field->label,
+						'description' => $field->description,
+						'has_access' => 1,
+					);
+				}
+			}
+
+			if (isset($item->fieldvalues) && is_array($item->fieldvalues))
+			{
+				foreach (array_keys($item->fieldvalues) as $field_id)
+				{
+					if (!isset($allowed_field_ids[(string) (int) $field_id]))
+					{
+						unset($item->fieldvalues[$field_id]);
+					}
+				}
+			}
 		}
 
 		// Use &test=1 to test / preview item data of first item
