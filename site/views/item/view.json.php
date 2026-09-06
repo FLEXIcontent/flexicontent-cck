@@ -108,6 +108,51 @@ class FlexicontentViewItem extends \Joomla\CMS\MVC\View\HtmlView
 			die('<pre>' . print_r($item, true) . '');
 		}*/
 
+		// Keep private account data and internal configuration out of public JSON.
+		foreach (array(
+			'asset_id', 'created_by', 'modified_by', 'checked_out',
+			'creatoremail', 'modifieremail', 'cmail', 'cuname', 'mmail', 'muname',
+			'attribs', 'parameters', 'params'
+		) as $property)
+		{
+			unset($item->$property);
+		}
+
+		// Publish values only for fields the current user is allowed to view.
+		$allowed_field_ids = array();
+		if (isset($item->fields) && is_array($item->fields))
+		{
+			foreach ($item->fields as $field_name => $field)
+			{
+				if (!is_object($field) || empty($field->has_access) || empty($field->id))
+				{
+					unset($item->fields[$field_name]);
+					continue;
+				}
+
+				$allowed_field_ids[(string) (int) $field->id] = true;
+				$item->fields[$field_name] = (object) array(
+					'id' => (int) $field->id,
+					'field_type' => $field->field_type,
+					'name' => $field->name,
+					'label' => $field->label,
+					'description' => $field->description,
+					'has_access' => 1,
+				);
+			}
+		}
+
+		if (isset($item->fieldvalues) && is_array($item->fieldvalues))
+		{
+			foreach (array_keys($item->fieldvalues) as $field_id)
+			{
+				if (!isset($allowed_field_ids[(string) (int) $field_id]))
+				{
+					unset($item->fieldvalues[$field_id]);
+				}
+			}
+		}
+
 		// Output item in JSON FORMAT
 		echo @json_encode($item);
 	}

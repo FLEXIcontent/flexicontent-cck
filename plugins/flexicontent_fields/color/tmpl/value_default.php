@@ -18,7 +18,14 @@ foreach ($values as $value)
 	// 2: Color box (having color as background)
 	if ($output_as === 2)
 	{
-		$value = '<span class="fcfield_color_vbox" style="background-color: ' . $value . '; padding: 8px; display: inline-block; border-radius: 4px; box-shadow: 1px 1px 2px;"></span>';
+		// Reject characters that can escape the CSS declaration, then encode for the HTML attribute.
+		$css_value = preg_match('/[\\\\;"\'<>{}]/', $value) ? 'transparent' : $value;
+		$css_value = htmlspecialchars($css_value, ENT_QUOTES, 'UTF-8');
+		$value = '<span class="fcfield_color_vbox" style="background-color: ' . $css_value . '; padding: 8px; display: inline-block; border-radius: 4px; box-shadow: 1px 1px 2px;"></span>';
+	}
+	else
+	{
+		$value = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
 	}
 
 	// Add prefix / suffix

@@ -557,20 +557,33 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 				continue;
 			}
 
+			$label  = htmlspecialchars(isset($value['label'])  ? (string) $value['label']  : '', ENT_QUOTES, 'UTF-8');
+			$cc     = htmlspecialchars(isset($value['cc'])     ? (string) $value['cc']     : '', ENT_QUOTES, 'UTF-8');
+			$phone1 = htmlspecialchars(isset($value['phone1']) ? (string) $value['phone1'] : '', ENT_QUOTES, 'UTF-8');
+			$phone2 = htmlspecialchars(isset($value['phone2']) ? (string) $value['phone2'] : '', ENT_QUOTES, 'UTF-8');
+			$phone3 = htmlspecialchars(isset($value['phone3']) ? (string) $value['phone3'] : '', ENT_QUOTES, 'UTF-8');
+
+			// A tel URL accepts only the normalized phone components, never raw stored text.
+			$raw_tel_cc = isset($value['cc']) ? trim((string) $value['cc']) : '';
+			$tel_cc     = preg_match('/^\+?[0-9]+$/D', $raw_tel_cc) ? ltrim($raw_tel_cc, '+') : '';
+			$tel_phone1 = preg_replace('/[^0-9A-Z]/i', '', isset($value['phone1']) ? (string) $value['phone1'] : '');
+			$tel_phone2 = preg_replace('/[^0-9A-Z]/i', '', isset($value['phone2']) ? (string) $value['phone2'] : '');
+			$tel_phone3 = preg_replace('/[^0-9A-Z]/i', '', isset($value['phone3']) ? (string) $value['phone3'] : '');
+
 			$html = $opentag
-					.($display_phone_label  ? $label_prefix.$value['label'] . $label_suffix : '');
+					.($display_phone_label ? $label_prefix . $label . $label_suffix : '');
 
 			if ($add_tel_link) {
 				$html .= '<a href="tel:'
-						. ($display_country_code ? '+' . $value['cc'] : '')
-						. ($display_area_code    ? $value['phone1'] : '')
-						. $value['phone2'] . $value['phone3']
+						. ($display_country_code && $tel_cc !== '' ? '+' . $tel_cc : '')
+						. ($display_area_code    ? $tel_phone1 : '')
+						. $tel_phone2 . $tel_phone3
 						. '">';
 			}
-			$html .= ($display_country_code ? $country_code_prefix . $value['cc'] : '')
+			$html .= ($display_country_code ? $country_code_prefix . $cc : '')
 					. ($display_country_code || $display_area_code ? $separator_cc_phone1 : '')
-					. ($display_area_code ? $value['phone1'] : '')
-					. $separator_phone1_phone2 . $value['phone2'] . $separator_phone2_phone3 . $value['phone3']
+					. ($display_area_code ? $phone1 : '')
+					. $separator_phone1_phone2 . $phone2 . $separator_phone2_phone3 . $phone3
 					. ($add_tel_link ? '</a>' : '')
 					. $closetag;
 
@@ -646,17 +659,19 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 			$v['phone1'] = preg_replace($regex, '', strtoupper($v['phone1']));
 			$v['phone2'] = preg_replace($regex, '', strtoupper($v['phone2']));
 			$v['phone3'] = preg_replace($regex, '', strtoupper($v['phone3']));
+			$raw_cc      = isset($v['cc']) ? trim((string) $v['cc']) : '';
+			$v['cc']     = preg_match('/^\+?[0-9]+$/D', $raw_cc) ? ltrim($raw_cc, '+') : '';
 
 			// enforce max length
-			$newpost[$new]['phone1'] = $phone1_maxlength ? $v['phone1'] : substr($v['phone1'], 0, $phone1_maxlength);
-			$newpost[$new]['phone2'] = $phone2_maxlength ? $v['phone2'] : substr($v['phone2'], 0, $phone2_maxlength);
-			$newpost[$new]['phone3'] = $phone3_maxlength ? $v['phone3'] : substr($v['phone3'], 0, $phone3_maxlength);
+			$newpost[$new]['phone1'] = $phone1_maxlength ? substr($v['phone1'], 0, $phone1_maxlength) : $v['phone1'];
+			$newpost[$new]['phone2'] = $phone2_maxlength ? substr($v['phone2'], 0, $phone2_maxlength) : $v['phone2'];
+			$newpost[$new]['phone3'] = $phone3_maxlength ? substr($v['phone3'], 0, $phone3_maxlength) : $v['phone3'];
 
 			if (!strlen($v['phone1']) && !strlen($v['phone2']) && !strlen($v['phone3']) && !$use_ingroup ) continue;  // Skip empty values if not in field group
 
 			// Validate other value properties
 			$newpost[$new]['label']  = flexicontent_html::dataFilter(@$v['label'],  $label_maxlength, 'STRING', 0);
-			$newpost[$new]['cc']     = flexicontent_html::dataFilter(@$v['cc'],     $cc_maxlength,    'STRING', 0);
+			$newpost[$new]['cc']     = $cc_maxlength ? substr($v['cc'], 0, $cc_maxlength) : $v['cc'];
 
 			$new++;
 		}
