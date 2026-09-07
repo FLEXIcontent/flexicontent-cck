@@ -69,8 +69,7 @@ class JFormFieldPhpthumbstatus extends FormField
 
 		$rows[] = array(
 			Text::_('FLEXI_PHPTHUMB_KEY_FILE'),
-			'<code>' . htmlspecialchars(str_replace(JPATH_SITE, '', $state['file']), ENT_QUOTES, 'UTF-8') . '</code> '
-			. (!$state['exists']
+			(!$state['exists']
 				? '<span class="badge bg-warning text-dark">' . Text::_('FLEXI_PHPTHUMB_KEY_MISSING') . '</span>'
 				: ($key_ok
 					? '<span class="badge bg-success">' . Text::_('FLEXI_PHPTHUMB_KEY_OK') . '</span>'
@@ -107,11 +106,18 @@ class JFormFieldPhpthumbstatus extends FormField
 		{
 			$link = Route::_('index.php?option=com_flexicontent&task=regeneratephpthumbkey&' . Session::getFormToken() . '=1', false);
 
-			$html .= '<a class="btn btn-sm btn-outline-secondary" href="' . htmlspecialchars($link, ENT_QUOTES, 'UTF-8') . '"'
-				. ' onclick="return confirm(\'' . htmlspecialchars(Text::_('FLEXI_PHPTHUMB_REGENERATE_KEY_CONFIRM'), ENT_QUOTES, 'UTF-8') . '\');">'
-				. '<span class="icon-refresh" aria-hidden="true"></span> ' . Text::_('FLEXI_PHPTHUMB_REGENERATE_KEY') . '</a>';
+			$confirmation = 'return confirm(' . json_encode(Text::_('FLEXI_PHPTHUMB_REGENERATE_KEY_CONFIRM'), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) . ');';
+			$html .= '<p class="mb-2"><a class="btn btn-sm btn-outline-secondary" href="' . htmlspecialchars($link, ENT_QUOTES, 'UTF-8') . '"'
+				. ' onclick="' . htmlspecialchars($confirmation, ENT_QUOTES, 'UTF-8') . '">'
+				. '<span class="icon-refresh" aria-hidden="true"></span> ' . Text::_('FLEXI_PHPTHUMB_REGENERATE_KEY') . '</a></p>'
+				. '<p class="small text-muted">' . Text::_('FLEXI_PHPTHUMB_REGENERATE_KEY_HELP') . '</p>';
 		}
 
-		return '<div class="fc-phpthumb-status">' . $html . '</div>';
+		$html .= '<details class="mb-3"><summary>' . Text::_('FLEXI_PHPTHUMB_KEY_LOCATION') . '</summary>'
+			. '<code style="overflow-wrap:anywhere;">' . htmlspecialchars(str_replace(JPATH_SITE, '', $state['file']), ENT_QUOTES, 'UTF-8') . '</code></details>'
+			. '<details class="mb-3"><summary>' . Text::_('FLEXI_PHPTHUMB_TEMPLATE_HELP_TITLE') . '</summary>'
+			. '<div class="mt-2">' . Text::_('FLEXI_PHPTHUMB_TEMPLATE_HELP') . '</div></details>';
+
+		return '<div class="fc-phpthumb-status" style="display:block;">' . $html . '</div>';
 	}
 }

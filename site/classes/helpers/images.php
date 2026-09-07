@@ -264,8 +264,13 @@ class flexicontent_images
 	/**
 	 * Sign the phpThumb URLs of rendered HTML that were not created via phpThumbURL()
 	 * (custom templates, module layouts, content), so that they keep working when signatures are enforced.
+	 *
+	 * Only image and style contexts are signed: src, srcset, data-src, data-srcset, data-lazy-src, poster
+	 * and href attributes, style attributes and <style> blocks. Text nodes, form fields, scripts and every
+	 * other attribute are left alone, so a URL reflected from user input (search terms, comments, form
+	 * values) can never be used to obtain a signature. Textarea contents (edit forms) are never modified.
 	 * URLs that already carry a valid signature are left untouched, URLs with a stale signature (key
-	 * regenerated) are re-signed. Text inside textarea elements (edit forms) is not modified.
+	 * regenerated) are re-signed.
 	 *
 	 * @param   string  $html
 	 *
@@ -319,50 +324,96 @@ class flexicontent_images
 			return $encoded ? str_replace('&', '&amp;', $signed) : $signed;
 		};
 
-		$url_re = '#(/librairies/phpthumb/phpThumb\.php\?)([^"\'\s<>),]+)#';
+		$marker = 'phpThumb.php?';
 
 		/**
-		 * Sign the URL(s) of a quoted value (attribute or string): a single URL may contain unencoded spaces,
-		 * a srcset list is split on its candidates, each ending with a width or density descriptor
+		 * Sign a single URL that may contain unencoded spaces (everything after the marker is the query)
 		 */
-		$sign_quoted = function ($matches) use ($sign_query, $url_re)
+		$sign_url = function ($url) use ($sign_query, $marker)
 		{
-			$quote = $matches[1];
-			$value = $matches[2];
+			$pos = strpos($url, $marker);
+
+			if ($pos === false)
+			{
+				return $url;
+			}
+
+			$pos += strlen($marker);
+
+			return substr($url, 0, $pos) . $sign_query(trim(substr($url, $pos)));
+		};
+
+		/**
+		 * Sign every url(...) of a CSS text (style attribute or <style> block)
+		 */
+		$sign_css = function ($css) use ($sign_url, $marker)
+		{
+			if (strpos($css, $marker) === false)
+			{
+				return $css;
+			}
+
+			return preg_replace_callback('#(url\(\s*)(["\']?)([^"\')]*' . preg_quote($marker, '#') . '[^"\')]*)\2(\s*\))#i', function ($m) use ($sign_url)
+			{
+				return $m[1] . $m[2] . $sign_url($m[3]) . $m[2] . $m[4];
+			}, $css);
+		};
+
+		/**
+		 * Sign the value of an image attribute: a single URL, or a srcset list of "url descriptor" candidates
+		 */
+		$sign_value = function ($value) use ($sign_url, $marker)
+		{
+			if (strpos($value, $marker) === false)
+			{
+				return $value;
+			}
 
 			if (preg_match('#\s\d+(?:\.\d+)?[wx]\s*(?:,|$)#', $value))
 			{
-				// srcset: candidates separated by commas, each "url descriptor"
 				$candidates = preg_split('#\s*,\s*(?=\S)#', $value);
 
 				foreach ($candidates as $c => $candidate)
 				{
-					if (preg_match('#^(.*?)(\s+\d+(?:\.\d+)?[wx])?$#s', $candidate, $parts) && strpos($parts[1], 'phpThumb.php?') !== false)
+					if (preg_match('#^(.*?)(\s+\d+(?:\.\d+)?[wx])?$#s', $candidate, $parts))
 					{
-						$url = $parts[1];
-						$pos = strpos($url, 'phpThumb.php?') + strlen('phpThumb.php?');
-						$candidates[$c] = substr($url, 0, $pos) . $sign_query(substr($url, $pos)) . ($parts[2] ?? '');
+						$candidates[$c] = $sign_url($parts[1]) . ($parts[2] ?? '');
 					}
 				}
 
-				return $quote . implode(', ', $candidates) . $quote;
+				return implode(', ', $candidates);
 			}
 
-			// A single URL: everything after 'phpThumb.php?' up to the closing quote (spaces included), unless
-			// the value is not a bare URL (e.g. inline CSS or script text), which is left to the unquoted pass
-			if (preg_match('#^\s*[^\s"\'<>]*phpThumb\.php\?([^"\'<>]*?)\s*$#s', $value, $m) && strpos($m[1], ')') === false)
-			{
-				$pos = strpos($value, 'phpThumb.php?') + strlen('phpThumb.php?');
-
-				return $quote . substr($value, 0, $pos) . $sign_query(trim(substr($value, $pos))) . $quote;
-			}
-
-			return $matches[0];
+			return $sign_url($value);
 		};
 
-		$sign_unquoted = function ($matches) use ($sign_query)
+		$sign_attributes = function ($chunk) use ($sign_value, $sign_css, $marker)
 		{
-			return $matches[1] . $sign_query($matches[2]);
+			// Attributes that carry image URLs (single URL or srcset list), quoted values only
+			$chunk = preg_replace_callback(
+				'#(\s(?:src|srcset|data-src|data-srcset|data-lazy-src|data-lazy-srcset|data-original|poster|href)\s*=\s*)(["\'])((?:(?!\2)[^<>])*' . preg_quote($marker, '#') . '(?:(?!\2)[^<>])*)\2#i',
+				function ($m) use ($sign_value)
+				{
+					return $m[1] . $m[2] . $sign_value($m[3]) . $m[2];
+				},
+				$chunk
+			);
+
+			// Inline styles
+			$chunk = preg_replace_callback(
+				'#(\sstyle\s*=\s*)(["\'])((?:(?!\2)[^<>])*' . preg_quote($marker, '#') . '(?:(?!\2)[^<>])*)\2#i',
+				function ($m) use ($sign_css)
+				{
+					return $m[1] . $m[2] . $sign_css($m[3]) . $m[2];
+				},
+				$chunk
+			);
+
+			// Style blocks
+			return preg_replace_callback('#(<style\b[^>]*>)(.*?)(</style>)#is', function ($m) use ($sign_css)
+			{
+				return $m[1] . $sign_css($m[2]) . $m[3];
+			}, $chunk);
 		};
 
 		// Leave form contents alone (e.g. an article being edited in the frontend)
@@ -370,11 +421,9 @@ class flexicontent_images
 
 		foreach ($chunks as $i => $chunk)
 		{
-			if ($i % 2 === 0 && strpos($chunk, 'phpThumb.php?') !== false)
+			if ($i % 2 === 0 && strpos($chunk, $marker) !== false)
 			{
-				// 1. quoted values (attributes, strings), 2. anything left (unquoted CSS url(...), plain text)
-				$chunk = preg_replace_callback('#(["\'])([^"\'<>]*?/librairies/phpthumb/phpThumb\.php\?[^"\'<>]*)\1#', $sign_quoted, $chunk);
-				$chunks[$i] = preg_replace_callback($url_re, $sign_unquoted, $chunk);
+				$chunks[$i] = $sign_attributes($chunk);
 			}
 		}
 
