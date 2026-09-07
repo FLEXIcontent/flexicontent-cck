@@ -104,7 +104,7 @@ class phpthumb_bmp {
 		$offset += 2;
 
 		if ($thisfile_bmp_header_raw['identifier'] != 'BM') {
-			$ThisFileInfo['error'][] = 'Expecting "BM" at offset '. (int) (@$ThisFileInfo[ 'avdataoffset']) .', found "'. $thisfile_bmp_header_raw[ 'identifier'].'"';
+			$ThisFileInfo['error'][] = 'Expecting "BM" at offset 0, found "'. $thisfile_bmp_header_raw[ 'identifier'].'"';
 			unset($ThisFileInfo['fileformat']);
 			unset($ThisFileInfo['bmp']);
 			return false;
@@ -758,12 +758,16 @@ class phpthumb_bmp {
 		$im = $this->PlotPixelsGD($BMPinfo['bmp']);
 		if (headers_sent()) {
 			echo 'plotted '.($BMPinfo['resolution_x'] * $BMPinfo['resolution_y']).' pixels in '.(time() - $starttime).' seconds<BR>';
-			imagedestroy($im);
+			if (PHP_VERSION_ID < 80000) { // imagedestroy does nothing after PHP8 and give deprecation warnings in PHP8.5
+				imagedestroy($im);
+			}
 			exit;
 		}
 		header('Content-Type: image/png');
 		imagepng($im);
-		imagedestroy($im);
+		if (PHP_VERSION_ID < 80000) { // imagedestroy does nothing after PHP8 and give deprecation warnings in PHP8.5
+			imagedestroy($im);
+		}
 		return true;
 	}
 
