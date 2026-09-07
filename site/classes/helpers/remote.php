@@ -30,6 +30,7 @@ class flexicontent_remote
 	const CONNECT_TIMEOUT = 5;
 	const TOTAL_TIMEOUT   = 15;
 	const STREAM_TIMEOUT  = 600;
+	const SAVE_SIZE_TIMEOUT = 5;
 	const USER_AGENT      = 'FLEXIcontent remote file client';
 
 	/**
@@ -37,6 +38,9 @@ class flexicontent_remote
 	 */
 	protected static $trusted_hosts = null;
 	protected static $site_host = null;
+
+	// One HTTP budget for all automatic size probes in the current PHP request.
+	protected static $size_probe_deadline = null;
 
 
 	/**
@@ -401,12 +405,13 @@ class flexicontent_remote
 	 * Validate a remote file URL
 	 *
 	 * @param   string  $url    The URL (a missing scheme is normalized to http://)
-	 * @param   string  $error  Set to a message when validation fails
+	 * @param   string   $error        Set to a message when validation fails
+	 * @param   boolean  $listed_only  Require an explicit trusted-host entry, even for the site host
 	 *
 	 * @return  array|boolean  false when invalid, otherwise an array with keys:
 	 *                         url (normalized), scheme, host, port, ips, pin (CURLOPT_RESOLVE entry), trusted, is_site
 	 */
-	public static function validateUrl($url, & $error = null)
+	public static function validateUrl($url, & $error = null, $listed_only = false)
 	{
 		$error = '';
 		$url   = trim((string) $url);
@@ -465,6 +470,15 @@ class flexicontent_remote
 		if ($host === '' || $port < 1 || $port > 65535)
 		{
 			$error = 'URL is not valid';
+
+			return false;
+		}
+
+		// Automatic sizing is stricter than the download proxy policy. Require
+		// an explicit entry even for the site host, before resolving any address.
+		if ($listed_only && !self::isTrustedHost($host, $port))
+		{
+			$error = 'Host is not in the trusted remote hosts list';
 
 			return false;
 		}
@@ -612,10 +626,11 @@ class flexicontent_remote
 	 * @param   array     $target  Validated target array (see validateUrl())
 	 * @param   callable  $sink    For 'GET': callable receiving body chunks
 	 * @param   integer   $max     For 'GET': maximum number of bytes to pass to the sink (0 = unlimited)
+	 * @param   float     $deadline  Optional shared HTTP deadline (microtime), used by automatic sizing
 	 *
 	 * @return  array  status, headers (lowercase names), errno, error, sent
 	 */
-	protected static function request($method, $target, $sink = null, $max = 0)
+	protected static function request($method, $target, $sink = null, $max = 0, $deadline = null)
 	{
 		$status  = 0;
 		$headers = array();
@@ -625,6 +640,13 @@ class flexicontent_remote
 		if (!function_exists('curl_init'))
 		{
 			return array('status' => 0, 'headers' => array(), 'errno' => -1, 'error' => 'cURL is not available', 'sent' => 0);
+		}
+
+		$remaining_ms = $deadline === null ? null : (int) floor(($deadline - microtime(true)) * 1000);
+
+		if ($remaining_ms !== null && $remaining_ms <= 0)
+		{
+			return array('status' => 0, 'headers' => array(), 'errno' => -1, 'error' => 'Automatic size lookup timed out', 'sent' => 0);
 		}
 
 		$ch = curl_init();
@@ -656,6 +678,12 @@ class flexicontent_remote
 				return strlen($line);
 			},
 		);
+
+		if ($remaining_ms !== null)
+		{
+			$options[CURLOPT_CONNECTTIMEOUT_MS] = min(self::CONNECT_TIMEOUT * 1000, $remaining_ms);
+			$options[CURLOPT_TIMEOUT_MS] = min(self::TOTAL_TIMEOUT * 1000, $remaining_ms);
+		}
 
 		if (defined('CURLOPT_PROTOCOLS_STR'))
 		{
@@ -735,10 +763,12 @@ class flexicontent_remote
 	 * @param   string  $url
 	 * @param   string   $error
 	 * @param   boolean  $trusted_only  Require every hop to match the proxy trusted-host policy
+	 * @param   boolean  $listed_only   Require every hop to be explicitly listed (no site-host exception)
+	 * @param   float    $deadline      Optional shared HTTP deadline; DNS lookups use the system resolver
 	 *
 	 * @return  array|boolean  false on failure, otherwise: target, status, headers, size (-1 if unknown)
 	 */
-	public static function resolveFinal($url, & $error = null, $trusted_only = false)
+	public static function resolveFinal($url, & $error = null, $trusted_only = false, $listed_only = false, $deadline = null)
 	{
 		$error = '';
 
@@ -749,7 +779,14 @@ class flexicontent_remote
 			return false;
 		}
 
-		$target = self::validateUrl($url, $error);
+		if ($deadline !== null && microtime(true) >= $deadline)
+		{
+			$error = 'Automatic size lookup timed out';
+
+			return false;
+		}
+
+		$target = self::validateUrl($url, $error, $listed_only);
 
 		if (!$target)
 		{
@@ -765,12 +802,12 @@ class flexicontent_remote
 
 		for ($hop = 0; $hop <= self::MAX_REDIRECTS; $hop++)
 		{
-			$res = self::request('HEAD', $target);
+			$res = self::request('HEAD', $target, null, 0, $deadline);
 
 			// Servers not supporting HEAD: retry with a GET of the first byte
 			if (!$res['errno'] && in_array($res['status'], array(405, 501), true))
 			{
-				$res = self::request('RANGE', $target);
+				$res = self::request('RANGE', $target, null, 0, $deadline);
 			}
 
 			// The filesize limit of the ranged GET being exceeded still gives us the headers
@@ -793,7 +830,7 @@ class flexicontent_remote
 				}
 
 				$next   = self::resolveRedirect($res['headers']['location'], $target);
-				$target = self::validateUrl($next, $error);
+				$target = self::validateUrl($next, $error, $listed_only);
 
 				if (!$target)
 				{
@@ -840,14 +877,52 @@ class flexicontent_remote
 
 
 	/**
+	 * Optional metadata lookup when a URL record is stored without a supplied size.
+	 * Configuration is always read server-side, including calls during frontend item saves.
+	 * Existing size/recalculation and proxy callers keep their original policies.
+	 *
+	 * @return  integer  Size in bytes, or 0 when disabled, disallowed, unavailable or unknown
+	 */
+	public static function getSizeOnSave($url)
+	{
+		try
+		{
+			if (!function_exists('curl_init') || !self::hasTrustedHosts()
+				|| !class_exists('\Joomla\CMS\Component\ComponentHelper')
+				|| !(int) \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('remote_probe_size', 0))
+			{
+				return 0;
+			}
+
+			if (self::$size_probe_deadline === null)
+			{
+				self::$size_probe_deadline = microtime(true) + self::SAVE_SIZE_TIMEOUT;
+			}
+
+			$error = '';
+			$size = self::headSize($url, $error, true, self::$size_probe_deadline);
+
+			return max(0, (int) $size);
+		}
+		catch (\Throwable $e)
+		{
+			// Optional metadata must never prevent a valid URL record from saving.
+			return 0;
+		}
+	}
+
+
+	/**
 	 * Get the size of a remote file without downloading it
 	 *
 	 * @param   string  $url
-	 * @param   string  $error  Set to a message when -999 is returned
+	 * @param   string   $error        Set to a message when -999 is returned
+	 * @param   boolean  $listed_only  Require explicitly listed hosts for the whole lookup
+	 * @param   float    $deadline     Optional shared HTTP deadline
 	 *
 	 * @return  integer  The size, -1 if it could not be determined, -999 on error (URL rejected, connection failed, HTTP error)
 	 */
-	public static function headSize($url, & $error = null)
+	public static function headSize($url, & $error = null, $listed_only = false, $deadline = null)
 	{
 		$error = '';
 
@@ -856,7 +931,7 @@ class flexicontent_remote
 			return -1;
 		}
 
-		$final = self::resolveFinal($url, $error);
+		$final = self::resolveFinal($url, $error, false, $listed_only, $deadline);
 
 		if ($final === false)
 		{
@@ -869,7 +944,7 @@ class flexicontent_remote
 		}
 
 		// No length in the response headers: try a GET of the first byte (no redirects are followed)
-		$res = self::request('RANGE', $final['target']);
+		$res = self::request('RANGE', $final['target'], null, 0, $deadline);
 
 		if ((!$res['errno'] || $res['errno'] === CURLE_FILESIZE_EXCEEDED || !empty($res['expected_abort'])) && $res['status'] >= 200 && $res['status'] < 300)
 		{

@@ -2296,6 +2296,10 @@
 
 			<field name="" type="separator" default="FLEXI_REMOTE_FILES" label="" level="level3" />
 			<field name="remote_trusted_hosts" type="textarea" rows="3" default="" label="FLEXI_REMOTE_TRUSTED_HOSTS" description="FLEXI_REMOTE_TRUSTED_HOSTS_DESC" class="input-xxlarge" />
+			<field name="remote_probe_size" type="radio" default="0" label="FLEXI_REMOTE_PROBE_SIZE" description="FLEXI_REMOTE_PROBE_SIZE_DESC" class="btn-group btn-group-yesno">
+				<option value="0">JNO</option>
+				<option value="1">JYES</option>
+			</field>
 
 			<field name="" type="separator" default="FLEXI_AUTO_RESIZE_ORIGINAL_IMAGES" description="" level="level3" />
 			<field name="" type="separator" default="FLEXI_AUTO_RESIZE_ORIGINAL_IMAGES_INFO" description="" level="level3" class="alert alert-info fcpadded"/>

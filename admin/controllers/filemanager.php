@@ -381,8 +381,8 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 					$data['filename'] = $url_valid['url'];
 				}
 
-				// Use the submitted file size when present. Do not probe an untrusted
-				// remote URL from the server merely to calculate optional metadata.
+				// A supplied size wins. Automatic lookup requires a saved configuration
+				// opt-in and explicitly trusted hosts, including every redirect.
 				if (!empty($data['size']))
 				{
 					$arr_sizes = array('KBs' => 1024, 'MBs' => (1024 * 1024), 'GBs' => (1024 * 1024 * 1024));
@@ -392,7 +392,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 				else
 				{
-					$data['size'] = 0;
+					$data['size'] = flexicontent_remote::getSizeOnSave($data['filename']);
 				}
 				break;
 
@@ -1193,9 +1193,9 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		{
 			if ($linktype === 1)
 			{
-				// Do not probe an untrusted remote URL from the server. Its size is
-				// optional metadata and can safely remain unknown.
-				$filesize = 0;
+				// This also runs inside frontend item saves: the remote helper uses
+				// administrator-configured policy, never caller permissions or input.
+				$filesize = flexicontent_remote::getSizeOnSave($url);
 			}
 			else  // $linktype === 2
 			{
