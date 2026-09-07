@@ -201,6 +201,7 @@ class flexicontent_security
             array('format_output', -1, 'output_custom_func'),
             array('default_image_custom', 2, 'default_image_custom_code'),
             array('auto_value', 2, 'auto_value_code'),
+            array('auto_filename', 2, 'auto_filename_code'),
         );
         foreach ($settings as $setting)
         {
