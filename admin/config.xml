@@ -2331,6 +2331,18 @@
 			<field name="upload_mime_illegal" type="text" size="50" default="text/html" label="FLEXI_ILLEGAL_MIME_TYPES" description="FLEXI_ILLEGAL_MIME_TYPES_DESC" class="input-xxlarge" />
 			<field name="upload_mime" type="textarea" rows="2" default="image/jpeg,image/gif,image/png,image/bmp,application/msword,application/excel,application/pdf,application/powerpoint,text/plain,application/x-zip" label="FLEXI_LEGAL_MIME_TYPES_LABEL" description="FLEXI_LEGAL_MIME_TYPES_DESC" class="input-xxlarge" />
 
+			<field name="" type="separator" default="FLEXI_PHPTHUMB" icon_class="icon-image" level="tab_open" box_type="1" remove_boxes="2" />
+			<field name="" type="separator" default="FLEXI_PHPTHUMB_INFO" description="" level="message" class="alert alert-info fcpadded"/>
+			<field name="" type="phpthumbstatus" label="" description="" />
+			<field name="phpthumb_high_security" type="radio" default="0" label="FLEXI_PHPTHUMB_HIGH_SECURITY" description="FLEXI_PHPTHUMB_HIGH_SECURITY_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="phpthumb_sign_legacy_urls" type="radio" default="1" label="FLEXI_PHPTHUMB_SIGN_LEGACY_URLS" description="FLEXI_PHPTHUMB_SIGN_LEGACY_URLS_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+
 		<field name="" type="separator" default="FLEXI_FILES_CONF" level="tabset_close" box_type="1" remove_boxes="2" />
 	</fieldset>
 
