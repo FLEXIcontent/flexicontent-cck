@@ -142,8 +142,10 @@ class phpUnsharpMask {
 				}
 			}
 		}
-		imagedestroy($imgCanvas);
-		imagedestroy($imgBlur);
+		if (PHP_VERSION_ID < 80000) { // imagedestroy does nothing after PHP8 and give deprecation warnings in PHP8.5
+			imagedestroy($imgCanvas);
+			imagedestroy($imgBlur);
+		}
 		return true;
 	}
 }
