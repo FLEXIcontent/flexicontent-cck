@@ -361,7 +361,9 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 				($option == 'com_users' && ($view == 'user'))
 			)
 		) {
-			HTMLHelper::_('jquery.framework');
+			if (Factory::getApplication()->getDocument() !== null) {
+				HTMLHelper::_('jquery.framework');
+			}
 			$js .= "
 				jQuery(document).ready(function() {
 					var el = parent.document.getElementById('fc_modal_popup_container');
