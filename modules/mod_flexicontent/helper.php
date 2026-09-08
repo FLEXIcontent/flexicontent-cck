@@ -249,14 +249,18 @@ class modFlexicontentHelper
 			return '<img src="' . $thumb_url . '" alt="' . $alt . '" style="' . $_style . '"' . $_size . ' loading="lazy" decoding="async" />';
 		}
 
-		// Encoder les espaces dans le chemin source (noms de fichiers avec espaces)
-		// et décoder &amp; → & car srcset est lu directement par le navigateur
-		$src        = str_replace(' ', '%20', $src);
-		$conf_base  = preg_replace('/&(?:amp;)?[wh]=\d+/', '', str_replace('&amp;', '&', $conf_noformat));
+		// Extra phpThumb options (e.g. '&amp;aoe=1&amp;q=95&amp;zc=1'), sizes and format are set per srcset level
+		parse_str(ltrim(str_replace('&amp;', '&', (string) $conf_noformat), '&'), $conf_extra);
+		unset($conf_extra['w'], $conf_extra['h'], $conf_extra['f'], $conf_extra['src'], $conf_extra['hash']);
 
-		$phpthumb_base = \Joomla\CMS\Uri\Uri::root(true)
-			. '/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='
-			. $base_url . $src;
+		// Signed phpThumb URL (HTML escaped, valid inside src and srcset attributes), $src is encoded by the helper
+		$phpthumb_url = function ($lw, $lh, $f) use ($base_url, $src, $conf_extra) {
+			return flexicontent_images::phpThumbURL(array_merge(
+				array('src' => $base_url . $src, 'w' => $lw, 'h' => $lh ?: ''),
+				$conf_extra,
+				array('f' => $f)
+			));
+		};
 
 		$ratio = ($w > 0 && $h > 0) ? ($h / $w) : 0;
 
@@ -269,11 +273,10 @@ class modFlexicontentHelper
 		foreach ($levels as $level) {
 			$lw = (int) $level['img_w'];
 			$lh = $ratio > 0 ? (int) round($lw * $ratio) : 0;
-			$conf_level = '&w=' . $lw . ($lh ? '&h=' . $lh : '') . $conf_base;
-			$url_img   = $phpthumb_base . $conf_level;
+			$url_img = $phpthumb_url($lw, $lh, '');
 
 			if ($use_webp) {
-				$srcset_webp[] = $phpthumb_base . $conf_level . '&f=webp' . ' ' . $lw . 'w';
+				$srcset_webp[] = $phpthumb_url($lw, $lh, 'webp') . ' ' . $lw . 'w';
 			}
 			$srcset_img[] = $url_img . ' ' . $lw . 'w';
 
@@ -402,32 +405,28 @@ return $html;
 			$src = $mod_default_img_path;
 
 			// Default image standard (taille normale)
-			$h		= '&amp;h=' . $mod_height;
-			$w		= '&amp;w=' . $mod_width;
-			$aoe	= '&amp;aoe=1';
-			$q		= '&amp;q=95';
-			$ar 	= '&amp;ar=x';
-			$zc		= $mod_method ? '&amp;zc=' . $mod_method : '';
-			$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-			$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
-			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
-
-			$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  \Joomla\CMS\Uri\Uri::base(true).'/' : '';
-			$thumb_default = \Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+			$thumb_default = flexicontent_images::phpThumbURL(array(
+				'src' => $src,
+				'w'   => $mod_width,
+				'h'   => $mod_height,
+				'aoe' => 1,
+				'q'   => 95,
+				'ar'  => 'x',
+				'zc'  => $mod_method ?: '',
+				'f'   => flexicontent_images::phpThumbFormat($src),
+			));
 
 			// Default image featured (taille featured)
-			$h		= '&amp;h=' . $mod_height_feat;
-			$w		= '&amp;w=' . $mod_width_feat;
-			$aoe	= '&amp;aoe=1';
-			$q		= '&amp;q=95';
-			$ar 	= '&amp;ar=x';
-			$zc		= $mod_method_feat ? '&amp;zc=' . $mod_method_feat : '';
-			$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-			$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
-			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
-
-			$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  \Joomla\CMS\Uri\Uri::base(true).'/' : '';
-			$thumb_default_feat = \Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+			$thumb_default_feat = flexicontent_images::phpThumbURL(array(
+				'src' => $src,
+				'w'   => $mod_width_feat,
+				'h'   => $mod_height_feat,
+				'aoe' => 1,
+				'q'   => 95,
+				'ar'  => 'x',
+				'zc'  => $mod_method_feat ?: '',
+				'f'   => flexicontent_images::phpThumbFormat($src),
+			));
 		}
 
 		// Retrieve custom displayed field data (including their parameters and access):  hits/voting/etc
@@ -2878,30 +2877,27 @@ return $html;
 				{
 					$src = \Joomla\CMS\Uri\Uri::base(true)."/".$joomla_image_path."/".$catdata->image;
 
-					$h		= '&amp;h=' . $catconf->image_height;
-					$w		= '&amp;w=' . $catconf->image_width;
-					$aoe	= '&amp;aoe=1';
-					$q		= '&amp;q=95';
-					$zc		= $catconf->image_method ? '&amp;zc=' . $catconf->image_method : '';
-					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-					$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
-					$conf	= $w . $h . $aoe . $q . $zc . $f;
-
-					$catimage = \Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
+					$catimage = flexicontent_images::phpThumbURL(array(
+						'src' => $src,
+						'w'   => $catconf->image_width,
+						'h'   => $catconf->image_height,
+						'aoe' => 1,
+						'q'   => 95,
+						'zc'  => $catconf->image_method ?: '',
+						'f'   => flexicontent_images::phpThumbFormat($src),
+					));
 				}
 				elseif ($catconf->image_source!=1 && $src = flexicontent_html::extractimagesrc($catdata))
 				{
-					$h		= '&amp;h=' . $catconf->image_height;
-					$w		= '&amp;w=' . $catconf->image_width;
-					$aoe	= '&amp;aoe=1';
-					$q		= '&amp;q=95';
-					$zc		= $catconf->image_method ? '&amp;zc=' . $catconf->image_method : '';
-					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-					$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
-					$conf	= $w . $h . $aoe . $q . $zc . $f;
-
-					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  \Joomla\CMS\Uri\Uri::base(true).'/' : '';
-					$catimage = \Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+					$catimage = flexicontent_images::phpThumbURL(array(
+						'src' => $src,
+						'w'   => $catconf->image_width,
+						'h'   => $catconf->image_height,
+						'aoe' => 1,
+						'q'   => 95,
+						'zc'  => $catconf->image_method ?: '',
+						'f'   => flexicontent_images::phpThumbFormat($src),
+					));
 				}
 
 				$catdata->image = $catimage;
