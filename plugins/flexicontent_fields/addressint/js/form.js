@@ -65,14 +65,62 @@
 	{
 		var theSelect = jQuery('#' + elementid_n + '_custom_marker');
 
-		theSelect.select2(
-		{
-			formatResult: function(state) { return fcfield_addrint.format_marker_image(state, theSelect) },
-			formatSelection: function(state) { return fcfield_addrint.format_marker_image(state, theSelect) },
-			escapeMarkup: function(m) { return m; }
-		});
+		if (window.fc_use_choicesjs) {
+			// Choices.js with custom rendering
+			window.fc_choices_instances = window.fc_choices_instances || {};
 
-		fc_attachSelect2(theSelect.parent());
+			// Destroy any existing instance so re-init / row clones don't stack wrappers
+			var prevKey = theSelect[0].id || theSelect[0].name;
+			var prevInst = theSelect.data('fc_choices_instance') || window.fc_choices_instances[prevKey];
+			if (prevInst && typeof prevInst.destroy === 'function') {
+				prevInst.destroy();
+			}
+			delete window.fc_choices_instances[prevKey];
+			theSelect.removeData('fc_choices_instance');
+
+			var choicesInstance = new Choices(theSelect[0], {
+				callbackOnCreateTemplates: function(template) {
+					return {
+						item: function(data) {
+							var div = document.createElement('div');
+							div.classList.add('choices__item', 'choices__item--selectable');
+							div.setAttribute('data-item', '');
+							div.setAttribute('data-value', data.value);
+							div.setAttribute('data-id', data.id);
+							div.innerHTML = '<img class="flag fc-marker-img" src="' + theSelect.data('marker-base-url') + data.value + '"/> ' + data.label;
+							return div;
+						},
+						choice: function(data) {
+							var div = document.createElement('div');
+							div.classList.add('choices__item', 'choices__item--choice', 'choices__list-item--choice');
+							div.setAttribute('data-select-text', '');
+							div.setAttribute('data-choice', '');
+							if (data.disabled) div.classList.add('is-disabled');
+							if (data.selected) div.classList.add('is-selected');
+							div.innerHTML = '<img class="flag fc-marker-img" src="' + theSelect.data('marker-base-url') + data.value + '"/> ' + data.label;
+							return div;
+						}
+					};
+				}
+			});
+
+			// Register the instance so destroy / reset helpers can find it
+			theSelect.data('fc_choices_instance', choicesInstance);
+			window.fc_choices_instances[prevKey] = choicesInstance;
+			if (choicesInstance.containerOuter && choicesInstance.containerOuter.element) {
+				choicesInstance.containerOuter.element.classList.add('fc-choices-outer');
+			}
+			fc_attachSelect2(theSelect.parent());
+		} else {
+			// Select2 with custom rendering (legacy)
+			theSelect.select2(
+			{
+				formatResult: function(state) { return fcfield_addrint.format_marker_image(state, theSelect) },
+				formatSelection: function(state) { return fcfield_addrint.format_marker_image(state, theSelect) },
+				escapeMarkup: function(m) { return m; }
+			});
+			fc_attachSelect2(theSelect.parent());
+		}
 	}
 
 

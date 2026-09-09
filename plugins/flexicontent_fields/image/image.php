@@ -405,13 +405,8 @@ class plgFlexicontent_fieldsImage extends FCField
 				var uniqueRowN = uniqueRowNum" . $field->id . ";
 				var element_id = '" . $elementid . "_' + uniqueRowN;
 
-				// Destroy any select2 elements
-				var sel2_elements = newField.find('div.select2-container');
-				if (sel2_elements.length)
-				{
-					sel2_elements.remove();
-					newField.find('select.use_select2_lib').select2('destroy').show();
-				}
+				// Destroy any select library elements (select2 or choices.js)
+				fc_destroySelectLib(newField);
 
 				newField.find('input.hasvalue').val('');
 				newField.find('input.hasvalue').attr('name', element_id + '_hasvalue');

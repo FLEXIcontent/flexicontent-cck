@@ -160,5 +160,15 @@ define('FLEXI_PHP_NEEDED',	'7.0.0');
 define('FLEXI_PHP_RECOMMENDED',	'8.0.25');
 define('FLEXI_VERSION', '4.2.1');
 define('FLEXI_RELEASE',	'');
-define('FLEXI_VHASH',	md5(filemtime(__FILE__) . filectime(__FILE__) . FLEXI_VERSION));
+// FLEXI_VHASH is used as cache-buster (version arg) for assets ;
+// include mtimes of the JS/CSS files most edited during development so
+// browsers don't serve stale cached versions after a file change.
+if (defined('JPATH_SITE')) {
+	define('FLEXI_VHASH',	md5(filemtime(__FILE__) . filectime(__FILE__) . FLEXI_VERSION
+		. @filemtime(JPATH_SITE . '/components/com_flexicontent/assets/js/flexi-lib.js')
+		. @filemtime(JPATH_SITE . '/components/com_flexicontent/assets/js/flexi-lib-form.js')
+		. @filemtime(JPATH_SITE . '/components/com_flexicontent/librairies/choicesjs/choices.min.js')));    
+} else {
+	define('FLEXI_VHASH',	md5(filemtime(__FILE__) . filectime(__FILE__) . FLEXI_VERSION));
+}
 define('FLEXI_PHP_54GE', version_compare(PHP_VERSION, '5.4.0', '>='));

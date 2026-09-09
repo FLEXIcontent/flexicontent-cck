@@ -623,6 +623,16 @@ body .nowrap_hidden {
   margin: -1px 0 0 0;
   white-space: nowrap;
 }
+#flexicontent .fcfield-relation-value_box {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: flex-start !important;
+  gap: 0.5rem !important;
+}
+#flexicontent .fcfield-relation-value_box > .fc-xpended-row {
+  width: auto !important;
+  flex: 1 1 auto !important;
+}
 #flexicontent {
   /* EXTRA START */
   /* EXTRA END */

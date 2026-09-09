@@ -398,8 +398,16 @@
 		field_list += field_list ? ','+val : val;
 		jQuery('#'+tagid).val(field_list);
 		if (selobj.hasClass('use_select2_lib')) {
-			selobj.select2('val', '');
-			selobj.prev().find('.select2-choice').removeClass('fc_highlight');
+			if (window.fc_use_choicesjs && window.fc_choices_instances) {
+				var instanceKey = selobj[0].id || selobj[0].name;
+				var instance = window.fc_choices_instances[instanceKey];
+				if (instance) {
+					instance.removeActiveItems();
+				}
+			} else {
+				selobj.select2('val', '');
+			}
+			selobj.prev().find('.select2-choice, .fc-choices-outer').removeClass('fc_highlight');
 		} else
 			selobj.prop('selectedIndex',0);
 	}

@@ -38,28 +38,24 @@
 
 	function getSEFurl(loader_el, loader_html, form, url_to_load, autosubmit_msg, autosubmit)
 	{
-		jQuery('#'+loader_el).html(loader_html);
-		jQuery.ajax({
-			type: 'GET',
-			url: url_to_load,
-			dataType: "text",
-			data: {
-			},
-			success: function( responseText )
-			{
-			 	form.action=responseText;
-			 	var fcform = jQuery(form);
-			 	fcform.attr('data-fcform_action', responseText);
-			 	if (autosubmit) {
-			 		jQuery('#'+loader_el).append(autosubmit_msg);
-					adminFormPrepare(form, 2);
-				} else {
-					jQuery('#'+loader_el).html('');
-				}
-			},
-			error: function (xhr, ajaxOptions, thrownError) {
-				alert('Error status: ' + xhr.status + ' , Error text: ' + thrownError);
+		var loader = document.getElementById(loader_el);
+		if (loader) loader.innerHTML = loader_html;
+		fetch(url_to_load)
+		.then(function(response) {
+			return response.text();
+		})
+		.then(function(responseText) {
+			form.action = responseText;
+			form.setAttribute('data-fcform_action', responseText);
+			if (autosubmit) {
+				if (loader) loader.insertAdjacentHTML('beforeend', autosubmit_msg || '');
+				adminFormPrepare(form, 2);
+			} else {
+				if (loader) loader.innerHTML = '';
 			}
+		})
+		.catch(function(err) {
+			alert('Error fetching: ' + err);
 		});
 	}
 
@@ -67,13 +63,12 @@
 	function adminFormPrepare(form, postprep, task)
 	{
 		var extra_action = '';
-		var fcform = jQuery(form);
 
-		var fcform_action = fcform.attr('data-fcform_action');
-		if ( typeof fcform_action === "undefined" || fcform_action === null )
+		var fcform_action = form.getAttribute('data-fcform_action');
+		if (fcform_action === null)
 		{
-			fcform_action = fcform.attr('action');
-			fcform.attr('data-fcform_action', fcform_action);
+			fcform_action = form.getAttribute('action');
+			form.setAttribute('data-fcform_action', fcform_action);
 		}
 
 		var var_sep = fcform_action.match(/\?/) ? '&' : '?';
@@ -93,17 +88,18 @@
 			if ( (element.type=='radio' || element.type=='checkbox') )
 			{
 				if ( !element.checked ) continue;
-				if ( jQuery(element).attr('data-is-default-value') == '1' )
+				if ( element.getAttribute('data-is-default-value') == '1' )
 				{
-					if (postprep==2) jQuery(element).attr('disabled', 'disabled');
+					if (postprep==2) element.disabled = true;
 					continue;
 				}
 			}
 			if ( element.type=='select-one' )
 			{
-				if ( jQuery(element).find('option:selected').attr('data-is-default-value') )
+				var selected_opt = element.options[element.selectedIndex];
+				if ( selected_opt && selected_opt.getAttribute('data-is-default-value') )
 				{
-					if (postprep==2) jQuery(element).attr('disabled', 'disabled');
+					if (postprep==2) element.disabled = true;
 					continue;
 				}
 			}
@@ -119,8 +115,8 @@
 			}
 			else
 			{
-				element_value = element.value;
-				if ( jQuery(element).hasClass('fc_iscalendar') && typeof JoomlaCalendar !== 'function' )
+				var element_value = element.value;
+				if ( element.classList.contains('fc_iscalendar') && typeof JoomlaCalendar !== 'function' )
 				{
 					var frmt = '%Y-%m-%d';
 					var date = Date.parseDate(element.value || element.innerHTML, frmt);
@@ -146,21 +142,22 @@
 		{
 			if (postprep==2)
 			{
-				var fc_filter_form_blocker = jQuery("#fc_filter_form_blocker");
+				var fc_filter_form_blocker = document.getElementById("fc_filter_form_blocker");
 				if (extra_action === '' && !!!task)
 					window.location.href = fcform_action;
 				else
 					form.submit( task );
 				if (fc_filter_form_blocker)
 				{
-					fc_filter_form_blocker.css("display", "block");
-					fc_progress(95, jQuery('#fc_filter_form_blocker .fc_blocker_bar'));
+					fc_filter_form_blocker.style.display = "block";
+					fc_progress(95, fc_filter_form_blocker.querySelector('.fc_blocker_bar'));
 				}
 			}
 			else if (postprep==1)
 			{
-				var form_id = jQuery(form).attr('id');
-				jQuery('#'+form_id+'_submitWarn').css("display", "inline-block");
+				var form_id = form.getAttribute('id');
+				var warn_el = document.getElementById(form_id+'_submitWarn');
+				if (warn_el) warn_el.style.display = "inline-block";
 			}
 		}
 	}
@@ -172,14 +169,20 @@
 			var element = form.elements[i];
 			if (typeof element.name === "undefined" || element.name === null || !element.name) continue;
 
-			if (element.name=='filter_order') {	element.value=='i.title'; continue; }
-			if (element.name=='filter_order_Dir') { element.value=='ASC'; continue; }
+			if (element.name=='filter_order') {	element.value='i.title'; continue; }
+			if (element.name=='filter_order_Dir') { element.value='ASC'; continue; }
 
 			var matches = element.name.match(/(filter[.]*|letter)/);
 			if (matches)
 			{
-				if (jQuery(element).data('select2')) {
-					jQuery(element).select2('val', '');
+				if (window.jQuery && window.jQuery.fn && element.s2) {
+					window.jQuery(element).select2('val', '');
+				} else if (window.fc_use_choicesjs && window.fc_choices_instances) {
+					var instanceKey = element.id || element.name;
+					var instance = window.fc_choices_instances[instanceKey];
+					if (instance) {
+						instance.removeActiveItems();
+					}
 				} else {
 					element.value = '';
 				}
@@ -189,169 +192,208 @@
 
 	function fc_toggleClass(ele, cls, fc_all) {
 		var inputs = ele.parentNode.parentNode.getElementsByTagName('input');
-		var input_0 = jQuery(inputs[0]);
+		var input_0 = inputs[0];
 		if (typeof fc_all === "undefined" || fc_all === null || !fc_all)
 		{
-			if ( jQuery(ele).attr('checked') ) {
-				jQuery(ele).next().addClass(cls);
-				jQuery(ele).parent().addClass('fc_checkradio_checked');
+			if ( ele.checked ) {
+				ele.nextElementSibling.classList.add(cls);
+				ele.parentNode.classList.add('fc_checkradio_checked');
 			} else {
-				jQuery(ele).next().removeClass(cls);
-				jQuery(ele).parent().removeClass('fc_checkradio_checked');
+				ele.nextElementSibling.classList.remove(cls);
+				ele.parentNode.classList.remove('fc_checkradio_checked');
 			}
 		  // Handle disabling 'select all' checkbox (if it exists), not needed but to make sure ...
-		  if (input_0.val()=='') {
-				input_0.prop('checked', false);
-				input_0.next().removeClass(cls);
-				input_0.parent().removeClass('fc_checkradio_checked');
+		  if (input_0.value=='') {
+				input_0.checked = false;
+				input_0.nextElementSibling.classList.remove(cls);
+				input_0.parentNode.classList.remove('fc_checkradio_checked');
 		  }
 		}
 		else
 		{
 			for (var i = 0; i < inputs.length; ++i) {
-				var input_i = jQuery(inputs[i]);
-				input_i.prop('checked', false);
-				input_i.next().removeClass(cls);
-				input_i.parent().removeClass('fc_checkradio_checked');
+				var input_i = inputs[i];
+				input_i.checked = false;
+				input_i.nextElementSibling.classList.remove(cls);
+				input_i.parentNode.classList.remove('fc_checkradio_checked');
 			}
 		  // Handle highlighting (but not enabling) 'select all' checkbox
-			jQuery(ele).prop('checked', true);
-			jQuery(ele).next().addClass(cls);
-			jQuery(ele).parent().addClass('fc_checkradio_checked');
+			ele.checked = true;
+			ele.nextElementSibling.classList.add(cls);
+			ele.parentNode.classList.add('fc_checkradio_checked');
 		}
 		//alert('done fc_toggleClass()');
 	}
 
 	function fc_toggleClassGrp(ele, cls, fc_all) {
 		var inputs = ele.parentNode.parentNode.getElementsByTagName('input');
-		var input_0 = jQuery(inputs[0]);
 		if (typeof fc_all === "undefined" || fc_all === null || !fc_all)
 		{
 			for (var i = 0; i < inputs.length; ++i) {
-				var input_i = jQuery(inputs[i]);
-				if ( input_i.attr('checked') ) {
-					input_i.next().addClass(cls);
-					input_i.parent().addClass('fc_checkradio_checked');
+				var input_i = inputs[i];
+				if ( input_i.checked ) {
+					input_i.nextElementSibling.classList.add(cls);
+					input_i.parentNode.classList.add('fc_checkradio_checked');
 				} else {
-					input_i.next().removeClass(cls);
-					input_i.parent().removeClass('fc_checkradio_checked');
+					input_i.nextElementSibling.classList.remove(cls);
+					input_i.parentNode.classList.remove('fc_checkradio_checked');
 				}
 			}
 		}
 		else
 		{
 			for (var i = 0; i < inputs.length; ++i) {
-				var input_i = jQuery(inputs[i]);
-				input_i.next().removeClass(cls);
-				input_i.parent().removeClass('fc_checkradio_checked');
+				var input_i = inputs[i];
+				input_i.nextElementSibling.classList.remove(cls);
+				input_i.parentNode.classList.remove('fc_checkradio_checked');
 			}
 		  // Handle highlighting (but not enabling) 'select all' radio button
-			jQuery(ele).next().addClass(cls);
-			jQuery(ele).parent().addClass('fc_checkradio_checked');
+			ele.nextElementSibling.classList.add(cls);
+			ele.parentNode.classList.add('fc_checkradio_checked');
 		}
 		//alert('done fc_toggleClassGrp()');
 	}
 
 
 	function fc_progress(percent, element) {
-		var progressBarWidth = percent * element.width() / 100;
-		element.find('div').animate({ width: progressBarWidth }, 5000).html("");
+		if (!element) return;
+		var bar = element.querySelector ? element.querySelector('div') : null;
+		if (!bar) bar = element;
+		var progressBarWidth = percent * (element.offsetWidth || 100) / 100;
+		bar.style.width = progressBarWidth + 'px';
+		bar.innerHTML = '';
 	}
 
 
 
-jQuery(document).ready(function() {
+document.addEventListener('DOMContentLoaded', function() {
 
-	// case-insensitive contains()
-	jQuery.expr[':'].contains_ci_fc = function(el,i,txt){
-		return (el.textContent || el.innerText || "").toUpperCase().indexOf(txt[3].toUpperCase()) >= 0;
-	};
+	// case-insensitive contains() helper (replaces jQuery.expr :contains_ci_fc)
+	function fcContainsCI(text, needle) {
+		return (text || "").toUpperCase().indexOf((needle || "").toUpperCase()) >= 0;
+	}
 
 	// Add instant text type filter to lists
-	jQuery('div.fc_list_filter_wrapper').each(function() {
-		var list = jQuery(this).find('ul:first');
+	var listWrappers = document.querySelectorAll('div.fc_list_filter_wrapper');
+	for (var w = 0; w < listWrappers.length; w++) {
+		var wrapper = listWrappers[w];
+		var list = wrapper.querySelector('ul');
+		if (!list) continue;
 		// prepend text filter input to the list
-		var form = jQuery("<form>").attr({"class":"fc_instant_filter", "action":"#"}),
-		input = jQuery("<input>").attr({"class":"fc_field_filter fc_label_internal fc_instant_filter fc_autosubmit_exclude", "type":"text", "data-fc_label_text":Joomla.JText._('FLEXI_TYPE_TO_FILTER')});
-		jQuery(form).append(input).insertBefore(this);
+		var form = document.createElement('form');
+		form.className = 'fc_instant_filter';
+		form.setAttribute('action', '#');
+		var input = document.createElement('input');
+		input.className = 'fc_field_filter fc_label_internal fc_instant_filter fc_autosubmit_exclude';
+		input.type = 'text';
+		input.setAttribute('data-fc_label_text', Joomla.JText._('FLEXI_TYPE_TO_FILTER'));
+		form.appendChild(input);
+		wrapper.insertBefore(form, wrapper.firstChild);
 
-		jQuery(input)
-		.change( function () {
-			var filter = jQuery(this).val();
-			if(filter) {
-				jQuery(list).find("li:not(.fc_checkradio_checked):not(.fc_checkradio_special) label:not(:contains_ci_fc(" + filter + "))").parent().slideUp();
-				jQuery(list).find("li:not(.fc_checkradio_checked):not(.fc_checkradio_special) label:contains_ci_fc(" + filter + ")").parent().slideDown();
-			} else {
-				jQuery(list).find("li").slideDown();
+		var filterInput = input;
+		filterInput.addEventListener('change', function() {
+			var filter = filterInput.value;
+			var lis = list.querySelectorAll('li:not(.fc_checkradio_checked):not(.fc_checkradio_special)');
+			for (var l = 0; l < lis.length; l++) {
+				var li = lis[l];
+				var label = li.querySelector('label');
+				var show = !filter || fcContainsCI(label ? label.textContent : '', filter);
+				li.style.display = show ? '' : 'none';
 			}
-			return false;
-		})
-		.keyup( function () {
-			jQuery(this).change();
 		});
-	});
+		filterInput.addEventListener('keyup', function() {
+			filterInput.dispatchEvent(new Event('change'));
+		});
+	}
 
 
 	// Initialize internal labels
-	jQuery('input.fc_label_internal').each(function() {
-		var el = jQuery(this);
-		var fc_label_text = el.attr('data-fc_label_text');
-		if (!fc_label_text) fc_label_text = el.attr('fc_label_text');
-		if (!fc_label_text) return;
+	var labelInputs = document.querySelectorAll('input.fc_label_internal');
+	for (var li = 0; li < labelInputs.length; li++) {
+		var labelEl = labelInputs[li];
+		var fc_label_text = labelEl.getAttribute('data-fc_label_text');
+		if (!fc_label_text) fc_label_text = labelEl.getAttribute('fc_label_text');
+		if (!fc_label_text) continue;
 		var _label = (fc_label_text.length >= 27) ? fc_label_text.substring(0, 25) + '...' : fc_label_text;
 
-		el.before(jQuery('<span/>', {
-			'class': 'fc_has_inner_label fc_has_inner_label_input',
-			'text': _label
-		}));
-		if (el.val().length > 0) el.prev().hide();
-	});
-
-
-	jQuery('input.fc_label_internal').bind('focus', function() {
-		var el = jQuery(this);
-		var fc_label_text = el.attr('data-fc_label_text');
-		if (!fc_label_text) fc_label_text = el.attr('fc_label_text');
-		if (!fc_label_text) return;
-		el.prev().hide();
-		el.css("opacity", "1");
-	}).bind('change blur', function(event) {
-		var el = jQuery(this);
-		var fc_label_text = el.attr('data-fc_label_text');
-		if (!fc_label_text) fc_label_text = el.attr('fc_label_text');
-		if (!fc_label_text) return;
-
-		if (event.type=='blur') {
-			var previous_value = el.attr('data-previous_value');
-			if ( typeof previous_value !== "undefined" && previous_value != el.val())  el.trigger('change');
+		var labelSpan = document.createElement('span');
+		labelSpan.className = 'fc_has_inner_label fc_has_inner_label_input';
+		labelSpan.textContent = _label;
+		labelEl.parentNode.insertBefore(labelSpan, labelEl);
+		if (labelEl.value && labelEl.value.length > 0) {
+			var labelPrev = labelEl.previousElementSibling;
+			if (labelPrev) labelPrev.style.display = 'none';
 		}
+	}
 
-		if ( el.val().length ) {
-			el.prev().hide();
-			el.css("opacity", "1");
-		} else {
-			el.prev().show();
-			el.css("opacity", "0.5");
-		}
-	});
+	var labelInputs2 = document.querySelectorAll('input.fc_label_internal');
+	for (var li2 = 0; li2 < labelInputs2.length; li2++) {
+		(function(el) {
+			el.addEventListener('focus', function() {
+				var fc_label_text = el.getAttribute('data-fc_label_text');
+				if (!fc_label_text) fc_label_text = el.getAttribute('fc_label_text');
+				if (!fc_label_text) return;
+				var prev = el.previousElementSibling;
+				if (prev) prev.style.display = 'none';
+				el.style.opacity = "1";
+			});
+			el.addEventListener('change', function() {
+				var fc_label_text = el.getAttribute('data-fc_label_text');
+				if (!fc_label_text) fc_label_text = el.getAttribute('fc_label_text');
+				if (!fc_label_text) return;
+				var prev = el.previousElementSibling;
+				if (el.value && el.value.length) {
+					if (prev) prev.style.display = 'none';
+					el.style.opacity = "1";
+				} else {
+					if (prev) prev.style.display = '';
+					el.style.opacity = "0.5";
+				}
+			});
+			el.addEventListener('blur', function() {
+				var fc_label_text = el.getAttribute('data-fc_label_text');
+				if (!fc_label_text) fc_label_text = el.getAttribute('fc_label_text');
+				if (!fc_label_text) return;
+
+				var previous_value = el.getAttribute('data-previous_value');
+				if (typeof previous_value !== "undefined" && previous_value != el.value) {
+					el.dispatchEvent(new Event('change'));
+				}
+
+				var prev = el.previousElementSibling;
+				if (el.value && el.value.length) {
+					if (prev) prev.style.display = 'none';
+					el.style.opacity = "1";
+				} else {
+					if (prev) prev.style.display = '';
+					el.style.opacity = "0.5";
+				}
+			});
+		})(labelInputs2[li2]);
+	}
 
 	// handle calender fields being changed by popup calendar
-	jQuery('input + button .icon-calendar').parent().bind('click', function() {
-		var newCalendar = typeof JoomlaCalendar === 'function';
-		var el = jQuery(this).prev();
-		el.attr('data-previous_value', el.val());
+	var calIcons = document.querySelectorAll('input + button .icon-calendar');
+	for (var ci = 0; ci < calIcons.length; ci++) {
+		var calBtn = calIcons[ci].parentElement;
+		var calInput = calBtn.previousElementSibling;
+		calBtn.addEventListener('click', function() {
+			var newCalendar = typeof JoomlaCalendar === 'function';
+			var el = calInput;
+			el.setAttribute('data-previous_value', el.value);
 
-		// Set a singular variable for the current input field
-		if (!newCalendar)
-		{
-			Calendar.prototype.__currentCalendarInput = el;
-		}
-		else
-		{
-			JoomlaCalendar.prototype.__currentCalendarInput = el;
-		}
-		//el.focus(); // Set document.activeElement so that close handler of calendar will find it
-	});
+			// Set a singular variable for the current input field
+			if (!newCalendar)
+			{
+				Calendar.prototype.__currentCalendarInput = el;
+			}
+			else
+			{
+				JoomlaCalendar.prototype.__currentCalendarInput = el;
+			}
+			//el.focus(); // Set document.activeElement so that close handler of calendar will find it
+		});
+	}
 
 
 	if (typeof JoomlaCalendar !== "undefined")
@@ -360,13 +402,13 @@ jQuery(document).ready(function() {
 		JoomlaCalendar.prototype.close = function()
 		{
 			var oldFuncResult = oldFunc.apply(this, arguments);
-			var el = JoomlaCalendar.prototype.__currentCalendarInput; //jQuery(document.activeElement);
+			var el = JoomlaCalendar.prototype.__currentCalendarInput; //document.activeElement;
 			if (!!el)
 			{
-				var previous_value = el.attr('data-previous_value');
-				if ( typeof previous_value !== "undefined" && previous_value != el.val())
+				var previous_value = el.getAttribute('data-previous_value');
+				if (typeof previous_value !== "undefined" && previous_value != el.value)
 				{
-					el.trigger('change');
+					el.dispatchEvent(new Event('change'));
 				}
 			}
 			return oldFuncResult;
@@ -379,11 +421,11 @@ jQuery(document).ready(function() {
 		Calendar.prototype.callCloseHandler = function()
 		{
 			var oldFuncResult = oldFunc.apply(this, arguments);
-			var el = Calendar.prototype.__currentCalendarInput; //jQuery(document.activeElement);
-			var previous_value = el.attr('data-previous_value');
-			if ( typeof previous_value !== "undefined" && previous_value != el.val())
+			var el = Calendar.prototype.__currentCalendarInput; //document.activeElement;
+			var previous_value = el.getAttribute('data-previous_value');
+			if (typeof previous_value !== "undefined" && previous_value != el.value)
 			{
-				el.trigger('change');
+				el.dispatchEvent(new Event('change'));
 			}
 			return oldFuncResult;
 		}
@@ -392,7 +434,7 @@ jQuery(document).ready(function() {
 	var fc_select_pageSize = 10;
 
 	// add Simple text search autocomplete
-	if (typeof jQuery.ui != 'undefined' && typeof jQuery.ui.autocomplete==='function') {
+	if (typeof jQuery !== 'undefined' && typeof jQuery.ui != 'undefined' && typeof jQuery.ui.autocomplete==='function') {
 		var theElements = jQuery("input.fc_index_complete_simple");
 		theElements.each(function () {
 			jQuery.ui.autocomplete( {
@@ -453,49 +495,121 @@ jQuery(document).ready(function() {
 
 
 	// add Tag-Like text search autocomplete
-	if(typeof jQuery('input.fc_index_complete_tlike').select2!=='undefined') {
-		jQuery('input.fc_index_complete_tlike').select2(
-		{
-			placeholder: Joomla.JText._('FLEXI_TYPE_TO_LIST'),
-			multiple: true,
-			minimumInputLength: 1,
-			separator: " ",
-			allowClear: true,
-
-			initSelection : function (element, callback) {
-				var data = [];
-				jQuery(element.val().split(" ")).each(function () {
-					data.push({id: this, text: this});
-				});
-				callback(data);
-			},
-
-			ajax: {
-				quietMillis: 200,
-				url: (jroot_url_fc + "components/com_flexicontent/tasks/core.php"),
-				dataType: 'json',
-				//Our search term and what page we are on
-				data: function (term, page) {
-					return {
-						type: (jQuery(this).hasClass('fc_adv_complete') ? "adv_index" : "basic_index"),
-						task: "txtautocomplete",
-						text: term,
-						pageSize: fc_select_pageSize,
-						pageNum: page,
-						lang: (jQuery(this).attr('data-txt_ac_lang') ? jQuery(this).attr('data-txt_ac_lang') : ''),
-						cid:  (jQuery(this).attr('data-txt_ac_cid')  ? jQuery(this).attr('data-txt_ac_cid')  : (parseInt(FC_URL_VARS['cid']) || 0)),
-						cids: (jQuery(this).attr('data-txt_ac_cids') ? jQuery(this).attr('data-txt_ac_cids') : FC_URL_VARS['cids']),
-						usesubs: (parseInt(jQuery(this).attr('data-txt_ac_usesubs')) || 0)
-					};
-				},
-				results: function (data, page) {
-					//Used to determine whether or not there are more results available,
-					//and if requests for more data should be sent in the infinite scrolling
-					var more = (page * fc_select_pageSize) < data.Total;
-					return { results: data.Matches, more: more };
+	if (window.fc_use_choicesjs || (typeof jQuery !== 'undefined' && typeof jQuery('input.fc_index_complete_tlike').select2 !== 'undefined')) {
+		if (window.fc_use_choicesjs) {
+			// Choices.js AJAX autocomplete
+			var tlikeInputs = document.querySelectorAll('input.fc_index_complete_tlike');
+			for (var tl = 0; tl < tlikeInputs.length; tl++) {
+				var el = tlikeInputs[tl];
+				// Convert space-separated value to initial choices
+				var initialData = [];
+				if (el.value) {
+					el.value.split(" ").forEach(function(val) {
+						if (val.trim()) {
+							initialData.push({ value: val.trim(), label: val.trim(), selected: true });
+						}
+					});
 				}
-			}
-		});
+
+				var choicesInstance = new Choices(el, {
+					maxItemCount: -1,
+					placeholderValue: Joomla.JText._('FLEXI_TYPE_TO_LIST'),
+					searchPlaceholderText: Joomla.JText._('FLEXI_TYPE_TO_LIST'),
+					searchChoices: false,
+					paste: true,
+					removeItemButton: true,
+					shouldSort: false
+				});
+
+				if (initialData.length) {
+					choicesInstance.setChoices(initialData);
+				}
+
+				// AJAX search
+				var searchTimeout = null;
+				el.addEventListener('search', function(e) {
+					var searchTerm = e.detail.value;
+					if (searchTimeout) clearTimeout(searchTimeout);
+					if (!searchTerm || searchTerm.length < 1) return;
+
+					searchTimeout = setTimeout(function() {
+						var type = el.classList.contains('fc_adv_complete') ? "adv_index" : "basic_index";
+						var params = {
+							type: type,
+							task: "txtautocomplete",
+							text: searchTerm,
+							pageSize: typeof fc_select_pageSize !== 'undefined' ? fc_select_pageSize : 50,
+							pageNum: 1,
+							lang: (el.getAttribute('data-txt_ac_lang') ? el.getAttribute('data-txt_ac_lang') : ''),
+							cid:  (el.getAttribute('data-txt_ac_cid')  ? el.getAttribute('data-txt_ac_cid')  : (typeof FC_URL_VARS !== 'undefined' ? (parseInt(FC_URL_VARS['cid']) || 0) : 0)),
+							cids: (el.getAttribute('data-txt_ac_cids') ? el.getAttribute('data-txt_ac_cids') : (typeof FC_URL_VARS !== 'undefined' ? FC_URL_VARS['cids'] : '')),
+							usesubs: (parseInt(el.getAttribute('data-txt_ac_usesubs')) || 0)
+						};
+
+						fetch(jroot_url_fc + "components/com_flexicontent/tasks/core.php?" + new URLSearchParams(params))
+							.then(function(response) { return response.json(); })
+							.then(function(data) {
+								if (data && data.Matches && data.Matches.length) {
+									var resultChoices = data.Matches.map(function(m) {
+										return { value: m.id, label: m.text };
+									});
+									// Replace dropdown choices in-place (keeps pre-selected initial tags in the list)
+									choicesInstance.setChoices(initialData.concat(resultChoices), 'value', 'label', true);
+								}
+							});
+					}, 200);
+				});
+
+				// Store instance for external access
+				el.fc_choices_instance = choicesInstance;
+				window.fc_choices_instances = window.fc_choices_instances || {};
+				window.fc_choices_instances[el.id || el.name] = choicesInstance;
+				}
+		} else {
+			// Select2 AJAX autocomplete (legacy)
+			jQuery('input.fc_index_complete_tlike').select2(
+			{
+				placeholder: Joomla.JText._('FLEXI_TYPE_TO_LIST'),
+				multiple: true,
+				minimumInputLength: 1,
+				separator: " ",
+				allowClear: true,
+
+				initSelection : function (element, callback) {
+					var data = [];
+					jQuery(element.val().split(" ")).each(function () {
+						data.push({id: this, text: this});
+					});
+					callback(data);
+				},
+
+				ajax: {
+					quietMillis: 200,
+					url: (jroot_url_fc + "components/com_flexicontent/tasks/core.php"),
+					dataType: 'json',
+					//Our search term and what page we are on
+					data: function (term, page) {
+						return {
+							type: (jQuery(this).hasClass('fc_adv_complete') ? "adv_index" : "basic_index"),
+							task: "txtautocomplete",
+							text: term,
+							pageSize: fc_select_pageSize,
+							pageNum: page,
+							lang: (jQuery(this).attr('data-txt_ac_lang') ? jQuery(this).attr('data-txt_ac_lang') : ''),
+							cid:  (jQuery(this).attr('data-txt_ac_cid')  ? jQuery(this).attr('data-txt_ac_cid')  : (parseInt(FC_URL_VARS['cid']) || 0)),
+							cids: (jQuery(this).attr('data-txt_ac_cids') ? jQuery(this).attr('data-txt_ac_cids') : FC_URL_VARS['cids']),
+							usesubs: (parseInt(jQuery(this).attr('data-txt_ac_usesubs')) || 0)
+						};
+					},
+					results: function (data, page) {
+						//Used to determine whether or not there are more results available,
+						//and if requests for more data should be sent in the infinite scrolling
+						var more = (page * fc_select_pageSize) < data.Total;
+						return { results: data.Matches, more: more };
+					}
+				}
+			});
+		}
 	}
 
 
@@ -523,7 +637,8 @@ function fc_recalculateWindow()
 	}, 100);*/
 
 	// reset popup overlay containers ... TODO add more ?
-	jQuery('#OverlayContainer').css("height", jQuery('body').css('height'));
+	var overlayContainer = document.getElementById('OverlayContainer');
+	if (overlayContainer) overlayContainer.style.height = (document.body.offsetHeight) + 'px';
 }
 
 
@@ -537,9 +652,15 @@ function fc_replaceUrlParam(url, paramName, paramValue)
 
 
 
-jQuery(document).ready(function () {
+// redirect contents (cc param) after cookie mis-match
+if (document.readyState === 'loading') {
+	document.addEventListener('DOMContentLoaded', fc_checkContentCookie);
+} else {
+	fc_checkContentCookie();
+}
 
-	var cc = (typeof FC_URL_VARS !="undefined" && 'cc' in FC_URL_VARS ? FC_URL_VARS['cc']: '');
+function fc_checkContentCookie() {
+	var cc = (typeof FC_URL_VARS != "undefined" && 'cc' in FC_URL_VARS ? FC_URL_VARS['cc']: '');
 	var fc_uid = fc_getCookie('fc_uid');
 	var base_url = !!jbase_url_fc ? jbase_url_fc : '';
 
@@ -550,4 +671,4 @@ jQuery(document).ready(function () {
 		window.location.replace(newUrl);
 		document.body.innerHTML = '<div style="display:none;">' + Joomla.JText._('FLEXI_UPDATING_CONTENTS') + ' <img id="loading_img" src="'+base_url+'components/com_flexicontent/assets/images/ajax-loader.gif"></div>';
 	}
-});
+}

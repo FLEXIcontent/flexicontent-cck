@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 defined( '_JEXEC' ) or die( 'Restricted access' );
 if ( \Joomla\CMS\Factory::getApplication()->input->getInt('print', 0) ) return;
 
@@ -81,34 +81,40 @@ if ($ff_placement)
 	echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endAccordion');
 	
 	\Joomla\CMS\Factory::getDocument()->addScriptDeclaration("
-	(function($) {
-		$(document).ready(function ()
-		{
-			$('#" . $ff_slider_tagid ."').on('shown', function ()
-			{
-				var active_slides = fclib_getCookie('" . $cookie_name ."');
-				try { active_slides = JSON.parse(active_slides); } catch(e) { active_slides = {}; }
-				active_slides['" . $ff_slider_tagid ."'] = $('#" . $ff_slider_tagid ." .in').attr('id');
-				fclib_setCookie('" . $cookie_name ."', JSON.stringify(active_slides), 7);
-			});
+	(function() {
+		function readActiveSlides() {
+			var s = fclib_getCookie('" . $cookie_name ."');
+			try { s = JSON.parse(s); } catch(e) { s = {}; }
+			return s;
+		}
 
-			$('#" . $ff_slider_tagid ."').on('hidden', function ()
-			{
-				var active_slides = fclib_getCookie('" . $cookie_name ."');
-				try { active_slides = JSON.parse(active_slides); } catch(e) { active_slides = {}; }
-				active_slides['" . $ff_slider_tagid ."'] = null;
-				fclib_setCookie('" . $cookie_name ."', JSON.stringify(active_slides), 7);
-			});
+		var container = document.getElementById('" . $ff_slider_tagid ."');
+		if (!container) return;
 
-			var active_slides = fclib_getCookie('" . $cookie_name ."');
-			try { active_slides = JSON.parse(active_slides); } catch(e) { active_slides = {}; }
-			$('#" . $ff_slider_tagid ." .collapse').removeClass('in');
-			if (!!active_slides['" . $ff_slider_tagid ."'])
-			{
-				$('#' + active_slides['" . $ff_slider_tagid ."']).addClass('in');
-			}
+		/* Remember which collapse slide is open (Bootstrap 3 events bubble from .collapse to container) */
+		container.addEventListener('shown.bs.collapse', function(e) {
+			var el = e && e.target ? e.target : null;
+			if (!el || !el.id) return;
+			var active_slides = readActiveSlides();
+			active_slides['" . $ff_slider_tagid ."'] = el.id;
+			fclib_setCookie('" . $cookie_name ."', JSON.stringify(active_slides), 7);
 		});
-	})(jQuery);
+		container.addEventListener('hidden.bs.collapse', function(e) {
+			var active_slides = readActiveSlides();
+			active_slides['" . $ff_slider_tagid ."'] = null;
+			fclib_setCookie('" . $cookie_name ."', JSON.stringify(active_slides), 7);
+		});
+
+		/* Restore the previously open slide */
+		var active_slides = readActiveSlides();
+		var collapses = container.querySelectorAll('.collapse');
+		for (var i = 0; i < collapses.length; i++) collapses[i].classList.remove('in');
+		var activeId = active_slides['" . $ff_slider_tagid ."'];
+		if (activeId) {
+			var activeEl = document.getElementById(activeId);
+			if (activeEl) activeEl.classList.add('in');
+		}
+	})();
 	");
 }
 
@@ -124,249 +130,326 @@ if ($listall_selector) : ?>
 
 <?php
 if ($this->params->get('filter_ajax', 0)) :
-\Joomla\CMS\Factory::getDocument()->addScriptDeclaration("
-	jQuery(document).ready(function($) {
-		
-		if (window.fc_ajax_filter_bound) return;
-		window.fc_ajax_filter_bound = true;
+\Joomla\CMS\Factory::getDocument()->addScriptDeclaration(<<<'JS'
+document.addEventListener('DOMContentLoaded', function() {
 
-		if (typeof window.adminFormPrepare === 'function' && !window._original_adminFormPrepare) {
-			window._original_adminFormPrepare = window.adminFormPrepare;
-			window.adminFormPrepare = function(form, postprep, task) {
-				var \$form = $(form);
-				var currentAction = \$form.attr('data-fcform_action') || \$form.attr('action') || '';
-				if (currentAction.indexOf('?') !== -1) {
-					var cleanBase = currentAction.split('?')[0];
-					\$form.attr('action', cleanBase);
-					\$form.attr('data-fcform_action', cleanBase);
+	if (window.fc_ajax_filter_bound) return;
+	window.fc_ajax_filter_bound = true;
+
+	/* --- tiny vanilla helpers (no jQuery) --- */
+	function fcGetAttr(el, name, val) {
+		if (val === undefined) return el ? el.getAttribute(name) : null;
+		if (el) el.setAttribute(name, val);
+	}
+	function fcFindOrCreateTask(form) {
+		var t = form.querySelector('input[name="task"]');
+		if (t) return t;
+		t = document.createElement('input');
+		t.type = 'hidden';
+		t.name = 'task';
+		form.appendChild(t);
+		return t;
+	}
+	function fcSerialize(form) {
+		var parts = [];
+		var els = form.elements;
+		for (var i = 0; i < els.length; i++) {
+			var el = els[i];
+			if (!el.name) continue;
+			var type = (el.type || '').toLowerCase();
+			var tag = el.tagName.toLowerCase();
+			if (tag === 'button' || type === 'submit' || type === 'reset' || type === 'file' || type === 'image') continue;
+			if (el.disabled) continue;
+			if ((type === 'checkbox' || type === 'radio') && !el.checked) continue;
+			if (type === 'select-multiple') {
+				for (var j = 0; j < el.options.length; j++) {
+					if (el.options[j].selected) parts.push(encodeURIComponent(el.name) + '=' + encodeURIComponent(el.options[j].value));
 				}
-				window._original_adminFormPrepare(form, 0, task);
-				if (postprep == 2) {
-					if (task) {
-						var taskInput = \$form.find('input[name=\"task\"]');
-						if (taskInput.length) taskInput.val(task);
-						else \$form.append('<input type=\"hidden\" name=\"task\" value=\"'+task+'\" />');
-					}
-					\$form.trigger('submit');
-					var fc_filter_form_blocker = $('#fc_filter_form_blocker');
-					if (fc_filter_form_blocker.length) {
-						fc_filter_form_blocker.css('display', 'block');
-					}
-				} else if (postprep == 1) {
-					$('#'+form.id+'_submitWarn').css('display', 'inline-block');
-				}
-			};
+				continue;
+			}
+			parts.push(encodeURIComponent(el.name) + '=' + encodeURIComponent(el.value));
 		}
+		return parts.join('&');
+	}
+	function fcSetOpacity(els, v) {
+		for (var i = 0; i < els.length; i++) els[i].style.opacity = v;
+	}
 
-		window.fcOverrideNativeSubmit = function(formId) {
-			var nativeForm = document.getElementById(formId);
-			if (nativeForm && !nativeForm._originalSubmit) {
-				nativeForm._originalSubmit = nativeForm.submit;
-				nativeForm.submit = function(task) {
-					var \$f = $(this);
-					if (task && typeof task === 'string') {
-						var taskInput = \$f.find('input[name=\"task\"]');
-						if (taskInput.length) taskInput.val(task);
-						else \$f.append('<input type=\"hidden\" name=\"task\" value=\"'+task+'\" />');
-					}
-					\$f.trigger('submit');
-				};
+	/* Save the original form-preparation hook, then wrap it: keep the base action intact
+	 * (adminFormPrepare appends the filters to it) and only handle the submit/warn part. */
+	if (typeof window.adminFormPrepare === 'function' && !window._original_adminFormPrepare) {
+		window._original_adminFormPrepare = window.adminFormPrepare;
+		window.adminFormPrepare = function(form, postprep, task) {
+			window._original_adminFormPrepare(form, 0, task);
+			if (postprep == 2) {
+				if (task) fcFindOrCreateTask(form).value = task;
+				form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+				var blocker = document.getElementById('fc_filter_form_blocker');
+				if (blocker) blocker.style.display = 'block';
+			} else if (postprep == 1) {
+				var warn = document.getElementById(form.id + '_submitWarn');
+				if (warn) warn.style.display = 'inline-block';
 			}
 		};
+	}
 
-		window.fcOverrideNativeSubmit('adminForm');
-		$('form[id^=\"moduleFCform_\"]').each(function() {
-			window.fcOverrideNativeSubmit(this.id);
-		});
+	/* Override native form.submit so programmatic submits go through the ajax handler */
+	window.fcOverrideNativeSubmit = function(formId) {
+		var nativeForm = document.getElementById(formId);
+		if (nativeForm && !nativeForm._originalSubmit) {
+			nativeForm._originalSubmit = nativeForm.submit;
+			nativeForm.submit = function(task) {
+				if (task && typeof task === 'string') fcFindOrCreateTask(this).value = task;
+				this.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+			};
+		}
+	};
 
-		$(document).on('submit', 'form', function(e) {
-			var \$form = $(this);
-			var isFlexiForm = \$form.attr('id') === 'adminForm' || \$form.attr('id').indexOf('default_form_') === 0 || \$form.closest('.mod_flexifilter_wrapper').length > 0 || \$form.closest('.fcfilter_form_component').length > 0;
-			if (!isFlexiForm) return;
+	window.fcOverrideNativeSubmit('adminForm');
+	var moduleForms = document.querySelectorAll('form[id^="moduleFCform_"]');
+	for (var mf = 0; mf < moduleForms.length; mf++) window.fcOverrideNativeSubmit(moduleForms[mf].id);
 
-			e.preventDefault();
+	/* Re-init select libraries (choices / select2 / chosen) after DOM replacement */
+	function fcReattachLibs(targetContainer, moduleContainers) {
+		var containers = [];
+		if (targetContainer) containers.push(targetContainer);
+		for (var mm = 0; mm < moduleContainers.length; mm++) {
+			var f = moduleContainers[mm].querySelector('form');
+			containers.push(f || moduleContainers[mm]);
+		}
+		for (var c = 0; c < containers.length; c++) {
+			var cont = containers[c];
+			if (!cont || !cont.querySelectorAll) continue;
 
-			var targetContainer = $('#flexicontent');
-			var moduleContainers = $('.mod_flexifilter_wrapper, .mod_fleximap');
-
-			if (!targetContainer.length && !moduleContainers.length) {
-				if (this._originalSubmit) this._originalSubmit.call(this);
-				else \$form[0].submit();
-				return;
+			/* choices.js or select2js (fc_attachSelect2 routes internally, skips on mobile) */
+			var libEls = cont.querySelectorAll('select.use_select2_lib');
+			if (libEls.length && window.fc_attachSelect2 && !window.skip_select2_js) {
+				window.fc_attachSelect2(cont, Array.prototype.slice.call(libEls));
 			}
 
-			var fullActionUrl = \$form.attr('action') || '';
-			var urlParts = fullActionUrl.split('?');
-			var baseUrl = urlParts[0];
-			var queryString = urlParts.length > 1 ? urlParts[1] : \$form.serialize();
-
-			if (targetContainer.length) targetContainer.css('opacity', '0.5');
-			if (moduleContainers.length) moduleContainers.css('opacity', '0.5');
-
-			var oldAutosubmits = {};
-			if (targetContainer.length) {
-				var oldForm = document.getElementById('adminForm');
-				if (oldForm) oldAutosubmits['adminForm'] = $(oldForm).attr('data-fc-autosubmit') || '2';
+			/* chosen library (mobile / .use_chosen_lib) â€” guard against double attach (jQuery plugin, only when available) */
+			if (window.jQuery && window.jQuery.fn && window.jQuery.fn.chosen) {
+				var chosenEls = cont.querySelectorAll('select.use_chosen_lib');
+				for (var ch = 0; ch < chosenEls.length; ch++) {
+					var s = chosenEls[ch];
+					var next = s.nextElementSibling;
+					var done = next && next.classList && next.classList.contains('chosen-container');
+					if (!done) window.jQuery(s).chosen();
+				}
 			}
-			moduleContainers.each(function() {
-				var modForm = $(this).find('form')[0];
-				if (modForm && modForm.id) oldAutosubmits[modForm.id] = $(modForm).attr('data-fc-autosubmit') || '2';
-			});
+		}
+	}
 
-			var fc_filter_form_blocker = $('#fc_filter_form_blocker');
-			if (fc_filter_form_blocker.length) {
-				fc_filter_form_blocker.css('display', 'block');
+	/* Main ajax submit handler */
+	document.addEventListener('submit', function(e) {
+		var form = e.target;
+		if (!form || !form.tagName || form.tagName.toLowerCase() !== 'form') return;
+
+		var isFlexiForm =
+			form.id === 'adminForm' ||
+			(form.id && form.id.indexOf('default_form_') === 0) ||
+			!!form.closest('.mod_flexifilter_wrapper') ||
+			!!form.closest('.fcfilter_form_component');
+		if (!isFlexiForm) return;
+
+		e.preventDefault();
+
+		var targetContainer = document.getElementById('flexicontent');
+		var moduleContainers = document.querySelectorAll('.mod_flexifilter_wrapper, .mod_fleximap');
+
+		if (!targetContainer && moduleContainers.length === 0) {
+			if (form._originalSubmit) form._originalSubmit.call(form);
+			else form.submit();
+			return;
+		}
+
+		var fullActionUrl = fcGetAttr(form, 'action') || '';
+		var urlParts = fullActionUrl.split('?');
+		var baseUrl = urlParts[0];
+		var queryString = urlParts.length > 1 ? urlParts[1] : fcSerialize(form);
+
+		if (targetContainer) targetContainer.style.opacity = '0.5';
+		fcSetOpacity(moduleContainers, '0.5');
+
+		var oldAutosubmits = {};
+		if (targetContainer) {
+			var oldForm = document.getElementById('adminForm');
+			if (oldForm) oldAutosubmits['adminForm'] = fcGetAttr(oldForm, 'data-fc-autosubmit') || '2';
+		}
+		for (var mm = 0; mm < moduleContainers.length; mm++) {
+			var modForm = moduleContainers[mm].querySelector('form');
+			if (modForm && modForm.id) oldAutosubmits[modForm.id] = fcGetAttr(modForm, 'data-fc-autosubmit') || '2';
+		}
+
+		var blocker = document.getElementById('fc_filter_form_blocker');
+		if (blocker) blocker.style.display = 'block';
+
+		/* Destroy noUiSlider instances BEFORE the DOM replacement */
+		if (typeof noUiSlider !== 'undefined') {
+			var toDestroy = document.querySelectorAll('[id*="_nouislider"]');
+			for (var di = 0; di < toDestroy.length; di++) {
+				if (toDestroy[di].noUiSlider) { try { toDestroy[di].noUiSlider.destroy(); } catch (eD) {} }
+			}
+		}
+
+		fetch(baseUrl + '?' + queryString, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+			body: queryString
+		}).then(function(resp) { return resp.text(); }).then(function(response) {
+			var doc = new DOMParser().parseFromString(response, 'text/html');
+
+			if (targetContainer) {
+				var newContent = doc.getElementById('flexicontent');
+				if (newContent) targetContainer.innerHTML = newContent.innerHTML;
+				targetContainer.style.opacity = '1';
 			}
 
-			// Détruire les instances noUiSlider AVANT le remplacement DOM
-			if (typeof noUiSlider !== 'undefined') {
-				var toDestroy = document.querySelectorAll('[id*=\"_nouislider\"]');
-				for (var di = 0; di < toDestroy.length; di++) {
-					if (toDestroy[di].noUiSlider) {
-						try { toDestroy[di].noUiSlider.destroy(); } catch(eD) {}
+			if (moduleContainers.length) {
+				for (var mc = 0; mc < moduleContainers.length; mc++) {
+					var modWrapper = moduleContainers[mc];
+					if (!document.body.contains(modWrapper)) continue;
+					var modId = modWrapper.id;
+					if (modId) {
+						var newMod = doc.getElementById(modId);
+						if (newMod) modWrapper.innerHTML = newMod.innerHTML;
 					}
+					modWrapper.style.opacity = '1';
 				}
 			}
 
-			$.ajax({
-				url: baseUrl, 
-				type: 'POST',
-				data: queryString, 
-				success: function(response) {
-					var parser = new DOMParser();
-					var doc = parser.parseFromString(response, 'text/html');
-					var parsedDoc = $(doc);
-					
-					if (targetContainer.length) {
-						var \$newContent = parsedDoc.find('#flexicontent');
-						if (\$newContent.length === 0 && parsedDoc.filter('#flexicontent').length > 0) {
-							\$newContent = parsedDoc.filter('#flexicontent');
-						}
-						if (\$newContent.length) {
-							targetContainer.html(\$newContent.html());
-						}
-						targetContainer.css('opacity', '1');
-					}
+			if (blocker) blocker.style.display = 'none';
 
-					if (moduleContainers.length) {
-						moduleContainers.each(function() {
-							var \$modWrapper = $(this);
-							if (!document.body.contains(\$modWrapper[0])) return;
-							var modId = \$modWrapper.attr('id');
-							if (modId) {
-								var \$newMod = parsedDoc.find('#' + modId);
-								if (\$newMod.length === 0 && parsedDoc.filter('#' + modId).length > 0) {
-									\$newMod = parsedDoc.filter('#' + modId);
-								}
-								if (\$newMod.length) {
-									\$modWrapper.html(\$newMod.html());
-								}
-							}
-							\$modWrapper.css('opacity', '1');
-						});
-					}
-					
-					if (fc_filter_form_blocker.length) {
-						fc_filter_form_blocker.css('display', 'none');
-					}
+			fcReattachLibs(targetContainer, moduleContainers);
 
-					if (typeof $.fn.select2 !== 'undefined') {
-						if (targetContainer.length) targetContainer.find('select.use_select2_lib').select2();
-						if (moduleContainers.length) moduleContainers.find('select.use_select2_lib').select2();
-					}
-
-					//allow to update nouislider with search is to ajaxed, as nouislider does not support dynamic content, we need to reinit it
-					parsedDoc.find('script:not([src])').each(function() {
-						var scriptContent = $(this).html();
-						if (scriptContent.indexOf('noUiSlider') === -1 && scriptContent.indexOf('_nouislider') === -1) return;
-						var allSliderEls = document.querySelectorAll('[id*=\"_nouislider\"]');
-						for (var si = 0; si < allSliderEls.length; si++) {
-							var se = allSliderEls[si];
-							if (scriptContent.indexOf(se.id) !== -1 && se.noUiSlider) {
-								try { se.noUiSlider.destroy(); } catch(eD) {}
-							}
-						}
-						var innerContent = scriptContent;
-						var readyMatch = scriptContent.indexOf('document).ready(function()');
-						if (readyMatch !== -1) {
-							var firstBrace = scriptContent.indexOf('{', readyMatch);
-							if (firstBrace !== -1) {
-								// Compter les accolades pour trouver la fermeture correcte du ready
-								var depth = 1;
-								var pos = firstBrace + 1;
-								while (pos < scriptContent.length && depth > 0) {
-									var ch = scriptContent[pos];
-									if (ch === '{') depth++;
-									else if (ch === '}') depth--;
+			/* Re-execute inline noUiSlider init scripts after ajax */
+			var scripts = doc.querySelectorAll('script:not([src])');
+			for (var sp = 0; sp < scripts.length; sp++) {
+				var scriptContent = scripts[sp].textContent || '';
+				if (scriptContent.indexOf('noUiSlider') === -1 && scriptContent.indexOf('_nouislider') === -1) continue;
+				var allSliderEls = document.querySelectorAll('[id*="_nouislider"]');
+				for (var si = 0; si < allSliderEls.length; si++) {
+					var se = allSliderEls[si];
+					if (scriptContent.indexOf(se.id) !== -1 && se.noUiSlider) { try { se.noUiSlider.destroy(); } catch (eD) {} }
+				}
+				var innerContent = scriptContent;
+				var readyMatch = scriptContent.indexOf('document).ready(function()');
+				if (readyMatch !== -1) {
+					var firstBrace = scriptContent.indexOf('{', readyMatch);
+					if (firstBrace !== -1) {
+						var depth = 1, pos = firstBrace + 1;
+						while (pos < scriptContent.length && depth > 0) {
+							var ch = scriptContent[pos];
+							if (ch === "'" || ch === '"') {
+								var quote = ch; pos++;
+								while (pos < scriptContent.length && scriptContent[pos] !== quote) {
+									if (scriptContent[pos] === '\\') pos++;
 									pos++;
 								}
-								// pos pointe maintenant après le } fermant du ready
-								// on extrait entre firstBrace+1 et pos-1
-								innerContent = scriptContent.substring(firstBrace + 1, pos - 1);
+							} else if (ch === '`') {
+								pos++;
+								while (pos < scriptContent.length && scriptContent[pos] !== '`') {
+									if (scriptContent[pos] === '\\') pos++;
+									pos++;
+								}
+							} else if (ch === '/' && pos + 1 < scriptContent.length) {
+								if (scriptContent[pos+1] === '/') {
+									while (pos < scriptContent.length && scriptContent[pos] !== '\n') pos++;
+								} else if (scriptContent[pos+1] === '*') {
+									pos += 2;
+									while (pos < scriptContent.length - 1 && !(scriptContent[pos] === '*' && scriptContent[pos+1] === '/')) pos++;
+									pos++;
+								}
+							} else {
+								if (ch === '{') depth++;
+								else if (ch === '}') depth--;
 							}
+							pos++;
 						}
-						try {
-							eval(innerContent);
-							console.log('[FC Slider] réinitialisé');
-						} catch(eE) {
-							console.log('[FC Slider] erreur reinit:', eE.message);
-						}
-					});
-
-					// update JoomlaCalendar with ajax search, as it does not support dynamic content, we need to reinit it
-					if (typeof JoomlaCalendar === 'function') {
-						var calContainers = document.querySelectorAll('.field-calendar');
-						for (var ci = 0; ci < calContainers.length; ci++) {
-							try { JoomlaCalendar.init(calContainers[ci]); } catch(eC) {
-								console.log('[FC Calendar] erreur init:', eC.message);
-							}
-						}
+						innerContent = scriptContent.substring(firstBrace + 1, pos - 1);
 					}
+				}
+				try { eval(innerContent); } catch (eE) { console.log('[FC Slider] erreur reinit:', eE.message); }
+			}
 
-					var formsToRebind = [];
-					var newAdminForm = document.getElementById('adminForm');
-					if (newAdminForm) formsToRebind.push(newAdminForm);
-					$('.mod_flexifilter_wrapper form').each(function() {
-						formsToRebind.push(this);
-					});
+			/* Re-init JoomlaCalendar after ajax */
+			if (typeof JoomlaCalendar === 'function') {
+				var calContainers = document.querySelectorAll('.field-calendar');
+				for (var ci = 0; ci < calContainers.length; ci++) {
+					try { JoomlaCalendar.init(calContainers[ci]); } catch (eC) { console.log('[FC Calendar] erreur init:', eC.message); }
+				}
+			}
 
-					formsToRebind.forEach(function(newForm) {
-						var fId = newForm.id;
-						if (oldAutosubmits[fId]) {
-							$(newForm).attr('data-fc-autosubmit', oldAutosubmits[fId]);
-							$(newForm.elements).filter('input:not(.fc_autosubmit_exclude):not(.select2-input), select:not(.fc_autosubmit_exclude)').on('change', function() {
-								if (window.adminFormPrepare) window.adminFormPrepare(newForm, oldAutosubmits[fId]);
+			/* Re-bind the refreshed forms */
+			var formsToRebind = [];
+			var newAdminForm = document.getElementById('adminForm');
+			if (newAdminForm) formsToRebind.push(newAdminForm);
+			var modFormWrappers = document.querySelectorAll('.mod_flexifilter_wrapper form');
+			for (var mw = 0; mw < modFormWrappers.length; mw++) formsToRebind.push(modFormWrappers[mw]);
+
+			for (var nb = 0; nb < formsToRebind.length; nb++) {
+				(function(newForm) {
+					if (!newForm) return;
+					var fId = newForm.id;
+					if (oldAutosubmits[fId]) {
+						newForm.setAttribute('data-fc-autosubmit', oldAutosubmits[fId]);
+						var autos = oldAutosubmits[fId];
+						var els = newForm.elements;
+						for (var ei = 0; ei < els.length; ei++) {
+							var fe = els[ei];
+							var type = (fe.type || '').toLowerCase();
+							if (type === 'hidden' || type === 'button' || type === 'submit' || type === 'reset' || type === 'file' || type === 'image') continue;
+							if (fe.classList.contains('fc_autosubmit_exclude')) continue;
+							if (fe.classList.contains('select2-input')) continue;
+							fe.addEventListener('change', function() {
+								if (window.adminFormPrepare) window.adminFormPrepare(newForm, autos);
 							});
 						}
-						$(newForm).find('.fc_button.button_reset').on('click', function() {
-							$(newForm).find('.use_select2_lib').select2('val', '');
-						});
-						if (window.fcOverrideNativeSubmit) {
-							window.fcOverrideNativeSubmit(fId);
-						}
-						var currentAction = $(newForm).attr('data-fcform_action') || $(newForm).attr('action') || baseUrl;
-						var cleanBase = currentAction.split('?')[0];
-						$(newForm).attr('action', cleanBase);
-						$(newForm).attr('data-fcform_action', cleanBase);
-					});
+					}
+					var resetBtns = newForm.querySelectorAll('.fc_button.button_reset');
+					for (var rb = 0; rb < resetBtns.length; rb++) {
+						(function(btn) {
+							btn.addEventListener('click', function() {
+								if (window.fc_use_choicesjs) {
+									var sels = newForm.querySelectorAll('.use_select2_lib');
+									for (var rr = 0; rr < sels.length; rr++) {
+										var instanceKey = sels[rr].id || sels[rr].name;
+										if (window.fc_choices_instances && window.fc_choices_instances[instanceKey]) {
+											window.fc_choices_instances[instanceKey].removeActiveItems();
+										}
+									}
+								} else {
+									if (window.jQuery && window.jQuery.fn && window.jQuery.fn.select2) {
+										var sels2 = newForm.querySelectorAll('.use_select2_lib');
+										for (var rr2 = 0; rr2 < sels2.length; rr2++) window.jQuery(sels2[rr2]).val('').trigger('change');
+									}
+									if (window.jQuery && window.jQuery.fn && window.jQuery.fn.chosen) {
+										var chSels = newForm.querySelectorAll('.use_chosen_lib');
+										for (var rrch = 0; rrch < chSels.length; rrch++) window.jQuery(chSels[rrch]).val('').trigger('chosen:updated');
+									}
+								}
+							});
+						})(resetBtns[rb]);
+					}
+					if (window.fcOverrideNativeSubmit) window.fcOverrideNativeSubmit(fId);
+					var currentAction = fcGetAttr(newForm, 'data-fcform_action') || fcGetAttr(newForm, 'action') || baseUrl;
+					newForm.setAttribute('action', currentAction);
+					newForm.setAttribute('data-fcform_action', currentAction);
+				})(formsToRebind[nb]);
+			}
 
-					if (window.history && window.history.pushState) {
-						window.history.pushState(null, '', fullActionUrl);
-					}
-				},
-				error: function() {
-					if (targetContainer.length) targetContainer.css('opacity', '1');
-					if (moduleContainers.length) moduleContainers.css('opacity', '1');
-					if (fc_filter_form_blocker.length) {
-						fc_filter_form_blocker.css('display', 'none');
-					}
-					if (\$form[0]._originalSubmit) \$form[0]._originalSubmit.call(\$form[0]);
-					else \$form[0].submit();
-				}
-			});
+			if (window.history && window.history.pushState) window.history.pushState(null, '', fullActionUrl);
+		}).catch(function() {
+			if (targetContainer) targetContainer.style.opacity = '1';
+			fcSetOpacity(moduleContainers, '1');
+			if (blocker) blocker.style.display = 'none';
+			if (form._originalSubmit) form._originalSubmit.call(form);
+			else form.submit();
 		});
 	});
-");
+});
+JS
+);
 endif;
 ?>
 

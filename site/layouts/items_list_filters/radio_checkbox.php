@@ -31,7 +31,11 @@ if ($filter_vals_display)
 $scroll_min = 10;  // Minimum number of filter values, after which a content scrollbar is added, TODO: add parameter for this
 $add_scrollbar = count($results) >= $scroll_min;
 
-if ($add_scrollbar)
+// mCustomScrollbar (mCSB) is a jQuery plugin: only load it in legacy (select2js) mode.
+// In choices.js mode the scrollbar is provided by native CSS (overflow) — see flexi_choices.css.
+$useChoicesJs = $cparams->get('select_lib_type', 0) == 1;
+
+if ($add_scrollbar && !$useChoicesJs)
 {
 	flexicontent_html::loadFramework('mCSB');
 }
@@ -110,8 +114,8 @@ foreach ($results as $result)
 	if ($filter_vals_display == 2)
 	{
 		$filter->html .= isset( $result->image_url ) ?
-			'<span class="fc_filter_val_img"><img onclick="jQuery(this).closest(\'li\').find(\'input\').click();" src="'.$result->image_url.'" alt="'.$result_text_encoded.'" title="'.$result_text_encoded.'" /></span>' :
-			'<span class="fc_filter_val_img"><span onclick="jQuery(this).closest(\'li\').find(\'input\').click();" class="'.$result->image.$icon_class.'" style="'.$icon_style.'" title="'.$result_text_encoded.'"></span></span>' ;
+			'<span class="fc_filter_val_img"><img onclick="this.closest(\'li\').querySelector(\'input\').click();" src="'.$result->image_url.'" alt="'.$result_text_encoded.'" title="'.$result_text_encoded.'" /></span>' :
+			'<span class="fc_filter_val_img"><span onclick="this.closest(\'li\').querySelector(\'input\').click();" class="'.$result->image.$icon_class.'" style="'.$icon_style.'" title="'.$result_text_encoded.'"></span></span>' ;
 	}
 	
 	if ($display_filter_as==4)
@@ -139,10 +143,10 @@ foreach ($results as $result)
 	{
 		$filter->html .= isset( $result->image_url ) ?
 			'<span class="fc_filter_val_img">
-				<img onclick="jQuery(this).closest(\'li\').find(\'input\').click();" src="'.$result->image_url.'" alt="' . $result_text_encoded . '" title="' . $result_text_encoded . '" />
+				<img onclick="this.closest(\'li\').querySelector(\'input\').click();" src="'.$result->image_url.'" alt="' . $result_text_encoded . '" title="' . $result_text_encoded . '" />
 			</span>' :
 			'<span class="fc_filter_val_img">
-				<span onclick="jQuery(this).closest(\'li\').find(\'input\').click();" class="'.$result->image.$icon_class.'" style="'.$icon_style.'" title="' . $result_text_encoded . '"></span>
+				<span onclick="this.closest(\'li\').querySelector(\'input\').click();" class="'.$result->image.$icon_class.'" style="'.$icon_style.'" title="' . $result_text_encoded . '"></span>
 			</span>' ;
 	}
 	

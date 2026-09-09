@@ -242,13 +242,8 @@ class plgFlexicontent_fieldsText extends FCField
 				var has_inputmask = newField.find('input.has_inputmask').length != 0;
 				if (has_inputmask)  newField.find('input.has_inputmask').inputmask();
 
-				// Destroy any select2 elements
-				var sel2_elements = newField.find('div.select2-container');
-				if (sel2_elements.length)
-				{
-					sel2_elements.remove();
-					newField.find('select.use_select2_lib').select2('destroy').show();
-				}
+				// Destroy any select library elements (select2 or choices.js)
+				fc_destroySelectLib(newField);
 				";
 
 			// Update select for textselect if it exists
@@ -350,7 +345,42 @@ class plgFlexicontent_fieldsText extends FCField
 			}
 
 			$sel_classes  = ' fcfield_textselval use_select2_lib ';
-		  $sel_onchange = " jQuery(this).parent().find('input.fcfield_textval').val(jQuery(this).val()).trigger('blur'); jQuery(this).select2('val', ''); ";
+		  $sel_onchange = "
+		  	var sel_el = this;
+		  	// Choices.js relocates the <select> inside its own wrapper (div.choices),
+		  	// so the text input cannot be found via sel_el.parentElement. Walk up the
+		  	// ancestors and take the first one that also contains the text input.
+		  	var txt_el = null;
+		  	jQuery(sel_el).parents().each(function(){
+		  		var _inp = jQuery(this).find('input.fcfield_textval');
+		  		if (_inp.length) { txt_el = _inp.first().get(0); return false; }
+		  	});
+		  	var choices_el = window.fc_use_choicesjs ? (sel_el.fc_choices_instance || (window.fc_choices_instances && window.fc_choices_instances[sel_el.id || sel_el.name])) : null;
+		  	// The native <select>.value is not yet synced when the change event is
+		  	// dispatched by Choices.js (the option.selected DOM update is deferred), so
+		  	// read the selected value from the Choices instance which is the source of truth.
+		  	var selval = sel_el.value;
+		  	if (choices_el && typeof choices_el.getValue === 'function') {
+		  		var gv = choices_el.getValue(true);
+		  		if (jQuery.isArray(gv)) {
+		  			for (var i = gv.length - 1; i >= 0; i--) {
+		  				if (gv[i] !== '' && gv[i] != null) { selval = gv[i]; break; }
+		  			}
+		  		} else if (gv !== '' && gv != null) {
+		  			selval = gv;
+		  		}
+		  	}
+		  	if (txt_el) {
+		  		jQuery(txt_el).val(selval).trigger('blur');
+		  	}
+		  	if (choices_el && typeof choices_el.removeActiveItems === 'function') {
+		  		choices_el.removeActiveItems();
+		  	} else if (jQuery.fn.select2) {
+		  		jQuery(sel_el).select2('val', '');
+		  	} else {
+		  		sel_el.selectedIndex = 0;
+		  	}
+		   "; 
 			$sel_attribs  = ' class="'.$sel_classes.'" onchange="'.$sel_onchange.'"';
 
 			$sel_fieldname = 'custom['.$field->name.'_sel][]';

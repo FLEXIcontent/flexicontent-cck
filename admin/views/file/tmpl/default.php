@@ -395,7 +395,7 @@ HTML;
 			<td>
 				<div class="input-group">
 					<input type="text" id="mime_ext" name="ext" value="<?php echo $this->row->ext; ?>" size="5" style="max-width:100px;" maxlength="100"/>
-					<select class="use_select2_lib" onchange="jQuery(this).parent().find('input').val(jQuery(this).val()); jQuery(this).val('').select2('destroy').show().select2(); ">
+					<select class="use_select2_lib" onchange="jQuery(this).parent().find('input').val(jQuery(this).val()); jQuery(this).val(''); fc_destroySelectLib(jQuery(this).parent()); fc_attachSelect2(jQuery(this).parent()); ">
 <option value=""><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_PLEASE_SELECT' ); ?></option>
 <option value="3dm">3dm :: x-world/x-3dmf</option>
 <option value="3dmf">3dmf :: x-world/x-3dmf</option>

@@ -1,0 +1,732 @@
+/**
+ * Choices.js customizations and enforced CSS for FLEXIcontent
+ * Matching the select2 overrides in flexi_shared.less / flexi_form.less
+ */
+
+/* ===========================
+   SINGLE SELECT - Core sizing
+   =========================== */
+
+#flexicontent .choices,
+.choices {
+	margin: 0;
+	min-height: calc(var(--form-inp-height) - 2px);
+	line-height: calc(var(--form-inp-height) - 4px);
+	vertical-align: baseline;
+	padding: 0;
+}
+
+#flexicontent .choices .choices__inner,
+.choices .choices__inner {
+	padding: 0 7px !important;
+	margin: 0 !important;
+	font-weight: normal !important;
+	display: flex !important;
+	align-items: center !important;
+	min-height: calc(var(--form-inp-height) - 2px) !important;
+	line-height: calc(var(--form-inp-height) - 4px) !important;
+	height: auto !important;
+	box-sizing: border-box !important;
+	background: var(--form-control-bg, #fff) !important;
+	border-radius: var(--border-radius, 0) !important;
+	border: var(--form-control-border, 1px solid var(--input-border-color, #aaa)) !important;
+}
+
+/* Frontend : Cassiopeia ne définit pas --form-control-* mais définit
+   --border-radius (.25rem). On fige 5px uniquement hors backend pour
+   donner aux selects choices un bord arrondi cohérent sur le front,
+   indépendant des variables du template. En backend (body.admin), ce sont
+   les variables Atum qui s'appliquent. */
+body:not(.admin) .choices {
+	--border-radius: 5px;
+}
+
+#flexicontent.fcconfig-form .choices .choices__inner {
+	min-height: calc(var(--form-inp-height) - 2px) !important;
+	line-height: calc(var(--form-inp-height) - 4px) !important;
+}
+
+html[dir="rtl"] .choices .choices__inner {
+	padding: 0 8px 0 0 !important;
+}
+
+.choices .choices__item--selectable {
+	color: inherit;
+	white-space: pre-wrap !important;
+	padding: 0 !important;
+	min-height: calc(var(--form-inp-height) - 4px) !important;
+	line-height: calc(var(--form-inp-height) - 4px) !important;
+}
+
+.choices .choices__list--single .choices__item--selectable {
+	padding: 0 7px !important;
+}
+
+/* The base choices.css adds 4px top/bottom padding to .choices__list--single,
+   which makes the closed box 6px taller than a same-height input placed
+   beside it (single-select textselect field). Zero it so the box matches
+   the input height and they align vertically. */
+/* Single-select list: restore the original padding (0 top/bottom, 16px right
+   for the arrow reserve, 4px left) so the closed box keeps its original look,
+   while the vertical padding fix still applies. */
+.choices .choices__list--single {
+	padding: 0 16px 0 4px !important;
+}
+
+/* The template .form-control (Atum .5rem / Bootstrap .375rem vertical padding)
+   makes the input taller than the choices box next to it, because flexicontent
+   forces min-height --form-inp-height but not the vertical padding. Neutralize
+   the vertical padding on inputs in the inline (.fc-xpended) layouts so the
+   input and the choices box have exactly the same height. */
+#flexicontent .fc-xpended > input,
+#flexicontent .fc-xpended-row > input {
+	padding-top: 0 !important;
+	padding-bottom: 0 !important;
+}
+
+.choices .choices__button {
+	border-left: 0px solid #aaa !important;
+	background: none !important;
+	margin: 0 !important;
+	padding: 0 2px !important;
+	background-image: url('../images/select2.png') !important;
+	background-position: right center !important;
+	background-repeat: no-repeat !important;
+	text-indent: 0 !important;
+	width: auto !important;
+	height: auto !important;
+	font-size: 0 !important;
+}
+
+/* Form validation failed */
+.choices.invalid .choices__inner {
+	border-color: red !important;
+}
+
+/* Placeholder text */
+.choices .choices__placeholder {
+	color: #999 !important;
+	opacity: 1 !important;
+}
+
+/* Focus state */
+.choices.is-focused .choices__inner {
+	border-color: #5897fb !important;
+	outline: 0 !important;
+	box-shadow: none !important;
+}
+
+
+/* ===========================
+   MULTI SELECT - Core
+   =========================== */
+
+.choices .choices__list--multiple {
+	list-style-type: none !important;
+	position: relative !important;
+	top: 0 !important;
+	left: 0 !important;
+	padding: 0px !important;
+	margin: 0 !important;
+	white-space: normal !important;
+	width: auto !important;
+	min-width: 2rem !important;
+	min-height: 1.9rem !important;
+	line-height: 1.9rem !important;
+	display: flex !important;
+	flex-wrap: wrap !important;
+}
+
+.choices .choices__list--multiple .choices__item {
+	box-sizing: content-box !important;
+	display: inline-flex !important;
+	align-items: center !important;
+	border-radius: var(--border-radius, 0) !important;
+	margin: 1px !important;
+	padding: 0 4px !important;
+	min-height: 1.7rem !important;
+	line-height: 1.7rem !important;
+	font-size: 0.9rem !important;
+	background-color: var(--choices-list-multiple-item-bg, var(--form-control-bg, #fff)) !important;
+	border: 1px solid var(--choices-list-multiple-item-bg, var(--input-border-color, #aaa)) !important;
+	color: var(--choices-list-multiple-item, inherit) !important;
+	word-break: break-word !important;
+}
+
+.choices .choices__list--multiple .choices__button {
+	background-image: url('../images/select2.png') !important;
+	background-position: right -22px !important;
+	background-repeat: no-repeat !important;
+	text-indent: 0 !important;
+	padding: 0 2px 0 2px !important;
+	margin: -1px 0 0 0 !important;
+	font-size: 0 !important;
+	width: auto !important;
+	height: auto !important;
+	border: 0 !important;
+	background-color: transparent !important;
+	color: #999 !important;
+}
+
+.choices .choices__list--multiple .choices__button:hover {
+	color: #666 !important;
+}
+
+/* Search field in multi-select */
+.choices .choices__input--cloned {
+	padding: 0px !important;
+	margin: 0px 2px !important;
+	line-height: 1em !important;
+	position: relative !important;
+	background: transparent !important;
+	border: 0 !important;
+	box-shadow: none !important;
+	outline: 0 !important;
+}
+
+.choices .choices__list--dropdown .choices__input,
+.choices__input--cloned {
+	min-height: calc(var(--form-inp-height) - 2px) !important;
+	line-height: calc(var(--form-inp-height) - 2px) !important;
+	padding: 0 7px !important;
+	margin-top: 1px !important;
+	box-sizing: content-box !important;
+	background: #fff !important;
+	background-image: url('../images/select2.png') !important;
+	background-repeat: no-repeat !important;
+	background-position: 93% -22px !important;
+	border: 0px solid lightgray !important;
+	cursor: pointer !important;
+	min-width: 32px !important;
+	width: 22px !important;
+}
+
+.choices.is-open .choices__input--cloned {
+	min-width: 124px !important;
+	width: auto !important;
+	cursor: default !important;
+	padding: 2px 6px 2px 26px !important;
+	background-position: -32px -22px !important;
+}
+
+
+/* ===========================
+   DROPDOWN
+   =========================== */
+
+.choices__list--dropdown {
+	padding: 0px !important;
+}
+
+/* Search input inside dropdown (single-select) */
+.choices__list--dropdown .choices__input {
+	display: block !important;
+	width: 100% !important;
+	padding: 6px 8px !important;
+	margin: 0 !important;
+	border: 0 !important;
+	border-bottom: 1px solid #ddd !important;
+	font-size: 0.9rem !important;
+	background: #f7f7f7 !important;
+	box-sizing: border-box !important;
+	min-height: calc(var(--form-inp-height) - 2px) !important;
+	line-height: calc(var(--form-inp-height) - 2px) !important;
+}
+
+.choices__list--dropdown .choices__input:focus {
+	outline: 0 !important;
+	background: #fff !important;
+}
+
+.choices__list--dropdown .choices__list {
+	padding: 0px !important;
+	max-height: 400px !important;
+	overflow-y: auto !important;
+}
+
+.choices__list--dropdown .choices__item {
+	padding: 0 2px 0 1rem !important;
+	font-size: 0.9rem !important;
+	line-height: 1.9rem !important;
+	min-height: 1.9rem !important;
+	cursor: pointer !important;
+	white-space: normal !important;
+}
+
+.choices__list--dropdown .choices__item--selectable.is-highlighted {
+	background: #d8d8d8 !important;
+	color: #fff !important;
+}
+
+.choices__list--dropdown .choices__item--disabled {
+	opacity: 0.6 !important;
+	font-style: italic !important;
+}
+
+/* Dropdown border when active */
+.choices.is-open .choices__list--dropdown {
+	border: 1px solid #aaa !important;
+	border-radius: 0 0 var(--border-radius, 0) var(--border-radius, 0) !important;
+}
+
+
+/* ===========================
+   FILTER BOX OVERRIDES
+   =========================== */
+
+#flexicontent .fc_filter_box .choices,
+.fc_filter_box .choices {
+	height: unset !important;
+	min-height: var(--filts-inp-height) !important;
+	line-height: var(--filts-inp-height) !important;
+	box-sizing: border-box !important;
+	padding: 0 !important;
+	margin-top: 0 !important;
+	margin-bottom: 0 !important;
+}
+
+#flexicontent .fc_filter_box .choices .choices__inner,
+.fc_filter_box .choices .choices__inner {
+	height: unset !important;
+	min-height: var(--filts-inp-height) !important;
+	line-height: var(--filts-inp-height) !important;
+	padding-top: 0 !important;
+	padding-bottom: 0 !important;
+	margin-top: 0 !important;
+	margin-bottom: 0 !important;
+}
+
+#flexicontent .fc_filter_box .choices .choices__input--cloned,
+.fc_filter_box .choices .choices__input--cloned {
+	height: unset !important;
+	min-height: calc(var(--filts-inp-height) - 2px) !important;
+	line-height: calc(var(--filts-inp-height) - 2px) !important;
+	padding: 0 4px !important;
+	margin-top: 0 !important;
+	margin-bottom: 0 !important;
+}
+
+#flexicontent .fc_filter_box .choices .choices__list--multiple,
+.fc_filter_box .choices .choices__list--multiple {
+	height: unset !important;
+	min-height: var(--filts-inp-height) !important;
+	line-height: var(--filts-inp-height) !important;
+	padding-top: 0 !important;
+	padding-bottom: 0 !important;
+	margin-top: 0 !important;
+	margin-bottom: 0 !important;
+}
+
+
+/* ===========================
+   INPUT GROUP SIZING (form-inp-height)
+   =========================== */
+
+.input-prepend .choices,
+.input-append .choices,
+.input-group .choices {
+	height: unset !important;
+	min-height: var(--form-inp-height) !important;
+	line-height: var(--form-inp-height) !important;
+	box-sizing: border-box !important;
+}
+
+.input-prepend .choices .choices__inner,
+.input-append .choices .choices__inner,
+.input-group .choices .choices__inner {
+	height: unset !important;
+	min-height: calc(var(--form-inp-height) - 2px) !important;
+	line-height: calc(var(--form-inp-height) - 2px) !important;
+}
+
+.input-prepend .choices .choices__input--cloned,
+.input-append .choices .choices__input--cloned,
+.input-group .choices .choices__input--cloned {
+	min-height: calc(var(--form-inp-height) - 2px) !important;
+	line-height: calc(var(--form-inp-height) - 2px) !important;
+}
+
+.input-prepend .choices .choices__list--multiple,
+.input-append .choices .choices__list--multiple,
+.input-group .choices .choices__list--multiple {
+	min-height: var(--form-inp-height) !important;
+	line-height: var(--form-inp-height) !important;
+}
+
+
+/* ===========================
+   MANAGER INPUT GROUP SIZING (fcman-inp-height)
+   =========================== */
+
+#j-main-container .fc-xpended .choices,
+#j-main-container .btn-group .choices {
+	min-height: var(--fcman-inp-height) !important;
+	line-height: var(--fcman-inp-height) !important;
+}
+
+#j-main-container .fc-xpended .choices .choices__inner,
+#j-main-container .btn-group .choices .choices__inner {
+	min-height: calc(var(--fcman-inp-height) - 2px) !important;
+	line-height: calc(var(--fcman-inp-height) - 2px) !important;
+}
+
+#j-main-container .fc-xpended .choices .choices__input--cloned,
+#j-main-container .btn-group .choices .choices__input--cloned {
+	min-height: calc(var(--fcman-inp-height) - 2px) !important;
+	line-height: calc(var(--fcman-inp-height) - 2px) !important;
+}
+
+#j-main-container .fc-xpended .choices .choices__list--multiple,
+#j-main-container .btn-group .choices .choices__list--multiple {
+	min-height: var(--fcman-inp-height) !important;
+	line-height: var(--fcman-inp-height) !important;
+}
+
+
+/* ===========================
+   FLOATED-LABEL MODE
+   =========================== */
+
+.flexicontent > div.use_select2_lib .choices,
+.flexicontent > .choices {
+	width: 100% !important;
+}
+
+.flexicontent > div.use_select2_lib .choices .choices__inner,
+.flexicontent > .choices .choices__inner {
+	border-radius: 0 !important;
+	border: 1px solid transparent !important;
+	border-bottom: 1px solid gray !important;
+	padding: 0 0 0 0px !important;
+}
+
+.flexicontent > div.use_select2_lib:not(.is-focused) .choices .choices__inner,
+.flexicontent > .choices:not(.is-focused) .choices__inner {
+	background: transparent !important;
+	box-shadow: unset !important;
+}
+
+
+/* ===========================
+   CHECKBOX MODE (multi-select with checkboxes)
+   =========================== */
+
+/* Force vertical stacking inside the checkbox dropdown */
+.choices__list--dropdown .choices__list--choice {
+	display: block !important;
+	width: 100% !important;
+}
+
+.fc-choices-checkbox-item {
+	display: flex !important;
+	align-items: center !important;
+	padding: 2px 8px !important;
+	cursor: pointer !important;
+	width: 100% !important;
+	box-sizing: border-box !important;
+}
+
+.fc-choices-checkbox {
+	margin-right: 6px !important;
+	cursor: pointer !important;
+}
+
+.fc-choices-checkbox-label {
+	cursor: pointer !important;
+	line-height: 1.9rem !important;
+}
+
+
+/* ===========================
+   SORTABLE
+   =========================== */
+
+.fc-choices-ghost {
+	opacity: 0.4 !important;
+}
+
+.fc-choices-drag {
+	background: #e8e8e8 !important;
+	border: 1px dashed #aaa !important;
+}
+
+/* Drag handle prepended to each sortable tag */
+.fc-select2-handle {
+	display: inline-block !important;
+	width: 1rem !important;
+	min-width: 1rem !important;
+	text-align: center !important;
+	cursor: grab !important;
+	user-select: none !important;
+	opacity: 0.7 !important;
+	font-size: 0.85rem !important;
+	line-height: 1 !important;
+	color: inherit !important;
+}
+
+.fc-select2-handle:hover {
+	opacity: 1 !important;
+}
+
+.fc-select2-handle:active {
+	cursor: grabbing !important;
+}
+
+
+/* ===========================
+   INNER LABELS & PROMPTS
+   =========================== */
+
+.fc_has_inner_label_choices,
+.fc_has_inner_prompt_choices {
+	position: absolute;
+	z-index: 1;
+	pointer-events: none;
+	color: #999;
+	font-style: italic;
+	padding: 0 7px;
+	line-height: calc(var(--form-inp-height) - 4px);
+	min-height: calc(var(--form-inp-height) - 4px);
+}
+
+.fc_has_inner_prompt_choices {
+	display: none;
+}
+
+.choices__inner {
+	position: relative !important;
+}
+
+
+/* ===========================
+   MARKER IMAGE (addressint)
+   =========================== */
+
+.fc-marker-img {
+	max-height: 20px;
+	vertical-align: middle;
+	margin-right: 4px;
+}
+
+
+/* ===========================
+   RTL SUPPORT
+   =========================== */
+
+html[dir="rtl"] .choices .choices__inner {
+	padding: 0 8px 0 0 !important;
+}
+
+html[dir="rtl"] .choices .choices__list--multiple .choices__item {
+	margin-left: 0 !important;
+	margin-right: 1px !important;
+}
+
+html[dir="rtl"] .choices .choices__button {
+	margin-left: 0 !important;
+	margin-right: 2px !important;
+}
+
+html[dir="rtl"] .fc_has_inner_label_choices,
+html[dir="rtl"] .fc_has_inner_prompt_choices {
+	right: 0;
+	left: auto;
+}
+
+
+/* ===========================
+   DARK MODE (Joomla 5/6, data-bs-theme)
+   =========================== */
+
+[data-bs-theme="dark"] .choices .choices__inner {
+	background: var(--body-bg, #26282b) !important;
+	border-color: var(--border-color, #4a4a4a) !important;
+	color: var(--body-color, #dee1e6) !important;
+}
+
+[data-bs-theme="dark"] .choices.is-focused .choices__inner,
+[data-bs-theme="dark"] .choices.is-open .choices__inner {
+	border-color: #4c8bf5 !important;
+}
+
+[data-bs-theme="dark"] .choices .choices__placeholder {
+	color: var(--text-muted, #999999) !important;
+}
+
+[data-bs-theme="dark"] .choices .choices__item {
+	color: var(--body-color, #dee1e6) !important;
+}
+
+[data-bs-theme="dark"] .choices .choices__list--multiple .choices__item {
+	background: var(--template-bg-dark-40, #3a3d42) !important;
+	border-color: var(--border-color, #555) !important;
+	color: var(--body-color, #dee1e6) !important;
+}
+
+[data-bs-theme="dark"] .choices .choices__button {
+	background-image: none !important;
+}
+
+[data-bs-theme="dark"] .choices .choices__list--multiple .choices__button {
+	background-image: none !important;
+	color: var(--text-muted, #999) !important;
+}
+
+[data-bs-theme="dark"] .choices .choices__list--multiple .choices__button:hover {
+	color: var(--body-color, #fff) !important;
+}
+
+[data-bs-theme="dark"] .choices .choices__input--cloned,
+[data-bs-theme="dark"] .choices__list--dropdown .choices__input {
+	background: var(--body-bg, #26282b) !important;
+	background-image: none !important;
+	color: var(--body-color, #dee1e6) !important;
+	border-bottom-color: var(--border-color, #4a4a4a) !important;
+}
+
+[data-bs-theme="dark"] .choices__list--dropdown .choices__input:focus {
+	background: var(--body-bg, #26282b) !important;
+}
+
+[data-bs-theme="dark"] .choices__list--dropdown {
+	background: var(--body-bg, #26282b) !important;
+	border-color: var(--border-color, #4a4a4a) !important;
+}
+
+[data-bs-theme="dark"] .choices__list--dropdown .choices__item--selectable.is-highlighted {
+	background: var(--template-bg-dark-40, #4a4d52) !important;
+	color: var(--body-color, #fff) !important;
+}
+
+[data-bs-theme="dark"] .choices[data-type*=select-one]::after {
+	border-color: var(--body-color, #dee1e6) transparent transparent transparent;
+}
+
+[data-bs-theme="dark"] .choices[data-type*=select-one].is-open::after {
+	border-color: transparent transparent var(--body-color, #dee1e6);
+}
+
+[data-bs-theme="dark"] .choices.is-disabled .choices__inner,
+[data-bs-theme="dark"] .choices.is-disabled .choices__input {
+	background-color: var(--template-bg-dark-80, #1f2124) !important;
+}
+
+[data-bs-theme="dark"] .fc-choices-checkbox-label {
+	color: var(--body-color, #dee1e6) !important;
+}
+
+[data-bs-theme="dark"] .fc_has_inner_label_choices,
+[data-bs-theme="dark"] .fc_has_inner_prompt_choices {
+	color: var(--text-muted, #999) !important;
+}
+
+[data-bs-theme="dark"] .flexicontent > div.use_select2_lib .choices:not(.is-focused) .choices__inner,
+[data-bs-theme="dark"] .flexicontent > .choices:not(.is-focused) .choices__inner {
+	border-bottom-color: var(--border-color, #4a4a4a) !important;
+}
+
+
+/* ===========================
+   BACKEND (Joomla admin / Atum) — theme CSS variables
+   COULEURS & ARRONDI issus des variables du thème (template.css)
+   =========================== */
+
+body.admin .choices .choices__inner {
+	background: var(--form-control-bg, var(--body-bg, #fff)) !important;
+	border: var(--form-control-border, 1px solid var(--input-border-color, #aaa)) !important;
+	border-radius: var(--border-radius, 0.25rem) !important;
+	color: var(--body-color, inherit) !important;
+}
+
+body.admin .choices.is-focused .choices__inner {
+	border-color: var(--focus, #39f) !important;
+	box-shadow: 0 0 0 0.2rem var(--focus-shadow, transparent) !important;
+}
+
+body.admin .choices .choices__placeholder {
+	color: var(--choices-input-placeholder, var(--text-muted, #999)) !important;
+}
+
+body.admin .choices .choices__list--dropdown {
+	background: var(--dropdown-bg, var(--body-bg, #fff)) !important;
+	border: var(--dropdown-border-width, var(--border-width, 1px)) solid var(--dropdown-border-color, var(--border-color, #dee2e6)) !important;
+	border-radius: var(--dropdown-border-radius, var(--border-radius, 0.25rem)) !important;
+	box-shadow: var(--dropdown-box-shadow, 0 1px 1px #00000026) !important;
+}
+
+body.admin .choices .choices__list--dropdown .choices__item {
+	color: var(--dropdown-link-color, var(--body-color, inherit)) !important;
+}
+
+body.admin .choices .choices__list--dropdown .choices__item--selectable.is-highlighted {
+	background: var(--atum-dropdown-link-hover-bg, var(--dropdown-link-hover-bg, var(--template-bg-dark-5, #e9ecef))) !important;
+	color: var(--atum-dropdown-link-hover-color, var(--dropdown-link-hover-color, var(--body-color, inherit))) !important;
+}
+
+body.admin .choices .choices__input,
+body.admin .choices .choices__input--cloned,
+body.admin .choices__list--dropdown .choices__input {
+	background-color: var(--form-control-bg, var(--body-bg, #fff)) !important;
+	color: var(--body-color, inherit) !important;
+}
+
+body.admin .choices .choices__list--multiple .choices__item {
+	background: var(--choices-list-multiple-item-bg, var(--template-bg-dark)) !important;
+	border-color: var(--choices-list-multiple-item-bg, var(--template-bg-dark)) !important;
+	color: var(--choices-list-multiple-item, var(--template-text-light, #fff)) !important;
+	border-radius: var(--border-radius-sm, 0.2rem) !important;
+}
+
+body.admin .choices .choices__list--multiple .choices__button {
+	width: 1.25rem !important;
+	height: 1.25rem !important;
+	min-width: 1.25rem !important;
+	min-height: 1.25rem !important;
+	padding: 0 !important;
+	margin: 0 0 0 4px !important;
+	background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3E%3Cpath fill='%23ffffff' d='M1.4 0L0 1.4l2.6 2.6L0 6.6 1.4 8 4 5.4 6.6 8 8 6.6 5.4 4 8 1.4 6.6 0 4 2.6z'/%3E%3C/svg%3E") !important;
+	background-position: center !important;
+	background-repeat: no-repeat !important;
+	background-size: 8px 8px !important;
+	color: var(--choices-list-multiple-item, var(--template-text-light, #fff)) !important;
+	opacity: 0.8 !important;
+}
+
+body.admin .choices .choices__list--multiple .choices__button:hover {
+	opacity: 1 !important;
+}
+
+body.admin .choices .choices__button:focus {
+	box-shadow: var(--choices__button_joomla-focus-box-shadow, 0 0 0 #00bcd4) !important;
+	outline: 0 !important;
+}
+
+body.admin .choices .choices__button {
+	background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3E%3Cpath fill='%236b6b6b' d='M1.4 0L0 1.4l2.6 2.6L0 6.6 1.4 8 4 5.4 6.6 8 8 6.6 5.4 4 8 1.4 6.6 0 4 2.6z'/%3E%3C/svg%3E") !important;
+	background-position: center !important;
+	background-repeat: no-repeat !important;
+	background-size: 8px 8px !important;
+	opacity: 0.8 !important;
+}
+
+body.admin .choices .choices__button:hover {
+	opacity: 1 !important;
+}
+
+body.admin .fc_has_inner_label_choices,
+body.admin .fc_has_inner_prompt_choices {
+	color: var(--choices-input-placeholder, var(--text-muted, #999)) !important;
+}
+
+/* Native scrollbar for filter value lists (vertical/horizontal) —
+   replaces the jQuery mCustomScrollbar (mCSB) used in legacy (select2js) mode,
+   since this stylesheet is only loaded when choices.js is active. */
+.fc_add_scroller {
+	overflow-y: auto !important;
+	max-height: 220px !important;
+	-webkit-overflow-scrolling: touch;
+}
+.fc_add_scroller_horizontal {
+	overflow-x: auto !important;
+	-webkit-overflow-scrolling: touch;
+}

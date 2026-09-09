@@ -93,3 +93,6 @@ site/medias/*
 
 # Local development tool settings
 .claude/
+
+# Session progress notes (local, not committed)
+CHOICESJS_PROGRESS.md

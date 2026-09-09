@@ -223,13 +223,8 @@ class plgFlexicontent_fieldsColor extends FCField
 				theInput.attr('name', fname_pfx);
 				theInput.attr('id', element_id);
 
-				// Destroy any select2 elements
-				var sel2_elements = newField.find('div.select2-container');
-				if (sel2_elements.length)
-				{
-					sel2_elements.remove();
-					newField.find('select.use_select2_lib').select2('destroy').show();
-				}
+				// Destroy any select library elements (select2 or choices.js)
+				fc_destroySelectLib(newField);
 				";
 
 			// Update select for textselect if it exists

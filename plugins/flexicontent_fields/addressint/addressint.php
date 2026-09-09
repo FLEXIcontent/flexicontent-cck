@@ -355,13 +355,8 @@ class plgFlexicontent_fieldsAddressint extends FCField
 				var newField  = lastField.clone();
 				newField.find('.fc-has-value').removeClass('fc-has-value');
 
-				// Destroy any select2 elements
-				var sel2_elements = newField.find('div.select2-container');
-				if (sel2_elements.length)
-				{
-					sel2_elements.remove();
-					newField.find('select.use_select2_lib, select.has_select2_lib').select2('destroy').show();
-				}
+				// Destroy any select library elements (select2 or choices.js)
+				fc_destroySelectLib(newField);
 
 				// New element's field name and id
 				var uniqueRowN = uniqueRowNum" . $field->id . ";
@@ -544,12 +539,8 @@ class plgFlexicontent_fieldsAddressint extends FCField
 				theSelect.attr('name', fname_pfx + '[ac_type]');
 				theSelect.attr('id', element_id + '_ac_type');
 
-				// Re-init any select2 element
-				var has_select2 = theSelect.prev().hasClass('.select2-container');
-				if (has_select2) {
-					theSelect.prev().remove();
-					theSelect.select2('destroy').show();
-				}
+				// Re-init any select library element (select2 or choices.js)
+				fc_destroySelectLib(theSelect.parent());
 				";
 
 			// Add new field to DOM

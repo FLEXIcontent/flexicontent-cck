@@ -607,11 +607,20 @@ if ($filter_autosubmit) {
 	';
 }
 
-// Notify select2 fields to clear their values when reseting the form
+// Notify select library fields to clear their values when reseting the form
 $js .= '
 		jQuery(document).ready(function() {
 			jQuery("#'.$form_id.' .fc_button.button_reset").on("click", function() {
-				jQuery("#'.$form_id.'_filter_box .use_select2_lib").select2("val", "");
+				if (window.fc_use_choicesjs) {
+					jQuery("#'.$form_id.'_filter_box .use_select2_lib").each(function() {
+						var instanceKey = this.id || this.name;
+						if (window.fc_choices_instances && window.fc_choices_instances[instanceKey]) {
+							window.fc_choices_instances[instanceKey].removeActiveItems();
+						}
+					});
+				} else {
+					jQuery("#'.$form_id.'_filter_box .use_select2_lib").select2("val", "");
+				}
 			});
 		});
 	';

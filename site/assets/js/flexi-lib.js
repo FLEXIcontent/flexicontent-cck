@@ -1,4 +1,4 @@
-
+﻿
 	window.fc_init_hide_dependent = 1;
 	window.fc_refreshing_dependent = 0;
 	window.fc_dependent_params = {};
@@ -1564,30 +1564,481 @@
 
 	var fc_dialog_resize = fc_debounce_exec(fc_dialog_resize_now, 200, false, null);
 
-	jQuery(window).resize(function() {
-		fc_dialog_resize();
-	});
+	if (typeof jQuery !== 'undefined') {
+		jQuery(window).resize(function() {
+			fc_dialog_resize();
+		});
+	}
 
 
-	/* Apply select2 JS to targeted elements */
+	/* Destroy select library (select2 or choices.js) from cloned elements for reinit */
+	function fc_destroySelectLib(container)
+	{
+		if (window.fc_use_choicesjs) {
+			// Destroy Choices.js instances
+			container.find('select.use_select2_lib, select.has_select2_lib').each(function() {
+				var el = this;
+				// Prefer the instance stored on the element (avoids id/name registry collisions)
+				var inst = jQuery(el).data('fc_choices_instance');
+				// Only use the registry instance when it really belongs to THIS element: when a
+				// field is cloned, the cloned <select> still has the id/name of the original, so
+				// a registry lookup by id/name would destroy the ORIGINAL instance instead.
+				if (!inst && window.fc_choices_instances) {
+					var regInst = window.fc_choices_instances[el.id || el.name];
+					if (regInst && regInst.passedElement && regInst.passedElement.element === el) {
+						inst = regInst;
+					}
+				}
+				if (inst && typeof inst.destroy === 'function') {
+					inst.destroy();
+				} else {
+					// Clone without its own instance: unwrap the duplicated Choices markup so the
+					// select can be re-initialised cleanly by the caller (fc_attachSelect2). Also
+					// reset the attributes Choices.js added (data-choice=active, hidden, tabindex=-1,
+					// class choices__input) which otherwise make `new Choices(el)` fail silently.
+					var wrapper = jQuery(el).closest('div.choices');
+					if (wrapper.length) wrapper.replaceWith(el);
+					el.removeAttribute('data-choice');
+					el.removeAttribute('tabindex');
+					el.hidden = false;
+					el.classList.remove('choices__input');
+					if (el.getAttribute('data-choice-orig-style')) {
+						el.removeAttribute('data-choice-orig-style');
+						el.style.cssText = '';
+					} else {
+						el.removeAttribute('style');
+					}
+				}
+				jQuery(el).removeData('fc_choices_instance');
+				if (window.fc_choices_instances && inst) delete window.fc_choices_instances[el.id || el.name];
+				jQuery(el).show();
+			});
+		} else {
+			// Destroy Select2 instances (legacy)
+			var sel2_elements = container.find('div.select2-container');
+			if (sel2_elements.length) {
+				sel2_elements.remove();
+				container.find('select.use_select2_lib, select.has_select2_lib').select2('destroy').show();
+			}
+		}
+	}
+
+
+	/* Apply select library (select2 or choices.js) to targeted elements */
+	// Accepts a string selector, a DOM element, a Document, or a jQuery object as container.
+	function fc_normalizeContainer(sel)
+	{
+		if (typeof sel === 'undefined' || !sel) return document;
+		if (sel.nodeType === 1 || sel.nodeType === 9) return sel;           // Element or Document
+		if (typeof sel.jquery !== 'undefined' && sel.length) return sel[0];  // jQuery object
+		if (typeof sel === 'string') { var found = document.querySelector(sel); return found || document.body; }
+		return document.body;
+	}
+
+	// Normalize targets (jQuery set, NodeList, array, single element) to a real array of <select>.
+	function fc_normalizeTargets(sbox, s2_elems)
+	{
+		var out = [];
+		if (s2_elems)
+		{
+			if (typeof s2_elems.jquery !== 'undefined' || typeof s2_elems.length !== 'undefined')
+			{
+				for (var i = 0; i < s2_elems.length; i++) { if (s2_elems[i]) out.push(s2_elems[i]); }
+			}
+			else out.push(s2_elems);
+		}
+		else
+		{
+			out = Array.prototype.slice.call(sbox.querySelectorAll('select.use_select2_lib'));
+		}
+		return out;
+	}
+
 	function fc_attachSelect2(sel, s2_elems)
 	{
-		sel      = typeof sel !== 'undefined' && sel ? sel : 'body';
-		var sbox = jQuery(sel);
-
-		s2_elems = s2_elems || sbox.find('select.use_select2_lib');
+		var sbox = fc_normalizeContainer(sel);
+		var targets = fc_normalizeTargets(sbox, s2_elems);
 
 		if (window.skip_select2_js)
 		{
-			s2_elems.removeClass('use_select2_lib').addClass('fc_isselect fc_ismobile fc_no_js_attach');
-			//s2_elems.filter(function(){return !jQuery(this).attr('multiple');})
-			sbox.find('.fc_mobile_label').show();
+			for (var i = 0; i < targets.length; i++)
+			{
+				targets[i].classList.remove('use_select2_lib');
+				targets[i].classList.add('fc_isselect', 'fc_ismobile', 'fc_no_js_attach');
+			}
+			var labels = sbox.querySelectorAll ? sbox.querySelectorAll('.fc_mobile_label') : [];
+			for (var j = 0; j < labels.length; j++) labels[j].style.display = '';
 			return;
 		}
 
+		// Route to the correct library
+		if (window.fc_use_choicesjs)
+		{
+			fc_attachChoices(sbox, targets);
+		}
+		else
+		{
+			fc_attachSelect2Legacy(sbox, targets);
+		}
+	}
+
+
+	/* ===========================
+	   CHOICES.JS IMPLEMENTATION
+	   =========================== */
+
+	// Store Choices.js instances for later access (destroy, etc.)
+	window.fc_choices_instances = window.fc_choices_instances || {};
+
+	function fc_attachChoices(sbox, s2_elems)
+	{
+		for (var n = 0; n < s2_elems.length; n++)
+		{
+			var el = s2_elems[n];
+
+			var isMultiple = el.hasAttribute('multiple');
+			var isRemoteSearch = isMultiple && !!el.getAttribute('data-fc_choices_search_remote');
+			var isNoSelect = el.classList.contains('fc_select2_noselect') && !isRemoteSearch;
+			var isCheckbox = isMultiple && !el.classList.contains('fc_select2_no_check');
+			var isSortable = el.classList.contains('fc_select2_sortable');
+
+			// Build Choices.js options
+			var choicesOptions = {
+				searchEnabled: !isNoSelect,
+				searchFloor: 1,
+				searchChoices: true,
+				searchResultLimit: 100,
+				shouldSort: false,
+				itemSelectText: '',
+				removeItemButton: isMultiple,
+				noResultsText: Joomla.JText._('FLEXI_NO_RESULTS'),
+				noChoicesText: Joomla.JText._('FLEXI_NO_CHOICES'),
+				classNames: {
+					containerInner: 'choices__inner',
+					input: 'choices__input',
+					containerOuter: 'choices',
+					dropdown: 'choices__dropdown',
+					item: 'choices__item',
+					list: 'choices__list',
+					listItem: 'choices__list-item',
+					choice: 'choices__choice',
+					selectedState: 'is-selected',
+					highlightedState: 'is-highlighted',
+					disabledState: 'is-disabled',
+					flippedState: 'is-flipped',
+					activeState: 'is-active',
+					openState: 'is-open',
+					focusState: 'is-focused',
+					placeholder: 'is-placeholder'
+				},
+				callbackOnCreateTemplates: function(template) {
+					var customTemplates = {};
+					if (isCheckbox) {
+						customTemplates.choice = function(config, data) {
+							var tpl = document.createElement('div');
+							tpl.classList.add('choices__item', 'choices__item--choice', 'fc-choices-checkbox-item');
+							if (data.disabled) tpl.classList.add('is-disabled');
+							if (data.selected) tpl.classList.add('is-selected');
+							var checkbox = document.createElement('input');
+							checkbox.type = 'checkbox';
+							checkbox.checked = data.selected;
+							checkbox.disabled = data.disabled;
+							checkbox.classList.add('fc-choices-checkbox');
+							checkbox.setAttribute('data-value', data.value);
+							var label = document.createElement('label');
+							label.classList.add('fc-choices-checkbox-label');
+							label.textContent = data.label;
+							tpl.appendChild(checkbox);
+							tpl.appendChild(label);
+							return tpl;
+						};
+					}
+					return customTemplates;
+				}
+			};
+
+			// No-select mode: hide dropdown entirely, just display value
+			if (isNoSelect) choicesOptions.searchEnabled = false;
+
+			// Placeholder for multiple selects
+			if (isMultiple && !isNoSelect) {
+				choicesOptions.placeholderValue = el.getAttribute('data-fc_label_text') || el.getAttribute('fc_label_text') || '';
+				choicesOptions.placeholder = true;
+			}
+
+			// Destroy existing instance if any (only when it belongs to THIS element:
+			// cloned selects share the id/name of the original element)
+			var registryInst = window.fc_choices_instances[el.id || el.name];
+			if (registryInst && registryInst.passedElement && registryInst.passedElement.element === el) {
+				registryInst.destroy();
+				delete window.fc_choices_instances[el.id || el.name];
+			}
+
+			// Initialize Choices.js
+			var choicesInstance = new Choices(el, choicesOptions);
+
+			// Store instance
+			var instanceKey = el.id || el.name || ('fc_choices_' + Math.random().toString(36).substr(2, 9));
+			window.fc_choices_instances[instanceKey] = choicesInstance;
+
+			// Store instance on the element so destroy/reset can find it even if several
+			// selects share the same name attribute (id || name registry collisions)
+			el.fc_choices_instance = choicesInstance;
+
+			// Custom hook class (consistency with select2 markup for highlight, etc.)
+			if (choicesInstance.containerOuter && choicesInstance.containerOuter.element) {
+				choicesInstance.containerOuter.element.classList.add('fc-choices-outer');
+			}
+
+			// Make sortable if requested (drag via a visible handle prepended to each tag)
+			if (isSortable && typeof Sortable !== 'undefined') {
+				var container = choicesInstance.containerOuter && choicesInstance.containerOuter.element;
+				if (container) {
+					var sortableSel = container.querySelector('.choices__list--multiple') || container.querySelector('.choices__list--dropdown');
+					var addSortableHandles = function(list) {
+						Array.prototype.forEach.call(list.querySelectorAll('.choices__item'), function(item) {
+							if (item.querySelector('.fc-select2-handle')) return;
+							var handle = document.createElement('span');
+							handle.className = 'fc-select2-handle';
+							handle.innerHTML = '&#x2630;';
+							item.insertBefore(handle, item.firstChild);
+						});
+					};
+					addSortableHandles(sortableSel);
+					Sortable.create(sortableSel, {
+						animation: 150,
+						handle: '.fc-select2-handle',
+						forceFallback: true,
+						ghostClass: 'fc-choices-ghost',
+						dragClass: 'fc-choices-drag',
+						onEnd: function(evt) {
+							var list = evt.from;
+							var items = list.querySelectorAll('.choices__item');
+							var select = el;
+							var fragment = document.createDocumentFragment();
+							Array.prototype.forEach.call(items, function(item) {
+								var value = item.getAttribute('data-value') || (item.querySelector('[data-value]') && item.querySelector('[data-value]').getAttribute('data-value'));
+								if (value) {
+									var option = select.querySelector('option[value="' + value + '"]');
+									if (option) fragment.appendChild(option);
+								}
+							});
+							select.insertBefore(fragment, select.firstChild);
+						}
+					});
+					// Add handle to items added after initial render (e.g. remote search selections)
+					new MutationObserver(function(mutations) {
+						mutations.forEach(function(mutation) {
+							if (mutation.addedNodes && mutation.addedNodes.length) addSortableHandles(sortableSel);
+						});
+					}).observe(sortableSel, { childList: true, subtree: true });
+				}
+			}
+
+			// Remote search mode (e.g. relation fields): fetch options from AJAX on input
+			if (isRemoteSearch && typeof window.fc_fetch_relation_choices === 'function') {
+				var remoteContainer = choicesInstance.containerOuter && choicesInstance.containerOuter.element;
+				var searchTimer = null;
+				var fetchRemote = function(query) {
+					clearTimeout(searchTimer);
+					searchTimer = setTimeout(function() {
+						window.fc_fetch_relation_choices(el.id, query, function(options) {
+							if (!options) options = [];
+							var selectedIds = [];
+							Array.prototype.forEach.call(el.options, function(opt) {
+								if (opt.selected) selectedIds.push(String(opt.value).split(':')[0]);
+							});
+							var fresh = options.filter(function(o) {
+								return selectedIds.indexOf(String(o.value).split(':')[0]) === -1;
+							});
+							if (fresh.length) {
+								choicesInstance.setChoices(fresh.map(function(o) {
+									return { value: String(o.value), label: String(o.label) };
+								}), 'value', 'label', true);
+							} else {
+								choicesInstance.clearChoices();
+							}
+						});
+					}, 250);
+				};
+				// Debounced search + initial fill when the search input receives focus
+				if (remoteContainer) {
+					var remoteHandler = function(e) {
+						if (e.target && e.target.matches && e.target.matches('input.choices__input')) {
+							fetchRemote(e.target.value || '');
+						}
+					};
+					remoteContainer.addEventListener('input', remoteHandler);
+					remoteContainer.addEventListener('focusin', remoteHandler);
+				}
+				fetchRemote('');
+			}
+
+			// Set initial data if provided
+			if (el.hasAttribute('data-select2-initdata')) {
+				var initData = el._fc_initdata;
+				if (!initData) {
+					try { initData = JSON.parse(el.getAttribute('data-select2-initdata') || '[]'); } catch (eI) { initData = []; }
+				}
+				if (initData && initData.length) {
+					choicesInstance.setChoiceByValue(initData.map(function(item) { return item.id || item.value; }));
+				}
+			}
+
+			// Checkbox mode: keep dropdown open, toggle values on click
+			if (isCheckbox) {
+				var dropdownEl = choicesInstance.dropdown && choicesInstance.dropdown.element;
+				if (dropdownEl) {
+					var observer = new MutationObserver(function(mutations) {
+						mutations.forEach(function(mutation) {
+							if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+								if (el._fc_keep_open) {
+									if (!dropdownEl.classList.contains('is-active')) {
+										dropdownEl.classList.add('is-active');
+										dropdownEl.style.display = 'block';
+									}
+								}
+							}
+						});
+					});
+					observer.observe(dropdownEl, { attributes: true, attributeFilter: ['class'] });
+				}
+
+				// Handle checkbox clicks (event delegation on the container)
+				sbox.addEventListener('click', function(e) {
+					var item = e.target && e.target.closest ? e.target.closest('.fc-choices-checkbox-item') : null;
+					if (!item) return;
+					var checkbox = item.querySelector('.fc-choices-checkbox');
+					if (!checkbox) return;
+					var value = checkbox.getAttribute('data-value');
+					var isChecked = checkbox.checked;
+					var vals = fcGetSelectValues(el);
+					vals = vals.map(String);
+					if (isChecked && vals.indexOf(value) === -1) vals.push(value);
+					else if (!isChecked) vals = vals.filter(function(v) { return v !== value; });
+					// Update the underlying select (form submission + external listeners)
+					fcSetSelectValues(el, vals);
+					el.dispatchEvent(new Event('change', { bubbles: true }));
+					// Sync Choices.js store so checked values render as tags before saving
+					choicesInstance.removeActiveItems();
+					choicesInstance.setChoiceByValue(vals);
+					// Keep dropdown open
+					el._fc_keep_open = true;
+					setTimeout(function() { el._fc_keep_open = false; }, 100);
+				});
+			}
+
+			// Highlight active value for single selects
+			if (!isMultiple && el.classList.contains('fc_add_highlight')) {
+				var val = el.value;
+				if (val && val.length) choicesInstance.containerOuter.element.classList.add('fc_highlight');
+				else choicesInstance.containerOuter.element.classList.remove('fc_highlight');
+			}
+
+			// Listen for change to update highlight
+			if (!isMultiple && el.classList.contains('fc_add_highlight')) {
+				el.addEventListener('change', function() {
+					var v = this.value;
+					var inst = this.fc_choices_instance;
+					if (inst && inst.containerOuter && inst.containerOuter.element) {
+						if (v && v.length) inst.containerOuter.element.classList.add('fc_highlight');
+						else inst.containerOuter.element.classList.remove('fc_highlight');
+					}
+				});
+			}
+		}
+
+		// Inner labels and prompts for multi-select
+		for (var m = 0; m < s2_elems.length; m++)
+		{
+			var selEl = s2_elems[m];
+			var instanceKey2 = selEl.id || selEl.name;
+			var instance2 = window.fc_choices_instances[instanceKey2];
+			if (!instance2 || !instance2.containerOuter || !instance2.containerOuter.element) continue;
+
+			var containerEl = instance2.containerOuter.element;
+			var innerEl = containerEl.querySelector('.choices__inner');
+			if (!innerEl) continue;
+
+			// Inner label
+			var fc_label_text = selEl.getAttribute('data-fc_label_text') || selEl.getAttribute('fc_label_text');
+			if (fc_label_text) {
+				var _label = fc_label_text.length >= 30 ? fc_label_text.substring(0, 28) + '...' : fc_label_text;
+				var spanLabel = document.createElement('span');
+				spanLabel.className = 'fc_has_inner_label fc_has_inner_label_choices';
+				spanLabel.textContent = _label;
+				if (innerEl.firstChild) innerEl.insertBefore(spanLabel, innerEl.firstChild);
+				else innerEl.appendChild(spanLabel);
+			}
+
+			// Inner prompt
+			var fc_prompt_text = selEl.getAttribute('data-fc_prompt_text') || selEl.getAttribute('fc_prompt_text');
+			var promptSpan = null;
+			if (fc_prompt_text) {
+				var _prompt = fc_prompt_text.length >= 30 ? fc_prompt_text.substring(0, 28) + '...' : fc_prompt_text;
+				promptSpan = document.createElement('span');
+				promptSpan.className = 'fc_has_inner_prompt fc_has_inner_prompt_choices';
+				promptSpan.textContent = _prompt;
+				promptSpan.style.display = 'none';
+				if (innerEl.firstChild) innerEl.insertBefore(promptSpan, innerEl.firstChild);
+				else innerEl.appendChild(promptSpan);
+			}
+
+			// Show/hide inner prompt based on input
+			var inputs = innerEl.querySelectorAll('.choices__input');
+			for (var inp = 0; inp < inputs.length; inp++) {
+				inputs[inp].addEventListener('input', function() {
+					var siblings = this.parentNode ? this.parentNode.children : [];
+					var promptEl = null, labelEl = null;
+					for (var sib = 0; sib < siblings.length; sib++) {
+						if (siblings[sib] === this) break;
+						if (siblings[sib].classList.contains('fc_has_inner_prompt')) promptEl = siblings[sib];
+						if (siblings[sib].classList.contains('fc_has_inner_label')) labelEl = siblings[sib];
+					}
+					if (this.value.length) {
+						if (promptEl) promptEl.style.display = 'none';
+						if (labelEl) labelEl.style.display = 'none';
+					} else {
+						if (promptEl) promptEl.style.display = '';
+						if (labelEl) labelEl.style.display = '';
+					}
+				});
+			}
+		}
+	}
+
+	// Read the selected value(s) of a <select> (single -> string, multiple -> array)
+	function fcGetSelectValues(sel)
+	{
+		if (sel.multiple) {
+			var out = [];
+			for (var i = 0; i < sel.options.length; i++) if (sel.options[i].selected) out.push(sel.options[i].value);
+			return out;
+		}
+		return sel.value;
+	}
+
+	// Set the selected value(s) of a <select>
+	function fcSetSelectValues(sel, vals)
+	{
+		vals = Array.isArray(vals) ? vals : [vals];
+		for (var i = 0; i < sel.options.length; i++) {
+			sel.options[i].selected = vals.indexOf(sel.options[i].value) !== -1;
+		}
+	}
+
+	/* ===========================
+	   SELECT2 LEGACY IMPLEMENTATION
+	   =========================== */
+
+	function fc_attachSelect2Legacy(sbox, s2_elems)
+	{
+		// Adapt new (jQuery-free) input types: sbox is a DOM element, s2_elems is an array of <select>
+		var sboxJ = jQuery(sbox);
+		var elemsJ = (s2_elems && s2_elems.jquery) ? s2_elems : jQuery(s2_elems);
 
 		// Attach select2 to specific to select elements having specific CSS class, for select-multiple show values as togglable checkboxes
-		s2_elems.each(function()
+		elemsJ.each(function()
 		{
 			function fc_formatSel2Option(item)
 			{
@@ -1634,9 +2085,20 @@
 			}
 		});
 
+		// Bridge jQuery change → native change event so delegated listeners (filters.php etc.) fire
+		elemsJ.each(function() {
+			var el = this;
+			jQuery(el).on('change', function() {
+				if (el._fc_dispatching_native) return;
+				el._fc_dispatching_native = true;
+				el.dispatchEvent(new Event('change', { bubbles: true }));
+				setTimeout(function() { el._fc_dispatching_native = false; }, 0);
+			});
+		});
+
 
 		// Customization of SELECT2 JS selectors
-		sbox.find('div.use_select2_lib').each(function()
+		sboxJ.find('div.use_select2_lib').each(function()
 		{
 			var el_container = jQuery(this);
 			var sel_EL = el_container.next('select');
@@ -1687,7 +2149,7 @@
 
 
 		// MULTI-SELECT2:
-		s2_elems.on('select2-open', function()
+		elemsJ.on('select2-open', function()
 		{
 
 			// Add events to handle focusing the text filter box (hide inner label)
@@ -1838,7 +2300,7 @@
 
 
 		// MULTI-SELECT2: Handle highlighting selected value
-		sbox.find('div.use_select2_lib.select2-container-multi input').on('keydown', function()
+		sboxJ.find('div.use_select2_lib.select2-container-multi input').on('keydown', function()
 		{
 			var el = jQuery(this);
 			setTimeout(function() {
@@ -1855,7 +2317,7 @@
 
 
 		// SELECT2: scrollbar wrap problem
-		s2_elems.on('loaded open', function()
+		elemsJ.on('loaded open', function()
 		{
 			var ul = jQuery('#select2-drop ul.select2-results');
 			var needsScroll= ul.prop('scrollHeight') > ul.prop('clientHeight');
@@ -1866,11 +2328,13 @@
 
 
 	/* Valid HTML for legacy modals using rel, TODO: add more */
-	jQuery(document).ready(function() {
-		jQuery(".modal").each(function(i, el) {
-			if (jQuery(el).get(0).hasAttribute("data-rel")) jQuery(el).attr("rel", jQuery(el).attr("data-rel"));
+	if (typeof jQuery !== 'undefined') {
+		jQuery(document).ready(function() {
+			jQuery(".modal").each(function(i, el) {
+				if (jQuery(el).get(0).hasAttribute("data-rel")) jQuery(el).attr("rel", jQuery(el).attr("data-rel"));
+			});
 		});
-	});
+	}
 
 
 	/* Restore the given form fields values into the given form */
@@ -1911,7 +2375,7 @@
 	}
 
 
-	if (typeof jQuery.fn.serializeObject == "undefined")
+	if (typeof jQuery !== 'undefined' && typeof jQuery.fn.serializeObject == "undefined")
 	{
 		jQuery.fn.serializeObject = function()
 		{
@@ -2321,7 +2785,7 @@
 		const container_el = jQuery(container_sel);
 		const elements_set = container_el.find('select.use_select2_lib');
 
-		if (typeof jQuery === undefined || typeof jQuery.select2 === undefined)
+		if (typeof jQuery === undefined || (typeof jQuery.select2 === undefined && typeof Choices === undefined))
 		{
 			elements_set.length && !!Joomla.fc_debug ? window.console.log('subformRepeatable() not loaded. Skipping it') : false;
 			return;
@@ -2330,7 +2794,7 @@
 		// Also run method on given "Add" events, e.g. 'subform-row-add'
 		(reAddOnEvents || []).forEach(element => container_el.on(element, fc_initSelect2));
 
-		// Attach select2
+		// Attach select library
 		fc_attachSelect2(container_el, elements_set);
 	}
 

@@ -1378,7 +1378,10 @@ class flexicontent_html
 		{
 			if ($load_jquery === null)
 			{
-				$load_jquery = (int) $cparams->get('loadfw_jquery', 1) === 1 || !$app->isClient('site');
+				// Choices.js mode on the site front loads NO jQuery (keeps front entirely
+				// jQuery-free); select2 legacy keeps jQuery + mousewheel.
+				$useChoicesJs = (int) $cparams->get('select_lib_type', 0) === 1;
+				$load_jquery = ( (int) $cparams->get('loadfw_jquery', 1) === 1 || !$app->isClient('site') ) && ! ( $app->isClient('site') && $useChoicesJs );
 			}
 
 			$loadfw_param   = 'loadfw_' . strtolower(str_replace('-', '_', $framework));
@@ -1497,13 +1500,20 @@ class flexicontent_html
 				break;
 
 			case 'mousewheel':
-				if ($load_jquery) flexicontent_html::loadJQuery();
+				// mousewheel is a jQuery plugin; in choices mode (jQuery-free front) it is not loaded.
+				if (!$load_jquery) break;
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/mousewheel';
 				$document->addScript($framework_path.'/jquery.mousewheel.min.js');
 				break;
 
 			case 'mCSB':
+				// mCustomScrollbar is a jQuery plugin; in choices mode (jQuery-free front) the
+				// native CSS scrollbar rules in flexi_choices.css (.fc_add_scroller) are used instead.
+				$mcsb_cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+				$mcsb_site_choices = $app->isClient('site') && (int) $mcsb_cparams->get('select_lib_type', 0) === 1;
+				if ($mcsb_site_choices) break;
+
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/mCSB';
@@ -1591,83 +1601,107 @@ class flexicontent_html
 				break;
 
 			case 'select2':
-				if ($load_jquery) flexicontent_html::loadJQuery();
-
 				// Load flexi-lib, as it contains the select2 attach function: fc_attachSelect2()
 				flexicontent_html::loadFramework('flexi-lib');
-
-				// Load jQuery mouse wheel as this JS can make use of it
-				flexicontent_html::loadFramework('mousewheel');
 
 				// Disable select2 JS in mobile devices and instead use chosen JS ...
 				$mobileDetector = flexicontent_html::getMobileDetector();
 				$isMobile = $mobileDetector->isMobile() || $mobileDetector->isTablet();
 
-				// Load chosen function (if not loaded already) and target specific selector
-				if ($isMobile) {
-    				try {
-        				JHtml::_('formbehavior.chosen', '.use_chosen_lib');
-    					} catch (\Throwable $e) {
-       			 // 'chosen' WebAsset preset removed in Joomla 6 core — safe to ignore,
-        		// Tom Select already handles mobile/touch correctly.
-   					 }
-				}
+				// Get component parameters to check which select library to use
+				$cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+				$useChoicesJs = $cparams->get('select_lib_type', 0) == 1;
 
-				// Regardless if we loaded chosen JS or some other code loaded it, prevent it from ... attaching to elements meant for select2
-				$js .= "
-				if (typeof jQuery.fn.chosen == 'function') {
-					jQuery.fn.chosen_fc = jQuery.fn.chosen;
-					jQuery.fn.chosen = function(){
-						var args = arguments;
-						var result;
-						jQuery(this).each(function() {
-							if (jQuery(this).hasClass('use_select2_lib') || jQuery(this).hasClass('fc_no_js_attach')) return;
-							result = jQuery(this).chosen_fc(args);
+				// Pass the library choice to JavaScript
+				$js .= "window.fc_use_choicesjs = " . ($useChoicesJs ? 'true' : 'false') . ";\n";
+
+				// Load choices.js UI strings for all languages
+				\Joomla\CMS\Language\Text::script('FLEXI_NO_RESULTS', false);
+				\Joomla\CMS\Language\Text::script('FLEXI_NO_CHOICES', false);
+
+				if ($useChoicesJs) {
+					// === CHOICES.JS LIBRARY ===
+					$ver = '11.1.0';
+					$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/choicesjs';
+					$css_path = \Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/css';
+
+					$document->addScript($framework_path.'/choices.min.js', array('version' => $ver));
+					$document->addScript($framework_path.'/sortable.min.js', array('version' => $ver));
+					$document->addStyleSheet($framework_path.'/choices.min.css', array('version' => $ver));
+					$document->addStyleSheet($css_path.'/flexi_choices.css', array('version' => '1.4'));
+
+					// Attach Choices.js JS but skip it in mobiles and use native selects instead
+					$js .= "
+						document.addEventListener('DOMContentLoaded', function()
+						{
+							window.skip_select2_js = ".($isMobile ? 1 : 0).";
+							fc_attachSelect2('body');
 						});
-						return result;
-					};
-				}
-				";
+					";
+				} else {
+					// === SELECT2 LIBRARY (legacy) ===
+					// select2js is a jQuery plugin: jQuery and mouse wheel are only loaded for this legacy path
+					if ($load_jquery) flexicontent_html::loadJQuery();
+					flexicontent_html::loadFramework('mousewheel');
 
-				$ver = '3.5.4';
-				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/select2';
-				$framework_folder = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'select2';
-				$document->addScript($framework_path.'/select2.min.js', array('version' => $ver));
-				$document->addScript($framework_path.'/select2.sortable.js', array('version' => $ver));
-				$document->addStyleSheet($framework_path.'/select2.css', array('version' => $ver));
-
-				$lang_code = flexicontent_html::getUserCurrentLang();
-				if ( $lang_code && $lang_code!='en' )
-				{
-					// Try language shortcode
-					if ( file_exists($framework_folder.DS.'select2_locale_'.$lang_code.'.js') ) {
-						$document->addScript($framework_path.'/select2_locale_'.$lang_code.'.js', array('version' => $ver));
-					}
-					// select2 JS 4.0.0+
-					/*if ( file_exists($framework_folder.DS.'select2'.DS.'i18n'.DS.$lang_code.'.js') ) {
-						$document->addScript($framework_path.'/select2/i18n/'.$lang_code.'.js', array('version' => $ver));
-					}*/
-					// Try country language code
-					else {
-						$country_code = flexicontent_html::getUserCurrentLang($short_tag=false);
-						if ( $country_code && file_exists($framework_folder.DS.'select2_locale_'.$country_code.'.js') ) {
-							$document->addScript($framework_path.'/select2_locale_'.$country_code.'.js', array('version' => $ver));
+					// Load chosen function (if not loaded already) and target specific selector
+					if ($isMobile) {
+						try {
+							JHtml::_('formbehavior.chosen', '.use_chosen_lib');
+						} catch (\Throwable $e) {
+							// 'chosen' WebAsset preset removed in Joomla 6 core — safe to ignore,
+							// Tom Select already handles mobile/touch correctly.
 						}
-						// select2 JS 4.0.0+
-						/*if ( $country_code && file_exists($framework_folder.DS.'select2'.DS.'i18n'.DS.$country_code.'.js') ) {
-							$document->addScript($framework_path.'/select2/i18n/'.$country_code.'.js', array('version' => $ver));
-						}*/
 					}
-				}
 
-				// Attach select2 JS but skip it in mobiles and use chosen instead
-				$js .= "
-					jQuery(document).ready(function()
+					// Regardless if we loaded chosen JS or some other code loaded it, prevent it from ... attaching to elements meant for select2
+					$js .= "
+					if (typeof jQuery.fn.chosen == 'function') {
+						jQuery.fn.chosen_fc = jQuery.fn.chosen;
+						jQuery.fn.chosen = function(){
+							var args = arguments;
+							var result;
+							jQuery(this).each(function() {
+								if (jQuery(this).hasClass('use_select2_lib') || jQuery(this).hasClass('fc_no_js_attach')) return;
+								result = jQuery(this).chosen_fc(args);
+							});
+							return result;
+						};
+					}
+					";
+
+					$ver = '3.5.4';
+					$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/select2';
+					$framework_folder = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'select2';
+					$document->addScript($framework_path.'/select2.min.js', array('version' => $ver));
+					$document->addScript($framework_path.'/select2.sortable.js', array('version' => $ver));
+					$document->addStyleSheet($framework_path.'/select2.css', array('version' => $ver));
+
+					$lang_code = flexicontent_html::getUserCurrentLang();
+					if ( $lang_code && $lang_code!='en' )
 					{
-						window.skip_select2_js = ".($isMobile ? 1 : 0).";
-						fc_attachSelect2('body');
-					});
-				";
+						// Try language shortcode
+						if ( file_exists($framework_folder.DS.'select2_locale_'.$lang_code.'.js') ) {
+							$document->addScript($framework_path.'/select2_locale_'.$lang_code.'.js', array('version' => $ver));
+						}
+						// Try country language code
+						else {
+							$country_code = flexicontent_html::getUserCurrentLang($short_tag=false);
+							if ( $country_code && file_exists($framework_folder.DS.'select2_locale_'.$country_code.'.js') ) {
+								$document->addScript($framework_path.'/select2_locale_'.$country_code.'.js', array('version' => $ver));
+							}
+						}
+					}
+
+					// Attach select2 JS but skip it in mobiles and use chosen instead
+					$js .= "
+						jQuery(document).ready(function()
+						{
+							window.skip_select2_js = ".($isMobile ? 1 : 0).";
+							fc_attachSelect2('body');
+						});
+					";
+				}
 				break;
 
 			case 'inputmask':
@@ -1833,7 +1867,9 @@ class flexicontent_html
 				break;
 
 			case 'fancybox':
-				if ($load_jquery) flexicontent_html::loadJQuery();
+				// fancybox is a jQuery plugin; in choices mode (jQuery-free front) it is not loaded.
+				if (!$load_jquery) break;
+
 				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js');
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/fancybox';
@@ -2015,7 +2051,7 @@ class flexicontent_html
 				}
 
 				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/tmpl-common.js', array('version' => FLEXI_VHASH));
-				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js', array('version' => FLEXI_VHASH));
+				if ($load_jquery) $document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js', array('version' => FLEXI_VHASH));
 				\Joomla\CMS\Language\Text::script("FLEXI_APPLYING_FILTERING", true);
 				\Joomla\CMS\Language\Text::script("FLEXI_TYPE_TO_LIST", true);
 				\Joomla\CMS\Language\Text::script("FLEXI_TYPE_TO_FILTER", true);
