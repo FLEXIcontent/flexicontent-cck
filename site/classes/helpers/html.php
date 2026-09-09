@@ -1937,6 +1937,18 @@ class flexicontent_html
 				";
 				break;
 
+			case 'glightbox':
+				// GLightbox is a pure vanilla JS lightbox (MIT), no jQuery dependency.
+				// It is loaded in both standard and Choices.js (jQuery-free front) modes.
+				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/glightbox';
+				$document->addStyleSheet($framework_path.'/dist/css/glightbox.min.css');
+				$document->addScript($framework_path.'/dist/js/glightbox.min.js');
+
+				// Attaching the lightbox is left to the caller so that it creates
+				// a GLightbox instance with field specific options
+				$js .= "";
+				break;
+
 			case 'fcxSlide':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 

@@ -1162,11 +1162,11 @@ class plgFlexicontent_fieldsImage extends FCField
 		 * If using a non allowed gallery JS, then force fancybox
 		 */
 
-		// Only allow multibox and fancybox in items manager
-		$iManager_containers = array(1,4);
+		// Only allow multibox, fancybox, glightbox in items manager
+		$iManager_containers = array(1,4,11);
 
 		// Display types that need special container are not allowed when field in a group
-		$no_container_needed = array(1,2,3,4,6);
+		$no_container_needed = array(1,2,3,4,6,11);
 
 		if (
 			(static::$isItemsManager && !in_array($popuptype, $iManager_containers)) ||
@@ -1264,8 +1264,9 @@ class plgFlexicontent_fieldsImage extends FCField
 			}
 		}
 
-		// Force Fancybox if using Media embeeding, this is until we add support for more galleries ...
-		elseif ($usemediaurl)
+		// Force Fancybox if using Media embeding, until we add support for more galleries ...
+		// (glightbox = popuptype 11 supports media URLs / videos natively, so it is NOT forced)
+		elseif ($usemediaurl && $popuptype != 11)
 		{
 			$popuptype = 4;
 		}
@@ -1433,6 +1434,7 @@ class plgFlexicontent_fieldsImage extends FCField
 				8 => 'photoswipe',
 				9 => 'pannellum',
 				10 => 'juxtapose',
+				11 => 'glightbox',
 			);
 
 			$viewlayout = isset($built_in_gallery_names[$popuptype])

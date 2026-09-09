@@ -210,7 +210,7 @@
 			</field>
 
 			<field name="" type="separator" default="FLEXI_FIELD_MEDIA_URL" _description="..." icon_class="icon-video" level="tab_open" box_type="1" />
-			<field name="" type="separator" default="PLEASE NOTE: If media-URL is enabled then &lt;b&gt;fancybox&lt;/b&gt; layout will be forced" level="level3" class="alert alert-warning fcpadded" />
+			<field name="" type="separator" default="PLEASE NOTE: If media-URL is enabled then &lt;b&gt;fancybox&lt;/b&gt; layout will be forced, except when &lt;b&gt;GLightbox&lt;/b&gt; layout is selected (it supports video URLs natively)" level="level3" class="alert alert-warning fcpadded" />
 
 			<field name="use_mediaurl" type="multilist" subtype="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC" toggle_related="1" class="btn-group btn-group-yesno">
 				<option value="0" show_list="" hide_list="img-mediaurl-mode">FLEXI_NO</option>
@@ -534,7 +534,7 @@
 			</field>
 
 			<field name="" type="separator" default="Layout" level="level3" />
-			<field name="" type="separator" label="" default="Layout is forced to 'fancybox' because parameter 'Media URL' was enabled, &lt;br&gt; please select to 'fancybox' layout to be able to customize its parameters" description="" class="alert fcpadded" depend_class="img-mediaurl-mode" />
+			<field name="" type="separator" label="" default="If 'Media URL' is enabled, the layout is forced to 'fancybox' except for the 'GLightbox' layout which supports video URLs natively" description="" class="alert fcpadded" depend_class="img-mediaurl-mode" />
 
 			<field name="popuptype" type="fclayout" default="4" label="FLEXI_FIELD_IMAGE_GALLERY_LAYOUT" description="FLEXI_FIELD_IMAGE_GALLERY_LAYOUT_DESC" depend_class="use_js_lib"
 				directory="/plugins/flexicontent_fields/image/tmpl"
@@ -550,6 +550,7 @@
 					<option filename="value_gallery_fancybox" value="4">FLEXI_FIELD_IMAGE_FANCYBOX_BUILTIN</option>
 					<option filename="value_gallery_widgetkit" value="6">FLEXI_FIELD_IMAGE_WIDGETKIT</option>
 					<option filename="value_gallery_photoswipe" value="8">FLEXI_FIELD_IMAGE_PHOTOSWIPE</option>
+					<option filename="value_gallery_glightbox" value="11">FLEXI_FIELD_IMAGE_GLIGHTBOX</option>
 				</group>
 
 				<group label="Inline layouts">
@@ -580,6 +581,7 @@
 					<option filename="value_gallery_fancybox" value="4">FLEXI_FIELD_IMAGE_FANCYBOX_BUILTIN</option>
 					<option filename="value_gallery_widgetkit" value="6">FLEXI_FIELD_IMAGE_WIDGETKIT</option>
 					<option filename="value_gallery_photoswipe" value="8">FLEXI_FIELD_IMAGE_PHOTOSWIPE</option>
+					<option filename="value_gallery_glightbox" value="11">FLEXI_FIELD_IMAGE_GLIGHTBOX</option>
 				</group>
 
 				<group label="Inline layouts">
