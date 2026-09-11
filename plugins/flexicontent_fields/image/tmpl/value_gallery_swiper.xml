@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+
+	<name>Image field layout -- Swiper + GLightbox</name>
+	<author>ggppdk</author>
+	<creationDate>September 2026</creationDate>
+	<copyright>Copyright (C) 2026 ggppdk</copyright>
+	<license>GNU/GPL v2</license>
+	<authorEmail>flexicontentck@gmail.com</authorEmail>
+	<authorUrl>www.flexicontent.org</authorUrl>
+	<version>1.0</version>
+	<description>Flexicontent fields - Image field layout - Swiper + GLightbox parameters</description>
+	
+	<fields name="attribs">
+		
+		<fieldset name="layout" addfieldpath="/administrator/components/com_flexicontent/elements">
+
+			<field name="PPFX_accent_color" type="color" format="hex" default="#007aff" label="Accent color" description="Theme color of the gallery: active pagination dot, progress bar fill and active thumbnail border. Navigation arrows keep their own color." />
+			<field name="PPFX_nav_color" type="color" format="hex" default="#007aff" label="Navigation arrows color" description="Color of the previous/next navigation arrows. Leave empty to fall back to the accent color." />
+
+		<field name="" type="separator" default="FLEXI_FIELD_IMAGE_CAROUSEL_OPTIONS" level="level2" />
+
+			<field name="PPFX_slide_height" type="text" default="" label="Carousel height" description="Controls the height of the carousel area. Leave empty to auto-size to image dimensions. Enter a number in pixels (e.g. 400) for a fixed height, or an aspect-ratio like 16/9 or 4/3 for a responsive height that scales with the container width. When set, images fill or fit the area according to the 'Image fit' option (fill/crop with 'Cover', whole and never enlarged with 'Contain'). When the 'Auto height' option is also enabled, a pixel value acts as a maximum height instead: smaller images keep their natural height, taller ones are capped." />
+			<field name="PPFX_carousel_padding" type="text" default="" label="Carousel padding" description="Padding applied inside the main carousel container, around the slides (and the overlaid pagination/arrows). Leave empty for no padding. Accepts a CSS padding value: a single value (e.g. 12px), two (10px 20px), or up to four (10px 12px 14px 16px), with any CSS length unit (px, em, rem, %)." />
+			<field name="PPFX_image_fit" type="radio" default="cover" label="Image fit" description="How each image fills its slide cell. 'Cover' forces the image to fill the whole cell, cropping or enlarging the overflow if the aspect ratios differ (default). 'Contain' shows the whole image without cropping and WITHOUT enlarging it: smaller images keep their natural size, centered in the cell; larger ones are scaled down to fit. NOTE: with an empty carousel height (auto-size mode) the two options look identical, because the cell grows to the image - selecting 'Contain' then gives the gallery a 16:9 display area automatically so the images are centered, like the Swiper demo. Applies to all transition effects and screen sizes." class="btn-group btn-group-yesno">
+				<option value="cover">Cover</option>
+				<option value="contain">Contain (centered)</option>
+			</field>
+			<field name="PPFX_auto_height" type="radio" default="false" label="Auto height" description="Dynamically adjust the carousel height to match the active slide content. Useful when slides have different aspect ratios. Works best with the 'Slide' or 'Fade' effect. NOTE: when a pixel 'Carousel height' is also set, it becomes a maximum - the carousel (and the images) never exceed it, smaller images keep their natural height." class="btn-group btn-group-yesno">
+				<option value="false">FLEXI_NO</option>
+				<option value="true">FLEXI_YES</option>
+			</field>
+			<field name="PPFX_direction" type="radio" default="horizontal" label="Direction" description="Slide direction: horizontal (default, left/right navigation) or vertical (top/bottom navigation). Vertical mode works best with a fixed carousel height." class="btn-group btn-group-yesno">
+				<option value="horizontal">Horizontal</option>
+				<option value="vertical">Vertical</option>
+			</field>
+			<field name="PPFX_effect" type="multilist" subtype="radio" default="slide" toggle_related="1" label="Transition effect" description="Visual transition effect between slides. 'Slide' is the classic sliding. 'Fade' crossfades between slides. 'Cube' gives a 3D cube rotation. 'Coverflow' mimics iTunes-style coverflow. 'Flip' flips the card. 'Cards' stacks slides like a deck. NOTE: Fade, Cube and Flip always display a single slide at a time (slides per view is forced to 1); 'Cards' still supports several slides per view (a visible stack behind the active card). The multi-row grid layout works with the 'Slide', the 'Fade' and the 'Flip' (each grid column transitions page by page), the 'Coverflow' effect (3D transforms per cell) and the 'Cards' effect (cells of stacked cards)." class="btn-group btn-group-yesno">
+				<option value="slide" show_list="" hide_list="slide_shadows,cube_main,flip_opts,coverflow_opts,cards_opts">Slide</option>
+				<option value="fade" show_list="" hide_list="slide_shadows,cube_main,flip_opts,coverflow_opts,cards_opts">Fade</option>
+				<option value="cube" show_list="slide_shadows,cube_main" hide_list="flip_opts,coverflow_opts,cards_opts">Cube</option>
+				<option value="coverflow" show_list="slide_shadows,coverflow_opts" hide_list="cube_main,flip_opts,cards_opts">Coverflow</option>
+				<option value="flip" show_list="slide_shadows,flip_opts" hide_list="cube_main,coverflow_opts,cards_opts">Flip</option>
+				<option value="cards" show_list="slide_shadows,cards_opts" hide_list="cube_main,flip_opts,coverflow_opts">Cards</option>
+			</field>
+			<field name="PPFX_slide_shadows" type="radio" default="true" label="Slide shadows" description="Display a shadow under each slide for the 3D effects. Applies with the 'Cube', 'Flip', 'Coverflow' and 'Cards' effects; no effect with the other transitions." class="btn-group btn-group-yesno" depend_class="slide_shadows">
+				<option value="false">FLEXI_NO</option>
+				<option value="true">FLEXI_YES</option>
+			</field>
+			<field name="PPFX_cube_shadow" type="radio" default="true" label="Cube main shadow" description="Display the large blurred shadow below the cube. Only applies with the 'Cube' effect." class="btn-group btn-group-yesno" depend_class="cube_main">
+				<option value="false">FLEXI_NO</option>
+				<option value="true">FLEXI_YES</option>
+			</field>
+			<field name="PPFX_flip_limit_rotation" type="radio" default="true" label="Flip limit rotation" description="When enabled, the flip is constrained to a half-turn so the card turns cleanly over its edge. When disabled, the card can spin a full rotation. Only applies with the 'Flip' effect." class="btn-group btn-group-yesno" depend_class="flip_opts">
+				<option value="false">FLEXI_NO</option>
+				<option value="true">FLEXI_YES</option>
+			</field>
+			<field name="PPFX_cards_rotate" type="radio" default="true" label="Cards rotate" description="Rotate each stacked card slightly so the deck fans out. When disabled, cards stack straight on top of each other. Only applies with the 'Cards' effect." class="btn-group btn-group-yesno" depend_class="cards_opts">
+				<option value="false">FLEXI_NO</option>
+				<option value="true">FLEXI_YES</option>
+			</field>
+			<field name="PPFX_cards_per_slide_offset" type="text" default="8" label="Cards offset (px)" description="Vertical offset in pixels between consecutive stacked cards. Higher values spread the deck more. Only applies with the 'Cards' effect." depend_class="cards_opts" />
+			<field name="PPFX_cards_per_slide_rotate" type="text" default="2" label="Cards rotation per slide (°)" description="Rotation angle in degrees applied to each consecutive stacked card. Only applies with the 'Cards' effect." depend_class="cards_opts" />
+			<field name="PPFX_coverflow_rotate" type="text" default="50" label="Coverflow rotate (°)" description="Angle in degrees to rotate non-active slides. 0 = no rotation, 50 = default coverflow rotation. Only applies with the 'Coverflow' effect." depend_class="coverflow_opts" />
+			<field name="PPFX_coverflow_stretch" type="text" default="0" label="Coverflow stretch (px)" description="Stretch gap in pixels between active and non-active slides. 0 = default, positive values increase spacing. Only applies with the 'Coverflow' effect." depend_class="coverflow_opts" />
+			<field name="PPFX_coverflow_depth" type="text" default="100" label="Coverflow depth (px)" description="Depth offset in pixels for non-active slides (3D perspective). Higher values push inactive slides further back. Only applies with the 'Coverflow' effect." depend_class="coverflow_opts" />
+			<field name="PPFX_coverflow_scale" type="text" default="1" label="Coverflow scale" description="Scale factor for non-active slides. 1 = same size as active, values &lt; 1 make inactive slides smaller. Only applies with the 'Coverflow' effect." depend_class="coverflow_opts" />
+			<field name="PPFX_space_between" type="text" default="10" label="Space between slides (px)" description="Horizontal or vertical gap between slides in pixels. Only applies with the 'slide' effect." />
+			<field name="PPFX_centered_slides" type="radio" default="false" label="Center slides" description="Center the active slide in the viewport instead of aligning it to the left/top edge. Works best with slidesPerView > 1." class="btn-group btn-group-yesno">
+				<option value="false">FLEXI_NO</option>
+				<option value="true">FLEXI_YES</option>
+			</field>
+			<field name="PPFX_slides_per_view" type="list" default="1" label="Slides per view" description="Number of slides visible simultaneously in the carousel. This is the main value and applies to all screen sizes. When responsive mode is on, this value applies to desktop screens (1200px and above), while the tablet and phone overrides apply to smaller screens. NOTE: this is the number of COLUMNS when combining with 'Grid rows'. The 'Fade' and 'Flip' effects always show a single slide (one column), so combine grid rows with the 'Slide', 'Coverflow' or 'Cards' effect for a real multi-column grid." class="use_select2_lib">
+				<option value="1">1</option>
+				<option value="2">2</option>
+				<option value="3">3</option>
+				<option value="4">4</option>
+				<option value="5">5</option>
+				<option value="6">6</option>
+				<option value="7">7</option>
+				<option value="8">8</option>
+				<option value="9">9</option>
+				<option value="10">10</option>
+				<option value="auto">Auto</option>
+			</field>
+			<field name="PPFX_slides_per_group" type="list" default="1" label="Slides per group" description="Number of slides to advance per swipe or click. Usually set this to the same value as 'Slides per view' so the carousel advances by a full page." class="use_select2_lib">
+				<option value="1">1</option>
+				<option value="2">2</option>
+				<option value="3">3</option>
+				<option value="4">4</option>
+				<option value="5">5</option>
+				<option value="6">6</option>
+				<option value="7">7</option>
+				<option value="8">8</option>
+				<option value="9">9</option>
+				<option value="10">10</option>
+			</field>
+			<field name="PPFX_grid_rows" type="list" default="1" label="Grid rows" description="Number of rows to display slides in. Set to 1 for a single row (standard carousel). Set to 2 or more to display slides in a grid layout. Each cell shows one image. Combine with 'Slides per view' to define columns. Works with the 'Slide', the 'Fade' and the 'Flip' (with Fade/Flip each grid column transitions page by page), the 'Coverflow' (3D transforms per cell) and the 'Cards' (cells of stacked cards) effects. Grid is disabled with the 'Cube' effect (which renders broken cells)." class="use_select2_lib">
+				<option value="1">1</option>
+				<option value="2">2</option>
+				<option value="3">3</option>
+				<option value="4">4</option>
+			</field>
+			<field name="PPFX_grid_fill" type="list" default="row" label="Grid fill direction" description="How slides fill the grid cells. 'Row' fills each row left-to-right before moving to the next row. 'Column' fills each column top-to-bottom before moving to the next column." class="use_select2_lib">
+				<option value="row">Row</option>
+				<option value="column">Column</option>
+			</field>
+			<field name="PPFX_responsive_spv" type="multilist" subtype="radio" default="0" toggle_related="1" label="Responsive slides per view" description="Use different numbers of visible slides on tablet and phone. When enabled, the base 'Slides per view' applies to desktop (1200px+), while the tablet and phone values override it on smaller screens. Breakpoints are fixed at 768px (phone/tablet) and 1200px (tablet/desktop)." class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="resp_spv">FLEXI_NO</option>
+				<option value="1" show_list="resp_spv" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="PPFX_slides_per_view_tablet" type="list" default="1" label="Slides per view - tablet" description="Number of visible slides at widths of 768px to 1199px." class="use_select2_lib" depend_class="resp_spv">
+				<option value="1">1</option>
+				<option value="2">2</option>
+				<option value="3">3</option>
+				<option value="4">4</option>
+				<option value="5">5</option>
+				<option value="6">6</option>
+				<option value="7">7</option>
+				<option value="8">8</option>
+				<option value="9">9</option>
+				<option value="10">10</option>
+				<option value="auto">Auto</option>
+			</field>
+			<field name="PPFX_slides_per_view_phone" type="list" default="1" label="Slides per view - phone" description="Number of visible slides at widths below 768px." class="use_select2_lib" depend_class="resp_spv">
+				<option value="1">1</option>
+				<option value="2">2</option>
+				<option value="3">3</option>
+				<option value="4">4</option>
+				<option value="5">5</option>
+				<option value="6">6</option>
+				<option value="7">7</option>
+				<option value="8">8</option>
+				<option value="9">9</option>
+				<option value="10">10</option>
+				<option value="auto">Auto</option>
+			</field>
+			<field name="PPFX_speed" type="text" default="300" label="Transition duration (ms)" description="Slide transition animation duration in milliseconds. Lower = faster transition (e.g. 200), higher = slower (e.g. 600)" />
+			<field name="PPFX_loop_mode" type="radio" default="false" label="Loop mode" description="When enabled, the carousel restarts from the first slide after the last one, and vice versa. Best used with navigation arrows or autoplay." class="btn-group btn-group-yesno">
+				<option value="false">FLEXI_NO</option>
+				<option value="true">FLEXI_YES</option>
+			</field>
+			<field name="PPFX_rewind" type="radio" default="false" label="Rewind" description="When enabled (and loop is off), clicking Next on the last slide rewinds to the first slide, and clicking Previous on the first slide jumps to the last. Provides a clear start/end point unlike loop." class="btn-group btn-group-yesno">
+				<option value="false">FLEXI_NO</option>
+				<option value="true">FLEXI_YES</option>
+			</field>
+			<field name="PPFX_autoplay" type="multilist" subtype="radio" default="0" toggle_related="1" label="Autoplay" description="Automatically advance to the next slide at a fixed interval. The delay can be configured below." class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="auto_play">FLEXI_NO</option>
+				<option value="1" show_list="auto_play" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="PPFX_autoplay_delay" type="text" default="3000" label="Autoplay delay (ms)" description="Time in milliseconds between each automatic slide transition (e.g. 3000 = 3 seconds)" depend_class="auto_play" />
+			<field name="PPFX_show_nav" type="radio" default="true" label="Show navigation arrows" description="Display previous/next arrow buttons to navigate between slides" class="btn-group btn-group-yesno">
+				<option value="false">FLEXI_NO</option>
+				<option value="true">FLEXI_YES</option>
+			</field>
+			<field name="" type="separator" default="FLEXI_FIELD_IMAGE_THUMBS_OPTIONS" level="level2" />
+
+			<field name="PPFX_show_thumbs" type="radio" default="true" label="Show thumbnail strip" description="Display a clickable thumbnail row below the main carousel for quick navigation between slides" class="btn-group btn-group-yesno">
+				<option value="false">FLEXI_NO</option>
+				<option value="true">FLEXI_YES</option>
+			</field>
+			<field name="PPFX_thumb_position" type="list" default="below" label="Thumbnail position" description="Position of the thumbnail strip relative to the main carousel. 'Left column' and 'Right column' display thumbnails as a vertical sidebar next to the carousel - a defined carousel height is recommended for best results." class="use_select2_lib">
+				<option value="below">Below carousel</option>
+				<option value="above">Above carousel</option>
+				<option value="left">Left column</option>
+				<option value="right">Right column</option>
+			</field>
+			<field name="PPFX_thumb_size" type="multilist" subtype="radio" default="m" toggle_related="1" label="Thumbnail image size" description="Which image size to use for the thumbnail strip. 'Small' and 'Medium' are pre-generated thumbnails. 'Large' uses the lightbox-size image. 'Custom' uses phpThumb to generate a resized image on the fly (cached for 30 days)." class="btn-group btn-group-yesno">
+				<option value="s" show_list="" hide_list="thumb_custom_size">Small (s)</option>
+				<option value="m" show_list="" hide_list="thumb_custom_size">Medium (m)</option>
+				<option value="l" show_list="" hide_list="thumb_custom_size">Large (l)</option>
+				<option value="custom" show_list="thumb_custom_size" hide_list="">Custom size</option>
+			</field>
+			<field name="PPFX_thumb_custom_size" type="text" default="" label="Custom thumbnail width (px)" description="Width in pixels for phpThumb to generate the thumbnail. Height is calculated automatically to preserve aspect ratio. The resized image is cached on the server for 30 days." depend_class="thumb_custom_size" />
+			<field name="PPFX_thumb_height" type="text" default="80" label="Thumbnail height (px)" description="Height in pixels of each thumbnail in the navigation strip. Width adjusts automatically to maintain aspect ratio." />
+			<field name="" type="separator" default="FLEXI_FIELD_IMAGE_PAGINATION" level="level2" />
+
+			<field name="PPFX_show_pagination" type="radio" default="true" label="Show pagination" description="Display a navigation indicator showing the current slide. The rendering depends on the pagination type: dots, fraction counter or progress bar." class="btn-group btn-group-yesno">
+				<option value="false">FLEXI_NO</option>
+				<option value="true">FLEXI_YES</option>
+			</field>
+			<field name="PPFX_pagination_type" type="multilist" subtype="radio" default="bullets" toggle_related="1" label="Pagination type" description="Rendering style of the pagination. 'Dots' shows one bullet per slide. 'Fraction' shows a counter like 3/12. 'Progress bar' shows a fill bar that grows as you advance through the slides." class="btn-group btn-group-yesno">
+				<option value="bullets" show_list="pag_dynamic" hide_list="pag_fraction">Dots</option>
+				<option value="fraction" show_list="pag_fraction" hide_list="pag_dynamic">Fraction (current / total)</option>
+				<option value="progressbar" show_list="" hide_list="pag_fraction,pag_dynamic">Progress bar</option>
+			</field>
+			<field name="PPFX_pagination_fraction" type="text" default="{current} / {total}" label="Fraction format text" description="Layout of the fraction counter text. Use {current} for the current slide number and {total} for the total number of slides. E.g. 'Slide {current} of {total}'" depend_class="pag_fraction" />
+			<field name="PPFX_pagination_clickable" type="radio" default="true" label="Clickable pagination" description="Allow clicking the pagination (dots, or the fraction counter) to jump directly to the corresponding slide" class="btn-group btn-group-yesno">
+				<option value="false">FLEXI_NO</option>
+				<option value="true">FLEXI_YES</option>
+			</field>
+			<field name="PPFX_pagination_dynamic" type="radio" default="false" label="Dynamic bullets" description="Compact dots that reflect the active slide, useful when there are many slides. The number of visible dots adapts to proximity of the current slide. Only applies with the 'Dots' type." class="btn-group btn-group-yesno" depend_class="pag_dynamic">
+				<option value="false">FLEXI_NO</option>
+				<option value="true">FLEXI_YES</option>
+			</field>
+			<field name="PPFX_pagination_hideonclick" type="radio" default="false" label="Hide pagination on click" description="Hide the pagination indicator when the user clicks on a slide, and show it again when the cursor moves" class="btn-group btn-group-yesno">
+				<option value="false">FLEXI_NO</option>
+				<option value="true">FLEXI_YES</option>
+			</field>
+			<field name="PPFX_show_scrollbar" type="multilist" subtype="radio" default="false" toggle_related="1" label="Show scrollbar" description="Display a thin scrollbar-like progress track overlaid at the bottom (horizontal) or on the right side (vertical) of the carousel, showing and allowing to scrub through the slide position" class="btn-group btn-group-yesno">
+				<option value="false" show_list="" hide_list="scroller">FLEXI_NO</option>
+				<option value="true" show_list="scroller" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="PPFX_scrollbar_draggable" type="radio" default="true" label="Draggable scrollbar" description="Allow dragging the scrollbar handle to navigate between slides" class="btn-group btn-group-yesno" depend_class="scroller">
+				<option value="false">FLEXI_NO</option>
+				<option value="true">FLEXI_YES</option>
+			</field>
+			<field name="PPFX_scrollbar_hide" type="radio" default="false" label="Auto-hide scrollbar" description="Hide the scrollbar automatically when the carousel is not being interacted with. Only applies when the scrollbar is draggable." class="btn-group btn-group-yesno" depend_class="scroller">
+				<option value="false">FLEXI_NO</option>
+				<option value="true">FLEXI_YES</option>
+			</field>
+			<field name="PPFX_scrollbar_drag_size" type="text" default="" label="Scrollbar handle size (px)" description="Size of the draggable scrollbar handle in pixels (height for horizontal scrollbar, width for vertical). Leave empty for auto size, which scales with the number of slides." depend_class="scroller" />
+
+		<field name="" type="separator" default="FLEXI_FIELD_IMAGE_LIGHTBOX_OPTIONS" level="level2" />
+
+			<field name="PPFX_show_caption" type="radio" default="true" label="Display caption in lightbox" description="Show the image title and description inside the GLightbox popup when clicking on a slide" class="btn-group btn-group-yesno">
+				<option value="false">FLEXI_NO</option>
+				<option value="true">FLEXI_YES</option>
+			</field>
+			<field name="PPFX_open_size" type="radio" default="l" label="Image size opened in lightbox" description="Which resized image is loaded in the lightbox popup. 'Original' loads the full-size file (slower but best quality). Independent from the display size in the carousel." class="btn-group btn-group-yesno">
+				<option value="s">Small (s)</option>
+				<option value="m">Medium (m)</option>
+				<option value="l">Large (l)</option>
+				<option value="o">Original</option>
+			</field>
+			<field name="PPFX_glightbox_loop" type="radio" default="true" label="Lightbox loop" description="When enabled, navigating past the last image in the lightbox wraps back to the first one (and vice versa)" class="btn-group btn-group-yesno">
+				<option value="false">FLEXI_NO</option>
+				<option value="true">FLEXI_YES</option>
+			</field>
+			<field name="PPFX_desc_position" type="list" default="bottom" label="Caption position" description="Position of the title and description text inside the GLightbox popup" class="use_select2_lib">
+				<option value="bottom">Bottom</option>
+				<option value="top">Top</option>
+				<option value="right">Right</option>
+				<option value="left">Left</option>
+			</field>
+
+		<field name="" type="separator" default="FLEXI_FIELD_IMAGE_BEHAVIORS" level="level2" />
+
+			<field name="PPFX_grab_cursor" type="radio" default="false" label="Grab cursor" description="Show a grab/move cursor on desktop when hovering the carousel, indicating the user can drag to navigate" class="btn-group btn-group-yesno">
+				<option value="false">FLEXI_NO</option>
+				<option value="true">FLEXI_YES</option>
+			</field>
+			<field name="PPFX_keyboard" type="radio" default="false" label="Keyboard navigation" description="Allow navigating between slides using the left/right (or up/down for vertical) arrow keys on the keyboard" class="btn-group btn-group-yesno">
+				<option value="false">FLEXI_NO</option>
+				<option value="true">FLEXI_YES</option>
+			</field>
+			<field name="PPFX_mousewheel" type="radio" default="false" label="Mousewheel navigation" description="Allow navigating between slides using the mouse wheel. Only triggers when the carousel is in the viewport." class="btn-group btn-group-yesno">
+				<option value="false">FLEXI_NO</option>
+				<option value="true">FLEXI_YES</option>
+			</field>
+  		
+		</fieldset>
+
+	</fields>
+	
+</form>

@@ -1949,6 +1949,18 @@ class flexicontent_html
 				$js .= "";
 				break;
 
+			case 'swiper':
+				// Swiper is a pure vanilla JS carousel/slider (MIT), no jQuery dependency.
+				// It is loaded in both standard and Choices.js (jQuery-free front) modes.
+				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/swiper';
+				$document->addStyleSheet($framework_path.'/dist/css/swiper-bundle.min.css');
+				$document->addScript($framework_path.'/dist/js/swiper-bundle.min.js');
+
+				// Attaching the carousel is left to the caller so that it creates
+				// Swiper instances with field specific options
+				$js .= "";
+				break;
+
 			case 'fcxSlide':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 

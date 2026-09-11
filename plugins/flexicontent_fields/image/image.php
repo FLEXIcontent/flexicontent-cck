@@ -1266,7 +1266,8 @@ class plgFlexicontent_fieldsImage extends FCField
 
 		// Force Fancybox if using Media embeding, until we add support for more galleries ...
 		// (glightbox = popuptype 11 supports media URLs / videos natively, so it is NOT forced)
-		elseif ($usemediaurl && $popuptype != 11)
+		// (swiper    = popuptype 12 opens media URLs / videos through GLightbox natively, so it is NOT forced)
+		elseif ($usemediaurl && !in_array($popuptype, array(11, 12)))
 		{
 			$popuptype = 4;
 		}
@@ -1435,6 +1436,7 @@ class plgFlexicontent_fieldsImage extends FCField
 				9 => 'pannellum',
 				10 => 'juxtapose',
 				11 => 'glightbox',
+				12 => 'swiper',
 			);
 
 			$viewlayout = isset($built_in_gallery_names[$popuptype])

@@ -551,6 +551,7 @@
 					<option filename="value_gallery_widgetkit" value="6">FLEXI_FIELD_IMAGE_WIDGETKIT</option>
 					<option filename="value_gallery_photoswipe" value="8">FLEXI_FIELD_IMAGE_PHOTOSWIPE</option>
 					<option filename="value_gallery_glightbox" value="11">FLEXI_FIELD_IMAGE_GLIGHTBOX</option>
+					<option filename="value_gallery_swiper" value="12">FLEXI_FIELD_IMAGE_SWIPER</option>
 				</group>
 
 				<group label="Inline layouts">
@@ -582,6 +583,7 @@
 					<option filename="value_gallery_widgetkit" value="6">FLEXI_FIELD_IMAGE_WIDGETKIT</option>
 					<option filename="value_gallery_photoswipe" value="8">FLEXI_FIELD_IMAGE_PHOTOSWIPE</option>
 					<option filename="value_gallery_glightbox" value="11">FLEXI_FIELD_IMAGE_GLIGHTBOX</option>
+					<option filename="value_gallery_swiper" value="12">FLEXI_FIELD_IMAGE_SWIPER</option>
 				</group>
 
 				<group label="Inline layouts">
