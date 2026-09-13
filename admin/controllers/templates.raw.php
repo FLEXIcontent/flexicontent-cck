@@ -557,17 +557,18 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 					}
 					elseif ($field->input)
 					{
-						$_depends = $field->getAttribute('depend_class');
-						echo '
-						<div class="control-group' . ($_depends ? ' ' . $_depends : '') . '" id="' . $_field_id . '-container">
-							<div class="control-label">
-								' . $_label . '
-							</div>
-							<div class="controls container_fcfield">
-								' . $_input . '
-							</div>
+					$_depends = $field->getAttribute('depend_class');
+					$_description = trim($field->description);
+					echo '
+					<div class="control-group' . ($_depends ? ' ' . $_depends : '') . '" id="' . $_field_id . '-container">
+						<div class="control-label">
+							' . $_label . '
 						</div>
-						';
+						<div class="controls container_fcfield">
+							' . $_input . ($_description ? '<div class="fc_description help-block" style="margin:4px 0 0; font-size:12px; color:#666;">' . \Joomla\CMS\Language\Text::_($_description) . '</div>' : '') . '
+						</div>
+					</div>
+					';
 					}
 
 				endforeach; ?>
