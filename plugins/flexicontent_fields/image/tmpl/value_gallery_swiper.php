@@ -32,6 +32,7 @@ if ( !function_exists('fc_swiper_yn') )
 // Swiper carousel parameters
 $autoplay        = fc_swiper_yn( $field->parameters->get( $PPFX_.'autoplay', 'false' ), 0 );
 $autoplay_delay  = (int) $field->parameters->get( $PPFX_.'autoplay_delay', 3000 );
+$autoplay_hover  = fc_swiper_yn( $field->parameters->get( $PPFX_.'autoplay_hover', 'false' ), 0 );
 $loop            = fc_swiper_yn( $field->parameters->get( $PPFX_.'loop_mode', 'false' ), 0 );
 $rewind          = fc_swiper_yn( $field->parameters->get( $PPFX_.'rewind', 'false' ), 0 );
 $speed           = (int) $field->parameters->get( $PPFX_.'speed', 300 );
@@ -477,7 +478,8 @@ if ( !isset(static::$js_added['swiper_glightbox'][__FILE__]) )
 				if (container.getAttribute('data-autoplay') === '1') {
 					mainParams.autoplay = {
 						delay: parseInt(container.getAttribute('data-autoplay-delay') || '3000', 10) || 3000,
-						disableOnInteraction: false
+						disableOnInteraction: false,
+						pauseOnMouseEnter: container.getAttribute('data-autoplay-hover') === '1'
 					};
 				}
 
@@ -631,7 +633,7 @@ if ($result !== _FC_RETURN_)
 		#' . $uid . ' .fc_swiper_thumbs .swiper-slide img { display: block; border-radius: 4px; border: 2px solid transparent; }
 		#' . $uid . ' .fc_swiper_thumbs .swiper-slide-thumb-active img { border-color: var(--swiper-theme-color, #007aff); }
 		' . ($thumb_is_vertical ? '
-		#' . $uid . ' { display: flex; align-items: stretch; }
+		#' . $uid . ' { display: flex; align-items: stretch; gap: 10px; }
 		#' . $uid . '.fc_swiper_thumbs_left { flex-direction: row-reverse; }
 		#' . $uid . ' .fc_swiper_main { flex: 1; min-width: 0; }
 		#' . $uid . ' .fc_swiper_thumbs_vertical { flex: 0 0 auto; width: ' . $thumb_height . 'px; padding: 0; margin: 0 !important; }
@@ -665,6 +667,7 @@ if ($result !== _FC_RETURN_)
 		data-grid-fill="' . $grid_fill . '"
 		data-autoplay="' . ($autoplay ? 1 : 0) . '"
 		data-autoplay-delay="' . $autoplay_delay . '"
+		data-autoplay-hover="' . ($autoplay_hover ? 1 : 0) . '"
 		data-pagination="' . ($show_pagination ? 1 : 0) . '"
 		data-pag-type="' . $pag_type . '"
 		data-pag-clickable="' . ($pag_clickable ? 1 : 0) . '"

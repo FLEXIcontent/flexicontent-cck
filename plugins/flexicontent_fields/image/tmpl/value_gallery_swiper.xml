@@ -148,6 +148,10 @@
 				<option value="1" show_list="auto_play" hide_list="">FLEXI_YES</option>
 			</field>
 			<field name="PPFX_autoplay_delay" type="text" default="3000" label="Autoplay delay (ms)" description="Time in milliseconds between each automatic slide transition (e.g. 3000 = 3 seconds)" depend_class="auto_play" />
+			<field name="PPFX_autoplay_hover" type="radio" default="false" label="Pause on hover" description="Pause autoplay while the mouse is over the carousel (and resume when it leaves). Useful so visitors can read long content without the slides moving away." depend_class="auto_play" class="btn-group btn-group-yesno">
+				<option value="false">FLEXI_NO</option>
+				<option value="true">FLEXI_YES</option>
+			</field>
 			<field name="PPFX_show_nav" type="radio" default="true" label="Show navigation arrows" description="Display previous/next arrow buttons to navigate between slides" class="btn-group btn-group-yesno">
 				<option value="false">FLEXI_NO</option>
 				<option value="true">FLEXI_YES</option>
