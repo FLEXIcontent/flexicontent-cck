@@ -29,6 +29,37 @@ if ( !function_exists('fc_swiper_yn') )
 	}
 }
 
+// Helper: escape a value destined to an HTML attribute (a stray quote would
+// break the container tag and silently kill the whole gallery)
+if ( !function_exists('fc_swiper_attr') )
+{
+	function fc_swiper_attr($v)
+	{
+		return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
+	}
+}
+
+// Helper: keep a value inside a whitelist (protects both the markup and the JS)
+if ( !function_exists('fc_swiper_enum') )
+{
+	function fc_swiper_enum($v, $allowed, $default)
+	{
+		return in_array($v, $allowed, true) ? $v : $default;
+	}
+}
+
+// Helper: slides per view, either a positive integer or the 'auto' keyword
+if ( !function_exists('fc_swiper_spv') )
+{
+	function fc_swiper_spv($v, $default = '1')
+	{
+		$v = trim((string) $v);
+		if ($v === 'auto') return 'auto';
+		$n = (int) $v;
+		return $n > 0 ? (string) $n : $default;
+	}
+}
+
 // Swiper carousel parameters
 $autoplay        = fc_swiper_yn( $field->parameters->get( $PPFX_.'autoplay', 'false' ), 0 );
 $autoplay_delay  = (int) $field->parameters->get( $PPFX_.'autoplay_delay', 3000 );
@@ -37,7 +68,7 @@ $loop            = fc_swiper_yn( $field->parameters->get( $PPFX_.'loop_mode', 'f
 $rewind          = fc_swiper_yn( $field->parameters->get( $PPFX_.'rewind', 'false' ), 0 );
 $speed           = (int) $field->parameters->get( $PPFX_.'speed', 300 );
 $show_pagination = fc_swiper_yn( $field->parameters->get( $PPFX_.'show_pagination', 'true' ), 1 );
-$pag_type         = $field->parameters->get( $PPFX_.'pagination_type', 'bullets' );
+$pag_type         = fc_swiper_enum( $field->parameters->get( $PPFX_.'pagination_type', 'bullets' ), array('bullets', 'fraction', 'progressbar'), 'bullets' );
 $pag_clickable    = fc_swiper_yn( $field->parameters->get( $PPFX_.'pagination_clickable', 'true' ), 1 );
 $pag_dynamic      = fc_swiper_yn( $field->parameters->get( $PPFX_.'pagination_dynamic', 'false' ), 0 );
 $pag_hideonclick  = fc_swiper_yn( $field->parameters->get( $PPFX_.'pagination_hideonclick', 'false' ), 0 );
@@ -60,20 +91,25 @@ $show_thumbs     = fc_swiper_yn( $field->parameters->get( $PPFX_.'show_thumbs', 
 $swiper_thumb_size = $field->parameters->get( $PPFX_.'thumb_size', 'm' );
 $thumb_custom_w  = (int) $field->parameters->get( $PPFX_.'thumb_custom_size', 0 );
 $thumb_height    = (int) $field->parameters->get( $PPFX_.'thumb_height', 80 );
-$thumb_position  = $field->parameters->get( $PPFX_.'thumb_position', 'below' );
-if (!in_array($thumb_position, array('above','left','right'))) $thumb_position = 'below';
+$thumb_position  = fc_swiper_enum( $field->parameters->get( $PPFX_.'thumb_position', 'below' ), array('above', 'left', 'right', 'below'), 'below' );
 $thumb_is_vertical = in_array($thumb_position, array('left','right'));
 $slide_height    = trim( $field->parameters->get( $PPFX_.'slide_height', '' ) );
 $slide_is_ratio  = $slide_height !== '' && strpos($slide_height, '/') !== false;
 $slide_css_value = $slide_is_ratio ? $slide_height : ((int) $slide_height ? (int) $slide_height . 'px' : '');
-$image_fit    = $field->parameters->get( $PPFX_.'image_fit', 'cover' );
-if (!in_array($image_fit, array('cover', 'contain'))) $image_fit = 'cover';
+
+// A ratio is injected into CSS: only accept the "W/H" form
+if ($slide_is_ratio && !preg_match('#^\d+(\.\d+)?\s*/\s*\d+(\.\d+)?$#', $slide_css_value))
+{
+	$slide_css_value = '';
+	$slide_is_ratio  = false;
+}
+$image_fit    = fc_swiper_enum( $field->parameters->get( $PPFX_.'image_fit', 'cover' ), array('cover', 'contain'), 'cover' );
 $carousel_padding = trim( $field->parameters->get( $PPFX_.'carousel_padding', '' ) );
 if ($carousel_padding !== '' && !preg_match('/^(\d+(\.\d+)?[a-z%]*)(\s+(\d+(\.\d+)?[a-z%]*)){0,3}$/i', $carousel_padding)) $carousel_padding = '';
 
 // Swiper behavior parameters
-$direction      = $field->parameters->get( $PPFX_.'direction', 'horizontal' );
-$effect         = $field->parameters->get( $PPFX_.'effect', 'slide' );
+$direction      = fc_swiper_enum( $field->parameters->get( $PPFX_.'direction', 'horizontal' ), array('horizontal', 'vertical'), 'horizontal' );
+$effect         = fc_swiper_enum( $field->parameters->get( $PPFX_.'effect', 'slide' ), array('slide', 'fade', 'cube', 'flip', 'coverflow', 'cards'), 'slide' );
 $cube_shadow          = fc_swiper_yn( $field->parameters->get( $PPFX_.'cube_shadow', 'true' ), 1 );
 $flip_limit_rotation  = fc_swiper_yn( $field->parameters->get( $PPFX_.'flip_limit_rotation', 'true' ), 1 );
 $cards_rotate         = fc_swiper_yn( $field->parameters->get( $PPFX_.'cards_rotate', 'true' ), 1 );
@@ -86,13 +122,13 @@ $coverflow_depth   = (int) $field->parameters->get( $PPFX_.'coverflow_depth', 10
 $coverflow_scale   = (float) $field->parameters->get( $PPFX_.'coverflow_scale', 1 );
 $space_between  = (int) $field->parameters->get( $PPFX_.'space_between', 10 );
 $centered       = fc_swiper_yn( $field->parameters->get( $PPFX_.'centered_slides', 'false' ), 0 );
-$slides_per_view  = $field->parameters->get( $PPFX_.'slides_per_view', '1' );
-$slides_per_group = $field->parameters->get( $PPFX_.'slides_per_group', '1' );
+$slides_per_view  = fc_swiper_spv( $field->parameters->get( $PPFX_.'slides_per_view', '1' ), '1' );
+$slides_per_group = max(1, (int) $field->parameters->get( $PPFX_.'slides_per_group', 1 ));
 $grid_rows        = (int) $field->parameters->get( $PPFX_.'grid_rows', 1 );
-$grid_fill        = $field->parameters->get( $PPFX_.'grid_fill', 'row' );
+$grid_fill        = fc_swiper_enum( $field->parameters->get( $PPFX_.'grid_fill', 'row' ), array('row', 'column'), 'row' );
 $responsive_spv   = fc_swiper_yn( $field->parameters->get( $PPFX_.'responsive_spv', 'false' ), 0 );
-$spv_tablet       = $responsive_spv ? (string) $field->parameters->get( $PPFX_.'slides_per_view_tablet', '1' ) : '';
-$spv_phone        = $responsive_spv ? (string) $field->parameters->get( $PPFX_.'slides_per_view_phone', '1' ) : '';
+$spv_tablet       = $responsive_spv ? fc_swiper_spv( $field->parameters->get( $PPFX_.'slides_per_view_tablet', '1' ), '1' ) : '';
+$spv_phone        = $responsive_spv ? fc_swiper_spv( $field->parameters->get( $PPFX_.'slides_per_view_phone', '1' ), '1' ) : '';
 
 // Swiper limitations:
 // - Fade/Cube/Flip always display ONE slide at a time (slides per view is
@@ -112,10 +148,11 @@ if (!$grid_supported)
 }
 if ($single_slide_effect)
 {
-	$slides_per_view = '1';
-	$responsive_spv  = 0;
-	$spv_tablet      = '';
-	$spv_phone       = '';
+	$slides_per_view  = '1';
+	$slides_per_group = 1;
+	$responsive_spv   = 0;
+	$spv_tablet       = '';
+	$spv_phone        = '';
 }
 $grab_cursor    = fc_swiper_yn( $field->parameters->get( $PPFX_.'grab_cursor', 'false' ), 0 );
 $keyboard       = fc_swiper_yn( $field->parameters->get( $PPFX_.'keyboard', 'false' ), 0 );
@@ -152,6 +189,12 @@ if ($grid_rows > 1)
 	}
 }
 
+// Loop and rewind are mutually exclusive in Swiper
+if ($loop)
+{
+	$rewind = 0;
+}
+
 // Contain needs a defined cell area to letterbox around the image (object-fit).
 // Without a height the cell grows to the image, so contain would render exactly
 // like cover (image sized to 100% of the cell width). Force the same 16/9 area
@@ -173,7 +216,7 @@ $carousel_cap = ($auto_height && $slide_height !== '' && !$slide_is_ratio) ? (in
 // GLightbox parameters
 $open_size      = $field->parameters->get( $PPFX_.'open_size', 'l' );
 $show_caption   = fc_swiper_yn( $field->parameters->get( $PPFX_.'show_caption', 'true' ), 1 );
-$desc_position  = $field->parameters->get( $PPFX_.'desc_position', 'bottom' );
+$desc_position  = fc_swiper_enum( $field->parameters->get( $PPFX_.'desc_position', 'bottom' ), array('bottom', 'top', 'left', 'right'), 'bottom' );
 $glightbox_loop = fc_swiper_yn( $field->parameters->get( $PPFX_.'glightbox_loop', 'true' ), 1 );
 
 // Decode HTML entities until the string is stable
@@ -278,7 +321,7 @@ foreach ($values as $n => $value)
 		'<div class="swiper-slide">'
 			. '<a class="fc_glightbox" href="' . $modal_href . '" '
 				. $modal_attribs . ' ' . $group_str . ' '
-				. 'data-desc-position="' . $desc_position . '"' . $caption_str . '>'
+				. 'data-desc-position="' . fc_swiper_attr($desc_position) . '"' . $caption_str . '>'
 				. $img_legend_eager
 			. '</a>'
 			. $inline_info
@@ -318,258 +361,550 @@ foreach ($values as $n => $value)
 // ***
 // *** Add per page custom JS (ONE Swiper init for ALL the page's galleries, ONE GLightbox)
 // ***
+// *** NOTE: the script is a NOWDOC (<<<'FCJS'), so NOTHING is interpolated by PHP and
+// *** no character needs escaping. Every per-gallery option, GLightbox included, is read
+// *** from the container's data-* attributes, so galleries with different settings no
+// *** longer inherit the settings of whichever field happened to render first.
+// ***
 
 if ( !isset(static::$js_added['swiper_glightbox'][__FILE__]) )
 {
 	flexicontent_html::loadFramework('swiper');
 	flexicontent_html::loadFramework('glightbox');
 
-	$js = "
-	(function() {
-		function fcSwiperGlightboxInit() {
-			if (typeof window.Swiper === 'undefined' || typeof window.GLightbox === 'undefined') {
-				window.setTimeout(fcSwiperGlightboxInit, 100);
-				return;
-			}
+	$js = <<<'FCJS'
+(function () {
+	'use strict';
 
-			// Single GLightbox instance for all galleries of the page,
-			// data-gallery attribute isolates each field's / item's gallery
-			GLightbox({
+	var PREFIX     = '[fc_swiper]';
+	var MAX_TRIES  = 100;   // 100 x 100ms = 10s before giving up on the libraries
+	var WAIT_DELAY = 100;
+	var tries      = 0;
+
+	var VALID_EFFECTS = ['slide', 'fade', 'cube', 'flip', 'coverflow', 'cards', 'creative'];
+	var GRID_EFFECTS  = ['slide', 'fade', 'flip', 'coverflow', 'cards'];
+	var SINGLE_SLIDE_EFFECTS = ['fade', 'cube', 'flip'];
+
+	function isDebug() {
+		return window.FC_SWIPER_DEBUG === true ||
+			String(window.location.search).indexOf('fc_swiper_debug=1') > -1;
+	}
+
+	function logErr(msg, ctx)  { console.error(PREFIX + ' ' + msg, ctx === undefined ? '' : ctx); }
+	function logWarn(msg, ctx) { console.warn(PREFIX + ' ' + msg, ctx === undefined ? '' : ctx); }
+	function logInfo(msg, ctx) { if (isDebug()) { console.info(PREFIX + ' ' + msg, ctx === undefined ? '' : ctx); } }
+
+	function label(container) {
+		return '#' + (container.id || '(no id)');
+	}
+
+	// ---------------------------------------------------------------------
+	// GLightbox (called AFTER the swipers, so loop clones are also bound)
+	// ---------------------------------------------------------------------
+	function initGlightbox() {
+		var anchors = document.querySelectorAll('.fc_glightbox');
+		if (!anchors.length) {
+			logInfo('no .fc_glightbox anchors on the page, lightbox not initialised');
+			return;
+		}
+
+		// Per-gallery options are read from the first container that carries them,
+		// GLightbox is a single page-wide instance.
+		var optHost   = document.querySelector('.fc_swiper_container[data-gl-loop]');
+		var glLoop    = optHost ? optHost.getAttribute('data-gl-loop') !== '0' : true;
+		var glDescPos = (optHost && optHost.getAttribute('data-gl-desc-position')) || 'bottom';
+
+		try {
+			window.fcGlightbox = GLightbox({
 				selector: '.fc_glightbox',
-				loop: " . ($glightbox_loop ? 'true' : 'false') . ",
+				loop: glLoop,
 				closeOnOutsideClick: true,
 				zoomable: true,
 				draggable: true,
 				preload: true,
-				descPosition: '" . addslashes($desc_position) . "'
+				descPosition: glDescPos
 			});
+			logInfo('GLightbox initialised on ' + anchors.length + ' anchor(s)');
+		} catch (e) {
+			logErr('GLightbox initialisation failed', e);
+		}
+	}
 
-			// Initialize every Swiper gallery of the page from its data-* attributes
-			document.querySelectorAll('.fc_swiper_container').forEach(function(container) {
-				var mainEl  = container.querySelector('.fc_swiper_main');
-				var thumbEl = container.querySelector('.fc_swiper_thumbs');
-				if (!mainEl) return;
+	// ---------------------------------------------------------------------
+	// Markup normalisation: rescue slides emitted outside .swiper-wrapper
+	// ---------------------------------------------------------------------
+	function normalizeSlides(mainEl, container) {
+		var wrapper = mainEl.querySelector('.swiper-wrapper');
 
-				var spaceValue = parseInt(container.getAttribute('data-space'), 10);
-				var fx = container.getAttribute('data-effect') || 'slide';
-				var mainParams = {
-					spaceBetween: isNaN(spaceValue) ? 10 : spaceValue,
-					speed: parseInt(container.getAttribute('data-speed') || '300', 10) || 300,
-					observer: true,
-					observeParents: false,
-					watchOverflow: true,
-					fitToWrapper: false,
-					direction: container.getAttribute('data-direction') || 'horizontal',
-					effect: fx
-				};
+		if (!wrapper) {
+			logErr(label(container) + ' has no .swiper-wrapper inside .fc_swiper_main, cannot initialise', mainEl);
+			return null;
+		}
 
-				var spv = container.getAttribute('data-slides-per-view') || '1';
-				var spvTablet = container.getAttribute('data-spv-tablet');
-				var spvPhone = container.getAttribute('data-spv-phone');
+		var all     = mainEl.querySelectorAll('.swiper-slide');
+		var strays  = [];
+		var i;
 
-				// Swiper limitation: fade/cube/flip only ever show ONE slide at a time
-				// (cards shows a visible stack behind the active card, so it accepts slidesPerView > 1)
-				if (fx === 'fade' || fx === 'cube' || fx === 'flip') {
-					spv = '1';
-					spvTablet = '';
-					spvPhone = '';
+		for (i = 0; i < all.length; i++) {
+			if (all[i].parentNode !== wrapper) { strays.push(all[i]); }
+		}
+
+		if (strays.length) {
+			logWarn(
+				label(container) + ': ' + strays.length + ' slide(s) were rendered OUTSIDE .swiper-wrapper and have been ' +
+				'moved back in. This is a template bug: the value separator is injecting closing/opening tags between ' +
+				'slides (check the field\'s "value separator" parameter / $separatorf).',
+				strays
+			);
+			for (i = 0; i < strays.length; i++) { wrapper.appendChild(strays[i]); }
+
+			// Drop the now-empty leftover containers the separator created
+			mainEl.querySelectorAll('.compare, .fcclear').forEach(function (el) {
+				if (el.parentNode !== wrapper && !el.querySelector('.swiper-slide') && !el.textContent.trim()) {
+					el.parentNode.removeChild(el);
 				}
-
-				// Effects with 3D slide shadows (generic option, Swiper defaults: ON) + their specific options
-				var slideShadows = container.getAttribute('data-slide-shadows') !== '0';
-
-				if (fx === 'cube') {
-					mainParams.cubeEffect = {
-						slideShadows: slideShadows,
-						shadow: container.getAttribute('data-cube-shadow') !== '0'
-					};
-				}
-
-				if (fx === 'flip') {
-					mainParams.flipEffect = {
-						slideShadows: slideShadows,
-						limitRotation: container.getAttribute('data-flip-limit-rotation') !== '0'
-					};
-				}
-
-				if (fx === 'cards') {
-					var caOffset = parseInt(container.getAttribute('data-cards-per-slide-offset'), 10);
-					var caRotate = parseInt(container.getAttribute('data-cards-per-slide-rotate'), 10);
-					mainParams.cardsEffect = {
-						slideShadows: slideShadows,
-						rotate: container.getAttribute('data-cards-rotate') !== '0',
-						perSlideOffset: isNaN(caOffset) ? 8 : caOffset,
-						perSlideRotate: isNaN(caRotate) ? 2 : caRotate
-					};
-				}
-
-				if (fx === 'coverflow') {
-					var cfRotate  = parseInt(container.getAttribute('data-coverflow-rotate'), 10);
-					var cfStretch = parseInt(container.getAttribute('data-coverflow-stretch'), 10);
-					var cfDepth   = parseInt(container.getAttribute('data-coverflow-depth'), 10);
-					var cfScale   = parseFloat(container.getAttribute('data-coverflow-scale'));
-					mainParams.coverflowEffect = {
-						slideShadows: slideShadows,
-						rotate: isNaN(cfRotate) ? 50 : cfRotate,
-						stretch: isNaN(cfStretch) ? 0 : cfStretch,
-						depth: isNaN(cfDepth) ? 100 : cfDepth,
-						scale: isNaN(cfScale) ? 1 : cfScale
-					};
-				}
-
-				if (spvPhone || spvTablet) {
-					mainParams.slidesPerView = spvPhone === 'auto' ? 'auto' : parseInt(spvPhone, 10) || 1;
-					mainParams.breakpoints = {};
-					if (spvTablet) {
-						mainParams.breakpoints[768] = { slidesPerView: spvTablet === 'auto' ? 'auto' : parseInt(spvTablet, 10) || 1 };
-					}
-					mainParams.breakpoints[1200] = { slidesPerView: spv === 'auto' ? 'auto' : parseInt(spv, 10) || 1 };
-				} else {
-					mainParams.slidesPerView = spv === 'auto' ? 'auto' : parseInt(spv, 10) || 1;
-				}
-
-				var spg = container.getAttribute('data-slides-per-group') || '1';
-				mainParams.slidesPerGroup = parseInt(spg, 10) || 1;
-
-				if (container.getAttribute('data-auto-height') === '1') {
-					mainParams.autoHeight = true;
-				}
-
-				if (container.getAttribute('data-centered') === '1') {
-					mainParams.centeredSlides = true;
-				}
-
-				if (container.getAttribute('data-grab-cursor') === '1') {
-					mainParams.grabCursor = true;
-				}
-
-				if (container.getAttribute('data-keyboard') === '1') {
-					mainParams.keyboard = { enabled: true };
-				}
-
-				if (container.getAttribute('data-mousewheel') === '1') {
-					mainParams.mousewheel = { forceToAxis: true };
-				}
-
-				if (container.getAttribute('data-loop') === '1') {
-					mainParams.loop = true;
-				}
-
-				if (container.getAttribute('data-rewind') === '1') {
-					mainParams.rewind = true;
-				}
-
-				// Grid layout is supported by the slide, fade, flip, coverflow and cards effects
-				// (only cube renders broken cells in a grid)
-				var gridRows = parseInt(container.getAttribute('data-grid-rows') || '1', 10) || 1;
-				if (fx !== 'slide' && fx !== 'fade' && fx !== 'flip' && fx !== 'coverflow' && fx !== 'cards') {
-					gridRows = 1;
-				}
-				if (gridRows > 1) {
-					mainParams.grid = {
-						rows: gridRows,
-						fill: container.getAttribute('data-grid-fill') || 'row'
-					};
-					if (mainParams.slidesPerView === 'auto') {
-						mainParams.slidesPerView = 1;
-					}
-				}
-
-				if (container.getAttribute('data-autoplay') === '1') {
-					mainParams.autoplay = {
-						delay: parseInt(container.getAttribute('data-autoplay-delay') || '3000', 10) || 3000,
-						disableOnInteraction: false,
-						pauseOnMouseEnter: container.getAttribute('data-autoplay-hover') === '1'
-					};
-				}
-
-				if (container.getAttribute('data-pagination') === '1' && mainEl.querySelector('.swiper-pagination')) {
-					var pagParams = {
-						el: mainEl.querySelector('.swiper-pagination'),
-						clickable: container.getAttribute('data-pag-clickable') === '1'
-					};
-
-					var pagType = container.getAttribute('data-pag-type') || 'bullets';
-					if (pagType !== 'bullets') {
-						pagParams.type = pagType;
-					}
-
-					if (pagType === 'bullets' && container.getAttribute('data-pag-dynamic') === '1') {
-						pagParams.dynamicBullets = true;
-					}
-
-					if (pagType === 'fraction') {
-						var fractionFormat = container.getAttribute('data-pag-fraction') || '{current} / {total}';
-						pagParams.renderFraction = function(currentClass, totalClass) {
-							return fractionFormat
-								.replace(/\{current\}/g, '<span class=\"' + currentClass + '\"></span>')
-								.replace(/\{total\}/g, '<span class=\"' + totalClass + '\"></span>');
-						};
-					}
-
-					if (container.getAttribute('data-pag-hideonclick') === '1') {
-						pagParams.hideOnClick = true;
-					}
-
-					mainParams.pagination = pagParams;
-				}
-
-				if (container.getAttribute('data-nav') === '1') {
-					mainParams.navigation = {
-nextEl: mainEl.querySelector('.swiper-button-next'),
-					prevEl: mainEl.querySelector('.swiper-button-prev')
-					};
-				}
-
-				if (container.getAttribute('data-scrollbar') === '1' && mainEl.querySelector('.swiper-scrollbar')) {
-					var sbParams = {
-						el: mainEl.querySelector('.swiper-scrollbar'),
-						draggable: container.getAttribute('data-scrollbar-draggable') === '1',
-						hide: container.getAttribute('data-scrollbar-hide') === '1'
-					};
-					var sbDragSize = parseInt(container.getAttribute('data-scrollbar-drag-size') || '0', 10) || 0;
-					if (sbDragSize) {
-						sbParams.dragSize = sbDragSize;
-					}
-					mainParams.scrollbar = sbParams;
-				}
-
-				// Thumbnails controller
-				if (container.getAttribute('data-thumbs') === '1' && thumbEl) {
-					var thumbParams = {
-						spaceBetween: 8,
-						slidesPerView: 'auto',
-						freeMode: true,
-						watchSlidesProgress: true
-					};
-					if (container.getAttribute('data-thumb-vertical') === '1') {
-						thumbParams.direction = 'vertical';
-						thumbParams.centeredSlides = true;
-						thumbParams.centeredSlidesBounds = true;
-					}
-					var thumbSwiper = new Swiper(thumbEl, thumbParams);
-					mainParams.thumbs = { swiper: thumbSwiper };
-				}
-
-				// Force all carousel images to load (Swiper uses translate3d, lazy images never trigger)
-				container.querySelectorAll('.swiper-slide img[loading=\"lazy\"]').forEach(function(img) {
-					img.removeAttribute('loading');
-					if (!img.complete) { img.src = img.src; }
-				});
-
-				var swiper = new Swiper(mainEl, mainParams);
-				container.querySelectorAll('.swiper-slide img').forEach(function(img) {
-					if (!img.complete) {
-						img.addEventListener('load', function() { swiper.update(); }, { once: true });
-					}
-				});
 			});
 		}
 
-		if (document.readyState === 'complete' || document.readyState === 'interactive') fcSwiperGlightboxInit();
-		else document.addEventListener('DOMContentLoaded', fcSwiperGlightboxInit);
-	})();
-	";
+		var count = wrapper.querySelectorAll(':scope > .swiper-slide').length;
+
+		if (count === 0) {
+			logErr(label(container) + ' contains no .swiper-slide element, nothing to initialise', mainEl);
+			return null;
+		}
+
+		logInfo(label(container) + ': ' + count + ' slide(s) found');
+		return count;
+	}
+
+	// ---------------------------------------------------------------------
+	// Parameter building
+	// ---------------------------------------------------------------------
+	function intAttr(container, name, fallback) {
+		var raw = container.getAttribute(name);
+		var val = parseInt(raw, 10);
+		if (raw !== null && raw !== '' && isNaN(val)) {
+			logWarn(label(container) + ': ' + name + '="' + raw + '" is not a number, falling back to ' + fallback);
+		}
+		return isNaN(val) ? fallback : val;
+	}
+
+	function floatAttr(container, name, fallback) {
+		var raw = container.getAttribute(name);
+		var val = parseFloat(raw);
+		if (raw !== null && raw !== '' && isNaN(val)) {
+			logWarn(label(container) + ': ' + name + '="' + raw + '" is not a number, falling back to ' + fallback);
+		}
+		return isNaN(val) ? fallback : val;
+	}
+
+	function spvValue(raw, fallback) {
+		if (raw === 'auto') { return 'auto'; }
+		var n = parseInt(raw, 10);
+		return isNaN(n) || n < 1 ? fallback : n;
+	}
+
+	function buildParams(container, mainEl, slideCount) {
+		var fx = container.getAttribute('data-effect') || 'slide';
+
+		if (VALID_EFFECTS.indexOf(fx) === -1) {
+			logErr(label(container) + ': unknown effect "' + fx + '", falling back to "slide"');
+			fx = 'slide';
+		}
+
+		var params = {
+			effect: fx,
+			direction: container.getAttribute('data-direction') === 'vertical' ? 'vertical' : 'horizontal',
+			spaceBetween: intAttr(container, 'data-space', 10),
+			speed: intAttr(container, 'data-speed', 300) || 300,
+			observer: true,
+			observeParents: true,   // recover when a hidden parent (tab/accordion) becomes visible
+			observeSlideChildren: true,
+			watchOverflow: true,
+			on: {}
+		};
+
+		// --- slides per view (responsive) ---------------------------------
+		var spv       = container.getAttribute('data-slides-per-view') || '1';
+		var spvTablet = container.getAttribute('data-spv-tablet') || '';
+		var spvPhone  = container.getAttribute('data-spv-phone') || '';
+
+		if (SINGLE_SLIDE_EFFECTS.indexOf(fx) > -1) {
+			if (spv !== '1' || spvTablet || spvPhone) {
+				logInfo(label(container) + ': effect "' + fx + '" only displays one slide at a time, ' +
+					'slides-per-view forced to 1');
+			}
+			spv = '1'; spvTablet = ''; spvPhone = '';
+		}
+
+		if (spvPhone || spvTablet) {
+			var base = spvPhone || spvTablet || spv;
+			params.slidesPerView = spvValue(base, 1);
+			params.breakpoints = {};
+			params.breakpoints[768]  = { slidesPerView: spvValue(spvTablet || spv, 1) };
+			params.breakpoints[1200] = { slidesPerView: spvValue(spv, 1) };
+		} else {
+			params.slidesPerView = spvValue(spv, 1);
+		}
+
+		params.slidesPerGroup = intAttr(container, 'data-slides-per-group', 1) || 1;
+
+		// --- effect specific options --------------------------------------
+		var slideShadows = container.getAttribute('data-slide-shadows') !== '0';
+
+		if (fx === 'cube') {
+			params.cubeEffect = {
+				slideShadows: slideShadows,
+				shadow: container.getAttribute('data-cube-shadow') !== '0'
+			};
+		}
+		if (fx === 'flip') {
+			params.flipEffect = {
+				slideShadows: slideShadows,
+				limitRotation: container.getAttribute('data-flip-limit-rotation') !== '0'
+			};
+		}
+		if (fx === 'cards') {
+			params.cardsEffect = {
+				slideShadows: slideShadows,
+				rotate: container.getAttribute('data-cards-rotate') !== '0',
+				perSlideOffset: floatAttr(container, 'data-cards-per-slide-offset', 8),
+				perSlideRotate: floatAttr(container, 'data-cards-per-slide-rotate', 2)
+			};
+		}
+		if (fx === 'coverflow') {
+			params.coverflowEffect = {
+				slideShadows: slideShadows,
+				rotate: intAttr(container, 'data-coverflow-rotate', 50),
+				stretch: intAttr(container, 'data-coverflow-stretch', 0),
+				depth: intAttr(container, 'data-coverflow-depth', 100),
+				scale: floatAttr(container, 'data-coverflow-scale', 1)
+			};
+		}
+
+		// --- booleans ------------------------------------------------------
+		if (container.getAttribute('data-auto-height') === '1')  { params.autoHeight = true; }
+		if (container.getAttribute('data-centered') === '1')     { params.centeredSlides = true; }
+		if (container.getAttribute('data-grab-cursor') === '1')  { params.grabCursor = true; }
+		if (container.getAttribute('data-keyboard') === '1')     { params.keyboard = { enabled: true }; }
+		if (container.getAttribute('data-mousewheel') === '1')   { params.mousewheel = { forceToAxis: true }; }
+		if (container.getAttribute('data-loop') === '1')         { params.loop = true; }
+		if (container.getAttribute('data-rewind') === '1')       { params.rewind = true; }
+
+		if (params.loop && params.rewind) {
+			logWarn(label(container) + ': loop and rewind are mutually exclusive, rewind ignored');
+			delete params.rewind;
+		}
+
+		// --- grid ----------------------------------------------------------
+		var gridRows = intAttr(container, 'data-grid-rows', 1) || 1;
+
+		if (gridRows > 1 && GRID_EFFECTS.indexOf(fx) === -1) {
+			logWarn(label(container) + ': effect "' + fx + '" does not support a multi-row grid, rows forced to 1');
+			gridRows = 1;
+		}
+		if (gridRows > 1) {
+			if (params.loop) {
+				logWarn(label(container) + ': Swiper does not support grid.rows together with loop, loop disabled');
+				params.loop = false;
+			}
+			if (params.autoHeight) {
+				logWarn(label(container) + ': autoHeight is incompatible with grid.rows, autoHeight disabled ' +
+					'(give .fc_swiper_main an explicit height or aspect-ratio instead)');
+				params.autoHeight = false;
+			}
+			if (params.slidesPerView === 'auto') {
+				logWarn(label(container) + ': slidesPerView "auto" is not supported with grid.rows, using 1');
+				params.slidesPerView = 1;
+			}
+			params.grid = {
+				rows: gridRows,
+				fill: container.getAttribute('data-grid-fill') === 'column' ? 'column' : 'row'
+			};
+		}
+
+		// --- autoplay ------------------------------------------------------
+		if (container.getAttribute('data-autoplay') === '1') {
+			params.autoplay = {
+				delay: intAttr(container, 'data-autoplay-delay', 3000) || 3000,
+				disableOnInteraction: false,
+				pauseOnMouseEnter: container.getAttribute('data-autoplay-hover') === '1'
+			};
+		}
+
+		// --- pagination ----------------------------------------------------
+		if (container.getAttribute('data-pagination') === '1') {
+			var pagEl = mainEl.querySelector('.swiper-pagination') || container.querySelector('.swiper-pagination');
+			if (!pagEl) {
+				logWarn(label(container) + ': pagination is enabled but no .swiper-pagination element was found');
+			} else {
+				var pagType = container.getAttribute('data-pag-type') || 'bullets';
+				var pagParams = {
+					el: pagEl,
+					clickable: container.getAttribute('data-pag-clickable') === '1'
+				};
+				if (pagType !== 'bullets') { pagParams.type = pagType; }
+				if (pagType === 'bullets' && container.getAttribute('data-pag-dynamic') === '1') {
+					pagParams.dynamicBullets = true;
+				}
+				if (pagType === 'fraction') {
+					var fmt = container.getAttribute('data-pag-fraction') || '{current} / {total}';
+					pagParams.renderFraction = function (currentClass, totalClass) {
+						return fmt
+							.replace(/\{current\}/g, '<span class="' + currentClass + '"></span>')
+							.replace(/\{total\}/g, '<span class="' + totalClass + '"></span>');
+					};
+				}
+				if (container.getAttribute('data-pag-hideonclick') === '1') { pagParams.hideOnClick = true; }
+				params.pagination = pagParams;
+			}
+		}
+
+		// --- navigation ----------------------------------------------------
+		if (container.getAttribute('data-nav') === '1') {
+			var nextEl = mainEl.querySelector('.swiper-button-next') || container.querySelector('.swiper-button-next');
+			var prevEl = mainEl.querySelector('.swiper-button-prev') || container.querySelector('.swiper-button-prev');
+			if (!nextEl || !prevEl) {
+				logWarn(label(container) + ': navigation is enabled but the arrow element(s) are missing', { nextEl: nextEl, prevEl: prevEl });
+			} else {
+				params.navigation = { nextEl: nextEl, prevEl: prevEl };
+			}
+		}
+
+		// --- scrollbar -----------------------------------------------------
+		if (container.getAttribute('data-scrollbar') === '1') {
+			var sbEl = mainEl.querySelector('.swiper-scrollbar') || container.querySelector('.swiper-scrollbar');
+			if (!sbEl) {
+				logWarn(label(container) + ': scrollbar is enabled but no .swiper-scrollbar element was found');
+			} else {
+				params.scrollbar = {
+					el: sbEl,
+					draggable: container.getAttribute('data-scrollbar-draggable') === '1',
+					hide: container.getAttribute('data-scrollbar-hide') === '1'
+				};
+				var dragSize = intAttr(container, 'data-scrollbar-drag-size', 0);
+				if (dragSize > 0) { params.scrollbar.dragSize = dragSize; }
+			}
+		}
+
+		// --- loop sanity ----------------------------------------------------
+		if (params.loop) {
+			var perView = params.slidesPerView === 'auto' ? 1 : params.slidesPerView;
+			if (slideCount <= perView) {
+				logWarn(label(container) + ': loop is enabled but there are only ' + slideCount + ' slide(s) for ' +
+					perView + ' per view, Swiper will disable looping');
+			}
+		}
+
+		return params;
+	}
+
+	// ---------------------------------------------------------------------
+	// Thumbnails
+	// ---------------------------------------------------------------------
+	function initThumbs(container, thumbEl) {
+		if (container.getAttribute('data-thumbs') !== '1') { return null; }
+
+		if (!thumbEl) {
+			logWarn(label(container) + ': thumbnails are enabled but no .fc_swiper_thumbs element was found');
+			return null;
+		}
+		if (thumbEl.swiper) {
+			logInfo(label(container) + ': thumbnail swiper already initialised, reusing it');
+			return thumbEl.swiper;
+		}
+
+		var thumbWrapper = thumbEl.querySelector('.swiper-wrapper');
+		if (!thumbWrapper || !thumbWrapper.querySelector('.swiper-slide')) {
+			logWarn(label(container) + ': the thumbnail strip has no slides, thumbnails disabled', thumbEl);
+			return null;
+		}
+
+		var thumbParams = {
+			spaceBetween: 8,
+			slidesPerView: 'auto',
+			freeMode: true,
+			watchSlidesProgress: true,
+			observer: true,
+			observeParents: true
+		};
+		if (container.getAttribute('data-thumb-vertical') === '1') {
+			thumbParams.direction = 'vertical';
+			thumbParams.centeredSlides = true;
+			thumbParams.centeredSlidesBounds = true;
+		}
+
+		try {
+			return new Swiper(thumbEl, thumbParams);
+		} catch (e) {
+			logErr(label(container) + ': thumbnail swiper failed to initialise', e);
+			return null;
+		}
+	}
+
+	// ---------------------------------------------------------------------
+	// Post-init diagnostics
+	// ---------------------------------------------------------------------
+	function postInitChecks(container, mainEl, swiper, slideCount) {
+		var perView = swiper.params.slidesPerView === 'auto' ? 1 : swiper.params.slidesPerView;
+
+		if (swiper.isLocked || slideCount <= perView) {
+			logInfo(label(container) + ': only ' + slideCount + ' slide(s) for ' + perView + ' per view, ' +
+				'Swiper locked the navigation and pagination (watchOverflow). This is why the gallery looks "dead".');
+		}
+
+		if (mainEl.offsetWidth === 0) {
+			logWarn(label(container) + ': the carousel has a width of 0px at init time (hidden parent: tab, ' +
+				'accordion, display:none?). Call window.fcSwiperGlightbox.update() once it becomes visible.', mainEl);
+
+			if (typeof IntersectionObserver !== 'undefined') {
+				var io = new IntersectionObserver(function (entries) {
+					entries.forEach(function (entry) {
+						if (entry.isIntersecting && entry.target.offsetWidth > 0) {
+							swiper.update();
+							logInfo(label(container) + ': became visible, swiper.update() called');
+							io.disconnect();
+						}
+					});
+				});
+				io.observe(mainEl);
+			}
+		}
+
+		var fx = swiper.params.effect;
+		if (fx !== 'slide' && !mainEl.classList.contains('swiper-' + fx)) {
+			logWarn(label(container) + ': the "' + fx + '" effect module does not appear to be active. Make sure you ' +
+				'are loading swiper-bundle.min.js, not the module build swiper.min.js.', mainEl);
+		}
+	}
+
+	// ---------------------------------------------------------------------
+	// Image loading (Swiper uses translate3d, lazy images outside the viewport never fire)
+	// ---------------------------------------------------------------------
+	function forceEagerImages(container) {
+		container.querySelectorAll('.swiper-slide img[loading="lazy"]').forEach(function (img) {
+			img.removeAttribute('loading');
+		});
+	}
+
+	function watchImages(container, swiper) {
+		container.querySelectorAll('.swiper-slide img').forEach(function (img) {
+			if (!img.complete) {
+				img.addEventListener('load', function () {
+					try { swiper.update(); } catch (e) { logErr('swiper.update() after image load failed', e); }
+				}, { once: true });
+				img.addEventListener('error', function () {
+					logWarn(label(container) + ': image failed to load: ' + img.currentSrc || img.src, img);
+				}, { once: true });
+			}
+		});
+	}
+
+	// ---------------------------------------------------------------------
+	// Single gallery
+	// ---------------------------------------------------------------------
+	function initContainer(container) {
+		var mainEl = container.querySelector('.fc_swiper_main');
+
+		if (!mainEl) {
+			logErr(label(container) + ' has no .fc_swiper_main element, skipped', container);
+			return null;
+		}
+		if (mainEl.swiper) {
+			logInfo(label(container) + ' is already initialised, skipped');
+			return mainEl.swiper;
+		}
+
+		var slideCount = normalizeSlides(mainEl, container);
+		if (!slideCount) { return null; }
+
+		forceEagerImages(container);
+
+		var params = buildParams(container, mainEl, slideCount);
+		var thumbSwiper = initThumbs(container, container.querySelector('.fc_swiper_thumbs'));
+		if (thumbSwiper) { params.thumbs = { swiper: thumbSwiper }; }
+
+		var swiper;
+		try {
+			swiper = new Swiper(mainEl, params);
+		} catch (e) {
+			logErr(label(container) + ': Swiper constructor threw, gallery not initialised', e);
+			logErr(label(container) + ': parameters used were', params);
+			return null;
+		}
+
+		postInitChecks(container, mainEl, swiper, slideCount);
+		watchImages(container, swiper);
+
+		logInfo(label(container) + ' initialised', { effect: params.effect, slides: slideCount, params: params });
+		return swiper;
+	}
+
+	// ---------------------------------------------------------------------
+	// Entry point
+	// ---------------------------------------------------------------------
+	function initAll(root) {
+		var scope = root || document;
+		var containers = scope.querySelectorAll('.fc_swiper_container');
+
+		if (!containers.length) {
+			logInfo('no .fc_swiper_container found in the given scope');
+		}
+
+		var instances = [];
+		containers.forEach(function (container) {
+			try {
+				var s = initContainer(container);
+				if (s) { instances.push(s); }
+			} catch (e) {
+				logErr(label(container) + ': unexpected error during initialisation', e);
+			}
+		});
+
+		// GLightbox last: loop clones created by Swiper must already exist
+		initGlightbox();
+
+		window.fcSwiperGlightbox.instances = instances;
+		logInfo(instances.length + ' gallery/galleries initialised');
+		return instances;
+	}
+
+	function boot() {
+		var missing = [];
+		if (typeof window.Swiper === 'undefined')    { missing.push('Swiper'); }
+		if (typeof window.GLightbox === 'undefined') { missing.push('GLightbox'); }
+
+		if (missing.length) {
+			tries++;
+			if (tries > MAX_TRIES) {
+				logErr('gave up after ' + Math.round(MAX_TRIES * WAIT_DELAY / 1000) + 's: ' +
+					missing.join(' and ') + ' never became available. Check that the asset(s) are actually ' +
+					'loaded on this page (flexicontent_html::loadFramework) and that no 404 / CSP error is shown above.');
+				return;
+			}
+			if (tries === 1) { logInfo('waiting for ' + missing.join(' and ') + '...'); }
+			window.setTimeout(boot, WAIT_DELAY);
+			return;
+		}
+
+		logInfo('Swiper ' + (window.Swiper.version || '?') + ' and GLightbox are available');
+		initAll(document);
+	}
+
+	window.fcSwiperGlightbox = {
+		init: initAll,                  // re-init after an AJAX insert: fcSwiperGlightbox.init(newNode)
+		instances: [],
+		update: function () {
+			window.fcSwiperGlightbox.instances.forEach(function (s) {
+				try { s.update(); } catch (e) { logErr('update() failed', e); }
+			});
+		}
+	};
+
+	if (document.readyState === 'complete' || document.readyState === 'interactive') { boot(); }
+	else { document.addEventListener('DOMContentLoaded', boot); }
+})();
+FCJS;
 
 	\Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
 
@@ -584,8 +919,15 @@ nextEl: mainEl.querySelector('.swiper-button-next'),
 $result = include( JPATH_ROOT . '/plugins/flexicontent_fields/image/tmpl_common/before_values_finalize.php' );
 if ($result !== _FC_RETURN_)
 {
-	// Add value separator
-	$field->{$prop} = implode($separatorf, $field->{$prop});
+	// *** IMPORTANT ***
+	// The slides are STRUCTURAL markup, they must be concatenated with an empty string.
+	// Do NOT use $separatorf here: some of the configurable value separators are tag
+	// pairs such as </div><div class="compare"> which close .swiper-wrapper after the
+	// first slide and push every other slide OUTSIDE of it. Swiper only collects the
+	// .swiper-slide elements that are DIRECT CHILDREN of .swiper-wrapper, so the
+	// carousel then shows a single slide, and watchOverflow locks the navigation and
+	// the pagination (the gallery looks dead while GLightbox keeps working).
+	$field->{$prop} = implode('', $field->{$prop});
 
 	// Thumbnail strip HTML
 	$thumbs_html = '';
@@ -595,9 +937,7 @@ if ($result !== _FC_RETURN_)
 		$thumb_margin = $thumb_position === 'above' ? 'margin-bottom:10px;' : 'margin-top:10px;';
 		$thumbs_html = '
 		<div class="' . $thumb_cls . '" style="' . $thumb_margin . ' padding-bottom: 2px;">
-			<div class="swiper-wrapper">
-				' . implode('', $swiper_thumbs) . '
-			</div>
+			<div class="swiper-wrapper">' . implode('', $swiper_thumbs) . '</div>
 		</div>';
 	}
 
@@ -659,42 +999,42 @@ if ($result !== _FC_RETURN_)
 		#' . $uid . ' .fc_swiper_main.swiper-vertical .swiper-button-next { top: auto; bottom: 10px; transform: translateX(-50%) rotate(90deg); }' : '') . '
 	</style>
 
-	<div id="' . $uid . '" class="fc_swiper_container fc_swiper_thumbs_' . $thumb_position . '"
-		data-speed="' . $speed . '"
+	<div id="' . $uid . '" class="fc_swiper_container fc_swiper_thumbs_' . fc_swiper_attr($thumb_position) . '"
+		data-speed="' . (int) $speed . '"
 		data-loop="' . ($loop ? 1 : 0) . '"
 		data-rewind="' . ($rewind ? 1 : 0) . '"
-		data-grid-rows="' . $grid_rows . '"
-		data-grid-fill="' . $grid_fill . '"
+		data-grid-rows="' . (int) $grid_rows . '"
+		data-grid-fill="' . fc_swiper_attr($grid_fill) . '"
 		data-autoplay="' . ($autoplay ? 1 : 0) . '"
-		data-autoplay-delay="' . $autoplay_delay . '"
+		data-autoplay-delay="' . (int) $autoplay_delay . '"
 		data-autoplay-hover="' . ($autoplay_hover ? 1 : 0) . '"
 		data-pagination="' . ($show_pagination ? 1 : 0) . '"
-		data-pag-type="' . $pag_type . '"
+		data-pag-type="' . fc_swiper_attr($pag_type) . '"
 		data-pag-clickable="' . ($pag_clickable ? 1 : 0) . '"
 		data-pag-dynamic="' . ($pag_dynamic ? 1 : 0) . '"
 		data-pag-hideonclick="' . ($pag_hideonclick ? 1 : 0) . '"
-		data-pag-fraction="' . $pag_fraction . '"
+		data-pag-fraction="' . fc_swiper_attr($pag_fraction) . '"
 		data-nav="' . ($show_nav ? 1 : 0) . '"
 		data-thumbs="' . ($show_thumbs && count($swiper_thumbs) ? 1 : 0) . '"
 		data-thumb-vertical="' . ($thumb_is_vertical ? 1 : 0) . '"
-		data-direction="' . $direction . '"
+		data-direction="' . fc_swiper_attr($direction) . '"
 		data-auto-height="' . ($auto_height ? 1 : 0) . '"
-		data-effect="' . $effect . '"
-		data-slide-shadows="' . $slide_shadows . '"
-		data-cube-shadow="' . $cube_shadow . '"
-		data-flip-limit-rotation="' . $flip_limit_rotation . '"
-		data-cards-rotate="' . $cards_rotate . '"
-		data-cards-per-slide-offset="' . $cards_per_slide_offset . '"
-		data-cards-per-slide-rotate="' . $cards_per_slide_rotate . '"
-		data-coverflow-rotate="' . $coverflow_rotate . '"
-		data-coverflow-stretch="' . $coverflow_stretch . '"
-		data-coverflow-depth="' . $coverflow_depth . '"
-		data-coverflow-scale="' . $coverflow_scale . '"
-		data-space="' . $space_between . '"
-		data-slides-per-view="' . $slides_per_view . '"
-		data-slides-per-group="' . $slides_per_group . '"
-		data-spv-tablet="' . $spv_tablet . '"
-		data-spv-phone="' . $spv_phone . '"
+		data-effect="' . fc_swiper_attr($effect) . '"
+		data-slide-shadows="' . ($slide_shadows ? 1 : 0) . '"
+		data-cube-shadow="' . ($cube_shadow ? 1 : 0) . '"
+		data-flip-limit-rotation="' . ($flip_limit_rotation ? 1 : 0) . '"
+		data-cards-rotate="' . ($cards_rotate ? 1 : 0) . '"
+		data-cards-per-slide-offset="' . (float) $cards_per_slide_offset . '"
+		data-cards-per-slide-rotate="' . (float) $cards_per_slide_rotate . '"
+		data-coverflow-rotate="' . (int) $coverflow_rotate . '"
+		data-coverflow-stretch="' . (int) $coverflow_stretch . '"
+		data-coverflow-depth="' . (int) $coverflow_depth . '"
+		data-coverflow-scale="' . (float) $coverflow_scale . '"
+		data-space="' . (int) $space_between . '"
+		data-slides-per-view="' . fc_swiper_attr($slides_per_view) . '"
+		data-slides-per-group="' . (int) $slides_per_group . '"
+		data-spv-tablet="' . fc_swiper_attr($spv_tablet) . '"
+		data-spv-phone="' . fc_swiper_attr($spv_phone) . '"
 		data-centered="' . ($centered ? 1 : 0) . '"
 		data-grab-cursor="' . ($grab_cursor ? 1 : 0) . '"
 		data-keyboard="' . ($keyboard ? 1 : 0) . '"
@@ -702,19 +1042,19 @@ if ($result !== _FC_RETURN_)
 		data-scrollbar="' . ($show_scrollbar ? 1 : 0) . '"
 		data-scrollbar-draggable="' . ($scrollbar_draggable ? 1 : 0) . '"
 		data-scrollbar-hide="' . ($scrollbar_hide ? 1 : 0) . '"
-		data-scrollbar-drag-size="' . $scrollbar_drag_size . '"
+		data-scrollbar-drag-size="' . (int) $scrollbar_drag_size . '"
+		data-gl-loop="' . ($glightbox_loop ? 1 : 0) . '"
+		data-gl-desc-position="' . fc_swiper_attr($desc_position) . '"
 		style="width:100%; max-width:100%; overflow:hidden;">
 
 		' . ($thumb_position === 'above' ? $thumbs_html : '') . '
 
 		<div class="swiper fc_swiper_main">
-			<div class="swiper-wrapper">
-				' . $field->{$prop} . '
-			</div>
+			<div class="swiper-wrapper">' . $field->{$prop} . '</div>
 			' . ($show_pagination ? '<div class="swiper-pagination"></div>' : '') . '
 			' . ($show_nav ? '<div class="swiper-button-prev"></div><div class="swiper-button-next"></div>' : '') . '
 			' . ($show_scrollbar ? '<div class="swiper-scrollbar"></div>' : '') . '
-		</div>' . '
+		</div>
 
 		' . ($thumb_position !== 'above' ? $thumbs_html : '') . '
 
