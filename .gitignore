@@ -96,3 +96,6 @@ site/medias/*
 
 # Session progress notes (local, not committed)
 CHOICESJS_PROGRESS.md
+AGENTS.md
+flexi-lib.diff.txt
+Modelfile.qwen3-16k
