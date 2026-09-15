@@ -1,331 +1,600 @@
-jQuery(document).ready(function(){
+/**
+ * fcvote.js — Vanilla (jQuery-free) voting field script
+ *
+ * Handles: star hover preview, vote submission (fetch),
+ * counter flash, message bubbles, review form (iframe modal),
+ * accordion toggle, modal widget toggle.
+ *
+ * Compatible with both jQuery-free (Choices.js) and jQuery modes.
+ */
+(function() {
+	'use strict';
 
-	// Joomla Root and Base URL
-	window.root_url = !!jroot_url_fc ? jroot_url_fc : '';
-	window.base_url = !!jbase_url_fc ? jbase_url_fc : '';
+	// Joomla Root and Base URL (set via addScriptDeclaration in html.php)
+	window.root_url = window.jroot_url_fc || '';
+	window.base_url = window.jbase_url_fc || '';
 
 	var under_vote = false;
 
-	/**
-	 * Show given message HTML as a small bubble (tooltip-like cloud) above the stars,
-	 * automatically hidden after 2 seconds
-	 */
-	function fcvote_show_message(msg, html)
-	{
-		if (!html || !msg || !msg.length) return;
-		msg = msg.first();
 
-		// Strip wrapper and the alert-close button of the server-side message HTML
-		var content = jQuery('<div></div>').html(html);
-		content.find('button.close').remove();
+	/* ================================================================
+	 *  MESSAGE BUBBLE
+	 * ================================================================ */
 
-		var is_warning = content.find('.fc-warning').length > 0;
-		var mssg_inner = content.find('.fc-mssg');
-		var inner_html = mssg_inner.length ? mssg_inner.html() : content.html();
+	function fcvote_show_message(msgEl, html) {
+		if (!html || !msgEl) return;
 
-		msg.css('margin-left', '')
-			.html(inner_html)
-			.removeClass('fcvote_message--success fcvote_message--warning')
-			.addClass(is_warning ? 'fcvote_message--warning' : 'fcvote_message--success')
-			.addClass('fcvote_message-visible');
+		// Parse server message HTML, strip wrapper and close button
+		var div = document.createElement('div');
+		div.innerHTML = html;
+		var closeBtns = div.querySelectorAll('button.close');
+		for (var i = 0; i < closeBtns.length; i++) {
+			closeBtns[i].parentNode.removeChild(closeBtns[i]);
+		}
 
-		// Keep the bubble inside the viewport (important on mobile screens)
+		var is_warning = div.querySelector('.fc-warning') !== null;
+		var mssg_inner = div.querySelector('.fc-mssg');
+		var inner_html = mssg_inner ? mssg_inner.innerHTML : div.innerHTML;
+
+		msgEl.style.marginLeft = '';
+		msgEl.innerHTML = inner_html;
+		msgEl.classList.remove('fcvote_message--success', 'fcvote_message--warning');
+		msgEl.classList.add(is_warning ? 'fcvote_message--warning' : 'fcvote_message--success');
+		msgEl.classList.add('fcvote_message-visible');
+
+		// Keep the bubble inside the viewport (important on mobile)
 		var pad = 8;
-		var rect = msg[0].getBoundingClientRect();
-		var win_width = window.innerWidth || jQuery(window).width();
+		var rect = msgEl.getBoundingClientRect();
+		var win_width = window.innerWidth || document.documentElement.clientWidth;
 		var shift = 0;
-		if (rect.left < pad)                    shift = pad - rect.left;
-		else if (rect.right > win_width - pad)  shift = (win_width - pad) - rect.right;
-		if (shift) msg.css('margin-left', Math.round(shift) + 'px');
+		if (rect.left < pad) shift = pad - rect.left;
+		else if (rect.right > win_width - pad) shift = (win_width - pad) - rect.right;
+		if (shift) msgEl.style.marginLeft = Math.round(shift) + 'px';
 
-		clearTimeout(msg.data('fcvote_hide_timer'));
-		msg.data('fcvote_hide_timer', setTimeout(function() {
-			msg.removeClass('fcvote_message-visible');
-		}, 2000));
+		clearTimeout(msgEl._fcvote_hide_timer);
+		msgEl._fcvote_hide_timer = setTimeout(function() {
+			msgEl.classList.remove('fcvote_message-visible');
+		}, 2000);
 	}
 
-	if (jQuery('.fcvote').length)
-	{
-		// Preview (on mouse over) the rating that would be submitted
-		jQuery('.fcvote a.fc_dovote').on('mouseenter', function()
-		{
-			var vote_list = jQuery(this).closest('.fcvote_list');
-			var total  = vote_list.find('li.voting-links').length;
-			var rating = parseInt(jQuery(this).text(), 10);
-			if (!total || !rating) return;
 
-			vote_list.addClass('fcvote-hovering')
-				.find('li.hover-rating').css('width', (100 * rating / total) + '%');
-		});
+	/* ================================================================
+	 *  STAR HOVER PREVIEW (event delegation)
+	 * ================================================================ */
 
-		jQuery('.fcvote ul.fcvote_list').on('mouseleave', function()
-		{
-			jQuery(this).removeClass('fcvote-hovering')
-				.find('li.hover-rating').css('width', 0);
-		});
+	document.addEventListener('mouseover', function(e) {
+		var link = e.target.closest('a.fc_dovote');
+		if (!link) return;
+		var vote_list = link.closest('.fcvote_list');
+		if (!vote_list) return;
+		var total = vote_list.querySelectorAll('li.voting-links').length;
+		var rating = parseInt(link.textContent, 10);
+		if (!total || !rating) return;
+		vote_list.classList.add('fcvote-hovering');
+		var hover = vote_list.querySelector('li.hover-rating');
+		if (hover) hover.style.width = (100 * rating / total) + '%';
+	});
 
-		jQuery('.fcvote a.fc_dovote').on('click', function(e)
-		{
-			if (under_vote) return;
-			under_vote = true;
+	document.addEventListener('mouseout', function(e) {
+		var ul = e.target.closest('ul.fcvote_list');
+		if (!ul) return;
+		var to = e.relatedTarget;
+		if (to && ul.contains(to)) return;
+		ul.classList.remove('fcvote-hovering');
+		var hover = ul.querySelector('li.hover-rating');
+		if (hover) hover.style.width = '0';
+	});
 
-			var voting_group = jQuery(this).closest('.voting-group');
-			voting_group.css('opacity', '0.5');
 
-			var vote_list = jQuery(this).closest('.fcvote_list');
-			var data_arr = jQuery(this).attr('data-rel').split("_");
+	/* ================================================================
+	 *  VOTE SUBMISSION (event delegation on .fc_dovote clicks)
+	 * ================================================================ */
 
-			// ID for item being voted
-			var itemID = data_arr[0];
+	document.addEventListener('click', function(e) {
+		var link = e.target.closest('a.fc_dovote');
+		if (!link) return;
+		if (under_vote) return;
 
-			// Voting characteristic, (defaults to the 'main' voting characteristic if not set)
-			var xid = typeof(data_arr[1])!='undefined' && data_arr[1] ? data_arr[1] : 'main';
+		e.preventDefault();
+		under_vote = true;
 
-			var xid_msg  = jQuery(this).closest('.fcvote').find('.fcvote_message');
-			var main_msg = voting_group.find('.voting-row_main').find('.fcvote_message');
-			if (!main_msg.length) main_msg = xid_msg;
+		var fcvote = link.closest('.fcvote');
+		var voting_group = fcvote ? fcvote.closest('.voting-group, .fieldname-group') : null;
+		if (voting_group) voting_group.style.opacity = '0.5';
 
-			var xid_cnt  = jQuery(this).closest('.fcvote').find('.fcvote-count');
-			var main_cnt = voting_group.find('.voting-row_main').find('.fcvote-count');
+		var vote_list = link.closest('.fcvote_list');
+		var data_arr = link.getAttribute('data-rel').split('_');
 
-			var xid_rating  = jQuery(this).closest('.fcvote_list').find('.current-rating');
-			var main_rating = voting_group.find('.voting-row_main').find('.fcvote_list').find('.current-rating');
+		// ID for item being voted
+		var itemID = data_arr[0];
 
-			var _htmlrating_main = main_cnt.length ? main_cnt.html() : '';
-			var _htmlrating = xid_cnt.html();
+		// Voting characteristic (defaults to 'main' if not set)
+		var xid = (typeof data_arr[1] !== 'undefined' && data_arr[1]) ? data_arr[1] : 'main';
 
-			var rating = jQuery(this).text();
+		var xid_msg = fcvote ? fcvote.querySelector('.fcvote_message') : null;
+		var main_msg = voting_group ? (voting_group.querySelector('.fieldname-row_main .fcvote_message') || xid_msg) : xid_msg;
 
-			var fc_csrf_token = (typeof Joomla !== 'undefined' && Joomla.getOptions) ? (Joomla.getOptions('csrf.token') || '') : '';
-			var voteurl = base_url
-				+ 'index.php?option=com_flexicontent&task=reviews.ajaxvote&user_rating=' + rating + '&cid=' + itemID + '&xid=' + xid
-				+ (fc_csrf_token ? '&' + fc_csrf_token + '=1' : '');
+		var xid_cnt = fcvote ? fcvote.querySelector('.fcvote-count') : null;
+		var main_cnt = voting_group ? (voting_group.querySelector('.fieldname-row_main .fcvote-count') || null) : null;
 
-			jQuery.ajax({
-				url: voteurl,
-				dataType: "json",
-				data: {
-					lang: (typeof fc_sef_lang != 'undefined' ? fc_sef_lang : '')
-				},
-				success: function( data )
-				{
-					if (typeof(data.percentage)!="undefined" && data.percentage)
-					{
-						xid_rating.css('width', data.percentage + "%");
+		var xid_rating = vote_list ? vote_list.querySelector('.current-rating') : null;
+		var main_rating = null;
+		if (voting_group) {
+			var main_row = voting_group.querySelector('.fieldname-row_main');
+			if (main_row) {
+				var main_vote_list = main_row.querySelector('.fcvote_list');
+				if (main_vote_list) main_rating = main_vote_list.querySelector('.current-rating');
+			}
+		}
+
+		var _htmlrating = xid_cnt ? xid_cnt.innerHTML : '';
+		var _htmlrating_main = main_cnt ? main_cnt.innerHTML : '';
+
+		var rating = link.textContent;
+
+		var fc_csrf_token = (typeof Joomla !== 'undefined' && Joomla.getOptions) ? (Joomla.getOptions('csrf.token') || '') : '';
+		var voteurl = base_url
+			+ 'index.php?option=com_flexicontent&task=reviews.ajaxvote&user_rating=' + rating + '&cid=' + itemID + '&xid=' + xid
+			+ (fc_csrf_token ? '&' + fc_csrf_token + '=1' : '');
+
+		fetch(voteurl, {
+			method: 'POST',
+			headers: { 'X-Requested-With': 'XMLHttpRequest' },
+			body: new URLSearchParams({ lang: (typeof window.fc_sef_lang !== 'undefined' ? window.fc_sef_lang : '') })
+		})
+		.then(function(r) { return r.json(); })
+		.then(function(data) {
+			// Update rating bar widths
+			if (data.percentage && xid_rating) xid_rating.style.width = data.percentage + '%';
+			if (data.percentage_main && main_rating) main_rating.style.width = data.percentage_main + '%';
+
+			// Update counter HTML
+			if (data.htmlrating) _htmlrating = data.htmlrating;
+			if (data.htmlrating_main) _htmlrating_main = data.htmlrating_main;
+
+			// Counter flash: show "you voted!" text briefly, then restore rating count
+			if (xid_cnt && data.html && data.htmlrating) {
+				xid_cnt.innerHTML = data.html;
+				xid_cnt.style.display = '';
+				setTimeout(function() { xid_cnt.classList.add('fcvote-flash'); }, 2000);
+				setTimeout(function() {
+					xid_cnt.classList.remove('fcvote-flash');
+					if (_htmlrating && _htmlrating.trim()) {
+						xid_cnt.innerHTML = _htmlrating;
 					}
-					if (typeof(data.percentage_main)!="undefined" && data.percentage_main)
-					{
-						main_rating.css('width', data.percentage_main + "%");
-					}
+				}, 3000);
+			} else if (xid_cnt && _htmlrating && _htmlrating.trim()) {
+				xid_cnt.innerHTML = _htmlrating;
+				xid_cnt.style.display = '';
+			}
 
-					if (typeof(data.htmlrating)!="undefined" && data.htmlrating)
-					{
-						_htmlrating = data.htmlrating;
-					}
-					if (typeof(data.htmlrating_main)!="undefined" && data.htmlrating_main)
-					{
-						_htmlrating_main = data.htmlrating_main;
-					}
-
-					// Show counter flash only if the counter is enabled in field configuration,
-					// (server sends empty 'htmlrating' when the counter is disabled)
-					if (data.html && data.htmlrating)
-					{
-						xid_cnt.html(data.html).show();
-
-						setTimeout(function()
-						{
-							xid_cnt.animate({opacity: "0.5"}, 900);
-						}, 2000);
-
-						setTimeout(function()
-						{
-							xid_cnt.css('opacity', 'unset');
-							if(_htmlrating.trim())
-							{
-								xid_cnt.css('opacity', 1).html(_htmlrating);
-							}
-							//else xid_cnt.html('').hide();
-						}, 3000);
-					}
-					else if (_htmlrating && _htmlrating.trim())
-					{
-						xid_cnt.html(_htmlrating).show();
-					}
-
-					if (main_cnt.length) {
-						if (data.html_main && data.htmlrating_main) {
-							main_cnt.html(data.html_main).show();
-							setTimeout(function() { main_cnt.animate({opacity: "0.5"}, 900);  }, 2000);
-							setTimeout(function() {
-								main_cnt.css('opacity', 'unset');
-								if(_htmlrating_main.trim())
-									main_cnt.css('opacity', 1).html(_htmlrating_main);
-								else
-									main_cnt.html('').hide();
-							}, 3000);
-						} else if (_htmlrating_main && _htmlrating_main.trim()) {
-							main_cnt.html(_htmlrating_main);
+			// Main counter flash
+			if (main_cnt) {
+				if (data.html_main && data.htmlrating_main) {
+					main_cnt.innerHTML = data.html_main;
+					main_cnt.style.display = '';
+					setTimeout(function() { main_cnt.classList.add('fcvote-flash'); }, 2000);
+					setTimeout(function() {
+						main_cnt.classList.remove('fcvote-flash');
+						if (_htmlrating_main && _htmlrating_main.trim()) {
+							main_cnt.innerHTML = _htmlrating_main;
+						} else {
+							main_cnt.innerHTML = '';
 						}
-					}
-
-					// Show vote messages as auto-hiding bubbles above the stars
-					if (typeof(data.message)!="undefined" && data.message) {
-						fcvote_show_message(xid_msg, data.message);
-					}
-					if (typeof(data.message_main)!="undefined" && data.message_main) {
-						fcvote_show_message(main_msg, data.message_main);
-					}
-
-					// Clear hover preview (e.g. touch devices do not fire mouseleave)
-					voting_group.find('ul.fcvote_list').removeClass('fcvote-hovering')
-						.find('li.hover-rating').css('width', 0);
-
-					under_vote = false;
-					voting_group.css('opacity', '');
-				},
-				error: function (xhr, ajaxOptions, thrownError) {
-					alert('Error status: ' + xhr.status + ' , Error text: ' + thrownError);
-					under_vote = false;
-					voting_group.css('opacity', '');
+					}, 3000);
+				} else if (_htmlrating_main && _htmlrating_main.trim()) {
+					main_cnt.innerHTML = _htmlrating_main;
 				}
-			});
+			}
 
+			// Show vote messages as auto-hiding bubbles above the stars
+			if (data.message) fcvote_show_message(xid_msg, data.message);
+			if (data.message_main) fcvote_show_message(main_msg, data.message_main);
+
+			// Clear hover preview (touch devices do not fire mouseleave)
+			if (voting_group) {
+				var hovers = voting_group.querySelectorAll('ul.fcvote_list');
+				for (var i = 0; i < hovers.length; i++) {
+					hovers[i].classList.remove('fcvote-hovering');
+					var h = hovers[i].querySelector('li.hover-rating');
+					if (h) h.style.width = '0';
+				}
+			}
+
+			under_vote = false;
+			if (voting_group) voting_group.style.opacity = '';
+		})
+		.catch(function(err) {
+			alert('Error: ' + (err.message || err));
+			under_vote = false;
+			if (voting_group) voting_group.style.opacity = '';
 		});
-	}
-});
+	});
 
-	function fcvote_open_review_form(tagid, content_id, review_type)
-	{
-		var box = jQuery('#'+tagid);
-		var box_loading = jQuery('#'+tagid+'_loading');
 
-		if (box.is(":visible"))
-		{
-			box_loading.empty().removeClass('ajax-loader').css('display', 'none');
-			box.slideUp(400, function(){ box.empty(); });
-			return;
+	/* ================================================================
+	 *  REVIEW FORM — Open (DOM modal, loads getreviewform HTML)
+	 * ================================================================ */
+
+	function fcvote_open_review_form(tagid, content_id, review_type) {
+		var url = base_url
+			+ 'index.php?option=com_flexicontent&task=getreviewform&format=raw&tagid=' + tagid
+			+ '&content_id=' + content_id + '&review_type=' + review_type
+			+ '&lang=' + (typeof window.fc_sef_lang !== 'undefined' ? window.fc_sef_lang : '');
+
+		// Reuse the (hidden) inline box if present, otherwise create one
+		var box = document.getElementById(tagid);
+		if (!box) {
+			box = document.createElement('div');
+			box.id = tagid;
+			box.className = 'fcvote_review_form_box';
 		}
 
-		if (1)
-		{
-			var url = base_url
-				+ 'index.php?option=com_flexicontent&task=reviews.edit&view=reviews&id=0&tmpl=component&tagid=' + tagid
-				+ '&content_id=' + content_id + '&review_type=' + review_type
-				+ '&lang=' + (typeof fc_sef_lang != 'undefined' ? fc_sef_lang : '');
+		// Open the modal (box is moved inside the modal, restored on close)
+		var overlay = fcvote_showAsDialog(box, 700, 660, null, { title: window.FC_VOTE_REVIEW_TITLE || '' });
 
-			fc_showDialog(url, 'fc_modal_popup_container', 0, 800, 800, 0, {title: 'Review this item'});
-		}
-		else
-		{
-			var url = root_url
-				+ 'index.php?option=com_flexicontent&format=raw&task=getreviewform&tagid=' + tagid
-				+ '&content_id=' + content_id + '&review_type=' + review_type;
+		// Loading placeholder while the form is fetched
+		box.innerHTML = '<div class="fc-mssg fc-info fc-nobgimage"><span class="fc-spinner"></span>&nbsp;Loading...</div>';
 
-			box_loading.empty().addClass('ajax-loader').css('display', 'inline-block');
+		fetch(url, {
+			headers: { 'X-Requested-With': 'XMLHttpRequest' }
+		})
+		.then(function(r) { return r.json(); })
+		.then(function(data) {
+			if (!box.parentNode) return; // modal was closed meanwhile
+			box.innerHTML = (data && data.html) ? data.html
+				: '<div class="fc-mssg fc-warning fc-nobgimage">' + ((data && data.error) ? data.error : 'Error loading review form') + '</div>';
+		})
+		.catch(function(err) {
+			if (!box.parentNode) return;
+			box.innerHTML = '<div class="fc-mssg fc-warning fc-nobgimage">Error: ' + (err.message || err) + '</div>';
+		});
 
-			jQuery.ajax({
-				url: url,
-				dataType: "json",
-				data: {
-					lang: (typeof fc_sef_lang != 'undefined' ? fc_sef_lang : '')
-				},
-				success: function( data )
-				{
-					box_loading.empty().removeClass('ajax-loader').css('display', 'none');
-					if (typeof(data.html) && data.html)
-					{
-						box.html(data.html).slideDown();
-					}
-				},
-				error: function (xhr, ajaxOptions, thrownError) {
-					box_loading.empty().removeClass('ajax-loader').css('display', 'none');
-					alert('Error status: ' + xhr.status + ' , Error text: ' + thrownError);
-				}
-			});
-		}
+		return overlay;
 	}
 
+	// Expose globally for inline onclick handlers
+	window.fcvote_open_review_form = fcvote_open_review_form;
 
-	function fcvote_submit_review_form(tagid, form)
-	{
-		var box = jQuery('#'+tagid);
-		var box_loading = jQuery('#'+tagid+'_loading');
 
-		if (( typeof(form.checkValidity) == "function" ) )
-		{
-			if (!form.checkValidity())
-			{
-				box_loading.empty().removeClass('ajax-loader').css('display', '');
-				fcvote_submit_review_form_show_validation(jQuery(form), box_loading);
+	/* ================================================================
+	 *  REVIEW FORM — Submit (fetch POST to storereviewform)
+	 * ================================================================ */
+
+	function fcvote_submit_review_form(tagid, form) {
+		var box = document.getElementById(tagid);
+		var box_loading = document.getElementById(tagid + '_loading');
+		var in_modal = !!document.querySelector('.fcvote_modal_overlay.fcvote_modal_visible');
+
+		if (typeof form.checkValidity === 'function') {
+			if (!form.checkValidity()) {
+				fcvote_submit_review_form_show_validation(form, box_loading || box);
 				return;
 			}
 		}
 
-		if (1)
-		{
-			var url = base_url
-				+ 'index.php?option=com_flexicontent&task=reviews.edit&view=reviews&id=0&tmpl=component&tagid='
-				+ tagid + '&content_id=' + content_id + '&review_type=' + review_type
-				+ '&lang=' + (typeof fc_sef_lang != 'undefined' ? fc_sef_lang : '');
+		var url = root_url
+			+ 'index.php?option=com_flexicontent&format=raw&task=storereviewform';
 
-			fc_showDialog(url, 'fc_modal_popup_container', 0, 800, 800, 0, {title: 'Review this item'});
+		if (box_loading && !in_modal) {
+			box_loading.innerHTML = '';
+			box_loading.classList.add('ajax-loader');
+			box_loading.style.display = 'inline-block';
 		}
-		else
-		{
-			var url = root_url
-				+ 'index.php?option=com_flexicontent&format=raw&task=storereviewform';
 
-			box_loading.empty().addClass('ajax-loader').css('display', 'inline-block');
-
-			jQuery.ajax({
-				url: url,
-				dataType: "json",
-				data: jQuery(form).serialize(),
-				success: function( data )
-				{
-					box_loading.empty().removeClass('ajax-loader').css('display', 'none');
-					if (typeof(data.html) && data.html)
-					{
-						if (typeof(data.error) && data.error)
-						{
-							box_loading.html(data.html).css('display', 'block');
+		fetch(url, {
+			method: 'POST',
+			headers: { 'X-Requested-With': 'XMLHttpRequest' },
+			body: new FormData(form)
+		})
+		.then(function(r) { return r.json(); })
+		.then(function(data) {
+			if (box_loading && !in_modal) {
+				box_loading.innerHTML = '';
+				box_loading.classList.remove('ajax-loader');
+				box_loading.style.display = 'none';
+			}
+			if (data.html) {
+				if (data.error) {
+					if (in_modal) {
+						if (box) {
+							var eBox = document.createElement('div');
+							eBox.innerHTML = data.html;
+							var firstForm = box.querySelector('form');
+							if (firstForm) firstForm.insertAdjacentElement('beforebegin', eBox.firstChild || eBox);
+							else box.insertAdjacentElement('afterbegin', eBox.firstChild || eBox);
 						}
-						else
-						{
-							box.html(data.html).show();
-						}
+					} else if (box_loading) {
+						box_loading.innerHTML = data.html;
+						box_loading.style.display = 'block';
 					}
-				},
-				error: function (xhr, ajaxOptions, thrownError) {
-					box_loading.empty().removeClass('ajax-loader').css('display', 'none');
-					alert('Error status: ' + xhr.status + ' , Error text: ' + thrownError);
+				} else if (box) {
+					box.innerHTML = data.html;
+					box.style.display = '';
 				}
-			});
+			}
+		})
+		.catch(function(err) {
+			if (box_loading && !in_modal) {
+				box_loading.innerHTML = '';
+				box_loading.classList.remove('ajax-loader');
+				box_loading.style.display = 'none';
+			}
+			alert('Error: ' + (err.message || err));
+		});
+	}
+
+	window.fcvote_submit_review_form = fcvote_submit_review_form;
+
+
+	/* ================================================================
+	 *  REVIEW FORM — Validation display
+	 * ================================================================ */
+
+	function fcvote_submit_review_form_show_validation(form, errorBox) {
+		var errorList = document.createElement('div');
+		if (errorBox) {
+			errorBox.innerHTML = '';
+			errorBox.appendChild(errorList);
+		}
+
+		var invalids = form.querySelectorAll(':invalid');
+		for (var i = 0; i < invalids.length; i++) {
+			var node = invalids[i];
+			var label = document.querySelector('label[for="' + node.id + '"]');
+			var labelText = label ? label.innerHTML : '';
+			var message = node.validationMessage || 'Invalid value.';
+
+			var errDiv = document.createElement('div');
+			errDiv.className = 'fc-mssg fc-warning fc-nobgimage';
+			errDiv.innerHTML = '<button type="button" class="close" data-dismiss="alert">&times;</button><b>' + labelText + '</b>: ' + message;
+			errorList.appendChild(errDiv);
+
+			if (!node.classList.contains('needs-validation')) {
+				node.classList.add('needs-validation');
+				node.addEventListener('blur', function() { this.classList.remove('invalid'); });
+			}
+			node.classList.add('invalid');
+		}
+	}
+
+	window.fcvote_submit_review_form_show_validation = fcvote_submit_review_form_show_validation;
+
+
+	/* ================================================================
+	 *  MODAL: Vanilla iframe dialog (fcvote_show_dialog)
+	 *
+	 *  Creates: overlay → modal → header + iframe
+	 *  Registers in window.fc_Dialogs for fc_closeDialog compat.
+	 * ================================================================ */
+
+	function fcvote_show_dialog(url, w, h, title) {
+		// Remove any existing fcvote modal
+		fcvote_remove_modal();
+
+		// Overlay
+		var overlay = document.createElement('div');
+		overlay.id = 'fcvote_modal_overlay';
+		overlay.className = 'fcvote_modal_overlay';
+
+		// Modal container
+		var modal = document.createElement('div');
+		modal.className = 'fcvote_modal';
+
+		// Header
+		var header = document.createElement('div');
+		header.className = 'fcvote_modal_header';
+
+		var titleEl = document.createElement('span');
+		titleEl.className = 'fcvote_modal_title';
+		titleEl.textContent = title || '';
+
+		var closeBtn = document.createElement('button');
+		closeBtn.className = 'fcvote_modal_close';
+		closeBtn.innerHTML = '&times;';
+		closeBtn.setAttribute('aria-label', 'Close');
+
+		header.appendChild(titleEl);
+		header.appendChild(closeBtn);
+
+		// Iframe
+		var iframe = document.createElement('iframe');
+		iframe.src = url;
+		iframe.style.visibility = 'hidden';
+		iframe.addEventListener('load', function() {
+			iframe.style.visibility = 'visible';
+		});
+
+		modal.appendChild(header);
+		modal.appendChild(iframe);
+		overlay.appendChild(modal);
+		document.body.appendChild(overlay);
+
+		// Animate in
+		requestAnimationFrame(function() {
+			overlay.classList.add('fcvote_modal_visible');
+		});
+
+		// Close handlers
+		closeBtn.addEventListener('click', function() { fcvote_remove_modal(); });
+		overlay.addEventListener('click', function(e) {
+			if (e.target === overlay) fcvote_remove_modal();
+		});
+		document.addEventListener('keydown', fcvote_modal_keydown);
+
+		// Prevent body scroll
+		document.body.classList.add('fc-no-scroll');
+
+		// Register in fc_Dialogs for admin iframe auto-close compatibility
+		if (typeof window.fc_Dialogs === 'undefined') window.fc_Dialogs = {};
+		window.fc_Dialogs['fc_modal_popup_container'] = {
+			dialog: function(method) {
+				if (method === 'close') fcvote_remove_modal();
+			}
+		};
+
+		return overlay;
+	}
+
+	window.fcvote_show_dialog = fcvote_show_dialog;
+
+
+	/* ================================================================
+	 *  MODAL: Vanilla DOM element dialog (fcvote_showAsDialog)
+	 *
+	 *  Moves a DOM element into a modal overlay for display.
+	 *  Restores it to its original parent on close.
+	 *  Compatible with the fc_showAsDialog signature:
+	 *    fcvote_showAsDialog(box, winwidth, winheight, closeFunc, params)
+	 * ================================================================ */
+
+	function fcvote_showAsDialog(box, winwidth, winheight, closeFunc, params) {
+		params = params || {};
+
+		if (!box) return null;
+
+		// Remove any existing fcvote modal
+		fcvote_remove_modal();
+
+		var title = params.title || '';
+
+		// Save original parent and next sibling for restoration
+		var parent = box.parentNode;
+		var nextSibling = box.nextSibling;
+		var origDisplay = box.style.display;
+
+		// Overlay
+		var overlay = document.createElement('div');
+		overlay.id = 'fcvote_modal_overlay';
+		overlay.className = 'fcvote_modal_overlay';
+
+		// Modal container
+		var modal = document.createElement('div');
+		modal.className = 'fcvote_modal';
+		if (winwidth) {
+			modal.style.width = Math.min(winwidth, window.innerWidth * 0.9) + 'px';
+			modal.style.maxWidth = '90vw';
+		}
+		if (winheight) {
+			modal.style.height = Math.min(winheight, window.innerHeight * 0.85) + 'px';
+			modal.style.maxHeight = '85vh';
+		}
+
+		// Header
+		var header = document.createElement('div');
+		header.className = 'fcvote_modal_header';
+
+		var titleEl = document.createElement('span');
+		titleEl.className = 'fcvote_modal_title';
+		titleEl.textContent = title;
+
+		var closeBtn = document.createElement('button');
+		closeBtn.className = 'fcvote_modal_close';
+		closeBtn.innerHTML = '&times;';
+		closeBtn.setAttribute('aria-label', 'Close');
+
+		header.appendChild(titleEl);
+		header.appendChild(closeBtn);
+
+		modal.appendChild(header);
+		modal.appendChild(box);
+		overlay.appendChild(modal);
+		document.body.appendChild(overlay);
+
+		// Make the moved element visible inside modal (override data-placement hiding)
+		box.style.display = '';
+
+		// Animate in
+		requestAnimationFrame(function() {
+			overlay.classList.add('fcvote_modal_visible');
+		});
+
+		// Close handler
+		function closeModal() {
+			// Restore element to original position
+			if (nextSibling && nextSibling.parentNode === parent) {
+				parent.insertBefore(box, nextSibling);
+			} else if (parent) {
+				parent.appendChild(box);
+			}
+			box.style.display = origDisplay;
+
+			fcvote_remove_modal();
+
+			// Execute close function
+			if (typeof closeFunc === 'function') closeFunc(box);
+			else if (closeFunc === 1) window.location.reload(false);
+		}
+
+		closeBtn.addEventListener('click', closeModal);
+		overlay.addEventListener('click', function(e) {
+			if (e.target === overlay) closeModal();
+		});
+		document.addEventListener('keydown', fcvote_modal_keydown);
+
+		// Store close function for fc_closeDialog
+		overlay._fcvote_closeFn = closeModal;
+
+		// Prevent body scroll
+		document.body.classList.add('fc-no-scroll');
+
+		// Register in fc_Dialogs
+		if (typeof window.fc_Dialogs === 'undefined') window.fc_Dialogs = {};
+		window.fc_Dialogs['fc_modal_popup_container'] = {
+			dialog: function(method) {
+				if (method === 'close') closeModal();
+			}
+		};
+
+		return overlay;
+	}
+
+	window.fcvote_showAsDialog = fcvote_showAsDialog;
+
+
+	/* ================================================================
+	 *  MODAL HELPERS
+	 * ================================================================ */
+
+	function fcvote_remove_modal() {
+		var overlay = document.getElementById('fcvote_modal_overlay');
+		if (overlay) {
+			overlay.classList.remove('fcvote_modal_visible');
+			setTimeout(function() {
+				if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+			}, 250);
+		}
+		document.removeEventListener('keydown', fcvote_modal_keydown);
+
+		// Restore body scroll
+		document.body.classList.remove('fc-no-scroll');
+	}
+
+	function fcvote_modal_keydown(e) {
+		if (e.key === 'Escape' || e.keyCode === 27) {
+			fcvote_remove_modal();
 		}
 	}
 
 
-	function fcvote_submit_review_form_show_validation(form, errorBox)
-	{
-		var errorList = jQuery('<div></div>');
-		errorBox.empty().append(errorList);
+	/* ================================================================
+	 *  fc_closeDialog COMPATIBILITY
+	 *
+	 *  Admin reviews controller saves → window.parent.fc_closeDialog('fc_modal_popup_container')
+	 *  If jQuery UI version exists (flexi-lib.js loaded), delegate to it.
+	 *  Otherwise close our vanilla modal.
+	 * ================================================================ */
 
-		//Find all invalid fields within the form.
-		form.find(':invalid').each(function(index, node)
-		{
-			//Find the field's corresponding label
-			var label = jQuery('label[for=' + node.id + ']');
-
-			//Opera incorrectly does not fill the validationMessage property.
-			var message = node.validationMessage || 'Invalid value.';
-			errorList.append('<div class="fc-mssg fc-warning fc-nobgimage"><button type="button" class="close" data-dismiss="alert">&times;</button><b>' + label.html() + '</b>: ' + message + '</div>');
-
-			var $node = jQuery(node);
-			if (!$node.hasClass('needs-validation'))
-			{
-				$node.addClass('needs-validation').on('blur', function() { jQuery(this).removeClass('invalid') });
+	if (typeof window.fc_closeDialog !== 'function') {
+		window.fc_closeDialog = function(name) {
+			// Prefer jQuery UI dialog when available
+			if (window.fc_Dialogs && window.fc_Dialogs[name] && typeof window.fc_Dialogs[name].dialog === 'function') {
+				return window.fc_Dialogs[name].dialog('close');
 			}
-			$node.addClass('invalid');
-		});
-	};
+			// Vanilla fallback
+			fcvote_remove_modal();
+			return false;
+		};
+	}
+
+})();

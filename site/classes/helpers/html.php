@@ -4142,6 +4142,8 @@ class flexicontent_html
 		$html = '';
 		$int_xid = (int) $xid;
 		$item_id = $field->item_id;
+		$review_type = 'item';
+		$add_review_form = (int) $field->parameters->get('allow_reviews', 0);
 
 
 		// Get extra voting option (composite voting)
@@ -4184,7 +4186,6 @@ class flexicontent_html
 				? \Joomla\CMS\Language\Text::_($field->parameters->get('main_label', 'FLEXI_VOTE_AVERAGE_RATING'))
 				: '';
 			$counter_show_label = $field->parameters->get('main_counter_show_label', 1);
-			$add_review_form = (int) $field->parameters->get('allow_reviews', 0);
 			$html .= flexicontent_html::ItemVoteDisplay(
 				$field,
 				$item_id,
@@ -4198,7 +4199,7 @@ class flexicontent_html
 				$counter_show_label,
 				$add_review_form,
 				$xids,
-				$review_type='item'
+				$review_type
 			);
 		}
 
@@ -4258,6 +4259,14 @@ class flexicontent_html
 		return '
 		<div class="' . $field->name . '-group">
 			' . $html . '
+			'.($add_review_form ? '
+			<div class="fcvote_review_row">
+				<input type="button" class="btn btn-primary fcvote_toggle_review_form"
+					onclick="fcvote_open_review_form(\'fcvote_review_form_box_'.$item_id.'\', '.$item_id.', \''.$review_type.'\', this)"
+					value="'.\Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_THIS_ITEM').'"/>
+				<div id="fcvote_review_form_box_'.$item_id.'_loading" class="fcvote_review_form_box_loading"></div>
+				<div id="fcvote_review_form_box_'.$item_id.'" class="fcvote_review_form_box" style="display:none;"></div>
+			</div>' : '').'
 		</div>';
 	}
 
@@ -4410,15 +4419,27 @@ class flexicontent_html
 			// Load tooltips JS
 			if ($cparams->get('add_tooltips', 1)) \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip');
 
-			flexicontent_html::loadFramework('jQuery');
-			flexicontent_html::loadFramework('flexi_tmpl_common');
-
 			$document =Factory::getApplication()->getDocument();
 			$document->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/css/fcvote.css', array('version' => FLEXI_VHASH));
 			$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/fcvote.js', array('version' => FLEXI_VHASH));
 
 			// Make the CSRF token available to the JS, via: Joomla.getOptions('csrf.token')
 			\Joomla\CMS\HTML\HTMLHelper::_('form.csrf');
+
+			// URL globals + SEF language for fcvote.js (standalone: loaded without flexi_js_common / flexi_tmpl_common)
+			$sef_lang_code = '';
+			$site_languages = \Joomla\CMS\Language\LanguageHelper::getLanguages('lang_code', false);
+			$lang_code = \Joomla\CMS\Factory::getLanguage()->getTag();
+			if ($site_languages && isset($site_languages->{$lang_code}))
+			{
+				$sef_lang_code = $site_languages->{$lang_code}->sef;
+			}
+			$document->addScriptDeclaration('
+				if (typeof window.jbase_url_fc === "undefined") window.jbase_url_fc = '.json_encode(\Joomla\CMS\Uri\Uri::base()).';
+				if (typeof window.jroot_url_fc === "undefined") window.jroot_url_fc = '.json_encode(\Joomla\CMS\Uri\Uri::root()).';
+				if (typeof window.fc_sef_lang === "undefined") window.fc_sef_lang = '.json_encode((string) $sef_lang_code).';
+				if (typeof window.FC_VOTE_REVIEW_TITLE === "undefined") window.FC_VOTE_REVIEW_TITLE = '.json_encode(\Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_THIS_ITEM')).';
+			');
 
 			// Star size and colors, via voting field parameters (Viewing -> Basic)
 			$star_size = (int) $field->parameters->get('stars_size', 24) ?: 24;
@@ -4615,14 +4636,6 @@ class flexicontent_html
 				</ul>
 
 				<div class="fcvote_message" ></div>
-
-				'.($add_review_form ? '
-				<input type="button" class="btn btn-primary fcvote_toggle_review_form"
-					onclick="fcvote_open_review_form(jQuery(\'#fcvote_review_form_box_'.$id.'\').attr(\'id\'), '.$id.', \''.$review_type.'\', this)"
-					value="'.\Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_THIS_ITEM').'"/>
-				<div id="fcvote_review_form_box_'.$id.'_loading" class="fcvote_review_form_box_loading"></div>
-				<span class="fcclear"></span>
-				<div id="fcvote_review_form_box_'.$id.'" class="fcvote_review_form_box" style="display:none;"></div>' : '').'
 
 				'.( $desc ? '<div class="fcvote-desc">'.$desc.'</div>' :'' ).'
 			</div>
