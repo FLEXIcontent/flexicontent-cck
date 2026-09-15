@@ -170,6 +170,10 @@
 				<option value="0" show_list="" hide_list="disp_filtflds">FLEXI_NO</option>
 				<option value="1" show_list="disp_filtflds" hide_list="">FLEXI_YES</option>
 			</field>
+			<field name="badge_position" type="radio" default="0" label="FLEXI_BADGE_FILTER" description="FLEXI_BADGE_FILTER_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_TOP</option>
+			</field>
 			
 			
 			<field name="" type="separator" level="level3" default="Search Areas (non-FC Content)" description=""/>
