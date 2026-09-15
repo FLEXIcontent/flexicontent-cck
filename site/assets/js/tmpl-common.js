@@ -190,6 +190,41 @@
 		}
 	}
 
+	if (typeof window.fcRemoveSingleFilter !== 'function') {
+		window.fcRemoveSingleFilter = function(fieldName, el) {
+			var form = el.closest('form') || document.getElementById('adminForm') || document.getElementById('searchForm');
+			if (!form) return;
+			var fields = form.querySelectorAll(
+				'[name="' + fieldName + '"],' +
+				'[name="' + fieldName + '[]"],' +
+				'[name="' + fieldName + '[1]"],' +
+				'[name="' + fieldName + '[2]"]'
+			);
+			if (fields.length) {
+				for (var i = 0; i < fields.length; i++) {
+					var f = fields[i];
+					if (f.tagName === 'SELECT') {
+						f.selectedIndex = 0;
+						if (window.fc_use_choicesjs && window.fc_choices_instances) {
+							var instanceKey = f.id || f.name;
+							var instance = window.fc_choices_instances[instanceKey];
+							if (instance) instance.removeActiveItems();
+						} else if (window.jQuery && window.jQuery.fn && window.jQuery.fn.select2 && (f.s2 || (f.nextElementSibling && f.nextElementSibling.className.indexOf('select2-container') !== -1))) {
+							window.jQuery(f).val(null).trigger('change');
+						}
+					} else {
+						f.value = '';
+					}
+				}
+				if (typeof adminFormPrepare === 'function') {
+					adminFormPrepare(form, 2);
+				} else {
+					form.submit();
+				}
+			}
+		};
+	}
+
 	function fc_toggleClass(ele, cls, fc_all) {
 		var inputs = ele.parentNode.parentNode.getElementsByTagName('input');
 		var input_0 = inputs[0];

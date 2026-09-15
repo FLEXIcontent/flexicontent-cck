@@ -93,6 +93,46 @@ else
 	style=""
 >
 
+	<?php if ($this->params->get('badge_position', 0)) : ?>
+	<?php
+	// BOF selected-filter badges (recap of active filter values, same feature as the category view)
+	$fc_badge_app = \Joomla\CMS\Factory::getApplication();
+	$active_filter_badges = array();
+	foreach ((isset($this->filters) ? $this->filters : array()) as $fc_filt)
+	{
+		if (empty($fc_filt->html)) continue;
+		$fc_val = $fc_badge_app->input->get('filter_' . $fc_filt->id, '', 'array');
+		if (!empty($fc_val))
+		{
+			preg_match('/<option[^>]+selected=["\']selected["\'][^>]*>(.*?)<\/option>/is', $fc_filt->html, $fc_matches);
+			$fc_displayVal = isset($fc_matches[1]) ? $fc_matches[1] : (is_array($fc_val) ? implode(', ', $fc_val) : $fc_val);
+			$fc_displayVal = trim(strip_tags(preg_replace('/\s*\([^)]*\)/', '', (string)$fc_displayVal)));
+			if (!empty($fc_displayVal) && strpos($fc_displayVal, '-') !== 0 && !in_array(strtolower($fc_displayVal), array('all', 'tous', 'any', ',', '')))
+			{
+				$active_filter_badges[] = (object)array('name' => 'filter_'.$fc_filt->id, 'label' => trim(strip_tags($fc_filt->label)), 'value' => $fc_displayVal);
+			}
+		}
+	}
+	?>
+
+	<?php if (!empty($active_filter_badges)) : ?>
+		<div class="fc-active-badges">
+			<?php foreach ($active_filter_badges as $fc_b) : ?>
+				<div class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center bg-light" style="text-transform:none; pointer-events:none;">
+					<span class="me-1 small text-muted"><?php echo $fc_b->label; ?>:</span>
+					<strong class="me-2 text-dark"><?php echo $fc_b->value; ?></strong>
+					<a href="javascript:void(0)" class="text-danger fw-bold ps-2 border-start border-secondary"
+					   style="pointer-events:auto; text-decoration:none; font-size:1.2rem; line-height:1; margin-left:5px;"
+					   onclick="fcRemoveSingleFilter('<?php echo $fc_b->name; ?>', this)">
+					   &times;
+					</a>
+				</div>
+			<?php endforeach; ?>
+		</div>
+
+	<?php endif; ?>
+	<?php endif; ?>
+
 	<?php $count = -1; ?>
 	<?php foreach($this->results as $i => $result) : ?>
 		<?php
