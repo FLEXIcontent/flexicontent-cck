@@ -275,6 +275,11 @@ document.addEventListener('DOMContentLoaded', function() {
 			(form.id && form.id.indexOf('default_form_') === 0) ||
 			!!form.closest('.mod_flexifilter_wrapper') ||
 			!!form.closest('.fcfilter_form_component');
+
+		// The search module (mod_flexiadvsearch) reuses the 'default_form_' id prefix but is NOT a
+		// filter form: its submit must navigate to the search view normally, not trigger AJAX filtering.
+		// Use the wrapper class (moduleclass_sfx may be appended to the form class) for a reliable match.
+		if (form.classList.contains('mod_flexiadvsearch') || form.closest('.mod_flexiadvsearch_wrapper')) isFlexiForm = false;
 		if (!isFlexiForm) return;
 
 		e.preventDefault();
