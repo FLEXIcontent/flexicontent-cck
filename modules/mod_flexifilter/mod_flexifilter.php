@@ -391,6 +391,7 @@ $jinput->set('view', $saved_view);
 
 // Load needed JS libs & CSS styles
 flexicontent_html::loadFramework('jQuery');
+flexicontent_html::loadFramework('select2');
 flexicontent_html::loadFramework('flexi_tmpl_common');
 
 // Add tooltips
