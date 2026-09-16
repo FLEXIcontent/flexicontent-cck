@@ -297,45 +297,17 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 
 
 	<?php if ((isset($item->positions['image'])) || (isset($item->positions['top']))) : ?>
+		<?php
+			$top_col_width = $this->params->get('top_col_width', '30%');
+			$top_col_gap   = $this->params->get('top_col_gap', '2rem');
+			$topblock_flex_style = 'display:flex; flex-wrap:nowrap; gap:' . htmlspecialchars($top_col_gap) . ';';
+		?>
 		<!-- BOF image/top  -->
-		<aside class="flexi topblock  ">  <!-- NOTE: image block is inside top block ... -->
+		<div class="flexi topblock" style="<?php echo $topblock_flex_style; ?>">
 
-			<?php
-				$has_output_image = false;
-				$has_output_top   = false;
-
-				if (isset($item->positions['image']))
-				{
-					foreach ($item->positions['image'] as $field)
-					{
-						$has_output_image = $has_output_image || strlen($field->display);
-					}
-				}
-
-				if (isset($item->positions['top']))
-				{
-					foreach ($item->positions['top'] as $field)
-					{
-						$has_output_top = $has_output_top || strlen($field->display);
-					}
-				}
-
-				$top_span_col_params = (int) $this->params->get('top_col_width', '30%');
-				
-				/*$top_span_cols = $top_span_cols_params < 1 || $top_span_cols_params > 12 ? 8 : $top_span_cols_params;
-				$img_span_cols = 12 - $top_span_cols > 0 ? 12 - $top_span_cols : 12;
-
-				$imgPos_widthClass = 'span' . $img_span_cols . ' col-lg-' . $img_span_cols . ' col-md-' .$img_span_cols;
-				$topPos_widthClass = 'span' . $top_span_cols . ' col-lg-' . $top_span_cols . ' col-md-' .$top_span_cols;
-
-				$box_class_image .= (!$has_output_top ? ' span12' : ' ' . $imgPos_widthClass);
-				$box_class_top   .= (!$has_output_image ? ' span12' : ' '. $topPos_widthClass);*/
-			?>
-
-          
           <?php if (isset($item->positions['image'])) : ?>
 		<!-- BOF image block -->
-		<div class="<?php echo $box_class_image; ?>">
+		<div class="<?php echo $box_class_image; ?>" style="flex:1; min-width:0;">
 			<?php foreach ($item->positions['image'] as $field) : ?>
 			<div class="flexi element field_<?php echo $field->name; ?>">
 				<?php if ($field->label) : ?>
@@ -352,12 +324,12 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 				<!-- BOF top block -->
 				<?php
 					$top_cols = $this->params->get('top_cols', 'two');
-					$span_class = ''; //$top_cols == 'one' ? 'span8' : 'span4'; // commented out: bootstrap spanNN is not responsive to width !
+					$topblock_top_style = 'flex:0 0 ' . htmlspecialchars($top_col_width) . '; min-width:0;';
 				?>
-				<div class="<?php echo $box_class_top; ?> <?php echo $top_cols; ?>cols">
+				<div class="<?php echo $box_class_top; ?> <?php echo $top_cols; ?>cols" style="<?php echo $topblock_top_style; ?>">
 					<ul class="flexi ">
 						<?php foreach ($item->positions['top'] as $field) : ?>
-						<li class="flexi lvbox <?php echo 'field_' . $field->name . ' ' . $span_class; ?>">
+						<li class="flexi lvbox <?php echo 'field_' . $field->name; ?>">
 							<div>
 								<?php if ($field->label) : ?>
 								<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
@@ -371,7 +343,8 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 				<!-- EOF top block -->
 			<?php endif; ?>
 
-		</aside>
+		</div>
+		<style>#flexicontent .flexi.topblock{overflow:hidden;width:100%;margin-bottom:10px}#flexicontent .topblock .flexi.image{display:flex;flex-direction:column}@media(max-width:768px){#flexicontent .flexi.topblock{flex-direction:column !important}#flexicontent .flexi.topblock > *{flex:1 1 100% !important}}</style>
 		<!-- EOF image/top  -->
 	<?php endif; ?>
 
