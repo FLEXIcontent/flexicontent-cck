@@ -265,6 +265,25 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 	}
 
+	/* Re-execute the inline scripts of replaced map modules (e.g. flexigooglemap):
+	 * innerHTML does not run <script> tags, so the map must be re-initialized manually.
+	 * The fresh module HTML (server-rendered with the filtered items) carries its init code inline. */
+	function fcReinitModuleScripts(moduleContainers) {
+		for (var mi = 0; mi < moduleContainers.length; mi++) {
+			var wrap = moduleContainers[mi];
+			if (!wrap || !wrap.querySelectorAll || !wrap.classList) continue;
+			if (!wrap.classList.contains('mod_fleximap')) continue;
+			var inlineScripts = wrap.querySelectorAll('script:not([src])');
+			for (var si = 0; si < inlineScripts.length; si++) {
+				var oldScript = inlineScripts[si];
+				var newScript = document.createElement('script');
+				newScript.type = 'text/javascript';
+				newScript.textContent = oldScript.textContent;
+				if (oldScript.parentNode) oldScript.parentNode.replaceChild(newScript, oldScript);
+			}
+		}
+	}
+
 	/* Main ajax submit handler */
 	document.addEventListener('submit', function(e) {
 		var form = e.target;
@@ -335,6 +354,9 @@ document.addEventListener('DOMContentLoaded', function() {
 					if (modId) {
 						var newMod = doc.getElementById(modId);
 						if (newMod) modWrapper.innerHTML = newMod.innerHTML;
+						/* Map module hidden when no locations match (hide_map_when_empty):
+						 * clear the stale map container instead of keeping the old markers */
+						else if (modWrapper.classList.contains('mod_fleximap')) modWrapper.innerHTML = '';
 					}
 					modWrapper.style.opacity = '1';
 				}
@@ -343,6 +365,9 @@ document.addEventListener('DOMContentLoaded', function() {
 			if (blocker) blocker.style.display = 'none';
 
 			fcReattachLibs(targetContainer, moduleContainers);
+
+			/* Re-initialize replaced map modules (innerHTML scripts are not executed by the browser) */
+			fcReinitModuleScripts(moduleContainers);
 
 			/* Re-bind the refreshed forms */
 			var formsToRebind = [];
@@ -403,6 +428,9 @@ document.addEventListener('DOMContentLoaded', function() {
 			}
 
 			if (window.history && window.history.pushState) window.history.pushState(null, '', fullActionUrl);
+
+			/* Notify modules/scripts that AJAX filtering completed */
+			document.dispatchEvent(new CustomEvent('fc:filterComplete', { detail: { doc: doc, moduleContainers: moduleContainers } }));
 		}).catch(function() {
 			if (targetContainer) targetContainer.style.opacity = '1';
 			fcSetOpacity(moduleContainers, '1');
