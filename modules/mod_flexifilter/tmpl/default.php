@@ -251,7 +251,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			if (!cont || !cont.querySelectorAll) continue;
 			var libEls = cont.querySelectorAll('select.use_select2_lib');
 			if (libEls.length && window.fc_attachSelect2 && !window.skip_select2_js) {
-				window.fc_attachSelect2(cont, Array.prototype.slice.call(libEls));
+				window.fc_attachSelect2(cont, window.jQuery ? jQuery(libEls) : libEls);
 			}
 			if (window.jQuery && window.jQuery.fn && window.jQuery.fn.chosen) {
 				var chosenEls = cont.querySelectorAll('select.use_chosen_lib');
@@ -333,11 +333,17 @@ document.addEventListener('DOMContentLoaded', function() {
 		var blocker = document.getElementById('fc_filter_form_blocker');
 		if (blocker) blocker.style.display = 'block';
 
+		/* Abort any in-flight request so only the latest filter wins */
+		if (window._fc_ajax_abort) { try { window._fc_ajax_abort.abort(); } catch(eAbort) {} }
+		window._fc_ajax_abort = new AbortController();
+
 		fetch(baseUrl + '?' + queryString, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
-			body: queryString
+			body: queryString,
+			signal: window._fc_ajax_abort.signal
 		}).then(function(resp) { return resp.text(); }).then(function(response) {
+		try {
 			var doc = new DOMParser().parseFromString(response, 'text/html');
 
 			if (targetContainer) {
@@ -345,6 +351,11 @@ document.addEventListener('DOMContentLoaded', function() {
 				if (newContent) targetContainer.innerHTML = newContent.innerHTML;
 				targetContainer.style.opacity = '1';
 			}
+
+			/* Re-query moduleContainers: modules may live inside #flexicontent and
+			 * were just replaced by the innerHTML swap above — the old NodeList
+			 * now points to disconnected elements. */
+			moduleContainers = document.querySelectorAll('.mod_flexifilter_wrapper, .mod_fleximap');
 
 			if (moduleContainers.length) {
 				for (var mc = 0; mc < moduleContainers.length; mc++) {
@@ -431,12 +442,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
 			/* Notify modules/scripts that AJAX filtering completed */
 			document.dispatchEvent(new CustomEvent('fc:filterComplete', { detail: { doc: doc, moduleContainers: moduleContainers } }));
-		}).catch(function() {
+		} catch(err) {
+			console.error('[FC AJAX] Error during DOM update:', err);
 			if (targetContainer) targetContainer.style.opacity = '1';
 			fcSetOpacity(moduleContainers, '1');
 			if (blocker) blocker.style.display = 'none';
-			if (form._originalSubmit) form._originalSubmit.call(form);
-			else form.submit();
+		}
+		}).catch(function(err) {
+			if (err && err.name === 'AbortError') return;
+			console.error('[FC AJAX] Fetch error:', err);
+			if (targetContainer) targetContainer.style.opacity = '1';
+			fcSetOpacity(moduleContainers, '1');
+			if (blocker) blocker.style.display = 'none';
 		});
 	});
 });
