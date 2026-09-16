@@ -251,7 +251,17 @@ document.addEventListener('DOMContentLoaded', function() {
 			if (!cont || !cont.querySelectorAll) continue;
 			var libEls = cont.querySelectorAll('select.use_select2_lib');
 			if (libEls.length && window.fc_attachSelect2 && !window.skip_select2_js) {
-				window.fc_attachSelect2(cont, window.jQuery ? jQuery(libEls) : libEls);
+				/* Only re-attach if the target library is actually available (the select2 framework
+				 * is loaded on-demand, e.g. it may be missing when mod_flexifilter is used on a page
+				 * whose category view doesn't load it). Otherwise fall back to native selects. */
+				var libReady = window.fc_use_choicesjs
+					? (typeof window.Choices === 'function')
+					: !!(window.jQuery && window.jQuery.fn && window.jQuery.fn.select2);
+				if (libReady) {
+					window.fc_attachSelect2(cont, window.jQuery ? jQuery(libEls) : libEls);
+				} else {
+					for (var li = 0; li < libEls.length; li++) libEls[li].classList.remove('use_select2_lib');
+				}
 			}
 			if (window.jQuery && window.jQuery.fn && window.jQuery.fn.chosen) {
 				var chosenEls = cont.querySelectorAll('select.use_chosen_lib');
