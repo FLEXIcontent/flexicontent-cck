@@ -719,15 +719,23 @@ CSS;
 })();
 
 		// Geo locate visitor on-demand via button click
-		document.addEventListener("click", function(e) {
-			if (e.target && e.target.classList.contains("geo-locate-me-btn")) {
-				fc_MapMad_geolocateMe_<?= $module->id; ?>(module_map_<?= $module->id; ?>);
-			}
-		});
-      // Correction zone grise au redimensionnement de la fenêtre
-window.addEventListener('resize', function() {
-    map.invalidateSize();
-});
+		// NOTE: wrap in a once-only guard because the whole inline script is re-executed
+		//       after AJAX filtering (fcReinitModuleScripts) to rebuild the map with fresh items
+		if (!window.__fcMapGlobals_<?= $module->id; ?>) {
+			window.__fcMapGlobals_<?= $module->id; ?> = true;
+
+			document.addEventListener("click", function(e) {
+				if (e.target && e.target.classList.contains("geo-locate-me-btn")) {
+					fc_MapMad_geolocateMe_<?= $module->id; ?>(module_map_<?= $module->id; ?>);
+				}
+			});
+			// Correction zone grise au redimensionnement de la fenêtre
+			window.addEventListener('resize', function() {
+				if (module_map_<?= $module->id; ?>) {
+					module_map_<?= $module->id; ?>.invalidateSize();
+				}
+			});
+		}
 	</script>
 
 
@@ -913,18 +921,24 @@ window.addEventListener('resize', function() {
 		fc_MapMod_initialize_<?= $module->id; ?>();
 
 		// Geo locate visitor on-demand via button click
-		document.addEventListener("click", function(e) {
-			if (e.target && e.target.classList.contains("geo-locate-me-btn")) {
-				fc_MapMad_geolocateMe_<?= $module->id; ?>(module_map_<?= $module->id; ?>);
-			}
-		});
+		// NOTE: wrap in a once-only guard because the whole inline script is re-executed
+		//       after AJAX filtering (fcReinitModuleScripts) to rebuild the map with fresh items
+		if (!window.__fcMapGlobals_<?= $module->id; ?>) {
+			window.__fcMapGlobals_<?= $module->id; ?> = true;
 
-		// Geo locate visitor on-demand via button click
-		document.addEventListener("change", function(e) {
-			if (e.target && e.target.classList.contains("geo-locate-zoom-level")) {
-				fc_MapMad_geolocateMe_<?= $module->id; ?>(module_map_<?= $module->id; ?>);
-			}
-		});
+			document.addEventListener("click", function(e) {
+				if (e.target && e.target.classList.contains("geo-locate-me-btn")) {
+					fc_MapMad_geolocateMe_<?= $module->id; ?>(module_map_<?= $module->id; ?>);
+				}
+			});
+
+			// Geo locate visitor on-demand via button click
+			document.addEventListener("change", function(e) {
+				if (e.target && e.target.classList.contains("geo-locate-zoom-level")) {
+					fc_MapMad_geolocateMe_<?= $module->id; ?>(module_map_<?= $module->id; ?>);
+				}
+			});
+		}
 	</script>
 
 

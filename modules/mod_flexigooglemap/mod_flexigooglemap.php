@@ -25,7 +25,7 @@ require_once(JPATH_SITE . DS . 'components' . DS . 'com_flexicontent' . DS . 'cl
 require_once(JPATH_SITE . DS . 'components' . DS . 'com_flexicontent' . DS . 'classes' . DS . 'flexicontent.categories.php');
 
 require_once(JPATH_SITE . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'item.php');
-//require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'category.php');
+require_once(JPATH_SITE . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'category.php');
 
 //require_once (JPATH_SITE.DS.'modules'.DS.'mod_flexicontent'.DS.'classes'.DS.'datetime.php');
 //\Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
