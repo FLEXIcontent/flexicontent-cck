@@ -1444,38 +1444,32 @@ class flexicontent_html
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/grapesjs';
 
-				$grapjs_vers = '0.16.22'; // need to update
+				$grapjs_vers = '0.23.6';
 				$url_grapjs_css = 'https://unpkg.com/grapesjs@' . $grapjs_vers . '/dist/css/grapes.min.css';
 				$url_grapjs_js = 'https://unpkg.com/grapesjs@' . $grapjs_vers . '/dist/grapes.min.js';
 
 				$document->addStyleSheet($framework_path.'/stylesheets/toastr.min.css');
 				$document->addStyleSheet($url_grapjs_css);
-				$document->addStyleSheet($framework_path.'/stylesheets/grapesjs-preset-webpage.min.css?0.1.10');
-				$document->addStyleSheet($framework_path.'/stylesheets/tooltip.css');
-				$document->addStyleSheet($framework_path.'/stylesheets/grapesjs-plugin-filestack.css');
 				$document->addStyleSheet($framework_path.'/stylesheets/demos.css');
 
-				$document->addScript('https://static.filestackapi.com/v3/filestack.js');
 				$document->addScript($framework_path.'/js/toastr.min.js');
 				$document->addScript($url_grapjs_js);
 
+				// Must be loaded before the plugin scripts (which call deprecated grapesjs.plugins.add() on load)
+				$document->addScript($framework_path.'/js/gjs-suppress-plugin-load-warnings.js');
+
 
 				// GrapesJS Plugins
-				//$document->addScript('https://unpkg.com/grapesjs-blocks-basic');
-				$document->addScript($framework_path.'/js/grapesjs-preset-webpage.min.js?0.1.10');
-				$document->addScript($framework_path.'/js/grapesjs-lory-slider.min.js?0.1.5');
-				$document->addScript($framework_path.'/js/grapesjs-tabs.min.js?0.1.1');
-				$document->addScript($framework_path.'/js/grapesjs-custom-code.min.js?0.1.1');
+				$document->addScript($framework_path.'/js/grapesjs-preset-webpage.js?1.0.3');
+				$document->addScript($framework_path.'/js/grapesjs-blocks-basic.js?1.0.2');
+				$document->addScript($framework_path.'/js/grapesjs-tabs.min.js?1.0.6');
+				$document->addScript($framework_path.'/js/grapesjs-custom-code.js?1.0.2');
 				$document->addScript($framework_path.'/js/grapesjs-touch.min.js?0.1.1');
-				$document->addScript($framework_path.'/js/grapesjs-parser-postcss.min.js?0.1.1');
-				$document->addScript($framework_path.'/js/grapesjs-tooltip.min.js?0.1.1');
+				$document->addScript($framework_path.'/js/grapesjs-tooltip.js?0.1.8');
 				//shapedivider module
 				//$document->addScript('https://unpkg.com/grapesjs-shape-divider');  
-				//ckeditor for graps
-				$document->addScript($framework_path.'/js/grapesjs-plugin-ckeditor.min.js?0.0.9');
-				$document->addScript('https://cdn.ckeditor.com/4.14.1/standard-all/ckeditor.js');
 				//bs4
-				//$document->addScript($framework_path.'/js/grapesjs-blocks-bootstrap4.min');
+				$document->addScript($framework_path.'/js/grapesjs-blocks-bootstrap4.min.js?0.2.5');
 				break;
 
 			case 'grapesjs_view':
@@ -6556,5 +6550,226 @@ class flexicontent_html
 		}
 
 		return $field->input;
+	}
+
+
+	/**
+	 * Render a GrapesJS Builder layout for an item, resolving the FlexiContent placeholders
+	 * that the Builder blocks output ({flexi_field:..}, {flexi_link:..}, {flexi_item:..})
+	 * plus the generic tokens ({{fc-item-id}}, %item_id%, %user_id%, %template_name%),
+	 * and loading the item-scoped Builder CSS (compiled from the saved builder CSS/LESS).
+	 *
+	 * @param   string   $layout_html   The Builder's HTML of the layout
+	 * @param   object   $params        Merged item parameters (containing builder_layoutN_* params)
+	 * @param   object   $item          The current FlexiContent item (with its loaded fields)
+	 * @param   array    $options       Optional: layout_name, css_prefix, css_id
+	 *
+	 * @return  string   The rendered layout HTML
+	 *
+	 * @since   4.4
+	 */
+	public static function renderBuilderLayout($layout_html, $params, $item, $options = array())
+	{
+		$html = (string) trim($layout_html);
+		if ($html === '') return '';
+
+		$layout_name = !empty($options['layout_name']) ? $options['layout_name'] : 'builder_layout1';
+		$css_prefix  = isset($options['css_prefix']) ? $options['css_prefix'] : '#flexicontent';
+		$css_id      = !empty($options['css_id']) ? $options['css_id'] : ($params->get('ilayout', 'grapesjs'));
+		$location    = '/components/com_flexicontent/builder/';
+
+		// 1. Compile (if not done already) the layout CSS, scoped by css_prefix, then load it
+		\Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
+		\Joomla\CMS\HTML\HTMLHelper::_('fclayoutbuilder.createCss',
+			(object) array('id' => $css_id),
+			$params,
+			(object) array(
+				'location'    => $location,
+				'css_prefix'  => $css_prefix,
+				'layout_name' => $layout_name,
+				'id'          => $css_id,
+			)
+		);
+		flexicontent_html::loadframework('grapesjs_view');
+		// Layout URL hash used as CSS file version (cache-buster). Fall back to a
+		// content-based hash for layouts saved before the hash gets populated.
+		$layout_hash = (string) $params->get($layout_name . '_hash');
+		if ($layout_hash === '')
+		{
+			$layout_hash = md5((string) $params->get($layout_name . '_css'));
+		}
+		\Joomla\CMS\Factory::getApplication()->getDocument()->addStyleSheet(
+			\Joomla\CMS\Uri\Uri::base(true) . $location . 'css/' . $layout_name . '_' . $css_id . '.css',
+			array('version' => $layout_hash)
+		);
+
+		// 2. Make element IDs unique per item, so that multiple items can coexist on a page
+		$matches = null;
+		preg_match_all('/\sid="([a-zA-Z0-9_-]*)"/', $html, $matches);
+
+		foreach ($matches[0] as $i => $k)
+		{
+			$tagid = $matches[1][$i];
+			$html = str_replace('id="' . $tagid . '"', 'id="' . $tagid . '_{{fc-item-id}}"', $html);
+			$html = str_replace('"#' . $tagid . '"', '"#' . $tagid . '_{{fc-item-id}}"', $html);
+			$html = str_replace("'#" . $tagid . "'", "'#" . $tagid . "_{{fc-item-id}}'", $html);
+		}
+
+		// 3. Replace the generic tokens with actual values
+		$html = str_replace('{{fc-item-id}}', $item->id, $html);
+		$html = str_replace('%item_id%',      $item->id, $html);
+		$html = str_replace('%user_id%',      (int) \Joomla\CMS\Factory::getApplication()->getIdentity()->id, $html);
+		$html = str_replace('%template_name%', $params->get('ilayout', 'grapesjs'), $html);
+
+		// 4. Resolve field placeholders: {flexi_field:field_name  item:122|current  method:display}
+		$html = preg_replace_callback('~\{flexi_field:([a-z0-9_-]+)\s*([^}]*)\}~i',
+			function($m) use ($item)
+			{
+				if (isset($item->fields[$m[1]]))
+				{
+					$display = trim((string) $item->fields[$m[1]]->display);
+					if ($display === '')
+					{
+						// Fields are normally pre-rendered only when assigned to the layout's
+						// template positions; render the builder-placed field on demand.
+						if (!class_exists('FlexicontentFields'))
+						{
+							@require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.fields.php');
+						}
+						try
+						{
+							$display = trim((string) FlexicontentFields::getFieldDisplay($item, $m[1], null, 'display', FLEXI_ITEMVIEW));
+						}
+						catch (\Joomla\CMS\Exception\ExceptionInterface $e)
+						{
+							$display = '';
+						}
+						catch (\Exception $e)
+						{
+							$display = '';
+						}
+					}
+					return $display;
+				}
+				return ''; // Field not rendered
+			},
+			$html
+		);
+
+		// 5. Resolve link placeholders: {flexi_link:item  item:566|current  linktext:_title_}
+		//    and their wrapper form (linktext:_noclose_) closed by {/flexi_link}
+		$html = preg_replace_callback('~\{flexi_link:item\s+([^}]*)\}~i',
+			function($m) use ($item)
+			{
+				$_id = 0;
+				$_text = '';
+				$_noclose = false;
+
+				foreach (preg_split('/\s+/', trim($m[1]), -1, PREG_SPLIT_NO_EMPTY) as $_arg)
+				{
+					$_pair = explode(':', $_arg, 2);
+					if (($_pair[0] === 'item' || $_pair[0] === 'id') && isset($_pair[1]))
+					{
+						$_pipes = explode('|', $_pair[1]);
+						$_id = in_array('current', $_pipes) ? $item->id : ((int) $_pipes[0] ?: $item->id);
+					}
+					elseif ($_pair[0] === 'linktext' && isset($_pair[1]))
+					{
+						$_noclose = $_pair[1] === '_noclose_';
+						$_text = ($_pair[1] === '_title_' || $_noclose) ? $item->title : $_pair[1];
+					}
+				}
+
+				if (!$_id) return '';
+
+				$_link = '<a href="' . \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getItemRoute($_id, $item->cat_id)) . '">' . htmlspecialchars($_text);
+
+				return $_noclose ? $_link : $_link . '</a>';
+			},
+			$html
+		);
+		$html = str_replace('{/flexi_link}', '</a>', $html);
+
+		// 6. Resolve the {flexi_item:profile ...} placeholders (prototype):
+		//    find the user's "profile" item (an item carrying a field of type "jprofile"
+		//    whose value is the user id) and render it with the given layout.
+		$html = preg_replace_callback('~\{flexi_item:profile\s+([^}]*)\}~i',
+			function($m) use ($item, $params)
+			{
+				// Guard against infinite recursion when the profile layout itself contains
+				// profile placeholders (allow at most 2 nested profile levels per request)
+				static $fcl_profile_depth = 0;
+				if ($fcl_profile_depth >= 2) return '';
+				$fcl_profile_depth++;
+
+				$uid = 0;
+				$ilayout = '';
+
+				foreach (preg_split('/\s+/', trim($m[1]), -1, PREG_SPLIT_NO_EMPTY) as $_arg)
+				{
+					$_pair = explode(':', $_arg, 2);
+					if (($_pair[0] === 'user') && isset($_pair[1]))
+					{
+						$_v = trim(str_replace(array('[', ']'), '', $_pair[1]));
+						$uid = ($_v === '' || $_v === 'current')
+							? (int) \Joomla\CMS\Factory::getApplication()->getIdentity()->id
+							: (int) $_v;
+					}
+					elseif (($_pair[0] === 'author_of') && isset($_pair[1]))
+					{
+						$_aid = 0;
+						$_raw = trim(str_replace(array('[', ']', '&'), '', $_pair[1]));
+						$_parts = array_map('trim', explode('|', $_raw));
+						$_aid = in_array('current', $_parts) || $_parts[0] === '' ? $item->id : (int) $_parts[0];
+						if ($_aid)
+						{
+							$_db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+							$_q  = $_db->getQuery(true);
+							$_q->select($_db->quoteName('created_by'))
+								->from($_db->quoteName('#__content'))
+								->where($_db->quoteName('id') . ' = ' . (int) $_aid);
+							$_db->setQuery($_q);
+							$uid = (int) $_db->loadResult();
+						}
+					}
+					elseif ($_pair[0] === 'ilayout' && isset($_pair[1]))
+					{
+						$ilayout = trim($_pair[1]);
+					}
+				}
+
+				if (!$uid) return '';
+
+				// The profile item of this user: any published item that carries a "jprofile"
+				// field holding the user id (like the jprofile field type stores it)
+				try
+				{
+					$_db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+					$_q  = $_db->getQuery(true);
+					$_q->select($_db->quoteName('fv.item_id'))
+						->from($_db->quoteName('#__flexicontent_fields_values', 'fv'))
+						->join('INNER', $_db->quoteName('#__flexicontent_fields', 'f') . ' ON ' . $_db->quoteName('f.id') . ' = ' . $_db->quoteName('fv.field_id'))
+						->where($_db->quoteName('f.field_type') . ' = ' . $_db->quote('jprofile'))
+						->where($_db->quoteName('fv.value') . ' = ' . $_db->quote((string) $uid))
+						->setLimit(1);
+					$_db->setQuery($_q);
+					$pid = (int) $_db->loadResult();
+					if (!$pid) return '';
+
+					$h = new flexicontent_html();
+					return (string) $h->renderItem($pid, FLEXI_ITEMVIEW, $ilayout);
+				}
+				catch (\Exception $e)
+				{
+					// Never break the item rendering because of a profile lookup
+					return '';
+				}
+			},
+			$html
+		);
+		// Leftover non-profile flexi_item placeholders are ignored silently
+		$html = preg_replace('~\{flexi_item:[^}]*\}~', '', $html);
+
+		return $html;
 	}
 }

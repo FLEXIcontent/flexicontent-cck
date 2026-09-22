@@ -159,9 +159,16 @@ $this->document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flex
 
 <form action="index.php" method="post" name="adminForm" id="adminForm" class="form-validate form-horizontal">
 
+	<?php
+	// Layout Builder templates (GrapesJS) are built visually, so the "Information" and
+	// "Fields placement" tabs are not meaningful and are not rendered at all.
+	$is_builder = $this->layout->name == 'grapesjs';
+	?>
+
 	<div class="fctabber tabset_layout fcparams_tabset" id="tabset_layout" style="margin:16px 0 !important;">
 
-		<div class="tabbertab" id="tabset_layout_information_tab" data-icon-class="icon-info" >
+		<?php if (!$is_builder) : ?>
+		<div class="tabbertab" id="tabset_layout_information_tab" data-icon-class="icon-info">
 			<h3 class="tabberheading"> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_INFORMATION' ); ?></h3>
 
 	<!--div class="fc-info fc-nobgimage fc-mssg-inline" style="font-size: 12px; margin: 0px 0px 16px 0px !important; padding: 16px 32px !important">
@@ -309,8 +316,10 @@ $this->document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flex
 	</table>
 
 		</div>
+		<?php endif; ?>
 
-		<div class="tabbertab" id="tabset_layout_fields_placement_tab" data-icon-class="icon-signup" >
+		<?php if (!$is_builder) : ?>
+		<div class="tabbertab" id="tabset_layout_fields_placement_tab" data-icon-class="icon-signup">
 			<h3 class="tabberheading"> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_FIELDS_PLACEMENT' ); ?></h3>
 
 			<div class="fcclear"></div>
@@ -481,14 +490,16 @@ $this->document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flex
 			</div>
 
 		</div>
+		<?php endif; ?>
 
 		<?php
 			$pfx = $this->layout->view == 'category' ? 'FCC' : 'FCI';
 		?>
 
-		<div class="tabbertab" id="tabset_layout_disp_params_tab" data-icon-class="icon-options" >
-			<h3 class="tabberheading"> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_DISPLAY_PARAMETERS' ); ?> </h3>
+		<div class="tabbertab<?php echo $is_builder ? ' tabbertabforced' : ''; ?>" id="tabset_layout_disp_params_tab" data-icon-class="icon-options" >
+			<h3 class="tabberheading"> <?php echo $is_builder ? \Joomla\CMS\Language\Text::_( 'FLEXI_TEMPLATE_BUILDER' ) : \Joomla\CMS\Language\Text::_( 'FLEXI_DISPLAY_PARAMETERS' ); ?> </h3>
 
+			<?php if (!$is_builder) : ?>
 			<div style="max-width:1024px; margin-bottom:16px;">
 
 				<div id="fc-mini-help_btn1" class="btn" onclick="fc_toggle_box_via_btn('fc-mini-help-heritage', this, 'btn-primary');" style="margin: 0 32px 0 0;">
@@ -526,18 +537,20 @@ $this->document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flex
 				</div>
 
 			</div>
+			<?php endif; ?>
 
-			<div style="max-width:1024px; margin-top:16px;">
+			<div style="max-width:<?php echo $is_builder ? '100%' : '1024px'; ?>; margin-top:16px;">
 
 				<?php
 				$groupname = 'attribs';  // Field Group name this is for name of <fields name="..." >
+				$builder_code_open = false;
 				$fieldSets = $this->layout->params->getFieldsets($groupname);
 				foreach ($fieldSets as $fsname => $fieldSet) :
 					if (isset($fieldSet->description) && trim($fieldSet->description)) :
 						echo '<div class="fc-mssg fc-info">'.\Joomla\CMS\Language\Text::_($fieldSet->description).'</div>';
 					endif;
 					?>
-					<fieldset class="panelform">
+					<?php if (!$is_builder) : ?><fieldset class="panelform"><?php endif; ?>
 						<?php foreach ($this->layout->params->getFieldset($fsname) as $field) :
 							$fieldname =  $field->__get('fieldname');
 							$cssprep = $field->getAttribute('cssprep');
@@ -548,8 +561,31 @@ $this->document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flex
 
 							if ($field->getAttribute('type')=='separator' || $field->hidden)
 							{
-								echo $field->input;
+								// Hidden builder fields (project data, JS, hash, LESS) hold stored values;
+								// render them with the saved value (Joomla's $field->input alone is blank)
+								$hinput = ($field->hidden && $value !== null)
+									? $this->layout->params->getInput($fieldname, $groupname, $value)
+									: $field->input;
+								echo str_replace('jform_attribs_', 'jform_layouts_'.$this->layout->name.'_',
+									str_replace('[attribs]', '[layouts]['.$this->layout->name.']',
+										$hinput
+									)
+								);
 								continue;
+							}
+
+							// Layout Builder: put the raw HTML / CSS fields into a collapsed accordion
+							// using a native <details> element (no JavaScript needed)
+							if ($is_builder && ($fieldname == 'builder_layout1_html' || $fieldname == 'builder_layout1_css') && !$builder_code_open)
+							{
+								$builder_code_open = true;
+								echo '<style>.fc-builder-code-toggle{list-style:none;}'
+									. '.fc-builder-code-toggle::-webkit-details-marker{display:none;}</style>';
+								echo '<details style="margin:12px 0 8px 0;">';
+								echo '<summary class="btn btn-primary fc-builder-code-toggle" style="display:inline-block;">'
+									. '<span class="icon-eye"></span> ' . \Joomla\CMS\Language\Text::_('FLEXI_HTML_CSS')
+									. '</summary>';
+								echo '<div style="margin-top:8px;">';
 							}
 							echo '<div class="control-group">';
 							echo '<div class="control-label">' .
@@ -565,8 +601,14 @@ $this->document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flex
 									)
 								) . '</div>';
 							echo '</div>';
+
+							if ($is_builder && $fieldname == 'builder_layout1_css')
+							{
+								echo '</div></details>';
+								$builder_code_open = false;
+							}
 						endforeach; ?>
-					</fieldset>
+					<?php if (!$is_builder) : ?></fieldset><?php endif; ?>
 				<?php endforeach; ?>
 
 			</div>

@@ -419,8 +419,18 @@ class FlexicontentModelTemplate extends FCModelAdmin
 			$layoutConf->cfgname = $this->_cfgname;
 			$layoutConf->attribs = '';
 		}
-		$layoutConf->attribs = new \Joomla\Registry\Registry($layoutConf->attribs);
-		$layoutConf->attribs = $layoutConf->attribs->toArray();
+		try {
+			$layoutConf->attribs = new \Joomla\Registry\Registry($layoutConf->attribs);
+			$layoutConf->attribs = $layoutConf->attribs->toArray();
+		}
+		catch (\Exception $e) {
+			// Corrupted / truncated JSON stored (e.g. column too small for the Layout Builder data)
+			\Joomla\CMS\Factory::getApplication()->enqueueMessage(
+				'Layout configuration for template "' . $this->_folder . '", layout "' . $this->_type . '" is corrupted and was ignored: ' . $e->getMessage(),
+				'warning'
+			);
+			$layoutConf->attribs = array();
+		}
 
 		//echo "<pre>"; print_r($layoutConf); echo "</pre>";
 		return $layoutConf;
@@ -444,6 +454,10 @@ class FlexicontentModelTemplate extends FCModelAdmin
 		$this->_db->execute();
 
 		$attribs = json_encode($attribs);
+		if ($attribs === false) {
+			JError::raiseWarning(500, 'Failed to encode layout configuration as JSON: ' . json_last_error_msg());
+			return false;
+		}
 		//echo "<pre>"; print_r($attribs); echo "</pre>";
 
 		$query 	= 'INSERT INTO #__flexicontent_layouts_conf (`template`, `cfgname`, `layout`, `attribs`)'
@@ -644,7 +658,9 @@ class FlexicontentModelTemplate extends FCModelAdmin
 	{
 		// Load the XML file into a \Joomla\CMS\Form\Form object
 		$jform = new \Joomla\CMS\Form\Form('com_flexicontent.template', array('control' => 'jform', 'load_data' => false));
-		$jform->load($this->_getLayout()->params);   // params is the XML file contents as a string
+		$_layout = $this->_getLayout();
+		if (!is_object($_layout) || empty($_layout->params)) return false;  // Layout not found for this type (e.g. no item.xml / category.xml) - abort
+		$jform->load($_layout->params);   // params is the XML file contents as a string
 
 		$layout_type = $layout=='items' ? 'item' : 'category';
 		$tmpldir = \Joomla\Filesystem\Path::clean(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates');

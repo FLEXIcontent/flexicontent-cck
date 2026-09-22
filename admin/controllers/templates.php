@@ -140,6 +140,45 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 		$post = $this->input->get->post->getArray();
 		$attribs = $post['jform']['layouts'][$folder];
 
+		// Make sure the Layout Builder JHtml helper is loaded before the layout XML filters run,
+		// otherwise callable filters like createUrlHash / prepareLess are silently ignored
+		// (this is why the builder hash stayed empty and the compiled CSS was never refreshed)
+		\Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
+		\Joomla\CMS\HTML\HTMLHelper::_('fclayoutbuilder.createUrlHash', '');
+
+		// Run the layout XML field filters (JHtmlFclayoutbuilder::createUrlHash / prepareLess, etc)
+		// so that the builder hash is regenerated and the LESS file is removed (CSS will be re-created)
+		$existing_attribs = flexicontent_tmpl::getLayoutparams($type, $folder, $cfgname);
+		$layout_type = $type == 'category' ? 'category' : 'item';
+		$attribs = flexicontent_tmpl::validateLayoutData($attribs, new \Joomla\Registry\Registry($existing_attribs),
+			(object) array('type' => $layout_type, 'name' => $folder, 'fset' => 'attribs', 'cssprep_save' => true)
+		);
+
+		// Deterministically regenerate the front-end HTML/CSS/JS from the builder project JSON
+		// (the single source of truth). The browser canvas serialization captured transient /
+		// partial states on some saves and produced degraded "_html" values (only text).
+		// Keep previously stored values when the project data is missing / invalid.
+		if (!class_exists('JHtmlFclayoutbuilder'))
+		{
+			$builder_helper = JPATH_SITE . '/components/com_flexicontent/helpers/html/fclayoutbuilder.php';
+			if (is_file($builder_helper)) require_once $builder_helper;
+		}
+		$layout_data    = isset($attribs['builder_layout1_data']) ? $attribs['builder_layout1_data'] : '';
+		$layout_render  = class_exists('JHtmlFclayoutbuilder') ? \JHtmlFclayoutbuilder::renderLayoutFromProject($layout_data) : null;
+		if (!empty($layout_render) && $layout_render['html'] !== null)
+		{
+			$attribs['builder_layout1_html'] = $layout_render['html'];
+			$attribs['builder_layout1_css']  = $layout_render['css'];
+			$attribs['builder_layout1_js']   = $layout_render['js'];
+
+			// Regenerate the layout URL hash (cache-buster for the compiled CSS file).
+			// The Joomla form filter skips fields with an empty submitted value, so the
+			// JHtmlFclayoutbuilder::createUrlHash filter could never populate this field:
+			// it only runs when the hash field already holds a value. Content-addressed so
+			// that unchanged layouts keep the same hash and the browser cache is reused.
+			$attribs['builder_layout1_hash'] = md5((string) $attribs['builder_layout1_css']);
+		}
+
 		// Set templates configuration
 		$model->setConfig($positions, $attribs);
 

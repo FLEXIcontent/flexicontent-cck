@@ -87,22 +87,51 @@ abstract class JHtmlFclayoutbuilder
 		$less_code  = str_replace($css_prefix . ' body', $css_prefix, $less_code);
 
 		//echo '<pre>' . $less_code . '</pre>';
-		$less_file  = 'less/' . $layout_name . '_' . $module->id . '.less';
+		$css_id     = isset($config->id) && $config->id !== '' ? $config->id : $module->id;
+		$less_file  = 'less/' . $layout_name . '_' . $css_id . '.less';
 		$less_path  = \Joomla\Filesystem\Path::clean($path . $less_file);
 
-		// Create LESS file
-		if (!file_exists($less_path))
+		// Create / update the LESS file when its generated content has changed.
+		// Relying on file existence alone left a stale compiled CSS on the page
+		// after the layout CSS was edited in the Layout Builder.
+		$less_code_changed = true;
+		if (file_exists($less_path))
 		{
-			$_resource = fopen($less_path, "w");
+			$less_code_changed = (@file_get_contents($less_path) !== $less_code);
+		}
+
+		if ($less_code_changed)
+		{
+			// Make sure the target folder exists (e.g. /components/com_flexicontent/builder/less/)
+			$less_dir = dirname($less_path);
+			if (!is_dir($less_dir))
+			{
+				@mkdir($less_dir, 0755, true);
+			}
+
+			$_resource = @fopen($less_path, "w");
+
+			// Do not break the page if the folder is missing / not writable
+			if ($_resource === false)
+			{
+				if (JDEBUG)
+				{
+					\Joomla\CMS\Factory::getApplication()->enqueueMessage(
+						'Could not create LESS file: ' . $less_path, 'warning'
+					);
+				}
+				return;
+			}
+
 			fwrite($_resource, $less_code);
 			fclose($_resource);
 
-			// Compile LESS file
-			$force = flexicontent_html::checkedLessCompile(
+			// Compile LESS file (force recompilation, the LESS content just changed)
+			flexicontent_html::checkedLessCompile(
 				array($less_file),
 				$path,
-				$inc_path = $path . 'less/include/',
-				$force = false
+				$path . 'less/include/',
+				true
 			);
 		}
 	}
@@ -121,11 +150,17 @@ abstract class JHtmlFclayoutbuilder
 	{
 		$jinput    = \Joomla\CMS\Factory::getApplication()->input;
 		$id        = $jinput->getInt('id', 0);
+		if (!$id)
+		{
+			// Template (layout) editor pages do not have an item id, they use the template folder name
+			$id = $jinput->getCmd('folder', 0);
+		}
+		if (!$id) $id = $jinput->getCmd('layout', 0);
 
 		if ($id)
 		{
 			$path = $file_path;
-			$path = str_replace('{{id}}', $id, $path);
+			$path = str_replace(array('{{id}}', '{{folder}}'), (string) $id, $path);
 			$path = \Joomla\Filesystem\Path::clean(JPATH_ROOT . $path . '.less');
 
 			if (file_exists($path))
@@ -140,6 +175,211 @@ abstract class JHtmlFclayoutbuilder
 		}
 
 		return '';
+	}
+
+
+	/**
+	 * Deterministically derive the front-end HTML / CSS of a Layout Builder project.
+	 *
+	 * Rebuilds them from the GrapesJS project JSON (the single source of truth) instead of
+	 * capturing the live canvas states, which were transient / partial on some browser saves
+	 * and produced degraded "_html" values (e.g. only plain text, no structure).
+	 *
+	 * @param string $data JSON project data (as returned by editor.getProjectData())
+	 * @return array with keys html / css / js; nulls when the project JSON is invalid
+	 *         so that callers can keep previously stored values.
+	 */
+	public static function renderLayoutFromProject($data)
+	{
+		$out = array('html' => null, 'css' => null, 'js' => null);
+		$project = is_string($data) ? json_decode($data, true) : null;
+		if (!is_array($project) || empty($project['pages'])) return $out;
+
+		// Collect the classes really used by the components: styling rules attached to
+		// unused classes (deleted components) must be skipped, exactly like the editor's
+		// CSS export (keepUsedStyles = false).
+		$used = array();
+		foreach ($project['pages'] as $page)
+		{
+			foreach (!empty($page['frames']) ? $page['frames'] : array() as $frame)
+			{
+				if (!empty($frame['component'])) self::_collectClasses($frame['component'], $used);
+			}
+		}
+
+		// CSS: non-media rules first (project order), then rules grouped by media query
+		$css    = '';
+		$medias = array();
+		if (!empty($project['styles']) && is_array($project['styles']))
+		{
+			foreach ($project['styles'] as $rule)
+			{
+				if (empty($rule['selectors']) || !is_array($rule['selectors'])) continue;
+				$names = array();
+				foreach ($rule['selectors'] as $sel)
+				{
+					$name = is_array($sel) ? (isset($sel['name']) ? $sel['name'] : '') : $sel;
+					// Skip the whole rule when any of its selectors is not used
+					if ($name === '' || !isset($used[$name])) continue 2;
+					$names[] = $name;
+				}
+				if (!$names) continue;
+				$props = '';
+				if (!empty($rule['style']) && is_array($rule['style']))
+				{
+					foreach ($rule['style'] as $k => $v) $props .= $k . ':' . $v . ';';
+				}
+				$ruleText = '.' . implode('.', $names) . '{' . $props . '}';
+				if (!empty($rule['mediaText'])) $medias[$rule['mediaText']][] = $ruleText;
+				else $css .= $ruleText;
+			}
+		}
+		foreach ($medias as $mediaText => $rules)
+		{
+			$css .= '@media ' . $mediaText . '{' . implode('', $rules) . '}';
+		}
+		$out['css'] = $css;
+
+		// HTML: render the first frame of the first page, without the <body> wrapper
+		$page0   = $project['pages'][0];
+		$frame0  = !empty($page0['frames'][0]) ? $page0['frames'][0] : array();
+		$wrapper = !empty($frame0['component']) ? $frame0['component'] : array();
+		if (!empty($wrapper['components']) && is_array($wrapper['components']))
+		{
+			foreach ($wrapper['components'] as $comp)
+			{
+				$out['html'] .= self::_renderComponent($comp);
+			}
+		}
+		if ($out['html'] === null) $out['html'] = '';
+		return $out;
+	}
+
+	/**
+	 * Collect the class names used by a component tree.
+	 */
+	protected static function _collectClasses($comp, &$used)
+	{
+		if (is_array($comp) && !empty($comp['classes']))
+		{
+			foreach ($comp['classes'] as $cl)
+			{
+				$name = is_array($cl) ? (isset($cl['name']) ? $cl['name'] : '') : $cl;
+				if ($name !== '') $used[$name] = 1;
+			}
+		}
+		if (is_array($comp) && !empty($comp['components']) && is_array($comp['components']))
+		{
+			foreach ($comp['components'] as $ch) self::_collectClasses($ch, $used);
+		}
+	}
+
+	/**
+	 * Render a single component into (X)HTML, mimicking the editor's model serialization.
+	 */
+	protected static function _renderComponent($comp)
+	{
+		if (!is_array($comp))
+		{
+			// Raw text / comment nodes are stored as plain strings
+			return (string) $comp;
+		}
+		$tag   = !empty($comp['tagName']) ? $comp['tagName'] : '';
+		if ($tag === '')
+		{
+			// Default tag of core GrapesJS component types (not stored in the project JSON)
+			$typeTags = array('image' => 'img', 'video' => 'iframe', 'map' => 'iframe', 'link' => 'a', 'text' => 'div');
+			$tag      = isset($comp['type'], $typeTags[$comp['type']]) ? $typeTags[$comp['type']] : 'div';
+		}
+		$attrs = array();
+
+		if (!empty($comp['attributes']) && is_array($comp['attributes']))
+		{
+			foreach ($comp['attributes'] as $k => $v) $attrs[$k] = (string) $v;
+		}
+		if (!empty($comp['classes']) && is_array($comp['classes']))
+		{
+			$names = array();
+			foreach ($comp['classes'] as $cl)
+			{
+				$name = is_array($cl) ? (isset($cl['name']) ? $cl['name'] : '') : $cl;
+				if ($name !== '') $names[] = $name;
+			}
+			if ($names) $attrs['class'] = implode(' ', $names);
+		}
+		// The video (iframe) component keeps the final URL in the "src" property
+		if (!empty($comp['src']) && !isset($attrs['src']))
+		{
+			$attrs['src'] = (string) $comp['src'];
+		}
+		// Inline styles are serialized as a style attribute, like the editor does with
+		// avoidInlineStyle: false (layout blocks rely on them for their flex layout)
+		if (!empty($comp['style']) && is_array($comp['style']))
+		{
+			$styleStr = '';
+			foreach ($comp['style'] as $k => $v)
+			{
+				if ($v === '' || $v === null) continue;
+				$styleStr .= $k . ':' . $v . ';';
+			}
+			if ($styleStr !== '') $attrs['style'] = $styleStr;
+		}
+
+		$attrStr = '';
+		foreach ($attrs as $k => $v)
+		{
+			$attrStr .= ' ' . $k . '="' . htmlspecialchars($v, ENT_QUOTES, 'UTF-8') . '"';
+		}
+
+		$inner = '';
+		// "Flexicontent Data" custom component types (see the editor's DomComponents.addType):
+		// their canvas preview is only cosmetic, the persisted tokens are what the front-end
+		// renderer (renderBuilderLayout) resolves at run time.
+		if (!empty($comp['type']) && $comp['type'] === 'fc-field')
+		{
+			$fname = isset($comp['attributes']['data-fc-field']) ? trim((string) $comp['attributes']['data-fc-field']) : '';
+			$inner = $fname !== '' ? '{flexi_field:' . $fname . ' item:current method:display}' : '';
+		}
+		elseif (!empty($comp['type']) && $comp['type'] === 'fc-link')
+		{
+			$fid  = isset($comp['attributes']['data-fc-itemid'])   ? trim((string) $comp['attributes']['data-fc-itemid'])   : '';
+			$ftxt = isset($comp['attributes']['data-fc-linktext']) ? trim((string) $comp['attributes']['data-fc-linktext']) : '_title_';
+			$fid  = $fid === '' ? 'current' : $fid;
+			$inner = '{flexi_link:item  item:' . $fid . '  linktext:' . $ftxt . '}';
+			if ($ftxt === '_noclose_')
+			{
+				// Wrapper form: keep anything dropped between the open anchor and {/flexi_link}
+				if (!empty($comp['components']) && is_array($comp['components']))
+				{
+					foreach ($comp['components'] as $fch) $inner .= self::_renderComponent($fch);
+				}
+				$inner .= '{/flexi_link}';
+			}
+		}
+		elseif (!empty($comp['type']) && $comp['type'] === 'fc-profile-user')
+		{
+			$fuid = isset($comp['attributes']['data-fc-userid']) ? trim((string) $comp['attributes']['data-fc-userid']) : '';
+			$fuid = $fuid === '' ? '%user_id%' : $fuid;
+			$inner = '{flexi_item:profile  user:' . $fuid . '  ilayout:%template_name%}';
+		}
+		elseif (!empty($comp['type']) && $comp['type'] === 'fc-profile-author')
+		{
+			$inner = '{flexi_item:profile  author_of:[%item_id% | current]  ilayout:%template_name%}';
+		}
+		elseif (isset($comp['content']) && $comp['content'] !== null && $comp['content'] !== '')
+		{
+			$inner = (string) $comp['content'];
+		}
+		elseif (!empty($comp['components']) && is_array($comp['components']))
+		{
+			foreach ($comp['components'] as $ch) $inner .= self::_renderComponent($ch);
+		}
+
+		if (in_array($tag, array('img', 'br', 'hr', 'input', 'meta', 'link', 'source')))
+		{
+			return '<' . $tag . $attrStr . '/>';
+		}
+		return '<' . $tag . $attrStr . '>' . $inner . '</' . $tag . '>';
 	}
 
 
@@ -345,16 +585,153 @@ abstract class JHtmlFclayoutbuilder
 		// 	font-family: \'FontAwesome\';
 		// 	font-weight: normal;
 		// }
+		.gjs-field.gjs-field-fc-field-select .fc-combo {
+			position: relative;
+			width: 100%;
+		}
+		.gjs-field.gjs-field-fc-field-select .fc-combo-input {
+			width: 100%;
+			box-sizing: border-box;
+			min-height: 22px;
+			padding: 3px 20px 3px 6px;
+			border: 1px solid rgba(0, 0, 0, .2);
+			border-radius: 2px;
+			background: #fff;
+			color: #444;
+			font-size: 12px;
+			outline: none;
+			cursor: pointer;
+		}
+		.gjs-field.gjs-field-fc-field-select .fc-combo-input:focus {
+			border-color: #78909c;
+			cursor: text;
+		}
+		.gjs-field.gjs-field-fc-field-select .fc-combo-arrow {
+			position: absolute;
+			top: 0;
+			right: 3px;
+			height: 100%;
+			width: 14px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			pointer-events: none;
+			color: #888;
+			font-size: 9px;
+		}
+		.gjs-field.gjs-field-fc-field-select .fc-combo-list {
+			position: absolute;
+			top: calc(100% + 2px);
+			left: 0;
+			right: 0;
+			z-index: 60;
+			max-height: 210px;
+			overflow-y: auto;
+			background: #fff;
+			border: 1px solid #ddd;
+			border-radius: 2px;
+			box-shadow: 0 4px 14px rgba(0, 0, 0, .3);
+			color: #333;
+			font-size: 12px;
+			text-align: left;
+		}
+		.gjs-field.gjs-field-fc-field-select .fc-combo-grp > b {
+			display: block;
+			padding: 4px 8px 3px;
+			font-size: 10px;
+			letter-spacing: .04em;
+			text-transform: uppercase;
+			background: #f4f4f4;
+			color: #7a7a7a;
+		}
+		.gjs-field.gjs-field-fc-field-select .fc-combo-opt {
+			padding: 4px 10px;
+			cursor: pointer;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			line-height: 1.3;
+		}
+		.gjs-field.gjs-field-fc-field-select .fc-combo-opt:hover,
+		.gjs-field.gjs-field-fc-field-select .fc-combo-active {
+			background: #e8f1fb;
+			color: #1c3d5f;
+		}
+		.gjs-field.gjs-field-fc-field-select .fc-search-nomatch {
+			padding: 6px 10px;
+			font-style: italic;
+			color: #a55;
+		}
 		label.gjs-sm-icon {
 			color: #fff;
 		}
 		');
-		
+
+		// The published FlexiContent fields (name + label + type), used by the "Flexicontent Data"
+		// blocks (fc-field trait picker / canvas badges). Same sources as the backend template
+		// view (FlexicontentModelTemplate::getFields), excluding form-only fields.
+		// 'group' is the human readable field-type label used to group the picker options.
+		$fcl_field_options = array();
+		$fcl_field_type_groups = array(
+			'core' => 'Core fields',             'coreprops'   => 'Core properties',
+			'text' => 'Text',                    'textarea'    => 'Textarea',
+			'textselect' => 'Text + Select',     'select'      => 'Select',
+			'selectmultiple' => 'Multiple select','checkbox'   => 'Checkbox',
+			'checkboximage' => 'Checkbox image', 'radio'       => 'Radio',
+			'radioimage' => 'Radio image',       'image'       => 'Image / Gallery',
+			'mediafile' => 'Media file',         'file'        => 'File',
+			'date' => 'Date',                    'color'       => 'Color',
+			'email' => 'E-mail',                 'weblink'     => 'Web link',
+			'linkslist' => 'Links list',         'addressint'  => 'Address',
+			'phonenumbers' => 'Phone numbers',   'relation'    => 'Relation',
+			'relation_reverse' => 'Relation reverse', 'termlist' => 'Terms',
+			'subform' => 'Sub-form',             'fieldgroup'  => 'Field group',
+			'comments' => 'Comments',            'fcpagenav'   => 'Page navigation',
+			'fcloadmodule' => 'Load module',     'jprofile'    => 'User profile',
+			'toolbar' => 'Toolbar',              'sharedmedia' => 'Shared media',
+			'account_via_submit' => 'Account via submit',
+		);
+		try
+		{
+			$fcl_db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+			$fcl_query = $fcl_db->getQuery(true);
+			$fcl_query->select(array('f.id', 'f.name', 'f.label', 'f.field_type'))
+				->from($fcl_db->quoteName('#__flexicontent_fields', 'f'))
+				->join('LEFT', $fcl_db->quoteName('#__flexicontent_fields_type_relations', 'rel') . ' ON rel.field_id = f.id')
+				->where($fcl_db->quoteName('f.published') . ' = 1')
+				->where($fcl_db->quoteName('f.field_type') . ' <> ' . $fcl_db->quote('custom_form_html'))
+				->group($fcl_db->quoteName('f.id'))
+				->order('f.label ASC');
+			$fcl_db->setQuery($fcl_query);
+
+			foreach ($fcl_db->loadObjectList() as $fcl_field)
+			{
+				if (substr($fcl_field->name, 0, 5) === 'form_') continue;
+				$fcl_ftype = str_replace(array('_', '-'), ' ', $fcl_field->field_type);
+				$fcl_group_label = isset($fcl_field_type_groups[$fcl_field->field_type])
+					? $fcl_field_type_groups[$fcl_field->field_type]
+					: ucwords($fcl_ftype);
+				$fcl_field_options[] = array(
+					'value' => $fcl_field->name,
+					'name'  => $fcl_field->name,
+					'label' => (($fcl_field->label && $fcl_field->label !== $fcl_field->name) ? \Joomla\CMS\Language\Text::_($fcl_field->label) : $fcl_field->name) . ' [' . $fcl_field->field_type . ']',
+					'type'  => $fcl_field->field_type,
+					'group' => $fcl_group_label,
+				);
+			}
+		}
+		catch (\Exception $e)
+		{
+			$fcl_field_options = array();
+		}
+
+		$html .= '<script>window.fcl_builder_fields_' . $editor_sfx . ' = ' . json_encode($fcl_field_options) . ';</script>';
+
 		//\Joomla\CMS\Factory::getDocument()->addScriptDeclaration(
 		// TODO add template.css file in editor for better display
 		$html .= '
 		<script>
-		function fclayout_init_builder(editor_sfx, element_id)
+function fclayout_init_builder(editor_sfx, element_id)
 		{
 			/**
 			 * Lets say, for instance, you start with your already defined HTML template
@@ -375,7 +752,70 @@ abstract class JHtmlFclayoutbuilder
 				lp+\'grapesjs-logo-cl.png\'
 			];
 
+			// Field values accessors, aware of `<input>`/`<textarea>` (`.value`) vs other elements (`.textContent`)
+			function fcl_get(el)
+			{
+				if (!el) return \'\';
+				var t = (el.tagName || \'\').toLowerCase();
+				return (t === \'input\' || t === \'textarea\') ? (el.value || \'\') : (el.textContent || \'\');
+			}
+
+			function fcl_set(el, v)
+			{
+				if (!el) return;
+				var t = (el.tagName || \'\').toLowerCase();
+				if (t === \'input\' || t === \'textarea\')
+				{
+					el.value = v || \'\';
+				}
+				else
+				{
+					el.innerHTML = v || \'\';
+				}
+			}
+
+			// Register every plugins used below (modern UMD builds expose a global, eg. gjs-blocks-basic/custom-code/tooltip)
+			// and isolate any failure so the editor still initialises.
+			[ \'grapesjs-preset-webpage\', \'gjs-blocks-basic\', \'grapesjs-tabs\', \'grapesjs-custom-code\',
+			  \'grapesjs-touch\', \'grapesjs-tooltip\', \'grapesjs-blocks-bootstrap4\'
+			].forEach(function(id)
+			{
+				var fn = grapesjs.plugins.get(id) || window[id];
+				if (fn)
+				{
+					fn = fn.default || fn;
+					if (typeof fn === \'function\')
+					{
+						grapesjs.plugins.add(id, function(ed, opts)
+						{
+							try { fn(ed, opts); }
+							catch(e) { console.error(\'Plugin \' + id + \' init failed:\', e); }
+						});
+					}
+				}
+				else
+				{
+					console.warn(\'Plugin \' + id + \' not found on page\');
+				}
+			});
+
+			// Plugins list (kept separate so the core can stay as-is if the list grows)
+			var fcl_builder_plugins = [
+				\'grapesjs-preset-webpage\',
+				\'gjs-blocks-basic\',
+				\'grapesjs-tabs\',
+				\'grapesjs-custom-code\',
+				\'grapesjs-touch\',
+				\'grapesjs-tooltip\',
+				\'grapesjs-blocks-bootstrap4\',
+			];
+
 			var editor = grapesjs.init({
+
+				// Do NOT show the browser "Changes you made may not be saved" dialog:
+				// this is a TOP-LEVEL editor option (the storageManager section does not read it),
+				// the layout fields are always written by saveToForm() on form submit
+				noticeOnUnload: false,
 
 				// TODO check loading css in canvas and real url
 				canvas: {
@@ -399,13 +839,13 @@ abstract class JHtmlFclayoutbuilder
 
 				// We use `fromElement` or `components` to get the HTML
 				// `components` accepts an HTML string or a JSON string of components
-				// Here, at first, we check and use components if are already defined
-				// otherwise the HTML string gonna be used
+				// Start from an EMPTY canvas; the saved project data is loaded next by the
+				// storage manager (autoload) and must be the ONLY source of content.
 				fromElement: 0,
-				components: LandingPage.components || LandingPage.html,
+				components: \'\',
 
 				// We might want to make the same check for styles
-				style: LandingPage.style || LandingPage.css,
+				style: \'\',
 				protectedCss: \'\',
 
 				showOffsets: 1,
@@ -417,28 +857,11 @@ abstract class JHtmlFclayoutbuilder
 
 				styleManager: { clearProperties: 1 },
 
-				plugins: [
-					\'gjs-preset-webpage\',
-					\'grapesjs-lory-slider\',
-					\'grapesjs-tabs\',
-					\'grapesjs-custom-code\',
-					\'grapesjs-touch\',
-					\'grapesjs-parser-postcss\',
-					\'grapesjs-tooltip\',
-					\'gjs-plugin-ckeditor\',
-					//\'grapesjs-shape-divider\',
-					//\'grapesjs-plugin-header\',
-					\'grapesjs-blocks-bootstrap4\',
-				],
+				plugins: fcl_builder_plugins,
 
 				pluginsOpts: {
 					\'grapesjs-tooltip\': {
-						sliderBlock: {
-							category: \'Extra\'
-						}
-					},
-					\'grapesjs-lory-slider\': {
-						sliderBlock: {
+						blockTooltip: {
 							category: \'Extra\'
 						}
 					},
@@ -446,9 +869,6 @@ abstract class JHtmlFclayoutbuilder
 						tabsBlock: {
 							category: \'Extra\'
 						}
-					},
-					\'gjs-plugin-ckeditor\': {
-						//need to specific tool bar
 					},
 					\'grapesjs-blocks-bootstrap4\': {
 						blocks: {
@@ -458,7 +878,7 @@ abstract class JHtmlFclayoutbuilder
 						labels: {
 						},
 					},
-					\'gjs-preset-webpage\': {
+					\'grapesjs-preset-webpage\': {
 						modalImportTitle: \'Import Template\',
 						modalImportLabel: \'<div style="margin-bottom: 10px; font-size: 13px;">Paste here your HTML/CSS and click Import</div>\',
 						modalImportContent: function(editor)
@@ -468,9 +888,8 @@ abstract class JHtmlFclayoutbuilder
 								\'<style>\n\' + document.querySelector(\'#\' + element_id + \'_css\').textContent.trim() + \'\n<\/style>\n\';
 						},
 
-						filestackOpts: null, //{ key: \'AYmqZc2e8RLGLE7TGkX3Hz\' },
-						aviaryOpts: false,
-						blocksBasicOpts: { flexGrid: 1 },
+						// The customStyleManager below is ignored by preset-webpage v1 (kept as reference),
+						// the Style Manager uses its default sectors
 						customStyleManager: [{
 							name: \'General\',
 							buildProps: [\'float\', \'display\', \'position\', \'top\', \'right\', \'left\', \'bottom\'],
@@ -784,8 +1203,22 @@ abstract class JHtmlFclayoutbuilder
 
 					params: {}, // Custom parameters to pass with the remote storage request, eg. CSRF token
 					headers: {}, // Custom headers for the remote storage request
-					autosave: true,        // Whether to store data automatically
+
+					// Autosave is disabled on purpose: the form fields are synchronously written
+					// by saveToForm() when the Joomla "adminForm" form is submitted (and by the
+					// "Save Layout into form" button), avoiding any race with the async store.
+					autosave: false,
 					autoload: true,        // Whether to auto-load stored data on init
+
+					// Do NOT show the browser "Changes you made may not be saved" dialog
+					// (the layout fields are always written by saveToForm() on form submit)
+noticeOnUnload: false,
+
+				// Autosave must be DISABLED at the top level too (like noticeOnUnload): when active,
+				// the storage manager store() re-writes the form fields on every edit step with the
+				// transient text-only canvas state, silently clobbering the layout structure.
+				autosave: false,
+				stepsBeforeSave: 1000000,
 				},
 
 
@@ -825,7 +1258,12 @@ abstract class JHtmlFclayoutbuilder
 
 
 				// Device manager: Desktop, Tablet, Mobile
-				mediaCondition: \'min-width\', // default is `max-width`
+				// NOTE mediaCondition \'min-width\' would INVERT the responsive workflow:
+				// rules styled on a device get `@media (min-width: Xpx)` which targets all
+				// LARGER viewports, not the selected one. With the default \'max-width\' a rule
+				// created on e.g. Mobile landscape becomes `@media (max-width: 768px)`, i.e.
+				// it only overrides the base (desktop) styles below that breakpoint.
+				mediaCondition: \'max-width\',
 				deviceManager: {
 					devices: [{
 						title: \'Mobiles in Portrait Mode\',
@@ -856,6 +1294,80 @@ abstract class JHtmlFclayoutbuilder
 			});
 
 
+			// On a device, GrapesJS writes the edits (drag AND StyleManager numeric) into the CSS rule
+			// of the CURRENT device @media (e.g. Tablet -> @media (max-width:992px)), which is exactly
+			// what we want for the responsive save (front renders per media query).
+			// To preview those edits inside the builder, the canvas frame is sized to the device
+			// width/height so its @media rules actually apply in the canvas (WYSIWYG editing).
+			editor.on(\'change:device\', function()
+			{
+				var fclDev = editor.getModel().getDeviceModel();
+				var fclW = fclDev ? (fclDev.get(\'width\') || \'\') : \'\';
+				var fclH = fclDev ? (fclDev.get(\'height\') || \'\') : \'\';
+				var fclFrame = editor.Canvas.getFrameEl();
+				if (!fclFrame) return;
+				fclFrame.style.width = fclW;
+				fclFrame.style.height = fclH;
+				var fclWrap = fclFrame.parentElement;
+				if (fclWrap) { fclWrap.style.width = fclW; fclWrap.style.height = fclH; }
+				editor.Canvas.refresh();
+			});
+
+			// The canvas <style> GrapesJS generates puts @media rules BEFORE the base rules,
+			// so equal-specificity base rules win inside the canvas and per-device overrides
+			// (width, padding, margin...) are invisible while editing (colors still won,
+			// because they are absent from the base rules).
+			// => Keep our own <style> (LAST element of the frame BODY, correct order = base then
+			// @media) refreshed with editor.getCss() on every rule change. The saved CSS is not
+			// affected (save order stays base -> @media, as GrapesJS produces on export).
+			(function()
+			{
+				var fclRefCss = function()
+				{
+					var fclFrame = editor.Canvas.getFrameEl();
+					if (!fclFrame || !fclFrame.contentDocument) return;
+					var fclDoc = fclFrame.contentDocument;
+					var fclRoot = fclDoc.body || fclDoc.documentElement;
+					var fclSt = fclDoc.getElementById("fcl-builder-style");
+					if (!fclSt)
+					{
+						fclSt = fclDoc.createElement("style");
+						fclSt.id = "fcl-builder-style";
+						fclRoot.appendChild(fclSt);
+					}
+					fclSt.textContent = editor.getCss();
+				};
+				var fclTryInstall = function()
+				{
+					var fclRules = editor.Css.getAll();
+					if (!fclRules || !fclRules.length) return; // retried below until rules exist
+					if (fclRules.__fclCssHooked === true) return;
+					fclRules.__fclCssHooked = true;
+					fclRules.on("add change remove", fclRefCss);
+					fclRefCss();
+				};
+				var fclTries = 0;
+				fclTryInstall();
+				var fclInt = setInterval(function()
+				{
+					fclTries++;
+					fclTryInstall();
+					if (fclTries > 40) clearInterval(fclInt);
+				}, 150);
+				// guarantee our style tag stays the LAST element of the frame body, whatever
+				// GrapesJS inserts (it appends its own component css <style> at the body end)
+				var fclEnsureLast = function()
+				{
+					var fclFrame = editor.Canvas.getFrameEl();
+					if (!fclFrame || !fclFrame.contentDocument) return;
+					var fclDoc = fclFrame.contentDocument;
+					var fclSt = fclDoc.getElementById("fcl-builder-style");
+					var fclRoot = fclDoc.body || fclDoc.documentElement;
+					if (fclSt && fclRoot.lastElementChild !== fclSt) fclRoot.appendChild(fclSt);
+				};
+				setInterval(fclEnsureLast, 150);
+			})();
+
 			var pn = editor.Panels;
 			var modal = editor.Modal;
 			editor.Commands.add(\'canvas-clear\', function()
@@ -866,7 +1378,7 @@ abstract class JHtmlFclayoutbuilder
 					var composer = editor.CssComposer.clear();
 					setTimeout(function()
 					{
-						editor.store(res => console.log(\'Store callback\'));
+						editor.store().catch(e => console.error(e));
 					}, 0);
 				}
 			});
@@ -933,11 +1445,13 @@ abstract class JHtmlFclayoutbuilder
 			 [\'export-template\', \'Export\'], [\'undo\', \'Undo\'], [\'redo\', \'Redo\'],
 			 [\'gjs-open-import-webpage\', \'Import\'], [\'canvas-clear\', \'Clear canvas\']]
 			.forEach(function(item) {
-				pn.getButton(\'options\', item[0]).set(\'attributes\', {title: item[1], \'data-tooltip-pos\': \'bottom\'});
+				var b = pn.getButton(\'options\', item[0]);
+				b && b.set(\'attributes\', {title: item[1], \'data-tooltip-pos\': \'bottom\'});
 			});
 			[[\'open-sm\', \'Style Manager\'], [\'open-layers\', \'Layers\'], [\'open-blocks\', \'Blocks\']]
 			.forEach(function(item) {
-				pn.getButton(\'views\', item[0]).set(\'attributes\', {title: item[1], \'data-tooltip-pos\': \'bottom\'});
+				var b = pn.getButton(\'views\', item[0]);
+				b && b.set(\'attributes\', {title: item[1], \'data-tooltip-pos\': \'bottom\'});
 			});
 			var titles = document.querySelectorAll(\'*[title]\');
 
@@ -957,7 +1471,8 @@ abstract class JHtmlFclayoutbuilder
 			}
 
 			// Show borders by default
-			pn.getButton(\'options\', \'sw-visibility\').set(\'active\', 1);
+			var swVisBtn = pn.getButton(\'options\', \'sw-visibility\');
+			swVisBtn && swVisBtn.set(\'active\', 1);
 
 
 			// Start and end events
@@ -970,9 +1485,45 @@ abstract class JHtmlFclayoutbuilder
 
 
 			// Do stuff on load
-			editor.on(\'load\', function()
-			{
-				var $ = grapesjs.$;
+editor.on(\'load\', function()
+				{
+					// Add the missing flex properties to the "Flex" sector (guaranteed present
+					// whatever the active Style Manager sectors are: custom or default ones)
+					var sm = editor.StyleManager;
+					var flexSector = null;
+					var secs = sm.getSectors().models;
+					for (var si = 0; si < secs.length; si++)
+					{
+						if (secs[si].getName() == \'Flex\') { flexSector = secs[si]; break; }
+					}
+					if (!flexSector)
+					{
+						flexSector = sm.addSector(\'flex\', { name: \'Flex\', open: false, properties: [] });
+					}
+					if (!flexSector.getProperty(\'flex-wrap\'))
+					{
+						sm.addProperty(flexSector.get(\'id\'), {
+							name: \'Wrap\',
+							property: \'flex-wrap\',
+							type: \'radio\',
+							defaults: \'nowrap\',
+							list: [
+								{ value: \'wrap\', name: \'Wrap\' },
+								{ value: \'nowrap\', name: \'No wrap\' }
+							]
+						});
+					}
+					if (!flexSector.getProperty(\'gap\'))
+					{
+						sm.addProperty(flexSector.get(\'id\'), {
+							name: \'Gap\',
+							property: \'gap\',
+							type: \'integer\',
+							units: [\'px\', \'em\'],
+							defaults: 0,
+							min: 0
+						});
+					}
 
 				// Load and show settings and style manager
 				var openTmBtn = pn.getButton(\'views\', \'open-tm\');
@@ -980,92 +1531,207 @@ abstract class JHtmlFclayoutbuilder
 				var openSm = pn.getButton(\'views\', \'open-sm\');
 				openSm && openSm.set(\'active\', 1);
 
-				// Add Settings Sector
-				var traitsSector = $(\'<div class="gjs-sm-sector no-select">\'+
-					\'<div class="gjs-sm-title"><span class="icon-settings fa fa-cog"></span> Settings</div>\' +
-					\'<div class="gjs-sm-properties" style="display: none;"></div></div>\');
-				var traitsProps = traitsSector.find(\'.gjs-sm-properties\');
-				traitsProps.append($(\'.gjs-trt-traits\'));
-				$(\'.gjs-sm-sectors\').before(traitsSector);
-
-				traitsSector.find(\'.gjs-sm-title\').on(\'click\', function()
+				// Add Settings Sector (Traits) above the Style Manager sectors
+				var smSectors = document.querySelector(\'.gjs-sm-sectors\');
+				if (smSectors)
 				{
-					var traitStyle = traitsProps.get(0).style;
-					var hidden = traitStyle.display == \'none\';
-					traitStyle.display = hidden ? \'block\' : \'none\';
-				});
+					var traitsSector = document.createElement(\'div\');
+					traitsSector.className = \'gjs-sm-sector no-select\';
+					traitsSector.innerHTML =
+						\'<div class="gjs-sm-title"><span class="icon-settings fa fa-cog"></span> Settings</div>\' +
+						\'<div class="gjs-sm-properties" style="display: none;"></div>\';
+					smSectors.parentNode.insertBefore(traitsSector, smSectors);
+					var traitsProps = traitsSector.querySelector(\'.gjs-sm-properties\');
+					var trtTraits = document.querySelector(\'.gjs-trt-traits\');
+					if (trtTraits) traitsProps.appendChild(trtTraits);
+					traitsSector.querySelector(\'.gjs-sm-title\').addEventListener(\'click\', function()
+					{
+						var traitStyle = traitsProps.style;
+						traitStyle.display = traitStyle.display == \'none\' ? \'block\' : \'none\';
+					});
+				}
 
 				// Open block manager
 				var openBlocksBtn = editor.Panels.getButton(\'views\', \'open-blocks\');
 				openBlocksBtn && openBlocksBtn.set(\'active\', 1);
 			});
 
+			/**
+			 * Stray \'textnode\' entries (debris from older/lossy saves) sit directly inside a
+			 * non-text component and cannot be selected / edited / deleted in the canvas.
+			 * Wrap each into a proper \'text\' component so it becomes a normal element.
+			 */
+			function fcl_fix_stray_textnodes(comp)
+			{
+				if (!comp || typeof comp !== \'object\' || !Array.isArray(comp.components)) return comp;
+				var textChildren = comp.type === \'text\';
+				var children = comp.components;
+				for (var i = 0; i < children.length; i++)
+				{
+					var child = children[i];
+					if (child && child.type === \'textnode\' && !textChildren)
+					{
+						children[i] = { type: \'text\', content: typeof child.content === \'string\' ? child.content : \'\' };
+					}
+					else if (child && typeof child === \'object\')
+					{
+						fcl_fix_stray_textnodes(child);
+					}
+				}
+				return comp;
+			}
+
 			editor.StorageManager.add(\'form-storage\', {
 				/**
-				 * Load the data
-				 * @param  {Array} keys Array containing values to load, eg, [\'gjs-components\', \'gjs-style\', ...]
-				 * @param  {Function} clb Callback function to call when the load is ended
-				 * @param  {Function} clbErr Callback function to call in case of errors
+				 * Load the saved layout and return a GrapesJS project object to load.
+				 * Preferred source: the full project data (_data field), saved verbatim by
+				 * getProjectData(). Legacy fallback: minimal project rebuilt from _html/_css.
 				 */
-				load(keys, clb, clbErr)
+				async load()
 				{
-					const result = {};
+					const qs = id => document.querySelector(\'#\' + element_id + \'_\' + id);
 
-					keys.forEach(key => {
-						var el_id = key.replace(\'fc-gjs-\' + editor_sfx, \'\');
-						var value = document.querySelector(\'#\' + element_id + \'_\' +  el_id).textContent;
-
-						console.log(\'Load: \' + key + \' \' + el_id);
-
-						/*if (key == \'html\')
-						{
-							var js   = document.querySelector(\'#\' + element_id + \'_js\').textContent.trim();
-
-							if (js)
-							{
-								value = value + \'\n<script>\n\' + document.querySelector(\'#\' + element_id + \'_js\').textContent + \'\n<\/script>\n\';
-							}
-						}*/
-
-						if (value)
-						{
-							result[key] = value;
-						}
-					});
-
-					// Might be called inside some async method
-					clb(result);
-				},
-
-				/**
-				 * Store the data
-				 * @param  {Object} data Data object to store
-				 * @param  {Function} clb Callback function to call when the load is ended
-				 * @param  {Function} clbErr Callback function to call in case of errors
-				 */
-				store(data, clb, clbErr)
-				{
-					for (let key in data)
+					// Preferred: the full GrapesJS project data, saved verbatim by getProjectData().
+					// It is the exact, lossless representation (pages/frames/components/styles/assets),
+					// so feeding it back to the editor\'s own loadProjectData() round-trips faithfully.
+					var raw = fcl_get(qs(\'data\'));
+					if (raw)
 					{
-						var el_id = key.replace(\'fc-gjs-\' + editor_sfx, \'\');
-
-						console.log(\'Store: \' + key + \' \' + el_id);
-
-						if (0) //(el_id == \'html\')
+						try
 						{
-							document.querySelector(\'#\' + element_id + \'_html\').innerHTML = editor.getHtml();
-							document.querySelector(\'#\' + element_id + \'_js\').innerHTML = editor.getJs();
+							var project = JSON.parse(raw);
+							console.log(\'Load layout: project data\');
+							if (project && Array.isArray(project.pages))
+							{
+								for (var p = 0; p < project.pages.length; p++)
+								{
+									var pf = project.pages[p];
+									if (!pf.frames) continue;
+									for (var g = 0; g < pf.frames.length; g++)
+									{
+										if (pf.frames[g] && pf.frames[g].component)
+										{
+											pf.frames[g].component = fcl_fix_stray_textnodes(pf.frames[g].component);
+										}
+									}
+								}
+							}
+							return project;
 						}
-						else
+						catch(e)
 						{
-							document.querySelector(\'#\' + element_id + \'_\' +  el_id).innerHTML = data[key];
+							console.warn(\'Invalid saved project data, falling back to HTML\', e);
 						}
 					}
 
-					// Might be called inside some async method
-					clb();
+					// Legacy fallback: build a minimal project from the rendered HTML/CSS fields
+					var html = fcl_get(qs(\'html\'));
+					var css  = fcl_get(qs(\'css\'));
+					var result = {};
+
+					if (html || css)
+					{
+						var frame = {};
+						if (html) frame.component = { components: html };
+						if (css)  frame.styles = css;
+
+						result.pages = [{
+							id: \'fc-page-main\',
+							name: \'Main\',
+							frames: [Object.assign({ id: \'fc-frame-1\' }, frame)]
+						}];
+					}
+
+					return result;
+				},
+
+				/**
+				 * Store layout data into the form fields (legacy format) for the backend.
+				 */
+				async store(projectData)
+				{
+					// NOTE: intentional NO-OP. saveToForm() is the ONLY writer of the form
+					// fields, and it runs exactly once when the form is actually submitted.
+					return projectData;
 				},
 			});
+
+
+			/**
+			 * All controls carrying the same form NAME as the "#<id>" field.
+			 * The backend reads fields by NAME; if the field element is rendered more
+			 * than once, PHP keeps the LAST occurrence -> we must write ALL of them.
+			 */
+			function fcl_controlsFor(id)
+			{
+				var el = document.querySelector(\'#\' + id);
+				if (!el) return [];
+				var name = el.getAttribute(\'name\');
+				if (name)
+				{
+					var all = document.querySelectorAll(\'[name="\' + name + \'"]\');
+					if (all.length) return Array.prototype.slice.call(all);
+				}
+				return [el];
+			}
+
+			function fcl_setField(id, val)
+			{
+				var list = fcl_controlsFor(id);
+				for (var i = 0; i < list.length; i++)
+				{
+					try { list[i].value = val; } catch(e) {}
+				}
+				return list.length;
+			}
+
+			function saveToForm()
+			{
+				// The GrapesJS project JSON is the single source of truth for the layout.
+				// The front-end HTML/CSS/JS are regenerated DETERMINISTICALLY server-side
+				// from it at save time (see JHtmlFclayoutbuilder::renderLayoutFromProject),
+				// because capturing the live canvas states produced transient/partial values.
+				var project = null;
+				try { project = editor.getProjectData(); }
+				catch(e) { console.error(\'getProjectData error:\', e); }
+				if (project) fcl_setField(element_id + \'_data\', JSON.stringify(project));
+			}
+
+			// Ensure the layout fields are written when the Joomla form is submitted.
+			// NOTE: the Joomla toolbar Save button calls form.submit() programmatically,
+			// which does NOT fire the "submit" event -> we must intercept HTMLFormElement.prototype.submit.
+			var _fcOrigSubmit = HTMLFormElement.prototype.submit;
+			HTMLFormElement.prototype.submit = function()
+			{
+				if (this && this.querySelector(\'#\' + element_id + \'_html\'))
+				{
+					try { saveToForm(); } catch(e) { console.error(\'saveToForm error:\', e); }
+				}
+				return _fcOrigSubmit.apply(this, arguments);
+			};
+
+			// Catch the native-submit-button path too (fires a "submit" event; the prototype
+			// intercept above does not run then). Added in capture phase on document.
+			document.addEventListener(\'submit\', function(e)
+			{
+				if (e && e.target && e.target.querySelector && e.target.querySelector(\'#\' + element_id + \'_html\'))
+				{
+					try { saveToForm(); } catch(err) { console.error(\'saveToForm (capture) error:\', err); }
+				}
+			}, true);
+
+			// NOTE: no continuous field sync on purpose. Writing the fields on every edit
+			// step captured transient/partial editor states during load and clobbered the
+			// layout structure. saveToForm() runs once, when the form is actually submitted.
+
+			var adminForm2 = document.querySelector(\'form#adminForm\');
+			if (adminForm2)
+			{
+				adminForm2.addEventListener(\'submit\', function()
+				{
+					try { saveToForm(); } catch(e) { console.error(\'saveToForm error:\', e); }
+				}, true);
+			}
 
 
 			/*
@@ -1210,10 +1876,443 @@ abstract class JHtmlFclayoutbuilder
 			});*/
 
 
+			/**
+			 * Custom "Flexicontent Data" component types.
+			 *
+			 * These replace the raw placeholder-text blocks: the canvas shows a friendly,
+			 * non-editable badge box and the field/item/user is configured with the Settings
+			 * (traits) panel. The project data (_data) stays clean (type + data-fc-* attributes
+			 * only, no preview markup), and the real placeholder tokens are regenerated
+			 * server-side at save time by JHtmlFclayoutbuilder::renderLayoutFromProject,
+			 * then resolved at run time by JHtmlFlexicontent::renderBuilderLayout.
+			 */
+			var fcl_field_opts = window[\'fcl_builder_fields_\' + editor_sfx] || [];
+
+			function fcl_opt_label(v)
+			{
+				for (var i = 0; i < fcl_field_opts.length; i++)
+				{
+					if (fcl_field_opts[i].value === v) return fcl_field_opts[i].label;
+				}
+				return v;
+			}
+
+			function fcl_data_box(tag, main, sub)
+			{
+				return \'<div class="fc-data-box" style="pointer-events:none;user-select:none;box-sizing:border-box;min-height:48px;padding:7px 12px 7px 34px;position:relative;border:1px dashed #b5b5b5;border-radius:4px;background:#f4f4f4;color:#333;font-family:Arial,Helvetica,sans-serif;">\' +
+					\'<span style="position:absolute;top:7px;left:9px;width:18px;height:18px;border-radius:9px;background:#6EA22B;color:#fff;text-align:center;line-height:18px;font-size:11px;font-weight:bold;">\' + tag + \'</span>\' +
+					\'<strong style="display:block;font-size:13px;line-height:1.2;">\' + main + \'</strong>\' +
+					(sub ? \'<em style="display:block;font-size:11px;color:#777777;font-style:normal;line-height:1.2;">\' + sub + \'</em>\' : \'\') +
+					\'</div>\';
+			}
+
+			// Run the base (default) component render FIRST so the element gets its id/classes/
+			// attributes/style, then replace the (empty) inner content with the label box.
+			// NB: not overriding render entirely would skip attribute/class application.
+			function fcl_boxed_view(badgeBuilder)
+			{
+				return {
+					init()
+					{
+						this.listenTo(this.model, \'change:attributes\', () => this.render());
+					},
+					render()
+					{
+						var defView = editor.DomComponents.getType(\'default\').view.prototype;
+						defView.render.call(this);
+						badgeBuilder.call(this);
+						return this;
+					},
+				};
+			}
+
+			// Integrated combobox trait (searchable, grouped) for the fc-field picker.
+			// GrapesJS 0.23: trait types are VIEW classes extending the base text trait view.
+			// TraitManager.addType clones the base trait view and merges the methods below.
+			// The underlying Trait MODEL still maps trait value to the component attribute
+			// (trait name = the attribute key), so the selection keeps updating data-fc-field.
+			editor.TraitManager.addType(\'fc-field-select\', {
+				eventCapture: [\'change\'],
+				templateInput()
+				{
+					return \'<div class="\' + this.clsField + \'"><div class="fc-combo">\' +
+						\'<input type="text" class="fc-combo-input" placeholder="Select a field or type to filter... " autocomplete="off" spellcheck="false">\' +
+						\'<div class="fc-combo-arrow">&#9662;</div>\' +
+						\'<div class="fc-combo-list" style="display:none;">\' +
+							\'<div class="fc-combo-groups"></div>\' +
+							\'<div class="fc-search-nomatch" style="display:none;">No matching field</div>\' +
+						\'</div>\' +
+						\'<div data-input style="display:none;"></div>\' +
+					\'</div></div>\';
+				},
+				getInputEl()
+				{
+					if (!this.$input)
+					{
+						var model = this.model;
+						var opts = model.get(\'options\') || [];
+						var select = document.createElement(\'select\');
+						var groups = {};
+						var vals = [];
+						for (var i = 0; i < opts.length; i++)
+						{
+							var o = opts[i];
+							var v = (typeof o.value === \'undefined\' ? o.id : o.value);
+							v = String(v).replace(/"/g, \'&quot;\');
+							var label = o.name || o.label || v;
+							var g = o.group || \'Flexicontent\';
+							if (!groups[g]) groups[g] = [];
+							groups[g].push({ v: v, t: label });
+							vals.push(v);
+						}
+						Object.keys(groups).sort().forEach(function(g)
+						{
+							var og = document.createElement(\'optgroup\');
+							og.setAttribute(\'label\', g);
+							groups[g].forEach(function(o)
+							{
+								var opt = document.createElement(\'option\');
+								opt.value = o.v;
+								opt.textContent = o.t;
+								og.appendChild(opt);
+							});
+							select.appendChild(og);
+						});
+						var cur = model.getTargetValue();
+						var found = false;
+						for (var j = 0; j < vals.length; j++)
+						{
+							if (String(vals[j]) === String(cur)) { found = true; break; }
+						}
+						var curVal = found ? cur : model.get(\'default\');
+						if (typeof curVal !== \'undefined\') select.value = String(curVal);
+						this.$input = { get: function() { return select; } };
+						this.input = select;
+					}
+					return this.$input.get(0);
+				},
+				setInputValue(value)
+				{
+					var el = this.getInputElem();
+					if (el) el.value = (value == null ? \'\' : String(value));
+					this.fcReflect();
+				},
+				onRender()
+				{
+					this.fcSetup();
+				},
+				fcSetup()
+				{
+					var el = this.el;
+					if (!el) return;
+					this._fcOpts = [];
+					this._fcActive = -1;
+					this._fcLabel = \'\';
+					var sel = this.$input ? this.$input.get(0) : null;
+					var groupEl = el.querySelector(\'.fc-combo-groups\');
+					var inp = el.querySelector(\'.fc-combo-input\');
+					if (!sel || !groupEl || !inp) return;
+					this.fcBuildList(sel, groupEl);
+					this.fcReflectEl(inp, sel);
+					var self = this;
+					inp.addEventListener(\'focus\', function() { self.fcOpen(); });
+					inp.addEventListener(\'click\', function() { self.fcOpen(); });
+					inp.addEventListener(\'input\', function() { self.fcFilter(inp.value); self.fcFocus(0); });
+					inp.addEventListener(\'keydown\', function(e) {
+						if (e.key === \'Escape\') { e.preventDefault(); self.fcClose(); inp.blur(); }
+						else if (e.key === \'ArrowDown\') { e.preventDefault(); self.fcOpen(); self.fcFocus(1); }
+						else if (e.key === \'ArrowUp\') { e.preventDefault(); self.fcOpen(); self.fcFocus(-1); }
+						else if (e.key === \'Enter\') { e.preventDefault(); self.fcCommit(self.fcPickCurrent()); }
+					});
+					inp.addEventListener(\'blur\', function() { self.fcClose(); });
+					var list = el.querySelector(\'.fc-combo-list\');
+					if (list)
+					{
+						list.addEventListener(\'mousedown\', function(e) { e.preventDefault(); });
+						list.addEventListener(\'click\', function(e) {
+							var o = e.target && e.target.closest ? e.target.closest(\'.fc-combo-opt\') : null;
+							var v = o && o.getAttribute(\'data-value\');
+							if (o && v != null) self.fcCommit(v);
+						});
+					}
+					var arrow = el.querySelector(\'.fc-combo-arrow\');
+					if (arrow) arrow.addEventListener(\'mousedown\', function(e) { e.preventDefault(); self.fcOpen(); });
+				},
+				fcBuildList(sel, groupEl)
+				{
+					var map = {};
+					this._fcOpts = [];
+					var ogs = sel.querySelectorAll(\'optgroup\');
+					for (var gi = 0; gi < ogs.length; gi++)
+					{
+						var og = ogs[gi];
+						var gname = og.getAttribute(\'label\') || \'\';
+						var grp = map[gname];
+						if (!grp)
+						{
+							grp = document.createElement(\'div\');
+							grp.className = \'fc-combo-grp\';
+							var b = document.createElement(\'b\');
+							b.textContent = gname;
+							grp.appendChild(b);
+							groupEl.appendChild(grp);
+							map[gname] = grp;
+						}
+						var opts = og.querySelectorAll(\'option\');
+						for (var oi = 0; oi < opts.length; oi++)
+						{
+							var opt = opts[oi];
+							var row = document.createElement(\'div\');
+							row.className = \'fc-combo-opt\';
+							row.setAttribute(\'data-value\', opt.value);
+							row.textContent = opt.textContent;
+							grp.appendChild(row);
+							this._fcOpts.push({ value: opt.value, text: opt.textContent.toLowerCase(), el: row, grp: grp, pos: this._fcOpts.length });
+						}
+					}
+				},
+				fcFilter(q)
+				{
+					var el = this.el;
+					if (!el) return;
+					q = String(q || \'\').toLowerCase().trim();
+					var opts = this._fcOpts;
+					var total = 0;
+					for (var i = 0; i < opts.length; i++)
+					{
+						var o = opts[i];
+						var hit = !q
+							|| String(o.text).indexOf(q) !== -1
+							|| String(o.value).toLowerCase().indexOf(q) !== -1;
+						o.el.style.display = hit ? \'\' : \'none\';
+						if (hit) total++;
+					}
+					var seen = {};
+					for (var j = 0; j < opts.length; j++)
+					{
+						var g = opts[j].grp;
+						if (seen[g]) continue;
+						seen[g] = 1;
+						var shown = 0;
+						for (var k = 0; k < opts.length; k++)
+						{
+							if (opts[k].grp === g && opts[k].el.style.display !== \'none\') shown++;
+						}
+						g.style.display = shown ? \'\' : \'none\';
+					}
+					var marker = el.querySelector(\'.fc-search-nomatch\');
+					if (marker) marker.style.display = total ? \'none\' : \'block\';
+				},
+				fcOpen()
+				{
+					var el = this.el;
+					if (!el) return;
+					var list = el.querySelector(\'.fc-combo-list\');
+					var inp = el.querySelector(\'.fc-combo-input\');
+					if (!list || !inp) return;
+					if (list.style.display === \'block\') return;
+					this._fcLabel = inp.value;
+					inp.value = \'\';
+					this.fcFilter(\'\');
+					list.style.display = \'block\';
+					this.fcFocus(0);
+				},
+				fcClose()
+				{
+					var el = this.el;
+					if (!el) return;
+					var list = el.querySelector(\'.fc-combo-list\');
+					var inp = el.querySelector(\'.fc-combo-input\');
+					if (list) list.style.display = \'none\';
+					if (inp && typeof this._fcLabel === \'string\')
+					{
+						this.fcReflectEl(inp, this.$input ? this.$input.get(0) : null);
+					}
+					this._fcActive = -1;
+				},
+				fcReflect()
+				{
+					this.fcReflectEl(this.el && this.el.querySelector(\'.fc-combo-input\'), this.$input ? this.$input.get(0) : null);
+				},
+				fcReflectEl(inp, sel)
+				{
+					if (!inp || !sel) return;
+					var txt = \'\';
+					var saw = false;
+					var opts = sel.options || [];
+					for (var i = 0; i < opts.length; i++)
+					{
+						if (String(opts[i].value) === String(sel.value)) { txt = opts[i].textContent; saw = true; break; }
+					}
+					inp.value = saw ? txt : \'\';
+				},
+				fcFocus(d)
+				{
+					var opts = this._fcOpts;
+					var vis = [];
+					if (!opts) return;
+					for (var i = 0; i < opts.length; i++)
+					{
+						if (opts[i].el.style.display !== \'none\') vis.push(opts[i]);
+					}
+					if (!vis.length) return;
+					var cur = -1;
+					for (var k = 0; k < vis.length; k++)
+					{
+						if (vis[k].pos === this._fcActive) { cur = k; break; }
+					}
+					var next = 0;
+					if (cur !== -1) next = cur + (typeof d === \'undefined\' ? 0 : d);
+					else next = (typeof d === \'undefined\' || d >= 0) ? 0 : vis.length - 1;
+					if (next < 0) next = 0;
+					if (next >= vis.length) next = vis.length - 1;
+					this._fcActive = vis[next].pos;
+					for (var m = 0; m < opts.length; m++)
+					{
+						if (opts[m].el) opts[m].el.classList.toggle(\'fc-combo-active\', m === this._fcActive);
+					}
+					if (vis[next].el.scrollIntoView) vis[next].el.scrollIntoView({ block: \'nearest\' });
+				},
+				fcPickCurrent()
+				{
+					var opts = this._fcOpts;
+					var vis = [];
+					if (!opts) return null;
+					for (var i = 0; i < opts.length; i++)
+					{
+						if (opts[i].el.style.display !== \'none\') vis.push(opts[i]);
+					}
+					if (!vis.length) return null;
+					for (var k = 0; k < vis.length; k++)
+					{
+						if (vis[k].pos === this._fcActive) return vis[k].value;
+					}
+					return vis[0].value;
+				},
+				fcCommit(v)
+				{
+					if (v == null) return;
+					var sel = this.$input ? this.$input.get(0) : null;
+					if (sel)
+					{
+						sel.value = String(v);
+						sel.dispatchEvent(new Event(\'change\', { bubbles: true }));
+						this.fcReflect();
+					}
+					this.fcClose();
+				},
+			});
+
+			editor.DomComponents.addType(\'fc-field\', {
+				// Also recognized when old HTML saves contain a data-fc-field attribute
+				isComponent: function(el)
+				{
+					if (el && el.hasAttribute && el.hasAttribute(\'data-fc-field\')) return { type: \'fc-field\' };
+				},
+				model: {
+					defaults: {
+						name: \'Flexicontent Field\',
+						editable: false,
+						droppable: false,
+						resizable: true,
+						attributes: { \'data-fc-field\': \'\' },
+						traits: [{
+							type: \'fc-field-select\',
+							// NB: in GrapesJS the trait \'name\' IS the attribute key written to the
+							// component (the legacy \'attribute\' key is ignored), so use it directly.
+							name: \'data-fc-field\',
+							label: \'Field\',
+							options: fcl_field_opts.map(function(o) { return { value: o.value, name: o.label, group: o.group }; }),
+						}],
+					},
+				},
+				view: fcl_boxed_view(function()
+				{
+					var name = this.model.getAttributes()[\'data-fc-field\'] || \'\';
+					this.el.innerHTML = fcl_data_box(\'F\',
+						name ? (\'Field: \' + name) : \'Flexicontent Field\',
+						name ? fcl_opt_label(name) : \'Choose a field in the Settings panel\');
+				}),
+			});
+
+			editor.DomComponents.addType(\'fc-link\', {
+				isComponent: function(el)
+				{
+					if (el && el.hasAttribute && el.hasAttribute(\'data-fc-link\')) return { type: \'fc-link\' };
+				},
+				model: {
+					defaults: {
+						name: \'Flexicontent Item Link\',
+						editable: false,
+						droppable: false,
+						resizable: true,
+						attributes: { \'data-fc-link\': \'item\', \'data-fc-itemid\': \'\', \'data-fc-linktext\': \'_title_\' },
+						traits: [
+							{ type: \'text\', name: \'data-fc-itemid\', label: \'Item ID\', placeholder: \'ex: 122|current|{{fc-item-id}}\' },
+							{ type: \'text\', name: \'data-fc-linktext\', label: \'Link text\', placeholder: \'_title_, text or _noclose_\' },
+						],
+					},
+				},
+				view: fcl_boxed_view(function()
+				{
+					var attrs = this.model.getAttributes() || {};
+					var id  = attrs[\'data-fc-itemid\'] || \'current\';
+					var txt = attrs[\'data-fc-linktext\'] || \'_title_\';
+					this.el.innerHTML = fcl_data_box(\'L\', \'Link to item \' + id,
+						(txt === \'_title_\') ? \'Item title\'
+							: (txt === \'_noclose_\') ? \'Custom content (wrapper)\'
+							: (\'Text: \' + txt));
+				}),
+			});
+
+			editor.DomComponents.addType(\'fc-profile-user\', {
+				isComponent: function(el)
+				{
+					if (el && el.hasAttribute && el.hasAttribute(\'data-fc-profile\') && el.getAttribute(\'data-fc-profile\') === \'user\') return { type: \'fc-profile-user\' };
+				},
+				model: {
+					defaults: {
+						name: \'User Profile\',
+						editable: false,
+						droppable: false,
+						resizable: true,
+						attributes: { \'data-fc-profile\': \'user\', \'data-fc-userid\': \'\' },
+						traits: [
+							{ type: \'text\', name: \'data-fc-userid\', label: \'User ID\', placeholder: \'empty = current user\' },
+						],
+					},
+				},
+				view: fcl_boxed_view(function()
+				{
+					var uid = this.model.getAttributes()[\'data-fc-userid\'] || \'\';
+					this.el.innerHTML = fcl_data_box(\'U\', \'User profile\', uid ? (\'user: \' + uid) : \'current user\');
+				}),
+			});
+
+			editor.DomComponents.addType(\'fc-profile-author\', {
+				isComponent: function(el)
+				{
+					if (el && el.hasAttribute && el.hasAttribute(\'data-fc-profile\') && el.getAttribute(\'data-fc-profile\') === \'author\') return { type: \'fc-profile-author\' };
+				},
+				model: {
+					defaults: {
+						name: \'Author Profile\',
+						editable: false,
+						droppable: false,
+						resizable: true,
+						attributes: { \'data-fc-profile\': \'author\' },
+					},
+				},
+				view: fcl_boxed_view(function()
+				{
+					this.el.innerHTML = fcl_data_box(\'A\', \'Author profile\', \'author of current item\');
+				}),
+			});
+
 			editor.BlockManager.add(\'fcfield\', {
 				label: \'Flexicontent Field\',
 				category: \'Flexicontent Data\',
-				content: \'<div style="display: inline-block" data-gjs-resizable="true" data-gjs-dragMode="absolute">{flexi_field:FIELDNAME  item:122|current|{{fc-item-id}}  method:display}</div>\',
+				content: { type: \'fc-field\', attributes: { \'data-fc-field\': fcl_field_opts.length ? fcl_field_opts[0].value : \'\' } },
 				select: true,
 				activate: true,
 				attributes: { class:\'fc-iblock fa fa-database\' },
@@ -1222,7 +2321,7 @@ abstract class JHtmlFclayoutbuilder
 			editor.BlockManager.add(\'fcitemlink\', {
 				label: \'Flexicontent item title with link\',
 				category: \'Flexicontent Data\',
-				content: \'<div style="display: inline-block" data-gjs-resizable="true" data-gjs-dragMode="absolute">{flexi_link:item  item:566|current|{{fc-item-id}}  linktext:_title_}</div>\',
+				content: { type: \'fc-link\', attributes: { \'data-fc-itemid\': \'566|current|{{fc-item-id}}\', \'data-fc-linktext\': \'_title_\' } },
 				select: true,
 				activate: true,
 				attributes: { class:\'fc-iblock fa fa-database\' },
@@ -1231,7 +2330,7 @@ abstract class JHtmlFclayoutbuilder
 			editor.BlockManager.add(\'fcitemlink2\', {
 				label: \'Flexicontent item link with custom text\',
 				category: \'Flexicontent Data\',
-				content: \'<div style="display: inline-block" data-gjs-resizable="true" data-gjs-dragMode="absolute">{flexi_link:item  id:577|current|{{fc-item-id}}  linktext:_noclose_} Some HTML {/flexi_link}</div>\',
+				content: { type: \'fc-link\', attributes: { \'data-fc-itemid\': \'577|current|{{fc-item-id}}\', \'data-fc-linktext\': \'_noclose_\' } },
 				select: true,
 				activate: true,
 				attributes: { class:\'fc-iblock fa fa-database\' },
@@ -1240,7 +2339,7 @@ abstract class JHtmlFclayoutbuilder
 			editor.BlockManager.add(\'fcitemprofil\', {
 				label: \'User profil\',
 				category: \'Flexicontent Data\',
-				content: \'<div style="display: inline-block" data-gjs-resizable="true" data-gjs-dragMode="absolute">{flexi_item:profile  user:%user_id%  ilayout:%template_name%}</div>\',
+				content: { type: \'fc-profile-user\', attributes: { \'data-fc-userid\': \'\' } },
 				select: true,
 				activate: true,
 				attributes: { class:\'fc-iblock fa fa-database\' },
@@ -1249,10 +2348,71 @@ abstract class JHtmlFclayoutbuilder
 			editor.BlockManager.add(\'fcauthor\', {
 				label: \'Author profil\',
 				category: \'Flexicontent Data\',
-				content: \'<div style="display: inline-block" data-gjs-resizable="true" data-gjs-dragMode="absolute"> {flexi_item:profile  author_of:[%item_id% | current]  ilayout:%template_name%}</div>\',
+				content: { type: \'fc-profile-author\', attributes: {} },
 				select: true,
 				activate: true,
 				attributes: { class:\'fc-iblock fa fa-database\' },
+			});
+
+
+			// --- Basic layout blocks: Section, Flex Row, pre-configured flex columns ---
+			// Flex layouts are built with inline styles (display:flex + flex-wrap), so they are
+			// self-contained: they survive the save (inline styles are stored in the project
+			// data and re-rendered by the server) and wrap gracefully on narrow viewports.
+			// data-gjs-resizable="true" makes the dropped divs resizable (consumed at import,
+			// it is NOT exported to the front-end HTML).
+			editor.BlockManager.add(\'flex-section\', {
+				label: \'Section\',
+				category: \'Basic\',
+				select: true,
+				activate: true,
+				attributes: { class: \'fa fa-square-o\' },
+				content: \'<section data-gjs-resizable="true"></section>\',
+			});
+
+			editor.BlockManager.add(\'flex-row\', {
+				label: \'Row (flex)\',
+				category: \'Basic\',
+				select: true,
+				activate: true,
+				attributes: { class: \'fa fa-arrows-h\' },
+				content: \'<div data-gjs-resizable="true" style="display:flex;flex-wrap:wrap;gap:10px;"></div>\',
+			});
+
+			editor.BlockManager.add(\'flex-cols-2\', {
+				label: \'2 Columns (50/50)\',
+				category: \'Basic\',
+				select: true,
+				activate: true,
+				attributes: { class: \'fa fa-columns\' },
+				content: \'<div data-gjs-resizable="true" style="display:flex;flex-wrap:wrap;gap:10px;"><div data-gjs-resizable="true" style="flex:0 1 auto;width:50%;min-width:200px;"></div><div data-gjs-resizable="true" style="flex:0 1 auto;width:50%;min-width:200px;"></div></div>\',
+			});
+
+			editor.BlockManager.add(\'flex-cols-3\', {
+				label: \'3 Columns (33/33/33)\',
+				category: \'Basic\',
+				select: true,
+				activate: true,
+				attributes: { class: \'fa fa-th-large\' },
+				content: \'<div data-gjs-resizable="true" style="display:flex;flex-wrap:wrap;gap:10px;"><div data-gjs-resizable="true" style="flex:0 1 auto;width:33.33%;min-width:150px;"></div><div data-gjs-resizable="true" style="flex:0 1 auto;width:33.33%;min-width:150px;"></div><div data-gjs-resizable="true" style="flex:0 1 auto;width:33.33%;min-width:150px;"></div></div>\',
+			});
+
+			editor.BlockManager.add(\'flex-cols-4\', {
+				label: \'4 Columns (25% each)\',
+				category: \'Basic\',
+				select: true,
+				activate: true,
+				attributes: { class: \'fa fa-th\' },
+				content: \'<div data-gjs-resizable="true" style="display:flex;flex-wrap:wrap;gap:10px;"><div data-gjs-resizable="true" style="flex:0 1 auto;width:25%;min-width:120px;"></div><div data-gjs-resizable="true" style="flex:0 1 auto;width:25%;min-width:120px;"></div><div data-gjs-resizable="true" style="flex:0 1 auto;width:25%;min-width:120px;"></div><div data-gjs-resizable="true" style="flex:0 1 auto;width:25%;min-width:120px;"></div></div>\',
+			});
+
+			editor.BlockManager.add(\'flex-cols-mainbar\', {
+				label: \'Main + Sidebar (2/3 - 1/3)\',
+				category: \'Basic\',
+				select: true,
+				activate: true,
+				attributes: { class: \'fa fa-bars\' },
+				content: \'<div data-gjs-resizable="true" style="display:flex;flex-wrap:wrap;gap:10px;"><div data-gjs-resizable="true" style="flex:0 1 auto;width:66.66%;min-width:250px;"></div><div data-gjs-resizable="true" style="flex:0 1 auto;width:33.33%;min-width:200px;"></div></div>\',
 			});
 
 
@@ -1329,13 +2489,7 @@ abstract class JHtmlFclayoutbuilder
 				className: \'fa fa-floppy-o\',
 				command: function(editor1, sender) {
 					sender && sender.set(\'active\', true);
-					document.querySelector(\'#\' + element_id + \'_html\').innerHTML = editor.getHtml().trim();
-					//document.querySelector(\'#\' + element_id + \'_js\').innerHTML = editor.getJs().trim();
-					document.querySelector(\'#\' + element_id + \'_css\').innerHTML = editor.getCss().trim();
-					document.querySelector(\'#\' + element_id + \'_styles\').innerHTML = JSON.stringify(editor.getStyle());
-					document.querySelector(\'#\' + element_id + \'_components\').innerHTML = JSON.stringify(editor.getComponents());
-					document.querySelector(\'#\' + element_id + \'_assets\').innerHTML = JSON.stringify(editor.AssetManager.getAll());
-
+					saveToForm();
 					setTimeout(function()
 					{
 						sender && sender.set(\'active\', false);
@@ -1442,13 +2596,19 @@ abstract class JHtmlFclayoutbuilder
 				editor.store(res => console.log(\'Store callback\'));
 			});*/
 
-			editor.load(res => console.log(\'Load callback\'));
+			// NOTE: no explicit editor.load() here: loading is done by the storageManager autoload
+			// (autoload: true above). Doing both would double-load the stored layout.
+
+			// Safety net: never show the browser "Changes you made may not be saved" dialog
+			// (GrapesJS re-sets window.onbeforeunload on every change step)
+			window.onbeforeunload = null;
+			setInterval(function() { window.onbeforeunload = null; }, 300);
 
 			editor.on(\'storage:error\', (err) => {
 				alert(`Error: ${err}`);
 			});
 
-			editor.on(\'change:device\', () => console.log(\'Current device: \', editor.getDevice()));
+			editor.on(\'device:update\', () => console.log(\'Current device: \', editor.getDevice()));
 
 			editor.on(\'run:export-template:before\', opts =>
 			{
@@ -1499,14 +2659,7 @@ abstract class JHtmlFclayoutbuilder
 		}
 
 		$html .= '
-		<span style="pointer: cursor; font-size: 48px;" class="btn"
-			onclick="this.style.display = \'none\'; this.nextElementSibling.style.display = \'\'; fclayout_init_builder(\'' . $editor_sfx . '\', \'' . $element_id . '\', ); return false;"
-		>
-			<img alt="Layout Builer" src="' . \Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/assets/images/layout_builder.png" style="width: 64px; height: 64px; line-height: 100%;" />
-			<span style="font-size: 24px;">' . \Joomla\CMS\Language\Text::_('FLEXI_EDIT') . '</span>
-		</span>
-
-		<div style="height: 90%; margin: 0px; display: none;">
+		<div style="height: 90%; margin: 0px;">
 
 			<div class="editor-row">
 
@@ -1524,6 +2677,25 @@ abstract class JHtmlFclayoutbuilder
 
 			<!--div id="blocks"></div-->
 		</div>
+
+		<script>
+		(function()
+		{
+			function fclayout_builder_autostart()
+			{
+				fclayout_init_builder(\'' . $editor_sfx . '\', \'' . $element_id . '\');
+			}
+
+			if (document.readyState === \'loading\')
+			{
+				document.addEventListener(\'DOMContentLoaded\', fclayout_builder_autostart);
+			}
+			else
+			{
+				fclayout_builder_autostart();
+			}
+		})();
+		</script>
 		'
 		/*. '
 		<div id="info-panel" style="display:none">

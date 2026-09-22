@@ -317,7 +317,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_layouts_conf` (
   `template` varchar(50) NOT NULL default '',
   `cfgname` varchar(50) NOT NULL default '',
   `layout` varchar(20) NOT NULL default '',
-  `attribs` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `attribs` LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   PRIMARY KEY  (`template`,`cfgname`,`layout`)
 ) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
 

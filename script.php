@@ -1368,9 +1368,13 @@ class com_flexicontentInstallerScript
 						  `template` varchar(50) NOT NULL default '',
 						  `cfgname` varchar(50) NOT NULL default '',
 						  `layout` varchar(20) NOT NULL default '',
-						  `attribs` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+						  `attribs` LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
 						  PRIMARY KEY  (`template`,`cfgname`,`layout`)
 						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
+					}
+					else {
+						// Widen column: Layout Builder data (html with inlined images / components / styles) can exceed the 64KB TEXT limit
+						$queries[] = "ALTER TABLE `#__flexicontent_layouts_conf` MODIFY `attribs` LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL";
 					}
 
 					$upgrade_count = 0;

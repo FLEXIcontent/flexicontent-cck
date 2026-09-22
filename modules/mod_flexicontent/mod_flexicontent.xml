@@ -968,9 +968,7 @@
 			<field name="builder_layout1_html" type="textarea" filter="raw" readonly="readonly" rows="2" default="" label="HTML" description="..." class="input-xxlarge"/>
 			<field name="builder_layout1_js" type="hidden" filter="raw" default="" label="JS" description="..." class="" />
 			<field name="builder_layout1_css" type="textarea" readonly="readonly" filter="raw" rows="2" default="" label="CSS" description="..." class="input-xxlarge" />
-			<field name="builder_layout1_styles" type="hidden" filter="raw" default="" label="Styles" description="..." class=""/>
-			<field name="builder_layout1_components" type="hidden" filter="raw" default="" label="Components" description="..." class=""/>
-			<field name="builder_layout1_assets" type="hidden" filter="raw" default="" label="Assets" description="..." class=""/>
+			<field name="builder_layout1_data" type="hidden" filter="raw" default="" label="Project data" description="..." class=""/>
 			<field name="builder_layout1_hash" type="hidden" filter="JHtmlFclayoutbuilder::createUrlHash" default="" label="Hash" description="..." class="" />
 			<field name="builder_layout1_less" type="hidden" filter="JHtmlFclayoutbuilder::prepareLess" default="/modules/mod_flexicontent/builder/less/builder_layout1_{{id}}" label="LESS" description="..." class="" />
 
@@ -983,9 +981,7 @@
 			<field name="builder_layout2_html" type="textarea" filter="raw" readonly="readonly" rows="2" default="" label="HTML" description="..." class="input-xxlarge"/>
 			<field name="builder_layout2_js" type="hidden" filter="raw" default="" label="JS" description="..." class="" />
 			<field name="builder_layout2_css" type="textarea" readonly="readonly" filter="raw" rows="2" default="" label="CSS" description="..." class="input-xxlarge" />
-			<field name="builder_layout2_styles" type="hidden" filter="raw" default="" label="Styles" description="..." class=""/>
-			<field name="builder_layout2_components" type="hidden" filter="raw" default="" label="Components" description="..." class=""/>
-			<field name="builder_layout2_assets" type="hidden" filter="raw" default="" label="Assets" description="..." class=""/>
+			<field name="builder_layout2_data" type="hidden" filter="raw" default="" label="Project data" description="..." class=""/>
 			<field name="builder_layout2_hash" type="hidden" filter="JHtmlFclayoutbuilder::createUrlHash" default="" label="Hash" description="..." class="" />
 			<field name="builder_layout2_less" type="hidden" filter="JHtmlFclayoutbuilder::prepareLess" default="/modules/mod_flexicontent/builder/less/builder_layout2_{{id}}" label="LESS" description="..." class="" />
 

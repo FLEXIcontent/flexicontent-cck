@@ -98,7 +98,12 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 		$field_type_select = flexicontent_html::buildfieldtypeslist($fftypes, $fieldname, '', ($_grouped ? 1 : 0), $attribs, $elementid);
 
 
-		if (isset($layout->positions)) {
+		// Layout Builder templates do not render the "Fields placement" tab, so do not emit
+		// the (jQuery UI) sortable lists / init JS for its positions (avoids a jQuery error)
+		$jssort = '';
+		$positions = '';
+
+		if (isset($layout->positions) && $layout->name != 'grapesjs') {
 			$sort = array();
 			$jssort = array();
 			$idsort = array();
@@ -289,6 +294,10 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 	 */
 	function check_xml_to_less($layout = null)
 	{
+		// Layout may not exist for this layout type (e.g. no category.xml in the template folder) - abort
+		if (!is_object($layout)) return;
+		if (!isset($layout->name) || !isset($layout->view)) return;
+
 		$tmpldir = JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$layout->name;
 
 		// ****************************************************************************************************************************
