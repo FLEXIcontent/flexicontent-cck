@@ -727,6 +727,100 @@ abstract class JHtmlFclayoutbuilder
 
 		$html .= '<script>window.fcl_builder_fields_' . $editor_sfx . ' = ' . json_encode($fcl_field_options) . ';</script>';
 
+		/**
+		 * Preview item data for the Layout Builder canvas.
+		 * A list of recent items is offered in the builder toolbar (below); the chosen item id
+		 * is kept in the 'fcl_preview_item' URL parameter (persisted across reloads) and in
+		 * sessionStorage (persisted across the builder session) and is sent to the getfieldpreview
+		 * endpoint (AJAX, batch of fields) so that every fc-field block shows its real rendered
+		 * value on the canvas.
+		 */
+		$fcl_preview_url_set = ($jinput->get('fcl_preview_item', null, 'int') !== null);
+		$fcl_preview_item_id = $jinput->getInt('fcl_preview_item', 0);
+		$fcl_recent_items    = array();
+		$fcl_preview_html    = '';
+		$fcl_preview_warn    = '';
+		$fcl_db2             = null;
+
+		/**
+		 * Recent items for the preview selector. Preferred source is the FC items table
+		 * (join ensures only FC items), with a graceful fallback to plain #__content rows
+		 * if that query fails or is empty (missing table / no FC items), so the toolbar is
+		 * always rendered.
+		 */
+		try
+		{
+			$fcl_db2 = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+			$fcl_pq  = $fcl_db2->getQuery(true);
+			$fcl_pq->select('a.id, a.title')
+				->from($fcl_db2->quoteName('#__content', 'a'))
+				->innerJoin($fcl_db2->quoteName('#__flexicontent_items', 'fi') . ' ON fi.item_id = a.id')
+				->where($fcl_db2->quoteName('a.state') . ' = 1')
+				->order('a.modified DESC, a.id DESC')
+				->setLimit(30);
+			$fcl_db2->setQuery($fcl_pq);
+			$fcl_recent_items = $fcl_db2->loadObjectList();
+		}
+		catch (\Exception $e)
+		{
+			$fcl_preview_warn .= ' flexicontent_items query: ' . $e->getMessage();
+			$fcl_recent_items = array();
+		}
+
+		if ($fcl_db2 && !count($fcl_recent_items))
+		{
+			try
+			{
+				$fcl_pq = $fcl_db2->getQuery(true);
+				$fcl_pq->select('a.id, a.title')
+					->from($fcl_db2->quoteName('#__content', 'a'))
+					->where($fcl_db2->quoteName('a.state') . ' = 1')
+					->order('a.modified DESC, a.id DESC')
+					->setLimit(30);
+				$fcl_db2->setQuery($fcl_pq);
+				$fcl_recent_items = $fcl_db2->loadObjectList();
+			}
+			catch (\Exception $e)
+			{
+				$fcl_preview_warn .= ' content query: ' . $e->getMessage();
+				$fcl_recent_items = array();
+			}
+		}
+
+		if (!count($fcl_recent_items))
+		{
+			$fcl_preview_item_id = 0;
+		}
+		elseif (!$fcl_preview_item_id)
+		{
+			$fcl_preview_item_id = (int) $fcl_recent_items[0]->id;
+		}
+
+		$fcl_preview_cfg = array(
+			'endpoint'   => 'index.php?option=com_flexicontent&task=templates.getfieldpreview&format=raw',
+			'token_name' => \Joomla\CMS\Session\Session::getFormToken(),
+			'token'      => '1',
+			'item_id'    => (int) $fcl_preview_item_id,
+			'url_set'    => (bool) $fcl_preview_url_set,
+			'warn'       => $fcl_preview_warn,
+		);
+		$html .= '<script>window.fcl_builder_preview_' . $editor_sfx . ' = ' . json_encode($fcl_preview_cfg) . ';</script>';
+
+		$fcl_preview_options = '<option value="0">' . (count($fcl_recent_items) ? '(badges only)' : '(badges only - no items found)') . '</option>';
+
+		foreach ($fcl_recent_items as $fcl_ri)
+		{
+			$fcl_sel = ((int) $fcl_ri->id === $fcl_preview_item_id) ? ' selected="selected"' : '';
+			$fcl_preview_options .= '<option value="' . (int) $fcl_ri->id . '"' . $fcl_sel . '>' . htmlspecialchars($fcl_ri->title, ENT_QUOTES, 'UTF-8') . ' (' . (int) $fcl_ri->id . ')</option>';
+		}
+
+		$fcl_preview_html = '
+			<div class="fcl-preview-toolbar" style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:#2d3556;color:#cbd2e8;font-size:12px;border-bottom:1px solid #22294a;">
+				<label for="fcl_preview_item_' . $editor_sfx . '" style="white-space:nowrap;">Preview item</label>
+				<select id="fcl_preview_item_' . $editor_sfx . '" class="inputbox" style="font-size:12px;max-width:480px;">' . $fcl_preview_options . '</select>
+				<span id="fcl_preview_status_' . $editor_sfx . '" class="fcl-preview-status" style="white-space:nowrap;">&nbsp;</span>
+			</div>';
+
 		//\Joomla\CMS\Factory::getDocument()->addScriptDeclaration(
 		// TODO add template.css file in editor for better display
 		$html .= '
@@ -1888,6 +1982,210 @@ editor.on(\'load\', function()
 			 */
 			var fcl_field_opts = window[\'fcl_builder_fields_\' + editor_sfx] || [];
 
+			// ---------------------------------------------------------------------
+			// Real-data preview: every fc-field block can show the actual rendered
+			// value of its field for a chosen preview item, fetched via AJAX (batch)
+			// from the getfieldpreview endpoint. Fetches are batched and cached per
+			// item; the badge overlay stays visible until a real value is available.
+			// ---------------------------------------------------------------------
+			var fcl_preview_cfg    = window[\'fcl_builder_preview_\' + editor_sfx] || null;
+			var fcl_preview_cache  = {};
+			var fcl_preview_timer  = null;
+			var fcl_preview_css_added = false;
+
+			if (fcl_preview_cfg && (!fcl_preview_cfg.item_id || fcl_preview_cfg.warn))
+			{
+				console.warn(\'fcl builder preview:\', fcl_preview_cfg.warn || \'no preview item selected\');
+			}
+
+			// Adopt the session-stored preview item when no item was chosen via the URL:
+			// the PHP config defaults item_id to the first recent item for display only,
+			// so the stored value has to override it (including the 0 = badges only case).
+			if (fcl_preview_cfg && !fcl_preview_cfg.url_set)
+			{
+				try
+				{
+					var fcl_stored_preview = window.sessionStorage.getItem(\'fcl_preview_item_\' + editor_sfx);
+					if (fcl_stored_preview !== null)
+					{
+						var fcl_stored_num = parseInt(fcl_stored_preview, 10) || 0;
+						if (fcl_stored_num !== (fcl_preview_cfg.item_id | 0)) fcSetPreviewItem(fcl_stored_num);
+					}
+				}
+				catch (e) {}
+			}
+
+			function fcPreviewItemId()
+			{
+				return fcl_preview_cfg ? (fcl_preview_cfg.item_id | 0) : 0;
+			}
+
+			function fcLoadFieldPreviews(names, cb)
+			{
+				var item_id = fcPreviewItemId();
+				names = names.filter(function(n) { return typeof n === \'string\' && n; });
+
+				if (!fcl_preview_cfg || !item_id || !names.length)
+				{
+					if (cb) cb(null);
+					return;
+				}
+
+				var key = \'item_\' + item_id;
+				if (!fcl_preview_cache[key]) fcl_preview_cache[key] = {};
+
+				var missing = names.filter(function(n) { return !(n in fcl_preview_cache[key]); });
+
+				if (!missing.length)
+				{
+					if (cb) cb(fcl_preview_cache[key]);
+					return;
+				}
+
+				var body = new URLSearchParams();
+				body.set(fcl_preview_cfg.token_name, fcl_preview_cfg.token || \'1\');
+				body.set(\'item_id\', item_id);
+				missing.forEach(function(n) { body.append(\'fields[]\', n); });
+
+				fetch(fcl_preview_cfg.endpoint, {
+					method: \'POST\',
+					headers: { \'X-Requested-With\': \'XMLHttpRequest\' },
+					body: body,
+					credentials: \'same-origin\',
+				})
+				.then(function(r) { return r.json(); })
+				.then(function(data)
+				{
+					if (data && data.ok && data.html)
+					{
+						var k = Object.keys(data.html);
+						for (var i = 0; i < k.length; i++) fcl_preview_cache[key][k[i]] = data.html[k[i]];
+					}
+					if (data && data.errors)
+					{
+						var ek = Object.keys(data.errors);
+						for (var i = 0; i < ek.length; i++) fcl_preview_cache[key][ek[i]] = null;
+					}
+					if (cb) cb(fcl_preview_cache[key]);
+				})
+				.catch(function(err)
+				{
+					console.error(\'fc preview fetch error\', err);
+					if (cb) cb(null);
+				});
+			}
+
+			function fcApplyPreviews(previews)
+			{
+				if (!previews) return;
+				var doc = editor.Canvas.getDocument();
+				if (!doc) return;
+				var boxes = doc.querySelectorAll(\'.fc-field-preview\');
+				for (var i = 0; i < boxes.length; i++)
+				{
+					var name = boxes[i].getAttribute(\'data-fc-field\');
+					if (!name || !(name in previews)) continue;
+					boxes[i].innerHTML = previews[name] || \'\';
+					boxes[i].classList[previews[name] ? \'add\' : \'remove\'](\'fc-has-value\');
+				}
+			}
+
+			function fcCollectFieldNames()
+			{
+				var doc = editor.Canvas.getDocument();
+				if (!doc) return [];
+				var els = doc.querySelectorAll(\'[data-fc-field]\');
+				var seen = {}, names = [];
+				for (var i = 0; i < els.length; i++)
+				{
+					var n = els[i].getAttribute(\'data-fc-field\');
+					if (n && !seen[n]) { seen[n] = 1; names.push(n); }
+				}
+				return names;
+			}
+
+			function fcClearPreviewSlots()
+			{
+				var doc = (typeof editor !== \'undefined\' && editor.Canvas) ? editor.Canvas.getDocument() : null;
+				if (!doc) return;
+				var boxes = doc.querySelectorAll(\'.fc-field-preview\');
+				for (var i = 0; i < boxes.length; i++)
+				{
+					boxes[i].innerHTML = \'\';
+					boxes[i].classList.remove(\'fc-has-value\');
+				}
+			}
+
+			function fcSchedulePreviewRefresh(delay)
+			{
+				if (!fcl_preview_cfg) return;
+				if (fcl_preview_timer) clearTimeout(fcl_preview_timer);
+				fcl_preview_timer = setTimeout(function()
+				{
+					fcl_preview_timer = null;
+					if (!fcPreviewItemId())
+					{
+						// No preview item: get rid of any previously fetched values so the
+						// badge overlays come back (badges only mode must not keep data)
+						fcClearPreviewSlots();
+						return;
+					}
+					fcLoadFieldPreviews(fcCollectFieldNames(), fcApplyPreviews);
+				}, delay || 300);
+			}
+
+			function fcSetPreviewItem(item_id)
+			{
+				if (!fcl_preview_cfg) return;
+				fcl_preview_cfg.item_id = (item_id | 0) || 0;
+				var status = document.getElementById(\'fcl_preview_status_\' + editor_sfx);
+				if (status) status.textContent = fcl_preview_cfg.item_id ? \'...\' : \'\';
+				// Persist the choice in the URL (reloads) and in sessionStorage (builder session)
+				var url = new URL(window.location.href);
+				if (fcl_preview_cfg.item_id) url.searchParams.set(\'fcl_preview_item\', fcl_preview_cfg.item_id);
+				else url.searchParams.delete(\'fcl_preview_item\');
+				window.history.replaceState(null, \'\', url.toString());
+				try
+				{
+					// Store the raw value (including 0 = badges only) so a reload restores it
+					window.sessionStorage.setItem(\'fcl_preview_item_\' + editor_sfx, fcl_preview_cfg.item_id);
+				}
+				catch (e) {}
+				// Sync the toolbar select when the value was adopted programmatically (not via the select)
+				var sel = document.getElementById(\'fcl_preview_item_\' + editor_sfx);
+				if (sel && sel.querySelector(\'option[value="\' + fcl_preview_cfg.item_id + \'"]\')) sel.value = String(fcl_preview_cfg.item_id);
+				fcSchedulePreviewRefresh(50);
+			}
+
+			// Inject the overlay rules into the canvas frame head (NOT into the project
+			// so saved layouts stay token-only) and wire the toolbar item selector.
+			editor.on(\'load\', function()
+			{
+				var sel = document.getElementById(\'fcl_preview_item_\' + editor_sfx);
+				if (sel)
+				{
+					sel.addEventListener(\'change\', function() { fcSetPreviewItem(sel.value | 0); }, false);
+				}
+
+				var doc = editor.Canvas.getDocument();
+				if (doc && !fcl_preview_css_added)
+				{
+					fcl_preview_css_added = true;
+					var st = doc.createElement(\'style\');
+					st.id = \'fcl-canvas-preview\';
+					st.textContent =
+						\'[data-fc-field]{position:relative}\' +
+						\'[data-fc-field] .fc-field-badge{position:absolute;top:0;left:0;right:0;bottom:0;z-index:1;transition:opacity .15s;pointer-events:none}\' +
+						\'[data-fc-field] .fc-field-preview.fc-has-value + .fc-field-badge{opacity:0}\' +
+						\'[data-fc-field]:hover .fc-field-badge,[data-fc-field].gjs-selected .fc-field-badge{opacity:1}\' +
+						\'[data-fc-field] .fc-field-preview{min-height:18px;word-wrap:break-word}\' +
+						\'[data-fc-field] .fc-field-preview:empty{min-height:48px}\';
+					doc.head.appendChild(st);
+				}
+
+				fcSchedulePreviewRefresh(0);
+			});
+
 			function fcl_opt_label(v)
 			{
 				for (var i = 0; i < fcl_field_opts.length; i++)
@@ -2229,9 +2527,17 @@ editor.on(\'load\', function()
 				view: fcl_boxed_view(function()
 				{
 					var name = this.model.getAttributes()[\'data-fc-field\'] || \'\';
-					this.el.innerHTML = fcl_data_box(\'F\',
-						name ? (\'Field: \' + name) : \'Flexicontent Field\',
-						name ? fcl_opt_label(name) : \'Choose a field in the Settings panel\');
+					// NB: the preview slot is in NORMAL FLOW with NO inline color/background/
+					// font styles, so styles applied to the block on the canvas cascade into
+					// the displayed value (parity with the frontend). The badge is a purely
+					// decorative overlay (dev marker), shown only until a value arrives or on
+					// hover/selection, so it never fights the user styles.
+					this.el.innerHTML =
+						\'<div class="fc-field-preview" data-fc-field="\' + name + \'" style="pointer-events:none;"></div>\' +
+						\'<div class="fc-field-badge">\' + fcl_data_box(\'F\',
+							name ? (\'Field: \' + name) : \'Flexicontent Field\',
+							name ? fcl_opt_label(name) : \'Choose a field in the Settings panel\') + \'</div>\';
+					if (name) fcSchedulePreviewRefresh(120);
 				}),
 			});
 
@@ -2658,7 +2964,7 @@ editor.on(\'load\', function()
 		';
 		}
 
-		$html .= '
+		$html .= $fcl_preview_html . '
 		<div style="height: 90%; margin: 0px;">
 
 			<div class="editor-row">

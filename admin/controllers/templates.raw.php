@@ -905,4 +905,117 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 
 		return strpos($compare_file, $prefix) === 0 ? $file_path : false;
 	}
+
+
+	/**
+	 * Render the 'display' HTML of one or several Flexicontent fields of a given item.
+	 *
+	 * Used by the GrapesJS Layout Builder to show real field values (a preview item data)
+	 * inside the designer canvas. Requested via AJAX as a batch of field names.
+	 *
+	 * @return void (echoes a JSON response)
+	 */
+	public function getfieldpreview()
+	{
+		// Check access (same permission as the rest of the layout management tasks)
+		if (!FlexicontentHelperPerm::getPerm()->CanTemplates)
+		{
+			jexit(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'));
+		}
+
+		header('Content-Type: application/json; charset=utf-8');
+
+		// Check for request forgeries
+		if (!\Joomla\CMS\Session\Session::checkToken('request'))
+		{
+			echo json_encode(array('ok' => false, 'error' => 'Invalid Token'));
+			exit;
+		}
+
+		$item_id = $this->input->getInt('item_id', 0);
+		$fields  = $this->input->get('fields', array(), 'array');
+
+		$result = array('ok' => true, 'html' => array(), 'errors' => array());
+
+		if (!$item_id || !is_array($fields) || !count($fields))
+		{
+			$result['ok'] = false;
+			$result['error'] = 'Missing or invalid item_id / fields';
+			echo json_encode($result);
+			exit;
+		}
+
+		// Limit the batch size and sanitize the field names
+		$fields = array_values(array_unique(array_filter(array_map(function ($f) {
+			$f = (string) $f;
+			return preg_match('/^[A-Za-z0-9_][A-Za-z0-9_\- .]*$/', $f) ? $f : '';
+		}, $fields))));
+		$fields = array_slice($fields, 0, 120);
+
+		if (!count($fields))
+		{
+			$result['ok'] = false;
+			$result['error'] = 'Invalid fields list';
+			echo json_encode($result);
+			exit;
+		}
+
+		try
+		{
+			require_once JPATH_SITE . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'item.php';
+			$item_model = new FlexicontentModelItem();
+			$item = $item_model->getItem($item_id, $check_view_access = false, $no_cache = false);
+
+			if (!$item || !isset($item->id))
+			{
+				$result['ok'] = false;
+				$result['error'] = 'Item not found';
+				echo json_encode($result);
+				exit;
+			}
+
+			$view = 'item';
+			// $_item_params == null means only retrieve fields (no parameters assignment)
+			FlexicontentFields::getFields($item, $view, $_item_params = null, $aid = null, $use_tmpl = false);
+
+			// Discard any stray echo (plugins) that could corrupt the JSON response
+			ob_start();
+			foreach ($fields as $field_name)
+			{
+				if (!isset($item->fields[$field_name]))
+				{
+					$result['errors'][$field_name] = 'not-assigned';
+					continue;
+				}
+
+				$field = $item->fields[$field_name];
+
+				if (!isset($field->display))
+				{
+					$values = isset($item->fieldvalues[$field->id]) ? $item->fieldvalues[$field->id] : array();
+					try
+					{
+						FlexicontentFields::renderField($item, $field, $values, $method = 'display', $view, $skip_trigger_plgs = false, $event_row = $item_id);
+					}
+					catch (\Throwable $e)
+					{
+						$result['errors'][$field_name] = 'render-error';
+						continue;
+					}
+				}
+
+				$html = isset($field->display) ? (string) $field->display : '';
+				$result['html'][$field_name] = $html;
+			}
+			ob_end_clean();
+		}
+		catch (\Throwable $e)
+		{
+			$result['ok'] = false;
+			$result['error'] = $e->getMessage();
+		}
+
+		echo json_encode($result);
+		exit;
+	}
 }

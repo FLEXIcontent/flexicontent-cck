@@ -6622,35 +6622,62 @@ class flexicontent_html
 		$html = str_replace('%template_name%', $params->get('ilayout', 'grapesjs'), $html);
 
 		// 4. Resolve field placeholders: {flexi_field:field_name  item:122|current  method:display}
+		//    NB: the FC item MODEL loads fields without running FlexicontentFields::getFields(),
+		//    so $item->cats / $item->tags / $item->favs are NOT populated and CORE fields relying
+		//    on them (e.g. 'categories', 'tags', 'favourites', 'voting') would output nothing in
+		//    a builder layout, even though they render fine in the GrapesJS canvas preview (whose
+		//    AJAX endpoint runs getFields() first). Load that auxiliary item data up-front.
+		if (!isset($item->cats) || !isset($item->tags) || !isset($item->favs) || !isset($item->fav))
+		{
+			if (!class_exists('FlexicontentFields'))
+			{
+				@require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.fields.php');
+			}
+
+			if (class_exists('FlexicontentFields'))
+			{
+				try
+				{
+					FlexicontentFields::getFields($item, FLEXI_ITEMVIEW, null, null, false);
+				}
+				catch (\Throwable $e)
+				{
+					// Keep going; the per-field on-demand rendering below will fall through to ''
+				}
+			}
+		}
+
 		$html = preg_replace_callback('~\{flexi_field:([a-z0-9_-]+)\s*([^}]*)\}~i',
 			function($m) use ($item)
 			{
+				// Prefer the already pre-rendered display, if any
 				if (isset($item->fields[$m[1]]))
 				{
 					$display = trim((string) $item->fields[$m[1]]->display);
-					if ($display === '')
-					{
-						// Fields are normally pre-rendered only when assigned to the layout's
-						// template positions; render the builder-placed field on demand.
-						if (!class_exists('FlexicontentFields'))
-						{
-							@require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.fields.php');
-						}
-						try
-						{
-							$display = trim((string) FlexicontentFields::getFieldDisplay($item, $m[1], null, 'display', FLEXI_ITEMVIEW));
-						}
-						catch (\Joomla\CMS\Exception\ExceptionInterface $e)
-						{
-							$display = '';
-						}
-						catch (\Exception $e)
-						{
-							$display = '';
-						}
-					}
-					return $display;
+					if ($display !== '') return $display;
 				}
+
+				// Fields are normally pre-rendered only when assigned to the layout's
+				// template positions; render the builder-placed field on demand. This also
+				// covers fields missing from $item->fields (getFieldDisplay() handles that
+				// gracefully and returns '').
+				if (!class_exists('FlexicontentFields'))
+				{
+					@require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.fields.php');
+				}
+
+				if (class_exists('FlexicontentFields'))
+				{
+					try
+					{
+						return trim((string) FlexicontentFields::getFieldDisplay($item, $m[1], null, 'display', FLEXI_ITEMVIEW));
+					}
+					catch (\Throwable $e)
+					{
+						return '';
+					}
+				}
+
 				return ''; // Field not rendered
 			},
 			$html
