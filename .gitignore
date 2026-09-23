@@ -56,6 +56,8 @@ site/templates/*
 !site/templates/grid
 !site/templates/items-tabbed
 !site/templates/table
+!site/templates/grapesjs/
+!site/templates/grapesjs/**
 
 site/librairies/pdfparser/
 site/librairies/php-stemmer/

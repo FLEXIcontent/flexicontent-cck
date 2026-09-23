@@ -567,6 +567,15 @@ class flexicontent_tmpl
 				$jform->setFieldAttribute($field->fieldname, 'required', 'false', $layout->fset);
 			}
 
+			// Layout Builder data/code fields are submitted as hidden fields but legitimately
+			// carry raw HTML / JSON (e.g. prefixes like '<h1>' or inline scripts), so they must
+			// NEVER be cleaned by Joomla's JFilterInput, regardless of the layout XML's own
+			// 'filter' attribute (the XML of unversioned layouts can lag deployed servers)
+			if (preg_match('/^builder_layout\d+_(html|css|js|data|less)$/', (string) $field->fieldname))
+			{
+				$jform->setFieldAttribute($field->fieldname, 'filter', 'raw', $layout->fset);
+			}
+
 			//echo $field->fieldname  . ' -- filter :: '. $field->getAttribute('filter', ' ... noHTML') . "<br/>";
 			$layout_data[$layout->fset][$field->fieldname] = isset($layout_data[$layout->fset][$field->fieldname])
 				? $layout_data[$layout->fset][$field->fieldname]

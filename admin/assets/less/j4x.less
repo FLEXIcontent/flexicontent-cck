@@ -217,6 +217,17 @@ div.toolbar-box {
 #flexicontent select.form-select {
 	width: 100%;
 }
+/* GrapesJS Layout Builder: neutralize the #flexicontent select styling inside the editor canvas */
+.editor-canvas select {
+	border: 0 !important;
+	width: inherit !important;
+}
+/* GrapesJS Layout Builder: neutralize the flexicontent radio/checkbox label styling inside the editor canvas */
+.editor-canvas .flexicontent input[type="radio"] + label:not(.btn),
+.editor-canvas .flexicontent input[type="checkbox"] + label:not(.btn) {
+	display: block !important;
+	margin-right: inherit !important;
+}
 
 #user-groups legend + .control-group,
 #user-groups .control-group {

@@ -338,7 +338,9 @@ abstract class JHtmlFclayoutbuilder
 		if (!empty($comp['type']) && $comp['type'] === 'fc-field')
 		{
 			$fname = isset($comp['attributes']['data-fc-field']) ? trim((string) $comp['attributes']['data-fc-field']) : '';
-			$inner = $fname !== '' ? '{flexi_field:' . $fname . ' item:current method:display}' : '';
+			$fpre  = isset($comp['attributes']['data-fc-prefix']) ? (string) $comp['attributes']['data-fc-prefix'] : '';
+			$fsuf  = isset($comp['attributes']['data-fc-suffix']) ? (string) $comp['attributes']['data-fc-suffix'] : '';
+			$inner = $fname !== '' ? $fpre . '{flexi_field:' . $fname . ' item:current method:display}' . $fsuf : '';
 		}
 		elseif (!empty($comp['type']) && $comp['type'] === 'fc-link')
 		{
@@ -1779,12 +1781,46 @@ editor.on(\'load\', function()
 				return list.length;
 			}
 
+			function fcSyncTraitInputsToModel()
+			{
+				// GrapesJS commits text-trait values on the input "change"/blur event, so at the
+				// moment the Joomla form is submitted the component attributes can still hold the
+				// previous (empty) value while the Settings panel input shows the freshly typed
+				// text. Force the panel values back into the model before serialization.
+				var comp = editor.getSelected();
+				if (!comp || !comp.get || comp.get(\'type\') !== \'fc-field\') return;
+				if (!comp.get(\'traits\') || !comp.get(\'traits\').models) return;
+				var rows = document.querySelectorAll(\'.gjs-trt-trait\');
+				var attrMap = { \'Prefix\': \'data-fc-prefix\', \'Suffix\': \'data-fc-suffix\' };
+				for (var i = 0; i < rows.length; i++)
+				{
+					var row = rows[i];
+					var lblEl = row.querySelector(\'.gjs-trt-trait__lbl\');
+					var input = row.querySelector(\'input, textarea\');
+					if (!lblEl || !input) continue;
+					var attrName = attrMap[lblEl.textContent.trim()];
+					if (!attrName) continue;
+					var t = null;
+					for (var j = 0; j < comp.get(\'traits\').models.length; j++)
+					{
+						if (comp.get(\'traits\').models[j].get(\'name\') === attrName) { t = comp.get(\'traits\').models[j]; break; }
+					}
+					if (!t) continue;
+					var current = comp.getAttributes()[attrName] || \'\';
+					if (String(input.value) !== String(current))
+					{
+						t.setValue(input.value);
+					}
+				}
+			}
+
 			function saveToForm()
 			{
 				// The GrapesJS project JSON is the single source of truth for the layout.
 				// The front-end HTML/CSS/JS are regenerated DETERMINISTICALLY server-side
 				// from it at save time (see JHtmlFclayoutbuilder::renderLayoutFromProject),
 				// because capturing the live canvas states produced transient/partial values.
+				try { fcSyncTraitInputsToModel(); } catch(e) { console.error(\'fcSyncTraitInputsToModel error:\', e); }
 				var project = null;
 				try { project = editor.getProjectData(); }
 				catch(e) { console.error(\'getProjectData error:\', e); }
@@ -1991,7 +2027,6 @@ editor.on(\'load\', function()
 			var fcl_preview_cfg    = window[\'fcl_builder_preview_\' + editor_sfx] || null;
 			var fcl_preview_cache  = {};
 			var fcl_preview_timer  = null;
-			var fcl_preview_css_added = false;
 
 			if (fcl_preview_cfg && (!fcl_preview_cfg.item_id || fcl_preview_cfg.warn))
 			{
@@ -2085,8 +2120,14 @@ editor.on(\'load\', function()
 				{
 					var name = boxes[i].getAttribute(\'data-fc-field\');
 					if (!name || !(name in previews)) continue;
-					boxes[i].innerHTML = previews[name] || \'\';
-					boxes[i].classList[previews[name] ? \'add\' : \'remove\'](\'fc-has-value\');
+					// Wrap the value with the block prefix/suffix (admin HTML) if any; the
+					// attributes live on the fc-field block itself, the parent of the slot
+					var host = boxes[i].parentElement;
+					var pre = host ? (host.getAttribute(\'data-fc-prefix\') || \'\') : \'\';
+					var suf = host ? (host.getAttribute(\'data-fc-suffix\') || \'\') : \'\';
+					var v = previews[name];
+					boxes[i].innerHTML = v ? (pre + v + suf) : \'\';
+					boxes[i].classList[v ? \'add\' : \'remove\'](\'fc-has-value\');
 				}
 			}
 
@@ -2157,8 +2198,44 @@ editor.on(\'load\', function()
 				fcSchedulePreviewRefresh(50);
 			}
 
-			// Inject the overlay rules into the canvas frame head (NOT into the project
-			// so saved layouts stay token-only) and wire the toolbar item selector.
+			// Inject the editor-only overlay/styles into the canvas frame head. These rules are NOT
+			// part of the saved project (they are injected only into the editing iframe), so the
+			// front-end code/CSS is never affected.
+			var fcl_canvas_bx_css =
+				\'[data-fc-field]{position:relative}\' +
+				\'[data-fc-field] .fc-field-badge{position:absolute;top:0;left:0;right:0;bottom:0;z-index:1;transition:opacity .15s;pointer-events:none}\' +
+				\'[data-fc-field] .fc-field-preview.fc-has-value + .fc-field-badge{opacity:0}\' +
+				\'[data-fc-field]:hover .fc-field-badge,[data-fc-field].gjs-selected .fc-field-badge{opacity:1}\' +
+				\'[data-fc-field] .fc-field-preview{min-height:18px;word-wrap:break-word}\' +
+				\'[data-fc-field] .fc-field-preview:empty{min-height:48px}\' +
+				// Empty layout containers stay visible & droppable in the canvas;
+				// these helper rules are injected only into the canvas head (not the project)
+				\'section.fc-empty-box:empty,div.fc-empty-box:empty{min-height:80px}\' +
+				\'div.fc-empty-box div.fc-empty-box:empty{min-height:60px}\' +
+				// Neutralize the backend admin j4x.css #flexicontent select rule (border,
+				// width) inside the editing canvas so dropped field <select>s render cleanly.
+				// [data-fc-field] is the per-block host without relying on a wrapper id.
+				// Canvas-only (injected in the iframe head, never saved, never on the front).
+				\'#flexicontent select,[data-fc-field] select{border:none!important;box-shadow:none!important}\';
+
+			// The canvas iframe document is recreated on refresh()/device changes, so the
+			// injected <style> must be re-added on every frame load (the guard is the element
+			// presence itself, not a one-shot flag).
+			function fcl_ensureCanvasInserts()
+			{
+				var doc = editor.Canvas.getDocument();
+				if (!doc || !doc.head) return;
+				var st = doc.getElementById(\'fcl-canvas-preview\');
+				if (!st)
+				{
+					st = doc.createElement(\'style\');
+					st.id = \'fcl-canvas-preview\';
+					st.textContent = fcl_canvas_bx_css;
+					doc.head.appendChild(st);
+				}
+			}
+
+			// Wire the toolbar item selector and keep the insert injection synced.
 			editor.on(\'load\', function()
 			{
 				var sel = document.getElementById(\'fcl_preview_item_\' + editor_sfx);
@@ -2166,25 +2243,10 @@ editor.on(\'load\', function()
 				{
 					sel.addEventListener(\'change\', function() { fcSetPreviewItem(sel.value | 0); }, false);
 				}
-
-				var doc = editor.Canvas.getDocument();
-				if (doc && !fcl_preview_css_added)
-				{
-					fcl_preview_css_added = true;
-					var st = doc.createElement(\'style\');
-					st.id = \'fcl-canvas-preview\';
-					st.textContent =
-						\'[data-fc-field]{position:relative}\' +
-						\'[data-fc-field] .fc-field-badge{position:absolute;top:0;left:0;right:0;bottom:0;z-index:1;transition:opacity .15s;pointer-events:none}\' +
-						\'[data-fc-field] .fc-field-preview.fc-has-value + .fc-field-badge{opacity:0}\' +
-						\'[data-fc-field]:hover .fc-field-badge,[data-fc-field].gjs-selected .fc-field-badge{opacity:1}\' +
-						\'[data-fc-field] .fc-field-preview{min-height:18px;word-wrap:break-word}\' +
-						\'[data-fc-field] .fc-field-preview:empty{min-height:48px}\';
-					doc.head.appendChild(st);
-				}
-
+				fcl_ensureCanvasInserts();
 				fcSchedulePreviewRefresh(0);
 			});
+			editor.on(\'frame:load\', fcl_ensureCanvasInserts);
 
 			function fcl_opt_label(v)
 			{
@@ -2521,6 +2583,16 @@ editor.on(\'load\', function()
 							name: \'data-fc-field\',
 							label: \'Field\',
 							options: fcl_field_opts.map(function(o) { return { value: o.value, name: o.label, group: o.group }; }),
+						}, {
+							type: \'text\',
+							name: \'data-fc-prefix\',
+							label: \'Prefix\',
+							placeholder: \'ex: <h1>\',
+						}, {
+							type: \'text\',
+							name: \'data-fc-suffix\',
+							label: \'Suffix\',
+							placeholder: \'ex: </h1>\',
 						}],
 					},
 				},
@@ -2673,7 +2745,7 @@ editor.on(\'load\', function()
 				select: true,
 				activate: true,
 				attributes: { class: \'fa fa-square-o\' },
-				content: \'<section data-gjs-resizable="true"></section>\',
+				content: \'<section data-gjs-resizable="true" class="fc-empty-box"></section>\',
 			});
 
 			editor.BlockManager.add(\'flex-row\', {
@@ -2682,7 +2754,7 @@ editor.on(\'load\', function()
 				select: true,
 				activate: true,
 				attributes: { class: \'fa fa-arrows-h\' },
-				content: \'<div data-gjs-resizable="true" style="display:flex;flex-wrap:wrap;gap:10px;"></div>\',
+				content: \'<div data-gjs-resizable="true" class="fc-empty-box" style="display:flex;flex-wrap:wrap;gap:10px;"></div>\',
 			});
 
 			editor.BlockManager.add(\'flex-cols-2\', {
@@ -2691,7 +2763,7 @@ editor.on(\'load\', function()
 				select: true,
 				activate: true,
 				attributes: { class: \'fa fa-columns\' },
-				content: \'<div data-gjs-resizable="true" style="display:flex;flex-wrap:wrap;gap:10px;"><div data-gjs-resizable="true" style="flex:0 1 auto;width:50%;min-width:200px;"></div><div data-gjs-resizable="true" style="flex:0 1 auto;width:50%;min-width:200px;"></div></div>\',
+				content: \'<div data-gjs-resizable="true" class="fc-empty-box" style="display:flex;flex-wrap:wrap;gap:10px;"><div data-gjs-resizable="true" class="fc-empty-box" style="flex:0 1 auto;width:50%;min-width:200px;"></div><div data-gjs-resizable="true" class="fc-empty-box" style="flex:0 1 auto;width:50%;min-width:200px;"></div></div>\',
 			});
 
 			editor.BlockManager.add(\'flex-cols-3\', {
@@ -2700,7 +2772,7 @@ editor.on(\'load\', function()
 				select: true,
 				activate: true,
 				attributes: { class: \'fa fa-th-large\' },
-				content: \'<div data-gjs-resizable="true" style="display:flex;flex-wrap:wrap;gap:10px;"><div data-gjs-resizable="true" style="flex:0 1 auto;width:33.33%;min-width:150px;"></div><div data-gjs-resizable="true" style="flex:0 1 auto;width:33.33%;min-width:150px;"></div><div data-gjs-resizable="true" style="flex:0 1 auto;width:33.33%;min-width:150px;"></div></div>\',
+				content: \'<div data-gjs-resizable="true" class="fc-empty-box" style="display:flex;flex-wrap:wrap;gap:10px;"><div data-gjs-resizable="true" class="fc-empty-box" style="flex:0 1 auto;width:33.33%;min-width:150px;"></div><div data-gjs-resizable="true" class="fc-empty-box" style="flex:0 1 auto;width:33.33%;min-width:150px;"></div><div data-gjs-resizable="true" class="fc-empty-box" style="flex:0 1 auto;width:33.33%;min-width:150px;"></div></div>\',
 			});
 
 			editor.BlockManager.add(\'flex-cols-4\', {
@@ -2709,7 +2781,7 @@ editor.on(\'load\', function()
 				select: true,
 				activate: true,
 				attributes: { class: \'fa fa-th\' },
-				content: \'<div data-gjs-resizable="true" style="display:flex;flex-wrap:wrap;gap:10px;"><div data-gjs-resizable="true" style="flex:0 1 auto;width:25%;min-width:120px;"></div><div data-gjs-resizable="true" style="flex:0 1 auto;width:25%;min-width:120px;"></div><div data-gjs-resizable="true" style="flex:0 1 auto;width:25%;min-width:120px;"></div><div data-gjs-resizable="true" style="flex:0 1 auto;width:25%;min-width:120px;"></div></div>\',
+				content: \'<div data-gjs-resizable="true" class="fc-empty-box" style="display:flex;flex-wrap:wrap;gap:10px;"><div data-gjs-resizable="true" class="fc-empty-box" style="flex:0 1 auto;width:25%;min-width:120px;"></div><div data-gjs-resizable="true" class="fc-empty-box" style="flex:0 1 auto;width:25%;min-width:120px;"></div><div data-gjs-resizable="true" class="fc-empty-box" style="flex:0 1 auto;width:25%;min-width:120px;"></div><div data-gjs-resizable="true" class="fc-empty-box" style="flex:0 1 auto;width:25%;min-width:120px;"></div></div>\',
 			});
 
 			editor.BlockManager.add(\'flex-cols-mainbar\', {
@@ -2718,7 +2790,7 @@ editor.on(\'load\', function()
 				select: true,
 				activate: true,
 				attributes: { class: \'fa fa-bars\' },
-				content: \'<div data-gjs-resizable="true" style="display:flex;flex-wrap:wrap;gap:10px;"><div data-gjs-resizable="true" style="flex:0 1 auto;width:66.66%;min-width:250px;"></div><div data-gjs-resizable="true" style="flex:0 1 auto;width:33.33%;min-width:200px;"></div></div>\',
+				content: \'<div data-gjs-resizable="true" class="fc-empty-box" style="display:flex;flex-wrap:wrap;gap:10px;"><div data-gjs-resizable="true" class="fc-empty-box" style="flex:0 1 auto;width:66.66%;min-width:250px;"></div><div data-gjs-resizable="true" class="fc-empty-box" style="flex:0 1 auto;width:33.33%;min-width:200px;"></div></div>\',
 			});
 
 

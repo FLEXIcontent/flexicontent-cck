@@ -154,6 +154,34 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 			(object) array('type' => $layout_type, 'name' => $folder, 'fset' => 'attribs', 'cssprep_save' => true)
 		);
 
+		// Joomla's Input layer applies the Global Text Filtering rules to every posted value,
+		// stripping HTML tags (e.g. '<h1>') even when they are embedded inside JSON such as the
+		// Layout Builder project data (data-fc-prefix="<h1>"). The PHP superglobals / raw request
+		// body are NOT processed by Joomla's filters, so use them as the source of truth for the
+		// Layout Builder fields below (the layout XML form filters still run afterwards).
+		$raw_layout = isset($_POST['jform']['layouts'][$folder]) ? $_POST['jform']['layouts'][$folder] : array();
+		if (empty($raw_layout))
+		{
+			$raw_body = file_get_contents('php://input');
+			if (is_string($raw_body) && strlen($raw_body) && strpos($raw_body, 'jform[') !== false)
+			{
+				$raw_post = array();
+				parse_str($raw_body, $raw_post);
+				$raw_layout = isset($raw_post['jform']['layouts'][$folder]) ? $raw_post['jform']['layouts'][$folder] : array();
+			}
+		}
+		if (empty($raw_layout))
+		{
+			$raw_layout = isset($post['jform']['layouts'][$folder]) ? $post['jform']['layouts'][$folder] : array();
+		}
+		foreach (array('builder_layout1_data', 'builder_layout1_html', 'builder_layout1_css', 'builder_layout1_js') as $builder_field)
+		{
+			if (array_key_exists($builder_field, $raw_layout))
+			{
+				$attribs[$builder_field] = $raw_layout[$builder_field];
+			}
+		}
+
 		// Deterministically regenerate the front-end HTML/CSS/JS from the builder project JSON
 		// (the single source of truth). The browser canvas serialization captured transient /
 		// partial states on some saves and produced degraded "_html" values (only text).

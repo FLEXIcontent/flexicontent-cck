@@ -995,7 +995,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 					$values = isset($item->fieldvalues[$field->id]) ? $item->fieldvalues[$field->id] : array();
 					try
 					{
-						FlexicontentFields::renderField($item, $field, $values, $method = 'display', $view, $skip_trigger_plgs = false, $event_row = $item_id);
+						FlexicontentFields::renderField($item, $field, $values, $method = 'display', $view, $skip_trigger_plgs = false, $event_row = $item);
 					}
 					catch (\Throwable $e)
 					{
