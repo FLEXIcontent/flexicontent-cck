@@ -3185,7 +3185,17 @@ editor.on(\'load\', function()
 						var ta = document.createElement(\'textarea\');
 						ta.rows = 6;
 						ta.spellcheck = false;
+						var ph = this.model && this.model.get ? (this.model.get(\'placeholder\') || \'\') : \'\';
+						if (ph) ta.placeholder = ph;
 						this.input = ta;
+					}
+					// The value lives in the component attribute (data-fc-customcss) and
+					// getModelValue() reads it directly: populate on render so reloaded values
+					// show up. Never touch it while the user is typing in this very field.
+					var v = this.getModelValue ? this.getModelValue() : \'\';
+					if (typeof v !== \'undefined\' && v !== null && document.activeElement !== this.input && String(this.input.value) !== String(v))
+					{
+						this.input.value = String(v);
 					}
 					return this.input;
 				},
