@@ -190,12 +190,40 @@ class flexicontent_tmpl
 			foreach($tmpls->category as $tmpl) $tmpl_names[$tmpl->name] = 1;
 			foreach($tmpls->items as $tmpl) $tmpl_names[$tmpl->name] = 1;
 			
+			$cat_names   = array();
+			foreach($tmpls->category as $tmpl) $cat_names[$tmpl->name] = 1;
+			$items_names = array();
+			foreach($tmpls->items as $tmpl) $items_names[$tmpl->name] = 1;
+			
+			$tmpl_path = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates';
+			
 			$new_layouts = array();
 			foreach($folder_names as $folder_name => $i)
 			{
-				if (!isset($tmpl_names[$folder_name]))
+				if (!isset($items_names[$folder_name]) && !isset($cat_names[$folder_name]))
 				{
+					// Brand new template folder
 					$new_layouts[] = $folder_name;
+				}
+				else
+				{
+					// Folder already cached for one layout type: detect an XML file added
+					// afterwards for the OTHER type (e.g. a category.xml added to a folder
+					// already cached for its item.xml), which a folder-level comparison
+					// cannot catch
+					$missing_xml = '';
+					if (!isset($items_names[$folder_name]) && file_exists($tmpl_path.DS.$folder_name.DS.'item.xml'))
+					{
+						$missing_xml = 'item.xml';
+					}
+					if (!isset($cat_names[$folder_name]) && file_exists($tmpl_path.DS.$folder_name.DS.'category.xml'))
+					{
+						$missing_xml = 'category.xml';
+					}
+					if ($missing_xml)
+					{
+						$new_layouts[] = $folder_name;
+					}
 				}
 			}
 			//print_r($new_layouts);
