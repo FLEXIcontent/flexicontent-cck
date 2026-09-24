@@ -3172,6 +3172,65 @@ editor.on(\'load\', function()
 				},
 			});
 
+			// --- CSS autocomplete (show-hint + css-hint) for the Custom CSS editor ---------
+			// The CodeMirror bundled inside GrapesJS is 5.63.0 but ships WITHOUT the hint
+			// addons. We load them from the same CDN the GrapesJS assets come from, after
+			// pointing the global CodeMirror at the bundled constructor so the addons register
+			// against it (the addons only touch the global).
+			var fc_cm_hint_css_injected = false;
+			function fcCMEnableHints(cm)
+			{
+				if (!cm || typeof cm.getOption !== \'function\' || cm._fcHintsEnabled) return;
+				var CM = window.CodeMirror;
+				if (!CM || typeof CM.showHint !== \'function\' || !CM.hint || typeof CM.hint.css !== \'function\') return;
+				try
+				{
+					var ek = cm.getOption(\'extraKeys\') || {};
+					if (Array.isArray(ek)) ek.push({ \'Ctrl-Space\': \'autocomplete\' });
+					else ek = Object.assign({}, ek, { \'Ctrl-Space\': \'autocomplete\' });
+					cm.setOption(\'extraKeys\', ek);
+					cm.on(\'inputRead\', function(c, change)
+					{
+						if (change.origin !== \'complete\' && change.text && change.text.length)
+						{
+							CM.showHint(c, CM.hint.css, { completeSingle: false });
+						}
+					});
+					cm._fcHintsEnabled = true;
+				}
+				catch (e) {}
+			}
+			function fcCMLoadHints()
+			{
+				if (window.fcCMHintsReady === true || window.fcCMHintsReady === \'loading\') return;
+				window.fcCMHintsReady = \'loading\';
+				var base = \'https://unpkg.com/codemirror@5.63.0/addon/hint/\';
+				var files = [ \'show-hint.js\', \'css-hint.js\' ];
+				(function next(i)
+				{
+					if (i >= files.length)
+					{
+						window.fcCMHintsReady = true;
+						if (!fc_cm_hint_css_injected)
+						{
+							fc_cm_hint_css_injected = true;
+							var st = document.createElement(\'style\');
+							st.id = \'fc-cm-hint-css\';
+							st.textContent = \'.CodeMirror-hints{position:absolute;z-index:10;overflow:hidden;list-style:none;margin:0;padding:2px;box-shadow:.5px .5px 3px rgba(0,0,0,.35);border-radius:3px;border:1px solid #ddd;font-size:90%;max-height:20em;overflow-y:auto;background:#fff}.CodeMirror-hint{cursor:pointer;white-space:pre;color:inherit}.CodeMirror-hint-active{background:#08f;color:#fff}\';
+							document.head.appendChild(st);
+						}
+						var editors = window.fcCMEditors || [];
+						for (var j = 0; j < editors.length; j++) fcCMEnableHints(editors[j]);
+						return;
+					}
+					var s = document.createElement(\'script\');
+					s.src = base + files[i];
+					s.onload = function() { next(i + 1); };
+					s.onerror = function() { window.fcCMHintsReady = \'error\'; };
+					document.head.appendChild(s);
+				})(0);
+			}
+
 			// Per-block Custom CSS, edited in the injected "Settings" sector (the traits
 			// panel of the Style Manager). GrapesJS 0.23 has no native textarea trait, so
 			// register a lightweight one cloning the base text trait view (trait model still
@@ -3240,6 +3299,13 @@ editor.on(\'load\', function()
 						this.fcCmEditor.on(\'blur\', function() { self.fcCmFocused = false; });
 						this.fcCmEditor.refresh();
 						this.input.style.display = \'none\';
+						// Expose the bundled CodeMirror constructor (statics-only usage) and hook
+						// the CSS autocomplete (loaded lazily from the addon CDN).
+						window.CodeMirror = window.CodeMirror || this.fcCmEditor.constructor;
+						window.fcCMEditors = window.fcCMEditors || [];
+						window.fcCMEditors.push(this.fcCmEditor);
+						fcCMEnableHints(this.fcCmEditor);
+						fcCMLoadHints();
 					}
 					catch (err)
 					{
@@ -3279,6 +3345,11 @@ editor.on(\'load\', function()
 					if (this.fcCmEditor && typeof this.fcCmEditor.toTextArea === \'function\')
 					{
 						try { this.fcCmEditor.toTextArea(); } catch (err) {}
+					}
+					if (window.fcCMEditors)
+					{
+						var idx = window.fcCMEditors.indexOf(this.fcCmEditor);
+						if (idx > -1) window.fcCMEditors.splice(idx, 1);
 					}
 					this.fcCmEditor = null;
 					this.fcCmFocused = false;
