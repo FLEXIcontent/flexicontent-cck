@@ -3161,21 +3161,77 @@ editor.on(\'load\', function()
 					if (el) el.value = (value == null ? \'\' : String(value));
 					this.fcReflect();
 				},
-				onRender()
+				onRender(m)
 				{
-					this.fcSetup();
+					this.fcSetup(m || {});
 				},
-				fcSetup()
+				fcBuildSelect()
+				{
+					// Native <select> carrying the options, kept inside the trait DOM so its
+					// bubbling "change" event reaches GrapesJS (component attribute updates).
+					// Built on demand: custom getInputEl() is NOT guaranteed to be invoked by
+					// every GrapesJS version/trait flow.
+					var model = this.model;
+					var opts = (model && model.get) ? (model.get(\'options\') || []) : [];
+					var select = document.createElement(\'select\');
+					var groups = {};
+					for (var i = 0; i < opts.length; i++)
+					{
+						var o = opts[i];
+						var v = (typeof o.value === \'undefined\' ? o.id : o.value);
+						v = String(v).replace(/"/g, \'&quot;\');
+						var label = o.name || o.label || v;
+						var g = o.group || \'Flexicontent\';
+						if (!groups[g]) groups[g] = [];
+						groups[g].push({ v: v, t: label });
+					}
+					Object.keys(groups).sort().forEach(function(g)
+					{
+						var og = document.createElement(\'optgroup\');
+						og.setAttribute(\'label\', g);
+						groups[g].forEach(function(o)
+						{
+							var opt = document.createElement(\'option\');
+							opt.value = o.v;
+							opt.textContent = o.t;
+							og.appendChild(opt);
+						});
+						select.appendChild(og);
+					});
+					return select;
+				},
+				fcSetup(m)
 				{
 					var el = this.el;
 					if (!el) return;
+					// Resolve the combo root defensively: modern GrapesJS calls onRender with
+					// ({ elInput, component, trait }); elInput may be the hidden <select> (the
+					// .fc-combo then lives as a sibling inside the [data-input] container) or
+					// the rendered trait field wrapping the combo.
+					var combo = (m && m.elInput && m.elInput.closest)
+						? m.elInput.closest(\'.fc-combo\')
+						: null;
+					if (!combo && el.querySelector) combo = el.querySelector(\'.fc-combo\');
+					if (!combo) return;
+					combo.__fclTrait = this;
+					this._fcCombo = combo;
 					this._fcOpts = [];
 					this._fcActive = -1;
 					this._fcLabel = \'\';
 					var sel = this.$input ? this.$input.get(0) : null;
-					var groupEl = el.querySelector(\'.fc-combo-groups\');
-					var inp = el.querySelector(\'.fc-combo-input\');
-					if (!sel || !groupEl || !inp) return;
+					var groupEl = combo.querySelector(\'.fc-combo-groups\');
+					var inp = combo.querySelector(\'.fc-combo-input\');
+					var list = combo.querySelector(\'.fc-combo-list\');
+					if (!groupEl || !inp || !list) return;
+					if (!sel)
+					{
+						sel = this.fcBuildSelect();
+						if (!sel) return;
+						this.$input = { get: function() { return sel; } };
+						this.input = sel;
+						if (list.parentNode) list.parentNode.appendChild(sel);
+					}
+					sel.style.display = \'none\';
 					this.fcBuildList(sel, groupEl);
 					this.fcReflectEl(inp, sel);
 					var self = this;
@@ -3189,17 +3245,13 @@ editor.on(\'load\', function()
 						else if (e.key === \'Enter\') { e.preventDefault(); self.fcCommit(self.fcPickCurrent()); }
 					});
 					inp.addEventListener(\'blur\', function() { self.fcClose(); });
-					var list = el.querySelector(\'.fc-combo-list\');
-					if (list)
-					{
-						list.addEventListener(\'mousedown\', function(e) { e.preventDefault(); });
-						list.addEventListener(\'click\', function(e) {
-							var o = e.target && e.target.closest ? e.target.closest(\'.fc-combo-opt\') : null;
-							var v = o && o.getAttribute(\'data-value\');
-							if (o && v != null) self.fcCommit(v);
-						});
-					}
-					var arrow = el.querySelector(\'.fc-combo-arrow\');
+					list.addEventListener(\'mousedown\', function(e) { e.preventDefault(); });
+					list.addEventListener(\'click\', function(e) {
+						var o = e.target && e.target.closest ? e.target.closest(\'.fc-combo-opt\') : null;
+						var v = o && o.getAttribute(\'data-value\');
+						if (o && v != null) self.fcCommit(v);
+					});
+					var arrow = combo.querySelector(\'.fc-combo-arrow\');
 					if (arrow) arrow.addEventListener(\'mousedown\', function(e) { e.preventDefault(); self.fcOpen(); });
 				},
 				fcBuildList(sel, groupEl)
@@ -3237,7 +3289,7 @@ editor.on(\'load\', function()
 				},
 				fcFilter(q)
 				{
-					var el = this.el;
+					var el = this._fcCombo || this.el;
 					if (!el) return;
 					q = String(q || \'\').toLowerCase().trim();
 					var opts = this._fcOpts;
@@ -3269,7 +3321,7 @@ editor.on(\'load\', function()
 				},
 				fcOpen()
 				{
-					var el = this.el;
+					var el = this._fcCombo || this.el;
 					if (!el) return;
 					var list = el.querySelector(\'.fc-combo-list\');
 					var inp = el.querySelector(\'.fc-combo-input\');
@@ -3283,7 +3335,7 @@ editor.on(\'load\', function()
 				},
 				fcClose()
 				{
-					var el = this.el;
+					var el = this._fcCombo || this.el;
 					if (!el) return;
 					var list = el.querySelector(\'.fc-combo-list\');
 					var inp = el.querySelector(\'.fc-combo-input\');
@@ -3296,7 +3348,8 @@ editor.on(\'load\', function()
 				},
 				fcReflect()
 				{
-					this.fcReflectEl(this.el && this.el.querySelector(\'.fc-combo-input\'), this.$input ? this.$input.get(0) : null);
+					var el = this._fcCombo || this.el;
+					this.fcReflectEl(el && el.querySelector(\'.fc-combo-input\'), this.$input ? this.$input.get(0) : null);
 				},
 				fcReflectEl(inp, sel)
 				{
@@ -3366,6 +3419,29 @@ editor.on(\'load\', function()
 					this.fcClose();
 				},
 			});
+
+			// Safety net: guarantee the field combo opens even if a given GrapesJS version
+			// diverges on trait hook wiring / input flow. Delegated capture listener; uses the
+			// registered trait instance when available (full filter/commit handling), else
+			// falls back to a raw reveal of the list DOM.
+			if (!window.__fclComboDelegated)
+			{
+				window.__fclComboDelegated = true;
+				function fclComboEnsureOpen(target)
+				{
+					if (!target || !target.closest) return;
+					var inp = target.closest ? target.closest(\'.fc-combo-input\') : null;
+					if (!inp) return;
+					var combo = inp.closest ? inp.closest(\'.fc-combo\') : null;
+					if (!combo) return;
+					var t = combo.__fclTrait;
+					if (t && typeof t.fcOpen === \'function\') { t.fcOpen(); return; }
+					var list = combo.querySelector(\'.fc-combo-list\');
+					if (list && list.style.display !== \'block\') list.style.display = \'block\';
+				}
+				document.addEventListener(\'click\', function(e) { fclComboEnsureOpen(e.target); }, true);
+				document.addEventListener(\'focusin\', function(e) { fclComboEnsureOpen(e.target); }, true);
+			}
 
 			// --- CSS autocomplete (show-hint + css-hint) for the Custom CSS editor ---------
 			// The CodeMirror bundled inside GrapesJS is 5.63.0 but ships WITHOUT the hint
