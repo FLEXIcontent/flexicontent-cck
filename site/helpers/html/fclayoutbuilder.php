@@ -258,6 +258,12 @@ abstract class JHtmlFclayoutbuilder
 		self::_collectLinkRules($wrapper, $linkRules);
 		$css .= implode('', $linkRules);
 
+		// Per-block Custom CSS: raw rules entered in the Settings panel of each block,
+		// concatenated in project order (target a block by its class, ex: .c893 a{...}).
+		$customCss = '';
+		self::_collectCustomCss($wrapper, $customCss);
+		if ($customCss !== '') $css .= "\n" . $customCss;
+
 		$out['css'] = $css;
 
 		// HTML: render the first frame of the first page, without the <body> wrapper
@@ -352,6 +358,23 @@ abstract class JHtmlFclayoutbuilder
 	}
 
 	/**
+	 * Collect the per-block Custom CSS snippets (data-fc-customcss attribute) of a tree,
+	 * concatenated in project order. These are raw, designer-authored rules.
+	 */
+	protected static function _collectCustomCss($comp, &$out)
+	{
+		if (is_array($comp) && !empty($comp['attributes']) && is_array($comp['attributes']))
+		{
+			$v = isset($comp['attributes']['data-fc-customcss']) ? trim((string) $comp['attributes']['data-fc-customcss']) : '';
+			if ($v !== '') $out .= $v . "\n";
+		}
+		if (is_array($comp) && !empty($comp['components']) && is_array($comp['components']))
+		{
+			foreach ($comp['components'] as $ch) self::_collectCustomCss($ch, $out);
+		}
+	}
+
+	/**
 	 * Render a single component into (X)HTML, mimicking the editor's model serialization.
 	 */
 	protected static function _renderComponent($comp)
@@ -374,9 +397,10 @@ abstract class JHtmlFclayoutbuilder
 		{
 			foreach ($comp['attributes'] as $k => $v)
 			{
-				// data-fc-linkstyles-* are only Style Manager carriers (see _collectLinkRules),
-				// never meant to reach the front-end markup
-				if (strpos($k, 'data-fc-linkstyles-') === 0) continue;
+				// data-fc-linkstyles-* are only Style Manager carriers (see _collectLinkRules)
+				// and data-fc-customcss is per-block Custom CSS (see _collectCustomCss):
+				// neither is meant to reach the front-end markup
+				if (strpos($k, 'data-fc-linkstyles-') === 0 || $k === 'data-fc-customcss') continue;
 				$attrs[$k] = (string) $v;
 			}
 		}
@@ -1874,10 +1898,17 @@ editor.on(\'load\', function()
 				// previous (empty) value while the Settings panel input shows the freshly typed
 				// text. Force the panel values back into the model before serialization.
 				var comp = editor.getSelected();
-				if (!comp || !comp.get || comp.get(\'type\') !== \'fc-field\') return;
+				if (!comp || !comp.get) return;
 				if (!comp.get(\'traits\') || !comp.get(\'traits\').models) return;
 				var rows = document.querySelectorAll(\'.gjs-trt-trait\');
-				var attrMap = { \'Prefix\': \'data-fc-prefix\', \'Suffix\': \'data-fc-suffix\' };
+				var attrMap = {
+					\'Prefix\': \'data-fc-prefix\',
+					\'Suffix\': \'data-fc-suffix\',
+					\'Custom CSS\': \'data-fc-customcss\',
+					\'Item ID\': \'data-fc-itemid\',
+					\'Link text\': \'data-fc-linktext\',
+					\'User ID\': \'data-fc-userid\',
+				};
 				for (var i = 0; i < rows.length; i++)
 				{
 					var row = rows[i];
@@ -2773,6 +2804,33 @@ editor.on(\'load\', function()
 				fcl_updating_link_styles = false;
 			}
 
+			// Reflect the per-block Custom CSS (data-fc-customcss attribute) into the canvas
+			// iframe (raw rules, concatenated in project order), so editing shows the result.
+			function fcl_ensureCanvasCustomCss()
+			{
+				var doc = editor.Canvas.getDocument();
+				if (!doc || !doc.head) return;
+				var rules = [];
+				var walk = function(comp)
+				{
+					if (!comp || typeof comp.get !== \'function\') return;
+					var attrs = comp.getAttributes ? (comp.getAttributes() || {}) : {};
+					var css = attrs[\'data-fc-customcss\'] ? String(attrs[\'data-fc-customcss\']) : \'\';
+					if (css) rules.push(css);
+					var children = comp.components && comp.components();
+					if (children) children.each(function(c) { walk(c); });
+				};
+				if (editor.getWrapper) walk(editor.getWrapper());
+				var st = doc.getElementById(\'fcl-canvas-customcss\');
+				if (!st)
+				{
+					st = doc.createElement(\'style\');
+					st.id = \'fcl-canvas-customcss\';
+					doc.head.appendChild(st);
+				}
+				st.textContent = rules.join(\'\n\');
+			}
+
 			// Wire the toolbar item selector and keep the insert injection synced.
 			editor.on(\'load\', function()
 			{
@@ -2784,6 +2842,7 @@ editor.on(\'load\', function()
 				fcl_configureStyleManager();
 				fcl_ensureCanvasInserts();
 				fcl_ensureCanvasLinkStyles();
+				fcl_ensureCanvasCustomCss();
 				fcSchedulePreviewRefresh(0);
 			});
 			editor.on(\'frame:load\', fcl_ensureCanvasInserts);
@@ -2792,6 +2851,11 @@ editor.on(\'load\', function()
 			editor.on(\'component:styleUpdate\', fcl_ensureCanvasLinkStyles);
 			editor.on(\'component:add\', fcl_ensureCanvasLinkStyles);
 			editor.on(\'component:remove\', fcl_ensureCanvasLinkStyles);
+			editor.on(\'frame:load\', fcl_ensureCanvasCustomCss);
+			editor.on(\'component:update\', fcl_ensureCanvasCustomCss);
+			editor.on(\'component:styleUpdate\', fcl_ensureCanvasCustomCss);
+			editor.on(\'component:add\', fcl_ensureCanvasCustomCss);
+			editor.on(\'component:remove\', fcl_ensureCanvasCustomCss);
 
 			function fcl_opt_label(v)
 			{
@@ -3107,6 +3171,45 @@ editor.on(\'load\', function()
 					this.fcClose();
 				},
 			});
+
+			// Per-block Custom CSS, edited in the injected "Settings" sector (the traits
+			// panel of the Style Manager). GrapesJS 0.23 has no native textarea trait, so
+			// register a lightweight one cloning the base text trait view (trait model still
+			// maps the value to the component attribute, here data-fc-customcss).
+			editor.TraitManager.addType(\'textarea\', {
+				eventCapture: [\'change\'],
+				getInputEl: function()
+				{
+					if (!this.input)
+					{
+						var ta = document.createElement(\'textarea\');
+						ta.rows = 6;
+						ta.spellcheck = false;
+						this.input = ta;
+					}
+					return this.input;
+				},
+			});
+
+			// Every block gets the Custom CSS trait on selection (any component type).
+			editor.on(\'component:selected\', function(comp)
+			{
+				if (!comp || typeof comp.get !== \'function\') return;
+				var tr = comp.get(\'traits\');
+				if (!tr || typeof tr.add !== \'function\') return;
+				if (tr.models)
+				{
+					for (var j = 0; j < tr.models.length; j++)
+					{
+						if (tr.models[j] && tr.models[j].get && tr.models[j].get(\'name\') === \'data-fc-customcss\') return;
+					}
+				}
+tr.add({ type: \'textarea\', name: \'data-fc-customcss\', label: \'Custom CSS\',
+					placeholder: \'.my-css { color:red }  (target this block by its class, see Selector Manager)\' });
+					// The TraitsView renders on component:toggled only: re-trigger it so the
+					// freshly added trait shows up immediately (idempotent, no loop).
+					editor.trigger(\'component:toggled\', comp);
+				});
 
 			editor.DomComponents.addType(\'fc-field\', {
 				// Also recognized when old HTML saves contain a data-fc-field attribute
