@@ -6582,6 +6582,16 @@ class flexicontent_html
 		$view          = !empty($options['view']) ? $options['view'] : FLEXI_ITEMVIEW;
 		$location    = '/components/com_flexicontent/builder/';
 
+		// Page-layout mode: the whole category page is rendered once, with no per-item
+		// context ($item is null) and only {flexi_cat:..} placeholders to resolve.
+		// Give $item a neutral stub so the per-item steps below degrade to empty output.
+		$is_page = empty($item) || !isset($item->id);
+		$item_id = isset($item->id) ? $item->id : '';
+		if ($is_page)
+		{
+			$item = (object) array('id' => '', 'title' => '', 'cat_id' => 0, 'fields' => array());
+		}
+
 		// 1. Compile (if not done already) the layout CSS, scoped by css_prefix, then load it.
 		// Guarded per layout/css id: a category list calls this once per item of the loop,
 		// only the first call must compile the LESS and register the assets.
@@ -6617,20 +6627,23 @@ class flexicontent_html
 		}
 
 		// 2. Make element IDs unique per item, so that multiple items can coexist on a page
-		$matches = null;
-		preg_match_all('/\sid="([a-zA-Z0-9_-]*)"/', $html, $matches);
-
-		foreach ($matches[0] as $i => $k)
+		if (!$is_page)
 		{
-			$tagid = $matches[1][$i];
-			$html = str_replace('id="' . $tagid . '"', 'id="' . $tagid . '_{{fc-item-id}}"', $html);
-			$html = str_replace('"#' . $tagid . '"', '"#' . $tagid . '_{{fc-item-id}}"', $html);
-			$html = str_replace("'#" . $tagid . "'", "'#" . $tagid . "_{{fc-item-id}}'", $html);
+			$matches = null;
+			preg_match_all('/\sid="([a-zA-Z0-9_-]*)"/', $html, $matches);
+
+			foreach ($matches[0] as $i => $k)
+			{
+				$tagid = $matches[1][$i];
+				$html = str_replace('id="' . $tagid . '"', 'id="' . $tagid . '_{{fc-item-id}}"', $html);
+				$html = str_replace('"#' . $tagid . '"', '"#' . $tagid . '_{{fc-item-id}}"', $html);
+				$html = str_replace("'#" . $tagid . "'", "'#" . $tagid . "_{{fc-item-id}}'", $html);
+			}
 		}
 
 		// 3. Replace the generic tokens with actual values
-		$html = str_replace('{{fc-item-id}}', $item->id, $html);
-		$html = str_replace('%item_id%',      $item->id, $html);
+		$html = str_replace('{{fc-item-id}}', $item_id, $html);
+		$html = str_replace('%item_id%',      $item_id, $html);
 		$html = str_replace('%user_id%',      (int) \Joomla\CMS\Factory::getApplication()->getIdentity()->id, $html);
 		$html = str_replace('%template_name%', $template_name, $html);
 
@@ -6809,6 +6822,16 @@ class flexicontent_html
 		);
 		// Leftover non-profile flexi_item placeholders are ignored silently
 		$html = preg_replace('~\{flexi_item:[^}]*\}~', '', $html);
+
+		// 7. Resolve the {flexi_cat:..} page placeholders (pre-rendered category elements)
+		$cat_elements = !empty($options['cat_elements']) ? $options['cat_elements'] : array();
+		$html = preg_replace_callback('~\{flexi_cat:([a-z0-9_-]+)\}~i',
+			function($m) use ($cat_elements)
+			{
+				return isset($cat_elements[$m[1]]) ? $cat_elements[$m[1]] : '';
+			},
+			$html
+		);
 
 		return $html;
 	}

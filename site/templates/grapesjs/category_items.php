@@ -28,18 +28,21 @@ $ilayout          = $this->params->get('clayout', 'grapesjs');
 $builder_enabled  = (int) $this->params->get('builder_enabled', 1);
 $builder_layout   = trim($this->params->get('builder_layout1_html', ''));
 
-$fcl_cols_desktop = max(1, (int) $this->params->get('cat_builder_cols_desktop', 3));
-$fcl_cols_tablet  = max(1, (int) $this->params->get('cat_builder_cols_tablet', 2));
-$fcl_cols_mobile  = max(1, (int) $this->params->get('cat_builder_cols_mobile', 1));
-$fcl_gap          = trim($this->params->get('cat_builder_gap', '32px'));
+$fcl_min_card = trim($this->params->get('cat_builder_min_card', '280px'));
+$fcl_gap_x    = trim($this->params->get('cat_builder_gap_x', '32px'));
+$fcl_gap_y    = trim($this->params->get('cat_builder_gap_y', '32px'));
+$fcl_rows_natural = ((int) $this->params->get('cat_builder_rows', 1) === 0);
+// auto-fit: empty tracks collapse and cards stretch to fill the whole row;
+// auto-fill: empty tracks are kept so cards keep their size (the last row may leave space)
+$fcl_fit = trim($this->params->get('cat_builder_fit', 'auto-fill'));
+$fcl_fit = in_array($fcl_fit, array('auto-fit', 'auto-fill'), true) ? $fcl_fit : 'auto-fit';
 ?>
 <style>
-.fc-builder-cat.fc-items-block{display:grid;grid-template-columns:repeat(var(--fcl-cols-d),1fr);gap:var(--fcl-gap);align-items:start}
+.fc-builder-cat.fc-items-block{display:grid;grid-template-columns:repeat(<?php echo $fcl_fit; ?>,minmax(min(var(--fcl-min-card,280px),100%),1fr));column-gap:var(--fcl-gap-x,32px);row-gap:var(--fcl-gap-y,32px)}
+.fc-builder-cat.fc-items-block.fc-builder-rows-natural{align-items:start}
 .fc-builder-cat .fc-item-builder{min-width:0}
-@media (max-width:991px){.fc-builder-cat.fc-items-block{grid-template-columns:repeat(var(--fcl-cols-t),1fr)}}
-@media (max-width:575px){.fc-builder-cat.fc-items-block{grid-template-columns:repeat(var(--fcl-cols-m),1fr)}}
 </style>
-<div class="fc-builder-cat fc-items-block" style="--fcl-cols-d:<?php echo (int)$fcl_cols_desktop; ?>;--fcl-cols-t:<?php echo (int)$fcl_cols_tablet; ?>;--fcl-cols-m:<?php echo (int)$fcl_cols_mobile; ?>;--fcl-gap:<?php echo htmlspecialchars($fcl_gap, ENT_QUOTES, 'UTF-8'); ?>">
+<div class="fc-builder-cat fc-items-block<?php echo $fcl_rows_natural ? ' fc-builder-rows-natural' : ''; ?>" style="--fcl-min-card:<?php echo htmlspecialchars($fcl_min_card, ENT_QUOTES, 'UTF-8'); ?>;--fcl-gap-x:<?php echo htmlspecialchars($fcl_gap_x, ENT_QUOTES, 'UTF-8'); ?>;--fcl-gap-y:<?php echo htmlspecialchars($fcl_gap_y, ENT_QUOTES, 'UTF-8'); ?>">
 
 <?php if ($builder_enabled && $builder_layout !== '') : foreach ($this->items as $item) : ?>
 	<div class="fc-item-builder">

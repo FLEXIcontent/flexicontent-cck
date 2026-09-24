@@ -174,7 +174,10 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 		{
 			$raw_layout = isset($post['jform']['layouts'][$folder]) ? $post['jform']['layouts'][$folder] : array();
 		}
-		foreach (array('builder_layout1_data', 'builder_layout1_html', 'builder_layout1_css', 'builder_layout1_js') as $builder_field)
+		foreach (array(
+			'builder_layout1_data', 'builder_layout1_html', 'builder_layout1_css', 'builder_layout1_js',
+			'builder_page1_data',  'builder_page1_html',  'builder_page1_css',  'builder_page1_js',
+		) as $builder_field)
 		{
 			if (array_key_exists($builder_field, $raw_layout))
 			{
@@ -205,6 +208,20 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 			// it only runs when the hash field already holds a value. Content-addressed so
 			// that unchanged layouts keep the same hash and the browser cache is reused.
 			$attribs['builder_layout1_hash'] = md5((string) $attribs['builder_layout1_css']);
+		}
+
+		// Same regeneration for the category page layout (builder_page1): the posted project
+		// JSON is the source of truth, the stored HTML/CSS/JS are rebuilt from it server-side
+		// (otherwise the raw canvas capture, e.g. empty block divs without {flexi_cat:..} tokens,
+		// would be saved as-is and the composed page would render only the item grid).
+		$layout_data    = isset($attribs['builder_page1_data']) ? $attribs['builder_page1_data'] : '';
+		$layout_render  = class_exists('JHtmlFclayoutbuilder') ? \JHtmlFclayoutbuilder::renderLayoutFromProject($layout_data) : null;
+		if (!empty($layout_render) && $layout_render['html'] !== null)
+		{
+			$attribs['builder_page1_html'] = $layout_render['html'];
+			$attribs['builder_page1_css']  = $layout_render['css'];
+			$attribs['builder_page1_js']   = $layout_render['js'];
+			$attribs['builder_page1_hash'] = md5((string) $attribs['builder_page1_css']);
 		}
 
 		// Set templates configuration

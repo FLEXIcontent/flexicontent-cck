@@ -501,6 +501,11 @@ abstract class JHtmlFclayoutbuilder
 		{
 			$inner = '{flexi_item:profile  author_of:[%item_id% | current]  ilayout:%template_name%}';
 		}
+		elseif (!empty($comp['type']) && $comp['type'] === 'fc-cat-element')
+		{
+			$cname = isset($comp['attributes']['data-fc-cat']) ? trim((string) $comp['attributes']['data-fc-cat']) : '';
+			$inner = $cname !== '' ? '{flexi_cat:' . $cname . '}' : '';
+		}
 		elseif (isset($comp['content']) && $comp['content'] !== null && $comp['content'] !== '')
 		{
 			$inner = (string) $comp['content'];
@@ -861,6 +866,21 @@ abstract class JHtmlFclayoutbuilder
 		}
 
 		$html .= '<script>window.fcl_builder_fields_' . $editor_sfx . ' = ' . json_encode($fcl_field_options) . ';</script>';
+
+		// The category page elements that the "Category page" blocks embed via {flexi_cat:..}
+		// placeholders. Their real render happens on the front-end (grapesjs/category.php
+		// pre-renders each element into $options['cat_elements']); the canvas only shows a badge.
+		$fcl_cat_options = array(
+			array('value' => 'title',          'label' => 'Page title & description',  'group' => 'Category page'),
+			array('value' => 'category',       'label' => 'Category description',  'group' => 'Category page'),
+			array('value' => 'subcategories',  'label' => 'Sub-categories',        'group' => 'Category page'),
+			array('value' => 'peercategories', 'label' => 'Peer categories',       'group' => 'Category page'),
+			array('value' => 'alpha',          'label' => 'Alpha index',           'group' => 'Category page'),
+			array('value' => 'filters',        'label' => 'Filters & selectors',   'group' => 'Category page'),
+			array('value' => 'pagination',     'label' => 'Pagination',            'group' => 'Category page'),
+			array('value' => 'items',          'label' => 'Item grid',             'group' => 'Category page'),
+		);
+		$html .= '<script>window.fcl_builder_catels_' . $editor_sfx . ' = ' . json_encode($fcl_cat_options) . ';</script>';
 
 		/**
 		 * Preview item data for the Layout Builder canvas.
@@ -2703,6 +2723,7 @@ editor.on(\'load\', function()
 			 * then resolved at run time by JHtmlFlexicontent::renderBuilderLayout.
 			 */
 			var fcl_field_opts = window[\'fcl_builder_fields_\' + editor_sfx] || [];
+			var fcl_cat_opts   = window[\'fcl_builder_catels_\' + editor_sfx] || [];
 
 			// ---------------------------------------------------------------------
 			// Real-data preview: every fc-field block can show the actual rendered
@@ -3057,6 +3078,15 @@ editor.on(\'load\', function()
 				for (var i = 0; i < fcl_field_opts.length; i++)
 				{
 					if (fcl_field_opts[i].value === v) return fcl_field_opts[i].label;
+				}
+				return v;
+			}
+
+			function fcl_cat_opt_label(v)
+			{
+				for (var i = 0; i < fcl_cat_opts.length; i++)
+				{
+					if (fcl_cat_opts[i].value === v) return fcl_cat_opts[i].label;
 				}
 				return v;
 			}
@@ -3765,9 +3795,43 @@ tr.add({ type: \'textarea\', name: \'data-fc-customcss\', label: \'Custom CSS\',
 						attributes: { \'data-fc-profile\': \'author\' },
 					},
 				},
+view: fcl_boxed_view(function()
+			{
+				this.el.innerHTML = fcl_data_box(\'A\', \'Author profile\', \'author of current item\');
+			}),
+			});
+
+			// Category page element: a pre-built block of the category view (page title,
+			// category description, sub-categories, peer categories, alpha index, filters,
+			// pagination, item grid). Only meaningful in the category page layout editor
+			// (editor_sfx = builder_page1), other editors ignore these blocks.
+			editor.DomComponents.addType(\'fc-cat-element\', {
+				isComponent: function(el)
+				{
+					if (el && el.hasAttribute && el.hasAttribute(\'data-fc-cat\')) return { type: \'fc-cat-element\' };
+				},
+				model: {
+					defaults: {
+						name: \'Category Page Element\',
+						editable: false,
+						droppable: false,
+						resizable: true,
+						attributes: { \'data-fc-cat\': \'\' },
+						traits: [{
+							type: \'fc-field-select\',
+							name: \'data-fc-cat\',
+							label: \'Category element\',
+							options: fcl_cat_opts.map(function(o) { return { value: o.value, name: o.label, group: o.group }; }),
+						}],
+					},
+				},
 				view: fcl_boxed_view(function()
 				{
-					this.el.innerHTML = fcl_data_box(\'A\', \'Author profile\', \'author of current item\');
+					var el = this.model.getAttributes()[\'data-fc-cat\'] || \'\';
+					var label = fcl_cat_opt_label(el);
+					this.el.innerHTML = fcl_data_box(\'C\',
+						label ? (\'Category: \' + label) : \'Category page element\',
+						el ? (\'Renders "\' + el + \'" of the category page\') : \'Choose an element in the Settings panel\');
 				}),
 			});
 
@@ -3815,6 +3879,84 @@ tr.add({ type: \'textarea\', name: \'data-fc-customcss\', label: \'Custom CSS\',
 				activate: true,
 				attributes: { class:\'fc-iblock fa fa-database\' },
 			});
+
+			// Category page blocks: each one embeds a pre-rendered element of the category
+			// page (see _renderComponent -> {flexi_cat:...} tokens). Shown only in the page
+			// layout editor of the category template (editor_sfx = builder_page1).
+			if (editor_sfx === \'builder_page1\')
+			{
+				editor.BlockManager.add(\'fccat-title\', {
+					label: \'Page title & description\',
+					category: \'Category page\',
+					content: { type: \'fc-cat-element\', attributes: { \'data-fc-cat\': \'title\' } },
+					select: true,
+					activate: true,
+					attributes: { class:\'fc-iblock fa fa-database\' },
+				});
+
+				editor.BlockManager.add(\'fccat-category\', {
+					label: \'Category description\',
+					category: \'Category page\',
+					content: { type: \'fc-cat-element\', attributes: { \'data-fc-cat\': \'category\' } },
+					select: true,
+					activate: true,
+					attributes: { class:\'fc-iblock fa fa-database\' },
+				});
+
+				editor.BlockManager.add(\'fccat-subcategories\', {
+					label: \'Sub-categories\',
+					category: \'Category page\',
+					content: { type: \'fc-cat-element\', attributes: { \'data-fc-cat\': \'subcategories\' } },
+					select: true,
+					activate: true,
+					attributes: { class:\'fc-iblock fa fa-database\' },
+				});
+
+				editor.BlockManager.add(\'fccat-peercategories\', {
+					label: \'Peer categories\',
+					category: \'Category page\',
+					content: { type: \'fc-cat-element\', attributes: { \'data-fc-cat\': \'peercategories\' } },
+					select: true,
+					activate: true,
+					attributes: { class:\'fc-iblock fa fa-database\' },
+				});
+
+				editor.BlockManager.add(\'fccat-alpha\', {
+					label: \'Alpha index\',
+					category: \'Category page\',
+					content: { type: \'fc-cat-element\', attributes: { \'data-fc-cat\': \'alpha\' } },
+					select: true,
+					activate: true,
+					attributes: { class:\'fc-iblock fa fa-database\' },
+				});
+
+				editor.BlockManager.add(\'fccat-filters\', {
+					label: \'Filters & selectors\',
+					category: \'Category page\',
+					content: { type: \'fc-cat-element\', attributes: { \'data-fc-cat\': \'filters\' } },
+					select: true,
+					activate: true,
+					attributes: { class:\'fc-iblock fa fa-database\' },
+				});
+
+				editor.BlockManager.add(\'fccat-pagination\', {
+					label: \'Pagination\',
+					category: \'Category page\',
+					content: { type: \'fc-cat-element\', attributes: { \'data-fc-cat\': \'pagination\' } },
+					select: true,
+					activate: true,
+					attributes: { class:\'fc-iblock fa fa-database\' },
+				});
+
+				editor.BlockManager.add(\'fccat-items\', {
+					label: \'Item grid\',
+					category: \'Category page\',
+					content: { type: \'fc-cat-element\', attributes: { \'data-fc-cat\': \'items\' } },
+					select: true,
+					activate: true,
+					attributes: { class:\'fc-iblock fa fa-database\' },
+				});
+			}
 
 			function fcl_applyLinkTraits()
 			{

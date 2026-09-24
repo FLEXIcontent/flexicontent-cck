@@ -33,12 +33,43 @@
 			<field name="builder_layout1_hash" type="hidden" filter="JHtmlFclayoutbuilder::createUrlHash" default="" label="Hash" description="" class="" not_inherited="1" />
 			<field name="builder_layout1_less" type="hidden" filter="JHtmlFclayoutbuilder::prepareLess" default="components/com_flexicontent/builder/less/builder_layout1_{{folder}}cat" label="LESS" description="" class="" not_inherited="1" />
 
-			<field name="builder_grid_info" type="separator" cssprep="1" not_inherited="1" default="Replication grid" description="Controls the grid in which the designed card is replicated (category pages)." level="level2" class="alert alert-info" />
+			<field name="builder_page_info" type="separator" cssprep="1" not_inherited="1" default="Page Layout (GrapesJS)" description="You are designing the whole category PAGE: each block renders a pre-built element of the category view (page title, category description, alpha index, subcategories, peer categories, filters, pagination, item grid)." level="level2" class="alert alert-info" />
 
-			<field name="cat_builder_cols_desktop" type="text" filter="int" default="3" not_inherited="1" label="Columns on desktop" description="Number of columns of the card grid on desktop screens." class="input-mini" />
-			<field name="cat_builder_cols_tablet" type="text" filter="int" default="2" not_inherited="1" label="Columns on tablet" description="Number of columns of the card grid on tablet screens (&lt;= 991px)." class="input-mini" />
-			<field name="cat_builder_cols_mobile" type="text" filter="int" default="1" not_inherited="1" label="Columns on mobile" description="Number of columns of the card grid on mobile screens (&lt;= 575px)." class="input-mini" />
-			<field name="cat_builder_gap" type="text" default="32px" not_inherited="1" label="Gap between cards" description="Space between the replicated cards, any CSS length (ex: 24px, 1.5rem)." class="input-mini" />
+			<field name="builder_page_enabled" type="radio" not_inherited="1" default="1" filter="int" label="Enable the Page Layout rendering" description="When disabled (or before any page layout is designed) the classic category page is displayed instead." class="btn-group">
+				<option value="1">JYES</option>
+				<option value="0">JNO</option>
+			</field>
+
+			<field name="show_buttons" type="radio" filter="int" not_inherited="1" default="1" label="Show the action buttons (print / RSS / ...)" description="The buttons are always displayed at the top-right of the page, outside the page-builder layout, whatever the block composition." class="btn-group">
+				<option value="1">JYES</option>
+				<option value="0">JNO</option>
+			</field>
+
+			<field name="builder_page1" type="fclayoutbuilder" default="" label="Page layout builder" description="" class=""
+				not_inherited="1"
+				editor_sfx="builder_page1"
+				lessfile="components/com_flexicontent/builder/less/builder_page1_{{folder}}catpage.less"
+			/>
+			<field name="builder_page1_html" type="textarea" filter="raw" readonly="readonly" rows="2" default="" label="HTML" description="" class="input-xxlarge" not_inherited="1"/>
+			<field name="builder_page1_js" type="hidden" filter="raw" default="" label="JS" description="" class="" not_inherited="1" />
+			<field name="builder_page1_css" type="textarea" readonly="readonly" filter="raw" rows="2" default="" label="CSS" description="" class="input-xxlarge" not_inherited="1" />
+			<field name="builder_page1_data" type="hidden" filter="raw" default="" label="Project data" description="" class="" not_inherited="1"/>
+			<field name="builder_page1_hash" type="hidden" filter="JHtmlFclayoutbuilder::createUrlHash" default="" label="Hash" description="" class="" not_inherited="1" />
+			<field name="builder_page1_less" type="hidden" filter="JHtmlFclayoutbuilder::prepareLess" default="components/com_flexicontent/builder/less/builder_page1_{{folder}}catpage" label="LESS" description="" class="" not_inherited="1" />
+
+			<field name="builder_grid_info" type="separator" cssprep="1" not_inherited="1" default="Replication grid" description="Fluid grid (auto-fit / minmax): the number of columns adapts automatically to the container width from the minimum card width. No fixed breakpoints are needed." level="level2" class="alert alert-info" />
+
+			<field name="cat_builder_min_card" type="text" default="280px" not_inherited="1" label="Minimum card width" description="Minimum width of a card; the grid places as many cards per row as the container allows. Any CSS length (ex: 240px, 18rem)." class="input-mini" />
+			<field name="cat_builder_gap_x" type="text" default="32px" not_inherited="1" label="Horizontal gap" description="Space between the cards of the same row (column-gap), any CSS length." class="input-mini" />
+			<field name="cat_builder_gap_y" type="text" default="32px" not_inherited="1" label="Vertical gap" description="Space between the card rows (row-gap), any CSS length." class="input-mini" />
+			<field name="cat_builder_rows" type="radio" filter="int" default="1" not_inherited="1" label="Equal card heights" description="When enabled all cards of a row stretch to the same height (CSS grid default). Otherwise each card keeps its natural height (align-items: start)." class="btn-group">
+				<option value="1">JYES</option>
+				<option value="0">JNO</option>
+			</field>
+			<field name="cat_builder_fit" type="radio" default="auto-fill" not_inherited="1" label="Width adaptation" description="auto-fit: the number of tracks is reduced to the existing cards which then stretch to fill the whole row (a single card fills the full width). auto-fill: the empty tracks are kept, the cards keep their size and the last row can leave horizontal space." class="btn-group">
+				<option value="auto-fit">Auto-fit</option>
+				<option value="auto-fill">Auto-fill</option>
+			</field>
 
 		</fieldset>
 	</fields>
