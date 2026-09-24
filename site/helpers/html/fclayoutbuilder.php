@@ -3185,19 +3185,103 @@ editor.on(\'load\', function()
 						var ta = document.createElement(\'textarea\');
 						ta.rows = 6;
 						ta.spellcheck = false;
+						ta.style.width = \'100%\';
 						var ph = this.model && this.model.get ? (this.model.get(\'placeholder\') || \'\') : \'\';
 						if (ph) ta.placeholder = ph;
 						this.input = ta;
+						var self = this;
+						// Wire up once the field is actually in the DOM (CodeMirror needs it)
+						setTimeout(function() { self.fcAttachCM(); }, 0);
 					}
 					// The value lives in the component attribute (data-fc-customcss) and
 					// getModelValue() reads it directly: populate on render so reloaded values
 					// show up. Never touch it while the user is typing in this very field.
 					var v = this.getModelValue ? this.getModelValue() : \'\';
-					if (typeof v !== \'undefined\' && v !== null && document.activeElement !== this.input && String(this.input.value) !== String(v))
+					if (typeof v !== \'undefined\' && v !== null)
 					{
-						this.input.value = String(v);
+						v = String(v);
+						if (this.fcCmEditor)
+						{
+							if (!this.fcCmFocused && String(this.fcCmEditor.getValue()) !== v) this.fcCmEditor.setValue(v);
+						}
+						else if (String(this.input.value) !== v) this.input.value = v;
 					}
 					return this.input;
+				},
+				// Replaces the raw textarea by the CodeMirror that ships INSIDE GrapesJS (it is
+				// the CodeManager "CodeMirror" viewer, css mode bundled): no extra asset to load.
+				fcAttachCM: function()
+				{
+					if (this.fcCmReady || !this.input || !this.input.parentNode) return;
+					this.fcCmReady = true;
+					var viewer = null;
+					try
+					{
+						var base = editor.CodeManager && typeof editor.CodeManager.getViewer === \'function\' ? editor.CodeManager.getViewer(\'CodeMirror\') : null;
+						if (base && typeof base.clone === \'function\') viewer = base.clone();
+					}
+					catch (err) {}
+					if (!viewer) return;
+					var self = this;
+					try
+					{
+						viewer.set({ codeName: \'css\', readOnly: false, theme: \'hopscotch\', lineNumbers: true });
+						viewer.init(this.input);
+						if (!viewer.editor) return;
+						this.fcCmEditor = viewer.editor;
+						this.fcCmEditor.setOption(\'mode\', \'css\');
+						this.fcCmEditor.setOption(\'lineWrapping\', true);
+						this.fcCmEditor.getWrapperElement().style.minHeight = \'120px\';
+						this.fcCmEditor.getWrapperElement().style.width = \'100%\';
+						var ph = this.model && this.model.get ? this.model.get(\'placeholder\') : \'\';
+						if (ph) { try { this.fcCmEditor.setOption(\'placeholder\', ph); } catch (err) {} }
+						this.fcCmEditor.on(\'change\', function() { self.onCMChange(); });
+						this.fcCmEditor.on(\'focus\', function() { self.fcCmFocused = true; });
+						this.fcCmEditor.on(\'blur\', function() { self.fcCmFocused = false; });
+						this.fcCmEditor.refresh();
+						this.input.style.display = \'none\';
+					}
+					catch (err)
+					{
+						if (this.fcCmEditor)
+						{
+							try { this.fcCmEditor.toTextArea(); } catch (err2) {}
+						}
+						this.fcCmEditor = null;
+						this.input.style.display = \'\';
+					}
+				},
+				onCMChange: function()
+				{
+					if (!this.fcCmEditor || !this.input) return;
+					var v = this.fcCmEditor.getValue();
+					// Keep the raw textarea (source of truth for the delegated change handler) in sync
+					if (String(this.input.value) !== String(v)) this.input.value = v;
+					if (this.model && typeof this.model.set === \'function\' && String(this.model.get(\'value\') || \'\') !== String(v))
+					{
+						this.model.set(\'value\', v);
+					}
+				},
+				// Base setInputValue only touches the hidden textarea; mirror into CodeMirror too
+				setInputValue: function(value)
+				{
+					var el = this.getInputElem && this.getInputElem();
+					value = (value == null ? \'\' : String(value));
+					if (el) el.value = value;
+					if (this.fcCmEditor && !this.fcCmFocused && String(this.fcCmEditor.getValue()) !== value)
+					{
+						this.fcCmEditor.setValue(value);
+					}
+				},
+				// Tears the CodeMirror instance down when the trait view is removed
+				removed: function()
+				{
+					if (this.fcCmEditor && typeof this.fcCmEditor.toTextArea === \'function\')
+					{
+						try { this.fcCmEditor.toTextArea(); } catch (err) {}
+					}
+					this.fcCmEditor = null;
+					this.fcCmFocused = false;
 				},
 			});
 
