@@ -2392,9 +2392,9 @@ class plgFlexicontent_fieldsImage extends FCField
 		{
 			$loaded = 1;
 			require_once ( JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'phpthumb.class.php' );
-			// WE DO INCLUDE TO FORCE LOADING OF configuration AFTER the class
-			// WE HAVE PATCHED configuration not to double define CONSTANTS and FUNCTIONS
-			include ( JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'phpThumb.config.php' );
+			// Load the configuration AFTER the class, via the helper so that it is loaded only once
+			// (a second include would reset it to the shipped defaults, losing the signing key)
+			flexicontent_images::phpThumbConfig();
 		}
 	}
 

@@ -34,45 +34,30 @@ if ($show_cat_image)
 	$joomla_image_path = $joomla_image_path ? $joomla_image_path . DS : '';
 	$joomla_image_url  = $joomla_image_url  ? $joomla_image_url  . '/' : '';
 
-	$h   = '&amp;h=' . $cat_image_height;
-	$w   = '&amp;w=' . $cat_image_width;
-	$aoe = '&amp;aoe=1';
-	$q   = '&amp;q=95';
-	$ar  = '&amp;ar=x';
-	$zc  = $cat_image_method ? '&amp;zc=' . $cat_image_method : '';
-
-	$phpThumbURL = \Joomla\CMS\Uri\Uri::base(true)
-		. '/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=';
+	$h   = $cat_image_height;
+	$w   = $cat_image_width;
+	$aoe = 1;
+	$q   = 95;
+	$ar  = 'x';
+	$zc  = $cat_image_method ?: '';
 }
 
 // ---------------------------------------------------------------------------
-// Helper : encode les espaces segment par segment
-// ---------------------------------------------------------------------------
-$encodeSrc = static function ($src) {
-	return implode('/', array_map(static function ($seg) {
-		return str_replace(
-			['%2E', '%2D', '%5F', '%7E'],
-			['.',   '-',   '_',   '~'],
-			rawurlencode($seg)
-		);
-	}, explode('/', $src)));
-};
-
-// ---------------------------------------------------------------------------
-// Helper : construit une URL phpThumb
+// Helper : construit une URL phpThumb signée (flexicontent_images::phpThumbURL() encode le chemin)
 // ---------------------------------------------------------------------------
 $buildThumbUrl = static function (
 	$src, $wParam, $hParam, $aoe, $q, $ar, $zc, $ext, $forceWebp = false
-) use ($phpThumbURL, $encodeSrc) {
-	$safeSrc = $encodeSrc($src);
+) {
 	if ($forceWebp) {
-		$f = '&amp;f=webp';
+		$f = 'webp';
 	} elseif (in_array($ext, ['png','gif','jpeg','jpg','webp','wbmp','bmp','ico'])) {
-		$f = '&amp;f=' . $ext;
+		$f = $ext;
 	} else {
 		$f = '';
 	}
-	return $phpThumbURL . $safeSrc . $wParam . $hParam . $aoe . $q . $ar . $zc . $f;
+	return flexicontent_images::phpThumbURL([
+		'src' => $src, 'w' => $wParam, 'h' => $hParam, 'aoe' => $aoe, 'q' => $q, 'ar' => $ar, 'zc' => $zc, 'f' => $f,
+	]);
 };
 
 // ---------------------------------------------------------------------------

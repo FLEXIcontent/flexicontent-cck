@@ -1089,6 +1089,14 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 			$body_css_time = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		}
 
+		/**
+		 * Sign phpThumb URLs that were not built via flexicontent_images::phpThumbURL() (custom templates, module
+		 * layouts, content), so that they keep working while phpThumb.php refuses unsigned URLs (high security mode)
+		 */
+		if ($app->isClient('site') && ComponentHelper::getParams('com_flexicontent')->get('phpthumb_sign_legacy_urls', 1)) {
+			$this->signLegacyPhpThumbURLs($app);
+		}
+
 		// If this is reached we now that the code for setting screen cookie has been added
 		if ($session->get('screenSizeCookieToBeAdded', 0, 'flexicontent')) {
 			$session->set('screenSizeCookieTried', 1, 'flexicontent');
@@ -1120,6 +1128,35 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 		}
 
 		return true;
+	}
+
+
+	/**
+	 * Add the signature to unsigned phpThumb URLs of the rendered page when phpThumb high security mode is on
+	 *
+	 * @param   \Joomla\CMS\Application\CMSApplication  $app
+	 * @return  void
+	 */
+	private function signLegacyPhpThumbURLs($app)
+	{
+		$body = $app->getBody();
+
+		if (!is_string($body) || strpos($body, 'phpThumb.php?') === false) {
+			return;
+		}
+
+		require_once(JPATH_SITE . '/components/com_flexicontent/classes/flexicontent.helper.php');
+
+		// Only needed when unsigned URLs are refused, otherwise the (unsigned) URLs work as they are
+		if (!flexicontent_images::phpThumbEnforced()) {
+			return;
+		}
+
+		$signed = flexicontent_images::phpThumbSignHtml($body);
+
+		if ($signed !== $body) {
+			$app->setBody($signed);
+		}
 	}
 
 
@@ -2059,6 +2096,36 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 			&& isset($table->element) && $table->element === 'com_flexicontent'
 		) {
 			$this->_switchUpdateChannel($table);
+
+			// Reflect the 'phpthumb_high_security' setting into the phpThumb configuration file managed by FLEXIcontent
+			$this->_syncPhpThumbConfig($table);
+		}
+	}
+
+
+	/**
+	 * Rewrite phpThumb.config_FLEXI.php (signing key, high security flag) after the component configuration was saved,
+	 * the just saved parameters are read from the table because ComponentHelper still holds the previous values
+	 *
+	 * @param   Table  $table  Table instance of the saved extension
+	 * @return  void
+	 */
+	private function _syncPhpThumbConfig($table)
+	{
+		try {
+			$params = $table->params instanceof \Joomla\Registry\Registry
+				? $table->params
+				: new \Joomla\Registry\Registry($table->params);
+
+			require_once(JPATH_SITE . '/components/com_flexicontent/classes/flexicontent.helper.php');
+
+			$result = flexicontent_images::phpThumbSyncConfig(false, (bool) $params->get('phpthumb_high_security', 0));
+
+			if ($result === false) {
+				Factory::getApplication()->enqueueMessage(Text::sprintf('FLEXI_PHPTHUMB_KEY_FILE_NOT_WRITABLE', flexicontent_images::phpThumbManagedFile()), 'warning');
+			}
+		} catch (\Throwable $e) {
+			Factory::getApplication()->enqueueMessage('phpThumb configuration: ' . $e->getMessage(), 'warning');
 		}
 	}
 
