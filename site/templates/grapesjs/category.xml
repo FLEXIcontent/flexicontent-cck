@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+	<author>FLEXIcontent Team</author>
+	<website>www.flexicontent.org</website>
+	<email>info@flexicontent.org</email>
+	<license>GPLv3</license>
+	<version>2</version>
+	<release>09 09 2026</release>
+	<microdata_support>0</microdata_support>
+
+	<defaulttitle>GrapesJS Category Layout</defaulttitle>
+	<description>Category layout edited with the FlexiContent Layout Builder (GrapesJS): design ONE item card, replicated in a grid for every item of the category loop, resolving flexi_field / flexi_link / flexi_item placeholders at runtime</description>
+
+	<fields name="attribs">
+		<fieldset name="attribs" addfieldpath="/administrator/components/com_flexicontent/elements">
+
+			<field name="params_builder_info" type="separator" cssprep="1" not_inherited="1" default="Layout Builder (GrapesJS)" description="You are designing ONE item (card); it will be replicated for each item of the category loop." level="level2" class="alert alert-info" />
+
+			<field name="builder_enabled" type="radio" not_inherited="1" default="1" filter="int" label="Enable the Layout Builder rendering" description="When disabled (or before any layout is designed) a minimal title list is displayed instead." class="btn-group">
+				<option value="1">JYES</option>
+				<option value="0">JNO</option>
+			</field>
+
+			<field name="builder_layout1" type="fclayoutbuilder" default="" label="Layout builder" description="" class=""
+				not_inherited="1"
+				editor_sfx="builder_layout1"
+				lessfile="components/com_flexicontent/builder/less/builder_layout1_{{folder}}cat.less"
+			/>
+			<field name="builder_layout1_html" type="textarea" filter="raw" readonly="readonly" rows="2" default="" label="HTML" description="" class="input-xxlarge" not_inherited="1"/>
+			<field name="builder_layout1_js" type="hidden" filter="raw" default="" label="JS" description="" class="" not_inherited="1" />
+			<field name="builder_layout1_css" type="textarea" readonly="readonly" filter="raw" rows="2" default="" label="CSS" description="" class="input-xxlarge" not_inherited="1" />
+			<field name="builder_layout1_data" type="hidden" filter="raw" default="" label="Project data" description="" class="" not_inherited="1"/>
+			<field name="builder_layout1_hash" type="hidden" filter="JHtmlFclayoutbuilder::createUrlHash" default="" label="Hash" description="" class="" not_inherited="1" />
+			<field name="builder_layout1_less" type="hidden" filter="JHtmlFclayoutbuilder::prepareLess" default="components/com_flexicontent/builder/less/builder_layout1_{{folder}}cat" label="LESS" description="" class="" not_inherited="1" />
+
+			<field name="builder_grid_info" type="separator" cssprep="1" not_inherited="1" default="Replication grid" description="Controls the grid in which the designed card is replicated (category pages)." level="level2" class="alert alert-info" />
+
+			<field name="cat_builder_cols_desktop" type="text" filter="int" default="3" not_inherited="1" label="Columns on desktop" description="Number of columns of the card grid on desktop screens." class="input-mini" />
+			<field name="cat_builder_cols_tablet" type="text" filter="int" default="2" not_inherited="1" label="Columns on tablet" description="Number of columns of the card grid on tablet screens (&lt;= 991px)." class="input-mini" />
+			<field name="cat_builder_cols_mobile" type="text" filter="int" default="1" not_inherited="1" label="Columns on mobile" description="Number of columns of the card grid on mobile screens (&lt;= 575px)." class="input-mini" />
+			<field name="cat_builder_gap" type="text" default="32px" not_inherited="1" label="Gap between cards" description="Space between the replicated cards, any CSS length (ex: 24px, 1.5rem)." class="input-mini" />
+
+		</fieldset>
+	</fields>
+
+	<fieldgroups>
+
+		<group posrow="subtitle" tcolor="darkcyan" title="After Title row 1">subtitle1</group>
+		<group posrow="subtitle" tcolor="darkcyan" title="After Title row 2">subtitle2</group>
+		<group posrow="subtitle" tcolor="darkcyan" title="After Title row 3">subtitle3</group>
+
+		<group posrow="img_top" tcolor="#3A2459" title="Top">top</group>
+		<group tcolor="#000000" title="Description">description</group>
+
+		<group tcolor="#6C1A10" title="Bottom">bottom</group>
+
+		<group tcolor="darkgray" title="Render only, no display">renderonly</group>
+
+	</fieldgroups>
+
+</form>

@@ -6576,32 +6576,45 @@ class flexicontent_html
 		$layout_name = !empty($options['layout_name']) ? $options['layout_name'] : 'builder_layout1';
 		$css_prefix  = isset($options['css_prefix']) ? $options['css_prefix'] : '#flexicontent';
 		$css_id      = !empty($options['css_id']) ? $options['css_id'] : ($params->get('ilayout', 'grapesjs'));
+		// Token values / field-rendering context (the item layout defaults are preserved:
+		// a category list layout passes 'template_name' => <clayout>cat and 'view' => 'category')
+		$template_name = !empty($options['template_name']) ? $options['template_name'] : $params->get('ilayout', 'grapesjs');
+		$view          = !empty($options['view']) ? $options['view'] : FLEXI_ITEMVIEW;
 		$location    = '/components/com_flexicontent/builder/';
 
-		// 1. Compile (if not done already) the layout CSS, scoped by css_prefix, then load it
-		\Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
-		\Joomla\CMS\HTML\HTMLHelper::_('fclayoutbuilder.createCss',
-			(object) array('id' => $css_id),
-			$params,
-			(object) array(
-				'location'    => $location,
-				'css_prefix'  => $css_prefix,
-				'layout_name' => $layout_name,
-				'id'          => $css_id,
-			)
-		);
-		flexicontent_html::loadframework('grapesjs_view');
-		// Layout URL hash used as CSS file version (cache-buster). Fall back to a
-		// content-based hash for layouts saved before the hash gets populated.
-		$layout_hash = (string) $params->get($layout_name . '_hash');
-		if ($layout_hash === '')
+		// 1. Compile (if not done already) the layout CSS, scoped by css_prefix, then load it.
+		// Guarded per layout/css id: a category list calls this once per item of the loop,
+		// only the first call must compile the LESS and register the assets.
+		static $fcl_builder_assets = array();
+		$asset_key = $layout_name . '_' . $css_id;
+		if (empty($fcl_builder_assets[$asset_key]))
 		{
-			$layout_hash = md5((string) $params->get($layout_name . '_css'));
+			$fcl_builder_assets[$asset_key] = true;
+
+			\Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
+			\Joomla\CMS\HTML\HTMLHelper::_('fclayoutbuilder.createCss',
+				(object) array('id' => $css_id),
+				$params,
+				(object) array(
+					'location'    => $location,
+					'css_prefix'  => $css_prefix,
+					'layout_name' => $layout_name,
+					'id'          => $css_id,
+				)
+			);
+			flexicontent_html::loadframework('grapesjs_view');
+			// Layout URL hash used as CSS file version (cache-buster). Fall back to a
+			// content-based hash for layouts saved before the hash gets populated.
+			$layout_hash = (string) $params->get($layout_name . '_hash');
+			if ($layout_hash === '')
+			{
+				$layout_hash = md5((string) $params->get($layout_name . '_css'));
+			}
+			\Joomla\CMS\Factory::getApplication()->getDocument()->addStyleSheet(
+				\Joomla\CMS\Uri\Uri::base(true) . $location . 'css/' . $layout_name . '_' . $css_id . '.css',
+				array('version' => $layout_hash)
+			);
 		}
-		\Joomla\CMS\Factory::getApplication()->getDocument()->addStyleSheet(
-			\Joomla\CMS\Uri\Uri::base(true) . $location . 'css/' . $layout_name . '_' . $css_id . '.css',
-			array('version' => $layout_hash)
-		);
 
 		// 2. Make element IDs unique per item, so that multiple items can coexist on a page
 		$matches = null;
@@ -6619,7 +6632,7 @@ class flexicontent_html
 		$html = str_replace('{{fc-item-id}}', $item->id, $html);
 		$html = str_replace('%item_id%',      $item->id, $html);
 		$html = str_replace('%user_id%',      (int) \Joomla\CMS\Factory::getApplication()->getIdentity()->id, $html);
-		$html = str_replace('%template_name%', $params->get('ilayout', 'grapesjs'), $html);
+		$html = str_replace('%template_name%', $template_name, $html);
 
 		// 4. Resolve field placeholders: {flexi_field:field_name  item:122|current  method:display}
 		//    NB: the FC item MODEL loads fields without running FlexicontentFields::getFields(),
@@ -6638,7 +6651,7 @@ class flexicontent_html
 			{
 				try
 				{
-					FlexicontentFields::getFields($item, FLEXI_ITEMVIEW, null, null, false);
+					FlexicontentFields::getFields($item, $view, null, null, false);
 				}
 				catch (\Throwable $e)
 				{
@@ -6648,7 +6661,7 @@ class flexicontent_html
 		}
 
 		$html = preg_replace_callback('~\{flexi_field:([a-z0-9_-]+)\s*([^}]*)\}~i',
-			function($m) use ($item)
+			function($m) use ($item, $view)
 			{
 				// Prefer the already pre-rendered display, if any
 				if (isset($item->fields[$m[1]]))
@@ -6670,7 +6683,7 @@ class flexicontent_html
 				{
 					try
 					{
-						return trim((string) FlexicontentFields::getFieldDisplay($item, $m[1], null, 'display', FLEXI_ITEMVIEW));
+						return trim((string) FlexicontentFields::getFieldDisplay($item, $m[1], null, 'display', $view));
 					}
 					catch (\Throwable $e)
 					{

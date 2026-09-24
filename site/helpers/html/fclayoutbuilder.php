@@ -48,12 +48,20 @@ abstract class JHtmlFclayoutbuilder
 	 */
 	public static function createCss($module, $params, $config)
 	{
-		static $cnt = -1;
+		// One-shot per request, per layout/css id: a category list calls this once per item
+		// of the loop and only the first call may rewrite / recompile the LESS (each call
+		// would also advance the keyframes counter, making the compiled CSS unstable).
+		static $cnt           = -1;
+		static $fcl_css_built = array();
+		$css_id      = isset($config->id) && $config->id !== '' ? $config->id : $module->id;
+		$layout_name = $config->layout_name;
+		$build_key   = $layout_name . '_' . $css_id;
+		if (isset($fcl_css_built[$build_key])) return;
+		$fcl_css_built[$build_key] = true;
 		$cnt++;
-		
+
 		$path        = \Joomla\Filesystem\Path::clean(JPATH_ROOT . $config->location);
 		$css_prefix  = $config->css_prefix;
-		$layout_name = $config->layout_name;
 
 		flexicontent_html::loadframework('sabberworm');
 		$oCssParser = new \Sabberworm\CSS\Parser($params->get($layout_name . '_css'));
@@ -87,7 +95,6 @@ abstract class JHtmlFclayoutbuilder
 		$less_code  = str_replace($css_prefix . ' body', $css_prefix, $less_code);
 
 		//echo '<pre>' . $less_code . '</pre>';
-		$css_id     = isset($config->id) && $config->id !== '' ? $config->id : $module->id;
 		$less_file  = 'less/' . $layout_name . '_' . $css_id . '.less';
 		$less_path  = \Joomla\Filesystem\Path::clean($path . $less_file);
 
