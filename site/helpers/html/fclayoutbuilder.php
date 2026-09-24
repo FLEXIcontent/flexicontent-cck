@@ -300,7 +300,7 @@ abstract class JHtmlFclayoutbuilder
 	/**
 	 * Collect the block-scoped link style rules (.classname a) of a component tree.
 	 */
-	protected static function _collectLinkRules($comp, &$rules)
+	protected static function _collectLinkRules($comp, &$rules, $parent = null)
 	{
 		if (is_array($comp) && !empty($comp['attributes']) && is_array($comp['attributes']))
 		{
@@ -342,18 +342,34 @@ abstract class JHtmlFclayoutbuilder
 					if ($cssprop === 'font-size' && preg_match('/^\d+(\.\d+)?$/', $v) === 1) $v .= 'px';
 					if ($v !== '') $props .= $cssprop . ':' . $v . ';';
 				}
-				if ($props !== '')
+				// The styled block can sit in three positions relative to the link(s):
+				//  - as a normal container with anchors inside it  ->  BASE a
+				//  - the block itself IS the <a> element           ->  BASE
+				//  - the block is wrapped by a manual <a href>     ->  a:has(BASE)
+				$typeTags = array('image' => 'img', 'video' => 'iframe', 'map' => 'iframe', 'link' => 'a', 'text' => 'div');
+				$tag = isset($comp['type'], $typeTags[$comp['type']]) ? $typeTags[$comp['type']] : (isset($comp['tagName']) && $comp['tagName'] !== '' ? $comp['tagName'] : '');
+				$tag = strtolower((string) $tag);
+				$ptag = '';
+				if (is_array($parent))
 				{
-					$rules[] = $base . ' a{' . $props . '}';
+					$ptag = isset($parent['type'], $typeTags[$parent['type']]) ? $typeTags[$parent['type']] : (isset($parent['tagName']) && $parent['tagName'] !== '' ? $parent['tagName'] : '');
+					$ptag = strtolower((string) $ptag);
 				}
-				$hv = isset($a['data-fc-linkstyles-hover']) && $a['data-fc-linkstyles-hover'] !== '' ? $a['data-fc-linkstyles-hover'] : (isset($s['data-fc-linkstyles-hover']) ? $s['data-fc-linkstyles-hover'] : '');
-				$hv = str_replace(array(';', '{', '}'), '', trim((string) $hv));
-				if ($hv !== '') $rules[] = $base . ' a:hover{color:' . $hv . ';}';
+				$sels = array($base . ' a');
+				if ($tag === 'a') $sels[] = $base;
+				elseif ($ptag === 'a') $sels[] = 'a:has(' . $base . ')';
+				foreach ($sels as $sel)
+				{
+					if ($props !== '') $rules[] = $sel . '{' . $props . '}';
+					$hv = isset($a['data-fc-linkstyles-hover']) && $a['data-fc-linkstyles-hover'] !== '' ? $a['data-fc-linkstyles-hover'] : (isset($s['data-fc-linkstyles-hover']) ? $s['data-fc-linkstyles-hover'] : '');
+					$hv = str_replace(array(';', '{', '}'), '', trim((string) $hv));
+					if ($hv !== '') $rules[] = $sel . ':hover{color:' . $hv . ';}';
+				}
 			}
 		}
 		if (is_array($comp) && !empty($comp['components']) && is_array($comp['components']))
 		{
-			foreach ($comp['components'] as $ch) self::_collectLinkRules($ch, $rules);
+			foreach ($comp['components'] as $ch) self::_collectLinkRules($ch, $rules, $comp);
 		}
 	}
 
@@ -2907,7 +2923,7 @@ editor.on(\'load\', function()
 				if (doc && doc.head)
 				{
 					var rules = [];
-					var walk = function(comp)
+					var walk = function(comp, par)
 					{
 						if (!comp || typeof comp.get !== \'function\') return;
 						// Accept the value whether it landed in attributes or in the style map.
@@ -2936,17 +2952,32 @@ editor.on(\'load\', function()
 						if (!base && key) base = \'[data-fc-links="\' + key + \'"]\';
 						if (base)
 						{
-							var sel = base + \' a\';
+							// Mirror the PHP _collectLinkRules: style descendant anchors, plus
+							// the block itself when it IS an <a>, or the wrapping <a> when the
+							// block is nested inside a manual link.
+							var tagOf = function(c)
+							{
+								var el = c.getEl ? c.getEl() : null;
+								if (el) return String(el.tagName).toLowerCase();
+								return String(c.get(\'tagName\') || (c.get(\'type\') === \'link\' ? \'a\' : \'div\')).toLowerCase();
+							};
+							var tag = tagOf(comp);
+							var sels = [base + \' a\'];
+							if (tag === \'a\') sels.push(base);
+							else if (par) { var pTag = tagOf(par); if (pTag === \'a\') sels.push(\'a:has(\' + base + \')\'); }
 							var props = \'\';
 							if (gv(\'data-fc-linkstyles-color\') !== \'\')  props += \'color:\' + gv(\'data-fc-linkstyles-color\') + \';\';
 							if (gv(\'data-fc-linkstyles-size\') !== \'\')   props += \'font-size:\' + gv(\'data-fc-linkstyles-size\') + \';\';
 							if (gv(\'data-fc-linkstyles-weight\') !== \'\') props += \'font-weight:\' + gv(\'data-fc-linkstyles-weight\') + \';\';
 							if (gv(\'data-fc-linkstyles-deco\') !== \'\')   props += \'text-decoration:\' + gv(\'data-fc-linkstyles-deco\') + \';\';
-							if (props) rules.push(sel + \'{\' + props + \'}\');
-							if (gv(\'data-fc-linkstyles-hover\') !== \'\') rules.push(sel + \':hover{color:\' + gv(\'data-fc-linkstyles-hover\') + \';}\');
+							for (var y = 0; y < sels.length; y++)
+							{
+								if (props) rules.push(sels[y] + \'{\' + props + \'}\');
+								if (gv(\'data-fc-linkstyles-hover\') !== \'\') rules.push(sels[y] + \':hover{color:\' + gv(\'data-fc-linkstyles-hover\') + \';}\');
+							}
 						}
 						var children = comp.components && comp.components();
-						if (children) children.each(function(c) { walk(c); });
+						if (children) children.each(function(c) { walk(c, comp); });
 					};
 					if (editor.getWrapper) walk(editor.getWrapper());
 					var st = doc.getElementById(\'fcl-canvas-links\');
