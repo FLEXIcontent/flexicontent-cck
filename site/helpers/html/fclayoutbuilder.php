@@ -195,6 +195,11 @@ abstract class JHtmlFclayoutbuilder
 		$project = is_string($data) ? json_decode($data, true) : null;
 		if (!is_array($project) || empty($project['pages'])) return $out;
 
+		// First frame of the first page: source of the component tree
+		$page0   = $project['pages'][0];
+		$frame0  = !empty($page0['frames'][0]) ? $page0['frames'][0] : array();
+		$wrapper = !empty($frame0['component']) ? $frame0['component'] : array();
+
 		// Collect the classes really used by the components: styling rules attached to
 		// unused classes (deleted components) must be skipped, exactly like the editor's
 		// CSS export (keepUsedStyles = false).
@@ -227,8 +232,15 @@ abstract class JHtmlFclayoutbuilder
 				$props = '';
 				if (!empty($rule['style']) && is_array($rule['style']))
 				{
-					foreach ($rule['style'] as $k => $v) $props .= $k . ':' . $v . ';';
+					foreach ($rule['style'] as $k => $v)
+					{
+						// data-fc-* keys are only Style Manager carriers for the block-scoped
+						// link styles (see _collectLinkRules), never valid CSS: skip them here
+						if (strpos($k, 'data-fc-') === 0) continue;
+						$props .= $k . ':' . $v . ';';
+					}
 				}
+				if ($props === '') continue;
 				$ruleText = '.' . implode('.', $names) . '{' . $props . '}';
 				if (!empty($rule['mediaText'])) $medias[$rule['mediaText']][] = $ruleText;
 				else $css .= $ruleText;
@@ -238,12 +250,17 @@ abstract class JHtmlFclayoutbuilder
 		{
 			$css .= '@media ' . $mediaText . '{' . implode('', $rules) . '}';
 		}
+
+		// Block-scoped link styles: a container styles all <a> inside it (color, size,
+		// weight, decoration) plus its hover color, scoped by the block\'s first class
+		// (.classname a) exactly like the canvas overlay, with a data-fc-links fallback.
+		$linkRules = array();
+		self::_collectLinkRules($wrapper, $linkRules);
+		$css .= implode('', $linkRules);
+
 		$out['css'] = $css;
 
 		// HTML: render the first frame of the first page, without the <body> wrapper
-		$page0   = $project['pages'][0];
-		$frame0  = !empty($page0['frames'][0]) ? $page0['frames'][0] : array();
-		$wrapper = !empty($frame0['component']) ? $frame0['component'] : array();
 		if (!empty($wrapper['components']) && is_array($wrapper['components']))
 		{
 			foreach ($wrapper['components'] as $comp)
@@ -275,6 +292,66 @@ abstract class JHtmlFclayoutbuilder
 	}
 
 	/**
+	 * Collect the block-scoped link style rules (.classname a) of a component tree.
+	 */
+	protected static function _collectLinkRules($comp, &$rules)
+	{
+		if (is_array($comp) && !empty($comp['attributes']) && is_array($comp['attributes']))
+		{
+			$a = $comp['attributes'];
+			// Scope by the block's first class so the rules match both the canvas overlay
+			// and the regenerated front-end markup; fall back to the data-fc-links
+			// attribute (auto-assigned by the editor) when the block has no class.
+			$base = '';
+			if (!empty($comp['classes']) && is_array($comp['classes']))
+			{
+				foreach ($comp['classes'] as $cl)
+				{
+					$n = is_array($cl) ? (isset($cl['name']) ? $cl['name'] : '') : $cl;
+					$n = str_replace(array(';', '{', '}', ' '), '', trim((string) $n));
+					if ($n !== '') { $base = '.' . $n; break; }
+				}
+			}
+			if ($base === '')
+			{
+				$key = isset($a['data-fc-links']) ? trim((string) $a['data-fc-links']) : '';
+				if ($key !== '') $base = '[data-fc-links="' . $key . '"]';
+			}
+			if ($base !== '')
+			{
+				$s = !empty($comp['style']) && is_array($comp['style']) ? $comp['style'] : array();
+				$map = array(
+					'data-fc-linkstyles-color'  => 'color',
+					'data-fc-linkstyles-size'   => 'font-size',
+					'data-fc-linkstyles-weight' => 'font-weight',
+					'data-fc-linkstyles-deco'   => 'text-decoration',
+				);
+				$props = '';
+				foreach ($map as $attr => $cssprop)
+				{
+					$v = isset($a[$attr]) && $a[$attr] !== '' ? $a[$attr] : (isset($s[$attr]) && $s[$attr] !== '' ? $s[$attr] : '');
+					$v = str_replace(array(';', '{', '}'), '', trim((string) $v));
+					// The editor appends the unit via the Size property; a bare number that
+					// slipped through (e.g. old saves) is fixed up to px (font-size:133px).
+					if ($cssprop === 'font-size' && preg_match('/^\d+(\.\d+)?$/', $v) === 1) $v .= 'px';
+					if ($v !== '') $props .= $cssprop . ':' . $v . ';';
+				}
+				if ($props !== '')
+				{
+					$rules[] = $base . ' a{' . $props . '}';
+				}
+				$hv = isset($a['data-fc-linkstyles-hover']) && $a['data-fc-linkstyles-hover'] !== '' ? $a['data-fc-linkstyles-hover'] : (isset($s['data-fc-linkstyles-hover']) ? $s['data-fc-linkstyles-hover'] : '');
+				$hv = str_replace(array(';', '{', '}'), '', trim((string) $hv));
+				if ($hv !== '') $rules[] = $base . ' a:hover{color:' . $hv . ';}';
+			}
+		}
+		if (is_array($comp) && !empty($comp['components']) && is_array($comp['components']))
+		{
+			foreach ($comp['components'] as $ch) self::_collectLinkRules($ch, $rules);
+		}
+	}
+
+	/**
 	 * Render a single component into (X)HTML, mimicking the editor's model serialization.
 	 */
 	protected static function _renderComponent($comp)
@@ -295,7 +372,13 @@ abstract class JHtmlFclayoutbuilder
 
 		if (!empty($comp['attributes']) && is_array($comp['attributes']))
 		{
-			foreach ($comp['attributes'] as $k => $v) $attrs[$k] = (string) $v;
+			foreach ($comp['attributes'] as $k => $v)
+			{
+				// data-fc-linkstyles-* are only Style Manager carriers (see _collectLinkRules),
+				// never meant to reach the front-end markup
+				if (strpos($k, 'data-fc-linkstyles-') === 0) continue;
+				$attrs[$k] = (string) $v;
+			}
 		}
 		if (!empty($comp['classes']) && is_array($comp['classes']))
 		{
@@ -320,6 +403,9 @@ abstract class JHtmlFclayoutbuilder
 			foreach ($comp['style'] as $k => $v)
 			{
 				if ($v === '' || $v === null) continue;
+				// data-fc-* style keys are only Style Manager carriers for the block-scoped
+				// link styles (see _collectLinkRules), never valid inline CSS: skip them
+				if (strpos($k, 'data-fc-') === 0) continue;
 				$styleStr .= $k . ':' . $v . ';';
 			}
 			if ($styleStr !== '') $attrs['style'] = $styleStr;
@@ -1814,6 +1900,372 @@ editor.on(\'load\', function()
 				}
 			}
 
+			// Style Manager: replace the generic default sectors with a set tailored to
+			// the layout blocks (spacing, flex, typography, background, border & effects).
+			var fcl_sm_sectors = [
+				{
+					id: \'fcl-layout\',
+					name: \'Layout & Spacing\',
+					open: 1,
+					buildProps: [\'margin\', \'padding\'],
+					properties: [
+						{ name: \'Display\', property: \'display\', type: \'select\', defaults: \'block\',
+							options: [
+								{ value: \'block\', name: \'Block\' },
+								{ value: \'inline\', name: \'Inline\' },
+								{ value: \'inline-block\', name: \'Inline block\' },
+								{ value: \'flex\', name: \'Flex\' },
+								{ value: \'inline-flex\', name: \'Inline flex\' },
+								{ value: \'grid\', name: \'Grid\' },
+								{ value: \'inline-grid\', name: \'Inline grid\' },
+								{ value: \'none\', name: \'None\' },
+								{ value: \'contents\', name: \'Contents\' },
+							] },
+						{ name: \'Position\', property: \'position\', type: \'select\', defaults: \'static\',
+							options: [
+								{ value: \'static\', name: \'Static\' },
+								{ value: \'relative\', name: \'Relative\' },
+								{ value: \'absolute\', name: \'Absolute\' },
+								{ value: \'fixed\', name: \'Fixed\' },
+								{ value: \'sticky\', name: \'Sticky\' },
+							] },
+						{ name: \'Float\', property: \'float\', type: \'select\', defaults: \'none\',
+							options: [
+								{ value: \'none\', name: \'None\' },
+								{ value: \'left\', name: \'Left\' },
+								{ value: \'right\', name: \'Right\' },
+							] },
+						{ name: \'Width\', property: \'width\', type: \'number\', defaults: \'auto\', units: [\'px\', \'em\', \'rem\', \'%\'] },
+						{ name: \'Height\', property: \'height\', type: \'number\', defaults: \'auto\', units: [\'px\', \'em\', \'rem\', \'%\'] },
+						{ name: \'Min width\', property: \'min-width\', type: \'number\', defaults: \'0\', units: [\'px\', \'em\', \'rem\', \'%\'] },
+						{ name: \'Min height\', property: \'min-height\', type: \'number\', defaults: \'0\', units: [\'px\', \'em\', \'rem\', \'%\'] },
+						{ name: \'Max width\', property: \'max-width\', type: \'number\', defaults: \'none\', units: [\'px\', \'em\', \'rem\', \'%\'] },
+						{ name: \'Max height\', property: \'max-height\', type: \'number\', defaults: \'none\', units: [\'px\', \'em\', \'rem\', \'%\'] },
+						{ name: \'Box sizing\', property: \'box-sizing\', type: \'select\', defaults: \'content-box\',
+							options: [
+								{ value: \'content-box\', name: \'Content box\' },
+								{ value: \'border-box\', name: \'Border box\' },
+								{ value: \'inherit\', name: \'Inherit\' },
+							] },
+						{ name: \'Overflow\', property: \'overflow\', type: \'select\', defaults: \'visible\',
+							options: [
+								{ value: \'visible\', name: \'Visible\' },
+								{ value: \'hidden\', name: \'Hidden\' },
+								{ value: \'scroll\', name: \'Scroll\' },
+								{ value: \'auto\', name: \'Auto\' },
+							] },
+						{ name: \'Z-index\', property: \'z-index\', type: \'number\', defaults: \'auto\' },
+					],
+				},
+				{
+					id: \'fcl-flex\',
+					name: \'Flex Container\',
+					properties: [
+						{ name: \'Flex direction\', property: \'flex-direction\', type: \'select\', defaults: \'row\',
+							options: [
+								{ value: \'row\', name: \'Row\' },
+								{ value: \'row-reverse\', name: \'Row reverse\' },
+								{ value: \'column\', name: \'Column\' },
+								{ value: \'column-reverse\', name: \'Column reverse\' },
+							] },
+						{ name: \'Wrap\', property: \'flex-wrap\', type: \'select\', defaults: \'nowrap\',
+							options: [
+								{ value: \'nowrap\', name: \'No wrap\' },
+								{ value: \'wrap\', name: \'Wrap\' },
+								{ value: \'wrap-reverse\', name: \'Wrap reverse\' },
+							] },
+						{ name: \'Justify content\', property: \'justify-content\', type: \'select\', defaults: \'flex-start\',
+							options: [
+								{ value: \'flex-start\', name: \'Flex start\' },
+								{ value: \'flex-end\', name: \'Flex end\' },
+								{ value: \'center\', name: \'Center\' },
+								{ value: \'space-between\', name: \'Space between\' },
+								{ value: \'space-around\', name: \'Space around\' },
+								{ value: \'space-evenly\', name: \'Space evenly\' },
+							] },
+						{ name: \'Align items\', property: \'align-items\', type: \'select\', defaults: \'stretch\',
+							options: [
+								{ value: \'stretch\', name: \'Stretch\' },
+								{ value: \'flex-start\', name: \'Flex start\' },
+								{ value: \'flex-end\', name: \'Flex end\' },
+								{ value: \'center\', name: \'Center\' },
+								{ value: \'baseline\', name: \'Baseline\' },
+							] },
+						{ name: \'Align content\', property: \'align-content\', type: \'select\', defaults: \'stretch\',
+							options: [
+								{ value: \'stretch\', name: \'Stretch\' },
+								{ value: \'flex-start\', name: \'Flex start\' },
+								{ value: \'flex-end\', name: \'Flex end\' },
+								{ value: \'center\', name: \'Center\' },
+								{ value: \'space-between\', name: \'Space between\' },
+								{ value: \'space-around\', name: \'Space around\' },
+							] },
+						{ name: \'Gap\', property: \'gap\', type: \'number\', defaults: \'0px\', units: [\'px\', \'em\', \'rem\'] },
+					],
+				},
+				{
+					id: \'fcl-flex-item\',
+					name: \'Flex Item\',
+					properties: [
+						{ name: \'Flex grow\', property: \'flex-grow\', type: \'number\', defaults: \'0\' },
+						{ name: \'Flex shrink\', property: \'flex-shrink\', type: \'number\', defaults: \'1\' },
+						{ name: \'Flex basis\', property: \'flex-basis\', type: \'select\', defaults: \'auto\',
+							options: [
+								{ value: \'auto\', name: \'Auto\' },
+								{ value: \'0px\', name: \'0px\' },
+								{ value: \'25%\', name: \'25%\' },
+								{ value: \'33.33%\', name: \'33.33%\' },
+								{ value: \'50%\', name: \'50%\' },
+								{ value: \'66.66%\', name: \'66.66%\' },
+								{ value: \'75%\', name: \'75%\' },
+								{ value: \'100%\', name: \'100%\' },
+							] },
+						{ name: \'Align self\', property: \'align-self\', type: \'select\', defaults: \'auto\',
+							options: [
+								{ value: \'auto\', name: \'Auto\' },
+								{ value: \'stretch\', name: \'Stretch\' },
+								{ value: \'flex-start\', name: \'Flex start\' },
+								{ value: \'flex-end\', name: \'Flex end\' },
+								{ value: \'center\', name: \'Center\' },
+								{ value: \'baseline\', name: \'Baseline\' },
+							] },
+						{ name: \'Order\', property: \'order\', type: \'number\', defaults: \'0\' },
+					],
+				},
+				{
+					id: \'fcl-typography\',
+					name: \'Typography\',
+					properties: [
+						{ name: \'Color\', property: \'color\', type: \'color\', defaults: \'#000000\' },
+						{ name: \'Font size\', property: \'font-size\', type: \'number\', defaults: \'1rem\', units: [\'px\', \'rem\', \'em\', \'pt\', \'%\'] },
+						{ name: \'Font weight\', property: \'font-weight\', type: \'select\', defaults: \'normal\',
+							options: [
+								{ value: \'normal\', name: \'Normal\' },
+								{ value: \'bold\', name: \'Bold\' },
+								{ value: \'bolder\', name: \'Bolder\' },
+								{ value: \'lighter\', name: \'Lighter\' },
+								{ value: \'100\', name: \'100\' },
+								{ value: \'200\', name: \'200\' },
+								{ value: \'300\', name: \'300\' },
+								{ value: \'400\', name: \'400\' },
+								{ value: \'500\', name: \'500\' },
+								{ value: \'600\', name: \'600\' },
+								{ value: \'700\', name: \'700\' },
+								{ value: \'800\', name: \'800\' },
+								{ value: \'900\', name: \'900\' },
+							] },
+						{ name: \'Font style\', property: \'font-style\', type: \'select\', defaults: \'normal\',
+							options: [
+								{ value: \'normal\', name: \'Normal\' },
+								{ value: \'italic\', name: \'Italic\' },
+								{ value: \'oblique\', name: \'Oblique\' },
+							] },
+						{ name: \'Line height\', property: \'line-height\', type: \'number\', defaults: \'normal\', units: [\'px\', \'rem\', \'em\', \'%\'] },
+						{ name: \'Letter spacing\', property: \'letter-spacing\', type: \'number\', defaults: \'normal\', units: [\'px\', \'em\'] },
+						{ name: \'Text align\', property: \'text-align\', type: \'select\', defaults: \'inherit\',
+							options: [
+								{ value: \'inherit\', name: \'Inherit\' },
+								{ value: \'left\', name: \'Left\' },
+								{ value: \'center\', name: \'Center\' },
+								{ value: \'right\', name: \'Right\' },
+								{ value: \'justify\', name: \'Justify\' },
+								{ value: \'start\', name: \'Start\' },
+								{ value: \'end\', name: \'End\' },
+							] },
+						{ name: \'Text decoration\', property: \'text-decoration\', type: \'select\', defaults: \'none\',
+							options: [
+								{ value: \'none\', name: \'None\' },
+								{ value: \'underline\', name: \'Underline\' },
+								{ value: \'overline\', name: \'Overline\' },
+								{ value: \'line-through\', name: \'Line through\' },
+							] },
+						{ name: \'Text transform\', property: \'text-transform\', type: \'select\', defaults: \'none\',
+							options: [
+								{ value: \'none\', name: \'None\' },
+								{ value: \'capitalize\', name: \'Capitalize\' },
+								{ value: \'uppercase\', name: \'Uppercase\' },
+								{ value: \'lowercase\', name: \'Lowercase\' },
+							] },
+						{ name: \'White space\', property: \'white-space\', type: \'select\', defaults: \'normal\',
+							options: [
+								{ value: \'normal\', name: \'Normal\' },
+								{ value: \'nowrap\', name: \'No wrap\' },
+								{ value: \'pre\', name: \'Pre\' },
+								{ value: \'pre-wrap\', name: \'Pre wrap\' },
+								{ value: \'pre-line\', name: \'Pre line\' },
+								{ value: \'break-spaces\', name: \'Break spaces\' },
+							] },
+						{ name: \'Text shadow\', property: \'text-shadow\', type: \'composite\',
+							properties: [
+								{ name: \'Offset X\', property: \'text-shadow-x\', type: \'number\', defaults: \'0px\', units: [\'px\', \'em\', \'rem\'] },
+								{ name: \'Offset Y\', property: \'text-shadow-y\', type: \'number\', defaults: \'0px\', units: [\'px\', \'em\', \'rem\'] },
+								{ name: \'Blur\', property: \'text-shadow-blur\', type: \'number\', defaults: \'0px\', units: [\'px\', \'em\', \'rem\'] },
+								{ name: \'Color\', property: \'text-shadow-color\', type: \'color\', defaults: \'#000000\' },
+							] },
+						{ name: \'Link color\', property: \'data-fc-linkstyles-color\', type: \'color\', defaults: \'\' },
+						{ name: \'Link hover color\', property: \'data-fc-linkstyles-hover\', type: \'color\', defaults: \'\' },
+						{ name: \'Link font size\', property: \'data-fc-linkstyles-size\', type: \'number\', defaults: \'\', units: [\'px\', \'rem\', \'em\'] },
+						{ name: \'Link font weight\', property: \'data-fc-linkstyles-weight\', type: \'select\', defaults: \'\',
+							options: [
+								{ value: \'\', name: \'Default\' },
+								{ value: \'normal\', name: \'Normal\' },
+								{ value: \'bold\', name: \'Bold\' },
+								{ value: \'300\', name: \'300\' },
+								{ value: \'400\', name: \'400\' },
+								{ value: \'500\', name: \'500\' },
+								{ value: \'600\', name: \'600\' },
+								{ value: \'700\', name: \'700\' },
+								{ value: \'800\', name: \'800\' },
+							] },
+						{ name: \'Link decoration\', property: \'data-fc-linkstyles-deco\', type: \'select\', defaults: \'\',
+							options: [
+								{ value: \'\', name: \'Default\' },
+								{ value: \'none\', name: \'None\' },
+								{ value: \'underline\', name: \'Underline\' },
+								{ value: \'overline\', name: \'Overline\' },
+								{ value: \'line-through\', name: \'Line through\' },
+							] },
+					],
+				},
+				{
+					id: \'fcl-background\',
+					name: \'Background\',
+					properties: [
+						{ name: \'Background color\', property: \'background-color\', type: \'color\', defaults: \'transparent\' },
+						{ name: \'Background repeat\', property: \'background-repeat\', type: \'select\', defaults: \'no-repeat\',
+							options: [
+								{ value: \'no-repeat\', name: \'No repeat\' },
+								{ value: \'repeat\', name: \'Repeat\' },
+								{ value: \'repeat-x\', name: \'Repeat x\' },
+								{ value: \'repeat-y\', name: \'Repeat y\' },
+								{ value: \'space\', name: \'Space\' },
+								{ value: \'round\', name: \'Round\' },
+							] },
+						{ name: \'Background position\', property: \'background-position\', type: \'select\', defaults: \'top left\',
+							options: [
+								{ value: \'top left\', name: \'Top left\' },
+								{ value: \'top center\', name: \'Top center\' },
+								{ value: \'top right\', name: \'Top right\' },
+								{ value: \'center left\', name: \'Center left\' },
+								{ value: \'center center\', name: \'Center\' },
+								{ value: \'center right\', name: \'Center right\' },
+								{ value: \'bottom left\', name: \'Bottom left\' },
+								{ value: \'bottom center\', name: \'Bottom center\' },
+								{ value: \'bottom right\', name: \'Bottom right\' },
+							] },
+						{ name: \'Background size\', property: \'background-size\', type: \'select\', defaults: \'auto\',
+							options: [
+								{ value: \'auto\', name: \'Auto\' },
+								{ value: \'cover\', name: \'Cover\' },
+								{ value: \'contain\', name: \'Contain\' },
+								{ value: \'100%\', name: \'100%\' },
+								{ value: \'100% 100%\', name: \'Stretch\' },
+							] },
+						{ name: \'Background attachment\', property: \'background-attachment\', type: \'select\', defaults: \'scroll\',
+							options: [
+								{ value: \'scroll\', name: \'Scroll\' },
+								{ value: \'fixed\', name: \'Fixed\' },
+								{ value: \'local\', name: \'Local\' },
+							] },
+					],
+				},
+				{
+					id: \'fcl-border\',
+					name: \'Border & Effects\',
+					properties: [
+						{ name: \'Border width\', property: \'border-width\', type: \'composite\',
+							// Per-side border widths (same pattern as the padding/margin grids in
+							// GrapesJS Studio): native CSS sub-properties, so the canvas preview
+							// and the front-end inline styles both apply them directly.
+							properties: [
+								{ name: \'Top\', property: \'border-top-width\', type: \'number\', defaults: \'0px\', units: [\'px\', \'em\', \'rem\'] },
+								{ name: \'Right\', property: \'border-right-width\', type: \'number\', defaults: \'0px\', units: [\'px\', \'em\', \'rem\'] },
+								{ name: \'Bottom\', property: \'border-bottom-width\', type: \'number\', defaults: \'0px\', units: [\'px\', \'em\', \'rem\'] },
+								{ name: \'Left\', property: \'border-left-width\', type: \'number\', defaults: \'0px\', units: [\'px\', \'em\', \'rem\'] },
+							] },
+						{ name: \'Border style\', property: \'border-style\', type: \'select\', defaults: \'none\',
+							options: [
+								{ value: \'none\', name: \'None\' },
+								{ value: \'solid\', name: \'Solid\' },
+								{ value: \'dashed\', name: \'Dashed\' },
+								{ value: \'dotted\', name: \'Dotted\' },
+								{ value: \'double\', name: \'Double\' },
+								{ value: \'groove\', name: \'Groove\' },
+								{ value: \'ridge\', name: \'Ridge\' },
+								{ value: \'inset\', name: \'Inset\' },
+								{ value: \'outset\', name: \'Outset\' },
+							] },
+						{ name: \'Border color\', property: \'border-color\', type: \'color\', defaults: \'#000000\' },
+						{ name: \'Border radius\', property: \'border-radius\', type: \'number\', defaults: \'0px\', units: [\'px\', \'em\', \'rem\', \'%\'] },
+						{ name: \'Opacity\', property: \'opacity\', type: \'number\', defaults: \'1\' },
+						{ name: \'Cursor\', property: \'cursor\', type: \'select\', defaults: \'default\',
+							options: [
+								{ value: \'default\', name: \'Default\' },
+								{ value: \'pointer\', name: \'Pointer\' },
+								{ value: \'move\', name: \'Move\' },
+								{ value: \'text\', name: \'Text\' },
+								{ value: \'grab\', name: \'Grab\' },
+								{ value: \'crosshair\', name: \'Crosshair\' },
+								{ value: \'help\', name: \'Help\' },
+								{ value: \'wait\', name: \'Wait\' },
+								{ value: \'zoom-in\', name: \'Zoom in\' },
+							] },
+						{ name: \'Pointer events\', property: \'pointer-events\', type: \'select\', defaults: \'auto\',
+							options: [
+								{ value: \'auto\', name: \'Auto\' },
+								{ value: \'none\', name: \'None\' },
+							] },
+					],
+				},
+			];
+
+			function fcl_configureStyleManager()
+			{
+				var sm = editor.StyleManager;
+				// The core/preset default sectors are generic; replace them all with ours.
+				// This runs on every editor load, so it is idempotent (reset clears first).
+				var s = sm.getSectors();
+				s.reset();
+				var i;
+				for (i = 0; i < fcl_sm_sectors.length; i++)
+				{
+					sm.addSector(fcl_sm_sectors[i].id, fcl_sm_sectors[i]);
+				}
+				// data-fc-linkstyles-* are not real CSS properties, so GrapesJS silently skips
+				// their style write. Instead each value is persisted as an ATTRIBUTE on the
+				// selected component (the source of truth for the canvas overlay and the
+				// front-end rules generated by _collectLinkRules). The StyleManager emits
+				// \'style:property:update\' for ANY property change (whatever its CSS validity,
+				// and regardless of the lazily created property models), carrying the Property
+				// model and its value: this is the reliable hook.
+				editor.on(\'style:property:update\', function(ev)
+				{
+					var prop = ev && ev.property ? ev.property : null;
+					if (!prop || typeof prop.get !== \'function\') return;
+					var pname = prop.get(\'property\') || \'\';
+					if (String(pname).indexOf(\'data-fc-linkstyles-\') !== 0) return;
+					var val = \'\';
+					try { val = prop.getValue ? prop.getValue() : \'\'; } catch (e) {}
+					// The Size property is a number: GrapesJS stores the value and its unit
+					// separately, so append the unit here (font-size:133px, never font-size:133).
+					var unit = prop.get && typeof prop.get === \'function\' ? prop.get(\'unit\') : \'\';
+					if (pname === \'data-fc-linkstyles-size\' && unit && String(val) !== \'\' && String(val).indexOf(unit) === -1)
+					{
+						val = String(val) + String(unit);
+					}
+					var target = null;
+					try { target = sm.getTarget ? sm.getTarget() : null; } catch (e) {}
+					if (!target && typeof editor.getSelected === \'function\') target = editor.getSelected();
+					if (target && typeof target.addAttributes === \'function\')
+					{
+						var _o = {};
+						_o[pname] = String(val);
+						target.addAttributes(_o);
+					}
+					fcl_ensureCanvasLinkStyles();
+				});
+			}
+
 			function saveToForm()
 			{
 				// The GrapesJS project JSON is the single source of truth for the layout.
@@ -2028,11 +2480,6 @@ editor.on(\'load\', function()
 			var fcl_preview_cache  = {};
 			var fcl_preview_timer  = null;
 
-			if (fcl_preview_cfg && (!fcl_preview_cfg.item_id || fcl_preview_cfg.warn))
-			{
-				console.warn(\'fcl builder preview:\', fcl_preview_cfg.warn || \'no preview item selected\');
-			}
-
 			// Adopt the session-stored preview item when no item was chosen via the URL:
 			// the PHP config defaults item_id to the first recent item for display only,
 			// so the stored value has to override it (including the 0 = badges only case).
@@ -2235,6 +2682,74 @@ editor.on(\'load\', function()
 				}
 			}
 
+			var fcl_updating_link_styles = false;
+			function fcl_ensureCanvasLinkStyles()
+			{
+				// Rebuild the scoped link-style overlay for the canvas: the values live in the
+				// data-fc-linkstyles-* ATTRIBUTES (written by the Style Manager property models,
+				// see fcl_configureStyleManager) and a data-fc-links key (the ccid) anchors the
+				// scope on both canvas and front. Guarded so the key assignment does not
+				// re-enter this loop.
+				if (fcl_updating_link_styles) return;
+				fcl_updating_link_styles = true;
+				var doc = editor.Canvas.getDocument();
+				if (doc && doc.head)
+				{
+					var rules = [];
+					var walk = function(comp)
+					{
+						if (!comp || typeof comp.get !== \'function\') return;
+						// Accept the value whether it landed in attributes or in the style map.
+						var attrs = comp.getAttributes ? (comp.getAttributes() || {}) : {};
+						var style = comp.getStyle ? (comp.getStyle() || {}) : {};
+						var gv = function(n)
+						{
+							var v = attrs[n] !== undefined && attrs[n] !== null ? attrs[n] : (style[n] !== undefined && style[n] !== null ? style[n] : \'\');
+							return String(v);
+						};
+						var hasStyle = gv(\'data-fc-linkstyles-color\') !== \'\' || gv(\'data-fc-linkstyles-hover\') !== \'\' ||
+							gv(\'data-fc-linkstyles-size\') !== \'\' || gv(\'data-fc-linkstyles-weight\') !== \'\' || gv(\'data-fc-linkstyles-deco\') !== \'\';
+						var key = attrs[\'data-fc-links\'] ?
+							String(attrs[\'data-fc-links\']) : (style[\'data-fc-links\'] ? String(style[\'data-fc-links\']) : \'\');
+						if (hasStyle && !key && typeof comp.getId === \'function\')
+						{
+							key = comp.getId() || \'\';
+							if (key && typeof comp.addAttributes === \'function\') comp.addAttributes({ \'data-fc-links\': key });
+						}
+						// Scope by the block\'s first class (.classname a), the same selector the
+						// front-end CSS regenerates server-side; fall back to the data-fc-links
+						// attribute when the block carries no class.
+						var base = \'\';
+						var cls = comp.getClasses ? (comp.getClasses() || []) : [];
+						for (var x = 0; x < cls.length; x++) { if (cls[x]) { base = \'.\' + cls[x]; break; } }
+						if (!base && key) base = \'[data-fc-links="\' + key + \'"]\';
+						if (base)
+						{
+							var sel = base + \' a\';
+							var props = \'\';
+							if (gv(\'data-fc-linkstyles-color\') !== \'\')  props += \'color:\' + gv(\'data-fc-linkstyles-color\') + \';\';
+							if (gv(\'data-fc-linkstyles-size\') !== \'\')   props += \'font-size:\' + gv(\'data-fc-linkstyles-size\') + \';\';
+							if (gv(\'data-fc-linkstyles-weight\') !== \'\') props += \'font-weight:\' + gv(\'data-fc-linkstyles-weight\') + \';\';
+							if (gv(\'data-fc-linkstyles-deco\') !== \'\')   props += \'text-decoration:\' + gv(\'data-fc-linkstyles-deco\') + \';\';
+							if (props) rules.push(sel + \'{\' + props + \'}\');
+							if (gv(\'data-fc-linkstyles-hover\') !== \'\') rules.push(sel + \':hover{color:\' + gv(\'data-fc-linkstyles-hover\') + \';}\');
+						}
+						var children = comp.components && comp.components();
+						if (children) children.each(function(c) { walk(c); });
+					};
+					if (editor.getWrapper) walk(editor.getWrapper());
+					var st = doc.getElementById(\'fcl-canvas-links\');
+					if (!st)
+					{
+						st = doc.createElement(\'style\');
+						st.id = \'fcl-canvas-links\';
+						doc.head.appendChild(st);
+					}
+					st.textContent = rules.join(\'\');
+				}
+				fcl_updating_link_styles = false;
+			}
+
 			// Wire the toolbar item selector and keep the insert injection synced.
 			editor.on(\'load\', function()
 			{
@@ -2243,10 +2758,17 @@ editor.on(\'load\', function()
 				{
 					sel.addEventListener(\'change\', function() { fcSetPreviewItem(sel.value | 0); }, false);
 				}
+				fcl_configureStyleManager();
 				fcl_ensureCanvasInserts();
+				fcl_ensureCanvasLinkStyles();
 				fcSchedulePreviewRefresh(0);
 			});
 			editor.on(\'frame:load\', fcl_ensureCanvasInserts);
+			editor.on(\'frame:load\', fcl_ensureCanvasLinkStyles);
+			editor.on(\'component:update\', fcl_ensureCanvasLinkStyles);
+			editor.on(\'component:styleUpdate\', fcl_ensureCanvasLinkStyles);
+			editor.on(\'component:add\', fcl_ensureCanvasLinkStyles);
+			editor.on(\'component:remove\', fcl_ensureCanvasLinkStyles);
 
 			function fcl_opt_label(v)
 			{
@@ -2731,6 +3253,13 @@ editor.on(\'load\', function()
 				activate: true,
 				attributes: { class:\'fc-iblock fa fa-database\' },
 			});
+
+			function fcl_applyLinkTraits()
+			{
+				// Block-scoped link styles are driven by the Style Manager "Link styles"
+				// composite in the Typography sector (values stored in the component style map
+				// as data-fc-link* keys, with a data-fc-links anchor attribute). No traits here.
+			}
 
 
 			// --- Basic layout blocks: Section, Flex Row, pre-configured flex columns ---
