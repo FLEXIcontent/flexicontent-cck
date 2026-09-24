@@ -1035,6 +1035,11 @@ function fclayout_init_builder(editor_sfx, element_id)
 
 				avoidInlineStyle: false,
 
+				// Style changes are applied to the selected component itself (inline) instead
+				// of creating a new generated class/rule on every edit: one style identity per
+				// block. The classes exposed in the Selector Manager stay fully usable.
+				selectorManager: { componentFirst: true },
+
 				// Allow to move 
 				//dragMode: \'absolute\',
 
@@ -2320,6 +2325,154 @@ editor.on(\'load\', function()
 				});
 			}
 
+			/**
+			 * Clean-up of the auto-generated per-rule classes: GrapesJS creates a brand new
+			 * class + rule on each styling operation (c784, c810, ...), so a single block ends
+			 * up carrying many class names for basically the same styles. This walks the saved
+			 * project and, for each component holding several "generated" classes (matching
+			 * c<digits> and used by exactly ONE component), merges all its base rules back into
+			 * a single class + rule; state rules (:hover) and @media rules are preserved, their
+			 * class name is only rewritten. User classes (shared by >1 components) are never
+			 * touched. In-place mutation of the project object.
+			 */
+			function fcConsolidateProjectStyles(project)
+			{
+				if (!project || !Array.isArray(project.styles) || !Array.isArray(project.pages)) return project;
+				var styles = project.styles;
+
+				var users = {};
+				var all = [];
+				function walk(node)
+				{
+					if (!node) return;
+					var arr = node.classes;
+					if (Array.isArray(arr))
+					{
+						all.push(node);
+						for (var i = 0; i < arr.length; i++)
+						{
+							var s = arr[i];
+							var nmI = s && typeof s === \'object\' ? s.name : s;
+							if (nmI) users[nmI] = (users[nmI] || 0) + 1;
+						}
+					}
+					var kids = node.components;
+					if (Array.isArray(kids)) for (var j = 0; j < kids.length; j++) walk(kids[j]);
+				}
+				for (var p = 0; p < project.pages.length; p++)
+				{
+					var frs = project.pages[p].frames || [];
+					for (var f = 0; f < frs.length; f++) walk(frs[f].component);
+				}
+
+				var reGen = /^c\d+$/;
+				var closes = {};   // generated class -> { target }
+				var targets = {};  // retained target classes
+				for (var a = 0; a < all.length; a++)
+				{
+					var cls = all[a].classes;
+					var gens = [];
+					for (var c = 0; c < cls.length; c++)
+					{
+						var sC = cls[c];
+						var nmC = sC && typeof sC === \'object\' ? sC.name : sC;
+						if (nmC && reGen.test(nmC) && users[nmC] === 1) gens.push(nmC);
+					}
+					// Only consolidate components that accumulated >= 2 generated classes
+					if (gens.length > 1)
+					{
+						var tgt = gens[0];
+						targets[tgt] = 1;
+						for (var o = 1; o < gens.length; o++) closes[gens[o]] = tgt;
+					}
+				}
+				var closeKeys = Object.keys(closes);
+				if (!closeKeys.length) return project;
+
+				// Rewrite the component classes we just collapsed (keep first occurrence, dedupe)
+				for (var b = 0; b < all.length; b++)
+				{
+					var ncl = all[b].classes;
+					var out = [];
+					var seenCl = {};
+					for (var q = 0; q < ncl.length; q++)
+					{
+						var selQ = ncl[q];
+						var nmQ = selQ && typeof selQ === \'object\' ? selQ.name : selQ;
+						if (!nmQ) continue;
+						if (closes[nmQ]) nmQ = closes[nmQ];
+						if (seenCl[nmQ]) continue;
+						seenCl[nmQ] = 1;
+						if (selQ && typeof selQ === \'object\') selQ.name = nmQ;
+						else selQ = nmQ;
+						out.push(selQ);
+					}
+					ncl.length = 0;
+					for (var w = 0; w < out.length; w++) ncl.push(out[w]);
+				}
+
+				// Rewrite class references in the rules and merge pure base rules per target
+				var firstIdx = {};      // target -> index of its first base rule
+				var mergedStyle = {};   // target -> merged style object
+				var drop = {};          // indices of consumed base rules
+				var targetAt = {};      // index -> target to (re)emit a merged rule at
+				for (var r = 0; r < styles.length; r++)
+				{
+					var rule = styles[r];
+					if (!rule || !Array.isArray(rule.selectors)) continue;
+					var isBase = !rule.mediaText && !rule.state && !rule.atRuleType && !rule.selectorsAdd;
+					var pure = isBase;
+					var names = [];
+					for (var z = 0; z < rule.selectors.length; z++)
+					{
+						var selR = rule.selectors[z];
+						if (!selR || (selR.type && selR.type !== \'class\')) { pure = false; continue; }
+						var nn = selR.name || \'\';
+						if (closes[nn]) { selR.name = closes[nn]; nn = selR.name; }
+						names.push(nn);
+					}
+					if (!isBase) continue;
+					if (!pure || names.length !== 1 || !targets[names[0]]) continue;
+					// Nested @media / & selectors inside a style object cannot be merged
+					var st = rule.style || {};
+					var mergeable = true;
+					for (var sk in st)
+					{
+						if (sk.charAt(0) === \'@\' || sk.charAt(0) === \'&\') { mergeable = false; break; }
+					}
+					var tk = names[0];
+					if (firstIdx[tk] === undefined) { firstIdx[tk] = r; targetAt[r] = tk; }
+					if (mergeable)
+					{
+						mergedStyle[tk] = Object.assign(mergedStyle[tk] || {}, st);
+						drop[r] = 1;
+					}
+				}
+				var outS = [];
+				var pushedT = {};
+				for (var x = 0; x < styles.length; x++)
+				{
+					var tv = targetAt[x];
+					if (tv !== undefined)
+					{
+						if (!pushedT[tv])
+						{
+							outS.push({
+								selectors: [{ name: tv, type: \'class\' }],
+								style: mergedStyle[tv] || {},
+								mediaText: \'\', state: \'\', atRuleType: \'\', singleAtRule: false,
+							});
+							pushedT[tv] = 1;
+						}
+						continue;
+					}
+					if (drop[x]) continue;
+					outS.push(styles[x]);
+				}
+				project.styles = outS;
+				return project;
+			}
+
 			function saveToForm()
 			{
 				// The GrapesJS project JSON is the single source of truth for the layout.
@@ -2330,7 +2483,11 @@ editor.on(\'load\', function()
 				var project = null;
 				try { project = editor.getProjectData(); }
 				catch(e) { console.error(\'getProjectData error:\', e); }
-				if (project) fcl_setField(element_id + \'_data\', JSON.stringify(project));
+				if (project)
+				{
+					try { fcConsolidateProjectStyles(project); } catch(e) { console.warn(\'fcConsolidateProjectStyles error:\', e); }
+					fcl_setField(element_id + \'_data\', JSON.stringify(project));
+				}
 			}
 
 			// Ensure the layout fields are written when the Joomla form is submitted.
