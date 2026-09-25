@@ -140,6 +140,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		$csv_header       = $model->getState('csv_header');
 		$csv_raw_export   = $model->getState('csv_raw_export');
 		$csv_all_fields   = $model->getState('csv_all_fields');
+		$csv_zip_media    = $model->getState('csv_zip_media');
 
 		// Support for using 'ALL', 'ORPHAN' fake states, by clearing other values
 		if (is_array($filter_state) && in_array('ALL', $filter_state))     $filter_state = array('ALL');
@@ -1118,6 +1119,26 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				$elementid,
 				$translate = true
 			),
+		));
+
+
+		// Build CSV export add media files to ZIP checkbox
+		$fieldname = 'csv_zip_media';
+		$elementid = 'csv_zip_media';
+		$value     = $csv_zip_media;
+
+		$lists[$elementid] = $this->getFilterDisplay(array(
+			'label' => \Joomla\CMS\Language\Text::_('Add media files to ZIP'),
+			'label_extra_class' => $this->popover_class . ($value ? ' fc-lbl-inverted' : ''),
+			'label_extra_attrs' => array(
+				'data-placement' => 'bottom',
+				'data-content' => flexicontent_html::getToolTip('', 'Download a ZIP file containing the CSV file and the files of fields using the <b>Importable</b> rendered format: <br>- images inside folder fcimport_media <br>- local files inside folder fcimport_docs <br>Extract it inside the tmp folder of the target site before importing. Different files with same name are renamed, e.g. icon_2.webp', 0, 1),
+			),
+			'html' => '
+				<div class="group-fcset" style="display: inline-block;">
+					<input type="checkbox" id="'.$elementid.'" name="'.$fieldname.'" onchange="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform()" value="1" '.($value ? ' checked="checked" ' : '').' />
+					<label id="'.$elementid.'-lbl" for="'.$elementid.'" style="margin: 0 12px; vertical-align: middle; border: 0;"></label>
+				</div>',
 		));
 
 

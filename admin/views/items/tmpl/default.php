@@ -735,6 +735,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 						echo $this->lists['csv_header'];
 						echo $this->lists['csv_raw_export'];
 						echo $this->lists['csv_all_fields'];
+						echo $this->lists['csv_zip_media'];
 					}
 					?>
 
