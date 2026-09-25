@@ -81,13 +81,16 @@ class FlexicontentViewItems extends \Joomla\CMS\MVC\View\HtmlView
 			die('CSV export not enabled for this view');
 		}
 
-		$field_sep  = $cparams->get('csv_export_field_sep', 0);
+		// Field and item separators, expanding escape characters like '\n', '\t', e.g. \n~~ for an item separator compatible with the import tool
+		$field_sep  = $this->_expandEscapes($cparams->get('csv_export_field_sep', ',')) ?: ',';
+		$record_sep = $this->_expandEscapes($cparams->get('csv_export_item_record_sep', '\n')) ?: "\n";
 
 		// Check if current view is filtered by item type
 		$filter_type    = $model->getState('filter_type');
 		$csv_header     = $app->isClient('administrator') ? (int) $model->getState('csv_header') : (int) $cparams->get('csv_export_header', 1);
 		$csv_raw_export = $app->isClient('administrator') ? (int) $model->getState('csv_raw_export') : 2;
 		$csv_all_fields = $app->isClient('administrator') ? (int) $model->getState('csv_all_fields') : 2;
+		$csv_zip_media  = $app->isClient('administrator') ? (int) $model->getState('csv_zip_media') : 0;
 		$err_count      = 0;
 		$csv_header     = $csv_header === -1 ? (int) $cparams->get('csv_export_header', 1) : $csv_header;
 
@@ -120,6 +123,15 @@ class FlexicontentViewItems extends \Joomla\CMS\MVC\View\HtmlView
 			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('(Set this inside filters slider)'), 'warning');
 			$app->redirect($this->_getSafeReferer());
 		}
+
+		if ($csv_zip_media && !class_exists('ZipArchive'))
+		{
+			$app->enqueueMessage('Cannot add media files to ZIP: PHP extension "zip" (ZipArchive) is not installed on the server', 'warning');
+			$app->redirect($this->_getSafeReferer());
+		}
+
+		// Fields using the 'Importable' CSV format will register their media files for adding them to the ZIP file
+		flexicontent_csvmedia::$enabled = (bool) $csv_zip_media;
 
 		// Map of CORE to item properties
 		$core_props = array(
@@ -237,10 +249,21 @@ class FlexicontentViewItems extends \Joomla\CMS\MVC\View\HtmlView
 		header("Pragma: no-cache");
 		header("Cache-Control: no-cache");
 		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
-		header('Content-Encoding: UTF-8');
-		header('Content-type: text/csv; charset=UTF-8');
-		header('Content-Disposition: attachment; filename=EXPORT-'.rand().'.csv');
-		//header("Content-Transfer-Encoding: binary");
+
+		$export_name = 'EXPORT-' . rand();
+
+		// Buffer the CSV output, to add it to the ZIP file after all items are exported
+		if ($csv_zip_media)
+		{
+			ob_start();
+		}
+		else
+		{
+			header('Content-Encoding: UTF-8');
+			header('Content-type: text/csv; charset=UTF-8');
+			header('Content-Disposition: attachment; filename=' . $export_name . '.csv');
+			//header("Content-Transfer-Encoding: binary");
+		}
 		echo "\xEF\xBB\xBF"; // UTF-8 BOM
 
 
@@ -261,14 +284,9 @@ class FlexicontentViewItems extends \Joomla\CMS\MVC\View\HtmlView
 				continue;
 			}
 
-			echo $delim . $this->_encodeCSVField($csv_header === 1 ? $field->label : $field->name);
+			echo $delim . $this->_encodeCSVField($csv_header === 1 ? $field->label : $this->_importColumnName($field), $field_sep, $record_sep);
 			$delim = $field_sep;
 			$total_fields++;
-		}
-		if ($cparams->get("csv_export_item_record_sep", "\n") == '\n'){
-			echo "\n";
-		}else{
-			echo $cparams->get("csv_export_item_record_sep", "\n");
 		}
 
 
@@ -289,6 +307,9 @@ class FlexicontentViewItems extends \Joomla\CMS\MVC\View\HtmlView
 			{
 				// Zero unneeded search index text
 				$item->search_index = '';
+
+				// Item separator is added before every item (and not after the last one)
+				echo $record_sep;
 
 				$delim = '';
 
@@ -331,16 +352,29 @@ class FlexicontentViewItems extends \Joomla\CMS\MVC\View\HtmlView
 							: '';
 
 						// Smart strip HTML tags without cutting the text
-						if ($csv_strip_html)
+						// (skip for importable format, stripping would remove its {...} tags)
+						if ($csv_strip_html && $field->parameters->get('csv_export_format', 'html') !== 'importable')
 						{
 							$vals = flexicontent_html::striptagsandcut($vals);
 						}
 					}
 
+					// Description (core field 'text'): stored in the item's introtext / fulltext columns (not in the field values table)
+					// Join them with the readmore separator, the import tool splits the 'text' column back to introtext / fulltext
+					elseif ($field->iscore && $field->field_type === 'maintext')
+					{
+						$vals = $item->introtext . (strlen(trim($item->fulltext ?? '')) ? '<hr id="system-readmore" />' . $item->fulltext : '');
+					}
+
 					// CASE 2: CORE properties (special case), TODO: Implement this as "RENDERED value display" (and make it default output for them ?)
 					elseif ($field->iscore && isset($core_props[$field_name]))
 					{
-						if ($csv_raw_export === 2 && isset($item->$field_name))
+						// Tags and categories: comma separated ids, as expected by the import tool ('tags_raw' and 'cid' columns)
+						if ($field_name === 'tags' || $field_name === 'categories')
+						{
+							$vals = implode(',', array_map(function ($obj) { return (int) (is_object($obj) ? $obj->id : $obj); }, (array) $item->$field_name));
+						}
+						elseif ($csv_raw_export === 2 && isset($item->$field_name))
 						{
 							$vals = $item->$field_name;
 						}
@@ -362,6 +396,12 @@ class FlexicontentViewItems extends \Joomla\CMS\MVC\View\HtmlView
 					elseif (isset($item->fieldvalues[$field->id]))
 					{
 						$vals = $item->fieldvalues[$field->id];
+
+						// Weblink: use the multi-property format of the import tool, e.g. [-link-]=https://...!![-linktext-]=Some text
+						if ($field->field_type === 'weblink')
+						{
+							$vals = array_map(function ($v) use ($cparams) { return $this->_importMultiPropValue($v, $cparams->get('csv_export_field_mprop_sep', '!!')); }, (array) $vals);
+						}
 					}
 
 					// Make sure that $vals is array of strings
@@ -379,12 +419,7 @@ class FlexicontentViewItems extends \Joomla\CMS\MVC\View\HtmlView
 						}
 						$vals = $_vals;
 					}
-					echo $this->_encodeCSVField( is_array($vals) ? implode($cparams->get('csv_export_field_multivalue_sep', '%%'), $vals ) : $vals );
-				}
-				if ($cparams->get("csv_export_item_record_sep", "\n") == '\n'){
-					echo "\n";
-				}else{
-					echo $cparams->get("csv_export_item_record_sep", "\n");
+					echo $this->_encodeCSVField( is_array($vals) ? implode($cparams->get('csv_export_field_multivalue_sep', '%%'), $vals ) : $vals, $field_sep, $record_sep );
 				}
 			}
 
@@ -420,20 +455,143 @@ class FlexicontentViewItems extends \Joomla\CMS\MVC\View\HtmlView
 			//$app->enqueueMessage('Exported all items' ), 'warning');
 		}
 
+		if ($csv_zip_media)
+		{
+			$this->_outputZip($export_name, ob_get_clean());
+		}
+
 		// Need to exist here !! to avoid any other output
 		jexit();
 	}
 
 
-	protected function _encodeCSVField($string)
+	/**
+	 * Output a ZIP file containing the CSV file and the media files registered by the fields
+	 *
+	 * @param   string  $export_name  Name of the ZIP file and of the CSV file inside it (without extension)
+	 * @param   string  $csv          The CSV file contents
+	 */
+	protected function _outputZip($export_name, $csv)
 	{
-		if (strpos($string, ',') !== false || strpos($string, '"') !== false || strpos($string, "\n") !== false) 
+		$zip_path = \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getApplication()->get('tmp_path', JPATH_SITE . DS . 'tmp') . DS . $export_name . '.zip');
+
+		$zip = new ZipArchive();
+
+		if ($zip->open($zip_path, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true)
+		{
+			// Headers are already sent, only the CSV file can be given
+			header('Content-type: text/csv; charset=UTF-8');
+			header('Content-Disposition: attachment; filename=' . $export_name . '.csv');
+			echo $csv;
+			return;
+		}
+
+		$zip->addFromString($export_name . '.csv', $csv);
+
+		foreach (flexicontent_csvmedia::$files as $folder => $files)
+		{
+			foreach ($files as $name => $src_path)
+			{
+				$zip->addFile($src_path, $folder . '/' . $name);
+
+				// Images and archives are already compressed
+				$zip->setCompressionName($folder . '/' . $name, ZipArchive::CM_STORE);
+			}
+		}
+
+		if (flexicontent_csvmedia::$missing)
+		{
+			$zip->addFromString('missing_files.txt', "Files not found on the server:\n" . implode("\n", array_keys(flexicontent_csvmedia::$missing)) . "\n");
+		}
+
+		$zip->close();
+
+		header('Content-type: application/zip');
+		header('Content-Disposition: attachment; filename=' . $export_name . '.zip');
+		header('Content-Length: ' . filesize($zip_path));
+		readfile($zip_path);
+
+		@unlink($zip_path);
+	}
+
+
+	/**
+	 * Enclose a value in double quotes when it contains the field or item separator
+	 * For standard CSV (comma separator), also when it contains double quotes or new lines
+	 * With multi-character separators e.g. ~~ and \n~~ values are normally not enclosed, thus the import tool needs no enclosure character
+	 */
+	protected function _encodeCSVField($string, $field_sep = ',', $record_sep = "\n")
+	{
+		$string = (string) $string;
+
+		if (strpos($string, $field_sep) !== false || strpos($string, $record_sep) !== false
+			|| ($field_sep === ',' && (strpos($string, '"') !== false || strpos($string, "\n") !== false)))
 		{
 			$string = '"' . str_replace('"', '""', $string) . '"';
 		}
 
 		//return mb_convert_encoding($string, 'UTF-16LE', 'UTF-8');
 		return $string;
+	}
+
+
+	/**
+	 * Convert a serialized multi-property value to the multi-property format of the import tool,
+	 * e.g. [-link-]=https://...!![-linktext-]=Some text, adding only non-empty properties (hits are counted per site, thus skipped)
+	 */
+	protected function _importMultiPropValue($value, $mprop_sep)
+	{
+		$array = flexicontent_db::unserialize_array($value, $force_array = false, $force_value = false);
+
+		if (!is_array($array))
+		{
+			return $value;
+		}
+
+		$props = array();
+
+		foreach ($array as $name => $propval)
+		{
+			if ($name !== 'hits' && is_scalar($propval) && strlen((string) $propval))
+			{
+				$props[] = '[-' . $name . '-]=' . $propval;
+			}
+		}
+
+		return implode($mprop_sep, $props);
+	}
+
+
+	/**
+	 * Column name of a field, using the column names expected by the import tool for fields whose name differs
+	 */
+	protected function _importColumnName($field)
+	{
+		if ($field->iscore && $field->name === 'tags')
+		{
+			return 'tags_raw';    // Comma separated tag ids
+		}
+
+		if ($field->iscore && $field->name === 'categories')
+		{
+			return 'cid';         // Comma separated category ids (secondary categories, the main category may also be included)
+		}
+
+		if ($field->field_type === 'coreprops' && $field->parameters->get('props_type', '') === 'category')
+		{
+			return 'catid';       // Main category id
+		}
+
+		return $field->name;
+	}
+
+
+	/**
+	 * Expand escape characters of a separator given in configuration, e.g. '\n~~' to a new line followed by ~~
+	 */
+	protected function _expandEscapes($string)
+	{
+		return strtr((string) $string, array('\n' => "\n", '\r' => "\r", '\t' => "\t"));
 	}
 
 
