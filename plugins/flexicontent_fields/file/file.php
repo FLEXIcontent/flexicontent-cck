@@ -978,6 +978,34 @@ class plgFlexicontent_fieldsFile extends FCField
 			return;
 		}
 
+		// CSV export in a format that the batch import tool can read back (see onBeforeSaveField)
+		if ($prop === 'csv_export' && $field->parameters->get('csv_export_format', 'html') === 'importable')
+		{
+			$field->{$prop} = array();
+
+			foreach ($this->getFileData($values, $published = true) as $file_data)
+			{
+				// Add local file to the ZIP file of the CSV export (if enabled), this may rename the file
+				$filename = $file_data->url ? $file_data->filename : flexicontent_csvmedia::add(
+					'fcimport_docs',
+					($file_data->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH) . DS . $file_data->filename,
+					$file_data->filename
+				);
+
+				$field->{$prop}[] = ($file_data->url ? '{URL}' . $filename . '{/URL}' : $filename)
+					. '{Altname}' . $file_data->altname . '{/Altname}'
+					. '{Desc}' . $file_data->description . '{/Desc}'
+					. '{Ext}' . $file_data->ext . '{/Ext}';
+			}
+
+			if (!$is_ingroup)
+			{
+				$field->{$prop} = implode(ComponentHelper::getParams('com_flexicontent')->get('csv_export_field_multivalue_sep', '%%'), $field->{$prop});
+			}
+
+			return;
+		}
+
 		static $langs = null;
 		if ($langs === null) $langs = FLEXIUtilities::getLanguages('code');
 
@@ -1352,21 +1380,21 @@ class plgFlexicontent_fieldsFile extends FCField
 			{
 				if ( !is_numeric($v) )
 				{
+					// Parse structured export format (see onDisplayFieldValue 'csv_export'):
+					// External file: {URL}...{/URL}{Altname}...{/Altname}{Desc}...{/Desc}{Ext}...{/Ext}
+					// Local file:    path/filename{Altname}...{/Altname}{Desc}...{/Desc}{Ext}...{/Ext}
+					// The tags are optional, a bare URL or a bare path/filename is also accepted
+					$_altname = preg_match('#\{Altname\}(.*?)\{/Altname\}#s', $v, $_m) ? trim($_m[1]) : '';
+					$_desc    = preg_match('#\{Desc\}(.*?)\{/Desc\}#s',       $v, $_m) ? trim($_m[1]) : '';
+					$_ext     = preg_match('#\{Ext\}(.*?)\{/Ext\}#s',         $v, $_m) ? trim($_m[1]) : '';
+					$_path    = preg_match('#^\{URL\}(.*?)\{/URL\}#s', $v, $_m)
+						? trim($_m[1])
+						: trim(preg_split('#\{(?:Altname|Desc|Ext)\}#', $v, 2)[0]);
+
 					// Detect URL value: {URL}...{/URL} structured format or bare http(s):// / ftp:// URL
-					if (preg_match('#^\{URL\}(.*?)\{/URL\}#s', $v) || preg_match('#^(?:https?|ftp)://#i', $v))
+					if (preg_match('#^\{URL\}#', $v) || preg_match('#^(?:https?|ftp)://#i', $_path))
 					{
-						// Parse structured export format: {URL}...{/URL}{Altname}...{/Altname}{Desc}...{/Desc}{Ext}...{/Ext}
-						if (preg_match('#^\{URL\}(.*?)\{/URL\}#s', $v, $_m))
-						{
-							$_url     = trim($_m[1]);
-							$_altname = preg_match('#\{Altname\}(.*?)\{/Altname\}#s', $v, $_m2) ? trim($_m2[1]) : '';
-							$_desc    = preg_match('#\{Desc\}(.*?)\{/Desc\}#s',       $v, $_m3) ? trim($_m3[1]) : '';
-							$_ext     = preg_match('#\{Ext\}(.*?)\{/Ext\}#s',         $v, $_m4) ? trim($_m4[1]) : '';
-						}
-						else
-						{
-							$_url = $v;  $_altname = '';  $_desc = '';  $_ext = '';
-						}
+						$_url = $_path;
 
 						// Create URL-type file record directly (mirrors addurl() without CSRF requirement)
 						$_db   = Factory::getDbo();
@@ -1396,8 +1424,8 @@ class plgFlexicontent_fieldsFile extends FCField
 					}
 					else
 					{
-						$filename = basename($v);
-						$sub_folder = dirname($v);
+						$filename = basename($_path);
+						$sub_folder = dirname($_path);
 						$sub_folder = $sub_folder && $sub_folder!='.' ? DS.$sub_folder : '';
 
 						// Add by calling the filemanager upload() task in interactive mode
@@ -1428,6 +1456,18 @@ class plgFlexicontent_fieldsFile extends FCField
 						$v = !empty($file_ids) ? reset($file_ids) : ($use_ingroup ? null : false);
 						$v = $v ?: ($use_ingroup ? null : false);
 						//$_filetitle = key($file_ids);  // This is the cleaned up filename, currently not needed
+
+						// Set file properties given via the structured format, addlocal() sets title to filename and empty description
+						if ($v && ($_altname !== '' || $_desc !== '' || $_ext !== ''))
+						{
+							$_fo = new stdClass;
+							$_fo->id = (int) $v;
+							if ($_altname !== '') $_fo->altname     = $_altname;
+							if ($_desc !== '')    $_fo->description = $_desc;
+							if ($_ext !== '')     $_fo->ext         = $_ext;
+
+							Factory::getDbo()->updateObject('#__flexicontent_files', $_fo, 'id');
+						}
 					}
 				}
 			}
