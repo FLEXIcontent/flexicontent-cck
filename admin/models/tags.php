@@ -399,7 +399,9 @@ class FlexicontentModelTags extends FCModelAdminList
 		$logs['error']   = 0;
 		$logs['success'] = 0;
 
-		$tags = explode("\n", $tags);
+		// Split on any line ending (textarea submits \r\n), trim whitespace and skip empty lines
+		$tags = preg_split('/\r\n|\r|\n/', $tags);
+		$tags = array_filter(array_map('trim', $tags), 'strlen');
 
 		foreach ($tags as $tag)
 		{
