@@ -99,6 +99,13 @@ class FlexicontentModelTags extends FCModelAdminList
 	 */
 	var $tagsHelper = null;
 
+	/**
+	 * Flag to also delete the related Joomla tags (and their mappings) when deleting records
+	 *
+	 * @var bool
+	 */
+	public $deleteJoomlaTags = false;
+
 
 	/**
 	 * Constructor
@@ -248,6 +255,91 @@ class FlexicontentModelTags extends FCModelAdminList
 		return $q
 			? ' HAVING ' . (count($having) ? implode(' AND ', $having) : ' 1 ')
 			: $having;
+	}
+
+
+	/**
+	 * Method to remove records, optionally also the related Joomla tags
+	 *
+	 * @param		array			$cid      array of record ids to delete
+	 *
+	 * @return	boolean	True on success
+	 *
+	 * @since   3.3.0
+	 */
+	public function delete($cid, $model = null)
+	{
+		$jtag_ids = array();
+
+		if ($this->deleteJoomlaTags && count($cid))
+		{
+			$cid_list = implode(',', ArrayHelper::toInteger($cid));
+
+			$jtag_ids = $this->_db->setQuery(
+				$this->_db->getQuery(true)
+					->select('jtag_id')
+					->from('#__flexicontent_tags')
+					->where('id IN (' . $cid_list . ')')
+					->where('jtag_id > 0')
+			)->loadColumn();
+			$jtag_ids = array_unique(ArrayHelper::toInteger($jtag_ids));
+		}
+
+		$result = parent::delete($cid, $model);
+
+		if ($result && count($jtag_ids))
+		{
+			// Keep Joomla tags that are still used by other (not deleted) FLEXIcontent tags
+			$still_used = $this->_db->setQuery(
+				$this->_db->getQuery(true)
+					->select('jtag_id')
+					->from('#__flexicontent_tags')
+					->where('jtag_id IN (' . implode(',', $jtag_ids) . ')')
+			)->loadColumn();
+			$jtag_ids = array_diff($jtag_ids, ArrayHelper::toInteger($still_used));
+
+			$this->_deleteJoomlaTags($jtag_ids);
+		}
+
+		return $result;
+	}
+
+
+	/**
+	 * Method to delete Joomla tags and their content mappings
+	 *
+	 * @param		array			$jtag_ids   array of Joomla tag ids
+	 *
+	 * @return	void
+	 *
+	 * @since   3.3.0
+	 */
+	protected function _deleteJoomlaTags($jtag_ids)
+	{
+		if (!count($jtag_ids))
+		{
+			return;
+		}
+
+		Table::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tags/tables');
+
+		foreach ($jtag_ids as $jtag_id)
+		{
+			// Delete mappings of the tag to content
+			$this->_db->setQuery(
+				$this->_db->getQuery(true)
+					->delete('#__contentitem_tag_map')
+					->where('tag_id = ' . (int) $jtag_id)
+			)->execute();
+
+			// Delete via Tag table, to keep nested set (lft / rgt) consistent
+			$table = Table::getInstance('Tag', 'TagsTable');
+
+			if ($table && $table->load($jtag_id))
+			{
+				$table->delete($jtag_id);
+			}
+		}
 	}
 
 
