@@ -71,6 +71,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 		// These will be usable only if (plural) records model has 'canDelRelated' Flag
 		$this->registerTask('remove_cascade',   'remove');
 		$this->registerTask('remove_relations', 'remove');
+		$this->registerTask('remove_cascade_jtags', 'remove');
 
 		$this->registerTask('exportxml', 'export');
 		$this->registerTask('exportsql', 'export');
@@ -767,7 +768,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 		$model_s = $this->getModel($this->record_name);
 
 		// Check that request action is supported by the model
-		if (in_array($this->task, array('remove_cascade', 'remove_relations')) && !$model::canDelRelated)
+		if (in_array($this->task, array('remove_cascade', 'remove_relations', 'remove_cascade_jtags')) && !$model::canDelRelated)
 		{
 			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('Unsupported task called'), 'error');
 			$app->setHeader('status', 500, true);
@@ -792,7 +793,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 
 		// Calculate access, if cascade removal, then pass via 'cid_locked' all records as ignore-assignments records
 		$cid_noauth = array();
-		$cid_locked = in_array($this->task, array('remove_cascade', 'remove_relations'))
+		$cid_locked = in_array($this->task, array('remove_cascade', 'remove_relations', 'remove_cascade_jtags'))
 			? $cid
 			: array();
 
@@ -834,6 +835,8 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 			// Delete the record or records and their assignments
 			case 'remove':
 			case 'remove_cascade':
+			case 'remove_cascade_jtags':
+				$model->deleteJoomlaTags = ($this->task === 'remove_cascade_jtags');
 				$result = $model->delete($cid, $model_s);
 				break;
 		}
