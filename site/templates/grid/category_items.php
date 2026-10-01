@@ -167,7 +167,7 @@ if (!function_exists('fc_cat_make_picture')) {
 		// Encoder les espaces dans les URLs (noms de fichiers avec espaces) + décoder &amp; pour srcset
 		$src      = str_replace([' ', '&amp;'], ['%20', '&'], $src);
 		$src_webp = str_replace([' ', '&amp;'], ['%20', '&'], $src_webp);
-		$raw_src  = str_replace(' ', '%20', $raw_src);
+		// $raw_src is passed to phpThumb as given: flexicontent_images::phpThumbURL() encodes it
 
 		$size_attrs = '';
 		if ($img_w) $size_attrs .= ' width="' . (int)$img_w . '"';
@@ -176,26 +176,26 @@ if (!function_exists('fc_cat_make_picture')) {
 		// f raw_src is available, we can generate srcset for responsive images and WebP support via phpThumb
 		if ($raw_src && $img_w) {
 			$ratio      = ($img_w > 0 && $img_h > 0) ? ($img_h / $img_w) : 0;
-			$phpthumb   = \Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $base_url . $raw_src;
+			// Signed phpThumb URL (HTML escaped, valid inside src and srcset attributes)
+			$phpthumb   = function ($w, $h, $f) use ($base_url, $raw_src) {
+				return flexicontent_images::phpThumbURL(['src' => $base_url . $raw_src, 'w' => $w, 'h' => $h ?: '', 'aoe' => 1, 'q' => 95, 'zc' => 1, 'f' => $f]);
+			};
 			$srcset_webp = $srcset_jpeg = $sizes_parts = [];
 
 			foreach ($_fc_cat_breakpoints as $vp => $lw) {
 				$lh = $ratio > 0 ? (int) round($lw * $ratio) : 0;
-				// Note: & (pas &amp;) car srcset est lu par le navigateur, pas parsé comme HTML
-				$_cf = '&w=' . $lw . ($lh ? '&h=' . $lh : '') . '&aoe=1&q=95&zc=1';
-				if ($use_webp) $srcset_webp[] = $phpthumb . $_cf . '&f=webp ' . $lw . 'w';
-				$srcset_jpeg[]  = $phpthumb . $_cf . '&f=jpg ' . $lw . 'w';
+				if ($use_webp) $srcset_webp[] = $phpthumb($lw, $lh, 'webp') . ' ' . $lw . 'w';
+				$srcset_jpeg[]  = $phpthumb($lw, $lh, 'jpg') . ' ' . $lw . 'w';
 				$sizes_parts[]  = '(max-width:' . $vp . 'px) ' . $lw . 'px';
 			}
 			// Desktop
 			$dw = (int) $img_w; $dh = $ratio > 0 ? (int) round($dw * $ratio) : 0;
-			$_cf_desk = '&w=' . $dw . ($dh ? '&h=' . $dh : '') . '&aoe=1&q=95&zc=1';
-			if ($use_webp) $srcset_webp[] = $phpthumb . $_cf_desk . '&f=webp ' . $dw . 'w';
-			$srcset_jpeg[]  = $phpthumb . $_cf_desk . '&f=jpg ' . $dw . 'w';
+			if ($use_webp) $srcset_webp[] = $phpthumb($dw, $dh, 'webp') . ' ' . $dw . 'w';
+			$srcset_jpeg[]  = $phpthumb($dw, $dh, 'jpg') . ' ' . $dw . 'w';
 			$sizes_parts[]  = $dw . 'px';
 
 			$sizes_str    = implode(', ', $sizes_parts);
-			$fallback_jpeg = $phpthumb . $_cf_desk . '&f=jpg';
+			$fallback_jpeg = $phpthumb($dw, $dh, 'jpg');
 			$img_tag      = '<img style="' . $style . '" src="' . $fallback_jpeg . '" alt="' . $alt . '" ' . $size_attrs . ' sizes="' . $sizes_str . '" srcset="' . implode(', ', $srcset_jpeg) . '" ' . $lazy_loading . ' />';
 
 			$webp_source = $use_webp && $srcset_webp
@@ -665,12 +665,18 @@ if ($leadnum) :
 					// Resize image via phpThumb
 					$_lw   = (int) $this->params->get('lead_width', 200);
 					$_lh   = (int) $this->params->get('lead_height', 200);
-					$_zc   = $this->params->get('lead_method') ? '&amp;zc=' . $this->params->get('lead_method') : '';
-					$_conf = '&amp;w=' . $_lw . '&amp;h=' . $_lh . '&amp;aoe=1&amp;q=95&amp;ar=x' . $_zc . '&amp;f=jpg';
 					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $_raw)) ? \Joomla\CMS\Uri\Uri::base(true).'/' : '';
-					$_phpthumb = \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$_raw;
 
-					$item->image          = $_phpthumb . $_conf;
+					$item->image          = flexicontent_images::phpThumbURL([
+						'src' => $base_url . $_raw,
+						'w'   => $_lw,
+						'h'   => $_lh,
+						'aoe' => 1,
+						'q'   => 95,
+						'ar'  => 'x',
+						'zc'  => $this->params->get('lead_method') ?: '',
+						'f'   => 'jpg',
+					]);
 					$item->image_w        = $_lw;
 					$item->image_h        = $_lh;
 					$item->image_raw_src  = $_raw;
@@ -1233,12 +1239,17 @@ if ($count > $leadnum) :
 				if ( $src && $RESIZE_FLAG ) {
 					$_iw   = (int) $this->params->get('intro_width', 200);
 					$_ih   = (int) $this->params->get('intro_height', 200);
-					$_zc   = $this->params->get('intro_method') ? '&amp;zc=' . $this->params->get('intro_method') : '';
-					$_conf = '&amp;w=' . $_iw . '&amp;h=' . $_ih . '&amp;aoe=1&amp;q=95' . $_zc . '&amp;f=jpg';
 					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $_raw)) ? \Joomla\CMS\Uri\Uri::base(true).'/' : '';
-					$_phpthumb = \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$_raw;
 
-					$item->image          = $_phpthumb . $_conf;
+					$item->image          = flexicontent_images::phpThumbURL([
+						'src' => $base_url . $_raw,
+						'w'   => $_iw,
+						'h'   => $_ih,
+						'aoe' => 1,
+						'q'   => 95,
+						'zc'  => $this->params->get('intro_method') ?: '',
+						'f'   => 'jpg',
+					]);
 					$item->image_w        = $_iw;
 					$item->image_h        = $_ih;
 					$item->image_raw_src  = $_raw;

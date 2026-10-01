@@ -129,33 +129,28 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 					if ( $cat_image_source && $cat->image && file_exists( JPATH_SITE .DS. $joomla_image_path . $cat->image ) ) {
 						$src = \Joomla\CMS\Uri\Uri::base(true) ."/". $joomla_image_url . $cat->image;
 
-						$h		= '&amp;h=' . $cat_image_height;
-						$w		= '&amp;w=' . $cat_image_width;
-						$aoe	= '&amp;aoe=1';
-						$q		= '&amp;q=95';
-						$ar 	= '&amp;ar=x';
-						$zc		= $cat_image_method ? '&amp;zc=' . $cat_image_method : '';
-						$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-						$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
-						$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
-
-						$thumb = \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
+						$thumb = flexicontent_images::phpThumbURL(array(
+							'src' => $src,
+							'w'   => $cat_image_width,
+							'h'   => $cat_image_height,
+							'aoe' => 1,
+							'q'   => 95,
+							'ar'  => 'x',
+							'zc'  => $cat_image_method ?: '',
+							'f'   => flexicontent_images::phpThumbFormat($src),
+						), true, true);
 					} else if ( $cat_image_source!=1 && $src = flexicontent_html::extractimagesrc($cat) ) {
 
-						$h		= '&amp;h=' . $feed_image_height;
-						$w		= '&amp;w=' . $feed_image_width;
-						$aoe	= '&amp;aoe=1';
-						$q		= '&amp;q=95';
-						$ar 	= '&amp;ar=x';
-						$zc		= $feed_image_method ? '&amp;zc=' . $feed_image_method : '';
-						$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-						$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
-						$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
-
-						$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  \Joomla\CMS\Uri\Uri::base(true).'/' : '';
-						$src = $base_url.$src;
-
-						$thumb = \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
+						$thumb = flexicontent_images::phpThumbURL(array(
+							'src' => $src,
+							'w'   => $feed_image_width,
+							'h'   => $feed_image_height,
+							'aoe' => 1,
+							'q'   => 95,
+							'ar'  => 'x',
+							'zc'  => $feed_image_method ?: '',
+							'f'   => flexicontent_images::phpThumbFormat($src),
+						), true, true);
 					}
 				}
 	  		if ($thumb) {

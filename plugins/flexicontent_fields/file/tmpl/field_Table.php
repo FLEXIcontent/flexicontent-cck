@@ -48,7 +48,7 @@ foreach ($field->value as $file_id)
 				$img_path = \Joomla\CMS\Uri\Uri::root(true) . '/' . $file_data->filename;
 				break;
 		}
-		$preview_src = \Joomla\CMS\Uri\Uri::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&amp;w=100&amp;h=100&amp;zc=1&amp;q=95&amp;ar=x';
+		$preview_src = flexicontent_images::phpThumbURL(array('src' => $img_path, 'w' => 100, 'h' => 100, 'zc' => 1, 'q' => 95, 'ar' => 'x'), true, true);
 		$preview_text = '';
 		$has_preview = true;
 	}
