@@ -261,6 +261,12 @@ class FlexicontentTasksCore
 			$sources_order = array('words');
 		}
 
+		// Further pages (infinite scroll of the Tag-like auto-complete) list only more words, never titles / tags again
+		if ($pageNum > 1)
+		{
+			$sources_order = in_array('words', $sources_order) ? array('words') : array();
+		}
+
 		$lang_where = '';
 
 		if ($filtercat)
@@ -336,6 +342,7 @@ class FlexicontentTasksCore
 		$options['Total'] = count($words_found);
 		$options['Matches'] = array();
 		$n = 0;
+		$skip = $pageSize * ($pageNum - 1);
 
 		foreach ($words_found as $_w => $i)
 		{
@@ -350,6 +357,12 @@ class FlexicontentTasksCore
 				{
 					continue;
 				}
+			}
+
+			if ($skip > 0)
+			{
+				--$skip;
+				continue;
 			}
 
 			$options['Matches'][] = array(
@@ -367,7 +380,7 @@ class FlexicontentTasksCore
 		// Item titles and tags that match the typed words
 		$suggestions = array('words' => $options['Matches'], 'titles' => array(), 'tags' => array());
 
-		if (count($sources_order) > 1 || $sources_order[0] != 'words')
+		if (array_diff($sources_order, array('words')))
 		{
 			// Conditions for the typed words: last word is still being typed (prefix of a word), earlier words must be contained
 			$_typed = preg_split('/\s+/u', $text);
