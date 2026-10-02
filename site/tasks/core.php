@@ -432,21 +432,43 @@ class FlexicontentTasksCore
 
 			if (in_array('tags', $sources_order))
 			{
+				// Falang translation of the tag title for the page language (same lookup as the tags field index)
+				$fa_lang_id = 0;
+				$falang_enabled = class_exists('\\Joomla\\CMS\\Plugin\\PluginHelper')
+					&& \Joomla\CMS\Plugin\PluginHelper::isEnabled('system', 'falangdriver')
+					&& $cparams->get('flexi_fish', 0);
+
+				if ($falang_enabled)
+				{
+					$_cur_tag = $this->_getLanguageTag();
+					$_lq = 'SELECT la.lang_id FROM #__languages AS la WHERE '
+						. ($lang ? 'la.lang_code LIKE ' . $db->Quote($db->escape($lang, true) . '%', false) : 'la.lang_code = ' . $db->Quote($_cur_tag))
+						. ' ORDER BY (la.lang_code = ' . $db->Quote($_cur_tag) . ') DESC';
+					$fa_lang_id = (int) $db->setQuery($_lq, 0, 1)->loadResult();
+				}
+
 				// Tags that have at least one item visible to the user, exact / starting matches first, then most used
-				$tag_query = 'SELECT t.id, t.name, COUNT(DISTINCT i.id) AS cnt'
+				$tag_query = 'SELECT t.id, t.name, ' . ($fa_lang_id ? 'fa.value' : '""') . ' AS fa_text, COUNT(DISTINCT i.id) AS cnt'
 					. ' FROM #__flexicontent_tags AS t'
 					. ' JOIN #__flexicontent_tags_item_relations AS trel ON trel.tid = t.id'
 					. ' JOIN #__flexicontent_items_tmp AS i ON i.id = trel.itemid'
+					. ($fa_lang_id
+						? ' LEFT JOIN #__falang_content AS fa ON fa.reference_table = "tags" AND fa.reference_field = "title"'
+							. ' AND fa.reference_id = t.jtag_id AND fa.language_id = ' . $fa_lang_id
+						: '')
 					. $cid_join
-					. ' WHERE t.published = 1 AND ' . $_conds('t.name')
+					. ' WHERE t.published = 1 AND '
+					. ($fa_lang_id ? '(' . $_conds('t.name') . ' OR ' . $_conds('fa.value') . ')' : $_conds('t.name'))
 					. $item_filters
-					. ' GROUP BY t.id, t.name'
-					. ' ORDER BY (t.name LIKE ' . $_text_like . ') DESC, cnt DESC'
+					. ' GROUP BY t.id, t.name' . ($fa_lang_id ? ', fa.value' : '')
+					. ' ORDER BY (' . ($fa_lang_id ? 'COALESCE(NULLIF(fa.value, ""), t.name)' : 't.name') . ' LIKE ' . $_text_like . ') DESC, cnt DESC'
 					. ' LIMIT ' . $titles_limit;
 
 				foreach ((array) $db->setQuery($tag_query)->loadAssocList() as $_t)
 				{
-					$suggestions['tags'][] = array('text' => $_t['name'], 'id' => $_t['name']);
+					// Show the translated title when there is one, otherwise the original name
+					$_tag_text = strlen(trim((string) $_t['fa_text'])) ? $_t['fa_text'] : $_t['name'];
+					$suggestions['tags'][] = array('text' => $_tag_text, 'id' => $_tag_text);
 				}
 			}
 
