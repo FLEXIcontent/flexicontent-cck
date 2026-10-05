@@ -96,32 +96,39 @@ class FLEXIadvsearchHelper
 
 	static function logSearch( $search_term )
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
-		$params = \Joomla\CMS\Component\ComponentHelper::getParams('com_search');
-		$enable_log_searches = $params->get('enabled');
-
-		$search_term_quoted = $db->Quote(trim($search_term));
-
-		if ($enable_log_searches)
+		if (!\Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('log_search_queries', 0))
 		{
-			$query = 'SELECT hits'
-				. ' FROM #__core_log_searches'
-				. ' WHERE LOWER( search_term ) = ' . $search_term_quoted;
+			return;
+		}
 
-			$hits = (int) $db->setQuery($query)->loadResult();
+		$search_term = \Joomla\String\StringHelper::substr(trim(\Joomla\String\StringHelper::strtolower($search_term)), 0, 128);
 
-			if ($hits)
-			{
-				$query = 'UPDATE #__core_log_searches'
-					. ' SET hits = ( hits + 1 )'
-					. ' WHERE LOWER( search_term ) = ' . $search_term_quoted;
-				$db->setQuery($query)->execute();
-			}
-			else
-			{
-				$query = 'INSERT INTO #__core_log_searches VALUES (' . $search_term_quoted . ', 1 )';
-				$db->setQuery($query)->execute();
-			}
+		if ($search_term === '')
+		{
+			return;
+		}
+
+		$db = \Joomla\CMS\Factory::getDbo();
+
+		try
+		{
+			// Create table on first use, so that updated sites need no manual SQL
+			$db->setQuery(
+				'CREATE TABLE IF NOT EXISTS `#__flexicontent_search_log` ('
+				. ' `search_term` varchar(128) NOT NULL default \'\','
+				. ' `hits` int(11) unsigned NOT NULL default \'1\','
+				. ' PRIMARY KEY (`search_term`), KEY `hits` (`hits`)'
+				. ') ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`'
+			)->execute();
+
+			$db->setQuery(
+				'INSERT INTO #__flexicontent_search_log (search_term, hits) VALUES (' . $db->Quote($search_term) . ', 1)'
+				. ' ON DUPLICATE KEY UPDATE hits = hits + 1'
+			)->execute();
+		}
+		catch (\Exception $e)
+		{
+			// Never break search because of logging
 		}
 	}
 

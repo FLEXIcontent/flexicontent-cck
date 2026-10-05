@@ -849,27 +849,11 @@ $fc_plgs[$fieldtype] = new $className($dispatcher, array('type'=>'flexicontent_f
 			$perms->CanIndex
 				? call_user_func($addEntry, '<span class="fcsb-icon-search icon-search"></span>'.\Joomla\CMS\Language\Text::_( 'FLEXI_SEARCH_INDEXES' ), 'index.php?option=com_flexicontent&view=search', $view=='search') : null;
 
-			$CanSeeSearchLogs = !FLEXI_J40GE && \Joomla\CMS\Factory::getUser()->authorise('core.admin', 'com_search');
-
-			if ($CanSeeSearchLogs)
-			{
-				$params = \Joomla\CMS\Component\ComponentHelper::getParams('com_search');
-				$enable_log_searches = $params->get('enabled');
-				if ($enable_log_searches)
-				{
-					call_user_func($addEntry,
-					'<a href="index.php?option=com_search&tmpl=component" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;" >'.
+			$perms->CanIndex
+				? call_user_func($addEntry,
+					'<a href="index.php?option=com_flexicontent&view=search&layout=logs&tmpl=component" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;" >'.
 						'<span class="fcsb-icon-book icon-book"></span>'.\Joomla\CMS\Language\Text::_( 'FLEXI_NAV_SD_SEARCH_LOGS' ).
-					'</a>', '', false);
-				}
-				else
-				{
-					call_user_func($addEntry,
-					'<a href="index.php?option=com_config&view=component&component=com_search&path=" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, function(){window.location.reload(false)}); return false;" >'.
-						'<span class="fcsb-icon-book icon-book"></span>'.\Joomla\CMS\Language\Text::_( 'FLEXI_NAV_SD_SEARCH_LOGS' ).
-					'</a>', '', false);
-				}
-			}
+					'</a>', '', false) : null;
 
 			$perms->CanStats
 				? call_user_func($addEntry, '<span class="fcsb-icon-stats icon-chart"></span>'.\Joomla\CMS\Language\Text::_( 'FLEXI_STATISTICS' ), 'index.php?option=com_flexicontent&view=stats', $view=='stats') : null;
