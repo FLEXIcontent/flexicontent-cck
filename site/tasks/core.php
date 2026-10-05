@@ -204,6 +204,11 @@ class FlexicontentTasksCore
 		if (!strlen($text)) jexit();
 
 		$search_prefix = $cparams->get('add_search_prefix') ? 'vvv' : '';
+
+		// Trailing space means the last word is complete, so we suggest the NEXT word
+		$next_word = (bool) preg_match('/\s$/u', $text);
+		$text  = trim($text);
+		if (!strlen($text)) jexit();
 		$words = preg_split('/\s\s*/u', $text);
 
 		$_words = array();
@@ -211,15 +216,56 @@ class FlexicontentTasksCore
 		{
 			$_words[] = !$search_prefix ? trim($_w) : preg_replace('/(\b[^\s,\.]+\b)/u', $search_prefix . '$0', trim($_w));
 		}
-		$newtext = '+' . implode(' +', $_words) . '*';
+		unset($_w);  // break the reference left by the foreach above
+		$newtext = '+' . implode(' +', $_words) . ($next_word ? '' : '*');
 
 		$db = $this->_getDbo();
 		$quoted_text = $db->escape($newtext, true);
 		$quoted_text = $db->Quote($quoted_text, false);
 		$_text_match = ' MATCH (si.search_index) AGAINST (' . $quoted_text . ' IN BOOLEAN MODE) ';
 
-		$limitstart = (int) ($pageSize * ($pageNum - 1));
-		$limit      = (int) $pageSize;
+		// Rows of the search index to scan for candidate words, and max number of suggestions returned
+		$scan_rows = max(50, min(2000, (int) $cparams->get('search_autocomplete_scan', 300)));
+		$pageSize  = max(1, min(30, (int) $cparams->get('search_autocomplete_limit', 10)));
+
+		$limitstart = 0;
+		$limit      = $scan_rows;
+
+		// Suggestion sources: 0 = words only, 1 = words + titles, 2 = titles only, 3 = words + tags + titles
+		$titles_mode  = (int) $cparams->get('search_autocomplete_titles', 0);
+		$titles_mode  = ($titles_mode >= 0 && $titles_mode <= 3) ? $titles_mode : 0;
+		$titles_limit = max(1, min(30, (int) $cparams->get('search_autocomplete_titles_limit', 5)));
+
+		// Order of the sources in the suggestions list
+		if ($titles_mode == 1)
+		{
+			$sources_order = (int) $cparams->get('search_autocomplete_titles_order', 0) === 1
+				? array('titles', 'words') : array('words', 'titles');
+		}
+		elseif ($titles_mode == 3)
+		{
+			$_orders = array(
+				0 => array('tags', 'words', 'titles'),
+				1 => array('tags', 'titles', 'words'),
+				2 => array('words', 'tags', 'titles'),
+				3 => array('titles', 'tags', 'words')
+			);
+			$sources_order = $_orders[(int) $cparams->get('search_autocomplete_tags_order', 0)] ?? $_orders[0];
+		}
+		elseif ($titles_mode == 2)
+		{
+			$sources_order = array('titles');
+		}
+		else
+		{
+			$sources_order = array('words');
+		}
+
+		// Further pages (infinite scroll of the Tag-like auto-complete) list only more words, never titles / tags again
+		if ($pageNum > 1)
+		{
+			$sources_order = in_array('words', $sources_order) ? array('words') : array();
+		}
 
 		$lang_where = '';
 
@@ -254,14 +300,20 @@ class FlexicontentTasksCore
 			. $access_where
 			. ' LIMIT ' . $limitstart . ', ' . $limit;
 
-		$data = $db->setQuery($query)->loadAssocList();
+		$data = !in_array('words', $sources_order) ? array() : $db->setQuery($query)->loadAssocList();
 
-		$word_prefix = array_pop($words);
+		$typed_words = array();
+		foreach ($words as $_w)
+		{
+			$typed_words[StringHelper::strtolower($_w, 'UTF-8')] = 1;
+		}
+
+		$word_prefix = $next_word ? '' : array_pop($words);
 		$complete_words = implode(' ', $words);
 
 		$words_found = array();
 		// [FIX 4 - ReDoS Protection]
-		$regex = '/(\b)(' . preg_quote($search_prefix, '/') . preg_quote($word_prefix, '/') . '\w*)(\b)/iu';
+		$regex = '/(\b)(' . preg_quote($search_prefix, '/') . preg_quote($word_prefix, '/') . ($next_word ? '\w+' : '\w*') . ')(\b)/iu';
 
 		if (!empty($data))
 		{
@@ -276,16 +328,21 @@ class FlexicontentTasksCore
 							$_m = preg_replace('/\b' . $search_prefix . '/u', '', $_m);
 						}
 						$_m_low = StringHelper::strtolower($_m, 'UTF-8');
-						$words_found[$_m_low] = 1;
+						if ($next_word && isset($typed_words[$_m_low])) continue;  // do not suggest already typed words
+						$words_found[$_m_low] = isset($words_found[$_m_low]) ? $words_found[$_m_low] + 1 : 1;
 					}
 				}
 			}
 		}
 
+		// Most frequent words first
+		arsort($words_found);
+
 		$options = array();
 		$options['Total'] = count($words_found);
 		$options['Matches'] = array();
 		$n = 0;
+		$skip = $pageSize * ($pageNum - 1);
 
 		foreach ($words_found as $_w => $i)
 		{
@@ -302,6 +359,12 @@ class FlexicontentTasksCore
 				}
 			}
 
+			if ($skip > 0)
+			{
+				--$skip;
+				continue;
+			}
+
 			$options['Matches'][] = array(
 				'text' => $complete_words . ($complete_words ? ' ' : '') . $_w,
 				'id'   => $complete_words . ($complete_words ? ' ' : '') . $_w
@@ -312,6 +375,118 @@ class FlexicontentTasksCore
 			{
 				break;
 			}
+		}
+
+		// Item titles and tags that match the typed words
+		$suggestions = array('words' => $options['Matches'], 'titles' => array(), 'tags' => array());
+
+		if (array_diff($sources_order, array('words')))
+		{
+			// Conditions for the typed words: last word is still being typed (prefix of a word), earlier words must be contained
+			$_typed = preg_split('/\s+/u', $text);
+			$_last_i = count($_typed) - 1;
+			$_text_like = $db->Quote($db->escape($text, true) . '%', false);
+
+			$_conds = function ($col) use ($db, $_typed, $_last_i, $next_word)
+			{
+				$conds = array();
+				foreach ($_typed as $_i => $_tw)
+				{
+					$_e = $db->escape($_tw, true);
+					$conds[] = ($_i == $_last_i && !$next_word)
+						? '(' . $col . ' LIKE ' . $db->Quote($_e . '%', false) . ' OR ' . $col . ' LIKE ' . $db->Quote('% ' . $_e . '%', false) . ')'
+						: $col . ' LIKE ' . $db->Quote('%' . $_e . '%', false);
+				}
+				return implode(' AND ', $conds);
+			};
+
+			// Respect the access levels of the current user
+			$user   = method_exists($app, 'getIdentity') ? $app->getIdentity() : \Joomla\CMS\Factory::getUser();
+			$levels = array_map('intval', $user->getAuthorisedViewLevels());
+			$item_access = $levels ? ' AND i.access IN (' . implode(',', $levels) . ')' : ' AND 0 = 1';
+
+			$item_filters = ''
+				. '   AND i.state IN (1,-5) '
+				. '   AND ( i.publish_up is NULL OR i.publish_up = ' . $db->Quote($nullDate) . ' OR i.publish_up <= ' . $_nowDate . ' ) '
+				. '   AND ( i.publish_down is NULL OR i.publish_down = ' . $db->Quote($nullDate) . ' OR i.publish_down >= ' . $_nowDate . ' ) '
+				. $lang_where
+				. $item_access;
+
+			$cid_join = $cid_list ? ' JOIN #__flexicontent_cats_item_relations AS crel ON i.id = crel.itemid AND crel.catid IN (' . $cid_list . ')' : '';
+
+			if (in_array('titles', $sources_order))
+			{
+				$title_query = 'SELECT DISTINCT i.id, i.title'
+					. ' FROM #__flexicontent_items_tmp AS i'
+					. $cid_join
+					. ' WHERE ' . $_conds('i.title')
+					. $item_filters
+					. ' ORDER BY (i.title LIKE ' . $_text_like . ') DESC, i.hits DESC'
+					. ' LIMIT ' . $titles_limit;
+
+				foreach ((array) $db->setQuery($title_query)->loadAssocList() as $_t)
+				{
+					$suggestions['titles'][] = array('text' => $_t['title'], 'id' => $_t['title']);
+				}
+			}
+
+			if (in_array('tags', $sources_order))
+			{
+				// Falang translation of the tag title for the page language (same lookup as the tags field index)
+				$fa_lang_id = 0;
+				$falang_enabled = class_exists('\\Joomla\\CMS\\Plugin\\PluginHelper')
+					&& \Joomla\CMS\Plugin\PluginHelper::isEnabled('system', 'falangdriver')
+					&& $cparams->get('flexi_fish', 0);
+
+				if ($falang_enabled)
+				{
+					$_cur_tag = $this->_getLanguageTag();
+					$_lq = 'SELECT la.lang_id FROM #__languages AS la WHERE '
+						. ($lang ? 'la.lang_code LIKE ' . $db->Quote($db->escape($lang, true) . '%', false) : 'la.lang_code = ' . $db->Quote($_cur_tag))
+						. ' ORDER BY (la.lang_code = ' . $db->Quote($_cur_tag) . ') DESC';
+					$fa_lang_id = (int) $db->setQuery($_lq, 0, 1)->loadResult();
+				}
+
+				// Tags that have at least one item visible to the user, exact / starting matches first, then most used
+				$tag_query = 'SELECT t.id, t.name, ' . ($fa_lang_id ? 'fa.value' : '""') . ' AS fa_text, COUNT(DISTINCT i.id) AS cnt'
+					. ' FROM #__flexicontent_tags AS t'
+					. ' JOIN #__flexicontent_tags_item_relations AS trel ON trel.tid = t.id'
+					. ' JOIN #__flexicontent_items_tmp AS i ON i.id = trel.itemid'
+					. ($fa_lang_id
+						? ' LEFT JOIN #__falang_content AS fa ON fa.reference_table = "tags" AND fa.reference_field = "title"'
+							. ' AND fa.reference_id = t.jtag_id AND fa.language_id = ' . $fa_lang_id
+						: '')
+					. $cid_join
+					. ' WHERE t.published = 1 AND '
+					. ($fa_lang_id ? '(' . $_conds('t.name') . ' OR ' . $_conds('fa.value') . ')' : $_conds('t.name'))
+					. $item_filters
+					. ' GROUP BY t.id, t.name' . ($fa_lang_id ? ', fa.value' : '')
+					. ' ORDER BY (' . ($fa_lang_id ? 'COALESCE(NULLIF(fa.value, ""), t.name)' : 't.name') . ' LIKE ' . $_text_like . ') DESC, cnt DESC'
+					. ' LIMIT ' . $titles_limit;
+
+				foreach ((array) $db->setQuery($tag_query)->loadAssocList() as $_t)
+				{
+					// Show the translated title when there is one, otherwise the original name
+					$_tag_text = strlen(trim((string) $_t['fa_text'])) ? $_t['fa_text'] : $_t['name'];
+					$suggestions['tags'][] = array('text' => $_tag_text, 'id' => $_tag_text);
+				}
+			}
+
+			// Merge the sources in the configured order, a suggestion already listed by an earlier source is skipped
+			$seen = array();
+			$options['Matches'] = array();
+			foreach ($sources_order as $_src)
+			{
+				foreach ($suggestions[$_src] as $_m)
+				{
+					$_low = StringHelper::strtolower($_m['text'], 'UTF-8');
+					if (isset($seen[$_low])) continue;
+					$seen[$_low] = 1;
+					$options['Matches'][] = $_m;
+				}
+			}
+
+			$options['Total'] = count($options['Matches']);
 		}
 
 		header('Content-Type: application/json; charset=utf-8');

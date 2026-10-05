@@ -1851,8 +1851,102 @@ class plgFlexicontent_fieldsMediafile extends FCField
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
-		$filter->parameters->set( 'display_filter_as_s', 1 );  // Only supports a basic filter of single text search input
-		FlexicontentFields::createFilter($filter, $value, $formName);
+		$mediadata = array('media_format', 'sample_rate', 'duration');
+		$media_property_filters = $filter->parameters->get('media_property_filters', $mediadata);
+		$media_property_filters = FLEXIUtilities::paramToArray($media_property_filters, "/[\s]*,[\s]*/", false, true);
+
+		// Only allow known columns, since the name is used inside SQL
+		$media_property_filters = array_intersect($media_property_filters, $mediadata);
+
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$html = array();
+		$label = $filter->label;
+
+		// Remember parameters / properties that we will alter
+		$param_names = array('display_filter_as_s', 'faceted_filter_s', 'display_label_filter_s');
+		$old_params = array();
+		foreach ($param_names as $param_name)
+		{
+			$old_params[$param_name] = $filter->parameters->get($param_name);
+		}
+		$had_options = property_exists($filter, 'filter_options');
+		$old_options = $had_options ? $filter->filter_options : null;
+
+		foreach($media_property_filters as $prop_name)
+		{
+			$prop_value = is_array($value) && isset($value[$prop_name]) ? $value[$prop_name] : null;
+
+			$is_range = $prop_name === 'duration';
+			$filter->parameters->set('display_filter_as_s', $is_range ? 3 : 0);
+			$filter->parameters->set('faceted_filter_s', 0);
+			$filter->parameters->set('display_label_filter_s', 0);
+
+			// Values are taken directly from the media data table, the advanced search index has file names / descriptions
+			unset($filter->filter_options);
+			if (!$is_range)
+			{
+				$query = $db->getQuery(true)
+					->select('md.' . $prop_name . ' AS value, md.' . $prop_name . ' AS text')
+					->from($db->quoteName('#__flexicontent_mediadatas', 'md'))
+					->join('INNER', $db->quoteName('#__flexicontent_files', 'f') . ' ON f.id = md.file_id')
+					->join('INNER', $db->quoteName('#__flexicontent_fields_item_relations', 'rel') . ' ON rel.value = f.id AND rel.field_id = ' . (int) $filter->id)
+					->where('md.' . $prop_name . ' IS NOT NULL')
+					->where('md.' . $prop_name . ' <> ' . $db->quote(''))
+					->group('md.' . $prop_name)
+					->order('md.' . $prop_name . ' ASC');
+
+				try
+				{
+					$db->setQuery($query);
+					$filter->filter_options = $db->loadObjectList() ?: array();
+				}
+				catch (\Exception $e)
+				{
+					$filter->filter_options = array();
+				}
+			}
+
+			unset($filter->html);
+			unset($filter->filt_prop_name);
+			$filter->label = $prop_name;
+			$filter->filt_prop_name = $prop_name;
+
+			FlexicontentFields::createFilter($filter, $prop_value, $formName);
+			$html[$prop_name] = $filter->html;
+		}
+
+		// Restore altered parameters / properties
+		foreach ($old_params as $param_name => $param_value)
+		{
+			$filter->parameters->set($param_name, $param_value);
+		}
+		unset($filter->filter_options);
+		if ($had_options) $filter->filter_options = $old_options;
+
+		unset($filter->filt_prop_name);
+		$filter->label = $label;
+
+		$out = '';
+		foreach($media_property_filters as $prop_name)
+		{
+			$filtername = $prop_name;
+
+			switch($prop_name)
+			{
+				case 'media_format': $filtername = \Joomla\CMS\Language\Text::_('FLEXI_FIELD_MEDIADATA_MEDIA_TYPE'); break;
+				case 'sample_rate':  $filtername = \Joomla\CMS\Language\Text::_('FLEXI_FIELD_MEDIADATA_SAMPLE_RATE'); break;
+				case 'duration':     $filtername = \Joomla\CMS\Language\Text::_('FLEXI_FIELD_MEDIADATA_DURATION_SECONDS'); break;
+			}
+
+			$out .= '
+			<div class="fc_filter_media_property_'.$prop_name.'">
+				<div class="fc_filter_label fc_label_field_'.$filter->id.'_'.$prop_name.'">'. $filtername . '</div>
+				<div class="fc_filter_html">' . $html[$prop_name] . '</div>
+			</div>
+			';
+		}
+
+		$filter->html = '<div class="fc_filter_media_properties_box">' . $out . '</div>';
 	}
 
 
@@ -1923,8 +2017,31 @@ class plgFlexicontent_fieldsMediafile extends FCField
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
-		$filter->parameters->set( 'display_filter_as_s', 1 );  // Only supports a basic filter of single text search input
-		return FlexicontentFields::getFilteredSearch($filter, $value, $return_sql);
+		// Value is an array per media property, skip properties that have only empty values
+		$clean = array();
+		if (is_array($value))
+		{
+			foreach ($value as $prop_name => $prop_value)
+			{
+				$flat = array();
+				if (is_array($prop_value))
+				{
+					array_walk_recursive($prop_value, function ($v) use (&$flat) { $flat[] = trim((string) $v); });
+				}
+				else
+				{
+					$flat[] = trim((string) $prop_value);
+				}
+				if (!strlen(implode('', $flat))) continue;
+
+				$clean[$prop_name] = $prop_value;
+			}
+		}
+
+		// Nothing to filter, return a non-empty string to indicate no filtering
+		if (!count($clean)) return ' ';
+
+		return $this->getFiltered($filter, $clean, $return_sql);
 	}
 
 
