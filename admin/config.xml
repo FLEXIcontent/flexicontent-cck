@@ -16,6 +16,10 @@
 
 		<field name="" type="separator" default="FLEXI_TEXT_SEARCH" label="" level="level0" />
 
+			<field name="log_search_queries" type="multilist" subtype="radio" default="0" label="FLEXI_SEARCH_LOG_ENABLE" description="FLEXI_SEARCH_LOG_ENABLE_DESC" class="btn-group btn-group-yesno" >
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			<field name="add_search_prefix" type="multilist" subtype="radio" default="0" label="FLEXI_TEXT_SEARCH_SMALL_COMMON_WORDS" description="FLEXI_TEXT_SEARCH_SMALL_COMMON_WORDS_DESC" class="btn-group btn-group-yesno" inline_tip="Please re-index the search indexes, after enabling this" tip_class="" tip_img="note.gif" >
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>

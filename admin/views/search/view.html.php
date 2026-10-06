@@ -46,7 +46,7 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 		$task     = $jinput->getCmd('task', '');
 		$layout   = $jinput->getString('layout', 'default');
 
-		if ($layout === 'indexer')
+		if ($layout === 'indexer' || $layout === 'logs')
 		{
 			return parent::display($tpl);
 		}

@@ -343,24 +343,11 @@ $items_task = 'task=items.';
 				$add_sep = true;
 			}
 
-			$CanSeeSearchLogs = \Joomla\CMS\Factory::getUser()->authorise('core.manage', 'com_search');
-
-			if ($CanSeeSearchLogs)
+			if ($this->perms->CanIndex)
 			{
-				$params = \Joomla\CMS\Component\ComponentHelper::getParams('com_search');
-				$enable_log_searches = $params->get('enabled');
-				if ($enable_log_searches)
-				{
-					$link = 'index.php?option=com_search&tmpl=component';
-					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-book', \Joomla\CMS\Language\Text::_( 'FLEXI_NAV_SD_SEARCH_LOGS' ), $modal = 1 );
-					$add_sep = true;
-				}
-				else
-				{
-					$link = 'index.php?option=com_config&view=component&component=com_search&path=';
-					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-book', \Joomla\CMS\Language\Text::_( 'FLEXI_NAV_SD_SEARCH_LOGS' ), $modal = 1, $close_function = 'function(){window.location.reload(false)}' );
-					$add_sep = true;
-				}
+				$link = 'index.php?option='.$option.'&amp;view=search&amp;layout=logs&amp;tmpl=component';
+				FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-book', \Joomla\CMS\Language\Text::_( 'FLEXI_NAV_SD_SEARCH_LOGS' ), $modal = 1 );
+				$add_sep = true;
 			}
 
 			if ($this->perms->CanStats && !isset($sbtns['stats']))
