@@ -231,34 +231,47 @@ class FlexicontentTasksCore
 		$limitstart = 0;
 		$limit      = $scan_rows;
 
-		// Suggestion sources: 0 = words only, 1 = words + titles, 2 = titles only, 3 = words + tags + titles
-		$titles_mode  = (int) $cparams->get('search_autocomplete_titles', 0);
-		$titles_mode  = ($titles_mode >= 0 && $titles_mode <= 3) ? $titles_mode : 0;
 		$titles_limit = max(1, min(30, (int) $cparams->get('search_autocomplete_titles_limit', 5)));
 
-		// Order of the sources in the suggestions list
-		if ($titles_mode == 1)
+		// Suggestion sources and their order (sortable option), e.g. "tags,words,titles"
+		$sources_order = array();
+		$_sources_cfg = (string) $cparams->get('search_autocomplete_sources', '');
+		foreach (preg_split('/\s*,\s*/', trim($_sources_cfg)) as $_src)
 		{
-			$sources_order = (int) $cparams->get('search_autocomplete_titles_order', 0) === 1
-				? array('titles', 'words') : array('words', 'titles');
+			if (in_array($_src, array('words', 'titles', 'tags', 'categories'), true) && !in_array($_src, $sources_order, true))
+			{
+				$sources_order[] = $_src;
+			}
 		}
-		elseif ($titles_mode == 3)
+
+		// Not configured yet: use the previous options (mode and orders), so that existing configurations keep working
+		if (!$sources_order)
 		{
-			$_orders = array(
-				0 => array('tags', 'words', 'titles'),
-				1 => array('tags', 'titles', 'words'),
-				2 => array('words', 'tags', 'titles'),
-				3 => array('titles', 'tags', 'words')
-			);
-			$sources_order = $_orders[(int) $cparams->get('search_autocomplete_tags_order', 0)] ?? $_orders[0];
-		}
-		elseif ($titles_mode == 2)
-		{
-			$sources_order = array('titles');
-		}
-		else
-		{
-			$sources_order = array('words');
+			$_legacy_mode = (int) $cparams->get('search_autocomplete_titles', 0);
+
+			if ($_legacy_mode == 1)
+			{
+				$sources_order = (int) $cparams->get('search_autocomplete_titles_order', 0) === 1
+					? array('titles', 'words') : array('words', 'titles');
+			}
+			elseif ($_legacy_mode == 3)
+			{
+				$_orders = array(
+					0 => array('tags', 'words', 'titles'),
+					1 => array('tags', 'titles', 'words'),
+					2 => array('words', 'tags', 'titles'),
+					3 => array('titles', 'tags', 'words')
+				);
+				$sources_order = $_orders[(int) $cparams->get('search_autocomplete_tags_order', 0)] ?? $_orders[0];
+			}
+			elseif ($_legacy_mode == 2)
+			{
+				$sources_order = array('titles');
+			}
+			else
+			{
+				$sources_order = array('words');
+			}
 		}
 
 		// Further pages (infinite scroll of the Tag-like auto-complete) list only more words, never titles / tags again
@@ -378,7 +391,7 @@ class FlexicontentTasksCore
 		}
 
 		// Item titles and tags that match the typed words
-		$suggestions = array('words' => $options['Matches'], 'titles' => array(), 'tags' => array());
+		$suggestions = array('words' => $options['Matches'], 'titles' => array(), 'tags' => array(), 'categories' => array());
 
 		if (array_diff($sources_order, array('words')))
 		{
@@ -430,10 +443,10 @@ class FlexicontentTasksCore
 				}
 			}
 
-			if (in_array('tags', $sources_order))
+			// Falang translation of tag / category titles for the page language (same lookup as the tags / categories field search index)
+			$fa_lang_id = 0;
+			if (in_array('tags', $sources_order) || in_array('categories', $sources_order))
 			{
-				// Falang translation of the tag title for the page language (same lookup as the tags field index)
-				$fa_lang_id = 0;
 				$falang_enabled = class_exists('\\Joomla\\CMS\\Plugin\\PluginHelper')
 					&& \Joomla\CMS\Plugin\PluginHelper::isEnabled('system', 'falangdriver')
 					&& $cparams->get('flexi_fish', 0);
@@ -446,7 +459,38 @@ class FlexicontentTasksCore
 						. ' ORDER BY (la.lang_code = ' . $db->Quote($_cur_tag) . ') DESC';
 					$fa_lang_id = (int) $db->setQuery($_lq, 0, 1)->loadResult();
 				}
+			}
 
+			if (in_array('categories', $sources_order))
+			{
+				// Categories that have at least one item visible to the user, starting matches first, then most items
+				$cat_query = 'SELECT c.id, c.title, ' . ($fa_lang_id ? 'fa.value' : '""') . ' AS fa_text, COUNT(DISTINCT i.id) AS cnt'
+					. ' FROM #__categories AS c'
+					. ' JOIN #__flexicontent_cats_item_relations AS crel2 ON crel2.catid = c.id'
+					. ' JOIN #__flexicontent_items_tmp AS i ON i.id = crel2.itemid'
+					. ($fa_lang_id
+						? ' LEFT JOIN #__falang_content AS fa ON fa.reference_table = "categories" AND fa.reference_field = "title"'
+							. ' AND fa.reference_id = c.id AND fa.language_id = ' . $fa_lang_id
+						: '')
+					. $cid_join
+					. ' WHERE c.published = 1 AND c.extension = "com_content" AND c.id <> 1'
+					. ' AND c.access IN (' . ($levels ? implode(',', $levels) : '0') . ') AND '
+					. ($fa_lang_id ? '(' . $_conds('c.title') . ' OR ' . $_conds('fa.value') . ')' : $_conds('c.title'))
+					. $item_filters
+					. ' GROUP BY c.id, c.title' . ($fa_lang_id ? ', fa.value' : '')
+					. ' ORDER BY (' . ($fa_lang_id ? 'COALESCE(NULLIF(fa.value, ""), c.title)' : 'c.title') . ' LIKE ' . $_text_like . ') DESC, cnt DESC'
+					. ' LIMIT ' . $titles_limit;
+
+				foreach ((array) $db->setQuery($cat_query)->loadAssocList() as $_c)
+				{
+					// Show the translated title when there is one, otherwise the original title
+					$_cat_text = strlen(trim((string) $_c['fa_text'])) ? $_c['fa_text'] : $_c['title'];
+					$suggestions['categories'][] = array('text' => $_cat_text, 'id' => $_cat_text);
+				}
+			}
+
+			if (in_array('tags', $sources_order))
+			{
 				// Tags that have at least one item visible to the user, exact / starting matches first, then most used
 				$tag_query = 'SELECT t.id, t.name, ' . ($fa_lang_id ? 'fa.value' : '""') . ' AS fa_text, COUNT(DISTINCT i.id) AS cnt'
 					. ' FROM #__flexicontent_tags AS t'
