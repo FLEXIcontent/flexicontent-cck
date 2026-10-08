@@ -33,25 +33,20 @@
 				<option value="1">FLEXI_FILTER_WORD_RELEVANT_TITLE</option>
 				<option value="2">FLEXI_YES</option>
 			</field>
+			<field name="filter_word_field_priority" type="fcfieldpriority" default="" label="FLEXI_FILTER_WORD_FIELD_PRIORITY" description="FLEXI_FILTER_WORD_FIELD_PRIORITY_DESC" >
+				<option value="title">FLEXI_FILTER_WORD_FIELD_TITLE</option>
+				<option value="categories">FLEXI_FILTER_WORD_FIELD_CATEGORIES</option>
+				<option value="tags">FLEXI_FILTER_WORD_FIELD_TAGS</option>
+			</field>
 			<field name="search_autocomplete_scan" type="number" default="300" min="50" max="2000" step="50" label="FLEXI_SEARCH_AUTOCOMPLETE_SCAN" description="FLEXI_SEARCH_AUTOCOMPLETE_SCAN_DESC" />
 			<field name="search_autocomplete_limit" type="number" default="10" min="1" max="30" step="1" label="FLEXI_SEARCH_AUTOCOMPLETE_LIMIT" description="FLEXI_SEARCH_AUTOCOMPLETE_LIMIT_DESC" />
-			<field name="search_autocomplete_titles" type="multilist" subtype="radio" default="0" label="FLEXI_SEARCH_AUTOCOMPLETE_TITLES" description="FLEXI_SEARCH_AUTOCOMPLETE_TITLES_DESC" class="txtsearch_display btn-group group-fcmethod fcoffactive" >
-				<option value="0" show_list="" hide_list="ac_order_two,ac_order_three,ac_titles_limit">FLEXI_SEARCH_AUTOCOMPLETE_TITLES_WORDS</option>
-				<option value="1" show_list="ac_order_two,ac_titles_limit" hide_list="ac_order_three">FLEXI_SEARCH_AUTOCOMPLETE_TITLES_BOTH</option>
-				<option value="3" show_list="ac_order_three,ac_titles_limit" hide_list="ac_order_two">FLEXI_SEARCH_AUTOCOMPLETE_TAGS_TITLES</option>
-				<option value="2" show_list="ac_titles_limit" hide_list="ac_order_two,ac_order_three">FLEXI_SEARCH_AUTOCOMPLETE_TITLES_ONLY</option>
+			<field name="search_autocomplete_sources" type="fcacsources" default="" label="FLEXI_SEARCH_AUTOCOMPLETE_SOURCES" description="FLEXI_SEARCH_AUTOCOMPLETE_SOURCES_DESC" >
+				<option value="words">FLEXI_SEARCH_AUTOCOMPLETE_SRC_WORDS</option>
+				<option value="titles">FLEXI_SEARCH_AUTOCOMPLETE_SRC_TITLES</option>
+				<option value="tags">FLEXI_SEARCH_AUTOCOMPLETE_SRC_TAGS</option>
+				<option value="categories">FLEXI_SEARCH_AUTOCOMPLETE_SRC_CATEGORIES</option>
 			</field>
-			<field name="search_autocomplete_titles_order" type="multilist" subtype="radio" default="0" label="FLEXI_SEARCH_AUTOCOMPLETE_TITLES_ORDER" description="FLEXI_SEARCH_AUTOCOMPLETE_TITLES_ORDER_DESC" class="ac_order_two txtsearch_display btn-group group-fcmethod fcoffactive" >
-				<option value="0">FLEXI_SEARCH_AUTOCOMPLETE_WORDS_BEFORE_TITLES</option>
-				<option value="1">FLEXI_SEARCH_AUTOCOMPLETE_TITLES_BEFORE_WORDS</option>
-			</field>
-			<field name="search_autocomplete_tags_order" type="multilist" subtype="radio" default="0" label="FLEXI_SEARCH_AUTOCOMPLETE_TITLES_ORDER" description="FLEXI_SEARCH_AUTOCOMPLETE_TITLES_ORDER_DESC" class="ac_order_three txtsearch_display btn-group group-fcmethod fcoffactive" >
-				<option value="0">FLEXI_SEARCH_AUTOCOMPLETE_ORDER_TAGS_WORDS_TITLES</option>
-				<option value="1">FLEXI_SEARCH_AUTOCOMPLETE_ORDER_TAGS_TITLES_WORDS</option>
-				<option value="2">FLEXI_SEARCH_AUTOCOMPLETE_ORDER_WORDS_TAGS_TITLES</option>
-				<option value="3">FLEXI_SEARCH_AUTOCOMPLETE_ORDER_TITLES_TAGS_WORDS</option>
-			</field>
-			<field name="search_autocomplete_titles_limit" type="number" default="5" min="1" max="30" step="1" label="FLEXI_SEARCH_AUTOCOMPLETE_TITLES_LIMIT" description="FLEXI_SEARCH_AUTOCOMPLETE_TITLES_LIMIT_DESC" class="ac_titles_limit" />
+			<field name="search_autocomplete_titles_limit" type="number" default="5" min="1" max="30" step="1" label="FLEXI_SEARCH_AUTOCOMPLETE_TITLES_LIMIT" description="FLEXI_SEARCH_AUTOCOMPLETE_TITLES_LIMIT_DESC" />
 
 		<field name="" type="separator" default="FLEXI_MULTI_LANGUAGE" label="" level="level0" />
 
