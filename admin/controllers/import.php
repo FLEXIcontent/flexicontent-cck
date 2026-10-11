@@ -1050,7 +1050,7 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 				{
 					$msg = 'Internal Error item with ID: "' . $c_item_id . " could not be loaded in order to be updated";
 					\Joomla\CMS\Log\Log::add($msg, \Joomla\CMS\Log\Log::WARNING, 'com_flexicontent.importcsv');
-					echo $msg . "<br/>";
+					echo $this->_failedItemMsg($msg);
 				}
 
 				// Otherwise (if not testing) try to create / update the item by using Item Model's store() method
@@ -1059,7 +1059,7 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 					$conf['failure_count']++;
 					$msg = 'Failed item no: ' . $lineno . ". titled as: '" . $data['title'] . "' : " . $itemmodel->getError();
 					\Joomla\CMS\Log\Log::add($msg, \Joomla\CMS\Log\Log::WARNING, 'com_flexicontent.importcsv');
-					echo $msg . "<br/>";
+					echo $this->_failedItemMsg($msg);
 				}
 
 				// Item record successfully stored
@@ -1110,9 +1110,9 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 			catch (\Throwable $e)
 			{
 				$conf['failure_count']++;
-				$msg = 'Failed item no: ' . $lineno . ' : UNCAUGHT ERROR: ' . $e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine();
+				$msg = 'Failed item no: ' . $lineno . (isset($data['title']) ? ". titled as: '" . $data['title'] . "'" : '') . ' : UNCAUGHT ERROR: ' . $e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine();
 				\Joomla\CMS\Log\Log::add($msg, \Joomla\CMS\Log\Log::WARNING, 'com_flexicontent.importcsv');
-				echo $msg . "<br/>";
+				echo $this->_failedItemMsg($msg);
 			}
 		}
 
@@ -1126,8 +1126,8 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 			jexit();
 		}
 
-		// When import is finished clean cache
-		if ($lineno == $itemcount)
+		// When import is finished clean cache (after the loop $lineno is the next line to import)
+		if ($lineno > $itemcount)
 		{
 			// Clean item's cache
 			$cache = FLEXIUtilities::getCache($group = '', 0);
@@ -1147,6 +1147,19 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 		}
 
 		jexit();
+	}
+
+
+	/**
+	 * Create the HTML of a failed item message for the import progress page, which counts them (CSS class 'fc_import_failed')
+	 *
+	 * @param   string  $msg  The message
+	 *
+	 * @return  string
+	 */
+	protected function _failedItemMsg($msg)
+	{
+		return '<div class="fc_import_failed" style="color: #c00; font-weight: bold;">' . htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') . '</div>';
 	}
 
 
@@ -1209,7 +1222,8 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 		// echo "<pre>"; print_r($filedata_arr); jexit();
 		if (count($filedata_arr))
 		{
-			$filenames_missing = array();
+			$filenames_missing    = array();
+			$filenames_unreadable = array();
 
 			foreach ($filedata_arr as $fld_name => $filedata)
 			{
@@ -1306,6 +1320,12 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 							{
 								$filenames_missing[$fld_name][$filename][] = $lineno;
 							}
+
+							// File exists but PHP can not read it (e.g. permissions of uploaded files), copying it during import would fail
+							elseif (!is_readable(\Joomla\Filesystem\Path::clean($srcpath_original . $_filename)))
+							{
+								$filenames_unreadable[$fld_name][$_filename][] = $lineno;
+							}
 						}
 
 						// Reconstruct the full cell value with all corrected filenames
@@ -1353,6 +1373,41 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 					foreach ($fld_files_missing as $filename_missing => $line_nums)
 					{
 						$parse_log .= 'LINE ' . implode(',', $line_nums) . ': ' . $filename_missing . ' <br/>';
+					}
+
+					$parse_log .= '
+					</span>
+					';
+				}
+			}
+
+			// Files that exist but are not readable, importing them would fail (not skippable, fix file permissions)
+			if (count($filenames_unreadable))
+			{
+				$parse_log .= '<span class="fc-mssg fc-error"> CSV File has FILE references to files that exist but <b>are not readable</b> by the web server (PHP), '
+					. '<br/>please fix their <b>permissions</b> (e.g. files 644, folders 755), importing them would fail' . "\n";
+
+				if ($task != 'testcsv')
+				{
+					$parse_log .= '<br/><b>-- (DEBUG was auto enabled for first 2 records)</b>' . "\n";
+					$task = 'testcsv';
+				}
+
+				$parse_log .= '</span>';
+
+				foreach ($filenames_unreadable as $fld_name => $fld_files_unreadable)
+				{
+					$field_type = $ff_names_to_types[$fld_name];
+					$srcpath_original = $ff_types_to_paths[$field_type];
+					$parse_log .= '
+					<span class="fc-mssg fc-warning">
+					FIELD: <b> ' . $fld_name . '</b> has ' . count($fld_files_unreadable) . ' not readable file(s) <br/>
+					-- In folder: <b> ' . $srcpath_original . ' </b><br/>
+					-- Not readable filenames list: <br/> ';
+
+					foreach ($fld_files_unreadable as $filename_unreadable => $line_nums)
+					{
+						$parse_log .= 'LINE ' . implode(',', $line_nums) . ': ' . $filename_unreadable . ' <br/>';
 					}
 
 					$parse_log .= '
