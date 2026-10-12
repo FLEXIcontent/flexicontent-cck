@@ -200,6 +200,10 @@ class FlexicontentTasksCore
 
 		$cid_list = !empty($cids) ? implode(',', $cids) : '';
 
+		// Content types selected in the search form (suggestions are limited to them)
+		$type_ids = array_filter(array_map('intval', explode(',', preg_replace('/[^0-9,]/', '', $jinput->get('types', '', 'string')))));
+		$type_join = $type_ids ? ' JOIN #__flexicontent_items_ext AS tie ON tie.item_id = i.id AND tie.type_id IN (' . implode(',', $type_ids) . ')' : '';
+
 		if ($type != 'basic_index' && $type != 'adv_index') jexit();
 		if (!strlen($text)) jexit();
 
@@ -304,6 +308,7 @@ class FlexicontentTasksCore
 			. ($access_where ? ' JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id' : '')
 			. ($access_where ? ' JOIN #__categories AS mc ON mc.id = i.catid' : '')
 			. ($cid_list ? ' JOIN #__flexicontent_cats_item_relations AS rel ON i.id = rel.itemid AND rel.catid IN (' . $cid_list . ')' : '')
+			. $type_join
 			. $joinaccess
 			. ' WHERE ' . $_text_match
 			. '   AND i.state IN (1,-5) '
@@ -425,7 +430,7 @@ class FlexicontentTasksCore
 				. $lang_where
 				. $item_access;
 
-			$cid_join = $cid_list ? ' JOIN #__flexicontent_cats_item_relations AS crel ON i.id = crel.itemid AND crel.catid IN (' . $cid_list . ')' : '';
+			$cid_join = ($cid_list ? ' JOIN #__flexicontent_cats_item_relations AS crel ON i.id = crel.itemid AND crel.catid IN (' . $cid_list . ')' : '') . $type_join;
 
 			if (in_array('titles', $sources_order))
 			{
@@ -464,20 +469,22 @@ class FlexicontentTasksCore
 			if (in_array('categories', $sources_order))
 			{
 				// Categories that have at least one item visible to the user, starting matches first, then most items
-				$cat_query = 'SELECT c.id, c.title, ' . ($fa_lang_id ? 'fa.value' : '""') . ' AS fa_text, COUNT(DISTINCT i.id) AS cnt'
+				$cat_query = 'SELECT c.id, c.title, c.metakey, ' . ($fa_lang_id ? 'fa.value' : '""') . ' AS fa_text, ' . ($fa_lang_id ? 'fk.value' : '""') . ' AS fa_metakey, COUNT(DISTINCT i.id) AS cnt'
 					. ' FROM #__categories AS c'
 					. ' JOIN #__flexicontent_cats_item_relations AS crel2 ON crel2.catid = c.id'
 					. ' JOIN #__flexicontent_items_tmp AS i ON i.id = crel2.itemid'
 					. ($fa_lang_id
 						? ' LEFT JOIN #__falang_content AS fa ON fa.reference_table = "categories" AND fa.reference_field = "title"'
 							. ' AND fa.reference_id = c.id AND fa.language_id = ' . $fa_lang_id
+							. ' LEFT JOIN #__falang_content AS fk ON fk.reference_table = "categories" AND fk.reference_field = "metakey"'
+							. ' AND fk.reference_id = c.id AND fk.language_id = ' . $fa_lang_id
 						: '')
 					. $cid_join
 					. ' WHERE c.published = 1 AND c.extension = "com_content" AND c.id <> 1'
 					. ' AND c.access IN (' . ($levels ? implode(',', $levels) : '0') . ') AND '
-					. ($fa_lang_id ? '(' . $_conds('c.title') . ' OR ' . $_conds('fa.value') . ')' : $_conds('c.title'))
+					. '(' . $_conds('c.title') . ' OR ' . $_conds('c.metakey') . ($fa_lang_id ? ' OR ' . $_conds('fa.value') . ' OR ' . $_conds('fk.value') : '') . ')'
 					. $item_filters
-					. ' GROUP BY c.id, c.title' . ($fa_lang_id ? ', fa.value' : '')
+					. ' GROUP BY c.id, c.title, c.metakey' . ($fa_lang_id ? ', fa.value, fk.value' : '')
 					. ' ORDER BY (' . ($fa_lang_id ? 'COALESCE(NULLIF(fa.value, ""), c.title)' : 'c.title') . ' LIKE ' . $_text_like . ') DESC, cnt DESC'
 					. ' LIMIT ' . $titles_limit;
 
@@ -485,7 +492,33 @@ class FlexicontentTasksCore
 				{
 					// Show the translated title when there is one, otherwise the original title
 					$_cat_text = strlen(trim((string) $_c['fa_text'])) ? $_c['fa_text'] : $_c['title'];
-					$suggestions['categories'][] = array('text' => $_cat_text, 'id' => $_cat_text);
+					$_cat_hits = array();
+
+					// Category keywords (Meta Keywords) that match the typed text are suggested too, e.g. "Pop Music"
+					foreach (array_filter(array_map('trim', explode(',', $_c['metakey'] . ',' . $_c['fa_metakey']))) as $_kw)
+					{
+						$_ok = true;
+						foreach ($_typed as $_i => $_tw)
+						{
+							$_pat = '/' . (($_i == $_last_i && !$next_word) ? '(^|\\s)' : '') . preg_quote($_tw, '/') . '/iu';
+							if (!preg_match($_pat, $_kw)) { $_ok = false; break; }
+						}
+						if ($_ok) $_cat_hits[] = $_kw;
+					}
+
+					$_title_ok = true;
+					foreach ($_typed as $_i => $_tw)
+					{
+						$_pat = '/' . (($_i == $_last_i && !$next_word) ? '(^|\\s)' : '') . preg_quote($_tw, '/') . '/iu';
+						if (!preg_match($_pat, $_cat_text)) { $_title_ok = false; break; }
+					}
+					if ($_title_ok) array_unshift($_cat_hits, $_cat_text);
+					if (!$_cat_hits) $_cat_hits[] = $_cat_text;
+
+					foreach ($_cat_hits as $_ct)
+					{
+						$suggestions['categories'][] = array('text' => $_ct, 'id' => $_ct);
+					}
 				}
 			}
 

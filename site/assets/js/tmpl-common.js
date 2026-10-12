@@ -1,3 +1,23 @@
+	/* Content types selected in the form of a text search input (name contenttypes[]: hidden inputs, checkboxes or select), used to limit the suggestions */
+	function fc_ac_form_types(input)
+	{
+		var node = input && input.jquery ? input[0] : input;
+		var form = node && node.form ? node.form : null;
+		if (!form) return '';
+		var vals = [];
+		var els = form.querySelectorAll('[name="contenttypes[]"], [name="contenttypes"]');
+		for (var i = 0; i < els.length; i++)
+		{
+			var e = els[i];
+			if (e.tagName === 'SELECT')
+			{
+				for (var j = 0; j < e.options.length; j++) if (e.options[j].selected) vals.push(e.options[j].value);
+			}
+			else if ((e.type !== 'checkbox' && e.type !== 'radio') || e.checked) vals.push(e.value);
+		}
+		return vals.filter(function(v) { return parseInt(v) > 0; }).join(',');
+	}
+
 	/* Set a cookie */
 	function fc_setCookie(cookieName, cookieValue, nDays, samesite="lax")
 	{
@@ -479,6 +499,7 @@ document.addEventListener('DOMContentLoaded', function() {
 					var el_lang = el.attr('data-txt_ac_lang') ? el.attr('data-txt_ac_lang') : '';
 					var el_cid  = el.attr('data-txt_ac_cid')  ? el.attr('data-txt_ac_cid')  : (parseInt(FC_URL_VARS['cid']) || 0);
 					var el_cids = el.attr('data-txt_ac_cids') ? el.attr('data-txt_ac_cids') : FC_URL_VARS['cids'];
+					var el_types = fc_ac_form_types(el);
 					var el_usesubs = parseInt(el.attr('data-txt_ac_usesubs')) || 0;
 					jQuery.ajax({
 						url: (jroot_url_fc + "components/com_flexicontent/tasks/core.php"),
@@ -491,6 +512,7 @@ document.addEventListener('DOMContentLoaded', function() {
 							lang: el_lang,
 							cid: el_cid,
 							cids: el_cids,
+							types: el_types,
 							usesubs: el_usesubs
 						},
 						success: function( data ) {
@@ -541,6 +563,7 @@ document.addEventListener('DOMContentLoaded', function() {
 						lang:    el.getAttribute('data-txt_ac_lang') ? el.getAttribute('data-txt_ac_lang') : '',
 						cid:     el.getAttribute('data-txt_ac_cid')  ? el.getAttribute('data-txt_ac_cid')  : (typeof FC_URL_VARS !== 'undefined' ? (parseInt(FC_URL_VARS['cid']) || 0) : 0),
 						cids:    el.getAttribute('data-txt_ac_cids') ? el.getAttribute('data-txt_ac_cids') : (typeof FC_URL_VARS !== 'undefined' ? (FC_URL_VARS['cids'] || '') : ''),
+						types:   fc_ac_form_types(el),
 						usesubs: parseInt(el.getAttribute('data-txt_ac_usesubs')) || 0
 					};
 				}
@@ -650,6 +673,7 @@ function acClose() {
 						params.set('lang', attrs.lang);
 						params.set('cid', attrs.cid);
 						params.set('cids', attrs.cids);
+						params.set('types', attrs.types);
 						params.set('usesubs', attrs.usesubs);
 
 						var abortable = (typeof AbortController !== 'undefined');
@@ -763,6 +787,7 @@ function acClose() {
 							lang: (el.getAttribute('data-txt_ac_lang') ? el.getAttribute('data-txt_ac_lang') : ''),
 							cid:  (el.getAttribute('data-txt_ac_cid')  ? el.getAttribute('data-txt_ac_cid')  : (typeof FC_URL_VARS !== 'undefined' ? (parseInt(FC_URL_VARS['cid']) || 0) : 0)),
 							cids: (el.getAttribute('data-txt_ac_cids') ? el.getAttribute('data-txt_ac_cids') : (typeof FC_URL_VARS !== 'undefined' ? FC_URL_VARS['cids'] : '')),
+							types: fc_ac_form_types(el),
 							usesubs: (parseInt(el.getAttribute('data-txt_ac_usesubs')) || 0)
 						};
 
@@ -818,6 +843,7 @@ function acClose() {
 							lang: (jQuery(this).attr('data-txt_ac_lang') ? jQuery(this).attr('data-txt_ac_lang') : ''),
 							cid:  (jQuery(this).attr('data-txt_ac_cid')  ? jQuery(this).attr('data-txt_ac_cid')  : (parseInt(FC_URL_VARS['cid']) || 0)),
 							cids: (jQuery(this).attr('data-txt_ac_cids') ? jQuery(this).attr('data-txt_ac_cids') : FC_URL_VARS['cids']),
+							types: fc_ac_form_types(this),
 							usesubs: (parseInt(jQuery(this).attr('data-txt_ac_usesubs')) || 0)
 						};
 					},
