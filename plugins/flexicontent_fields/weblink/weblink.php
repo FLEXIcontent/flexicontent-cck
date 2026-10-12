@@ -469,13 +469,8 @@ class plgFlexicontent_fieldsWeblink extends FCField
 				theInput.attr('id', element_id + '_hits');
 				newField.find('.urlhits-lbl').first().attr('for', element_id + '_hits');
 
-				// Destroy any select2 elements
-				var sel2_elements = newField.find('div.select2-container');
-				if (sel2_elements.length)
-				{
-					sel2_elements.remove();
-					newField.find('select.use_select2_lib').select2('destroy').show();
-				}
+				// Destroy any select library elements (select2 or choices.js)
+				fc_destroySelectLib(newField);
 
 				// Set hits to zero for new row value
 				newField.find('span.hitcount').html('0 ' + " . json_encode(\Joomla\CMS\Language\Text::_('FLEXI_HITS')) . ");

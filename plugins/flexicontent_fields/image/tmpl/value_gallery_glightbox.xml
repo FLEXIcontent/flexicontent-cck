@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+
+	<name>Image field layout -- GLightbox</name>
+	<author>ggppdk</author>
+	<creationDate>September 2026</creationDate>
+	<copyright>Copyright (C) 2026 ggppdk</copyright>
+	<license>GNU/GPL v2</license>
+	<authorEmail>flexicontentck@gmail.com</authorEmail>
+	<authorUrl>www.flexicontent.org</authorUrl>
+	<version>1.0</version>
+	<description>Flexicontent fields - Image field layout - GLightbox parameters</description>
+	
+	<fields name="attribs">
+		
+		<fieldset name="layout" addfieldpath="/administrator/components/com_flexicontent/elements">
+
+		<field name="" type="separator" default="FLEXI_DISPLAY" level="level2" />
+
+			<field name="PPFX_show_caption" type="radio" default="true" label="Display caption in lightbox" description="Display the image title and description inside the lightbox" class="btn-group btn-group-yesno">
+				<option value="false">FLEXI_NO</option>
+				<option value="true">FLEXI_YES</option>
+			</field>
+			<field name="PPFX_open_size" type="radio" default="l" label="Image size opened in lightbox" description="Select which resized image is opened in the lightbox (s, m, l or original). Independent from the display size chosen in the main Image field parameters." class="btn-group btn-group-yesno">
+				<option value="s">Small (s)</option>
+				<option value="m">Medium (m)</option>
+				<option value="l">Large (l)</option>
+				<option value="o">Original</option>
+			</field>
+
+		<field name="" type="separator" default="FLEXI_FIELD_IMAGE_BEHAVIORS" level="level2" />
+
+			<field name="PPFX_loop_mode" type="radio" default="false" label="FLEXI_FIELD_IMAGE_LOOP" description="FLEXI_FIELD_IMAGE_LOOP_DESC" class="btn-group btn-group-yesno">
+				<option value="false">FLEXI_NO</option>
+				<option value="true">FLEXI_YES</option>
+			</field>
+			<field name="PPFX_keyboard_mode" type="radio" default="true" label="FLEXI_FIELD_IMAGE_KEYBOARD_NAV" description="FLEXI_FIELD_IMAGE_KEYBOARD_NAV_DESC" class="btn-group btn-group-yesno">
+				<option value="false">FLEXI_NO</option>
+				<option value="true">FLEXI_YES</option>
+			</field>
+			<field name="PPFX_touch_navigation" type="radio" default="true" label="Touch swipe navigation" description="Navigate between slides by swiping on touch devices" class="btn-group btn-group-yesno">
+				<option value="false">FLEXI_NO</option>
+				<option value="true">FLEXI_YES</option>
+			</field>
+			<field name="PPFX_close_outside" type="radio" default="true" label="Close on click outside" description="Close the lightbox when clicking on the dark area around the content" class="btn-group btn-group-yesno">
+				<option value="false">FLEXI_NO</option>
+				<option value="true">FLEXI_YES</option>
+			</field>
+			<field name="PPFX_preload" type="radio" default="true" label="Preload adjacent slides" description="Preload the previous and next slide images while browsing" class="btn-group btn-group-yesno">
+				<option value="false">FLEXI_NO</option>
+				<option value="true">FLEXI_YES</option>
+			</field>
+
+		<field name="" type="separator" default="FLEXI_FIELD_IMAGE_TRANISITION_EFFECT" level="level2" />
+
+			<field name="PPFX_open_effect" type="list" default="zoom" label="Open animation" description="Open animation of the lightbox" class="use_select2_lib">
+				<option value="none">None</option>
+				<option value="zoom">Zoom</option>
+				<option value="fade">Fade</option>
+				<option value="slide">Slide</option>
+			</field>
+			<field name="PPFX_close_effect" type="list" default="zoom" label="Close animation" description="Close animation of the lightbox" class="use_select2_lib">
+				<option value="none">None</option>
+				<option value="zoom">Zoom</option>
+				<option value="fade">Fade</option>
+				<option value="slide">Slide</option>
+			</field>
+			<field name="PPFX_slide_effect" type="list" default="slide" label="FLEXI_FIELD_IMAGE_TRANISITION_EFFECT" description="FLEXI_FIELD_IMAGE_TRANISITION_EFFECT_DESC" class="use_select2_lib">
+				<option value="slide">Slide</option>
+				<option value="fade">Fade</option>
+				<option value="zoom">Zoom</option>
+				<option value="slideBack">Slide back</option>
+				<option value="none">None</option>
+			</field>
+
+		<field name="" type="separator" default="FLEXI_FIELD_IMAGE_SLIDESHOW_OPTIONS" level="level2" />
+
+			<field name="PPFX_zoomable" type="radio" default="true" label="Zoom image on click" description="Allow zooming the image by clicking or tapping on it" class="btn-group btn-group-yesno">
+				<option value="false">FLEXI_NO</option>
+				<option value="true">FLEXI_YES</option>
+			</field>
+			<field name="PPFX_draggable" type="radio" default="true" label="Drag image to pan" description="Allow dragging the zoomed image to pan it" class="btn-group btn-group-yesno">
+				<option value="false">FLEXI_NO</option>
+				<option value="true">FLEXI_YES</option>
+			</field>
+			<field name="PPFX_autoplay_videos" type="radio" default="false" label="FLEXI_FIELD_IMAGE_AUTOPLAY" description="Autoplay video content when its slide is opened" class="btn-group btn-group-yesno">
+				<option value="false">FLEXI_NO</option>
+				<option value="true">FLEXI_YES</option>
+			</field>
+			<field name="PPFX_desc_position" type="list" default="bottom" label="Caption position" description="Position of the title and description caption inside the lightbox" class="use_select2_lib">
+				<option value="bottom">Bottom</option>
+				<option value="top">Top</option>
+				<option value="right">Right</option>
+				<option value="left">Left</option>
+			</field>
+  		
+		</fieldset>
+
+	</fields>
+	
+</form>

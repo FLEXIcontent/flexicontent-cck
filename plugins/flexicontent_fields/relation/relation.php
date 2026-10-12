@@ -277,13 +277,8 @@ class plgFlexicontent_fieldsRelation extends FCField
 				newField.find('label.item_selector-lbl').attr('id', element_id + '_item_selector-lbl');
 				newField.find('label.selected_items-lbl').attr('id', element_id + '-lbl');
 
-				// Destroy any select2 elements
-				var sel2_elements = newField.find('div.select2-container');
-				if (sel2_elements.length)
-				{
-					sel2_elements.remove();
-					newField.find('select.use_select2_lib').select2('destroy').show();
-				}
+				// Destroy any select library elements (select2 or choices.js)
+				fc_destroySelectLib(newField);
 
 				// Update value holder
 				newField.find('.fcfield_value_holder')
@@ -303,6 +298,9 @@ class plgFlexicontent_fieldsRelation extends FCField
 
 				// Re-init any select2 elements
 				fc_attachSelect2(newField);
+
+				// In single-field Choices.js UI, hide the redundant standalone item picker
+				if (window.fc_use_choicesjs && window.fcfield_relation) fcfield_relation.hideLegacyPickers(newField);
 
 				" . (count($allowedtree) === 1 ? "
 				var cat_selector = jQuery('#' + element_id + '_cat_selector');
@@ -594,6 +592,8 @@ class plgFlexicontent_fieldsRelation extends FCField
 						<select id="' . $elementid_n . '" name="' . $fieldname_n . '" ' . ($multiple_per_value ? 'multiple="multiple" ' : '')
 				. ' class="' . $classes . ' fcfield-relation-selected_items" ' . $attribs
 				. ' data-max-related="' . $max_values . '" '
+				. ' data-fc_choices_search_remote="1" data-field_id="' . $field->id . '" data-item_id="' . $item->id . '" data-item_type="' . $item->type_id . '" data-item_lang="' . $item->language . '" '
+				. ' data-load_method="' . (int) $load_method . '" '
 				. ' onchange="return fcfield_relation.selected_items_modified(this);">
 							' . $items_options_select[$n] . '
 						</select>

@@ -6032,14 +6032,18 @@ dl.tabs dt a:link,
   text-decoration: none;
   background: none;
 }
-div.current {
+div.current:not(.gslide) {
   border: 1px solid #cccccc;
   clear: both;
   padding: 10px 10px;
 }
-div.current dd {
+div.current:not(.gslide) dd {
   margin: 0;
   padding: 0;
+}
+div[class^="glightbox_fccontainer_"] {
+  display: flex;
+  flex-wrap: wrap;
 }
 #bottom-block {
   margin: 0 auto;
@@ -6497,4 +6501,8 @@ div.fc-field-box {
 }
 h2.fc_search_result_title a {
   text-decoration: none;
+}
+/** fix swiper **/
+.swiper.fc_swiper_main {
+  width: 100% !important;
 }

@@ -494,52 +494,38 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 					<input type="hidden" name="review_type" value="' . $review_type . '" />
 					<input type="hidden" name="' . \Joomla\CMS\Session\Session::getFormToken() . '" value="1" />
 
-					<table class="fc-form-tbl fcinner">
+					<div class="fcvote-form-fields">
 
-						<tr class="fcvote_review_form_title_row">
-							<td class="key">
-								<label class="fc-prop-lbl" for="fcvote_review_form_' . $item->id . '_title">' . \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_TITLE') . '</label>
-							</td>
-							<td>
-								<input type="text" name="title" size="200"
-									value="'.htmlspecialchars( ($review ? $review->title : ''), ENT_COMPAT, 'UTF-8' ).'"
-									id="fcvote_review_form_' . $item->id . '_title"
-								/>
-							</td>
-						</tr>
+						<div class="fcvote-form-group">
+							<label class="fcvote-form-label" for="fcvote_review_form_' . $item->id . '_title">' . \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_TITLE') . '</label>
+							<input type="text" name="title"
+								value="'.htmlspecialchars( ($review ? $review->title : ''), ENT_COMPAT, 'UTF-8' ).'"
+								id="fcvote_review_form_' . $item->id . '_title"
+							/>
+						</div>
 
-						<tr class="fcvote_review_form_email_row">
-							<td class="key">
-								<label class="fc-prop-lbl" for="fcvote_review_form_' . $item->id . '_email">' . \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_EMAIL') . '</label>
-							</td>
-							<td>' . ($user->id ? '<span class=badge>' . $user->email . '</span>' : '
-								<input required type="text" name="email" size="200"
-									value="'.htmlspecialchars( ($review ? $review->email : ''), ENT_COMPAT, 'UTF-8' ).'"
-									id="fcvote_review_form_' . $item->id . '_email"
-								/>') . '
-							</td>
-						</tr>
+						<div class="fcvote-form-group">
+							<label class="fcvote-form-label" for="fcvote_review_form_' . $item->id . '_email">' . \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_EMAIL') . '</label>
+							' . ($user->id ? '<div class="fcvote-form-badge badge">' . $user->email . '</div>' : '
+							<input required type="text" name="email"
+								value="'.htmlspecialchars( ($review ? $review->email : ''), ENT_COMPAT, 'UTF-8' ).'"
+								id="fcvote_review_form_' . $item->id . '_email"
+							/>') . '
+						</div>
 
-						<tr class="fcvote_review_form_text_row">
-							<td class="key">
-								<label class="fc-prop-lbl" for="fcvote_review_form_' . $item->id . '_text">'.\Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_TEXT').'</label>
-							</td>
-							<td class="top">
-								<textarea required name="text" rows="4" cols="200" id="fcvote_review_form_' . $item->id . '_text" >' . ($review ? $review->text : '') . '</textarea>
-							</td>
-						</tr>
+						<div class="fcvote-form-group">
+							<label class="fcvote-form-label" for="fcvote_review_form_' . $item->id . '_text">'.\Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_TEXT').'</label>
+							<textarea required name="text" rows="4" id="fcvote_review_form_' . $item->id . '_text" >' . ($review ? $review->text : '') . '</textarea>
+						</div>
 
-						<tr class="fcvote_review_form_submit_btn_row">
-							<td class="key"></td>
-							<td class="top">
-								<input type="button" class="btn btn-success fcvote_review_form_submit_btn"
-									onclick="fcvote_submit_review_form(\'' . $html_tagid . '\', this.form); return false;"
-									value="' . \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_SUMBIT') . '"
-								/>
-							</td>
-						</tr>
+						<div class="fcvote-form-group fcvote-form-submit">
+							<input type="button" class="btn btn-success fcvote_review_form_submit_btn"
+								onclick="fcvote_submit_review_form(\'' . $html_tagid . '\', this.form); return false;"
+								value="' . \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_SUMBIT') . '"
+							/>
+						</div>
 
-					</table>
+					</div>
 
 				</form>
 		');

@@ -408,13 +408,8 @@ class plgFlexicontent_fieldsImage extends FCField
 				var uniqueRowN = uniqueRowNum" . $field->id . ";
 				var element_id = '" . $elementid . "_' + uniqueRowN;
 
-				// Destroy any select2 elements
-				var sel2_elements = newField.find('div.select2-container');
-				if (sel2_elements.length)
-				{
-					sel2_elements.remove();
-					newField.find('select.use_select2_lib').select2('destroy').show();
-				}
+				// Destroy any select library elements (select2 or choices.js)
+				fc_destroySelectLib(newField);
 
 				newField.find('input.hasvalue').val('');
 				newField.find('input.hasvalue').attr('name', element_id + '_hasvalue');
@@ -1222,11 +1217,11 @@ class plgFlexicontent_fieldsImage extends FCField
 		 * If using a non allowed gallery JS, then force fancybox
 		 */
 
-		// Only allow multibox and fancybox in items manager
-		$iManager_containers = array(1,4);
+		// Only allow multibox, fancybox, glightbox in items manager
+		$iManager_containers = array(1,4,11);
 
 		// Display types that need special container are not allowed when field in a group
-		$no_container_needed = array(1,2,3,4,6);
+		$no_container_needed = array(1,2,3,4,6,11);
 
 		if (
 			(static::$isItemsManager && !in_array($popuptype, $iManager_containers)) ||
@@ -1324,8 +1319,10 @@ class plgFlexicontent_fieldsImage extends FCField
 			}
 		}
 
-		// Force Fancybox if using Media embeeding, this is until we add support for more galleries ...
-		elseif ($usemediaurl)
+		// Force Fancybox if using Media embeding, until we add support for more galleries ...
+		// (glightbox = popuptype 11 supports media URLs / videos natively, so it is NOT forced)
+		// (swiper    = popuptype 12 opens media URLs / videos through GLightbox natively, so it is NOT forced)
+		elseif ($usemediaurl && !in_array($popuptype, array(11, 12)))
 		{
 			$popuptype = 4;
 		}
@@ -1493,6 +1490,8 @@ class plgFlexicontent_fieldsImage extends FCField
 				8 => 'photoswipe',
 				9 => 'pannellum',
 				10 => 'juxtapose',
+				11 => 'glightbox',
+				12 => 'swiper',
 			);
 
 			$viewlayout = isset($built_in_gallery_names[$popuptype])
