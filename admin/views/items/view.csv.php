@@ -167,6 +167,18 @@ class FlexicontentViewItems extends \Joomla\CMS\MVC\View\HtmlView
 		$has_pro    = \Joomla\CMS\Plugin\PluginHelper::isEnabled($extfolder = 'system', $extname = 'flexisyspro');
 		$export_all = $has_pro && $app->isClient('administrator') && $jinput->getCmd('items_set', '') === 'all';
 
+		// Export only the items selected via the checkboxes of the items manager
+		$export_selected = $app->isClient('administrator') && $jinput->getCmd('items_set', '') === 'selected';
+		$selected_ids    = $export_selected
+			? array_values(array_filter(\Joomla\Utilities\ArrayHelper::toInteger($jinput->get('cid', array(), 'array'))))
+			: array();
+
+		if ($export_selected && !$selected_ids)
+		{
+			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_NO_ITEMS_SELECTED'), 'warning');
+			$app->redirect($this->_getSafeReferer());
+		}
+
 		if ($export_all)
 		{
 			// Create plugin instance
@@ -194,6 +206,20 @@ class FlexicontentViewItems extends \Joomla\CMS\MVC\View\HtmlView
 		if ($export_all)
 		{
 			$items = $plg->getItemsSet($model, $_init = true);
+		}
+		elseif ($export_selected)
+		{
+			// Selected items, current filters still apply (selected items are listed thus they match them)
+			$model->setState('filter_ids', $selected_ids);
+			$model->setState('limitstart', 0);
+			$model->setState('limit', count($selected_ids));
+			$items = $model->getData();
+
+			if (!$items)
+			{
+				$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_NO_ITEMS_SELECTED'), 'warning');
+				$app->redirect($this->_getSafeReferer());
+			}
 		}
 		else
 		{

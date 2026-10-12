@@ -346,6 +346,136 @@ class FlexicontentViewImport extends FlexicontentViewBaseRecords
 
 
 		/**
+		 * Tags to assign to all imported items (tags option 'd'), with a tag selector like the one of the item form
+		 */
+
+		$perms       = FlexicontentHelperPerm::getPerm();
+		$import_tags = array();
+		$tags_ids    = ArrayHelper::toInteger((array) $model->getState('tags_ids'));
+
+		if ($tags_ids)
+		{
+			$import_tags = $db->setQuery('SELECT id, name FROM #__flexicontent_tags WHERE id IN (' . implode(',', $tags_ids) . ') ORDER BY name')->loadObjectList();
+		}
+
+		flexicontent_html::loadFramework('jQuery');  // jQuery UI autocomplete
+		$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/assets/js/itemscreen.js', array('version' => FLEXI_VHASH));
+		\Joomla\CMS\Language\Text::script('FLEXI_DELETE_TAG', true);
+		\Joomla\CMS\Language\Text::script('FLEXI_ENTER_TAG', true);
+
+		$document->addScriptDeclaration("
+			jQuery(document).ready(function()
+			{
+				var tagInput = jQuery('#input-tags');
+				if (!tagInput.length) return;
+
+				// Show the tag selector for tags options 'b', 'c' (added to the tags of the column) and 'd' (only these tags)
+				jQuery('input[name=\"tags_col\"]').on('change', function(){
+					var v = parseInt(jQuery('input[name=\"tags_col\"]:checked').val() || 0);
+					jQuery('#fc_import_tags_box').toggle(v > 0);
+					jQuery('.fc_import_tags_hint_col').toggle(v == 1 || v == 2);
+					jQuery('.fc_import_tags_hint_only').toggle(v == 3);
+				});
+
+				tagInput.keydown(function(event)
+				{
+					if (event.keyCode != 13) return;
+
+					var el = jQuery(event.target);
+					if (el.val() == '') return false;
+
+					// Enter pressed while an autocomplete item is focused, the 'select' event handler will handle it
+					if (jQuery('.ui-autocomplete .ui-state-focus').length != 0) return false;
+
+					var data_id = el.data('tagid'), data_name = el.data('tagname');
+					if (el.val() == data_name && data_id != '' && data_id != '0')
+					{
+						addToList(data_id, data_name);
+					}
+					else
+					{
+						// Get existing tag by name, or create it (if allowed)
+						addtag(0, el.val());
+					}
+
+					el.autocomplete('close');
+					el.val('');
+					return false;
+				});
+
+				var fcTagsCache = {};
+
+				jQuery.ui.autocomplete({
+					source: function(request, response)
+					{
+						var el = jQuery(this.element), term = request.term;
+						if (term in fcTagsCache) { response(fcTagsCache[term]); return; }
+
+						jQuery.ajax({
+							url: '" . \Joomla\CMS\Uri\Uri::base(true) . "/components/com_flexicontent/tasks/core.php?" . \Joomla\CMS\Session\Session::getFormToken() . "=1',
+							dataType: 'json',
+							data: { q: term, task: 'viewtags', lang: '" . \Joomla\CMS\Factory::getLanguage()->getTag() . "', format: 'json' },
+							success: function(data)
+							{
+								var response_data = jQuery.map(data, function(item)
+								{
+									if (el.val() == item.name) { el.data('tagid', item.id); el.data('tagname', item.name); }
+									var label_text = item.name + (item.translated_text ? ' (' + item.translated_text + ')' : '');
+									return jQuery('#ultagbox').find('input[value=\"' + item.id + '\"]').length > 0 ? null : { label: label_text, value: item.id };
+								});
+								fcTagsCache[term] = response_data;
+								response(response_data);
+							}
+						});
+					},
+					delay: 200,
+					minLength: 0,
+					focus: function(event, ui)
+					{
+						var el = jQuery(event.target);
+						if (ui.item.value != '' && ui.item.value != '0') el.val(ui.item.label);
+						el.data('tagid', ui.item.value);
+						el.data('tagname', ui.item.label);
+						event.preventDefault();
+					},
+					select: function(event, ui)
+					{
+						var el = jQuery(event.target);
+						if (ui.item.value != '' && ui.item.value != '0')
+						{
+							addToList(ui.item.value, ui.item.label);
+							el.val('');
+						}
+						event.preventDefault();
+					}
+				}, tagInput.get(0));
+
+				tagInput.focus(function(){ jQuery(this).autocomplete('search', this.value); });
+			});
+
+			// Called by itemscreen.addtag() too, after a tag was found / created
+			function addToList(id, name)
+			{
+				var obj = jQuery('#ultagbox');
+				if (obj.find('input[value=\"' + id + '\"]').length > 0) return;
+				obj.append('<li class=\"tagitem\"><span>' + name + '</span><input type=\"hidden\" name=\"tags_ids[]\" value=\"' + id + '\" /><a href=\"javascript:;\" class=\"deletetag\" onclick=\"javascript:deleteTag(this);\" title=\"' + Joomla.JText._('FLEXI_DELETE_TAG') + '\"></a></li>');
+			}
+
+			function addtag(id, tagname)
+			{
+				if (tagname == '') { alert(Joomla.JText._('FLEXI_ENTER_TAG')); return; }
+				var tag = new itemscreen();
+				tag.addtag(id || 0, tagname, '" . \Joomla\CMS\Uri\Uri::base(true) . "/index.php?option=com_flexicontent&task=tags.addtag&format=raw&" . \Joomla\CMS\Session\Session::getFormToken() . "=1');
+			}
+
+			function deleteTag(obj)
+			{
+				jQuery(obj).closest('li').remove();
+			}
+		");
+
+
+		/**
 		 * Assign data to template
 		 */
 
@@ -355,6 +485,8 @@ class FlexicontentViewImport extends FlexicontentViewBaseRecords
 		$this->cparams = $cparams;
 		$this->file_fields = $file_fields;
 		$this->formvals = $formvals;
+		$this->import_tags = $import_tags;
+		$this->perms = $perms;
 
 		parent::display($tpl);
 	}

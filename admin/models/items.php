@@ -1561,6 +1561,15 @@ class FlexicontentModelItems extends FCModelAdminList
 			$where[] = 'a.id = ' . $filter_id;
 		}
 
+		// Limit to given item ids (e.g. CSV export of selected items), set only by code, not via request
+		$filter_ids = ArrayHelper::toInteger((array) $this->getState('filter_ids'));
+		$filter_ids = array_filter($filter_ids);
+
+		if ($filter_ids)
+		{
+			$where[] = 'a.id IN (' . implode(',', $filter_ids) . ')';
+		}
+
 		if (!empty($filter_lang))
 		{
 			if (!is_array($filter_lang))

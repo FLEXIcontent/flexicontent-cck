@@ -1615,6 +1615,25 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 
 
 			/**
+			 * Add selected-items CSV Export button
+			 */
+
+			$btn_title = \Joomla\CMS\Language\Text::_('FLEXI_CSV_EXPORT_SELECTED_ITEMS', true);
+			$btn_info  = flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_CSV_EXPORT_SELECTED_ITEMS_INFO'), 2);
+			$task_url  = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&view=items&format=csv&items_set=selected';
+
+			$full_js = "var cid = []; jQuery.each(jQuery(\"input[name='cid[]']:checked\"), function(){ cid.push(jQuery(this).val()); }); "
+				. "if (!cid.length) { alert('" . \Joomla\CMS\Language\Text::_('FLEXI_NO_ITEMS_SELECTED', true) . "'); return false; } "
+				. "window.location.replace('" . $task_url . "&' + cid.map(function(el){ return 'cid[]=' + el; }).join('&')); return false;";
+			$btn_arr[] = flexicontent_html::addToolBarButton(
+				$btn_title, 'csvexport_selected', $full_js, $msg_alert='', $msg_confirm='',
+				$btn_task='', $extra_js="", $btn_list=false, $btn_menu=true, $btn_confirm=false,
+				$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? '_DDI_class_ ' . $this->btn_iv_class : '') . ' ' . $this->tooltip_class, $btn_icon='icon-download',
+				'data-placement="right" data-title="' . $btn_info . '"', $auto_add = 0, $tag_type='button'
+			);
+
+
+			/**
 			 * Add all-items CSV Export button
 			 */
 
