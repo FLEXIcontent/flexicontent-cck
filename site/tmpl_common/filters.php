@@ -152,12 +152,12 @@ if ( $use_search || $use_filters ) :
 				<div class="<?php echo $filter_container_class; ?> fc_filter_buttons_box">
 					<div class="fc_buttons btn-group">
 						<?php if ($show_search_go) : ?>
-							<button type="button" class="<?php echo $flexi_button_class_go; ?>" onclick="var f=jQuery(this).closest('form')[0]; adminFormPrepare(f, 2); return false;">
+							<button type="button" class="<?php echo $flexi_button_class_go; ?>" onclick="var f=this.closest('form'); adminFormPrepare(f, 2); return false;">
 								<i class="icon-search"></i> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_GO' ); ?>
 							</button>
 						<?php endif; ?>
 						<?php if ($show_search_reset) : ?>
-							<button type="button" class="<?php echo $flexi_button_class_reset; ?>" onclick="var f=jQuery(this).closest('form')[0]; adminFormClearFilters(f); adminFormPrepare(f, 2); return false;">
+							<button type="button" class="<?php echo $flexi_button_class_reset; ?>" onclick="var f=this.closest('form'); adminFormClearFilters(f); adminFormPrepare(f, 2); return false;">
 								<i class="icon-remove"></i> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_RESET' ); ?>
 							</button>
 						<?php endif; ?>
@@ -173,52 +173,64 @@ if ( $use_search || $use_filters ) :
 	<?php
 $js = "
 window.fcRemoveSingleFilter = function(fieldName, el) {
-    var form = jQuery(el).closest('form');
-    if (!form.length) return;
+    var form = el.closest('form');
+    if (!form) return;
     // Cherche l'input exact ET les inputs indexés (filter_18[1], filter_18[2]...)
-    var field = form.find(
+    var fields = form.querySelectorAll(
         '[name=\"'+fieldName+'\"],' +
         '[name=\"'+fieldName+'[]\"],' +
         '[name=\"'+fieldName+'[1]\"],' +
         '[name=\"'+fieldName+'[2]\"]'
     );
-    if (field.length) {
-        field.each(function() {
-            var f = jQuery(this);
-            if (f.is('select')) {
-                f.prop('selectedIndex', 0);
-                if (f.data('select2')) f.val(null).trigger('change.select2');
+    if (fields.length) {
+        for (var i = 0; i < fields.length; i++) {
+            var f = fields[i];
+            if (f.tagName === 'SELECT') {
+                f.selectedIndex = 0;
+                if (window.fc_use_choicesjs && window.fc_choices_instances) {
+                    var instanceKey = f.id || f.name;
+                    var instance = window.fc_choices_instances[instanceKey];
+                    if (instance) instance.removeActiveItems();
+                } else if (window.jQuery && window.jQuery.fn && window.jQuery.fn.select2 && (f.s2 || (f.nextElementSibling && f.nextElementSibling.className.indexOf('select2-container') !== -1))) {
+                    // select2js legacy: jQuery is loaded in this mode
+                    window.jQuery(f).val(null).trigger('change');
+                }
             } else {
-                f.val('');
+                f.value = '';
             }
-        });
+        }
         if (typeof adminFormPrepare === 'function') {
-            adminFormPrepare(form[0], 2);
+            adminFormPrepare(form, 2);
         } else {
-            form[0].submit();
+            form.submit();
         }
     }
 };
 
-jQuery(document).ready(function($) {
-    var containerId = '".$form_id."_filter_box';
+document.addEventListener('DOMContentLoaded', function() {
+    var container = document.getElementById('".$form_id."_filter_box');
+    if (!container) return;
 
     function fixFormAutosubmit() {
-        var form = jQuery('#' + containerId).closest('form');
-        if (!form.length) return;
-        var current = form.attr('data-fc-autosubmit');
+        var form = container.closest('form');
+        if (!form) return;
+        var current = form.getAttribute('data-fc-autosubmit');
         if (!current || current === '0') {
-            form.attr('data-fc-autosubmit', ".($filter_autosubmit ? '2' : '1').");
+            form.setAttribute('data-fc-autosubmit', ".($filter_autosubmit ? '2' : '1').");
         }
     }
     fixFormAutosubmit();
 
-    \$(document).on('change', '#' + containerId + ' input:not([type=hidden]), #' + containerId + ' select', function() {
-        if (!\$(this).hasClass('fc_autosubmit_exclude')) {
-            var f = this.form || \$(this).closest('form')[0];
-            if (typeof adminFormPrepare === 'function') {
-                adminFormPrepare(f, ".($filter_autosubmit ? '2' : '1').");
-            }
+    document.addEventListener('change', function(e) {
+        var t = e && e.target;
+        if (!t || !t.tagName) return;
+        var isField = t.tagName === 'SELECT' || (t.tagName === 'INPUT' && t.type !== 'hidden');
+        if (!isField) return;
+        if (!container.contains(t)) return;
+        if (t.classList.contains('fc_autosubmit_exclude')) return;
+        var f = t.form || t.closest('form');
+        if (f && typeof adminFormPrepare === 'function') {
+            adminFormPrepare(f, ".($filter_autosubmit ? '2' : '1').");
         }
     });
 });";

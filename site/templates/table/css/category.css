@@ -1,1 +1,171 @@
-body #flexicontent .fc_item_title,body #flexicontent .fc_item_title a{color:#ad2121;background-color:inherit;padding-top:0px;padding-right:0px;padding-left:0px;padding-bottom:0px;border-radius:0px}td.fc_title_col{background-color:inherit !important}table#adminListTableFCcategory th{background:inherit !important;color:inherit}body table.adminlist tbody tr.row0:hover td,table.adminlist tbody tr.row1:hover td,table.adminlist tr:hover td.filtered_column{background-color:inherit !important}body table.adminlist tbody tr{border-top:0px solid #dadada !important;text-align:inherit}body #flexicontent .flexi.label,body #flexicontent .desc-title.label{background-color:#999999;color:#ffffff;border-radius:3px;padding-top:2px;padding-right:4px;padding-left:4px;padding-bottom:2px}table.adminlist tbody tr.row0 td{background:#ffffff}table.adminlist tbody tr.row1 td{background:#f7f7f7}table.adminlist{color:#555555}.subcategorieslist{margin:0 0 1em}.button-editor{display:inline-flex;align-items:center}#mainChooseColBox_cols ul li{list-style-type:none}#mainChooseColBox_cols ul{padding-left:0px}#mainChooseColBox .icon-arrow-up-2{display:block;text-align:center;margin-top:-10px}#fc_alpha .btn.fc_alpha_index,#fc_alpha .btn.fc_alpha_index_sep{margin-top:0;margin-bottom:0}.group{overflow:auto !important}.fc_item_title a{display:inline-block;float:left;font-size:14px;font-weight:bold;margin-left:16px}.fc_title_row_box{display:inline-block;float:left;max-width:100%;padding:0%;margin-left:16px}.fc_item_separator_row{display:block;clear:both;height:40px;border:0px solid}.flexicontent #fc-filters-box,.flexicontent #mainChooseColBox,.flexicontent #itemusage-filters{padding:8px 18px;margin:0px;vertical-align:top;min-height:34px;position:absolute;min-width:215px;box-shadow:0 5px 15px 0 #a1a1a1;background:#fff;z-index:1}@media screen and (max-width:600px){table#adminListTableFCcategory{border:0}table#adminListTableFCcategory thead{border:none;clip:rect(0 0 0 0);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;width:1px}table#adminListTableFCcategory tr{border-bottom:3px solid #ddd;display:block;margin-bottom:.625em}table#adminListTableFCcategory td{border-bottom:1px solid #ddd;display:block;font-size:.8em;text-align:left}table#adminListTableFCcategory td::before{content:attr(data-label);float:left;font-weight:bold;text-transform:uppercase}table#adminListTableFCcategory td:last-child{border-bottom:0}}
+/* Place your less variables, mixins, etc, here 
+1. This is commonly imported by files: item.less and category.less, 
+2. If you add extra less file imports, then place files 
+inside same folder for automatic compiling to be triggered */
+/* This is created automatically, do NOT edit this manually! 
+This is used by item layout to save parameters as less variables. 
+NOTE: Make sure that this is imported by 'config.less' 
+ to make a parameter be a LESS variable, edit parameter in item.xml and add cssprep="less" 
+ created parameters will be like: @FCI_parameter_name: value; */
+/* This is created automatically, do NOT edit this manually! 
+This is used by category layout to save parameters as less variables. 
+NOTE: Make sure that this is imported by 'config.less' 
+ to make a parameter be a LESS variable, edit parameter in category.xml and add cssprep="less" 
+ created parameters will be like: @FCC_parameter_name: value; */
+/* Default Theme : category template CSS file */
+/* LESS EXAMPLE variable name: 'FCC_' + parameter name */
+/* e.g. 'FCC_' + 'title_color' =>  'FCC_title_color' */
+body #flexicontent .fc_item_title,
+body #flexicontent .fc_item_title a {
+  color: inherit;
+  background-color: inherit;
+  padding-top: 0px;
+  padding-right: 0px;
+  padding-left: 0px;
+  padding-bottom: 0px;
+  border-radius: 0px;
+}
+td.fc_title_col {
+  background-color: inherit !important;
+}
+table#adminListTableFCcategory th {
+  background: inherit !important;
+  color: inherit;
+}
+body table.adminlist tbody tr.row0:hover td,
+table.adminlist tbody tr.row1:hover td,
+table.adminlist tr:hover td.filtered_column {
+  background-color: inherit !important;
+}
+body table.adminlist tbody tr {
+  border-top: 0px solid #dadada !important;
+  text-align: inherit;
+}
+/* Label styling */
+body #flexicontent .flexi.label,
+body #flexicontent .desc-title.label {
+  background-color: #999999;
+  color: #ffffff;
+  border-radius: 3px;
+  padding-top: 2px;
+  padding-right: 4px;
+  padding-left: 4px;
+  padding-bottom: 2px;
+}
+table.adminlist tbody tr.row0 td {
+  background: #ffffff;
+}
+table.adminlist tbody tr.row1 td {
+  background: #f7f7f7;
+}
+table.adminlist {
+  color: #555555;
+}
+.subcategorieslist {
+  margin: 0 0 1em;
+}
+/** editor button alignement **/
+.button-editor {
+  display: inline-flex;
+  align-items: center;
+}
+/** columns box css **/
+#mainChooseColBox_cols ul li {
+  list-style-type: none;
+}
+#mainChooseColBox_cols ul {
+  padding-left: 0px;
+}
+#mainChooseColBox .icon-arrow-up-2 {
+  display: block;
+  text-align: center;
+  margin-top: -10px;
+}
+/* =============================================
+   Bootstrap adjustments
+============================================= */
+#fc_alpha .btn.fc_alpha_index,
+#fc_alpha .btn.fc_alpha_index_sep {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+/*
+ * clearfix, for clearing a block that contains floated elements
+ * without appending an extra HTML TAG with 'clearfix' class
+ */
+.group {
+  overflow: auto !important;
+}
+.fc_item_title a {
+  display: inline-block;
+  float: left;
+  font-size: 14px;
+  font-weight: bold;
+  margin-left: 16px;
+}
+.fc_title_row_box {
+  display: inline-block;
+  float: left;
+  max-width: 100%;
+  padding: 0%;
+  margin-left: 16px;
+}
+.fc_item_separator_row {
+  display: block;
+  clear: both;
+  height: 40px;
+  border: 0px solid;
+}
+.flexicontent #fc-filters-box,
+.flexicontent #mainChooseColBox,
+.flexicontent #itemusage-filters {
+  padding: 8px 18px;
+  margin: 0px;
+  vertical-align: top;
+  min-height: 34px;
+  position: absolute;
+  min-width: 215px;
+  box-shadow: 0 5px 15px 0 #a1a1a1;
+  background: #fff;
+  z-index: 1;
+}
+/** responsive table **/
+@media screen and (max-width: 600px) {
+  table#adminListTableFCcategory {
+    border: 0;
+  }
+  table#adminListTableFCcategory thead {
+    border: none;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+  }
+  table#adminListTableFCcategory tr {
+    border-bottom: 3px solid #ddd;
+    display: block;
+    margin-bottom: 0.625em;
+  }
+  table#adminListTableFCcategory td {
+    border-bottom: 1px solid #ddd;
+    display: block;
+    font-size: 0.8em;
+    text-align: left;
+  }
+  table#adminListTableFCcategory td::before {
+    /*
+	  * aria-label has no advantage, it won't be read inside a table
+	  content: attr(aria-label);
+	  */
+    content: attr(data-label);
+    float: left;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+  table#adminListTableFCcategory td:last-child {
+    border-bottom: 0;
+  }
+}
