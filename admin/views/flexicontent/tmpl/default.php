@@ -472,6 +472,7 @@ $items_task = 'task=items.';
 					jQuery('#displayfversion').html('<p><img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" style=\"vertical-align: middle;\"><\/p>');
 					jQuery.ajax({
 						url: 'index.php?option=com_flexicontent&task=flexicontent.fcversioncompare&format=raw&". \Joomla\CMS\Session\Session::getFormToken() ."=1',
+						cache: false,
 						success: function(str) {
 							jQuery('#displayfversion').html(str);
 							jQuery('#displayfversion').parent().css('height', 'auto');
@@ -776,6 +777,7 @@ $items_task = 'task=items.';
 							jQuery('#displayfversion').html('<p><img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" style=\"vertical-align: middle;\"><\/p>');
 							jQuery.ajax({
 								url: 'index.php?option=com_flexicontent&task=flexicontent.fcversioncompare&format=raw&". \Joomla\CMS\Session\Session::getFormToken() ."=1',
+								cache: false,
 								success: function(str) {
 									jQuery('#displayfversion').html(str);
 									jQuery('#displayfversion').parent().css('height', 'auto');

@@ -61,11 +61,12 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 		// Read installation manifest
 		$manifest_path = JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'flexicontent.xml';
 		$com_xml = \Joomla\CMS\Installer\Installer::parseXMLInstallFile($manifest_path);
+		$com_xml = is_array($com_xml) ? $com_xml : array();
 
 		$check = array();
 		$check['connect']              = 0;
-		$check['current_version']      = $com_xml['version'];
-		$check['current_creationDate'] = $com_xml['creationDate'];
+		$check['current_version']      = $com_xml['version'] ?? '';
+		$check['current_creationDate'] = $com_xml['creationDate'] ?? '';
 		$check['channel']              = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('update_channel', 'stable');
 
 		// GitHub API — last 10 releases (enough to find latest stable + latest beta)
@@ -145,23 +146,23 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 			}
 		}
 
-		$installed = str_replace(' ', '', $check['current_version']);
+		$installed = str_replace(' ', '', (string) $check['current_version']);
 
 		// Stable info
 		if ($stable)
 		{
-			$sv = ltrim($stable['tag_name'], 'v');
+			$sv = ltrim($stable['tag_name'] ?? '', 'v');
 			$check['stable_version']  = $sv;
-			$check['stable_released'] = substr($stable['published_at'], 0, 10);
+			$check['stable_released'] = substr($stable['published_at'] ?? '', 0, 10);
 			$check['stable_current']  = version_compare($installed, str_replace(' ', '', $sv));
 		}
 
 		// Beta info
 		if ($beta)
 		{
-			$bv = ltrim($beta['tag_name'], 'v');
+			$bv = ltrim($beta['tag_name'] ?? '', 'v');
 			$check['beta_version']  = $bv;
-			$check['beta_released'] = substr($beta['published_at'], 0, 10);
+			$check['beta_released'] = substr($beta['published_at'] ?? '', 0, 10);
 			$check['beta_current']  = version_compare($installed, str_replace(' ', '', $bv));
 		}
 
