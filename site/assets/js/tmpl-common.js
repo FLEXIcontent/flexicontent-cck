@@ -571,7 +571,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				var dropdown = document.createElement('ul');
 				dropdown.className = 'fc_ac_dropdown';
 				dropdown.setAttribute('role', 'listbox');
-				dropdown.style.cssText = 'position:absolute;z-index:5000;display:none;list-style:none;margin:0;padding:2px 0;background:#fff;border:1px solid #ccc;border-top:none;max-height:260px;overflow:auto;box-shadow:0 4px 10px rgba(0,0,0,.15);box-sizing:border-box;';
+				dropdown.style.display = 'none';
 				document.body.appendChild(dropdown);
 
 				var acItems = [];
@@ -579,20 +579,43 @@ document.addEventListener('DOMContentLoaded', function() {
 				var acSearchTimer = null;
 				var acInFlight = null;
 
+				// Read an option from data-fc_ac_* attribute, else from --fc-ac-* CSS variable, else fallback
+				function acOption(attr, cssvar, fallback) {
+					var val = el.getAttribute(attr);
+					if (val === null || val === '') {
+						val = window.getComputedStyle(el).getPropertyValue(cssvar);
+						if (val) val = val.trim();
+					}
+					return (val === null || val === '') ? fallback : val;
+				}
+
 				function acPosition() {
+					// Allow fully manual positioning via data-fc_ac_autopos="0" / --fc-ac-autopos: manual
+					var autopos = acOption('data-fc_ac_autopos', '--fc-ac-autopos', 'auto');
+					if (autopos === '0' || autopos === 'manual' || autopos === 'none') return;
+
 					var rect = el.getBoundingClientRect();
-					dropdown.style.minWidth = rect.width + 'px';
-					dropdown.style.left = (rect.left + window.pageXOffset) + 'px';
-					dropdown.style.top = (rect.bottom + window.pageYOffset) + 'px';
+
+					// Optional explicit width (data-fc_ac_width / --fc-ac-width), else match the input width
+					var width = acOption('data-fc_ac_width', '--fc-ac-width', '');
+					if (width) {
+						dropdown.style.width = /^[0-9.]+$/.test(width) ? width + 'px' : width;
+						dropdown.style.minWidth = '';
+					} else {
+						dropdown.style.width = '';
+						dropdown.style.minWidth = rect.width + 'px';
+					}
+
+					// Optional offsets (data-fc_ac_offset_x / --fc-ac-offset-x, data-fc_ac_offset_y / --fc-ac-offset-y)
+					var offX = parseFloat(acOption('data-fc_ac_offset_x', '--fc-ac-offset-x', 0)) || 0;
+					var offY = parseFloat(acOption('data-fc_ac_offset_y', '--fc-ac-offset-y', 0)) || 0;
+					dropdown.style.left = (rect.left + window.pageXOffset + offX) + 'px';
+					dropdown.style.top  = (rect.bottom + window.pageYOffset + offY) + 'px';
 				}
 
 				function acHighlight(idx) {
 					for (var i = 0; i < acItems.length; i++) {
-						if (i === idx) {
-							acItems[i].style.background = '#eee';
-						} else {
-							acItems[i].style.background = '';
-						}
+						acItems[i].classList.toggle('is-active', i === idx);
 					}
 					acActiveIndex = idx;
 					if (acItems[idx] && acItems[idx].scrollIntoView) {
@@ -614,10 +637,9 @@ document.addEventListener('DOMContentLoaded', function() {
 							li.className = 'fc_ac_item';
 							li.setAttribute('role', 'option');
 							li.textContent = item.text;
-							li.style.cssText = 'padding:5px 10px;cursor:pointer;font-size:13px;line-height:1.4;';
 							li.addEventListener('mousedown', function(e) {
 								e.preventDefault();
-								acSelect(item);
+								acSelect(item, 'click');
 							});
 							li.addEventListener('mouseenter', function() {
 								acHighlight(idx);
@@ -630,11 +652,26 @@ document.addEventListener('DOMContentLoaded', function() {
 					acPosition();
 				}
 
-				function acSelect(item) {
+				function acSelect(item, source) {
 					if (!item) return;
 					el.value = item.text;
 					acClose();
-					el.dispatchEvent(new Event('change'));
+
+					var proceed = true;
+
+					// Click selection fires a cancelable custom event, so integrators can
+					// launch the search (or any other action) on selection.
+					if (source === 'click' && typeof CustomEvent !== 'undefined') {
+						proceed = el.dispatchEvent(new CustomEvent('fc:autocomplete:select', {
+							bubbles: true,
+							cancelable: true,
+							detail: { input: el, item: item, text: item.text, value: item.text, source: source }
+						}));
+					}
+
+					if (proceed) {
+						el.dispatchEvent(new Event('change'));
+					}
 				}
 
 function acClose() {
