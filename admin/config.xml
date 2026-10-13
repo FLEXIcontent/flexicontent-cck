@@ -253,6 +253,11 @@
 				<option value="1">JYES</option>
 			</field>
 
+			<field name="item_links_in_listings" type="fcradio" default="0" label="FLEXI_ITEM_LINKS_IN_LISTINGS" description="FLEXI_ITEM_LINKS_IN_LISTINGS_DESC" class="group-fcset fc-cleared">
+				<option value="0">FLEXI_ITEM_LINKS_MAIN_CATEGORY</option>
+				<option value="1">FLEXI_ITEM_LINKS_CURRENT_CATEGORY</option>
+			</field>
+
 			<field name="add_item_sef_segment" type="fcradio" default="1" label="FLEXI_SHORTER_ITEM_OR_CATEGORY_SEF_URLS" description="FLEXI_SHORTER_ITEM_OR_CATEGORY_SEF_URLS_DESC" class="group-fcset fc-cleared">
 				<option value="0">FLEXI_SKIP_ITEM_SEGMENT_IN_ITEM_URLS</option>
 				<option value="1">FLEXI_SKIP_CAT_SEGMENT_IN_CAT_URLS</option>

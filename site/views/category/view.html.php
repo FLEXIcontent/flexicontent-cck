@@ -540,6 +540,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		\Joomla\CMS\Plugin\PluginHelper::importPlugin('content');
 
 		$noroute_cats = array_flip($globalnoroute);
+		$links_use_current_cat = (int) ComponentHelper::getParams('com_flexicontent')->get('item_links_in_listings', 0) === 1;
 
 		$type_attribs = flexicontent_db::getTypeAttribs($force=true, $typeid=0);
 		$type_params = array();
@@ -577,7 +578,8 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 
 			// 1. CATEGORY SLUG: CURRENT category
 			// -- Current category IS a category of the item and ALSO routing (creating links) to this category is allowed
-			if ( $item_in_category && !isset($noroute_cats[$category->id]) )
+			// -- ONLY if configured (component option 'item_links_in_listings'), by default item links use the item's MAIN category, so that item has a single URL
+			if ( $links_use_current_cat && $item_in_category && !isset($noroute_cats[$category->id]) )
 			{
 				$item->categoryslug = $category->slug;
 			}
