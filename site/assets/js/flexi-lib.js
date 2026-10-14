@@ -1739,6 +1739,14 @@
 							tpl.classList.add('choices__item', 'choices__item--choice', 'fc-choices-checkbox-item');
 							if (data.disabled) tpl.classList.add('is-disabled');
 							if (data.selected) tpl.classList.add('is-selected');
+							tpl.dataset.choice = '';
+							tpl.dataset.id = data.id;
+							tpl.dataset.value = data.value;
+							if (data.disabled) {
+								tpl.dataset.choiceDisabled = '';
+							} else {
+								tpl.dataset.choiceSelectable = '';
+							}
 							var checkbox = document.createElement('input');
 							checkbox.type = 'checkbox';
 							checkbox.checked = data.selected;
@@ -1913,15 +1921,17 @@
 					var value = checkbox.getAttribute('data-value');
 					var isChecked = checkbox.checked;
 					var vals = fcGetSelectValues(el);
-					vals = vals.map(String);
+					if (vals === null || vals === undefined) vals = [];
+					if (!Array.isArray(vals)) vals = (String(vals) === '' ? [] : [vals]);
+					vals = vals.map(function(v){ return String(v); });
 					if (isChecked && vals.indexOf(value) === -1) vals.push(value);
 					else if (!isChecked) vals = vals.filter(function(v) { return v !== value; });
 					// Update the underlying select (form submission + external listeners)
 					fcSetSelectValues(el, vals);
 					el.dispatchEvent(new Event('change', { bubbles: true }));
 					// Sync Choices.js store so checked values render as tags before saving
-					choicesInstance.removeActiveItems();
-					choicesInstance.setChoiceByValue(vals);
+					if (choicesInstance.removeActiveItems) choicesInstance.removeActiveItems();
+					if (choicesInstance.setChoiceByValue) choicesInstance.setChoiceByValue(vals);
 					// Keep dropdown open
 					el._fc_keep_open = true;
 					setTimeout(function() { el._fc_keep_open = false; }, 100);
