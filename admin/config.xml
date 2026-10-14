@@ -159,10 +159,6 @@
 				<option value="1">FLEXI_BOTH</option>
 				<option value="2">FLEXI_MANUALLY_IN_FRONTEND</option>
 			</field>
-			<field name="loadfw_select2" type="fcradio" default="1" label="select2" description="FLEXI_USE_BROWSER_FRAMEWORKS_DESC" class="btn-group btn-group-yesno">
-				<option value="1">FLEXI_BOTH</option>
-				<option value="2">FLEXI_MANUALLY_IN_FRONTEND</option>
-			</field>
 			<field name="loadfw_inputmask" type="fcradio" default="1" label="inputmask" description="FLEXI_USE_BROWSER_FRAMEWORKS_DESC" class="btn-group btn-group-yesno">
 				<option value="1">FLEXI_BOTH</option>
 				<option value="2">FLEXI_MANUALLY_IN_FRONTEND</option>
@@ -192,6 +188,10 @@
 				<field name="select_lib_type" type="fcradio" default="0" label="FLEXI_SELECT_LIB_TYPE" description="FLEXI_SELECT_LIB_TYPE_DESC" class="btn-group group-fcmethod">
 					<option value="0">FLEXI_SELECT_LIB_SELECT2</option>
 					<option value="1">FLEXI_SELECT_LIB_CHOICES</option>
+				</field>
+				<field name="loadfw_select2" type="fcradio" default="1" label="FLEXI_SELECT_LIB_LOAD" description="FLEXI_SELECT_LIB_LOAD_DESC" class="btn-group btn-group-yesno">
+					<option value="1">FLEXI_BOTH</option>
+					<option value="2">FLEXI_MANUALLY_IN_FRONTEND</option>
 				</field>
 
 		<field name="" type="separator" default="FLEXI_PERFORMANCE" label="" level="level0" />
