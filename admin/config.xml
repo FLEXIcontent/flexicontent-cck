@@ -45,8 +45,11 @@
 				<option value="titles">FLEXI_SEARCH_AUTOCOMPLETE_SRC_TITLES</option>
 				<option value="tags">FLEXI_SEARCH_AUTOCOMPLETE_SRC_TAGS</option>
 				<option value="categories">FLEXI_SEARCH_AUTOCOMPLETE_SRC_CATEGORIES</option>
+				<option value="fields">FLEXI_SEARCH_AUTOCOMPLETE_SRC_FIELDS</option>
+				<option value="metakeys">FLEXI_SEARCH_AUTOCOMPLETE_SRC_METAKEYS</option>
 			</field>
 			<field name="search_autocomplete_titles_limit" type="number" default="5" min="1" max="30" step="1" label="FLEXI_SEARCH_AUTOCOMPLETE_TITLES_LIMIT" description="FLEXI_SEARCH_AUTOCOMPLETE_TITLES_LIMIT_DESC" />
+			<field name="search_autocomplete_fields_limit" type="number" default="3" min="1" max="30" step="1" label="FLEXI_SEARCH_AUTOCOMPLETE_FIELDS_LIMIT" description="FLEXI_SEARCH_AUTOCOMPLETE_FIELDS_LIMIT_DESC" />
 
 		<field name="" type="separator" default="FLEXI_MULTI_LANGUAGE" label="" level="level0" />
 
