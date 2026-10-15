@@ -2,8 +2,24 @@
 
 namespace Sabberworm\CSS;
 
-interface Renderable {
-	public function __toString();
-	public function render(\Sabberworm\CSS\OutputFormat $oOutputFormat);
-	public function getLineNo();
+interface Renderable
+{
+    /**
+     * @return string
+     *
+     * @deprecated in V8.8.0, will be removed in V9.0.0. Use `render` instead.
+     */
+    public function __toString();
+
+    /**
+     * @param OutputFormat|null $oOutputFormat
+     *
+     * @return string
+     */
+    public function render($oOutputFormat);
+
+    /**
+     * @return int
+     */
+    public function getLineNo();
 }
