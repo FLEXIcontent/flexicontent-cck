@@ -11,3 +11,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_versions` (
   PRIMARY KEY  (`id`),
   KEY `version2item` (`item_id`,`version_id`)
 ) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+
+-- Widen layout configuration storage so the Layout Builder (GrapesJS) project JSON
+-- does not overflow the old TEXT column (65 KB) and silently lose the template config.
+ALTER TABLE `#__flexicontent_layouts_conf` MODIFY `attribs` LONGTEXT NULL;

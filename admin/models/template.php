@@ -444,15 +444,6 @@ class FlexicontentModelTemplate extends FCModelAdmin
 	 */
 	function storeLayoutConf($folder, $cfgname, $layout, $attribs)
 	{
-		// delete old record
-		$query 	= 'DELETE FROM #__flexicontent_layouts_conf'
-			. ' WHERE template = ' . $this->_db->Quote($folder)
-			. '  AND cfgname = ' . $this->_db->Quote($cfgname)
-			. '  AND layout = ' . $this->_db->Quote($layout)
-			;
-		$this->_db->setQuery($query);
-		$this->_db->execute();
-
 		$attribs = json_encode($attribs);
 		if ($attribs === false) {
 			JError::raiseWarning(500, 'Failed to encode layout configuration as JSON: ' . json_last_error_msg());
@@ -460,6 +451,11 @@ class FlexicontentModelTemplate extends FCModelAdmin
 		}
 		//echo "<pre>"; print_r($attribs); echo "</pre>";
 
+		// Single upsert. Previously this did DELETE then INSERT: when the INSERT failed
+		// (e.g. the old TEXT column overflowing with Layout Builder JSON, see the
+		// install / update SQL that widens it to LONGTEXT) the row was already deleted
+		// and the whole template configuration was lost. ON DUPLICATE KEY UPDATE keeps
+		// the existing row intact on failure.
 		$query 	= 'INSERT INTO #__flexicontent_layouts_conf (`template`, `cfgname`, `layout`, `attribs`)'
 			.' VALUES(' .
 				$this->_db->Quote($folder) . ',' .
@@ -467,9 +463,22 @@ class FlexicontentModelTemplate extends FCModelAdmin
 				$this->_db->Quote($layout) . ',' .
 				$this->_db->Quote($attribs) .
 			')'
+			. ' ON DUPLICATE KEY UPDATE attribs = VALUES(attribs)'
 			;
 		$this->_db->setQuery($query);
-		$this->_db->execute();
+
+		try {
+			$result = $this->_db->execute();
+		}
+		catch (\Exception $e) {
+			JError::raiseWarning(500, 'Failed to save layout configuration: ' . $e->getMessage());
+			return false;
+		}
+
+		if ($result === false) {
+			JError::raiseWarning(500, 'Failed to save layout configuration: ' . $this->_db->getError());
+			return false;
+		}
 
 		return true;
 	}
