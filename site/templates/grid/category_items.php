@@ -25,6 +25,7 @@ $lazy_loading = $use_lazy_loading ? ' loading="lazy" decoding="async" ' : '';
 // Adding WebP support : define breakpoints for responsive srcset generation via phpThumb (if raw_src is available)
 // Format : 'viewport_width' => 'image_width_for_that_viewport'
 $_fc_cat_breakpoints = [480 => 480, 768 => 768]; // desktop = $img_w (taille configurée)
+$GLOBALS['_fc_cat_breakpoints'] = $_fc_cat_breakpoints; // expose to fc_cat_make_picture() (file may be included inside a method scope)
 
 // Helper : encode une URL pour usage dans srcset (préserve %20 pour les espaces, évite double-encodage)
 if (!function_exists('fc_cat_srcset_url')) {
@@ -164,6 +165,7 @@ if (!function_exists('fc_cat_make_picture_from_thumbs')) {
 if (!function_exists('fc_cat_make_picture')) {
 	function fc_cat_make_picture($src_webp, $src, $alt, $style, $lazy_loading, $img_w = 0, $img_h = 0, $use_webp = 1, $raw_src = '', $base_url = '') {
 		global $_fc_cat_breakpoints;
+		if (empty($_fc_cat_breakpoints)) $_fc_cat_breakpoints = [480 => 480, 768 => 768];
 		// Encoder les espaces dans les URLs (noms de fichiers avec espaces) + décoder &amp; pour srcset
 		$src      = str_replace([' ', '&amp;'], ['%20', '&'], $src);
 		$src_webp = str_replace([' ', '&amp;'], ['%20', '&'], $src_webp);

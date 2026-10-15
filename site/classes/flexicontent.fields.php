@@ -5643,8 +5643,9 @@ class FlexicontentFields
 			$catslug = "";
 
 			// Check if removed from category or inside a noRoute category or inside a non-published category and use main category slug or other routable & published category slug
-			$catid_arr = explode(',', $result->catidlist);
-			$catalias_arr = explode(',', $result->cataliaslist);
+			// ... catidlist / cataliaslist are only populated by the relation list query, other callers (e.g. googlemap module) may pass plain item objects
+			$catid_arr = !empty($result->catidlist) ? explode(',', $result->catidlist) : array();
+			$catalias_arr = !empty($result->cataliaslist) ? explode(',', $result->cataliaslist) : array();
 
 			for($i=0; $i<count($catid_arr); $i++)
 			{
