@@ -321,7 +321,7 @@ if ($readmore_class_std === 'readon btn std')  $readmore_class_std  = 'readon bt
  * Featured
  * item placement 0: cleared, 1: as masonry tiles, 2: tabs, 3: accordion (sliders)
  */
-$item_placement_feat = (int) $params->get($layout.'_item_placement_feat', 1);
+$item_placement_feat = (int) $params->get($layout.'_item_placement_feat', 0);
 $item_columns_feat   = (int) $params->get('item_columns_feat', 3);
 /** add column class or no class for grid mode */
 if ($item_columns_feat  >= 1 && $item_column_mode_feat == 1 ){

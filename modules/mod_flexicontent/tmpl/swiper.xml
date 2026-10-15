@@ -45,7 +45,7 @@
 			<field name="item_tab_featured" type="separator" default="Featured items" description="Placed before the Swiper carousel" icon_class="icon-list" level="tab_open" box_type="1" />
 
 			<field name="" type="separator" default="Basic" level="level2" />
-			<field name="swiper_item_placement_feat" type="multilist" subtype="radio" default="1" toggle_related="1" label="FLEXI_ITEMS_PLACEMENT" description="FLEXI_ITEMS_PLACEMENT_DESC" class="btn-group group-fcinfo">
+			<field name="swiper_item_placement_feat" type="multilist" subtype="radio" default="0" toggle_related="1" label="FLEXI_ITEMS_PLACEMENT" description="FLEXI_ITEMS_PLACEMENT_DESC" class="btn-group group-fcinfo">
 				<option value="0" show_list="swiper_column_mode_feat,swiper_item_width_feat,item_columns_feat">FLEXI_CLEARED</option>
 				<option value="1" show_list="swiper_column_mode_feat,swiper_item_width_feat,item_columns_feat">FLEXI_AS_MASONRY_TILES</option>
 				<option value="2" hide_list="swiper_column_mode_feat,swiper_item_width_feat,item_columns_feat">FLEXI_TABS</option>
@@ -109,7 +109,7 @@
 			</field>
 			<field name="swiper_padding_top_bottom_feat" type="text"  default="0" label="padding top/bottom" description="This is the padding applied at top and bottom of the items" />
 			<field name="swiper_padding_left_right_feat" type="text"  default="0" label="padding left/right" description="This is the padding applied at left and right of the items" />
-			<field name="swiper_border_width_feat" type="text" default="1px" label="border width" description="This is the border width applied around the items" />
+			<field name="swiper_border_width_feat" type="text" default="0px" label="border width" description="This is the border width applied around the items" />
 			<field name="swiper_border_style_feat" type="list" default="solid" label="border style" description="This is the border style applied around the items">
 				<option value="none">None</option>
 				<option value="solid">Solid</option>
@@ -119,8 +119,8 @@
 			</field>
 			<field name="swiper_border_color_feat" type="color" default="#cccccc" label="border color" description="This is the border color applied around the items" />
 			<field name="swiper_border_radius_feat" type="text" default="0" label="border radius" description="e.g. 4px, 0.5rem, 50% for circle" />
-			<field name="swiper_margin_top_bottom_feat" type="text"  default="2rem" label="margin top/bottom" description="This is the margin applied at top and bottom of the items" />
-			<field name="swiper_margin_left_right_feat" type="text"  default="2rem" label="margin left/right" description="This is the margin applied at left and right of the items" />
+			<field name="swiper_margin_top_bottom_feat" type="text"  default="0px" label="margin top/bottom" description="This is the margin applied at top and bottom of the items" />
+			<field name="swiper_margin_left_right_feat" type="text"  default="0px" label="margin left/right" description="This is the margin applied at left and right of the items" />
 
 			<field name="item_tab_standard" type="separator" default="Standard items" description="Placed inside the Swiper carousel" icon_class="icon-list" level="tab_open" box_type="1" />
 
@@ -154,8 +154,8 @@
 				<option value="0">No (use default/custom CSS)</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="swiper_padding_top_bottom" type="text" default="8px" label="padding top/bottom" description="This is the padding applied at top and bottom of the items" />
-			<field name="swiper_padding_left_right" type="text" default="12px" label="padding left/right" description="This is the padding applied at left and right of the items" />
+			<field name="swiper_padding_top_bottom" type="text" default="0px" label="padding top/bottom" description="This is the padding applied at top and bottom of the items" />
+			<field name="swiper_padding_left_right" type="text" default="0px" label="padding left/right" description="This is the padding applied at left and right of the items" />
 			<field name="swiper_border_width" type="text" default="0" label="border width" description="This is the border width applied around the items" />
 			<field name="swiper_border_style" type="list" default="solid" label="border style" description="This is the border style applied around the items">
 				<option value="none">None</option>
