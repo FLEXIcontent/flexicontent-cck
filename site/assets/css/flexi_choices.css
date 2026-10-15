@@ -319,6 +319,32 @@ html[dir="rtl"] .choices .choices__inner {
 
 
 /* ===========================
+   BACKEND MANAGER FILTER BOX (#fc-filters-box) — MULTI-SELECT FIX
+   =========================== */
+/* The outer .choices__inner is display:flex nowrap (see above) while the
+   cloned search input is a sibling of the chips list. The input expands to
+   min-width:124px on .is-open, so with nowrap it stole the row width and the
+   chips list (.choices__list--multiple) got squeezed. Allow wrapping so the
+   input moves to its own line instead of compressing the list. */
+
+#fc-filters-box .choices[data-type*="select-multiple"] .choices__inner {
+	flex-wrap: wrap !important;
+}
+
+#fc-filters-box .choices[data-type*="select-multiple"] .choices__list--multiple {
+	flex: 1 1 auto !important;
+}
+
+#fc-filters-box .choices[data-type*="select-multiple"] .choices__input--cloned {
+	flex: 0 0 auto !important;
+}
+
+#fc-filters-box .choices[data-type*="select-multiple"].is-open .choices__input--cloned {
+	flex: 1 1 100% !important;
+}
+
+
+/* ===========================
    INPUT GROUP SIZING (form-inp-height)
    =========================== */
 
