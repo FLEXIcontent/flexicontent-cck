@@ -16,6 +16,10 @@
 
 		<field name="" type="separator" default="FLEXI_TEXT_SEARCH" label="" level="level0" />
 
+			<field name="log_search_queries" type="multilist" subtype="radio" default="0" label="FLEXI_SEARCH_LOG_ENABLE" description="FLEXI_SEARCH_LOG_ENABLE_DESC" class="btn-group btn-group-yesno" >
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			<field name="add_search_prefix" type="multilist" subtype="radio" default="0" label="FLEXI_TEXT_SEARCH_SMALL_COMMON_WORDS" description="FLEXI_TEXT_SEARCH_SMALL_COMMON_WORDS_DESC" class="btn-group btn-group-yesno" inline_tip="Please re-index the search indexes, after enabling this" tip_class="" tip_img="note.gif" >
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -29,6 +33,23 @@
 				<option value="1">FLEXI_FILTER_WORD_RELEVANT_TITLE</option>
 				<option value="2">FLEXI_YES</option>
 			</field>
+			<field name="filter_word_field_priority" type="fcfieldpriority" default="" label="FLEXI_FILTER_WORD_FIELD_PRIORITY" description="FLEXI_FILTER_WORD_FIELD_PRIORITY_DESC" >
+				<option value="title">FLEXI_FILTER_WORD_FIELD_TITLE</option>
+				<option value="categories">FLEXI_FILTER_WORD_FIELD_CATEGORIES</option>
+				<option value="tags">FLEXI_FILTER_WORD_FIELD_TAGS</option>
+			</field>
+			<field name="search_autocomplete_scan" type="number" default="300" min="50" max="2000" step="50" label="FLEXI_SEARCH_AUTOCOMPLETE_SCAN" description="FLEXI_SEARCH_AUTOCOMPLETE_SCAN_DESC" />
+			<field name="search_autocomplete_limit" type="number" default="10" min="1" max="30" step="1" label="FLEXI_SEARCH_AUTOCOMPLETE_LIMIT" description="FLEXI_SEARCH_AUTOCOMPLETE_LIMIT_DESC" />
+			<field name="search_autocomplete_sources" type="fcacsources" default="" label="FLEXI_SEARCH_AUTOCOMPLETE_SOURCES" description="FLEXI_SEARCH_AUTOCOMPLETE_SOURCES_DESC" >
+				<option value="words">FLEXI_SEARCH_AUTOCOMPLETE_SRC_WORDS</option>
+				<option value="titles">FLEXI_SEARCH_AUTOCOMPLETE_SRC_TITLES</option>
+				<option value="tags">FLEXI_SEARCH_AUTOCOMPLETE_SRC_TAGS</option>
+				<option value="categories">FLEXI_SEARCH_AUTOCOMPLETE_SRC_CATEGORIES</option>
+				<option value="fields">FLEXI_SEARCH_AUTOCOMPLETE_SRC_FIELDS</option>
+				<option value="metakeys">FLEXI_SEARCH_AUTOCOMPLETE_SRC_METAKEYS</option>
+			</field>
+			<field name="search_autocomplete_titles_limit" type="number" default="5" min="1" max="30" step="1" label="FLEXI_SEARCH_AUTOCOMPLETE_TITLES_LIMIT" description="FLEXI_SEARCH_AUTOCOMPLETE_TITLES_LIMIT_DESC" />
+			<field name="search_autocomplete_fields_limit" type="number" default="3" min="1" max="30" step="1" label="FLEXI_SEARCH_AUTOCOMPLETE_FIELDS_LIMIT" description="FLEXI_SEARCH_AUTOCOMPLETE_FIELDS_LIMIT_DESC" />
 
 		<field name="" type="separator" default="FLEXI_MULTI_LANGUAGE" label="" level="level0" />
 
@@ -141,10 +162,6 @@
 				<option value="1">FLEXI_BOTH</option>
 				<option value="2">FLEXI_MANUALLY_IN_FRONTEND</option>
 			</field>
-			<field name="loadfw_select2" type="fcradio" default="1" label="select2" description="FLEXI_USE_BROWSER_FRAMEWORKS_DESC" class="btn-group btn-group-yesno">
-				<option value="1">FLEXI_BOTH</option>
-				<option value="2">FLEXI_MANUALLY_IN_FRONTEND</option>
-			</field>
 			<field name="loadfw_inputmask" type="fcradio" default="1" label="inputmask" description="FLEXI_USE_BROWSER_FRAMEWORKS_DESC" class="btn-group btn-group-yesno">
 				<option value="1">FLEXI_BOTH</option>
 				<option value="2">FLEXI_MANUALLY_IN_FRONTEND</option>
@@ -168,6 +185,15 @@
 				<option value="2">FLEXI_MANUALLY_IN_FRONTEND</option>
 			</field>
 
+				<field name="" type="separator" default="FLEXI_SELECT_LIB_DESC" label="" level="level3" class="alert alert-info fcpadded" />
+				<field name="select_lib_type" type="fcradio" default="0" label="FLEXI_SELECT_LIB_TYPE" description="FLEXI_SELECT_LIB_TYPE_DESC" class="btn-group group-fcmethod">
+					<option value="0">FLEXI_SELECT_LIB_SELECT2</option>
+					<option value="1">FLEXI_SELECT_LIB_CHOICES</option>
+				</field>
+				<field name="loadfw_select2" type="fcradio" default="1" label="FLEXI_SELECT_LIB_LOAD" description="FLEXI_SELECT_LIB_LOAD_DESC" class="btn-group btn-group-yesno">
+					<option value="1">FLEXI_BOTH</option>
+					<option value="2">FLEXI_MANUALLY_IN_FRONTEND</option>
+				</field>
 
 		<field name="" type="separator" default="FLEXI_PERFORMANCE" label="" level="level0" />
 
@@ -233,6 +259,11 @@
 			<field name="sef_ids" type="radio" default="0" label="JGLOBAL_SEF_NOIDS_LABEL" description="JGLOBAL_SEF_NOIDS_DESC" class="btn-group group-fcmethod" filter="integer" >
 				<option value="0">JNO</option>
 				<option value="1">JYES</option>
+			</field>
+
+			<field name="item_links_in_listings" type="fcradio" default="0" label="FLEXI_ITEM_LINKS_IN_LISTINGS" description="FLEXI_ITEM_LINKS_IN_LISTINGS_DESC" class="group-fcset fc-cleared">
+				<option value="0">FLEXI_ITEM_LINKS_MAIN_CATEGORY</option>
+				<option value="1">FLEXI_ITEM_LINKS_CURRENT_CATEGORY</option>
 			</field>
 
 			<field name="add_item_sef_segment" type="fcradio" default="1" label="FLEXI_SHORTER_ITEM_OR_CATEGORY_SEF_URLS" description="FLEXI_SHORTER_ITEM_OR_CATEGORY_SEF_URLS_DESC" class="group-fcset fc-cleared">

@@ -439,6 +439,21 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 		$select_relevance = array();
 		$text_search = $this->_buildTextSearch($text, $phrase, $txtmode, $select_relevance);
 
+		// Priority of the content types (type parameter 'search_priority'), it is the first sort criterion
+		$type_priority_cases = array();
+		foreach ($typeData as $_tdata)
+		{
+			$_type_priority = (int) $_tdata->params->get('search_priority', 0);
+			if ($_type_priority > 0)
+			{
+				$type_priority_cases[] = 'WHEN ' . (int) $_tdata->id . ' THEN ' . $_type_priority;
+			}
+		}
+		if ($type_priority_cases)
+		{
+			$select_relevance = array('type_priority' => 'CASE ty.id ' . implode(' ', $type_priority_cases) . ' ELSE 0 END') + (array) $select_relevance;
+		}
+
 
 		// ***
 		// *** Create ORDER clause
@@ -961,6 +976,34 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 		// Text search relevance [title] or [title, search index]
 		$filter_word_relevance_order = (int) $this->_params->get('filter_word_relevance_order', 0);
 
+		// Priority of the kind of field (title, category, tags) in which the words are found, only for the advanced index (1 row per field value)
+		$filter_word_field_priority = array();
+		if ($txtmode)
+		{
+			// Sortable option, e.g. "title,categories,tags", the previous list option stored a number (1..6)
+			$_prio_cfg = trim((string) $this->_params->get('filter_word_field_priority', ''));
+			$_prio_legacy = array(
+				1 => array('title', 'categories', 'tags'),
+				2 => array('title', 'tags', 'categories'),
+				3 => array('categories', 'title', 'tags'),
+				4 => array('categories', 'tags', 'title'),
+				5 => array('tags', 'title', 'categories'),
+				6 => array('tags', 'categories', 'title')
+			);
+
+			if (ctype_digit($_prio_cfg))
+			{
+				$filter_word_field_priority = $_prio_legacy[(int) $_prio_cfg] ?? array();
+			}
+			else foreach (preg_split('/\s*,\s*/', $_prio_cfg) as $_ft)
+			{
+				if (in_array($_ft, array('title', 'categories', 'tags'), true) && !in_array($_ft, $filter_word_field_priority, true))
+				{
+					$filter_word_field_priority[] = $_ft;
+				}
+			}
+		}
+
 		if ($phrase === null)
 		{
 			$default_searchphrase = $this->_params->get('default_searchphrase', 'all');
@@ -1128,7 +1171,17 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 				}
 			}
 
-			// Title relevance clause, Search index relevance clause ... (currently search index relevance not DONE)
+			// Field kind priority: the text search clause is part of the JOIN of the index rows, so the rows of an item are only the matching ones,
+			// and an item has a priority when it has a matching row of that kind of field (MAX over its rows)
+			if ($filter_word_field_priority)
+			{
+				foreach ($filter_word_field_priority as $_field_type)
+				{
+					$select_relevance['fld_' . $_field_type] = 'MAX(txtf.field_type = ' . $db->Quote($_field_type) . ')';
+				}
+			}
+
+			// Title relevance clause, Search index relevance clause (best matching row of the item, not an arbitrary one)
 			if ($filter_word_relevance_order > 0)
 			{
 				$select_relevance['rel_title'] = $_title_relev;
@@ -1136,7 +1189,7 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 
 			if ($filter_word_relevance_order > 1)
 			{
-				$select_relevance['rel_index'] = $_index_relev;
+				$select_relevance['rel_index'] = 'MAX(' . $_index_relev . ')';
 			}
 
 			// Indicate ignored words

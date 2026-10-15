@@ -131,8 +131,25 @@ foreach($_levels as $_level) {
 					<?php endif; ?>
 				</td>
 				<td class="key">
+					<span class="fc-prop-lbl">Tags</span>
 				</td>
 				<td class="data">
+					<?php
+						$tags_col   = isset($this->conf['tags_col']) ? (int) $this->conf['tags_col'] : 0;
+						$tags_ids   = !empty($this->conf['tags_ids']) ? \Joomla\Utilities\ArrayHelper::toInteger($this->conf['tags_ids']) : array();
+						$tags_names = $tags_col && $tags_ids
+							? \Joomla\CMS\Factory::getDbo()->setQuery('SELECT name FROM #__flexicontent_tags WHERE id IN (' . implode(',', $tags_ids) . ') ORDER BY name')->loadColumn()
+							: array();
+						$tags_names = htmlspecialchars(implode(', ', $tags_names), ENT_COMPAT, 'UTF-8');
+					?>
+					<?php if ($tags_col === 1 || $tags_col === 2): ?>
+						<span class="icon-stack"></span><b><?php echo 'Using column \'' . ($tags_col === 1 ? 'tags_names' : 'tags_raw') . '\''; ?></b>
+						<?php echo $tags_names ? ' + <b>' . $tags_names . '</b>' : ''; ?>
+					<?php elseif ($tags_col === 3): ?>
+						<span class="icon-lock"></span><b><?php echo $tags_names ?: '-'; ?></b>
+					<?php else: ?>
+						<span class="icon-lock"></span><b><?php echo 'No tags'; ?></b>
+					<?php endif; ?>
 				</td>
 			</tr>
 			

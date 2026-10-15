@@ -693,7 +693,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 					<?php echo ($this->count_filters  ? ' <sup>' . $this->count_filters . '</sup>' : ''); ?>
 				</div>
 
-				<div id="fc-filters-box" <?php if (!$this->count_filters || empty($tools_state->filters_box)) echo 'style="display:none;"'; ?> class="fcman-abs" onclick="var event = arguments[0] || window.event; event.stopPropagation();">
+				<div id="fc-filters-box" <?php if (!$this->count_filters || empty($tools_state->filters_box)) echo 'style="display:none;"'; ?> class="fcman-abs">
 					<?php
 					echo $this->lists['filter_assockey'];
 					echo $this->lists['filter_fileid'];
@@ -735,6 +735,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 						echo $this->lists['csv_header'];
 						echo $this->lists['csv_raw_export'];
 						echo $this->lists['csv_all_fields'];
+						echo $this->lists['csv_zip_media'];
 					}
 					?>
 

@@ -47,6 +47,9 @@ class plgFlexicontent_fieldsImage extends FCField
 	static $single_displays = array('display_single' => 0, 'display_single_total' => 1, 'display_single_link' => 2, 'display_single_total_link' => 3);
 	static $js_added = array();
 
+	// CSV importable format: tag name => value property, e.g. filename.webp{Alt}...{/Alt}{Title}...{/Title}
+	static $csv_tags = array('Alt' => 'alt', 'Title' => 'title', 'Desc' => 'desc', 'Cust1' => 'cust1', 'Cust2' => 'cust2', 'Link' => 'urllink', 'MediaURL' => 'mediaurl');
+
 	// ***
 	// *** CONSTRUCTOR
 	// ***
@@ -405,13 +408,8 @@ class plgFlexicontent_fieldsImage extends FCField
 				var uniqueRowN = uniqueRowNum" . $field->id . ";
 				var element_id = '" . $elementid . "_' + uniqueRowN;
 
-				// Destroy any select2 elements
-				var sel2_elements = newField.find('div.select2-container');
-				if (sel2_elements.length)
-				{
-					sel2_elements.remove();
-					newField.find('select.use_select2_lib').select2('destroy').show();
-				}
+				// Destroy any select library elements (select2 or choices.js)
+				fc_destroySelectLib(newField);
 
 				newField.find('input.hasvalue').val('');
 				newField.find('input.hasvalue').attr('name', element_id + '_hasvalue');
@@ -975,6 +973,58 @@ class plgFlexicontent_fieldsImage extends FCField
 		}
 
 
+		// CSV export in a format that the batch import tool can read back (see onBeforeSaveField)
+		// Only the filename is exported, the image files are expected inside the root of the import media folder
+		if ($prop === 'csv_export' && $field->parameters->get('csv_export_format', 'html') === 'importable')
+		{
+			$field->{$prop} = array();
+
+			// Handle file-ids as values (DB-mode legacy values)
+			$v = $values ? reset($values) : null;
+			$files_data = $v && (string)(int)$v == $v ? $this->getFileData($values, $published = false) : array();
+
+			foreach ((array) $values as $value)
+			{
+				if ((string)(int)$value == $value)
+				{
+					$value = array('originalname' => isset($files_data[$value]) ? $files_data[$value]->filename : '');
+				}
+				else
+				{
+					$array = $this->unserialize_array($value, $force_array=false, $force_value=false);
+					$value = $array ?: array('originalname' => $value);
+				}
+
+				$csv_value = !empty($value['originalname']) ? basename($value['originalname']) : '';
+
+				// Add original image file to the ZIP file of the CSV export (if enabled), this may rename the file
+				if (strlen($csv_value) && $image_source !== -1)
+				{
+					$csv_value = flexicontent_csvmedia::add('fcimport_media', $this->getThumbPaths($field, $item, $value)[0], $csv_value);
+				}
+
+				foreach (static::$csv_tags as $tag => $propname)
+				{
+					if (isset($value[$propname]) && strlen((string) $value[$propname]))
+					{
+						$csv_value .= '{' . $tag . '}' . $value[$propname] . '{/' . $tag . '}';
+					}
+				}
+
+				if (strlen($csv_value) || $is_ingroup)
+				{
+					$field->{$prop}[] = $csv_value;
+				}
+			}
+
+			if (!$is_ingroup)
+			{
+				$field->{$prop} = implode(ComponentHelper::getParams('com_flexicontent')->get('csv_export_field_multivalue_sep', '%%'), $field->{$prop});
+			}
+
+			return;
+		}
+
 		// Check for deleted image files or image files that cannot be thumbnailed,
 		// rebuilding thumbnails as needed, and then assigning checked values to a new array
 		$usable_values = array();
@@ -1167,11 +1217,11 @@ class plgFlexicontent_fieldsImage extends FCField
 		 * If using a non allowed gallery JS, then force fancybox
 		 */
 
-		// Only allow multibox and fancybox in items manager
-		$iManager_containers = array(1,4);
+		// Only allow multibox, fancybox, glightbox in items manager
+		$iManager_containers = array(1,4,11);
 
 		// Display types that need special container are not allowed when field in a group
-		$no_container_needed = array(1,2,3,4,6);
+		$no_container_needed = array(1,2,3,4,6,11);
 
 		if (
 			(static::$isItemsManager && !in_array($popuptype, $iManager_containers)) ||
@@ -1269,8 +1319,10 @@ class plgFlexicontent_fieldsImage extends FCField
 			}
 		}
 
-		// Force Fancybox if using Media embeeding, this is until we add support for more galleries ...
-		elseif ($usemediaurl)
+		// Force Fancybox if using Media embeding, until we add support for more galleries ...
+		// (glightbox = popuptype 11 supports media URLs / videos natively, so it is NOT forced)
+		// (swiper    = popuptype 12 opens media URLs / videos through GLightbox natively, so it is NOT forced)
+		elseif ($usemediaurl && !in_array($popuptype, array(11, 12)))
 		{
 			$popuptype = 4;
 		}
@@ -1438,6 +1490,8 @@ class plgFlexicontent_fieldsImage extends FCField
 				8 => 'photoswipe',
 				9 => 'pannellum',
 				10 => 'juxtapose',
+				11 => 'glightbox',
+				12 => 'swiper',
 			);
 
 			$viewlayout = isset($built_in_gallery_names[$popuptype])
@@ -1659,6 +1713,21 @@ class plgFlexicontent_fieldsImage extends FCField
 			if ( /*$is_importcsv &&*/ !is_array($v) && $v )
 			{
 				$array = $this->unserialize_array($v, $force_array=false, $force_value=false);
+
+				// CSV importable format (see onDisplayFieldValue 'csv_export'): filename{Alt}...{/Alt}{Title}...{/Title}...
+				if (!$array && preg_match('#\{(' . implode('|', array_keys(static::$csv_tags)) . ')\}#', $v))
+				{
+					$array = array('originalname' => trim(preg_split('#\{(?:' . implode('|', array_keys(static::$csv_tags)) . ')\}#', $v, 2)[0]));
+
+					foreach (static::$csv_tags as $tag => $propname)
+					{
+						if (preg_match('#\{' . $tag . '\}(.*?)\{/' . $tag . '\}#s', $v, $_m))
+						{
+							$array[$propname] = trim($_m[1]);
+						}
+					}
+				}
+
 				$v = $array ?: array(
 					'originalname' => $v
 				);

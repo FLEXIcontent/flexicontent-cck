@@ -1259,6 +1259,10 @@ td.col_edit_layout {
   /* SELECT2 */
   /* Single-choice */
   /* Multi-choises */
+  /* CHOICES.JS (equivalent of the SELECT2 width rules above) */
+  /* Single-choice */
+  /* Multi-choices */
+  /* Double size filters */
 }
 .flexicontent #fc-filters-box .fc-filter.fc-filter-double {
   min-width: 628px;
@@ -1400,6 +1404,34 @@ td.col_edit_layout {
   width: 100% !important;
   line-height: calc(var(--form-inp-height) - 2px) !important;
   min-height: calc(var(--form-inp-height) - 2px) !important;
+}
+.flexicontent #fc-filters-box .fc-filter .choices {
+  width: 196px !important;
+}
+.flexicontent #fc-filters-box .fc-filter .choices[data-type*="select-multiple"] {
+  width: 206px !important;
+}
+.flexicontent #fc-filters-box .fc-filter.fc-filter-double .choices {
+  width: 482px !important;
+}
+.flexicontent #fc-filters-box .fc-filter.fc-filter-double .choices[data-type*="select-multiple"] {
+  width: 490px !important;
+}
+/* Reorder toolbar filter selects: these .fc-filter are rendered outside
+   #fc-filters-box (into #fcorder_notes_box / #fc_fieldtype_filter_box),
+   so they need their own Choices width rules.
+   display:inline-block keeps them on the same line as the floated label:
+   without it the plain block .choices loses its BFC when the dropdown opens
+   and drops to the next line. */
+.flexicontent #fcorder_notes_box .choices,
+.flexicontent #fc_fieldtype_filter_box .choices {
+  width: 196px !important;
+  display: inline-block !important;
+  vertical-align: top;
+}
+.flexicontent #fcorder_notes_box .choices[data-type*="select-multiple"],
+.flexicontent #fc_fieldtype_filter_box .choices[data-type*="select-multiple"] {
+  width: 206px !important;
 }
 #s2id_scope.select2-container.use_select2_lib {
   margin: 0;
@@ -6032,14 +6064,18 @@ dl.tabs dt a:link,
   text-decoration: none;
   background: none;
 }
-div.current {
+div.current:not(.gslide) {
   border: 1px solid #cccccc;
   clear: both;
   padding: 10px 10px;
 }
-div.current dd {
+div.current:not(.gslide) dd {
   margin: 0;
   padding: 0;
+}
+div[class^="glightbox_fccontainer_"] {
+  display: flex;
+  flex-wrap: wrap;
 }
 #bottom-block {
   margin: 0 auto;
@@ -6497,4 +6533,8 @@ div.fc-field-box {
 }
 h2.fc_search_result_title a {
   text-decoration: none;
+}
+/** fix swiper **/
+.swiper.fc_swiper_main {
+  width: 100% !important;
 }

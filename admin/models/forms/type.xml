@@ -514,6 +514,7 @@
 			<field name="" type="separator" default="Search view can do &lt;b&gt;text search&lt;/b&gt; and &lt;b&gt;filtering&lt;/b&gt;, differently per content type, &lt;br/&gt; -- you may set search behaviour here. &lt;br/&gt; &lt;b&gt;NOTE:&lt;/b&gt; these are not used in category-like views (content lists), for these views configure in component / category / menu items" level="level4" />
 			<field name="searchable" type="filters" isadvsearch="1" isfilter="*" fieldnameasvalue="1" multiple="false" type_id_variable="cid" default="" label="FLEXI_TYPE_SEARCHABLE_FIELDS" description="FLEXI_TYPE_SEARCHABLE_FIELDS_DESC" />
 			<field name="filters" type="filters" isadvfilter="1" isfilter="*" fieldnameasvalue="1" multiple="false" type_id_variable="cid" default="" label="FLEXI_TYPE_FILTERS" description="FLEXI_TYPE_FILTERS_DESC" />
+			<field name="search_priority" type="number" default="0" min="0" max="100" step="1" label="FLEXI_TYPE_SEARCH_PRIORITY" description="FLEXI_TYPE_SEARCH_PRIORITY_DESC" />
 
 		</fieldset>
 

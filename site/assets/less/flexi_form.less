@@ -687,6 +687,19 @@ body .nowrap_hidden {
 }
 
 
+#flexicontent .fcfield-relation-value_box {
+	display: flex !important;
+	flex-wrap: wrap !important;
+	align-items: flex-start !important;
+	gap: 0.5rem !important;
+
+	> .fc-xpended-row {
+		width: auto !important;
+		flex: 1 1 auto !important;
+	}
+}
+
+
 #flexicontent {
 	input.form-control,
 	select.form-select,
@@ -1531,7 +1544,43 @@ td.col_edit_layout {
 				}
 			}
 		}
+
+		/* CHOICES.JS (equivalent of the SELECT2 width rules above) */
+		/* Single-choice */
+		.choices {
+			width: 196px !important;
+		}
+
+		/* Multi-choices */
+		.choices[data-type*="select-multiple"] {
+			width: 206px !important;
+		}
+
+		/* Double size filters */
+		&.fc-filter-double .choices {
+			width: 482px !important;
+		}
+		&.fc-filter-double .choices[data-type*="select-multiple"] {
+			width: 490px !important;
+		}
 	}
+}
+
+/* Reorder toolbar filter selects: these .fc-filter are rendered outside
+   #fc-filters-box (into #fcorder_notes_box / #fc_fieldtype_filter_box),
+   so they need their own Choices width rules.
+   display:inline-block keeps them on the same line as the floated label:
+   without it the plain block .choices loses its BFC when the dropdown opens
+   and drops to the next line. */
+.flexicontent #fcorder_notes_box .choices,
+.flexicontent #fc_fieldtype_filter_box .choices {
+	width: 196px !important;
+	display: inline-block !important;
+	vertical-align: top;
+}
+.flexicontent #fcorder_notes_box .choices[data-type*="select-multiple"],
+.flexicontent #fc_fieldtype_filter_box .choices[data-type*="select-multiple"] {
+	width: 206px !important;
 }
 
 // *** Search Scope

@@ -48,6 +48,7 @@
 			<field name="count" type="text" filter="int" default="5" size="3" label="FLEXI_UMOD_COUNT_TOTAL" description="FLEXI_UMOD_COUNT_TOTAL_DESC" />
 			<field name="count_feat" type="text" filter="int" default="1" size="3" label="FLEXI_UMOD_COUNT_FEATURED" description="FLEXI_UMOD_COUNT_FEATURED_DESC" />
 			<field name="count_std" type="text" filter="unset" readonly="readonly" disabled="disabled" default="Total - Featured" size="3" label="FLEXI_UMOD_COUNT_STANDARD" description="FLEXI_UMOD_COUNT_STANDARD_DESC" />
+			<field name="offset_items" type="text" filter="int" default="0" size="3" label="FLEXI_UMOD_OFFSET_ITEMS" description="FLEXI_UMOD_OFFSET_ITEMS_DESC" />
 			<field name="" type="separator" default="NOTE: to list items with FEATURED FLAG, please go to TAB 'Select Items' and find scope 'Joomla Featured FLAG'" level="level3" class="alert alert-success fcpadded" />
 
 			<field name="" type="separator" default="FLEXI_MENU_ITEM" level="level1" />

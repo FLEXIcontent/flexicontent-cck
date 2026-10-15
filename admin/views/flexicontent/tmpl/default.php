@@ -343,24 +343,11 @@ $items_task = 'task=items.';
 				$add_sep = true;
 			}
 
-			$CanSeeSearchLogs = \Joomla\CMS\Factory::getUser()->authorise('core.manage', 'com_search');
-
-			if ($CanSeeSearchLogs)
+			if ($this->perms->CanIndex)
 			{
-				$params = \Joomla\CMS\Component\ComponentHelper::getParams('com_search');
-				$enable_log_searches = $params->get('enabled');
-				if ($enable_log_searches)
-				{
-					$link = 'index.php?option=com_search&tmpl=component';
-					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-book', \Joomla\CMS\Language\Text::_( 'FLEXI_NAV_SD_SEARCH_LOGS' ), $modal = 1 );
-					$add_sep = true;
-				}
-				else
-				{
-					$link = 'index.php?option=com_config&view=component&component=com_search&path=';
-					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-book', \Joomla\CMS\Language\Text::_( 'FLEXI_NAV_SD_SEARCH_LOGS' ), $modal = 1, $close_function = 'function(){window.location.reload(false)}' );
-					$add_sep = true;
-				}
+				$link = 'index.php?option='.$option.'&amp;view=search&amp;layout=logs&amp;tmpl=component';
+				FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-book', \Joomla\CMS\Language\Text::_( 'FLEXI_NAV_SD_SEARCH_LOGS' ), $modal = 1 );
+				$add_sep = true;
 			}
 
 			if ($this->perms->CanStats && !isset($sbtns['stats']))
@@ -485,6 +472,7 @@ $items_task = 'task=items.';
 					jQuery('#displayfversion').html('<p><img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" style=\"vertical-align: middle;\"><\/p>');
 					jQuery.ajax({
 						url: 'index.php?option=com_flexicontent&task=flexicontent.fcversioncompare&format=raw&". \Joomla\CMS\Session\Session::getFormToken() ."=1',
+						cache: false,
 						success: function(str) {
 							jQuery('#displayfversion').html(str);
 							jQuery('#displayfversion').parent().css('height', 'auto');
@@ -789,6 +777,7 @@ $items_task = 'task=items.';
 							jQuery('#displayfversion').html('<p><img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" style=\"vertical-align: middle;\"><\/p>');
 							jQuery.ajax({
 								url: 'index.php?option=com_flexicontent&task=flexicontent.fcversioncompare&format=raw&". \Joomla\CMS\Session\Session::getFormToken() ."=1',
+								cache: false,
 								success: function(str) {
 									jQuery('#displayfversion').html(str);
 									jQuery('#displayfversion').parent().css('height', 'auto');

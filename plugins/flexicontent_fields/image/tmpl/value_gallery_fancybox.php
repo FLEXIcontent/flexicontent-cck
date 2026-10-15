@@ -76,9 +76,123 @@ foreach ($values as $n => $value)
 
 if ( !isset(static::$js_added[$field->id][__FILE__]) )
 {
-	flexicontent_html::loadFramework('fancybox');
+	// In Choices.js mode the front is jQuery-free: use a self-contained vanilla lightbox
+	// instead of the jQuery fancybox library.
+	$gallery_cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+	$gallery_useChoices = (int) $gallery_cparams->get('select_lib_type', 0) === 1;
 
-	$js = '';
+	if ($gallery_useChoices)
+	{
+		$js = '
+		(function() {
+			var fcLightbox = window.fcLightbox || null;
+			if (fcLightbox) return;
+			window.fcLightbox = true;
+
+			function fcLightboxInit() {
+			var CSS = "div.fc-lightbox{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.9);z-index:99999;display:none;align-items:center;justify-content:center;flex-direction:column}div.fc-lightbox.fc-is-open{display:flex}div.fc-lightbox img,div.fc-lightbox iframe{max-width:92vw;max-height:84vh;box-shadow:0 0 25px rgba(0,0,0,.6)}div.fc-lightbox .fc-lightbox-media{display:flex;align-items:center;justify-content:center}div.fc-lightbox button{position:absolute;background:rgba(0,0,0,.5);color:#fff;border:0;font-size:28px;line-height:1;cursor:pointer;padding:2px 10px}div.fc-lightbox .fc-lb-close{top:12px;right:12px}div.fc-lightbox .fc-lb-prev{left:12px;top:50%;transform:translateY(-50%)}div.fc-lightbox .fc-lb-next{right:12px;top:50%;transform:translateY(-50%)}div.fc-lightbox .fc-lb-caption{color:#fff;padding:10px;text-align:center}";
+			(function(){var s=document.createElement("style");s.textContent=CSS;document.head.appendChild(s);})();
+
+			var overlay = document.createElement("div");
+			overlay.className = "fc-lightbox";
+			overlay.innerHTML = "<button type=button class=fc-lb-close>&times;</button><button type=button class=fc-lb-prev>&lsaquo;</button><div class=fc-lightbox-media></div><button type=button class=fc-lb-next>&rsaquo;</button><div class=fc-lb-caption></div>";
+			document.body.appendChild(overlay);
+
+			var media = overlay.querySelector(".fc-lightbox-media");
+			var caption = overlay.querySelector(".fc-lb-caption");
+			var items = [];
+			var idx = 0;
+
+			function isVideo(url){ return /youtube\.com\/watch\?v=|youtu\.be\/|vimeo\.com\//.test(url); }
+			function buildSrc(el){
+				var href = el.getAttribute("href") || el.getAttribute("data-src") || "";
+				if (el.getAttribute("data-type") === "iframe" || isVideo(href)) {
+					if (/youtube\.com\/watch\?v=([\w-]+)/.test(href)) {
+						var m = href.match(/youtube\.com\/watch\?v=([\w-]+)/);
+						return { type: "iframe", src: "https://www.youtube.com/embed/" + m[1] };
+					}
+					if (/youtu\.be\/([\w-]+)/.test(href)) {
+						var m2 = href.match(/youtu\.be\/([\w-]+)/);
+						return { type: "iframe", src: "https://www.youtube.com/embed/" + m2[1] };
+					}
+					if (/vimeo\.com\/(\d+)/.test(href)) {
+						var m3 = href.match(/vimeo\.com\/(\d+)/);
+						return { type: "iframe", src: "https://player.vimeo.com/video/" + m3[1] };
+					}
+					return { type: "iframe", src: href };
+				}
+				return { type: "img", src: el.getAttribute("data-src") || href };
+			}
+
+			function render(){
+				media.innerHTML = "";
+				var g = items[idx];
+				if (!g) return;
+				if (g.type === "iframe") {
+					var f = document.createElement("iframe");
+					f.src = g.src; f.setAttribute("allowfullscreen","");
+					f.setAttribute("frameborder","0");
+					f.setAttribute("allow","autoplay; fullscreen; encrypted-media");
+					media.appendChild(f);
+				} else {
+					var im = document.createElement("img");
+					im.src = g.src;
+					media.appendChild(im);
+				}
+				caption.textContent = g.title || "";
+				overlay.style.display = "flex";
+				document.body.style.overflow = "hidden";
+			}
+
+			function close(){ overlay.style.display = "none"; media.innerHTML = ""; document.body.style.overflow = ""; }
+			function nav(dir){ idx = (idx + dir + items.length) % items.length; render(); }
+
+			overlay.querySelector(".fc-lb-close").addEventListener("click", close);
+			overlay.querySelector(".fc-lb-prev").addEventListener("click", function(){ nav(-1); });
+			overlay.querySelector(".fc-lb-next").addEventListener("click", function(){ nav(1); });
+			overlay.addEventListener("click", function(e){ if (e.target === overlay) close(); });
+			document.addEventListener("keydown", function(e){
+				if (overlay.style.display === "none") return;
+				if (e.key === "Escape") close();
+				if (e.key === "ArrowLeft") nav(-1);
+				if (e.key === "ArrowRight") nav(1);
+			});
+
+			document.addEventListener("click", function(e){
+				var a = e.target.closest ? e.target.closest("a.fb_gallery") : null;
+				if (!a) return;
+				e.preventDefault();
+				var gal = (a.dataset && a.dataset.fancybox) || (a.getAttribute && a.getAttribute("data-fancybox")) || "";
+				var groupEls, i;
+				if (gal) {
+					groupEls = Array.prototype.slice.call(document.querySelectorAll("a.fb_gallery[data-fancybox=\"" + gal + "\"]"));
+				} else {
+					groupEls = [a];
+				}
+				items = groupEls.map(function(x){
+					var s = buildSrc(x);
+					s.title = x.getAttribute("data-title") || "";
+					return s;
+				});
+				idx = groupEls.indexOf(a);
+				if (idx < 0) idx = 0;
+				render();
+			});
+			}
+
+			if (document.body) {
+				fcLightboxInit();
+			} else {
+				document.addEventListener("DOMContentLoaded", fcLightboxInit);
+			}
+		})();
+		';
+	}
+	else
+	{
+		flexicontent_html::loadFramework('fancybox');
+		$js = '';
+	}
 
 	if ($js) \Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
 
@@ -93,8 +207,19 @@ $uid = 'fc_'.$field_name_js."_fcitem".$item->id;
 
 if (!isset(static::$js_added[$field->id][__FILE__][$item->id]))
 {
-	//$js = file_get_contents(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'fancybox'.DS.'dist'.DS.'jquery.fancybox.js');
-	//$js = str_replace('unique_gal_id', $uid, $js);
+	// In Choices.js mode (jQuery-free front) the vanilla lightbox binds itself to all
+	// a.fb_gallery links generically, so no per-field jQuery fancybox init is emitted.
+	$gallery_cparams2 = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+	$gallery_useChoices2 = (int) $gallery_cparams2->get('select_lib_type', 0) === 1;
+
+	if ($gallery_useChoices2)
+	{
+		static::$js_added[$field->id][__FILE__][$item->id] = true;
+	}
+	else
+	{
+		//$js = file_get_contents(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'fancybox'.DS.'dist'.DS.'jquery.fancybox.js');
+		//$js = str_replace('unique_gal_id', $uid, $js);
 
 
 
@@ -137,7 +262,8 @@ if (!isset(static::$js_added[$field->id][__FILE__][$item->id]))
 	";
 
 	if ($js) \Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
-	static::$js_added[$field->id][__FILE__][$item->id] = true;
+		static::$js_added[$field->id][__FILE__][$item->id] = true;
+	}
 }
 
 /**

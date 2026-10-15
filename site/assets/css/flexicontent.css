@@ -623,6 +623,16 @@ body .nowrap_hidden {
   margin: -1px 0 0 0;
   white-space: nowrap;
 }
+#flexicontent .fcfield-relation-value_box {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: flex-start !important;
+  gap: 0.5rem !important;
+}
+#flexicontent .fcfield-relation-value_box > .fc-xpended-row {
+  width: auto !important;
+  flex: 1 1 auto !important;
+}
 #flexicontent {
   /* EXTRA START */
   /* EXTRA END */
@@ -1266,6 +1276,10 @@ td.col_edit_layout {
   /* SELECT2 */
   /* Single-choice */
   /* Multi-choises */
+  /* CHOICES.JS (equivalent of the SELECT2 width rules above) */
+  /* Single-choice */
+  /* Multi-choices */
+  /* Double size filters */
 }
 .flexicontent #fc-filters-box .fc-filter.fc-filter-double {
   min-width: 628px;
@@ -1407,6 +1421,34 @@ td.col_edit_layout {
   padding: 2px 6px 2px 26px !important;
   background: #fff url(../images/select2.png) no-repeat scroll -32px -22px !important;
   width: 100% !important;
+}
+.flexicontent #fc-filters-box .fc-filter .choices {
+  width: 196px !important;
+}
+.flexicontent #fc-filters-box .fc-filter .choices[data-type*="select-multiple"] {
+  width: 206px !important;
+}
+.flexicontent #fc-filters-box .fc-filter.fc-filter-double .choices {
+  width: 482px !important;
+}
+.flexicontent #fc-filters-box .fc-filter.fc-filter-double .choices[data-type*="select-multiple"] {
+  width: 490px !important;
+}
+/* Reorder toolbar filter selects: these .fc-filter are rendered outside
+   #fc-filters-box (into #fcorder_notes_box / #fc_fieldtype_filter_box),
+   so they need their own Choices width rules.
+   display:inline-block keeps them on the same line as the floated label:
+   without it the plain block .choices loses its BFC when the dropdown opens
+   and drops to the next line. */
+.flexicontent #fcorder_notes_box .choices,
+.flexicontent #fc_fieldtype_filter_box .choices {
+  width: 196px !important;
+  display: inline-block !important;
+  vertical-align: top;
+}
+.flexicontent #fcorder_notes_box .choices[data-type*="select-multiple"],
+.flexicontent #fc_fieldtype_filter_box .choices[data-type*="select-multiple"] {
+  width: 206px !important;
 }
 #s2id_scope.select2-container.use_select2_lib {
   margin: 0;
@@ -6047,14 +6089,18 @@ dl.tabs dt a:link,
   text-decoration: none;
   background: none;
 }
-div.current {
+div.current:not(.gslide) {
   border: 1px solid #cccccc;
   clear: both;
   padding: 10px 10px;
 }
-div.current dd {
+div.current:not(.gslide) dd {
   margin: 0;
   padding: 0;
+}
+div[class^="glightbox_fccontainer_"] {
+  display: flex;
+  flex-wrap: wrap;
 }
 #bottom-block {
   margin: 0 auto;
@@ -6685,4 +6731,34 @@ h2.fc_search_result_title a {
 /** module calendar field correction **/
 .mod_flexifilter_wrapper .field-calendar .btn-primary {
   height: calc(var(--ctrls-inp-height) + 2px) !important;
+}
+/** fix swiper **/
+.swiper.fc_swiper_main {
+  width: 100% !important;
+}
+/** Vanilla text-search autocomplete dropdown (see tmpl-common.js) **/
+ul.fc_ac_dropdown {
+  position: absolute;
+  z-index: 5000;
+  display: none;
+  list-style: none;
+  margin: 0;
+  padding: 2px 0;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-top: none;
+  max-height: 260px;
+  overflow: auto;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  box-sizing: border-box;
+}
+ul.fc_ac_dropdown > li.fc_ac_item {
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1.4;
+}
+ul.fc_ac_dropdown > li.fc_ac_item:hover,
+ul.fc_ac_dropdown > li.fc_ac_item.is-active {
+  background: #eee;
 }

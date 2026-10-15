@@ -378,4 +378,11 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_file_usage` (
 	KEY  `file_id` (`file_id`),
 	KEY  `context` (`context`),
 	KEY  `prop` (`prop`)
-) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`
+) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+
+CREATE TABLE IF NOT EXISTS `#__flexicontent_search_log` (
+  `search_term` varchar(128) NOT NULL default '',
+  `hits` int(11) unsigned NOT NULL default '1',
+  PRIMARY KEY (`search_term`),
+  KEY `hits` (`hits`)
+) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`;

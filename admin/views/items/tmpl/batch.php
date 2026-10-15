@@ -151,6 +151,14 @@ body .form-horizontal .control-group {
   min-height: 1.55rem !important;
   line-height: 1.55rem !important;
 }
+#flexicontent .choices, .choices {
+  height: 1.55rem;
+  line-height: 1.55rem;
+}
+.choices .choices__inner {
+  min-height: 1.55rem !important;
+  line-height: 1.55rem !important;
+}
 </style>
 
 

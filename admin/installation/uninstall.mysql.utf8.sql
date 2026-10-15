@@ -19,4 +19,5 @@ DROP TABLE IF EXISTS
 `#__flexicontent_advsearch_index`,
 `#__flexicontent_authors_ext`,
 `#__flexicontent_download_coupons`,
-`#__flexicontent_download_history`;
+`#__flexicontent_download_history`,
+`#__flexicontent_search_log`;

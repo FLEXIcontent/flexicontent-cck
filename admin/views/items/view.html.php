@@ -140,6 +140,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		$csv_header       = $model->getState('csv_header');
 		$csv_raw_export   = $model->getState('csv_raw_export');
 		$csv_all_fields   = $model->getState('csv_all_fields');
+		$csv_zip_media    = $model->getState('csv_zip_media');
 
 		// Support for using 'ALL', 'ORPHAN' fake states, by clearing other values
 		if (is_array($filter_state) && in_array('ALL', $filter_state))     $filter_state = array('ALL');
@@ -602,9 +603,8 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 						'class' => $this->select_class,
 						'multiple' => 'multiple',
 						'size' => '3',
-						'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
-						'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(jQuery(this).val()); if (this.valChanged && this != document.activeElement) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
-						'onblur' => 'this.oVal = jQuery(this).val(); if (this.valChanged) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
+						'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
+						'onblur' => '',
 						'placeholder' => $filt_placeholder,
 					),
 					$elementid
@@ -632,9 +632,8 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 						'class' => $this->select_class,
 						'multiple' => 'multiple',
 						'size' => '3',
-						'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
-						'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(jQuery(this).val()); if (this.valChanged && this != document.activeElement) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
-						'onblur' => 'this.oVal = jQuery(this).val(); if (this.valChanged) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
+						'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
+						'onblur' => '',
 					)
 				),
 			));
@@ -714,9 +713,8 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 						'class' => $this->select_class,
 						'multiple' => 'multiple',
 						'size' => '3',
-						'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
-						'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(jQuery(this).val()); if (this.valChanged && this != document.activeElement) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
-						'onblur' => 'this.oVal = jQuery(this).val(); if (this.valChanged) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
+						'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
+						'onblur' => '',
 					),
 					$value,
 					$displaytype = 1
@@ -785,9 +783,8 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 					'class' => $this->select_class,
 					'multiple' => 'multiple',
 					'size' => '3',
-					'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
-					'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(jQuery(this).val()); if (this.valChanged && this != document.activeElement) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
-					'onblur' => 'this.oVal = jQuery(this).val(); if (this.valChanged) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
+					'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
+					'onblur' => '',
 				),
 				$value,
 				$displaytype = 0
@@ -842,9 +839,8 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 						'class' => $this->select_class,
 						'multiple' => 'multiple',
 						'size' => '3',
-						'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
-						'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(jQuery(this).val()); if (this.valChanged && this != document.activeElement) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
-						'onblur' => 'this.oVal = jQuery(this).val(); if (this.valChanged) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
+						'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
+						'onblur' => '',
 					),
 					'list.select' => $value,
 				)
@@ -901,9 +897,8 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 					'class' => $this->select_class,
 					'multiple' => 'multiple',
 					'size' => '3',
-					'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
-					'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(jQuery(this).val()); if (this.valChanged && this != document.activeElement) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
-					'onblur' => 'this.oVal = jQuery(this).val(); if (this.valChanged) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
+					'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
+					'onblur' => '',
 				),
 				'value',
 				'text',
@@ -1118,6 +1113,26 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				$elementid,
 				$translate = true
 			),
+		));
+
+
+		// Build CSV export add media files to ZIP checkbox
+		$fieldname = 'csv_zip_media';
+		$elementid = 'csv_zip_media';
+		$value     = $csv_zip_media;
+
+		$lists[$elementid] = $this->getFilterDisplay(array(
+			'label' => \Joomla\CMS\Language\Text::_('Add media files to ZIP'),
+			'label_extra_class' => $this->popover_class . ($value ? ' fc-lbl-inverted' : ''),
+			'label_extra_attrs' => array(
+				'data-placement' => 'bottom',
+				'data-content' => flexicontent_html::getToolTip('', 'Download a ZIP file containing the CSV file and the files of fields using the <b>Importable</b> rendered format: <br>- images inside folder fcimport_media <br>- local files inside folder fcimport_docs <br>Extract it inside the tmp folder of the target site before importing. Different files with same name are renamed, e.g. icon_2.webp', 0, 1),
+			),
+			'html' => '
+				<div class="group-fcset" style="display: inline-block;">
+					<input type="checkbox" id="'.$elementid.'" name="'.$fieldname.'" onchange="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform()" value="1" '.($value ? ' checked="checked" ' : '').' />
+					<label id="'.$elementid.'-lbl" for="'.$elementid.'" style="margin: 0 12px; vertical-align: middle; border: 0;"></label>
+				</div>',
 		));
 
 
@@ -1587,6 +1602,25 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 			$full_js   = "window.location.replace('" . $task_url . "')";
 			$btn_arr[] = flexicontent_html::addToolBarButton(
 				$btn_title, 'csvexport', $full_js, $msg_alert='', $msg_confirm='',
+				$btn_task='', $extra_js="", $btn_list=false, $btn_menu=true, $btn_confirm=false,
+				$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? '_DDI_class_ ' . $this->btn_iv_class : '') . ' ' . $this->tooltip_class, $btn_icon='icon-download',
+				'data-placement="right" data-title="' . $btn_info . '"', $auto_add = 0, $tag_type='button'
+			);
+
+
+			/**
+			 * Add selected-items CSV Export button
+			 */
+
+			$btn_title = \Joomla\CMS\Language\Text::_('FLEXI_CSV_EXPORT_SELECTED_ITEMS', true);
+			$btn_info  = flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_CSV_EXPORT_SELECTED_ITEMS_INFO'), 2);
+			$task_url  = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&view=items&format=csv&items_set=selected';
+
+			$full_js = "var cid = []; jQuery.each(jQuery(\"input[name='cid[]']:checked\"), function(){ cid.push(jQuery(this).val()); }); "
+				. "if (!cid.length) { alert('" . \Joomla\CMS\Language\Text::_('FLEXI_NO_ITEMS_SELECTED', true) . "'); return false; } "
+				. "window.location.replace('" . $task_url . "&' + cid.map(function(el){ return 'cid[]=' + el; }).join('&')); return false;";
+			$btn_arr[] = flexicontent_html::addToolBarButton(
+				$btn_title, 'csvexport_selected', $full_js, $msg_alert='', $msg_confirm='',
 				$btn_task='', $extra_js="", $btn_list=false, $btn_menu=true, $btn_confirm=false,
 				$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? '_DDI_class_ ' . $this->btn_iv_class : '') . ' ' . $this->tooltip_class, $btn_icon='icon-download',
 				'data-placement="right" data-title="' . $btn_info . '"', $auto_add = 0, $tag_type='button'

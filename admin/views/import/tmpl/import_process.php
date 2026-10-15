@@ -74,7 +74,19 @@ jQuery(document).ready(function()
 		//alert(' ' +looper + '>=' + number);
 		if (looper>=number && looper)
 		{
-			jQuery('div#statuscomment').html( jQuery('div#statuscomment').text() + ' , IMPORT FINISHED. You can review AND/OR RESET import process');
+			// Failed items are marked by the server, an item may be partially created (e.g. title only) if its fields failed to save
+			var failed = jQuery('div#statuslog .fc_import_failed').length;
+
+			if (failed)
+			{
+				jQuery('div#statuscomment').html(jQuery('div#statuscomment').text() + ' , IMPORT FINISHED WITH <b>' + failed + ' FAILED ITEM(S)</b>.'
+					+ ' Failed items may have been created partially (e.g. title only), please review them and the import log file (logs folder).');
+				jQuery('div#fc_import_failed_box').html('<b>' + failed + '</b> item(s) failed to import, see the red lines below').show();
+			}
+			else
+			{
+				jQuery('div#statuscomment').html( jQuery('div#statuscomment').text() + ' , IMPORT FINISHED. You can review AND/OR RESET import process');
+			}
 			return;
 		}
 
@@ -201,6 +213,7 @@ jQuery(document).ready(function()
 
 <div class="fcclear"></div>
 <div id="statuscomment"></div>
+<div id="fc_import_failed_box" class="alert alert-danger" style="display: none; margin-top: 12px;"></div>
 <div id="statuslog"></div>
 <div class="fcclear" style="margin-top:16px;"></div>
 <details style="margin-top:8px;">

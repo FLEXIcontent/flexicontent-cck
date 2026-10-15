@@ -220,6 +220,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$csv_header     = $fcform ? $jinput->get('csv_header',     '',    'int')    :  $app->getUserStateFromRequest( $p.'csv_header',     'csv_header',     '',    'int');
 		$csv_raw_export = $fcform ? $jinput->get('csv_raw_export', '',    'int')    :  $app->getUserStateFromRequest( $p.'csv_raw_export', 'csv_raw_export', '',    'int');
 		$csv_all_fields = $fcform ? $jinput->get('csv_all_fields', '1',    'int')    :  $app->getUserStateFromRequest( $p.'csv_all_fields', 'csv_all_fields', '1',    'int');
+		$csv_zip_media  = $fcform ? $jinput->get('csv_zip_media',  0,      'int')    :  $app->getUserStateFromRequest( $p.'csv_zip_media',  'csv_zip_media',  0,      'int');
 
 
 		if (!is_array($filter_tag))    $filter_tag    = strlen($filter_tag)    ? array($filter_tag)    : array();
@@ -240,6 +241,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$this->setState('csv_header', $csv_header);
 		$this->setState('csv_raw_export', $csv_raw_export);
 		$this->setState('csv_all_fields', $csv_all_fields);
+		$this->setState('csv_zip_media', $csv_zip_media);
 
 		$app->setUserState($p . 'filter_tag', $filter_tag);
 		$app->setUserState($p . 'filter_lang', $filter_lang);
@@ -251,6 +253,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$app->setUserState($p . 'csv_header', $csv_header);
 		$app->setUserState($p . 'csv_raw_export', $csv_raw_export);
 		$app->setUserState($p . 'csv_all_fields', $csv_all_fields);
+		$app->setUserState($p . 'csv_zip_media', $csv_zip_media);
 
 
 		// Date filters
@@ -1556,6 +1559,15 @@ class FlexicontentModelItems extends FCModelAdminList
 		if ($filter_id)
 		{
 			$where[] = 'a.id = ' . $filter_id;
+		}
+
+		// Limit to given item ids (e.g. CSV export of selected items), set only by code, not via request
+		$filter_ids = ArrayHelper::toInteger((array) $this->getState('filter_ids'));
+		$filter_ids = array_filter($filter_ids);
+
+		if ($filter_ids)
+		{
+			$where[] = 'a.id IN (' . implode(',', $filter_ids) . ')';
 		}
 
 		if (!empty($filter_lang))

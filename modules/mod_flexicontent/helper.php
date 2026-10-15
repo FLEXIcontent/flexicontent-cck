@@ -1134,6 +1134,9 @@ return $html;
 			? (int) $params->get('maxskipcount', 50)
 			: (int) $params->get('count', 5);
 
+		$offset_items = (int) $params->get('offset_items', 0);
+		if ($offset_items < 0) $offset_items = 0;
+
 		// Now check if no items need to be retrieved
 		if ( $count === 0 && $totals === null )
 		{
@@ -2687,7 +2690,7 @@ return $html;
 			$per_cat_query = str_replace('__CID_WHERE__', $cat_where, $items_query);
 			//require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'SqlFormatter'.DS.'SqlFormatter.php');
 			//echo str_replace('PPP_', '#__', SqlFormatter::format(str_replace('#__', 'PPP_', $query)))."<br/>";
-			$db->setQuery($per_cat_query, 0, $count ? $count : 1);
+			$db->setQuery($per_cat_query, $offset_items, $count ? $count : 1);
 
 			if ($count)
 			{

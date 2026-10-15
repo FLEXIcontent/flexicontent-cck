@@ -198,6 +198,7 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 
 				// Tags
 				$conf['tags_col'] = $jinput->get('tags_col', 0, 'int');
+				$conf['tags_ids'] = array_values(array_filter(ArrayHelper::toInteger($jinput->get('tags_ids', array(), 'array'))));
 
 				// Publication: META data
 				$conf['created_by_col'] = $jinput->get('created_by_col', 0, 'int');
@@ -566,6 +567,18 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 					$tags_model	= $this->getModel('tags');
 				}
 
+				// Tags selected in the import form (use only existing tag ids), assigned to all items:
+				// options 'b', 'c' add them to the tags of the column, option 'd' uses only them (required)
+				$conf['tags_ids'] = $conf['tags_col'] && $conf['tags_ids']
+					? $db->setQuery('SELECT id FROM #__flexicontent_tags WHERE id IN (' . implode(',', $conf['tags_ids']) . ')')->loadColumn()
+					: array();
+
+				if ($conf['tags_col'] == 3 && !$conf['tags_ids'])
+				{
+					$app->enqueueMessage('Please select the tags to assign to all imported items (Tags TAB)', 'error');
+					$app->redirect($link);
+				}
+
 				// ***
 				// *** Verify that custom specified item ids do not already exist
 				// ***
@@ -627,6 +640,12 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 
 				foreach ($conf['columns'] as $colname)
 				{
+					// Tag columns are known columns, they are used or ignored according to the Tags option (e.g. ignored for option 'd')
+					if ($colname === 'tags_names' || $colname === 'tags_raw')
+					{
+						continue;
+					}
+
 					if (!isset($conf['core_props'][$colname]) && !isset($conf['custom_fields'][$colname]) && !isset($conf['attribs'][$colname]) && !isset($conf['metadata'][$colname]))
 					{
 						$unused_columns[] = $colname;
@@ -899,6 +918,16 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 
 				$data['vstate']  = 2;
 
+				// Tags selected in the import form, assigned to all items
+				if ($conf['tags_col'] == 3)
+				{
+					$data['tag'] = $conf['tags_ids'];
+				}
+				elseif ($conf['tags_ids'])
+				{
+					$data['tag'] = array_values(array_unique(array_merge(isset($data['tag']) ? (array) $data['tag'] : array(), $conf['tags_ids'])));
+				}
+
 				if (!$data['id'])
 				{
 					$data['type_id'] = isset($data['type_id'])  ? $data['type_id']  : $conf['type_id'];
@@ -1021,7 +1050,7 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 				{
 					$msg = 'Internal Error item with ID: "' . $c_item_id . " could not be loaded in order to be updated";
 					\Joomla\CMS\Log\Log::add($msg, \Joomla\CMS\Log\Log::WARNING, 'com_flexicontent.importcsv');
-					echo $msg . "<br/>";
+					echo $this->_failedItemMsg($msg);
 				}
 
 				// Otherwise (if not testing) try to create / update the item by using Item Model's store() method
@@ -1030,7 +1059,7 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 					$conf['failure_count']++;
 					$msg = 'Failed item no: ' . $lineno . ". titled as: '" . $data['title'] . "' : " . $itemmodel->getError();
 					\Joomla\CMS\Log\Log::add($msg, \Joomla\CMS\Log\Log::WARNING, 'com_flexicontent.importcsv');
-					echo $msg . "<br/>";
+					echo $this->_failedItemMsg($msg);
 				}
 
 				// Item record successfully stored
@@ -1081,9 +1110,9 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 			catch (\Throwable $e)
 			{
 				$conf['failure_count']++;
-				$msg = 'Failed item no: ' . $lineno . ' : UNCAUGHT ERROR: ' . $e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine();
+				$msg = 'Failed item no: ' . $lineno . (isset($data['title']) ? ". titled as: '" . $data['title'] . "'" : '') . ' : UNCAUGHT ERROR: ' . $e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine();
 				\Joomla\CMS\Log\Log::add($msg, \Joomla\CMS\Log\Log::WARNING, 'com_flexicontent.importcsv');
-				echo $msg . "<br/>";
+				echo $this->_failedItemMsg($msg);
 			}
 		}
 
@@ -1097,8 +1126,8 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 			jexit();
 		}
 
-		// When import is finished clean cache
-		if ($lineno == $itemcount)
+		// When import is finished clean cache (after the loop $lineno is the next line to import)
+		if ($lineno > $itemcount)
 		{
 			// Clean item's cache
 			$cache = FLEXIUtilities::getCache($group = '', 0);
@@ -1118,6 +1147,19 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 		}
 
 		jexit();
+	}
+
+
+	/**
+	 * Create the HTML of a failed item message for the import progress page, which counts them (CSS class 'fc_import_failed')
+	 *
+	 * @param   string  $msg  The message
+	 *
+	 * @return  string
+	 */
+	protected function _failedItemMsg($msg)
+	{
+		return '<div class="fc_import_failed" style="color: #c00; font-weight: bold;">' . htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') . '</div>';
 	}
 
 
@@ -1180,7 +1222,8 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 		// echo "<pre>"; print_r($filedata_arr); jexit();
 		if (count($filedata_arr))
 		{
-			$filenames_missing = array();
+			$filenames_missing    = array();
+			$filenames_unreadable = array();
 
 			foreach ($filedata_arr as $fld_name => $filedata)
 			{
@@ -1215,10 +1258,25 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 						}
 
 						$filename = '';
+						$filename_tags = '';
 
 						if (!isset($prop_arr))
 						{
 							$filename = $val;
+
+							// Importable CSV export format, e.g. file.webp{Alt}...{/Alt} or file.zip{Altname}...{/Altname}{Desc}...{/Desc}
+							// External files {URL}...{/URL} or http(s):// / ftp:// URLs have no file on the server, skip checking them
+							if (preg_match('#^\{URL\}#', $filename) || preg_match('#^(?:https?|ftp)://#i', $filename))
+							{
+								$filename = '';
+							}
+
+							// Check only the filename, keeping the property tags to be added back to the value
+							elseif (preg_match('#^(.*?)(\{[A-Za-z][A-Za-z0-9]*\}.*)$#s', $filename, $matches))
+							{
+								$filename      = trim($matches[1]);
+								$filename_tags = $matches[2];
+							}
 						}
 						else
 						{
@@ -1246,7 +1304,7 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 								// Update value in-place within the multi-value array instead of overwriting the entire cell
 								if (!isset($prop_arr))
 								{
-									$vals[$i] = $_filename;
+									$vals[$i] = $_filename . $filename_tags;
 								}
 								else
 								{
@@ -1261,6 +1319,12 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 							if (!$_filename)
 							{
 								$filenames_missing[$fld_name][$filename][] = $lineno;
+							}
+
+							// File exists but PHP can not read it (e.g. permissions of uploaded files), copying it during import would fail
+							elseif (!is_readable(\Joomla\Filesystem\Path::clean($srcpath_original . $_filename)))
+							{
+								$filenames_unreadable[$fld_name][$_filename][] = $lineno;
 							}
 						}
 
@@ -1309,6 +1373,41 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 					foreach ($fld_files_missing as $filename_missing => $line_nums)
 					{
 						$parse_log .= 'LINE ' . implode(',', $line_nums) . ': ' . $filename_missing . ' <br/>';
+					}
+
+					$parse_log .= '
+					</span>
+					';
+				}
+			}
+
+			// Files that exist but are not readable, importing them would fail (not skippable, fix file permissions)
+			if (count($filenames_unreadable))
+			{
+				$parse_log .= '<span class="fc-mssg fc-error"> CSV File has FILE references to files that exist but <b>are not readable</b> by the web server (PHP), '
+					. '<br/>please fix their <b>permissions</b> (e.g. files 644, folders 755), importing them would fail' . "\n";
+
+				if ($task != 'testcsv')
+				{
+					$parse_log .= '<br/><b>-- (DEBUG was auto enabled for first 2 records)</b>' . "\n";
+					$task = 'testcsv';
+				}
+
+				$parse_log .= '</span>';
+
+				foreach ($filenames_unreadable as $fld_name => $fld_files_unreadable)
+				{
+					$field_type = $ff_names_to_types[$fld_name];
+					$srcpath_original = $ff_types_to_paths[$field_type];
+					$parse_log .= '
+					<span class="fc-mssg fc-warning">
+					FIELD: <b> ' . $fld_name . '</b> has ' . count($fld_files_unreadable) . ' not readable file(s) <br/>
+					-- In folder: <b> ' . $srcpath_original . ' </b><br/>
+					-- Not readable filenames list: <br/> ';
+
+					foreach ($fld_files_unreadable as $filename_unreadable => $line_nums)
+					{
+						$parse_log .= 'LINE ' . implode(',', $line_nums) . ': ' . $filename_unreadable . ' <br/>';
 					}
 
 					$parse_log .= '

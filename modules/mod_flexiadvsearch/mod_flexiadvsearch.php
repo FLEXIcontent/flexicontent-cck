@@ -12,6 +12,14 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
+use Joomla\CMS\Component\ComponentHelper;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Helper\ModuleHelper;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Profiler\Profiler;
+use Joomla\CMS\Uri\Uri;
+
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
@@ -28,8 +36,8 @@ JLoader::register('\Joomla\CMS\Form\FormFieldFclayoutbuilder', JPATH_ADMINISTRAT
 
 
 // Decide whether to show module contents
-$app     = \Joomla\CMS\Factory::getApplication();
-$config  = \Joomla\CMS\Factory::getConfig();
+$app     = Factory::getApplication();
+$config  = Factory::getConfig();
 $jinput  = $app->input;
 $option  = $jinput->get('option', '', 'cmd');
 $view    = $jinput->get('view', '', 'cmd');
@@ -88,7 +96,7 @@ if ( !$show_mod )  return;
 
 global $modfc_jprof;
 jimport('joomla.profiler.profiler');
-$modfc_jprof = new \Joomla\CMS\Profiler\Profiler();
+$modfc_jprof = new Profiler();
 $modfc_jprof->mark('START: FLEXIcontent Search Module');
 
 // Include helpers class file
@@ -103,8 +111,8 @@ if ($mod_initialized === null)
 }
 
 // Initialize various variables
-$document = \Joomla\CMS\Factory::getDocument();
-$flexiparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+$document = Factory::getDocument();
+$flexiparams = ComponentHelper::getParams('com_flexicontent');
 
 // Include the helper only once
 require_once (dirname(__FILE__).DS.'helper.php');
@@ -119,7 +127,7 @@ $add_ccs      = $params->get('add_ccs');
 $add_ccs      = is_numeric($add_ccs) ? (int) $add_ccs : ($disable_css ? 0 : 1);
 $add_tooltips = (int) $params->get('add_tooltips', (int) $flexiparams->get('add_tooltips', 1));
 
-$text      = \Joomla\CMS\Language\Text::_($params->get('text', 'FLEXI_ADV_MOD_SEARCH_PROMPT'));
+$text      = Text::_($params->get('text', 'FLEXI_ADV_MOD_SEARCH_PROMPT'));
 $width     = intval($params->get('width', 20));
 $maxlength = $width > 20 ? $width : 20;
 
@@ -129,21 +137,21 @@ $maxlength = $width > 20 ? $width : 20;
 $button       = $params->get('button', '');
 $button_pos   = $params->get('button_pos', 'left');
 $button_as    = $params->get('button_as', '');
-$button_text  = \Joomla\CMS\Language\Text::_($params->get('button_text', 'FLEXI_ADV_MOD_GO'));
+$button_text  = Text::_($params->get('button_text', 'FLEXI_ADV_MOD_GO'));
 $button_image = $params->get('button_image', 'components/com_flexicontent/assets/images/magnifier.png');
 
 // Direct button
 $direct       = $params->get('direct_button', '');
 $direct_pos   = $params->get('direct_pos', 'left');
 $direct_as    = $params->get('direct_as', '');
-$direct_text  = \Joomla\CMS\Language\Text::_($params->get('direct_text', 'FLEXI_ADV_MOD_DIRECT'));
+$direct_text  = Text::_($params->get('direct_text', 'FLEXI_ADV_MOD_DIRECT'));
 $direct_image = $params->get('direct_image', 'components/com_flexicontent/assets/images/question.png');
 
 // Link to search view button ('Advanced')
 $link_to_advsearch     = $params->get('link_to_advsearch', 1);
 $link_to_advsearch_pos = $params->get('link_to_advsearch_pos', 'bottom');
 $link_to_advsearch_as  = '';
-$link_to_advsearch_txt = \Joomla\CMS\Language\Text::_($params->get('link_to_advsearch_txt', 'FLEXI_ADV_MOD_OPEN_DETAILED_SEARCH'));
+$link_to_advsearch_txt = Text::_($params->get('link_to_advsearch_txt', 'FLEXI_ADV_MOD_OPEN_DETAILED_SEARCH'));
 
 
 // Load needed JS libs & CSS styles
@@ -153,7 +161,7 @@ flexicontent_html::loadFramework('flexi_tmpl_common');
 // Add tooltips
 if ($add_tooltips)
 {
-	\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip');
+	HTMLHelper::_('bootstrap.tooltip');
 }
 
 // Add css
@@ -165,28 +173,28 @@ if ($add_ccs && $layout)
 		// Active module layout css (optional)
 		if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css'))
 		{
-			echo flexicontent_html::getInlineLinkOnce(\Joomla\CMS\Uri\Uri::base(true).'/modules/'.$modulename.'/tmpl/'.$layout.'/'.$layout.'.css', array('version'=>FLEXI_VHASH));
+			echo flexicontent_html::getInlineLinkOnce(Uri::base(true).'/modules/'.$modulename.'/tmpl/'.$layout.'/'.$layout.'.css', array('version'=>FLEXI_VHASH));
 		}
 
 		// Module 's core CSS
 		if (file_exists(dirname(__FILE__).DS.'tmpl_common'.DS.'module.css'))
 		{
-			echo flexicontent_html::getInlineLinkOnce(\Joomla\CMS\Uri\Uri::base(true).'/modules/'.$modulename.'/tmpl_common/module.css', array('version'=>FLEXI_VHASH));
+			echo flexicontent_html::getInlineLinkOnce(Uri::base(true).'/modules/'.$modulename.'/tmpl_common/module.css', array('version'=>FLEXI_VHASH));
 		}
 
 		// Component CSS with optional override
-		echo flexicontent_html::getInlineLinkOnce(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version'=>FLEXI_VHASH));
+		echo flexicontent_html::getInlineLinkOnce(Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version'=>FLEXI_VHASH));
 		if (FLEXI_J40GE && file_exists(JPATH_SITE.DS.'media/templates/site'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css'))
 		{
-			echo flexicontent_html::getInlineLinkOnce(\Joomla\CMS\Uri\Uri::base(true).'/media/templates/site/'.$app->getTemplate().'/css/flexicontent.css', array('version'=>FLEXI_VHASH));
+			echo flexicontent_html::getInlineLinkOnce(Uri::base(true).'/media/templates/site/'.$app->getTemplate().'/css/flexicontent.css', array('version'=>FLEXI_VHASH));
 		}
 		elseif (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css'))
 		{
-			echo flexicontent_html::getInlineLinkOnce(\Joomla\CMS\Uri\Uri::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css', array('version'=>FLEXI_VHASH));
+			echo flexicontent_html::getInlineLinkOnce(Uri::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css', array('version'=>FLEXI_VHASH));
 		}
 
 		// Filter's styles
-		echo '<link rel="stylesheet" href="'.\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexi_filters.css?'.FLEXI_VHASH.'">';
+		echo '<link rel="stylesheet" href="'.Uri::base(true).'/components/com_flexicontent/assets/css/flexi_filters.css?'.FLEXI_VHASH.'">';
 	}
 	
 	// Standards compliant implementation by placing CSS link into the HTML HEAD
@@ -195,28 +203,28 @@ if ($add_ccs && $layout)
 		// Active module layout css (optional)
 		if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css'))
 		{
-			$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/modules/'.$modulename.'/tmpl/'.$layout.'/'.$layout.'.css', array('version' => FLEXI_VHASH));
+			$document->addStyleSheet(Uri::base(true).'/modules/'.$modulename.'/tmpl/'.$layout.'/'.$layout.'.css', array('version' => FLEXI_VHASH));
 		}
 
 		// Module 's core CSS
 		if (file_exists(dirname(__FILE__).DS.'tmpl_common'.DS.'module.css'))
 		{
-			$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/modules/'.$modulename.'/tmpl_common/module.css', array('version' => FLEXI_VHASH));
+			$document->addStyleSheet(Uri::base(true).'/modules/'.$modulename.'/tmpl_common/module.css', array('version' => FLEXI_VHASH));
 		}
 
 		// Component CSS with optional override
-		$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
+		$document->addStyleSheet(Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		if (FLEXI_J40GE && file_exists(JPATH_SITE.DS.'media/templates/site'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css'))
 		{
-			$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/media/templates/site/'.$app->getTemplate().'/css/flexicontent.css', array('version' => FLEXI_VHASH));
+			$document->addStyleSheet(Uri::base(true).'/media/templates/site/'.$app->getTemplate().'/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		}
 		elseif (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css'))
 		{
-			$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css');
+			$document->addStyleSheet(Uri::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css');
 		}
 
 		// Filter's styles
-		$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexi_filters.css', array('version' => FLEXI_VHASH));
+		$document->addStyleSheet(Uri::base(true).'/components/com_flexicontent/assets/css/flexi_filters.css', array('version' => FLEXI_VHASH));
 	}
 }
 
@@ -228,7 +236,7 @@ if ($itemid)
 	//$menu = $app->getMenu()->getItem($itemid);     // Retrieve active menu
 	
 	// Merge into module params (a) COMPONENT parameters, then (b) active menu parameters
-	$params->merge(\Joomla\CMS\Component\ComponentHelper::getComponent('com_flexicontent')->params);
+	$params->merge(ComponentHelper::getComponent('com_flexicontent')->params);
 	/*if ($menu)
 	{
 		$params->merge($menu->getParams());
@@ -236,7 +244,7 @@ if ($itemid)
 }
 
 // Render Layout
-require(\Joomla\CMS\Helper\ModuleHelper::getLayoutPath('mod_flexiadvsearch', $layout));
+require(ModuleHelper::getLayoutPath('mod_flexiadvsearch', $layout));
 
 // append performance stats to global variable
 if ( $flexiparams->get('print_logging_info') )

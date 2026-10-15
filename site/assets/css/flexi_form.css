@@ -620,6 +620,16 @@ body .nowrap_hidden {
   margin: -1px 0 0 0;
   white-space: nowrap;
 }
+#flexicontent .fcfield-relation-value_box {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: flex-start !important;
+  gap: 0.5rem !important;
+}
+#flexicontent .fcfield-relation-value_box > .fc-xpended-row {
+  width: auto !important;
+  flex: 1 1 auto !important;
+}
 #flexicontent {
   /* EXTRA START */
   /* EXTRA END */
@@ -1263,6 +1273,10 @@ td.col_edit_layout {
   /* SELECT2 */
   /* Single-choice */
   /* Multi-choises */
+  /* CHOICES.JS (equivalent of the SELECT2 width rules above) */
+  /* Single-choice */
+  /* Multi-choices */
+  /* Double size filters */
 }
 .flexicontent #fc-filters-box .fc-filter.fc-filter-double {
   min-width: 628px;
@@ -1404,6 +1418,34 @@ td.col_edit_layout {
   padding: 2px 6px 2px 26px !important;
   background: #fff url(../images/select2.png) no-repeat scroll -32px -22px !important;
   width: 100% !important;
+}
+.flexicontent #fc-filters-box .fc-filter .choices {
+  width: 196px !important;
+}
+.flexicontent #fc-filters-box .fc-filter .choices[data-type*="select-multiple"] {
+  width: 206px !important;
+}
+.flexicontent #fc-filters-box .fc-filter.fc-filter-double .choices {
+  width: 482px !important;
+}
+.flexicontent #fc-filters-box .fc-filter.fc-filter-double .choices[data-type*="select-multiple"] {
+  width: 490px !important;
+}
+/* Reorder toolbar filter selects: these .fc-filter are rendered outside
+   #fc-filters-box (into #fcorder_notes_box / #fc_fieldtype_filter_box),
+   so they need their own Choices width rules.
+   display:inline-block keeps them on the same line as the floated label:
+   without it the plain block .choices loses its BFC when the dropdown opens
+   and drops to the next line. */
+.flexicontent #fcorder_notes_box .choices,
+.flexicontent #fc_fieldtype_filter_box .choices {
+  width: 196px !important;
+  display: inline-block !important;
+  vertical-align: top;
+}
+.flexicontent #fcorder_notes_box .choices[data-type*="select-multiple"],
+.flexicontent #fc_fieldtype_filter_box .choices[data-type*="select-multiple"] {
+  width: 206px !important;
 }
 #s2id_scope.select2-container.use_select2_lib {
   margin: 0;

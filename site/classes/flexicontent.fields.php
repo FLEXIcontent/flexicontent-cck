@@ -3228,7 +3228,11 @@ class FlexicontentFields
 				. (FLEXI_FALANG
 					? 'CONCAT_WS(\' \',
 						CASE WHEN (fat.value IS NOT NULL) THEN fat.value ELSE c.title END, 
-						CASE WHEN (fak.value IS NOT NULL) THEN fak.value ELSE c.metakey END
+						CASE WHEN (fak.value IS NOT NULL) THEN fak.value ELSE c.metakey END,
+						CASE WHEN (im.language = \'*\') THEN (
+							SELECT GROUP_CONCAT(fax.value SEPARATOR \' \') FROM #__falang_content AS fax
+							WHERE fax.reference_table = \'categories\' AND fax.reference_field IN (\'title\', \'metakey\') AND fax.reference_id = c.id
+						) END
 					)'
 					: 'CONCAT_WS(\' \', c.title, c.metakey)'
 				) . ' AS value '
@@ -3250,7 +3254,11 @@ class FlexicontentFields
 				. (FLEXI_FALANG
 					? 'CONCAT_WS(\' \',
 						CASE WHEN (fat.value IS NOT NULL) THEN fat.value ELSE t.name END, 
-						CASE WHEN (fak.value IS NOT NULL) THEN fak.value ELSE jt.metakey END
+						CASE WHEN (fak.value IS NOT NULL) THEN fak.value ELSE jt.metakey END,
+						CASE WHEN (im.language = \'*\') THEN (
+							SELECT GROUP_CONCAT(fax.value SEPARATOR \' \') FROM #__falang_content AS fax
+							WHERE fax.reference_table = \'tags\' AND fax.reference_field IN (\'title\', \'metakey\') AND fax.reference_id = t.jtag_id
+						) END
 					)'
 					: 'CONCAT_WS(\' \', t.name, jt.metakey)'
 				) . ' AS value '
@@ -5635,8 +5643,9 @@ class FlexicontentFields
 			$catslug = "";
 
 			// Check if removed from category or inside a noRoute category or inside a non-published category and use main category slug or other routable & published category slug
-			$catid_arr = explode(',', $result->catidlist);
-			$catalias_arr = explode(',', $result->cataliaslist);
+			// ... catidlist / cataliaslist are only populated by the relation list query, other callers (e.g. googlemap module) may pass plain item objects
+			$catid_arr = !empty($result->catidlist) ? explode(',', $result->catidlist) : array();
+			$catalias_arr = !empty($result->cataliaslist) ? explode(',', $result->cataliaslist) : array();
 
 			for($i=0; $i<count($catid_arr); $i++)
 			{

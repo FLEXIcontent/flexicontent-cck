@@ -780,14 +780,18 @@ dl.tabs dt a:link,
   text-decoration: none;
   background: none;
 }
-div.current {
+div.current:not(.gslide) {
   border: 1px solid #cccccc;
   clear: both;
   padding: 10px 10px;
 }
-div.current dd {
+div.current:not(.gslide) dd {
   margin: 0;
   padding: 0;
+}
+div[class^="glightbox_fccontainer_"] {
+  display: flex;
+  flex-wrap: wrap;
 }
 #bottom-block {
   margin: 0 auto;
@@ -1418,4 +1422,34 @@ h2.fc_search_result_title a {
 /** module calendar field correction **/
 .mod_flexifilter_wrapper .field-calendar .btn-primary {
   height: calc(var(--ctrls-inp-height) + 2px) !important;
+}
+/** fix swiper **/
+.swiper.fc_swiper_main {
+  width: 100% !important;
+}
+/** Vanilla text-search autocomplete dropdown (see tmpl-common.js) **/
+ul.fc_ac_dropdown {
+  position: absolute;
+  z-index: 5000;
+  display: none;
+  list-style: none;
+  margin: 0;
+  padding: 2px 0;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-top: none;
+  max-height: 260px;
+  overflow: auto;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  box-sizing: border-box;
+}
+ul.fc_ac_dropdown > li.fc_ac_item {
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1.4;
+}
+ul.fc_ac_dropdown > li.fc_ac_item:hover,
+ul.fc_ac_dropdown > li.fc_ac_item.is-active {
+  background: #eee;
 }
