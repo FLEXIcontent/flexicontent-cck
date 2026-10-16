@@ -1246,6 +1246,12 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		}
 
 
+		// CHECK / CREATE the phpThumb configuration file managed by FLEXIcontent (signing key, high security flag)
+		if (flexicontent_images::phpThumbSyncConfig() === false)
+		{
+			Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::sprintf('FLEXI_PHPTHUMB_KEY_FILE_NOT_WRITABLE', flexicontent_images::phpThumbManagedFile()), 'notice');
+		}
+
 		$phpthumbcache 	= Path::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'cache');
 
 		// CHECK phpThumb cache exists and create the folder

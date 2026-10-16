@@ -76,9 +76,13 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 								$qualidade = 50;
 								$widthImage = 100 ;
 								$heighImage = 80 ;
-								$finalCut = "&amp;w=" . $widthImage . "&amp;h=" . $heighImage . "&amp;q=" . $qualidade;
-								$imageSrcSemDomain = explode($domain, $field->display_medium_src)[0];
-								$finalImage = $domain."/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=" . $imageSrcSemDomain . $finalCut;
+								$imageSrcSemDomain = preg_replace('#^https?://' . preg_quote($domain, '#') . '#i', '', (string) $field->display_medium_src);
+								$finalImage = flexicontent_images::phpThumbURL(array(
+									'src' => $imageSrcSemDomain,
+									'w'   => $widthImage,
+									'h'   => $heighImage,
+									'q'   => $qualidade,
+								), true, true);
 								$xmlItem->appendChild($dm->createElement(	$field->name	    ,  	$finalImage	));
 								break;
 							

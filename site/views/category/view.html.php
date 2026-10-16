@@ -673,7 +673,14 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 			: $app->getCfg('image_path', '');
 		$joomla_image_path = $joomla_image_path ? $joomla_image_path.DS : '';
 		$joomla_image_url  = '';//$joomla_image_url  ? $joomla_image_url.'/' : ''; // NEED REVIEW
-		$phpThumbURL = $this->baseurl.'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=';
+		// Signed phpThumb URL builder, $conf holds the sizing options (see flexicontent_images::phpThumbURL())
+		$phpThumbURL = function ($src, array $conf)
+		{
+			$conf['src'] = $src;
+			$conf['f']   = flexicontent_images::phpThumbFormat($src);
+
+			return flexicontent_images::phpThumbURL($conf);
+		};
 
 
 		// ***
@@ -689,25 +696,18 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		$cat_image_height = $params->get('cat_image_height', 80);
 		$cat_default_image = $params->get('cat_default_image', '');
 
+		$conf = array();
+
 		if ($show_cat_image)
 		{
-			$h		= '&amp;h=' . $cat_image_height;
-			$w		= '&amp;w=' . $cat_image_width;
-			$aoe	= '&amp;aoe=1';
-			$q		= '&amp;q=95';
-			$ar 	= '&amp;ar=x';
-			$zc		= $cat_image_method ? '&amp;zc=' . $cat_image_method : '';
+			$conf = array('w' => $cat_image_width, 'h' => $cat_image_height, 'aoe' => 1, 'q' => 95, 'ar' => 'x', 'zc' => $cat_image_method ?: '');
 		}
 
 		if ($cat_default_image)
 		{
 			$src = $this->baseurl ."/". $joomla_image_url . $cat_default_image;
 
-			$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-			$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
-			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
-
-			$default_image = $phpThumbURL.$src.$conf;
+			$default_image = $phpThumbURL($src, $conf);
 			$default_image = '<img class="fccat_image" src="'.$default_image.'" alt="%s" title="%s"/>';
 		}
 		else
@@ -735,23 +735,15 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 				{
 					$src = $this->baseurl ."/". $joomla_image_url . $cat->image;
 
-					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-					$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
-					$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
-
-					$image = $phpThumbURL.$src.$conf;
+					$image = $phpThumbURL($src, $conf);
 				}
 
 				elseif ( $cat_image_source !=1 && $src = flexicontent_html::extractimagesrc($cat) )
 				{
-					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-					$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
-					$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
-
 					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  $this->baseurl.'/' : '';
 					$src = $base_url.$src;
 
-					$image = $phpThumbURL.$src.$conf;
+					$image = $phpThumbURL($src, $conf);
 				}
 
 				$cat->image_src = @$src;  // Also add image category URL for developers
@@ -787,25 +779,18 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		$cat_image_height = $params->get('subcat_image_height', 24);
 		$cat_default_image = $params->get('subcat_default_image', '');
 
+		$conf = array();
+
 		if ($show_cat_image)
 		{
-			$h		= '&amp;h=' . $cat_image_height;
-			$w		= '&amp;w=' . $cat_image_width;
-			$aoe	= '&amp;aoe=1';
-			$q		= '&amp;q=95';
-			$ar 	= '&amp;ar=x';
-			$zc		= $cat_image_method ? '&amp;zc=' . $cat_image_method : '';
+			$conf = array('w' => $cat_image_width, 'h' => $cat_image_height, 'aoe' => 1, 'q' => 95, 'ar' => 'x', 'zc' => $cat_image_method ?: '');
 		}
 
 		if ($cat_default_image)
 		{
 			$src = $this->baseurl ."/". $joomla_image_url . $cat_default_image;
 
-			$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-			$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
-			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
-
-			$default_image = $phpThumbURL.$src.$conf;
+			$default_image = $phpThumbURL($src, $conf);
 			$default_image = '<img class="fccat_image" src="'.$default_image.'" alt="%s" title="%s"/>';
 		}
 		else
@@ -836,23 +821,15 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 				{
 					$src = $this->baseurl ."/". $joomla_image_url . $cat->image;
 
-					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-					$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
-					$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
-
-					$image = $phpThumbURL.$src.$conf;
+					$image = $phpThumbURL($src, $conf);
 				}
 
 				elseif ( $cat_image_source!=1 && $src = flexicontent_html::extractimagesrc($cat) )
 				{
-					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-					$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
-					$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
-
 					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  $this->baseurl.'/' : '';
 					$src = $base_url.$src;
 
-					$image = $phpThumbURL.$src.$conf;
+					$image = $phpThumbURL($src, $conf);
 				}
 
 				$cat->image_src = @$src;  // Also add image category URL for developers
@@ -888,25 +865,18 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		$cat_image_height = $params->get('peercat_image_height', 24);
 		$cat_default_image = $params->get('peercat_default_image', '');
 
+		$conf = array();
+
 		if ($show_cat_image)
 		{
-			$h		= '&amp;h=' . $cat_image_height;
-			$w		= '&amp;w=' . $cat_image_width;
-			$aoe	= '&amp;aoe=1';
-			$q		= '&amp;q=95';
-			$ar 	= '&amp;ar=x';
-			$zc		= $cat_image_method ? '&amp;zc=' . $cat_image_method : '';
+			$conf = array('w' => $cat_image_width, 'h' => $cat_image_height, 'aoe' => 1, 'q' => 95, 'ar' => 'x', 'zc' => $cat_image_method ?: '');
 		}
 
 		if ($cat_default_image)
 		{
 			$src = $this->baseurl ."/". $joomla_image_url . $cat_default_image;
 
-			$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-			$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
-			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
-
-			$default_image = $phpThumbURL.$src.$conf;
+			$default_image = $phpThumbURL($src, $conf);
 			$default_image = '<img class="fccat_image"  src="'.$default_image.'" alt="%s" title="%s"/>';
 		}
 		else
@@ -936,23 +906,15 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 				{
 					$src = $this->baseurl ."/". $joomla_image_url . $cat->image;
 
-					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-					$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
-					$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
-
-					$image = $phpThumbURL.$src.$conf;
+					$image = $phpThumbURL($src, $conf);
 				}
 
 				elseif ( $cat_image_source!=1 && $src = flexicontent_html::extractimagesrc($cat) )
 				{
-					$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-					$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
-					$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
-
 					$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  $this->baseurl.'/' : '';
 					$src = $base_url.$src;
 
-					$image = $phpThumbURL.$src.$conf;
+					$image = $phpThumbURL($src, $conf);
 				}
 
 				$cat->image_src = @$src;  // Also add image category URL for developers

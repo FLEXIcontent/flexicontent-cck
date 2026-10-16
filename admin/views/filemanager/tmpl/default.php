@@ -1115,19 +1115,20 @@ if ($js)
 								// Clean the file path
 								$file_abspath = Path::clean($file_abspath);
 
-								// For path used in URL we always use forward slashes
-								$file_url = rawurlencode(str_replace('\\', '/', $file_abspath));
+								// Source for phpThumb: a path relative to the site root when the file is inside it (no server
+								// paths in URLs), otherwise the absolute path as it is (phpThumb decides whether it is allowed)
+								$file_src   = str_replace('\\', '/', $file_abspath);
+								$site_root  = rtrim(str_replace('\\', '/', JPATH_SITE), '/') . '/';
+								$file_inroot = stripos($file_src, $site_root) === 0;
+								$file_src   = $file_inroot ? substr($file_src, strlen($site_root)) : $file_src;
 
 								// Use the same format for output if possible
-								$output_formats = array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico');
-								$f = in_array($ext, $output_formats)
-									? '&amp;f=' . $ext
-									: '';
+								$file_format = flexicontent_images::phpThumbFormat($file_src);
 
 								if (empty($thumb_or_icon))
 								{
 									$thumb_or_icon = file_exists($file_abspath)
-										? '<img class="fc-fileman-thumb" onclick="if (jQuery(this).hasClass(\'fc_zoomed\')) { fman_zoom_thumb(event, this); return false; }" src="'.Uri::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_url.$f. '&amp;w=800&amp;h=800&amp;zc=1&amp;q=95&amp;f=jpeg&amp;ar=x" alt="'.$filename_original.'" />'
+										? '<img class="fc-fileman-thumb" onclick="if (jQuery(this).hasClass(\'fc_zoomed\')) { fman_zoom_thumb(event, this); return false; }" src="' . flexicontent_images::phpThumbURL(array('src' => $file_src, 'w' => 800, 'h' => 800, 'zc' => 1, 'q' => 95, 'f' => 'jpeg', 'ar' => 'x'), true, true, !$file_inroot) . '" alt="'.$filename_original.'" />'
 										: '<span class="badge badge-box badge-important">'.Text::_('FLEXI_FILE_NOT_FOUND').'</span>';
 								}
 
@@ -1181,7 +1182,7 @@ if ($js)
 								{
 									// File preview icon for content form
 									$file_is_selected = isset($this->pending_file_names[$row->filename]);
-									$file_preview = !in_array($ext, $imagesExt) ? '' : Uri::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_url.$f. '&amp;w='.$this->thumb_w.'&amp;h='.$this->thumb_h.'&amp;zc=1&amp;q=95&amp;ar=x';
+									$file_preview = !in_array($ext, $imagesExt) ? '' : flexicontent_images::phpThumbURL(array('src' => $file_src, 'w' => $this->thumb_w, 'h' => $this->thumb_h, 'zc' => 1, 'q' => 95, 'ar' => 'x', 'f' => $file_format), true, true, !$file_inroot);
 
 									// Link to assign file value into the content form
 									$row->file_assign_link = $this->assign_mode ?
