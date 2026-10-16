@@ -180,6 +180,10 @@
 				<option value="1">FLEXI_FRONTEND</option>
 				<option value="2">FLEXI_MANUALLY_IN_FRONTEND</option>
 			</field>
+			<field name="loadfw_bootstrap_js" type="fcradio" default="1" label="bootstrap.js" description="FLEXI_USE_BROWSER_FRAMEWORKS_DESC" class="btn-group btn-group-yesno">
+				<option value="1">FLEXI_FRONTEND</option>
+				<option value="2">FLEXI_MANUALLY_IN_FRONTEND</option>
+			</field>
 			<field name="loadfw_icomoon_css" type="fcradio" default="2" label="icomoon.css" description="FLEXI_USE_BROWSER_FRAMEWORKS_DESC" class="btn-group btn-group-yesno">
 				<option value="1">FLEXI_FRONTEND</option>
 				<option value="2">FLEXI_MANUALLY_IN_FRONTEND</option>

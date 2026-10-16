@@ -1433,6 +1433,14 @@ class flexicontent_html
 
 				break;
 
+			case 'bootstrap_js':
+				// Bootstrap 5 JS for the front-end, matching the Joomla-shipped version
+				// (media/vendor/bootstrap, 5.3.8 on Joomla 6) and the version used by the
+				// builder canvas. Loaded via the WebAssetManager so only the needed JS is
+				// pulled in; used by the builder layout JS components (tabs, accordion, ...).
+				\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.framework');
+				break;
+
 			case 'touch-punch':
 				$mobileDetector = flexicontent_html::getMobileDetector();
 				$isMobile = $mobileDetector->isMobile() || $mobileDetector->isTablet();
@@ -1471,19 +1479,80 @@ class flexicontent_html
 				$document->addScript($framework_path.'/js/grapesjs-tooltip.js?0.1.8');
 				//shapedivider module
 				//$document->addScript('https://unpkg.com/grapesjs-shape-divider');  
-				//bs4
-				$document->addScript($framework_path.'/js/grapesjs-blocks-bootstrap4.min.js?0.2.5');
+				// BS4 blocks plugin dropped: the canvas now runs Bootstrap 5, BS5 blocks
+				// are provided natively by the builder (see fclayoutbuilder.php).
 				break;
 
 			case 'grapesjs_view':
+				// Front-end runtime for the "Tabs" block (grapesjs-tabs plugin). The tab
+				// switching logic lives in the GrapesJS component "script", which is NOT
+				// exported with the layout (renderLayoutFromProject stores HTML + CSS only),
+				// so every [role=tabpanel] keeps its [hidden] attribute and only the titles
+				// are visible. Re-implement the same behaviour here. Vanilla JS on purpose:
+				// the front can be jQuery-free (Choices.js mode) and the markup is the
+				// plugin's own (role/aria-controls/hidden), not a Bootstrap tab component.
 				$js .= "
-					jQuery(document).ready(function(){
-						jQuery('.tab-container').click(function(e)
-						{
+					(function () {
+						var ACTIVE = 'tab-active';
+						var TAB = '[role=tab]';
+						var PANEL = '[role=tabpanel]';
+
+						function activate(root, tab) {
+							var tabs = root.querySelectorAll(TAB);
+							var panels = root.querySelectorAll(PANEL);
+							var idx = -1, i;
+							for (i = 0; i < tabs.length; i++) {
+								tabs[i].classList.remove(ACTIVE);
+								tabs[i].setAttribute('aria-selected', 'false');
+								tabs[i].tabIndex = -1;
+								if (tabs[i] === tab) idx = i;
+							}
+							for (i = 0; i < panels.length; i++) panels[i].hidden = true;
+							tab.classList.add(ACTIVE);
+							tab.setAttribute('aria-selected', 'true');
+							tab.tabIndex = 0;
+							// Link through aria-controls. The per-item unique-id pass rewrites
+							// the id attribute but not the aria-controls value, so the [id^=..]
+							// suffix fallback is required; otherwise use the tab position.
+							var cid = tab.getAttribute('aria-controls');
+							var panel = cid ? (root.querySelector('#' + cid) || root.querySelector('[id^=\"' + cid + '_\"]')) : null;
+							if (!panel && idx > -1) panel = panels[idx];
+							if (panel) panel.hidden = false;
+						}
+
+						function initRoot(root) {
+							var tabs = root.querySelectorAll(TAB);
+							if (!tabs.length) return;
+							var current = null;
+							var hash = (location.hash || '').replace('#', '');
+							if (hash) current = root.querySelector(TAB + '[aria-controls=\"' + hash + '\"]') || root.querySelector(TAB + '[aria-controls^=\"' + hash + '_\"]');
+							if (!current) current = root.querySelector(TAB + '.' + ACTIVE);
+							activate(root, current || tabs[0]);
+						}
+
+						function init() {
+							var lists = document.querySelectorAll('[role=tablist]');
+							for (var i = 0; i < lists.length; i++) {
+								var root = lists[i].parentNode;
+								if (root) initRoot(root);
+							}
+						}
+
+						document.addEventListener('click', function (e) {
+							var tab = e.target.closest ? e.target.closest(TAB) : null;
+							if (!tab) return;
 							e.preventDefault();
-							return true;
+							if (tab.classList.contains(ACTIVE)) return;
+							var list = tab.closest('[role=tablist]');
+							var root = list ? list.parentNode : tab.parentNode;
+							activate(root, tab);
+							var cid = tab.getAttribute('aria-controls');
+							if (cid && window.history && history.pushState) { try { history.pushState(null, null, '#' + cid); } catch (err) {} }
 						});
-					});
+
+						if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+						else init();
+					})();
 				";
 				break;
 
@@ -6686,6 +6755,7 @@ class flexicontent_html
 				)
 			);
 			flexicontent_html::loadframework('grapesjs_view');
+			flexicontent_html::loadframework('bootstrap_js');
 			// Layout URL hash used as CSS file version (cache-buster). Fall back to a
 			// content-based hash for layouts saved before the hash gets populated.
 			$layout_hash = (string) $params->get($layout_name . '_hash');

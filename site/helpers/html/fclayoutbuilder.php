@@ -960,6 +960,9 @@ abstract class JHtmlFclayoutbuilder
 			'warn'       => $fcl_preview_warn,
 		);
 		$html .= '<script>window.fcl_builder_preview_' . $editor_sfx . ' = ' . json_encode($fcl_preview_cfg) . ';</script>';
+		// Joomla web root (e.g. "/" or "/subdir/"), used to load same-origin canvas assets
+		// (Bootstrap CSS) instead of a CDN, so the canvas never depends on an external host.
+		$html .= '<script>window.fcl_builder_root = ' . json_encode(\Joomla\CMS\Uri\Uri::root(true)) . ';</script>';
 
 		$fcl_preview_options = '<option value="0">' . (count($fcl_recent_items) ? '(badges only)' : '(badges only - no items found)') . '</option>';
 
@@ -970,7 +973,7 @@ abstract class JHtmlFclayoutbuilder
 		}
 
 		$fcl_preview_html = '
-			<div class="fcl-preview-toolbar" style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:#2d3556;color:#cbd2e8;font-size:12px;border-bottom:1px solid #22294a;">
+			<div class="fcl-preview-toolbar" style="display:flex;align-items:center;gap:8px;padding:6px 10px;color:#333;font-size:12px;border-bottom:1px solid #ddd;">
 				<label for="fcl_preview_item_' . $editor_sfx . '" style="white-space:nowrap;">Preview item</label>
 				<select id="fcl_preview_item_' . $editor_sfx . '" class="inputbox" style="font-size:12px;max-width:480px;">' . $fcl_preview_options . '</select>
 				<span id="fcl_preview_status_' . $editor_sfx . '" class="fcl-preview-status" style="white-space:nowrap;">&nbsp;</span>
@@ -1026,7 +1029,7 @@ function fclayout_init_builder(editor_sfx, element_id)
 			// Register every plugins used below (modern UMD builds expose a global, eg. gjs-blocks-basic/custom-code/tooltip)
 			// and isolate any failure so the editor still initialises.
 			[ \'grapesjs-preset-webpage\', \'gjs-blocks-basic\', \'grapesjs-tabs\', \'grapesjs-custom-code\',
-			  \'grapesjs-touch\', \'grapesjs-tooltip\', \'grapesjs-blocks-bootstrap4\'
+			  \'grapesjs-touch\', \'grapesjs-tooltip\'
 			].forEach(function(id)
 			{
 				var fn = grapesjs.plugins.get(id) || window[id];
@@ -1056,7 +1059,6 @@ function fclayout_init_builder(editor_sfx, element_id)
 				\'grapesjs-custom-code\',
 				\'grapesjs-touch\',
 				\'grapesjs-tooltip\',
-				\'grapesjs-blocks-bootstrap4\',
 			];
 
 			var editor = grapesjs.init({
@@ -1066,15 +1068,16 @@ function fclayout_init_builder(editor_sfx, element_id)
 				// the layout fields are always written by saveToForm() on form submit
 				noticeOnUnload: false,
 
-				// TODO check loading css in canvas and real url
+				// Bootstrap 5 in the canvas, matching the Joomla 6 front-end (media/vendor/
+				// bootstrap ships 5.3.8). Only the CSS is loaded here: the Bootstrap JS bundle
+				// is NOT injected inside the canvas iframe (so the native data-api is not
+				// available there). Tabs/accordion opening in the editor is handled by the
+				// canvas-only shim injected in fcl_ensureCanvasInserts().
 				canvas: {
-					styles: [\'https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css\']
+					// Same-origin Bootstrap 5.3.8 (Joomla media/vendor), matching the front-end.
+					// Avoids any CDN dependency from inside the canvas iframe.
+					styles: [ (window.fcl_builder_root || \'/\') + \'media/vendor/bootstrap/css/bootstrap.min.css\' ]
 				},
-				scripts: [
-					\'https://code.jquery.com/jquery-3.3.1.slim.min.js\',
-					\'https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js\',
-					\'https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js\'
-				],
 
 				avoidInlineStyle: false,
 
@@ -1114,25 +1117,26 @@ function fclayout_init_builder(editor_sfx, element_id)
 				plugins: fcl_builder_plugins,
 
 				pluginsOpts: {
+					// "Basic" category: only keep text, link, image, video, map (the plugin
+					// otherwise also adds column1/2/3/3-7 layout blocks).
+					\'gjs-blocks-basic\': {
+						blocks: [\'text\', \'link\', \'image\', \'video\', \'map\']
+					},
 					\'grapesjs-tooltip\': {
 						blockTooltip: {
 							category: \'Extra\'
 						}
 					},
 					\'grapesjs-tabs\': {
-						tabsBlock: {
-							category: \'Extra\'
-						}
-					},
-					\'grapesjs-blocks-bootstrap4\': {
-						blocks: {
-						},
-						blockCategories: {
-						},
-						labels: {
-						},
+						// Block disabled: superseded by the native BS5 "Tabs" block (nav-tabs).
+						// The plugin stays registered so existing layouts using its tab component
+						// type keep rendering; a falsy tabsBlock skips BlockManager.add().
+						tabsBlock: false
 					},
 					\'grapesjs-preset-webpage\': {
+						// No preset blocks: preset-webpage would add link-block / quote / text-basic
+						// to the "Basic" category (which must only keep text, link, image, video, map).
+						blocks: [],
 						modalImportTitle: \'Import Template\',
 						modalImportLabel: \'<div style="margin-bottom: 10px; font-size: 13px;">Paste here your HTML/CSS and click Import</div>\',
 						modalImportContent: function(editor)
@@ -1835,6 +1839,32 @@ editor.on(\'load\', function()
 				return comp;
 			}
 
+			/**
+			 * Layouts saved before the fc-accordion component existed keep the plain
+			 * \'default\' type, so the new Mode trait would not show up on them. Retag every
+			 * root Bootstrap accordion (class \'accordion\' / \'accordion-flush\') as
+			 * \'fc-accordion\' when a project is loaded, leaving its inner items untouched.
+			 */
+			function fcl_migrate_accordions(comp)
+			{
+				if (!comp || typeof comp !== \'object\') return comp;
+				var classes = [];
+				if (Array.isArray(comp.classes)) classes = classes.concat(comp.classes);
+				else if (typeof comp.classes === \'string\') classes = classes.concat(comp.classes.split(/\s+/));
+				if (comp.attributes && comp.attributes.class) classes = classes.concat(String(comp.attributes.class).split(/\s+/));
+				var isRoot = classes.indexOf(\'accordion\') >= 0 || classes.indexOf(\'accordion-flush\') >= 0;
+				if (isRoot && comp.type !== \'fc-accordion\') comp.type = \'fc-accordion\';
+				if (Array.isArray(comp.components))
+				{
+					for (var i = 0; i < comp.components.length; i++)
+					{
+						var child = comp.components[i];
+						if (child && typeof child === \'object\') fcl_migrate_accordions(child);
+					}
+				}
+				return comp;
+			}
+
 			editor.StorageManager.add(\'form-storage\', {
 				/**
 				 * Load the saved layout and return a GrapesJS project object to load.
@@ -1866,6 +1896,7 @@ editor.on(\'load\', function()
 										if (pf.frames[g] && pf.frames[g].component)
 										{
 											pf.frames[g].component = fcl_fix_stray_textnodes(pf.frames[g].component);
+											pf.frames[g].component = fcl_migrate_accordions(pf.frames[g].component);
 										}
 									}
 								}
@@ -2914,6 +2945,16 @@ editor.on(\'load\', function()
 				// these helper rules are injected only into the canvas head (not the project)
 				\'section.fc-empty-box:empty,div.fc-empty-box:empty{min-height:80px}\' +
 				\'div.fc-empty-box div.fc-empty-box:empty{min-height:60px}\' +
+				// Visual helpers for the BS5 structural blocks (canvas only, never exported):
+				// keep an empty Spacer / Section identifiable while editing.
+				\'.fc-section{outline:1px dashed rgba(110,162,43,.55);outline-offset:-1px}\' +
+				\'.fc-spacer{outline:1px dashed rgba(110,162,43,.55);background:rgba(110,162,43,.08);min-height:10px}\' +
+				\'.fc-spacer:hover,.fc-spacer.gjs-selected{background:rgba(110,162,43,.18)}\' +
+				// Bootstrap tabs: keep the native switch (only the active pane is shown);
+				// switch to a tab, then drop components into its (now active) pane. On the front the
+				// native BS behaviour keeps only the active pane visible; rules are canvas-only.
+				\'.tab-content>.tab-pane{min-height:40px}\' +
+				\'.tab-content>.tab-pane.active{outline:1px dashed rgba(110,162,43,.5);outline-offset:-1px}\' +
 				// Neutralize the backend admin j4x.css #flexicontent select rule (border,
 				// width) inside the editing canvas so dropped field <select>s render cleanly.
 				// [data-fc-field] is the per-block host without relying on a wrapper id.
@@ -2934,6 +2975,48 @@ editor.on(\'load\', function()
 					st.id = \'fcl-canvas-preview\';
 					st.textContent = fcl_canvas_bx_css;
 					doc.head.appendChild(st);
+				}
+
+				// Canvas-only interactivity for the BS5 Tabs / Accordion blocks. The Bootstrap
+				// JS bundle is NOT loaded inside the iframe, so the native data-api never runs
+				// there. This tiny delegated shim reproduces the switch/open behaviour for the
+				// editor preview only; it lives in the iframe head and is never exported (the
+				// front-end keeps the genuine Bootstrap JS via loadframework(\'bootstrap_js\')).
+				var bs = doc.getElementById(\'fcl-canvas-bsjs\');
+				if (!bs)
+				{
+					bs = doc.createElement(\'script\');
+					bs.id = \'fcl-canvas-bsjs\';
+					bs.textContent =
+						\'(function(){if(window.__fclCanvasBs)return;window.__fclCanvasBs=1;\' +
+						\'document.addEventListener("click",function(e){\' +
+						\'var el=e.target;\' +
+						\'while(el&&el!==document&&!el.getAttribute)el=el.parentNode;\' +
+						\'if(!el||!el.getAttribute||!el.getAttribute("data-bs-toggle"))return;\' +
+						\'var kind=el.getAttribute("data-bs-toggle");\' +
+						\'var sel=el.getAttribute("data-bs-target")||el.getAttribute("href")||"";\' +
+						\'if(sel.charAt(0)!=="#")return;\' +
+						\'var tgt=document.getElementById(sel.slice(1));if(!tgt)return;\' +
+						\'if(kind==="tab"||kind==="pill"||kind==="list"){\' +
+						\'var nav=el.closest(".nav,[role=tablist]")||el.parentNode;\' +
+						\'var lk=nav?nav.querySelectorAll("[data-bs-toggle=tab],[data-bs-toggle=pill],[data-bs-toggle=list]"):[el];\' +
+						\'for(var i=0;i<lk.length;i++){lk[i].classList.remove("active");lk[i].setAttribute("aria-selected","false");}\' +
+						\'el.classList.add("active");el.setAttribute("aria-selected","true");\' +
+						\'var host=nav&&nav.parentNode?nav.parentNode.querySelector(".tab-content"):null;\' +
+						\'var pn=(host||document).querySelectorAll(".tab-pane");\' +
+						\'for(var j=0;j<pn.length;j++){pn[j].classList.remove("active","show");}\' +
+						\'tgt.classList.add("active","show");e.preventDefault();\' +
+						\'}else if(kind==="collapse"){\' +
+						\'var isOpen=tgt.classList.contains("show");\' +
+						\'var ps=el.getAttribute("data-bs-parent");\' +
+						\'if(ps&&ps.charAt(0)==="#"){var par=document.getElementById(ps.slice(1));\' +
+						\'if(par){var cs=par.querySelectorAll(".collapse.show");for(var k=0;k<cs.length;k++)cs[k].classList.remove("show");\' +
+						\'var bt=par.querySelectorAll("[data-bs-toggle=collapse]");for(var m=0;m<bt.length;m++){bt[m].classList.add("collapsed");bt[m].setAttribute("aria-expanded","false");}}}\' +
+						\'if(isOpen){tgt.classList.remove("show");el.classList.add("collapsed");el.setAttribute("aria-expanded","false");}\' +
+						\'else{tgt.classList.add("show");el.classList.remove("collapsed");el.setAttribute("aria-expanded","true");}\' +
+						\'e.preventDefault();}\' +
+						\'},true);})();\';
+					doc.head.appendChild(bs);
 				}
 			}
 
@@ -3657,25 +3740,259 @@ editor.on(\'load\', function()
 				},
 			});
 
+			// --- BS5 grid / spacing helpers -------------------------------------------------
+			// Widths and gutters are edited through BS5 utility classes (never inline styles),
+			// so the saved HTML stays responsive and clean. These helpers back the structural
+			// Section/Row/Column/Spacer components registered below.
+			var FCL_COL_BP_RE = {
+				\'\': /^col(?:-[0-9]{1,2}|-auto)?$/,
+				sm: /^col-sm(?:-[0-9]{1,2}|-auto)?$/,
+				md: /^col-md(?:-[0-9]{1,2}|-auto)?$/,
+				lg: /^col-lg(?:-[0-9]{1,2}|-auto)?$/,
+				xl: /^col-xl(?:-[0-9]{1,2}|-auto)?$/,
+				xxl: /^col-xxl(?:-[0-9]{1,2}|-auto)?$/
+			};
+			var FCL_COL_ANY_RE = /^col(?:-(?:sm|md|lg|xl|xxl))?(?:-[0-9]{1,2}|-auto)?$/;
+
+			function fcl_colParse(cls)
+			{
+				var m = String(cls || \'\').match(/^col(?:-(sm|md|lg|xl|xxl))?(?:-([0-9]{1,2}|auto))?$/);
+				return m ? { bp: m[1] || \'\', span: m[2] || \'\' } : null;
+			}
+
+			function fcl_colHasAny(comp)
+			{
+				var cls = (comp.getClasses && comp.getClasses()) || [];
+				for (var i = 0; i < cls.length; i++) { if (FCL_COL_ANY_RE.test(cls[i])) return true; }
+				return false;
+			}
+
+			// Map a real pixel width to a BS5 breakpoint key (largest bp <= width).
+			function fcl_bpFromWidth(w)
+			{
+				if (w >= 1400) return \'xxl\';
+				if (w >= 1200) return \'xl\';
+				if (w >= 992) return \'lg\';
+				if (w >= 768) return \'md\';
+				if (w >= 576) return \'sm\';
+				return \'\';
+			}
+
+			// BS5 breakpoint of the current canvas. The iframe viewport width (innerWidth) is what
+			// the @media rules actually use, so it is the authoritative source; the frame element and
+			// the device width are only fallbacks (the Desktop device has width \'\' in this builder,
+			// which used to yield bp=\'\' and made resized columns fall back to 50/50).
+			function fcl_deviceBp(widthOverride)
+			{
+				var w = parseInt(widthOverride, 10) || 0;
+				if (!w)
+				{
+					try
+					{
+						var win = editor.Canvas.getWindow && editor.Canvas.getWindow();
+						if (win && win.innerWidth) w = win.innerWidth;
+					}
+					catch (e) {}
+				}
+				if (!w)
+				{
+					try
+					{
+						var frame = editor.Canvas.getFrameEl();
+						if (frame && frame.offsetWidth) w = frame.offsetWidth;
+					}
+					catch (e) {}
+				}
+				if (!w)
+				{
+					try
+					{
+						var doc = editor.Canvas.getDocument();
+						if (doc && doc.documentElement && doc.documentElement.clientWidth) w = doc.documentElement.clientWidth;
+					}
+					catch (e) {}
+				}
+				if (!w)
+				{
+					try { var dm = editor.getModel().getDeviceModel(); w = dm ? (parseInt(dm.get(\'width\'), 10) || 0) : 0; } catch (e) {}
+				}
+				return fcl_bpFromWidth(w);
+			}
+
+			function fcl_colRankOf(bp) { return !bp ? 1 : ({ sm: 2, md: 3, lg: 4, xl: 5, xxl: 6 }[bp] || 1); }
+
+			// Effective column class at the given device breakpoint (the largest breakpoint
+			// present that is <= the device one), mirroring how the browser applies BS5.
+			function fcl_colEffective(comp, bp)
+			{
+				var rank = fcl_colRankOf(bp), best = \'\', bestRank = -1;
+				var cls = (comp.getClasses && comp.getClasses()) || [];
+				for (var i = 0; i < cls.length; i++)
+				{
+					var p = fcl_colParse(cls[i]);
+					if (!p) continue;
+					var r = fcl_colRankOf(p.bp);
+					if (r <= rank && r > bestRank) { best = cls[i]; bestRank = r; }
+				}
+				return best;
+			}
+
+			// Replace the column class for ONE breakpoint only (other breakpoints preserved).
+			function fcl_colSetAtBp(comp, bp, span)
+			{
+				var re = FCL_COL_BP_RE[bp] || FCL_COL_BP_RE[\'\'];
+				var cls = (comp.getClasses ? comp.getClasses() : []).slice();
+				for (var i = 0; i < cls.length; i++) { if (re.test(cls[i])) comp.removeClass(cls[i]); }
+				comp.addClass(\'col\' + (bp ? \'-\' + bp : \'\') + (span ? \'-\' + span : \'\'));
+			}
+
+			// Generic "one class per family" helpers used by the fc-class-select traits.
+			function fcl_classMatch(comp, re)
+			{
+				var cls = (comp.getClasses && comp.getClasses()) || [];
+				for (var i = 0; i < cls.length; i++) { if (re.test(cls[i])) return cls[i]; }
+				return \'\';
+			}
+			function fcl_classReplace(comp, re, value)
+			{
+				var cls = (comp.getClasses ? comp.getClasses() : []).slice();
+				for (var i = 0; i < cls.length; i++) { if (re.test(cls[i])) comp.removeClass(cls[i]); }
+				if (value) comp.addClass(value);
+			}
+
+			var FCL_SPACING_LABELS = { 0: \'0\', 1: \'0.25rem\', 2: \'0.5rem\', 3: \'1rem\', 4: \'1.5rem\', 5: \'3rem\' };
+			function fcl_spacingOptions(prefix)
+			{
+				var out = [{ value: \'\', label: \'None\' }];
+				for (var i = 0; i <= 5; i++) out.push({ value: prefix + \'-\' + i, label: FCL_SPACING_LABELS[i] });
+				return out;
+			}
+			function fcl_gutterOptions(prefix)
+			{
+				var p = prefix || \'g\';
+				var out = [{ value: \'\', label: p === \'g\' ? \'Default (1.5rem)\' : \'Default\' }];
+				for (var i = 0; i <= 5; i++) out.push({ value: p + \'-\' + i, label: FCL_SPACING_LABELS[i] });
+				return out;
+			}
+			function fcl_colWidthOptions()
+			{
+				var out = [
+					{ value: \'\', label: \'None\', group: \'Auto\' },
+					{ value: \'col\', label: \'Equal width (.col)\', group: \'Auto\' },
+					{ value: \'col-auto\', label: \'Fit content (.col-auto)\', group: \'Auto\' }
+				];
+				var bps = [
+					{ bp: \'\', label: \'Base / xs (all)\' },
+					{ bp: \'sm\', label: \'sm (>=576)\' },
+					{ bp: \'md\', label: \'md (>=768)\' },
+					{ bp: \'lg\', label: \'lg (>=992)\' },
+					{ bp: \'xl\', label: \'xl (>=1200)\' },
+					{ bp: \'xxl\', label: \'xxl (>=1400)\' }
+				];
+				for (var i = 0; i < bps.length; i++)
+				{
+					for (var n = 1; n <= 12; n++)
+					{
+						out.push({ value: \'col\' + (bps[i].bp ? \'-\' + bps[i].bp : \'\') + \'-\' + n, label: n + \'/12\', group: bps[i].label });
+					}
+				}
+				return out;
+			}
+
+			// Grouped <select> trait that maps its value to a BS5 utility CLASS instead of an
+			// attribute: the trait definition supplies a custom getValue()/setValue(), which
+			// short-circuits the base trait model attribute write (nothing pollutes the HTML).
+			editor.TraitManager.addType(\'fc-class-select\', {
+				getInputEl: function()
+				{
+					if (!this.input)
+					{
+						var opts = (this.model && this.model.get) ? (this.model.get(\'options\') || []) : [];
+						var sel = document.createElement(\'select\');
+						var groups = {}, order = [];
+						for (var i = 0; i < opts.length; i++)
+						{
+							var o = opts[i];
+							if (typeof o === \'string\') o = { value: o, label: o };
+							var val = String(typeof o.value === \'undefined\' ? (o.id || \'\') : o.value);
+							var lab = o.label || o.name || val;
+							var g = o.group || \'\';
+							if (!groups[g]) { groups[g] = []; order.push(g); }
+							groups[g].push({ v: val, t: lab });
+						}
+						for (var gi = 0; gi < order.length; gi++)
+						{
+							var gname = order[gi], host = sel;
+							if (gname)
+							{
+								host = document.createElement(\'optgroup\');
+								host.setAttribute(\'label\', gname);
+								sel.appendChild(host);
+							}
+							var list = groups[gname];
+							for (var oi = 0; oi < list.length; oi++)
+							{
+								var op = document.createElement(\'option\');
+								op.value = list[oi].v;
+								op.textContent = list[oi].t;
+								host.appendChild(op);
+							}
+						}
+						this.input = sel;
+					}
+					return this.input;
+				},
+				onRender: function()
+				{
+					// Reflect the current (possibly computed) value once the field is in the DOM.
+					try
+					{
+						var v = (this.model && typeof this.model.getTargetValue === \'function\') ? this.model.getTargetValue() : \'\';
+						this.setInputValue(v == null ? \'\' : v);
+					}
+					catch (e) {}
+				},
+			});
+
 			// Every block gets the Custom CSS trait on selection (any component type).
 			editor.on(\'component:selected\', function(comp)
 			{
 				if (!comp || typeof comp.get !== \'function\') return;
 				var tr = comp.get(\'traits\');
 				if (!tr || typeof tr.add !== \'function\') return;
-				if (tr.models)
+
+				var fcl_hasTrait = function(name)
 				{
+					if (!tr.models) return false;
 					for (var j = 0; j < tr.models.length; j++)
 					{
-						if (tr.models[j] && tr.models[j].get && tr.models[j].get(\'name\') === \'data-fc-customcss\') return;
+						if (tr.models[j] && tr.models[j].get && tr.models[j].get(\'name\') === name) return true;
 					}
+					return false;
+				};
+
+				var added = false;
+
+				// Mode trait for a Bootstrap accordion root. Added on selection so it also shows
+				// up on existing / legacy accordions, whatever component type they were saved with.
+				var cls = comp.getClasses ? (comp.getClasses() || []) : [];
+				if ((cls.indexOf(\'accordion\') >= 0 || cls.indexOf(\'accordion-flush\') >= 0) && !fcl_hasTrait(\'data-fc-accmode\'))
+				{
+					tr.add(fcl_accModeTrait());
+					added = true;
 				}
-tr.add({ type: \'textarea\', name: \'data-fc-customcss\', label: \'Custom CSS\',
-					placeholder: \'.my-css { color:red }  (target this block by its class, see Selector Manager)\' });
-					// The TraitsView renders on component:toggled only: re-trigger it so the
-					// freshly added trait shows up immediately (idempotent, no loop).
-					editor.trigger(\'component:toggled\', comp);
-				});
+
+				if (!fcl_hasTrait(\'data-fc-customcss\'))
+				{
+					tr.add({ type: \'textarea\', name: \'data-fc-customcss\', label: \'Custom CSS\',
+						placeholder: \'.my-css { color:red }  (target this block by its class, see Selector Manager)\' });
+					added = true;
+				}
+
+				// The TraitsView renders on component:toggled only: re-trigger it so the
+				// freshly added trait(s) show up immediately (idempotent, no loop).
+				if (added) editor.trigger(\'component:toggled\', comp);
+			});
 
 			editor.DomComponents.addType(\'fc-field\', {
 				// Also recognized when old HTML saves contain a data-fc-field attribute
@@ -3965,65 +4282,509 @@ view: fcl_boxed_view(function()
 				// as data-fc-link* keys, with a data-fc-links anchor attribute). No traits here.
 			}
 
+			// --- Bootstrap 5 structural components (Section / Row / Column / Spacer) ------
+			// Column widths + row gutters + section/spacer rhythm are all edited through BS5
+			// utility classes via the fc-class-select trait above (no inline styles).
 
-			// --- Basic layout blocks: Section, Flex Row, pre-configured flex columns ---
-			// Flex layouts are built with inline styles (display:flex + flex-wrap), so they are
-			// self-contained: they survive the save (inline styles are stored in the project
-			// data and re-rendered by the server) and wrap gracefully on narrow viewports.
-			// data-gjs-resizable="true" makes the dropped divs resizable (consumed at import,
-			// it is NOT exported to the front-end HTML).
-			editor.BlockManager.add(\'flex-section\', {
-				label: \'Section\',
-				category: \'Basic\',
+			editor.DomComponents.addType(\'fc-row\', {
+				isComponent: function(el)
+				{
+					if (el && el.classList && el.classList.contains(\'row\')) return { type: \'fc-row\' };
+				},
+				model: {
+					defaults: {
+						traits: [{
+							type: \'fc-class-select\',
+							name: \'data-fc-rowgx\',
+							label: \'Gutter horizontal\',
+							options: fcl_gutterOptions(\'gx\'),
+							getValue: function(o) { return fcl_classMatch(o.component, /^gx-[0-5]$/); },
+							setValue: function(o) { fcl_classReplace(o.component, /^gx-[0-5]$/, o.value || \'\'); fcl_classReplace(o.component, /^g-[0-5]$/, \'\'); },
+						}, {
+							type: \'fc-class-select\',
+							name: \'data-fc-rowgy\',
+							label: \'Gutter vertical\',
+							options: fcl_gutterOptions(\'gy\'),
+							getValue: function(o) { return fcl_classMatch(o.component, /^gy-[0-5]$/); },
+							setValue: function(o) { fcl_classReplace(o.component, /^gy-[0-5]$/, o.value || \'\'); fcl_classReplace(o.component, /^g-[0-5]$/, \'\'); },
+						}, {
+							type: \'fc-class-select\',
+							name: \'data-fc-rowmt\',
+							label: \'Space above\',
+							options: fcl_spacingOptions(\'mt\'),
+							getValue: function(o) { return fcl_classMatch(o.component, /^mt-[0-5]$/); },
+							setValue: function(o) { fcl_classReplace(o.component, /^mt-[0-5]$/, o.value || \'\'); },
+						}, {
+							type: \'fc-class-select\',
+							name: \'data-fc-rowmb\',
+							label: \'Space below\',
+							options: fcl_spacingOptions(\'mb\'),
+							getValue: function(o) { return fcl_classMatch(o.component, /^mb-[0-5]$/); },
+							setValue: function(o) { fcl_classReplace(o.component, /^mb-[0-5]$/, o.value || \'\'); },
+						}],
+					},
+					init: function()
+					{
+						// Migrate the legacy combined gutter (g-N = both axes) to the split
+						// gx-N / gy-N so it can then be edited per axis.
+						var cls = this.getClasses();
+						var g = null;
+						for (var i = 0; i < cls.length; i++)
+						{
+							var m = /^g-([0-5])$/.exec(cls[i]);
+							if (m) { g = m[1]; break; }
+						}
+						if (g === null) return;
+						var hasX = false, hasY = false;
+						for (var j = 0; j < cls.length; j++)
+						{
+							if (/^gx-[0-5]$/.test(cls[j])) hasX = true;
+							if (/^gy-[0-5]$/.test(cls[j])) hasY = true;
+						}
+						this.removeClass(\'g-\' + g);
+						if (!hasX) this.addClass(\'gx-\' + g);
+						if (!hasY) this.addClass(\'gy-\' + g);
+					},
+				},
+			});
+
+			editor.DomComponents.addType(\'fc-col\', {
+				isComponent: function(el)
+				{
+					if (!el || !el.className) return;
+					var parts = String(el.className).split(/\s+/);
+					for (var i = 0; i < parts.length; i++) { if (FCL_COL_ANY_RE.test(parts[i])) return { type: \'fc-col\' }; }
+				},
+				model: {
+					defaults: {
+						// Magnet resizer: only the right handle is shown (every other handle must
+						// be explicitly disabled, they all default to true in GrapesJS 0.23);
+						// on release the width is snapped to the 12-col grid and re-expressed as
+						// classes (the inline width written live by the resizer is dropped by the
+						// canvas refresh).
+						resizable: { tl: false, tc: false, tr: false, cl: false, cr: true, bl: false, bc: false, br: false, onEnd: function() { fcl_colResizeEnd(); } },
+						traits: [{
+							type: \'fc-class-select\',
+							name: \'data-fc-colwidth\',
+							label: \'Column width\',
+							options: fcl_colWidthOptions(),
+							getValue: function(o) { return fcl_colEffective(o.component, fcl_deviceBp()); },
+							setValue: function(o)
+							{
+								var comp = o.component, value = o.value || \'\';
+								if (!value)
+								{
+									// "None" resets every breakpoint of the column family.
+									var cls = (comp.getClasses ? comp.getClasses() : []).slice();
+									for (var i = 0; i < cls.length; i++) { if (FCL_COL_ANY_RE.test(cls[i])) comp.removeClass(cls[i]); }
+									return;
+								}
+								var p = fcl_colParse(value);
+								if (p) fcl_colSetAtBp(comp, p.bp, p.span);
+							},
+						}],
+					},
+				},
+			});
+
+			editor.DomComponents.addType(\'fc-section\', {
+				isComponent: function(el)
+				{
+					if (el && el.tagName === \'SECTION\') return { type: \'fc-section\' };
+				},
+				model: {
+					defaults: {
+						tagName: \'section\',
+						droppable: true,
+						traits: [{
+							type: \'fc-class-select\',
+							name: \'data-fc-secpad\',
+							label: \'Vertical padding\',
+							options: fcl_spacingOptions(\'py\'),
+							getValue: function(o) { return fcl_classMatch(o.component, /^py-[0-5]$/); },
+							setValue: function(o) { fcl_classReplace(o.component, /^py-[0-5]$/, o.value || \'\'); },
+						}, {
+							type: \'fc-class-select\',
+							name: \'data-fc-secmb\',
+							label: \'Bottom margin\',
+							options: fcl_spacingOptions(\'mb\'),
+							getValue: function(o) { return fcl_classMatch(o.component, /^mb-[0-5]$/); },
+							setValue: function(o) { fcl_classReplace(o.component, /^mb-[0-5]$/, o.value || \'\'); },
+						}],
+					},
+				},
+			});
+
+			editor.DomComponents.addType(\'fc-spacer\', {
+				isComponent: function(el)
+				{
+					if (el && el.classList && el.classList.contains(\'fc-spacer\')) return { type: \'fc-spacer\' };
+				},
+				model: {
+					defaults: {
+						tagName: \'div\',
+						droppable: false,
+						selectable: true,
+						traits: [{
+							type: \'fc-class-select\',
+							name: \'data-fc-spacerh\',
+							label: \'Height (padding)\',
+							options: fcl_spacingOptions(\'py\'),
+							getValue: function(o) { return fcl_classMatch(o.component, /^py-[0-5]$/); },
+							setValue: function(o) { fcl_classReplace(o.component, /^py-[0-5]$/, o.value || \'\'); },
+						}],
+					},
+				},
+			});
+
+			// Bootstrap tab panes are plain droppable containers. The canvas-only CSS above keeps
+			// every pane visible while editing, so components can be dropped into each one; the
+			// native BS behaviour (only the active pane visible) is restored on the front-end.
+			editor.DomComponents.addType(\'fc-tab-pane\', {
+				isComponent: function(el)
+				{
+					if (el && el.classList && el.classList.contains(\'tab-pane\')) return { type: \'fc-tab-pane\' };
+				},
+				model: {
+					defaults: {
+						tagName: \'div\',
+						droppable: true,
+						selectable: true,
+					},
+				},
+			});
+
+			// BS5 Accordion root. A "Mode" trait toggles between the exclusive accordion
+			// (every .accordion-collapse carries data-bs-parent="#id": opening one closes the
+			// others) and the independent mode (data-bs-parent removed: several panels may stay
+			// open and all can be closed). The attribute is written on the child components so
+			// both the canvas and the exported front-end HTML follow the native BS behaviour.
+			var fcl_accSeq = 0;
+
+			function fcl_accCollapses(comp)
+			{
+				var out = [];
+				var walk = function(c)
+				{
+					var cls = c.getClasses ? (c.getClasses() || []) : [];
+					if (cls.indexOf(\'accordion-collapse\') >= 0) out.push(c);
+					var kids = c.components && c.components();
+					if (kids && kids.forEach) kids.forEach(walk);
+				};
+				var kids = comp.components && comp.components();
+				if (kids && kids.forEach) kids.forEach(walk);
+				return out;
+			}
+
+			function fcl_accRootId(comp)
+			{
+				var attrs = comp.getAttributes ? (comp.getAttributes() || {}) : {};
+				var id = attrs.id ? String(attrs.id) : \'\';
+				if (!id)
+				{
+					id = \'fcAcc\' + (++fcl_accSeq) + \'_\' + Date.now().toString(36);
+					comp.addAttributes({ id: id });
+				}
+				return id;
+			}
+
+			function fcl_accModeTrait()
+			{
+				return {
+					type: \'fc-class-select\',
+					name: \'data-fc-accmode\',
+					label: \'Mode\',
+					options: [
+						{ value: \'exclusive\', label: \'Exclusive (one open)\' },
+						{ value: \'independent\', label: \'Independent (all closable)\' }
+					],
+					getValue: function(o)
+					{
+						var comp = o && o.component;
+						if (!comp) return \'exclusive\';
+						var cs = fcl_accCollapses(comp);
+						for (var i = 0; i < cs.length; i++)
+						{
+							var a = cs[i].getAttributes ? (cs[i].getAttributes() || {}) : {};
+							if (a[\'data-bs-parent\']) return \'exclusive\';
+						}
+						return \'independent\';
+					},
+					setValue: function(o)
+					{
+						var comp = o && o.component;
+						if (!comp) return;
+						var cs = fcl_accCollapses(comp);
+						if (o.value === \'independent\')
+						{
+							for (var i = 0; i < cs.length; i++) cs[i].removeAttributes([\'data-bs-parent\']);
+						}
+						else
+						{
+							var id = fcl_accRootId(comp);
+							for (var j = 0; j < cs.length; j++) cs[j].addAttributes({ \'data-bs-parent\': \'#\' + id });
+						}
+					},
+				};
+			}
+
+			editor.DomComponents.addType(\'fc-accordion\', {
+				isComponent: function(el)
+				{
+					if (el && el.classList && el.classList.contains(\'accordion\')) return { type: \'fc-accordion\' };
+				},
+				model: {
+					defaults: {
+						tagName: \'div\',
+						droppable: true,
+						traits: [fcl_accModeTrait()],
+					},
+				},
+			});
+
+			// Magnetic column resizer: snap the dragged width to the 12-col grid and hand the
+			// overflow to the next sibling column so the row always totals 12 (at the current
+			// device breakpoint). Falls back to width-derived spans for auto/equal columns.
+			function fcl_colResizeEnd()
+			{
+				try
+				{
+					var comp = editor.getSelected();
+					if (comp && comp.get(\'type\') === \'fc-col\')
+					{
+						// Snap BEFORE removing the inline width: fcl_colSnapSiblings needs the live
+						// (dragged) width to compute the ratio. Only then drop the inline size the
+						// resizer wrote (columns are always class-driven).
+						var parent = comp.parent();
+						if (parent && parent.get(\'type\') === \'fc-row\') fcl_colSnapSiblings(comp, parent);
+						fcl_stripSizeStyles(comp);
+					}
+				}
+				catch (e) {}
+				try { editor.Canvas.refresh({ all: true }); } catch (e2) {}
+			}
+
+			function fcl_stripSizeStyles(comp)
+			{
+				try
+				{
+					if (!comp || !comp.getStyle) return;
+					var names = [\'width\', \'min-width\', \'max-width\', \'height\', \'min-height\', \'max-height\'];
+					var style = comp.getStyle() || {};
+					for (var i = 0; i < names.length; i++)
+					{
+						if (style[names[i]] != null) comp.removeStyle(names[i]);
+					}
+				}
+				catch (e) {}
+			}
+
+			// Drop every bootstrap column-width class on the component and set ONE base span.
+			// The base (no breakpoint) class keeps the column defined at every width; writing a
+			// breakpoint-specific class would leave lower widths without any width (=> stacked).
+			function fcl_colWriteBase(comp, span)
+			{
+				var cls = (comp.getClasses ? comp.getClasses() : []).slice();
+				for (var i = 0; i < cls.length; i++) { if (FCL_COL_ANY_RE.test(cls[i])) comp.removeClass(cls[i]); }
+				comp.addClass(\'col\' + (span ? \'-\' + span : \'\'));
+			}
+
+			// Snap the dragged row back to the 12-col grid. The reference is the ROW width: it stays
+			// constant during the drag even when the live column overflows/wraps, so the ratio is
+			// reliable (reading the sibling columns instead breaks as soon as one wraps to a new
+			// line). The dragged column takes its snapped span and the others share the remainder
+			// (>=1 each) so the row always totals exactly 12. Result is written as clean base classes
+			// (col-N), never accumulated per breakpoint.
+			function fcl_colSnapSiblings(comp, parent)
+			{
+				var cols = [];
+				parent.components().each(function(c) { if (c.get && c.get(\'type\') === \'fc-col\') cols.push(c); });
+				if (cols.length < 2) return;
+				var idx = cols.indexOf(comp);
+				if (idx < 0) return;
+				var rowEl = parent.getEl && parent.getEl();
+				var elIdx = cols[idx].getEl && cols[idx].getEl();
+				var rowW = rowEl ? rowEl.getBoundingClientRect().width : 0;
+				var wIdx = elIdx ? elIdx.getBoundingClientRect().width : 0;
+				if (!rowW || !wIdx) return;
+				var target = Math.round((wIdx / rowW) * 12);
+				var maxTarget = 12 - (cols.length - 1); // keep >=1 free for each other column
+				if (target < 1) target = 1;
+				if (target > maxTarget) target = maxTarget;
+				// Live widths of the other columns, for a proportional share of the remainder.
+				var others = [], otherTotal = 0;
+				for (var i = 0; i < cols.length; i++)
+				{
+					if (i === idx) continue;
+					var e = cols[i].getEl && cols[i].getEl();
+					var w = e ? e.getBoundingClientRect().width : 0;
+					others.push({ comp: cols[i], w: w });
+					otherTotal += w;
+				}
+				var remaining = 12 - target, alloc = 0;
+				for (var k = 0; k < others.length; k++)
+				{
+					var s = otherTotal ? Math.round((others[k].w / otherTotal) * remaining) : Math.floor(remaining / others.length);
+					if (s < 1) s = 1;
+					others[k].span = s;
+					alloc += s;
+				}
+				// Fix rounding so the shares sum to exactly \'remaining\' (keeping every share >=1).
+				var diff = alloc - remaining, guard = 0;
+				while (diff !== 0 && guard++ < 100)
+				{
+					var moved = false;
+					for (var m = 0; m < others.length && diff !== 0; m++)
+					{
+						if (diff > 0 && others[m].span > 1) { others[m].span--; diff--; moved = true; }
+						else if (diff < 0) { others[m].span++; diff++; moved = true; }
+					}
+					if (!moved) break;
+				}
+				fcl_colWriteBase(comp, target);
+				for (var n = 0; n < others.length; n++) fcl_colWriteBase(others[n].comp, others[n].span);
+			}
+
+			// --- Bootstrap 5 blocks (BS5.3 markup, same version as the canvas + the front) ---
+			// Interactivity (tabs, accordion, ...) relies on the native BS5 data-api, which is
+			// available both in the canvas (bootstrap.bundle is loaded) and on the front-end
+			// (loadframework(\'bootstrap_js\') -> Bootstrap::framework()). The per-item id suffix
+			// applied by renderBuilderLayout() keeps #id / #target references unique per item.
+			var fcl_bs5 = { id: \'bs5\', label: \'Bootstrap 5\', open: false, order: 4 };
+
+			editor.BlockManager.add(\'bs5-container\', {
+				label: \'Container\',
+				category: fcl_bs5,
 				select: true,
 				activate: true,
 				attributes: { class: \'fa fa-square-o\' },
-				content: \'<section data-gjs-resizable="true" class="fc-empty-box"></section>\',
+				content: \'<div class="container"><div class="fc-empty-box"></div></div>\',
 			});
 
-			editor.BlockManager.add(\'flex-row\', {
-				label: \'Row (flex)\',
-				category: \'Basic\',
+			editor.BlockManager.add(\'bs5-section\', {
+				label: \'Section\',
+				category: fcl_bs5,
 				select: true,
 				activate: true,
-				attributes: { class: \'fa fa-arrows-h\' },
-				content: \'<div data-gjs-resizable="true" class="fc-empty-box" style="display:flex;flex-wrap:wrap;gap:10px;"></div>\',
+				attributes: { class: \'fa fa-window-maximize\' },
+				content: \'<section class="fc-section py-4"><div class="fc-empty-box"></div></section>\',
 			});
 
-			editor.BlockManager.add(\'flex-cols-2\', {
-				label: \'2 Columns (50/50)\',
-				category: \'Basic\',
+			editor.BlockManager.add(\'bs5-spacer\', {
+				label: \'Spacer\',
+				category: fcl_bs5,
+				select: true,
+				activate: true,
+				attributes: { class: \'fa fa-arrows-v\' },
+				content: \'<div class="fc-spacer py-3"></div>\',
+			});
+
+			editor.BlockManager.add(\'bs5-row\', {
+				label: \'Row (empty)\',
+				category: fcl_bs5,
+				select: true,
+				activate: true,
+				attributes: { class: \'fa fa-ellipsis-h\' },
+				content: \'<div class="container"><div class="row fc-empty-box"></div></div>\',
+			});
+
+			editor.BlockManager.add(\'bs5-column\', {
+				label: \'Column\',
+				category: fcl_bs5,
 				select: true,
 				activate: true,
 				attributes: { class: \'fa fa-columns\' },
-				content: \'<div data-gjs-resizable="true" class="fc-empty-box" style="display:flex;flex-wrap:wrap;gap:10px;"><div data-gjs-resizable="true" class="fc-empty-box" style="flex:0 1 auto;width:50%;min-width:200px;"></div><div data-gjs-resizable="true" class="fc-empty-box" style="flex:0 1 auto;width:50%;min-width:200px;"></div></div>\',
+				content: \'<div class="col fc-empty-box"></div>\',
 			});
 
-			editor.BlockManager.add(\'flex-cols-3\', {
-				label: \'3 Columns (33/33/33)\',
-				category: \'Basic\',
+			editor.BlockManager.add(\'bs5-row-col-2\', {
+				label: \'Row: 2 columns\',
+				category: fcl_bs5,
+				select: true,
+				activate: true,
+				attributes: { class: \'fa fa-columns\' },
+				content: \'<div class="container"><div class="row"><div class="col-md-6 fc-empty-box"></div><div class="col-md-6 fc-empty-box"></div></div></div>\',
+			});
+
+			editor.BlockManager.add(\'bs5-row-col-3\', {
+				label: \'Row: 3 columns\',
+				category: fcl_bs5,
 				select: true,
 				activate: true,
 				attributes: { class: \'fa fa-th-large\' },
-				content: \'<div data-gjs-resizable="true" class="fc-empty-box" style="display:flex;flex-wrap:wrap;gap:10px;"><div data-gjs-resizable="true" class="fc-empty-box" style="flex:0 1 auto;width:33.33%;min-width:150px;"></div><div data-gjs-resizable="true" class="fc-empty-box" style="flex:0 1 auto;width:33.33%;min-width:150px;"></div><div data-gjs-resizable="true" class="fc-empty-box" style="flex:0 1 auto;width:33.33%;min-width:150px;"></div></div>\',
+				content: \'<div class="container"><div class="row"><div class="col-md-4 fc-empty-box"></div><div class="col-md-4 fc-empty-box"></div><div class="col-md-4 fc-empty-box"></div></div></div>\',
 			});
 
-			editor.BlockManager.add(\'flex-cols-4\', {
-				label: \'4 Columns (25% each)\',
-				category: \'Basic\',
+			editor.BlockManager.add(\'bs5-row-col-4\', {
+				label: \'Row: 4 columns\',
+				category: fcl_bs5,
 				select: true,
 				activate: true,
 				attributes: { class: \'fa fa-th\' },
-				content: \'<div data-gjs-resizable="true" class="fc-empty-box" style="display:flex;flex-wrap:wrap;gap:10px;"><div data-gjs-resizable="true" class="fc-empty-box" style="flex:0 1 auto;width:25%;min-width:120px;"></div><div data-gjs-resizable="true" class="fc-empty-box" style="flex:0 1 auto;width:25%;min-width:120px;"></div><div data-gjs-resizable="true" class="fc-empty-box" style="flex:0 1 auto;width:25%;min-width:120px;"></div><div data-gjs-resizable="true" class="fc-empty-box" style="flex:0 1 auto;width:25%;min-width:120px;"></div></div>\',
+				content: \'<div class="container"><div class="row"><div class="col-md-3 fc-empty-box"></div><div class="col-md-3 fc-empty-box"></div><div class="col-md-3 fc-empty-box"></div><div class="col-md-3 fc-empty-box"></div></div></div>\',
 			});
 
-			editor.BlockManager.add(\'flex-cols-mainbar\', {
-				label: \'Main + Sidebar (2/3 - 1/3)\',
-				category: \'Basic\',
+			editor.BlockManager.add(\'bs5-row-mainbar\', {
+				label: \'Row: main + sidebar\',
+				category: fcl_bs5,
 				select: true,
 				activate: true,
 				attributes: { class: \'fa fa-bars\' },
-				content: \'<div data-gjs-resizable="true" class="fc-empty-box" style="display:flex;flex-wrap:wrap;gap:10px;"><div data-gjs-resizable="true" class="fc-empty-box" style="flex:0 1 auto;width:66.66%;min-width:250px;"></div><div data-gjs-resizable="true" class="fc-empty-box" style="flex:0 1 auto;width:33.33%;min-width:200px;"></div></div>\',
+				content: \'<div class="container"><div class="row"><div class="col-md-8 fc-empty-box"></div><div class="col-md-4 fc-empty-box"></div></div></div>\',
+			});
+
+			editor.BlockManager.add(\'bs5-card\', {
+				label: \'Card\',
+				category: fcl_bs5,
+				select: true,
+				activate: true,
+				attributes: { class: \'fa fa-square\' },
+				content: \'<div class="card"><div class="card-body"><h5 class="card-title">Card title</h5><p class="card-text">Some quick example text to build on the card title and make up the bulk of the card content.</p><a href="#" class="btn btn-primary">Go somewhere</a></div></div>\',
+			});
+
+			editor.BlockManager.add(\'bs5-card-image\', {
+				label: \'Card with image\',
+				category: fcl_bs5,
+				select: true,
+				activate: true,
+				attributes: { class: \'fa fa-picture-o\' },
+				content: \'<div class="card"><img class="card-img-top" src="\' + plp + \'600x400" alt="Card image"><div class="card-body"><h5 class="card-title">Card title</h5><p class="card-text">Some quick example text to build on the card title.</p><a href="#" class="btn btn-primary">Go somewhere</a></div></div>\',
+			});
+
+			editor.BlockManager.add(\'bs5-button\', {
+				label: \'Button\',
+				category: fcl_bs5,
+				select: true,
+				activate: true,
+				attributes: { class: \'fa fa-hand-pointer-o\' },
+				content: \'<a href="#" class="btn btn-primary">Button</a>\',
+			});
+
+			editor.BlockManager.add(\'bs5-button-outline\', {
+				label: \'Button (outline)\',
+				category: fcl_bs5,
+				select: true,
+				activate: true,
+				attributes: { class: \'fa fa-square-o\' },
+				content: \'<a href="#" class="btn btn-outline-primary">Button</a>\',
+			});
+
+			editor.BlockManager.add(\'bs5-accordion\', {
+				label: \'Accordion\',
+				category: fcl_bs5,
+				select: true,
+				activate: true,
+				attributes: { class: \'fa fa-list\' },
+				content: \'<div class="accordion" id="fcAccordion"><div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#fcAcc1" aria-expanded="true" aria-controls="fcAcc1">Accordion Item #1</button></h2><div id="fcAcc1" class="accordion-collapse collapse show" data-bs-parent="#fcAccordion"><div class="accordion-body">First item body content.</div></div></div><div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#fcAcc2" aria-expanded="false" aria-controls="fcAcc2">Accordion Item #2</button></h2><div id="fcAcc2" class="accordion-collapse collapse" data-bs-parent="#fcAccordion"><div class="accordion-body">Second item body content.</div></div></div><div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#fcAcc3" aria-expanded="false" aria-controls="fcAcc3">Accordion Item #3</button></h2><div id="fcAcc3" class="accordion-collapse collapse" data-bs-parent="#fcAccordion"><div class="accordion-body">Third item body content.</div></div></div></div>\',
+			});
+
+			editor.BlockManager.add(\'bs5-tabs\', {
+				label: \'Tabs\',
+				category: fcl_bs5,
+				select: true,
+				activate: true,
+				attributes: { class: \'fa fa-folder-o\' },
+				content: \'<ul class="nav nav-tabs" id="fcTabs" role="tablist"><li class="nav-item" role="presentation"><button class="nav-link active" id="fcTab1-tab" data-bs-toggle="tab" data-bs-target="#fcTab1" type="button" role="tab" aria-controls="fcTab1" aria-selected="true">Tab 1</button></li><li class="nav-item" role="presentation"><button class="nav-link" id="fcTab2-tab" data-bs-toggle="tab" data-bs-target="#fcTab2" type="button" role="tab" aria-controls="fcTab2" aria-selected="false">Tab 2</button></li><li class="nav-item" role="presentation"><button class="nav-link" id="fcTab3-tab" data-bs-toggle="tab" data-bs-target="#fcTab3" type="button" role="tab" aria-controls="fcTab3" aria-selected="false">Tab 3</button></li></ul><div class="tab-content" id="fcTabsContent"><div class="tab-pane fade show active" id="fcTab1" role="tabpanel" aria-labelledby="fcTab1-tab"></div><div class="tab-pane fade" id="fcTab2" role="tabpanel" aria-labelledby="fcTab2-tab"></div><div class="tab-pane fade" id="fcTab3" role="tabpanel" aria-labelledby="fcTab3-tab"></div></div>\',
 			});
 
 
