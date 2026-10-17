@@ -1302,12 +1302,21 @@ class FlexicontentModelItems extends FCModelAdminList
 
 		if ($filter_fileid)
 		{
-			$fileid_to_itemids = $session->get('fileid_to_itemids', array(),'flexicontent');
-			$itemids =  $fileid_to_itemids[$filter_fileid];
+			// Items using the file via file-id storing fields (File, MediaFile), found directly in the DB,
+			// so it does not depend on data that the file manager may (or may not) have stored in the session.
+			// Field ids are looked up first, so that only the (few) rows of these fields are searched for the value
+			$file_field_ids = $this->_db->setQuery(
+				'SELECT id FROM #__flexicontent_fields WHERE field_type IN (' . $this->_db->Quote('file') . ', ' . $this->_db->Quote('mediafile') . ')'
+			)->loadColumn();
+			$file_field_ids = ArrayHelper::toInteger($file_field_ids);
 
-			return empty($itemids)
+			return empty($file_field_ids)
 				? ' WHERE 0 '
-				: ' WHERE a.id IN ('. implode(',', $itemids) .') ';
+				: ' WHERE a.id IN ('
+					. 'SELECT rel.item_id FROM #__flexicontent_fields_item_relations AS rel'
+					. ' WHERE rel.field_id IN (' . implode(',', $file_field_ids) . ')'
+					. ' AND rel.value = ' . $this->_db->Quote((string) (int) $filter_fileid)
+				. ') ';
 		}
 
 
