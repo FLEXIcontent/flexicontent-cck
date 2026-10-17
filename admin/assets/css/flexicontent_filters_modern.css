@@ -700,3 +700,227 @@
 #fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern.fc-filters-modern-md #fc-filters-slide-btn {
   justify-self: end;
 }
+
+
+/* Special filter entries with value -1 ("Items without tags"): italic, underlined, accent color.
+   Choices.js exposes the option value as data-value on the list entry and on the selected chip. */
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .choices__item--choice[data-value="-1"],
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .choices__item--choice[data-value="-1"] label {
+  color: var(--fcm-accent) !important;
+  font-style: italic;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .choices__list--multiple .choices__item[data-value="-1"] {
+  background: var(--fcm-accent) !important;
+  border-color: var(--fcm-accent) !important;
+  color: #fff !important;
+  font-style: italic;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+
+/* ==========================================================================
+   Filter presets (see filter_presets.js): "Save" + up to 5 pills next to the Apply button
+   ========================================================================== */
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filters-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-presets {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  margin-left: 6px;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-preset {
+  display: inline-flex;
+  align-items: stretch;
+  box-sizing: border-box;
+  height: 30px;
+  max-width: 150px;           /* long names are cut with an ellipsis, the pill never grows beyond this */
+  overflow: hidden;
+  border: 1px solid #c7d4f7;
+  border-radius: 2px;
+  background: var(--fcm-accent-soft);
+  color: #2a4fb0;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-preset.is-active {
+  border-color: var(--fcm-accent);
+  background: var(--fcm-accent);
+  color: #fff;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-preset .fc-preset-apply {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0;
+  padding: 0 4px 0 10px !important;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 28px !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-preset .fc-preset-del {
+  flex: 0 0 22px;
+  width: 22px;
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0;
+  padding: 0 !important;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  opacity: 0.6;
+  font-size: 15px;
+  line-height: 28px !important;
+  cursor: pointer;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-preset .fc-preset-del:hover {
+  opacity: 1;
+  color: #c62828;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-preset.is-active .fc-preset-del:hover {
+  color: #ffd2d2;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-presets .fc-preset-save {
+  height: 30px !important;
+  min-height: 0 !important;
+  margin: 0;
+  padding: 0 12px !important;
+  border: 1px dashed var(--fcm-accent);
+  border-radius: 2px;
+  background: transparent;
+  color: var(--fcm-accent);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 28px !important;
+  white-space: nowrap;
+  cursor: pointer;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-presets .fc-preset-save:hover {
+  background: var(--fcm-accent-soft);
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-presets .fc-preset-name {
+  width: 170px;
+  max-width: 100%;
+  height: 30px !important;
+  min-height: 0 !important;
+  margin: 0;
+  padding: 0 10px !important;
+  box-sizing: border-box;
+  border: 1px solid var(--fcm-accent) !important;
+  border-radius: 2px !important;
+  background: #fff;
+  font-size: 12px;
+  line-height: 28px !important;
+}
+
+/* The Apply button shares the look of the other buttons of this row: flat, same height */
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filters-actions .fc-filters-apply {
+  box-sizing: border-box;
+  height: 30px !important;
+  min-height: 0 !important;
+  min-width: 0;
+  margin: 0;
+  padding: 0 22px !important;
+  border-radius: 2px;
+  box-shadow: none;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 28px !important;
+  white-space: nowrap;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filters-actions .fc-filters-apply:hover {
+  box-shadow: none;
+}
+
+/* Info icon with the help tooltip */
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-preset-info {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-preset-info .fc-preset-info-icon {
+  width: 20px;
+  height: 20px !important;
+  min-height: 0 !important;
+  margin: 0;
+  padding: 0 !important;
+  border: 1px solid var(--fcm-muted);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--fcm-muted);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 12px;
+  font-style: italic;
+  font-weight: 700;
+  line-height: 18px !important;
+  text-align: center;
+  cursor: pointer;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-preset-info .fc-preset-info-icon:hover,
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-preset-info.is-open .fc-preset-info-icon {
+  border-color: var(--fcm-accent);
+  color: var(--fcm-accent);
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-preset-info .fc-preset-info-tip {
+  display: none;
+  position: absolute;
+  left: -8px;
+  bottom: calc(100% + 8px);
+  z-index: 80;
+  box-sizing: border-box;
+  width: 300px;
+  max-width: calc(100vw - 120px);
+  padding: 10px 12px;
+  border: 1px solid var(--fcm-border);
+  background: #fff;
+  box-shadow: 0 10px 28px rgba(31, 45, 90, 0.2);
+  color: var(--fcm-text);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.45;
+  text-align: left;
+  white-space: normal;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-preset-info:hover .fc-preset-info-tip,
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-preset-info.is-open .fc-preset-info-tip {
+  display: block;
+}
+
+
+/* Files / Tags / Fields / Types boxes use an adaptive number of columns: the actions row takes all columns but the last,
+   the hide button sits in the last one, so both stay on the same row (as in the items manager) */
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern.fc-filters-modern-fm .fc-filters-actions,
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern.fc-filters-modern-sm .fc-filters-actions,
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern.fc-filters-modern-md .fc-filters-actions {
+  grid-column: 1 / -2;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern.fc-filters-modern-fm #fc-filters-slide-btn,
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern.fc-filters-modern-sm #fc-filters-slide-btn,
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern.fc-filters-modern-md #fc-filters-slide-btn {
+  grid-column: -2 / -1;
+}
+@media (max-width: 520px) {
+  #fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern.fc-filters-modern-fm .fc-filters-actions,
+  #fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern.fc-filters-modern-sm .fc-filters-actions,
+  #fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern.fc-filters-modern-md .fc-filters-actions,
+  #fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern.fc-filters-modern-fm #fc-filters-slide-btn,
+  #fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern.fc-filters-modern-sm #fc-filters-slide-btn,
+  #fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern.fc-filters-modern-md #fc-filters-slide-btn {
+    grid-column: 1 / -1;
+  }
+}

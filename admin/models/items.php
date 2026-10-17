@@ -1550,7 +1550,16 @@ class FlexicontentModelItems extends FCModelAdminList
 		if (!empty($filter_tag))
 		{
 			$filter_tag = ArrayHelper::toInteger($filter_tag);
-			$where[] = 'tg.tid IN (' . implode( ',', $filter_tag) .')';
+
+			// Special value -1: items without tags (no row in the tags relations table), can be combined with tags
+			$no_tags = in_array(-1, $filter_tag, true);
+			$filter_tag = array_filter($filter_tag, function ($tid) { return $tid > 0; });
+
+			$tag_where = array();
+			if ($no_tags) $tag_where[] = 'tg.tid IS NULL';
+			if (count($filter_tag)) $tag_where[] = 'tg.tid IN (' . implode( ',', $filter_tag) .')';
+
+			if (count($tag_where)) $where[] = '(' . implode(' OR ', $tag_where) . ')';
 		}
 
 		if (!empty($filter_type))

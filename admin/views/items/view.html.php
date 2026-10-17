@@ -233,6 +233,13 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				if ((int) \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('backend_filters_style', 0) === 1)
 				{
 					$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent_filters_modern.css', array('version' => FLEXI_VHASH));
+
+					// Filter presets (stored in the browser)
+					foreach (array('FLEXI_PRESET_SAVE', 'FLEXI_PRESET_SAVE_TITLE', 'FLEXI_PRESET_NAME', 'FLEXI_PRESET_MAX', 'FLEXI_PRESET_DELETE', 'FLEXI_PRESET_DELETE_CONFIRM', 'FLEXI_PRESET_HELP') as $_preset_txt)
+					{
+						\Joomla\CMS\Language\Text::script($_preset_txt);
+					}
+					$document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/js/filter_presets.js', array('version' => FLEXI_VHASH), array('defer' => true));
 				}
 			}
 			else
@@ -796,7 +803,10 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 					'onblur' => '',
 				),
 				$value,
-				$displaytype = 0
+				$displaytype = 0,
+				$tagid = null,
+				// Special value -1: items that have no tags
+				$extra_options = array(-1 => \Joomla\CMS\Language\Text::_('FLEXI_ITEMS_WITHOUT_TAGS'))
 			),
 		));
 
