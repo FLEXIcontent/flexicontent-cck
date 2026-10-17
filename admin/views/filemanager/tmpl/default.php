@@ -794,7 +794,12 @@ if ($js)
 														<?php echo ($this->count_filters  ? ' <sup>' . $this->count_filters . '</sup>' : ''); ?>
 													</div>
 
-													<div id="fc-filters-box" <?php if (!$this->count_filters || empty($tools_state->filters_box)) echo 'style="display:none;"'; ?> class="fcman-abs">
+													<?php
+													// Modern style of the filters box, selected in component configuration (Items Manager > Appearance)
+													$filters_modern = (int) ComponentHelper::getParams('com_flexicontent')->get('backend_filters_style', 0) === 1;
+													$filters_apply_btn = $filters_modern && (int) ComponentHelper::getParams('com_flexicontent')->get('backend_filters_apply', 1) === 1;
+													?>
+													<div id="fc-filters-box" <?php if (!$this->count_filters || empty($tools_state->filters_box)) echo 'style="display:none;"'; ?> class="fcman-abs<?php echo $filters_modern ? ' fc-filters-modern fc-filters-modern-fm' : ''; ?>">
 														<?php
 														/**
 														 * When layout == image then some filters are not applicable
@@ -814,8 +819,42 @@ if ($js)
 														echo $this->lists['item_id'];
 														?>
 
+														<?php if ($filters_apply_btn) : ?>
+														<div class="fc-filters-actions">
+															<button type="button" class="btn btn-primary fc-filters-apply" onclick="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();">
+																<span class="icon-filter"></span> <?php echo Text::_('FLEXI_APPLY'); ?>
+															</button>
+														</div>
+														<?php endif; ?>
+
 														<div id="fc-filters-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="<?php echo Text::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
 													</div>
+
+													<?php if ($filters_apply_btn) : ?>
+													<script>
+														/* Apply-button mode: changing a filter inside the box does not reload the list immediately.
+														   The filters are applied by the Apply button or by clicking outside of the box. */
+														(function() {
+															var box = document.getElementById('fc-filters-box');
+															if (!box) return;
+															var dirty = false;
+															var els = box.querySelectorAll('[onchange*="submitform"]');
+															for (var i = 0; i < els.length; i++) {
+																els[i].removeAttribute('onchange');
+																els[i].onchange = null;
+															}
+															var markDirty = function() { dirty = true; };
+															box.addEventListener('change', markDirty, true);
+															if (window.jQuery) jQuery(box).on('change', markDirty);
+															document.addEventListener('mousedown', function(e) {
+																if (!dirty || box.contains(e.target)) return;
+																dirty = false;
+																if (!!document.adminForm.limitstart) document.adminForm.limitstart.value = 0;
+																Joomla.submitform();
+															}, true);
+														})();
+													</script>
+													<?php endif; ?>
 
 													<button title="" data-original-title="<?php echo Text::_('FLEXI_RESET_FILTERS'); ?>" class="<?php echo $btn_class . (FLEXI_J40GE ? ' btn-outline-dark ' : ' ') . $this->tooltip_class; ?>" onclick="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; delAllFilters(); Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-cancel"></i>' : Text::_('FLEXI_CLEAR'); ?></button>
 												</div>

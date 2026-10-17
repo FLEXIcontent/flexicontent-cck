@@ -1,0 +1,95 @@
+/* Items manager: 'Items using file' search filter (see items_filter_file.js) */
+.fc-filefilter {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-width: 180px;
+}
+.fc-filefilter .fc-filefilter-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding-right: 28px;
+}
+.fc-filefilter .fc-filefilter-clear {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #777;
+  font-size: 16px;
+  line-height: 18px;
+  cursor: pointer;
+}
+.fc-filefilter .fc-filefilter-clear:hover {
+  background: rgba(0, 0, 0, 0.08);
+  color: #222;
+}
+.fc-filefilter .fc-filefilter-clear[hidden],
+.fc-filefilter .fc-filefilter-list[hidden] {
+  display: none;
+}
+.fc-filefilter .fc-filefilter-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  max-height: 320px;
+  margin: 2px 0 0 0;
+  padding: 4px;
+  overflow-y: auto;
+  list-style: none;
+  border: 1px solid #c4cde0;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 14px 30px rgba(31, 45, 90, 0.18);
+}
+.fc-filefilter .fc-filefilter-list li {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  line-height: 1.3;
+}
+.fc-filefilter .fc-filefilter-list li.is-active,
+.fc-filefilter .fc-filefilter-list li[data-id]:hover {
+  background: #e6edfe;
+}
+.fc-filefilter .fc-filefilter-title {
+  font-weight: 600;
+}
+.fc-filefilter .fc-filefilter-name {
+  color: #6b7792;
+  font-size: 11px;
+  word-break: break-all;
+}
+.fc-filefilter .fc-filefilter-empty {
+  color: #6b7792;
+  cursor: default;
+}
+
+/* Legacy rules force a tall height on every button inside .fc-xpended-row (making the clear button an oval) */
+#flexicontent #j-main-container .fc-filefilter .fc-filefilter-clear {
+  width: 22px;
+  height: 22px !important;
+  min-height: 0 !important;
+  margin: 0;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  border-radius: 50%;
+  line-height: 1 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#flexicontent #j-main-container .fc-filefilter .fc-filefilter-clear[hidden] {
+  display: none !important;
+}

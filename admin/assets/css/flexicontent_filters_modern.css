@@ -1,0 +1,702 @@
+/**
+ * Modern layout of the backend list filters box (items manager)
+ *
+ * Loaded only when the component parameter "Backend list filters" is set to "Modern"
+ * (Backend Managers > Items Manager > Appearance). All rules are scoped to
+ * #fc-filters-box.fc-filters-modern, so "Classic" is untouched.
+ *
+ * Specificity: the id is repeated on purpose (#fc-filters-box x3). The component CSS has rules like
+ * "#flexicontent #j-main-container .fc-xpended-row .input-group-prepend > *" with !important
+ * (min-height / line-height), which have 2 ids and would otherwise override these rules.
+ *
+ * The box is shown/hidden by jQuery slide effects that set an inline "display" value
+ * (none / block), so the grid is forced with !important only while the box is not hidden.
+ */
+
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern {
+  /* design tokens */
+  --fcm-bg-1: #f7f9fe;
+  --fcm-bg-2: #edf1fa;
+  --fcm-border: #d9e0ee;
+  --fcm-text: #1f2a44;
+  --fcm-muted: #6b7792;
+  --fcm-accent: #3d6df0;
+  --fcm-accent-soft: #e6edfe;
+  --fcm-radius: 10px;
+  --fcm-h: 42px;
+  /* neutralize the very tall classic input height used by flexi_choices.css */
+  --form-inp-height: var(--fcm-h);
+  --filts-inp-height: var(--fcm-h);
+}
+
+/* The panel: wide, soft background, anchored to the left of its toolbar cell */
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern.fcman-abs {
+  left: 0;
+  right: auto;
+  width: 1180px;
+  min-width: 359px;
+  max-width: calc(100vw - 80px);
+  padding: 18px 16px 12px 16px;
+  box-sizing: border-box;
+  background: linear-gradient(180deg, var(--fcm-bg-1) 0%, var(--fcm-bg-2) 100%);
+  border: 5px solid var(--fcm-border);
+  border-radius: 0 px;
+  box-shadow: 0 18px 48px rgba(31, 45, 90, 0.18), 0 2px 6px rgba(31, 45, 90, 0.06);
+  color: var(--fcm-text);
+}
+/* 4 columns grid, rows are aligned (not hidden: jQuery sets inline display:none) */
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern.fcman-abs:not([style*="display: none"]):not([style*="display:none"]) {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  /* rows keep their content height while jQuery slideDown/slideUp animates the box height
+     (otherwise the auto rows shrink and the filters overlap during the animation) */
+  grid-auto-rows: max-content;
+  align-content: start;
+  gap: 10px 12px;
+  align-items: start;
+}
+
+/* One filter = one grid cell */
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter {
+  float: none;
+  width: auto;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  box-sizing: border-box;
+  position: relative;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter.fc-filter-double,
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter:has(#startdate) {
+  grid-column: span 2;
+  width: auto;
+  min-width: 0;
+}
+/* Whichever filter is being used must stay above its neighbours (dropdown lists overlay them) */
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-moldern .fc-filter:focus-within {
+  z-index: 30;
+}
+
+/* Label on top of the control, control uses the full width of the cell.
+   (legacy rules give the wrapper div min-height:1.9rem and line-height:1.9rem, reset them) */
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .fc-xpended-row,
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .fc-xpended-row .input-group-prepend {
+  display: block;
+  width: 100%;
+  min-height: 0 !important;
+  line-height: 1.3 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+/* Wrapper children must not inherit the legacy forced min-height */
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .input-group-prepend > .choices,
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .input-group-prepend > .field-calendar {
+  min-height: 0 !important;
+}
+/* The original <select> that Choices.js hides must never take space */
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter select.choices__input,
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter select[hidden],
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .is-hidden {
+  display: none !important;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter > * {
+  float: none;
+  margin: 0 !important;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .fc-xpended-row .input-group-text:first-child,
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .fc-xpended-row .add-on:first-child {
+  display: block !important;
+  float: none !important;
+  clear: both;
+  min-width: 0;
+  max-width: none;
+  width: auto;
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 0 0 3px 2px !important;
+  margin: 0 !important;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--fcm-muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  line-height: 1.2 !important;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: normal;
+}
+/* Active filters: accent label with a dot */
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .fc-xpended-row .input-group-text.fc-lbl-inverted:first-child,
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .fc-xpended-row .add-on.fc-lbl-inverted:first-child {
+  color: var(--fcm-accent);
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .fc-lbl-inverted:first-child::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: 5px;
+  border-radius: 50%;
+  background: var(--fcm-accent);
+  vertical-align: middle;
+}
+
+/* Controls: Choices.js, Select2, native select and text inputs fill the cell */
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .choices,
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .choices[data-type*="select-multiple"],
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter.fc-filter-double .choices,
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter.fc-filter-double .choices[data-type*="select-multiple"] {
+  display: block;
+  position: relative;
+  width: 100% !important;
+  max-width: 100%;
+  margin: 0 !important;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .select2-container,
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .select2-container .select2-choice,
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .select2-container-multi,
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter.fc-filter-double .select2-container .select2-choice,
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter.fc-filter-double .select2-container-multi {
+  width: 100% !important;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Field look: white, rounded, soft border, accent focus ring */
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .choices .choices__inner,
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter select:not(.select2-offscreen):not(.choices__input),
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter input[type="text"]:not(.select2-input):not(.select2-focusser):not(.choices__input),
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .fc-xpended-row > input {
+  min-height: var(--fcm-h) !important;
+  border: 1px solid var(--fcm-border) !important;
+  border-radius: 0 !important;
+  background-color: #fff !important;
+  box-shadow: 0 1px 2px rgba(31, 45, 90, 0.05) !important;
+  color: var(--fcm-text);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  font-size: small !important;
+  padding-left: 10px !important;
+  max-height: 42px !important;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter select:not(.select2-offscreen):not(.choices__input),
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter input[type="text"]:not(.select2-input):not(.select2-focusser):not(.choices__input),
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .fc-xpended-row > input {
+  width: 100% !important;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 0 12px;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .choices:hover .choices__inner,
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter select:not(.select2-offscreen):not(.choices__input):hover,
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter input[type="text"]:not(.select2-input):not(.select2-focusser):not(.choices__input):hover {
+  border-color: #b8c4de !important;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .choices.is-focused .choices__inner,
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .choices.is-open .choices__inner,
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter select:not(.select2-offscreen):not(.choices__input):focus,
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter input[type="text"]:not(.select2-input):not(.select2-focusser):not(.choices__input):focus {
+  border-color: var(--fcm-accent) !important;
+  box-shadow: 0 0 0 3px rgba(61, 109, 240, 0.16) !important;
+  outline: 0;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .choices.is-open .choices__inner {
+  border-radius: var(--fcm-radius) var(--fcm-radius) 0 0 !important;
+}
+
+/* Multi-select: chips + search input on one line, so opening the list does not change the height */
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .choices[data-type*="select-multiple"] .choices__inner {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 6px !important;
+  max-height: 80px;
+  overflow-y: auto;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .choices[data-type*="select-multiple"] .choices__list--multiple {
+  display: contents !important;
+}
+/* Selected values: small, minimal rounding (like the stock Choices.js) */
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .choices__list--multiple .choices__item {
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  padding: 0 6px !important;
+  min-height: 22px !important;
+  height: 22px;
+  line-height: 20px !important;
+  font-size: 12px !important;
+  font-weight: 500;
+  border: 1px solid #25407a !important;
+  border-radius: 3px !important;
+  background: #2f4f94 !important;
+  color: #fff !important;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .choices__list--multiple .choices__button {
+  margin: 0 0 0 4px !important;
+  padding: 0 2px !important;
+  /* make the (grey) sprite cross white */
+  filter: brightness(0) invert(1);
+  opacity: 0.8;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .choices__list--multiple .choices__button:hover {
+  opacity: 1;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .choices__input--cloned,
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .choices.is-open .choices__input--cloned,
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .choices[data-type*="select-multiple"].is-open .choices__input--cloned {
+  flex: 1 1 50px !important;
+  min-width: 50px !important;
+  width: auto !important;
+  min-height: 24px !important;
+  height: 24px !important;
+  line-height: 24px !important;
+  margin: 0 !important;
+  padding: 0 4px !important;
+  background: transparent !important;
+  background-image: none !important;
+  box-sizing: border-box !important;
+}
+
+/* Dropdown list: overlays the layout, never pushes it */
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .choices__list--dropdown,
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .choices__list[aria-expanded] {
+  z-index: 60;
+  margin: 0 !important;
+  border: 1px solid var(--fcm-accent) !important;
+  border-top: 0 !important;
+  border-radius: 0 0 var(--fcm-radius) var(--fcm-radius) !important;
+  box-shadow: 0 14px 30px rgba(31, 45, 90, 0.18);
+  overflow: hidden;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .choices__list--dropdown .choices__item--selectable.is-highlighted {
+  background: var(--fcm-accent-soft) !important;
+  color: #2a4fb0;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .choices__list--dropdown .choices__input {
+  min-height: 34px !important;
+  line-height: 34px !important;
+}
+
+/* Checkbox filters as toggle switches (the visible element is the label next to the hidden input) */
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .group-fcset input[type="checkbox"] + label {
+  position: relative;
+  display: inline-block !important;
+  width: 40px !important;
+  min-width: 40px !important;
+  height: 22px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 11px;
+  background: #c9d2e6 !important;
+  background-image: none !important;
+  vertical-align: middle;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .group-fcset input[type="checkbox"] + label::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(31, 45, 90, 0.35);
+  transition: transform 0.2s ease;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .group-fcset input[type="checkbox"]:checked + label {
+  background: var(--fcm-accent) !important;
+  background-image: none !important;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .group-fcset input[type="checkbox"]:checked + label::after {
+  transform: translateX(18px);
+}
+
+/* Item ID input: a normal full-width block under its label */
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter #filter_id {
+  display: block !important;
+  float: none !important;
+  position: static !important;
+  width: 100% !important;
+  height: var(--fcm-h);
+  margin: 0 !important;
+}
+
+/* Category + its 'Subcategories' option share one cell: the toggle sits right under the Category field.
+   Explicit heights, so no legacy min-height / line-height can add space below it. */
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter-group {
+  display: block;
+  min-width: 0;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter-group > .fc-filter {
+  display: block;
+  width: auto;
+  margin: 0;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter-group > .fc-filter + .fc-filter,
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter-group > .fc-filter + .fc-filter .fc-xpended-row,
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter-group > .fc-filter + .fc-filter .input-group-prepend {
+  height: 22px !important;
+  min-height: 0 !important;
+  line-height: 22px !important;
+  overflow: visible;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter-group > .fc-filter + .fc-filter {
+  margin-top: 3px;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter-group > .fc-filter + .fc-filter .fc-xpended-row,
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter-group > .fc-filter + .fc-filter .input-group-prepend {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter-group > .fc-filter + .fc-filter .input-group-text:first-child {
+  padding: 0 !important;
+  line-height: 22px !important;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 600;
+  order: 2;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter-group > .fc-filter + .fc-filter .group-fcset {
+  display: flex !important;
+  align-items: center;
+  height: 22px;
+  order: 1;
+}
+
+/* CSV export block: its own 4 column grid, so it never inherits odd placement from the rows above */
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filters-csv {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-auto-rows: max-content;
+  gap: 10px 12px;
+  align-items: start;
+  margin-top: 2px;
+  padding-top: 12px;
+  border-top: 1px solid var(--fcm-border);
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filters-csv > .clear {
+  display: none !important;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filters-csv > h4 {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: var(--fcm-text);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* Checkbox filters (Subcategories, ZIP, ...) */
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin: 6px 0 0 2px;
+  accent-color: var(--fcm-accent);
+}
+
+/* Date filter (spans 2 columns): [type select] [From] [To] on one row */
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter:has(#startdate) .fc-xpended-row .input-group-prepend {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  align-items: start;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter:has(#startdate) .input-group-prepend > .input-group-text:first-child {
+  grid-column: 1 / -1;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .field-calendar {
+  display: block;
+  width: auto;
+  min-width: 0;
+  margin: 0;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .field-calendar > .input-group {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  width: 100%;
+  height: var(--fcm-h);
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .field-calendar input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100% !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+  border-radius: 0 !important;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .field-calendar > .input-group > button {
+  flex: 0 0 38px;
+  width: 38px;
+  height: 100% !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+  box-sizing: border-box !important;
+  border-radius: 0;
+}
+/* Calendar button icon */
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .field-calendar > .input-group > button [class*="icon-"]::before {
+  margin: 0 2px 0 0;
+  font-size: 14px;
+}
+
+/* Section titles (e.g. CSV export) use the whole row */
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern > .clear {
+  display: none;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern > h4 {
+  grid-column: 1 / -1;
+  margin: 2px 0 0 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--fcm-border);
+  color: var(--fcm-text);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* Footer: Apply button + hide button */
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filters-actions {
+  grid-column: 1 / span 3;
+  margin: 2px 0 0 0;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filters-apply {
+  min-width: 140px;
+  height: var(--fcm-h);
+  padding: 0 22px;
+  border: 0;
+  border-radius: 0;
+  background: linear-gradient(180deg, #4ea3ff 0%, var(--fcm-accent) 100%);
+  box-shadow: 0 6px 16px rgba(61, 109, 240, 0.35);
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  margin-bottom: 10px;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filters-apply:hover {
+  filter: brightness(1.06);
+  box-shadow: 0 8px 20px rgba(61, 109, 240, 0.42);
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern #fc-filters-slide-btn {
+  grid-column: 4;
+  justify-self: end !important;
+  width: auto !important;
+  min-width: 0;
+  margin: 2px 0 0 0;
+  padding: 6px 16px;
+  border-radius: var(--fcm-radius);
+}
+
+/* Smaller screens: 3 / 2 / 1 columns */
+@media (max-width: 1100px) {
+  #fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filters-csv { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  #fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern.fcman-abs:not([style*="display: none"]):not([style*="display:none"]) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  #fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filters-actions { grid-column: 1 / span 2; }
+  #fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern #fc-filters-slide-btn { grid-column: 3; }
+}
+@media (max-width: 800px) {
+  #fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filters-csv { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern.fcman-abs:not([style*="display: none"]):not([style*="display:none"]) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  #fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filters-actions { grid-column: 1; }
+  #fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern #fc-filters-slide-btn { grid-column: 2; }
+}
+@media (max-width: 520px) {
+  #fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filters-csv { grid-template-columns: minmax(0, 1fr); }
+  #fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern.fcman-abs:not([style*="display: none"]):not([style*="display:none"]) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  #fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter.fc-filter-double,
+  #fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter:has(#startdate) {
+    grid-column: span 1;
+  }
+  #fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filters-actions,
+  #fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern #fc-filters-slide-btn { grid-column: 1; justify-self: start; }
+}
+
+
+/* ==========================================================================
+   Select2 (legacy library) inside the Modern filters box
+   ========================================================================== */
+
+/* Select2 keeps the original <select> and its focus input off-screen (1px, clipped).
+   The field look above must not make them visible again ("field inside a field"). */
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .select2-offscreen {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  min-height: 0 !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  clip: rect(0 0 0 0) !important;
+  overflow: hidden !important;
+  opacity: 0;
+}
+/* The search inputs living inside a Select2 / Choices control are not separate fields */
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .select2-container input[type="text"],
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .choices input[type="text"] {
+  min-height: 0 !important;
+  height: auto !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Select2 containers: full width of the cell, same look as the other fields */
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .select2-container {
+  display: block;
+  width: 100% !important;
+  max-width: 100%;
+  margin: 0 !important;
+  box-sizing: border-box;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .select2-container .select2-choice,
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .select2-container-multi .select2-choices {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: 100%;
+  margin: 0 !important;
+  min-height: var(--fcm-h);
+  border: 1px solid var(--fcm-border) !important;
+  border-radius: 0 !important;
+  background-color: #fff !important;
+  background-image: none !important;
+  box-shadow: 0 1px 2px rgba(31, 45, 90, 0.05) !important;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .select2-container .select2-choice {
+  height: var(--fcm-h);
+  line-height: calc(var(--fcm-h) - 2px);
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .select2-container .select2-choice > .select2-chosen {
+  margin-right: 28px;
+  white-space: nowrap;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .select2-container .select2-choice .select2-arrow {
+  border: 0;
+  border-radius: 0 var(--fcm-radius) var(--fcm-radius) 0;
+  background: transparent !important;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .select2-container-active .select2-choice,
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .select2-container-active .select2-choices,
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .select2-dropdown-open .select2-choice {
+  border-color: var(--fcm-accent) !important;
+  box-shadow: 0 0 0 3px rgba(61, 109, 240, 0.16) !important;
+}
+/* Select2 multi: selected values as the same small dark chips */
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .select2-container-multi .select2-choices {
+  padding: 2px 4px;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .select2-container-multi .select2-choices .select2-search-choice {
+  margin: 2px 3px 2px 0;
+  padding: 2px 6px 2px 20px;
+  border: 1px solid #25407a;
+  border-radius: 3px;
+  background: #2f4f94;
+  box-shadow: none;
+  color: #fff;
+  font-size: 12px;
+  line-height: 16px;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .select2-container-multi .select2-choices .select2-search-choice-close {
+  filter: brightness(0) invert(1);
+  opacity: 0.8;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .select2-container-multi .select2-choices .select2-search-field input {
+  height: 26px !important;
+  margin: 0 !important;
+  padding: 0 4px !important;
+}
+
+
+/* 'Items using file' search input: room for the clear button */
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .fc-filefilter-input {
+  padding-right: 32px !important;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .fc-filefilter-clear {
+  right: 8px;
+  width: 22px;
+  height: 22px !important;
+  min-height: 0 !important;
+  margin: 0;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  border-radius: 50%;
+  line-height: 1 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter .fc-filefilter-clear[hidden] {
+  display: none !important;
+}
+
+/* Date filter: the calendar popup is absolutely positioned and sizes itself to the room left inside its
+   positioned ancestor. With .fc-filter being "position: relative" the popup of the "To" field (which is placed
+   further right) got squeezed. Letting it use the whole filters box as reference gives both popups the same width. */
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern .fc-filter:has(#startdate) {
+  position: static;
+}
+
+
+/* ==========================================================================
+   Files manager variant (.fc-filters-modern-fm)
+   The list sits in a column next to the upload panel, which clips whatever is wider than the column.
+   The box is limited to that column width and the number of columns adapts to it.
+   ========================================================================== */
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern.fcman-abs.fc-filters-modern-fm {
+  width: min(1180px, 46vw);
+  min-width: 0;
+  max-width: none;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern.fcman-abs.fc-filters-modern-fm:not([style*="display: none"]):not([style*="display:none"]) {
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern.fc-filters-modern-fm .fc-filters-actions,
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern.fc-filters-modern-fm #fc-filters-slide-btn {
+  grid-column: 1 / -1;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern.fc-filters-modern-fm #fc-filters-slide-btn {
+  justify-self: end;
+}
+
+
+/* ==========================================================================
+   Boxes with few filters (Tags, Types: .fc-filters-modern-sm, Fields: .fc-filters-modern-md):
+   narrower panel, the number of columns adapts to its width
+   ========================================================================== */
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern.fcman-abs.fc-filters-modern-sm {
+  width: min(480px, calc(100vw - 80px));
+  min-width: 0;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern.fcman-abs.fc-filters-modern-md {
+  width: min(860px, calc(100vw - 80px));
+  min-width: 0;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern.fcman-abs.fc-filters-modern-sm:not([style*="display: none"]):not([style*="display:none"]),
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern.fcman-abs.fc-filters-modern-md:not([style*="display: none"]):not([style*="display:none"]) {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern.fc-filters-modern-sm .fc-filters-actions,
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern.fc-filters-modern-sm #fc-filters-slide-btn,
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern.fc-filters-modern-md .fc-filters-actions,
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern.fc-filters-modern-md #fc-filters-slide-btn {
+  grid-column: 1 / -1;
+}
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern.fc-filters-modern-sm #fc-filters-slide-btn,
+#fc-filters-box#fc-filters-box#fc-filters-box.fc-filters-modern.fc-filters-modern-md #fc-filters-slide-btn {
+  justify-self: end;
+}

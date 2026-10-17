@@ -932,4 +932,58 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		// Also clean this as it contains Joomla frontend view cache of the component)
 		$cache_site->clean('com_flexicontent');
 	}
+
+
+	/**
+	 * Search files by title (altname) or filename, used by the 'Items using file' filter of the items manager
+	 * Returns a JSON array of {id, label, name}
+	 *
+	 * @return void
+	 */
+	public function searchfiles()
+	{
+		@ob_end_clean();
+
+		\Joomla\CMS\Session\Session::checkToken('request') or jexit(json_encode(array()));
+
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+
+		if (!$user->authorise('core.manage', 'com_flexicontent'))
+		{
+			jexit(json_encode(array()));
+		}
+
+		$term = trim($this->input->get('term', '', 'string'));
+
+		// Require 2 characters, avoids listing a big part of the files table
+		if (StringHelper::strlen($term) < 2)
+		{
+			jexit(json_encode(array()));
+		}
+
+		$db   = \Joomla\CMS\Factory::getDbo();
+		$like = $db->Quote('%' . $db->escape($term, true) . '%', false);
+
+		$query = $db->getQuery(true)
+			->select(array('f.id', 'f.altname', 'f.filename'))
+			->from($db->quoteName('#__flexicontent_files', 'f'))
+			->where('(' . $db->quoteName('f.altname') . ' LIKE ' . $like . ' OR ' . $db->quoteName('f.filename') . ' LIKE ' . $like . ')')
+			->order($db->quoteName('f.altname') . ' ASC')
+			->setLimit(30);
+
+		$rows = $db->setQuery($query)->loadObjectList();
+		$out  = array();
+
+		foreach ($rows as $row)
+		{
+			$out[] = array(
+				'id'    => (int) $row->id,
+				'label' => $row->altname !== '' ? $row->altname : $row->filename,
+				'name'  => $row->filename,
+			);
+		}
+
+		header('Content-Type: application/json; charset=utf-8');
+		jexit(json_encode($out));
+	}
 }

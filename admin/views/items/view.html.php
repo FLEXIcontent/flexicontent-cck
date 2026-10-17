@@ -99,7 +99,6 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		$count_filters = 0;
 
 		// File id filtering
-		$fileid_to_itemids = $session->get('fileid_to_itemids', array(),'flexicontent');
 		$filter_fileid     = $model->getState('filter_fileid');
 
 		// Category filtering
@@ -225,6 +224,16 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				!\Joomla\CMS\Factory::getLanguage()->isRtl()
 					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
+
+				// 'Items using file' filter: search files by title while typing
+				$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/items_filter_file.css', array('version' => FLEXI_VHASH));
+				$document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/js/items_filter_file.js', array('version' => FLEXI_VHASH), array('defer' => true));
+
+				// Modern (multi-column) layout of the filters box, selected in component configuration
+				if ((int) \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('backend_filters_style', 0) === 1)
+				{
+					$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent_filters_modern.css', array('version' => FLEXI_VHASH));
+				}
 			}
 			else
 			{
@@ -492,7 +501,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		$value     = $filter_id;
 
 		$lists[$elementid] = $this->getFilterDisplay(array(
-			'label' => \Joomla\CMS\Language\Text::_('FLEXI_ID'),
+			'label' => \Joomla\CMS\Language\Text::_('FLEXI_ITEM_ID'),
 			'label_extra_class' =>  ($value ? ' fc-lbl-inverted' : ''),
 			'html' => '<input type="text" name="'.$fieldname.'" id="'.$elementid.'" size="6" value="' . $value . '" class="fcfield_textval" style="width:auto;" />',
 		));
@@ -950,38 +959,30 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		$elementid = 'filter_fileid';
 		$value     = $filter_fileid;
 
-		if ($fileid_to_itemids && count($fileid_to_itemids))
-		{
-			$files_data = $model->getFileData(array_keys($fileid_to_itemids));
-			$file_options = array();
-			$file_options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option',  '', '-'/*.\Joomla\CMS\Language\Text::_( 'FLEXI_SELECT' ).' '.\Joomla\CMS\Language\Text::_( 'FLEXI_FILE' )*/ );
+		// The file is searched by title (altname) or filename while typing (AJAX), the list of files is not loaded here
+		$file_label = '';
 
-			foreach($files_data as $_file)
-			{
-				$file_options[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', $_file->id, $_file->altname );
-			}
-
-			$lists[$elementid] = $this->getFilterDisplay(array(
-				'label' => \Joomla\CMS\Language\Text::_('FLEXI_ITEMS_USING') . ' ' . \Joomla\CMS\Language\Text::_('FLEXI_FILE'),
-				'label_extra_class' => ($value ? ' fc-lbl-inverted' : ''),
-				'html' => \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist',
-					$file_options,
-					$fieldname,
-					array(
-						'size' => '1',
-						'class' => $this->select_class,
-						'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
-					),
-					'value',
-					'text',
-					$value
-				),
-			));
-		}
-		else
+		if ($filter_fileid)
 		{
-			$lists[$elementid] = '';
+			$_files = $model->getFileData(array((int) $filter_fileid));
+			$file_label = !empty($_files) ? ($_files[0]->altname !== '' ? $_files[0]->altname : $_files[0]->filename) : '';
 		}
+
+		$lists[$elementid] = $this->getFilterDisplay(array(
+			'label' => \Joomla\CMS\Language\Text::_('FLEXI_ITEMS_USING') . ' ' . \Joomla\CMS\Language\Text::_('FLEXI_FILE'),
+			'label_extra_class' => ($value ? ' fc-lbl-inverted' : ''),
+			'html' => '
+				<div class="fc-filefilter" data-search-url="' . htmlspecialchars(\Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&task=items.searchfiles&format=raw&' . \Joomla\CMS\Session\Session::getFormToken() . '=1', ENT_QUOTES, 'UTF-8') . '"
+					data-no-results="' . htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_NO_FILES_FOUND'), ENT_QUOTES, 'UTF-8') . '">
+					<input type="text" id="' . $elementid . '_search" class="fcfield_textval fc-filefilter-input" autocomplete="off"
+						placeholder="' . htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_SEARCH_FILES'), ENT_QUOTES, 'UTF-8') . '"
+						value="' . htmlspecialchars($file_label, ENT_QUOTES, 'UTF-8') . '" />
+					<button type="button" class="fc-filefilter-clear" title="' . htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_CLEAR'), ENT_QUOTES, 'UTF-8') . '"' . ($value ? '' : ' hidden') . '>&times;</button>
+					<input type="hidden" name="' . $fieldname . '" id="' . $elementid . '" value="' . (int) $value . '"
+						onchange="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();" />
+					<ul class="fc-filefilter-list" hidden></ul>
+				</div>',
+		));
 
 
 		/**
