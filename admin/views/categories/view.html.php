@@ -125,6 +125,19 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 				!\Joomla\CMS\Factory::getLanguage()->isRtl()
 					? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 					: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
+
+				// Modern (multi-column) layout of the filters box, selected in component configuration
+				if ((int) \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('backend_filters_style', 1) === 1)
+				{
+					$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent_filters_modern.css', array('version' => FLEXI_VHASH));
+
+					// Filter presets (stored in the browser)
+					foreach (array('FLEXI_PRESET_SAVE', 'FLEXI_PRESET_SAVE_TITLE', 'FLEXI_PRESET_NAME', 'FLEXI_PRESET_MAX', 'FLEXI_PRESET_DELETE', 'FLEXI_PRESET_DELETE_CONFIRM', 'FLEXI_PRESET_HELP') as $_preset_txt)
+					{
+						\Joomla\CMS\Language\Text::script($_preset_txt);
+					}
+					$document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/js/filter_presets.js', array('version' => FLEXI_VHASH), array('defer' => true));
+				}
 			}
 			else
 			{

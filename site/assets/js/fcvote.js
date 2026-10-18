@@ -109,7 +109,7 @@
 		under_vote = true;
 
 		var fcvote = link.closest('.fcvote');
-		var voting_group = fcvote ? fcvote.closest('.voting-group, .fieldname-group') : null;
+		var voting_group = fcvote ? fcvote.closest('.voting-group') : null;
 		if (voting_group) voting_group.style.opacity = '0.5';
 
 		var vote_list = link.closest('.fcvote_list');
@@ -122,20 +122,22 @@
 		var xid = (typeof data_arr[1] !== 'undefined' && data_arr[1]) ? data_arr[1] : 'main';
 
 		var xid_msg = fcvote ? fcvote.querySelector('.fcvote_message') : null;
-		var main_msg = voting_group ? (voting_group.querySelector('.fieldname-row_main .fcvote_message') || xid_msg) : xid_msg;
+		var main_msg = voting_group ? (voting_group.querySelector('.voting-row_main .fcvote_message') || xid_msg) : xid_msg;
 
 		var xid_cnt = fcvote ? fcvote.querySelector('.fcvote-count') : null;
-		var main_cnt = voting_group ? (voting_group.querySelector('.fieldname-row_main .fcvote-count') || null) : null;
+		var main_cnt = voting_group ? (voting_group.querySelector('.voting-row_main .fcvote-count') || null) : null;
 
 		var xid_rating = vote_list ? vote_list.querySelector('.current-rating') : null;
 		var main_rating = null;
 		if (voting_group) {
-			var main_row = voting_group.querySelector('.fieldname-row_main');
+			var main_row = voting_group.querySelector('.voting-row_main');
 			if (main_row) {
 				var main_vote_list = main_row.querySelector('.fcvote_list');
 				if (main_vote_list) main_rating = main_vote_list.querySelector('.current-rating');
 			}
 		}
+		// Voting the 'main' characteristic without a surrounding group: the list itself is the main one
+		if (!main_rating && xid === 'main') main_rating = xid_rating;
 
 		var _htmlrating = xid_cnt ? xid_cnt.innerHTML : '';
 		var _htmlrating_main = main_cnt ? main_cnt.innerHTML : '';
