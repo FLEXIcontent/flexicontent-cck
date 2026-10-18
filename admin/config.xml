@@ -2160,7 +2160,7 @@
 				<option value="1">FLEXI_SHOW</option>
 			</field>
 
-			<field name="backend_filters_style" type="fcradio" default="0" label="FLEXI_BACKEND_FILTERS_STYLE" description="FLEXI_BACKEND_FILTERS_STYLE_DESC" class="btn-group group-fcmethod">
+			<field name="backend_filters_style" type="fcradio" default="1" label="FLEXI_BACKEND_FILTERS_STYLE" description="FLEXI_BACKEND_FILTERS_STYLE_DESC" class="btn-group group-fcmethod">
 				<option value="0">FLEXI_BACKEND_FILTERS_CLASSIC</option>
 				<option value="1">FLEXI_BACKEND_FILTERS_MODERN</option>
 			</field>

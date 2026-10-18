@@ -230,7 +230,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				$document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/js/items_filter_file.js', array('version' => FLEXI_VHASH), array('defer' => true));
 
 				// Modern (multi-column) layout of the filters box, selected in component configuration
-				if ((int) \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('backend_filters_style', 0) === 1)
+				if ((int) \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('backend_filters_style', 1) === 1)
 				{
 					$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent_filters_modern.css', array('version' => FLEXI_VHASH));
 

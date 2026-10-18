@@ -183,7 +183,7 @@ if ($js)
 				</div>
 
 				<?php
-				$filters_modern = (int) \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('backend_filters_style', 0) === 1;
+				$filters_modern = (int) \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('backend_filters_style', 1) === 1;
 				$filters_apply_btn = $filters_modern && (int) \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('backend_filters_apply', 1) === 1;
 				?>
 				<div id="fc-filters-box" <?php if (!$this->count_filters || empty($tools_state->filters_box)) echo 'style="display:none;"'; ?> class="fcman-abs<?php echo $filters_modern ? ' fc-filters-modern fc-filters-modern-sm' : ''; ?>">
