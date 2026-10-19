@@ -809,6 +809,7 @@ abstract class JHtmlFclayoutbuilder
 			color: #fff;
 		}
 		');
+		}
 
 		// The published FlexiContent fields (name + label + type), used by the "Flexicontent Data"
 		// blocks (fc-field trait picker / canvas badges). Same sources as the backend template
@@ -5396,7 +5397,6 @@ view: fcl_boxed_view(function()
 		}
 		</script>
 		';
-		}
 
 		$html .= $fcl_preview_html . '
 		<div style="height: 90%; margin: 0px;">
