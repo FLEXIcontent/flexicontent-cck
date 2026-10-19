@@ -30,11 +30,6 @@
 
 			<field name="builder_page_info" type="separator" cssprep="1" not_inherited="1" default="Page Layout (GrapesJS)" description="You are designing the whole category PAGE: each block renders a pre-built element of the category view (page title, category description, alpha index, subcategories, peer categories, filters, pagination, item grid)." level="level2" class="alert alert-info" />
 
-			<field name="builder_page_enabled" type="radio" not_inherited="1" default="1" filter="int" label="Enable the Page Layout rendering" description="When disabled (or before any page layout is designed) the classic category page is displayed instead." class="btn-group">
-				<option value="1">JYES</option>
-				<option value="0">JNO</option>
-			</field>
-
 			<field name="show_buttons" type="radio" filter="int" not_inherited="1" default="1" label="Show the action buttons (print / RSS / ...)" description="The buttons are always displayed at the top-right of the page, outside the page-builder layout, whatever the block composition." class="btn-group">
 				<option value="1">JYES</option>
 				<option value="0">JNO</option>

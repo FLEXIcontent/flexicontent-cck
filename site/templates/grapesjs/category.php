@@ -5,10 +5,9 @@
 
 	// GrapesJS page layout: the whole category page is composed in the Layout Builder.
 	// Each {flexi_cat:..} block embeds a pre-rendered element of the classic page.
-	$page_builder_enabled = (int) $this->params->get('builder_page_enabled', 1);
 	$page_builder_layout  = trim($this->params->get('builder_page1_html', ''));
 
-	if ($page_builder_enabled && $page_builder_layout !== '')
+	if ($page_builder_layout !== '')
 	{
 		$tmpl_common = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS;
 		$cat_elements = array();
