@@ -458,6 +458,14 @@ abstract class JHtmlFclayoutbuilder
 			if ($styleStr !== '') $attrs['style'] = $styleStr;
 		}
 
+		// "Flexicontent Link" block: the chosen target becomes an href placeholder resolved
+		// at run time (renderBuilderLayout -> FlexicontentHelperRoute). Keep the raw
+		// data-fc-target attribute too, so the block is still detected when re-imported.
+		if (!empty($comp['type']) && $comp['type'] === 'fc-lien' && !empty($attrs['data-fc-target']))
+		{
+			$attrs['href'] = '{flexi_lien:' . $attrs['data-fc-target'] . '}';
+		}
+
 		$attrStr = '';
 		foreach ($attrs as $k => $v)
 		{
@@ -489,6 +497,14 @@ abstract class JHtmlFclayoutbuilder
 					foreach ($comp['components'] as $fch) $inner .= self::_renderComponent($fch);
 				}
 				$inner .= '{/flexi_link}';
+			}
+		}
+		elseif (!empty($comp['type']) && $comp['type'] === 'fc-lien')
+		{
+			// Editable link text = the component's own children (a text span)
+			if (!empty($comp['components']) && is_array($comp['components']))
+			{
+				foreach ($comp['components'] as $fch) $inner .= self::_renderComponent($fch);
 			}
 		}
 		elseif (!empty($comp['type']) && $comp['type'] === 'fc-profile-user')
@@ -885,6 +901,70 @@ abstract class JHtmlFclayoutbuilder
 			array('value' => 'items',          'label' => 'Item grid',             'group' => 'Category page'),
 		);
 		$html .= '<script>window.fcl_builder_catels_' . $editor_sfx . ' = ' . json_encode($fcl_cat_options) . ';</script>';
+
+		// Options for the "Lien Flexicontent" block: ONE "Lien vers" picker listing the
+		// current content plus the Flexicontent categories, items and files. Same data
+		// sources as the JCE flexicontentlinks adapter (see site/librairies/JCE/links).
+		// Values are self-describing: 'current', 'cat:<id>', 'item:<id>', 'file:<id>'.
+		$fcl_link_opts = array(
+			array('value' => 'current', 'label' => 'Contenu courant', 'group' => 'Contenu courant'),
+		);
+
+		try
+		{
+			$fcl_ldb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+
+			// Flexicontent categories (Joomla categories used by com_flexicontent)
+			$fcl_lq = $fcl_ldb->getQuery(true)
+				->select(array('id', 'title'))
+				->from($fcl_ldb->quoteName('#__categories'))
+				->where($fcl_ldb->quoteName('extension') . ' = ' . $fcl_ldb->quote('com_content'))
+				->where($fcl_ldb->quoteName('published') . ' = 1')
+				->order('lft ASC')
+				->setLimit(300);
+			$fcl_ldb->setQuery($fcl_lq);
+
+			foreach ($fcl_ldb->loadObjectList() as $fcl_lc)
+			{
+				$fcl_link_opts[] = array('value' => 'cat:' . (int) $fcl_lc->id, 'label' => $fcl_lc->title, 'group' => 'Catégories');
+			}
+
+			// Flexicontent items (inner join ensures only real FC items)
+			$fcl_lq = $fcl_ldb->getQuery(true)
+				->select(array('a.id', 'a.title'))
+				->from($fcl_ldb->quoteName('#__content', 'a'))
+				->innerJoin($fcl_ldb->quoteName('#__flexicontent_items', 'fi') . ' ON fi.item_id = a.id')
+				->where($fcl_ldb->quoteName('a.state') . ' = 1')
+				->order('a.title ASC')
+				->setLimit(300);
+			$fcl_ldb->setQuery($fcl_lq);
+
+			foreach ($fcl_ldb->loadObjectList() as $fcl_li)
+			{
+				$fcl_link_opts[] = array('value' => 'item:' . (int) $fcl_li->id, 'label' => $fcl_li->title, 'group' => 'Articles');
+			}
+
+			// Files uploaded in the Flexicontent file manager
+			$fcl_lq = $fcl_ldb->getQuery(true)
+				->select(array('id', 'altname', 'filename'))
+				->from($fcl_ldb->quoteName('#__flexicontent_files'))
+				->where($fcl_ldb->quoteName('published') . ' = 1')
+				->order('id DESC')
+				->setLimit(300);
+			$fcl_ldb->setQuery($fcl_lq);
+
+			foreach ($fcl_ldb->loadObjectList() as $fcl_lf)
+			{
+				$fcl_lfname = trim((string) $fcl_lf->altname) !== '' ? $fcl_lf->altname : $fcl_lf->filename;
+				$fcl_link_opts[] = array('value' => 'file:' . (int) $fcl_lf->id, 'label' => $fcl_lfname, 'group' => 'Fichiers');
+			}
+		}
+		catch (\Throwable $e)
+		{
+			// Keep only the "current content" option so the block still works
+		}
+
+		$html .= '<script>window.fcl_builder_linkopts_' . $editor_sfx . ' = ' . json_encode($fcl_link_opts) . ';</script>';
 
 		/**
 		 * Preview item data for the Layout Builder canvas.
@@ -2782,6 +2862,7 @@ editor.on(\'load\', function()
 			 */
 			var fcl_field_opts = window[\'fcl_builder_fields_\' + editor_sfx] || [];
 			var fcl_cat_opts   = window[\'fcl_builder_catels_\' + editor_sfx] || [];
+			var fcl_link_opts  = window[\'fcl_builder_linkopts_\' + editor_sfx] || [];
 
 			// ---------------------------------------------------------------------
 			// Real-data preview: every fc-field block can show the actual rendered
@@ -4177,6 +4258,41 @@ view: fcl_boxed_view(function()
 						label ? (\'Category: \' + label) : \'Category page element\',
 						el ? (\'Renders "\' + el + \'" of the category page\') : \'Choose an element in the Settings panel\');
 				}),
+			});
+
+			// Flexicontent link block: an editable <a class="btn"> whose target is chosen
+			// with a single "Lien vers" picker (Contenu courant / Catégories / Articles /
+			// Fichiers). No custom view: the default one keeps the inner text editable.
+			// At save time the value becomes an href placeholder {flexi_lien:<value>}
+			// resolved at run time by JHtmlFlexicontent::renderBuilderLayout.
+			editor.DomComponents.addType(\'fc-lien\', {
+				isComponent: function(el)
+				{
+					if (el && el.hasAttribute && el.hasAttribute(\'data-fc-target\')) return { type: \'fc-lien\' };
+				},
+				model: {
+					defaults: {
+						tagName: \'a\',
+						name: \'Flexicontent Link\',
+						classes: [\'btn\'],
+						attributes: { \'data-fc-target\': \'current\' },
+						traits: [{
+							type: \'fc-field-select\',
+							name: \'data-fc-target\',
+							label: \'Lien vers\',
+							options: fcl_link_opts.map(function(o) { return { value: o.value, name: o.label, group: o.group }; }),
+						}],
+					},
+				},
+			});
+
+			editor.BlockManager.add(\'fclien\', {
+				label: \'Lien Flexicontent\',
+				category: \'Flexicontent Data\',
+				content: \'<a class="btn" data-gjs-type="fc-lien" data-fc-target="current"><span data-gjs-type="text">En savoir plus</span></a>\',
+				select: true,
+				activate: true,
+				attributes: { class:\'fc-iblock fa fa-link\' },
 			});
 
 			editor.BlockManager.add(\'fcfield\', {

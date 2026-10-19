@@ -6895,6 +6895,43 @@ class flexicontent_html
 		);
 		$html = str_replace('{/flexi_link}', '</a>', $html);
 
+		// 5b. Resolve href-only link placeholders produced by the "Lien Flexicontent" block:
+		//     {flexi_lien:<current>|cat:<id>|item:<id>|file:<id>} -> a routed URL.
+		$html = preg_replace_callback('~\{flexi_lien:([a-z]+)(?::([0-9]+))?\}~i',
+			function($m) use ($item)
+			{
+				$type = strtolower($m[1]);
+				$id   = isset($m[2]) ? (int) $m[2] : 0;
+
+				if ($type === 'current')
+				{
+					$id = isset($item->id) ? (int) $item->id : 0;
+
+					return $id
+						? \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getItemRoute($id, isset($item->cat_id) ? $item->cat_id : 0))
+						: '#';
+				}
+
+				if ($type === 'item' && $id)
+				{
+					return \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getItemRoute($id));
+				}
+
+				if ($type === 'cat' && $id)
+				{
+					return \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getCategoryRoute($id));
+				}
+
+				if ($type === 'file' && $id)
+				{
+					return \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getTaskRoute($id, 'download', 0, array('id' => $id)));
+				}
+
+				return '#';
+			},
+			$html
+		);
+
 		// 6. Resolve the {flexi_item:profile ...} placeholders (prototype):
 		//    find the user's "profile" item (an item carrying a field of type "jprofile"
 		//    whose value is the user id) and render it with the given layout.
