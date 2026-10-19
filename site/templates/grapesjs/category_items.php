@@ -25,7 +25,6 @@ if (!$this->items)
 }
 
 $ilayout          = $this->params->get('clayout', 'grapesjs');
-$builder_enabled  = (int) $this->params->get('builder_enabled', 1);
 $builder_layout   = trim($this->params->get('builder_layout1_html', ''));
 
 $fcl_min_card = trim($this->params->get('cat_builder_min_card', '280px'));
@@ -44,7 +43,7 @@ $fcl_fit = in_array($fcl_fit, array('auto-fit', 'auto-fill'), true) ? $fcl_fit :
 </style>
 <div class="fc-builder-cat fc-items-block<?php echo $fcl_rows_natural ? ' fc-builder-rows-natural' : ''; ?>" style="--fcl-min-card:<?php echo htmlspecialchars($fcl_min_card, ENT_QUOTES, 'UTF-8'); ?>;--fcl-gap-x:<?php echo htmlspecialchars($fcl_gap_x, ENT_QUOTES, 'UTF-8'); ?>;--fcl-gap-y:<?php echo htmlspecialchars($fcl_gap_y, ENT_QUOTES, 'UTF-8'); ?>">
 
-<?php if ($builder_enabled && $builder_layout !== '') : foreach ($this->items as $item) : ?>
+<?php if ($builder_layout !== '') : foreach ($this->items as $item) : ?>
 	<div class="fc-item-builder">
 		<?php echo flexicontent_html::renderBuilderLayout(
 			$builder_layout,

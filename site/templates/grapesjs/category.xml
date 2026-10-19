@@ -16,11 +16,6 @@
 
 			<field name="params_builder_info" type="separator" cssprep="1" not_inherited="1" default="Layout Builder (GrapesJS)" description="You are designing ONE item (card); it will be replicated for each item of the category loop." level="level2" class="alert alert-info" />
 
-			<field name="builder_enabled" type="radio" not_inherited="1" default="1" filter="int" label="Enable the Layout Builder rendering" description="When disabled (or before any layout is designed) a minimal title list is displayed instead." class="btn-group">
-				<option value="1">JYES</option>
-				<option value="0">JNO</option>
-			</field>
-
 			<field name="builder_layout1" type="fclayoutbuilder" default="" label="Layout builder" description="" class=""
 				not_inherited="1"
 				editor_sfx="builder_layout1"
