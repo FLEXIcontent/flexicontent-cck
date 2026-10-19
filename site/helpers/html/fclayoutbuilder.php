@@ -1029,7 +1029,7 @@ function fclayout_init_builder(editor_sfx, element_id)
 			// Register every plugins used below (modern UMD builds expose a global, eg. gjs-blocks-basic/custom-code/tooltip)
 			// and isolate any failure so the editor still initialises.
 			[ \'grapesjs-preset-webpage\', \'gjs-blocks-basic\', \'grapesjs-tabs\', \'grapesjs-custom-code\',
-			  \'grapesjs-touch\', \'grapesjs-tooltip\'
+			  \'grapesjs-touch\', \'grapesjs-tooltip\', \'grapesjs-icons\'
 			].forEach(function(id)
 			{
 				var fn = grapesjs.plugins.get(id) || window[id];
@@ -1059,6 +1059,7 @@ function fclayout_init_builder(editor_sfx, element_id)
 				\'grapesjs-custom-code\',
 				\'grapesjs-touch\',
 				\'grapesjs-tooltip\',
+				\'grapesjs-icons\',
 			];
 
 			var editor = grapesjs.init({
@@ -1132,6 +1133,15 @@ function fclayout_init_builder(editor_sfx, element_id)
 						// The plugin stays registered so existing layouts using its tab component
 						// type keep rendering; a falsy tabsBlock skips BlockManager.add().
 						tabsBlock: false
+					},
+					// Iconify icon picker (grapesjs-icons). The block is dropped into the "Basic"
+					// category; a double-click (or a drop) opens the icon picker modal listing the
+					// collections below. The chosen icon is inlined as SVG, so the front-end needs
+					// no runtime (Iconify is only queried while editing). Add/remove collection
+					// prefixes from https://icon-sets.iconify.design/ as needed.
+					\'grapesjs-icons\': {
+						collections: [\'bi\', \'ri\', \'mdi\', \'fa6-solid\', \'fa6-brands\'],
+						block: { category: \'Basic\' }
 					},
 					\'grapesjs-preset-webpage\': {
 						// No preset blocks: preset-webpage would add link-block / quote / text-basic
@@ -3002,7 +3012,7 @@ editor.on(\'load\', function()
 						\'var lk=nav?nav.querySelectorAll("[data-bs-toggle=tab],[data-bs-toggle=pill],[data-bs-toggle=list]"):[el];\' +
 						\'for(var i=0;i<lk.length;i++){lk[i].classList.remove("active");lk[i].setAttribute("aria-selected","false");}\' +
 						\'el.classList.add("active");el.setAttribute("aria-selected","true");\' +
-						\'var host=nav&&nav.parentNode?nav.parentNode.querySelector(".tab-content"):null;\' +
+						\'var host=tgt.closest?tgt.closest(".tab-content"):null;\' +
 						\'var pn=(host||document).querySelectorAll(".tab-pane");\' +
 						\'for(var j=0;j<pn.length;j++){pn[j].classList.remove("active","show");}\' +
 						\'tgt.classList.add("active","show");e.preventDefault();\' +
@@ -4437,6 +4447,99 @@ view: fcl_boxed_view(function()
 				},
 			});
 
+			// BS5 Alert. Two traits drive it: "Variant" maps to a single alert-<context> class and
+			// "Dismissible" toggles the alert-dismissible class together with the .btn-close
+			// button. Unlike the attribute-oriented fc-class-select default both act on classes /
+			// children, so they supply their own getValue() / setValue().
+			var FCL_ALERT_VARIANTS = [\'primary\', \'secondary\', \'success\', \'danger\', \'warning\', \'info\', \'light\', \'dark\'];
+			var FCL_ALERT_VARIANT_RE = /^alert-(primary|secondary|success|danger|warning|info|light|dark)$/;
+
+			function fcl_alertVariantOptions()
+			{
+				var out = [{ value: \'\', label: \'Default (no variant)\' }];
+				for (var i = 0; i < FCL_ALERT_VARIANTS.length; i++)
+				{
+					out.push({ value: \'alert-\' + FCL_ALERT_VARIANTS[i], label: FCL_ALERT_VARIANTS[i] });
+				}
+				return out;
+			}
+
+			function fcl_alertCloseBtn(comp)
+			{
+				var found = null;
+				var kids = (comp && comp.components) ? comp.components() : null;
+				if (kids && kids.forEach)
+				{
+					kids.forEach(function(c)
+					{
+						var a = (c.getAttributes ? c.getAttributes() : null) || {};
+						if (!found && a[\'data-bs-dismiss\'] === \'alert\') found = c;
+					});
+				}
+				return found;
+			}
+
+			function fcl_alertDismiss(comp, on)
+			{
+				var cls = (comp.getClasses ? (comp.getClasses() || []) : []);
+				var has = cls.indexOf(\'alert-dismissible\') >= 0;
+				var btn = fcl_alertCloseBtn(comp);
+				if (on)
+				{
+					if (!has) comp.addClass(\'alert-dismissible\');
+					if (!btn)
+					{
+						comp.append(\'<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>\');
+					}
+				}
+				else
+				{
+					if (has) comp.removeClass(\'alert-dismissible\');
+					if (btn) btn.remove();
+				}
+			}
+
+			editor.DomComponents.addType(\'fc-alert\', {
+				isComponent: function(el)
+				{
+					if (el && el.classList && el.classList.contains(\'alert\')) return { type: \'fc-alert\' };
+				},
+				model: {
+					defaults: {
+						tagName: \'div\',
+						droppable: true,
+						selectable: true,
+						attributes: { role: \'alert\' },
+						traits: [
+							{
+								type: \'fc-class-select\',
+								name: \'data-fc-alertvariant\',
+								label: \'Variant\',
+								options: fcl_alertVariantOptions(),
+								getValue: function(o) { return fcl_classMatch(o.component, FCL_ALERT_VARIANT_RE); },
+								setValue: function(o) { fcl_classReplace(o.component, FCL_ALERT_VARIANT_RE, o.value || \'\'); },
+							},
+							{
+								type: \'fc-class-select\',
+								name: \'data-fc-alertdismiss\',
+								label: \'Dismissible\',
+								options: [{ value: \'\', label: \'No\' }, { value: \'yes\', label: \'Yes\' }],
+								getValue: function(o)
+								{
+									var c = o && o.component;
+									var cl = (c && c.getClasses) ? (c.getClasses() || []) : [];
+									return cl.indexOf(\'alert-dismissible\') >= 0 ? \'yes\' : \'\';
+								},
+								setValue: function(o)
+								{
+									if (o && o.component) fcl_alertDismiss(o.component, o.value === \'yes\');
+								},
+							},
+						],
+					},
+				},
+			});
+
 			// Bootstrap tab panes are plain droppable containers. The canvas-only CSS above keeps
 			// every pane visible while editing, so components can be dropped into each one; the
 			// native BS behaviour (only the active pane visible) is restored on the front-end.
@@ -4541,6 +4644,246 @@ view: fcl_boxed_view(function()
 					},
 				},
 			});
+
+			// Keep each Tabs / Accordion instance self-contained. Both BS5 blocks ship fixed ids
+			// (#fcAccordion / #fcAcc1.., #fcTabs / #fcTab1..). GrapesJS de-duplicates the *id
+			// attributes* when a second instance is dropped (it appends "-2": #fcAccordion ->
+			// #fcAccordion-2) but it leaves the *references* untouched (data-bs-target /
+			// data-bs-parent, aria-controls / aria-labelledby, href="#..."), so the new instance
+			// keeps driving the first one. A group is therefore broken whenever one of its
+			// references resolves to an element that is NOT part of the group (or an id is
+			// duplicated). Broken groups get re-scoped positionally: ids and references are
+			// regenerated together, pairing the Nth toggle with the Nth panel. Healthy groups are
+			// left untouched. Runs on load (fixes already-saved layouts) and after a component is
+			// added (block drop, clone, paste).
+			var fcl_bsScopeSeq = 0;
+			var FCL_BS_REF_ATTRS = [\'data-bs-target\', \'data-bs-parent\', \'aria-controls\', \'aria-labelledby\', \'href\'];
+
+			function fcl_bsBase(prefix)
+			{
+				return prefix + (++fcl_bsScopeSeq) + \'_\' + Date.now().toString(36);
+			}
+
+			function fcl_directComps(comp)
+			{
+				var out = [];
+				var kk = (comp && comp.components) ? comp.components() : null;
+				if (kk && kk.forEach) kk.forEach(function(c) { out.push(c); });
+				return out;
+			}
+
+			function fcl_walkComps(comp, fn)
+			{
+				if (!comp) return;
+				fn(comp);
+				var kids = (typeof comp.components === \'function\') ? comp.components() : null;
+				if (kids && kids.forEach) kids.forEach(function(c) { fcl_walkComps(c, fn); });
+			}
+
+			function fcl_compClasses(comp)
+			{
+				return (comp && comp.getClasses) ? (comp.getClasses() || []) : [];
+			}
+
+			function fcl_hasTabToggle(comp)
+			{
+				var found = false;
+				fcl_walkComps(comp, function(c)
+				{
+					var a = (c.getAttributes ? c.getAttributes() : null) || {};
+					var t = a[\'data-bs-toggle\'];
+					if (t === \'tab\' || t === \'pill\' || t === \'list\') found = true;
+				});
+				return found;
+			}
+
+			function fcl_tabContentSibling(nav)
+			{
+				var parent = (nav && nav.parent) ? nav.parent() : null;
+				if (!parent) return null;
+				var models = (parent.components && parent.components().models) || [];
+				var idx = models.indexOf(nav);
+				if (idx < 0) return null;
+				for (var i = idx + 1; i < models.length; i++)
+				{
+					var cls = fcl_compClasses(models[i]);
+					if (cls.indexOf(\'tab-content\') >= 0) return models[i];
+					if (cls.indexOf(\'nav\') >= 0) break;
+				}
+				// Fallback: a tab-content placed before its nav list (still its own group).
+				for (var b = idx - 1; b >= 0; b--)
+				{
+					var cls2 = fcl_compClasses(models[b]);
+					if (cls2.indexOf(\'tab-content\') >= 0) return models[b];
+					if (cls2.indexOf(\'nav\') >= 0) break;
+				}
+				return null;
+			}
+
+			function fcl_bsGroups(root)
+			{
+				var groups = [];
+				fcl_walkComps(root, function(c)
+				{
+					var cls = fcl_compClasses(c);
+					if (cls.indexOf(\'accordion\') >= 0 || cls.indexOf(\'accordion-flush\') >= 0)
+					{
+						groups.push({ kind: \'accordion\', root: c });
+					}
+				});
+				fcl_walkComps(root, function(c)
+				{
+					var cls = fcl_compClasses(c);
+					if (cls.indexOf(\'nav\') < 0 || !fcl_hasTabToggle(c)) return;
+					var content = fcl_tabContentSibling(c);
+					if (content) groups.push({ kind: \'tabs\', nav: c, content: content });
+				});
+				return groups;
+			}
+
+			function fcl_groupComps(g)
+			{
+				var comps = [];
+				if (g.kind === \'accordion\')
+				{
+					fcl_walkComps(g.root, function(c) { comps.push(c); });
+				}
+				else
+				{
+					fcl_walkComps(g.nav, function(c) { comps.push(c); });
+					fcl_walkComps(g.content, function(c) { comps.push(c); });
+				}
+				return comps;
+			}
+
+			function fcl_contains(root, node)
+			{
+				if (!root || !node) return false;
+				if (root === node) return true;
+				var k = (typeof root.components === \'function\') ? root.components() : null;
+				var found = false;
+				if (k && k.forEach) k.forEach(function(c) { if (!found && fcl_contains(c, node)) found = true; });
+				return found;
+			}
+
+			// A group is broken when an id is duplicated, or when one of its references resolves
+			// to a component that exists but lives outside the group. Dangling references (target
+			// id absent from the tree, e.g. a plain external link) are ignored.
+			function fcl_groupBroken(g, idOwner, counts)
+			{
+				var comps = fcl_groupComps(g);
+				for (var i = 0; i < comps.length; i++)
+				{
+					var a = (comps[i].getAttributes ? comps[i].getAttributes() : null) || {};
+					if (a.id && counts[a.id] > 1) return true;
+					for (var k = 0; k < FCL_BS_REF_ATTRS.length; k++)
+					{
+						var v = a[FCL_BS_REF_ATTRS[k]];
+						if (typeof v !== \'string\' || !v) continue;
+						var t = v.charAt(0) === \'#\' ? v.slice(1) : v;
+						var owner = t ? idOwner[t] : null;
+						if (owner && comps.indexOf(owner) < 0) return true;
+					}
+				}
+				return false;
+			}
+
+			function fcl_scopeAccordion(root)
+			{
+				var base = fcl_bsBase(\'fcAcc\');
+				root.addAttributes({ id: base });
+				var btns = [], panes = [];
+				fcl_walkComps(root, function(c)
+				{
+					var cls = fcl_compClasses(c);
+					var a = (c.getAttributes ? c.getAttributes() : null) || {};
+					if (a[\'data-bs-toggle\'] === \'collapse\') btns.push(c);
+					if (cls.indexOf(\'accordion-collapse\') >= 0) panes.push(c);
+				});
+				var n = Math.max(btns.length, panes.length);
+				for (var i = 0; i < n; i++)
+				{
+					var paneId = base + \'-\' + (i + 1);
+					if (panes[i])
+					{
+						var pa = (panes[i].getAttributes ? panes[i].getAttributes() : null) || {};
+						var set = { id: paneId };
+						if (pa[\'data-bs-parent\']) set[\'data-bs-parent\'] = \'#\' + base;
+						panes[i].addAttributes(set);
+					}
+					if (btns[i]) btns[i].addAttributes({ \'data-bs-target\': \'#\' + paneId, \'aria-controls\': paneId });
+				}
+			}
+
+			function fcl_scopeTabs(nav, content)
+			{
+				var base = fcl_bsBase(\'fcTabs\');
+				nav.addAttributes({ id: base });
+				if (content) content.addAttributes({ id: base + \'-content\' });
+				var btns = [], panes = [];
+				fcl_walkComps(nav, function(c)
+				{
+					var a = (c.getAttributes ? c.getAttributes() : null) || {};
+					var t = a[\'data-bs-toggle\'];
+					if (t === \'tab\' || t === \'pill\' || t === \'list\') btns.push(c);
+				});
+				if (content)
+				{
+					fcl_directComps(content).forEach(function(c)
+					{
+						if (fcl_compClasses(c).indexOf(\'tab-pane\') >= 0) panes.push(c);
+					});
+					if (!panes.length)
+					{
+						fcl_walkComps(content, function(c) { if (fcl_compClasses(c).indexOf(\'tab-pane\') >= 0) panes.push(c); });
+					}
+				}
+				var n = Math.max(btns.length, panes.length);
+				for (var i = 0; i < n; i++)
+				{
+					var btnId = base + \'-tab-\' + (i + 1);
+					var paneId = base + \'-pane-\' + (i + 1);
+					if (btns[i]) btns[i].addAttributes({ id: btnId, \'data-bs-target\': \'#\' + paneId, \'aria-controls\': paneId });
+					if (panes[i]) panes[i].addAttributes({ id: paneId, \'aria-labelledby\': btnId });
+				}
+			}
+
+			function fcl_fixBsGroups()
+			{
+				var root = (editor.getWrapper ? editor.getWrapper() : null);
+				if (!root) return;
+				var idOwner = {}, counts = {};
+				fcl_walkComps(root, function(c)
+				{
+					var a = (c.getAttributes ? c.getAttributes() : null) || {};
+					if (!a.id) return;
+					counts[a.id] = (counts[a.id] || 0) + 1;
+					if (!idOwner[a.id]) idOwner[a.id] = c;
+				});
+				var groups = fcl_bsGroups(root);
+				for (var i = 0; i < groups.length; i++)
+				{
+					var g = groups[i];
+					if (!fcl_groupBroken(g, idOwner, counts)) continue;
+					if (g.kind === \'accordion\') fcl_scopeAccordion(g.root);
+					else fcl_scopeTabs(g.nav, g.content);
+				}
+			}
+
+			var fcl_bsUniqTimer = null;
+			function fcl_scheduleBsUniq()
+			{
+				if (fcl_bsUniqTimer) return;
+				fcl_bsUniqTimer = setTimeout(function()
+				{
+					fcl_bsUniqTimer = null;
+					try { fcl_fixBsGroups(); } catch (e) {}
+				}, 50);
+			}
+
+			editor.on(\'component:add\', fcl_scheduleBsUniq);
+			editor.on(\'block:drag:stop\', fcl_scheduleBsUniq);
+			editor.on(\'load\', fcl_scheduleBsUniq);
 
 			// Magnetic column resizer: snap the dragged width to the 12-col grid and hand the
 			// overflow to the next sibling column so the row always totals 12 (at the current
@@ -4767,6 +5110,15 @@ view: fcl_boxed_view(function()
 				activate: true,
 				attributes: { class: \'fa fa-square-o\' },
 				content: \'<a href="#" class="btn btn-outline-primary">Button</a>\',
+			});
+
+			editor.BlockManager.add(\'bs5-alert\', {
+				label: \'Alert\',
+				category: fcl_bs5,
+				select: true,
+				activate: true,
+				attributes: { class: \'fa fa-exclamation-triangle\' },
+				content: \'<div class="alert alert-info" role="alert"><span>A simple info alert, check it out!</span></div>\',
 			});
 
 			editor.BlockManager.add(\'bs5-accordion\', {

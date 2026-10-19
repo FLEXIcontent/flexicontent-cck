@@ -1477,6 +1477,8 @@ class flexicontent_html
 				$document->addScript($framework_path.'/js/grapesjs-custom-code.js?1.0.2');
 				$document->addScript($framework_path.'/js/grapesjs-touch.min.js?0.1.1');
 				$document->addScript($framework_path.'/js/grapesjs-tooltip.js?0.1.8');
+				// Icon picker (Iconify). Bundle = grapesjs-icons@0.0.4 + iconify-icon, exposes window['grapesjs-icons'].
+				$document->addScript($framework_path.'/js/grapesjs-icons.js?0.0.4');
 				//shapedivider module
 				//$document->addScript('https://unpkg.com/grapesjs-shape-divider');  
 				// BS4 blocks plugin dropped: the canvas now runs Bootstrap 5, BS5 blocks
@@ -6819,8 +6821,13 @@ class flexicontent_html
 		$html = preg_replace_callback('~\{flexi_field:([a-z0-9_-]+)\s*([^}]*)\}~i',
 			function($m) use ($item, $view)
 			{
-				// Prefer the already pre-rendered display, if any
-				if (isset($item->fields[$m[1]]))
+				// Prefer the already pre-rendered display, if any. The field object exists for
+				// every field of the item type, but ->display is filled only once the field has
+				// actually been rendered (e.g. it is assigned to a template position); a field
+				// placed solely in the builder layout is rendered on demand below. Skip array
+				// displays (field-group rendering) too, they cannot be cast to a string here.
+				if (isset($item->fields[$m[1]]) && isset($item->fields[$m[1]]->display)
+					&& is_scalar($item->fields[$m[1]]->display))
 				{
 					$display = trim((string) $item->fields[$m[1]]->display);
 					if ($display !== '') return $display;
@@ -6839,7 +6846,9 @@ class flexicontent_html
 				{
 					try
 					{
-						return trim((string) FlexicontentFields::getFieldDisplay($item, $m[1], null, 'display', $view));
+						$rendered = FlexicontentFields::getFieldDisplay($item, $m[1], null, 'display', $view);
+
+						return is_scalar($rendered) ? trim((string) $rendered) : '';
 					}
 					catch (\Throwable $e)
 					{
