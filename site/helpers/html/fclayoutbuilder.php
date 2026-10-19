@@ -698,6 +698,9 @@ abstract class JHtmlFclayoutbuilder
 		.gjs-block > .gjs-block-label > svg {
 			max-width: 54px;
 		}
+		.gjs-block > .gjs-block__media > svg {
+			max-width: 54px;
+		}
 
 
 		/**
@@ -1560,6 +1563,19 @@ noticeOnUnload: false,
 				},
 
 			});
+
+
+			// The "grapesjs-icons" plugin registers its "Icon" block without media, so it shows
+			// in the block panel as a bare label. Give it an inline SVG (the block view re-renders
+			// on a model change, so this is picked up even after init).
+			(function()
+			{
+				var fclIconBlk = editor.BlockManager.get(\'icon\');
+				if (fclIconBlk)
+				{
+					fclIconBlk.set(\'media\', \'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M4 4h6v6H4V4Zm10 0h6v6h-6V4ZM4 14h6v6H4v-6Zm10 0h6v6h-6v-6Z"/></svg>\');
+				}
+			})();
 
 
 			// On a device, GrapesJS writes the edits (drag AND StyleManager numeric) into the CSS rule
