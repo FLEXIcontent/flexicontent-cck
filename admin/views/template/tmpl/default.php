@@ -574,9 +574,11 @@ $this->document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flex
 								continue;
 							}
 
-							// Layout Builder: put the raw HTML / CSS fields into a collapsed accordion
-							// using a native <details> element (no JavaScript needed)
-							if ($is_builder && ($fieldname == 'builder_layout1_html' || $fieldname == 'builder_layout1_css') && !$builder_code_open)
+							// Layout Builder: put the raw HTML / CSS fields of each builder zone
+							// (item layout builder, page layout builder, ...) into a collapsed
+							// accordion using a native <details> element (no JavaScript needed)
+							$is_builder_code_field = ($is_builder && preg_match('/^builder_.*_(html|css)$/', $fieldname));
+							if ($is_builder_code_field && !$builder_code_open)
 							{
 								$builder_code_open = true;
 								echo '<style>.fc-builder-code-toggle{list-style:none;}'
@@ -602,7 +604,7 @@ $this->document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flex
 								) . '</div>';
 							echo '</div>';
 
-							if ($is_builder && $fieldname == 'builder_layout1_css')
+							if ($is_builder_code_field && $builder_code_open && substr($fieldname, -4) == '_css')
 							{
 								echo '</div></details>';
 								$builder_code_open = false;
