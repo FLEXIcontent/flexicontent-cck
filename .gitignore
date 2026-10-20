@@ -101,3 +101,8 @@ CHOICESJS_PROGRESS.md
 AGENTS.md
 flexi-lib.diff.txt
 Modelfile.qwen3-16k
+
+# Local GrapesJS builder debug harness (jsdom)
+.gtest.js
+.fcl_*.js
+.fcl_check.js

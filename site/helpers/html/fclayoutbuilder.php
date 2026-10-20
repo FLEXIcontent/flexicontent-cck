@@ -3448,6 +3448,23 @@ editor.on(\'load\', function()
 						});
 						select.appendChild(og);
 					});
+					// Preselect the current (possibly computed) value, so a computed/aliased
+					// target (shared attribute, custom getValue) is reflected on first render
+					// instead of defaulting to the first option.
+					try
+					{
+						var cur = (model && typeof model.getTargetValue === \'function\') ? model.getTargetValue() : null;
+						if (cur !== null && typeof cur !== \'undefined\')
+						{
+							var foundOpt = false;
+							for (var k = 0; k < select.options.length; k++)
+							{
+								if (String(select.options[k].value) === String(cur)) { foundOpt = true; break; }
+							}
+							if (foundOpt) select.value = String(cur);
+						}
+					}
+					catch (e) {}
 					return select;
 				},
 				fcSetup(m)
@@ -4323,7 +4340,9 @@ view: fcl_boxed_view(function()
 						var v = comp ? (comp.getAttributes()[\'data-fc-target\'] || \'\') : \'\';
 						return fcl_lienOwns(t.name, v) ? v : \'\';
 					},
-					// Selecting a value writes the shared attribute (and clears it on "Aucun").
+					// Selecting a value writes the single shared attribute (or clears it on
+					// "Aucun"). The three dropdowns keep distinct names only to avoid GrapesJS
+					// trait dedup; the stored value always lands on \'data-fc-target\'.
 					setValue: function(opts)
 					{
 						var self = opts.trait;
@@ -4331,17 +4350,6 @@ view: fcl_boxed_view(function()
 						var comp = self.target;
 						if (!comp) return;
 						comp.addAttributes({ \'data-fc-target\': (fcl_lienOwns(t.name, v) ? v : \'\') });
-						// Push the new shared value into the two other dropdowns right away
-						// (getTraits() may return an array or a Backbone collection).
-						var all = comp.getTraits ? comp.getTraits() : [];
-						var ts  = all && all.models ? all.models : (all || []);
-						for (var i = 0; i < ts.length; i++)
-						{
-							if (ts[i] !== self && String(ts[i].getName()).indexOf(\'data-fc-target\') === 0 && ts[i].getView && ts[i].getView())
-							{
-								ts[i].targetUpdated();
-							}
-						}
 					},
 				};
 			});
