@@ -516,6 +516,29 @@ class flexicontent_tmpl
 	}
 
 	/**
+	 * Core ("referenced") template folders shipped with FLEXIcontent. They are not
+	 * user-created: they cannot be deleted and are shown as locked in the template manager.
+	 * Single source of truth for the whole component.
+	 *
+	 * @return  array  List of core template (folder) names
+	 */
+	static function getCoreTemplates()
+	{
+		return array('grid', 'table', 'faq', 'items-tabbed', 'grapesjs');
+	}
+
+	/**
+	 * Check whether a template (folder) is a core / referenced template.
+	 *
+	 * @param   string  $name  Template (folder) name
+	 * @return  boolean
+	 */
+	static function isCoreTemplate($name)
+	{
+		return in_array($name, self::getCoreTemplates(), true);
+	}
+
+	/**
 	 * Method to get all available fields for a template in a view
 	 *
 	 * @access public

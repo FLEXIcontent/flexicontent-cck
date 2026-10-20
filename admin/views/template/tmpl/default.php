@@ -148,7 +148,7 @@ if (!$use_editor)  $app->enqueueMessage(\Joomla\CMS\Language\Text::_('Codemirror
 	}
 
 	var jformToken   = '<?php echo \Joomla\CMS\Session\Session::getFormToken();?>';
-	var isCoreLayout = <?php echo in_array($this->layout->name, array('grid','table','faq','items-tabbed')) ? 1: 0;?>
+	var isCoreLayout = <?php echo flexicontent_tmpl::isCoreTemplate($this->layout->name) ? 1: 0;?>
 </script>
 
 <?php

@@ -33,7 +33,7 @@ $loading_msg = flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI
 	}
 ');
 
-$basetemplates = array('grid','table','faq','items-tabbed');
+$basetemplates = flexicontent_tmpl::getCoreTemplates();
 $ctrl_task = FLEXI_J16GE ? 'task=templates.' : 'controller=templates&task=';
 $form_token = \Joomla\CMS\Session\Session::getFormToken();
 $js = "

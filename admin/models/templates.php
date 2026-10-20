@@ -114,7 +114,7 @@ class FlexicontentModelTemplates extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 
 		$path 	= JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS;
 
-		if (!$dir || ($dir === 'grid') || ($dir === 'table') || ($dir === 'faq') || ($dir === 'items-tabbed')) return false;
+		if (!$dir || flexicontent_tmpl::isCoreTemplate($dir)) return false;
 		if (!\Joomla\Filesystem\Folder::delete($path.$dir)) return false;
 
 		// delete old record
