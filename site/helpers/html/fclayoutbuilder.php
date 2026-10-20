@@ -407,11 +407,16 @@ abstract class JHtmlFclayoutbuilder
 			// Raw text / comment nodes are stored as plain strings
 			return (string) $comp;
 		}
+		if (!empty($comp['type']) && $comp['type'] === 'textnode')
+		{
+			// GrapesJS text nodes: plain text, never wrapped in a tag
+			return isset($comp['content']) ? (string) $comp['content'] : '';
+		}
 		$tag   = !empty($comp['tagName']) ? $comp['tagName'] : '';
 		if ($tag === '')
 		{
 			// Default tag of core GrapesJS component types (not stored in the project JSON)
-			$typeTags = array('image' => 'img', 'video' => 'iframe', 'map' => 'iframe', 'link' => 'a', 'text' => 'div');
+			$typeTags = array('image' => 'img', 'video' => 'iframe', 'map' => 'iframe', 'link' => 'a', 'fc-lien' => 'a', 'text' => 'div');
 			$tag      = isset($comp['type'], $typeTags[$comp['type']]) ? $typeTags[$comp['type']] : 'div';
 		}
 		$attrs = array();
@@ -933,7 +938,7 @@ abstract class JHtmlFclayoutbuilder
 			$fcl_lq = $fcl_ldb->getQuery(true)
 				->select(array('a.id', 'a.title'))
 				->from($fcl_ldb->quoteName('#__content', 'a'))
-				->innerJoin($fcl_ldb->quoteName('#__flexicontent_items', 'fi') . ' ON fi.item_id = a.id')
+				->innerJoin($fcl_ldb->quoteName('#__flexicontent_items_ext', 'fi') . ' ON fi.item_id = a.id')
 				->where($fcl_ldb->quoteName('a.state') . ' = 1')
 				->order('a.title ASC')
 				->setLimit(300);

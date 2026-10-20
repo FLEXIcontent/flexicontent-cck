@@ -6924,7 +6924,7 @@ class flexicontent_html
 
 				if ($type === 'file' && $id)
 				{
-					return \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getTaskRoute($id, 'download', 0, array('id' => $id)));
+					return \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getTaskRoute($id, 'download_file', 0, array('id' => $id)));
 				}
 
 				return '#';
