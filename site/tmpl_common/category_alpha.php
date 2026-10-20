@@ -35,9 +35,9 @@ if ($show_alpha == 1) {
 		}
 	}
 
-	$groups = explode("!!", $custom_lang_alpha_index);
-	$groupcssclasses = explode("!!", $this->params->get('alphagrpcssclasses'));
-	$alphaaliases = explode("!!", $this->params->get('alphaaliases'));
+	$groups = explode("!!", (string) $custom_lang_alpha_index);
+	$groupcssclasses = explode("!!", (string) $this->params->get('alphagrpcssclasses', ''));
+	$alphaaliases = explode("!!", (string) $this->params->get('alphaaliases', ''));
 }
 foreach ($alphaaliases as $alphaalias) {
 	$alias_data = explode("~", $alphaalias);
