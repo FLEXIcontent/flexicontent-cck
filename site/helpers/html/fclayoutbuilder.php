@@ -907,12 +907,23 @@ abstract class JHtmlFclayoutbuilder
 		);
 		$html .= '<script>window.fcl_builder_catels_' . $editor_sfx . ' = ' . json_encode($fcl_cat_options) . ';</script>';
 
-		// Options for the "Lien Flexicontent" block: ONE "Lien vers" picker listing the
-		// current content plus the Flexicontent categories, items and files. Same data
-		// sources as the JCE flexicontentlinks adapter (see site/librairies/JCE/links).
+		// Options for the three dropdowns of the "Lien Flexicontent" block. The dropdowns
+		// are bound to the SAME stored data-fc-target attribute: whichever dropdown matches
+		// the stored value shows it, the two others fall back to "Aucun". Same data sources
+		// as the JCE flexicontentlinks adapter (see site/librairies/JCE/links).
 		// Values are self-describing: 'current', 'cat:<id>', 'item:<id>', 'file:<id>'.
+		$fcl_none = function($group)
+		{
+			return array('value' => '', 'label' => '— Aucun —', 'group' => $group);
+		};
+
 		$fcl_link_opts = array(
-			array('value' => 'current', 'label' => 'Contenu courant', 'group' => 'Contenu courant'),
+			'cats'  => array($fcl_none('Catégories')),
+			'items' => array(
+				$fcl_none('Articles'),
+				array('value' => 'current', 'label' => 'Article courant (contenu de la boucle)', 'group' => 'Articles'),
+			),
+			'files' => array($fcl_none('Fichiers')),
 		);
 
 		try
@@ -931,7 +942,7 @@ abstract class JHtmlFclayoutbuilder
 
 			foreach ($fcl_ldb->loadObjectList() as $fcl_lc)
 			{
-				$fcl_link_opts[] = array('value' => 'cat:' . (int) $fcl_lc->id, 'label' => $fcl_lc->title, 'group' => 'Catégories');
+				$fcl_link_opts['cats'][] = array('value' => 'cat:' . (int) $fcl_lc->id, 'label' => $fcl_lc->title, 'group' => 'Catégories');
 			}
 
 			// Flexicontent items (inner join ensures only real FC items)
@@ -946,7 +957,7 @@ abstract class JHtmlFclayoutbuilder
 
 			foreach ($fcl_ldb->loadObjectList() as $fcl_li)
 			{
-				$fcl_link_opts[] = array('value' => 'item:' . (int) $fcl_li->id, 'label' => $fcl_li->title, 'group' => 'Articles');
+				$fcl_link_opts['items'][] = array('value' => 'item:' . (int) $fcl_li->id, 'label' => $fcl_li->title, 'group' => 'Articles');
 			}
 
 			// Files uploaded in the Flexicontent file manager
@@ -961,12 +972,12 @@ abstract class JHtmlFclayoutbuilder
 			foreach ($fcl_ldb->loadObjectList() as $fcl_lf)
 			{
 				$fcl_lfname = trim((string) $fcl_lf->altname) !== '' ? $fcl_lf->altname : $fcl_lf->filename;
-				$fcl_link_opts[] = array('value' => 'file:' . (int) $fcl_lf->id, 'label' => $fcl_lfname, 'group' => 'Fichiers');
+				$fcl_link_opts['files'][] = array('value' => 'file:' . (int) $fcl_lf->id, 'label' => $fcl_lfname, 'group' => 'Fichiers');
 			}
 		}
 		catch (\Throwable $e)
 		{
-			// Keep only the "current content" option so the block still works
+			// Keep the built-in options (Aucun / Article courant) so the block still works
 		}
 
 		$html .= '<script>window.fcl_builder_linkopts_' . $editor_sfx . ' = ' . json_encode($fcl_link_opts) . ';</script>';
@@ -2867,7 +2878,20 @@ editor.on(\'load\', function()
 			 */
 			var fcl_field_opts = window[\'fcl_builder_fields_\' + editor_sfx] || [];
 			var fcl_cat_opts   = window[\'fcl_builder_catels_\' + editor_sfx] || [];
-			var fcl_link_opts  = window[\'fcl_builder_linkopts_\' + editor_sfx] || [];
+			var fcl_link_opts  = window[\'fcl_builder_linkopts_\' + editor_sfx] || {};
+
+			// Option list of one of the three "Lien vers ..." dropdowns of the fc-lien
+			// block: { value, name (label), group } as expected by fc-field-select.
+			function fcl_lienOpts(list)
+			{
+				var out = [], i;
+				for (i = 0; i < (list || []).length; i++)
+				{
+					var o = list[i];
+					out.push({ value: o.value, name: o.label, group: o.group || \'Flexicontent\' });
+				}
+				return out;
+			}
 
 			// ---------------------------------------------------------------------
 			// Real-data preview: every fc-field block can show the actual rendered
@@ -4266,10 +4290,70 @@ view: fcl_boxed_view(function()
 			});
 
 			// Flexicontent link block: an editable <a class="btn"> whose target is chosen
-			// with a single "Lien vers" picker (Contenu courant / Catégories / Articles /
-			// Fichiers). No custom view: the default one keeps the inner text editable.
+			// with THREE dropdowns bound to the SAME stored data-fc-target attribute:
+			//   - Lien vers une catégorie
+			//   - Lien vers un article (first option = the current content, i.e. the
+			//     article of the loop on a category page)
+			//   - Lien vers un fichier
+			// GrapesJS dedupes traits that share a name, so the three carry DISTINCT names
+			// (data-fc-target, data-fc-target2, data-fc-target3) and bridge to the single
+			// shared attribute through setValue/getValue. Every dropdown re-syncs when
+			// data-fc-target changes, hence only one target is active at a time ("Aucun"
+			// resets it). No custom view: the default one keeps the inner text editable.
 			// At save time the value becomes an href placeholder {flexi_lien:<value>}
 			// resolved at run time by JHtmlFlexicontent::renderBuilderLayout.
+			var fcl_lienTraits = [
+				{ name: \'data-fc-target\',  label: \'Lien vers une catégorie\', opts: fcl_link_opts.cats },
+				{ name: \'data-fc-target2\', label: \'Lien vers un article\',    opts: fcl_link_opts.items },
+				{ name: \'data-fc-target3\', label: \'Lien vers un fichier\',    opts: fcl_link_opts.files },
+			];
+			var fcl_lienTraitDefs = fcl_lienTraits.map(function(t)
+			{
+				return {
+					type: \'fc-field-select\',
+					name: t.name,
+					label: t.label,
+					default: \'\',
+					options: fcl_lienOpts(t.opts),
+					// Read the single shared attribute, return this dropdown\'s own option
+					// only when it belongs to it, else "" (=> "Aucun").
+					getValue: function(o)
+					{
+						var comp = (o && o.component) || (this && this.target);
+						var v = comp ? (comp.getAttributes()[\'data-fc-target\'] || \'\') : \'\';
+						return fcl_lienOwns(t.name, v) ? v : \'\';
+					},
+					// Selecting a value writes the shared attribute (and clears it on "Aucun").
+					setValue: function(opts)
+					{
+						var self = opts.trait;
+						var v = opts.value;
+						var comp = self.target;
+						if (!comp) return;
+						comp.addAttributes({ \'data-fc-target\': (fcl_lienOwns(t.name, v) ? v : \'\') });
+						// Push the new shared value into the two other dropdowns right away
+						// (getTraits() may return an array or a Backbone collection).
+						var all = comp.getTraits ? comp.getTraits() : [];
+						var ts  = all && all.models ? all.models : (all || []);
+						for (var i = 0; i < ts.length; i++)
+						{
+							if (ts[i] !== self && String(ts[i].getName()).indexOf(\'data-fc-target\') === 0 && ts[i].getView && ts[i].getView())
+							{
+								ts[i].targetUpdated();
+							}
+						}
+					},
+				};
+			});
+			// A dropdown "owns" a target value when the value maps to one of its options.
+			function fcl_lienOwns(name, value)
+			{
+				var t = fcl_lienTraits.filter(function(x) { return x.name === name; })[0];
+				if (!t || !value) return false;
+				var list = t.opts || [];
+				for (var i = 0; i < list.length; i++) if (list[i].value === value) return true;
+				return false;
+			}
 			editor.DomComponents.addType(\'fc-lien\', {
 				isComponent: function(el)
 				{
@@ -4281,12 +4365,7 @@ view: fcl_boxed_view(function()
 						name: \'Flexicontent Link\',
 						classes: [\'btn\'],
 						attributes: { \'data-fc-target\': \'current\' },
-						traits: [{
-							type: \'fc-field-select\',
-							name: \'data-fc-target\',
-							label: \'Lien vers\',
-							options: fcl_link_opts.map(function(o) { return { value: o.value, name: o.label, group: o.group }; }),
-						}],
+						traits: fcl_lienTraitDefs,
 					},
 				},
 			});
