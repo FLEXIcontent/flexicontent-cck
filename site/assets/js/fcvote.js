@@ -10,9 +10,19 @@
 (function() {
 	'use strict';
 
-	// Joomla Root and Base URL (set via addScriptDeclaration in html.php)
-	window.root_url = window.jroot_url_fc || '';
-	window.base_url = window.jbase_url_fc || '';
+	// Joomla Root and Base URL (set via addScriptDeclaration in html.php).
+	// Resolved at call time: this file is loaded before that inline declaration runs,
+	// so reading them here would give '' and produce a relative (SEF-path) AJAX URL.
+	function fcvote_base_url() {
+		if (window.jbase_url_fc) return window.jbase_url_fc;
+		var p = (typeof Joomla !== 'undefined' && Joomla.getOptions) ? Joomla.getOptions('system.paths') : null;
+		return (p && p.baseFull) ? p.baseFull : document.baseURI;
+	}
+	function fcvote_root_url() {
+		if (window.jroot_url_fc) return window.jroot_url_fc;
+		var p = (typeof Joomla !== 'undefined' && Joomla.getOptions) ? Joomla.getOptions('system.paths') : null;
+		return (p && p.rootFull) ? p.rootFull : document.baseURI;
+	}
 
 	var under_vote = false;
 
@@ -99,7 +109,7 @@
 		under_vote = true;
 
 		var fcvote = link.closest('.fcvote');
-		var voting_group = fcvote ? fcvote.closest('.voting-group, .fieldname-group') : null;
+		var voting_group = fcvote ? fcvote.closest('.voting-group') : null;
 		if (voting_group) voting_group.style.opacity = '0.5';
 
 		var vote_list = link.closest('.fcvote_list');
@@ -112,20 +122,22 @@
 		var xid = (typeof data_arr[1] !== 'undefined' && data_arr[1]) ? data_arr[1] : 'main';
 
 		var xid_msg = fcvote ? fcvote.querySelector('.fcvote_message') : null;
-		var main_msg = voting_group ? (voting_group.querySelector('.fieldname-row_main .fcvote_message') || xid_msg) : xid_msg;
+		var main_msg = voting_group ? (voting_group.querySelector('.voting-row_main .fcvote_message') || xid_msg) : xid_msg;
 
 		var xid_cnt = fcvote ? fcvote.querySelector('.fcvote-count') : null;
-		var main_cnt = voting_group ? (voting_group.querySelector('.fieldname-row_main .fcvote-count') || null) : null;
+		var main_cnt = voting_group ? (voting_group.querySelector('.voting-row_main .fcvote-count') || null) : null;
 
 		var xid_rating = vote_list ? vote_list.querySelector('.current-rating') : null;
 		var main_rating = null;
 		if (voting_group) {
-			var main_row = voting_group.querySelector('.fieldname-row_main');
+			var main_row = voting_group.querySelector('.voting-row_main');
 			if (main_row) {
 				var main_vote_list = main_row.querySelector('.fcvote_list');
 				if (main_vote_list) main_rating = main_vote_list.querySelector('.current-rating');
 			}
 		}
+		// Voting the 'main' characteristic without a surrounding group: the list itself is the main one
+		if (!main_rating && xid === 'main') main_rating = xid_rating;
 
 		var _htmlrating = xid_cnt ? xid_cnt.innerHTML : '';
 		var _htmlrating_main = main_cnt ? main_cnt.innerHTML : '';
@@ -133,7 +145,7 @@
 		var rating = link.textContent;
 
 		var fc_csrf_token = (typeof Joomla !== 'undefined' && Joomla.getOptions) ? (Joomla.getOptions('csrf.token') || '') : '';
-		var voteurl = base_url
+		var voteurl = fcvote_base_url()
 			+ 'index.php?option=com_flexicontent&task=reviews.ajaxvote&user_rating=' + rating + '&cid=' + itemID + '&xid=' + xid
 			+ (fc_csrf_token ? '&' + fc_csrf_token + '=1' : '');
 
@@ -217,7 +229,7 @@
 	 * ================================================================ */
 
 	function fcvote_open_review_form(tagid, content_id, review_type) {
-		var url = base_url
+		var url = fcvote_base_url()
 			+ 'index.php?option=com_flexicontent&task=getreviewform&format=raw&tagid=' + tagid
 			+ '&content_id=' + content_id + '&review_type=' + review_type
 			+ '&lang=' + (typeof window.fc_sef_lang !== 'undefined' ? window.fc_sef_lang : '');
@@ -273,7 +285,7 @@
 			}
 		}
 
-		var url = root_url
+		var url = fcvote_root_url()
 			+ 'index.php?option=com_flexicontent&format=raw&task=storereviewform';
 
 		if (box_loading && !in_modal) {

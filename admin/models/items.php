@@ -1302,12 +1302,21 @@ class FlexicontentModelItems extends FCModelAdminList
 
 		if ($filter_fileid)
 		{
-			$fileid_to_itemids = $session->get('fileid_to_itemids', array(),'flexicontent');
-			$itemids =  $fileid_to_itemids[$filter_fileid];
+			// Items using the file via file-id storing fields (File, MediaFile), found directly in the DB,
+			// so it does not depend on data that the file manager may (or may not) have stored in the session.
+			// Field ids are looked up first, so that only the (few) rows of these fields are searched for the value
+			$file_field_ids = $this->_db->setQuery(
+				'SELECT id FROM #__flexicontent_fields WHERE field_type IN (' . $this->_db->Quote('file') . ', ' . $this->_db->Quote('mediafile') . ')'
+			)->loadColumn();
+			$file_field_ids = ArrayHelper::toInteger($file_field_ids);
 
-			return empty($itemids)
+			return empty($file_field_ids)
 				? ' WHERE 0 '
-				: ' WHERE a.id IN ('. implode(',', $itemids) .') ';
+				: ' WHERE a.id IN ('
+					. 'SELECT rel.item_id FROM #__flexicontent_fields_item_relations AS rel'
+					. ' WHERE rel.field_id IN (' . implode(',', $file_field_ids) . ')'
+					. ' AND rel.value = ' . $this->_db->Quote((string) (int) $filter_fileid)
+				. ') ';
 		}
 
 
@@ -1541,7 +1550,16 @@ class FlexicontentModelItems extends FCModelAdminList
 		if (!empty($filter_tag))
 		{
 			$filter_tag = ArrayHelper::toInteger($filter_tag);
-			$where[] = 'tg.tid IN (' . implode( ',', $filter_tag) .')';
+
+			// Special value -1: items without tags (no row in the tags relations table), can be combined with tags
+			$no_tags = in_array(-1, $filter_tag, true);
+			$filter_tag = array_filter($filter_tag, function ($tid) { return $tid > 0; });
+
+			$tag_where = array();
+			if ($no_tags) $tag_where[] = 'tg.tid IS NULL';
+			if (count($filter_tag)) $tag_where[] = 'tg.tid IN (' . implode( ',', $filter_tag) .')';
+
+			if (count($tag_where)) $where[] = '(' . implode(' OR ', $tag_where) . ')';
 		}
 
 		if (!empty($filter_type))

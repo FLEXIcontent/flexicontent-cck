@@ -4874,7 +4874,7 @@ class flexicontent_html
 	 * @return array
 	 * @since 1.5
 	 */
-	static function buildtagsselect($name, $attribs, $selected, $displaytype=1, $tagid=null)
+	static function buildtagsselect($name, $attribs, $selected, $displaytype=1, $tagid=null, $extra_options=array())
 	{
 		$db =Factory::getContainer()->get(DatabaseInterface::class);
 		$query = 'SELECT id, name'
@@ -4889,6 +4889,10 @@ class flexicontent_html
 			$options[] = \Joomla\CMS\HTML\HTMLHelper::_( 'select.option', '', $displaytype);
 		else if ($displaytype)
 			$options[] = \Joomla\CMS\HTML\HTMLHelper::_( 'select.option', '', \Joomla\CMS\Language\Text::_( 'FLEXI_SELECT_TAG' ));
+
+		// Optional special entries listed before the tags, array(value => text)
+		foreach ($extra_options as $extra_value => $extra_text)
+			$options[] = \Joomla\CMS\HTML\HTMLHelper::_( 'select.option', $extra_value, $extra_text);
 
 		foreach ($data as $val)
 			$options[] = \Joomla\CMS\HTML\HTMLHelper::_( 'select.option', $val->id, $val->name);

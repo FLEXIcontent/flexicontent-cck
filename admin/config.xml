@@ -2164,6 +2164,16 @@
 				<option value="1">FLEXI_SHOW</option>
 			</field>
 
+			<field name="backend_filters_style" type="fcradio" default="1" label="FLEXI_BACKEND_FILTERS_STYLE" description="FLEXI_BACKEND_FILTERS_STYLE_DESC" class="btn-group group-fcmethod">
+				<option value="0">FLEXI_BACKEND_FILTERS_CLASSIC</option>
+				<option value="1">FLEXI_BACKEND_FILTERS_MODERN</option>
+			</field>
+
+			<field name="backend_filters_apply" type="fcradio" default="1" label="FLEXI_BACKEND_FILTERS_APPLY" description="FLEXI_BACKEND_FILTERS_APPLY_DESC" class="btn-group group-fcmethod">
+				<option value="0">FLEXI_BACKEND_FILTERS_APPLY_INSTANT</option>
+				<option value="1">FLEXI_BACKEND_FILTERS_APPLY_BUTTON</option>
+			</field>
+
 			<field name="iman_skip_cols" type="fccheckbox" default=""
 				checkoptions="FLEXI_SINGLE_TYPE,FLEXI_LANGUAGE,FLEXI_ASSOCIATIONS,FLEXI_CATEGORIES,FLEXI_TAGS,FLEXI_TEMPLATE,FLEXI_ACCESS,FLEXI_AUTHOR,FLEXI_CREATED,FLEXI_REVISED,JGLOBAL_HITS,JGLOBAL_VOTES,JGLOBAL_RATINGS,FLEXI_ID"
 				checkvals="single_type,lang,assocs,cats,tags,template,access,author,created,modified,hits,votes,ratings,id" defaultvals="single_type"
