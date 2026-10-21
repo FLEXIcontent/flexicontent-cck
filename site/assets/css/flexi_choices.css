@@ -154,22 +154,37 @@ html[dir="rtl"] .choices .choices__inner {
 }
 
 .choices .choices__list--multiple .choices__button {
-	background-image: url('../images/select2.png') !important;
-	background-position: right -22px !important;
+	/* Inline SVG icon (same as the admin theme) instead of the select2 sprite:
+	   the sprite was painted outside of the button box, and the box itself was
+	   4x0 px, so a selected value could not be unchecked */
+	background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3E%3Cpath fill='%236b6b6b' d='M1.4 0L0 1.4l2.6 2.6L0 6.6 1.4 8 4 5.4 6.6 8 8 6.6 5.4 4 8 1.4 6.6 0 4 2.6z'/%3E%3C/svg%3E") !important;
+	background-position: center !important;
 	background-repeat: no-repeat !important;
+	background-size: 8px 8px !important;
 	text-indent: 0 !important;
-	padding: 0 2px 0 2px !important;
-	margin: -1px 0 0 0 !important;
+	padding: 0 !important;
+	margin: -1px 0 0 2px !important;
 	font-size: 0 !important;
-	width: auto !important;
-	height: auto !important;
+	width: 12px !important;
+	height: 12px !important;
+	min-width: 12px !important;
+	min-height: 12px !important;
+	vertical-align: middle !important;
+	cursor: pointer !important;
 	border: 0 !important;
 	background-color: transparent !important;
 	color: #999 !important;
+	opacity: 0.8 !important;
 }
 
 .choices .choices__list--multiple .choices__button:hover {
 	color: #666 !important;
+	opacity: 1 !important;
+}
+
+/* The placeholder is rendered as an item, but it must not be removable */
+.choices .choices__list--multiple .choices__item[data-value=""] .choices__button {
+	display: none !important;
 }
 
 /* Search field in multi-select */
@@ -553,6 +568,10 @@ html[dir="rtl"] .choices .choices__button {
 	margin-right: 2px !important;
 }
 
+html[dir="rtl"] .choices .choices__list--multiple .choices__button {
+	margin: -1px 2px 0 0 !important;
+}
+
 html[dir="rtl"] .fc_has_inner_label_choices,
 html[dir="rtl"] .fc_has_inner_prompt_choices {
 	right: 0;
@@ -594,7 +613,7 @@ html[dir="rtl"] .fc_has_inner_prompt_choices {
 }
 
 [data-bs-theme="dark"] .choices .choices__list--multiple .choices__button {
-	background-image: none !important;
+	background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3E%3Cpath fill='%23dee1e6' d='M1.4 0L0 1.4l2.6 2.6L0 6.6 1.4 8 4 5.4 6.6 8 8 6.6 5.4 4 8 1.4 6.6 0 4 2.6z'/%3E%3C/svg%3E") !important;
 	color: var(--text-muted, #999) !important;
 }
 

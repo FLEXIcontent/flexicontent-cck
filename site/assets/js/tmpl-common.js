@@ -80,6 +80,44 @@
 	}
 
 
+	// Check whether the form holds at least one usable (non default, non empty) filter value
+	function fcHasFilterValue(form)
+	{
+		if (!form || !form.elements) return false;
+
+		for (var i=0; i<form.elements.length; i++)
+		{
+			var element = form.elements[i];
+			if (typeof element.name === "undefined" || element.name === null || !element.name) continue;
+			if (!element.name.match(/^(filter.*|cids|letter|clayout|limit|orderby|orderby_2nd|listall|q|searchword|p|searchphrase|areas\[\]|contenttypes\[\]|txtflds|o|ordering)$/)) continue;
+
+			if ( element.type=='radio' || element.type=='checkbox' )
+			{
+				if ( !element.checked ) continue;
+				if ( element.getAttribute('data-is-default-value') == '1' ) continue;
+				if ( element.value != '' ) return true;
+			}
+			else if ( element.type=='select-multiple' )
+			{
+				for (var p=0; p < element.options.length; p++)
+					if ( element.options[p].selected && element.options[p].value !== '' ) return true;
+			}
+			else if ( element.type=='select-one' )
+			{
+				var selected_opt = element.options[element.selectedIndex];
+				if ( selected_opt && selected_opt.getAttribute('data-is-default-value') ) continue;
+				if ( element.value != '' ) return true;
+			}
+			else if ( element.value != '' )
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+
 	function adminFormPrepare(form, postprep, task)
 	{
 		var extra_action = '';
@@ -103,7 +141,10 @@
 			if (element.name=='filter_order_Dir' && element.value=='ASC') continue;
 
 			var matches = element.name.match(/^(filter.*|cids|letter|clayout|limit|orderby|orderby_2nd|listall|q|searchword|p|searchphrase|areas\[\]|contenttypes\[\]|txtflds|o|ordering)$/);
-			if (!matches || element.value == '') continue;
+			if (!matches) continue;
+			// A multiple select has no single value: its selection is handled below.
+			// An empty select.value only means that its placeholder option is still selected.
+			if (element.type != 'select-multiple' && element.value == '') continue;
 
 			if ( (element.type=='radio' || element.type=='checkbox') )
 			{
@@ -129,6 +170,8 @@
 				for (var p=0; p < element.length; p++)
 				{
 					if ( ! element.options[p].selected ) continue;
+					// The empty option is the placeholder, it must not be sent as a filter value
+					if ( element.options[p].value === '' ) continue;
 					extra_action += var_sep + element.name.replace("[]","") + '[' + ']=' + encodeURIComponent(element.options[p].value);
 					var_sep = '&';
 				}
@@ -163,7 +206,9 @@
 			if (postprep==2)
 			{
 				var fc_filter_form_blocker = document.getElementById("fc_filter_form_blocker");
-				if (extra_action === '' && !!!task)
+				// Never navigate to the unfiltered url while a filter value is set,
+				// the filter would be silently dropped
+				if (extra_action === '' && !!!task && !fcHasFilterValue(form))
 					window.location.href = fcform_action;
 				else
 					form.submit( task );

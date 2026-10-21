@@ -1692,10 +1692,14 @@
 
 	function fc_attachChoices(sbox, s2_elems)
 	{
-		for (var n = 0; n < s2_elems.length; n++)
-		{
-			var el = s2_elems[n];
+		for (var n = 0; n < s2_elems.length; n++) fc_initChoicesFor(sbox, s2_elems[n]);
 
+		// Per-element scope: 'var' declared inside a loop is function-scoped, so every variable
+		// captured by a deferred callback (el, choicesInstance, containers, observers, timers)
+		// was shared between all iterations and always resolved to the LAST processed <select>.
+		// A dedicated function gives each <select> its own scope.
+		function fc_initChoicesFor(sbox, el)
+		{
 			var isMultiple = el.hasAttribute('multiple');
 			var isRemoteSearch = isMultiple && !!el.getAttribute('data-fc_choices_search_remote');
 			var isNoSelect = el.classList.contains('fc_select2_noselect') && !isRemoteSearch;
@@ -1916,14 +1920,20 @@
 				sbox.addEventListener('click', function(e) {
 					var item = e.target && e.target.closest ? e.target.closest('.fc-choices-checkbox-item') : null;
 					if (!item) return;
+					// Only handle clicks that belong to THIS select's own Choices widget
+					if (choicesInstance.containerOuter && choicesInstance.containerOuter.element
+						&& !choicesInstance.containerOuter.element.contains(item)) return;
 					var checkbox = item.querySelector('.fc-choices-checkbox');
 					if (!checkbox) return;
 					var value = checkbox.getAttribute('data-value');
+					if (value === '' || value === null) return;
 					var isChecked = checkbox.checked;
 					var vals = fcGetSelectValues(el);
 					if (vals === null || vals === undefined) vals = [];
 					if (!Array.isArray(vals)) vals = (String(vals) === '' ? [] : [vals]);
 					vals = vals.map(function(v){ return String(v); });
+					// The empty value is the placeholder, it must never stay selected
+					vals = vals.filter(function(v){ return v !== ''; });
 					if (isChecked && vals.indexOf(value) === -1) vals.push(value);
 					else if (!isChecked) vals = vals.filter(function(v) { return v !== value; });
 					// Update the underlying select (form submission + external listeners)
@@ -1935,6 +1945,27 @@
 					// Keep dropdown open
 					el._fc_keep_open = true;
 					setTimeout(function() { el._fc_keep_open = false; }, 100);
+				});
+
+				// Handle clicks on the remove button of an already selected item (multiple selects):
+				// uncheck the value and let the filter be recomputed
+				sbox.addEventListener('click', function(e) {
+					var rmBtn = e.target && e.target.closest ? e.target.closest('.choices__button') : null;
+					if (!rmBtn || !isMultiple) return;
+					var rmItem = rmBtn.closest('[data-item]');
+					var rmValue = rmItem ? rmItem.getAttribute('data-value') : null;
+					if (rmValue === null || rmValue === '') return;
+					if (choicesInstance.containerOuter && choicesInstance.containerOuter.element
+						&& !choicesInstance.containerOuter.element.contains(rmItem)) return;
+					var rmVals = fcGetSelectValues(el);
+					if (rmVals === null || rmVals === undefined) rmVals = [];
+					if (!Array.isArray(rmVals)) rmVals = (String(rmVals) === '' ? [] : [rmVals]);
+					rmVals = rmVals.map(function(v){ return String(v); });
+					rmVals = rmVals.filter(function(v){ return v !== '' && v !== rmValue; });
+					fcSetSelectValues(el, rmVals);
+					// Remove the choice from the Choices.js widget as well
+					if (choicesInstance.removeChoice) choicesInstance.removeChoice(rmValue);
+					el.dispatchEvent(new Event('change', { bubbles: true }));
 				});
 			}
 
@@ -2033,7 +2064,11 @@
 	{
 		vals = Array.isArray(vals) ? vals : [vals];
 		for (var i = 0; i < sel.options.length; i++) {
-			sel.options[i].selected = vals.indexOf(sel.options[i].value) !== -1;
+			var v = sel.options[i].value;
+			// On a multiple select the empty option is the placeholder: keeping it selected
+			// makes select.value empty, which hides the filter from the form processing
+			if (sel.multiple && v === '') { sel.options[i].selected = false; continue; }
+			sel.options[i].selected = vals.indexOf(v) !== -1;
 		}
 	}
 
