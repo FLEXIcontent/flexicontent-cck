@@ -1737,6 +1737,29 @@
 				},
 				callbackOnCreateTemplates: function(template) {
 					var customTemplates = {};
+					// Already selected values are listed by Choices.js while searching, hide them and make them non-navigable
+					if (isMultiple && !isCheckbox && el.classList.contains('fc_choices_keep_search')) {
+						customTemplates.choice = function(config, data) {
+							var tpl = document.createElement('div');
+							tpl.classList.add('choices__item', 'choices__item--choice');
+							tpl.dataset.choice = '';
+							tpl.dataset.id = data.id;
+							tpl.dataset.value = data.value;
+							tpl.setAttribute('role', 'option');
+							if (data.elementId) tpl.id = data.elementId;
+							if (data.selected || data.disabled) {
+								tpl.classList.add('is-disabled');
+								tpl.dataset.choiceDisabled = '';
+								tpl.setAttribute('aria-disabled', 'true');
+								if (data.selected) tpl.style.display = 'none';
+							} else {
+								tpl.classList.add('choices__item--selectable');
+								tpl.dataset.choiceSelectable = '';
+							}
+							tpl.textContent = data.label;
+							return tpl;
+						};
+					}
 					if (isCheckbox) {
 						customTemplates.choice = function(config, data) {
 							var tpl = document.createElement('div');
@@ -1897,6 +1920,22 @@
 				}
 			}
 
+			// Keep the search text after picking a value (Choices.js clears it), to allow picking several values of the same search
+			if (isMultiple && !isCheckbox && el.classList.contains('fc_choices_keep_search')) {
+				var kInpEl = choicesInstance.input && choicesInstance.input.element;
+				var kTerm = '';
+				if (kInpEl) kInpEl.addEventListener('input', function() { kTerm = kInpEl.value; });
+				el.addEventListener('hideDropdown', function() { kTerm = ''; });
+				el.addEventListener('addItem', function() {
+					var term = kTerm;
+					if (!term || !kInpEl) return;
+					setTimeout(function() {
+						kInpEl.value = term;
+						kInpEl.dispatchEvent(new Event('input', { bubbles: true }));
+					}, 0);
+				});
+			}
+
 			// Checkbox mode: keep dropdown open, toggle values on click
 			if (isCheckbox) {
 				var dropdownEl = choicesInstance.dropdown && choicesInstance.dropdown.element;
@@ -1915,6 +1954,48 @@
 					});
 					observer.observe(dropdownEl, { attributes: true, attributeFilter: ['class'] });
 				}
+
+				// Choices.js clears the search text when a choice is selected, remember it and restore it after our sync
+				// (arrow keys also clear the input text while the filter stays applied, so track what the user typed)
+				var fcSearchTerm = '';
+				var fcTypedTerm = '';
+				var fcInpEl = choicesInstance.input && choicesInstance.input.element;
+				if (fcInpEl) fcInpEl.addEventListener('input', function() { fcTypedTerm = fcInpEl.value; });
+				el.addEventListener('hideDropdown', function() { fcTypedTerm = ''; });
+				function fcRememberSearch() {
+					fcSearchTerm = fcTypedTerm;
+				}
+				function fcRestoreSearch(hlValue) {
+					var term = fcSearchTerm;
+					fcSearchTerm = '';
+					var inpEl = choicesInstance.input && choicesInstance.input.element;
+					setTimeout(function() {
+						if (term && inpEl) {
+							inpEl.value = term;
+							inpEl.dispatchEvent(new Event('input', { bubbles: true }));
+						}
+						// Keyboard: keep the highlight on the choice that was just toggled, so arrows continue from there
+						if (hlValue !== undefined) {
+							var outerEl = choicesInstance.containerOuter && choicesInstance.containerOuter.element;
+							var items = outerEl ? outerEl.querySelectorAll('.fc-choices-checkbox-item') : [];
+							for (var h = 0; h < items.length; h++) {
+								var isIt = items[h].dataset.value === hlValue;
+								items[h].classList.toggle('is-highlighted', isIt);
+								if (isIt && items[h].scrollIntoView) items[h].scrollIntoView({ block: 'nearest' });
+							}
+						}
+					}, 0);
+				}
+				sbox.addEventListener('mousedown', function(e) {
+					var it = e.target && e.target.closest ? e.target.closest('.fc-choices-checkbox-item') : null;
+					if (it && choicesInstance.containerOuter && choicesInstance.containerOuter.element
+						&& choicesInstance.containerOuter.element.contains(it)) {
+						// Choices.js selects the choice on mousedown and re-renders the list (the click target is then detached),
+						// so restore the search text right after its handler ran
+						fcRememberSearch();
+						fcRestoreSearch();
+					}
+				}, true);
 
 				// Handle checkbox clicks (event delegation on the container)
 				sbox.addEventListener('click', function(e) {
@@ -1945,7 +2026,37 @@
 					// Keep dropdown open
 					el._fc_keep_open = true;
 					setTimeout(function() { el._fc_keep_open = false; }, 100);
+					fcRestoreSearch();
 				});
+
+				// Keyboard: Enter on the highlighted choice. Choices.js only adds the item (it never removes an already selected one)
+				// and does not know about our checkbox markup, so toggle the value and sync the widget like the click handler above
+				sbox.addEventListener('keydown', function(e) {
+					if (e.key !== 'Enter') return;
+					var outer = choicesInstance.containerOuter && choicesInstance.containerOuter.element;
+					if (!outer || !outer.contains(e.target) || !choicesInstance.dropdown || !choicesInstance.dropdown.isActive) return;
+					var hlItem = outer.querySelector('.fc-choices-checkbox-item.is-highlighted');
+					if (!hlItem) return;
+					var hlValue = hlItem.dataset.value;
+					if (hlValue === '' || hlValue === undefined || hlValue === null) return;
+					var wasSelected = hlItem.classList.contains('is-selected');
+					el._fc_keep_open = true;
+					fcRememberSearch();
+					setTimeout(function() {
+						var kvals = fcGetSelectValues(el);
+						if (kvals === null || kvals === undefined) kvals = [];
+						if (!Array.isArray(kvals)) kvals = (String(kvals) === '' ? [] : [kvals]);
+						kvals = kvals.map(function(v){ return String(v); }).filter(function(v){ return v !== ''; });
+						if (wasSelected) kvals = kvals.filter(function(v){ return v !== hlValue; });
+						else if (kvals.indexOf(hlValue) === -1) kvals.push(hlValue);
+						fcSetSelectValues(el, kvals);
+						el.dispatchEvent(new Event('change', { bubbles: true }));
+						if (choicesInstance.removeActiveItems) choicesInstance.removeActiveItems();
+						if (choicesInstance.setChoiceByValue) choicesInstance.setChoiceByValue(kvals);
+						setTimeout(function() { el._fc_keep_open = false; }, 100);
+						fcRestoreSearch(hlValue);
+					}, 0);
+				}, true);
 
 				// Handle clicks on the remove button of an already selected item (multiple selects):
 				// uncheck the value and let the filter be recomputed

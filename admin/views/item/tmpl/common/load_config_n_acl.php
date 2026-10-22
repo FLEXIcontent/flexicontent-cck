@@ -230,7 +230,8 @@ if ($tags_editable || (!$isSite && $this->perms['canversion']))
 					var el = jQuery(event.target);
 					if (el.val()=='') return false; // No tag to assign / create
 
-					var selection_isactive = jQuery('.ui-autocomplete .ui-state-focus').length != 0;
+					// jQuery UI marks the focused menu item with class ui-state-focus (older versions) or ui-state-active (newer)
+					var selection_isactive = jQuery('.ui-autocomplete:visible .ui-state-focus, .ui-autocomplete:visible .ui-state-active').length != 0;
 					if (selection_isactive) return false; // Enter pressed, while autocomplete item is focused, autocomplete \'select\' event handler will handle this
 
 					var data_id   = el.data('tagid');
@@ -256,15 +257,34 @@ if ($tags_editable || (!$isSite && $this->perms['canversion']))
 
 			var fcTagsCache = {};
 
+			// Last text typed by the user in the tag input (not changed by autocomplete focus / navigation)
+			var fcTagTerm = '';
+			tagInput.on('input', function () { fcTagTerm = this.value; });
+
 			jQuery.ui.autocomplete({
 				source: function( request, response )
 				{
 					var el   = jQuery(this.element);
 					var term = request.term;
 
+					// Cache holds the raw (unfiltered) results, tags already assigned are filtered out on every response
+					var fcTagsFilter = function(data)
+					{
+						return jQuery.map(data, function(item)
+						{
+							if (el.val() == item.name)
+							{
+								el.data('tagid',   item.id);
+								el.data('tagname', item.name);
+							}
+							let label_text = item.name + (item.translated_text ? ' (' + item.translated_text + ')' : '');
+							return jQuery('#ultagbox').find('input[value=\"'+item.id+'\"]').length > 0 ? null : { label: label_text, value: item.id };
+						});
+					};
+
 					if (term in fcTagsCache)
 					{
-						response(fcTagsCache[term]);
+						response(fcTagsFilter(fcTagsCache[term]));
 						return;
 					}
 
@@ -283,21 +303,8 @@ if ($tags_editable || (!$isSite && $this->perms['canversion']))
 						},
 						success: function(data)
 						{
-							//window.console.log( '... received tags for \"' + term + '\"');
-							var response_data = jQuery.map(data, function(item)
-							{
-								if (el.val() == item.name)
-								{
-									//window.console.log( 'Found exact TAG match, (' + item.id + ', \"' + item.name + '\")');
-									el.data('tagid',   item.id);
-									el.data('tagname', item.name);
-								}
-								let label_text = item.name + (item.translated_text ? ' (' + item.translated_text + ')' : '');
-								return jQuery('#ultagbox').find('input[value=\"'+item.id+'\"]').length > 0 ? null : { label: label_text, value: item.id };
-							});
-
-							fcTagsCache[term] = response_data;
-							response(response_data);
+							fcTagsCache[term] = data;
+							response(fcTagsFilter(data));
 						}
 					});
 				},
@@ -328,7 +335,11 @@ if ($tags_editable || (!$isSite && $this->perms['canversion']))
 					if (ui.item.value != '' && ui.item.value != '0')
 					{
 						addToList(ui.item.value, ui.item.label);
-						el.val('');  //clear existing value
+
+						// Restore the search text typed by the user (keyboard navigation replaced it with the focused label)
+						// and keep the list open (re-query after the menu got closed by this selection), to allow selecting more tags
+						el.val(fcTagTerm);
+						setTimeout(function() { el.autocomplete('search', fcTagTerm); }, 50);
 					}
 
 					event.preventDefault();  // Prevent default behaviour of setting 'ui.item.value' into the input and triggering change event
@@ -343,6 +354,11 @@ if ($tags_editable || (!$isSite && $this->perms['canversion']))
 			// Call search method on focus to allow immediate search
 			tagInput.focus(function () {
 				jQuery(this).autocomplete('search', this.value);
+			});
+
+			// Input stays focused after selecting a tag (list is closed), so also open the list on click
+			tagInput.on('click', function () {
+				if (!jQuery(this).autocomplete('widget').is(':visible')) jQuery(this).autocomplete('search', this.value);
 			});
 
 			// Call autocomplete.search method to load and cache all tags up to a maximum ... e.g. 500

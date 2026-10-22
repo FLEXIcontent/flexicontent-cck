@@ -1271,7 +1271,8 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 			'tags[]',
 			array(
 				'id' => 'tags',
-				'class' => 'use_select2_lib',
+				// No checkbox mode: selected tags leave the list, keyboard works natively, search text is kept after a pick
+				'class' => 'use_select2_lib fc_select2_no_check fc_choices_keep_search',
 				'multiple' => 'multiple',
 				'size' => '10',
 			),
