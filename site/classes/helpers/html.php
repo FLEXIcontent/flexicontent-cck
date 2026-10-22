@@ -1165,6 +1165,46 @@ class flexicontent_html
 	}
 
 
+	/**
+	 * Get the labels of ALL selected options of a filter's HTML
+	 * (multi-select filters can have several selected values)
+	 *
+	 * @access public
+	 * @return array
+	 * @since 4.2
+	 */
+	static function getSelectedOptionsLabels($filterHtml)
+	{
+		$labels = array();
+
+		if (!preg_match_all('/<option\b[^>]*>.*?<\/option>/is', (string) $filterHtml, $opts))
+		{
+			return $labels;
+		}
+
+		foreach ($opts[0] as $optHtml)
+		{
+			// Keep only selected options
+			if (!preg_match('/selected\s*=\s*(?:"selected"|\'selected\'|selected)/i', $optHtml))
+			{
+				continue;
+			}
+			// Skip options with an empty value (e.g. the filter's internal prompt label)
+			if (preg_match('/value\s*=\s*(["\'])(.*?)\1/i', $optHtml, $valMatch) && $valMatch[2] === '')
+			{
+				continue;
+			}
+			$label = trim(strip_tags($optHtml));
+			if ($label !== '')
+			{
+				$labels[] = $label;
+			}
+		}
+
+		return $labels;
+	}
+
+
 	static function searchphrase_selector(&$params, $formname='adminForm')
 	{
 		$show_searchphrase = $params->get('show_searchphrase', 1);
@@ -1628,7 +1668,7 @@ class flexicontent_html
 					$document->addScript($framework_path.'/choices.min.js', array('version' => $ver));
 					$document->addScript($framework_path.'/sortable.min.js', array('version' => $ver));
 					$document->addStyleSheet($framework_path.'/choices.min.css', array('version' => $ver));
-					$document->addStyleSheet($css_path.'/flexi_choices.css', array('version' => '1.5'));
+					$document->addStyleSheet($css_path.'/flexi_choices.css', array('version' => '1.6'));
 
 					// Attach Choices.js JS but skip it in mobiles and use native selects instead
 					$js .= "

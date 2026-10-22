@@ -104,8 +104,11 @@ else
 		$fc_val = $fc_badge_app->input->get('filter_' . $fc_filt->id, '', 'array');
 		if (!empty($fc_val))
 		{
-			preg_match('/<option[^>]+selected=["\']selected["\'][^>]*>(.*?)<\/option>/is', $fc_filt->html, $fc_matches);
-			$fc_displayVal = isset($fc_matches[1]) ? $fc_matches[1] : (is_array($fc_val) ? implode(', ', $fc_val) : $fc_val);
+			// Collect ALL selected options (multi-select filters can have several values)
+			$fc_selectedLabels = flexicontent_html::getSelectedOptionsLabels($fc_filt->html);
+			$fc_displayVal = !empty($fc_selectedLabels)
+				? implode(', ', $fc_selectedLabels)
+				: (is_array($fc_val) ? implode(', ', $fc_val) : $fc_val);
 			$fc_displayVal = trim(strip_tags(preg_replace('/\s*\([^)]*\)/', '', (string)$fc_displayVal)));
 			if (!empty($fc_displayVal) && strpos($fc_displayVal, '-') !== 0 && !in_array(strtolower($fc_displayVal), array('all', 'tous', 'any', ',', '')))
 			{

@@ -137,6 +137,19 @@ html[dir="rtl"] .choices .choices__inner {
 	flex-wrap: wrap !important;
 }
 
+/* The chips container (.choices__list--multiple) is created by choices.js and
+   IS required: selected values (tags) are rendered inside it. But when no value
+   is selected it must not reserve any horizontal space, otherwise the cloned
+   input (and its placeholder) is pushed to the right by the 2rem min-width. */
+.choices .choices__list--multiple:empty {
+	min-width: 0 !important;
+}
+
+/* Same in the backend items manager filter box, where the list grows (flex:1 1 auto) */
+#fc-filters-box .choices[data-type*="select-multiple"] .choices__list--multiple:empty {
+	flex-grow: 0 !important;
+}
+
 .choices .choices__list--multiple .choices__item {
 	box-sizing: content-box !important;
 	display: inline-flex !important;

@@ -44,8 +44,11 @@ if ($badge_position > 0 && $use_filters) {
         if (empty($filt->html)) continue;
         $val = $app->input->get('filter_' . $filt->id, '', 'array');
         if (!empty($val)) {
-            preg_match('/<option[^>]+selected=["\']selected["\'][^>]*>(.*?)<\/option>/is', $filt->html, $matches);
-            $displayVal = isset($matches[1]) ? $matches[1] : (is_array($val) ? implode(', ', $val) : $val);
+            // Collect ALL selected options (multi-select filters can have several values)
+            $selectedLabels = flexicontent_html::getSelectedOptionsLabels($filt->html);
+            $displayVal = !empty($selectedLabels)
+                ? implode(', ', $selectedLabels)
+                : (is_array($val) ? implode(', ', $val) : $val);
             $displayVal = trim(strip_tags(preg_replace('/\s*\([^)]*\)/', '', (string)$displayVal)));
             
             if (!empty($displayVal) && strpos($displayVal, '-') !== 0 && !in_array(strtolower($displayVal), ['all', 'tous', 'any', ',', ''])) {
