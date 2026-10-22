@@ -656,6 +656,81 @@ ob_start(); ?>
 				</div>
 			</div>
 
+
+			<?php if ($this->behaviour !== 'translate' && !empty($this->batch_fields)) :
+				$batch_types = flexicontent_html::getTypesList();
+				$batch_field_url = 'index.php?option=com_flexicontent&task=items.batchfieldform&format=raw&' . \Joomla\CMS\Session\Session::getFormToken() . '=1';
+				$batch_modes = array(
+					'add'     => 'FLEXI_BATCH_FIELD_MODE_ADD',
+					'replace' => 'FLEXI_BATCH_FIELD_MODE_REPLACE',
+					'fill'    => 'FLEXI_BATCH_FIELD_MODE_FILL',
+					'clear'   => 'FLEXI_BATCH_FIELD_MODE_CLEAR',
+				);
+			?>
+
+				<style>
+					#batch_field_cards { margin: 12px 0 0 0; }
+					#batch_field_cards .batch-field-card { border: 1px solid #c4cdd9; border-radius: 4px; background: rgba(255,255,255,0.55); padding: 10px 14px 12px; margin: 0 0 12px 0; }
+					#batch_field_cards .batch-field-head { display: flex; flex-wrap: nowrap; align-items: center; gap: 12px; padding-bottom: 8px; margin-bottom: 10px; border-bottom: 1px solid #d5dce6; }
+					#batch_field_cards .batch-field-label { flex: 1 1 auto; min-width: 0; font-size: 1.05em; }
+					#batch_field_cards .batch-field-mode { flex: 0 0 auto; width: auto; min-width: 190px; margin: 0; }
+					#batch_field_cards .batch-field-remove { flex: 0 0 auto; margin: 0; line-height: 1; }
+					#batch_field_cards .batch-field-body { min-width: 0; display: flow-root; }
+					#batch_field_cards .batch-field-body .choices,
+					#batch_field_cards .batch-field-body .select2-container { width: 100% !important; max-width: 100%; }
+					#batch_field_cards .batch-field-body input[type=text],
+					#batch_field_cards .batch-field-body textarea { max-width: 100%; }
+					#batch_field_cards .batch-field-card.fc-loading .batch-field-body { min-height: 36px; opacity: .5; }
+				</style>
+
+				<fieldset class="panelform" id="row_batch_fields_title">
+					<br/><span class="alert alert-info fc-iblock" style="margin-bottom: 4px;"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_BATCH_CUSTOM_FIELDS'); ?></span>
+				</fieldset>
+
+				<div class="control-group" id="row_batch_fields">
+					<div class="control-label">
+						<label class="label-fcinner" for="batch_field_picker">
+							<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_BATCH_ADD_FIELD' ); ?>
+						</label>
+					</div>
+					<div class="controls">
+						<select id="batch_field_picker" class="use_select2_lib" data-placeholder="<?php echo htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_BATCH_SELECT_FIELD'), ENT_QUOTES, 'UTF-8'); ?>">
+							<option value=""></option>
+							<?php foreach ($this->batch_fields as $batch_field) :
+								$type_names = array();
+								foreach ($batch_field->type_ids as $tid)
+								{
+									if (isset($batch_types[$tid])) $type_names[] = \Joomla\CMS\Language\Text::_($batch_types[$tid]->name);
+								}
+							?>
+								<option value="<?php echo (int) $batch_field->id; ?>" data-types="<?php echo implode(',', $batch_field->type_ids); ?>" data-multiple="<?php echo (int) $batch_field->multiple; ?>">
+									<?php echo htmlspecialchars($batch_field->label . ($type_names ? '  (' . implode(', ', $type_names) . ')' : ''), ENT_QUOTES, 'UTF-8'); ?>
+								</option>
+							<?php endforeach; ?>
+						</select>
+						<div class="fc-small" style="margin-top: 4px;"><?php echo \Joomla\CMS\Language\Text::_('FLEXI_BATCH_FIELDS_INFO'); ?></div>
+					</div>
+				</div>
+
+				<div id="batch_field_cards" data-url="<?php echo htmlspecialchars($batch_field_url, ENT_QUOTES, 'UTF-8'); ?>">
+					<template id="batch_field_card_tmpl">
+						<div class="batch-field-card" data-field-id="">
+							<div class="batch-field-head">
+								<strong class="batch-field-label"></strong>
+								<select class="batch-field-mode" disabled="disabled">
+									<?php foreach ($batch_modes as $mode => $mode_lbl) : ?>
+										<option value="<?php echo $mode; ?>"><?php echo \Joomla\CMS\Language\Text::_($mode_lbl); ?></option>
+									<?php endforeach; ?>
+								</select>
+								<button type="button" class="btn btn-small batch-field-remove" title="<?php echo htmlspecialchars(\Joomla\CMS\Language\Text::_('JACTION_DELETE'), ENT_QUOTES, 'UTF-8'); ?>">&times;</button>
+							</div>
+							<div class="batch-field-body"></div>
+						</div>
+					</template>
+				</div>
+
+			<?php endif; ?>
+
 		</fieldset>
 
 	</div>

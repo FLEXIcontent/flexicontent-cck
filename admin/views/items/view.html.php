@@ -1311,7 +1311,31 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		$lists['access'] = \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $levels, $fieldname, $attribs, 'value', 'text', $value='', $elementid, $translate = true);
 
 
+		// Custom fields that can be set in batch, for the types of the selected items
+		$itemTypeIds = array();
+		foreach ($rows as $row)
+		{
+			$itemTypeIds[] = (int) $row->type_id;
+		}
+		$batch_fields = $behaviour === 'translate' ? array() : $model->getBatchFields(array_unique($itemTypeIds));
+
+		// Fields assigned to a type, also become available when a different item type is selected, so offer all fields of the types that could be targeted
+		if ($behaviour !== 'translate')
+		{
+			$batch_fields_all = $model->getBatchFields(array_keys($types));
+			foreach ($batch_fields_all as $fid => $fld)
+			{
+				if (!isset($batch_fields[$fid]))
+				{
+					$batch_fields[$fid] = $fld;
+				}
+			}
+			uasort($batch_fields, function ($a, $b) { return strcasecmp($a->label, $b->label); });
+		}
+
 		//assign data to template
+		$this->batch_fields = $batch_fields;
+		$this->itemTypeIds = array_values(array_unique($itemTypeIds));
 		$this->lists = $lists;
 		$this->rows = $rows;
 		$this->itemCats = $itemCats;

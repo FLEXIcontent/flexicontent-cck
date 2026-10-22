@@ -143,6 +143,152 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 
 	/**
+	 * Method to get the (edit) form of a custom field, for use inside the batch tool
+	 * Returns JSON: html of the field input + the assets (scripts / styles) that the field has added to the document
+	 *
+	 * @return void
+	 *
+	 * @since 3.3
+	 */
+	public function batchfieldform()
+	{
+		// Check for request forgeries
+		\Joomla\CMS\Session\Session::checkToken('request') or jexit(json_encode(array('error' => \Joomla\CMS\Language\Text::_('JINVALID_TOKEN'))));
+
+		$user     = \Joomla\CMS\Factory::getUser();
+		$document = \Joomla\CMS\Factory::getDocument();
+		$db       = \Joomla\CMS\Factory::getDbo();
+
+		@ob_end_clean();
+		header('Content-Type: application/json; charset=utf-8');
+
+		if (!$user->authorise('flexicontent.copyitems', 'com_flexicontent'))
+		{
+			jexit(json_encode(array('error' => \Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'))));
+		}
+
+		$field_id = $this->input->getInt('field_id', 0);
+
+		// Types that the field is assigned to, and optionally the type the new value will be used for
+		$type_ids = $db->setQuery('SELECT type_id FROM #__flexicontent_fields_type_relations WHERE field_id = ' . (int) $field_id)->loadColumn();
+		$type_id  = $this->input->getInt('type_id', 0);
+		$type_id  = in_array($type_id, $type_ids) ? $type_id : (int) reset($type_ids);
+
+		// Only fields that can be batch-edited (and that the user can edit) are allowed
+		$items_model  = $this->getModel($this->record_name_pl);
+		$batch_fields = $type_id ? $items_model->getBatchFields(array($type_id)) : array();
+
+		if (!isset($batch_fields[$field_id]))
+		{
+			jexit(json_encode(array('error' => \Joomla\CMS\Language\Text::_('FLEXI_BATCH_FIELD_NOT_AVAILABLE'))));
+		}
+
+		// Create a new (empty) item of the type, and render the field of it, as the item form does
+		$model = $this->getModel($this->record_name);
+		$model->setId(0, null, $type_id, null);
+		$item   = $model->getItem(null, $check_view_access = false, $no_cache = true, $force_version = -1);
+		$fields = $model->getExtrafields(true);
+		$item->fields = & $fields;
+
+		$field = $fields[$batch_fields[$field_id]->name];
+		$field->value = array();
+
+		FlexicontentFields::getFieldFormDisplay($field, $item, $user);
+
+		$html = is_array($field->html) ? implode('', $field->html) : (string) $field->html;
+
+		// Collect the assets the field added to the document, so that they can be loaded by the batch page
+		$assets = array('scripts' => array(), 'inline' => array(), 'styles' => array(), 'style_inline' => array());
+
+		$to_text = function ($v) use (&$to_text)
+		{
+			if (is_string($v))
+			{
+				return $v;
+			}
+
+			if (is_array($v))
+			{
+				return isset($v['content']) ? $to_text($v['content']) : implode("\n", array_filter(array_map($to_text, $v)));
+			}
+
+			return '';
+		};
+
+		$to_url = function ($uri)
+		{
+			$uri = (string) $uri;
+
+			return ($uri === '' || preg_match('#^(https?:)?//#', $uri) || $uri[0] === '/') ? $uri : \Joomla\CMS\Uri\Uri::root(true) . '/' . $uri;
+		};
+
+		// Legacy API: addScript() / addScriptDeclaration() / addStyleSheet() / addStyleDeclaration()
+		foreach (array_keys((array) ($document->_scripts ?? array())) as $src)
+		{
+			$assets['scripts'][] = array('src' => $to_url($src), 'module' => false);
+		}
+
+		foreach ((array) ($document->_script ?? array()) as $code)
+		{
+			if (($code = trim($to_text($code))) !== '')
+			{
+				$assets['inline'][] = $code;
+			}
+		}
+
+		foreach (array_keys((array) ($document->_styleSheets ?? array())) as $href)
+		{
+			$assets['styles'][] = $to_url($href);
+		}
+
+		foreach ((array) ($document->_style ?? array()) as $css)
+		{
+			if (($css = trim($to_text($css))) !== '')
+			{
+				$assets['style_inline'][] = $css;
+			}
+		}
+
+		// Web Asset Manager (Joomla 4+): the same calls are registered as web assets
+		if (method_exists($document, 'getWebAssetManager'))
+		{
+			$wa = $document->getWebAssetManager();
+
+			foreach (array('script' => array('scripts', 'inline'), 'style' => array('styles', 'style_inline')) as $type => $keys)
+			{
+				foreach ($wa->getAssets($type, true) as $asset)
+				{
+					$uri     = $asset->getUri(true);
+					$content = $asset->getOption('content');
+
+					if ($uri)
+					{
+						$assets[$keys[0]][] = $type === 'script'
+							? array('src' => $to_url($uri), 'module' => (($asset->getAttributes()['type'] ?? '') === 'module'))
+							: $to_url($uri);
+					}
+					elseif (is_string($content) && trim($content) !== '')
+					{
+						$assets[$keys[1]][] = trim($content);
+					}
+				}
+			}
+		}
+
+		// Unique values (scripts are arrays, so compare them serialized)
+		foreach ($assets as $key => $list)
+		{
+			$assets[$key] = array_values(array_intersect_key($list, array_unique(array_map('serialize', $list))));
+		}
+
+		// Joomla script options (e.g. texts and settings used by calendar and other scripts)
+		$assets['options'] = method_exists($document, 'getScriptOptions') ? (object) $document->getScriptOptions() : new stdClass;
+
+		jexit(json_encode(array('html' => $html, 'assets' => $assets)));
+	}
+
+
+	/**
 	 * Method to reset hits
 	 *
 	 * @since 1.0

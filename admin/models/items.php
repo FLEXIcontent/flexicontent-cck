@@ -52,6 +52,23 @@ class FlexicontentModelItems extends FCModelAdminList
 	protected $copyRelations = false;
 
 	/**
+	 * IDs of the records created by the last copyitems() call
+	 *
+	 * @var int[]
+	 */
+	public $copiedIds = array();
+
+	/**
+	 * Field types that can be set via the batch tool, as these store plain values (no uploads / nested structures / virtual output)
+	 *
+	 * @var string[]
+	 */
+	protected static $batchFieldTypes = array(
+		'text', 'textarea', 'select', 'selectmultiple', 'radio', 'checkbox', 'radioimage', 'checkboximage',
+		'textselect', 'termlist', 'date', 'color', 'email', 'weblink', 'phonenumbers',
+	);
+
+	/**
 	 * Events
 	 *
 	 * @var string
@@ -1807,6 +1824,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		 */
 		$cid_reverse = array_reverse($cid);
 		$total_cnt = 0;
+		$this->copiedIds = array();
 		global $globalcats;
 
 		$items = array();
@@ -2205,6 +2223,7 @@ class FlexicontentModelItems extends FCModelAdminList
 						$assoc_data['associations'][$row->language]  = $row->id;  // Add new item itself
 						$assoc_data['associations'][$item->language] = $item->id; // Add current item (needed if association group is empty)
 					}
+				$this->copiedIds[] = (int) $row->id;
 				$total_cnt++;
 			}
 		}
@@ -2483,6 +2502,77 @@ class FlexicontentModelItems extends FCModelAdminList
 		}
 
 		return true;
+	}
+
+
+	/**
+	 * Get the custom fields that can be set via the batch tool, for the given item types
+	 *
+	 * @param   int[]  $type_ids  Item types to get the fields for
+	 *
+	 * @return  array  Field objects (id, name, label, field_type, type_ids), ordered by label
+	 */
+	public function getBatchFields(array $type_ids)
+	{
+		$type_ids = array_values(array_filter(ArrayHelper::toInteger($type_ids)));
+
+		if (!$type_ids)
+		{
+			return array();
+		}
+
+		$db = $this->_db;
+		$query = $db->getQuery(true)
+			->select('f.id, f.name, f.label, f.field_type, f.attribs, f.valueseditable, ftr.type_id')
+			->from('#__flexicontent_fields AS f')
+			->join('INNER', '#__flexicontent_fields_type_relations AS ftr ON ftr.field_id = f.id')
+			->where('f.published = 1')
+			->where('f.iscore = 0')
+			->where('f.field_type IN (' . implode(',', array_map(array($db, 'quote'), static::$batchFieldTypes)) . ')')
+			->where('ftr.type_id IN (' . implode(',', $type_ids) . ')')
+			->order('f.label, f.id');
+
+		$fields = array();
+		$user   = \Joomla\CMS\Factory::getUser();
+
+		foreach ($db->setQuery($query)->loadObjectList() as $row)
+		{
+			if (!isset($fields[$row->id]))
+			{
+				// Fields that are part of a field group are edited via the group
+				$params = new \Joomla\Registry\Registry($row->attribs);
+
+				if ($params->get('use_ingroup', 0))
+				{
+					continue;
+				}
+
+				// Fields whose values the user is not allowed to edit
+				if ($row->valueseditable && !$user->authorise('flexicontent.editfieldvalues', 'com_flexicontent.field.' . $row->id))
+				{
+					continue;
+				}
+
+				// Whether the field can hold several values (some types always can), and the maximum number of them (0 = unlimited)
+				$row->multiple   = (int) (in_array($row->field_type, array('selectmultiple', 'checkbox', 'checkboximage')) || $params->get('allow_multiple', 0));
+				$row->max_values = $row->multiple ? (int) $params->get('max_values', 0) : 1;
+
+				// The 'Allow multiple values' setting itself (several values, e.g. several groups of options, instead of a single one)
+				$row->allow_multiple = (int) $params->get('allow_multiple', 0);
+
+				// Types whose single value is a set of options (array), e.g. a multi-select
+				$row->value_is_arr = (int) in_array($row->field_type, array('selectmultiple', 'checkbox', 'checkboximage'));
+
+				$row->label    = \Joomla\CMS\Language\Text::_($row->label);
+				$row->type_ids = array();
+				unset($row->attribs, $row->valueseditable);
+				$fields[$row->id] = $row;
+			}
+
+			$fields[$row->id]->type_ids[] = (int) $row->type_id;
+		}
+
+		return $fields;
 	}
 
 
