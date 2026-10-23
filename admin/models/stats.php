@@ -435,7 +435,7 @@ class FlexicontentModelStats extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 		//count
 		foreach ($votes as $vote) {
 
-			if(!$vote->rating_sum) {
+			if(!$vote->rating_sum || !(int) $vote->rating_count) {
 				$collect['novotes']++;
 				continue;
 			}

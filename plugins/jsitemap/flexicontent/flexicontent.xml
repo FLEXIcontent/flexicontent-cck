@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<datasource>
+	<name>FLEXIcontent</name>
+	<description>FLEXIcontent plugin for JSitemap</description>
+	
+	<config>
+		<fieldset name="params" addfieldpath="administrator/components/com_flexicontent/elements">
+			<field name="cats_scope" type="radio" default="1" label="COM_JMAP_PLGFLEXICONTENT_CAT_SCOPE" description="COM_JMAP_PLGFLEXICONTENT_CAT_SCOPE_DESC" class="btn-group btn-group-yesno">
+				<option value="0">COM_JMAP_PLGFLEXICONTENT_INCLUDE</option>
+				<option value="1">COM_JMAP_PLGFLEXICONTENT_EXCLUDE</option>
+			</field>
+			<field name="cats" type="flexicategories" multiple="true" label="COM_JMAP_PLGFLEXICONTENT_CATEGORIES" description="COM_JMAP_PLGFLEXICONTENT_CATEGORIES_DESC" />
+		</fieldset>
+	</config>
+</datasource>

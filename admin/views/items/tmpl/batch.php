@@ -159,6 +159,11 @@ body .form-horizontal .control-group {
   min-height: 1.55rem !important;
   line-height: 1.55rem !important;
 }
+/* Multi-selects (tags, secondary categories): grow with the number of selected values instead of clipping them */
+#flexicontent .choices[data-type*="select-multiple"], .choices[data-type*="select-multiple"] {
+  height: auto !important;
+  line-height: normal;
+}
 </style>
 
 
@@ -246,7 +251,7 @@ ob_start(); ?>
 
 
 <?php if ($isQuicktranslateMode): ?>
-	<input type="submit" value="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_ADD_TRANSLATIONS') ?>" class="btn btn-success" onclick="this.form.task.value='batchprocess';" />
+	<input type="submit" id="fc_add_translations_btn" value="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_ADD_TRANSLATIONS') ?>" class="btn btn-success" onclick="this.form.task.value='batchprocess';" />
 	<div class="fcclear"></div>
 
 	<div class="toggle_all_values_buttons_box" style="display: inline-block; float: right;">
@@ -482,7 +487,7 @@ ob_start(); ?>
 						? '[_lang_code_]' //'FLEXI_DEFAULT_TRANSLATE_PREFIX'
 						: 'FLEXI_DEFAULT_PREFIX' );
 					?>
-					<input type="text" id="prefix" name="prefix" value="<?php echo $defprefix; ?>" size="15" />
+					<input type="text" id="prefix" name="prefix" value="" placeholder="<?php echo htmlspecialchars($defprefix, ENT_QUOTES, 'UTF-8'); ?>" size="15" />
 				</div>
 			</div>
 
@@ -753,6 +758,165 @@ ob_start(); ?>
 </div>
 
 <?php echo implode("\n", $submit_cids); ?>
+<?php if ($this->behaviour === 'translate'): ?>
+<style>
+#fc_batch_progress { display: none; position: fixed; z-index: 99999; left: 0; top: 0; right: 0; bottom: 0; background: rgba(255,255,255,.9); overflow: auto; }
+#fc_batch_progress.fc-active { display: block; }
+#fc_batch_progress .fc-batch-progress-box { max-width: 640px; margin: 24px auto; padding: 0 16px; }
+#fc_batch_progress .fc-batch-progress-head { margin-bottom: 16px; }
+#fc_batch_progress #fc_bp_bar { width: 302px; height: 17px; border: 1px solid #000; padding: 0; margin: 0 10px 0 0; float: left; clear: left; background: #fff; }
+#fc_batch_progress #fc_bp_inside { width: 0; height: 15px; margin: 1px; padding: 0; background-color: #000; transition: width .2s; }
+#fc_batch_progress #fc_bp_percent { clear: right; }
+#fc_batch_progress #fc_bp_status { clear: both; color: darkgreen; padding-top: 24px; }
+#fc_batch_progress #fc_bp_errors { color: #b00; margin-top: 12px; }
+#fc_batch_progress #fc_bp_close { display: none; margin-top: 20px; }
+</style>
+<div id="fc_batch_progress" role="alert" aria-live="polite">
+	<div class="fc-batch-progress-box">
+		<div class="fc-batch-progress-head" id="fc_bp_head"><?php echo \Joomla\CMS\Language\Text::_('FLEXI_TASK_RUNNING'); ?> ...</div>
+		<div id="fc_bp_bar"><div id="fc_bp_inside"></div></div>
+		<div id="fc_bp_percent">0 %</div>
+		<div id="fc_bp_status"></div>
+		<div id="fc_bp_errors"></div>
+		<button type="button" class="btn btn-success" id="fc_bp_close"><?php echo \Joomla\CMS\Language\Text::_('JTOOLBAR_CLOSE'); ?></button>
+	</div>
+</div>
+<script>
+/**
+ * Translate to other languages, one request per (item, language) pair, so that a real progress can be shown
+ * (same approach as the Re-Index tools, which call the server in small steps). Each request is the same
+ * 'batchprocess' task as the normal form submit, just with a single item and a single language.
+ */
+(function () {
+	var form = document.getElementById('adminForm');
+	if (!form || !window.fetch || !window.FormData || !window.Joomla) return;
+
+	var itemTitles = <?php
+		$_fc_titles = array();
+		foreach ($this->rows as $_fc_row) $_fc_titles[(int) $_fc_row->id] = $_fc_row->title;
+		echo json_encode($_fc_titles, JSON_FORCE_OBJECT);
+	?>;
+	var txt = {
+		done:  <?php echo json_encode(\Joomla\CMS\Language\Text::_('FLEXI_BATCH_TRANSLATING_DONE')); ?>,
+		items: <?php echo json_encode(\Joomla\CMS\Language\Text::_('FLEXI_ITEMS')); ?>,
+		created: <?php echo json_encode(\Joomla\CMS\Language\Text::_('FLEXI_BATCH_TRANSLATING_CREATED')); ?>,
+		time:  <?php echo json_encode(\Joomla\CMS\Language\Text::_('FLEXI_BATCH_TOTAL_TASK_TIME')); ?>,
+		back:  <?php echo json_encode(\Joomla\CMS\Language\Text::_('FLEXI_BATCH_BACK_TO_ITEMS')); ?>
+	};
+	var quick = <?php echo json_encode((bool) $isQuicktranslateMode); ?>;   // Modal: item(s) to multiple languages. Otherwise: items to the single chosen language
+	var returnUrl = 'index.php?option=com_flexicontent&view=items';
+	var running = false;
+
+	function $(id) { return document.getElementById(id); }
+	function esc(str) { var d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+
+	// Returns false when there is nothing to do (let the normal form submit / validation handle it)
+	function start() {
+		var cids  = Array.prototype.map.call(form.querySelectorAll('input[name="cid[]"]'), function (el) { return el.value; });
+		var langs;
+
+		if (quick) {
+			langs = Array.prototype.map.call(form.querySelectorAll('input[name="languages[]"]:checked'), function (el) { return el.value; });
+		} else {
+			var langEl = form.querySelector('input[name="language"]:checked') || form.querySelector('select[name="language"]');
+			langs = langEl && langEl.value && langEl.value !== '*' ? [langEl.value] : [];
+		}
+
+		if (!langs.length || !cids.length) return false;
+		if (running) return true;
+		running = true;
+
+		var btn = $('fc_add_translations_btn');
+		if (btn) btn.disabled = true;
+
+		var jobs = [];
+		cids.forEach(function (id) { langs.forEach(function (lang) { jobs.push({ id: id, lang: lang }); }); });
+
+		var total = jobs.length, done = 0, created = 0, errors = [], t0 = Date.now();
+		$('fc_batch_progress').classList.add('fc-active');
+
+		function render(current) {
+			var percent = total ? (done / total * 100) : 100;
+			$('fc_bp_inside').style.width = Math.min(300, percent * 3) + 'px';
+			$('fc_bp_percent').textContent = ' ' + percent.toFixed(2) + ' %';
+			$('fc_bp_status').innerHTML = done + ' / ' + total + ' ' + esc(txt.created)
+				+ (current ? '<br/><br/>' + current : '')
+				+ '<br/><br/>' + esc(txt.time) + ': ' + ((Date.now() - t0) / 1000).toFixed(2) + ' secs';
+			$('fc_bp_errors').innerHTML = errors.map(esc).join('<br/>');
+		}
+
+		function finish() {
+			$('fc_bp_head').innerHTML = '<strong>' + esc(txt.done.replace('%s', created)) + '</strong>';
+			render('');
+			var closeBtn = $('fc_bp_close');
+			closeBtn.style.display = 'inline-block';
+			closeBtn.onclick = quick
+				? function () { $('fc_batch_progress').classList.remove('fc-active'); }
+				: function () { window.location.href = returnUrl; };
+			if (!quick) closeBtn.textContent = txt.back;
+			running = false;
+		}
+
+		function next() {
+			if (done >= total) return finish();
+
+			var job = jobs[done];
+			var title = itemTitles[job.id] || ('#' + job.id);
+			render(esc(title) + ' &rarr; ' + esc(job.lang));
+
+			var fd = new FormData(form);
+			fd.delete('cid[]');
+			fd.append('cid[]', job.id);
+			if (quick) {
+				fd.delete('languages[]');
+				fd.append('languages[]', job.lang);
+			}
+			fd.set('task', 'batchprocess');
+			fd.set('fc_ajax', '1');
+
+			fetch(form.getAttribute('action') || 'index.php', { method: 'POST', body: fd, credentials: 'same-origin' })
+				.then(function (r) { return r.text(); })
+				.then(function (body) {
+					var data = null;
+					try { data = JSON.parse(body); } catch (ex) {}
+
+					if (data && data.ok) {
+						created += parseInt(data.created, 10) || 0;
+					} else if (data) {
+						errors.push(title + ' (' + job.lang + '): ' + ((data.errors || []).join(' ') || data.message || 'no translation created'));
+					} else {
+						var tmp = document.createElement('div');
+						tmp.innerHTML = body;
+						errors.push(title + ' (' + job.lang + '): ' + ((tmp.textContent || '').trim().replace(/\s+/g, ' ') || 'HTTP error').substring(0, 300));
+					}
+				})
+				.catch(function (err) {
+					errors.push(title + ' (' + job.lang + '): ' + err);
+				})
+				.then(function () {
+					done++;
+					setTimeout(next, 20);
+				});
+		}
+
+		next();
+		return true;
+	}
+
+	// Hook the form submit (both the toolbar 'Save' button, via Joomla.submitform() that clicks a hidden submit button, and the modal's own button).
+	// stopImmediatePropagation(): other submit handlers (AJAX / 'form is being submitted' blocker added by admin.js) must not run for our stepped requests
+	form.addEventListener('submit', function (e) {
+		var task = form.task && typeof form.task.value !== 'undefined' ? form.task.value : '';
+		if (!/(^|\.)batchprocess$/.test(task)) return;
+
+		if (start()) {
+			e.preventDefault();
+			e.stopImmediatePropagation();
+		}
+	});
+})();
+</script>
+<?php endif; ?>
 <input type="hidden" name="option" value="com_flexicontent" />
 <input type="hidden" name="controller" value="items" />
 <input type="hidden" name="view" value="items" />

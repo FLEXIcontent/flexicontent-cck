@@ -1935,6 +1935,42 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			}
 		}
 
+		// AJAX step of the batch progress UI (one item, one language per request): reply with JSON, instead of HTML / redirect
+		if ($this->input->getInt('fc_ajax', 0))
+		{
+			$errors = array();
+
+			foreach ($app->getMessageQueue(true) as $queued)
+			{
+				if (in_array($queued['type'], array('error', 'warning'), true))
+				{
+					$errors[] = trim(strip_tags($queued['message']));
+				}
+			}
+
+			if (isset($total_cnt) && $total_cnt)
+			{
+				$created = (int) $total_cnt;
+			}
+			else
+			{
+				$created = $method == 99 || $method == 3 ? 0 : count($auth_cid);
+			}
+
+			if ($clean_cache_flag)
+			{
+				$this->_cleanCache();
+			}
+
+			header('Content-Type: application/json; charset=utf-8');
+			jexit(json_encode(array(
+				'ok'      => !$errors && $created > 0,
+				'created' => $created,
+				'message' => trim(strip_tags($msg)),
+				'errors'  => $errors,
+			)));
+		}
+
 		// CHECK CASE OF TRANSLATING SINGLE ITEM TO MULTIPLE LANGUAGES and terminate with success message, because this is inside a modal window
 		if ($lang_arr)
 		{

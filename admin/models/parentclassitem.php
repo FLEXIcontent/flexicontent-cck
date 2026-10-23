@@ -4243,6 +4243,14 @@ class ParentClassItem extends FCModelAdmin
 		// Assign each item 's extra votes to the item's votes as member variable "extra"
 		foreach ($extra_votes as $extra_vote)
 		{
+			if (!isset($votes[$extra_vote->content_id]))
+			{
+				$votes[$extra_vote->content_id] = new stdClass;
+			}
+			if (!isset($votes[$extra_vote->content_id]->extra))
+			{
+				$votes[$extra_vote->content_id]->extra = array();
+			}
 			$votes[$extra_vote->content_id]->extra[$extra_vote->extra_id] = $extra_vote;
 		}
 
@@ -4262,11 +4270,13 @@ class ParentClassItem extends FCModelAdmin
 
 		$votes = $this->getVotes($id);
 
-		if ($votes)
+		// Item may have no row in #__content_rating (no votes yet), or only extra votes
+		$rating_count = isset($votes[$id]->rating_count) ? (int) $votes[$id]->rating_count : 0;
+
+		if ($rating_count > 0)
 		{
 			$rating_resolution = $this->getVotingResolution($id);
 			$rating_sum = (int) $votes[$id]->rating_sum;
-			$rating_count = (int) $votes[$id]->rating_count;
 
 			$score = $rating_sum / $rating_count * (100 / $rating_resolution);
 			$score = round($score, 2);

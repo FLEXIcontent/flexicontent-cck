@@ -448,6 +448,9 @@ class com_flexicontentInstallerScript
 		$dbprefix = $app->getCfg('dbprefix');
 		$dbname   = $app->getCfg('db');
 
+		// Copy our data source plugin into JSitemap (com_jmap), if it is installed
+		$this->_installJsitemapPlugin($parent->getParent()->getPath('source'));
+
 		/*
 		// always create or modify these parameters
 		$params['my_param0'] = 'Component version ' . $this->release;
@@ -1869,6 +1872,69 @@ class com_flexicontentInstallerScript
 	/*
 	* sets parameter values in the component's row of the extension table
 	*/
+	/**
+	 * JSitemap (com_jmap) data sources are not Joomla extensions, they are folders inside com_jmap/plugins/,
+	 * so the installer cannot install them: copy our data source there, but only if com_jmap is installed
+	 *
+	 * @param   string  $source  Path of the extracted installation package
+	 *
+	 * @return  void
+	 */
+	private function _installJsitemapPlugin($source)
+	{
+		$src = rtrim($source, '/\\') . '/plugins/jsitemap/flexicontent';
+		$dst = JPATH_ADMINISTRATOR . '/components/com_jmap/plugins/flexicontent';
+
+		// JSitemap is not installed (or too old to have the external plugins folder), nothing to do
+		if (!is_dir(JPATH_ADMINISTRATOR . '/components/com_jmap/plugins') || !is_dir($src))
+		{
+			return;
+		}
+
+		try
+		{
+			if (!is_dir($dst) && !mkdir($dst, 0755, true))
+			{
+				throw new RuntimeException('cannot create folder ' . $dst);
+			}
+
+			$iterator = new RecursiveIteratorIterator(
+				new RecursiveDirectoryIterator($src, FilesystemIterator::SKIP_DOTS),
+				RecursiveIteratorIterator::SELF_FIRST
+			);
+
+			foreach ($iterator as $file)
+			{
+				$target = $dst . '/' . $iterator->getSubPathName();
+
+				if ($file->isDir())
+				{
+					if (!is_dir($target) && !mkdir($target, 0755, true))
+					{
+						throw new RuntimeException('cannot create folder ' . $target);
+					}
+				}
+				elseif (!copy($file->getPathname(), $target))
+				{
+					throw new RuntimeException('cannot copy file ' . $target);
+				}
+			}
+
+			// README is for the repository only
+			if (is_file($dst . '/README.md'))
+			{
+				unlink($dst . '/README.md');
+			}
+
+			echo '<div class="alert alert-success" style="margin:8px 0px 8px 0px;">FLEXIcontent data source for JSitemap (com_jmap) was installed / updated</div>';
+		}
+		catch (Throwable $e)
+		{
+			\Joomla\CMS\Factory::getApplication()->enqueueMessage('Could not install the FLEXIcontent data source for JSitemap: ' . $e->getMessage() . '. You can copy plugins/jsitemap/flexicontent manually to ' . $dst, 'warning');
+		}
+	}
+
+
 	private function _setComponentParams($param_array)
 	{
 		if ( count($param_array) > 0 )

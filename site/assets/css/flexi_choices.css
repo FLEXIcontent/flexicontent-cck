@@ -212,7 +212,6 @@ html[dir="rtl"] .choices .choices__inner {
 	outline: 0 !important;
 }
 
-.choices .choices__list--dropdown .choices__input,
 .choices__input--cloned {
 	min-height: calc(var(--form-inp-height) - 2px) !important;
 	line-height: calc(var(--form-inp-height) - 2px) !important;
@@ -289,6 +288,24 @@ html[dir="rtl"] .choices .choices__inner {
 .choices__list--dropdown .choices__item--disabled {
 	opacity: 0.6 !important;
 	font-style: italic !important;
+}
+
+/* Manager header (scope selector next to the search box): the .choices box is only as wide as
+   the selected label, so let the dropdown be wider than it, keep text on 1 line, and stack it
+   above neighbouring controls (thumb sliders, toolbars, etc.) */
+#fc-managers-header .choices.is-open,
+#fc-managers-header .choices.is-focused {
+	z-index: 1000;
+}
+
+#fc-managers-header .choices__list--dropdown,
+#fc-managers-header .choices__list[aria-expanded] {
+	min-width: 240px;
+	z-index: 1000 !important;
+}
+
+#fc-managers-header .choices__list--dropdown .choices__item {
+	white-space: nowrap !important;
 }
 
 /* Dropdown border when active */
@@ -787,4 +804,56 @@ body.admin .fc_has_inner_prompt_choices {
 .fc_add_scroller_horizontal {
 	overflow-x: auto !important;
 	-webkit-overflow-scrolling: touch;
+}
+
+
+/* ===========================
+   ITEM FORM: selected tags (ul#ultagbox)
+   Make them look like the Choices.js multi-select chips (e.g. "Secondary" categories)
+   =========================== */
+
+ul#ultagbox > li {
+	box-sizing: content-box !important;
+	display: inline-flex !important;
+	align-items: center !important;
+	float: none !important;
+	height: auto !important;
+	min-height: 1.7rem !important;
+	margin: 1px !important;
+	padding: 0 4px !important;
+	line-height: 1.7rem !important;
+	font-size: 0.9rem !important;
+	border-radius: var(--border-radius, 0) !important;
+	background-color: var(--choices-list-multiple-item-bg, var(--form-control-bg, #fff)) !important;
+	border: 1px solid var(--choices-list-multiple-item-bg, var(--input-border-color, #aaa)) !important;
+	color: var(--choices-list-multiple-item, inherit) !important;
+}
+
+ul#ultagbox > li.tagitem > span,
+ul#ultagbox > li.tagitem.plain > span {
+	float: none !important;
+	padding: 0 !important;
+	font-size: inherit !important;
+	background: none !important;
+	word-break: break-word;
+}
+
+ul#ultagbox > li.tagitem > a.deletetag {
+	/* X icon painted with the chip's text color via mask, so it stays readable on any chip background */
+	color: inherit !important; /* <a> would otherwise use the link color */
+	background-color: currentColor !important;
+	background-image: none !important;
+	-webkit-mask: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3E%3Cpath d='M1.4 0L0 1.4l2.6 2.6L0 6.6 1.4 8 4 5.4 6.6 8 8 6.6 5.4 4 8 1.4 6.6 0 4 2.6z'/%3E%3C/svg%3E") center / 8px 8px no-repeat;
+	mask: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3E%3Cpath d='M1.4 0L0 1.4l2.6 2.6L0 6.6 1.4 8 4 5.4 6.6 8 8 6.6 5.4 4 8 1.4 6.6 0 4 2.6z'/%3E%3C/svg%3E") center / 8px 8px no-repeat;
+	display: inline-block !important;
+	width: 12px !important;
+	height: 12px !important;
+	margin: -1px 0 0 6px !important;
+	padding: 0 !important;
+	opacity: 0.7;
+	cursor: pointer;
+}
+
+ul#ultagbox > li.tagitem > a.deletetag:hover {
+	opacity: 1;
 }
