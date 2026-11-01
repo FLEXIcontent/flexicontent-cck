@@ -1293,6 +1293,7 @@ class flexicontent_html
 			$JQUERY_UI_THEME = 'ui-lightness';
 		}
 		\Joomla\CMS\Language\Text::script("FLEXI_FORM_IS_BEING_SUBMITTED", true);
+		\Joomla\CMS\Language\Text::script("FLEXI_AJAX_SAVE_UNCONFIRMED", true);
 		\Joomla\CMS\Language\Text::script("FLEXI_LOADING", true);
 
 		/*

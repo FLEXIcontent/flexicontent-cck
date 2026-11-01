@@ -4,6 +4,8 @@
 function fc_submit_form(form, task, validate)
 {
 	var $form = jQuery(form);
+	// Keep one request's serialized fields and cleanup state intact until it settles.
+	if (form.fc_ajax_saving) return false;
 	
 	// ***
 	// *** Do task tests
@@ -54,8 +56,8 @@ function fc_submit_form(form, task, validate)
 			form.doserialized_submit = 0;  // Clear FLAG until next time submit form method is called
 
 			// These should have been removed already by cleanup process, but make sure that any previously injected fields are removed
-			sdata = document.getElementById(sdata_id);
-			sdata_count = document.getElementById(sdata_id);
+			sdata = form.querySelector('input[name="' + sdata_id + '"]');
+			sdata_count = form.querySelector('input[name="' + sdata_id + '_count"]');
 			if (!!sdata) sdata.parentNode.removeChild(sdata);
 			if (!!sdata_count) sdata_count.parentNode.removeChild(sdata_count);
 			
@@ -158,41 +160,64 @@ function fc_submit_form(form, task, validate)
 			
 			// Joomla Base URL
 			var base_url = !!jbase_url_fc ? jbase_url_fc : '';
+			var restored = false;
+			var serialized_fields = form.form_was_serialized ? sinfo.fields_active.slice() : [];
+			var serialized_input = sdata, serialized_count_input = sdata_count;
+			var loading, ajax_marker;
 
-			$form.after('<span id="fc_doajax_loading"><img src="'+base_url+'components/com_flexicontent/assets/images/ajax-loader.gif" align="center" /> ... Saving</span>');
+			function restoreForm()
+			{
+				if (restored) return;
+				restored = true;
+				form.fc_ajax_saving = false;
+				// A synchronous transport failure can finish before the progress handler runs.
+				form.doanimated_submit = 0;
+				if (loading) loading.remove();
+				if (ajax_marker) ajax_marker.remove();
+				jQuery('#fc_filter_form_blocker').remove();
+				if ($form.data('btn_box')) $form.data('btn_box').show();
+				if ($form.data('msg_box')) $form.data('msg_box').hide();
+				$form.show();
+
+				if (serialized_input && serialized_input.parentNode) serialized_input.parentNode.removeChild(serialized_input);
+				if (serialized_count_input && serialized_count_input.parentNode) serialized_count_input.parentNode.removeChild(serialized_count_input);
+				// Only fields enabled before serialization belong to this list.
+				for (var i = 0; i < serialized_fields.length; i++) serialized_fields[i].removeAttribute('disabled');
+				form.form_was_serialized = 0;
+			}
+
+			function showSaveFailure()
+			{
+				var key = 'FLEXI_AJAX_SAVE_UNCONFIRMED';
+				var message = Joomla.JText._(key);
+				if (!message || message === key) message = 'The save could not be confirmed. Your entries are still in this form. Keep this page open, check your connection or sign-in, then try saving again.';
+				// An error response can be an entire login/error page. Never inject its HTML.
+				jQuery('#system-message-container').empty().append(
+					jQuery('<div class="alert alert-danger" role="alert"></div>').text(message)
+				);
+			}
+
+			form.fc_ajax_saving = true;
+			loading = jQuery('<span id="fc_doajax_loading"><img src="'+base_url+'components/com_flexicontent/assets/images/ajax-loader.gif" align="center" /> ... Saving</span>').insertAfter($form);
 			$form.hide();
-			$form.append('<input type="hidden" name="fc_doajax_submit" id="fc_doajax_submit" value="1" />');
+			ajax_marker = jQuery('<input type="hidden" name="fc_doajax_submit" id="fc_doajax_submit" value="1" />').appendTo($form);
 			jQuery.ajax({
 				type: form.method,
 				url: form.action,
 				data: $form.serialize(),
+				timeout: 120000,
 				success: function (data)
 				{
-					jQuery('#fc_doajax_loading').remove();
-					jQuery('#fc_doajax_submit').remove();
-					jQuery('#fc_filter_form_blocker').remove();
-
-					if ($form.data('btn_box')) $form.data('btn_box').show();
-					if ($form.data('msg_box')) $form.data('msg_box').hide();
-					$form.show();
-
+					// Restore before global ajaxSuccess/ajaxError listeners (including editors).
+					restoreForm();
 					jQuery('#system-message-container').html(data);
-					if ( typeof form.form_was_serialized !== 'undefined' && form.form_was_serialized )
-					{
-						// Remove serialization data field and active elements counter field
-						sdata.parentNode.removeChild(sdata);
-						sdata_count.parentNode.removeChild(sdata_count);
-
-						// Restore any modified form elements
-						for ( var i = 0, l = sinfo.fields_active.length; i < l; i++ )
-						{
-							sinfo.fields_active[i].removeAttribute('disabled');
-						};
-
-						// Clear "form was serialized" FLAG
-						form.form_was_serialized = 0;
-					}
-				}
+				},
+				error: function ()
+				{
+					restoreForm();
+					showSaveFailure();
+				},
+				complete: restoreForm
 			});
 			return false;  // Indicate that nothing more should be done ... in case anyone is listening after us
 		});
