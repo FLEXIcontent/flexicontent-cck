@@ -1925,13 +1925,13 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 				// Add a preview button for (currently) LOADED version of the item
 				$btn_arr['preview_current_insite'] = str_replace('_PREVIEW_LINK_', $prvlink_loaded_ver,
-					str_replace('_LBL_TEXT_', $inline_txt . $lbl_txt_loaded_ver, $preview_btn_html));
+					str_replace('_LBL_TEXT_', $lbl_txt_loaded_ver, $preview_btn_html));
 				// Add a preview button for currently ACTIVE version of the item
 				$btn_arr['preview_active_insite'] = str_replace('_PREVIEW_LINK_', $prvlink_active_ver,
-					str_replace('_LBL_TEXT_', $inline_txt . $lbl_txt_active_ver, $preview_btn_html));
+					str_replace('_LBL_TEXT_', $lbl_txt_active_ver, $preview_btn_html));
 				// Add a preview button for currently LATEST version of the item
 				$btn_arr['preview_latest_insite'] = str_replace('_PREVIEW_LINK_', $prvlink_last_ver,
-					str_replace('_LBL_TEXT_', $inline_txt . $lbl_txt_last_ver, $preview_btn_html));
+					str_replace('_LBL_TEXT_', $lbl_txt_last_ver, $preview_btn_html));
 
 				//$toolbar->appendButton( 'Custom', $btn_arr['preview_current'], 'preview_current' );
 				//$toolbar->appendButton( 'Custom', $btn_arr['preview_active'], 'preview_active' );
