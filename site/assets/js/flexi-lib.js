@@ -1149,7 +1149,8 @@
 		var i = 0;
 		for (var cnt=0; cnt<col_selectors.length; cnt++)
 		{
-			if ( jQuery(col_selectors[cnt]).prop("checked") )
+			// A column hidden only by the screen size (CSS) is still selected, it is shown on wider screens
+			if ( jQuery(col_selectors[cnt]).prop("checked") || jQuery(col_selectors[cnt]).attr("data-screen-hidden") === '1' )
 			{
 				col_selected[i++] = jQuery(col_selectors[cnt]).attr("data-colno");
 			}
@@ -1221,16 +1222,171 @@
 			// 7. Create column checkbox and append it to str
 			var ffieldid   = 'columnchoose_' + data_tbl_id + '_' + col;
 			var ffieldname = 'columnchoose_' + data_tbl_id + '[' + col + ']';
-			str = str + '<li><input id="' + ffieldid + '" name="' + ffieldname + '" type="checkbox" data-colno="' + col + '" ' + checked_str + ' onclick="fc_tbl_toggle_column(\''+container_div_id+'\', \''+data_tbl_id+'\', '+col+', 0);">'
+			str = str + '<li><input id="' + ffieldid + '" name="' + ffieldname + '" type="checkbox" data-colno="' + col + '" ' + checked_str + ' onclick="fc_tbl_column_choice(\''+container_div_id+'\', \''+data_tbl_id+'\', '+col+', this);">'
 			+ '<label id="' + ffieldid + '_label" style="color:'+fontcolor_str+';" for="' + ffieldid + '">' + col_display_name + '</label></li>';
 		}
 
-		// 8. Fill in 'column choose box'
-		str = '<span id="'+container_div_id+'_cols"><ul>' + str + '</ul></span>' + end_text;
+		// 8. Fill in 'column choose box', with a note shown when the screen size hides some of the columns
+		var screen_note = typeof Joomla !== 'undefined' && Joomla.Text
+			? Joomla.Text._('FLEXI_COLUMNS_SCREEN_HIDDEN', 'Some columns are hidden on smaller screens. Tick one to show it.')
+			: 'Some columns are hidden on smaller screens. Tick one to show it.';
+		str = '<span id="'+container_div_id+'_cols"><ul>' + str + '</ul></span>'
+			+ '<div id="'+container_div_id+'_screen_note" class="fc-columns-screen-note small text-muted" style="display: none; clear: both;">' + screen_note + '</div>'
+			+ end_text;
 		document.getElementById(container_div_id).innerHTML=str;
 
-		// 9. Update cookie data and display data
+		// 9. Untick the columns that CSS hides on the current screen size
+		fc_tbl_screen_columns(container_div_id, data_tbl_id, true);
+
+		// 10. Update cookie data and display data
 		column_toggles_update_data(container_div_id, data_tbl_id);
+	}
+
+
+	/*
+	 * Columns hidden by CSS on smaller screens (e.g. by the 'hidden-phone' / 'hidden-tablet' classes of the
+	 * list tables) are shown unticked in the column chooser while hidden. Ticking such a column shows it on
+	 * smaller screens too; this is remembered in the browser (localStorage). The screen size never changes
+	 * the column chooser cookie, so wider screens keep showing the columns that the user has chosen.
+	 */
+
+	// *** Get / set the columns shown on smaller screens by the user's choice
+	function fc_tbl_screen_cols_get(data_tbl_id)
+	{
+		try {
+			var all = JSON.parse(window.localStorage.getItem('fc_columnchooser_screen') || '{}');
+			return Array.isArray(all[data_tbl_id]) ? all[data_tbl_id] : [];
+		} catch (e) {
+			return [];
+		}
+	}
+
+	function fc_tbl_screen_cols_set(data_tbl_id, cols)
+	{
+		try {
+			var all = JSON.parse(window.localStorage.getItem('fc_columnchooser_screen') || '{}');
+			all[data_tbl_id] = cols;
+			window.localStorage.setItem('fc_columnchooser_screen', JSON.stringify(all));
+		} catch (e) {}
+	}
+
+
+	// *** Get all cells of a column, given the index of its head cell (cells may use 'colspan')
+	function fc_tbl_column_cells(data_tbl_id, col_no)
+	{
+		var rows = jQuery('#'+data_tbl_id).find('> thead > tr, > tbody > tr');
+		var span = function(cell) { return parseInt(cell.getAttribute('data-colspan') || cell.getAttribute('colspan')) || 1; };
+		var head = jQuery(rows[0]).children('td, th');
+		var start = 0;
+		for (var i = 0; i < col_no && i < head.length; i++) start += span(head[i]);
+		var end = start + (head[col_no] ? span(head[col_no]) : 1);
+
+		var cells = [];
+		for (var row = 0; row < rows.length; row++)
+		{
+			var tcells = jQuery(rows[row]).children('td, th');
+			var pos = 0;
+			for (var cell = 0; cell < tcells.length && pos < end; cell++)
+			{
+				var n = span(tcells[cell]);
+				if (pos >= start && pos + n <= end) cells.push(tcells[cell]);
+				pos += n;
+			}
+		}
+		return cells;
+	}
+
+
+	// *** Update the column chooser for the current screen size, and show the columns that the user has chosen to show
+	function fc_tbl_screen_columns(container_div_id, data_tbl_id, firstrun)
+	{
+		var show_col = eval('show_col_'+data_tbl_id);
+		var forced   = fc_tbl_screen_cols_get(data_tbl_id);
+		var thcells  = jQuery('#'+data_tbl_id+' thead tr:first').find('th');
+		var hidden_cnt = 0;
+
+		jQuery('#'+container_div_id+'_cols input').each(function()
+		{
+			var col = parseInt(this.getAttribute('data-colno'));
+			var th  = thcells[col];
+			if (!th) return;
+
+			// Column is shown according to the column chooser (cookie)
+			var shown = !js_isset(show_col[col]) || !!show_col[col];
+
+			// Measure without the display set below (FC's own hide replaces it, so only remove our 'important' one)
+			var cells = null;
+			if (th.getAttribute('data-screen-forced') === '1')
+			{
+				cells = fc_tbl_column_cells(data_tbl_id, col);
+				jQuery(cells).each(function()
+				{
+					if (this.style.getPropertyPriority('display') === 'important') this.style.removeProperty('display');
+				}).removeAttr('data-screen-forced');
+			}
+
+			var screen_hidden = shown && window.getComputedStyle(th).display === 'none';
+			var force = screen_hidden && forced.indexOf(col) !== -1;
+
+			if (force)
+			{
+				cells = cells || fc_tbl_column_cells(data_tbl_id, col);
+				jQuery(cells).each(function()
+				{
+					this.style.setProperty('display', 'table-cell', 'important');
+				}).attr('data-screen-forced', '1');
+			}
+
+			this.checked = shown && (!screen_hidden || force);
+			this.setAttribute('data-screen-hidden', screen_hidden && !force ? '1' : '0');
+			if (screen_hidden && !force) hidden_cnt++;
+		});
+
+		var note = document.getElementById(container_div_id + '_screen_note');
+		if (note) note.style.display = hidden_cnt ? 'block' : 'none';
+
+		// Check again when the window is resized
+		if (firstrun)
+		{
+			var timer = null;
+			jQuery(window).on('resize', function()
+			{
+				clearTimeout(timer);
+				timer = setTimeout(function() { fc_tbl_screen_columns(container_div_id, data_tbl_id, false); }, 150);
+			});
+		}
+	}
+
+
+	// *** Tick / untick a column in the column chooser
+	function fc_tbl_column_choice(container_div_id, data_tbl_id, col_no, el)
+	{
+		var show_col = eval('show_col_'+data_tbl_id);
+		var shown    = !js_isset(show_col[col_no]) || !!show_col[col_no];
+		var forced   = fc_tbl_screen_cols_get(data_tbl_id);
+		var pos      = forced.indexOf(col_no);
+		var th       = jQuery('#'+data_tbl_id+' thead tr:first').find('th')[col_no];
+
+		if (el.checked)
+		{
+			// Show the column, and keep showing it on this screen size if CSS hides it
+			if (!shown) fc_tbl_toggle_column(container_div_id, data_tbl_id, col_no, 0);
+			if (th && window.getComputedStyle(th).display === 'none' && pos === -1) forced.push(col_no);
+		}
+		else if (pos !== -1 && th && th.getAttribute('data-screen-forced') === '1')
+		{
+			// Shown on this screen size only by the user's choice: let CSS hide it again, the cookie is not changed
+			forced.splice(pos, 1);
+		}
+		else
+		{
+			// Hide the column on all screen sizes (column chooser cookie)
+			if (pos !== -1) forced.splice(pos, 1);
+			fc_tbl_toggle_column(container_div_id, data_tbl_id, col_no, 0);
+		}
+
+		fc_tbl_screen_cols_set(data_tbl_id, forced);
+		fc_tbl_screen_columns(container_div_id, data_tbl_id, false);
 	}
 
 

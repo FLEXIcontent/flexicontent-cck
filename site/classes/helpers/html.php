@@ -587,6 +587,9 @@ class flexicontent_html
 		$app  =Factory::getApplication();
 		$jinput = $app->input;
 
+		// Note of the column chooser, about the columns hidden on smaller screens
+		\Joomla\CMS\Language\Text::script('FLEXI_COLUMNS_SCREEN_HIDDEN');
+
 		// Clear legacy cookie
 		$legacy_cookie = $jinput->cookie->get('columnchoose_'.$data_tbl_id, null);
 		if ($legacy_cookie) $jinput->cookie->set('columnchoose_'.$data_tbl_id, null, 1, '', '');
