@@ -405,10 +405,10 @@
 			</field>
 			<field name="robots" type="radio" label="FLEXI_METADATA_ROBOTS_LABEL" description="FLEXI_METADATA_ROBOTS_DESC" class="group-fcset fc-cleared">
 				<option value="">FLEXI_JOOMLA_DEFAULT</option>
-				<option value="index, follow">JGLOBAL_INDEX_FOLLOW</option>
-				<option value="noindex, follow">JGLOBAL_NOINDEX_FOLLOW</option>
-				<option value="index, nofollow">JGLOBAL_INDEX_NOFOLLOW</option>
-				<option value="noindex, nofollow">JGLOBAL_NOINDEX_NOFOLLOW</option>
+				<option value="index, follow">FLEXI_INDEX_FOLLOW</option>
+				<option value="noindex, follow">FLEXI_NOINDEX_FOLLOW</option>
+				<option value="index, nofollow">FLEXI_INDEX_NOFOLLOW</option>
+				<option value="noindex, nofollow">FLEXI_NOINDEX_NOFOLLOW</option>
 			</field>
 
 			<field name="" type="separator" default="Menu Item" level="level1" />
