@@ -369,6 +369,13 @@ class FlexicontentViewItems extends \Joomla\CMS\MVC\View\HtmlView
 					$delim = $field_sep;
 					$vals = '';
 
+					// Raw exports must enforce the same field view access as rendered output.
+					// The delimiter is already emitted, so denied fields keep an empty CSV cell.
+					if (empty($field->has_access))
+					{
+						continue;
+					}
+
 					// CASE 1: RENDERED value display !
 					if ($include_in_csv_export === 2)
 					{
