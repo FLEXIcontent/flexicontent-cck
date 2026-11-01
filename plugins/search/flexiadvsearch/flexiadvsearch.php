@@ -126,6 +126,10 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 
 		$db       = \Joomla\CMS\Factory::getDbo();
 		$user     = \Joomla\CMS\Factory::getUser();
+		$field_view_levels = array_map('intval', $user->getAuthorisedViewLevels());
+		$can_view_field = static function ($field) use ($field_view_levels) {
+			return !(int) $field->access || in_array((int) $field->access, $field_view_levels, true);
+		};
 
 		$app->setUserState('fc_view_total_'.$view, 0);
 		$app->setUserState('fc_view_limit_max_'.$view, 0);
@@ -394,6 +398,11 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 			}
 		}
 
+
+		// Search results and filter predicates must respect the current field
+		// access, independently of which user originally built the shared index.
+		$fields_text = array_filter($fields_text, $can_view_field);
+		$filters = array_filter($filters, $can_view_field);
 
 		/**
 		 * Load Plugin parameters
@@ -730,8 +739,12 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 		{
 			$onBasic_textsearch    = '';
 			$onAdvanced_textsearch = $text_search;
-			$join_textsearch = ' JOIN #__flexicontent_advsearch_index as ts ON ts.item_id = i.id '.(count($fields_text) ? 'AND ts.field_id IN ('. implode(',',array_keys($fields_text)) .')' : '');
-			$join_textfields = ' JOIN #__flexicontent_fields as txtf ON txtf.id=ts.field_id';
+			$join_textsearch = ' JOIN #__flexicontent_advsearch_index as ts ON ts.item_id = i.id AND ts.field_id IN ('
+				. (count($fields_text) ? implode(',', array_keys($fields_text)) : '0') . ')';
+			// Apply this to both the matching query and the result-text query.
+			$join_textfields = ' JOIN #__flexicontent_fields as txtf ON txtf.id=ts.field_id'
+				. ' AND txtf.published = 1 AND txtf.isadvsearch IN (1,2)'
+				. ' AND txtf.access IN (0' . (count($field_view_levels) ? ',' . implode(',', $field_view_levels) : '') . ')';
 		}
 
 		// JOIN clauses ... (shared with filters)
