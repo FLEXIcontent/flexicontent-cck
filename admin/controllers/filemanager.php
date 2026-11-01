@@ -1493,6 +1493,49 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 	 *
 	 * @since 3.3
 	 */
+	public function removeunlink()
+	{
+		$this->input->set('unlink', 1);
+
+		return $this->remove();
+	}
+
+
+	/**
+	 * Create HTML list of items (with links to edit them), that use files
+	 *
+	 * @param   array   $usage_items  Result of the model method getFilesUsageItems()
+	 * @param   array   $files        File records keyed by file id
+	 * @param   int     $max_items    Max number of items to list
+	 *
+	 * @return  string
+	 */
+	protected function _getUsageItemsHtml(array $usage_items, array $files, $max_items = 100)
+	{
+		$li = array();
+
+		foreach (array_slice($usage_items, 0, $max_items, true) as $usage_item)
+		{
+			$names = array();
+
+			foreach (array_keys($usage_item->files) as $_fid)
+			{
+				if (isset($files[$_fid]))
+				{
+					$names[] = htmlspecialchars($files[$_fid]->filename_original ? $files[$_fid]->filename_original : $files[$_fid]->filename, ENT_QUOTES, 'UTF-8');
+				}
+			}
+
+			$li[] = '<li><a href="' . \Joomla\CMS\Router\Route::_('index.php?option=com_flexicontent&task=items.edit&cid=' . $usage_item->id) . '" target="_blank" rel="noopener">'
+				. htmlspecialchars($usage_item->title, ENT_QUOTES, 'UTF-8') . '</a> <small>(#' . $usage_item->id . ')</small>'
+				. ' &ndash; <small>' . (count($names) > 3 ? implode(', ', array_slice($names, 0, 3)) . ' ... +' . (count($names) - 3) : implode(', ', $names)) . '</small></li>';
+		}
+
+		return '<ul>' . implode('', $li) . '</ul>'
+			. (count($usage_items) > $max_items ? '... +' . (count($usage_items) - $max_items) : '');
+	}
+
+
 	public function remove()
 	{
 		// Check for request forgeries
@@ -1645,6 +1688,43 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$model = $this->getModel($this->record_name_pl);
 		$deletable = $model->getDeletable($cid);
 
+		// Remove the assignments of files that are in use, then delete them (task: removeunlink)
+		if ($this->input->getInt('unlink', 0) && count($cid) != count($deletable))
+		{
+			if (!$candelete || !$user->authorise('core.edit', 'com_content'))
+			{
+				$this->exitHttpHead = array(0 => array('status' => '403 Forbidden'));
+				$this->exitMessages = array(0 => array('error' => 'FLEXI_ALERTNOTAUTH_TASK'));
+				$this->exitLogTexts = array();
+				$this->exitSuccess  = false;
+
+				return $this->terminate(null, $exitMessages);
+			}
+
+			$unlink_ids = array_values(array_diff($cid, $deletable));
+			$usage_items = $model->getFilesUsageItems($unlink_ids);
+			$unlinked = $model->removeAssociations($unlink_ids);
+
+			if ($unlinked === false)
+			{
+				$this->exitHttpHead = array(0 => array('status' => '500 Internal Server Error'));
+				$this->exitMessages = array(0 => array('error' => \Joomla\CMS\Language\Text::_('FLEXI_OPERATION_FAILED') . ' : ' . $model->getError()));
+				$this->exitLogTexts = array();
+				$this->exitSuccess  = false;
+
+				return $this->terminate(null, $exitMessages);
+			}
+
+			$app->enqueueMessage(
+				\Joomla\CMS\Language\Text::sprintf('FLEXI_FILEMAN_ASSOC_REMOVED', count($unlinked['items']), count($unlink_ids))
+				. $this->_getUsageItemsHtml($usage_items, $files),
+				'message'
+			);
+
+			// Files may be in use via ways that we cannot unlink (e.g. image fields), recalculate
+			$deletable = $model->getDeletable($cid);
+		}
+
 		// Find files that are currently in use
 		if (count($cid) != count($deletable))
 		{
@@ -1662,6 +1742,20 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			}
 
 			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_CANNOT_REMOVE_FILES_IN_USE') . ': ' . implode(', ', $inuse_files), 'warning');
+
+			// List the items that use these files (with links to edit them), so that the associations can be removed
+			$usage_items = $model->getFilesUsageItems(array_diff($cid, $deletable));
+
+			if ($usage_items)
+			{
+				$app->enqueueMessage(
+					\Joomla\CMS\Language\Text::sprintf('FLEXI_FILES_IN_USE_BY_ITEMS', count($usage_items))
+					. $this->_getUsageItemsHtml($usage_items, $files)
+					. '<br>' . \Joomla\CMS\Language\Text::_('FLEXI_FILEMAN_USE_REMOVE_ASSOC_BTN'),
+					'warning'
+				);
+			}
+
 			$cid = $deletable;
 		}
 
@@ -2151,6 +2245,41 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			$app->setHeader('status', '500 Internal Server Error', true);
 			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_NO_ITEMS_SELECTED'), 'error');
 			$this->setRedirect($this->returnURL);
+
+			return;
+		}
+
+		// Batch: set the same access level to all selected files
+		$batch_access = $this->input->getInt('batch_access', 0);
+
+		if ($batch_access > 0)
+		{
+			$perms = FlexicontentHelperPerm::getPerm();
+			$allowed = array();
+			$accesses = array();
+			$row = \Joomla\CMS\Table\Table::getInstance('flexicontent_files', '');
+
+			foreach ($cid as $_id)
+			{
+				$row->load($_id);
+
+				if ($perms->CanFiles && ($perms->CanViewAllFiles || $user->id == $row->uploaded_by))
+				{
+					$allowed[] = $_id;
+					$accesses[$_id] = $batch_access;
+				}
+			}
+
+			if ($allowed && !$model->saveaccess($allowed, $accesses))
+			{
+				$app->setHeader('status', '500 Internal Server Error', true);
+				$this->setRedirect($this->returnURL, \Joomla\CMS\Language\Text::_('FLEXI_OPERATION_FAILED') . ' : ' . $model->getError(), 'error');
+
+				return;
+			}
+
+			\Joomla\CMS\Factory::getCache('com_flexicontent')->clean();
+			$this->setRedirect($this->returnURL, \Joomla\CMS\Language\Text::sprintf('FLEXI_FILEMAN_ACCESS_CHANGED', count($allowed), count($cid)));
 
 			return;
 		}

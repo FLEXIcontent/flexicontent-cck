@@ -27,6 +27,68 @@ require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'
 class flexicontent_cats
 {
 	/**
+	 * Get the configuration of the category path display (Backend Managers tab of component options)
+	 *
+	 * @return  object  enabled: 0 / 1, mode: 'full' / 'last', levels: number of last parents to show
+	 */
+	public static function getPathConfig()
+	{
+		static $conf = null;
+
+		if ($conf === null)
+		{
+			$cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+
+			$conf = (object) array(
+				'enabled' => (int) $cparams->get('cat_path_show', 1),
+				'mode'    => $cparams->get('cat_path_mode', 'full') === 'last' ? 'last' : 'full',
+				'levels'  => max(1, (int) $cparams->get('cat_path_levels', 3)),
+			);
+		}
+
+		return $conf;
+	}
+
+
+	/**
+	 * Get the titles of the parent categories of a category (without the category itself and the root)
+	 *
+	 * @param   int   $catid     The category id
+	 * @param   bool  $shorten   Apply the 'Last items' option, otherwise the full path is returned
+	 *
+	 * @return  array  Titles, the first is '...' if the path was shortened
+	 */
+	public static function getParentsPathTitles($catid, $shorten = true)
+	{
+		global $globalcats;
+
+		$titles = array();
+
+		if (empty($globalcats[$catid]->ancestorsarray))
+		{
+			return $titles;
+		}
+
+		foreach ($globalcats[$catid]->ancestorsarray as $anc_id)
+		{
+			if ($anc_id != $catid && isset($globalcats[$anc_id]) && $globalcats[$anc_id]->id > 1)
+			{
+				$titles[] = $globalcats[$anc_id]->title;
+			}
+		}
+
+		$conf = self::getPathConfig();
+
+		if ($shorten && $conf->mode === 'last' && count($titles) > $conf->levels)
+		{
+			$titles = array_merge(array('...'), array_slice($titles, -$conf->levels));
+		}
+
+		return $titles;
+	}
+
+
+	/**
 	 * Parent Categories
 	 *
 	 * @var array
@@ -563,6 +625,26 @@ class flexicontent_cats
 			}
 		}
 
+		// Show the full path (parent categories) of each category, e.g. for filters, since categories may have the same title,
+		// enabled by adding the CSS class 'fc_cat_path' to the select (it is used by flexi-lib.js to show the path, and to search inside it)
+		$path_conf = self::getPathConfig();
+
+		if ($path_conf->enabled && $app->isClient('administrator'))
+		{
+			if (is_array($attribs))
+			{
+				$attribs['class'] = trim((isset($attribs['class']) ? $attribs['class'] : '') . ' fc_cat_path');
+			}
+			elseif (strpos((string) $attribs, 'fc_cat_path') === false)
+			{
+				$attribs = strpos((string) $attribs, 'class="') !== false
+					? preg_replace('/class="/', 'class="fc_cat_path ', (string) $attribs, 1)
+					: trim((string) $attribs . ' class="fc_cat_path"');
+			}
+		}
+
+		$show_path = strpos(is_array($attribs) ? (isset($attribs['class']) ? $attribs['class'] : '') : (string) $attribs, 'fc_cat_path') !== false;
+
 		// Category state suffixes
 		$state_sfxs = array(1 => ' -P-', 0 => ' -U-', 2 => ' -A-', -2 => ' -T-', );
 
@@ -605,11 +687,28 @@ class flexicontent_cats
 					$parent_title = htmlspecialchars($parent_title, ENT_COMPAT, 'UTF-8');
 				}
 
+				$opt_attr = $parent_title ? array('data-title' => $parent_title) : array();
+
+				if ($show_path && $cat->id)
+				{
+					$full_titles  = self::getParentsPathTitles($cat->id, false);
+					$shown_titles = self::getParentsPathTitles($cat->id, true);
+
+					if ($shown_titles)
+					{
+						$opt_attr['data-label-description'] = htmlspecialchars(implode(' › ', $shown_titles), ENT_QUOTES, 'UTF-8');
+					}
+
+					// Text that is searched when the user types in the select: always the full path
+					$search_str = ($full_titles ? implode(' › ', $full_titles) . ' › ' : '') . $cat->title;
+					$opt_attr['data-custom-properties'] = htmlspecialchars(json_encode(array('search' => $search_str), JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8');
+				}
+
 				//$catlist[] = \Joomla\CMS\HTML\HTMLHelper::_( 'select.option', $cat->id, $cat_title, array( 'attr' => array('title' => $parent_title), 'disable' => false) );
 				$catlist[] = (object) array(
 					'value' => $cat->id,
 					'text'  => $cat_title,
-					'attr'  => ($parent_title ? array('data-title' => $parent_title) : null),
+					'attr'  => ($opt_attr ?: null),
 					'disable' => !$allowed
 				);
 

@@ -1668,7 +1668,7 @@ class flexicontent_html
 					$document->addScript($framework_path.'/choices.min.js', array('version' => $ver));
 					$document->addScript($framework_path.'/sortable.min.js', array('version' => $ver));
 					$document->addStyleSheet($framework_path.'/choices.min.css', array('version' => $ver));
-					$document->addStyleSheet($css_path.'/flexi_choices.css', array('version' => '2.0'));
+					$document->addStyleSheet($css_path.'/flexi_choices.css', array('version' => '2.4'));
 
 					// Attach Choices.js JS but skip it in mobiles and use native selects instead
 					$js .= "

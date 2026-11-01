@@ -857,3 +857,99 @@ ul#ultagbox > li.tagitem > a.deletetag {
 ul#ultagbox > li.tagitem > a.deletetag:hover {
 	opacity: 1;
 }
+
+
+/* ===========================
+   CATEGORY SELECTS WITH PATH (select class fc_cat_path)
+   =========================== */
+
+.choices__list--dropdown .choices__item--choice .choices__description {
+	display: block;
+	margin-top: -2px;
+	font-size: 0.75rem !important;
+	line-height: 1.1rem;
+	opacity: .65;
+	font-weight: normal;
+}
+
+.choices__list--dropdown .choices__item--choice:has(.choices__description) {
+	line-height: 1.2rem !important;
+	padding-top: 3px !important;
+	padding-bottom: 3px !important;
+}
+
+/* Selected value: single line, the parents path is shortened with an ellipsis, the title is always visible */
+.fc-choices-catpath .choices__list--single .choices__item {
+	display: flex !important;
+	align-items: baseline;
+	min-width: 0;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+.fc-choices-catpath .fc-catpath-parents,
+.fc-choices-catpath .fc-catpath-title {
+	white-space: nowrap !important;
+	word-break: normal !important;
+}
+
+.fc-choices-catpath .choices__list--single .choices__item {
+	flex-wrap: nowrap !important;
+	overflow: hidden !important;
+}
+
+.fc-choices-catpath .fc-catpath-parents {
+	flex: 0 1 auto;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	opacity: .6;
+	font-size: .9em;
+	padding-right: .25em;
+}
+
+.fc-choices-catpath .fc-catpath-title {
+	flex: 0 0 auto;
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+/* Dropdown: as wide as the longest path (not wider than the viewport), paths wrap instead of being cut, no horizontal scroll */
+.fc-choices-catpath .choices__list--dropdown {
+	width: max-content;
+	min-width: 100%;
+	max-width: min(560px, calc(100vw - 32px));
+}
+
+.fc-choices-catpath .choices__list--dropdown .choices__list {
+	overflow-x: hidden !important;
+}
+
+.fc-choices-catpath .choices__list--dropdown .choices__item--choice {
+	white-space: normal !important;
+}
+
+.fc-choices-catpath .choices__list--dropdown .choices__description {
+	word-break: break-word;
+}
+
+/* Checkbox mode (multiple selects): path of the category below its title */
+.fc-choices-checkbox-textbox {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+}
+
+.fc-choices-checkbox-textbox .fc-choices-checkbox-label {
+	line-height: 1.4rem !important;
+}
+
+.fc-choices-checkbox-textbox .choices__description {
+	display: block;
+	margin: -2px 0 0 0;
+	font-size: 0.75rem;
+	line-height: 1.1rem;
+	opacity: .65;
+	white-space: normal;
+}

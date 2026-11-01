@@ -938,10 +938,6 @@ if ($js)
 								<span class="icon-remove" style="color: darkred;"></span>
 							</span>
 												</div>
-											<?php else: ?>
-												<span class="<?php echo $this->btn_sm_class . ' ' . $this->tooltip_class; ?>" onclick="if (document.adminForm.boxchecked.value == 0) { alert(Joomla.JText._('FLEXI_NO_ITEMS_SELECTED')); } else { if (confirm(Joomla.JText._('FLEXI_ARE_YOU_SURE'))) { Joomla.submitbutton('filemanager.remove', 'adminForm', false); } }" data-title="<?php echo flexicontent_html::getToolTip('', 'FLEXI_DELETE', 1, 1); ?>" data-placement="bottom">
-							<span class="icon-remove" style="color: darkred;"></span>
-						</span>
 											<?php endif; ?>
 
 

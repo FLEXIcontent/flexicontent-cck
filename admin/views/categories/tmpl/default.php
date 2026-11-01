@@ -670,6 +670,21 @@ if ($js)
 						? StringHelper::substr( htmlspecialchars($row->alias, ENT_QUOTES, 'UTF-8'), 0 , 25) . '...'
 						: htmlspecialchars($row->alias, ENT_QUOTES, 'UTF-8');
 				?>]</small>
+
+				<?php
+				/**
+				 * Path of parent categories, since categories may have the same title and, when searching / filtering / ordering,
+				 * the tree is not complete, so the indentation can not tell which is the parent (shown only then)
+				 */
+				$_tree_is_partial = $this->count_filters || !empty($this->lists['search']) || (isset($this->lists['order']) && $this->lists['order'] !== 'a.lft');
+
+				if (flexicontent_cats::getPathConfig()->enabled && $_tree_is_partial && $row->level > 1) :
+					$_path_titles = array_map(function ($_t) { return htmlspecialchars($_t, ENT_QUOTES, 'UTF-8'); }, flexicontent_cats::getParentsPathTitles($row->id));
+
+					if ($_path_titles) :
+				?>
+					<div class="fc-cat-path small text-muted"><?php echo implode(' &rsaquo; ', $_path_titles); ?></div>
+				<?php endif; endif; ?>
 			</td>
 
 			<td class="col_lang small hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >

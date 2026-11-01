@@ -23,6 +23,14 @@ $ctrl_task = 'task=filemanager.';
 
 $app = \Joomla\CMS\Factory::getApplication();
 $indexer_name = $app->input->get('indexer', 'filemanager_stats', 'cmd');
+
+// Tool: delete orphaned files, has its own template (warning, confirmation, progress)
+if ($indexer_name === 'orphans')
+{
+	include __DIR__ . '/orphans.php';
+
+	return;
+}
 $rebuildmode  = $app->input->get('rebuildmode', '', 'cmd');
 $index_urls   = $app->input->get('index_urls', 0, 'int');
 

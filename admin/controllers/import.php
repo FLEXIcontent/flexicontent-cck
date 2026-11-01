@@ -355,6 +355,17 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 					$app->redirect($link);
 				}
 
+				// Only the header row was found: the Item Separator did not match anything in the file, the whole file was read as a single row
+				if (count($contents) < 2)
+				{
+					$app->enqueueMessage(
+						'CSV file has no item rows: Item Separator [ ' . htmlspecialchars($jinput->get('record_separator', '', 'string')) . ' ] was not found in the file. '
+						. 'Use a single backslash to write a new line, e.g. <b>\n~~</b> (and not <b>\\\\n~~</b>)',
+						'error'
+					);
+					$app->redirect($link);
+				}
+
 				// ***
 				// *** Get field names (from the header line (row 0), and remove it form the data array
 				// ***

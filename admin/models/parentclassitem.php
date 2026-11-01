@@ -3583,6 +3583,24 @@ class ParentClassItem extends FCModelAdmin
 
 
 		// ***
+		// *** Tags field is configured as "Non-translatable": the same tags are assigned to all language versions (associated items)
+		// ***
+
+		if (isset($data['tags']) && !$isNew && $this->useAssociations() && $this->isTagsFieldUntranslatable())
+		{
+			// Get (non-cached) associations, they may have been just changed
+			$assocs = flexicontent_db::getLangAssocs(array((int) $item->id));
+			$assoc_item_ids = isset($assocs[$item->id]) ? array_diff(array_keys($assocs[$item->id]), array((int) $item->id)) : array();
+
+			foreach ($assoc_item_ids as $assoc_item_id)
+			{
+				$this->saveFcTagsAssignments($data['tags'], (int) $assoc_item_id, $_replace = true);
+				$this->saveJTagsAssignments($data['tags'], (int) $assoc_item_id);
+			}
+		}
+
+
+		// ***
 		// *** Delete only category relations which are not part of the categories array anymore to avoid loosing ordering
 		// ***
 
@@ -5334,6 +5352,32 @@ class ParentClassItem extends FCModelAdmin
 	 *
 	 * @return	array		The array of associations
 	 */
+	/**
+	 * Method to check if the core field 'tags' is configured as non-translatable (field option), i.e. value is shared by the language versions
+	 *
+	 * @return  boolean
+	 *
+	 * @since   3.3.0
+	 */
+	public function isTagsFieldUntranslatable()
+	{
+		static $untranslatable = null;
+
+		if ($untranslatable === null)
+		{
+			$query = $this->_db->getQuery(true)
+				->select('untranslatable')
+				->from('#__flexicontent_fields')
+				->where('iscore = 1')
+				->where('field_type = ' . $this->_db->Quote('tags'));
+
+			$untranslatable = (bool) $this->_db->setQuery($query)->loadResult();
+		}
+
+		return $untranslatable;
+	}
+
+
 	function getLangAssocs($id=0)
 	{
 		static $translations = array(0 => array());

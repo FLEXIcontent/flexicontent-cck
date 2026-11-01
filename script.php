@@ -1914,9 +1914,15 @@ class com_flexicontentInstallerScript
 						throw new RuntimeException('cannot create folder ' . $target);
 					}
 				}
-				elseif (!copy($file->getPathname(), $target))
+				elseif (!@copy($file->getPathname(), $target))
 				{
-					throw new RuntimeException('cannot copy file ' . $target);
+					// Existing file may be owned by another system user (e.g. copied manually): it is not writable
+					// by the web server, but it can be replaced if the folder is writable
+					if (!is_file($target) || !@unlink($target) || !@copy($file->getPathname(), $target))
+					{
+						throw new RuntimeException('cannot copy file ' . $target
+							. (is_file($target) ? ' (existing file is not writable, owner uid ' . @fileowner($target) . ', web server uid ' . (function_exists('posix_geteuid') ? posix_geteuid() : '?') . ')' : ''));
+					}
 				}
 			}
 

@@ -1784,13 +1784,76 @@
 							label.classList.add('fc-choices-checkbox-label');
 							label.textContent = data.label;
 							tpl.appendChild(checkbox);
-							tpl.appendChild(label);
+
+							if (data.labelDescription) {
+								// Category path (see fc_cat_path): title and path in a column
+								var textBox = document.createElement('span');
+								textBox.className = 'fc-choices-checkbox-textbox';
+								textBox.appendChild(label);
+								var descEl = document.createElement('small');
+								descEl.className = 'choices__description';
+								descEl.textContent = data.labelDescription;
+								textBox.appendChild(descEl);
+								tpl.appendChild(textBox);
+							} else {
+								tpl.appendChild(label);
+							}
 							return tpl;
 						};
 					}
 					return customTemplates;
 				}
 			};
+
+			// Category selects with full path (see flexicontent_cats::buildcatselect): list shows the parents path of each category, search matches words of
+			// the whole path (words in any order, e.g. 'windows browsers'), selected value is shown with its path
+			if (el.classList.contains('fc_cat_path'))
+			{
+				choicesOptions.searchFields = ['customProperties.search'];
+				choicesOptions.fuseOptions = { includeScore: true, ignoreLocation: true, threshold: 0, useExtendedSearch: true };
+			}
+
+			if (!isMultiple && el.classList.contains('fc_cat_path'))
+			{
+				var fcCatPathBaseTemplates = choicesOptions.callbackOnCreateTemplates;
+				choicesOptions.callbackOnCreateTemplates = function(template) {
+					var customTemplates = fcCatPathBaseTemplates ? fcCatPathBaseTemplates.apply(this, arguments) : {};
+
+					customTemplates.item = function(config, choice) {
+						var cn = config.classNames;
+						var div = document.createElement('div');
+						div.classList.add(cn.item);
+
+						var path = choice.labelDescription || '';
+						var title = String(choice.label).replace(/^(?:\. )*\|_\s*/, '');
+
+						if (path && choice.value !== '')
+						{
+							// Path can be shortened with ellipsis, the title is always fully shown (single line)
+							var spanPath = document.createElement('span');
+							spanPath.className = 'fc-catpath-parents';
+							spanPath.textContent = path + ' \u203a ';
+							div.appendChild(spanPath);
+						}
+
+						var spanTitle = document.createElement('span');
+						spanTitle.className = 'fc-catpath-title';
+						spanTitle.textContent = title;
+						div.appendChild(spanTitle);
+
+						div.dataset.item = '';
+						div.dataset.id = choice.id;
+						div.dataset.value = choice.value;
+						div.setAttribute('aria-selected', 'true');
+						div.setAttribute('role', 'option');
+						if (choice.placeholder) div.classList.add(cn.placeholder);
+						div.classList.add(choice.highlighted ? cn.highlightedState : cn.itemSelectable);
+						return div;
+					};
+
+					return customTemplates;
+				};
+			}
 
 			// No-select mode: hide dropdown entirely, just display value
 			if (isNoSelect) choicesOptions.searchEnabled = false;
@@ -2077,6 +2140,20 @@
 					// Remove the choice from the Choices.js widget as well
 					if (choicesInstance.removeChoice) choicesInstance.removeChoice(rmValue);
 					el.dispatchEvent(new Event('change', { bubbles: true }));
+				});
+			}
+
+			if (el.classList.contains('fc_cat_path') && choicesInstance.containerOuter && choicesInstance.containerOuter.element)
+			{
+				choicesInstance.containerOuter.element.classList.add('fc-choices-catpath');
+
+				// The dropdown can be wider than the select: keep it inside the viewport (e.g. mobiles, selects at the right side of the page)
+				el.addEventListener('showDropdown', function() {
+					var dd = choicesInstance.dropdown && choicesInstance.dropdown.element;
+					if (!dd) return;
+					dd.style.left = '';
+					var overflow = dd.getBoundingClientRect().right - (document.documentElement.clientWidth - 8);
+					if (overflow > 0) dd.style.left = -overflow + 'px';
 				});
 			}
 

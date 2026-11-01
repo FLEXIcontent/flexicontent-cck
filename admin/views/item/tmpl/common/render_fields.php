@@ -325,6 +325,11 @@ if ($tags_displayed) : ob_start();  // tags ?>
 
 		<div class="controls container_fcfield container_fcfield_name_tags">
 
+			<?php if ($field && !empty($field->untranslatable) && flexicontent_db::useAssociations()) : ?>
+				<div class="fc_val_translation_shared_mssg alert alert-info fc-small fc-iblock" style="margin:0 2px 6px 2px; max-width: unset;"><?php echo Text::_('FLEXI_FIELD_VALUE_IS_NON_TRANSLATABLE'); ?></div>
+				<div class="fcclear"></div>
+			<?php endif; ?>
+
 			<?php if ($tags_editable) : ?>
 				<div id="tags">
 					<input type="text" id="input-tags" name="tagname" class="<?php echo $tip_class; ?>"

@@ -751,6 +751,84 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 		//\Joomla\CMS\Toolbar\ToolbarHelper::deleteList(\Joomla\CMS\Language\Text::_('FLEXI_ARE_YOU_SURE'), 'filemanager.remove');
 
 		/**
+		 * Batch actions for the selected files: Change State, Access, Delete (dropdowns, like in the other managers)
+		 */
+
+		$mk_btn = function ($text, $name, $full_js, $task, $icon, $desc = '', $btn_class = 'btn-info') use ($contrl)
+		{
+			return flexicontent_html::addToolBarButton(
+				$text, $name, $full_js,
+				$msg_alert = \Joomla\CMS\Language\Text::_('FLEXI_NO_ITEMS_SELECTED'), $msg_confirm = '',
+				$task, $extra_js = '', $btn_list = true, $btn_menu = true, $btn_confirm = false,
+				$this->btn_sm_class . ' btn-fcaction ' . (FLEXI_J40GE ? '_DDI_class_ ' . $btn_class : '') . ' ' . $this->tooltip_class, $icon,
+				'data-placement="right" title="' . flexicontent_html::encodeHTML($desc, 2) . '"', $auto_add = 0, $tag_type = 'button'
+			);
+		};
+
+		$mk_drop = function ($id, $icon, $text, $btn_arr, $group)
+		{
+			if (!count($btn_arr))
+			{
+				return;
+			}
+
+			$drop_btn = '
+				<button id="' . $id . '" class="' . $this->btn_sm_class . ' dropdown-toggle btn-fcaction" data-toggle="dropdown" data-bs-toggle="dropdown">
+					<span title="' . \Joomla\CMS\Language\Text::_($text) . '" class="' . $icon . '"></span>
+					' . \Joomla\CMS\Language\Text::_($text) . '
+					<span class="caret"></span>
+				</button>';
+			array_unshift($btn_arr, $drop_btn);
+			flexicontent_html::addToolBarDropMenu($btn_arr, $group, ' ');
+		};
+
+		if ($hasEditState)
+		{
+			// Change state
+			$btn_arr = array();
+			$btn_arr[] = $mk_btn('FLEXI_PUBLISHED', 'publish', "Joomla.submitbutton('" . $contrl . "publish', 'adminForm', false); return false;", '', 'icon-publish', \Joomla\CMS\Language\Text::_('FLEXI_FILEMAN_BATCH_PUBLISH'));
+			$btn_arr[] = $mk_btn('FLEXI_UNPUBLISHED', 'unpublish', "Joomla.submitbutton('" . $contrl . "unpublish', 'adminForm', false); return false;", '', 'icon-unpublish', \Joomla\CMS\Language\Text::_('FLEXI_FILEMAN_BATCH_UNPUBLISH'));
+			$mk_drop('toolbar-changestate', 'icon-checkmark', 'FLEXI_CHANGE_STATE', $btn_arr, 'files_state_btns_group');
+
+			// Access level
+			$btn_arr = array();
+
+			foreach (\Joomla\CMS\HTML\HTMLHelper::_('access.assetgroups') as $_level)
+			{
+				$set_js = "var f = jQuery('#adminForm'); f.find('input[name=batch_access]').remove();"
+					. " f.append(jQuery('<input type=\"hidden\" name=\"batch_access\" />').val(" . (int) $_level->value . "));"
+					. " Joomla.submitbutton('" . $contrl . "access', 'adminForm', false); return false;";
+
+				$btn_arr[] = $mk_btn(
+					htmlspecialchars($_level->text, ENT_QUOTES, 'UTF-8'), 'access_' . (int) $_level->value, $set_js, '', 'icon-eye',
+					\Joomla\CMS\Language\Text::_('FLEXI_FILEMAN_BATCH_ACCESS') . ': ' . $_level->text
+				);
+			}
+
+			$mk_drop('toolbar-batchaccess', 'icon-eye', 'FLEXI_ACCESS', $btn_arr, 'files_access_btns_group');
+		}
+
+		if ($hasDelete)
+		{
+			$btn_arr = array();
+			$confirm_js = function ($msg_key) use ($contrl)
+			{
+				return "if (confirm('" . flexicontent_html::escapeJsText(\Joomla\CMS\Language\Text::_($msg_key), 'd') . "')) { Joomla.submitbutton('%s', 'adminForm', false); } return false;";
+			};
+
+			$btn_arr[] = $mk_btn(
+				'FLEXI_DELETE', 'delete', sprintf($confirm_js('FLEXI_ARE_YOU_SURE'), $contrl . 'remove'), '', 'icon-remove',
+				\Joomla\CMS\Language\Text::_('FLEXI_FILEMAN_DELETE_UNUSED_DESC'), 'btn-warning'
+			);
+			$btn_arr[] = $mk_btn(
+				'FLEXI_FILEMAN_REMOVE_ASSOC_DELETE', 'delete_unlink', sprintf($confirm_js('FLEXI_FILEMAN_REMOVE_ASSOC_DELETE_CONFIRM'), $contrl . 'removeunlink'), '', 'icon-unlink',
+				\Joomla\CMS\Language\Text::_('FLEXI_FILEMAN_REMOVE_ASSOC_DELETE_DESC'), 'btn-danger'
+			);
+			$mk_drop('toolbar-delete', 'icon-delete', 'FLEXI_DELETE', $btn_arr, 'files_delete_btns_group');
+		}
+
+
+		/**
 		 * Maintenance button (Check-in, Verify Tag mappings, Assignments + Record)
 		 */
 
@@ -813,6 +891,21 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 				'btn btn-fcaction ' . (FLEXI_J40GE ? '_DDI_class_ ' : '') . $this->tooltip_class, 'icon-loop',
 				'data-placement="right" data-taskurl="' . $popup_load_url . '" title="' . flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_RECALCULATE_SIZES_SELECTED_DESC'), 'd') . '"', $auto_add = 0, $tag_type='button')
 				;
+		}
+
+		if ($perms->CanConfig && \Joomla\CMS\Factory::getUser()->authorise('flexicontent.deletefile', 'com_flexicontent'))
+		{
+			$popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&amp;view=filemanager&amp;layout=indexer&amp;tmpl=component&amp;indexer=orphans';
+			$btn_name = 'delete_orphans';
+			$full_js = "var url = jQuery(this).data('taskurl'); fc_showDialog(url, 'fc_modal_popup_container', 0, 650, 450, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
+						. $loading_msg . "<\/span>'; window.location.reload(false)}, {'title': '" . flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_ORPHANS_TITLE'), 'd') . "'}); return false;";
+			$btn_arr[] = flexicontent_html::addToolBarButton(
+				\Joomla\CMS\Language\Text::_('FLEXI_ORPHANS_TITLE'), $btn_name, $full_js,
+				$msg_alert = '', $msg_confirm = '',
+				$btn_task = '', $extra_js = '', $btn_list = false, $btn_menu = true, $btn_confirm = false,
+				'btn btn-fcaction ' . (FLEXI_J40GE ? '_DDI_class_ btn-danger ' : '') . $this->tooltip_class, 'icon-trash',
+				'data-placement="right" data-taskurl="' . $popup_load_url . '" title="' . flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_ORPHANS_DESC'), 'd') . '"', $auto_add = 0, $tag_type = 'button'
+			);
 		}
 
 		if (count($btn_arr))

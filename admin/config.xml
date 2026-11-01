@@ -2170,6 +2170,22 @@
 				<option value="1">FLEXI_BACKEND_FILTERS_APPLY_BUTTON</option>
 			</field>
 
+			<field name="cat_path_show" type="fcradio" default="1" label="FLEXI_CAT_PATH_SHOW" description="FLEXI_CAT_PATH_SHOW_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+
+			<field name="cat_path_mode" type="fcradio" default="full" label="FLEXI_CAT_PATH_MODE" description="FLEXI_CAT_PATH_MODE_DESC" showon="cat_path_show:1" class="btn-group group-fcmethod">
+				<option value="full">FLEXI_CAT_PATH_MODE_FULL</option>
+				<option value="last">FLEXI_CAT_PATH_MODE_LAST</option>
+			</field>
+
+			<field name="cat_path_levels" type="list" default="3" label="FLEXI_CAT_PATH_LEVELS" description="FLEXI_CAT_PATH_LEVELS_DESC" showon="cat_path_show:1[AND]cat_path_mode:last" class="use_select2_lib">
+				<option value="2">2</option>
+				<option value="3">3</option>
+				<option value="4">4</option>
+			</field>
+
 			<field name="iman_skip_cols" type="fccheckbox" default=""
 				checkoptions="FLEXI_SINGLE_TYPE,FLEXI_LANGUAGE,FLEXI_ASSOCIATIONS,FLEXI_CATEGORIES,FLEXI_TAGS,FLEXI_TEMPLATE,FLEXI_ACCESS,FLEXI_AUTHOR,FLEXI_CREATED,FLEXI_REVISED,JGLOBAL_HITS,JGLOBAL_VOTES,JGLOBAL_RATINGS,FLEXI_ID"
 				checkvals="single_type,lang,assocs,cats,tags,template,access,author,created,modified,hits,votes,ratings,id" defaultvals="single_type"
