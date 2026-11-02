@@ -56,14 +56,7 @@ if (version_compare(JVERSION, '4.0', 'ge'))
         public function __construct(DispatcherInterface $dispatcher, array $config)
         {
             // Call the parent constructor.
-            if ($config instanceof DispatcherInterface) {
-                $dispatcher = $config;
-                $config     = \func_num_args() > 1 ? func_get_arg(1) : [];
-
-                parent::__construct($dispatcher, $config);
-            } else {
-                parent::__construct($config);
-            }
+            parent::__construct($dispatcher, $config);
 
             $this->setDatabase(Factory::getContainer()->get(DatabaseInterface::class));
         }
