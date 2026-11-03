@@ -78,7 +78,8 @@
 			delete window.fc_choices_instances[prevKey];
 			theSelect.removeData('fc_choices_instance');
 
-			var choicesInstance = new Choices(theSelect[0], {
+			// FLEXIcontent's own Choices.js, even when another copy replaced window.Choices
+			var choicesInstance = new (window.fc_Choices || Choices)(theSelect[0], {
 				callbackOnCreateTemplates: function(template) {
 					return {
 						item: function(data) {

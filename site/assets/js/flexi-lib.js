@@ -1976,7 +1976,8 @@
 					var customTemplates = fcCatPathBaseTemplates ? fcCatPathBaseTemplates.apply(this, arguments) : {};
 
 					customTemplates.item = function(config, choice) {
-						var cn = config.classNames;
+						// Choices.js 11 passes its config, 9 and 10 (e.g. Joomla's own copy) pass the class names
+						var cn = config.classNames || config;
 						var div = document.createElement('div');
 						div.classList.add(cn.item);
 
@@ -2029,7 +2030,9 @@
 			}
 
 			// Initialize Choices.js
-			var choicesInstance = new Choices(el, choicesOptions);
+			// FLEXIcontent's own Choices.js (see flexicontent_html::loadFramework), even when Joomla's copy replaced window.Choices
+			var ChoicesLib = window.fc_Choices || Choices;
+			var choicesInstance = new ChoicesLib(el, choicesOptions);
 
 			// Store instance
 			var instanceKey = el.id || el.name || ('fc_choices_' + Math.random().toString(36).substr(2, 9));
