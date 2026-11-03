@@ -99,7 +99,11 @@ class JFormFieldFccategory extends \Joomla\CMS\Form\FormField
 			function fcSelectCategory(id, title)
 			{
 				document.getElementById(fc_select_cat_element_id).value = id;
-				document.getElementById(fc_select_cat_element_id+'_name').value = title;"
+				document.getElementById(fc_select_cat_element_id+'_name').value = title;
+
+				// Point the edit button to the selected category
+				var edit_btn = document.getElementById(fc_select_cat_element_id+'_edit');
+				if (edit_btn) edit_btn.href = 'index.php?option=com_flexicontent&task=category.edit&id=' + id;"
 			.($allowEdit  ? "
 				jQuery('#'+fc_select_cat_element_id+'_edit').removeClass('hidden');" : '')
 			.($allowClear ? "
@@ -150,7 +154,7 @@ class JFormFieldFccategory extends \Joomla\CMS\Form\FormField
 				'.\Joomla\CMS\Language\Text::_( 'FLEXI_FORM_SELECT' ).'
 			</a>
 			'.($allowEdit ? '
-			<a id="' .$element_id. '_edit" class="btn ' . ($this->value ? '' : ' hidden') . ' hasTooltip" href="index.php?option=com_flexicontent&amp;task=category.edit&amp;cid=' . $this->value . '" target="_blank" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_EDIT_CATEGORY' ).'">
+			<a id="' .$element_id. '_edit" class="btn ' . ($this->value ? '' : ' hidden') . ' hasTooltip" href="index.php?option=com_flexicontent&amp;task=category.edit&amp;id=' . $this->value . '" target="_blank" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_EDIT_CATEGORY' ).'">
 				<span class="icon-edit"></span>' . \Joomla\CMS\Language\Text::_('FLEXI_FORM_EDIT') . '
 			</a>
 			' : '').'

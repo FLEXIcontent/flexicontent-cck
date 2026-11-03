@@ -501,7 +501,7 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 					break;
 				case 'edit':
 					$cid = $app->input->get('id', $app->input->get('cid', 0));
-					$redirectURL = 'index.php?option=' . $this->extension . '&task=category.edit&cid=' . intval(is_array($cid) ? $cid[0] : $cid);
+					$redirectURL = 'index.php?option=' . $this->extension . '&task=category.edit&id=' . intval(is_array($cid) ? $cid[0] : $cid);
 					break;
 				default:
 					if (!$task) {
