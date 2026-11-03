@@ -1674,6 +1674,10 @@ class flexicontent_html
 					$document->addStyleSheet($framework_path.'/choices.min.css', array('version' => $ver));
 					$document->addStyleSheet($css_path.'/flexi_choices.css', array('version' => '2.4'));
 
+					// Keep a reference to this copy: Joomla loads its own older Choices.js (deferred) for its fancy-select
+					// fields, e.g. on the type form, and that copy replaces window.Choices once this one has run
+					$js .= "window.fc_Choices = window.Choices;\n";
+
 					// Attach Choices.js JS but skip it in mobiles and use native selects instead
 					$js .= "
 						document.addEventListener('DOMContentLoaded', function()

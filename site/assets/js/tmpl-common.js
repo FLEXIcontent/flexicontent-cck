@@ -837,7 +837,8 @@ function acClose() {
 					});
 				}
 
-				var choicesInstance = new Choices(el, {
+				// FLEXIcontent's own Choices.js, even when another copy replaced window.Choices
+				var choicesInstance = new (window.fc_Choices || Choices)(el, {
 					maxItemCount: -1,
 					placeholderValue: Joomla.JText._('FLEXI_TYPE_TO_LIST'),
 					searchPlaceholderText: Joomla.JText._('FLEXI_TYPE_TO_LIST'),
