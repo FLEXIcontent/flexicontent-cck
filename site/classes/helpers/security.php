@@ -111,46 +111,45 @@ class flexicontent_security
         return strpos($path, $base) === 0;
     }
 
-    /** A saved form retry must not turn a client-supplied id into an issued id. */
+    /**
+     * Check that a temporary upload ID was issued by this site to the current user
+     * (or, for guests, the current session) within the last 24 hours.
+     *
+     * The ID carries its own signature, so the check reads no session data. Another
+     * request of the same session that ends later and writes back an older copy of
+     * the session (Joomla does not lock sessions) can no longer invalidate an open
+     * form. A client-chosen or altered ID still fails.
+     */
     public static function isIssuedTemporaryItemId($app, $id, $option = 'com_flexicontent')
     {
-        if (!is_string($id) || !preg_match('/^_\d{4}_\d{2}_\d{2}_\d{2}_\d{2}_\d{2}_[0-9a-f.]{13,}$/D', $id)) return false;
-        $issued = (array) $app->getUserState($option . '.edit.item.active_tmp_itemids', array());
-        return isset($issued[$id]) && (int) $issued[$id] >= time() - 86400;
+        if (!is_string($id) || !preg_match('/^(_(\d{4})_(\d{2})_(\d{2})_(\d{2})_(\d{2})_(\d{2})_[0-9a-f]{32})([0-9a-f]{32})$/D', $id, $m)) return false;
+        $issuedAt = gmmktime((int) $m[5], (int) $m[6], (int) $m[7], (int) $m[3], (int) $m[4], (int) $m[2]);
+        if ($issuedAt === false || $issuedAt > time() + 300 || $issuedAt < time() - 86400) return false;
+        return hash_equals(self::signTemporaryItemId($app, $m[1]), $m[8]);
     }
 
-    /** Reuse only session-issued IDs; retry form data is not an authority registry. */
+    /** Reuse the ID kept for a failed save's retry only if it verifies; otherwise issue a new one. */
     public static function getOrCreateTemporaryItemId($app, $option = 'com_flexicontent')
     {
         $stateKey = $option . '.edit.item.unique_tmp_itemid';
         $id = $app->getUserState($stateKey);
         if (!self::isIssuedTemporaryItemId($app, $id, $option))
         {
-            $id = date('_Y_m_d_H_i_s_') . bin2hex(random_bytes(16));
-        }
-
-        // Embedded wrappers save under their component's namespace, while upload
-        // removal always runs through com_flexicontent. Record verified issuance
-        // in both namespaces; never promote an unchecked retry value here.
-        $now = time();
-        foreach (array_unique(array($option, 'com_flexicontent')) as $namespace)
-        {
-            $registryKey = $namespace . '.edit.item.active_tmp_itemids';
-            $issued = (array) $app->getUserState($registryKey, array());
-            $issued = array_filter($issued, function ($timestamp) use ($now) {
-                return (int) $timestamp >= $now - 86400;
-            });
-            unset($issued[$id]);
-            $issued[$id] = $now;
-            if (count($issued) > 20)
-            {
-                asort($issued);
-                $issued = array_slice($issued, -20, null, true);
-            }
-            $app->setUserState($registryKey, $issued);
+            // Keep the "_Y_m_d_" start: old temporary folders are cleaned up by that date.
+            $base = gmdate('_Y_m_d_H_i_s_') . bin2hex(random_bytes(16));
+            $id = $base . self::signTemporaryItemId($app, $base);
         }
         $app->setUserState($stateKey, $id);
         return $id;
+    }
+
+    /** Signature of a temporary upload ID, bound to the user (guests: the session) with the site secret. */
+    private static function signTemporaryItemId($app, $base)
+    {
+        $user = (method_exists($app, 'getIdentity') ? $app->getIdentity() : null) ?: \Joomla\CMS\Factory::getUser();
+        $session = method_exists($app, 'getSession') ? $app->getSession() : \Joomla\CMS\Factory::getSession();
+        $owner = $user->guest ? 'session:' . $session->getId() : 'user:' . (int) $user->id;
+        return substr(hash_hmac('sha256', 'flexicontent.unique_tmp_itemid|' . $owner . '|' . $base, (string) $app->get('secret')), 0, 32);
     }
 
     public static function canViewItemState($item, $user)

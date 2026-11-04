@@ -1479,7 +1479,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		}
 
 		// Retry state can contain a client-chosen value after a failed POST.
-		// Only the server-issued registry grants access to unsaved upload folders.
+		// Only a temporary ID signed by this site for this user grants access to unsaved upload folders.
 		return flexicontent_security::isIssuedTemporaryItemId(
 			\Joomla\CMS\Factory::getApplication(), $u_item_id
 		);
