@@ -371,27 +371,11 @@ jQuery(document).ready(function() {
 		
 		if ($inline_tip = @$attributes['inline_tip'])
 		{
-			$tip_img = @$attributes['tip_img'];
-			$tip_img = $tip_img ? $tip_img : 'comments.png';
-			$preview_img = @$attributes['preview_img'];
-			$preview_img = $preview_img ? $preview_img : '';
-			$tip_class = @$attributes['tip_class'];
-			$tip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
-			$hintmage = \Joomla\CMS\HTML\HTMLHelper::image ( 'components/com_flexicontent/assets/images/'.$tip_img, \Joomla\CMS\Language\Text::_( 'FLEXI_NOTES' ), ' style="max-height:24px; padding:0px; margin-left:12px; margin-right:0px;" ' );
-			$previewimage = $preview_img ? \Joomla\CMS\HTML\HTMLHelper::image ( 'components/com_flexicontent/assets/images/'.$preview_img, \Joomla\CMS\Language\Text::_( 'FLEXI_NOTES' ), ' style="max-height:24px; padding:0px; margin:0px;" ' ) : '';
-			$tip_text = '<span class="'.$tip_class.'" style="" title="'.flexicontent_html::getToolTip(null, $inline_tip, 1, 1).'">'.$hintmage.$previewimage.'</span>';
+			$tip_text = flexicontent_html::getInlineTip($inline_tip, @$attributes['tip_img'], @$attributes['tip_class'], @$attributes['preview_img']);
 		}
 		if ($inline_tip = @$attributes['inline_tip2'])
 		{
-			$tip_img = @$attributes['tip_img2'];
-			$tip_img = $tip_img ? $tip_img : 'comments.png';
-			$preview_img = @$attributes['preview_img2'];
-			$preview_img = $preview_img ? $preview_img : '';
-			$tip_class = @$attributes['tip_class2'];
-			$tip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
-			$hintmage = \Joomla\CMS\HTML\HTMLHelper::image ( 'administrator/components/com_flexicontent/assets/images/'.$tip_img, \Joomla\CMS\Language\Text::_( 'FLEXI_NOTES' ), ' style="max-height:24px; padding:0px; margin-left:12px; margin-right:0px;" ' );
-			$previewimage = $preview_img ? \Joomla\CMS\HTML\HTMLHelper::image ( 'administrator/components/com_flexicontent/assets/images/'.$preview_img, \Joomla\CMS\Language\Text::_( 'FLEXI_NOTES' ), ' style="max-height:24px; padding:0px; margin:0px;" ' ) : '';
-			$tip_text2 = '<span class="'.$tip_class.'" style="" title="'.flexicontent_html::getToolTip(null, $inline_tip, 1, 1).'">'.$hintmage.$previewimage.'</span>';
+			$tip_text2 = flexicontent_html::getInlineTip($inline_tip, @$attributes['tip_img2'], @$attributes['tip_class2'], @$attributes['preview_img2']);
 		}
 		return
 			\Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $layouts, $fieldname, $attribs, 'value', 'text', $value, $element_id)

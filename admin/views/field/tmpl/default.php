@@ -447,4 +447,4 @@ $this->document->addScriptDeclaration($js);
 <?php
 //keep session alive while editing
 \Joomla\CMS\HTML\HTMLHelper::_('behavior.keepalive');
-HTMLHelper::_('bootstrap.popover', '.hasPopover', array('trigger' => 'click hover'));
+HTMLHelper::_('bootstrap.popover', '.hasPopover', array('trigger' => 'click hover focus'));
