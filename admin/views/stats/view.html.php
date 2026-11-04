@@ -80,7 +80,26 @@ class FlexicontentViewStats extends FlexicontentViewBaseRecords
 
 		//*****************************************************************Adicionar as biblitecas*******************************************************************************************//
 		$document->addStyleSheet('//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css');
-		$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/librairies/esl/esl.js');
+		// ESL exposes AMD globals: load it only after Joomla's scripts have initialized.
+		$chart_base = \Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/';
+		$local_charts = is_dir(JPATH_SITE . '/components/com_flexicontent/librairies/echarts')
+			&& is_dir(JPATH_SITE . '/components/com_flexicontent/librairies/zrender');
+		$document->addScriptOptions('flexicontent.stats', array(
+			'loader' => $chart_base . 'librairies/esl/esl.js',
+			'packages' => $local_charts ? array(
+				array('name' => 'echarts', 'location' => $chart_base . 'librairies/echarts', 'main' => 'echarts'),
+				array('name' => 'zrender', 'location' => $chart_base . 'librairies/zrender', 'main' => 'zrender'),
+			) : array(),
+			'scripts' => $local_charts ? array() : array(
+				'https://cdnjs.cloudflare.com/ajax/libs/echarts/2.2.0/echarts.js',
+				'https://cdnjs.cloudflare.com/ajax/libs/echarts/2.2.0/chart/line.js',
+				'https://cdnjs.cloudflare.com/ajax/libs/echarts/2.2.0/chart/bar.js',
+				'https://cdnjs.cloudflare.com/ajax/libs/echarts/2.2.0/chart/pie.js',
+				'https://cdnjs.cloudflare.com/ajax/libs/zrender/2.0.7/zrender.js',
+			),
+		));
+		\Joomla\CMS\Language\Text::script('FLEXI_STATS_CHARTS_UNAVAILABLE');
+		$document->addScript($chart_base . 'assets/js/stats.js', array('version' => (string) filemtime(JPATH_SITE . '/components/com_flexicontent/assets/js/stats.js')), array('defer' => true));
 		//*****************************************************************Adicionar as biblitecas*******************************************************************************************//
 		
 		
