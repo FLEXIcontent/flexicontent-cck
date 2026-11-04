@@ -119,7 +119,7 @@ foreach($values as $file_id)
 		$_tooltip_content = \Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_FILE_TYPE', true ) .': '. $file_data->ext;
 		$icon = '
 		<span class="fcfile_mime">
-			' . \Joomla\CMS\HTML\HTMLHelper::image($file_data->icon, $file_data->ext, 'class="fcicon-mime '.$tooltip_class.'" title="'.\Joomla\CMS\HTML\HTMLHelper::tooltipText($_tooltip_title, $_tooltip_content, 1, 0).'"') . '
+			' . \Joomla\CMS\HTML\HTMLHelper::image($file_data->icon, $file_data->ext, array('class' => 'fcicon-mime '.$tooltip_class, 'title' => \Joomla\CMS\HTML\HTMLHelper::tooltipText($_tooltip_title, $_tooltip_content, 1, 1))) . '
 		</span>';
 	}
 

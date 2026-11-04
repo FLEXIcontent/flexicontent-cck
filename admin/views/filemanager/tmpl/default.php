@@ -1187,7 +1187,7 @@ if ($js)
 											{
 												$icon_name = $this->assigned_fields_icons[$field_type];
 												$tip = $row->{'assigned_'.$field_type} . ' ' . $field_label;
-												$image = HTMLHelper::image('administrator/components/com_flexicontent/assets/images/'.$icon_name.'.png', $tip, 'title="'.$usage_in_str.' '.$field_type.' '.$fields_str.'"' );
+												$image = HTMLHelper::image('administrator/components/com_flexicontent/assets/images/'.$icon_name.'.png', $tip, array('title' => htmlspecialchars($usage_in_str.' '.$field_type.' '.$fields_str, ENT_COMPAT, 'UTF-8')) );
 												$row->assigned[] = $row->{'assigned_'.$field_type} . ' ' . $image;
 											}
 										}
@@ -1544,7 +1544,7 @@ if ($js)
 											{
 												$icon_name = $this->assigned_fields_icons[$field_type];
 												$tip = $row->{'assigned_'.$field_type} . ' ' . $field_label;
-												$image = HTMLHelper::image('administrator/components/com_flexicontent/assets/images/'.$icon_name.'.png', $tip, 'title="'.$usage_in_str.' '.$field_type.' '.$fields_str.'"' );
+												$image = HTMLHelper::image('administrator/components/com_flexicontent/assets/images/'.$icon_name.'.png', $tip, array('title' => htmlspecialchars($usage_in_str.' '.$field_type.' '.$fields_str, ENT_COMPAT, 'UTF-8')) );
 												$row->assigned[] = $row->{'assigned_'.$field_type} . ' ' . $image;
 											}
 										}
