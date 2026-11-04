@@ -3129,26 +3129,16 @@ class FlexicontentModelItems extends FCModelAdminList
 		}
 
 
-		// ***
-		// *** Retrieve asset before deleting the items
-		// ***
-		$query = $this->_db->getQuery(true)
-			->select('asset_id')
-			->from('#__content')
-			->where('id IN (' . $cid_list . ')');
-
-		$assetids = $this->_db->setQuery($query)->loadColumn();
-		$assetidslist = implode(',', $assetids );
-
-
-		// ***
-		// *** Remove basic item data
-		// ***
-		$query = 'DELETE FROM #__content'
-			. ' WHERE id IN ('. $cid_list .')'
-		;
-		$this->_db->setQuery($query)->execute();
-
+		// Delete content through Joomla's table API, including its nested ACL asset.
+		foreach ($cid as $id)
+		{
+			$table = Table::getInstance('Content');
+			if (!$table->load($id) || !$table->delete($id))
+			{
+				$this->setError($table->getError() ?: 'The item could not be deleted.');
+				return false;
+			}
+		}
 
 		// ***
 		// *** Remove extended item data
@@ -3185,6 +3175,19 @@ class FlexicontentModelItems extends FCModelAdminList
 			. '	  AND type_alias = ' . $this->_db->Quote('com_content.article')
 		;
 		$this->_db->setQuery($query)->execute();
+
+
+		// ***
+		// *** Remove Joomla workflow associations (Joomla's article model does this, its Content table does not)
+		// ***
+		if (FLEXI_J40GE)
+		{
+			$query = 'DELETE FROM #__workflow_associations'
+				. ' WHERE item_id IN ('. $cid_list .')'
+				. '   AND extension = ' . $this->_db->Quote('com_content.article')
+			;
+			$this->_db->setQuery($query)->execute();
+		}
 
 
 		// ***
@@ -3232,13 +3235,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$this->_db->setQuery($query)->execute();
 
 
-		// ***
-		// *** Delete item asset/ACL records
-		// ***
-		$query 	= 'DELETE FROM #__assets'
-			. ' WHERE id in ('.$assetidslist.')'
-		;
-		//$this->_db->setQuery($query)->execute();
+
 
 
 		/**
