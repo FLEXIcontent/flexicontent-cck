@@ -5940,7 +5940,7 @@ class flexicontent_html
 		$full_js = "javascript: $full_js";
 
 		$button_html	= '
-		<'.$tag_type.' '.($tag_type=='a' ? 'href="javascript:;"' : '').'
+		<'.$tag_type.' '.($tag_type=='a' ? 'href="javascript:;"' : ($tag_type=='button' ? 'type="button"' : '')).'
 			onclick="'.htmlspecialchars($full_js, ENT_QUOTES, 'UTF-8').'"
 			class="toolbar ' . $btn_sm_class . ' ' . $btn_class . '"
 			' . $attrs . '
@@ -5948,6 +5948,13 @@ class flexicontent_html
 			<span class="'.$class.'" title="'.htmlspecialchars($text, ENT_QUOTES, 'UTF-8').'"></span>
 			'.$text.'
 		</'.$tag_type.'>';
+
+		// Keep the existing click handler; expose native buttons to Joomla's keyboard shortcuts.
+		if (FLEXI_J40GE && $tag_type === 'button' && in_array($btn_name, array('save', 'apply', 'apply_ajax'), true))
+		{
+			$shortcut_class = $btn_name === 'save' ? 'button-save' : 'button-apply';
+			$button_html = '<joomla-toolbar-button>' . str_replace('class="toolbar ', 'class="toolbar ' . $shortcut_class . ' ', $button_html) . '</joomla-toolbar-button>';
+		}
 
 		if (!$auto_add)
 		{
