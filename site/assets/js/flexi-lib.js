@@ -3147,15 +3147,19 @@
 		const elements_set_tooltip = container_el.find('.hasTooltip');
 		const elements_set_popover = container_el.find('.hasPopover');
 
-		if (typeof jQuery === undefined || typeof jQuery.tooltip === undefined)
+		// The plugins are jQuery.fn.tooltip / jQuery.fn.popover (Bootstrap 5 adds them when its popover script is loaded)
+		const has_tooltip = typeof jQuery !== 'undefined' && typeof jQuery.fn.tooltip === 'function';
+		const has_popover = typeof jQuery !== 'undefined' && typeof jQuery.fn.popover === 'function';
+
+		if (!has_tooltip)
 		{
 			elements_set_tooltip.length && !!Joomla.fc_debug ? window.console.log('tooltip() not loaded. Skipping it') : false;
 		}
-		if (typeof jQuery === undefined || typeof jQuery.popover === undefined)
+		if (!has_popover)
 		{
 			elements_set_popover.length && !!Joomla.fc_debug ? window.console.log('popover() not loaded. Skipping it') : false;
 		}
-		if (typeof jQuery === undefined || (typeof jQuery.tooltip === undefined && typeof jQuery.popover === undefined))
+		if (!has_tooltip && !has_popover)
 		{
 			return;
 		}
@@ -3164,8 +3168,8 @@
 		(reAddOnEvents || []).forEach(element => container_el.on(element, fc_initTooltips));
 
 		// Add tooltips and popovers
-		typeof jQuery.tooltip !== undefined ? elements_set_tooltip.tooltip({html: true, container: container_el}) : false;
-		typeof jQuery.popover !== undefined ? elements_set_popover.popover({html: true, container: container_el, trigger : 'hover focus'}) : false;
+		has_tooltip ? elements_set_tooltip.tooltip({html: true, container: container_el}) : false;
+		has_popover ? elements_set_popover.popover({html: true, container: container_el, trigger : 'hover focus'}) : false;
 	}
 
 
@@ -3177,9 +3181,9 @@
 		const container_el = jQuery(container_sel);
 		const elements_set = container_el.find('select.use_select2_lib');
 
-		if (typeof jQuery === undefined || (typeof jQuery.select2 === undefined && typeof Choices === undefined))
+		if (typeof jQuery === 'undefined' || (typeof jQuery.fn.select2 !== 'function' && typeof Choices === 'undefined'))
 		{
-			elements_set.length && !!Joomla.fc_debug ? window.console.log('subformRepeatable() not loaded. Skipping it') : false;
+			elements_set.length && !!Joomla.fc_debug ? window.console.log('select2() / Choices not loaded. Skipping it') : false;
 			return;
 		}
 
@@ -3196,7 +3200,7 @@
 		const container_el = jQuery(container_sel);
 		const elements_set = container_el.find('textarea.codemirror-source');
 
-		if (typeof Joomla.editors === undefined || typeof CodeMirror === undefined)
+		if (typeof Joomla.editors === 'undefined' || typeof CodeMirror === 'undefined' || typeof CodeMirror.fromTextArea !== 'function')
 		{
 			elements_set.length && !!Joomla.fc_debug ? window.console.log('CodeMirror not loaded. Skipping it') : false;
 			return;
@@ -3223,7 +3227,7 @@
 		const container_el = jQuery(container_sel);
 		const elements_set = container_el.find('div.subform-repeatable');
 
-		if (typeof jQuery === undefined || typeof jQuery.subformRepeatable)
+		if (typeof jQuery === 'undefined' || typeof jQuery.fn.subformRepeatable !== 'function')
 		{
 			elements_set.length && !!Joomla.fc_debug ? window.console.log('subformRepeatable() not loaded. Skipping it') : false;
 			return;
@@ -3240,7 +3244,7 @@
 		const container_el = jQuery(container_sel);
 		const elements_set = container_el.find('.minicolors');
 
-		if (typeof jQuery === undefined || typeof jQuery.minicolors === undefined)
+		if (typeof jQuery === 'undefined' || typeof jQuery.fn.minicolors !== 'function')
 		{
 			elements_set.length && !!Joomla.fc_debug ? window.console.log('minicolors() not loaded. Skipping it') : false;
 			return;
