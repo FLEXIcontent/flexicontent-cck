@@ -42,7 +42,9 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 		$layout  = $this->get( 'Data');
 		if (!$layout)
 		{
-			$app->redirect('index.php?option=com_flexicontent', \Joomla\CMS\Language\Text::_( 'Template not found: <b>' ) . $jinput->getString('folder', 'table') . '</b>');
+			$app->enqueueMessage(\Joomla\CMS\Language\Text::sprintf('FLEXI_TEMPLATE_NOT_FOUND', htmlspecialchars($folder, ENT_QUOTES, 'UTF-8')), 'warning');
+			$app->redirect('index.php?option=com_flexicontent&view=templates');
+			return;
 		}
 		$conf    = $this->get( 'LayoutConf');
 
