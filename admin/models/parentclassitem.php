@@ -2586,6 +2586,12 @@ class ParentClassItem extends FCModelAdmin
 				$db->execute();
 				$db->setQuery('DELETE FROM #__flexicontent_items_tmp WHERE id='.$item->id);
 				$db->execute();
+				if (FLEXI_J40GE)
+				{
+					// The default workflow was assigned when the item was first stored
+					$db->setQuery('DELETE FROM #__workflow_associations WHERE item_id=' . (int) $item->id . ' AND extension=' . $db->quote('com_content.article'));
+					$db->execute();
+				}
 
 				$db->setQuery('DELETE FROM #__flexicontent_tags_item_relations WHERE itemid='.$item->id);
 				$db->execute();

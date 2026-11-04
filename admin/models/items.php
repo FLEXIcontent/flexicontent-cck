@@ -3178,6 +3178,19 @@ class FlexicontentModelItems extends FCModelAdminList
 
 
 		// ***
+		// *** Remove Joomla workflow associations (Joomla's article model does this, its Content table does not)
+		// ***
+		if (FLEXI_J40GE)
+		{
+			$query = 'DELETE FROM #__workflow_associations'
+				. ' WHERE item_id IN ('. $cid_list .')'
+				. '   AND extension = ' . $this->_db->Quote('com_content.article')
+			;
+			$this->_db->setQuery($query)->execute();
+		}
+
+
+		// ***
 		// *** Remove assigned category references
 		// ***
 		$query = 'DELETE FROM #__flexicontent_cats_item_relations'
