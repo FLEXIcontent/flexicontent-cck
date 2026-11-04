@@ -882,15 +882,37 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 			$ids = ArrayHelper::toInteger($ids);
 			$cid_list = implode(',', $ids);
 
-			// Delete records themselves
-			$query = $this->_db->getQuery(true)
-				->delete('#__' . $this->records_dbtbl)
-				->where('id IN (' . $cid_list . ')');
-
-			$this->_db->setQuery($query)->execute();
+			// Asset-tracked records must use Joomla's table API so ACL nodes are removed safely.
+			$table = $this->getTable($this->records_jtable, '');
+			if (property_exists($table, 'asset_id'))
+			{
+				foreach ($ids as $id)
+				{
+					$table->reset();
+					if (!$table->load($id))
+					{
+						$this->setError($table->getError() ?: 'The record could not be loaded for deletion.');
+						return false;
+					}
+					// Never delete unselected children implicitly; the controller checked each selected ID.
+					$deleted = $table instanceof \Joomla\CMS\Table\Nested ? $table->delete($id, false) : $table->delete($id);
+					if (!$deleted)
+					{
+						$this->setError($table->getError());
+						return false;
+					}
+				}
+			}
+			else
+			{
+				$query = $this->_db->getQuery(true)
+					->delete('#__' . $this->records_dbtbl)
+					->where('id IN (' . $cid_list . ')');
+				$this->_db->setQuery($query)->execute();
+			}
 
 			// Also delete related Data, like 'assignments'
-			$this->delete_relations($cid);
+			$this->delete_relations($ids);
 		}
 
 		/**
