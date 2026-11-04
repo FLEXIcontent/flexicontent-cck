@@ -273,6 +273,29 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 
 				// Retrieve the uploaded CSV file
 				$csvfile = @$_FILES["csvfile"]["tmp_name"];
+				$prev_csv_key = 'com_flexicontent.import.csvfile';
+
+				if (is_file($csvfile))
+				{
+					// Keep a copy of the uploaded file, so that it need not be selected again after returning to the form (test / error)
+					$keep_path = rtrim($app->get('tmp_path', JPATH_ROOT . '/tmp'), '/\\') . '/fcimport_csv_' . (int) $user->id . '.csv';
+					$keep_name = basename((string) @$_FILES["csvfile"]["name"]);
+
+					if (@copy($csvfile, $keep_path))
+					{
+						$app->setUserState($prev_csv_key, array('path' => $keep_path, 'name' => $keep_name));
+					}
+				}
+				else
+				{
+					// No new file selected: use the file kept from a previous submit
+					$prev_csv = $app->getUserState($prev_csv_key, null);
+
+					if ($prev_csv && !empty($prev_csv['path']) && is_file($prev_csv['path']))
+					{
+						$csvfile = $prev_csv['path'];
+					}
+				}
 
 				if (!is_file($csvfile))
 				{

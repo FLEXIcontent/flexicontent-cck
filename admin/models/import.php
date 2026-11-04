@@ -175,6 +175,11 @@ class FlexicontentModelImport extends \Joomla\CMS\MVC\Model\ListModel
 		$media_folder = $app->getUserStateFromRequest( $p.'media_folder', 'media_folder', $this->cparams->get('import_media_folder', 'tmp/fcimport_media'), 'string');
 		$docs_folder  = $app->getUserStateFromRequest( $p.'docs_folder', 'docs_folder', $this->cparams->get('import_docs_folder', 'tmp/fcimport_docs'), 'string');
 
+		// Fields whose files should not be checked (checkboxes), remembered so that they are kept when returning to the form
+		$skip_file_field = $fcform ? $jinput->get('skip_file_field', array(), 'array') : $app->getUserStateFromRequest( $p.'skip_file_field', 'skip_file_field', array(), 'array');
+		$this->setState('skip_file_field', (array) $skip_file_field);
+		$app->setUserState($p.'skip_file_field', (array) $skip_file_field);
+
 		$this->setState('media_folder', $media_folder);
 		$this->setState('docs_folder', $docs_folder);
 

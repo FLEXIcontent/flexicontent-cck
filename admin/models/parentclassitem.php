@@ -5703,11 +5703,12 @@ class ParentClassItem extends FCModelAdmin
 
 		try
 		{
+			// PHP 8.1+: loadString() throws a TypeError on NULL (e.g. NULL column of a new / reused record), so cast to string
 			is_array($this->_record->$colname)
 				? $registry->loadArray($this->_record->$colname)
-				: $registry->loadString($this->_record->$colname);
+				: $registry->loadString((string) $this->_record->$colname);
 		}
-		catch (Exception $e)
+		catch (\Throwable $e)
 		{
 			$registry = flexicontent_db::check_fix_JSON_column($colname, $this->records_dbtbl, 'id', $this->_record->id, $this->_record->$colname);
 		}
