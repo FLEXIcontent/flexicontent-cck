@@ -1,0 +1,67 @@
+name: Close stale issues
+
+on:
+  schedule:
+    - cron: '30 3 * * *'   # every day at 03:30 UTC
+  workflow_dispatch:
+    inputs:
+      debug-only:
+        description: 'Dry run (log only, change nothing)'
+        type: boolean
+        default: true
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  # 1) Issues explicitly waiting for feedback from the reporter
+  needs-info:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v9
+        with:
+          debug-only: ${{ github.event_name == 'workflow_dispatch' && inputs.debug-only || false }}
+          only-labels: 'needs-info'
+          days-before-issue-stale: 21
+          days-before-issue-close: 7
+          stale-issue-label: 'stale'
+          stale-issue-message: >
+            Hello, we asked for more information on this issue but have not
+            received a reply. If you can still reproduce the problem, please
+            provide the requested details (FLEXIcontent version, Joomla
+            version, PHP version, steps to reproduce). Otherwise, this issue
+            will be closed in 7 days.
+          close-issue-message: >
+            Closing this issue due to lack of response. Feel free to reopen
+            it or open a new one with the requested information.
+          days-before-pr-stale: -1
+          days-before-pr-close: -1
+          operations-per-run: 100
+
+  # 2) Old issues with no activity at all (very conservative)
+  inactive:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v9
+        with:
+          debug-only: ${{ github.event_name == 'workflow_dispatch' && inputs.debug-only || false }}
+          days-before-issue-stale: 365
+          days-before-issue-close: 30
+          stale-issue-label: 'stale'
+          stale-issue-message: >
+            This issue has had no activity for over a year. It may no longer
+            be relevant, especially if it was reported against an older
+            Joomla or FLEXIcontent version. If it still occurs with the
+            latest release, please leave a comment with your environment
+            details. Otherwise, it will be closed in 30 days.
+          close-issue-message: >
+            Closing due to prolonged inactivity. If the problem still exists
+            on the latest FLEXIcontent release, please reopen this issue or
+            open a new one with up-to-date details.
+          exempt-issue-labels: 'bug,confirmed,security,enhancement,help wanted,pinned,joomla6'
+          exempt-all-milestones: true
+          exempt-all-issue-assignees: true
+          days-before-pr-stale: -1
+          days-before-pr-close: -1
+          operations-per-run: 100
