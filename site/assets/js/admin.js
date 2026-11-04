@@ -211,6 +211,12 @@ function fc_submit_form(form, task, validate)
 					// Restore before global ajaxSuccess/ajaxError listeners (including editors).
 					restoreForm();
 					jQuery('#system-message-container').html(data);
+					var messages = document.getElementById('system-message-container');
+					if (messages.querySelector('.alert-success, .alert-message, joomla-alert[type="success"], joomla-alert[type="message"]')
+						&& !messages.querySelector('.alert-danger, .alert-error, joomla-alert[type="danger"], joomla-alert[type="error"]'))
+					{
+						form.dispatchEvent(new CustomEvent('flexicontent:save-confirmed'));
+					}
 				},
 				error: function ()
 				{
