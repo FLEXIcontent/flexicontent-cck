@@ -1731,7 +1731,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 				'FLEXI_APPLY', $btn_name, $full_js="Joomla.submitbutton('".$ctrl.".apply_ajax')", $msg_alert='', $msg_confirm='',
 				$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
 				$btn_class=(FLEXI_J40GE ? ' _DDI_class_ btn-success ' : '') . ' ' . $this->tooltip_class, $btn_icon="icon-loop",
-				'data-placement="'.$tip_place_mainbtn.'" title="'.\Joomla\CMS\Language\Text::_('FLEXI_FAST_SAVE_INFO', true).'"', $auto_add = 0, $tbname);
+				'data-placement="'.$tip_place_mainbtn.'" title="'.\Joomla\CMS\Language\Text::_('FLEXI_FAST_SAVE_INFO', true).'"', $auto_add = 0, $tag_type='button', $tbname);
 		}
 
 		// Apply & Reload button   ***   (Apply Type, is a special case of new that has not loaded custom fieds yet, due to type not defined on initial form load)
@@ -1751,7 +1751,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 				$btn_title, $btn_name, $full_js="Joomla.submitbutton('".$btn_task."')", $msg_alert='', $msg_confirm='',
 				$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
 				$btn_class=(FLEXI_J40GE ? ' _DDI_class_ btn-success ' : '') . ' ' . $this->tooltip_class, $btn_icon="icon-save",
-				'data-placement="'.$tip_place_subbtn.'" title=""', $auto_add = 0, $tbname);
+				'data-placement="'.$tip_place_subbtn.'" title=""', $auto_add = 0, $tag_type='button', $tbname);
 		}
 
 		flexicontent_html::addToolBarDropMenu(
@@ -1780,7 +1780,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 				'JSAVE', $btn_name, $full_js="Joomla.submitbutton('".$btn_task."')", $msg_alert='', $msg_confirm='',
 				$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
 				$btn_class=(FLEXI_J40GE ? ' _DDI_class_ btn-success ' : '') . ' ' . $this->tooltip_class, $btn_icon="icon-save",
-				'data-placement="'.$tip_place_mainbtn.'" title=""', $auto_add = 0, $tbname);
+				'data-placement="'.$tip_place_mainbtn.'" title=""', $auto_add = 0, $tag_type='button', $tbname);
 
 			if ( !$isredirected_after_submit )
 			{
@@ -1795,7 +1795,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 						(!$isnew ? 'FLEXI_SAVE_A_PREVIEW' : 'FLEXI_ADD_A_PREVIEW'), $btn_name, $full_js="Joomla.submitbutton('".$btn_task."')", $msg_alert='', $msg_confirm='',
 						$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
 						$btn_class=(FLEXI_J40GE ? ' _DDI_class_ btn-success ' : '') . ' ' . $this->tooltip_class, $btn_icon="icon-save",
-						'data-placement="'.$tip_place_subbtn.'" title=""', $auto_add = 0, $tbname);
+						'data-placement="'.$tip_place_subbtn.'" title=""', $auto_add = 0, $tag_type='button', $tbname);
 				}
 
 				if (!$isnew)
@@ -1811,7 +1811,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 							'FLEXI_SAVE_AND_NEW', $btn_name, $full_js="Joomla.submitbutton('".$btn_task."')", $msg_alert='', $msg_confirm='',
 							$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
 							$btn_class= (FLEXI_J40GE ? ' _DDI_class_ btn-success ' : '') . ' ' . $this->tooltip_class, $btn_icon="icon-save-new",
-							'data-placement="'.$tip_place_subbtn.'" title="'.\Joomla\CMS\Language\Text::_('FLEXI_SAVE_AND_NEW_INFO', true).'"', $auto_add = 0, $tbname);
+							'data-placement="'.$tip_place_subbtn.'" title="'.\Joomla\CMS\Language\Text::_('FLEXI_SAVE_AND_NEW_INFO', true).'"', $auto_add = 0, $tag_type='button', $tbname);
 					}
 
 					// Also if an existing item, can save to a copy
@@ -1826,7 +1826,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 							'FLEXI_SAVE_AS_COPY', $btn_name, $full_js="Joomla.submitbutton('".$btn_task."')", $msg_alert='', $msg_confirm='',
 							$btn_task, $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
 							$btn_class= (FLEXI_J40GE ? ' _DDI_class_ btn-success ' : '') . ' ' . $this->tooltip_class, $btn_icon="icon-save-copy",
-							'data-placement="'.$tip_place_subbtn.'" title="'.\Joomla\CMS\Language\Text::_('FLEXI_SAVE_AS_COPY_INFO', true).'"', $auto_add = 0, $tbname);
+							'data-placement="'.$tip_place_subbtn.'" title="'.\Joomla\CMS\Language\Text::_('FLEXI_SAVE_AS_COPY_INFO', true).'"', $auto_add = 0, $tag_type='button', $tbname);
 					}
 				}
 			}
