@@ -232,7 +232,7 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 
 		//create the toolbar
 		$bar = \Joomla\CMS\Factory::getApplication()->getDocument()->getToolbar('toolbar');
-		\Joomla\CMS\Toolbar\ToolbarHelper::title( \Joomla\CMS\Language\Text::_( 'FLEXI_EDIT_TEMPLATE' ), 'eye' );
+		\Joomla\CMS\Toolbar\ToolbarHelper::title( \Joomla\CMS\Language\Text::_( 'FLEXI_EDIT_TEMPLATE' ), 'paint-brush thememanager' );
 		if (!$ismodal) {
 			\Joomla\CMS\Toolbar\ToolbarHelper::apply('templates.apply');
 			\Joomla\CMS\Toolbar\ToolbarHelper::save('templates.save');
