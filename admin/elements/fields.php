@@ -368,15 +368,7 @@ class JFormFieldFields extends \Joomla\CMS\Form\FormField
 
 		if ($inline_tip = @$attributes['inline_tip'])
 		{
-			$tip_img = @$attributes['tip_img'];
-			$tip_img = $tip_img ? $tip_img : 'comments.png';
-			$preview_img = @$attributes['preview_img'];
-			$preview_img = $preview_img ? $preview_img : '';
-			$tip_class = @$attributes['tip_class'];
-			$tip_class .= ' hasTooltip';
-			$hintmage = \Joomla\CMS\HTML\HTMLHelper::image ( 'administrator/components/com_flexicontent/assets/images/'.$tip_img, \Joomla\CMS\Language\Text::_( 'FLEXI_NOTES' ), ' style="vertical-align:middle; max-height:24px; padding:0px; margin:0 0 0 12px;" ' );
-			$previewimage = $preview_img ? \Joomla\CMS\HTML\HTMLHelper::image ( 'administrator/components/com_flexicontent/assets/images/'.$preview_img, \Joomla\CMS\Language\Text::_( 'FLEXI_NOTES' ), ' style="vertical-align:middle; max-height:24px; padding:0px; margin:0 0 0 12px;" ' ) : '';
-			$tip_text = '<span class="'.$tip_class.'" style="float:left;" title="'.flexicontent_html::getToolTip(null, $inline_tip, 1, 1).'">'.$hintmage.$previewimage.'</span>';
+			$tip_text = flexicontent_html::getInlineTip($inline_tip, @$attributes['tip_img'], @$attributes['tip_class'], @$attributes['preview_img'], 'float: left;');
 		}
 
 

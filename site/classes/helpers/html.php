@@ -629,6 +629,54 @@ class flexicontent_html
 	}
 
 
+	/**
+	 * Create the inline note of a form field: an icon that shows the note in a popover
+	 * on mouse hover, keyboard focus or click / tap
+	 *
+	 * @param   string  $text     The note, a language string or text (may contain HTML)
+	 * @param   string  $img      Note image in the assets/images folder, FLEXIcontent's own note images are shown as icons
+	 * @param   string  $class    Extra CSS classes of the note
+	 * @param   string  $preview  Optional image (assets/images folder) shown after the icon
+	 * @param   string  $style    Inline CSS of the note
+	 *
+	 * @return  string  The HTML of the note
+	 * @since   5.1
+	 */
+	static function getInlineTip($text, $img = '', $class = '', $preview = '', $style = '')
+	{
+		static $icons = array(
+			'comments.png'    => 'icon-info-circle',
+			'information.png' => 'icon-info-circle',
+			'note.gif'        => 'icon-info-circle',
+			'warning.png'     => 'icon-warning',
+		);
+
+		// Same options as the field editor, its labels use the same selector
+		\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.popover', '.hasPopover', array('trigger' => 'click hover focus'));
+
+		$img     = (string) $img ?: 'comments.png';
+		$preview = (string) $preview;
+		$label   = \Joomla\CMS\Language\Text::_('FLEXI_NOTES');
+		$path    = 'administrator/components/com_flexicontent/assets/images/';
+		$attribs = array('style' => 'vertical-align: middle; max-height: 24px;');
+
+		// An array of attributes: Joomla 4+ splits an attribute string at every space
+		$html = isset($icons[$img])
+			? '<span class="' . $icons[$img] . '" aria-hidden="true"></span><span class="visually-hidden">' . $label . '</span>'
+			: \Joomla\CMS\HTML\HTMLHelper::image($path . $img, $label, $attribs);
+
+		if ($preview !== '')
+		{
+			$html .= ' ' . \Joomla\CMS\HTML\HTMLHelper::image($path . $preview, '', $attribs);
+		}
+
+		return '<span class="hasPopover fc-inline-tip ' . htmlspecialchars(trim((string) $class), ENT_COMPAT, 'UTF-8') . '" tabindex="0"'
+			. ' style="margin-inline-start: 12px;' . ($style ? ' ' . $style : '') . '"'
+			. ' data-bs-content="' . htmlspecialchars(\Joomla\CMS\Language\Text::_((string) $text), ENT_COMPAT, 'UTF-8') . '">'
+			. $html . '</span>';
+	}
+
+
 	static function escape($str)
 	{
 		return htmlspecialchars($str, ENT_COMPAT, 'UTF-8');
