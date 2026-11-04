@@ -333,7 +333,7 @@ $items_task = 'task=items.';
 			if ($this->perms->CanTemplates && !isset($sbtns['templates']))
 			{
 				$link = 'index.php?option='.$option.'&amp;view=templates';
-				FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-eye', \Joomla\CMS\Language\Text::_( 'FLEXI_TEMPLATES' ) );
+				FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-paint-brush', \Joomla\CMS\Language\Text::_( 'FLEXI_TEMPLATES' ) );
 				$add_sep = true;
 			}
 			if ($this->perms->CanIndex && !isset($sbtns['index']))
@@ -384,7 +384,7 @@ $items_task = 'task=items.';
 			{
 				if (!isset($sbtns['groups'])) {
 					$link = 'index.php?option='.$option.'&amp;view=groups';
-					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-users', \Joomla\CMS\Language\Text::_( 'FLEXI_GROUPS' ) );
+					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-users-cog', \Joomla\CMS\Language\Text::_( 'FLEXI_GROUPS' ) );
 				}
 				if (!isset($sbtns['addgroup'])) {
 					$link = 'index.php?option='.$option.'&amp;task=groups.add';

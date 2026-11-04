@@ -116,7 +116,7 @@ class FlexicontentViewTemplates extends FlexicontentViewBaseRecords
 		// Create document/toolbar titles
 		$doc_title = \Joomla\CMS\Language\Text::_('FLEXI_TEMPLATES');
 		$site_title = $document->getTitle();
-		\Joomla\CMS\Toolbar\ToolbarHelper::title( $doc_title, 'eye' );
+		\Joomla\CMS\Toolbar\ToolbarHelper::title( $doc_title, 'paint-brush thememanager' );
 		$document->setTitle($doc_title .' - '. $site_title);
 
 		// Create the toolbar

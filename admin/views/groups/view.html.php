@@ -152,7 +152,7 @@ class FlexicontentViewGroups extends FlexicontentViewBaseRecords
 		// Create document/toolbar titles
 		$doc_title = \Joomla\CMS\Language\Text::_( 'FLEXI_GROUPS' );
 		$site_title = $document->getTitle();
-		\Joomla\CMS\Toolbar\ToolbarHelper::title( $doc_title, 'users-cog' );
+		\Joomla\CMS\Toolbar\ToolbarHelper::title( $doc_title, 'users-cog groups' );
 		$document->setTitle($doc_title .' - '. $site_title);
 
 		// Create the toolbar

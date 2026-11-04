@@ -114,7 +114,7 @@ class FlexicontentViewGroup extends FlexicontentViewBaseRecord
 		$isNew		= ($this->item->id == 0);
 		$canDo		= UsersHelper::getActions();
 
-		\Joomla\CMS\Toolbar\ToolbarHelper::title(\Joomla\CMS\Language\Text::_($isNew ? 'COM_USERS_VIEW_NEW_GROUP_TITLE' : 'COM_USERS_VIEW_EDIT_GROUP_TITLE'), 'users-cog');
+		\Joomla\CMS\Toolbar\ToolbarHelper::title(\Joomla\CMS\Language\Text::_($isNew ? 'COM_USERS_VIEW_NEW_GROUP_TITLE' : 'COM_USERS_VIEW_EDIT_GROUP_TITLE'), 'users-cog groups-add');
 
 		if ($canDo->get('core.edit') || $canDo->get('core.create'))
 		{
