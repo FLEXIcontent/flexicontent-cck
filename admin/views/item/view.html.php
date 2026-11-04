@@ -361,6 +361,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 		// Add js function to overload the joomla submitform validation
 		$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
+		$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/item-form.js', array('version' => (string) filemtime(JPATH_SITE.'/components/com_flexicontent/assets/js/item-form.js')), array('defer' => true));
 		$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
 
 		// Add js function for custom code used by FLEXIcontent item form
