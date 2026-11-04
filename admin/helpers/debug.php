@@ -86,7 +86,6 @@ class UsersHelperDebug
 			if (!empty($component_actions)) {
 				foreach($component_actions as &$action)
 				{
-					echo $action->name . " -- ";
 					if ( StringHelper::substr( $action->name , 0 , 5) != 'core.' ) continue;
 					$action_title = str_replace('core.', '', $action->name); //$action->title;
 					$actions[$action_title] = array($action->name, $action->description);

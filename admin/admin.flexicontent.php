@@ -210,7 +210,8 @@ $jinput->set('task', $controller_task);
 if (
 	$view=='group' || $controller_name=='group'   || $view=='groups' || $controller_name=='groups' ||
 	$view=='user' || $controller_name=='user'   || $view=='users' || $controller_name=='users' ||
-	$view=='debuggroup' || $controller_name=='debuggroup'
+	$view=='debuggroup' || $controller_name=='debuggroup' ||
+	$view=='debuguser' || $controller_name=='debuguser'
 )
 {
 	// Load english language file for 'com_users' component then override with current language file
@@ -219,7 +220,7 @@ if (
 	// users helper file
 	require_once (JPATH_ADMINISTRATOR.'/components/com_flexicontent/helpers/users.php');
 }
-if ( $view=='debuggroup' || $controller_name=='debuggroup' ) {
+if ( $view=='debuggroup' || $controller_name=='debuggroup' || $view=='debuguser' || $controller_name=='debuguser' ) {
 	// users helper file
 	require_once (JPATH_ADMINISTRATOR.'/components/com_flexicontent/helpers/debug.php');
 }
