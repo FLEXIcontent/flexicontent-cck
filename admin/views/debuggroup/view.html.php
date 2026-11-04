@@ -28,7 +28,7 @@ class FlexicontentViewDebugGroup extends \Joomla\CMS\MVC\View\HtmlView
 		// Access check.
 		if (!\Joomla\CMS\Factory::getUser()->authorise('core.manage', 'com_users') || !\Joomla\CMS\Factory::getConfig()->get('debug'))
 		{
-			return JError::raiseWarning(404, \Joomla\CMS\Language\Text::_('JERROR_ALERTNOAUTHOR'));
+			throw new \Joomla\CMS\Access\Exception\NotAllowed(\Joomla\CMS\Language\Text::_('JERROR_ALERTNOAUTHOR'), 403);
 		}
 
 		$this->actions		= $this->get('DebugActions');
@@ -41,8 +41,7 @@ class FlexicontentViewDebugGroup extends \Joomla\CMS\MVC\View\HtmlView
 
 		// Check for errors.
 		if (count($errors = $this->get('Errors'))) {
-			JError::raiseError(500, implode("\n", $errors));
-			return false;
+			throw new \Exception(implode("\n", $errors), 500);
 		}
 
 		$this->addToolbar();
