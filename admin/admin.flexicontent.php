@@ -283,8 +283,8 @@ if ($format === 'html')
 
 	if ( 1 ) // always load tooltips JS in backend
 	{
-		// J3.0+ tooltips (bootstrap based)
-		\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip');
+		// Bootstrap tooltips on .hasTooltip (Joomla 3 attached them by default; Joomla 4+ only for a given selector)
+		\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip', '.hasTooltip');
 	}
 	// Add flexi-lib JS
 	\Joomla\CMS\Factory::getDocument()->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', array('version' => FLEXI_VHASH));  // Frontend/backend script

@@ -370,6 +370,10 @@ jQuery(document).ready(function() {
 			? flexicontent_html::getToolTip($label, (string) $this->element['description'], 1, 1)
 			: '...';
 
+		// Joomla 4+ attaches Bootstrap tooltips only for a given selector; these labels are also shown outside
+		// FLEXIcontent's own pages (its Options, menu items, modules), where admin.flexicontent.php does not run
+		\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip', '.hasTooltip');
+
 		return '<label style=""  class="'.$class.'" title="'.$title.'" >'.\Joomla\CMS\Language\Text::_($label).'</label>';
 	}
 
