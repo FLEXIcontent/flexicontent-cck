@@ -52,15 +52,15 @@ $listDirn	= $this->escape($this->state->get('list.direction'));
 	<div class="clr"> </div>
 
 	<div>
-		<?php echo \Joomla\CMS\Language\Text::_('COM_USERS_DEBUG_LEGEND'); ?>
-		<span class="swatch"><?php echo \Joomla\CMS\Language\Text::sprintf('COM_USERS_DEBUG_NO_CHECK', '-');?></span>
+		<?php echo \Joomla\CMS\Language\Text::_('FLEXI_DEBUG_LEGEND'); ?>
+		<span class="swatch"><?php echo \Joomla\CMS\Language\Text::sprintf('FLEXI_DEBUG_NO_CHECK', '-');?></span>
 		<span class="check-0 swatch"><?php echo \Joomla\CMS\Language\Text::sprintf('COM_USERS_DEBUG_IMPLICIT_DENY', '-');?></span>
 		<span class="check-a swatch"><?php echo \Joomla\CMS\Language\Text::sprintf('COM_USERS_DEBUG_EXPLICIT_ALLOW', '&#10003;');?></span>
 		<span class="check-d swatch"><?php echo \Joomla\CMS\Language\Text::sprintf('COM_USERS_DEBUG_EXPLICIT_DENY', '&#10007;');?></span>
 	</div>
 
 
-	<table id="adminListTableFCdebuggroup class="adminlist table fcmanlist" itemscope itemtype="http://schema.org/WebPage">
+	<table id="adminListTableFCdebuggroup" class="adminlist table fcmanlist" itemscope itemtype="http://schema.org/WebPage">
 		<thead>
 			<tr>
 				<th class="left">
