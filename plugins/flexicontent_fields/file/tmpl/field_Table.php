@@ -258,6 +258,10 @@ HTML;
 			data-filename="'.htmlspecialchars($file_data->filename, ENT_COMPAT, 'UTF-8').'"
 		/>
 		<input type="hidden" class="fc-file-id" id="'.$elementid_n.'_file-id" name="'.$fieldname_n.'[file-id]" value="'.htmlspecialchars($file_id, ENT_COMPAT, 'UTF-8').'" />'.'
+		'.(!\Joomla\CMS\Factory::getApplication()->isClient('administrator') ? '' : '
+		<button type="button" class="btn btn-sm btn-outline-secondary fc-edit-file-btn '.$tooltip_class.'" style="margin: 4px 0;" title="'.htmlspecialchars(Text::_('FLEXI_FIELD_FILE_EDIT_FILE'), ENT_COMPAT, 'UTF-8').'" onclick="return fc_editFile_'.$field->id.'(this);">
+			<span class="icon-edit" aria-hidden="true"></span> '.Text::_('FLEXI_FIELD_FILE_EDIT_FILE').'
+		</button>').'
 
 		'.( (!$multiple || $use_ingroup) && !$required_class && $use_myfiles != 4 ? '
 		<div class="fcclear"></div>

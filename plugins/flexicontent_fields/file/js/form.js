@@ -262,3 +262,61 @@
 		jQuery(valcounter).trigger('blur');
 		return true;
 	}
+
+	/**
+	 * Open the file edit form (file manager record form) of the file assigned to a value, inside a modal dialog
+	 */
+	fcfield_file.openEditDialog = function(btn, url_tpl, checkin_url_tpl, title, msg_nofile)
+	{
+		var id = parseInt(jQuery(btn).closest('.fcfieldval_container').find('input.fc-file-id').first().val(), 10);
+
+		if (!id)
+		{
+			alert(msg_nofile);
+			return false;
+		}
+
+		// Release the lock of the file record when the dialog is closed (saving also checks the record in)
+		var checkin = function()
+		{
+			try {
+				fetch(checkin_url_tpl.replace('__file_id__', id), {credentials: 'same-origin', redirect: 'manual'}).catch(function(){});
+			} catch (e) {}
+		};
+
+		fcfield_file.dialog_handle['_edit'] = fc_showDialog(url_tpl.replace('__file_id__', id), 'fc_modal_popup_container', 0, 0, 0, checkin, {title: title, paddingW: 10, paddingH: 16});
+		return false;
+	}
+
+
+	/**
+	 * Refresh the displayed data of every value (of any file field in the form) that uses the given file,
+	 * called by the file edit form (inside the modal) after the file record is saved
+	 */
+	fcfield_file.refreshFileRows = function(file)
+	{
+		var file_id = parseInt(file.id, 10);
+		if (!file_id) return;
+
+		jQuery('input.fc-file-id').filter(function() { return parseInt(this.value, 10) === file_id; }).each(function()
+		{
+			var container = jQuery(this).closest('.fcfieldval_container');
+			var filename  = file.filename || '';
+			var altname   = file.altname || '';
+			var original  = file.filename_original ? file.filename_original : filename;
+
+			container.find('.fc_filedata_storage_name').text(filename);
+			container.find('.fc_filedata_txt').val(filename).attr('data-filename', filename).data('filename', filename);
+			container.find('.fc_filedata_txt_nowrap').empty().append(document.createTextNode(filename)).append('<br/>').append(document.createTextNode(altname));
+			container.find('.fc_filedata_title').val(original);
+			container.find('.fc_filetitle').val(altname).blur();
+			container.find('.fc_filedesc').val(file.description || '');
+
+			// Extension text of the preview box (only when no image preview is shown)
+			var ext = (file.ext || '').toString().toUpperCase();
+			if (ext && !container.find('.fc_preview_thumb').attr('src').match(/phpThumb/i))
+			{
+				container.find('.fc_preview_text').text(ext);
+			}
+		});
+	}
