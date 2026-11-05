@@ -762,6 +762,12 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			$fileName = $this->input->get('filename', '', 'string');
 
 			$fileName_tmp = $app->getUserState($fileName, date('Y_m_d_') . uniqid());
+
+			// The state key is the client-sent file name, so only use a value with the form given below
+			if (!is_string($fileName_tmp) || !preg_match('/^\d{4}_\d{2}_\d{2}_[0-9a-f]{13}$/D', $fileName_tmp))
+			{
+				$fileName_tmp = date('Y_m_d_') . uniqid();
+			}
 			$app->setUserState($fileName, $fileName_tmp);
 			$filePath_tmp = $targetDir . DIRECTORY_SEPARATOR . $fileName_tmp;
 
