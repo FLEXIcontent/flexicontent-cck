@@ -2780,6 +2780,8 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		 * Find and excluded records that user cannot edit
 		 */
 		$record_model = $this->getModel($this->record_name);
+		$errors = [];
+		$modified = 0;
 
 		if ($checkACL)
 		{
@@ -2816,7 +2818,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			}
 			elseif (count($cid_noauth))
 			{
-				$app->enqueueMessage($msg_noauth, 'warning');
+				$errors[] = $msg_noauth;
 			}
 		}
 
@@ -2826,7 +2828,11 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			// EITHER Load existing item into the ITEM model
 			$item = $record_model->getItem($item_ID, $check_view_access = false, $no_cache = true, $force_version = 0);
 			// You can use $item to get existing values
-			if (!$item) die('item ' . $item_ID . ' not found');
+			if (!$item)
+			{
+				$errors[] = 'item ' . $item_ID . ' not found';
+				continue;
+			}
 
 			// IMPORTANT: Get existing field values for the item
 			$items               = array($item);
@@ -2852,26 +2858,38 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			$app->input->set('unique_tmp_itemid', null);
 			if (!$result)
 			{
-				$msg = 'Failed to store item: ' . $record_model->getError();
+				$msg = 'Failed to store item ' . $item_ID . ': ' . $record_model->getError();
 				\Joomla\CMS\Log\Log::add($msg);
-				echo $msg . "<br/>";
+				$errors[] = $msg;
+			}
+			else
+			{
+				$modified++;
 			}
 		}
 
 		// Clear dependent cache data
 		$this->_cleanCache();
 
-		$msg = count($cid) . ' ' . \Joomla\CMS\Language\Text::_('FLEXI_RECORDS_MODIFIED');
+		$msg = $modified . ' ' . \Joomla\CMS\Language\Text::_('FLEXI_RECORDS_MODIFIED');
 
-		/*echo '<pre>';
-		print_r($cid); echo "\n";
-		print_r($fieldname); echo "\n";
-		print_r($values); echo "\n";
-		print_r($data);
-		exit;*/
+		if ($this->input->get('is_ajax') && $errors)
+		{
+			$app->setHeader('status', '400 Bad Request', true);
+			$app->setHeader('Content-Type', 'text/plain; charset=utf-8', true);
+			$app->sendHeaders();
+			echo $msg . "\n" . implode("\n", $errors);
+			$app->close();
+		}
 
 		if ($this->input->get('is_ajax')) die('OK');
-		$this->setRedirect($this->returnURL, $msg, 'message');
+
+		foreach ($errors as $error)
+		{
+			$app->enqueueMessage(htmlspecialchars($error, ENT_QUOTES, 'UTF-8'), 'error');
+		}
+
+		$this->setRedirect($this->returnURL, $msg, $errors ? ($modified ? 'warning' : 'error') : 'message');
 	}
 
 
