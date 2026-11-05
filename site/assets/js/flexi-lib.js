@@ -2029,6 +2029,9 @@
 				delete window.fc_choices_instances[el.id || el.name];
 			}
 
+			// Let templates and plugins change the options (for example wrap callbackOnCreateTemplates) before the instance is created
+			el.dispatchEvent(new CustomEvent('flexicontent:choices-options', { bubbles: true, detail: { options: choicesOptions } }));
+
 			// Initialize Choices.js
 			// FLEXIcontent's own Choices.js (see flexicontent_html::loadFramework), even when Joomla's copy replaced window.Choices
 			var ChoicesLib = window.fc_Choices || Choices;
@@ -2323,6 +2326,9 @@
 				else choicesInstance.containerOuter.element.classList.remove('fc_highlight');
 			}
 
+			// The instance is created and registered (el.fc_choices_instance): templates and plugins can decorate it
+			el.dispatchEvent(new CustomEvent('flexicontent:choices-ready', { bubbles: true, detail: { instance: choicesInstance } }));
+
 			// Listen for change to update highlight
 			if (!isMultiple && el.classList.contains('fc_add_highlight')) {
 				el.addEventListener('change', function() {
@@ -2475,6 +2481,9 @@
 			{
 				sel_EL.select2_sortable();
 			}
+
+			// Select2 is attached: templates and plugins can decorate it
+			sel_EL[0].dispatchEvent(new CustomEvent('flexicontent:select2-ready', { bubbles: true }));
 		});
 
 		// Bridge jQuery change → native change event so delegated listeners (filters.php etc.) fire

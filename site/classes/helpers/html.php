@@ -1707,6 +1707,9 @@ class flexicontent_html
 				// Pass the library choice to JavaScript
 				$js .= "window.fc_use_choicesjs = " . ($useChoicesJs ? 'true' : 'false') . ";\n";
 
+				// Set the mobile flag now too, not only on DOMContentLoaded, for scripts that run before that (fields, templates)
+				$js .= "window.skip_select2_js = " . ($isMobile ? 1 : 0) . ";\n";
+
 				// Load choices.js UI strings for all languages
 				\Joomla\CMS\Language\Text::script('FLEXI_NO_RESULTS', false);
 				\Joomla\CMS\Language\Text::script('FLEXI_NO_CHOICES', false);
