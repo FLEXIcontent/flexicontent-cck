@@ -3191,6 +3191,13 @@ class FlexicontentModelItems extends FCModelAdminList
 
 
 		// ***
+		// *** Remove featured (front page) entries (Joomla's article model does this, its Content table does not)
+		// ***
+		$query = 'DELETE FROM #__content_frontpage WHERE content_id IN ('. $cid_list .')';
+		$this->_db->setQuery($query)->execute();
+
+
+		// ***
 		// *** Remove assigned category references
 		// ***
 		$query = 'DELETE FROM #__flexicontent_cats_item_relations'
