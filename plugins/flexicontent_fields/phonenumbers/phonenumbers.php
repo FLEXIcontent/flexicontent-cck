@@ -125,15 +125,45 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 
 
 		// CET ALLOWED countries, with special check for single country
-		$ac_country_default      = $field->parameters->get('ac_country_default', '');
-		$ac_country_allowed_list = $field->parameters->get('ac_country_allowed_list', '');
-		$ac_country_allowed_list = $ac_country_default . ',' . $ac_country_allowed_list;
-		$ac_country_allowed_list = array_unique(FLEXIUtilities::paramToArray($ac_country_allowed_list, "/[\s]*,[\s]*/", false, true));
-		$single_country          = count($ac_country_allowed_list)==1 && $ac_country_default ? $ac_country_default : false;
+		$ac_country_default      = trim($field->parameters->get('ac_country_default', ''));
+		$ac_country_allowed_list = trim($field->parameters->get('ac_country_allowed_list', ''));
+		$ac_country_allowed_list = $ac_country_allowed_list === '' ? array() : array_values(array_unique(array_filter(
+			FLEXIUtilities::paramToArray($ac_country_default . ',' . $ac_country_allowed_list, "/[\s]*,[\s]*/", false, true),
+			'strlen'
+		)));
+		$single_country = count($ac_country_allowed_list) === 1 && $ac_country_default === reset($ac_country_allowed_list)
+			? $ac_country_default
+			: false;
 
 
 		// CREATE COUNTRY OPTIONS
-		$_list = count($ac_country_allowed_list) ? array_flip($ac_country_allowed_list) : array();
+		if (count($ac_country_allowed_list))
+		{
+			$_list = array_flip($ac_country_allowed_list);
+		}
+		else
+		{
+			// An empty allowed list means all countries. Use the same English
+			// language keys that supply the labels, then localize each option below.
+			static $all_country_codes = null;
+			if ($all_country_codes === null)
+			{
+				$all_country_codes = array();
+				$country_file = JPATH_ADMINISTRATOR . '/language/en-GB/en-GB.plg_flexicontent_fields_phonenumbers.ini';
+				$country_strings = is_file($country_file)
+					? \Joomla\CMS\Language\LanguageHelper::parseIniFile($country_file)
+					: array();
+				foreach (array_keys($country_strings ?: array()) as $key)
+				{
+					$prefix = 'PLG_FC_PHONENUMBERS_CC_';
+					if (strpos($key, $prefix) === 0 && strlen($key) > strlen($prefix))
+					{
+						$all_country_codes[substr($key, strlen($prefix))] = true;
+					}
+				}
+			}
+			$_list = $all_country_codes;
+		}
 
 		$allowed_country_names = array();
 		$allowed_countries     = array('' => \Joomla\CMS\Language\Text::_('FLEXI_SELECT'));
@@ -154,7 +184,7 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 
 		$countries_attribs = ''
 			. ($single_country ? ' disabled="disabled" readonly="readonly"' : '')
-			. ' onchange="fcfield_addrint.toggle_USA_state(this);" ';
+			;
 
 
 
