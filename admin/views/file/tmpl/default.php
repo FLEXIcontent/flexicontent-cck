@@ -245,7 +245,7 @@ HTML;
 				</label>
 			</td>
 			<td>
-				<input type="text" id="altname" name="altname" value="<?php echo $this->row->altname; ?>" maxlength="4000" class="input-xxlarge required" />
+				<input type="text" id="altname" name="altname" value="<?php echo htmlspecialchars((string) $this->row->altname, ENT_QUOTES, 'UTF-8'); ?>" maxlength="4000" class="input-xxlarge required" />
 			</td>
 		</tr>
 
@@ -256,7 +256,7 @@ HTML;
 				</label>
 			</td>
 			<td>
-				<textarea name="description" rows="5" class="input-xxlarge" id="file-desc"><?php echo $this->row->description; ?></textarea>
+				<textarea name="description" rows="5" class="input-xxlarge" id="file-desc"><?php echo htmlspecialchars((string) $this->row->description, ENT_QUOTES, 'UTF-8'); ?></textarea>
 			</td>
 		</tr>
 
@@ -394,7 +394,7 @@ HTML;
 			</td>
 			<td>
 				<div class="input-group">
-					<input type="text" id="mime_ext" name="ext" value="<?php echo $this->row->ext; ?>" size="5" style="max-width:100px;" maxlength="100"/>
+					<input type="text" id="mime_ext" name="ext" value="<?php echo htmlspecialchars((string) $this->row->ext, ENT_QUOTES, 'UTF-8'); ?>" size="5" style="max-width:100px;" maxlength="100"/>
 					<select class="use_select2_lib" onchange="jQuery(this).parent().find('input').val(jQuery(this).val()); jQuery(this).val(''); fc_destroySelectLib(jQuery(this).parent()); fc_attachSelect2(jQuery(this).parent()); ">
 <option value=""><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_PLEASE_SELECT' ); ?></option>
 <option value="3dm">3dm :: x-world/x-3dmf</option>
@@ -1055,11 +1055,11 @@ HTML;
 <?php echo \Joomla\CMS\HTML\HTMLHelper::_( 'form.token' ); ?>
 <input type="hidden" name="option" value="com_flexicontent" />
 <?php if (!$this->row->url) : ?>
-<input type="hidden" name="ext" value="<?php echo $this->row->ext; ?>" />
+<input type="hidden" name="ext" value="<?php echo htmlspecialchars((string) $this->row->ext, ENT_QUOTES, 'UTF-8'); ?>" />
 <?php endif; ?>
-<input type="hidden" name="url" value="<?php echo $this->row->url; ?>" />
+<input type="hidden" name="url" value="<?php echo htmlspecialchars((string) $this->row->url, ENT_QUOTES, 'UTF-8'); ?>" />
 <input type="hidden" name="secure" value="<?php echo $this->row->secure; ?>" />
-<input type="hidden" name="uploaded" value="<?php echo $this->row->uploaded; ?>" />
+<input type="hidden" name="uploaded" value="<?php echo htmlspecialchars((string) $this->row->uploaded, ENT_QUOTES, 'UTF-8'); ?>" />
 <input type="hidden" name="uploaded_by" value="<?php echo $this->row->uploaded_by; ?>" />
 <input type="hidden" name="published" value="<?php echo $this->row->published; ?>" />
 <input type="hidden" name="id" value="<?php echo $this->row->id; ?>" />
