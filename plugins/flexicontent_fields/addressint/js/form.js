@@ -60,69 +60,95 @@
 	}
 
 
-	// Initialize marker selector
+	// Build trusted local marker images as DOM nodes; option labels always stay text.
+	fcfield_addrint.markerLabel = function(select, value, label)
+	{
+		var span = document.createElement('span');
+		span.className = 'fc-marker-label';
+		var option = Array.prototype.find.call(select.options, function(o) { return o.value === String(value || ''); });
+		var base = select.getAttribute('data-marker-base-url');
+		if (option && value && base) {
+			try {
+				var baseUrl = new URL(base, window.location.href);
+				var url = new URL(encodeURIComponent(String(value)), baseUrl);
+				if (/^https?:$/.test(url.protocol) && url.origin === window.location.origin && url.pathname.indexOf(baseUrl.pathname) === 0) {
+					var image = document.createElement('img');
+					image.className = 'flag fc-marker-img'; image.alt = ''; image.src = url.href;
+					span.appendChild(image);
+				}
+			} catch (error) { /* A missing/invalid marker URL leaves a usable text option. */ }
+		}
+		span.appendChild(document.createTextNode(option ? option.textContent : String(label || '')));
+		return span;
+	};
+
+	// Initialize marker selector (or retain the native control and a selected-image preview on mobile).
 	fcfield_addrint.initMarkerSelector = function(elementid_n, config_name)
 	{
 		var theSelect = jQuery('#' + elementid_n + '_custom_marker');
+		if (!theSelect.length) return;
+		var el = theSelect[0];
+		var prevKey = el.id || el.name;
+		var prevInst = el.fc_choices_instance || theSelect.data('fc_choices_instance') || (window.fc_choices_instances && window.fc_choices_instances[prevKey]);
+		if (prevInst && prevInst.passedElement && prevInst.passedElement.element === el) prevInst.destroy();
+		delete el.fc_choices_instance;
+		theSelect.removeData('fc_choices_instance');
+		if (window.fc_choices_instances && window.fc_choices_instances[prevKey] === prevInst) delete window.fc_choices_instances[prevKey];
+
+		if (window.skip_select2_js) {
+			var preview = el.nextElementSibling;
+			if (!preview || !preview.classList.contains('fc-marker-native-preview')) {
+				preview = document.createElement('span'); preview.className = 'fc-marker-native-preview';
+				preview.setAttribute('aria-hidden', 'true'); el.after(preview);
+			}
+			var updatePreview = function() {
+				preview.replaceChildren();
+				var image = fcfield_addrint.markerLabel(el, el.value, '').querySelector('img');
+				if (image) preview.appendChild(image);
+				preview.hidden = !image;
+			};
+			theSelect.off('change.fcMarkerPreview').on('change.fcMarkerPreview', updatePreview);
+			updatePreview();
+			return;
+		}
+		var nativePreview = el.nextElementSibling;
+		if (nativePreview && nativePreview.classList.contains('fc-marker-native-preview')) nativePreview.remove();
 
 		if (window.fc_use_choicesjs) {
-			// Choices.js with custom rendering
 			window.fc_choices_instances = window.fc_choices_instances || {};
-
-			// Destroy any existing instance so re-init / row clones don't stack wrappers
-			var prevKey = theSelect[0].id || theSelect[0].name;
-			var prevInst = theSelect.data('fc_choices_instance') || window.fc_choices_instances[prevKey];
-			if (prevInst && typeof prevInst.destroy === 'function') {
-				prevInst.destroy();
-			}
-			delete window.fc_choices_instances[prevKey];
-			theSelect.removeData('fc_choices_instance');
-
-			// FLEXIcontent's own Choices.js, even when another copy replaced window.Choices
-			var choicesInstance = new (window.fc_Choices || Choices)(theSelect[0], {
-				callbackOnCreateTemplates: function(template) {
-					return {
-						item: function(data) {
-							var div = document.createElement('div');
-							div.classList.add('choices__item', 'choices__item--selectable');
-							div.setAttribute('data-item', '');
-							div.setAttribute('data-value', data.value);
-							div.setAttribute('data-id', data.id);
-							div.innerHTML = '<img class="flag fc-marker-img" src="' + theSelect.data('marker-base-url') + data.value + '"/> ' + data.label;
-							return div;
-						},
-						choice: function(data) {
-							var div = document.createElement('div');
-							div.classList.add('choices__item', 'choices__item--choice', 'choices__list-item--choice');
-							div.setAttribute('data-select-text', '');
-							div.setAttribute('data-choice', '');
-							if (data.disabled) div.classList.add('is-disabled');
-							if (data.selected) div.classList.add('is-selected');
-							div.innerHTML = '<img class="flag fc-marker-img" src="' + theSelect.data('marker-base-url') + data.value + '"/> ' + data.label;
-							return div;
-						}
-					};
+			var options = {
+				allowHTML: false,
+				allowHtmlUserInput: false,
+				shouldSort: false,
+				callbackOnCreateTemplates: function() {
+					var templates = {};
+					['item', 'choice'].forEach(function(kind) {
+						templates[kind] = function(config, data, extra, group) {
+							var node = (window.fc_Choices || Choices).defaults.templates[kind].call(this, config, data, extra, group);
+							Array.prototype.slice.call(node.childNodes).forEach(function(child) { if (child.nodeType === 3) child.remove(); });
+							node.prepend(fcfield_addrint.markerLabel(el, data.value, data.label));
+							return node;
+						};
+					});
+					return templates;
 				}
-			});
-
-			// Register the instance so destroy / reset helpers can find it
-			theSelect.data('fc_choices_instance', choicesInstance);
-			window.fc_choices_instances[prevKey] = choicesInstance;
-			if (choicesInstance.containerOuter && choicesInstance.containerOuter.element) {
-				choicesInstance.containerOuter.element.classList.add('fc-choices-outer');
-			}
-			fc_attachSelect2(theSelect.parent());
+			};
+			el.dispatchEvent(new CustomEvent('flexicontent:choices-options', {bubbles: true, detail: {options: options}}));
+			// FLEXIcontent's own Choices.js, even when another copy replaced window.Choices
+			var instance = new (window.fc_Choices || Choices)(el, options);
+			el.fc_choices_instance = instance;
+			theSelect.data('fc_choices_instance', instance);
+			window.fc_choices_instances[prevKey] = instance;
+			instance.containerOuter.element.classList.add('fc-choices-outer');
+			el.dispatchEvent(new CustomEvent('flexicontent:choices-ready', {bubbles: true, detail: {instance: instance}}));
 		} else {
-			// Select2 with custom rendering (legacy)
-			theSelect.select2(
-			{
-				formatResult: function(state) { return fcfield_addrint.format_marker_image(state, theSelect) },
-				formatSelection: function(state) { return fcfield_addrint.format_marker_image(state, theSelect) },
-				escapeMarkup: function(m) { return m; }
+			theSelect.select2({
+				formatResult: function(state) { return fcfield_addrint.format_marker_image(state, theSelect); },
+				formatSelection: function(state) { return fcfield_addrint.format_marker_image(state, theSelect); },
+				escapeMarkup: function(markup) { return markup; }
 			});
-			fc_attachSelect2(theSelect.parent());
 		}
-	}
+	};
 
 
 	// Calculate marker anchor values
@@ -504,12 +530,7 @@
 
 	fcfield_addrint.format_marker_image = function (state, theSelect)
 	{
-		if (!state.id)
-		{
-			return state.text;
-		}
-
-		return '<img class="flag" src="' + theSelect.data('marker-base-url') + state.id + '"/> ' + state.text;
+		return fcfield_addrint.markerLabel(theSelect[0], state.id, state.text).outerHTML;
 	}
 
 
