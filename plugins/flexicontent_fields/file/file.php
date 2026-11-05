@@ -347,6 +347,17 @@ class plgFlexicontent_fieldsFile extends FCField
 			}
 
 
+			function fc_editFile_".$field->id."(element)
+			{
+				return fcfield_file.openEditDialog(element,
+					".json_encode(\Joomla\CMS\Uri\Uri::base(true).'/index.php?option=com_flexicontent&task=filemanager.edit&view=file&id=__file_id__&tmpl=component&fcmodal=1&'.\Joomla\CMS\Session\Session::getFormToken().'=1').",
+					".json_encode(\Joomla\CMS\Uri\Uri::base(true).'/index.php?option=com_flexicontent&task=filemanager.checkin&cid[]=__file_id__&'.\Joomla\CMS\Session\Session::getFormToken().'=1').",
+					".json_encode(\Joomla\CMS\Language\Text::_('FLEXI_FIELD_FILE_EDIT_FILE')).",
+					".json_encode(\Joomla\CMS\Language\Text::_('FLEXI_FIELD_FILE_EDIT_NO_FILE'))."
+				);
+			}
+
+
 			function fc_openFileSelection_".$field->id."(element)
 			{
 				var obj = jQuery(element);

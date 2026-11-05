@@ -59,7 +59,23 @@ $disabled = $this->row->url ? '' : ' disabled="disabled"';
 		return true;
 	}
 </script>
+<?php
+// Opened from the file field of the item form (inside a modal dialog): the toolbar is not available, so we show our own Save / Close buttons
+$fc_in_modal = \Joomla\CMS\Factory::getApplication()->input->getCmd('tmpl') === 'component'
+	&& \Joomla\CMS\Factory::getApplication()->input->getInt('fcmodal', 0)
+	&& (int) $this->row->id;
+?>
 <div id="flexicontent" class="flexicontent">
+<?php if ($fc_in_modal) : ?>
+	<div class="fc-file-modal-bar" style="position: sticky; top: 0; z-index: 10; padding: 8px 0; margin-bottom: 8px; background: inherit; display: flex; gap: 8px; align-items: center;">
+		<button type="button" class="btn btn-success" onclick="Joomla.submitbutton('filemanager.apply_ajax'); return false;">
+			<span class="icon-save" aria-hidden="true"></span> <?php echo Text::_('JSAVE'); ?>
+		</button>
+		<button type="button" class="btn btn-secondary" onclick="fcFileModalClose(); return false;">
+			<span class="icon-cancel" aria-hidden="true"></span> <?php echo Text::_('JTOOLBAR_CLOSE'); ?>
+		</button>
+	</div>
+<?php endif; ?>
 <form action="index.php" method="post" name="adminForm" id="adminForm" class="form-validate form-horizontal" onsubmit="handleFormSumbit(this)" enctype="multipart/form-data">
 
 	<table class="fc-form-tbl">
@@ -360,7 +376,7 @@ HTML;
 				</label>
 			</td>
 			<td>
-				<?php echo $this->lists['access']; ?>
+				<span class="fc-file-narrow" style="display:inline-block; width:100%; max-width:320px;"><?php echo $this->lists['access']; ?></span>
 			</td>
 		</tr>
 
@@ -1063,6 +1079,10 @@ HTML;
 <input type="hidden" name="uploaded_by" value="<?php echo $this->row->uploaded_by; ?>" />
 <input type="hidden" name="published" value="<?php echo $this->row->published; ?>" />
 <input type="hidden" name="id" value="<?php echo $this->row->id; ?>" />
+<?php if ($fc_in_modal) : ?>
+<input type="hidden" name="tmpl" value="component" />
+<input type="hidden" name="fcmodal" value="1" />
+<?php endif; ?>
 <input type="hidden" name="controller" value="filemanager" />
 <input type="hidden" name="view" value="file" />
 <input type="hidden" name="task" value="" />
@@ -1080,7 +1100,118 @@ HTML;
     min-width: 60% !important;
     max-width: unset;
   }
+
+  /* File edit form layout: label column + fluid fields */
+  #flexicontent #adminForm table.fc-form-tbl {
+    width: 100%;
+    max-width: 1100px;
+    table-layout: auto;
+    border-collapse: separate;
+    border-spacing: 0 6px;
+  }
+  #flexicontent #adminForm table.fc-form-tbl td.key {
+    width: 190px;
+    min-width: 150px;
+    text-align: right;
+    vertical-align: top;
+    padding: 8px 14px 0 0;
+    white-space: normal;
+  }
+  #flexicontent #adminForm table.fc-form-tbl td:not(.key) {
+    width: auto;
+    vertical-align: top;
+  }
+  /* Text fields (URL, filenames, title, description): use the whole available width */
+  #flexicontent #adminForm input.input-xxlarge,
+  #flexicontent #adminForm input.input-xxl,
+  #flexicontent #adminForm textarea.input-xxlarge,
+  #flexicontent #adminForm input#filename,
+  #flexicontent #adminForm input#filename_original,
+  #flexicontent #adminForm input#altname {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  #flexicontent #adminForm textarea#file-desc {
+    min-height: 90px;
+    resize: vertical;
+  }
+  /* Parameter fields: compact */
+  #flexicontent #adminForm .advanced-file-props select,
+  #flexicontent #adminForm .advanced-file-props .select2-container,
+  #flexicontent #adminForm .advanced-file-props .chzn-container,
+  #flexicontent #adminForm .fc-file-narrow * {
+    width: 100% !important;
+    max-width: 320px !important;
+  }
+  #flexicontent #adminForm .advanced-file-props span.fc-file-narrow,
+  #flexicontent #adminForm .advanced-file-props span[style*="width:94%"] {
+    width: 100% !important;
+    max-width: 320px !important;
+  }
+  #flexicontent #adminForm input#hits {
+    width: 140px;
+    max-width: 140px;
+  }
+  #flexicontent #adminForm input#size {
+    width: 140px;
+    max-width: 140px;
+  }
+  #flexicontent #adminForm .input-group {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 6px;
+    width: auto;
+  }
+  #flexicontent #adminForm .input-group > select,
+  #flexicontent #adminForm .input-group > .select2-container {
+    max-width: 220px !important;
+    width: auto !important;
+    flex: 0 1 220px;
+  }
+  #flexicontent #adminForm input#mime_ext {
+    width: 100px;
+    max-width: 100px;
+  }
+  #flexicontent #adminForm .advanced-file-props fieldset.radio,
+  #flexicontent #adminForm .advanced-file-props .btn-group {
+    margin: 0;
+  }
+  /* "Advanced properties" button: smaller gap */
+  #flexicontent #adminForm input[value="Advanced properties"] {
+    margin-top: 16px !important;
+  }
+  #flexicontent #adminForm #file_replacement_box .alert {
+    padding: 6px 12px;
+  }
 </style>
+<?php if ($fc_in_modal) : ?>
+<script>
+	function fcFileModalClose()
+	{
+		try { window.parent.jQuery('#fc_modal_popup_container').dialog('close'); } catch (e) { window.close(); }
+	}
+
+	// After a confirmed (AJAX) save, show the new data in the values of the parent (item) form that use this file
+	document.getElementById('adminForm').addEventListener('flexicontent:save-confirmed', function()
+	{
+		var form = this;
+		var val = function(sel) { var el = form.querySelector(sel); return el ? el.value : ''; };
+
+		var file = {
+			id: val('input[name="id"]'),
+			filename: val('input[name="filename"]'),
+			filename_original: val('input[name="filename_original"]'),
+			altname: val('input[name="altname"]'),
+			description: val('textarea[name="description"]'),
+			ext: val('#mime_ext') || val('input[name="ext"]')
+		};
+
+		try { window.parent.fcfield_file.refreshFileRows(file); } catch (e) {}
+	});
+</script>
+<?php endif; ?>
 <script>
 	function jInsertFieldValue(value, id) {
 		var elem = jQuery('#'+id).get(0);
