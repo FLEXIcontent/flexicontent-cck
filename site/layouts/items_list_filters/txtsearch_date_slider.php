@@ -53,7 +53,7 @@ else
 
 		if ($anyAsFirstLastValues)
 		{
-			$step_values[] = "''";
+			$step_values[] = '';
 			$step_labels[] = \Joomla\CMS\Language\Text::_('FLEXI_ANY');
 			$i++;
 		}
@@ -65,7 +65,7 @@ else
 				continue;
 			}
 
-			$step_values[] = "'" . addcslashes($result->value, "'") . "'";
+			$step_values[] = (string) $result->value;
 			$step_labels[] = $result->text;
 
 			if ($result->value==$value1)
@@ -86,7 +86,7 @@ else
 
 		if ($display_filter_as == 8 && $anyAsFirstLastValues)
 		{
-			$step_values[] = "''";
+			$step_values[] = '';
 			$step_labels[] = \Joomla\CMS\Language\Text::_('FLEXI_ANY');
 		}
 
@@ -127,7 +127,7 @@ else
 
 		foreach ($custom_vals as $i => $v)
 		{
-			$step_values[$i] = "'" . addcslashes($v, "'") . "'";
+			$step_values[$i] = (string) $v;
 		}
 
 		$step_labels = & $custom_labels;
@@ -162,8 +162,8 @@ else
 			var input2 = document.getElementById('".$filter_ffid.$rght_no."');
 			var isSingle = ".($display_filter_as==7 ? '1' : '0').";
 
-			var step_values = [".implode(', ', $step_values)."];
-			var step_labels = [\"".implode('", "', array_map('addslashes', $step_labels))."\"];
+			var step_values = ".json_encode(array_values($step_values), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT).";
+			var step_labels = ".json_encode(array_values($step_labels), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT).";
 
 			noUiSlider.create(slider, {".
 				($display_filter_as==7 ? "

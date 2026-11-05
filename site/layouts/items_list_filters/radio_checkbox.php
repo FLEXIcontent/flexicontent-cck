@@ -107,6 +107,7 @@ foreach ($results as $result)
 		? ' fc_checkradio_checked' : '';
 
 	$result_text_encoded = htmlspecialchars($result->text, ENT_COMPAT, 'UTF-8');
+	$result_value_encoded = htmlspecialchars((string) $result->value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
 	$filter->html .= '<li class="fc_checkradio_option'.$checked_class_li.'" style="'.$value_style.'">';
 	
@@ -122,13 +123,13 @@ foreach ($results as $result)
 	{
 		$filter->html .= ' <input onchange="fc_toggleClassGrp(this, \'fc_highlight\');" ';
 		$filter->html .= '  id="'.$filter_ffid.$i.'" type="radio" name="'.$filter_ffname.'" ';
-		$filter->html .= '  value="'.$result->value.'" '.$checked_attr.$disable_attr.' class="fc_checkradio" />';
+		$filter->html .= '  value="'.$result_value_encoded.'" '.$checked_attr.$disable_attr.' class="fc_checkradio" />';
 	}
 	else
 	{
 		$filter->html .= ' <input onchange="fc_toggleClass(this, \'fc_highlight\');" ';
 		$filter->html .= '  id="'.$filter_ffid.$i.'" type="checkbox" name="'.$filter_ffname.'[]" ';
-		$filter->html .= '  value="'.$result->value.'" '.$checked_attr.$disable_attr.' class="fc_checkradio" />';
+		$filter->html .= '  value="'.$result_value_encoded.'" '.$checked_attr.$disable_attr.' class="fc_checkradio" />';
 	}
 	
 	$filter->html .= '<label class="fc_filter_val fc_cleared '.$checked_class.'" for="'.$filter_ffid.$i.'">';
