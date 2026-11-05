@@ -724,7 +724,8 @@ $fc_plgs[$fieldtype] = new $className($dispatcher, array('type'=>'flexicontent_f
 		// Redirect to Joomla backend
 		if (!$perms->CanManage)
 		{
-			$app->redirect('index.php', \Joomla\CMS\Language\Text::_('FLEXI_NO_ACCESS'), 'warning');
+			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_NO_ACCESS'), 'warning');
+			$app->redirect('index.php');
 		}
 
 		// Check access to current management tab

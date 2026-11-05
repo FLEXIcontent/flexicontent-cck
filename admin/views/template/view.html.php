@@ -220,7 +220,8 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 		$perms = FlexicontentHelperPerm::getPerm();
 
 		if (!$perms->CanTemplates) {
-			$app->redirect('index.php?option=com_flexicontent', \Joomla\CMS\Language\Text::_( 'FLEXI_NO_ACCESS' ));
+			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_NO_ACCESS'), 'warning');
+			$app->redirect('index.php?option=com_flexicontent');
 		}
 
 
