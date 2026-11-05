@@ -42,12 +42,8 @@ class FlexicontentTasksCore
 		// อนุญาตเฉพาะ AJAX Request ที่ส่งมาจาก Domain ของเว็บไซต์ตัวเองเท่านั้น
 		$is_ajax = (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest');
 		
-		$http_host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
-		$referer   = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
-		$is_valid_origin = (!empty($referer) && parse_url($referer, PHP_URL_HOST) === $http_host);
-
 		// หากเปิดผ่าน URL Browser ตรงๆ โดยไม่มี AJAX Header หรือมาจากเว็บภายนอก ให้ปฏิเสธทันที
-		if (!$is_ajax || !$is_valid_origin)
+		if (!$is_ajax)
 		{
 			header('HTTP/1.1 403 Forbidden');
 			header('Content-Type: text/plain; charset=utf-8');
@@ -56,6 +52,16 @@ class FlexicontentTasksCore
 
 		require_once JPATH_BASE . '/includes/defines.php';
 		require_once JPATH_BASE . '/includes/framework.php';
+
+		// Read proxy trust only after Joomla has loaded the site's configuration.
+		$config = new JConfig();
+
+		if (!self::hasSameOrigin($_SERVER, !empty($config->behind_loadbalancer)))
+		{
+			header('HTTP/1.1 403 Forbidden');
+			header('Content-Type: text/plain; charset=utf-8');
+			exit('Access Denied: Direct browser requests to this endpoint are strictly forbidden.');
+		}
 
 		$is_admin    = preg_match('/\/administrator\//', isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '');
 		$client_name = $is_admin ? 'administrator' : 'site';
@@ -118,6 +124,57 @@ class FlexicontentTasksCore
 			header('HTTP/1.1 403 Forbidden');
 			jexit('Invalid task or access denied.');
 		}
+	}
+
+
+	/**
+	 * Compare the browser origin with the request authority, including effective ports.
+	 * Forwarded scheme headers are trusted only for a configured load balancer.
+	 */
+	protected static function hasSameOrigin($server, $behind_loadbalancer = false)
+	{
+		$host = isset($server['HTTP_HOST']) ? $server['HTTP_HOST'] : '';
+		$referer = isset($server['HTTP_REFERER']) ? $server['HTTP_REFERER'] : '';
+
+		if (!is_string($host) || !is_string($referer) || $host === '' || $referer === ''
+			|| preg_match('/[\x00-\x20\x7f]/', $host . $referer)
+			|| strpos($host . $referer, '\\') !== false)
+		{
+			return false;
+		}
+
+		$scheme = !empty($server['HTTPS']) && strtolower($server['HTTPS']) !== 'off' ? 'https' : 'http';
+
+		if ($behind_loadbalancer && !empty($server['HTTP_X_FORWARDED_PROTO']))
+		{
+			$forwarded_scheme = strtolower(trim($server['HTTP_X_FORWARDED_PROTO']));
+
+			if ($forwarded_scheme !== 'http' && $forwarded_scheme !== 'https')
+			{
+				return false;
+			}
+
+			$scheme = $forwarded_scheme;
+		}
+
+		$request = parse_url($scheme . '://' . $host);
+		$origin = parse_url($referer);
+
+		if (!$request || !$origin || empty($request['host']) || empty($origin['host']) || empty($origin['scheme'])
+			|| isset($request['user']) || isset($request['pass']) || isset($request['path'])
+			|| isset($request['query']) || isset($request['fragment'])
+			|| isset($origin['user']) || isset($origin['pass']))
+		{
+			return false;
+		}
+
+		$default_port = $scheme === 'https' ? 443 : 80;
+		$request_port = isset($request['port']) ? $request['port'] : $default_port;
+		$origin_port = isset($origin['port']) ? $origin['port'] : $default_port;
+
+		return strtolower($origin['scheme']) === $scheme
+			&& strtolower($origin['host']) === strtolower($request['host'])
+			&& $request_port > 0 && $request_port === $origin_port;
 	}
 
 
