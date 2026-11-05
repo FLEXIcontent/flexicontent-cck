@@ -45,6 +45,18 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 
 	function purge()
 	{
+		$app = \Joomla\CMS\Factory::getApplication();
+
+		if ($app->input->getMethod() !== 'POST' || !\Joomla\CMS\Session\Session::checkToken('post'))
+		{
+			throw new \Exception(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'), 403);
+		}
+
+		if (!FlexicontentHelperPerm::getPerm()->CanIndex)
+		{
+			throw new \Exception(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'), 403);
+		}
+
 		$model = $this->getModel('search');
 		$model->purge();
 		$msg = \Joomla\CMS\Language\Text::_('FLEXI_ITEMS_PURGED');
