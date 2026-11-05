@@ -230,12 +230,20 @@
 		var iframe;
 		if (!no_iframe)
 		{
-			iframe = jQuery('<iframe id="'+tagid+'_frame" style="visibility:hidden; width:100%; height:100%; border:0; margin:0; padding:0;" src=""></iframe>');
+			iframe = jQuery('<iframe id="'+tagid+'_frame" tabindex="0" style="visibility:hidden; width:100%; height:100%; border:0; margin:0; padding:0;" src=""></iframe>');
 			container.append(iframe);
 			iframe.on('load', function() {
 				// Show retrieved contents and hide the loading animation
 				iframe.show().css('visibility', 'visible');
 				loading.hide();
+
+				// Keyboard users: move focus into the loaded page, else it stays on the dialog's Close button and Tab never reaches the iframe
+				try {
+					var doc = iframe[0].contentDocument;
+					var first = doc && doc.querySelector('a[href]:not([tabindex="-1"]), button:not([disabled]):not([tabindex="-1"]), input:not([type=hidden]):not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])');
+					if (first) first.focus();
+					else if (iframe[0].contentWindow) iframe[0].contentWindow.focus();
+				} catch (e) { /* another origin: leave the focus where it is */ }
 
 				// Remove unneeded scroll bar inside iframe document, new browser security disallows this ?
 				//iframe.contents().find('body').css({ 'height': 'unset' });
