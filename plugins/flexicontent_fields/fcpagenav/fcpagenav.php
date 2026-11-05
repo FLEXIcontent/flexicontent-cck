@@ -337,18 +337,16 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 			$RESIZE_FLAG = !$params->get($uprefix.'_image') || !$params->get($uprefix.'_image_size');
 			if ( $src && $RESIZE_FLAG ) {
 				// Resize image when src path is set and RESIZE_FLAG: (a) using image extracted from item main text OR (b) not using image field's already created thumbnails
-				$w		= '&amp;w=' . $params->get($rprefix.'_width', 200);
-				$h		= '&amp;h=' . $params->get($rprefix.'_height', 200);
-				$aoe	= '&amp;aoe=1';
-				$q		= '&amp;q=95';
-				$ar 	= '&amp;ar=x';
-				$zc		= $params->get($rprefix.'_method') ? '&amp;zc=' . $params->get($rprefix.'_method') : '';
-				$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-				$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
-				$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
-
-				$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  \Joomla\CMS\Uri\Uri::base(true).'/' : '';
-				$thumb = \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+				$thumb = flexicontent_images::phpThumbURL(array(
+					'src' => $src,
+					'w'   => $params->get($rprefix.'_width', 200),
+					'h'   => $params->get($rprefix.'_height', 200),
+					'aoe' => 1,
+					'q'   => 95,
+					'ar'  => 'x',
+					'zc'  => $params->get($rprefix.'_method') ?: '',
+					'f'   => flexicontent_images::phpThumbFormat($src),
+				));
 			} else {
 				// Do not resize image when (a) image src path not set or (b) using image field's already created thumbnails
 				$thumb = $src;
@@ -380,31 +378,28 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 		if ( $cat_image_source && $cat->image && file_exists( JPATH_SITE .DS. $joomla_image_path . $cat->image ) ) {
 			$src = \Joomla\CMS\Uri\Uri::base(true) ."/". $joomla_image_url . $cat->image;
 
-			$w		= '&amp;w=' . $params->get($rprefix.'_width', 200);
-			$h		= '&amp;h=' . $params->get($rprefix.'_height', 200);
-			$aoe	= '&amp;aoe=1';
-			$q		= '&amp;q=95';
-			$ar 	= '&amp;ar=x';
-			$zc		= $params->get($rprefix.'_method') ? '&amp;zc=' . $params->get($rprefix.'_method') : '';
-			$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-			$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
-			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
-
-			$image_src = \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
+			$image_src = flexicontent_images::phpThumbURL(array(
+				'src' => $src,
+				'w'   => $params->get($rprefix.'_width', 200),
+				'h'   => $params->get($rprefix.'_height', 200),
+				'aoe' => 1,
+				'q'   => 95,
+				'ar'  => 'x',
+				'zc'  => $params->get($rprefix.'_method') ?: '',
+				'f'   => flexicontent_images::phpThumbFormat($src),
+			));
 		} else if ( $cat_image_source!=1 && $src = flexicontent_html::extractimagesrc($cat) ) {
 			// Resize image when src path is set and RESIZE_FLAG: (a) using image extracted from item main text OR (b) not using image field's already created thumbnails
-			$w		= '&amp;w=' . $params->get($rprefix.'_width', 200);
-			$h		= '&amp;h=' . $params->get($rprefix.'_height', 200);
-			$aoe	= '&amp;aoe=1';
-			$q		= '&amp;q=95';
-			$ar 	= '&amp;ar=x';
-			$zc		= $params->get($rprefix.'_method') ? '&amp;zc=' . $params->get($rprefix.'_method') : '';
-			$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-			$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
-			$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
-
-			$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  \Joomla\CMS\Uri\Uri::base(true).'/' : '';
-			$image_src = \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+			$image_src = flexicontent_images::phpThumbURL(array(
+				'src' => $src,
+				'w'   => $params->get($rprefix.'_width', 200),
+				'h'   => $params->get($rprefix.'_height', 200),
+				'aoe' => 1,
+				'q'   => 95,
+				'ar'  => 'x',
+				'zc'  => $params->get($rprefix.'_method') ?: '',
+				'f'   => flexicontent_images::phpThumbFormat($src),
+			));
 		}
 		$cat->image_src = $image_src;
 		return $image_src;
