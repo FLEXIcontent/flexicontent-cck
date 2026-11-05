@@ -121,7 +121,8 @@ class FlexicontentViewCategory extends FlexicontentViewBaseRecord
 		// Check no access to categories management (Global permission)
 		if ( !$perms->CanCats )
 		{
-			$app->redirect('index.php?option=com_flexicontent', \Joomla\CMS\Language\Text::_( 'FLEXI_NO_ACCESS' ));
+			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_NO_ACCESS'), 'warning');
+			$app->redirect('index.php?option=com_flexicontent');
 		}
 
 		// Check no privilege to create new category under any category
