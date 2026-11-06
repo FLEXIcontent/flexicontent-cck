@@ -516,6 +516,14 @@
 			<field name="filters" type="filters" isadvfilter="1" isfilter="*" fieldnameasvalue="1" multiple="false" type_id_variable="cid" default="" label="FLEXI_TYPE_FILTERS" description="FLEXI_TYPE_FILTERS_DESC" />
 			<field name="search_priority" type="number" default="0" min="0" max="100" step="1" label="FLEXI_TYPE_SEARCH_PRIORITY" description="FLEXI_TYPE_SEARCH_PRIORITY_DESC" />
 
+			<field name="" type="separator" default="FLEXI_TYPE_SEARCH_RESULTS_DISPLAY" level="level2" />
+			<field name="search_image" type="fcimage" default="" prompt_text="FLEXI_SEARCH_IMG_EXTRACT_FROM_TEXT" label="FLEXI_TYPE_SEARCH_IMAGE" description="FLEXI_TYPE_SEARCH_IMAGE_DESC" />
+			<field name="search_show_date" type="radio" default="1" label="FLEXI_TYPE_SEARCH_SHOW_DATE" description="FLEXI_TYPE_SEARCH_SHOW_DATE_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="search_infoflds" type="textarea" default="" cols="30" rows="3" label="FLEXI_TYPE_SEARCH_INFOFLDS" description="FLEXI_TYPE_SEARCH_INFOFLDS_DESC" />
+
 		</fieldset>
 
 

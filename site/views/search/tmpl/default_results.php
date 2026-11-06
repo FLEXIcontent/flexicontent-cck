@@ -44,33 +44,81 @@ flexicontent_html::calculateItemMarkups($fcitems, $this->params);
 flexicontent_db::getOriginalContentItemids($fcitems);
 
 
+// ****************************************************************
+// Per content type settings (Content type -> Search view), that the
+// search menu item may override: image field, creation date, fields
+// ****************************************************************
+$fc_typeData = isset($this->typeData) ? $this->typeData : array();
+
+$fc_typeparam = function ($type_id, $name, $default = '') use ($fc_typeData)
+{
+	return isset($fc_typeData[$type_id]) ? $fc_typeData[$type_id]->params->get($name, $default) : $default;
+};
+
+
 // *****************************************************
 // Get image configuration for FLEXIcontent result items
 // *****************************************************
 $fcr_use_image = $this->params->get('fcr_use_image', 1);
-$fcr_image = $this->params->get('fcr_image');
 
-if ($fcr_use_image && $fcr_image) {
-	$img_size_map   = array('l'=>'large', 'm'=>'medium', 's'=>'small');
-	$img_field_size = $img_size_map[ $this->params->get('fcr_image_size' , 'l') ];
-	$img_field_name = $this->params->get('fcr_image');
-}
+// Menu item setting: '' = use setting of the content type of each result, '__text__' = extract from main text, otherwise a field name
+$fcr_image_menu = trim((string) $this->params->get('fcr_image', ''));
+
+$img_size_map   = array('l'=>'large', 'm'=>'medium', 's'=>'small');
+$img_field_size = $img_size_map[ $this->params->get('fcr_image_size', 'l') ] ?? 'large';
 
 
 // *******************************************************************
 // Get custom displayed fields to add to each FLEXIcontent result item
 // *******************************************************************
-$use_infoflds = (int)$this->params->get('use_infoflds', 1);
-$infoflds = $this->params->get('infoflds', '');
-$infoflds = preg_replace("/[\"'\\\]/u", "", $infoflds);
-$infoflds = preg_split("/\s*,\s*/u", $infoflds);
-if ( !strlen($infoflds[0]) ) unset($infoflds[0]);
-$infoflds = array_keys(array_flip($infoflds));  // array_flip to get unique filter ids as KEYS (due to flipping) ... and then array_keys to get filter_ids in 0,1,2, ... array
+$fc_parse_fieldnames = function ($list)
+{
+	$list = preg_replace("/[\"'\\\\]/u", "", (string) $list);
+	$list = preg_split("/\s*,\s*/u", trim($list));
+	$list = array_filter($list, 'strlen');
 
-if ( $use_infoflds && count($infoflds) ) {
-	foreach ($infoflds as $fieldname) {
-		FlexicontentFields::getFieldDisplay($fcitems, $fieldname, $values=null, $method='display');
+	return array_values(array_unique($list));
+};
+
+// Menu item setting: '' = use fields of the content type of each result, 0 = no fields, 1 = use the fields listed in the menu item
+$use_infoflds  = trim((string) $this->params->get('use_infoflds', ''));
+$menu_infoflds = $fc_parse_fieldnames($this->params->get('infoflds', ''));
+
+$item_infoflds = array();
+$infoflds_items_by_field = array();
+
+foreach ($fcitems as $i => $fc_item)
+{
+	if ($use_infoflds === '1')
+	{
+		$item_infoflds[$i] = $menu_infoflds;
 	}
+	elseif ($use_infoflds === '0')
+	{
+		$item_infoflds[$i] = array();
+	}
+	else
+	{
+		$item_infoflds[$i] = $fc_parse_fieldnames($fc_typeparam((int) @$this->results[$i]->type_id, 'search_infoflds', ''));
+	}
+
+	foreach ($item_infoflds[$i] as $fieldname)
+	{
+		$infoflds_items_by_field[$fieldname][$i] = true;
+	}
+}
+
+foreach ($infoflds_items_by_field as $fieldname => $item_idxs)
+{
+	$fc_items_subset = array();
+
+	foreach ($item_idxs as $i => $_true)
+	{
+		$fc_items_subset[$i] = & $fcitems[$i];
+	}
+
+	FlexicontentFields::getFieldDisplay($fc_items_subset, $fieldname, $values=null, $method='display');
+	unset($fc_items_subset);
 }
 
 $form_placement = (int) $this->params->get('form_placement', 0);
@@ -163,6 +211,21 @@ else
 		}
 
 		$item_link = \Joomla\CMS\Router\Route::_($result->href);
+
+		// Per item settings (content type setting, unless overridden by the menu item)
+		$fc_type_id = (int) @$result->type_id;
+
+		$menu_show_date = trim((string) $this->params->get('show_date', ''));
+		$show_date = $menu_show_date !== ''
+			? (int) $menu_show_date
+			: ( @$result->fc_item_id ? (int) $fc_typeparam($fc_type_id, 'search_show_date', 1) : 1 );
+
+		$img_field_name = '';
+		if ( @$result->fc_item_id && $fcr_image_menu !== '__text__' )
+		{
+			$img_field_name = $fcr_image_menu !== '' ? $fcr_image_menu : trim((string) $fc_typeparam($fc_type_id, 'search_image', ''));
+		}
+		$infoflds = @$result->fc_item_id ? $item_infoflds[$i] : array();
 		?>
 		<fieldset id="searchlist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>">
 			<div class="search-results<?php echo $this->pageclass_sfx; ?>">
@@ -182,22 +245,43 @@ else
 				<?php if ( @ $result->fc_item_id ) echo $markup_tags; ?>
 
 
-				<?php if ($this->params->get('show_date', 1)) : ?>
-					<span class="fc_search_result_date">
-						<span class="fc-mssg-inline fc-success fc-nobgimage">
-							<?php echo $result->created; ?>
+				<?php if ($show_date || ($this->params->get( 'show_section', 1 ) && $result->section)) : ?>
+				<div class="fc_search_result_meta">
+					<?php if ( $this->params->get( 'show_section', 1 ) && $result->section ) : ?>
+						<span class="fc_search_result_category">
+							<?php if ( @ $result->fc_item_id && !empty($result->categories) ) : ?>
+								<?php
+								// All categories of the item as links, the main category first and marked
+								$fc_cats = array_values($result->categories);
+								$fc_main_catid = (int) @$fcitems[$i]->catid;
+								usort($fc_cats, function ($a, $b) use ($fc_main_catid) {
+									return ((int) $b->id === $fc_main_catid) - ((int) $a->id === $fc_main_catid);
+								});
+								foreach ($fc_cats as $fc_cat) :
+									$fc_is_main = (int) $fc_cat->id === $fc_main_catid;
+									?>
+									<a href="<?php echo \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getCategoryRoute($fc_cat->slug)); ?>"
+										class="fc-mssg-inline fc-info fc-nobgimage fc_search_result_cat<?php echo $fc_is_main ? ' fc_search_result_maincat' : ''; ?>"
+										<?php echo $fc_is_main ? 'style="font-weight:bold;"' : ''; ?>>
+										<?php echo $this->escape($fc_cat->title); ?>
+									</a>
+								<?php endforeach; ?>
+							<?php else : ?>
+								<span class="fc-mssg-inline fc-info fc-nobgimage">
+									<?php echo $this->escape($result->section); ?>
+								</span>
+							<?php endif; ?>
 						</span>
-					</span>
-				<?php endif; ?>
+					<?php endif; ?>
 
-
-
-				<?php if ( $this->params->get( 'show_section', 1 ) && $result->section ) : ?>
-					<span class="fc_search_result_category">
-						<span class="fc-mssg-inline fc-info fc-nobgimage">
-							<?php echo $this->escape($result->section); ?>
+					<?php if ($show_date) : ?>
+						<span class="fc_search_result_date">
+							<span class="fc-mssg-inline fc-success fc-nobgimage">
+								<?php echo $result->created; ?>
+							</span>
 						</span>
-					</span>
+					<?php endif; ?>
+				</div>
 				<?php endif; ?>
 
 
@@ -206,15 +290,21 @@ else
 
 					<?php
 					$src = $thumb = '';
+					$img_from_field = false;
 					if (!empty($img_field_name)) :
 						FlexicontentFields::getFieldDisplay($fcitems[$i], $img_field_name, $values=null, $method='display');
 						$img_field = & $fcitems[$i]->fields[$img_field_name];
 						$src = str_replace(\Joomla\CMS\Uri\Uri::root(), '', ($img_field->thumbs_src[$img_field_size][0] ?? '') );
-					else :
+						$img_from_field = (bool) $src;
+						unset($img_field);
+					endif;
+
+					// Field not set / not in this type / empty: extract the image from the main text
+					if (!$src) :
 						$src = flexicontent_html::extractimagesrc($fcitems[$i]);
 					endif;
 
-					$RESIZE_FLAG = !$this->params->get('fcr_image') || !$this->params->get('fcr_image_size');
+					$RESIZE_FLAG = !$img_from_field || !$this->params->get('fcr_image_size');
 					if ( $src && $RESIZE_FLAG ) {
 						// Resize image when src path is set and RESIZE_FLAG: (a) using image extracted from item main text OR (b) not using image field's already created thumbnails
 						$w		= '&amp;w=' . $this->params->get('fcr_width', 200);

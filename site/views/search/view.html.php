@@ -883,15 +883,27 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 				//print_r($searchwords);
 			}
 
-			// Create regular expressions, for highlighting the matched words
-			$w_regexp_highlight = array();
+			// Create ONE regular expression matching ANY of the searched words, so that every occurrence is highlighted as a whole
+			// (longer words first, so that the longest match wins), words may be adjacent e.g. 'ios 27.3 beta'
+			$w_regexp_alts = array();
 
 			foreach($searchwords as $n => $_word)
 			{
-				$w_regexp_highlight[$_word] = StringHelper::strlen($_word) <= 2  ||  $n+1 < count($searchwords)
-					? '#\b('. preg_quote($_word, '#') .')\b#iu'   // Non-last word or word too small avoid highlighting non exact matches
-					: '#\b('. preg_quote($_word, '#') .')#iu';
+				if (!strlen($_word))
+				{
+					continue;
+				}
+
+				$w_regexp_alts[$_word] = StringHelper::strlen($_word) <= 2  ||  $n+1 < count($searchwords)
+					? '\b'. preg_quote($_word, '#') .'\b'   // Non-last word or word too small avoid highlighting non exact matches
+					: '\b'. preg_quote($_word, '#');
 			}
+
+			uksort($w_regexp_alts, function ($a, $b) {
+				return StringHelper::strlen($b) - StringHelper::strlen($a);
+			});
+
+			$w_regexp_highlight = count($w_regexp_alts) ? '#(?:' . implode('|', $w_regexp_alts) . ')#iu' : '';
 
 			for ($i=0; $i < count($results); $i++)
 			{
@@ -902,16 +914,40 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 					$parts = FLEXIadvsearchHelper::prepareSearchContent( $result->text, $params->get('text_chars', 200), $searchwords );
 					//if( count($parts)>1 ) { echo "<pre>"; print_r($parts); exit;}
 
+					// Remove duplicate parts (e.g. short text, where every searched word gives the very same part),
+					// and highlight ALL searched words inside the remaining parts
+					$kept_plain = array();
+					$unique_parts = array();
+
 					foreach ($parts as $word_found => $part)
 					{
-						if (!$word_found)
+						$plain = trim(str_replace(array('&nbsp;', '...'), ' ', strip_tags($part)));
+						$plain = trim(preg_replace('/\s+/u', ' ', $plain));
+
+						foreach ($kept_plain as $_kept)
 						{
-							continue;
+							if ($plain === $_kept || ($plain !== '' && StringHelper::strpos($_kept, $plain) !== false))
+							{
+								continue 2;
+							}
 						}
 
-						$searchRegex = $w_regexp_highlight[$word_found];
-						$parts[$word_found] = preg_replace($searchRegex, '_fc_highlight_start_\0_fc_highlight_end_', $part );
+						$kept_plain[] = $plain;
+
+						if ($word_found && $w_regexp_highlight)
+						{
+							$part = preg_replace_callback($w_regexp_highlight, function ($m) {
+								return '_fc_highlight_start_' . $m[0] . '_fc_highlight_end_';
+							}, $part);
+
+							// Merge highlights of adjacent words, so that a matched phrase is highlighted as a whole
+							$part = preg_replace('/_fc_highlight_end_((?:\s|&nbsp;)+)_fc_highlight_start_/u', '$1', $part);
+						}
+
+						$unique_parts[$word_found] = $part;
 					}
+
+					$parts = $unique_parts;
 					$result->text = implode(' <br/> ', $parts);
 
 					$replace_count_total = 0;
