@@ -2072,6 +2072,17 @@
 							item.insertBefore(handle, item.firstChild);
 						});
 					};
+					// Choices handles mousedown in capture mode and re-renders a clicked item.
+					// Leave handle presses to Sortable so its dragged node stays attached.
+					var choicesMouseDown = choicesInstance._onMouseDown;
+					if (typeof choicesMouseDown === 'function') {
+						container.removeEventListener('mousedown', choicesMouseDown, true);
+						choicesInstance._onMouseDown = function(event) {
+							if (event.target && event.target.closest && event.target.closest('.fc-select2-handle')) return;
+							return choicesMouseDown(event);
+						};
+						container.addEventListener('mousedown', choicesInstance._onMouseDown, true);
+					}
 					addSortableHandles(sortableSel);
 					Sortable.create(sortableSel, {
 						animation: 150,
