@@ -1396,3 +1396,8 @@ div#tags #input_new_tag {
 #adminListTableFCfields .btn.btn-small {
   display: block !important;
 }
+
+/* Keep checkout controls inline instead of inheriting Atum's full-row flex button. */
+#flexicontent .fcmanlist td.col_title > a.btn.btn-micro {
+  display: inline-flex;
+}
