@@ -6184,6 +6184,64 @@ fc_search_result_category .fc-mssg-inline {
   display: block;
   float: left;
 }
+.flexicontent.fcsearch .fc_search_result_meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  clear: both;
+  margin: 4px 0 6px 0;
+}
+.flexicontent.fcsearch .fc_search_result_meta .fc_search_result_category {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+}
+.flexicontent.fcsearch .fc_search_result_meta .fc-mssg-inline {
+  margin: 0;
+}
+.flexicontent.fcsearch .fc_search_result_fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  clear: both;
+  margin-top: 10px;
+}
+.flexicontent.fcsearch .fc_search_result_fields .fc_search_field_container {
+  display: inline-flex;
+  align-items: stretch;
+  border: 1px solid #d0d7e2;
+  border-radius: 999px;
+  overflow: hidden;
+  background: #ffffff;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.flexicontent.fcsearch .fc_search_result_fields .fc_search_field_label {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px 3px 12px;
+  margin: 0;
+  background: #eef2f7;
+  border-radius: 0;
+  color: #4a5568;
+  font-size: 12px;
+  font-weight: 600;
+  text-shadow: none;
+  white-space: nowrap;
+}
+.flexicontent.fcsearch .fc_search_result_fields .fc_search_field_value {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 12px 3px 10px;
+  color: #1f2933;
+}
+.flexicontent.fcsearch .fc_search_result_fields .fc_search_field_value * {
+  display: inline;
+  margin: 0;
+  padding: 0;
+}
 /************************************************************************
  * Frontend templates: Some CSS HACKS/RULES (to fix alignment & wrapping)
  ************************************************************************/

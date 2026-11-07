@@ -56,6 +56,14 @@ jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 			array('value' => '', 'text' => \Joomla\CMS\Language\Text::_($prompt_text))
 		);
 
+		// Optional extra choice, meaning: extract the image from the main text (value '__text__')
+		if (!empty($attributes['add_extract']))
+		{
+			$images[] = array(
+				array('value' => '__text__', 'text' => \Joomla\CMS\Language\Text::_('FLEXI_SEARCH_IMG_EXTRACT_FROM_TEXT'))
+			);
+		}
+
 		$valcolumn = 'name';
 		if (@$attributes['valcolumn'])
 		{

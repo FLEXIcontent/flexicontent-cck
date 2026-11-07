@@ -214,7 +214,8 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="text_chars" type="text" default="240" label="Context Limit &lt;br/&gt; &lt;i&gt; (# of characters) &lt;/i&gt;" description="Number of characters of content text shown of around each found search word" />
-			<field name="show_date" type="radio" default="1" label="Show creation date" description="Display for each result its creation date" class="btn-group btn-group-yesno">
+			<field name="show_date" type="radio" default="" label="Show creation date" description="Display for each result its creation date. By default the setting of the content type of each result is used (Content type -> Search view), choose Yes / No to override it for all types" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_SEARCH_FROM_TYPE</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -225,7 +226,7 @@
 				<option value="0" show_list="" hide_list="disp_img">FLEXI_NO</option>
 				<option value="1" show_list="disp_img" hide_list="">FLEXI_YES</option>
 			</field>
-			<field name="fcr_image" type="fcimage" default="" label="FLEXI_IMAGE_SOURCE" description="FLEXI_IMAGE_SOURCE_DESC" class="disp_img"/>
+			<field name="fcr_image" type="fcimage" default="" prompt_text="FLEXI_SEARCH_IMG_FROM_TYPE" add_extract="1" label="FLEXI_IMAGE_SOURCE" description="By default the image field set in the content type of each result is used (Content type -> Search view). Select a field, or the main text, to override it for all types" class="disp_img"/>
 			<field name="fcr_position" type="radio" default="0" label="FLEXI_IMAGE_POSITION" description="FLEXI_IMAGE_POSITION_DESC" class="disp_img btn-group btn-group-yesno">
 				<option value="0">FLEXI_IMAGE_LEFT</option>
 				<option value="1">FLEXI_IMAGE_RIGHT</option>
@@ -249,7 +250,8 @@
 			
 			<field name="" type="separator" level="level2" default="Display Fields (Render their HTML)" description=""/>
 			
-			<field name="use_infoflds" type="multilist" subtype="radio" toggle_related="1" default="0" label="Display Extra Fields" description="Display for each result its creation date" class="btn-group btn-group-yesno">
+			<field name="use_infoflds" type="multilist" subtype="radio" toggle_related="1" default="" label="Display Extra Fields" description="Display extra fields for each result. By default the fields set in the content type of each result are used (Content type -> Search view). Choose Yes to use the list below for all types, or No to display no extra fields" class="btn-group btn-group-yesno">
+				<option value="" show_list="" hide_list="disp_field">FLEXI_SEARCH_FROM_TYPE</option>
 				<option value="0" show_list="" hide_list="disp_field">FLEXI_NO</option>
 				<option value="1" show_list="disp_field" hide_list="">FLEXI_YES</option>
 			</field>
