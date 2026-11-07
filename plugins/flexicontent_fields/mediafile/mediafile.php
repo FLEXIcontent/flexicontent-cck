@@ -149,6 +149,10 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		$iform_access= $inputmode==1 ? 0 : $field->parameters->get('iform_access',0);
 		$iform_dir   = $inputmode==1 ? 0 : $field->parameters->get('iform_dir',   0);
 		$iform_stamp = 0; //$inputmode==1 ? 0 : $field->parameters->get('iform_stamp', 0);
+		if (!Factory::getApplication()->getIdentity()->authorise('flexicontent.editfileproperties', 'com_flexicontent'))
+		{
+			$iform_lang = $iform_access = $iform_stamp = 0;
+		}
 
 		$secure_default = 0; //!$iform_dir   ? 0 : (int) $field->parameters->get('iform_dir_default', 1);
 		$stamp_default  = 0; //!$iform_stamp ? 0 : (int) $field->parameters->get('iform_stamp_default', 1);
@@ -1383,6 +1387,10 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		$iform_access= $inputmode==1 ? 0 : $field->parameters->get('iform_access',0);
 		$iform_dir   = $inputmode==1 ? 0 : $field->parameters->get('iform_dir',   0);
 		$iform_stamp = $inputmode==1 ? 0 : $field->parameters->get('iform_stamp', 0);
+		if (!Factory::getApplication()->getIdentity()->authorise('flexicontent.editfileproperties', 'com_flexicontent'))
+		{
+			$iform_lang = $iform_access = $iform_stamp = 0;
+		}
 
 		// Execute once
 		static $initialized = null;

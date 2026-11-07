@@ -2347,6 +2347,23 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 
+			<field name="" type="separator" default="FLEXI_FILE_EDITOR" level="tab_open" box_type="1" remove_boxes="2" />
+			<field name="" type="separator" default="FLEXI_FILE_EDITOR_FIELDS_DESC" level="level3" class="alert alert-info" />
+			<field name="file_editor_show_download_filename" type="radio" default="1" label="FLEXI_FILE_EDITOR_DOWNLOAD_FILENAME" class="btn-group btn-group-yesno"><option value="0">JHIDE</option><option value="1">JSHOW</option></field>
+			<field name="file_editor_show_title" type="radio" default="1" label="FLEXI_FILE_EDITOR_TITLE" class="btn-group btn-group-yesno"><option value="0">JHIDE</option><option value="1">JSHOW</option></field>
+			<field name="file_editor_show_description" type="radio" default="1" label="FLEXI_FILE_EDITOR_DESCRIPTION" class="btn-group btn-group-yesno"><option value="0">JHIDE</option><option value="1">JSHOW</option></field>
+			<field name="file_editor_show_replace" type="radio" default="1" label="FLEXI_FILE_EDITOR_REPLACE" class="btn-group btn-group-yesno"><option value="0">JHIDE</option><option value="1">JSHOW</option></field>
+			<field name="file_editor_show_keep_uploaded_date" type="radio" default="1" label="FLEXI_FILE_EDITOR_KEEP_UPLOADED_DATE" class="btn-group btn-group-yesno"><option value="0">JHIDE</option><option value="1">JSHOW</option></field>
+			<field name="file_editor_show_keep_uploaded_by" type="radio" default="1" label="FLEXI_FILE_EDITOR_KEEP_UPLOADED_BY" class="btn-group btn-group-yesno"><option value="0">JHIDE</option><option value="1">JSHOW</option></field>
+			<field name="file_editor_show_language" type="radio" default="1" label="FLEXI_FILE_EDITOR_LANGUAGE" class="btn-group btn-group-yesno"><option value="0">JHIDE</option><option value="1">JSHOW</option></field>
+			<field name="file_editor_show_access" type="radio" default="1" label="FLEXI_FILE_EDITOR_ACCESS" class="btn-group btn-group-yesno"><option value="0">JHIDE</option><option value="1">JSHOW</option></field>
+			<field name="file_editor_show_stamp" type="radio" default="1" label="FLEXI_FILE_EDITOR_STAMP" class="btn-group btn-group-yesno"><option value="0">JHIDE</option><option value="1">JSHOW</option></field>
+			<field name="file_editor_show_hits" type="radio" default="1" label="FLEXI_FILE_EDITOR_HITS" class="btn-group btn-group-yesno"><option value="0">JHIDE</option><option value="1">JSHOW</option></field>
+			<field name="file_editor_show_type" type="radio" default="1" label="FLEXI_FILE_EDITOR_TYPE" class="btn-group btn-group-yesno"><option value="0">JHIDE</option><option value="1">JSHOW</option></field>
+			<field name="file_editor_show_size" type="radio" default="1" label="FLEXI_FILE_EDITOR_SIZE" class="btn-group btn-group-yesno"><option value="0">JHIDE</option><option value="1">JSHOW</option></field>
+			<field name="file_editor_show_storage" type="radio" default="1" label="FLEXI_FILE_EDITOR_STORAGE" class="btn-group btn-group-yesno"><option value="0">JHIDE</option><option value="1">JSHOW</option></field>
+			<field name="file_editor_show_path" type="radio" default="0" label="FLEXI_FILE_EDITOR_PATH" class="btn-group btn-group-yesno"><option value="0">JHIDE</option><option value="1">JSHOW</option></field>
+
 			<field name="" type="separator" default="FLEXI_LIMITS" icon_class="icon-lock" level="tab_open" box_type="1" remove_boxes="2" />
 			<field name="upload_maxsize" type="text" size="50" default="10000000" label="FLEXI_MAXIMUM_SIZE_LABEL" description="FLEXI_MAXIMUM_SIZE_DESC" />
 			<field name="upload_extensions" type="textarea" rows="2" default="bmp,wbmp,csv,doc,docx,webp,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,txt,xcf,xls,xlsx,zip,ics" label="FLEXI_ALLOWED_EXTENSIONS" description="FLEXI_ALLOWED_EXTENSIONS_DESC" class="input-xxlarge" />

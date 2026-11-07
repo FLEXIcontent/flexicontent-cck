@@ -314,7 +314,7 @@
 
 			// Extension text of the preview box (only when no image preview is shown)
 			var ext = (file.ext || '').toString().toUpperCase();
-			if (ext && !container.find('.fc_preview_thumb').attr('src').match(/phpThumb/i))
+			if (ext && !(container.find('.fc_preview_thumb').attr('src') || '').match(/phpThumb/i))
 			{
 				container.find('.fc_preview_text').text(ext);
 			}

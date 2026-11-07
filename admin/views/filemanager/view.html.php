@@ -168,7 +168,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 
 			unset($cols['_SAVED_']);
 		}
-		
+
 		/*
 		 * Column selection of optional columns not given)
 		 */
@@ -312,7 +312,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 
 
 		/**
-		 * Get data from the model, note data retrieval must be before 
+		 * Get data from the model, note data retrieval must be before
 		 * getTotal() and getPagination() because it also calculates total rows
 		 */
 
@@ -790,22 +790,26 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 			$btn_arr[] = $mk_btn('FLEXI_UNPUBLISHED', 'unpublish', "Joomla.submitbutton('" . $contrl . "unpublish', 'adminForm', false); return false;", '', 'icon-unpublish', \Joomla\CMS\Language\Text::_('FLEXI_FILEMAN_BATCH_UNPUBLISH'));
 			$mk_drop('toolbar-changestate', 'icon-checkmark', 'FLEXI_CHANGE_STATE', $btn_arr, 'files_state_btns_group');
 
-			// Access level
-			$btn_arr = array();
-
-			foreach (\Joomla\CMS\HTML\HTMLHelper::_('access.assetgroups') as $_level)
+			if (\Joomla\CMS\Factory::getApplication()->getIdentity()->authorise('flexicontent.editfileproperties', 'com_flexicontent'))
 			{
-				$set_js = "var f = jQuery('#adminForm'); f.find('input[name=batch_access]').remove();"
-					. " f.append(jQuery('<input type=\"hidden\" name=\"batch_access\" />').val(" . (int) $_level->value . "));"
-					. " Joomla.submitbutton('" . $contrl . "access', 'adminForm', false); return false;";
+				// Access level
+				$btn_arr = array();
 
-				$btn_arr[] = $mk_btn(
-					htmlspecialchars($_level->text, ENT_QUOTES, 'UTF-8'), 'access_' . (int) $_level->value, $set_js, '', 'icon-eye',
-					\Joomla\CMS\Language\Text::_('FLEXI_FILEMAN_BATCH_ACCESS') . ': ' . $_level->text
-				);
+				foreach (\Joomla\CMS\HTML\HTMLHelper::_('access.assetgroups') as $_level)
+				{
+					$set_js = "var f = jQuery('#adminForm'); f.find('input[name=batch_access]').remove();"
+						. " f.append(jQuery('<input type=\"hidden\" name=\"batch_access\" />').val(" . (int) $_level->value . "));"
+						. " Joomla.submitbutton('" . $contrl . "access', 'adminForm', false); return false;";
+
+					$btn_arr[] = $mk_btn(
+						htmlspecialchars($_level->text, ENT_QUOTES, 'UTF-8'), 'access_' . (int) $_level->value, $set_js, '', 'icon-eye',
+						\Joomla\CMS\Language\Text::_('FLEXI_FILEMAN_BATCH_ACCESS') . ': ' . $_level->text
+					);
+				}
+
+				$mk_drop('toolbar-batchaccess', 'icon-eye', 'FLEXI_ACCESS', $btn_arr, 'files_access_btns_group');
 			}
 
-			$mk_drop('toolbar-batchaccess', 'icon-eye', 'FLEXI_ACCESS', $btn_arr, 'files_access_btns_group');
 		}
 
 		if ($hasDelete)

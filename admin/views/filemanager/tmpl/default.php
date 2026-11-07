@@ -1371,7 +1371,7 @@ if ($js)
 									<?php if (!empty($this->cols['access'])) : ?>
 										<td class="center hidden-phone">
 											<?php
-											echo $this->CanFiles && ($this->CanViewAllFiles || $user->id == $row->uploaded_by)
+											echo $user->authorise('flexicontent.editfileproperties', 'com_flexicontent') && $this->CanFiles && ($this->CanViewAllFiles || $user->id == $row->uploaded_by)
 												? flexicontent_html::userlevel('access['.$row->id.']', $row->access ?? 1, 'class="fcfield_selectval" onchange="return setAccessLevel(this, '.$row->id.');"')
 												: (strlen($row->access_level ?? '') ? $this->escape($row->access_level) : '-');
 											?>

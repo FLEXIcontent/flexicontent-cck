@@ -150,6 +150,10 @@ class plgFlexicontent_fieldsFile extends FCField
 		$iform_access= $inputmode==1 ? 0 : $field->parameters->get('iform_access',0);
 		$iform_dir   = $inputmode==1 ? 0 : $field->parameters->get('iform_dir',   0);
 		$iform_stamp = $inputmode==1 ? 0 : $field->parameters->get('iform_stamp', 0);
+		if (!Factory::getApplication()->getIdentity()->authorise('flexicontent.editfileproperties', 'com_flexicontent'))
+		{
+			$iform_lang = $iform_access = $iform_stamp = 0;
+		}
 
 		$secure_default = !$iform_dir   ? 1 : (int) $field->parameters->get('iform_dir_default', 1);
 		$stamp_default  = !$iform_stamp ? 1 : (int) $field->parameters->get('iform_stamp_default', 1);
@@ -350,7 +354,7 @@ class plgFlexicontent_fieldsFile extends FCField
 			function fc_editFile_".$field->id."(element)
 			{
 				return fcfield_file.openEditDialog(element,
-					".json_encode(\Joomla\CMS\Uri\Uri::base(true).'/index.php?option=com_flexicontent&task=filemanager.edit&view=file&id=__file_id__&tmpl=component&fcmodal=1&'.\Joomla\CMS\Session\Session::getFormToken().'=1').",
+					".json_encode(\Joomla\CMS\Uri\Uri::base(true).'/index.php?option=com_flexicontent&task=filemanager.edit&view=file&id=__file_id__&tmpl=component&fcmodal=1&fieldid='.(int)$field->id.'&u_item_id='.(int)$item->id.'&'.\Joomla\CMS\Session\Session::getFormToken().'=1').",
 					".json_encode(\Joomla\CMS\Uri\Uri::base(true).'/index.php?option=com_flexicontent&task=filemanager.checkin&cid[]=__file_id__&'.\Joomla\CMS\Session\Session::getFormToken().'=1').",
 					".json_encode(\Joomla\CMS\Language\Text::_('FLEXI_FIELD_FILE_EDIT_FILE')).",
 					".json_encode(\Joomla\CMS\Language\Text::_('FLEXI_FIELD_FILE_EDIT_NO_FILE'))."
@@ -1351,6 +1355,10 @@ class plgFlexicontent_fieldsFile extends FCField
 		$iform_access= $inputmode==1 ? 0 : $field->parameters->get('iform_access',0);
 		$iform_dir   = $inputmode==1 ? 0 : $field->parameters->get('iform_dir',   0);
 		$iform_stamp = $inputmode==1 ? 0 : $field->parameters->get('iform_stamp', 0);
+		if (!Factory::getApplication()->getIdentity()->authorise('flexicontent.editfileproperties', 'com_flexicontent'))
+		{
+			$iform_lang = $iform_access = $iform_stamp = 0;
+		}
 
 		// Execute once
 		static $initialized = null;

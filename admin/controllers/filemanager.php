@@ -212,6 +212,31 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			$data['uploaded']    = \Joomla\CMS\Factory::getDate('now')->toSql();
 		}
 
+		require_once JPATH_SITE . '/components/com_flexicontent/classes/helpers/fileeditor.php';
+		// Hidden editor controls retain existing values, even if a request posts replacements.
+		if (!$isnew)
+		{
+			$data['url'] = (int) $record->url;
+			foreach (array('download_filename' => 'filename_original', 'title' => 'altname', 'description' => 'description', 'language' => 'language', 'access' => 'access', 'stamp' => 'stamp', 'hits' => 'hits', 'storage' => 'filename') as $setting => $property)
+			{
+				if (!flexicontent_fileeditor::visible($params, $setting)) $data[$property] = $record->$property;
+			}
+		}
+		foreach (array('keep_uploaded_date', 'keep_uploaded_by') as $setting)
+		{
+			if (!flexicontent_fileeditor::visible($params, $setting)) $this->input->set($setting, 0);
+		}
+		if (!flexicontent_fileeditor::visible($params, 'keep_uploaded_by')) $this->input->set('keep_uploader_by', 0);
+
+		// File editing does not implicitly grant permission to alter advanced file settings.
+		if (!$user->authorise('flexicontent.editfileproperties', 'com_flexicontent'))
+		{
+			$data['language'] = !$isnew ? $record->language : '*';
+			$data['access']   = !$isnew ? (int) $record->access : 1;
+			$data['stamp']    = !$isnew ? (int) $record->stamp : 1;
+			$data['hits']     = !$isnew ? (int) $record->hits : 0;
+		}
+
 		$data['description'] = flexicontent_html::dataFilter($data['description'], 32000, 'STRING', 0);  // Limit description to 32000 characters
 		$data['hits'] = (int) $data['hits'];
 		$data['secure'] = $data['secure'] ? 1 : 0;   // Only allow 1 or 0
@@ -221,9 +246,46 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		// Check if we are replacing the file with a new one
 		$Filedata = $this->input->files->get('file_replacement');
 
+		// An empty browser file input is metadata editing, not a replacement upload.
+		if (is_array($Filedata) && (int) ($Filedata['error'] ?? UPLOAD_ERR_OK) === UPLOAD_ERR_NO_FILE)
+		{
+			$Filedata = null;
+		}
+
+		if ($Filedata && !flexicontent_fileeditor::visible($params, 'replace'))
+		{
+			http_response_code(400);
+			return $this->_abortFileSave($app, \Joomla\CMS\Language\Text::_('FLEXI_FILE_EDITOR_REPLACEMENT_DISABLED'), '400 Bad Request');
+		}
+
 		// Check if an existing file is being replaced with a new one (and current file is not a URL)
 		if (!$isnew && $Filedata && $data['url'] == 0)
 		{
+			// Let field/storage integrations validate before the existing file is moved or replaced.
+			try
+			{
+				if (method_exists($app, 'getDispatcher') && class_exists('\Joomla\Event\Event'))
+				{
+					$replacementEvent = new \Joomla\Event\Event('onFlexicontentBeforeFileReplace', array('file' => clone $record, 'upload' => $Filedata, 'error' => ''));
+					$app->getDispatcher()->dispatch('onFlexicontentBeforeFileReplace', $replacementEvent);
+					$replacementError = (string) $replacementEvent->getArgument('error', '');
+				}
+				else
+				{
+					$replacementError = '';
+					$app->triggerEvent('onFlexicontentBeforeFileReplace', array(clone $record, $Filedata, &$replacementError));
+				}
+			}
+			catch (\Throwable $e)
+			{
+				$replacementError = 'File replacement validation failed';
+			}
+			if ($replacementError !== '')
+			{
+				http_response_code(400);
+				return $this->_abortFileSave($app, $replacementError, '400 Bad Request');
+			}
+
 			// Prepare the handling of the uploaded file via the upload task
 			$this->runMode = 'interactive';
 			$this->input->set('file-ffname', 'file_replacement');
@@ -441,6 +503,21 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			return $this->_abortFileSave($app, \Joomla\CMS\Language\Text::_('File extension not allowed'));
 		}
 
+		// A download name cannot relabel a PDF as another format. The stored file is authoritative.
+		if ((int) $data['url'] !== 2)
+		{
+			$data['filename_original'] = flexicontent_fileeditor::downloadName($data['filename_original'] ?? '', $data['filename']);
+		}
+
+		// Replacement upload handling can rebuild the payload. Retain protected settings there too.
+		if (!$user->authorise('flexicontent.editfileproperties', 'com_flexicontent'))
+		{
+			$data['language'] = !$isnew ? $record->language : '*';
+			$data['access']   = !$isnew ? (int) $record->access : 1;
+			$data['stamp']    = !$isnew ? (int) $record->stamp : 1;
+			$data['hits']     = !$isnew ? (int) $record->hits : 0;
+		}
+
 		// Validate access level exists (set to public otherwise)
 		$data['access'] = flexicontent_html::dataFilter($data['access'], 11, 'ACCESSLEVEL', 0);
 
@@ -515,7 +592,18 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 		if ($this->input->get('fc_doajax_submit'))
 		{
-			jexit(flexicontent_html::get_system_messages_html());
+			$messages = flexicontent_html::get_system_messages_html();
+			if ($this->input->getInt('fcmodal', 0) && !$isnew)
+			{
+				$savedFile = $model->getTable();
+				if ($savedFile->load($model->getId()))
+				{
+					$properties = array_flip(array('id', 'filename', 'filename_original', 'altname', 'description', 'ext'));
+					$fileData = array_intersect_key((array) $savedFile, $properties);
+					$messages .= '<script type="application/json" id="fc-file-saved-data">' . json_encode($fileData, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE) . '</script>';
+				}
+			}
+			jexit($messages);
 		}
 	}
 
@@ -1011,7 +1099,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 		$fileObj->size        = $filesize;
 		$fileObj->uploaded    = $Fobj && $this->input->get('keep_uploaded_date') ? $Fobj->uploaded : Factory::getDate('now')->toSql();  // We reset date if file is replaced
-		$fileObj->uploaded_by = $Fobj && $this->input->get('keep_uploader_by')   ? $Fobj->uploaded_by : $user->get('id');
+		$fileObj->uploaded_by = $Fobj && $this->input->getBool('keep_uploaded_by', $this->input->getBool('keep_uploader_by', false))   ? $Fobj->uploaded_by : $user->get('id');
 
 		// File object exists, we are replacing the file
 		if ($fileObj->id) return $this->terminate($file_id, $exitMessages);
@@ -2237,6 +2325,13 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		// Initialize variables
 		$app   = \Joomla\CMS\Factory::getApplication();
 		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
+
+		if (!$user->authorise('flexicontent.editfileproperties', 'com_flexicontent'))
+		{
+			$app->setHeader('status', '403 Forbidden', true);
+			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+			return;
+		}
 
 		// Get model
 		$model = $this->getModel($this->record_name_pl);
