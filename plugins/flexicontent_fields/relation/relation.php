@@ -598,7 +598,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 							' . $items_options_select[$n] . '
 						</select>
 						' . ($selected_items_sortable ? '
-						<span class="add-on"><span class="icon-info hasTooltip" title="' . Text::_('FLEXI_FIELD_ALLOW_SORTABLE_INFO') . '"></span>' . Text::_('FLEXI_ORDER') . '</span>' : '') . '
+						<span class="add-on fcfield-relation-order_hint"><span class="icon-info hasTooltip" title="' . Text::_('FLEXI_FIELD_ALLOW_SORTABLE_INFO') . '"></span>' . Text::_('FLEXI_ORDER') . '</span>' : '') . '
 					</div>
 
 				</div>

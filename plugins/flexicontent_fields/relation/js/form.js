@@ -21,7 +21,10 @@
 			{
 				// Only the standalone item picker is redundant in single-field Choices.js UI:
 				// the category selector stays (it drives the remote search).
-				jQuery(this).find('.fcfield-relation-item_selector_box').hide();
+				jQuery(this).find('.fcfield-relation-item_selector_box, .fcfield-relation-order_hint').each(function() {
+					this.hidden = true;
+					this.style.setProperty('display', 'none', 'important');
+				});
 			}
 		});
 	}
