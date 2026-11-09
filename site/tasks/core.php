@@ -295,6 +295,55 @@ class FlexicontentTasksCore
 		$titles_limit = max(1, min(30, (int) $cparams->get('search_autocomplete_titles_limit', 5)));
 		$fields_limit = max(1, min(30, (int) $cparams->get('search_autocomplete_fields_limit', 3)));
 
+		// Rich suggestions options (module configuration), used to enrich item-title suggestions
+		$ac_rich = (int) $jinput->get('ac_rich', 0, 'int') === 1;
+
+		// Read a string option, joining array input into a comma separated list
+		$ac_str = function ($name, $default = '') use ($jinput)
+		{
+			$val = $jinput->get($name, $default, 'string');
+
+			if (is_array($val))
+			{
+				$val = implode(',', array_filter($val, 'is_scalar'));
+			}
+
+			return trim((string) $val);
+		};
+
+		$ac_image_source = strtolower($ac_str('ac_image_source', 'auto'));
+		if (!in_array($ac_image_source, array('auto', 'field'), true))
+		{
+			$ac_image_source = 'auto';
+		}
+
+		$ac_image_field = strtolower($ac_str('ac_image_field', ''));
+		if ($ac_image_field === '0' || !preg_match('/^[a-z0-9_-]{1,100}$/', $ac_image_field))
+		{
+			$ac_image_field = '';
+		}
+
+		$ac_image_width    = max(16, min(400, (int) $jinput->get('ac_image_width', 60, 'int')));
+		$ac_image_height   = max(16, min(400, (int) $jinput->get('ac_image_height', 60, 'int')));
+		$ac_image_method   = (int) $jinput->get('ac_image_method', 1, 'int') ? 1 : 0;
+		$ac_title_maxlen   = max(0, min(300, (int) $jinput->get('ac_title_maxlen', 60, 'int')));
+		$ac_info_maxlen    = max(0, min(300, (int) $jinput->get('ac_info_maxlen', 80, 'int')));
+		$ac_info_labels    = (int) $jinput->get('ac_info_labels', 1, 'int') === 1;
+
+		$ac_info_fields = array();
+		foreach (preg_split('/\s*,\s*/', $ac_str('ac_info_fields', '')) as $_field_name)
+		{
+			$_field_name = strtolower(trim($_field_name));
+			if (preg_match('/^[a-z0-9_-]{1,100}$/', $_field_name) && !in_array($_field_name, $ac_info_fields, true))
+			{
+				$ac_info_fields[] = $_field_name;
+			}
+			if (count($ac_info_fields) >= 12)
+			{
+				break;
+			}
+		}
+
 		// Suggestion sources and their order (sortable option), e.g. "tags,words,titles"
 		$sources_order = array();
 		$_sources_cfg = (string) $cparams->get('search_autocomplete_sources', '');
@@ -510,7 +559,11 @@ class FlexicontentTasksCore
 
 				foreach ((array) $db->setQuery($title_query)->loadAssocList() as $_t)
 				{
-					$suggestions['titles'][] = array('text' => $_t['title'], 'id' => $_t['title']);
+					$suggestions['titles'][] = array(
+						'text'     => $_t['title'],
+						'id'       => $_t['title'],
+						'_item_id' => (int) $_t['id'],
+					);
 				}
 			}
 
@@ -704,6 +757,22 @@ class FlexicontentTasksCore
 				}
 			}
 
+			// Enrich item-title suggestions with image, display title and configured field values
+			if ($ac_rich && !empty($suggestions['titles']) && in_array('titles', $sources_order, true))
+			{
+				$this->_enrichTitleSuggestions($suggestions['titles'], array(
+					'image_source' => $ac_image_source,
+					'image_field'  => $ac_image_field,
+					'image_width'  => $ac_image_width,
+					'image_height' => $ac_image_height,
+					'image_method' => $ac_image_method,
+					'title_maxlen' => $ac_title_maxlen,
+					'info_fields'  => $ac_info_fields,
+					'info_labels'  => $ac_info_labels,
+					'info_maxlen'  => $ac_info_maxlen,
+				));
+			}
+
 			// Merge the sources in the configured order, a suggestion already listed by an earlier source is skipped
 			$seen = array();
 			$options['Matches'] = array();
@@ -720,6 +789,13 @@ class FlexicontentTasksCore
 
 			$options['Total'] = count($options['Matches']);
 		}
+
+		// Internal fields must not be exposed to the client
+		foreach ($options['Matches'] as &$_match)
+		{
+			unset($_match['_item_id']);
+		}
+		unset($_match);
 
 		header('Content-Type: application/json; charset=utf-8');
 		jexit(json_encode($options));
@@ -819,6 +895,828 @@ class FlexicontentTasksCore
 		}
 
 		jexit(json_encode($array));
+	}
+
+
+	/**
+	 * Add image, shortened title and configured extra field values to item-title suggestions
+	 */
+	private function _enrichTitleSuggestions(&$titles, $opts)
+	{
+		$db = $this->_getDbo();
+
+		$opts += array(
+			'image_source' => 'auto',
+			'image_field'  => '',
+			'image_width'  => 60,
+			'image_height' => 60,
+			'image_method' => 1,
+			'title_maxlen' => 60,
+			'info_fields'  => array(),
+			'info_labels'  => 1,
+			'info_maxlen'  => 80,
+		);
+
+		$ids = array();
+		foreach ($titles as $_t)
+		{
+			$_id = isset($_t['_item_id']) ? (int) $_t['_item_id'] : 0;
+			if ($_id > 0)
+			{
+				$ids[$_id] = $_id;
+			}
+		}
+
+		if (!$ids)
+		{
+			return;
+		}
+
+		$ids_list = implode(',', $ids);
+
+		$query = 'SELECT i.id, i.title, i.type_id, i.catid, i.lang_parent_id, i.language, c.introtext, c.`fulltext`'
+			. ' FROM #__flexicontent_items_tmp AS i'
+			. ' LEFT JOIN #__content AS c ON c.id = i.id'
+			. ' WHERE i.id IN (' . $ids_list . ')';
+
+		$items = array();
+		foreach ((array) $db->setQuery($query)->loadObjectList() as $_row)
+		{
+			$items[(int) $_row->id] = $_row;
+		}
+
+		if (!$items)
+		{
+			return;
+		}
+
+		// Item id used for field values, the language parent when the field is not translatable
+		$uids = array();
+		foreach ($items as $_row)
+		{
+			$_uid = !empty($_row->lang_parent_id) ? (int) $_row->lang_parent_id : (int) $_row->id;
+			$uids[$_uid] = $_uid;
+		}
+
+		// Query both the item id and its language parent, non-translatable fields are stored on the parent
+		$info = !empty($opts['info_fields'])
+			? $this->_getInfoFieldEntries($ids + $uids, $opts['info_fields'], $opts['info_maxlen'], $opts['info_labels'])
+			: array();
+
+		$image_field  = null;
+		$image_params = array();
+		$image_values = array();
+
+		if ($opts['image_source'] === 'field' && $opts['image_field'] !== '')
+		{
+			$image_field = $this->_getImageField($opts['image_field']);
+
+			if ($image_field)
+			{
+				$image_params = $this->_decodeFieldParams($image_field);
+				$image_values = $this->_getImageFieldValues($image_field, $ids + $uids);
+			}
+		}
+
+		foreach ($titles as &$_t)
+		{
+			$_id = isset($_t['_item_id']) ? (int) $_t['_item_id'] : 0;
+
+			if (!isset($items[$_id]))
+			{
+				continue;
+			}
+
+			$_row = $items[$_id];
+			$_uid = !empty($_row->lang_parent_id) ? (int) $_row->lang_parent_id : (int) $_row->id;
+
+			$_t['title_display'] = $this->_acPlainText($_row->title, $opts['title_maxlen']);
+
+			$_image = '';
+
+			if ($image_field)
+			{
+				// Prefer the image stored on the item itself (translatable field), then its language parent
+				if (isset($image_values[$_id]))
+				{
+					$_image = $this->_imageFieldSrc($image_field, $image_params, $_id, $image_values[$_id]);
+				}
+
+				if (!$_image && $_uid !== $_id && isset($image_values[$_uid]))
+				{
+					$_image = $this->_imageFieldSrc($image_field, $image_params, $_uid, $image_values[$_uid]);
+				}
+			}
+
+			if (!$_image)
+			{
+				$_image = $this->_extractTextImage((isset($_row->introtext) ? $_row->introtext : '') . ' ' . (isset($_row->fulltext) ? $_row->fulltext : ''));
+			}
+
+			if ($_image)
+			{
+				$_t['image'] = $this->_acThumbUrl($_image, $opts['image_width'], $opts['image_height'], $opts['image_method']);
+			}
+
+			$_by_field = array();
+
+			foreach ((!empty($info[$_id]) ? $info[$_id] : array()) as $_entry)
+			{
+				if (isset($_entry['_field']))
+				{
+					$_by_field[$_entry['_field']] = $_entry;
+				}
+			}
+
+			// Only use the parent value when the item has no value for that field
+			if ($_uid !== $_id && !empty($info[$_uid]))
+			{
+				foreach ($info[$_uid] as $_entry)
+				{
+					if (isset($_entry['_field']) && !isset($_by_field[$_entry['_field']]))
+					{
+						$_by_field[$_entry['_field']] = $_entry;
+					}
+				}
+			}
+
+			$_entries = array();
+
+			foreach ($opts['info_fields'] as $_field_name)
+			{
+				if (isset($_by_field[$_field_name]))
+				{
+					$_entries[] = $_by_field[$_field_name];
+				}
+			}
+
+			foreach ($_entries as &$_entry)
+			{
+				unset($_entry['_field']);
+			}
+			unset($_entry);
+
+			if (!empty($_entries))
+			{
+				$_t['fields'] = $_entries;
+			}
+		}
+		unset($_t);
+	}
+
+
+	/**
+	 * Load the metadata of published fields, indexed by their (lowercase) name
+	 */
+	private function _getFieldsByName($names)
+	{
+		$db = $this->_getDbo();
+		$quoted = array();
+
+		foreach ($names as $_name)
+		{
+			$quoted[] = $db->Quote(strtolower($_name));
+		}
+
+		if (!$quoted)
+		{
+			return array();
+		}
+
+		$query = 'SELECT id, name, label, field_type, attribs'
+			. ' FROM #__flexicontent_fields'
+			. ' WHERE published = 1 AND LOWER(name) IN (' . implode(',', $quoted) . ')';
+
+		$fields = array();
+		foreach ((array) $db->setQuery($query)->loadObjectList() as $_field)
+		{
+			$fields[strtolower($_field->name)] = $_field;
+		}
+
+		return $fields;
+	}
+
+
+	/**
+	 * Load a published image field by name
+	 */
+	private function _getImageField($name)
+	{
+		$db = $this->_getDbo();
+
+		$query = 'SELECT id, name, label, field_type, attribs'
+			. ' FROM #__flexicontent_fields'
+			. ' WHERE published = 1 AND field_type = ' . $db->Quote('image')
+			. ' AND LOWER(name) = ' . $db->Quote(strtolower($name));
+
+		return $db->setQuery($query, 0, 1)->loadObject();
+	}
+
+
+	/**
+	 * Decode the JSON parameters of a field
+	 */
+	private function _decodeFieldParams($field)
+	{
+		$params = json_decode((string) $field->attribs, true);
+
+		return is_array($params) ? $params : array();
+	}
+
+
+	/**
+	 * First stored value of an image field for every item
+	 */
+	private function _getImageFieldValues($field, $item_ids)
+	{
+		if (!$item_ids)
+		{
+			return array();
+		}
+
+		$db = $this->_getDbo();
+		$query = 'SELECT item_id, value'
+			. ' FROM #__flexicontent_fields_item_relations'
+			. ' WHERE field_id = ' . (int) $field->id
+			. ' AND item_id IN (' . implode(',', $item_ids) . ')'
+			. ' ORDER BY item_id, valueorder, suborder';
+
+		$values = array();
+		foreach ((array) $db->setQuery($query)->loadObjectList() as $_row)
+		{
+			$item_id = (int) $_row->item_id;
+
+			if (!isset($values[$item_id]) || $values[$item_id] === '')
+			{
+				$values[$item_id] = $_row->value;
+			}
+		}
+
+		return $values;
+	}
+
+
+	/**
+	 * Plain-text values of the configured extra fields for each item
+	 */
+	private function _getInfoFieldEntries($item_ids, $names, $maxlen, $show_labels)
+	{
+		$fields = $this->_getFieldsByName($names);
+
+		if (!$fields || !$item_ids)
+		{
+			return array();
+		}
+
+		$db = $this->_getDbo();
+		$field_ids = array();
+
+		foreach ($fields as $_field)
+		{
+			$field_ids[] = (int) $_field->id;
+		}
+
+		$query = 'SELECT field_id, item_id, value'
+			. ' FROM #__flexicontent_fields_item_relations'
+			. ' WHERE field_id IN (' . implode(',', $field_ids) . ')'
+			. ' AND item_id IN (' . implode(',', $item_ids) . ')'
+			. ' ORDER BY item_id, field_id, valueorder, suborder';
+
+		$values = array();
+		foreach ((array) $db->setQuery($query)->loadObjectList() as $_row)
+		{
+			$item_id = (int) $_row->item_id;
+			$field_id = (int) $_row->field_id;
+
+			if (!isset($values[$item_id][$field_id]) || $values[$item_id][$field_id] === '')
+			{
+				$values[$item_id][$field_id] = $_row->value;
+			}
+		}
+
+		$entries = array();
+		foreach ($item_ids as $_item_id)
+		{
+			foreach ($names as $_name)
+			{
+				if (!isset($fields[$_name]))
+				{
+					continue;
+				}
+
+				$_field = $fields[$_name];
+				$_field_id = (int) $_field->id;
+
+				if (!isset($values[$_item_id][$_field_id]))
+				{
+					continue;
+				}
+
+				$_text = $this->_acFieldValueText($_field, $values[$_item_id][$_field_id], $maxlen);
+
+				if ($_text === '')
+				{
+					continue;
+				}
+
+				$_entry = array('value' => $_text, '_field' => strtolower((string) $_field->name));
+
+				if ($show_labels)
+				{
+					$_label = trim((string) $_field->label);
+					$_label = $_label !== '' ? \Joomla\CMS\Language\Text::_($_label) : '';
+					$_entry['label'] = $_label !== '' ? $_label : $_field->name;
+				}
+
+				$entries[$_item_id][] = $_entry;
+
+				if (count($entries[$_item_id]) >= 12)
+				{
+					break;
+				}
+			}
+		}
+
+		return $entries;
+	}
+
+
+	/**
+	 * Convert a stored field value to a short plain-text value
+	 */
+	private function _acFieldValueText($field, $raw, $maxlen)
+	{
+		$params = $this->_decodeFieldParams($field);
+		$value  = $this->_acDecodeValue($raw);
+		$type   = (string) $field->field_type;
+
+		if (is_object($value))
+		{
+			return '';
+		}
+
+		if ($type === 'addressint' && is_array($value))
+		{
+			$value = !empty($value['addr_display']) ? $value['addr_display']
+				: (!empty($value['addr_formatted']) ? $value['addr_formatted']
+				: (!empty($value['addr']) ? $value['addr'] : ''));
+		}
+		elseif (in_array($type, array('image', 'image_gallery', 'sharedmedia'), true) && is_array($value))
+		{
+			$_array = $value;
+			$value = !empty($_array['alt']) ? $_array['alt']
+				: (!empty($_array['title']) ? $_array['title']
+				: (!empty($_array['desc']) ? $_array['desc']
+				: (!empty($_array['url']) ? $_array['url']
+				: (!empty($_array['originalname']) ? basename($_array['originalname']) : ''))));
+		}
+		elseif (in_array($type, array('date', 'created', 'modified', 'datefield'), true))
+		{
+			if (is_array($value))
+			{
+				$value = reset($value);
+			}
+
+			$value = trim((string) $value);
+
+			if ($value !== '' && $value !== '0000-00-00' && $value !== '0000-00-00 00:00:00')
+			{
+				$value = class_exists('\\Joomla\\CMS\\HTML\\HTMLHelper')
+					? \Joomla\CMS\HTML\HTMLHelper::_('date', $value, 'Y-m-d')
+					: substr($value, 0, 10);
+			}
+		}
+		elseif (in_array($type, array('select', 'radio', 'selectmultiple', 'checkbox', 'checkboximage', 'radioimage', 'selectmultipleimage'), true))
+		{
+			$map = $this->_acOptionMap($params);
+			$texts = array();
+
+			foreach ((array) $value as $_v)
+			{
+				if (is_object($_v))
+				{
+					continue;
+				}
+
+				if (is_array($_v))
+				{
+					$_v = $this->_acFlattenText($_v);
+				}
+
+				$_v = trim((string) $_v);
+
+				if ($_v !== '')
+				{
+					$texts[] = isset($map[$_v]) ? $map[$_v] : $_v;
+				}
+			}
+
+			$value = implode(', ', $texts);
+		}
+		else
+		{
+			$value = $this->_acFlattenText($value);
+		}
+
+		if (is_array($value))
+		{
+			$value = $this->_acFlattenText($value);
+		}
+
+		return $this->_acPlainText($value, $maxlen);
+	}
+
+
+	/**
+	 * Decode serialized or JSON encoded field values
+	 */
+	private function _acDecodeValue($raw)
+	{
+		if (!is_string($raw))
+		{
+			return $raw;
+		}
+
+		$raw = trim($raw);
+
+		if ($raw === '')
+		{
+			return '';
+		}
+
+		if (preg_match('/^(?:[aOsibdN]:|N;$)/', $raw))
+		{
+			$value = @unserialize($raw, array('allowed_classes' => false));
+
+			if ($value !== false || $raw === 'b:0;')
+			{
+				return $value;
+			}
+		}
+
+		if (($raw[0] === '{' && substr($raw, -1) === '}') || ($raw[0] === '[' && substr($raw, -1) === ']'))
+		{
+			$value = json_decode($raw, true);
+
+			if (json_last_error() === JSON_ERROR_NONE)
+			{
+				return $value;
+			}
+		}
+
+		return $raw;
+	}
+
+
+	/**
+	 * Option value => option text map of select / radio / checkbox fields
+	 */
+	private function _acOptionMap($params)
+	{
+		$elements = isset($params['field_elements']) ? (string) $params['field_elements'] : '';
+
+		if ($elements === '')
+		{
+			return array();
+		}
+
+		$_parts = preg_split('/%%\s*/', $elements);
+
+		if (count($_parts) === 1 && strpos($elements, "\n") !== false)
+		{
+			$_parts = preg_split('/\r?\n/', $elements);
+		}
+
+		$map = array();
+		foreach ($_parts as $_part)
+		{
+			$_part = trim($_part);
+
+			if ($_part === '')
+			{
+				continue;
+			}
+
+			$_props = preg_split('/[\s]*::[\s]*/', $_part);
+			$_key = trim((string) $_props[0]);
+			$_val = isset($_props[1]) ? trim((string) $_props[1]) : $_key;
+
+			if ($_key !== '')
+			{
+				$_label = $_val !== '' ? \Joomla\CMS\Language\Text::_($_val) : $_key;
+				$map[$_key] = $_label !== '' ? $_label : $_key;
+			}
+		}
+
+		return $map;
+	}
+
+
+	/**
+	 * Flatten a decoded field value to a plain text string
+	 */
+	private function _acFlattenText($value)
+	{
+		if (is_object($value))
+		{
+			return '';
+		}
+
+		if (!is_array($value))
+		{
+			return (string) $value;
+		}
+
+		$parts = array();
+		foreach ($value as $_v)
+		{
+			if (is_object($_v))
+			{
+				continue;
+			}
+
+			if (is_array($_v))
+			{
+				$_v = $this->_acFlattenText($_v);
+			}
+
+			$_v = trim((string) $_v);
+
+			if ($_v !== '')
+			{
+				$parts[] = $_v;
+			}
+		}
+
+		return implode(', ', $parts);
+	}
+
+
+	/**
+	 * Shorten a value and remove any HTML from it
+	 */
+	private function _acPlainText($text, $maxlen)
+	{
+		$text = html_entity_decode((string) $text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+		$text = strip_tags($text);
+		$text = preg_replace('/[\x00-\x1F\x7F]+/u', ' ', $text);
+		$text = preg_replace('/\s+/u', ' ', $text);
+		$text = trim($text);
+
+		$maxlen = (int) $maxlen;
+
+		if ($maxlen > 0 && StringHelper::strlen($text) > $maxlen)
+		{
+			$text = StringHelper::substr($text, 0, $maxlen);
+			$space = StringHelper::strrpos($text, ' ');
+
+			if ($space !== false && $space > (int) ($maxlen * 0.6))
+			{
+				$text = StringHelper::substr($text, 0, $space);
+			}
+
+			$text = rtrim($text) . '…';
+		}
+
+		return $text;
+	}
+
+
+	/**
+	 * First image found inside the item text
+	 */
+	private function _extractTextImage($text)
+	{
+		if (!preg_match_all('/<img\b[^>]*\bsrc\s*=\s*(["\'])(.*?)\1/is', (string) $text, $_matches))
+		{
+			return '';
+		}
+
+		foreach ($_matches[2] as $_src)
+		{
+			$_src = trim(html_entity_decode($_src, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+
+			if ($_src === '' || preg_match('/^data:/i', $_src))
+			{
+				continue;
+			}
+
+			if (preg_match('#^(?:[a-z]+:)?//#i', $_src))
+			{
+				return $_src;
+			}
+
+			$_rel = rawurldecode(ltrim(preg_replace('/[?#].*$/', '', $_src), '/'));
+
+			if ($_rel !== '' && !preg_match('#(^|/)\.\.(/|$)#', $_rel) && is_file(JPATH_SITE . '/' . $_rel))
+			{
+				return $this->_acRootUrl() . '/' . str_replace(' ', '%20', $_rel);
+			}
+		}
+
+		return '';
+	}
+
+
+	/**
+	 * Thumbnail URL of the first value of an image field
+	 */
+	private function _imageFieldSrc($field, $params, $item_id, $raw)
+	{
+		$value = $this->_acDecodeValue($raw);
+
+		if (!is_array($value))
+		{
+			$value = array('originalname' => (string) $raw);
+		}
+
+		$default_image = isset($params['default_image']) ? (string) $params['default_image'] : '';
+		$default_image = trim(explode('#', $default_image)[0]);
+
+		$image_source = isset($params['image_source']) ? (int) $params['image_source'] : 0;
+		$image_source = $image_source > 1 ? 0 : $image_source;
+
+		// Intro-full image mode stores the site-relative image path, not just the file name
+		$image_subpath = $image_source === -1 && !empty($value['image_path'])
+			? trim((string) $value['image_path'])
+			: (isset($value['originalname']) ? trim((string) $value['originalname']) : '');
+		$image_subpath = trim(explode('#', $image_subpath)[0]);
+		$using_default = false;
+
+		if ($image_subpath === '')
+		{
+			$image_subpath = $default_image;
+			$using_default = true;
+		}
+
+		if ($image_subpath === '' || preg_match('#(^|/)\.\.(/|$)#', $image_subpath))
+		{
+			return '';
+		}
+
+		if (preg_match('#^(?:[a-z]+:)?//#i', $image_subpath))
+		{
+			return $image_subpath;
+		}
+
+		$subpath = str_replace('\\', '/', dirname($image_subpath));
+		$subpath = ($subpath === '.') ? '' : trim($subpath, '/');
+		$image_name = basename(!empty($value['originalname']) ? (string) $value['originalname'] : $image_subpath);
+
+		$dir = isset($params['dir']) ? trim(str_replace('\\', '/', (string) $params['dir']), '/') : 'images/stories/flexicontent';
+
+		if ($dir === '' || preg_match('#(^|/)\.\.(/|$)#', $dir))
+		{
+			return '';
+		}
+
+		$extra_folder = '';
+
+		if ($using_default)
+		{
+			$extra_folder = '';
+		}
+		elseif ($image_source === -1)
+		{
+			$extra_folder = 'intro_full';
+		}
+		elseif ($image_source === -2)
+		{
+			$extra_folder = 'mediaman';
+		}
+		elseif ($image_source >= 1)
+		{
+			$extra_folder = 'item_' . (int) $item_id . '_field_' . (int) $field->id;
+		}
+
+		$thumb_dir = $dir . ($extra_folder ? '/' . $extra_folder : '');
+		$multiple  = $using_default
+			|| ($image_source === 0 && !empty($params['list_all_media_files']) && empty($params['unique_thumb_method']))
+			|| !empty($value['default_image']);
+		$extra_prefix = $multiple ? 'fld' . (int) $field->id . '_' : '';
+
+		$candidates = array(
+			$thumb_dir . '/m_' . $extra_prefix . $image_name,
+			$thumb_dir . '/s_' . $extra_prefix . $image_name,
+		);
+
+		// Original image paths
+		if ($using_default)
+		{
+			$candidates[] = ($subpath ? $subpath . '/' : '') . $image_name;
+		}
+		elseif ($image_source === -1)
+		{
+			$candidates[] = ($subpath ? $subpath . '/' : '') . $image_name;
+		}
+		elseif ($image_source === -2)
+		{
+			$candidates[] = ($subpath ? $subpath . '/' : '') . $image_name;
+		}
+		elseif ($image_source >= 1)
+		{
+			$candidates[] = $thumb_dir . '/original/' . ($subpath ? $subpath . '/' : '') . $image_name;
+		}
+		else
+		{
+			static $com_params = null;
+
+			if ($com_params === null)
+			{
+				$com_params = class_exists('\\Joomla\\CMS\\Component\\ComponentHelper')
+					? \Joomla\CMS\Component\ComponentHelper::getParams($this->option)
+					: JComponentHelper::getParams($this->option);
+			}
+
+			$target_dir = isset($params['target_dir']) ? (int) $params['target_dir'] : 1;
+			$base = $target_dir
+				? $com_params->get('file_path', 'components/com_flexicontent/uploads')
+				: $com_params->get('media_path', 'components/com_flexicontent/medias');
+			$base = trim(str_replace('\\', '/', (string) $base), '/');
+			$candidates[] = $base . '/' . ($subpath ? $subpath . '/' : '') . $image_name;
+		}
+
+		// The stored path itself may be relative to the site root (media manager / intro-full image)
+		$candidates[] = ltrim($image_subpath, '/');
+
+		if (!empty($value['default_image']))
+		{
+			$candidates[] = ltrim(explode('#', (string) $value['default_image'])[0], '/');
+		}
+
+		foreach ($candidates as $_rel)
+		{
+			$_rel = ltrim((string) $_rel, '/');
+
+			if ($_rel !== '' && is_file(JPATH_SITE . '/' . $_rel))
+			{
+				return $this->_acRootUrl() . '/' . str_replace(' ', '%20', $_rel);
+			}
+		}
+
+		return '';
+	}
+
+
+	private function _acRootUrl()
+	{
+		if (class_exists('\\Joomla\\CMS\\Uri\\Uri'))
+		{
+			return rtrim(\Joomla\CMS\Uri\Uri::root(true), '/');
+		}
+
+		if (class_exists('JUri'))
+		{
+			return rtrim(JUri::root(true), '/');
+		}
+
+		return '';
+	}
+
+
+	/**
+	 * Build a phpThumb URL for a local image, external images are returned unchanged
+	 */
+	private function _acThumbUrl($src, $width, $height, $method)
+	{
+		$src = trim((string) $src);
+
+		if ($src === '' || preg_match('/^data:/i', $src))
+		{
+			return $src;
+		}
+
+		// External images are kept as-is
+		if (preg_match('#^[a-z][a-z0-9+.-]*://#i', $src) || preg_match('#^//#', $src))
+		{
+			return $src;
+		}
+
+		$root = $this->_acRootUrl();
+		$rel  = $src;
+
+		if ($root !== '' && strpos($rel, $root . '/') === 0)
+		{
+			$rel = substr($rel, strlen($root) + 1);
+		}
+
+		$rel = ltrim($rel, '/');
+
+		if ($rel === '')
+		{
+			return $src;
+		}
+
+		$ext  = strtolower(pathinfo(parse_url($rel, PHP_URL_PATH), PATHINFO_EXTENSION));
+		$file = in_array($ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico'), true) ? '&f=' . $ext : '';
+
+		return $root . '/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='
+			. $root . '/' . $rel
+			. '&w=' . max(16, (int) $width)
+			. '&h=' . max(16, (int) $height)
+			. '&aoe=1&q=95&ar=x'
+			. ($method ? '&zc=1' : '')
+			. $file;
 	}
 
 

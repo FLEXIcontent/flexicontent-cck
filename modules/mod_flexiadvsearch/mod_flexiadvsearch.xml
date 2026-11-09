@@ -191,6 +191,56 @@
 			</field>
 		</fieldset>
 
+		<fieldset name="FLEXI_SEARCH_AUTOCOMPLETE" label="FLEXI_SEARCH_AUTOCOMPLETE" description="FLEXI_SEARCH_AUTOCOMPLETE_DESC">
+
+			<field name="search_autocomplete" type="radio" default="1" label="FLEXI_SEARCHWORD_AUTOCOMPLETE" description="FLEXI_SEARCHWORD_AUTOCOMPLETE_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_AUTOCOMPLETE_SIMPLE</option>
+				<option value="2">FLEXI_AUTOCOMPLETE_TAG_LIKE</option>
+			</field>
+
+			<field name="search_ac_dropdown_width" type="text" size="30" filter="string" default="" label="FLEXI_SEARCH_AC_DROPDOWN_WIDTH" description="FLEXI_SEARCH_AC_DROPDOWN_WIDTH_DESC" class="input-xlarge" />
+
+			<field name="" type="separator" default="FLEXI_SEARCH_AC_RICH" description="FLEXI_SEARCH_AC_RICH_DESC" level="level2" />
+
+			<field name="search_ac_rich" type="multilist" subtype="radio" default="1" label="FLEXI_SEARCH_AC_RICH_ENABLE" description="FLEXI_SEARCH_AC_RICH_ENABLE_DESC" toggle_related="1" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="disp_richac">FLEXI_NO</option>
+				<option value="1" show_list="disp_richac" hide_list="">FLEXI_YES</option>
+			</field>
+
+			<field name="search_ac_image_source" type="multilist" subtype="radio" default="auto" label="FLEXI_SEARCH_AC_IMAGE_SOURCE" description="FLEXI_SEARCH_AC_IMAGE_SOURCE_DESC" toggle_related="1" class="disp_richac btn-group btn-group-yesno">
+				<option value="auto" show_list="" hide_list="disp_imagefield">FLEXI_SEARCH_AC_IMAGE_AUTO</option>
+				<option value="field" show_list="disp_imagefield" hide_list="">FLEXI_SEARCH_AC_IMAGE_FIELD</option>
+			</field>
+
+			<field name="search_ac_image_field" type="fields" field_type="image" fieldnameasvalue="1" filter="string" default="" label="FLEXI_SEARCH_AC_IMAGE_FIELD_LBL" description="FLEXI_SEARCH_AC_IMAGE_FIELD_LBL_DESC" class="disp_richac disp_imagefield" />
+
+			<field name="search_ac_image_width" type="number" default="60" min="16" max="400" step="1" label="FLEXI_SEARCH_AC_IMAGE_WIDTH" description="FLEXI_SEARCH_AC_IMAGE_WIDTH_DESC" class="disp_richac" />
+			<field name="search_ac_image_height" type="number" default="60" min="16" max="400" step="1" label="FLEXI_SEARCH_AC_IMAGE_HEIGHT" description="FLEXI_SEARCH_AC_IMAGE_HEIGHT_DESC" class="disp_richac" />
+
+			<field name="search_ac_image_method" type="radio" default="1" label="FLEXI_SEARCH_AC_IMAGE_METHOD" description="FLEXI_SEARCH_AC_IMAGE_METHOD_DESC" class="disp_richac btn-group btn-group-yesno">
+				<option value="0">FLEXI_SCALE</option>
+				<option value="1">FLEXI_CROP</option>
+			</field>
+
+			<field name="search_ac_image_position" type="radio" default="left" label="FLEXI_SEARCH_AC_IMAGE_POSITION" description="FLEXI_SEARCH_AC_IMAGE_POSITION_DESC" class="disp_richac btn-group group-fcinfo">
+				<option value="left">FLEXI_LEFT</option>
+				<option value="right">FLEXI_RIGHT</option>
+			</field>
+
+			<field name="search_ac_title_maxlen" type="number" default="60" min="0" max="300" step="1" label="FLEXI_SEARCH_AC_TITLE_MAXLEN" description="FLEXI_SEARCH_AC_TITLE_MAXLEN_DESC" class="disp_richac" />
+
+			<field name="search_ac_info_fields" type="fields" issortable="1" fieldnameasvalue="1" filter="string" default="" label="FLEXI_SEARCH_AC_INFO_FIELDS" description="FLEXI_SEARCH_AC_INFO_FIELDS_DESC" class="disp_richac" />
+
+			<field name="search_ac_info_labels" type="radio" default="1" label="FLEXI_SEARCH_AC_INFO_LABELS" description="FLEXI_SEARCH_AC_INFO_LABELS_DESC" class="disp_richac btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+
+			<field name="search_ac_info_maxlen" type="number" default="80" min="0" max="300" step="1" label="FLEXI_SEARCH_AC_INFO_MAXLEN" description="FLEXI_SEARCH_AC_INFO_MAXLEN_DESC" class="disp_richac" />
+
+		</fieldset>
+
 		<fieldset name="FLEXI_MODULE_DISPLAYING_RULES" label="FLEXI_MODULE_DISPLAYING_RULES" description="FLEXI_MODULE_DISPLAYING_RULES_DESC">
 			<field name="combine_show_rules" type="radio" default="AND" label="FLEXI_COMBINE_SHOW_RULES" description="FLEXI_COMBINE_SHOW_RULES_DESC" class="btn-group group-fcinfo">
 				<option value="OR">FLEXI_OR</option>

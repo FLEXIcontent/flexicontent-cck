@@ -18,6 +18,121 @@
 		return vals.filter(function(v) { return parseInt(v) > 0; }).join(',');
 	}
 
+	/* Rich suggestions options (module config) for the simple auto-complete */
+	function fc_ac_rich_params(input)
+	{
+		var node = input && input.jquery ? input[0] : input;
+		if (!node || node.getAttribute('data-fc_ac_rich') !== '1') return {};
+
+		var get = function(name, fallback) {
+			var val = node.getAttribute('data-fc_ac_' + name);
+			return (val === null || val === '') ? fallback : val;
+		};
+
+		return {
+			ac_rich:          1,
+			ac_image_source:  get('image_source', 'auto'),
+			ac_image_field:   get('image_field', ''),
+			ac_image_width:   get('image_width', 60),
+			ac_image_height:  get('image_height', 60),
+			ac_image_method:  get('image_method', 1),
+			ac_image_position: get('image_position', 'left'),
+			ac_title_maxlen:  get('title_maxlen', 60),
+			ac_info_fields:   get('info_fields', ''),
+			ac_info_labels:   get('info_labels', 1),
+			ac_info_maxlen:   get('info_maxlen', 80)
+		};
+	}
+
+	/* Suggestion dropdown width from the module option / CSS variable */
+	function fc_ac_dropdown_width(input)
+	{
+		var node = input && input.jquery ? input[0] : input;
+		if (!node) return '';
+
+		var val = node.getAttribute('data-fc_ac_width');
+		if (val === null || val === '') {
+			val = window.getComputedStyle(node).getPropertyValue('--fc-ac-width');
+			if (val) val = val.trim();
+		}
+		if (!val) return '';
+
+		return /^[0-9.]+$/.test(val) ? val + 'px' : val;
+	}
+
+	/* Apply the configured width and always cap the dropdown to the viewport */
+	function fc_ac_apply_dropdown_width(input, element)
+	{
+		var node = element && element.jquery ? element[0] : element;
+		if (!node || !node.style) return;
+
+		node.style.maxWidth = 'calc(100vw - 2rem)';
+
+		var width = fc_ac_dropdown_width(input);
+		if (width) {
+			node.style.width = width;
+			node.style.minWidth = '';
+		}
+	}
+
+	/* Escape a plain text value before injecting it into suggestion HTML */
+	function fc_ac_escape_html(str)
+	{
+		return String(str === null || typeof str === 'undefined' ? '' : str)
+			.replace(/&/g, '&amp;')
+			.replace(/</g, '&lt;')
+			.replace(/>/g, '&gt;')
+			.replace(/"/g, '&quot;')
+			.replace(/'/g, '&#039;');
+	}
+
+	/* Build the rich suggestion inner HTML (image + title + fields) */
+	function fc_ac_render_item_html(item, opts)
+	{
+		opts = opts || {};
+
+		// Only item-title suggestions are enriched, other sources stay plain text
+		if (!item.title_display && !item.image && !item.fields) {
+			return '<div>' + fc_ac_escape_html(item.text || '') + '</div>';
+		}
+
+		var title = item.title_display || item.text || '';
+		var pos_class = opts.ac_image_position === 'right' ? ' fc_ac_pos_right' : ' fc_ac_pos_left';
+		var html = '<div class="fc_ac_item_inner' + pos_class + '">';
+		var show_labels = parseInt(opts.ac_info_labels, 10) === 1;
+
+		if (item.image) {
+			var w = parseInt(opts.ac_image_width, 10) || 60;
+			var h = parseInt(opts.ac_image_height, 10) || 60;
+			var method_class = parseInt(opts.ac_image_method, 10) === 1 ? ' fc_ac_thumb_crop' : ' fc_ac_thumb_scale';
+			html += '<div class="fc_ac_thumb' + method_class + '">'
+				+ '<img src="' + fc_ac_escape_html(item.image) + '" width="' + w + '" height="' + h + '"'
+				+ ' style="width:' + w + 'px;height:' + h + 'px;"'
+				+ ' alt="' + fc_ac_escape_html(title) + '" loading="lazy" />'
+				+ '</div>';
+		}
+
+		html += '<div class="fc_ac_content">';
+		html += '<div class="fc_ac_title">' + fc_ac_escape_html(title) + '</div>';
+
+		if (item.fields && item.fields.length) {
+			html += '<div class="fc_ac_infos">';
+			for (var i = 0; i < item.fields.length; i++) {
+				var f = item.fields[i] || {};
+				html += '<span class="fc_ac_info">';
+				if (show_labels && f.label) {
+					html += '<span class="fc_ac_info_label">' + fc_ac_escape_html(f.label) + ':</span> ';
+				}
+				html += '<span class="fc_ac_info_value">' + fc_ac_escape_html(f.value) + '</span>';
+				html += '</span>';
+			}
+			html += '</div>';
+		}
+
+		html += '</div></div>';
+		return html;
+	}
+
 	/* Set a cookie */
 	function fc_setCookie(cookieName, cookieValue, nDays, samesite="lax")
 	{
@@ -538,7 +653,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	if (fc_ui_autocomplete_available) {
 		var theElements = jQuery("input.fc_index_complete_simple");
 		theElements.each(function () {
-			jQuery.ui.autocomplete( {
+			var acWidget = jQuery.ui.autocomplete( {
 				source: function( request, response ) {
 					var el = jQuery(this.element);
 					var el_lang = el.attr('data-txt_ac_lang') ? el.attr('data-txt_ac_lang') : '';
@@ -549,7 +664,7 @@ document.addEventListener('DOMContentLoaded', function() {
 					jQuery.ajax({
 						url: (jroot_url_fc + "components/com_flexicontent/tasks/core.php"),
 						dataType: "json",
-						data: {
+						data: jQuery.extend({
 							type: (el.hasClass('fc_adv_complete') ? "adv_index" : "basic_index"),
 							task: "txtautocomplete",
 							pageSize: fc_select_pageSize,
@@ -559,15 +674,15 @@ document.addEventListener('DOMContentLoaded', function() {
 							cids: el_cids,
 							types: el_types,
 							usesubs: el_usesubs
-						},
+						}, fc_ac_rich_params(el)),
 						success: function( data ) {
 							//console.log( '... done' );
 							response( jQuery.map( data.Matches, function( item ) {
-								return {
+								return jQuery.extend({}, item, {
 									/*label: item.item_id +': '+ item.text,*/
 									label: item.text,
 									value: item.text
-								}
+								});
 							}));
 						}
 					});
@@ -583,6 +698,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				open: function() {
 					jQuery( this ).removeClass( "ui-corner-all" ).addClass( "ui-corner-top" );
 					jQuery(this).removeClass('working');
+					if (acWidget.menu && acWidget.menu.element) fc_ac_apply_dropdown_width(this, acWidget.menu.element);
 				},
 				close: function() {
 					jQuery( this ).removeClass( "ui-corner-top" ).addClass( "ui-corner-all" );
@@ -592,6 +708,14 @@ document.addEventListener('DOMContentLoaded', function() {
 					jQuery(this).addClass('working');
 				}
 			}, this );
+
+			if (acWidget && typeof acWidget._renderItem === 'function') {
+				acWidget._renderItem = function( ul, item ) {
+					var opts = fc_ac_rich_params(this.element);
+					var link = jQuery('<a>').append(opts.ac_rich ? fc_ac_render_item_html(item, opts) : jQuery('<div>').text(item.label));
+					return jQuery('<li>').append(link).appendTo(ul);
+				};
+			}
 		});
 	}
 
@@ -623,6 +747,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				var acActiveIndex = -1;
 				var acSearchTimer = null;
 				var acInFlight = null;
+				var acRichOpts = fc_ac_rich_params(el);
 
 				// Read an option from data-fc_ac_* attribute, else from --fc-ac-* CSS variable, else fallback
 				function acOption(attr, cssvar, fallback) {
@@ -642,11 +767,8 @@ document.addEventListener('DOMContentLoaded', function() {
 					var rect = el.getBoundingClientRect();
 
 					// Optional explicit width (data-fc_ac_width / --fc-ac-width), else match the input width
-					var width = acOption('data-fc_ac_width', '--fc-ac-width', '');
-					if (width) {
-						dropdown.style.width = /^[0-9.]+$/.test(width) ? width + 'px' : width;
-						dropdown.style.minWidth = '';
-					} else {
+					fc_ac_apply_dropdown_width(el, dropdown);
+					if (!fc_ac_dropdown_width(el)) {
 						dropdown.style.width = '';
 						dropdown.style.minWidth = rect.width + 'px';
 					}
@@ -681,7 +803,12 @@ document.addEventListener('DOMContentLoaded', function() {
 							var li = document.createElement('li');
 							li.className = 'fc_ac_item';
 							li.setAttribute('role', 'option');
-							li.textContent = item.text;
+							li._fcAcItem = item;
+							if (acRichOpts.ac_rich) {
+								li.innerHTML = fc_ac_render_item_html(item, acRichOpts);
+							} else {
+								li.textContent = item.text;
+							}
 							li.addEventListener('mousedown', function(e) {
 								e.preventDefault();
 								acSelect(item, 'click');
@@ -757,6 +884,9 @@ function acClose() {
 						params.set('cids', attrs.cids);
 						params.set('types', attrs.types);
 						params.set('usesubs', attrs.usesubs);
+						for (var rp in acRichOpts) {
+							if (acRichOpts.hasOwnProperty(rp)) params.set(rp, acRichOpts[rp]);
+						}
 
 						var abortable = (typeof AbortController !== 'undefined');
 						if (abortable) {
@@ -794,7 +924,7 @@ function acClose() {
 						// highlighted, select it first so the search uses the chosen term.
 						e.preventDefault();
 						if (dropdown.style.display !== 'none' && acActiveIndex >= 0 && acItems[acActiveIndex]) {
-							acSelect({ text: acItems[acActiveIndex].textContent });
+							acSelect(acItems[acActiveIndex]._fcAcItem || { text: acItems[acActiveIndex].textContent });
 						} else {
 							acClose();
 						}
@@ -823,76 +953,100 @@ function acClose() {
 	// add Tag-Like text search autocomplete
 	if (window.fc_use_choicesjs || (typeof jQuery !== 'undefined' && typeof jQuery('input.fc_index_complete_tlike').select2 !== 'undefined')) {
 		if (window.fc_use_choicesjs) {
-			// Choices.js AJAX autocomplete
 			var tlikeInputs = document.querySelectorAll('input.fc_index_complete_tlike');
 			for (var tl = 0; tl < tlikeInputs.length; tl++) {
-				var el = tlikeInputs[tl];
-				// Convert space-separated value to initial choices
-				var initialData = [];
-				if (el.value) {
-					el.value.split(" ").forEach(function(val) {
-						if (val.trim()) {
-							initialData.push({ value: val.trim(), label: val.trim(), selected: true });
-						}
+				(function(el) {
+					if (!el.parentNode || el.getAttribute('data-fc_choices_init') === '1') return;
+
+					var select = document.createElement('select');
+					select.multiple = true;
+					select.className = el.className;
+					select.id = (el.id || ('fc_tlike_' + tl)) + '_choices';
+					var ariaLabel = el.getAttribute('aria-label');
+					if (ariaLabel) select.setAttribute('aria-label', ariaLabel);
+
+					if (el.value) {
+						el.value.split(' ').forEach(function(val) {
+							if (val.trim()) {
+								var option = document.createElement('option');
+								option.value = val.trim();
+								option.text = val.trim();
+								option.selected = true;
+								option.setAttribute('selected', '');
+								select.appendChild(option);
+							}
+						});
+					}
+
+					el.parentNode.insertBefore(select, el.nextSibling);
+					el.type = 'hidden';
+					el.setAttribute('data-fc_choices_init', '1');
+
+					// FLEXIcontent's own Choices.js, even when another copy replaced window.Choices
+					var choicesInstance = new (window.fc_Choices || Choices)(select, {
+						maxItemCount: -1,
+						placeholderValue: Joomla.JText._('FLEXI_TYPE_TO_LIST'),
+						searchPlaceholderText: Joomla.JText._('FLEXI_TYPE_TO_LIST'),
+						searchChoices: false,
+						paste: true,
+						removeItemButton: true,
+						shouldSort: false
 					});
-				}
 
-				// FLEXIcontent's own Choices.js, even when another copy replaced window.Choices
-				var choicesInstance = new (window.fc_Choices || Choices)(el, {
-					maxItemCount: -1,
-					placeholderValue: Joomla.JText._('FLEXI_TYPE_TO_LIST'),
-					searchPlaceholderText: Joomla.JText._('FLEXI_TYPE_TO_LIST'),
-					searchChoices: false,
-					paste: true,
-					removeItemButton: true,
-					shouldSort: false
-				});
+					if (choicesInstance.dropdown && choicesInstance.dropdown.element) {
+						fc_ac_apply_dropdown_width(el, choicesInstance.dropdown.element);
+					}
 
-				if (initialData.length) {
-					choicesInstance.setChoices(initialData);
-				}
+					var syncValue = function() {
+						var values = choicesInstance.getValue(true);
+						if (!Array.isArray(values)) values = values ? [values] : [];
+						el.value = values.join(' ');
+					};
+					select.addEventListener('change', syncValue);
+					select.addEventListener('addItem', syncValue);
+					select.addEventListener('removeItem', syncValue);
 
-				// AJAX search
-				var searchTimeout = null;
-				el.addEventListener('search', function(e) {
-					var searchTerm = e.detail.value;
-					if (searchTimeout) clearTimeout(searchTimeout);
-					if (!searchTerm || searchTerm.length < 1) return;
+					// AJAX search
+					var searchTimeout = null;
+					select.addEventListener('search', function(e) {
+						var searchTerm = e.detail.value;
+						if (searchTimeout) clearTimeout(searchTimeout);
+						if (!searchTerm || searchTerm.length < 1) return;
 
-					searchTimeout = setTimeout(function() {
-						var type = el.classList.contains('fc_adv_complete') ? "adv_index" : "basic_index";
-						var params = {
-							type: type,
-							task: "txtautocomplete",
-							text: searchTerm,
-							pageSize: typeof fc_select_pageSize !== 'undefined' ? fc_select_pageSize : 50,
-							pageNum: 1,
-							lang: (el.getAttribute('data-txt_ac_lang') ? el.getAttribute('data-txt_ac_lang') : ''),
-							cid:  (el.getAttribute('data-txt_ac_cid')  ? el.getAttribute('data-txt_ac_cid')  : (typeof FC_URL_VARS !== 'undefined' ? (parseInt(FC_URL_VARS['cid']) || 0) : 0)),
-							cids: (el.getAttribute('data-txt_ac_cids') ? el.getAttribute('data-txt_ac_cids') : (typeof FC_URL_VARS !== 'undefined' ? FC_URL_VARS['cids'] : '')),
-							types: fc_ac_form_types(el),
-							usesubs: (parseInt(el.getAttribute('data-txt_ac_usesubs')) || 0)
-						};
+						searchTimeout = setTimeout(function() {
+							var type = el.classList.contains('fc_adv_complete') ? "adv_index" : "basic_index";
+							var params = {
+								type: type,
+								task: "txtautocomplete",
+								text: searchTerm,
+								pageSize: typeof fc_select_pageSize !== 'undefined' ? fc_select_pageSize : 50,
+								pageNum: 1,
+								lang: (el.getAttribute('data-txt_ac_lang') ? el.getAttribute('data-txt_ac_lang') : ''),
+								cid:  (el.getAttribute('data-txt_ac_cid')  ? el.getAttribute('data-txt_ac_cid')  : (typeof FC_URL_VARS !== 'undefined' ? (parseInt(FC_URL_VARS['cid']) || 0) : 0)),
+								cids: (el.getAttribute('data-txt_ac_cids') ? el.getAttribute('data-txt_ac_cids') : (typeof FC_URL_VARS !== 'undefined' ? FC_URL_VARS['cids'] : '')),
+								types: fc_ac_form_types(el),
+								usesubs: (parseInt(el.getAttribute('data-txt_ac_usesubs')) || 0)
+							};
 
-						fetch(jroot_url_fc + "components/com_flexicontent/tasks/core.php?" + new URLSearchParams(params), { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-							.then(function(response) { return response.json(); })
-							.then(function(data) {
-								if (data && data.Matches && data.Matches.length) {
-									var resultChoices = data.Matches.map(function(m) {
+							fetch(jroot_url_fc + "components/com_flexicontent/tasks/core.php?" + new URLSearchParams(params), { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+								.then(function(response) { return response.json(); })
+								.then(function(data) {
+									var resultChoices = (data && data.Matches ? data.Matches : []).map(function(m) {
 										return { value: m.id, label: m.text };
 									});
-									// Replace dropdown choices in-place (keeps pre-selected initial tags in the list)
-									choicesInstance.setChoices(initialData.concat(resultChoices), 'value', 'label', true);
-								}
-							});
-					}, 200);
-				});
+									choicesInstance.setChoices(resultChoices, 'value', 'label', true);
+								});
+						}, 200);
+					});
 
-				// Store instance for external access
-				el.fc_choices_instance = choicesInstance;
-				window.fc_choices_instances = window.fc_choices_instances || {};
-				window.fc_choices_instances[el.id || el.name] = choicesInstance;
-				}
+					// Store instance for external access
+					select.fc_choices_instance = choicesInstance;
+					el.fc_choices_instance = choicesInstance;
+					window.fc_choices_instances = window.fc_choices_instances || {};
+					window.fc_choices_instances[select.id] = choicesInstance;
+					window.fc_choices_instances[el.id || el.name] = choicesInstance;
+				})(tlikeInputs[tl]);
+			}
 		} else {
 			// Select2 AJAX autocomplete (legacy)
 			jQuery('input.fc_index_complete_tlike').select2(

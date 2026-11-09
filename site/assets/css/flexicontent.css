@@ -6820,3 +6820,61 @@ ul.fc_ac_dropdown > li.fc_ac_item:hover,
 ul.fc_ac_dropdown > li.fc_ac_item.is-active {
   background: #eee;
 }
+/** Rich suggestions (image + title + extra fields) **/
+.fc_ac_item_inner {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.fc_ac_item_inner.fc_ac_pos_right {
+  flex-direction: row-reverse;
+}
+.fc_ac_thumb {
+  flex: 0 0 auto;
+  line-height: 0;
+}
+.fc_ac_thumb img {
+  display: block;
+  max-width: none;
+  border-radius: 3px;
+}
+.fc_ac_thumb_crop img {
+  object-fit: cover;
+}
+.fc_ac_thumb_scale img {
+  object-fit: contain;
+}
+.fc_ac_content {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.fc_ac_title {
+  font-weight: 600;
+  line-height: 1.3;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+.fc_ac_infos {
+  margin-top: 2px;
+  font-size: 12px;
+  line-height: 1.35;
+  color: #666;
+}
+.fc_ac_info {
+  display: block;
+}
+.fc_ac_info_label {
+  font-weight: 600;
+  color: #444;
+  margin-right: 3px;
+}
+.fc_ac_info_value {
+  color: #666;
+}
+.ui-autocomplete .ui-menu-item > a {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}

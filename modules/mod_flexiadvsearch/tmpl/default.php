@@ -41,6 +41,81 @@ $form_name = "default_form_".$module->id;
 $txtmode = (int) $params->get('txtmode', 0);
 $show_search_label = $params->get('show_search_label', 1);
 $search_autocomplete = $params->get( 'search_autocomplete', 1 );
+$search_ac_dropdown_width = $params->get('search_ac_dropdown_width', '');
+$search_ac_dropdown_width = is_array($search_ac_dropdown_width)
+	? (string) reset($search_ac_dropdown_width)
+	: trim((string) $search_ac_dropdown_width);
+if (preg_match('/^\d+(?:\.\d+)?$/', $search_ac_dropdown_width))
+{
+	$search_ac_dropdown_width .= 'px';
+}
+if ($search_ac_dropdown_width === '0px')
+{
+	$search_ac_dropdown_width = '';
+}
+if ($search_ac_dropdown_width !== '' && (strlen($search_ac_dropdown_width) > 100 || !preg_match('/^[0-9a-zA-Z.%+\-*\/(),\s]+$/', $search_ac_dropdown_width)))
+{
+	$search_ac_dropdown_width = '';
+}
+
+// Rich suggestions configuration (module options only)
+$search_ac_rich         = (int) $params->get('search_ac_rich', 1);
+$search_ac_image_source = $params->get('search_ac_image_source', 'auto');
+$search_ac_image_source = in_array($search_ac_image_source, array('auto', 'field'), true) ? $search_ac_image_source : 'auto';
+$search_ac_image_field  = $params->get('search_ac_image_field', '');
+$search_ac_image_field  = is_array($search_ac_image_field) ? (string) reset($search_ac_image_field) : trim((string) $search_ac_image_field);
+$search_ac_image_field  = ($search_ac_image_field === '0' || !preg_match('/^[a-zA-Z0-9_\-]+$/', $search_ac_image_field)) ? '' : $search_ac_image_field;
+$search_ac_image_width  = max(16, min(400, (int) $params->get('search_ac_image_width', 60)));
+$search_ac_image_height = max(16, min(400, (int) $params->get('search_ac_image_height', 60)));
+$search_ac_image_method = (int) $params->get('search_ac_image_method', 1) ? 1 : 0;
+$search_ac_image_position = $params->get('search_ac_image_position', 'left') === 'right' ? 'right' : 'left';
+$search_ac_title_maxlen = max(0, min(300, (int) $params->get('search_ac_title_maxlen', 60)));
+$search_ac_info_labels  = (int) $params->get('search_ac_info_labels', 1) ? 1 : 0;
+$search_ac_info_maxlen  = max(0, min(300, (int) $params->get('search_ac_info_maxlen', 80)));
+
+$search_ac_info_fields = $params->get('search_ac_info_fields', '');
+if (is_array($search_ac_info_fields))
+{
+	$search_ac_info_fields = isset($search_ac_info_fields['selector']) && is_array($search_ac_info_fields['selector'])
+		? implode(',', $search_ac_info_fields['selector'])
+		: implode(',', array_filter($search_ac_info_fields, 'is_scalar'));
+}
+$search_ac_info_fields = (string) $search_ac_info_fields;
+$_ac_info_fields = array();
+foreach (preg_split('/\s*,\s*/', $search_ac_info_fields) as $_ac_field)
+{
+	if ($_ac_field !== '' && preg_match('/^[a-zA-Z0-9_\-]+$/', $_ac_field))
+	{
+		$_ac_info_fields[] = $_ac_field;
+	}
+
+	if (count($_ac_info_fields) >= 12)
+	{
+		break;
+	}
+}
+$search_ac_info_fields = implode(',', array_unique($_ac_info_fields));
+
+$rich_attrs = '';
+if ((int) $search_autocomplete === 1 && $search_ac_rich)
+{
+	$rich_attrs = ' data-fc_ac_rich="1"'
+		. ' data-fc_ac_image_source="' . $search_ac_image_source . '"'
+		. ' data-fc_ac_image_field="' . htmlspecialchars($search_ac_image_field, ENT_QUOTES, 'UTF-8') . '"'
+		. ' data-fc_ac_image_width="' . $search_ac_image_width . '"'
+		. ' data-fc_ac_image_height="' . $search_ac_image_height . '"'
+		. ' data-fc_ac_image_method="' . $search_ac_image_method . '"'
+		. ' data-fc_ac_image_position="' . $search_ac_image_position . '"'
+		. ' data-fc_ac_title_maxlen="' . $search_ac_title_maxlen . '"'
+		. ' data-fc_ac_info_fields="' . htmlspecialchars($search_ac_info_fields, ENT_QUOTES, 'UTF-8') . '"'
+		. ' data-fc_ac_info_labels="' . $search_ac_info_labels . '"'
+		. ' data-fc_ac_info_maxlen="' . $search_ac_info_maxlen . '"';
+}
+
+$ac_width_attr = $search_ac_dropdown_width !== ''
+	? ' data-fc_ac_width="' . htmlspecialchars($search_ac_dropdown_width, ENT_QUOTES, 'UTF-8') . '"'
+	: '';
+
 $flexi_button_class_go =  ($params->get('flexi_button_class_go' ,'') != '-1')  ?
     $params->get('flexi_button_class_go', (FLEXI_J30GE ? 'btn btn-success' : 'fc_button'))   :
     $params->get('flexi_button_class_go_custom', (FLEXI_J30GE ? 'btn btn-success' : 'fc_button'))  ;
@@ -420,7 +495,7 @@ if (!empty($js)) {
 
 		$output[] = '
 			<input type="'.($search_autocomplete==2 ? 'hidden' : 'text').'"
-				data-txt_ac_lang="' . Factory::getLanguage()->getTag() . '"
+				data-txt_ac_lang="' . Factory::getLanguage()->getTag() . '"'.$rich_attrs.$ac_width_attr.'
 id="mod_search_searchword-'.$module->id.'" class="'.($isJ4 ? 'form-control ' : '').$text_search_class.'"
 				placeholder="'.$search_inner_prompt.'" label="'.$search_inner_prompt.'"  name="q" '.($search_autocomplete==2 ? '' : ' size="'.$search_inner_width.'" maxlength="'.$maxchars.'"').' value="'.htmlspecialchars($searchword, ENT_QUOTES, 'UTF-8').'" aria-label="'.$search_inner_prompt.'"  />';
 
