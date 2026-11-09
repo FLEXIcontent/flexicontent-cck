@@ -1124,21 +1124,6 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="nf_extra_properties" type="fccheckbox" default="" display_useglobal="1"
-				checkoptions="FLEXI_NF_CREATOR,FLEXI_NF_MODIFIER,FLEXI_NF_CREATION_TIME,FLEXI_NF_MODIFICATION_TIME,FLEXI_NF_VIEW_LINK,FLEXI_NF_EDIT_LINK_FE,FLEXI_NF_EDIT_LINK_BE"
-				checkvals="creator,modifier,created,modified,viewlink,editlinkfe,editlinkbe"
-				defaultvals=""
-				label="FLEXI_NF_EXTRA_PROPERTIES" description="FLEXI_NF_EXTRA_PROPERTIES_DESC" cols="2" />
-			<field name="nf_add_introtext" type="radio" default="" label="FLEXI_NF_ADD_INTROTEXT" description="FLEXI_NF_ADD_INTROTEXT_DESC" class="btn-group btn-group-yesno">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="nf_add_fulltext" type="radio" default="" label="FLEXI_NF_ADD_FULLTEXT" description="FLEXI_NF_ADD_FULLTEXT_DESC" class="btn-group btn-group-yesno">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
 			<field name="nf_enable_debug" type="radio" default="" label="FLEXI_NF_ENABLE_DEBUG" description="FLEXI_NF_ENABLE_DEBUG_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>

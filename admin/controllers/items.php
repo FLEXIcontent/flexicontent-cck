@@ -881,22 +881,6 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 
 		/**
-		 * Use session to detect multiple item saves to avoid sending notification EMAIL multiple times
-		 */
-		$is_first_save = true;
-
-		if ($session->has('saved_fcitems', 'flexicontent'))
-		{
-			$saved_fcitems = $session->get('saved_fcitems', array(), 'flexicontent');
-			$is_first_save = $isnew ? true : !isset($saved_fcitems[$model->get('id')]);
-		}
-
-		// Add item to saved items of the corresponding session array
-		$saved_fcitems[$model->get('id')] = $timestamp = time();  // Current time as seconds since Unix epoc;
-		$session->set('saved_fcitems', $saved_fcitems, 'flexicontent');
-
-
-		/**
 		 * Get categories added / removed from the item
 		 */
 		$query 	= 'SELECT DISTINCT c.id, c.title FROM #__categories AS c'
@@ -941,109 +925,109 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		/**
 		 * We need to get emails to notify, from Global/item's Content Type parameters -AND- from item's categories parameters
+		 *
+		 * Notifications are evaluated on every save. The "Debug notifications" option only displays
+		 * debugging information after saving, it does not control whether emails are sent.
 		 */
 		$notify_emails = array();
 
-		if ($is_first_save || $cats_altered || $params->get('nf_enable_debug', 0))
+		// Get needed flags regarding the saved items
+		$approve_version = 2;
+		$pending_approval_state = -3;
+		$draft_state = -4;
+
+		$current_version = FLEXIUtilities::getCurrentVersions($item->id, true); // Get current item version
+		$last_version    = FLEXIUtilities::getLastVersions($item->id, true);    // Get last version (=latest one saved, highest version id),
+
+		// $validated_data variables vstate & state may have been (a) tampered in the form, and/or (b) altered by save procedure so better not use them
+		$needs_version_reviewal     = !$isnew && ($last_version > $current_version) && !$canPublish && !$AutoApproveChanges;
+		$needs_publication_approval = $isnew && ($item->state == $pending_approval_state) && !$canPublish;
+
+		$draft_from_non_publisher = $item->state == $draft_state && !$canPublish;
+
+		if ($draft_from_non_publisher)
 		{
-			// Get needed flags regarding the saved items
-			$approve_version = 2;
-			$pending_approval_state = -3;
-			$draft_state = -4;
+			// Suppress notifications for draft-state items (new or existing ones), for these each author will publication approval manually via a button
+			$nConf = false;
+		}
+		else
+		{
+			// Get notifications configuration and select appropriate emails for current saving case
+			$nConf = $model->getNotificationsConf($params);  // echo "<pre>"; print_r($nConf); "</pre>";
+		}
 
-			$current_version = FLEXIUtilities::getCurrentVersions($item->id, true); // Get current item version
-			$last_version    = FLEXIUtilities::getLastVersions($item->id, true);    // Get last version (=latest one saved, highest version id),
+		if ($nConf)
+		{
+			$states_notify_new = $params->get('states_notify_new', array(1, 0, 2, -3, -4, -5));
 
-			// $validated_data variables vstate & state may have been (a) tampered in the form, and/or (b) altered by save procedure so better not use them
-			$needs_version_reviewal     = !$isnew && ($last_version > $current_version) && !$canPublish && !$AutoApproveChanges;
-			$needs_publication_approval = $isnew && ($item->state == $pending_approval_state) && !$canPublish;
-
-			$draft_from_non_publisher = $item->state == $draft_state && !$canPublish;
-
-			if ($draft_from_non_publisher)
+			if (empty($states_notify_new))
 			{
-				// Suppress notifications for draft-state items (new or existing ones), for these each author will publication approval manually via a button
-				$nConf = false;
-			}
-			else
-			{
-				// Get notifications configuration and select appropriate emails for current saving case
-				$nConf = $model->getNotificationsConf($params);  // echo "<pre>"; print_r($nConf); "</pre>";
+				$states_notify_new = array();
 			}
 
-			if ($nConf)
+			elseif (! is_array($states_notify_new))
 			{
-				$states_notify_new = $params->get('states_notify_new', array(1, 0, 2, -3, -4, -5));
-
-				if (empty($states_notify_new))
-				{
-					$states_notify_new = array();
-				}
-
-				elseif (! is_array($states_notify_new))
-				{
-					$states_notify_new = !FLEXI_J16GE ? array($states_notify_new) : explode("|", $states_notify_new);
-				}
-
-				$states_notify_existing = $params->get('states_notify_existing', array(1, 0, 2, -3, -4, -5));
-
-				if (empty($states_notify_existing))
-				{
-					$states_notify_existing = array();
-				}
-
-				elseif (! is_array($states_notify_existing))
-				{
-					$states_notify_existing = !FLEXI_J16GE ? array($states_notify_existing) : explode("|", $states_notify_existing);
-				}
-
-				$n_state_ok = in_array($item->state, $states_notify_new);
-				$e_state_ok = in_array($item->state, $states_notify_existing);
-
-				if ($needs_publication_approval)
-				{
-					$notify_emails = $nConf->emails->notify_new_pending;
-				}
-				elseif ($isnew && $n_state_ok)
-				{
-					$notify_emails = $nConf->emails->notify_new;
-				}
-				elseif ($isnew)
-				{
-					$notify_emails = array();
-				}
-				elseif ($needs_version_reviewal)
-				{
-					$notify_emails = $nConf->emails->notify_existing_reviewal;
-				}
-				elseif (!$isnew && $e_state_ok)
-				{
-					$notify_emails = $nConf->emails->notify_existing;
-				}
-				elseif (!$isnew)
-				{
-					$notify_emails = array();
-				}
-
-				if ($needs_publication_approval)
-				{
-					$notify_text = $params->get('text_notify_new_pending');
-				}
-				elseif ($isnew)
-				{
-					$notify_text = $params->get('text_notify_new');
-				}
-				elseif ($needs_version_reviewal)
-				{
-					$notify_text = $params->get('text_notify_existing_reviewal');
-				}
-				elseif (!$isnew)
-				{
-					$notify_text = $params->get('text_notify_existing');
-				}
-
-				// print_r($notify_emails); jexit();
+				$states_notify_new = !FLEXI_J16GE ? array($states_notify_new) : explode("|", $states_notify_new);
 			}
+
+			$states_notify_existing = $params->get('states_notify_existing', array(1, 0, 2, -3, -4, -5));
+
+			if (empty($states_notify_existing))
+			{
+				$states_notify_existing = array();
+			}
+
+			elseif (! is_array($states_notify_existing))
+			{
+				$states_notify_existing = !FLEXI_J16GE ? array($states_notify_existing) : explode("|", $states_notify_existing);
+			}
+
+			$n_state_ok = in_array($item->state, $states_notify_new);
+			$e_state_ok = in_array($item->state, $states_notify_existing);
+
+			if ($needs_publication_approval)
+			{
+				$notify_emails = $nConf->emails->notify_new_pending;
+			}
+			elseif ($isnew && $n_state_ok)
+			{
+				$notify_emails = $nConf->emails->notify_new;
+			}
+			elseif ($isnew)
+			{
+				$notify_emails = array();
+			}
+			elseif ($needs_version_reviewal)
+			{
+				$notify_emails = $nConf->emails->notify_existing_reviewal;
+			}
+			elseif (!$isnew && $e_state_ok)
+			{
+				$notify_emails = $nConf->emails->notify_existing;
+			}
+			elseif (!$isnew)
+			{
+				$notify_emails = array();
+			}
+
+			if ($needs_publication_approval)
+			{
+				$notify_text = $params->get('text_notify_new_pending');
+			}
+			elseif ($isnew)
+			{
+				$notify_text = $params->get('text_notify_new');
+			}
+			elseif ($needs_version_reviewal)
+			{
+				$notify_text = $params->get('text_notify_existing_reviewal');
+			}
+			elseif (!$isnew)
+			{
+				$notify_text = $params->get('text_notify_existing');
+			}
+
+			// print_r($notify_emails); jexit();
 		}
 
 

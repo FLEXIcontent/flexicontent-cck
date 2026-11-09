@@ -431,6 +431,40 @@ class com_flexicontentInstallerScript
 
 
 	/*
+	* Create the Joomla mail templates used by the FLEXIcontent notifications.
+	* Existing templates are left untouched, so user customisations are preserved.
+	*/
+	function _createNotificationMailTemplates()
+	{
+		if (!class_exists('\\Joomla\\CMS\\Mail\\MailTemplate'))
+		{
+			return;
+		}
+
+		$helper = JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/notificationmail.php';
+
+		if (!is_file($helper))
+		{
+			return;
+		}
+
+		require_once $helper;
+
+		try
+		{
+			FlexicontentHelperNotificationMail::ensureTemplates(true);
+		}
+		catch (\Throwable $e)
+		{
+			\Joomla\CMS\Factory::getApplication()->enqueueMessage(
+				'FLEXIcontent notification mail templates: ' . $e->getMessage(),
+				'warning'
+			);
+		}
+	}
+
+
+	/*
 	* $parent is the class calling this method.
 	* $type is the type of change (install, update or discover_install, not uninstall).
 	* postflight is run after the extension is registered in the database.
@@ -450,6 +484,9 @@ class com_flexicontentInstallerScript
 
 		// Copy our data source plugin into JSitemap (com_jmap), if it is installed
 		$this->_installJsitemapPlugin($parent->getParent()->getPath('source'));
+
+		// Create the FLEXIcontent notification mail templates, without overwriting customised ones
+		$this->_createNotificationMailTemplates();
 
 		/*
 		// always create or modify these parameters

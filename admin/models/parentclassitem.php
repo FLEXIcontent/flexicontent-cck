@@ -17,6 +17,8 @@ use Joomla\CMS\Table\Table;
 
 require_once('base/base.php');
 
+JLoader::register('FlexicontentHelperNotificationMail', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/notificationmail.php');
+
 /**
  * FLEXIcontent Component (Common) Item Model (FrontEnd / BackEnd)
  *
@@ -4890,6 +4892,19 @@ class ParentClassItem extends FCModelAdmin
 	}
 
 
+	/**
+	 * Method to build the FlexiContent custom field tags used by the notification mail templates
+	 *
+	 * @return  array
+	 */
+	protected function getNotificationFieldTags()
+	{
+		$fields = $this->getExtrafields(true);
+
+		return FlexicontentHelperNotificationMail::getFieldTags(is_array($fields) ? $fields : array());
+	}
+
+
 	// *****************************************************************************************
 	// If there are emails to notify for current saving case, then send the notifications emails
 	// *****************************************************************************************
@@ -4903,7 +4918,7 @@ class ParentClassItem extends FCModelAdmin
 		$notify_text   = $notify_vars->notify_text;
 		$before_cats   = $notify_vars->before_cats;
 		$after_cats    = $notify_vars->after_cats;
-		$oitem         = $notify_vars->original_item;
+		$oitem         = isset($notify_vars->original_item) ? $notify_vars->original_item : null;
 
 		if ( !count($notify_emails) ) return true;
 
@@ -4911,6 +4926,11 @@ class ParentClassItem extends FCModelAdmin
 		$db      = \Joomla\CMS\Factory::getDbo();
 		$user    = \Joomla\CMS\Factory::getUser();
 		$use_versioning = $this->_cparams->get('use_versioning', 1);
+
+		// Select the Joomla mail template to use for the current notification case
+		$notify_type = FlexicontentHelperNotificationMail::getTypeFromFlags(
+			$isNew, $needs_publication_approval, $needs_version_reviewal, $manual_approval_request
+		);
 
 		// Get category titles of categories add / removed from the item
 		$cats_added_titles = $cats_removed_titles = array();
@@ -4939,6 +4959,13 @@ class ParentClassItem extends FCModelAdmin
 			{
 				$cats_titles[] = $after_cat->title;
 			}
+		}
+
+		// Current category assignments, always used by the mail template tags
+		$current_cats_titles = array();
+		foreach($after_cats as $after_cat)
+		{
+			$current_cats_titles[] = $after_cat->title;
 		}
 
 
@@ -4978,8 +5005,9 @@ class ParentClassItem extends FCModelAdmin
 		// CREATE MESSAGE BODY
 		// *******************
 
-		$nf_extra_properties = $params->get('nf_extra_properties', array('creator','modifier','created','modified','viewlink','editlinkfe','editlinkbe','introtext','fulltext'));
-		$nf_extra_properties  = FLEXIUtilities::paramToArray($nf_extra_properties);
+		// The notification mail templates expose all of these values as tags.
+		// The legacy hardcoded body (used only when the template system is unavailable) keeps including all of them.
+		$nf_extra_properties = array('creator', 'modifier', 'created', 'modified', 'viewlink', 'editlinkfe', 'editlinkbe');
 
 		// ADD INFO for item title
 		$body  = '<b>'.\Joomla\CMS\Language\Text::_( 'FLEXI_NF_CONTENT_TITLE' ) . "</b>: ";
@@ -5122,23 +5150,74 @@ class ParentClassItem extends FCModelAdmin
 			//$body .= $link . "<br/>\r\n<br/>\r\n";
 		}
 
-		// ADD INFO for introtext/fulltext
-		if ( $params->get('nf_add_introtext') )
+		// Introtext / fulltext are no longer appended to the legacy body:
+		// the notification mail templates expose them as {INTROTEXT} and {FULLTEXT} tags.
+
+
+		// *******************************************************
+		// Build the data used by the Joomla mail template tags
+		// *******************************************************
+		$tag_state = isset($state_names[$this->get('state')])
+			? \Joomla\CMS\Language\Text::_($state_names[$this->get('state')])
+			: (string) $this->get('state');
+
+		// Guard against null / invalid dates: do not render a bogus date for new items
+		$null_date     = $db->getNullDate();
+		$created_value = (string) $this->get('created');
+
+		$tag_created = '';
+
+		if ($created_value && $created_value !== $null_date && $created_value !== '0000-00-00 00:00:00')
 		{
-			//echo "<pre>"; print_r($this->_record); exit;
-			$body .= "<br/><br/>\r\n";
-			$body .= "*************************************************************** <br/>\r\n";
-			$body .= \Joomla\CMS\Language\Text::_( 'FLEXI_NF_INTROTEXT_LONG' ) . "<br/>\r\n";
-			$body .= "*************************************************************** <br/>\r\n";
-			$body .= flexicontent_html::striptagsandcut( $this->get('introtext'), 200 );
+			$tag_created_date = \Joomla\CMS\Factory::getDate($created_value);
+			$tag_created_date->setTimezone($tz);
+			$tag_created = $tag_created_date->format('D, d M Y H:i:s', true) . ' ' . $tz->getName();
 		}
-		if ( $params->get('nf_add_fulltext') )
+
+		$modified_value = (string) $this->get('modified');
+
+		$tag_modified = '';
+
+		if ($modified_value && $modified_value !== $null_date && $modified_value !== '0000-00-00 00:00:00')
 		{
-			$body .= "<br/><br/>\r\n";
-			$body .= "*************************************************************** <br/>\r\n";
-			$body .= \Joomla\CMS\Language\Text::_( 'FLEXI_NF_FULLTEXT_LONG' ) . "<br/>\r\n";
-			$body .= "*************************************************************** <br/>\r\n";
-			$body .= flexicontent_html::striptagsandcut( $this->get('fulltext'), 200 );
+			$tag_modified_date = \Joomla\CMS\Factory::getDate($modified_value);
+			$tag_modified_date->setTimezone($tz);
+			$tag_modified = $tag_modified_date->format('D, d M Y H:i:s', true) . ' ' . $tz->getName();
+		}
+
+		$tag_edit_url_fe = $item_url . (strstr($item_url, '?') ? '&' : '?') . 'task=edit';
+		$tag_edit_url_be = \Joomla\CMS\Router\Route::_(
+			\Joomla\CMS\Uri\Uri::root() . 'administrator/index.php?option=com_flexicontent&task=items.edit&cid=' . $this->get('id')
+		);
+
+		$template_data = array(
+			'sitename'           => (string) $app->get('sitename'),
+			'siteurl'            => \Joomla\CMS\Uri\Uri::root(),
+			'title'              => (string) $this->get('title'),
+			'id'                 => (string) $this->get('id'),
+			'state'              => $tag_state,
+			'creator'            => (string) $this->get('creator'),
+			'modifier'           => (string) $this->get('modifier'),
+			'editor_name'        => $user->get('id') ? (string) $user->get('name') : \Joomla\CMS\Language\Text::_('FLEXI_NF_BY_GUEST'),
+			'editor_username'    => (string) $user->get('username'),
+			'created'            => $tag_created,
+			'modified'           => $tag_modified,
+			'categories'         => implode(', ', $current_cats_titles),
+			'categories_added'   => implode(', ', $cats_added_titles),
+			'categories_removed' => implode(', ', $cats_removed_titles),
+			'view_url'           => $item_url,
+			'edit_url_fe'        => $tag_edit_url_fe,
+			'edit_url_be'        => $tag_edit_url_be,
+			'introtext'          => flexicontent_html::striptagsandcut( $this->get('introtext'), 200 ),
+			'fulltext'           => flexicontent_html::striptagsandcut( $this->get('fulltext'), 200 ),
+			'notify_text'        => $notify_text ? \Joomla\CMS\Language\Text::_($notify_text) : '',
+			'category_text'      => FlexicontentHelperNotificationMail::getCategoryText((int) $this->get('catid'), $notify_type),
+		);
+
+		// Add FlexiContent custom fields as {FIELD_<NAME>} tags and as a {FIELDS} summary
+		if (FlexicontentHelperNotificationMail::isAvailable())
+		{
+			$template_data = array_merge($template_data, $this->getNotificationFieldTags());
 		}
 
 
@@ -5148,7 +5227,6 @@ class ParentClassItem extends FCModelAdmin
 		$from      = $app->getCfg( 'mailfrom' );
 		$fromname  = $app->getCfg( 'fromname' );
 		$recipient = $params->get('nf_send_as_bcc', 0) ? array($from) : $notify_emails;
-		$html_mode = true;
 		$cc  = null;
 		$bcc = $params->get('nf_send_as_bcc', 0) ? $notify_emails : null;
 		$attachment  = null;
@@ -5162,9 +5240,26 @@ class ParentClassItem extends FCModelAdmin
 			if ( isset($_bcc_[$from]) ) unset($bcc[$_bcc_[$from]]);
 		}
 
-		$send_result = \Joomla\CMS\Factory::getMailer()->sendMail( $from, $fromname, $recipient, $subject, $body, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
+		// Send through the Joomla mail template system, when available
+		$send_result = FlexicontentHelperNotificationMail::send(
+			$notify_type,
+			$notify_emails,
+			$template_data,
+			(string) $this->get('language'),
+			(bool) $params->get('nf_send_as_bcc', 0)
+		);
+
+		$template_used = $send_result !== null;
+
+		// Fallback to the legacy hardcoded email when the template system is not available
+		if ($send_result === null)
+		{
+			$html_mode = true;
+			$send_result = \Joomla\CMS\Factory::getMailer()->sendMail( $from, $fromname, $recipient, $subject, $body, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
+		}
 
 		$debug_str = ""
+			."<br/>MODE: " . ($template_used ? 'Joomla mail template: ' . $notify_type : 'legacy hardcoded email') . "<br/>"
 			."<br/>FROM: $from"
 			."<br/>FROMNAME:  $fromname <br/>"
 			."<br/>RECIPIENTS: " .implode(",", $recipient)

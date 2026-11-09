@@ -64,6 +64,7 @@
 	<!-- Site Language files Copy Section -->
 	<languages folder="site/language">
 		<language tag="en-GB">en-GB/en-GB.com_flexicontent.ini</language>
+		<language tag="en-GB">en-GB/en-GB.flexicontent.ini</language>
 	</languages>
 	
 	
@@ -113,6 +114,7 @@
 		<languages folder="admin/language">
 			<language tag="en-GB">en-GB/en-GB.com_flexicontent.ini</language>
 			<language tag="en-GB">en-GB/en-GB.com_flexicontent.sys.ini</language>
+			<language tag="en-GB">en-GB/en-GB.flexicontent.ini</language>
 		</languages>
 		
 		<params>
