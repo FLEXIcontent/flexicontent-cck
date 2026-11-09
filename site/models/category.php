@@ -419,41 +419,69 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		$app->input->set('limitstart', $limitstart);
 		$app->input->set('start', $limitstart);
 
-		try {
-			// 2, get items, we use direct query because some extensions break the SQL_CALC_FOUND_ROWS, so let's bypass them (at this point it is OK)
-			// *** Usage of FOUND_ROWS() will fail when (e.g.) Joom!Fish or Falang are installed, in this case we will be forced to re-execute the query ...
-			// PLUS, we don't need Joom!Fish or Falang layer at --this-- STEP which may slow down the query considerably in large sites
-			$query_limited = $query
-				. ' LIMIT ' . $limit
-				. ' OFFSET ' . $limitstart;
-			$rows = flexicontent_db::directQuery($query_limited);
-			$query_ids = array();
-			foreach ($rows as $row) $query_ids[] = $row->id;
-			//$this->_db->setQuery($query, $limitstart, $limit);
-			//$query_ids = $this->_db->loadColumn();
+		$caps = $this->_getAuthorCaps();
 
-			// 3, get current items total for pagination
-			$this->_db->setQuery("SELECT FOUND_ROWS()");
-			$this->_total = $this->_db->loadResult();
+		if ($caps)
+		{
+			// Author layout with limits: get all ordered ids, apply limits, then paginate the result
+			$rows = flexicontent_db::directQuery($query);
+			$seen = array();
+			$per_cat = array();
+			$all_ids = array();
+
+			foreach ($rows as $row)
+			{
+				if (isset($seen[$row->id])) continue;
+				if ($caps['per_cat'] && (isset($per_cat[$row->lim_catid]) ? $per_cat[$row->lim_catid] : 0) >= $caps['per_cat']) continue;
+
+				$seen[$row->id] = 1;
+				$per_cat[$row->lim_catid] = (isset($per_cat[$row->lim_catid]) ? $per_cat[$row->lim_catid] : 0) + 1;
+				$all_ids[] = (int) $row->id;
+
+				if ($caps['total'] && count($all_ids) >= $caps['total']) break;
+			}
+
+			$this->_total = count($all_ids);
+			$query_ids = $limit > 0 ? array_slice($all_ids, $limitstart, $limit) : $all_ids;
 		}
 
-		catch (Exception $e) {
-			// 2, get items via normal joomla SQL layer
-			$this->_db->setQuery($query, $limitstart, $limit);
-			$query_ids = $this->_db->loadColumn();
+		else
+		{
+			try {
+				// 2, get items, we use direct query because some extensions break the SQL_CALC_FOUND_ROWS, so let's bypass them (at this point it is OK)
+				// *** Usage of FOUND_ROWS() will fail when (e.g.) Joom!Fish or Falang are installed, in this case we will be forced to re-execute the query ...
+				// PLUS, we don't need Joom!Fish or Falang layer at --this-- STEP which may slow down the query considerably in large sites
+				$query_limited = $query
+					. ' LIMIT ' . $limit
+					. ' OFFSET ' . $limitstart;
+				$rows = flexicontent_db::directQuery($query_limited);
+				$query_ids = array();
+				foreach ($rows as $row) $query_ids[] = $row->id;
+				//$this->_db->setQuery($query, $limitstart, $limit);
+				//$query_ids = $this->_db->loadColumn();
 
-			// 3, get current items total for pagination
-			if (count($query_ids))
-			{
-				$this->_total = null;
-				$this->getTotal();
+				// 3, get current items total for pagination
+				$this->_db->setQuery("SELECT FOUND_ROWS()");
+				$this->_total = $this->_db->loadResult();
 			}
-			else
-			{
-				$this->_total = 0;
+
+			catch (Exception $e) {
+				// 2, get items via normal joomla SQL layer
+				$this->_db->setQuery($query, $limitstart, $limit);
+				$query_ids = $this->_db->loadColumn();
+
+				// 3, get current items total for pagination
+				if (count($query_ids))
+				{
+					$this->_total = null;
+					$this->getTotal();
+				}
+				else
+				{
+					$this->_total = 0;
+				}
 			}
 		}
-
 
 		// Assign total number of items found this will be used to decide whether to do item counting per filter value
 		global $fc_catview;
@@ -540,6 +568,25 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 	function &getParams()
 	{
 		return $this->_params;
+	}
+
+
+	/**
+	 * Get item limits of AUTHOR layout: total items and items per category (0 = unlimited)
+	 *
+	 * @return array|false  False if no limit is configured
+	 */
+	function _getAuthorCaps()
+	{
+		if ($this->_layout != 'author')
+		{
+			return false;
+		}
+
+		$total   = max(0, (int) $this->_params->get('author_limit_total', 0));
+		$per_cat = max(0, (int) $this->_params->get('author_limit_per_cat', 0));
+
+		return $total || $per_cat ? array('total' => $total, 'per_cat' => $per_cat) : false;
 	}
 
 
@@ -723,6 +770,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			$query = 'SELECT '
 				. ($count_total ? 'SQL_CALC_FOUND_ROWS' : '') . ' DISTINCT i.id '
 				. @ $orderby_col
+				. ($this->_getAuthorCaps() ? ', rel.catid AS lim_catid' : '')
 				;
 		}
 

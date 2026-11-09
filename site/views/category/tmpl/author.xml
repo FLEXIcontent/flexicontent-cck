@@ -32,6 +32,9 @@
 				<option value="5">FLEXI_LEVEL_5</option>
 			</field>
 			
+			<field name="author_limit_total" type="text" default="0" size="4" label="FLEXI_AUTHOR_LIMIT_TOTAL" description="FLEXI_AUTHOR_LIMIT_TOTAL_DESC" />
+			<field name="author_limit_per_cat" type="text" default="0" size="4" label="FLEXI_AUTHOR_LIMIT_PER_CAT" description="FLEXI_AUTHOR_LIMIT_PER_CAT_DESC" />
+
 			<field name="sep_conf_override" type="separator" default="FLEXI_CONFIGURATION_AUTHOR" description="FLEXI_CONFIGURATION_AUTHOR_DESC" level="level1" />
 			
 			<field name="override_defaultconf" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_ENABLE_OVERRIDE_CATEGORY" description="FLEXI_ENABLE_OVERRIDE_CATEGORY_DESC" class="btn-group group-fcmethod">
