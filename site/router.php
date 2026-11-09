@@ -420,6 +420,10 @@ class _FlexicontentSiteRouter
 
 						unset($query['authorid']);
 						unset($query['cid']);
+
+						// Category filters are configured only via the menu item, they must not appear in the SEF URL
+						unset($query['cids']);
+						unset($query['excl_cids']);
 						break;
 
 					case 'favs':

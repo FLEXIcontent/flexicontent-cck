@@ -47,6 +47,13 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 	var $_ids = array();
 
 	/**
+	 * Excluded category ids (used by AUTHOR layout), their descendants are excluded too
+	 *
+	 * @var array
+	 */
+	var $_excl_ids = array();
+
+	/**
 	 * Category properties
 	 *
 	 * @var object
@@ -220,6 +227,19 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			case 'author':
 				$this->_authorid = $jinput->get('authorid', 0, 'int');
 				$this->_authorid_slug = $jinput->get('authorid', 0, 'string');
+
+				// Optional multiple categories to include / exclude (in addition to single 'cid')
+				foreach (array('cids' => '_ids', 'excl_cids' => '_excl_ids') as $_var => $_prop)
+				{
+					$_list = $jinput->get($_var, array(), 'array');
+
+					if (!is_array($_list))
+					{
+						$_list = explode(',', preg_replace('/[^0-9,]/i', '', (string) $_list));
+					}
+
+					$this->$_prop = array_values(array_filter(array_unique(ArrayHelper::toInteger($_list))));
+				}
 				break;
 
 			case 'myitems':
@@ -1055,11 +1075,40 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 
 		if ($this->_id || count($this->_ids))
 		{
-			$id_arr = $this->_id ? array($this->_id) : $this->_ids;
+			$id_arr = array_values(array_unique(array_merge($this->_id ? array($this->_id) : array(), $this->_ids)));
+
+			// Author layout: selected categories always include their descendants, regardless of 'display_subcategories_items'
+			if ($this->_layout == 'author')
+			{
+				foreach ($id_arr as $_sel_id)
+				{
+					if (!empty($globalcats[$_sel_id]->descendantsarray))
+					{
+						foreach ($globalcats[$_sel_id]->descendantsarray as $_sub_id) $id_arr[] = (int) $_sub_id;
+					}
+				}
+				$id_arr = array_values(array_unique($id_arr));
+			}
 			// Get sub categories used to create items list, according to configuration and user access
 			$this->_getDataCats($id_arr);
 			$_data_cats = "'".implode("', '", $this->_data_cats)."'";
 			$where .= ' AND rel.catid IN ('.$_data_cats.')';
+		}
+
+		// Exclude items assigned to given categories (and their descendants), used by AUTHOR layout
+		if ($this->_layout == 'author' && count($this->_excl_ids))
+		{
+			$excl_cats = array();
+			foreach ($this->_excl_ids as $excl_id)
+			{
+				$excl_cats[$excl_id] = 1;
+				if (!empty($globalcats[$excl_id]->descendantsarray))
+				{
+					foreach ($globalcats[$excl_id]->descendantsarray as $subcatid) $excl_cats[(int) $subcatid] = 1;
+				}
+			}
+			$where .= ' AND NOT EXISTS (SELECT 1 FROM #__flexicontent_cats_item_relations AS excl_rel'
+				. ' WHERE excl_rel.itemid = i.id AND excl_rel.catid IN (' . implode(',', array_keys($excl_cats)) . '))';
 		}
 
 		// Get privilege to view non viewable items (upublished, archived, trashed, expired, scheduled).
@@ -1763,7 +1812,8 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		// Make sure category has been loaded
 		$this->getCategory();
 
-		if (!$this->_id && !count($this->_ids))
+		// Author layout lists only items, category filters must not produce sub-category links
+		if ($this->_layout == 'author' || (!$this->_id && !count($this->_ids)))
 		{
 			return array();
 		}
