@@ -287,6 +287,13 @@ Dans un corps HTML, il est possible d'utiliser des entités HTML :
 
 Dans un corps texte, il faut éviter d'écrire littéralement la séquence ou accepter qu'elle soit interprétée.
 
+Les entités HTML sont décodées dans l'expression avant analyse. Un éditeur WYSIWYG qui enregistre `&gt;=`, `&lt;` ou `&quot;` à la place de `>=`, `<` et `"` ne casse donc pas les conditions :
+
+```text
+{if field_price&gt;=100000}   →  {if field_price>=100000}
+{if field_floors&lt;10}        →  {if field_floors<10}
+```
+
 ---
 
 ## 6. Sémantique d'évaluation

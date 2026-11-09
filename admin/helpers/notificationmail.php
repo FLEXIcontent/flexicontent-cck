@@ -1165,7 +1165,10 @@ class FlexicontentHelperNotificationMail
 	 */
 	protected static function conditionParseExpression($expression, array &$diagnostics)
 	{
-		$expression = trim((string) $expression);
+		// A template edited in a WYSIWYG editor stores the comparison operators
+		// HTML encoded (&gt;=, &lt;, &quot;). Decode them before parsing, otherwise
+		// the condition is invalid and its content is always kept.
+		$expression = trim(html_entity_decode((string) $expression, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
 
 		if ($expression === '')
 		{

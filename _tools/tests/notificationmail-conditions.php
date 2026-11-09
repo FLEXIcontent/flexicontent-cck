@@ -138,6 +138,11 @@ check('editor_id', '{if editor_id=8}X{/if}', $ctx, 'X');
 check('raccourci champ', '{if floors=2}X{/if}', $ctx, 'X');
 check('champ html normalise', '{if field_html=Lyon}X{/if}', $ctx, 'X');
 
+check('entites html operateur >=', '{if field_floors&gt;=3}X{/if}', $ctx, 'X');
+check('entites html operateur <', '{if field_price&lt;300000}X{/if}', $ctx, 'X');
+check('entites html guillemets', '{if field_city=&quot;Lyon&quot;}X{/if}', $ctx, 'X');
+check('entites html comparaison fausse', '{if field_floors&gt;8}X{/if}', $ctx, '');
+
 check('condition invalide garde le contenu', 'A{if catid=}B{/if}C', $ctx, 'ABC');
 check('condition inconnue garde le contenu', 'A{if catid 11}B{/if}C', $ctx, 'ABC');
 check('if non ferme garde le contenu', 'A{if catid=12}B', $ctx, 'AB');
