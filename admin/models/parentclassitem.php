@@ -4893,15 +4893,26 @@ class ParentClassItem extends FCModelAdmin
 
 
 	/**
+	 * Method to get the FlexiContent custom fields used by the notification emails
+	 *
+	 * @return  array
+	 */
+	protected function getNotificationFields()
+	{
+		$fields = $this->getExtrafields(true);
+
+		return is_array($fields) ? $fields : array();
+	}
+
+
+	/**
 	 * Method to build the FlexiContent custom field tags used by the notification mail templates
 	 *
 	 * @return  array
 	 */
 	protected function getNotificationFieldTags()
 	{
-		$fields = $this->getExtrafields(true);
-
-		return FlexicontentHelperNotificationMail::getFieldTags(is_array($fields) ? $fields : array());
+		return FlexicontentHelperNotificationMail::getFieldTags($this->getNotificationFields());
 	}
 
 
@@ -5215,10 +5226,29 @@ class ParentClassItem extends FCModelAdmin
 		);
 
 		// Add FlexiContent custom fields as {FIELD_<NAME>} tags and as a {FIELDS} summary
+		$notification_fields = array();
+
 		if (FlexicontentHelperNotificationMail::isAvailable())
 		{
-			$template_data = array_merge($template_data, $this->getNotificationFieldTags());
+			$notification_fields = $this->getNotificationFields();
+			$template_data       = array_merge(
+				$template_data,
+				FlexicontentHelperNotificationMail::getFieldTags($notification_fields)
+			);
 		}
+
+		// Raw context used to evaluate the {if ...} blocks of the templates
+		$condition_context = array(
+			'catid'     => (int) $this->get('catid'),
+			'incat'     => array_map('intval', array_keys($after_cats)),
+			'state_id'  => (int) $this->get('state'),
+			'lang'      => FlexicontentHelperNotificationMail::getLanguage((string) $this->get('language')),
+			'type_id'   => (int) $this->get('type_id'),
+			'item_id'   => (int) $this->get('id'),
+			'author_id' => (int) $this->get('created_by'),
+			'editor_id' => (int) $user->get('id'),
+			'fields'    => FlexicontentHelperNotificationMail::getFieldConditionContext($notification_fields),
+		);
 
 
 		// **********
@@ -5246,7 +5276,8 @@ class ParentClassItem extends FCModelAdmin
 			$notify_emails,
 			$template_data,
 			(string) $this->get('language'),
-			(bool) $params->get('nf_send_as_bcc', 0)
+			(bool) $params->get('nf_send_as_bcc', 0),
+			$condition_context
 		);
 
 		$template_used = $send_result !== null;
@@ -5267,6 +5298,13 @@ class ParentClassItem extends FCModelAdmin
 			."<br/>SUBJECT: $subject <br/>"
 			."<br/><br/>**********<br/>BODY<br/>**********<br/> $body <br/>"
 			;
+
+		$condition_errors = FlexicontentHelperNotificationMail::getLastConditionErrors();
+
+		if ($condition_errors)
+		{
+			$debug_str .= "<br/><br/>CONDITIONS<br/>" . implode('<br/>', array_map('htmlspecialchars', $condition_errors)) . '<br/>';
+		}
 
 		if ($send_result) {
 			// OK
