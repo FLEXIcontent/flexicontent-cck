@@ -1660,17 +1660,32 @@ class FlexicontentTasksCore
 
 	private function _acRootUrl()
 	{
+		$root = '';
+
 		if (class_exists('\\Joomla\\CMS\\Uri\\Uri'))
 		{
-			return rtrim(\Joomla\CMS\Uri\Uri::root(true), '/');
+			$root = \Joomla\CMS\Uri\Uri::root(true);
 		}
-
-		if (class_exists('JUri'))
+		elseif (class_exists('JUri'))
 		{
-			return rtrim(JUri::root(true), '/');
+			$root = JUri::root(true);
 		}
 
-		return '';
+		$root = rtrim($root, '/');
+
+		/*
+		 * This endpoint is called directly (components/com_flexicontent/tasks/core.php),
+		 * so Joomla derives the base path from SCRIPT_NAME and returns the "tasks" folder
+		 * instead of the site root. Strip it so image / phpThumb URLs stay correct.
+		 */
+		$endpoint_path = '/components/com_flexicontent/tasks';
+
+		if ($root !== '' && substr($root, -strlen($endpoint_path)) === $endpoint_path)
+		{
+			$root = rtrim(substr($root, 0, -strlen($endpoint_path)), '/');
+		}
+
+		return $root;
 	}
 
 
