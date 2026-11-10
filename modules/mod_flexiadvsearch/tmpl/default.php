@@ -61,10 +61,11 @@ if ($search_ac_dropdown_width !== '' && (strlen($search_ac_dropdown_width) > 100
 // Rich suggestions configuration (module options only)
 $search_ac_rich         = (int) $params->get('search_ac_rich', 1);
 $search_ac_image_source = $params->get('search_ac_image_source', 'auto');
-$search_ac_image_source = in_array($search_ac_image_source, array('auto', 'field'), true) ? $search_ac_image_source : 'auto';
+$search_ac_image_source = in_array($search_ac_image_source, array('auto', 'field', 'type'), true) ? $search_ac_image_source : 'auto';
 $search_ac_image_field  = $params->get('search_ac_image_field', '');
 $search_ac_image_field  = is_array($search_ac_image_field) ? (string) reset($search_ac_image_field) : trim((string) $search_ac_image_field);
 $search_ac_image_field  = ($search_ac_image_field === '0' || !preg_match('/^[a-zA-Z0-9_\-]+$/', $search_ac_image_field)) ? '' : $search_ac_image_field;
+$search_ac_info_source  = $params->get('search_ac_info_source', 'module') === 'type' ? 'type' : 'module';
 $search_ac_image_width  = max(16, min(400, (int) $params->get('search_ac_image_width', 60)));
 $search_ac_image_height = max(16, min(400, (int) $params->get('search_ac_image_height', 60)));
 $search_ac_image_method = (int) $params->get('search_ac_image_method', 1) ? 1 : 0;
@@ -107,6 +108,7 @@ if ((int) $search_autocomplete === 1 && $search_ac_rich)
 		. ' data-fc_ac_image_method="' . $search_ac_image_method . '"'
 		. ' data-fc_ac_image_position="' . $search_ac_image_position . '"'
 		. ' data-fc_ac_title_maxlen="' . $search_ac_title_maxlen . '"'
+		. ' data-fc_ac_info_source="' . $search_ac_info_source . '"'
 		. ' data-fc_ac_info_fields="' . htmlspecialchars($search_ac_info_fields, ENT_QUOTES, 'UTF-8') . '"'
 		. ' data-fc_ac_info_labels="' . $search_ac_info_labels . '"'
 		. ' data-fc_ac_info_maxlen="' . $search_ac_info_maxlen . '"';

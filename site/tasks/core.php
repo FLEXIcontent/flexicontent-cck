@@ -312,10 +312,13 @@ class FlexicontentTasksCore
 		};
 
 		$ac_image_source = strtolower($ac_str('ac_image_source', 'auto'));
-		if (!in_array($ac_image_source, array('auto', 'field'), true))
+		if (!in_array($ac_image_source, array('auto', 'field', 'type'), true))
 		{
 			$ac_image_source = 'auto';
 		}
+
+		// Extra fields: 'module' = fields listed in the module, 'type' = fields set in the content type of each item
+		$ac_info_source = strtolower($ac_str('ac_info_source', 'module')) === 'type' ? 'type' : 'module';
 
 		$ac_image_field = strtolower($ac_str('ac_image_field', ''));
 		if ($ac_image_field === '0' || !preg_match('/^[a-z0-9_-]{1,100}$/', $ac_image_field))
@@ -768,6 +771,7 @@ class FlexicontentTasksCore
 					'image_method' => $ac_image_method,
 					'title_maxlen' => $ac_title_maxlen,
 					'info_fields'  => $ac_info_fields,
+					'info_source'  => $ac_info_source,
 					'info_labels'  => $ac_info_labels,
 					'info_maxlen'  => $ac_info_maxlen,
 				));
@@ -913,6 +917,7 @@ class FlexicontentTasksCore
 			'image_method' => 1,
 			'title_maxlen' => 60,
 			'info_fields'  => array(),
+			'info_source'  => 'module',
 			'info_labels'  => 1,
 			'info_maxlen'  => 80,
 		);
@@ -958,23 +963,104 @@ class FlexicontentTasksCore
 			$uids[$_uid] = $_uid;
 		}
 
+		// Content type settings (Content type -> Search view), used when the source is 'type'
+		$type_params = array();
+
+		if ($opts['image_source'] === 'type' || $opts['info_source'] === 'type')
+		{
+			$type_ids = array();
+			foreach ($items as $_row)
+			{
+				if ((int) $_row->type_id > 0)
+				{
+					$type_ids[(int) $_row->type_id] = (int) $_row->type_id;
+				}
+			}
+
+			if ($type_ids)
+			{
+				$query = 'SELECT id, attribs FROM #__flexicontent_types WHERE id IN (' . implode(',', $type_ids) . ')';
+
+				foreach ((array) $db->setQuery($query)->loadObjectList() as $_type)
+				{
+					$type_params[(int) $_type->id] = new \Joomla\Registry\Registry($_type->attribs);
+				}
+			}
+		}
+
+		// Sanitize a comma separated list of field names
+		$clean_names = function ($list)
+		{
+			$names = array();
+
+			foreach (preg_split('/\s*,\s*/', trim((string) $list)) as $_name)
+			{
+				$_name = strtolower(trim($_name));
+
+				if (preg_match('/^[a-z0-9_-]{1,100}$/', $_name) && !in_array($_name, $names, true))
+				{
+					$names[] = $_name;
+				}
+
+				if (count($names) >= 12)
+				{
+					break;
+				}
+			}
+
+			return $names;
+		};
+
+		// Image field and extra fields of every item, from the module or from the content type of the item
+		$item_image_field = array();
+		$item_info_fields = array();
+		$all_info_fields  = array();
+
+		foreach ($items as $_iid => $_row)
+		{
+			$_tp = isset($type_params[(int) $_row->type_id]) ? $type_params[(int) $_row->type_id] : null;
+
+			$_img = '';
+			if ($opts['image_source'] === 'field')
+			{
+				$_img = $opts['image_field'];
+			}
+			elseif ($opts['image_source'] === 'type' && $_tp)
+			{
+				$_names = $clean_names($_tp->get('search_image', ''));
+				$_img = $_names ? $_names[0] : '';
+			}
+			$item_image_field[$_iid] = $_img;
+
+			$item_info_fields[$_iid] = $opts['info_source'] === 'type'
+				? ($_tp ? $clean_names($_tp->get('search_infoflds', '')) : array())
+				: $opts['info_fields'];
+
+			$all_info_fields = array_merge($all_info_fields, $item_info_fields[$_iid]);
+		}
+
+		$all_info_fields = array_values(array_unique($all_info_fields));
+
 		// Query both the item id and its language parent, non-translatable fields are stored on the parent
-		$info = !empty($opts['info_fields'])
-			? $this->_getInfoFieldEntries($ids + $uids, $opts['info_fields'], $opts['info_maxlen'], $opts['info_labels'])
+		$info = !empty($all_info_fields)
+			? $this->_getInfoFieldEntries($ids + $uids, $all_info_fields, $opts['info_maxlen'], $opts['info_labels'])
 			: array();
 
-		$image_field  = null;
-		$image_params = array();
-		$image_values = array();
+		// Load every needed image field once (name => array(field, params, values), or null when not found)
+		$image_fields = array();
 
-		if ($opts['image_source'] === 'field' && $opts['image_field'] !== '')
+		foreach (array_unique(array_filter($item_image_field)) as $_img_name)
 		{
-			$image_field = $this->_getImageField($opts['image_field']);
+			$image_fields[$_img_name] = null;
+			$_field = $this->_getImageField($_img_name);
 
-			if ($image_field)
+			if ($_field)
 			{
-				$image_params = $this->_decodeFieldParams($image_field);
-				$image_values = $this->_getImageFieldValues($image_field, $ids + $uids);
+				$image_fields[$_img_name] = array(
+					'field'  => $_field,
+					'params' => $this->_decodeFieldParams($_field),
+					'values' => $this->_getImageFieldValues($_field, $ids + $uids),
+				);
 			}
 		}
 
@@ -994,17 +1080,21 @@ class FlexicontentTasksCore
 
 			$_image = '';
 
-			if ($image_field)
+			$_ifd = !empty($item_image_field[$_id]) && !empty($image_fields[$item_image_field[$_id]])
+				? $image_fields[$item_image_field[$_id]]
+				: null;
+
+			if ($_ifd)
 			{
 				// Prefer the image stored on the item itself (translatable field), then its language parent
-				if (isset($image_values[$_id]))
+				if (isset($_ifd['values'][$_id]))
 				{
-					$_image = $this->_imageFieldSrc($image_field, $image_params, $_id, $image_values[$_id]);
+					$_image = $this->_imageFieldSrc($_ifd['field'], $_ifd['params'], $_id, $_ifd['values'][$_id]);
 				}
 
-				if (!$_image && $_uid !== $_id && isset($image_values[$_uid]))
+				if (!$_image && $_uid !== $_id && isset($_ifd['values'][$_uid]))
 				{
-					$_image = $this->_imageFieldSrc($image_field, $image_params, $_uid, $image_values[$_uid]);
+					$_image = $this->_imageFieldSrc($_ifd['field'], $_ifd['params'], $_uid, $_ifd['values'][$_uid]);
 				}
 			}
 
@@ -1042,7 +1132,7 @@ class FlexicontentTasksCore
 
 			$_entries = array();
 
-			foreach ($opts['info_fields'] as $_field_name)
+			foreach ($item_info_fields[$_id] as $_field_name)
 			{
 				if (isset($_by_field[$_field_name]))
 				{

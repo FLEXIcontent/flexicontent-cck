@@ -1002,7 +1002,7 @@ body .form-grid {
 			display: flex;
 			align-items: flex-start;
 
-			> :nth-child(1) {
+			> :nth-child(1):not([role="tooltip"]):not(.rl-admin-popover-container) {
 				flex-grow: 0;
 				flex-shrink: 1;
 				flex-basis: auto;
@@ -1027,7 +1027,7 @@ body .form-grid {
 				max-width: 600px;
 			}
 
-			> div {
+			> div:not([role="tooltip"]):not(.rl-admin-popover-container) {
 				flex-grow: 1;
 				flex-shrink: 1;
 				display: flex;
