@@ -38,6 +38,7 @@
 			ac_image_method:  get('image_method', 1),
 			ac_image_position: get('image_position', 'left'),
 			ac_title_maxlen:  get('title_maxlen', 60),
+			ac_info_source:   get('info_source', 'module'),
 			ac_info_fields:   get('info_fields', ''),
 			ac_info_labels:   get('info_labels', 1),
 			ac_info_maxlen:   get('info_maxlen', 80)

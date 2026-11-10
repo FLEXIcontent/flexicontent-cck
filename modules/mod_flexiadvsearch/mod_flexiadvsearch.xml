@@ -211,6 +211,7 @@
 			<field name="search_ac_image_source" type="multilist" subtype="radio" default="auto" label="FLEXI_SEARCH_AC_IMAGE_SOURCE" description="FLEXI_SEARCH_AC_IMAGE_SOURCE_DESC" toggle_related="1" class="disp_richac btn-group btn-group-yesno">
 				<option value="auto" show_list="" hide_list="disp_imagefield">FLEXI_SEARCH_AC_IMAGE_AUTO</option>
 				<option value="field" show_list="disp_imagefield" hide_list="">FLEXI_SEARCH_AC_IMAGE_FIELD</option>
+				<option value="type" show_list="" hide_list="disp_imagefield">FLEXI_SEARCH_AC_USE_TYPE_SETTINGS</option>
 			</field>
 
 			<field name="search_ac_image_field" type="fields" field_type="image" fieldnameasvalue="1" filter="string" default="" label="FLEXI_SEARCH_AC_IMAGE_FIELD_LBL" description="FLEXI_SEARCH_AC_IMAGE_FIELD_LBL_DESC" class="disp_richac disp_imagefield" />
@@ -230,7 +231,12 @@
 
 			<field name="search_ac_title_maxlen" type="number" default="60" min="0" max="300" step="1" label="FLEXI_SEARCH_AC_TITLE_MAXLEN" description="FLEXI_SEARCH_AC_TITLE_MAXLEN_DESC" class="disp_richac" />
 
-			<field name="search_ac_info_fields" type="fields" issortable="1" fieldnameasvalue="1" filter="string" default="" label="FLEXI_SEARCH_AC_INFO_FIELDS" description="FLEXI_SEARCH_AC_INFO_FIELDS_DESC" class="disp_richac" />
+			<field name="search_ac_info_source" type="multilist" subtype="radio" default="module" label="FLEXI_SEARCH_AC_INFO_SOURCE" description="FLEXI_SEARCH_AC_INFO_SOURCE_DESC" toggle_related="1" class="disp_richac btn-group btn-group-yesno">
+				<option value="module" show_list="disp_infofields" hide_list="">FLEXI_SEARCH_AC_INFO_SOURCE_MODULE</option>
+				<option value="type" show_list="" hide_list="disp_infofields">FLEXI_SEARCH_AC_USE_TYPE_SETTINGS</option>
+			</field>
+
+			<field name="search_ac_info_fields" type="fields" issortable="1" fieldnameasvalue="1" filter="string" default="" label="FLEXI_SEARCH_AC_INFO_FIELDS" description="FLEXI_SEARCH_AC_INFO_FIELDS_DESC" class="disp_richac disp_infofields" />
 
 			<field name="search_ac_info_labels" type="radio" default="1" label="FLEXI_SEARCH_AC_INFO_LABELS" description="FLEXI_SEARCH_AC_INFO_LABELS_DESC" class="disp_richac btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>

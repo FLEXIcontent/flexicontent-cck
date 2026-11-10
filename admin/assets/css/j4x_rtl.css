@@ -926,7 +926,7 @@ body .form-grid .control-group .controls {
   display: flex;
   align-items: flex-start;
 }
-body .form-grid .control-group .controls > :nth-child(1) {
+body .form-grid .control-group .controls > :nth-child(1):not([role="tooltip"]):not(.rl-admin-popover-container) {
   flex-grow: 0;
   flex-shrink: 1;
   flex-basis: auto;
@@ -948,7 +948,7 @@ body .form-grid .control-group .controls > textarea {
 body .form-grid .control-group .controls > input.form-control {
   max-width: 600px;
 }
-body .form-grid .control-group .controls > div {
+body .form-grid .control-group .controls > div:not([role="tooltip"]):not(.rl-admin-popover-container) {
   flex-grow: 1;
   flex-shrink: 1;
   display: flex;
