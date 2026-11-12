@@ -12,6 +12,7 @@
 defined('_JEXEC') or die;
 
 require_once JPATH_ROOT . '/components/com_flexicontent/classes/helpers/security.php';
+require_once JPATH_ROOT . '/components/com_flexicontent/classes/helpers/fileeditor.php';
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
@@ -238,6 +239,10 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		}
 
 		$data['description'] = flexicontent_html::dataFilter($data['description'], 32000, 'STRING', 0);  // Limit description to 32000 characters
+
+		// Custom (HTML) properties: only enabled ones are taken from the request, others keep their existing value
+		unset($data['custom1'], $data['custom2']);
+		foreach (flexicontent_fileeditor::filterCustomPost($this->input->post) as $cname => $cvalue) $data[$cname] = $cvalue;
 		$data['hits'] = (int) $data['hits'];
 		$data['secure'] = $data['secure'] ? 1 : 0;   // Only allow 1 or 0
 		$data['stamp']  = $data['stamp'] ? 1 : 0;   // only allow 1 or 0
@@ -598,7 +603,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 				$savedFile = $model->getTable();
 				if ($savedFile->load($model->getId()))
 				{
-					$properties = array_flip(array('id', 'filename', 'filename_original', 'altname', 'description', 'ext'));
+					$properties = array_flip(array('id', 'filename', 'filename_original', 'altname', 'description', 'ext', 'custom1', 'custom2'));
 					$fileData = array_intersect_key((array) $savedFile, $properties);
 					$messages .= '<script type="application/json" id="fc-file-saved-data">' . json_encode($fileData, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE) . '</script>';
 				}
@@ -1110,6 +1115,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$fileObj->ext         = $ext;
 
 		$fileObj->description = $filedesc;
+		foreach (flexicontent_fileeditor::filterCustomPost($this->input) as $cname => $cvalue) $fileObj->$cname = $cvalue;
 		$fileObj->language    = strlen($filelang) ? $filelang : '*';
 		$fileObj->access      = strlen($fileaccess) ? $fileaccess : 1;
 		$fileObj->hits        = 0;
@@ -1357,6 +1363,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$fileObj->ext         = $ext;
 
 		$fileObj->description = $filedesc;
+		foreach (flexicontent_fileeditor::filterCustomPost($this->input) as $cname => $cvalue) $fileObj->$cname = $cvalue;
 		$fileObj->language    = strlen($filelang) ? $filelang : '*';
 		$fileObj->access      = strlen($fileaccess) ? $fileaccess : 1;
 
@@ -2147,6 +2154,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 					$fileObj->ext         = $ext;
 
 					$fileObj->description = $filedesc;
+					foreach (flexicontent_fileeditor::filterCustomPost($this->input) as $cname => $cvalue) $fileObj->$cname = $cvalue;
 					$fileObj->language    = strlen($filelang) ? $filelang : '*';
 					$fileObj->access      = strlen($fileaccess) ? $fileaccess : 1;
 

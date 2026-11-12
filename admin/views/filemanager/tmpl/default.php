@@ -11,6 +11,8 @@
 
 defined('_JEXEC') or die('Restricted access');
 
+require_once JPATH_SITE . '/components/com_flexicontent/classes/helpers/fileeditor.php';
+
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
@@ -1914,6 +1916,8 @@ if ($js)
 																</td>
 															</tr>
 
+<?php echo flexicontent_fileeditor::renderCustomRows((object) array('id' => 0, 'custom1' => '', 'custom2' => ''), '', 3); ?>
+
 															<tr>
 																<td id="file-lang-lbl-container" class="key <?php echo $this->tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_LANGUAGE', 'FLEXI_FILE_LANGUAGE_DESC', 1, 1); ?>">
 																	<label class="fc-prop-lbl" id="file-lang-lbl" for="file-lang">
@@ -2193,6 +2197,8 @@ $jMedia_file_displayData['mediaTypeNames'] = is_array($jMedia_file_displayData['
 															</td>
 														</tr>
 
+<?php echo flexicontent_fileeditor::renderCustomRows((object) array('id' => 0, 'custom1' => '', 'custom2' => ''), '', 3); ?>
+
 														<tr>
 															<td></td><td><input style="margin-top: 64px;" type="button" class="btn btn-primary" value="Advanced properties" onclick="jQuery('.advanced-file-props').toggle({ direction: 'left' }, 300);"/></td>
 														</tr>
@@ -2325,6 +2331,8 @@ $jMedia_file_displayData['mediaTypeNames'] = is_array($jMedia_file_displayData['
 															<textarea name="file-desc" cols="24" rows="6" id="file-desc_addFileForm" class="input-xxlarge"></textarea>
 														</td>
 													</tr>
+
+<?php echo flexicontent_fileeditor::renderCustomRows((object) array('id' => 0, 'custom1' => '', 'custom2' => ''), '', 3); ?>
 
 													<tr>
 														<td class="key <?php echo $this->tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip('FLEXI_FILE_FILTER_REGEX', 'FLEXI_FILE_FILTER_REGEX_DESC', 1, 1); ?>">

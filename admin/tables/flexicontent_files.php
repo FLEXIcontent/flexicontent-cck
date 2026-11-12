@@ -56,6 +56,12 @@ class flexicontent_files extends \Joomla\CMS\Table\Table
 	/** @var int */
 	var $stamp			= 1;
 
+	/** @var string|null Custom HTML property 1 (see File field params custom1_*) */
+	var $custom1		= null;
+
+	/** @var string|null Custom HTML property 2 (see File field params custom2_*) */
+	var $custom2		= null;
+
 	/** @var date */
 	var $uploaded			= '';
 

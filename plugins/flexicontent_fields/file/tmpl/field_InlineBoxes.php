@@ -246,6 +246,20 @@ HTML;
 	}
 
 
+	// Custom (HTML) file properties
+	$custom_form_html = '';
+	foreach ($custom_props as $cn => $cp)
+	{
+		if (!$cp['form']) continue;
+		$cv = plgFlexicontent_fieldsFile::getCustomFormValue($cp, $cn, $file_data, isset($form_data[$file_id]) ? $form_data[$file_id] : null);
+		$clabel = htmlspecialchars($cp['show_label'] ? $cp['label'] : '', ENT_QUOTES, 'UTF-8');
+		$custom_form_html .= '
+				<div class="'.$input_grp_class.' fc-xpended-row inlinefile-custom'.$cn.'-box">
+					'.($cp['show_label'] ? '<label class="' . $add_on_class . ' fc-lbl inlinefile-custom'.$cn.'-lbl" id="'.$elementid_n.'_custom'.$cn.'-lbl" for="'.$elementid_n.'_custom'.$cn.'">'.$clabel.'</label>' : '').'
+					<textarea id="'.$elementid_n.'_custom'.$cn.'" cols="24" rows="'.(int) $cp['rows'].'" name="'.$fieldname_n.'[custom'.$cn.']" class="fc_filecustom'.$cn.' fcfield_textareaval">'.htmlspecialchars($cv, ENT_QUOTES, 'UTF-8').'</textarea>
+				</div>';
+	}
+
 	$field->html[] = '
 
 		<span class="fc_filedata_storage_name" style="display:none;">'.$file_data->filename.'</span>
@@ -331,6 +345,8 @@ HTML;
 					</label>
 					<textarea id="'.$elementid_n.'_file-desc" cols="24" rows="3" name="'.$fieldname_n.'[file-desc]" class="fc_filedesc fcfield_textareaval">'.(!isset($form_data[$file_id]) ? $file_data->description : $form_data[$file_id]['file-desc']).'</textarea>
 				</div>' : '').
+
+			$custom_form_html.
 
 			( $iform_dir ? '
 				<div class="'.$input_grp_class.' fc-xpended-row inlinefile-secure-box">

@@ -2352,6 +2352,43 @@
 			<field name="file_editor_show_storage" type="radio" default="1" label="FLEXI_FILE_EDITOR_STORAGE" class="btn-group btn-group-yesno"><option value="0">JHIDE</option><option value="1">JSHOW</option></field>
 			<field name="file_editor_show_path" type="radio" default="0" label="FLEXI_FILE_EDITOR_PATH" class="btn-group btn-group-yesno"><option value="0">JHIDE</option><option value="1">JSHOW</option></field>
 
+			<field name="" type="separator" default="FLEXI_FILE_CUSTOM_GLOBAL_DESC" level="level3" class="alert alert-info" />
+			<field name="" type="separator" default="FLEXI_FILE_CUSTOM1_SEP" description="FLEXI_FILE_CUSTOM_SEP_DESC" level="level3" />
+			<field name="file_custom1_enable" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_ENABLE" description="FLEXI_FILE_CUSTOM_ENABLE_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="file-custom1-on">FLEXI_NO</option>
+				<option value="1" show_list="file-custom1-on" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="file_custom1_label" type="text" default="" label="FLEXI_FILE_CUSTOM_LABEL" description="FLEXI_FILE_CUSTOM_LABEL_DESC" depend_class="file-custom1-on" />
+			<field name="file_custom1_label_show" type="radio" default="1" label="FLEXI_FILE_CUSTOM_LABEL_SHOW" description="FLEXI_FILE_CUSTOM_LABEL_SHOW_DESC" depend_class="file-custom1-on" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="file_custom1_default" type="textarea" filter="raw" rows="3" cols="40" default="" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_FILE_CUSTOM_DEFAULT_DESC" depend_class="file-custom1-on" />
+			<field name="file_custom1_rows" type="number" default="2" min="1" max="30" step="1" label="FLEXI_FILE_CUSTOM_ROWS" description="FLEXI_FILE_CUSTOM_ROWS_DESC" depend_class="file-custom1-on" />
+			<field name="file_custom1_default_use" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC" depend_class="file-custom1-on">
+				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
+				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
+				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
+			</field>
+
+			<field name="" type="separator" default="FLEXI_FILE_CUSTOM2_SEP" description="FLEXI_FILE_CUSTOM_SEP_DESC" level="level3" />
+			<field name="file_custom2_enable" type="multilist" subtype="radio" toggle_related="1" default="0" label="FLEXI_ENABLE" description="FLEXI_FILE_CUSTOM_ENABLE_DESC" class="btn-group btn-group-yesno">
+				<option value="0" show_list="" hide_list="file-custom2-on">FLEXI_NO</option>
+				<option value="1" show_list="file-custom2-on" hide_list="">FLEXI_YES</option>
+			</field>
+			<field name="file_custom2_label" type="text" default="" label="FLEXI_FILE_CUSTOM_LABEL" description="FLEXI_FILE_CUSTOM_LABEL_DESC" depend_class="file-custom2-on" />
+			<field name="file_custom2_label_show" type="radio" default="1" label="FLEXI_FILE_CUSTOM_LABEL_SHOW" description="FLEXI_FILE_CUSTOM_LABEL_SHOW_DESC" depend_class="file-custom2-on" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="file_custom2_default" type="textarea" filter="raw" rows="3" cols="40" default="" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_FILE_CUSTOM_DEFAULT_DESC" depend_class="file-custom2-on" />
+			<field name="file_custom2_rows" type="number" default="2" min="1" max="30" step="1" label="FLEXI_FILE_CUSTOM_ROWS" description="FLEXI_FILE_CUSTOM_ROWS_DESC" depend_class="file-custom2-on" />
+			<field name="file_custom2_default_use" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC" depend_class="file-custom2-on">
+				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
+				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
+				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
+			</field>
+
 			<field name="" type="separator" default="FLEXI_LIMITS" icon_class="icon-lock" level="tab_open" box_type="1" remove_boxes="2" />
 			<field name="upload_maxsize" type="text" size="50" default="10000000" label="FLEXI_MAXIMUM_SIZE_LABEL" description="FLEXI_MAXIMUM_SIZE_DESC" />
 			<field name="upload_extensions" type="textarea" rows="2" default="bmp,wbmp,csv,doc,docx,webp,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,txt,xcf,xls,xlsx,zip,ics" label="FLEXI_ALLOWED_EXTENSIONS" description="FLEXI_ALLOWED_EXTENSIONS_DESC" class="input-xxlarge" />

@@ -289,6 +289,8 @@ HTML;
 			</td>
 		</tr>
 
+		<?php echo flexicontent_fileeditor::renderCustomRows($this->row, $fc_atum_control, 5); ?>
+
 
 		<?php if ($this->row->url != 1) : ?>
 

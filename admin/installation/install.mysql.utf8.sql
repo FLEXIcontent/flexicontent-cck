@@ -163,6 +163,8 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_files` (
   `size` int(11) unsigned NOT NULL default '0',
   `assignments` int(11) unsigned NOT NULL default '0',
   `stamp` tinyint(3) unsigned NOT NULL default '1',
+  `custom1` mediumtext NULL,
+  `custom2` mediumtext NULL,
   `uploaded` datetime NOT NULL default '1000-01-01 00:00:00',
   `uploaded_by` int(11) unsigned NOT NULL default '0',
   `checked_out` int(11) unsigned NOT NULL default '0',
