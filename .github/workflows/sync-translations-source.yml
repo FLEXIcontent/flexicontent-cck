@@ -1,5 +1,5 @@
 # .github/workflows/sync-translations-source.yml
-name: Sync en-GB sources to flexicontent-translations
+name: Sync en-GB sources to translations repo
 
 on:
   push:
@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       dry_run:
-        description: 'Simulation (aucun commit)'
+        description: 'Simulation (aucun fichier modifié, aucun commit)'
         type: boolean
         default: true
 
@@ -20,36 +20,84 @@ concurrency:
 
 jobs:
   sync:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           path: cck
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           repository: FLEXIcontent/flexicontent-translations
-          token: ${{ secrets.TRANSLATIONS_PAT }}   # fine-grained, contents:write sur ce seul dépôt
+          token: ${{ secrets.TRANSLATIONS_PAT }}
           path: tr
 
-      - name: Sync sources into resources/
+      - name: Map and sync en-GB sources into resources/
         env:
-          DRY: ${{ github.event.inputs.dry_run == 'true' && '-n' || '' }}
+          DRY: ${{ github.event.inputs.dry_run == 'true' }}
         run: |
-          mkdir -p tr/resources
-          # --delete ne supprime que les fichiers qui correspondent aux include
-          # (tout le reste est protégé par --exclude='*')
-          rsync -a $DRY -v --prune-empty-dirs --delete \
-            --include='*/' \
-            --include='admin/language/en-GB/*.ini' \
-            --include='site/language/en-GB/*.ini' \
-            --include='site/templates/*/language/en-GB/*.ini' \
-            --include='modules/**/language/*.ini' \
-            --include='modules/**/language/en-GB/*.ini' \
-            --include='plugins/**/en-GB.*.ini' \
-            --include='plugins/**/en-GB/*.ini' \
-            --exclude='*' \
-            cck/ tr/resources/
+          set -euo pipefail
+
+          # Fichiers du cck à ne PAS envoyer (chemins relatifs à la racine du cck)
+          SKIP=(
+            # "admin/language/en-GB/en-GB.flexicontent.ini"
+            # "site/language/en-GB/en-GB.flexicontent.ini"
+          )
+
+          STAGE="$(mktemp -d)"
+
+          # 1) Construire l'arborescence cible (noms sans préfixe en-GB.)
+          while IFS= read -r -d '' f; do
+            rel="${f#cck/}"
+            for s in "${SKIP[@]:-}"; do
+              [[ -n "$s" && "$rel" == "$s" ]] && continue 2
+            done
+            dir="$(dirname "$rel")"
+            base="$(basename "$rel")"
+            case "$rel" in
+              site/templates/*/language/en-GB/en-GB.ini)
+                tpl="${rel#site/templates/}"; tpl="${tpl%%/*}"
+                base="$tpl.ini" ;;
+              *)
+                base="${base#en-GB.}" ;;
+            esac
+            mkdir -p "$STAGE/$dir"
+            cp "$f" "$STAGE/$dir/$base"
+          done < <(find cck/admin/language/en-GB cck/site/language/en-GB \
+                        cck/site/templates cck/modules cck/plugins \
+                        -type f -name 'en-GB*.ini' -print0)
+
+          # 2) Comparer au contenu actuel de resources/ et copier si besoin
+          new=0; upd=0; same=0
+          while IFS= read -r -d '' f; do
+            rel="${f#$STAGE/}"
+            dest="tr/resources/$rel"
+            if [ ! -f "$dest" ]; then
+              echo "NEW      $rel"; new=$((new+1))
+            elif ! cmp -s "$f" "$dest"; then
+              echo "UPDATED  $rel"; upd=$((upd+1))
+            else
+              same=$((same+1)); continue
+            fi
+            if [ "$DRY" != "true" ]; then
+              mkdir -p "$(dirname "$dest")"
+              cp "$f" "$dest"
+            fi
+          done < <(find "$STAGE" -type f -name '*.ini' -print0)
+
+          # 3) Signaler (sans supprimer) les .ini de resources/ absents du cck
+          orphans=0
+          while IFS= read -r -d '' f; do
+            rel="${f#tr/resources/}"
+            if [ ! -f "$STAGE/$rel" ]; then
+              echo "ORPHAN   $rel"; orphans=$((orphans+1))
+            fi
+          done < <(find tr/resources/admin tr/resources/site \
+                        tr/resources/modules tr/resources/plugins \
+                        -type f -name '*.ini' -print0 2>/dev/null)
+
+          echo "----"
+          echo "new=$new updated=$upd unchanged=$same orphans=$orphans (dry_run=$DRY)"
 
       - name: Commit and push
         if: ${{ github.event.inputs.dry_run != 'true' }}
