@@ -2457,10 +2457,11 @@
 		// Attach select2 to specific to select elements having specific CSS class, for select-multiple show values as togglable checkboxes
 		elemsJ.each(function()
 		{
-			function fc_formatSel2Option(item)
+			function fc_formatSel2Option(item, container, query, escapeMarkup)
 			{
 				var data_title = jQuery(item.element).attr('data-title');
-				return !data_title ? item.text : "<div title='" + data_title + "'>" + item.text + "</div>";
+				var result_text = escapeMarkup(item.text);
+				return !data_title ? result_text : "<div title='" + escapeMarkup(data_title) + "'>" + result_text + "</div>";
 			}
 
 			var sel_EL = jQuery(this);
