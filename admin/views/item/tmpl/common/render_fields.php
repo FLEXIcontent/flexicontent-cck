@@ -114,18 +114,18 @@ if ( !$this->params->get('auto_title', 0) || $usetitle ) :  ob_start();  // titl
 			<!-- tabber start -->
 			<div class="fctabber tabber-inline s-gray tabber-lang" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
 				<div class="tabbertab fc-tabbed-field-box" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" >
-					<h3 class="tabberheading"> <?php echo '-'.$this->itemlang->name.'-'; ?> </h3>
+					<h3 class="tabberheading"> <?php echo '-'.htmlspecialchars((string) $this->itemlang->name, ENT_QUOTES, 'UTF-8').'-'; ?> </h3>
 					<?php echo $this->form->getInput('title');?>
 				</div>
 				<?php foreach ($this->row->item_translations as $t): ?>
 					<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*' && !in_array($t->code, $disable_langs)) : ?>
 						<div class="tabbertab fc-tabbed-field-box" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" >
-							<h3 class="tabberheading"> <?php echo $t->name; // $t->shortcode; ?> </h3>
+							<h3 class="tabberheading"> <?php echo htmlspecialchars((string) $t->name, ENT_QUOTES, 'UTF-8'); // $t->shortcode; ?> </h3>
 							<?php
 							$ff_id = 'jfdata_'.$t->shortcode.'_title';
 							$ff_name = 'jfdata['.$t->shortcode.'][title]';
 							?>
-							<input class="fc_form_title fcfield_textareaval" type="text" id="<?php echo $ff_id; ?>" name="<?php echo $ff_name; ?>" value="<?php echo @$t->fields->title->value; ?>" size="36" maxlength="254" />
+							<input class="fc_form_title fcfield_textareaval" type="text" id="<?php echo $ff_id; ?>" name="<?php echo $ff_name; ?>" value="<?php echo htmlspecialchars($t->fields->title->value ?? '', ENT_QUOTES, 'UTF-8'); ?>" size="36" maxlength="254" />
 						</div>
 					<?php endif; ?>
 				<?php endforeach; ?>
@@ -178,18 +178,18 @@ if ($usealias) : ob_start();  // alias ?>
 			<!-- tabber start -->
 			<div class="fctabber tabber-inline s-gray tabber-lang" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
 				<div class="tabbertab fc-tabbed-field-box" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" >
-					<h3 class="tabberheading"> <?php echo '-'.$this->itemlang->name.'-'; ?> </h3>
+					<h3 class="tabberheading"> <?php echo '-'.htmlspecialchars((string) $this->itemlang->name, ENT_QUOTES, 'UTF-8').'-'; ?> </h3>
 					<?php echo $this->form->getInput('alias');?>
 				</div>
 				<?php foreach ($this->row->item_translations as $t): ?>
 					<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*' && !in_array($t->code, $disable_langs)) : ?>
 						<div class="tabbertab fc-tabbed-field-box" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" >
-							<h3 class="tabberheading"> <?php echo $t->name; // $t->shortcode; ?> </h3>
+							<h3 class="tabberheading"> <?php echo htmlspecialchars((string) $t->name, ENT_QUOTES, 'UTF-8'); // $t->shortcode; ?> </h3>
 							<?php
 							$ff_id = 'jfdata_'.$t->shortcode.'_alias';
 							$ff_name = 'jfdata['.$t->shortcode.'][alias]';
 							?>
-							<input class="fc_form_alias fcfield_textareaval" type="text" id="<?php echo $ff_id; ?>" name="<?php echo $ff_name; ?>" value="<?php echo @$t->fields->alias->value; ?>" size="36" maxlength="254" />
+							<input class="fc_form_alias fcfield_textareaval" type="text" id="<?php echo $ff_id; ?>" name="<?php echo $ff_name; ?>" value="<?php echo htmlspecialchars($t->fields->alias->value ?? '', ENT_QUOTES, 'UTF-8'); ?>" size="36" maxlength="254" />
 						</div>
 					<?php endif; ?>
 				<?php endforeach; ?>
@@ -288,7 +288,7 @@ if ($uselang) : ob_start();  // lang ?>
 			) : ?>
 				<?php echo $this->lists['languages']; ?>
 			<?php else: ?>
-				<?php echo $this->itemlang->image.' ['.$this->itemlang->name.']'; ?>
+				<?php echo $this->itemlang->image.' ['.htmlspecialchars((string) $this->itemlang->name, ENT_QUOTES, 'UTF-8').']'; ?>
 			<?php endif; ?>
 		</div>
 
@@ -1181,18 +1181,18 @@ if ( $typeid && $usemetadata ) : ob_start(); // metadata ?>
 					<!-- tabber start -->
 					<div class="fctabber tabber-inline s-gray tabber-lang" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
 						<div class="tabbertab fc-tabbed-field-box" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" >
-							<h3 class="tabberheading"> <?php echo '-'.$this->itemlang->name.'-'; ?> </h3>
+							<h3 class="tabberheading"> <?php echo '-'.htmlspecialchars((string) $this->itemlang->name, ENT_QUOTES, 'UTF-8').'-'; ?> </h3>
 							<?php echo $this->form->getInput('metadesc'); ?>
 						</div>
 						<?php foreach ($this->row->item_translations as $t): ?>
 							<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*' && !in_array($t->code, $disable_langs)) : ?>
 								<div class="tabbertab fc-tabbed-field-box" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" >
-									<h3 class="tabberheading"> <?php echo $t->name; // $t->shortcode; ?> </h3>
+									<h3 class="tabberheading"> <?php echo htmlspecialchars((string) $t->name, ENT_QUOTES, 'UTF-8'); // $t->shortcode; ?> </h3>
 									<?php
 									$ff_id = 'jfdata_'.$t->shortcode.'_metadesc';
 									$ff_name = 'jfdata['.$t->shortcode.'][metadesc]';
 									?>
-									<textarea id="<?php echo $ff_id; ?>" class="fcfield_textareaval" rows="3" cols="46" name="<?php echo $ff_name; ?>"><?php echo @$t->fields->metadesc->value; ?></textarea>
+									<textarea id="<?php echo $ff_id; ?>" class="fcfield_textareaval" rows="3" cols="46" name="<?php echo $ff_name; ?>"><?php echo htmlspecialchars($t->fields->metadesc->value ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
 								</div>
 							<?php endif; ?>
 						<?php endforeach; ?>
@@ -1222,18 +1222,18 @@ if ( $typeid && $usemetadata ) : ob_start(); // metadata ?>
 					<!-- tabber start -->
 					<div class="fctabber tabber-inline s-gray tabber-lang" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
 						<div class="tabbertab fc-tabbed-field-box" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" >
-							<h3 class="tabberheading"> <?php echo '-'.$this->itemlang->name.'-'; ?> </h3>
+							<h3 class="tabberheading"> <?php echo '-'.htmlspecialchars((string) $this->itemlang->name, ENT_QUOTES, 'UTF-8').'-'; ?> </h3>
 							<?php echo $this->form->getInput('metakey'); ?>
 						</div>
 						<?php foreach ($this->row->item_translations as $t): ?>
 							<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*' && !in_array($t->code, $disable_langs)) : ?>
 								<div class="tabbertab fc-tabbed-field-box" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" >
-									<h3 class="tabberheading"> <?php echo $t->name; // $t->shortcode; ?> </h3>
+									<h3 class="tabberheading"> <?php echo htmlspecialchars((string) $t->name, ENT_QUOTES, 'UTF-8'); // $t->shortcode; ?> </h3>
 									<?php
 									$ff_id = 'jfdata_'.$t->shortcode.'_metakey';
 									$ff_name = 'jfdata['.$t->shortcode.'][metakey]';
 									?>
-									<textarea id="<?php echo $ff_id; ?>" class="fcfield_textareaval" rows="3" cols="46" name="<?php echo $ff_name; ?>"><?php echo @$t->fields->metakey->value; ?></textarea>
+									<textarea id="<?php echo $ff_id; ?>" class="fcfield_textareaval" rows="3" cols="46" name="<?php echo $ff_name; ?>"><?php echo htmlspecialchars($t->fields->metakey->value ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
 								</div>
 							<?php endif; ?>
 						<?php endforeach; ?>
@@ -1889,7 +1889,7 @@ if ($this->fields && $typeid) :
 					
 					<div class="fctabber tabber-inline s-gray tabber-lang" id="fcform_tabset_<?php echo $tabSetCnt; ?>">
 						<div class="tabbertab fc-tabbed-field-box" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" >
-							<h3 class="tabberheading"> <?php echo '- '.$this->itemlang->name.' -'; ?> </h3>
+							<h3 class="tabberheading"> <?php echo '- '.htmlspecialchars((string) $this->itemlang->name, ENT_QUOTES, 'UTF-8').' -'; ?> </h3>
 							<?php
 								$field_tab_labels = & $field->tab_labels;
 								$field_html       = & $field->html;
@@ -1899,7 +1899,7 @@ if ($this->fields && $typeid) :
 						<?php foreach ($this->row->item_translations as $t): ?>
 							<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*' && !in_array($t->code, $disable_langs)) : ?>
 								<div class="tabbertab fc-tabbed-field-box" id="fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>" >
-									<h3 class="tabberheading"> <?php echo $t->name; // $t->shortcode; ?> </h3>
+									<h3 class="tabberheading"> <?php echo htmlspecialchars((string) $t->name, ENT_QUOTES, 'UTF-8'); // $t->shortcode; ?> </h3>
 									<?php
 									$field_tab_labels = & $t->fields->text->tab_labels;
 									$field_html       = & $t->fields->text->html;

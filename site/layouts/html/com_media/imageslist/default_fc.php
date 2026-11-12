@@ -142,7 +142,7 @@ if (count($this->images) > 0 || count($this->videos) > 0 || count($this->docs) >
 			$folder =  &$this->folders[$i];
 			?>
 			<li class="imgOutline thumbnail height-80 width-80 center">
-				<a href="index.php?option=com_media&amp;view=imagesList&amp;layout=<?php echo $this->viewLayout;?>&amp;tmpl=component&amp;folder=<?php echo $folder->path_relative; ?>&amp;asset=<?php echo $asset;?>&amp;author=<?php echo $author;?>" target="imageframe">
+				<a href="index.php?option=com_media&amp;view=imagesList&amp;layout=<?php echo $this->viewLayout;?>&amp;tmpl=component&amp;folder=<?php echo htmlspecialchars((string) $folder->path_relative, ENT_QUOTES, 'UTF-8'); ?>&amp;asset=<?php echo htmlspecialchars((string) $asset, ENT_QUOTES, 'UTF-8'); ?>&amp;author=<?php echo htmlspecialchars((string) $author, ENT_QUOTES, 'UTF-8'); ?>" target="imageframe">
 					<div class="imgFolder">
 						<span class="icon-folder-2"></span>
 					</div>
@@ -163,7 +163,7 @@ if (count($this->images) > 0 || count($this->videos) > 0 || count($this->docs) >
 			?>
 
 			<li class="imgOutline thumbnail height-80 width-80 center">
-				<a class="img-preview" href="javascript:ImageManager.populateFields('<?php echo $file->path_relative; ?>')" title="<?php echo $file->name; ?>" >
+				<a class="img-preview" href="javascript:ImageManager.populateFields('<?php echo htmlspecialchars(addcslashes((string) $file->path_relative, "\\'"), ENT_QUOTES, 'UTF-8'); ?>')" title="<?php echo htmlspecialchars((string) $file->name, ENT_QUOTES, 'UTF-8'); ?>" >
 					<div class="imgThumb">
 						<div class="imgThumbInside">
 							<?php echo \Joomla\CMS\HTML\HTMLHelper::_('image', $file->icon_32, $file->name, null, true, true) ? \Joomla\CMS\HTML\HTMLHelper::_('image', $file->icon_32, $file->title, null, true) : \Joomla\CMS\HTML\HTMLHelper::_('image', 'media/con_info.png', $file->name, null, true); ?>
@@ -190,7 +190,7 @@ if (count($this->images) > 0 || count($this->videos) > 0 || count($this->docs) >
 			?>
 
 			<li class="imgOutline thumbnail height-80 width-80 center">
-				<a class="img-preview" href="javascript:ImageManager.populateFields('<?php echo $file->path_relative; ?>')" title="<?php echo $file->name; ?>" >
+				<a class="img-preview" href="javascript:ImageManager.populateFields('<?php echo htmlspecialchars(addcslashes((string) $file->path_relative, "\\'"), ENT_QUOTES, 'UTF-8'); ?>')" title="<?php echo htmlspecialchars((string) $file->name, ENT_QUOTES, 'UTF-8'); ?>" >
 					<div class="imgThumb">
 						<div class="imgThumbInside">
 							<?php echo \Joomla\CMS\HTML\HTMLHelper::_('image', $file->icon_32, $file->name, null, true, true) ? \Joomla\CMS\HTML\HTMLHelper::_('image', $file->icon_32, $file->title, null, true) : \Joomla\CMS\HTML\HTMLHelper::_('image', 'media/con_info.png', $file->name, null, true); ?>
@@ -200,7 +200,7 @@ if (count($this->images) > 0 || count($this->videos) > 0 || count($this->docs) >
 						<?php echo \Joomla\CMS\HTML\HTMLHelper::_('string.truncate', $file->name, 10, false); ?>
 					</div>
 				</a>
-				<span class="video-preview-icon btn icon-search" style="z-index: 2; position: absolute; bottom: 0; right: 0; padding: 4px; box-sizing: content-box; margin: 0;" href="<?php echo COM_MEDIA_BASEURL, '/', $file->name; ?>" title="<?php echo $file->name; ?>"></span>
+				<span class="video-preview-icon btn icon-search" style="z-index: 2; position: absolute; bottom: 0; right: 0; padding: 4px; box-sizing: content-box; margin: 0;" href="<?php echo COM_MEDIA_BASEURL, '/', htmlspecialchars((string) $file->name, ENT_QUOTES, 'UTF-8'); ?>" title="<?php echo htmlspecialchars((string) $file->name, ENT_QUOTES, 'UTF-8'); ?>"></span>
 			</li>
 			<?php
 			FLEXI_J40GE
@@ -217,7 +217,7 @@ if (count($this->images) > 0 || count($this->videos) > 0 || count($this->docs) >
 			?>
 
 			<li class="imgOutline thumbnail height-80 width-80 center">
-				<a class="img-preview" href="javascript:ImageManager.populateFields('<?php echo $file->path_relative; ?>')" title="<?php echo $file->name; ?>" >
+				<a class="img-preview" href="javascript:ImageManager.populateFields('<?php echo htmlspecialchars(addcslashes((string) $file->path_relative, "\\'"), ENT_QUOTES, 'UTF-8'); ?>')" title="<?php echo htmlspecialchars((string) $file->name, ENT_QUOTES, 'UTF-8'); ?>" >
 					<div class="imgThumb">
 						<div class="imgThumbInside">
 						<?php echo \Joomla\CMS\HTML\HTMLHelper::_('image', $this->baseURL . '/' . $file->path_relative, \Joomla\CMS\Language\Text::sprintf('COM_MEDIA_IMAGE_TITLE', $file->title, \Joomla\CMS\HTML\HTMLHelper::_('number.bytes', $file->size)), array('width' => $file->width_60, 'height' => $file->height_60)); ?>
@@ -227,7 +227,7 @@ if (count($this->images) > 0 || count($this->videos) > 0 || count($this->docs) >
 						<?php echo \Joomla\CMS\HTML\HTMLHelper::_('string.truncate', $file->name, 10, false); ?>
 					</div>
 				</a>
-				<span class="img-preview-icon btn icon-search" style="z-index: 2; position: absolute; bottom: 0; right: 0; padding: 4px; box-sizing: content-box; margin: 0;" href="<?php echo COM_MEDIA_BASEURL, '/', $file->name; ?>" title="<?php echo $file->name; ?>"></span>
+				<span class="img-preview-icon btn icon-search" style="z-index: 2; position: absolute; bottom: 0; right: 0; padding: 4px; box-sizing: content-box; margin: 0;" href="<?php echo COM_MEDIA_BASEURL, '/', htmlspecialchars((string) $file->name, ENT_QUOTES, 'UTF-8'); ?>" title="<?php echo htmlspecialchars((string) $file->name, ENT_QUOTES, 'UTF-8'); ?>"></span>
 			</li>
 			<?php
 			FLEXI_J40GE

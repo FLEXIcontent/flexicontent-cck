@@ -14,6 +14,13 @@ $author     = $input->getCmd('author');
 $asset      = $input->getCmd('asset');
 $filetypes  = $input->getString('filetypes', '');
 
+// 'filetypes' is only ever a comma-separated list of media kinds (e.g. 'folders,images,docs'),
+// anything else is dropped: the value is echoed into the #imageframe src attribute below
+if (!preg_match('/^[A-Za-z0-9,_-]*$/', $filetypes))
+{
+	$filetypes = '';
+}
+
 // This needed if you are creating a custom named layout for 'imagesList' view
 $this->imagesListLayout = 'default_fc';
 
@@ -225,7 +232,7 @@ else // XTD Image plugin
 
 		</div>
 
-		<iframe style="display:block; box-sizing: border-box;" id="imageframe" name="imageframe" src="index.php?option=com_media&amp;view=imagesList&amp;filetypes=<?php echo $filetypes; ?>&amp;layout=default_fc&amp;tmpl=component&amp;folder=<?php echo $this->state->folder; ?>&amp;asset=<?php echo $asset; ?>&amp;author=<?php echo $author; ?>"></iframe>
+		<iframe style="display:block; box-sizing: border-box;" id="imageframe" name="imageframe" src="index.php?option=com_media&amp;view=imagesList&amp;filetypes=<?php echo htmlspecialchars($filetypes, ENT_QUOTES, 'UTF-8'); ?>&amp;layout=default_fc&amp;tmpl=component&amp;folder=<?php echo htmlspecialchars((string) $this->state->folder, ENT_QUOTES, 'UTF-8'); ?>&amp;asset=<?php echo htmlspecialchars((string) $asset, ENT_QUOTES, 'UTF-8'); ?>&amp;author=<?php echo htmlspecialchars((string) $author, ENT_QUOTES, 'UTF-8'); ?>"></iframe>
 
 		<?php if (!$this->state->get('field.id')) : ?>
 		<div class="well">
