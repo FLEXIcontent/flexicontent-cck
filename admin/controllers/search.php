@@ -45,17 +45,7 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 
 	function purge()
 	{
-		$app = \Joomla\CMS\Factory::getApplication();
-
-		if ($app->input->getMethod() !== 'POST' || !\Joomla\CMS\Session\Session::checkToken('post'))
-		{
-			throw new \Exception(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'), 403);
-		}
-
-		if (!FlexicontentHelperPerm::getPerm()->CanIndex)
-		{
-			throw new \Exception(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'), 403);
-		}
+		$this->requireIndexMutation();
 
 		$model = $this->getModel('search');
 		$model->purge();
@@ -66,8 +56,31 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 
 	function custom_order()
 	{
+		$this->requireIndexMutation();
 		flexicontent_db::setValues_commonDataTypes(null, true);
 		$msg = \Joomla\CMS\Language\Text::_('FLEXI_CUSTOM_ORDER_INDEXES_UPDATED');
 		$this->setRedirect('index.php?option=com_flexicontent&view=search', $msg);
+	}
+
+	/** Enforce the same authority as the Search screen before changing indexes. */
+	private function requireIndexMutation()
+	{
+		$app = \Joomla\CMS\Factory::getApplication();
+		$user = $app->getIdentity();
+		if (!$app->isClient('administrator') || !$user->id
+			|| !$user->authorise('flexicontent.managefields', 'com_flexicontent')
+			|| !($user->authorise('flexicontent.createfield', 'com_flexicontent')
+				|| $user->authorise('flexicontent.editfield', 'com_flexicontent')))
+		{
+			throw new \RuntimeException(\Joomla\CMS\Language\Text::_('JERROR_ALERTNOAUTHOR'), 403);
+		}
+		if (strtoupper($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST')
+		{
+			throw new \RuntimeException('POST request required', 405);
+		}
+		if (!\Joomla\CMS\Session\Session::checkToken('post'))
+		{
+			throw new \RuntimeException(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'), 403);
+		}
 	}
 }

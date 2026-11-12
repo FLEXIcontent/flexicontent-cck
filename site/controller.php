@@ -240,11 +240,10 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 		// If component is serving different pages to logged users, this will avoid
 		// having users seeing same page after login/logout when conservative caching is used
-		if ( $userid = \Joomla\CMS\Factory::getApplication()->getIdentity()->get('id') )
-		{
-			$this->input->set('__fc_user_id__', $userid);
-			$safeurlparams['__fc_user_id__'] = 'STRING';
-		}
+		// This cache discriminator belongs to the authenticated identity, including
+		// guests. Never leave a caller-supplied member id in a guest request.
+		$this->input->set('__fc_user_id__', (int) $userid);
+		$safeurlparams['__fc_user_id__'] = 'INT';
 
 		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
 		$use_mobile_layouts  = $cparams->get('use_mobile_layouts', 0);
@@ -1091,7 +1090,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 					. $access_clauses['select']  // has access
 
 					.' FROM #__flexicontent_files AS f '
-					.($field_type=='file' || $field_type=='mediafile' ? ' LEFT JOIN #__flexicontent_fields_item_relations AS rel ON '
+					.($field_type=='file' || $field_type=='mediafile' ? ($using_access && $task !== 'download_file' && $task !== 'download_files' ? ' INNER JOIN' : ' LEFT JOIN') . ' #__flexicontent_fields_item_relations AS rel ON '
 						. ' rel.field_id = '. $field_id . ' AND rel.value = ' . (int) $file_id . ' AND rel.item_id = ' . (int) $content_id
 						: '')  // Only check value usage for 'file' field
 					.($task !== 'download_file' && $task !== 'download_files' ? ' LEFT JOIN #__flexicontent_fields AS fi ON fi.id = '. $field_id : '')
@@ -1122,6 +1121,12 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				{
 					$file->has_content_access = $this->_checkDirectFileAccess($file, $user) ? 1 : 0;
 				}
+				elseif (!in_array($field_type, array('file', 'mediafile'), true) && !$this->_checkDirectFileAccess($file, $user))
+				{
+					// A different field kind cannot lend its item's ACL to an
+					// unrelated file. Use the ordinary direct-file policy instead.
+					$file->has_content_access = 0;
+				}
 				elseif ($file->has_content_access && !$this->_canViewItemState($content_id, $file->item_state, $file->item_created_by, $user))
 				{
 					$file->has_content_access = 0;
@@ -1130,7 +1135,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 			// Add target path (with target filename) for case we were not provide a custom name like when using download_tree task
 			static $used_names = array();
-			if ($task !== 'download_tree')
+			if ($task !== 'download_tree' && !empty($file))
 			{
 				$basename = basename($file->filename);
 				if (isset($used_names[$basename]))
