@@ -1317,6 +1317,158 @@ class flexicontent_db
 
 
 	/**
+	 * Get non-translatable flags of the category fields: 'main' (coreprops field 'form_category') and 'secondary' (core field 'categories')
+	 *
+	 * @return  array  array('main' => bool, 'secondary' => bool)
+	 */
+	static function getCategoriesUntranslatable()
+	{
+		static $flags = null;
+
+		if ($flags === null)
+		{
+			$flags = array('main' => false, 'secondary' => false);
+
+			if (static::useAssociations())
+			{
+				$db = \Joomla\CMS\Factory::getDbo();
+				$rows = $db->setQuery(
+					'SELECT name, untranslatable FROM #__flexicontent_fields'
+					. ' WHERE (iscore = 1 AND field_type = ' . $db->quote('categories') . ')'
+					. ' OR (field_type = ' . $db->quote('coreprops') . ' AND name = ' . $db->quote('form_category') . ')'
+				)->loadObjectList();
+
+				foreach ($rows as $row)
+				{
+					$key = $row->name === 'form_category' ? 'main' : 'secondary';
+					$flags[$key] = $flags[$key] || (bool) $row->untranslatable;
+				}
+			}
+		}
+
+		return $flags;
+	}
+
+
+	/**
+	 * Method to check if the main or the secondary categories are configured as non-translatable
+	 *
+	 * @return  boolean
+	 */
+	static function isCategoriesFieldUntranslatable()
+	{
+		$flags = static::getCategoriesUntranslatable();
+
+		return $flags['main'] || $flags['secondary'];
+	}
+
+
+	/**
+	 * Copy the main and/or secondary categories of an item to the items it is associated with (according to the non-translatable flags)
+	 * If a category has an associated category in the language of the target item, then that category is used, otherwise the same category
+	 *
+	 * @param   int  $item_id  The item having the categories to be copied
+	 *
+	 * @return  int[]  IDs of items that were updated
+	 */
+	static function propagateCategoriesToAssocs($item_id)
+	{
+		$item_id = (int) $item_id;
+		$updated = array();
+		$flags = static::getCategoriesUntranslatable();
+
+		if (!$item_id || (!$flags['main'] && !$flags['secondary']))
+		{
+			return $updated;
+		}
+
+		$db = \Joomla\CMS\Factory::getDbo();
+
+		$assocs = static::getLangAssocs(array($item_id));
+		$assoc_ids = isset($assocs[$item_id]) ? array_diff(array_keys($assocs[$item_id]), array($item_id)) : array();
+
+		if (!$assoc_ids)
+		{
+			return $updated;
+		}
+
+		$catid = (int) $db->setQuery('SELECT catid FROM #__content WHERE id = ' . $item_id)->loadResult();
+		$cats  = array_map('intval', (array) $db->setQuery('SELECT catid FROM #__flexicontent_cats_item_relations WHERE itemid = ' . $item_id)->loadColumn());
+
+		if (!$catid)
+		{
+			return $updated;
+		}
+
+		$cats[] = $catid;
+		$cats = array_values(array_unique($cats));
+
+		// Categories (and their associated categories by language)
+		$cat_assocs = $db->setQuery(
+			'SELECT a.id AS src_id, c.id, c.language'
+			. ' FROM #__associations AS a'
+			. ' JOIN #__associations AS k ON a.' . $db->qn('key') . ' = k.' . $db->qn('key') . ' AND k.context = a.context'
+			. ' JOIN #__categories AS c ON c.id = k.id'
+			. ' WHERE a.context = ' . $db->quote('com_categories.item') . ' AND a.id IN (' . implode(',', $cats) . ')'
+		)->loadObjectList();
+
+		$cat_map = array();
+		foreach ($cat_assocs as $ca)
+		{
+			$cat_map[(int) $ca->src_id][$ca->language] = (int) $ca->id;
+		}
+
+		foreach ($assoc_ids as $assoc_id)
+		{
+			$assoc_id = (int) $assoc_id;
+			$lang = $assocs[$item_id][$assoc_id]->language;
+
+			$map = function ($cid) use ($cat_map, $lang)
+			{
+				return isset($cat_map[$cid][$lang]) ? $cat_map[$cid][$lang] : (int) $cid;
+			};
+
+			$t_row   = $db->setQuery('SELECT catid FROM #__content WHERE id = ' . $assoc_id)->loadObject();
+			$t_old   = array_map('intval', (array) $db->setQuery('SELECT catid FROM #__flexicontent_cats_item_relations WHERE itemid = ' . $assoc_id)->loadColumn());
+			$t_catid = $flags['main'] ? $map($catid) : (int) $t_row->catid;
+
+			if ($flags['secondary'])
+			{
+				$t_cats = array_map($map, $cats);
+				// Main category was not shared: keep its own main category
+				$t_cats[] = $t_catid;
+			}
+			else
+			{
+				// Secondary categories were not shared: keep the existing ones, only make sure the main category is in
+				$t_cats = $t_old;
+				$t_cats[] = $t_catid;
+			}
+
+			$t_cats = array_values(array_unique($t_cats));
+
+			if ($flags['main'])
+			{
+				$db->setQuery('UPDATE #__content SET catid = ' . $t_catid . ' WHERE id = ' . $assoc_id)->execute();
+			}
+
+			$db->setQuery('DELETE FROM #__flexicontent_cats_item_relations WHERE itemid = ' . $assoc_id)->execute();
+
+			$vals = array();
+			foreach ($t_cats as $c)
+			{
+				$vals[] = '(' . (int) $c . ',' . $assoc_id . ')';
+			}
+
+			$db->setQuery('INSERT INTO #__flexicontent_cats_item_relations (catid, itemid) VALUES ' . implode(',', $vals))->execute();
+			$updated[] = $assoc_id;
+		}
+
+		return $updated;
+	}
+
+
+	/**
 	 * Method to determine if J3.1+ associations should be used
 	 *
 	 * @return  boolean True if using J3 associations; false otherwise.

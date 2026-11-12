@@ -2702,7 +2702,7 @@ class FlexicontentFields
 			$supportadvfilter = $iscore ? in_array($field_type, $fi->core_advfilters) : in_array('onAdvSearchDisplayFilter', $classmethods);
 
 			// ITEM FORM related properties
-			$supportuntranslatable = !$iscore || in_array($field_type, array('maintext', 'tags'));
+			$supportuntranslatable = !$iscore || in_array($field_type, array('maintext', 'tags', 'categories'));
 			$supportvalueseditable = !$iscore || $field_type=='maintext';
 			$supportformhidden     = !$iscore || $field_type=='maintext';
 			$supportedithelp       = !$iscore || $field_type=='maintext';

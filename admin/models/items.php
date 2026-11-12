@@ -2501,6 +2501,12 @@ class FlexicontentModelItems extends FCModelAdminList
 			}
 		}
 
+		// Categories field is configured as "Non-translatable": apply the categories to the associated items too
+		if (flexicontent_db::isCategoriesFieldUntranslatable())
+		{
+			flexicontent_db::propagateCategoriesToAssocs((int) $itemid);
+		}
+
 		return true;
 	}
 
