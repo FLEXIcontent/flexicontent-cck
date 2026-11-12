@@ -1762,6 +1762,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$copynr   = $this->input->get('copynr', 1, 'int');
 		$maincat  = $this->input->get('maincat', '', 'int');
 		$seccats  = $this->input->get('seccats', array(), 'array');
+		$seccats  = array_values(array_filter(ArrayHelper::toInteger($seccats), static function ($id) { return $id > 0; }));
 		$tags     = $this->input->get('tags', array(), 'array');
 		$keepseccats = $this->input->get('keepseccats', 0, 'int');
 
@@ -1830,8 +1831,8 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			}
 		}
 
-		// Set only authenticated item ids for the copyitems() method
-		$auth_cid = $cid;
+		// Keep the authorised subset. Replacing it with the original selection
+		// would reintroduce rows that the edit-permission check just rejected.
 		$clean_cache_flag = false;
 
 

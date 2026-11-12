@@ -252,7 +252,8 @@ foreach ($this->values as $n => $value)
 	}
 
 	// generate link to google maps directions
-	$map_link = empty($value['url'])  ?  false  :  $value['url'];
+	// Validate old stored values too; URL text filtering is not a scheme policy.
+	$map_link = empty($value['url']) ? '' : flexicontent_security::safeUrl($value['url']);
 
 	// if no url, compatibility with old values
 	if (empty($map_link))
@@ -272,7 +273,7 @@ foreach ($this->values as $n => $value)
 	}
 
 	// generate map directions link html
-	$map_directions = '<div class="directions"><a href="'.$map_link.'" target="_blank">'.$directions_link_label.'</a></div>';
+	$map_directions = '<div class="directions"><a href="'.htmlspecialchars($map_link, ENT_QUOTES, 'UTF-8').'" target="_blank" rel="noopener noreferrer">'.$directions_link_label.'</a></div>';
 
 	// generate map (only if lat and lon available)
 	$map = '';

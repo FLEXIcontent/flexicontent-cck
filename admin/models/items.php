@@ -2372,6 +2372,11 @@ class FlexicontentModelItems extends FCModelAdminList
 	 */
 	function moveitem($itemid, $maincat, $seccats = null, $lang = null, $state = null, $type_id = 0, $access = null, $tags = array(), $keeptags = 2)
 	{
+		$itemid = (int) $itemid;
+		if ($seccats !== null)
+		{
+			$seccats = array_values(array_unique(array_filter(ArrayHelper::toInteger((array) $seccats), static function ($id) { return $id > 0; })));
+		}
 		$tags = array_values(array_filter(ArrayHelper::toInteger((array) $tags)));
 
 		$item = $this->getTable($this->records_jtable, '');
@@ -2422,7 +2427,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		foreach($seccats as $cat)
 		{
 			$query 	= 'INSERT INTO #__flexicontent_cats_item_relations (`catid`, `itemid`)'
-				.' VALUES(' . $cat . ',' . $itemid . ')'
+				.' VALUES(' . (int) $cat . ',' . $itemid . ')'
 			;
 			$this->_db->setQuery($query);
 			$this->_db->execute();
