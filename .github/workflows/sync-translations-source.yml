@@ -54,10 +54,14 @@ jobs:
             done
             dir="$(dirname "$rel")"
             base="$(basename "$rel")"
-            case "$rel" in
+                        case "$rel" in
               site/templates/*/language/en-GB/en-GB.ini)
                 tpl="${rel#site/templates/}"; tpl="${tpl%%/*}"
                 base="$tpl.ini" ;;
+              plugins/*/language/en-GB/*)
+                # resources/ stocke les plugins à plat : on retire language/en-GB
+                dir="${dir%/language/en-GB}"
+                base="${base#en-GB.}" ;;
               *)
                 base="${base#en-GB.}" ;;
             esac
