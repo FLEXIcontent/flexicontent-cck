@@ -29,6 +29,38 @@ $document= \Joomla\CMS\Factory::getDocument();
 $jinput  = $app->input;
 $format  = $jinput->get('format', 'html', 'cmd');
 
+// Security: many views and models read 'layout' with the 'string' filter, which keeps quotes, and print it
+// into HTML attributes and JavaScript (e.g. the file manager), which allowed reflected XSS through a crafted link.
+// Real layout names only use [A-Za-z0-9_.-], so strip anything else before any view or controller reads it.
+$fc_layout_raw = $jinput->get('layout', null, 'raw');
+
+if ($fc_layout_raw !== null)
+{
+	$fc_layout_safe = is_string($fc_layout_raw) ? preg_replace('/[^A-Za-z0-9_.\-]/', '', $fc_layout_raw) : '';
+	$fc_layout_safe = $fc_layout_safe !== '' ? $fc_layout_safe : 'default';
+
+	if ($fc_layout_safe !== $fc_layout_raw)
+	{
+		$jinput->set('layout', $fc_layout_safe);
+
+		if (isset($_GET['layout']))
+		{
+			$_GET['layout'] = $fc_layout_safe;
+			$jinput->get->set('layout', $fc_layout_safe);
+		}
+
+		if (isset($_POST['layout']))
+		{
+			$_POST['layout'] = $fc_layout_safe;
+			$jinput->post->set('layout', $fc_layout_safe);
+		}
+	}
+
+	unset($fc_layout_safe);
+}
+
+unset($fc_layout_raw);
+
 // Logging
 global $fc_run_times;
 $fc_run_times['render_field'] = array();

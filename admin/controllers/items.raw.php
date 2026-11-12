@@ -295,7 +295,10 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	 */
 	function resethits()
 	{
-		// Check session token, item exists, is editable
+		// Check for request forgeries (the reset buttons already send the token)
+		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+
+		// Check item exists, is editable
 		$itemmodel = $this->_getEditorModel();
 
 		if (!is_object($itemmodel))
@@ -318,7 +321,10 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	 */
 	function resetvotes()
 	{
-		// Check session token, item exists, is editable
+		// Check for request forgeries (the reset buttons already send the token)
+		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+
+		// Check item exists, is editable
 		$itemmodel = $this->_getEditorModel();
 
 		if (!is_object($itemmodel))
@@ -566,6 +572,9 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	 */
 	function bindextdata()
 	{
+		// Check for request forgeries
+		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+
 		// Need to recheck post-installation / integrity tasks after,
 		// this should NOT effect RAW HTTP requests, used by AJAX ITEM binding
 		// \Joomla\CMS\Factory::getSession()->set('flexicontent.recheck_aftersave', true);
@@ -594,6 +603,9 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	 */
 	function fixmaincat()
 	{
+		// Check for request forgeries
+		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+
 		$default_cat = $this->input->getInt('default_cat', 0);
 		$model = $this->getModel($this->record_name_pl);
 		$model->fixMainCat($default_cat);

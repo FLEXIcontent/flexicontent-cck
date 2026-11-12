@@ -148,6 +148,14 @@ class FlexicontentViewTemplates extends FlexicontentViewBaseRecords
 
 		$tmpldirectory = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS;
 		$source = $jinput->get('source', '', 'STRING');
+
+		// Security: 'source' is printed into the duplicate dialog, so only accept an existing template folder name
+		// (same name rule as the templates.duplicate task)
+		if ($source !== '' && (!preg_match('/^[A-Za-z0-9][A-Za-z0-9_\-\.]*$/', $source) || strpos($source, '..') !== false || !is_dir($tmpldirectory . $source)))
+		{
+			$source = '';
+		}
+
 		$dest   = $source ? flexicontent_upload::sanitizedir($tmpldirectory, $source) : '';
 
 		$this->lists       = $lists;
