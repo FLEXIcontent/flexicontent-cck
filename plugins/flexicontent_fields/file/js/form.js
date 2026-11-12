@@ -311,6 +311,8 @@
 			container.find('.fc_filedata_title').val(original);
 			container.find('.fc_filetitle').val(altname).blur();
 			container.find('.fc_filedesc').val(file.description || '');
+			if (typeof file.custom1 !== 'undefined') container.find('.fc_filecustom1').val(file.custom1 || '');
+			if (typeof file.custom2 !== 'undefined') container.find('.fc_filecustom2').val(file.custom2 || '');
 
 			// Extension text of the preview box (only when no image preview is shown)
 			var ext = (file.ext || '').toString().toUpperCase();

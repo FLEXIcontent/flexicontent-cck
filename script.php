@@ -870,6 +870,12 @@ class com_flexicontentInstallerScript
 					if ( $files_tbl_exists && !array_key_exists('stamp', $tbl_fields['#__'.$tbl_name])) {
 						$changes[] = "ADD `stamp` tinyint(3) unsigned NOT NULL default '1' AFTER `assignments`";
 					}
+					if ( $files_tbl_exists && !array_key_exists('custom1', $tbl_fields['#__'.$tbl_name])) {
+						$changes[] = "ADD `custom1` MEDIUMTEXT NULL AFTER `stamp`";
+					}
+					if ( $files_tbl_exists && !array_key_exists('custom2', $tbl_fields['#__'.$tbl_name])) {
+						$changes[] = "ADD `custom2` MEDIUMTEXT NULL AFTER `custom1`";
+					}
 					if ( isset($tbl_datatypes[$tbl_name]) && strtolower($tbl_datatypes[$tbl_name]['attribs']['DATA_TYPE']) != 'mediumtext' ) {
 						$changes[] = "CHANGE `attribs` `attribs` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL";
 					}

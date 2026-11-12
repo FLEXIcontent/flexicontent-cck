@@ -247,6 +247,26 @@ HTML;
 	}
 
 
+	// Custom (HTML) file properties
+	$custom_form_html = '';
+	foreach ($custom_props as $cn => $cp)
+	{
+		if (!$cp['form']) continue;
+		$cv = plgFlexicontent_fieldsFile::getCustomFormValue($cp, $cn, $file_data, isset($form_data[$file_id]) ? $form_data[$file_id] : null);
+		$clabel = htmlspecialchars($cp['show_label'] ? $cp['label'] : '', ENT_QUOTES, 'UTF-8');
+		$custom_form_html .= '
+			<tr class="inlinefile-custom'.$cn.'-row">
+				<td class="key inlinefile-custom'.$cn.'-lbl-cell">
+					<label class="fc-prop-lbl inlinefile-custom'.$cn.'-lbl" id="'.$elementid_n.'_custom'.$cn.'-lbl" for="'.$elementid_n.'_custom'.$cn.'">'.$clabel.'</label>
+				</td>
+				<td class="inlinefile-custom'.$cn.'-data-cell">
+					<span class="inlinefile-custom'.$cn.'-data">
+						<textarea id="'.$elementid_n.'_custom'.$cn.'" cols="24" rows="'.(int) $cp['rows'].'" name="'.$fieldname_n.'[custom'.$cn.']" class="fc_filecustom'.$cn.'">'.htmlspecialchars($cv, ENT_QUOTES, 'UTF-8').'</textarea>
+					</span>
+				</td>
+			</tr>';
+	}
+
 	$field->html[] = '
 
 		<span class="fc_filedata_storage_name" style="display:none;">'.$file_data->filename.'</span>
@@ -357,6 +377,8 @@ HTML;
 					</span>
 				</td>
 			</tr>' : '').
+
+			$custom_form_html.
 
 			( $iform_dir ? '
 			<tr class="inlinefile-secure-row">

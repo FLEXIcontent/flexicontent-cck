@@ -327,6 +327,22 @@ else if ($prop !== 'display_properties_only') :
 	}
 
 
+	// [3b]: Add custom (HTML) file properties, nothing is displayed if disabled or empty (default value may be used if configured so)
+	if ($compact_display != 2 && $prop != 'namelist' && !empty($custom_props))
+	{
+		foreach ($custom_props as $cn => $cp)
+		{
+			$cvalue = plgFlexicontent_fieldsFile::getCustomDisplayValue($cp, $cn, $file_data);
+			if ($cvalue === '') continue;
+
+			$html .= '<div class="fcfile_custom fcfile_custom' . $cn . '">'
+				. ($cp['show_label'] ? '<span class="fcfile_custom_label">' . htmlspecialchars($cp['label'], ENT_QUOTES, 'UTF-8') . '</span> ' : '')
+				. '<div class="fcfile_custom_value">' . $cvalue . '</div>'
+				. '</div>';
+		}
+	}
+
+
 	// [4]: Display the buttons:  DOWNLOAD, SHARE, ADD TO CART
 
 	$actions_arr = array();

@@ -155,6 +155,22 @@ class plgFlexicontent_fieldsFile extends FCField
 			$iform_lang = $iform_access = $iform_stamp = 0;
 		}
 
+		$custom_props = self::getCustomProps($field, $inputmode);
+
+		// JS code used when cloning a value box: reset custom property inputs to their default
+		$custom_props_js = '';
+		foreach ($custom_props as $n => $cp)
+		{
+			if (!$cp['form']) continue;
+			$custom_props_js .= "
+				var theInput = newField.find('textarea.fc_filecustom" . $n . "').first();
+				theInput.val(" . json_encode($cp['default'], JSON_HEX_TAG | JSON_HEX_AMP) . ");
+				theInput.attr('name', fname_pfx + '[custom" . $n . "]');
+				theInput.attr('id', element_id + '_custom" . $n . "');
+				newField.find('.inlinefile-custom" . $n . "-lbl').first().attr('for', element_id + '_custom" . $n . "').attr('id', element_id + '_custom" . $n . "-lbl');
+			";
+		}
+
 		$secure_default = !$iform_dir   ? 1 : (int) $field->parameters->get('iform_dir_default', 1);
 		$stamp_default  = !$iform_stamp ? 1 : (int) $field->parameters->get('iform_stamp_default', 1);
 
@@ -294,6 +310,7 @@ class plgFlexicontent_fieldsFile extends FCField
 			}
 			$files_data[0] = (object)array(
 				'id' => '', 'filename' => '', 'filename_original' => '', 'altname' => '', 'description' => '',
+				'custom1' => isset($custom_props[1]) ? $custom_props[1]['default'] : '', 'custom2' => isset($custom_props[2]) ? $custom_props[2]['default'] : '',
 				'url' => '',
 				'secure' => (!$iform_dir  ? 1 : (int) $field->parameters->get('iform_dir_default', 1)),
 				'stamp' => (!$iform_stamp ? 1 : (int) $field->parameters->get('iform_stamp_default', 1)),
@@ -560,6 +577,8 @@ class plgFlexicontent_fieldsFile extends FCField
 				theInput.attr('id', element_id + '_file-desc');
 				newField.find('.inlinefile-desc-lbl').first().attr('for', element_id + '_file-desc').attr('id', element_id + '_file-desc-lbl');
 				" : "")."
+
+				".$custom_props_js."
 
 				// Destroy any select library elements (select2 or choices.js)
 				fc_destroySelectLib(newField);
@@ -1002,9 +1021,18 @@ class plgFlexicontent_fieldsFile extends FCField
 					$file_data->filename
 				);
 
+				// Custom (HTML) properties are exported only when they have a value, so that older import code / sites are not affected
+				$custom_tags = '';
+				foreach (array(1, 2) as $cn)
+				{
+					$cval = isset($file_data->{'custom' . $cn}) ? (string) $file_data->{'custom' . $cn} : '';
+					if (strlen(trim($cval))) $custom_tags .= '{Custom' . $cn . '}' . $cval . '{/Custom' . $cn . '}';
+				}
+
 				$field->{$prop}[] = ($file_data->url ? '{URL}' . $filename . '{/URL}' : $filename)
 					. '{Altname}' . $file_data->altname . '{/Altname}'
 					. '{Desc}' . $file_data->description . '{/Desc}'
+					. $custom_tags
 					. '{Ext}' . $file_data->ext . '{/Ext}';
 			}
 
@@ -1062,6 +1090,9 @@ class plgFlexicontent_fieldsFile extends FCField
 		$display_size  = $display_size && static::$isItemsManager ?  0 : $display_size;
 		$display_hits  = $display_hits && static::$isItemsManager ?  0 : $display_hits;
 		$display_descr = $display_descr && static::$isItemsManager ?  0 : $display_descr;
+
+		// Custom (HTML) file properties, not displayed in backend items manager
+		$custom_props = static::$isItemsManager ? array() : self::getCustomProps($field);
 
 		$add_lang_img = $display_lang == 1 || $display_lang == 3;
 		$add_lang_txt = $display_lang == 2 || $display_lang == 3 || static::$isMobile;
@@ -1360,6 +1391,8 @@ class plgFlexicontent_fieldsFile extends FCField
 			$iform_lang = $iform_access = $iform_stamp = 0;
 		}
 
+		$custom_props = array_filter(self::getCustomProps($field, $inputmode), function ($cp) { return $cp['form']; });
+
 		// Execute once
 		static $initialized = null;
 		static $srcpath_original = '';
@@ -1395,15 +1428,22 @@ class plgFlexicontent_fieldsFile extends FCField
 				if ( !is_numeric($v) )
 				{
 					// Parse structured export format (see onDisplayFieldValue 'csv_export'):
-					// External file: {URL}...{/URL}{Altname}...{/Altname}{Desc}...{/Desc}{Ext}...{/Ext}
-					// Local file:    path/filename{Altname}...{/Altname}{Desc}...{/Desc}{Ext}...{/Ext}
+					// External file: {URL}...{/URL}{Altname}...{/Altname}{Desc}...{/Desc}{Custom1}...{/Custom1}{Custom2}...{/Custom2}{Ext}...{/Ext}
+					// Local file:    path/filename{Altname}...{/Altname}{Desc}...{/Desc}{Custom1}...{/Custom1}{Custom2}...{/Custom2}{Ext}...{/Ext}
 					// The tags are optional, a bare URL or a bare path/filename is also accepted
 					$_altname = preg_match('#\{Altname\}(.*?)\{/Altname\}#s', $v, $_m) ? trim($_m[1]) : '';
 					$_desc    = preg_match('#\{Desc\}(.*?)\{/Desc\}#s',       $v, $_m) ? trim($_m[1]) : '';
 					$_ext     = preg_match('#\{Ext\}(.*?)\{/Ext\}#s',         $v, $_m) ? trim($_m[1]) : '';
+					$_custom  = array();
+					foreach (array(1, 2) as $_cn)
+					{
+						// Custom (HTML) properties, HTML is filtered according to the Text Filters of the current user's groups
+						$_cv = preg_match('#\{Custom' . $_cn . '\}(.*?)\{/Custom' . $_cn . '\}#s', $v, $_m) ? trim($_m[1]) : '';
+						if ($_cv !== '') $_custom['custom' . $_cn] = \Joomla\CMS\Component\ComponentHelper::filterText($_cv);
+					}
 					$_path    = preg_match('#^\{URL\}(.*?)\{/URL\}#s', $v, $_m)
 						? trim($_m[1])
-						: trim(preg_split('#\{(?:Altname|Desc|Ext)\}#', $v, 2)[0]);
+						: trim(preg_split('#\{(?:Altname|Desc|Ext|Custom[12])\}#', $v, 2)[0]);
 
 					// Detect URL value: {URL}...{/URL} structured format or bare http(s):// / ftp:// URL
 					if (preg_match('#^\{URL\}#', $v) || preg_match('#^(?:https?|ftp)://#i', $_path))
@@ -1425,6 +1465,7 @@ class plgFlexicontent_fieldsFile extends FCField
 						$_fo->stamp             = 0;
 						$_fo->ext               = $_ext ?: strtolower(pathinfo($_url, PATHINFO_EXTENSION));
 						$_fo->description       = $_desc;
+						foreach ($_custom as $_cname => $_cvalue) $_fo->$_cname = $_cvalue;
 						$_fo->language          = '*';
 						$_fo->access            = 1;
 						$_fo->hits              = 0;
@@ -1472,13 +1513,14 @@ class plgFlexicontent_fieldsFile extends FCField
 						//$_filetitle = key($file_ids);  // This is the cleaned up filename, currently not needed
 
 						// Set file properties given via the structured format, addlocal() sets title to filename and empty description
-						if ($v && ($_altname !== '' || $_desc !== '' || $_ext !== ''))
+						if ($v && ($_altname !== '' || $_desc !== '' || $_ext !== '' || $_custom))
 						{
 							$_fo = new stdClass;
 							$_fo->id = (int) $v;
 							if ($_altname !== '') $_fo->altname     = $_altname;
 							if ($_desc !== '')    $_fo->description = $_desc;
 							if ($_ext !== '')     $_fo->ext         = $_ext;
+							foreach ($_custom as $_cname => $_cvalue) $_fo->$_cname = $_cvalue;
 
 							Factory::getDbo()->updateObject('#__flexicontent_files', $_fo, 'id');
 						}
@@ -1526,6 +1568,11 @@ class plgFlexicontent_fieldsFile extends FCField
 				$v['file-lang']  = !$iform_lang   ? '' : flexicontent_html::dataFilter($v['file-lang'],   9,     'STRING', 0);
 				$v['file-access']= !$iform_access ? '' : flexicontent_html::dataFilter($v['file-access'], 9,     'ACCESSLEVEL', 0);
 				$v['stamp']      = !$iform_stamp  ? 1 : ((int) $v['stamp'] ? 1 : 0);
+				foreach ($custom_props as $cn => $cp)
+				{
+					// HTML allowed, filtered according to the Text Filters of Joomla for the current user's groups
+					$v['custom' . $cn] = \Joomla\CMS\Component\ComponentHelper::filterText(isset($v['custom' . $cn]) ? (string) $v['custom' . $cn] : '');
+				}
 
 				if( $new_file )
 				{
@@ -1611,6 +1658,7 @@ class plgFlexicontent_fieldsFile extends FCField
 					if ($iform_lang)   $dbdata['language'] = $v['file-lang'];
 					if ($iform_access) $dbdata['access'] = $v['file-access'];
 					if ($iform_stamp)  $dbdata['stamp']  = $v['stamp'];
+					foreach ($custom_props as $cn => $cp) $dbdata['custom' . $cn] = $v['custom' . $cn];
 					//if ($iform_dir)  $dbdata['secure'] = $v['secure'];  // !! Do not change folder for existing files
 
 					// Load file data from DB
@@ -1705,9 +1753,21 @@ class plgFlexicontent_fieldsFile extends FCField
 					$app->input->set('fname_level2', $n);
 					$app->input->set('fname_level3', 'file-data');
 
+					$v_custom = $v;  // Keep posted values, since $v is replaced by the file id below
 					$upload_errs = null;
 					$file_id = $fman->upload(null, $upload_errs);
 					$v = !empty($file_id) ? $file_id : ($use_ingroup ? null : false);
+
+					// The upload task does not know about this field's custom properties, so store them now
+					if (!empty($file_id) && is_numeric($file_id) && $custom_props)
+					{
+						$crow = \Joomla\CMS\Table\Table::getInstance('flexicontent_files', '');
+						if ($crow->load((int) $file_id))
+						{
+							foreach ($custom_props as $cn => $cp) $crow->{'custom' . $cn} = $v_custom['custom' . $cn];
+							$crow->store();
+						}
+					}
 
 					if (empty($file_id)) foreach ($upload_errs as $err_type => $upload_err)
 					{
@@ -1801,7 +1861,7 @@ class plgFlexicontent_fieldsFile extends FCField
 			if ($_files_data) foreach($_files_data as $_file_id => $_file_data) $values[$_file_id] = (array)$_file_data;
 		}
 
-		FlexicontentFields::onIndexAdvSearch($field, $values, $item, $required_properties=array('filename'), $search_properties=array('altname', 'description'), $properties_spacer=' ', $filter_func='strip_tags');
+		FlexicontentFields::onIndexAdvSearch($field, $values, $item, $required_properties=array('filename'), $search_properties=array_merge(array('altname', 'description'), array_map(function ($n) { return 'custom' . $n; }, array_keys(self::getCustomProps($field)))), $properties_spacer=' ', $filter_func='strip_tags');
 		return true;
 	}
 
@@ -1828,7 +1888,7 @@ class plgFlexicontent_fieldsFile extends FCField
 			if ($_files_data) foreach($_files_data as $_file_id => $_file_data) $values[$_file_id] = (array)$_file_data;
 		}
 
-		FlexicontentFields::onIndexSearch($field, $values, $item, $required_properties=array('filename'), $search_properties=array('altname', 'description'), $properties_spacer=' ', $filter_func='strip_tags');
+		FlexicontentFields::onIndexSearch($field, $values, $item, $required_properties=array('filename'), $search_properties=array_merge(array('altname', 'description'), array_map(function ($n) { return 'custom' . $n; }, array_keys(self::getCustomProps($field)))), $properties_spacer=' ', $filter_func='strip_tags');
 		return true;
 	}
 
@@ -1844,6 +1904,26 @@ class plgFlexicontent_fieldsFile extends FCField
 	/**
 	 * Get DB data for the given file IDs
 	 */
+
+	/** Settings of the 2 custom (HTML) file properties of this field, see flexicontent_fileeditor::customProps() */
+	public static function getCustomProps($field, $inputmode = null)
+	{
+		require_once JPATH_SITE . '/components/com_flexicontent/classes/helpers/fileeditor.php';
+		return flexicontent_fileeditor::customProps($field->parameters, $inputmode);
+	}
+
+	public static function getCustomFormValue(array $cp, $n, $file_data, $form_row = null)
+	{
+		require_once JPATH_SITE . '/components/com_flexicontent/classes/helpers/fileeditor.php';
+		return flexicontent_fileeditor::customFormValue($cp, $n, $file_data, $form_row);
+	}
+
+	public static function getCustomDisplayValue(array $cp, $n, $file_data)
+	{
+		require_once JPATH_SITE . '/components/com_flexicontent/classes/helpers/fileeditor.php';
+		return flexicontent_fileeditor::customDisplayValue($cp, $n, $file_data);
+	}
+
 
 	function getFileData($fid, $published = 1, $extra_select = '')
 	{
