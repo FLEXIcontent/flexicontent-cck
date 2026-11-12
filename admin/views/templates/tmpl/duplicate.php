@@ -61,8 +61,8 @@ $ctrl_task = FLEXI_J16GE ? 'task=templates.' : 'controller=templates&task=';
 			</span>
 		</legend>
 		<?php echo FLEXI_J16GE ? '<br />' : ''; ?>
-		<input type="text" id="dest" name="dest" value="<?php echo $this->dest; ?>" size="52" />
-		<input type="hidden" id="source" name="source" value="<?php echo $this->source; ?>" />
+		<input type="text" id="dest" name="dest" value="<?php echo htmlspecialchars($this->dest, ENT_QUOTES, 'UTF-8'); ?>" size="52" />
+		<input type="hidden" id="source" name="source" value="<?php echo htmlspecialchars($this->source, ENT_QUOTES, 'UTF-8'); ?>" />
 	</fieldset>
 	<table width="100%">
 		<tr>

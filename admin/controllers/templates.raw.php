@@ -84,9 +84,11 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 
 		$model = $this->getModel($this->record_name_pl);
 
-		if (!$model->duplicate($source, $dest))
+		// Security: only copy an existing template folder inside the templates root (no path traversal),
+		// and escape both names because this response is inserted into the page as HTML
+		if (!$this->_getLayoutPath($source) || !$model->duplicate($source, $dest))
 		{
-			echo \Joomla\CMS\Language\Text::sprintf('FLEXI_TEMPLATE_FAILED_CLONE', $source);
+			echo \Joomla\CMS\Language\Text::sprintf('FLEXI_TEMPLATE_FAILED_CLONE', htmlspecialchars($source, ENT_QUOTES, 'UTF-8'));
 
 			return;
 		}
@@ -94,7 +96,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 		{
 			$tmplcache = \Joomla\CMS\Factory::getCache('com_flexicontent_tmpl');
 			$tmplcache->clean();
-			echo '<span class="copyok" style="margin-top:15px; display:block">' . \Joomla\CMS\Language\Text::sprintf('FLEXI_TEMPLATE_CLONED', $source, $dest) . '</span>';
+			echo '<span class="copyok" style="margin-top:15px; display:block">' . \Joomla\CMS\Language\Text::sprintf('FLEXI_TEMPLATE_CLONED', htmlspecialchars($source, ENT_QUOTES, 'UTF-8'), htmlspecialchars($dest, ENT_QUOTES, 'UTF-8')) . '</span>';
 		}
 	}
 

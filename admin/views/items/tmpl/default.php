@@ -627,7 +627,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 			<span class="badge" style="border-radius: 3px;" id="orphan_items_count"><?php echo $this->unassociated; ?></span>
 			<span id="orphan_items_mssg"><?php echo Text::_( 'FLEXI_ITEMS' ); ?></span>
 
-			<div id="bindToTypeBox" style="display: inline-block;" data-action="index.php?option=com_flexicontent&amp;<?php echo $items_task; ?>bindextdata&amp;tmpl=component&amp;format=raw">
+			<div id="bindToTypeBox" style="display: inline-block;" data-action="index.php?option=com_flexicontent&amp;<?php echo $items_task; ?>bindextdata&amp;tmpl=component&amp;format=raw&amp;<?php echo \Joomla\CMS\Session\Session::getFormToken(); ?>=1">
 
 				<input id="button-bind" type="button"
 					class="<?php echo $btn_class; ?> btn-primary" style='float:none !important; box-sizing: border-box; min-width: 200px;'
@@ -658,7 +658,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 			<span id="badcat_items_count" class="badge" style="border-radius: 3px;"><?php echo $this->badcatitems; ?></span>
 			<?php echo Text::_( 'FLEXI_ITEMS' ); ?>
 
-			<div id="fixCatBox" style="display: inline-block;" data-action="index.php?option=com_flexicontent&amp;<?php echo $items_task; ?>fixmaincat&amp;tmpl=component&amp;format=raw">
+			<div id="fixCatBox" style="display: inline-block;" data-action="index.php?option=com_flexicontent&amp;<?php echo $items_task; ?>fixmaincat&amp;tmpl=component&amp;format=raw&amp;<?php echo \Joomla\CMS\Session\Session::getFormToken(); ?>=1">
 				<input id="button-fixcat" type="button"
 					class="<?php echo $btn_class; ?> btn-primary"
 					value="<?php echo Text::_( 'FLEXI_FIX' ); ?>" onclick="return false;"
