@@ -1692,8 +1692,13 @@ class plgFlexicontent_fieldsFile extends FCField
 					// Set the changed data into the object
 					foreach ($dbdata as $index => $data) $row->{$index} = $data;
 
+					// Only users that can edit all files, or the uploader of the file (edit own files), may change its properties
+					$_user = Factory::getApplication()->getIdentity();
+					$canEditFile = $_user->authorise('flexicontent.editfile', 'com_flexicontent')
+						|| ($_user->authorise('flexicontent.editownfile', 'com_flexicontent') && (int) $row->uploaded_by === (int) $_user->id);
+
 					// Update DB data of the file
-					if ( !$row->check() || !$row->store() )
+					if ( $canEditFile && (!$row->check() || !$row->store()) )
 					{
 						Factory::getApplication()->enqueueMessage("FILE FIELD: " . $row->getError(), 'warning');
 						if ($use_ingroup) $newpost[$new++] = null;
