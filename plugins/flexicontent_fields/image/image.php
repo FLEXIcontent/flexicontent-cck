@@ -1877,7 +1877,8 @@ class plgFlexicontent_fieldsImage extends FCField
 				{
 					$new_filenames[$v['originalname']] = 1;
 
-					// Validate other value properties
+					// Validate other value properties (a CSV import value has only the properties that it gives)
+					$v += array('urllink' => '', 'mediaurl' => '', 'alt' => '', 'title' => '', 'desc' => '', 'cust1' => '', 'cust2' => '');
 					$v['urllink'] = $linkto_url ? flexicontent_html::dataFilter($v['urllink'], 4000, 'URL', 0) : null;
 					$v['mediaurl'] = $usemediaurl ? flexicontent_html::dataFilter($v['mediaurl'], 4000, 'URL', 0) : null;
 					if ($usemediaurl === 1 && strpos($v['mediaurl'], 'youtube') === false && strpos($v['mediaurl'], 'vimeo') === false)
