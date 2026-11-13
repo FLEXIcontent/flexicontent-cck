@@ -1468,6 +1468,17 @@ class flexicontent_db
 			if ($flags['main'])
 			{
 				$db->setQuery('UPDATE #__content SET catid = ' . $t_catid . ' WHERE id = ' . $assoc_id)->execute();
+				$db->setQuery('UPDATE #__flexicontent_items_tmp SET catid = ' . $t_catid . ' WHERE id = ' . $assoc_id)->execute();
+
+				// Item permissions are inherited from the main category: move the item's asset under the new category's asset
+				$asset     = new \Joomla\CMS\Table\Asset($db);
+				$cat_asset = (int) $db->setQuery('SELECT asset_id FROM #__categories WHERE id = ' . $t_catid)->loadResult();
+
+				if ($cat_asset && $asset->loadByName('com_content.article.' . $assoc_id) && (int) $asset->parent_id !== $cat_asset)
+				{
+					$asset->setLocation($cat_asset, 'last-child');
+					$asset->store();
+				}
 			}
 
 			$db->setQuery('DELETE FROM #__flexicontent_cats_item_relations WHERE itemid = ' . $assoc_id)->execute();
