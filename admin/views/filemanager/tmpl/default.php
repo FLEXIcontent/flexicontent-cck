@@ -2150,6 +2150,12 @@ if (version_compare(\Joomla\CMS\Version::MAJOR_VERSION, '4', 'ge')) {
         'videosExt' => is_array($videosExt) ? $videosExt : (empty($videosExt) ? [] : explode(',', $videosExt)),
         'documentsExt' => is_array($documentsExt) ? $documentsExt : (empty($documentsExt) ? [] : explode(',', $documentsExt)),
     ];
+
+    // Extensions the picker accepts per media type (media.php prints them in supported-extensions),
+    // the lists above are already empty for the types that are not allowed
+    foreach (array('images', 'audios', 'videos', 'documents') as $jmedia_type) {
+        $jMedia_file_displayData[$jmedia_type . 'AllowedExt'] = $jMedia_file_displayData[$jmedia_type . 'Ext'];
+    }
 } else {
     $jMedia_file_displayData += [
         'filetypes' => is_array($fileTypes) ? $fileTypes : (empty($fileTypes) ? [] : explode(',', $fileTypes)),
