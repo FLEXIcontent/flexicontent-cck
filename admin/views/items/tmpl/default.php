@@ -1387,7 +1387,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				}
 				
 				$_title = flexicontent_html::getToolTip(
-					$assoc_item->title,
+					htmlspecialchars((string) $assoc_item->title, ENT_QUOTES, 'UTF-8'),
 					(isset($state_icons[$assoc_item->state]) ? '<span class="' . $state_icons[$assoc_item->state] . '"></span>' : '') .
 					(isset($state_names[$assoc_item->state]) ? $state_names[$assoc_item->state] . '<br>': '') .
 					($is_oc_item ? '' : '<span class="icon-pencil"></span>' . Text::_( !$assoc_item->is_uptodate && $assoc_modified < $oc_item_modified ? 'FLEXI_TRANSLATION_IS_OUTDATED' : 'FLEXI_TRANSLATION_IS_UPTODATE')) .
@@ -1403,7 +1403,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 				echo '
 				<a class="fc_assoc_translation label label-association ' . $this->popover_class . $assoc_isstale_class . $assoc_state_class . ' hasTooltip"
-					target="_blank" href="'.$_link.'" data-placement="top" aria-label="'.$_title.' data-content="'.$_title.' data-bs-original-title="'.$_title.'"
+					target="_blank" href="'.$_link.'" data-placement="top" aria-label="'.$_title.'" data-content="'.$_title.'" data-bs-original-title="'.$_title.'"
 				>
 					<span>' . ($assoc_item->lang=='*' ? Text::_('FLEXI_ALL') : strtoupper($assoc_item->shortcode ?: '?')) . '</span>
 				</a>';
