@@ -2344,6 +2344,16 @@ class ParentClassItem extends FCModelAdmin
 		}
 		$item->created = $date->toSql();
 
+		// -- New item on Joomla 4+: like com_content, use the creation date and creator as modification date and modifier.
+		// #__content.modified is NOT NULL without a default, so leaving it NULL stores 0000-00-00 00:00:00 there, while
+		// #__flexicontent_items_tmp stores its 1000-01-01 default. The post-installation check "Update temporary item data"
+		// then fails, and the next administrator session is redirected from every FLEXIcontent view to the dashboard
+		if ($isNew && FLEXI_J40GE)
+		{
+			$item->modified    = $item->created;
+			$item->modified_by = $item->created_by;
+		}
+
 
 		// -- Publish UP Date
 		if ($item->publish_up && StringHelper::strlen(StringHelper::trim( $item->publish_up )) <= 10)
