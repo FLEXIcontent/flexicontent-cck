@@ -3645,6 +3645,15 @@ class ParentClassItem extends FCModelAdmin
 			$this->_db->setQuery($query)->execute();
 		}
 
+		// ***
+		// *** Categories field is configured as "Non-translatable": same categories are assigned to all language versions
+		// ***
+
+		if (!$isNew && $this->useAssociations() && flexicontent_db::isCategoriesFieldUntranslatable())
+		{
+			flexicontent_db::propagateCategoriesToAssocs((int) $item->id);
+		}
+
 		return true;
 	}
 
