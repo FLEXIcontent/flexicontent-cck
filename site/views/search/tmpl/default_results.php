@@ -43,6 +43,10 @@ flexicontent_html::calculateItemMarkups($fcitems, $this->params);
 // *********************************************************
 flexicontent_db::getOriginalContentItemids($fcitems);
 
+// Image link tooltip (this sub-layout does not share the variables of the search form layout)
+$tooltip_class    = 'hasTooltip';
+$_read_more_about = \Joomla\CMS\Language\Text::_('FLEXI_READ_MORE_ABOUT');
+
 
 // ****************************************************************
 // Per content type settings (Content type -> Search view), that the
