@@ -1511,7 +1511,8 @@ class flexicontent_html
 				break;
 
 			case 'bootstrap-toggle':
-				if ($load_jquery) flexicontent_html::loadJQuery();
+				// A jQuery plugin: it needs jQuery also in Choices.js mode, where the site front does not load jQuery otherwise
+				if ($load_jquery || (int) $cparams->get('loadfw_jquery', 1) === 1) flexicontent_html::loadJQuery();
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/bootstrap-toggle';
 				$document->addScript($framework_path.'/js/bootstrap2-toggle.min.js');
@@ -2241,8 +2242,9 @@ class flexicontent_html
 				);
 
 				if ( $cparams->get('page_reloading_enable', 1) ) :
+					// Choices.js mode keeps the site front free of jQuery, so the overlay is only added when jQuery is there
 					$js .= '
-						jQuery( document ).ready(function() {
+						if (window.jQuery) jQuery( document ).ready(function() {
 							jQuery("body").prepend(\'\\
 								<div id="fc_filter_form_blocker" style="display: none;">\\
 									<div class="fc_blocker_overlay" style="' . $styles->overlay_box . '"></div>\\
