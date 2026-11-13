@@ -3602,6 +3602,17 @@ class ParentClassItem extends FCModelAdmin
 
 			foreach ($assoc_item_ids as $assoc_item_id)
 			{
+				// Association membership does not grant permission to edit the target item
+				$t_row = $this->_db->setQuery('SELECT created_by, checked_out FROM #__content WHERE id = ' . (int) $assoc_item_id)->loadObject();
+				$asset = 'com_content.article.' . (int) $assoc_item_id;
+
+				if (!$t_row || (!empty($t_row->checked_out) && (int) $t_row->checked_out !== (int) $user->id)
+					|| !($user->authorise('core.edit', $asset)
+						|| (!empty($t_row->created_by) && (int) $t_row->created_by === (int) $user->id && $user->authorise('core.edit.own', $asset))))
+				{
+					continue;
+				}
+
 				$this->saveFcTagsAssignments($data['tags'], (int) $assoc_item_id, $_replace = true);
 				$this->saveJTagsAssignments($data['tags'], (int) $assoc_item_id);
 			}
