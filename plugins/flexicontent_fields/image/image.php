@@ -1826,7 +1826,7 @@ class plgFlexicontent_fieldsImage extends FCField
 
 						$app->input->set('return', null);
 						$app->input->set('file-dir-path', DS.$import_media_folder . $sub_folder);
-						$app->input->set('file-filter-re', preg_quote($filename));
+						$app->input->set('file-filter-re', '^' . preg_quote($filename, '/') . '$');  // Whole name, e.g. photo.jpg must not match 2025-photo.jpg
 						$app->input->set('secure', 1);
 						$app->input->set('keep', 1);
 

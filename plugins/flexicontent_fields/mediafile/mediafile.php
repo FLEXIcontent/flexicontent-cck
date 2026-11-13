@@ -1437,7 +1437,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 					$Fobj = new stdClass();
 					$Fobj->return_url     = null;
 					$Fobj->file_dir_path  = DS. $import_docs_folder . $sub_folder;
-					$Fobj->file_filter_re = preg_quote($filename);
+					$Fobj->file_filter_re = '^' . preg_quote($filename, '/') . '$';  // Whole name, e.g. report.pdf must not match 2025-report.pdf
 					$Fobj->secure = 0; //(int) $field->parameters->get('iform_dir_default', 0);
 					$Fobj->stamp  = 0; //(int) $field->parameters->get('iform_stamp_default', 0);
 					$Fobj->keep   = 1;
