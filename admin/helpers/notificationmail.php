@@ -369,8 +369,14 @@ class FlexicontentHelperNotificationMail
 
 		try
 		{
-			foreach (array('getTemplate', 'send') as $name)
+			// loadTemplate() exists since Joomla 6, where send() uses it instead of getTemplate()
+			foreach (array('getTemplate', 'send', 'loadTemplate') as $name)
 			{
+				if ($name === 'loadTemplate' && !method_exists('\\Joomla\\CMS\\Mail\\MailTemplate', $name))
+				{
+					continue;
+				}
+
 				$method = new \ReflectionMethod('\\Joomla\\CMS\\Mail\\MailTemplate', $name);
 
 				if ($method->isPrivate() || $method->isFinal())

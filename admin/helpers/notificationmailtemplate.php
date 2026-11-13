@@ -96,6 +96,20 @@ class FlexicontentMailTemplate extends MailTemplate
 		return $mailer ? $mailer->renderTemplateConditions($mail) : $mail;
 	}
 
+	/**
+	 * Joomla 6 loads the template with $this->loadTemplate() inside send(). Its static
+	 * getTemplate() uses a plain MailTemplate instance and is not called by send().
+	 *
+	 * @param   string  $key       Template identifier
+	 * @param   string  $language  Language code of the template
+	 *
+	 * @return  \stdClass|null
+	 */
+	protected function loadTemplate(string $key, string $language): ?\stdClass
+	{
+		return $this->renderTemplateConditions(parent::loadTemplate($key, $language));
+	}
+
 	/** Render only template fields, never data substituted by replaceTags(). */
 	protected function renderTemplateConditions($mail)
 	{
