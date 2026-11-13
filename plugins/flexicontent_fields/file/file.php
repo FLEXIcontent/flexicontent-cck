@@ -1852,7 +1852,7 @@ class plgFlexicontent_fieldsFile extends FCField
 			// null indicates that indexer is running, values is set to NULL which means retrieve data from the DB
 			$values = null;
 			$field->field_rawvalues = 1;
-			$field->field_valuesselect = ' file.id AS value_id, file.altname, file.description, file.filename, file.secure';
+			$field->field_valuesselect = ' file.id AS value_id, file.altname, file.description, file.filename, file.secure, file.custom1, file.custom2';
 			$field->field_valuesjoin   = ' JOIN #__flexicontent_files AS file ON file.id = fi.value';
 			$field->field_groupby      = null;
 		} else {
@@ -1879,7 +1879,7 @@ class plgFlexicontent_fieldsFile extends FCField
 			// null indicates that indexer is running, values is set to NULL which means retrieve data from the DB
 			$values = null;
 			$field->field_rawvalues = 1;
-			$field->field_valuesselect = ' file.id AS value_id, file.altname, file.description, file.filename, file.secure';
+			$field->field_valuesselect = ' file.id AS value_id, file.altname, file.description, file.filename, file.secure, file.custom1, file.custom2';
 			$field->field_valuesjoin   = ' JOIN #__flexicontent_files AS file ON file.id = fi.value';
 			$field->field_groupby      = null;
 		} else {
