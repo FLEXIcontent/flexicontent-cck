@@ -30,7 +30,7 @@ switch ( \Joomla\CMS\Factory::getConfig()->get('error_reporting') )
 		break;
 	
 	case 'maximum':
-		error_reporting(E_ALL & ~E_STRICT);
+		error_reporting(E_ALL & ~2048);  // 2048 = E_STRICT, its constant is deprecated in PHP 8.4
 		ini_set('display_errors',1);
 		break;
 	

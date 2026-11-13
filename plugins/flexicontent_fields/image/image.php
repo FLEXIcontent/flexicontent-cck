@@ -3255,7 +3255,7 @@ class plgFlexicontent_fieldsImage extends FCField
 				try {
 					ob_start();
 
-					$old_error_reporting = error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT);
+					$old_error_reporting = error_reporting(E_ALL & ~E_DEPRECATED & ~2048);  // 2048 = E_STRICT, its constant is deprecated in PHP 8.4
 					$old_error_handler = set_error_handler(array($this, '_custom_error_handler'));
 
 					$return = eval($custom_text_code);
@@ -3289,7 +3289,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			case E_USER_NOTICE:
 			case E_DEPRECATED:
 			case E_USER_DEPRECATED:
-			case E_STRICT:
+			case 2048:  // E_STRICT, only raised before PHP 8
 				echo("NOTICE: $errstr at line: $errline \n");
 				break;
 
