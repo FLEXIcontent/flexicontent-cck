@@ -1465,6 +1465,7 @@ class flexicontent_html
 
 		static $load_frameworks = null;
 		static $load_jquery = null;
+		static $jquery_for_plugins = null;
 
 		if (!isset($load_frameworks[$framework]))
 		{
@@ -1474,6 +1475,10 @@ class flexicontent_html
 				// jQuery-free); select2 legacy keeps jQuery + mousewheel.
 				$useChoicesJs = (int) $cparams->get('select_lib_type', 0) === 1;
 				$load_jquery = ( (int) $cparams->get('loadfw_jquery', 1) === 1 || !$app->isClient('site') ) && ! ( $app->isClient('site') && $useChoicesJs );
+
+				// jQuery plugins without a jQuery-free alternative still need jQuery in Choices.js mode,
+				// so it is loaded on the pages that use them (unless jQuery loading is turned off)
+				$jquery_for_plugins = (int) $cparams->get('loadfw_jquery', 1) === 1 || !$app->isClient('site');
 			}
 
 			$loadfw_param   = 'loadfw_' . strtolower(str_replace('-', '_', $framework));
@@ -1511,8 +1516,7 @@ class flexicontent_html
 				break;
 
 			case 'bootstrap-toggle':
-				// A jQuery plugin: it needs jQuery also in Choices.js mode, where the site front does not load jQuery otherwise
-				if ($load_jquery || (int) $cparams->get('loadfw_jquery', 1) === 1) flexicontent_html::loadJQuery();
+				if ($jquery_for_plugins) flexicontent_html::loadJQuery();
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/bootstrap-toggle';
 				$document->addScript($framework_path.'/js/bootstrap2-toggle.min.js');
@@ -1947,7 +1951,7 @@ class flexicontent_html
 
 			case 'multibox':
 			case 'jmultibox':
-				if ($load_jquery) flexicontent_html::loadJQuery();
+				if ($jquery_for_plugins) flexicontent_html::loadJQuery();
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/jmultibox';
 
@@ -2005,7 +2009,7 @@ class flexicontent_html
 				break;
 
 			case 'elastislide':
-				if ($load_jquery) flexicontent_html::loadJQuery();
+				if ($jquery_for_plugins) flexicontent_html::loadJQuery();
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/elastislide';
 				$document->addStyleSheet($framework_path.'/css/gallery.css');
