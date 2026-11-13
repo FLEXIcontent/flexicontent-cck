@@ -1809,7 +1809,7 @@ class flexicontent_html
 				break;
 
 			case 'inputmask':
-				if ($load_jquery) flexicontent_html::loadJQuery();
+				if ($jquery_for_plugins) flexicontent_html::loadJQuery();
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/inputmask';
 				$document->addScript($framework_path.'/jquery.inputmask.bundle.min.js');
@@ -2022,7 +2022,7 @@ class flexicontent_html
 				break;
 
 			case 'photoswipe':
-				if ($load_jquery) flexicontent_html::loadJQuery();
+				if ($jquery_for_plugins) flexicontent_html::loadJQuery();
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/photoswipe';
 
@@ -2066,7 +2066,7 @@ class flexicontent_html
 				break;
 
 			case 'fcxSlide':
-				if ($load_jquery) flexicontent_html::loadJQuery();
+				if ($jquery_for_plugins) flexicontent_html::loadJQuery();
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/fcxSlide';
 				$document->addScript($framework_path.'/class.fcxSlide.js', array('version' => FLEXI_VHASH));
