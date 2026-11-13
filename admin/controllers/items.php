@@ -2773,9 +2773,11 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			$cid_noauth = [];
 			foreach ($cid as $i => $_id)
 			{
-				$record = $record_model->getRecord($_id);
+				// The item model keeps the first loaded record: getRecord() of another id returns it again,
+				// so load each item explicitly, otherwise every id is checked against the first item's permissions
+				$record = $record_model->getItem($_id, $check_view_access = false, $no_cache = true);
 
-				if (!$record_model->canEdit($record))
+				if (!$record || !$record_model->canEdit($record))
 				{
 					$cid_noauth[] = $_id;
 					unset($cid[$i]);
@@ -2822,7 +2824,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			// IMPORTANT: Get existing field values for the item
 			$items               = array($item);
 			$items_custom_values = FlexicontentFields::getCustomFieldValues($items, 'item');
-			$data['custom']      = reset($items_custom_values); // Get data of first item
+			$data['custom']      = reset($items_custom_values) ?: array(); // Get data of first item (none if the item has no field values yet)
 
 			// Indicate which item to update
 			$data['id'] = $item_ID;
