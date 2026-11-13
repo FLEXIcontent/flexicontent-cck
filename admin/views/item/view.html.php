@@ -519,7 +519,8 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 					else
 					{
 						$msg = \Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK');
-						throw new Exception($msg, 403);
+						// The error page prints the exception message as plain text: drop the markup of the language string
+						throw new Exception(trim(strip_tags(preg_replace('#<br\s*/?>#i', ' ', $msg))), 403);
 					}
 				}
 
