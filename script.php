@@ -479,8 +479,8 @@ class com_flexicontentInstallerScript
 
 		$app = \Joomla\CMS\Factory::getApplication();
 		$db = \Joomla\CMS\Factory::getDbo();
-		$dbprefix = $app->getCfg('dbprefix');
-		$dbname   = $app->getCfg('db');
+		$dbprefix = $app->get('dbprefix');
+		$dbname   = $app->get('db');
 
 		// Copy our data source plugin into JSitemap (com_jmap), if it is installed
 		$this->_installJsitemapPlugin($parent->getParent()->getPath('source'));
@@ -1596,8 +1596,8 @@ class com_flexicontentInstallerScript
 		$error = false;
 		$extensions = array();
 		$db = \Joomla\CMS\Factory::getDbo();
-		$dbprefix = $app->getCfg('dbprefix');
-		$dbname   = $app->getCfg('db');
+		$dbprefix = $app->get('dbprefix');
+		$dbname   = $app->get('db');
 
 		// Uninstall additional flexicontent modules/plugins found in Joomla DB,
 		// This code part (for uninstalling additional extensions) originates from Zoo J1.5 Component:
@@ -1731,7 +1731,7 @@ class com_flexicontentInstallerScript
 						<?php
 						$queries = array();
 
-						$query = 'SHOW TABLES LIKE "' . \Joomla\CMS\Factory::getApplication()->getCfg('dbprefix') . 'jcomments"';
+						$query = 'SHOW TABLES LIKE "' . \Joomla\CMS\Factory::getApplication()->get('dbprefix') . 'jcomments"';
 						$db->setQuery($query);
 						$jcomments_tbl_exists = (boolean) count($db->loadObjectList());
 						if ($jcomments_tbl_exists) {
