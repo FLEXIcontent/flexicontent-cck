@@ -339,7 +339,7 @@ class Flexicontent extends _Flexicontent
     public function onFinderChangeState($context, $pks = null, $value = null)
     {
         $event = null;
-        if ($context instanceof FinderEvent\AfterSaveEvent)
+        if ($context instanceof FinderEvent\AfterChangeStateEvent)
         {
             $event   = $context;
             $context = $event->getContext();
