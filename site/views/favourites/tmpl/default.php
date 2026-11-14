@@ -195,18 +195,16 @@ $items	= & $this->items;
 			$RESIZE_FLAG = !$image_source || !$img_field_size;
 			if ( $src && $RESIZE_FLAG ) {
 				// Resize image when src path is set and RESIZE_FLAG: (a) using image extracted from item main text OR (b) not using image field's already created thumbnails
-				$h		= '&amp;h=' . $image_height;
-				$w		= '&amp;w=' . $image_width;
-				$aoe	= '&amp;aoe=1';
-				$q		= '&amp;q=95';
-				$ar 	= '&amp;ar=x';
-				$zc		= $image_method ? '&amp;zc=' . $image_method : '';
-				$ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-				$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&amp;f='.$ext : '';
-				$conf	= $w . $h . $aoe . $q . $ar . $zc . $f;
-				
-				$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  \Joomla\CMS\Uri\Uri::base(true).'/' : '';
-				$thumb = \Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+				$thumb = flexicontent_images::phpThumbURL(array(
+					'src' => $src,
+					'w'   => $image_width,
+					'h'   => $image_height,
+					'aoe' => 1,
+					'q'   => 95,
+					'ar'  => 'x',
+					'zc'  => $image_method ?: '',
+					'f'   => flexicontent_images::phpThumbFormat($src),
+				));
 			} else {
 				// Do not resize image when (a) image src path not set or (b) using image field's already created thumbnails
 			}

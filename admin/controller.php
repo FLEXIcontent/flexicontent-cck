@@ -291,4 +291,50 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\AdminController
 	{
 		flexicontent_ajax::call_extfunc();
 	}
+
+
+	/**
+	 * Create a new key for signing phpThumb URLs (component configuration, phpThumb tab)
+	 *
+	 * @return  void
+	 */
+	public function regeneratePhpThumbKey()
+	{
+		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+
+		$app  = \Joomla\CMS\Factory::getApplication();
+		$user = $app->getIdentity();
+		$link = 'index.php?option=com_config&view=component&component=com_flexicontent';
+
+		if (!$user || !$user->authorise('core.admin', 'com_flexicontent'))
+		{
+			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('JERROR_ALERTNOAUTHOR'), 'error');
+			$this->setRedirect($link);
+
+			return;
+		}
+
+		$result = flexicontent_images::phpThumbSyncConfig(true);
+
+		if ($result === false)
+		{
+			$app->enqueueMessage(\Joomla\CMS\Language\Text::sprintf('FLEXI_PHPTHUMB_KEY_FILE_NOT_WRITABLE', flexicontent_images::phpThumbManagedFile()), 'error');
+		}
+		else
+		{
+			// Pages cached with URLs signed by the previous key are now stale
+			try
+			{
+				\Joomla\CMS\Factory::getCache()->clean('page');
+				\Joomla\CMS\Factory::getCache()->clean('com_flexicontent');
+			}
+			catch (\Throwable $e)
+			{
+			}
+
+			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_PHPTHUMB_KEY_REGENERATED'), 'message');
+		}
+
+		$this->setRedirect($link);
+	}
 }
