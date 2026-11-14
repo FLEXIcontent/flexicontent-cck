@@ -656,10 +656,12 @@ class FlexicontentTasksCore
 			if (in_array('fields', $sources_order))
 			{
 				// Whole values of searchable Text fields, e.g. a cyrillic name "Лаки Патчер" of an item titled "Lucky Patcher"
+				// Only published fields that the user may view, as the search index and the item view do
 				$field_query = 'SELECT fv.value, COUNT(DISTINCT i.id) AS cnt'
 					. ' FROM #__flexicontent_fields_item_relations AS fv'
 					. ' JOIN #__flexicontent_fields AS f ON f.id = fv.field_id AND f.field_type = "text"'
 					. '  AND (f.issearch = 1 OR f.isadvsearch = 1)'
+					. '  AND f.published = 1 AND f.access IN (' . ($levels ? implode(',', $levels) : '0') . ')'
 					. ' JOIN #__flexicontent_items_tmp AS i ON i.id = fv.item_id'
 					. $cid_join
 					. ' WHERE ' . $_conds('fv.value')
