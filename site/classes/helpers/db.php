@@ -1351,6 +1351,34 @@ class flexicontent_db
 
 
 	/**
+	 * Check if the user can modify an item that is associated (language association) with an item being saved
+	 * Association membership does not grant permission to edit the target item, also skip items checked out by other users
+	 *
+	 * @param   int                           $item_id  The associated (target) item
+	 * @param   \Joomla\CMS\User\User|null  $user     The user, defaults to the current user
+	 *
+	 * @return  boolean
+	 */
+	static function canEditAssocItem($item_id, $user = null)
+	{
+		$item_id = (int) $item_id;
+		$user = $user ?: \Joomla\CMS\Factory::getUser();
+		$db = \Joomla\CMS\Factory::getDbo();
+
+		$row = $db->setQuery('SELECT created_by, checked_out FROM #__content WHERE id = ' . $item_id)->loadObject();
+		$asset = 'com_content.article.' . $item_id;
+
+		if (!$row || (!empty($row->checked_out) && (int) $row->checked_out !== (int) $user->id))
+		{
+			return false;
+		}
+
+		return $user->authorise('core.edit', $asset)
+			|| (!empty($row->created_by) && (int) $row->created_by === (int) $user->id && $user->authorise('core.edit.own', $asset));
+	}
+
+
+	/**
 	 * Method to check if the main or the secondary categories are configured as non-translatable
 	 *
 	 * @return  boolean
@@ -1423,6 +1451,12 @@ class flexicontent_db
 		foreach ($assoc_ids as $assoc_id)
 		{
 			$assoc_id = (int) $assoc_id;
+
+			if (!static::canEditAssocItem($assoc_id))
+			{
+				continue;
+			}
+
 			$lang = $assocs[$item_id][$assoc_id]->language;
 
 			$map = function ($cid) use ($cat_map, $lang)
