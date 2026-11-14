@@ -6394,6 +6394,22 @@ class ParentClassItem extends FCModelAdmin
                 $this->table->reset();
                 $this->table->load($pk);
 
+                // An empty replacement must clear the existing Joomla assignments.
+                // SetNewTags can skip an empty list when no store set tagsChanged.
+                if (FLEXI_J40GE && !$jtag_ids && $replaceTags)
+                {
+                    $tagsHelper = $this->table->getTagsHelper();
+
+                    if (!$tagsHelper || !$tagsHelper->deleteTagData($this->table, $pk))
+                    {
+                        $this->setError($this->table->getError());
+
+                        return false;
+                    }
+
+                    continue;
+                }
+
                 // Joomla 6 : On injecte la propriété dans l'objet Table car le plugin Taggable l'y cherche
                 $this->table->replaceTags = $replaceTags;
                 
