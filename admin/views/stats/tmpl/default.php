@@ -166,9 +166,9 @@ $ctrl_users = "task=users.";
 <?php
 	$stasts          = $this->itemsgraph[0];
 	$months          = array();
-	$monthslist      = '';
+	$monthslist      = '[]';
 	$totalitems       = array();
-	$totalitemslist   = '';
+	$totalitemslist   = '[]';
 
 
 	foreach ($stasts as $s) {
@@ -273,11 +273,12 @@ $ctrl_users = "task=users.";
 			$typeslabel        = explode('|',$workflow['labels']);
 			$typeslabellist    = json_encode($typeslabel);
 			$valuesitems       = explode(',',$workflow['values']);
-			$datalist          = '';
+			$data              = array();
 
 			foreach ($typeslabel  as $key=>$label) {
-					$datalist.= '{value:'.$valuesitems[$key].', name:"'.$label.'"},';
+					$data[] = array('value' => (float) ($valuesitems[$key] ?? 0), 'name' => $label);
 			}
+			$datalist = json_encode($data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 		 ?>
 
 	    <script>
@@ -315,9 +316,7 @@ $ctrl_users = "task=users.";
 			          type:'pie',
 			          radius : '75%',
 			          center: ['60%', '60%'],
-			          data:[
-			               <?php echo $datalist; ?>
-			           ]
+			          data:<?php echo $datalist; ?>
 			        }
 			      ]
 			    };
@@ -592,11 +591,12 @@ $ctrl_users = "task=users.";
 				$voteslabel        = explode('|',$votesitems['labels']);
 				$voteslabellist    = json_encode($voteslabel);
 				$valuesvotes       = explode(',',$votesitems['values']);
-				$datalist          = '';
+				$data              = array();
 
 				foreach ($voteslabel  as $key=>$label) {
-						$datalist.= '{value:'.$valuesvotes[$key].', name:"'.$label.'"},';
+						$data[] = array('value' => (float) ($valuesvotes[$key] ?? 0), 'name' => $label);
 				}
+				$datalist = json_encode($data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 			 ?>
 
 		    <script>
@@ -634,9 +634,7 @@ $ctrl_users = "task=users.";
 				          type:'pie',
 				          radius : '75%',
 				          center: ['50%', '60%'],
-				          data:[
-				               <?php echo $datalist; ?>
-				           ]
+				          data:<?php echo $datalist; ?>
 				        }
 				      ]
 				    };
