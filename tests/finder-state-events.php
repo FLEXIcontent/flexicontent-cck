@@ -27,6 +27,9 @@ namespace {
     eval('use Joomla\CMS\Event\Finder as FinderEvent;
         class FinderStateFixture {
             public array $calls = [];
+            public array $legacy = [];
+            private function removeLegacyLinks($pk, $removeTaxonomies = true) { return $this->legacy[$pk] ?? false; }
+            public function reindex($pk) { $this->calls[] = ["reindex", $pk]; }
             public function itemStateChange($pks, $value) { $this->calls[] = ["state", $pks, $value]; }
             public function pluginDisable($pks) { $this->calls[] = ["disable", $pks]; }
             ' . $method . '}');
@@ -44,6 +47,12 @@ namespace {
         $fixture->onFinderChangeState(...$args);
         if ($fixture->calls !== $expected) { throw new \RuntimeException('Finder state change was ignored or misrouted'); }
     }
+    $fixture = new FinderStateFixture;
+    $fixture->legacy[42] = true;
+    $fixture->onFinderChangeState(new $event('com_content.article', [42], 0));
+    if ($fixture->calls !== [['reindex', 42], ['state', [42], 0]]) {
+        throw new \RuntimeException('Legacy index key must be replaced before the state update');
+    }
     restore_error_handler();
-    echo count($cases) . " Finder state event checks passed\n";
+    echo (count($cases) + 1) . " Finder state event checks passed\n";
 }

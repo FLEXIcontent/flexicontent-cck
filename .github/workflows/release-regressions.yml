@@ -30,6 +30,7 @@ jobs:
           php -d error_reporting=-1 tests/finder-query.php
           php -d error_reporting=-1 tests/finder-parameters.php
           php -d error_reporting=-1 tests/finder-state-events.php
+          php -d error_reporting=-1 tests/finder-identifiers.php
           php -d error_reporting=-1 tests/route-menu-context.php
           php -d error_reporting=-1 tests/installer-platform.php 4.4.0
           php -d error_reporting=-1 tests/installer-platform.php 5.0.0
