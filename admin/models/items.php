@@ -1744,6 +1744,14 @@ class FlexicontentModelItems extends FCModelAdminList
 	}
 
 
+	/** Normalize scalar batch requests and the omitted-language marker. */
+	protected function normaliseBatchLanguages($languages): array
+	{
+		if (is_array($languages)) return array_values($languages);
+		return $languages === null || $languages === '' || $languages === '_not_posted_'
+			? [] : [(string) $languages];
+	}
+
 	/**
 	 * Method to copy items 
 	 *
@@ -1757,6 +1765,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$jinput = $app->input;
 
 		$tags = array_values(array_filter(ArrayHelper::toInteger((array) $tags)));
+		$lang_arr = $this->normaliseBatchLanguages($lang_arr);
 
 		$dbprefix = $app->getCfg('dbprefix');
 
@@ -2384,12 +2393,12 @@ class FlexicontentModelItems extends FCModelAdminList
 
 		// Keep original if: null, zero, ''
 		$item->catid    = $maincat ?: $item->catid;
-		$item->language = $lang ?: $item->language;
+		$item->language = $lang && $lang !== '_not_posted_' ? $lang : $item->language;
 		$item->type_id  = $type_id ?: $item->type_id;
 		$item->access   = $access ?: $item->access;
 
 		// keep original if: null, ''
-		$item->state = strlen($state) ? $state : $item->state;
+		$item->state = strlen((string) $state) ? $state : $item->state;
 
 		$item->store();
 
