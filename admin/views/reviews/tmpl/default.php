@@ -79,8 +79,22 @@ $tools_state = isset($FcMansConf->$fc_man_name)
  * Order stuff and table related variables
  */
 
-$list_total_cols = 9
+$list_total_cols = 10
 	+ ($useAssocs ? 1 : 0);
+
+// Number of stars used by the voting (reviews) field, for displaying the rating of reviews
+$rv_stars = 5;
+$rv_db    = \Joomla\CMS\Factory::getDbo();
+$rv_field = $rv_db->setQuery('SELECT * FROM #__flexicontent_fields WHERE field_type = ' . $rv_db->Quote('voting'))->loadObject();
+
+if ($rv_field)
+{
+	$rv_item = (object) array('type_id' => 0);
+	FlexicontentFields::loadFieldConfig($rv_field, $rv_item);
+	$rv_resolution = max(5, min(100, (int) $rv_field->parameters->get('rating_resolution', 5)));
+	$rv_stars = (int) $rv_field->parameters->get('rating_stars', 5);
+	$rv_stars = max(1, min(10, $rv_stars > 0 ? min($rv_stars, $rv_resolution) : $rv_resolution));
+}
 
 
 
@@ -263,6 +277,10 @@ if ($js)
 			</th>
 
 			<th class="hideOnDemandClass center">
+				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_REVIEW_RATING', 'a.average_rating', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+			</th>
+
+			<th class="hideOnDemandClass center">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_REVIEW_APPROVED', 'a.approved', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
@@ -360,6 +378,17 @@ if ($js)
 				 */
 				echo \Joomla\CMS\HTML\HTMLHelper::_($hlpname . '.edit_link', $row, $i, $row->canEdit);
 				echo $content ? '<br><small>[' . $content->title . ']</small>' : '';
+				?>
+			</td>
+
+			<td class="center nowrap">
+				<?php
+				/**
+				 * Display the rating (stars) given by the reviewer
+				 */
+				echo (int) $row->average_rating > 0
+					? flexicontent_html::reviewStars($row->average_rating, $rv_stars, '1.2em')
+					: '-';
 				?>
 			</td>
 

@@ -278,6 +278,17 @@
 		var box_loading = document.getElementById(tagid + '_loading');
 		var in_modal = !!document.querySelector('.fcvote_modal_overlay.fcvote_modal_visible');
 
+		// Rating (stars) is required
+		var rating_input = form.elements['rating'];
+		var rating_error = form.querySelector('.fcvote-review-rating-error');
+		if (rating_input) {
+			if (!rating_input.value) {
+				if (rating_error) rating_error.style.display = '';
+				return;
+			}
+			if (rating_error) rating_error.style.display = 'none';
+		}
+
 		if (typeof form.checkValidity === 'function') {
 			if (!form.checkValidity()) {
 				fcvote_submit_review_form_show_validation(form, box_loading || box);
@@ -323,6 +334,7 @@
 				} else if (box) {
 					box.innerHTML = data.html;
 					box.style.display = '';
+					fcvote_review_update_button(tagid, 'edit');
 				}
 			}
 		})
@@ -337,6 +349,81 @@
 	}
 
 	window.fcvote_submit_review_form = fcvote_submit_review_form;
+
+
+	/* ================================================================
+	 *  REVIEW FORM — Rating (stars) picker
+	 * ================================================================ */
+
+	function fcvote_review_set_rating(btn) {
+		var wrap = btn.parentNode;
+		var value = parseInt(btn.getAttribute('data-value'), 10) || 0;
+		var input = wrap.querySelector('input[name="rating"]');
+		if (input) input.value = value;
+
+		var stars = wrap.querySelectorAll('.fcvote-review-star');
+		for (var i = 0; i < stars.length; i++) {
+			var v = parseInt(stars[i].getAttribute('data-value'), 10) || 0;
+			stars[i].style.color = v <= value ? '#f5a623' : '#ccc';
+		}
+
+		var form = btn.form || (input && input.form);
+		var err = form ? form.querySelector('.fcvote-review-rating-error') : null;
+		if (err) err.style.display = 'none';
+	}
+
+	window.fcvote_review_set_rating = fcvote_review_set_rating;
+
+
+	/* ================================================================
+	 *  REVIEW FORM — Update label of the 'review' button (new / edit)
+	 * ================================================================ */
+
+	function fcvote_review_update_button(tagid, mode) {
+		var btns = document.querySelectorAll('.fcvote_toggle_review_form');
+		for (var i = 0; i < btns.length; i++) {
+			if (btns[i].getAttribute('data-tagid') !== tagid) continue;
+			var label = btns[i].getAttribute(mode === 'edit' ? 'data-label-edit' : 'data-label-new');
+			if (label) btns[i].value = label;
+		}
+	}
+
+
+	/* ================================================================
+	 *  REVIEW FORM — Delete the review of the current user
+	 * ================================================================ */
+
+	function fcvote_delete_review(tagid, form) {
+		var btn = form.querySelector('.fcvote_review_form_delete_btn');
+		if (!window.confirm(btn ? btn.getAttribute('data-confirm') : '')) return;
+
+		var box = document.getElementById(tagid);
+		var url = fcvote_root_url()
+			+ 'index.php?option=com_flexicontent&format=raw&task=deletereviewform';
+
+		fetch(url, {
+			method: 'POST',
+			headers: { 'X-Requested-With': 'XMLHttpRequest' },
+			body: new FormData(form)
+		})
+		.then(function(r) { return r.json(); })
+		.then(function(data) {
+			if (!data || !data.html || !box) return;
+			if (data.error) {
+				var eBox = document.createElement('div');
+				eBox.innerHTML = data.html;
+				form.insertAdjacentElement('beforebegin', eBox.firstElementChild || eBox);
+			} else {
+				box.innerHTML = data.html;
+				fcvote_review_update_button(tagid, 'new');
+			}
+		})
+		.catch(function(err) {
+			alert('Error: ' + (err.message || err));
+		});
+	}
+
+	window.fcvote_delete_review = fcvote_delete_review;
 
 
 	/* ================================================================

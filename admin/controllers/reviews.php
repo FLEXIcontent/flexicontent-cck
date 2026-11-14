@@ -46,6 +46,26 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 	var $exitSuccess  = true;
 
 	/**
+	 * Internal voting mode: ajaxvote() is called by PHP code (e.g. when a review is saved),
+	 * it throws exceptions on errors and returns the result, instead of sending a response
+	 *
+	 * @var boolean
+	 */
+	protected $voteInternal = false;
+
+	/**
+	 * Method to set the internal voting mode
+	 *
+	 * @param   boolean  $internal  True to enable the internal mode
+	 *
+	 * @return  void
+	 */
+	public function setVoteInternal($internal = true)
+	{
+		$this->voteInternal = (bool) $internal;
+	}
+
+	/**
 	 * Constructor
 	 *
 	 * @param   array   $config    associative array of configuration settings.
@@ -536,8 +556,8 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 			// Modification of existing review (via non-admin), save old data if review is currently in "approved" status
 			if (!$isNew && $model->get('approved'))
 			{
-				$validated_data['title_old']       = $model->get('title');
-				$validated_data['description_old'] = $model->get('description');
+				$validated_data['title_old'] = $model->get('title');
+				$validated_data['text_old']  = $model->get('text');
 			}
 		}
 		
@@ -781,6 +801,16 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 
 
 		/**
+		 * Logged users: their rating is stored in the DB too (as a review record, that is displayed only if it has text),
+		 * this allows a single vote per user, that can be changed, and it is the rating of the user's review
+		 */
+		$sync_user_rating = $user->id
+			&& (int) $field->parameters->get('allow_reviews', 0)
+			&& !$enable_extra_votes
+			&& $xid === 'main';
+
+
+		/**
 		 * Check: item id exists in our voting logging SESSION (array) variable, to avoid double voting
 		 */
 
@@ -811,6 +841,18 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 			$old_ratings['main'] = isset($vote_history[$cid]['main'])
 				? (int) round($vote_history[$cid]['main'])
 				: 0;
+
+			// Logged users: the rating of the user is stored in the DB (in his review record), so use it as old rating
+			if ($sync_user_rating)
+			{
+				$persisted_rating = $this->_getUserRating($cid, $user, $rating_resolution);
+
+				if ($persisted_rating)
+				{
+					$old_ratings['main'] = $persisted_rating;
+				}
+			}
+
 			$vote_history[$cid]['main'] = $user_rating_main;
 		}
 
@@ -1035,6 +1077,12 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 				</div>';
 		}
 
+		// Store the rating of a logged user (reviews are enabled), if called via the review form this is done by the review form
+		if ($sync_user_rating && $voteIsComplete && !$this->voteInternal)
+		{
+			$this->_storeUserRating($cid, $user, $user_rating, $rating_resolution);
+		}
+
 		// Set the voting data, into SESSION
 		$session->set('vote_history', $vote_history, 'flexicontent');
 
@@ -1049,7 +1097,11 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		 * Set response and exit
 		 */
 
-		if ($no_ajax)
+		if ($this->voteInternal)
+		{
+			return $result;
+		}
+		elseif ($no_ajax)
 		{
 			$app->enqueueMessage($xid === 'main' ? $result->message_main.'<br/>'.$result->message : $result->message_main, 'notice');
 			return;
@@ -1063,6 +1115,64 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 
 
 	/**
+	 * Method to get the rating (on the voting field scale) that a logged user has given to an item
+	 *
+	 * @param   int      $cid         The content ID
+	 * @param   object   $user        The user
+	 * @param   int      $resolution  The rating resolution of the voting field
+	 *
+	 * @return  int      The rating, or 0 if the user has not rated the item
+	 */
+	protected function _getUserRating($cid, $user, $resolution)
+	{
+		$review = \Joomla\CMS\Table\Table::getInstance('flexicontent_reviews', '', array());
+
+		if (!$review->load(array('content_id' => (int) $cid, 'user_id' => (int) $user->id, 'type' => 'item')))
+		{
+			return 0;
+		}
+
+		return (int) $review->average_rating > 0
+			? max(1, (int) round($review->average_rating * $resolution / 100))
+			: 0;
+	}
+
+
+	/**
+	 * Method to store the rating of a logged user, in his review record (creating a record without text if needed)
+	 *
+	 * @param   int      $cid         The content ID
+	 * @param   object   $user        The user
+	 * @param   int      $rating      The rating on the voting field scale
+	 * @param   int      $resolution  The rating resolution of the voting field
+	 *
+	 * @return  boolean  True on success
+	 */
+	protected function _storeUserRating($cid, $user, $rating, $resolution)
+	{
+		$review = \Joomla\CMS\Table\Table::getInstance('flexicontent_reviews', '', array());
+
+		if (!$review->load(array('content_id' => (int) $cid, 'user_id' => (int) $user->id, 'type' => 'item')))
+		{
+			// Rating only record: it is not displayed (no text), and it needs no approval
+			$review->reset();
+			$review->content_id = (int) $cid;
+			$review->type       = 'item';
+			$review->user_id    = (int) $user->id;
+			$review->email      = $user->email;
+			$review->state      = 1;
+			$review->approved   = 1;
+			$review->verified   = 1;
+		}
+
+		$review->average_rating = (int) round(100 * $rating / $resolution);
+		$review->check();
+
+		return $review->store();
+	}
+
+
+	/**
 	 * Method to terminate the ajax voting tasking task on error
 	 *
 	 * @since 1.0
@@ -1071,8 +1181,14 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 	{
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 
+		// Internal call (PHP code), let the caller handle the error
+		if ($this->voteInternal)
+		{
+			throw new RuntimeException(trim(strip_tags($mssg)));
+		}
+
 		// Handle non ajax call
-		if ($no_ajax)
+		elseif ($no_ajax)
 		{
 			\Joomla\CMS\Factory::getApplication()->enqueueMessage($mssg, 'notice');
 			return;

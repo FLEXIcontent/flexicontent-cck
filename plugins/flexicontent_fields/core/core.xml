@@ -1206,40 +1206,40 @@
 
 		<fieldset name="group-voting-reviews" hidden="true" icon_class="icon-paragraph-justify" label="FLEXI_FIELD_VOTE_REVIEWS" description="FLEXI_FIELD_VOTE_REVIEWS_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
 
-			<field name="" type="separator" default="This an unfinished ALPHA-state feature, it is meant to be enabled only by testers" level="level3" class="alert alert-warning" />
+			<field name="" type="separator" default="FLEXI_FIELD_VOTE_REVIEWS_ALPHA_WARNING" level="level3" class="alert alert-warning" />
 			<field name="" type="separator" default="" level="level_br" />
 
 			<field name="" type="separator" default="reviews_conf" level="tabset_start" tab_class="s-fake" box_type="1" />
-			<field name="tab-reviews-auth-workflow" type="separator" default="Authoring, Workflow" icon_class="icon-pencil" level="tab_open" box_type="1" />
+			<field name="tab-reviews-auth-workflow" type="separator" default="FLEXI_FIELD_VOTE_REVIEWS_TAB_WORKFLOW" icon_class="icon-pencil" level="tab_open" box_type="1" />
 
-			<field name="allow_reviews" type="radio" default="0" label="FLEXI_ENABLE" description="..." class="btn-group btn-group-yesno">
+			<field name="allow_reviews" type="radio" default="0" label="FLEXI_ENABLE" description="FLEXI_FIELD_VOTE_REVIEWS_ENABLE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 
-			<field name="" type="separator" default="New reviews" level="level2" />
-			<field name="allow_submit_review_by" type="radio" default="0" label="Allow submissions" description="Allow reviews to be submitted by guests" class="btn-group btn-group-yesno">
+			<field name="" type="separator" default="FLEXI_FIELD_VOTE_REVIEWS_NEW" level="level2" />
+			<field name="allow_submit_review_by" type="radio" default="0" label="FLEXI_FIELD_VOTE_REVIEWS_ALLOW_SUBMIT" description="FLEXI_FIELD_VOTE_REVIEWS_ALLOW_SUBMIT_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_DISABLED</option>
-				<option value="1">Anyone</option>
-				<option value="1">Logged Only</option>
-				<option value="2">Use Access Level</option>
+				<option value="1">FLEXI_FIELD_VOTE_REVIEWS_SUBMIT_ANYONE</option>
+				<option value="2">FLEXI_FIELD_VOTE_REVIEWS_SUBMIT_LOGGED</option>
+				<option value="3">FLEXI_FIELD_VOTE_REVIEWS_SUBMIT_ACCESSLEVEL</option>
 			</field>
-			<field name="review_submit_access" type="accesslevel" default="1" label="Submit Access Level" description="..." />
+			<field name="review_submit_access" type="accesslevel" default="1" label="FLEXI_FIELD_VOTE_REVIEWS_SUBMIT_ACCESS" description="FLEXI_FIELD_VOTE_REVIEWS_SUBMIT_ACCESS_DESC" />
 
-			<field name="" type="separator" default="Publishing" description="" level="level2" />
-			<field name="do_approval" type="radio" default="1" label="Publish after approval" description="Require an administrator to read and approve new reviews" class="btn-group btn-group-yesno">
+			<field name="" type="separator" default="FLEXI_FIELD_VOTE_REVIEWS_PUBLISHING" description="" level="level2" />
+			<field name="do_approval" type="radio" default="1" label="FLEXI_FIELD_VOTE_REVIEWS_APPROVAL" description="FLEXI_FIELD_VOTE_REVIEWS_APPROVAL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 
-			<field name="" type="separator" default="Guests" description="" level="level3" />
-			<field name="verify_email_ownership" type="radio" default="1" label="Verify email ownerships" disabled="disabled" description="For every new review by a guest, an email will be sent to the guest user email to verify email ownership" class="btn-group btn-group-yesno">
+			<field name="" type="separator" default="FLEXI_FIELD_VOTE_REVIEWS_GUESTS" description="" level="level3" />
+			<field name="verify_email_ownership" type="radio" default="1" label="FLEXI_FIELD_VOTE_REVIEWS_VERIFY_EMAIL" disabled="disabled" description="FLEXI_FIELD_VOTE_REVIEWS_VERIFY_EMAIL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
-				<option value="1">Yes ... TODO</option>
+				<option value="1">FLEXI_FIELD_VOTE_REVIEWS_VERIFY_EMAIL_YES</option>
 			</field>
 
-			<field name="tab-reviews-display" type="separator" default="Layout" icon_class="icon-palette" level="tab_open" box_type="1" />
-			<field name="reviews_placement" type="radio" default="0" label="Reviews List Placement" description="" class="btn-group group-fcinfo">
+			<field name="tab-reviews-display" type="separator" default="FLEXI_FIELD_VOTE_REVIEWS_TAB_LAYOUT" icon_class="icon-palette" level="tab_open" box_type="1" />
+			<field name="reviews_placement" type="radio" default="0" label="FLEXI_FIELD_VOTE_REVIEWS_PLACEMENT" description="" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_INLINE</option>
 				<option value="1">FLEXI_MODAL_WINDOW</option>
 			</field>

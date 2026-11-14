@@ -4237,6 +4237,33 @@ class flexicontent_html
 	}
 
 	/**
+	 * Creates a read-only display of rating stars (e.g. for the rating of a review)
+	 *
+	 * @param   int     $percent  The rating as a percentage (0 - 100)
+	 * @param   int     $stars    The number of stars to display
+	 * @param   string  $size     CSS size of each star
+	 *
+	 * @return  string  The HTML of the stars, self-contained (inline styles)
+	 *
+	 * @since   3.3.0
+	 */
+	static function reviewStars($percent, $stars = 5, $size = '1.1em')
+	{
+		$percent = max(0, min(100, (int) $percent));
+		$stars   = max(1, min(10, (int) $stars));
+		$size    = htmlspecialchars($size, ENT_QUOTES, 'UTF-8');
+		$label   = round($percent * $stars / 100, 1) . ' / ' . $stars;
+
+		$star = '<svg viewBox="0 0 576 512" aria-hidden="true" focusable="false" style="flex:none;width:' . $size . ';height:' . $size . ';"><path fill="currentColor" d="M316.9 18C311.6 7 300.4 0 288.1 0s-23.4 7-28.8 18L195 150.3 51.4 171.5c-12 1.8-22 10.2-25.7 21.7s-.7 24.2 7.9 32.7L137.8 327 113.2 469.7c-2 12 3 24.2 12.9 31.3s23 8 33.8 2.3l128.3-68.5 128.3 68.5c10.8 5.7 23.9 4.9 33.8-2.3s14.9-19.3 12.9-31.3L438.5 327 542.7 225.9c8.6-8.5 11.7-21.2 7.9-32.7s-13.7-19.9-25.7-21.7L381.2 150.3 316.9 18z"/></svg>';
+		$row  = str_repeat($star, $stars);
+
+		return '<span class="fc-review-stars" role="img" aria-label="' . $label . '" title="' . $label . '" style="position:relative;display:inline-block;white-space:nowrap;line-height:1;vertical-align:middle;">'
+			. '<span style="display:inline-flex;color:#ccc;">' . $row . '</span>'
+			. '<span style="position:absolute;left:0;top:0;display:inline-flex;overflow:hidden;width:' . $percent . '%;color:#f5a623;">' . $row . '</span>'
+			. '</span>';
+	}
+
+	/**
 	 * Creates the ajax voting stars system
 	 *
 	 * @param array $field
@@ -4265,7 +4292,29 @@ class flexicontent_html
 		$int_xid = (int) $xid;
 		$item_id = $field->item_id;
 		$review_type = 'item';
-		$add_review_form = (int) $field->parameters->get('allow_reviews', 0);
+		// Show the review button only if reviews are enabled and new submissions are allowed
+		$add_review_form = (int) ($field->parameters->get('allow_reviews', 0) && $field->parameters->get('allow_submit_review_by', 0));
+		$review_btn_label_new  = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_THIS_ITEM');
+		$review_btn_label_edit = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_EDIT_YOURS');
+		$review_btn_label = $review_btn_label_new;
+
+		// A logged user that has already reviewed this item, can edit / delete his review (instead of adding another)
+		if ($add_review_form && ($review_uid = (int) \Joomla\CMS\Factory::getApplication()->getIdentity()->id))
+		{
+			$review_db = \Joomla\CMS\Factory::getDbo();
+			$review_q  = $review_db->getQuery(true)
+				->select('COUNT(*)')
+				->from('#__flexicontent_reviews')
+				->where('content_id = ' . (int) $field->item_id)
+				->where('type = ' . $review_db->Quote($review_type))
+				->where('user_id = ' . $review_uid)
+				->where('CHAR_LENGTH(TRIM(text)) > 0');
+
+			if ((int) $review_db->setQuery($review_q)->loadResult())
+			{
+				$review_btn_label = $review_btn_label_edit;
+			}
+		}
 
 
 		// Get extra voting option (composite voting)
@@ -4384,8 +4433,11 @@ class flexicontent_html
 			'.($add_review_form ? '
 			<div class="fcvote_review_row">
 				<input type="button" class="btn btn-primary fcvote_toggle_review_form"
+					data-tagid="fcvote_review_form_box_'.$item_id.'"
+					data-label-new="'.htmlspecialchars($review_btn_label_new, ENT_COMPAT, 'UTF-8').'"
+					data-label-edit="'.htmlspecialchars($review_btn_label_edit, ENT_COMPAT, 'UTF-8').'"
 					onclick="fcvote_open_review_form(\'fcvote_review_form_box_'.$item_id.'\', '.$item_id.', \''.$review_type.'\', this)"
-					value="'.\Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_THIS_ITEM').'"/>
+					value="'.htmlspecialchars($review_btn_label, ENT_COMPAT, 'UTF-8').'"/>
 				<div id="fcvote_review_form_box_'.$item_id.'_loading" class="fcvote_review_form_box_loading"></div>
 				<div id="fcvote_review_form_box_'.$item_id.'" class="fcvote_review_form_box" style="display:none;"></div>
 			</div>' : '').'

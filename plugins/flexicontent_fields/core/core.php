@@ -1322,42 +1322,53 @@ class plgFlexicontent_fieldsCore extends FCField
 	 */
 	private function _getReviews($items, $item)
 	{
-		static $item_reviews = null;
+		static $item_reviews = array();
 
-		if (!isset($item_reviews[$item->id]))
+		$item_id = (int) $item->id;
+
+		if (!isset($item_reviews[$item_id]))
 		{
 			$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
-			$item_ids = array();
+			// Always include the current item, and avoid overwriting the $item argument
+			$item_ids = array($item_id);
 
-			foreach($items as $item)
+			foreach ((array) $items as $_item)
 			{
-				$item_ids[] = (int) $item->id;
+				$item_ids[] = (int) $_item->id;
 			}
 
+			$item_ids = array_unique($item_ids);
+
+			// Only published AND approved reviews are visible to the public, a user also sees his own (pending) review
+			$uid = (int) \Joomla\CMS\Factory::getApplication()->getIdentity()->id;
+
 			$query = $db->getQuery(true)
-				->select('*')
-				->from('#__flexicontent_reviews')
-				->where('content_id IN (' . implode(',', $item_ids) . ')')
-				->where('type = ' . $db->Quote('item'));
+				->select('r.*')
+				->select('u.name AS author_name')
+				->from('#__flexicontent_reviews AS r')
+				->join('LEFT', '#__users AS u ON u.id = r.user_id')
+				->where('r.content_id IN (' . implode(',', $item_ids) . ')')
+				->where('r.type = ' . $db->Quote('item'))
+				->where('r.state = 1')
+				->where($uid ? '(r.approved = 1 OR r.user_id = ' . $uid . ')' : 'r.approved = 1')
+				->where('CHAR_LENGTH(TRIM(r.text)) > 0')
+				->order('r.submit_date DESC');
 
 			$rvdata = $db->setQuery($query)->loadObjectList();
 
-			foreach($rvdata as $r)
+			// This is needed for future isset checks
+			foreach ($item_ids as $_id)
 			{
-				$item_reviews[$r->content_id][] = $r;
+				$item_reviews[$_id] = array();
 			}
 
-			// This is need for future isset checks
-			foreach($items as $item)
+			foreach ($rvdata as $r)
 			{
-				if (!isset($item_reviews[$item->id]))
-				{
-					$item_reviews[$item->id] = array();
-				}
+				$item_reviews[(int) $r->content_id][] = $r;
 			}
 		}
 
-		return $item_reviews[$item->id];
+		return $item_reviews[$item_id];
 	}
 }
