@@ -27,4 +27,10 @@ foreach(['language','state']as $property){
         if($item->$property!==$expected)throw new RuntimeException('Omitted batch '.$property.' changed stored data');$count++;
     }
 }
+$copy=substr($source,strpos($source,'function copyitems('),strpos($source,'function moveitem(')-strpos($source,'function copyitems('));
+if(!preg_match('/\$row->state\s*=\s*[^;]+;/',$copy,$match))throw new RuntimeException('Batch copy state assignment missing');
+foreach([[null,1],['',1],[false,1],[0,0],['0','0'],[-2,-2],[1,1]]as[$state,$expected]){
+    $row=(object)['state'=>1];eval($match[0]);
+    if($row->state!==$expected)throw new RuntimeException('Omitted copy state changed stored data');$count++;
+}
 restore_error_handler();echo $count." batch value checks passed\n";
