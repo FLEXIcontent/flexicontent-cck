@@ -31,6 +31,10 @@ if (!defined('FLEXI_J40GE'))   define('FLEXI_J40GE', version_compare( $jversion-
 
 class com_flexicontentInstallerScript
 {
+	public $release;
+	public $release_existing;
+	public $minimum_joomla_release;
+
 	/*
 	* $parent is the class calling this method.
 	* $type is the type of change (install, update or discover_install, not uninstall).
@@ -39,10 +43,6 @@ class com_flexicontentInstallerScript
 	*/
 	function preflight( $type, $parent )
 	{
-		// Display fatal errors, warnings, notices
-		error_reporting(E_ERROR || E_WARNING || E_NOTICE);
-		ini_set('display_errors',1);
-
 		// Try to increment some limits
 		@ set_time_limit( 150 );   // try to set execution time 2.5 minutes
 		ignore_user_abort( true ); // continue execution if client disconnects
@@ -73,7 +73,7 @@ class com_flexicontentInstallerScript
 		}
 
 		// First check PHP minimum version is running
-		$PHP_VERSION_NEEDED = '5.4.0';
+		$PHP_VERSION_NEEDED = '8.2.0';
 		if (version_compare(PHP_VERSION, $PHP_VERSION_NEEDED, '<'))
 		{
 			// load english language file for 'com_flexicontent' component then override with current language file
@@ -97,7 +97,7 @@ class com_flexicontentInstallerScript
 		$this->release_existing = $existing_manifest[ 'version' ];
 
 		// Manifest file minimum Joomla version
-		$this->minimum_joomla_release = $parent->getManifest()->attributes()->version;
+		$this->minimum_joomla_release = (string) $parent->getManifest()->attributes()->version;
 
 		// Only execute during install / update not during uninstallation (J4 will run post flight during uninstall too)
 		if ($type=='update' || $type=='install') :
@@ -1577,10 +1577,6 @@ class com_flexicontentInstallerScript
 	*/
 	function uninstall( $parent )
 	{
-		// Display fatal errors, warnings, notices
-		error_reporting(E_ERROR || E_WARNING || E_NOTICE);
-		ini_set('display_errors',1);
-
 		$app = \Joomla\CMS\Factory::getApplication();
 
 		// Extra CSS needed for J3.x+
