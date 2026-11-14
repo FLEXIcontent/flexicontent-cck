@@ -39,6 +39,20 @@ class FlexicontentHelperRoute
 	protected static $menuitems = null;
 	protected static $route_active_lang = null;
 
+	/** Get the site menu without requiring a web method on ConsoleApplication. */
+	private static function getSiteMenu()
+	{
+		$app = \Joomla\CMS\Factory::getApplication();
+
+		if (!method_exists($app, 'getMenu'))
+		{
+			$app = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Application\SiteApplication::class);
+		}
+
+		return $app->getMenu('site', array());
+	}
+
+
 	/**
 	 * function to retrieve component menuitems only once;
 	 */
@@ -51,7 +65,7 @@ class FlexicontentHelperRoute
 		$component = \Joomla\CMS\Component\ComponentHelper::getComponent('com_flexicontent');
 
 		// Get frontend menu items
-		$menus = \Joomla\CMS\Factory::getApplication()->getMenu('site', array());
+		$menus = self::getSiteMenu();
 
 		/**
 		 * Limit to flexicontent component
@@ -106,7 +120,7 @@ class FlexicontentHelperRoute
 	{
 		static $active = null;
 
-		$active = \Joomla\CMS\Factory::getApplication()->getMenu('site', array())->getActive();
+		$active = self::getSiteMenu()->getActive();
 
 		if (!$active || !isset($active->query['option']) || $active->query['option'] !== 'com_flexicontent')
 		{
@@ -296,7 +310,7 @@ class FlexicontentHelperRoute
 		$levels = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
 
 		// Get home page menu items according to language, and
-		$menus = \Joomla\CMS\Factory::getApplication()->getMenu('site', array());
+		$menus = self::getSiteMenu();
 
 		// Get content languages and filter them to include only inteface languages
 		$content_langs = \Joomla\CMS\Language\LanguageHelper::getLanguages();
@@ -994,7 +1008,7 @@ class FlexicontentHelperRoute
 
 			if ($Itemid) {
 				$link .= '&Itemid='.$Itemid;
-				$menus = \Joomla\CMS\Factory::getApplication()->getMenu('site', array());   // this will work in J1.5 backend too !!!
+				$menus = self::getSiteMenu();   // this will work in J1.5 backend too !!!
 				$menuitem = $menus->getItem($Itemid);  // Try to load the menu item
 			}
 		}
@@ -1861,7 +1875,7 @@ class FlexicontentHelperRoute
 			? \Joomla\CMS\Component\ComponentHelper::getParams('com_languages')->get('site', 'en-GB')
 			: \Joomla\CMS\Factory::getLanguage()->getTag();
 
-		$menus = \Joomla\CMS\Factory::getApplication()->getMenu('site', array());   // this will work in J1.5 backend too !!!
+		$menus = self::getSiteMenu();   // this will work in J1.5 backend too !!!
 		$menu = $menus->getItem($menuitem_id);  // Try to load the menu item
 
 		// Check that (a) it exists and is active (b) points to com_flexicontent

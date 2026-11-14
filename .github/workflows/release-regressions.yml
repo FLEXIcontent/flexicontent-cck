@@ -1,0 +1,40 @@
+name: Release regressions
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  release-regressions:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.2', '8.3', '8.4']
+    steps:
+      - uses: actions/checkout@v5
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: simplexml
+          coverage: none
+      - name: Release regressions
+        run: |
+          php -d error_reporting=-1 tests/item-comments-selector.php
+          php -d error_reporting=-1 tests/statistics-data.php
+          php -d error_reporting=-1 tests/tag-assignment-removal.php
+          php -d error_reporting=-1 tests/finder-query.php
+          php -d error_reporting=-1 tests/finder-parameters.php
+          php -d error_reporting=-1 tests/finder-state-events.php
+          php -d error_reporting=-1 tests/finder-identifiers.php
+          php -d error_reporting=-1 tests/route-menu-context.php
+          php -d error_reporting=-1 tests/installer-platform.php 4.4.0
+          php -d error_reporting=-1 tests/installer-platform.php 5.0.0
+          php -d error_reporting=-1 tests/installer-platform.php 6.2.0
+          for cache_case in missing empty invalid no-version null-version existing; do
+            php -d error_reporting=-1 tests/installer-manifest-cache.php "$cache_case"
+          done

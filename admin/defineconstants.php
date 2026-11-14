@@ -156,9 +156,9 @@ if (!defined('FLEXI_ITEMVIEW'))		define('FLEXI_ITEMVIEW'	, FLEXI_J16GE ? 'item' 
 if (!defined('FLEXI_ICONPATH'))		define('FLEXI_ICONPATH'	, FLEXI_J16GE ? 'media/system/images/' : 'images/M_images/' );
 
 // Version constants
-define('FLEXI_PHP_NEEDED',	'7.0.0');
-define('FLEXI_PHP_RECOMMENDED',	'8.0.25');
-define('FLEXI_VERSION', '4.2.1');
+define('FLEXI_PHP_NEEDED',	'8.2.0');
+define('FLEXI_PHP_RECOMMENDED',	'8.4.0');
+define('FLEXI_VERSION', '5.3');
 define('FLEXI_RELEASE',	'');
 // FLEXI_VHASH is used as cache-buster (version arg) for assets ;
 // include mtimes of the JS/CSS files most edited during development so
