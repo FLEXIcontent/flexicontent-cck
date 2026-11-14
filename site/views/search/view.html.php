@@ -108,7 +108,15 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 		 * Load needed JS libs & CSS styles
 		 */
 
-		flexicontent_html::loadFramework('jQuery');
+		// The search form scripts need jQuery, also in Choices.js mode (unless jQuery loading is turned off)
+		if ((int) \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('loadfw_jquery', 1) === 1)
+		{
+			flexicontent_html::loadJQuery();
+		}
+		else
+		{
+			flexicontent_html::loadFramework('jQuery');
+		}
 		flexicontent_html::loadFramework('flexi_tmpl_common');
 
 		// Add css files to the document <head> section (also load CSS joomla template override)
