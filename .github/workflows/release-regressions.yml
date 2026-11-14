@@ -34,6 +34,7 @@ jobs:
           php -d error_reporting=-1 tests/route-menu-context.php
           php -d error_reporting=-1 tests/relation-values.php
           php -d error_reporting=-1 tests/batch-values.php
+          php -d error_reporting=-1 tests/cache-path.php
           node tests/image-media-clone.cjs
           php -d error_reporting=-1 tests/installer-platform.php 4.4.0
           php -d error_reporting=-1 tests/installer-platform.php 5.0.0
