@@ -416,14 +416,31 @@ class flexicontent_images
 			}, $chunk);
 		};
 
-		// Leave form contents alone (e.g. an article being edited in the frontend)
-		$chunks = preg_split('#(<textarea\b[^>]*>.*?</textarea>)#is', $html, -1, PREG_SPLIT_DELIM_CAPTURE);
+		// Preserve raw-text elements and comments before inspecting markup tokens.
+		$protected = <<<'HTML_PATTERN'
+~(<!--.*?(?:-->|$)|<script\b(?:[^>"']|"[^"]*"|'[^']*')*>.*?(?:</script\s*>|$)|<textarea\b(?:[^>"']|"[^"]*"|'[^']*')*>.*?(?:</textarea\s*>|$))~is
+HTML_PATTERN;
+		$tokens = <<<'HTML_PATTERN'
+~<style\b(?:[^>"']|"[^"]*"|'[^']*')*>.*?</style\s*>|<(?:[^>"']|"[^"]*"|'[^']*')+>~is
+HTML_PATTERN;
+		$style = <<<'HTML_PATTERN'
+~^(<style\b(?:[^>"']|"[^"]*"|'[^']*')*>)(.*?)(</style\s*>)$~is
+HTML_PATTERN;
+		$chunks = preg_split($protected, $html, -1, PREG_SPLIT_DELIM_CAPTURE);
 
 		foreach ($chunks as $i => $chunk)
 		{
 			if ($i % 2 === 0 && strpos($chunk, $marker) !== false)
 			{
-				$chunks[$i] = $sign_attributes($chunk);
+				$chunks[$i] = preg_replace_callback($tokens, function ($match) use ($sign_attributes, $sign_css, $style)
+				{
+					if (preg_match($style, $match[0], $parts))
+					{
+						return $sign_attributes($parts[1]) . $sign_css($parts[2]) . $parts[3];
+					}
+
+					return $sign_attributes($match[0]);
+				}, $chunk);
 			}
 		}
 
