@@ -19,14 +19,14 @@
 	<install> <!-- Runs on install -->
 		<sql>
 			<file driver="mysql" charset="utf8">installation/install.mysql.utf8.sql</file>
-			<file driver="mysql">installation/install.mysql.nonutf8.sql</file>
+			<file driver="mysql" charset="">installation/install.mysql.nonutf8.sql</file>
 		</sql>
 	</install>
 	
 	<uninstall> <!-- Runs on uninstall -->
 		<sql>
 			<file driver="mysql" charset="utf8">installation/uninstall.mysql.utf8.sql</file>
-			<file driver="mysql">installation/uninstall.mysql.nonutf8.sql</file>
+			<file driver="mysql" charset="">installation/uninstall.mysql.nonutf8.sql</file>
 		</sql>
 	</uninstall>
 	

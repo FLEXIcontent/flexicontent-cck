@@ -1904,7 +1904,9 @@ class com_flexicontentInstallerScript
 		$db->setQuery( 'SELECT manifest_cache FROM #__extensions WHERE element = '. $db->quote($name) .' AND type= '. $db->quote($type) );
 		$manifest_cache =  $db->loadResult();
 
-		$paramsArr = json_decode($manifest_cache, true );
+		$paramsArr = json_decode((string) $manifest_cache, true);
+		$paramsArr = is_array($paramsArr) ? $paramsArr : array();
+		$paramsArr['version'] = (string) ($paramsArr['version'] ?? '0.0.0');
 		return $paramsArr;
 	}
 

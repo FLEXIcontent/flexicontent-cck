@@ -30,3 +30,6 @@ jobs:
           php -d error_reporting=-1 tests/installer-platform.php 4.4.0
           php -d error_reporting=-1 tests/installer-platform.php 5.0.0
           php -d error_reporting=-1 tests/installer-platform.php 6.2.0
+          for cache_case in missing empty invalid no-version null-version existing; do
+            php -d error_reporting=-1 tests/installer-manifest-cache.php "$cache_case"
+          done
