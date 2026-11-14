@@ -185,7 +185,7 @@ if ($js)
 					<?php
 					echo $this->lists['filter_state'];
 					echo $this->lists['filter_approved'];
-					echo $this->lists['filter_verified'];
+					echo $this->lists['filter_verified'] ?? '';
 					?>
 
 					<div id="fc-filters-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
