@@ -2344,6 +2344,16 @@ class ParentClassItem extends FCModelAdmin
 		}
 		$item->created = $date->toSql();
 
+		// -- New item on Joomla 4+: like com_content, use the creation date and creator as modification date and modifier.
+		// #__content.modified is NOT NULL without a default, so leaving it NULL stores 0000-00-00 00:00:00 there, while
+		// #__flexicontent_items_tmp stores its 1000-01-01 default. The post-installation check "Update temporary item data"
+		// then fails, and the next administrator session is redirected from every FLEXIcontent view to the dashboard
+		if ($isNew && FLEXI_J40GE)
+		{
+			$item->modified    = $item->created;
+			$item->modified_by = $item->created_by;
+		}
+
 
 		// -- Publish UP Date
 		if ($item->publish_up && StringHelper::strlen(StringHelper::trim( $item->publish_up )) <= 10)
@@ -3602,6 +3612,17 @@ class ParentClassItem extends FCModelAdmin
 
 			foreach ($assoc_item_ids as $assoc_item_id)
 			{
+				// Association membership does not grant permission to edit the target item
+				$t_row = $this->_db->setQuery('SELECT created_by, checked_out FROM #__content WHERE id = ' . (int) $assoc_item_id)->loadObject();
+				$asset = 'com_content.article.' . (int) $assoc_item_id;
+
+				if (!$t_row || (!empty($t_row->checked_out) && (int) $t_row->checked_out !== (int) $user->id)
+					|| !($user->authorise('core.edit', $asset)
+						|| (!empty($t_row->created_by) && (int) $t_row->created_by === (int) $user->id && $user->authorise('core.edit.own', $asset))))
+				{
+					continue;
+				}
+
 				$this->saveFcTagsAssignments($data['tags'], (int) $assoc_item_id, $_replace = true);
 				$this->saveJTagsAssignments($data['tags'], (int) $assoc_item_id);
 			}
@@ -4793,14 +4814,14 @@ class ParentClassItem extends FCModelAdmin
 
 		// (b) Get Content Type specific notifications (that override global)
 		$only_cat_conf = $params->get('nf_allow_cat_specific') && $params->get('cats_enable_notifications') == '2';
-		$nConf->userlist_notify_new            = $only_cat_conf ? array() : FLEXIUtilities::paramToArray( $params->get('userlist_notify_new'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
+		$nConf->userlist_notify_new            = $only_cat_conf ? array() : FLEXIUtilities::paramToArray( $params->get('userlist_notify_new'), $regex="/[\s]*,[\s]*/", $filterfunc="trim");
 		$nConf->usergrps_notify_new            = $only_cat_conf ? array() : FLEXIUtilities::paramToArray( $params->get('usergrps_notify_new', array()) );
-		$nConf->userlist_notify_new_pending    = $only_cat_conf ? array() : FLEXIUtilities::paramToArray( $params->get('userlist_notify_new_pending'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
+		$nConf->userlist_notify_new_pending    = $only_cat_conf ? array() : FLEXIUtilities::paramToArray( $params->get('userlist_notify_new_pending'), $regex="/[\s]*,[\s]*/", $filterfunc="trim");
 		$nConf->usergrps_notify_new_pending    = $only_cat_conf ? array() : FLEXIUtilities::paramToArray( $params->get('usergrps_notify_new_pending', array()) );
 
-		$nConf->userlist_notify_existing             = $only_cat_conf ? array() : FLEXIUtilities::paramToArray( $params->get('userlist_notify_existing'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
+		$nConf->userlist_notify_existing             = $only_cat_conf ? array() : FLEXIUtilities::paramToArray( $params->get('userlist_notify_existing'), $regex="/[\s]*,[\s]*/", $filterfunc="trim");
 		$nConf->usergrps_notify_existing             = $only_cat_conf ? array() : FLEXIUtilities::paramToArray( $params->get('usergrps_notify_existing', array()) );
-		$nConf->userlist_notify_existing_reviewal    = $only_cat_conf ? array() : FLEXIUtilities::paramToArray( $params->get('userlist_notify_existing_reviewal'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
+		$nConf->userlist_notify_existing_reviewal    = $only_cat_conf ? array() : FLEXIUtilities::paramToArray( $params->get('userlist_notify_existing_reviewal'), $regex="/[\s]*,[\s]*/", $filterfunc="trim");
 		$nConf->usergrps_notify_existing_reviewal    = $only_cat_conf ? array() : FLEXIUtilities::paramToArray( $params->get('usergrps_notify_existing_reviewal', array()) );
 
 		// (c) Get category specific notifications
@@ -4816,14 +4837,14 @@ class ParentClassItem extends FCModelAdmin
 				$cat_params = $this->_new_JRegistry($cat_params);
 				if ( ! $cat_params->get('cats_enable_notifications', 0) ) continue;  // Skip this category if category-specific notifications are not enabled for this category
 
-				$cats_userlist_notify_new            = FLEXIUtilities::paramToArray( $cat_params->get('cats_userlist_notify_new'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
+				$cats_userlist_notify_new            = FLEXIUtilities::paramToArray( $cat_params->get('cats_userlist_notify_new'), $regex="/[\s]*,[\s]*/", $filterfunc="trim");
 				$cats_usergrps_notify_new            = FLEXIUtilities::paramToArray( $cat_params->get('cats_usergrps_notify_new', array()) );
-				$cats_userlist_notify_new_pending    = FLEXIUtilities::paramToArray( $cat_params->get('cats_userlist_notify_new_pending'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
+				$cats_userlist_notify_new_pending    = FLEXIUtilities::paramToArray( $cat_params->get('cats_userlist_notify_new_pending'), $regex="/[\s]*,[\s]*/", $filterfunc="trim");
 				$cats_usergrps_notify_new_pending    = FLEXIUtilities::paramToArray( $cat_params->get('cats_usergrps_notify_new_pending', array()) );
 
-				$cats_userlist_notify_existing             = FLEXIUtilities::paramToArray( $cat_params->get('cats_userlist_notify_existing'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
+				$cats_userlist_notify_existing             = FLEXIUtilities::paramToArray( $cat_params->get('cats_userlist_notify_existing'), $regex="/[\s]*,[\s]*/", $filterfunc="trim");
 				$cats_usergrps_notify_existing             = FLEXIUtilities::paramToArray( $cat_params->get('cats_usergrps_notify_existing', array()) );
-				$cats_userlist_notify_existing_reviewal    = FLEXIUtilities::paramToArray( $cat_params->get('cats_userlist_notify_existing_reviewal'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
+				$cats_userlist_notify_existing_reviewal    = FLEXIUtilities::paramToArray( $cat_params->get('cats_userlist_notify_existing_reviewal'), $regex="/[\s]*,[\s]*/", $filterfunc="trim");
 				$cats_usergrps_notify_existing_reviewal    = FLEXIUtilities::paramToArray( $cat_params->get('cats_usergrps_notify_existing_reviewal', array()) );
 
 				$nConf->userlist_notify_new            = array_unique(array_merge($nConf->userlist_notify_new,            $cats_userlist_notify_new));
@@ -4858,7 +4879,7 @@ class ParentClassItem extends FCModelAdmin
 			$_user_names = array();
 			foreach ($nConf->{$ulist[$ntype]} as $user_id_name) {
 				if ( is_numeric($user_id_name) ) $_user_ids[] = (int) $user_id_name;
-				else $_user_names[] = $db->Quote($user_id_name);
+				elseif ($user_id_name !== '') $_user_names[] = $user_id_name;  // quoted once, below
 			}
 			if ( count($_user_ids) || count($_user_names) )
 			{

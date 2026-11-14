@@ -534,7 +534,7 @@ abstract class JHtmlFcbase
 		if ($use_icon && !empty($row->language) && !empty($langs->{$row->language}->imgsrc))
 		{
 			return '<img class="' . static::$tooltip_class . '" '.
-				' title=' . flexicontent_html::getToolTip(\Joomla\CMS\Language\Text::_('FLEXI_LANGUAGE'), ($row->language === '*' ? \Joomla\CMS\Language\Text::_('FLEXI_ALL') : (!empty($row->language) ? $langs->{$row->language}->name : '')), 0, 1) . '" ' .
+				' title="' . flexicontent_html::getToolTip(\Joomla\CMS\Language\Text::_('FLEXI_LANGUAGE'), ($row->language === '*' ? \Joomla\CMS\Language\Text::_('FLEXI_ALL') : (!empty($row->language) ? $langs->{$row->language}->name : '')), 0, 1) . '" ' .
 				' src="' . $langs->{$row->language}->imgsrc . '" alt="'. $row->language . '" /> ' .
 				($use_icon === 2 ? $langs->{$row->language}->name : '')
 				;

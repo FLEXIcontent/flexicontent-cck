@@ -348,7 +348,15 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$document->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/css/flexi_form_fields.css', array('version' => FLEXI_VHASH));
 
 		// Add JS frameworks
-		flexicontent_html::loadFramework('jQuery');
+		// The form scripts (fields, validation, uploaders) need jQuery, also on the site in Choices.js mode
+		if (!$isAdmin && (int) $cparams->get('loadfw_jquery', 1) === 1)
+		{
+			flexicontent_html::loadJQuery();
+		}
+		else
+		{
+			flexicontent_html::loadFramework('jQuery');
+		}
 		flexicontent_html::loadFramework('select2');
 		flexicontent_html::loadFramework('touch-punch');
 		flexicontent_html::loadFramework('prettyCheckable');
@@ -519,7 +527,8 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 					else
 					{
 						$msg = \Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK');
-						throw new Exception($msg, 403);
+						// The error page prints the exception message as plain text: drop the markup of the language string
+						throw new Exception(trim(strip_tags(preg_replace('#<br\s*/?>#i', ' ', $msg))), 403);
 					}
 				}
 

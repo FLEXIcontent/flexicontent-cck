@@ -684,7 +684,7 @@ if ($leadnum) :
 					$item->image         = $src ?: $thumb_rendered;
 					// Les URLs FC sont des chemins relatifs (ex: /subdir/images/...)
 					$item->image_fc_url  = $src; // chemin relatif
-					$item->image_fc_size = $img_field_size;
+					$item->image_fc_size = $img_field_size ?? '';  // not set when no image field is configured
 					// thumbs_src contient déjà toutes les tailles après getFieldDisplay
 					$item->image_fc_urls = [
 						'small'    => $img_field->thumbs_src['small'][0]    ?? '',
@@ -1251,7 +1251,7 @@ if ($count > $leadnum) :
 					$item->image         = $src ?: $thumb_rendered;
 					// Les URLs FC sont des chemins relatifs (ex: /subdir/images/...)
 					$item->image_fc_url  = $src; // chemin relatif
-					$item->image_fc_size = $img_field_size;
+					$item->image_fc_size = $img_field_size ?? '';  // not set when no image field is configured
 					// thumbs_src contient déjà toutes les tailles après getFieldDisplay
 					$item->image_fc_urls = [
 						'small'    => $img_field->thumbs_src['small'][0]    ?? '',

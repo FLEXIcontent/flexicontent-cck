@@ -81,13 +81,13 @@ if ($export)
 
 	$out = fopen('php://output', 'w');
 	fwrite($out, "\xEF\xBB\xBF");   // UTF-8 BOM, so that Excel detects the encoding
-	fputcsv($out, array('search_term', 'hits'));
+	fputcsv($out, array('search_term', 'hits'), ',', '"', '\\');
 
 	foreach ($rows as $row)
 	{
 		// Prefix formula-like terms, so that spreadsheets do not execute them
 		$term = preg_match('/^[=+\-@\t\r]/', $row->search_term) ? "'" . $row->search_term : $row->search_term;
-		fputcsv($out, array($term, (int) $row->hits));
+		fputcsv($out, array($term, (int) $row->hits), ',', '"', '\\');
 	}
 
 	fclose($out);

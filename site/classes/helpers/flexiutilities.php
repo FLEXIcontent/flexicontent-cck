@@ -630,13 +630,14 @@ $fc_plgs[$fieldtype] = new $className($dispatcher, array('type'=>'flexicontent_f
 				if($char==$enclosure_char) {
 					$isEnclosured = true;
 				} else {
-					if( $char==$fld_sep_start && $i+$fld_sep_size < $size && substr($string, $i,$fld_sep_size) == $field_separator ) {
+					// A separator may also be the last character(s) of the file, e.g. an export whose last item ends with an empty field
+					if( $char==$fld_sep_start && $i+$fld_sep_size <= $size && substr($string, $i,$fld_sep_size) == $field_separator ) {
 						$i = $i + ($fld_sep_size-1);
 						$array[$rowIndex][$columnIndex] = $fieldValue;
 						$fieldValue="";
 
 						$columnIndex++;
-					} else if( $char==$rec_sep_start && $i+$rec_sep_size < $size && substr($string, $i,$rec_sep_size) == $record_separator ) {
+					} else if( $char==$rec_sep_start && $i+$rec_sep_size <= $size && substr($string, $i,$rec_sep_size) == $record_separator ) {
 						$i = $i + ($rec_sep_size-1);
 						echo "\n";
 						$array[$rowIndex][$columnIndex] = $fieldValue;
@@ -653,7 +654,7 @@ $fc_plgs[$fieldtype] = new $className($dispatcher, array('type'=>'flexicontent_f
 			}
 		}
 
-		if($fieldValue) { // save last field
+		if($fieldValue !== '' || $columnIndex > 0) { // save last field (also an empty one, or '0', after a field separator)
 			$array[$rowIndex][$columnIndex] = $fieldValue;
 		}
 		return $array;

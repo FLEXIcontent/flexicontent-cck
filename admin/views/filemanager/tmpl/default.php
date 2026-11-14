@@ -2135,7 +2135,10 @@ HTML;
     'name' => 'file-jmedia-data',
     'id' => 'file-jmedia-data',
     'value' => '',
-    'folder' => is_array($jmedia_subpath) ? $jmedia_subpath : [$jmedia_subpath], // Ensures folder is an array
+    // Folder the picker opens: J3 sub-path inside JPATH_ROOT/images, J4+ adapter path 'local-<top-level directory>:/<sub-path>'
+    'folder' => version_compare(\Joomla\CMS\Version::MAJOR_VERSION, '4', 'lt')
+        ? $jmedia_subpath
+        : 'local-' . $jmedia_topdir . ':/' . $jmedia_subpath,
 ];
 
 if (version_compare(\Joomla\CMS\Version::MAJOR_VERSION, '4', 'ge')) {
@@ -2147,21 +2150,26 @@ if (version_compare(\Joomla\CMS\Version::MAJOR_VERSION, '4', 'ge')) {
         'videosExt' => is_array($videosExt) ? $videosExt : (empty($videosExt) ? [] : explode(',', $videosExt)),
         'documentsExt' => is_array($documentsExt) ? $documentsExt : (empty($documentsExt) ? [] : explode(',', $documentsExt)),
     ];
+
+    // Extensions the picker accepts per media type (media.php prints them in supported-extensions),
+    // the lists above are already empty for the types that are not allowed
+    foreach (array('images', 'audios', 'videos', 'documents') as $jmedia_type) {
+        $jMedia_file_displayData[$jmedia_type . 'AllowedExt'] = $jMedia_file_displayData[$jmedia_type . 'Ext'];
+    }
 } else {
     $jMedia_file_displayData += [
         'filetypes' => is_array($fileTypes) ? $fileTypes : (empty($fileTypes) ? [] : explode(',', $fileTypes)),
     ];
 }
 
-// Ensure mediaTypeNames is always an array to prevent implode errors in media.php
-$jMedia_file_displayData['mediaTypeNames'] = is_array($jMedia_file_displayData['mediaTypeNames'] ?? null)
-    ? $jMedia_file_displayData['mediaTypeNames']
-    : explode(',', (string) $jMedia_file_displayData['mediaTypeNames']);
+// Names of the supported media types, an array as Joomla's MediaField passes it (media.php implodes it)
+$jMedia_file_displayData['mediaTypeNames'] = array_values(array_intersect_key(
+    array('images' => 'images', 'audios' => 'audios', 'videos' => 'videos', 'docs' => 'documents'),
+    array_flip((array) $jmedia_filetypes)
+));
 
 		$media_field = \Joomla\CMS\Layout\LayoutHelper::render('joomla.form.field.media', $jMedia_file_displayData, $layouts_path ?? '');
 		$media_field_html = str_replace('{field-media-id}', 'field-media-data', $media_field);
-		echo $media_field_html;
-
 
 																		echo $media_field_html;
 																	}
