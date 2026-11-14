@@ -27,6 +27,7 @@ jobs:
           php -d error_reporting=-1 tests/item-comments-selector.php
           php -d error_reporting=-1 tests/statistics-data.php
           php -d error_reporting=-1 tests/tag-assignment-removal.php
+          php -d error_reporting=-1 tests/finder-query.php
           php -d error_reporting=-1 tests/installer-platform.php 4.4.0
           php -d error_reporting=-1 tests/installer-platform.php 5.0.0
           php -d error_reporting=-1 tests/installer-platform.php 6.2.0

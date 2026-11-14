@@ -546,9 +546,7 @@ class Flexicontent extends _Flexicontent
         $case_when_item_alias = ' CASE WHEN ';
         $case_when_item_alias .= $query->charLength('a.alias', '!=', '0');
         $case_when_item_alias .= ' THEN ';
-        $a_id = static::$isJ4GE
-            ? $query->castAs('CHAR', 'a.id')
-            : $query->castAsChar('a.id');
+        $a_id = $query->castAs('CHAR', 'a.id');
         $case_when_item_alias .= $query->concatenate([$a_id, 'a.alias'], ':');
         $case_when_item_alias .= ' ELSE ';
         $case_when_item_alias .= $a_id . ' END as slug';
@@ -557,9 +555,7 @@ class Flexicontent extends _Flexicontent
         $case_when_category_alias = ' CASE WHEN ';
         $case_when_category_alias .= $query->charLength('c.alias', '!=', '0');
         $case_when_category_alias .= ' THEN ';
-        $c_id = static::$isJ4GE
-            ? $query->castAs('CHAR', 'c.id')
-            : $query->castAsChar('c.id');
+        $c_id = $query->castAs('CHAR', 'c.id');
         $case_when_category_alias .= $query->concatenate([$c_id, 'c.alias'], ':');
         $case_when_category_alias .= ' ELSE ';
         $case_when_category_alias .= $c_id . ' END as catslug';
