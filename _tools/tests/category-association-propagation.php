@@ -34,7 +34,12 @@ namespace {
         public function setQuery($q) { $this->query = $q; return $this; }
         public function quote($s) { return "'" . $s . "'"; }
         public function qn($s) { return '`' . $s . '`'; }
-        public function loadResult() { return 10; }
+        public function loadResult() {
+            // The source main category is 10; the target keeps its own main category
+            // when only secondary categories are shared.
+            if (strpos($this->query, 'catid FROM #__content WHERE id = 2') !== false) return $this->target->catid;
+            return 10;
+        }
         public function loadColumn() { return strpos($this->query, 'itemid = 1') !== false ? array(10, 11) : $this->relations; }
         public function loadObject() { return $this->target ? clone $this->target : null; }
         public function loadObjectList() {
