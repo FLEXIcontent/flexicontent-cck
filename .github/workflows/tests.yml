@@ -22,7 +22,7 @@ jobs:
       - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: curl
+          extensions: curl, mbstring
           coverage: none
 
       - name: Syntax check (php -l)
@@ -39,4 +39,8 @@ jobs:
           php tests/filemanager-frontend-guard.php
           php _tools/tests/fileeditor.php
           php _tools/tests/notificationmail-conditions.php
+          php _tools/tests/notificationmail-template-loading.php
+          php _tools/tests/notificationmail-template-loading-j6.php
+          php _tools/tests/file-index-custom-properties.php
+          php _tools/tests/category-association-propagation.php
           python3 _tools/tests/remote-size/run.py --php php
