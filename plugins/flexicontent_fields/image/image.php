@@ -458,6 +458,10 @@ class plgFlexicontent_fieldsImage extends FCField
 				}
 
 				newField.find('table.fcimg_dbfile_tbl').parent('display', 'none');
+
+				// The properties box and its toggle (pencil) button must refer to the new value, not to the value that was cloned
+				newField.find('.fcimg_value_props').attr('data-name', element_id);
+				newField.find('.image-option').attr('onclick', 'jQuery(\'.fcimg_value_props[data-name=' + element_id + ']\').toggle(150);');
 				";
 
 			if ($linkto_url) $js .= "
@@ -478,7 +482,7 @@ class plgFlexicontent_fieldsImage extends FCField
 					theInput.attr('id', element_id + '_' + el_name);
 				}
 
-				newField.find('input.img_mediaurl').attr('value', ".json_encode($default_mediaurl).");
+				newField.find('input.img_mediaurl').val(".json_encode($default_mediaurl).");
 
 				newField.find('.fcfield-medialurlvalue').attr('onclick', 'fcfield_image.toggleMediaURL(\'' + element_id + '\', \'".$field_name_js."\');');
 				newField.find('.img_fetch_btn').attr('onclick', 'fcfield_image.fetchData(\'' + element_id + '\', \'".$field_name_js."\'); return false;');
@@ -491,29 +495,29 @@ class plgFlexicontent_fieldsImage extends FCField
 			}
 
 			if ($usealt) $js .= "
-				newField.find('input.imgalt').attr('value', ".json_encode($default_alt).");
+				newField.find('input.imgalt').val(".json_encode($default_alt).");
 				newField.find('input.imgalt').attr('name','".$fieldname."['+uniqueRowN+'][alt]');
 				newField.find('input.imgalt').attr('id', element_id + '_alt');
 				";
 
 			if ($usetitle) $js .= "
-				newField.find('input.imgtitle').attr('value', ".json_encode($default_title).");
+				newField.find('input.imgtitle').val(".json_encode($default_title).");
 				newField.find('input.imgtitle').attr('name','".$fieldname."['+uniqueRowN+'][title]');
 				newField.find('input.imgtitle').attr('id', element_id + '_title');
 				";
 
 			if ($usedesc) $js .= "
-				newField.find('textarea.imgdesc').attr('value', ".json_encode($default_desc).");
+				newField.find('textarea.imgdesc').val(".json_encode($default_desc).");
 				newField.find('textarea.imgdesc').attr('name','".$fieldname."['+uniqueRowN+'][desc]');
 				";
 
 			if ($usecust1) $js .= "
-				newField.find('input.imgcust1').attr('value', ".json_encode($default_cust1).");
+				newField.find('input.imgcust1').val(".json_encode($default_cust1).");
 				newField.find('input.imgcust1').attr('name','".$fieldname."['+uniqueRowN+'][cust1]');
 				";
 
 			if ($usecust2) $js .= "
-				newField.find('input.imgcust2').attr('value', ".json_encode($default_cust2).");
+				newField.find('input.imgcust2').val(".json_encode($default_cust2).");
 				newField.find('input.imgcust2').attr('name','".$fieldname."['+uniqueRowN+'][cust2]');
 				";
 
