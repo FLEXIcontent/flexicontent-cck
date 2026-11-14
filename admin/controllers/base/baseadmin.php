@@ -1085,7 +1085,9 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 	{
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 
-		// Currently no cache cleaned for all cases
+		// Progressive module caches can contain item metadata in their saved document head.
+		$cache = FLEXIUtilities::getCache('', 0);
+		$cache->clean('com_modules');
 	}
 
 
