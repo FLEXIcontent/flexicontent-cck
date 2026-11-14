@@ -1402,6 +1402,8 @@ class flexicontent_db
 
 		$cats[] = $catid;
 		$cats = array_values(array_unique($cats));
+		$secondary_cats = array_values(array_diff($cats, array($catid)));
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		// Categories (and their associated categories by language)
 		$cat_assocs = $db->setQuery(
@@ -1428,20 +1430,36 @@ class flexicontent_db
 				return isset($cat_map[$cid][$lang]) ? $cat_map[$cid][$lang] : (int) $cid;
 			};
 
-			$t_row   = $db->setQuery('SELECT catid FROM #__content WHERE id = ' . $assoc_id)->loadObject();
+			$t_row = $db->setQuery('SELECT catid, created_by, checked_out FROM #__content WHERE id = ' . $assoc_id)->loadObject();
+
+			// Association membership does not grant permission to edit the target item.
+			if (!$t_row || (!empty($t_row->checked_out) && (int) $t_row->checked_out !== (int) $user->id))
+			{
+				continue;
+			}
+
+			$asset = 'com_content.article.' . $assoc_id;
+			$can_edit = $user->authorise('core.edit', $asset)
+				|| (!empty($t_row->created_by) && (int) $t_row->created_by === (int) $user->id && $user->authorise('core.edit.own', $asset));
+
+			if (!$can_edit)
+			{
+				continue;
+			}
+
 			$t_old   = array_map('intval', (array) $db->setQuery('SELECT catid FROM #__flexicontent_cats_item_relations WHERE itemid = ' . $assoc_id)->loadColumn());
 			$t_catid = $flags['main'] ? $map($catid) : (int) $t_row->catid;
 
 			if ($flags['secondary'])
 			{
-				$t_cats = array_map($map, $cats);
+				$t_cats = array_map($map, $secondary_cats);
 				// Main category was not shared: keep its own main category
 				$t_cats[] = $t_catid;
 			}
 			else
 			{
 				// Secondary categories were not shared: keep the existing ones, only make sure the main category is in
-				$t_cats = $t_old;
+				$t_cats = array_values(array_diff($t_old, array((int) $t_row->catid)));
 				$t_cats[] = $t_catid;
 			}
 
@@ -1450,6 +1468,17 @@ class flexicontent_db
 			if ($flags['main'])
 			{
 				$db->setQuery('UPDATE #__content SET catid = ' . $t_catid . ' WHERE id = ' . $assoc_id)->execute();
+				$db->setQuery('UPDATE #__flexicontent_items_tmp SET catid = ' . $t_catid . ' WHERE id = ' . $assoc_id)->execute();
+
+				// Item permissions are inherited from the main category: move the item's asset under the new category's asset
+				$asset     = new \Joomla\CMS\Table\Asset($db);
+				$cat_asset = (int) $db->setQuery('SELECT asset_id FROM #__categories WHERE id = ' . $t_catid)->loadResult();
+
+				if ($cat_asset && $asset->loadByName('com_content.article.' . $assoc_id) && (int) $asset->parent_id !== $cat_asset)
+				{
+					$asset->setLocation($cat_asset, 'last-child');
+					$asset->store();
+				}
 			}
 
 			$db->setQuery('DELETE FROM #__flexicontent_cats_item_relations WHERE itemid = ' . $assoc_id)->execute();
