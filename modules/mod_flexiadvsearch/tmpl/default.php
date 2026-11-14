@@ -28,7 +28,8 @@ use Joomla\Utilities\ArrayHelper;
 $app = Factory::getApplication();
 $doc = Factory::getDocument();
 $tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
-$isJ4 = defined('FLEXI_J40GE') && FLEXI_J40GE;
+$r = 0;  // Row counter of the odd / even row classes
+$isJ4 =defined('FLEXI_J40GE') && FLEXI_J40GE;
 
 $wa = Factory::getApplication()->getDocument()->getWebAssetManager();
 $wa->useScript('jquery');
