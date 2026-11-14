@@ -6409,6 +6409,8 @@ class ParentClassItem extends FCModelAdmin
                             'subject'     => $this->table,
                             'newTags'     => $jtag_ids,
                             'replaceTags' => $replaceTags,
+                            // Joomla 6 passes it to TagsHelper::postStore(..., bool $remove): null is a TypeError there
+                            'removeTags'  => false,
                         )
                     );
 
