@@ -2306,7 +2306,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 					continue;
 				}
 
-				list ($itemid, $catid) = explode(':', $v);
+				list ($itemid, $catid) = array_pad(explode(':', (string) $v, 2), 2, 0);
 				$itemid                                  = (int) $itemid;
 				$catid                                   = (int) $catid;
 				$related_items_sets[$n][$itemid]         = new stdClass;
