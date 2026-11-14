@@ -541,6 +541,15 @@ class FlexicontentTasksCore
 			$levels = array_map('intval', $user->getAuthorisedViewLevels());
 			$item_access = $levels ? ' AND i.access IN (' . implode(',', $levels) . ')' : ' AND 0 = 1';
 
+			// Like the search results: the main category and the content type must be viewable too
+			if ($levels)
+			{
+				$item_access .= ' AND EXISTS (SELECT 1 FROM #__categories AS acc_mc WHERE acc_mc.id = i.catid AND acc_mc.published = 1'
+					. ' AND acc_mc.access IN (' . implode(',', $levels) . '))'
+					. ' AND EXISTS (SELECT 1 FROM #__flexicontent_types AS acc_ty WHERE acc_ty.id = i.type_id'
+					. ' AND acc_ty.access IN (' . implode(',', $levels) . '))';
+			}
+
 			$item_filters = ''
 				. '   AND i.state IN (1,-5) '
 				. '   AND ( i.publish_up is NULL OR i.publish_up = ' . $db->Quote($nullDate) . ' OR i.publish_up <= ' . $_nowDate . ' ) '
@@ -1175,7 +1184,8 @@ class FlexicontentTasksCore
 
 		$query = 'SELECT id, name, label, field_type, attribs'
 			. ' FROM #__flexicontent_fields'
-			. ' WHERE published = 1 AND LOWER(name) IN (' . implode(',', $quoted) . ')';
+			. ' WHERE published = 1 AND LOWER(name) IN (' . implode(',', $quoted) . ')'
+			. ' AND access IN (' . $this->_viewLevelsList() . ')';
 
 		$fields = array();
 		foreach ((array) $db->setQuery($query)->loadObjectList() as $_field)
@@ -1197,7 +1207,8 @@ class FlexicontentTasksCore
 		$query = 'SELECT id, name, label, field_type, attribs'
 			. ' FROM #__flexicontent_fields'
 			. ' WHERE published = 1 AND field_type = ' . $db->Quote('image')
-			. ' AND LOWER(name) = ' . $db->Quote(strtolower($name));
+			. ' AND LOWER(name) = ' . $db->Quote(strtolower($name))
+			. ' AND access IN (' . $this->_viewLevelsList() . ')';
 
 		return $db->setQuery($query, 0, 1)->loadObject();
 	}
@@ -1994,6 +2005,20 @@ class FlexicontentTasksCore
 			? \Joomla\CMS\Factory::getApplication()
 			: JFactory::getApplication();
 	}
+
+	/**
+	 * View access levels of the current user as a comma separated list, for field access checks
+	 * (field names of rich suggestions come from the request, so field view access must be enforced here)
+	 */
+	private function _viewLevelsList()
+	{
+		$app    = $this->_getApp();
+		$user   = method_exists($app, 'getIdentity') ? $app->getIdentity() : \Joomla\CMS\Factory::getUser();
+		$levels = $user ? array_map('intval', $user->getAuthorisedViewLevels()) : array();
+
+		return $levels ? implode(',', $levels) : '0';
+	}
+
 
 	private function _getDbo()
 	{
