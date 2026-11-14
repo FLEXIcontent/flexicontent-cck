@@ -393,7 +393,7 @@ class Flexicontent extends _Flexicontent
         /**
          * Check if type is allowed to be indexed
          */
-        $typesToIndex = $this->params->get('types_to_index', []);
+        $typesToIndex = $this->getListParameter('types_to_index');
         if (!isset($item->fc_type_id))
         {
             $fc_type_id= $this->db->setQuery($this->db->getQuery(true)
@@ -479,7 +479,7 @@ class Flexicontent extends _Flexicontent
         //if (!$item->state) return;
 
         // Get taxonomies to display
-        $taxonomies = $this->params->get('taxonomies', ['type', 'author', 'category', 'language']);
+        $taxonomies = $this->getListParameter('taxonomies', ['type', 'author', 'category', 'language']);
 
         // Add the type taxonomy data.
         if (\in_array('type', $taxonomies)) {
@@ -571,6 +571,16 @@ class Flexicontent extends _Flexicontent
         return $query;
     }
 
+
+    /** Read both saved multi-select arrays and comma-separated manifest defaults. */
+    private function getListParameter(string $name, array $default = []): array
+    {
+        $value = $this->params->get($name, $default);
+
+        return is_array($value)
+            ? $value
+            : preg_split('/\s*,\s*/', (string) $value, -1, PREG_SPLIT_NO_EMPTY);
+    }
 
     // override ...
     protected function getUrl($id, $extension, $view, $cid=0)
