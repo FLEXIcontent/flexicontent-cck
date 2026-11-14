@@ -239,6 +239,9 @@ namespace {
     check('slow server yields zero', flexicontent_remote::getSizeOnSave($url . '/slow.txt') === 0);
     $elapsed = microtime(true) - $start;
     check('shared HTTP budget enforced', $elapsed >= 4 && $elapsed < 6);
+    // cURL times out on its own clock and can return a few ms before the microtime() deadline: wait for the deadline
+    $deadline = (new \ReflectionProperty('flexicontent_remote', 'size_probe_deadline'))->getValue();
+    while (microtime(true) <= $deadline) { usleep(1000); }
     $before = count(requests());
     check('exhausted budget prevents later probes in same save', flexicontent_remote::getSizeOnSave($url . '/size.txt') === 0 && count(requests()) === $before);
     echo $checks . ' checks passed (real local HTTP)' . PHP_EOL;
