@@ -770,7 +770,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			$query = 'SELECT '
 				. ($count_total ? 'SQL_CALC_FOUND_ROWS' : '') . ' DISTINCT i.id '
 				. @ $orderby_col
-				. ($this->_getAuthorCaps() ? ', rel.catid AS lim_catid' : '')
+				. ($this->_getAuthorCaps() ? ', rel.catid AS lim_catid, (rel.catid <> i.catid) AS lim_notmain' : '')
 				;
 		}
 
@@ -811,11 +811,18 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 
 		elseif (!$query_ids)
 		{
+			// Author item limits: the rows of an item (one per category) must come in a fixed order, so that the item
+			// is counted in the same category on every page load: main category first, then by category id
+			$lim_orderby = $this->_getAuthorCaps()
+				? (trim((string) $orderby) !== '' ? ', ' : ' ORDER BY ') . 'lim_notmain, lim_catid'
+				: '';
+
 			$query .= ""
 				. @ $orderby_join  // optional
 				. $where . $extra_where
 				//. ' GROUP BY i.id '
 				. $orderby
+				. $lim_orderby
 				;
 		}
 
@@ -2600,6 +2607,13 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			// Always add these
 			$params->set( 'item_depth', $menu_params->get('item_depth') );
 			$params->set( 'pageclass_sfx', $menu_params->get('pageclass_sfx') );
+
+			// Author layout item limits are menu item settings (not part of the overridable category configuration)
+			if ($this->_layout == 'author')
+			{
+				$params->set( 'author_limit_total', $menu_params->get('author_limit_total', 0) );
+				$params->set( 'author_limit_per_cat', $menu_params->get('author_limit_per_cat', 0) );
+			}
 		}
 
 
