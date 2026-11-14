@@ -22,6 +22,9 @@ use Joomla\CMS\Mail\MailTemplate;
  */
 class FlexicontentMailTemplate extends MailTemplate
 {
+	/** Mailers currently sending; a stack also isolates nested sends. */
+	protected static $sendingMailers = array();
+
 	/**
 	 * Raw condition context.
 	 *
@@ -59,17 +62,57 @@ class FlexicontentMailTemplate extends MailTemplate
 	}
 
 	/**
-	 * Load the mail template and render its conditional blocks.
+	 * Scope the context used by Joomla's static template loader to this send.
+	 *
+	 * @return  boolean
+	 */
+	public function send()
+	{
+		self::$sendingMailers[] = $this;
+
+		try
+		{
+			return parent::send();
+		}
+		finally
+		{
+			array_pop(self::$sendingMailers);
+		}
+	}
+
+	/**
+	 * Load the raw template before Joomla translates fields and replaces tags.
 	 *
 	 * @param   string  $key       Template identifier
 	 * @param   string  $language  Language code of the template
 	 *
 	 * @return  object|null
 	 */
+	public static function getTemplate($key, $language)
+	{
+		$mail = parent::getTemplate($key, $language);
+		$mailer = end(self::$sendingMailers);
+
+		return $mailer ? $mailer->renderTemplateConditions($mail) : $mail;
+	}
+
+	/**
+	 * Joomla 6 loads the template with $this->loadTemplate() inside send(). Its static
+	 * getTemplate() uses a plain MailTemplate instance and is not called by send().
+	 *
+	 * @param   string  $key       Template identifier
+	 * @param   string  $language  Language code of the template
+	 *
+	 * @return  \stdClass|null
+	 */
 	protected function loadTemplate(string $key, string $language): ?\stdClass
 	{
-		$mail = parent::loadTemplate($key, $language);
+		return $this->renderTemplateConditions(parent::loadTemplate($key, $language));
+	}
 
+	/** Render only template fields, never data substituted by replaceTags(). */
+	protected function renderTemplateConditions($mail)
+	{
 		if (!$mail || !$this->conditionContext)
 		{
 			return $mail;

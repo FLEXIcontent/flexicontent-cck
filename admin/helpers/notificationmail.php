@@ -355,8 +355,8 @@ class FlexicontentHelperNotificationMail
 	/**
 	 * Check whether the FlexiContent mail template subclass can be used.
 	 *
-	 * The conditions are rendered by overriding MailTemplate::loadTemplate(),
-	 * so the method must exist and must not be private or final.
+	 * Conditions are rendered by getTemplate() during a scoped send(), before
+	 * Joomla translates the template fields and substitutes user-supplied tags.
 	 *
 	 * @return  bool
 	 */
@@ -369,9 +369,23 @@ class FlexicontentHelperNotificationMail
 
 		try
 		{
-			$method = new \ReflectionMethod('\\Joomla\\CMS\\Mail\\MailTemplate', 'loadTemplate');
+			// loadTemplate() exists since Joomla 6, where send() uses it instead of getTemplate()
+			foreach (array('getTemplate', 'send', 'loadTemplate') as $name)
+			{
+				if ($name === 'loadTemplate' && !method_exists('\\Joomla\\CMS\\Mail\\MailTemplate', $name))
+				{
+					continue;
+				}
 
-			return !$method->isPrivate() && !$method->isFinal();
+				$method = new \ReflectionMethod('\\Joomla\\CMS\\Mail\\MailTemplate', $name);
+
+				if ($method->isPrivate() || $method->isFinal())
+				{
+					return false;
+				}
+			}
+
+			return true;
 		}
 		catch (\Throwable $e)
 		{
