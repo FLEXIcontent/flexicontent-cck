@@ -268,7 +268,7 @@ class com_flexicontentInstallerScript
 		$db->setQuery('CREATE TABLE IF NOT EXISTS #__flexicontent_basicsearch_index ('
 			. 'item_id INT UNSIGNED NOT NULL, field_id INT UNSIGNED NOT NULL, search_index LONGTEXT NOT NULL,'
 			. 'PRIMARY KEY (item_id, field_id), KEY field_id (field_id), FULLTEXT KEY search_index (search_index)'
-			. ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci')->execute();
+			. ') ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci')->execute();
 		if (!$basic_index_exists && !FLEXI_NEW_INSTALL)
 		{
 			// The preflight language cache may still contain the previous package's strings.
@@ -276,6 +276,10 @@ class com_flexicontentInstallerScript
 			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', $language_source . '/admin', 'en-GB', true);
 			\Joomla\CMS\Factory::getApplication()->enqueueMessage(
 				\Joomla\CMS\Language\Text::_('FLEXI_BASIC_AUTOCOMPLETE_REBUILD'), 'notice');
+
+			// The notice above is shown only once: also flag the basic-searchable fields as 'dirty',
+			// so that the backend keeps asking for a rebuild of the Basic index until it has been done
+			$db->setQuery('UPDATE #__flexicontent_fields SET issearch = 2 WHERE issearch = 1 AND published = 1')->execute();
 		}
 
 		// Parse XML file to identify additional extensions,

@@ -954,6 +954,16 @@ class FlexicontentModelItems extends FCModelAdminList
 			}
 		}
 
+		// Add the same title and text to the field-attributed basic index (word suggestions)
+		$core_ids = $this->_db->setQuery('SELECT name, id FROM #__flexicontent_fields WHERE iscore = 1 AND name IN (' . $this->_db->Quote('title') . ', ' . $this->_db->Quote('text') . ')')->loadAssocList('name', 'id');
+		$basic_index = array();
+		foreach ($rows as $row)
+		{
+			if (!empty($core_ids['title'])) $basic_index[(int) $row->id][(int) $core_ids['title']] = $row->title;
+			if (!empty($core_ids['text']))  $basic_index[(int) $row->id][(int) $core_ids['text']] = $row->text_stripped;
+		}
+		flexicontent_db::replaceBasicSearchIndex(array_keys($basic_index), $basic_index);
+
 		// Update temporary item data
 		$this->updateItemCountingData($rows);
 	}
@@ -2061,6 +2071,13 @@ class FlexicontentModelItems extends FCModelAdminList
 							flexicontent_db::setValues_commonDataTypes($field);
 						}
 					}
+
+					// The merged basic index was copied with the item row, copy the field-attributed rows too (word suggestions)
+					$this->_db->setQuery('INSERT IGNORE INTO #__flexicontent_basicsearch_index (item_id, field_id, search_index)'
+						. ' SELECT ' . (int) $row->id . ', field_id, search_index'
+						. ' FROM #__flexicontent_basicsearch_index'
+						. ' WHERE item_id = ' . (int) $sourceid
+					)->execute();
 
 					if ($use_versioning)
 					{
