@@ -362,7 +362,7 @@ if ($tags_displayed) : ob_start();  // tags ?>
 								}
 								echo '
 								<li class="tagitem">
-									<span>' . $tag->name . ($tag->translated_text ? ' (' . $tag->translated_text . ')' : '') . '</span>
+									<span>' . htmlspecialchars((string) $tag->name, ENT_QUOTES, 'UTF-8') . ($tag->translated_text ? ' (' . htmlspecialchars((string) $tag->translated_text, ENT_QUOTES, 'UTF-8') . ')' : '') . '</span>
 									<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" />
 									<a href="javascript:;" class="deletetag" onclick="javascript:deleteTag(this);" title="'.Text::_('FLEXI_DELETE_TAG').'"></a>
 								</li>';
@@ -371,7 +371,7 @@ if ($tags_displayed) : ob_start();  // tags ?>
 							{
 								echo '
 								<li class="tagitem plain">
-									<span>' . $tag->name . ($tag->translated_text ? ' (' . $tag->translated_text . ')' : '') . '</span>
+									<span>' . htmlspecialchars((string) $tag->name, ENT_QUOTES, 'UTF-8') . ($tag->translated_text ? ' (' . htmlspecialchars((string) $tag->translated_text, ENT_QUOTES, 'UTF-8') . ')' : '') . '</span>
 									<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" />
 								</li>';
 							}
@@ -390,7 +390,7 @@ if ($tags_displayed) : ob_start();  // tags ?>
 							$_checked = isset($common_tags_selected[$tag->id]) ? ' checked="checked" ' : '';
 							echo '
 							<input type="checkbox" name="jform[tag][]" value="'.$tag->id.'" data-tagname="'.$tag->name.'" id="quick-tag-'.$tag->id.'" '.$_checked.' />
-							<label for="quick-tag-'.$tag->id.'" class="tagitem">'.$tag->name.'</label>
+							<label for="quick-tag-'.$tag->id.'" class="tagitem">'.htmlspecialchars((string) $tag->name, ENT_QUOTES, 'UTF-8').'</label>
 							';
 						}
 					}

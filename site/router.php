@@ -368,7 +368,7 @@ class _FlexicontentSiteRouter
 							$segments[] = 'tagged';
 						}
 
-						if ($mtagid !== $tagid)
+						if ($tagid !== null && $mtagid !== $tagid)
 						{
 							$segments[] = 0  // TODO use here $remove_ids
 								? $tagalias  // TODO: Use alias path from TAGs Tree
@@ -404,7 +404,7 @@ class _FlexicontentSiteRouter
 							$segments[] = 'authored';
 						}
 
-						if ($mauthorid !== $authorid)
+						if ($authorid !== null && $mauthorid !== $authorid)
 						{
 							$segments[] = $remove_ids
 								? $authoralias

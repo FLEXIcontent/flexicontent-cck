@@ -3686,7 +3686,7 @@ class flexicontent_html
 		$link = $item_url . (strpos($item_url, '?') !== false ? '&' : '?') . 'task=approval' . '&' . \Joomla\CMS\Session\Session::getFormToken() . '=1';
 
 		$targetLink = "_self";
-		$confirm_text = \Joomla\CMS\Language\Text::_('FLEXI_CONFIRM_SEND_APPROVAL', true) . "\n" . ' (' . $overlib . ')';
+		$confirm_text = \Joomla\CMS\Language\Text::_('FLEXI_CONFIRM_SEND_APPROVAL', true) . '\n' . ' (' . addslashes($overlib) . ')';  // '\n': a line break written for the JS string of the onclick attribute (a real line break is a JS syntax error)
 
 		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="' . $tooltip_placement . '" onclick="return confirm(\''.$confirm_text.'\')" target="'.$targetLink.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
 		$output = \Joomla\CMS\Language\Text::_('FLEXI_ICON_SEP') . $output . \Joomla\CMS\Language\Text::_('FLEXI_ICON_SEP');

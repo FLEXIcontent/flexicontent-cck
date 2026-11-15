@@ -208,7 +208,7 @@ foreach($values as $file_id)
 	$name_escaped = htmlspecialchars($name_str, ENT_COMPAT, 'UTF-8');
 
 	$name_classes = $file_classes . ' fcfile_title';
-	$name_html = '<span class="' . $name_classes . '">'. $name_str . '</span>';
+	$name_html = '<span class="' . $name_classes . '">'. htmlspecialchars((string) $name_str, ENT_QUOTES, 'UTF-8') . '</span>';
 
 
 	// f. DESCRIPTION: either as tooltip or as inline text

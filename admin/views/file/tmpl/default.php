@@ -222,6 +222,12 @@ HTML;
 												  'audiosExt'    => $audiosExt,
 												  'videosExt'    => $videosExt,
 												  'documentsExt' => $documentsExt,
+
+												  // Extensions the picker accepts per media type (media.php prints them in supported-extensions)
+												  'imagesAllowedExt'    => $imagesExt,
+												  'audiosAllowedExt'    => $audiosExt,
+												  'videosAllowedExt'    => $videosExt,
+												  'documentsAllowedExt' => $documentsExt,
 											  ];
 										  }
 										  else {

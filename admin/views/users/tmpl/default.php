@@ -425,7 +425,7 @@ if ($js)
 			$activation_img   = $img_path . ($row->activation ? 'publish_x.png' : 'tick.png');
 			$activation_title = $row->activation ? \Joomla\CMS\Language\Text::_( 'COM_USERS_UNACTIVATED' ) : \Joomla\CMS\Language\Text::_( 'COM_USERS_ACTIVATED' );
 
-			if ($row->lastvisitDate == "0000-00-00 00:00:00") {
+			if (empty($row->lastvisitDate) || $row->lastvisitDate == "0000-00-00 00:00:00") {
 				$lvisit = \Joomla\CMS\Language\Text::_( 'Never' );
 			} else {
 				$lvisit	= \Joomla\CMS\HTML\HTMLHelper::_('date', $row->lastvisitDate, 'Y-m-d H:i:s');
