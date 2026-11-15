@@ -1351,6 +1351,34 @@ class flexicontent_db
 
 
 	/**
+	 * Check if the user can modify an item that is associated (language association) with an item being saved
+	 * Association membership does not grant permission to edit the target item, also skip items checked out by other users
+	 *
+	 * @param   int                           $item_id  The associated (target) item
+	 * @param   \Joomla\CMS\User\User|null  $user     The user, defaults to the current user
+	 *
+	 * @return  boolean
+	 */
+	static function canEditAssocItem($item_id, $user = null)
+	{
+		$item_id = (int) $item_id;
+		$user = $user ?: \Joomla\CMS\Factory::getUser();
+		$db = \Joomla\CMS\Factory::getDbo();
+
+		$row = $db->setQuery('SELECT created_by, checked_out FROM #__content WHERE id = ' . $item_id)->loadObject();
+		$asset = 'com_content.article.' . $item_id;
+
+		if (!$row || (!empty($row->checked_out) && (int) $row->checked_out !== (int) $user->id))
+		{
+			return false;
+		}
+
+		return $user->authorise('core.edit', $asset)
+			|| (!empty($row->created_by) && (int) $row->created_by === (int) $user->id && $user->authorise('core.edit.own', $asset));
+	}
+
+
+	/**
 	 * Method to check if the main or the secondary categories are configured as non-translatable
 	 *
 	 * @return  boolean
@@ -1423,6 +1451,12 @@ class flexicontent_db
 		foreach ($assoc_ids as $assoc_id)
 		{
 			$assoc_id = (int) $assoc_id;
+
+			if (!static::canEditAssocItem($assoc_id, $user))
+			{
+				continue;
+			}
+
 			$lang = $assocs[$item_id][$assoc_id]->language;
 
 			$map = function ($cid) use ($cat_map, $lang)
@@ -1430,25 +1464,10 @@ class flexicontent_db
 				return isset($cat_map[$cid][$lang]) ? $cat_map[$cid][$lang] : (int) $cid;
 			};
 
-			$t_row = $db->setQuery('SELECT catid, created_by, checked_out FROM #__content WHERE id = ' . $assoc_id)->loadObject();
-
-			// Association membership does not grant permission to edit the target item.
-			if (!$t_row || (!empty($t_row->checked_out) && (int) $t_row->checked_out !== (int) $user->id))
-			{
-				continue;
-			}
-
-			$asset = 'com_content.article.' . $assoc_id;
-			$can_edit = $user->authorise('core.edit', $asset)
-				|| (!empty($t_row->created_by) && (int) $t_row->created_by === (int) $user->id && $user->authorise('core.edit.own', $asset));
-
-			if (!$can_edit)
-			{
-				continue;
-			}
+			$t_catid_old = (int) $db->setQuery('SELECT catid FROM #__content WHERE id = ' . $assoc_id)->loadResult();
 
 			$t_old   = array_map('intval', (array) $db->setQuery('SELECT catid FROM #__flexicontent_cats_item_relations WHERE itemid = ' . $assoc_id)->loadColumn());
-			$t_catid = $flags['main'] ? $map($catid) : (int) $t_row->catid;
+			$t_catid = $flags['main'] ? $map($catid) : $t_catid_old;
 
 			if ($flags['secondary'])
 			{
@@ -1459,7 +1478,7 @@ class flexicontent_db
 			else
 			{
 				// Secondary categories were not shared: keep the existing ones, only make sure the main category is in
-				$t_cats = array_values(array_diff($t_old, array((int) $t_row->catid)));
+				$t_cats = array_values(array_diff($t_old, array($t_catid_old)));
 				$t_cats[] = $t_catid;
 			}
 
