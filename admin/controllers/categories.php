@@ -293,6 +293,8 @@ class FlexicontentControllerCategories extends FlexicontentControllerBaseAdmin
 	 */
 	protected function _cleanCache()
 	{
+		parent::_cleanCache();
+
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 		// Clean cache
 		$cache = \Joomla\CMS\Factory::getCache('com_flexicontent');

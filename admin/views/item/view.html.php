@@ -1517,7 +1517,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		{
 			// Set to zero if disabled or to "" (aka use default) for any other value.  THIS WILL FORCE comment field use default Global/Category/Content Type setting or disable it,
 			// thus a per item commenting system cannot be selected. This is OK because it makes sense to have a different commenting system per CONTENT TYPE by not per Content Item
-			$isdisabled = !$page_params->get('comments') && strlen($page_params->get('comments'));
+			$isdisabled = !$page_params->get('comments') && strlen((string) $page_params->get('comments'));
 			$fieldvalue = $isdisabled ? 0 : "";
 
 			$fieldname = 'jform[attribs][comments]';

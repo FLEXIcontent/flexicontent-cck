@@ -402,6 +402,7 @@ class plgFlexicontent_fieldsImage extends FCField
 				// Find last container of fields and clone it to create a new container of fields
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
 				var newField  = lastField.clone();
+				fcfield_image.prepareMediaClone(lastField.get(0), newField.get(0));
 				newField.find('.fc-has-value').removeClass('fc-has-value');
 
 				// New element's field name and id
@@ -551,7 +552,7 @@ class plgFlexicontent_fieldsImage extends FCField
 					" : '') .
 
 				// Re-init any Quantum manager form field element (Quantum manager)
-				($image_source === -2 && $use_jformfields  ? "if (newField.find('.quantummanager')) initQuantumuploadimage(newField.get(0));" : '')
+				($image_source === -2 && $use_jformfields  ? "if (newField.find('.quantummanager').length && typeof initQuantumuploadimage === 'function') initQuantumuploadimage(newField.get(0));" : '')
 			;
 
 			// Add new element to sortable objects (if field not in group)

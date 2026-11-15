@@ -60,7 +60,12 @@ namespace {
         public function quote($s) { return "'" . $s . "'"; }
         public function qn($s) { return '`' . $s . '`'; }
         // Category N has asset 100 + N
-        public function loadResult() { return preg_match('/asset_id FROM #__categories WHERE id = (\d+)/', $this->query, $m) ? 100 + (int) $m[1] : 10; }
+        public function loadResult() {
+            if (preg_match('/asset_id FROM #__categories WHERE id = (\d+)/', $this->query, $m)) return 100 + (int) $m[1];
+            // The source main category is 10; preserve the actual target value.
+            if (strpos($this->query, 'catid FROM #__content WHERE id = 2') !== false) return $this->target->catid;
+            return 10;
+        }
         public function loadColumn() { return strpos($this->query, 'itemid = 1') !== false ? array(10, 11) : $this->relations; }
         public function loadObject() { return $this->target ? clone $this->target : null; }
         public function loadObjectList() {

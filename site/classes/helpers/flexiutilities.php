@@ -380,7 +380,7 @@ class FLEXIUtilities
 			'defaultgroup' => $group,
 			'storage' => $conf->get('cache_handler', ''),
 			'caching' => true,
-			'cachebase' => ($client == 1 ? JPATH_ADMINISTRATOR . '/cache' : $conf->get('cache_path', JPATH_SITE . '/cache'))
+			'cachebase' => ($client == 1 ? JPATH_ADMINISTRATOR . '/cache' : $conf->get('cache_path', JPATH_CACHE))
 		);
 
 		jimport('joomla.cache.cache');

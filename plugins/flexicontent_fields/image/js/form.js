@@ -5,6 +5,22 @@
 	fcfield_image.currElement = [];
 	fcfield_image.dialog_handle = [];
 
+	// Joomla detaches an empty media control's clear button but keeps its reference.
+	// Restore that button before connecting a cloned control to the document.
+	fcfield_image.prepareMediaClone = function(source, clone)
+	{
+		var originals = source.querySelectorAll('joomla-field-media');
+		clone.querySelectorAll('joomla-field-media').forEach(function(media, index)
+		{
+			var original = originals[index];
+			var selector = media.getAttribute('button-clear');
+			if (selector && !media.querySelector(selector) && original && original.buttonClearEl)
+			{
+				(media.querySelector('.input-group') || media).appendChild(original.buttonClearEl.cloneNode(true));
+			}
+		});
+	};
+
 	fcfield_image.toggleMediaURL = function(element_id_n, config_name)
 	{
 		var url = jQuery("#"+element_id_n+"_mediaurl").val();
