@@ -11,6 +11,30 @@ namespace Joomla\CMS {
         }
     }
 }
+namespace Joomla\CMS\Table {
+    // The assets table: asset name => parent asset id
+    class Asset {
+        public static $parents = array();
+        public static $stored = array();
+        public $parent_id = 0;
+        private $name;
+        private $location;
+        public function __construct($db) {}
+        public function loadByName($name) {
+            if (!isset(self::$parents[$name])) return false;
+            $this->name = $name;
+            $this->parent_id = self::$parents[$name];
+            return true;
+        }
+        public function setLocation($referenceId, $position) { $this->location = array($referenceId, $position); }
+        public function store() {
+            if ($this->location[1] !== 'last-child') throw new \RuntimeException('Unexpected asset position');
+            self::$parents[$this->name] = $this->location[0];
+            self::$stored[] = $this->name;
+            return true;
+        }
+    }
+}
 namespace {
     define('_JEXEC', 1);
     require __DIR__ . '/../../site/classes/helpers/db.php';
@@ -30,11 +54,13 @@ namespace {
         public $relations = array(30, 31);
         public $writes = 0;
         public $fallback = false;
+        public $tmpCatid;
         public function __construct() { $this->target = (object) array('catid'=>30, 'created_by'=>8, 'checked_out'=>0); }
         public function setQuery($q) { $this->query = $q; return $this; }
         public function quote($s) { return "'" . $s . "'"; }
         public function qn($s) { return '`' . $s . '`'; }
-        public function loadResult() { return 10; }
+        // Category N has asset 100 + N
+        public function loadResult() { return preg_match('/asset_id FROM #__categories WHERE id = (\d+)/', $this->query, $m) ? 100 + (int) $m[1] : 10; }
         public function loadColumn() { return strpos($this->query, 'itemid = 1') !== false ? array(10, 11) : $this->relations; }
         public function loadObject() { return $this->target ? clone $this->target : null; }
         public function loadObjectList() {
@@ -44,7 +70,8 @@ namespace {
         }
         public function execute() {
             $this->writes++;
-            if (preg_match('/SET catid = (\d+)/', $this->query, $m)) $this->target->catid = (int) $m[1];
+            if (preg_match('/^UPDATE #__flexicontent_items_tmp SET catid = (\d+)/', $this->query, $m)) $this->tmpCatid = (int) $m[1];
+            elseif (preg_match('/SET catid = (\d+)/', $this->query, $m)) $this->target->catid = (int) $m[1];
             elseif (strpos($this->query, 'DELETE') === 0) $this->relations = array();
             elseif (strpos($this->query, 'INSERT') === 0) {
                 preg_match_all('/\((\d+),2\)/', $this->query, $m);
@@ -70,8 +97,12 @@ namespace {
         \Joomla\CMS\Factory::$db = new AssociationDatabase;
         \Joomla\CMS\Factory::$user = new AssociationUser;
         AssociationHelper::$flags = array('main'=>$main, 'secondary'=>$secondary);
+        // The target item's asset is under its category 30
+        \Joomla\CMS\Table\Asset::$parents = array('com_content.article.2' => 130);
+        \Joomla\CMS\Table\Asset::$stored = array();
         return \Joomla\CMS\Factory::$db;
     }
+    $assets = \Joomla\CMS\Table\Asset::class;
     foreach (array(array(false,false),array(true,false),array(false,true),array(true,true)) as $flags) {
         $db = resetCase($flags[0], $flags[1]);
         $updated = AssociationHelper::propagateCategoriesToAssocs(1);
@@ -80,7 +111,18 @@ namespace {
         same($main, $db->target->catid, 'main flag');
         same($cats, $db->relations, 'independent secondary flag');
         same($flags[0] || $flags[1] ? array(2) : array(), $updated, 'updated IDs');
+        same($flags[0] ? 20 : null, $db->tmpCatid, 'temporary item data follows the main category');
+        same($main + 100, $assets::$parents['com_content.article.2'], 'asset follows the main category');
+        same($flags[0] ? array('com_content.article.2') : array(), $assets::$stored, 'asset stored only when the main category changes');
     }
+    // Asset already under the new main category: not stored again
+    $db = resetCase(true, false); $assets::$parents['com_content.article.2'] = 120;
+    AssociationHelper::propagateCategoriesToAssocs(1);
+    same(array(), $assets::$stored, 'asset already in place');
+    // Missing asset row: categories still propagate
+    $db = resetCase(true, false); $assets::$parents = array();
+    same(array(2), AssociationHelper::propagateCategoriesToAssocs(1), 'missing asset still updated');
+    same(20, $db->target->catid, 'missing asset main category');
     foreach (array('denied','own-not-owner','guest-own','other-checkout','missing') as $case) {
         $db = resetCase(); $user = \Joomla\CMS\Factory::$user;
         if ($case === 'denied' || $case === 'own-not-owner') $user->edit = false;
@@ -92,6 +134,7 @@ namespace {
         same(array(), AssociationHelper::propagateCategoriesToAssocs(1), $case . ' skipped');
         same(0, $db->writes, $case . ' no writes');
         same($before, serialize(array($db->target, $db->relations)), $case . ' unchanged');
+        same(array(), $assets::$stored, $case . ' asset unchanged');
     }
     foreach (array('own','self-checkout') as $case) {
         $db = resetCase(); $user = \Joomla\CMS\Factory::$user;
