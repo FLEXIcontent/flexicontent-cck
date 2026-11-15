@@ -34,6 +34,7 @@ $fc_download_full = flexicontent_fileeditor::downloadName($this->row->filename_o
 $fc_download_ext = flexicontent_fileeditor::extension($this->row->filename);
 $fc_download_stem = $fc_download_ext !== '' ? substr($fc_download_full, 0, -strlen($fc_download_ext) - 1) : $fc_download_full;
 $fc_editor_escape = static function($value) { return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8'); };
+$fc_filename_html = $fc_editor_escape($this->row->filename);
 
 $jmedia_filetypes = array('folders', 'images', 'docs', 'videos', 'audios');
 
@@ -148,7 +149,7 @@ $fc_in_modal = \Joomla\CMS\Factory::getApplication()->input->getCmd('tmpl') === 
 													<img alt="{$preview_alt}" src="{$value_src}" data-juri-root="{$juri_root}" class="inline-preview-img" style="max-width:300px"/>
 												</div>
 												<div class="input-group">
-													<input class="form-control input-group-prepend" type="text" readonly="" style="background:#eee; border:1px solid #aaa; min-width: min(500px, 80vw); max-width:1020px" value="{$this->row->filename}" id="filename" name="filename" placeholder="{$file_placeholder_text}" />
+													<input class="form-control input-group-prepend" type="text" readonly="" style="background:#eee; border:1px solid #aaa; min-width: min(500px, 80vw); max-width:1020px" value="{$fc_filename_html}" id="filename" name="filename" placeholder="{$file_placeholder_text}" />
 													{$select_file_btn}
 													<button type="button" href="#" title="Clear" class="form-control btn input-group-append fit-contents clear-btn" onclick="{$file_clear_value_js}"><i class="icon-cancel"></i></button>
 												</div>
@@ -238,7 +239,7 @@ HTML;
 				else :
 
 					echo '
-					<input type="text" id="filename" name="filename" value="' . $this->row->filename . '" class="input-xxlarge input-xxl required' . $fc_atum_control . '" maxlength="4000"
+					<input type="text" id="filename" name="filename" value="' . $fc_editor_escape($this->row->filename) . '" class="input-xxlarge input-xxl required' . $fc_atum_control . '" maxlength="4000"
 					' . ((int)$this->row->url === 0 ? ' readonly="readonly" style="background:#eee; border:1px solid #aaa" ' : '') . '
 					/>
 					';
