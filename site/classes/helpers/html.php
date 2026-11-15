@@ -1657,7 +1657,7 @@ class flexicontent_html
 					? $params->get('api_lang_code_edit', flexicontent_html::getUserCurrentLang())
 					: $params->get('api_lang_code', flexicontent_html::getUserCurrentLang());
 				$force_language_param = '&language=' . $force_language_code;
-				$apikey = trim($params->get('google_maps_js_api_key', $params->get('apikey')));
+				$apikey = trim((string) $params->get('google_maps_js_api_key', $params->get('apikey')));
 
 				// Key is not empty
 				if ($apikey)
@@ -2360,7 +2360,7 @@ class flexicontent_html
 		if ($validation=='-1') return flexicontent_html::striptagsandcut( $v, $maxlength );
 
 		// validation: via function call
-		$v = $maxlength ? substr($v, 0, $maxlength) : $v;
+		$v = $maxlength ? substr((string) $v, 0, $maxlength) : $v;
 		if ($check_callable)
 		{
 			if (strpos($validation, '::') !== false && is_callable(explode('::', $validation)))
@@ -3686,7 +3686,7 @@ class flexicontent_html
 		$link = $item_url . (strpos($item_url, '?') !== false ? '&' : '?') . 'task=approval' . '&' . \Joomla\CMS\Session\Session::getFormToken() . '=1';
 
 		$targetLink = "_self";
-		$confirm_text = \Joomla\CMS\Language\Text::_('FLEXI_CONFIRM_SEND_APPROVAL', true) . "\n" . ' (' . $overlib . ')';
+		$confirm_text = \Joomla\CMS\Language\Text::_('FLEXI_CONFIRM_SEND_APPROVAL', true) . '\n' . ' (' . addslashes($overlib) . ')';  // '\n': a line break written for the JS string of the onclick attribute (a real line break is a JS syntax error)
 
 		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="' . $tooltip_placement . '" onclick="return confirm(\''.$confirm_text.'\')" target="'.$targetLink.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
 		$output = \Joomla\CMS\Language\Text::_('FLEXI_ICON_SEP') . $output . \Joomla\CMS\Language\Text::_('FLEXI_ICON_SEP');

@@ -199,7 +199,7 @@
 				origin: new google.maps.Point(0, 0),
 				anchor: new google.maps.Point(a.wA, a.hA)
 			};
-			fcfield_addrint.posMarker[elementid_n].setIcon(icon);
+			if (fcfield_addrint.posMarker[elementid_n]) fcfield_addrint.posMarker[elementid_n].setIcon(icon);
 		});
 
 		img.src = url;

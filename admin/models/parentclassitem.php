@@ -1050,7 +1050,7 @@ class ParentClassItem extends FCModelAdmin
 			if ($useAssocs)
 			{
 				$site_default = substr(flexicontent_html::getSiteDefaultLang(), 0,2);
-				$is_content_default_lang = $site_default == substr($item->language, 0,2);
+				$is_content_default_lang = $site_default == substr((string) $item->language, 0,2);
 				if ($is_content_default_lang)
 				{
 					$item->lang_parent_id = $item->id;
@@ -2838,7 +2838,7 @@ class ParentClassItem extends FCModelAdmin
 		$useAssocs = $this->useAssociations();
 
 		$site_default = substr(flexicontent_html::getSiteDefaultLang(), 0,2);
-		$is_content_default_lang = $site_default == substr($item->language, 0,2);
+		$is_content_default_lang = $site_default == substr((string) $item->language, 0,2);
 
 		$get_untraslatable_values = $useAssocs && !$is_content_default_lang;
 		if ($useAssocs)
@@ -2850,6 +2850,17 @@ class ParentClassItem extends FCModelAdmin
 			$assoc_item_ids = array_keys($_langAssocs);
 		}
 		if (empty($assoc_item_ids)) $assoc_item_ids = array();
+
+		// Association membership does not grant permission to edit the associated items (same rule as for the non-translatable
+		// tags and categories, #1381 / #1362): values of non-translatable fields are written only into associated items
+		// that the user may edit and that are not checked out by another user
+		if ($checkACL && $assoc_item_ids)
+		{
+			$assoc_item_ids = array_values(array_filter($assoc_item_ids, function ($assoc_item_id) use ($user)
+			{
+				return flexicontent_db::canEditAssocItem((int) $assoc_item_id, $user);
+			}));
+		}
 
 
 		// ***
@@ -3127,6 +3138,7 @@ class ParentClassItem extends FCModelAdmin
 
 		$ai_query_vals = array();
 		$ai_query_vals_f = array();
+		$basic_index = array();
 
 		if ($fields)
 		{
@@ -3160,9 +3172,15 @@ class ParentClassItem extends FCModelAdmin
 					if (isset($field->search[$item->id]) && strlen($field->search[$item->id]))
 					{
 						$searchindex[] = $field->search[$item->id];
+						$basic_index[$item->id][$field->id] = $field->search[$item->id];
 					}
 				}
 			}
+		}
+
+		if ($data['vstate'] == 2 || $isNew)
+		{
+			flexicontent_db::replaceBasicSearchIndex(array($item->id), $basic_index);
 		}
 
 		// Remove item's old advanced search index entries

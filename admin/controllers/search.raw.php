@@ -169,8 +169,14 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 			$model->purge($del_field_ids);
 		}
 
+		// A full basic rebuild also replaces the field-attributed autocomplete index.
+		if ($indexer === 'basic')
+		{
+			$db->setQuery('TRUNCATE TABLE #__flexicontent_basicsearch_index')->execute();
+		}
+
 		// For basic index, clear records if no fields marked as text searchable
-		elseif (!count($fields))
+		if ($indexer === 'basic' && !count($fields))
 		{
 			$db->setQuery("UPDATE #__flexicontent_items_ext SET search_index = '' ");
 			$db->execute();
@@ -418,6 +424,7 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 
 				// Add all query itemids to searchindex array so that it will be cleared even if zero fields are indexed
 				$searchindex = array();
+				$basic_index = array();
 
 				foreach ($query_itemids as $query_itemid)
 				{
@@ -481,6 +488,7 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 						if (!empty($field->search[$query_itemid]))
 						{
 							$searchindex[$query_itemid][] = $field->search[$query_itemid];
+							$basic_index[$query_itemid][$field->id] = $field->search[$query_itemid];
 						}
 					}
 
@@ -497,6 +505,8 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 
 			if ($indexer === 'basic')
 			{
+				flexicontent_db::replaceBasicSearchIndex($query_itemids, $basic_index);
+
 				// Check for zero search index records
 				if (count($searchindex))
 				{
@@ -755,6 +765,29 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 	 */
 	public function purge()
 	{
+		// Same authority as the 'search.purge' task of the html controller (search.php): this raw twin is reached
+		// with format=raw and must not purge by GET, without the form token, or for a user who cannot manage the index
+		$app  = \Joomla\CMS\Factory::getApplication();
+		$user = $app->getIdentity();
+
+		if (!$app->isClient('administrator') || !$user->id
+			|| !$user->authorise('flexicontent.managefields', 'com_flexicontent')
+			|| !($user->authorise('flexicontent.createfield', 'com_flexicontent')
+				|| $user->authorise('flexicontent.editfield', 'com_flexicontent')))
+		{
+			throw new \RuntimeException(\Joomla\CMS\Language\Text::_('JERROR_ALERTNOAUTHOR'), 403);
+		}
+
+		if (strtoupper($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST')
+		{
+			throw new \RuntimeException('POST request required', 405);
+		}
+
+		if (!\Joomla\CMS\Session\Session::checkToken('post'))
+		{
+			throw new \RuntimeException(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'), 403);
+		}
+
 		$model = $this->getModel('search');
 		$model->purge();
 		$msg = \Joomla\CMS\Language\Text::_('FLEXI_ITEMS_PURGED');

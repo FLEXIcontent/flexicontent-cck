@@ -531,12 +531,17 @@ abstract class JHtmlFcbase
 	 */
 	public static function lang_display($row, $i, $langs, $use_icon = false, $undefined = 'JUNDEFINED')
 	{
+		// The language title is plain text: encode it for the cell, and for the tooltip (which is rendered as HTML)
+		$lang_name = !empty($row->language) && isset($langs->{$row->language}->name)
+			? htmlspecialchars((string) $langs->{$row->language}->name, ENT_QUOTES, 'UTF-8')
+			: '';
+
 		if ($use_icon && !empty($row->language) && !empty($langs->{$row->language}->imgsrc))
 		{
 			return '<img class="' . static::$tooltip_class . '" '.
-				' title="' . flexicontent_html::getToolTip(\Joomla\CMS\Language\Text::_('FLEXI_LANGUAGE'), ($row->language === '*' ? \Joomla\CMS\Language\Text::_('FLEXI_ALL') : (!empty($row->language) ? $langs->{$row->language}->name : '')), 0, 1) . '" ' .
-				' src="' . $langs->{$row->language}->imgsrc . '" alt="'. $row->language . '" /> ' .
-				($use_icon === 2 ? $langs->{$row->language}->name : '')
+				' title="' . flexicontent_html::getToolTip(\Joomla\CMS\Language\Text::_('FLEXI_LANGUAGE'), ($row->language === '*' ? \Joomla\CMS\Language\Text::_('FLEXI_ALL') : $lang_name), 0, 1) . '" ' .
+				' src="' . htmlspecialchars((string) $langs->{$row->language}->imgsrc, ENT_QUOTES, 'UTF-8') . '" alt="'. htmlspecialchars((string) $row->language, ENT_QUOTES, 'UTF-8') . '" /> ' .
+				($use_icon === 2 ? $lang_name : '')
 				;
 		}
 		elseif ($row->language === '*')
@@ -545,7 +550,7 @@ abstract class JHtmlFcbase
 		}
 		else
 		{
-			return !empty($row->language) ? $langs->{$row->language}->name : \Joomla\CMS\Language\Text::_($undefined);
+			return !empty($row->language) ? $lang_name : \Joomla\CMS\Language\Text::_($undefined);
 		}
 	}
 }

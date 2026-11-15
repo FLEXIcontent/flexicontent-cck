@@ -279,6 +279,12 @@ $this->document->addScriptDeclaration($js);
 							{
 								$_value = $form_layout->getValue($fieldname, $groupname, $layoutParams->get($fieldname));
 
+								// Layout configuration never saved: use the default of the field, a NULL value makes the core fields log PHP 8.1+ deprecations
+								if ($_value === null)
+								{
+									$_value = (string) $field->getAttribute('default', '');
+								}
+
 								// Not only set the disabled attribute but also clear the required attribute to avoid issues with some fields (like 'color' field)
 								$form_layout->setFieldAttribute($fieldname, 'disabled', 'true', $field->group);
 								$form_layout->setFieldAttribute($fieldname, 'required', 'false', $field->group);

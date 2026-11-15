@@ -11,6 +11,36 @@ use Joomla\CMS\Table\Table;
  */
 class flexicontent_db
 {
+	/** Replace field-attributed basic-index text for approved item saves / indexer batches. */
+	static function replaceBasicSearchIndex($item_ids, array $rows)
+	{
+		$item_ids = array_values(array_unique(array_filter(array_map('intval', $item_ids))));
+		if (!$item_ids) return;
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$db->setQuery('DELETE FROM #__flexicontent_basicsearch_index WHERE item_id IN (' . implode(',', $item_ids) . ')')->execute();
+		$prefix = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('add_search_prefix') ? 'vvv' : '';
+		$values = array();
+		$bytes = 0;
+		foreach ($rows as $item_id => $fields)
+		{
+			if (!in_array((int) $item_id, $item_ids, true)) continue;
+			foreach ($fields as $field_id => $text)
+			{
+				if (!(int) $field_id || !strlen((string) $text)) continue;
+				if ($prefix) $text = preg_replace('/(\b[^\s,\.]+\b)/u', $prefix . '$0', trim($text));
+				$value = '(' . (int) $item_id . ',' . (int) $field_id . ',' . $db->quote($text) . ')';
+				$values[] = $value;
+				$bytes += strlen($value);
+				if ($bytes >= 1000000)
+				{
+					$db->setQuery('INSERT INTO #__flexicontent_basicsearch_index (item_id,field_id,search_index) VALUES ' . implode(',', $values))->execute();
+					$values = array(); $bytes = 0;
+				}
+			}
+		}
+		if ($values) $db->setQuery('INSERT INTO #__flexicontent_basicsearch_index (item_id,field_id,search_index) VALUES ' . implode(',', $values))->execute();
+	}
+
 	/**
 	 * Method to get the overridden language string (frontend in backend and backend in frontend)
 	 *

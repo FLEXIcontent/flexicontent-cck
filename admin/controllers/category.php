@@ -81,6 +81,15 @@ class FlexicontentControllerCategory extends \Joomla\CMS\MVC\Controller\FormCont
 	 */
 	public function edit($key = null, $urlVar = null)
 	{
+		// The category form is refused without the 'manage categories' permission (see the view).
+		// Refuse here, before the category is checked out by a user who cannot open the form to release it
+		if (!FlexicontentHelperPerm::getPerm()->CanCats)
+		{
+			$this->setRedirect('index.php?option=com_flexicontent', \Joomla\CMS\Language\Text::_('FLEXI_NO_ACCESS'), 'warning');
+
+			return false;
+		}
+
 		return parent::edit($key, $urlVar);
 	}
 

@@ -287,7 +287,7 @@ if ($js)
 				<?php endif; ?>
 				<?php if (JDEBUG) : ?>
 					<div class="fltrt"><div class="button2-left smallsub"><div class="blank"><a href="<?php echo \Joomla\CMS\Router\Route::_('index.php?option=com_flexicontent&view=debuggroup&group_id='.(int) $item->id);?>">
-					<?php echo \Joomla\CMS\Language\Text::_('COM_USERS_DEBUG_GROUP');?></a></div></div></div>
+					<?php echo \Joomla\CMS\Language\Text::_(FLEXI_J40GE ? 'COM_USERS_DEBUG_PERMISSIONS' : 'COM_USERS_DEBUG_GROUP');?></a></div></div></div>
 				<?php endif; ?>
 			</td>
 			<td class="col_usergrp left">
