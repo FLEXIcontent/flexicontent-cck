@@ -389,7 +389,7 @@ if ($tags_displayed) : ob_start();  // tags ?>
 						{
 							$_checked = isset($common_tags_selected[$tag->id]) ? ' checked="checked" ' : '';
 							echo '
-							<input type="checkbox" name="jform[tag][]" value="'.$tag->id.'" data-tagname="'.$tag->name.'" id="quick-tag-'.$tag->id.'" '.$_checked.' />
+							<input type="checkbox" name="jform[tag][]" value="'.$tag->id.'" data-tagname="'.htmlspecialchars((string) $tag->name, ENT_QUOTES, 'UTF-8').'" id="quick-tag-'.$tag->id.'" '.$_checked.' />
 							<label for="quick-tag-'.$tag->id.'" class="tagitem">'.htmlspecialchars((string) $tag->name, ENT_QUOTES, 'UTF-8').'</label>
 							';
 						}
