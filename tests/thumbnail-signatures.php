@@ -42,7 +42,7 @@ $decoded=html_entity_decode($rotated,ENT_QUOTES,'UTF-8');
 if(!preg_match('/\?([^"]+)"/',$decoded,$m)||!str_ends_with($m[1],'&hash='.hash_hmac('sha256',explode('&hash=',$m[1])[0],$newKey)))throw new RuntimeException('Rotated signature is invalid');
 $count++;
 $filtered=flexicontent_images::phpThumbQuery(['src'=>'/images/test.png','w'=>0,'h'=>null,'f'=>'','q'=>false]);
-if(!str_contains($filtered,'w=0')||str_contains($filtered,'h=')||str_contains($filtered,'f=')||str_contains($filtered,'q='))throw new RuntimeException('Empty/zero query handling changed');
+if(!str_contains($filtered,'w=0')||preg_match('/(?:^|&)(?:h|f|q)=/',$filtered))throw new RuntimeException('Empty/zero query handling changed');
 $count++;
 foreach(['','weak']as $weak){
     $property->setValue(null,['high_security_password'=>$weak,'high_security_enabled'=>false,'high_security_url_separator'=>'&']);
