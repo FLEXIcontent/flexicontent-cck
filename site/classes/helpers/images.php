@@ -44,19 +44,17 @@ class flexicontent_images
 	}
 
 	/**
-	 * Cached component, module and page output may contain the previous thumbnail
-	 * signatures or legacy unsigned URLs. Use Joomla's configured cache storage.
+	 * Any cached layout can call the public thumbnail helper. Clear all Joomla
+	 * output groups, including individual mod_* groups, when its key/settings
+	 * change. Use Joomla's configured cache storage and cache path.
 	 */
 	static function phpThumbClearCaches()
 	{
 		$cache = \Joomla\CMS\Factory::getContainer()
 			->get(\Joomla\CMS\Cache\CacheControllerFactoryInterface::class)
-			->createCacheController('callback');
+			->createCacheController('callback', array('defaultgroup' => ''));
 
-		foreach (array('com_flexicontent', 'com_modules', 'page') as $group)
-		{
-			$cache->clean($group);
-		}
+		$cache->clean();
 	}
 
 
