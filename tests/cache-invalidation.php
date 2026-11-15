@@ -12,12 +12,12 @@ namespace {
  $count=0;
  foreach(['Base'=>null,'Items'=>'admin/controllers/items.php','Raw'=>'admin/controllers/items.raw.php','Categories'=>'admin/controllers/categories.php']as $name=>$file){
   $class='Cache'.$name.'Fixture';if($file)eval('class '.$class.' extends CacheBaseFixture {'.method($file,'protected function _cleanCache(').'}');
-  CacheRecorder::$calls=[];(new $class)->run();if(!in_array(['com_modules',0],CacheRecorder::$calls,true))throw new \RuntimeException($name.' did not invalidate module metadata');
+  CacheRecorder::$calls=[];(new $class)->run();foreach(['com_modules','page']as $dependent)if(!in_array([$dependent,0],CacheRecorder::$calls,true))throw new \RuntimeException($name.' did not invalidate '.$dependent);
   if($file&&$name!=='Categories'&&!in_array(['com_flexicontent_items',0],CacheRecorder::$calls,true))throw new \RuntimeException('Existing item invalidation lost');$count++;
  }
  class CacheModelRoot {public array $calls=[];protected function cleanCache($group=null,$client_id=0){$this->calls[]=[$group,$client_id];}public function run($group=null,$client=0){$this->cleanCache($group,$client);}}
  eval('class CacheModelFixture extends CacheModelRoot {'.method('admin/models/parentclassitem.php','protected function cleanCache(').'}');
- foreach([0,1]as $client){$model=new CacheModelFixture;$model->run(null,$client);foreach(['com_modules','com_flexicontent_items','com_flexicontent_filters']as $group)if(!in_array([$group,$client],$model->calls,true))throw new \RuntimeException('Model dependent cache invalidation missing');$count++;}
+ foreach([0,1]as $client){$model=new CacheModelFixture;$model->run(null,$client);foreach(['com_modules','page','com_flexicontent_items','com_flexicontent_filters']as $group)if(!in_array([$group,$client],$model->calls,true))throw new \RuntimeException('Model dependent cache invalidation missing');$count++;}
  $model=new CacheModelFixture;$model->run('custom',0);if($model->calls!==[['custom',0]])throw new \RuntimeException('Explicit group clearing changed');$count++;
  restore_error_handler();echo $count." cache invalidation checks passed\n";
 }

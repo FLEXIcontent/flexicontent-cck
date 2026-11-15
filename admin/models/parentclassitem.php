@@ -5914,6 +5914,7 @@ class ParentClassItem extends FCModelAdmin
 			parent::cleanCache('com_flexicontent_items', $client_id);
 			parent::cleanCache('com_flexicontent_filters', $client_id);
 			parent::cleanCache('com_modules', $client_id);
+			parent::cleanCache('page', $client_id);
 		}
 	}
 

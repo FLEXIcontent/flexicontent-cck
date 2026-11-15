@@ -1088,6 +1088,8 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 		// Progressive module caches can contain item metadata in their saved document head.
 		$cache = FLEXIUtilities::getCache('', 0);
 		$cache->clean('com_modules');
+		// Full-page snapshots must not outlive content or access changes.
+		$cache->clean('page');
 	}
 
 
