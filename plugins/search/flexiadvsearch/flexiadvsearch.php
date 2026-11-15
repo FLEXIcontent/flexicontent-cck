@@ -928,7 +928,10 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 				// If joomla article view is allowed allowed and then search view may optional create Joomla article links
 				if( $typeData[$item->type_id]->params->get('allow_jview', 0) == 1 && $typeData[$item->type_id]->params->get('search_jlinks', 1) )
 				{
-					$item->href = \Joomla\CMS\Router\Route::_(ContentHelperRoute::getArticleRoute($item->slug, $item->categoryslug, $item->language));
+					// ContentHelperRoute is a Joomla 3 class name, Joomla 6 has it only with the Backward Compatibility 6 plugin
+					$item->href = \Joomla\CMS\Router\Route::_(FLEXI_J40GE
+						? \Joomla\Component\Content\Site\Helper\RouteHelper::getArticleRoute($item->slug, $item->categoryslug, $item->language)
+						: ContentHelperRoute::getArticleRoute($item->slug, $item->categoryslug, $item->language));
 				}
 				else
 				{
