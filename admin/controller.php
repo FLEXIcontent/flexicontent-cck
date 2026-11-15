@@ -325,8 +325,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\AdminController
 			// Pages cached with URLs signed by the previous key are now stale
 			try
 			{
-				\Joomla\CMS\Factory::getCache()->clean('page');
-				\Joomla\CMS\Factory::getCache()->clean('com_flexicontent');
+				flexicontent_images::phpThumbClearCaches();
 			}
 			catch (\Throwable $e)
 			{

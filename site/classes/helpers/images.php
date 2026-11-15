@@ -43,6 +43,22 @@ class flexicontent_images
 		return JPATH_SITE . '/' . self::PHPTHUMB_REL_DIR;
 	}
 
+	/**
+	 * Cached component, module and page output may contain the previous thumbnail
+	 * signatures or legacy unsigned URLs. Use Joomla's configured cache storage.
+	 */
+	static function phpThumbClearCaches()
+	{
+		$cache = \Joomla\CMS\Factory::getContainer()
+			->get(\Joomla\CMS\Cache\CacheControllerFactoryInterface::class)
+			->createCacheController('callback');
+
+		foreach (array('com_flexicontent', 'com_modules', 'page') as $group)
+		{
+			$cache->clean($group);
+		}
+	}
+
 
 	/**
 	 * URL of the phpThumb script

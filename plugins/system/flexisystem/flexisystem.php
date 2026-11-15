@@ -2121,6 +2121,9 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 
 			if ($result === false) {
 				Factory::getApplication()->enqueueMessage(Text::sprintf('FLEXI_PHPTHUMB_KEY_FILE_NOT_WRITABLE', flexicontent_images::phpThumbManagedFile()), 'warning');
+			} else {
+				// Protection and legacy rewriting settings affect cached image URLs too.
+				flexicontent_images::phpThumbClearCaches();
 			}
 		} catch (\Throwable $e) {
 			Factory::getApplication()->enqueueMessage('phpThumb configuration: ' . $e->getMessage(), 'warning');
