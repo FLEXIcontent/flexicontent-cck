@@ -262,6 +262,22 @@ class com_flexicontentInstallerScript
 
 		$db = \Joomla\CMS\Factory::getDbo();
 
+		// Both installation and upgrade need a field-attributed basic autocomplete index.
+		// Never copy the legacy merged text: it cannot be checked against field permissions.
+		$basic_index_exists = in_array($db->getPrefix() . 'flexicontent_basicsearch_index', $db->getTableList(), true);
+		$db->setQuery('CREATE TABLE IF NOT EXISTS #__flexicontent_basicsearch_index ('
+			. 'item_id INT UNSIGNED NOT NULL, field_id INT UNSIGNED NOT NULL, search_index LONGTEXT NOT NULL,'
+			. 'PRIMARY KEY (item_id, field_id), KEY field_id (field_id), FULLTEXT KEY search_index (search_index)'
+			. ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci')->execute();
+		if (!$basic_index_exists && !FLEXI_NEW_INSTALL)
+		{
+			// The preflight language cache may still contain the previous package's strings.
+			$language_source = isset($parent) ? $parent->getParent()->getPath('source') : $this->parent->getPath('source');
+			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', $language_source . '/admin', 'en-GB', true);
+			\Joomla\CMS\Factory::getApplication()->enqueueMessage(
+				\Joomla\CMS\Language\Text::_('FLEXI_BASIC_AUTOCOMPLETE_REBUILD'), 'notice');
+		}
+
 		// Parse XML file to identify additional extensions,
 		// This code part (for installing additional extensions) originates from Zoo J1.5 Component:
 		// @author    YOOtheme http://www.yootheme.com
@@ -1666,6 +1682,10 @@ class com_flexicontentInstallerScript
 		// uninstall additional extensions
 		for ($i = 0; $i < count($extensions); $i++) {
 			$extension =& $extensions[$i];
+
+			// Joomla 6 no longer gives a new Installer its database: without this every uninstall below throws
+			// and the bundled plugins / modules stay installed (the system plugin then breaks every page)
+			$extension['installer']->setDatabase($db);
 
 			if ($extension['id'] > 0 && $extension['installer']->uninstall($extension['type'], $extension['id'], $extension['client_id'])) {
 				$extension['status'] = true;

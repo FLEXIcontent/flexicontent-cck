@@ -1907,7 +1907,7 @@ class FlexicontentModelItems extends FCModelAdminList
 					$lang_from			= substr($row->language,0,2);
 					$row->language	= $lang ? $lang : $row->language;
 					$lang_to				= substr($row->language,0,2);
-					$row->state			= strlen($state) ? $state : $row->state;  // keep original if: null, ''
+					$row->state			= strlen((string) $state) ? $state : $row->state;  // keep original if: null, ''
 					$row->type_id		= $type_id ? $type_id : $row->type_id;    // keep original if: null, zero, ''
 					$row->access		= $access ? $access : $row->access;       // keep original if: null, zero, ''
 
@@ -2389,7 +2389,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$item->access   = $access ?: $item->access;
 
 		// keep original if: null, ''
-		$item->state = strlen($state) ? $state : $item->state;
+		$item->state = strlen((string) $state) ? $state : $item->state;
 
 		$item->store();
 
@@ -3150,6 +3150,8 @@ class FlexicontentModelItems extends FCModelAdminList
 				return false;
 			}
 		}
+
+		$this->_db->setQuery('DELETE FROM #__flexicontent_basicsearch_index WHERE item_id IN (' . $cid_list . ')')->execute();
 
 		// ***
 		// *** Remove extended item data

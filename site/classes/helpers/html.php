@@ -1657,7 +1657,7 @@ class flexicontent_html
 					? $params->get('api_lang_code_edit', flexicontent_html::getUserCurrentLang())
 					: $params->get('api_lang_code', flexicontent_html::getUserCurrentLang());
 				$force_language_param = '&language=' . $force_language_code;
-				$apikey = trim($params->get('google_maps_js_api_key', $params->get('apikey')));
+				$apikey = trim((string) $params->get('google_maps_js_api_key', $params->get('apikey')));
 
 				// Key is not empty
 				if ($apikey)
@@ -2360,7 +2360,7 @@ class flexicontent_html
 		if ($validation=='-1') return flexicontent_html::striptagsandcut( $v, $maxlength );
 
 		// validation: via function call
-		$v = $maxlength ? substr($v, 0, $maxlength) : $v;
+		$v = $maxlength ? substr((string) $v, 0, $maxlength) : $v;
 		if ($check_callable)
 		{
 			if (strpos($validation, '::') !== false && is_callable(explode('::', $validation)))

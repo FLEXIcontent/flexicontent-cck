@@ -615,7 +615,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 			'T'  => -2
 		);
 
-		$state = strlen($state)
+		$state = strlen((string) $state)
 			? $state
 			: $this->input->get('newstate', '', 'string');
 

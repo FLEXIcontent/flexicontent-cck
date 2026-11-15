@@ -132,8 +132,8 @@ else
 
 		$step_labels = & $custom_labels;
 		$i = 0;
-		$set_start = strlen($value1) > 0;
-		$set_end   = strlen($value2) > 0;
+		$set_start = strlen((string) $value1) > 0;
+		$set_end   = strlen((string) $value2) > 0;
 
 		foreach ($custom_vals as $n => $custom_val)
 		{
@@ -161,6 +161,10 @@ else
 			var input1 = document.getElementById('".$filter_ffid.$left_no."');
 			var input2 = document.getElementById('".$filter_ffid.$rght_no."');
 			var isSingle = ".($display_filter_as==7 ? '1' : '0').";
+
+			// Labels of found values are stored data: show them as text. Only the custom labels of the field configuration may hold markup
+			var labelsAreHtml = ".($slider_display_config==2 ? '1' : '0').";
+			var setLabel = function(el, text) { if (labelsAreHtml) { el.innerHTML = text; } else { el.textContent = text; } };
 
 			var step_values = ".json_encode(array_values($step_values), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT).";
 			var step_labels = ".json_encode(array_values($step_labels), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT).";
@@ -240,7 +244,7 @@ else
 				if (showAsTooltips)
 				{
 					var max_len = 36;
-					tooltips[handle].innerHTML = tooltip_text.length > max_len+4 ? tooltip_text.substring(0, max_len)+' ...' : tooltip_text;
+					setLabel(tooltips[handle], tooltip_text.length > max_len+4 ? tooltip_text.substring(0, max_len)+' ...' : tooltip_text);
 
 					var left  = jQuery(tooltips[handle]).closest('.noUi-origin').position().left;
 					var width = jQuery(tooltips[handle]).closest('.noUi-base').width();
@@ -276,7 +280,7 @@ else
 				else
 				{
 					var max_len = 56;
-					txtBoxes[handle].innerHTML = tooltip_text.length > max_len+4 ? tooltip_text.substring(0, max_len)+' ...' : tooltip_text;
+					setLabel(txtBoxes[handle], tooltip_text.length > max_len+4 ? tooltip_text.substring(0, max_len)+' ...' : tooltip_text);
 				}
 
 			});

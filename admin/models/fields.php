@@ -660,6 +660,9 @@ class FlexicontentModelFields extends FCModelAdminList
 			;
 			$this->_db->setQuery($query)->execute();
 
+			// Delete field-attributed basic autocomplete data
+			$this->_db->setQuery('DELETE FROM #__flexicontent_basicsearch_index WHERE field_id IN (' . $cid_list . ')')->execute();
+
 			// Delete advanced search index data
 			$query = $this->_db->getQuery(true)
 				->delete('#__flexicontent_advsearch_index')

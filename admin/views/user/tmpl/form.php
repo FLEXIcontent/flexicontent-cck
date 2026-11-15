@@ -26,10 +26,11 @@ $cparams = \Joomla\CMS\Component\ComponentHelper::getParams ('com_media');
 $date_format = FLEXI_J16GE ? 'Y-m-d H:i:s' : '%Y-%m-%d %H:%M:%S';
 
 
-if ($this->row->get('lastvisitDate') == "0000-00-00 00:00:00") {
+$lastVisit = $this->row->lastvisitDate ?? '';
+if (!$lastVisit || $lastVisit == "0000-00-00 00:00:00") {
 	$lvisit = \Joomla\CMS\Language\Text::_( 'Never' );
 } else {
-	$lvisit	= \Joomla\CMS\HTML\HTMLHelper::_('date', $this->row->get('lastvisitDate'), $date_format);
+	$lvisit	= \Joomla\CMS\HTML\HTMLHelper::_('date', $lastVisit, $date_format);
 }
 
 // Load JS tabber lib
@@ -677,8 +678,8 @@ $this->document->addScriptDeclaration($js);
 	<div class="fcclear"></div>
 
 	<input type="hidden" name="option" value="com_flexicontent" />
-	<input type="hidden" name="id" value="<?php echo $this->row->get('id'); ?>" />
-	<input type="hidden" name="cid[]" value="<?php echo $this->row->get('id'); ?>" />
+	<input type="hidden" name="id" value="<?php echo (int) ($this->row->id ?? 0); ?>" />
+	<input type="hidden" name="cid[]" value="<?php echo (int) ($this->row->id ?? 0); ?>" />
 	<input type="hidden" name="controller" value="users" />
 	<input type="hidden" name="view" value="user" />
 	<input type="hidden" name="task" value="" />

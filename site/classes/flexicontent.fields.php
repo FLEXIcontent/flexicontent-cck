@@ -493,7 +493,7 @@ class FlexicontentFields
 						{
 							if ($shortcode == $t->shortcode) continue;
 							$field->name = array('jfdata',$t->shortcode,'text');
-							$field->value[0] = html_entity_decode($t->fields->text->value, ENT_QUOTES, 'UTF-8');
+							$field->value[0] = html_entity_decode((string) $t->fields->text->value, ENT_QUOTES, 'UTF-8');
 							FLEXIUtilities::call_FC_Field_Func('textarea', 'onDisplayField', array(&$field, &$item) );
 							$t->fields->text->tab_labels = $field->tab_labels;
 							$t->fields->text->html = $field->html;

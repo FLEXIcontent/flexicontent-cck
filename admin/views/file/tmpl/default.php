@@ -311,7 +311,7 @@ HTML;
 					<span class="label text-white bg-info label-info"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_REAL_PATH' ); ?></span> &nbsp;
 				</td>
 				<td>
-					<?php echo $this->rowdata->path;?>
+					<?php echo $fc_editor_escape($this->rowdata->path); ?>
 				</td>
 			</tr>
 

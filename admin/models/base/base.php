@@ -1634,7 +1634,7 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 				. ' WHERE item_id = ' . (int) $id
 				. ' AND valueorder = 1'
 				. ' AND field_id = 10'
-				. ' AND version = ' . (int) $v['version']
+				. ' AND version = ' . (int) ($v['version'] ?? 0)
 			;
 			$this->_db->setQuery($query)->execute();
 		}

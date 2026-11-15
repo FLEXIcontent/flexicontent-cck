@@ -406,10 +406,33 @@ class FlexicontentTasksCore
 		$access_where = '';
 		$joinaccess   = '';
 
+		/**
+		 * The words source reads the shared search index. Like the search results and the titles source (#1370), only use
+		 * items that the user may view: item access level, published and viewable main category, viewable content type.
+		 * Both indexes use only the rows of published, searchable fields that the user may view.
+		 * ($use_tmp is always true here: 'i' is #__flexicontent_items_tmp, which has the access, catid and type_id columns)
+		 */
+		$_wuser   = method_exists($app, 'getIdentity') ? $app->getIdentity() : \Joomla\CMS\Factory::getUser();
+		$_wlevels = $_wuser ? array_map('intval', $_wuser->getAuthorisedViewLevels()) : array();
+		$_wlevels = $_wlevels ? implode(',', $_wlevels) : '0';
+
+		$words_access = ' AND i.access IN (' . $_wlevels . ')'
+			. ' AND EXISTS (SELECT 1 FROM #__categories AS wacc_mc WHERE wacc_mc.id = i.catid AND wacc_mc.published = 1'
+			. ' AND wacc_mc.access IN (' . $_wlevels . '))'
+			. ' AND EXISTS (SELECT 1 FROM #__flexicontent_types AS wacc_ty WHERE wacc_ty.id = i.type_id'
+			. ' AND wacc_ty.access IN (' . $_wlevels . '))';
+
+		// The merged basic index cannot tell which field supplied a word. Never use it
+		// for suggestions, including old rows that predate this permission-aware index.
+		$words_field_join = ' JOIN #__flexicontent_fields AS wacc_f ON wacc_f.id = si.field_id AND wacc_f.published = 1'
+			. ' AND (wacc_f.access = 0 OR wacc_f.access IN (' . $_wlevels . '))'
+			. ($type == 'basic_index' ? ' AND wacc_f.issearch IN (1,2)' : ' AND wacc_f.isadvsearch IN (1,2)')
+			. ' JOIN #__flexicontent_fields_type_relations AS wacc_ft ON wacc_ft.field_id = si.field_id AND wacc_ft.type_id = i.type_id';
+
 		$_nowDate  = 'UTC_TIMESTAMP()';
 		$nullDate  = $db->getNullDate();
 
-		$tbl = ($type == 'basic_index') ? 'flexicontent_items_ext' : 'flexicontent_advsearch_index';
+		$tbl = ($type == 'basic_index') ? 'flexicontent_basicsearch_index' : 'flexicontent_advsearch_index';
 		$query = 'SELECT si.item_id, si.search_index'
 			. ' FROM #__' . $tbl . ' AS si'
 			. ' JOIN ' . ($use_tmp ? '#__flexicontent_items_tmp' : '#__content') . ' AS i ON i.id = si.item_id'
@@ -420,12 +443,14 @@ class FlexicontentTasksCore
 			. ($cid_list ? ' JOIN #__flexicontent_cats_item_relations AS rel ON i.id = rel.itemid AND rel.catid IN (' . $cid_list . ')' : '')
 			. $type_join
 			. $joinaccess
+			. $words_field_join
 			. ' WHERE ' . $_text_match
 			. '   AND i.state IN (1,-5) '
 			. '   AND ( i.publish_up is NULL OR i.publish_up = ' . $db->Quote($nullDate) . ' OR i.publish_up <= ' . $_nowDate . ' ) '
 			. '   AND ( i.publish_down is NULL OR i.publish_down = ' . $db->Quote($nullDate) . ' OR i.publish_down >= ' . $_nowDate . ' ) '
 			. $lang_where
 			. $access_where
+			. $words_access
 			. ' LIMIT ' . $limitstart . ', ' . $limit;
 
 		$data = !in_array('words', $sources_order) ? array() : $db->setQuery($query)->loadAssocList();

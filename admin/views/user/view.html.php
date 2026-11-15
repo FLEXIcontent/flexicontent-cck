@@ -194,16 +194,16 @@ class FlexicontentViewUser extends FlexicontentViewBaseRecord
 			$full_js="var url = jQuery(this).attr('data-href'); var the_dialog = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, fc_edit_juser_modal_close, {title:'".$modal_title."', loadFunc: fc_edit_juser_modal_load}); return false;",
 			$msg_alert='', $msg_confirm='',
 			$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="spaced-btn btn-info".$tip_class, $btn_icon="icon-pencil",
-			'data-placement="bottom" data-href="index.php?option=com_users&task=user.edit&id='.$row->get('id').'" title="Edit all details of joomla user"'
+			'data-placement="bottom" data-href="index.php?option=com_users&task=user.edit&id='.($row->id ?? 0).'" title="Edit all details of joomla user"'
 		);
 
 
 		// Get contact data
-		if ($row->get('id'))
+		if (($row->id ?? 0))
 		{
 			$query = 'SELECT *'
 				. ' FROM #__contact_details'
-				. ' WHERE user_id = ' . (int) $row->get('id');
+				. ' WHERE user_id = ' . (int) ($row->id ?? 0);
 			$contact = $db->setQuery($query)->loadObjectList();
 		}
 
@@ -229,7 +229,7 @@ class FlexicontentViewUser extends FlexicontentViewBaseRecord
 
 		\Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 		$flexiauthor_extdata = \Joomla\CMS\Table\Table::getInstance('flexicontent_authors_ext', '');
-		$flexiauthor_extdata->load($row->get('id'));
+		$flexiauthor_extdata->load(($row->id ?? 0));
 		//echo "<pre>"; print_r($flexiauthor_extdata); echo "</pre>"; exit;
 
 
@@ -321,7 +321,7 @@ class FlexicontentViewUser extends FlexicontentViewBaseRecord
 			}
 		}
 
-		if (!$row->get('id'))
+		if (!($row->id ?? 0))
 		{
 			$new_usertype = \Joomla\CMS\Component\ComponentHelper::getParams('com_users')->get('new_usertype');
 			$usergroups = $new_usertype ? array($new_usertype) : array();
@@ -329,16 +329,16 @@ class FlexicontentViewUser extends FlexicontentViewBaseRecord
 		else
 		{
 			$ugrps_qtmpl = 'SELECT group_id FROM #__user_usergroup_map AS ug WHERE ug.user_id = %d';
-			$query = sprintf($ugrps_qtmpl, (int) $row->get('id'));
+			$query = sprintf($ugrps_qtmpl, (int) ($row->id ?? 0));
 
 			$usergroups = $db->setQuery($query)->loadColumn();
 		}
 
 		// build the html select list
-		$lists['block'] 	= \Joomla\CMS\HTML\HTMLHelper::_('select.booleanlist',  'block', 'class="inputbox" size="1"', $row->get('block') );
+		$lists['block'] 	= \Joomla\CMS\HTML\HTMLHelper::_('select.booleanlist',  'block', 'class="inputbox" size="1"', ($row->block ?? 0) );
 
 		// build the html select list
-		$lists['sendEmail'] = \Joomla\CMS\HTML\HTMLHelper::_('select.booleanlist',  'sendEmail', 'class="inputbox" size="1"', $row->get('sendEmail') );
+		$lists['sendEmail'] = \Joomla\CMS\HTML\HTMLHelper::_('select.booleanlist',  'sendEmail', 'class="inputbox" size="1"', ($row->sendEmail ?? 0) );
 
 
 		/**
