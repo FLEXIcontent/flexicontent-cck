@@ -671,8 +671,8 @@ class ParentClassItem extends FCModelAdmin
 				// Decide to limit to CURRENT CATEGORY
 				$limit_to_cid = $this->_cid ? ' AND rel.catid = '. (int) $this->_cid : ' AND rel.catid = i.catid';
 
-				// Get voting resolution
-				$rating_resolution = (int)$this->getVotingResolution();
+				// Get voting resolution (not needed when no item of the site has votes: the rating columns below will be NULL)
+				$rating_resolution = FlexicontentFields::_hasItemData('votes') ? (int)$this->getVotingResolution() : 5;
 
 				// *******************************
 				// Initialize and create the query
@@ -1000,7 +1000,9 @@ class ParentClassItem extends FCModelAdmin
 					->select('DISTINCT tid')
 					->from('#__flexicontent_tags_item_relations')
 					->where('itemid = ' . (int) $pk);
-				$item->tags = $db->setQuery($query)->loadColumn();
+
+				// Skip the query when no item of the site has a tag
+				$item->tags = FlexicontentFields::_hasItemData('tags') ? $db->setQuery($query)->loadColumn() : array();
 				$item->tags = array_reverse($item->tags);
 			}
 
@@ -4295,6 +4297,12 @@ class ParentClassItem extends FCModelAdmin
 			return array();
 		}
 
+		// No item of the site has votes: same result as the 2 queries below, without running them
+		if (!FlexicontentFields::_hasItemData('votes') && !FlexicontentFields::_hasItemData('extravotes'))
+		{
+			return array();
+		}
+
 		$query = $this->_db->getQuery(true)
 			->select('*')
 			->from('#__content_rating')
@@ -6272,15 +6280,23 @@ class ParentClassItem extends FCModelAdmin
 		}
 		elseif (!isset($record->rating_count) || !isset($record->rating) || !isset($record->score))
 		{
-			$rating_resolution = (int)$this->getVotingResolution();
+			// No item of the site has votes: this item has no rating data, no need to query them
+			if (!FlexicontentFields::_hasItemData('votes'))
+			{
+				$rating_data = null;
+			}
+			else
+			{
+				$rating_resolution = (int)$this->getVotingResolution();
 
-			// Get category access for the item's main category, used later to determine viewing of the item
-			$query = 'SELECT '
-				.' v.rating_count as rating_count, ROUND( v.rating_sum / v.rating_count ) AS rating, ((v.rating_sum / v.rating_count)*'.(100 / $rating_resolution).') as score'
-				.' FROM #__content_rating AS v WHERE v.content_id = '. (int) $record->id
-				;
-			$this->_db->setQuery($query);
-			$rating_data = $this->_db->loadObject();
+				// Get category access for the item's main category, used later to determine viewing of the item
+				$query = 'SELECT '
+					.' v.rating_count as rating_count, ROUND( v.rating_sum / v.rating_count ) AS rating, ((v.rating_sum / v.rating_count)*'.(100 / $rating_resolution).') as score'
+					.' FROM #__content_rating AS v WHERE v.content_id = '. (int) $record->id
+					;
+				$this->_db->setQuery($query);
+				$rating_data = $this->_db->loadObject();
+			}
 			$record->rating_count = !$rating_data ? 0 : $rating_data->rating_count;
 			$record->rating       = !$rating_data ? 0 : $rating_data->rating;
 			$record->score        = !$rating_data ? 0 : $rating_data->score;

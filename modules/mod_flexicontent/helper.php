@@ -682,7 +682,9 @@ return $html;
 			}
 			elseif (($use_fields && count($fields)) || ($use_fields_feat && count($fields_feat)))
 			{
-				$rows = FlexicontentFields::getFields($filtered_rows, 'module', $params);
+				// The 'skip on empty fields' filter above has already loaded the field values of these rows,
+				// do not query them a second time ($reuse_loaded), only render the fields
+				$rows = FlexicontentFields::getFields($filtered_rows, 'module', $params, false, true, count($skiponempty_fields) > 0);
 			}
 			else
 			{
@@ -691,7 +693,8 @@ return $html;
 				// Batch-load field values (no rendering) so that the per-row
 				// getFieldDisplay() calls further below do not each trigger a
 				// separate single-item getFields() (~11 queries per item).
-				FlexicontentFields::getFields($rows, 'module');
+				// ... unless the 'skip on empty fields' filter above has already loaded them
+				FlexicontentFields::getFields($rows, 'module', null, false, true, count($skiponempty_fields) > 0);
 			}
 
 			$lists = array();
