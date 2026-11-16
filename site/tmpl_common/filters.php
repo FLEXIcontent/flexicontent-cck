@@ -120,7 +120,7 @@ if ( $use_search || $use_filters ) :
                 $n = 0;
 				foreach ($filters as $filt) {
 					if (empty($filt->html)) continue;
-					$filt_lbl = $filt->label;
+					$filt_lbl = htmlspecialchars((string) $filt->label, ENT_QUOTES, 'UTF-8');  // the field label is plain text
 					$label_outside = !$filters_in_tabs && ($show_filter_labels==1 || ($show_filter_labels==0 && $filt->parameters->get('display_label_filter')==1));
 					$even_odd_class = !$filters_in_tabs ? (($n++)%2 ? ' fc_even': ' fc_odd') : '';
 					$is_empty = empty($app->input->get('filter_' . $filt->id, '', 'array'));

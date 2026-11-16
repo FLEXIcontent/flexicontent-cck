@@ -406,11 +406,43 @@ class FlexicontentTasksCore
 		$access_where = '';
 		$joinaccess   = '';
 
+		/**
+		 * The words source reads the shared search index. Like the search results and the titles source (#1370), only use
+		 * items that the user may view: item access level, published and viewable main category, viewable content type.
+		 * Both indexes use only the rows of published, searchable fields that the user may view.
+		 * ($use_tmp is always true here: 'i' is #__flexicontent_items_tmp, which has the access, catid and type_id columns)
+		 */
+		$_wuser   = method_exists($app, 'getIdentity') ? $app->getIdentity() : \Joomla\CMS\Factory::getUser();
+		$_wlevels = $_wuser ? array_map('intval', $_wuser->getAuthorisedViewLevels()) : array();
+		$_wlevels = $_wlevels ? implode(',', $_wlevels) : '0';
+
+		$words_access = ' AND i.access IN (' . $_wlevels . ')'
+			. ' AND EXISTS (SELECT 1 FROM #__categories AS wacc_mc WHERE wacc_mc.id = i.catid AND wacc_mc.published = 1'
+			. ' AND wacc_mc.access IN (' . $_wlevels . '))'
+			. ' AND EXISTS (SELECT 1 FROM #__flexicontent_types AS wacc_ty WHERE wacc_ty.id = i.type_id'
+			. ' AND wacc_ty.access IN (' . $_wlevels . '))';
+
+		// The merged basic index cannot tell which field supplied a word. Never use it
+		// for suggestions, including old rows that predate this permission-aware index.
+		$words_field_join = ' JOIN #__flexicontent_fields AS wacc_f ON wacc_f.id = si.field_id AND wacc_f.published = 1'
+			. ' AND (wacc_f.access = 0 OR wacc_f.access IN (' . $_wlevels . '))'
+			. ($type == 'basic_index' ? ' AND wacc_f.issearch IN (1,2)' : ' AND wacc_f.isadvsearch IN (1,2)')
+			. ' JOIN #__flexicontent_fields_type_relations AS wacc_ft ON wacc_ft.field_id = si.field_id AND wacc_ft.type_id = i.type_id';
+
 		$_nowDate  = 'UTC_TIMESTAMP()';
 		$nullDate  = $db->getNullDate();
 
-		$tbl = ($type == 'basic_index') ? 'flexicontent_items_ext' : 'flexicontent_advsearch_index';
-		$query = 'SELECT si.item_id, si.search_index'
+		$tbl = ($type == 'basic_index') ? 'flexicontent_basicsearch_index' : 'flexicontent_advsearch_index';
+		if ($type == 'basic_index' && count($_words) > 1)
+		{
+			$basic_query = self::basicAutocompleteQuery($db, $_words, $next_word, $_wlevels);
+			$_text_match = $basic_query['match'];
+			$words_field_join .= $basic_query['joins'];
+		}
+
+		// Keep the full-text candidate lookup ahead of permission joins when
+		// joining the completed-word sets; their sizes are poorly estimated.
+		$query = 'SELECT ' . (isset($basic_query) ? 'STRAIGHT_JOIN ' : '') . 'si.item_id, si.search_index'
 			. ' FROM #__' . $tbl . ' AS si'
 			. ' JOIN ' . ($use_tmp ? '#__flexicontent_items_tmp' : '#__content') . ' AS i ON i.id = si.item_id'
 			. (($access_where && !$use_tmp) || ($filtercat && !$use_tmp) || $type !== 'basic_index' ?
@@ -420,12 +452,14 @@ class FlexicontentTasksCore
 			. ($cid_list ? ' JOIN #__flexicontent_cats_item_relations AS rel ON i.id = rel.itemid AND rel.catid IN (' . $cid_list . ')' : '')
 			. $type_join
 			. $joinaccess
+			. $words_field_join
 			. ' WHERE ' . $_text_match
 			. '   AND i.state IN (1,-5) '
 			. '   AND ( i.publish_up is NULL OR i.publish_up = ' . $db->Quote($nullDate) . ' OR i.publish_up <= ' . $_nowDate . ' ) '
 			. '   AND ( i.publish_down is NULL OR i.publish_down = ' . $db->Quote($nullDate) . ' OR i.publish_down >= ' . $_nowDate . ' ) '
 			. $lang_where
 			. $access_where
+			. $words_access
 			. ' LIMIT ' . $limitstart . ', ' . $limit;
 
 		$data = !in_array('words', $sources_order) ? array() : $db->setQuery($query)->loadAssocList();
@@ -1835,6 +1869,56 @@ class FlexicontentTasksCore
 			. '&aoe=1&q=95&ar=x'
 			. ($method ? '&zc=1' : '')
 			. $file;
+	}
+
+
+	/**
+	 * Match Basic autocomplete terms across permitted fields of the same item.
+	 * The outer query still checks access to the item and the suggestion field.
+	 */
+	protected static function basicAutocompleteQuery($db, $words, $next_word, $view_levels)
+	{
+		// Bound the number of full-text lookups for long pasted search text.
+		if (count($words) > 16)
+		{
+			return array('match' => '0', 'joins' => '');
+		}
+
+		$last_word = end($words);
+		if (!$next_word)
+		{
+			$words[count($words) - 1] .= '*';
+		}
+		$completed_words = array_unique(array_slice($words, 0, -1));
+		$optional_words = implode(' ', array_unique($words));
+
+		// Keep completions in the field containing the final prefix. For next-word
+		// suggestions the last word can be unindexed (e.g. "the"); PHP checks its
+		// word boundary and the immediately following word after this LIKE prefilter.
+		$match = $next_word
+			? ' si.search_index LIKE ' . $db->Quote('%' . $db->escape($last_word, true) . '%', false)
+			: ' MATCH (si.search_index) AGAINST (' . $db->Quote($db->escape('+' . $last_word . '*', true), false) . ' IN BOOLEAN MODE)';
+
+		$joins = '';
+		foreach ($completed_words as $n => $word)
+		{
+			// Other terms are optional anchors: MyISAM can ignore a stopword/short
+			// required term just as in the original combined Boolean expression.
+			$term = $db->Quote($db->escape('+' . $word . ' ' . $optional_words, true), false);
+			// An uncorrelated item/type set lets the database evaluate each term
+			// once instead of repeating a full-text lookup for every candidate row.
+			$alias = 'word_match' . (int) $n;
+			$joins .= ' JOIN (SELECT DISTINCT word_si.item_id, word_ft.type_id'
+				. ' FROM #__flexicontent_basicsearch_index AS word_si'
+				. ' JOIN #__flexicontent_fields AS word_f ON word_f.id = word_si.field_id'
+				. ' AND word_f.published = 1 AND word_f.issearch IN (1,2)'
+				. ' AND (word_f.access = 0 OR word_f.access IN (' . $view_levels . '))'
+				. ' JOIN #__flexicontent_fields_type_relations AS word_ft ON word_ft.field_id = word_si.field_id'
+				. ' WHERE MATCH (word_si.search_index) AGAINST (' . $term . ' IN BOOLEAN MODE)) AS ' . $alias
+				. ' ON ' . $alias . '.item_id = si.item_id AND ' . $alias . '.type_id = i.type_id';
+		}
+
+		return array('match' => $match, 'joins' => $joins);
 	}
 
 

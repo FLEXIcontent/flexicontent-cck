@@ -56,7 +56,7 @@ $filter->html .= '
 	<div class="fc_checkradio_group_wrapper fc_add_scroller'.($add_scrollbar ? ' fc_list_filter_wrapper':'').'">
 		<ul class="fc_field_filter fc_checkradio_group'.($add_scrollbar ? ' fc_list_filter':'').'">
 			<li class="fc_checkradio_option fc_checkradio_special'.$checked_class_li.'" style="'.$value_style.'">
-			' . ($label_filter==2  ? ' <span class="fc_filter_label_inline">'.$filter->label.'</span> ' : '');
+			' . ($label_filter==2  ? ' <span class="fc_filter_label_inline">'.htmlspecialchars((string) $filter->label, ENT_QUOTES, 'UTF-8').'</span> ' : '');
 
 if ($display_filter_as == 4)
 {

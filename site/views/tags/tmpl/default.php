@@ -93,11 +93,11 @@ if (\Joomla\CMS\Factory::getApplication()->input->getInt('print', 0)) {
 
 <?php if ( $this->params->get( 'show_page_heading', 1 ) ) : ?>
 	<h1 class="componentheading">
-		<?php echo $this->params->get('page_heading'); ?>
+		<?php echo htmlspecialchars((string) $this->params->get('page_heading'), ENT_QUOTES, 'UTF-8'); ?>
 	</h1>
 <?php else : ?>
 	<h2 class="contentheading">
-		<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_TAG' ).' : '.$this->tag->name; ?>
+		<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_TAG' ).' : '.htmlspecialchars((string) $this->tag->name, ENT_QUOTES, 'UTF-8'); ?>
 	</h2>
 <?php endif; ?>
 

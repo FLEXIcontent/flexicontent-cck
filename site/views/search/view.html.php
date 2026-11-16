@@ -481,6 +481,21 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 
 
 		/**
+		 * The search form must respect field view access, as the search results do (plgSearchFlexiadvsearch, #1306):
+		 * do not offer filters (with the list of their values) or text-search fields of fields that the user may not view
+		 */
+
+		$field_view_levels = array_map('intval', \Joomla\CMS\Factory::getUser()->getAuthorisedViewLevels());
+		$can_view_field = static function ($field) use ($field_view_levels)
+		{
+			return !(int) $field->access || in_array((int) $field->access, $field_view_levels, true);
+		};
+
+		$fields_text = array_filter($fields_text, $can_view_field);
+		$filters     = array_filter($filters, $can_view_field);
+
+
+		/**
 		 * Create Form Elements (the 'lists' array)
 		 */
 

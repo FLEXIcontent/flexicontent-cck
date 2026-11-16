@@ -1,0 +1,45 @@
+name: Autocomplete regressions
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  autocomplete:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        database: ['mysql:8.0', 'mariadb:10.11']
+    services:
+      database:
+        image: ${{ matrix.database }}
+        env:
+          MYSQL_ROOT_PASSWORD: autocomplete-test
+          MYSQL_DATABASE: autocomplete_test
+          MYSQL_USER: autocomplete
+          MYSQL_PASSWORD: autocomplete-test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -pautocomplete-test"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=12
+    steps:
+      - uses: actions/checkout@v5
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mysqli
+          coverage: none
+      - name: Cross-field autocomplete and field permissions
+        env:
+          FC_AUTOCOMPLETE_TEST_DATABASE: autocomplete_test
+          FC_AUTOCOMPLETE_TEST_USER: autocomplete
+          FC_AUTOCOMPLETE_TEST_PASSWORD: autocomplete-test
+        run: php tests/basic-autocomplete.php

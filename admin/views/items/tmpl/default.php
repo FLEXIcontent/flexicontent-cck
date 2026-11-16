@@ -777,7 +777,9 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 						box.addEventListener('change', markDirty, true);
 						if (window.jQuery) jQuery(box).on('change', markDirty);
 						document.addEventListener('mousedown', function(e) {
-							if (!dirty || box.contains(e.target)) return;
+							// The Select2 (legacy) drop-down and its mask are appended to <body>, outside of the box:
+							// picking a (second) value there is not a click outside of the box
+							if (!dirty || box.contains(e.target) || (e.target.closest && e.target.closest('.select2-drop, #select2-drop-mask'))) return;
 							dirty = false;
 							if (!!document.adminForm.limitstart) document.adminForm.limitstart.value = 0;
 							Joomla.submitform();
@@ -1557,7 +1559,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 					{
 						if ( isset($this->itemTags[$_itag]) )
 						{
-							$row_tags[] = ' <span class="itemtag">'.$this->itemTags[$_itag]->name.'</span> ';
+							$row_tags[] = ' <span class="itemtag">'.htmlspecialchars((string) $this->itemTags[$_itag]->name, ENT_QUOTES, 'UTF-8').'</span> ';
 							$tag_names[] = $this->itemTags[$_itag]->name;
 						}
 					}

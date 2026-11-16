@@ -750,7 +750,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$itemlang = new stdClass();
 		$itemlang->shortcode = substr($item->language ,0,2);
 		$itemlang->name = $languages->{$item->language}->name;
-		$itemlang->image = '<img src="'.@$languages->{$item->language}->imgsrc.'" alt="'.$languages->{$item->language}->name.'" />';
+		$itemlang->image = '<img src="'.htmlspecialchars((string) @$languages->{$item->language}->imgsrc, ENT_QUOTES, 'UTF-8').'" alt="'.htmlspecialchars((string) $languages->{$item->language}->name, ENT_QUOTES, 'UTF-8').'" />';
 
 		// Label for current item state
 		$state_labels = array(

@@ -738,9 +738,9 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			$file = $this->refactorFilesArray($file);
 
 			// Get nested position, and reach the final file data array
-			$fname_level1 = $this->input->get('fname_level1', null, 'string');
-			$fname_level2 = $this->input->get('fname_level2', null, 'string');
-			$fname_level3 = $this->input->get('fname_level3', null, 'string');
+			$fname_level1 = (string) $this->input->get('fname_level1', '', 'string');
+			$fname_level2 = (string) $this->input->get('fname_level2', '', 'string');
+			$fname_level3 = (string) $this->input->get('fname_level3', '', 'string');
 
 			if (strlen($fname_level1))
 			{

@@ -1320,7 +1320,7 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 						if ($filename)
 						{
 							$path_parts = pathinfo($filename);
-							$fext  = $path_parts['extension'];
+							$fext  = isset($path_parts['extension']) ? $path_parts['extension'] : '';
 							$fname = $path_parts['filename'];
 
 							//echo "<pre>"; print_r(\Joomla\Filesystem\Path::clean( $srcpath_original . $filename)); echo '</pre>';

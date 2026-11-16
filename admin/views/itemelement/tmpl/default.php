@@ -713,7 +713,7 @@ if ($js)
 
 			<?php if (!isset($disable_columns['cats'])): ?>
 			<td class="col_cats small hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
-				<?php echo $globalcats[$row->catid]->title; ?>
+				<?php echo htmlspecialchars((string) $globalcats[$row->catid]->title, ENT_QUOTES, 'UTF-8'); ?>
 			</td>
 			<?php endif; ?>
 

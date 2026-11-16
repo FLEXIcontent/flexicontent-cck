@@ -918,6 +918,7 @@ ob_start(); ?>
 </script>
 <?php endif; ?>
 <input type="hidden" name="option" value="com_flexicontent" />
+<input type="hidden" name="boxchecked" value="0" />
 <input type="hidden" name="controller" value="items" />
 <input type="hidden" name="view" value="items" />
 <input type="hidden" name="task" value="" />

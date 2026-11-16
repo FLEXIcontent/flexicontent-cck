@@ -17,6 +17,7 @@ DROP TABLE IF EXISTS
 `#__flexicontent_templates`,
 `#__flexicontent_layouts_conf`,
 `#__flexicontent_advsearch_index`,
+`#__flexicontent_basicsearch_index`,
 `#__flexicontent_authors_ext`,
 `#__flexicontent_download_coupons`,
 `#__flexicontent_download_history`,

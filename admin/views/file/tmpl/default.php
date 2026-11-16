@@ -222,6 +222,12 @@ HTML;
 												  'audiosExt'    => $audiosExt,
 												  'videosExt'    => $videosExt,
 												  'documentsExt' => $documentsExt,
+
+												  // Extensions the picker accepts per media type (media.php prints them in supported-extensions)
+												  'imagesAllowedExt'    => $imagesExt,
+												  'audiosAllowedExt'    => $audiosExt,
+												  'videosAllowedExt'    => $videosExt,
+												  'documentsAllowedExt' => $documentsExt,
 											  ];
 										  }
 										  else {
@@ -311,7 +317,7 @@ HTML;
 					<span class="label text-white bg-info label-info"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_REAL_PATH' ); ?></span> &nbsp;
 				</td>
 				<td>
-					<?php echo $this->rowdata->path;?>
+					<?php echo $fc_editor_escape($this->rowdata->path); ?>
 				</td>
 			</tr>
 
