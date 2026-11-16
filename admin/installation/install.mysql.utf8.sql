@@ -91,6 +91,16 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_reviews` (
   KEY `useful_no` (`useful_no`)
 ) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
 
+CREATE TABLE IF NOT EXISTS `#__flexicontent_reviews_useful` (
+  `review_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL DEFAULT '0',
+  `ip` varchar(50) NOT NULL DEFAULT '',
+  `vote` tinyint(1) NOT NULL DEFAULT '1',
+  `vote_date` datetime NOT NULL,
+  PRIMARY KEY  (`review_id`, `user_id`, `ip`),
+  KEY `user_id` (`user_id`)
+) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+
 CREATE TABLE IF NOT EXISTS `#__flexicontent_fields` (
   `id` int(11) unsigned NOT NULL auto_increment,
   `asset_id` int(11) unsigned NOT NULL default '0',

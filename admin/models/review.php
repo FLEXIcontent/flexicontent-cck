@@ -216,6 +216,18 @@ class FlexicontentModelReview extends FCModelAdmin
 		$readonlyFields = array();
 		$hiddenFields   = array();
 		
+		// The reviewed item and the reviewer (user or guest) can be selected only when creating a new review
+		if (!$isNew)
+		{
+			foreach (array('content_id', 'user_id') as $fieldname)
+			{
+				$form->setFieldAttribute($fieldname, 'type', 'text');
+				$form->setFieldAttribute($fieldname, 'class', 'readonly');
+				$form->setFieldAttribute($fieldname, 'readonly', 'true');
+				$form->setFieldAttribute($fieldname, 'filter', 'unset');
+			}
+		}
+
 		// Only allow email to guests to admins
 		if ((!$isNew || $isLogged) && !$this->canManage)
 		{

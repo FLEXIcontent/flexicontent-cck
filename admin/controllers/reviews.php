@@ -196,7 +196,39 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 	 */
 	public function remove()
 	{
-		parent::remove();
+		// Remember the ratings of the selected reviews, they are also votes of the reviewed items
+		$cid = ArrayHelper::toInteger($this->input->get('cid', array(), 'array'));
+		$rated = array();
+
+		if (count($cid))
+		{
+			$db = \Joomla\CMS\Factory::getDbo();
+			$rated = $db->setQuery(
+				'SELECT id, content_id, average_rating FROM #__' . $this->records_dbtbl
+				. ' WHERE id IN (' . implode(',', $cid) . ') AND content_id > 0 AND average_rating > 0'
+			)->loadObjectList('id');
+		}
+
+		$result = parent::remove();
+
+		// Remove the votes of the reviews that were actually deleted (permissions / locks may skip some records)
+		if (count($rated))
+		{
+			$db = \Joomla\CMS\Factory::getDbo();
+			$existing = $db->setQuery(
+				'SELECT id FROM #__' . $this->records_dbtbl . ' WHERE id IN (' . implode(',', array_keys($rated)) . ')'
+			)->loadColumn();
+
+			foreach ($rated as $id => $row)
+			{
+				if (!in_array($id, $existing))
+				{
+					$this->_applyRatingChange((int) $row->content_id, (int) $row->average_rating, 0);
+				}
+			}
+		}
+
+		return $result;
 	}
 
 
@@ -230,7 +262,12 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		{
 			$content_id = isset($content_ids[$id]) ? (int) $content_ids[$id] : 0;
 
-			if (!$content_id || !$user->authorise('core.edit.state', 'com_content.article.' . $content_id))
+			// Reviews of an item are checked against the item, reviews without item (orphans) need the reviews management permission
+			$can_change = $content_id
+				? $user->authorise('core.edit.state', 'com_content.article.' . $content_id)
+				: $this->canManage;
+
+			if (!$can_change)
 			{
 				// Prune items that you can't change.
 				unset($cid[$i]);
@@ -477,6 +514,90 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		}
 
 		/**
+		 * Reviews managers: a rating (stars) is required, a new review needs an item and a user can have only 1 review per item
+		 */
+
+		if ($this->canManage && $validated_data)
+		{
+			$isNew = !$model->get('id');
+
+			if (empty($validated_data['average_rating']) || (int) $validated_data['average_rating'] < 1)
+			{
+				$model->setError(\Joomla\CMS\Language\Text::_('FLEXI_REVIEW_ERR_RATING_REQUIRED'));
+				return false;
+			}
+
+			if ($isNew)
+			{
+				$content_id = !empty($validated_data['content_id']) ? (int) $validated_data['content_id'] : 0;
+
+				if (!$content_id)
+				{
+					$model->setError(\Joomla\CMS\Language\Text::_('FLEXI_REVIEW_ERR_SELECT_ITEM'));
+					return false;
+				}
+
+				$db = \Joomla\CMS\Factory::getDbo();
+
+				/**
+				 * The reviewer is either an existing user or a guest (no user selected), a reviewer can have only 1 review per item
+				 */
+				$reviewer_id = !empty($validated_data['user_id']) ? (int) $validated_data['user_id'] : 0;
+
+				if ($reviewer_id)
+				{
+					$reviewer = \Joomla\CMS\Factory::getUser($reviewer_id);
+
+					if (!$reviewer->id)
+					{
+						$model->setError(\Joomla\CMS\Language\Text::_('FLEXI_REVIEW_ERR_USER_NOT_FOUND'));
+						return false;
+					}
+
+					// The email of a user is the email of his account
+					$validated_data['email'] = $reviewer->email;
+					$where_reviewer = 'user_id = ' . $reviewer_id;
+				}
+				else
+				{
+					$validated_data['user_id'] = 0;
+					$guest_email = isset($validated_data['email']) ? trim($validated_data['email']) : '';
+
+					if ($guest_email === '')
+					{
+						$model->setError(\Joomla\CMS\Language\Text::_('FLEXI_REVIEW_ERR_GUEST_EMAIL'));
+						return false;
+					}
+
+					// The email belongs to a registered user, the review must be assigned to that user
+					$registered_id = (int) $db->setQuery('SELECT id FROM #__users WHERE email = ' . $db->Quote($guest_email))->loadResult();
+
+					if ($registered_id)
+					{
+						$model->setError(\Joomla\CMS\Language\Text::_('FLEXI_REVIEW_ERR_EMAIL_IS_USER'));
+						return false;
+					}
+
+					$where_reviewer = 'user_id = 0 AND email = ' . $db->Quote($guest_email);
+				}
+
+				$query = $db->getQuery(true)
+					->select('COUNT(*)')
+					->from('#__flexicontent_reviews')
+					->where('content_id = ' . $content_id)
+					->where('type = ' . $db->Quote(!empty($validated_data['type']) ? $validated_data['type'] : 'item'))
+					->where($where_reviewer);
+
+				if ((int) $db->setQuery($query)->loadResult())
+				{
+					$model->setError(\Joomla\CMS\Language\Text::_('FLEXI_REVIEW_ERR_USER_ALREADY'));
+					return false;
+				}
+			}
+		}
+
+
+		/**
 		 * If user can not manage reviews then do "Review validation on the posted data", like enforcing email and stripping HTML tags
 		 */
 
@@ -517,8 +638,11 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		 */
 		if ($isNew)
 		{
-			// Set owner ID
-			$validated_data['user_id'] = $user_id;
+			// Set owner ID, reviews managers choose the reviewer (a user, or a guest) in the form, otherwise the owner is the current user
+			if (!$this->canManage)
+			{
+				$validated_data['user_id'] = $user_id;
+			}
 			
 			// Unlogged submission, require email verification
 			if (!$user_id)
@@ -560,8 +684,137 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 				$validated_data['text_old']  = $model->get('text');
 			}
 		}
-		
+
+		/**
+		 * The rating of the review is also a vote of the item, update the item's rating
+		 */
+		if ($this->canManage && isset($validated_data['average_rating']))
+		{
+			$this->_applyRatingChange(
+				$isNew ? (int) $validated_data['content_id'] : (int) $model->get('content_id'),
+				$isNew ? 0 : (int) $model->get('average_rating'),
+				(int) $validated_data['average_rating']
+			);
+		}
+
 		return true;
+	}
+
+
+	/**
+	 * Task to change the rating (stars) of a review, e.g. from the list of reviews (ajax)
+	 *
+	 * @return  void
+	 *
+	 * @since   3.3
+	 */
+	public function setrating()
+	{
+		$fail = function ($msg)
+		{
+			jexit(json_encode(array('error' => 1, 'msg' => $msg)));
+		};
+
+		if (!\Joomla\CMS\Session\Session::checkToken('request'))
+		{
+			$fail(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		}
+
+		if (!$this->canManage)
+		{
+			$fail(\Joomla\CMS\Language\Text::_('JLIB_APPLICATION_ERROR_EDIT_NOT_PERMITTED'));
+		}
+
+		$id      = $this->input->get('id', 0, 'int');
+		$percent = $this->input->get('rating', 0, 'int');
+
+		if (!$id || $percent < 1 || $percent > 100)
+		{
+			$fail(\Joomla\CMS\Language\Text::_('FLEXI_REVIEW_ERR_RATING_REQUIRED'));
+		}
+
+		$review = \Joomla\CMS\Table\Table::getInstance('flexicontent_reviews', '', array());
+
+		if (!$review->load($id))
+		{
+			$fail($review->getError() ?: 'Review not found');
+		}
+
+		$old_percent = (int) $review->average_rating;
+		$review->average_rating = $percent;
+
+		if (!$review->store())
+		{
+			$fail($review->getError());
+		}
+
+		$this->_applyRatingChange((int) $review->content_id, $old_percent, $percent);
+
+		jexit(json_encode(array('error' => 0, 'rating' => $percent)));
+	}
+
+
+	/**
+	 * Method to apply a change of the rating of a review, to the rating (votes) of the reviewed item
+	 *
+	 * @param   int   $content_id   The reviewed item
+	 * @param   int   $old_percent  The old rating of the review as percentage, 0 if there was no rating
+	 * @param   int   $new_percent  The new rating of the review as percentage, 0 if the rating is removed
+	 *
+	 * @return  void
+	 *
+	 * @since   3.3
+	 */
+	protected function _applyRatingChange($content_id, $old_percent, $new_percent)
+	{
+		if (!$content_id || $old_percent === $new_percent)
+		{
+			return;
+		}
+
+		$model = $this->getModel($this->record_name);
+		$field = $model->getVotingReviewsField((object) array('type_id' => 0), true);
+
+		// Composite voting calculates the rating of the item from the voting characteristics
+		if (!$field || (int) $field->parameters->get('enable_extra_votes', 0))
+		{
+			return;
+		}
+
+		$resolution = max(5, min(100, (int) $field->parameters->get('rating_resolution', 5)));
+		$old_vote   = $old_percent > 0 ? max(1, (int) round($old_percent * $resolution / 100)) : 0;
+		$new_vote   = $new_percent > 0 ? max(1, (int) round($new_percent * $resolution / 100)) : 0;
+
+		$delta_sum   = $new_vote - $old_vote;
+		$delta_count = ($new_vote > 0 ? 1 : 0) - ($old_vote > 0 ? 1 : 0);
+
+		if (!$delta_sum && !$delta_count)
+		{
+			return;
+		}
+
+		$db = \Joomla\CMS\Factory::getDbo();
+		$exists = (int) $db->setQuery('SELECT COUNT(*) FROM #__content_rating WHERE content_id = ' . (int) $content_id)->loadResult();
+
+		if ($exists)
+		{
+			$db->setQuery(
+				'UPDATE #__content_rating'
+				. ' SET rating_sum = GREATEST(CAST(rating_sum AS SIGNED) + ' . (int) $delta_sum . ', 0),'
+				. '     rating_count = GREATEST(CAST(rating_count AS SIGNED) + ' . (int) $delta_count . ', 0)'
+				. ' WHERE content_id = ' . (int) $content_id
+			)->execute();
+		}
+		elseif ($new_vote > 0)
+		{
+			$db->setQuery(
+				'INSERT #__content_rating SET content_id = ' . (int) $content_id . ', lastip = ' . $db->Quote('')
+				. ', rating_sum = ' . (int) $new_vote . ', rating_count = 1'
+			)->execute();
+		}
+
+		// The rating of the item changed, clean item-related caches
+		FLEXIUtilities::getCache($group = '', 0)->clean('com_flexicontent');
 	}
 
 
@@ -801,13 +1054,22 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 
 
 		/**
-		 * Logged users: their rating is stored in the DB too (as a review record, that is displayed only if it has text),
-		 * this allows a single vote per user, that can be changed, and it is the rating of the user's review
+		 * Logged users: the rating of the user is also the rating of the user's review (a review record is the rating of the user in the DB),
+		 * the rating of the review is authoritative: it is used as old rating, and it is updated when the user changes his vote via the stars
+		 *
+		 * Option 'reviews_store_rating': if enabled, a rating without review (text) also creates a review record (without text, it is not displayed),
+		 * this allows a single vote per user (any browser), that can be changed. Otherwise a review record is not created by voting,
+		 * votes of users without review are protected from double voting by the user's session / IP address (as in the FLEXIcontent voting field)
 		 */
 		$sync_user_rating = $user->id
 			&& (int) $field->parameters->get('allow_reviews', 0)
 			&& !$enable_extra_votes
 			&& $xid === 'main';
+
+		$store_rating_only = $sync_user_rating && (int) $field->parameters->get('reviews_store_rating', 0);
+
+		// The rating of the user is known from the DB (review record), set below
+		$db_rating_known = false;
 
 
 		/**
@@ -845,11 +1107,14 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 			// Logged users: the rating of the user is stored in the DB (in his review record), so use it as old rating
 			if ($sync_user_rating)
 			{
-				$persisted_rating = $this->_getUserRating($cid, $user, $rating_resolution);
+				// The stored rating is authoritative (also when it is zero, e.g. the review was trashed by a moderator)
+				$stored_rating = $this->_getUserRating($cid, $user, $rating_resolution, $store_rating_only);
 
-				if ($persisted_rating)
+				// No review record: authoritative only if ratings without review are stored, otherwise use the rating of the user's session
+				if ($stored_rating !== null || $store_rating_only)
 				{
-					$old_ratings['main'] = $persisted_rating;
+					$old_ratings['main'] = (int) $stored_rating;
+					$db_rating_known = true;
 				}
 			}
 
@@ -973,8 +1238,14 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 				 * if this IP has voted for this item recently and refuse to accept vote
 				 */
 
-				if ($xid_n == $xid && !$old_rating && $currip === $db_itemratings->lastip)
+				if ($xid_n == $xid && !$old_rating && !$db_rating_known && $currip === $db_itemratings->lastip)
 				{
+					// Review form (internal call): the review is saved anyway, only its rating is not counted again as vote of the item
+					if ($this->voteInternal)
+					{
+						return null;
+					}
+
 					$error = \Joomla\CMS\Language\Text::_('FLEXI_YOU_HAVE_ALREADY_VOTED');
 					return $this->_ajaxvote_error($error, $xid, $no_ajax);
 				}
@@ -1080,7 +1351,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		// Store the rating of a logged user (reviews are enabled), if called via the review form this is done by the review form
 		if ($sync_user_rating && $voteIsComplete && !$this->voteInternal)
 		{
-			$this->_storeUserRating($cid, $user, $user_rating, $rating_resolution);
+			$this->_storeUserRating($cid, $user, $user_rating, $rating_resolution, $store_rating_only);
 		}
 
 		// Set the voting data, into SESSION
@@ -1120,16 +1391,22 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 	 * @param   int      $cid         The content ID
 	 * @param   object   $user        The user
 	 * @param   int      $resolution  The rating resolution of the voting field
+	 * @param   boolean  $trashed     True: a review in the trash is the rating record of the user (rating zero), false: it is treated as no review record
 	 *
-	 * @return  int      The rating, or 0 if the user has not rated the item
+	 * @return  int|null  The rating, 0 if the review of the user has no rating, null if the user has no review record
 	 */
-	protected function _getUserRating($cid, $user, $resolution)
+	protected function _getUserRating($cid, $user, $resolution, $trashed = true)
 	{
 		$review = \Joomla\CMS\Table\Table::getInstance('flexicontent_reviews', '', array());
 
 		if (!$review->load(array('content_id' => (int) $cid, 'user_id' => (int) $user->id, 'type' => 'item')))
 		{
-			return 0;
+			return null;
+		}
+
+		if (!$trashed && (int) $review->state === -2)
+		{
+			return null;
 		}
 
 		return (int) $review->average_rating > 0
@@ -1145,14 +1422,34 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 	 * @param   object   $user        The user
 	 * @param   int      $rating      The rating on the voting field scale
 	 * @param   int      $resolution  The rating resolution of the voting field
+	 * @param   boolean  $create      Create the review record if the user has none (rating without review), otherwise only an existing record is updated
 	 *
 	 * @return  boolean  True on success
 	 */
-	protected function _storeUserRating($cid, $user, $rating, $resolution)
+	protected function _storeUserRating($cid, $user, $rating, $resolution, $create = true)
 	{
 		$review = \Joomla\CMS\Table\Table::getInstance('flexicontent_reviews', '', array());
 
-		if (!$review->load(array('content_id' => (int) $cid, 'user_id' => (int) $user->id, 'type' => 'item')))
+		$exists = $review->load(array('content_id' => (int) $cid, 'user_id' => (int) $user->id, 'type' => 'item'));
+
+		// A review that was deleted by the user (trashed): keep its old data, and start a new rating only record
+		if ($exists && (int) $review->state === -2)
+		{
+			$review->title_old = $review->title;
+			$review->text_old  = $review->text;
+			$review->title     = '';
+			$review->text      = '';
+			$review->state     = 1;
+			$review->approved  = 1;
+		}
+
+		// The user has no review record (a trashed review is also treated as none), and ratings without review are not stored
+		if (!$create && (!$exists || (int) $review->state === -2))
+		{
+			return true;
+		}
+
+		if (!$exists)
 		{
 			// Rating only record: it is not displayed (no text), and it needs no approval
 			$review->reset();

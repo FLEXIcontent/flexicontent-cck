@@ -471,6 +471,12 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				->where('r.type = ' . $db->Quote($review_type))
 				->where('r.user_id = ' . (int) $user->id);
 			$review = $db->setQuery($query)->loadObject();
+
+			// A review deleted by the user (trashed) is treated as non-existent
+			if ($review && (int) $review->state === -2)
+			{
+				$review = false;
+			}
 		}
 
 		// Rating (stars) picker of the review form
@@ -561,7 +567,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 						<div class="fcvote-form-group">
 							<label class="fcvote-form-label" for="fcvote_review_form_' . $item->id . '_email">' . \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_EMAIL') . '</label>
-							' . ($user->id ? '<div class="fcvote-form-badge badge">' . htmlspecialchars($user->email, ENT_COMPAT, 'UTF-8') . '</div>' : '
+							' . ($user->id ? '<div class="fcvote-form-email" style="padding:0.4em 0;">' . htmlspecialchars($user->email, ENT_COMPAT, 'UTF-8') . '</div>' : '
 							<input required type="text" name="email"
 								value="'.htmlspecialchars( ($review ? $review->email : ''), ENT_COMPAT, 'UTF-8' ).'"
 								id="fcvote_review_form_' . $item->id . '_email"
@@ -757,8 +763,9 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			$do_approval = (int) $field->parameters->get('do_approval', 1);
 			$verify_email_ownership = (int) $field->parameters->get('verify_email_ownership', 1);
 
-			// A record that has no text yet (rating only record, created by voting) is not a modification
-			$had_text = $review_id && trim((string) $review->text) !== '';
+			// A review that was deleted by the user (trashed) is re-created, same for a record that has no text (rating only record, created by voting)
+			$was_trashed = $review_id && (int) $review->state === -2;
+			$had_text = $review_id && !$was_trashed && trim((string) $review->text) !== '';
 
 			// Modification of an existing review that is currently approved: keep the old data
 			if ($had_text && $review->approved)
@@ -778,7 +785,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			// New or modified reviews need approval (if configured), the same as in the backend controller
 			$review->approved = $do_approval ? 0 : 1;
 
-			if (!$review_id)
+			if (!$review_id || $was_trashed)
 			{
 				// New reviews are published, visibility is controlled by approval
 				$review->state = 1;
@@ -887,7 +894,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 				'type'       => $review_type,
 			);
 
-			if (!$review->load($review_props))
+			if (!$review->load($review_props) || (int) $review->state === -2)
 			{
 				$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_NOT_FOUND');
 			}
@@ -895,31 +902,19 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			{
 				$old_percent = (int) $review->average_rating;
 
-				if (!$review->delete((int) $review->id))
+				// The review is moved to the trash (it can be seen / restored in the backend), its rating is removed
+				$review->state = -2;
+				$review->average_rating = 0;
+
+				if (!$review->store())
 				{
 					$errors[] = \Joomla\CMS\Language\Text::sprintf('FLEXI_VOTE_REVIEW_ERR_STORE', $review->getError());
 				}
 
 				// The rating of the review is also the user's vote, remove it from the item's rating
-				elseif ($old_percent > 0 && !(int) $field->parameters->get('enable_extra_votes', 0))
+				else
 				{
-					$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
-					$old_vote = max(1, (int) round($old_percent * $this->getReviewResolution($field) / 100));
-
-					$db->setQuery(
-						'UPDATE #__content_rating'
-						. ' SET rating_sum = GREATEST(CAST(rating_sum AS SIGNED) - ' . (int) $old_vote . ', 0),'
-						. '     rating_count = GREATEST(CAST(rating_count AS SIGNED) - 1, 0)'
-						. ' WHERE content_id = ' . (int) $content_id
-					)->execute();
-
-					// Forget the vote in the user's session, otherwise a new vote would be counted as a change of the old vote
-					$session = \Joomla\CMS\Factory::getSession();
-					$vote_history = $session->get('vote_history', array(), 'flexicontent');
-					unset($vote_history[$content_id]);
-					$session->set('vote_history', $vote_history, 'flexicontent');
-
-					FLEXIUtilities::getCache($group = '', 0)->clean('com_flexicontent');
+					$this->revertReviewVote($field, $content_id, $old_percent, $is_own = true);
 				}
 			}
 		}
@@ -934,6 +929,663 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		);
 
 		jexit(json_encode($result));
+	}
+
+
+	/**
+	 * Renders the reviews list (or a single review) using the layout of the voting field, in 'list-only' mode ($prop = 'display_reviews')
+	 *
+	 * @param   object  $item                  The item record
+	 * @param   object  $field                 The voting field (with its parameters)
+	 * @param   int     $rv_chunk_offset       0: the whole list (rating, buttons, own review, first reviews), > 0: only the next reviews
+	 * @param   int     $rv_single_review_id   If set, only this review is rendered (e.g. after the quick edit by a moderator)
+	 * @param   int     $rv_star_filter        Only the reviews with this rating (number of stars), 0: all reviews
+	 * @param   bool    $rv_inline_box         The list is displayed in the page ('All reviews' button), not in the modal window (next reviews loaded by scrolling)
+	 * @param   bool    $rv_full               Full mode: the display of the field (stars, counter / button) and the reviews card of the item view, used to refresh the page without reloading it
+	 *
+	 * @return  string|array  The HTML, in the full mode an array: field => display of the field, card => reviews card
+	 */
+	private function renderReviewsTemplate($item, $field, $rv_chunk_offset = 0, $rv_single_review_id = 0, $rv_star_filter = 0, $rv_inline_box = false, $rv_full = false)
+	{
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+
+		// Variables expected by the layout of the voting field
+		$vote = $db->setQuery(
+			$db->getQuery(true)
+				->select('rating_sum, rating_count')
+				->from('#__content_rating')
+				->where('content_id = ' . (int) $item->id)
+		)->loadObject();
+
+		$field->item_id    = (int) $item->id;
+		$field->item_title = (string) $item->title;
+
+		$prop              = $rv_full ? 'display' : 'display_reviews';
+		$allow_reviews     = 1;
+		$reviews_placement = 0;
+		$view              = 'item';
+		$pretext = $posttext = '';
+
+		// Full mode: same variables as the display of the field in the item view (voting field of the core plugin)
+		if ($rv_full)
+		{
+			$allow_reviews     = (int) $field->parameters->get('allow_reviews', 0);
+			$reviews_placement = (int) $field->parameters->get('reviews_placement', 0);
+
+			$vote_submit_inview = FLEXIUtilities::paramToArray($field->parameters->get('vote_submit_inview', array('item')));
+
+			if (!in_array('item', $vote_submit_inview))
+			{
+				$vote = $vote ?: new stdClass;
+				$vote->allow_vote = false;
+			}
+
+			// Text before / after the field
+			foreach (array('pretext', 'posttext') as $_pt)
+			{
+				$_pt_value = $field->parameters->get($_pt, '');
+
+				if ($_pt_value !== '')
+				{
+					$_cacheable = false;
+					$$_pt = (string) FlexicontentFields::replaceFieldValue($field, $item, $_pt_value, $_pt, $_cacheable);
+				}
+			}
+		}
+
+		include(JPATH_PLUGINS . '/flexicontent_fields/core/tmpl/voting/value_default.php');
+
+		if ($rv_full)
+		{
+			return array(
+				'field' => (string) $field->display,
+				'card'  => (string) $field->display_reviews,
+			);
+		}
+
+		return (string) $field->display_reviews;
+	}
+
+
+	/**
+	 * Ajax task: get the HTML of the reviews list of an item (loaded on demand, e.g. when the 'N Reviews' button is clicked)
+	 * The list is created by the layout of the voting field, in 'list-only' mode ($prop = 'display_reviews')
+	 *
+	 * @access public
+	 * @since 3.3.0
+	 */
+	function getreviewslist()
+	{
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$db   = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+
+		$content_id = $this->input->get('content_id', 0, 'int');
+
+		$errors = array();
+		$html   = '';
+
+		$this->loadReviewLanguage();
+
+		if (!$content_id)
+		{
+			$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_CONTENT_ID');
+		}
+		else
+		{
+			// Check that reviews are enabled and the content exists (submission permission is not needed for displaying)
+			$item  = null;
+			$field = null;
+			$this->reviewPrepare($content_id, $item, $field, $errors, $_checkSubmit = false);
+		}
+
+		// The user must be able to view the item
+		if (!count($errors) && (!in_array((int) $item->access, $user->getAuthorisedViewLevels())
+			|| ((int) $item->state !== 1 && !$user->authorise('core.edit.state', 'com_content.article.' . (int) $item->id))))
+		{
+			$errors[] = \Joomla\CMS\Language\Text::_('JERROR_ALERTNOAUTHOR');
+		}
+
+		if (!count($errors))
+		{
+			// Offset of the first review to return, 0: the whole list (rating, buttons, own review, first reviews), > 0: only the next reviews
+			// Filter by rating (number of stars, 0: all reviews), 'inline': the list is displayed in the page (not in the modal window)
+			$html = $this->renderReviewsTemplate(
+				$item, $field,
+				max(0, $this->input->get('offset', 0, 'int')),
+				0,
+				max(0, $this->input->get('star', 0, 'int')),
+				(bool) $this->input->get('inline', 0, 'int')
+			);
+		}
+
+		jexit(json_encode((object) array(
+			'error' => count($errors) ? 1 : 0,
+			'html'  => count($errors)
+				? '<div class="fc-mssg fc-warning fc-nobgimage">' . implode('<br>', $errors) . '</div>'
+				: $html
+		)));
+	}
+
+
+	/**
+	 * Ajax task: get the current HTML of the voting field of an item (stars, reviews counter / button) and of its reviews card,
+	 * used to refresh the item page after the reviews changed, without reloading the page
+	 * The HTML is created by the layout of the voting field, as in the item view
+	 *
+	 * @access public
+	 * @since 3.3.0
+	 */
+	function getreviewsrefresh()
+	{
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+
+		$content_id = $this->input->get('content_id', 0, 'int');
+
+		$errors = array();
+		$result = (object) array('error' => 0);
+
+		$this->loadReviewLanguage();
+
+		if (!$content_id)
+		{
+			$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_CONTENT_ID');
+		}
+		else
+		{
+			$item  = null;
+			$field = null;
+			$this->reviewPrepare($content_id, $item, $field, $errors, $_checkSubmit = false);
+		}
+
+		// The user must be able to view the item
+		if (!count($errors) && (!in_array((int) $item->access, $user->getAuthorisedViewLevels())
+			|| ((int) $item->state !== 1 && !$user->authorise('core.edit.state', 'com_content.article.' . (int) $item->id))))
+		{
+			$errors[] = \Joomla\CMS\Language\Text::_('JERROR_ALERTNOAUTHOR');
+		}
+
+		// Composite voting (extra votes) is not supported by the refresh, the page must be reloaded
+		if (!count($errors) && (int) $field->parameters->get('enable_extra_votes', 0))
+		{
+			$errors[] = 'Composite voting';
+		}
+
+		if (!count($errors))
+		{
+			// Same state as in the item view (e.g. the aggregate rating markup)
+			$this->input->set('flexi_callview', 'item');
+
+			$rendered = $this->renderReviewsTemplate($item, $field, 0, 0, 0, true, $rv_full = true);
+
+			$result->field = $rendered['field'];
+			$result->card  = $rendered['card'];
+		}
+		else
+		{
+			$result->error = 1;
+			$result->msg   = implode(' ', $errors);
+		}
+
+		jexit(json_encode($result));
+	}
+
+
+	/**
+	 * Ajax task: the current user (or guest) marks a review as useful / not useful ('Was this helpful?')
+	 * Voting again with the same answer removes the vote, voting with the other answer changes the vote
+	 *
+	 * @access public
+	 * @since 3.3.0
+	 */
+	function votereviewuseful()
+	{
+		// Check for request forgeries
+		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$db   = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+
+		$review_id = $this->input->get('review_id', 0, 'int');
+		$answer    = $this->input->get('vote', '', 'cmd');
+
+		$errors = array();
+		$result = (object) array('error' => 0);
+
+		$this->loadReviewLanguage();
+
+		// The review must be visible: published, approved and with text
+		$review = $review_id
+			? $db->setQuery(
+				$db->getQuery(true)
+					->select('id, content_id, user_id, useful_yes, useful_no')
+					->from('#__flexicontent_reviews')
+					->where('id = ' . (int) $review_id)
+					->where('type = ' . $db->Quote('item'))
+					->where('state = 1')
+					->where('approved = 1')
+					->where('CHAR_LENGTH(TRIM(text)) > 0')
+			)->loadObject()
+			: null;
+
+		if (!$review || !in_array($answer, array('yes', 'no'), true))
+		{
+			$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_NOT_FOUND');
+		}
+
+		if (!count($errors))
+		{
+			// Check that reviews are enabled and get the configuration of the field
+			$item  = null;
+			$field = null;
+			$this->reviewPrepare((int) $review->content_id, $item, $field, $errors, $_checkSubmit = false);
+		}
+
+		// The user must be able to view the item
+		if (!count($errors) && (!in_array((int) $item->access, $user->getAuthorisedViewLevels()) || ((int) $item->state !== 1 && !$user->authorise('core.edit.state', 'com_content.article.' . (int) $item->id))))
+		{
+			$errors[] = \Joomla\CMS\Language\Text::_('JERROR_ALERTNOAUTHOR');
+		}
+
+		if (!count($errors))
+		{
+			// 0: disabled, 1: logged users, 2: anyone (guests are identified by IP address)
+			$useful_mode = (int) $field->parameters->get('reviews_useful', 1);
+
+			if (!$useful_mode)
+			{
+				$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_USEFUL_DISABLED');
+			}
+			elseif ($useful_mode === 1 && !$user->id)
+			{
+				$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_LOGIN_REQUIRED');
+			}
+			elseif ($user->id && (int) $review->user_id === (int) $user->id)
+			{
+				$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_USEFUL_OWN');
+			}
+		}
+
+		if (!count($errors))
+		{
+			list($uid, $ip) = flexicontent_html::getReviewVoterKey();
+
+			$where_voter = 'review_id = ' . (int) $review->id . ' AND user_id = ' . (int) $uid . ' AND ip = ' . $db->Quote($ip);
+			$previous    = $db->setQuery('SELECT vote FROM #__flexicontent_reviews_useful WHERE ' . $where_voter)->loadResult();
+			$new         = $answer === 'yes' ? 1 : 0;
+			$col         = array(1 => 'useful_yes', 0 => 'useful_no');
+
+			if ($previous !== null && (int) $previous === $new)
+			{
+				// Same answer again: remove the vote
+				$db->setQuery('DELETE FROM #__flexicontent_reviews_useful WHERE ' . $where_voter)->execute();
+				$db->setQuery('UPDATE #__flexicontent_reviews SET ' . $col[$new] . ' = GREATEST(' . $col[$new] . ' - 1, 0) WHERE id = ' . (int) $review->id)->execute();
+				$my_vote = '';
+			}
+			elseif ($previous !== null)
+			{
+				// Other answer: change the vote
+				$db->setQuery('UPDATE #__flexicontent_reviews_useful SET vote = ' . $new . ', vote_date = ' . $db->Quote(\Joomla\CMS\Factory::getDate()->toSql()) . ' WHERE ' . $where_voter)->execute();
+				$db->setQuery('UPDATE #__flexicontent_reviews SET ' . $col[$new] . ' = ' . $col[$new] . ' + 1, ' . $col[1 - $new] . ' = GREATEST(' . $col[1 - $new] . ' - 1, 0) WHERE id = ' . (int) $review->id)->execute();
+				$my_vote = $answer;
+			}
+			else
+			{
+				// New vote
+				$db->setQuery(
+					'INSERT INTO #__flexicontent_reviews_useful (review_id, user_id, ip, vote, vote_date) VALUES ('
+					. (int) $review->id . ', ' . (int) $uid . ', ' . $db->Quote($ip) . ', ' . $new . ', ' . $db->Quote(\Joomla\CMS\Factory::getDate()->toSql()) . ')'
+				)->execute();
+				$db->setQuery('UPDATE #__flexicontent_reviews SET ' . $col[$new] . ' = ' . $col[$new] . ' + 1 WHERE id = ' . (int) $review->id)->execute();
+				$my_vote = $answer;
+			}
+
+			$counts = $db->setQuery('SELECT useful_yes, useful_no FROM #__flexicontent_reviews WHERE id = ' . (int) $review->id)->loadObject();
+
+			$result->my_vote     = $my_vote;
+			$result->useful_yes  = (int) $counts->useful_yes;
+			$result->useful_no   = (int) $counts->useful_no;
+			$result->count_text  = $result->useful_yes
+				? \Joomla\CMS\Language\Text::plural('FLEXI_VOTE_REVIEW_USEFUL_N', $result->useful_yes)
+				: '';
+		}
+
+		if (count($errors))
+		{
+			$result->error = 1;
+			$result->msg   = implode("\n", $errors);
+		}
+
+		jexit(json_encode($result));
+	}
+
+
+	/**
+	 * Loads a review that a moderator wants to edit, and checks the permissions
+	 *
+	 * @param   int     $review_id   The review id
+	 * @param   array   $errors      Array of error messages (to be extended)
+	 *
+	 * @return  \Joomla\CMS\Table\Table|null   The review (Table object), null on error
+	 */
+	private function loadReviewForModerator($review_id, & $errors)
+	{
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+
+		$review = \Joomla\CMS\Table\Table::getInstance($type = 'flexicontent_reviews', $prefix = '', $config = array());
+
+		if (!$review_id || !$review->load($review_id) || (int) $review->state === -2 || $review->type !== 'item')
+		{
+			$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_NOT_FOUND');
+			return null;
+		}
+
+		if (!$user->authorise('core.edit.state', 'com_content.article.' . (int) $review->content_id))
+		{
+			$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_NO_PERMISSION');
+			return null;
+		}
+
+		// Check that reviews are enabled and the content exists
+		$item  = null;
+		$field = null;
+		$this->reviewPrepare((int) $review->content_id, $item, $field, $errors, $_checkSubmit = false);
+
+		return count($errors) ? null : $review;
+	}
+
+
+	/**
+	 * Ajax task: the form for the quick edit of a review by a moderator (fix typos, approve)
+	 *
+	 * @access public
+	 * @since 3.3.0
+	 */
+	function getreviewedit()
+	{
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+
+		$review_id = $this->input->get('review_id', 0, 'int');
+		$errors    = array();
+
+		$this->loadReviewLanguage();
+
+		$review = $this->loadReviewForModerator($review_id, $errors);
+
+		if ($review)
+		{
+			$author = $review->user_id
+				? $db->setQuery('SELECT name FROM #__users WHERE id = ' . (int) $review->user_id)->loadResult()
+				: '';
+			$author = $author ?: \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_GUEST');
+
+			$form_id = 'fcvote_review_edit_form_' . (int) $review->id;
+
+			$html = '
+				<form id="' . $form_id . '" name="' . $form_id . '" action="javascript:;">
+
+					<input type="hidden" name="review_id" value="' . (int) $review->id . '" />
+					<input type="hidden" name="' . \Joomla\CMS\Session\Session::getFormToken() . '" value="1" />
+
+					<div class="fcvote-form-fields">
+
+						<div class="fcvote-form-group">
+							<span class="fcvote-review-author">' . htmlspecialchars((string) $author, ENT_QUOTES, 'UTF-8') . '</span>
+							' . ((int) $review->average_rating > 0 ? flexicontent_html::reviewStars($review->average_rating, flexicontent_html::reviewStarsCount(), '1em') : '') . '
+						</div>
+
+						<div class="fcvote-form-group">
+							<label class="fcvote-form-label" for="' . $form_id . '_title">' . \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_TITLE') . '</label>
+							<input type="text" name="title" id="' . $form_id . '_title" maxlength="255"
+								value="' . htmlspecialchars((string) $review->title, ENT_COMPAT, 'UTF-8') . '" />
+						</div>
+
+						<div class="fcvote-form-group">
+							<label class="fcvote-form-label" for="' . $form_id . '_text">' . \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_TEXT') . '</label>
+							<textarea required name="text" rows="6" id="' . $form_id . '_text">' . htmlspecialchars((string) $review->text, ENT_COMPAT, 'UTF-8') . '</textarea>
+						</div>
+
+						<div class="fcvote-form-group">
+							<label class="fcvote-switch">
+								<input type="checkbox" name="approved" value="1"' . ((int) $review->approved ? ' checked="checked"' : '') . ' />
+								<span class="fcvote-switch-slider"></span>
+								<span class="fcvote-switch-label">' . \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_APPROVED') . '</span>
+							</label>
+						</div>
+
+						<div class="fcvote-form-group fcvote-form-submit">
+							<input type="button" class="btn btn-success fcvote_review_form_submit_btn"
+								onclick="fcvote_review_edit_save(this.form); return false;"
+								value="' . htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_SAVE'), ENT_COMPAT, 'UTF-8') . '" />
+						</div>
+
+					</div>
+
+				</form>';
+		}
+
+		jexit(json_encode((object) array(
+			'error' => count($errors) ? 1 : 0,
+			'html'  => count($errors)
+				? '<div class="fc-mssg fc-warning fc-nobgimage">' . implode('<br>', $errors) . '</div>'
+				: $html
+		)));
+	}
+
+
+	/**
+	 * Ajax task: save the quick edit of a review by a moderator (title, text, approved), the rating and the author are not changed
+	 *
+	 * @access public
+	 * @since 3.3.0
+	 */
+	function savereviewedit()
+	{
+		// Check for request forgeries
+		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+
+		$review_id = $this->input->get('review_id', 0, 'int');
+		$errors    = array();
+
+		$this->loadReviewLanguage();
+
+		$title    = flexicontent_html::dataFilter($this->input->get('title', '', 'string'), $maxlength = 255, 'STRING', 0);     // Decode entities, and strip HTML
+		$text     = flexicontent_html::dataFilter($this->input->get('text', '', 'string'), $maxlength = 10000, 'STRING', 0);   // Decode entities, and strip HTML
+		$approved = $this->input->get('approved', 0, 'int') ? 1 : 0;
+
+		$review = $this->loadReviewForModerator($review_id, $errors);
+
+		if ($review && trim($text) === '')
+		{
+			$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_TEXT');
+		}
+
+		if (!count($errors))
+		{
+			// Keep the old data, if the title / text changed
+			if ((string) $review->title !== $title || (string) $review->text !== $text)
+			{
+				$review->title_old = $review->title;
+				$review->text_old  = $review->text;
+			}
+
+			$review->title    = $title;
+			$review->text     = $text;
+			$review->approved = $approved;
+
+			if (!$review->store())
+			{
+				$errors[] = \Joomla\CMS\Language\Text::sprintf('FLEXI_VOTE_REVIEW_ERR_STORE', $review->getError());
+			}
+		}
+
+		// The updated review, rendered like in the list (the list is updated without reloading the page)
+		$item_html = '';
+
+		if (!count($errors))
+		{
+			$item  = null;
+			$field = null;
+			$this->reviewPrepare((int) $review->content_id, $item, $field, $errors, $_checkSubmit = false);
+
+			if (!count($errors))
+			{
+				$item_html = $this->renderReviewsTemplate($item, $field, 0, (int) $review->id);
+			}
+		}
+
+		jexit(json_encode((object) array(
+			'error'     => count($errors) ? 1 : 0,
+			'item_html' => $item_html,
+			'html'      => '
+				<div class="fc-mssg ' . (count($errors) ? 'fc-warning' : 'fc-success') . ' fc-nobgimage">
+					' . (count($errors) ? implode('<br>', $errors) : \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_MSG_EDIT_SAVED')) . '
+				</div>'
+		)));
+	}
+
+
+	/**
+	 * Ajax task: a moderator approves a pending review
+	 *
+	 * @access public
+	 * @since 3.3.0
+	 */
+	function approvereview()
+	{
+		$this->moderateReview('approve');
+	}
+
+
+	/**
+	 * Ajax task: a moderator moves a review to the trash
+	 *
+	 * @access public
+	 * @since 3.3.0
+	 */
+	function trashreview()
+	{
+		$this->moderateReview('trash');
+	}
+
+
+	/**
+	 * Method to approve / trash a review, by a user that can change the state of the reviewed content
+	 *
+	 * @param   string   $action   Either 'approve' or 'trash'
+	 *
+	 * @return  void   It sends a JSON response and exits
+	 *
+	 * @since   3.3.0
+	 */
+	private function moderateReview($action)
+	{
+		// Check for request forgeries
+		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$review_id = $this->input->get('review_id', 0, 'int');
+		$errors = array();
+
+		$this->loadReviewLanguage();
+
+		$review = \Joomla\CMS\Table\Table::getInstance($type = 'flexicontent_reviews', $prefix = '', $config = array());
+
+		if (!$review_id || !$review->load($review_id) || (int) $review->state === -2 || $review->type !== 'item')
+		{
+			$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_NOT_FOUND');
+		}
+		elseif (!$user->authorise('core.edit.state', 'com_content.article.' . (int) $review->content_id))
+		{
+			$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_NO_PERMISSION');
+		}
+		else
+		{
+			// Check that reviews are enabled and the content exists
+			$item  = null;
+			$field = null;
+			$this->reviewPrepare((int) $review->content_id, $item, $field, $errors, $_checkSubmit = false);
+		}
+
+		if (!count($errors))
+		{
+			$old_percent = (int) $review->average_rating;
+
+			if ($action === 'approve')
+			{
+				$review->approved = 1;
+			}
+			else
+			{
+				// Moved to the trash (it can be seen / restored in the backend), its rating is removed
+				$review->state = -2;
+				$review->average_rating = 0;
+			}
+
+			if (!$review->store())
+			{
+				$errors[] = \Joomla\CMS\Language\Text::sprintf('FLEXI_VOTE_REVIEW_ERR_STORE', $review->getError());
+			}
+			elseif ($action === 'trash')
+			{
+				// The rating of the review is also a vote, remove it from the item's rating
+				$this->revertReviewVote($field, (int) $review->content_id, $old_percent, $is_own = ((int) $review->user_id === (int) $user->id));
+			}
+		}
+
+		$msg = count($errors)
+			? implode(' ', $errors)
+			: \Joomla\CMS\Language\Text::_($action === 'approve' ? 'FLEXI_VOTE_REVIEW_MSG_APPROVED' : 'FLEXI_VOTE_REVIEW_MSG_TRASHED');
+
+		jexit(json_encode(array(
+			'error'  => count($errors) ? 1 : 0,
+			'msg'    => strip_tags($msg),
+			'action' => $action,
+			'id'     => (int) $review_id,
+		)));
+	}
+
+
+	/**
+	 * Method to remove the vote of a review (that is deleted / trashed) from the rating of the reviewed item
+	 *
+	 * @param   object   $field        The voting field
+	 * @param   int      $content_id   The reviewed item
+	 * @param   int      $old_percent  The rating of the review as percentage
+	 * @param   boolean  $is_own       True if the review is of the current user (then session data of the vote are also cleared)
+	 *
+	 * @return  void
+	 *
+	 * @since   3.3.0
+	 */
+	private function revertReviewVote($field, $content_id, $old_percent, $is_own = false)
+	{
+		// Composite voting calculates the rating from the voting characteristics
+		if ($old_percent < 1 || (int) $field->parameters->get('enable_extra_votes', 0))
+		{
+			return;
+		}
+
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$old_vote = max(1, (int) round($old_percent * $this->getReviewResolution($field) / 100));
+
+		$db->setQuery(
+			'UPDATE #__content_rating'
+			. ' SET rating_sum = GREATEST(CAST(rating_sum AS SIGNED) - ' . (int) $old_vote . ', 0),'
+			. '     rating_count = GREATEST(CAST(rating_count AS SIGNED) - 1, 0)'
+			. ($is_own ? ', lastip = IF(lastip = ' . $db->Quote($_SERVER['REMOTE_ADDR']) . ', ' . $db->Quote('') . ', lastip)' : '')
+			. ' WHERE content_id = ' . (int) $content_id
+		)->execute();
+
+		if ($is_own)
+		{
+			// Forget the vote in the user's session, otherwise a new vote would be counted as a change of the old vote
+			$session = \Joomla\CMS\Factory::getSession();
+			$vote_history = $session->get('vote_history', array(), 'flexicontent');
+			unset($vote_history[$content_id]);
+			$session->set('vote_history', $vote_history, 'flexicontent');
+		}
+
+		FLEXIUtilities::getCache($group = '', 0)->clean('com_flexicontent');
 	}
 
 

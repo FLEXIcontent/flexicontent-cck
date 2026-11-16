@@ -631,6 +631,10 @@ class com_flexicontentInstallerScript
 		$db->setQuery($query);
 		$reviews_tbl_exists = (bool) count($db->loadObjectList());
 
+		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_reviews_useful"';
+		$db->setQuery($query);
+		$reviews_useful_tbl_exists = (boolean) count($db->loadObjectList());
+
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . '__flexicontent_mediadatas"';
 		$db->setQuery($query);
 		$mediadatas_tbl_exists = (bool) count($db->loadObjectList());
@@ -1153,14 +1157,29 @@ class com_flexicontentInstallerScript
 							PRIMARY KEY  (`id`),
 							KEY (`content_id`, `user_id`, `type`),
 							KEY (`content_id`, `type`),
-							KEY `user_id` (`user_id`)
+							KEY `user_id` (`user_id`),
 							FULLTEXT KEY `title` (`title`),
 							FULLTEXT KEY `text` (`text`),
-							KEY `state` (`state`)
-							KEY `approved` (`approved`)
-							KEY `verified` (`verified`)
-							KEY `useful_yes` (`useful_yes`)
+							KEY `state` (`state`),
+							KEY `approved` (`approved`),
+							KEY `verified` (`verified`),
+							KEY `useful_yes` (`useful_yes`),
 							KEY `useful_no` (`useful_no`)
+						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;";
+					}
+
+					// Table with the 'useful' votes of the reviews
+					if (!$reviews_useful_tbl_exists)
+					{
+						$queries[] = "
+						CREATE TABLE IF NOT EXISTS `#__flexicontent_reviews_useful` (
+							`review_id` int(11) NOT NULL,
+							`user_id` int(11) NOT NULL DEFAULT '0',
+							`ip` varchar(50) NOT NULL DEFAULT '',
+							`vote` tinyint(1) NOT NULL DEFAULT '1',
+							`vote_date` datetime NOT NULL,
+							PRIMARY KEY  (`review_id`, `user_id`, `ip`),
+							KEY `user_id` (`user_id`)
 						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;";
 					}
 

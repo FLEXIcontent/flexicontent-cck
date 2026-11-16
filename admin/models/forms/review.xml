@@ -2,8 +2,11 @@
 <form>
 
 	<fieldset name="basic" addfieldpath="/administrator/components/com_flexicontent/elements" icon_class="icon-info-circle">
+		<field name="content_id" type="item" default="0" filter="INT" label="FLEXI_ITEM" description="" clear="false" labelclass="fc-prop-lbl" />
+		<field name="user_id" type="user" default="0" filter="INT" label="FLEXI_REVIEW_ACCOUNT" description="FLEXI_REVIEW_ACCOUNT_DESC" labelclass="fc-prop-lbl" />
+		<field name="email" type="text" filter="EMAIL" label="FLEXI_REVIEW_EMAIL" description="FLEXI_REVIEW_EMAIL_DESC" labelclass="fc-prop-lbl" />
 		<field name="title" type="text" filter="STRING" required="true" label="FLEXI_REVIEW_TITLE" description="FLEXI_REVIEW_TEXT_DESC" class="input-xxlarge" labelclass="fc-prop-lbl" />
-		<field name="email" type="text" filter="EMAIL" required="true" label="FLEXI_REVIEW_EMAIL" description="" labelclass="fc-prop-lbl" />
+		<field name="average_rating" type="fcreviewrating" default="0" filter="INT" label="FLEXI_REVIEW_RATING" description="" labelclass="fc-prop-lbl" />
 		<field name="text" type="textarea" filter="STRING" required="true" label="FLEXI_REVIEW_TEXT" description="FLEXI_REVIEW_TEXT_DESC" class="input-xxlarge" rows="4" cols="80" buttons="false" labelclass="fc-prop-lbl" />
 
 		<field name="state" type="list" default="1" filter="INT" label="FLEXI_REVIEW_STATE" description="FLEXI_REVIEW_STATE_DESC" class="use_select2_lib" labelclass="fc-prop-lbl">
@@ -25,11 +28,8 @@
 		<field name="useful_no" type="int" default="0" filter="INT" label="FLEXI_REVIEW_NOT_USEFUL" description="FLEXI_REVIEW_NOT_USEFUL_DESC" class="readonly" readonly="true" labelclass="fc-prop-lbl" />
 
 		<field name="id" type="hidden" default="0" filter="INT" label="JGLOBAL_FIELD_ID_LABEL" description="JGLOBAL_FIELD_ID_DESC" class="readonly" readonly="true" labelclass="fc-prop-lbl" />
-		<field name="content_id" type="text" default="0" filter="INT" label="FLEXI_ITEM" description="" class="readonly" readonly="true" labelclass="fc-prop-lbl" />
 		<field name="type" type="text" default="item" filter="STRING" label="FLEXI_TYPE" description="" class="readonly" readonly="true" labelclass="fc-prop-lbl" />
-		<field name="average_rating" type="text" label="FLEXI_FIELD_VOTE_AVERAGE_RATING" description="" class="readonly" readonly="true" labelclass="fc-prop-lbl" />
 		<field name="custom_ratings" type="text" label="FLEXI_FIELD_VOTE_COMPOSITE_VOTING" description="" class="readonly" readonly="true" labelclass="fc-prop-lbl" />
-		<field name="user_id" type="text" default="0" filter="INT" label="FLEXI_REVIEW_ACCOUNT" description="" class="readonly" readonly="true" labelclass="fc-prop-lbl" />
 
 		<field name="submit_date" type="text" default="" filter="UNSET" label="Submit date" description="" class="readonly" readonly="true" labelclass="fc-prop-lbl" />
 		<field name="update_date" type="text" default="" filter="UNSET" label="Submit date" description="" class="readonly" readonly="true" labelclass="fc-prop-lbl" />

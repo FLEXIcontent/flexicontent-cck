@@ -309,9 +309,6 @@ class plgFlexicontent_fieldsCore extends FCField
 
 					if ($allow_reviews)
 					{
-						// Get item's reviews. Pass items to avoid multiple queries ...
-						$reviews = $this->_getReviews($items, $item);
-
 						// Placement of reviews
 						$reviews_placement = (int) $field->parameters->get('reviews_placement', 0);
 					}
@@ -1308,67 +1305,5 @@ class plgFlexicontent_fieldsCore extends FCField
 				$this->_catTreeRecurse($cat->id, $cats, $display_filter_as, 0, $start_depth, $filter_depth);
 			}
 		}
-	}
-
-
-	/**
-	 * Function to get review records of and item
-	 *
-	 * @param	  array	   $property	 Current set of items. To get reviews via single query
-	 * @param	  object   $item		   The item for which to return its reviews
-	 *
-	 * @return	array    The reviews of $item
-	 * 
-	 */
-	private function _getReviews($items, $item)
-	{
-		static $item_reviews = array();
-
-		$item_id = (int) $item->id;
-
-		if (!isset($item_reviews[$item_id]))
-		{
-			$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
-
-			// Always include the current item, and avoid overwriting the $item argument
-			$item_ids = array($item_id);
-
-			foreach ((array) $items as $_item)
-			{
-				$item_ids[] = (int) $_item->id;
-			}
-
-			$item_ids = array_unique($item_ids);
-
-			// Only published AND approved reviews are visible to the public, a user also sees his own (pending) review
-			$uid = (int) \Joomla\CMS\Factory::getApplication()->getIdentity()->id;
-
-			$query = $db->getQuery(true)
-				->select('r.*')
-				->select('u.name AS author_name')
-				->from('#__flexicontent_reviews AS r')
-				->join('LEFT', '#__users AS u ON u.id = r.user_id')
-				->where('r.content_id IN (' . implode(',', $item_ids) . ')')
-				->where('r.type = ' . $db->Quote('item'))
-				->where('r.state = 1')
-				->where($uid ? '(r.approved = 1 OR r.user_id = ' . $uid . ')' : 'r.approved = 1')
-				->where('CHAR_LENGTH(TRIM(r.text)) > 0')
-				->order('r.submit_date DESC');
-
-			$rvdata = $db->setQuery($query)->loadObjectList();
-
-			// This is needed for future isset checks
-			foreach ($item_ids as $_id)
-			{
-				$item_reviews[$_id] = array();
-			}
-
-			foreach ($rvdata as $r)
-			{
-				$item_reviews[(int) $r->content_id][] = $r;
-			}
-		}
-
-		return $item_reviews[$item_id];
 	}
 }

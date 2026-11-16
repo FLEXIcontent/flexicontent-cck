@@ -64,6 +64,34 @@ $form = $this->form;
 </div>
 <div style="margin-bottom:24px;"></div>
 
+<script>
+// A selected user (reviewer) provides the email (his account email), so the email field is cleared and disabled
+(function ()
+{
+	var userInput = document.querySelector('[name="jform[user_id]"]');
+	var email = document.getElementById('jform_email');
+
+	// Only when creating a review (otherwise the reviewer is shown as read-only text)
+	if (!userInput || !email || userInput.type !== 'hidden') return;
+
+	var last = null;
+
+	function syncEmail()
+	{
+		var hasUser = parseInt(userInput.value, 10) > 0;
+		if (hasUser === last) return;
+		last = hasUser;
+
+		if (hasUser) { email.value = ''; email.disabled = true; }
+		else { email.disabled = false; }
+	}
+
+	userInput.addEventListener('change', syncEmail);
+	setInterval(syncEmail, 300);
+	syncEmail();
+})();
+</script>
+
 <?php
 //keep session alive while editing
 \Joomla\CMS\HTML\HTMLHelper::_('behavior.keepalive');

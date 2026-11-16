@@ -4237,6 +4237,301 @@ class flexicontent_html
 	}
 
 	/**
+	 * Get the WHERE conditions (array) selecting the reviews that the current user can see, for the given items:
+	 * the public sees published + approved reviews with text, the author also sees his own (pending) review,
+	 * and moderators (users that can change the state of the reviewed content) also see the pending reviews
+	 *
+	 * @param   object   $db         The database object
+	 * @param   array    $item_ids   The ids of the reviewed items
+	 *
+	 * @return  array    The WHERE conditions
+	 */
+	static function reviewsVisibleWhere($db, $item_ids)
+	{
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
+		$uid      = (int) $user->id;
+		$item_ids = array_values(array_unique(array_map('intval', (array) $item_ids)));
+
+		$visible = array('r.approved = 1');
+
+		if ($uid)
+		{
+			$visible[] = 'r.user_id = ' . $uid;
+
+			$moderated = array();
+
+			foreach ($item_ids as $_id)
+			{
+				if ($user->authorise('core.edit.state', 'com_content.article.' . $_id))
+				{
+					$moderated[] = $_id;
+				}
+			}
+
+			if ($moderated)
+			{
+				$visible[] = 'r.content_id IN (' . implode(',', $moderated) . ')';
+			}
+		}
+
+		return array(
+			'r.type = ' . $db->Quote('item'),
+			'r.state = 1',
+			'CHAR_LENGTH(TRIM(r.text)) > 0',
+			'r.content_id IN (' . ($item_ids ? implode(',', $item_ids) : '0') . ')',
+			'(' . implode(' OR ', $visible) . ')',
+		);
+	}
+
+
+	/**
+	 * Get the number of (visible) reviews of the given items, with a single query (used for the reviews counter)
+	 *
+	 * @param   array    $item_ids   The ids of the reviewed items
+	 *
+	 * @return  array    Array of item id => number of reviews
+	 */
+	static function getItemReviewCounts($item_ids)
+	{
+		static $counts = array();
+
+		$item_ids = array_values(array_unique(array_map('intval', (array) $item_ids)));
+		$missing  = array_values(array_diff($item_ids, array_keys($counts)));
+
+		if ($missing)
+		{
+			$db = \Joomla\CMS\Factory::getDbo();
+
+			$query = $db->getQuery(true)
+				->select('r.content_id, COUNT(*) AS total')
+				->from('#__flexicontent_reviews AS r')
+				->where(static::reviewsVisibleWhere($db, $missing))
+				->group('r.content_id');
+
+			$found = $db->setQuery($query)->loadAssocList('content_id', 'total');
+
+			foreach ($missing as $_id)
+			{
+				$counts[$_id] = (int) ($found[$_id] ?? 0);
+			}
+		}
+
+		return array_intersect_key($counts, array_flip($item_ids));
+	}
+
+
+	/**
+	 * Get the number of stars (1 to $stars) of the rating of a review, rating = percentage (0 - 100)
+	 * Same rounding as the SQL condition of reviewStarWhere()
+	 *
+	 * @param   int|float  $percent  The rating of the review as a percentage
+	 * @param   int        $stars    The number of stars of the rating
+	 *
+	 * @return  int  The number of stars, 0 if the review has no rating
+	 */
+	static function reviewStarBucket($percent, $stars = 5)
+	{
+		return (int) $percent > 0 ? max(1, (int) round($percent * max(1, (int) $stars) / 100)) : 0;
+	}
+
+
+	/**
+	 * SQL condition: the review has the given rating (number of stars), used by the filter of the reviews list
+	 *
+	 * @param   int   $star    The number of stars to match
+	 * @param   int   $stars   The number of stars of the rating
+	 *
+	 * @return  string  The SQL condition
+	 */
+	static function reviewStarWhere($star, $stars = 5)
+	{
+		return '(r.average_rating > 0 AND GREATEST(1, ROUND(r.average_rating * ' . max(1, (int) $stars) . ' / 100)) = ' . (int) $star . ')';
+	}
+
+
+	/**
+	 * Get the distribution of the ratings of the (visible) reviews of an item: number of reviews for each number of stars
+	 *
+	 * @param   int   $item_id   The id of the reviewed item
+	 * @param   int   $stars     The number of stars of the rating
+	 *
+	 * @return  array  Array of stars => number of reviews, for 1 to $stars (reviews without rating are not counted)
+	 */
+	static function getItemReviewDistribution($item_id, $stars = 5)
+	{
+		$stars = max(1, (int) $stars);
+		$db    = \Joomla\CMS\Factory::getDbo();
+
+		$query = $db->getQuery(true)
+			->select('CAST(GREATEST(1, ROUND(r.average_rating * ' . $stars . ' / 100)) AS UNSIGNED) AS stars, COUNT(*) AS total')
+			->from('#__flexicontent_reviews AS r')
+			->where(static::reviewsVisibleWhere($db, array($item_id)))
+			->where('r.average_rating > 0')
+			->group('stars');
+
+		$found = $db->setQuery($query)->loadAssocList('stars', 'total') ?: array();
+		$dist  = array();
+
+		for ($s = 1; $s <= $stars; $s++)
+		{
+			$dist[$s] = (int) ($found[$s] ?? 0);
+		}
+
+		return $dist;
+	}
+
+
+	/**
+	 * Get the review of the current (logged) user for the given item
+	 *
+	 * @param   int   $item_id   The id of the reviewed item
+	 *
+	 * @return  object|null   The review (with the author name) or null
+	 */
+	static function getItemOwnReview($item_id)
+	{
+		$uid = (int) \Joomla\CMS\Factory::getApplication()->getIdentity()->id;
+
+		if (!$uid)
+		{
+			return null;
+		}
+
+		$db = \Joomla\CMS\Factory::getDbo();
+
+		$query = $db->getQuery(true)
+			->select('r.*')
+			->select('u.name AS author_name')
+			->from('#__flexicontent_reviews AS r')
+			->join('LEFT', '#__users AS u ON u.id = r.user_id')
+			->where(static::reviewsVisibleWhere($db, array($item_id)))
+			->where('r.user_id = ' . $uid)
+			->order('r.id DESC');
+
+		return $db->setQuery($query, 0, 1)->loadObject() ?: null;
+	}
+
+
+	/**
+	 * Get a page of the reviews of an item, newest first, without the review of the current user (it is displayed separately)
+	 *
+	 * @param   int   $item_id   The id of the reviewed item
+	 * @param   int   $offset    Number of reviews to skip
+	 * @param   int   $limit     Number of reviews to return
+	 * @param   int   $star      Return only the reviews with this rating (number of stars), 0: all reviews
+	 * @param   int   $stars     The number of stars of the rating
+	 *
+	 * @return  array   The reviews (with the author name)
+	 */
+	static function getItemReviewsPage($item_id, $offset, $limit, $star = 0, $stars = 5)
+	{
+		$uid = (int) \Joomla\CMS\Factory::getApplication()->getIdentity()->id;
+		$db  = \Joomla\CMS\Factory::getDbo();
+
+		$query = $db->getQuery(true)
+			->select('r.*')
+			->select('u.name AS author_name')
+			->from('#__flexicontent_reviews AS r')
+			->join('LEFT', '#__users AS u ON u.id = r.user_id')
+			->where(static::reviewsVisibleWhere($db, array($item_id)))
+			->order('r.submit_date DESC, r.id DESC');
+
+		if ($uid)
+		{
+			$query->where('r.user_id <> ' . $uid);
+		}
+
+		// Only the reviews with the given rating (number of stars)
+		if ((int) $star > 0)
+		{
+			$query->where(static::reviewStarWhere($star, $stars));
+		}
+
+		return $db->setQuery($query, max(0, (int) $offset), max(1, (int) $limit))->loadObjectList() ?: array();
+	}
+
+
+	/**
+	 * Identify the voter of the 'useful' votes of reviews: logged users by user id, guests by IP address
+	 *
+	 * @return  array   array(user id, ip), the ip is empty for logged users
+	 */
+	static function getReviewVoterKey()
+	{
+		$uid = (int) \Joomla\CMS\Factory::getApplication()->getIdentity()->id;
+
+		return array($uid, $uid ? '' : substr((string) ($_SERVER['REMOTE_ADDR'] ?? ''), 0, 50));
+	}
+
+
+	/**
+	 * Get the 'useful' votes of the current user (or guest IP) for the given reviews
+	 *
+	 * @param   array   $review_ids   The ids of the reviews
+	 *
+	 * @return  array   Array of review id => 1 (useful) or 0 (not useful), reviews without a vote are not included
+	 */
+	static function getReviewUsefulVotes($review_ids)
+	{
+		$review_ids = array_values(array_unique(array_filter(array_map('intval', (array) $review_ids))));
+
+		if (!$review_ids)
+		{
+			return array();
+		}
+
+		list($uid, $ip) = static::getReviewVoterKey();
+
+		if (!$uid && $ip === '')
+		{
+			return array();
+		}
+
+		$db = \Joomla\CMS\Factory::getDbo();
+
+		$query = $db->getQuery(true)
+			->select('review_id, vote')
+			->from('#__flexicontent_reviews_useful')
+			->where('review_id IN (' . implode(',', $review_ids) . ')')
+			->where('user_id = ' . $uid)
+			->where('ip = ' . $db->Quote($ip));
+
+		return array_map('intval', $db->setQuery($query)->loadAssocList('review_id', 'vote'));
+	}
+
+
+	/**
+	 * Get the number of stars used for the ratings of reviews (same as the voting field)
+	 *
+	 * @return  int  The number of stars (1 to 10)
+	 *
+	 * @since   3.3.0
+	 */
+	static function reviewStarsCount()
+	{
+		static $stars = null;
+
+		if ($stars === null)
+		{
+			$stars = 5;
+			$db    = \Joomla\CMS\Factory::getDbo();
+			$field = $db->setQuery('SELECT * FROM #__flexicontent_fields WHERE field_type = ' . $db->Quote('voting'))->loadObject();
+
+			if ($field)
+			{
+				$item = (object) array('type_id' => 0);
+				FlexicontentFields::loadFieldConfig($field, $item);
+
+				$resolution = max(5, min(100, (int) $field->parameters->get('rating_resolution', 5)));
+				$stars      = (int) $field->parameters->get('rating_stars', 5);
+				$stars      = max(1, min(10, $stars > 0 ? min($stars, $resolution) : $resolution));
+			}
+		}
+
+		return $stars;
+	}
+
+	/**
 	 * Creates a read-only display of rating stars (e.g. for the rating of a review)
 	 *
 	 * @param   int     $percent  The rating as a percentage (0 - 100)
@@ -4292,29 +4587,8 @@ class flexicontent_html
 		$int_xid = (int) $xid;
 		$item_id = $field->item_id;
 		$review_type = 'item';
-		// Show the review button only if reviews are enabled and new submissions are allowed
+		// Reviews are enabled and new submissions are allowed (the review button / list is displayed by the reviews list of the field)
 		$add_review_form = (int) ($field->parameters->get('allow_reviews', 0) && $field->parameters->get('allow_submit_review_by', 0));
-		$review_btn_label_new  = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_THIS_ITEM');
-		$review_btn_label_edit = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_EDIT_YOURS');
-		$review_btn_label = $review_btn_label_new;
-
-		// A logged user that has already reviewed this item, can edit / delete his review (instead of adding another)
-		if ($add_review_form && ($review_uid = (int) \Joomla\CMS\Factory::getApplication()->getIdentity()->id))
-		{
-			$review_db = \Joomla\CMS\Factory::getDbo();
-			$review_q  = $review_db->getQuery(true)
-				->select('COUNT(*)')
-				->from('#__flexicontent_reviews')
-				->where('content_id = ' . (int) $field->item_id)
-				->where('type = ' . $review_db->Quote($review_type))
-				->where('user_id = ' . $review_uid)
-				->where('CHAR_LENGTH(TRIM(text)) > 0');
-
-			if ((int) $review_db->setQuery($review_q)->loadResult())
-			{
-				$review_btn_label = $review_btn_label_edit;
-			}
-		}
 
 
 		// Get extra voting option (composite voting)
@@ -4430,17 +4704,6 @@ class flexicontent_html
 		return '
 		<div class="' . $field->name . '-group">
 			' . $html . '
-			'.($add_review_form ? '
-			<div class="fcvote_review_row">
-				<input type="button" class="btn btn-primary fcvote_toggle_review_form"
-					data-tagid="fcvote_review_form_box_'.$item_id.'"
-					data-label-new="'.htmlspecialchars($review_btn_label_new, ENT_COMPAT, 'UTF-8').'"
-					data-label-edit="'.htmlspecialchars($review_btn_label_edit, ENT_COMPAT, 'UTF-8').'"
-					onclick="fcvote_open_review_form(\'fcvote_review_form_box_'.$item_id.'\', '.$item_id.', \''.$review_type.'\', this)"
-					value="'.htmlspecialchars($review_btn_label, ENT_COMPAT, 'UTF-8').'"/>
-				<div id="fcvote_review_form_box_'.$item_id.'_loading" class="fcvote_review_form_box_loading"></div>
-				<div id="fcvote_review_form_box_'.$item_id.'" class="fcvote_review_form_box" style="display:none;"></div>
-			</div>' : '').'
 		</div>';
 	}
 
@@ -4760,12 +5023,19 @@ class flexicontent_html
 				}
 			}
 
-			$dovote_class = ' hasTooltip ' . ($has_acclvl ? 'fc_dovote' : '');
+			$dovote_class = $has_acclvl ? 'fc_dovote' : '';
+
+			// Tooltip of the stars (e.g. 'Good 4/5'), it is displayed by fcvote.js (not by the tooltip library of the site: it was not hidden after clicking), can be disabled in the field configuration
+			$show_star_tips = (int) $field->parameters->get('stars_tooltips', 1);
 
 			for ($i = 1; $i <= $rating_resolution; $i++)
 			{
+				$tip_attrs = $show_star_tips
+					? ' data-fcvote-tip="' . htmlspecialchars($star_tooltips[$i], ENT_QUOTES, 'UTF-8') . '" aria-label="' . htmlspecialchars($star_tooltips[$i], ENT_QUOTES, 'UTF-8') . '"'
+					: '';
+
 				$html_vote_links .= '
-					<li class="voting-links"><a onclick="'.$onclick.'" href="'.$href.'" title="'.$star_tooltips[$i].'" class="'.$dovote_class.' '.$star_classes[$i].'" data-rel="'.$id.'_'.$xid.'">'.$i.'</a></li>';
+					<li class="voting-links"><a onclick="'.$onclick.'" href="'.$href.'"'.$tip_attrs.' class="'.$dovote_class.' '.$star_classes[$i].'" data-rel="'.$id.'_'.$xid.'">'.$i.'</a></li>';
 			}
 		}
 
