@@ -671,8 +671,11 @@ class ParentClassItem extends FCModelAdmin
 				// Decide to limit to CURRENT CATEGORY
 				$limit_to_cid = $this->_cid ? ' AND rel.catid = '. (int) $this->_cid : ' AND rel.catid = i.catid';
 
-				// Get voting resolution (not needed when no item of the site has votes: the rating columns below will be NULL)
-				$rating_resolution = FlexicontentFields::_hasItemData('votes') ? (int)$this->getVotingResolution() : 5;
+				// Rating data are loaded only if items of the site have votes and the voting field is published
+				$load_rating = FlexicontentFields::_hasItemData('votes');
+
+				// Get voting resolution
+				$rating_resolution = $load_rating ? (int)$this->getVotingResolution() : 0;
 
 				// *******************************
 				// Initialize and create the query
@@ -690,7 +693,10 @@ class ParentClassItem extends FCModelAdmin
 				$query->select('ua.name AS author');                                       // Author data
 
 				// Rating count, Rating & Score
-				$query->select('v.rating_count as rating_count, ROUND( v.rating_sum / v.rating_count ) AS rating, ((v.rating_sum / v.rating_count)*'.(100 / $rating_resolution).') as score');
+				$query->select($load_rating
+					? 'v.rating_count as rating_count, ROUND( v.rating_sum / v.rating_count ) AS rating, ((v.rating_sum / v.rating_count)*'.(100 / $rating_resolution).') as score'
+					: 'NULL AS rating_count, NULL AS rating, NULL AS score'
+				);
 
 				// Item and Current Category slugs (for URL)
 				$query->select('CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug');
@@ -1001,8 +1007,9 @@ class ParentClassItem extends FCModelAdmin
 					->from('#__flexicontent_tags_item_relations')
 					->where('itemid = ' . (int) $pk);
 
-				// Skip the query when no item of the site has a tag
-				$item->tags = FlexicontentFields::_hasItemData('tags') ? $db->setQuery($query)->loadColumn() : array();
+				// Skip the query when no item of the site has a tag. The tag ids are also used by the item form,
+				// so they are loaded even if the tags field is unpublished ($check_field = false)
+				$item->tags = FlexicontentFields::_hasItemData('tags', false) ? $db->setQuery($query)->loadColumn() : array();
 				$item->tags = array_reverse($item->tags);
 			}
 
@@ -4297,7 +4304,7 @@ class ParentClassItem extends FCModelAdmin
 			return array();
 		}
 
-		// No item of the site has votes: same result as the 2 queries below, without running them
+		// No item of the site has votes, or the voting field is unpublished: do not run the 2 queries below
 		if (!FlexicontentFields::_hasItemData('votes') && !FlexicontentFields::_hasItemData('extravotes'))
 		{
 			return array();
@@ -6280,7 +6287,7 @@ class ParentClassItem extends FCModelAdmin
 		}
 		elseif (!isset($record->rating_count) || !isset($record->rating) || !isset($record->score))
 		{
-			// No item of the site has votes: this item has no rating data, no need to query them
+			// No item of the site has votes, or the voting field is unpublished: no rating data to query
 			if (!FlexicontentFields::_hasItemData('votes'))
 			{
 				$rating_data = null;

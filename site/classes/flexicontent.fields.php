@@ -1530,7 +1530,7 @@ class FlexicontentFields
 		if (empty($cids)) return array();
 		$cids = ArrayHelper::toInteger($cids);
 
-		// No item of this site has a tag: same result as the query below, without running it
+		// No item of this site has a tag, or the tags field is unpublished: do not run the queries below
 		if (!FlexicontentFields::_hasItemData('tags')) return array();
 
 		$query = 'SELECT t.tid, t.itemid'
@@ -1680,7 +1680,7 @@ class FlexicontentFields
 		$cids = array();
 		foreach ($items as $item) { array_push($cids, $item->id); }
 
-		// Favourites via DB (skipped when no item of this site is a favourite of any user: same result, an empty list)
+		// Favourites via DB (skipped when no item of this site is a favourite of any user, or the favourites field is unpublished)
 		if (FlexicontentFields::_hasItemData('favourites'))
 		{
 			$query 	= 'SELECT DISTINCT itemid, 1 AS favs FROM #__flexicontent_favourites'
@@ -1720,7 +1720,7 @@ class FlexicontentFields
 		$cids = array();
 		foreach ($items as $item) { array_push($cids, $item->id); }
 
-		// Favourites via DB (skipped when no item of this site is a favourite of any user: same result, an empty list)
+		// Favourites via DB (skipped when no item of this site is a favourite of any user, or the favourites field is unpublished)
 		if (FlexicontentFields::_hasItemData('favourites'))
 		{
 			$query 	= 'SELECT DISTINCT itemid, 1 AS fav FROM #__flexicontent_favourites'
@@ -1909,12 +1909,16 @@ class FlexicontentFields
 	 * A single query per page view finds which of these DB tables are empty, so that the respective
 	 * queries of _getTags(), _getFavourites(), _getFavoured(), _getVotes() can be skipped (their result is known: empty)
 	 *
-	 * @param   string   $name   The kind of item data
+	 * The same query also finds if the core field that displays these data (tags, favourites, voting) is published.
+	 * An unpublished core field is never displayed, so by default its data are not loaded either
 	 *
-	 * @return	boolean  False only when it is known that no item has such data
+	 * @param   string   $name          The kind of item data
+	 * @param   boolean  $check_field   False to ignore the published state of the respective core field
+	 *
+	 * @return	boolean  False only when it is known that no item has such data, or that the respective core field is unpublished
 	 * @since	5.3
 	 */
-	static function _hasItemData($name)
+	static function _hasItemData($name, $check_field = true)
 	{
 		static $usage = null;
 
@@ -1932,6 +1936,9 @@ class FlexicontentFields
 				. ', EXISTS (SELECT 1 FROM #__flexicontent_favourites WHERE type = 0) AS favourites'
 				. ', EXISTS (SELECT 1 FROM #__content_rating) AS votes'
 				. ', EXISTS (SELECT 1 FROM #__flexicontent_items_extravote) AS extravotes'
+				. ', EXISTS (SELECT 1 FROM #__flexicontent_fields WHERE iscore = 1 AND published = 1 AND field_type = ' . $db->Quote('tags') . ') AS tags_field'
+				. ', EXISTS (SELECT 1 FROM #__flexicontent_fields WHERE iscore = 1 AND published = 1 AND field_type = ' . $db->Quote('favourites') . ') AS favourites_field'
+				. ', EXISTS (SELECT 1 FROM #__flexicontent_fields WHERE iscore = 1 AND published = 1 AND field_type = ' . $db->Quote('voting') . ') AS voting_field'
 				;
 
 			try
@@ -1945,7 +1952,21 @@ class FlexicontentFields
 			}
 		}
 
-		return !isset($usage[$name]) || (int) $usage[$name] !== 0;
+		// No item of the site has such data
+		if (isset($usage[$name]) && (int) $usage[$name] === 0)
+		{
+			return false;
+		}
+
+		// The core field that displays these data is unpublished
+		static $field_of = array('tags' => 'tags_field', 'favourites' => 'favourites_field', 'votes' => 'voting_field', 'extravotes' => 'voting_field');
+
+		if ($check_field && isset($field_of[$name]) && isset($usage[$field_of[$name]]) && (int) $usage[$field_of[$name]] === 0)
+		{
+			return false;
+		}
+
+		return true;
 	}
 
 
@@ -2022,7 +2043,7 @@ class FlexicontentFields
 			array_push($cids, $item->id);
 		}
 
-		// No item of this site has votes: same result as the 2 queries below, without running them
+		// No item of this site has votes, or the voting field is unpublished: do not run the 2 queries below
 		$has_votes = FlexicontentFields::_hasItemData('votes');
 		$has_extra = FlexicontentFields::_hasItemData('extravotes');
 
