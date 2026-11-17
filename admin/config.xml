@@ -2076,8 +2076,8 @@
 			</field>
 
 			<field name="dashboard_buttons_hide" type="fccheckbox" default="" display_useglobal="0" cols="4.1"
-				checkoptions="FLEXI_ITEMS,FLEXI_NEW_ITEM,FLEXI_CATEGORIES,FLEXI_NEW_CATEGORY,FLEXI_COMMENTS,FLEXI_TYPES,FLEXI_ADD_TYPE,FLEXI_FIELDS,FLEXI_ADD_FIELD,FLEXI_TAGS,FLEXI_NEW_TAG,FLEXI_FILES,FLEXI_TEMPLATES,FLEXI_INDEX,FLEXI_STATISTICS,FLEXI_USERS,FLEXI_ADD_USER,FLEXI_GROUPS,FLEXI_ADD_GROUP,FLEXI_IMPORT,Plugins-Fields,Plugins-System,Plugins-Flexicontent"
-				checkvals="items,additem,cats,addcat,comments,types,addtype,fields,addfield,tags,addtag,files,templates,index,stats,users,adduser,groups,addgroup,import,plgfields,plgsystem,plgflexicontent"
+				checkoptions="FLEXI_ITEMS,FLEXI_NEW_ITEM,FLEXI_CATEGORIES,FLEXI_NEW_CATEGORY,FLEXI_COMMENTS,FLEXI_TYPES,FLEXI_ADD_TYPE,FLEXI_FIELDS,FLEXI_ADD_FIELD,FLEXI_TAGS,FLEXI_NEW_TAG,FLEXI_FILES,FLEXI_TEMPLATES,FLEXI_INDEX,FLEXI_STATISTICS,FLEXI_USERS,FLEXI_ADD_USER,FLEXI_GROUPS,FLEXI_ADD_GROUP,FLEXI_IMPORT,Plugins-Fields,Plugins-System,Plugins-Flexicontent,FLEXI_REVIEWS"
+				checkvals="items,additem,cats,addcat,comments,types,addtype,fields,addfield,tags,addtag,files,templates,index,stats,users,adduser,groups,addgroup,import,plgfields,plgsystem,plgflexicontent,reviews"
 				defaultvals=""
 				label="FLEXI_DASH_HIDE_BTNS" description="FLEXI_DASH_HIDE_BTNS_DESC" />
 			<field name="dashboard_sliders_disable" type="fccheckbox" default="" display_useglobal="0"

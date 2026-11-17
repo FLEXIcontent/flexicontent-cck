@@ -161,6 +161,7 @@ class FlexicontentModelReview extends FCModelAdmin
 		$record->id							= 0;
 		$record->content_id			= $this->getState('content_id');
 		$record->type						= $this->getState('review_type');
+		$record->name					= '';
 		$record->email					= $this->getState('email');
 		$record->title					= '';
 		$record->text						= '';
@@ -212,15 +213,35 @@ class FlexicontentModelReview extends FCModelAdmin
 
 		$isNew    = empty($this->_record->id);
 		$isLogged = (bool) \Joomla\CMS\Factory::getUser()->id;
+
+		// Ratings of the characteristics are used only if composite voting is enabled
+		if (!flexicontent_html::getVotingCharacteristics(flexicontent_html::getVotingFieldConfig()))
+		{
+			$form->removeField('custom_ratings');
+		}
 		
 		$readonlyFields = array();
 		$hiddenFields   = array();
 		
+		// The reviewed item and the reviewer (user or guest) can be selected only when creating a new review
+		if (!$isNew)
+		{
+			foreach (array('content_id', 'user_id') as $fieldname)
+			{
+				$form->setFieldAttribute($fieldname, 'type', 'text');
+				$form->setFieldAttribute($fieldname, 'class', 'readonly');
+				$form->setFieldAttribute($fieldname, 'readonly', 'true');
+				$form->setFieldAttribute($fieldname, 'filter', 'unset');
+			}
+		}
+
 		// Only allow email to guests to admins
 		if ((!$isNew || $isLogged) && !$this->canManage)
 		{
 			$readonlyFields[]= 'email';
 			$hiddenFields[]  = 'email';
+			$readonlyFields[]= 'name';
+			$hiddenFields[]  = 'name';
 		}
 
 		if (!$this->canManage)
@@ -472,6 +493,9 @@ class FlexicontentModelReview extends FCModelAdmin
 		// Validate title, decode entities, and strip HTML
 		$data['title'] = flexicontent_html::dataFilter($data['title'], $maxlength=255, 'STRING', 0);
 
+		// Validate name: required for guests, logged users are identified by their account
+		$data['name'] = $user->id ? '' : trim(flexicontent_html::dataFilter(isset($data['name']) ? $data['name'] : '', $maxlength=100, 'STRING', 0));
+
 		// Validate email
 		$data['email'] = $user->id ? $user->email : flexicontent_html::dataFilter($data['email'], $maxlength=255, 'EMAIL', 0);
 
@@ -486,6 +510,12 @@ class FlexicontentModelReview extends FCModelAdmin
 		if (!$content_id)
 		{
 			$this->setError('Content being reviewed not given (content_id is zero)');
+			return false;
+		}
+
+		if (!$user->id && $data['name'] === '')
+		{
+			$this->setError(\Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_NAME'));
 			return false;
 		}
 

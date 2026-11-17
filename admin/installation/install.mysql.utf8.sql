@@ -63,6 +63,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_reviews` (
   `average_rating` int NOT NULL,
   `custom_ratings` text NULL,
   `user_id` int(11) NOT NULL DEFAULT '0',
+  `name` varchar(255) NOT NULL DEFAULT '',
   `email` varchar(255) NOT NULL DEFAULT '',
   `title` varchar(255) NULL,
   `title_old` varchar(255) NULL,
@@ -89,6 +90,16 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_reviews` (
   KEY `verified` (`verified`),
   KEY `useful_yes` (`useful_yes`),
   KEY `useful_no` (`useful_no`)
+) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+
+CREATE TABLE IF NOT EXISTS `#__flexicontent_reviews_useful` (
+  `review_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL DEFAULT '0',
+  `ip` varchar(50) NOT NULL DEFAULT '',
+  `vote` tinyint(1) NOT NULL DEFAULT '1',
+  `vote_date` datetime NOT NULL,
+  PRIMARY KEY  (`review_id`, `user_id`, `ip`),
+  KEY `user_id` (`user_id`)
 ) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_fields` (

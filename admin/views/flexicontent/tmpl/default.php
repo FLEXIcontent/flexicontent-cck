@@ -32,12 +32,28 @@ $dashboard_buttons_hide = FLEXIUtilities::paramToArray($dashboard_buttons_hide);
 $sbtns = array_flip($dashboard_buttons_hide);
 $skip_content_fieldset = isset($sbtns['items']) && isset($sbtns['additem']) && isset($sbtns['cats']) && isset($sbtns['addcat']) && isset($sbtns['comments']);
 $skip_types_fieldset   = isset($sbtns['types']) && isset($sbtns['addtype']) && isset($sbtns['fields']) && isset($sbtns['addfield']) && isset($sbtns['tags']) && isset($sbtns['addtag']) && isset($sbtns['files']);
-$skip_viewing_fieldset = isset($sbtns['templates']) && isset($sbtns['index']) && isset($sbtns['stats']);
+// Reviews button: show only if reviews are enabled in the voting field and user can manage reviews
+$showReviews = false;
+
+if (!isset($sbtns['reviews']) && $this->perms->CanReviews && file_exists(JPATH_ADMINISTRATOR . '/components/com_flexicontent/views/reviews'))
+{
+	$rv_db    = \Joomla\CMS\Factory::getDbo();
+	$rv_field = $rv_db->setQuery('SELECT * FROM #__flexicontent_fields WHERE field_type = ' . $rv_db->Quote('voting'))->loadObject();
+
+	if ($rv_field)
+	{
+		$rv_item = (object) array('type_id' => 0);
+		FlexicontentFields::loadFieldConfig($rv_field, $rv_item);
+		$showReviews = (int) $rv_field->parameters->get('allow_reviews', 0) > 0;
+	}
+}
+
+$skip_viewing_fieldset = isset($sbtns['templates']) && isset($sbtns['index']) && isset($sbtns['stats']) && !$showReviews;
 $skip_users_fieldset   = isset($sbtns['users']) && isset($sbtns['adduser']) && isset($sbtns['groups']) && isset($sbtns['addgroup']);
 $skip_expert_fieldset  = isset($sbtns['import']) && isset($sbtns['plgfields']) && isset($sbtns['plgsystem']) && isset($sbtns['plgflexicontent']);
 
 $sectionTypes   = $this->perms->CanTypes || $this->perms->CanFields || $this->perms->CanTags || $this->perms->CanFiles;
-$sectionViewing = $this->perms->CanTemplates || $this->perms->CanIndex || $this->perms->CanStats;
+$sectionViewing = $this->perms->CanTemplates || $this->perms->CanIndex || $this->perms->CanStats || $showReviews;
 $sectionUsers   = $this->perms->CanAuthors || $this->perms->CanGroups;
 $sectionExpert  = $this->perms->CanPlugins || $this->perms->CanImport;
 
@@ -357,6 +373,16 @@ $items_task = 'task=items.';
 
 				$link = 'index.php?option='.$option.'&amp;view=stats';
 				FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-chart', \Joomla\CMS\Language\Text::_( 'FLEXI_STATISTICS' ) );
+				$add_sep = true;
+			}
+
+			if ($showReviews)
+			{
+				if ($add_sep)
+					echo '<span class="fc-board-button_sep"></span>';
+
+				$link = 'index.php?option='.$option.'&amp;view=reviews';
+				FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-comments-2', \Joomla\CMS\Language\Text::_( 'FLEXI_REVIEWS' ) );
 			}
 			?>
 			</div>

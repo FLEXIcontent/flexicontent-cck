@@ -309,9 +309,6 @@ class plgFlexicontent_fieldsCore extends FCField
 
 					if ($allow_reviews)
 					{
-						// Get item's reviews. Pass items to avoid multiple queries ...
-						$reviews = $this->_getReviews($items, $item);
-
 						// Placement of reviews
 						$reviews_placement = (int) $field->parameters->get('reviews_placement', 0);
 					}
@@ -1308,56 +1305,5 @@ class plgFlexicontent_fieldsCore extends FCField
 				$this->_catTreeRecurse($cat->id, $cats, $display_filter_as, 0, $start_depth, $filter_depth);
 			}
 		}
-	}
-
-
-	/**
-	 * Function to get review records of and item
-	 *
-	 * @param	  array	   $property	 Current set of items. To get reviews via single query
-	 * @param	  object   $item		   The item for which to return its reviews
-	 *
-	 * @return	array    The reviews of $item
-	 * 
-	 */
-	private function _getReviews($items, $item)
-	{
-		static $item_reviews = null;
-
-		if (!isset($item_reviews[$item->id]))
-		{
-			$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
-
-			$item_ids = array();
-
-			foreach($items as $item)
-			{
-				$item_ids[] = (int) $item->id;
-			}
-
-			$query = $db->getQuery(true)
-				->select('*')
-				->from('#__flexicontent_reviews')
-				->where('content_id IN (' . implode(',', $item_ids) . ')')
-				->where('type = ' . $db->Quote('item'));
-
-			$rvdata = $db->setQuery($query)->loadObjectList();
-
-			foreach($rvdata as $r)
-			{
-				$item_reviews[$r->content_id][] = $r;
-			}
-
-			// This is need for future isset checks
-			foreach($items as $item)
-			{
-				if (!isset($item_reviews[$item->id]))
-				{
-					$item_reviews[$item->id] = array();
-				}
-			}
-		}
-
-		return $item_reviews[$item->id];
 	}
 }

@@ -466,6 +466,20 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 	</footer>
 	<?php endif; ?>
 
+	<?php
+	/**
+	 * Reviews list of the 'voting' field, used when the field parameter 'Reviews list placement' is set to 'Inline',
+	 * the stars and the reviews button are displayed where the field was placed, and the list is displayed here
+	 * (the 'voting' field must be in a field position or in the 'renderonly' position of the template)
+	 */
+	if (!empty($item->fields['voting']->display_reviews)) : ?>
+		<!-- BOF reviews list -->
+		<section class="fc_reviews_list">
+			<?php echo $item->fields['voting']->display_reviews; ?>
+		</section>
+		<!-- EOF reviews list -->
+	<?php endif; ?>
+
 	<?php echo $mainAreaTag == 'section' ? '</article>' : ''; ?>
 
 	<?php if ($this->params->get('comments') && !\Joomla\CMS\Factory::getApplication()->input->getInt('print', 0)) : ?>
