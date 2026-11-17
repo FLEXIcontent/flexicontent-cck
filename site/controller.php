@@ -973,7 +973,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			// Save review into DB
 			if (!$review->store())
 			{
-				$errors[] = \Joomla\CMS\Language\Text::sprintf('FLEXI_VOTE_REVIEW_ERR_STORE', $review->getError());
+				$errors[] = \Joomla\CMS\Language\Text::sprintf('FLEXI_VOTE_REVIEW_ERR_STORE', htmlspecialchars((string) $review->getError(), ENT_QUOTES, 'UTF-8'));
 			}
 		}
 
@@ -1081,7 +1081,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 				if (!$review->store())
 				{
-					$errors[] = \Joomla\CMS\Language\Text::sprintf('FLEXI_VOTE_REVIEW_ERR_STORE', $review->getError());
+					$errors[] = \Joomla\CMS\Language\Text::sprintf('FLEXI_VOTE_REVIEW_ERR_STORE', htmlspecialchars((string) $review->getError(), ENT_QUOTES, 'UTF-8'));
 				}
 
 				// The rating of the review is also the user's vote, remove it from the item's rating
@@ -1611,7 +1611,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 			if (!$review->store())
 			{
-				$errors[] = \Joomla\CMS\Language\Text::sprintf('FLEXI_VOTE_REVIEW_ERR_STORE', $review->getError());
+				$errors[] = \Joomla\CMS\Language\Text::sprintf('FLEXI_VOTE_REVIEW_ERR_STORE', htmlspecialchars((string) $review->getError(), ENT_QUOTES, 'UTF-8'));
 			}
 		}
 
@@ -1720,7 +1720,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 			if (!$review->store())
 			{
-				$errors[] = \Joomla\CMS\Language\Text::sprintf('FLEXI_VOTE_REVIEW_ERR_STORE', $review->getError());
+				$errors[] = \Joomla\CMS\Language\Text::sprintf('FLEXI_VOTE_REVIEW_ERR_STORE', htmlspecialchars((string) $review->getError(), ENT_QUOTES, 'UTF-8'));
 			}
 			elseif ($action === 'trash')
 			{

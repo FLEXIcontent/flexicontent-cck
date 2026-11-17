@@ -164,6 +164,13 @@
 	 *  It does not depend on the tooltip library of the site, and it is hidden when the mouse leaves the star, when the vote is made, or on scrolling
 	 * ================================================================ */
 
+	// Escapes text that is inserted as HTML
+	function fcvote_esc(text) {
+		var d = document.createElement('div');
+		d.textContent = String(text);
+		return d.innerHTML;
+	}
+
 	var fcvote_tip_el = null;
 
 	function fcvote_hide_tooltip(el) {
@@ -413,7 +420,7 @@
 		})
 		.catch(function(err) {
 			if (!box.parentNode) return;
-			box.innerHTML = '<div class="fc-mssg fc-warning fc-nobgimage">Error: ' + (err.message || err) + '</div>';
+			box.innerHTML = '<div class="fc-mssg fc-warning fc-nobgimage">Error: ' + fcvote_esc(err.message || err) + '</div>';
 		});
 
 		return overlay;
@@ -753,7 +760,7 @@
 		})
 		.catch(function(err) {
 			if (!box.parentNode) return;
-			box.innerHTML = '<div class="fc-mssg fc-warning fc-nobgimage">Error: ' + (err.message || err) + '</div>';
+			box.innerHTML = '<div class="fc-mssg fc-warning fc-nobgimage">Error: ' + fcvote_esc(err.message || err) + '</div>';
 		});
 
 		return false;
@@ -931,7 +938,7 @@
 		})
 		.catch(function(err) {
 			if (!box.parentNode) return;
-			box.innerHTML = '<div class="fc-mssg fc-warning fc-nobgimage">Error: ' + (err.message || err) + '</div>';
+			box.innerHTML = '<div class="fc-mssg fc-warning fc-nobgimage">Error: ' + fcvote_esc(err.message || err) + '</div>';
 		});
 
 		return false;
@@ -1444,15 +1451,26 @@
 	function fcvote_refresh_page() {
 		var wraps = document.querySelectorAll('.fcvote-field[data-item]');
 		var ids = [];
+		var live = true;
 
 		for (var i = 0; i < wraps.length; i++) {
 			var id = wraps[i].getAttribute('data-item');
 			if (ids.indexOf(id) < 0) ids.push(id);
+			if (wraps[i].getAttribute('data-live') === '0') live = false;
 		}
 
 		function fallback() {
 			fcvote_toast_after_reload(window.fcvote_last_toast || '');
 			window.location.reload();
+		}
+
+		// Field option 'live update' is disabled: the page is reloaded, when the last window is closed (not while a window is open)
+		if (!live) {
+			if (fcvote_open_overlays().length) {
+				window.fcvote_reviews_changed = true;
+				return;
+			}
+			return fallback();
 		}
 
 		if (!ids.length) return fallback();

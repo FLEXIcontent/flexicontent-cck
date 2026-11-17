@@ -1259,6 +1259,10 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="reviews_live_update" type="radio" default="1" label="FLEXI_FIELD_VOTE_REVIEWS_LIVE_UPDATE" description="FLEXI_FIELD_VOTE_REVIEWS_LIVE_UPDATE_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			<field name="reviews_store_rating" type="radio" default="0" label="FLEXI_FIELD_VOTE_REVIEWS_STORE_RATING" description="FLEXI_FIELD_VOTE_REVIEWS_STORE_RATING_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>

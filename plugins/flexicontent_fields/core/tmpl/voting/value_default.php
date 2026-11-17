@@ -524,7 +524,7 @@ if ($allow_reviews)
 	// Container of the stars and the reviews button: it is replaced by fcvote.js when the reviews change (without reloading the page)
 	if (!$rv_list_only)
 	{
-		$field->{$prop} = '<div class="fcvote-field" data-item="' . $rv_item_id . '">' . $field->{$prop} . '</div>';
+		$field->{$prop} = '<div class="fcvote-field" data-item="' . $rv_item_id . '" data-live="' . ((int) $field->parameters->get('reviews_live_update', 1) ? 1 : 0) . '">' . $field->{$prop} . '</div>';
 	}
 
 
