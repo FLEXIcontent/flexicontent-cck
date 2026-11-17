@@ -1327,6 +1327,27 @@ div table.fc-table-list tr:nth-child(odd) td {
 [data-bs-theme="dark"] .select2-container-multi.select2-dropdown-open .select2-choices .select2-search-field input.select2-input {
   background: #282c33 !important;
 }
+/* About FLEXIcontent credits */
+[data-bs-theme="dark"] div#fc-dash-sliders {
+  background: var(--body-bg);
+}
+[data-bs-theme="dark"] div#fc-dash-credits #fc-dash-logo {
+  background: #fff;
+  border-radius: 6px;
+}
+[data-bs-theme="dark"] div#fc-dash-credits #fc-dash-license {
+  color: var(--body-color) !important;
+  background: var(--body-bg) !important;
+  border-color: var(--border-color) !important;
+  border-left-color: var(--template-bg-dark-40) !important;
+}
+[data-bs-theme="dark"] #flexicontent fieldset.fc-board-set div.fc-board-set-inner {
+  border-top-color: var(--border-color);
+}
+[data-bs-theme="dark"] div#fc-dash-credits #fc-dash-devs .label:not(.bg-info) {
+  color: var(--body-color);
+  background: var(--template-bg-dark-60);
+}
 .buttons.btn-group.fc-iblock.dropdown {
   margin-left: inherit !important;
   width: inherit !important;

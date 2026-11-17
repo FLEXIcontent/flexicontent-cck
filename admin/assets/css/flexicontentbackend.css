@@ -5574,6 +5574,7 @@ div#fc-dash-credits #fc-dash-license {
 }
 div#fc-dash-credits #fc-dash-devs {
   display: inline-flex;
+  flex-wrap: wrap;
 }
 div#fc-dash-credits #fc-dash-devs > .fc-mssg-inline {
   vertical-align: top;

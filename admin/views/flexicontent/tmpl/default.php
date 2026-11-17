@@ -820,6 +820,27 @@ $items_task = 'task=items.';
 						</span>
 
 						<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box">
+							<span class="label <?php echo $tooltip_class;?>" title="Core Developer">Yannick Berges</span><br/><br/>
+							<a class="<?php echo $btn_class.' btn-small '.$tooltip_class;?>" style="" href="http://com3elles.com/" target="_blank" title="<?php echo flexicontent_html::getToolTip("Com'3Elles", "Com'3Elles, agence de communication, conseil et formations", 0, 1); ?>">
+								com3elles.com
+							</a>
+						</span>
+
+						<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box">
+							<span class="label <?php echo $tooltip_class;?>" title="Developer / Contributor">iamrobert Digital Design</span><br/><br/>
+							<a class="<?php echo $btn_class.' btn-small '.$tooltip_class;?>" style="" href="https://www.iamrobert.com/" target="_blank" title="iamrobert Digital Design">
+								iamrobert.com
+							</a>
+						</span>
+
+						<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box">
+							<span class="label <?php echo $tooltip_class;?>" title="Developer / Contributor">Roman Lipatov</span><br/><br/>
+							<a class="<?php echo $btn_class.' btn-small '.$tooltip_class;?>" style="" href="https://github.com/lipatovroman" target="_blank" title="Roman Lipatov on GitHub">
+								github.com/lipatovroman
+							</a>
+						</span>
+
+						<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box">
 							<span class="label text-white bg-info label-info <?php echo $tooltip_class;?>" title="Core Developer">Marvelic Engine</span><br/><br/>
 							<a class="<?php echo $btn_class.' btn-small '.$tooltip_class;?>" style="" href="http://www.marvelic.co.th" target="_blank" title="<?php echo flexicontent_html::getToolTip("Marvelic Engine", "Marvelic Engine is a Joomla consultancy based in Bangkok, Thailand. Support services include consulting, Joomla implementation, training, and custom extensions development.", 0, 1); ?>">
 								marvelic.co.th
@@ -828,13 +849,6 @@ $items_task = 'task=items.';
 
 						<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box">
 							<span class="label <?php echo $tooltip_class;?>" title="Core Developer">Suriya Kaewmungmuang</span>
-						</span>
-
-						<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box">
-							<span class="label <?php echo $tooltip_class;?>" title="Core Developer">Yannick Berges</span><br/><br/>
-							<a class="<?php echo $btn_class.' btn-small '.$tooltip_class;?>" style="" href="http://com3elles.com/" target="_blank" title="<?php echo flexicontent_html::getToolTip("Com'3Elles", "Com'3Elles, agence de communication, conseil et formations", 0, 1); ?>">
-								com3elles.com
-							</a>
 						</span>
 
 						<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box">
