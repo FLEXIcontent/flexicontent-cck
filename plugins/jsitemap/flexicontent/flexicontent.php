@@ -24,6 +24,10 @@ class JMapFilePluginFLEXIcontent implements JMapFilePlugin {
 	 * Retrieves records for the plugin data source using whatever way and resource is required
 	 * Formats and returns an associative array of data based on the following scheme  
 	 *
+	 * The parameter types repeat JSitemap's interface (JMapFilePlugin) and must stay as they are: JSitemap
+	 * registers JRegistry, JDatabase, JMapModel and JMapException as class aliases before it calls this method.
+	 * Everything else here uses the namespaced Joomla classes, so no other legacy alias is needed.
+	 *
 	 * @param JRegistry The object holding configuration parameters for the plugin and data source
 	 * @param JDatabase $db The database connector object
 	 * @param JMapModel $sitemapModel The sitemap model object reference, it's needed to manage limitStart, limitRows properties and affected_rows state
@@ -55,21 +59,23 @@ class JMapFilePluginFLEXIcontent implements JMapFilePlugin {
 
 		// Check if the extension is installed
 		if(!file_exists(JPATH_SITE . '/components/com_flexicontent')) {
-			throw new JMapException(JText::sprintf('COM_JMAP_ERROR_EXTENSION_NOTINSTALLED', 'FLEXIcontent'), 'warning');
+			throw new JMapException(\Joomla\CMS\Language\Text::sprintf('COM_JMAP_ERROR_EXTENSION_NOTINSTALLED', 'FLEXIcontent'), 'warning');
 		}
 		
 		// The associative array holding the returned data
 		$returndata = array();
 		
 		// Get user
-		$user = JFactory::getUser();
+		$app  = \Joomla\CMS\Factory::getApplication();
+		$user = $app->getIdentity()
+			?: \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById(0);  // no identity: a guest
 		if(!is_object($user)) {
-			throw new JMapException(JText::_('COM_JMAP_PLGFLEXICONTENT_NOUSER_OBJECT'), 'warning');
+			throw new JMapException(\Joomla\CMS\Language\Text::_('COM_JMAP_PLGFLEXICONTENT_NOUSER_OBJECT'), 'warning');
 		}
 
 		// Get access level and language
 		$accessLevel = $user->getAuthorisedViewLevels();
-		$langTag = JFactory::getLanguage()->getTag();
+		$langTag = $app->getLanguage()->getTag();
 		
 		// Category scope
 		$catScope = $pluginParams->get('cats_scope', 1);
@@ -122,12 +128,6 @@ class JMapFilePluginFLEXIcontent implements JMapFilePlugin {
 			$items = $db->setQuery($itemsQuery, $sitemapModel->limitStart, $sitemapModel->limitRows)->loadObjectList();
 		}
 		
-		if(method_exists($db, 'getErrorNum')) {
-			if ($db->getErrorNum ()) {
-				throw new JMapException(JText::sprintf('COM_JMAP_ERROR_RETRIEVING_DATA_FROM_PLUGIN_DATASOURCE', $db->getErrorMsg()), 'warning');
-			}
-		}
-		
 		// Detected a precaching call, we have to store in the model state the number of affected rows for the JS application
 		if($sitemapModel->limitRows) {
 			$sitemapModel->setState('affected_rows', count($items));
@@ -143,7 +143,7 @@ class JMapFilePluginFLEXIcontent implements JMapFilePlugin {
 		if(count($items)) {
 			$itemsByCats = array();
 			foreach ($items as $item) {
-				$item->link = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->id . ':' . $item->alias, $item->catid));
+				$item->link = \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getItemRoute($item->id . ':' . $item->alias, $item->catid));
 				// First pass organize items by containing cats
 				$itemsByCats[$item->catid][] = $item;
 			}
@@ -167,11 +167,6 @@ class JMapFilePluginFLEXIcontent implements JMapFilePlugin {
 						->where('language in (' . $db->q($langTag) . ',' . $db->q('*') . ')');
 		
 		$totalItemsCats = $db->setQuery($catsQuery)->loadObjectList();
-		if (method_exists ( $db, 'getErrorNum' )) {
-			if ($db->getErrorNum ()) {
-				throw new JMapException ( JText::sprintf ( 'COM_JMAP_ERROR_RETRIEVING_DATA_FROM_PLUGIN_DATASOURCE', $db->getErrorMsg () ), 'warning' );
-			}
-		}
 		
 		$catsTreeQuery = $db->getQuery(true)
 							->select('parent_id AS ' . $db->qn('parent'))
@@ -181,13 +176,6 @@ class JMapFilePluginFLEXIcontent implements JMapFilePlugin {
 		
 		$totalItemsCatsTree = $db->setQuery($catsTreeQuery)->loadAssocList('child');
 		
-		if(method_exists($db, 'getErrorNum')) {
-			if ($db->getErrorNum ())
-			{
-				throw new JMapException(JText::sprintf('COM_JMAP_ERROR_RETRIEVING_DATA_FROM_PLUGIN_DATASOURCE', $db->getErrorMsg()), 'warning');
-			}
-		}
-		
 		// Second pass organize the categories tree by parent -> children
 		$catsTree = array();
 		if (count ( $totalItemsCats )) {
@@ -195,7 +183,7 @@ class JMapFilePluginFLEXIcontent implements JMapFilePlugin {
 			$linkableCats = $pluginParams->get('linkable_content_cats', 0);
 			foreach ( $totalItemsCats as &$childCat ) {
 				if($linkableCats) {
-					$childCat->category_link = JRoute::_ (FlexicontentHelperRoute::getCategoryRoute($childCat->category_id . ':' . $childCat->category_alias));
+					$childCat->category_link = \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getCategoryRoute($childCat->category_id . ':' . $childCat->category_alias));
 				}
 				$parent = $totalItemsCatsTree [$childCat->category_id] ['parent'];
 				$parentCat = ($parent == 1) ? 0 : $parent;
