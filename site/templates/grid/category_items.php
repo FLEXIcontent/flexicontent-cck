@@ -57,7 +57,10 @@ if (!function_exists('fc_cat_make_picture_from_thumbs')) {
 		if (!$main_url) return '';
 
 		$size_order  = ['small', 'medium', 'large'];
-		$size_widths = ['small' => 480, 'medium' => 768, 'large' => 1200];
+
+		// The srcset width descriptors must be the real widths of the thumbnails: use the image field's configured
+		// widths, passed in $urls['widths'] (fixed guesses of 480/768/1200 made phones pick the 120px small thumbnail)
+		$size_widths = (!empty($urls['widths']) ? $urls['widths'] : array()) + ['small' => 120, 'medium' => 400, 'large' => 800];
 
 		// Construire le chemin filesystem depuis un chemin relatif ou une URL absolue
 		// JPATH_SITE = /home/.../realestate/demoj4
@@ -691,6 +694,8 @@ if ($leadnum) :
 						'medium'   => $img_field->thumbs_src['medium'][0]   ?? '',
 						'large'    => $img_field->thumbs_src['large'][0]    ?? '',
 						'original' => $img_field->thumbs_src['original'][0] ?? '',
+						// Real thumbnail widths, for the srcset width descriptors
+						'widths'   => !empty($img_field->parameters) ? [ 'small' => (int) $img_field->parameters->get('w_s', 120), 'medium' => (int) $img_field->parameters->get('w_m', 400), 'large' => (int) $img_field->parameters->get('w_l', 800) ] : [],
 					];
 				}
 				unset($_lead_original_src, $_raw);
@@ -1258,6 +1263,8 @@ if ($count > $leadnum) :
 						'medium'   => $img_field->thumbs_src['medium'][0]   ?? '',
 						'large'    => $img_field->thumbs_src['large'][0]    ?? '',
 						'original' => $img_field->thumbs_src['original'][0] ?? '',
+						// Real thumbnail widths, for the srcset width descriptors
+						'widths'   => !empty($img_field->parameters) ? [ 'small' => (int) $img_field->parameters->get('w_s', 120), 'medium' => (int) $img_field->parameters->get('w_m', 400), 'large' => (int) $img_field->parameters->get('w_l', 800) ] : [],
 					];
 				}
 				unset($_intro_original_src, $_raw);

@@ -101,7 +101,14 @@ class modFlexicontentHelper
 		// Construire les srcsets en exploitant small/medium/large si disponibles et existants
 		// On ne construit le srcset que pour les tailles <= à la taille demandée
 		$size_order  = ['small', 'medium', 'large'];
-		$size_widths = ['small' => 480, 'medium' => 768, 'large' => 1200];
+
+		// The srcset width descriptors must be the real widths of the thumbnails, i.e. the image field's
+		// configured thumbnail widths (fixed guesses of 480/768/1200 made phones pick the 120px small thumbnail)
+		$size_widths = [
+			'small'  => (int) $img_field->parameters->get('w_s', 120),
+			'medium' => (int) $img_field->parameters->get('w_m', 400),
+			'large'  => (int) $img_field->parameters->get('w_l', 800),
+		];
 
 		$srcset_img  = [];
 		$srcset_webp = [];
@@ -149,15 +156,16 @@ class modFlexicontentHelper
 					}
 				} else {
 					// Taille demandée : desktop / taille de base
+					// The width descriptor is the image's own width; the display width goes into "sizes"
 					$desktop_w    = $display_w ?: $w;
-					$srcset_img[] = $_srcset_url($main_url) . ' ' . $desktop_w . 'w';
+					$srcset_img[] = $_srcset_url($main_url) . ' ' . $w . 'w';
 					$sizes_parts[] = $desktop_w . 'px';
 					$fallback_url  = $main_url;
 					if ($use_webp && !$_src_is_webp) {
 						$webp_fs  = preg_replace('/\.(jpe?g|png|gif)$/i', '.webp', $main_fs);
 						$webp_url = preg_replace('/\.(jpe?g|png|gif)$/i', '.webp', $main_url);
 						if (file_exists($webp_fs)) {
-							$srcset_webp[] = $_srcset_url($webp_url) . ' ' . $desktop_w . 'w';
+							$srcset_webp[] = $_srcset_url($webp_url) . ' ' . $w . 'w';
 						}
 					}
 				}
