@@ -1110,16 +1110,12 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 		if ($fc_performance_msg && $format === 'html') {
 			$html = $app->getBody();
 
-			$inline_js_close_btn = !FLEXI_J30GE ? 'onclick="this.parentNode.parentNode.removeChild(this.parentNode);"' : '';
-			$inline_css_close_btn = !FLEXI_J30GE ? 'float:right; display:block; font-size:18px; cursor: pointer;' : '';
-
 			$_replace_ = strpos($html, '<!-- fc_perf -->') ? '<!-- fc_perf -->' : '</body>';
 
 			$html = str_replace(
 				$_replace_,
 				'<div id="fc_perf_box" class="fc-mssg fc-info">' .
-					'<a class="close" data-dismiss="alert" ' . $inline_js_close_btn . ' style="' . $inline_css_close_btn . '" >&#215;</a>' .
-					(!empty($body_css_time) ? sprintf('** [Flexisystem PLG: Adding css classes to BODY: %.3f s]<br/>', $body_css_time / 1000000) : '') .
+					(!empty($body_css_time) ? sprintf('<div class="fc-perf-plugin-time">** [Flexisystem PLG: Adding css classes to BODY: %.3f s]</div>', $body_css_time / 1000000) : '') .
 					$fc_performance_msg .
 					'</div>' . "\n" . $_replace_,
 				$html

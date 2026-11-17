@@ -359,9 +359,9 @@ if ( $print_logging_info && $jinput->get('tmpl', '', 'cmd')!='component' && $for
 	$fields_render_times = FlexicontentFields::getFieldRenderTimes($fields_render_total);
 
 	$fc_jprof->mark('END: FLEXIcontent component: '.$_msg);
-	$msg = '<div style="font-family:tahoma!important; font-size:11px!important;">'. implode('<br/>', $fc_jprof->getbuffer()) .'</div>';
+	$msg = '<div class="fc-perf-summary">'. implode('<br/>', $fc_jprof->getbuffer()) .'</div>';
 
-	$msg .= '<div style="font-family:tahoma!important; font-size:11px!important;">';
+	$msg .= '<div class="fc-perf-details">';
 
 	if (isset($fc_run_times['initialize_component']))
 		$msg .= sprintf('<br/>-- [Initialize component: %.2f s] ', $fc_run_times['initialize_component']/1000000);
@@ -373,17 +373,17 @@ if ( $print_logging_info && $jinput->get('tmpl', '', 'cmd')!='component' && $for
 
 		$msg .= '<small>';
 		if (isset($fc_run_times['getExistMenuItems']))
-			$msg .= sprintf('<br/>&nbsp; &nbsp; &nbsp; - Default menu item for URLs : %.2f s ', $fc_run_times['getExistMenuItems']/1000000);
+			$msg .= sprintf('<br/>- Default menu item for URLs : %.2f s ', $fc_run_times['getExistMenuItems']/1000000);
 		if (isset($fc_run_times['getItemsBadLang']))
-			$msg .= sprintf('<br/>&nbsp; &nbsp; &nbsp; - Items language and translation associations: %.2f s ', $fc_run_times['getItemsBadLang']/1000000);
+			$msg .= sprintf('<br/>- Items language and translation associations: %.2f s ', $fc_run_times['getItemsBadLang']/1000000);
 		if (isset($fc_run_times['getItemsNoCat']))
-			$msg .= sprintf('<br/>&nbsp; &nbsp; &nbsp; - Items multi-category relations: %.2f s ', $fc_run_times['getItemsNoCat']/1000000);
+			$msg .= sprintf('<br/>- Items multi-category relations: %.2f s ', $fc_run_times['getItemsNoCat']/1000000);
 		if (isset($fc_run_times['checkCurrentVersionData']))
-			$msg .= sprintf('<br/>&nbsp; &nbsp; &nbsp; - Items current version data: %.2f s ', $fc_run_times['checkCurrentVersionData']/1000000);
+			$msg .= sprintf('<br/>- Items current version data: %.2f s ', $fc_run_times['checkCurrentVersionData']/1000000);
 		if (isset($fc_run_times['getItemCountingDataOK']))
-			$msg .= sprintf('<br/>&nbsp; &nbsp; &nbsp; - Items temporary accounting data: %.2f s ', $fc_run_times['getItemCountingDataOK']/1000000);
+			$msg .= sprintf('<br/>- Items temporary accounting data: %.2f s ', $fc_run_times['getItemCountingDataOK']/1000000);
 		if (isset($fc_run_times['checkInitialPermission']))
-			$msg .= sprintf('<br/>&nbsp; &nbsp; &nbsp; - ACL initial permissions: %.2f s ', $fc_run_times['checkInitialPermission']/1000000);
+			$msg .= sprintf('<br/>- ACL initial permissions: %.2f s ', $fc_run_times['checkInitialPermission']/1000000);
 		$msg .= '</small>';
 	}
 	// **** EOF: BACKEND SPECIFIC
@@ -488,17 +488,14 @@ if ( $print_logging_info && $jinput->get('tmpl', '', 'cmd')!='component' && $for
 	if (count($fields_render_times))
 	{
 		$msg .= sprintf('<br/><br/>-- [FC Fields Rendering: %.2f s] ', $fields_render_total/1000000);
-		$msg .= '<br/>';
+		$msg .= '<div class="fc-perf-grid">';
 
 		foreach($fields_render_times as $i => $_time)
 		{
-			$msg .=
-				'<div style="white-space:nowrap; float:left;'.($i%3==0 ? 'clear:both !important;' : '').'">'.
-					$fields_render_times[$i].
-				'</div>';
+			$msg .= '<div class="fc-perf-item">' . $fields_render_times[$i] . '</div>';
 		}
 
-		$msg .= '<br/><div class="fcclear"></div>';
+		$msg .= '</div>';
 	}
 
 	$msg .= '</div>';

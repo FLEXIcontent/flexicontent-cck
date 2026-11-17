@@ -354,9 +354,9 @@ if ( $print_logging_info && $jinput->get('tmpl', '', 'cmd')!='component' && $for
 	$filters_creation_times = FlexicontentFields::getFilterCreationTimes($filters_creation_total);
 
 	$fc_jprof->mark('END: FLEXIcontent component: '.$_msg);
-	$msg = '<div style="font-family:tahoma!important; font-size:11px!important;">'. implode('<br/>', $fc_jprof->getbuffer()) .'</div>';
+	$msg = '<div class="fc-perf-summary">'. implode('<br/>', $fc_jprof->getbuffer()) .'</div>';
 
-	$msg .= '<div style="font-family:tahoma!important; font-size:11px!important;">';
+	$msg .= '<div class="fc-perf-details">';
 
 	if (isset($fc_run_times['initialize_component']))
 		$msg .= sprintf('<br/>-- [Initialize component: %.2f s] ', $fc_run_times['initialize_component']/1000000);
@@ -468,17 +468,14 @@ if ( $print_logging_info && $jinput->get('tmpl', '', 'cmd')!='component' && $for
 	if (count($fields_render_times))
 	{
 		$msg .= sprintf('<br/><br/>-- [FC Fields Rendering: %.2f s] ', $fields_render_total/1000000);
-		$msg .= '<br/>';
+		$msg .= '<div class="fc-perf-grid">';
 
 		foreach($fields_render_times as $i => $_time)
 		{
-			$msg .=
-				'<div style="white-space:nowrap; float:left;'.($i%3==0 ? 'clear:both !important;' : '').'">'.
-					$fields_render_times[$i].
-				'</div>';
+			$msg .= '<div class="fc-perf-item">' . $fields_render_times[$i] . '</div>';
 		}
 
-		$msg .= '<br/><div class="fcclear"></div>';
+		$msg .= '</div>';
 	}
 
 	// **********************
@@ -486,16 +483,14 @@ if ( $print_logging_info && $jinput->get('tmpl', '', 'cmd')!='component' && $for
 	// **********************
 
 	if (count($filters_creation_times)) {
-		$msg .= sprintf('<br/>-- [FC Filters Creation: %.2f s] ', $filters_creation_total/1000000);
+		$msg .= sprintf('<br/><br/>-- [FC Filters Creation: %.2f s] ', $filters_creation_total/1000000);
 		if (isset($fc_run_times['create_filter_init'])) $msg .= sprintf('<br/> &nbsp; Filters Init: %.2f s ', $fc_run_times['create_filter_init']/1000000);
 
-		$msg .= '<br/>';
+		$msg .= '<div class="fc-perf-grid">';
 		foreach($filters_creation_times as $i => $_time) {
-			$msg .=
-				'<div style="white-space:nowrap; float:left;'.($i%3==0 ? 'clear:both !important;' : '').'" >'.
-					$filters_creation_times[$i].
-				'</div>';
+			$msg .= '<div class="fc-perf-item">' . $filters_creation_times[$i] . '</div>';
 		}
+		$msg .= '</div>';
 	}
 
 	$msg .= '</div>';
