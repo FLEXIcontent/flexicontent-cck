@@ -19,8 +19,6 @@
 // Check to ensure this file is included in Joomla!
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('cms.plugin.plugin');
-
 /**
  * Flexicontent Notification Plugin
  *
@@ -143,7 +141,7 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 
 			if (empty($owners_notified[$item->id]))
 			{
-				$owner = \Joomla\CMS\Factory::getUser($item->created_by);
+				$owner = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById((int) $item->created_by);
 				$this->sendOwnerNotification($item, $owner, $params);
 
 				// Set flag to avoid resending notification
@@ -247,10 +245,7 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 		// Get the route helper
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
 
-		// Import joomla mail helper class that contains the sendMail helper function
-		jimport('joomla.mail.helper');
-
-		$mailer = \Joomla\CMS\Factory::getMailer();
+		$mailer = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Mail\MailerFactoryInterface::class)->createMailer();
 		$mailer->Encoding = 'base64';
 
 		/**
@@ -388,10 +383,7 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 		// Get the route helper
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
 
-		// Import joomla mail helper class that contains the sendMail helper function
-		jimport('joomla.mail.helper');
-
-		$mailer = \Joomla\CMS\Factory::getMailer();
+		$mailer = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Mail\MailerFactoryInterface::class)->createMailer();
 		$mailer->Encoding = 'base64';
 
 		$debug_notifications = (int) $params->get('debug_notifications', 0);

@@ -64,10 +64,10 @@ if (version_compare(JVERSION, '4.0', 'ge'))
 }
 else
 {
-    \JLoader::register('FinderIndexerAdapter', JPATH_ADMINISTRATOR . '/components/com_finder/helpers/indexer/adapter.php');
-    \JLoader::register('FinderIndexerHelper', JPATH_ADMINISTRATOR . '/components/com_finder/helpers/indexer/helper.php');
-    \JLoader::register('FinderIndexer', JPATH_ADMINISTRATOR . '/components/com_finder/helpers/indexer/indexer.php');
-    \JLoader::register('FinderIndexerResult', JPATH_ADMINISTRATOR . '/components/com_finder/helpers/indexer/result.php');
+    require_once JPATH_ADMINISTRATOR . '/components/com_finder/helpers/indexer/adapter.php';
+    require_once JPATH_ADMINISTRATOR . '/components/com_finder/helpers/indexer/helper.php';
+    require_once JPATH_ADMINISTRATOR . '/components/com_finder/helpers/indexer/indexer.php';
+    require_once JPATH_ADMINISTRATOR . '/components/com_finder/helpers/indexer/result.php';
 
     class_alias(\FinderIndexerAdapter::class, Adapter::class);
     class_alias(\FinderIndexerResult::class, Result::class);

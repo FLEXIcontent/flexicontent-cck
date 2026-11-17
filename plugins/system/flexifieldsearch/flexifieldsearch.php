@@ -51,8 +51,9 @@ class PlgSystemFlexifieldsearch extends CMSPlugin
         }
 
         $doc = $this->app->getDocument();
-        $doc->addStyleDeclaration($this->getSearchCss());
-        $doc->addScriptDeclaration($this->getSearchJs());
+        $wa  = $doc->getWebAssetManager();
+        $wa->addInlineStyle($this->getSearchCss());
+        $wa->addInlineScript($this->getSearchJs());
     }
 
     private function getSearchCss(): string

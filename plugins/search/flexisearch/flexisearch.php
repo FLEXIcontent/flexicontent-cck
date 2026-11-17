@@ -19,7 +19,6 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('cms.plugin.plugin');
 
 require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 
@@ -148,10 +147,10 @@ class plgSearchFlexisearch extends \Joomla\CMS\Plugin\CMSPlugin
 	{
 		$db		= \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$app	= \Joomla\CMS\Factory::getApplication();
-		$user	= \Joomla\CMS\Factory::getUser();
+		$user	= $app->getIdentity();
 		
 		// Get language
-		$cntLang = substr(\Joomla\CMS\Factory::getLanguage()->getTag(), 0,2);  // Current Content language (Can be natively switched in J2.5)
+		$cntLang = substr($app->getLanguage()->getTag(), 0,2);  // Current Content language (Can be natively switched in J2.5)
 		$urlLang  = \Joomla\CMS\Factory::getApplication()->input->getWord('lang', '' );                 // Language from URL (Can be switched via Joomfish in J1.5)
 		$lang = (FLEXI_J16GE || empty($urlLang)) ? $cntLang : $urlLang;
 		

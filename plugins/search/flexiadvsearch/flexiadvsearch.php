@@ -22,7 +22,6 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-jimport('cms.plugin.plugin');
 
 require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 
@@ -125,7 +124,7 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 		$view   = $jinput->getCmd('view', '');
 
 		$db       = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
-		$user     = \Joomla\CMS\Factory::getUser();
+		$user     = $app->getIdentity();
 		$field_view_levels = array_map('intval', $user->getAuthorisedViewLevels());
 		$can_view_field = static function ($field) use ($field_view_levels) {
 			return !(int) $field->access || in_array((int) $field->access, $field_view_levels, true);
@@ -1031,7 +1030,7 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 			: 'flexicontent_advsearch_index';
 
 		// Try to add space between words for current language using a dictionary
-		$lang_handler = FlexicontentFields::getLangHandler(\Joomla\CMS\Factory::getLanguage()->getTag());
+		$lang_handler = FlexicontentFields::getLangHandler(\Joomla\CMS\Factory::getApplication()->getLanguage()->getTag());
 
 		if ($lang_handler)
 		{
@@ -1072,7 +1071,7 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 			 */
 			if ($filter_word_like_any
 				&& in_array(flexicontent_html::getUserCurrentLang(), array('zh', 'jp', 'ja', 'th'))
-				&& ! FlexicontentFields::getLangHandler(\Joomla\CMS\Factory::getLanguage()->getTag(), $_hasHandlerOnly = true)
+				&& ! FlexicontentFields::getLangHandler(\Joomla\CMS\Factory::getApplication()->getLanguage()->getTag(), $_hasHandlerOnly = true)
 			)
 			{
 				$_index_match = ' LOWER ('.$ts.'.search_index) LIKE '.$db->Quote( '%'.$escaped_text.'%', false );
@@ -1135,7 +1134,7 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 				case 'all':
 					$nospace_languages = array('th-TH');
 
-					$is_nospace_language = in_array(\Joomla\CMS\Factory::getLanguage()->getTag(), $nospace_languages);
+					$is_nospace_language = in_array(\Joomla\CMS\Factory::getApplication()->getLanguage()->getTag(), $nospace_languages);
 
 					// TODO check if not using the * for THAI is appropriate & needed
 					$newtext = $is_nospace_language
