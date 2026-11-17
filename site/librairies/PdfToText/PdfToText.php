@@ -981,7 +981,7 @@ abstract class  PdfObjectBase		// extends  Object
 						$count ++ ;
 					    }
 
-					$result		.=  chr ( $ord ) ;
+					$result		.=  chr ( $ord & 0xFF ) ;
 					$offset		 =  $backslash_index ;
 				    }
 			    }
@@ -1054,7 +1054,7 @@ abstract class  PdfObjectBase		// extends  Object
 
 							$i -- ;		// Count one character less since $i will be incremented at the end of the for() loop
 
-							$result .= chr ( $ord ) ;
+							$result .= chr ( $ord & 0xFF ) ;
 						    }
 						else
 							$result .=  $nch ;
@@ -3188,7 +3188,7 @@ class  PdfToText 	extends PdfObjectBase
     					$sum 	=  ( $sum * 85 ) + $ords [ $j ] ;
 
     				for ( $j = 3  ; $j  >=  0  ; $j -- )
-    					$result 	.=  chr ( $sum >> ( $j * 8 ) ) ;
+    					$result 	.=  chr ( ( $sum >> ( $j * 8 ) ) & 0xFF ) ;
 			    }
 		    }
 
@@ -3200,7 +3200,7 @@ class  PdfToText 	extends PdfObjectBase
     				$sum 	+= ( $ords [ $i ] + ( $i == $ord_count - 1 ) ) * $exp85 [$i] ;
 
     			for  ( $i = 0  ; $i  <  $ord_count - 1  ; $i++ )
-    				$result 	.=  chr ( $sum >> ( ( 3 - $i ) * 8 ) ) ;
+    				$result 	.=  chr ( ( $sum >> ( ( 3 - $i ) * 8 ) ) & 0xFF ) ;
     		    }
 
 		// All done, return
@@ -3713,7 +3713,7 @@ class  PdfToText 	extends PdfObjectBase
 												$digit_count ++ ;
 											    }
 
-											$ch1	=  chr ( octdec ( $oct ) ) ;
+											$ch1	=  chr ( octdec ( $oct ) & 0xFF ) ;
 											$i -- ;
 										    }
 									    }
@@ -3739,7 +3739,7 @@ class  PdfToText 	extends PdfObjectBase
 												$digit_count ++ ;
 											    }
 
-											$ch2	=  chr ( octdec ( $oct ) ) ;
+											$ch2	=  chr ( octdec ( $oct ) & 0xFF ) ;
 											$i -- ;
 										    }
 									    }
@@ -5216,7 +5216,7 @@ class  PdfToText 	extends PdfObjectBase
 									$digit_count ++ ;
 								    }
 
-								$ch1	=  chr ( octdec ( $oct ) ) ;
+								$ch1	=  chr ( octdec ( $oct ) & 0xFF ) ;
 								$i -- ;
 							    }
 						    }
@@ -5242,7 +5242,7 @@ class  PdfToText 	extends PdfObjectBase
 									$digit_count ++ ;
 								    }
 
-								$ch2	=  chr ( octdec ( $oct ) ) ;
+								$ch2	=  chr ( octdec ( $oct ) & 0xFF ) ;
 								$i -- ;
 							    }
 						    }
