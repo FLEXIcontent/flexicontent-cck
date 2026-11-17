@@ -60,6 +60,7 @@ namespace {
                 public $input;
                 public function __construct() { $this->input = new CsvParams([]); }
                 public function isClient($name) { return $name === 'site'; }
+                public function getIdentity() { return (object) ['id' => 0]; }
             };
             $field = static function ($id, $name, $label, $core = false, $allowed = true) {
                 return (object) ['id' => $id, 'name' => $name, 'label' => $label, 'field_type' => $core ? 'title' : 'selectmultiple', 'iscore' => $core, 'has_access' => $allowed, 'parameters' => new CsvParams(['include_in_csv_export' => 1])];

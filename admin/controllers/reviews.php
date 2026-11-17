@@ -260,7 +260,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		\Joomla\CMS\Session\Session::checkToken() or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		$cid    = $this->input->get('cid', array(), 'array');
 		$cid    = ArrayHelper::toInteger($cid);
@@ -326,7 +326,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 	public function edit()
 	{
 		$app      = \Joomla\CMS\Factory::getApplication();
-		$user     = \Joomla\CMS\Factory::getUser();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 		$document = \Joomla\CMS\Factory::getDocument();
 
@@ -590,7 +590,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 
 				if ($reviewer_id)
 				{
-					$reviewer = \Joomla\CMS\Factory::getUser($reviewer_id);
+					$reviewer = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById((int) $reviewer_id);
 
 					if (!$reviewer->id)
 					{
@@ -679,7 +679,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 
 		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
-		$user    = \Joomla\CMS\Factory::getUser();
+		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$user_id = (int) $user->id;
 		$isNew   = !$model->get('id');
 		$item  = (object) array('type_id' => empty($record->item_type_id) ? 0 : $record->item_type_id);
@@ -997,7 +997,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$field = $model->getVotingReviewsField($item, $setAsDefault = true);
 
 		/**
@@ -1037,7 +1037,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 	public function ajaxvote()
 	{
 		$app  = \Joomla\CMS\Factory::getApplication();
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$db   = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );

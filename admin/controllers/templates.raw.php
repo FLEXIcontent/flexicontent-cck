@@ -166,7 +166,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 		}
 
 		$app  = \Joomla\CMS\Factory::getApplication();
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$db   = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		// Get vars
@@ -607,7 +607,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 		}
 
 		$app  = \Joomla\CMS\Factory::getApplication();
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		$var['sysmssg'] = '';
 		$var['content'] = '';
@@ -724,7 +724,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 		}
 
 		$app  = \Joomla\CMS\Factory::getApplication();
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		$var['sysmssg'] = '';
 		$var['content'] = '';

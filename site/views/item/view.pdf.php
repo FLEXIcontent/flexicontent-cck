@@ -31,7 +31,7 @@ class FlexicontentViewItems extends \Joomla\CMS\MVC\View\HtmlView
 	function display($tpl = null)
 	{
 		$app        = \Joomla\CMS\Factory::getApplication();
-		$user       = \Joomla\CMS\Factory::getUser();
+		$user       = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$dispatcher = JEventDispatcher::getInstance();
 
 		// Initialize some variables

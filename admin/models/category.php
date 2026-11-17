@@ -469,7 +469,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 		$categoryId = $jinput->get('id');
 		$assetKey   = $categoryId ? $this->extension_proxy . '.category.' . $categoryId : $this->extension_proxy;
 
-		if (!\Joomla\CMS\Factory::getUser()->authorise('core.edit.state', $assetKey))
+		if (!\Joomla\CMS\Factory::getApplication()->getIdentity()->authorise('core.edit.state', $assetKey))
 		{
 			// Disable fields for display.
 			$form->setFieldAttribute('ordering', 'disabled', 'true');
@@ -521,7 +521,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 			// Convert the created and modified dates to local user time for display in the form.
 
 			$site_zone = \Joomla\CMS\Factory::getApplication()->get('offset');
-			$user_zone = \Joomla\CMS\Factory::getUser()->getParam('timezone', $site_zone);
+			$user_zone = \Joomla\CMS\Factory::getApplication()->getIdentity()->getParam('timezone', $site_zone);
 			$tz_string = $user_zone;
 			$tz = new DateTimeZone( $tz_string );
 
@@ -697,7 +697,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 	public function canEdit($record = null, $user = null)
 	{
 		$record  = $record ?: $this->_record;
-		$user    = $user ?: \Joomla\CMS\Factory::getUser();
+		$user    = $user ?: \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$asset   = $record && !$record->id ? $this->type_alias . '.' . $record->id : $this->option;
 		$isOwner = $record && $user->id && $record->created_user_id == $user->id;
 
@@ -718,7 +718,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 	public function canEditState($record = null, $user = null)
 	{
 		$record  = $record ?: $this->_record;
-		$user    = $user ?: \Joomla\CMS\Factory::getUser();
+		$user    = $user ?: \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$asset   = $record && !$record->id ? $this->type_alias . '.' . $record->id : $this->option;
 		$isOwner = $record && $user->id && $record->created_user_id == $user->id;
 
@@ -739,7 +739,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 	public function canDelete($record = null)
 	{
 		$record  = $record ?: $this->_record;
-		$user    = \Joomla\CMS\Factory::getUser();
+		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$asset   = $record && !$record->id ? $this->type_alias . '.' . $record->id : $this->option;
 		$isOwner = $record && $user->id && $record->created_user_id == $user->id;
 

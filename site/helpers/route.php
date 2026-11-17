@@ -305,7 +305,7 @@ class FlexicontentHelperRoute
 		if ( !self::$add_url_lang ) return;
 
 		// Get user's access levels
-		$user	= \Joomla\CMS\Factory::getUser();
+		$user	= \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$levels = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
 
 		// Get home page menu items according to language, and
@@ -1824,7 +1824,7 @@ class FlexicontentHelperRoute
 		);
 
 		self::$lookup[$language] = array();
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		foreach($component_menuitems[$language] as $menuitem)
 		{

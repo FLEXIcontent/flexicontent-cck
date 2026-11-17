@@ -100,7 +100,7 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 	 */
 	function getIndexedFieldJSON()
 	{
-		$user   = \Joomla\CMS\Factory::getUser();
+		$user   = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$app    = \Joomla\CMS\Factory::getApplication();
 		$jinput = $app->input;
 

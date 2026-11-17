@@ -38,7 +38,7 @@ class FlexicontentViewAppsman extends \Joomla\CMS\MVC\View\HtmlView
 		$task    = $jinput->get('task', '', 'cmd');
 
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
-		$user     = \Joomla\CMS\Factory::getUser();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$db       = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$document = \Joomla\CMS\Factory::getDocument();
 		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
@@ -268,7 +268,7 @@ class FlexicontentViewAppsman extends \Joomla\CMS\MVC\View\HtmlView
 	 */
 	function setToolbar($conf, $task)
 	{
-		$user     = \Joomla\CMS\Factory::getUser();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$document = \Joomla\CMS\Factory::getDocument();
 		$toolbar  = \Joomla\CMS\Toolbar\Toolbar::getInstance('toolbar');
 		$perms    = FlexicontentHelperPerm::getPerm();

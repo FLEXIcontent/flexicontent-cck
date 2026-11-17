@@ -212,7 +212,7 @@ class FlexicontentModelReview extends FCModelAdmin
 		 */
 
 		$isNew    = empty($this->_record->id);
-		$isLogged = (bool) \Joomla\CMS\Factory::getUser()->id;
+		$isLogged = (bool) \Joomla\CMS\Factory::getApplication()->getIdentity()->id;
 
 		// Ratings of the characteristics are used only if composite voting is enabled
 		if (!flexicontent_html::getVotingCharacteristics(flexicontent_html::getVotingFieldConfig()))
@@ -320,7 +320,7 @@ class FlexicontentModelReview extends FCModelAdmin
 		}
 
 		$record  = $record ?: $this->_record;
-		$user    = $user ?: \Joomla\CMS\Factory::getUser();
+		$user    = $user ?: \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$app     = \Joomla\CMS\Factory::getApplication();
 
 		$isOwner = $record && $record->user_id == $user->id;
@@ -395,7 +395,7 @@ class FlexicontentModelReview extends FCModelAdmin
 		}
 
 		$record  = $record ?: $this->_record;
-		$user    = $user ?: \Joomla\CMS\Factory::getUser();
+		$user    = $user ?: \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		return $this->canManage;
 	}
@@ -411,7 +411,7 @@ class FlexicontentModelReview extends FCModelAdmin
 	public function canDelete($record = null)
 	{
 		$record  = $record ?: $this->_record;
-		$user    = \Joomla\CMS\Factory::getUser();
+		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		return $this->canManage;
 	}
@@ -481,7 +481,7 @@ class FlexicontentModelReview extends FCModelAdmin
 	 */
 	public function reviewerValidation($data)
 	{
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$db   = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$review_id   = $data['id'];
@@ -572,7 +572,7 @@ class FlexicontentModelReview extends FCModelAdmin
 
 		if (count($cid))
 		{
-			$user     = \Joomla\CMS\Factory::getUser();
+			$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 			$cid_list = implode(',', $cid);
 
 			$query = $this->_db->getQuery(true)

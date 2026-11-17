@@ -48,7 +48,7 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 		$app      = \Joomla\CMS\Factory::getApplication();
 		$jinput   = $app->input;
 		$document = \Joomla\CMS\Factory::getDocument();
-		$user     = \Joomla\CMS\Factory::getUser();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 		$db       = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);

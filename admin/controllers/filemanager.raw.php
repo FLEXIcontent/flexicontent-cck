@@ -139,7 +139,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		}
 
 		// Clear previous log file
-		$log_filename      = 'filemanager_stats_indexer_' . \Joomla\CMS\Factory::getUser()->id . '.php';
+		$log_filename      = 'filemanager_stats_indexer_' . \Joomla\CMS\Factory::getApplication()->getIdentity()->id . '.php';
 		$log_filename_full = \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getApplication()->getConfig()->get('log_path') . DS . $log_filename);
 
 		if (file_exists($log_filename_full))
@@ -427,7 +427,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			}
 			if ($mediadata_err_count || $mediadata_file_count)
 			{
-				$session->set('mediadata_stats_log_filename', 'mediadata_stats_indexer_' . \Joomla\CMS\Factory::getUser()->id . '.php', 'flexicontent');
+				$session->set('mediadata_stats_log_filename', 'mediadata_stats_indexer_' . \Joomla\CMS\Factory::getApplication()->getIdentity()->id . '.php', 'flexicontent');
 			}
 
 
@@ -551,7 +551,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		header('Content-Type: application/json; charset=utf-8');
 		header('Cache-Control: no-cache');
 
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		if (!\Joomla\CMS\Session\Session::checkToken('request'))
 		{
@@ -571,7 +571,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 	 */
 	private function _orphansFile()
 	{
-		return \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getApplication()->getConfig()->get('tmp_path') . '/fc_orphans_' . (int) \Joomla\CMS\Factory::getUser()->id . '.json');
+		return \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getApplication()->getConfig()->get('tmp_path') . '/fc_orphans_' . (int) \Joomla\CMS\Factory::getApplication()->getIdentity()->id . '.json');
 	}
 
 

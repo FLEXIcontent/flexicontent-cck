@@ -91,7 +91,7 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 		}
 
 		// Clear previous log file
-		$log_filename = 'items_search_indexer_' . \Joomla\CMS\Factory::getUser()->id . '.php';
+		$log_filename = 'items_search_indexer_' . \Joomla\CMS\Factory::getApplication()->getIdentity()->id . '.php';
 		$log_filename_full = \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getApplication()->getConfig()->get('log_path') . DS . $log_filename);
 
 		if (file_exists($log_filename_full))

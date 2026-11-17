@@ -480,7 +480,7 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 		 * do not offer filters (with the list of their values) or text-search fields of fields that the user may not view
 		 */
 
-		$field_view_levels = array_map('intval', \Joomla\CMS\Factory::getUser()->getAuthorisedViewLevels());
+		$field_view_levels = array_map('intval', \Joomla\CMS\Factory::getApplication()->getIdentity()->getAuthorisedViewLevels());
 		$can_view_field = static function ($field) use ($field_view_levels)
 		{
 			return !(int) $field->access || in_array((int) $field->access, $field_view_levels, true);

@@ -39,7 +39,7 @@ class FlexicontentViewItem extends \Joomla\CMS\MVC\View\HtmlView
 		$jinput   = $app->input;
 
 		//initialize variables
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$aid   = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
 
 

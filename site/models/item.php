@@ -64,7 +64,7 @@ class FlexicontentModelItem extends ParentClassItem
 
 		global $globalcats;
 		$app  = \Joomla\CMS\Factory::getApplication();
-		$user	= \Joomla\CMS\Factory::getUser();
+		$user	= \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 		$uri  = \Joomla\CMS\Uri\Uri::getInstance();
 		$aid	= (int) $user->get('aid');
@@ -507,7 +507,7 @@ class FlexicontentModelItem extends ParentClassItem
 	 */
 	function getFavoured()
 	{
-		return flexicontent_db::getFavoured($type=0, $this->_id, \Joomla\CMS\Factory::getUser()->id);
+		return flexicontent_db::getFavoured($type=0, $this->_id, \Joomla\CMS\Factory::getApplication()->getIdentity()->id);
 	}
 
 
@@ -520,7 +520,7 @@ class FlexicontentModelItem extends ParentClassItem
 	 */
 	function removefav()
 	{
-		return flexicontent_db::removefav($type=0, $this->_id, \Joomla\CMS\Factory::getUser()->id);
+		return flexicontent_db::removefav($type=0, $this->_id, \Joomla\CMS\Factory::getApplication()->getIdentity()->id);
 	}
 
 
@@ -533,7 +533,7 @@ class FlexicontentModelItem extends ParentClassItem
 	 */
 	function addfav()
 	{
-		return flexicontent_db::addfav($type=0, $this->_id, \Joomla\CMS\Factory::getUser()->id);
+		return flexicontent_db::addfav($type=0, $this->_id, \Joomla\CMS\Factory::getApplication()->getIdentity()->id);
 	}
 
 }

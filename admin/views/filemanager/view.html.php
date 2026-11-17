@@ -43,7 +43,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 		$app      = \Joomla\CMS\Factory::getApplication();
 		$jinput   = $app->input;
 		$document = \Joomla\CMS\Factory::getDocument();
-		$user     = \Joomla\CMS\Factory::getUser();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 		$db       = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
@@ -716,7 +716,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 	 */
 	function setToolbar()
 	{
-		$user     = \Joomla\CMS\Factory::getUser();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$document = \Joomla\CMS\Factory::getDocument();
 		$toolbar  = \Joomla\CMS\Toolbar\Toolbar::getInstance('toolbar');
 		$perms    = FlexicontentHelperPerm::getPerm();
@@ -902,7 +902,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 				;
 		}
 
-		if ($perms->CanConfig && \Joomla\CMS\Factory::getUser()->authorise('flexicontent.deletefile', 'com_flexicontent'))
+		if ($perms->CanConfig && \Joomla\CMS\Factory::getApplication()->getIdentity()->authorise('flexicontent.deletefile', 'com_flexicontent'))
 		{
 			$popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&amp;view=filemanager&amp;layout=indexer&amp;tmpl=component&amp;indexer=orphans';
 			$btn_name = 'delete_orphans';

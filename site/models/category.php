@@ -203,7 +203,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 	protected function populateRecordState($ordering = null, $direction = null)
 	{
 		$app    = \Joomla\CMS\Factory::getApplication();
-		$user   = \Joomla\CMS\Factory::getUser();
+		$user   = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$jinput = $app->input;
 		$option = $jinput->get('option', '', 'cmd');
 		$view   = $jinput->get('view', '', 'cmd');
@@ -852,7 +852,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		if ( $this->_data_cats!==null ) return $this->_data_cats;
 
 		global $globalcats;
-		$user     = \Joomla\CMS\Factory::getUser();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$ordering = 'c.lft ASC';
 
 		$show_noauth = $this->_params->get('show_noauth', 0);   // show unauthorized items
@@ -926,7 +926,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 	 */
 	function _buildAccessSelect()
 	{
-		$user    = \Joomla\CMS\Factory::getUser();
+		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$show_noauth = $this->_params->get('show_noauth', 0);
 
 		$select_access = '';
@@ -1077,7 +1077,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		$app    = \Joomla\CMS\Factory::getApplication();
 		$jinput = $app->input;
 		$option = $this->getState('option');
-		$user		= \Joomla\CMS\Factory::getUser();
+		$user		= \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$db     = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
@@ -1666,7 +1666,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 	 */
 	function _buildChildsQuery($id=0)
 	{
-		$user    = \Joomla\CMS\Factory::getUser();
+		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$show_noauth = $this->_params->get('show_noauth', 0);   // Show unauthorized items
 
 		// Select only categories that user has view access, if listing of unauthorized content is not enabled
@@ -1768,7 +1768,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			return $counts;
 		}
 
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$db   = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		// Get the view's parameters
@@ -1882,7 +1882,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 	 */
 	function _getsubs($id)
 	{
-		$user			= \Joomla\CMS\Factory::getUser();
+		$user			= \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$show_noauth = $this->_params->get('show_noauth', 0);   // Show unauthorized items
 
 		// Where
@@ -1936,7 +1936,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			return array();
 		}
 
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$show_noauth = $this->_params->get('show_noauth', 0);   // Show unauthorized items
 
 		$where = ' WHERE c.published = 1'
@@ -2070,7 +2070,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 
 		// Initialize some vars
 		$app  = \Joomla\CMS\Factory::getApplication();
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		// Set a specific id
 		if ($pk)
@@ -3127,7 +3127,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 	 */
 	function getFavoured()
 	{
-		return flexicontent_db::getFavoured($type=1, $this->_id, \Joomla\CMS\Factory::getUser()->id);
+		return flexicontent_db::getFavoured($type=1, $this->_id, \Joomla\CMS\Factory::getApplication()->getIdentity()->id);
 	}
 
 
@@ -3140,7 +3140,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 	 */
 	function removefav()
 	{
-		return flexicontent_db::removefav($type=1, $this->_id, \Joomla\CMS\Factory::getUser()->id);
+		return flexicontent_db::removefav($type=1, $this->_id, \Joomla\CMS\Factory::getApplication()->getIdentity()->id);
 	}
 
 
@@ -3153,7 +3153,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 	 */
 	function addfav()
 	{
-		return flexicontent_db::addfav($type=1, $this->_id, \Joomla\CMS\Factory::getUser()->id);
+		return flexicontent_db::addfav($type=1, $this->_id, \Joomla\CMS\Factory::getApplication()->getIdentity()->id);
 	}
 
 

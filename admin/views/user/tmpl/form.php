@@ -684,7 +684,7 @@ $this->document->addScriptDeclaration($js);
 	<input type="hidden" name="view" value="user" />
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" name="contact_id" value="" />
-	<?php if (!\Joomla\CMS\Factory::getUser()->authorise('com_users', 'email_events')) : ?>
+	<?php if (!\Joomla\CMS\Factory::getApplication()->getIdentity()->authorise('com_users', 'email_events')) : ?>
 		<input type="hidden" name="sendEmail" value="0" />
 	<?php endif; ?>
 	<?php echo \Joomla\CMS\HTML\HTMLHelper::_( 'form.token' ); ?>

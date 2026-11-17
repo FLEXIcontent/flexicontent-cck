@@ -39,7 +39,7 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 		$params   = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 		$document	= \Joomla\CMS\Factory::getDocument();
 		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
-		$user     = \Joomla\CMS\Factory::getUser();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$db       = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$print_logging_info = $params->get('print_logging_info');
 

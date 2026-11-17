@@ -16,7 +16,7 @@ use Joomla\String\StringHelper;
 
 $app      = \Joomla\CMS\Factory::getApplication();
 $option   = $app->input->get('option', '', 'CMD');
-$user     = \Joomla\CMS\Factory::getUser();
+$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 $template = $app->getTemplate();
 $session  = \Joomla\CMS\Factory::getApplication()->getSession();
 $hlpname  = 'fcbase';

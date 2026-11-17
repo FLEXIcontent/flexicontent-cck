@@ -105,7 +105,7 @@ class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 	{
 		$app   = \Joomla\CMS\Factory::getApplication();
 		$model = $this->getModel($this->record_name);
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 
@@ -212,7 +212,7 @@ class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 	public function exportclear()
 	{
 		$app      = \Joomla\CMS\Factory::getApplication();
-		$user     = \Joomla\CMS\Factory::getUser();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 
 		// Calculate access
@@ -243,7 +243,7 @@ class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 	public function import()
 	{
 		$app      = \Joomla\CMS\Factory::getApplication();
-		$user     = \Joomla\CMS\Factory::getUser();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 		$document = \Joomla\CMS\Factory::getDocument();
 		$has_zlib = version_compare(PHP_VERSION, '5.4.0', '>=');
@@ -539,7 +539,7 @@ class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 	public function export()
 	{
 		$app      = \Joomla\CMS\Factory::getApplication();
-		$user     = \Joomla\CMS\Factory::getUser();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 		$document = \Joomla\CMS\Factory::getDocument();
 

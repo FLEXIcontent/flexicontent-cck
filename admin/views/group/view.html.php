@@ -43,7 +43,7 @@ class FlexicontentViewGroup extends FlexicontentViewBaseRecord
 		$app        = \Joomla\CMS\Factory::getApplication();
 		$jinput     = $app->input;
 		$document   = \Joomla\CMS\Factory::getDocument();
-		$user       = \Joomla\CMS\Factory::getUser();
+		$user       = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$db         = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$cparams    = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 		$perms      = FlexicontentHelperPerm::getPerm();
@@ -116,7 +116,7 @@ class FlexicontentViewGroup extends FlexicontentViewBaseRecord
 	{
 		\Joomla\CMS\Factory::getApplication()->input->set('hidemainmenu', 1);
 
-		$user		= \Joomla\CMS\Factory::getUser();
+		$user		= \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$isNew		= ($this->item->id == 0);
 		$canDo		= UsersHelper::getActions();
 

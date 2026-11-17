@@ -3,7 +3,7 @@
 
 defined('_JEXEC') or die;
 
-$user       = \Joomla\CMS\Factory::getUser();
+$user       = \Joomla\CMS\Factory::getApplication()->getIdentity();
 $input      = \Joomla\CMS\Factory::getApplication()->input;
 $params     = \Joomla\CMS\Component\ComponentHelper::getParams('com_media');
 $lang       = \Joomla\CMS\Factory::getLanguage();

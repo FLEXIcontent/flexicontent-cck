@@ -199,7 +199,7 @@ class FlexicontentControllerMediadatas extends FlexicontentControllerBaseAdmin
 		\Joomla\CMS\Session\Session::checkToken() or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		$cid    = $this->input->get('cid', array(), 'array');
 		$values = array('approved' => 1, 'unapproved' => 0);
@@ -252,7 +252,7 @@ class FlexicontentControllerMediadatas extends FlexicontentControllerBaseAdmin
 	public function edit()
 	{
 		$app      = \Joomla\CMS\Factory::getApplication();
-		$user     = \Joomla\CMS\Factory::getUser();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 		$document = \Joomla\CMS\Factory::getDocument();
 
@@ -472,7 +472,7 @@ class FlexicontentControllerMediadatas extends FlexicontentControllerBaseAdmin
 	public function ajaxvote()
 	{
 		$app  = \Joomla\CMS\Factory::getApplication();
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$db   = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );

@@ -471,7 +471,7 @@ class FlexicontentModelItems extends FCModelAdminList
 	 */
 	function getExtraCols()
 	{
-		$user   = \Joomla\CMS\Factory::getUser();
+		$user   = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		// Check if extra columns already calculated
 		if ( $this->_extra_cols !== null) return $this->_extra_cols;
@@ -548,7 +548,7 @@ class FlexicontentModelItems extends FCModelAdminList
 	function getCustomFilts()
 	{
 		$app     = \Joomla\CMS\Factory::getApplication();
-		$user    = \Joomla\CMS\Factory::getUser();
+		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$jinput  = $app->input;
 		$option  = $jinput->get('option', '', 'cmd');
 		$view    = $jinput->get('view', '', 'cmd');
@@ -1310,7 +1310,7 @@ class FlexicontentModelItems extends FCModelAdminList
 	function _buildContentJoinsWhere(& $extra_joins = '', $tmp_only = false)
 	{
 		$session = \Joomla\CMS\Factory::getApplication()->getSession();
-		$user    = \Joomla\CMS\Factory::getUser();
+		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$perms   = FlexicontentHelperPerm::getPerm();
 
 
@@ -2575,7 +2575,7 @@ class FlexicontentModelItems extends FCModelAdminList
 			->order('f.label, f.id');
 
 		$fields = array();
-		$user   = \Joomla\CMS\Factory::getUser();
+		$user   = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		foreach ($db->setQuery($query)->loadObjectList() as $row)
 		{
@@ -2629,7 +2629,7 @@ class FlexicontentModelItems extends FCModelAdminList
 	 */
 	function sendNotification($users, $item)
 	{
-		$sender = \Joomla\CMS\Factory::getUser();
+		$sender = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		// messaging for new items
 		require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_messages'.DS.'tables'.DS.'message.php');

@@ -270,7 +270,7 @@ class FlexicontentControllerTypes extends FlexicontentControllerBaseAdmin
 
 		// Initialize variables
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$task   = $this->input->get('task', 'copy', 'cmd');
 		$option = $this->input->get('option', '', 'cmd');
 
@@ -337,7 +337,7 @@ class FlexicontentControllerTypes extends FlexicontentControllerBaseAdmin
 		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		// Get model (NOTE: For this task we will use singular model)
 		$model = $this->getModel($this->record_name);

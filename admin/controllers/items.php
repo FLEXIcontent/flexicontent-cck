@@ -196,7 +196,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		// Initialize variables
 		$app     = \Joomla\CMS\Factory::getApplication();
 		$db      = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
-		$user    = \Joomla\CMS\Factory::getUser();
+		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$config  = \Joomla\CMS\Factory::getApplication()->getConfig();
 		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 		$perms   = FlexicontentHelperPerm::getPerm();
@@ -1298,7 +1298,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	public function edit()
 	{
 		$app      = \Joomla\CMS\Factory::getApplication();
-		$user     = \Joomla\CMS\Factory::getUser();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 		$document = \Joomla\CMS\Factory::getDocument();
 		$isAdmin  = $app->isClient('administrator');
@@ -1585,7 +1585,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		$app   = \Joomla\CMS\Factory::getApplication();
 		$model = $this->getModel($this->record_name_pl);
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		// Calculate ACL access
 		$is_authorised = $user->authorise('flexicontent.orderitems', 'com_flexicontent');
@@ -1660,7 +1660,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		$app   = \Joomla\CMS\Factory::getApplication();
 		$model = $this->getModel($this->record_name_pl);
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		// Calculate ACL access
 		$is_authorised = $user->authorise('flexicontent.orderitems', 'com_flexicontent');
@@ -1709,7 +1709,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$app   = \Joomla\CMS\Factory::getApplication();
 		$db    = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$model = $this->getModel($this->record_name_pl);
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		$cid = $this->input->get('cid', array(), 'array');
 		$cid = ArrayHelper::toInteger($cid);
@@ -2082,7 +2082,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$nochange  = array();
 		$propagated = array();  // associated items (outside the selection) that got values of non-translatable fields
 
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$can_checkin_others = $user->authorise('core.manage', 'com_checkin');
 
 		/**
@@ -2113,7 +2113,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			// Do not change items that are checked out by another user (unless user can check them in)
 			if (!empty($record->checked_out) && $record->checked_out != $user->id && !$can_checkin_others)
 			{
-				$locked[$item_id] = \Joomla\CMS\Factory::getUser($record->checked_out)->name;
+				$locked[$item_id] = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById((int) $record->checked_out)->name;
 				continue;
 			}
 
@@ -2480,7 +2480,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		\Joomla\CMS\Session\Session::checkToken() or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		$cid    = $this->input->get('cid', array(), 'array');
 		$values = array('featured' => 1, 'unfeatured' => 0);
@@ -2640,7 +2640,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
 		$app  = \Joomla\CMS\Factory::getApplication();
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		$id			= $this->input->getInt('id', 0);
 		$version	= $this->input->getInt('version', 0);
@@ -2717,7 +2717,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		// Initialize variables
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$isAdmin  = $app->isClient('administrator');
 
 		// Get model
@@ -2899,7 +2899,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		$id    = $this->input->get('id', 0, 'int');
 		$record_model = $this->getModel($this->record_name);
 		$tags  = $record_model->gettags();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		// Get tag ids if non-new item
 		$used = $id ? $record_model->getUsedtagsIds($id) : null;
@@ -2981,7 +2981,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		// Initialize variables
 		$app   = \Joomla\CMS\Factory::getApplication();
 		$db    = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		$cid = $this->input->get('cid', array(), 'array');
 		$cid = ArrayHelper::toInteger($cid);

@@ -61,7 +61,7 @@ class FlexicontentControllerGroup extends \Joomla\CMS\MVC\Controller\FormControl
 	 */
 	protected function allowSave($data, $key = 'id')
 	{
-		return (\Joomla\CMS\Factory::getUser()->authorise('core.admin', 'com_users') && parent::allowSave($data, $key));
+		return (\Joomla\CMS\Factory::getApplication()->getIdentity()->authorise('core.admin', 'com_users') && parent::allowSave($data, $key));
 	}
 
 	/**
@@ -82,7 +82,7 @@ class FlexicontentControllerGroup extends \Joomla\CMS\MVC\Controller\FormControl
 		if (\Joomla\CMS\Access\Access::checkGroup($data[$key], 'core.admin'))
 		{
 			// If I'm not a Super Admin, then disallow the edit.
-			if (!\Joomla\CMS\Factory::getUser()->authorise('core.admin'))
+			if (!\Joomla\CMS\Factory::getApplication()->getIdentity()->authorise('core.admin'))
 			{
 				return false;
 			}

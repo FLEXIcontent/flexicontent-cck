@@ -991,7 +991,7 @@ class flexicontent_db
 		$cid = \Joomla\CMS\Factory::getApplication()->input->get('cid', array(0), 'array');
 		$cid = ArrayHelper::toInteger($cid);
 
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$controller->setRedirect($redirect_url, '');
 
 		static $canCheckinRecords = null;
@@ -1392,7 +1392,7 @@ class flexicontent_db
 	static function canEditAssocItem($item_id, $user = null)
 	{
 		$item_id = (int) $item_id;
-		$user = $user ?: \Joomla\CMS\Factory::getUser();
+		$user = $user ?: \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$row = $db->setQuery('SELECT created_by, checked_out FROM #__content WHERE id = ' . $item_id)->loadObject();
@@ -1664,7 +1664,7 @@ class flexicontent_db
 				->createTable('Tag', 'Administrator');
 		}
 
-		$canCreate = \Joomla\CMS\Factory::getUser()->authorise('core.create', 'com_tags');
+		$canCreate = \Joomla\CMS\Factory::getApplication()->getIdentity()->authorise('core.create', 'com_tags');
 
 		foreach ($tags as $key => $tag)
 		{

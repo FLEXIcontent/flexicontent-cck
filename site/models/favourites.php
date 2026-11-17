@@ -84,7 +84,7 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 	{
 		$app    = \Joomla\CMS\Factory::getApplication();
 		$jinput = $app->input;
-		$user   = \Joomla\CMS\Factory::getUser();
+		$user   = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		$option = $jinput->getCmd('option', '');
 		$view   = $jinput->getCmd('view', '');
@@ -240,7 +240,7 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 	 */
 	function _buildQuery()
 	{
-		$user		= \Joomla\CMS\Factory::getUser();
+		$user		= \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		// Show special state items
 		$show_noauth = $this->_params->get('show_noauth', 0);   // Show unauthorized items
@@ -387,7 +387,7 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 	{
 		$app    = \Joomla\CMS\Factory::getApplication();
 		$jinput = $app->input;
-		$user   = \Joomla\CMS\Factory::getUser();
+		$user   = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$db     = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$show_owned = $this->_params->get('show_owned', 1);     // Show items owned by current user, regardless of their state

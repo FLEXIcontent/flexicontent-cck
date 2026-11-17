@@ -43,7 +43,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		$app      = \Joomla\CMS\Factory::getApplication();
 		$jinput   = $app->input;
 		$document = \Joomla\CMS\Factory::getDocument();
-		$user     = \Joomla\CMS\Factory::getUser();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 		$db       = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
@@ -672,7 +672,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		 */
 
 		$site_zone = $app->get('offset');
-		$user_zone = \Joomla\CMS\Factory::getUser()->getParam('timezone', $site_zone);
+		$user_zone = \Joomla\CMS\Factory::getApplication()->getIdentity()->getParam('timezone', $site_zone);
 
 		$tz = new DateTimeZone( $user_zone );
 		$tz_offset = $tz->getOffset(new \Joomla\CMS\Date\Date()) / 3600;
@@ -1215,7 +1215,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		// Initialise variables
 		$app      = \Joomla\CMS\Factory::getApplication();
 		$jinput   = $app->input;
-		$user 		= \Joomla\CMS\Factory::getUser();
+		$user 		= \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$document	= \Joomla\CMS\Factory::getDocument();
 		$contrl   = $this->ctrl . '.';
 
@@ -1362,7 +1362,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 	 */
 	function setToolbar()
 	{
-		$user     = \Joomla\CMS\Factory::getUser();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$document = \Joomla\CMS\Factory::getDocument();
 		$toolbar  = \Joomla\CMS\Toolbar\Toolbar::getInstance('toolbar');
 		$perms    = FlexicontentHelperPerm::getPerm();

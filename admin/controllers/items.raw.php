@@ -161,7 +161,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		// Check for request forgeries
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(json_encode(array('error' => \Joomla\CMS\Language\Text::_('JINVALID_TOKEN'))));
 
-		$user     = \Joomla\CMS\Factory::getUser();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$document = \Joomla\CMS\Factory::getDocument();
 		$db       = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
@@ -667,7 +667,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		if ($indexer === 'tag_assignments')
 		{
-			$log_filename = 'tag_assignments_' . \Joomla\CMS\Factory::getUser()->id . '.php';
+			$log_filename = 'tag_assignments_' . \Joomla\CMS\Factory::getApplication()->getIdentity()->id . '.php';
 			$log_category = 'com_flexicontent.items.tag_assignments_indexer';
 
 			// Get ids of records to process
@@ -679,7 +679,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
                 elseif ($indexer === 'resave')
                 {
-                        $log_filename = 'resave_' . \Joomla\CMS\Factory::getUser()->id . '.php';
+                        $log_filename = 'resave_' . \Joomla\CMS\Factory::getApplication()->getIdentity()->id . '.php';
                         $log_category = 'com_flexicontent.items.resave_indexer';
 
                         if (!empty($selectedIds))

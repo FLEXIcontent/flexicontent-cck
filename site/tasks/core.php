@@ -412,7 +412,7 @@ class FlexicontentTasksCore
 		 * Both indexes use only the rows of published, searchable fields that the user may view.
 		 * ($use_tmp is always true here: 'i' is #__flexicontent_items_tmp, which has the access, catid and type_id columns)
 		 */
-		$_wuser   = method_exists($app, 'getIdentity') ? $app->getIdentity() : \Joomla\CMS\Factory::getUser();
+		$_wuser   = method_exists($app, 'getIdentity') ? $app->getIdentity() : \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$_wlevels = $_wuser ? array_map('intval', $_wuser->getAuthorisedViewLevels()) : array();
 		$_wlevels = $_wlevels ? implode(',', $_wlevels) : '0';
 
@@ -571,7 +571,7 @@ class FlexicontentTasksCore
 			};
 
 			// Respect the access levels of the current user
-			$user   = method_exists($app, 'getIdentity') ? $app->getIdentity() : \Joomla\CMS\Factory::getUser();
+			$user   = method_exists($app, 'getIdentity') ? $app->getIdentity() : \Joomla\CMS\Factory::getApplication()->getIdentity();
 			$levels = array_map('intval', $user->getAuthorisedViewLevels());
 			$item_access = $levels ? ' AND i.access IN (' . implode(',', $levels) . ')' : ' AND 0 = 1';
 
@@ -2099,7 +2099,7 @@ class FlexicontentTasksCore
 	private function _viewLevelsList()
 	{
 		$app    = $this->_getApp();
-		$user   = method_exists($app, 'getIdentity') ? $app->getIdentity() : \Joomla\CMS\Factory::getUser();
+		$user   = method_exists($app, 'getIdentity') ? $app->getIdentity() : \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$levels = $user ? array_map('intval', $user->getAuthorisedViewLevels()) : array();
 
 		return $levels ? implode(',', $levels) : '0';

@@ -157,7 +157,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 
 		// Standalone modes, set HTTP headers, also get value of 'status' header
 		$app  = \Joomla\CMS\Factory::getApplication();
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		$httpStatus = $this->exitSuccess ? '200 OK' : '400 Bad Request';
 
@@ -243,7 +243,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 
 		// Initialize variables
 		$app     = \Joomla\CMS\Factory::getApplication();
-		$user    = \Joomla\CMS\Factory::getUser();
+		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		$ctrl_task = 'task=' . $this->record_name_pl . '.';
 		$original_task = $this->task;
@@ -590,7 +590,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 		// Initialize variables
 		$app   = \Joomla\CMS\Factory::getApplication();
 		$db    = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		// Get models
 		$model = $this->getModel($this->record_name_pl);
@@ -766,7 +766,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 
 		// Initialize variables
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		// Get model
 		$model   = $this->getModel($this->record_name_pl);
@@ -879,7 +879,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 	public function edit()
 	{
 		$app      = \Joomla\CMS\Factory::getApplication();
-		$user     = \Joomla\CMS\Factory::getUser();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 		$document = \Joomla\CMS\Factory::getDocument();
 
@@ -977,7 +977,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 
 		// Initialize variables
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		// Get model
 		$model = $this->getModel($this->record_name_pl);
@@ -1146,7 +1146,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 
 		// Initialize variables
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		$app->enqueueMessage(\Joomla\CMS\Language\Text::_('Task ' . __FUNCTION__ . ' not implemented YET'), 'error');
 		$app->setHeader('status', 500, true);

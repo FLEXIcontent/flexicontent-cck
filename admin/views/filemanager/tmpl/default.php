@@ -26,7 +26,7 @@ global $globalcats;
 $app      = Factory::getApplication();
 $jinput   = $app->input;
 $config   = Factory::getApplication()->getConfig();
-$user     = Factory::getUser();
+$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 $session  = Factory::getApplication()->getSession();
 $document = Factory::getDocument();
 $cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');

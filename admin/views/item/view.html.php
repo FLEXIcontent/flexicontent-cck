@@ -101,7 +101,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$document   = \Joomla\CMS\Factory::getDocument();
 		$config     = \Joomla\CMS\Factory::getApplication()->getConfig();
 		$session    = \Joomla\CMS\Factory::getApplication()->getSession();
-		$user       = \Joomla\CMS\Factory::getUser();
+		$user       = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$db         = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$uri        = \Joomla\CMS\Uri\Uri::getInstance();
 		$task       = $jinput->getCmd('task');
@@ -1017,7 +1017,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$app      = \Joomla\CMS\Factory::getApplication();
 		$jinput   = $app->input;
 		$db       = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
-		$user     = \Joomla\CMS\Factory::getUser();	// get current user
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();	// get current user
 		$model    = $this->getModel();
 		$item     = $model->getItem(null, $check_view_access=false, $no_cache=false, $force_version=0);  // ZERO force_version means unversioned data
 		$document = \Joomla\CMS\Factory::getDocument();
@@ -1312,8 +1312,8 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 				. ' <input type="checkbox" id="' . $elementid . '" data-element-grpid="' . $elementid . '" name="' . $fieldname . '" ' . $attribs . ' value="1" checked="checked" />'
 				. ($prettycheckable_added ? '' : '&nbsp;' . $lbltxt . '</label>');
 
-			$this->ownerCanEdit     = $model->canEdit(null, \Joomla\CMS\Factory::getUser($item->created_by));
-			$this->ownerCanEditState = $model->canEditState(null, \Joomla\CMS\Factory::getUser($item->created_by));
+			$this->ownerCanEdit     = $model->canEdit(null, \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById((int) $item->created_by));
+			$this->ownerCanEditState = $model->canEditState(null, \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById((int) $item->created_by));
 		}
 
 		// Retrieve author configuration
@@ -1608,7 +1608,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 		// Get user, user's global permissions
 		$permission = FlexicontentHelperPerm::getPerm();
-		$user       = \Joomla\CMS\Factory::getUser();
+		$user       = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		$perms = array();
 		$perms['isSuperAdmin'] = $permission->SuperAdmin;
@@ -1679,7 +1679,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$categories = & $globalcats;
 
 		$app     = \Joomla\CMS\Factory::getApplication();
-		$user    = \Joomla\CMS\Factory::getUser();
+		$user    = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 
 		$perms   = $this->_getItemPerms();
@@ -2083,7 +2083,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$menus = $app->getMenu();
 		$menu  = $menus->getActive();
 		$uri   = \Joomla\CMS\Uri\Uri::getInstance();
-		$user  = \Joomla\CMS\Factory::getUser();
+		$user  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$aid   = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
 		$db    = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$nullDate = $db->getNullDate();

@@ -43,7 +43,7 @@ class FlexicontentViewCategory extends FlexicontentViewBaseRecord
 		$app        = \Joomla\CMS\Factory::getApplication();
 		$jinput     = $app->input;
 		$document   = \Joomla\CMS\Factory::getDocument();
-		$user       = \Joomla\CMS\Factory::getUser();
+		$user       = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$db         = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$cparams    = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 		$perms      = FlexicontentHelperPerm::getPerm();

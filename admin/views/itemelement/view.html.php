@@ -43,7 +43,7 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 		$app      = \Joomla\CMS\Factory::getApplication();
 		$jinput   = $app->input;
 		$document = \Joomla\CMS\Factory::getDocument();
-		$user     = \Joomla\CMS\Factory::getUser();
+		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 		$db       = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
@@ -363,7 +363,7 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 		{
 			$lists[$elementid] = $this->getFilterDisplay(array(
 				'label' => \Joomla\CMS\Language\Text::_('FLEXI_AUTHOR'),
-				'html' => '<span class="add-on"><i>' . \Joomla\CMS\Factory::getUser($created_by)->name . '</i></span>',
+				'html' => '<span class="add-on"><i>' . \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById((int) $created_by)->name . '</i></span>',
 			));
 		}
 

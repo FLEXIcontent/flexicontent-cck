@@ -94,7 +94,7 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 		// Initialize some variables
 		$app = \Joomla\CMS\Factory::getApplication();
 		$db  = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
-		$me  = \Joomla\CMS\Factory::getUser();
+		$me  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$config = \Joomla\CMS\Factory::getApplication()->getConfig();
 		$MailFrom	= $config->get('mailfrom');
 		$FromName	= $config->get('fromname');
@@ -235,7 +235,7 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 
 		$app   = \Joomla\CMS\Factory::getApplication();
 		$db    = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
-		$me    = \Joomla\CMS\Factory::getUser();
+		$me    = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$curIsSuperAdmin = $me->authorise('core.admin', 'root.1');
 
 		$cid = $this->input->get('cid', array(), 'array');
@@ -253,7 +253,7 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 		foreach ($cid as $id)
 		{
 			// Check the action is allowed
-			$user = \Joomla\CMS\Factory::getUser($id);
+			$user = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById((int) $id);
 			$isSuperAdmin = $user->authorise('core.admin', 'root.1');
 
 			if ($id == $me->get('id'))
@@ -330,7 +330,7 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 
 		$app = \Joomla\CMS\Factory::getApplication();
 		$db  = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
-		$me  = \Joomla\CMS\Factory::getUser();
+		$me  = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$curIsSuperAdmin = $me->authorise('core.admin', 'root.1');
 
 		if (!$check_uids)
@@ -357,7 +357,7 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 		foreach ($cid as $id)
 		{
 			// Check the action is allowed
-			$user = \Joomla\CMS\Factory::getUser($id);
+			$user = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById((int) $id);
 			$isSuperAdmin = $user->authorise('core.admin', 'root.1');
 
 			if ($id == $me->get('id'))

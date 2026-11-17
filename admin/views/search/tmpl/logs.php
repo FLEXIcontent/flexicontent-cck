@@ -18,7 +18,7 @@ $limit  = $app->input->getInt('limit', 50);
 $limit  = in_array($limit, array(25, 50, 100), true) ? $limit : 50;
 $page   = max(1, $app->input->getInt('page', 1));
 
-$canPurge = \Joomla\CMS\Factory::getUser()->authorise('core.admin', 'com_flexicontent');
+$canPurge = \Joomla\CMS\Factory::getApplication()->getIdentity()->authorise('core.admin', 'com_flexicontent');
 
 if ($canPurge && $app->input->getInt('purge', 0) && $app->input->getMethod() === 'POST')
 {
