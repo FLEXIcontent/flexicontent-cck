@@ -52,7 +52,7 @@
 		if ($allow_relative_addrs == 2)
 		{
 			$_tip_title  = flexicontent_html::getToolTip(null, 'FLEXI_FIELD_WEBLINK_IS_RELATIVE_DESC', 1, 1);
-			$is_absolute = (boolean) parse_url($value['link'], PHP_URL_SCHEME); // preg_match("#^http|^https|^ftp#i", $value['link']);
+			$is_absolute = (bool) parse_url($value['link'], PHP_URL_SCHEME); // preg_match("#^http|^https|^ftp#i", $value['link']);
 			$has_value_class = ' fc-has-value';
 
 			$autoprefix = '

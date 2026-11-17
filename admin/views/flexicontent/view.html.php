@@ -105,7 +105,7 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 			$missingversion		= true; //!$use_versioning || !$model->checkCurrentVersionData();
 			$cachethumb				= $model->getCacheThumbPerms();
 
-			$existdbindexes    = ! (boolean) ($missingindexes = $model->getExistDBindexes($check_only=false));
+			$existdbindexes    = ! (bool) ($missingindexes = $model->getExistDBindexes($check_only=false));
 			$itemcountingdok   = $model->getItemCountingDataOK();
 			$initialpermission = $model->checkInitialPermission();
 		}

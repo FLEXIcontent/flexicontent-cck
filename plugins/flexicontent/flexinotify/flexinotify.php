@@ -505,7 +505,7 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 				if ($send_result) $count_sent++;
 			}
 
-			$send_result = (boolean) $count_sent;
+			$send_result = (bool) $count_sent;
 			if ($debug_notifications)
 			{
 				$app->enqueueMessage("** Notification Plugin: &nbsp; Sent personalized message per subscriber", 'message');
@@ -543,7 +543,7 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 				if ($send_result) $count_sent += count($to_100);
 			}
 
-			$send_result = (boolean) $count_sent;
+			$send_result = (bool) $count_sent;
 			if ($debug_notifications)
 			{
 				$app->enqueueMessage("** Notification Plugin: &nbsp; Sent same message to all subscribers", 'message');

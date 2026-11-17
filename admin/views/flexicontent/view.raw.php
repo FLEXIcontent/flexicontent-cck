@@ -96,7 +96,6 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 			@curl_setopt($ch, CURLOPT_USERAGENT, 'FLEXIcontent-dashboard');
 			@curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
 			$data = @curl_exec($ch);
-			@curl_close($ch);
 		}
 
 		// Fallback: fopen

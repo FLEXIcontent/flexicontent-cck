@@ -211,7 +211,7 @@ class FlexicontentModelReview extends FCModelAdmin
 		 */
 
 		$isNew    = empty($this->_record->id);
-		$isLogged = (boolean) \Joomla\CMS\Factory::getUser()->id;
+		$isLogged = (bool) \Joomla\CMS\Factory::getUser()->id;
 		
 		$readonlyFields = array();
 		$hiddenFields   = array();

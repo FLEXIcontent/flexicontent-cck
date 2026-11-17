@@ -190,7 +190,7 @@ class plgFlexicontent_fieldsTextarea extends FCField
 				$skip_buttons[] = 'readmore';
 			}
 		}
-		$skip_buttons_arr = ($show_buttons && ($editor_name=='jce' || $editor_name=='tinymce') && count($skip_buttons)) ? $skip_buttons : (boolean) $show_buttons;   // JCE supports skipping buttons
+		$skip_buttons_arr = ($show_buttons && ($editor_name=='jce' || $editor_name=='tinymce') && count($skip_buttons)) ? $skip_buttons : (bool) $show_buttons;   // JCE supports skipping buttons
 
 		// Initialise property with default value
 		if (!$field->value || (count($field->value) === 1 && reset($field->value) === null))
@@ -1124,7 +1124,7 @@ class plgFlexicontent_fieldsTextarea extends FCField
 			if ( !in_array('readmore',  $skip_buttons) )  $skip_buttons[] = 'readmore';
 		}
 
-		$skip_buttons_arr = ($show_buttons && ($editor_name=='jce' || $editor_name=='tinymce') && count($skip_buttons)) ? $skip_buttons : (boolean) $show_buttons;   // JCE supports skipping buttons
+		$skip_buttons_arr = ($show_buttons && ($editor_name=='jce' || $editor_name=='tinymce') && count($skip_buttons)) ? $skip_buttons : (bool) $show_buttons;   // JCE supports skipping buttons
 		$_asset_ = null;
 		$_author_ = null;
 

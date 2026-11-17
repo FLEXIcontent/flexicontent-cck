@@ -77,7 +77,7 @@ class JFormFieldFlexicategories extends \Joomla\CMS\Form\FormField
 		$element_id = $this->id;
 		$ffname = (string) $this->element['name'];
 		
-		$published_only = (boolean) @$attributes['published_only'];
+		$published_only = (bool) @$attributes['published_only'];
 		$parent_id   = (int) @$attributes['parent_id'];
 		$depth_limit = (int) @$attributes['depth_limit'];
 		$tree = flexicontent_cats::getCategoriesTree($published_only, $parent_id, $depth_limit);

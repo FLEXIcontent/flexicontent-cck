@@ -474,7 +474,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 					{
 						$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_edit_coupons"';
 						$db->setQuery($query);
-						$tbl_exists = (boolean) count($db->loadObjectList());
+						$tbl_exists = (bool) count($db->loadObjectList());
 						if ($tbl_exists)
 						{
 							$query = 'SELECT * FROM #__flexicontent_edit_coupons '

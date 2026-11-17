@@ -581,80 +581,80 @@ class com_flexicontentInstallerScript
 
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_fields_item_relations"';
 		$db->setQuery($query);
-		$fi_rels_tbl_exists = (boolean) count($db->loadObjectList());
+		$fi_rels_tbl_exists = (bool) count($db->loadObjectList());
 
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_items_versions"';
 		$db->setQuery($query);
-		$fi_vers_tbl_exists = (boolean) count($db->loadObjectList());
+		$fi_vers_tbl_exists = (bool) count($db->loadObjectList());
 
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_favourites"';
 		$db->setQuery($query);
-		$favs_tbl_exists = (boolean) count($db->loadObjectList());
+		$favs_tbl_exists = (bool) count($db->loadObjectList());
 
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_files"';
 		$db->setQuery($query);
-		$files_tbl_exists = (boolean) count($db->loadObjectList());
+		$files_tbl_exists = (bool) count($db->loadObjectList());
 
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_fields"';
 		$db->setQuery($query);
-		$fields_tbl_exists = (boolean) count($db->loadObjectList());
+		$fields_tbl_exists = (bool) count($db->loadObjectList());
 
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_types"';
 		$db->setQuery($query);
-		$types_tbl_exists = (boolean) count($db->loadObjectList());
+		$types_tbl_exists = (bool) count($db->loadObjectList());
 
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_tags"';
 		$db->setQuery($query);
-		$tags_tbl_exists = (boolean) count($db->loadObjectList());
+		$tags_tbl_exists = (bool) count($db->loadObjectList());
 
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_items_ext"';
 		$db->setQuery($query);
-		$iext_tbl_exists = (boolean) count($db->loadObjectList());
+		$iext_tbl_exists = (bool) count($db->loadObjectList());
 
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_advsearch_index"';
 		$db->setQuery($query);
-		$advsearch_index_tbl_exists = (boolean) count($db->loadObjectList());
+		$advsearch_index_tbl_exists = (bool) count($db->loadObjectList());
 
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_authors_ext"';
 		$db->setQuery($query);
-		$authors_ext_tbl_exists = (boolean) count($db->loadObjectList());
+		$authors_ext_tbl_exists = (bool) count($db->loadObjectList());
 
 		// BETA table
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_reviews_dev"';
 		$db->setQuery($query);
-		$reviews_beta_tbl_exists = (boolean) count($db->loadObjectList());
+		$reviews_beta_tbl_exists = (bool) count($db->loadObjectList());
 
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_reviews"';
 		$db->setQuery($query);
-		$reviews_tbl_exists = (boolean) count($db->loadObjectList());
+		$reviews_tbl_exists = (bool) count($db->loadObjectList());
 
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . '__flexicontent_mediadatas"';
 		$db->setQuery($query);
-		$mediadatas_tbl_exists = (boolean) count($db->loadObjectList());
+		$mediadatas_tbl_exists = (bool) count($db->loadObjectList());
 
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_templates"';
 		$db->setQuery($query);
-		$templates_tbl_exists = (boolean) count($db->loadObjectList());
+		$templates_tbl_exists = (bool) count($db->loadObjectList());
 
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_layouts_conf"';
 		$db->setQuery($query);
-		$layouts_conf_tbl_exists = (boolean) count($db->loadObjectList());
+		$layouts_conf_tbl_exists = (bool) count($db->loadObjectList());
 
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_items_tmp"';
 		$db->setQuery($query);
-		$content_cache_tbl_exists = (boolean) count($db->loadObjectList());
+		$content_cache_tbl_exists = (bool) count($db->loadObjectList());
 
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_download_history"';
 		$db->setQuery($query);
-		$dl_history_tbl_exists = (boolean) count($db->loadObjectList());
+		$dl_history_tbl_exists = (bool) count($db->loadObjectList());
 
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_download_coupons"';
 		$db->setQuery($query);
-		$dl_coupons_tbl_exists = (boolean) count($db->loadObjectList());
+		$dl_coupons_tbl_exists = (bool) count($db->loadObjectList());
 
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_file_usage"';
 		$db->setQuery($query);
-		$file_usage_tbl_exists = (boolean) count($db->loadObjectList());
+		$file_usage_tbl_exists = (bool) count($db->loadObjectList());
 
 		// Data Types of columns
 		$tbl_names_arr = array('flexicontent_files', 'flexicontent_fields', 'flexicontent_types');
@@ -1753,7 +1753,7 @@ class com_flexicontentInstallerScript
 
 						$query = 'SHOW TABLES LIKE "' . \Joomla\CMS\Factory::getApplication()->get('dbprefix') . 'jcomments"';
 						$db->setQuery($query);
-						$jcomments_tbl_exists = (boolean) count($db->loadObjectList());
+						$jcomments_tbl_exists = (bool) count($db->loadObjectList());
 						if ($jcomments_tbl_exists) {
 							$queries['jcomments'] = 'UPDATE #__jcomments AS j SET j.object_group="com_content" WHERE j.object_group="com_flexicontent" ';
 							$queries['jcomments_objects'] = 'UPDATE #__jcomments_objects AS j SET j.object_group="com_content" WHERE j.object_group="com_flexicontent" ';

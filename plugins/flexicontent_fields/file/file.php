@@ -2022,7 +2022,7 @@ class plgFlexicontent_fieldsFile extends FCField
 			;
 		$db->setQuery($query);
 		$db_id = $db->loadResult();
-		return (boolean)$db_id;
+		return (bool)$db_id;
 	}
 
 

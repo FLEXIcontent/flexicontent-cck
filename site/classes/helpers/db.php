@@ -1602,7 +1602,7 @@ class flexicontent_db
 		$db = \Joomla\CMS\Factory::getDbo();
 
 		$query = 'SELECT COUNT(*) FROM #__tags WHERE parent_id = 0 AND id <> 1';
-		$tags_table_fix_needed = (boolean) $db->setQuery($query)->loadResult();
+		$tags_table_fix_needed = (bool) $db->setQuery($query)->loadResult();
 
 		// Fix Joomla tags table
 		if ($tags_table_fix_needed)

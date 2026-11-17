@@ -877,7 +877,7 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 						</div>
 					<?php endif; ?>
 
-				<?php $captured_title = ob_get_clean(); $hasTitle = (boolean) trim($captured_title); ?>
+				<?php $captured_title = ob_get_clean(); $hasTitle = (bool) trim($captured_title); ?>
 				<!-- EOF item title -->
 
 
@@ -910,7 +910,7 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 
 					<?php endif; ?>
 
-				<?php $captured_image = ob_get_clean(); $hasImage = (boolean) trim($captured_image); ?>
+				<?php $captured_image = ob_get_clean(); $hasImage = (bool) trim($captured_image); ?>
 				<!-- EOF item's image -->
 
 				<?php echo $content_layout_feat!=2 ? $captured_image : '';?>
@@ -1141,7 +1141,7 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 					</div>
 				<?php endif;
 
-			$captured_title = ob_get_clean(); $hasTitle = (boolean) trim($captured_title);
+			$captured_title = ob_get_clean(); $hasTitle = (bool) trim($captured_title);
 			// EOF item title
 
 
@@ -1174,7 +1174,7 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 
 				<?php endif;
 
-			$captured_image = ob_get_clean(); $hasImage = (boolean) trim($captured_image);
+			$captured_image = ob_get_clean(); $hasImage = (bool) trim($captured_image);
 			// EOF item's image
 
 

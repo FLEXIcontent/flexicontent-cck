@@ -474,7 +474,7 @@ if ($std_builder_layout_num)
 						</div>
 					<?php endif; ?>
 
-				<?php $captured_title = ob_get_clean(); $hasTitle = (boolean) trim($captured_title); ?>
+				<?php $captured_title = ob_get_clean(); $hasTitle = (bool) trim($captured_title); ?>
 				<!-- EOF item title -->
 
 
@@ -505,7 +505,7 @@ if ($std_builder_layout_num)
 
 					<?php endif; ?>
 
-				<?php $captured_image = ob_get_clean(); $hasImage = (boolean) trim($captured_image); ?>
+				<?php $captured_image = ob_get_clean(); $hasImage = (bool) trim($captured_image); ?>
 				<!-- EOF item's image -->
 
 				<?php echo $content_layout_feat!=2 ? $captured_image : '';?>
@@ -786,7 +786,7 @@ if ($std_builder_layout_num)
 						</div>
 					<?php endif; ?>
 
-				<?php $captured_title = ob_get_clean(); $hasTitle = (boolean) trim($captured_title); ?>
+				<?php $captured_title = ob_get_clean(); $hasTitle = (bool) trim($captured_title); ?>
 				<!-- EOF item title -->
 
 
@@ -817,7 +817,7 @@ if ($std_builder_layout_num)
 
 					<?php endif; ?>
 
-				<?php $captured_image = ob_get_clean(); $hasImage = (boolean) trim($captured_image); ?>
+				<?php $captured_image = ob_get_clean(); $hasImage = (bool) trim($captured_image); ?>
 				<!-- EOF item's image -->
 
 				<?php echo $content_layout!=2 ? $captured_image : '';?>

@@ -790,14 +790,14 @@ class flexicontent_items extends _flexicontent_items
 
 		if (!empty($record_ext->$fk_ext))
 		{
-			$ext_exists = (boolean) $this->_db->setQuery('SELECT COUNT(*) FROM ' . $this->_tbl_ext . ' WHERE ' . $fk_ext . '=' . (int) $record_ext->$fk_ext)->loadResult();
+			$ext_exists = (bool) $this->_db->setQuery('SELECT COUNT(*) FROM ' . $this->_tbl_ext . ' WHERE ' . $fk_ext . '=' . (int) $record_ext->$fk_ext)->loadResult();
 		}
 
 		// Check if record at temporary data DB table exists
 		$tmp_exists = false;
 		if (!empty($record_tmp->$fk_tmp))
 		{
-			$tmp_exists = (boolean) $this->_db->setQuery('SELECT COUNT(*) FROM ' . $this->_tbl_tmp . ' WHERE ' . $fk_tmp . '=' . (int) $record_tmp->$fk_tmp)->loadResult();
+			$tmp_exists = (bool) $this->_db->setQuery('SELECT COUNT(*) FROM ' . $this->_tbl_tmp . ' WHERE ' . $fk_tmp . '=' . (int) $record_tmp->$fk_tmp)->loadResult();
 		}
 
 		// Properties that were never loaded/set (e.g. type_id, is_uptodate, when the items_ext
