@@ -1822,6 +1822,15 @@ class FlexicontentFields
 		// Assign each item 's extra votes to the item's votes as member variable "extra"
 		foreach ($extra_votes as $extra_vote)
 		{
+			// An item can have extra votes without a row in #__content_rating
+			if (!isset($votes[$extra_vote->content_id]))
+			{
+				$votes[$extra_vote->content_id] = new stdClass;
+			}
+			if (!isset($votes[$extra_vote->content_id]->extra))
+			{
+				$votes[$extra_vote->content_id]->extra = array();
+			}
 			$votes[$extra_vote->content_id]->extra[$extra_vote->extra_id] = $extra_vote;
 		}
 
