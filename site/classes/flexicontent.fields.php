@@ -107,7 +107,7 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5
 	 */
-	static function & getFields(&$_items, $view = FLEXI_ITEMVIEW, $params = null, $aid = false, $use_tmpl = true)
+	static function & getFields(&$_items, $view = FLEXI_ITEMVIEW, $params = null, $aid = false, $use_tmpl = true, $reuse_loaded = false)
 	{
 		static $expired_cleaned = false;
 
@@ -128,7 +128,29 @@ class FlexicontentFields
 		$aid = is_array($aid) ? $aid : \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
 
 		$vars = null;
-		FlexicontentFields::getItemFields($items, $vars, $view, $aid);
+
+		if ($reuse_loaded)
+		{
+			// The caller states that items which already have their fields were loaded earlier in this request
+			// (e.g. by a previous getFields() call without parameters) and were not changed since: load only the rest
+			$_pending = array();
+			foreach ($items as $i => $item)
+			{
+				if (!isset($item->fields) || !isset($item->fieldvalues))
+				{
+					$_pending[] = $items[$i];
+				}
+			}
+
+			if ($_pending)
+			{
+				FlexicontentFields::getItemFields($_pending, $vars, $view, $aid);
+			}
+		}
+		else
+		{
+			FlexicontentFields::getItemFields($items, $vars, $view, $aid);
+		}
 
 		if ( $print_logging_info )  @$fc_run_times['field_values_params'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
@@ -359,8 +381,7 @@ class FlexicontentFields
 			$vars['cats']       = FlexicontentFields::_getCategories($items, $view);
 			$vars['favourites'] = FlexicontentFields::_getFavourites($items, $view);
 			$vars['favoured']   = FlexicontentFields::_getFavoured($items, $view);
-			$vars['authors']    = FlexicontentFields::_getAuthors($items, $view);
-			$vars['modifiers']  = FlexicontentFields::_getModifiers($items, $view);
+			list($vars['authors'], $vars['modifiers']) = FlexicontentFields::_getAuthorsModifiers($items, $view);
 			$vars['typenames']  = FlexicontentFields::_getTypenames($items, $view);
 			$vars['votes']      = FlexicontentFields::_getVotes($items, $view);
 			$vars['custom']     = FlexicontentFields::_getCustomValues($items, $view);
@@ -1509,6 +1530,9 @@ class FlexicontentFields
 		if (empty($cids)) return array();
 		$cids = ArrayHelper::toInteger($cids);
 
+		// No item of this site has a tag, or the tags field is unpublished: do not run the queries below
+		if (!FlexicontentFields::_hasItemData('tags')) return array();
+
 		$query = 'SELECT t.tid, t.itemid'
 			. ' FROM #__flexicontent_tags_item_relations AS t'
 			. ' WHERE t.itemid IN (' . implode(',', $cids) .')';
@@ -1656,12 +1680,19 @@ class FlexicontentFields
 		$cids = array();
 		foreach ($items as $item) { array_push($cids, $item->id); }
 
-		// Favourites via DB
-		$query 	= 'SELECT DISTINCT itemid, 1 AS favs FROM #__flexicontent_favourites'
-				. " WHERE type = 0 AND itemid IN ('" . implode("','", $cids) . "')"
-				;
-		$db->setQuery($query);
-		$favourites = $db->loadObjectList('itemid');
+		// Favourites via DB (skipped when no item of this site is a favourite of any user, or the favourites field is unpublished)
+		if (FlexicontentFields::_hasItemData('favourites'))
+		{
+			$query 	= 'SELECT DISTINCT itemid, 1 AS favs FROM #__flexicontent_favourites'
+					. " WHERE type = 0 AND itemid IN ('" . implode("','", $cids) . "')"
+					;
+			$db->setQuery($query);
+			$favourites = $db->loadObjectList('itemid');
+		}
+		else
+		{
+			$favourites = array();
+		}
 
 		// Also add favourites via cookie (Only current user is considered)
 		$favs = flexicontent_favs::getInstance()->getRecords($_favs_type = 'item');
@@ -1689,13 +1720,20 @@ class FlexicontentFields
 		$cids = array();
 		foreach ($items as $item) { array_push($cids, $item->id); }
 
-		// Favourites via DB
-		$query 	= 'SELECT DISTINCT itemid, 1 AS fav FROM #__flexicontent_favourites'
-			. ' WHERE type = 0 AND itemid IN (' . implode(',', $cids) . ')'
-			. ' AND userid = ' . ((int)$user->id)
-			;
-		$db->setQuery($query);
-		$favoured = $db->loadObjectList('itemid');
+		// Favourites via DB (skipped when no item of this site is a favourite of any user, or the favourites field is unpublished)
+		if (FlexicontentFields::_hasItemData('favourites'))
+		{
+			$query 	= 'SELECT DISTINCT itemid, 1 AS fav FROM #__flexicontent_favourites'
+				. ' WHERE type = 0 AND itemid IN (' . implode(',', $cids) . ')'
+				. ' AND userid = ' . ((int)$user->id)
+				;
+			$db->setQuery($query);
+			$favoured = $db->loadObjectList('itemid');
+		}
+		else
+		{
+			$favoured = array();
+		}
 
 		// Also add favourites via cookie
 		$favs = flexicontent_favs::getInstance()->getRecords($_favs_type = 'item');
@@ -1761,6 +1799,178 @@ class FlexicontentFields
 	}
 
 	/**
+	 * Method to get the authors and the modifiers of the items with a single query
+	 *
+	 * @access	private
+	 * @return	array   array(authors, modifiers), each indexed by item id, same data as _getAuthors() and _getModifiers()
+	 * @since	5.3
+	 */
+	static function _getAuthorsModifiers(&$items, $view = FLEXI_ITEMVIEW)
+	{
+		// Versioned (previewed) item: its author / modifier may differ from the stored ones, use the 2 separate methods
+		if (count($items)==1 && !empty($items[0]->version_id))
+		{
+			return array(
+				FlexicontentFields::_getAuthors($items, $view),
+				FlexicontentFields::_getModifiers($items, $view),
+			);
+		}
+
+		$authors = $modifiers = array();
+
+		$cids = array();
+		foreach ($items as $item) { array_push($cids, $item->id); }
+		$cids = ArrayHelper::toInteger($cids);
+
+		if (empty($cids))
+		{
+			return array($authors, $modifiers);
+		}
+
+		$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+		$query 	= 'SELECT i.id, ua.name, i.created_by_alias as alias, ua.username, ua.email'
+			. ', um.name AS m_name, um.username AS m_username, um.email AS m_email'
+			. ' FROM #__content AS i'
+			. ' LEFT JOIN #__users AS ua ON ua.id = i.created_by'
+			. ' LEFT JOIN #__users AS um ON um.id = i.modified_by'
+			. ' WHERE i.id IN (' . implode(',', $cids) . ')'
+			;
+		$db->setQuery($query);
+		$rows = $db->loadObjectList('id');
+
+		foreach ($rows as $id => $row)
+		{
+			$authors[$id]   = (object) array('id' => $row->id, 'name' => $row->name, 'alias' => $row->alias, 'username' => $row->username, 'email' => $row->email);
+			$modifiers[$id] = (object) array('id' => $row->id, 'name' => $row->m_name, 'username' => $row->m_username, 'email' => $row->m_email);
+		}
+
+		return array($authors, $modifiers);
+	}
+
+
+	/**
+	 * Check if current request is a plain page view (a GET request without a task),
+	 * thus a request during which item data are only read and not modified
+	 *
+	 * @return	boolean
+	 * @since	5.3
+	 */
+	static function _isPageView()
+	{
+		// Not remembered: a task may be added to the request after this is first called (e.g. by URL routing)
+		$method = isset($_SERVER['REQUEST_METHOD']) ? strtoupper($_SERVER['REQUEST_METHOD']) : '';
+
+		return $method === 'GET' && !strlen(\Joomla\CMS\Factory::getApplication()->getInput()->get('task', '', 'cmd'));
+	}
+
+
+	/**
+	 * Check if a field with the given name exists. During a page view all field names are read once, so that
+	 * loadFieldConfig() does not run one query per core field and content type, looking for a
+	 * field named  CORE-FIELD-NAME_TYPE-ALIAS  (a legacy way to customize a core field per type), that almost never exists
+	 *
+	 * @param   string   $name   The field name
+	 *
+	 * @return	boolean  False only when it is known that no such field exists
+	 * @since	5.3
+	 */
+	static function _fieldNameExists($name)
+	{
+		static $names = null;
+
+		// Requests that modify data may create fields: unknown, the caller will query
+		if (!FlexicontentFields::_isPageView())
+		{
+			return true;
+		}
+
+		if ($names === null)
+		{
+			$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+
+			try
+			{
+				$names = array_flip(array_map('strtolower', $db->setQuery('SELECT name FROM #__flexicontent_fields')->loadColumn()));
+			}
+			catch (\Exception $e)
+			{
+				$names = false;
+			}
+		}
+
+		return $names === false || isset($names[strtolower($name)]);
+	}
+
+
+	/**
+	 * Check if any item of the site has data of the given kind: 'tags', 'favourites', 'votes', 'extravotes'
+	 *
+	 * Many sites never use tags, favourites or voting, but the data of these were queried for every list of items.
+	 * A single query per page view finds which of these DB tables are empty, so that the respective
+	 * queries of _getTags(), _getFavourites(), _getFavoured(), _getVotes() can be skipped (their result is known: empty)
+	 *
+	 * The same query also finds if the core field that displays these data (tags, favourites, voting) is published.
+	 * An unpublished core field is never displayed, so by default its data are not loaded either
+	 *
+	 * @param   string   $name          The kind of item data
+	 * @param   boolean  $check_field   False to ignore the published state of the respective core field
+	 *
+	 * @return	boolean  False only when it is known that no item has such data, or that the respective core field is unpublished
+	 * @since	5.3
+	 */
+	static function _hasItemData($name, $check_field = true)
+	{
+		static $usage = null;
+
+		// A request that modifies data may add the first tag / favourite / vote of the site and then use it: always query
+		if (!FlexicontentFields::_isPageView())
+		{
+			return true;
+		}
+
+		if ($usage === null)
+		{
+			$db = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
+			$query = 'SELECT'
+				. ' EXISTS (SELECT 1 FROM #__flexicontent_tags_item_relations) AS tags'
+				. ', EXISTS (SELECT 1 FROM #__flexicontent_favourites WHERE type = 0) AS favourites'
+				. ', EXISTS (SELECT 1 FROM #__content_rating) AS votes'
+				. ', EXISTS (SELECT 1 FROM #__flexicontent_items_extravote) AS extravotes'
+				. ', EXISTS (SELECT 1 FROM #__flexicontent_fields WHERE iscore = 1 AND published = 1 AND field_type = ' . $db->Quote('tags') . ') AS tags_field'
+				. ', EXISTS (SELECT 1 FROM #__flexicontent_fields WHERE iscore = 1 AND published = 1 AND field_type = ' . $db->Quote('favourites') . ') AS favourites_field'
+				. ', EXISTS (SELECT 1 FROM #__flexicontent_fields WHERE iscore = 1 AND published = 1 AND field_type = ' . $db->Quote('voting') . ') AS voting_field'
+				;
+
+			try
+			{
+				$usage = $db->setQuery($query)->loadAssoc() ?: array();
+			}
+			catch (\Exception $e)
+			{
+				// Unknown usage, the queries of every kind of data will be executed
+				$usage = array();
+			}
+		}
+
+		// No item of the site has such data
+		if (isset($usage[$name]) && (int) $usage[$name] === 0)
+		{
+			return false;
+		}
+
+		// The core field that displays these data is unpublished
+		static $field_of = array('tags' => 'tags_field', 'favourites' => 'favourites_field', 'votes' => 'voting_field', 'extravotes' => 'voting_field');
+
+		if ($check_field && isset($field_of[$name]) && isset($usage[$field_of[$name]]) && (int) $usage[$field_of[$name]] === 0)
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+
+	/**
 	 * Method to get the types names of the items
 	 *
 	 * @access	private
@@ -1775,11 +1985,37 @@ class FlexicontentFields
 		foreach ($items as $item) { $type_ids[$item->type_id]=1; }
 		$type_ids = array_keys($type_ids);
 
-		$query 	= 'SELECT id, name FROM #__flexicontent_types'
-				. " WHERE id IN ('" . implode("','", $type_ids) . "')"
-				;
-		$db->setQuery($query);
-		$types = $db->loadObjectList('id');
+		// During a page view, type names are queried once per type, instead of once per list of items
+		static $known_types = array();
+		$reuse_known = FlexicontentFields::_isPageView();
+		$query_ids = $reuse_known ? array_diff($type_ids, array_keys($known_types)) : $type_ids;
+
+		if ($query_ids)
+		{
+			$query 	= 'SELECT id, name FROM #__flexicontent_types'
+					. " WHERE id IN ('" . implode("','", $query_ids) . "')"
+					;
+			$db->setQuery($query);
+			$types = $db->loadObjectList('id');
+		}
+		else
+		{
+			$types = array();
+		}
+
+		if ($reuse_known)
+		{
+			foreach ($query_ids as $type_id)
+			{
+				$known_types[$type_id] = isset($types[$type_id]) ? $types[$type_id] : false;
+			}
+
+			$types = array();
+			foreach ($type_ids as $type_id)
+			{
+				if ($known_types[$type_id])  $types[$type_id] = $known_types[$type_id];
+			}
+		}
 
 		$typenames = array();
 		foreach ($items as $item) {
@@ -1807,11 +2043,26 @@ class FlexicontentFields
 			array_push($cids, $item->id);
 		}
 
+		// No item of this site has votes, or the voting field is unpublished: do not run the 2 queries below
+		$has_votes = FlexicontentFields::_hasItemData('votes');
+		$has_extra = FlexicontentFields::_hasItemData('extravotes');
+
+		if (!$has_votes && !$has_extra)
+		{
+			return array();
+		}
+
 		$query 	= 'SELECT * FROM #__content_rating'
 				. " WHERE content_id IN ('" . implode("','", $cids) . "')"
 				;
 		$db->setQuery($query);
 		$votes = $db->loadObjectList('content_id');
+
+		// No item of this site has votes for an extra (composite) voting characteristic
+		if (!$has_extra)
+		{
+			return $votes;
+		}
 
 		$query 	= 'SELECT *, field_id as extra_id FROM #__flexicontent_items_extravote'
 				. " WHERE content_id IN ('" . implode("','", $cids) . "')"
@@ -1944,9 +2195,16 @@ class FlexicontentFields
 				}
 
 				// SPECIAL CASE: check if it exists a FAKE (custom) field that customizes CORE field per Content Type
-				$query = "SELECT attribs, published FROM #__flexicontent_fields WHERE name=".$db->Quote($field->name."_".$typealias);
-				$db->setQuery($query);  //echo $query;
-				$data = $db->loadObject(); //print_r($data);
+				if (FlexicontentFields::_fieldNameExists($field->name."_".$typealias))
+				{
+					$query = "SELECT attribs, published FROM #__flexicontent_fields WHERE name=".$db->Quote($field->name."_".$typealias);
+					$db->setQuery($query);  //echo $query;
+					$data = $db->loadObject(); //print_r($data);
+				}
+				else
+				{
+					$data = null;
+				}
 				if ($data && $data->published)
 				{
 					\Joomla\CMS\Factory::getApplication()->enqueueMessage(__FUNCTION__."(): Please unpublish plugin with name: ".$field->name."_".$typealias." it is used for customizing a core field",'error');

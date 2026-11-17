@@ -671,8 +671,11 @@ class ParentClassItem extends FCModelAdmin
 				// Decide to limit to CURRENT CATEGORY
 				$limit_to_cid = $this->_cid ? ' AND rel.catid = '. (int) $this->_cid : ' AND rel.catid = i.catid';
 
+				// Rating data are loaded only if items of the site have votes and the voting field is published
+				$load_rating = FlexicontentFields::_hasItemData('votes');
+
 				// Get voting resolution
-				$rating_resolution = (int)$this->getVotingResolution();
+				$rating_resolution = $load_rating ? (int)$this->getVotingResolution() : 0;
 
 				// *******************************
 				// Initialize and create the query
@@ -690,7 +693,10 @@ class ParentClassItem extends FCModelAdmin
 				$query->select('ua.name AS author');                                       // Author data
 
 				// Rating count, Rating & Score
-				$query->select('v.rating_count as rating_count, ROUND( v.rating_sum / v.rating_count ) AS rating, ((v.rating_sum / v.rating_count)*'.(100 / $rating_resolution).') as score');
+				$query->select($load_rating
+					? 'v.rating_count as rating_count, ROUND( v.rating_sum / v.rating_count ) AS rating, ((v.rating_sum / v.rating_count)*'.(100 / $rating_resolution).') as score'
+					: 'NULL AS rating_count, NULL AS rating, NULL AS score'
+				);
 
 				// Item and Current Category slugs (for URL)
 				$query->select('CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug');
@@ -715,7 +721,10 @@ class ParentClassItem extends FCModelAdmin
 				$query->join('LEFT', '#__flexicontent_items_ext AS ie ON ie.item_id = i.id');
 				$query->join('LEFT', '#__flexicontent_types AS ty ON (CASE WHEN ie.type_id = 0 THEN ' . (int) $this->_typeid . ' ELSE ie.type_id END) = ty.id');
 				$query->join('LEFT', '#__users AS ua on ua.id = i.created_by');
-				$query->join('LEFT', '#__content_rating AS v ON i.id = v.content_id');
+				if ($load_rating)
+				{
+					$query->join('LEFT', '#__content_rating AS v ON i.id = v.content_id');
+				}
 				$query->join('LEFT', '#__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id' . $limit_to_cid);
 
 				// Join twice on category table, once for current category and once for item's main category
@@ -1000,7 +1009,10 @@ class ParentClassItem extends FCModelAdmin
 					->select('DISTINCT tid')
 					->from('#__flexicontent_tags_item_relations')
 					->where('itemid = ' . (int) $pk);
-				$item->tags = $db->setQuery($query)->loadColumn();
+
+				// Skip the query when no item of the site has a tag. The tag ids are also used by the item form,
+				// so they are loaded even if the tags field is unpublished ($check_field = false)
+				$item->tags = FlexicontentFields::_hasItemData('tags', false) ? $db->setQuery($query)->loadColumn() : array();
 				$item->tags = array_reverse($item->tags);
 			}
 
@@ -4295,19 +4307,36 @@ class ParentClassItem extends FCModelAdmin
 			return array();
 		}
 
-		$query = $this->_db->getQuery(true)
-			->select('*')
-			->from('#__content_rating')
-			->where('content_id IN (' . implode(', ', $cids) . ')');
+		// No item of the site has votes, or the voting field is unpublished: do not run the 2 queries below
+		$has_votes = FlexicontentFields::_hasItemData('votes');
+		$has_extra = FlexicontentFields::_hasItemData('extravotes');
 
-		$votes = $this->_db->setQuery($query)->loadObjectList('content_id');
+		if (!$has_votes && !$has_extra)
+		{
+			return array();
+		}
 
-		$query = $this->_db->getQuery(true)
-			->select('*, field_id as extra_id')
-			->from('#__flexicontent_items_extravote')
-			->where('content_id IN (' . implode(', ', $cids) . ')');
+		$votes = array();
+		if ($has_votes)
+		{
+			$query = $this->_db->getQuery(true)
+				->select('*')
+				->from('#__content_rating')
+				->where('content_id IN (' . implode(', ', $cids) . ')');
 
-		$extra_votes = $this->_db->setQuery($query)->loadObjectList();
+			$votes = $this->_db->setQuery($query)->loadObjectList('content_id');
+		}
+
+		$extra_votes = array();
+		if ($has_extra)
+		{
+			$query = $this->_db->getQuery(true)
+				->select('*, field_id as extra_id')
+				->from('#__flexicontent_items_extravote')
+				->where('content_id IN (' . implode(', ', $cids) . ')');
+
+			$extra_votes = $this->_db->setQuery($query)->loadObjectList();
+		}
 
 		// Assign each item 's extra votes to the item's votes as member variable "extra"
 		foreach ($extra_votes as $extra_vote)
@@ -6272,15 +6301,23 @@ class ParentClassItem extends FCModelAdmin
 		}
 		elseif (!isset($record->rating_count) || !isset($record->rating) || !isset($record->score))
 		{
-			$rating_resolution = (int)$this->getVotingResolution();
+			// No item of the site has votes, or the voting field is unpublished: no rating data to query
+			if (!FlexicontentFields::_hasItemData('votes'))
+			{
+				$rating_data = null;
+			}
+			else
+			{
+				$rating_resolution = (int)$this->getVotingResolution();
 
-			// Get category access for the item's main category, used later to determine viewing of the item
-			$query = 'SELECT '
-				.' v.rating_count as rating_count, ROUND( v.rating_sum / v.rating_count ) AS rating, ((v.rating_sum / v.rating_count)*'.(100 / $rating_resolution).') as score'
-				.' FROM #__content_rating AS v WHERE v.content_id = '. (int) $record->id
-				;
-			$this->_db->setQuery($query);
-			$rating_data = $this->_db->loadObject();
+				// Get category access for the item's main category, used later to determine viewing of the item
+				$query = 'SELECT '
+					.' v.rating_count as rating_count, ROUND( v.rating_sum / v.rating_count ) AS rating, ((v.rating_sum / v.rating_count)*'.(100 / $rating_resolution).') as score'
+					.' FROM #__content_rating AS v WHERE v.content_id = '. (int) $record->id
+					;
+				$this->_db->setQuery($query);
+				$rating_data = $this->_db->loadObject();
+			}
 			$record->rating_count = !$rating_data ? 0 : $rating_data->rating_count;
 			$record->rating       = !$rating_data ? 0 : $rating_data->rating;
 			$record->score        = !$rating_data ? 0 : $rating_data->score;
