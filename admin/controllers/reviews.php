@@ -208,7 +208,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		{
 			$db = \Joomla\CMS\Factory::getDbo();
 			$rated = $db->setQuery(
-				'SELECT id, content_id, average_rating FROM #__' . $this->records_dbtbl
+				'SELECT id, content_id, average_rating, custom_ratings FROM #__' . $this->records_dbtbl
 				. ' WHERE id IN (' . implode(',', $cid) . ') AND content_id > 0 AND average_rating > 0'
 			)->loadObjectList('id');
 		}
@@ -228,6 +228,11 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 				if (!in_array($id, $existing))
 				{
 					$this->_applyRatingChange((int) $row->content_id, (int) $row->average_rating, 0);
+
+					if (trim((string) $row->custom_ratings) !== '')
+					{
+						$this->_applyCompositeChange((int) $row->content_id, (array) json_decode((string) $row->custom_ratings, true), array());
+					}
 				}
 			}
 		}
@@ -525,6 +530,35 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		{
 			$isNew = !$model->get('id');
 
+			// Composite voting: the rating of every characteristic is required, the overall rating is calculated from them
+			$vfield = $model->getVotingReviewsField((object) array('type_id' => 0), true);
+			$chars  = flexicontent_html::getVotingCharacteristics($vfield);
+
+			if ($chars)
+			{
+				$posted     = isset($validated_data['custom_ratings']) && is_array($validated_data['custom_ratings']) ? $validated_data['custom_ratings'] : array();
+				$resolution = max(5, min(100, (int) $vfield->parameters->get('rating_resolution', 5)));
+				$percents   = array();
+				$votes      = array();
+
+				foreach ($chars as $xid => $char)
+				{
+					$p = isset($posted[$xid]) ? (int) $posted[$xid] : 0;
+
+					if ($p < 1 || $p > 100)
+					{
+						$model->setError(\Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_RATING_ALL'));
+						return false;
+					}
+
+					$votes[$xid]    = max(1, (int) round($p * $resolution / 100));
+					$percents[$xid] = (int) round(100 * $votes[$xid] / $resolution);
+				}
+
+				$validated_data['custom_ratings'] = json_encode($percents);
+				$validated_data['average_rating'] = (int) round(100 * max(1, (int) round(array_sum($votes) / count($votes))) / $resolution);
+			}
+
 			if (empty($validated_data['average_rating']) || (int) $validated_data['average_rating'] < 1)
 			{
 				$model->setError(\Joomla\CMS\Language\Text::_('FLEXI_REVIEW_ERR_RATING_REQUIRED'));
@@ -702,11 +736,23 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		 */
 		if ($this->canManage && isset($validated_data['average_rating']))
 		{
+			$_content_id = $isNew ? (int) $validated_data['content_id'] : (int) $model->get('content_id');
+
 			$this->_applyRatingChange(
-				$isNew ? (int) $validated_data['content_id'] : (int) $model->get('content_id'),
+				$_content_id,
 				$isNew ? 0 : (int) $model->get('average_rating'),
 				(int) $validated_data['average_rating']
 			);
+
+			// Composite voting: the ratings of the characteristics are votes too
+			if (isset($validated_data['custom_ratings']))
+			{
+				$this->_applyCompositeChange(
+					$_content_id,
+					$isNew ? array() : (array) json_decode((string) $model->get('custom_ratings'), true),
+					(array) json_decode((string) $validated_data['custom_ratings'], true)
+				);
+			}
 		}
 
 		return true;
@@ -739,6 +785,12 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 
 		$id      = $this->input->get('id', 0, 'int');
 		$percent = $this->input->get('rating', 0, 'int');
+
+		// Composite voting: the overall rating is calculated from the characteristics
+		if (flexicontent_html::getVotingCharacteristics(flexicontent_html::getVotingFieldConfig()))
+		{
+			$fail(\Joomla\CMS\Language\Text::_('FLEXI_VOTE_AVERAGE_RATING_CALCULATED_AUTOMATICALLY'));
+		}
 
 		if (!$id || $percent < 1 || $percent > 100)
 		{
@@ -826,6 +878,91 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		}
 
 		// The rating of the item changed, clean item-related caches
+		FLEXIUtilities::getCache($group = '', 0)->clean('com_flexicontent');
+	}
+
+
+	/**
+	 * Method to apply a change of the ratings of the characteristics of a review (composite voting) to the votes of the reviewed item,
+	 * the overall rating is the average of the characteristics (as calculated by the voting)
+	 *
+	 * @param   int    $content_id    The reviewed item
+	 * @param   array  $old_percents  xid => old rating (percent), empty if there was no rating
+	 * @param   array  $new_percents  xid => new rating (percent), empty if the ratings are removed
+	 *
+	 * @return  void
+	 *
+	 * @since   3.3
+	 */
+	protected function _applyCompositeChange($content_id, $old_percents, $new_percents)
+	{
+		$model = $this->getModel($this->record_name);
+		$field = $model->getVotingReviewsField((object) array('type_id' => 0), true);
+		$chars = flexicontent_html::getVotingCharacteristics($field);
+
+		if (!$content_id || !$chars)
+		{
+			return;
+		}
+
+		$resolution = max(5, min(100, (int) $field->parameters->get('rating_resolution', 5)));
+		$db         = \Joomla\CMS\Factory::getDbo();
+		$to_vote    = function ($percent) use ($resolution)
+		{
+			return $percent > 0 ? max(1, (int) round($percent * $resolution / 100)) : 0;
+		};
+
+		// Apply a change of a vote to a votes table (the record is created by the first vote)
+		$apply = function ($table, $extra_where, $extra_set, $old_vote, $new_vote) use ($db, $content_id)
+		{
+			$delta_sum   = $new_vote - $old_vote;
+			$delta_count = ($new_vote > 0 ? 1 : 0) - ($old_vote > 0 ? 1 : 0);
+
+			if (!$delta_sum && !$delta_count)
+			{
+				return;
+			}
+
+			$exists = (int) $db->setQuery('SELECT COUNT(*) FROM ' . $table . ' WHERE content_id = ' . (int) $content_id . $extra_where)->loadResult();
+
+			if ($exists)
+			{
+				$db->setQuery(
+					'UPDATE ' . $table
+					. ' SET rating_sum = GREATEST(CAST(rating_sum AS SIGNED) + ' . (int) $delta_sum . ', 0),'
+					. '     rating_count = GREATEST(CAST(rating_count AS SIGNED) + ' . (int) $delta_count . ', 0)'
+					. ' WHERE content_id = ' . (int) $content_id . $extra_where
+				)->execute();
+			}
+			elseif ($new_vote > 0)
+			{
+				$db->setQuery(
+					'INSERT ' . $table . ' SET content_id = ' . (int) $content_id . ', lastip = ' . $db->Quote('')
+					. ', rating_sum = ' . (int) $new_vote . ', rating_count = 1' . $extra_set
+				)->execute();
+			}
+		};
+
+		$old_votes = array();
+		$new_votes = array();
+
+		foreach ($chars as $xid => $char)
+		{
+			$old_votes[$xid] = $to_vote(isset($old_percents[$xid]) ? (int) $old_percents[$xid] : 0);
+			$new_votes[$xid] = $to_vote(isset($new_percents[$xid]) ? (int) $new_percents[$xid] : 0);
+
+			$apply('#__flexicontent_items_extravote', ' AND field_id = ' . (int) $xid, ', field_id = ' . (int) $xid, $old_votes[$xid], $new_votes[$xid]);
+		}
+
+		// Overall rating (a vote of the item) exists only if all characteristics are rated
+		$main = function ($votes)
+		{
+			return count($votes) && !in_array(0, $votes, true) ? max(1, (int) round(array_sum($votes) / count($votes))) : 0;
+		};
+
+		$apply('#__content_rating', '', '', $main($old_votes), $main($new_votes));
+
+		// The ratings of the item changed, clean item-related caches
 		FLEXIUtilities::getCache($group = '', 0)->clean('com_flexicontent');
 	}
 

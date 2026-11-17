@@ -656,3 +656,26 @@ body.fc-no-scroll {
   opacity: 1;
   transform: translate(-50%, -50%);
 }
+
+/* Composite voting: ratings of the characteristics in a review */
+.fcvote-review-extra {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin: 4px 0 6px;
+  font-size: 0.85em;
+  color: #6b7280;
+}
+.fcvote-review-extra-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+/* Review form: characteristics in 2 / 3 columns (2 for an even number, 3 for an odd number of characteristics) */
+@media (max-width: 480px) {
+  .fcvote-review-chars {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}

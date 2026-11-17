@@ -213,6 +213,12 @@ class FlexicontentModelReview extends FCModelAdmin
 
 		$isNew    = empty($this->_record->id);
 		$isLogged = (bool) \Joomla\CMS\Factory::getUser()->id;
+
+		// Ratings of the characteristics are used only if composite voting is enabled
+		if (!flexicontent_html::getVotingCharacteristics(flexicontent_html::getVotingFieldConfig()))
+		{
+			$form->removeField('custom_ratings');
+		}
 		
 		$readonlyFields = array();
 		$hiddenFields   = array();

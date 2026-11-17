@@ -524,6 +524,83 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 							<div class="fc-mssg fc-warning fc-nobgimage fcvote-review-rating-error" style="display:none;">' . \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_RATING') . '</div>
 						</div>';
 
+		// Composite voting: the overall rating is calculated from the rating characteristics (small stars), the overall stars are read-only
+		$rv_chars = flexicontent_html::getVotingCharacteristics($field);
+
+		if ($rv_chars)
+		{
+			$rv_resolution = $this->getReviewResolution($field);
+			$rv_stored     = ($review && trim((string) $review->custom_ratings) !== '') ? (array) json_decode((string) $review->custom_ratings, true) : array();
+			$rv_history    = \Joomla\CMS\Factory::getSession()->get('vote_history', array(), 'flexicontent');
+			$rv_vals       = array();
+
+			foreach ($rv_chars as $xid => $rv_char)
+			{
+				$v = 0;
+
+				if (!empty($rv_stored[$xid]))
+				{
+					$v = (int) round(((int) $rv_stored[$xid]) * $rating_stars / 100);
+				}
+				elseif (!empty($rv_history[$content_id][$xid]))
+				{
+					$v = (int) round(((int) $rv_history[$content_id][$xid]) * $rating_stars / $rv_resolution);
+				}
+
+				$rv_vals[$xid] = max(0, min($rating_stars, $v));
+			}
+
+			$rv_main = !in_array(0, $rv_vals, true) ? max(1, (int) round(array_sum($rv_vals) / count($rv_vals))) : 0;
+			$star_svg_small = str_replace('1.8em', '1.25em', $star_svg);
+
+			// Overall rating (read-only, calculated by fcvote.js from the characteristics, and by the server)
+			$rating_html = '
+						<div class="fcvote-form-group">
+							<label class="fcvote-form-label">' . \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_RATING') . '</label>
+							<div class="fcvote-review-rating fcvote-review-rating-main" data-main="1" style="display:flex;gap:2px;pointer-events:none;">
+								<input type="hidden" name="rating" value="' . ($rv_main ?: '') . '" />';
+
+			for ($i = 1; $i <= $rating_stars; $i++)
+			{
+				$rating_html .= '
+								<span class="fcvote-review-star" data-value="' . $i . '" style="color:' . ($i <= $rv_main ? '#f5a623' : '#ccc') . ';">' . $star_svg . '</span>';
+			}
+
+			$rating_html .= '
+							</div>
+						</div>
+
+						<div class="fcvote-form-group">
+							<div class="fcvote-review-chars" style="display:grid;grid-template-columns:repeat(' . (count($rv_chars) % 2 ? 3 : 2) . ',minmax(0,1fr));gap:12px 24px;">';
+
+			foreach ($rv_chars as $xid => $rv_char)
+			{
+				$rating_html .= '
+								<div class="fcvote-review-char">
+									<div class="fcvote-form-label fcvote-review-char-title"' . ($rv_char->desc !== '' ? ' data-fcvote-tip="' . htmlspecialchars($rv_char->desc, ENT_QUOTES, 'UTF-8') . '" style="cursor:help;"' : '') . '>' . htmlspecialchars($rv_char->title !== '' ? $rv_char->title : (string) $xid, ENT_QUOTES, 'UTF-8') . '</div>
+									<div class="fcvote-review-rating fcvote-review-xrating" style="display:flex;gap:2px;">
+										<input type="hidden" name="xrating[' . (int) $xid . ']" value="' . ($rv_vals[$xid] ?: '') . '" />';
+
+				for ($i = 1; $i <= $rating_stars; $i++)
+				{
+					$rating_html .= '
+										<button type="button" class="fcvote-review-star" data-value="' . $i . '"
+											aria-label="' . $i . ' / ' . $rating_stars . '" data-fcvote-tip="' . $i . ' / ' . $rating_stars . '"
+											onclick="fcvote_review_set_xrating(this); return false;"
+											style="background:none;border:0;padding:0;margin:0;cursor:pointer;color:' . ($i <= $rv_vals[$xid] ? '#f5a623' : '#ccc') . ';">' . $star_svg_small . '</button>';
+				}
+
+				$rating_html .= '
+									</div>
+								</div>';
+			}
+
+			$rating_html .= '
+							</div>
+							<div class="fc-mssg fc-warning fc-nobgimage fcvote-review-rating-error" style="display:none;">' . \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_RATING_ALL') . '</div>
+						</div>';
+		}
+
 		// Delete button (only if the user already has a review)
 		$delete_html = $review_has_text
 			? ' <input type="button" class="btn btn-danger fcvote_review_form_delete_btn"
@@ -691,12 +768,39 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			$this->reviewPrepare($content_id, $item, $field, $errors, $_checkSubmit = true);
 		}
 
+		$char_votes = array();
+		$char_percents = array();
+
 		// Validate rating
 		if (!count($errors))
 		{
 			$rating_stars = $this->getReviewStars($field);
 
-			if ($rating < 1 || $rating > $rating_stars)
+			// Composite voting: the rating of every characteristic is required, the overall rating is calculated from them
+			$rv_chars = flexicontent_html::getVotingCharacteristics($field);
+			$char_votes = array();
+			$char_percents = array();
+
+			if ($rv_chars)
+			{
+				$posted = (array) $this->input->get('xrating', array(), 'array');
+				$resolution = $this->getReviewResolution($field);
+
+				foreach ($rv_chars as $xid => $rv_char)
+				{
+					$r = isset($posted[$xid]) ? (int) $posted[$xid] : 0;
+
+					if ($r < 1 || $r > $rating_stars)
+					{
+						$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_RATING_ALL');
+						break;
+					}
+
+					$char_votes[$xid]    = max(1, (int) round($r * $resolution / $rating_stars));
+					$char_percents[$xid] = (int) round(100 * $char_votes[$xid] / $resolution);
+				}
+			}
+			elseif ($rating < 1 || $rating > $rating_stars)
 			{
 				$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_RATING');
 			}
@@ -733,7 +837,36 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		// The rating of the review is also the rating (vote) of the item (not when using composite voting)
 		$rating_percent = null;
 
-		if (!count($errors))
+		if (!count($errors) && $char_votes)
+		{
+			// Composite voting: the overall rating is the average of the characteristics (as the voting does), every characteristic is a vote
+			$resolution = $this->getReviewResolution($field);
+			$vote_value = max(1, (int) round(array_sum($char_votes) / count($char_votes)));
+			$rating_percent = (int) round(100 * $vote_value / $resolution);
+
+			JLoader::register('FlexicontentControllerReviews', JPATH_BASE . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'reviews.php');
+
+			try
+			{
+				foreach ($char_votes as $xid => $char_vote)
+				{
+					$this->input->set('user_rating', $char_vote);
+					$this->input->set('cid', $content_id);
+					$this->input->set('xid', (int) $xid);
+					$this->input->set('no_ajax', 0);
+
+					$rman = new FlexicontentControllerReviews();
+					$rman->setVoteInternal(true);
+					$rman->ajaxvote();
+				}
+			}
+			catch (\Exception $e)
+			{
+				$errors[] = htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8');
+			}
+		}
+
+		elseif (!count($errors))
 		{
 			$resolution = $this->getReviewResolution($field);
 			$vote_value = max(1, (int) round($rating * $resolution / $rating_stars));
@@ -815,6 +948,12 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			$review->user_id = $user->id;
 			$review->text  = $text;
 			$review->average_rating = $rating_percent;
+
+			// Composite voting: the ratings of the characteristics (percent)
+			if ($char_percents)
+			{
+				$review->custom_ratings = json_encode($char_percents);
+			}
 
 			// New or modified reviews need approval (if configured), the same as in the backend controller
 			$review->approved = $do_approval ? 0 : 1;
@@ -1354,6 +1493,30 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 			$form_id = 'fcvote_review_edit_form_' . (int) $review->id;
 
+			// Composite voting: ratings of the characteristics (read-only, as the overall rating)
+			$rv_extra_html = '';
+			$rv_chars      = flexicontent_html::getVotingCharacteristics(flexicontent_html::getVotingFieldConfig());
+
+			if ($rv_chars && trim((string) $review->custom_ratings) !== '')
+			{
+				$rv_extra = (array) json_decode((string) $review->custom_ratings, true);
+
+				foreach ($rv_chars as $rv_xid => $rv_char)
+				{
+					if (!isset($rv_extra[$rv_xid]))
+					{
+						continue;
+					}
+
+					$rv_extra_html .= '<span class="fcvote-review-extra-item">'
+						. '<span class="fcvote-review-extra-title">' . htmlspecialchars($rv_char->title !== '' ? $rv_char->title : (string) $rv_xid, ENT_QUOTES, 'UTF-8') . '</span> '
+						. flexicontent_html::reviewStars((int) $rv_extra[$rv_xid], flexicontent_html::reviewStarsCount(), '0.8em')
+						. '</span>';
+				}
+
+				$rv_extra_html = $rv_extra_html !== '' ? '<div class="fcvote-review-extra">' . $rv_extra_html . '</div>' : '';
+			}
+
 			$html = '
 				<form id="' . $form_id . '" name="' . $form_id . '" action="javascript:;">
 
@@ -1364,7 +1527,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 						<div class="fcvote-form-group">
 							<span class="fcvote-review-author">' . htmlspecialchars((string) $author, ENT_QUOTES, 'UTF-8') . '</span>
-							' . ((int) $review->average_rating > 0 ? flexicontent_html::reviewStars($review->average_rating, flexicontent_html::reviewStarsCount(), '1em') : '') . '
+							' . ((int) $review->average_rating > 0 ? '<div>' . flexicontent_html::reviewStars($review->average_rating, flexicontent_html::reviewStarsCount(), '1em') . '</div>' : '') . $rv_extra_html . '
 						</div>
 
 						<div class="fcvote-form-group">

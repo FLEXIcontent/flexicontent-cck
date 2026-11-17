@@ -32,6 +32,9 @@ class JFormFieldFcreviewrating extends \Joomla\CMS\Form\FormField
 	function getInput()
 	{
 		$stars   = flexicontent_html::reviewStarsCount();
+
+		// Composite voting: the overall rating is calculated from the characteristics (read-only)
+		$composite = (bool) flexicontent_html::getVotingCharacteristics(flexicontent_html::getVotingFieldConfig());
 		$percent = max(0, min(100, (int) $this->value));
 		$value   = (int) round($percent * $stars / 100);
 
@@ -42,7 +45,7 @@ class JFormFieldFcreviewrating extends \Joomla\CMS\Form\FormField
 			. "w.querySelector('input').value=Math.round(100*v/parseInt(w.getAttribute('data-stars'),10));"
 			. "var s=w.querySelectorAll('button');for(var i=0;i<s.length;i++){s[i].style.color=(i<v)?'#f5a623':'#ccc';}return false;";
 
-		$html = '<div class="fc-review-rating-input" data-stars="' . $stars . '" style="display:flex;gap:2px;">'
+		$html = '<div class="fc-review-rating-input" data-stars="' . $stars . '"' . ($composite ? ' data-main="1"' : '') . ' style="display:flex;gap:2px;' . ($composite ? 'pointer-events:none;' : '') . '">'
 			. '<input type="hidden" name="' . htmlspecialchars($this->name, ENT_COMPAT, 'UTF-8') . '" id="' . htmlspecialchars($this->id, ENT_COMPAT, 'UTF-8') . '" value="' . $percent . '" />';
 
 		for ($i = 1; $i <= $stars; $i++)

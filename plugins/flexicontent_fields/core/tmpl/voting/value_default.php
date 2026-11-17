@@ -136,8 +136,11 @@ if ($allow_reviews)
 		. 'background:#508dae;color:#ffffff;border:0;border-radius:8px;cursor:pointer;font-size:0.9em;font-weight:500;line-height:1.4;'
 		. 'text-transform:none;letter-spacing:normal;text-decoration:none;box-shadow:none;';
 
+	// Composite voting: the characteristics are displayed as a second row of small stars in every review
+	$rv_chars = flexicontent_html::getVotingCharacteristics($field);
+
 	// Renders a review of the list
-	$rv_render = function ($review, $rv_own) use ($rv_user, $rv_stars, $rv_token, $rv_item_id, $rv_btn_style, $rv_btn_outline, $rv_icon_check, $rv_icon_trash, $rv_icon_edit, $rv_useful_mode, $rv_can_vote, $rv_useful_btn, &$rv_my_votes)
+	$rv_render = function ($review, $rv_own) use ($rv_chars, $rv_user, $rv_stars, $rv_token, $rv_item_id, $rv_btn_style, $rv_btn_outline, $rv_icon_check, $rv_icon_trash, $rv_icon_edit, $rv_useful_mode, $rv_can_vote, $rv_useful_btn, &$rv_my_votes)
 	{
 		// Pending (unapproved) reviews are displayed dimmed, moderators can approve them or move them to the trash
 		$rv_pending = !(int) $review->approved;
@@ -182,6 +185,29 @@ if ($allow_reviews)
 				</div>';
 		}
 
+		// Composite voting: ratings of the characteristics of this review
+		$rv_extra_html = '';
+
+		if ($rv_chars && trim((string) $review->custom_ratings) !== '')
+		{
+			$rv_extra = (array) json_decode((string) $review->custom_ratings, true);
+
+			foreach ($rv_chars as $rv_xid => $rv_char)
+			{
+				if (!isset($rv_extra[$rv_xid]))
+				{
+					continue;
+				}
+
+				$rv_extra_html .= '<span class="fcvote-review-extra-item">'
+					. '<span class="fcvote-review-extra-title">' . htmlspecialchars($rv_char->title !== '' ? $rv_char->title : (string) $rv_xid, ENT_QUOTES, 'UTF-8') . '</span> '
+					. flexicontent_html::reviewStars((int) $rv_extra[$rv_xid], $rv_stars, '0.8em')
+					. '</span>';
+			}
+
+			$rv_extra_html = $rv_extra_html !== '' ? '<div class="fcvote-review-extra">' . $rv_extra_html . '</div>' : '';
+		}
+
 		return '
 			<div class="fcvote-review-item' . ($rv_pending ? ' fcvote-review-pending-item' : '') . '" id="review_' . (int) $review->id . '">
 				<div class="fcvote-review-head">
@@ -193,6 +219,7 @@ if ($allow_reviews)
 					. ($rv_date ? ' <span class="fcvote-review-date">' . htmlspecialchars($rv_date, ENT_QUOTES, 'UTF-8') . '</span>' : '')
 					. ($rv_edited ? ' <span class="fcvote-review-edited">(' . \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_EDITED') . ')</span>' : '') . '
 				</div>'
+				. $rv_extra_html
 				. ((string) $review->title !== '' ? '<h4 class="fcvote-review-title">' . htmlspecialchars((string) $review->title, ENT_QUOTES, 'UTF-8') . '</h4>' : '') . '
 				<p class="fcvote-review-text">' . nl2br(htmlspecialchars((string) $review->text, ENT_QUOTES, 'UTF-8')) . '</p>'
 				. $rv_useful_html

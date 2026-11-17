@@ -174,7 +174,7 @@
 	function fcvote_show_tooltip(link) {
 		var text = link.getAttribute('data-fcvote-tip');
 		var list = link.closest('ul.fcvote_list');
-		if (!text || !list) return;
+		if (!text) return;
 
 		if (!fcvote_tip_el) {
 			fcvote_tip_el = document.createElement('div');
@@ -186,6 +186,13 @@
 		var tip = fcvote_tip_el;
 		tip.textContent = text;
 
+		// Any other element (e.g. the rating characteristics of the review form): centered above the element
+		if (!list) {
+			var r = link.getBoundingClientRect();
+			fcvote_place_above(tip, r.left + r.width / 2, r.top - 6);
+			return;
+		}
+
 		// Centered above the hovered star: the links overlap (the link of star N covers N stars), so use the position of the star in the list
 		var total = list.querySelectorAll('li.voting-links').length || 1;
 		var star = Math.min(total, Math.max(1, parseInt(link.textContent, 10) || 1));
@@ -196,16 +203,16 @@
 
 	// Show on hover, hide when the mouse is over anything else
 	document.addEventListener('mouseover', function(e) {
-		var link = e.target.closest ? e.target.closest('a[data-fcvote-tip]') : null;
+		var link = e.target.closest ? e.target.closest('[data-fcvote-tip]') : null;
 		if (link) fcvote_show_tooltip(link);
 		else if (fcvote_tip_el && fcvote_tip_el.style.display !== 'none') fcvote_hide_tooltip();
 	});
 
 	document.documentElement.addEventListener('mouseleave', function() { fcvote_hide_tooltip(); });
-	window.addEventListener('scroll', function() { fcvote_hide_tooltip(); fcvote_hide_bubble(); }, { passive: true });
+	window.addEventListener('scroll', function() { fcvote_hide_tooltip(); fcvote_hide_bubble(); }, { passive: true, capture: true });
 	window.addEventListener('blur', function() { fcvote_hide_tooltip(); });
 	document.addEventListener('touchstart', function(e) {
-		if (!e.target.closest || !e.target.closest('a[data-fcvote-tip]')) fcvote_hide_tooltip();
+		if (!e.target.closest || !e.target.closest('[data-fcvote-tip]')) fcvote_hide_tooltip();
 	}, { passive: true });
 
 
@@ -436,6 +443,13 @@
 		// Rating (stars) is required
 		var rating_input = form.elements['rating'];
 		var rating_error = form.querySelector('.fcvote-review-rating-error');
+		var xinputs = form.querySelectorAll('.fcvote-review-xrating input[type="hidden"]');
+		for (var xi = 0; xi < xinputs.length; xi++) {
+			if (!xinputs[xi].value) {
+				if (rating_error) rating_error.style.display = '';
+				return;
+			}
+		}
 		if (rating_input) {
 			if (!rating_input.value) {
 				if (rating_error) rating_error.style.display = '';
@@ -558,6 +572,47 @@
 	}
 
 	window.fcvote_review_set_rating = fcvote_review_set_rating;
+
+	// Composite voting: rating of a characteristic (small stars), the overall rating is the average of the characteristics
+	function fcvote_review_set_xrating(btn) {
+		var wrap = btn.parentNode;
+		var value = parseInt(btn.getAttribute('data-value'), 10) || 0;
+		var input = wrap.querySelector('input[type="hidden"]');
+		if (input) input.value = value;
+
+		var stars = wrap.querySelectorAll('.fcvote-review-star');
+		for (var i = 0; i < stars.length; i++) {
+			var v = parseInt(stars[i].getAttribute('data-value'), 10) || 0;
+			stars[i].style.color = v <= value ? '#f5a623' : '#ccc';
+		}
+
+		var form = btn.form || (input && input.form);
+		if (!form) return;
+
+		var inputs = form.querySelectorAll('.fcvote-review-xrating input[type="hidden"]');
+		var sum = 0, done = 0;
+		for (var j = 0; j < inputs.length; j++) {
+			var n = parseInt(inputs[j].value, 10) || 0;
+			if (n > 0) { sum += n; done++; }
+		}
+
+		var main = form.querySelector('.fcvote-review-rating-main');
+		if (main) {
+			var avg = (done === inputs.length && done > 0) ? Math.max(1, Math.round(sum / done)) : 0;
+			var main_input = main.querySelector('input[name="rating"]');
+			if (main_input) main_input.value = avg || '';
+			var main_stars = main.querySelectorAll('.fcvote-review-star');
+			for (var k = 0; k < main_stars.length; k++) {
+				var mv = parseInt(main_stars[k].getAttribute('data-value'), 10) || 0;
+				main_stars[k].style.color = mv <= avg ? '#f5a623' : '#ccc';
+			}
+		}
+
+		var err = form.querySelector('.fcvote-review-rating-error');
+		if (err) err.style.display = 'none';
+	}
+
+	window.fcvote_review_set_xrating = fcvote_review_set_xrating;
 
 
 	/* ================================================================

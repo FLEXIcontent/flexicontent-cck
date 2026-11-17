@@ -4507,6 +4507,26 @@ class flexicontent_html
 	 *
 	 * @since   3.3.0
 	 */
+	static function getVotingFieldConfig()
+	{
+		static $field = false;
+
+		if ($field === false)
+		{
+			$db    = \Joomla\CMS\Factory::getDbo();
+			$field = $db->setQuery('SELECT * FROM #__flexicontent_fields WHERE field_type = ' . $db->Quote('voting'))->loadObject();
+
+			if ($field)
+			{
+				// The item is passed by reference, so it must be a variable
+				$item = (object) array('type_id' => 0);
+				FlexicontentFields::loadFieldConfig($field, $item);
+			}
+		}
+
+		return $field ?: null;
+	}
+
 	static function reviewStarsCount()
 	{
 		static $stars = null;
@@ -4514,14 +4534,10 @@ class flexicontent_html
 		if ($stars === null)
 		{
 			$stars = 5;
-			$db    = \Joomla\CMS\Factory::getDbo();
-			$field = $db->setQuery('SELECT * FROM #__flexicontent_fields WHERE field_type = ' . $db->Quote('voting'))->loadObject();
+			$field = static::getVotingFieldConfig();
 
 			if ($field)
 			{
-				$item = (object) array('type_id' => 0);
-				FlexicontentFields::loadFieldConfig($field, $item);
-
 				$resolution = max(5, min(100, (int) $field->parameters->get('rating_resolution', 5)));
 				$stars      = (int) $field->parameters->get('rating_stars', 5);
 				$stars      = max(1, min(10, $stars > 0 ? min($stars, $resolution) : $resolution));
@@ -4529,6 +4545,48 @@ class flexicontent_html
 		}
 
 		return $stars;
+	}
+
+	/**
+	 * Get the voting characteristics of the composite voting (extra votes) of the voting field
+	 *
+	 * @param   object  $field  The voting field
+	 *
+	 * @return  array   xid => object(title, desc), empty if composite voting is disabled
+	 */
+	static function getVotingCharacteristics($field)
+	{
+		$chars = array();
+
+		if (!$field || !(int) $field->parameters->get('enable_extra_votes', 0))
+		{
+			return $chars;
+		}
+
+		$extra_votes = preg_split("/[\s]*%%[\s]*/", (string) $field->parameters->get('extra_votes', ''));
+
+		foreach ($extra_votes as $extra_vote)
+		{
+			if (trim($extra_vote) === '')
+			{
+				continue;
+			}
+
+			$parts = explode('##', $extra_vote);
+			$xid   = (int) trim($parts[0]);
+
+			if ($xid < 1)
+			{
+				continue;
+			}
+
+			$chars[$xid] = (object) array(
+				'title' => isset($parts[1]) ? trim($parts[1]) : '',
+				'desc'  => isset($parts[2]) ? trim($parts[2]) : '',
+			);
+		}
+
+		return $chars;
 	}
 
 	/**
@@ -4595,7 +4653,10 @@ class flexicontent_html
 		$xids = array();
 		$enable_extra_votes = (int) $field->parameters->get('enable_extra_votes', 0);
 
-		if ($enable_extra_votes && ($xid === 'all' || $xid === 'extra' || $int_xid))
+		// Characteristics are not displayed with the rating (they are rated in the review form only), the overall rating is then read-only
+		$extra_hidden = $enable_extra_votes && !(int) $field->parameters->get('extra_show_in_display', 1);
+
+		if ($enable_extra_votes && !$extra_hidden && ($xid === 'all' || $xid === 'extra' || $int_xid))
 		{
 			// Retrieve and split-up extra vote types, (removing last one if empty)
 			$extra_votes = $field->parameters->get('extra_votes', '');
@@ -4639,7 +4700,7 @@ class flexicontent_html
 				'main',
 				$vote_label,
 				$stars_override = 0,
-				($allow_vote = isset($vote->allow_vote) ? $vote->allow_vote : true),
+				($allow_vote = !$extra_hidden && (isset($vote->allow_vote) ? $vote->allow_vote : true)),
 				$vote_counter = 'default',
 				$counter_show_label,
 				$add_review_form,
