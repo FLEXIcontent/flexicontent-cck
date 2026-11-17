@@ -37,6 +37,7 @@ jobs:
           php -d error_reporting=-1 tests/category-csv.php
           php -d error_reporting=-1 tests/cache-path.php
           php -d error_reporting=-1 tests/cache-invalidation.php
+          php -d error_reporting=-1 tests/extra-votes-without-rating.php
           node tests/image-media-clone.cjs
           php -d error_reporting=-1 tests/installer-platform.php 4.4.0
           php -d error_reporting=-1 tests/installer-platform.php 5.0.0
