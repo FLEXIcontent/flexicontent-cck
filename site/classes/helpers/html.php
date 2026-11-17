@@ -4401,7 +4401,7 @@ class flexicontent_html
 
 		$query = $db->getQuery(true)
 			->select('r.*')
-			->select('u.name AS author_name')
+			->select('CASE WHEN u.id IS NOT NULL THEN u.name ELSE r.name END AS author_name')
 			->from('#__flexicontent_reviews AS r')
 			->join('LEFT', '#__users AS u ON u.id = r.user_id')
 			->where(static::reviewsVisibleWhere($db, array($item_id)))
@@ -4430,7 +4430,7 @@ class flexicontent_html
 
 		$query = $db->getQuery(true)
 			->select('r.*')
-			->select('u.name AS author_name')
+			->select('CASE WHEN u.id IS NOT NULL THEN u.name ELSE r.name END AS author_name')
 			->from('#__flexicontent_reviews AS r')
 			->join('LEFT', '#__users AS u ON u.id = r.user_id')
 			->where(static::reviewsVisibleWhere($db, array($item_id)))

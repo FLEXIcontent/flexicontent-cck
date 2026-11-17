@@ -624,7 +624,21 @@ if ($js)
 			</td>
 
 			<td class="center hidden-phone hidden-tablet">
-				<?php echo $row->author_name ?: \Joomla\CMS\Language\Text::_('FLEXI_GUEST'); ?>
+				<?php
+				if ($row->author_name)
+				{
+					echo htmlspecialchars($row->author_name, ENT_QUOTES, 'UTF-8');
+				}
+				elseif (trim((string) $row->name) !== '')
+				{
+					// Guest: the name given in the review form, marked as a guest
+					echo htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8') . ' <span class="badge bg-secondary badge-secondary" style="margin:0;">' . \Joomla\CMS\Language\Text::_('FLEXI_GUEST') . '</span>';
+				}
+				else
+				{
+					echo \Joomla\CMS\Language\Text::_('FLEXI_GUEST');
+				}
+				?>
 			</td>
 
 			<td class="center hidden-phone hidden-tablet">

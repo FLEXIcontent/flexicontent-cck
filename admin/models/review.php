@@ -161,6 +161,7 @@ class FlexicontentModelReview extends FCModelAdmin
 		$record->id							= 0;
 		$record->content_id			= $this->getState('content_id');
 		$record->type						= $this->getState('review_type');
+		$record->name					= '';
 		$record->email					= $this->getState('email');
 		$record->title					= '';
 		$record->text						= '';
@@ -233,6 +234,8 @@ class FlexicontentModelReview extends FCModelAdmin
 		{
 			$readonlyFields[]= 'email';
 			$hiddenFields[]  = 'email';
+			$readonlyFields[]= 'name';
+			$hiddenFields[]  = 'name';
 		}
 
 		if (!$this->canManage)
@@ -484,6 +487,9 @@ class FlexicontentModelReview extends FCModelAdmin
 		// Validate title, decode entities, and strip HTML
 		$data['title'] = flexicontent_html::dataFilter($data['title'], $maxlength=255, 'STRING', 0);
 
+		// Validate name: required for guests, logged users are identified by their account
+		$data['name'] = $user->id ? '' : trim(flexicontent_html::dataFilter(isset($data['name']) ? $data['name'] : '', $maxlength=100, 'STRING', 0));
+
 		// Validate email
 		$data['email'] = $user->id ? $user->email : flexicontent_html::dataFilter($data['email'], $maxlength=255, 'EMAIL', 0);
 
@@ -498,6 +504,12 @@ class FlexicontentModelReview extends FCModelAdmin
 		if (!$content_id)
 		{
 			$this->setError('Content being reviewed not given (content_id is zero)');
+			return false;
+		}
+
+		if (!$user->id && $data['name'] === '')
+		{
+			$this->setError(\Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_NAME'));
 			return false;
 		}
 

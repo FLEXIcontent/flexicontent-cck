@@ -1139,6 +1139,7 @@ class com_flexicontentInstallerScript
 							`average_rating` int NOT NULL,
 							`custom_ratings` text NULL,
 							`user_id` int(11) NOT NULL DEFAULT '0',
+							`name` varchar(255) NOT NULL DEFAULT '',
 							`email` varchar(255) NOT NULL DEFAULT '',
 							`title` varchar(255) NULL,
 							`title_old` varchar(255) NULL,
@@ -1183,6 +1184,9 @@ class com_flexicontentInstallerScript
 						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;";
 					}
 
+					if ( $reviews_tbl_exists && !array_key_exists('name', $tbl_fields['#__flexicontent_reviews']) ) {
+						$queries[] = "ALTER TABLE `#__flexicontent_reviews` ADD `name` varchar(255) NOT NULL DEFAULT '' AFTER `user_id`";
+					}
 					if ( $reviews_tbl_exists && !array_key_exists('title_old', $tbl_fields['#__flexicontent_reviews']) ) {
 						$queries[] = "ALTER TABLE `#__flexicontent_reviews` ADD `title_old` varchar(255) NULL AFTER `title`";
 					}

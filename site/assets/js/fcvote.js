@@ -420,6 +420,14 @@
 	 *  REVIEW FORM — Submit (fetch POST to storereviewform)
 	 * ================================================================ */
 
+	// Characters counter of the review text (shows used/maximum)
+	document.addEventListener('input', function(e) {
+		var ta = e.target;
+		if (!ta || !ta.matches || !ta.matches('textarea[data-fcvote-max]')) return;
+		var counter = ta.parentNode.querySelector('.fcvote-counter');
+		if (counter) counter.textContent = ta.value.length + '/' + ta.getAttribute('data-fcvote-max');
+	});
+
 	function fcvote_submit_review_form(tagid, form) {
 		var box = document.getElementById(tagid);
 		var box_loading = document.getElementById(tagid + '_loading');
@@ -445,7 +453,8 @@
 		}
 
 		var url = fcvote_root_url()
-			+ 'index.php?option=com_flexicontent&format=raw&task=storereviewform';
+			+ 'index.php?option=com_flexicontent&format=raw&task=storereviewform'
+			+ '&lang=' + (typeof window.fc_sef_lang !== 'undefined' ? window.fc_sef_lang : '');
 
 		if (box_loading && !in_modal) {
 			box_loading.innerHTML = '';
@@ -575,7 +584,8 @@
 
 		var box = document.getElementById(tagid);
 		var url = fcvote_root_url()
-			+ 'index.php?option=com_flexicontent&format=raw&task=deletereviewform';
+			+ 'index.php?option=com_flexicontent&format=raw&task=deletereviewform'
+			+ '&lang=' + (typeof window.fc_sef_lang !== 'undefined' ? window.fc_sef_lang : '');
 
 		fetch(url, {
 			method: 'POST',
@@ -616,7 +626,8 @@
 		body.set(btn.getAttribute('data-token'), '1');
 
 		var url = fcvote_root_url()
-			+ 'index.php?option=com_flexicontent&format=raw&task=deletereviewform';
+			+ 'index.php?option=com_flexicontent&format=raw&task=deletereviewform'
+			+ '&lang=' + (typeof window.fc_sef_lang !== 'undefined' ? window.fc_sef_lang : '');
 
 		btn.disabled = true;
 
@@ -705,7 +716,8 @@
 		if (btn) btn.disabled = true;
 
 		var url = fcvote_root_url()
-			+ 'index.php?option=com_flexicontent&format=raw&task=savereviewedit';
+			+ 'index.php?option=com_flexicontent&format=raw&task=savereviewedit'
+			+ '&lang=' + (typeof window.fc_sef_lang !== 'undefined' ? window.fc_sef_lang : '');
 
 		fetch(url, {
 			method: 'POST',
@@ -764,7 +776,8 @@
 		body.set(btn.getAttribute('data-token'), '1');
 
 		var url = fcvote_root_url()
-			+ 'index.php?option=com_flexicontent&format=raw&task=votereviewuseful';
+			+ 'index.php?option=com_flexicontent&format=raw&task=votereviewuseful'
+			+ '&lang=' + (typeof window.fc_sef_lang !== 'undefined' ? window.fc_sef_lang : '');
 
 		for (var i = 0; i < btns.length; i++) btns[i].disabled = true;
 
@@ -1014,7 +1027,8 @@
 		body.set(btn.getAttribute('data-token'), '1');
 
 		var url = fcvote_root_url()
-			+ 'index.php?option=com_flexicontent&format=raw&task=' + (action === 'approve' ? 'approvereview' : 'trashreview');
+			+ 'index.php?option=com_flexicontent&format=raw&task=' + (action === 'approve' ? 'approvereview' : 'trashreview')
+			+ '&lang=' + (typeof window.fc_sef_lang !== 'undefined' ? window.fc_sef_lang : '');
 
 		btn.disabled = true;
 
@@ -1162,8 +1176,14 @@
 
 		// Close handlers
 		closeBtn.addEventListener('click', function() { fcvote_remove_modal(); });
+		// Close on a click outside of the dialog, but not when a press started inside the dialog (e.g. selecting text of a field and releasing the mouse over the backdrop)
+		var down_on_overlay = false;
+		overlay.addEventListener('mousedown', function(e) { down_on_overlay = (e.target === overlay); });
+		overlay.addEventListener('touchstart', function(e) { down_on_overlay = (e.target === overlay); }, { passive: true });
 		overlay.addEventListener('click', function(e) {
-			if (e.target === overlay) fcvote_remove_modal();
+			var close = (e.target === overlay) && down_on_overlay;
+			down_on_overlay = false;
+			if (close) fcvote_remove_modal();
 		});
 		document.addEventListener('keydown', fcvote_modal_keydown);
 
@@ -1279,8 +1299,14 @@
 		}
 
 		closeBtn.addEventListener('click', closeModal);
+		// Close on a click outside of the dialog, but not when a press started inside the dialog (e.g. selecting text of a field and releasing the mouse over the backdrop)
+		var down_on_overlay = false;
+		overlay.addEventListener('mousedown', function(e) { down_on_overlay = (e.target === overlay); });
+		overlay.addEventListener('touchstart', function(e) { down_on_overlay = (e.target === overlay); }, { passive: true });
 		overlay.addEventListener('click', function(e) {
-			if (e.target === overlay) closeModal();
+			var close = (e.target === overlay) && down_on_overlay;
+			down_on_overlay = false;
+			if (close) closeModal();
 		});
 		document.addEventListener('keydown', fcvote_modal_keydown);
 

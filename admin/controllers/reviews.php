@@ -76,6 +76,10 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 	{
 		parent::__construct($config);
 
+		// Language of the voting field (reviews strings live in the field's language file)
+		\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, 'en-GB', true);
+		\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, null, true);
+
 		// Register task aliases
 		$this->registerTask('add',          'edit');
 		$this->registerTask('apply',        'save');
@@ -556,12 +560,20 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 
 					// The email of a user is the email of his account
 					$validated_data['email'] = $reviewer->email;
+					$validated_data['name']  = '';
 					$where_reviewer = 'user_id = ' . $reviewer_id;
 				}
 				else
 				{
 					$validated_data['user_id'] = 0;
 					$guest_email = isset($validated_data['email']) ? trim($validated_data['email']) : '';
+					$validated_data['name'] = isset($validated_data['name']) ? trim($validated_data['name']) : '';
+
+					if ($validated_data['name'] === '')
+					{
+						$model->setError(\Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_NAME'));
+						return false;
+					}
 
 					if ($guest_email === '')
 					{

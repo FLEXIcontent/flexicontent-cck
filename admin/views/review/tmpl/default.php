@@ -70,6 +70,7 @@ $form = $this->form;
 {
 	var userInput = document.querySelector('[name="jform[user_id]"]');
 	var email = document.getElementById('jform_email');
+	var guestName = document.getElementById('jform_name');
 
 	// Only when creating a review (otherwise the reviewer is shown as read-only text)
 	if (!userInput || !email || userInput.type !== 'hidden') return;
@@ -82,8 +83,8 @@ $form = $this->form;
 		if (hasUser === last) return;
 		last = hasUser;
 
-		if (hasUser) { email.value = ''; email.disabled = true; }
-		else { email.disabled = false; }
+		if (hasUser) { email.value = ''; email.disabled = true; if (guestName) { guestName.value = ''; guestName.disabled = true; } }
+		else { email.disabled = false; if (guestName) guestName.disabled = false; }
 	}
 
 	userInput.addEventListener('change', syncEmail);

@@ -108,6 +108,10 @@ class FlexicontentModelReviews extends FCModelAdminList
 		// Call parent after setting ... $this->view_id
 		parent::__construct($config);
 
+		// Language of the voting field (reviews strings live in the field's language file)
+		\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, 'en-GB', true);
+		\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_core', JPATH_ADMINISTRATOR, null, true);
+
 		$p = $this->ovid;
 
 

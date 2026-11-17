@@ -546,6 +546,9 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 		$review_type = 'item';
 
+		$rv_max  = $this->getReviewMaxLength($field);
+		$rv_text = $review ? (string) $review->text : '';
+
 		$result = (object) array(
 			'html' => '
 				<form id="fcvote_review_form_' . $item->id . '" name="fcvote_review_form_' . $item->id . '" action="javascript:;">
@@ -566,6 +569,15 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 						</div>
 
 						<div class="fcvote-form-group">
+							<label class="fcvote-form-label" for="fcvote_review_form_' . $item->id . '_name">' . \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_NAME') . '</label>
+							' . ($user->id ? '<div class="fcvote-form-name" style="padding:0.4em 0;">' . htmlspecialchars($user->name, ENT_COMPAT, 'UTF-8') . '</div>' : '
+							<input required type="text" name="name" maxlength="100"
+								value="'.htmlspecialchars( ($review ? $review->name : ''), ENT_COMPAT, 'UTF-8' ).'"
+								id="fcvote_review_form_' . $item->id . '_name"
+							/>') . '
+						</div>
+
+						<div class="fcvote-form-group">
 							<label class="fcvote-form-label" for="fcvote_review_form_' . $item->id . '_email">' . \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_EMAIL') . '</label>
 							' . ($user->id ? '<div class="fcvote-form-email" style="padding:0.4em 0;">' . htmlspecialchars($user->email, ENT_COMPAT, 'UTF-8') . '</div>' : '
 							<input required type="text" name="email"
@@ -576,7 +588,8 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 						<div class="fcvote-form-group">
 							<label class="fcvote-form-label" for="fcvote_review_form_' . $item->id . '_text">'.\Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_TEXT').'</label>
-							<textarea required name="text" rows="4" id="fcvote_review_form_' . $item->id . '_text" >' . htmlspecialchars(($review ? (string) $review->text : ''), ENT_COMPAT, 'UTF-8') . '</textarea>
+							<textarea required name="text" rows="4" id="fcvote_review_form_' . $item->id . '_text"' . ($rv_max ? ' maxlength="' . $rv_max . '" data-fcvote-max="' . $rv_max . '"' : '') . ' >' . htmlspecialchars($rv_text, ENT_COMPAT, 'UTF-8') . '</textarea>
+							' . ($rv_max ? '<div class="fcvote-counter">' . (function_exists('mb_strlen') ? mb_strlen($rv_text, 'UTF-8') : strlen($rv_text)) . '/' . $rv_max . '</div>' : '') . '
 						</div>
 
 						<div class="fcvote-form-group fcvote-form-submit">
@@ -614,6 +627,9 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		// Validate title
 		$title = flexicontent_html::dataFilter($this->input->get('title', '', 'string'), $maxlength=255, 'STRING', 0);  // Decode entities, and strip HTML
 
+		// Validate name: required for guests, logged users are identified by their account (their name is not stored in the review)
+		$name = $user->id ? '' : trim(flexicontent_html::dataFilter($this->input->get('name', '', 'string'), $maxlength=100, 'STRING', 0));  // Decode entities, and strip HTML
+
 		// Validate email
 		$email = $user->id ? $user->email : flexicontent_html::dataFilter($this->input->get('email', '', 'string'), $maxlength=255, 'EMAIL', 0);  // Validate email
 
@@ -631,6 +647,11 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		if (!$content_id)
 		{
 			$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_CONTENT_ID');
+		}
+
+		if (!$user->id && $name === '')
+		{
+			$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_NAME');
 		}
 
 		if (!$email)
@@ -694,6 +715,18 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			if ((int) $db->setQuery($query)->loadResult())
 			{
 				$errors[] = \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_ERR_ALREADY');
+			}
+		}
+
+		// Maximum length of the review text
+		if (!count($errors))
+		{
+			$max_length = $this->getReviewMaxLength($field);
+			$text_length = function_exists('mb_strlen') ? mb_strlen($text, 'UTF-8') : strlen($text);
+
+			if ($max_length && $text_length > $max_length)
+			{
+				$errors[] = \Joomla\CMS\Language\Text::sprintf('FLEXI_VOTE_REVIEW_ERR_TOO_LONG', $max_length);
 			}
 		}
 
@@ -777,6 +810,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			$review->content_id = $content_id;
 			$review->type  = $review_type;
 			$review->title = $title;
+			$review->name  = $name;
 			$review->email = $email;
 			$review->user_id = $user->id;
 			$review->text  = $text;
@@ -1316,7 +1350,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			$author = $review->user_id
 				? $db->setQuery('SELECT name FROM #__users WHERE id = ' . (int) $review->user_id)->loadResult()
 				: '';
-			$author = $author ?: \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_GUEST');
+			$author = $author ?: (trim((string) $review->name) !== '' ? $review->name : \Joomla\CMS\Language\Text::_('FLEXI_VOTE_REVIEW_GUEST'));
 
 			$form_id = 'fcvote_review_edit_form_' . (int) $review->id;
 
@@ -1631,6 +1665,17 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 	 *
 	 * @since   3.3.0
 	 */
+	/**
+	 * Maximum number of characters of a review text (field parameter), 0: no limit
+	 */
+	private function getReviewMaxLength($field)
+	{
+		$max = $field ? (int) $field->parameters->get('reviews_max_length', 500) : 500;
+
+		return max(0, $max);
+	}
+
+
 	private function loadReviewLanguage()
 	{
 		$lang = \Joomla\CMS\Factory::getApplication()->getLanguage();
