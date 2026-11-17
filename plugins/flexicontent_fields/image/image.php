@@ -17,9 +17,15 @@ use Joomla\Filesystem\Path;
 use Joomla\Filesystem\Folder;
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php';
-require_once JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'controllers'.DS.'filemanager.php';  // we use JPATH_BASE since controller exists in frontend too
-require_once JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'filemanager.php';  // we use JPATH_BASE since model exists in frontend too
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FCField'                           => JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php',
+		'FlexicontentControllerFilemanager' => JPATH_ADMINISTRATOR . '/components/com_flexicontent/controllers/filemanager.php',
+		'FlexicontentModelFilemanager'      => JPATH_ADMINISTRATOR . '/components/com_flexicontent/models/filemanager.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 if (!defined('_FC_CONTINUE_'))  define('_FC_CONTINUE_', 1);
 if (!defined('_FC_BREAK_'))  define('_FC_BREAK_', 2);

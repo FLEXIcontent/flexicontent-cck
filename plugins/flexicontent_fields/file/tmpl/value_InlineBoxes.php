@@ -5,7 +5,13 @@ use Joomla\CMS\Router\Route;
 use Joomla\CMS\Uri\Uri;
 use Joomla\Filesystem\Path;
 use Joomla\String\StringHelper;
-require_once JPATH_SITE . '/components/com_flexicontent/helpers/route.php';
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FlexicontentHelperRoute' => JPATH_SITE . '/components/com_flexicontent/helpers/route.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 $isAdmin = Factory::getApplication()->isClient('administrator');
 

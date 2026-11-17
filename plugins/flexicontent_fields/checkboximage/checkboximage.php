@@ -10,7 +10,13 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/indexedfield.php';
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FCIndexedField' => JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/indexedfield.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 class plgFlexicontent_fieldsCheckboximage extends FCIndexedField
 {

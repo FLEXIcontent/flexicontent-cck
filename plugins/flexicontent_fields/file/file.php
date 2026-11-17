@@ -17,9 +17,15 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 // Public handlers may run before the database helper is autoloaded.
 require_once JPATH_SITE . '/components/com_flexicontent/classes/helpers/security.php';
-require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php';
-require_once JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'controllers'.DS.'filemanager.php';  // we use JPATH_BASE since controller exists in frontend too
-require_once JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'filemanager.php';  // we use JPATH_BASE since model exists in frontend too
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FCField'                           => JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php',
+		'FlexicontentControllerFilemanager' => JPATH_BASE . '/components/com_flexicontent/controllers/filemanager.php',
+		'FlexicontentModelFilemanager'      => JPATH_BASE . '/components/com_flexicontent/models/filemanager.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 class plgFlexicontent_fieldsFile extends FCField
 {
