@@ -382,9 +382,10 @@ class FlexicontentModelItems extends FCModelAdminList
 				$rows = $this->_db->loadObjectList();
 				if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
-				// 2, get current items total for pagination
-				$this->_db->setQuery("SELECT FOUND_ROWS()");
-				$this->_total = $this->_db->loadResult();
+				// 2, get current items total for pagination: count the rows of the same query (without ordering).
+				// Not SQL_CALC_FOUND_ROWS: it stops the database from ending the list query after the rows of the
+				// current page, and MySQL 8.0.17+ deprecates it
+				$this->_total = (int) $this->_db->setQuery('SELECT COUNT(*) FROM (' . $this->_buildQuery(false, true) . ') AS fc_list')->loadResult();
 
 				// 3, get item ids
 				$query_ids = array();
@@ -1049,7 +1050,7 @@ class FlexicontentModelItems extends FCModelAdminList
 	 *
 	 * @since   3.3.0
 	 */
-	protected function _buildQuery($query_ids = false)
+	protected function _buildQuery($query_ids = false, $for_count = false)
 	{
 		$use_versioning = $this->cparams->get('use_versioning', 1);
 		$lang  = 'ie.language AS lang, ie.lang_parent_id, ';
@@ -1092,7 +1093,7 @@ class FlexicontentModelItems extends FCModelAdminList
 
 		if ( !$query_ids )
 		{
-			$query = 'SELECT SQL_CALC_FOUND_ROWS a.id '
+			$query = 'SELECT a.id '
 				. ( in_array($filter_order, array('rating_count','rating')) ?
 					', cr.rating_count AS rating_count' . $ratings_col : ''
 				)
@@ -1169,7 +1170,11 @@ class FlexicontentModelItems extends FCModelAdminList
 				? ' JOIN #__flexicontent_fields_item_relations as fi ON a.id=fi.item_id'
 				: '')
 
-			. ' LEFT JOIN #__flexicontent_tags_item_relations AS tg ON a.id=tg.itemid'
+			// Tags: needed by the item data query (taglist column) and by the tag filter of the list query only.
+			// Joined without a tag filter, every tag of an item multiplies the rows the list query must group.
+			. ($query_ids || !empty($filter_tag)
+				? ' LEFT JOIN #__flexicontent_tags_item_relations AS tg ON a.id=tg.itemid'
+				: '')
 
 			. ($query_ids || in_array($filter_order, array('rating_count', 'rating'))
 				? ' LEFT JOIN ' . $rating_join
@@ -1205,8 +1210,8 @@ class FlexicontentModelItems extends FCModelAdminList
 				? ' LEFT JOIN #__viewlevels AS level ON level.id = a.access'
 				: '')
 
-			// Workflows
-			. (FLEXI_J40GE
+			// Workflows: only the item data query selects their columns, the list query never filters or orders by them
+			. (FLEXI_J40GE && $query_ids
 				? ' LEFT JOIN #__workflow_associations AS wa ON wa.item_id = a.id AND wa.extension = "com_content.article"' .
 				' LEFT JOIN #__workflow_stages AS ws ON ws.id = wa.stage_id' .
 				' LEFT JOIN #__workflows AS w ON w.id = ws.workflow_id'
@@ -1235,7 +1240,7 @@ class FlexicontentModelItems extends FCModelAdminList
 				. $where
 				. ' GROUP BY a.id'
 				. (count($having) ? ' HAVING ' . implode(' AND ', $having) : '')
-				. $orderby
+				. ($for_count ? '' : $orderby)
 			;
 		}
 		else

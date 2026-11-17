@@ -3282,14 +3282,23 @@ class flexicontent_html
 				: JLoader::register($recordClass, JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.$config->record_name.'.php');
 		}
 
-		try
+		// One model per record type: it is only needed for its list of supported states, which does not depend on
+		// the record. (Creating one per row ran a query per row of every list that shows state buttons.)
+		static $models = array();
+
+		if (!isset($models[$recordClass]))
 		{
-			$model = new $recordClass();
+			try
+			{
+				$models[$recordClass] = new $recordClass();
+			}
+			catch (Exception $e)
+			{
+				die('flexicontent_html::' . __FUNCTION__ . '() , unknown type: ' . $config->record_name);
+			}
 		}
-		catch (Exception $e)
-		{
-			die('flexicontent_html::' . __FUNCTION__ . '() , unknown type: ' . $record_name);
-		}
+
+		$model = $models[$recordClass];
 
 		$archive_unsupported = !isset($model->supported_conditions[2]);
 		$trash_unsupported   = !isset($model->supported_conditions[-2]);
