@@ -103,22 +103,31 @@ class plgSystemFlexisystem extends CMSPlugin
 		 */
 
 		if ($task === 'articles.featured' || $task === 'articles.unfeatured') {
-			$this->_loadFcHelpersAndLanguage();
+			// Mirror the toggle of Joomla's Articles manager, with the same conditions Joomla checks before it
+			// changes the flag: administrator, valid form token, edit state permission on each article
+			$cid = \Joomla\Utilities\ArrayHelper::toInteger($app->input->get('cid', array(), 'array'));
+			$user = $app->getIdentity();
 
-			// Load the FLEXIcontent item
-			$cid = $app->input->get('cid', array(), 'array');
-			$cid = (int) reset($cid);
+			$cid = $app->isClient('administrator') && $app->input->getCmd('option') === 'com_content'
+				&& \Joomla\CMS\Session\Session::checkToken('request') && $user
+				? array_filter($cid, function ($id) use ($user) { return $id > 0 && $user->authorise('core.edit.state', 'com_content.article.' . $id); })
+				: array();
 
-			// Update featured flag (model will also handle cache cleaning)
-			$itemmodel = new FlexicontentModelItem();
-			$itemmodel->featured($cid, $task === 'articles.featured' ? 1 : 0);
+			if ($cid) {
+				$this->_loadFcHelpersAndLanguage();
+
+				// Update featured flag (model will also handle cache cleaning)
+				$itemmodel = new FlexicontentModelItem();
+				$itemmodel->featured($cid, $task === 'articles.featured' ? 1 : 0);
+			}
 		}
 
 		/**
 		 * Call joomla configuration model to update to sync the permission between com_flexicontent and com_content
 		 */
 
-		elseif ($task === 'config.store') {
+		// Joomla 3 only: the com_config classes used below do not exist in Joomla 4+
+		elseif (!FLEXI_J40GE && $task === 'config.store') {
 			$comp = $app->input->get('comp', '', 'cmd');
 			$comp = str_replace('com_flexicontent.category.', 'com_content.category.', $comp);
 			$comp = str_replace('com_flexicontent.item.', 'com_content.article.', $comp);
