@@ -132,7 +132,7 @@ $query = $db->getQuery(true)
 		//' OR (a.name =' . $db->quote('plg_editors_none')   . ' AND a.enabled = 1) '
 	);
 $db->setQuery($query);
-$use_editor = (boolean)$db->loadResult();
+$use_editor = (bool)$db->loadResult();
 if (!$use_editor)  $app->enqueueMessage(\Joomla\CMS\Language\Text::_('Codemirror is disabled, please enable, simple textarea will be used for editting files'), 'warning');
 
 \Joomla\CMS\Language\Text::script('FLEXI_TMPLS_LOAD_FILE_BEFORE_SAVING', true);

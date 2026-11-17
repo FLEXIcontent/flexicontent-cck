@@ -112,14 +112,14 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 
 		$filter_indextype	= $model->getState( 'filter_indextype' );
 
-		$f_active['filter_itemlang']	= (boolean)$filter_itemlang;
-		$f_active['filter_fieldtype']	= (boolean)$filter_fieldtype;
-		$f_active['filter_type']	= (boolean)$filter_type;
-		$f_active['filter_state']	= (boolean)$filter_state;
+		$f_active['filter_itemlang']	= (bool)$filter_itemlang;
+		$f_active['filter_fieldtype']	= (bool)$filter_fieldtype;
+		$f_active['filter_type']	= (bool)$filter_type;
+		$f_active['filter_state']	= (bool)$filter_state;
 
 		$f_active['search']			= strlen($search);
 		$f_active['search_itemtitle']	= strlen($search_itemtitle);
-		$f_active['search_itemid']		= (boolean)$search_itemid;
+		$f_active['search_itemid']		= (bool)$search_itemid;
 
 
 		/**

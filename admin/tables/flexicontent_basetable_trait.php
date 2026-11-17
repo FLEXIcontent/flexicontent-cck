@@ -370,7 +370,7 @@ trait flexicontent_basetable_trait
 				);
 			}
 			
-			$duplicate_alias = (boolean) $this->_db->setQuery($query)->loadResult();
+			$duplicate_alias = (bool) $this->_db->setQuery($query)->loadResult();
 
 			if ($duplicate_alias)
 			{

@@ -134,10 +134,10 @@ if ($clustermode) {
 
 // Load framework (Map API)
 switch ($mapapi) {
-	case 'googlemap';
+	case 'googlemap':
 		flexicontent_html::loadFramework('google-maps', '', $params);
 		break;
-	case 'openstreetmap';
+	case 'openstreetmap':
 		flexicontent_html::loadFramework('openstreetmap', '', $params);
 
 		// Get OS Map TILE server

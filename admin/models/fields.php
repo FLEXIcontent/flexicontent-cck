@@ -357,7 +357,7 @@ class FlexicontentModelFields extends FCModelAdminList
 
 		// Use filter value if content type was not given
 		$typeid = $typeid ?: $this->getState('filter_type');
-		$multi_assigns_ordering = (boolean) $typeid;
+		$multi_assigns_ordering = (bool) $typeid;
 
 
 		/**

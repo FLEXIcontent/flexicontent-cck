@@ -361,7 +361,7 @@ class flexicontent_tags extends flexicontent_basetable
 		if ($tags_table_fix_needed === null)
 		{
 			$query = 'SELECT COUNT(*) FROM #__tags WHERE parent_id = 0 AND id <> 1';
-			$tags_table_fix_needed = (boolean) $this->_db->setQuery($query)->execute();
+			$tags_table_fix_needed = (bool) $this->_db->setQuery($query)->execute();
 
 			// Fix Joomla tags table
 			if ($tags_table_fix_needed)

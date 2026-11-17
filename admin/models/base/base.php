@@ -359,7 +359,7 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 		 
 		if (!empty($data))
 		{
-			$data_matches = $data && (boolean) $this->_record;
+			$data_matches = $data && (bool) $this->_record;
 
 			foreach ($data as $k => $v)
 			{
@@ -389,7 +389,7 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 			}
 		}
 
-		return (boolean) $this->_record;
+		return (bool) $this->_record;
 	}
 
 

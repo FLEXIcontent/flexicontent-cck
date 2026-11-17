@@ -4109,7 +4109,7 @@ class FlexicontentFields
 		$field_tbl = 'flexicontent_advsearch_index_field_'.$filter->id;
 		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . $field_tbl . '"';
 		$db->setQuery($query);
-		$tbl_exists = (boolean) count($db->loadObjectList());
+		$tbl_exists = (bool) count($db->loadObjectList());
 		$field_tbl = $tbl_exists ? $field_tbl : 'flexicontent_advsearch_index';
 
 		// Get ALL items that have such values for the given field
@@ -4755,7 +4755,7 @@ class FlexicontentFields
 		$show_matching_items = $filter->parameters->get( 'show_matching_items_s', 1 );
 		$show_matches = $isRange || !$faceted_filter ?  0  :  $show_matching_items;
 
-		$filter->filter_isindexed = (boolean) $indexed_elements;
+		$filter->filter_isindexed = (bool) $indexed_elements;
 		$indexed_elements_given = is_array($indexed_elements) && $indexed_elements;
 
 		if ($faceted_filter || !$indexed_elements_given)
@@ -5065,7 +5065,7 @@ class FlexicontentFields
 		$field_tbl = 'flexicontent_advsearch_index_field_'.$filter->id;
 		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . $field_tbl . '"';
 		$db->setQuery($query);
-		$tbl_exists = (boolean) count($db->loadObjectList());
+		$tbl_exists = (bool) count($db->loadObjectList());
 		$field_tbl = $tbl_exists ? $field_tbl : 'flexicontent_advsearch_index';
 
 
