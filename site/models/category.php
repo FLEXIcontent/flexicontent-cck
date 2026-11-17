@@ -1715,7 +1715,60 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 	 */
 	function _getassigned($id)
 	{
+		$counts = $this->_getassignedMany(array((int) $id));
+
+		return $counts[(int) $id];
+	}
+
+
+	/**
+	 * Method to get the number of assigned items of several categories (each including its sub-categories)
+	 * with one query
+	 *
+	 * @param   int[]  $ids  Category ids
+	 *
+	 * @return  int[]  Item count per category id
+	 */
+	function _getassignedMany($ids)
+	{
 		global $globalcats;
+
+		$ids = array_values(array_unique(array_map('intval', $ids)));
+
+		if (!$ids)
+		{
+			return array();
+		}
+
+		// Map every counted category to the requested category whose sub-tree contains it. The sub-trees of
+		// sibling categories do not overlap, so COUNT(DISTINCT itemid) per group equals one count per category.
+		// If they do overlap (e.g. a multi-category view of nested categories), count each category separately.
+		$tree_of = array();
+		$overlap = false;
+
+		foreach ($ids as $id)
+		{
+			$list = !empty($globalcats[$id]->descendants) ? $globalcats[$id]->descendants : $id;
+
+			foreach (array_map('intval', explode(',', $list)) as $catid)
+			{
+				$overlap = $overlap || isset($tree_of[$catid]);
+				$tree_of[$catid] = $id;
+			}
+		}
+
+		if ($overlap && count($ids) > 1)
+		{
+			$counts = array();
+
+			foreach ($ids as $id)
+			{
+				$counts += $this->_getassignedMany(array($id));
+			}
+
+			return $counts;
+		}
+
 		$user = \Joomla\CMS\Factory::getUser();
 		$db   = \Joomla\CMS\Factory::getDbo();
 
@@ -1777,8 +1830,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		}
 
 		// Count items according to full depth level !!!
-		$catlist = !empty($globalcats[$id]->descendants) ? $globalcats[$id]->descendants : $id;
-		$where .= ' AND rel.catid IN ('.$catlist.')';
+		$where .= ' AND rel.catid IN (' . implode(',', array_keys($tree_of)) . ')';
 
 		// Select only items that user has view access, if listing of unauthorized content is not enabled
 		// Checking item, category, content type access level
@@ -1791,7 +1843,15 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			$where .= ' AND  i.access IN (0,'.$aid_list.')';
 		}
 
-		$query 	= 'SELECT COUNT(DISTINCT rel.itemid)'
+		// Group by the requested category that each counted category belongs to
+		$group_of = array();
+
+		foreach ($ids as $id)
+		{
+			$group_of[] = ' WHEN rel.catid IN (' . implode(',', array_keys($tree_of, $id, true)) . ') THEN ' . $id;
+		}
+
+		$query 	= 'SELECT CASE' . implode('', $group_of) . ' END AS cnt_catid, COUNT(DISTINCT rel.itemid) AS cnt'
 			. ' FROM #__flexicontent_cats_item_relations AS rel'
 			. (!$use_tmp ?
 				' JOIN #__content AS i ON rel.itemid = i.id' :
@@ -1800,12 +1860,17 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			. ' JOIN #__flexicontent_types AS ty ON ' .(!$use_tmp ? 'ie' : 'i'). '.type_id = ty.id'
 			. ' JOIN #__categories AS mc ON mc.id =   i.catid AND mc.published = 1'
 			. $where
+			. ' GROUP BY cnt_catid'
 			;
 
-		$db->setQuery($query);
-		$assigneditems = $db->loadResult();
+		$counts = array_fill_keys($ids, 0);
 
-		return $assigneditems;
+		foreach ($db->setQuery($query)->loadObjectList() as $row)
+		{
+			$counts[(int) $row->cnt_catid] = (int) $row->cnt;
+		}
+
+		return $counts;
 	}
 
 
@@ -1855,6 +1920,53 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		return $subcats;
 	}
 
+
+	/**
+	 * Method to return the sub categories of several categories with one query
+	 *
+	 * @param   int[]  $ids  Parent category ids
+	 *
+	 * @return  array  Per parent id, the same list of objects (with an 'id' property) that _getsubs() returns
+	 */
+	function _getsubsMany($ids)
+	{
+		$ids = array_values(array_unique(array_map('intval', $ids)));
+
+		if (!$ids)
+		{
+			return array();
+		}
+
+		$user = \Joomla\CMS\Factory::getUser();
+		$show_noauth = $this->_params->get('show_noauth', 0);   // Show unauthorized items
+
+		$where = ' WHERE c.published = 1'
+			. ' AND c.parent_id IN (' . implode(',', $ids) . ')';
+
+		// Select only categories that user has view access, if listing of unauthorized content is not enabled
+		if (!$show_noauth)
+		{
+			$aid_list = implode(',', \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id));
+			$where .= ' AND c.access IN (0,' . $aid_list . ')';
+		}
+
+		$query = 'SELECT DISTINCT c.id, c.parent_id'
+			. ' FROM #__categories as c'
+			. ' LEFT JOIN #__users AS u ON u.id = c.created_user_id'
+			. $where
+			. $this->_buildCatOrderBy()
+			;
+
+		$subcats = array();
+
+		foreach ($this->_db->setQuery($query)->loadObjectList() as $row)
+		{
+			$subcats[(int) $row->parent_id][] = (object) array('id' => $row->id);
+		}
+
+		return $subcats;
+	}
+
 	/**
 	 * Method to get the children of a category
 	 *
@@ -1881,24 +1993,18 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		$query = $this->_buildChildsQuery();
 		$this->_childs = $this->_getList($query);
 
-		$k = 0;
-		$count = count($this->_childs);
+		// Item counts and sub-category lists of all children, one query each (was two queries per child)
+		$ids = array_map(function ($c) { return (int) $c->id; }, $this->_childs);
 
-		for ($i = 0; $i < $count; $i++)
+		if ( $print_logging_info )  $start_microtime = microtime(true);
+		$counts  = $show_itemcount ? $this->_getassignedMany($ids) : array();
+		if ( $print_logging_info ) @$fc_run_times['item_counting_sub_cats'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		$subcats = $this->_getsubsMany($ids);
+
+		foreach ($this->_childs as $category)
 		{
-			$category = & $this->_childs[$i];
-			$category->assigneditems = null;
-
-			if ($show_itemcount)
-			{
-				if ( $print_logging_info )  $start_microtime = microtime(true);
-				$category->assigneditems = $this->_getassigned( $category->id );
-				if ( $print_logging_info ) @$fc_run_times['item_counting_sub_cats'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-			}
-
-			$category->subcats = $this->_getsubs($category->id);
-
-			$k = 1 - $k;
+			$category->assigneditems = $show_itemcount ? ($counts[(int) $category->id] ?? 0) : null;
+			$category->subcats = $subcats[(int) $category->id] ?? array();
 		}
 
 		return $this->_childs;
@@ -1931,23 +2037,18 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		$query = $this->_buildChildsQuery($this->_category->parent_id);
 		$this->_peers = $this->_getList($query);
 
-		$k = 0;
-		$count = count($this->_peers);
+		// Item counts and sub-category lists of all peers, one query each (was two queries per peer)
+		$ids = array_map(function ($c) { return (int) $c->id; }, $this->_peers);
 
-		for ($i = 0; $i < $count; $i++)
+		if ( $print_logging_info )  $start_microtime = microtime(true);
+		$counts  = $show_itemcount ? $this->_getassignedMany($ids) : array();
+		if ( $print_logging_info ) @$fc_run_times['item_counting_peer_cats'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		$subcats = $this->_getsubsMany($ids);
+
+		foreach ($this->_peers as $category)
 		{
-			$category =& $this->_peers[$i];
-			$category->assigneditems = null;
-			if ($show_itemcount)
-			{
-				if ( $print_logging_info )  $start_microtime = microtime(true);
-				$category->assigneditems = $this->_getassigned( $category->id );
-				if ( $print_logging_info ) @$fc_run_times['item_counting_peer_cats'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-			}
-
-			$category->subcats = $this->_getsubs($category->id);
-
-			$k = 1 - $k;
+			$category->assigneditems = $show_itemcount ? ($counts[(int) $category->id] ?? 0) : null;
+			$category->subcats = $subcats[(int) $category->id] ?? array();
 		}
 
 		return $this->_peers;
