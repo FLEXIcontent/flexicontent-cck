@@ -26,19 +26,18 @@ jobs:
           coverage: none
 
       - name: Syntax check (php -l)
-        # site/librairies/json only loads when json_encode() is missing (PHP < 5.2)
-        # Compile-time deprecations are printed to stdout so that they reach lint.txt. Those in FLEXIcontent's own
-        # code fail the job; those in the bundled third-party libraries (site/librairies) are listed only.
+        # Compile-time deprecations are printed to stdout so that they reach lint.txt, and fail the job
+        # (the bundled third-party libraries in site/librairies included).
         run: |
           set -o pipefail
-          find . -path ./site/librairies/json -prune -o -name '*.php' -type f -print0 \
+          find . -name '*.php' -type f -print0 \
             | xargs -0 -n1 -P4 php -d error_reporting=-1 -d display_errors=stdout -d log_errors=0 -l \
             | { grep -v '^No syntax errors detected' || true; } | tee lint.txt
           if grep -qE 'Parse error|Fatal error' lint.txt; then
             exit 1
           fi
-          if grep -E 'Deprecated' lint.txt | grep -v '/site/librairies/'; then
-            echo "::error::PHP deprecations in FLEXIcontent code (listed above)"
+          if grep -E 'Deprecated' lint.txt; then
+            echo "::error::PHP deprecations (listed above)"
             exit 1
           fi
 
