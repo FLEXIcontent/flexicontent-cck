@@ -2525,7 +2525,6 @@ class plgFlexicontent_fieldsImage extends FCField
 			if ($img)
 			{
 				$ok = @imagewebp($img, $webp_path, $quality);
-				imagedestroy($img);
 
 				if ($ok && file_exists($webp_path))
 				{

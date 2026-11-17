@@ -383,7 +383,7 @@ if ($js)
 			$row_ilayout          = $row->config->get('ilayout');
 			$row_form_ilayout_fe  = $row->config->get('form_ilayout_fe', 'tabs');
 			$row_form_ilayout_be  = $row->config->get('form_ilayout_be', 'tabs');
-			$catid_allowed_parent = $row->config->get('catid_allowed_parent');
+			$catid_allowed_parent = (int) $row->config->get('catid_allowed_parent');  // (int): used as an array key below, null is deprecated as a key in PHP 8.5
 			?>
 		<tr class="<?php echo 'row' . ($i % 2); ?>">
 
