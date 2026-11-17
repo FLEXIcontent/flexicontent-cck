@@ -13,7 +13,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 use Joomla\CMS\Editor\Editor;
 
-JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
+require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php';
 
 class plgFlexicontent_fieldsTextarea extends FCField
 {

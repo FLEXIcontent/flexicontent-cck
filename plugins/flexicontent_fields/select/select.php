@@ -10,7 +10,7 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-JLoader::register('FCIndexedField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/indexedfield.php');
+require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/indexedfield.php';
 
 class plgFlexicontent_fieldsSelect extends FCIndexedField
 {

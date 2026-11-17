@@ -17,9 +17,9 @@ use Joomla\Filesystem\Path;
 use Joomla\Filesystem\Folder;
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
-JLoader::register('FlexicontentControllerFilemanager', JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'controllers'.DS.'filemanager.php');  // we use JPATH_BASE since controller exists in frontend too
-JLoader::register('FlexicontentModelFilemanager', JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'filemanager.php');  // we use JPATH_BASE since model exists in frontend too
+require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php';
+require_once JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'controllers'.DS.'filemanager.php';  // we use JPATH_BASE since controller exists in frontend too
+require_once JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'filemanager.php';  // we use JPATH_BASE since model exists in frontend too
 
 if (!defined('_FC_CONTINUE_'))  define('_FC_CONTINUE_', 1);
 if (!defined('_FC_BREAK_'))  define('_FC_BREAK_', 2);
@@ -89,9 +89,6 @@ class plgFlexicontent_fieldsImage extends FCField
 		if ( !$initialized )
 		{
 			$initialized = 1;
-			jimport('joomla.filesystem.file');
-			jimport('joomla.filesystem.folder');
-			jimport('joomla.filesystem.path');
 			$this->_load_phpthumb();
 		}
 
@@ -255,7 +252,6 @@ class plgFlexicontent_fieldsImage extends FCField
 			}
 			else
 			{
-				jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 				\Joomla\CMS\Form\FormHelper::loadFieldClass('media');   // \Joomla\CMS\Form\Field\MediaField
 			}
 
@@ -712,7 +708,10 @@ class plgFlexicontent_fieldsImage extends FCField
 			\Joomla\CMS\Language\Text::script("FLEXI_ERROR", true);
 
 			flexicontent_html::loadFramework('flexi-lib');
-			\Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
+			require_once JPATH_SITE . '/components/com_flexicontent/helpers/html/fcuploader.php';
+			if (!\Joomla\CMS\HTML\HTMLHelper::getServiceRegistry()->hasService('fcuploader')) {
+				\Joomla\CMS\HTML\HTMLHelper::getServiceRegistry()->register('fcuploader', 'JHtmlFcuploader');
+			}
 			$document->getWebAssetManager()->registerAndUseScript('plg_flexicontent_fields_image.form', 'plugins/flexicontent_fields/image/js/form.js', array('version' => FLEXI_VHASH));
 		}
 
@@ -1556,9 +1555,6 @@ class plgFlexicontent_fieldsImage extends FCField
 		if ( !$initialized )
 		{
 			$initialized = 1;
-			jimport('joomla.filesystem.file');
-			jimport('joomla.filesystem.folder');
-			jimport('joomla.filesystem.path');
 			if ( $is_importcsv )
 			{
 				$srcpath_original = Path::clean( JPATH_SITE .DS. $import_media_folder .DS );
@@ -2000,9 +1996,6 @@ class plgFlexicontent_fieldsImage extends FCField
 
 		if ($image_source >= 1)
 		{
-			jimport('joomla.filesystem.file');
-			jimport('joomla.filesystem.folder');
-			jimport('joomla.filesystem.path');
 
 			// Delete image folder if it exists
 			$dest_path = Path::clean( JPATH_SITE .DS. $dir . DS. 'item_'.$item->id   . '_field_'.$field->id .DS);
@@ -2221,9 +2214,6 @@ class plgFlexicontent_fieldsImage extends FCField
 		$fparams = $field->parameters;
 		$params->merge($fparams);
 
-		jimport('joomla.utilities.date');
-		jimport('joomla.filesystem.file');
-		jimport('joomla.client.helper');
 
 		// Set FTP credentials, if given
 		\Joomla\CMS\Client\ClientHelper::setCredentialsFromRequest('ftp');
@@ -2266,7 +2256,6 @@ class plgFlexicontent_fieldsImage extends FCField
 			{
 				if ($format === 'json')
 				{
-					jimport('joomla.error.log');
 					$log = \Joomla\CMS\Log\Log::getInstance('com_flexicontent.error.php');
 					$log->addEntry(array(
 						'comment' => 'Invalid: ' . $filepath . ': ' . $err_text
@@ -2291,7 +2280,6 @@ class plgFlexicontent_fieldsImage extends FCField
 			{
 				if ($format === 'json')
 				{
-					jimport('joomla.error.log');
 					$log = \Joomla\CMS\Log\Log::getInstance('com_flexicontent.error.php');
 					$log->addEntry(array('comment' => 'Cannot upload: '.$filepath));
 					header('HTTP/1.0 409 Conflict');
@@ -2324,7 +2312,6 @@ class plgFlexicontent_fieldsImage extends FCField
 
 				if ($format === 'json')
 				{
-					jimport('joomla.error.log');
 					$log = \Joomla\CMS\Log\Log::getInstance();
 					$log->addEntry(array('comment' => $filepath));
 
@@ -2373,9 +2360,6 @@ class plgFlexicontent_fieldsImage extends FCField
 		if (!$initialized)
 		{
 			$initialized = 1;
-			jimport('joomla.filesystem.file');
-			jimport('joomla.filesystem.folder');
-			jimport('joomla.filesystem.path');
 		}
 
 		// (DB/Folder/Other) Mode of image field
@@ -2641,8 +2625,6 @@ class plgFlexicontent_fieldsImage extends FCField
 		$app = Factory::getApplication();
 		$db  = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
-		jimport('joomla.filesystem.file');
-		jimport('joomla.filesystem.path');
 
 		// Only a plain filename is accepted, refuse directory separators, parent-folder references and NULL bytes
 		$filename = (string) $filename;
@@ -2734,9 +2716,6 @@ class plgFlexicontent_fieldsImage extends FCField
 		if ( !$initialized )
 		{
 			$initialized = 1;
-			jimport('joomla.filesystem.file');
-			jimport('joomla.filesystem.folder');
-			jimport('joomla.filesystem.path');
 		}
 
 		// Unseriaze value if not already done
@@ -2973,7 +2952,10 @@ class plgFlexicontent_fieldsImage extends FCField
 		$hint_image = \Joomla\CMS\HTML\HTMLHelper::image ( 'components/com_flexicontent/assets/images/comments.png', \Joomla\CMS\Language\Text::_( 'FLEXI_NOTES' ), '' );
 		$warn_image = \Joomla\CMS\HTML\HTMLHelper::image ( 'components/com_flexicontent/assets/images/warning.png', \Joomla\CMS\Language\Text::_( 'FLEXI_NOTES' ), '' );
 
-		\Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
+		require_once JPATH_SITE . '/components/com_flexicontent/helpers/html/fcuploader.php';
+		if (!\Joomla\CMS\HTML\HTMLHelper::getServiceRegistry()->hasService('fcuploader')) {
+			\Joomla\CMS\HTML\HTMLHelper::getServiceRegistry()->register('fcuploader', 'JHtmlFcuploader');
+		}
 		$upConf = \Joomla\CMS\HTML\HTMLHelper::_('fcuploader.getUploadConf', $field);
 		$phpUploadLimit = flexicontent_upload::getPHPuploadLimit();
 

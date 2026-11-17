@@ -10,7 +10,7 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
+require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php';
 
 class plgFlexicontent_fieldsJProfile extends FCField
 {
@@ -357,7 +357,6 @@ class plgFlexicontent_fieldsJProfile extends FCField
 		}
 
 		// Load \Joomla\CMS\Form\FormHelper
-		jimport('joomla.form.helper');
 
 		// Load \Joomla\CMS\Form\Field\UserField
 		\Joomla\CMS\Form\FormHelper::loadFieldClass('user');
@@ -516,7 +515,6 @@ class plgFlexicontent_fieldsJProfile extends FCField
 		if (empty(static::$users))
 		{
 			$users = array();
-			jimport('joomla.user.helper');
 			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_users', JPATH_SITE, 'en-GB', $force_reload = false);
 			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_users', JPATH_SITE, null, $force_reload = false);
 		}

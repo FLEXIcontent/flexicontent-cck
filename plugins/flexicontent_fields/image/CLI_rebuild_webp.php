@@ -116,11 +116,8 @@ echo "Qualité WebP : " . $options['quality'] . "\n";
 // Chargement du plugin image FLEXIcontent
 // ============================================================
 
-JLoader::register(
-	'plgFlexicontent_fieldsImage',
-	$joomla_root . '/plugins/flexicontent_fields/image/image.php'
-);
-JLoader::register('FCField', $joomla_root . '/administrator/components/com_flexicontent/helpers/fcfield/parentfield.php');
+require_once $joomla_root . '/plugins/flexicontent_fields/image/image.php';
+require_once $joomla_root . '/administrator/components/com_flexicontent/helpers/fcfield/parentfield.php';
 
 // Instancier le plugin de façon minimale (on a juste besoin des méthodes helper)
 $dispatcher = JEventDispatcher::getInstance();

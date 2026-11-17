@@ -13,7 +13,7 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
+require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php';
 
 class plgFlexicontent_fieldsSubform extends FCField
 {
@@ -52,7 +52,6 @@ class plgFlexicontent_fieldsSubform extends FCField
 		// Load the subform field if earlier than Joomla 4
 		if (!FLEXI_J40GE)
 		{
-			jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 			\Joomla\CMS\Form\FormHelper::loadFieldClass('subform');   // \Joomla\CMS\Form\Field\SubformField
 		}
 

@@ -13,7 +13,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 use Joomla\CMS\Mail\MailerFactoryInterface;
 require_once JPATH_SITE . '/components/com_flexicontent/classes/helpers/security.php';
 require_once __DIR__ . '/security.php';
-JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
+require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php';
 
 class plgFlexicontent_fieldsEmail extends FCField
 {

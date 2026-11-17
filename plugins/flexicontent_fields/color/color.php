@@ -10,7 +10,7 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
+require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php';
 
 class plgFlexicontent_fieldsColor extends FCField
 {
@@ -347,7 +347,6 @@ class plgFlexicontent_fieldsColor extends FCField
 
 		if (!FLEXI_J40GE)
 		{
-			jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 			\Joomla\CMS\Form\FormHelper::loadFieldClass('color');   // \Joomla\CMS\Form\Field\ColorField
 		}
 

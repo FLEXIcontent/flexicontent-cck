@@ -274,7 +274,7 @@ if ($allow_reviews)
 	// Single review mode (list-only): only the given review is rendered, e.g. after the quick edit by a moderator
 	if ($rv_list_only && !empty($rv_single_review_id))
 	{
-		$rv_db = \Joomla\CMS\Factory::getDbo();
+		$rv_db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$rv_single = $rv_db->setQuery(
 			$rv_db->getQuery(true)

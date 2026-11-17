@@ -5,7 +5,7 @@ use Joomla\CMS\Router\Route;
 use Joomla\CMS\Uri\Uri;
 use Joomla\Filesystem\Path;
 use Joomla\String\StringHelper;
-JLoader::register('FlexicontentHelperRoute', JPATH_SITE . '/components/com_flexicontent/helpers/route.php');
+require_once JPATH_SITE . '/components/com_flexicontent/helpers/route.php';
 
 $isAdmin = Factory::getApplication()->isClient('administrator');
 

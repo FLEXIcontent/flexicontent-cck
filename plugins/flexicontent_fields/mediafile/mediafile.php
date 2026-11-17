@@ -17,9 +17,9 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 // Public handlers may run before the database helper is autoloaded.
 require_once JPATH_SITE . '/components/com_flexicontent/classes/helpers/security.php';
-JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
-JLoader::register('FlexicontentControllerFilemanager', JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'controllers'.DS.'filemanager.php');  // we use JPATH_BASE since controller exists in frontend too
-JLoader::register('FlexicontentModelFilemanager', JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'filemanager.php');  // we use JPATH_BASE since model exists in frontend too
+require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php';
+require_once JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'controllers'.DS.'filemanager.php';  // we use JPATH_BASE since controller exists in frontend too
+require_once JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'filemanager.php';  // we use JPATH_BASE since model exists in frontend too
 
 class plgFlexicontent_fieldsMediafile extends FCField
 {
@@ -734,7 +734,10 @@ class plgFlexicontent_fieldsMediafile extends FCField
 
 			//flexicontent_html::loadFramework('wavesurfer');
 			flexicontent_html::loadFramework('flexi-lib');
-			\Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
+			require_once JPATH_SITE . '/components/com_flexicontent/helpers/html/fcuploader.php';
+			if (!\Joomla\CMS\HTML\HTMLHelper::getServiceRegistry()->hasService('fcuploader')) {
+				\Joomla\CMS\HTML\HTMLHelper::getServiceRegistry()->register('fcuploader', 'JHtmlFcuploader');
+			}
 			$document->getWebAssetManager()->registerAndUseScript('plg_flexicontent_fields_mediafile.wavesurfer', 'https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js');
 			$document->getWebAssetManager()->registerAndUseScript('plg_flexicontent_fields_mediafile.form', 'plugins/flexicontent_fields/mediafile/js/form.js', array('version' => filemtime(JPATH_ROOT . '/plugins/flexicontent_fields/mediafile/js/form.js')));
 
@@ -1100,7 +1103,10 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			$fc_lib_added = true;
 
 			flexicontent_html::loadFramework('flexi-lib');
-			\Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
+			require_once JPATH_SITE . '/components/com_flexicontent/helpers/html/fcuploader.php';
+			if (!\Joomla\CMS\HTML\HTMLHelper::getServiceRegistry()->hasService('fcuploader')) {
+				\Joomla\CMS\HTML\HTMLHelper::getServiceRegistry()->register('fcuploader', 'JHtmlFcuploader');
+			}
 		}
 
 		// Add needed JS/CSS
@@ -1115,7 +1121,10 @@ class plgFlexicontent_fieldsMediafile extends FCField
 
 			//flexicontent_html::loadFramework('wavesurfer');
 			flexicontent_html::loadFramework('flexi-lib');
-			\Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
+			require_once JPATH_SITE . '/components/com_flexicontent/helpers/html/fcuploader.php';
+			if (!\Joomla\CMS\HTML\HTMLHelper::getServiceRegistry()->hasService('fcuploader')) {
+				\Joomla\CMS\HTML\HTMLHelper::getServiceRegistry()->register('fcuploader', 'JHtmlFcuploader');
+			}
 			$document->getWebAssetManager()->registerAndUseScript('plg_flexicontent_fields_mediafile.wavesurfer', 'https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js');
 			$document->getWebAssetManager()->registerAndUseScript('plg_flexicontent_fields_mediafile.view', 'plugins/flexicontent_fields/mediafile/js/view.js', array('version' => filemtime(JPATH_ROOT . '/plugins/flexicontent_fields/mediafile/js/view.js')));
 			//$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/assets/js/pako.min.js', array('version' => FLEXI_VHASH));
@@ -1398,8 +1407,6 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		if ( !$initialized )
 		{
 			$initialized = 1;
-			jimport('joomla.filesystem.folder');
-			jimport('joomla.filesystem.path');
 			$srcpath_original  = \Joomla\Filesystem\Path::clean( JPATH_SITE .DS. $import_docs_folder .DS );
 		}
 
@@ -1626,7 +1633,8 @@ class plgFlexicontent_fieldsMediafile extends FCField
 					//if ($iform_dir)  $dbdata['secure'] = $v['secure'];  // !! Do not change folder for existing files
 
 					// Load file data from DB
-					$row = \Joomla\CMS\Table\Table::getInstance('flexicontent_files', '');
+					require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_files.php';
+					$row = new \flexicontent_files($db);
 					$row->load( $file_id );
 					$_filename = $row->filename_original ? $row->filename_original : $row->filename;
 					$dbdata['secure'] = $row->secure ? 1 : 0;  // !! Do not change media/secure -folder- for existing files
@@ -2549,7 +2557,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		$attachment=null; $replyto=null; $replytoname=null;
 
 		// Send the email
-		$send_result = Factory::getMailer()->sendMail( $MailFrom, $FromName, $email, $subject, $body, $html_mode, $cc, $bcc, $attachment, $from, $sender );
+		$send_result = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Mail\MailerFactoryInterface::class)->createMailer()->sendMail( $MailFrom, $FromName, $email, $subject, $body, $html_mode, $cc, $bcc, $attachment, $from, $sender );
 		if ( $send_result !== true )
 		{
 			\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text:: _ ('FLEXI_FIELD_FILE_EMAIL_NOT_SENT'), 'notice');

@@ -11,7 +11,7 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 require_once JPATH_SITE . '/components/com_flexicontent/classes/helpers/security.php';
-JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
+require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php';
 #[AllowDynamicProperties] //php8.2 compatibility
 class plgFlexicontent_fieldsAddressint extends FCField
 {

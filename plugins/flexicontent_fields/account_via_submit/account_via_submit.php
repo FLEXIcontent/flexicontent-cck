@@ -11,7 +11,7 @@
 
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
+require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php';
 
 class plgFlexicontent_fieldsAccount_via_submit extends FCField
 {
@@ -139,7 +139,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		{
 			if ($field->parameters->get('display_item_owner', 0))
 			{
-				$owner = \Joomla\CMS\Factory::getUser($item->created_by);
+				$owner = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById((int) $item->created_by);
 			  $field->html[] = '
 			  <div class="'.$input_grp_class.' fc-xpended">
 				  <span class="' . $add_on_class . ' fc_acc_via_mail_item_owner">'.\Joomla\CMS\Language\Text::_( 'FLEXI_ACCOUNT_V_SUBMIT_ITEM_OWNER' ).'</span>
@@ -410,9 +410,6 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 	public static function registerUser($name, $username, $email, $password, $gender, &$field)
 	{
 		// Initialize new usertype setting
-		jimport('joomla.user.user');
-		jimport('joomla.user.helper');
-		jimport('cms.component.helper');
 		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_users', JPATH_SITE, 'en-GB', false);
 		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_users', JPATH_SITE, null, true);
 
@@ -467,7 +464,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		// Make sure user was created
 		$db->setQuery('SELECT id FROM #__users WHERE email = ' . $db->Quote($email));
 		$newUserID = $db->loadResult();
-		$user = \Joomla\CMS\Factory::getUser($newUserID);
+		$user = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById((int) $newUserID);
 
 		// User creation failed ?? !!
 		if ( !$user->id )  return false;
@@ -533,7 +530,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 
 		// Send the email
 		try {
-			$send_result = \Joomla\CMS\Factory::getMailer()->sendMail(
+			$send_result = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Mail\MailerFactoryInterface::class)->createMailer()->sendMail(
 				$data['mailfrom'], $data['fromname'], $recipient, $emailSubject, $emailBody,
 				$html_mode, $cc, $bcc, $attachment, $replyto, $replytoname
 			);
@@ -583,7 +580,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 
 			// Send the email
 			try {
-				$send_result = \Joomla\CMS\Factory::getMailer()->sendMail(
+				$send_result = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Mail\MailerFactoryInterface::class)->createMailer()->sendMail(
 					$data['mailfrom'], $data['fromname'], $recipient, $emailSubject, $emailBody,
 					$html_mode, $cc, $bcc, $attachment, $replyto, $replytoname
 				);
@@ -642,7 +639,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 
 		// Send the email
 		try {
-			$send_result = \Joomla\CMS\Factory::getMailer()->sendMail(
+			$send_result = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Mail\MailerFactoryInterface::class)->createMailer()->sendMail(
 				$mailfrom, $fromname, $recipient, $emailSubject, $emailBody,
 				$html_mode, $cc, $bcc, $attachment, $replyto, $replytoname
 			);

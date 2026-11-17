@@ -10,9 +10,16 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
-JLoader::register('plgFlexicontent_fieldsText', JPATH_SITE . '/plugins/flexicontent_fields/text/text.php');
-JLoader::register('plgFlexicontent_fieldsSelect', JPATH_SITE . '/plugins/flexicontent_fields/select/select.php');
+require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php';
+// Lazy autoload (was JLoader::register): these are sibling field plugin classes,
+// loaded only if/when textselect actually instantiates them (avoids redeclaration)
+spl_autoload_register(static function ($class) {
+	if ($class === 'plgFlexicontent_fieldsText') {
+		require_once JPATH_SITE . '/plugins/flexicontent_fields/text/text.php';
+	} elseif ($class === 'plgFlexicontent_fieldsSelect') {
+		require_once JPATH_SITE . '/plugins/flexicontent_fields/select/select.php';
+	}
+}, true, true);
 
 class plgFlexicontent_fieldsTextselect extends FCField
 {

@@ -15,7 +15,7 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\String\StringHelper;
-JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
+require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php';
 
 class plgFlexicontent_fieldsRelation extends FCField
 {
@@ -1308,7 +1308,8 @@ class plgFlexicontent_fieldsRelation extends FCField
 		 * Load and check field
 		 */
 
-		$field = \Joomla\CMS\Table\Table::getInstance($_type = 'flexicontent_fields', $_prefix = '', $_config = array());
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_fields.php';
+		$field = new \flexicontent_fields($db);
 
 		if (!$field->load($field_id))
 		{
@@ -1344,7 +1345,8 @@ class plgFlexicontent_fieldsRelation extends FCField
 		 * Load and check item
 		 */
 
-		$item = \Joomla\CMS\Table\Table::getInstance($_type = 'flexicontent_items', $_prefix = '', $_config = array());
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_items.php';
+		$item = new \flexicontent_items($db);
 
 		if (!$item_id)
 		{
@@ -1898,7 +1900,8 @@ class plgFlexicontent_fieldsRelation extends FCField
 		 * Load and check field
 		 */
 
-		$field = \Joomla\CMS\Table\Table::getInstance($_type = 'flexicontent_fields', $_prefix = '', $_config = array());
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_fields.php';
+		$field = new \flexicontent_fields($db);
 
 		if (!$field->load($field_id))
 		{
@@ -1930,7 +1933,8 @@ class plgFlexicontent_fieldsRelation extends FCField
 		 * Load and check item
 		 */
 
-		$item = \Joomla\CMS\Table\Table::getInstance($_type = 'flexicontent_items', $_prefix = '', $_config = array());
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_items.php';
+		$item = new \flexicontent_items($db);
 
 		if (!$item_id)
 		{
