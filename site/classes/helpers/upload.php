@@ -243,7 +243,6 @@ class flexicontent_upload
 						$err = 'FLEXI_WARNINVALIDMIME';
 						return false;
 					}
-					finfo_close($finfo);
 
 				}
 				else if(function_exists('mime_content_type') /*&& $params->get('check_mime',1)*/)

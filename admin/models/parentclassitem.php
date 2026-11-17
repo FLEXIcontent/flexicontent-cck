@@ -4683,6 +4683,9 @@ class ParentClassItem extends FCModelAdmin
 		if (!$item_id)  $item_id = $this->_id;
 		if (!$item_id)  return array();
 
+		// The version is also an array key below: null as an array key is deprecated in PHP 8.5
+		$version = (int) $version;
+
 		static $field_values;
 		if ( isset($field_values[$item_id][$version] ) )
 			return $field_values[$item_id][$version];
@@ -4753,7 +4756,8 @@ class ParentClassItem extends FCModelAdmin
 		$fields = $this->_db->setQuery($query)->loadObjectList('name');
 
 		// Get values of CUSTOM fields for current item
-		$custom_vals[$this->_id] = $this->getCustomFieldsValues($this->_id, $this->_version);
+		// (int): the id of a new item is null, and null as an array key is deprecated in PHP 8.5
+		$custom_vals[(int) $this->_id] = $this->getCustomFieldsValues($this->_id, $this->_version);
 
 		// Get values of language parent item (if not loading a specific version) to use them for untranslatable fields
 		if ( $original_content_id && !$this->_version)
@@ -4776,7 +4780,7 @@ class ParentClassItem extends FCModelAdmin
 			// while checking if current field is using untranslatable value from original content item
 			else
 			{
-				$item_id = ($original_content_id && $field->untranslatable && !$this->_version) ? $original_content_id : $this->_id;
+				$item_id = ($original_content_id && $field->untranslatable && !$this->_version) ? $original_content_id : (int) $this->_id;
 				$field->value = isset($custom_vals[$item_id][$field->id]) ? $custom_vals[$item_id][$field->id] : array();
 
 				// Categories and Tags must have been serialized but some early versions did not do it, we will check before unserializing them
