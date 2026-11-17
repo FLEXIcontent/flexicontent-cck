@@ -2479,7 +2479,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		$quality   = max(1, min(100, (int) $quality));
 
 		// Ne pas régénérer si le webp est déjà à jour par rapport à la source
-		if (file_exists($webp_path) && filemtime($webp_path) >= filemtime($src_path))
+		if (file_exists($webp_path) && filemtime($webp_path) >= filemtime($src_path) && @getimagesize($webp_path))
 		{
 			return true;
 		}
@@ -2514,9 +2514,11 @@ class plgFlexicontent_fieldsImage extends FCField
 
 			if ($img)
 			{
+				// GD's WebP encoder requires true-colour images (GIF/indexed PNG are palettes).
+				if (!imageistruecolor($img)) imagepalettetotruecolor($img);
 				$ok = @imagewebp($img, $webp_path, $quality);
 
-				if ($ok && file_exists($webp_path))
+				if ($ok && @getimagesize($webp_path))
 				{
 					@chmod($webp_path, 0644);
 					return true;
