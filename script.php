@@ -508,6 +508,9 @@ class com_flexicontentInstallerScript
 		// Create the FLEXIcontent notification mail templates, without overwriting customised ones
 		$this->_createNotificationMailTemplates();
 
+		// Delete files of earlier versions that are no longer part of the package
+		$this->_removeObsoleteFiles();
+
 		/*
 		// always create or modify these parameters
 		$params['my_param0'] = 'Component version ' . $this->release;
@@ -2002,6 +2005,41 @@ class com_flexicontentInstallerScript
 		catch (Throwable $e)
 		{
 			\Joomla\CMS\Factory::getApplication()->enqueueMessage('Could not install the FLEXIcontent data source for JSitemap: ' . $e->getMessage() . '. You can copy plugins/jsitemap/flexicontent manually to ' . $dst, 'warning');
+		}
+	}
+
+
+	/**
+	 * An update copies the new files but does not delete files that left the package: remove them here
+	 *
+	 * Only the listed files are deleted, and a folder only if it is empty afterwards
+	 *
+	 * @return  void
+	 */
+	private function _removeObsoleteFiles()
+	{
+		$obsolete = array(
+			// json_encode() / json_decode() fallback for PHP < 5.2, removed in 5.3
+			JPATH_SITE . '/components/com_flexicontent/librairies/json' => array('JSON.php', 'jsonwrapper_inner.php'),
+		);
+
+		foreach ($obsolete as $folder => $files)
+		{
+			if (!is_dir($folder))
+			{
+				continue;
+			}
+
+			foreach ($files as $file)
+			{
+				if (is_file($folder . '/' . $file))
+				{
+					@unlink($folder . '/' . $file);
+				}
+			}
+
+			// rmdir() only removes an empty folder: files added by the site owner are left alone
+			@rmdir($folder);
 		}
 	}
 

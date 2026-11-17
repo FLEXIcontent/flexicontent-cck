@@ -54,11 +54,6 @@ switch ( \Joomla\CMS\Factory::getConfig()->get('error_reporting') )  // Set the 
 		break;
 }
 
-if (!function_exists('json_encode'))  // PHP < 5.2 lack support for json
-{
-	require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'json'.DS.'jsonwrapper_inner.php');
-} 
-
 JLoader::register('flexicontent_html', JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'html.php');
 JLoader::register('flexicontent_upload', JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'upload.php');
 JLoader::register('flexicontent_tmpl', JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'tmpl.php');
