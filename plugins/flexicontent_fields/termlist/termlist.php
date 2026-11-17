@@ -153,7 +153,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 			if ( !in_array('pagebreak', $skip_buttons) ) $skip_buttons[] = 'pagebreak';
 			if ( !in_array('readmore',  $skip_buttons) )  $skip_buttons[] = 'readmore';
 		}
-		$skip_buttons_arr = ($show_buttons && ($editor_name=='jce' || $editor_name=='tinymce') && count($skip_buttons)) ? $skip_buttons : (boolean) $show_buttons;   // JCE supports skipping buttons
+		$skip_buttons_arr = ($show_buttons && ($editor_name=='jce' || $editor_name=='tinymce') && count($skip_buttons)) ? $skip_buttons : (bool) $show_buttons;   // JCE supports skipping buttons
 
 		// Initialise property with default value
 		if (!$field->value || (count($field->value) === 1 && reset($field->value) === null))

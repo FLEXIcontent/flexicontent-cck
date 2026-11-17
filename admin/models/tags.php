@@ -604,7 +604,7 @@ class FlexicontentModelTags extends FCModelAdminList
 			);
 		}
 
-		return (boolean) $this->_db->setQuery($query)->execute();
+		return (bool) $this->_db->setQuery($query)->execute();
 	}
 
 

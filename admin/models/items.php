@@ -1788,11 +1788,11 @@ class FlexicontentModelItems extends FCModelAdminList
 
 		$_FALANG = false;
 		$this->_db->setQuery('SHOW TABLES LIKE "'.$dbprefix.'falang_content"');
-		$_FALANG = (boolean) count($this->_db->loadObjectList());
+		$_FALANG = (bool) count($this->_db->loadObjectList());
 
 		// Try to find old joomfish tables (with current DB prefix)
 		$this->_db->setQuery('SHOW TABLES LIKE "'.$dbprefix.'jf_content"');
-		$_FISH = (boolean) count($this->_db->loadObjectList());
+		$_FISH = (bool) count($this->_db->loadObjectList());
 
 		// Try to find old joomfish tables (with J1.5 jos prefix)
 		if (!$_FISH)
@@ -1811,7 +1811,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		if ($_FISH)
 		{
 			$this->_db->setQuery('SHOW TABLES LIKE "'.$dbprefix.'jf_languages_ext"');
-			$_FISH22GE = (boolean) count($this->_db->loadObjectList());
+			$_FISH22GE = (bool) count($this->_db->loadObjectList());
 		}
 
 		$_NEW_LANG_TBL = FLEXI_J16GE || $_FISH22GE;
@@ -2703,7 +2703,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		}
 
 		$filter_order_type = $this->getState('filter_order_type');
-		$multi_assigns_ordering = (boolean) $filter_order_type;
+		$multi_assigns_ordering = (bool) $filter_order_type;
 
 		// Correct direction according to current value of the 'direction' filter
 		$direction = strtolower($this->getState('filter_order_Dir')) == 'desc' ? - $direction : $direction;

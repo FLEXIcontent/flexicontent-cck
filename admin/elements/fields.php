@@ -75,11 +75,11 @@ class JFormFieldFields extends \Joomla\CMS\Form\FormField
 		 * Option labels and option values (for the created SELECT form field)
 		 */
 
-		$fieldnameastext = (boolean) @ $attributes['fieldnameastext'];
-		$groupables = (boolean) @ $attributes['groupables'];
+		$fieldnameastext = (bool) @ $attributes['fieldnameastext'];
+		$groupables = (bool) @ $attributes['groupables'];
 		
 		// NOTE: ELSE should always be 'id', otherwise we break compatiblity with all previous FC versions !
-		$ovalue = ((boolean) @ $attributes['fieldnameasvalue']) ?
+		$ovalue = ((bool) @ $attributes['fieldnameasvalue']) ?
 			'name' :
 			'id' ;
 
@@ -128,7 +128,7 @@ class JFormFieldFields extends \Joomla\CMS\Form\FormField
 
 		// For 'Filters' type not set means true otherwise false
 		$issortable = strlen(@$attributes['issortable'] ?? '') ?
-			(boolean) $attributes['issortable'] :
+			(bool) $attributes['issortable'] :
 			($this->type=='Filters' ? true : false);
 
 
@@ -295,7 +295,7 @@ class JFormFieldFields extends \Joomla\CMS\Form\FormField
 
 		else
 		{
-			if ((boolean) @ $attributes['display_useglobal'] && !$issortable)
+			if ((bool) @ $attributes['display_useglobal'] && !$issortable)
 			{
 				array_unshift($options, \Joomla\CMS\HTML\HTMLHelper::_('select.option', '' , '- '.\Joomla\CMS\Language\Text::_('FLEXI_USE_GLOBAL').' -'));
 				array_unshift($options, \Joomla\CMS\HTML\HTMLHelper::_('select.option', '0', '- '.\Joomla\CMS\Language\Text::_('FLEXI_NOT_SET').' -'));   // Compatibility with older FC versions

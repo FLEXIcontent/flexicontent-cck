@@ -524,7 +524,7 @@ class ParentClassItem extends FCModelAdmin
 		{
 			//echo "********************************<br/>\n RETURNING ALREADY loaded item: {$pk}<br/> ********************************<br/><br/><br/>";
 			//echo "<pre>"; debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS); echo "</pre>";
-			return (boolean) $this->_record;
+			return (bool) $this->_record;
 		}
 
 		$db   = $this->_db;
@@ -588,7 +588,7 @@ class ParentClassItem extends FCModelAdmin
 		// Check if item is alredy loaded and is of correct version
 		if ( $this->_version == $version && isset($this->_record) )
 		{
-			return (boolean) $this->_record;
+			return (bool) $this->_record;
 		}
 		$this->_version = $version; // Set number of loaded version
 		//echo 'version: '.$version ."<br/>";
@@ -623,7 +623,7 @@ class ParentClassItem extends FCModelAdmin
 		{
 			//echo "********************************<br/>\n RETURNING CACHED item: {$pk}<br/> ********************************<br/><br/><br/>";
 			$this->_record = $items[$pk];
-			return (boolean) $this->_record;
+			return (bool) $this->_record;
 		}
 
 		//echo "**************************<br/>\n LOADING item id: {$pk}  version:{$this->_version}<br/> **************************<br/><br/><br/>";
@@ -1099,7 +1099,7 @@ class ParentClassItem extends FCModelAdmin
 			$fc_list_items[$pk] = $this->_record;
 		}
 
-		return (boolean) $this->_record;
+		return (bool) $this->_record;
 	}
 
 
@@ -5734,7 +5734,7 @@ class ParentClassItem extends FCModelAdmin
 			;
 
 		$count = $this->_db->setQuery($query)->loadResult();
-		$duplicates_found = (boolean) $count;
+		$duplicates_found = (bool) $count;
 
 		return !$duplicates_found
 			? $alias

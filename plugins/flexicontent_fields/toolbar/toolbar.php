@@ -201,7 +201,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 				// Add image if fould, making sure it is converted to ABSOLUTE URL
 				if ($imageurl)
 				{
-					$is_absolute = (boolean) parse_url($imageurl, PHP_URL_SCHEME); // preg_match("#^http|^https|^ftp#i", $imageurl);
+					$is_absolute = (bool) parse_url($imageurl, PHP_URL_SCHEME); // preg_match("#^http|^https|^ftp#i", $imageurl);
 					$imageurl = $is_absolute ? $imageurl : \Joomla\CMS\Uri\Uri::root().$imageurl;
 					$document->addCustomTag("<meta property=\"og:image\" content=\"{$imageurl}\" />");
 				}
@@ -267,7 +267,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 			$app = \Joomla\CMS\Factory::getApplication();
 			$dbprefix = $app->getCfg('dbprefix');
 			$db->setQuery('SHOW TABLES LIKE "'.$dbprefix.'jcomments"');
-			$jcomment_installed = (boolean) count($db->loadObjectList());
+			$jcomment_installed = (bool) count($db->loadObjectList());
 		}
 		if (!$jcomment_installed) return 0;
 
