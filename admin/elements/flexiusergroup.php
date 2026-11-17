@@ -97,7 +97,7 @@ class JFormFieldFLEXIUsergroup extends \Joomla\CMS\Form\FormField  // \Joomla\CM
 			$extra_options[] = $tmp;
 		}
 		
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$db->setQuery(
 			'SELECT a.id AS value, a.title AS text, COUNT(DISTINCT b.id) AS level' .
 			' FROM #__usergroups AS a' .

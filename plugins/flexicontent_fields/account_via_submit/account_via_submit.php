@@ -315,7 +315,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		$this->initialize($field);
 
 		// Check email already used
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$db->setQuery('SELECT id FROM #__users WHERE email = ' . $db->Quote($email));
 		$existingUserID = $db->loadResult();
 
@@ -401,7 +401,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		$attribs->initialized = 1;
 		$attribs = json_encode($attribs);
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query = "UPDATE #__flexicontent_fields SET attribs=".$db->Quote($attribs) ." WHERE id = ".$field->id;
 		$result = $db->setQuery($query)->execute();
 	}
@@ -417,7 +417,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		\Joomla\CMS\Factory::getLanguage()->load('com_users', JPATH_SITE, null, true);
 
 		$app = \Joomla\CMS\Factory::getApplication();
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$usersConf = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_users' );
 
 		$useractivation = $field->parameters->get('useractivation', '');
@@ -473,9 +473,9 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		if ( !$user->id )  return false;
 
 		$data = $user->getProperties();
-		$data['fromname'] = $app->getCfg('fromname');
-		$data['mailfrom'] = $app->getCfg('mailfrom');
-		$data['sitename'] = $app->getCfg('sitename');
+		$data['fromname'] = $app->get('fromname');
+		$data['mailfrom'] = $app->get('mailfrom');
+		$data['sitename'] = $app->get('sitename');
 		$data['siteurl']  = \Joomla\CMS\Uri\Uri::root();
 		$data['password_clear'] = $password_clear;
 		$data['activation'] = $activation;
@@ -604,12 +604,12 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 
 	function sendEditCoupon(&$item, &$field, $email, $token)
 	{
-		$db  = \Joomla\CMS\Factory::getDbo();
+		$db  = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$app = \Joomla\CMS\Factory::getApplication();
 
-		$SiteName	= $app->getCfg('sitename');
-		$mailfrom = $app->getCfg('mailfrom');
-		$fromname = $app->getCfg('fromname');
+		$SiteName	= $app->get('sitename');
+		$mailfrom = $app->get('mailfrom');
+		$fromname = $app->get('fromname');
 
 		// Check for a valid from address
 		if (! $mailfrom || ! \Joomla\CMS\Mail\MailHelper::isEmailAddress($mailfrom))

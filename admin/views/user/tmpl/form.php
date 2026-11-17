@@ -86,7 +86,7 @@ $this->document->addScriptDeclaration($js);
 
 				// DB Query to get -mulitple- user group ids for all authors,
 				// Get user-To-usergoup mapping for users in current page
-				$db = \Joomla\CMS\Factory::getDbo();
+				$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 				
 				$query = 'SELECT group_id FROM #__user_usergroup_map WHERE user_id = '.(int) $this->form->getValue('id');
 				$user_grpids = $db->setQuery($query)->loadColumn();

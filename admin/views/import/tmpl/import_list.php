@@ -138,7 +138,7 @@ foreach($_levels as $_level) {
 						$tags_col   = isset($this->conf['tags_col']) ? (int) $this->conf['tags_col'] : 0;
 						$tags_ids   = !empty($this->conf['tags_ids']) ? \Joomla\Utilities\ArrayHelper::toInteger($this->conf['tags_ids']) : array();
 						$tags_names = $tags_col && $tags_ids
-							? \Joomla\CMS\Factory::getDbo()->setQuery('SELECT name FROM #__flexicontent_tags WHERE id IN (' . implode(',', $tags_ids) . ') ORDER BY name')->loadColumn()
+							? \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class)->setQuery('SELECT name FROM #__flexicontent_tags WHERE id IN (' . implode(',', $tags_ids) . ') ORDER BY name')->loadColumn()
 							: array();
 						$tags_names = htmlspecialchars(implode(', ', $tags_names), ENT_COMPAT, 'UTF-8');
 					?>

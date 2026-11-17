@@ -25,9 +25,9 @@ HTMLHelper::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_flexicontent/h
 global $globalcats;
 $app      = Factory::getApplication();
 $jinput   = $app->input;
-$config   = Factory::getConfig();
+$config   = Factory::getApplication()->getConfig();
 $user     = Factory::getUser();
-$session  = Factory::getSession();
+$session  = Factory::getApplication()->getSession();
 $document = Factory::getDocument();
 $cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 $ctrl     = 'filemanager.';

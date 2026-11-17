@@ -51,7 +51,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\AdminController
 			$link 	= 'index.php?option=com_flexicontent';
 			$this->setRedirect($link);   // we do not message since this will be displayed by template of the view ...
 		}
-		$session = \Joomla\CMS\Factory::getSession();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 
 		// GET POSTINSTALL tasks from session variable AND IF NEEDED re-evaluate it
 		// NOTE, POSTINSTALL WILL NOT LET USER USE ANYTHING UNTIL ALL TASKS ARE COMPLETED

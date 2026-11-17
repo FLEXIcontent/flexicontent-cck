@@ -66,7 +66,7 @@ class plgFlexicontent_fieldsTermlist extends FCField
 
 		// Create the editor object of editor prefered by the user,
 		// this will also add the needed JS to the HTML head
-		$editor_name = $field->parameters->get( 'editor',  $user->getParam('editor', $app->getCfg('editor'))  );
+		$editor_name = $field->parameters->get( 'editor',  $user->getParam('editor', $app->get('editor'))  );
 		$editor  = \Joomla\CMS\Editor\Editor::getInstance($editor_name);
 		$editor_plg_params = array();  // Override parameters of the editor plugin, ignored by most editors !!
 

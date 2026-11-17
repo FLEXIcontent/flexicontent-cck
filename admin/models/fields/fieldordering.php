@@ -61,7 +61,7 @@ class JFormFieldFieldordering extends \Joomla\CMS\Form\FormField
 		// Initialize JavaScript field attributes.
 		$attr .= $this->element['onchange'] ? ' onchange="'.(string) $this->element['onchange'].'"' : '';
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		// Build the query for the ordering list.
 		$query = 'SELECT ordering AS value, label AS text'

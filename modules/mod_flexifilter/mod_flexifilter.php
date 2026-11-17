@@ -29,7 +29,7 @@ JLoader::register('\Joomla\CMS\Form\FormFieldFclayoutbuilder', JPATH_ADMINISTRAT
 
 // Decide whether to show module contents
 $app     = \Joomla\CMS\Factory::getApplication();
-$config  = \Joomla\CMS\Factory::getConfig();
+$config  = \Joomla\CMS\Factory::getApplication()->getConfig();
 $jinput  = $app->input;
 $option  = $jinput->get('option', '', 'cmd');
 $view    = $jinput->get('view', '', 'cmd');
@@ -472,7 +472,7 @@ if ( ($display_cat_list && $mcats_selection) || !$catid)
 // !! target (single) category view when selecting single category a category is currently selected
 else if ($catid)
 {
-	$db = \Joomla\CMS\Factory::getDbo();
+	$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 	$query 	= 'SELECT CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
 		.' FROM #__categories AS c WHERE c.id = '.$catid;
 	$db->setQuery( $query );

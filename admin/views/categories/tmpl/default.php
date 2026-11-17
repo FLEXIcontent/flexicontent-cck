@@ -17,9 +17,9 @@ use Joomla\String\StringHelper;
 global $globalcats;
 $app      = \Joomla\CMS\Factory::getApplication();
 $jinput   = $app->input;
-$config   = \Joomla\CMS\Factory::getConfig();
+$config   = \Joomla\CMS\Factory::getApplication()->getConfig();
 $user     = \Joomla\CMS\Factory::getUser();
-$session  = \Joomla\CMS\Factory::getSession();
+$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 $document = \Joomla\CMS\Factory::getDocument();
 $cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 $ctrl     = 'categories.';
@@ -41,7 +41,7 @@ $edit_cat_title  = \Joomla\CMS\Language\Text::_('FLEXI_EDIT_CATEGORY', true);
 $rem_filt_txt    = \Joomla\CMS\Language\Text::_('FLEXI_REMOVE_FILTER', true);
 $rem_filt_tip    = ' class="' . $this->tooltip_class . ' filterdel" title="'.flexicontent_html::getToolTip('FLEXI_ACTIVE_FILTER', 'FLEXI_CLICK_TO_REMOVE_THIS_FILTER', 1, 1).'" ';
 $_NEVER_         = \Joomla\CMS\Language\Text::_('FLEXI_NEVER');
-$_NULL_DATE_     = \Joomla\CMS\Factory::getDbo()->getNullDate();
+$_NULL_DATE_     = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class)->getNullDate();
 
 
 

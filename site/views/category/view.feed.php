@@ -39,7 +39,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 	function display( $tpl = null )
 	{
 		// Initialize framework variables
-		$db       = \Joomla\CMS\Factory::getDbo();
+		$db       = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$app      = \Joomla\CMS\Factory::getApplication();
 		$document = \Joomla\CMS\Factory::getDocument();
 
@@ -230,7 +230,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 			$category->image = ''; //$params->get('image');
 			if ($category->image)
 			{
-				$joomla_image_path = $app->getCfg('image_path', '');
+				$joomla_image_path = $app->get('image_path', '');
 				$joomla_image_url  = str_replace (DS, '/', $joomla_image_path);
 				$joomla_image_path = $joomla_image_path ? $joomla_image_path.DS : '';
 				$joomla_image_url  = $joomla_image_url  ? $joomla_image_url.'/' : '';

@@ -73,8 +73,8 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 		$indexer     = $this->input->getCmd('indexer', 'advanced');
 		$rebuildmode = $this->input->getCmd('rebuildmode', '');
 
-		$session = \Joomla\CMS\Factory::getSession();
-		$db      = \Joomla\CMS\Factory::getDbo();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
+		$db      = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$app     = \Joomla\CMS\Factory::getApplication();
 		$model = $this->getModel('search');
 
@@ -86,7 +86,7 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 
 		// Clear previous log file
 		$log_filename = 'items_search_indexer_' . \Joomla\CMS\Factory::getUser()->id . '.php';
-		$log_filename_full = \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getConfig()->get('log_path') . DS . $log_filename);
+		$log_filename_full = \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getApplication()->getConfig()->get('log_path') . DS . $log_filename);
 
 		if (file_exists($log_filename_full))
 		{
@@ -116,8 +116,8 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 
 		// Check is session table DATA column is not mediumtext (16MBs, it can be 64 KBs ('text') in some sites that were not properly upgraded)
 		$tblname  = 'session';
-		$dbprefix = $app->getCfg('dbprefix');
-		$dbname   = $app->getCfg('db');
+		$dbprefix = $app->get('dbprefix');
+		$dbname   = $app->get('db');
 		$db->setQuery("SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '" . $dbname . "' AND TABLE_NAME = '" . $dbprefix . $tblname . "'");
 		$jession_coltypes = $db->loadAssocList('COLUMN_NAME');
 		$_dataColType = strtolower($jession_coltypes['data']['DATA_TYPE']);
@@ -246,8 +246,8 @@ class FlexicontentControllerSearch extends FlexicontentControllerBaseAdmin
 
 		$start_microtime = microtime(true);
 
-		$session = \Joomla\CMS\Factory::getSession();
-		$db      = \Joomla\CMS\Factory::getDbo();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
+		$db      = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$app     = \Joomla\CMS\Factory::getApplication();
 
 		$has_zlib      = function_exists("zlib_encode"); // Version_compare(PHP_VERSION, '5.4.0', '>=');

@@ -38,8 +38,8 @@ if (($_mp=$app->getParams()->get('robots')))    $document->setMetadata('robots',
  */
 if ($item->metadesc)		$document->setDescription( $item->metadesc );
 if ($item->metakey)			$document->setMetadata('keywords', $item->metakey);
-//if ($app->getCfg('MetaTitle') == '1') $document->setMetaData('title', $item->title);   // This has been deprecated, instead search engines will use the <title> tag
-if ($app->getCfg('MetaAuthor') == '1')  $document->setMetaData('author', $item->author);
+//if ($app->get('MetaTitle') == '1') $document->setMetaData('title', $item->title);   // This has been deprecated, instead search engines will use the <title> tag
+if ($app->get('MetaAuthor') == '1')  $document->setMetaData('author', $item->author);
 
 
 /**

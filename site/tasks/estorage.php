@@ -135,7 +135,7 @@ class FlexicontentCronTasks
 			array('com_flexicontent.estorage')  // category of logged messages
 		);
 
-		$db  = \Joomla\CMS\Factory::getDbo();
+		$db  = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 
 		/**

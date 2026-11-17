@@ -461,7 +461,7 @@ class FlexicontentModelReview extends FCModelAdmin
 	public function reviewerValidation($data)
 	{
 		$user = \Joomla\CMS\Factory::getUser();
-		$db   = \Joomla\CMS\Factory::getDbo();
+		$db   = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$review_id   = $data['id'];
 		$content_id  = $data['content_id'];
@@ -577,7 +577,7 @@ class FlexicontentModelReview extends FCModelAdmin
 	{
 		if (empty($this->fields[$item ? $item->type_id : 0]))
 		{
-			$db    = \Joomla\CMS\Factory::getDbo();
+			$db    = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 			$query = 'SELECT * FROM #__flexicontent_fields WHERE field_type = ' . $db->Quote('voting');
 			$field = $db->setQuery($query)->loadObject();
 

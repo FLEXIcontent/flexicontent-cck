@@ -36,7 +36,7 @@ class FlexicontentViewReview extends FlexicontentViewBaseRecord
 		$jinput     = $app->input;
 		$document   = \Joomla\CMS\Factory::getDocument();
 		$user       = \Joomla\CMS\Factory::getUser();
-		$db         = \Joomla\CMS\Factory::getDbo();
+		$db         = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$cparams    = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 		$perms      = FlexicontentHelperPerm::getPerm();
 

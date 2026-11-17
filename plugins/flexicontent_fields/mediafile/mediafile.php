@@ -1197,7 +1197,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 
 		if ($mod_is_enabled === null && $allowaddtocart && !Factory::getApplication()->isClient('administrator'))
 		{
-			$db = Factory::getDbo();
+			$db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 			$mod_is_enabled = $db->setQuery($db->getQuery(true)
 				->select('published')
 				->from('#__modules')
@@ -1465,7 +1465,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 						try
 						{
 							$_file_id = (int) $v;
-							$_db = Factory::getDbo();
+							$_db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 							$_fileObj = $_db->setQuery('SELECT * FROM #__flexicontent_files WHERE id = ' . $_file_id)->loadObject();
 
 							if ($_fileObj)
@@ -1544,7 +1544,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 					$v['secure']   = 0; //!$iform_dir    ? 0 : ((int) $v['secure'] ? 1 : 0);
 				}
 
-				$db = Factory::getDbo();
+				$db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 				if (!empty($v['mediafile']))
 				{
@@ -2150,7 +2150,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		if (count($new_ids))
 		{
 			// Only query files that are not already cached
-			$db = Factory::getDbo();
+			$db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 			$query = 'SELECT ' . $md_select . ' f.* '. $extra_select //filename, filename_original, altname, description, ext, id'
 				. ' FROM #__flexicontent_files AS f'
 				. ' LEFT JOIN #__flexicontent_mediadatas AS md ON f.id = md.file_id'
@@ -2186,7 +2186,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 	function canDeleteFile( &$field, $file_id, &$item )
 	{
 		// Check file exists in DB
-		$db   = Factory::getDbo();
+		$db   = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query = 'SELECT id'
 			. ' FROM #__flexicontent_files'
 			. ' WHERE id='. $db->Quote($file_id)
@@ -2208,7 +2208,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 	function checkFileAssignment( &$field, $file_id, &$item )
 	{
 		// Check file exists in DB
-		$db   = Factory::getDbo();
+		$db   = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query = 'SELECT item_id '
 			. ' FROM #__flexicontent_fields_item_relations '
 			. ' WHERE '
@@ -2277,10 +2277,10 @@ class plgFlexicontent_fieldsMediafile extends FCField
 	function share_file_form($tpl = null)
 	{
 		$user = Factory::getUser();
-		$db   = Factory::getDbo();
+		$db   = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$app  = Factory::getApplication();
 
-		$session  = Factory::getSession();
+		$session  = Factory::getApplication()->getSession();
 		$document = Factory::getDocument();
 
 		$file_id    = $app->input->get('file_id', 0, 'int');
@@ -2349,10 +2349,10 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		flexicontent_security::requirePostToken();
 
 		$user = Factory::getUser();
-		$db   = Factory::getDbo();
+		$db   = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$app  = Factory::getApplication();
 
-		$session  = Factory::getSession();
+		$session  = Factory::getApplication()->getSession();
 		$document = Factory::getDocument();
 
 		$timeout = $session->get('com_flexicontent.formtime', 0);
@@ -2361,9 +2361,9 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			return $this->share_file_form();
 		}
 
-		$SiteName	= $app->getCfg('sitename');
-		$MailFrom	= $app->getCfg('mailfrom');
-		$FromName	= $app->getCfg('fromname');
+		$SiteName	= $app->get('sitename');
+		$MailFrom	= $app->get('mailfrom');
+		$FromName	= $app->get('fromname');
 
 		$file_id    = $app->input->get('file_id', 0, 'int');
 		$content_id = $app->input->get('content_id', 0, 'int');

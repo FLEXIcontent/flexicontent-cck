@@ -190,7 +190,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		$use_tmp = true;
 		
 		$user = \Joomla\CMS\Factory::getUser();
-		$db   = \Joomla\CMS\Factory::getDbo();
+		$db   = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$orderby = $this->_buildCatOrderBy('cat_');
 		
 		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
@@ -361,7 +361,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		$use_tmp = true;
 		
 		$user = \Joomla\CMS\Factory::getUser();
-		$db   = \Joomla\CMS\Factory::getDbo();
+		$db   = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$cat_orderby = $this->_buildCatOrderBy('subcat_');
 		
 		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),

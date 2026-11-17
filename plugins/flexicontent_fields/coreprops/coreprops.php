@@ -201,7 +201,7 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$formfieldname = 'filter_'.$filter->id;
 
 		$_s = $isSearchView ? '_s' : '';
@@ -338,7 +338,7 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$value_quoted = array();
 		foreach ($value as $i => $v)
 		{
@@ -386,7 +386,7 @@ class plgFlexicontent_fieldsCoreprops extends FCField
 	{
 		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$value_quoted = array();
 		foreach ($value as $i => $v)
 		{

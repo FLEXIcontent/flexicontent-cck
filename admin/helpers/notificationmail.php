@@ -234,7 +234,7 @@ class FlexicontentHelperNotificationMail
 
 		if (!isset(static::$categoryParams[$catid]))
 		{
-			$db    = Factory::getDbo();
+			$db    = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 			$query = $db->getQuery(true)
 				->select($db->quoteName('params'))
 				->from($db->quoteName('#__categories'))
@@ -521,7 +521,7 @@ class FlexicontentHelperNotificationMail
 
 		try
 		{
-			$db = Factory::getDbo();
+			$db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 			$extension_name = $db->setQuery(
 				$db->getQuery(true)

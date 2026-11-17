@@ -784,7 +784,7 @@ class FlexicontentModelItems extends FCModelAdminList
 	{
 		if (!$checkNoExtData && !$checkInvalidCat) return $count_only ? 0 : array();
 
-		$session = \Joomla\CMS\Factory::getSession();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 		$configured = FLEXI_J16GE ? FLEXI_CAT_EXTENSION : FLEXI_SECTION;
 		if ( !$configured ) return null;
 
@@ -868,7 +868,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$default_lang = flexicontent_html::getSiteDefaultLang();
 
 		// Get invalid cats, to avoid using them during binding, this is only done once
-		$session = \Joomla\CMS\Factory::getSession();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 		$badcats_fixed = $session->get('badcats', null, 'flexicontent');
 		if ( $badcats_fixed === null ) {
 			// Correct non-existent main category in content table
@@ -1309,7 +1309,7 @@ class FlexicontentModelItems extends FCModelAdminList
 	 */
 	function _buildContentJoinsWhere(& $extra_joins = '', $tmp_only = false)
 	{
-		$session = \Joomla\CMS\Factory::getSession();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 		$user    = \Joomla\CMS\Factory::getUser();
 		$perms   = FlexicontentHelperPerm::getPerm();
 
@@ -1782,7 +1782,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		$tags = array_values(array_filter(ArrayHelper::toInteger((array) $tags)));
 		$lang_arr = $this->normaliseBatchLanguages($lang_arr);
 
-		$dbprefix = $app->getCfg('dbprefix');
+		$dbprefix = $app->get('dbprefix');
 
 		$use_versioning = $this->cparams->get('use_versioning', 1);
 

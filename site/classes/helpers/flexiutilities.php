@@ -98,7 +98,7 @@ class FLEXIUtilities
 	static function getlanguageslist($published_only=false, $add_all = true)
 	{
 		$app = \Joomla\CMS\Factory::getApplication();
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		static $langs_cache = array();
 		//static $pub_languages = array();
 		//static $all_languages = array();
@@ -223,7 +223,7 @@ class FLEXIUtilities
 		) {
 			if (!$id) $all_retrieved = true;
 			$g_lastversions =  array();
-			$db = \Joomla\CMS\Factory::getDbo();
+			$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 			$query = "SELECT item_id as id, max(version_id) as version"
 									." FROM #__flexicontent_versions"
 									." WHERE 1"
@@ -257,7 +257,7 @@ class FLEXIUtilities
 
 		if( $g_currentversions==NULL || $force )
 		{
-			$db = \Joomla\CMS\Factory::getDbo();
+			$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 			if (!FLEXI_J16GE) {
 				$query = "SELECT i.id, i.version FROM #__content AS i"
 					." WHERE i.sectionid=".FLEXI_SECTION
@@ -295,7 +295,7 @@ class FLEXIUtilities
 
 	static function &getLastItemVersion($id)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query = 'SELECT max(version) as version'
 				.' FROM #__flexicontent_items_versions'
 				.' WHERE item_id = ' . (int)$id
@@ -313,7 +313,7 @@ class FLEXIUtilities
 
 		if ($status === null)
 		{
-			$db = \Joomla\CMS\Factory::getDbo();
+			$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 			$query = "SELECT c.id,c.version,iv.version as iversion FROM #__content as c "
 				." LEFT JOIN #__flexicontent_items_versions as iv ON c.id=iv.item_id AND c.version=iv.version"
 				." JOIN #__categories as cat ON c.catid=cat.id"
@@ -338,7 +338,7 @@ class FLEXIUtilities
 	 */
 	static function &getFirstVersion($id, $max, $current_version)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query = 'SELECT version_id'
 				.' FROM #__flexicontent_versions'
 				.' WHERE item_id = ' . (int)$id
@@ -359,7 +359,7 @@ class FLEXIUtilities
 	 */
 	static function &getVersionsCount($id)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query = 'SELECT COUNT(*)'
 				.' FROM #__flexicontent_versions'
 				.' WHERE item_id = ' . (int)$id
@@ -373,7 +373,7 @@ class FLEXIUtilities
 
 	static function getCache($group='', $client=0)
 	{
-		$conf = \Joomla\CMS\Factory::getConfig();
+		$conf = \Joomla\CMS\Factory::getApplication()->getConfig();
 
 		//$client = 0;//0 is site, 1 is admin
 		$options = array(
@@ -580,7 +580,7 @@ $fc_plgs[$fieldtype] = new $className($dispatcher, array('type'=>'flexicontent_f
 	 */
 	static function isSqlValidDate($date)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$q = "SELECT day(".$db->Quote($date).")";
 		$db->setQuery($q);
 		$num = $db->loadResult();
@@ -718,8 +718,8 @@ $fc_plgs[$fieldtype] = new $className($dispatcher, array('type'=>'flexicontent_f
 		$perms   = FlexicontentHelperPerm::getPerm();
 		$app     = \Joomla\CMS\Factory::getApplication();
 		$jinput  = $app->input;
-		$db      = \Joomla\CMS\Factory::getDbo();
-		$session = \Joomla\CMS\Factory::getSession();
+		$db      = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
 
 		// Redirect to Joomla backend

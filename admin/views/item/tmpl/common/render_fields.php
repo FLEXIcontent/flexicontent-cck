@@ -1046,7 +1046,7 @@ if ($usepublicationdetails) : // timezone_info, publication_details ?>
 	<?php ob_start(); ?>
 		<?php
 		// Dates displayed in the item form, are in user timezone for J2.5, and in site's default timezone for J1.5
-		$site_zone = $app->getCfg('offset');
+		$site_zone = $app->get('offset');
 		$user_zone = $user->getParam('timezone', $site_zone);
 
 		$tz = new DateTimeZone( $user_zone );

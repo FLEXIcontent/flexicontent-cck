@@ -157,7 +157,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		$user     = \Joomla\CMS\Factory::getUser();
 		$document = \Joomla\CMS\Factory::getDocument();
-		$db       = \Joomla\CMS\Factory::getDbo();
+		$db       = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		@ob_end_clean();
 		header('Content-Type: application/json; charset=utf-8');
@@ -577,7 +577,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		// Need to recheck post-installation / integrity tasks after,
 		// this should NOT effect RAW HTTP requests, used by AJAX ITEM binding
-		// \Joomla\CMS\Factory::getSession()->set('flexicontent.recheck_aftersave', true);
+		// \Joomla\CMS\Factory::getApplication()->getSession()->set('flexicontent.recheck_aftersave', true);
 
 		$bind_limit = $this->input->getInt('bind_limit', 25000);
 
@@ -648,8 +648,8 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
                 $selectedIds = array_values(array_filter($selectedIds));
                 $selectedMode = false;
 
-		$session = \Joomla\CMS\Factory::getSession();
-		$db      = \Joomla\CMS\Factory::getDbo();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
+		$db      = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$app     = \Joomla\CMS\Factory::getApplication();
 
 		// Get records model to call needed methods
@@ -703,7 +703,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
                 }
 
 		// Get full logfile path
-		$log_filename_full = \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getConfig()->get('log_path') . DS . $log_filename);
+		$log_filename_full = \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getApplication()->getConfig()->get('log_path') . DS . $log_filename);
 
 		// Clear previous log file
 		if (file_exists($log_filename_full))
@@ -757,8 +757,8 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		$start_microtime = microtime(true);
 
-		$session = \Joomla\CMS\Factory::getSession();
-		$db      = \Joomla\CMS\Factory::getDbo();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
+		$db      = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$app     = \Joomla\CMS\Factory::getApplication();
 
 		$has_zlib      = function_exists("zlib_encode"); // Version_compare(PHP_VERSION, '5.4.0', '>=');
@@ -1119,7 +1119,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			jexit(json_encode(array()));
 		}
 
-		$db   = \Joomla\CMS\Factory::getDbo();
+		$db   = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$like = $db->Quote('%' . $db->escape($term, true) . '%', false);
 
 		$query = $db->getQuery(true)

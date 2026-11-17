@@ -26,7 +26,7 @@ class FlexicontentViewDebugUser extends \Joomla\CMS\MVC\View\HtmlView
 	public function display($tpl = null)
 	{
 		// Access check.
-		if (!\Joomla\CMS\Factory::getUser()->authorise('core.manage', 'com_users') || !\Joomla\CMS\Factory::getConfig()->get('debug'))
+		if (!\Joomla\CMS\Factory::getUser()->authorise('core.manage', 'com_users') || !\Joomla\CMS\Factory::getApplication()->getConfig()->get('debug'))
 		{
 			throw new \Joomla\CMS\Access\Exception\NotAllowed(\Joomla\CMS\Language\Text::_('JERROR_ALERTNOAUTHOR'), 403);
 		}

@@ -72,7 +72,7 @@ abstract class JHtmlFcitems extends JHtmlFcbase
 
 		if ($tz === null)
 		{
-			$nullDate = \Joomla\CMS\Factory::getDbo()->getNullDate();
+			$nullDate = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class)->getNullDate();
 			$nowDate = \Joomla\CMS\Factory::getDate()->toUnix();
 
 			$tz = \Joomla\CMS\Factory::getUser()->getTimezone();

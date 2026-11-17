@@ -185,7 +185,7 @@ trait flexicontent_basetable_trait
 	public function stringURLSafe($string, $language, $force_ascii)
 	{
 		// Return a cleaned unicode alias
-		if (\Joomla\CMS\Factory::getConfig()->get('unicodeslugs') && !$force_ascii)
+		if (\Joomla\CMS\Factory::getApplication()->getConfig()->get('unicodeslugs') && !$force_ascii)
 		{
 			return \Joomla\CMS\Filter\OutputFilter::stringURLUnicodeSlug($string);
 		}
@@ -224,7 +224,7 @@ trait flexicontent_basetable_trait
 			else
 			{
 				// Detect that unicode aliases are enabled but this ascii alias is forced for this record
-				$unicodeslugs_override = \Joomla\CMS\Factory::getConfig()->get('unicodeslugs') && $force_ascii;
+				$unicodeslugs_override = \Joomla\CMS\Factory::getApplication()->getConfig()->get('unicodeslugs') && $force_ascii;
 
 				// Detect old joomla versions (Joomla <=3.5.x) that will not run the transliterator element's language
 				$r = new ReflectionMethod('\Joomla\CMS\Application\ApplicationHelper', 'stringURLSafe');

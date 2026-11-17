@@ -39,7 +39,7 @@ class FlexicontentViewStats extends FlexicontentViewBaseRecords
 		//initialise variables
 		$document = \Joomla\CMS\Factory::getDocument();
 		$user     = \Joomla\CMS\Factory::getUser();
-		$session  = \Joomla\CMS\Factory::getSession();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 		
 		// Get data from the model
 		$genstats   = $this->get( 'Generalstats' );

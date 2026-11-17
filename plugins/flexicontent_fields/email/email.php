@@ -807,7 +807,7 @@ class plgFlexicontent_fieldsEmail extends FCField
         if ($params->get('viewlayout', '') !== 'form') throw new \RuntimeException('Contact form is disabled', 403);
         $formid = $input->get('formid', '', 'raw');
         if (!is_string($formid) || !preg_match('/^fcemail_[a-f0-9]{16}$/D', $formid)) throw new \RuntimeException('Invalid contact form', 400);
-        $db = \Joomla\CMS\Factory::getDbo();
+        $db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
         $values = $db->setQuery('SELECT value FROM #__flexicontent_fields_item_relations WHERE item_id = ' . (int) $item->id
             . ' AND field_id = ' . (int) $field->id . ' ORDER BY valueorder')->loadColumn();
         $recipient = flexicontent_email_security::recipient($item->id, $field, $values, $input->get('recipient_key', '', 'raw'), $app->get('secret'));

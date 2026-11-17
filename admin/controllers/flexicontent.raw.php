@@ -76,7 +76,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		// Check for request forgeries
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$existing = $db->setQuery($db->getQuery(true)
             ->select('id')
@@ -199,7 +199,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		// Check for request forgeries
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, 'en-GB', true);
 		\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, null, true);
@@ -336,7 +336,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		// Check for request forgeries
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$db->setQuery("SELECT extension_id FROM #__extensions WHERE element='com_flexicontent' AND type='component' ");
 		$flexi_comp_id = $db->loadResult();
 
@@ -409,7 +409,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		// Check for request forgeries
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$query 	= '
 		INSERT INTO `#__flexicontent_types`
@@ -463,7 +463,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
 		$format = strtolower($this->input->get('format', 'html', 'CMD'));
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$query	= 'UPDATE #__extensions'
 			. ' SET enabled = 1'
@@ -517,7 +517,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 	 */
 	function addMcatItemRelations()
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		// 1st: remove orphan relations
 		$query = "DELETE rel.*"
@@ -569,7 +569,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		// Check for request forgeries
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$nullDate	= $db->getNullDate();
 
 		// Add language column
@@ -685,7 +685,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		// Check for request forgeries
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$nullDate	= $db->getNullDate();
 
 		$model  = $this->getModel('flexicontent');
@@ -809,7 +809,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		// Check for request forgeries
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$nullDate	= $db->getNullDate();
 
 		$query 	= " CREATE TABLE IF NOT EXISTS #__flexicontent_versions (
@@ -850,7 +850,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		// Check for request forgeries
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$nullDate	= $db->getNullDate();
 
 		$query 	= 'SELECT item_id, version FROM #__flexicontent_items_versions'
@@ -923,7 +923,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		// Check for request forgeries
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$nullDate	= $db->getNullDate();
 
 		$query 	= " CREATE TABLE IF NOT EXISTS #__flexicontent_authors_ext (
@@ -1010,7 +1010,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		// Check for request forgeries
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$cache_tbl = "#__flexicontent_items_tmp";
 
 		// Truncate the table, this will handle redudant columns too
@@ -1096,7 +1096,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		// Check for request forgeries
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
-		$db  = \Joomla\CMS\Factory::getDbo();
+		$db  = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$app = \Joomla\CMS\Factory::getApplication();
 
 		$queries 	= array();
@@ -1424,7 +1424,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		// Check for request forgeries
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		try
 		{

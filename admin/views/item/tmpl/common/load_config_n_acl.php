@@ -3,7 +3,7 @@ defined('_JEXEC') or die('Restricted access');
 
 $app     = \Joomla\CMS\Factory::getApplication();
 $user    = \Joomla\CMS\Factory::getUser();
-$session = \Joomla\CMS\Factory::getSession();
+$session = \Joomla\CMS\Factory::getApplication()->getSession();
 $isSite  = $app->isClient('site');
 $CFGsfx  = $isSite ? '_fe' : '_be';
 

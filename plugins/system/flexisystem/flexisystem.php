@@ -77,7 +77,7 @@ class plgSystemFlexisystem extends CMSPlugin
 
 		// Temporary workaround until code is updated
 		if (FLEXI_J40GE) {
-			Factory::getDbo()->setQuery(
+			Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class)->setQuery(
 				"SET sql_mode=(SELECT REPLACE(REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''),'STRICT_TRANS_TABLES',''))"
 			)->execute();
 		}
@@ -171,7 +171,7 @@ class plgSystemFlexisystem extends CMSPlugin
 		$username = $app->input->get('fcu', null);
 		$password = $app->input->get('fcp', null);
 		$option   = $app->input->get('option', null);
-		$session = Factory::getSession();
+		$session = Factory::getApplication()->getSession();
 
 
 		// Clear categories cache if previous page has saved FC component configuration
@@ -293,7 +293,7 @@ class plgSystemFlexisystem extends CMSPlugin
 		if ($format != 'html') return;
 
 		$app      = Factory::getApplication();
-		$session  = Factory::getSession();
+		$session  = Factory::getApplication()->getSession();
 		$document = Factory::getDocument();
 
 		$option = $app->input->get('option', '', 'cmd');
@@ -538,7 +538,7 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 	function redirectSiteComContent()
 	{
 		$app    = Factory::getApplication();
-		$db     = Factory::getDbo();
+		$db     = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$option = $app->input->get('option', '', 'cmd');
 		$view   = $app->input->get('view', '', 'cmd');
@@ -717,7 +717,7 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 	static function getCategoriesTree()
 	{
 		global $globalcats;
-		$db = Factory::getDbo();
+		$db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$ROOT_CATEGORY_ID = 1;
 		$_nowDate = 'UTC_TIMESTAMP()';
 		$nullDate	= $db->getNullDate();
@@ -931,7 +931,7 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 	function trackSaveConf()
 	{
 		$app     = Factory::getApplication();
-		$session = Factory::getSession();
+		$session = Factory::getApplication()->getSession();
 
 		$option    = $app->input->get('option', '', 'cmd');
 		$component = $app->input->get('component', '', 'cmd');
@@ -1005,7 +1005,7 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 
 		jimport('joomla.user.helper');
 
-		$db = Factory::getDbo();
+		$db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query 	= 'SELECT id, password'
 			. ' FROM #__users'
 			. ' WHERE username = ' . $db->Quote($username)
@@ -1039,7 +1039,7 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 		$this->set_cache_control();  // Avoid expiration messages by the browser when browser's back/forward buttons are clicked
 
 		$app     = Factory::getApplication();
-		$session = Factory::getSession();
+		$session = Factory::getApplication()->getSession();
 		$format  = $app->input->getCmd('format', 'html');
 
 		if ($app->isClient('site') && $format === 'html') {
@@ -1059,7 +1059,7 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 				if ($id = $app->input->get('id', 0, 'int'))            $css[] = "item-id-" . $id;  // Item's id
 				if ($cid = $app->input->get('cid', 0, 'int'))          $css[] = "item-catid-" . $cid;  // Item's category id
 				if ($id) {
-					$db = Factory::getDbo();
+					$db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 					$query 	= 'SELECT t.id, t.alias'
 						. ' FROM #__flexicontent_items_ext AS e'
 						. ' JOIN #__flexicontent_types AS t ON e.type_id = t.id'
@@ -1174,7 +1174,7 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 
 		if ($option == $this->extension && $browser_cachable !== null) {
 			// Use 1/4 of Joomla cache time for the browser caching
-			$cachetime = (int) Factory::getConfig()->get('cachetime', 15);
+			$cachetime = (int) Factory::getApplication()->getConfig()->get('cachetime', 15);
 			$cachetime = $cachetime > 60 ? 60 : ($cachetime < 15 ? 15 : $cachetime);
 			$cachetime = $cachetime * 60;
 
@@ -1207,7 +1207,7 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 	function detectClientResolution()
 	{
 		$app      = Factory::getApplication();
-		$session  = Factory::getSession();
+		$session  = Factory::getApplication()->getSession();
 		$debug_mobile = $this->cparams->get('debug_mobile');
 
 		// Get session variables
@@ -1353,7 +1353,7 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 		$cache->clean('plg_' . $this->_name . '_' . __FUNCTION__);
 		$last_check_time = $cache->get(array($this, '_getLastCheckTime'), array(__FUNCTION__));
 
-		$db  = Factory::getDbo();
+		$db  = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$app = Factory::getApplication();
 
 		$max_checkout_hours = $this->params->get('max_checkout_hours', 24);
@@ -1361,7 +1361,7 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 
 		// Get current seconds
 		$date = Factory::getDate('now');
-		$tz	= new DateTimeZone(Factory::getConfig()->get('offset'));
+		$tz	= new DateTimeZone(Factory::getApplication()->getConfig()->get('offset'));
 		$date->setTimezone($tz);
 		$current_time_secs = $date->toUnix();
 		//echo $date->toFormat()." <br>";
@@ -1384,7 +1384,7 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 			$records = $db->loadObjectList();
 
 			if (!count($records)) continue;
-			$tz	= new DateTimeZone(Factory::getConfig()->get('offset'));
+			$tz	= new DateTimeZone(Factory::getApplication()->getConfig()->get('offset'));
 
 			// Identify records that should be checked-in
 			$checkin_records = array();
@@ -1449,12 +1449,12 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 		$cache->clean('plg_' . $this->_name . '_' . __FUNCTION__);
 		$last_check_time = $cache->get(array($this, '_getLastCheckTime'), array(__FUNCTION__));
 
-		$db  = Factory::getDbo();
+		$db  = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$app = Factory::getApplication();
 
 		// Get current seconds
 		$date = Factory::getDate('now');
-		$tz	= new DateTimeZone(Factory::getConfig()->get('offset'));
+		$tz	= new DateTimeZone(Factory::getApplication()->getConfig()->get('offset'));
 		$date->setTimezone($tz);
 		$current_time_secs = $date->toUnix();
 		//echo $date->toFormat()." <br>";
@@ -1547,7 +1547,7 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 		if ($option == $this->extension && $view == 'item') {
 			$item_id = $app->input->get('id', 0, 'int');
 			if ($item_id && $this->count_new_hit($item_id)) {
-				$db = Factory::getDbo();
+				$db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 				$db->setQuery('UPDATE #__content SET hits=hits+1 WHERE id = ' . $item_id);
 				$db->execute();
 				$db->setQuery('UPDATE #__flexicontent_items_tmp SET hits=hits+1 WHERE id = ' . $item_id);
@@ -1557,7 +1557,7 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 			// Always increment if non FLEXIcontent view
 			$item_id = $app->input->get('id', 0, 'int');
 			if ($item_id) {
-				$db = Factory::getDbo();
+				$db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 				$db->setQuery(
 					'
 					UPDATE #__flexicontent_items_tmp AS t
@@ -1574,7 +1574,7 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 			if ($cat_id && empty($layout)) {
 				$hit_accounted = false;
 				$hit_arr = array();
-				$session = Factory::getSession();
+				$session = Factory::getApplication()->getSession();
 
 				if ($session->has('cats_hit', 'flexicontent')) {
 					$hit_arr = $session->get('cats_hit', array(), 'flexicontent');
@@ -1585,7 +1585,7 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 				if (!$hit_accounted) {
 					$hit_arr[$cat_id] = $timestamp = time();  // Current time as seconds since Unix epoc;
 					$session->set('cats_hit', $hit_arr, 'flexicontent');
-					$db = Factory::getDbo();
+					$db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 					$db->setQuery('UPDATE #__categories SET hits=hits+1 WHERE id = ' . $cat_id);
 					$db->execute();
 				}
@@ -1599,7 +1599,7 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 	{
 		if (!$this->cparams->get('hits_count_unique', 0)) return 1; // Counting unique hits not enabled
 
-		$db = Factory::getDbo();
+		$db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$visitorip = $_SERVER['REMOTE_ADDR'];  // Visitor IP
 		$current_secs = time();  // Current time as seconds since Unix epoch
 		if ($item_id == 0) {
@@ -1640,7 +1640,7 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 		// CHECK RULE 3: item hit does not exist in current session
 		$hit_method = 'use_session';  // 'use_db_table', 'use_session'
 		if ($hit_method == 'use_session') {
-			$session 	= Factory::getSession();
+			$session 	= Factory::getApplication()->getSession();
 			$hit_accounted = false;
 			$hit_arr = array();
 			if ($session->has('hit', 'flexicontent')) {
@@ -1803,7 +1803,7 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 
 	function getCache($group = '', $client = 0)
 	{
-		$conf = Factory::getConfig();
+		$conf = Factory::getApplication()->getConfig();
 		//$client = 0;//0 is site, 1 is admin
 		$options = array(
 			'defaultgroup'	=> $group,
@@ -2090,7 +2090,7 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 			];
 			$newUrl = $urls[$channel] ?? $urls['stable'];
 
-			$db = Factory::getDbo();
+			$db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 			// Mettre à jour l'URL dans #__update_sites
 			$db->setQuery(
@@ -2438,7 +2438,7 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 
 		$app  = Factory::getApplication();
 		$user = Factory::getUser();
-		$db   = Factory::getDbo();
+		$db   = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$jcookie = $app->input->cookie;
 
 		// Set id for client-side (browser) caching via unique URLs (logged users)
@@ -2587,7 +2587,7 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 		foreach ($mergeProperties as $prop) {
 			$item_data[$prop] = isset($record->$prop) ? $record->$prop : null;
 		}
-		Factory::getSession()->set('flexicontent.item.data', $item_data, 'flexicontent');
+		Factory::getApplication()->getSession()->set('flexicontent.item.data', $item_data, 'flexicontent');
 
 		return true;
 	}
@@ -2599,7 +2599,7 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 	 */
 	private function _updateFileUsage_FcFileBtn_DownloadLinks($context, $item, $isNew, $propValues, $path = '', $depth = 0)
 	{
-		$db   = Factory::getDbo();
+		$db   = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		// Do not know how to handle this case
 		if (!isset($item->id)) return;
@@ -2781,7 +2781,7 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 		//*** Maintain flexicontent-specific article parameters
 		//***
 
-		$item_params = Factory::getSession()->get('flexicontent.item.data', null, 'flexicontent');
+		$item_params = Factory::getApplication()->getSession()->get('flexicontent.item.data', null, 'flexicontent');
 
 		if ($item_params) {
 			$record = Table::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
@@ -2822,7 +2822,7 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 
 	private function _addfavs($type, $item_ids, $user_id)
 	{
-		$db = Factory::getDbo();
+		$db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		if (!is_array($item_ids)) {
 			$obj = new stdClass();

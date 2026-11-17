@@ -786,8 +786,8 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		$session = Factory::getApplication()->getSession();
 		$app = Factory::getApplication();
 
-		$dbprefix = $app->getCfg('dbprefix');
-		$dbname   = $app->getCfg('db');
+		$dbprefix = $app->get('dbprefix');
+		$dbname   = $app->get('db');
 
 		$jversion = new \Joomla\CMS\Version;
 
@@ -1019,8 +1019,8 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 
 		jimport('joomla.filesystem.file');
 		$app = Factory::getApplication();
-		$dbprefix = $app->getCfg('dbprefix');
-		$dbname   = $app->getCfg('db');
+		$dbprefix = $app->get('dbprefix');
+		$dbname   = $app->get('db');
 
 		$tblname_indexnames = array(
 			'flexicontent_tags'=>array('name'=>0, 'alias'=>0, 'published'=>0, 'jtag_id'=>0),

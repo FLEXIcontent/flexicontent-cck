@@ -546,7 +546,7 @@ class plgFlexicontent_fieldsCore extends FCField
             $auto_title_code = '';
             if ($auto_title === 2)
             {
-                $db = \Joomla\CMS\Factory::getDbo();
+                $db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
                 $typeParams = new \Joomla\Registry\Registry($db->setQuery('SELECT attribs FROM #__flexicontent_types WHERE id = ' . (int) $item->type_id)->loadResult());
                 $auto_title_code = (int) $typeParams->get('auto_title', 0) === 2 ? $typeParams->get('auto_title_code', '') : '';
             }
@@ -638,7 +638,7 @@ class plgFlexicontent_fieldsCore extends FCField
 			? in_array($filter->field_type, array('type','state','tags','categories','created','createdby','modified','modifiedby'))
 			: false;
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$formfieldname = 'filter_'.$filter->id;
 
 		$_s = $isSearchView ? '_s' : '';
@@ -1166,7 +1166,7 @@ class plgFlexicontent_fieldsCore extends FCField
 			return array();
 		}
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$_s = $for_advsearch ? '_s' : '';
 
 		$values = array();
@@ -1326,7 +1326,7 @@ class plgFlexicontent_fieldsCore extends FCField
 
 		if (!isset($item_reviews[$item->id]))
 		{
-			$db = \Joomla\CMS\Factory::getDbo();
+			$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 			$item_ids = array();
 

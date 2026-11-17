@@ -471,8 +471,8 @@ class FLEXIcontentModelSearch extends FCModelAdminList
 	public function purge($del_fieldids = null)
 	{
 		$app      = \Joomla\CMS\Factory::getApplication();
-		$dbprefix = $app->getCfg('dbprefix');
-		$dbname   = $app->getCfg('db');
+		$dbprefix = $app->get('dbprefix');
+		$dbname   = $app->get('db');
 
 		/**
 		 * Empty Common text-search index

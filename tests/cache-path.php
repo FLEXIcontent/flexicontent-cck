@@ -1,7 +1,7 @@
 <?php
 /** Match the active Joomla cache path while retaining configured paths and admin storage. */
 namespace Joomla\CMS {
- class Factory {public static $config;public static function getConfig(){return self::$config;}}
+ class Factory {public static $config;public static function getConfig(){return self::$config;}public static function getApplication(){return new class {public function getConfig(){return Factory::$config;}};}}
 }
 namespace Joomla\CMS\Cache {
  class Cache {public static function getInstance($handler,$options){return (object)$options;}}

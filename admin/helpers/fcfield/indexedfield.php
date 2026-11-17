@@ -963,7 +963,7 @@ class FCIndexedField extends FCField
 			if ($cascade_after)
 			{
 				// Filter out values not in the the value group, this is done by modifying the SQL query
-				$db = \Joomla\CMS\Factory::getDbo();
+				$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 				$_elements = array();
 				foreach($valgrps as & $vg) $vg = $db->Quote($vg);
 				unset($vg);

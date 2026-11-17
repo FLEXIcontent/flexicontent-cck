@@ -92,7 +92,7 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 		$plugin  = \Joomla\CMS\Plugin\PluginHelper::getPlugin('flexicontent', 'flexinotify');
 		$params  = new \Joomla\Registry\Registry($plugin->params);
 		$app     = \Joomla\CMS\Factory::getApplication();
-		$session = \Joomla\CMS\Factory::getSession();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 
 		$debug_notifications = (int) $params->get('debug_notifications', 0);
 
@@ -209,7 +209,7 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 
 	function _getSubscribers($itemid)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$query	= 'SELECT u.* '
 				.' FROM #__flexicontent_favourites AS f'
@@ -242,7 +242,7 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 
 		$categories = $globalcats;
 		$app        = \Joomla\CMS\Factory::getApplication();
-		$config     = \Joomla\CMS\Factory::getConfig();
+		$config     = \Joomla\CMS\Factory::getApplication()->getConfig();
 
 		// Get the route helper
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
@@ -310,12 +310,12 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 		 * Create parameters passed to mail helper function
 		 */
 
-		$site_info  = $app->getCfg('sitename') . ' - ' . \Joomla\CMS\Uri\Uri::root();
-		$sendermail	= $params->get('sendermail', $app->getCfg('mailfrom'));
+		$site_info  = $app->get('sitename') . ' - ' . \Joomla\CMS\Uri\Uri::root();
+		$sendermail	= $params->get('sendermail', $app->get('mailfrom'));
 		$sendermail	= \Joomla\CMS\Mail\MailHelper::cleanAddress($sendermail);
 
 		// Use 'sitename' as sender name
-		$sendername	= $params->get('sendername', $app->getCfg('sitename'));
+		$sendername	= $params->get('sendername', $app->get('sitename'));
 
 		// Use custom message subject if this is set
 		$subject = $params->get('mailsubject_owner', '')
@@ -383,7 +383,7 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 		$categories = $globalcats;
 
 		$app    = \Joomla\CMS\Factory::getApplication();
-		$config = \Joomla\CMS\Factory::getConfig();
+		$config = \Joomla\CMS\Factory::getApplication()->getConfig();
 
 		// Get the route helper
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
@@ -451,12 +451,12 @@ class plgFlexicontentFlexinotify extends \Joomla\CMS\Plugin\CMSPlugin
 		 * Create parameters passed to mail helper function
 		 */
 
-		$site_info  = $app->getCfg('sitename') . ' - ' . \Joomla\CMS\Uri\Uri::root();
-		$sendermail	= $params->get('sendermail', $app->getCfg('mailfrom'));
+		$site_info  = $app->get('sitename') . ' - ' . \Joomla\CMS\Uri\Uri::root();
+		$sendermail	= $params->get('sendermail', $app->get('mailfrom'));
 		$sendermail	= \Joomla\CMS\Mail\MailHelper::cleanAddress($sendermail);
 
 		// Use 'sitename' as sender name
-		$sendername	= $params->get('sendername', $app->getCfg('sitename'));
+		$sendername	= $params->get('sendername', $app->get('sitename'));
 
 		// Use custom message subject if this is set
 		$subject	= $params->get('mailsubject', '')

@@ -4107,7 +4107,7 @@ class FlexicontentFields
 		$valueswhere = str_replace('_v_', $colname, $valueswhere);
 
 		$field_tbl = 'flexicontent_advsearch_index_field_'.$filter->id;
-		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . $field_tbl . '"';
+		$query = 'SHOW TABLES LIKE "' . $app->get('dbprefix') . $field_tbl . '"';
 		$db->setQuery($query);
 		$tbl_exists = (bool) count($db->loadObjectList());
 		$field_tbl = $tbl_exists ? $field_tbl : 'flexicontent_advsearch_index';
@@ -5063,7 +5063,7 @@ class FlexicontentFields
 		$show_matches = $isRange || !$faceted_filter ?  0  :  $show_matching_items;
 
 		$field_tbl = 'flexicontent_advsearch_index_field_'.$filter->id;
-		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . $field_tbl . '"';
+		$query = 'SHOW TABLES LIKE "' . $app->get('dbprefix') . $field_tbl . '"';
 		$db->setQuery($query);
 		$tbl_exists = (bool) count($db->loadObjectList());
 		$field_tbl = $tbl_exists ? $field_tbl : 'flexicontent_advsearch_index';

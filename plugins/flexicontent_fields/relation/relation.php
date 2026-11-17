@@ -70,7 +70,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 		$document = Factory::getDocument();
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 		$app      = Factory::getApplication();
-		$db       = Factory::getDbo();
+		$db       = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$user     = Factory::getUser();
 
 		$tooltip_class   = 'hasTooltip';
@@ -991,7 +991,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 	{
 		if (!in_array($filter->field_type, static::$field_types)) return;
 
-		$db       = Factory::getDbo();
+		$db       = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$_nowDate = 'UTC_TIMESTAMP()';
 		$nullDate = $db->getNullDate();
 
@@ -1139,7 +1139,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 		{
 			$_ids = array();
 			foreach ($post as $_id) $_ids[] = (int) $_id;  // convert itemID:catID to itemID
-			$db    = Factory::getDbo();
+			$db    = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 			$query = 'SELECT i.id AS value_id, i.title AS value FROM #__content AS i WHERE i.id IN (' . implode(',', $_ids) . ')';
 			$_values = $db->setQuery($query)->loadAssocList();
 			$values  = array();
@@ -1169,7 +1169,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 		{
 			$_ids = array();
 			foreach ($post as $_id) $_ids[] = (int) $_id;  // convert itemID:catID to itemID
-			$db    = Factory::getDbo();
+			$db    = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 			$query = 'SELECT i.id AS value_id, i.title AS value FROM #__content AS i WHERE i.id IN (' . implode(',', $_ids) . ')';
 			$_values = $db->setQuery($query)->loadAssocList();
 			$values  = array();
@@ -1267,7 +1267,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 		// Get API objects / data
 		$app  = Factory::getApplication();
 		$user = Factory::getUser();
-		$db   = Factory::getDbo();
+		$db   = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$view = $app->input->get('view', '', 'CMD');
 
 		// Get Access Levels of user
@@ -1858,7 +1858,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 		// Get API objects / data
 		$app  = Factory::getApplication();
 		$user = Factory::getUser();
-		$db   = Factory::getDbo();
+		$db   = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		// Get Access Levels of user
 		$uacc = array_flip(\Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id));
@@ -2375,7 +2375,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 	{
 		$app    = Factory::getApplication();
 		$user   = Factory::getUser();
-		$db     = Factory::getDbo();
+		$db     = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$jinput = $app->input;
 		$option = $jinput->get('option', '', 'cmd');
 		$view   = $jinput->get('view', '', 'cmd');
@@ -2501,7 +2501,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 			}
 			elseif ($filter->field_type == 'text')
 			{
-				$db       = Factory::getDbo();
+				$db       = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 				$query    = $db->getQuery(true)
 						->select('DISTINCT value, value AS text')
 						->from('#__flexicontent_fields_item_relations')

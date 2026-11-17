@@ -39,8 +39,8 @@ class FlexicontentViewTagelement extends FlexicontentViewBaseRecords
 		$document = \Joomla\CMS\Factory::getDocument();
 		$user     = \Joomla\CMS\Factory::getUser();
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
-		$session  = \Joomla\CMS\Factory::getSession();
-		$db       = \Joomla\CMS\Factory::getDbo();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
+		$db       = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$option   = $jinput->getCmd('option', '');
 		$view     = $jinput->getCmd('view', '');

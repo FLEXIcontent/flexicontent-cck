@@ -9,7 +9,7 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\CMS\Language\Text;
 
 $app    = \Joomla\CMS\Factory::getApplication();
-$db     = \Joomla\CMS\Factory::getDbo();
+$db     = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 $order  = $app->input->getCmd('order', 'hits') === 'term' ? 'term' : 'hits';
 $dir    = strtoupper($app->input->getCmd('dir', $order === 'hits' ? 'DESC' : 'ASC')) === 'ASC' ? 'ASC' : 'DESC';
 $filter = trim($app->input->getString('q', ''));

@@ -56,7 +56,7 @@ class JFormFieldFcauthor extends JFormFieldList
 
 			$options = array();
 
-			$db = \Joomla\CMS\Factory::getDbo();
+			$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 			// Construct the query
 			$query = $db->getQuery(true)

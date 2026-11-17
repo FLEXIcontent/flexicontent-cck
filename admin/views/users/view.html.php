@@ -39,8 +39,8 @@ class FlexicontentViewUsers extends FlexicontentViewBaseRecords
 		$document = \Joomla\CMS\Factory::getDocument();
 		$user     = \Joomla\CMS\Factory::getUser();
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
-		$session  = \Joomla\CMS\Factory::getSession();
-		$db       = \Joomla\CMS\Factory::getDbo();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
+		$db       = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$option   = $jinput->getCmd('option', '');
 		$view     = $jinput->getCmd('view', '');
@@ -475,7 +475,7 @@ class FlexicontentViewUsers extends FlexicontentViewBaseRecords
 		 * Create note about dates displayed using current user's timezone
 		 */
 
-		$site_zone = $app->getCfg('offset');
+		$site_zone = $app->get('offset');
 		$user_zone = \Joomla\CMS\Factory::getUser()->getParam('timezone', $site_zone);
 
 		$tz = new DateTimeZone( $user_zone );
@@ -575,7 +575,7 @@ class FlexicontentViewUsers extends FlexicontentViewBaseRecords
 		$document = \Joomla\CMS\Factory::getDocument();
 		$toolbar  = \Joomla\CMS\Toolbar\Toolbar::getInstance('toolbar');
 		$perms    = FlexicontentHelperPerm::getPerm();
-		$session  = \Joomla\CMS\Factory::getSession();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 		$useAssocs= flexicontent_db::useAssociations();
 		$canDo    = UsersHelper::getActions();
 

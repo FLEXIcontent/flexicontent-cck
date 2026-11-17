@@ -1622,7 +1622,7 @@ class plgFlexicontent_fieldsImage extends FCField
 					if ($save_as_copy)
 					{
 						$sourceId = (int) $unique_tmp_itemid;
-						$sourceOwner = Factory::getDbo()->setQuery('SELECT created_by FROM #__content WHERE id = ' . $sourceId)->loadResult();
+						$sourceOwner = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class)->setQuery('SELECT created_by FROM #__content WHERE id = ' . $sourceId)->loadResult();
 						$sourceAsset = 'com_content.article.' . $sourceId;
 						$authorized = $sourceOwner !== null && $sourceOwner !== false && ($user->authorise('core.edit', $sourceAsset)
 							|| ((int) $sourceOwner === (int) $user->id && !$user->guest && $user->authorise('core.edit.own', $sourceAsset)));
@@ -2303,9 +2303,9 @@ class plgFlexicontent_fieldsImage extends FCField
 			}
 			else
 			{
-				$db     = Factory::getDbo();
+				$db     = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 				$user   = Factory::getUser();
-				$config = Factory::getConfig();
+				$config = Factory::getApplication()->getConfig();
 
 				$timezone = $config->get('offset');
 				$date = Factory::getDate('now');
@@ -2639,7 +2639,7 @@ class plgFlexicontent_fieldsImage extends FCField
 	public function removeOriginalFile($field, $filename)
 	{
 		$app = Factory::getApplication();
-		$db  = Factory::getDbo();
+		$db  = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		jimport('joomla.filesystem.file');
 		jimport('joomla.filesystem.path');
@@ -2908,7 +2908,7 @@ class plgFlexicontent_fieldsImage extends FCField
 	function canDeleteImage( &$field, $record, &$item )
 	{
 		// Retrieve available (and appropriate) images from the DB
-		$db   = Factory::getDbo();
+		$db   = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query = 'SELECT id'
 			. ' FROM #__flexicontent_files'
 			. ' WHERE filename='. $db->Quote($record)
@@ -2932,7 +2932,7 @@ class plgFlexicontent_fieldsImage extends FCField
 
 	function listImageUses($field, $record)
 	{
-		$db = Factory::getDbo();
+		$db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query = 'SELECT value, item_id'
 			. ' FROM #__flexicontent_fields_item_relations'
 			. ' WHERE field_id = '. (int) $field->id
@@ -3048,7 +3048,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		if ( count($new_ids) )
 		{
 			// Only query files that are not already cached
-			$db = Factory::getDbo();
+			$db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 			$query = 'SELECT * '. $extra_select //filename, filename_original, altname, description, ext, id'
 				. ' FROM #__flexicontent_files'
 				. ' WHERE id IN ('. implode(',', $new_ids) . ')'

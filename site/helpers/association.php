@@ -85,7 +85,7 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 			$layout = $jinput->getCmd('layout');
 			if ($cid)
 			{
-				$db     = version_compare(JVERSION, '4', 'lt') ? Factory::getDbo() : Factory::getContainer()->get('DatabaseDriver');
+				$db     = version_compare(JVERSION, '4', 'lt') ? Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class) : Factory::getContainer()->get('DatabaseDriver');
 				$category = $db->setQuery('SELECT id, language FROM #__categories WHERE id = ' . $cid)->loadObject();
 			}
 			// Assume language ALL if no current language
@@ -152,7 +152,7 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 			return array();
 		}
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query = 'SELECT i.language, ie.type_id, i.id, i.catid, '
 			. '  CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(":", i.id, i.alias) ELSE i.id END as title_slug, '
 			. '  CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(":", c.id, c.alias) ELSE c.id END as cat_slug '
@@ -177,7 +177,7 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 			return array();
 		}
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		if (!FLEXI_FALANG) return array();
 
 		$query  =
@@ -218,7 +218,7 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 			return array();
 		}
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query = 'SELECT c.language, c.id, '
 			. '  CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(":", c.id, c.alias) ELSE c.id END as title_slug '
 			. ' FROM #__associations AS a'
@@ -305,7 +305,7 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 	 */
 	private static function _getItemCatSlug($record, $menu)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$moption = isset($menu->query['option']) ? $menu->query['option'] : '';
 		$mview   = isset($menu->query['view']) ? $menu->query['view'] : '';

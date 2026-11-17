@@ -37,7 +37,7 @@ JLoader::register('\Joomla\CMS\Form\FormFieldFclayoutbuilder', JPATH_ADMINISTRAT
 
 // Decide whether to show module contents
 $app     = Factory::getApplication();
-$config  = Factory::getConfig();
+$config  = Factory::getApplication()->getConfig();
 $jinput  = $app->input;
 $option  = $jinput->get('option', '', 'cmd');
 $view    = $jinput->get('view', '', 'cmd');

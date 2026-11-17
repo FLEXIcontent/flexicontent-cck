@@ -142,7 +142,7 @@ foreach ($values as $value)
 
 	//Captcha
 	$display_captcha = (int) $field->parameters->get($LPN . 'display_captcha', 0);
-	$captcha_plgname = $display_captcha ? $app->getCfg('captcha') : '0';
+	$captcha_plgname = $display_captcha ? $app->get('captcha') : '0';
 	$captcha_html    = '';
 
     if ($display_captcha)

@@ -64,7 +64,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 	function saveprops()
 	{
 		// Set tree data into session
-		$session = \Joomla\CMS\Factory::getSession();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 		$file_row_id = $this->input->get('file_row_id', '', 'string');
 		$uploader_file_data = $session->get('uploader_file_data', array(), 'flexicontent');
 		$props = array();
@@ -122,8 +122,8 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$rebuildmode = $this->input->getCmd('rebuildmode', '');
 		$index_urls  = $this->input->getInt('index_urls', 0);
 
-		$session = \Joomla\CMS\Factory::getSession();
-		$db      = \Joomla\CMS\Factory::getDbo();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
+		$db      = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$app     = \Joomla\CMS\Factory::getApplication();
 
 		// Check indexer type
@@ -134,7 +134,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 		// Clear previous log file
 		$log_filename      = 'filemanager_stats_indexer_' . \Joomla\CMS\Factory::getUser()->id . '.php';
-		$log_filename_full = \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getConfig()->get('log_path') . DS . $log_filename);
+		$log_filename_full = \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getApplication()->getConfig()->get('log_path') . DS . $log_filename);
 
 		if (file_exists($log_filename_full))
 		{
@@ -210,8 +210,8 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 		$start_microtime = microtime(true);
 
-		$session = \Joomla\CMS\Factory::getSession();
-		$db      = \Joomla\CMS\Factory::getDbo();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
+		$db      = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$app     = \Joomla\CMS\Factory::getApplication();
 
 		$has_zlib      = function_exists("zlib_encode"); // Version_compare(PHP_VERSION, '5.4.0', '>=');
@@ -565,7 +565,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 	 */
 	private function _orphansFile()
 	{
-		return \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getConfig()->get('tmp_path') . '/fc_orphans_' . (int) \Joomla\CMS\Factory::getUser()->id . '.json');
+		return \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getApplication()->getConfig()->get('tmp_path') . '/fc_orphans_' . (int) \Joomla\CMS\Factory::getUser()->id . '.json');
 	}
 
 
@@ -603,7 +603,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$this->_orphansPrecheck();
 
 		// Release the session (lock), the scan can take long
-		\Joomla\CMS\Factory::getSession()->close();
+		\Joomla\CMS\Factory::getApplication()->getSession()->close();
 
 		@set_time_limit(300);
 
@@ -654,7 +654,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$this->_orphansPrecheck();
 
 		// Release the session (lock) before the work
-		\Joomla\CMS\Factory::getSession()->close();
+		\Joomla\CMS\Factory::getApplication()->getSession()->close();
 
 		@set_time_limit(300);
 

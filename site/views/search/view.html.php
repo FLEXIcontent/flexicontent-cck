@@ -54,7 +54,7 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 		$view   = $jinput->getCmd('view', '');
 
 		$document = \Joomla\CMS\Factory::getDocument();
-		$db       = \Joomla\CMS\Factory::getDbo();
+		$db       = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$menus    = $app->getMenu();
 		$menu     = $menus->getActive();
 		$uri      = \Joomla\CMS\Uri\Uri::getInstance();
@@ -215,12 +215,12 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 		$doc_title = $params->get( 'page_title' );
 
 		// Check and prepend or append site name to page title
-		if ( $doc_title != $app->getCfg('sitename') ) {
-			if ($app->getCfg('sitename_pagetitles', 0) == 1) {
-				$doc_title = Text::sprintf('JPAGETITLE', $app->getCfg('sitename'), $doc_title);
+		if ( $doc_title != $app->get('sitename') ) {
+			if ($app->get('sitename_pagetitles', 0) == 1) {
+				$doc_title = Text::sprintf('JPAGETITLE', $app->get('sitename'), $doc_title);
 			}
-			elseif ($app->getCfg('sitename_pagetitles', 0) == 2) {
-				$doc_title = Text::sprintf('JPAGETITLE', $doc_title, $app->getCfg('sitename'));
+			elseif ($app->get('sitename_pagetitles', 0) == 2) {
+				$doc_title = Text::sprintf('JPAGETITLE', $doc_title, $app->get('sitename'));
 			}
 		}
 
@@ -885,7 +885,7 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 				}
 			}
 
-			$_sh404sef = defined('SH404SEF_IS_RUNNING') && \Joomla\CMS\Factory::getConfig()->get('sef');
+			$_sh404sef = defined('SH404SEF_IS_RUNNING') && \Joomla\CMS\Factory::getApplication()->getConfig()->get('sef');
 			if ($_sh404sef)
 			{
 				$pageNav->setAdditionalUrlParam('limit', $model->getState('limit'));

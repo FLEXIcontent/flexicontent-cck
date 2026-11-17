@@ -87,9 +87,9 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 
 		// Initialize some variables
 		$app = \Joomla\CMS\Factory::getApplication();
-		$db  = \Joomla\CMS\Factory::getDbo();
+		$db  = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$me  = \Joomla\CMS\Factory::getUser();
-		$config = \Joomla\CMS\Factory::getConfig();
+		$config = \Joomla\CMS\Factory::getApplication()->getConfig();
 		$MailFrom	= $config->get('mailfrom');
 		$FromName	= $config->get('fromname');
 		$SiteName	= $config->get('sitename');
@@ -228,7 +228,7 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$db    = \Joomla\CMS\Factory::getDbo();
+		$db    = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$me    = \Joomla\CMS\Factory::getUser();
 		$curIsSuperAdmin = $me->authorise('core.admin', 'root.1');
 
@@ -323,7 +323,7 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
 		$app = \Joomla\CMS\Factory::getApplication();
-		$db  = \Joomla\CMS\Factory::getDbo();
+		$db  = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$me  = \Joomla\CMS\Factory::getUser();
 		$curIsSuperAdmin = $me->authorise('core.admin', 'root.1');
 
@@ -421,7 +421,7 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
 		$app    = \Joomla\CMS\Factory::getApplication();
-		$db     = \Joomla\CMS\Factory::getDbo();
+		$db     = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$task   = $this->getTask();
 		$cids   = $this->input->get('cid', array(), 'array');

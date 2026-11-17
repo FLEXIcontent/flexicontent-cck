@@ -127,7 +127,7 @@ class flexicontent_cats
 	 */
 	protected function getParentCats($all_cols=false)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$this->parentcats_data = array();
 		if (empty($this->parentcats_ids)) return;
@@ -152,7 +152,7 @@ class flexicontent_cats
 	 */
 	protected function buildParentCats($cid)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		// ALTERNATIVE 1
 		/*$currcat = \Joomla\CMS\Categories\Categories::getInstance('Content')->get($cid);
@@ -209,7 +209,7 @@ class flexicontent_cats
 	public static function getCategoriesTree( $published_only = false, $parent_id = 0, $depth_limit=0 )
 	{
 		global $globalcats;
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		
 		$allowed_catstates = is_array($published_only) ? $published_only : array();
 
@@ -817,7 +817,7 @@ class flexicontent_cats
 		}
 
 		// Filter categories (check that are published and that have ACCESS Level that is assinged to current user)
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query = 'SELECT DISTINCT c.id'
 			.' FROM #__categories AS c'
 			.$joinaccess

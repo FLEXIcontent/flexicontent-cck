@@ -38,7 +38,7 @@ class JFormFieldFieldtypes extends JFormFieldList
 	protected $type = 'Fieldtypes';
 
 	protected function getOptions() {
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$query = 'SELECT element AS value, REPLACE(name, "FLEXIcontent - ", "") AS text'
 		. ' FROM '.(FLEXI_J16GE ? '#__extensions' : '#__plugins')

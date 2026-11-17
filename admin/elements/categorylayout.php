@@ -67,7 +67,7 @@ class JFormFieldCategorylayout extends JFormFieldList
 		
 		// Get current extension and id being edited
 		$app    = \Joomla\CMS\Factory::getApplication();
-		$db     = \Joomla\CMS\Factory::getDbo();
+		$db     = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$jinput = $app->input;
 		$option = $jinput->get('option', '', 'CMD');
 		$view   = $jinput->get('view', '', 'CMD');

@@ -63,7 +63,7 @@ class JFormFieldFields extends \Joomla\CMS\Form\FormField
 
 		$app  = \Joomla\CMS\Factory::getApplication();
 		$doc	= \Joomla\CMS\Factory::getDocument();
-		$db		= \Joomla\CMS\Factory::getDbo();
+		$db		= \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 
 		$node = & $this->element;

@@ -44,7 +44,7 @@ class JFormFieldPluginlist extends JFormFieldList
 	function getInput()
 	{
 		$doc = \Joomla\CMS\Factory::getDocument();
-		$db  = \Joomla\CMS\Factory::getDbo();
+		$db  = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		
 		$node = & $this->element;
 		$attributes = get_object_vars($node->attributes());

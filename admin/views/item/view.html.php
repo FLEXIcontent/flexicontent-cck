@@ -93,10 +93,10 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$jinput     = $app->input;
 		$dispatcher = JEventDispatcher::getInstance();
 		$document   = \Joomla\CMS\Factory::getDocument();
-		$config     = \Joomla\CMS\Factory::getConfig();
-		$session    = \Joomla\CMS\Factory::getSession();
+		$config     = \Joomla\CMS\Factory::getApplication()->getConfig();
+		$session    = \Joomla\CMS\Factory::getApplication()->getSession();
 		$user       = \Joomla\CMS\Factory::getUser();
-		$db         = \Joomla\CMS\Factory::getDbo();
+		$db         = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$uri        = \Joomla\CMS\Uri\Uri::getInstance();
 		$task       = $jinput->getCmd('task');
 		$cparams    = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
@@ -406,7 +406,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 			if ($display_captcha)
 			{
 				// Get configured captcha plugin
-				$c_plugin = $page_params->get('captcha', $app->getCfg('captcha')); // TODO add param to override default
+				$c_plugin = $page_params->get('captcha', $app->get('captcha')); // TODO add param to override default
 				if ($c_plugin)
 				{
 					$c_name = 'captcha_response_field';
@@ -472,7 +472,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 					$edittok = $jinput->get('edittok', null, 'cmd');
 					if ($edittok)
 					{
-						$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_edit_coupons"';
+						$query = 'SHOW TABLES LIKE "' . $app->get('dbprefix') . 'flexicontent_edit_coupons"';
 						$db->setQuery($query);
 						$tbl_exists = (bool) count($db->loadObjectList());
 						if ($tbl_exists)
@@ -789,11 +789,11 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 			// Check and prepend or append site name
 			// Add Site Name to page title
-			if ($app->getCfg('sitename_pagetitles', 0) == 1) {
-				$doc_title = $app->getCfg('sitename') ." - ". $doc_title ;
+			if ($app->get('sitename_pagetitles', 0) == 1) {
+				$doc_title = $app->get('sitename') ." - ". $doc_title ;
 			}
-			elseif ($app->getCfg('sitename_pagetitles', 0) == 2) {
-				$doc_title = $doc_title ." - ". $app->getCfg('sitename') ;
+			elseif ($app->get('sitename_pagetitles', 0) == 2) {
+				$doc_title = $doc_title ." - ". $app->get('sitename') ;
 			}
 
 			// Finally, set document title
@@ -1010,12 +1010,12 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 	{
 		$app      = \Joomla\CMS\Factory::getApplication();
 		$jinput   = $app->input;
-		$db       = \Joomla\CMS\Factory::getDbo();
+		$db       = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$user     = \Joomla\CMS\Factory::getUser();	// get current user
 		$model    = $this->getModel();
 		$item     = $model->getItem(null, $check_view_access=false, $no_cache=false, $force_version=0);  // ZERO force_version means unversioned data
 		$document = \Joomla\CMS\Factory::getDocument();
-		$session  = \Joomla\CMS\Factory::getSession();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 		$option   = $jinput->get('option', '', 'cmd');
 		$isAdmin  = $app->isClient('administrator');
 		$isSite   = $app->isClient('site');
@@ -1674,7 +1674,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 		$app     = \Joomla\CMS\Factory::getApplication();
 		$user    = \Joomla\CMS\Factory::getUser();
-		$session = \Joomla\CMS\Factory::getSession();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 
 		$perms   = $this->_getItemPerms();
 		$tparams = $model->getTypeparams();
@@ -1861,8 +1861,8 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		 * Add a preview button(s)
 		 */
 
-		//$_sh404sef = \Joomla\CMS\Plugin\PluginHelper::isEnabled('system', 'sh404sef') && \Joomla\CMS\Factory::getConfig()->get('sef');
-		$_sh404sef = defined('SH404SEF_IS_RUNNING') && \Joomla\CMS\Factory::getConfig()->get('sef');
+		//$_sh404sef = \Joomla\CMS\Plugin\PluginHelper::isEnabled('system', 'sh404sef') && \Joomla\CMS\Factory::getApplication()->getConfig()->get('sef');
+		$_sh404sef = defined('SH404SEF_IS_RUNNING') && \Joomla\CMS\Factory::getApplication()->getConfig()->get('sef');
 		if ( !$isnew && in_array( 'preview_latest', $allowbuttons) )
 		{
 			// Create the non-SEF URL
@@ -2072,14 +2072,14 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$jinput = $app->input;
 
 		$dispatcher = JEventDispatcher::getInstance();
-		$session  = \Joomla\CMS\Factory::getSession();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 		$document = \Joomla\CMS\Factory::getDocument();
 		$menus = $app->getMenu();
 		$menu  = $menus->getActive();
 		$uri   = \Joomla\CMS\Uri\Uri::getInstance();
 		$user  = \Joomla\CMS\Factory::getUser();
 		$aid   = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
-		$db    = \Joomla\CMS\Factory::getDbo();
+		$db    = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$nullDate = $db->getNullDate();
 
 
@@ -2605,7 +2605,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		);
 		$submit_conf_hash = md5(serialize($submit_conf));
 
-		$session = \Joomla\CMS\Factory::getSession();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 		$item_submit_conf = $session->get('item_submit_conf', array(),'flexicontent');
 		$item_submit_conf[$submit_conf_hash] = $submit_conf;
 		$session->set('item_submit_conf', $item_submit_conf, 'flexicontent');

@@ -70,7 +70,7 @@ $force_print = false || JDEBUG;
 
 // Force post-install check for testing purposes
 /*if ( $format == "html" ) {
-	$session = \Joomla\CMS\Factory::getSession();
+	$session = \Joomla\CMS\Factory::getApplication()->getSession();
 	$postinst_integrity_ok = $session->get('flexicontent.postinstall');
 	$recheck_aftersave = $session->get('flexicontent.recheck_aftersave');
 	$force_print = $postinst_integrity_ok===NULL || $postinst_integrity_ok===false || $recheck_aftersave;
