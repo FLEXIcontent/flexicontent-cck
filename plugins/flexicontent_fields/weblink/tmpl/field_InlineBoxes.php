@@ -86,7 +86,7 @@
 					'onchange' => 'jQuery(this).closest(\'.fc-field-props-box\').find(\'.fcfield_message_box\').html(\'\'); if (this.selectedIndex > 0) { var mm_id=jQuery(this).parent().parent().find(\'.urlimage\').attr(\'id\'); jQuery(\'#\' + mm_id).data(\'basepath\', \'' . \Joomla\CMS\Uri\Uri::root() .'\'); jInsertFieldValue(this.value, mm_id); this.selectedIndex = 0; }',
 					'style' => 'width: auto; margin: 0;',
 				);
-				$imagelist = '<div style="width: 36px; overflow: hidden; display: flex; border: 0; border-radius: 0; margin-bottom: 1px; margin-' . (!\Joomla\CMS\Factory::getLanguage()->isRtl() ? 'left' : 'right') .': 0px">'.
+				$imagelist = '<div style="width: 36px; overflow: hidden; display: flex; border: 0; border-radius: 0; margin-bottom: 1px; margin-' . (!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl() ? 'left' : 'right') .': 0px">'.
 					\Joomla\CMS\HTML\HTMLHelper::_('select.genericlist',
 						$image_options,
 						$fieldname_n.'[imagelist]',
@@ -126,7 +126,7 @@
 
 				$mm_link = 'index.php?option=com_media&amp;view=images&amp;layout=default_fc&amp;tmpl=component&amp;asset=com_flexicontent&amp;author=&amp;fieldid=\'+mm_id+\'&amp;folder=';
 				$image_preview = '
-					<div style="float: '. (!\Joomla\CMS\Factory::getLanguage()->isRtl() ? 'left' : 'right') . '; max-width: 150px;">
+					<div style="float: '. (!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl() ? 'left' : 'right') . '; max-width: 150px;">
 						' . $previewImgEmpty . $previewImg .'
 					</div>';
 

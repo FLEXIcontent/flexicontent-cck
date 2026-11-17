@@ -483,7 +483,9 @@ if (!isset($addressint_view_js_added[$field->id]) && $map_api === 'googlemap' &&
 
 	// Load google-maps library
 	flexicontent_html::loadFramework('google-maps', '', $field->parameters);
-	\Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+	if ($js !== "") {
+		\Joomla\CMS\Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript($js);
+	}
 }
 
 // Code is WIP (work-in-progress) only for testing 1 address inside item view
@@ -510,5 +512,7 @@ if (!empty($js_perValue))
 		' . implode("\n", $js_perValue) . '
 	});
 	';
-	\Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+	if ($js !== "") {
+		\Joomla\CMS\Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript($js);
+	}
 }

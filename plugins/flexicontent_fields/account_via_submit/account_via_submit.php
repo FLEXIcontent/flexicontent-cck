@@ -42,7 +42,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		$field->label = $field->parameters->get('label_form') ? \Joomla\CMS\Language\Text::_($field->parameters->get('label_form')) : \Joomla\CMS\Language\Text::_($field->label);
 
 		// initialize framework objects and other variables
-		$document = \Joomla\CMS\Factory::getDocument();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
 
 		$tooltip_class = 'hasTooltip';
@@ -123,8 +123,8 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 			float: left !important;
 		}
 		';
-		if ($js)  $document->addScriptDeclaration($js);
-		if ($css) $document->addStyleDeclaration($css);
+		if ($js)  $document->getWebAssetManager()->addInlineScript($js);
+		if ($css) $document->getWebAssetManager()->addInlineStyle($css);
 
 
 		/**
@@ -133,7 +133,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 
 		$field->html = array();
 
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
 		if ($item->id)
 		{
@@ -258,7 +258,7 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		if (!$isnew) return;
 
 		// Check if user is logged, if so then nothing to do
-		$user = \Joomla\CMS\Factory::getUser();
+		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		if ($user->id)
 		{
 			$post = array();
@@ -413,8 +413,8 @@ class plgFlexicontent_fieldsAccount_via_submit extends FCField
 		jimport('joomla.user.user');
 		jimport('joomla.user.helper');
 		jimport('cms.component.helper');
-		\Joomla\CMS\Factory::getLanguage()->load('com_users', JPATH_SITE, 'en-GB', false);
-		\Joomla\CMS\Factory::getLanguage()->load('com_users', JPATH_SITE, null, true);
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_users', JPATH_SITE, 'en-GB', false);
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_users', JPATH_SITE, null, true);
 
 		$app = \Joomla\CMS\Factory::getApplication();
 		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);

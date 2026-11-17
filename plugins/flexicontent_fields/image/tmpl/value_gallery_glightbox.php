@@ -210,7 +210,9 @@ if ( !isset(static::$js_added['glightbox'][__FILE__]) )
 	})();
 	";
 
-	\Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+	if ($js !== "") {
+		\Joomla\CMS\Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript($js);
+	}
 
 	static::$js_added['glightbox'][__FILE__] = array();
 }

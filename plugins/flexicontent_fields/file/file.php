@@ -58,10 +58,10 @@ class plgFlexicontent_fieldsFile extends FCField
 		if ($use_ingroup && empty($field->ingroup)) return;
 
 		// Initialize framework objects and other variables
-		$document = Factory::getDocument();
+		$document = Factory::getApplication()->getDocument();
 		$cparams  = ComponentHelper::getParams( 'com_flexicontent' );
 		$app  = Factory::getApplication();
-		$user = Factory::getUser();
+		$user = Factory::getApplication()->getIdentity();
 
 		$tooltip_class = 'hasTooltip';
 		$add_on_class    = $cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
@@ -240,7 +240,7 @@ class plgFlexicontent_fieldsFile extends FCField
 					elem_container_prefix: '".$resize_cfg->element_class_prefix."'
 				}";
 
-			$document->addScriptDeclaration("
+			$document->getWebAssetManager()->addInlineScript("
 			jQuery(document).ready(function()
 			{
 				fc_attachSingleSlider(".$thumb_size_slider_cfg.", ".$thumb_size_resizer.");
@@ -749,7 +749,7 @@ class plgFlexicontent_fieldsFile extends FCField
 
 			flexicontent_html::loadFramework('flexi-lib');
 			\Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
-			$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/file/js/form.js', array('version' => FLEXI_VHASH));
+			$document->getWebAssetManager()->registerAndUseScript('plg_flexicontent_fields_file.form', 'plugins/flexicontent_fields/file/js/form.js', array('version' => FLEXI_VHASH));
 		}
 
 		// Add field's CSS / JS
@@ -758,8 +758,8 @@ class plgFlexicontent_fieldsFile extends FCField
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
 			var maxValues".$field->id." = ".$max_values.";
 		";
-		if ($js)  $document->addScriptDeclaration($js);
-		if ($css) $document->addStyleDeclaration($css);
+		if ($js)  $document->getWebAssetManager()->addInlineScript($js);
+		if ($css) $document->getWebAssetManager()->addInlineStyle($css);
 
 
 		/**
@@ -787,7 +787,7 @@ class plgFlexicontent_fieldsFile extends FCField
 
 		// Use inline media field
 		if ($use_myfiles == 4) {
-			$document->addScriptDeclaration('
+			$document->getWebAssetManager()->addInlineScript('
 				function jInsertFieldValue(value, id)
 				{	
 					console.log(id);
@@ -969,7 +969,7 @@ class plgFlexicontent_fieldsFile extends FCField
 			$initialized = 1;
 
 			$app       = Factory::getApplication();
-			$document  = Factory::getDocument();
+			$document  = Factory::getApplication()->getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -1165,7 +1165,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		$noaccess_addvars      = $field->parameters->get( 'noaccess_addvars', 0);
 
 		// Select appropriate messages depending if user is logged on
-		if (Factory::getUser()->guest)
+		if (Factory::getApplication()->getIdentity()->guest)
 		{
 			if ($noaccess_url_unlogged)
 			{
@@ -1224,7 +1224,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		}
 
 		// Get user access level (these are multiple for J2.5)
-		$user = Factory::getUser();
+		$user = Factory::getApplication()->getIdentity();
 		$aid_arr = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
 
 		$n = 0;
@@ -2079,12 +2079,12 @@ class plgFlexicontent_fieldsFile extends FCField
 	 */
 	function share_file_form($tpl = null)
 	{
-		$user = Factory::getUser();
+		$user = Factory::getApplication()->getIdentity();
 		$db   = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$app  = Factory::getApplication();
 
 		$session  = Factory::getApplication()->getSession();
-		$document = Factory::getDocument();
+		$document = Factory::getApplication()->getDocument();
 
 		$file_id    = $app->input->get('file_id', 0, 'int');
 		$content_id = $app->input->get('content_id', 0, 'int');
@@ -2134,7 +2134,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		$data->desc    = $desc;
 		$data->mailto  = $mailto;
 
-		$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
+		$document->getWebAssetManager()->registerAndUseStyle('plg_flexicontent_fields_file.flexicontent', 'components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		include('file'.DS.'share_form.php');
 		$session->set('com_flexicontent.formtime', time());
 	}
@@ -2151,12 +2151,12 @@ class plgFlexicontent_fieldsFile extends FCField
 		// Check for request forgeries
 		flexicontent_security::requirePostToken();
 
-		$user = Factory::getUser();
+		$user = Factory::getApplication()->getIdentity();
 		$db   = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$app  = Factory::getApplication();
 
 		$session  = Factory::getApplication()->getSession();
-		$document = Factory::getDocument();
+		$document = Factory::getApplication()->getDocument();
 
 		$timeout = $session->get('com_flexicontent.formtime', 0);
 		if ($timeout == 0 || time() - $timeout < 2) {
@@ -2359,7 +2359,7 @@ class plgFlexicontent_fieldsFile extends FCField
 			return $this->share_file_form();
 		}
 
-		$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
+		$document->getWebAssetManager()->registerAndUseStyle('plg_flexicontent_fields_file.flexicontent', 'components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		include('file'.DS.'share_result.php');
 	}
 
@@ -2367,7 +2367,7 @@ class plgFlexicontent_fieldsFile extends FCField
 	// Private common method to create join + and-where SQL CLAUSEs, for checking access of field - item pair(s), IN FUTURE maybe moved
 	function _createFieldItemAccessClause($get_select_access = false, $include_file = false )
 	{
-		$user  = Factory::getUser();
+		$user  = Factory::getApplication()->getIdentity();
 		$select_access = $joinacc = $andacc = '';
 
 		$aid_arr = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);

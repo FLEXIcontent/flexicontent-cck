@@ -49,7 +49,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 		if ($use_ingroup && empty($field->ingroup)) return;
 
 		// Initialize framework objects and other variables
-		$document = \Joomla\CMS\Factory::getDocument();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
 
 		$tooltip_class = 'hasTooltip';
@@ -354,7 +354,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 			\Joomla\CMS\Language\Text::script('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_RESPONSE_PARSING_FAILED', false);
 			\Joomla\CMS\Language\Text::script('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_SERVER_RESPONDED_WITH_ERROR', false);
 			\Joomla\CMS\Language\Text::script('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_REASON', false);
-			$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/sharedmedia/js/form.js', array('version' => FLEXI_VHASH));
+			$document->getWebAssetManager()->registerAndUseScript('plg_flexicontent_fields_sharedmedia.form', 'plugins/flexicontent_fields/sharedmedia/js/form.js', array('version' => FLEXI_VHASH));
 		}
 
 		// JS CODE to handle fetching media DATA
@@ -603,8 +603,8 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
 			var maxValues".$field->id." = ".$max_values.";
 		";
-		if ($js)  $document->addScriptDeclaration($js);
-		if ($css) $document->addStyleDeclaration($css);
+		if ($js)  $document->getWebAssetManager()->addInlineScript($js);
+		if ($css) $document->getWebAssetManager()->addInlineStyle($css);
 
 
 		// Do not convert the array to string if field is in a group
@@ -693,7 +693,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 			$initialized = 1;
 
 			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$document  = \Joomla\CMS\Factory::getApplication()->getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -770,11 +770,11 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 			//$document->addScript('https://www.youtube.com/iframe_api');
 			//$document->addScript('https://cdn.plyr.io/3.6.2/plyr.js');
 			//$document->addStyleSheet('https://cdn.plyr.io/3.6.2/plyr.css');
-			$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/sharedmedia/js/view.js', array('version' => FLEXI_VHASH));
+			$document->getWebAssetManager()->registerAndUseScript('plg_flexicontent_fields_sharedmedia.view', 'plugins/flexicontent_fields/sharedmedia/js/view.js', array('version' => FLEXI_VHASH));
 		}
 
-		if ($js)  $document->addScriptDeclaration($js);
-		if ($css) $document->addStyleDeclaration($css);
+		if ($js)  $document->getWebAssetManager()->addInlineScript($js);
+		if ($css) $document->getWebAssetManager()->addInlineStyle($css);
 
 		$unserialize_vals = true;
 		if ($unserialize_vals)

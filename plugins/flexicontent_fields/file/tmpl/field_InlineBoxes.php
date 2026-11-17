@@ -405,5 +405,5 @@ $js = ""
 	});
 ");
 
-if ($js) $document->addScriptDeclaration($js);
+if ($js) $document->getWebAssetManager()->addInlineScript($js);
 

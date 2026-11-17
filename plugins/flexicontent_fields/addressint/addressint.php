@@ -51,7 +51,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 
 
 		// Initialize framework objects and other variables
-		$document = \Joomla\CMS\Factory::getDocument();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
 
 		$tooltip_class = 'hasTooltip';
@@ -691,7 +691,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			if ($mapapi_edit === 'googlemap')
 			{
 				// Load form.js (Google Maps autocomplete + map)
-				$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/addressint/js/form.js', array('version' => FLEXI_VHASH));
+				$document->getWebAssetManager()->registerAndUseScript('plg_flexicontent_fields_addressint.form', 'plugins/flexicontent_fields/addressint/js/form.js', array('version' => FLEXI_VHASH));
 
 				// Load Google Maps JS API
 				flexicontent_html::loadFramework('google-maps', 'form', $field->parameters);
@@ -700,7 +700,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			{
 				// Load form_osm.js (Nominatim autocomplete + Leaflet map)
 				// Leaflet itself is loaded dynamically by form_osm.js if not already present
-				$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/addressint/js/form_osm.js', array('version' => FLEXI_VHASH));
+				$document->getWebAssetManager()->registerAndUseScript('plg_flexicontent_fields_addressint.form_osm', 'plugins/flexicontent_fields/addressint/js/form_osm.js', array('version' => FLEXI_VHASH));
 			}
 		}
 
@@ -711,8 +711,8 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
 			var maxValues".$field->id." = ".$max_values.";
 		";
-		if ($js)  $document->addScriptDeclaration($js);
-		if ($css) $document->addStyleDeclaration($css);
+		if ($js)  $document->getWebAssetManager()->addInlineScript($js);
+		if ($css) $document->getWebAssetManager()->addInlineStyle($css);
 
 
 		/**
@@ -905,7 +905,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			$initialized = 1;
 
 			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$document  = \Joomla\CMS\Factory::getApplication()->getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');

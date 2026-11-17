@@ -311,4 +311,6 @@ if ($dom_ready_js)
 	';
 }
 
-$document->addScriptDeclaration($js);
+if ($js !== "") {
+	$document->getWebAssetManager()->addInlineScript($js);
+}

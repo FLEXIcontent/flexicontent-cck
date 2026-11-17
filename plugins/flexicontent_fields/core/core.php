@@ -79,7 +79,7 @@ class plgFlexicontent_fieldsCore extends FCField
 			$initialized = 1;
 
 			$app       = \Joomla\CMS\Factory::getApplication();
-			$document  = \Joomla\CMS\Factory::getDocument();
+			$document  = \Joomla\CMS\Factory::getApplication()->getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -875,18 +875,18 @@ class plgFlexicontent_fieldsCore extends FCField
 				if($disable_keyboardinput)
 				{
 					$filter_ffid   = $formName.'_'.$filter->id.'_val';
-					$document =  \Joomla\CMS\Factory::getDocument();
+					$document =  \Joomla\CMS\Factory::getApplication()->getDocument();
 					switch ($display_filter_as)
 					{
 						case 1:
-							$document->addScriptDeclaration("
+							$document->getWebAssetManager()->addInlineScript("
 										jQuery(document).ready(function(){
 											jQuery('#".$filter_ffid."').on('keydown keypress keyup', false);
 										});
 									");
 						break;
 						case 3:
-							$document->addScriptDeclaration("
+							$document->getWebAssetManager()->addInlineScript("
 										jQuery(document).ready(function(){
 											jQuery('#".$filter_ffid."1').on('keydown keypress keyup', false);
 											jQuery('#".$filter_ffid."2').on('keydown keypress keyup', false);

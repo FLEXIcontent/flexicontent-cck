@@ -906,7 +906,9 @@ if ( !isset(static::$js_added['swiper_glightbox'][__FILE__]) )
 })();
 FCJS;
 
-	\Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+	if ($js !== "") {
+		\Joomla\CMS\Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript($js);
+	}
 
 	static::$js_added['swiper_glightbox'][__FILE__] = array();
 }

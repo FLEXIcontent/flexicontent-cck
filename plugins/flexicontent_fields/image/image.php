@@ -79,10 +79,10 @@ class plgFlexicontent_fieldsImage extends FCField
 		$is_ingroup  = !empty($field->ingroup);
 
 		// Initialize framework objects and other variables
-		$document = Factory::getDocument();
+		$document = Factory::getApplication()->getDocument();
 		$cparams  = ComponentHelper::getParams( 'com_flexicontent' );
 		$app  = Factory::getApplication();
-		$user = Factory::getUser();
+		$user = Factory::getApplication()->getIdentity();
 
 		// Execute once
 		static $initialized = null;
@@ -314,7 +314,7 @@ class plgFlexicontent_fieldsImage extends FCField
 					elem_container_prefix: '".$resize_cfg->element_class_prefix."'
 				}";
 
-			$document->addScriptDeclaration("
+			$document->getWebAssetManager()->addInlineScript("
 			jQuery(document).ready(function()
 			{
 				fc_attachSingleSlider(".$thumb_size_slider_cfg.", ".$thumb_size_resizer.");
@@ -713,7 +713,7 @@ class plgFlexicontent_fieldsImage extends FCField
 
 			flexicontent_html::loadFramework('flexi-lib');
 			\Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
-			$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/image/js/form.js', array('version' => FLEXI_VHASH));
+			$document->getWebAssetManager()->registerAndUseScript('plg_flexicontent_fields_image.form', 'plugins/flexicontent_fields/image/js/form.js', array('version' => FLEXI_VHASH));
 		}
 
 		// Add field's CSS / JS
@@ -722,8 +722,8 @@ class plgFlexicontent_fieldsImage extends FCField
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
 			var maxValues".$field->id." = ".$max_values.";
 		";
-		if ($js)  $document->addScriptDeclaration($js);
-		if ($css) $document->addStyleDeclaration($css);
+		if ($js)  $document->getWebAssetManager()->addInlineScript($js);
+		if ($css) $document->getWebAssetManager()->addInlineStyle($css);
 
 
 		/**
@@ -824,7 +824,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			$initialized = 1;
 
 			$app       = Factory::getApplication();
-			$document  = Factory::getDocument();
+			$document  = Factory::getApplication()->getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -1618,7 +1618,7 @@ class plgFlexicontent_fieldsImage extends FCField
 				{
 					// Only issued temporary IDs or an authorized existing source item are accepted.
 					$save_as_copy = ctype_digit((string) $unique_tmp_itemid);
-					$user = Factory::getUser();
+					$user = Factory::getApplication()->getIdentity();
 					if ($save_as_copy)
 					{
 						$sourceId = (int) $unique_tmp_itemid;
@@ -2304,7 +2304,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			else
 			{
 				$db     = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
-				$user   = Factory::getUser();
+				$user   = Factory::getApplication()->getIdentity();
 				$config = Factory::getApplication()->getConfig();
 
 				$timezone = $config->get('offset');
@@ -2883,7 +2883,7 @@ class plgFlexicontent_fieldsImage extends FCField
 				)
 			)
 			{
-				/*if (Factory::getUser()->authorise('core.admin', 'root.1'))
+				/*if (Factory::getApplication()->getIdentity()->authorise('core.admin', 'root.1'))
 				{
 					echo "FILENAME: ".$thumbname.", ".($crop ? "CROP" : "SCALE").", ".($thumbnail_exists ? "OLDSIZE(w,h): $filesize_w,$filesize_h" : "")
 						."  NEWSIZE(w,h): $param_w,$param_h <br />"

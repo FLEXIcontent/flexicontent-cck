@@ -392,8 +392,8 @@ class plgFlexicontent_fieldsEmail extends FCField
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
 			var maxValues".$field->id." = ".$max_values.";
 		";
-		if ($js)  $document->addScriptDeclaration($js);
-		if ($css) $document->addStyleDeclaration($css);
+		if ($js)  $document->getWebAssetManager()->addInlineScript($js);
+		if ($css) $document->getWebAssetManager()->addInlineStyle($css);
 
 
 		// Do not convert the array to string if field is in a group
@@ -854,7 +854,7 @@ class plgFlexicontent_fieldsEmail extends FCField
         if ($pluginParams->get('email_admin_copy', 0) && filter_var($pluginParams->get('email_admin', ''), FILTER_VALIDATE_EMAIL))
             $mailer->addBCC($pluginParams->get('email_admin'));
         // An anonymous copy address would reintroduce an arbitrary-recipient relay.
-        $user = \Joomla\CMS\Factory::getUser();
+        $user = \Joomla\CMS\Factory::getApplication()->getIdentity();
         if ($pluginParams->get('email_user_copy', 0) && !$user->guest && !$user->block && strcasecmp($user->email, $fromemail) === 0)
             $mailer->addBCC($user->email);
         $sent = $mailer->Send();

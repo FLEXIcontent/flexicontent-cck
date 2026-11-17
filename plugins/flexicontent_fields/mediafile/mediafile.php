@@ -58,10 +58,10 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		if ($use_ingroup && empty($field->ingroup)) return;
 
 		// Initialize framework objects and other variables
-		$document = Factory::getDocument();
+		$document = Factory::getApplication()->getDocument();
 		$cparams  = ComponentHelper::getParams( 'com_flexicontent' );
 		$app  = Factory::getApplication();
-		$user = Factory::getUser();
+		$user = Factory::getApplication()->getIdentity();
 
 		$tooltip_class = 'hasTooltip';
 		$add_on_class    = $cparams->get('bootstrap_ver', 2)==2  ?  'add-on' : 'input-group-addon';
@@ -226,7 +226,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 					elem_container_prefix: '".$resize_cfg->element_class_prefix."'
 				}";
 
-			$document->addScriptDeclaration("
+			$document->getWebAssetManager()->addInlineScript("
 			jQuery(document).ready(function()
 			{
 				fc_attachSingleSlider(".$thumb_size_slider_cfg.", ".$thumb_size_resizer.");
@@ -735,8 +735,8 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			//flexicontent_html::loadFramework('wavesurfer');
 			flexicontent_html::loadFramework('flexi-lib');
 			\Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
-			$document->addScript('https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js');
-			$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/mediafile/js/form.js', array('version' => filemtime(JPATH_ROOT . '/plugins/flexicontent_fields/mediafile/js/form.js')));
+			$document->getWebAssetManager()->registerAndUseScript('plg_flexicontent_fields_mediafile.wavesurfer', 'https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js');
+			$document->getWebAssetManager()->registerAndUseScript('plg_flexicontent_fields_mediafile.form', 'plugins/flexicontent_fields/mediafile/js/form.js', array('version' => filemtime(JPATH_ROOT . '/plugins/flexicontent_fields/mediafile/js/form.js')));
 
 			$js .= "
 			jQuery(document).ready(function()
@@ -763,8 +763,8 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
 			var maxValues".$field->id." = ".$max_values.";
 		";
-		if ($js)  $document->addScriptDeclaration($js);
-		if ($css) $document->addStyleDeclaration($css);
+		if ($js)  $document->getWebAssetManager()->addInlineScript($js);
+		if ($css) $document->getWebAssetManager()->addInlineStyle($css);
 
 
 		/**
@@ -792,7 +792,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 
 		// Use inline media field
 		if ($use_myfiles == 4) {
-			$document->addScriptDeclaration('
+			$document->getWebAssetManager()->addInlineScript('
 				function jInsertFieldValue(value, id)
 				{	
 					var elem = jQuery(\'#\'+id).get(0);
@@ -973,7 +973,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			$initialized = 1;
 
 			$app       = Factory::getApplication();
-			$document  = Factory::getDocument();
+			$document  = Factory::getApplication()->getDocument();
 			$option    = $app->input->getCmd('option', '');
 			$format    = $app->input->getCmd('format', 'html');
 			$realview  = $app->input->getCmd('view', '');
@@ -1108,7 +1108,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		if ( $js_added === null )
 		{
 			$js_added = true;
-			$document = Factory::getDocument();
+			$document = Factory::getApplication()->getDocument();
 
 			\Joomla\CMS\Language\Text::script('PLG_FLEXICONTENT_FIELDS_MEDIAFILE_RESPONSE_PARSING_FAILED', false);
 			\Joomla\CMS\Language\Text::script('PLG_FLEXICONTENT_FIELDS_MEDIAFILE_FILE_NOT_FOUND', false);
@@ -1116,13 +1116,13 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			//flexicontent_html::loadFramework('wavesurfer');
 			flexicontent_html::loadFramework('flexi-lib');
 			\Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
-			$document->addScript('https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js');
-			$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/mediafile/js/view.js', array('version' => filemtime(JPATH_ROOT . '/plugins/flexicontent_fields/mediafile/js/view.js')));
+			$document->getWebAssetManager()->registerAndUseScript('plg_flexicontent_fields_mediafile.wavesurfer', 'https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js');
+			$document->getWebAssetManager()->registerAndUseScript('plg_flexicontent_fields_mediafile.view', 'plugins/flexicontent_fields/mediafile/js/view.js', array('version' => filemtime(JPATH_ROOT . '/plugins/flexicontent_fields/mediafile/js/view.js')));
 			//$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/assets/js/pako.min.js', array('version' => FLEXI_VHASH));
 			//$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/assets/js/pako_deflate.min.js', array('version' => FLEXI_VHASH));
 			//$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/assets/js/pako_inflate.min.js', array('version' => FLEXI_VHASH));
 
-			$document->addScriptDeclaration("
+			$document->getWebAssetManager()->addInlineScript("
 			jQuery(document).ready(function()
 			{
 				audio_spectrum_conf['" . $field_name_js . "'] = [];
@@ -1166,7 +1166,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		$noaccess_addvars      = $field->parameters->get( 'noaccess_addvars', 0);
 
 		// Select appropriate messages depending if user is logged on
-		if (Factory::getUser()->guest)
+		if (Factory::getApplication()->getIdentity()->guest)
 		{
 			if ($noaccess_url_unlogged)
 			{
@@ -1225,7 +1225,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		}
 
 		// Get user access level (these are multiple for J2.5)
-		$user = Factory::getUser();
+		$user = Factory::getApplication()->getIdentity();
 		$aid_arr = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);
 
 		$n = 0;
@@ -2276,12 +2276,12 @@ class plgFlexicontent_fieldsMediafile extends FCField
 	 */
 	function share_file_form($tpl = null)
 	{
-		$user = Factory::getUser();
+		$user = Factory::getApplication()->getIdentity();
 		$db   = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$app  = Factory::getApplication();
 
 		$session  = Factory::getApplication()->getSession();
-		$document = Factory::getDocument();
+		$document = Factory::getApplication()->getDocument();
 
 		$file_id    = $app->input->get('file_id', 0, 'int');
 		$content_id = $app->input->get('content_id', 0, 'int');
@@ -2331,7 +2331,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		$data->desc    = $desc;
 		$data->mailto  = $mailto;
 
-		$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
+		$document->getWebAssetManager()->registerAndUseStyle('plg_flexicontent_fields_mediafile.flexicontent', 'components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		include('file'.DS.'share_form.php');
 		$session->set('com_flexicontent.formtime', time());
 	}
@@ -2348,12 +2348,12 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		// Check for request forgeries
 		flexicontent_security::requirePostToken();
 
-		$user = Factory::getUser();
+		$user = Factory::getApplication()->getIdentity();
 		$db   = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$app  = Factory::getApplication();
 
 		$session  = Factory::getApplication()->getSession();
-		$document = Factory::getDocument();
+		$document = Factory::getApplication()->getDocument();
 
 		$timeout = $session->get('com_flexicontent.formtime', 0);
 		if ($timeout == 0 || time() - $timeout < 2) {
@@ -2556,7 +2556,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			return $this->share_file_form();
 		}
 
-		$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
+		$document->getWebAssetManager()->registerAndUseStyle('plg_flexicontent_fields_mediafile.flexicontent', 'components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
 		include('file'.DS.'share_result.php');
 	}
 
@@ -2564,7 +2564,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 	// Private common method to create join + and-where SQL CLAUSEs, for checking access of field - item pair(s), IN FUTURE maybe moved
 	function _createFieldItemAccessClause($get_select_access = false, $include_file = false )
 	{
-		$user  = Factory::getUser();
+		$user  = Factory::getApplication()->getIdentity();
 		$select_access = $joinacc = $andacc = '';
 
 		$aid_arr = \Joomla\CMS\Access\Access::getAuthorisedViewLevels($user->id);

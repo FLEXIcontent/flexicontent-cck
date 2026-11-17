@@ -170,7 +170,7 @@ $(document).ready(function()
 ";
 }
 
-if ($js) \Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+if ($js) \Joomla\CMS\Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript($js);
 
 
 /**
