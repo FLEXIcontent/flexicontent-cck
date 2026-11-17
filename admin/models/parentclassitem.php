@@ -721,7 +721,10 @@ class ParentClassItem extends FCModelAdmin
 				$query->join('LEFT', '#__flexicontent_items_ext AS ie ON ie.item_id = i.id');
 				$query->join('LEFT', '#__flexicontent_types AS ty ON (CASE WHEN ie.type_id = 0 THEN ' . (int) $this->_typeid . ' ELSE ie.type_id END) = ty.id');
 				$query->join('LEFT', '#__users AS ua on ua.id = i.created_by');
-				$query->join('LEFT', '#__content_rating AS v ON i.id = v.content_id');
+				if ($load_rating)
+				{
+					$query->join('LEFT', '#__content_rating AS v ON i.id = v.content_id');
+				}
 				$query->join('LEFT', '#__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id' . $limit_to_cid);
 
 				// Join twice on category table, once for current category and once for item's main category
@@ -4305,24 +4308,35 @@ class ParentClassItem extends FCModelAdmin
 		}
 
 		// No item of the site has votes, or the voting field is unpublished: do not run the 2 queries below
-		if (!FlexicontentFields::_hasItemData('votes') && !FlexicontentFields::_hasItemData('extravotes'))
+		$has_votes = FlexicontentFields::_hasItemData('votes');
+		$has_extra = FlexicontentFields::_hasItemData('extravotes');
+
+		if (!$has_votes && !$has_extra)
 		{
 			return array();
 		}
 
-		$query = $this->_db->getQuery(true)
-			->select('*')
-			->from('#__content_rating')
-			->where('content_id IN (' . implode(', ', $cids) . ')');
+		$votes = array();
+		if ($has_votes)
+		{
+			$query = $this->_db->getQuery(true)
+				->select('*')
+				->from('#__content_rating')
+				->where('content_id IN (' . implode(', ', $cids) . ')');
 
-		$votes = $this->_db->setQuery($query)->loadObjectList('content_id');
+			$votes = $this->_db->setQuery($query)->loadObjectList('content_id');
+		}
 
-		$query = $this->_db->getQuery(true)
-			->select('*, field_id as extra_id')
-			->from('#__flexicontent_items_extravote')
-			->where('content_id IN (' . implode(', ', $cids) . ')');
+		$extra_votes = array();
+		if ($has_extra)
+		{
+			$query = $this->_db->getQuery(true)
+				->select('*, field_id as extra_id')
+				->from('#__flexicontent_items_extravote')
+				->where('content_id IN (' . implode(', ', $cids) . ')');
 
-		$extra_votes = $this->_db->setQuery($query)->loadObjectList();
+			$extra_votes = $this->_db->setQuery($query)->loadObjectList();
+		}
 
 		// Assign each item 's extra votes to the item's votes as member variable "extra"
 		foreach ($extra_votes as $extra_vote)
