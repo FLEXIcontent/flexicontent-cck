@@ -2251,7 +2251,7 @@ class  PdfToText 	extends PdfObjectBase
 	    DESCRIPTION
 	        Adobe supports 4 predefined fonts : standard, Mac, WinAnsi and PDF). All the characters in these fonts
 		are identified by a character time, a little bit like HTML entities ; for example, 'one' will be the
-		character '1', 'acircumflex' will be 'â', etc.
+		character '1', 'acircumflex' will be 'Ã¢', etc.
 		There are thousands of character names defined by Adobe (see https://mupdf.com/docs/browse/source/pdf/pdf-glyphlist.h.html).
 		Some of them are not in this list ; this is the case for example of the 'ax' character names, where 'x'
 		is a decimal number. When such a character is specified in a /Differences array, then there is somewhere
@@ -3460,7 +3460,7 @@ class  PdfToText 	extends PdfObjectBase
 
 	    PARAMETERS
 		$page_number (integer) -
-			¨Page number that contains the text to be extracted.
+			Â¨Page number that contains the text to be extracted.
 
 	    	$object_id (integer) -
 	    		Object id of this text block.
@@ -4479,7 +4479,7 @@ class  PdfToText 	extends PdfObjectBase
 
 	    PARAMETERS
 		$page_number (integer) -
-			¨Page number that contains the text to be extracted.
+			Â¨Page number that contains the text to be extracted.
 
 	    	$object_id (integer) -
 	    		Object id of this text block.
