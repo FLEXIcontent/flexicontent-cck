@@ -1155,11 +1155,12 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 						// Text nLH (no-Language-Handler, aka NO SPACES added to guess and seperate words)
 						$text_nLH = trim($original_text);  
 						$escaped_text_nLH = $db->escape($text_nLH, true);
-						$quoted_text_nLH  = $db->Quote($escaped_text_nLH, false);
+						// LIKE value with its % wildcards, quoted as one value
+						$quoted_text_nLH  = $db->Quote('%' . $escaped_text_nLH . '%', false);
 
-						$_index_match = " (MATCH (".$ts.".search_index) AGAINST (".$quoted_text." IN BOOLEAN MODE) OR i.title LIKE '%".$quoted_text_nLH."%') ";
-						$_title_relev = " (MATCH (i.title) AGAINST (".$quoted_text_np." IN BOOLEAN MODE) OR i.title LIKE '%".$quoted_text_nLH."%') ";
-						$_index_relev = " (MATCH (".$ts.".search_index) AGAINST (".$quoted_text." IN BOOLEAN MODE) OR i.title LIKE '%".$quoted_text_nLH."%') ";
+						$_index_match = " (MATCH (".$ts.".search_index) AGAINST (".$quoted_text." IN BOOLEAN MODE) OR i.title LIKE ".$quoted_text_nLH.") ";
+						$_title_relev = " (MATCH (i.title) AGAINST (".$quoted_text_np." IN BOOLEAN MODE) OR i.title LIKE ".$quoted_text_nLH.") ";
+						$_index_relev = " (MATCH (".$ts.".search_index) AGAINST (".$quoted_text." IN BOOLEAN MODE) OR i.title LIKE ".$quoted_text_nLH.") ";
 					}
 					else
 					{
