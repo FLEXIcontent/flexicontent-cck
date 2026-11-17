@@ -18,7 +18,6 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Log\Log;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\Registry\Registry;
-use Joomla\CMS\Table\Table;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Plugin\CMSPlugin;
 use Joomla\CMS\Plugin\PluginHelper;
@@ -26,7 +25,7 @@ use Joomla\Filesystem\Path;
 use Joomla\CMS\Table\Asset;
 use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\HTML\HTMLHelper;
-use Joomla\CMS\Cache\Cache;
+use Joomla\CMS\Cache\CacheControllerFactoryInterface;
 use Joomla\CMS\Form\Form;
 use Joomla\CMS\Application\ApplicationHelper;
 use Joomla\CMS\User\UserHelper;
@@ -39,7 +38,12 @@ use Joomla\CMS\Router\Route;
 
 if (!defined('DS'))  define('DS', DIRECTORY_SEPARATOR);
 require_once(JPATH_ADMINISTRATOR . '/components/com_flexicontent/defineconstants.php');
-JLoader::register('JHtmlFclayoutbuilder', JPATH_ROOT . '/components/com_flexicontent/helpers/html/fclayoutbuilder.php');
+// Lazy autoload (was JLoader::register): loading eagerly is too early during plugin boot
+spl_autoload_register(static function ($class) {
+	if ($class === 'JHtmlFclayoutbuilder') {
+		require_once JPATH_ROOT . '/components/com_flexicontent/helpers/html/fclayoutbuilder.php';
+	}
+}, true, true);
 
 /**
  * Example system plugin
@@ -147,9 +151,9 @@ class plgSystemFlexisystem extends CMSPlugin
 						'title'     => $app->input->get('title', '', 'string')
 					);
 
-					JLoader::register('ConfigModelApplication', JPATH_ADMINISTRATOR . '/components/com_config/model/application.php');
-					JLoader::register('ConfigModelForm', JPATH_SITE . '/components/com_config/model/form.php');
-					JLoader::register('ConfigModelCms', JPATH_SITE . '/components/com_config/model/cms.php');
+					require_once JPATH_ADMINISTRATOR . '/components/com_config/model/application.php';
+					require_once JPATH_SITE . '/components/com_config/model/form.php';
+					require_once JPATH_SITE . '/components/com_config/model/cms.php';
 
 					if (!(substr($permissions['component'], -6) === '.false')) {
 						// Load Permissions from Session and send to Model
@@ -199,7 +203,8 @@ class plgSystemFlexisystem extends CMSPlugin
 			$start_microtime = microtime(true);
 			if (FLEXI_CACHE) {
 				// Add the category tree to categories cache
-				$catscache = Factory::getCache('com_flexicontent_cats');
+				$catscache = Factory::getContainer()->get(CacheControllerFactoryInterface::class)
+					->createCacheController('callback', ['defaultgroup' => 'com_flexicontent_cats']);
 				$catscache->setCaching(1);                  // Force cache ON
 				$catscache->setLifeTime(FLEXI_CACHE_TIME);  // Set expire time (default is 1 hour)
 				$globalcats = $catscache->get(array($this, 'getCategoriesTree'), array());
@@ -271,10 +276,10 @@ class plgSystemFlexisystem extends CMSPlugin
 
 		// Users with core.admin on templates ARE ALREADY ABLE TO EDIT PHP FILES
 		// these are typically administrators and super admins roles
-		$hasTemplates = Factory::getUser()->authorise('core.admin', 'com_templates');
+		$hasTemplates = Factory::getApplication()->getIdentity()->authorise('core.admin', 'com_templates');
 
 		if (!Factory::getApplication()->isClient('administrator')) {
-			if (!Factory::getUser()->authorise('core.admin') && (isset($_POST['jform']['params']['php_rule']) || isset($_REQUEST['jform']['params']['php_rule']))) {
+			if (!Factory::getApplication()->getIdentity()->authorise('core.admin') && (isset($_POST['jform']['params']['php_rule']) || isset($_REQUEST['jform']['params']['php_rule']))) {
 				Factory::getApplication()->enqueueMessage('You can not edit this in frontend. Please login as a super admin', 'warning');
 				Factory::getApplication()->redirect(Route::_('index.php'));
 			}
@@ -293,8 +298,8 @@ class plgSystemFlexisystem extends CMSPlugin
 		if ($format != 'html') return;
 
 		$app      = Factory::getApplication();
-		$session  = Factory::getApplication()->getSession();
-		$document = Factory::getDocument();
+		$session  = $app->getSession();
+		$document = $app->getDocument();
 
 		$option = $app->input->get('option', '', 'cmd');
 		$view   = $app->input->get('view', '', 'cmd');
@@ -315,8 +320,8 @@ class plgSystemFlexisystem extends CMSPlugin
 		$js = '';
 
 		if ($isBE_Module_Edit || $isBE_Menu_Edit) {
-			Factory::getLanguage()->load($this->extension, JPATH_ADMINISTRATOR, 'en-GB', $_force_reload = false);
-			Factory::getLanguage()->load($this->extension, JPATH_ADMINISTRATOR, null, $_force_reload = false);
+			$app->getLanguage()->load($this->extension, JPATH_ADMINISTRATOR, 'en-GB', $_force_reload = false);
+			$app->getLanguage()->load($this->extension, JPATH_ADMINISTRATOR, null, $_force_reload = false);
 		}
 
 		if (
@@ -350,7 +355,9 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
     $wa = $document->getWebAssetManager();
     $wa->useScript('jquery');
     $wa->useScript('jquery-noconflict');
-    $document->addScriptDeclaration($js);
+    if ($js !== '') {
+        $wa->addInlineScript($js);
+    }
 }
 
 
@@ -383,9 +390,9 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 				});
 			";
 		}
-		if ($js && $document !== null && method_exists($document, 'addScriptDeclaration')) {
-    $document->addScriptDeclaration($js);
-}
+		if ($js && $document !== null) {
+			$document->getWebAssetManager()->addInlineScript($js);
+		}
 
 
 		// Detect resolution we will do this regardless of ... using mobile layouts
@@ -411,7 +418,7 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 	function redirectAdminComContent()
 	{
 		$app   = Factory::getApplication();
-		$user  = Factory::getUser();
+		$user  = $app->getIdentity();
 		$option = $app->input->get('option', '', 'cmd');
 
 		// Skip other components
@@ -1003,8 +1010,6 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 		$username  = $app->input->get('fcu', null);
 		$password  = $app->input->get('fcp', null);
 
-		jimport('joomla.user.helper');
-
 		$db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query 	= 'SELECT id, password'
 			. ' FROM #__users'
@@ -1139,14 +1144,16 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 		$app = Factory::getApplication();
 		$format = $app->input->get('format', 'html', 'cmd');
 
-		if (!$app->isClient('administrator') || !Factory::getUser()->id || $format !== 'html') {
+		if (!$app->isClient('administrator') || !$app->getIdentity()->id || $format !== 'html') {
 			return;
 		}
 
 		require_once(JPATH_SITE . '/components/com_flexicontent/helpers/permission.php');
 		$perms = FlexicontentHelperPerm::getPerm();
 
-		Factory::getDocument()->addScriptDeclaration("
+		$wa = $app->getDocument() !== null ? $app->getDocument()->getWebAssetManager() : null;
+		if ($wa !== null) {
+			$wa->addInlineScript("
 			document.addEventListener('DOMContentLoaded', function(){
 				" . (!$perms->CanReviews ? 'document.querySelectorAll(\'#menu a[href="index.php?option=com_flexicontent&view=reviews"]\').forEach(function(element) { element.parentNode.remove(); });' : '') . "
 				" . (!$perms->CanCats    ? 'document.querySelectorAll(\'#menu a[href="index.php?option=com_flexicontent&view=categories"]\').forEach(function(element) { element.parentNode.remove(); });' : '') . "
@@ -1161,7 +1168,8 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 				" . (!$perms->CanStats   ? 'document.querySelectorAll(\'#menu a[href="index.php?option=com_flexicontent&view=stats"]\').forEach(function(element) { element.parentNode.remove(); });' : '') . "
 				" . (!$perms->CanConfig  ? 'document.querySelectorAll(\'#menu a[href="index.php?option=com_config&view=component&component=com_flexicontent"]\').forEach(function(element) { element.parentNode.remove(); });' : '') . "
 			});
-		");
+			");
+		}
 	}
 
 
@@ -1267,7 +1275,7 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 
 		$debug_mobile = $this->cparams->get('debug_mobile');
 
-		$document = Factory::getDocument();
+		$document = Factory::getApplication()->getDocument();
 		$js = '
 			function fc_getScreenWidth()
 			{
@@ -1319,8 +1327,8 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 			' . /*($debug_mobile ? 'alert("Detected screen resolution: " + fc_screen_resolution + " this info will be used on next load");' : '') .*/ '
 			' . /*'window.location="'.$_SERVER["REQUEST_URI"].'"; ' .*/ '
 		';
-		if ($document && method_exists($document, 'addScriptDeclaration')) {
-			$document->addScriptDeclaration($js);
+		if ($document !== null) {
+			$document->getWebAssetManager()->addInlineScript($js);
 		}
 		$screenSizeCookieAdded = true;
 	}
@@ -1340,7 +1348,8 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 		if (!$limit_checkout_hours && !$checkin_on_session_end) return true;
 
 		// Get last execution time from cache
-		$cache = Factory::getCache('plg_' . $this->_name . '_' . __FUNCTION__);
+		$cache = Factory::getContainer()->get(CacheControllerFactoryInterface::class)
+			->createCacheController('callback', ['defaultgroup' => 'plg_' . $this->_name . '_' . __FUNCTION__]);
 		$cache->setCaching(1);      // Force cache ON
 		$cache->setLifeTime(3600);  // Set expire time (default is 1 hour)
 		$last_check_time = $cache->get(array($this, '_getLastCheckTime'), array(__FUNCTION__));
@@ -1436,7 +1445,8 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 		if (!$archive_on_publish_down) return true;
 
 		// Get last execution time from cache
-		$cache = Factory::getCache('plg_' . $this->_name . '_' . __FUNCTION__);
+		$cache = Factory::getContainer()->get(CacheControllerFactoryInterface::class)
+			->createCacheController('callback', ['defaultgroup' => 'plg_' . $this->_name . '_' . __FUNCTION__]);
 		$cache->setCaching(1);      // Force cache ON
 		$cache->setLifeTime(3600);  // Set expire time (default is 1 hour)
 		$last_check_time = $cache->get(array($this, '_getLastCheckTime'), array(__FUNCTION__));
@@ -1495,7 +1505,8 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 		$cparams = ComponentHelper::getParams('com_flexicontent');
 
 		// Get last execution time from cache
-		$cache = Factory::getCache('plg_' . $this->_name . '_' . __FUNCTION__);
+		$cache = Factory::getContainer()->get(CacheControllerFactoryInterface::class)
+			->createCacheController('callback', ['defaultgroup' => 'plg_' . $this->_name . '_' . __FUNCTION__]);
 		$cache->setCaching(1);      // Force cache ON
 		$cache->setLifeTime(3600);  // Set expire time (default is 1 hour)
 		$last_check_time = $cache->get(array($this, '_getLastCheckTime'), array(__FUNCTION__));
@@ -1522,7 +1533,6 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 
 			if ($output) {
 				$log_filename = 'cron_estorage.php';
-				jimport('joomla.log.log');
 				Log::addLogger(
 					array(
 						'text_file' => $log_filename,  // Sets the target log file
@@ -1775,7 +1785,7 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 		$admin_grp = 7;
 		$super_admin_grp = 8;
 
-		$user = Factory::getUser();
+		$user = Factory::getApplication()->getIdentity();
 		$coreUserGroups = $user->getAuthorisedGroups();
 		// $coreViewLevels = $user->getAuthorisedViewLevels();
 		$aid = max($user->getAuthorisedViewLevels());
@@ -1812,9 +1822,8 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 			'cachebase'		=> ($client == 1) ? JPATH_ADMINISTRATOR . '/cache' : $conf->get('cache_path', JPATH_SITE . '/cache')
 		);
 
-		jimport('joomla.cache.cache');
-		$cache = Cache::getInstance('', $options);
-		return $cache;
+		return Factory::getContainer()->get(CacheControllerFactoryInterface::class)
+			->createCacheController('callback', $options);
 	}
 
 
@@ -1882,7 +1891,8 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 	public function onExtensionBeforeSave($context, $table, $isNew)
 	{
 		$app   = Factory::getApplication();
-		$user  = Factory::getUser();
+		$user  = $app->getIdentity();
+		$db    = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$option = $app->input->get('component', '', 'cmd');
 
 		/**
@@ -1917,9 +1927,9 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 			// and if rules exists (in J3.5+ they are saved via AJAX thus code would normally be triggered only in J3.2 - J3.4)
 			if ($rules_arr != null && $user->authorise('core.admin', $option)) {
 				// Get asset of the other component
-				$asset = Table::getInstance('asset');
+				$asset = new Asset($db);
 				if (!$asset->loadByName($option_other)) {
-					$root = Table::getInstance('asset');
+					$root = new Asset($db);
 					$root->loadByName('root.1');
 					$asset->name = $option_other;
 					$asset->title = $option_other;
@@ -1942,7 +1952,7 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 
 				// If com_content configuration was saved then restore cleared *.own rules, and re-save com_content asset
 				if ($option == 'com_content') {
-					$com_content_asset = Table::getInstance('asset');
+					$com_content_asset = new Asset($db);
 					if ($com_content_asset->loadByName('com_content')) {
 						$com_content_rules = json_decode($com_content_asset->rules, true);
 						$com_content_rules['core.delete.own'] = isset($asset_rules['core.delete.own']) ? $asset_rules['core.delete.own'] : '';
@@ -2154,8 +2164,8 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 		}
 
 		$app        = Factory::getApplication();
-		$document   = Factory::getDocument();
-		$user       = Factory::getUser();
+		$document   = $app->getDocument();
+		$user       = $app->getIdentity();
 
 		// Check we are loading the com_content article form
 		if ($form->getName() !== 'com_content.article' || Factory::getApplication()->input->get('option', '', 'CMD') !== 'com_content') {
@@ -2199,7 +2209,7 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 
 		// Get current type_id of the item
 		if ($data->id) {
-			$record = Table::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
+			$record = new \flexicontent_items(Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 			$record->load($data->id);
 		}
 		$data->type_id = !empty($record) && $record->type_id ? $record->type_id : 0;
@@ -2234,20 +2244,16 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 		// *** Load CSS files
 		// ***
 
-		!Factory::getLanguage()->isRtl()
-			? $document->addStyleSheet(Uri::root(true) . '/components/com_flexicontent/assets/css/flexi_form.css', array('version' => FLEXI_VHASH))
-			: $document->addStyleSheet(Uri::root(true) . '/components/com_flexicontent/assets/css/flexi_form_rtl.css', array('version' => FLEXI_VHASH));
-
-		!Factory::getLanguage()->isRtl()
-			? $document->addStyleSheet(Uri::root(true) . '/components/com_flexicontent/assets/css/flexi_containers.css', array('version' => FLEXI_VHASH))
-			: $document->addStyleSheet(Uri::root(true) . '/components/com_flexicontent/assets/css/flexi_containers_rtl.css', array('version' => FLEXI_VHASH));
-
-		!Factory::getLanguage()->isRtl()
-			? $document->addStyleSheet(Uri::root(true) . '/components/com_flexicontent/assets/css/flexi_shared.css', array('version' => FLEXI_VHASH))
-			: $document->addStyleSheet(Uri::root(true) . '/components/com_flexicontent/assets/css/flexi_shared_rtl.css', array('version' => FLEXI_VHASH));
-
-		// Fields common CSS
-		$document->addStyleSheet(Uri::root(true) . '/components/com_flexicontent/assets/css/flexi_form_fields.css', array('version' => FLEXI_VHASH));
+		$wa = $document !== null ? $document->getWebAssetManager() : null;
+		if ($wa !== null) {
+			$isRtl = $app->getLanguage()->isRtl();
+			$cssBase = 'components/com_flexicontent/assets/css/';
+			$wa->registerAndUseStyle('plg_system_flexisystem.form', $cssBase . ($isRtl ? 'flexi_form_rtl.css' : 'flexi_form.css'), array('version' => FLEXI_VHASH));
+			$wa->registerAndUseStyle('plg_system_flexisystem.containers', $cssBase . ($isRtl ? 'flexi_containers_rtl.css' : 'flexi_containers.css'), array('version' => FLEXI_VHASH));
+			$wa->registerAndUseStyle('plg_system_flexisystem.shared', $cssBase . ($isRtl ? 'flexi_shared_rtl.css' : 'flexi_shared.css'), array('version' => FLEXI_VHASH));
+			// Fields common CSS
+			$wa->registerAndUseStyle('plg_system_flexisystem.form_fields', $cssBase . 'flexi_form_fields.css', array('version' => FLEXI_VHASH));
+		}
 
 
 		// ***
@@ -2263,11 +2269,13 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 
 		// Add js function to overload the joomla submitform validation
 		HTMLHelper::_('behavior.formvalidator');  // load default validation JS to make sure it is overriden
-		$document->addScript(Uri::root(true) . '/components/com_flexicontent/assets/js/admin.js', array('version' => FLEXI_VHASH));
-		$document->addScript(Uri::root(true) . '/components/com_flexicontent/assets/js/validate.js', array('version' => FLEXI_VHASH));
-
-		// Add js function for custom code used by FLEXIcontent item form
-		$document->addScript(Uri::root(true) . '/components/com_flexicontent/assets/js/itemscreen.js', array('version' => FLEXI_VHASH));
+		if ($wa !== null) {
+			$jsBase = 'components/com_flexicontent/assets/js/';
+			$wa->registerAndUseScript('plg_system_flexisystem.admin', $jsBase . 'admin.js', array('version' => FLEXI_VHASH));
+			$wa->registerAndUseScript('plg_system_flexisystem.validate', $jsBase . 'validate.js', array('version' => FLEXI_VHASH));
+			// Add js function for custom code used by FLEXIcontent item form
+			$wa->registerAndUseScript('plg_system_flexisystem.itemscreen', $jsBase . 'itemscreen.js', array('version' => FLEXI_VHASH));
+		}
 
 
 		// ***
@@ -2437,7 +2445,7 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 		require_once(JPATH_SITE . '/components/com_flexicontent/classes/flexicontent.helper.php');
 
 		$app  = Factory::getApplication();
-		$user = Factory::getUser();
+		$user = $app->getIdentity();
 		$db   = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$jcookie = $app->input->cookie;
 
@@ -2521,7 +2529,7 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 		$item = $itemmodel->getItem($cid, $check_view_access = false, $no_cache = true);
 
 		// Load backend 'flexicontent' items model and use it to update flexicontent temporary data
-		JLoader::register('FlexicontentModelItems', JPATH_ADMINISTRATOR . '/components/com_flexicontent/models/items.php');
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/models/items.php';
 		$items_model = new FlexicontentModelItems();
 		$items_model->updateItemCountingData(array($item));
 
@@ -2571,7 +2579,7 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 		$this->_loadFcHelpersAndLanguage();
 		$model = new FlexicontentModelItem();
 
-		$record = Table::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
+		$record = new \flexicontent_items(Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 		$record->load($item->id);
 
 		$mergeProperties = array('attribs', 'metadata');
@@ -2734,7 +2742,7 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 
 		// Get current type_id of the item
 		if (!$isNew) {
-			$record = Table::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
+			$record = new \flexicontent_items(Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 			$record->load($data['id']);
 			$data['type_id'] = $record->type_id;
 		}
@@ -2772,7 +2780,7 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 		//*** Call backend 'flexicontent' items model to update flexicontent temporary data
 		//***
 
-		JLoader::register('FlexicontentModelItems', JPATH_ADMINISTRATOR . '/components/com_flexicontent/models/items.php');
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/models/items.php';
 		$items_model = new FlexicontentModelItems();
 		$items_model->updateItemCountingData(false, $item->catid);
 
@@ -2784,7 +2792,7 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 		$item_params = Factory::getApplication()->getSession()->get('flexicontent.item.data', null, 'flexicontent');
 
 		if ($item_params) {
-			$record = Table::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
+			$record = new \flexicontent_items(Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 			$record->load($item->id);
 			$record->bind($item_params);
 			$record->store();
@@ -2807,8 +2815,8 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 
 	private function _loadFcHelpersAndLanguage()
 	{
-		Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR);
-		Table::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables');
+		Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR);
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_items.php';
 
 		require_once(JPATH_ADMINISTRATOR . '/components/com_flexicontent/defineconstants.php');
 		require_once(JPATH_SITE . '/components/com_flexicontent/classes/flexicontent.fields.php');
@@ -2816,7 +2824,7 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 		require_once(JPATH_SITE . '/components/com_flexicontent/classes/flexicontent.categories.php');
 		require_once(JPATH_SITE . '/components/com_flexicontent/helpers/permission.php');
 
-		JLoader::register('FlexicontentModelItem', JPATH_BASE . '/components/com_flexicontent/models/item.php');
+		require_once JPATH_BASE . '/components/com_flexicontent/models/item.php';
 	}
 
 
