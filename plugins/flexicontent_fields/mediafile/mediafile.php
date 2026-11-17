@@ -2357,7 +2357,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 
 		$timeout = $session->get('com_flexicontent.formtime', 0);
 		if ($timeout == 0 || time() - $timeout < 2) {
-			JError::raiseNotice(500, \Joomla\CMS\Language\Text:: _ ('FLEXI_FIELD_FILE_EMAIL_NOT_SENT'));
+			\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text:: _ ('FLEXI_FIELD_FILE_EMAIL_NOT_SENT'), 'notice');
 			return $this->share_file_form();
 		}
 
@@ -2469,7 +2469,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		if (!$link || !\Joomla\CMS\Uri\Uri::isInternal($link))
 		{
 			//Non-local url...
-			JError::raiseNotice(500, \Joomla\CMS\Language\Text:: _ ('FLEXI_FIELD_FILE_EMAIL_NOT_SENT'));
+			\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text:: _ ('FLEXI_FIELD_FILE_EMAIL_NOT_SENT'), 'notice');
 			return $this->share_file_form();
 		}
 
@@ -2499,7 +2499,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			{
 				if (strpos($_POST[$field], $header) !== false)
 				{
-					JError::raiseError(403, '');
+					throw new \Exception('', 403);
 				}
 			}
 		}
@@ -2521,14 +2521,14 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		if (! $email  || ! \Joomla\CMS\Mail\MailHelper::isEmailAddress($email))
 		{
 			$error	= \Joomla\CMS\Language\Text::sprintf('FLEXI_FIELD_FILE_EMAIL_INVALID', $email);
-			JError::raiseWarning(0, $error);
+			\Joomla\CMS\Factory::getApplication()->enqueueMessage($error, 'warning');
 		}
 
 		// Check for a valid from address
 		if (! $from || ! \Joomla\CMS\Mail\MailHelper::isEmailAddress($from))
 		{
 			$error	= \Joomla\CMS\Language\Text::sprintf('FLEXI_FIELD_FILE_EMAIL_INVALID', $from);
-			JError::raiseWarning(0, $error);
+			\Joomla\CMS\Factory::getApplication()->enqueueMessage($error, 'warning');
 		}
 
 		if ($error)
@@ -2552,7 +2552,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		$send_result = Factory::getMailer()->sendMail( $MailFrom, $FromName, $email, $subject, $body, $html_mode, $cc, $bcc, $attachment, $from, $sender );
 		if ( $send_result !== true )
 		{
-			JError::raiseNotice(500, \Joomla\CMS\Language\Text:: _ ('FLEXI_FIELD_FILE_EMAIL_NOT_SENT'));
+			\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text:: _ ('FLEXI_FIELD_FILE_EMAIL_NOT_SENT'), 'notice');
 			return $this->share_file_form();
 		}
 

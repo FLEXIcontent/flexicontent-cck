@@ -369,7 +369,7 @@ class plgContentFlexiBreak extends \Joomla\CMS\Plugin\CMSPlugin
 		else
 		{
 			ob_end_clean();
-			JError::raiseError(500, \Joomla\CMS\Language\Text::_('Failed to load template '.$name.'.php'));
+			throw new \Exception(\Joomla\CMS\Language\Text::_('Failed to load template '.$name.'.php'), 500);
 			return '';
 		}
 		return trim(ob_get_clean());

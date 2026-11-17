@@ -128,7 +128,7 @@ class FlexicontentViewCategory extends FlexicontentViewBaseRecord
 		// Check no privilege to create new category under any category
 		if ( $isnew && (!$perms->CanCats || !FlexicontentHelperPerm::getPermAny('core.create')) )
 		{
-			JError::raiseWarning( 403, \Joomla\CMS\Language\Text::_( 'FLEXI_NO_ACCESS_CREATE' ) );
+			\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_( 'FLEXI_NO_ACCESS_CREATE' ), 'warning');
 			$app->redirect( 'index.php?option=com_flexicontent' );
 		}
 
@@ -162,7 +162,7 @@ class FlexicontentViewCategory extends FlexicontentViewBaseRecord
 		if ( $isnew && !$cancreate_cat )
 		{
 			$acc_msg = \Joomla\CMS\Language\Text::_( 'FLEXI_NO_ACCESS_CREATE' ) ."<br/>". (FLEXI_J16GE ? \Joomla\CMS\Language\Text::_( 'FLEXI_CANNOT_ADD_CATEGORY_REASON' ) : "");
-			JError::raiseWarning( 403, $acc_msg);
+			\Joomla\CMS\Factory::getApplication()->enqueueMessage($acc_msg, 'warning');
 			$app->redirect('index.php?option=com_flexicontent&view=categories');
 		}
 
@@ -170,7 +170,7 @@ class FlexicontentViewCategory extends FlexicontentViewBaseRecord
 		if ( !$isnew && !$canedit_cat )
 		{
 			$acc_msg = \Joomla\CMS\Language\Text::_( 'FLEXI_NO_ACCESS_EDIT' ) ."<br/>". \Joomla\CMS\Language\Text::_( 'FLEXI_CANNOT_EDIT_CATEGORY_REASON' );
-			JError::raiseWarning( 403, $acc_msg);
+			\Joomla\CMS\Factory::getApplication()->enqueueMessage($acc_msg, 'warning');
 			$app->redirect( 'index.php?option=com_flexicontent&view=categories' );
 		}
 

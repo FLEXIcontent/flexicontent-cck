@@ -331,7 +331,7 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 		$tmpldir = JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$folder;
 
 		// Create less folders if they do not exist already
-		if ( !is_dir( $tmpldir . '/less' ) ) if ( !mkdir( $tmpldir . '/less') )  JError::raiseWarning(100, \Joomla\CMS\Language\Text::_('Unable to create "/less/" folder'));
+		if ( !is_dir( $tmpldir . '/less' ) ) if ( !mkdir( $tmpldir . '/less') )  \Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_('Unable to create "/less/" folder'), 'warning');
 
 		// Abort if directory creation failed
 		if ( ! is_dir( $tmpldir . '/less' ) ) return;
@@ -341,7 +341,7 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 		// Create CUSTOM config.less, that is include by item.less / category.less
 		// ************************************************************ ***********
 
-		if ( !is_dir( $tmpldir . '/less/include' ) ) if ( !mkdir( $tmpldir . '/less/include') )  JError::raiseWarning(100, \Joomla\CMS\Language\Text::_('Unable to create "/less/include" folder'));
+		if ( !is_dir( $tmpldir . '/less/include' ) ) if ( !mkdir( $tmpldir . '/less/include') )  \Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_('Unable to create "/less/include" folder'), 'warning');
 		if ( !file_exists($tmpldir . '/less/include/config.less') ) {
 			file_put_contents($tmpldir . '/less/include/config.less', "/* Place your less variables, mixins, etc, here \n1. This is commonly imported by files: item.less and category.less, \n2. If you add extra less file imports, then place files \ninside same folder for automatic compiling to be triggered */\n\n@import 'config_auto_item.less';\n@import 'config_auto_category.less';\n");
 		}
@@ -356,7 +356,7 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 			if ( !file_exists($tmpldir . $css_name) )  continue;  // Do not try to copy CSS file that does not exist
 			if ( !file_exists($tmpldir . $less_name) ) {
 				if ( !\Joomla\Filesystem\File::copy($tmpldir.$css_name, $tmpldir.$less_name) ) {
-					JError::raiseWarning(100, \Joomla\CMS\Language\Text::_('Unable to create file: "'.$tmpldir.$less_name.'"'));
+					\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_('Unable to create file: "'.$tmpldir.$less_name.'"'), 'warning');
 				} else {
 					$file_data = "@import 'include/config.less';\n\n";
 					$file_data .= preg_replace("/[ \t]*\*zoom[\s]*:[\s]*expression[^\r\n]+[\r\n]+/u", "", file_get_contents($tmpldir.$less_name));  // copy and replace old invalid code

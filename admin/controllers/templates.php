@@ -235,7 +235,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 		// Check access
 		if (!$is_authorised)
 		{
-			JError::raiseWarning(403, \Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'));
+			\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'), 'warning');
 			$this->setRedirect('index.php?option=com_flexicontent', '');
 
 			return;
