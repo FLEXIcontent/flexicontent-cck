@@ -19,9 +19,6 @@ defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
 
-jimport('cms.html.html');      // JHtml
-jimport('cms.html.select');    // \Joomla\CMS\HTML\Helpers\Select
-jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
 
 //jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 //\Joomla\CMS\Form\FormHelper::loadFieldClass('...');   // \Joomla\CMS\Form\FormField...
@@ -44,7 +41,6 @@ class JFormFieldMicrodatatype extends \Joomla\CMS\Form\FormField {
 		
 		if ($types === null)
 		{
-			jimport('joomla.microdata.microdata');
 			$jm = new \Joomla\CMS\Microdata\Microdata();
 			$jm_types = $jm->getTypes();
 			$types = array_keys($jm_types);

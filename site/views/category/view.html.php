@@ -19,8 +19,6 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('legacy.view.legacy');
-jimport('joomla.filesystem.file');
 
 use Joomla\CMS\Language\Text;
 use Joomla\String\StringHelper;

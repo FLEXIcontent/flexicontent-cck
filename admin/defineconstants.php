@@ -65,9 +65,6 @@ if (!defined('FLEXI_J50GE'))   define('FLEXI_J50GE', version_compare( $jversion-
 
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 
-if ( !class_exists('\Joomla\CMS\MVC\Controller\BaseController') )  jimport('legacy.controller.legacy');
-if ( !class_exists('\Joomla\CMS\MVC\Model\BaseDatabaseModel') )       jimport('legacy.model.legacy');
-if ( !class_exists('\Joomla\CMS\MVC\View\HtmlView') )        jimport('legacy.view.legacy');
 
 // Set a default timezone if web server provider has not done so
 // phpversion() should be used instead of PHP_VERSION, if not inside Joomla code

@@ -22,7 +22,13 @@ use Joomla\Filesystem\File;
 use Joomla\Filesystem\Path;
 use Joomla\Database\DatabaseInterface;
 
-JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FlexicontentControllerBaseAdmin' => JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 // Manually import models in case used by frontend, then models will not be autoloaded correctly via getModel('name')
 require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'file.php';
@@ -985,14 +991,11 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$subfolder_path = str_replace('\\', '/', $subfolder_path);
 
 
-		jimport('joomla.utilities.date');
 
 		// Set FTP credentials, if given
-		jimport('joomla.client.helper');
 		\Joomla\CMS\Client\ClientHelper::setCredentialsFromRequest('ftp');
 
 		// Make the filename safe
-		jimport('joomla.filesystem.file');
 
 		// Get field parameter 'auto_filename_code' which has PHP code to create the filename
 		$auto_filename_code = $field->params->auto_filename_code ?? 0;
@@ -1256,7 +1259,6 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$filesize  = $this->input->get('file-url-size', 0, 'int');
 		$size_unit = $this->input->get('size_unit', 'KBs', 'cmd');
 
-		jimport('joomla.utilities.date');
 
 		// Check if the form fields are not empty
 		if (!$url)
@@ -2075,9 +2077,6 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$allowed_exts = $filter_ext ? array_intersect($filter_ext, $allowed_exts) : $allowed_exts;
 		$allowed_exts = array_flip($allowed_exts);
 
-		jimport('joomla.utilities.date');
-		jimport('joomla.filesystem.file');
-		jimport('joomla.filesystem.folder');
 
 		// Get files
 		$filesdir = \Joomla\Filesystem\Path::clean(JPATH_SITE . $filesdir . DS);
@@ -2513,7 +2512,6 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 
 		// Set FTP credentials, if given
-		jimport('joomla.client.helper');
 		\Joomla\CMS\Client\ClientHelper::setCredentialsFromRequest('ftp');
 	}
 

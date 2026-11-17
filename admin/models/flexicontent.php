@@ -12,8 +12,6 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
-jimport('legacy.model.legacy');
-jimport('joomla.access.rules');
 use Joomla\String\StringHelper;
 use Joomla\CMS\Factory;
 use Joomla\Filesystem\Path;
@@ -650,9 +648,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 	// Check and if needed install 3rd party plugins that do not use Joomla plugin system
 	function install_3rdParty_plugins()
 	{
-		jimport('joomla.filesystem.path' );
-		jimport('joomla.filesystem.folder');
-		jimport('joomla.filesystem.file');
 
 		// ****************************
 		// Handle jcomments integration
@@ -1017,7 +1012,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		static $missing;
 		if ($missing !== NULL) return $check_only ? empty($missing) : $missing;
 
-		jimport('joomla.filesystem.file');
 		$app = Factory::getApplication();
 		$dbprefix = $app->get('dbprefix');
 		$dbname   = $app->get('db');
@@ -1214,9 +1208,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		static $return;
 		if ($return!==null) return $return;
 
-		jimport('joomla.filesystem.file');
-		jimport('joomla.filesystem.folder');
-		jimport('joomla.filesystem.path');
 
 		$conf_override_file = Path::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'phpThumb.config_OVERRIDE.php');
 
@@ -1305,8 +1296,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 
 		$finished = false;
 
-		jimport('joomla.filesystem.file');
-		jimport('joomla.filesystem.folder');
 
 		$deprecated['files'] = array();
 		$deprecated['folders'] = array();
@@ -1817,7 +1806,6 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 
 	function createLanguagePack($code = 'en-GB', $method = '', $params = array())
 	{
-		jimport('joomla.filesystem.file');
 
 		$prefix 	= $code . '.';
 		$suffix 	= '.ini';

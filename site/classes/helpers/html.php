@@ -318,9 +318,6 @@ class flexicontent_html
 		static $initialized;
 		if ($initialized===null)
 		{
-			jimport('joomla.filesystem.path' );
-			jimport('joomla.filesystem.folder');
-			jimport('joomla.filesystem.file');
 			$initialized = 1;
 		}
 
@@ -2450,7 +2447,6 @@ class flexicontent_html
 
 			case 'EMAIL':
 				// Use the Joomla mail helper to validate emails
-				jimport('joomla.mail.helper');
 				if ( !\Joomla\CMS\Mail\MailHelper::isEmailAddress($v) ) $v = '';
 				break;
 
@@ -2595,7 +2591,6 @@ class flexicontent_html
 	 */
 	static function extractimagesrc( $row )
 	{
-		jimport('joomla.filesystem.file');
 
 		$regex = '#<\s*img [^\>]*src\s*=\s*(["\'])(.*?)\1#im';
 
@@ -3285,9 +3280,13 @@ class flexicontent_html
 		if (!class_exists($recordClass))
 		{
 			// Prefer frontend record model if it exists
-			!$isAdmin && file_exists(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.$config->record_name.'.php')
-				? JLoader::register($recordClass, JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.$config->record_name.'.php')
-				: JLoader::register($recordClass, JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.$config->record_name.'.php');
+			// Lazy class loading (was JLoader::register): load the record model only if/when used
+			$recordPath = !$isAdmin && file_exists(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.$config->record_name.'.php')
+				? JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.$config->record_name.'.php'
+				: JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.$config->record_name.'.php';
+			spl_autoload_register(static function ($class) use ($recordClass, $recordPath) {
+				if ($class === $recordClass && is_file($recordPath)) require_once $recordPath;
+			}, true, true);
 		}
 
 		// One model per record type: it is only needed for its list of supported states, which does not depend on
@@ -7010,9 +7009,6 @@ class flexicontent_html
 	// Check and if needed install Joomla template overrides into current Joomla template
 	public static function install_template_overrides($display_mssg = false)
 	{
-		jimport('joomla.filesystem.path' );
-		jimport('joomla.filesystem.folder');
-		jimport('joomla.filesystem.file');
 		$app =Factory::getApplication();
 
 		$pathDestFolder_arr = array(

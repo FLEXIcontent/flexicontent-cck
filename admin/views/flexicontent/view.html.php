@@ -14,7 +14,13 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-JLoader::register('FlexicontentViewBaseRecords', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_records.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FlexicontentViewBaseRecords' => JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/base/view_records.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 /**
  * HTML View class for the FLEXIcontent (backend) dashboard screen
@@ -38,8 +44,6 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 		$print_logging_info = $params->get('print_logging_info');
 
 		// Load the file system librairies
-		jimport('joomla.filesystem.folder');
-		jimport('joomla.filesystem.file');
 
 		// activate the tooltips
 		//\Joomla\CMS\HTML\HTMLHelper::_('behavior.tooltip');
@@ -222,7 +226,6 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 		}
 
 		// Lists
-		jimport('joomla.filesystem.folder');
 		$lists 		= array();
 		$options 	= array();
 		$folder 	= JPATH_ADMINISTRATOR.DS.'language';

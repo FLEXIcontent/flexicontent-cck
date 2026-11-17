@@ -19,8 +19,6 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport('legacy.view.legacy');
-jimport('joomla.filesystem.file');
 
 /**
  * HTML View class for the Category View

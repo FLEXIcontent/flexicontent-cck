@@ -167,7 +167,6 @@ class flexicontent_upload
 			return false;
 		}
 
-		jimport('joomla.filesystem.file');
 
 
 		// ***************************************************************
@@ -300,7 +299,6 @@ class flexicontent_upload
 	*/
 	static function sanitize($base_Dir, $filename)
 	{
-		jimport('joomla.filesystem.file');
 
 		// Check for any trailing dots and remove them (trailing shouldn't be possible cause of the getExt check)
 		$filename = rtrim($filename, '.');
@@ -344,7 +342,6 @@ class flexicontent_upload
 	*/
 	static function sanitizedir($base_Dir, $folder)
 	{
-		jimport('joomla.filesystem.folder');
 
 		// Replace invalid characters with dash, if makeSafe has been called then this has already been done
 		$regex = array('#(\.){2,}#', '#[^A-Za-z0-9\.\_\- ]#', '#^\.#');

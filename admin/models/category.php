@@ -519,7 +519,6 @@ class FlexicontentModelCategory extends FCModelAdmin
 			$item->metadata = $registry->toArray();
 
 			// Convert the created and modified dates to local user time for display in the form.
-			jimport('joomla.utilities.date');
 
 			$site_zone = \Joomla\CMS\Factory::getApplication()->get('offset');
 			$user_zone = \Joomla\CMS\Factory::getUser()->getParam('timezone', $site_zone);
@@ -587,7 +586,6 @@ class FlexicontentModelCategory extends FCModelAdmin
 	 */
 	protected function preprocessForm(\Joomla\CMS\Form\Form $form, $data, $plugins_group = null)
 	{
-		jimport('joomla.filesystem.path');
 
 		$lang = \Joomla\CMS\Factory::getLanguage();
 		$component = $this->getState($this->getName().'.component', '');
@@ -605,7 +603,10 @@ class FlexicontentModelCategory extends FCModelAdmin
 		{
 			$cName = ucfirst($eName) . ucfirst($section) . 'HelperCategory';
 
-			JLoader::register($cName, $path);
+			// Lazy class loading (was JLoader::register): loaded only if/when used.
+			spl_autoload_register(static function ($class) use ($cName, $path) {
+				if ($class === $cName && is_file($path)) require_once $path;
+			}, true, true);
 
 			if (class_exists($cName) && is_callable(array($cName, 'onPrepareForm')))
 			{

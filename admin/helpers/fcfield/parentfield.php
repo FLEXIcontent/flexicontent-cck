@@ -10,7 +10,6 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-jimport('cms.plugin.plugin');
 
 class FCField extends \Joomla\CMS\Plugin\CMSPlugin
 {
@@ -136,7 +135,10 @@ class FCField extends \Joomla\CMS\Plugin\CMSPlugin
 				$plg_db_data    = \Joomla\CMS\Plugin\PluginHelper::getPlugin($extfolder, $extname);
 
 				// Load class if called by CLI
-				JLoader::register($className, $plgPath);
+				// Lazy class loading (was JLoader::register): loaded only if/when used.
+				spl_autoload_register(static function ($class) use ($className, $plgPath) {
+					if ($class === $className && is_file($plgPath)) require_once $plgPath;
+				}, true, true);
 
 				self::$fcProPlg = new $className($dispatcher, array(
 					'type'   => $extfolder,

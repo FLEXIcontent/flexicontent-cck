@@ -15,7 +15,6 @@ use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
 // Import parent controller
-jimport('legacy.controller.form');
 
 /**
  * FLEXIcontent (User) Group Controller

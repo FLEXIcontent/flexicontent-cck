@@ -15,11 +15,14 @@ use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\Database\DatabaseInterface;
 
-jimport('joomla.filesystem.file');
-jimport('joomla.filesystem.folder');
-jimport('joomla.filesystem.path');
 
-JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FlexicontentControllerBaseAdmin' => JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 // Manually import models in case used by frontend, then models will not be autoloaded correctly via getModel('name')
 require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'import.php';
@@ -111,7 +114,6 @@ class FlexicontentControllerImport extends FlexicontentControllerBaseAdmin
 		$parse_log = "\n\n\n" . '<b>please click</b> <a href="' . $link . '">here</a> to return previous page' . "\n\n\n";
 		$log_filename = 'importcsv_' . ($user->id) . '.php';
 
-		jimport('joomla.log.log');
 		\Joomla\CMS\Log\Log::addLogger(
 			array(
 				'text_file' => $log_filename,  // Sets the target log file

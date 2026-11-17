@@ -14,7 +14,13 @@ defined('_JEXEC') or die;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FlexicontentControllerBaseAdmin' => JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 // Manually import models in case used by frontend, then models will not be autoloaded correctly via getModel('name')
 require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'template.php';
@@ -159,7 +165,6 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 			jexit(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'));
 		}
 
-		jimport('joomla.filesystem.file');
 		$app  = \Joomla\CMS\Factory::getApplication();
 		$user = \Joomla\CMS\Factory::getUser();
 		$db   = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
@@ -601,7 +606,6 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 			jexit(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'));
 		}
 
-		jimport('joomla.filesystem.file');
 		$app  = \Joomla\CMS\Factory::getApplication();
 		$user = \Joomla\CMS\Factory::getUser();
 
@@ -719,7 +723,6 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 			jexit(\Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'));
 		}
 
-		jimport('joomla.filesystem.file');
 		$app  = \Joomla\CMS\Factory::getApplication();
 		$user = \Joomla\CMS\Factory::getUser();
 

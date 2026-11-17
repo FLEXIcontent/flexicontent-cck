@@ -1574,7 +1574,10 @@ class flexicontent_db
 		else
 		{
 			$hname = $cname . 'HelperAssociation';
-			JLoader::register($hname, JPATH_SITE . '/components/' . $component . '/helpers/association.php');
+			// Lazy class loading (was JLoader::register): loaded only if/when used.
+			spl_autoload_register(static function ($class) use ($component, $hname) {
+				if ($class === $hname && is_file(JPATH_SITE . '/components/' . $component . '/helpers/association.php')) require_once JPATH_SITE . '/components/' . $component . '/helpers/association.php';
+			}, true, true);
 
 			$assoc = class_exists($hname) && !empty($hname::$category_association);
 		}

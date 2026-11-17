@@ -20,8 +20,10 @@ use Joomla\Utilities\ArrayHelper;
 use Joomla\Database\DatabaseInterface;
 use Joomla\CMS\Mail\MailerFactoryInterface;
 
-jimport('legacy.controller.legacy');
-JLoader::register('FlexicontentControllerItems', JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'controllers'.DS.'items.php');  // we use JPATH_BASE since controller exists in frontend too
+// Lazy class loading (was JLoader::register): loaded only if/when used.
+spl_autoload_register(static function ($class) {
+	if ($class === 'FlexicontentControllerItems' && is_file($f = JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'controllers'.DS.'items.php')) require_once $f;
+}, true, true);
 
 #[AllowDynamicProperties] //php8.2 compatibility
 
@@ -844,7 +846,10 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			$vote_value = max(1, (int) round(array_sum($char_votes) / count($char_votes)));
 			$rating_percent = (int) round(100 * $vote_value / $resolution);
 
-			JLoader::register('FlexicontentControllerReviews', JPATH_BASE . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'reviews.php');
+			// Lazy class loading (was JLoader::register): loaded only if/when used.
+			spl_autoload_register(static function ($class) {
+				if ($class === 'FlexicontentControllerReviews' && is_file($f = JPATH_BASE . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'reviews.php')) require_once $f;
+			}, true, true);
 
 			try
 			{
@@ -874,7 +879,10 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 			if (!(int) $field->parameters->get('enable_extra_votes', 0))
 			{
-				JLoader::register('FlexicontentControllerReviews', JPATH_BASE . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'reviews.php');
+				// Lazy class loading (was JLoader::register): loaded only if/when used.
+				spl_autoload_register(static function ($class) {
+					if ($class === 'FlexicontentControllerReviews' && is_file($f = JPATH_BASE . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'reviews.php')) require_once $f;
+				}, true, true);
 
 				$this->input->set('user_rating', $vote_value);
 				$this->input->set('cid', $content_id);
@@ -1950,7 +1958,10 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 	 */
 	public function ajaxvote()
 	{
-		JLoader::register('FlexicontentControllerReviews', JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'controllers'.DS.'reviews.php');
+		// Lazy class loading (was JLoader::register): loaded only if/when used.
+		spl_autoload_register(static function ($class) {
+			if ($class === 'FlexicontentControllerReviews' && is_file($f = JPATH_BASE.DS.'components'.DS.'com_flexicontent'.DS.'controllers'.DS.'reviews.php')) require_once $f;
+		}, true, true);
 
 		$rman = new FlexicontentControllerReviews();
 		$rman->ajaxvote();
@@ -1972,7 +1983,10 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		$cid  = (int) $cid[0];
 
 		// Check if tag exists (id exists or name exists)
-		JLoader::register("FlexicontentModelTag", JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'tag.php');
+		// Lazy class loading (was JLoader::register): loaded only if/when used.
+		spl_autoload_register(static function ($class) {
+			if ($class === 'FlexicontentModelTag' && is_file($f = JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'tag.php')) require_once $f;
+		}, true, true);
 		$model = new FlexicontentModelTag();
 		$model->setId($cid);
 		$tag = $model->getTag($name);
@@ -2045,7 +2059,6 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 	public function download()
 	{
 		// Import and Initialize some joomla API variables
-		jimport('joomla.filesystem.file');
 
 		$app   = \Joomla\CMS\Factory::getApplication();
 		$db    = \Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class);
@@ -3791,7 +3804,6 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 	{
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 
-		jimport('joomla.filesystem.file');
 		$all_files = array();
 
 		foreach ($nodes as $node)

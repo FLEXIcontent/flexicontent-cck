@@ -15,7 +15,6 @@ defined('_JEXEC') or die('Restricted access');
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
-jimport('joomla.form.field');  // \Joomla\CMS\Form\FormField
 
 /**
  * Renders star pickers for the ratings of the voting characteristics of a review (composite voting), stored as percentages (JSON)

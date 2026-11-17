@@ -17,7 +17,6 @@ use Joomla\Registry\Registry;
 use Joomla\CMS\Language\LanguageHelper;
 
 // Component Helper
-jimport('cms.component.helper');
 
 //include constants file
 require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
@@ -432,7 +431,10 @@ class FlexicontentHelperRoute
 		global $globalcats;
 		if ($globalcats === null)
 		{
-			JLoader::register('plgSystemFlexisystem', JPATH_ROOT . '/plugins/system/flexisystem/flexisystem.php');
+			// Lazy class loading (was JLoader::register): loaded only if/when used.
+			spl_autoload_register(static function ($class) {
+				if ($class === 'plgSystemFlexisystem' && is_file($f = JPATH_ROOT . '/plugins/system/flexisystem/flexisystem.php')) require_once $f;
+			}, true, true);
 			plgSystemFlexisystem::getCategoriesTree();
 		}
 		$_catid = (int) $catid;
@@ -622,7 +624,10 @@ class FlexicontentHelperRoute
 		global $globalcats;
 		if ($globalcats === null)
 		{
-			JLoader::register('plgSystemFlexisystem', JPATH_ROOT . '/plugins/system/flexisystem/flexisystem.php');
+			// Lazy class loading (was JLoader::register): loaded only if/when used.
+			spl_autoload_register(static function ($class) {
+				if ($class === 'plgSystemFlexisystem' && is_file($f = JPATH_ROOT . '/plugins/system/flexisystem/flexisystem.php')) require_once $f;
+			}, true, true);
 			plgSystemFlexisystem::getCategoriesTree();
 		}
 		$_catid = (int) $catid;

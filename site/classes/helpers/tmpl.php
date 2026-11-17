@@ -58,10 +58,6 @@ class flexicontent_tmpl
 		static $initialized;
 		if ($initialized===null)
 		{
-			jimport('joomla.filesystem.path' );
-			jimport('joomla.filesystem.folder');
-			jimport('joomla.filesystem.file');
-			jimport('joomla.form.form');
 			$initialized = 1;
 		}
 		
@@ -267,8 +263,6 @@ class flexicontent_tmpl
 	
 	static function checkCompileLess($tmpls, $force, $checked_layouts=array())
 	{
-		jimport('joomla.filesystem.path' );
-		jimport('joomla.filesystem.file');
 		
 		$templates_path = Path::clean(JPATH_SITE.DS.'components/com_flexicontent/templates/');
 		
@@ -290,7 +284,6 @@ class flexicontent_tmpl
 	
 	static function checkXmlModified($tmpls, $checked_layouts=array())
 	{
-		jimport('joomla.filesystem.file');
 		
 		$checked_tmpls = array();
 		
@@ -480,7 +473,6 @@ class flexicontent_tmpl
 	
 	static function getThemes($tmpldir='')
 	{
-		jimport('joomla.filesystem.folder');
 		$tmpldir = $tmpldir ? $tmpldir : JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates';
 		$themes = \Joomla\Filesystem\Folder::folders($tmpldir);  // Get specific template folder
 

@@ -11,8 +11,6 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-jimport('cms.component.helper');
-jimport('cms.plugin.helper');
 
 
 
@@ -50,7 +48,6 @@ if ($print_logging_info && $format === 'html')
 {
 	$start_microtime = microtime(true);
 	global $fc_jprof;
-	jimport('joomla.profiler.profiler');
 	$fc_jprof = new \Joomla\CMS\Profiler\Profiler();
 	$fc_jprof->mark('START: FLEXIcontent component');
 }

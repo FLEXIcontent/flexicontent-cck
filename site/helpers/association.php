@@ -15,7 +15,10 @@ use Joomla\CMS\Language\LanguageHelper;
 use Joomla\CMS\Language\Multilanguage;
 use Joomla\Component\Categories\Administrator\Helper\CategoryAssociationHelper as J4_CategoryAssociationHelper;
 
-JLoader::register('FlexicontentHelperRoute', JPATH_SITE . '/components/com_flexicontent/helpers/route.php');
+// Lazy class loading (was JLoader::register): loaded only if/when used.
+spl_autoload_register(static function ($class) {
+	if ($class === 'FlexicontentHelperRoute' && is_file($f = JPATH_SITE . '/components/com_flexicontent/helpers/route.php')) require_once $f;
+}, true, true);
 \Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 
 
@@ -24,7 +27,10 @@ JLoader::register('FlexicontentHelperRoute', JPATH_SITE . '/components/com_flexi
  */
 if (!FLEXI_J40GE)
 {
-	JLoader::register('CategoryHelperAssociation', JPATH_ADMINISTRATOR . '/components/com_categories/helpers/association.php');
+	// Lazy class loading (was JLoader::register): loaded only if/when used.
+	spl_autoload_register(static function ($class) {
+		if ($class === 'CategoryHelperAssociation' && is_file($f = JPATH_ADMINISTRATOR . '/components/com_categories/helpers/association.php')) require_once $f;
+	}, true, true);
 
 	class CategoryAssociationHelper extends CategoryHelperAssociation {}
 }

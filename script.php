@@ -22,7 +22,6 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 // Joomla version variables
 if (!defined('FLEXI_J16GE') || !defined('FLEXI_J30GE'))
 {
-	jimport('cms.version.version');
 	$jversion = new \Joomla\CMS\Version;
 }
 if (!defined('FLEXI_J16GE'))   define('FLEXI_J16GE', version_compare( $jversion->getShortVersion(), '1.6.0', 'ge' ) );

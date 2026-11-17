@@ -14,7 +14,13 @@ defined('_JEXEC') or die;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-JLoader::register('FlexicontentController', JPATH_BASE . DS . 'components' . DS . 'com_flexicontent' . DS . 'controller.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FlexicontentController' => JPATH_BASE . DS . 'components' . DS . 'com_flexicontent' . DS . 'controller.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 require_once('traitbase.php');
 
 #[AllowDynamicProperties] //php8.2 compatibility
@@ -171,7 +177,6 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 			if (!empty($this->exitLogTexts))
 			{
 				$log_filename = 'filemanager_upload_' . ($user->id) . '.php';
-				jimport('joomla.log.log');
 				\Joomla\CMS\Log\Log::addLogger(
 					array(
 						'text_file' => $log_filename,  // Sets the target log file

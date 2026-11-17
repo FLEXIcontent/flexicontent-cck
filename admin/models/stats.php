@@ -11,7 +11,6 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-jimport('legacy.model.legacy');
 
 /**
  * FLEXIcontent Component stats Model

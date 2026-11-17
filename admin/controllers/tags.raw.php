@@ -14,7 +14,10 @@ defined('_JEXEC') or die;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-JLoader::register('FlexicontentControllerBaseAdmin', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php');
+// Lazy class loading (was JLoader::register): loaded only if/when used.
+spl_autoload_register(static function ($class) {
+	if ($class === 'FlexicontentControllerBaseAdmin' && is_file($f = JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'controllers' . DS . 'base' . DS . 'baseadmin.php')) require_once $f;
+}, true, true);
 
 // Manually import models in case used by frontend, then models will not be autoloaded correctly via getModel('name')
 require_once JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'tag.php';
@@ -125,7 +128,10 @@ class FlexicontentControllerTags extends FlexicontentControllerBaseAdmin
 		$cid  = (int) $cid[0];
 
 		// Check if tag exists (id exists or name exists)
-		JLoader::register("FlexicontentModelTag", JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'tag.php');
+		// Lazy class loading (was JLoader::register): loaded only if/when used.
+		spl_autoload_register(static function ($class) {
+			if ($class === 'FlexicontentModelTag' && is_file($f = JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'tag.php')) require_once $f;
+		}, true, true);
 		$model = new FlexicontentModelTag;
 		$model->setId($cid);
 		$tag = $model->getTag($name);
@@ -287,7 +293,6 @@ class FlexicontentControllerTags extends FlexicontentControllerBaseAdmin
 		$records_cnt      = $this->input->getInt('records_cnt', 0);        // Counter of items indexed so far, this is given via HTTP request
 
 		$log_filename = $session->get($indexer . '_log_filename', null, 'flexicontent');
-		jimport('joomla.log.log');
 		\Joomla\CMS\Log\Log::addLogger(
 			array(
 				'text_file' => $log_filename,  // Sets the target log file

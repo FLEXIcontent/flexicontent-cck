@@ -14,7 +14,6 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-jimport('legacy.view.legacy');
 
 /**
  * HTML View class for backend record screens (Base)

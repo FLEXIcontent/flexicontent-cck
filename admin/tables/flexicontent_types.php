@@ -11,7 +11,6 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-jimport('joomla.access.rules');
 use Joomla\String\StringHelper;
 require_once('flexicontent_basetable.php');
 

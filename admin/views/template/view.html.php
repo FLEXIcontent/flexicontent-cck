@@ -11,7 +11,6 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-jimport('legacy.view.legacy');
 use Joomla\String\StringHelper;
 use Joomla\Database\DatabaseInterface;
 use Joomla\CMS\Toolbar\ToolbarFactoryInterface;

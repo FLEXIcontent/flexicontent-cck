@@ -21,9 +21,6 @@ defined('_JEXEC') or die('Restricted access');
 //adding inline help
 if (FLEXI_J40GE) \Joomla\CMS\Toolbar\ToolbarHelper::inlinehelp();
 
-jimport('joomla.filesystem.folder');
-jimport('joomla.filesystem.file');
-jimport('joomla.filesystem.path');
 
 if ( !$this->layout->name ) die('Template folder does not exist');
 

@@ -18,8 +18,6 @@ defined('_JEXEC') or die('Restricted access');
  * @subpackage	Table
  * @since		1.0
  */
-jimport('joomla.database.tablenested');
-jimport('joomla.access.rules');
 use Joomla\String\StringHelper;
 require_once('flexicontent_basetablenested.php');
 

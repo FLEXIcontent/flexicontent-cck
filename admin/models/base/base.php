@@ -15,7 +15,6 @@ use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Table\Table;
 
-jimport('legacy.model.admin');
 require_once('traitbase.php');
 
 #[AllowDynamicProperties] //php8.2 compatibility
@@ -1010,7 +1009,10 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 		if (isset($options['params_fset']) && isset($options['layout_type']))
 		{
 			// Merge Layout parameters into parameters of the record
-			JLoader::register('flexicontent_tmpl', JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'tmpl.php');
+			// Lazy class loading (was JLoader::register): loaded only if/when used.
+			spl_autoload_register(static function ($class) {
+				if ($class === 'flexicontent_tmpl' && is_file($f = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'tmpl.php')) require_once $f;
+			}, true, true);
 			$layout_data = flexicontent_tmpl::mergeLayoutParams($item, $data, $options);
 
 			// Unset layout data since these we handled above

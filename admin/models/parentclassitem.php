@@ -17,7 +17,13 @@ use Joomla\CMS\Table\Table;
 
 require_once('base/base.php');
 
-JLoader::register('FlexicontentHelperNotificationMail', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/notificationmail.php');
+// Lazy class loading (was JLoader::register): loaded only if/when actually used.
+spl_autoload_register(static function ($class) {
+	$map = array(
+		'FlexicontentHelperNotificationMail' => JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/notificationmail.php',
+	);
+	if (isset($map[$class]) && is_file($map[$class])) require_once $map[$class];
+}, true, true);
 
 /**
  * FLEXIcontent Component (Common) Item Model (FrontEnd / BackEnd)

@@ -11,7 +11,6 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-jimport('legacy.model.legacy');
 
 /**
  * FLEXIcontent Component Templates Model
@@ -88,7 +87,6 @@ class FlexicontentModelTemplates extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 	 */
 	function duplicate($source, $dest)
 	{
-		jimport('joomla.filesystem.folder');
 
 		$path 	= JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS;
 		$dest	= $dest ? flexicontent_upload::sanitizedir($path, $dest) : '';
@@ -110,7 +108,6 @@ class FlexicontentModelTemplates extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 	 */
 	function delete($dir)
 	{
-		jimport('joomla.filesystem.folder');
 
 		$path 	= JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS;
 

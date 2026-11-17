@@ -18,7 +18,6 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-jimport('legacy.view.legacy');
 
 /**
  * View class for the FLEXIcontent field screen

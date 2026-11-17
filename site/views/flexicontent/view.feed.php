@@ -19,7 +19,6 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 use Joomla\Database\DatabaseInterface;
-jimport('legacy.view.legacy');
 
 /**
  * HTML View class for the FLEXIcontent View (RSS)

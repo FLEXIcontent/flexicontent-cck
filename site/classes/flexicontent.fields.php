@@ -3072,7 +3072,6 @@ class FlexicontentFields
 		 */
 		/*
 		$pdfparser_path = $cparams->get('pdfparser_path', 'components/com_flexicontent/librairies/pdfparser');
-		jimport('joomla.filesystem.path');
 		$pdfparser_path = \Joomla\Filesystem\Path::clean($pdfparser_path);
 
 		if (!$pdfparser_path)
@@ -3135,7 +3134,6 @@ class FlexicontentFields
 			return false;
 		}*/
 
-		jimport('joomla.filesystem.file');
 		$segmenter_path = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'THSplitLib'.DS.'segment.php';
 
 		if (!file_exists($segmenter_path))

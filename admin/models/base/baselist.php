@@ -15,7 +15,6 @@ use Joomla\CMS\Factory;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 
-jimport('legacy.model.list');
 require_once('traitbase.php');
 require_once('traitlegacylist.php');
 

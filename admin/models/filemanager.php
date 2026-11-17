@@ -11,9 +11,6 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-jimport('joomla.filesystem.file');
-jimport('joomla.filesystem.folder');
-jimport('joomla.filesystem.path');
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Table\Table;
@@ -2096,8 +2093,6 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 
 		if ( !count( $cid ) ) return false;
 
-		jimport('joomla.filesystem.path');
-		jimport('joomla.filesystem.file');
 
 		// This is already done by controller task / caller but redo
 		$cid = ArrayHelper::toInteger($cid);
@@ -2683,7 +2678,6 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			return;
 		}
 
-		jimport('joomla.log.log');
 		\Joomla\CMS\Log\Log::addLogger(
 			array(
 				'text_file' => $logger->filename,  // Sets the target log file

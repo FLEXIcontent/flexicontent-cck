@@ -14,7 +14,6 @@ defined('_JEXEC') or die('Restricted access');
 use Joomla\Registry\Registry;
 use Joomla\Utilities\ArrayHelper;
 
-jimport('legacy.model.admin');
 
 if (FLEXI_J40GE)
 {

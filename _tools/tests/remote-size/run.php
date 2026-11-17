@@ -107,7 +107,10 @@ namespace {
     }
     // Keep imports and the complete controller class. Only Joomla's include/bootstrap preamble is replaced.
     $source = file_get_contents(sourcePath('admin/controllers/filemanager.php'));
-    $imports = substr($source, strpos($source, 'use Joomla\\CMS\\Factory;'), strpos($source, 'JLoader::register') - strpos($source, 'use Joomla\\CMS\\Factory;'));
+    $usePos = strpos($source, 'use Joomla\\CMS\\Factory;');
+    $classPos = strpos($source, 'class FlexicontentControllerFilemanager ');
+    preg_match_all('/^use\s+[^;]+;\s*$/m', substr($source, $usePos, $classPos - $usePos), $importMatches);
+    $imports = implode("\n", $importMatches[0]) . "\n";
     eval($imports . substr($source, strpos($source, 'class FlexicontentControllerFilemanager ')));
     class TestController extends FlexicontentControllerFilemanager {
         public function __construct($input) { $this->input = $input; $this->model = new TestModel(); }
