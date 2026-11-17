@@ -1,3 +1,8 @@
+/**
+ * State selector of records (flexicontent_html::statebutton): the frontend buttons and the backend managers.
+ *
+ * Plain JavaScript: it works the same with or without jQuery on the page.
+ */
 
 var fc_state_imgs = {
 	'1': 'accept.png',
@@ -23,7 +28,7 @@ var fc_state_icons = {
 var fc_statehandler = function(options)
 {
 	// Joomla Base URL
-	var base_url = !!jbase_url_fc ? jbase_url_fc : '';
+	var base_url = typeof jbase_url_fc !== 'undefined' && !!jbase_url_fc ? jbase_url_fc : '';
 
 	this.options = {
 		id: '',
@@ -34,36 +39,126 @@ var fc_statehandler = function(options)
 		font_icons: true,
 		refresh_on_success: false
 	};
-	
+
 	if( typeof options != 'undefined') for (var key in options)
 	{
 		this.options[key] = options[key];  //window.console.log(key, options[key]);
 	};
 
 
+	var text = function(key)
+	{
+		var J = window.Joomla, T = J && (J.Text || J.JText);
+		return T && T._ ? T._(key) : key;
+	};
+
+	// Value of a data-* attribute that holds JSON (as jQuery's .data() did)
+	var jsonData = function(el, name)
+	{
+		var value = el.getAttribute('data-' + name);
+		try {
+			return value ? JSON.parse(value) : null;
+		} catch(e) {
+			return null;
+		}
+	};
+
+	// As jQuery's :hidden
+	var isHidden = function(el)
+	{
+		return !(el.offsetWidth || el.offsetHeight || el.getClientRects().length);
+	};
+
+	// As jQuery's .slideToggle(): animate height, padding and margin from / to zero
+	var slideToggle = function(el, ms)
+	{
+		if (el.fcSlide)
+		{
+			el.fcSlide.finish();
+		}
+
+		var show = isHidden(el);
+
+		if (show)
+		{
+			el.style.display = 'block';
+		}
+
+		if (!el.animate)
+		{
+			el.style.display = show ? 'block' : 'none';
+			return;
+		}
+
+		var cs   = window.getComputedStyle(el);
+		var full = {height: el.offsetHeight + 'px', paddingTop: cs.paddingTop, paddingBottom: cs.paddingBottom, marginTop: cs.marginTop, marginBottom: cs.marginBottom};
+		var none = {height: '0px', paddingTop: '0px', paddingBottom: '0px', marginTop: '0px', marginBottom: '0px'};
+
+		el.style.overflow = 'hidden';
+		el.fcSlide = el.animate(show ? [none, full] : [full, none], {duration: ms, easing: 'ease-in-out'});
+		el.fcSlide.onfinish = function()
+		{
+			el.fcSlide = null;
+			el.style.overflow = '';
+			if (!show)
+			{
+				el.style.display = 'none';
+			}
+		};
+	};
+
+
 	// *** AJAX request to set new item state
 	this.setState = function(state, id)
 	{
-		var row = jQuery('#row' + id);
-		var toggler = row.closest('.statetoggler');
+		var row = document.getElementById('row' + id);
+		var toggler = row ? row.closest('.statetoggler') : null;
 		var options = this.options;
 
-		row.empty().addClass('ajax-loader');
+		if (row)
+		{
+			row.innerHTML = '';
+			row.classList.add('ajax-loader');
+		}
 
-		jQuery.ajax({
-			url: this.options.script_url + '&task=' + this.options.task + '&id=' + id + '&state=' + state + (this.options.token ? '&' + this.options.token + '=1' : ''),
-			dataType: 'json',
-			data: {
-				lang: (typeof fc_sef_lang != 'undefined' ? fc_sef_lang : '')
-			},
-			success: function( data )
+		var url = this.options.script_url + '&task=' + this.options.task + '&id=' + id + '&state=' + state + (this.options.token ? '&' + this.options.token + '=1' : '')
+			+ '&lang=' + encodeURIComponent(typeof fc_sef_lang != 'undefined' ? fc_sef_lang : '');
+
+		fetch(url, {
+			credentials: 'same-origin',
+			headers: {'Accept': 'application/json, text/javascript, */*; q=0.01', 'X-Requested-With': 'XMLHttpRequest'}
+		})
+			.then(function(r)
 			{
-				row.removeClass('ajax-loader').html(data.html);
-				toggler.attr('data-original-title', data.title);
+				return r.text().then(function(body)
+				{
+					if (!r.ok)
+					{
+						throw {status: r.status, text: r.statusText};
+					}
+					try {
+						return JSON.parse(body);
+					} catch(e) {
+						throw {status: r.status, text: String(e)};
+					}
+				});
+			})
+			.then(function(data)
+			{
+				if (row)
+				{
+					row.classList.remove('ajax-loader');
+					if (typeof data.html != 'undefined') row.innerHTML = data.html;
+				}
+				if (toggler && typeof data.title != 'undefined')
+				{
+					toggler.setAttribute('data-original-title', data.title);
+				}
 
 				if (typeof data.error != 'undefined')
 				{
-					jQuery('#system-message-container').html(data.error);
+					var msgs = document.getElementById('system-message-container');
+					if (msgs) msgs.innerHTML = data.error;
 				}
 				else
 				{
@@ -73,11 +168,11 @@ var fc_statehandler = function(options)
 						window.location.reload(false);  //window.location.replace(window.location.href);
 					}
 				}
-			},
-			error: function (xhr, ajaxOptions, thrownError) {
-				alert('Error status: ' + xhr.status + ' , Error text: ' + thrownError);
-			}
-		});
+			})
+			.catch(function(err)
+			{
+				alert('Error status: ' + ((err && err.status) || 0) + ' , Error text: ' + ((err && (err.text || err.message)) || ''));
+			});
 	};
 
 
@@ -86,8 +181,9 @@ var fc_statehandler = function(options)
 	{
 		if (!fc_statehandler_singleton) return;
 
-		var toggler = jQuery(el);
-		var ops = toggler.find('.options');
+		var toggler = el;
+		var ops = toggler.querySelector('.options');
+		if (!ops) return;
 
 		var fc_state_titles = typeof _fc_state_titles != 'undefined' ? _fc_state_titles : {
 			 '1': 'FLEXI_PUBLISH_THIS_ITEM',
@@ -100,30 +196,30 @@ var fc_statehandler = function(options)
 			 'u': 'FLEXI_UNKNOWN'
 		};
 
-		if ( ops.is(':hidden') )
+		if (isHidden(ops))
 		{
 			this.active_selector_box = null;
 
-			toggler.addClass('active');
-			toggler.css('z-index', 100); // should 3 or more
+			toggler.classList.add('active');
+			toggler.style.zIndex = 100; // should 3 or more
 
-			if (ops.children().length == 0)
+			if (ops.children.length == 0)
 			{
-				var html = ''; //'<div>' + Joomla.JText._('FLEXI_ACTION') + '</div>';
+				var html = ''; //'<div>' + text('FLEXI_ACTION') + '</div>';
 
-				var iid    = ops.data('id');
-				var states = ops.data('st');
-				var titles = ops.data('tt');
+				var iid    = ops.getAttribute('data-id');
+				var states = jsonData(ops, 'st') || [];
+				var titles = jsonData(ops, 'tt');
 
-				jQuery(states).each(function(index, item)
+				states.forEach(function(item)
 				{
-					var action_text = (titles && !! titles[item.i]) ? (Joomla.JText._('FLEXI_SET_STATE_TO') + ' ' + titles[item.i]) : Joomla.JText._(fc_state_titles[item.i]);
+					var action_text = (titles && !! titles[item.i]) ? (text('FLEXI_SET_STATE_TO') + ' ' + titles[item.i]) : text(fc_state_titles[item.i]);
 
 					html += fc_statehandler_singleton.options.font_icons
 						? '<span onclick="fc_statehandler_singleton.setState(\'' + item.i + '\', \'' + iid + '\')"><span class="icon-' + fc_state_icons[item.i] + '"></span>' + action_text + '</span>'
 						: '<span onclick="fc_statehandler_singleton.setState(\'' + item.i + '\', \'' + iid + '\')"><img src="' + fc_statehandler_singleton.options.img_path + fc_state_imgs[item.i] + '"/>' + action_text + '</span>';
 				});
-				jQuery(html).appendTo(ops);
+				ops.insertAdjacentHTML('beforeend', html);
 			}
 			this.active_selector_box = toggler;
 		}
@@ -132,22 +228,23 @@ var fc_statehandler = function(options)
 			this.active_selector_box = null;
 
 			setTimeout(function(){
-				toggler.removeClass('active');
-				toggler.css('z-index', '');
+				toggler.classList.remove('active');
+				toggler.style.zIndex = '';
 			}, 200);
 		}
-		ops.slideToggle(200);
+		slideToggle(ops, 200);
 	};
 
 
 	// *** Detect click outside container and close any open selector
 	this.closeSelector = function(event)
 	{
-		if (!this.active_selector_box) return;  // no open container
-		if (this.active_selector_box.is(event.target)) return;  // if target of the click is the container
-		if (this.active_selector_box.has(event.target).length !== 0) return; // if target of click is a descendant of the container
+		var box = this.active_selector_box;
 
-		this.active_selector_box.click();
+		if (!box) return;  // no open container
+		if (box === event.target || box.contains(event.target)) return;  // if target of the click is the container or a descendant of it
+
+		box.click();
 		this.active_selector_box = null;
 	};
 };
@@ -155,7 +252,7 @@ var fc_statehandler = function(options)
 
 var fc_statehandler_singleton = false;
 
-jQuery(document).mouseup(function(event)
+document.addEventListener('mouseup', function(event)
 {
 	if (fc_statehandler_singleton) fc_statehandler_singleton.closeSelector(event);
 });
