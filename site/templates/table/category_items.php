@@ -10,7 +10,8 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 // first define the template name
 $tmpl = $this->tmpl;
-$user = \Joomla\CMS\Factory::getUser();
+$app  = \Joomla\CMS\Factory::getApplication();
+$user = $app->getIdentity();
 
 $btn_class = 'btn';
 $tooltip_class = 'hasTooltip';
