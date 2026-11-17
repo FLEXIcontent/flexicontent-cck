@@ -1296,6 +1296,13 @@ class FlexicontentModelItems extends FCModelAdminList
 				break;
 		}
 
+		// LIMIT may use a different sort plan from the old SQL_CALC_FOUND_ROWS query.
+		// Keep tied values on stable pages instead of repeating items across offsets.
+		if ($orderby && strpos($orderby, 'a.id') === false)
+		{
+			$orderby .= ', a.id ASC';
+		}
+
 		return $orderby;
 	}
 
