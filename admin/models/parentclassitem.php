@@ -5633,6 +5633,26 @@ class ParentClassItem extends FCModelAdmin
 
 
 	/**
+	 * Update FLEXIcontent's copy after Joomla has changed the featured flag.
+	 * Joomla owns the content and frontpage tables in this event path.
+	 */
+	public function mirrorFeatured($pks, $value)
+	{
+		$pks = array_filter(ArrayHelper::toInteger((array) $pks), static function ($id) { return $id > 0; });
+
+		if ($pks)
+		{
+			$this->_db->setQuery('UPDATE #__flexicontent_items_tmp SET featured = ' . (int) $value
+				. ' WHERE id IN (' . implode(',', $pks) . ')')->execute();
+			$this->cleanCache(null, 0);
+			$this->cleanCache(null, 1);
+		}
+
+		return true;
+	}
+
+
+	/**
 	 * Method to toggle the featured setting of articles.
 	 *
 	 * @param	array	The ids of the items to toggle.
