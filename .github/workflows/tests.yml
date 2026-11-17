@@ -26,8 +26,8 @@ jobs:
           coverage: none
 
       - name: Syntax check (php -l)
-        # Compile-time deprecations are printed to stdout so that they reach lint.txt. Those in FLEXIcontent's own
-        # code fail the job; those in the bundled third-party libraries (site/librairies) are listed only.
+        # Compile-time deprecations are printed to stdout so that they reach lint.txt, and fail the job
+        # (the bundled third-party libraries in site/librairies included).
         run: |
           set -o pipefail
           find . -name '*.php' -type f -print0 \
@@ -36,8 +36,8 @@ jobs:
           if grep -qE 'Parse error|Fatal error' lint.txt; then
             exit 1
           fi
-          if grep -E 'Deprecated' lint.txt | grep -v '/site/librairies/'; then
-            echo "::error::PHP deprecations in FLEXIcontent code (listed above)"
+          if grep -E 'Deprecated' lint.txt; then
+            echo "::error::PHP deprecations (listed above)"
             exit 1
           fi
 
