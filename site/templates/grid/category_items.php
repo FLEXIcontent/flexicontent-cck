@@ -59,15 +59,14 @@ if (!function_exists('fc_cat_make_picture_from_thumbs')) {
 
 		$size_order  = ['small', 'medium', 'large'];
 
-		// The srcset width descriptors must be the real widths of the thumbnails: use the image field's configured
-		// widths, passed in $urls['widths'] (fixed guesses of 480/768/1200 made phones pick the 120px small thumbnail)
-		$size_widths = (!empty($urls['widths']) ? $urls['widths'] : array()) + ['small' => 120, 'medium' => 400, 'large' => 800];
-
 		// Construire le chemin filesystem depuis un chemin relatif ou une URL absolue
 		// JPATH_SITE = /home/.../realestate/demoj4
 		// URL FC     = /realestate/demoj4/images/... → strip du base_path avant concat
 		$_url_to_fs = function($url) {
 			if (!$url) return '';
+			$host = parse_url($url, PHP_URL_HOST);
+			if ($host && strcasecmp($host, (string) parse_url(\Joomla\CMS\Uri\Uri::root(), PHP_URL_HOST)) !== 0) return '';
+
 			$decoded   = rawurldecode($url);
 			$base_path = \Joomla\CMS\Uri\Uri::root(true); // ex: /realestate/demoj4
 			// Extraire le path de l'URL (gère http:// et chemins relatifs)
@@ -94,7 +93,6 @@ if (!function_exists('fc_cat_make_picture_from_thumbs')) {
 
 		$srcset_img  = [];
 		$srcset_webp = [];
-		$sizes_parts = [];
 		$fallback_url = $main_url;
 
 		$target_idx = array_search($size, $size_order);
@@ -103,11 +101,15 @@ if (!function_exists('fc_cat_make_picture_from_thumbs')) {
 		if ($is_single) {
 			$dw = $display_w ?: 1200;
 			$srcset_img[]  = fc_cat_srcset_url($main_url) . ' ' . $dw . 'w';
-			$sizes_parts[] = $dw . 'px';
 			if ($use_webp && !$_src_is_webp && $main_exists) {
 				$webp_fs  = preg_replace('/\.(jpe?g|png|gif)$/i', '.webp', $main_fs);
 				$webp_url = preg_replace('/\.(jpe?g|png|gif)$/i', '.webp', $main_url);
-				if (file_exists($webp_fs)) $srcset_webp[] = fc_cat_srcset_url($webp_url) . ' ' . $dw . 'w';
+				if (file_exists($webp_fs)) {
+					$webp_dimensions = @getimagesize($webp_fs);
+					if ($webp_dimensions && $webp_dimensions[0]) {
+						$srcset_webp[(int) $webp_dimensions[0]] = fc_cat_srcset_url($webp_url) . ' ' . (int) $webp_dimensions[0] . 'w';
+					}
+				}
 			}
 		} else {
 			foreach ($size_order as $idx => $s) {
@@ -115,28 +117,39 @@ if (!function_exists('fc_cat_make_picture_from_thumbs')) {
 				$s_url = ($idx === $target_idx) ? $main_url : ($urls[$s] ?? '');
 				if (!$s_url) continue;
 				$s_fs  = $_url_to_fs($s_url);
-				$w     = ($idx === $target_idx) ? ($display_w ?: $size_widths[$s]) : $size_widths[$s];
+				if (!$s_fs) continue;
+				$dimensions = @getimagesize($s_fs);
+				if (!$dimensions || !$dimensions[0]) continue;
+				$w = (int) $dimensions[0];
 
 				// On inclut même si file_exists échoue (CDN, chemin non standard) pour le cas principal
 				$s_exists = ($idx === $target_idx) ? true : file_exists($s_fs);
 				if (!$s_exists) continue;
 
 				if ($idx < $target_idx) {
-					$srcset_img[]  = fc_cat_srcset_url($s_url) . ' ' . $w . 'w';
-					$sizes_parts[] = '(max-width:' . $w . 'px) ' . $w . 'px';
+					$srcset_img[$w] = fc_cat_srcset_url($s_url) . ' ' . $w . 'w';
 					if ($use_webp && !$_src_is_webp) {
 						$webp_fs  = preg_replace('/\.(jpe?g|png|gif)$/i', '.webp', $s_fs);
 						$webp_url = preg_replace('/\.(jpe?g|png|gif)$/i', '.webp', $s_url);
-						if (file_exists($webp_fs)) $srcset_webp[] = fc_cat_srcset_url($webp_url) . ' ' . $w . 'w';
+						if (file_exists($webp_fs)) {
+							$webp_dimensions = @getimagesize($webp_fs);
+							if ($webp_dimensions && $webp_dimensions[0]) {
+								$srcset_webp[(int) $webp_dimensions[0]] = fc_cat_srcset_url($webp_url) . ' ' . (int) $webp_dimensions[0] . 'w';
+							}
+						}
 					}
 				} else {
 					$fallback_url  = $main_url;
-					$srcset_img[]  = fc_cat_srcset_url($main_url) . ' ' . $w . 'w';
-					$sizes_parts[] = $w . 'px';
+					$srcset_img[$w] = fc_cat_srcset_url($main_url) . ' ' . $w . 'w';
 					if ($use_webp && !$_src_is_webp && $main_exists) {
 						$webp_fs  = preg_replace('/\.(jpe?g|png|gif)$/i', '.webp', $main_fs);
 						$webp_url = preg_replace('/\.(jpe?g|png|gif)$/i', '.webp', $main_url);
-						if (file_exists($webp_fs)) $srcset_webp[] = fc_cat_srcset_url($webp_url) . ' ' . $w . 'w';
+						if (file_exists($webp_fs)) {
+							$webp_dimensions = @getimagesize($webp_fs);
+							if ($webp_dimensions && $webp_dimensions[0]) {
+								$srcset_webp[(int) $webp_dimensions[0]] = fc_cat_srcset_url($webp_url) . ' ' . (int) $webp_dimensions[0] . 'w';
+							}
+						}
 					}
 				}
 			}
@@ -145,10 +158,10 @@ if (!function_exists('fc_cat_make_picture_from_thumbs')) {
 		// Toujours générer au moins l'img de base
 		if (empty($srcset_img)) {
 			$srcset_img[]  = fc_cat_srcset_url($main_url) . ' ' . ($display_w ?: 800) . 'w';
-			$sizes_parts[] = ($display_w ?: 800) . 'px';
 		}
 
-		$sizes_str  = implode(', ', $sizes_parts);
+		// Lazy images can use their actual CSS layout width; eager images need a safe fallback.
+		$sizes_str = strpos($lazy_loading, 'loading="lazy"') !== false ? 'auto, 100vw' : '100vw';
 		$has_srcset = count($srcset_img) > 1;
 
 		$img_tag = '<img style="' . $style . '" src="' . fc_cat_srcset_url($fallback_url) . '" alt="' . $alt . '"' . $size_attrs
@@ -158,7 +171,7 @@ if (!function_exists('fc_cat_make_picture_from_thumbs')) {
 
 		$html = '<picture>';
 		if (!empty($srcset_webp)) {
-			$html .= '<source type="image/webp"' . ($has_srcset ? ' sizes="' . $sizes_str . '"' : '') . ' srcset="' . implode(', ', $srcset_webp) . '">';
+			$html .= '<source type="image/webp"' . (count($srcset_webp) > 1 ? ' sizes="' . $sizes_str . '"' : '') . ' srcset="' . implode(', ', $srcset_webp) . '">';
 		}
 		$html .= $img_tag . '</picture>';
 		return $html;
@@ -693,8 +706,6 @@ if ($leadnum) :
 						'medium'   => $img_field->thumbs_src['medium'][0]   ?? '',
 						'large'    => $img_field->thumbs_src['large'][0]    ?? '',
 						'original' => $img_field->thumbs_src['original'][0] ?? '',
-						// Real thumbnail widths, for the srcset width descriptors
-						'widths'   => !empty($img_field->parameters) ? [ 'small' => (int) $img_field->parameters->get('w_s', 120), 'medium' => (int) $img_field->parameters->get('w_m', 400), 'large' => (int) $img_field->parameters->get('w_l', 800) ] : [],
 					];
 				}
 				unset($_lead_original_src, $_raw);
@@ -1262,8 +1273,6 @@ if ($count > $leadnum) :
 						'medium'   => $img_field->thumbs_src['medium'][0]   ?? '',
 						'large'    => $img_field->thumbs_src['large'][0]    ?? '',
 						'original' => $img_field->thumbs_src['original'][0] ?? '',
-						// Real thumbnail widths, for the srcset width descriptors
-						'widths'   => !empty($img_field->parameters) ? [ 'small' => (int) $img_field->parameters->get('w_s', 120), 'medium' => (int) $img_field->parameters->get('w_m', 400), 'large' => (int) $img_field->parameters->get('w_l', 800) ] : [],
 					];
 				}
 				unset($_intro_original_src, $_raw);
