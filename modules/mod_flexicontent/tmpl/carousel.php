@@ -290,7 +290,9 @@ $jcookie  = \Joomla\CMS\Factory::getApplication()->input->cookie;
 flexicontent_html::loadFramework('fcxSlide');
 flexicontent_html::loadFramework('mCSB');
 flexicontent_html::loadFramework('imagesLoaded');
+flexicontent_html::loadFramework('jQuery');
 flexicontent_html::loadFramework('flexi_tmpl_common');
+flexicontent_html::loadFramework('flexi-lib');
 
 
 /**

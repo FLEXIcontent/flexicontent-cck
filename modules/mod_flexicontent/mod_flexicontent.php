@@ -235,9 +235,17 @@ $mod_fc_run_times['category_data_retrieval'] = microtime(1) - $mod_fc_run_times[
 $mod_fc_run_times['rendering_template'] = microtime(1);
 
 // Load needed JS libs & CSS styles
-flexicontent_html::loadFramework('jQuery');
-flexicontent_html::loadFramework('flexi_tmpl_common');
-flexicontent_html::loadFramework('flexi-lib');
+// The module's own layouts load the libraries they use (tabs and accordion, carousel, swiper, favourites list),
+// so a plain list adds no FLEXIcontent JavaScript. A layout overridden in the site template may rely on the
+// libraries that were always added here before, so they are still added for overrides.
+$layout_file = \Joomla\CMS\Helper\ModuleHelper::getLayoutPath('mod_flexicontent', $layout);
+
+if (strpos(\Joomla\Filesystem\Path::clean($layout_file), \Joomla\Filesystem\Path::clean(JPATH_THEMES)) === 0)
+{
+	flexicontent_html::loadFramework('jQuery');
+	flexicontent_html::loadFramework('flexi_tmpl_common');
+	flexicontent_html::loadFramework('flexi-lib');
+}
 
 // Add tooltips
 if ($add_tooltips)

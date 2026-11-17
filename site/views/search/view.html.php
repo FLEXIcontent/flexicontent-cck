@@ -142,16 +142,12 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 		// NOTE: if zero search areas are posted then search model will search in ALL areas (including flexicontent)
 		$document->addScriptDeclaration("
 			var _toggle_content_area = function() {
-				let count = 0;
-				let contenttypes_filter_list = jQuery('#contenttypes_filter_list');
-				if (contenttypes_filter_list.length) {
-					contenttypes_filter_list.find('input').each(function() {
-						if (jQuery(this).prop('checked')) count++;
-					});
-					console.log(count);
-					!count
-						? jQuery('#area_flexicontent').attr('disabled', 'disabled')
-						: jQuery('#area_flexicontent').removeAttr('disabled');
+				var contenttypes_filter_list = document.getElementById('contenttypes_filter_list');
+				var area = document.getElementById('area_flexicontent');
+				if (contenttypes_filter_list && area) {
+					contenttypes_filter_list.querySelectorAll('input:checked').length
+						? area.removeAttribute('disabled')
+						: area.setAttribute('disabled', 'disabled');
 				}
 			}
 		");

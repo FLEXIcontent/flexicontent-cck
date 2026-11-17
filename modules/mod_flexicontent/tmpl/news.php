@@ -201,6 +201,10 @@ if (($item_placement_feat === 1 && $item_columns_feat > 1) || ($item_placement_s
  */
 if ($item_placement_feat === 2 || $item_placement_std === 2 || $item_placement_feat === 3 || $item_placement_std === 3)
 {
+	// The active tab / slide is remembered in a cookie (flexi-lib.js), the tab events are handled with jQuery
+	flexicontent_html::loadFramework('jQuery');
+	flexicontent_html::loadFramework('flexi-lib');
+
 	$cookie_name = 'fc_modules_data';
 	$fcMods_conf = $jcookie->get($cookie_name, '{}', 'string');
 
@@ -1177,7 +1181,7 @@ if ($std_builder_layout_num)
 	{
 		$margin_left_right_feat = intval($margin_left_right_feat);
 		$js = "
-		jQuery(document).ready(function(){
+		document.addEventListener('DOMContentLoaded', function(){
 			var container_feat = document.querySelector('div#mod_fcitems_box_featured_".$uniq_ord_id."');
 			var msnry;
 			// initialize Masonry after all images have loaded
@@ -1198,7 +1202,7 @@ if ($std_builder_layout_num)
 	{
 		$margin_left_right = intval($margin_left_right);
 		$js = "
-		jQuery(document).ready(function(){
+		document.addEventListener('DOMContentLoaded', function(){
 			var container = document.querySelector('div#mod_fcitems_box_standard_".$uniq_ord_id."');
 			var msnry;
 			// initialize Masonry after all images have loaded

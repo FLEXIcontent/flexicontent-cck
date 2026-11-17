@@ -1466,6 +1466,7 @@ class flexicontent_html
 		static $load_frameworks = null;
 		static $load_jquery = null;
 		static $jquery_for_plugins = null;
+		static $jquery_free_front = null;
 
 		if (!isset($load_frameworks[$framework]))
 		{
@@ -1479,6 +1480,9 @@ class flexicontent_html
 				// jQuery plugins without a jQuery-free alternative still need jQuery in Choices.js mode,
 				// so it is loaded on the pages that use them (unless jQuery loading is turned off)
 				$jquery_for_plugins = (int) $cparams->get('loadfw_jquery', 1) === 1 || !$app->isClient('site');
+
+				// Choices.js mode without jQuery for plugins: the site front has no jQuery at all
+				$jquery_free_front = $app->isClient('site') && $useChoicesJs && !$jquery_for_plugins;
 			}
 
 			$loadfw_param   = 'loadfw_' . strtolower(str_replace('-', '_', $framework));
@@ -1516,6 +1520,8 @@ class flexicontent_html
 				break;
 
 			case 'bootstrap-toggle':
+				// A jQuery plugin: on a jQuery-free front the checkboxes stay plain checkboxes
+				if ($jquery_free_front) break;
 				if ($jquery_for_plugins) flexicontent_html::loadJQuery();
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/bootstrap-toggle';
@@ -1599,6 +1605,7 @@ class flexicontent_html
 			case 'mousewheel':
 				// mousewheel is a jQuery plugin; in choices mode (jQuery-free front) it is not loaded.
 				if (!$load_jquery) break;
+				flexicontent_html::loadJQuery(1, 0, 0);  // a jQuery plugin: load jQuery itself (core only, without jQuery UI)
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/mousewheel';
 				$document->addScript($framework_path.'/jquery.mousewheel.min.js');
@@ -1973,6 +1980,7 @@ class flexicontent_html
 			case 'fancybox':
 				// fancybox is a jQuery plugin; in choices mode (jQuery-free front) it is not loaded.
 				if (!$load_jquery) break;
+				flexicontent_html::loadJQuery(1, 0, 0);  // a jQuery plugin: load jQuery itself (core only, without jQuery UI)
 
 				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js');
 

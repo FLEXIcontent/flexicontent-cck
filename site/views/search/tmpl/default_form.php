@@ -65,7 +65,7 @@ $js ="";
 if ($autodisplayadvoptions)
 {
 	$js .= '
-	jQuery(document).ready(function() {
+	if (window.jQuery) jQuery(document).ready(function() {
 	  var status = {
 	    "true": "open",
 	    "false": "close"
@@ -241,7 +241,7 @@ if ($disp_slide_filter)
 								$checked_attr  = $use_advsearch_options ? 'checked=checked' : '';
 								$checked_class = $use_advsearch_options ? 'btn-primary' : '';
 								echo '
-								<input type="checkbox" id="use_advsearch_options" name="use_advsearch_options" value="1" '.$checked_attr.' onclick="jQuery(this).next().toggleClass(\'btn-primary\');" style="display:none"/>
+								<input type="checkbox" id="use_advsearch_options" name="use_advsearch_options" value="1" '.$checked_attr.' onclick="this.nextElementSibling.classList.toggle(\'btn-primary\');" style="display:none"/>
 								<label id="use_advsearch_options_lbl" class="btn '.$checked_class.' hasTooltip" for="use_advsearch_options" title="'.Text::_('FLEXI_SEARCH_ADVANCED_OPTIONS').'">
 									<span class="icon-list"></span>' . Text::_('FLEXI_SEARCH_ADVANCED') . '
 								</label>
@@ -581,7 +581,7 @@ if ($disp_slide_filter)
 $filter_autosubmit = 0;
 if ($filter_autosubmit) {
 	$js = '
-		jQuery(document).ready(function() {
+		if (window.jQuery) jQuery(document).ready(function() {
 			var form=document.getElementById("'.$form_id.'");
 			if (!!form)
 			{
@@ -594,7 +594,7 @@ if ($filter_autosubmit) {
 	';
 } else {
 	$js = '
-		jQuery(document).ready(function() {
+		if (window.jQuery) jQuery(document).ready(function() {
 			var form=document.getElementById("'.$form_id.'");
 			if (!!form)
 			{
@@ -609,7 +609,7 @@ if ($filter_autosubmit) {
 
 // Notify select library fields to clear their values when reseting the form
 $js .= '
-		jQuery(document).ready(function() {
+		if (window.jQuery) jQuery(document).ready(function() {
 			jQuery("#'.$form_id.' .fc_button.button_reset").on("click", function() {
 				if (window.fc_use_choicesjs) {
 					jQuery("#'.$form_id.'_filter_box .use_select2_lib").each(function() {
@@ -632,7 +632,7 @@ $document->addScriptDeclaration($js);
 if ($disp_slide_filter)
 {
 	Factory::getDocument()->addScriptDeclaration("
-	(function($) {
+	if (window.jQuery) (function($) {
 		$(document).ready(function ()
 		{
 			$('#" . $ff_slider_tagid ."').on('shown', function ()

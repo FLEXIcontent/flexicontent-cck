@@ -38,6 +38,11 @@ if ($params->get('display_favlist', 0))
 	$forced_itemid = $params->get('forced_itemid');
 	$alt_add = \Joomla\CMS\Language\Text::_( 'FLEXI_FAVOURE' );
 	$alt_delete = \Joomla\CMS\Language\Text::_( 'FLEXI_REMOVE_FAVOURITE' );
+
+	// The list is kept in a cookie (flexi-lib.js) and managed with jQuery
+	flexicontent_html::loadFramework('jQuery');
+	flexicontent_html::loadFramework('flexi-lib');
+
 	$js = '
 		if (typeof jQuery != "undefined")
 		{
