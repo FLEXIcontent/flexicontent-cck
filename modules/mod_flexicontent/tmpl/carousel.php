@@ -283,7 +283,7 @@ if ($item_columns_feat  >= 1 && $item_column_mode_feat == 1 ){
 $item_placement_std = -1;
 $item_columns_std   = 1;
 
-$document = \Joomla\CMS\Factory::getDocument();
+$document = Factory::getApplication()->getDocument();
 $jcookie  = \Joomla\CMS\Factory::getApplication()->input->cookie;
 
 // Add Carousel JS
@@ -314,8 +314,10 @@ if ($transition)
 
 	if (file_exists($file_path))
 	{
-		$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.effect.min.js');
-		$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.effect-'.$transition.'.min.js');
+		// Register jQuery-UI core as a WA asset so effects render after it (dedupes the legacy load by URI).
+		$wa->registerAndUseScript('flexicontent.jquery-ui', 'components/com_flexicontent/librairies/jquery/js/jquery-ui-1.13.1/jquery-ui.min.js', [], [], ['jquery']);
+		$wa->registerAndUseScript('flexicontent.jquery-ui.effect', 'components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.effect.min.js', [], [], ['flexicontent.jquery-ui']);
+		$wa->registerAndUseScript('flexicontent.jquery-ui.effect.'.$transition, 'components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.effect-'.$transition.'.min.js', [], [], ['flexicontent.jquery-ui.effect']);
 	}
 }
 
@@ -757,7 +759,7 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 					? \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endTabSet')
 					: \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endAccordion');
 
-				\Joomla\CMS\Factory::getDocument()->addScriptDeclaration("
+				$wa->addInlineScript("
 				(function($) {
 					$(document).ready(function ()
 					{

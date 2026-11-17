@@ -26,7 +26,7 @@ use Joomla\CMS\Uri\Uri;
 use Joomla\String\StringHelper;
 use Joomla\Utilities\ArrayHelper;
 $app = Factory::getApplication();
-$doc = Factory::getDocument();
+$doc = $app->getDocument();
 $tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 $r = 0;  // Row counter of the odd / even row classes
 $isJ4 =defined('FLEXI_J40GE') && FLEXI_J40GE;
@@ -498,7 +498,7 @@ if (!empty($js)) {
 
 		$output[] = '
 			<input type="'.($search_autocomplete==2 ? 'hidden' : 'text').'"
-				data-txt_ac_lang="' . Factory::getLanguage()->getTag() . '"'.$rich_attrs.$ac_width_attr.'
+				data-txt_ac_lang="' . $app->getLanguage()->getTag() . '"'.$rich_attrs.$ac_width_attr.'
 id="mod_search_searchword-'.$module->id.'" class="'.($isJ4 ? 'form-control ' : '').$text_search_class.'"
 				placeholder="'.$search_inner_prompt.'" label="'.$search_inner_prompt.'"  name="q" '.($search_autocomplete==2 ? '' : ' size="'.$search_inner_width.'" maxlength="'.$maxchars.'"').' value="'.htmlspecialchars($searchword, ENT_QUOTES, 'UTF-8').'" aria-label="'.$search_inner_prompt.'"  />';
 

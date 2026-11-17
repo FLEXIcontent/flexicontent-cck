@@ -17,6 +17,7 @@
  **/
 
 
+use Joomla\CMS\Cache\CacheControllerFactoryInterface;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Uri\Uri;
 use Joomla\Filesystem\Path;
@@ -314,7 +315,8 @@ class modFlexigooglemapHelper
 		if ($defaultMarker_url && $params->get('mapapi', 'googlemap') !== 'googlemap')
 		{
 			if (FLEXI_CACHE) {
-				$cache = \Joomla\CMS\Factory::getCache('com_flexicontent');
+				$cache = \Joomla\CMS\Factory::getContainer()->get(CacheControllerFactoryInterface::class)
+					->createCacheController('callback', ['defaultgroup' => 'com_flexicontent']);
 				$cache->setCaching(1);
 				$cache->setLifeTime(FLEXI_CACHE_TIME);
 				list($markerWidth, $markerHeight) = $cache->get('getimagesize', array($defaultMarker_path ?: $defaultMarker_url));

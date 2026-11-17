@@ -15,6 +15,7 @@ defined('_JEXEC') or die('Restricted access');
 
 use Joomla\String\StringHelper;
 use Joomla\Database\DatabaseInterface;
+use Joomla\CMS\Cache\CacheControllerFactoryInterface;
 
 class modFlexicontentHelper
 {
@@ -1162,7 +1163,8 @@ return $html;
 			if (FLEXI_CACHE)
 			{
 				// add the category tree to categories cache
-				$catscache 	= \Joomla\CMS\Factory::getCache('com_flexicontent_cats');
+				$catscache 	= \Joomla\CMS\Factory::getContainer()->get(CacheControllerFactoryInterface::class)
+					->createCacheController('callback', ['defaultgroup' => 'com_flexicontent_cats']);
 				$catscache->setCaching(1); 		//force cache
 				$catscache->setLifeTime(84600); //set expiry to one day
 				$globalcats = $catscache->get(
@@ -3056,8 +3058,8 @@ return $html;
 		$location   = '/modules/mod_flexicontent/builder/';
 		$css_file   = 'css/' . $layout_name . '_' . $module->id . '.css';
 
-		\Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
-		\Joomla\CMS\HTML\HTMLHelper::_('fclayoutbuilder.createCss',
+		require_once JPATH_SITE . '/components/com_flexicontent/helpers/html/fclayoutbuilder.php';
+		\JHtmlFclayoutbuilder::createCss(
 			$module,
 			$params,
 			$config = (object) array(
@@ -3072,8 +3074,10 @@ return $html;
 		 */
 		flexicontent_html::loadframework('grapesjs_view');
 
-		\Joomla\CMS\Factory::getApplication()->getDocument()->addStyleSheet(
-			\Joomla\CMS\Uri\Uri::base(true) . $location . $css_file,
+		$wa = \Joomla\CMS\Factory::getApplication()->getDocument()->getWebAssetManager();
+		$wa->registerAndUseStyle(
+			'mod_flexicontent.builder.' . $module->id,
+			ltrim($location . $css_file, '/'),
 			array('version' => $params->get($layout_name . '_hash'))
 		);
 	}

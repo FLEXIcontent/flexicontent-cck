@@ -18,8 +18,6 @@
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
 
-jimport('joomla.form.formfield');
-
 class JFormFieldIconlist extends \Joomla\CMS\Form\FormField
 {
 	protected $type = 'iconlist';

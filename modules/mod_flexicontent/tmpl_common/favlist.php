@@ -1,7 +1,7 @@
 <?php
 if ($params->get('display_favlist', 0))
 {
-	$document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/modules/mod_flexicontent/tmpl_common/js/favlist.js');
+	$wa->registerAndUseScript('mod_flexicontent.favlist', 'modules/mod_flexicontent/tmpl_common/js/favlist.js', [], [], ['jquery']);
 
 	echo '
 	<p class="news_favs_head">' . \Joomla\CMS\Language\Text::_('FLEXI_MOD_RECENTLY_ADDED_FAVOURITES') . '</p>
@@ -60,5 +60,5 @@ if ($params->get('display_favlist', 0))
 			});
 		}
   ';
-	$document->addScriptDeclaration($js);
+	$wa->addInlineScript($js);
 }
