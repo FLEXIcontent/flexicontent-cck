@@ -519,6 +519,41 @@ div table.adminform td {
   display: inline-block;
   box-sizing: content-box;
 }
+.fav-block .fcfavs-icon_box .fcfavs-toggle-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+  opacity: 0;
+}
+.fav-block .fcfavs-icon_box .fcfavs-toggle-input:focus-visible + * {
+  outline: 2px solid var(--fcfavs-color-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+.fav-block .fcfavs-icon_box .fcfavs-svg_icon {
+  width: 28px;
+  height: 28px;
+  vertical-align: middle;
+  fill: transparent;
+  stroke: #000;
+  stroke-width: 1;
+  stroke-linejoin: round;
+  transition: fill 0.15s, stroke 0.15s;
+}
+.fav-block .fcfavs-icon_box .fcfavs-svg_icon.fcfavs-heart-fill {
+  fill: #f44336;
+  stroke: #f44336;
+}
+.fav-block .fcfavs-icon_box .fcfavs-svg_icon.fcfavs-svg_login {
+  fill: #303c42;
+  stroke: #303c42;
+}
 .fav-block .fcfavs-icon_box [class^="fcfavs"],
 .fav-block .fcfavs-icon_box [class*=" fcfavs"] {
   font-size: 14px;
@@ -675,6 +710,11 @@ div table.adminform td {
   color: #880000;
   position: absolute;
   line-height: 100%;
+}
+@media (prefers-reduced-motion: reduce) {
+  .fav-block .fcfavs-icon_box .fcfavs-svg_icon {
+    transition: none;
+  }
 }
 /***********
  * JComments
