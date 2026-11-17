@@ -52,7 +52,7 @@ class flexicontent_db
 		// static variable (array) so that we load overrides only once per language
 		static $lang_overrides_site;
 		static $lang_overrides_admin;
-		$oLang = $oLang ?: \Joomla\CMS\Factory::getLanguage()->getTag();
+		$oLang = $oLang ?: \Joomla\CMS\Factory::getApplication()->getLanguage()->getTag();
 
 		// Check if we have loaded the override file already, (aka we load it only once)
 		if ($oLang && (!isset($lang_overrides_site[$oLang]) || !isset($lang_overrides_site[$oLang])))

@@ -136,7 +136,7 @@ abstract class JHtmlFcuploader
 		\Joomla\CMS\Language\Text::script("FLEXI_PLEASE_WAIT", true);
 		\Joomla\CMS\Language\Text::script("FLEXI_FILE_PROPERTIES", true);
 		\Joomla\CMS\Language\Text::script("FLEXI_APPLYING_DOT", true);
-		\Joomla\CMS\Factory::getDocument()->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/plupload-extend.js', array('version' => FLEXI_VHASH));
+		\Joomla\CMS\Factory::getApplication()->getDocument()->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/plupload-extend.js', array('version' => FLEXI_VHASH));
 
 		// Add plupload Queue handling functions and initialize a plupload Queue
 		$js = '
@@ -187,7 +187,7 @@ abstract class JHtmlFcuploader
 		});
 		';
 
-		\Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+		\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration($js);
 	}
 
 

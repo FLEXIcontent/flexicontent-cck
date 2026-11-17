@@ -28,7 +28,7 @@ $jinput   = $app->input;
 $config   = Factory::getApplication()->getConfig();
 $user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 $session  = Factory::getApplication()->getSession();
-$document = Factory::getDocument();
+$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 $cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 $ctrl     = 'filemanager.';
 $hlpname  = 'fcfilemanager';
@@ -58,13 +58,13 @@ $onclick  = $this->escape($function);
 if (!empty($editor))
 {
 	// This view is used also in com_menus. Load the xtd script only if the editor is set!
-	Factory::getDocument()->addScriptOptions('xtd-fcfiles', array('editor' => $editor));
+	\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptOptions('xtd-fcfiles', array('editor' => $editor));
 	$onclick = "jSelectFcfile";
 }
 
 if (version_compare(\Joomla\CMS\Version::MAJOR_VERSION, '4', 'ge'))
 {
-	$wa  = Factory::getDocument()->getWebAssetManager();
+	$wa  = \Joomla\CMS\Factory::getApplication()->getDocument()->getWebAssetManager();
 	$wa->registerAndUseScript('clipboard_js', Uri::base() . 'components/com_flexicontent/assets/js/clipboard_v2.0.11.min.js');
 }
 else
@@ -1675,8 +1675,8 @@ if ($js)
 					'.
 												($enable_multi_uploader ? '
 						<span class="' . $this->btn_sm_class . ' ' . $this->tooltip_class.'" onclick="jQuery(\'#fc-fileman-formbox-1\').toggle(); jQuery(\'#fc-fileman-formbox-2\').toggle(); setTimeout(function(){ '.$uploader_tag_id.'.autoResize(\''.$up_sfx_n.'\'); }, 100);"
-							id="single_multi_uploader" data-title="' . flexicontent_html::getToolTip('', 'FLEXI_TOGGLE_BASIC_UPLOADER_DESC', 1, 1) . '" style="float: ' . (Factory::getLanguage()->isRTL() ? 'left;' : 'right;') . '"
-						data-placement="'. (Factory::getLanguage()->isRTL() ? 'right' : 'left') . '">
+							id="single_multi_uploader" data-title="' . flexicontent_html::getToolTip('', 'FLEXI_TOGGLE_BASIC_UPLOADER_DESC', 1, 1) . '" style="float: ' . (\Joomla\CMS\Factory::getApplication()->getLanguage()->isRTL() ? 'left;' : 'right;') . '"
+						data-placement="'. (\Joomla\CMS\Factory::getApplication()->getLanguage()->isRTL() ? 'right' : 'left') . '">
 							'.Text::_( 'FLEXI_TOGGLE_BASIC_UPLOADER' ).'
 						</span>
 					' : '') . '
@@ -2484,7 +2484,7 @@ $jMedia_file_displayData['mediaTypeNames'] = array_values(array_intersect_key(
 
 
 <?php
-Factory::getDocument()->addScriptDeclaration('
+\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration('
 	function fc_edit_mmdata_modal_load( container )
 	{
 		if ( container.find("iframe").get(0).contentWindow.location.href.indexOf("view=mediadatas") != -1 )

@@ -478,7 +478,7 @@ class FlexicontentModelTags extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 		{
 			$lta = 'i';
 			//$where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . ' OR '.$lta.'.language="*" ) ';
-			$where .= ' AND (' . $lta . ' .language = ' . $db->Quote(\Joomla\CMS\Factory::getLanguage()->getTag()) . ' OR ' . $lta . '.language = ' . $db->Quote('*') . ')';
+			$where .= ' AND (' . $lta . ' .language = ' . $db->Quote(\Joomla\CMS\Factory::getApplication()->getLanguage()->getTag()) . ' OR ' . $lta . '.language = ' . $db->Quote('*') . ')';
 		}
 
 		// Get privilege to view non viewable items (upublished, archived, trashed, expired, scheduled).

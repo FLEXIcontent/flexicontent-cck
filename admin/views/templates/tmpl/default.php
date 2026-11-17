@@ -25,7 +25,7 @@ $commentimage = \Joomla\CMS\HTML\HTMLHelper::image ( 'administrator/components/c
 $loading_msg = flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_LOADING') .' ... '. \Joomla\CMS\Language\Text::_('FLEXI_PLEASE_WAIT'), 2);
 
 \Joomla\CMS\Language\Text::script("FLEXI_UPDATING_CONTENTS", true);
-\Joomla\CMS\Factory::getDocument()->addScriptDeclaration('
+\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration('
 	function fc_template_modal_close()
 	{
 		window.location.reload(false);
@@ -58,7 +58,7 @@ jQuery(document).ready(function() {
 	});
 });
 ";
-\Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration($js);
 
 $edit_layout = htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', true), ENT_QUOTES, 'UTF-8');
 $edit_icon         = '<span class="icon-edit"></span>';

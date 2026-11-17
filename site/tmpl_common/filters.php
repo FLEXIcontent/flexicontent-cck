@@ -6,7 +6,7 @@ use Joomla\CMS\Factory;
 $wa = Factory::getApplication()->getDocument()->getWebAssetManager();
 
 $app    = \Joomla\CMS\Factory::getApplication();
-$document = \Joomla\CMS\Factory::getDocument();
+$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 
 $show_search_go = $params->get('show_search_go', 1);
 $show_search_reset = $params->get('show_search_reset', 1);

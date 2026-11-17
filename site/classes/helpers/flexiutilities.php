@@ -74,7 +74,7 @@ class FLEXIUtilities
 		//$extension = $extension ? $extension : 'com_flexicontent';
 
 		// Get current UI language, because language file paths use LL-CC (language-country)
-		$language_tag = $language_tag ? $language_tag : \Joomla\CMS\Factory::getLanguage()->getTag();
+		$language_tag = $language_tag ? $language_tag : \Joomla\CMS\Factory::getApplication()->getLanguage()->getTag();
 
 		// We will use template folder as BASE of language files instead of joomla's language folder
 		// Since FLEXIcontent templates are meant to be user-editable it makes sense to place language files inside them
@@ -82,8 +82,8 @@ class FLEXIUtilities
 		$base_dir = $tmpldir.DS.$tmplname;
 
 		// Final use joomla's API to load our template's language files -- (load english template language file then override with current language file)
-		\Joomla\CMS\Factory::getLanguage()->load($extension, $base_dir, 'en-GB', $reload=true);        // Fallback to english language template file
-		\Joomla\CMS\Factory::getLanguage()->load($extension, $base_dir, $language_tag, $reload=true);  // User's current language template file
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load($extension, $base_dir, 'en-GB', $reload=true);        // Fallback to english language template file
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load($extension, $base_dir, $language_tag, $reload=true);  // User's current language template file
 
 		if ($print_logging_info) $fc_run_times['templates_parsing_ini'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 	}

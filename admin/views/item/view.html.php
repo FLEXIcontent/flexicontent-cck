@@ -81,12 +81,12 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 			// TODO: remove this need by moving common language string to different file ?
 
 			// Load english language file for 'com_content' component then override with current language file
-			\Joomla\CMS\Factory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR, 'en-GB', true);
-			\Joomla\CMS\Factory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR, null, true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_content', JPATH_ADMINISTRATOR, 'en-GB', true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_content', JPATH_ADMINISTRATOR, null, true);
 
 			// Load english language file for 'com_flexicontent' component then override with current language file
-			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
-			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 		}
 
 		/**
@@ -98,7 +98,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$app        = \Joomla\CMS\Factory::getApplication();
 		$jinput     = $app->input;
 		$dispatcher = JEventDispatcher::getInstance();
-		$document   = \Joomla\CMS\Factory::getDocument();
+		$document   = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$config     = \Joomla\CMS\Factory::getApplication()->getConfig();
 		$session    = \Joomla\CMS\Factory::getApplication()->getSession();
 		$user       = \Joomla\CMS\Factory::getApplication()->getIdentity();
@@ -342,11 +342,11 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		// Add css to document
 		if ($isAdmin)
 		{
-			!\Joomla\CMS\Factory::getLanguage()->isRtl()
+			!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH))
 				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend_rtl.css', array('version' => FLEXI_VHASH));
 		}
-		!\Joomla\CMS\Factory::getLanguage()->isRtl()
+		!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 			? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 			: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 
@@ -1020,7 +1020,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();	// get current user
 		$model    = $this->getModel();
 		$item     = $model->getItem(null, $check_view_access=false, $no_cache=false, $force_version=0);  // ZERO force_version means unversioned data
-		$document = \Joomla\CMS\Factory::getDocument();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 		$option   = $jinput->get('option', '', 'cmd');
 		$isAdmin  = $app->isClient('administrator');
@@ -2079,7 +2079,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 		$dispatcher = JEventDispatcher::getInstance();
 		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
-		$document = \Joomla\CMS\Factory::getDocument();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$menus = $app->getMenu();
 		$menu  = $menus->getActive();
 		$uri   = \Joomla\CMS\Uri\Uri::getInstance();
@@ -2156,7 +2156,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		if (!$params->get('disablecss', ''))
 		{
 			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
-			!\Joomla\CMS\Factory::getLanguage()->isRtl()
+			!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 		}

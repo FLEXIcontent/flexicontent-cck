@@ -1061,8 +1061,8 @@ class _FlexicontentSiteRouter
 						if (!$record_id)
 						{
 							// Make sure our language file has been loaded
-							Factory::getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', true);
-							Factory::getLanguage()->load('com_flexicontent', JPATH_SITE, null, true);
+							\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', true);
+							\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_SITE, null, true);
 
 							throw new Exception(Text::sprintf('FLEXI_REQUESTED_CONTENT_OR_VIEW_NOT_FOUND', $explicit_view), 404);
 						}
@@ -1109,7 +1109,7 @@ class _FlexicontentSiteRouter
 		$tbl = '#__categories', $alias_col = 'alias'
 	)
 	{
-		$language = !$language /*&& !$parent_id*/ ? Factory::getLanguage()->getTag() : $language;
+		$language = !$language /*&& !$parent_id*/ ? \Joomla\CMS\Factory::getApplication()->getLanguage()->getTag() : $language;
 
 		$db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query = $db->getQuery(true)
@@ -1206,8 +1206,8 @@ class _FlexicontentSiteRouter
 		if (count($records) > 1)
 		{
 			// Make sure our language file has been loaded
-			Factory::getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', true);
-			Factory::getLanguage()->load('com_flexicontent', JPATH_SITE, null, true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_SITE, null, true);
 
 			throw new Exception(Text::sprintf('FLEXI_DUPLICATE_ALIAS_FAILED_TO_FIND_UNIQUE_PAGE', ($tbl === '#__categories' ? 'category' : 'item'), $alias), 404);
 		}
@@ -1261,8 +1261,8 @@ class _FlexicontentSiteRouter
 
 						if ($real_alias && $real_alias !== $record_alias_from_url)
 						{
-							Factory::getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', true);
-							Factory::getLanguage()->load('com_flexicontent', JPATH_SITE, null, true);
+							\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', true);
+							\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_SITE, null, true);
 							throw new Exception(Text::sprintf('FLEXI_REQUESTED_CONTENT_OR_VIEW_NOT_FOUND', 'Item'), 404);
 						}
 					}
@@ -1454,8 +1454,8 @@ class _FlexicontentSiteRouter
 			if (!$record_id)
 			{
 				// Make sure our language file has been loaded
-				Factory::getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', true);
-				Factory::getLanguage()->load('com_flexicontent', JPATH_SITE, null, true);
+				\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', true);
+				\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_SITE, null, true);
 
 				throw new Exception(Text::sprintf('FLEXI_REQUESTED_CONTENT_OR_VIEW_NOT_FOUND', $expected_view), 404);
 			}

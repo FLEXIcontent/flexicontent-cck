@@ -76,8 +76,8 @@ class com_flexicontentInstallerScript
 		if (version_compare(PHP_VERSION, $PHP_VERSION_NEEDED, '<'))
 		{
 			// load english language file for 'com_flexicontent' component then override with current language file
-			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
-			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 
 			\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::sprintf('FLEXI_UPGRADE_PHP_VERSION_GE', $PHP_VERSION_NEEDED), 'warning');
 			return false;
@@ -272,7 +272,7 @@ class com_flexicontentInstallerScript
 		{
 			// The preflight language cache may still contain the previous package's strings.
 			$language_source = isset($parent) ? $parent->getParent()->getPath('source') : $this->parent->getPath('source');
-			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', $language_source . '/admin', 'en-GB', true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', $language_source . '/admin', 'en-GB', true);
 			\Joomla\CMS\Factory::getApplication()->enqueueMessage(
 				\Joomla\CMS\Language\Text::_('FLEXI_BASIC_AUTOCOMPLETE_REBUILD'), 'notice');
 

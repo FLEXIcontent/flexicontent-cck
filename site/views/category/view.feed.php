@@ -40,7 +40,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		// Initialize framework variables
 		$db       = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$app      = \Joomla\CMS\Factory::getApplication();
-		$document = \Joomla\CMS\Factory::getDocument();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 
 		// Get model
 		$model  = $this->getModel();

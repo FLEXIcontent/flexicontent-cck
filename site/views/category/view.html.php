@@ -54,7 +54,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		$format   = $jinput->get('format', 'html', 'cmd');
 		$print    = $jinput->get('print', '', 'cmd');
 
-		$document = \Joomla\CMS\Factory::getDocument();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 
 		// Check for Joomla issue with system plugins creating \Joomla\CMS\Document\Document in early events forcing it to be wrong type, when format as url suffix is enabled
 		if ($format && $document->getType() != strtolower($format))
@@ -185,7 +185,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		if (!$params->get('disablecss', ''))
 		{
 			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css', array('version' => FLEXI_VHASH));
-			!\Joomla\CMS\Factory::getLanguage()->isRtl()
+			!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl()
 				? $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x.css' : 'j3x.css'), array('version' => FLEXI_VHASH))
 				: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 		}

@@ -6,7 +6,7 @@ defined('_JEXEC') or die;
 $user       = \Joomla\CMS\Factory::getApplication()->getIdentity();
 $input      = \Joomla\CMS\Factory::getApplication()->input;
 $params     = \Joomla\CMS\Component\ComponentHelper::getParams('com_media');
-$lang       = \Joomla\CMS\Factory::getLanguage();
+$lang       = \Joomla\CMS\Factory::getApplication()->getLanguage();
 $onClick    = '';
 $fieldInput = $this->state->get('field.id');
 $isMoo      = $input->getInt('ismoo', 1);
@@ -40,7 +40,7 @@ if ($lang->isRtl())
 	\Joomla\CMS\HTML\HTMLHelper::_('stylesheet', 'media/popup-imagemanager_rtl.css', array('version' => 'auto', 'relative' => true));
 }
 
-\Joomla\CMS\Factory::getDocument()->addScriptOptions(
+\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptOptions(
 	'mediamanager', array(
 		'base'   => $params->get('image_path', 'images') . '/',
 		'asset'  => $asset,
@@ -49,7 +49,7 @@ if ($lang->isRtl())
 	)
 );
 
-\Joomla\CMS\Factory::getDocument()->addStyleDeclaration('
+\Joomla\CMS\Factory::getApplication()->getDocument()->addStyleDeclaration('
 	@media (min-width: 480px) {
 		#folderlist_chzn {
 			min-width: 320px;
@@ -130,7 +130,7 @@ if ($lang->isRtl())
 	}
 ');
 
-\Joomla\CMS\Factory::getDocument()->addScriptDeclaration(
+\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration(
 "
 	jQuery(document).ready(function($){
 		if (!!window.parent.fc_dialog_resize_now)

@@ -145,7 +145,7 @@ class FlexicontentHelperRoute
 		// Get 'current' language. This SITE Default language if we are in Backend, and Current UI language if we are in Frontend
 		$current_language = \Joomla\CMS\Factory::getApplication()->isClient('administrator')
 			? \Joomla\CMS\Component\ComponentHelper::getParams('com_languages')->get('site', 'en-GB')
-			: \Joomla\CMS\Factory::getLanguage()->getTag();
+			: \Joomla\CMS\Factory::getApplication()->getLanguage()->getTag();
 
 		// Get preference for default menu item
 		$params = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
@@ -199,7 +199,7 @@ class FlexicontentHelperRoute
 		// Get 'current' language. This SITE Default language if we are in Backend, and Current UI language if we are in Frontend
 		$current_language = \Joomla\CMS\Factory::getApplication()->isClient('administrator')
 			? \Joomla\CMS\Component\ComponentHelper::getParams('com_languages')->get('site', 'en-GB')
-			: \Joomla\CMS\Factory::getLanguage()->getTag();
+			: \Joomla\CMS\Factory::getApplication()->getLanguage()->getTag();
 
 		// Get preference for default menu item
 		$params = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
@@ -237,7 +237,7 @@ class FlexicontentHelperRoute
 		// Get 'current' language. This SITE Default language if we are in Backend, and Current UI language if we are in Frontend
 		$current_language = \Joomla\CMS\Factory::getApplication()->isClient('administrator')
 			? \Joomla\CMS\Component\ComponentHelper::getParams('com_languages')->get('site', 'en-GB')
-			: \Joomla\CMS\Factory::getLanguage()->getTag();
+			: \Joomla\CMS\Factory::getApplication()->getLanguage()->getTag();
 
 		// Get preference for default menu item
 		$params = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
@@ -416,7 +416,7 @@ class FlexicontentHelperRoute
 			// Get 'current' language. This SITE Default language if we are in Backend, and Current UI language if we are in Frontend
 			$current_language = \Joomla\CMS\Factory::getApplication()->isClient('administrator')
 				? \Joomla\CMS\Component\ComponentHelper::getParams('com_languages')->get('site', 'en-GB')
-				: \Joomla\CMS\Factory::getLanguage()->getTag();
+				: \Joomla\CMS\Factory::getApplication()->getLanguage()->getTag();
 		}
 
 		if ($use_language === null)
@@ -610,7 +610,7 @@ class FlexicontentHelperRoute
 			// Get 'current' language. This SITE Default language if we are in Backend, and Current UI language if we are in Frontend
 			$current_language = \Joomla\CMS\Factory::getApplication()->isClient('administrator')
 				? \Joomla\CMS\Component\ComponentHelper::getParams('com_languages')->get('site', 'en-GB')
-				: \Joomla\CMS\Factory::getLanguage()->getTag();
+				: \Joomla\CMS\Factory::getApplication()->getLanguage()->getTag();
 		}
 
 		if ($use_language === null)
@@ -897,7 +897,7 @@ class FlexicontentHelperRoute
 			// Get 'current' language. This SITE Default language if we are in Backend, and Current UI language if we are in Frontend
 			$current_language = \Joomla\CMS\Factory::getApplication()->isClient('administrator')
 				? \Joomla\CMS\Component\ComponentHelper::getParams('com_languages')->get('site', 'en-GB')
-				: \Joomla\CMS\Factory::getLanguage()->getTag();
+				: \Joomla\CMS\Factory::getApplication()->getLanguage()->getTag();
 		}
 
 		if ($use_language === null)
@@ -1046,7 +1046,7 @@ class FlexicontentHelperRoute
 			// Get 'current' language. This SITE Default language if we are in Backend, and Current UI language if we are in Frontend
 			$current_language = \Joomla\CMS\Factory::getApplication()->isClient('administrator')
 				? \Joomla\CMS\Component\ComponentHelper::getParams('com_languages')->get('site', 'en-GB')
-				: \Joomla\CMS\Factory::getLanguage()->getTag();
+				: \Joomla\CMS\Factory::getApplication()->getLanguage()->getTag();
 		}
 
 		if ($use_language === null)
@@ -1162,7 +1162,7 @@ class FlexicontentHelperRoute
 		{
 			$current_language = \Joomla\CMS\Factory::getApplication()->isClient('administrator')
 				? \Joomla\CMS\Component\ComponentHelper::getParams('com_languages')->get('site', 'en-GB')
-				: \Joomla\CMS\Factory::getLanguage()->getTag();
+				: \Joomla\CMS\Factory::getApplication()->getLanguage()->getTag();
 		}
 
 
@@ -1319,7 +1319,7 @@ class FlexicontentHelperRoute
 		{
 			$current_language = \Joomla\CMS\Factory::getApplication()->isClient('administrator')
 				? \Joomla\CMS\Component\ComponentHelper::getParams('com_languages')->get('site', 'en-GB')
-				: \Joomla\CMS\Factory::getLanguage()->getTag();
+				: \Joomla\CMS\Factory::getApplication()->getLanguage()->getTag();
 		}
 
 
@@ -1505,7 +1505,7 @@ class FlexicontentHelperRoute
 		{
 			$current_language = \Joomla\CMS\Factory::getApplication()->isClient('administrator')
 				? \Joomla\CMS\Component\ComponentHelper::getParams('com_languages')->get('site', 'en-GB')
-				: \Joomla\CMS\Factory::getLanguage()->getTag();
+				: \Joomla\CMS\Factory::getApplication()->getLanguage()->getTag();
 		}
 
 
@@ -1669,7 +1669,7 @@ class FlexicontentHelperRoute
 		{
 			$current_language = \Joomla\CMS\Factory::getApplication()->isClient('administrator')
 				? \Joomla\CMS\Component\ComponentHelper::getParams('com_languages')->get('site', 'en-GB')
-				: \Joomla\CMS\Factory::getLanguage()->getTag();
+				: \Joomla\CMS\Factory::getApplication()->getLanguage()->getTag();
 		}
 
 
@@ -1878,7 +1878,7 @@ class FlexicontentHelperRoute
 		// Get 'current' language. This SITE Default language if we are in Backend, and Current UI language if we are in Frontend
 		$current_language = \Joomla\CMS\Factory::getApplication()->isClient('administrator')
 			? \Joomla\CMS\Component\ComponentHelper::getParams('com_languages')->get('site', 'en-GB')
-			: \Joomla\CMS\Factory::getLanguage()->getTag();
+			: \Joomla\CMS\Factory::getApplication()->getLanguage()->getTag();
 
 		$menus = self::getSiteMenu();   // this will work in J1.5 backend too !!!
 		$menu = $menus->getItem($menuitem_id);  // Try to load the menu item

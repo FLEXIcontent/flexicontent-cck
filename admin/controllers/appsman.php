@@ -245,7 +245,7 @@ class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 		$app      = \Joomla\CMS\Factory::getApplication();
 		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
-		$document = \Joomla\CMS\Factory::getDocument();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$has_zlib = version_compare(PHP_VERSION, '5.4.0', '>=');
 
 		$this->input->set('view', $this->record_name);
@@ -541,7 +541,7 @@ class FlexicontentControllerAppsman extends FlexicontentControllerBaseAdmin
 		$app      = \Joomla\CMS\Factory::getApplication();
 		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
-		$document = \Joomla\CMS\Factory::getDocument();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 
 		$this->input->set('view', $this->record_name);
 		$this->input->set('hidemainmenu', 1);

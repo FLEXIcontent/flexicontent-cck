@@ -23,7 +23,7 @@ $is_fc_component = 1;
 
 $cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 $app     = \Joomla\CMS\Factory::getApplication();
-$document= \Joomla\CMS\Factory::getDocument();
+$document= \Joomla\CMS\Factory::getApplication()->getDocument();
 $jinput  = $app->input;
 $format  = $jinput->get('format', 'html', 'cmd');
 
@@ -85,24 +85,24 @@ if (!FLEXI_ONDEMAND)
  */
 
 
-if ( \Joomla\CMS\Factory::getLanguage()->getDefault() != 'en-GB' )
+if ( \Joomla\CMS\Factory::getApplication()->getLanguage()->getDefault() != 'en-GB' )
 {
 	// If site default language is not english then load english language file for 'com_flexicontent' component, and the override (forcing a reload) with current language file
 	// We make sure that 'english' file has been loaded, because we need it as fallback for language strings that do not exist in current language
-	\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', $force_reload = false, $load_default = true);
-	\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_SITE, null, $force_reload = true, $load_default = true);
+	\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', $force_reload = false, $load_default = true);
+	\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_SITE, null, $force_reload = true, $load_default = true);
 }
 
 else
 	// No force loading needed, save some time, and do not force language file reload
-	\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_SITE);
+	\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_SITE);
 
 // Load language overrides, just before executing the component (DONE manually for J1.5)
 /*if (!FLEXI_J16GE)
 {
 	$overrideDir = JPATH_SITE . '/languages/overrides/';
-	\Joomla\CMS\Factory::getLanguage()->load('override', $overrideDir, 'en-GB', $force_reload = true, $load_default = true);
-	\Joomla\CMS\Factory::getLanguage()->load('override', $overrideDir, null, $force_reload = true, $load_default = true);
+	\Joomla\CMS\Factory::getApplication()->getLanguage()->load('override', $overrideDir, 'en-GB', $force_reload = true, $load_default = true);
+	\Joomla\CMS\Factory::getApplication()->getLanguage()->load('override', $overrideDir, null, $force_reload = true, $load_default = true);
 }*/
 
 
@@ -322,7 +322,7 @@ if ($format === 'html')
 
 	// Load icomoon CSS
 	if ( $cparams->get('loadfw_icomoon_css', 2)==1 )
-		\Joomla\CMS\Factory::getDocument()->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/media/jui/css/icomoon.css');
+		\Joomla\CMS\Factory::getApplication()->getDocument()->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/media/jui/css/icomoon.css');
 }
 
 

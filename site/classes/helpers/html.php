@@ -4926,7 +4926,7 @@ class flexicontent_html
 			// URL globals + SEF language for fcvote.js (standalone: loaded without flexi_js_common / flexi_tmpl_common)
 			$sef_lang_code = '';
 			$site_languages = \Joomla\CMS\Language\LanguageHelper::getLanguages('lang_code', false);
-			$lang_code = \Joomla\CMS\Factory::getLanguage()->getTag();
+			$lang_code = \Joomla\CMS\Factory::getApplication()->getLanguage()->getTag();
 			if ($site_languages && isset($site_languages->{$lang_code}))
 			{
 				$sef_lang_code = $site_languages->{$lang_code}->sef;

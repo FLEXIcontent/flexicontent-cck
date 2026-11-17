@@ -587,7 +587,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 	protected function preprocessForm(\Joomla\CMS\Form\Form $form, $data, $plugins_group = null)
 	{
 
-		$lang = \Joomla\CMS\Factory::getLanguage();
+		$lang = \Joomla\CMS\Factory::getApplication()->getLanguage();
 		$component = $this->getState($this->getName().'.component', '');
 		$section   = $this->getState($this->getName().'.section', '');
 		$extension = \Joomla\CMS\Factory::getApplication()->input->get('extension', null);

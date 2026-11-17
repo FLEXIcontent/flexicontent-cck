@@ -316,7 +316,7 @@ else
 		});
 	";
 
-	\Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+	\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration($js);
 	//\Joomla\CMS\Factory::getDocument()->addStyleDeclaration("");
 }
 

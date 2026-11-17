@@ -23,7 +23,7 @@ $is_fc_component = 1;
 
 $cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 $app     = \Joomla\CMS\Factory::getApplication();
-$document= \Joomla\CMS\Factory::getDocument();
+$document= \Joomla\CMS\Factory::getApplication()->getDocument();
 $jinput  = $app->input;
 $format  = $jinput->get('format', 'html', 'cmd');
 
@@ -118,26 +118,26 @@ if (!FLEXI_ONDEMAND)
  */
 
 // Load language file of 'com_content' component
-\Joomla\CMS\Factory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR);
+\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_content', JPATH_ADMINISTRATOR);
 
-if ( \Joomla\CMS\Factory::getLanguage()->getDefault() != 'en-GB' )
+if ( \Joomla\CMS\Factory::getApplication()->getLanguage()->getDefault() != 'en-GB' )
 {
 	// If site default language is not english then load english language file for 'com_flexicontent' component, and the override (forcing a reload) with current language file
 	// We make sure that 'english' file has been loaded, because we need it as fallback for language strings that do not exist in current language
-	\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', $force_reload = false, $load_default = true);
-	\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, $force_reload = true, $load_default = true);
+	\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', $force_reload = false, $load_default = true);
+	\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, $force_reload = true, $load_default = true);
 }
 
 else
 	// No force loading needed, save some time, and do not force language file reload
-	\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR);
+	\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR);
 
 // Load language overrides, just before executing the component (DONE manually for J1.5)
 /*if (!FLEXI_J16GE)
 {
 	$overrideDir = JPATH_ADMINISTRATOR . '/languages/overrides/';
-	\Joomla\CMS\Factory::getLanguage()->load('override', $overrideDir, 'en-GB', $force_reload = true, $load_default = true);
-	\Joomla\CMS\Factory::getLanguage()->load('override', $overrideDir, null, $force_reload = true, $load_default = true);
+	\Joomla\CMS\Factory::getApplication()->getLanguage()->load('override', $overrideDir, 'en-GB', $force_reload = true, $load_default = true);
+	\Joomla\CMS\Factory::getApplication()->getLanguage()->load('override', $overrideDir, null, $force_reload = true, $load_default = true);
 }*/
 
 
@@ -244,8 +244,8 @@ if (
 )
 {
 	// Load english language file for 'com_users' component then override with current language file
-	\Joomla\CMS\Factory::getLanguage()->load('com_users', JPATH_ADMINISTRATOR, 'en-GB', true);
-	\Joomla\CMS\Factory::getLanguage()->load('com_users', JPATH_ADMINISTRATOR, null, true);
+	\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_users', JPATH_ADMINISTRATOR, 'en-GB', true);
+	\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_users', JPATH_ADMINISTRATOR, null, true);
 	// users helper file
 	require_once (JPATH_ADMINISTRATOR.'/components/com_flexicontent/helpers/users.php');
 }
@@ -317,8 +317,8 @@ if ($format === 'html')
 		\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip', '.hasTooltip');
 	}
 	// Add flexi-lib JS
-	\Joomla\CMS\Factory::getDocument()->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', array('version' => FLEXI_VHASH));  // Frontend/backend script
-	\Joomla\CMS\Factory::getDocument()->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/js/flexi-lib.js', array('version' => FLEXI_VHASH));  // Backend only script
+	\Joomla\CMS\Factory::getApplication()->getDocument()->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js', array('version' => FLEXI_VHASH));  // Frontend/backend script
+	\Joomla\CMS\Factory::getApplication()->getDocument()->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/js/flexi-lib.js', array('version' => FLEXI_VHASH));  // Backend only script
 
 	// Validate when Joomla.submitForm() is called, NOTE: for non-FC views this is done before the method is called
 	$js = '

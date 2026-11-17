@@ -30,7 +30,7 @@ use Joomla\Utilities\ArrayHelper;
 require_once JPATH_ROOT . DIRECTORY_SEPARATOR . 'components' . DIRECTORY_SEPARATOR . 'com_flexicontent' . DIRECTORY_SEPARATOR . 'classes' . DIRECTORY_SEPARATOR . 'flexicontent.helper.php';
 
 // Load JS tabber lib
-$doc = Factory::getDocument();
+$doc = \Joomla\CMS\Factory::getApplication()->getDocument();
 $doc->addScript(Uri::root(true) . '/components/com_flexicontent/assets/js/tabber-minimized.js', ['version' => FLEXI_VHASH]);
 $doc->addStyleSheet(Uri::root(true) . '/components/com_flexicontent/assets/css/tabber.css', ['version' => FLEXI_VHASH]);
 $doc->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');
@@ -501,7 +501,7 @@ jQuery(document).ready(function(){
 		$templates = $db->setQuery($query)->loadObjectList('element');
 
 		// Load sys language file for the current module
-		$lang = Factory::getLanguage();
+		$lang = \Joomla\CMS\Factory::getApplication()->getLanguage();
 		$lang->load($module . '.sys', $client->path, null, false, true)
 			|| $lang->load($module . '.sys', $client->path . '/modules/' . $module, null, false, true);
 

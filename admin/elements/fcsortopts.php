@@ -53,7 +53,7 @@ class JFormFieldFcSortOpts extends \Joomla\CMS\Form\FormField
 		{
 			$assets_added = true;
 
-			Factory::getDocument()->addStyleDeclaration('
+			\Joomla\CMS\Factory::getApplication()->getDocument()->addStyleDeclaration('
 				.fc-sortopts-list { list-style: none; margin: 8px 0 0; padding: 6px; min-height: 36px; border: 1px dashed #bbb; background: #f4f4f4; display: flex; flex-wrap: wrap; gap: 6px; }
 				.fc-sortopts-list:empty::before { content: attr(data-empty); color: #888; padding: 4px; }
 				.fc-sortopts-list li { display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; border: 1px solid #aaa; border-radius: 3px; background: #fff; cursor: move; user-select: none; }
@@ -62,7 +62,7 @@ class JFormFieldFcSortOpts extends \Joomla\CMS\Form\FormField
 				.fc-sortopts-add { width: auto; display: inline-block; }
 			');
 
-			Factory::getDocument()->addScriptDeclaration("
+			\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration("
 				document.addEventListener('DOMContentLoaded', function () {
 					document.querySelectorAll('.fc-sortopts').forEach(function (box) {
 						var hidden = box.querySelector('input[type=hidden]');

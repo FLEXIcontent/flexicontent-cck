@@ -80,7 +80,7 @@ if ($ff_placement)
 	echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endSlide');
 	echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endAccordion');
 	
-	\Joomla\CMS\Factory::getDocument()->addScriptDeclaration("
+	\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration("
 	(function() {
 		function readActiveSlides() {
 			var s = fclib_getCookie('" . $cookie_name ."');
@@ -130,7 +130,7 @@ if ($listall_selector) : ?>
 
 <?php
 if ($this->params->get('filter_ajax', 0)) :
-\Joomla\CMS\Factory::getDocument()->addScriptDeclaration(<<<'JS'
+\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration(<<<'JS'
 document.addEventListener('DOMContentLoaded', function() {
 
 	if (window.fc_ajax_filter_bound) return;

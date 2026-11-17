@@ -25,7 +25,7 @@ $jinput   = $app->input;
 $config   = Factory::getApplication()->getConfig();
 $user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 $session  = Factory::getApplication()->getSession();
-$document = Factory::getDocument();
+$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 $cparams  = ComponentHelper::getParams('com_flexicontent');
 $ctrl     = 'items.';
 $hlpname  = 'fcitemelement';
@@ -40,7 +40,7 @@ $onclick  = $this->escape($function);
 if (!empty($editor))
 {
 	// This view is used also in com_menus. Load the xtd script only if the editor is set!
-	Factory::getDocument()->addScriptOptions('xtd-fcitems', array('editor' => $editor));
+	\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptOptions('xtd-fcitems', array('editor' => $editor));
 	$onclick = "jSelectFcitem";
 }
 

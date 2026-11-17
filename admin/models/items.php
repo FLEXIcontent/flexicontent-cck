@@ -2635,7 +2635,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_messages'.DS.'tables'.DS.'message.php');
 
 		// load language for messaging
-		$lang = \Joomla\CMS\Factory::getLanguage();
+		$lang = \Joomla\CMS\Factory::getApplication()->getLanguage();
 		$lang->load('com_messages');
 
 		$ctrl_task = FLEXI_J16GE ? '&task=items.edit' : '&controller=items&task=edit';

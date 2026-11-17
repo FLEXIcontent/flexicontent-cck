@@ -28,7 +28,7 @@ $jinput   = $app->input;
 $config   = Factory::getApplication()->getConfig();
 $user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 $session  = Factory::getApplication()->getSession();
-$document = Factory::getDocument();
+$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 $cparams  = ComponentHelper::getParams('com_flexicontent');
 $global_col_appearance  = (int) $cparams->get('items_manager_cols_appearance', 0);
 $global_trim_chars      = (int) $cparams->get('items_manager_trim_chars', 100);
@@ -1681,7 +1681,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 </div><!-- #flexicontent end -->
 
 <?php
-Factory::getDocument()->addScriptDeclaration('
+\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration('
 	function fc_edit_jarticle_modal_load( container )
 	{
 		if ( container.find("iframe").get(0).contentWindow.location.href.indexOf("view=articles") != -1 )

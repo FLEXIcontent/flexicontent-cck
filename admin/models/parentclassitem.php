@@ -4092,7 +4092,7 @@ class ParentClassItem extends FCModelAdmin
 			return array();
 		}
 
-		$lang_code = !empty($this->_record->language) ? $this->_record->language : \Joomla\CMS\Factory::getLanguage()->getTag();
+		$lang_code = !empty($this->_record->language) ? $this->_record->language : \Joomla\CMS\Factory::getApplication()->getLanguage()->getTag();
 
 		$query = $this->_db->getQuery(true)
 			->select('la.*')

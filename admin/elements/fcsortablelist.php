@@ -58,7 +58,7 @@ class JFormFieldFcSortableList extends \Joomla\CMS\Form\FormField
 	{
 		flexicontent_html::loadJQuery();
 
-		$document = \Joomla\CMS\Factory::getDocument();
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$js = "";
 		if ($js) $document->addScriptDeclaration($js);
 	}
@@ -73,7 +73,7 @@ class JFormFieldFcSortableList extends \Joomla\CMS\Form\FormField
 			$js_css_added = true;
 		}
 		
-		$doc	= \Joomla\CMS\Factory::getDocument();
+		$doc	= \Joomla\CMS\Factory::getApplication()->getDocument();
 		$db		= \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$attributes = $this->element->attributes();
 
@@ -316,7 +316,7 @@ class JFormFieldFcSortableList extends \Joomla\CMS\Form\FormField
 			<div class="fcclear"></div>';
 			
 			$js = "";
-			if ($js) \Joomla\CMS\Factory::getDocument()->addScriptDeclaration($js);
+			if ($js) \Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration($js);
 		}
 
 		return

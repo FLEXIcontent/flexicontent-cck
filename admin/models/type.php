@@ -448,8 +448,8 @@ class FlexicontentModelType extends FCModelAdmin
 	 */
 	private function _addCorepropsFieldFields($type_ids)
 	{
-		\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, 'en-GB', true);
-		\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, null, true);
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, 'en-GB', true);
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, null, true);
 
 		$p = 'FLEXI_COREPROPS_';
 		$coreprop_names = array

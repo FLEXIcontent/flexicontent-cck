@@ -11,7 +11,7 @@ static $allow_guests_favs, $users_counter;  // Favourites field configuration
 static $js_and_css_added = false;
 if (!$js_and_css_added)
 {
-	$document = \Joomla\CMS\Factory::getDocument();
+	$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 	$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 	$use_font = $cparams->get('use_font_icons', 1);
 

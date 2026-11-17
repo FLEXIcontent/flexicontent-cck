@@ -217,8 +217,8 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 					return;
 				}
 
-				\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, 'en-GB', true);
-				\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, null, true);
+				\Joomla\CMS\Factory::getApplication()->getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, 'en-GB', true);
+				\Joomla\CMS\Factory::getApplication()->getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, null, true);
 				$ext_params = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 				$query = '';
 				$path = \Joomla\Filesystem\Path::clean(JPATH_ADMINISTRATOR . '/components/com_flexicontent/views/item/tmpl');
@@ -232,8 +232,8 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 				// Load item form layout
 				if ($ext_type === 'forms')
 				{
-					\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, 'en-GB', true);
-					\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, null, true);
+					\Joomla\CMS\Factory::getApplication()->getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, 'en-GB', true);
+					\Joomla\CMS\Factory::getApplication()->getLanguage()->load('plg_flexicontent_fields_coreprops', JPATH_ADMINISTRATOR, null, true);
 					$inh_params = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 					$path = \Joomla\Filesystem\Path::clean(JPATH_ADMINISTRATOR . '/components/com_flexicontent/views/item/tmpl');
 				}
@@ -283,8 +283,8 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 
 				if ($ext_name)
 				{
-					\Joomla\CMS\Factory::getLanguage()->load($ext_name, JPATH_SITE, 'en-GB', true);
-					\Joomla\CMS\Factory::getLanguage()->load($ext_name, JPATH_SITE, null, true);
+					\Joomla\CMS\Factory::getApplication()->getLanguage()->load($ext_name, JPATH_SITE, 'en-GB', true);
+					\Joomla\CMS\Factory::getApplication()->getLanguage()->load($ext_name, JPATH_SITE, null, true);
 				}
 
 				$path = is_dir($directory) ? $directory : JPATH_ROOT . $directory;
@@ -296,8 +296,8 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 
 				if ($ext_name)
 				{
-					\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_' . $ext_name, JPATH_ADMINISTRATOR, 'en-GB', true);
-					\Joomla\CMS\Factory::getLanguage()->load('plg_flexicontent_fields_' . $ext_name, JPATH_ADMINISTRATOR, null, true);
+					\Joomla\CMS\Factory::getApplication()->getLanguage()->load('plg_flexicontent_fields_' . $ext_name, JPATH_ADMINISTRATOR, 'en-GB', true);
+					\Joomla\CMS\Factory::getApplication()->getLanguage()->load('plg_flexicontent_fields_' . $ext_name, JPATH_ADMINISTRATOR, null, true);
 				}
 
 				$path = is_dir($directory) ? $directory : JPATH_ROOT . $directory;
@@ -330,8 +330,8 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 		 */
 		if (!$app->isClient('administrator'))
 		{
-			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
-			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 		}
 
 

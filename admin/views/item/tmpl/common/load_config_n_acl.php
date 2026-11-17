@@ -298,7 +298,7 @@ if ($tags_editable || (!$isSite && $this->perms['canversion']))
 							q: term,
 							task: 'viewtags',
 							item_lang: jQuery('#jform_language').val(),
-							lang: '". \Joomla\CMS\Factory::getLanguage()->getTag() . "',
+							lang: '". \Joomla\CMS\Factory::getApplication()->getLanguage()->getTag() . "',
 							format: 'json'
 						},
 						success: function(data)

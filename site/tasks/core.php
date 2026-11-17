@@ -2074,13 +2074,13 @@ class FlexicontentTasksCore
 
 		if (class_exists('\\Joomla\\CMS\\Factory'))
 		{
-			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
-			\Joomla\CMS\Factory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 		}
 		elseif (class_exists('JFactory'))
 		{
-			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
-			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 		}
 	}
 
@@ -2117,11 +2117,11 @@ class FlexicontentTasksCore
 	{
 		if (class_exists('\\Joomla\\CMS\\Factory'))
 		{
-			return \Joomla\CMS\Factory::getLanguage()->getTag();
+			return \Joomla\CMS\Factory::getApplication()->getLanguage()->getTag();
 		}
 		elseif (class_exists('JFactory'))
 		{
-			return JFactory::getLanguage()->getTag();
+			return \Joomla\CMS\Factory::getApplication()->getLanguage()->getTag();
 		}
 		return 'en-GB';
 	}

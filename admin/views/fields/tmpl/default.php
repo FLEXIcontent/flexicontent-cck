@@ -24,7 +24,7 @@ $jinput   = $app->input;
 $config   = Factory::getApplication()->getConfig();
 $user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 $session  = Factory::getApplication()->getSession();
-$document = Factory::getDocument();
+$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 $cparams  = ComponentHelper::getParams('com_flexicontent');
 $ctrl     = 'fields.';
 $hlpname  = 'fcfields';
@@ -171,7 +171,7 @@ $inputmask_txts = array(
 	'mm/yyyy' => 'Month/Year (mm/yyyy)',
 );
 
-Factory::getLanguage()->load('plg_flexicontent_fields_image', JPATH_ADMINISTRATOR);
+\Joomla\CMS\Factory::getApplication()->getLanguage()->load('plg_flexicontent_fields_image', JPATH_ADMINISTRATOR);
 $image_source_txts = array(
 	'-2' => 'Joomla media manager',
 	'-1' => 'Joomla article images: (intro + full)',
@@ -945,7 +945,7 @@ if ($js)
 </div><!-- #flexicontent end -->
 
 <?php
-Factory::getDocument()->addScriptDeclaration('
+\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration('
 	function fc_edit_fcfield_modal_load( container )
 	{
 		if ( container.find("iframe").get(0).contentWindow.location.href.indexOf("view=fields") != -1 )

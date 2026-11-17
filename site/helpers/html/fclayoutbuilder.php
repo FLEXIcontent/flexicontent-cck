@@ -193,7 +193,7 @@ abstract class JHtmlFclayoutbuilder
 		{
 			$framework_added = true;
 
-			$document = \Joomla\CMS\Factory::getDocument();
+			$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 			flexicontent_html::loadframework('grapejs');
 
 			$document->addStyleDeclaration('
