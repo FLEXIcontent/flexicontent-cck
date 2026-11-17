@@ -4307,7 +4307,8 @@ class FlexicontentFields
 		} catch ( Exception $e ) {
 			if ($skip_on_invalid) return '';
 			else $date = '';
-			\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::sprintf('FLEXI_CLEARING_INVALID_CALENDAR_DATE', $value), 'warning');
+			// System messages are output as HTML
+			\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::sprintf('FLEXI_CLEARING_INVALID_CALENDAR_DATE', htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8')), 'warning');
 		}
 
 		// Create JS calendar

@@ -928,7 +928,7 @@ class plgFlexicontent_fieldsDate extends FCField
 			catch ( Exception $e ) {
 				\Joomla\CMS\Factory::getApplication()->enqueueMessage(
 					'<b>' . $field->label . ' ' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD') . '</b>: ' .
-					\Joomla\CMS\Language\Text::sprintf('FLEXI_CLEARING_INVALID_CALENDAR_DATE', $post[$n])
+					\Joomla\CMS\Language\Text::sprintf('FLEXI_CLEARING_INVALID_CALENDAR_DATE', htmlspecialchars((string) $post[$n], ENT_QUOTES, 'UTF-8'))
 				, 'warning');
 			}
 
