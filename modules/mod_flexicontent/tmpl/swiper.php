@@ -683,6 +683,10 @@ if ($std_builder_layout_num)
  */
 if ($item_placement_feat === 2 || $item_placement_std === 2 || $item_placement_feat === 3 || $item_placement_std === 3)
 {
+	// The active tab / slide is remembered in a cookie (flexi-lib.js), the tab events are handled with jQuery
+	flexicontent_html::loadFramework('jQuery');
+	flexicontent_html::loadFramework('flexi-lib');
+
 	$cookie_name = 'fc_modules_data';
 	$fcMods_conf = $jcookie->get($cookie_name, '{}', 'string');
 
@@ -1748,7 +1752,7 @@ $container_id = $module->id . (count($catdata_arr) > 1 && $catdata ? '_' . $catd
 	if ($item_placement_feat == 1 && $item_columns_feat_int > 1)
 	{
 		$js = "
-		jQuery(document).ready(function(){
+		document.addEventListener('DOMContentLoaded', function(){
 			var container_feat = document.querySelector('div#mod_fcitems_box_featured_".$uniq_ord_id."');
 			var msnry;
 			// initialize Masonry after all images have loaded

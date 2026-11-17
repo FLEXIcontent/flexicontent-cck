@@ -1599,6 +1599,7 @@ class flexicontent_html
 			case 'mousewheel':
 				// mousewheel is a jQuery plugin; in choices mode (jQuery-free front) it is not loaded.
 				if (!$load_jquery) break;
+				flexicontent_html::loadJQuery(1, 0, 0);  // a jQuery plugin: load jQuery itself (core only, without jQuery UI)
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/mousewheel';
 				$document->addScript($framework_path.'/jquery.mousewheel.min.js');
@@ -1973,6 +1974,7 @@ class flexicontent_html
 			case 'fancybox':
 				// fancybox is a jQuery plugin; in choices mode (jQuery-free front) it is not loaded.
 				if (!$load_jquery) break;
+				flexicontent_html::loadJQuery(1, 0, 0);  // a jQuery plugin: load jQuery itself (core only, without jQuery UI)
 
 				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js');
 
