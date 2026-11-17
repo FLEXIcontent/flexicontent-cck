@@ -1251,7 +1251,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		// CHECK phpThumb cache exists and create the folder
 		if ( !is_dir($phpthumbcache) && !mkdir($phpthumbcache) )
 		{
-			JError::raiseWarning(100, 'Error: Unable to create phpThumb folder: '. $phpthumbcache .' image thumbnail will not work properly' );
+			\Joomla\CMS\Factory::getApplication()->enqueueMessage('Error: Unable to create phpThumb folder: '. $phpthumbcache .' image thumbnail will not work properly', 'warning');
 			$return = true;  // Cancel task !! to allow user to continue
 			return;
 		}
@@ -1267,7 +1267,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		// If permissions not good check if we can change them
 		if ( !$return && !Path::canChmod($phpthumbcache) )
 		{
-			JError::raiseWarning(100, 'Error: Unable to change phpThumb folder permissions: '. $phpthumbcache .' there maybe a wrong owner of the folder. Correct permissions are important for proper thumbnails and for -security-' );
+			\Joomla\CMS\Factory::getApplication()->enqueueMessage('Error: Unable to change phpThumb folder permissions: '. $phpthumbcache .' there maybe a wrong owner of the folder. Correct permissions are important for proper thumbnails and for -security-', 'warning');
 			$return = true;  // Cancel task !! to allow user to continue
 			return;
 		}

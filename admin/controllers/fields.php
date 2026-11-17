@@ -490,7 +490,7 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 		if (!$ids_map)
 		{
 			$msg = \Joomla\CMS\Language\Text::_('FLEXI_FIELDS_COPY_FAILED');
-			JError::raiseWarning(500, $model->getError());
+			\Joomla\CMS\Factory::getApplication()->enqueueMessage($model->getError(), 'warning');
 		}
 		else
 		{
