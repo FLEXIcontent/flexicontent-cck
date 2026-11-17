@@ -60,8 +60,8 @@ class FlexicontentModelAppsman extends \Joomla\CMS\MVC\Model\ListModel
 	function getTableCreateSQL($table, $backup_filename=false, $where='', $id_colname=null, $clear_id=false)
 	{
 		$app = \Joomla\CMS\Factory::getApplication();
-		$dbprefix = $app->getCfg('dbprefix');
-		$dbtype   = $app->getCfg('dbtype');
+		$dbprefix = $app->get('dbprefix');
+		$dbtype   = $app->get('dbtype');
 
 		$this->_db->setQuery('SHOW CREATE TABLE '.$table);
 		$showTable = $this->_db->loadRow();
@@ -320,7 +320,7 @@ class FlexicontentModelAppsman extends \Joomla\CMS\MVC\Model\ListModel
 
 	function doImport_flexicontent_fields_type_relations($rows, $remap)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$table_name = 'flexicontent_fields_type_relations';
 		foreach ($rows as $row)
 		{

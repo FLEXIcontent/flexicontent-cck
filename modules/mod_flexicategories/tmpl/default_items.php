@@ -29,7 +29,7 @@ $cat_card_layout = $params->get('cat_image_float', 'left');
 
 if ($show_cat_image)
 {
-	$joomla_image_path = $app->getCfg('image_path', '');
+	$joomla_image_path = $app->get('image_path', '');
 	$joomla_image_url  = str_replace(DS, '/', $joomla_image_path);
 	$joomla_image_path = $joomla_image_path ? $joomla_image_path . DS : '';
 	$joomla_image_url  = $joomla_image_url  ? $joomla_image_url  . '/' : '';

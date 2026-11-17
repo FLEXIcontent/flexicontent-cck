@@ -64,7 +64,7 @@ class JFormFieldContenttypes extends JFormFieldList
 
 	protected function getOptions()
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query = 'SELECT id AS value, name AS text'
 		. ' FROM #__flexicontent_types'
 		. ' WHERE published = 1'

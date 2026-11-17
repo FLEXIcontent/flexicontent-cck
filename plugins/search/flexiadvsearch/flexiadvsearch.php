@@ -124,7 +124,7 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 		$option = $jinput->getCmd('option', '');
 		$view   = $jinput->getCmd('view', '');
 
-		$db       = \Joomla\CMS\Factory::getDbo();
+		$db       = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$user     = \Joomla\CMS\Factory::getUser();
 		$field_view_levels = array_map('intval', $user->getAuthorisedViewLevels());
 		$can_view_field = static function ($field) use ($field_view_levels) {
@@ -955,7 +955,7 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 	{
 		$app    = \Joomla\CMS\Factory::getApplication();
 		$option = $app->input->getCmd('option', '');
-		$db     = \Joomla\CMS\Factory::getDbo();
+		$db     = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		static $text_search = null;
 

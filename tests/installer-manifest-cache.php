@@ -10,6 +10,9 @@ namespace Joomla\CMS {
                 public function loadResult() { return Factory::$cache; }
             };
         }
+        public static function getContainer() {
+            return new class { public function get($id) { return Factory::getDbo(); } };
+        }
     }
 }
 namespace {

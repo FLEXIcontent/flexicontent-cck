@@ -29,12 +29,12 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 	function display( $tpl = null )
 	{
 		$app      = \Joomla\CMS\Factory::getApplication();
-		$config   = \Joomla\CMS\Factory::getConfig();
+		$config   = \Joomla\CMS\Factory::getApplication()->getConfig();
 		$params   = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 		$document	= \Joomla\CMS\Factory::getDocument();
-		$session  = \Joomla\CMS\Factory::getSession();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 		$user     = \Joomla\CMS\Factory::getUser();
-		$db       = \Joomla\CMS\Factory::getDbo();
+		$db       = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$print_logging_info = $params->get('print_logging_info');
 
 		// Load the file system librairies
@@ -238,9 +238,9 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 		$lists['missing_lang'] = $model->createLanguagePack();
 
 		// Get the default copyright values to populate the form automatically
-		$mailfrom = $app->getCfg('mailfrom');
-		$fromname = $app->getCfg('fromname');
-		$website 	= $app->getCfg('live_site');
+		$mailfrom = $app->get('mailfrom');
+		$fromname = $app->get('fromname');
+		$website 	= $app->get('live_site');
 
 
 		$this->pending = $pending;

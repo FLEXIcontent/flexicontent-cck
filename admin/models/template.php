@@ -481,7 +481,7 @@ class FlexicontentModelTemplate extends FCModelAdmin
 	 */
 	function getFieldTypesList()
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$query = 'SELECT element AS type_name, REPLACE(name, "FLEXIcontent - ", "") AS field_name '
 		. ' FROM #__extensions'

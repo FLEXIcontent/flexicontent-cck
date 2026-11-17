@@ -30,7 +30,7 @@ class UsersHelperDebug
 	static function getComponents()
 	{
 		// Initialise variable.
-		$db		= \Joomla\CMS\Factory::getDbo();
+		$db		= \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query	= $db->getQuery(true);
 
 		$query->select('name AS text, element AS value')

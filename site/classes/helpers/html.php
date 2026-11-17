@@ -3504,7 +3504,7 @@ class flexicontent_html
 			: null;
 		$stateicon = flexicontent_html::stateicon($state, $icon_params, 'html', $state_text, $record, $show_status = 2);
 
-		$tz_string =Factory::getApplication()->getCfg('offset');
+		$tz_string =Factory::getApplication()->get('offset');
 		$tz = new DateTimeZone( $tz_string );
 		$tz_offset = $tz->getOffset(new \Joomla\CMS\Date\Date()) / 3600;
 

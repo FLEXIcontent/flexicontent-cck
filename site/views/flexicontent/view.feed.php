@@ -101,7 +101,7 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 	  	if ($feed_use_image) {  // feed image is enabled
 
 				// Get some variables
-				$joomla_image_path = $app->getCfg('image_path',  FLEXI_J16GE ? '' : 'images'.DS.'stories' );
+				$joomla_image_path = $app->get('image_path',  FLEXI_J16GE ? '' : 'images'.DS.'stories' );
 				$joomla_image_url  = str_replace (DS, '/', $joomla_image_path);
 				$joomla_image_path = $joomla_image_path ? $joomla_image_path.DS : '';
 				$joomla_image_url  = $joomla_image_url  ? $joomla_image_url.'/' : '';

@@ -147,7 +147,7 @@ class plgFlexicontent_fieldsToolbar extends FCField
 			// OPEN GRAPH: site name
 			if ($field->parameters->get('add_og_site_name') && $view == 'item')
 			{
-				$document->addCustomTag("<meta property=\"og:site_name\" content=\"".\Joomla\CMS\Factory::getApplication()->getCfg('sitename')."\" />");
+				$document->addCustomTag("<meta property=\"og:site_name\" content=\"".\Joomla\CMS\Factory::getApplication()->get('sitename')."\" />");
 			}
 
 			// OPEN GRAPH: title
@@ -260,12 +260,12 @@ class plgFlexicontent_fieldsToolbar extends FCField
 
 	private function _getCommentsCount($id)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		static $jcomment_installed = null;
 
 		if ($jcomment_installed===null) {
 			$app = \Joomla\CMS\Factory::getApplication();
-			$dbprefix = $app->getCfg('dbprefix');
+			$dbprefix = $app->get('dbprefix');
 			$db->setQuery('SHOW TABLES LIKE "'.$dbprefix.'jcomments"');
 			$jcomment_installed = (bool) count($db->loadObjectList());
 		}

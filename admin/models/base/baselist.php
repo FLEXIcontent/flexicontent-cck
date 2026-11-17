@@ -212,7 +212,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 		 * Pagination: limit, limitstart
 		 */
 
-		$limit      = $fcform ? $jinput->get('limit', $app->getCfg('list_limit'), 'int') : $app->getUserStateFromRequest($p . 'limit', 'limit', $app->getCfg('list_limit'), 'int');
+		$limit      = $fcform ? $jinput->get('limit', $app->get('list_limit'), 'int') : $app->getUserStateFromRequest($p . 'limit', 'limit', $app->get('list_limit'), 'int');
 		$limitstart = $fcform ? $jinput->get('limitstart', 0, 'int') : $app->getUserStateFromRequest($p . 'limitstart', 'limitstart', 0, 'int');
 
 		// In case limit has been changed, adjust limitstart accordingly

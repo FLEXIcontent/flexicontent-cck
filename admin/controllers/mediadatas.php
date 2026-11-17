@@ -247,7 +247,7 @@ class FlexicontentControllerMediadatas extends FlexicontentControllerBaseAdmin
 	{
 		$app      = \Joomla\CMS\Factory::getApplication();
 		$user     = \Joomla\CMS\Factory::getUser();
-		$session  = \Joomla\CMS\Factory::getSession();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 		$document = \Joomla\CMS\Factory::getDocument();
 
 		$this->input->set('view', $this->record_name);
@@ -467,8 +467,8 @@ class FlexicontentControllerMediadatas extends FlexicontentControllerBaseAdmin
 	{
 		$app  = \Joomla\CMS\Factory::getApplication();
 		$user = \Joomla\CMS\Factory::getUser();
-		$db   = \Joomla\CMS\Factory::getDbo();
-		$session = \Joomla\CMS\Factory::getSession();
+		$db   = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
 
 		$no_ajax     = $this->input->get('no_ajax', 0, 'int');

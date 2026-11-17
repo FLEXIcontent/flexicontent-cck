@@ -449,7 +449,7 @@ jQuery(document).ready(function(){
 	 */
 	protected function getModuleLayoutsFromTemplates(array &$groups, array $layout_files): void
 	{
-		$db = Factory::getDbo();
+		$db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		// Resolve client id
 		$clientId = $this->element['client_id'];

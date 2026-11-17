@@ -77,7 +77,7 @@ class JFormFieldFcSortableList extends \Joomla\CMS\Form\FormField
 		}
 		
 		$doc	= \Joomla\CMS\Factory::getDocument();
-		$db		= \Joomla\CMS\Factory::getDbo();
+		$db		= \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$attributes = $this->element->attributes();
 
 		$iselements = $attributes->subtype =='elements';

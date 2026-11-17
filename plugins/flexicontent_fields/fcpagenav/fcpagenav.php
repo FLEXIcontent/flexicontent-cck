@@ -365,7 +365,7 @@ class plgFlexicontent_fieldsFcpagenav extends FCField
 
 		// Joomla media folder
 		$app = \Joomla\CMS\Factory::getApplication();
-		$joomla_image_path = $app->getCfg('image_path',  FLEXI_J16GE ? '' : 'images'.DS.'stories' );
+		$joomla_image_path = $app->get('image_path',  FLEXI_J16GE ? '' : 'images'.DS.'stories' );
 		$joomla_image_url  = str_replace (DS, '/', $joomla_image_path);
 		$joomla_image_path = $joomla_image_path ? $joomla_image_path.DS : '';
 		$joomla_image_url  = $joomla_image_url  ? $joomla_image_url.'/' : '';

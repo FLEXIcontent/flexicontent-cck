@@ -305,7 +305,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		$this->setState('filter_order_Dir', $jinput->get('filter_order_Dir', 'ASC', 'cmd'));
 
 		// Get minimum word search length
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$db->setQuery("SHOW VARIABLES LIKE '%ft_min_word_len%'");
 		$_dbvariable = $db->loadObject();
 		$min_word_len = (int) @ $_dbvariable->Value;
@@ -1079,7 +1079,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		$jinput = $app->input;
 		$option = $this->getState('option');
 		$user		= \Joomla\CMS\Factory::getUser();
-		$db     = \Joomla\CMS\Factory::getDbo();
+		$db     = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
 		//  thus the items are published globally at the time the author specified in his/her local clock
@@ -1276,7 +1276,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 	{
 		$app    = \Joomla\CMS\Factory::getApplication();
 		$option = $app->input->getCmd('option', '');
-		$db     = \Joomla\CMS\Factory::getDbo();
+		$db     = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		static $text_search = null;
 
@@ -1770,7 +1770,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		}
 
 		$user = \Joomla\CMS\Factory::getUser();
-		$db   = \Joomla\CMS\Factory::getDbo();
+		$db   = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		// Get the view's parameters
 		$use_tmp = true;
@@ -2908,13 +2908,13 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			else if ( !$return_sql )
 			{
 				//echo "<br>GET FILTERED Items (cat model) -- [".$filter->name."] using in-query ids :<br>". $query."<br>\n";
-				$db = \Joomla\CMS\Factory::getDbo();
+				$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 				$db->setQuery($query);
 				$filtered = $db->loadColumn();
 			}
 			else if ($return_sql===2)
 			{
-				$db = \Joomla\CMS\Factory::getDbo();
+				$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 				static $iids_tblname  = array();
 				if ( !isset($iids_tblname[$filter->id]) ) {
 					$iids_tblname[$filter->id] = 'fc_filter_iids_'.$filter->id;
@@ -3034,7 +3034,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			foreach ($this->_data as $item) $item_ids[] = $item->id;
 		}
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query = 'SELECT COUNT(com.object_id) AS total, com.object_id AS item_id'
 		      . ' FROM #__jcomments AS com'
 		      . ' WHERE com.object_id in (' . implode(',',$item_ids) .')'
@@ -3076,7 +3076,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 
 	public function logSearch($search_term)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$params = \Joomla\CMS\Component\ComponentHelper::getParams('com_search');
 		$enable_log_searches = $params->get('enabled');
 

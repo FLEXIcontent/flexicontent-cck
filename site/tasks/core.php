@@ -2109,7 +2109,7 @@ class FlexicontentTasksCore
 	private function _getDbo()
 	{
 		return class_exists('\\Joomla\\CMS\\Factory')
-			? \Joomla\CMS\Factory::getDbo()
+			? \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class)
 			: JFactory::getDbo();
 	}
 

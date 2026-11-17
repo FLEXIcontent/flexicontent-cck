@@ -131,7 +131,7 @@ $image_plugin  = new plgFlexicontent_fieldsImage($dispatcher, array());
 // Récupérer le(s) champ(s) à traiter
 // ============================================================
 
-$db = Factory::getDbo();
+$db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 $query = $db->getQuery(true)
 	->select('f.id, f.name, f.label, fp.params')

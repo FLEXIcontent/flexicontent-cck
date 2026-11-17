@@ -44,7 +44,7 @@ jimport('joomla.form.helper'); // \Joomla\CMS\Form\FormHelper
 
 	public function getGroups()
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$node = & $this->element;
 		$attributes = get_object_vars($node->attributes());
 		$attributes = $attributes['@attributes'];

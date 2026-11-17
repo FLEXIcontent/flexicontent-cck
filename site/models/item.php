@@ -60,7 +60,7 @@ class FlexicontentModelItem extends ParentClassItem
 		global $globalcats;
 		$app  = \Joomla\CMS\Factory::getApplication();
 		$user	= \Joomla\CMS\Factory::getUser();
-		$session = \Joomla\CMS\Factory::getSession();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 		$uri  = \Joomla\CMS\Uri\Uri::getInstance();
 		$aid	= (int) $user->get('aid');
 		$gid	= (int) $user->get('gid');

@@ -389,7 +389,7 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 		$app    = \Joomla\CMS\Factory::getApplication();
 		$jinput = $app->input;
 		$user   = \Joomla\CMS\Factory::getUser();
-		$db     = \Joomla\CMS\Factory::getDbo();
+		$db     = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$show_owned = $this->_params->get('show_owned', 1);     // Show items owned by current user, regardless of their state
 		$show_trashed = $this->_params->get('show_trashed', 1);   // Show trashed items (to authorized users)

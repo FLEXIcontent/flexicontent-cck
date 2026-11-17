@@ -19,7 +19,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 $params =  $this->params;
-$db     =  \Joomla\CMS\Factory::getDbo();
+$db     =  \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 // Date configuration
 $use_date   = $params->get( 'show_modify_date', 1 ) ;

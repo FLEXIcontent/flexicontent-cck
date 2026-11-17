@@ -50,7 +50,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		$dispatcher = JEventDispatcher::getInstance();
 		$app      = \Joomla\CMS\Factory::getApplication();
 		$jinput   = \Joomla\CMS\Factory::getApplication()->input;
-		$session  = \Joomla\CMS\Factory::getSession();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 
 		$option   = $jinput->get('option', '', 'cmd');
 		$format   = $jinput->get('format', 'html', 'cmd');
@@ -670,7 +670,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 
 		$joomla_image_path = FLEXI_J40GE
 			?	ComponentHelper::getParams('com_media')->get('image_path', 'images')
-			: $app->getCfg('image_path', '');
+			: $app->get('image_path', '');
 		$joomla_image_path = $joomla_image_path ? $joomla_image_path.DS : '';
 		$joomla_image_url  = '';//$joomla_image_url  ? $joomla_image_url.'/' : ''; // NEED REVIEW
 		$phpThumbURL = $this->baseurl.'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=';
@@ -1085,7 +1085,7 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 
 			$resultsCounter = $pageNav->getResultsCounter();  // for overriding model's result counter
 
-			$_sh404sef = defined('SH404SEF_IS_RUNNING') && \Joomla\CMS\Factory::getConfig()->get('sef');
+			$_sh404sef = defined('SH404SEF_IS_RUNNING') && \Joomla\CMS\Factory::getApplication()->getConfig()->get('sef');
 			if ($_sh404sef)
 			{
 				$pageNav->setAdditionalUrlParam('limit', $model->getState('limit'));

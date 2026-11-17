@@ -271,7 +271,7 @@ class FlexicontentHelperRoute
 			return;
 		}
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		/**
 		 * Create map of: item language code to SEF URL language code
@@ -353,7 +353,7 @@ class FlexicontentHelperRoute
 		}
 
 		// Retrieve item's Content Type parameters
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query = $db->getQuery(true)
 			->select('t.attribs, t.id')
 			->from('#__flexicontent_types AS t');
@@ -387,7 +387,7 @@ class FlexicontentHelperRoute
 
 		// Finally last fallback, make a DB query to load the item
 		//echo "FlexicontentHelperRoute::_loadItem(".$_id .") doing query<br/>";
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query = $db->getQuery(true)
 			->select('i.*, ie.type_id')
 			->from('#__content AS i')

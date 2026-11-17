@@ -584,7 +584,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 
 		// Initialize variables
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$db    = \Joomla\CMS\Factory::getDbo();
+		$db    = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$user  = \Joomla\CMS\Factory::getUser();
 
 		// Get models
@@ -875,7 +875,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 	{
 		$app      = \Joomla\CMS\Factory::getApplication();
 		$user     = \Joomla\CMS\Factory::getUser();
-		$session  = \Joomla\CMS\Factory::getSession();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 		$document = \Joomla\CMS\Factory::getDocument();
 
 		$this->input->set('view', $this->record_name);
@@ -1222,7 +1222,7 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 	 */
 	protected function _getRecordsQuery($cid, $cols)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$cid = ArrayHelper::toInteger($cid);
 		$cols_list = implode(',', array_filter($cols, array($db, 'quoteName')));

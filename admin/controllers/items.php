@@ -127,7 +127,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		// Initialize variables
 		$app     = \Joomla\CMS\Factory::getApplication();
-		$db      = \Joomla\CMS\Factory::getDbo();
+		$db      = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$cid = $this->input->get('cid', array(), 'array');
 		$cid = ArrayHelper::toInteger($cid);
@@ -189,10 +189,10 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		// Initialize variables
 		$app     = \Joomla\CMS\Factory::getApplication();
-		$db      = \Joomla\CMS\Factory::getDbo();
+		$db      = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$user    = \Joomla\CMS\Factory::getUser();
-		$config  = \Joomla\CMS\Factory::getConfig();
-		$session = \Joomla\CMS\Factory::getSession();
+		$config  = \Joomla\CMS\Factory::getApplication()->getConfig();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 		$perms   = FlexicontentHelperPerm::getPerm();
 		$isSite  = $app->isClient('site');
 
@@ -555,7 +555,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 			$display_captcha = $display_captcha && ( $is_submitop || $captcha_formop);  // for submit operation we do not need to check 'captcha_formop' ...
 			if ($display_captcha)
 			{
-				$c_plugin = $params->get('captcha', $app->getCfg('captcha')); // TODO add param to override default
+				$c_plugin = $params->get('captcha', $app->get('captcha')); // TODO add param to override default
 				if ($c_plugin)
 				{
 					$c_name = 'captcha_response_field';
@@ -1293,7 +1293,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 	{
 		$app      = \Joomla\CMS\Factory::getApplication();
 		$user     = \Joomla\CMS\Factory::getUser();
-		$session  = \Joomla\CMS\Factory::getSession();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 		$document = \Joomla\CMS\Factory::getDocument();
 		$isAdmin  = $app->isClient('administrator');
 
@@ -1393,7 +1393,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 				}
 
 				// Get User Group / Author parameters
-				$db = \Joomla\CMS\Factory::getDbo();
+				$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 				$authorparams = flexicontent_db::getUserConfig($user->id);
 				$max_auth_limit = intval($authorparams->get('max_auth_limit', 0));  // Maximum number of content items the user can create
 
@@ -1701,7 +1701,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$db    = \Joomla\CMS\Factory::getDbo();
+		$db    = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$model = $this->getModel($this->record_name_pl);
 		$user  = \Joomla\CMS\Factory::getUser();
 
@@ -2004,7 +2004,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		}
 
 		$app = \Joomla\CMS\Factory::getApplication();
-		$db  = \Joomla\CMS\Factory::getDbo();
+		$db  = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$items_model  = $this->getModel($this->record_name_pl);
 		$record_model = $this->getModel($this->record_name);
@@ -2974,7 +2974,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		// Initialize variables
 		$app   = \Joomla\CMS\Factory::getApplication();
-		$db    = \Joomla\CMS\Factory::getDbo();
+		$db    = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$user  = \Joomla\CMS\Factory::getUser();
 
 		$cid = $this->input->get('cid', array(), 'array');

@@ -355,7 +355,7 @@ class JFormFieldFcMenuitem extends GroupedlistField
 		array $languages = []
 	)
 	{
-		$db    = Factory::getDbo();
+		$db    = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query = $db->getQuery(true)
 			->select(
 				'DISTINCT a.id AS value,

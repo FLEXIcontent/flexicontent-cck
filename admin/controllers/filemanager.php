@@ -844,7 +844,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			$chunk = $this->input->get('chunk', 0, 'int');
 
 			// Get / Create target directory
-			$targetDir = $app->getCfg('tmp_path') . DIRECTORY_SEPARATOR . "fc_fileselement";
+			$targetDir = $app->get('tmp_path') . DIRECTORY_SEPARATOR . "fc_fileselement";
 
 			if (!file_exists($targetDir))
 			{

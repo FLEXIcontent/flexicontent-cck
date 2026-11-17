@@ -253,14 +253,14 @@ class com_flexicontentInstallerScript
 		$cache->clean( 'com_flexicontent_filters' );
 
 		// reseting post installation session variables
-		$session  = \Joomla\CMS\Factory::getSession();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 		$session->set('flexicontent.postinstall', false);
 		$session->set('flexicontent.allplgpublish', false);
 		$session->set('flexicontent.allplgpublish', false);
 		$session->set('unbounded_noext', false, 'flexicontent');
 		$session->set('unbounded_badcat', false, 'flexicontent');
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		// Both installation and upgrade need a field-attributed basic autocomplete index.
 		// Never copy the legacy merged text: it cannot be checked against field permissions.
@@ -498,7 +498,7 @@ class com_flexicontentInstallerScript
 		}
 
 		$app = \Joomla\CMS\Factory::getApplication();
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$dbprefix = $app->get('dbprefix');
 		$dbname   = $app->get('db');
 
@@ -1611,7 +1611,7 @@ class com_flexicontentInstallerScript
 		// init vars
 		$error = false;
 		$extensions = array();
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$dbprefix = $app->get('dbprefix');
 		$dbname   = $app->get('db');
 
@@ -1924,7 +1924,7 @@ class com_flexicontentInstallerScript
 		static $paramsArr = null;
 		if ($paramsArr !== null) return $paramsArr;
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$db->setQuery( 'SELECT manifest_cache FROM #__extensions WHERE element = '. $db->quote($name) .' AND type= '. $db->quote($type) );
 		$manifest_cache =  $db->loadResult();
 
@@ -2011,7 +2011,7 @@ class com_flexicontentInstallerScript
 		if ( count($param_array) > 0 )
 		{
 			// read the existing component value(s)
-			$db = \Joomla\CMS\Factory::getDbo();
+			$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 			$db->setQuery('SELECT params FROM #__extensions WHERE element = "com_flexicontent"');
 			$params = json_decode( $db->loadResult(), true );
 			// add the new variable(s) to the existing one(s)
@@ -2034,7 +2034,7 @@ class com_flexicontentInstallerScript
 	private function _renameExtensionLegacyParameters($map, $dbtbl_name, $dbcol_name, $record_id)
 	{
 		// Load parameters directly from DB
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query = 'SELECT ' . $dbcol_name
 			. ' FROM #__' . $dbtbl_name . ' '
 			. ' WHERE '
@@ -2089,7 +2089,7 @@ class com_flexicontentInstallerScript
 			$attr_vals_fix = array()  // For an example see groupmarker case
 	)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		
 		$where = array();
 		foreach($match_cols as $col => $val)
@@ -2171,7 +2171,7 @@ class com_flexicontentInstallerScript
 	 */
 	private function _deprecate_field($old_type, $new_type, & $msg, & $n)
 	{
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$query = 'UPDATE #__flexicontent_fields'
 			.' SET field_type = ' .$db->Quote($new_type)

@@ -1276,7 +1276,7 @@ return $html;
 		$nullDate	= $db->getNullDate();
 		if ($use_local_time)
 		{
-			$nowDate = \Joomla\CMS\HTML\HTMLHelper::_('date', $nowDate, 'Y-m-d H:i:s', $app->getCfg('offset') );
+			$nowDate = \Joomla\CMS\HTML\HTMLHelper::_('date', $nowDate, 'Y-m-d H:i:s', $app->get('offset') );
 		}
 
 		// Server date
@@ -2870,7 +2870,7 @@ return $html;
 			return false;
 		}
 
-		$joomla_image_path = $app->getCfg('image_path',  FLEXI_J16GE ? '' : 'images'.DS.'stories' );
+		$joomla_image_path = $app->get('image_path',  FLEXI_J16GE ? '' : 'images'.DS.'stories' );
 		foreach ($catdata_arr as $i => $catdata)
 		{
 			$catdata->params = new \Joomla\Registry\Registry($catdata->params);

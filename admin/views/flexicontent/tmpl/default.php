@@ -18,7 +18,7 @@ $app      = \Joomla\CMS\Factory::getApplication();
 $option   = $app->input->get('option', '', 'CMD');
 $user     = \Joomla\CMS\Factory::getUser();
 $template = $app->getTemplate();
-$session  = \Joomla\CMS\Factory::getSession();
+$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 $hlpname  = 'fcbase';
 
 $btn_class = 'btn';

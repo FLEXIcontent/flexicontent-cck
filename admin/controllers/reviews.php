@@ -201,7 +201,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		$value  = ArrayHelper::getValue($values, $this->task, 0, 'int');
 
 		// Access checks, these are done against the content item that is being reviewed
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$content_ids = count($cid)
 			? $db->setQuery('SELECT id, content_id FROM #__' . $this->records_dbtbl . ' WHERE id IN (' . implode(',', $cid) . ')')->loadAssocList('id', 'content_id')
 			: array();
@@ -255,7 +255,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 	{
 		$app      = \Joomla\CMS\Factory::getApplication();
 		$user     = \Joomla\CMS\Factory::getUser();
-		$session  = \Joomla\CMS\Factory::getSession();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 		$document = \Joomla\CMS\Factory::getDocument();
 
 		$this->input->set('view', $this->record_name);
@@ -610,8 +610,8 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 	{
 		$app  = \Joomla\CMS\Factory::getApplication();
 		$user = \Joomla\CMS\Factory::getUser();
-		$db   = \Joomla\CMS\Factory::getDbo();
-		$session = \Joomla\CMS\Factory::getSession();
+		$db   = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
 
 		$no_ajax     = $this->input->get('no_ajax', 0, 'int');

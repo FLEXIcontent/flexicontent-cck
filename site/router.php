@@ -1111,7 +1111,7 @@ class _FlexicontentSiteRouter
 	{
 		$language = !$language /*&& !$parent_id*/ ? Factory::getLanguage()->getTag() : $language;
 
-		$db = Factory::getDbo();
+		$db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query = $db->getQuery(true)
 			->select('i.id')
 			->from($db->QuoteName($tbl) . ' AS i')
@@ -1251,7 +1251,7 @@ class _FlexicontentSiteRouter
 
 					if ($record_id_from_url)
 					{
-						$db = Factory::getDbo();
+						$db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 						$query = $db->getQuery(true)
 							->select($db->quoteName($alias_col))
 							->from($db->quoteName($tbls[0]))
@@ -1355,7 +1355,7 @@ class _FlexicontentSiteRouter
 		// If current category id not given then use item's main category
 		if (!isset($globalcats[$cid]))
 		{
-			$db = Factory::getDbo();
+			$db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 			$query = $db->getQuery(true)
 				->select('i.catid')
@@ -1499,7 +1499,7 @@ class _FlexicontentSiteRouter
 			$cid = $item->catid;
 		}
 		else {
-			$db = version_compare(JVERSION, '4', 'lt') ? Factory::getDbo() : Factory::getContainer()->get('DatabaseDriver');
+			$db = version_compare(JVERSION, '4', 'lt') ? Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class) : Factory::getContainer()->get('DatabaseDriver');
 			$sql_query = $db->getQuery(true)
 				->select('i.catid')
 				->from($db->QuoteName('#__content') . ' AS i')

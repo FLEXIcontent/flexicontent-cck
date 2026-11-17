@@ -36,7 +36,7 @@ $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button fcsimple';
 
 $app = \Joomla\CMS\Factory::getApplication();
-$db = \Joomla\CMS\Factory::getDbo();
+$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 \Joomla\CMS\Factory::getApplication()->setUserState('editor.source.syntax', 'css');
 
 $code_btn_lbls = array(

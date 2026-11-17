@@ -339,7 +339,7 @@ else // XTD Image plugin
 						</div>
 					</div>
 				</fieldset>
-				<?php \Joomla\CMS\Factory::getSession()->set('com_media.return_url', 'index.php?option=com_media&view=images&tmpl=component&fieldid=' . $input->getCmd('fieldid', '') . '&e_name=' . $input->getCmd('e_name') . '&asset=' . $asset . '&author=' . $author); ?>
+				<?php \Joomla\CMS\Factory::getApplication()->getSession()->set('com_media.return_url', 'index.php?option=com_media&view=images&tmpl=component&fieldid=' . $input->getCmd('fieldid', '') . '&e_name=' . $input->getCmd('e_name') . '&asset=' . $asset . '&author=' . $author); ?>
 			</div>
 		</form>
 	</div>

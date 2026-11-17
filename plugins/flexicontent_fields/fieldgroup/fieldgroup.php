@@ -55,7 +55,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 		// Initialize framework objects and other variables
 		$document = \Joomla\CMS\Factory::getDocument();
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' );
-		$db   = \Joomla\CMS\Factory::getDbo();
+		$db   = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$user = \Joomla\CMS\Factory::getUser();
 		$app  = \Joomla\CMS\Factory::getApplication();
 		$isAdmin = $app->isClient('administrator');
@@ -861,7 +861,7 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 			return $grouped_fields[$field->id] = array();
 		}
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query = 'SELECT f.* '
 			. ' FROM #__flexicontent_fields AS f '
 			. ' WHERE f.published = 1'

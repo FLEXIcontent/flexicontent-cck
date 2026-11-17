@@ -5,6 +5,9 @@ namespace Joomla\CMS {
         public static $db;
         public static $user;
         public static function getDbo() { return self::$db; }
+        public static function getContainer() {
+            return new class { public function get($id) { return Factory::$db; } };
+        }
         public static function getUser() { return self::$user; }
         public static function getApplication() {
             return new class { public function getIdentity() { return Factory::$user; } };

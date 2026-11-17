@@ -521,7 +521,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 			// Convert the created and modified dates to local user time for display in the form.
 			jimport('joomla.utilities.date');
 
-			$site_zone = \Joomla\CMS\Factory::getApplication()->getCfg('offset');
+			$site_zone = \Joomla\CMS\Factory::getApplication()->get('offset');
 			$user_zone = \Joomla\CMS\Factory::getUser()->getParam('timezone', $site_zone);
 			$tz_string = $user_zone;
 			$tz = new DateTimeZone( $tz_string );
@@ -909,7 +909,7 @@ class FlexicontentModelCategory extends FCModelAdmin
 			parent::cleanCache('com_flexicontent_cats', $client_id);
 
 			// Indicate to our system plugin that its category cache needs to be cleaned
-			\Joomla\CMS\Factory::getSession()->set('clear_cats_cache', 1, 'flexicontent');
+			\Joomla\CMS\Factory::getApplication()->getSession()->set('clear_cats_cache', 1, 'flexicontent');
 		}
 	}
 

@@ -750,7 +750,7 @@ class ParentClassItem extends FCModelAdmin
 
 				// Do not translate, this is the Falang overriden method of a database extended Class
 				// Try to execute query directly and load the data as an object
-				if ( FLEXI_FISH && $task=='edit' && $option=='com_flexicontent' && in_array( $app->getCfg('dbtype') , array('mysqli','mysql') ) )
+				if ( FLEXI_FISH && $task=='edit' && $option=='com_flexicontent' && in_array( $app->get('dbtype') , array('mysqli','mysql') ) )
 				{
 					$data = flexicontent_db::directQuery($query);
 					$data = isset($data[0]) ? $data[0] : null;
@@ -1468,7 +1468,7 @@ class ParentClassItem extends FCModelAdmin
 		$iparams_extra = new \Joomla\Registry\Registry();
 
 		$user    = \Joomla\CMS\Factory::getUser();
-		$session = \Joomla\CMS\Factory::getSession();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 		$asset   = $this->type_alias . '.' . $this->_id;
 
 		// Check if item was editable, but was rendered non-editable
@@ -1783,7 +1783,7 @@ class ParentClassItem extends FCModelAdmin
 
 		// Default -- Access level.
 		// -- NOTE: This default will be forced if user has not access level edit privelege
-		$default_accesslevel = $app->getCfg( 'access', $public_acclevel = 1 );
+		$default_accesslevel = $app->get( 'access', $public_acclevel = 1 );
 
 		// Default -- Publication state.
 		// -- NOTE: this will only be used if user has publish privilege, otherwise items will be forced to (a) pending_approval state for NEW ITEMS and (b) to item's current state for EXISTING ITEMS
@@ -1901,7 +1901,7 @@ class ParentClassItem extends FCModelAdmin
 		$print_logging_info = $cparams->get('print_logging_info');
 
 		// Dates displayed in the item form, are in user timezone for J2.5, and in site's default timezone for J1.5
-		$site_zone = $app->getCfg('offset');
+		$site_zone = $app->get('offset');
 		$user_zone = $user->getParam('timezone', $site_zone);
 		$tz_offset = $user_zone;
 
@@ -1963,7 +1963,7 @@ class ParentClassItem extends FCModelAdmin
 			// Also make sure we have a valid access level
 			if ( !$item->access || !flexicontent_html::userlevel(null, $item->access, null, null, '', $_createlist = false) )
 			{
-				$item->access = $app->getCfg( 'access', $public_acclevel = 1 );
+				$item->access = $app->get( 'access', $public_acclevel = 1 );
 			}
 		}
 
@@ -2068,7 +2068,7 @@ class ParentClassItem extends FCModelAdmin
 			if ($isSite && $isNew && !empty($data['submit_conf']))
 			{
 				$h = $data['submit_conf'];
-				$session = \Joomla\CMS\Factory::getSession();
+				$session = \Joomla\CMS\Factory::getApplication()->getSession();
 				$item_submit_conf = $session->get('item_submit_conf', array(),'flexicontent');
 				$submit_conf = !empty($item_submit_conf[$h]) ? $item_submit_conf[$h] : null;
 
@@ -3085,8 +3085,8 @@ class ParentClassItem extends FCModelAdmin
 		$filterables = array_keys($filterables);
 		$filterables = array_flip($filterables);
 
-		$dbprefix = $app->getCfg('dbprefix');
-		$dbname   = $app->getCfg('db');
+		$dbprefix = $app->get('dbprefix');
+		$dbname   = $app->get('db');
 		$tbl_prefix = $dbprefix . 'flexicontent_advsearch_index_field_';
 		$query = 'SELECT TABLE_NAME
 			FROM INFORMATION_SCHEMA.TABLES
@@ -3120,7 +3120,7 @@ class ParentClassItem extends FCModelAdmin
 		$tbl_names_flipped = array_flip($tbl_names);
 		foreach ($filterables as $_field_id => $_ignored)
 		{
-			$tbl_name = $app->getCfg('dbprefix').'flexicontent_advsearch_index_field_'.$_field_id;
+			$tbl_name = $app->get('dbprefix').'flexicontent_advsearch_index_field_'.$_field_id;
 			if ( isset($tbl_names_flipped[$tbl_name]) ) continue;
 			$query = '
 			CREATE TABLE IF NOT EXISTS `' .$tbl_name. '` (
@@ -3720,8 +3720,8 @@ class ParentClassItem extends FCModelAdmin
 
 		$db = $this->_db;
 		$app = \Joomla\CMS\Factory::getApplication();
-		$dbprefix = $app->getCfg('dbprefix');
-		$dbtype   = $app->getCfg('dbtype');
+		$dbprefix = $app->get('dbprefix');
+		$dbtype   = $app->get('dbtype');
 
 		if ( in_array($dbtype, array('mysqli','mysql')) )
 		{
@@ -4851,7 +4851,7 @@ class ParentClassItem extends FCModelAdmin
 			return $nConf;
 		}
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$nConf = new stdClass();
 
 		// (b) Get Content Type specific notifications (that override global)
@@ -5006,7 +5006,7 @@ class ParentClassItem extends FCModelAdmin
 		if ( !count($notify_emails) ) return true;
 
 		$app     = \Joomla\CMS\Factory::getApplication();
-		$db      = \Joomla\CMS\Factory::getDbo();
+		$db      = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$user    = \Joomla\CMS\Factory::getUser();
 		$use_versioning = $this->_cparams->get('use_versioning', 1);
 
@@ -5133,7 +5133,7 @@ class ParentClassItem extends FCModelAdmin
 		// ADD INFO about creation / modification times. Use site's timezone !! we must
 		// (a) set timezone to be site's timezone then
 		// (b) call $date_OBJECT->format()  with s local flag parameter set to true
-		$tz_offset = \Joomla\CMS\Factory::getApplication()->getCfg('offset');
+		$tz_offset = \Joomla\CMS\Factory::getApplication()->get('offset');
 		$tz = new DateTimeZone($tz_offset);
 		$tz_offset_str = $tz->getOffset(new \Joomla\CMS\Date\Date()) / 3600;
 		$tz_offset_str = ' &nbsp; (UTC+'.$tz_offset_str.') ';
@@ -5326,8 +5326,8 @@ class ParentClassItem extends FCModelAdmin
 		// **********
 		// Send email
 		// **********
-		$from      = $app->getCfg( 'mailfrom' );
-		$fromname  = $app->getCfg( 'fromname' );
+		$from      = $app->get( 'mailfrom' );
+		$fromname  = $app->get( 'fromname' );
 		$recipient = $params->get('nf_send_as_bcc', 0) ? array($from) : $notify_emails;
 		$cc  = null;
 		$bcc = $params->get('nf_send_as_bcc', 0) ? $notify_emails : null;
@@ -5498,7 +5498,7 @@ class ParentClassItem extends FCModelAdmin
 			$validators = $this->getApprovalRequestReceivers($approvable->id, $approvable->catid);
 
 			if ( !count($validators->notify_emails) ) {
-				$validators->notify_emails[] = \Joomla\CMS\Factory::getApplication()->getCfg('mailfrom');
+				$validators->notify_emails[] = \Joomla\CMS\Factory::getApplication()->get('mailfrom');
 			}
 
 			$query 	= 'SELECT DISTINCT c.id, c.title FROM #__categories AS c'
@@ -5998,7 +5998,7 @@ class ParentClassItem extends FCModelAdmin
 	{
 		$record  = $record ?: $this->_record;
 		$user    = $user ?: \Joomla\CMS\Factory::getUser();
-		$session = \Joomla\CMS\Factory::getSession();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 		$isOwner = !empty($record->created_by) && ( $record->created_by == $user->get('id') );
 
 		// Check if item was editable, but was rendered non-editable
@@ -6051,7 +6051,7 @@ class ParentClassItem extends FCModelAdmin
 	{
 		$record  = $record ?: $this->_record;
 		$user    = $user ?: \Joomla\CMS\Factory::getUser();
-		$session = \Joomla\CMS\Factory::getSession();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 		$isOwner = !empty($record->created_by) && ( $record->created_by == $user->get('id') );
 
 		$hasCoupon = false;
@@ -6137,7 +6137,7 @@ class ParentClassItem extends FCModelAdmin
 	{
 		$record = $record ?: $this->_record;
 		$user = \Joomla\CMS\Factory::getUser();
-		$session = \Joomla\CMS\Factory::getSession();
+		$session = \Joomla\CMS\Factory::getApplication()->getSession();
 		$isOwner = !empty($this->_record->created_by) && $this->_record->created_by == $user->get('id');
 
 		// The access filter has been set, we already know current user can view this item or we should not check access

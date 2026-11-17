@@ -30,7 +30,7 @@ class FlexicontentViewItemcompare extends \Joomla\CMS\MVC\View\HtmlView {
 		$app      = \Joomla\CMS\Factory::getApplication();
 		$jinput   = $app->input;
 		$option   = $jinput->getCmd('option');
-		$db       = \Joomla\CMS\Factory::getDbo();
+		$db       = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$document = \Joomla\CMS\Factory::getDocument();
 
 		// Initialise variables

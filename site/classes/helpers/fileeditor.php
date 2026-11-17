@@ -66,7 +66,7 @@ class flexicontent_fileeditor
 		$fieldid = (int) $fieldid;
 		if (!$fieldid) return null;
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$attribs = $db->setQuery($db->getQuery(true)
 			->select('attribs')->from('#__flexicontent_fields')
 			->where('id = ' . $fieldid)->where('field_type = ' . $db->quote('file'))
@@ -82,7 +82,7 @@ class flexicontent_fileeditor
 		if ($props !== null) return $props;
 
 		$props = array();
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$rows = $db->setQuery($db->getQuery(true)
 			->select('attribs')->from('#__flexicontent_fields')
 			->where('field_type = ' . $db->quote('file'))->order('id')

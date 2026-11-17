@@ -147,7 +147,7 @@ class flexicontent_security
     private static function signTemporaryItemId($app, $base)
     {
         $user = (method_exists($app, 'getIdentity') ? $app->getIdentity() : null) ?: \Joomla\CMS\Factory::getUser();
-        $session = method_exists($app, 'getSession') ? $app->getSession() : \Joomla\CMS\Factory::getSession();
+        $session = method_exists($app, 'getSession') ? $app->getSession() : \Joomla\CMS\Factory::getApplication()->getSession();
         $owner = $user->guest ? 'session:' . $session->getId() : 'user:' . (int) $user->id;
         return substr(hash_hmac('sha256', 'flexicontent.unique_tmp_itemid|' . $owner . '|' . $base, (string) $app->get('secret')), 0, 32);
     }
@@ -166,7 +166,7 @@ class flexicontent_security
     /** Resolve a field from its actual item/type, checking every viewing boundary. */
     public static function loadItemField($itemId, $fieldId, $fieldType)
     {
-        $db = \Joomla\CMS\Factory::getDbo();
+        $db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
         $user = \Joomla\CMS\Factory::getUser();
         $levels = implode(',', array_unique(array_merge(array(0), array_map('intval', $user->getAuthorisedViewLevels()))));
         $item = $db->setQuery('SELECT i.*, e.type_id FROM #__content AS i'

@@ -39,8 +39,8 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 		$document = \Joomla\CMS\Factory::getDocument();
 		$user     = \Joomla\CMS\Factory::getUser();
 		$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
-		$session  = \Joomla\CMS\Factory::getSession();
-		$db       = \Joomla\CMS\Factory::getDbo();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
+		$db       = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$option   = $jinput->getCmd('option', '');
 		$view     = $jinput->getCmd('view', '');
@@ -715,7 +715,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 		$document = \Joomla\CMS\Factory::getDocument();
 		$toolbar  = \Joomla\CMS\Toolbar\Toolbar::getInstance('toolbar');
 		$perms    = FlexicontentHelperPerm::getPerm();
-		$session  = \Joomla\CMS\Factory::getSession();
+		$session  = \Joomla\CMS\Factory::getApplication()->getSession();
 		$useAssocs= flexicontent_db::useAssociations();
 
 		$js = '';
@@ -944,7 +944,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 
 			if ($log_filename = $session->get('filemanager_stats_log_filename', null, 'flexicontent'))
 			{
-				\Joomla\CMS\Factory::getApplication()->enqueueMessage('You may see log file : <b>' . \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getConfig()->get('log_path') . DS . $log_filename) . '</b> for messages and errors', 'warning');
+				\Joomla\CMS\Factory::getApplication()->enqueueMessage('You may see log file : <b>' . \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getApplication()->getConfig()->get('log_path') . DS . $log_filename) . '</b> for messages and errors', 'warning');
 			}
 		}
 		$session->set('filemanager_stats_log_filename', null, 'flexicontent');
@@ -965,7 +965,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 			{
 				\Joomla\CMS\Factory::getApplication()->enqueueMessage(
 					($error_count ? '' : 'Please see mediadata logfile. Processed all ' . $file_count . '  preview files') .
-					' You may see log file : <b>' . \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getConfig()->get('log_path') . DS . $log_filename) . '</b>' .
+					' You may see log file : <b>' . \Joomla\Filesystem\Path::clean(\Joomla\CMS\Factory::getApplication()->getConfig()->get('log_path') . DS . $log_filename) . '</b>' .
 					($error_count ? ' for messages and errors' : ' for more information'),
 					$error_count ? 'warning' : 'message'
 				);

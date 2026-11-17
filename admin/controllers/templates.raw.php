@@ -162,7 +162,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 		jimport('joomla.filesystem.file');
 		$app  = \Joomla\CMS\Factory::getApplication();
 		$user = \Joomla\CMS\Factory::getUser();
-		$db   = \Joomla\CMS\Factory::getDbo();
+		$db   = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		// Get vars
 		$ext_option = $this->input->getCmd('ext_option', '');  // Current component name
