@@ -1890,9 +1890,9 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 
 		if ($method == 'zip') {
 			if (count($adminfiles))
-				mkdir($targetfolder.DS.'admin', 0755);
+				mkdir($targetfolder.DS.'admin', 0755, true);
 			if (count($sitefiles))
-				mkdir($targetfolder.DS.'site', 0755);
+				mkdir($targetfolder.DS.'site', 0755, true);
 		}
 
 		foreach ($adminfiles as $file) {
@@ -1972,8 +1972,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 				$files[$i]['time'] = time();
 			}
 
-			jimport('joomla.archive.archive');
-			$packager = JArchive::getAdapter('zip');
+			$packager = new \Joomla\Archive\Zip();
 			if (!$packager->create($archivename, $files)) {
 				echo \Joomla\CMS\Language\Text::_('FLEXI_OPERATION_FAILED');
 				return false;
