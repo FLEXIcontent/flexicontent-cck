@@ -633,7 +633,7 @@ class com_flexicontentInstallerScript
 
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_reviews_useful"';
 		$db->setQuery($query);
-		$reviews_useful_tbl_exists = (boolean) count($db->loadObjectList());
+		$reviews_useful_tbl_exists = (bool) count($db->loadObjectList());
 
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . '__flexicontent_mediadatas"';
 		$db->setQuery($query);
