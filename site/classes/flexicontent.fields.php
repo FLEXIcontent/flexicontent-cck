@@ -2066,11 +2066,14 @@ class FlexicontentFields
 			return array();
 		}
 
-		$query 	= 'SELECT * FROM #__content_rating'
-				. " WHERE content_id IN ('" . implode("','", $cids) . "')"
-				;
-		$db->setQuery($query);
-		$votes = $db->loadObjectList('content_id');
+		$votes = array();
+		if ($has_votes)
+		{
+			$query = 'SELECT * FROM #__content_rating'
+				. " WHERE content_id IN ('" . implode("','", $cids) . "')";
+			$db->setQuery($query);
+			$votes = $db->loadObjectList('content_id');
+		}
 
 		// No item of this site has votes for an extra (composite) voting characteristic
 		if (!$has_extra)
