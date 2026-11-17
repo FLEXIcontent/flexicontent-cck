@@ -2,6 +2,16 @@
 (function () {
 	'use strict';
 
+	// Joomla 5+ logs "Direct access to Joomla.editors.instances is deprecated" on every
+	// read of that list. JoomlaEditor.get() lives in an ES module this script cannot
+	// reach, and some editors are only registered in the old list, so read the list's
+	// own property: the same editor objects on Joomla 4, 5 and 6, without the warning.
+	function getEditor(id) {
+		var list = window.Joomla && Joomla.editors && Joomla.editors.instances;
+		var entry = list && Object.getOwnPropertyDescriptor(list, id);
+		return entry ? entry.value : null;
+	}
+
 	function init() {
 		var form = document.getElementById('adminForm');
 		if (!form || form.dataset.fcLeaveGuard) return;
@@ -16,7 +26,7 @@
 			// Reading a rich editor can synchronize its textarea. Read it before
 			// FormData so the same edit is not compared in two different states.
 			form.querySelectorAll('textarea[id]').forEach(function (field) {
-				var editor = window.Joomla && Joomla.editors && Joomla.editors.instances[field.id];
+				var editor = getEditor(field.id);
 				try {
 					if (editor && typeof editor.getValue === 'function') editors[field.name] = editor.getValue();
 				} catch (error) { /* Use the textarea while its editor is starting. */ }
