@@ -58,13 +58,28 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
     await form(page, '<fieldset class="fc_input_set"><input type="checkbox" name="boxes[]" value="a" class="required validate-cboxlimitations" data-min_values="2"><input type="checkbox" name="boxes[]" value="b" class="required validate-cboxlimitations" data-min_values="2"></fieldset><select name="jform[catid]" id="jform_catid" class="validate-catid"><option value=""></option><option value="4">Cat</option></select><select name="jform[cid][]" id="jform_cid" multiple class="validate-sellimitations" data-exact_values="1"><option value="4" selected>Cat</option></select>');
     await validate(page);
     assert.equal(await page.evaluate(() => document.formvalidator.isValid(document.forms[0])), false);
+    assert.deepEqual(await page.locator('[name="boxes[]"]').evaluateAll(boxes => boxes.map(box => box.getAttribute('aria-invalid'))), ['true', 'true']);
     await page.locator('[value=a]').check();
     assert.equal(await page.evaluate(() => document.formvalidator.isValid(document.forms[0])), false);
     await page.locator('[value=b]').check();
     assert.equal(await page.evaluate(() => document.formvalidator.isValid(document.forms[0])), true);
+    assert.deepEqual(await page.locator('[name="boxes[]"]').evaluateAll(boxes => boxes.map(box => box.getAttribute('aria-invalid'))), ['false', 'false']);
     assert.equal(await page.inputValue('#jform_catid'), '4');
     await page.selectOption('#jform_cid', []);
     assert.equal(await page.evaluate(() => document.formvalidator.isValid(document.forms[0])), false);
+  });
+  await test('Checkbox errors mark every enabled option and survive a disabled sibling', async page => {
+    await form(page, '<fieldset class="fc_input_set"><input id="a" type="checkbox" name="choices[]" value="a" class="validate-cboxlimitations" data-min_values="2"><label for="a">A</label><input id="b" type="checkbox" name="choices[]" value="b" class="validate-cboxlimitations" data-min_values="2"><label for="b">B</label><input id="disabled-box" type="checkbox" name="choices[]" disabled checked></fieldset>');
+    await validate(page);
+    assert.equal(await page.evaluate(() => document.formvalidator.isValid(document.forms[0])), false);
+    assert.equal(await page.locator('fieldset.invalid input[aria-invalid=true]').count(), 2);
+    assert.equal(await page.locator('#disabled-box').getAttribute('aria-invalid'), null);
+    assert.equal(await page.locator('label.invalid').count(), 2);
+    assert.equal(await page.locator('.fc-field-invalid').count(), 1);
+    await page.locator('#a').check();
+    assert.equal(await page.locator('input[aria-invalid=true]').count(), 2);
+    await page.locator('#b').check();
+    assert.equal(await page.locator('input[aria-invalid=true], .fc-field-invalid').count(), 0);
   });
   await test('Hidden rich text is synchronized before required validation', async page => {
     await form(page, '<div class="fcfield_box required_box"><textarea id="body" name="body" class="mce_editable" style="display:none"></textarea></div>');

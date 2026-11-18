@@ -10,6 +10,8 @@ These are browser tests of the shared helpers. Successful POST interception does
 
 ## Migration boundary
 
+The validator keeps the same exported methods and `custom` registry. Internal routines such as `handleResponse` and `findLabel` were private in the previous implementation. Field plugins can use `validate`, `isValid`, `setHandler` and `attachToForm` to integrate with the validator.
+
 This change moves shared submission/validation, record-list controls, dialogs, manager ordering, batch controls and common form initialization to native APIs. It also constructs uploader controllers before field-ready callbacks can invoke them. It preserves `dialog('close')` handles and optional jQuery AJAX/data bridges for existing integrations.
 
 jQuery loaders remain enabled. Field-specific repeaters, conditional form dependencies, Plupload's jQuery widgets, legacy Select2, legacy color/subform plugins, and PHP-generated initialization scripts still require further work. A native helper does not make the complete editor page independent of jQuery. Third-party field plugins and site overrides are outside this patch.

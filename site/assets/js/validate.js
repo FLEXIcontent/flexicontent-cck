@@ -14,7 +14,12 @@ var JFormValidator_FC = function () {
   const required = el => el.classList.contains('required') || el.required || el.getAttribute('aria-required') === 'true';
   const empty = value => value == null || value.length === 0;
   const inputSet = el => el.closest('.fc_input_set, .btn-group, fieldset');
-  const group = el => Array.from(el.form?.elements || []).filter(other => other.name === el.name && other.type === el.type && !other.matches(':disabled'));
+  const isGroupControl = el => /^(radio|checkbox)$/.test(el.type);
+  const group = el => {
+    const fields = el.name && el.form ? Array.from(el.form.elements) : [el];
+    return fields.filter(other => other.name === el.name && other.type === el.type
+      && !other.matches(':disabled, .novalidate'));
+  };
   function setHandler(name, fn, enabled = true) { handlers[name] = {exec: fn, enabled: enabled !== false}; }
   function label(el) {
     const cached = F.element(F.data(el, 'label'));
@@ -130,11 +135,17 @@ var JFormValidator_FC = function () {
   }
   function response(valid, el, preserveMessage = false) {
     if (!valid && !fcform_1st_invalid_found) reveal(el);
-    const lbl = label(el), isGroup = /^(radio|checkbox)$/.test(el.type);
+    const lbl = label(el), isGroup = isGroupControl(el);
     const box = F.data(el, 'use_fcfield_box') ? el.closest('.fcfield_box.required_box') : null;
     const set = isGroup ? inputSet(el) : null;
-    for (const target of [el, lbl, box, set]) target?.classList.toggle('invalid', !valid);
-    el.setAttribute('aria-invalid', String(!valid));
+    const members = isGroup ? group(el) : [el];
+    for (const member of members) {
+      member.classList.toggle('invalid', !valid);
+      member.setAttribute('aria-invalid', String(!valid));
+      label(member)?.classList.toggle('invalid', !valid);
+    }
+    box?.classList.toggle('invalid', !valid);
+    set?.classList.toggle('invalid', !valid);
     if (F.data(el.form, 'use_all_mssg_box') && lbl) return;
     const hidden = el.classList.contains('fc_hidden_value');
     const expanded = el.parentElement?.classList.contains('fc-xpended-row');
@@ -147,9 +158,15 @@ var JFormValidator_FC = function () {
   function validate(el) {
     el = F.element(el);
     if (!el || F.data(el.form, 'skip_validation') || el.id?.startsWith('jform_rules')) return true;
-    if (el.matches(':disabled')) { response(true, el); return true; }
+    if (el.matches(':disabled')) {
+      if (isGroupControl(el)) {
+        el.classList.remove('invalid');
+        el.removeAttribute('aria-invalid');
+      } else response(true, el);
+      return true;
+    }
     syncEditor(el);
-    const isGroup = /^(radio|checkbox)$/.test(el.type);
+    const isGroup = isGroupControl(el);
     let valid = true;
     if (required(el)) {
       if (isGroup) valid = group(el).some(other => other.checked);
