@@ -233,6 +233,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\AdminController
 
 		if ( $print_logging_info ) $start_microtime = microtime(true);
 		$itemcountingdok  = $model->getItemCountingDataOK();
+		$dbcharsetok      = !$model->getDBCharsetPending();
 		if ( $print_logging_info ) @$fc_run_times['getItemCountingDataOK'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		//printf('<br/>-- [getItemCountingDataOK: %.2f s] ', $fc_run_times['getItemCountingDataOK']/1000000);
 
@@ -257,7 +258,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\AdminController
 			//!$existfplg || !$existseplg || existsyplg ||
 			!$existcats || !$langsynced || !$existversions || !$existversionsdata || !$existauthors ||
 			!$deprecatedfiles || !$nooldfieldsdata || !$missingversion || !$cachethumb ||
-			!$existdbindexes || !$itemcountingdok || !$initialpermission
+			!$existdbindexes || !$itemcountingdok || !$initialpermission || !$dbcharsetok
 		) {
 			$postinst_integrity_ok = false;
 		}

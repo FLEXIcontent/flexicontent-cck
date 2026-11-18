@@ -54,6 +54,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		$this->registerTask('addmcatitemrelations',		'addMcatItemRelations');
 		$this->registerTask('updatelanguageData',			'updateLanguageData');
 		$this->registerTask('createdbindexes',				'createDBindexes');
+		$this->registerTask('convertdbcharset',				'convertDBCharset');
 		$this->registerTask('createversionstable',		'createVersionsTable');
 		$this->registerTask('populateversionstable',	'populateVersionsTable');
 		$this->registerTask('createauthorstable',			'createauthorstable');
@@ -804,6 +805,52 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 
 
 	/**
+	 * Method to convert the FLEXIcontent DB tables that still use the 3-byte utf8 character set to utf8mb4
+	 *
+	 * Each table is copied by its ALTER, so a request converts tables for a few seconds only (at least one table)
+	 * The dashboard repeats the request while the reply contains the "fc-dbcharset-more" marker
+	 *
+	 * @return	void
+	 */
+	function convertDBCharset()
+	{
+		// Check for request forgeries
+		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+
+		if (!\Joomla\CMS\Factory::getApplication()->getIdentity()->authorise('core.admin', 'com_flexicontent'))
+		{
+			jexit('<span class="install-notok"></span>' . \Joomla\CMS\Language\Text::_('JERROR_ALERTNOAUTHOR'));
+		}
+
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/dbcharset.php';
+
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+
+		// The database server finishes an ALTER even if this request is cut off
+		@set_time_limit(0);
+		ignore_user_abort(true);
+
+		$failed = false;
+
+		foreach (FlexicontentDbCharset::convertPending($db, 0, 5) as $tblname => $result)
+		{
+			$failed = $failed || !$result[0];
+			echo '<div>' . ($result[0] ? '' : '<span class="install-notok"></span>')
+				. htmlspecialchars(($tblname !== '' ? $tblname . ': ' : '') . $result[1], ENT_QUOTES, 'UTF-8') . '</div>';
+		}
+
+		if ($failed)
+		{
+			return;
+		}
+
+		echo FlexicontentDbCharset::getPendingTables($db)
+			? '<span class="fc-dbcharset-more"></span>'
+			: '<span class="install-ok"></span>';
+	}
+
+
+	/**
 	 * Method to create the versions table
 	 *
 	 * @access	public
@@ -828,7 +875,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 					`state` int(3) NOT NULL default '0',
 					PRIMARY KEY  (`id`),
 					KEY `version2item` (`item_id`,`version_id`)
-					) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
+					) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`";
 
 		try
 		{
@@ -934,10 +981,10 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 
 		$query 	= " CREATE TABLE IF NOT EXISTS #__flexicontent_authors_ext (
   				`user_id` int(11) unsigned NOT NULL,
-  				`author_basicparams` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
-  				`author_catparams` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  				`author_basicparams` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  				`author_catparams` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
 					PRIMARY KEY  (`user_id`)
-					) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
+					) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`";
 		$db->setQuery($query);
 
 		try

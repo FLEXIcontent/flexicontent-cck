@@ -903,7 +903,7 @@ class com_flexicontentInstallerScript
 						$changes[] = "ADD `custom2` MEDIUMTEXT NULL AFTER `custom1`";
 					}
 					if ( isset($tbl_datatypes[$tbl_name]) && strtolower($tbl_datatypes[$tbl_name]['attribs']['DATA_TYPE']) != 'mediumtext' ) {
-						$changes[] = "CHANGE `attribs` `attribs` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL";
+						$changes[] = "CHANGE `attribs` `attribs` MEDIUMTEXT NOT NULL";
 					}
 
 					if ($changes)
@@ -936,7 +936,7 @@ class com_flexicontentInstallerScript
 						$changes[] = "ADD `asset_id` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `id`";
 					}
 					if ( isset($tbl_datatypes[$tbl_name]) && strtolower($tbl_datatypes[$tbl_name]['attribs']['DATA_TYPE']) != 'mediumtext' ) {
-						$changes[] = "CHANGE `attribs` `attribs` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL";
+						$changes[] = "CHANGE `attribs` `attribs` MEDIUMTEXT NOT NULL";
 					}
 
 					if ($changes)
@@ -955,7 +955,7 @@ class com_flexicontentInstallerScript
 						$changes[] = "ADD `itemscreatable` SMALLINT(8) NOT NULL DEFAULT '0' AFTER `published`";
 					}
 					if ( isset($tbl_datatypes[$tbl_name]) && strtolower($tbl_datatypes[$tbl_name]['attribs']['DATA_TYPE']) != 'mediumtext' ) {
-						$changes[] = "CHANGE `attribs` `attribs` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL";
+						$changes[] = "CHANGE `attribs` `attribs` MEDIUMTEXT NOT NULL";
 					}
 					if ( $types_tbl_exists && !array_key_exists('description', $tbl_fields['#__'.$tbl_name])) {
 						$changes[] = "ADD `description` TEXT NULL AFTER `alias`";
@@ -1028,8 +1028,8 @@ class com_flexicontentInstallerScript
 							KEY `field_id` (`field_id`),
 							KEY `item_id` (`item_id`),
 							FULLTEXT `search_index` (`search_index`),
-							KEY `value_id` (`value_id`)
-							) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
+							KEY `value_id` (`value_id`(191))
+							) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`";
 					}
 
 					/*
@@ -1088,10 +1088,10 @@ class com_flexicontentInstallerScript
 						$queries[] = "
 						CREATE TABLE IF NOT EXISTS `#__flexicontent_authors_ext` (
 						  `user_id` int(11) unsigned NOT NULL,
-						  `author_basicparams` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
-						  `author_catparams` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+						  `author_basicparams` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+						  `author_catparams` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
 						  PRIMARY KEY  (`user_id`)
-						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
+						) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`";
 					}
 
 					$upgrade_count = 0;
@@ -1155,8 +1155,8 @@ class com_flexicontentInstallerScript
 							`checked_out_time` datetime NOT NULL default '1000-01-01 00:00:00',
 							`attribs` mediumtext NULL,
 							PRIMARY KEY  (`id`),
-							KEY (`content_id`, `user_id`, `type`),
-							KEY (`content_id`, `type`),
+							KEY (`content_id`, `user_id`, `type`(191)),
+							KEY (`content_id`, `type`(191)),
 							KEY `user_id` (`user_id`),
 							FULLTEXT KEY `title` (`title`),
 							FULLTEXT KEY `text` (`text`),
@@ -1165,7 +1165,7 @@ class com_flexicontentInstallerScript
 							KEY `verified` (`verified`),
 							KEY `useful_yes` (`useful_yes`),
 							KEY `useful_no` (`useful_no`)
-						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;";
+						) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`;";
 					}
 
 					// Table with the 'useful' votes of the reviews
@@ -1180,7 +1180,7 @@ class com_flexicontentInstallerScript
 							`vote_date` datetime NOT NULL,
 							PRIMARY KEY  (`review_id`, `user_id`, `ip`),
 							KEY `user_id` (`user_id`)
-						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;";
+						) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`;";
 					}
 
 					if ( $reviews_tbl_exists && !array_key_exists('name', $tbl_fields['#__flexicontent_reviews']) ) {
@@ -1259,16 +1259,16 @@ class com_flexicontentInstallerScript
 							UNIQUE `file_id` (`file_id`),
 							KEY `state` (`state`),
 							KEY `media_type` (`media_type`),
-							KEY `media_format` (`media_format`),
-							KEY `resolution` (`resolution`),
+							KEY `media_format` (`media_format`(191)),
+							KEY `resolution` (`resolution`(191)),
 							KEY `fps` (`fps`),
 							KEY `bit_rate` (`bit_rate`),
 							KEY `bits_per_sample` (`bits_per_sample`),
 							KEY `sample_rate` (`sample_rate`),
 							KEY `duration` (`duration`),
-							KEY `channels` (`channels`),
-							KEY `channel_layout` (`channel_layout`)
-						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;";
+							KEY `channels` (`channels`(191)),
+							KEY `channel_layout` (`channel_layout`(191))
+						) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`;";
 					}
 
 					$upgrade_count = 0;
@@ -1335,7 +1335,7 @@ class com_flexicontentInstallerScript
 							 `is_uptodate` tinyint(3) unsigned NOT NULL default '0',
 							 `lang_parent_id` int(11) NOT NULL DEFAULT '0',
 							 PRIMARY KEY (`id`)
-							) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+							) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 						";
 					} else {
 						$_querycols = array();
@@ -1389,7 +1389,7 @@ class com_flexicontentInstallerScript
 							PRIMARY KEY (`id`),
 							KEY `user_id` (`user_id`),
 							KEY `file_id` (`file_id`)
-						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
+						) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`";
 					}
 
 					if ( !$dl_coupons_tbl_exists ) {
@@ -1405,8 +1405,8 @@ class com_flexicontentInstallerScript
 							PRIMARY KEY (`id`),
 							KEY `user_id` (`user_id`),
 							KEY `file_id` (`file_id`),
-							KEY `token` (`token`)
-						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
+							KEY `token` (`token`(191))
+						) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`";
 					}
 
 
@@ -1419,9 +1419,9 @@ class com_flexicontentInstallerScript
 							`prop` varchar(255) NOT NULL,
 							KEY  `id` (`id`),
 							KEY  `file_id` (`file_id`),
-							KEY  `context` (`context`),
-							KEY  `prop` (`prop`)
-						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
+							KEY  `context` (`context`(191)),
+							KEY  `prop` (`prop`(191))
+						) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`";
 					}
 
 					$upgrade_count = 0;
@@ -1459,9 +1459,9 @@ class com_flexicontentInstallerScript
 						  `template` varchar(50) NOT NULL default '',
 						  `cfgname` varchar(50) NOT NULL default '',
 						  `layout` varchar(20) NOT NULL default '',
-						  `attribs` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+						  `attribs` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
 						  PRIMARY KEY  (`template`,`cfgname`,`layout`)
-						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
+						) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`";
 					}
 
 					$upgrade_count = 0;
@@ -1580,6 +1580,39 @@ class com_flexicontentInstallerScript
 						}
 					}
 					else echo '<span class="badge bg-info badge-info">nothing to do</span>';
+					?>
+					</td>
+				</tr>
+
+		<?php
+		// Convert the tables that still use the 3-byte utf8 character set to utf8mb4. Every table is copied by its ALTER,
+		// so the large ones are left for the dashboard's post-installation task, which converts one table per request
+		?>
+				<tr class="row0">
+					<td class="key" style="font-size:11px;">Convert DB tables to utf8mb4: </td>
+					<td>
+					<?php
+					require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/dbcharset.php';
+
+					try {
+						// Tables up to 32 MB, and no new table once 15 seconds have passed
+						$charset_log = FlexicontentDbCharset::convertPending($db, 32 * 1024 * 1024, 15);
+						$charset_left = count(FlexicontentDbCharset::getPendingTables($db));
+
+						foreach ($charset_log as $tbl_name => $result) {
+							echo ($result[0]
+								? '<span class="badge bg-success badge-success">converted</span> '
+								: '<span class="badge badge-error">SQL Error</span> '
+							) . htmlspecialchars($tbl_name . ': ' . $result[1], ENT_QUOTES, 'UTF-8') . '<br/>';
+						}
+
+						echo $charset_left
+							? '<span class="badge bg-warning badge-warning">' . $charset_left . ' table(s) left for the dashboard\'s post-installation task</span>'
+							: ($charset_log ? '' : '<span class="badge bg-info badge-info">nothing to do</span>');
+					}
+					catch (Exception $e) {
+						echo '<span class="badge badge-error">SQL Error</span> '. $e->getMessage() . '<br/>';
+					}
 					?>
 					</td>
 				</tr>
