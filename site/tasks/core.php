@@ -86,6 +86,10 @@ class FlexicontentTasksCore
 
 		\Joomla\CMS\Factory::$application = $app;
 
+		// This entry point does not run initialiseApp(), so give the application its language the way Joomla does there
+		$app->loadLanguage($container->get(\Joomla\CMS\Language\LanguageFactoryInterface::class)->createLanguage($app->get('language'), $app->get('debug_lang')));
+		\Joomla\CMS\Factory::$language = $app->getLanguage();
+
 		// [FIX 1 - Broken Access Control]: Task Whitelisting
 		$jinput = $app->input;
 		$task   = $jinput->get('task', '', 'cmd');
