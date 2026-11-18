@@ -234,7 +234,8 @@ class FlexicontentViewUser extends FlexicontentViewBaseRecord
 		// *************************************************************************************************
 
 		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_authors_ext.php';
-		$flexiauthor_extdata = new flexicontent_authors_ext(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
+		$__fcTableDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$flexiauthor_extdata = new flexicontent_authors_ext($__fcTableDb);
 		$flexiauthor_extdata->load(($row->id ?? 0));
 		//echo "<pre>"; print_r($flexiauthor_extdata); echo "</pre>"; exit;
 

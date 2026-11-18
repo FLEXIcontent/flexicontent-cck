@@ -2600,7 +2600,8 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			 */
 
 			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_files.php';
-			$filetable = new flexicontent_files(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
+			$__fcTableDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+			$filetable = new flexicontent_files($__fcTableDb);
 			$filetable->hit($file_id);
 			if ( empty($file->history_id) )
 			{

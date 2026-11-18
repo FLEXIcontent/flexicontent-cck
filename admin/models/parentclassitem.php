@@ -6681,7 +6681,8 @@ class ParentClassItem extends FCModelAdmin
 
 		// We will use the tags table to store them
 		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_tags.php';
-		$tagTable = new flexicontent_tags(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
+		$__fcTableDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$tagTable = new flexicontent_tags($__fcTableDb);
 		$canCreate = FlexicontentHelperPerm::getPerm()->CanTags;
 
 		foreach ($tags as $key => $tag)

@@ -167,7 +167,8 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 		$author_postdata['author_catparams']	= $data['authorcatparams'];
 
 		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_authors_ext.php';
-		$flexiauthor_extdata = new flexicontent_authors_ext(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
+		$__fcTableDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$flexiauthor_extdata = new flexicontent_authors_ext($__fcTableDb);
 
 		// Bind data, Check data & Store the data to the database table
 		if (!$flexiauthor_extdata->save($author_postdata))

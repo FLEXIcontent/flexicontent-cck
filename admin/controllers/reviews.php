@@ -804,7 +804,8 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		}
 
 		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_reviews.php';
-		$review = new flexicontent_reviews(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
+		$__fcTableDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$review = new flexicontent_reviews($__fcTableDb);
 
 		if (!$review->load($id))
 		{
@@ -1578,7 +1579,8 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 	protected function _getUserRating($cid, $user, $resolution, $trashed = true)
 	{
 		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_reviews.php';
-		$review = new flexicontent_reviews(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
+		$__fcTableDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$review = new flexicontent_reviews($__fcTableDb);
 
 		if (!$review->load(array('content_id' => (int) $cid, 'user_id' => (int) $user->id, 'type' => 'item')))
 		{
@@ -1610,7 +1612,8 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 	protected function _storeUserRating($cid, $user, $rating, $resolution, $create = true)
 	{
 		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_reviews.php';
-		$review = new flexicontent_reviews(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
+		$__fcTableDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$review = new flexicontent_reviews($__fcTableDb);
 
 		$exists = $review->load(array('content_id' => (int) $cid, 'user_id' => (int) $user->id, 'type' => 'item'));
 

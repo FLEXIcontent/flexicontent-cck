@@ -62,7 +62,8 @@ class JFormFieldFctag extends \Joomla\CMS\Form\FormField
 		}
 
 		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_tags.php';
-		$item = new flexicontent_tags(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
+		$__fcTableDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$item = new flexicontent_tags($__fcTableDb);
 		if ($this->value)
 		{
 			$item->load($this->value);

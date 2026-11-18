@@ -1839,7 +1839,8 @@ class FlexicontentModelItems extends FCModelAdminList
 			$this->_db->setQuery('SELECT id FROM #__flexicontent_fields WHERE name = "text" ');
 			$desc_field_id = $this->_db->loadResult();
 			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_fields.php';
-			$desc_field = new flexicontent_fields(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
+			$__fcTableDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+			$desc_field = new flexicontent_fields($__fcTableDb);
 			$desc_field->load($desc_field_id);
 		}
 

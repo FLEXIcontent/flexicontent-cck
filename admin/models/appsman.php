@@ -239,7 +239,8 @@ class FlexicontentModelAppsman extends \Joomla\CMS\MVC\Model\ListModel
 
 		$template_names = array();
 		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_types.php';
-		$type = new flexicontent_types(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
+		$__fcTableDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$type = new flexicontent_types($__fcTableDb);
 		foreach ($type_ids as $type_id)
 		{
 			$type->id = $type_id;

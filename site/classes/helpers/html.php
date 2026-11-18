@@ -798,7 +798,8 @@ class flexicontent_html
 		if (!$ilayout)
 		{
 			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_types.php';
-			$type = new flexicontent_types(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
+			$__fcTableDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+			$type = new flexicontent_types($__fcTableDb);
 			$type->id = $item->type_id;
 			$type->load();
 			$type->params = new \Joomla\Registry\Registry($type->attribs);
