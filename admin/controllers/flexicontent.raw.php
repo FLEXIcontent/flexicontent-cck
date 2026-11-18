@@ -398,7 +398,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		echo '<span class="install-ok"></span>';
 
 		// This is necessary as extension data are cached ... and just above we updated the component parameters -manually- (and (also added menu item)
-		$cache = \Joomla\CMS\Factory::getCache();
+		$cache = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Cache\CacheControllerFactoryInterface::class)->createCacheController('callback', ['defaultgroup' => '']);
 		$cache->clean('_system');
 	}
 
@@ -1276,7 +1276,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 			$db->execute();
 		}
 
-		$catscache = \Joomla\CMS\Factory::getCache('com_flexicontent_cats');
+		$catscache = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Cache\CacheControllerFactoryInterface::class)->createCacheController('callback', ['defaultgroup' => 'com_flexicontent_cats']);
 		$catscache->clean();
 
 		$model = $this->getModel('flexicontent');

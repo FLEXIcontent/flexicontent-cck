@@ -212,7 +212,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 
 		if (count($cid))
 		{
-			$db = \Joomla\CMS\Factory::getDbo();
+			$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 			$rated = $db->setQuery(
 				'SELECT id, content_id, average_rating, custom_ratings FROM #__' . $this->records_dbtbl
 				. ' WHERE id IN (' . implode(',', $cid) . ') AND content_id > 0 AND average_rating > 0'
@@ -224,7 +224,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		// Remove the votes of the reviews that were actually deleted (permissions / locks may skip some records)
 		if (count($rated))
 		{
-			$db = \Joomla\CMS\Factory::getDbo();
+			$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 			$existing = $db->setQuery(
 				'SELECT id FROM #__' . $this->records_dbtbl . ' WHERE id IN (' . implode(',', array_keys($rated)) . ')'
 			)->loadColumn();
@@ -581,7 +581,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 					return false;
 				}
 
-				$db = \Joomla\CMS\Factory::getDbo();
+				$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 				/**
 				 * The reviewer is either an existing user or a guest (no user selected), a reviewer can have only 1 review per item
@@ -864,7 +864,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 			return;
 		}
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$exists = (int) $db->setQuery('SELECT COUNT(*) FROM #__content_rating WHERE content_id = ' . (int) $content_id)->loadResult();
 
 		if ($exists)
@@ -913,7 +913,7 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		}
 
 		$resolution = max(5, min(100, (int) $field->parameters->get('rating_resolution', 5)));
-		$db         = \Joomla\CMS\Factory::getDbo();
+		$db         = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$to_vote    = function ($percent) use ($resolution)
 		{
 			return $percent > 0 ? max(1, (int) round($percent * $resolution / 100)) : 0;

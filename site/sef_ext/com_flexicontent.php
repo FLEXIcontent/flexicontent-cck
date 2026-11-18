@@ -116,7 +116,7 @@ if (!$FC_sh404sef_init)
 	if (FLEXI_FISH)
 	{
 		// Get template XML data from cache
-		$_cache = \Joomla\CMS\Factory::getCache('com_flexicontent_cats');  // Get Joomla Cache
+		$_cache = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Cache\CacheControllerFactoryInterface::class)->createCacheController('callback', ['defaultgroup' => 'com_flexicontent_cats']);  // Get Joomla Cache
 		//$_cache->setCaching(1); 		              // Force cache ON
 		//$_cache->setLifeTime(FLEXI_CACHE_TIME); 	// Set expire time (default is 1 hour)
 		$_helper = new sh404_fc_helper();

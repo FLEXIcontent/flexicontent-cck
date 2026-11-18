@@ -172,7 +172,7 @@ class flexicontent_tmpl
 		if ( $apply_cache )
 		{
 			// Get template XML data from cache
-			$tmplcache = Factory::getCache('com_flexicontent_tmpl');  // Get Joomla Cache of '...tmpl' Caching Group
+			$tmplcache = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Cache\CacheControllerFactoryInterface::class)->createCacheController('callback', ['defaultgroup' => 'com_flexicontent_tmpl']);  // Get Joomla Cache of '...tmpl' Caching Group
 			$tmplcache->setCaching(1); 		              // Force cache ON
 			$tmplcache->setLifeTime(FLEXI_CACHE_TIME); 	// Set expire time (default is 1 hour)
 			$tmpls = $tmplcache->get(
@@ -337,7 +337,7 @@ class flexicontent_tmpl
 		$apply_cache = 1;//FLEXI_CACHE;
 		if ( $apply_cache )
 		{
-			$tmplcache = Factory::getCache('com_flexicontent_tmpl');  // Get Joomla Cache of '...tmpl' Caching Group
+			$tmplcache = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Cache\CacheControllerFactoryInterface::class)->createCacheController('callback', ['defaultgroup' => 'com_flexicontent_tmpl']);  // Get Joomla Cache of '...tmpl' Caching Group
 			$tmplcache->setCaching(1); 		              // Force cache ON
 			$tmplcache->setLifeTime(FLEXI_CACHE_TIME); 	// Set expire time (default is 1 hour)
 			$layout_texts = $tmplcache->get(

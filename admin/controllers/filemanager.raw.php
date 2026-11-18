@@ -711,7 +711,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 		if (!$ids)
 		{
-			\Joomla\CMS\Factory::getCache('com_flexicontent')->clean();
+			\Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Cache\CacheControllerFactoryInterface::class)->createCacheController('callback', ['defaultgroup' => 'com_flexicontent'])->clean();
 		}
 
 		jexit(json_encode(array(

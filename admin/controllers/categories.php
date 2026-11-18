@@ -303,9 +303,9 @@ class FlexicontentControllerCategories extends FlexicontentControllerBaseAdmin
 
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 		// Clean cache
-		$cache = \Joomla\CMS\Factory::getCache('com_flexicontent');
+		$cache = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Cache\CacheControllerFactoryInterface::class)->createCacheController('callback', ['defaultgroup' => 'com_flexicontent']);
 		$cache->clean();
-		$catscache = \Joomla\CMS\Factory::getCache('com_flexicontent_cats');
+		$catscache = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Cache\CacheControllerFactoryInterface::class)->createCacheController('callback', ['defaultgroup' => 'com_flexicontent_cats']);
 		$catscache->clean();
 	}
 

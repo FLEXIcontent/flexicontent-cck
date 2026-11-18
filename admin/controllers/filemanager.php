@@ -1912,7 +1912,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		}
 
 		// Clear cache and return
-		$cache = \Joomla\CMS\Factory::getCache('com_flexicontent');
+		$cache = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Cache\CacheControllerFactoryInterface::class)->createCacheController('callback', ['defaultgroup' => 'com_flexicontent']);
 		$cache->clean();
 
 		$this->setRedirect($this->returnURL, $msg);
@@ -2017,7 +2017,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			$msg .= \Joomla\CMS\Language\Text::_($state ? 'FLEXI_PUBLISHED' : 'FLEXI_UNPUBLISHED') . ': ' . implode(', ', $allowed_files);
 		}
 
-		$cache = \Joomla\CMS\Factory::getCache('com_flexicontent');
+		$cache = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Cache\CacheControllerFactoryInterface::class)->createCacheController('callback', ['defaultgroup' => 'com_flexicontent']);
 		$cache->clean();
 
 		$this->setRedirect($this->returnURL, $msg);
@@ -2312,7 +2312,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 	{
 		$this->input->get('task', '', 'cmd') !== __FUNCTION__ or die(__FUNCTION__ . ' : direct call not allowed');
 
-		$cache = \Joomla\CMS\Factory::getCache('com_flexicontent');
+		$cache = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Cache\CacheControllerFactoryInterface::class)->createCacheController('callback', ['defaultgroup' => 'com_flexicontent']);
 		$cache->clean();
 	}
 
@@ -2387,7 +2387,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 				return;
 			}
 
-			\Joomla\CMS\Factory::getCache('com_flexicontent')->clean();
+			\Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Cache\CacheControllerFactoryInterface::class)->createCacheController('callback', ['defaultgroup' => 'com_flexicontent'])->clean();
 			$this->setRedirect($this->returnURL, \Joomla\CMS\Language\Text::sprintf('FLEXI_FILEMAN_ACCESS_CHANGED', count($allowed), count($cid)));
 
 			return;
@@ -2425,7 +2425,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			return;
 		}
 
-		$cache = \Joomla\CMS\Factory::getCache('com_flexicontent');
+		$cache = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Cache\CacheControllerFactoryInterface::class)->createCacheController('callback', ['defaultgroup' => 'com_flexicontent']);
 		$cache->clean();
 
 		$isAjax = $this->input->get('isAjax', 0, 'int');

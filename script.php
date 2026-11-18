@@ -243,7 +243,7 @@ class com_flexicontentInstallerScript
 		$extensions = array();
 
 		// clear a cache
-		$cache = \Joomla\CMS\Factory::getCache();
+		$cache = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Cache\CacheControllerFactoryInterface::class)->createCacheController('callback', ['defaultgroup' => '']);
 		$cache->clean( '_system' );  // This might be necessary as installing-uninstalling in same session may result in wrong extension ids, etc
 		$cache->clean( 'com_flexicontent' );
 		$cache->clean( 'com_flexicontent_tmpl' );

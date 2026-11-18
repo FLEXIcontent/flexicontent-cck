@@ -1980,9 +1980,7 @@ class FlexicontentTasksCore
 
 		if ($cache_enabled && isset($plg))
 		{
-			$catscache = class_exists('\\Joomla\\CMS\\Factory')
-				? \Joomla\CMS\Factory::getCache('com_flexicontent_cats')
-				: JFactory::getCache('com_flexicontent_cats');
+			$catscache = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Cache\CacheControllerFactoryInterface::class)->createCacheController('callback', ['defaultgroup' => 'com_flexicontent_cats']);
 
 			$catscache->setCaching(1);
 			$catscache->setLifeTime($cache_time);
@@ -2110,7 +2108,7 @@ class FlexicontentTasksCore
 	{
 		return class_exists('\\Joomla\\CMS\\Factory')
 			? \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class)
-			: JFactory::getDbo();
+			: \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 	}
 
 	private function _getLanguageTag()

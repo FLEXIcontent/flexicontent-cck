@@ -38,7 +38,7 @@ $showReviews = false;
 
 if (!isset($sbtns['reviews']) && $this->perms->CanReviews && file_exists(JPATH_ADMINISTRATOR . '/components/com_flexicontent/views/reviews'))
 {
-	$rv_db    = \Joomla\CMS\Factory::getDbo();
+	$rv_db    = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 	$rv_field = $rv_db->setQuery('SELECT * FROM #__flexicontent_fields WHERE field_type = ' . $rv_db->Quote('voting'))->loadObject();
 
 	if ($rv_field)

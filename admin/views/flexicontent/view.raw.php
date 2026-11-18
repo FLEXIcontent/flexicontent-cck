@@ -174,7 +174,7 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 	function fversion($params)
 	{
 		// Cache GitHub API call for 1 hour
-		$cache = \Joomla\CMS\Factory::getCache('com_flexicontent');
+		$cache = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Cache\CacheControllerFactoryInterface::class)->createCacheController('callback', ['defaultgroup' => 'com_flexicontent']);
 		$cache->setCaching(1);
 		$cache->setLifeTime(3600);
 		$check = $cache->get(array('FlexicontentViewFlexicontent', 'getUpdateComponent'), array());

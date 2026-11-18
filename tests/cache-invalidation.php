@@ -1,6 +1,6 @@
 <?php
 /** Content mutations must also invalidate dependent progressive module metadata. */
-namespace Joomla\CMS {class Factory {public static function getCache($group){return new \CacheRecorder($group,0);}}}
+namespace Joomla\CMS {class Factory {public static function getContainer(){return new class {public function get($id){return new \Joomla\CMS\CacheControllerFactoryStub();}};}}class CacheControllerFactoryStub {public function createCacheController($type,$options){return new \CacheRecorder($options['defaultgroup'] ?? '',0);}}}
 namespace {
  error_reporting(E_ALL);set_error_handler(static function($s,$m,$f,$l){throw new \ErrorException($m,0,$s,$f,$l);});
  class CacheRecorder {public static array $calls=[];public function __construct(private string $group,private int $client){}public function clean($group=null){self::$calls[]=[$group??$this->group,$this->client];}}

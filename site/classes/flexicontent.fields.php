@@ -3161,7 +3161,7 @@ class FlexicontentFields
 		require_once ($segmenter_path);
 
 		// Apply caching to dictionary parsing regardless of cache setting ...
-		$handlercache = \Joomla\CMS\Factory::getCache('com_flexicontent_lang_handlers');  // Get Joomla Cache of '... lang_handlers' Caching Group
+		$handlercache = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Cache\CacheControllerFactoryInterface::class)->createCacheController('callback', ['defaultgroup' => 'com_flexicontent_lang_handlers']);  // Get Joomla Cache of '... lang_handlers' Caching Group
 		$handlercache->setCaching(1);         // Force cache ON
 		$handlercache->setLifeTime(24*3600);  // Set expire time (hard-code this to 1 day), since it is costly
 		$dictionary = $handlercache->get(
@@ -4218,7 +4218,7 @@ class FlexicontentFields
 		// Apply caching to filters regardless of cache setting ...
 		if (FLEXI_CACHE)
 		{
-			$itemcache = \Joomla\CMS\Factory::getCache('com_flexicontent_filters');  // Get Joomla Cache of '...items' Caching Group
+			$itemcache = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Cache\CacheControllerFactoryInterface::class)->createCacheController('callback', ['defaultgroup' => 'com_flexicontent_filters']);  // Get Joomla Cache of '...items' Caching Group
 			$itemcache->setCaching(1); 		              // Force cache ON
 			$itemcache->setLifeTime(FLEXI_CACHE_TIME); 	// Set expire time (default is 1 hour)
 		}

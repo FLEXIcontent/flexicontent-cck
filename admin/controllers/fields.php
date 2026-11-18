@@ -522,7 +522,7 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 				$msg .= \Joomla\CMS\Language\Text::sprintf('FLEXI_FIELDS_UNEDITABLE_FIELDS_NOT_COPIED', count($non_auth_cid)) . ' ';
 			}
 
-			$cache = \Joomla\CMS\Factory::getCache('com_flexicontent');
+			$cache = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Cache\CacheControllerFactoryInterface::class)->createCacheController('callback', ['defaultgroup' => 'com_flexicontent']);
 			$cache->clean();
 		}
 

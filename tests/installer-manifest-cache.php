@@ -3,7 +3,7 @@
 namespace Joomla\CMS {
     class Factory {
         public static $cache;
-        public static function getDbo() {
+        public static function dbStub() {
             return new class {
                 public function setQuery($query) { return $this; }
                 public function quote($value) { return "'" . $value . "'"; }
@@ -11,7 +11,7 @@ namespace Joomla\CMS {
             };
         }
         public static function getContainer() {
-            return new class { public function get($id) { return Factory::getDbo(); } };
+            return new class { public function get($id) { return Factory::dbStub(); } };
         }
     }
 }

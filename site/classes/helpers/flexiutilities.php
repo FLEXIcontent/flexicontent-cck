@@ -383,7 +383,7 @@ class FLEXIUtilities
 			'cachebase' => ($client == 1 ? JPATH_ADMINISTRATOR . '/cache' : $conf->get('cache_path', JPATH_CACHE))
 		);
 
-		$cache = \Joomla\CMS\Cache\Cache::getInstance('', $options);
+		$cache = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Cache\CacheControllerFactoryInterface::class)->createCacheController('', $options);
 
 		return $cache;
 	}

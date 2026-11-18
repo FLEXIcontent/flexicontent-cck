@@ -493,7 +493,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		// No rating stored in a review, use the rating given via the vote stars (of this session)
 		elseif (!(int) $field->parameters->get('enable_extra_votes', 0))
 		{
-			$vote_history = \Joomla\CMS\Factory::getSession()->get('vote_history', array(), 'flexicontent');
+			$vote_history = \Joomla\CMS\Factory::getApplication()->getSession()->get('vote_history', array(), 'flexicontent');
 
 			if (!empty($vote_history[$content_id]['main']))
 			{
@@ -533,7 +533,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		{
 			$rv_resolution = $this->getReviewResolution($field);
 			$rv_stored     = ($review && trim((string) $review->custom_ratings) !== '') ? (array) json_decode((string) $review->custom_ratings, true) : array();
-			$rv_history    = \Joomla\CMS\Factory::getSession()->get('vote_history', array(), 'flexicontent');
+			$rv_history    = \Joomla\CMS\Factory::getApplication()->getSession()->get('vote_history', array(), 'flexicontent');
 			$rv_vals       = array();
 
 			foreach ($rv_chars as $xid => $rv_char)
@@ -1832,7 +1832,7 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		if ($is_own)
 		{
 			// Forget the vote in the user's session, otherwise a new vote would be counted as a change of the old vote
-			$session = \Joomla\CMS\Factory::getSession();
+			$session = \Joomla\CMS\Factory::getApplication()->getSession();
 			$vote_history = $session->get('vote_history', array(), 'flexicontent');
 			unset($vote_history[$content_id]);
 			$session->set('vote_history', $vote_history, 'flexicontent');

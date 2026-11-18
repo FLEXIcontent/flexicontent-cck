@@ -4299,7 +4299,7 @@ class flexicontent_html
 
 		if ($missing)
 		{
-			$db = \Joomla\CMS\Factory::getDbo();
+			$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 			$query = $db->getQuery(true)
 				->select('r.content_id, COUNT(*) AS total')
@@ -4359,7 +4359,7 @@ class flexicontent_html
 	static function getItemReviewDistribution($item_id, $stars = 5)
 	{
 		$stars = max(1, (int) $stars);
-		$db    = \Joomla\CMS\Factory::getDbo();
+		$db    = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$query = $db->getQuery(true)
 			->select('CAST(GREATEST(1, ROUND(r.average_rating * ' . $stars . ' / 100)) AS UNSIGNED) AS stars, COUNT(*) AS total')
@@ -4396,7 +4396,7 @@ class flexicontent_html
 			return null;
 		}
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$query = $db->getQuery(true)
 			->select('r.*')
@@ -4425,7 +4425,7 @@ class flexicontent_html
 	static function getItemReviewsPage($item_id, $offset, $limit, $star = 0, $stars = 5)
 	{
 		$uid = (int) \Joomla\CMS\Factory::getApplication()->getIdentity()->id;
-		$db  = \Joomla\CMS\Factory::getDbo();
+		$db  = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$query = $db->getQuery(true)
 			->select('r.*')
@@ -4486,7 +4486,7 @@ class flexicontent_html
 			return array();
 		}
 
-		$db = \Joomla\CMS\Factory::getDbo();
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
 		$query = $db->getQuery(true)
 			->select('review_id, vote')
@@ -4512,7 +4512,7 @@ class flexicontent_html
 
 		if ($field === false)
 		{
-			$db    = \Joomla\CMS\Factory::getDbo();
+			$db    = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 			$field = $db->setQuery('SELECT * FROM #__flexicontent_fields WHERE field_type = ' . $db->Quote('voting'))->loadObject();
 
 			if ($field)

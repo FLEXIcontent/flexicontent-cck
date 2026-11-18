@@ -27,7 +27,7 @@ class FlexicontentHelperPerm
 
 		// Return cached data
 		if ( FLEXI_CACHE ) {
-			$catscache = \Joomla\CMS\Factory::getCache('com_flexicontent_cats');  // Get desired cache group
+			$catscache = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Cache\CacheControllerFactoryInterface::class)->createCacheController('callback', ['defaultgroup' => 'com_flexicontent_cats']);  // Get desired cache group
 			$catscache->setCaching(1); 		              // Force cache ON
 			$catscache->setLifeTime(FLEXI_CACHE_TIME);  // Set expire time (default is 1 hour)
 
@@ -213,7 +213,7 @@ class FlexicontentHelperPerm
 		// Return cached data
 		$user_id = $user ? $user->id : \Joomla\CMS\Factory::getApplication()->getIdentity()->id;
 		if (FLEXI_CACHE) {
-			$catscache = \Joomla\CMS\Factory::getCache('com_flexicontent_cats');  // Get desired cache group
+			$catscache = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Cache\CacheControllerFactoryInterface::class)->createCacheController('callback', ['defaultgroup' => 'com_flexicontent_cats']);  // Get desired cache group
 			$catscache->setCaching(1); 		              // Force cache ON
 			$catscache->setLifeTime(FLEXI_CACHE_TIME);  // set expire time (default is 1 hour)
 

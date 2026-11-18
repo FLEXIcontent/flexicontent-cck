@@ -100,7 +100,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 		}
 		else
 		{
-			$tmplcache = \Joomla\CMS\Factory::getCache('com_flexicontent_tmpl');
+			$tmplcache = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Cache\CacheControllerFactoryInterface::class)->createCacheController('callback', ['defaultgroup' => 'com_flexicontent_tmpl']);
 			$tmplcache->clean();
 			echo '<span class="copyok" style="margin-top:15px; display:block">' . \Joomla\CMS\Language\Text::sprintf('FLEXI_TEMPLATE_CLONED', htmlspecialchars($source, ENT_QUOTES, 'UTF-8'), htmlspecialchars($dest, ENT_QUOTES, 'UTF-8')) . '</span>';
 		}
@@ -135,7 +135,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 		}
 		else
 		{
-			$tmplcache = \Joomla\CMS\Factory::getCache('com_flexicontent_tmpl');
+			$tmplcache = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Cache\CacheControllerFactoryInterface::class)->createCacheController('callback', ['defaultgroup' => 'com_flexicontent_tmpl']);
 			$tmplcache->clean();
 			echo '<span class="copyok">' . \Joomla\CMS\Language\Text::sprintf('FLEXI_TEMPLATE_DELETED', $dir) . '</span>';
 		}
@@ -792,7 +792,7 @@ class FlexicontentControllerTemplates extends FlexicontentControllerBaseAdmin
 
 			if (preg_match('#\.xml#', $file_path))
 			{
-				$tmplcache = \Joomla\CMS\Factory::getCache('com_flexicontent_tmpl');
+				$tmplcache = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Cache\CacheControllerFactoryInterface::class)->createCacheController('callback', ['defaultgroup' => 'com_flexicontent_tmpl']);
 				$tmplcache->clean();
 			}
 		}

@@ -195,7 +195,7 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 				$adminEmail = $MailFrom;
 			}
 
-			\Joomla\CMS\Factory::getMailer()->sendMail($adminEmail, $adminName, $user->get('email'), $subject, $message);
+			\Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\Mail\MailerFactoryInterface::class)->createMailer()->sendMail($adminEmail, $adminName, $user->get('email'), $subject, $message);
 		}
 
 		$ctrl = 'users.';

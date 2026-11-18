@@ -1,10 +1,8 @@
 <?php
 /** Match the active Joomla cache path while retaining configured paths and admin storage. */
 namespace Joomla\CMS {
- class Factory {public static $config;public static function getConfig(){return self::$config;}public static function getApplication(){return new class {public function getConfig(){return Factory::$config;}};}}
-}
-namespace Joomla\CMS\Cache {
- class Cache {public static function getInstance($handler,$options){return (object)$options;}}
+ class Factory {public static $config;public static function getConfig(){return self::$config;}public static function getApplication(){return new class {public function getConfig(){return Factory::$config;}};}public static function getContainer(){return new class {public function get($id){return new \Joomla\CMS\CacheControllerFactoryStub();}};}}
+ class CacheControllerFactoryStub {public function createCacheController($type,$options){return (object)$options;}}
 }
 namespace {
  error_reporting(E_ALL);set_error_handler(static function($s,$m,$f,$l){throw new \ErrorException($m,0,$s,$f,$l);});
