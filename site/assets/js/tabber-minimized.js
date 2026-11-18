@@ -428,14 +428,14 @@ tabberObj.prototype.init = function(e)
 		/* Add the list element to the list */
 		DOM_ul.appendChild(DOM_li);
 
-		if (DOM_a.tabber_hasClass('hasTooltip') && !!jQuery)
+		if (DOM_a.tabber_hasClass('hasTooltip') && typeof jQuery !== 'undefined')
 		{
 			try{
 				jQuery(DOM_a).tooltip({html: true, container: DOM_a});
 			}catch(e){}
 		}
 
-		if (DOM_a.tabber_hasClass('hasPopover') && !!jQuery)
+		if (DOM_a.tabber_hasClass('hasPopover') && typeof jQuery !== 'undefined')
 		{
 			try {
 				jQuery(DOM_a).popover({html: true, container: DOM_a, trigger : 'hover focus'});

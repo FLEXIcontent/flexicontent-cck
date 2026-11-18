@@ -2194,6 +2194,7 @@ class flexicontent_html
 				break;
 
 			case 'flexi-lib':
+				flexicontent_html::loadFramework('form-utils');
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
 				flexicontent_html::loadFramework('flexi_js_common');
@@ -2271,7 +2272,17 @@ class flexicontent_html
 				break;
 
 			// Used only by content / configuration forms, that have form elements needing this
+			case 'form-utils':
+				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/form-utils.js', array('version' => FLEXI_VHASH));
+				break;
+
+			case 'sortable':
+				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/librairies/choicesjs/sortable.min.js', array('version' => FLEXI_VHASH));
+				break;
+
 			case 'flexi-lib-form':
+				flexicontent_html::loadFramework('form-utils');
+				flexicontent_html::loadFramework('sortable');
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
 				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/flexi-lib-form.js', array('version' => FLEXI_VHASH));

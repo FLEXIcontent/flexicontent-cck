@@ -83,270 +83,146 @@
 	}
 
 
-	// Display content in modal popup
-	function fc_showAsDialog(obj, winwidth, winheight, closeFunc, params)
+	// Dialog handles retain dialog('close') for field plugins which already use it.
+	const fc_nativeDialogs = new WeakMap();
+	function fc_showAsDialog(obj, winwidth, winheight, closeFunc, params = {})
 	{
-		params = typeof params !== 'undefined' ? params : {};
-		params = fc_getAutoSizePos(winwidth, winheight, params);
-
-		// Make it jQuery object if it is not already
-		obj = jQuery(obj);
-
-		// Get close function
-		closeFunc = typeof closeFunc !== 'undefined' && closeFunc ? closeFunc : 0;
-		var keepPlace = !!params.keepPlace;
-		var visibleOnClose = !!params.visibleOnClose;
-
-		// Because allowing moving modal to be moved out of form (under body), we need to set form ATTRIBUTE to form, for any form elements inside it
-		if (!keepPlace)
-		{
-			var form_fields = obj.find('textarea, select, input, button').toArray();
-			for ( var i = 0, l = form_fields.length; i < l; i++ )
-			{
-				// Get field type / tag name
-				var $el = jQuery(form_fields[i]);
-				var form = form_fields[i].form;
-				if (form && form.id && !$el.attr('form'))
-				{
-					$el.attr('form', form.id);
-				}
-			}
-		}
-
-		var parent = obj.parent();
-		var theDialog = obj.dialog({
-			title: params.title,
-			closeOnEscape: (typeof params.closeOnEscape !== 'undefined'  ?  params.closeOnEscape  :  true),
-			resize: false,
-			autoOpen: false,
-			width: params.winwidth,
-			height: params.winheight,
-			//position: { at: 'center' },
-			modal: (typeof params.modal !== 'undefined'  ?  params.modal  :  true),
-			dialogClass: params.dialogClass,
-			icons: {
-				primary: "ui-icon-heart"
-			},
-			buttons: {
-				/*'Close': function() { jQuery(this).dialog('close'); }*/
-			},
-			open: function(ev, ui){
-				// Fix for Pagebuilder CK modifying not-owned modals
-				jQuery('.ui-widgetck .ui-dialog-titlebar-close > .ui-icon').removeClass('ui-widgetck-overlay').css('top', '0').css('left', '0');
-				jQuery('.ui-widgetck').removeClass('ui-widgetck').addClass('ui-widget fc-no-scroll');
-				jQuery('.ui-widgetck-content').removeClass('ui-widgetck-content').addClass('ui-widget-content');
-				jQuery('.ui-widgetck-header').removeClass('ui-widgetck-header').addClass('ui-widget-header');
-				jQuery('.ui-widgetck-overlay').removeClass('ui-widgetck-overlay').addClass('ui-widget-overlay').css('z-index', '2049').css('position', 'fixed');
-
-				// Close on click outside of modal popup
-				if (typeof params.closeOnOutClick !== 'undefined'  ?  params.closeOnOutClick  :  true) {
-					jQuery('.ui-widget-overlay, .pac-container').bind('click', function () {
-						obj.dialog('close');
-					});
-				}
-			},
-			// Clear contents after dialog closes
-			close: function(ev, ui)
-			{
-				// Allow parent document to scroll again
-				var bodyTag = jQuery(this).closest('body');
-				var fc_modal_count = parseInt(bodyTag.data('fc_modal_count'));
-				bodyTag.data('fc_modal_count', --fc_modal_count);
-
-				if (fc_modal_count == 0)
-				{
-					bodyTag.removeClass('fc-no-scroll');
-				}
-
-				// Destroy the dialog completely, this is needed because we have moved the content back into its proper position
-				jQuery(this).dialog('destroy');
-
-				// Allow CSS class to apply
-				if (visibleOnClose) obj.css({'height': '', 'width': '', 'display': '', 'visibility': ''});
-
-				// Finalize by doing the closing operation
-				if (typeof closeFunc === 'function') closeFunc(obj);
-				else if (closeFunc == 1) window.location.reload(false);
-				else if (closeFunc == 0) ;
-				else alert('Unknown action'+closeFunc);
-			}
-		})
-		.dialog('widget').next('.ui-widget-overlay').css('background', 'gray');  // Add an overlay
-
-		// Manually move the dialog content back into its proper position, (the extra dialog container will be destroyed on dialog close)
-		if (keepPlace) obj.parent().appendTo(parent);
-
-		// Force manual position of dialog
-		obj.parent().css({ 'left': params.winleft+'px', 'width': params.winwidth+'px', 'top': params.wintop+'px'});
-
-		// Open the dialog manually
-		theDialog = obj.dialog('open');
-
-		// Add modal's data to the data of the parent of the HTML container: max-width, max-height, params, dialog reference
-		theDialog.data('fc_dialog_params', params);
-		theDialog.data('fc_dialog_maxwidth', winwidth);
-		theDialog.data('fc_dialog_maxheight', winheight);
-		obj.parent().data('fc_dialog', theDialog);
-
-		// Stop scrolling of parent document
-		var bodyTag = obj.closest('body');
-		var fc_modal_count = !! bodyTag.data('fc_modal_count') ? parseInt(bodyTag.data('fc_modal_count')) : 0;
-		bodyTag.data('fc_modal_count', ++fc_modal_count);
-		bodyTag.addClass('fc-no-scroll');
-
-		// Return a reference of the dialog to the caller
-		return theDialog;
-	}
-
-
-	// Load given URL in an open dialog
-	function fc_showDialog(url, tagid, no_iframe, winwidth, winheight, closeFunc, params)
-	{
-		params = typeof params !== 'undefined' ? params : {};
-		params = fc_getAutoSizePos(winwidth, winheight, params);
-
-		var loadFunc = typeof params.loadFunc !== 'undefined' && params.loadFunc ? params.loadFunc : false;
-
-		// Get close function
-		var closeFunc = typeof closeFunc !== 'undefined' && closeFunc ? closeFunc : 0;
-
-		// Get container creating it if it does not exist
-		var container = jQuery('#'+tagid);
-		if (!container.length)
-		{
-			container = jQuery('<div id="'+tagid+'"></div>').appendTo(document.body);
-		}
-
-		// Get loading animation tag, creating it if it does not exist, (re)showing if it is exists
-		var loading = jQuery('#'+tagid+'_loading');
-		if (!loading.length)
-		{
-			loading = jQuery('<div id="'+tagid+'_loading" class="fc_loading_msg" style="position:absolute; background-color:transparent;">loading...</div>');
-			container.prepend(loading);
-		}
-		else loading.show();
-
-		// Add the iframe
-		var iframe;
-		if (!no_iframe)
-		{
-			iframe = jQuery('<iframe id="'+tagid+'_frame" tabindex="0" style="visibility:hidden; width:100%; height:100%; border:0; margin:0; padding:0;" src=""></iframe>');
-			container.append(iframe);
-			iframe.on('load', function() {
-				// Show retrieved contents and hide the loading animation
-				iframe.show().css('visibility', 'visible');
-				loading.hide();
-
-				// Keyboard users: move focus into the loaded page, else it stays on the dialog's Close button and Tab never reaches the iframe
-				try {
-					var doc = iframe[0].contentDocument;
-					var first = doc && doc.querySelector('a[href]:not([tabindex="-1"]), button:not([disabled]):not([tabindex="-1"]), input:not([type=hidden]):not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])');
-					if (first) first.focus();
-					else if (iframe[0].contentWindow) iframe[0].contentWindow.focus();
-				} catch (e) { /* another origin: leave the focus where it is */ }
-
-				// Remove unneeded scroll bar inside iframe document, new browser security disallows this ?
-				//iframe.contents().find('body').css({ 'height': 'unset' });
-			});
-		}
-
-		// Contaner CSS depending on usage of iframe
-		no_iframe ?
-			container.css('overflow', 'scroll') :
-			container.css('overflow', 'hidden').css('padding', '0') ;
-
-		// Initialize popup container
-		container.dialog({
-			title: params.title,
-			closeOnEscape: (typeof params.closeOnEscape !== 'undefined'  ?  params.closeOnEscape  :  false),
-			autoOpen: false,
-			width: params.winwidth,
-			height: params.winheight,
-			modal: (typeof params.modal !== 'undefined'  ?  params.modal  :  true),
-			//position: { at: 'center' },
-			dialogClass: params.dialogClass,
-			// Load contents (url) when dialog opens
-			open: function(ev, ui){
-				no_iframe ?
-					container.load(url) :
-					jQuery('#'+tagid+'_frame').attr('src', url);
-
-				// Fix for Pagebuilder CK modifying not-owned modals
-				jQuery('.ui-widgetck .ui-dialog-titlebar-close > .ui-icon').removeClass('ui-widgetck-overlay').css('top', '0').css('left', '0');
-				jQuery('.ui-widgetck').removeClass('ui-widgetck').addClass('ui-widget fc-no-scroll');
-				jQuery('.ui-widgetck-content').removeClass('ui-widgetck-content').addClass('ui-widget-content');
-				jQuery('.ui-widgetck-header').removeClass('ui-widgetck-header').addClass('ui-widget-header');
-				jQuery('.ui-widgetck-overlay').removeClass('ui-widgetck-overlay').addClass('ui-widget-overlay').css('z-index', '2049').css('position', 'fixed');
-
-				// Close on click outside of modal popup
-				jQuery('.ui-widget-overlay, .pac-container').bind('click', function(){
-					container.dialog('close');
-				});
-			},
-			// Clear contents after dialog closes
-			close: function(ev, ui)
-			{
-				// Allow parent document to scroll again
-				var bodyTag = jQuery(this).closest('body');
-				var fc_modal_count = parseInt(bodyTag.data('fc_modal_count'));
-				bodyTag.data('fc_modal_count', --fc_modal_count);
-
-				if (fc_modal_count == 0)
-				{
-					bodyTag.removeClass('fc-no-scroll');
-				}
-
-				// Remove container / iframe contents (we re-use it)
-				no_iframe  ?  container.html('')  :  jQuery('#'+tagid+'_frame').remove();
-
-				// Finalize by doing the closing operation
-				if (typeof closeFunc === 'function') closeFunc();
-				else if (closeFunc == 1) window.location.reload(false);
-				else if (closeFunc == 0) ;
-				else alert('Unknown action'+closeFunc);
+		const content = FlexiForm.element(obj);
+		if (!content) return null;
+		const active = fc_nativeDialogs.get(content);
+		if (active) return active;
+		const settings = {...params};
+		const previousFocus = document.activeElement;
+		const marker = document.createComment('FLEXIcontent dialog position');
+		content.before(marker);
+		const originalStyle = content.getAttribute('style');
+		const associations = [];
+		content.querySelectorAll('input,textarea,select,button').forEach(input => {
+			if (input.form?.id && !input.hasAttribute('form')) {
+				input.setAttribute('form', input.form.id); associations.push(input);
 			}
 		});
+		const dialog = document.createElement('dialog');
+		dialog.className = 'fc-native-dialog ui-dialog ui-widget ui-widget-content';
+		dialog.style.cssText = 'position:fixed;padding:0;margin:auto;max-width:calc(100vw - 10px);max-height:calc(100vh - 10px);border:1px solid #aaa;';
+		const titlebar = document.createElement('div');
+		titlebar.className = 'ui-dialog-titlebar ui-widget-header';
+		titlebar.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:8px;flex:none;';
+		const title = document.createElement('span'); title.className = 'ui-dialog-title'; title.textContent = settings.title || '';
+		title.id = 'fc-dialog-title-' + (++fc_showAsDialog.sequence); dialog.setAttribute('aria-labelledby', title.id);
+		const close = document.createElement('button'); close.type = 'button'; close.textContent = '\u00d7';
+		close.className = 'btn fc-dialog-close'; close.setAttribute('aria-label', FlexiForm.text('JCLOSE'));
+		titlebar.append(title, close); dialog.append(titlebar, content);
+		(settings.keepPlace ? marker.parentNode : document.body).append(dialog);
+		content.style.cssText += ';display:block;visibility:visible;flex:1;min-height:0;width:auto;height:auto;overflow:auto;';
+		const resize = () => {
+			const size = fc_getAutoSizePos(winwidth, winheight, {...settings});
+			dialog.style.width = size.winwidth + 'px'; dialog.style.height = size.winheight + 'px';
+		};
+		resize(); window.addEventListener('resize', resize);
+		const handle = {element: content, close: () => { dialog.close(); finish(); }, dialog: action => {
+			if (action === 'close' || action === 'destroy') handle.close();
+			return handle;
+		}};
+		// Select2 3.x normally puts its menu under body, outside a native modal's
+		// interactive subtree. Its existing body/positioning API can target this dialog.
+		const legacySelects = new Map();
+		let legacyMask;
+		const legacyOpening = event => {
+			const instance = window.jQuery(event.target).data('select2');
+			if (!instance?.body || legacySelects.has(instance)) return;
+			legacySelects.set(instance, instance.body); instance.body = window.jQuery(dialog);
+			const mask = document.getElementById('select2-drop-mask');
+			if (mask && mask.parentElement !== dialog) { legacyMask = {mask, parent: mask.parentElement}; dialog.append(mask); }
+		};
+		if (window.jQuery) window.jQuery(content).on('select2-opening.fcNativeDialog', legacyOpening);
+		fc_nativeDialogs.set(content, handle);
+		close.addEventListener('click', handle.close);
+		dialog.addEventListener('cancel', event => { if (settings.closeOnEscape === false) event.preventDefault(); });
+		dialog.addEventListener('click', event => {
+			if (event.target !== dialog || settings.closeOnOutClick === false) return;
+			const rect = dialog.getBoundingClientRect();
+			if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) handle.close();
+		});
+		let finished = false;
+		const finish = () => {
+			if (finished) return;
+			finished = true;
+			if (window.jQuery) window.jQuery(content).off('select2-opening.fcNativeDialog', legacyOpening);
+			legacySelects.forEach((parent, instance) => { instance.close(); instance.body = parent; instance.dropdown.detach().appendTo(parent); });
+			const mask = document.getElementById('select2-drop-mask');
+			if (mask?.parentElement === dialog) (legacyMask?.parent || document.body).append(mask);
+			window.removeEventListener('resize', resize); fc_nativeDialogs.delete(content);
+			marker.replaceWith(content); associations.forEach(input => input.removeAttribute('form'));
+			if (originalStyle === null) content.removeAttribute('style'); else content.setAttribute('style', originalStyle);
+			if (settings.visibleOnClose) FlexiForm.show(content);
+			dialog.remove();
+			const count = Math.max(0, (FlexiForm.data(document.body, 'fc_modal_count') || 1) - 1);
+			FlexiForm.data(document.body, 'fc_modal_count', count);
+			if (!count) document.body.classList.remove('fc-no-scroll');
+			if (typeof closeFunc === 'function') closeFunc(window.jQuery ? window.jQuery(content) : content);
+			else if (closeFunc === 1) window.location.reload();
+			if (previousFocus?.isConnected) previousFocus.focus();
+		};
+		dialog.addEventListener('close', finish, {once: true});
+		FlexiForm.data(document.body, 'fc_modal_count', (FlexiForm.data(document.body, 'fc_modal_count') || 0) + 1);
+		document.body.classList.add('fc-no-scroll');
+		settings.modal === false ? dialog.show() : dialog.showModal();
+		dialog.style.display = 'flex'; dialog.style.flexDirection = 'column';
+		return handle;
+	}
+	fc_showAsDialog.sequence = 0;
 
-		// Force manual position of dialog
-		container.parent().css({ 'left': params.winleft+'px', 'width': params.winwidth+'px', 'top': params.wintop+'px'});
-
-		// Open the dialog manually
-		var theDialog = container.dialog('open');
-		fc_Dialogs[tagid] = theDialog;
-
-		// Add modal's data to the data of the parent of the HTML container: max-width, max-height, params, dialog reference
-		theDialog.data('fc_dialog_params', params);
-		theDialog.data('fc_dialog_maxwidth', winwidth);
-		theDialog.data('fc_dialog_maxheight', winheight);
-		container.parent().data('fc_dialog', theDialog);
-
-		// Attach on-load function to the iframe
-		if (!no_iframe && loadFunc)
-		{
-			jQuery('#'+tagid).find('iframe').first().on('load', function(e, data) {
-				loadFunc( container );
+	function fc_showDialog(url, tagid, no_iframe, winwidth, winheight, closeFunc, params = {})
+	{
+		fc_closeDialog(tagid);
+		let content = document.getElementById(tagid);
+		if (!content) { content = document.createElement('div'); content.id = tagid; document.body.append(content); }
+		content.replaceChildren(); content.style.display = 'none';
+		const loading = document.createElement('div'); loading.className = 'fc_loading_msg'; loading.textContent = 'Loading...'; content.append(loading);
+		let frame, controller;
+		const handle = fc_showAsDialog(content, winwidth, winheight, () => {
+			controller?.abort(); content.replaceChildren(); content.style.display = 'none';
+			if (fc_Dialogs[tagid] === handle) delete fc_Dialogs[tagid];
+			if (typeof closeFunc === 'function') closeFunc(); else if (closeFunc === 1) window.location.reload();
+		}, {closeOnEscape: false, ...params});
+		fc_Dialogs[tagid] = handle;
+		if (!no_iframe) {
+			frame = document.createElement('iframe'); frame.id = tagid + '_frame'; frame.title = params.title || FlexiForm.text('FLEXI_EDIT');
+			frame.style.cssText = 'width:100%;height:100%;border:0;display:block;visibility:hidden;';
+			content.style.overflow = 'hidden'; content.style.padding = '0';
+			frame.addEventListener('load', () => {
+				loading.remove(); frame.style.visibility = 'visible';
+				try {
+					const doc = frame.contentDocument;
+					const first = doc?.querySelector('a[href]:not([tabindex="-1"]),button:not([disabled]),input:not([type=hidden]):not([disabled]),select:not([disabled]),textarea:not([disabled])');
+					if (first) first.focus(); else frame.contentWindow?.focus();
+					if (params.closeOnEscape) doc?.addEventListener('keydown', event => { if (event.key === 'Escape') handle.close(); });
+				} catch (_) { /* Cross-origin previews do not expose their document. */ }
+				if (typeof params.loadFunc === 'function') params.loadFunc(window.jQuery ? window.jQuery(content) : content);
 			});
+			frame.src = url; content.append(frame);
+		} else {
+			// Keep the optional legacy transport's AJAX hooks for existing integrations.
+			if (window.jQuery) window.jQuery(content).load(url);
+			else {
+				controller = new AbortController();
+				const targetUrl = new URL(url, document.baseURI);
+				if (targetUrl.origin !== location.origin) { loading.textContent = 'Dialog URL must use this site'; return handle; }
+				fetch(targetUrl, {credentials: 'same-origin', signal: controller.signal}).then(response => {
+					if (!response.ok) throw Error('Dialog could not be loaded'); return response.text();
+				}).then(html => FlexiForm.insertHTML(content, html, controller.signal)).catch(error => {
+					if (error.name !== 'AbortError' && !controller.signal.aborted) { loading.textContent = error.message; content.prepend(loading); }
+				});
+			}
 		}
-
-		// Stop scrolling of parent document
-		var bodyTag = container.closest('body');
-		var fc_modal_count = !! bodyTag.data('fc_modal_count') ? parseInt(bodyTag.data('fc_modal_count')) : 0;
-		bodyTag.data('fc_modal_count', ++fc_modal_count);
-		bodyTag.addClass('fc-no-scroll');
-
-		// Return a reference of the dialog to the caller
-		return theDialog;
+		return handle;
 	}
 
-
-	// Close given dialog
 	function fc_closeDialog(name)
 	{
-		if (!!fc_Dialogs[name])
-		{
-			fc_Dialogs[name].dialog('close');
-		}
-		return false;
+		const handle = fc_Dialogs[name] || fc_nativeDialogs.get(document.getElementById(name));
+		handle?.dialog('close'); return false;
 	}
 
 
@@ -754,50 +630,28 @@
 
 
 	/* Attach boostrap styling / behaviour to the inner contents of the given selector */
+	const fc_bootstrapBound = new WeakSet();
 	function fc_bootstrapAttach(sel)
 	{
-		var sbox = jQuery(sel);
-
-		// Turn radios into btn-group
-		sbox.find('.radio.btn-group label').addClass('btn');
-
-		sbox.find('fieldset.btn-group').each(function() {
-			// Handle disabled, prevent clicks on the container, and add disabled style to each button
-			if (jQuery(this).prop('disabled')) {
-				jQuery(this).css('pointer-events', 'none').off('click');
-				jQuery(this).find('.btn').addClass('disabled');
-			}
+		const box = fc_normalizeContainer(sel);
+		box.querySelectorAll('.radio.btn-group label').forEach(label => label.classList.add('btn'));
+		box.querySelectorAll('fieldset.btn-group').forEach(group => {
+			group.querySelectorAll('.btn').forEach(button => button.classList.toggle('disabled', group.disabled));
 		});
-
-		sbox.find('.btn-group label:not(.active)').click(function()
-		{
-			var label = jQuery(this);
-			var input = jQuery('#' + label.attr('for'));
-
-			if (!input.prop('checked')) {
-				label.closest('.btn-group').find('label').removeClass('active btn-success btn-danger btn-primary');
-				if (input.val() == '') {
-					label.addClass('active btn-primary');
-				} else if (input.val() == 0) {
-					label.addClass('active btn-danger');
-				} else {
-					label.addClass('active btn-success');
-				}
-				input.prop('checked', true);
-				input.trigger('change');
+		box.querySelectorAll('.btn-group input[type=radio]').forEach(input => {
+			const update = () => {
+				if (!input.checked) return;
+				const group = input.closest('.btn-group');
+				group.querySelectorAll('label').forEach(label => {
+					label.classList.remove('active', 'btn-success', 'btn-danger', 'btn-primary');
+					if (label.htmlFor === input.id) label.classList.add('active', input.value === '' ? 'btn-primary' : input.value === '0' ? 'btn-danger' : 'btn-success');
+				});
+			};
+			if (!fc_bootstrapBound.has(input)) {
+				input.addEventListener('change', update);
+				fc_bootstrapBound.add(input);
 			}
-		});
-
-		sbox.find('.btn-group input[checked="checked"]').each(function()
-		{
-			var input = jQuery(this);
-			if (input.val() == '') {
-				input.parent().find('label[for="' + input.attr('id') + '"]').addClass('active btn-primary');
-			} else if (input.val() == 0) {
-				input.parent().find('label[for="' + input.attr('id') + '"]').addClass('active btn-danger');
-			} else {
-				input.parent().find('label[for="' + input.attr('id') + '"]').addClass('active btn-success');
-			}
+			update();
 		});
 	}
 
@@ -3104,7 +2958,7 @@
 		}
 
 		// Close modal to allow click events to work on the parent window 's form
-		jQuery('#'+container_id).dialog('close');
+		fc_closeDialog(container_id);
 
 		// If it is a Joomla form
 		if (is_jform)
@@ -3134,7 +2988,7 @@
 	function fc_initDynamicLayoutJsCss(container_id, reAddOnEvents, html)
 	{
 		const container_sel = '#' + container_id;
-		jQuery(container_sel).html(html);
+		document.getElementById(container_id).innerHTML = html;
 
 		tabberAutomatic(tabberOptions, container_id);
 		fc_bindFormDependencies(container_sel, 0, '');
@@ -3155,145 +3009,74 @@
 	/*
 	 * Initialize bootstrap styles and effects
 	 */
+	const fc_initBindings = new WeakMap();
+	function fc_initContainer(event, selector, events, initializer)
+	{
+		const box = fc_normalizeContainer(selector || event?.detail?.row || event?.target);
+		if (!fc_initBindings.has(box)) fc_initBindings.set(box, new Map());
+		const bindings = fc_initBindings.get(box);
+		(events || []).forEach(name => {
+			const key = name + ':' + initializer.name;
+			if (bindings.has(key)) return;
+			const listener = event => initializer(event, event.detail?.row || event.target);
+			box.addEventListener(name, listener);
+			bindings.set(key, listener);
+		});
+		return box;
+	}
+
 	function fc_initBootstrap(event, container_sel, reAddOnEvents)
 	{
-		const container_el = jQuery(container_sel);
-
-		// Also run method on given "Add" events, e.g. 'subform-row-add'
-		(reAddOnEvents || []).forEach(element => container_el.on(element, fc_initBootstrap));
-
-		// Add bootstap styless and effects
-		fc_bootstrapAttach(container_el);
+		fc_bootstrapAttach(fc_initContainer(event, container_sel, reAddOnEvents, fc_initBootstrap));
 	}
 
-
-	/*
-	 * Initialize tooltips and popovers
-	 */
 	function fc_initTooltips(event, container_sel, reAddOnEvents)
 	{
-		const container_el = jQuery(container_sel);
-		const elements_set_tooltip = container_el.find('.hasTooltip');
-		const elements_set_popover = container_el.find('.hasPopover');
-
-		// The plugins are jQuery.fn.tooltip / jQuery.fn.popover (Bootstrap 5 adds them when its popover script is loaded)
-		const has_tooltip = typeof jQuery !== 'undefined' && typeof jQuery.fn.tooltip === 'function';
-		const has_popover = typeof jQuery !== 'undefined' && typeof jQuery.fn.popover === 'function';
-
-		if (!has_tooltip)
-		{
-			elements_set_tooltip.length && !!Joomla.fc_debug ? window.console.log('tooltip() not loaded. Skipping it') : false;
-		}
-		if (!has_popover)
-		{
-			elements_set_popover.length && !!Joomla.fc_debug ? window.console.log('popover() not loaded. Skipping it') : false;
-		}
-		if (!has_tooltip && !has_popover)
-		{
-			return;
-		}
-
-		// Also run method on given "Add" events, e.g. 'subform-row-add'
-		(reAddOnEvents || []).forEach(element => container_el.on(element, fc_initTooltips));
-
-		// Add tooltips and popovers
-		has_tooltip ? elements_set_tooltip.tooltip({html: true, container: container_el}) : false;
-		has_popover ? elements_set_popover.popover({html: true, container: container_el, trigger : 'hover focus'}) : false;
-	}
-
-
-	/*
-	 * Initialize select2 behaviour
-	 */
-	function fc_initSelect2(event, container_sel, reAddOnEvents)
-	{
-		const container_el = jQuery(container_sel);
-		const elements_set = container_el.find('select.use_select2_lib');
-
-		if (typeof jQuery === 'undefined' || (typeof jQuery.fn.select2 !== 'function' && typeof Choices === 'undefined'))
-		{
-			elements_set.length && !!Joomla.fc_debug ? window.console.log('select2() / Choices not loaded. Skipping it') : false;
-			return;
-		}
-
-		// Also run method on given "Add" events, e.g. 'subform-row-add'
-		(reAddOnEvents || []).forEach(element => container_el.on(element, fc_initSelect2));
-
-		// Attach select library
-		fc_attachSelect2(container_el, elements_set);
-	}
-
-
-	function fc_initCodeMirror(event, container_sel, reAddOnEvents)
-	{
-		const container_el = jQuery(container_sel);
-		const elements_set = container_el.find('textarea.codemirror-source');
-
-		if (typeof Joomla.editors === 'undefined' || typeof CodeMirror === 'undefined' || typeof CodeMirror.fromTextArea !== 'function')
-		{
-			elements_set.length && !!Joomla.fc_debug ? window.console.log('CodeMirror not loaded. Skipping it') : false;
-			return;
-		}
-
-		// Also run method on given "Add" events, e.g. 'subform-row-add'
-		(reAddOnEvents || []).forEach(element => container_el.on(element, fc_initCodeMirror));
-
-		elements_set.each(function () {
-			var input = jQuery(this).removeClass('codemirror-source');
-			var id = input.prop('id');
-
-			Joomla.editors.instances[id] = CodeMirror.fromTextArea(this, input.data('options'));
+		const box = fc_initContainer(event, container_sel, reAddOnEvents, fc_initTooltips);
+		[['Tooltip', '.hasTooltip'], ['Popover', '.hasPopover']].forEach(([name, selector]) => {
+			const options = {html: true, container: box, ...(name === 'Popover' ? {trigger: 'hover focus'} : {})};
+			box.querySelectorAll(selector).forEach(el => {
+				const Native = window.bootstrap?.[name];
+				if (Native) Native.getOrCreateInstance(el, options);
+				else if (window.jQuery?.fn[name.toLowerCase()]) window.jQuery(el)[name.toLowerCase()](options);
+			});
 		});
 	}
 
-
-
-	/*
-	 * Initialize subform fields
-	 */
-	function fc_initSubform (event, container_sel)
+	function fc_initSelect2(event, container_sel, reAddOnEvents)
 	{
-		const container_el = jQuery(container_sel);
-		const elements_set = container_el.find('div.subform-repeatable');
-
-		if (typeof jQuery === 'undefined' || typeof jQuery.fn.subformRepeatable !== 'function')
-		{
-			elements_set.length && !!Joomla.fc_debug ? window.console.log('subformRepeatable() not loaded. Skipping it') : false;
-			return;
-		}
-		elements_set.subformRepeatable();
+		const box = fc_initContainer(event, container_sel, reAddOnEvents, fc_initSelect2);
+		if (window.fc_use_choicesjs ? typeof Choices === 'undefined' : !window.jQuery?.fn.select2) return;
+		fc_attachSelect2(box, box.querySelectorAll('select.use_select2_lib'));
 	}
 
+	function fc_initCodeMirror(event, container_sel, reAddOnEvents)
+	{
+		const box = fc_initContainer(event, container_sel, reAddOnEvents, fc_initCodeMirror);
+		if (!window.Joomla?.editors || !window.CodeMirror?.fromTextArea) return;
+		box.querySelectorAll('textarea.codemirror-source').forEach(input => {
+			input.classList.remove('codemirror-source');
+			Joomla.editors.instances[input.id] = CodeMirror.fromTextArea(input, FlexiForm.data(input, 'options'));
+		});
+	}
 
-	/*
-	 * Initialize any minicolor fields
-	 */
+	function fc_initSubform(event, container_sel)
+	{
+		// Joomla's current joomla-field-subform element initializes itself. Older layouts
+		// may still request the legacy plugin while it remains installed.
+		const box = fc_initContainer(event, container_sel, [], fc_initSubform);
+		if (window.jQuery?.fn.subformRepeatable) window.jQuery(box.querySelectorAll('div.subform-repeatable')).subformRepeatable();
+	}
+
 	function fc_initMinicolors(event, container_sel, reAddOnEvents)
 	{
-		const container_el = jQuery(container_sel);
-		const elements_set = container_el.find('.minicolors');
-
-		if (typeof jQuery === 'undefined' || typeof jQuery.fn.minicolors !== 'function')
-		{
-			elements_set.length && !!Joomla.fc_debug ? window.console.log('minicolors() not loaded. Skipping it') : false;
-			return;
-		}
-
-		// Also run method on given "Add" events, e.g. 'subform-row-add'
-		(reAddOnEvents || []).forEach(element => container_el.on(element, fc_initMinicolors));
-
-		elements_set.each(function() {
-			var $this = jQuery(this);
-			var format = $this.data('validate') === 'color' ? 'hex' : $this.data('format') || 'hex';
-
-			$this.minicolors({
-				control: $this.data('control') || 'hue',
-				format: format === 'rgba' ? 'rgb' : format,
-				keywords: $this.data('keywords') || '',
-				opacity: format === 'rgba',
-				position: $this.data('position') || 'default',
-				theme: $this.data('theme') || 'bootstrap',
-			});
+		const box = fc_initContainer(event, container_sel, reAddOnEvents, fc_initMinicolors);
+		if (!window.jQuery?.fn.minicolors) return;
+		box.querySelectorAll('.minicolors').forEach(input => {
+			const data = key => FlexiForm.data(input, key);
+			const format = data('validate') === 'color' ? 'hex' : data('format') || 'hex';
+			window.jQuery(input).minicolors({control: data('control') || 'hue', format: format === 'rgba' ? 'rgb' : format,
+				keywords: data('keywords') || '', opacity: format === 'rgba', position: data('position') || 'default', theme: data('theme') || 'bootstrap'});
 		});
 	}
 

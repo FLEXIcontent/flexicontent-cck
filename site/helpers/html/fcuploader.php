@@ -47,7 +47,7 @@ abstract class JHtmlFcuploader
 
 		return (object) array(
 			'toggleBtn' => '
-				<span class="'.$tBtn['class'].' fc_files_uploader_toggle_btn" data-rowno="'.$n.'" onclick="'.$tBtn['onclick'].$up_tag_id.'.toggleUploader(jQuery(this).data(\'rowno\'), '.$tBtn['action'].');">
+				<span class="'.$tBtn['class'].' fc_files_uploader_toggle_btn" data-rowno="'.$n.'" onclick="'.$tBtn['onclick'].$up_tag_id.'.toggleUploader(Number(this.dataset.rowno), '.$tBtn['action'].');">
 					' . $tBtn['text'] . '
 				</span>
 			',
@@ -173,18 +173,19 @@ abstract class JHtmlFcuploader
 			silverlight_xap_url : "'.$pluploadlib.'/js/Moxie.xap"
 		};
 
-		jQuery(document).ready(function()
+		(function()
 		{
-			// Create a configuration object, to be used by all uploaders in this group
+			// Publish the group before any ready callback auto-opens an empty field.
+			// Construction only registers methods; toggleUploader creates the DOM widget.
 			var uploader = '.$up_tag_id.' = new fc_plupload('.$up_tag_id.'_options);
 
 			// Register debounced autoresizing of all uploaders in this group
 			var uploader_resize = fc_debounce_exec(uploader.autoResize, 200, false, uploader);
-			jQuery(window).resize(function()
+			window.addEventListener("resize", function()
 			{
 				uploader_resize();
 			});
-		});
+		})();
 		';
 
 		\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration($js);
