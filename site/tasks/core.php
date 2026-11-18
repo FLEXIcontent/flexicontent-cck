@@ -253,7 +253,17 @@ class FlexicontentTasksCore
 			$_words[] = !$search_prefix ? trim($_w) : preg_replace('/(\b[^\s,\.]+\b)/u', $search_prefix . '$0', trim($_w));
 		}
 		unset($_w);  // break the reference left by the foreach above
-		$newtext = '+' . implode(' +', $_words) . ($next_word ? '' : '*');
+
+		// On InnoDB a character such as - or @ inside a word would be read as a search operator
+		class_exists('flexicontent_db', false) || require_once JPATH_SITE . '/components/com_flexicontent/classes/helpers/db.php';
+		$_words = flexicontent_db::getBooleanSearchWords($_words, $type == 'basic_index' ? 'flexicontent_basicsearch_index' : 'flexicontent_advsearch_index', 'search_index', true);
+		if (!$_words)
+		{
+			// Nothing left that the index holds: answer as for "no match"
+			header('Content-Type: application/json; charset=utf-8');
+			jexit(json_encode(array('Total' => 0, 'Matches' => array())));
+		}
+		$newtext ='+' . implode(' +', $_words) . ($next_word ? '' : '*');
 
 		$db = $this->_getDbo();
 		$quoted_text = $db->escape($newtext, true);
@@ -1884,7 +1894,10 @@ class FlexicontentTasksCore
 
 		// A word that cannot be found in the index (ignored by the fulltext index) is a stop word or too short
 		$db = $this->_getDbo();
-		$quoted_word = $db->escape($search_prefix . $word, true);
+		class_exists('flexicontent_db', false) || require_once JPATH_SITE . '/components/com_flexicontent/classes/helpers/db.php';
+		$word_parts = flexicontent_db::getBooleanSearchWords(array($search_prefix . $word), $tbl);
+		if (!$word_parts) return true;
+		$quoted_word = $db->escape(implode(' +', $word_parts), true);
 		$query = 'SELECT ' . $col
 			. ' FROM #__' . $tbl
 			. ' WHERE MATCH (' . $col . ') AGAINST ("+' . $quoted_word . '" IN BOOLEAN MODE)'

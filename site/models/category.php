@@ -1329,8 +1329,8 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		$text = preg_replace('/(\b[^\s,\.]+\b)/u', $search_prefix.'$0', $text_np);
 
 		// Split to words
-		$words_np = preg_split('/\s\s*/u', $text_np);
-		$words = preg_split('/\s\s*/u', $text);
+		$words_np = flexicontent_db::getBooleanSearchWords(preg_split('/\s\s*/u', $text_np), 'flexicontent_items_tmp', 'title');
+		$words = flexicontent_db::getBooleanSearchWords(preg_split('/\s\s*/u', $text), $si_tbl);
 
 		if (strlen($text))
 		{
