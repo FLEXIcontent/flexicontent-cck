@@ -336,17 +336,17 @@ jQuery(document).ready(function() {
 
 		if (@$attributes['firstoption'])
 		{
-			$layouts[] = JHTMLSelect::option('', \Joomla\CMS\Language\Text::_($attributes['firstoption']));
+			$layouts[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '', \Joomla\CMS\Language\Text::_($attributes['firstoption']));
 		}
 		elseif ($view !== 'type')
 		{
 			$type_layout = ($attributes['name'] == 'ilayout_mobile') ? $type_default_layout_mobile : $type_default_layout;
-			$layouts[] = JHTMLSelect::option('', \Joomla\CMS\Language\Text::_( 'FLEXI_TYPE_DEFAULT' ) .' :: '. $type_layout .' ::' );
+			$layouts[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '', \Joomla\CMS\Language\Text::_( 'FLEXI_TYPE_DEFAULT' ) .' :: '. $type_layout .' ::' );
 		}
 
 		foreach ($tmpls as $tmpl)
 		{
-			$layouts[] = JHTMLSelect::option($tmpl->name, $tmpl->name);
+			$layouts[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', $tmpl->name, $tmpl->name);
 		}
 		
 		$fieldname	= $this->name;

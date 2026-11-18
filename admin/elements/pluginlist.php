@@ -75,11 +75,11 @@ class JFormFieldPluginlist extends JFormFieldList
 		$plugins = array();
 		foreach ($plgs as $plg)
 		{
-			$plugins[] = JHTMLSelect::option($plg->name, $plg->name);
+			$plugins[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', $plg->name, $plg->name);
 		}
 		
 		$attribs = ' class="use_select2_lib" multiple="multiple" size="5" ';
 		
-		return JHTMLSelect::genericList($plugins, $fieldname, $attribs, 'value', 'text', $values, $element_id);
+		return \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $plugins, $fieldname, $attribs, 'value', 'text', $values, $element_id);
 	}
 }

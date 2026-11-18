@@ -287,16 +287,16 @@ jQuery(document).ready(function() {
 
 		if (@$attributes['firstoption'])
 		{
-			$layouts[] = JHTMLSelect::option('', \Joomla\CMS\Language\Text::_($attributes['firstoption']));
+			$layouts[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '', \Joomla\CMS\Language\Text::_($attributes['firstoption']));
 		}
 		else
 		{
-			$layouts[] = JHTMLSelect::option('', '-- '.\Joomla\CMS\Language\Text::_( 'FLEXI_USE_GLOBAL' ). ' --');
+			$layouts[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '', '-- '.\Joomla\CMS\Language\Text::_( 'FLEXI_USE_GLOBAL' ). ' --');
 		}
 
 		foreach ($tmpls as $tmpl)
 		{
-			$layouts[] = JHTMLSelect::option($tmpl->name, $tmpl->name);
+			$layouts[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', $tmpl->name, $tmpl->name);
 		}
 		
 		$fieldname	= $this->name;

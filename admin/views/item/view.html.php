@@ -2355,8 +2355,6 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$jinput->set('isflexicontent', 'yes');
 
 		// Needed by legacy non-updated plugins
-		!FLEXI_J40GE ? JRequest::setVar('view', 'article') : null;
-		!FLEXI_J40GE ? JRequest::setVar('option', 'com_content') : null;
 
 		$limitstart = $jinput->get('limitstart', 0, 'int');
 
@@ -2383,8 +2381,6 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$jinput->set('option', 'com_flexicontent');
 
 		// Needed by legacy non-updated plugins
-		!FLEXI_J40GE ? JRequest::setVar('view', 'item') : null;
-		!FLEXI_J40GE ? JRequest::setVar('option', 'com_flexicontent') : null;
 
 		// Restore suppressed plugins
 		FLEXIUtilities::suppressPlugins($suppress_arr, 'restore' );

@@ -92,7 +92,7 @@ class JFormFieldClayoutlist extends JFormFieldList
 		
 		if ($tmpls !== false) {
 			foreach ($tmpls as $tmpl) {
-				$layouts[] = JHTMLSelect::option($tmpl->name, $tmpl->name);
+				$layouts[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', $tmpl->name, $tmpl->name);
 			}
 		}
 		

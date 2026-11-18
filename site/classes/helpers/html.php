@@ -1755,7 +1755,7 @@ class flexicontent_html
 					// Load chosen function (if not loaded already) and target specific selector
 					if ($isMobile) {
 						try {
-							JHtml::_('formbehavior.chosen', '.use_chosen_lib');
+							\Joomla\CMS\HTML\HTMLHelper::_('formbehavior.chosen', '.use_chosen_lib');
 						} catch (\Throwable $e) {
 							// 'chosen' WebAsset preset removed in Joomla 6 core — safe to ignore,
 							// Tom Select already handles mobile/touch correctly.
@@ -6913,94 +6913,8 @@ class flexicontent_html
 	// Get SEF url regardless of being in backend / frontend
 	public static function getSefUrl($url, $xhtml = true, $ssl = null)
 	{
-		static $site_router, $site_instance, $isAdmin, $isSH404SEF, $useSiteApp;
-		
-		/**
-		 * J4 case
-		 */
-
-		if (FLEXI_J40GE)
-		{
-			// This also works in J4 
-			// return $url = \Joomla\CMS\Router\Route::link('site', $url);
-
-			$router =Factory::getContainer()->get(\Joomla\CMS\Router\SiteRouter::class);
-			$url = $router->build($url);
-			$url = $url->toString();
-
-			return $url;
-		}
-
-		
-		/**
-		 * J3 case
-		 */
-
-		// Get frontend route instance if we are in the backend and SH404SEF is not installed
-		if ($site_router === null)
-		{
-			$isAdmin    =Factory::getApplication()->isClient('administrator');
-			$isSH404SEF = defined('SH404SEF_IS_RUNNING') &&Factory::getApplication()->getConfig()->get('sef');
-			$useSiteApp = $isAdmin; // && $isSH404SEF;
-
-			$site_instance = $useSiteApp
-				? JApplication::getInstance('site')   // In J4 use CMSApplication::getInstance('site')
-				:Factory::getApplication();
-			$site_router = $site_instance->getRouter('site');
-		}
-
-		if (!is_array($url) && (strpos($url, '&') !== 0) && (strpos($url, 'index.php') !== 0))
-		{
-			return $url;
-		}
-
-		// Build route
-		$uri = $site_router->build($url);
-
-		$scheme = array('path', 'query', 'fragment');
-
-		/*
-		 * Get the secure/unsecure URLs.
-		 *
-		 * If the first 5 characters of the BASE are 'https', then we are on an ssl connection over
-		 * https and need to set our secure URL to the current request URL, if not, and the scheme is
-		 * 'http', then we need to do a quick string manipulation to switch schemes.
-		 */
-		if ((int) $ssl || $uri->isSsl())
-		{
-			static $host_port;
-
-			if (!is_array($host_port))
-			{
-				$uri2 = \Joomla\CMS\Uri\Uri::getInstance();
-				$host_port = array($uri2->getHost(), $uri2->getPort());
-			}
-
-			// Determine which scheme we want.
-			$uri->setScheme(((int) $ssl === 1 || $uri->isSsl()) ? 'https' : 'http');
-			$uri->setHost($host_port[0]);
-			$uri->setPort($host_port[1]);
-			$scheme = array_merge($scheme, array('host', 'port', 'scheme'));
-		}
-
-		$url = $uri->toString($scheme);
-
-		// Replace spaces.
-		$url = preg_replace('/\s/u', '%20', $url);
-
-		if ($xhtml)
-		{
-			$url = htmlspecialchars($url, ENT_COMPAT, 'UTF-8');
-		}
-
-		/**
-		 * Needed in older Joomla versions like J3.7 (and maybe for J3.8, J3.9). Check if we are in the backend again
-		 * and remove '/administrator' from URL as it is added even though we've set the application to the site app
-		 */
-		if ($useSiteApp)
-		{
-			$url = str_replace(\Joomla\CMS\Uri\Uri::base(true), \Joomla\CMS\Uri\Uri::root(true), $url);
-		}
+		$router = Factory::getContainer()->get(\Joomla\CMS\Router\SiteRouter::class);
+		$url    = $router->build($url)->toString();
 
 		return $url;
 	}

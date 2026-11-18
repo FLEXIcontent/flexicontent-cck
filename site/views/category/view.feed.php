@@ -58,7 +58,6 @@ class FlexicontentViewCategory extends \Joomla\CMS\MVC\View\HtmlView
 		\Joomla\CMS\Factory::getApplication()->input->set('limit', $params->get('feed_limit'));
 
 		// Needed by legacy non-updated plugins
-		!FLEXI_J40GE ? JRequest::setVar('limit', $params->get('feed_limit')) : null;
 
 		$params->set('orderby', $params->get('feed_orderby', 'rdate'));
 		$params->set('orderbycustomfield'   , $params->get('feed_orderbycustomfield' , 1));

@@ -68,46 +68,23 @@ class FlexicontentTasksCore
 
 		if (!defined('FLEXI_J40GE'))
 		{
-			if (class_exists('\\Joomla\\CMS\\Version'))
-			{
-				$jversion = new \Joomla\CMS\Version;
-				define('FLEXI_J40GE', version_compare($jversion->getShortVersion(), '3.99.99', '>'));
-			}
-			elseif (class_exists('JVersion'))
-			{
-				$jversion = new JVersion;
-				define('FLEXI_J40GE', version_compare($jversion->getShortVersion(), '3.99.99', '>'));
-			}
-			else
-			{
-				define('FLEXI_J40GE', false);
-			}
+			define('FLEXI_J40GE', true);
 		}
 
-		if (!FLEXI_J40GE)
-		{
-			$app = class_exists('\\Joomla\\CMS\\Factory')
-				? \Joomla\CMS\Factory::getApplication($client_name)
-				: JFactory::getApplication($client_name);
-			$app->initialise();
-		}
-		else
-		{
-			$container = \Joomla\CMS\Factory::getContainer();
+		$container = \Joomla\CMS\Factory::getContainer();
 
-			$container->alias('session.web', 'session.web.' . $client_name)
-				->alias('session', 'session.web.' . $client_name)
-				->alias('\Joomla\CMS\Session\Session', 'session.web.' . $client_name)
-				->alias(\Joomla\CMS\Session\Session::class, 'session.web.' . $client_name)
-				->alias(\Joomla\Session\Session::class, 'session.web.' . $client_name)
-				->alias(\Joomla\Session\SessionInterface::class, 'session.web.' . $client_name);
+		$container->alias('session.web', 'session.web.' . $client_name)
+			->alias('session', 'session.web.' . $client_name)
+			->alias('\Joomla\CMS\Session\Session', 'session.web.' . $client_name)
+			->alias(\Joomla\CMS\Session\Session::class, 'session.web.' . $client_name)
+			->alias(\Joomla\Session\Session::class, 'session.web.' . $client_name)
+			->alias(\Joomla\Session\SessionInterface::class, 'session.web.' . $client_name);
 
-			$app = $is_admin
-				? $container->get(\Joomla\CMS\Application\AdministratorApplication::class)
-				: $container->get(\Joomla\CMS\Application\SiteApplication::class);
+		$app = $is_admin
+			? $container->get(\Joomla\CMS\Application\AdministratorApplication::class)
+			: $container->get(\Joomla\CMS\Application\SiteApplication::class);
 
-			\Joomla\CMS\Factory::$application = $app;
-		}
+		\Joomla\CMS\Factory::$application = $app;
 
 		// [FIX 1 - Broken Access Control]: Task Whitelisting
 		$jinput = $app->input;
@@ -189,9 +166,7 @@ class FlexicontentTasksCore
 		$app = $this->_getApp();
 		$jinput  = $app->input;
 		
-		$cparams = class_exists('\\Joomla\\CMS\\Component\\ComponentHelper')
-			? \Joomla\CMS\Component\ComponentHelper::getParams($this->option)
-			: JComponentHelper::getParams($this->option);
+		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams($this->option);
 		
 		$use_tmp = true;
 
@@ -857,20 +832,11 @@ class FlexicontentTasksCore
 	public function viewtags()
 	{
 		$token_valid = false;
-		if (class_exists('\\Joomla\\CMS\\Session\\Session'))
-		{
-			$token_valid = \Joomla\CMS\Session\Session::checkToken('request');
-		}
-		elseif (class_exists('JSession'))
-		{
-			$token_valid = JSession::checkToken('request');
-		}
+		$token_valid = \Joomla\CMS\Session\Session::checkToken('request');
 
 		if (!$token_valid)
 		{
-			$invalid_token_msg = class_exists('\\Joomla\\CMS\\Language\\Text')
-				? \Joomla\CMS\Language\Text::_('JINVALID_TOKEN')
-				: (class_exists('JText') ? JText::_('JINVALID_TOKEN') : 'Invalid Token');
+			$invalid_token_msg = \Joomla\CMS\Language\Text::_('JINVALID_TOKEN');
 			jexit($invalid_token_msg);
 		}
 
@@ -895,9 +861,7 @@ class FlexicontentTasksCore
 		if (isset($perms->CanUseTags) && !$perms->CanUseTags)
 		{
 			$this->_loadLanguage();
-			$no_access_msg = class_exists('\\Joomla\\CMS\\Language\\Text')
-				? \Joomla\CMS\Language\Text::_('FLEXI_FIELD_NO_ACCESS')
-				: (class_exists('JText') ? JText::_('FLEXI_FIELD_NO_ACCESS') : 'No Access');
+			$no_access_msg = \Joomla\CMS\Language\Text::_('FLEXI_FIELD_NO_ACCESS');
 
 			$array[] = (object) array(
 				'id'   => '0',
@@ -931,9 +895,7 @@ class FlexicontentTasksCore
 				$can_create = isset($perms->CanCreateTags) && $perms->CanCreateTags;
 				$tag_key = $can_create ? 'FLEXI_NEW_TAG_ENTER_TO_CREATE' : 'FLEXI_NO_TAGS_FOUND';
 				
-				$empty_msg = class_exists('\\Joomla\\CMS\\Language\\Text')
-					? \Joomla\CMS\Language\Text::_($tag_key)
-					: (class_exists('JText') ? JText::_($tag_key) : ($can_create ? 'New tag: enter to create' : 'No tags found'));
+				$empty_msg = \Joomla\CMS\Language\Text::_($tag_key);
 
 				$array[] = (object) array(
 					'id'              => '0',
@@ -1760,9 +1722,7 @@ class FlexicontentTasksCore
 
 			if ($com_params === null)
 			{
-				$com_params = class_exists('\\Joomla\\CMS\\Component\\ComponentHelper')
-					? \Joomla\CMS\Component\ComponentHelper::getParams($this->option)
-					: JComponentHelper::getParams($this->option);
+				$com_params = \Joomla\CMS\Component\ComponentHelper::getParams($this->option);
 			}
 
 			$target_dir = isset($params['target_dir']) ? (int) $params['target_dir'] : 1;
@@ -1799,14 +1759,7 @@ class FlexicontentTasksCore
 	{
 		$root = '';
 
-		if (class_exists('\\Joomla\\CMS\\Uri\\Uri'))
-		{
-			$root = \Joomla\CMS\Uri\Uri::root(true);
-		}
-		elseif (class_exists('JUri'))
-		{
-			$root = JUri::root(true);
-		}
+		$root = \Joomla\CMS\Uri\Uri::root(true);
 
 		$root = rtrim($root, '/');
 
@@ -1959,20 +1912,10 @@ class FlexicontentTasksCore
 		}
 		require_once $plugin_path;
 
-		$plg_db_data = class_exists('\\Joomla\\CMS\\Plugin\\PluginHelper')
-			? \Joomla\CMS\Plugin\PluginHelper::getPlugin($extfolder, $extname)
-			: (class_exists('JPluginHelper') ? JPluginHelper::getPlugin($extfolder, $extname) : (object) array('params' => ''));
+		$plg_db_data = \Joomla\CMS\Plugin\PluginHelper::getPlugin($extfolder, $extname);
 
-		if (class_exists('JEventDispatcher'))
-		{
-			$dispatcher = JEventDispatcher::getInstance();
-			$plg = new $className($dispatcher, array('type' => $extfolder, 'name' => $extname, 'params' => isset($plg_db_data->params) ? $plg_db_data->params : ''));
-		}
-		elseif (class_exists('\\Joomla\\CMS\\Factory'))
-		{
-			$dispatcher = \Joomla\CMS\Factory::getApplication();
-			$plg = new $className($dispatcher, array('type' => $extfolder, 'name' => $extname, 'params' => isset($plg_db_data->params) ? $plg_db_data->params : ''));
-		}
+		$dispatcher = \Joomla\CMS\Factory::getApplication()->getDispatcher();
+		$plg = new $className($dispatcher, array('type' => $extfolder, 'name' => $extname, 'params' => isset($plg_db_data->params) ? $plg_db_data->params : ''));
 
 		global $globalcats;
 		$cache_enabled = defined('FLEXI_CACHE') && FLEXI_CACHE;
@@ -2002,13 +1945,9 @@ class FlexicontentTasksCore
 		$jinput = $app->input;
 		if ($jinput->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
 
-		$cparams = class_exists('\\Joomla\\CMS\\Component\\ComponentHelper')
-			? \Joomla\CMS\Component\ComponentHelper::getParams($this->option)
-			: JComponentHelper::getParams($this->option);
+		$cparams = \Joomla\CMS\Component\ComponentHelper::getParams($this->option);
 
-		$falang_enabled = class_exists('\\Joomla\\CMS\\Plugin\\PluginHelper')
-			? \Joomla\CMS\Plugin\PluginHelper::isEnabled('system', 'falangdriver')
-			: (class_exists('JPluginHelper') ? JPluginHelper::isEnabled('system', 'falangdriver') : false);
+		$falang_enabled = \Joomla\CMS\Plugin\PluginHelper::isEnabled('system', 'falangdriver');
 
 		if (!defined('FLEXI_FISH'))   define('FLEXI_FISH', ($cparams->get('flexi_fish', 0) && $falang_enabled) ? 1 : 0);
 		if (!defined('FLEXI_FALANG')) define('FLEXI_FALANG', defined('FLEXI_FISH') && FLEXI_FISH);
@@ -2070,24 +2009,14 @@ class FlexicontentTasksCore
 		$jinput = $app->input;
 		if ($jinput->get('task', '', 'cmd') == __FUNCTION__) die(__FUNCTION__ . ' : direct call not allowed');
 
-		if (class_exists('\\Joomla\\CMS\\Factory'))
-		{
-			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
-			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
-		}
-		elseif (class_exists('JFactory'))
-		{
-			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
-			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
-		}
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+		\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 	}
 
 
 	private function _getApp()
 	{
-		return class_exists('\\Joomla\\CMS\\Factory')
-			? \Joomla\CMS\Factory::getApplication()
-			: JFactory::getApplication();
+		return \Joomla\CMS\Factory::getApplication();
 	}
 
 	/**
@@ -2106,21 +2035,11 @@ class FlexicontentTasksCore
 
 	private function _getDbo()
 	{
-		return class_exists('\\Joomla\\CMS\\Factory')
-			? \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class)
-			: \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		return \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 	}
 
 	private function _getLanguageTag()
 	{
-		if (class_exists('\\Joomla\\CMS\\Factory'))
-		{
-			return \Joomla\CMS\Factory::getApplication()->getLanguage()->getTag();
-		}
-		elseif (class_exists('JFactory'))
-		{
-			return \Joomla\CMS\Factory::getApplication()->getLanguage()->getTag();
-		}
-		return 'en-GB';
+		return \Joomla\CMS\Factory::getApplication()->getLanguage()->getTag();
 	}
 }
