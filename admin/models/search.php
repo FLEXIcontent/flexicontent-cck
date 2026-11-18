@@ -548,6 +548,10 @@ class FLEXIcontentModelSearch extends FCModelAdminList
 			) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`
 			';
 			$this->_db->setQuery($query)->execute();
+
+			// A new table must not come back as MyISAM on a site that was moved to InnoDB
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/dbengine.php';
+			FlexicontentDbEngine::followSiteEngine($this->_db, $tbl_name);
 		}
 	}
 }
