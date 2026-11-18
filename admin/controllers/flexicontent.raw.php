@@ -63,6 +63,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		$this->registerTask('cleanupoldtables',				'cleanupOldTables');
 		$this->registerTask('addcurrentversiondata',	'addCurrentVersionData');
 		$this->registerTask('updateinitialpermission', 'updateInitialPermission');
+		$this->registerTask('convertdbengine',				'convertDBEngine');
 
 		$this->registerTask('createlanguagepack',			'createLanguagePack');
 		$this->registerTask('fcversioncompare',				'FCVersionCompare');
@@ -914,6 +915,65 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		}
 
 		echo '<span class="install-ok"></span>';
+	}
+
+
+	/**
+	 * Optional task: move one FLEXIcontent DB table to InnoDB and verify it
+	 *
+	 * One table per request, so that the task can be continued after a timeout. The page repeats the request
+	 * while the reply contains the "fc-dbengine-more" marker
+	 *
+	 * @return	void
+	 */
+	function convertDBEngine()
+	{
+		// Check for request forgeries
+		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+
+		$app = \Joomla\CMS\Factory::getApplication();
+		$notok = '<span class="install-notok"></span>';
+
+		if (!$app->getIdentity()->authorise('core.admin', 'com_flexicontent'))
+		{
+			jexit('<div>' . $notok . \Joomla\CMS\Language\Text::_('JERROR_ALERTNOAUTHOR') . '</div>');
+		}
+
+		// The administrator must have confirmed that a backup exists
+		if (!$app->input->getInt('backup_confirmed', 0))
+		{
+			jexit('<div>' . $notok . \Joomla\CMS\Language\Text::_('FLEXI_DBENGINE_BACKUP_CONFIRM') . '</div>');
+		}
+
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/dbengine.php';
+
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+
+		if (!FlexicontentDbEngine::getPreflight($db)->ok)
+		{
+			jexit('<div>' . $notok . \Joomla\CMS\Language\Text::_('FLEXI_DBENGINE_CANNOT_START') . '</div>');
+		}
+
+		// The database server finishes an ALTER even if this request is cut off
+		@set_time_limit(0);
+		ignore_user_abort(true);
+
+		$result = FlexicontentDbEngine::convertNext($db);
+
+		if ($result === null)
+		{
+			jexit('<div><span class="install-ok"></span>' . \Joomla\CMS\Language\Text::_('FLEXI_DBENGINE_ALL_DONE') . '</div>');
+		}
+
+		echo '<div>' . ($result[1] ? '<span class="install-ok"></span>' : $notok)
+			. htmlspecialchars(($result[0] !== '' ? $result[0] . ': ' : '') . $result[2], ENT_QUOTES, 'UTF-8') . '</div>';
+
+		if ($result[1])
+		{
+			echo FlexicontentDbEngine::getPendingTables($db)
+				? '<span class="fc-dbengine-more"></span>'
+				: '<div><span class="install-ok"></span>' . \Joomla\CMS\Language\Text::_('FLEXI_DBENGINE_ALL_DONE') . '</div>';
+		}
 	}
 
 

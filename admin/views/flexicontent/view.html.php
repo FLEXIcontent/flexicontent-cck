@@ -51,6 +51,12 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 		// Get model
 		$model = $this->getModel('flexicontent');
 
+		// The optional task that moves the DB tables to InnoDB has its own page
+		if ($this->getLayout() === 'dbengine')
+		{
+			return $this->_displayDbEngine($tpl);
+		}
+
 		// initialise template related variables
 		$template	= $app->getTemplate();
 		$themes		= flexicontent_tmpl::getThemes();
@@ -144,6 +150,15 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 		// *****************************
 
 		$perms = FlexicontentHelperPerm::getPerm();
+
+		// Number of DB tables that an administrator could move to InnoDB (optional task, shown as a note)
+		$this->dbengine_pending = 0;
+
+		if ($user->authorise('core.admin', 'com_flexicontent'))
+		{
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/dbengine.php';
+			$this->dbengine_pending = count(FlexicontentDbEngine::getPendingTables($db));
+		}
 
 
 
@@ -335,5 +350,37 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 		</span>
 		<?php
 	}
-}
 
+
+	/**
+	 * Page of the optional task that moves FLEXIcontent's DB tables to InnoDB:
+	 * the checks to read before starting, the tables to convert and the start button
+	 */
+	protected function _displayDbEngine($tpl = null)
+	{
+		$app  = \Joomla\CMS\Factory::getApplication();
+		$user = $app->getIdentity();
+
+		if (!$user->authorise('core.admin', 'com_flexicontent'))
+		{
+			throw new \Exception(\Joomla\CMS\Language\Text::_('JERROR_ALERTNOAUTHOR'), 403);
+		}
+
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/dbengine.php';
+
+		!FLEXI_J40GE
+			? $app->getDocument()->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/j3x.css', array('version' => FLEXI_VHASH))
+			: $app->getDocument()->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/j4x.css', array('version' => FLEXI_VHASH));
+		$app->getDocument()->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css', array('version' => FLEXI_VHASH));
+
+		FLEXIUtilities::ManagerSideMenu(null);
+
+		$doc_title = \Joomla\CMS\Language\Text::_('FLEXI_DBENGINE_TITLE');
+		\Joomla\CMS\Toolbar\ToolbarHelper::title($doc_title, 'database');
+		$app->getDocument()->setTitle($doc_title . ' - ' . $app->getDocument()->getTitle());
+
+		$this->dbengine = FlexicontentDbEngine::getPreflight(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
+
+		parent::display($tpl);
+	}
+}
