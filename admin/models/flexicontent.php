@@ -862,7 +862,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		}
 
 		// Check for emtpy language in flexicontent EXT table
-		$query = "SELECT COUNT(*)"
+		$query = "SELECT 1"
 			." FROM #__flexicontent_items_ext as ie"
 			." WHERE ie.language='' "
 			." LIMIT 1";
@@ -870,7 +870,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		$cnt = $this->_db->loadResult();
 		if ($cnt) return $return = true;
 
-		$query = "SELECT COUNT(*)"  // Check for emtpy language in Joomla content EXT table
+		$query = "SELECT 1"  // Check for emtpy language in Joomla content EXT table
 			." FROM #__content as i"
 			." WHERE i.language=''"
 			." LIMIT 1";
@@ -878,7 +878,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		$cnt = $this->_db->loadResult();
 		if ($cnt) return $return = true;
 
-		$query = "SELECT COUNT(*)"
+		$query = "SELECT 1"
 			." FROM #__content as i"
 			." JOIN #__flexicontent_items_ext as ie ON i.id=ie.item_id "
 			." WHERE i.language<>ie.language"
@@ -888,7 +888,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		if ($cnt) return $return = true;
 
 		// Check for not yet transfered language associations
-		$query = "SELECT COUNT(*)"
+		$query = "SELECT 1"
 			." FROM #__flexicontent_items_ext as ie"
 			." WHERE ie.lang_parent_id <> 0"
 			." LIMIT 1";
@@ -1180,17 +1180,18 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 	function getExistVersionsPopulated() {
 		static $return;
 		if ($return === NULL) {
-			$query 	= 'SELECT COUNT( version )'
+			// Only "is there any row" is asked: do not count the rows, InnoDB has to read them all for that
+			$query 	= 'SELECT 1'
 					. ' FROM #__flexicontent_items_versions'
 					;
-			$this->_db->setQuery( $query );
+			$this->_db->setQuery( $query, 0, 1 );
 			if(!$this->_db->loadResult()) {
 				$return = true;
 			} else {
-				$query 	= 'SELECT COUNT( id )'
+				$query 	= 'SELECT 1'
 						. ' FROM #__flexicontent_versions'
 						;
-				$this->_db->setQuery( $query );
+				$this->_db->setQuery( $query, 0, 1 );
 				$return = $this->_db->loadResult() ? true : false;
 			}
 		}
@@ -1465,7 +1466,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 	{
 		static $return;
 		if ($return === NULL) {
-			$query 	= 'SELECT COUNT( item_id )'
+			$query 	= 'SELECT 1'
 					. ' FROM #__flexicontent_fields_item_relations'
 					. ' WHERE field_id < 15'
 					. ' LIMIT 1';
