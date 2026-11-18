@@ -523,16 +523,21 @@ class FlexicontentModelTags extends FCModelAdminList
 	 */
 	public function getNotMappedTagIds(&$total = null, $start = 0, $limit = 5000)
 	{
-		$query = 'SELECT SQL_CALC_FOUND_ROWS ft.id '
-			. ' FROM #__flexicontent_tags AS ft'
+		$from_where = ' FROM #__flexicontent_tags AS ft'
 			. ' LEFT JOIN #__tags AS jt ON ft.jtag_id = jt.id'
-			. ' WHERE ft.jtag_id = 0 OR jt.id IS NULL'
+			. ' WHERE ft.jtag_id = 0 OR jt.id IS NULL';
+
+		// The id order makes the pages of the list (start, limit) well defined
+		$query = 'SELECT ft.id '
+			. $from_where
+			. ' ORDER BY ft.id'
 			. ($limit ? ' LIMIT ' . (int) $start . ', ' . (int) $limit : '')
 		;
 		$tag_ids = $this->_db->setQuery($query)->loadColumn();
 
 		// Get items total
-		$total = $this->_db->setQuery('SELECT FOUND_ROWS()')->loadResult();
+		// Not SQL_CALC_FOUND_ROWS + FOUND_ROWS(): MySQL 8.0.17+ deprecates them
+		$total = $this->_db->setQuery('SELECT COUNT(*) ' . $from_where)->loadResult();
 
 		return $tag_ids;
 	}
