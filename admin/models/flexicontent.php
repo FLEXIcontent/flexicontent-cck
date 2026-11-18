@@ -111,7 +111,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 				. ' WHERE c.state = -5 OR c.state = 1'
 				. (!FLEXI_J16GE ? ' AND c.sectionid = ' . (int)FLEXI_SECTION : '')
 				. ($allitems ? '' : ' AND c.created_by = '.$user->id)
-				. ' GROUP BY fv.item_id '
+				. ' GROUP BY c.id '
 				. ' HAVING c.version<>MAX(fv.version_id) '
 				. ' ORDER BY c.modified DESC, c.id DESC'
 				;
@@ -129,7 +129,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		if (!empty($ids))
 		{
 			$query = $query_select_data . str_replace('#__flexicontent_items_tmp', '#__content', $query_from_join) . ' WHERE c.id IN ('.implode(',',$ids).')'
-				.' GROUP BY fv.item_id ';
+				.' GROUP BY c.id ';
 			$this->_db->SetQuery($query, 0, 5);
 			$_data = $this->_db->loadObjectList('id');
 
