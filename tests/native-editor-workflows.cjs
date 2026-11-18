@@ -262,6 +262,18 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
     assert.equal(await page.locator('.batch-field-card').count(),0);
     assert.equal(await page.locator('#batch_field_picker option[value="45"]').isDisabled(),false);
   });
+  await test('Batch assets preserve Joomla import maps and inline module scripts',async page=>{
+    await form(page,'<input id="module-field" value="kept">');
+    await page.route('https://fixture.invalid/editor-api.js',route=>route.fulfill({contentType:'text/javascript',body:'export const readField = () => document.getElementById("module-field").value;'}));
+    await page.route('https://fixture.invalid/editor-init.js',route=>route.fulfill({contentType:'text/javascript',body:'import {readField} from "fixture-editor-api"; window.externalModuleValue=readField();'}));
+    await page.addScriptTag({content:source('admin/assets/js/batchprocess.js')});
+    await page.evaluate(async()=>{
+      await fc_batch_fields.loadAssets({importmap:{imports:{'fixture-editor-api':'/editor-api.js'}},scripts:[{src:'/editor-init.js',module:true}]});
+      await fc_batch_fields.runInline({type:'module',code:'import {readField} from "fixture-editor-api"; window.inlineModuleValue=readField();'});
+    });
+    await page.waitForFunction(()=>window.inlineModuleValue==='kept');
+    assert.deepEqual(await page.evaluate(()=>[externalModuleValue,inlineModuleValue]),['kept','kept']);
+  });
   await browser.close();
   console.log(JSON.stringify(results, null, 2));
   if (results.some(result => result.status !== 'pass')) process.exitCode = 1;

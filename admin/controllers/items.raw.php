@@ -205,6 +205,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		// Collect the assets the field added to the document, so that they can be loaded by the batch page
 		$assets = array('scripts' => array(), 'inline' => array(), 'styles' => array(), 'style_inline' => array());
+		$importmap = array();
 
 		$to_text = function ($v) use (&$to_text)
 		{
@@ -229,16 +230,16 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		};
 
 		// Legacy API: addScript() / addScriptDeclaration() / addStyleSheet() / addStyleDeclaration()
-		foreach (array_keys((array) ($document->_scripts ?? array())) as $src)
+		foreach ((array) ($document->_scripts ?? array()) as $src => $attributes)
 		{
-			$assets['scripts'][] = array('src' => $to_url($src), 'module' => false);
+			$assets['scripts'][] = array('src' => $to_url($src), 'module' => (($attributes['type'] ?? '') === 'module'));
 		}
 
-		foreach ((array) ($document->_script ?? array()) as $code)
+		foreach ((array) ($document->_script ?? array()) as $type => $code)
 		{
 			if (($code = trim($to_text($code))) !== '')
 			{
-				$assets['inline'][] = $code;
+				$assets['inline'][] = array('code' => $code, 'type' => $type);
 			}
 		}
 
@@ -266,16 +267,29 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 				{
 					$uri     = $asset->getUri(true);
 					$content = $asset->getOption('content');
+					$script_type = $asset->getAttributes()['type'] ?? 'text/javascript';
+
+					// Joomla import-map assets are module definitions, not classic scripts.
+					if ($type === 'script' && $uri && $asset->getOption('importmap'))
+					{
+						$name = $asset->getOption('importmapName') ?: $asset->getName();
+						$scope = $asset->getOption('importmapScope');
+						if ($scope) $importmap['scopes'][$scope][$name] = $to_url($uri);
+						else $importmap['imports'][$name] = $to_url($uri);
+						continue;
+					}
 
 					if ($uri)
 					{
 						$assets[$keys[0]][] = $type === 'script'
-							? array('src' => $to_url($uri), 'module' => (($asset->getAttributes()['type'] ?? '') === 'module'))
+							? array('src' => $to_url($uri), 'module' => ($script_type === 'module'))
 							: $to_url($uri);
 					}
 					elseif (is_string($content) && trim($content) !== '')
 					{
-						$assets[$keys[1]][] = trim($content);
+						$assets[$keys[1]][] = $type === 'script'
+							? array('code' => trim($content), 'type' => $script_type)
+							: trim($content);
 					}
 				}
 			}
@@ -288,6 +302,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		}
 
 		// Joomla script options (e.g. texts and settings used by calendar and other scripts)
+		if ($importmap) $assets['importmap'] = $importmap;
 		$assets['options'] = method_exists($document, 'getScriptOptions') ? (object) $document->getScriptOptions() : new stdClass;
 
 		jexit(json_encode(array('html' => $html, 'assets' => $assets)));

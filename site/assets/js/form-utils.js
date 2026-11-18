@@ -68,7 +68,7 @@ window.FlexiForm = (() => {
       script.textContent = original.textContent;
       const nonce = original.nonce || document.querySelector('script[nonce]')?.nonce; if (nonce) script.nonce = nonce;
       const executable = !script.type || /^(text|application)\/javascript$/.test(script.type) || script.type === 'module';
-      if (executable && (script.src || script.type === 'module')) {
+      if (executable && script.src) {
         script.async = false;
         await new Promise((resolve, reject) => {
           script.onload = resolve; script.onerror = () => reject(Error('Dialog script could not be loaded'));

@@ -63,6 +63,7 @@ var fc_batch_fields = {
   },
   async loadAssets(assets, done) {
     if (assets.options && Joomla.loadOptions) Joomla.loadOptions(assets.options);
+    if (assets.importmap) await this.runInline({code: JSON.stringify(assets.importmap), type: 'importmap'});
     for (const href of assets.styles || []) {
       const url = new URL(href, document.baseURI).href.split('?')[0];
       if (Array.from(document.querySelectorAll('link[rel=stylesheet]')).some(el => el.href.split('?')[0] === url)) continue;
@@ -114,9 +115,9 @@ var fc_batch_fields = {
       body.replaceChildren(template.content);
       for (const original of scripts) {
         if (original.src) await this.loadScripts([{src: original.src, module: original.type === 'module'}]);
-        else this.runInline(original.textContent);
+        else await this.runInline({code: original.textContent, type: original.type});
       }
-      for (const code of result.assets?.inline || []) this.runInline(code);
+      for (const code of result.assets?.inline || []) await this.runInline(code);
       this.stripValidation(card);
       card.querySelectorAll('.field-calendar').forEach(el => { if (window.JoomlaCalendar) JoomlaCalendar.init(el); });
       card.querySelectorAll('select[multiple].use_select2_lib').forEach(el => el.classList.add('fc_select2_no_check'));
@@ -128,11 +129,15 @@ var fc_batch_fields = {
       body.replaceChildren(warning); mode.disabled = true;
     } finally { card.classList.remove('fc-loading'); }
   },
-  runInline(code) {
+  async runInline(value) {
+    const code = typeof value === 'string' ? value : value?.code;
     if (typeof code !== 'string' || !code.trim()) return;
-    const script = document.createElement('script'); script.textContent = code;
+    const script = document.createElement('script'); script.textContent = code; script.type = value?.type || 'text/javascript';
     const nonce = document.querySelector('script[nonce]')?.nonce; if (nonce) script.nonce = nonce;
-    document.head.append(script); script.remove();
+    // Inline modules do not dispatch a load event. Leave their execution and
+    // dependency ordering to the browser instead of waiting indefinitely.
+    document.head.append(script);
+    if (script.type !== 'module' && script.type !== 'importmap') script.remove();
   },
   stripValidation(card) {
     card = FlexiForm.element(card);
