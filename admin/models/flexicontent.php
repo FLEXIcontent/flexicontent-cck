@@ -47,7 +47,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		$allitems	= $permission->DisplayAllItems;
 
 		$use_tmp = true;
-		$query_select_ids = 'SELECT SQL_CALC_FOUND_ROWS c.id';
+		$query_select_ids = 'SELECT c.id';
 		$query_select_data = 'SELECT c.id, c.title, c.catid, c.created, cr.name as creator, c.created_by, c.modified, c.modified_by, mr.name as modifier, c.checked_out';
 
 		$query_from_join = ''
@@ -59,16 +59,16 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 				. ' WHERE state = -3'
 				. (!FLEXI_J16GE ? ' AND c.sectionid = ' . (int)FLEXI_SECTION : '')
 				. ($allitems ? '' : ' AND c.created_by = '.$user->id)
-				. ' ORDER BY c.created DESC'
+				. ' ORDER BY c.created DESC, c.id DESC'
 				;
 
 		$query = $query_select_ids . $query_from_join . $query_where_orderby_having;
 		$this->_db->SetQuery($query, 0, 5);
 		$ids = $this->_db->loadColumn();
 
-		// Get total
-		$this->_db->setQuery("SELECT FOUND_ROWS()");
-		$total = $this->_db->loadResult();
+		// Get total: the number of rows of the same query without its LIMIT
+		// Not SQL_CALC_FOUND_ROWS + FOUND_ROWS(): MySQL 8.0.17+ deprecates them
+		$total = $this->_db->setQuery('SELECT COUNT(*) FROM (' . $query . ') AS fc_list')->loadResult();
 
 		$genstats = array();
 
@@ -97,7 +97,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		$allitems	= $permission->DisplayAllItems;
 
 		$use_tmp = true;
-		$query_select_ids = 'SELECT SQL_CALC_FOUND_ROWS c.id'.', c.version, MAX(fv.version_id)';
+		$query_select_ids = 'SELECT c.id'.', c.version, MAX(fv.version_id)';
 		$query_select_data = 'SELECT c.id, c.title, c.catid, c.created, cr.name as creator, c.created_by, c.modified, c.modified_by, mr.name as modifier, c.checked_out'
 			.', c.version, MAX(fv.version_id)';
 
@@ -113,16 +113,16 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 				. ($allitems ? '' : ' AND c.created_by = '.$user->id)
 				. ' GROUP BY fv.item_id '
 				. ' HAVING c.version<>MAX(fv.version_id) '
-				. ' ORDER BY c.modified DESC'
+				. ' ORDER BY c.modified DESC, c.id DESC'
 				;
 
 		$query = $query_select_ids . $query_from_join . $query_where_orderby_having;
 		$this->_db->SetQuery($query, 0, 5);
 		$ids = $this->_db->loadColumn();
 
-		// Get total
-		$this->_db->setQuery("SELECT FOUND_ROWS()");
-		$total = $this->_db->loadResult();
+		// Get total: the number of rows of the same query without its LIMIT
+		// Not SQL_CALC_FOUND_ROWS + FOUND_ROWS(): MySQL 8.0.17+ deprecates them
+		$total = $this->_db->setQuery('SELECT COUNT(*) FROM (' . $query . ') AS fc_list')->loadResult();
 
 		$genstats = array();
 
@@ -153,7 +153,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		$requestApproval = @ $permission->RequestApproval;
 
 		$use_tmp = true;
-		$query_select_ids = 'SELECT SQL_CALC_FOUND_ROWS c.id';
+		$query_select_ids = 'SELECT c.id';
 		$query_select_data = 'SELECT c.id, c.title, c.catid, c.created, cr.name as creator, c.created_by, c.modified, c.modified_by, mr.name as modifier, c.checked_out';
 
 		$query_from_join = ''
@@ -165,16 +165,16 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 				. ' WHERE state = -4'
 				. (!FLEXI_J16GE ? ' AND c.sectionid = ' . (int)FLEXI_SECTION : '')
 				. (($allitems || $requestApproval) ? '' : ' AND c.created_by = '.$user->id)
-				. ' ORDER BY c.created DESC'
+				. ' ORDER BY c.created DESC, c.id DESC'
 				;
 
 		$query = $query_select_ids . $query_from_join . $query_where_orderby_having;
 		$this->_db->SetQuery($query, 0, 5);
 		$ids = $this->_db->loadColumn();
 
-		// Get total
-		$this->_db->setQuery("SELECT FOUND_ROWS()");
-		$total = $this->_db->loadResult();
+		// Get total: the number of rows of the same query without its LIMIT
+		// Not SQL_CALC_FOUND_ROWS + FOUND_ROWS(): MySQL 8.0.17+ deprecates them
+		$total = $this->_db->setQuery('SELECT COUNT(*) FROM (' . $query . ') AS fc_list')->loadResult();
 
 		$genstats = array();
 
@@ -203,7 +203,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		$allitems	= $permission->DisplayAllItems;
 
 		$use_tmp = true;
-		$query_select_ids = 'SELECT SQL_CALC_FOUND_ROWS c.id';
+		$query_select_ids = 'SELECT c.id';
 		$query_select_data = 'SELECT c.id, c.title, c.catid, c.created, cr.name as creator, c.created_by, c.modified, c.modified_by, mr.name as modifier, c.checked_out';
 
 		$query_from_join = ''
@@ -215,16 +215,16 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 				. ' WHERE c.state = -5'
 				. (!FLEXI_J16GE ? ' AND c.sectionid = ' . (int)FLEXI_SECTION : '')
 				. ($allitems ? '' : ' AND c.created_by = '.$user->id)
-				. ' ORDER BY c.created DESC'
+				. ' ORDER BY c.created DESC, c.id DESC'
 				;
 
 		$query = $query_select_ids . $query_from_join . $query_where_orderby_having;
 		$this->_db->SetQuery($query, 0, 5);
 		$ids = $this->_db->loadColumn();
 
-		// Get total
-		$this->_db->setQuery("SELECT FOUND_ROWS()");
-		$total = $this->_db->loadResult();
+		// Get total: the number of rows of the same query without its LIMIT
+		// Not SQL_CALC_FOUND_ROWS + FOUND_ROWS(): MySQL 8.0.17+ deprecates them
+		$total = $this->_db->setQuery('SELECT COUNT(*) FROM (' . $query . ') AS fc_list')->loadResult();
 
 		$genstats = array();
 
