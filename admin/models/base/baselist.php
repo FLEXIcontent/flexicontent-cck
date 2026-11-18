@@ -300,8 +300,22 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 		// Lets load the records if it doesn't already exist
 		if ($this->_data === null)
 		{
+			// A copy of the list query without a LIMIT, for counting: Joomla stores the LIMIT of a page on the query object itself
+			$count_query = clone $this->_getListQuery();
+			$count_query->clear('limit');
+
 			$this->_data  = $this->_getList($this->_getListQuery(), $this->getState('limitstart'), $this->getState('limit'));
-			$this->_total = $this->_db->setQuery('SELECT FOUND_ROWS()')->loadResult();
+
+			// Not SQL_CALC_FOUND_ROWS + FOUND_ROWS(): MySQL 8.0.17+ deprecates them. Count the rows of the same list query instead.
+			// A list query with two columns of the same name cannot be a derived table: then count as getTotal() does
+			try
+			{
+				$this->_total = $this->_db->setQuery('SELECT COUNT(*) FROM (' . $count_query . ') AS fc_list')->loadResult();
+			}
+			catch (\Exception $e)
+			{
+				$this->_total = (int) $this->_getListCount($count_query);
+			}
 		}
 
 		return $this->_data;
@@ -367,7 +381,7 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 
 		// Create a query with all its clauses: WHERE, HAVING and ORDER BY, etc
 		$query = $this->_db->getQuery(true)
-			->select('SQL_CALC_FOUND_ROWS a.*')
+			->select('a.*')
 			->select($editor_col_quoted . ' AS editor')
 			->from('#__' . $this->records_dbtbl . ' AS a')
 			->group('a.id');
@@ -396,6 +410,10 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 		$this->_buildContentWhere($query);
 		$this->_buildContentHaving($query);
 		$this->_buildContentOrderBy($query);
+
+		// A unique last sort key. Without SQL_CALC_FOUND_ROWS the database may stop sorting at the LIMIT,
+		// and rows with equal sort values could then repeat or go missing across pages
+		$query->order('a.id');
 
 		// Add always-active ("hard") filters
 		$this->_buildHardFiltersWhere($query);
