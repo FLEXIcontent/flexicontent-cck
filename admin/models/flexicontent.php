@@ -1017,8 +1017,8 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		$dbname   = $app->get('db');
 
 		$tblname_indexnames = array(
-			'flexicontent_tags'=>array('name'=>0, 'alias'=>0, 'published'=>0, 'jtag_id'=>0),
-			'flexicontent_types'=>array('name'=>0, 'alias'=>0, 'published'=>0, 'access'=>0),
+			'flexicontent_tags'=>array('name'=>191, 'alias'=>191, 'published'=>0, 'jtag_id'=>0),
+			'flexicontent_types'=>array('name'=>191, 'alias'=>191, 'published'=>0, 'access'=>0),
 			'flexicontent_items_ext'=>array('type_id'=>0, 'is_uptodate'=>0, 'lang_parent_id'=>0),
 			'flexicontent_items_tmp'=>array(
 				'title'=>array(
@@ -1067,7 +1067,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 				)
 			),
 			'flexicontent_download_history'=>array('user_id'=>0, 'file_id'=>0),
-			'flexicontent_download_coupons'=>array('user_id'=>0, 'file_id'=>0, 'token'=>0, 'expire_on'=>0),
+			'flexicontent_download_coupons'=>array('user_id'=>0, 'file_id'=>0, 'token'=>191, 'expire_on'=>0),
 			'flexicontent_templates'=>array(
 				'configuration'=>array(
 					'cols'=>array('template'=>0, 'cfgname'=>0, 'layout'=>0, 'position'=>0)
@@ -1382,7 +1382,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 				  `view` varchar(30) NOT NULL default '',
 				  `folder` varchar(100) NOT NULL default '',
 				  `position` varchar(255) NOT NULL default ''
-				) ENGINE=MyISAM DEFAULT CHARSET=utf8
+				) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 				";
 		$this->_db->setQuery( $query );
 		$this->_db->execute();

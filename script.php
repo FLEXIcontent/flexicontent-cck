@@ -1028,8 +1028,8 @@ class com_flexicontentInstallerScript
 							KEY `field_id` (`field_id`),
 							KEY `item_id` (`item_id`),
 							FULLTEXT `search_index` (`search_index`),
-							KEY `value_id` (`value_id`)
-							) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
+							KEY `value_id` (`value_id`(191))
+							) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`";
 					}
 
 					/*
@@ -1088,10 +1088,10 @@ class com_flexicontentInstallerScript
 						$queries[] = "
 						CREATE TABLE IF NOT EXISTS `#__flexicontent_authors_ext` (
 						  `user_id` int(11) unsigned NOT NULL,
-						  `author_basicparams` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
-						  `author_catparams` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+						  `author_basicparams` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+						  `author_catparams` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
 						  PRIMARY KEY  (`user_id`)
-						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
+						) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`";
 					}
 
 					$upgrade_count = 0;
@@ -1155,8 +1155,8 @@ class com_flexicontentInstallerScript
 							`checked_out_time` datetime NOT NULL default '1000-01-01 00:00:00',
 							`attribs` mediumtext NULL,
 							PRIMARY KEY  (`id`),
-							KEY (`content_id`, `user_id`, `type`),
-							KEY (`content_id`, `type`),
+							KEY (`content_id`, `user_id`, `type`(191)),
+							KEY (`content_id`, `type`(191)),
 							KEY `user_id` (`user_id`),
 							FULLTEXT KEY `title` (`title`),
 							FULLTEXT KEY `text` (`text`),
@@ -1165,7 +1165,7 @@ class com_flexicontentInstallerScript
 							KEY `verified` (`verified`),
 							KEY `useful_yes` (`useful_yes`),
 							KEY `useful_no` (`useful_no`)
-						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;";
+						) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`;";
 					}
 
 					// Table with the 'useful' votes of the reviews
@@ -1180,7 +1180,7 @@ class com_flexicontentInstallerScript
 							`vote_date` datetime NOT NULL,
 							PRIMARY KEY  (`review_id`, `user_id`, `ip`),
 							KEY `user_id` (`user_id`)
-						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;";
+						) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`;";
 					}
 
 					if ( $reviews_tbl_exists && !array_key_exists('name', $tbl_fields['#__flexicontent_reviews']) ) {
@@ -1259,16 +1259,16 @@ class com_flexicontentInstallerScript
 							UNIQUE `file_id` (`file_id`),
 							KEY `state` (`state`),
 							KEY `media_type` (`media_type`),
-							KEY `media_format` (`media_format`),
-							KEY `resolution` (`resolution`),
+							KEY `media_format` (`media_format`(191)),
+							KEY `resolution` (`resolution`(191)),
 							KEY `fps` (`fps`),
 							KEY `bit_rate` (`bit_rate`),
 							KEY `bits_per_sample` (`bits_per_sample`),
 							KEY `sample_rate` (`sample_rate`),
 							KEY `duration` (`duration`),
-							KEY `channels` (`channels`),
-							KEY `channel_layout` (`channel_layout`)
-						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;";
+							KEY `channels` (`channels`(191)),
+							KEY `channel_layout` (`channel_layout`(191))
+						) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`;";
 					}
 
 					$upgrade_count = 0;
@@ -1335,7 +1335,7 @@ class com_flexicontentInstallerScript
 							 `is_uptodate` tinyint(3) unsigned NOT NULL default '0',
 							 `lang_parent_id` int(11) NOT NULL DEFAULT '0',
 							 PRIMARY KEY (`id`)
-							) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+							) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 						";
 					} else {
 						$_querycols = array();
@@ -1389,7 +1389,7 @@ class com_flexicontentInstallerScript
 							PRIMARY KEY (`id`),
 							KEY `user_id` (`user_id`),
 							KEY `file_id` (`file_id`)
-						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
+						) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`";
 					}
 
 					if ( !$dl_coupons_tbl_exists ) {
@@ -1405,8 +1405,8 @@ class com_flexicontentInstallerScript
 							PRIMARY KEY (`id`),
 							KEY `user_id` (`user_id`),
 							KEY `file_id` (`file_id`),
-							KEY `token` (`token`)
-						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
+							KEY `token` (`token`(191))
+						) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`";
 					}
 
 
@@ -1419,9 +1419,9 @@ class com_flexicontentInstallerScript
 							`prop` varchar(255) NOT NULL,
 							KEY  `id` (`id`),
 							KEY  `file_id` (`file_id`),
-							KEY  `context` (`context`),
-							KEY  `prop` (`prop`)
-						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
+							KEY  `context` (`context`(191)),
+							KEY  `prop` (`prop`(191))
+						) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`";
 					}
 
 					$upgrade_count = 0;
@@ -1459,9 +1459,9 @@ class com_flexicontentInstallerScript
 						  `template` varchar(50) NOT NULL default '',
 						  `cfgname` varchar(50) NOT NULL default '',
 						  `layout` varchar(20) NOT NULL default '',
-						  `attribs` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+						  `attribs` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
 						  PRIMARY KEY  (`template`,`cfgname`,`layout`)
-						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
+						) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`";
 					}
 
 					$upgrade_count = 0;

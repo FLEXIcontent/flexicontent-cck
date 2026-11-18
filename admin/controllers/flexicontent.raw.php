@@ -828,7 +828,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 					`state` int(3) NOT NULL default '0',
 					PRIMARY KEY  (`id`),
 					KEY `version2item` (`item_id`,`version_id`)
-					) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
+					) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`";
 
 		try
 		{
@@ -934,10 +934,10 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 
 		$query 	= " CREATE TABLE IF NOT EXISTS #__flexicontent_authors_ext (
   				`user_id` int(11) unsigned NOT NULL,
-  				`author_basicparams` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
-  				`author_catparams` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  				`author_basicparams` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  				`author_catparams` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
 					PRIMARY KEY  (`user_id`)
-					) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
+					) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`";
 		$db->setQuery($query);
 
 		try
