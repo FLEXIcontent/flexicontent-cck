@@ -79,4 +79,21 @@ if (count($parser->Pages) !== 2) {
     throw new RuntimeException('Expected 2 pages, got ' . count($parser->Pages));
 }
 
+// ASCII85 emits bytes from a 32-bit accumulator, including partial final groups.
+$decoder = new ReflectionMethod(PdfToText::class, '__decode_ascii_85');
+$emptyParser = (new ReflectionClass(PdfToText::class))->newInstanceWithoutConstructor();
+foreach (['5sdq,~>' => 'ABCD', '5sdp~>' => 'ABC', 'z~>' => "\0\0\0\0"] as $encoded => $expected) {
+    if ($decoder->invoke($emptyParser, $encoded) !== $expected) {
+        throw new RuntimeException('ASCII85 byte decoding changed');
+    }
+}
+// A PDF octal escape keeps the low eight bits, including values above 0377.
+foreach (['\\101\\102' => 'AB', '\\377' => "\xFF", '\\777' => "\xFF"] as $encoded => $expected) {
+    foreach (['Unescape', 'ProcessEscapedString'] as $method) {
+        if ((new ReflectionMethod(PdfObjectBase::class, $method))->invoke($emptyParser, $encoded, true) !== $expected) {
+            throw new RuntimeException('PDF octal byte decoding changed');
+        }
+    }
+}
+
 echo "pdftotext-php8: OK\n";

@@ -1296,6 +1296,13 @@ class FlexicontentModelItems extends FCModelAdminList
 				break;
 		}
 
+		// LIMIT may use a different sort plan from the old SQL_CALC_FOUND_ROWS query.
+		// Keep tied values on stable pages instead of repeating items across offsets.
+		if ($orderby && strpos($orderby, 'a.id') === false)
+		{
+			$orderby .= ', a.id ASC';
+		}
+
 		return $orderby;
 	}
 
@@ -1546,7 +1553,8 @@ class FlexicontentModelItems extends FCModelAdminList
 			{
 				$filter_state = array('ALL');
 				$FS = array('ALL'=>0);
-				$filter_state = $this->setState('filter_state', $filter_state);
+				// Keep the model state unchanged: the count rebuild must see the same
+				// review/version flags as the first list query.
 			}
 			elseif (isset($FS['ORPHAN']))
 			{

@@ -22,8 +22,9 @@ namespace
     {
         public $rating = [];
         public $extra = [];
+        public $queries = [];
         private $query = '';
-        public function setQuery($query) { $this->query = (string) $query; return $this; }
+        public function setQuery($query) { $this->query = (string) $query; $this->queries[] = $this->query; return $this; }
         public function loadObjectList($key = '')
         {
             $rows = strpos($this->query, '#__flexicontent_items_extravote') !== false ? $this->extra : $this->rating;
@@ -48,8 +49,8 @@ namespace
         if ($token === '{') { $depth++; $opened = true; }
         if ($token === '}' && --$depth === 0 && $opened) { break; }
     }
-    // Only _getVotes() is under test: any other static method of the class that it may call answers "yes"
-    eval('class FlexicontentFields { public static function __callStatic($name, $args) { return true; } ' . $method . '}');
+    // Model the table-presence flags, including conservative loading in non-page contexts.
+    eval('class FlexicontentFields { public static $flags = ["votes" => true, "extravotes" => true]; public static function _hasItemData($kind) { return self::$flags[$kind]; } ' . $method . '}');
 
     $db = new VotesDbFixture;
     $db->rating = [
@@ -84,6 +85,22 @@ namespace
     // Ordinary votes only, and no votes at all
     $check((int) $votes[9]->rating_sum === 4 && !isset($votes[9]->extra), 'Item with only ordinary votes changed');
     $check(!isset($votes[10]), 'Item without votes got a votes object');
+
+    $db->rating = []; $db->queries = [];
+    FlexicontentFields::$flags = ['votes' => false, 'extravotes' => true];
+    $votes = FlexicontentFields::_getVotes($items);
+    $check(count($db->queries) === 1 && strpos($db->queries[0], '#__flexicontent_items_extravote') !== false, 'Extra-only site queries the empty ordinary rating table');
+    $check(array_keys($votes[8]->extra) === [3, 4] && !isset($votes[8]->rating_count), 'Extra-only guard changes vote data');
+
+    $db->rating = [['content_id' => 9, 'rating_sum' => 4, 'rating_count' => 1]];
+    $db->extra = []; $db->queries = [];
+    FlexicontentFields::$flags = ['votes' => true, 'extravotes' => false];
+    $votes = FlexicontentFields::_getVotes($items);
+    $check(count($db->queries) === 1 && $votes[9]->rating_count === 1, 'Ordinary-only site changes query count or votes');
+
+    $db->queries = [];
+    FlexicontentFields::$flags = ['votes' => false, 'extravotes' => false];
+    $check(FlexicontentFields::_getVotes($items) === [] && !$db->queries, 'Empty site still queries vote tables');
 
     restore_error_handler();
     echo $count . " extra votes checks passed\n";

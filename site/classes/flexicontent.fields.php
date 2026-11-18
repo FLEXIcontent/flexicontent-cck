@@ -1848,8 +1848,12 @@ class FlexicontentFields
 
 
 	/**
-	 * Check if current request is a plain page view (a GET request without a task),
+	 * Check if current request is a plain HTML page view of the site (a GET request without a task),
 	 * thus a request during which item data are only read and not modified
+	 *
+	 * Other formats (json, raw, feed ...), com_ajax calls, forms and the administrator are not page views:
+	 * they may output item data directly, e.g. the item's JSON view prints the rating of the item,
+	 * which must not depend on the voting field being published
 	 *
 	 * @return	boolean
 	 * @since	5.3
@@ -1858,8 +1862,19 @@ class FlexicontentFields
 	{
 		// Not remembered: a task may be added to the request after this is first called (e.g. by URL routing)
 		$method = isset($_SERVER['REQUEST_METHOD']) ? strtoupper($_SERVER['REQUEST_METHOD']) : '';
+		if ($method !== 'GET')
+		{
+			return false;
+		}
 
-		return $method === 'GET' && !strlen(\Joomla\CMS\Factory::getApplication()->getInput()->get('task', '', 'cmd'));
+		$app = \Joomla\CMS\Factory::getApplication();
+		$input = $app->getInput();
+
+		return $app->isClient('site')
+			&& !strlen($input->get('task', '', 'cmd'))
+			&& $input->get('format', 'html', 'cmd') === 'html'
+			&& $input->get('option', '', 'cmd') !== 'com_ajax'
+			&& !in_array($input->get('layout', '', 'cmd'), array('form', 'edit'), true);
 	}
 
 
@@ -2051,11 +2066,14 @@ class FlexicontentFields
 			return array();
 		}
 
-		$query 	= 'SELECT * FROM #__content_rating'
-				. " WHERE content_id IN ('" . implode("','", $cids) . "')"
-				;
-		$db->setQuery($query);
-		$votes = $db->loadObjectList('content_id');
+		$votes = array();
+		if ($has_votes)
+		{
+			$query = 'SELECT * FROM #__content_rating'
+				. " WHERE content_id IN ('" . implode("','", $cids) . "')";
+			$db->setQuery($query);
+			$votes = $db->loadObjectList('content_id');
+		}
 
 		// No item of this site has votes for an extra (composite) voting characteristic
 		if (!$has_extra)

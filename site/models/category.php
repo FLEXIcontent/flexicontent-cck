@@ -1949,7 +1949,9 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			$where .= ' AND c.access IN (0,' . $aid_list . ')';
 		}
 
-		$query = 'SELECT DISTINCT c.id, c.parent_id'
+		// No DISTINCT: the join to the creator is one-to-one, so no category can be returned twice,
+		// and MySQL's ONLY_FULL_GROUP_BY mode rejects DISTINCT with an ordering column that is not selected
+		$query = 'SELECT c.id, c.parent_id'
 			. ' FROM #__categories as c'
 			. ' LEFT JOIN #__users AS u ON u.id = c.created_user_id'
 			. $where

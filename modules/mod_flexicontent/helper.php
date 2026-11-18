@@ -103,17 +103,8 @@ class modFlexicontentHelper
 		// On ne construit le srcset que pour les tailles <= à la taille demandée
 		$size_order  = ['small', 'medium', 'large'];
 
-		// The srcset width descriptors must be the real widths of the thumbnails, i.e. the image field's
-		// configured thumbnail widths (fixed guesses of 480/768/1200 made phones pick the 120px small thumbnail)
-		$size_widths = [
-			'small'  => (int) $img_field->parameters->get('w_s', 120),
-			'medium' => (int) $img_field->parameters->get('w_m', 400),
-			'large'  => (int) $img_field->parameters->get('w_l', 800),
-		];
-
 		$srcset_img  = [];
 		$srcset_webp = [];
-		$sizes_parts = [];
 		$fallback_url = $main_url;
 
 		// Pour original : on affiche juste l'image originale, pas de srcset multi-tailles
@@ -123,10 +114,12 @@ class modFlexicontentHelper
 				$webp_fs  = preg_replace('/\.(jpe?g|png|gif)$/i', '.webp', $main_fs);
 				$webp_url = preg_replace('/\.(jpe?g|png|gif)$/i', '.webp', $main_url);
 				if (file_exists($webp_fs)) {
-					$srcset_webp[] = $_srcset_url($webp_url) . ' ' . ($display_w ?: 1200) . 'w';
+					$webp_dimensions = @getimagesize($webp_fs);
+					if ($webp_dimensions && $webp_dimensions[0]) {
+						$srcset_webp[(int) $webp_dimensions[0]] = $_srcset_url($webp_url) . ' ' . (int) $webp_dimensions[0] . 'w';
+					}
 				}
 			}
-			$sizes_parts[] = ($display_w ?: 1200) . 'px';
 		} else {
 			// Trouver les tailles inférieures ou égales à la taille demandée
 			$target_idx = array_search($size, $size_order);
@@ -142,31 +135,35 @@ class modFlexicontentHelper
 				if (!file_exists($s_fs)) {
 					continue;
 				}
-				$w = $size_widths[$s];
+				$dimensions = @getimagesize($s_fs);
+				if (!$dimensions || !$dimensions[0]) continue;
+				$w = (int) $dimensions[0];
 
 				if ($idx < $target_idx) {
 					// Taille inférieure : breakpoint responsive
-					$srcset_img[]  = $_srcset_url($s_url) . ' ' . $w . 'w';
-					$sizes_parts[] = '(max-width:' . $w . 'px) ' . $w . 'px';
+					$srcset_img[$w] = $_srcset_url($s_url) . ' ' . $w . 'w';
 					if ($use_webp && !$_src_is_webp) {
 						$webp_fs  = preg_replace('/\.(jpe?g|png|gif)$/i', '.webp', $s_fs);
 						$webp_url = preg_replace('/\.(jpe?g|png|gif)$/i', '.webp', $s_url);
 						if (file_exists($webp_fs)) {
-							$srcset_webp[] = $_srcset_url($webp_url) . ' ' . $w . 'w';
+							$webp_dimensions = @getimagesize($webp_fs);
+							if ($webp_dimensions && $webp_dimensions[0]) {
+								$srcset_webp[(int) $webp_dimensions[0]] = $_srcset_url($webp_url) . ' ' . (int) $webp_dimensions[0] . 'w';
+							}
 						}
 					}
 				} else {
 					// Taille demandée : desktop / taille de base
-					// The width descriptor is the image's own width; the display width goes into "sizes"
-					$desktop_w    = $display_w ?: $w;
-					$srcset_img[] = $_srcset_url($main_url) . ' ' . $w . 'w';
-					$sizes_parts[] = $desktop_w . 'px';
+					$srcset_img[$w] = $_srcset_url($main_url) . ' ' . $w . 'w';
 					$fallback_url  = $main_url;
 					if ($use_webp && !$_src_is_webp) {
 						$webp_fs  = preg_replace('/\.(jpe?g|png|gif)$/i', '.webp', $main_fs);
 						$webp_url = preg_replace('/\.(jpe?g|png|gif)$/i', '.webp', $main_url);
 						if (file_exists($webp_fs)) {
-							$srcset_webp[] = $_srcset_url($webp_url) . ' ' . $w . 'w';
+							$webp_dimensions = @getimagesize($webp_fs);
+							if ($webp_dimensions && $webp_dimensions[0]) {
+								$srcset_webp[(int) $webp_dimensions[0]] = $_srcset_url($webp_url) . ' ' . (int) $webp_dimensions[0] . 'w';
+							}
 						}
 					}
 				}
@@ -177,7 +174,8 @@ class modFlexicontentHelper
 			return '';
 		}
 
-		$sizes_str = implode(', ', $sizes_parts);
+		// These lazy images fill their CSS container, which may override the width attribute.
+		$sizes_str = 'auto, 100vw';
 		$_style = 'width:100%;height:auto;display:block!important;border:0!important;';
 
 		$img_tag = '<img'
@@ -212,6 +210,13 @@ class modFlexicontentHelper
 	public static function thumbUrlToFilesystemPath($thumb_url)
 	{
 		if (!$thumb_url) {
+			return '';
+		}
+
+		// A remote URL cannot be verified using a same-named file on this server.
+		$host = parse_url($thumb_url, PHP_URL_HOST);
+		if ($host && strcasecmp($host, (string) parse_url(\Joomla\CMS\Uri\Uri::root(), PHP_URL_HOST)) !== 0)
+		{
 			return '';
 		}
 

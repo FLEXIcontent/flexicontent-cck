@@ -103,35 +103,11 @@ class plgSystemFlexisystem extends CMSPlugin
 		$task = $app->input->get('task', '', 'string');  // NOTE during this event 'task' is (controller.task), thus we use filtering 'string'
 
 		/**
-		 * Call 'flexicontent' items model to update the featured FLAG, thus updating temporary data too
-		 */
-
-		if ($task === 'articles.featured' || $task === 'articles.unfeatured') {
-			// Mirror the toggle of Joomla's Articles manager, with the same conditions Joomla checks before it
-			// changes the flag: administrator, valid form token, edit state permission on each article
-			$cid = \Joomla\Utilities\ArrayHelper::toInteger($app->input->get('cid', array(), 'array'));
-			$user = $app->getIdentity();
-
-			$cid = $app->isClient('administrator') && $app->input->getCmd('option') === 'com_content'
-				&& \Joomla\CMS\Session\Session::checkToken('request') && $user
-				? array_filter($cid, function ($id) use ($user) { return $id > 0 && $user->authorise('core.edit.state', 'com_content.article.' . $id); })
-				: array();
-
-			if ($cid) {
-				$this->_loadFcHelpersAndLanguage();
-
-				// Update featured flag (model will also handle cache cleaning)
-				$itemmodel = new FlexicontentModelItem();
-				$itemmodel->featured($cid, $task === 'articles.featured' ? 1 : 0);
-			}
-		}
-
-		/**
 		 * Call joomla configuration model to update to sync the permission between com_flexicontent and com_content
 		 */
 
 		// Joomla 3 only: the com_config classes used below do not exist in Joomla 4+
-		elseif (!FLEXI_J40GE && $task === 'config.store') {
+		if (!FLEXI_J40GE && $task === 'config.store') {
 			$comp = $app->input->get('comp', '', 'cmd');
 			$comp = str_replace('com_flexicontent.category.', 'com_content.category.', $comp);
 			$comp = str_replace('com_flexicontent.item.', 'com_content.article.', $comp);
@@ -2489,6 +2465,24 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 	{
 		$jcookie = Factory::getApplication()->input->cookie;
 		$jcookie->set('fc_uid', 'p', 0);
+	}
+
+
+	/**
+	 * Mirror only a featured change that Joomla has completed successfully.
+	 * The before-change event may abort the operation (for example, a workflow).
+	 */
+	public function onContentAfterChangeFeatured(\Joomla\Event\EventInterface $event)
+	{
+		if ($event->getArgument('extension') !== 'com_content.article')
+		{
+			return true;
+		}
+
+		$this->_loadFcHelpersAndLanguage();
+		$itemmodel = new FlexicontentModelItem();
+
+		return $itemmodel->mirrorFeatured($event->getArgument('pks'), $event->getArgument('value'));
 	}
 
 
