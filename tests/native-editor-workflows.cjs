@@ -74,6 +74,9 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
     await page.evaluate(() => { editorText = '<p>Written in the editor</p>'; });
     assert.equal(await page.evaluate(() => document.formvalidator.isValid(document.forms[0])), true);
     assert.equal(await page.inputValue('#body'), '<p>Written in the editor</p>');
+    await page.evaluate(()=>{tinyMCE.get=()=>({initialized:false,getContent(){throw Error('Editor is still starting');}});});
+    assert.equal(await page.evaluate(()=>document.formvalidator.isValid(document.forms[0])),true);
+    assert.equal(await page.inputValue('#body'),'<p>Written in the editor</p>');
   });
   await test('Idle upload queues do not block saving; completed unassigned uploads retain their validation state',async page=>{
     await form(page,'<input class="validate-fcuploader fc_hidden_value" value="" id="upload-status">');
@@ -145,7 +148,10 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
     assert.equal(await page.inputValue('#state'), '');
   });
   if (process.env.FLEXI_TEST_JQUERY) await test('Legacy editor AJAX hooks receive the serialized request and success response', async page => {
-    await form(page, '<input name="title" value="Legacy editor">', 'data-fc_force_serialization="1"');
+    await form(page, '<label for="legacy-title">Title</label><input id="legacy-title" name="title" value="Legacy editor">', 'data-fc_force_serialization="1"');
+    await validate(page);
+    assert(await page.evaluate(()=>document.formvalidator.isValid(document.forms[0])));
+    assert.equal(await page.evaluate(()=>jQuery('#legacy-title').data('label').text()),'Title');
     await page.route('https://fixture.invalid/save', route => route.fulfill({body:'<div class="alert alert-success">Item saved</div>',contentType:'text/html'}));
     await page.evaluate(() => {
       window.hooks=[];

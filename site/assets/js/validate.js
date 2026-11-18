@@ -24,7 +24,7 @@ var JFormValidator_FC = function () {
     const labels = Array.from(document.querySelectorAll('label'));
     const find = key => labels.find(lbl => lbl.htmlFor === key || lbl.getAttribute('data-for') === key || lbl.id === key + '-lbl');
     const found = find(id) || find(id.replace(/_[0-9]+$/, '')) || null;
-    F.data(el, 'label', found);
+    F.data(el, 'label', found && window.jQuery ? window.jQuery(found) : found || false);
     return found;
   }
   function message(anchor, text, before = rtl) {
@@ -91,7 +91,7 @@ var JFormValidator_FC = function () {
     const tiny = window.tinyMCE?.get(el.id);
     const mirror = el.nextElementSibling?.CodeMirror;
     const editor = tiny || mirror;
-    if (editor && !F.visible(el)) {
+    if (editor && (!tiny || tiny.initialized !== false) && !F.visible(el)) {
       el.value = (tiny ? tiny.getContent() : mirror.getValue()).trim();
       if (!el.value) tiny ? tiny.setContent('') : mirror.setValue('');
     }
