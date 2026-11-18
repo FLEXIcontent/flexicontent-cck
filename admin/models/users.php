@@ -172,7 +172,7 @@ class FlexicontentModelUsers extends FCModelAdminList
 
 		// Create a query with all its clauses: WHERE, HAVING and ORDER BY, etc
 		$query = $this->_db->getQuery(true)
-			->select('SQL_CALC_FOUND_ROWS a.*')
+			->select('a.*')
 			->select($editor_col_quoted . ' AS editor')
 			->select('s.userid IS NOT NULL AS loggedin')
 			->select('(SELECT COUNT(*) FROM #__content AS i WHERE i.created_by = a.id) AS itemscount')
