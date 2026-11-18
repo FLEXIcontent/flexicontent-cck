@@ -454,7 +454,8 @@ class FlexicontentModelItemelement extends FCModelAdminList
 					break;
 
 				case 'ie.search_index':
-					$textwhere[] = ' MATCH (ie.search_index) AGAINST (' . $this->_db->Quote($search_prefix . $escaped_search . '*', false ).' IN BOOLEAN MODE)';
+					$ft_search = implode('%', flexicontent_db::getBooleanSearchWords(explode('%', $search_prefix . $escaped_search)));
+					$textwhere[] = ' MATCH (ie.search_index) AGAINST (' . $this->_db->Quote($ft_search . '*', false ).' IN BOOLEAN MODE)';
 					break;
 			}
 		}

@@ -3997,6 +3997,24 @@ class FlexicontentFields
 		$colname = !empty($filter->filter_colname)
 			? $filter->filter_colname
 			: 'value';
+
+		// A field value column has no FULLTEXT index. Only MyISAM can run a boolean MATCH without one (it reads every row),
+		// InnoDB answers with SQL error 1191. So on other engines match the words of a text search filter with LIKE
+		if (strpos($valueswhere, ' MATCH (_v_) ') !== false && substr($colname, -12) !== 'search_index'
+			&& flexicontent_db::getTableEngine('flexicontent_fields_item_relations') !== 'myisam'
+		)
+		{
+			$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+			$like_clauses = array();
+
+			foreach (preg_split('/[\s,\.]+/u', (string) reset($value), -1, PREG_SPLIT_NO_EMPTY) as $word)
+			{
+				$like_clauses[] = '_v_ LIKE ' . $db->Quote('%' . $db->escape($word, true) . '%', false);
+			}
+
+			$valueswhere = $like_clauses ? ' AND (' . implode(' OR ', $like_clauses) . ')' : ' AND 0 = 1';
+		}
+
 		$valueswhere = str_replace('_v_', $colname, $valueswhere);
 
 		$valuesfrom = !empty($filter->filter_valuesfrom)

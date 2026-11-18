@@ -30,6 +30,12 @@ if (!defined('FLEXI_J40GE'))   define('FLEXI_J40GE', version_compare( $jversion-
 
 class com_flexicontentInstallerScript
 {
+	/**
+	 * The storage engine of the DB tables of a NEW installation: 'MyISAM' (as until now) or 'InnoDB'.
+	 * Existing sites are never changed by an upgrade, they have an optional dashboard task for it
+	 */
+	const NEW_INSTALL_ENGINE = 'MyISAM';
+
 	public $release;
 	public $release_existing;
 	public $minimum_joomla_release;
@@ -1622,6 +1628,23 @@ class com_flexicontentInstallerScript
 		<?php
 		//echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endSlide');
 		//echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endAccordion');
+
+		// New installation: give the (still empty) DB tables the engine chosen by NEW_INSTALL_ENGINE
+		if (FLEXI_NEW_INSTALL && self::NEW_INSTALL_ENGINE === 'InnoDB')
+		{
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/dbengine.php';
+
+			try {
+				while (($engine_result = FlexicontentDbEngine::convertNext($db)) && $engine_result[1]);
+
+				if (!empty($engine_result)) {
+					echo '<span class="badge badge-error">SQL Error</span> ' . htmlspecialchars($engine_result[0] . ': ' . $engine_result[2], ENT_QUOTES, 'UTF-8') . '<br/>';
+				}
+			}
+			catch (Exception $e) {
+				echo '<span class="badge badge-error">SQL Error</span> '. $e->getMessage() . '<br/>';
+			}
+		}
 		?>
 
 		<div class="alert alert-success" style="margin: 8px 0 64px 0;">
