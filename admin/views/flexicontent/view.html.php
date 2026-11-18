@@ -112,6 +112,7 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 			$existdbindexes    = ! (bool) ($missingindexes = $model->getExistDBindexes($check_only=false));
 			$itemcountingdok   = $model->getItemCountingDataOK();
 			$initialpermission = $model->checkInitialPermission();
+			$dbcharsetok       = ! (bool) ($dbcharsetpending = $model->getDBCharsetPending());
 		}
 
 		else if ($optional_tasks)  // IF optional tasks do not recheck instead just set the FLAGS to true
@@ -120,8 +121,8 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 			$existfplg = $existseplg = $existsyplg = true;
 		  $existcats = $langsynced = $existversions = $existversionsdata = $existauthors = true;
 		  $deprecatedfiles = $nooldfieldsdata = $missingversion = $cachethumb = true;
-		  $existdbindexes = $itemcountingdok = $initialpermission = true;
-		  $missingindexes = array();
+		  $existdbindexes = $itemcountingdok = $initialpermission = $dbcharsetok = true;
+		  $missingindexes = $dbcharsetpending = array();
 		}
 
 
@@ -289,6 +290,8 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 		$this->missingindexes = isset($missingindexes) ? $missingindexes : null;
 		$this->itemcountingdok = isset($itemcountingdok) ? $itemcountingdok : null;
 		$this->initialpermission = isset($initialpermission) ? $initialpermission : null;
+		$this->dbcharsetok = isset($dbcharsetok) ? $dbcharsetok : null;
+		$this->dbcharsetpending = isset($dbcharsetpending) ? $dbcharsetpending : array();
 
 		// assign Rights to the template
 		$this->perms = $perms;

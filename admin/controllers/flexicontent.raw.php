@@ -54,6 +54,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		$this->registerTask('addmcatitemrelations',		'addMcatItemRelations');
 		$this->registerTask('updatelanguageData',			'updateLanguageData');
 		$this->registerTask('createdbindexes',				'createDBindexes');
+		$this->registerTask('convertdbcharset',				'convertDBCharset');
 		$this->registerTask('createversionstable',		'createVersionsTable');
 		$this->registerTask('populateversionstable',	'populateVersionsTable');
 		$this->registerTask('createauthorstable',			'createauthorstable');
@@ -800,6 +801,52 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		}
 
 		echo '<span class="install-ok"></span>';
+	}
+
+
+	/**
+	 * Method to convert the FLEXIcontent DB tables that still use the 3-byte utf8 character set to utf8mb4
+	 *
+	 * Each table is copied by its ALTER, so a request converts tables for a few seconds only (at least one table)
+	 * The dashboard repeats the request while the reply contains the "fc-dbcharset-more" marker
+	 *
+	 * @return	void
+	 */
+	function convertDBCharset()
+	{
+		// Check for request forgeries
+		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+
+		if (!\Joomla\CMS\Factory::getApplication()->getIdentity()->authorise('core.admin', 'com_flexicontent'))
+		{
+			jexit('<span class="install-notok"></span>' . \Joomla\CMS\Language\Text::_('JERROR_ALERTNOAUTHOR'));
+		}
+
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/dbcharset.php';
+
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+
+		// The database server finishes an ALTER even if this request is cut off
+		@set_time_limit(0);
+		ignore_user_abort(true);
+
+		$failed = false;
+
+		foreach (FlexicontentDbCharset::convertPending($db, 0, 5) as $tblname => $result)
+		{
+			$failed = $failed || !$result[0];
+			echo '<div>' . ($result[0] ? '' : '<span class="install-notok"></span>')
+				. htmlspecialchars(($tblname !== '' ? $tblname . ': ' : '') . $result[1], ENT_QUOTES, 'UTF-8') . '</div>';
+		}
+
+		if ($failed)
+		{
+			return;
+		}
+
+		echo FlexicontentDbCharset::getPendingTables($db)
+			? '<span class="fc-dbcharset-more"></span>'
+			: '<span class="install-ok"></span>';
 	}
 
 

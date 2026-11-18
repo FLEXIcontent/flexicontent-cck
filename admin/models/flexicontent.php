@@ -901,6 +901,25 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 
 
 	/**
+	 * Method to get the FLEXIcontent DB tables that still use the 3-byte utf8 character set
+	 *
+	 * @return	array   The tables to convert to utf8mb4, indexed by name. Empty when all are converted
+	 */
+	function getDBCharsetPending()
+	{
+		static $pending;
+
+		if ($pending === null)
+		{
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/dbcharset.php';
+			$pending = FlexicontentDbCharset::getPendingTables($this->_db);
+		}
+
+		return $pending;
+	}
+
+
+	/**
 	 * Method to get if temporary item data table is up-to-date
 	 *
 	 * @access	public
