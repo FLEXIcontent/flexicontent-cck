@@ -233,8 +233,8 @@ class FlexicontentViewUser extends FlexicontentViewBaseRecord
 		// Get author extended data, basic (described in author.xml) and category (described incategory.xml)
 		// *************************************************************************************************
 
-		\Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
-		$flexiauthor_extdata = \Joomla\CMS\Table\Table::getInstance('flexicontent_authors_ext', '');
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_authors_ext.php';
+		$flexiauthor_extdata = new flexicontent_authors_ext(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 		$flexiauthor_extdata->load(($row->id ?? 0));
 		//echo "<pre>"; print_r($flexiauthor_extdata); echo "</pre>"; exit;
 

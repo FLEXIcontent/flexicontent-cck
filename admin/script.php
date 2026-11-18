@@ -1760,12 +1760,12 @@ class com_flexicontentInstallerScript
 					<td class="key" style="font-size:11px;">Restore com_content top-level category assets</td>
 					<td>
 						<?php
-						$asset	= \Joomla\CMS\Table\Table::getInstance('asset');
+						$asset = new \Joomla\CMS\Table\Asset(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 						$asset_loaded = $asset->loadByName('com_content');  // Try to load component asset for com_content
 						if (!$asset_loaded) {
 							$result = 0;
 						} else {
-							$cc_asset	= \Joomla\CMS\Table\Table::getInstance('asset');
+							$cc_asset = new \Joomla\CMS\Table\Asset(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 							$query = 'SELECT s.id FROM #__assets AS s'
 								.' JOIN #__categories AS c ON s.id=c.asset_id'
 								.' WHERE c.parent_id=1 AND c.extension="com_content"';

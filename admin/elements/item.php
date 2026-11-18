@@ -21,7 +21,6 @@ use Joomla\CMS\Form\FormField;
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once(JPATH_ROOT.'/components/com_flexicontent/classes/flexicontent.helper.php');
 
-Table::addIncludePath(JPATH_ADMINISTRATOR.'/components/com_flexicontent/tables');
 
 
 /**
@@ -63,7 +62,8 @@ class JFormFieldItem extends FormField
 			$element_id = $this->id;
 		}
 
-		$item = Table::getInstance('flexicontent_items', '');
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_items.php';
+		$item = new flexicontent_items(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 		if ($this->value)
 		{
 			$item->load($this->value);

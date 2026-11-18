@@ -34,7 +34,6 @@ class FlexicontentFields
 	 */
 	static function renderFields( $item_per_field=true, $item_ids=array(), $field_names=array(), $view=FLEXI_ITEMVIEW, $methods=array(), $cfparams=array() )
 	{
-		\Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 		require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
 
@@ -2609,7 +2608,19 @@ class FlexicontentFields
 		{
 			if ( empty($field->item_id) ) return;
 
-			$item = \Joomla\CMS\Table\Table::getInstance( $type = 'flexicontent_items', $prefix = '', $config = array() );
+			$__tblType = $type = 'flexicontent_items';
+			$__tblPrefix = $prefix = '';
+			$__tblDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+			if ($__tblPrefix === 'TagsTable') {
+				$item = \Joomla\CMS\Factory::getApplication()->bootComponent('com_tags')->getMVCFactory()->createTable($__tblType, 'Administrator');
+			} elseif ($__tblPrefix === 'JTable') {
+				$__tblClass = '\\Joomla\\CMS\\Table\\' . ucfirst($__tblType);
+				$item = new $__tblClass($__tblDb);
+			} else {
+				$__tblClass = $__tblPrefix . ucfirst($__tblType);
+				require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/' . strtolower($__tblType) . '.php';
+				$item = new $__tblClass($__tblDb);
+			}
 			$item->load( $field->item_id );
 		}
 

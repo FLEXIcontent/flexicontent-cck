@@ -2365,7 +2365,8 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			$perms = FlexicontentHelperPerm::getPerm();
 			$allowed = array();
 			$accesses = array();
-			$row = \Joomla\CMS\Table\Table::getInstance('flexicontent_files', '');
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_files.php';
+			$row = new flexicontent_files(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 
 			foreach ($cid as $_id)
 			{
@@ -2393,7 +2394,8 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		}
 
 		$file_id = (int) reset($cid);
-		$row = \Joomla\CMS\Table\Table::getInstance('flexicontent_files', '');
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_files.php';
+		$row = new flexicontent_files(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 		$row->load($file_id);
 
 		// Calculate access

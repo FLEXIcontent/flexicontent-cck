@@ -37,7 +37,7 @@ class _flexicontent_fields_common extends flexicontent_basetable
 	 */
 	protected function __getAssetParentId(?\Joomla\CMS\Table\Table $table = null, $id = null)
 	{
-		$asset = \Joomla\CMS\Table\Table::getInstance('Asset');
+		$asset = new \Joomla\CMS\Table\Asset(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 		$asset->loadByName('com_flexicontent');
 		return $asset->id;
 	}

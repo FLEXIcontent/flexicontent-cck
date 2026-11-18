@@ -10,7 +10,8 @@
 defined('_JEXEC') or die;
 
 // Include the component HTML helpers.
-\Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_COMPONENT.'/helpers/html');
+require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html/fc_service_registry.php';
+flexicontent_register_html_helpers(JPATH_COMPONENT.'/helpers/html');
 
 // Load the tooltip behavior.
 $tip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';

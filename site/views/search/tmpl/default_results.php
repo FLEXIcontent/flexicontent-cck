@@ -22,7 +22,8 @@ $fcitems = array();
 foreach ($this->results as $i => $result)
 {
 	if ( ! @$result->fc_item_id ) continue;
-	$fcitems[$i] = \Joomla\CMS\Table\Table::getInstance('flexicontent_items', '');
+	require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_items.php';
+	$fcitems[$i] = new flexicontent_items(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 	$fcitems[$i]->load($result->fc_item_id);
 	$fcitems[$i]->category_access = $result->category_access;
 	$fcitems[$i]->type_access = $result->type_access ;

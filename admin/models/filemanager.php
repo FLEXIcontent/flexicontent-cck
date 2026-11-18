@@ -703,8 +703,19 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			{
 				$u_item_id = (int) $u_item_id;
 
-				\Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
-				$record = \Joomla\CMS\Table\Table::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
+				$__tblType = $type = 'flexicontent_items';
+				$__tblPrefix = $prefix = '';
+				$__tblDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+				if ($__tblPrefix === 'TagsTable') {
+					$record = \Joomla\CMS\Factory::getApplication()->bootComponent('com_tags')->getMVCFactory()->createTable($__tblType, 'Administrator');
+				} elseif ($__tblPrefix === 'JTable') {
+					$__tblClass = '\\Joomla\\CMS\\Table\\' . ucfirst($__tblType);
+					$record = new $__tblClass($__tblDb);
+				} else {
+					$__tblClass = $__tblPrefix . ucfirst($__tblType);
+					require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/' . strtolower($__tblType) . '.php';
+					$record = new $__tblClass($__tblDb);
+				}
 				if ($record->load($u_item_id))
 				{
 					$asset = 'com_content.article.' . $u_item_id;

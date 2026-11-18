@@ -2016,7 +2016,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		try { $db->execute(); } catch (Exception $e) { echo $e->getMessage(); }
 
 		// CHECK that we have the same Component Actions in assets DB table with the Actions as in component's access.xml file
-		$asset	= \Joomla\CMS\Table\Table::getInstance('asset');
+		$asset = new \Joomla\CMS\Table\Asset(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 		if ($comp_section = $asset->loadByName($component_name))    // Try to load component asset, if missing it returns false
 		{
 			$this->verifyExtraRules();  // Verify that com_content component asset has the extra FC specific rules
@@ -2057,7 +2057,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		// Get a list com_content TOP-LEVEL categories that have wrong asset names (do not point to 'com_content' asset)
 		// (NOTE: we do not longer force category asset creation if asset is not set, so we will not check them here)
 		// !!! WARNING this query must be same like the one USED in function initialPermission()
-		$com_content_asset	= \Joomla\CMS\Table\Table::getInstance('asset');
+		$com_content_asset = new \Joomla\CMS\Table\Asset(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 		$com_content_asset->loadByName('com_content');
 		$query = $db->getQuery(true)
 			->select('c.id')
@@ -2109,7 +2109,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		$app = Factory::getApplication();
 		$component_name	= $app->input->get('option', '', 'CMD');
 		$db = $this->_db;
-		$asset	= \Joomla\CMS\Table\Table::getInstance('asset');   // Create an asset object
+		$asset = new \Joomla\CMS\Table\Asset(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));   // Create an asset object
 
 		/*** Component assets ***/
 		$asset_exists = $asset->loadByName($component_name);
@@ -2123,7 +2123,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 			// Component asset entry does not exist or is empty: We will create initial rules for all component's actions
 
 			// Get root asset
-			$root = \Joomla\CMS\Table\Table::getInstance('asset');
+			$root = new \Joomla\CMS\Table\Asset(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 			$root->loadByName('root.1');
 
 			// Initialize component asset
@@ -2202,11 +2202,11 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		}
 
 		// Load component asset
-		$component_asset = \Joomla\CMS\Table\Table::getInstance('asset');
+		$component_asset = new \Joomla\CMS\Table\Asset(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 		$component_asset->loadByName($component_name);
 
 		// Load com_content asset
-		$com_content_asset = \Joomla\CMS\Table\Table::getInstance('asset');
+		$com_content_asset = new \Joomla\CMS\Table\Asset(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 		$com_content_asset->loadByName('com_content');
 		$com_content_name = 'com_content';
 
@@ -2496,7 +2496,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		// *** Get com_flexicontent asset
 		// ***
 
-		$comp_asset = \Joomla\CMS\Table\Table::getInstance('asset');
+		$comp_asset = new \Joomla\CMS\Table\Asset(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 		$existing_rules = $comp_asset->loadByName('com_flexicontent') && !empty($comp_asset->rules)
 			? json_decode($comp_asset->rules, true)
 			: array();
@@ -2537,7 +2537,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 		// *** Get com_content asset and its rule names
 		// ***
 
-		$com_content_asset = \Joomla\CMS\Table\Table::getInstance('asset');
+		$com_content_asset = new \Joomla\CMS\Table\Asset(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 		$com_content_asset->loadByName('com_content');
 		$com_content_rules = json_decode($com_content_asset->rules, true);
 
@@ -2710,12 +2710,12 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 	{
 		$debug_initial_perms = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('debug_initial_perms');
 
-		$fc_asset = \Joomla\CMS\Table\Table::getInstance('asset');
+		$fc_asset = new \Joomla\CMS\Table\Asset(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 		$fc_asset->loadByName('com_flexicontent');
 		$fc_asset_rules = json_decode($fc_asset->rules, true);
 		if ( !count($fc_asset_rules) )  return; // The asset is empty do not try anything
 
-		$com_content_asset = \Joomla\CMS\Table\Table::getInstance('asset');
+		$com_content_asset = new \Joomla\CMS\Table\Asset(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 		$com_content_asset->loadByName('com_content');
 		$com_content_rules = json_decode($com_content_asset->rules, true);
 

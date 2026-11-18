@@ -292,7 +292,19 @@ class FlexicontentViewTag extends FlexicontentViewBaseRecord
 				$jtag     = reset($jtag_id_arr);
 				$jtag_id  = $jtag->id;
 
-				$tagTable = \Joomla\CMS\Table\Table::getInstance($_type = 'flexicontent_tags', $_prefix = '', $_config = array());
+				$__tblType = $_type = 'flexicontent_tags';
+				$__tblPrefix = $_prefix = '';
+				$__tblDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+				if ($__tblPrefix === 'TagsTable') {
+					$tagTable = \Joomla\CMS\Factory::getApplication()->bootComponent('com_tags')->getMVCFactory()->createTable($__tblType, 'Administrator');
+				} elseif ($__tblPrefix === 'JTable') {
+					$__tblClass = '\\Joomla\\CMS\\Table\\' . ucfirst($__tblType);
+					$tagTable = new $__tblClass($__tblDb);
+				} else {
+					$__tblClass = $__tblPrefix . ucfirst($__tblType);
+					require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/' . strtolower($__tblType) . '.php';
+					$tagTable = new $__tblClass($__tblDb);
+				}
 				$tagTable->load($row->id);
 				$tagTable->jtag_id = $jtag_id;
 				$tagTable->store();

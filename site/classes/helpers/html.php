@@ -775,7 +775,6 @@ class flexicontent_html
 	 */
 	function renderItem($item_id, $view=FLEXI_ITEMVIEW, $ilayout = '')
 	{
-		\Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.fields.php');
 		//require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'permission.php');
@@ -798,7 +797,8 @@ class flexicontent_html
 		// Get type's ilayout
 		if (!$ilayout)
 		{
-			$type = \Joomla\CMS\Table\Table::getInstance('flexicontent_types', '');
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_types.php';
+			$type = new flexicontent_types(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 			$type->id = $item->type_id;
 			$type->load();
 			$type->params = new \Joomla\Registry\Registry($type->attribs);

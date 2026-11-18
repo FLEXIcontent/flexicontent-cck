@@ -722,15 +722,51 @@ class flexicontent_items extends _flexicontent_items
 		$tk_tmp = $this->_tbl_key_tmp;
 
 		// Split the data to their actual DB table, (#__flexicontent_items_tmp duplicates non-TEXT data of #__content)
-		$record = Table::getInstance($this->_jtbls[$this->_tbl][0]);
+		$__tblType = $this->_jtbls[$this->_tbl][0];
+		$__tblPrefix = 'JTable';
+		$__tblDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		if ($__tblPrefix === 'TagsTable') {
+			$record = \Joomla\CMS\Factory::getApplication()->bootComponent('com_tags')->getMVCFactory()->createTable($__tblType, 'Administrator');
+		} elseif ($__tblPrefix === 'JTable') {
+			$__tblClass = '\\Joomla\\CMS\\Table\\' . ucfirst($__tblType);
+			$record = new $__tblClass($__tblDb);
+		} else {
+			$__tblClass = $__tblPrefix . ucfirst($__tblType);
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/' . strtolower($__tblType) . '.php';
+			$record = new $__tblClass($__tblDb);
+		}
 		$record->_tbl = $this->_tbl;
 		$record->_tbl_key = $k;
 
-		$record_ext = Table::getInstance($this->_jtbls[$this->_tbl_ext][0], $this->_jtbls[$this->_tbl_ext][1]);
+		$__tblType = $this->_jtbls[$this->_tbl_ext][0];
+		$__tblPrefix = $this->_jtbls[$this->_tbl_ext][1];
+		$__tblDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		if ($__tblPrefix === 'TagsTable') {
+			$record_ext = \Joomla\CMS\Factory::getApplication()->bootComponent('com_tags')->getMVCFactory()->createTable($__tblType, 'Administrator');
+		} elseif ($__tblPrefix === 'JTable') {
+			$__tblClass = '\\Joomla\\CMS\\Table\\' . ucfirst($__tblType);
+			$record_ext = new $__tblClass($__tblDb);
+		} else {
+			$__tblClass = $__tblPrefix . ucfirst($__tblType);
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/' . strtolower($__tblType) . '.php';
+			$record_ext = new $__tblClass($__tblDb);
+		}
 		$record_ext->_tbl = $this->_tbl_ext;
 		$record_ext->_tbl_key = $fk_ext;
 
-		$record_tmp = Table::getInstance($this->_jtbls[$this->_tbl_tmp][0], $this->_jtbls[$this->_tbl_tmp][1]);
+		$__tblType = $this->_jtbls[$this->_tbl_tmp][0];
+		$__tblPrefix = $this->_jtbls[$this->_tbl_tmp][1];
+		$__tblDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		if ($__tblPrefix === 'TagsTable') {
+			$record_tmp = \Joomla\CMS\Factory::getApplication()->bootComponent('com_tags')->getMVCFactory()->createTable($__tblType, 'Administrator');
+		} elseif ($__tblPrefix === 'JTable') {
+			$__tblClass = '\\Joomla\\CMS\\Table\\' . ucfirst($__tblType);
+			$record_tmp = new $__tblClass($__tblDb);
+		} else {
+			$__tblClass = $__tblPrefix . ucfirst($__tblType);
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/' . strtolower($__tblType) . '.php';
+			$record_tmp = new $__tblClass($__tblDb);
+		}
 		$record_tmp->_tbl = $this->_tbl_tmp;
 		$record_tmp->_tbl_key = $fk_tmp;
 
@@ -864,7 +900,7 @@ class flexicontent_items extends _flexicontent_items
 		$name  = $this->_getAssetName();
 		$title = $this->_getAssetTitle();
 
-		$asset = Table::getInstance('Asset');
+		$asset = new \Joomla\CMS\Table\Asset(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 		$asset->loadByName($name);
 
 		// Check for an error.

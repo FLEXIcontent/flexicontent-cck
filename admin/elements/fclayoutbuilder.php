@@ -49,7 +49,8 @@ class JFormFieldFclayoutbuilder extends \Joomla\CMS\Form\FormField
 			'editor_sfx' => ($this->element['editor_sfx'] ?: $this->element['name']),
 		);
 
-		\Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html/fc_service_registry.php';
+		flexicontent_register_html_helpers(JPATH_SITE . '/components/com_flexicontent/helpers/html');
 		return \Joomla\CMS\HTML\HTMLHelper::_('fclayoutbuilder.getBuilderHtml', $builder_options);
 	}
 }

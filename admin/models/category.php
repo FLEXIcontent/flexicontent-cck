@@ -211,11 +211,6 @@ class FlexicontentModelCategory extends FCModelAdmin
 			? $prefix
 			: (FLEXI_J40GE ? 'JTable' : 'CategoriesTable');
 
-		if (!FLEXI_J40GE)
-		{
-			\Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_categories'.DS.'tables');
-		}
-
 		return parent::getTable($type, $prefix, $config);
 	}
 

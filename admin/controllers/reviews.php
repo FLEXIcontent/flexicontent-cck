@@ -803,7 +803,8 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 			$fail(\Joomla\CMS\Language\Text::_('FLEXI_REVIEW_ERR_RATING_REQUIRED'));
 		}
 
-		$review = \Joomla\CMS\Table\Table::getInstance('flexicontent_reviews', '', array());
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_reviews.php';
+		$review = new flexicontent_reviews(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 
 		if (!$review->load($id))
 		{
@@ -1017,7 +1018,19 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		 * Load content item related to the review
 		 */
 
-		$item = \Joomla\CMS\Table\Table::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
+		$__tblType = $type = 'flexicontent_items';
+		$__tblPrefix = $prefix = '';
+		$__tblDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		if ($__tblPrefix === 'TagsTable') {
+			$item = \Joomla\CMS\Factory::getApplication()->bootComponent('com_tags')->getMVCFactory()->createTable($__tblType, 'Administrator');
+		} elseif ($__tblPrefix === 'JTable') {
+			$__tblClass = '\\Joomla\\CMS\\Table\\' . ucfirst($__tblType);
+			$item = new $__tblClass($__tblDb);
+		} else {
+			$__tblClass = $__tblPrefix . ucfirst($__tblType);
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/' . strtolower($__tblType) . '.php';
+			$item = new $__tblClass($__tblDb);
+		}
 
 		if ($content_id && !$item->load($content_id))
 		{
@@ -1072,7 +1085,19 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 		 * Load item
 		 */
 
-		$item = \Joomla\CMS\Table\Table::getInstance( $type = 'flexicontent_items', $prefix = '', $config = array() );
+		$__tblType = $type = 'flexicontent_items';
+		$__tblPrefix = $prefix = '';
+		$__tblDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		if ($__tblPrefix === 'TagsTable') {
+			$item = \Joomla\CMS\Factory::getApplication()->bootComponent('com_tags')->getMVCFactory()->createTable($__tblType, 'Administrator');
+		} elseif ($__tblPrefix === 'JTable') {
+			$__tblClass = '\\Joomla\\CMS\\Table\\' . ucfirst($__tblType);
+			$item = new $__tblClass($__tblDb);
+		} else {
+			$__tblClass = $__tblPrefix . ucfirst($__tblType);
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/' . strtolower($__tblType) . '.php';
+			$item = new $__tblClass($__tblDb);
+		}
 		$item->load($cid);
 
 
@@ -1552,7 +1577,8 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 	 */
 	protected function _getUserRating($cid, $user, $resolution, $trashed = true)
 	{
-		$review = \Joomla\CMS\Table\Table::getInstance('flexicontent_reviews', '', array());
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_reviews.php';
+		$review = new flexicontent_reviews(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 
 		if (!$review->load(array('content_id' => (int) $cid, 'user_id' => (int) $user->id, 'type' => 'item')))
 		{
@@ -1583,7 +1609,8 @@ class FlexicontentControllerReviews extends FlexicontentControllerBaseAdmin
 	 */
 	protected function _storeUserRating($cid, $user, $rating, $resolution, $create = true)
 	{
-		$review = \Joomla\CMS\Table\Table::getInstance('flexicontent_reviews', '', array());
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_reviews.php';
+		$review = new flexicontent_reviews(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 
 		$exists = $review->load(array('content_id' => (int) $cid, 'user_id' => (int) $user->id, 'type' => 'item'));
 

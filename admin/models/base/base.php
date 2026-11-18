@@ -1690,10 +1690,6 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 				{
 					$jm_state = $state;
 				}
-
-				// Workaround for extensions using the model but not setting correct include path
-				$component = $parts[1] === 'category' ? 'com_categories' : $parts[1];
-				\Joomla\CMS\MVC\Model\BaseDatabaseModel::addIncludePath(JPATH_BASE . '/components/' . $component . '/models');
 			}
 
 			//Trigger the event

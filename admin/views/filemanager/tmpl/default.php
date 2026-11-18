@@ -20,7 +20,8 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Uri\Uri;
 use Joomla\Filesystem\Path;
 use Joomla\String\StringHelper;
-HTMLHelper::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html');
+require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html/fc_service_registry.php';
+flexicontent_register_html_helpers(JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html');
 
 global $globalcats;
 $app      = Factory::getApplication();
@@ -669,7 +670,8 @@ if ($enable_multi_uploader)
 		}"
 	);
 
-	HTMLHelper::addIncludePath(JPATH_SITE . '/components/com_flexicontent/helpers/html');
+	require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html/fc_service_registry.php';
+	flexicontent_register_html_helpers(JPATH_SITE . '/components/com_flexicontent/helpers/html');
 	$upConf = HTMLHelper::_('fcuploader.getUploadConf', $this->field);
 	$uploader_html = HTMLHelper::_('fcuploader.getUploader', $this->field, $this->u_item_id, $uploader_tag_id, $up_sfx_n, $upload_options);
 

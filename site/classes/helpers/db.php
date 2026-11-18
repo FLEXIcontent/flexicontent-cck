@@ -1014,7 +1014,19 @@ class flexicontent_db
 			}
 
 			// Get a new (DB) Table instance of the row to checkin.
-			$table = \Joomla\CMS\Table\Table::getInstance($jtable_name, '');
+			$__tblType = $jtable_name;
+			$__tblPrefix = '';
+			$__tblDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+			if ($__tblPrefix === 'TagsTable') {
+				$table = \Joomla\CMS\Factory::getApplication()->bootComponent('com_tags')->getMVCFactory()->createTable($__tblType, 'Administrator');
+			} elseif ($__tblPrefix === 'JTable') {
+				$__tblClass = '\\Joomla\\CMS\\Table\\' . ucfirst($__tblType);
+				$table = new $__tblClass($__tblDb);
+			} else {
+				$__tblClass = $__tblPrefix . ucfirst($__tblType);
+				require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/' . strtolower($__tblType) . '.php';
+				$table = new $__tblClass($__tblDb);
+			}
 
 			if (!$table->load($pk))
 			{
@@ -1621,8 +1633,7 @@ class flexicontent_db
 					->createTable('Tag', 'Administrator');
 			} else
 			{
-				JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tags/tables');
-				$tbl = JTable::getInstance('Tag', 'TagsTable');
+				$tbl = \Joomla\CMS\Factory::getApplication()->bootComponent('com_tags')->getMVCFactory()->createTable('Tag', 'Administrator');
 			}
 
 			$tbl->rebuild();
@@ -1653,8 +1664,7 @@ class flexicontent_db
 		}
 
 		// We will use the tags table to store them
-		//Table::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tags/tables');
-		$tagTable  = Table::getInstance('Tag', 'TagsTable');
+		$tagTable = \Joomla\CMS\Factory::getApplication()->bootComponent('com_tags')->getMVCFactory()->createTable('Tag', 'Administrator');
 
 		if(FLEXI_J40GE && !$tagTable)
         {

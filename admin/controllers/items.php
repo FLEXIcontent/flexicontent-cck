@@ -2658,7 +2658,19 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		}
 
 		// First checkin the open item, but do not force check-in of items locked by other users
-		$item = \Joomla\CMS\Table\Table::getInstance($this->records_jtable, '');
+		$__tblType = $this->records_jtable;
+		$__tblPrefix = '';
+		$__tblDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		if ($__tblPrefix === 'TagsTable') {
+			$item = \Joomla\CMS\Factory::getApplication()->bootComponent('com_tags')->getMVCFactory()->createTable($__tblType, 'Administrator');
+		} elseif ($__tblPrefix === 'JTable') {
+			$__tblClass = '\\Joomla\\CMS\\Table\\' . ucfirst($__tblType);
+			$item = new $__tblClass($__tblDb);
+		} else {
+			$__tblClass = $__tblPrefix . ucfirst($__tblType);
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/' . strtolower($__tblType) . '.php';
+			$item = new $__tblClass($__tblDb);
+		}
 		$item->load($id);
 
 		if ($item->checked_out && $item->checked_out != $user->id && !$user->authorise('core.manage', 'com_checkin'))

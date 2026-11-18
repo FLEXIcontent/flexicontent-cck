@@ -320,7 +320,8 @@ class flexicontent_categories extends _flexicontent_categories
 		}
 
 		// Verify that the alias is unique
-		$table = \Joomla\CMS\Table\Table::getInstance('flexicontent_categories','');
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_categories.php';
+		$table = new flexicontent_categories(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 		if ($table->load(array('alias'=>$this->alias,'parent_id'=>$this->parent_id,'extension'=>$this->extension)) && ($table->id != $this->id || $this->id==0)) {
 
 			$this->setError(\Joomla\CMS\Language\Text::_('JLIB_DATABASE_ERROR_CATEGORY_UNIQUE_ALIAS'));
@@ -330,7 +331,7 @@ class flexicontent_categories extends _flexicontent_categories
 		// NOT NEEDED handle by parent::store()
 		/*if (isset($this->asset_id))
 		{
-			$asset	= \Joomla\CMS\Table\Table::getInstance('Asset');
+			$asset = new \Joomla\CMS\Table\Asset(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 			if (!$asset->load($this->asset_id)) {
 				$name = $this->_getAssetName();
 				$asset->loadByName($name);

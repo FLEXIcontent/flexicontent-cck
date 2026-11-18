@@ -162,12 +162,12 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 		}
 
 		// *** BOF AUTHOR EXTENDED DATA ***
-		\Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'tables');
 		$author_postdata['user_id']	= $user->get('id');
 		$author_postdata['author_basicparams']	= $data['authorbasicparams'];
 		$author_postdata['author_catparams']	= $data['authorcatparams'];
 
-		$flexiauthor_extdata = \Joomla\CMS\Table\Table::getInstance('flexicontent_authors_ext', '');
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_authors_ext.php';
+		$flexiauthor_extdata = new flexicontent_authors_ext(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 
 		// Bind data, Check data & Store the data to the database table
 		if (!$flexiauthor_extdata->save($author_postdata))

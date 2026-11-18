@@ -22,7 +22,6 @@ use Joomla\Utilities\ArrayHelper;
 if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
 require_once(JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
-\Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 
 
 /**
@@ -62,7 +61,8 @@ class JFormFieldFctag extends \Joomla\CMS\Form\FormField
 			$element_id = $this->id;
 		}
 
-		$item = \Joomla\CMS\Table\Table::getInstance('flexicontent_tags', '');
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_tags.php';
+		$item = new flexicontent_tags(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 		if ($this->value)
 		{
 			$item->load($this->value);

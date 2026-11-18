@@ -28,7 +28,6 @@ require_once(JPATH_SITE . DS . 'components' . DS . 'com_flexicontent' . DS . 'mo
 require_once(JPATH_SITE . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' . DS . 'category.php');
 
 //require_once (JPATH_SITE.DS.'modules'.DS.'mod_flexicontent'.DS.'classes'.DS.'datetime.php');
-//\Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 
 
 // Decide whether to show module contents

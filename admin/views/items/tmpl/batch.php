@@ -60,16 +60,40 @@ foreach($all_langs as $lang)
 if ($isQuicktranslateMode)
 {
 	// Helper
-	\Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html');
+	require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html/fc_service_registry.php';
+	flexicontent_register_html_helpers(JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html');
 	$hlpname  = 'fcitems';
 }
 
 if ($isQuicktranslateSingle)
 {
 	// \Joomla\CMS\Table\Table
-	\Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
-	$record = \Joomla\CMS\Table\Table::getInstance($type = 'flexicontent_items', $prefix = '', $config = array());
-	$catRec = \Joomla\CMS\Table\Table::getInstance($type = 'flexicontent_categories', $prefix = '', $config = array());
+	$__tblType = $type = 'flexicontent_items';
+	$__tblPrefix = $prefix = '';
+	$__tblDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+	if ($__tblPrefix === 'TagsTable') {
+		$record = \Joomla\CMS\Factory::getApplication()->bootComponent('com_tags')->getMVCFactory()->createTable($__tblType, 'Administrator');
+	} elseif ($__tblPrefix === 'JTable') {
+		$__tblClass = '\\Joomla\\CMS\\Table\\' . ucfirst($__tblType);
+		$record = new $__tblClass($__tblDb);
+	} else {
+		$__tblClass = $__tblPrefix . ucfirst($__tblType);
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/' . strtolower($__tblType) . '.php';
+		$record = new $__tblClass($__tblDb);
+	}
+	$__tblType = $type = 'flexicontent_categories';
+	$__tblPrefix = $prefix = '';
+	$__tblDb = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+	if ($__tblPrefix === 'TagsTable') {
+		$catRec = \Joomla\CMS\Factory::getApplication()->bootComponent('com_tags')->getMVCFactory()->createTable($__tblType, 'Administrator');
+	} elseif ($__tblPrefix === 'JTable') {
+		$__tblClass = '\\Joomla\\CMS\\Table\\' . ucfirst($__tblType);
+		$catRec = new $__tblClass($__tblDb);
+	} else {
+		$__tblClass = $__tblPrefix . ucfirst($__tblType);
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/' . strtolower($__tblType) . '.php';
+		$catRec = new $__tblClass($__tblDb);
+	}
 
 	$assoc_items_arr = array();
 	$assoc_cats_arr  = array();

@@ -19,7 +19,6 @@ use Joomla\Component\Categories\Administrator\Helper\CategoryAssociationHelper a
 spl_autoload_register(static function ($class) {
 	if ($class === 'FlexicontentHelperRoute' && is_file($f = JPATH_SITE . '/components/com_flexicontent/helpers/route.php')) require_once $f;
 }, true, true);
-\Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 
 
 /*
@@ -242,12 +241,14 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 	{
 		if ($view == 'item')
 		{
-			$record = \Joomla\CMS\Table\Table::getInstance('flexicontent_items', '');
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_items.php';
+			$record = new flexicontent_items(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 			$record->load(array('id' => $id));
 		}
 		elseif ($view == 'category')
 		{
-			$record = \Joomla\CMS\Table\Table::getInstance('flexicontent_categories', '');
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_categories.php';
+			$record = new flexicontent_categories(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 			$record->load(array('id' => $id));
 		}
 
@@ -334,7 +335,8 @@ abstract class FlexicontentHelperAssociation extends CategoryAssociationHelper
 		// Use matching category from menu item, otherwise use main category of item
 		$matched_cid = in_array($mcid, $catids) ? $mcid : $record->catid;
 
-		$cat = \Joomla\CMS\Table\Table::getInstance('flexicontent_categories', '');
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_categories.php';
+		$cat = new flexicontent_categories(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 		$cat->load(array('id' => $matched_cid));
 
 		return $matched_cid . ($cat ? ':' . $cat->alias : '');

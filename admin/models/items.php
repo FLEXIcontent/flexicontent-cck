@@ -1838,7 +1838,8 @@ class FlexicontentModelItems extends FCModelAdminList
 		{
 			$this->_db->setQuery('SELECT id FROM #__flexicontent_fields WHERE name = "text" ');
 			$desc_field_id = $this->_db->loadResult();
-			$desc_field = \Joomla\CMS\Table\Table::getInstance('flexicontent_fields', '');
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_fields.php';
+			$desc_field = new flexicontent_fields(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 			$desc_field->load($desc_field_id);
 		}
 
@@ -1857,7 +1858,8 @@ class FlexicontentModelItems extends FCModelAdminList
 
 		foreach ($cid_reverse as $itemid)
 		{
-			$item = \Joomla\CMS\Table\Table::getInstance('flexicontent_items', '');
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_items.php';
+			$item = new flexicontent_items(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 			$item->load($itemid);
 
 			$items[$itemid] = $item;
@@ -3174,7 +3176,7 @@ class FlexicontentModelItems extends FCModelAdminList
 		// Delete content through Joomla's table API, including its nested ACL asset.
 		foreach ($cid as $id)
 		{
-			$table = Table::getInstance('Content');
+			$table = new \Joomla\CMS\Table\Content(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 			if (!$table->load($id) || !$table->delete($id))
 			{
 				$this->setError($table->getError() ?: 'The item could not be deleted.');
@@ -3510,7 +3512,8 @@ class FlexicontentModelItems extends FCModelAdminList
 		//$logs->err = new stdClass();
 
 		// Create the new category for the flexicontent items
-		$topcat = \Joomla\CMS\Table\Table::getInstance('flexicontent_categories','');
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_categories.php';
+		$topcat = new flexicontent_categories(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 		$topcat->parent_id	= 1;
 		$topcat->level			= 0;
 		$topcat->extension	= "com_content";
@@ -3565,7 +3568,8 @@ class FlexicontentModelItems extends FCModelAdminList
 			// Loop throught the categories of the created section
 			foreach ($categories as $category)
 			{
-				$subcat = \Joomla\CMS\Table\Table::getInstance('flexicontent_categories','');
+				require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_categories.php';
+				$subcat = new flexicontent_categories(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 				$subcat->load($category->id);
 				$subcat->id			= 0;
 				$subcat->lft		= null;
@@ -3594,7 +3598,7 @@ class FlexicontentModelItems extends FCModelAdminList
 				// Loop throught the articles of the created category
 				foreach ($articles as $article)
 				{
-					$item = \Joomla\CMS\Table\Table::getInstance('content');
+					$item = new \Joomla\CMS\Table\Content(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 					$item->load($article->id);
 					$item->id					= 0;
 					$item->catid			= $subcat->id;
@@ -3612,7 +3616,8 @@ class FlexicontentModelItems extends FCModelAdminList
 		} // end if
 
 		foreach ($categories as $category) {
-			$subcat = \Joomla\CMS\Table\Table::getInstance('flexicontent_categories','');
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_categories.php';
+			$subcat = new flexicontent_categories(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 			$subcat->load($map_old_new[$category->id]);
 			$subcat->lft			= null;
 			$subcat->rgt			= null;

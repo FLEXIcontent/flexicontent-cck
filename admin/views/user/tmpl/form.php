@@ -286,7 +286,8 @@ $this->document->addScriptDeclaration($js);
 				<h3 class="tabberheading hasTooltip"> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_ASSIGNED_GROUPS' ); ?> </h3>
 				
 				<fieldset id="user-groups_set">
-					<?php \Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_ADMINISTRATOR.'/components/com_users/helpers/html'); ?>
+					<?php require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/html/fc_service_registry.php';
+					flexicontent_register_html_helpers(JPATH_ADMINISTRATOR.'/components/com_users/helpers/html');  ?>
 					<?php echo \Joomla\CMS\HTML\HTMLHelper::_('access.usergroups', 'jform[groups]', $this->usergroups, true); ?>
 				</fieldset>
 				

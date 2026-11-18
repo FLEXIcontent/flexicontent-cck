@@ -321,7 +321,6 @@ class FlexicontentModelTags extends FCModelAdminList
 			return;
 		}
 
-		Table::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tags/tables');
 
 		foreach ($jtag_ids as $jtag_id)
 		{
@@ -333,7 +332,7 @@ class FlexicontentModelTags extends FCModelAdminList
 			)->execute();
 
 			// Delete via Tag table, to keep nested set (lft / rgt) consistent
-			$table = Table::getInstance('Tag', 'TagsTable');
+			$table = \Joomla\CMS\Factory::getApplication()->bootComponent('com_tags')->getMVCFactory()->createTable('Tag', 'Administrator');
 
 			if ($table && $table->load($jtag_id))
 			{

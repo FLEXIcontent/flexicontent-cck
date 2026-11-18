@@ -478,7 +478,8 @@ class FlexicontentModelItem extends ParentClassItem
 			return false;
 		}
 
-		$item = \Joomla\CMS\Table\Table::getInstance('flexicontent_items', '');
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/tables/flexicontent_items.php';
+		$item = new flexicontent_items(\Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class));
 		$item->hit($this->_id);
 
 		return true;

@@ -69,7 +69,6 @@ require_once (JPATH_SITE.'/components/com_flexicontent/helpers/permission.php');
 require_once (JPATH_SITE.'/components/com_flexicontent/helpers/route.php');
 
 // Add component's table directory to the include path
-\Joomla\CMS\Table\Table::addIncludePath(JPATH_ADMINISTRATOR.'/components/com_flexicontent/tables');
 
 // Import the flexicontent_fields plugins and flexicontent plugins
 if (!FLEXI_ONDEMAND)
