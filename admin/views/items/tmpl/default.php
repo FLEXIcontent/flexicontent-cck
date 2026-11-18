@@ -1611,7 +1611,13 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 			<?php if (!isset($disable_columns['ratings'])) : ?>
 			<td class="col_ratings center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
-				<?php echo '<span class="badge bg-warning badge-warning"> ' .sprintf('%.0f', (float) $row->rating) .'%</span>'; ?>
+				<?php
+				// An item without votes has no rating. Its 'rating' column holds the voting field's "default rating",
+				// a value that only places unrated items among the rated ones when a list is ordered by rating
+				echo (int) $row->rating_count
+					? '<span class="badge bg-warning badge-warning"> ' . sprintf('%.0f', (float) $row->rating) . '%</span>'
+					: '<span class="badge bg-secondary badge-secondary" title="' . htmlspecialchars(Text::_('FLEXI_NOT_RATED_YET'), ENT_QUOTES, 'UTF-8') . '">-</span>';
+				?>
 			</td>
 			<?php endif; ?>
 
