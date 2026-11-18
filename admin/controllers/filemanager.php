@@ -2087,7 +2087,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 		if (!is_dir($destpath))
 		{
-			if (!mkdir($destpath))
+			if (!mkdir($destpath, 0755, true))
 			{
 				$this->exitHttpHead = array( 0 => array('status' => '500 Internal Server Error') );
 				$this->exitMessages = array( 0 => array('error' => 'Error. Unable to create folders') );
