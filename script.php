@@ -903,7 +903,7 @@ class com_flexicontentInstallerScript
 						$changes[] = "ADD `custom2` MEDIUMTEXT NULL AFTER `custom1`";
 					}
 					if ( isset($tbl_datatypes[$tbl_name]) && strtolower($tbl_datatypes[$tbl_name]['attribs']['DATA_TYPE']) != 'mediumtext' ) {
-						$changes[] = "CHANGE `attribs` `attribs` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL";
+						$changes[] = "CHANGE `attribs` `attribs` MEDIUMTEXT NOT NULL";
 					}
 
 					if ($changes)
@@ -936,7 +936,7 @@ class com_flexicontentInstallerScript
 						$changes[] = "ADD `asset_id` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `id`";
 					}
 					if ( isset($tbl_datatypes[$tbl_name]) && strtolower($tbl_datatypes[$tbl_name]['attribs']['DATA_TYPE']) != 'mediumtext' ) {
-						$changes[] = "CHANGE `attribs` `attribs` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL";
+						$changes[] = "CHANGE `attribs` `attribs` MEDIUMTEXT NOT NULL";
 					}
 
 					if ($changes)
@@ -955,7 +955,7 @@ class com_flexicontentInstallerScript
 						$changes[] = "ADD `itemscreatable` SMALLINT(8) NOT NULL DEFAULT '0' AFTER `published`";
 					}
 					if ( isset($tbl_datatypes[$tbl_name]) && strtolower($tbl_datatypes[$tbl_name]['attribs']['DATA_TYPE']) != 'mediumtext' ) {
-						$changes[] = "CHANGE `attribs` `attribs` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL";
+						$changes[] = "CHANGE `attribs` `attribs` MEDIUMTEXT NOT NULL";
 					}
 					if ( $types_tbl_exists && !array_key_exists('description', $tbl_fields['#__'.$tbl_name])) {
 						$changes[] = "ADD `description` TEXT NULL AFTER `alias`";
