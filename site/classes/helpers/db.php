@@ -401,6 +401,55 @@ class flexicontent_db
 	}
 
 
+	/**
+	 * The storage engine of a FLEXIcontent table, in lower case: 'myisam', 'innodb', ...
+	 *
+	 * @param   string  $tbl  The table name without prefix, e.g. 'flexicontent_items_ext'
+	 */
+	static function getTableEngine($tbl = 'flexicontent_items_ext')
+	{
+		static $engines = null;
+
+		// One query per request for all FLEXIcontent tables
+		if ($engines === null)
+		{
+			$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+			$engines = $db->setQuery(
+				'SELECT t.TABLE_NAME AS name, LOWER(t.ENGINE) AS engine FROM information_schema.TABLES AS t'
+				. ' WHERE t.TABLE_SCHEMA = DATABASE()'
+				. '  AND t.TABLE_NAME LIKE ' . $db->quote($db->escape($db->getPrefix() . 'flexicontent_', true) . '%', false)
+			)->loadAssocList('name', 'engine');
+		}
+
+		$name = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class)->getPrefix() . $tbl;
+
+		return isset($engines[$name]) ? $engines[$name] : '';
+	}
+
+
+	/**
+	 * The shortest word that the database adds to the FULLTEXT index of a table.
+	 * MyISAM and InnoDB each have their own server setting for it (defaults: 4 and 3 characters)
+	 *
+	 * @param   string  $tbl  The table name without prefix
+	 */
+	static function getMinWordLen($tbl = 'flexicontent_items_ext')
+	{
+		static $lengths = array();
+
+		$variable = self::getTableEngine($tbl) === 'innodb' ? 'innodb_ft_min_token_size' : 'ft_min_word_len';
+
+		if (!isset($lengths[$variable]))
+		{
+			$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+			$_dbvariable = $db->setQuery("SHOW VARIABLES LIKE '" . $variable . "'")->loadObject();
+			$lengths[$variable] = (int) @ $_dbvariable->Value;
+		}
+
+		return $lengths[$variable];
+	}
+
+
 	/*
 	 * Find stopwords and too small words
 	 *

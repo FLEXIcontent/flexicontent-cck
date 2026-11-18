@@ -304,10 +304,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		$this->setState('filter_order_Dir', $jinput->get('filter_order_Dir', 'ASC', 'cmd'));
 
 		// Get minimum word search length
-		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
-		$db->setQuery("SHOW VARIABLES LIKE '%ft_min_word_len%'");
-		$_dbvariable = $db->loadObject();
-		$min_word_len = (int) @ $_dbvariable->Value;
+		$min_word_len = flexicontent_db::getMinWordLen();
 		$search_prefix = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
 		$min_word_len = !$search_prefix ?  $min_word_len : 1;
 		$app->setUserState($option.'.min_word_len', $min_word_len);
