@@ -198,9 +198,9 @@ class FLEXIcontentModelSearch extends FCModelAdminList
 		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
 
-		// 2, get current items total for pagination
-		$this->_db->setQuery("SELECT FOUND_ROWS()");
-		$this->_total = $this->_db->loadResult();
+		// 2, get current items total for pagination: the number of rows of the same query without its LIMIT
+		// Not SQL_CALC_FOUND_ROWS + FOUND_ROWS(): MySQL 8.0.17+ deprecates them
+		$this->_total = $this->_db->setQuery('SELECT COUNT(*) FROM (' . $query . ') AS fc_list')->loadResult();
 
 		$filter_indextype = $this->getState('filter_indextype');
 		$isADV = $filter_indextype=='advanced';
@@ -281,7 +281,7 @@ class FLEXIcontentModelSearch extends FCModelAdminList
 		$isADV = $filter_indextype=='advanced';
 
 		$query = !$query_ids
-			? 'SELECT SQL_CALC_FOUND_ROWS ' . ($isADV ? 'ai.sid' : 'ext.item_id')
+			? 'SELECT ' . ($isADV ? 'ai.sid' : 'ext.item_id')
 			: ($isADV
 				? 'SELECT f.label, f.name, f.field_type, ai.*, a.title, a.id, a.language, 0 AS checked_out '
 				: 'SELECT ext.*, a.title, a.id, a.language, 0 AS checked_out '
