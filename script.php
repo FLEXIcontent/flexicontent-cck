@@ -1584,6 +1584,39 @@ class com_flexicontentInstallerScript
 					</td>
 				</tr>
 
+		<?php
+		// Convert the tables that still use the 3-byte utf8 character set to utf8mb4. Every table is copied by its ALTER,
+		// so the large ones are left for the dashboard's post-installation task, which converts one table per request
+		?>
+				<tr class="row0">
+					<td class="key" style="font-size:11px;">Convert DB tables to utf8mb4: </td>
+					<td>
+					<?php
+					require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/dbcharset.php';
+
+					try {
+						// Tables up to 32 MB, and no new table once 15 seconds have passed
+						$charset_log = FlexicontentDbCharset::convertPending($db, 32 * 1024 * 1024, 15);
+						$charset_left = count(FlexicontentDbCharset::getPendingTables($db));
+
+						foreach ($charset_log as $tbl_name => $result) {
+							echo ($result[0]
+								? '<span class="badge bg-success badge-success">converted</span> '
+								: '<span class="badge badge-error">SQL Error</span> '
+							) . htmlspecialchars($tbl_name . ': ' . $result[1], ENT_QUOTES, 'UTF-8') . '<br/>';
+						}
+
+						echo $charset_left
+							? '<span class="badge bg-warning badge-warning">' . $charset_left . ' table(s) left for the dashboard\'s post-installation task</span>'
+							: ($charset_log ? '' : '<span class="badge bg-info badge-info">nothing to do</span>');
+					}
+					catch (Exception $e) {
+						echo '<span class="badge badge-error">SQL Error</span> '. $e->getMessage() . '<br/>';
+					}
+					?>
+					</td>
+				</tr>
+
 			</tbody>
 		</table>
 		<?php
