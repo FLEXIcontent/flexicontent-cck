@@ -61,6 +61,24 @@ namespace {
 				}
 			}
 		}
+		$db->setQuery("INSERT INTO $table VALUES (3,'coffee table'),(4,'table for coffee'),(5,'marble bench'),(6,'vvvcoffee vvvtable')")->execute();
+		foreach (['InnoDB', 'MyISAM'] as $engine)
+		{
+			if ($engine === 'MyISAM') $db->setQuery("ALTER TABLE $table ENGINE=MyISAM")->execute();
+			foreach ([
+				['"coffee table"', 'all', '', [3]],
+				['"coffee table" "marble bench"', 'any', '', [3, 5]],
+				['"coffee table" marble', 'all', '', []],
+				['"coffee table" cof', 'all', '', [3]],
+				['"coffee table"', 'any', 'vvv', [6]],
+			] as [$query, $mode, $prefix, $expected])
+			{
+				$terms = flexicontent_db::getQuotedSearchTerms($query, $mode);
+				$where = flexicontent_db::getQuotedFulltextCondition('search_index', $terms, $mode, $prefix);
+				$ids = array_map('intval', $db->setQuery("SELECT id FROM $table WHERE $where ORDER BY id")->loadColumn());
+				if ($ids !== $expected) throw new RuntimeException("$engine $query returned " . json_encode($ids));
+			}
+		}
 		echo "FULLTEXT list and selector regressions passed\n";
 	}
 	finally

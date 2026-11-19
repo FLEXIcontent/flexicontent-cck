@@ -482,6 +482,44 @@ class flexicontent_db
 	}
 
 
+	/** Split all/any searches into ordinary words and double-quoted phrases. */
+	static function getQuotedSearchTerms($text, $phrase)
+	{
+		if (!in_array($phrase, array('all', 'any'), true) || !preg_match('/"[^"]+"/u', $text))
+		{
+			return null;
+		}
+
+		preg_match_all('/"(?<quoted>[^"]+)"|(?<word>[^"\s]+)/u', $text, $matches, PREG_SET_ORDER | PREG_UNMATCHED_AS_NULL);
+		return $matches;
+	}
+
+	/** Build one boolean expression, keeping the words in a quoted phrase together. */
+	static function getQuotedFulltextCondition($column, $terms, $phrase, $prefix = '')
+	{
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$required = $phrase === 'all' ? '+' : '';
+		$groups = array();
+
+		foreach ($terms as $term)
+		{
+			preg_match_all('/[\p{L}\p{M}\p{N}_]+/u', $term['quoted'] ?? $term['word'], $matches);
+			$words = array_map(static fn($word) => $prefix . $word, $matches[0]);
+			if ($term['quoted'] !== null && $words)
+			{
+				$groups[] = $required . '"' . implode(' ', $words) . '"';
+			}
+			else foreach ($words as $word)
+			{
+				$groups[] = $required . $word . '*';
+			}
+		}
+
+		return $groups
+			? ' MATCH (' . $column . ') AGAINST (' . $db->quote(implode(' ', $groups)) . ' IN BOOLEAN MODE) '
+			: ' 0=1 ';
+	}
+
 	/**
 	 * The condition of a LIKE %text% search on a column, see useLikeSearch().
 	 *
@@ -501,16 +539,31 @@ class flexicontent_db
 		$text  = trim((string) $text);
 
 		// A phrase in double quotes is searched as it was typed too
-		if (preg_match('/^"(.+)"$/us', $text, $quoted))
+		if (preg_match('/^"([^"]+)"$/us', $text, $quoted))
 		{
 			$text   = trim($quoted[1]);
 			$phrase = 'exact';
 		}
 
 		// In a column with prefixed words the words of a phrase follow each other as "one vvvtwo"
-		$words = $phrase === 'exact'
-			? array($prefix === '' ? $text : preg_replace('/\s+/u', ' ' . $prefix, $text))
-			: array_unique(preg_split('/\s+/u', $text, -1, PREG_SPLIT_NO_EMPTY));
+		if (($terms = self::getQuotedSearchTerms($text, $phrase)) !== null)
+		{
+			$words = array();
+			foreach ($terms as $term)
+			{
+				$word = trim($term['quoted'] ?? $term['word']);
+				if ($word !== '')
+				{
+					$words[] = $term['quoted'] === null || $prefix === '' ? $word : preg_replace('/\s+/u', ' ' . $prefix, $word);
+				}
+			}
+		}
+		else
+		{
+			$words = $phrase === 'exact'
+				? array($prefix === '' ? $text : preg_replace('/\s+/u', ' ' . $prefix, $text))
+				: array_unique(preg_split('/\s+/u', $text, -1, PREG_SPLIT_NO_EMPTY));
+		}
 		$conds = array();
 
 		foreach ($words as $word)

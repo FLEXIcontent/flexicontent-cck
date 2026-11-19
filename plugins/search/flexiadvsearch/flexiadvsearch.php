@@ -1083,6 +1083,13 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 				$_index_relev = $_index_match;
 			}
 
+			elseif (($terms = flexicontent_db::getQuotedSearchTerms($text_np, $phrase)) !== null)
+			{
+				$_index_match = flexicontent_db::getQuotedFulltextCondition($ts . '.search_index', $terms, $phrase, $search_prefix);
+				$_title_relev = flexicontent_db::getQuotedFulltextCondition('i.title', $terms, $phrase);
+				$_index_relev = $_index_match;
+			}
+
 			/*
 			 * FullText search
 			 */

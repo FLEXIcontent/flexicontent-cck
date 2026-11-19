@@ -521,6 +521,7 @@ class FlexicontentModelTags extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 
 		$si_tbl = 'flexicontent_items_ext';
 
+		$quoted_terms = flexicontent_db::getQuotedSearchTerms($text, $phrase);
 		$search_prefix = $this->_params->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
 		$text = !$search_prefix  ?  trim( $text )  :  preg_replace('/(\b[^\s,\.]+\b)/u', $search_prefix.'$0', trim($text));
 		$words = flexicontent_db::getBooleanSearchWords(preg_split('/\s\s*/u', $text));
@@ -531,7 +532,11 @@ class FlexicontentModelTags extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 			$escaped_text = $db->escape($text, true);
 			$quoted_text = $db->Quote( $escaped_text, false );
 
-			switch ($phrase)
+			if ($quoted_terms !== null)
+			{
+				$_text_match = flexicontent_db::getQuotedFulltextCondition($ts . '.search_index', $quoted_terms, $phrase, $search_prefix);
+			}
+			else switch ($phrase)
 			{
 				case 'natural':
 					$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.') ';
