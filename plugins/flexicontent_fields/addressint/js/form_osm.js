@@ -16,7 +16,7 @@
  *   fcfield_addrint.map_zoom[field]            — niveau de zoom par défaut
  *   fcfield_addrint.configure[field]           — ignoré (compatibilité)
  */
-;(function ($) {
+;(function () {
 	'use strict';
 
 	/* ------------------------------------------------------------------ *
@@ -80,7 +80,8 @@
 	function fireChange(id) {
 		var e = el(id);
 		if (!e) return;
-		$(e).trigger('change');
+		e.fc_choices_instance?.refresh();
+		e.dispatchEvent(new Event('change', { bubbles: true }));
 	}
 
 	function debounce(fn, delay, key) {
@@ -500,8 +501,8 @@
 		if (!selectEl) return;
 		var id       = selectEl.id || '';
 		var prefix   = id.replace(/_country$/, '');
-		var stateRow = el(prefix + '_state') ? $(el(prefix + '_state')).closest('tr')[0] : null;
-		var provRow  = el(prefix + '_province') ? $(el(prefix + '_province')).closest('tr')[0] : null;
+		var stateRow = el(prefix + '_state')?.closest('tr');
+		var provRow  = el(prefix + '_province')?.closest('tr');
 
 		if (!stateRow && !provRow) return;
 
@@ -568,4 +569,4 @@
 		}
 	}
 
-}(jQuery));
+}());

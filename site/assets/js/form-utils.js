@@ -53,6 +53,16 @@ window.FlexiForm = (() => {
     el.focus({preventScroll: true});
   }
   const change = el => el && el.dispatchEvent(new Event('change', {bubbles: true}));
+  function cloneFieldRow(row) {
+    const copy = row.cloneNode(true);
+    // Joomla detaches the Clear button while empty but requires it on connection.
+    const media = row.querySelectorAll('joomla-field-media');
+    copy.querySelectorAll('joomla-field-media').forEach((field, index) => {
+      const clear = media[index].buttonClearEl;
+      if (clear && !field.querySelector('.button-clear')) field.querySelector('.input-group')?.append(clear.cloneNode(true));
+    });
+    return copy;
+  }
   const text = key => (Joomla.Text || Joomla.JText)._(key);
   // Only for trusted HTML returned by a same-origin Joomla view. Recreate scripts
   // in document order, as the former jQuery.load() dialog transport did.
@@ -80,5 +90,5 @@ window.FlexiForm = (() => {
       }
     }
   }
-  return {element, ready, visible, value, data, show, focusInvalid, change, text, insertHTML};
+  return {element, ready, visible, value, data, show, focusInvalid, change, cloneFieldRow, text, insertHTML};
 })();

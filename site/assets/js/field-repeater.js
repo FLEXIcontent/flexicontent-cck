@@ -7,6 +7,7 @@ window.FlexiFieldRepeater = (() => {
     control.id = id;
     control.name = name;
     delete control.dataset.originalId;
+    delete control.dataset.originalName;
     if (control instanceof HTMLSelectElement) {
       const values = new Set(Array.isArray(value) ? value : [value]);
       for (const option of control.options) option.defaultSelected = option.selected = values.has(option.value);
@@ -46,7 +47,7 @@ window.FlexiFieldRepeater = (() => {
         alert(FlexiForm.text('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + config.max);
         return 'cancel';
       }
-      const row = previous.cloneNode(true);
+      const row = FlexiForm.cloneFieldRow(previous);
       fc_destroySelectLib(row);
       row.querySelectorAll('.fc-has-value, .invalid').forEach(element => element.classList.remove('fc-has-value', 'invalid'));
       row.querySelectorAll('[aria-invalid]').forEach(element => element.removeAttribute('aria-invalid'));
@@ -64,13 +65,15 @@ window.FlexiFieldRepeater = (() => {
         fc_bootstrapAttach(row);
         fc_initSelect2(null, row);
         fc_initTooltips(null, row);
-        adapter?.ready?.(row, ref, config);
+        adapter?.ready?.(row, ref, config, { animate_visible });
       } catch (error) {
+        adapter?.dispose?.(row, config);
         fc_destroySelectLib(row);
         row.remove();
         throw error;
       }
       if (remove_previous) {
+        if (remove_previous !== 2) adapter?.dispose?.(previous, config);
         fc_destroySelectLib(previous);
         previous.remove();
       }
@@ -81,6 +84,7 @@ window.FlexiFieldRepeater = (() => {
       if (animate_visible && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
         row.animate([{ opacity: 0.1 }, { opacity: 1 }], { duration: 400 });
       }
+      return adapter?.result?.(ref, config);
     }
 
     function remove(button, suppliedRow) {
@@ -91,6 +95,7 @@ window.FlexiFieldRepeater = (() => {
       if (count <= 1) {
         add(null, row, { remove_previous: true, scroll_visible: false, animate_visible: false });
       } else {
+        adapter?.dispose?.(row, config);
         fc_destroySelectLib(row);
         row.remove();
         if (!container) groupCount--;

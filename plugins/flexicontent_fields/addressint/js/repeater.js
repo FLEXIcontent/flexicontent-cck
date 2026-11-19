@@ -1,0 +1,59 @@
+window.fcfield_address = (() => {
+  function setEnabled(button, enabled) {
+    const row = button.closest('.fcfieldval_container');
+    const properties = row?.querySelector('.fc-field-value-properties-box');
+    if (!properties) return;
+    FlexiForm.show(row.querySelector('.fcfield-enablevalue')?.parentElement, !enabled);
+    FlexiForm.show(row.querySelector('.fcfield-disablevalue')?.parentElement, enabled);
+    const controls = enabled
+      ? properties.querySelectorAll('.fc-field-prop-disabled')
+      : properties.querySelectorAll('input:enabled, select:enabled, textarea:enabled, button:enabled');
+    for (const control of controls) {
+      control.disabled = !enabled;
+      control.classList.toggle('fc-field-prop-disabled', !enabled);
+    }
+    properties.classList.toggle('fc-field-value-disabled', !enabled);
+  }
+
+  function prepare(row, ref, config) {
+    const prefix = config.id + '_';
+    for (const control of row.querySelectorAll('input, textarea, select')) {
+      const original = control.dataset.originalId || control.id;
+      const key = original.startsWith(prefix) ? original.slice(prefix.length).match(/^\d+_(.+)$/)?.[1] : null;
+      if (!key) continue;
+      FlexiFieldRepeater.setControl(row, control, ref.id + '_' + key, ref.name + '[' + key + ']', config.defaults[key] ?? '');
+      if (key === 'autocomplete') delete control.dataset.osmInit;
+    }
+    for (const [selector, id] of [
+      ['.addrint_messages', ref.id + '_messages'],
+      ['.addrint_map_canvas', 'map_canvas_' + ref.id],
+      ['.fcfield_addressint_map', ref.id + '_addressint_map'],
+    ]) {
+      const node = row.querySelector(selector);
+      if (!node) continue;
+      node.id = id;
+      if (selector === '.fcfield_addressint_map') node.style.display = 'none';
+      else node.replaceChildren();
+      node.classList.remove('has_fc_google_maps_map', 'has_fc_openstreet_map', 'leaflet-container');
+    }
+    const zoom = row.querySelector('[id$="_zoom_label"]');
+    if (zoom) {
+      zoom.id = ref.id + '_zoom_label';
+      zoom.textContent = config.defaults.zoom;
+    }
+  }
+
+  function start(id, key, showMap = false) {
+    const field = window.fcfield_addrint;
+    const autocomplete = document.getElementById(id + '_autocomplete');
+    if (autocomplete) field?.initAutoComplete?.(id, key);
+    if (showMap) field?.initMap?.(id, key);
+    if (document.getElementById(id + '_custom_marker')) field?.initMarkerSelector?.(id, key);
+  }
+
+  function ready(row, ref, config) {
+    if (config.mapEngine !== 'googlemap' || (window.jQuery && window.google?.maps)) start(ref.id, config.fieldKey);
+  }
+
+  return { prepare, ready, setEnabled, start };
+})();

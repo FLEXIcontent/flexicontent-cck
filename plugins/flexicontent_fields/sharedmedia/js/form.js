@@ -19,9 +19,10 @@
 
 	fcfield_sharemedia.setHeight = function(selector, factor)
 	{
-		jQuery(selector).each( function() {
-			jQuery(this).css("height", parseInt(factor*jQuery(this).width()));
-		});
+		for (const frame of document.querySelectorAll(selector))
+		{
+			frame.style.height = Math.floor(factor * frame.clientWidth) + 'px';
+		}
 	}
 
 
@@ -34,8 +35,8 @@
 		fcfield_sharemedia.setMetaData(element_id_n, {title: "", author: "", duration: "", description: "", thumb: ""}, config_name);
 
 		// Clear other data
-		jQuery("#" + element_id_n + "_height").val("");
-		jQuery("#" + element_id_n + "_width").val("");
+		document.getElementById(element_id_n + "_height").value = "";
+		document.getElementById(element_id_n + "_width").value = "";
 
 		// Hide the value rows
 		fcfield_sharemedia.toggleMETArows(element_id_n, -1);
@@ -344,12 +345,11 @@
 	{
 		element_id_n = typeof element_id_n === "undefined" || !element_id_n  ?  fcfield_sharemedia.fc_elemID_tmp : element_id_n;
 
-		// If replaced with native JS then must check properties exist
-		jQuery("#"+element_id_n+"_title").val(data.title);
-		jQuery("#"+element_id_n+"_author").val(data.author);
-		jQuery("#"+element_id_n+"_duration").val(data.duration);
-		jQuery("#"+element_id_n+"_description").val(data.description);
-		jQuery("#"+element_id_n+"_thumb").val(data.thumb);
+		for (const key of ['title', 'author', 'duration', 'description', 'thumb'])
+		{
+			const field = document.getElementById(element_id_n + '_' + key);
+			if (field) field.value = data[key] ?? '';
+		}
 	}
 
 
@@ -358,25 +358,15 @@
 		action = typeof action === "undefined" ? 0 : action;
 
 		var fields = ['title', 'author', 'duration', 'description', 'api_type', 'embed_url', 'media_id', 'preview', 'width', 'height'];
-		var fields_selector = "#" + element_id_n + "_" + fields.join(", " + "#" + element_id_n + "_");
-
-		switch (action)
+		for (const field of fields)
 		{
-			case 1: jQuery(fields_selector).closest("tr").fadeIn(2000); break;
-			case -1: jQuery(fields_selector).closest("tr").hide(); break;
-			case 0: jQuery(fields_selector).closest("tr").toggle(0); break;
+			const row = document.getElementById(element_id_n + '_' + field)?.closest('tr');
+			if (row) row.style.display = action === -1 || (!action && row.style.display !== 'none') ? 'none' : '';
 		}
 	}
 
-
-	jQuery(window).resize(function() {
-		fcfield_sharemedia.setHeight("iframe.sharedmedia", 2/3);
-	});
-
-
-	jQuery(document).ready(function(){
-		fcfield_sharemedia.setHeight("iframe.sharedmedia", 2/3);
-		jQuery(document).on("mouseenter", ".fcfield_sharedmedia_valuebox", function(event) {
-			fcfield_sharemedia.setHeight("iframe.sharedmedia", 2/3);
-		});
-	});
+	window.addEventListener('resize', () => fcfield_sharemedia.setHeight('iframe.sharedmedia', 2/3));
+	document.addEventListener('DOMContentLoaded', () => fcfield_sharemedia.setHeight('iframe.sharedmedia', 2/3));
+	document.addEventListener('mouseenter', event => {
+		if (event.target.matches?.('.fcfield_sharedmedia_valuebox')) fcfield_sharemedia.setHeight('iframe.sharedmedia', 2/3);
+	}, true);

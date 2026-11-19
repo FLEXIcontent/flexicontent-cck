@@ -19,8 +19,17 @@ window.fcfield_group = (() => {
     row.querySelectorAll('.fc-has-value, .invalid').forEach(element => element.classList.remove('fc-has-value', 'invalid'));
     row.querySelectorAll('[aria-invalid]').forEach(element => element.removeAttribute('aria-invalid'));
     row.querySelectorAll('.fc-field-invalid').forEach(element => element.remove());
+    // Keep cloned Joomla editors from mounting before their child field is reindexed.
+    row.querySelectorAll(':is(.fc_txtarea, .fc_termtext) joomla-editor-codemirror').forEach(editor => {
+      const placeholder = document.createElement('div');
+      for (const attribute of editor.attributes) placeholder.setAttribute(attribute.name, attribute.value);
+      placeholder.dataset.fcEditor = editor.localName;
+      placeholder.append(...editor.childNodes);
+      editor.replaceWith(placeholder);
+    });
     row.querySelectorAll('input, select, textarea, button').forEach((control, index) => {
       if (control.id) control.dataset.originalId = control.id;
+      if (control.name) control.dataset.originalName = control.name;
       control.name = control.id = prefix + index;
     });
   }
@@ -86,7 +95,7 @@ window.fcfield_group = (() => {
       }
       const index = nextIndex++;
       const prefix = '_duplicated_' + config.id + '_' + index + '_';
-      const row = previous.cloneNode(true);
+      const row = FlexiForm.cloneFieldRow(previous);
       prepareCopy(row, prefix);
       const initialized = [];
       if (insert_before) previous.before(row);

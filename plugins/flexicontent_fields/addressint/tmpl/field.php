@@ -270,11 +270,6 @@ foreach ($values as $value)
 	 * Initialize Custom Marker Selector
 	 */
 
-	$dom_ready_js .= (!$use_custom_marker ? '' : '
-		fcfield_addrint.initMarkerSelector("'.$elementid_n.'", "'.$field_name_js.'");
-	');
-
-
 	/**
 	 * Initialize autocomplete search box and MAP display
 	 * Same JS function names for both engines (googlemap & nominatim)
@@ -286,13 +281,13 @@ foreach ($values as $value)
 	';
 
 	$dom_ready_js .= '
-		fcfield_addrint.initAutoComplete("'.$elementid_n.'", "'.$field_name_js.'");'
-		. (!$coords_are_empty ? '
-		fcfield_addrint.initMap("'.$elementid_n.'", "'.$field_name_js.'");'
-		: '')
-	;
+		if (' . ($mapapi_edit !== 'googlemap' ? 'true' : 'window.jQuery && window.google?.maps') . ') {
+			fcfield_address.start("'.$elementid_n.'", "'.$field_name_js.'", '.($coords_are_empty ? 'false' : 'true').');
+		}
+	';
 
 	$field->html[$n] = '
+		'.($use_ingroup ? '<input type="hidden" id="'.$elementid_n.'_present" name="'.$fieldname_n.'[present]" value="1">' : '').'
 		<div class="fc-field-value-properties-box ' . ($value_is_disabled ? ' fc-field-value-disabled' : '') . '">
 			' . $field_html . '
 		</div>
@@ -305,7 +300,7 @@ if ($dom_ready_js)
 {
 	$js .= '
 	// load autocomplete on page ready
-	jQuery(document).ready(function() {
+	FlexiForm.ready(function() {
 		' . $dom_ready_js . '
 	});
 	';

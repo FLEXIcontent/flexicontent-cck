@@ -2312,6 +2312,11 @@ class flexicontent_html
 				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/indexed-field.js', array('version' => FLEXI_VHASH));
 				break;
 
+			case 'native-field-controls':
+				flexicontent_html::loadFramework('form-utils');
+				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/native-field-controls.js', array('version' => FLEXI_VHASH));
+				break;
+
 			case 'flexi-lib-form':
 				flexicontent_html::loadFramework('form-utils');
 				flexicontent_html::loadFramework('sortable');
