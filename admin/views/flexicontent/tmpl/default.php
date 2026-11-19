@@ -31,8 +31,8 @@ $dashboard_buttons_hide = $this->params->get('dashboard_buttons_hide', array());
 $dashboard_buttons_hide = FLEXIUtilities::paramToArray($dashboard_buttons_hide);
 
 $sbtns = array_flip($dashboard_buttons_hide);
-$skip_content_fieldset = isset($sbtns['items']) && isset($sbtns['additem']) && isset($sbtns['cats']) && isset($sbtns['addcat']) && isset($sbtns['comments']);
-$skip_types_fieldset   = isset($sbtns['types']) && isset($sbtns['addtype']) && isset($sbtns['fields']) && isset($sbtns['addfield']) && isset($sbtns['tags']) && isset($sbtns['addtag']) && isset($sbtns['files']);
+$skip_content_fieldset = isset($sbtns['items']) && isset($sbtns['additem']) && isset($sbtns['cats']) && isset($sbtns['addcat']) && isset($sbtns['files']) && isset($sbtns['comments']);
+$skip_types_fieldset   = isset($sbtns['types']) && isset($sbtns['addtype']) && isset($sbtns['fields']) && isset($sbtns['addfield']) && isset($sbtns['tags']) && isset($sbtns['addtag']);
 // Reviews button: show only if reviews are enabled in the voting field and user can manage reviews
 $showReviews = false;
 
@@ -85,8 +85,10 @@ $hide_fc_license_credits = $this->params->get('dashboard_hide_fc_license_credits
 $php_lims = flexicontent_html::checkPHPLimits();
 
 $ssliders = array_flip($dashboard_sliders_disable);
-$skip_sliders = isset($sbtns['pending']) && isset($sbtns['revised']) && isset($sbtns['inprogress']) && isset($sbtns['draft']) && isset($sbtns['version']);
-$skip_sliders = $skip_sliders && $this->dopostinstall && $this->allplgpublish && !$hide_fc_license_credits && !isset($php_lims['warning']);
+// The state sliders live in the "Waiting for action" card. PHP/DB and About
+// were moved to the "Update" card accordion, so they no longer count here.
+$skip_sliders = isset($sbtns['pending']) && isset($sbtns['revised']) && isset($sbtns['inprogress']) && isset($sbtns['draft']);
+$skip_sliders = $skip_sliders && $this->dopostinstall && $this->allplgpublish;
 
 // ensures the PHP version is correct
 if (version_compare(PHP_VERSION, FLEXI_PHP_NEEDED, '<'))
@@ -164,7 +166,155 @@ $items_task = 'task=items.';
 			$_title .= ' - <span class="badge bg-success badge-success">OK</span>';
 		?>
 
-		<div id="fc-dash-boardbtns">
+		<?php
+		/*
+		 * Build the content of the "Update" card accordion up front, so it can
+		 * be rendered independently of the "Waiting for action" card:
+		 *   1. version comparison  2. PHP/DB requirements  3. About FLEXIcontent
+		 */
+
+		// 1. Version comparison (auto-loaded, or loaded when the slide is expanded)
+		$fc_version_check = '';
+		if (!isset($ssliders['version']))
+		{
+			$auto_load_version = $this->params->get('show_updatecheck', 1) && $this->perms->CanConfig;
+			$token = \Joomla\CMS\Session\Session::getFormToken();
+			$version_labels = json_encode(array(
+				'ok'     => \Joomla\CMS\Language\Text::_('FLEXI_VERSION_STATUS_OK'),
+				'update' => \Joomla\CMS\Language\Text::_('FLEXI_VERSION_STATUS_UPDATE'),
+				'error'  => \Joomla\CMS\Language\Text::_('FLEXI_VERSION_STATUS_ERROR'),
+			));
+			$load_js = "
+				var fcVersionLabels = " . $version_labels . ";
+				function fcSetVersionBadge(status) {
+					var cls = status === 'update' ? 'bg-warning badge-warning' : (status === 'error' ? 'bg-danger' : 'bg-success badge-success');
+					jQuery('#fc-version-badge')
+						.removeClass('bg-secondary bg-success badge-success bg-warning badge-warning bg-danger')
+						.addClass(cls)
+						.text(fcVersionLabels[status] || fcVersionLabels.ok);
+				}
+				if (jQuery.trim(jQuery('#displayfversion').html()) === '') {
+					jQuery('#displayfversion').html('<p><img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" style=\"vertical-align: middle;\"><\/p>');
+					jQuery.ajax({
+						url: 'index.php?option=com_flexicontent&task=flexicontent.fcversioncompare&format=raw&$token=1',
+						cache: false,
+						success: function(str) {
+							jQuery('#displayfversion').html(str);
+							jQuery('#displayfversion').parent().css('height', 'auto');
+							var status = jQuery('<div>').html(str).find('#fc-version-status').attr('data-status') || 'ok';
+							fcSetVersionBadge(status);
+						},
+						error: function () { fcSetVersionBadge('error'); }
+					});
+				}";
+
+			if ($auto_load_version)
+			{
+				$this->document->addScriptDeclaration("
+				jQuery(document).ready(function () {
+					$load_js
+				});
+				");
+			}
+			else
+			{
+				$this->document->addScriptDeclaration("
+				jQuery(document).ready(function () {
+					jQuery('#fc-dash-update-sliders-version').on('show.bs.collapse', function () {
+						$load_js
+					});
+				});
+				");
+			}
+
+			$fc_version_check = '<div id="displayfversion" style="min-height:20px;"></div>';
+		}
+
+		// 2. PHP/DB requirements
+		ob_start();
+		echo '<div class="fc-mssg fc-note">';
+		foreach ($php_lims as $type => $html) {
+			echo implode('<br/>', $html);
+		}
+		echo \Joomla\CMS\Language\Text::sprintf(
+			'<br/>(you may have to contact your web hosting company for setting these for you)<br/>
+			For more information on changing these limitations, please see this article: %s',
+			'<a href="http://www.flexicontent.org/documentation/faq/78-installation-upgrade/591">PHP/DB Requirements</a>'
+		);
+		echo '</div>';
+		$fc_requirements = ob_get_clean();
+
+		// 3. About FLEXIcontent (no nested card/header: it lives inside an accordion slide)
+		ob_start(); ?>
+		<div id="fc-dash-credits">
+			<div class="fc-board-set-inner card-body">
+			<?php
+				$logo_style = ';';
+				if (!$disable_fc_logo)
+				{
+					echo \Joomla\CMS\HTML\HTMLHelper::image('administrator/components/com_flexicontent/assets/images/logo.png', 'FLEXIcontent', ' id="fc-dash-logo" ');
+				}
+			?>
+				<span id="fc-dash-license" class="nowrap_box fc-mssg-inline fc-info fc-nobgimage" style="">
+					FLEXIcontent <?php echo FLEXI_VERSION . ' ' . FLEXI_RELEASE; ?><br/> GNU/GPL licence, Copyright &copy; 2009-2022
+				</span><br/><br/>
+				<span id="fc-dash-devs" class="nowrap_box">
+					<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box" style="text-align:center;" >
+						<span class="label text-white bg-info label-info <?php echo $tooltip_class;?>" title="Core developer">Georgios Papadakis</span><br/><br/>
+						<a class="<?php echo $btn_class.' btn-small btn-primary '.$tooltip_class;?>" style="" href="http://www.flexicontent.org" title="FLEXIcontent home page" target="_blank">FLEXIcontent.org</a>
+					</span>
+
+					<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box" style="text-align:center;" >
+						<span class="label text-white bg-info label-info <?php echo $tooltip_class;?>" title="Core developer">Emmanuel Danan</span><br/><br/>
+						<a class="<?php echo $btn_class.' btn-small btn-primary '.$tooltip_class;?>" style="" href="http://www.agerix.fr" title="Agerix : L'agence digitale gauloise<br>Spécialistes Joomla - conception, refonte, migration et maintenance." target="_blank">agerix.fr</a>
+					</span>
+
+					<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box">
+						<span class="label <?php echo $tooltip_class;?>" title="Core Developer">Yannick Berges</span><br/><br/>
+						<a class="<?php echo $btn_class.' btn-small '.$tooltip_class;?>" style="" href="http://com3elles.com/" target="_blank" title="<?php echo flexicontent_html::getToolTip("Com'3Elles", "Com'3Elles, agence de communication, conseil et formations", 0, 1); ?>">
+							com3elles.com
+						</a>
+					</span>
+
+					<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box">
+						<span class="label <?php echo $tooltip_class;?>" title="Developer / Contributor">iamrobert Digital Design</span><br/><br/>
+						<a class="<?php echo $btn_class.' btn-small '.$tooltip_class;?>" style="" href="https://www.iamrobert.com/" target="_blank" title="iamrobert Digital Design">
+							iamrobert.com
+						</a>
+					</span>
+
+					<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box">
+						<span class="label <?php echo $tooltip_class;?>" title="Developer / Contributor">Roman Lipatov</span><br/><br/>
+						<a class="<?php echo $btn_class.' btn-small '.$tooltip_class;?>" style="" href="https://github.com/lipatovroman" target="_blank" title="Roman Lipatov on GitHub">
+							github.com/lipatovroman
+						</a>
+					</span>
+
+					<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box">
+						<span class="label text-white bg-info label-info <?php echo $tooltip_class;?>" title="Core Developer">Marvelic Engine</span><br/><br/>
+						<a class="<?php echo $btn_class.' btn-small '.$tooltip_class;?>" style="" href="http://www.marvelic.co.th" target="_blank" title="<?php echo flexicontent_html::getToolTip("Marvelic Engine", "Marvelic Engine is a Joomla consultancy based in Bangkok, Thailand. Support services include consulting, Joomla implementation, training, and custom extensions development.", 0, 1); ?>">
+							marvelic.co.th
+						</a>
+					</span>
+
+					<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box">
+						<span class="label <?php echo $tooltip_class;?>" title="Core Developer">Suriya Kaewmungmuang</span>
+					</span>
+
+					<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box">
+						<span class="label <?php echo $tooltip_class;?>" title="Developer / Contributor">Ruben Reyes</span><br/><br/>
+						<a class="<?php echo $btn_class.' btn-small '.$tooltip_class;?>" style="" href="http://www.lyquix.com" target="_blank" title="<?php echo flexicontent_html::getToolTip("Lyquix", "Lyquix - Philadelphia Marketing, Advertising, Web Design and Development Agency", 0, 1); ?>">
+							lyquix.com
+						</a>
+					</span>
+				</span>
+
+			</div>
+		</div>
+		<?php $fc_logo_license = ob_get_clean();
+		?>
+
+		<div class="fc-dashboard-notices">
 		<?php
 		if (!$this->dopostinstall)
 		{
@@ -203,31 +353,84 @@ $items_task = 'task=items.';
 				. '</div>';
 		}
 		?>
+		</div><!-- END OF .fc-dashboard-notices -->
 
+		<div class="fc-dashboard-layout">
+		<section class="fc-dashboard-cards">
+		<div id="fc-dash-boardbtns">
 		<?php
 		// BOF -- SHOW DASHBOARD BUTTONS -- (POST installation is DONE)
 		if ($this->dopostinstall && $config_saved) :
+			/**
+			 * Render a Joomla-style combined quickicon: main link on the left,
+			 * a "+" add link on the right (Joomla quickicon-group markup).
+			 */
+			$render_combo_quickicon = function ($link, $icon, $label, $add_link, $add_label, $modal = false, $modal_width = 0)
+			{
+				$add_js_title = flexicontent_html::encodeHTML($add_label, 2);
+				$add_onclick  = $modal
+					? "var url = jQuery(this).attr('href'); fc_showDialog(url, 'fc_modal_popup_container', 0, ".(int) $modal_width.", 0, false, {'title': '".$add_js_title."'}); return false;"
+					: '';
+				?>
+				<div class="fc-board-button fc-board-button-combo quick-icons">
+					<ul class="quickicon-group list-unstyled d-flex w-100 mb-0">
+						<li class="quickicon">
+							<a href="<?php echo $link; ?>">
+								<div class="quickicon-info">
+									<div class="quickicon-icon"><div class="<?php echo $icon; ?>" aria-hidden="true"></div></div>
+								</div>
+								<div class="quickicon-name d-flex align-items-end"><?php echo $label; ?></div>
+							</a>
+						</li>
+						<li class="quickicon-linkadd j-links-link d-flex">
+							<a class="d-flex" href="<?php echo $add_link; ?>" title="<?php echo htmlspecialchars($add_label, ENT_COMPAT, 'UTF-8'); ?>"<?php if ($add_onclick) echo ' onclick="'.htmlspecialchars($add_onclick, ENT_COMPAT, 'UTF-8').'"'; ?>>
+								<span class="icon-plus" aria-hidden="true"></span>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<?php
+			};
 		?>
 
 		<?php if (empty($skip_content_fieldset)): ?>
-		<fieldset class="fc-board-set">
-			<h3 class="fc-board-header"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_NAV_SD_CONTENT_EDITING' );?></h3>
+		<fieldset class="fc-board-set card fc-dashboard-card">
+			<h3 class="fc-board-header card-header"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_NAV_SD_CONTENT_EDITING' );?></h3>
 
-			<div class="fc-board-set-inner"><?php
-			if (!isset($sbtns['items']))
-			{
-				$link = 'index.php?option='.$option.'&amp;view=items';
-				FlexicontentViewFlexicontent::quickiconButton( $link, '', 'icon-items', \Joomla\CMS\Language\Text::_( 'FLEXI_ITEMS' ) );
-			}
-			if (!isset($sbtns['additem']))
+			<div class="fc-board-set-inner card-body"><?php
+			$show_items_btn    = !isset($sbtns['items']);
+			$show_additem_btn  = !isset($sbtns['additem']);
+			$can_add_any_item  = false;
+
+			if ($show_additem_btn)
 			{
 				// Check if user can create in at least one published category
 				require_once("components/com_flexicontent/models/item.php");
 
 				$itemmodel = new FlexicontentModelItem();
-				$CanAddAny = $itemmodel->getItemAccess()->get('access-create');
+				$can_add_any_item = $itemmodel->getItemAccess()->get('access-create');
+			}
 
-				if ($CanAddAny)
+			if ($show_items_btn && $show_additem_btn && $can_add_any_item)
+			{
+				$render_combo_quickicon(
+					'index.php?option='.$option.'&amp;view=items',
+					'icon-file-alt',
+					\Joomla\CMS\Language\Text::_('FLEXI_ITEMS'),
+					'index.php?option='.$option.'&amp;view=types&amp;tmpl=component&amp;layout=typeslist&amp;action=new',
+					\Joomla\CMS\Language\Text::_('FLEXI_NEW_ITEM'),
+					true,
+					1200
+				);
+			}
+			else
+			{
+				if ($show_items_btn)
+				{
+					$link = 'index.php?option='.$option.'&amp;view=items';
+					FlexicontentViewFlexicontent::quickiconButton( $link, '', 'icon-items', \Joomla\CMS\Language\Text::_( 'FLEXI_ITEMS' ) );
+				}
+				if ($show_additem_btn && $can_add_any_item)
 				{
 					$link = 'index.php?option='.$option.'&amp;view=types&amp;tmpl=component&amp;layout=typeslist&amp;action=new';
 					FlexicontentViewFlexicontent::quickiconButton($link, '', 'icon-apply', \Joomla\CMS\Language\Text::_('FLEXI_NEW_ITEM' ), 1, 1, 1200, 0);
@@ -240,20 +443,39 @@ $items_task = 'task=items.';
 			}*/
 			if ($this->perms->CanCats)
 			{
-				if (!isset($sbtns['cats']))
+				$show_cats_btn    = !isset($sbtns['cats']);
+				$show_addcat_btn  = !isset($sbtns['addcat']);
+				$can_create_cat   = $show_addcat_btn ? FlexicontentHelperPerm::getPermAny('core.create') : false;
+
+				if ($show_cats_btn && $show_addcat_btn && $can_create_cat)
 				{
-					$link = 'index.php?option='.$option.'&amp;view=categories';
-					FlexicontentViewFlexicontent::quickiconButton( $link, '' ,'icon-folder', \Joomla\CMS\Language\Text::_( 'FLEXI_CATEGORIES' ) );
+					$render_combo_quickicon(
+						'index.php?option='.$option.'&amp;view=categories',
+						'icon-folder',
+						\Joomla\CMS\Language\Text::_('FLEXI_CATEGORIES'),
+						'index.php?option='.$option.'&amp;view=category',
+						\Joomla\CMS\Language\Text::_('FLEXI_NEW_CATEGORY')
+					);
 				}
-				if (!isset($sbtns['addcat']))
+				else
 				{
-					$canCreateAny = FlexicontentHelperPerm::getPermAny('core.create');
-					if ($canCreateAny)
+					if ($show_cats_btn)
+					{
+						$link = 'index.php?option='.$option.'&amp;view=categories';
+						FlexicontentViewFlexicontent::quickiconButton( $link, '' ,'icon-folder', \Joomla\CMS\Language\Text::_( 'FLEXI_CATEGORIES' ) );
+					}
+					if ($show_addcat_btn && $can_create_cat)
 					{
 						$link = 'index.php?option='.$option.'&amp;view=category';
 						FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-folder-plus', \Joomla\CMS\Language\Text::_( 'FLEXI_NEW_CATEGORY' ) );
 					}
 				}
+			}
+			// Files moved here from "Types & Fields", right after Categories
+			if ($this->perms->CanFiles && !isset($sbtns['files']))
+			{
+				$link = 'index.php?option='.$option.'&amp;view=filemanager';
+				FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-images' , \Joomla\CMS\Language\Text::_( 'FLEXI_FILEMANAGER' ) );
 			}
 			if (isset($sbtns['comments']))
 			{
@@ -295,56 +517,100 @@ $items_task = 'task=items.';
 
 
 		<?php if (empty($skip_types_fieldset)): ?>
-		<fieldset class="fc-board-set">
-			<h3 class="fc-board-header"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_NAV_SD_TYPES_N_FIELDS' );?></h3>
+		<fieldset class="fc-board-set card fc-dashboard-card">
+			<h3 class="fc-board-header card-header"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_NAV_SD_TYPES_N_FIELDS' );?></h3>
 
-			<div class="fc-board-set-inner"><?php
+			<div class="fc-board-set-inner card-body"><?php
 			$add_sep = false;
 			if ($this->perms->CanTypes)
 			{
-				if (!isset($sbtns['types'])) {
-					$link = 'index.php?option='.$option.'&amp;view=types';
-					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-briefcase', \Joomla\CMS\Language\Text::_( 'FLEXI_TYPES' ) );
+				$show_types_btn   = !isset($sbtns['types']);
+				$show_addtype_btn = !isset($sbtns['addtype']);
+
+				if ($show_types_btn && $show_addtype_btn)
+				{
+					$render_combo_quickicon(
+						'index.php?option='.$option.'&amp;view=types',
+						'icon-briefcase',
+						\Joomla\CMS\Language\Text::_('FLEXI_TYPES'),
+						'index.php?option='.$option.'&amp;view=type',
+						\Joomla\CMS\Language\Text::_('FLEXI_NEW_TYPE')
+					);
 					$add_sep = true;
 				}
-				if (!isset($sbtns['addtype'])) {
-					$link = 'index.php?option='.$option.'&amp;view=type';
-					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-file-add', \Joomla\CMS\Language\Text::_( 'FLEXI_NEW_TYPE' ) );
-					$add_sep = true;
+				else
+				{
+					if ($show_types_btn) {
+						$link = 'index.php?option='.$option.'&amp;view=types';
+						FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-briefcase', \Joomla\CMS\Language\Text::_( 'FLEXI_TYPES' ) );
+						$add_sep = true;
+					}
+					if ($show_addtype_btn) {
+						$link = 'index.php?option='.$option.'&amp;view=type';
+						FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-file-add', \Joomla\CMS\Language\Text::_( 'FLEXI_NEW_TYPE' ) );
+						$add_sep = true;
+					}
 				}
 			}
 			if ($this->perms->CanFields)
 			{
-				if (!isset($sbtns['fields'])) {
-					$link = 'index.php?option='.$option.'&amp;view=fields';
-					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-signup', \Joomla\CMS\Language\Text::_( 'FLEXI_FIELDS' ) );
+				$show_fields_btn   = !isset($sbtns['fields']);
+				$show_addfield_btn = !isset($sbtns['addfield']);
+
+				if ($show_fields_btn && $show_addfield_btn)
+				{
+					$render_combo_quickicon(
+						'index.php?option='.$option.'&amp;view=fields',
+						'icon-signup',
+						\Joomla\CMS\Language\Text::_('FLEXI_FIELDS'),
+						'index.php?option='.$option.'&amp;view=field',
+						\Joomla\CMS\Language\Text::_('FLEXI_NEW_FIELD')
+					);
 					$add_sep = true;
 				}
-				if (!isset($sbtns['addfield'])) {
-					$link = 'index.php?option='.$option.'&amp;view=field';
-					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-file-add', \Joomla\CMS\Language\Text::_( 'FLEXI_NEW_FIELD' ) );
-					$add_sep = true;
+				else
+				{
+					if ($show_fields_btn) {
+						$link = 'index.php?option='.$option.'&amp;view=fields';
+						FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-signup', \Joomla\CMS\Language\Text::_( 'FLEXI_FIELDS' ) );
+						$add_sep = true;
+					}
+					if ($show_addfield_btn) {
+						$link = 'index.php?option='.$option.'&amp;view=field';
+						FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-file-add', \Joomla\CMS\Language\Text::_( 'FLEXI_NEW_FIELD' ) );
+						$add_sep = true;
+					}
 				}
 				$addTagsBtns  = $this->perms->CanTags && (!isset($sbtns['tags']) || !isset($sbtns['addtag']));
-				$addFilesBtns = $this->perms->CanFiles && !isset($sbtns['files']);
-				if ($add_sep && ($addTagsBtns || $addFilesBtns))
+				if ($add_sep && $addTagsBtns)
 					echo '<span class="fc-board-button_sep"></span>';
 			}
 			if ($this->perms->CanTags)
 			{
-				if (!isset($sbtns['tags'])) {
-					$link = 'index.php?option='.$option.'&amp;view=tags';
-					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-tags', \Joomla\CMS\Language\Text::_( 'FLEXI_TAGS' ) );
+				$show_tags_btn   = !isset($sbtns['tags']);
+				$show_addtag_btn = !isset($sbtns['addtag']);
+
+				if ($show_tags_btn && $show_addtag_btn)
+				{
+					$render_combo_quickicon(
+						'index.php?option='.$option.'&amp;view=tags',
+						'icon-tags',
+						\Joomla\CMS\Language\Text::_('FLEXI_TAGS'),
+						'index.php?option='.$option.'&amp;view=tag',
+						\Joomla\CMS\Language\Text::_('FLEXI_NEW_TAG')
+					);
 				}
-				if (!isset($sbtns['addtag'])) {
-					$link = 'index.php?option='.$option.'&amp;view=tag';
-					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-file-add', \Joomla\CMS\Language\Text::_( 'FLEXI_NEW_TAG' ) );
+				else
+				{
+					if ($show_tags_btn) {
+						$link = 'index.php?option='.$option.'&amp;view=tags';
+						FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-tags', \Joomla\CMS\Language\Text::_( 'FLEXI_TAGS' ) );
+					}
+					if ($show_addtag_btn) {
+						$link = 'index.php?option='.$option.'&amp;view=tag';
+						FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-file-add', \Joomla\CMS\Language\Text::_( 'FLEXI_NEW_TAG' ) );
+					}
 				}
-			}
-			if ($this->perms->CanFiles && !isset($sbtns['files']))
-			{
-				$link = 'index.php?option='.$option.'&amp;view=filemanager';
-				FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-images' , \Joomla\CMS\Language\Text::_( 'FLEXI_FILEMANAGER' ) );
 			}
 			?>
 			</div>
@@ -353,10 +619,10 @@ $items_task = 'task=items.';
 
 
 		<?php if (empty($skip_viewing_fieldset)): ?>
-		<fieldset class="fc-board-set">
-			<h3 class="fc-board-header"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_NAV_SD_CONTENT_VIEWING' );?></h3>
+		<fieldset class="fc-board-set card fc-dashboard-card">
+			<h3 class="fc-board-header card-header"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_NAV_SD_CONTENT_VIEWING' );?></h3>
 
-			<div class="fc-board-set-inner"><?php
+			<div class="fc-board-set-inner card-body"><?php
 			$add_sep = false;
 			if ($this->perms->CanTemplates && !isset($sbtns['templates']))
 			{
@@ -403,30 +669,62 @@ $items_task = 'task=items.';
 
 
 		<?php if (empty($skip_users_fieldset)): ?>
-		<fieldset class="fc-board-set">
-			<h3 class="fc-board-header"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_NAV_SD_USERS_N_GROUPS' );?></h3>
+		<fieldset class="fc-board-set card fc-dashboard-card">
+			<h3 class="fc-board-header card-header"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_NAV_SD_USERS_N_GROUPS' );?></h3>
 
-			<div class="fc-board-set-inner"><?php
+			<div class="fc-board-set-inner card-body"><?php
 			if ($this->perms->CanAuthors)
 			{
-				if (!isset($sbtns['users'])) {
-					$link = 'index.php?option='.$option.'&amp;view=users';
-					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-users', \Joomla\CMS\Language\Text::_( 'FLEXI_USERS' ) );
+				$show_users_btn    = !isset($sbtns['users']);
+				$show_adduser_btn  = !isset($sbtns['adduser']);
+
+				if ($show_users_btn && $show_adduser_btn)
+				{
+					$render_combo_quickicon(
+						'index.php?option='.$option.'&amp;view=users',
+						'icon-users',
+						\Joomla\CMS\Language\Text::_('FLEXI_USERS'),
+						'index.php?option='.$option.'&amp;task=users.add',
+						\Joomla\CMS\Language\Text::_('FLEXI_ADD_USER')
+					);
 				}
-				if (!isset($sbtns['adduser'])) {
-					$link = 'index.php?option='.$option.'&amp;task=users.add';
-					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-file-add', \Joomla\CMS\Language\Text::_( 'FLEXI_ADD_USER' ) );
+				else
+				{
+					if ($show_users_btn) {
+						$link = 'index.php?option='.$option.'&amp;view=users';
+						FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-users', \Joomla\CMS\Language\Text::_( 'FLEXI_USERS' ) );
+					}
+					if ($show_adduser_btn) {
+						$link = 'index.php?option='.$option.'&amp;task=users.add';
+						FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-file-add', \Joomla\CMS\Language\Text::_( 'FLEXI_ADD_USER' ) );
+					}
 				}
 			}
 			if ($this->perms->CanGroups)
 			{
-				if (!isset($sbtns['groups'])) {
-					$link = 'index.php?option='.$option.'&amp;view=groups';
-					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-users-cog', \Joomla\CMS\Language\Text::_( 'FLEXI_GROUPS' ) );
+				$show_groups_btn   = !isset($sbtns['groups']);
+				$show_addgroup_btn = !isset($sbtns['addgroup']);
+
+				if ($show_groups_btn && $show_addgroup_btn)
+				{
+					$render_combo_quickicon(
+						'index.php?option='.$option.'&amp;view=groups',
+						'icon-users-cog',
+						\Joomla\CMS\Language\Text::_('FLEXI_GROUPS'),
+						'index.php?option='.$option.'&amp;task=groups.add',
+						\Joomla\CMS\Language\Text::_('FLEXI_ADD_GROUP')
+					);
 				}
-				if (!isset($sbtns['addgroup'])) {
-					$link = 'index.php?option='.$option.'&amp;task=groups.add';
-					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-file-add', \Joomla\CMS\Language\Text::_( 'FLEXI_ADD_GROUP' ) );
+				else
+				{
+					if ($show_groups_btn) {
+						$link = 'index.php?option='.$option.'&amp;view=groups';
+						FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-users-cog', \Joomla\CMS\Language\Text::_( 'FLEXI_GROUPS' ) );
+					}
+					if ($show_addgroup_btn) {
+						$link = 'index.php?option='.$option.'&amp;task=groups.add';
+						FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-file-add', \Joomla\CMS\Language\Text::_( 'FLEXI_ADD_GROUP' ) );
+					}
 				}
 			}
 			?>
@@ -436,10 +734,10 @@ $items_task = 'task=items.';
 
 
 		<?php if (empty($skip_expert_fieldset)): ?>
-		<fieldset class="fc-board-set">
-			<h3 class="fc-board-header"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_NAV_SD_EXPERT_USAGE' );?></h3>
+		<fieldset class="fc-board-set card fc-dashboard-card">
+			<h3 class="fc-board-header card-header"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_NAV_SD_EXPERT_USAGE' );?></h3>
 
-			<div class="fc-board-set-inner"><?php
+			<div class="fc-board-set-inner card-body"><?php
 			$add_sep = false;
 			if ($this->perms->CanImport && !isset($sbtns['import']))
 			{
@@ -477,10 +775,10 @@ $items_task = 'task=items.';
 
 
 		<?php if ($this->params->get('support_url')): ?>
-		<fieldset class="fc-board-set">
-			<h3 class="fc-board-header"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_HELP' );?></h3>
+		<fieldset class="fc-board-set card fc-dashboard-card">
+			<h3 class="fc-board-header card-header"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_HELP' );?></h3>
 
-			<div class="fc-board-set-inner"><?php
+			<div class="fc-board-set-inner card-body"><?php
 			$link = $this->params->get('support_url');
 			FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-help', \Joomla\CMS\Language\Text::_( 'FLEXI_SUPPORT' ), 1 );
 
@@ -501,39 +799,44 @@ $items_task = 'task=items.';
 		endif; ?>
 
 
-		<?php
-		if ( $this->params->get('show_updatecheck', 1) && $this->perms->CanConfig )
-		{
-			$this->document->addScriptDeclaration("
-			jQuery(document).ready(function () {
-				if(jQuery.trim(jQuery('#displayfversion').html())=='') {
-					jQuery('#displayfversion').html('<p><img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" style=\"vertical-align: middle;\"><\/p>');
-					jQuery.ajax({
-						url: 'index.php?option=com_flexicontent&task=flexicontent.fcversioncompare&format=raw&". \Joomla\CMS\Session\Session::getFormToken() ."=1',
-						cache: false,
-						success: function(str) {
-							jQuery('#displayfversion').html(str);
-							jQuery('#displayfversion').parent().css('height', 'auto');
-						}
-					});
-				}
-			});
-			");
-			echo '
-			<fieldset class="fc-board-set">
-				<h3 class="fc-board-header">'.\Joomla\CMS\Language\Text::_( 'FLEXI_UPDATE_CHECK' ).'</h3>
-				<div class="fc-board-set-inner">
-					<div id="displayfversion" style="float: left;"></div>
-				</div>
-			</fieldset>
-			';
-		}
-		?>
-
 		</div> <!-- END OF #fc-dash-boardbtns -->
+		</section><!-- END OF .fc-dashboard-cards -->
+
+		<aside class="fc-dashboard-updates">
+			<h2 class="visually-hidden"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_DASHBOARD_SYSTEM_INFO' ); ?></h2>
+
+			<section class="fc-board-set card fc-dashboard-card fc-dashboard-updatecheck">
+				<h3 class="fc-board-header card-header"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_DASHBOARD_SYSTEM_INFO' ); ?></h3>
+				<div class="fc-board-set-inner card-body">
+		<?php
+		echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.startAccordion', 'fc-dash-update-sliders', array());
+
+		if ($fc_version_check !== '')
+		{
+			$version_title = \Joomla\CMS\Language\Text::_( 'FLEXI_UPDATE_CHECK' )
+				. ' <span id="fc-version-badge" class="badge bg-secondary">&hellip;</span>';
+			echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addSlide', 'fc-dash-update-sliders', $version_title, 'fc-dash-update-sliders-version' );
+			echo $fc_version_check;
+			echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endSlide');
+		}
+
+		echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addSlide', 'fc-dash-update-sliders', $_title, 'fc-dash-update-sliders-requirements' );
+		echo $fc_requirements;
+		echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endSlide');
+
+		echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addSlide', 'fc-dash-update-sliders', \Joomla\CMS\Language\Text::_( 'About FLEXIcontent' ), 'fc-dash-update-sliders-aboutflexi' );
+		echo $fc_logo_license;
+		echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endSlide');
+
+		echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endAccordion');
+		?>
+				</div>
+			</section>
 
 
-
+			<section class="fc-board-set card fc-dashboard-card fc-dashboard-waiting">
+				<h3 class="fc-board-header card-header"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_DASHBOARD_WAITING_ACTION' ); ?></h3>
+				<div class="fc-board-set-inner card-body">
 		<?php
 		if (!$this->dopostinstall || !$this->allplgpublish) :
 
@@ -552,32 +855,7 @@ $items_task = 'task=items.';
 
 			echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.startAccordion', 'fc-dash-sliders', array());
 
-			ob_start(); ?>
-
-			<?php
-				echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addSlide', 'fc-dash-sliders', $_title, 'fc-dash-sliders-requirements' );
-				echo '<div class="fc-mssg fc-note" style="margin: 24px; display: inline-block;">';
-				echo '<b>PHP/DB requirements</b><br/>';
-				foreach($php_lims as $type => $html) {
-					echo implode('<br/>', $html);
-				}
-				echo \Joomla\CMS\Language\Text::sprintf(
-					'<br/>(you may have to contact your web hosting company for setting these for you)<br/>
-					For more information on changing these limitations, please see this article: %s',
-					'<a href="http://www.flexicontent.org/documentation/faq/78-installation-upgrade/591">PHP/DB Requirements</a>'
-				);
-				echo '</div>';
-				echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endSlide');
-			?>
-
-			<?php $fc_requirements = ob_get_clean();
-
-			if ( isset($php_lims['warning']) ) : // Place requirements at top slider if they are failing
-				echo $fc_requirements;
-			endif; ?>
-
-
-			<?php if (!isset($ssliders['pending'])):
+			if (!isset($ssliders['pending'])):
 				$title = \Joomla\CMS\Language\Text::_( 'FLEXI_PENDING_SLIDER' ).' - <span class="badge bg-warning badge-warning">'.$this->totalrows['pending'].'</span>';
 				echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addSlide', 'fc-dash-sliders', $title, 'fc-dash-sliders-pending' );
 				$show_all_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_state=PE';
@@ -803,124 +1081,15 @@ $items_task = 'task=items.';
 				echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endSlide');
 			endif; /* !isset($ssliders['draft']) */ ?>
 
-
-			<?php if (!isset($ssliders['version'])): ?>
 			<?php
-			if ( !$this->params->get('show_updatecheck', 1) || !$this->perms->CanConfig )
-			{
-				$this->document->addScriptDeclaration("
-				jQuery(document).ready(function () {
-					jQuery('#updatecomponent').click(function(e){
-						if(jQuery.trim(jQuery('#displayfversion').html())=='') {
-							jQuery('#displayfversion').html('<p><img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" style=\"vertical-align: middle;\"><\/p>');
-							jQuery.ajax({
-								url: 'index.php?option=com_flexicontent&task=flexicontent.fcversioncompare&format=raw&". \Joomla\CMS\Session\Session::getFormToken() ."=1',
-								cache: false,
-								success: function(str) {
-									jQuery('#displayfversion').html(str);
-									jQuery('#displayfversion').parent().css('height', 'auto');
-								}
-							});
-						}
-					});
-				});
-				");
-				echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addSlide', 'fc-dash-sliders', \Joomla\CMS\Language\Text::_( 'FLEXI_VERSION_CHECKING' ), 'fc-dash-sliders-updatecomponent' );
-				echo "<div id=\"displayfversion\" style='min-height:20px;'></div>";
-				echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endSlide');
-			}
-			endif; /* !isset($ssliders['version']) */ ?>
-
-
-			<?php ob_start(); ?>
-			<div id="fc-dash-credits">
-			<?php echo !$hide_fc_license_credits ? '<fieldset class="fc-board-set"><h3 class="fc-board-header">'.\Joomla\CMS\Language\Text::_( 'About FLEXIcontent' ).'</h3>' : ''; ?>
-				<div class="fc-board-set-inner">
-				<?php
-					$logo_style = ';';
-					if (!$disable_fc_logo)
-					{
-						echo \Joomla\CMS\HTML\HTMLHelper::image('administrator/components/com_flexicontent/assets/images/logo.png', 'FLEXIcontent', ' id="fc-dash-logo" ');
-					}
-				?>
-					<span id="fc-dash-license" class="nowrap_box fc-mssg-inline fc-info fc-nobgimage" style="">
-						FLEXIcontent <?php echo FLEXI_VERSION . ' ' . FLEXI_RELEASE; ?><br/> GNU/GPL licence, Copyright &copy; 2009-2022
-					</span><br/><br/>
-					<span id="fc-dash-devs" class="nowrap_box">
-						<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box" style="text-align:center;" >
-							<span class="label text-white bg-info label-info <?php echo $tooltip_class;?>" title="Core developer">Georgios Papadakis</span><br/><br/>
-							<a class="<?php echo $btn_class.' btn-small btn-primary '.$tooltip_class;?>" style="" href="http://www.flexicontent.org" title="FLEXIcontent home page" target="_blank">FLEXIcontent.org</a>
-						</span>
-
-						<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box" style="text-align:center;" >
-							<span class="label text-white bg-info label-info <?php echo $tooltip_class;?>" title="Core developer">Emmanuel Danan</span><br/><br/>
-							<a class="<?php echo $btn_class.' btn-small btn-primary '.$tooltip_class;?>" style="" href="http://www.agerix.fr" title="Agerix : L'agence digitale gauloise<br>Spécialistes Joomla - conception, refonte, migration et maintenance." target="_blank">agerix.fr</a>
-						</span>
-
-						<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box">
-							<span class="label <?php echo $tooltip_class;?>" title="Core Developer">Yannick Berges</span><br/><br/>
-							<a class="<?php echo $btn_class.' btn-small '.$tooltip_class;?>" style="" href="http://com3elles.com/" target="_blank" title="<?php echo flexicontent_html::getToolTip("Com'3Elles", "Com'3Elles, agence de communication, conseil et formations", 0, 1); ?>">
-								com3elles.com
-							</a>
-						</span>
-
-						<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box">
-							<span class="label <?php echo $tooltip_class;?>" title="Developer / Contributor">iamrobert Digital Design</span><br/><br/>
-							<a class="<?php echo $btn_class.' btn-small '.$tooltip_class;?>" style="" href="https://www.iamrobert.com/" target="_blank" title="iamrobert Digital Design">
-								iamrobert.com
-							</a>
-						</span>
-
-						<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box">
-							<span class="label <?php echo $tooltip_class;?>" title="Developer / Contributor">Roman Lipatov</span><br/><br/>
-							<a class="<?php echo $btn_class.' btn-small '.$tooltip_class;?>" style="" href="https://github.com/lipatovroman" target="_blank" title="Roman Lipatov on GitHub">
-								github.com/lipatovroman
-							</a>
-						</span>
-
-						<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box">
-							<span class="label text-white bg-info label-info <?php echo $tooltip_class;?>" title="Core Developer">Marvelic Engine</span><br/><br/>
-							<a class="<?php echo $btn_class.' btn-small '.$tooltip_class;?>" style="" href="http://www.marvelic.co.th" target="_blank" title="<?php echo flexicontent_html::getToolTip("Marvelic Engine", "Marvelic Engine is a Joomla consultancy based in Bangkok, Thailand. Support services include consulting, Joomla implementation, training, and custom extensions development.", 0, 1); ?>">
-								marvelic.co.th
-							</a>
-						</span>
-
-						<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box">
-							<span class="label <?php echo $tooltip_class;?>" title="Core Developer">Suriya Kaewmungmuang</span>
-						</span>
-
-						<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box">
-							<span class="label <?php echo $tooltip_class;?>" title="Developer / Contributor">Ruben Reyes</span><br/><br/>
-							<a class="<?php echo $btn_class.' btn-small '.$tooltip_class;?>" style="" href="http://www.lyquix.com" target="_blank" title="<?php echo flexicontent_html::getToolTip("Lyquix", "Lyquix - Philadelphia Marketing, Advertising, Web Design and Development Agency", 0, 1); ?>">
-								lyquix.com
-							</a>
-						</span>
-					</span>
-
-				</div>
-			<?php echo !$hide_fc_license_credits ? '</fieldset>' : ''; ?>
-
-			</div>
-			<?php $fc_logo_license = ob_get_clean(); ?>
-
-			<?php
-			// Place PHP/DB requirements at bottom if no warning found
-			if ( !isset($php_lims['warning']) && $this->perms->CanConfig ) :
-				echo $fc_requirements;
-			endif;
-
-			if ($hide_fc_license_credits) :
-				echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addSlide', 'fc-dash-sliders', "About FLEXIcontent", 'fc-dash-sliders-aboutflexi' );
-				echo $fc_logo_license;
-				echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endSlide');
-			endif;
-
 			echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.endAccordion');
 
 		endif; /* !$skip_sliders */ ?>
+				</div>
+			</section>
 
-
-		<?php if (!$hide_fc_license_credits) echo $fc_logo_license; ?>
+		</aside><!-- END OF .fc-dashboard-updates -->
+		</div><!-- END OF .fc-dashboard-layout -->
 
 
 	<!-- Common management form fields -->
