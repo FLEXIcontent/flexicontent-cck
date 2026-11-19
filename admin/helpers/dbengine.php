@@ -339,6 +339,39 @@ class FlexicontentDbEngine
 
 
 	/**
+	 * On a site that was moved to InnoDB, give the empty tables that are still MyISAM the site's engine.
+	 *
+	 * These are tables that an upgrade has just created. An empty table changes its engine at once,
+	 * nothing is copied. A table with rows is left for the administrator's "Move DB tables to InnoDB" page.
+	 *
+	 * @return  string[]  The names of the tables that were changed
+	 */
+	public static function followSiteEngineForEmptyTables($db)
+	{
+		$tables = self::getTables($db);
+		$prefix = $db->getPrefix();
+		$done   = array();
+
+		if (!isset($tables[$prefix . 'flexicontent_items_ext']) || $tables[$prefix . 'flexicontent_items_ext']->pending)
+		{
+			return $done;
+		}
+
+		foreach ($tables as $table)
+		{
+			// MyISAM keeps an exact row count
+			if ($table->pending && strtolower((string) $table->engine) === 'myisam' && (int) $table->rows === 0)
+			{
+				self::followSiteEngine($db, $table->name);
+				$done[] = $table->name;
+			}
+		}
+
+		return $done;
+	}
+
+
+	/**
 	 * Give the DATETIME columns that still default to the zero date the default of a new installation.
 	 *
 	 * Tables of older installations have columns with DEFAULT '0000-00-00 00:00:00'. A database server in its

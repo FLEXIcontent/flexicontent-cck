@@ -1671,6 +1671,21 @@ class com_flexicontentInstallerScript
 		}
 		?>
 
+		<?php
+		// Upgrade of a site that was moved to InnoDB: a table that this upgrade has just created must not stay MyISAM
+		if (!FLEXI_NEW_INSTALL)
+		{
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/dbengine.php';
+
+			try {
+				FlexicontentDbEngine::followSiteEngineForEmptyTables($db);
+			}
+			catch (Exception $e) {
+				echo '<span class="badge badge-error">SQL Error</span> '. $e->getMessage() . '<br/>';
+			}
+		}
+		?>
+
 		<div class="alert alert-success" style="margin: 8px 0 64px 0;">
 			<span class="btn btn-info" onclick="window.open('index.php?option=com_flexicontent','_self');" style="cursor: pointer;">
 				<?php echo \Joomla\CMS\Language\Text::_('FLEXI_DASHBOARD'); ?>
