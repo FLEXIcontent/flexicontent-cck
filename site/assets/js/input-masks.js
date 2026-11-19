@@ -3,6 +3,44 @@
   const Inputmask = window.Inputmask;
   if (!Inputmask) return;
   Inputmask.extendAliases({
+    // The upstream URL alias inserts a protocol before typing starts. Typing or
+    // pasting a complete URL can then duplicate it. Preserve the user's characters
+    // and validate the complete URL instead of supplying part of its value.
+    url: {
+      regex: null,
+      mask: 'u{*}',
+      definitions: {u: {validator: '.'}},
+      greedy: false,
+      placeholder: '',
+      autoUnmask: false,
+      tabThrough: false,
+      showMaskOnFocus: false,
+      showMaskOnHover: false,
+      inputmode: 'url',
+      isComplete(buffer) {
+        const value = buffer.join('');
+        if (!value) return true;
+        try {
+          const url = new URL(value);
+          return /^(https?|ftps?):$/.test(url.protocol) && !!url.hostname;
+        } catch (_) { return false; }
+      }
+    },
+    // Inputmask 5 defaults to integer percentages; FLEXIcontent's former preset
+    // accepted two decimal places. Keep existing decimal values intact.
+    percentage: {
+      alias: 'numeric',
+      digits: 2,
+      digitsOptional: true,
+      radixPoint: '.',
+      min: 0,
+      max: 100,
+      suffix: ' %',
+      allowMinus: false,
+      clearMaskOnLostFocus: true,
+      removeMaskOnSubmit: true,
+      unmaskAsNumber: false
+    },
     decimal: {
       alias: 'numeric',
       radixPoint: '.',
@@ -67,6 +105,9 @@
       alias: 'numeric',
       digits: 0,
       radixPoint: '',
+      // A displayed zero can become a trailing digit after tabbing into an
+      // empty field and clicking again. Keep the empty integer genuinely empty.
+      placeholder: '',
       clearMaskOnLostFocus: true,
       removeMaskOnSubmit: true,
       unmaskAsNumber: false
@@ -75,6 +116,7 @@
       alias: 'numeric',
       digits: 0,
       radixPoint: '',
+      placeholder: '',
       allowMinus: false,
       clearMaskOnLostFocus: true,
       removeMaskOnSubmit: true,

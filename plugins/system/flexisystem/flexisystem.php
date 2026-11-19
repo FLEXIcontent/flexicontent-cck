@@ -352,8 +352,6 @@ $document = $app->getDocument();
 // hors contexte web (CLI, API, tâches planifiées, etc.)
 if ($document !== null && method_exists($document, 'getWebAssetManager')) {
     $wa = $document->getWebAssetManager();
-    $wa->useScript('jquery');
-    $wa->useScript('jquery-noconflict');
     if ($js !== '') {
         $wa->addInlineScript($js);
     }
@@ -377,14 +375,14 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 			)
 		) {
 			if (Factory::getApplication()->getDocument() !== null) {
-				HTMLHelper::_('jquery.framework');
+				flexicontent_html::loadFramework('form-utils');
 			}
 			$js .= "
-				jQuery(document).ready(function() {
+				FlexiForm.ready(function() {
 					var el = parent.document.getElementById('fc_modal_popup_container');
 					if (el) {
-						jQuery('.navbar').hide();
-						jQuery('body').css('padding-top', 0);
+						document.querySelectorAll('.navbar').forEach(node => node.hidden = true);
+						document.body.style.paddingTop = '0';
 					}
 				});
 			";

@@ -26,6 +26,7 @@ $cat_image_webp    = (bool) $params->get('cat_image_webp', 0);
 
 // Layout card : top | left | right
 $cat_card_layout = $params->get('cat_image_float', 'left');
+$phpThumbURL = '';
 
 if ($show_cat_image)
 {

@@ -105,12 +105,12 @@
 			</field>
 
 			<field name="" type="separator" default="FLEXI_PAGE_RELOADING_OVERLAY_BOX" label="" level="level2" />
-			<field name="page_reloading_overlay_bg_color" type="color" label="FLEXI_BACKGROUND" default="rgba(0, 0, 0, 0.3)" format="rgba" keywords="transparent,initial,inherit" />
+			<field name="page_reloading_overlay_bg_color" type="fccolor" label="FLEXI_BACKGROUND" default="rgba(0, 0, 0, 0.3)" format="rgba" keywords="transparent,initial,inherit" />
 
 			<field name="" type="separator" default="FLEXI_PAGE_RELOADING_CONTENTS_BOX" label="" level="level2" />
 
-			<field name="page_reloading_content_color" type="color" label="FLEXI_TEXT_COLOR" default="rgba(0, 0, 0, 1)" format="rgba" keywords="transparent,initial,inherit" />
-			<field name="page_reloading_content_bg_color" type="color" label="FLEXI_BACKGROUND" default="rgba(255, 255, 255, 1)" format="rgba" keywords="transparent,initial,inherit" />
+			<field name="page_reloading_content_color" type="fccolor" label="FLEXI_TEXT_COLOR" default="rgba(0, 0, 0, 1)" format="rgba" keywords="transparent,initial,inherit" />
+			<field name="page_reloading_content_bg_color" type="fccolor" label="FLEXI_BACKGROUND" default="rgba(255, 255, 255, 1)" format="rgba" keywords="transparent,initial,inherit" />
 
 			<field name="" type="separator" default="FLEXI_PAGE_RELOADING_LOGO_IMAGE" label="" level="level3" />
 			<field name="" type="separator" default="FLEXI_PAGE_RELOADING_LOGO_IMAGE_ABOUT" label="" level="level3" class="alert alert-info fcpadded" />
@@ -129,7 +129,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="page_reloading_pbar_color" type="color" showon="page_reloading_pbar_display:1" label="FLEXI_COLOR" default="rgba(0, 153, 255, 1)" format="rgba" keywords="transparent,initial,inherit" />
+			<field name="page_reloading_pbar_color" type="fccolor" showon="page_reloading_pbar_display:1" label="FLEXI_COLOR" default="rgba(0, 153, 255, 1)" format="rgba" keywords="transparent,initial,inherit" />
 
 
 		<field name="" type="separator" default="FLEXI_CONFIG_ADVANCED" icon_class="icon-cog" level="tab_open" box_type="1" remove_boxes="2" />

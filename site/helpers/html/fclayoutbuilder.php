@@ -913,18 +913,12 @@ abstract class JHtmlFclayoutbuilder
 
 			// Simple warn notifier
 			var origWarn = console.warn;
-			toastr.options = {
-				closeButton: true,
-				preventDuplicates: true,
-				showDuration: 250,
-				hideDuration: 150
-			};
 			console.warn = function (msg) {
-				if (msg.indexOf(\'[undefined]\') == -1 && msg.indexOf(\'writeDynaList\') == -1)
+				if (typeof msg === \'string\' && msg.indexOf(\'[undefined]\') == -1 && msg.indexOf(\'writeDynaList\') == -1)
 				{
-					toastr.warning(msg);
+					FlexiForm.message(\'warning\', msg);
 				}
-				origWarn(msg);
+				origWarn.apply(console, arguments);
 			};
 
 

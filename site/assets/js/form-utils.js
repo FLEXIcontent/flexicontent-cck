@@ -64,6 +64,21 @@ window.FlexiForm = (() => {
     return copy;
   }
   const text = key => (Joomla.Text || Joomla.JText)._(key);
+  const alert = (message, title) => {
+    const Dialog = window.customElements?.get('joomla-dialog');
+    return Dialog ? Dialog.alert(escapeHTML(message), title ? escapeHTML(title) : undefined) : Promise.resolve(window.alert(message));
+  };
+  const confirm = (message, title) => {
+    const Dialog = window.customElements?.get('joomla-dialog');
+    return Dialog ? Dialog.confirm(escapeHTML(message), title ? escapeHTML(title) : undefined) : Promise.resolve(window.confirm(message));
+  };
+  const escapeHTML = value => { const node = document.createElement('span'); node.textContent = value; return node.innerHTML; };
+  const message = (type, value) => Joomla.renderMessages({[type]:[escapeHTML(value)]});
+  function clearSelect(select) {
+    const choices = select.fc_choices_instance || data(select, 'fc_choices_instance');
+    if (choices) { choices.removeActiveItems(); if (!select.multiple) choices.setChoiceByValue(''); }
+    Array.from(select.options).forEach(option => { option.selected = !select.multiple && option.value === ''; });
+  }
   // Only for trusted HTML returned by a same-origin Joomla view. Recreate scripts
   // in document order, as the former jQuery.load() dialog transport did.
   async function insertHTML(target, html, signal) {
@@ -90,5 +105,5 @@ window.FlexiForm = (() => {
       }
     }
   }
-  return {element, ready, visible, value, data, show, focusInvalid, change, cloneFieldRow, text, insertHTML};
+  return {element, ready, visible, value, data, show, focusInvalid, change, cloneFieldRow, text, insertHTML, alert, confirm, message, clearSelect};
 })();

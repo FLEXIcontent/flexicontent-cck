@@ -90,7 +90,7 @@ window.fcfield_group = (() => {
       if (previous?.parentElement !== list) return;
       const { insert_before, remove_previous, scroll_visible = true, animate_visible = true } = options;
       if (!remove_previous && config.max && list.children.length >= config.max) {
-        alert(FlexiForm.text('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + config.max);
+        FlexiForm.alert(FlexiForm.text('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + config.max);
         return 'cancel';
       }
       const index = nextIndex++;

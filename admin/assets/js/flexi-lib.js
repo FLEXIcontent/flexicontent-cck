@@ -28,7 +28,7 @@ FlexiForm.ready(() => {
       const target = previous[event.newIndex];
       if (group(target) !== group(event.item)) {
         previous.forEach(row => list.append(row));
-        if (window.move_within_ordering_groups_limits) alert(window.move_within_ordering_groups_limits);
+        if (window.move_within_ordering_groups_limits) FlexiForm.alert(window.move_within_ordering_groups_limits);
         return;
       }
       Array.from(list.children).forEach((row, index) => {

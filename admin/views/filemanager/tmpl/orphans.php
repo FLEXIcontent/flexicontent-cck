@@ -185,8 +185,8 @@ document.addEventListener('DOMContentLoaded', () => {
 	});
 
 	node('cancel').addEventListener('click', close);
-	node('start').addEventListener('click', () => {
-		if (!confirm(<?php echo json_encode(Text::_('FLEXI_ORPHANS_CONFIRM_FINAL')); ?>)) return;
+	node('start').addEventListener('click', async () => {
+		if (!(await FlexiForm.confirm(<?php echo json_encode(Text::_('FLEXI_ORPHANS_CONFIRM_FINAL')); ?>))) return;
 		show('step1', false);
 		show('confirm', false);
 		show('run', true);

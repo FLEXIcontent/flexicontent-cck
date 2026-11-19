@@ -79,7 +79,7 @@ var JFormValidator_FC = function () {
     const selected = [...new Set([...values, ...(primary ? [primary] : [])])];
     if (max_cat_assign_fc && selected.length > max_cat_assign_fc
       && !selected.every(value => existing_cats_fc.map(String).includes(value))) {
-      alert(F.text('FLEXI_TOO_MANY_ITEM_CATEGORIES') + max_cat_assign_fc); return false;
+      F.alert(F.text('FLEXI_TOO_MANY_ITEM_CATEGORIES') + max_cat_assign_fc); return false;
     }
     return true;
   });

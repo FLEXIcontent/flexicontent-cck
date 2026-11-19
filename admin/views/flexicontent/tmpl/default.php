@@ -184,48 +184,35 @@ $items_task = 'task=items.';
 				'update' => \Joomla\CMS\Language\Text::_('FLEXI_VERSION_STATUS_UPDATE'),
 				'error'  => \Joomla\CMS\Language\Text::_('FLEXI_VERSION_STATUS_ERROR'),
 			));
-			$load_js = "
-				var fcVersionLabels = " . $version_labels . ";
-				function fcSetVersionBadge(status) {
-					var cls = status === 'update' ? 'bg-warning badge-warning' : (status === 'error' ? 'bg-danger' : 'bg-success badge-success');
-					jQuery('#fc-version-badge')
-						.removeClass('bg-secondary bg-success badge-success bg-warning badge-warning bg-danger')
-						.addClass(cls)
-						.text(fcVersionLabels[status] || fcVersionLabels.ok);
-				}
-				if (jQuery.trim(jQuery('#displayfversion').html()) === '') {
-					jQuery('#displayfversion').html('<p><img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" style=\"vertical-align: middle;\"><\/p>');
-					jQuery.ajax({
-						url: 'index.php?option=com_flexicontent&task=flexicontent.fcversioncompare&format=raw&$token=1',
-						cache: false,
-						success: function(str) {
-							jQuery('#displayfversion').html(str);
-							jQuery('#displayfversion').parent().css('height', 'auto');
-							var status = jQuery('<div>').html(str).find('#fc-version-status').attr('data-status') || 'ok';
-							fcSetVersionBadge(status);
-						},
-						error: function () { fcSetVersionBadge('error'); }
-					});
-				}";
-
-			if ($auto_load_version)
-			{
-				$this->document->addScriptDeclaration("
-				jQuery(document).ready(function () {
-					$load_js
+			$version_url = json_encode('index.php?option=com_flexicontent&task=flexicontent.fcversioncompare&format=raw&' . $token . '=1');
+			$auto_load_js = $auto_load_version ? 'true' : 'false';
+			$this->document->addScriptDeclaration("
+				FlexiForm.ready(() => {
+					const labels = $version_labels;
+					const result = document.getElementById('displayfversion');
+					let loading = false;
+					const badge = status => {
+						const node = document.getElementById('fc-version-badge');
+						if (!node) return;
+						node.classList.remove('bg-secondary','bg-success','badge-success','bg-warning','badge-warning','bg-danger');
+						node.classList.add(status === 'update' ? 'bg-warning' : status === 'error' ? 'bg-danger' : 'bg-success');
+						node.textContent = labels[status] || labels.ok;
+					};
+					const load = async () => {
+						if (!result || loading || result.textContent.trim()) return;
+						loading = true; result.setAttribute('aria-busy', 'true');
+						try {
+							const response = await fetch($version_url, {credentials:'same-origin'});
+							if (!response.ok) throw Error(response.statusText);
+							await FlexiForm.insertHTML(result, await response.text());
+							badge(result.querySelector('#fc-version-status')?.dataset.status || 'ok');
+						} catch (error) { badge('error'); }
+						finally { loading = false; result.removeAttribute('aria-busy'); }
+					};
+					if ($auto_load_js) load();
+					document.getElementById('fc-dash-update-sliders-version')?.addEventListener('show.bs.collapse', load);
 				});
-				");
-			}
-			else
-			{
-				$this->document->addScriptDeclaration("
-				jQuery(document).ready(function () {
-					jQuery('#fc-dash-update-sliders-version').on('show.bs.collapse', function () {
-						$load_js
-					});
-				});
-				");
-			}
+			");
 
 			$fc_version_check = '<div id="displayfversion" style="min-height:20px;"></div>';
 		}
@@ -369,7 +356,7 @@ $items_task = 'task=items.';
 			{
 				$add_js_title = flexicontent_html::encodeHTML($add_label, 2);
 				$add_onclick  = $modal
-					? "var url = jQuery(this).attr('href'); fc_showDialog(url, 'fc_modal_popup_container', 0, ".(int) $modal_width.", 0, false, {'title': '".$add_js_title."'}); return false;"
+					? "var url = this.getAttribute('href'); fc_showDialog(url, 'fc_modal_popup_container', 0, ".(int) $modal_width.", 0, false, {'title': '".$add_js_title."'}); return false;"
 					: '';
 				?>
 				<div class="fc-board-button fc-board-button-combo quick-icons">

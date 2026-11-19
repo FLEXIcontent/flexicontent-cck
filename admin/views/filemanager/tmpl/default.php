@@ -1400,7 +1400,7 @@ if ($js)
 
 									<?php if ($isFilesElement) : /* Direct delete button for fileselement view */ ?>
 										<td>
-											<a class="btn btn-mini ntxt" href="javascript:;" onclick="if (confirm('<?php echo Text::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>')) { return Joomla.listItemTask('cb<?php echo $i; ?>','filemanager.remove'); }">
+											<a class="btn btn-mini ntxt" href="javascript:;" onclick="FlexiForm.confirm('<?php echo Text::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>').then(accepted => { if (accepted) Joomla.listItemTask('cb<?php echo $i; ?>','filemanager.remove'); }); return false;">
 												<span class="icon-remove" title="<?php echo Text::_('FLEXI_REMOVE'); ?>"></span>
 											</a>
 										</td>
@@ -1518,7 +1518,7 @@ if ($js)
 					<span class="btn fc-fileman-preview-btn icon-search" onclick="fman_zoom_thumb(event, this); return false;"></span>
 					'; ?>
 									<span class="btn fc-fileman-selection-mark icon-checkmark" id="_cb<?php echo $i; ?>" ></span>
-									<span class="btn fc-fileman-delete-btn icon-remove" onclick="if (confirm('<?php echo Text::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>')) { document.adminForm.filename.value='<?php echo rawurlencode($row->filename);?>'; return Joomla.listItemTask('cb<?php echo $i; ?>','filemanager.remove'); }"></span>
+									<span class="btn fc-fileman-delete-btn icon-remove" onclick="FlexiForm.confirm('<?php echo Text::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>').then(accepted => { if (accepted) { document.adminForm.filename.value='<?php echo rawurlencode($row->filename);?>'; Joomla.listItemTask('cb<?php echo $i; ?>','filemanager.remove'); } }); return false;"></span>
 									<span class="fc-fileman-filename-box"><?php echo $row->title_cut; ?></span>
 								</div>
 								<?php

@@ -44,9 +44,9 @@ var itemscreen = function (name, options = {}) {
       const [id, label] = (await request(url, {cid, name: tagname})).split('|');
       if (label === undefined) return;
       if (id !== '0') addToList(id, label);
-      else alert(label);
+      else FlexiForm.alert(label);
     } catch (error) {
-      alert('Failed to add tag');
+      FlexiForm.alert('Failed to add tag');
     }
   };
 

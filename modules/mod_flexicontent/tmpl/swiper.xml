@@ -117,7 +117,7 @@
 				<option value="dotted">Dotted</option>
 				<option value="double">Double</option>
 			</field>
-			<field name="swiper_border_color_feat" type="color" default="#cccccc" label="border color" description="This is the border color applied around the items" />
+			<field name="swiper_border_color_feat" type="fccolor" default="#cccccc" label="border color" description="This is the border color applied around the items" />
 			<field name="swiper_border_radius_feat" type="text" default="0" label="border radius" description="e.g. 4px, 0.5rem, 50% for circle" />
 			<field name="swiper_margin_top_bottom_feat" type="text"  default="0px" label="margin top/bottom" description="This is the margin applied at top and bottom of the items" />
 			<field name="swiper_margin_left_right_feat" type="text"  default="0px" label="margin left/right" description="This is the margin applied at left and right of the items" />
@@ -164,7 +164,7 @@
 				<option value="dotted">Dotted</option>
 				<option value="double">Double</option>
 			</field>
-			<field name="swiper_border_color" type="color" default="#cccccc" label="border color" description="This is the border color applied around the items" />
+			<field name="swiper_border_color" type="fccolor" default="#cccccc" label="border color" description="This is the border color applied around the items" />
 			<field name="swiper_border_radius" type="text" default="0" label="border radius" description="e.g. 4px, 0.5rem, 50% for circle" />
 			<field name="swiper_margin_top_bottom" type="text" default="0" label="margin top/bottom" description="This is the margin applied at top and bottom of the items" />
 			<field name="swiper_margin_left_right" type="text" default="0" label="margin left/right" description="This is the margin applied at left and right of the items" />
@@ -172,8 +172,8 @@
 			<field name="item_tab_swiper" type="separator" default="Swiper options" description="..." icon_class="icon-refresh" level="tab_open" box_type="1" />
 
 			<field name="" type="separator" default="Colors" level="level2" />
-			<field name="swiper_accent_color" type="color" format="hex" default="#007aff" label="Accent color" description="Theme color of the carousel: active pagination dot, progress bar fill and active thumbnail border. Navigation arrows keep their own color." />
-			<field name="swiper_nav_color" type="color" format="hex" default="" label="Navigation arrows color" description="Color of the previous/next navigation arrows. Leave empty to fall back to the accent color." />
+			<field name="swiper_accent_color" type="fccolor" format="hex" default="#007aff" label="Accent color" description="Theme color of the carousel: active pagination dot, progress bar fill and active thumbnail border. Navigation arrows keep their own color." />
+			<field name="swiper_nav_color" type="fccolor" format="hex" default="" label="Navigation arrows color" description="Color of the previous/next navigation arrows. Leave empty to fall back to the accent color." />
 
 			<field name="" type="separator" default="Carousel size" level="level2" />
 			<field name="swiper_slide_height" type="text" default="" label="Slide height" description="Controls the height of each slide cell. Leave empty for natural height (content sized by its own image and text). Enter a number in pixels (e.g. 400) for a uniform height, or an aspect-ratio like 16/9 or 4/3 for a height that scales with the slide width. When set, items are clipped to the cell (content that does not fit is hidden) so the carousel keeps a clean uniform look. Grid and vertical modes always need a defined height: if left empty, grids automatically get a 16:9 area while vertical mode gets a fixed height capped at 70vh/420px. When all items only contain a short text, check the 'Force same height' option of each item instead." />

@@ -498,7 +498,7 @@ class FlexicontentViewTags extends FlexicontentViewBaseRecords
 			{
 				$popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&view=tags&layout=import&tmpl=component';
 				$btn_name = 'import';
-				$full_js="var url = jQuery(this).data('taskurl'); fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 0, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
+				$full_js="var url = this.dataset.taskurl; fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 0, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
 							.$loading_msg."<\/span>'; window.location.reload(false)}, {'title': '".flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_MASS_TAGS_IMPORT'), 2)."'}); return false;";
 				$btn_arr[] = flexicontent_html::addToolBarButton(
 					'FLEXI_MASS_TAGS_IMPORT', $btn_name, $full_js,
@@ -510,7 +510,7 @@ class FlexicontentViewTags extends FlexicontentViewBaseRecords
 
 				$popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&view=tags&layout=indexer&tmpl=component&indexer=tag_mappings';
 				$btn_name = 'verify_mapping';
-				$full_js="if (!confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_VERIFY_TAG_MAPPINGS_DESC'), 2)) . "')) return false; var url = jQuery(this).data('taskurl'); fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
+				$full_js="if (!confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_VERIFY_TAG_MAPPINGS_DESC'), 2)) . "')) return false; var url = this.dataset.taskurl; fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
 							.$loading_msg."<\/span>'; window.location.reload(false)}, {'title': '".flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_VERIFY_TAG_MAPPINGS'), 2)."'}); return false;";
 				$btn_arr[] = flexicontent_html::addToolBarButton(
 					'FLEXI_VERIFY_TAG_MAPPINGS', $btn_name, $full_js,
@@ -538,7 +538,7 @@ class FlexicontentViewTags extends FlexicontentViewBaseRecords
 		if ($js)
 		{
 			$document->addScriptDeclaration('
-				jQuery(document).ready(function(){
+				FlexiForm.ready(function(){
 					' . $js . '
 				});
 			');

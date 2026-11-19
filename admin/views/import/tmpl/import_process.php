@@ -34,140 +34,17 @@ $import_task = 'task=import.';
 	<?php echo \Joomla\CMS\HTML\HTMLHelper::_( 'form.token' ); ?>
 </form>
 
+<?php
+flexicontent_html::loadFramework('flexi-lib');
+\Joomla\CMS\Factory::getApplication()->getDocument()->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/assets/js/admin-actions.js', array('version' => FLEXI_VHASH));
+?>
 <script>
-
-jQuery(document).ready(function()
-{
-	var items_per_call = <?php echo (int) $this->conf['items_per_step']; ?>;
-	var width = 0;
-	var looper = 0;
-	var onesector = 1000;
-	var items_length = 0;
-	var number = 0;
-	var form_token = '';
-
-	function debugLog(msg) {
-		console.log('[FC Import] ' + msg);
-		jQuery('div#debuglog').append('<div>' + msg + '</div>');
-	}
-
-	// Extract readable error text (title + body text) from a server error page (e.g. Joomla error page)
-	function extractServerError(html) {
-		try {
-			var doc = new DOMParser().parseFromString(html, 'text/html');
-			var title = (doc.title || '').trim();
-			var text = doc.body ? doc.body.innerText.replace(/\n{3,}/g, '\n\n').trim() : '';
-			return (title ? 'PAGE TITLE: ' + title + '\n' : '') + text.substring(0, 4000);
-		} catch (e) {
-			return html.substring(0, 4000);
-		}
-	}
-
-	function debugLogServerError(responseText) {
-		debugLog('Server error page text:<br/><pre style="white-space:pre-wrap; color:#900;">'
-			+ extractServerError(responseText).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-			+ '</pre>');
-	}
-
-	function updateprogress()
-	{
-		//alert(' ' +looper + '>=' + number);
-		if (looper>=number && looper)
-		{
-			// Failed items are marked by the server, an item may be partially created (e.g. title only) if its fields failed to save
-			var failed = jQuery('div#statuslog .fc_import_failed').length;
-
-			if (failed)
-			{
-				jQuery('div#statuscomment').html(jQuery('div#statuscomment').text() + ' , IMPORT FINISHED WITH <b>' + failed + ' FAILED ITEM(S)</b>.'
-					+ ' Failed items may have been created partially (e.g. title only), please review them and the import log file (logs folder).');
-				jQuery('div#fc_import_failed_box').html('<b>' + failed + '</b> item(s) failed to import, see the red lines below').show();
-			}
-			else
-			{
-				jQuery('div#statuscomment').html( jQuery('div#statuscomment').text() + ' , IMPORT FINISHED. You can review AND/OR RESET import process');
-			}
-			return;
-		}
-
-		var ajax_url = "index.php?option=com_flexicontent&<?php echo $import_task; ?>importcsv&items_per_call="
-			+items_per_call+"&itemcnt="+looper+'&'+form_token+'=1';
-
-		debugLog('importcsv AJAX call: looper=' + looper + ' number=' + number + ' token=' + form_token);
-
-		jQuery.ajax({
-			url: ajax_url,
-			success: function(response, status2, xhr2) {
-				var preview = response.substring(0, 300).replace(/</g,'&lt;').replace(/>/g,'&gt;');
-				debugLog('importcsv response HTTP=' + xhr2.status + ' length=' + response.length + ' preview: ' + preview);
-				var arr = response.split('||||');
-				if(arr[0]=='fail') {
-					jQuery('div#statuscomment').html(arr[1]);
-					looper = number;
-					return;
-				} else if(arr[0] !== 'success') {
-					debugLog('<span style="color:red">Unexpected importcsv response (not success/fail). First 200 chars: ' + preview.substring(0,200) + '</span>');
-					jQuery('div#statuscomment').html('<span style="color:red">Unexpected server response &mdash; check debuglog below</span>');
-					looper = number;
-					return;
-				} else {
-					form_token = arr[1];
-				}
-				width = onesector*looper;
-				if (width>300) width = 300;
-				percent = width/3;
-				jQuery('div#insideprogress').css('width', width+'px');
-				jQuery('div#updatepercent').text(' '+percent.toFixed(2)+' %');
-				jQuery('div#statuscomment').html((looper<number?looper:number)+' / '+number+' items ');
-				jQuery('div#statuslog').append(arr[2]);
-				setTimeout(updateprogress, 20);  // milliseconds to delay updating the HTML display
-			},
-			error: function(xhr, status, error) {
-				debugLog('<span style="color:red">importcsv AJAX ERROR: HTTP=' + xhr.status + ' status=' + status + ' error=' + error + '</span>');
-				debugLogServerError(xhr.responseText);
-				jQuery('div#statuscomment').html('<span style="color:red">AJAX error: ' + status + ' (HTTP ' + xhr.status + ') &mdash; check debuglog below</span>');
-			}
-		});
-		looper=looper+items_per_call;
-	}
-
-	debugLog('Calling getlineno...');
-
-	jQuery.ajax({
-		url: "index.php?option=com_flexicontent&<?php echo $import_task; ?>getlineno&format=raw",
-		success: function(response, status, xhr) {
-			debugLog('getlineno response HTTP=' + xhr.status + ' raw=[' + response + ']');
-			var arr = response.split('|');
-			if(arr[0]=='fail') {
-				debugLog('<span style="color:red">getlineno FAIL: session conf not found or empty</span>');
-				jQuery('div#statuscomment').html('<span style="color:red">Session error: import config not found. Please go back and re-initialize the import.</span>');
-				return;
-			}
-
-			items_length = arr[1];
-			items_lineno = arr[2];
-			form_token = arr[3];
-			number = parseInt(items_length);
-			onesector = (number==0)?300:(300/number);
-			looper = parseInt(items_lineno);
-			debugLog('getlineno OK: items=' + number + ' lineno=' + looper);
-			if(looper>=number && looper) {
-				var msg = 'IMPORT already FINISHED. Please RESET import process';
-				alert(msg);
-				jQuery('div#statuscomment').html( msg );
-				return;
-			} else {
-				updateprogress();
-			}
-		},
-		error: function(xhr, status, error) {
-			debugLog('<span style="color:red">getlineno AJAX ERROR: HTTP=' + xhr.status + ' status=' + status + ' error=' + error + '</span>');
-			debugLogServerError(xhr.responseText);
-			jQuery('div#statuscomment').html('<span style="color:red">AJAX error on getlineno: ' + status + ' &mdash; check debuglog below</span>');
-		}
-	});
-});
-
+FlexiForm.ready(() => FlexiAdmin.runImport(<?php echo json_encode(array(
+ 'countUrl' => 'index.php?option=com_flexicontent&task=import.getlineno&format=raw',
+ // The CSV writer is in the HTML controller; only getlineno uses the raw controller.
+ 'importUrl' => 'index.php?option=com_flexicontent&task=import.importcsv',
+ 'batch' => (int) $this->conf['items_per_step'],
+)); ?>));
 </script>
 
 <style>

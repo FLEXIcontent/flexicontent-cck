@@ -21,34 +21,12 @@ defined('_JEXEC') or die('Restricted access');
 $ctrl_task = FLEXI_J16GE ? 'task=templates.' : 'controller=templates&task=';
 ?>
 
+<?php
+flexicontent_html::loadFramework('flexi-lib');
+\Joomla\CMS\Factory::getApplication()->getDocument()->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/assets/js/admin-actions.js', array('version' => FLEXI_VHASH));
+?>
 <script>
-(function ($) {
-
-	$(document).ready(function() {
-
-		var ajaxloader = '<span class="ajax-loader"><\/span>';
-		var adminForm = $('#adminForm');
-		var log_bind = $('#log-bind');
-
-		adminForm.on('submit', function(e, data)
-		{
-			e.preventDefault();
-			log_bind.html(ajaxloader);
-
-			$.ajax({
-				type: 'POST',
-				data: adminForm.serialize(),
-				url:  adminForm.prop('action'),
-				success: function(str) {
-					log_bind.html(str);
-				}
-			});
-
-		});
-
-	});
-
-})(jQuery);
+FlexiForm.ready(() => FlexiAdmin.bindResultForm(document.getElementById('adminForm'), document.getElementById('log-bind')));
 </script>
 
 <form action="index.php?option=com_flexicontent&<?php echo $ctrl_task; ?>duplicate&layout=duplicate&<?php echo FLEXI_J16GE ? 'format=raw' : 'tmpl=component';?>" method="post" name="adminForm" id="adminForm">

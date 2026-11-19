@@ -292,6 +292,14 @@ $controller	= \Joomla\CMS\MVC\Controller\BaseController::getInstance('Flexiconte
 
 $controller->execute( $task );
 
+if ($format === 'html' && FLEXI_J40GE)
+{
+	$admin_assets = \Joomla\CMS\Uri\Uri::root(true) . '/administrator/components/com_flexicontent/assets/';
+	$document->addStyleSheet($admin_assets . 'css/native-admin.css', array('version' => FLEXI_VHASH));
+	$document->addScript($admin_assets . 'js/native-admin-layout.js', array('version' => FLEXI_VHASH), array('defer' => true));
+	\Joomla\CMS\Language\Text::script('FLEXI_SCROLL_TABLE');
+}
+
 // Redirect if set by the controller
 $controller->redirect();
 

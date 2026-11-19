@@ -372,7 +372,7 @@ class flexicontent_html
 				$less->setFormatter('compressed');
 			}
 
-			// wikimedia/less.php nécessite les répertoires d'import explicites
+			// wikimedia/less.php requires explicit import directories
 			$importDirs = array_merge(
 				array(dirname($path . $in) . DS),
 				$inc_paths,
@@ -1208,7 +1208,6 @@ class flexicontent_html
 					'.implode('', $options).'
 				</fieldset>
 			';
-			Factory::getApplication()->getDocument()->addScriptDeclaration('jQuery(document).ready(function(){ jQuery(\'input[name="'.$layout_type.'"]\').click( function() { adminFormPrepare(this.form, 2); }); });');
 		}
 		return $outside_label.$html;
 	}
@@ -1476,8 +1475,8 @@ class flexicontent_html
 		$input = $app->getInput();
 		$view = $input->getCmd('view', 'flexicontent');
 		return FLEXI_J40GE && $app->isClient('administrator')
-			&& (($view === 'flexicontent' && in_array($input->getCmd('layout', ''), ['', 'default'], true)) || in_array($view, array(
-				'item', 'items', 'field', 'type', 'template', 'filemanager', 'fileselement',
+			&& (($input->getCmd('option') === 'com_config' && $input->getCmd('component') === 'com_flexicontent') || in_array($input->getCmd('option'), ['com_modules', 'com_menus'], true) || ($view === 'flexicontent' && in_array($input->getCmd('layout', ''), ['', 'default'], true)) || in_array($view, array(
+				'item', 'items', 'itemcompare', 'itemelement', 'tagelement', 'field', 'fields', 'type', 'types', 'tag', 'tags', 'template', 'templates', 'category', 'categories', 'users', 'groups', 'stats', 'search', 'import', 'file', 'filemanager', 'fileselement',
 			), true));
 	}
 
@@ -1571,7 +1570,7 @@ class flexicontent_html
 			case 'touch-punch':
 				$mobileDetector = flexicontent_html::getMobileDetector();
 				$isMobile = $mobileDetector->isMobile() || $mobileDetector->isTablet();
-				if ($isMobile)
+				if ($isMobile && $load_jquery)
 				{
 					if ($load_jquery) flexicontent_html::loadJQuery();
 					$document->addScript(\Joomla\CMS\Uri\Uri::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.touch-punch.min.js');
@@ -1586,7 +1585,6 @@ class flexicontent_html
 				$url_grapjs_css = 'https://unpkg.com/grapesjs@' . $grapjs_vers . '/dist/css/grapes.min.css';
 				$url_grapjs_js = 'https://unpkg.com/grapesjs@' . $grapjs_vers . '/dist/grapes.min.js';
 
-				$document->addStyleSheet($framework_path.'/stylesheets/toastr.min.css');
 				$document->addStyleSheet($url_grapjs_css);
 				$document->addStyleSheet($framework_path.'/stylesheets/grapesjs-preset-webpage.min.css?0.1.10');
 				$document->addStyleSheet($framework_path.'/stylesheets/tooltip.css');
@@ -1594,7 +1592,7 @@ class flexicontent_html
 				$document->addStyleSheet($framework_path.'/stylesheets/demos.css');
 
 				$document->addScript('https://static.filestackapi.com/v3/filestack.js');
-				$document->addScript($framework_path.'/js/toastr.min.js');
+				flexicontent_html::loadFramework('flexi-lib');
 				$document->addScript($url_grapjs_js);
 
 
@@ -1973,6 +1971,10 @@ class flexicontent_html
 
 			case 'flexi-lib':
 				flexicontent_html::loadFramework('form-utils');
+				if (version_compare(JVERSION, '5.0', '>='))
+				{
+					$document->getWebAssetManager()->useScript('joomla.dialog-autocreate')->useScript('messages');
+				}
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
 				flexicontent_html::loadFramework('flexi_js_common');
@@ -2031,10 +2033,10 @@ class flexicontent_html
 				);
 
 				if ( $cparams->get('page_reloading_enable', 1) ) :
-					// Choices.js mode keeps the site front free of jQuery, so the overlay is only added when jQuery is there
+					// Preserve configured progress styling on native forms.
 					$js .= '
-						if (window.jQuery) jQuery( document ).ready(function() {
-							jQuery("body").prepend(\'\\
+						FlexiForm.ready(function() {
+							if (!document.getElementById("fc_filter_form_blocker")) document.body.insertAdjacentHTML("afterbegin", \'\\
 								<div id="fc_filter_form_blocker" style="display: none;">\\
 									<div class="fc_blocker_overlay" style="' . $styles->overlay_box . '"></div>\\
 									<div class="fc_blocker_content" style="' . $styles->content_box . '">\\
@@ -6137,6 +6139,7 @@ class flexicontent_html
 		$tbname = 'toolbar'
 	)
 	{
+		self::loadFramework('flexi-lib');
 		if (FLEXI_J40GE) {
 		$toolbar = \Joomla\CMS\Toolbar\Toolbar::getInstance($tbname);
 		} else {
@@ -6156,7 +6159,7 @@ class flexicontent_html
 			$full_js = $extra_js ."; Joomla.submitbutton('$task');";
 			if ($confirm)
 			{
-				$full_js = "if (confirm('".$confirm_msg."')) { ".$full_js." }";
+				$full_js = "if (await FlexiForm.confirm('".$confirm_msg."')) { ".$full_js." }";
 			}
 			if (!$menu)
 			{
@@ -6166,9 +6169,13 @@ class flexicontent_html
 
 		if ($list)
 		{
-			$full_js = "if (document.adminForm.boxchecked.value==0) { alert('".$err_msg."') ;} else { ".$full_js." }";
+			$full_js = "if (document.adminForm.boxchecked.value==0) { FlexiForm.alert('".$err_msg."') ;} else { ".$full_js." }";
 		}
 
+		if (strpos($full_js, 'await FlexiForm.confirm(') !== false)
+		{
+			$full_js = "(async () => { " . $full_js . " })(); return false;";
+		}
 		$full_js = "javascript: $full_js";
 
 		$button_html	= '
@@ -6244,9 +6251,10 @@ class flexicontent_html
 			$drop_btn = str_replace('<button ', '<button id="btngroup_id_' . $btngroup_id . '" ', $drop_btn);
 		}
 
+		$primary_button = str_replace('_DDI_class_', '', array_shift($btn_arr));
 		$buttons_html = '
 			<div class="buttons btn-group' . (FLEXI_J40GE ? ' dropdown' : '') . '">
-				'.array_shift($btn_arr).'
+				'.$primary_button.'
 			  '.($drop_btn ?: '
 			  <button class="' . $drop_btn_class . '"
 					' . (FLEXI_J40GE ? ' data-bs-toggle="dropdown" ' : ' data-toggle="dropdown" ') .'

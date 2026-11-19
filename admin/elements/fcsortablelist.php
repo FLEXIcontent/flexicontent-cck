@@ -56,7 +56,7 @@ class JFormFieldFcSortableList extends \Joomla\CMS\Form\FormField
 	
 	function add_css_js()
 	{
-		flexicontent_html::loadJQuery();
+		flexicontent_html::loadFramework('flexi-lib-form');
 
 		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$js = "";

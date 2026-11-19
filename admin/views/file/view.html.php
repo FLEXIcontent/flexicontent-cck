@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * @package         FLEXIcontent
  * @version         3.3

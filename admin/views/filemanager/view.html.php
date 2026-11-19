@@ -820,7 +820,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 			$btn_arr = array();
 			$confirm_js = function ($msg_key) use ($contrl)
 			{
-				return "if (confirm('" . flexicontent_html::escapeJsText(\Joomla\CMS\Language\Text::_($msg_key), 'd') . "')) { Joomla.submitbutton('%s', 'adminForm', false); } return false;";
+				return "if (await FlexiForm.confirm('" . flexicontent_html::escapeJsText(\Joomla\CMS\Language\Text::_($msg_key), 'd') . "')) { Joomla.submitbutton('%s', 'adminForm', false); } return false;";
 			};
 
 			$btn_arr[] = $mk_btn(
@@ -856,7 +856,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 			$popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&amp;view=filemanager&amp;layout=indexer&amp;tmpl=component&amp;indexer=filemanager_stats';
 			$btn_text = \Joomla\CMS\Language\Text::_('FLEXI_INDEX_FILE_STATISTICS') . ' (' . \Joomla\CMS\Language\Text::_('FLEXI_SIZE') . ', ' . \Joomla\CMS\Language\Text::_('FLEXI_USAGE') . ' )';
 			$btn_name = 'index_files_stats';
-			$full_js="if (!confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_INDEX_FILE_STATISTICS_DESC'), 'd')) . "')) return false; var url = this.dataset.taskurl; fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
+			$full_js="if (!(await FlexiForm.confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_INDEX_FILE_STATISTICS_DESC'), 'd')) . "'))) return false; var url = this.dataset.taskurl; fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
 						.$loading_msg."<\/span>'; window.location.reload(false)}, {'title': '".flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_INDEX_FILE_STATISTICS'), 'd')."'}); return false;";
 			$btn_arr[] = flexicontent_html::addToolBarButton(
 				$btn_text, $btn_name, $full_js,
@@ -869,7 +869,7 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 			$popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&amp;view=filemanager&amp;layout=indexer&amp;tmpl=component&amp;indexer=filemanager_stats&amp;index_urls=1';
 			$btn_text = \Joomla\CMS\Language\Text::_('FLEXI_INDEX_FILE_STATISTICS') . ' (' . \Joomla\CMS\Language\Text::_('FLEXI_SIZE') . ', ' . \Joomla\CMS\Language\Text::_('FLEXI_USAGE') . ', ' . \Joomla\CMS\Language\Text::_('FLEXI_URL') . ' )';
 			$btn_name = 'index_files_urls_stats';
-			$full_js="if (!confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_INDEX_FILE_STATISTICS_DESC'), 'd')) . "')) return false; var url = this.dataset.taskurl; fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
+			$full_js="if (!(await FlexiForm.confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_INDEX_FILE_STATISTICS_DESC'), 'd')) . "'))) return false; var url = this.dataset.taskurl; fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
 						.$loading_msg."<\/span>'; window.location.reload(false)}, {'title': '".flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_INDEX_FILE_STATISTICS'), 'd')."'}); return false;";
 			$btn_arr[] = flexicontent_html::addToolBarButton(
 				$btn_text, $btn_name, $full_js,
@@ -886,8 +886,8 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 			$confirm_msg      = flexicontent_html::escapeJsText(\Joomla\CMS\Language\Text::_('FLEXI_RECALCULATE_SIZES_SELECTED_DESC'), 'd');
 			$dialog_title     = flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_RECALCULATE_SIZES_SELECTED'), 'd');
 			$full_js = "var cid = Array.from(document.querySelectorAll('[name=\"cid[]\"]:checked'), input => input.value);"
-				. " if (!cid.length) { alert('" . $no_selection_msg . "'); return false; }"
-				. " if (!confirm('" . $confirm_msg . "')) return false;"
+				. " if (!cid.length) { FlexiForm.alert('" . $no_selection_msg . "'); return false; }"
+				. " if (!(await FlexiForm.confirm('" . $confirm_msg . "'))) return false;"
 				. " var url = this.dataset.taskurl + '&selected_ids=' + cid.join(',');"
 				. " fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">" . $loading_msg . "<\\/span>'; window.location.reload(false)}, {'title': '" . $dialog_title . "'});"
 				. " return false;";

@@ -44,7 +44,7 @@ window.FlexiFieldRepeater = (() => {
       if (!previous?.isConnected) return 'cancel';
       const count = container ? container.children.length : groupCount;
       if (!remove_previous && config.max && count >= config.max) {
-        alert(FlexiForm.text('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + config.max);
+        FlexiForm.alert(FlexiForm.text('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + config.max);
         return 'cancel';
       }
       const row = FlexiForm.cloneFieldRow(previous);

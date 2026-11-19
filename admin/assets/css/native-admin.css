@@ -1,0 +1,47 @@
+/* Keep wide manager tables inside Atum's flex column. */
+body.com_flexicontent .container-main,
+#flexicontent #j-main-container,
+#fc-fileman-fileslist-col,
+#fc-fileman-addfiles-col {
+  min-width: 0;
+}
+#flexicontent .fc-table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  margin-block-end: 1rem;
+}
+#flexicontent .fc-table-scroll > table.fcmanlist {
+  margin-block-end: 0;
+}
+#flexicontent .fc-table-scroll:focus-visible {
+  outline: 2px solid var(--focus, var(--link-color, #0d6efd));
+  outline-offset: 2px;
+}
+#flexicontent table.fc-table-list.fc-tbl-short {
+  min-width: 0;
+}
+@media (max-width: 991.98px) {
+  #fc-fileman-fileslist-col, #fc-fileman-addfiles-col {
+    width: 100%;
+    flex: 0 0 100%;
+  }
+  #fc-fileman-addfiles-col { margin-block-start: 1rem; }
+}
+@media (max-width: 575.98px) {
+  body.view-stats #flexicontent .col-2 { width: 50%; flex: 0 0 50%; }
+  body.view-stats #flexicontent .btn-block { max-width: 100%; white-space: normal; }
+  body.view-import #flexicontent .fc-form-tbl,
+  body.view-import #flexicontent .fc-form-tbl > tbody,
+  body.view-import #flexicontent .fc-form-tbl > tbody > tr,
+  body.view-import #flexicontent .fc-form-tbl > tbody > tr > td {
+    display: block;
+    width: 100% !important;
+    max-width: 100%;
+  }
+  body.view-import #flexicontent .fc-form-tbl .key { padding-block-end: .25rem; }
+  body.view-import #flexicontent .fc-form-tbl .data { padding-block-end: .75rem; }
+  body.view-import #flexicontent .fc-form-tbl input,
+  body.view-import #flexicontent .fc-form-tbl select,
+  body.view-import #flexicontent .fc-form-tbl textarea,
+  body.view-import #flexicontent .fc-form-tbl .choices { max-width: 100%; }
+}

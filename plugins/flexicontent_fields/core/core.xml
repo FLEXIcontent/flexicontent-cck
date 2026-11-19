@@ -1096,8 +1096,8 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="stars_color" type="color" default="#FFB400" label="FLEXI_FIELD_VOTE_STARS_COLOR" description="FLEXI_FIELD_VOTE_STARS_COLOR_DESC" />
-			<field name="stars_color_empty" type="color" default="#CCCCCC" label="FLEXI_FIELD_VOTE_STARS_COLOR_EMPTY" description="FLEXI_FIELD_VOTE_STARS_COLOR_EMPTY_DESC" />
+			<field name="stars_color" type="fccolor" default="#FFB400" label="FLEXI_FIELD_VOTE_STARS_COLOR" description="FLEXI_FIELD_VOTE_STARS_COLOR_DESC" />
+			<field name="stars_color_empty" type="fccolor" default="#CCCCCC" label="FLEXI_FIELD_VOTE_STARS_COLOR_EMPTY" description="FLEXI_FIELD_VOTE_STARS_COLOR_EMPTY_DESC" />
 
 			<field name="" type="separator" default="FLEXI_FIELD_LABEL_AND_ACCESS" level="level2" />
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">

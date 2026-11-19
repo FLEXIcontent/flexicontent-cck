@@ -207,18 +207,18 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 
 		if ($filter_state)
 		{
-			$js .= "jQuery('.col_status').addClass('filtered_column');";
+			$js .= "document.querySelectorAll('.col_status').forEach(el => el.classList.add('filtered_column'));";
 		}
-		if (strlen($search)) $js .= "jQuery('.col_title').addClass('filtered_column');";
-		if ($filter_cats)    $js .= "jQuery('.col_cats').addClass('filtered_column');";
-		if ($filter_type)    $js .= "jQuery('.col_type').addClass('filtered_column');";
-		if ($filter_author)  $js .= "jQuery('.col_authors').addClass('filtered_column');";
-		if ($filter_lang)    $js .= "jQuery('.col_lang').addClass('filtered_column');";
-		if ($filter_access)  $js .= "jQuery('.col_access').addClass('filtered_column');";
+		if (strlen($search)) $js .= "document.querySelectorAll('.col_title').forEach(el => el.classList.add('filtered_column'));";
+		if ($filter_cats)    $js .= "document.querySelectorAll('.col_cats').forEach(el => el.classList.add('filtered_column'));";
+		if ($filter_type)    $js .= "document.querySelectorAll('.col_type').forEach(el => el.classList.add('filtered_column'));";
+		if ($filter_author)  $js .= "document.querySelectorAll('.col_authors').forEach(el => el.classList.add('filtered_column'));";
+		if ($filter_lang)    $js .= "document.querySelectorAll('.col_lang').forEach(el => el.classList.add('filtered_column'));";
+		if ($filter_access)  $js .= "document.querySelectorAll('.col_access').forEach(el => el.classList.add('filtered_column'));";
 		if ($js)
 		{
 			$document->addScriptDeclaration('
-				jQuery(document).ready(function(){
+				FlexiForm.ready(function(){
 					' . $js . '
 				});
 			');
@@ -317,9 +317,9 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 					$displaytype = '-',
 					array(
 						'class' => $this->select_class,
-						'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
-						'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(jQuery(this).val()); if (this.valChanged && this != document.activeElement) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
-						'onblur' => 'this.oVal = jQuery(this).val(); if (this.valChanged) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
+						'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = FlexiForm.value(this); this.valChanged = false;',
+						'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(FlexiForm.value(this)); if (this.valChanged && this != document.activeElement) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
+						'onblur' => 'this.oVal = FlexiForm.value(this); if (this.valChanged) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
 						'placeholder' => $filt_placeholder,
 					),
 					$elementid
@@ -352,9 +352,9 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 					$displaytype = '-',
 					array(
 						'class' => $this->select_class,
-						'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
-						'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(jQuery(this).val()); if (this.valChanged && this != document.activeElement) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
-						'onblur' => 'this.oVal = jQuery(this).val(); if (this.valChanged) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
+						'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = FlexiForm.value(this); this.valChanged = false;',
+						'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(FlexiForm.value(this)); if (this.valChanged && this != document.activeElement) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
+						'onblur' => 'this.oVal = FlexiForm.value(this); if (this.valChanged) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
 					)
 				),
 			));
@@ -382,9 +382,9 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 					$fieldname,
 					array(
 						'class' => $this->select_class,
-						'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
-						'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(jQuery(this).val()); if (this.valChanged && this != document.activeElement) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
-						'onblur' => 'this.oVal = jQuery(this).val(); if (this.valChanged) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
+						'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = FlexiForm.value(this); this.valChanged = false;',
+						'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(FlexiForm.value(this)); if (this.valChanged && this != document.activeElement) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
+						'onblur' => 'this.oVal = FlexiForm.value(this); if (this.valChanged) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
 					),
 					$value,
 					$displaytype = '-'
@@ -450,9 +450,9 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 				$fieldname,
 				array(
 					'class' => $this->select_class,
-					'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
-					'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(jQuery(this).val()); if (this.valChanged && this != document.activeElement) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
-					'onblur' => 'this.oVal = jQuery(this).val(); if (this.valChanged) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
+					'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = FlexiForm.value(this); this.valChanged = false;',
+					'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(FlexiForm.value(this)); if (this.valChanged && this != document.activeElement) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
+					'onblur' => 'this.oVal = FlexiForm.value(this); if (this.valChanged) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
 				),
 				'value',
 				'text',
@@ -511,9 +511,9 @@ class FlexicontentViewItemelement extends FlexicontentViewBaseRecords
 				$fieldname,
 				array(
 					'class' => $this->select_class,
-					'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = jQuery(this).val(); this.valChanged = false;',
-					'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(jQuery(this).val()); if (this.valChanged && this != document.activeElement) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
-					'onblur' => 'this.oVal = jQuery(this).val(); if (this.valChanged) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
+					'onmouseenter' => 'if (typeof this.oVal == \'undefined\') this.oVal = FlexiForm.value(this); this.valChanged = false;',
+					'onchange' => 'this.valChanged = JSON.stringify(this.oVal) !== JSON.stringify(FlexiForm.value(this)); if (this.valChanged && this != document.activeElement) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
+					'onblur' => 'this.oVal = FlexiForm.value(this); if (this.valChanged) {if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();}',
 				),
 				'value',
 				'text',

@@ -15,8 +15,8 @@
 		
 		<fieldset name="layout" addfieldpath="/administrator/components/com_flexicontent/elements">
 
-			<field name="PPFX_accent_color" type="color" format="hex" default="#007aff" label="Accent color" description="Theme color of the gallery: active pagination dot, progress bar fill and active thumbnail border. Navigation arrows keep their own color." />
-			<field name="PPFX_nav_color" type="color" format="hex" default="#007aff" label="Navigation arrows color" description="Color of the previous/next navigation arrows. Leave empty to fall back to the accent color." />
+			<field name="PPFX_accent_color" type="fccolor" format="hex" default="#007aff" label="Accent color" description="Theme color of the gallery: active pagination dot, progress bar fill and active thumbnail border. Navigation arrows keep their own color." />
+			<field name="PPFX_nav_color" type="fccolor" format="hex" default="#007aff" label="Navigation arrows color" description="Color of the previous/next navigation arrows. Leave empty to fall back to the accent color." />
 
 		<field name="" type="separator" default="FLEXI_FIELD_IMAGE_CAROUSEL_OPTIONS" level="level2" />
 

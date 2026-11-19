@@ -1658,7 +1658,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 			$task_url  = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&view=items&format=csv&items_set=selected';
 
 			$full_js = "var cid = Array.from(document.querySelectorAll(\"input[name='cid[]']:checked\"), input => input.value); "
-				. "if (!cid.length) { alert('" . \Joomla\CMS\Language\Text::_('FLEXI_NO_ITEMS_SELECTED', true) . "'); return false; } "
+				. "if (!cid.length) { FlexiForm.alert('" . \Joomla\CMS\Language\Text::_('FLEXI_NO_ITEMS_SELECTED', true) . "'); return false; } "
 				. "window.location.replace('" . $task_url . "&' + cid.map(function(el){ return 'cid[]=' + encodeURIComponent(el); }).join('&')); return false;";
 			$btn_arr[] = flexicontent_html::addToolBarButton(
 				$btn_title, 'csvexport_selected', $full_js, $msg_alert='', $msg_confirm='',
@@ -1699,7 +1699,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		{
 			$popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&amp;view=items&amp;layout=indexer&amp;tmpl=component&amp;indexer=tag_assignments';
 			$btn_name = 'sync_tags';
-			$full_js="if (!confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_2WAY_TAG_ASSIGNMENTS_SYNC_DESC'), 2)) . "')) return false; var url = this.dataset.taskurl; fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
+			$full_js="if (!(await FlexiForm.confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_2WAY_TAG_ASSIGNMENTS_SYNC_DESC'), 2)) . "'))) return false; var url = this.dataset.taskurl; fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
 						.$loading_msg."<\/span>'; window.location.reload(false)}, {'title': '".flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_2WAY_TAG_ASSIGNMENTS_SYNC'), 2)."'}); return false;";
 			$btn_arr[] = flexicontent_html::addToolBarButton(
 				'FLEXI_2WAY_TAG_ASSIGNMENTS_SYNC', $btn_name, $full_js,
@@ -1714,7 +1714,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				{
 						$popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&amp;view=items&amp;layout=indexer&amp;tmpl=component&amp;indexer=resave';
 						$btn_name = 'recalculate_alias';
-						$full_js="if (!confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('Recalculate item aliases. <br>Only for new websites <br>as this can destroy your existing SEO ranks'), 2)) . "')) return false; var url = this.dataset.taskurl; fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
+						$full_js="if (!(await FlexiForm.confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('Recalculate item aliases. <br>Only for new websites <br>as this can destroy your existing SEO ranks'), 2)) . "'))) return false; var url = this.dataset.taskurl; fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
 												.$loading_msg."<\/span>'; window.location.reload(false)}, {'title': '".flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('Recalculate aliases for all items'), 2)."'}); return false;";
 						$btn_arr[] = flexicontent_html::addToolBarButton(
 								'Recalculate aliases for all items', $btn_name, $full_js,
@@ -1729,8 +1729,8 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 						$confirm_msg = str_replace('<br>', '\\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('Recalculate item aliases. <br>Only for new websites <br>as this can destroy your existing SEO ranks'), 2));
 						$modal_title = flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('Recalculate aliases for selected items'), 2);
 						$full_js = "var cid = Array.from(document.querySelectorAll(\"input[name='cid[]']:checked\"), input => input.value); "
-								. "if (!cid.length) { alert('" . $no_selection_alert . "'); return false; } "
-								. "if (!confirm('" . $confirm_msg . "')) return false; "
+								. "if (!cid.length) { FlexiForm.alert('" . $no_selection_alert . "'); return false; } "
+								. "if (!(await FlexiForm.confirm('" . $confirm_msg . "'))) return false; "
 								. "var url = this.dataset.taskurl; "
 								. "url += '&' + cid.map(function(el){ return 'cid[]=' + encodeURIComponent(el); }).join('&'); "
 								. "fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\\\"fc_loading_msg\\\">"

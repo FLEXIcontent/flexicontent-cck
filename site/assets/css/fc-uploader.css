@@ -5,6 +5,12 @@
   padding: .5rem;
 }
 
+/* The legacy plupload container reserves 530px even inside a smaller column. */
+#flexicontent .fc_file_uploader .fc-native-upload.plupload_container {
+  min-width: 0;
+  max-width: 100%;
+}
+
 .fc_auto_uploader > .fc-native-upload {
   border: 0;
   padding: 0;

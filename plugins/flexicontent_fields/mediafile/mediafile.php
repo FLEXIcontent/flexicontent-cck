@@ -780,6 +780,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 
 			\Joomla\CMS\Language\Text::script('PLG_FLEXICONTENT_FIELDS_MEDIAFILE_RESPONSE_PARSING_FAILED', false);
 			\Joomla\CMS\Language\Text::script('PLG_FLEXICONTENT_FIELDS_MEDIAFILE_FILE_NOT_FOUND', false);
+			\Joomla\CMS\Language\Text::script('FLEXI_FIELD_MEDIAFILE_PLAYBACK_LOAD_FAILED');
 
 			//flexicontent_html::loadFramework('wavesurfer');
 			flexicontent_html::loadFramework('flexi-lib');

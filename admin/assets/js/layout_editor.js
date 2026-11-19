@@ -109,10 +109,10 @@
 		const path = byId('editor__file_subpath').value;
 		const layout = byId('editor__layout_name').value;
 		if (!path) {
-			alert(FlexiForm.text('FLEXI_TMPLS_LOAD_FILE_BEFORE_SAVING'));
+			FlexiForm.alert(FlexiForm.text('FLEXI_TMPLS_LOAD_FILE_BEFORE_SAVING'));
 			return;
 		}
-		if (isCoreLayout && !confirm(FlexiForm.text('FLEXI_TMPLS_SAVE_BUILT_IN_TEMPLATE_FILE_WARNING'))) return;
+		if (isCoreLayout && !await FlexiForm.confirm(FlexiForm.text('FLEXI_TMPLS_SAVE_BUILT_IN_TEMPLATE_FILE_WARNING'))) return;
 		const button = byId('editor__save_file_btn');
 		if (button.disabled || pendingLoad) return;
 		button.disabled = true;

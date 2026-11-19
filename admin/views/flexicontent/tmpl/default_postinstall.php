@@ -30,7 +30,7 @@ FlexiForm.ready(() => {
 		existcats: 'addmcatitemrelations',
 		langsynced: 'updatelanguagedata',
 		existdbindexes: 'createdbindexes',
-		dbcharset: 'upgradedbcharset',
+		dbcharsetok: 'convertdbcharset',
 		existversions: 'createversionstable',
 		existversionsdata: 'populateversionstable',
 		existauthors: 'createauthorstable',
@@ -54,9 +54,15 @@ FlexiForm.ready(() => {
 			loader.className = 'ajax-loader';
 			result.replaceChildren(loader);
 			try {
-				const response = await fetch(endpoint, {credentials: 'same-origin'});
-				if (!response.ok) throw Error(response.statusText);
-				await FlexiForm.insertHTML(result, await response.text());
+				let more, log = '';
+				do {
+					const response = await fetch(endpoint, {credentials: 'same-origin'});
+					if (!response.ok) throw Error(response.statusText);
+					const html = await response.text();
+					more = id === 'dbcharsetok' && html.includes('fc-dbcharset-more');
+					log = more ? log + html : html;
+					await FlexiForm.insertHTML(result, log);
+				} while (more);
 			} catch (error) {
 				result.replaceChildren(button);
 			}

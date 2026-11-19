@@ -25,6 +25,7 @@ jobs:
       - name: Release regressions
         run: |
           php -d error_reporting=-1 tests/item-comments-selector.php
+          php -d error_reporting=-1 tests/manager-checkin-controls.php
           php -d error_reporting=-1 tests/statistics-data.php
           php -d error_reporting=-1 tests/group-by-columns.php
           php -d error_reporting=-1 tests/tag-assignment-removal.php

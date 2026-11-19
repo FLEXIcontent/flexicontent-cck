@@ -58,7 +58,7 @@ window.FlexiMediaField = (() => {
       catch { return null; }
     }
     if (response.error) {
-      alert(response.error.message || response.error);
+      FlexiForm.alert(response.error.message || response.error);
       return null;
     }
     return response.data ? {

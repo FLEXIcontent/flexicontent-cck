@@ -47,6 +47,12 @@
 		var nonimg_mssg = typeof nonimg_mssg !== 'undefined' ? nonimg_mssg : '';
 		var input = document.getElementById(input_id);
 		var msg_box = document.getElementById(msg_id);
+		var preview = document.getElementById(img_id);
+		if (!input || !preview) return;
+		// Invalidate the previous asynchronous read when the selection changes.
+		var selectedFile = input.files?.[0];
+		input.fc_previewFile = selectedFile;
+		if (!selectedFile) preview.style.display = 'none';
 		var _msg = '';
 
 		var input_files = input.files;
@@ -60,7 +66,7 @@
 		  	if (nonimg_mssg=='-1') _msg = '';
 		  	else if (nonimg_mssg=='-2') _msg = input.value;
 		  	else if (nonimg_mssg=='0' || nonimg_mssg=='') _msg = (nonimg_mssg!='' ? nonimg_mssg : input.value+' <br/> '+Joomla.JText._('FLEXI_NOT_AN_IMAGE_FILE'));
-		  	jQuery('#'+img_id).hide();
+				preview.style.display = 'none';
 		  }
 			else
 			{
@@ -68,16 +74,16 @@
 		  	else _msg = '';
 				var reader = new FileReader();
 				reader.onload = function (e) {
-					var img = jQuery('#'+img_id);
-					img.attr('src', e.target.result);
-					if (thumb_w)  parseInt(thumb_w) ? img.width(thumb_w)  : img.css('width',  thumb_w);
-					if (thumb_h)  parseInt(thumb_h) ? img.height(thumb_h) : img.css('height', thumb_h);
-					img.show();
+					if (input.fc_previewFile !== selectedFile) return;
+					preview.src = e.target.result;
+					if (thumb_w) preview.style.width = /^\d+(\.\d+)?$/.test(String(thumb_w)) ? thumb_w + 'px' : thumb_w;
+					if (thumb_h) preview.style.height = /^\d+(\.\d+)?$/.test(String(thumb_h)) ? thumb_h + 'px' : thumb_h;
+					preview.style.display = '';
 				};
 				reader.readAsDataURL(input_files[0]);
 			}
 		}
-		msg_box.nodeName == 'INPUT' ? msg_box.value = input.value : msg_box.innerHTML = input.value;
+		if (msg_box) msg_box.nodeName == 'INPUT' ? msg_box.value = input.value : msg_box.textContent = input.value;
 	}
 
 
@@ -100,7 +106,15 @@
 				input.setAttribute('form', input.form.id); associations.push(input);
 			}
 		});
-		const dialog = document.createElement('dialog');
+		const Dialog = window.customElements?.get('joomla-dialog');
+		const titleText = document.createElement('span'); titleText.textContent = settings.title || '';
+		const popup = Dialog && settings.modal !== false ? new Dialog({
+			popupType: 'inline', popupContent: content, textHeader: titleText.innerHTML,
+			cancelable: settings.closeOnEscape !== false, className: 'fc-joomla-dialog',
+			preferredParent: settings.keepPlace ? marker.parentNode : document.body
+		}) : null;
+		const dialog = popup ? popup.getBody().closest('dialog') : document.createElement('dialog');
+		if (!popup) {
 		dialog.className = 'fc-native-dialog ui-dialog ui-widget ui-widget-content';
 		dialog.style.cssText = 'position:fixed;padding:0;margin:auto;max-width:calc(100vw - 10px);max-height:calc(100vh - 10px);border:1px solid #aaa;';
 		const titlebar = document.createElement('div');
@@ -112,13 +126,14 @@
 		close.className = 'btn fc-dialog-close'; close.setAttribute('aria-label', FlexiForm.text('JCLOSE'));
 		titlebar.append(title, close); dialog.append(titlebar, content);
 		(settings.keepPlace ? marker.parentNode : document.body).append(dialog);
+		}
 		content.style.cssText += ';display:block;visibility:visible;flex:1;min-height:0;width:auto;height:auto;overflow:auto;';
 		const resize = () => {
 			const size = fc_getAutoSizePos(winwidth, winheight, {...settings});
 			dialog.style.width = size.winwidth + 'px'; dialog.style.height = size.winheight + 'px';
 		};
 		resize(); window.addEventListener('resize', resize);
-		const handle = {element: content, close: () => { dialog.close(); finish(); }, dialog: action => {
+		const handle = {element: content, close: () => { popup ? popup.close() : dialog.close(); finish(); }, dialog: action => {
 			if (action === 'close' || action === 'destroy') handle.close();
 			return handle;
 		}};
@@ -135,7 +150,7 @@
 		};
 		if (window.jQuery) window.jQuery(content).on('select2-opening.fcNativeDialog', legacyOpening);
 		fc_nativeDialogs.set(content, handle);
-		close.addEventListener('click', handle.close);
+		if (!popup) dialog.querySelector('.fc-dialog-close').addEventListener('click', handle.close);
 		dialog.addEventListener('cancel', event => { if (settings.closeOnEscape === false) event.preventDefault(); });
 		dialog.addEventListener('click', event => {
 			if (event.target !== dialog || settings.closeOnOutClick === false) return;
@@ -151,6 +166,7 @@
 			const mask = document.getElementById('select2-drop-mask');
 			if (mask?.parentElement === dialog) (legacyMask?.parent || document.body).append(mask);
 			window.removeEventListener('resize', resize); fc_nativeDialogs.delete(content);
+			popup?.destroy();
 			marker.replaceWith(content); associations.forEach(input => input.removeAttribute('form'));
 			if (originalStyle === null) content.removeAttribute('style'); else content.setAttribute('style', originalStyle);
 			if (settings.visibleOnClose) FlexiForm.show(content);
@@ -165,8 +181,11 @@
 		dialog.addEventListener('close', finish, {once: true});
 		FlexiForm.data(document.body, 'fc_modal_count', (FlexiForm.data(document.body, 'fc_modal_count') || 0) + 1);
 		document.body.classList.add('fc-no-scroll');
-		settings.modal === false ? dialog.show() : dialog.showModal();
-		dialog.style.display = 'flex'; dialog.style.flexDirection = 'column';
+		if (popup) popup.show();
+		else {
+			settings.modal === false ? dialog.show() : dialog.showModal();
+			dialog.style.display = 'flex'; dialog.style.flexDirection = 'column';
+		}
 		return handle;
 	}
 	fc_showAsDialog.sequence = 0;
@@ -2200,7 +2219,7 @@
 
 
 
-	// Submit a form in parent window from a jQuery modal
+	// Submit a form in the parent window from a dialog.
 	fc_parent_form_submit = function(container_id, form_id, fields, options)
 	{
 		var form = window.parent.document.getElementById(form_id);
@@ -2215,7 +2234,7 @@
 
 		if (is_list && form.boxchecked.value==0)
 		{
-			alert(Joomla.JText._('FLEXI_NO_ITEMS_SELECTED'));
+			window.parent.FlexiForm.alert(FlexiForm.text('FLEXI_NO_ITEMS_SELECTED'));
 			return;
 		}
 
@@ -2227,7 +2246,7 @@
 		{
 			form.progressbar_submit_handler_success = true;
 			// Default to doing animation
-			form.doanimated_submit = typeof form.doanimated_submit === 'undefined' ? 1 : 0;
+			if (typeof form.doanimated_submit === 'undefined') form.doanimated_submit = 1;
 
 			form.addEventListener('submit', function(e)
 			{
@@ -2237,28 +2256,7 @@
 				}
 				//form.doanimated_submit = 0;  // Clear FLAG until next time Joomla.submitform() is called
 
-				var fc_filter_form_blocker = jQuery('#fc_filter_form_blocker');
-
-				if (!fc_filter_form_blocker.length)
-				{
-					fc_filter_form_blocker = jQuery(
-						'<div id="fc_filter_form_blocker">' +
-							'<div class="fc_blocker_overlay"></div>' +
-							'<div class="fc_blocker_content">' +
-								'<div class="fc_blocker_logo></div>' +
-								'<div class="fc_blocker_mssg>' + Joomla.JText._('FLEXI_LOADING') + '</div>' +
-								'<div class="fc_blocker_bar"><div></div></div>' +
-							'</div>' +
-						'</div>'
-					).prependTo(jQuery('body'));
-				}
-
-				if (fc_filter_form_blocker)
-				{
-					fc_filter_form_blocker.css("display", "block");
-					fc_filter_form_blocker.find('.fc_blocker_mssg').html(Joomla.JText._('FLEXI_LOADING'));
-					fc_admin_progress(95, jQuery('#fc_filter_form_blocker .fc_blocker_bar'));
-				}
+				window.parent.fc_showSubmitProgress('FLEXI_LOADING', form.ownerDocument);
 			});
 		}
 
@@ -2308,6 +2306,8 @@
 		if (typeof(fcfield_attach_sortable) == 'function')  fcfield_attach_sortable(container_sel);
 
 		fc_initSelect2(null, container_sel, reAddOnEvents);
+		window.fc_initColorInputs?.(document.getElementById(container_id));
+		document.getElementById(container_id).dispatchEvent(new CustomEvent('joomla:updated', {bubbles: true}));
 	}
 
 

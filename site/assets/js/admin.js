@@ -109,15 +109,16 @@ function fc_submit_form(form, task) {
   form.append(button); button.click(); button.remove(); form.removeEventListener('submit', submit);
 }
 
-function fc_showSubmitProgress() {
-  let blocker = document.getElementById('fc_filter_form_blocker');
+function fc_showSubmitProgress(messageKey = 'FLEXI_FORM_IS_BEING_SUBMITTED', ownerDocument = document) {
+  let blocker = ownerDocument.getElementById('fc_filter_form_blocker');
   if (!blocker) {
-    blocker = document.createElement('div'); blocker.id = 'fc_filter_form_blocker';
+    blocker = ownerDocument.createElement('div'); blocker.id = 'fc_filter_form_blocker';
     blocker.innerHTML = '<div class="fc_blocker_overlay"></div><div class="fc_blocker_content"><div class="fc_blocker_logo"></div><div class="fc_blocker_mssg"></div><div class="fc_blocker_bar"><div></div></div></div>';
-    document.body.prepend(blocker);
+    ownerDocument.body.prepend(blocker);
   }
   FlexiForm.show(blocker);
-  blocker.querySelector('.fc_blocker_mssg').textContent = FlexiForm.text('FLEXI_FORM_IS_BEING_SUBMITTED');
+  const message = blocker.querySelector('.fc_blocker_mssg');
+  if (message) message.textContent = FlexiForm.text(messageKey);
   fc_admin_progress(95, blocker.querySelector('.fc_blocker_bar'));
 }
 

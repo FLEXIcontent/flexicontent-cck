@@ -85,6 +85,7 @@ class fc_Waveform_LazyLoad
 		var barText = progressBar?.querySelector('.barText');
 		var preview = file.dataset.wfpreview;
 		var peaks = file.dataset.wfpeaks;
+		var loadError;
 		var base = (fcview_mediafile_base_url[config_name] || '').replace(/\/$/, '');
 		var mediaURL = path => new URL(path, new URL(base + '/', document.baseURI));
 
@@ -281,14 +282,29 @@ class fc_Waveform_LazyLoad
 
 		var loadFile = function ()
 		{
+			if (loadError) loadError.hidden = true;
 			var url = mediaURL(preview).href;
-			// v7: load() renders waveform and loads audio; pass peaks only when available
-			if (audio_spectrum._saved_peaks_) {
-				audio_spectrum.load(url, [audio_spectrum._saved_peaks_]);
-			} else {
-				audio_spectrum.load(url);
-			}
+			var channelData = audio_spectrum._saved_peaks_ ? [audio_spectrum._saved_peaks_] : undefined;
 			audio_spectrum._loading_started_ = true;
+			audio_spectrum.load(url, channelData).catch(function ()
+			{
+				audio_spectrum._loading_started_ = false;
+				audio_spectrum.start_on_ready = false;
+				stopProgressBar(0);
+				buttons.play.disabled = false;
+				buttons.pause.disabled = buttons.stop.disabled = true;
+				buttons.pause.classList.remove('is_active');
+				buttons.play.style.display = 'inline-block';
+				buttons.pause.style.display = buttons.stop.style.display = 'none';
+				if (!loadError) {
+					loadError = document.createElement('p');
+					loadError.className = 'alert alert-warning fc-mediafile-load-error';
+					loadError.setAttribute('role', 'status');
+					loadError.textContent = Joomla.Text._('FLEXI_FIELD_MEDIAFILE_PLAYBACK_LOAD_FAILED');
+					box.before(loadError);
+				}
+				loadError.hidden = false;
+			});
 		}
 
 

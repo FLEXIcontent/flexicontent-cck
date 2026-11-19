@@ -146,32 +146,31 @@ $js .= "
 function delFilter(name)
 {
 	//if(window.console) window.console.log('Clearing filter:'+name);
-	var myForm = jQuery('#adminForm');
-	var filter = jQuery('#'+name);
+	var filter = document.getElementById(name);
 
-	if (!filter.length)
+	if (!filter)
 	{
 		return;
 	}
-	else if (filter.attr('type') == 'checkbox')
+	else if (filter.type === 'checkbox')
 	{
-		filter.removeAttr('checked');
+		filter.checked = false;
 	}
 	else
 	{
-		filter.val('');
+		if (filter.tagName === 'SELECT') FlexiForm.clearSelect(filter); else filter.value = '';
 
 		// Case that input has Calendar JS attached
-		if (filter.attr('data-alt-value'))
+		if (filter.hasAttribute('data-alt-value'))
 		{
-			filter.attr('data-alt-value', '');
+			filter.setAttribute('data-alt-value', '');
 		}
 	}
 }
 
 function delAllFilters()
 {
-	jQuery('.fc_field_filter').val('');  // clear custom filters
+	document.querySelectorAll('.fc_field_filter').forEach(filter => { if (filter.tagName === 'SELECT') FlexiForm.clearSelect(filter); else filter.value = ''; });
 	delFilter('search');
 	delFilter('filter_level');
 	delFilter('filter_state');
@@ -400,7 +399,7 @@ if ($js)
 		<?php if ($useAssocs) : ?>
 
 			<th class="col_assocs_count"><?php $colposition++; ?>
-				<div id="fc-toggle-assocs_btn" style="padding: 4px 0 2px 6px;" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?>" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_ASSOCIATIONS'); ?>" onclick="jQuery('#columnchoose_<?php echo $this->data_tbl_id . '_' . $colposition; ?>_label').click();" >
+				<div id="fc-toggle-assocs_btn" style="padding: 4px 0 2px 6px;" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?>" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_ASSOCIATIONS'); ?>" onclick="document.querySelector('#columnchoose_<?php echo $this->data_tbl_id . '_' . $colposition; ?>_label').click();" >
 					<span class="icon-flag"></span>
 				</div>
 			</th>

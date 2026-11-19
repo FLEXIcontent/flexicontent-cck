@@ -2078,7 +2078,8 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
 		$name = $this->input->get('name', null, 'string');
-		$cid  = $this->input->get('id', array(0), 'array');
+		// The site router may populate the main input's id with the active menu's article id.
+		$cid  = $this->input->post->get('id', $this->input->get->get('id', array(0), 'array'), 'array');
 		$cid  = ArrayHelper::toInteger($cid, array(0));
 		$cid  = (int) $cid[0];
 
@@ -2087,7 +2088,8 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		spl_autoload_register(static function ($class) {
 			if ($class === 'FlexicontentModelTag' && is_file($f = JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'tag.php')) require_once $f;
 		}, true, true);
-		$model = new FlexicontentModelTag();
+		// Save must not pick up the routed article id through the model state either.
+		$model = new FlexicontentModelTag(['ignore_request' => true]);
 		$model->setId($cid);
 		$tag = $model->getTag($name);
 

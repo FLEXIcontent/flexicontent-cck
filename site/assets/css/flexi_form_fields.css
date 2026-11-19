@@ -1086,6 +1086,7 @@ table.fc_uploader_header_tbl td:last-child {
   list-style: none !important;
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
   align-items: flex-start;
 }
 /* FIELD: multiple-value (sortable) container (not cleared) */
@@ -2051,4 +2052,23 @@ span.add-on.fcfont-icon.icon.icon-.image-option {
 }
 textarea.fcfield_textareaval {
   resize: both;
+}
+
+/* Keep multi-property field inputs within narrow editing panes. */
+@media (max-width: 575.98px) {
+  #flexicontent .fcfield_field_data_box,
+  #flexicontent .fcfield_field_preview_box,
+  #flexicontent .fc_termtitle,
+  #flexicontent .fc_termtext,
+  #flexicontent .fc-field-props-box { min-width: 0; max-width: 100%; width: 100%; }
+  #flexicontent .fcfieldval_container table.fc-form-tbl,
+  #flexicontent .fcfieldval_container table.fc-form-tbl > tbody,
+  #flexicontent .fcfieldval_container table.fc-form-tbl > tbody > tr,
+  #flexicontent .fcfieldval_container table.fc-form-tbl > tbody > tr > td {
+    display: block; width: 100% !important; max-width: 100%; box-sizing: border-box;
+  }
+  #flexicontent .fcfieldval_container table.fc-form-tbl .key { padding-block-end: .25rem; }
+  #flexicontent .fcfieldval_container input:not([type=checkbox]):not([type=radio]),
+  #flexicontent .fcfieldval_container textarea,
+  #flexicontent .fcfieldval_container .choices { max-width: 100%; min-width: 0; }
 }

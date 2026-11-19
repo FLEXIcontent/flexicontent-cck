@@ -47,7 +47,7 @@ var fcfield_file = {
 
   openEditDialog(button, url, checkinUrl, title, noFileMessage) {
     const id = parseInt(FlexiMediaField.row(button)?.querySelector('input.fc-file-id')?.value, 10);
-    if (!id) { alert(noFileMessage); return false; }
+    if (!id) { FlexiForm.alert(noFileMessage); return false; }
     const checkin = () => fetch(checkinUrl.replace('__file_id__', id), {
       credentials: 'same-origin', redirect: 'manual'
     }).catch(() => {});

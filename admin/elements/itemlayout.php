@@ -240,6 +240,8 @@ if (!@$attributes['skipparams'])
 	FlexiForm.ready(() => window.ilayout_activatePanel(config.active));
 })({$options});
 JS;
+		flexicontent_html::loadFramework('flexi-lib');
+		$doc->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/assets/js/color-input.js', array('version' => 'auto'), array('defer' => true));
 		$doc->addScriptDeclaration($js);
 }
 		

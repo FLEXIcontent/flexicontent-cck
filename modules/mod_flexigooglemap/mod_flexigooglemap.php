@@ -126,7 +126,7 @@ $add_tooltips = 0; //(int) $params->get('add_tooltips', 1);
  * NOTE: anonymous functions inside: LAYOUT_mapLocations.php, LAYOUT_mapLocation.php are used to render the map locations
  *    $renderedMapLocations = function ($params, &$mapItems, $module);
  */
-$mapItems             = null;
+$mapItems             = [];
 $renderedMapLocations = modFlexigooglemapHelper::renderMapLocations($params, $mapItems, $module);
 
 $mapItemData = [];

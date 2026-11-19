@@ -124,8 +124,9 @@ abstract class JHtmlFcbase
 			? \Joomla\CMS\Language\Text::sprintf('FLEXI_CLICK_TO_RELEASE_YOUR_LOCK_DESC', $row->editor, $row->checked_out_time)
 			: \Joomla\CMS\Language\Text::sprintf('FLEXI_CLICK_TO_RELEASE_FOREIGN_LOCK_DESC', $row->editor, $row->checked_out_time);
 
-		return 
-		($row->checked_out != $user->id ? '<input id="cb'.$i.'" type="checkbox" value="'.$row->id.'" name="cid[]" style="display:none!important;">' : '') . '
+		// The manager already renders this row's checkbox through grid_id().
+		// A second control duplicates both its DOM id and submitted cid value.
+		return '
 		<a class="btn btn-micro btn-outline-secondary ntxt ' . static::$tooltip_class . '" title="' . \Joomla\CMS\HTML\HTMLHelper::tooltipText('', $_tip_title, true, false) . '" href="javascript:;" onclick="var ccb=document.getElementById(\'cb'.$i.'\'); ccb.checked=1; ccb.form.task.value=\'' . static::$ctrl . '.checkin\'; ccb.form.submit();">
 			<span class="icon-checkedout"></span>
 		</a>
