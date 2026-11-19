@@ -32,20 +32,13 @@ class FlexicontentDbCharset
 	 */
 	public static function getTargetCollation($db)
 	{
-		static $collation = null;
+		$collation = (string) $db->setQuery(
+			'SELECT c.COLLATION_NAME FROM information_schema.COLUMNS AS c'
+			. ' WHERE c.TABLE_SCHEMA = DATABASE() AND c.TABLE_NAME = ' . $db->quote($db->getPrefix() . 'content')
+			. ' AND c.COLUMN_NAME = ' . $db->quote('title')
+		)->loadResult();
 
-		if ($collation === null)
-		{
-			$collation = (string) $db->setQuery(
-				'SELECT c.COLLATION_NAME FROM information_schema.COLUMNS AS c'
-				. ' WHERE c.TABLE_SCHEMA = DATABASE() AND c.TABLE_NAME = ' . $db->quote($db->getPrefix() . 'content')
-				. ' AND c.COLUMN_NAME = ' . $db->quote('title')
-			)->loadResult();
-
-			$collation = preg_match('/^utf8mb4_[a-z0-9_]+$/', $collation) ? $collation : 'utf8mb4_unicode_ci';
-		}
-
-		return $collation;
+		return preg_match('/^utf8mb4_[a-z0-9_]+$/', $collation) ? $collation : 'utf8mb4_unicode_ci';
 	}
 
 
@@ -225,10 +218,11 @@ class FlexicontentDbCharset
 			: 1000;
 
 		$rows = $db->setQuery(
-			'SELECT s.INDEX_NAME AS index_name, s.NON_UNIQUE AS non_unique, s.COLUMN_NAME AS column_name, s.SUB_PART AS sub_part,'
-			. ' c.CHARACTER_MAXIMUM_LENGTH AS char_length, c.IS_NULLABLE AS is_nullable'
+			'SELECT s.INDEX_NAME AS index_name, s.NON_UNIQUE AS non_unique, s.COLUMN_NAME AS column_name, s.SUB_PART AS sub_part, s.COLLATION AS index_order,'
+			. ' c.CHARACTER_MAXIMUM_LENGTH AS char_length, c.CHARACTER_OCTET_LENGTH AS octet_length,'
+			. ' c.CHARACTER_SET_NAME AS charset, c.DATA_TYPE AS data_type, c.IS_NULLABLE AS is_nullable'
 			. ' FROM information_schema.STATISTICS AS s'
-			. ' JOIN information_schema.COLUMNS AS c'
+			. ' LEFT JOIN information_schema.COLUMNS AS c'
 			. '  ON c.TABLE_SCHEMA = s.TABLE_SCHEMA AND c.TABLE_NAME = s.TABLE_NAME AND c.COLUMN_NAME = s.COLUMN_NAME'
 			. ' WHERE s.TABLE_SCHEMA = DATABASE() AND s.TABLE_NAME = ' . $db->quote($table->name)
 			. "  AND s.INDEX_TYPE NOT IN ('FULLTEXT', 'SPATIAL')"
@@ -243,6 +237,7 @@ class FlexicontentDbCharset
 		}
 
 		$clauses = array();
+		$integer_bytes = array('tinyint' => 1, 'smallint' => 2, 'mediumint' => 3, 'int' => 4, 'bigint' => 8);
 
 		foreach ($indexes as $index_name => $parts)
 		{
@@ -251,14 +246,20 @@ class FlexicontentDbCharset
 
 			foreach ($parts as $part)
 			{
-				$chars   = $part->char_length !== null ? (int) ($part->sub_part ?: $part->char_length) : 0;
-				$shorter = min($chars, self::KEY_CHARS);
-				$extra   = ($chars ? 2 : 8) + ($part->is_nullable === 'YES' ? 1 : 0);
+				// Binary and other character sets are unchanged; ENUM/SET keys store numeric values.
+				$chars = $part->char_length !== null && !in_array($part->data_type, array('enum', 'set'))
+					? (int) ($part->sub_part ?: $part->char_length) : 0;
+				$utf8 = in_array($part->charset, array('utf8', 'utf8mb3', 'utf8mb4'), true);
+				$width = $utf8 ? 4 : ($part->char_length ? $part->octet_length / $part->char_length : 1);
+				$shorter = $utf8 ? min($chars, self::KEY_CHARS) : $chars;
+				// Key limits count indexed bytes, not nullable flags or variable-length headers.
+				$extra = $chars ? 0 : (isset($integer_bytes[$part->data_type]) ? $integer_bytes[$part->data_type] : 8);
 
-				$bytes         += $chars * 4 + $extra;
-				$shorter_bytes += $shorter * 4 + $extra;
+				$bytes         += $chars * $width + $extra;
+				$shorter_bytes += $shorter * $width + $extra;
 				$cols[]         = $db->quoteName($part->column_name)
-					. ($chars && ($part->sub_part || $shorter < $chars) ? '(' . $shorter . ')' : '');
+					. ($chars && ($part->sub_part || $shorter < $chars) ? '(' . $shorter . ')' : '')
+					. ($part->index_order === 'D' ? ' DESC' : '');
 			}
 
 			if ($bytes <= $limit)
@@ -272,8 +273,20 @@ class FlexicontentDbCharset
 				throw new \RuntimeException('Index ' . $index_name . ' is too long for utf8mb4 and cannot be shortened automatically');
 			}
 
+			// Keep server-specific index options, including comments and visibility.
+			if (in_array(null, array_column($parts, 'column_name'), true))
+			{
+				throw new \RuntimeException('Cannot automatically rebuild the functional index ' . $index_name);
+			}
+			$create = $db->setQuery('SHOW CREATE TABLE ' . $db->quoteName($table->name))->loadRow();
+			if (!preg_match('/^\s*(?:KEY|INDEX)\s+' . preg_quote($db->quoteName($index_name), '/')
+				. '\s+\((?:[^\r\n()]|\([^\r\n()]*\))*?\)([^\r\n]*)/m', $create[1], $definition))
+			{
+				throw new \RuntimeException('Could not read the definition of index ' . $index_name);
+			}
+			$options = rtrim(rtrim($definition[1]), ',');
 			$clauses[] = 'DROP INDEX ' . $db->quoteName($index_name);
-			$clauses[] = 'ADD INDEX ' . $db->quoteName($index_name) . ' (' . implode(', ', $cols) . ')';
+			$clauses[] = 'ADD INDEX ' . $db->quoteName($index_name) . ' (' . implode(', ', $cols) . ')' . $options;
 		}
 
 		return $clauses;

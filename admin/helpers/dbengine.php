@@ -311,15 +311,10 @@ class FlexicontentDbEngine
 	 */
 	public static function followSiteEngine($db, $tablename)
 	{
-		static $site_engine = null;
-
-		if ($site_engine === null)
-		{
-			$site_engine = strtolower((string) $db->setQuery(
-				'SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE()'
-				. ' AND TABLE_NAME = ' . $db->quote($db->getPrefix() . 'flexicontent_items_ext')
-			)->loadResult());
-		}
+		$site_engine = strtolower((string) $db->setQuery(
+			'SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE()'
+			. ' AND TABLE_NAME = ' . $db->quote($db->getPrefix() . 'flexicontent_items_ext')
+		)->loadResult());
 
 		if ($site_engine !== 'innodb')
 		{
