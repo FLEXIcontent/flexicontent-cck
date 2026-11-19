@@ -31,6 +31,11 @@ class FlexicontentDbEngine
 	 */
 	const SPACE_FACTOR = 3;
 
+	/**
+	 * The default that a new installation gives its NOT NULL DATETIME columns
+	 */
+	const DATE_DEFAULT = '1000-01-01 00:00:00';
+
 
 	/**
 	 * FLEXIcontent's tables in this database (per-field search tables included), smallest first.
@@ -330,6 +335,47 @@ class FlexicontentDbEngine
 		{
 			$db->setQuery('ALTER TABLE ' . $db->quoteName($tablename) . ' ENGINE=InnoDB')->execute();
 		}
+	}
+
+
+	/**
+	 * Give the DATETIME columns that still default to the zero date the default of a new installation.
+	 *
+	 * Tables of older installations have columns with DEFAULT '0000-00-00 00:00:00'. A database server in its
+	 * default mode (strict, NO_ZERO_DATE) refuses that default in every ALTER TABLE that is run outside of Joomla,
+	 * for example the ALTER TABLE ... ENGINE=MyISAM that goes back from InnoDB. Only the default is changed:
+	 * no row is read or written, and no table is copied.
+	 *
+	 * @return  string[]  The columns that were changed, as "table.column"
+	 */
+	public static function fixZeroDateDefaults($db)
+	{
+		$columns = $db->setQuery(
+			'SELECT TABLE_NAME AS tbl, COLUMN_NAME AS col FROM information_schema.COLUMNS'
+			. ' WHERE TABLE_SCHEMA = DATABASE()'
+			. '  AND TABLE_NAME LIKE ' . $db->quote($db->escape($db->getPrefix() . 'flexicontent_', true) . '%', false)
+			. '  AND DATA_TYPE = ' . $db->quote('datetime')
+			// MySQL reports the default as 0000-00-00 00:00:00, MariaDB with quotes around it
+			. '  AND COLUMN_DEFAULT LIKE ' . $db->quote('%0000-00-00 00:00:00%')
+			. ' ORDER BY TABLE_NAME, ORDINAL_POSITION'
+		)->loadObjectList();
+
+		$alters  = array();
+		$changed = array();
+
+		foreach ($columns as $column)
+		{
+			$alters[$column->tbl][] = 'ALTER COLUMN ' . $db->quoteName($column->col) . ' SET DEFAULT ' . $db->quote(self::DATE_DEFAULT);
+			$changed[] = $column->tbl . '.' . $column->col;
+		}
+
+		// All columns of a table in one statement: a strict server checks the defaults of the whole table
+		foreach ($alters as $tablename => $table_alters)
+		{
+			$db->setQuery('ALTER TABLE ' . $db->quoteName($tablename) . ' ' . implode(', ', $table_alters))->execute();
+		}
+
+		return $changed;
 	}
 
 
