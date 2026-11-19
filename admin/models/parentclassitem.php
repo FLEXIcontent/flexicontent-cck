@@ -921,7 +921,8 @@ class ParentClassItem extends FCModelAdmin
 					." FROM #__flexicontent_items_versions as iv "
 					." LEFT JOIN #__flexicontent_fields as f on f.id=iv.field_id"
 					." WHERE iv.version='".$version."' AND (f.iscore=1 OR iv.field_id=-1 OR iv.field_id=-2) AND iv.item_id='".$pk."'"
-					." GROUP BY f.id";
+					// By the versioned field id: f.id is NULL for the two pseudo fields (-1 and -2), which shared one row before
+					." GROUP BY iv.field_id";
 				$db->setQuery($query);
 				$fields = $db->loadObjectList();
 				$fields = $fields ? $fields : array();
@@ -2767,16 +2768,21 @@ class ParentClassItem extends FCModelAdmin
 		// *** Delete old versions that are above the limit of kept versions
 		// ***
 
-		$vcount	= FLEXIUtilities::getVersionsCount($item->id);
+		// A version marked as permanent backup does not count towards the limit and is never rotated away
+		$kept_version = (int) FLEXIUtilities::getKeptVersion($item->id);
+		$vcount	= FLEXIUtilities::getVersionsCount($item->id, true);
 		$vmax	= $cparams->get('nr_versions', 10);
 
 		if ($vcount > $vmax) {
-			$deleted_version = FLEXIUtilities::getFirstVersion($item->id, $vmax, $current_version);
+			$deleted_version = FLEXIUtilities::getFirstVersion($item->id, $vmax, $current_version, true);
+			$keep_filter_values = $kept_version ? ' AND version!=' . $kept_version : '';
+			$keep_filter_meta   = $kept_version ? ' AND version_id!=' . $kept_version : '';
 			$query = 'DELETE'
 					.' FROM #__flexicontent_items_versions'
 					.' WHERE item_id = ' . (int)$item->id
 					.' AND version <=' . $deleted_version
 					.' AND version!=' . (int)$current_version
+					. $keep_filter_values
 					;
 			$this->_db->setQuery($query);
 			$this->_db->execute();
@@ -2786,6 +2792,7 @@ class ParentClassItem extends FCModelAdmin
 					.' WHERE item_id = ' . (int)$item->id
 					.' AND version_id <=' . $deleted_version
 					.' AND version_id!=' . (int)$current_version
+					. $keep_filter_meta
 					;
 			$this->_db->setQuery($query);
 			$this->_db->execute();
@@ -3141,11 +3148,15 @@ class ParentClassItem extends FCModelAdmin
 			  KEY `field_id` (`field_id`),
 			  KEY `item_id` (`item_id`),
 			  FULLTEXT `search_index` (`search_index`),
-			  KEY `value_id` (`value_id`)
-			) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`
+			  KEY `value_id` (`value_id`(191))
+			) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`
 			';
 			$this->_db->setQuery($query);
 			$this->_db->execute();
+
+			// A new table must not come back as MyISAM on a site that was moved to InnoDB
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/dbengine.php';
+			FlexicontentDbEngine::followSiteEngine($this->_db, $tbl_name);
 		}
 
 
@@ -4828,7 +4839,7 @@ class ParentClassItem extends FCModelAdmin
 	 */
 	function getVersionList($limitstart=0, $versionsperpage=0)
 	{
-		$query 	= 'SELECT v.version_id AS nr, v.created AS date, ua.name AS modifier, v.comment AS comment'
+		$query 	= 'SELECT v.version_id AS nr, v.created AS date, ua.name AS modifier, v.comment AS comment, v.keep AS keep'
 				.' FROM #__flexicontent_versions AS v'
 				.' LEFT JOIN #__users AS ua ON ua.id = v.created_by'
 				.' WHERE item_id = ' . (int)$this->_id

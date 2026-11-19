@@ -175,8 +175,15 @@ foreach ($this->values as $n => $value)
 
 	if ($marker_path || $marker_url)
 	{
-		// Marker Size
-		list($wS, $hS) = getimagesize($marker_path ?: $marker_url);
+		// Marker Size. Do not call getimagesize() on a remote URL: it can block the
+		// whole request when the host is unreachable (e.g. comparing versions of an
+		// item using an OpenStreetMap address field). Use the default marker size.
+		$marker_source = $marker_path ?: $marker_url;
+		$marker_size = (!preg_match('#^https?://#i', $marker_source) && is_readable($marker_source))
+			? @getimagesize($marker_source)
+			: false;
+		$wS = $marker_size ? $marker_size[0] : 25;
+		$hS = $marker_size ? $marker_size[1] : 41;
 
 		// Marker Anchor
 		switch($value['marker_anchor'])

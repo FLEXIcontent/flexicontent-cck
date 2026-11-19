@@ -1600,7 +1600,7 @@
 				<option value="1">FLEXI_INLINE</option>
 				<option value="2">FLEXI_SLIDER</option>
 			</field>
-			<field name="versionsplacement_fe" type="fcradio" default="1" label="FLEXI_MENU_USE_VERSIONS" description="FLEXI_MENU_USE_VERSIONS_DESC" class="btn-group btn-group-yesno">
+			<field name="versionsplacement_fe" type="fcradio" default="2" label="FLEXI_MENU_USE_VERSIONS" description="FLEXI_MENU_USE_VERSIONS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE_ALWAYS_EVEN_IF_EDITABLE</option>
 				<option value="1">FLEXI_POPUP</option>
 				<option value="2">FLEXI_INLINE</option>
@@ -1842,7 +1842,7 @@
 				<option value="1">FLEXI_INLINE</option>
 				<option value="2">FLEXI_SLIDER</option>
 			</field>
-			<field name="versionsplacement_be" type="fcradio" default="1" label="FLEXI_MENU_USE_VERSIONS" description="FLEXI_MENU_USE_VERSIONS_DESC" class="btn-group btn-group-yesno">
+			<field name="versionsplacement_be" type="fcradio" default="2" label="FLEXI_MENU_USE_VERSIONS" description="FLEXI_MENU_USE_VERSIONS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE_ALWAYS_EVEN_IF_EDITABLE</option>
 				<option value="1">FLEXI_POPUP</option>
 				<option value="2">FLEXI_INLINE</option>

@@ -304,10 +304,7 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		$this->setState('filter_order_Dir', $jinput->get('filter_order_Dir', 'ASC', 'cmd'));
 
 		// Get minimum word search length
-		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
-		$db->setQuery("SHOW VARIABLES LIKE '%ft_min_word_len%'");
-		$_dbvariable = $db->loadObject();
-		$min_word_len = (int) @ $_dbvariable->Value;
+		$min_word_len = flexicontent_db::getMinWordLen();
 		$search_prefix = \Joomla\CMS\Component\ComponentHelper::getParams( 'com_flexicontent' )->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
 		$min_word_len = !$search_prefix ?  $min_word_len : 1;
 		$app->setUserState($option.'.min_word_len', $min_word_len);
@@ -447,9 +444,8 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		else
 		{
 			try {
-				// 2, get items, we use direct query because some extensions break the SQL_CALC_FOUND_ROWS, so let's bypass them (at this point it is OK)
-				// *** Usage of FOUND_ROWS() will fail when (e.g.) Joom!Fish or Falang are installed, in this case we will be forced to re-execute the query ...
-				// PLUS, we don't need Joom!Fish or Falang layer at --this-- STEP which may slow down the query considerably in large sites
+				// 2, get items, we use direct query because we don't need Joom!Fish or Falang layer at --this-- STEP
+				// which may slow down the query considerably in large sites
 				$query_limited = $query
 					. ' LIMIT ' . $limit
 					. ' OFFSET ' . $limitstart;
@@ -459,9 +455,22 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 				//$this->_db->setQuery($query, $limitstart, $limit);
 				//$query_ids = $this->_db->loadColumn();
 
-				// 3, get current items total for pagination
-				$this->_db->setQuery("SELECT FOUND_ROWS()");
-				$this->_total = $this->_db->loadResult();
+				// 3, get current items total for pagination: every row of the list carries it (COUNT(*) OVER() in _buildQuery())
+				if ($rows)
+				{
+					$this->_total = $rows[0]->fc_list_total;
+				}
+
+				// No row to read it from. A page after the last one (or a limit of zero) still needs the total
+				elseif ($limitstart || !$limit)
+				{
+					$this->_total = null;
+					$this->getTotal();
+				}
+				else
+				{
+					$this->_total = 0;
+				}
 			}
 
 			catch (Exception $e) {
@@ -765,17 +774,33 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 
 		elseif (!$query_ids)
 		{
-			// SQL_CALC_FOUND_ROWS, will cause problems with 3rd-party extensions that modify the query, this will be tried with direct DB query
+			// The total of the list is a column of the list: COUNT(*) OVER(), one statement instead of SQL_CALC_FOUND_ROWS
+			// + FOUND_ROWS(), which MySQL 8.0.17+ deprecates. A window function counts the rows before DISTINCT is applied,
+			// the list is therefore grouped by the item id instead: the same rows, because every other column
+			// of the list has one value per item
+			$list_total = $count_total && !$this->_getAuthorCaps();
+
 			$query = 'SELECT '
-				. ($count_total ? 'SQL_CALC_FOUND_ROWS' : '') . ' DISTINCT i.id '
+				. ($list_total ? '' : ' DISTINCT') . ' i.id '
 				. @ $orderby_col
 				. ($this->_getAuthorCaps() ? ', rel.catid AS lim_catid, (rel.catid <> i.catid) AS lim_notmain' : '')
+				. ($list_total ? ', COUNT(*) OVER() AS fc_list_total' : '')
 				;
 		}
 
 		else
 		{
-			$query = 'SELECT i.*, ie.*, u.name as author, ty.name AS typename, ty.alias AS typealias, rel.catid as rel_catid,'
+			// One row per item, so an item that is in several categories needs a definite one here: the category that the
+			// list ordered it by (see below). That is its main category when the page lists it, else the lowest category id
+			$_page_cats = $this->_data_cats ? implode(',', array_map('intval', $this->_data_cats)) : '';
+			$_on_page   = $_page_cats !== '' ? ' AND rel.catid IN (' . $_page_cats . ')' : '';
+
+			$query = 'SELECT i.*, ie.*, u.name as author, ty.name AS typename, ty.alias AS typealias,'
+				. ' COALESCE('
+				. '  MAX(CASE WHEN rel.catid = i.catid' . $_on_page . ' THEN rel.catid END),'
+				. ($_page_cats !== '' ? '  MIN(CASE WHEN rel.catid IN (' . $_page_cats . ') THEN rel.catid END),' : '')
+				. '  MIN(rel.catid)'
+				. ' ) as rel_catid,'
 				. ' c.title AS maincat_title, c.alias AS maincat_alias,'  // Main category data
 				. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
 				. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
@@ -816,11 +841,36 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 				? (trim((string) $orderby) !== '' ? ', ' : ' ORDER BY ') . 'lim_notmain, lim_catid'
 				: '';
 
+			// A unique last sort key. Without SQL_CALC_FOUND_ROWS the database may stop sorting at the LIMIT,
+			// and rows with equal sort values could then repeat or go missing across pages
+			$id_orderby = $list_total && trim((string) $orderby) !== '' && strpos($orderby, 'i.id') === false
+				? ', i.id'
+				: '';
+
+			// The list is grouped by item: ordering by category and position (rel.catid, rel.ordering) then needs a definite row
+			// of an item that is in several of the listed categories. As for the author item limits above: the row of its
+			// main category when that category is listed, else the lowest category id
+			if ($list_total && strpos((string) $orderby, 'rel.') !== false)
+			{
+				$orderby = preg_replace('/\brel\.catid\b/',
+					'COALESCE(MAX(CASE WHEN rel.catid = i.catid THEN rel.catid END), MIN(rel.catid))',
+					$orderby
+				);
+
+				// The position inside that same category
+				$orderby = preg_replace('/\brel\.ordering\b/',
+					'COALESCE(MAX(CASE WHEN rel.catid = i.catid THEN rel.ordering END),'
+					. ' SUBSTRING_INDEX(GROUP_CONCAT(rel.ordering ORDER BY rel.catid), \',\', 1) + 0)',
+					$orderby
+				);
+			}
+
 			$query .= ""
 				. @ $orderby_join  // optional
 				. $where . $extra_where
-				//. ' GROUP BY i.id '
+				. ($list_total ? ' GROUP BY i.id ' : '')
 				. $orderby
+				. $id_orderby
 				. $lim_orderby
 				;
 		}
@@ -1332,8 +1382,8 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		$text = preg_replace('/(\b[^\s,\.]+\b)/u', $search_prefix.'$0', $text_np);
 
 		// Split to words
-		$words_np = preg_split('/\s\s*/u', $text_np);
-		$words = preg_split('/\s\s*/u', $text);
+		$words_np = flexicontent_db::getBooleanSearchWords(preg_split('/\s\s*/u', $text_np), 'flexicontent_items_tmp', 'title');
+		$words = flexicontent_db::getBooleanSearchWords(preg_split('/\s\s*/u', $text), $si_tbl);
 
 		if (strlen($text))
 		{
@@ -1351,16 +1401,17 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 
 			/*
 			 * LIKE %word% search (needed by languages without spaces),
-			 * (1) Skip / Ignore this for languages with spaces,
+			 * (1) Skip / Ignore this for languages with spaces, unless the searched text itself is Chinese or Japanese
 			 * (2) Skip / Ignore this if current language supports splitting via dictionary
 			 */
-			if ($filter_word_like_any
-				&& in_array(flexicontent_html::getUserCurrentLang(), array('zh', 'jp', 'ja', 'th'))
-				&& ! FlexicontentFields::getLangHandler(\Joomla\CMS\Factory::getApplication()->getLanguage()->getTag(), $_hasHandlerOnly = true)
-			)
+			if (flexicontent_db::useLikeSearch($filter_word_like_any, $text_np))
 			{
-				$_index_match = ' LOWER ('.$ts.'.search_index) LIKE '.$db->Quote( '%'.$escaped_text.'%', false );
-				$_title_relev = ' LOWER (i.title) LIKE '.$db->Quote( '%'.$escaped_text.'%', false );
+				// The text without the search prefix, because it is also matched inside the words of the index
+				$_index_match = flexicontent_db::getLikeSearchCondition($ts . '.search_index', $text_np, $phrase, $search_prefix);
+				$_title_relev = flexicontent_db::getLikeSearchCondition('i.title', $text_np, $phrase);
+
+				// Needed by "Most relevant first: Yes". Without it the relevance column was empty: an SQL syntax error
+				$_index_relev = $_index_match;
 			}
 
 			/*

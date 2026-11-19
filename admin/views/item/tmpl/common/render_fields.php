@@ -1561,71 +1561,41 @@ endif; // end of template: layout_selection, layout_params
 
 
 
-if ($typeid && $use_versioning && $this->perms['canversion'] && $versionsplacement !== 0) : ob_start()  // versions ?>
-	<table class="" style="margin: 10px; width: auto;">
-		<tr>
-			<td>
-				<h3><?php echo Text::_( 'FLEXI_VERSIONS_HISTORY' ); ?></h3>
-			</td>
-		</tr>
-		<tr><td>
-			<table id="version_tbl" class="fc-table-list fc-tbl-short">
-			<?php if ($this->row->id == 0) : ?>
-			<tr>
-				<td class="versions-first" colspan="4"><?php echo Text::_( 'FLEXI_NEW_ARTICLE' ); ?></td>
-			</tr>
-			<?php
-			else :
-			$date_format = (($date_format = Text::_( 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS_J16GE' )) == 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS_J16GE') ? "d/M H:i" : $date_format;
-			foreach ($this->versions as $version) :
-				$isCurrent = (int) $version->nr === (int) $this->row->current_version;
-				$class = $isCurrent ? ' id="active-version" class="success"' : '';
-				if ((int)$version->nr > 0) :
-			?>
-			<tr<?php echo $class; ?>>
-				<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo '#' . $version->nr; ?></span></td>
-				<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo HTMLHelper::_('date', (($version->nr == 1) ? $this->row->created : $version->date), $date_format ); ?></span></td>
-				<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo ($version->nr == 1) ? flexicontent_html::striptagsandcut($this->row->creator, 25) : flexicontent_html::striptagsandcut($version->modifier, 25); ?></span></td>
-				<td class="versions">
-
-					<a href="javascript:;" class="hasTooltip" title="<?php echo HTMLHelper::tooltipText( Text::_( 'FLEXI_COMMENT' ), ($version->comment ? $version->comment : 'No comment written'), 0, 1); ?>"><?php echo $comment_image;?></a>
-
-					<?php if (!$isSite) :?>
-
-						<?php if (!$isCurrent && $allow_versioncomparing) : ?>
-							<a class="modal-versions"
-								href="index.php?option=com_flexicontent&amp;view=itemcompare&amp;cid=<?php echo $this->row->id; ?>&amp;version=<?php echo $version->nr; ?>&amp;tmpl=component"
-								title="<?php echo Text::_( 'FLEXI_COMPARE_WITH_CURRENT_VERSION' ); ?>"
-							>
-								<?php echo $compare_image; ?>
-							</a>
-						<?php endif; ?>
-
-						<?php if ($isCurrent) : ?>
-							<a onclick="javascript:return clickRestore('<?php echo Uri::base(true); ?>/index.php?option=com_flexicontent&amp;view=item&amp;<?php echo $task_items;?>edit&amp;<?php echo ($isSite ? 'id=' : 'cid=') . $this->row->id;?>&amp;version=<?php echo $version->nr; ?>');" href="javascript:;"><?php echo Text::_( 'FLEXI_CURRENT' ); ?></a>
-						<?php else : ?>
-							<a onclick="javascript:return clickRestore('<?php echo Uri::base(true); ?>/index.php?option=com_flexicontent&amp;task=items.edit&amp;<?php echo ($isSite ? 'id=' : 'cid=') . $this->row->id;?>&amp;version=<?php echo $version->nr; ?>&amp;<?php echo \Joomla\CMS\Session\Session::getFormToken();?>=1');"
-								href="javascript:;"
-								title="<?php echo Text::sprintf( 'FLEXI_REVERT_TO_THIS_VERSION', $version->nr ); ?>"
-							>
-								<?php echo $revert_image; ?>
-							</a>
-						<?php endif; ?>
-
-					<?php endif; ?>
-
-				</td>
-			</tr>
-			<?php
-				endif;
-			endforeach;
-			endif; ?>
-			</table>
-		</td></tr>
-		<tr style="background:unset;"><td style="background:unset;">
-			<div id="fc_pager"></div>
-		</td></tr>
-	</table>
+if ($typeid && $use_versioning && !empty($this->perms['canversion']) && $versionsplacement !== 0) : ob_start(); // versions
+	// The history table is always inline in the Versions tab. The setting only controls
+	// how the comparison of a version is opened: new browser tab (inline) or modal (popup).
+	$compare_mode = (!$isSite && $versionsplacement === 1) ? 'popup' : 'inline';
+	$date_format = (($date_format = Text::_( 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS_J16GE' )) == 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS_J16GE') ? "d/M H:i" : $date_format;
+	$token = \Joomla\CMS\Session\Session::getFormToken();
+	$ajax_url = Uri::base(true) . '/index.php?option=com_flexicontent&' . $task_items . 'getversionlist'
+		. '&id=' . (int) $this->row->id . '&active=' . (int) $this->row->current_version
+		. '&compare_mode=' . $compare_mode
+		. '&' . $token . '=1&format=raw&page=';
+	$version_options = array(
+		'item_id'         => (int) $this->row->id,
+		'current_version' => (int) $this->row->current_version,
+		'is_site'         => $isSite,
+		'allow_comparing' => (int) $allow_versioncomparing,
+		'can_keep'        => !$isSite,
+		'task_items'      => $task_items,
+		'token'           => $token,
+		'date_format'     => $date_format,
+		'compare_mode'    => $compare_mode,
+	);
+	?>
+	<div class="fc-versions-panel" data-fc-versions-panel
+		data-compare-mode="<?php echo $compare_mode; ?>"
+		data-ajax-url="<?php echo htmlspecialchars($ajax_url, ENT_COMPAT, 'UTF-8'); ?>"
+		data-item-id="<?php echo (int) $this->row->id; ?>"
+		data-active="<?php echo (int) $this->row->current_version; ?>"
+		data-pagecount="<?php echo (int) $this->pagecount; ?>"
+		data-current-page="<?php echo (int) $this->current_page; ?>"
+		data-confirm-restore="<?php echo htmlspecialchars(Text::_( 'FLEXI_CONFIRM_VERSION_RESTORE' ), ENT_COMPAT, 'UTF-8'); ?>"
+	>
+		<h3><?php echo Text::_( 'FLEXI_VERSIONS_HISTORY' ); ?></h3>
+		<div data-fc-versions-table><?php echo flexicontent_html::renderVersionsTable($this->versions, $this->row, $version_options); ?></div>
+		<div id="fc_pager"></div>
+	</div>
 	<div class="fcclear"></div>
 <?php
 $fn = 'versions';

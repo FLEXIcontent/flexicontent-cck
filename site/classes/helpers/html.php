@@ -5255,10 +5255,12 @@ class flexicontent_html
 	static function builduploaderlist($name, $attribs, $selected, $displaytype=1, $tagid=null)
 	{
 		$db =Factory::getContainer()->get(DatabaseInterface::class);
-		$query = 'SELECT DISTINCT f.uploaded_by AS uid, u.name AS name'
+		// One row per uploader, by name. The order was that of the file extension of an unspecified file of each uploader
+		$query = 'SELECT f.uploaded_by AS uid, u.name AS name'
 		. ' FROM #__flexicontent_files AS f'
 		. ' LEFT JOIN #__users AS u ON u.id = f.uploaded_by'
-		. ' ORDER BY f.ext ASC'
+		. ' GROUP BY f.uploaded_by, u.name'
+		. ' ORDER BY u.name ASC, f.uploaded_by ASC'
 		;
 		$db->setQuery($query);
 		$data = $db->loadObjectList();
@@ -6870,5 +6872,186 @@ class flexicontent_html
 		}
 
 		return $field->input;
+	}
+
+
+	/**
+	 * Render the version history table of an item.
+	 * Shared by the item form and the Ajax pagination endpoint, so both renderings
+	 * always stay identical (including the comparison link's opening mode).
+	 *
+	 * @param   array   $versions  Rows from ParentClassItem::getVersionList()
+	 * @param   object  $item      Item (needs id, created, creator, current version)
+	 * @param   array   $options   Rendering options, see renderVersionRow()
+	 *
+	 * @return  string
+	 */
+	public static function renderVersionsTable($versions, $item, $options)
+	{
+		$html = '<table class="table table-sm fc-version-table">'
+			. '<thead><tr>'
+			. '<th scope="col">' . \Joomla\CMS\Language\Text::_('FLEXI_VERSION') . '</th>'
+			. '<th scope="col">' . \Joomla\CMS\Language\Text::_('JDATE') . '</th>'
+			. '<th scope="col">' . \Joomla\CMS\Language\Text::_('JAUTHOR') . '</th>'
+			. '<th scope="col">' . \Joomla\CMS\Language\Text::_('FLEXI_VERSION_BACKUP') . '</th>'
+			. '<th scope="col">' . \Joomla\CMS\Language\Text::_('FLEXI_ACTIONS') . '</th>'
+			. '</tr></thead><tbody>';
+
+		if (empty($item->id))
+		{
+			$html .= '<tr><td colspan="5" class="versions-first">'
+				. \Joomla\CMS\Language\Text::_('FLEXI_NEW_ARTICLE')
+				. '</td></tr>';
+		}
+		else
+		{
+			foreach ($versions as $version)
+			{
+				if ((int) $version->nr > 0)
+				{
+					$html .= self::renderVersionRow($version, $item, $options);
+				}
+			}
+		}
+
+		return $html . '</tbody></table>';
+	}
+
+
+	/**
+	 * Render one row of the version history table.
+	 *
+	 * Expected options:
+	 *   item_id, current_version, is_site, allow_comparing, can_keep, task_items, token, date_format
+	 *
+	 * @return  string
+	 */
+	public static function renderVersionRow($version, $item, $options)
+	{
+		$nr       = (int) $version->nr;
+		$isSite   = !empty($options['is_site']);
+		$current  = (int) $options['current_version'];
+		$isCurrent = $nr === $current;
+		$isKept   = !empty($version->keep);
+		$dateFormat = !empty($options['date_format'])
+			? $options['date_format']
+			: 'd/M H:i';
+		$taskItems = isset($options['task_items']) ? $options['task_items'] : 'task=items.';
+		$token    = isset($options['token']) ? $options['token'] : \Joomla\CMS\Session\Session::getFormToken();
+		$itemId   = (int) $options['item_id'];
+		$compareMode = isset($options['compare_mode']) ? $options['compare_mode'] : 'inline';
+
+		$classes = array('fc-version-row');
+		if ($isCurrent) $classes[] = 'active-version';
+		if ($isKept)    $classes[] = 'is-kept';
+
+		$author = $nr === 1
+			? (isset($item->creator) ? $item->creator : '')
+			: $version->modifier;
+		$author = self::striptagsandcut($author, 25);
+
+		// Permanent backup marker (one per item, excluded from rotation)
+		$keepCell = '<td class="versions fc-version-keep-cell">';
+		if (!empty($options['can_keep']) && !$isSite)
+		{
+			$keepUrl = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&task=items.setversionkeep&format=raw'
+				. '&id=' . $itemId . '&version=' . $nr . '&' . $token . '=1';
+			$keepLabel = $isKept
+				? \Joomla\CMS\Language\Text::sprintf('FLEXI_VERSION_UNKEEP', $nr)
+				: \Joomla\CMS\Language\Text::sprintf('FLEXI_VERSION_KEEP', $nr);
+			$keepIcon = $isKept ? 'icon-lock' : 'icon-unlock';
+			$keepCell .= '<a href="javascript:;" data-keep-url="' . htmlspecialchars($keepUrl, ENT_COMPAT, 'UTF-8') . '"'
+				. ' class="fc-version-keep hasTooltip'
+				. ($isKept ? ' is-kept' : ' is-unlocked') . '" title="' . htmlspecialchars($keepLabel, ENT_COMPAT, 'UTF-8') . '"'
+				. ' data-version="' . $nr . '">'
+				. '<span class="' . $keepIcon . '" aria-hidden="true"></span>'
+				. '<span class="visually-hidden">' . htmlspecialchars($keepLabel, ENT_COMPAT, 'UTF-8') . '</span>'
+				. '</a>';
+		}
+		elseif ($isKept)
+		{
+			$keepCell .= '<span class="icon-lock text-warning" aria-hidden="true"></span>';
+		}
+		$keepCell .= '</td>';
+
+		// Comment tooltip
+		$comment = !empty($version->comment)
+			? $version->comment
+			: \Joomla\CMS\Language\Text::_('FLEXI_NO_VERSION_COMMENT');
+		$tooltip = \Joomla\CMS\HTML\HTMLHelper::tooltipText(
+			\Joomla\CMS\Language\Text::_('FLEXI_COMMENT'),
+			$comment,
+			0,
+			1
+		);
+		// tooltipText() already escapes its output when $escape = 1 (as passed above)
+		$actions = '<a href="javascript:;" class="hasTooltip fc-version-comment" title="' . $tooltip . '">'
+			. '<span class="icon-comment" aria-hidden="true"></span>'
+			. '<span class="visually-hidden">' . \Joomla\CMS\Language\Text::_('FLEXI_COMMENT') . '</span>'
+			. '</a>';
+
+		// Compare with current version: new browser tab (inline) or Joomla dialog (popup)
+		if (!$isSite && !$isCurrent && !empty($options['allow_comparing']))
+		{
+			$compareUrl = 'index.php?option=com_flexicontent&view=itemcompare&cid[]=' . $itemId
+				. '&version=' . $nr . '&tmpl=component';
+			$compareLabel = \Joomla\CMS\Language\Text::_('FLEXI_COMPARE_WITH_CURRENT_VERSION');
+
+			if ($compareMode === 'popup')
+			{
+				$dialogOptions = array(
+					'popupType'  => 'iframe',
+					'src'        => \Joomla\CMS\Uri\Uri::base(true) . '/' . $compareUrl,
+					'textHeader' => $compareLabel . ' #' . $nr,
+					'width'      => '90%',
+					'height'     => '85%',
+				);
+				$actions .= ' <a class="fc-version-compare hasTooltip" href="' . htmlspecialchars($compareUrl, ENT_COMPAT, 'UTF-8') . '"'
+					. ' data-joomla-dialog="' . htmlspecialchars(json_encode($dialogOptions, JSON_UNESCAPED_SLASHES), ENT_COMPAT, 'UTF-8') . '"'
+					. ' title="' . htmlspecialchars($compareLabel, ENT_COMPAT, 'UTF-8') . '">'
+					. '<span class="icon-eye-open" aria-hidden="true"></span>'
+					. '<span class="visually-hidden">' . $compareLabel . '</span>'
+					. '</a>';
+			}
+			else
+			{
+				$actions .= ' <a class="fc-version-compare hasTooltip" href="' . htmlspecialchars($compareUrl, ENT_COMPAT, 'UTF-8') . '"'
+					. ' target="_blank" rel="noopener noreferrer"'
+					. ' title="' . htmlspecialchars($compareLabel, ENT_COMPAT, 'UTF-8') . '">'
+					. '<span class="icon-eye-open" aria-hidden="true"></span>'
+					. '<span class="visually-hidden">' . $compareLabel . '</span>'
+					. '</a>';
+			}
+		}
+
+		// Restore (loads the version into the edit form)
+		if (!$isSite)
+		{
+			if ($isCurrent)
+			{
+				$actions .= ' <span class="fc-version-current badge bg-success">'
+					. \Joomla\CMS\Language\Text::_('FLEXI_CURRENT') . '</span>';
+			}
+			else
+			{
+				$restoreUrl = 'index.php?option=com_flexicontent&' . $taskItems . 'edit'
+					. '&cid[]=' . $itemId . '&version=' . $nr . '&' . $token . '=1';
+				$restoreLabel = \Joomla\CMS\Language\Text::sprintf('FLEXI_REVERT_TO_THIS_VERSION', $nr);
+				$actions .= ' <a href="javascript:;" class="fc-version-restore hasTooltip"'
+					. ' data-restore-url="' . htmlspecialchars(\Joomla\CMS\Uri\Uri::base(true) . '/' . $restoreUrl, ENT_COMPAT, 'UTF-8') . '"'
+					. ' title="' . htmlspecialchars($restoreLabel, ENT_COMPAT, 'UTF-8') . '">'
+					. '<span class="icon-undo" aria-hidden="true"></span>'
+					. '<span class="visually-hidden">' . $restoreLabel . '</span>'
+					. '</a>';
+			}
+		}
+
+		return '<tr class="' . implode(' ', $classes) . '" data-version="' . $nr . '">'
+			. '<td class="versions fc-version-nr">#' . $nr . '</td>'
+			. '<td class="versions fc-version-date">' . \Joomla\CMS\HTML\HTMLHelper::_('date', ($nr === 1 ? $item->created : $version->date) ?: '', $dateFormat) . '</td>'
+			. '<td class="versions fc-version-author">' . htmlspecialchars($author, ENT_COMPAT, 'UTF-8') . '</td>'
+			. $keepCell
+			. '<td class="versions fc-version-actions">' . $actions . '</td>'
+			. '</tr>';
 	}
 }

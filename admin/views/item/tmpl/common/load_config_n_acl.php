@@ -201,16 +201,8 @@ if ($tags_editable)
 	flexicontent_html::loadTagPicker('jform[tag][]', $isSite ? 'addtag' : 'tags.addtag', true);
 }
 
-// Version history uses its own pager and comment tools.
-if (!$isSite && $this->perms['canversion'])
-{
-	$this->document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/assets/js/item-history.js', array('version' => FLEXI_VHASH));
-	$historyUrl = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&'
-		. $task_items . 'getversionlist&id=' . $this->row->id . '&active=' . $this->row->version
-		. '&' . \Joomla\CMS\Session\Session::getFormToken() . '=1&format=raw';
-	$this->document->addScriptDeclaration('FlexiForm.ready(() => fc_initItemHistory('
-		. json_encode($historyUrl, JSON_HEX_TAG | JSON_HEX_AMP) . ', ' . (int) $this->current_page . ', ' . (int) $this->pagecount . '));');
-}
+// Version history is initialized by flexi_versions.js.
+
 
 
 // ITEM SCREEN

@@ -61,6 +61,12 @@ class plgSystemFlexisystem extends CMSPlugin
 	{
 		parent::__construct($subject, $config);
 
+		// Joomla's command line application: add FLEXIcontent's console commands when it starts
+		if (Factory::getApplication() instanceof \Joomla\CMS\Application\ConsoleApplication)
+		{
+			$subject->addListener(\Joomla\Application\ApplicationEvents::BEFORE_EXECUTE, array($this, 'registerConsoleCommands'));
+		}
+
 		static $language_loaded = null;
 
 		if (!$language_loaded) {
@@ -84,6 +90,23 @@ class plgSystemFlexisystem extends CMSPlugin
 			Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class)->setQuery(
 				"SET sql_mode=(SELECT REPLACE(REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''),'STRICT_TRANS_TABLES',''))"
 			)->execute();
+		}
+	}
+
+
+	/**
+	 * Joomla's command line application is about to run: add FLEXIcontent's console commands to it
+	 *
+	 *   php cli/joomla.php flexicontent:database:innodb
+	 */
+	public function registerConsoleCommands()
+	{
+		$app = Factory::getApplication();
+
+		if (file_exists($command = JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/dbenginecommand.php'))
+		{
+			require_once $command;
+			$app->addCommand(new FlexicontentDbEngineCommand);
 		}
 	}
 

@@ -523,7 +523,7 @@ class FlexicontentModelTags extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 
 		$search_prefix = $this->_params->get('add_search_prefix') ? 'vvv' : '';   // SEARCH WORD Prefix
 		$text = !$search_prefix  ?  trim( $text )  :  preg_replace('/(\b[^\s,\.]+\b)/u', $search_prefix.'$0', trim($text));
-		$words = preg_split('/\s\s*/u', $text);
+		$words = flexicontent_db::getBooleanSearchWords(preg_split('/\s\s*/u', $text));
 
 		if( strlen($text) )
 		{

@@ -353,6 +353,11 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		// Fields common CSS
 		$document->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/css/flexi_form_fields.css', array('version' => FLEXI_VHASH));
 
+		// Version history table (loaded after j3x/j4x so it is not affected by their overrides).
+		// Use the backend path: the site-side copies are symlinks and may be blocked (403).
+		$version_assets = \Joomla\CMS\Uri\Uri::root(true).'/administrator/components/com_flexicontent/assets';
+		$document->addStyleSheet($version_assets.'/css/flexi_versions.css', array('version' => FLEXI_VHASH));
+
 		// Add JS frameworks
 		// The form scripts (fields, validation, uploaders) need jQuery, also on the site in Choices.js mode
 		if (!$isAdmin && (int) $cparams->get('loadfw_jquery', 1) === 1)
@@ -378,6 +383,15 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 
 		// Add js function for custom code used by FLEXIcontent item form
 		$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/itemscreen.js', array('version' => FLEXI_VHASH));
+
+		// Version history panel: table, pagination, permanent backup
+		$document->addScript($version_assets.'/js/flexi_versions.js', array('version' => FLEXI_VHASH));
+
+		// Joomla dialog is used by the version comparison link in popup mode
+		if ($isAdmin)
+		{
+			$document->getWebAssetManager()->useScript('joomla.dialog-autocreate');
+		}
 
 
 		if ($isSite)
@@ -982,7 +996,8 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$this->toolbar = $toolbar;
 
 		// Version related: version data, current page, total pages
-		$this->versions     = $versions;
+		$this->versions       = $versions;
+		$this->versionsperpage = $versionsperpage;
 		$this->current_page = $current_page;
 		$this->pagecount    = $pagecount;
 

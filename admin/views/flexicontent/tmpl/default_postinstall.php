@@ -170,6 +170,33 @@ jQuery(document).ready(function() {
 <?php endif; ?>
 
 
+
+<?php if(!$this->dbcharsetok) : ?>
+	jQuery('#dbcharsetok').on('click', function(e, data)
+	{
+		var url = "index.php?option=com_flexicontent&task=flexicontent.convertdbcharset&format=raw&<?php echo \Joomla\CMS\Session\Session::getFormToken();?>=1&tmpl=component";
+		var log = '';
+
+		// One request converts one or a few tables, repeat until none is left
+		var convert = function()
+		{
+			jQuery('#dbcharsetok-log').html(log + ajaxloader);
+			jQuery.ajax({
+				type: 'GET',
+				url: url,
+				data: {}
+			}).done( function(data) {
+				var more = data.indexOf('fc-dbcharset-more') !== -1;
+				log = more ? log + data : data;
+				jQuery('#dbcharsetok-log').html(log);
+				if (more) convert();
+			});
+		};
+		convert();
+	});
+<?php endif; ?>
+
+
 <?php if(!$this->existversions) : ?>
 	jQuery('#existversions').on('click', function(e, data)
 	{
@@ -434,6 +461,26 @@ jQuery(document).ready(function() {
 			<td>
 				<div id="existdbindexes-log" class="install-task">
 					<?php echo $this->existdbindexes ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="existdbindexes" href="javascript:;">'.\Joomla\CMS\Language\Text::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="key">
+				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_CONVERT_DB_TABLES_UTF8MB4' ); ?>
+				<?php
+					if (!$this->dbcharsetok && !empty($this->dbcharsetpending)) {
+						echo "<br/><span class='fc-mssg-inline fc-mssg fc-info'>" . \Joomla\CMS\Language\Text::_( 'FLEXI_CONVERT_DB_TABLES_UTF8MB4_DESC' ) . "</span>";
+						echo "<br># tables: ". count($this->dbcharsetpending) ." : ";
+						foreach($this->dbcharsetpending as $tblname => $tbl)
+						{
+							echo "<br/><b>" . htmlspecialchars($tblname, ENT_QUOTES, 'UTF-8') . "</b> (<small>" . (int) $tbl->rows . " rows, " . round($tbl->bytes / 1048576, 1) . " MB</small>)";
+						}
+					}
+				?>
+			</td>
+			<td>
+				<div id="dbcharsetok-log" class="install-task">
+					<?php echo $this->dbcharsetok ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span><a class="fc_button fc_simple" id="dbcharsetok" href="javascript:;">'.\Joomla\CMS\Language\Text::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
 				</div>
 			</td>
 		</tr>

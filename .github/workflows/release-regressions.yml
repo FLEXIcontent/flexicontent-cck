@@ -26,6 +26,7 @@ jobs:
         run: |
           php -d error_reporting=-1 tests/item-comments-selector.php
           php -d error_reporting=-1 tests/statistics-data.php
+          php -d error_reporting=-1 tests/group-by-columns.php
           php -d error_reporting=-1 tests/tag-assignment-removal.php
           php -d error_reporting=-1 tests/finder-query.php
           php -d error_reporting=-1 tests/finder-parameters.php
@@ -34,12 +35,15 @@ jobs:
           php -d error_reporting=-1 tests/route-menu-context.php
           php -d error_reporting=-1 tests/relation-values.php
           php -d error_reporting=-1 tests/batch-values.php
+          php -d error_reporting=-1 tests/strict-mode-records.php
           php -d error_reporting=-1 tests/category-csv.php
           php -d error_reporting=-1 tests/cache-path.php
           php -d error_reporting=-1 tests/cache-invalidation.php
           php -d error_reporting=-1 tests/extra-votes-without-rating.php
           php -d error_reporting=-1 tests/plain-page-item-data.php
           php -d error_reporting=-1 tests/items-stable-order.php
+          php -d error_reporting=-1 tests/list-totals.php
+          php -d error_reporting=-1 tests/like-search.php
           php -d error_reporting=-1 tests/thumbnail-widths.php
           php -d error_reporting=-1 tests/webp-generation.php
           php -d error_reporting=-1 tests/pdftotext-php8.php

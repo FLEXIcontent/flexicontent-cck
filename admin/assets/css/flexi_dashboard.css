@@ -1,0 +1,525 @@
+/**
+ * FLEXIcontent dashboard, Joomla-style cards and update column.
+ * Loaded after j3x/j4x stylesheets so it can override their legacy floats.
+ */
+
+#flexicontent .fc-dashboard-notices {
+	margin: 0 0 1rem;
+}
+
+#flexicontent .fc-dashboard-notices > .fc-mssg {
+	margin: 0 0 .5rem;
+}
+
+/* Two-column layout: feature cards on the left, update elements on the right */
+#flexicontent .fc-dashboard-layout {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
+	grid-template-areas: "cards updates";
+	gap: 1rem;
+	align-items: start;
+}
+
+#flexicontent .fc-dashboard-updates {
+	grid-area: updates;
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+	min-width: 0;
+}
+
+#flexicontent .fc-dashboard-updates > * {
+	margin: 0;
+}
+
+#flexicontent .fc-dashboard-waiting {
+	order: -1;
+}
+
+#flexicontent .fc-dashboard-updatecheck {
+	order: 0;
+}
+
+#flexicontent .fc-dashboard-updates #fc-dash-credits {
+	order: 1;
+}
+
+#flexicontent .fc-dashboard-cards {
+	grid-area: cards;
+	min-width: 0;
+}
+
+@media (max-width: 991.98px) {
+	#flexicontent .fc-dashboard-layout {
+		grid-template-columns: minmax(0, 1fr);
+		grid-template-areas: "cards" "updates";
+	}
+}
+
+/* Cards */
+#flexicontent .fc-dashboard-card {
+	float: none;
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	margin: 0 0 1rem;
+	padding: 0;
+	background: var(--card-bg, #fff);
+	border: 1px solid var(--card-border-color, #e5e7eb);
+	border-radius: var(--card-border-radius, .25rem);
+	box-shadow: 0 1px 2px rgba(0, 0, 0, .06);
+	overflow: hidden;
+}
+
+/* Legacy "#flexicontent fieldset.fc-board-set" forces width:auto, float:left and
+   margin:0 24px 12px 0. Make every dashboard card fill its grid/flex track. */
+#flexicontent .fc-dashboard-updates fieldset.fc-dashboard-card,
+#flexicontent .fc-dashboard-cards fieldset.fc-dashboard-card {
+	float: none;
+	width: 100%;
+	min-width: 0;
+	margin: 0;
+}
+
+#flexicontent .fc-dashboard-card > .fc-board-header {
+	float: none;
+	flex: 0 0 auto;
+	display: block;
+	width: auto;
+	margin: 0;
+	padding: .7rem 1rem;
+	background: var(--card-header-bg, var(--tertiary-bg, #f6f7f9));
+	border-bottom: 1px solid var(--card-border-color, #e5e7eb);
+	color: var(--emphasis-color, inherit);
+	font-size: 1rem;
+	font-weight: 600;
+	line-height: 1.4;
+}
+
+#flexicontent .fc-dashboard-cards .fc-dashboard-card > .fc-board-set-inner {
+	float: none;
+	clear: none;
+	flex: 1 1 auto;
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+	align-items: start;
+	align-content: start;
+	gap: .5rem;
+	padding: 1rem;
+	border-top: 0;
+}
+
+#flexicontent .fc-dashboard-updates .fc-dashboard-card > .fc-board-set-inner {
+	float: none;
+	clear: none;
+	flex: 1 1 auto;
+	display: block;
+	padding: .75rem 1rem;
+	border-top: 0;
+}
+
+/* Quick icons inside the cards */
+#flexicontent .fc-dashboard-cards #fc-dash-boardbtns {
+	float: none;
+	clear: none;
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 1rem;
+	align-items: stretch;
+	width: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+#flexicontent .fc-dashboard-cards .fc-dashboard-card {
+	margin: 0;
+}
+
+@media (max-width: 1199.98px) {
+	#flexicontent .fc-dashboard-cards #fc-dash-boardbtns {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
+
+#flexicontent .fc-dashboard-cards .fc-board-button_sep {
+	display: none;
+}
+
+#flexicontent .fc-dashboard-cards .fc-board-button {
+	float: none;
+	display: block;
+	width: 100%;
+	min-width: 190px;
+	height: auto;
+	min-height: 104px;
+	margin: 0;
+	padding: .35rem;
+	text-align: center;
+	background: var(--tertiary-bg, #f8f9fa);
+	border: 1px solid var(--card-border-color, #e5e7eb);
+	border-radius: var(--card-border-radius, .25rem);
+	color: var(--body-color, #444);
+	box-shadow: none;
+	transition: background-color .15s ease, border-color .15s ease, transform .15s ease;
+}
+
+#flexicontent .fc-dashboard-cards .fc-board-button:hover {
+	background: var(--secondary-bg, #eef1f4);
+	border-color: var(--primary-bg, #0d6efd);
+	box-shadow: 0 1px 4px rgba(0, 0, 0, .12);
+	transform: translateY(-1px);
+}
+
+#flexicontent .fc-dashboard-cards .fc-board-button .fc-board-button-inner {
+	display: block;
+	width: auto;
+	height: auto;
+}
+
+#flexicontent .fc-dashboard-cards .fc-board-button:not(.fc-board-button-combo) a {
+	display: block;
+	height: auto;
+	padding: .85rem .25rem .5rem;
+}
+
+/*
+ * Standalone buttons: use the same Atum quickicon variables as the combined
+ * tiles (background, 1rem padding, 2rem icon, bold .875rem label, hover).
+ * The legacy FLEXIcontent rules are overridden with a higher specificity.
+ */
+#flexicontent div#fc-dash-boardbtns .fc-board-button:not(.fc-board-button-combo) {
+	height: 6rem;
+	min-height: 6rem;
+	padding: 0;
+	text-align: start;
+	background: var(--template-quickicon-bg, var(--tertiary-bg, #f8f9fa));
+	border: var(--quickicon-border, 1px solid var(--card-border-color, #e5e7eb));
+	border-radius: var(--quickicon-border-radius, .25rem);
+	color: var(--template-quickicon-color, var(--body-color, #444));
+	box-shadow: none;
+	transition: all .25s;
+}
+
+#flexicontent div#fc-dash-boardbtns .fc-board-button:not(.fc-board-button-combo):hover,
+#flexicontent div#fc-dash-boardbtns .fc-board-button:not(.fc-board-button-combo):focus-within {
+	background: var(--template-quickicon-bg-hvr, var(--secondary-bg, #eef1f4));
+	border: var(--quickicon-border, 1px solid var(--card-border-color, #e5e7eb));
+	color: var(--quickicon-link-hvr, var(--primary-bg, #0d6efd));
+	box-shadow: none;
+	transform: none;
+}
+
+#flexicontent div#fc-dash-boardbtns .fc-board-button:not(.fc-board-button-combo) .fc-board-button-inner {
+	display: flex;
+	width: 100%;
+	height: 100%;
+}
+
+#flexicontent div#fc-dash-boardbtns .fc-board-button:not(.fc-board-button-combo) a {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0 1rem;
+	color: var(--template-quickicon-color, var(--body-color, #444));
+	text-decoration: none;
+	transition: all .25s;
+}
+
+#flexicontent div#fc-dash-boardbtns .fc-board-button:not(.fc-board-button-combo):hover a,
+#flexicontent div#fc-dash-boardbtns .fc-board-button:not(.fc-board-button-combo):focus-within a {
+	color: var(--quickicon-link-hvr, var(--primary-bg, #0d6efd));
+	background: transparent;
+}
+
+#flexicontent div#fc-dash-boardbtns .fc-board-button:not(.fc-board-button-combo) .fc-dashboard-icon {
+	display: block;
+	flex: 0 0 auto;
+	width: auto;
+	height: auto;
+	margin-block: 0;
+	margin-inline-start: .2rem;
+	font-size: 2rem;
+	line-height: 1;
+	color: var(--template-quickicon-color, inherit);
+}
+
+#flexicontent div#fc-dash-boardbtns .fc-board-button:not(.fc-board-button-combo):hover .fc-dashboard-icon,
+#flexicontent div#fc-dash-boardbtns .fc-board-button:not(.fc-board-button-combo):focus-within .fc-dashboard-icon {
+	color: var(--quickicon-color-hvr, var(--primary-bg, #0d6efd));
+}
+
+#flexicontent div#fc-dash-boardbtns .fc-board-button:not(.fc-board-button-combo) .fc-board-btn-text {
+	display: block;
+	width: auto;
+	min-height: 0;
+	margin: 0;
+	padding: .125rem 0 .25rem;
+	font-size: .875rem;
+	font-weight: 700;
+	line-height: 1.2;
+	text-align: start;
+	white-space: normal;
+}
+
+/*
+ * Combined "Items + New item" tile.
+ * Uses the exact Joomla quickicon markup/classes so Atum's .quick-icons styles
+ * (background, icon, label, add-link column, hover states) are reused as-is.
+ * Only the custom .fc-board-button tile styles need to be reset here.
+ */
+#flexicontent .fc-dashboard-cards .fc-board-button.fc-board-button-combo {
+	min-width: 190px;
+	min-height: 0;
+	padding: 0;
+	background: transparent;
+	border: 0;
+	box-shadow: none;
+}
+
+#flexicontent .fc-dashboard-cards .fc-board-button.fc-board-button-combo:hover {
+	background: transparent;
+	border-color: transparent;
+	box-shadow: none;
+	transform: none;
+}
+
+#flexicontent .fc-dashboard-cards .fc-board-button.fc-board-button-combo .quickicon-group {
+	height: 100%;
+	min-height: 6rem;
+}
+
+/* FLEXIcontent legacy rule (div#fc-dash-boardbtns .fc-board-button a) forces
+   padding:25% 0 0 and display:inline-block; restore Atum's quickicon layout */
+#flexicontent div#fc-dash-boardbtns .fc-board-button.fc-board-button-combo .quickicon a {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+	justify-content: flex-end;
+	width: auto;
+	height: auto;
+	margin: 0;
+	padding: 0 1rem;
+}
+
+#flexicontent div#fc-dash-boardbtns .fc-board-button.fc-board-button-combo .quickicon-linkadd a {
+	display: flex;
+	align-items: flex-end;
+	justify-content: center;
+	width: 100%;
+	height: auto;
+	margin: 0;
+	padding: 0;
+}
+
+#flexicontent .fc-dashboard-cards .fc-board-button .fc-dashboard-icon {
+	display: block;
+	width: auto;
+	height: auto;
+	margin: 0 auto .35rem;
+	font-size: 1.9rem;
+	line-height: 1;
+}
+
+#flexicontent .fc-dashboard-cards .fc-board-button .fc-board-btn-img {
+	display: block;
+	float: none;
+	width: 32px;
+	margin: 0 auto .35rem;
+}
+
+#flexicontent .fc-dashboard-cards .fc-board-button .fc-board-btn-text {
+	display: block;
+	width: auto;
+	min-height: 0;
+	margin: 0;
+	padding: 0;
+	font-size: .82rem;
+	line-height: 1.3;
+	white-space: normal;
+}
+
+/* Left column: update elements in an accordion */
+#flexicontent .fc-dashboard-updates .accordion {
+	float: none;
+	clear: none;
+	width: 100%;
+	margin: 0 0 1rem;
+	padding: 0;
+	background: transparent;
+}
+
+#flexicontent .fc-dashboard-waiting #fc-dash-sliders {
+	margin: 0;
+}
+
+#flexicontent .fc-dashboard-updates .accordion .accordion-item {
+	margin: 0 0 .5rem;
+	background: var(--card-bg, #fff);
+	border: 0;
+	border-radius: var(--card-border-radius, .25rem);
+	overflow: hidden;
+}
+
+/* No borders on the accordion headers (Bootstrap + FLEXIcontent add some) */
+#flexicontent .fc-dashboard-updates .accordion .accordion-button,
+#flexicontent .fc-dashboard-updates .accordion .accordion-button.collapsed,
+#flexicontent .fc-dashboard-updates .accordion .accordion-button:not(.collapsed) {
+	border: 0;
+	box-shadow: none;
+}
+
+#flexicontent .fc-dashboard-updates .accordion .accordion-button {
+	padding: .7rem 1rem;
+	background: var(--card-header-bg, var(--tertiary-bg, #f6f7f9));
+	color: var(--emphasis-color, inherit);
+	font-weight: 600;
+}
+
+#flexicontent .fc-dashboard-updates .accordion .accordion-button:not(.collapsed) {
+	box-shadow: none;
+}
+
+/* No bold on the state accordions: Pending, Revised, In progress, Draft */
+#flexicontent .fc-dashboard-updates .accordion .accordion-button[data-bs-target="#fc-dash-sliders-pending"],
+#flexicontent .fc-dashboard-updates .accordion .accordion-button[data-bs-target="#fc-dash-sliders-revised"],
+#flexicontent .fc-dashboard-updates .accordion .accordion-button[data-bs-target="#fc-dash-sliders-inprogress"],
+#flexicontent .fc-dashboard-updates .accordion .accordion-button[data-bs-target="#fc-dash-sliders-draft"] {
+	font-weight: normal;
+}
+
+#flexicontent .fc-dashboard-updates .accordion .accordion-body {
+	padding: .75rem 1rem;
+}
+
+#flexicontent .fc-dashboard-updates .accordion table.table {
+	width: 100%;
+	margin: 0;
+	font-size: .85rem;
+}
+
+#flexicontent .fc-dashboard-updates .accordion table.table th,
+#flexicontent .fc-dashboard-updates .accordion table.table td {
+	padding: .4rem .5rem;
+	vertical-align: middle;
+}
+
+#flexicontent .fc-dashboard-updates .accordion .fc-mssg {
+	margin: 0;
+}
+
+#flexicontent .fc-dashboard-updatecheck #displayfversion {
+	float: none;
+	width: 100%;
+	font-size: .85rem;
+}
+
+#flexicontent .fc-dashboard-updates #fc-dash-credits {
+	float: none;
+	clear: none;
+	margin: 0;
+}
+
+#flexicontent .fc-dashboard-updates #fc-dash-credits #fc-dash-logo {
+	display: block;
+	float: none;
+	max-width: 100%;
+	margin: 0 0 .75rem !important;
+}
+
+#flexicontent .fc-dashboard-updates #fc-dash-credits #fc-dash-devs,
+#flexicontent .fc-dashboard-updates #fc-dash-credits #fc-dash-devs > .fc-mssg-inline {
+	display: block;
+}
+
+#flexicontent .fc-dashboard-updates #fc-dash-credits #fc-dash-devs > .fc-mssg-inline {
+	margin: 0 0 .75rem !important;
+}
+
+/* RTL: mirror the columns (cards on the right, updates on the left) */
+[dir="rtl"] #flexicontent .fc-dashboard-layout {
+	grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
+	grid-template-areas: "cards updates";
+}
+
+@media (max-width: 991.98px) {
+	[dir="rtl"] #flexicontent .fc-dashboard-layout {
+		grid-template-columns: minmax(0, 1fr);
+		grid-template-areas: "cards" "updates";
+	}
+}
+
+/* Dark mode fallbacks when Atum CSS variables are not available */
+[data-bs-theme="dark"] #flexicontent .fc-dashboard-card {
+	background: var(--card-bg, #1e2124);
+	border-color: var(--card-border-color, #343a40);
+}
+
+[data-bs-theme="dark"] #flexicontent .fc-dashboard-card > .fc-board-header,
+[data-bs-theme="dark"] #flexicontent .fc-dashboard-updates .accordion .accordion-button {
+	background: var(--card-header-bg, var(--tertiary-bg, #2b3035));
+	color: var(--emphasis-color, #dee2e6);
+}
+
+[data-bs-theme="dark"] #flexicontent .fc-dashboard-cards .fc-board-button:not(.fc-board-button-combo) {
+	background: var(--tertiary-bg, #2b3035);
+	border-color: var(--card-border-color, #343a40);
+	color: var(--body-color, #dee2e6);
+}
+
+/* Dark mode: accordions of the "Waiting for action" card */
+[data-bs-theme="dark"] #flexicontent .fc-dashboard-updates .accordion .accordion-item {
+	background: var(--card-bg, #1e2124);
+	border-color: var(--card-border-color, var(--border-color, #ffffff1a));
+}
+
+[data-bs-theme="dark"] #flexicontent .fc-dashboard-updates .accordion .accordion-button,
+[data-bs-theme="dark"] #flexicontent .fc-dashboard-updates .accordion .accordion-button:not(.collapsed),
+[data-bs-theme="dark"] #flexicontent .fc-dashboard-updates .accordion .accordion-button.collapsed {
+	background: var(--card-header-bg, var(--tertiary-bg, #2b3035));
+	color: var(--card-header-color, var(--emphasis-color, #dee2e6));
+	box-shadow: none;
+}
+
+[data-bs-theme="dark"] #flexicontent .fc-dashboard-updates .accordion .accordion-button:after,
+[data-bs-theme="dark"] #flexicontent .fc-dashboard-updates .accordion .accordion-button:not(.collapsed):after {
+	filter: invert(1) grayscale(1) brightness(2);
+}
+
+[data-bs-theme="dark"] #flexicontent .fc-dashboard-updates .accordion .accordion-body {
+	background: var(--card-bg, #1e2124);
+	color: var(--body-color, #dee2e6);
+}
+
+[data-bs-theme="dark"] #flexicontent .fc-dashboard-updates .accordion .accordion-body a {
+	color: var(--link-color, #6fbfdb);
+}
+
+[data-bs-theme="dark"] #flexicontent .fc-dashboard-updates .accordion table.table,
+[data-bs-theme="dark"] #flexicontent .fc-dashboard-updates .accordion table.table th,
+[data-bs-theme="dark"] #flexicontent .fc-dashboard-updates .accordion table.table td {
+	color: var(--body-color, #dee2e6);
+	border-color: var(--border-color, #ffffff1a);
+}
+
+[data-bs-theme="dark"] #flexicontent .fc-dashboard-updates .accordion table.table thead th {
+	background: var(--tertiary-bg, #2b3035);
+}
+
+[data-bs-theme="dark"] #flexicontent .fc-dashboard-updates .accordion table.table tbody tr:hover td {
+	background: var(--secondary-bg, #2b3035);
+}
+
+/* Keep the accent borders of .fc-mssg, but darken their backgrounds */
+[data-bs-theme="dark"] #flexicontent .fc-dashboard-updates .fc-mssg,
+[data-bs-theme="dark"] #flexicontent .fc-dashboard-updates .fc-mssg.fc-note,
+[data-bs-theme="dark"] #flexicontent .fc-dashboard-updates .fc-mssg.fc-info,
+[data-bs-theme="dark"] #flexicontent .fc-dashboard-updates .fc-mssg.fc-warning,
+[data-bs-theme="dark"] #flexicontent .fc-dashboard-updates .fc-mssg.fc-success,
+[data-bs-theme="dark"] #flexicontent .fc-dashboard-updates .fc-mssg.fc-error {
+	background-color: rgba(255, 255, 255, .06);
+	color: var(--body-color, #dee2e6);
+}
