@@ -74,16 +74,17 @@ function fc_submit_form(form, task) {
     const receive = html => {
       cleanup();
       const box = document.getElementById('system-message-container');
-      if (!box) return;
+      if (!box) { fail(); return; }
       // This endpoint returns Joomla's message fragment; do not execute returned scripts.
       const template = document.createElement('template'); template.innerHTML = html;
       template.content.querySelectorAll('script').forEach(el => el.remove());
       if (!template.content.querySelector('.alert, joomla-alert')) { fail(); return; }
       box.replaceChildren(template.content);
-      if (box.querySelector('.alert-success, .alert-message, joomla-alert[type=success], joomla-alert[type=message]')
-        && !box.querySelector('.alert-danger, .alert-error, joomla-alert[type=danger], joomla-alert[type=error]')) {
-        form.dispatchEvent(new CustomEvent('flexicontent:save-confirmed', {detail:{status:200, responseText:html}}));
-      }
+      const confirmed = box.querySelector('.alert-success, .alert-message, joomla-alert[type=success], joomla-alert[type=message]')
+        && !box.querySelector('.alert-danger, .alert-error, joomla-alert[type=danger], joomla-alert[type=error]');
+      form.dispatchEvent(new CustomEvent(confirmed ? 'flexicontent:save-confirmed' : 'flexicontent:save-failed', {
+        bubbles: true, detail: {status: 200, responseText: html}
+      }));
     };
     // Restore the form and messages BEFORE legacy global ajaxSuccess/ajaxError
     // listeners. Existing editor plugins use those hooks for their saved baseline.

@@ -307,10 +307,9 @@ $layout = $jinput->getString('layout', '');
 
 if ($format === 'html')
 {
-	// Load jquery Framework, but let some views decide for themselves, so that they can choose not to load some parts of jQuery.ui JS
 	flexicontent_html::loadFramework('form-utils');
 	flexicontent_html::loadFramework('sortable');
-	if ($view != 'item' || $view != 'fileselement') flexicontent_html::loadFramework('jQuery');
+	if (!flexicontent_html::usesNativeAdminAssets()) flexicontent_html::loadFramework('jQuery');
 
 	if ( 1 ) // always load tooltips JS in backend
 	{

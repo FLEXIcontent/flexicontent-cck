@@ -277,10 +277,13 @@ class FlexicontentViewField extends FlexicontentViewBaseRecord
 		if (!empty($model->helpURL))
 		{
 			$onclick_js = empty($_SERVER['HTTPS']) && $model->helpModal
-				? 'var url = jQuery(this).attr(\'data-href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, false, {\'title\': \''.flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_($model->helpTitle), 2).'\'}); return false;'
-				: 'var url = jQuery(this).attr(\'data-href\'); window.open(url); return false;';
+				? 'var url = this.dataset.href; fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, false, {\'title\': \''.flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_($model->helpTitle), 2).'\'}); return false;'
+				: 'var url = this.dataset.href; window.open(url); return false;';
 			$js .= "
-				jQuery('#toolbar-help a.toolbar, #toolbar-help button').attr('data-href', '".$model->helpURL."').attr('onclick', \"".$onclick_js."\");
+				document.querySelectorAll('#toolbar-help a.toolbar, #toolbar-help button').forEach(button => {
+					button.dataset.href = " . json_encode($model->helpURL, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT) . ";
+					button.setAttribute('onclick', " . json_encode($onclick_js, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT) . ");
+				});
 			";
 			\Joomla\CMS\Toolbar\ToolbarHelper::custom( $btn_task='', 'help.png', 'help_f2.png', $model->helpTitle, false );
 		}
@@ -355,7 +358,7 @@ class FlexicontentViewField extends FlexicontentViewBaseRecord
 		if (empty($level_name))
 		{
 			\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::sprintf('FLEXI_ABOUT_INVALID_ACCESS_LEVEL_PLEASE_SAVE_NEW', $row->access, 'Public'), 'warning');
-			$document->addScriptDeclaration("jQuery(document).ready(function() { jQuery('#jform_access').val(1).trigger('change'); });");
+			$document->addScriptDeclaration("FlexiForm.ready(function() { const access = document.getElementById('jform_access'); if (access) { access.value = '1'; access.fc_choices_instance?.refresh(); FlexiForm.change(access); } });");
 		}
 
 
@@ -365,23 +368,41 @@ class FlexicontentViewField extends FlexicontentViewBaseRecord
 	
 		if (!$row->iscore)
 		{
-			$_field_id = 'jform_field_type';
-			$_row_id = $form->getValue("id");
-			$_ctrl_task = 'task=fields.getfieldspecificproperties';
+			$fieldSettingsUrl = json_encode(
+				'index.php?option=com_flexicontent&task=fields.getfieldspecificproperties&format=raw&cid=' . (int) $form->getValue('id')
+			);
 			$js .= "
-				jQuery('#".$_field_id."').on('change', function() {
-					jQuery('#fieldspecificproperties').html('<p class=\"centerimg\"><img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" style=\"vertical-align: middle;\"></p>');
-					jQuery.ajax({
-						type: \"GET\",
-						url: 'index.php?option=com_flexicontent&".$_ctrl_task."&cid=".$_row_id."&field_type='+this.value+'&format=raw',
-						success: function(str)
-						{
-							// Initialize JS and CSS of the layout
-							const container_id  = 'fieldspecificproperties';
-							fc_initDynamicLayoutJsCss(container_id, ['subform-row-add'], str);
-							jQuery('#field_typename').html(jQuery('#".$_field_id."').val());
-						}
-					});
+				const typeSelect = document.getElementById('jform_field_type');
+				const properties = document.getElementById('fieldspecificproperties');
+				const typeName = document.getElementById('field_typename');
+				let fieldSettingsRequest;
+				let appliedType = typeSelect?.value;
+				typeSelect?.addEventListener('change', async function() {
+					const fieldType = typeSelect.value;
+					fieldSettingsRequest?.abort();
+					const request = fieldSettingsRequest = new AbortController();
+					const url = new URL(" . $fieldSettingsUrl . ", document.baseURI);
+					url.searchParams.set('field_type', fieldType);
+					properties.setAttribute('aria-busy', 'true');
+					try {
+						const response = await fetch(url, {
+							headers: {'X-Requested-With': 'XMLHttpRequest'},
+							signal: request.signal
+						});
+						if (!response.ok) throw new Error('HTTP ' + response.status);
+						const html = await response.text();
+						if (request.signal.aborted) return;
+						fc_initDynamicLayoutJsCss('fieldspecificproperties', ['subform-row-add'], html);
+						if (typeName) typeName.textContent = fieldType;
+						appliedType = fieldType;
+					} catch (error) {
+						if (request.signal.aborted) return;
+						typeSelect.value = appliedType;
+						typeSelect.fc_choices_instance?.refresh();
+						Joomla.renderMessages({error: [FlexiForm.text('JERROR_AN_ERROR_HAS_OCCURRED')]});
+					} finally {
+						if (fieldSettingsRequest === request) properties.removeAttribute('aria-busy');
+					}
 				});
 			";
 		}
@@ -436,7 +457,7 @@ class FlexicontentViewField extends FlexicontentViewBaseRecord
 
 		if ($js)
 		{
-			$document->addScriptDeclaration('jQuery(document).ready(function(){'
+			$document->addScriptDeclaration('FlexiForm.ready(function(){'
 				.$js.
 			'});');
 		}

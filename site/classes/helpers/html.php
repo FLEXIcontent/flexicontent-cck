@@ -1469,6 +1469,16 @@ class flexicontent_html
 			. '));');
 	}
 
+	/** Administrator views that can start without the shared jQuery loader. */
+	static function usesNativeAdminAssets()
+	{
+		$app = Factory::getApplication();
+		return FLEXI_J40GE && $app->isClient('administrator')
+			&& in_array($app->getInput()->getCmd('view'), array(
+				'item', 'items', 'field', 'type', 'template', 'filemanager', 'fileselement',
+			), true);
+	}
+
 	/** Load a JavaScript framework once per request. */
 	static function loadFramework( $framework, $mode='', $params=null )
 	{
@@ -1493,7 +1503,9 @@ class flexicontent_html
 				// Choices.js mode on the site front loads NO jQuery (keeps front entirely
 				// jQuery-free); select2 legacy keeps jQuery + mousewheel.
 				$useChoicesJs = (int) $cparams->get('select_lib_type', 0) === 1;
-				$load_jquery = ( (int) $cparams->get('loadfw_jquery', 1) === 1 || !$app->isClient('site') ) && ! ( $app->isClient('site') && $useChoicesJs );
+				$load_jquery = !self::usesNativeAdminAssets()
+					&& ( (int) $cparams->get('loadfw_jquery', 1) === 1 || !$app->isClient('site') )
+					&& ! ( $app->isClient('site') && $useChoicesJs );
 
 				// jQuery plugins without a jQuery-free alternative still need jQuery in Choices.js mode,
 				// so it is loaded on the pages that use them (unless jQuery loading is turned off)

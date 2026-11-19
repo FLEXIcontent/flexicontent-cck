@@ -31,7 +31,7 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$user     = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
-		$use_jquery_sortable = true;
+		$use_jquery_sortable = true;  // Connected position lists are enabled.
 
 		$type    = $jinput->getWord('type', 'items');
 		$folder  = $jinput->getString('folder', 'table');
@@ -101,84 +101,21 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 
 		if (isset($layout->positions)) {
 			$sort = array();
-			$jssort = array();
 			$idsort = array();
-			$sort[0] = 'sortablecorefields';
-			$sort[1] = 'sortableuserfields';
-			$i = 2;
-			$count=-1;
-			foreach ($layout->positions as $pos) {
+			$sort = array('sortablecorefields', 'sortableuserfields');
+			$count = -1;
+			foreach ($layout->positions as $pos)
+			{
 				$count++;
-				if ( isset($layout->attributes[$count]) && isset($layout->attributes[$count]['readonly']) ) {
-					continue;
-				}
-				$sort[$i] 	= 'sortable-'.$pos;
-				$idsort[$i] = $pos;
-				$i++;
-			}
-			foreach ($idsort as $k => $v) {
-				if ($k > 1) {
-					$jssort[] = 'tmpls_fcfield_store_ordering(jQuery("#sortable-'.$v.'"))';
-				}
+				if (isset($layout->attributes[$count]['readonly'])) continue;
+				$sort[] = 'sortable-' . $pos;
+				$idsort[] = $pos;
 			}
 			$positions = implode(',', $idsort);
-
-			$jssort = implode("; ", $jssort);
-			$sortable_ids = "#".implode(",#", $sort);
-
-			$js = "
-			jQuery(function() {
-				my = jQuery( \"$sortable_ids\" ).sortable({
-					connectWith: \"".$sortable_ids."\",
-					update: function(event, ui) {
-						if (ui.sender)
-							tmpls_fcfield_store_ordering(jQuery(ui.sender));
-						else
-							tmpls_fcfield_store_ordering(jQuery(ui.item).parent());
-					}
-				});
-				tmpls_fcfield_init_ordering();
-			});
-			function tmpls_fcfield_store_ordering(parent_element) {
-				hidden_id = '#'+jQuery.trim(parent_element.attr('id').replace('sortable-',''));
-				fields = new Array();
-				i = 0;
-				parent_element.children('li').each(function(){
-					fields[i++] = jQuery(this).attr('id').replace('field_', '');
-				});
-				jQuery(hidden_id).val(fields.join(','))
-			}
-			";
-
-			$js .= '
-			var fieldListFilters = new Array( "content_type", "field_type" );
-			function filterFieldList (containerID, method, group)
-			{
-				var needed_classes = "";
-				for (i=0; i<fieldListFilters.length; i++)
-				{
-					filter_name = fieldListFilters[i];
-
-					var filter_val = jQuery("#" + filter_name + "_" + group).val();
-					if (filter_val) {
-						needed_classes += "."+filter_name+"_"+filter_val;
-					}
-				}
-
-				if (needed_classes) {
-					(method=="hide") ?
-						jQuery("#"+containerID).find("li").show().filter(":not("+needed_classes+")").hide() :
-						jQuery("#"+containerID).find("li").css({"color":"red"}).filter(":not("+needed_classes+")").css({"color":"black"});
-				} else {
-					(method=="hide") ?
-						jQuery("#"+containerID).find("li").show() :
-						jQuery("#"+containerID).find("li").css({"color":"black"});
-				}
-			}
-
-			';
-
-			$document->addScriptDeclaration( $js );
+			$lists = json_encode($sort, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT);
+			$document->addScriptDeclaration("
+				FlexiForm.ready(() => fc_layout_init_positions(" . $lists . "));
+			");
 		}
 
 
@@ -196,9 +133,7 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 			: $document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flexicontent/assets/css/' . (FLEXI_J40GE ? 'j4x_rtl.css' : 'j3x_rtl.css'), array('version' => FLEXI_VHASH));
 
 		// Add JS frameworks
-		flexicontent_html::loadJQuery();
 		flexicontent_html::loadFramework('select2');
-		flexicontent_html::loadFramework('touch-punch');
 		flexicontent_html::loadFramework('prettyCheckable');
 		flexicontent_html::loadFramework('flexi-lib');
 		flexicontent_html::loadFramework('flexi-lib-form');

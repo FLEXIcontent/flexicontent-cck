@@ -542,6 +542,12 @@ $this->document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flex
 
 							$value = $this->layout->params->getValue($fieldname, $groupname, @$this->conf->attribs[$fieldname]);
 							$value = $value !== '' ? $value : null;
+							if (FLEXI_J40GE && strcasecmp($field->type, 'color') === 0 && !$field->hidden)
+							{
+								// Keep the editable CSS value, including keywords and alpha.
+								$this->layout->params->setFieldAttribute($fieldname, 'type', 'text', $groupname);
+								$this->layout->params->setFieldAttribute($fieldname, 'class', trim($field->class . ' fc-layout-color'), $groupname);
+							}
 
 							if ($field->getAttribute('type')=='separator' || $field->hidden)
 							{

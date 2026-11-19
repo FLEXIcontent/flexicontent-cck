@@ -271,30 +271,30 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 
 		if ($filter_state || strlen($filter_featured))
 		{
-			$js .= "jQuery('.col_status').addClass('filtered_column');";
+			$js .= "document.querySelectorAll('.col_status').forEach(column => column.classList.add('filtered_column'));";
 		}
-		if (strlen($search)) $js .= "jQuery('.col_title').addClass('filtered_column');";
-		if ($filter_cats)    $js .= "jQuery('.col_cats').addClass('filtered_column');";
-		if ($filter_type)    $js .= "jQuery('.col_type').addClass('filtered_column');";
-		if ($filter_author)  $js .= "jQuery('.col_authors').addClass('filtered_column');";
-		if ($filter_lang)    $js .= "jQuery('.col_lang').addClass('filtered_column');";
-		if ($filter_access)  $js .= "jQuery('.col_access').addClass('filtered_column');";
-		if ($filter_meta)    $js .= "jQuery('.col_meta').addClass('filtered_column');";
-		if ($filter_tag)     $js .= "jQuery('.col_tag').addClass('filtered_column');";
-		if ($filter_id)      $js .= "jQuery('.col_id').addClass('filtered_column');";
+		if (strlen($search)) $js .= "document.querySelectorAll('.col_title').forEach(column => column.classList.add('filtered_column'));";
+		if ($filter_cats)    $js .= "document.querySelectorAll('.col_cats').forEach(column => column.classList.add('filtered_column'));";
+		if ($filter_type)    $js .= "document.querySelectorAll('.col_type').forEach(column => column.classList.add('filtered_column'));";
+		if ($filter_author)  $js .= "document.querySelectorAll('.col_authors').forEach(column => column.classList.add('filtered_column'));";
+		if ($filter_lang)    $js .= "document.querySelectorAll('.col_lang').forEach(column => column.classList.add('filtered_column'));";
+		if ($filter_access)  $js .= "document.querySelectorAll('.col_access').forEach(column => column.classList.add('filtered_column'));";
+		if ($filter_meta)    $js .= "document.querySelectorAll('.col_meta').forEach(column => column.classList.add('filtered_column'));";
+		if ($filter_tag)     $js .= "document.querySelectorAll('.col_tag').forEach(column => column.classList.add('filtered_column'));";
+		if ($filter_id)      $js .= "document.querySelectorAll('.col_id').forEach(column => column.classList.add('filtered_column'));";
 		if ($startdate || $enddate)
 		{
 			if ($date == 1) {
-				$js .= "jQuery('.col_created').addClass('filtered_column');";
+				$js .= "document.querySelectorAll('.col_created').forEach(column => column.classList.add('filtered_column'));";
 			} else if ($date == 2) {
-				$js .= "jQuery('.col_revised').addClass('filtered_column');";
+				$js .= "document.querySelectorAll('.col_revised').forEach(column => column.classList.add('filtered_column'));";
 			}
 		}
 
 		if ($js)
 		{
 			$document->addScriptDeclaration('
-				jQuery(document).ready(function(){
+				FlexiForm.ready(function(){
 					' . $js . '
 				});
 			');
@@ -1425,7 +1425,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 			 */
 			$popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&view=types&tmpl=component&layout=typeslist&action=new' . '&catid=' . $filter_cats;
 			$btn_name = 'add_item';
-			$full_js = "var url = jQuery(this).data('taskurl'); fc_showDialog(url, 'fc_modal_popup_container', 0, 1200, 0, false, {'title': '".flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_TYPE'), 2)."'}); return false;";
+			$full_js = "var url = this.dataset.taskurl; fc_showDialog(url, 'fc_modal_popup_container', 0, 1200, 0, false, {'title': '".flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_TYPE'), 2)."'}); return false;";
 			$btn_arr[] = flexicontent_html::addToolBarButton(
 				'FLEXI_NEW', $btn_name, $full_js,
 				$msg_alert = '', $msg_confirm = '',
@@ -1546,9 +1546,9 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				$popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&view=items&tmpl=component&task=quicktranslate';
 				$btn_name = 'quicktranslate';
 				$full_js = "" .
-					"var url = jQuery(this).data('taskurl'); " .
-					"var cid = []; jQuery.each(jQuery(\"input[name='cid[]']:checked\"), function(){ cid.push(jQuery(this).val()); }); " .
-					"url += '&' + cid.map(function(el, idx) { return 'cid[' + ']=' + el; }).join('&'); " .
+					"var url = this.dataset.taskurl; " .
+					"var cid = Array.from(document.querySelectorAll(\"input[name='cid[]']:checked\"), input => input.value); " .
+					"url += '&' + cid.map(function(el, idx) { return 'cid[]=' + encodeURIComponent(el); }).join('&'); " .
 					"fc_showDialog(url, 'fc_modal_popup_container', 0, 1200, 0, fc_edit_batch_modal_close, {'title': '".flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('Add translations'), 2)."'}); return false;";
 				$btn_arr[] = flexicontent_html::addToolBarButton(
 					'FLEXI_VERIFY_N_TRANSLATE', $btn_name, $full_js,
@@ -1564,9 +1564,9 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				$popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&view=items&tmpl=component&task=quicktranslateall';
 				$btn_name = 'quicktranslateall';
 				$full_js = "" .
-					"var url = jQuery(this).data('taskurl'); " .
-					"var cid = []; jQuery.each(jQuery(\"input[name='cid[]']:checked\"), function(){ cid.push(jQuery(this).val()); }); " .
-					"url += '&' + cid.map(function(el, idx) { return 'cid[' + ']=' + el; }).join('&'); " .
+					"var url = this.dataset.taskurl; " .
+					"var cid = Array.from(document.querySelectorAll(\"input[name='cid[]']:checked\"), input => input.value); " .
+					"url += '&' + cid.map(function(el, idx) { return 'cid[]=' + encodeURIComponent(el); }).join('&'); " .
 					"fc_showDialog(url, 'fc_modal_popup_container', 0, 1200, 0, fc_edit_batch_modal_close, {'title': '".flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_TRANSLATE_SELECTED_ITEMS_ALL_LANGUAGES'), 2)."'}); return false;";
 				$btn_arr[] = flexicontent_html::addToolBarButton(
 					'FLEXI_TRANSLATE_SELECTED_ITEMS_ALL_LANGUAGES', $btn_name, $full_js,
@@ -1657,9 +1657,9 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 			$btn_info  = flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_CSV_EXPORT_SELECTED_ITEMS_INFO'), 2);
 			$task_url  = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&view=items&format=csv&items_set=selected';
 
-			$full_js = "var cid = []; jQuery.each(jQuery(\"input[name='cid[]']:checked\"), function(){ cid.push(jQuery(this).val()); }); "
+			$full_js = "var cid = Array.from(document.querySelectorAll(\"input[name='cid[]']:checked\"), input => input.value); "
 				. "if (!cid.length) { alert('" . \Joomla\CMS\Language\Text::_('FLEXI_NO_ITEMS_SELECTED', true) . "'); return false; } "
-				. "window.location.replace('" . $task_url . "&' + cid.map(function(el){ return 'cid[]=' + el; }).join('&')); return false;";
+				. "window.location.replace('" . $task_url . "&' + cid.map(function(el){ return 'cid[]=' + encodeURIComponent(el); }).join('&')); return false;";
 			$btn_arr[] = flexicontent_html::addToolBarButton(
 				$btn_title, 'csvexport_selected', $full_js, $msg_alert='', $msg_confirm='',
 				$btn_task='', $extra_js="", $btn_list=false, $btn_menu=true, $btn_confirm=false,
@@ -1682,7 +1682,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 
 				$full_js = $has_pro
 					? "window.location.replace('" . $task_url . "')"
-					: "var box = jQuery('#fc_available_in_pro'); fc_file_props_handle = fc_showAsDialog(box, 480, 320, null, {title:'" . \Joomla\CMS\Language\Text::_($btn_title) . "'}); return false;";
+					: "var box = document.getElementById('fc_available_in_pro'); fc_file_props_handle = fc_showAsDialog(box, 480, 320, null, {title:'" . \Joomla\CMS\Language\Text::_($btn_title) . "'}); return false;";
 
 				$btn_name='collaborate';
 				$btn_arr[$btn_name] = '<div id="fc_available_in_pro" style="display: none;">' . \Joomla\CMS\Language\Text::_('FLEXI_AVAILABLE_IN_PRO_VERSION') . '</div>' . flexicontent_html::addToolBarButton(
@@ -1699,7 +1699,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		{
 			$popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&amp;view=items&amp;layout=indexer&amp;tmpl=component&amp;indexer=tag_assignments';
 			$btn_name = 'sync_tags';
-			$full_js="if (!confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_2WAY_TAG_ASSIGNMENTS_SYNC_DESC'), 2)) . "')) return false; var url = jQuery(this).data('taskurl'); fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
+			$full_js="if (!confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_2WAY_TAG_ASSIGNMENTS_SYNC_DESC'), 2)) . "')) return false; var url = this.dataset.taskurl; fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
 						.$loading_msg."<\/span>'; window.location.reload(false)}, {'title': '".flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_2WAY_TAG_ASSIGNMENTS_SYNC'), 2)."'}); return false;";
 			$btn_arr[] = flexicontent_html::addToolBarButton(
 				'FLEXI_2WAY_TAG_ASSIGNMENTS_SYNC', $btn_name, $full_js,
@@ -1714,7 +1714,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 				{
 						$popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&amp;view=items&amp;layout=indexer&amp;tmpl=component&amp;indexer=resave';
 						$btn_name = 'recalculate_alias';
-						$full_js="if (!confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('Recalculate item aliases. <br>Only for new websites <br>as this can destroy your existing SEO ranks'), 2)) . "')) return false; var url = jQuery(this).data('taskurl'); fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
+						$full_js="if (!confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('Recalculate item aliases. <br>Only for new websites <br>as this can destroy your existing SEO ranks'), 2)) . "')) return false; var url = this.dataset.taskurl; fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
 												.$loading_msg."<\/span>'; window.location.reload(false)}, {'title': '".flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('Recalculate aliases for all items'), 2)."'}); return false;";
 						$btn_arr[] = flexicontent_html::addToolBarButton(
 								'Recalculate aliases for all items', $btn_name, $full_js,
@@ -1728,11 +1728,11 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 						$no_selection_alert = \Joomla\CMS\Language\Text::_('FLEXI_NO_ITEMS_SELECTED', true);
 						$confirm_msg = str_replace('<br>', '\\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('Recalculate item aliases. <br>Only for new websites <br>as this can destroy your existing SEO ranks'), 2));
 						$modal_title = flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('Recalculate aliases for selected items'), 2);
-						$full_js = "var cid = []; jQuery.each(jQuery(\"input[name='cid[]']:checked\"), function(){ cid.push(jQuery(this).val()); }); "
+						$full_js = "var cid = Array.from(document.querySelectorAll(\"input[name='cid[]']:checked\"), input => input.value); "
 								. "if (!cid.length) { alert('" . $no_selection_alert . "'); return false; } "
 								. "if (!confirm('" . $confirm_msg . "')) return false; "
-								. "var url = jQuery(this).data('taskurl'); "
-								. "url += '&' + cid.map(function(el){ return 'cid[]=' + el; }).join('&'); "
+								. "var url = this.dataset.taskurl; "
+								. "url += '&' + cid.map(function(el){ return 'cid[]=' + encodeURIComponent(el); }).join('&'); "
 								. "fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 350, function(){document.body.innerHTML='<span class=\\\"fc_loading_msg\\\">"
 								. $loading_msg . "<\\/span>'; window.location.reload(false)}, {'title': '" . $modal_title . "'}); return false;";
 						$btn_arr[] = flexicontent_html::addToolBarButton(
@@ -1768,7 +1768,7 @@ class FlexicontentViewItems extends FlexicontentViewBaseRecords
 		if ($js)
 		{
 			$document->addScriptDeclaration('
-				jQuery(document).ready(function(){
+				FlexiForm.ready(function(){
 					' . $js . '
 				});
 			');
