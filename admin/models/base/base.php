@@ -609,8 +609,9 @@ abstract class FCModelAdmin extends \Joomla\CMS\MVC\Model\AdminModel
 		}
 
 		// The values that the database stores when strict mode is off (a text cut to the length of its column, '' as 0 in
-		// a number column), so that it accepts the record with strict mode on too. This also covers Joomla's own tables
-		flexicontent_db::fitRecordToColumns($record, $record->getFields());
+		// a number column, '' or 0 in a required column of a new row), so that it accepts the record with strict mode on
+		// too. This also covers Joomla's own tables and the file table, which do not extend flexicontent_basetable
+		flexicontent_db::fitRecordToColumns($record, $record->getFields(), $isNew);
 
 		// Store data in the db
 		if (!$record->store())
