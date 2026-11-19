@@ -6180,7 +6180,7 @@ class flexicontent_html
 			class="toolbar ' . $btn_sm_class . ' ' . $btn_class . '"
 			' . $attrs . '
 		>
-			<span class="'.$class.'" title="'.htmlspecialchars($text, ENT_QUOTES, 'UTF-8').'"></span>
+			<span class="'.$class.'" aria-hidden="true"></span>
 			'.$text.'
 		</'.$tag_type.'>';
 
@@ -6252,9 +6252,10 @@ class flexicontent_html
 			<div class="buttons btn-group' . (FLEXI_J40GE ? ' dropdown' : '') . '">
 				'.$primary_button.'
 			  '.($drop_btn ?: '
-			  <button class="' . $drop_btn_class . '"
+			  <button type="button" class="' . $drop_btn_class . '"
 					' . (FLEXI_J40GE ? ' data-bs-toggle="dropdown" ' : ' data-toggle="dropdown" ') .'
 					id="btngroup_id_' . $btngroup_id . '" aria-expanded="false"
+					aria-label="' . htmlspecialchars(\Joomla\CMS\Language\Text::_('JOPTIONS'), ENT_QUOTES, 'UTF-8') . '"
 				>
 			    <span class="caret"></span>
 			  </button>').'

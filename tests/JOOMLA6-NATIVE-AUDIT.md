@@ -118,6 +118,46 @@ are local fixtures and are not included in the extension package.
 - `git diff --check` passed. Source hashes and raw output remain in private lab evidence; no credentials, configuration files or sessions are committed.
 - CI runs the added browser and PHP regressions. The four hosted workflows at the previous audit commit `4c083f8e7` passed. Results for the follow-up commit must be assessed on that commit's checks.
 
+## Frontend toolbar follow-up — 20 November 2026
+
+Cassiopeia exposed three overlapping toolbar rules: `.btn-sm` shrank Save's
+label inside a group, the old edit-view overrides removed its vertical padding,
+and generic field-control rules padded the `joomla-toolbar-button` wrapper.
+Save was 26 pixels high on a create form versus Cancel's 42 pixels. On a
+390-pixel edit form its icon wrapped above its label, while the split toggle
+and Cancel had different sizes and alignment.
+
+The shared `flexi_toolbar.less` rules now give frontend actions consistent
+typography, 44-pixel minimum height and icon spacing, with a joined split Save
+control that grows correctly on a phone. Both LTR/RTL Joomla stylesheets import
+and compile this source. Template button colours are retained. The shared PHP
+helper marks decorative icons hidden from assistive technology and gives the
+dropdown an explicit button type and Joomla's translated `JOPTIONS` label
+(the administrator-only toggle translation is unavailable in the frontend).
+
+Verification on the installed site:
+
+- Create and edit forms at **390/768/1440**: equal button heights and fonts,
+  icon spacing, joined split controls and no document overflow; screenshots
+  inspected before/after. Keyboard Arrow Down opens the menu; Escape closes it
+  and returns focus to the toggle.
+- **Save/reopen in frontend and administrator**, plus frontend **Save and
+  preview** and **Cancel**, passed with jQuery absent/blocked and no JavaScript
+  errors. The media sample's custom values were unchanged. The contacts sample
+  was already checked out by another contributor and was left untouched.
+- Existing `native-editor-workflows.cjs` suite passed (36 cases in this run);
+  PHP syntax, both LESS compilations and `git diff --check` passed. The earlier
+  full regression totals above apply to the preceding audit snapshot; this
+  narrow follow-up reran the affected editor/browser checks.
+
+The styling follows the installed Joomla 6.2 toolbar markup and
+[Bootstrap button-group structure](https://getbootstrap.com/docs/5.3/components/button-group/).
+
+| Frontend editor | Before | After |
+|---|---|---|
+| Desktop, 1440 px | [Before](audit-images/toolbar-before-1440.png) | [After](audit-images/toolbar-after-1440.png) |
+| Mobile, 390 px | [Before](audit-images/toolbar-before-390.png) | [After](audit-images/toolbar-after-390.png) |
+
 ## Remaining dependencies and release limits
 
 The inventory scans tracked and untracked PHP, JS, XML, JSON, CSS and LESS under administrator, site, plugins and modules. It found **2,506 matching lines in 344 files**, including **108 authored files**; the remainder are vendor/minified files. Comments, retained packages and guarded compatibility hooks count as textual matches, not necessarily executed dependencies.
