@@ -2300,6 +2300,12 @@ class flexicontent_html
 				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/librairies/choicesjs/sortable.min.js', array('version' => FLEXI_VHASH));
 				break;
 
+			case 'field-repeater':
+				flexicontent_html::loadFramework('flexi-lib');
+				flexicontent_html::loadFramework('sortable');
+				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/field-repeater.js', array('version' => FLEXI_VHASH));
+				break;
+
 			case 'flexi-lib-form':
 				flexicontent_html::loadFramework('form-utils');
 				flexicontent_html::loadFramework('sortable');

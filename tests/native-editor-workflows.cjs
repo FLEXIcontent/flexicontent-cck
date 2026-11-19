@@ -57,12 +57,13 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
     await loadDependencies(page);
     await validate(page);
     await page.addScriptTag({content: source('site/librairies/choicesjs/sortable.min.js')});
+    await page.addScriptTag({content: source('site/assets/js/field-repeater.js')});
     await page.addScriptTag({content: source('plugins/flexicontent_fields/text/js/form.js')});
     await page.addScriptTag({content: source('plugins/flexicontent_fields/fieldgroup/js/form.js')});
     await page.evaluate(() => {
       Joomla.Showon = { initialise(row) { window.lastShowon = JSON.parse(row.querySelector('[data-showon]').dataset.showon); } };
       for (const [id, field] of [[77, 'left'], [78, 'right']]) {
-        const child = fcfield_text.repeater({fieldId:id, initialCount:2, id:'custom_' + field, name:'custom[' + field + ']', defaultValue:'', max:0});
+        const child = FlexiFieldRepeater.get({fieldId:id, initialCount:2, id:'custom_' + field, name:'custom[' + field + ']', defaultValue:'', max:0}, fcfield_text);
         window['addField' + id] = (_, row, element, options) => child.add(null, element, options);
         window['deleteField' + id] = (_, row, element) => child.remove(null, element);
       }
@@ -349,10 +350,11 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
     await validate(page);
     await loadDependencies(page);
     await page.addScriptTag({content: source('site/librairies/choicesjs/sortable.min.js')});
+    await page.addScriptTag({content: source('site/assets/js/field-repeater.js')});
     await page.addScriptTag({content: source('plugins/flexicontent_fields/text/js/form.js')});
     await page.evaluate(() => {
-      window.textRows = fcfield_text.repeater({fieldId: 42, initialCount: 1, id: 'custom_text', name: 'custom[text]', defaultValue: '', max: 2});
-      fcfield_text.attachOrdering(42);
+      window.textRows = FlexiFieldRepeater.get({fieldId: 42, initialCount: 1, id: 'custom_text', name: 'custom[text]', defaultValue: '', max: 2}, fcfield_text);
+      FlexiFieldRepeater.attachOrdering(42);
     });
     await page.click('#add');
     assert.equal(await page.inputValue('#custom_text_1'), '');
@@ -388,13 +390,14 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
     await loadDependencies(page);
     await page.addScriptTag({content: source('site/librairies/choicesjs/choices.min.js')});
     await page.addStyleTag({content: source('site/librairies/choicesjs/choices.min.css')});
+    await page.addScriptTag({content: source('site/assets/js/field-repeater.js')});
     await page.addScriptTag({content: source('plugins/flexicontent_fields/text/js/form.js')});
     await page.evaluate(() => {
       window.Joomla.JText = Joomla.Text;
       window.fc_use_choicesjs = true;
       fc_attachSelect2('#sortables_43');
       window.originalChoice = document.querySelector('select').fc_choices_instance;
-      window.textSelectRows = fcfield_text.repeater({fieldId: 43, initialCount: 1, id: 'custom_text', name: 'custom[text]', defaultValue: '', max: 2});
+      window.textSelectRows = FlexiFieldRepeater.get({fieldId: 43, initialCount: 1, id: 'custom_text', name: 'custom[text]', defaultValue: '', max: 2}, fcfield_text);
       document.getElementById('add').addEventListener('click', event => textSelectRows.add(event.target, null, {scroll_visible: false}));
     });
     await page.click('#add');

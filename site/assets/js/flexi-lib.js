@@ -471,23 +471,23 @@
 
 	function fc_toggleCompactValuesView(el, field_values_box, btn_class)
 	{
-		btn_class = btn_class || 'btn-info';
-		// Get field value containers
-		var rows = field_values_box.find('.fcfieldval_container');
-		var el = jQuery(el);
-
-		// Set expanding flag and expand or compact properties
-		if (el.prop('tagName')=='INPUT')
+		const button = FlexiForm.element(el);
+		const box = FlexiForm.element(field_values_box);
+		if (!button || !box) return;
+		let expanded;
+		if (button.tagName === 'INPUT')
 		{
-			var expand_field = el.prop('type')=='checkbox' ? el.is(':checked') : el.val()=='1';
+			expanded = button.type === 'checkbox' ? button.checked : button.value === '1';
 		}
 		else
 		{
-			var expand_field = !el.data('expandedFieldState');
-			el.data('expandedFieldState', expand_field);
-			expand_field ? el.addClass('active ' + btn_class) : el.removeClass('active ' + btn_class);
+			expanded = !FlexiForm.data(button, 'expandedFieldState');
+			FlexiForm.data(button, 'expandedFieldState', expanded);
+			for (const name of ['active', ...(btn_class || 'btn-info').trim().split(/\s+/)]) {
+				if (name) button.classList.toggle(name, expanded);
+			}
 		}
-		expand_field ? rows.addClass('fc-expanded'): rows.removeClass('fc-expanded');
+		box.querySelectorAll('.fcfieldval_container').forEach(row => row.classList.toggle('fc-expanded', expanded));
 	}
 
 

@@ -187,35 +187,8 @@ class plgFlexicontent_fieldsText extends FCField
 
 		if ($multiple)
 		{
-			$config = json_encode(array(
-				'fieldId' => (int) $field->id,
-				'initialCount' => count($field->value),
-				'id' => $elementid,
-				'name' => $fieldname,
-				'defaultValue' => $default_value,
-				'max' => (int) $max_values,
-			), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
-			if ($max_values) \Joomla\CMS\Language\Text::script('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED', true);
-
-			if ($add_ctrl_btns)
-			{
-				flexicontent_html::loadFramework('sortable');
-				$js .= "FlexiForm.ready(() => fcfield_text.attachOrdering(" . (int) $field->id . "));";
-			}
-
-			// Keep these callbacks for repeatable field groups and older field layouts.
-			$js .= "
-				function addField".$field->id."(el, groupval_box, fieldval_box, params)
-				{
-					return fcfield_text.repeater(".$config.").add(el, fieldval_box, params);
-				}
-
-				function deleteField".$field->id."(el, groupval_box, fieldval_box)
-				{
-					fcfield_text.repeater(".$config.").remove(el, fieldval_box);
-				}
-				addField".$field->id.".fcNative = deleteField".$field->id.".fcNative = true;
-			";
+			$config = array('defaultValue' => $default_value);
+			$js .= $this->buildValueRepeater($field, $elementid, $fieldname, $max_values, $add_ctrl_btns, $config, 'fcfield_text');
 
 			$remove_button = '<span class="' . $btn_item_class . ' fcfield-delvalue ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
 			$move2         = '<span class="' . $btn_item_class . ' fcfield-drag-handle ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
