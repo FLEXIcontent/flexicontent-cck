@@ -804,6 +804,10 @@ class flexicontent_items extends _flexicontent_items
 			}
 		}
 
+		// The values that the database stores when strict mode is off (a text cut to its column, '' as 0 in a number column),
+		// so that it accepts the three records in strict mode too
+		flexicontent_db::fitRecordToColumns($record, $this->getFields(), !$this->$k);
+
 		if ($this->$k)
 		{
 			$ret = $this->_db->updateObject($this->_tbl, $record, $k, $updateNulls);
@@ -855,6 +859,7 @@ class flexicontent_items extends _flexicontent_items
 		// Update extended data record
 		if ($ext_exists)
 		{
+			flexicontent_db::fitRecordToColumns($record_ext, $this->_tbl_fields[$this->_tbl_ext]);
 			$ret = $this->_db->updateObject($this->_tbl_ext, $record_ext, $fk_ext, $updateNulls);
 		}
 
@@ -863,12 +868,16 @@ class flexicontent_items extends _flexicontent_items
 		{
 			// Insert without using autoincrement
 			$record_ext->$fk_ext = $this->$tk_ext;
+
+			// A new row: the required columns that were dropped above need a value, or strict mode refuses the INSERT
+			flexicontent_db::fitRecordToColumns($record_ext, $this->_tbl_fields[$this->_tbl_ext], true);
 			$ret = $this->_db->insertObject($this->_tbl_ext, $record_ext, $fk_ext);
 		}
 
 		// Update #__flexicontent_items_tmp table
 		if ($tmp_exists)
 		{
+			flexicontent_db::fitRecordToColumns($record_tmp, $this->_tbl_fields[$this->_tbl_tmp]);
 			$ret = $this->_db->updateObject($this->_tbl_tmp, $record_tmp, $fk_tmp, $updateNulls);
 		}
 
@@ -877,6 +886,7 @@ class flexicontent_items extends _flexicontent_items
 		{
 			// Insert without using autoincrement
 			$record_tmp->$fk_tmp = $this->$tk_tmp;
+			flexicontent_db::fitRecordToColumns($record_tmp, $this->_tbl_fields[$this->_tbl_tmp], true);
 			$ret = $this->_db->insertObject($this->_tbl_tmp, $record_tmp, $fk_tmp);
 		}
 
@@ -921,6 +931,9 @@ class flexicontent_items extends _flexicontent_items
 		$asset->parent_id = $parentId;
 		$asset->name  = $name;
 		$asset->title = $title;
+
+		// The title column of the assets table is shorter than the item title
+		flexicontent_db::fitRecordToColumns($asset, array_intersect_key($asset->getFields(), array('title' => 1)));
 
 		if ($this->_rules instanceof \Joomla\CMS\Access\Rules)
 		{

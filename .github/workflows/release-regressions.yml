@@ -35,6 +35,7 @@ jobs:
           php -d error_reporting=-1 tests/route-menu-context.php
           php -d error_reporting=-1 tests/relation-values.php
           php -d error_reporting=-1 tests/batch-values.php
+          php -d error_reporting=-1 tests/strict-mode-records.php
           php -d error_reporting=-1 tests/category-csv.php
           php -d error_reporting=-1 tests/cache-path.php
           php -d error_reporting=-1 tests/cache-invalidation.php
