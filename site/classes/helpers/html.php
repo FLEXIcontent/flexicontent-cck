@@ -1473,10 +1473,12 @@ class flexicontent_html
 	static function usesNativeAdminAssets()
 	{
 		$app = Factory::getApplication();
+		$input = $app->getInput();
+		$view = $input->getCmd('view', 'flexicontent');
 		return FLEXI_J40GE && $app->isClient('administrator')
-			&& in_array($app->getInput()->getCmd('view'), array(
+			&& (($view === 'flexicontent' && in_array($input->getCmd('layout', ''), ['', 'default'], true)) || in_array($view, array(
 				'item', 'items', 'field', 'type', 'template', 'filemanager', 'fileselement',
-			), true);
+			), true));
 	}
 
 	/** Load a JavaScript framework once per request. */
@@ -2103,6 +2105,11 @@ class flexicontent_html
 				\Joomla\CMS\Language\Text::script("FLEXI_INDEXED_FIELD_STATE_COL_DISABLED", true);
 				\Joomla\CMS\Language\Text::script('FLEXI_REQUIRED',true);
 				\Joomla\CMS\Language\Text::script('FLEXI_INVALID',true);
+				\Joomla\CMS\Language\Text::script('FLEXI_INPUTMASK_INCOMPLETE', true);
+				\Joomla\CMS\Language\Text::script('FLEXI_VALIDATION_EMAIL_FORMAT', true);
+				\Joomla\CMS\Language\Text::script('FLEXI_FORM_IS_BEING_SUBMITTED', true);
+				\Joomla\CMS\Language\Text::script('FLEXI_AJAX_SAVE_UNCONFIRMED', true);
+				\Joomla\CMS\Language\Text::script('FLEXI_LOADING', true);
 				\Joomla\CMS\Language\Text::script('JLIB_FORM_FIELD_INVALID',true);
 				\Joomla\CMS\Language\Text::script('FLEXI_AUTO',true);
 				\Joomla\CMS\Language\Text::script('FLEXI_FIELD_SELECT_AT_LEAST_PROMPT',true);

@@ -489,6 +489,25 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
     await page.locator('#b').check();
     assert.equal(await page.locator('input[aria-invalid=true], .fc-field-invalid').count(), 0);
   });
+  await test('Incomplete masked email stays editable and blank optional masks stay valid', async page => {
+    await form(page, `<label for="email">Email</label><input id="email" class="has_inputmask" data-inputmask="'alias':'email'">
+      <label for="ip">IP address</label><input id="ip" class="has_inputmask" data-inputmask="'alias':'ip'">`);
+    await validate(page);
+    await page.addScriptTag({content: source('site/librairies/inputmask/inputmask.min.js')});
+    await page.addScriptTag({content: source('site/assets/js/input-masks.js')});
+    const valid = () => page.evaluate(() => document.formvalidator.isValid(document.getElementById('adminForm')));
+    assert.equal(await valid(), true);
+    const email = page.locator('#email');
+    await email.pressSequentially('aaaa@');
+    assert.equal(await valid(), false);
+    assert.match(await email.inputValue(), /^aaaa@/);
+    assert.equal(await email.getAttribute('aria-invalid'), 'true');
+    assert.equal(await page.locator('.fc-field-invalid').filter({hasText:'FLEXI_VALIDATION_EMAIL_FORMAT'}).count(), 1);
+    assert.equal(await page.locator('#ip').getAttribute('aria-invalid'), 'false');
+    await email.pressSequentially('example.test');
+    assert.equal(await valid(), true);
+    assert.equal(await page.locator('.fc-field-invalid').count(), 0);
+  });
   await test('Hidden rich text is synchronized before required validation', async page => {
     await form(page, '<div class="fcfield_box required_box"><textarea id="body" name="body" class="mce_editable" style="display:none"></textarea></div>');
     await page.evaluate(() => { window.editorText = ''; window.tinyMCE = {get: () => ({getContent: () => editorText, setContent: value => { editorText = value; }})}; });

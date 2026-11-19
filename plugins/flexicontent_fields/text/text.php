@@ -288,6 +288,10 @@ class plgFlexicontent_fieldsText extends FCField
 
 		// Add placeholder tag parameter if not using validation mask, (if using vaildation mask then placeholder should be added a validation mask property)
 		$attribs .= $placeholder ? ' placeholder="'.htmlspecialchars( $placeholder, ENT_COMPAT, 'UTF-8' ).'" ' : '';
+		if (strcasecmp($field->parameters->get('validation', 'HTML'), 'EMAIL') === 0)
+		{
+			$attribs .= ' data-fc-format="email" ';
+		}
 
 
 		/**
@@ -657,9 +661,14 @@ class plgFlexicontent_fieldsText extends FCField
 			// *** Validate data, skipping values that are empty after validation
 			// ***
 
-			$post[$n] = strlen($v)
+			$filtered = strlen($v)
 				? flexicontent_html::dataFilter($v, $maxlength, $validation, 0)
 				: '';
+			if ($v !== '' && $filtered === '' && strcasecmp($validation, 'EMAIL') === 0)
+			{
+				return false;
+			}
+			$post[$n] = $filtered;
 
 			// Skip empty value, but if in group increment the value position
 			if (!strlen($post[$n]))

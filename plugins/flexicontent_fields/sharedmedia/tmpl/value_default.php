@@ -29,7 +29,7 @@ foreach ($values as $value)
 		continue;
 	}
 
-	$duration = intval($value['duration']);
+	$duration = (int) ($value['duration'] ?? 0);
 	if ($display_duration && $duration)
 	{
 		$h = $duration >= 3600  ?  intval($duration/3600)  :  0;

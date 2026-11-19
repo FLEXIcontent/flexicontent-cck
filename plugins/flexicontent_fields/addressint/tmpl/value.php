@@ -410,7 +410,7 @@ foreach ($this->values as $n => $value)
 
 static $addressint_view_js_added = array();
 
-if (!isset($addressint_view_js_added[$field->id]) && $map_api === 'googlemap' && $map_embed_type === 'int')
+if ($show_map && !isset($addressint_view_js_added[$field->id]) && $map_api === 'googlemap' && $map_embed_type === 'int')
 {
 	$addressint_view_js_added[$field->id] = true;
 
@@ -498,7 +498,7 @@ if (!isset($addressint_view_js_added[$field->id]) && $map_api === 'googlemap' &&
 // Code is WIP (work-in-progress) only for testing 1 address inside item view
 static $addressint_view_js_added_OS = null;
 
-if ($addressint_view_js_added_OS === null && $map_api === 'openstreetmap')
+if ($show_map && $addressint_view_js_added_OS === null && $map_api === 'openstreetmap')
 {
 	$addressint_view_js_added_OS = true;
 

@@ -133,7 +133,7 @@ var JFormValidator_FC = function () {
       if (F.visible(button)) { F.data(button, 'fc_noeffect', 1); button.click(); }
     });
   }
-  function response(valid, el, preserveMessage = false) {
+  function response(valid, el, preserveMessage = false, failure = '') {
     if (!valid && !fcform_1st_invalid_found) reveal(el);
     const lbl = label(el), isGroup = isGroupControl(el);
     const box = F.data(el, 'use_fcfield_box') ? el.closest('.fcfield_box.required_box') : null;
@@ -146,12 +146,13 @@ var JFormValidator_FC = function () {
     }
     box?.classList.toggle('invalid', !valid);
     set?.classList.toggle('invalid', !valid);
-    if (F.data(el.form, 'use_all_mssg_box') && lbl) return;
+    if (F.data(el.form, 'use_all_mssg_box') && lbl && !failure && !el.inputmask
+      && !el.matches('.validate-email, [data-fc-format=email]')) return;
     const hidden = el.classList.contains('fc_hidden_value');
     const expanded = el.parentElement?.classList.contains('fc-xpended-row');
     const anchor = box || set || (hidden ? el.parentElement?.firstElementChild : expanded ? el.parentElement : el);
     if (preserveMessage && !valid) return;
-    const text = valid ? '' : F.data(el, 'error-mssg') || F.text(empty(F.value(el)) ? 'FLEXI_REQUIRED' : 'FLEXI_INVALID');
+    const text = valid ? '' : failure || F.data(el, 'error-mssg') || F.text(empty(F.value(el)) ? 'FLEXI_REQUIRED' : 'FLEXI_INVALID');
     const note = message(anchor, text, !!box || hidden || (isGroup && rtl));
     if (note && F.data(el, 'error-css')) note.style.cssText = F.data(el, 'error-css');
   }
@@ -167,26 +168,43 @@ var JFormValidator_FC = function () {
     }
     syncEditor(el);
     const isGroup = isGroupControl(el);
+    const mask = el.inputmask;
+    const entered = F.value(el);
+    const complete = mask?.isComplete();
+    const value = mask && !empty(entered)
+      ? (complete === false && entered === mask.getemptymask() ? '' : mask.unmaskedvalue())
+      : entered;
     let valid = true;
+    let failure = '';
     if (required(el)) {
       if (isGroup) valid = group(el).some(other => other.checked);
       else if (el.tagName === 'FIELDSET') {
         valid = Array.from(el.querySelectorAll('input')).some(other => other.checked && !other.matches(':disabled'));
-      } else valid = !empty(F.value(el));
+      } else valid = !empty(value);
     }
     const name = String(el.className || '').match(/validate-([a-zA-Z0-9_-]+)/)?.[1];
     const handler = handlers[name];
     const limitation = name === 'sellimitations' || name === 'cboxlimitations';
-    if (valid && handler?.enabled) {
+    if (valid && !empty(value)) {
+      const email = name === 'email' || mask?.opts?.alias === 'email' || el.dataset.fcFormat === 'email';
+      if (email && handlers.email.enabled && handlers.email.exec(value) === false) {
+        valid = false;
+        failure = F.text('FLEXI_VALIDATION_EMAIL_FORMAT');
+      } else if (complete === false) {
+        valid = false;
+        failure = F.text(email ? 'FLEXI_VALIDATION_EMAIL_FORMAT' : 'FLEXI_INPUTMASK_INCOMPLETE');
+      }
+    }
+    if (valid && handler?.enabled && name !== 'email') {
       let result = true;
       if (limitation || fcpass_element[el.id] || name === 'fccats') result = handler.exec(el);
       else if (name === 'fcuploader') { if (!empty(F.value(el))) result = handler.exec(el); }
       else if (isGroup && required(el)) result = handler.exec(el.parentNode);
-      else if (!isGroup && !empty(F.value(el))) result = handler.exec(F.value(el));
+      else if (!isGroup && !empty(value)) result = handler.exec(value);
       if (result === null) return true;
       valid = result === true;
     }
-    response(valid, el, limitation);
+    response(valid, el, limitation, failure);
     return valid;
   }
   function attachToForm(form, container) {

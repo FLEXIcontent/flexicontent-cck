@@ -359,14 +359,10 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$document->addStyleSheet($version_assets.'/css/flexi_versions.css', array('version' => FLEXI_VHASH));
 
 		// Add JS frameworks
-		// The form scripts (fields, validation, uploaders) need jQuery, also on the site in Choices.js mode
-		if (!$isAdmin && (int) $cparams->get('loadfw_jquery', 1) === 1)
+		// Joomla 4+ item forms load the native controls. A legacy widget can still request its own assets.
+		if (!FLEXI_J40GE)
 		{
 			flexicontent_html::loadJQuery();
-		}
-		else
-		{
-			flexicontent_html::loadFramework('jQuery');
 		}
 		flexicontent_html::loadFramework('select2');
 		flexicontent_html::loadFramework('flexi-lib');

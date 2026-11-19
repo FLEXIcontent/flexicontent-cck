@@ -179,41 +179,12 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 		\Joomla\CMS\Toolbar\ToolbarHelper::title( $doc_title, 'home' );
 		$document->setTitle($doc_title .' - '. $site_title);
 
-		$js = "jQuery(document).ready(function(){";
 
 		// Create the toolbar
 		$toolbar = \Joomla\CMS\Toolbar\Toolbar::getInstance('toolbar');
-		$loading_msg = flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_LOADING') .' ... '. \Joomla\CMS\Language\Text::_('FLEXI_PLEASE_WAIT'), 2);
 
 		if($perms->CanConfig)
 		{
-			if (0) // FLEXI_J37GE
-			{
-				$btn_task = '';
-				$popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&layout=import&format=raw';
-				//$toolbar->appendButton('Popup', 'download', \Joomla\CMS\Language\Text::_('FLEXI_IMPORT_JOOMLA'), str_replace('&', '&amp;', $popup_load_url), 780, 500);
-				$js .= "
-					jQuery('#toolbar-download a.toolbar, #toolbar-download button')
-						.attr('href', '".$popup_load_url."')
-						.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 780, 500, function(){document.body.innerHTML=\'<span class=\"fc_loading_msg\">"
-							.$loading_msg."<\/span>\'; window.location.reload(false)}, {\'title\': \'".flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_IMPORT_JOOMLA'), 2)."\'}); return false;');
-				";
-				\Joomla\CMS\Toolbar\ToolbarHelper::custom( $btn_task, 'download.png', 'download_f2.png', 'FLEXI_IMPORT_JOOMLA', false );
-			}
-
-			if (0) // TODO evaluate for e.g. submiting a template
-			{
-				$btn_task = '';
-				$popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&layout=language&tmpl=component';
-				//$toolbar->appendButton('Popup', 'language', \Joomla\CMS\Language\Text::_('FLEXI_SEND_LANGUAGE'), str_replace('&', '&amp;', $popup_load_url), 780, 540);
-				$js .= "
-					jQuery('#toolbar-language a.toolbar, #toolbar-language button')
-						.attr('href', '".$popup_load_url."')
-						.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 780, 540, false, {\'title\': \'".flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_SEND_LANGUAGE'), 2)."\'}); return false;');
-				";
-				\Joomla\CMS\Toolbar\ToolbarHelper::custom( $btn_task, 'language.png', 'language_f2.png', 'FLEXI_SEND_LANGUAGE', false );
-			}
-
 			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
 			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
 			$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
@@ -221,8 +192,6 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 			\Joomla\CMS\Toolbar\ToolbarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
 		}
 
-		$js .= "});";
-		$document->addScriptDeclaration($js);
 
 		// Add modal edit code
 		if (1)
@@ -231,10 +200,9 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 			$document->addScriptDeclaration('
 				function fc_edit_fcitem_modal_load( container )
 				{
-					if ( container.find("iframe").get(0).contentWindow.location.href.indexOf("view=items") != -1 )
-					{
-						container.dialog("close");
-					}
+					const dialog = FlexiForm.element(container);
+					const frame = dialog?.querySelector("iframe");
+					if (frame?.contentDocument?.location.href.includes("view=items")) fc_closeDialog(dialog.id);
 				}
 				function fc_edit_fcitem_modal_close()
 				{
@@ -336,7 +304,7 @@ class FlexicontentViewFlexicontent extends \Joomla\CMS\MVC\View\HtmlView
 		// Initialise variables
 		$lang = \Joomla\CMS\Factory::getApplication()->getLanguage();
 		$link_attribs = $modal
-			? ' onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', '.((int)(!$modal_create_iframe)).', '.$modal_width.', '.$modal_height.', ' . $close_function . ', {\'title\': \''.flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_($text), 2).'\'}); return false;"'
+			? ' onclick="var url = this.getAttribute(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', '.((int)(!$modal_create_iframe)).', '.$modal_width.', '.$modal_height.', ' . $close_function . ', {\'title\': \''.flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_($text), 2).'\'}); return false;"'
 			: '';
 		$img_attribs  = ' class="fc-board-btn-img"';
   	?>

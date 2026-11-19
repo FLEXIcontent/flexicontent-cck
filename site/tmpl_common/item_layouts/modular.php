@@ -92,7 +92,7 @@ $microdata_itemtype_code = 'itemscope itemtype="http://schema.org/'.$microdata_i
 	<?php if (\Joomla\CMS\Factory::getApplication()->input->getInt('print', 0)) : ?>
 		<!-- BOF Print handling -->
 		<?php if ($this->params->get('print_behaviour', 'auto') == 'auto') : ?>
-			<script>jQuery(document).ready(function(){ window.print(); });</script>
+			<script>window.addEventListener('load', () => window.print(), {once: true});</script>
 		<?php	elseif ($this->params->get('print_behaviour') == 'button') : ?>
 			<input type='button' id='printBtn' name='printBtn' value='<?php echo \Joomla\CMS\Language\Text::_('Print');?>' class='btn btn-info' onclick='this.style.display="none"; window.print(); return false;'>
 		<?php endif; ?>

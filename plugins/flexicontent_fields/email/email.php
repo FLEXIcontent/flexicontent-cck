@@ -545,7 +545,12 @@ class plgFlexicontent_fieldsEmail extends FCField
 			// *** Validate data, skipping values that are empty after validation
 			// ***
 
-			$addr = flexicontent_html::dataFilter($v['addr'], $maxlength, 'EMAIL', 0);  // Clean bad text/html
+			$rawAddress = trim((string) ($v['addr'] ?? ''));
+			$addr = flexicontent_html::dataFilter($rawAddress, $maxlength, 'EMAIL', 0);
+			if (!$is_importcsv && $rawAddress !== '' && $addr === '')
+			{
+				return false;
+			}
 
 			// Skip empty value, but if in group increment the value position
 			if (!strlen($addr))

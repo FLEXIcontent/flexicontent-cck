@@ -722,7 +722,7 @@ class FlexicontentFields
 			}
 			if (!isset($field->{$method}))
 			{
-				$field->{$method} = $field->ingroup ? [] : '';
+				$field->{$method} = !empty($field->ingroup) ? [] : '';
 			}
 
 			// Only cache the result, only if using no values were given, thus DB values were used
