@@ -290,7 +290,7 @@ foreach ($list as $cat) :
 		<ul class="list-unstyled ps-3 mt-2 d-flex flex-column gap-2">
 		<?php $temp = $list; ?>
 		<?php $list = $cat->getChildren(); ?>
-		<?php require \Joomla\CMS\Helper\ModuleHelper::getLayoutPath('mod_flexicategories', $params->get('layout', 'default') . '_items'); ?>
+		<?php require ModFlexiCategoriesHelper::getItemsLayoutPath($params->get('layout', 'default')); ?>
 		<?php $list = $temp; ?>
 		</ul>
 	<?php endif; ?>

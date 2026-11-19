@@ -28,6 +28,7 @@ jobs:
           php -d error_reporting=-1 tests/statistics-data.php
           php -d error_reporting=-1 tests/group-by-columns.php
           php -d error_reporting=-1 tests/search-index-order.php
+          php -d error_reporting=-1 tests/category-module-items-layout.php
           php -d error_reporting=-1 tests/tag-assignment-removal.php
           php -d error_reporting=-1 tests/finder-query.php
           php -d error_reporting=-1 tests/finder-parameters.php
