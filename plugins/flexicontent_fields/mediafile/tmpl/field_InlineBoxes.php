@@ -24,8 +24,16 @@ foreach ($field->value as $file_id)
 	$filename_original = $file_data->filename_original ? $file_data->filename_original : $file_data->filename;
 
 	$ext = strtolower(flexicontent_upload::getExt($file_data->filename));
-	$file_data->waveform_preview = !$file_data->filename ? '' : 'audio_preview/' . str_ireplace('.'.$ext, '', basename($file_data->filename)) . '.mp3';
-	$file_data->waveform_peaks   = !$file_data->filename ? '' : 'audio_preview/' . str_ireplace('.'.$ext, '', basename($file_data->filename)) . '.json';
+	$audio_extensions = ['aac', 'flac', 'm4a', 'mp3', 'oga', 'ogg', 'opus', 'wav', 'webm'];
+	$audio_file = $file_data->filename && in_array($ext, $audio_extensions, true);
+	$upload_directory = dirname($file_data->filename);
+	$preview_base = ($upload_directory === '.' ? '' : $upload_directory . '/') . 'audio_preview/' . pathinfo($file_data->filename, PATHINFO_FILENAME);
+	$file_data->waveform_preview = $audio_file ? $preview_base . '.mp3' : '';
+	$file_data->waveform_peaks = $audio_file ? $preview_base . '.json' : '';
+	$public_audio_root = rtrim(\Joomla\CMS\Uri\Uri::root(true) . '/' . $mediapath, '/');
+	$original_audio = $audio_file && isset($file_data->secure) && !$file_data->secure && empty($file_data->url)
+		? $public_audio_root . '/' . implode('/', array_map('rawurlencode', explode('/', $file_data->filename)))
+		: '';
 
 	$preview_css = 'width:100px; height:100px;';
 
@@ -257,6 +265,8 @@ HTML;
 			value="'.htmlspecialchars($filename_original, ENT_COMPAT, 'UTF-8').'"
 			data-label_text="'.$field->label.'"
 			data-filename="'.htmlspecialchars($file_data->filename, ENT_COMPAT, 'UTF-8').'"
+			data-wf-public-root="'.htmlspecialchars($public_audio_root, ENT_QUOTES, 'UTF-8').'"
+			data-wforiginal="'.htmlspecialchars($original_audio, ENT_QUOTES, 'UTF-8').'"
 			data-wfpreview="'.htmlspecialchars($file_data->waveform_preview, ENT_COMPAT, 'UTF-8').'"
 			data-wfpeaks="'.htmlspecialchars($file_data->waveform_peaks, ENT_COMPAT, 'UTF-8').'"
 		/>

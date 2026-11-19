@@ -60,6 +60,7 @@ class fc_Waveform_LazyLoad
 	var fcfield_mediafile_base_url = [];
 	var audio_spectrum_arr = [];
 	var audio_spectrum_conf = [];
+	const waveformAudio = /\.(?:aac|flac|m4a|mp3|oga|ogg|opus|wav|webm)(?:[?#]|$)/i;
 
 	fcfield_mediafile.debugToConsole = [];
 	fcfield_mediafile.use_native_apis = [];
@@ -122,7 +123,7 @@ class fc_Waveform_LazyLoad
 			var formattedTime = secondsToTimestamp(audio_spectrum.getCurrentTime());
 
 			// v7: WaveSurfer no longer creates <wave> elements; position timer inside the container
-			var container = document.querySelector('#fc_mediafile_audio_spectrum_' + fnn);
+			var container = spectrum;
 			if (!container) return;
 
 			if (!container.querySelector('.fccurrentTimeBox'))
@@ -255,14 +256,7 @@ class fc_Waveform_LazyLoad
 
 		var loadFile = function ()
 		{
-			var url = mediaWaveformURL(file.dataset.wfpreview, config_name);
-			// v7: load() renders waveform and loads audio; pass peaks only when available
-			if (audio_spectrum._saved_peaks_) {
-				audio_spectrum.load(url, [audio_spectrum._saved_peaks_]);
-			} else {
-				audio_spectrum.load(url);
-			}
-			audio_spectrum._loading_started_ = true;
+			return loadWaveform(file, spectrum, config_name);
 		}
 
 
@@ -305,20 +299,20 @@ class fc_Waveform_LazyLoad
 
 		mediaWaveforms.set(spectrum, audio_spectrum);
 
-		// v7 polyfill for empty() — used by clearField() to reset the waveform display
-		audio_spectrum.empty = function()
+		audio_spectrum.resetPreview = function()
 		{
-			try { audio_spectrum.stop(); } catch(e) {}
-			audio_spectrum.loaded            = false;
+			audio_spectrum.pause();
+			audio_spectrum.start_on_ready = false;
+			audio_spectrum.loaded = false;
 			audio_spectrum._loading_started_ = false;
-			audio_spectrum._saved_peaks_     = null;
-			var container = document.querySelector('#fc_mediafile_audio_spectrum_' + fnn);
-			if (container)
-			{
-				container.querySelectorAll('canvas').forEach(function(c) {
-					c.getContext('2d').clearRect(0, 0, c.width, c.height);
-				});
-			}
+			audio_spectrum._saved_peaks_ = null;
+			audio_spectrum.empty();
+			buttons.play.style.display = 'inline-block';
+			buttons.play.disabled = false;
+			buttons.pause.style.display = 'none';
+			buttons.pause.disabled = true;
+			buttons.pause.classList.remove('is_active');
+			buttons.stop.disabled = true;
 		};
 
 		// Get control buttons
@@ -365,6 +359,7 @@ class fc_Waveform_LazyLoad
 
 		audio_spectrum.on('ready', function()
 		{
+			if (audio_spectrum.getDuration() <= 0.001) return;
 			buttons.play.disabled  = false;
 			buttons.pause.disabled = false;
 			buttons.stop.disabled  = false;
@@ -406,28 +401,16 @@ class fc_Waveform_LazyLoad
 		// v7: 'interaction' replaces 'seek'; callback receives newTime in seconds, not 0-1 progress
 		audio_spectrum.on('interaction', seekHandler);
 
-		audio_spectrum.on('error', function(e) {
-			console.warn(e);
+
+
+		box.addEventListener('keydown', event => {
+			if (!event.target.matches('button, [role="button"], input')) keyPressedDown(event);
 		});
-
-		box.addEventListener("keydown", function (event) {
-			return keyPressedDown(event);
-		}, false);
-		box.addEventListener("keydown", function (event) {
-			return keyPressedDown(event);
-		}, false);
-
-		buttons.play.addEventListener("keydown", function (event) {
-			return keyPressedDown(event);
-		}, false);
-		buttons.pause.addEventListener("keydown", function (event) {
-			return keyPressedDown(event);
-		}, false);
 
 		// Add events of playback buttons
 		buttons.play.addEventListener('click', function()
 		{
-			if (!!!file.dataset.wfpreview)
+			if (!file.dataset.wfpreview && !file.dataset.wforiginal)
 			{
 				alert(Joomla.JText._('FLEXI_PLEASE_UPLOAD_A_FILE'));
 				return;
@@ -521,7 +504,7 @@ class fc_Waveform_LazyLoad
 
 		buttons.load.addEventListener('click', function()
 		{
-			if (!!file.dataset.wfpreview)
+			if (file.dataset.wfpreview || file.dataset.wforiginal)
 			{
 				buttons.pause.disabled = true;
 				buttons.stop.disabled  = true;
@@ -534,7 +517,12 @@ class fc_Waveform_LazyLoad
 		}, false);
 
 
-		// Render pre-computed peaks when they are available.
+		const status = document.createElement('span');
+		status.className = 'fc-waveform-status';
+		status.setAttribute('role', 'status');
+		controls.after(status);
+
+		// Render pre-computed peaks or decode an available audio file.
 		loadWaveform(file, spectrum, config_name);
 	};
 
@@ -557,25 +545,40 @@ class fc_Waveform_LazyLoad
 	async function loadWaveform(input, spectrum, key)
 	{
 		const player = mediaWaveforms.get(spectrum);
+		if (!player || !input?.isConnected || (!input.dataset.wfpreview && !input.dataset.wforiginal)) return;
 		cancelWaveform(spectrum);
-		if (!player || !input?.dataset.wfpreview || !input.dataset.wfpeaks) return;
 		const request = new AbortController();
 		mediaWaveformRequests.set(spectrum, request);
-		const audio = mediaWaveformURL(input.dataset.wfpreview, key);
-		const json = mediaWaveformURL(input.dataset.wfpeaks, key);
+		const original = input.dataset.wforiginal;
+		const preview = input.dataset.wfpreview;
+		const active = () => !request.signal.aborted && input.isConnected;
+		player._loading_started_ = true;
+		player.loaded = false;
 		player._dummyProgress();
 		try {
-			const response = await fetch(json, {signal: request.signal});
-			if (!response.ok) return;
-			const {data} = await response.json();
-			if (!input.isConnected || request.signal.aborted || !Array.isArray(data) || data.length < 2) return;
-			const peaks = [data[1], ...data];
-			player._saved_peaks_ = peaks;
-			player.loaded = false;
-			player._loading_started_ = true;
-			await player.load(audio, [peaks]);
+			let peaks;
+			if (input.dataset.wfpeaks) {
+				try {
+					const response = await fetch(mediaWaveformURL(input.dataset.wfpeaks, key), {signal: request.signal});
+					const payload = response.ok ? await response.json() : null;
+					const data = payload?.data;
+					if (Array.isArray(data) && data.length > 1) peaks = [data[1], ...data];
+				} catch { /* The player can decode audio without precomputed peaks. */ }
+			}
+			if (!active()) return;
+			const audio = original && !peaks ? original : mediaWaveformURL(preview, key);
+			try {
+				await player.load(audio, peaks ? [peaks] : undefined);
+			} catch (error) {
+				if (!active() || !original || audio === original) throw error;
+				await player.load(original);
+			}
 		} catch {
-			if (!request.signal.aborted) player._loading_started_ = false;
+			if (active()) {
+				player.resetPreview();
+				const message = spectrum.closest('.fc_mediafile_audio_spectrum_box')?.querySelector('.fc-waveform-status');
+				if (message) message.textContent = FlexiForm.text('PLG_FLEXICONTENT_FIELDS_MEDIAFILE_FILE_NOT_FOUND');
+			}
 		} finally {
 			if (mediaWaveformRequests.get(spectrum) === request) {
 				mediaWaveformRequests.delete(spectrum);
@@ -590,24 +593,44 @@ class fc_Waveform_LazyLoad
 		if (input) {
 			delete input.dataset.wfpreview;
 			delete input.dataset.wfpeaks;
+			delete input.dataset.wforiginal;
 		}
 		const spectrum = box.querySelector('.fc_mediafile_audio_spectrum');
 		cancelWaveform(spectrum);
 		const player = mediaWaveforms.get(spectrum);
 		player?._stopProgressBar();
-		player?.empty();
+		const message = spectrum?.closest('.fc_mediafile_audio_spectrum_box')?.querySelector('.fc-waveform-status');
+		if (message) message.textContent = '';
+		player?.resetPreview();
 	}
 
 	function assignWaveform(box, input, file, key)
 	{
 		if (!input) return;
 		clearWaveform(box);
+		if (!waveformAudio.test(file.filename)) return;
+		if (String(file.secure) === '0' && String(file.url ?? 0) === '0' && input.dataset.wfPublicRoot) {
+			input.dataset.wforiginal = input.dataset.wfPublicRoot + '/' + file.filename.split('/').map(encodeURIComponent).join('/');
+		}
 		const path = file.filename.replace(/(^|\/)([^/]+)\.[^./]+$/, '$1audio_preview/$2');
 		const hasFileExtension = path !== file.filename;
 		input.dataset.wfpreview = file.waveform_preview || (hasFileExtension ? path + '.mp3' : '');
 		input.dataset.wfpeaks = file.waveform_peaks || (hasFileExtension ? path + '.json' : '');
 		loadWaveform(input, box.querySelector('.fc_mediafile_audio_spectrum'), key);
 	}
+
+	fcfield_mediafile.disposeValue = function(box)
+	{
+		const spectrum = box.querySelector('.fc_mediafile_audio_spectrum');
+		const player = mediaWaveforms.get(spectrum);
+		if (!player) return;
+		cancelWaveform(spectrum);
+		player._stopProgressBar();
+		player.destroy();
+		mediaWaveforms.delete(spectrum);
+		const index = audio_spectrum_arr.indexOf(player);
+		if (index !== -1) audio_spectrum_arr.splice(index, 1);
+	};
 
 	fcfield_mediafile.showUploader = function(fieldName)
 	{

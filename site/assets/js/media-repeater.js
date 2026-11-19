@@ -57,9 +57,10 @@ window.fcfield_media_rows = (() => {
       preview.src = blankImage;
       if (!image && !config.previewAlways) preview.parentElement.style.display = 'none';
     }
+    row.querySelector('.fc-waveform-status')?.remove();
     const filename = row.querySelector('.fc_filedata_txt');
     if (filename) {
-      for (const attr of ['data-filename', 'data-wfpreview', 'data-wfpeaks']) filename.removeAttribute(attr);
+      for (const attr of ['data-filename', 'data-wfpreview', 'data-wfpeaks', 'data-wforiginal']) filename.removeAttribute(attr);
       filename.classList.remove('file_unpublished');
     }
     const current = row.querySelector('.fc_filedata_txt_nowrap');
@@ -85,6 +86,7 @@ window.fcfield_media_rows = (() => {
   }
 
   function dispose(row, config) {
+    if (config.kind === 'mediafile') window.fcfield_mediafile?.disposeValue?.(row);
     const image = config.kind === 'image';
     const value = fieldId(row, image)?.value;
     const hasValue = image ? value : Number(value) > 0 || row.querySelector('.fc_filedata')?.value;

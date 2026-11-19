@@ -435,7 +435,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			if (!\Joomla\CMS\HTML\HTMLHelper::getServiceRegistry()->hasService('fcuploader')) {
 				\Joomla\CMS\HTML\HTMLHelper::getServiceRegistry()->register('fcuploader', 'JHtmlFcuploader');
 			}
-			$document->getWebAssetManager()->registerAndUseScript('plg_flexicontent_fields_mediafile.wavesurfer', 'https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js');
+			$document->getWebAssetManager()->registerAndUseScript('plg_flexicontent_fields_mediafile.wavesurfer', 'components/com_flexicontent/librairies/wavesurfer/wavesurfer.min.js', array('version' => '7.12.12'));
 			flexicontent_html::loadFramework('media-field-controls');
 			$document->getWebAssetManager()->registerAndUseScript('plg_flexicontent_fields_mediafile.form', 'plugins/flexicontent_fields/mediafile/js/form.js', array('version' => filemtime(JPATH_ROOT . '/plugins/flexicontent_fields/mediafile/js/form.js')));
 
@@ -787,14 +787,14 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			if (!\Joomla\CMS\HTML\HTMLHelper::getServiceRegistry()->hasService('fcuploader')) {
 				\Joomla\CMS\HTML\HTMLHelper::getServiceRegistry()->register('fcuploader', 'JHtmlFcuploader');
 			}
-			$document->getWebAssetManager()->registerAndUseScript('plg_flexicontent_fields_mediafile.wavesurfer', 'https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js');
+			$document->getWebAssetManager()->registerAndUseScript('plg_flexicontent_fields_mediafile.wavesurfer', 'components/com_flexicontent/librairies/wavesurfer/wavesurfer.min.js', array('version' => '7.12.12'));
 			$document->getWebAssetManager()->registerAndUseScript('plg_flexicontent_fields_mediafile.view', 'plugins/flexicontent_fields/mediafile/js/view.js', array('version' => filemtime(JPATH_ROOT . '/plugins/flexicontent_fields/mediafile/js/view.js')));
 			//$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/assets/js/pako.min.js', array('version' => FLEXI_VHASH));
 			//$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/assets/js/pako_deflate.min.js', array('version' => FLEXI_VHASH));
 			//$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/assets/js/pako_inflate.min.js', array('version' => FLEXI_VHASH));
 
 			$document->getWebAssetManager()->addInlineScript("
-			jQuery(document).ready(function()
+			FlexiForm.ready(function()
 			{
 				audio_spectrum_conf['" . $field_name_js . "'] = [];
 				audio_spectrum_conf['" . $field_name_js . "']['waveColor'] = '" . $field->parameters->get( 'ws_wave_color', '#619fc7' ) . "';
