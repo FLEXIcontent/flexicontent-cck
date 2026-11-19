@@ -444,9 +444,8 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 		else
 		{
 			try {
-				// 2, get items, we use direct query because some extensions break the SQL_CALC_FOUND_ROWS, so let's bypass them (at this point it is OK)
-				// *** Usage of FOUND_ROWS() will fail when (e.g.) Joom!Fish or Falang are installed, in this case we will be forced to re-execute the query ...
-				// PLUS, we don't need Joom!Fish or Falang layer at --this-- STEP which may slow down the query considerably in large sites
+				// 2, get items, we use direct query because we don't need Joom!Fish or Falang layer at --this-- STEP
+				// which may slow down the query considerably in large sites
 				$query_limited = $query
 					. ' LIMIT ' . $limit
 					. ' OFFSET ' . $limitstart;
@@ -456,9 +455,22 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 				//$this->_db->setQuery($query, $limitstart, $limit);
 				//$query_ids = $this->_db->loadColumn();
 
-				// 3, get current items total for pagination
-				$this->_db->setQuery("SELECT FOUND_ROWS()");
-				$this->_total = $this->_db->loadResult();
+				// 3, get current items total for pagination: every row of the list carries it (COUNT(*) OVER() in _buildQuery())
+				if ($rows)
+				{
+					$this->_total = $rows[0]->fc_list_total;
+				}
+
+				// No row to read it from. A page after the last one (or a limit of zero) still needs the total
+				elseif ($limitstart || !$limit)
+				{
+					$this->_total = null;
+					$this->getTotal();
+				}
+				else
+				{
+					$this->_total = 0;
+				}
 			}
 
 			catch (Exception $e) {
@@ -762,11 +774,17 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 
 		elseif (!$query_ids)
 		{
-			// SQL_CALC_FOUND_ROWS, will cause problems with 3rd-party extensions that modify the query, this will be tried with direct DB query
+			// The total of the list is a column of the list: COUNT(*) OVER(), one statement instead of SQL_CALC_FOUND_ROWS
+			// + FOUND_ROWS(), which MySQL 8.0.17+ deprecates. A window function counts the rows before DISTINCT is applied,
+			// the list is therefore grouped by the item id instead: the same rows, because every other column
+			// of the list has one value per item
+			$list_total = $count_total && !$this->_getAuthorCaps();
+
 			$query = 'SELECT '
-				. ($count_total ? 'SQL_CALC_FOUND_ROWS' : '') . ' DISTINCT i.id '
+				. ($list_total ? '' : ' DISTINCT') . ' i.id '
 				. @ $orderby_col
 				. ($this->_getAuthorCaps() ? ', rel.catid AS lim_catid, (rel.catid <> i.catid) AS lim_notmain' : '')
+				. ($list_total ? ', COUNT(*) OVER() AS fc_list_total' : '')
 				;
 		}
 
@@ -813,11 +831,18 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 				? (trim((string) $orderby) !== '' ? ', ' : ' ORDER BY ') . 'lim_notmain, lim_catid'
 				: '';
 
+			// A unique last sort key. Without SQL_CALC_FOUND_ROWS the database may stop sorting at the LIMIT,
+			// and rows with equal sort values could then repeat or go missing across pages
+			$id_orderby = $list_total && trim((string) $orderby) !== '' && strpos($orderby, 'i.id') === false
+				? ', i.id'
+				: '';
+
 			$query .= ""
 				. @ $orderby_join  // optional
 				. $where . $extra_where
-				//. ' GROUP BY i.id '
+				. ($list_total ? ' GROUP BY i.id ' : '')
 				. $orderby
+				. $id_orderby
 				. $lim_orderby
 				;
 		}

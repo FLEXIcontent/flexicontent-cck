@@ -2636,10 +2636,13 @@ return $html;
 		 * Create query to get item ids
 		 */
 
-		$items_query 	= 'SELECT ' . ($totals !== null ? 'SQL_CALC_FOUND_ROWS' : '')
+		// With "show found items" the total of the list is a column of the list: COUNT(*) OVER(), counted after GROUP BY.
+		// One statement instead of SQL_CALC_FOUND_ROWS + FOUND_ROWS(), which MySQL 8.0.17+ deprecates
+		$items_query 	= 'SELECT '
 			. ' i.id '
 			. (in_array('commented', $ordering) ? $select_comments : '')
 			. (in_array('rated', $ordering) ? $select_rated : '')
+			. ($totals !== null ? ', COUNT(*) OVER() AS fc_list_total' : '')
 			. ' FROM #__flexicontent_items_tmp AS i'
 			. ' JOIN #__flexicontent_items_ext AS ie on ie.item_id = i.id'
 			. ' JOIN #__flexicontent_types AS ty on ie.type_id = ty.id'
@@ -2656,7 +2659,11 @@ return $html;
 			. $where .' '. ($apply_config_per_category ? '__CID_WHERE__' : '')
 			. $where_field_filters
 			. ' GROUP BY i.id'
-			. (!$behaviour_items && $method_items == 3 && $items_use_order ? ' ORDER BY FIELD(i.id, '. $items .')' : $orderby)
+			. (!$behaviour_items && $method_items == 3 && $items_use_order ? ' ORDER BY FIELD(i.id, '. $items .')' : $orderby
+				// A unique last sort key. Without SQL_CALC_FOUND_ROWS the database may stop sorting at the LIMIT,
+				// and rows with equal sort values could then repeat or go missing across pages
+				. ($totals !== null && trim((string) $orderby) !== '' && strpos($orderby, 'i.id') === false ? ', i.id' : '')
+			)
 			;
 
 
@@ -2710,20 +2717,21 @@ return $html;
 			//echo str_replace('PPP_', '#__', SqlFormatter::format(str_replace('#__', 'PPP_', $query)))."<br/>";
 			$db->setQuery($per_cat_query, $offset_items, $count ? $count : 1);
 
+			$rows    = $db->loadObjectList();
+			$content = array();
+
 			if ($count)
 			{
-				$content = $db->loadColumn(0);
-			}
-			else
-			{
-				$db->execute();
-				$content = array();
+				foreach ($rows as $row) $content[] = $row->id;
 			}
 
+			// Total of found items: every row of the list carries it
 			if ($totals !== null)
 			{
-				$db->setQuery("SELECT FOUND_ROWS()");
-				$totals[$catid] = $db->loadResult();
+				$totals[$catid] = $rows
+					? $rows[0]->fc_list_total
+					// No row to read it from: only an offset after the last item still needs the total
+					: ($offset_items ? $db->setQuery('SELECT COUNT(*) FROM (' . $per_cat_query . ') AS fc_list')->loadResult() : 0);
 			}
 
 			@ $mod_fc_run_times['query_items'] += microtime(1) - $_microtime;
