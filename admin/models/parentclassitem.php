@@ -921,7 +921,8 @@ class ParentClassItem extends FCModelAdmin
 					." FROM #__flexicontent_items_versions as iv "
 					." LEFT JOIN #__flexicontent_fields as f on f.id=iv.field_id"
 					." WHERE iv.version='".$version."' AND (f.iscore=1 OR iv.field_id=-1 OR iv.field_id=-2) AND iv.item_id='".$pk."'"
-					." GROUP BY f.id";
+					// By the versioned field id: f.id is NULL for the two pseudo fields (-1 and -2), which shared one row before
+					." GROUP BY iv.field_id";
 				$db->setQuery($query);
 				$fields = $db->loadObjectList();
 				$fields = $fields ? $fields : array();

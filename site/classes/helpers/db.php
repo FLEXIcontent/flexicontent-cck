@@ -1313,7 +1313,7 @@ class flexicontent_db
 			.'  AND plg.`type` = ' . $db->Quote('plugin')
 			.'  AND plg.`folder` = ' . $db->Quote('flexicontent_fields')
 			.'  AND plg.`element` <> ' . $db->Quote('core')
-			.($usage ? ' GROUP BY plg.element' : '')
+			.($usage ? ' GROUP BY plg.element, plg.name' : '')
 			.' ORDER BY title ASC'
 			;
 

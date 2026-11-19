@@ -413,7 +413,11 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 		$where_favs[] = $user->get('id') ? 'fav.userid = ' . (int)$user->get('id') : '0';
 		$where_favs[] = !empty($favs)    ? 'i.id IN (' . implode(',', $favs) . ')' : '0';
 
-		$where = ' WHERE (' . implode(' OR ', $where_favs) . ')';
+		// A visitor without favourites: a condition on a column that no item meets, and not a constant "0 OR 0".
+		// With a constant false WHERE, MySQL does not see that the columns of the query depend on GROUP BY i.id (ONLY_FULL_GROUP_BY)
+		$where = !$user->get('id') && empty($favs)
+			? ' WHERE (i.id = 0)'
+			: ' WHERE (' . implode(' OR ', $where_favs) . ')';
 
 		// Get privilege to view non viewable items (upublished, archived, trashed, expired, scheduled).
 		// NOTE:  ACL view level is checked at a different place

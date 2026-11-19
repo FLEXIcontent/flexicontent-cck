@@ -5442,10 +5442,12 @@ class flexicontent_html
 	static function builduploaderlist($name, $attribs, $selected, $displaytype=1, $tagid=null)
 	{
 		$db =Factory::getContainer()->get(DatabaseInterface::class);
-		$query = 'SELECT DISTINCT f.uploaded_by AS uid, u.name AS name'
+		// One row per uploader, by name. The order was that of the file extension of an unspecified file of each uploader
+		$query = 'SELECT f.uploaded_by AS uid, u.name AS name'
 		. ' FROM #__flexicontent_files AS f'
 		. ' LEFT JOIN #__users AS u ON u.id = f.uploaded_by'
-		. ' ORDER BY f.ext ASC'
+		. ' GROUP BY f.uploaded_by, u.name'
+		. ' ORDER BY u.name ASC, f.uploaded_by ASC'
 		;
 		$db->setQuery($query);
 		$data = $db->loadObjectList();

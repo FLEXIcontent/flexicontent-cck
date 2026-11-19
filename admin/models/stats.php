@@ -115,9 +115,9 @@ class FlexicontentModelStats extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 		$query = 'SELECT
 				  COUNT(*) AS item_count,
 				  DATE_FORMAT(i.created, "%Y-%m") as year_month_num,
-				  DATE_FORMAT(i.created, "%Y-%b") as year_month_text,
-				  DATE_FORMAT(i.created, "%m") as month_num,
-				  DATE_FORMAT(i.created, "%b") as month_txt
+				  MIN(DATE_FORMAT(i.created, "%Y-%b")) as year_month_text,
+				  MIN(DATE_FORMAT(i.created, "%m")) as month_num,
+				  MIN(DATE_FORMAT(i.created, "%b")) as month_txt
 
 				FROM #__content AS i
 				WHERE i.created > DATE_SUB(NOW(), INTERVAL 120 MONTH)
@@ -235,7 +235,8 @@ class FlexicontentModelStats extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 	 */
 	function getCreators()
 	{
-		$query = 'SELECT COUNT(*) AS counter, i.created_by AS id, ua.name, ua.username'
+		// One row per user name: MIN() names the user of the row, where the choice was left to the database before
+		$query = 'SELECT COUNT(*) AS counter, MIN(i.created_by) AS id, ua.name, MIN(ua.username) AS username'
 			. ' FROM #__content AS i'
 			. ' JOIN #__categories as c ON i.catid=c.id'
 			. ' LEFT JOIN #__users AS ua ON ua.id = i.created_by'
@@ -259,7 +260,7 @@ class FlexicontentModelStats extends \Joomla\CMS\MVC\Model\BaseDatabaseModel
 	 */
 	function getEditors()
 	{
-		$query = 'SELECT COUNT(*) AS counter, i.modified_by AS id, ua.name, ua.username'
+		$query = 'SELECT COUNT(*) AS counter, MIN(i.modified_by) AS id, ua.name, MIN(ua.username) AS username'
 			. ' FROM #__content AS i'
 			. ' JOIN #__categories as c ON i.catid=c.id'
 			. ' LEFT JOIN #__users AS ua ON ua.id = i.modified_by'
