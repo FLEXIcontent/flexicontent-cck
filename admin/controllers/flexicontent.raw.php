@@ -1221,6 +1221,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 
 		$db  = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$app = \Joomla\CMS\Factory::getApplication();
+		$nullDate = $db->getNullDate();
 
 		$queries 	= array();
 
@@ -1257,6 +1258,15 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 
 			if ($row->version > $lastversion)
 			{
+				// The columns that the steps below read. The list query above does not load them, so the item got category 0
+				// (an empty string, which strict mode refuses) and an empty text in its version record
+				$db->setQuery('SELECT catid, introtext, `fulltext`, modified FROM #__content WHERE id = ' . (int) $row->id);
+
+				foreach ((array) $db->loadAssoc() as $name => $value)
+				{
+					$row->$name = $value;
+				}
+
 				// Get field values of the current item version
 				$query = "SELECT f.id,fir.value,f.field_type,f.name,fir.valueorder,fir.suborder,f.iscore "
 						. " FROM #__flexicontent_fields_item_relations as fir"
