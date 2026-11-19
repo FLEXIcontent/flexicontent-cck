@@ -14,7 +14,7 @@ The validator keeps the same exported methods and `custom` registry. Internal ro
 
 This change moves shared submission/validation, record-list controls, dialogs, manager ordering, batch controls and common form initialization to native APIs. It also constructs uploader controllers before field-ready callbacks can invoke them. It preserves `dialog('close')` handles and optional jQuery AJAX/data bridges for existing integrations.
 
-The shared administrator dependency engine and the Text and Text Select repeatable controls use native DOM events. Legacy jQuery events still reach dependent selects when Select2 or an older plugin sends them. Text Select uses the existing Choices integration and supports the legacy Select2 setting.
+The shared administrator dependency engine and the Text and Text Select repeatable controls use native DOM events. Legacy jQuery events still reach dependent selects when Select2 or an older plugin sends them. Text Select uses Choices; legacy Select2 event adapters remain for external integrations.
 
 The item editor and CSV import share a native tag picker. Cascaded selectors use native events and fetch. PrettyCheckable rendering and synthetic jQuery changes still have compatibility hooks when an older widget is enabled.
 
@@ -22,7 +22,7 @@ Field group add, remove, compact controls and drag ordering use native DOM APIs 
 
 The native path also covers field repeaters, Plupload controllers, Inputmask, color inputs, Joomla subforms, version history, manager filters, layout parameter loading and CSV import. Choices mode does not load jQuery for these tested paths. Native color fields preserve CSS text and alpha values without Joomla's jQuery MiniColors widget. Joomla 5+ dialogs and messages are loaded through the Web Asset Manager; older installations retain the dialog fallback.
 
-Legacy Select2, PrettyCheckable, optional gallery/carousel layouts, older module helpers and third-party overrides still contain jQuery dependencies. Compatibility hooks remain when jQuery is explicitly present. This is not a declaration that every bundled feature or configuration is jQuery-independent. See the [Joomla 6 lab audit](JOOMLA6-NATIVE-AUDIT.md) for tested scope and outstanding work.
+Optional gallery/carousel plugins and third-party overrides can still request jQuery. The `select2` loader name now resolves to Choices and the PrettyCheckable loader uses native inputs; compatibility hooks remain when an external integration provides an older widget. Recent favourites, module tab persistence and Flexibreak are native. This is not a declaration that every bundled feature or configuration is jQuery-independent. See the [Joomla 6 lab audit](JOOMLA6-NATIVE-AUDIT.md) for tested scope and outstanding work.
 
 ## Additional suites
 
@@ -37,7 +37,17 @@ node tests/native-color-input.cjs
 node tests/native-media-uploader.cjs
 node tests/native-public-waveform.cjs
 node tests/image-media-clone.cjs
+node tests/native-legacy-helpers.cjs
+node tests/native-public-widgets.cjs
 php tests/manager-checkin-controls.php
+php tests/favourites-controller.php
+php tests/gallery-options.php
+php tests/flexibreak-layouts.php
+php tests/module-tab-state.php
+php tests/optional-jquery-assets.php fancybox
+php tests/optional-jquery-assets.php fancybox manual
 ```
 
 The manager suite covers history pagination and failed requests, stale layout requests, parent-dialog submission, empty-selection alerts, and asynchronous file previews. Mask cases use fresh controls and actual keyboard/paste events, including immediate focus followed by typing and tab-then-click entry. The shipped Inputmask patch is documented alongside the vendor source. Browser fixtures test behavior; the installed-site audit separately verifies persisted database values.
+
+The follow-up suites cover delayed Joomla editor-registry removal, restored Choices values, safe recent-favourites rendering, AJAX failure messages, module state isolation, pagebreak navigation, comparison-gallery settings/resizing, conditional legacy dependency loading and typed FancyBox options. The [code index](NATIVE-CODE-INDEX.md) links all changed JavaScript files.

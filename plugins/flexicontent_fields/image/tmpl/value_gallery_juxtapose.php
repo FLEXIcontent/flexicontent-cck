@@ -33,57 +33,10 @@ foreach ($values as $n => $value)
 
 //var_dump($field->{$prop});
 
-// ***
-// *** Add per field custom JS
-// ***
-
-if ( !isset(static::$js_added[$field->id][__FILE__]) )
-{
-	//flexicontent_html::loadFramework('juxtapose'); TODO ADDING script inline not in CDN
-
-	$js = "
-	(function($)
-	{
-		$(document).ready(function()
-		{
-			var juxtapose = $('.juxtapose_" . $field->id . "');
-
-			juxtapose.each(function(index, element) {
-				var juxtaposeContainer = juxtapose.parent();
-				var juxtaposeRatio;
-			
-				$(window).on('load', function (event) {
-					juxtaposeRatio = $(element).outerHeight() / $(element).outerWidth();
-				});
-			
-				$(window).on('resize', function (event) {
-					var newWidth = juxtaposeContainer.outerWidth();
-					var newHeight = newWidth * juxtaposeRatio;
-					$(element).css({width: newWidth, height: newHeight});
-				});
-			});
-		});
-	})(jQuery);
-	";
-
-	if ($js) \Joomla\CMS\Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript($js);
-
-	static::$js_added[$field->id][__FILE__] = array();
-}
-
-// ***
-// *** Add - per (field, item) pair - custom JS
-// ***
-
-$uid = 'fc_'.$field_name_js."_fcitem".$item->id;
-
-if (!isset(static::$js_added[$field->id][__FILE__][$item->id]))
-{
-	$js = "";
-
-	if ($js) \Joomla\CMS\Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript($js);
-	static::$js_added[$field->id][__FILE__][$item->id] = true;
-}
+// The gallery engine is native. Initialize explicitly so its HTML scanner does
+// not overwrite the vertical mode with data-makeresponsive (Juxtapose 1.2.2).
+$document = \Joomla\CMS\Factory::getApplication()->getDocument();
+$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/assets/js/juxtapose.js');
 
 /**
  * Include common layout code before finalize values
@@ -116,8 +69,8 @@ if ($result !== _FC_RETURN_)
 		 */
 		$html[] = '
 			<div
-				id="juxtapose-wrapper_' . $item->id . '_' . $field->id . '"
-				class="juxtapose juxtapose_' . $field->id . '"
+				id="juxtapose-wrapper_' . $item->id . '_' . $field->id . '_' . $i . '"
+				class="fc-juxtapose juxtapose_' . $field->id . '"
 				data-startingposition="'.$slider_position.'%"
 				data-showlabels="' . $display_label . '"
 				data-showcredits="' . $display_credit . '"

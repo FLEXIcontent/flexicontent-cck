@@ -451,39 +451,23 @@
 
 
 	/* Set children to have same minimum height e.g. floated elements that need to wrap properly */
-	function fc_setEqualHeights(box, property, delay)
+	function fc_setEqualHeights(box, property = 0, delay = 20)
 	{
-		property = !!property ? property : 0;  // 0: both height + min-height, 1: height, 2: min-height
-		delay = !!delay ? delay : 20;
-		var elements = box.children();
-		elements.css({'height': '', 'min-height': ''});
-		setTimeout(function() {
-			var max_h  = Number.NEGATIVE_INFINITY;
-			var max_mh = Number.NEGATIVE_INFINITY;
-
-			jQuery.each(elements, function(index, item) {
-				if (property==1 || property==0)
-				{
-					if (jQuery(item).height() > max_h) max_h = jQuery(item).height();
-				}
-				if (property==2 || property==0)
-				{
-					if (jQuery(item).outerHeight() > max_mh) max_mh = jQuery(item).outerHeight();
-				}
-			});
-
-			var val_h  = '' + max_h + 'px';
-			var val_mh = '' + max_mh + 'px';
-			elements.each(function(i, v) {
-				if (property==1 || property==0)
-				{
-					if (v.style.height != val_h) v.style.height = val_h;
-				}
-				if (property==2 || property==0)
-				{
-					if (v.style.minHeight != val_mh) v.style.minHeight = val_mh;
-				}
-			});
+		const parent = FlexiForm.element(box);
+		if (!parent) return;
+		const elements = Array.from(parent.children);
+		elements.forEach(element => { element.style.height = ''; element.style.minHeight = ''; });
+		setTimeout(() => {
+			const height = Math.max(0, ...elements.map(element => element.getBoundingClientRect().height));
+			for (const element of elements) {
+				const style = getComputedStyle(element);
+				const extra = style.boxSizing === 'border-box' ? 0 :
+					['paddingTop', 'paddingBottom', 'borderTopWidth', 'borderBottomWidth']
+					.reduce((sum, name) => sum + (parseFloat(style[name]) || 0), 0);
+				const value = Math.max(0, height - extra) + 'px';
+				if (Number(property) !== 2) element.style.height = value;
+				if (Number(property) !== 1) element.style.minHeight = value;
+			}
 		}, delay);
 	}
 
@@ -1000,7 +984,7 @@
 	{
 		var today = new Date();
 		var expires = new Date();
-		var path = typeof jclient_path_fc != 'undefined' ? jclient_path_fc : window.location.hostname;
+		var path = typeof jclient_path_fc != 'undefined' ? jclient_path_fc : '/';
 		if (nDays==null || nDays<0) nDays=0;
 
 		if (nDays)
@@ -1018,8 +1002,10 @@
 	/* Get a cookie */
 	function fclib_getCookie(cookieName)
 	{
-		let matched = document.cookie.match(new RegExp('(^|;\\s*)' + cookieName + '=([^;]+)'));
-		return matched ? decodeURIComponent(matched[2]) : '';
+		const prefix = cookieName + '=';
+		const cookie = document.cookie.split(';').map(value => value.trim()).find(value => value.startsWith(prefix));
+		try { return cookie ? decodeURIComponent(cookie.slice(prefix.length)) : ''; }
+		catch (error) { return ''; }
 	}
 
 
@@ -1028,8 +1014,11 @@
 	 */
 	function fclib_createCookieList(cookieName, nDays)
 	{
-		var cookieValue = fclib_getCookie(cookieName);
-		var items = jQuery.parseJSON(cookieValue ? cookieValue : '{}');
+		let items = Object.create(null);
+		try {
+			const saved = JSON.parse(fclib_getCookie(cookieName) || '{}');
+			if (saved && typeof saved === 'object' && !Array.isArray(saved)) Object.assign(items, saved);
+		} catch (error) { /* A stale or truncated cookie must not break the page. */ }
 		nDays = nDays || 90;
 
 		return {
@@ -1053,7 +1042,7 @@
 			// Clear items
 			"clear": function()
 			{
-				items = {};
+				items = Object.create(null);
 				fclib_setCookie(cookieName, JSON.stringify(items), nDays);
 			},
 
@@ -1066,116 +1055,88 @@
 	}
 
 
-	/* Remove known textarea editors, optionally add a flag to restore editors laters */
-	function fc_removeAreaEditors(txtareas, addRestoreClass)
-	{
-		addRestoreClass = typeof addRestoreClass != 'undefined' ? addRestoreClass : 0;
-
-		// Remove known JS editors
-		txtareas.each(function(i, txtarea)
-		{
-			var areaid = jQuery(txtarea).attr('id');
-
-			var hasTinyMCE = !!(!areaid || typeof tinyMCE === 'undefined' ? false : tinyMCE.get(areaid));
-			if (hasTinyMCE) {
-				tinyMCE.majorVersion >= 4 ?
-					tinymce.remove('#'+areaid) :
-					tinymce.EditorManager.execCommand('mceRemoveEditor', false, areaid) ;
-				if (addRestoreClass) jQuery(txtarea).addClass('fc_hadTinyMCE');
-			}
-
-			var hasCodeMirror = typeof CodeMirror === 'undefined' ? false : jQuery(txtarea).first().next().hasClass('CodeMirror');
-			if (hasCodeMirror) {
-				jQuery(txtarea).first().next().get(0).CodeMirror.toTextArea();
-				if (addRestoreClass) jQuery(txtarea).addClass('fc_hadCodeMirror');
-
-				// Remove codemirror container in case that removing it failed
-				if (jQuery(txtarea).first().next('.CodeMirror').length) jQuery(txtarea).first().next('.CodeMirror').remove();
-			}
-		});
+	// Keep editor options when a row is detached, reordered, then restored.
+	const fc_areaEditorOptions = new WeakMap();
+	function fc_editorAreas(areas) {
+		return areas?.nodeType ? [areas] : Array.from(areas || []);
 	}
 
+	/* Remove known textarea editors, optionally mark them for restoration. */
+	function fc_removeAreaEditors(txtareas, addRestoreClass = false)
+	{
+		for (const area of fc_editorAreas(txtareas)) {
+			const tiny = (window.tinymce || window.tinyMCE)?.get(area.id);
+			const code = area.nextElementSibling?.CodeMirror;
+			const saved = { tiny: tiny?.settings, code: code?.options };
+			fc_areaEditorOptions.set(area, saved);
+			if (tiny) {
+				tiny.save();
+				tiny.remove();
+				if (area.closest('.js-editor-tinymce')) {
+					// Joomla 5+ keeps a separate editor registry. Restore only after it is cleared.
+					saved.detached = import('editor-api').then(({JoomlaEditor}) => JoomlaEditor.unregister(area.id)).catch(() => {});
+				}
+				if (addRestoreClass) area.classList.add('fc_hadTinyMCE');
+			}
+			if (code) {
+				code.toTextArea();
+				if (addRestoreClass) area.classList.add('fc_hadCodeMirror');
+			}
+		}
+	}
 
-	/* Restore known textarea editors to textareas with respective class */
 	function fc_restoreAreaEditors(txtareas)
 	{
-		fc_attachTinyMCE( txtareas.filter('.fc_hadTinyMCE') );
-		fc_attachCodeMirror( txtareas.filter('.fc_hadCodeMirror') );
+		const areas = fc_editorAreas(txtareas);
+		fc_attachTinyMCE(areas.filter(area => area.classList.contains('fc_hadTinyMCE')));
+		fc_attachCodeMirror(areas.filter(area => area.classList.contains('fc_hadCodeMirror')));
 	}
 
-
-	/* Attach tinyMCE with default settings */
-	function fc_attachTinyMCE(txtareas, MCEoptions, mceFieldname)
+	function fc_attachTinyMCE(txtareas, MCEoptions, mceFieldname = false)
 	{
-		// Create a copy of the options,  so that we do not modify the original options objet
-		var _MCEoptions = typeof MCEoptions!=='undefined' ? jQuery.extend({}, MCEoptions) : {};
-		mceFieldname = typeof mceFieldname!=='undefined' ? mceFieldname : false;
-
-		var theArea, areaID;
-		txtareas.each(function(i, txtarea)
-		{
-			var theArea = jQuery(txtarea);
-			var areaID = theArea.attr('id');
-
-			// Remove tinymce classes from the textarea
-			theArea.removeClass('mce_editable');
-
-			// J3.7.0+ (with integrated XTD buttons) is using new setup method
-			if (typeof mceFieldname!=='undefined' && typeof Joomla.JoomlaTinyMCE != 'undefined' && typeof MCEoptions.joomlaExtButtons != 'undefined')
-			{
-				var tinyMCEOptions = {};
-				tinyMCEOptions[mceFieldname] = _MCEoptions;
-				Joomla.JoomlaTinyMCE.setupEditor(jQuery('#' + areaID).get(0), {tinyMCE: tinyMCEOptions});
+		const areas = fc_editorAreas(txtareas), tiny = window.tinymce || window.tinyMCE;
+		if (!tiny) return false;
+		for (const area of areas) {
+			if (tiny.get(area.id)) continue;
+			const options = { ...(MCEoptions || fc_areaEditorOptions.get(area)?.tiny || {}) };
+			area.classList.remove('mce_editable', 'fc_hadTinyMCE');
+			const wrapper = area.closest('.js-editor-tinymce');
+			if (wrapper && window.Joomla?.JoomlaTinyMCE?.setupEditor) {
+				Promise.resolve(fc_areaEditorOptions.get(area)?.detached).then(() => {
+					if (!tiny.get(area.id)) Joomla.JoomlaTinyMCE.setupEditor(area, Joomla.getOptions('plg_editor_tinymce', {}));
+				});
+			} else if (mceFieldname && options.joomlaExtButtons && window.Joomla?.JoomlaTinyMCE?.setupEditor) {
+				Joomla.JoomlaTinyMCE.setupEditor(area, {tinyMCE: {[mceFieldname]: options}});
+			} else if (Number(tiny.majorVersion) >= 4) {
+				tiny.init({...options, selector: null, target: area});
+			} else {
+				tiny.init({...options, mode: 'exact', elements: area.id});
 			}
-			else if (tinyMCE.majorVersion >= 4)
-			{
-				_MCEoptions.selector = '#' + areaID;
-				tinyMCE.init(_MCEoptions);
-				//tinyMCE.EditorManager.execCommand('mceAddEditor', true, areaID);  //var editor = tinyMCE.get(areaid);  //tinyMCE.editors[areaID];
+			area.classList.add('mce_editable');
+			for (const container of area.parentElement?.children || []) {
+				if (container.classList.contains('mce-container')) container.style.removeProperty('display');
 			}
-			else
-			{
-				_MCEoptions.mode = 'exact';
-				_MCEoptions.elements = areaID;
-				tinyMCE.init(_MCEoptions);
-				//tinyMCE.EditorManager.execCommand('mceAddControl', true, areaID);  //var editor = tinymce.EditorManager.get(area_id);  // tinyMCE.editors[areaID];
-			}
-
-			// Some cleanups for proper display
-			theArea.addClass('mce_editable');
-			theArea.parent().children('.mce-container').css('display', '');   // allow editor container to stretch to the full width of its external container
-		});
-
-		return txtareas.length==1 ? tinyMCE.get(areaID) : true;
+		}
+		return areas.length === 1 ? tiny.get(areas[0].id) : true;
 	}
 
-
-	/* Attach CodeMirror with optional settings */
 	function fc_attachCodeMirror(txtareas, CMoptions)
 	{
-		CMoptions = typeof CMoptions!=='undefined' ? CMoptions : {
-			mode: 'application/x-httpd-php',
-			indentUnit: 2,
-			lineNumbers: true,
-			matchBrackets: true,
-			lineWrapping: true,
-			onCursorActivity: function(CM)
-			{
-				CM.setLineClass(hlLine, null);
-				hlLine = CM.setLineClass(CM.getCursor().line, 'activeline');
-			}
-		};
-
-		var editor, theArea;
-		txtareas.each(function(i, txtarea)
-		{
-			theArea = jQuery(txtarea);
-			theArea.removeClass(); // Remove all classes from the textarea
-			editor = CodeMirror.fromTextArea(theArea.get(0), CMoptions);
+		const areas = fc_editorAreas(txtareas);
+		if (!window.CodeMirror) return false;
+		let editor;
+		for (const area of areas) {
+			// Joomla 6 owns the lifecycle of its CodeMirror custom element.
+			if (area.closest('joomla-editor-codemirror')) continue;
+			const options = CMoptions || fc_areaEditorOptions.get(area)?.code || {
+				mode: 'application/x-httpd-php', indentUnit: 2, lineNumbers: true,
+				matchBrackets: true, lineWrapping: true, styleActiveLine: true
+			};
+			editor = area.nextElementSibling?.CodeMirror || CodeMirror.fromTextArea(area, {...options});
 			editor.refresh();
-		});
-
-		return txtareas.length==1 ? editor : true;
+			area.classList.remove('fc_hadCodeMirror');
+		}
+		return areas.length === 1 ? editor : true;
 	}
 
 
@@ -1201,19 +1162,13 @@
 	/* Disable/enable a check box group e.g. when 'Use Global' option is toggled */
 	function fc_toggle_checkbox_group(containerID, useGlobalElement)
 	{
-		var container = jQuery('#'+containerID);
-		var inputs = container.find('input');
-		el = jQuery(useGlobalElement);
-		if ( el.is(':checked') ) {
-			inputs.each(function(index){
-				jQuery(this).attr('disabled', true);
-			});
-		} else {
-			inputs.each(function(index){
-				jQuery(this).attr('disabled', false);
-			});
+		const container = document.getElementById(containerID);
+		const control = FlexiForm.element(useGlobalElement);
+		if (!container || !control) return;
+		for (const input of container.querySelectorAll('input')) {
+			input.disabled = input !== control && control.checked;
 		}
-		el.attr('disabled', false);
+		control.disabled = false;
 	}
 
 
@@ -2000,51 +1955,36 @@
 		}
 	}
 
-	/* Valid HTML for legacy modals using rel, TODO: add more */
-	if (typeof jQuery !== 'undefined') {
-		jQuery(document).ready(function() {
-			jQuery(".modal").each(function(i, el) {
-				if (jQuery(el).get(0).hasAttribute("data-rel")) jQuery(el).attr("rel", jQuery(el).attr("data-rel"));
-			});
-		});
-	}
+	/* Preserve legacy modal rel attributes without requiring jQuery. */
+	FlexiForm.ready(() => {
+		for (const element of document.querySelectorAll('.modal[data-rel]')) element.setAttribute('rel', element.dataset.rel);
+	});
 
-
-	/* Restore the given form fields values into the given form */
+	/* Restore saved values, including unchecked boxes and multiple selections. */
 	function fc_restore_form_field_values(form, data)
 	{
-		if (!data)
-		{
-			form[0].reset();
-
-			var elements = Array.from(form[0].elements);
-	 	 	for (var i = 0, l = elements.length; i < l; i++)
-	 	 	{
-				var el = jQuery(elements[i]);
-				var tagName = elements[i].tagName;
-				var inputType = tagName != 'INPUT' ? false : elements[i].type;
-				if (tagName == 'SELECT' || (inputType && inputType!='BUTTON'))
-				{
-					el.trigger('change');
-				}
+		form = FlexiForm.element(form);
+		if (!form?.elements) return;
+		const controls = Array.from(form.elements);
+		if (!data) form.reset();
+		for (const control of controls) {
+			if (!control.matches('input, select, textarea') || ['button', 'submit', 'reset', 'file'].includes(control.type)) continue;
+			if (data && !Object.prototype.hasOwnProperty.call(data, control.name)) continue;
+			if (data) {
+				const value = data[control.name];
+				const values = (Array.isArray(value) ? value : [value]).map(value => String(value ?? ''));
+				if (control.type === 'checkbox' || control.type === 'radio') control.checked = values.includes(control.value);
+				else if (control.tagName === 'SELECT' && control.multiple) {
+					for (const option of control.options) option.selected = values.includes(option.value);
+				} else control.value = value ?? '';
 			}
-
-			return;
+			if (control.fc_choices_instance) {
+				const values = Array.from(control.selectedOptions, option => option.value);
+				control.fc_choices_instance.removeActiveItems();
+				control.fc_choices_instance.setChoiceByValue(values);
+			}
+			control.dispatchEvent(new Event('change', {bubbles: true}));
 		}
-
-		jQuery.each(data, function(name, val)
-		{
-			var el = form.find('[name="'+name+'"]'),
-			type = el.attr('type');
-
-			switch(type)
-			{
-				case 'checkbox':  el.attr('checked', 'checked'); break;
-				case 'radio':     el.filter('[value="'+val+'"]').attr('checked', 'checked'); break;
-				default: el.val(val);
-			}
-			el.trigger('change');
-		});
 	}
 
 

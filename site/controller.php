@@ -386,7 +386,8 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		}
 
 		// Get Favourites field configuration
-		$favs_field = reset(FlexicontentFields::getFieldsByIds(array(12)));
+		$favs_fields = FlexicontentFields::getFieldsByIds(array(12));
+		$favs_field = reset($favs_fields);
 		$favs_field->parameters = new \Joomla\Registry\Registry($favs_field->attribs);
 
 		$usercount = (int) $favs_field->parameters->get('display_favoured_usercount', 0);
@@ -401,8 +402,9 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		// Guest user does not have DB data, instead use Cookie data
 		else
 		{
-			// Get model of the give type
-			$model = $this->getModel($type);
+			// Frontend editing can register the administrator item model under the same
+			// legacy class name. Use the shared favourites helpers with an explicit ID.
+			$favourite_type = $type === 'category' ? 1 : 0;
 
 			if (!$user->id)
 			{
@@ -418,14 +420,14 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			else
 			{
 				// Toggle favourite
-				$isfav = $model->getFavoured();
+				$isfav = flexicontent_db::getFavoured($favourite_type, $id, $user->id);
 				$isfav
-					? $model->removefav()
-					: $model->addfav();
+					? flexicontent_db::removefav($favourite_type, $id, $user->id)
+					: flexicontent_db::addfav($favourite_type, $id, $user->id);
 			}
 
 			// Output response for counter (if this has been enabled)
-			$favs = $model->getFavourites();
+			$favs = flexicontent_db::getFavourites($favourite_type, $id);
 			echo $isfav
 				? ($favs && $usercount ? '-' . $favs : 'removed')
 				: ($favs && $usercount ? '+' . $favs : 'added');

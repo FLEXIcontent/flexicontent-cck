@@ -204,6 +204,7 @@ function toggleFCFavCookie(id, type)
 				});
 			});
 		}, status_info ? 200 : 1);
+		return on;
 	}
 
 
@@ -271,7 +272,10 @@ function toggleFCFavCookie(id, type)
 			.then(function (response)
 			{
 				pending[key] = false;
-				done(response.trim(), links, boxes, add_counter, was);
+				var on = done(response.trim(), links, boxes, add_counter, was);
+				if (on !== null) document.dispatchEvent(new CustomEvent('flexicontent:favourite-changed', {
+					detail: {id: id, type: type, on: on, source: input || links[0]}
+				}));
 			})
 			.catch(function (err)
 			{
@@ -287,7 +291,16 @@ function toggleFCFavCookie(id, type)
 					box.innerHTML = '';
 				});
 
-				alert('Error status: ' + ((err && err.status) || 0) + ' , Error text: ' + ((err && (err.text || err.message)) || ''));
+				var message = 'Error status: ' + ((err && err.status) || 0) + ' , Error text: ' + ((err && (err.text || err.message)) || '');
+				if (window.Joomla && Joomla.renderMessages) {
+					Joomla.renderMessages({error: [escapeHtml(message)]});
+				} else {
+					// Older templates may omit Joomla's message container/assets.
+					var notice = document.createElement('div');
+					notice.className = 'alert alert-danger'; notice.setAttribute('role', 'alert');
+					notice.textContent = message;
+					(links[0] || document.body).insertAdjacentElement('afterend', notice);
+				}
 			});
 	}
 

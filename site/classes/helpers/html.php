@@ -1501,15 +1501,14 @@ class flexicontent_html
 		{
 			if ($load_jquery === null)
 			{
-				// Choices.js mode on the site front loads NO jQuery (keeps front entirely
-				// jQuery-free); select2 legacy keeps jQuery + mousewheel.
+				// Generic/native pages do not preload jQuery in Choices mode.
+				// Selected legacy widgets below request their own dependencies explicitly.
 				$useChoicesJs = (int) $cparams->get('select_lib_type', 0) === 1;
 				$load_jquery = !self::usesNativeAdminAssets()
 					&& ( (int) $cparams->get('loadfw_jquery', 1) === 1 || !$app->isClient('site') )
 					&& ! ( $app->isClient('site') && $useChoicesJs );
 
-				// jQuery plugins without a jQuery-free alternative still need jQuery in Choices.js mode,
-				// so it is loaded on the pages that use them (unless jQuery loading is turned off)
+				// Retained for the legacy bootstrap-toggle compatibility path.
 				$jquery_for_plugins = (int) $cparams->get('loadfw_jquery', 1) === 1 || !$app->isClient('site');
 
 				// Choices.js mode without jQuery for plugins: the site front has no jQuery at all
@@ -1615,15 +1614,12 @@ class flexicontent_html
 				break;
 
 			case 'grapesjs_view':
-				$js .= "
-					jQuery(document).ready(function(){
-						jQuery('.tab-container').click(function(e)
-						{
-							e.preventDefault();
-							return true;
-						});
+				self::loadFramework('form-utils');
+				$js .= "FlexiForm.ready(function () {
+					document.querySelectorAll('.tab-container').forEach(function (tab) {
+						tab.addEventListener('click', function (event) { event.preventDefault(); });
 					});
-				";
+				});";
 				break;
 
 			case 'sabberworm':
@@ -1633,8 +1629,7 @@ class flexicontent_html
 				break;
 
 			case 'mousewheel':
-				// mousewheel is a jQuery plugin; in choices mode (jQuery-free front) it is not loaded.
-				if (!$load_jquery) break;
+				// Called only by widgets that actually use the mousewheel plugin.
 				flexicontent_html::loadJQuery(1, 0, 0);  // a jQuery plugin: load jQuery itself (core only, without jQuery UI)
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/mousewheel';
@@ -1648,7 +1643,7 @@ class flexicontent_html
 				$mcsb_site_choices = $app->isClient('site') && (int) $mcsb_cparams->get('select_lib_type', 0) === 1;
 				if ($mcsb_site_choices) break;
 
-				if ($load_jquery) flexicontent_html::loadJQuery();
+				flexicontent_html::loadJQuery(1, 0, 0);
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/mCSB';
 
@@ -1677,7 +1672,7 @@ class flexicontent_html
 				break;
 
 			case 'image-picker':
-				if ($load_jquery) flexicontent_html::loadJQuery();
+				flexicontent_html::loadJQuery(1, 0, 0);
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/image-picker';
 				$document->addScript($framework_path.'/image-picker.min.js');
@@ -1769,7 +1764,7 @@ class flexicontent_html
 
 			case 'multibox':
 			case 'jmultibox':
-				if ($jquery_for_plugins) flexicontent_html::loadJQuery();
+				flexicontent_html::loadJQuery(1, 0, 0);
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/jmultibox';
 
@@ -1789,8 +1784,7 @@ class flexicontent_html
 				break;
 
 			case 'fancybox':
-				// fancybox is a jQuery plugin; in choices mode (jQuery-free front) it is not loaded.
-				if (!$load_jquery) break;
+				// An explicitly selected gallery needs jQuery core, independently of the select widget.
 				flexicontent_html::loadJQuery(1, 0, 0);  // a jQuery plugin: load jQuery itself (core only, without jQuery UI)
 
 				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js');
@@ -1819,7 +1813,7 @@ class flexicontent_html
 				break;
 
 			case 'galleriffic':
-				if ($load_jquery) flexicontent_html::loadJQuery();
+				flexicontent_html::loadJQuery(1, 0, 0);
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/galleriffic';
 				$document->addStyleSheet($framework_path.'/css/basic.css');
@@ -1828,7 +1822,7 @@ class flexicontent_html
 				break;
 
 			case 'elastislide':
-				if ($jquery_for_plugins) flexicontent_html::loadJQuery();
+				flexicontent_html::loadJQuery(1, 0, 0);
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/elastislide';
 				$document->addStyleSheet($framework_path.'/css/gallery.css');
@@ -1841,7 +1835,8 @@ class flexicontent_html
 				break;
 
 			case 'photoswipe':
-				if ($jquery_for_plugins) flexicontent_html::loadJQuery();
+				// This bundled version exposes a native API; its jQuery adapter uses removed .live().
+				flexicontent_html::loadFramework('form-utils');
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/photoswipe';
 
@@ -1854,8 +1849,8 @@ class flexicontent_html
 				$document->addScript($framework_path.'/code.photoswipe.min.js');
 
 				$js .= "
-					jQuery(document).ready(function() {
-						var myPhotoSwipe = jQuery('.photoswipe_fccontainer a').photoSwipe();
+					FlexiForm.ready(function() {
+						Code.photoSwipe('.photoswipe_fccontainer a');
 					});
 				";
 				break;
@@ -1885,7 +1880,8 @@ class flexicontent_html
 				break;
 
 			case 'fcxSlide':
-				if ($jquery_for_plugins) flexicontent_html::loadJQuery();
+				flexicontent_html::loadJQuery(1, 0, 0);
+				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js');
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/fcxSlide';
 				$document->addScript($framework_path.'/class.fcxSlide.js', array('version' => FLEXI_VHASH));
@@ -1899,7 +1895,7 @@ class flexicontent_html
 				break;
 
 			case 'zTree':
-				if ($load_jquery) flexicontent_html::loadJQuery();
+				flexicontent_html::loadJQuery(1, 0, 0);
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/zTree';
 				$document->addStyleSheet($framework_path.'/css/flexi_ztree.css');

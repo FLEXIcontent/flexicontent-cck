@@ -1,6 +1,8 @@
 # Joomla 6 native workflow audit — 20 November 2026
 
-The tested core workflows pass on the Laragon `f6.test` laboratory with Joomla 6.2.0, PHP 8.3.30, Choices enabled and jQuery script requests blocked. This patch is suitable for code review in draft PR #1421. **The entire extension is not yet certified jQuery-independent or release-ready:** optional legacy integrations remain, and the coverage limits below matter.
+The tested core workflows pass on the Laragon `f6.test` laboratory with Joomla 6.2.0, PHP 8.3.30 and Choices enabled. Native workflows are tested with jQuery absent/blocked. Selected legacy plugins retain jQuery, loaded only when those plugins are requested. This follows the agreed compatibility policy; it is not package-wide removal of every jQuery reference.
+
+The patch is ready for code review in **draft PR #1421**. The complete [code index](NATIVE-CODE-INDEX.md) links the JavaScript rewrites, CSS and integration files. The coverage limits below still prevent full release certification.
 
 ## Branch and environment
 
@@ -29,9 +31,27 @@ Local runtime files were backed up, overlaid from the source worktree and SHA-25
 | Builder/media | Builder notification dependency and media retry handling affected native workflows | Joomla warnings, native media controls and playback retry; builder opening verified |
 | Responsive layout | Repeatable/property tables, uploader minimum width, pagination and wide manager tables overflowed | Wrapping, bounded fields, stacked narrow layouts and keyboard-accessible table scrolling; matching LESS/CSS updated |
 
+## Follow-up: optional dependencies and remaining authored helpers
+
+| Area | Reproduced problem | Fix and verification |
+|---|---|---|
+| Optional gallery assets | Choices mode skipped required dependencies or replaced FancyBox with a limited fallback | The selected plugin requests jQuery core once, without jQuery UI; per-widget manual loading remains respected. FancyBox uses its actual configured plugin |
+| PhotoSwipe | Its legacy adapter calls removed jQuery `.live()` | Initialize the bundled native API; open, next and close pass without jQuery |
+| Juxtapose | FLEXIcontent's resize wrapper threw `jQuery is not defined`; vendor HTML scanning overwrote vertical mode | Native explicit initialization, unique IDs for image pairs, typed settings and parent resize observation; horizontal/vertical drag and aspect-ratio resizing pass |
+| Galleriffic | Missing stored dimensions collapsed images; zero-height clipping hid pause/play; icon HTML broke title markup | Preserve natural image dimensions, expose overlay controls and create attributes through the DOM. Pause/next and popup-disabled operation pass |
+| FancyBox settings | Toolbar `false` was truthy text; thumbnail autostart was unused | JSON-encode typed settings, actual `buttons`, thumbnails and disabled effects; preserve the existing misspelled transition setting for compatibility. Hidden toolbar, custom/empty buttons and thumbnail autostart pass |
+| Content carousel | Removing jQuery UI exposed an undeclared easing dependency | Request its easing plugin directly. Next-page navigation and stop pass with jQuery core and no UI |
+| News/Swiper/carousel state | Old `shown`/`hidden` events did not match Bootstrap 5; closed panels were forgotten | Native Bootstrap events, scoped cookies and closed-state restoration; malformed nested cookie data normalized. Actual selection/reload/open/close checks pass |
+| Recent favourites | Cookie parsing and module updates required jQuery; failed requests could create optimistic entries | Native rendering, safe cookie recovery, Sortable and success-only events. Add/reload/remove pass signed in, with two-module and failure fixtures |
+| Favourites endpoint | Frontend editing registered the administrator item model, which lacks `getFavoured()`; AJAX returned HTTP 500 | Use existing favourites DB helpers with explicit item/category/user IDs; preserve token validation and counters. Live signed-in round-trip and controller tests pass |
+| Exported helpers | Use Global, equal heights, form-value restore and editor adapters still required jQuery | Native DOM implementations retain DOM/collection compatibility, checkbox/radio/multi-select values and Choices state |
+| TinyMCE restoration | Removing TinyMCE left Joomla's editor registry populated, preventing restoration | Await registry removal before `setupEditor`; a real Joomla editor retains Unicode content, and a delayed-registry regression covers the race |
+| Flexibreak | Native pages hit jQuery calls; tabs/sliders called removed Joomla helpers; PHP emitted dynamic-property warnings | Native navigation/show-all/hash handling, Joomla tabs/Bootstrap accordion rendering, declared state and reset per article. All five display modes pass |
+| Failure messages | Favourites network errors used a blocking browser alert | Joomla messages loaded through WAM; error state rolls back and the failure remains visible |
+
 ## Installed-site coverage
 
-All rows marked Passed refer to actual browser interaction, not source inspection alone. Requests for off-site services were blocked except the explicitly permitted static builder assets used for its opening check.
+All rows marked Passed refer to actual browser interaction, not source inspection alone. Requests for off-site services were blocked except explicitly permitted static builder and Juxtapose assets. No external provider credentials or private content were transmitted by these checks.
 
 | Status | Scope | Evidence and limits |
 |---|---|---|
@@ -46,6 +66,8 @@ All rows marked Passed refer to actual browser interaction, not source inspectio
 | Passed | Public modules | Category navigation, content module, filters, latest items and advanced search; advanced-search toggle and Enter search; map's unconfigured empty state only |
 | Passed | Responsive | Five frontend/editor/statistics surfaces at 390/768/1440: document width equals viewport; additional manager screenshots at those widths |
 | Passed | Permissions smoke | Author/registered denied editing where expected; administrator/publisher authorized saves |
+| Passed | Optional galleries | Nine modes (none, FancyBox, Galleriffic, elastislide, multibox, GLightbox, Swiper, PhotoSwipe, Juxtapose) at 390/768/1280; actual navigation and open/close; no console or local HTTP errors. GLightbox hides arrows below 769px, so narrow-width navigation uses the keyboard |
+| Passed | Public follow-up | News/Swiper/carousel remembered state, carousel next/stop, signed-in favourite add/reload/remove, and all five Flexibreak modes. Temporary field/module/article/plugin settings restored |
 | Passed | Cleanup | Audit content IDs 48–67, five uploaded files and two tags deleted through managers; original 47 items retained; six temporarily published modules restored |
 | Limited | GrapesJS | Builder opens without jQuery; saving every widget, external uploads and all canvas configurations were not certified |
 | Untested | External integrations | Real map/geocoding, mail delivery, remote media/provider credentials and other unconfigured services |
@@ -55,29 +77,30 @@ The initial Kitchen Sink automation had a scroll/stability timeout during Choice
 
 ## Automated validation
 
-- 42 PHP/Node/Python regression commands passed, including the existing release suite and the new check-in control test.
-- Nine browser/Node suites passed: shared editor workflows (41 cases, including explicit legacy compatibility cases), real Joomla dialogs (three widths), maintenance (nine cases), manager workflows (seven cases), masks (25 cases), colors, uploader, public waveform and media cloning.
-- 219 PHP and authored JavaScript syntax checks passed across the complete changed source set. The readable patched Inputmask vendor file is included in JavaScript syntax checking.
-- `git diff --check` is required before committing; changed source hashes and raw test output are retained with the private lab evidence.
-- `.github/workflows/native-browser-regressions.yml` adds the isolated suites using pinned Joomla 6.2.0 browser assets. Local success does not claim that a hosted Actions run has completed.
+- **66 PHP/Node/Python regression commands passed**, including dependency load order/deduplication/manual opt-out, item/category favourites, gallery settings, Flexibreak rendering and malformed module cookies.
+- **11 browser/Node suites passed**: shared editors (41 cases), real Joomla dialogs (three widths), maintenance (nine cases), managers (seven cases), masks (25 cases), colors, uploader, public waveform, legacy helper migration, public widgets and media cloning.
+- **241 PHP and JavaScript syntax checks passed** across the cumulative changed source set. The readable patched Inputmask file is included; the changed Galleriffic vendor file was also exercised in the browser.
+- `git diff --check` passed. Source hashes and raw output remain in private lab evidence; no credentials, configuration files or sessions are committed.
+- CI runs the added browser and PHP regressions. The four hosted workflows at the previous audit commit `09e42af` passed. Results for the follow-up commit must be assessed on that commit's checks.
 
 ## Remaining dependencies and release limits
 
-The inventory scans tracked and untracked PHP, JS, XML, JSON, CSS and LESS under administrator, site, plugins and modules. It found 2,612 matching lines across 350 files, of which 114 are authored files and the remainder vendor/minified files. These counts include comments and guarded compatibility hooks: a textual match is not automatically an executed dependency.
+The inventory scans tracked and untracked PHP, JS, XML, JSON, CSS and LESS under administrator, site, plugins and modules. It found **2,506 matching lines in 344 files**, including **108 authored files**; the remainder are vendor/minified files. Comments, retained packages and guarded compatibility hooks count as textual matches, not necessarily executed dependencies.
 
-Remaining real legacy paths include:
+The following jQuery paths remain intentionally optional:
 
-- Content-module `carousel.php` and its fcxSlide engine; recent-favourites cookie/module helpers; optional `news.php`/`swiper.php` tab-state handlers.
-- FancyBox, elastislide, galleriffic and multibox gallery variants; optional legacy InlineBoxes/media output and Joomla media overrides.
-- `plugins/content/flexibreak`, optional PrettyCheckable/Select2/custom-scrollbar widgets and their vendor packages.
-- Legacy exported helpers in `flexi-lib.js`, including the old editor adapters and “Use Global” checkbox helper. The tested editor path uses the newer native controllers; external callers of the legacy helpers are not certified.
-- Builder canvas configuration and third-party template overrides that explicitly request jQuery/Bootstrap 4.
+- FancyBox, elastislide, Galleriffic, multibox and the fcxSlide carousel. Their actual controls passed in the installed site; their dependencies load when requested, without jQuery UI.
+- Explicitly requested image-picker, zTree, mousewheel and legacy custom-scrollbar widgets. Asset-loader behavior is tested; every third-party widget configuration is not certified. Choices mode uses native CSS scrolling for the scrollbar path.
+- Legacy InlineBoxes/media output and old Joomla media overrides; builder canvas content and third-party overrides that explicitly request jQuery/Bootstrap 4. These remain compatibility paths, with configuration-specific coverage outstanding.
+- Guarded exported jQuery UI/data/event bridges for existing integrations. The rewritten helpers themselves run without jQuery; external custom callers are not comprehensively certified.
 
-Guarded compatibility adapters remain intentionally for existing jQuery integrations. Native Choices is the tested default; enabling Select2 is a different configuration. The configuration's legacy library switches have not been removed while those integrations still exist.
+The earlier remaining-work list is superseded: recent favourites, module tab-state handlers, Flexibreak, Use Global, cookie/form restoration and editor adapters have now been migrated and tested. The current loader's `select2` compatibility name selects Choices; `prettyCheckable` does not load its vendor widget. Their retained package files/hooks do not mean normal configuration pages execute those libraries.
 
-Not every alert in every maintenance/legacy view has been migrated. The shared dialog bridge and tested manager/editor actions use Joomla Dialog; remaining direct `alert`/`confirm` calls must be reviewed with their workflows. The Inputmask focus-order patch is a vendor change with an adjacent `UPSTREAM-PATCHES.md`; it needs preservation or upstream reconciliation on upgrades.
+Joomla Dialog/messages are used by the tested core managers and editors, and Joomla messages handle the favourites failure path. Some direct browser alerts remain in legacy/untested views and compatibility fallbacks. This is not a claim that every alert throughout the package has been converted.
 
-These are explicit outstanding migration and coverage items. Keep the PR in draft; do not advertise complete jQuery removal or use this audit as full release certification.
+Inputmask and Galleriffic have adjacent `UPSTREAM-PATCHES.md` notes for vendor changes. Reconcile those patches when updating the libraries. Juxtapose still uses its pre-existing external CDN dependency; external availability is a release consideration.
+
+Keep the PR in draft pending review and the untested external-provider, browser/platform and installer matrix described above. Optional jQuery plugins are supported by design; the patch does not claim full release certification or zero jQuery in every bundled file.
 
 ## Screenshot comparisons
 
@@ -89,6 +112,8 @@ Screenshots show the same 390-pixel viewport before/after layout changes. Counts
 | File Manager | [Before](audit-images/files-before-390.png) | [After](audit-images/files-after-390.png) |
 | Public listing | [Before](audit-images/listing-before-390.png) | [After](audit-images/listing-after-390.png) |
 
+Galleriffic controls at the same 1280-pixel viewport: [before](audit-images/galleriffic-before-1280.png), [after](audit-images/galleriffic-after-1280.png), and [mobile](audit-images/galleriffic-mobile.png).
+
 [Mobile rich-text controls](audit-images/editor-mobile.png) and [mobile mask controls](audit-images/masks-mobile.png) supplement the full-page width measurements.
 
 ## API references
@@ -96,3 +121,6 @@ Screenshots show the same 390-pixel viewport before/after layout changes. Counts
 - [Joomla Dialog](https://manual.joomla.org/docs/next/general-concepts/javascript/js-library/joomla-dialog/) and [AJAX/messages](https://manual.joomla.org/docs/next/general-concepts/javascript/ajax/).
 - [Joomla 6 migration features](https://manual.joomla.org/migrations/54-60/new-features/); installed Joomla 6.2.0 sources were checked alongside documentation.
 - [Inputmask upstream changelog](https://github.com/RobinHerbots/Inputmask/blob/5.x/Changelog.md); the local focus-order fix and its reason are documented next to the shipped vendor source.
+
+- [Joomla native tabs](https://manual.joomla.org/docs/next/general-concepts/bootstrap/tabs/) and [editor registry API](https://manual.joomla.org/docs/4.4/general-concepts/javascript/js-library/editors/).
+- [Juxtapose source](https://github.com/NUKnightLab/juxtapose) and [FancyBox 3 options](https://github.com/fancyapps/fancybox/blob/master/docs/index.html).

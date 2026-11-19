@@ -39,4 +39,6 @@ jobs:
           node tests/native-color-input.cjs
           node tests/native-media-uploader.cjs
           node tests/native-public-waveform.cjs
+          node tests/native-legacy-helpers.cjs
+          node tests/native-public-widgets.cjs
           node tests/image-media-clone.cjs

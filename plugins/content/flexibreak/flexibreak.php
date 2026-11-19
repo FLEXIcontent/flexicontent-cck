@@ -43,6 +43,19 @@ class plgContentFlexiBreak extends \Joomla\CMS\Plugin\CMSPlugin
 	static $rowLinks = array();
 	var $pattern = '#(<hr[^>]*?class=[\"|\']system-pagebreak[\"|\'][^(>|/>)]*?/?>)#iU';
 	var $pluginPath;
+	protected $pages = array();
+	protected $pagescount = 0;
+	protected $texts = array();
+	protected $textscount = 0;
+	protected $limitstart = 0;
+	protected $showall = false;
+	protected $row;
+	protected $prev_link = '';
+	protected $next_link = '';
+	protected $nonsef_link = '';
+	protected $page_links = array();
+	protected $toc_return_link;
+	protected $_text;
 
 	function __construct(&$subject, $params)
 	{
@@ -109,6 +122,9 @@ class plgContentFlexiBreak extends \Joomla\CMS\Plugin\CMSPlugin
 		{
 			return;
 		}
+		$this->_text = null;
+		$this->page_links = array();
+		$this->toc_return_link = null;
 
 		// Get slug and limitstart (current page) and use them to create next / previous links
 		$row->slug = !empty($row->slug) ? $row->slug : $row->id;
@@ -161,11 +177,6 @@ class plgContentFlexiBreak extends \Joomla\CMS\Plugin\CMSPlugin
 		// Add JS code for JS based navigation
 		if ($display_method === 1 || $display_method === 0)
 		{
-			if (!class_exists('flexicontent_html'))
-			{
-				require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
-				flexicontent_html::loadFramework('jQuery');
-			}
 
 			$wa->registerAndUseScript('plg_content_flexibreak.script', $plgbase.'.js');
 		}

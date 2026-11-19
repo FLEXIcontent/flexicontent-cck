@@ -87,6 +87,7 @@ if (!$js_and_css_added)
 	");
 
 	$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/fcfav.js', array('version' => FLEXI_VHASH));
+	if (FLEXI_J40GE) $document->getWebAssetManager()->useScript('messages');
 
 	// Make the CSRF token available to the JS, via: Joomla.getOptions('csrf.token')
 	\Joomla\CMS\HTML\HTMLHelper::_('form.csrf');
