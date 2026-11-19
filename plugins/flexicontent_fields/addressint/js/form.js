@@ -110,12 +110,6 @@
       return;
     }
 
-    // Preserve the optional legacy widget when explicitly enabled.
-    if (!window.fc_use_choicesjs && !window.skip_select2_js && window.jQuery?.fn.select2) {
-      const format = state => FC.markerLabel(select, state.id, state.text).outerHTML;
-      window.jQuery(select).select2({ formatResult:format, formatSelection:format, escapeMarkup:markup => markup });
-      return;
-    }
     const preview = document.createElement('span');
     preview.className = 'fc-marker-native-preview';
     preview.setAttribute('aria-hidden','true');

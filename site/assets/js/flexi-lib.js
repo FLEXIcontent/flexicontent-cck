@@ -715,7 +715,8 @@
 		//window.console.log('Using cookieName: ' + cookieName + ', managerName: ' + managerName);
 		//window.console.log(cookieName + ', Old value: ' +cookieValue);
 
-		cookieValue = jQuery.parseJSON(cookieValue ? cookieValue : '{}');
+		try { cookieValue = JSON.parse(cookieValue || '{}') || {}; }
+		catch { cookieValue = {}; }
 
 		if (typeof cookieValue[managerName] == 'undefined')
 		{
@@ -734,244 +735,97 @@
 	//******************************************
 
 	// *** Hide a column of a table
-	function fc_tbl_toggle_column(container_div_id, data_tbl_id, col_no, firstrun)
+	// Recompute each cell using its original column span, including summary rows.
+	function fc_tbl_toggle_column(containerId, tableId, column, firstRun)
 	{
-		// 1. Get column-status array for the table with id: data_tbl_id
-		var show_col = eval('show_col_'+data_tbl_id);
-
-		// 2. Decide show or hide action and update the displayed number of the hidden columns (if any must be in the element with id: data_tbl_id+'_hidecolnum_box')
-		if ( !js_isset(show_col[col_no]) || show_col[col_no] ) {
-			var action_func = 'hide';
-			show_col[col_no] = 0;
-			var hidecol_box = document.getElementById(data_tbl_id+'_hidecolnum_box');
-			if ( js_isset(hidecol_box) ) {
-				hidecol_box.innerHTML = parseInt(hidecol_box.innerHTML) + 1;
+		const table = document.getElementById(tableId);
+		const header = table?.tHead?.rows[0];
+		const visible = window['show_col_' + tableId];
+		if (!header?.cells[column] || !visible) return;
+		visible[column] = visible[column] === 0 ? 1 : 0;
+		const shown = Array.from(header.cells).flatMap((cell, i) => Array(Number(cell.dataset.colspan ||= cell.colSpan)).fill(visible[i] !== 0));
+		table.querySelectorAll(':scope > thead > tr, :scope > tbody > tr').forEach(row => {
+			let start = 0;
+			for (const cell of row.cells) {
+				const span = Number(cell.dataset.colspan ||= cell.colSpan);
+				const width = span - shown.slice(start, start + span).filter(value => !value).length;
+				start += span;
+				cell.classList.remove('initiallyHidden');
+				cell.classList.toggle('isHidden', !width);
+				cell.style.display = width ? '' : 'none';
+				if (span > 1) cell.colSpan = width || span;
 			}
-		} else {
-			var action_func = 'show';
-			show_col[col_no] = 1;
-			var hidecol_box = document.getElementById(data_tbl_id+'_hidecolnum_box');
-			if ( js_isset(hidecol_box) ) {
-				hidecol_box.innerHTML = parseInt(hidecol_box.innerHTML) - 1;
-			}
-		}
-
-
-		if (firstrun)
-		{
-			if (action_func === 'hide' && !document.getElementById('fc_' + container_div_id + '_btn').classList.contains('btn-inverse'))
-			{
-				document.getElementById('fc_' + container_div_id + '_btn').classList += ' btn-dark btn-inverse text-white';
-			}
-		}
-
-		//var ffieldname_label = 'columnchoose_' + data_tbl_id + '_' + col_no + '_label';
-		//var ffieldname_label = document.getElementById(ffieldname_label);
-		//if ( js_isset(ffieldname_label) ) if (action_func == 'show')  ffieldname_label.style.color='black';  else ffieldname_label.style.color='#00aa00';
-
-		// 3. Get table and all its rows
-		var tbl  = document.getElementById(data_tbl_id);
-		var rows = jQuery(tbl).find('> thead > tr, > tbody > tr');
-		var toggle_amount = 1;
-
-		// Find 'colspan' start of the column given the -index- 'col_no' of the head cell
-		var _col_no = 0;
-		var tcells = jQuery(rows[0]).children('td, th');
-		for (cell=0; cell<col_no; cell++) {
-			if (cell>=tcells.length) break;
-			colspan = parseInt(jQuery(tcells[cell]).attr('colspan'));
-			if (colspan) {
-				_col_no = _col_no + colspan;
-			} else {
-				_col_no++;
-			}
-		}
-
-		// 4. Iterate through rows toggling the particular column
-		for (var row=0; row<rows.length; row++) {
-			var cell_cnt, cell;
-
-			// Get cell(s) of the current row
-			var tcells = jQuery(rows[row]).children('td, th');
-
-			// First row is header, we will get 'colspan' of the HEAD CELL, which indicates how many 'toggle_amount' single-colspan columns should be toggled
-			if (row==0) {
-				toggle_amount = parseInt(jQuery(tcells[col_no]).attr('colspan'));
-				if (!toggle_amount) toggle_amount = 1;
-			}
-
-			// Find where the cell's index in current row, we need this loop since previous cell of row maybe using colspan
-			cell_cnt = 0;
-			for (cell=0; cell<tcells.length; cell++) {
-				var colspan;
-				var data_colspan = jQuery(tcells[cell]).attr('data-colspan');
-				if (firstrun && !data_colspan) {
-					colspan = parseInt(jQuery(tcells[cell]).attr('colspan'));
-					if (colspan) {
-						jQuery(tcells[cell]).attr('data-colspan', colspan);
-					}
-				} else {
-					colspan = parseInt(jQuery(tcells[cell]).attr('data-colspan'));
-				}
-
-				if (cell_cnt==_col_no+toggle_amount-1) break;
-				var next_cnt = colspan ? cell_cnt + colspan : cell_cnt + 1;
-				if (next_cnt > _col_no) break;
-				cell_cnt = next_cnt;
-			}
-
-			// Finally TOGGLE the found cell, we take into account that the given cell may have colspan,
-			// if it does have colspan we increase / decrease, a ZERO remaining colspan, will make us hide the cell, and a non-zero makes us display the cell
-			var _cell = cell;
-			var colspan_remaining = toggle_amount;
-			for (cell=_cell; cell<_cell+toggle_amount; cell++) {
-				if (cell<tcells.length) {
-					var colspan = parseInt(jQuery(tcells[cell]).attr('colspan'));
-
-					jQuery(tcells[cell]).removeClass('initiallyHidden');
-					if ( colspan )
-					{
-						if ( action_func == 'hide' )
-						{
-							if ( colspan > colspan_remaining ) {
-								jQuery(tcells[cell]).attr('colspan', colspan - colspan_remaining);
-							} else {
-								firstrun ?
-								eval('jQuery(tcells[cell]).'+action_func+'(0)') :
-								eval('jQuery(tcells[cell]).'+action_func+'(0)');
-								jQuery(tcells[cell]).addClass('isHidden');
-							}
-						}
-						else if (!firstrun)
-						{
-							if ( !jQuery(tcells[cell]).hasClass('isHidden') ) {
-								jQuery(tcells[cell]).attr('colspan', colspan + colspan_remaining);
-							} else {
-								eval('jQuery(tcells[cell]).'+action_func+'(0)');
-								jQuery(tcells[cell]).removeClass('isHidden');
-							}
-						}
-						colspan_remaining = colspan_remaining - colspan;
-					}
-					else if (action_func == 'hide' || !firstrun)
-					{
-						firstrun ?
-						eval('jQuery(tcells[cell]).'+action_func+'(0)') :
-						eval('jQuery(tcells[cell]).'+action_func+'(0)');
-						colspan_remaining--;
-					}
-				}
-				if (colspan_remaining<1) break; // no more colspan to toggle columns
-			}
-		}
-
-		// Update cookie data and display data
-		if (!firstrun && container_div_id)
-		{
-			column_toggles_update_data(container_div_id, data_tbl_id);
-		}
+		});
+		const counter = document.getElementById(tableId + '_hidecolnum_box');
+		if (counter) counter.textContent = visible.filter(value => value === 0).length;
+		if (firstRun && visible[column] === 0)
+			document.getElementById('fc_' + containerId + '_btn')?.classList.add('btn-dark', 'btn-inverse', 'text-white');
+		if (!firstRun && containerId) column_toggles_update_data(containerId, tableId);
 	}
 
-
-	// *** Update cookie data and display data
-	function column_toggles_update_data(container_div_id, data_tbl_id)
+	function column_toggles_update_data(containerId, tableId)
 	{
-		var col_selectors = jQuery('#'+container_div_id+'_cols input');
-		var col_selected = new Array();
-		var i = 0;
-		for (var cnt=0; cnt<col_selectors.length; cnt++)
-		{
-			// A column hidden only by the screen size (CSS) is still selected, it is shown on wider screens
-			if ( jQuery(col_selectors[cnt]).prop("checked") || jQuery(col_selectors[cnt]).attr("data-screen-hidden") === '1' )
-			{
-				col_selected[i++] = jQuery(col_selectors[cnt]).attr("data-colno");
-			}
-		}
-
-		var cookieName = 'fc_columnchooser';
-		var cookieValue  = fclib_getCookie(cookieName);
-		//window.console.log(cookieName + ' - old value: ' +cookieValue);
-
-		cookieValue = jQuery.parseJSON(cookieValue ? cookieValue : '{}');
-		cookieValue[data_tbl_id] = col_selected.join(',');
-		//window.console.log(cookieName + ' - new value: ' + JSON.stringify(cookieValue));
-
-		var nDays = 30;
-		fclib_setCookie(cookieName, JSON.stringify(cookieValue), nDays);
-    //console.log('Updated columns selector cookie');
-
-		var totals_tag = jQuery('#columnchoose_totals');
-		if (totals_tag.length)
-		{
-			totals_tag.html(col_selectors.length == col_selected.length ? '' : ' '+(col_selected.length - col_selectors.length));
-		}
+		const selectors = document.getElementById(containerId + '_cols')?.querySelectorAll('input') || [];
+		const chosen = Array.from(selectors).filter(input => input.checked || input.dataset.screenHidden === '1')
+			.map(input => input.dataset.colno);
+		let preferences;
+		try { preferences = JSON.parse(fclib_getCookie('fc_columnchooser') || '{}') || {}; }
+		catch { preferences = {}; }
+		preferences[tableId] = chosen.join(',');
+		fclib_setCookie('fc_columnchooser', JSON.stringify(preferences), 30);
+		const totals = document.getElementById('columnchoose_totals');
+		if (totals) totals.textContent = selectors.length === chosen.length ? '' : ' ' + (chosen.length - selectors.length);
 	}
 
-
-	// *** Create column choosers row for a table. NOTE must have <th> cells at row 0
-	function create_column_choosers(container_div_id, data_tbl_id, firstload, start_text, end_text, toggle_on_init)
+	function create_column_choosers(containerId, tableId, firstLoad, startHtml = '', endHtml = '', apply)
 	{
-		// 1. Get column-status array for the table with id: data_tbl_id
-		var show_col = eval('show_col_'+data_tbl_id);
-
-		// 2. Get table and its first row and then the 'th' cells in it
-		var firstrow  = jQuery("#"+data_tbl_id+" thead tr:first"); //document.getElementById(data_tbl_id);
-		var thcells = firstrow.find('th');
-
-		// 3. Iterate through the 'th' cells and create column hiders for those having the class 'hideOnDemandClass'
-		var str = (typeof start_text != "undefined") ? start_text : '';
-
-		for (var col = 0; col < thcells.length; col++)
-		{
-			// 4. Skip if not having 'hideOnDemandClass' class
-			if (!jQuery(thcells[col]).hasClass('hideOnDemandClass')) continue;
-
-			// 5. Get column name
-			var column_toggle_lbl = jQuery(thcells[col]).find('.column_toggle_lbl');
-			var col_display_name = column_toggle_lbl.length ? column_toggle_lbl.html() : jQuery(thcells[col]).text();
-			column_toggle_lbl.remove();
-
-			// 6. Show / Hide current column
-			if ( ( !firstload && !js_isset(show_col[col]) ) || ( jQuery(thcells[col]).hasClass('initiallyHidden') && !js_isset(show_col[col]) ) )
-			{
-				var checked_str = '';
-				var fontcolor_str = 'black';//var fontcolor_str = '#aaaaaa';
-
-				// *** It has value of 0 or not set, set it to 1 for fc_tbl_toggle_column() function to hide it
-				show_col[col] = 1;
-				if (toggle_on_init) fc_tbl_toggle_column(container_div_id, data_tbl_id, col, 1);
-			}
-			else
-			{
-				var checked_str = 'checked="checked"';
-				var fontcolor_str = 'black'; //var fontcolor_str = 'black';
-
-				// *** It has value of 1 or not set, set it to 0 for fc_tbl_toggle_column() function to show it
-				show_col[col] = 0;
-				if (toggle_on_init) fc_tbl_toggle_column(container_div_id, data_tbl_id, col, 1);
-			}
-
-			// 7. Create column checkbox and append it to str
-			var ffieldid   = 'columnchoose_' + data_tbl_id + '_' + col;
-			var ffieldname = 'columnchoose_' + data_tbl_id + '[' + col + ']';
-			str = str + '<li><input id="' + ffieldid + '" name="' + ffieldname + '" type="checkbox" data-colno="' + col + '" ' + checked_str + ' onclick="fc_tbl_column_choice(\''+container_div_id+'\', \''+data_tbl_id+'\', '+col+', this);">'
-			+ '<label id="' + ffieldid + '_label" style="color:'+fontcolor_str+';" for="' + ffieldid + '">' + col_display_name + '</label></li>';
+		const container = document.getElementById(containerId);
+		const header = document.getElementById(tableId)?.tHead?.rows[0];
+		const visible = window['show_col_' + tableId];
+		if (!container || !header || !visible) return;
+		const chooser = document.createElement('span');
+		chooser.id = containerId + '_cols';
+		const list = document.createElement('ul');
+		const columns = [];
+		for (const [column, cell] of Array.from(header.cells).entries()) {
+			if (!cell.classList.contains('hideOnDemandClass')) continue;
+			const name = cell.querySelector('.column_toggle_lbl');
+			const label = document.createElement('label');
+			if (name) {
+				label.append(...name.childNodes);
+				name.remove();
+			} else label.textContent = cell.textContent.trim();
+			const shown = visible[column] !== undefined ? Boolean(visible[column])
+				: firstLoad && !cell.classList.contains('initiallyHidden');
+			const input = document.createElement('input');
+			input.type = 'checkbox';
+			input.id = 'columnchoose_' + tableId + '_' + column;
+			input.name = 'columnchoose_' + tableId + '[' + column + ']';
+			label.htmlFor = input.id;
+			label.id = input.id + '_label';
+			input.dataset.colno = column;
+			input.checked = shown;
+			input.addEventListener('change', () => fc_tbl_column_choice(containerId, tableId, column, input));
+			const item = document.createElement('li');
+			item.append(input, label);
+			list.append(item);
+			columns.push([column, shown]);
 		}
-
-		// 8. Fill in 'column choose box', with a note shown when the screen size hides some of the columns
-		var screen_note = typeof Joomla !== 'undefined' && Joomla.Text
-			? Joomla.Text._('FLEXI_COLUMNS_SCREEN_HIDDEN', 'Some columns are hidden on smaller screens. Tick one to show it.')
-			: 'Some columns are hidden on smaller screens. Tick one to show it.';
-		str = '<span id="'+container_div_id+'_cols"><ul>' + str + '</ul></span>'
-			+ '<div id="'+container_div_id+'_screen_note" class="fc-columns-screen-note small text-muted" style="display: none; clear: both;">' + screen_note + '</div>'
-			+ end_text;
-		document.getElementById(container_div_id).innerHTML=str;
-
-		// 9. Untick the columns that CSS hides on the current screen size
-		fc_tbl_screen_columns(container_div_id, data_tbl_id, true);
-
-		// 10. Update cookie data and display data
-		column_toggles_update_data(container_div_id, data_tbl_id);
+		if (apply) for (const [column, shown] of columns) {
+			visible[column] = shown ? 0 : 1;
+			fc_tbl_toggle_column(containerId, tableId, column, true);
+		}
+		chooser.append(list);
+		const note = document.createElement('div');
+		note.id = containerId + '_screen_note';
+		note.className = 'fc-columns-screen-note small text-muted';
+		note.style.cssText = 'display:none; clear:both';
+		note.textContent = FlexiForm.text('FLEXI_COLUMNS_SCREEN_HIDDEN', 'Some columns are hidden on smaller screens. Tick one to show it.');
+		container.innerHTML = startHtml;
+		container.append(chooser, note);
+		if (endHtml) container.insertAdjacentHTML('beforeend', endHtml);
+		fc_tbl_screen_columns(containerId, tableId, true);
+		column_toggles_update_data(containerId, tableId);
 	}
 
 
@@ -1006,9 +860,9 @@
 	// *** Get all cells of a column, given the index of its head cell (cells may use 'colspan')
 	function fc_tbl_column_cells(data_tbl_id, col_no)
 	{
-		var rows = jQuery('#'+data_tbl_id).find('> thead > tr, > tbody > tr');
+		var rows = document.getElementById(data_tbl_id)?.querySelectorAll(':scope > thead > tr, :scope > tbody > tr') || [];
 		var span = function(cell) { return parseInt(cell.getAttribute('data-colspan') || cell.getAttribute('colspan')) || 1; };
-		var head = jQuery(rows[0]).children('td, th');
+		var head = rows[0]?.cells || [];
 		var start = 0;
 		for (var i = 0; i < col_no && i < head.length; i++) start += span(head[i]);
 		var end = start + (head[col_no] ? span(head[col_no]) : 1);
@@ -1016,7 +870,7 @@
 		var cells = [];
 		for (var row = 0; row < rows.length; row++)
 		{
-			var tcells = jQuery(rows[row]).children('td, th');
+			var tcells = rows[row].cells;
 			var pos = 0;
 			for (var cell = 0; cell < tcells.length && pos < end; cell++)
 			{
@@ -1032,14 +886,14 @@
 	// *** Update the column chooser for the current screen size, and show the columns that the user has chosen to show
 	function fc_tbl_screen_columns(container_div_id, data_tbl_id, firstrun)
 	{
-		var show_col = eval('show_col_'+data_tbl_id);
+		var show_col = window['show_col_' + data_tbl_id] || [];
 		var forced   = fc_tbl_screen_cols_get(data_tbl_id);
-		var thcells  = jQuery('#'+data_tbl_id+' thead tr:first').find('th');
+		var thcells  = (document.getElementById(data_tbl_id)?.tHead?.rows[0]?.cells || []);
 		var hidden_cnt = 0;
 
-		jQuery('#'+container_div_id+'_cols input').each(function()
+		document.getElementById(container_div_id + '_cols')?.querySelectorAll('input').forEach(input =>
 		{
-			var col = parseInt(this.getAttribute('data-colno'));
+			var col = Number(input.dataset.colno);
 			var th  = thcells[col];
 			if (!th) return;
 
@@ -1051,10 +905,10 @@
 			if (th.getAttribute('data-screen-forced') === '1')
 			{
 				cells = fc_tbl_column_cells(data_tbl_id, col);
-				jQuery(cells).each(function()
-				{
-					if (this.style.getPropertyPriority('display') === 'important') this.style.removeProperty('display');
-				}).removeAttr('data-screen-forced');
+				cells.forEach(cell => {
+					if (cell.style.getPropertyPriority('display') === 'important') cell.style.removeProperty('display');
+					delete cell.dataset.screenForced;
+				});
 			}
 
 			var screen_hidden = shown && window.getComputedStyle(th).display === 'none';
@@ -1063,14 +917,14 @@
 			if (force)
 			{
 				cells = cells || fc_tbl_column_cells(data_tbl_id, col);
-				jQuery(cells).each(function()
-				{
-					this.style.setProperty('display', 'table-cell', 'important');
-				}).attr('data-screen-forced', '1');
+				cells.forEach(cell => {
+					cell.style.setProperty('display', 'table-cell', 'important');
+					cell.dataset.screenForced = '1';
+				});
 			}
 
-			this.checked = shown && (!screen_hidden || force);
-			this.setAttribute('data-screen-hidden', screen_hidden && !force ? '1' : '0');
+			input.checked = shown && (!screen_hidden || force);
+			input.setAttribute('data-screen-hidden', screen_hidden && !force ? '1' : '0');
 			if (screen_hidden && !force) hidden_cnt++;
 		});
 
@@ -1081,7 +935,7 @@
 		if (firstrun)
 		{
 			var timer = null;
-			jQuery(window).on('resize', function()
+			window.addEventListener('resize', function()
 			{
 				clearTimeout(timer);
 				timer = setTimeout(function() { fc_tbl_screen_columns(container_div_id, data_tbl_id, false); }, 150);
@@ -1093,11 +947,11 @@
 	// *** Tick / untick a column in the column chooser
 	function fc_tbl_column_choice(container_div_id, data_tbl_id, col_no, el)
 	{
-		var show_col = eval('show_col_'+data_tbl_id);
+		var show_col = window['show_col_' + data_tbl_id] || [];
 		var shown    = !js_isset(show_col[col_no]) || !!show_col[col_no];
 		var forced   = fc_tbl_screen_cols_get(data_tbl_id);
 		var pos      = forced.indexOf(col_no);
-		var th       = jQuery('#'+data_tbl_id+' thead tr:first').find('th')[col_no];
+		var th       = (document.getElementById(data_tbl_id)?.tHead?.rows[0]?.cells || [])[col_no];
 
 		if (el.checked)
 		{
@@ -1307,39 +1161,21 @@
 
 
 	/* Toggle box via a button and set CSS class to indicate that it is open  */
-	function fc_toggle_box_via_btn(theBox, btn, btnClass, btnNew, mode, cookieName)
+	function fc_toggle_box_via_btn(target, btn, buttonClass, alternate, mode, cookie)
 	{
-		var box = typeof theBox=='string' ? jQuery('#'+theBox) : theBox;
-
-		if (btnNew)
-		{
-			// Show but remove 'display' property to allow CSS classes to take effect (possibly hiding it)
-			btnNew.show().css('display', '');
-			jQuery(btn).hide();
+		const boxes = typeof target === 'string' ? [document.getElementById(target)]
+			: target?.nodeType ? [target] : Array.from(target || []);
+		const button = FlexiForm.element(btn);
+		const alternateButton = FlexiForm.element(alternate);
+		if (alternateButton) {
+			alternateButton.style.removeProperty('display');
+			FlexiForm.show(button, false);
 		}
-		var cookieName = !!cookieName ? (typeof cookieName=='string' ? cookieName : theBox + '-disp') : false;
-		//window.console.log(cookieName);
-
-		if (
-			(typeof mode!=='undefined' && parseInt(mode)) ||  // use the mode provided
-			(typeof mode==='undefined' && box.is(':hidden'))  // if any of the elements collection 'box' is hidden then open them all
-		) {
-			if (cookieName) fclib_setCookie(cookieName, 1, 0);  // nDays 0 , aka no expiration date, keep cookie till browser closes
-			jQuery(btn).data('fc_noeffect') || jQuery(btn).hasClass('fc_noeffect') ?
-				box.show() :
-				box.slideDown(400) ;
-			// Only remove 'data-fc_noeffect' but not the fc_noeffect class
-			jQuery(btn).addClass(btnClass).data('fc_noeffect', null);
-		}
-		else
-		{
-			if (cookieName) fclib_setCookie(cookieName, 0, 0);  // nDays 0 , aka no expiration date, keep cookie till browser closes
-			jQuery(btn).data('fc_noeffect') || jQuery(btn).hasClass('fc_noeffect') ?
-				box.hide() :
-				box.slideUp(400) ;
-			// Only remove 'data-fc_noeffect' but not the fc_noeffect class
-			jQuery(btn).removeClass(btnClass).data('fc_noeffect', null);
-		}
+		const shown = mode === undefined ? boxes.some(box => !FlexiForm.visible(box)) : Boolean(parseInt(mode, 10));
+		if (cookie) fclib_setCookie(typeof cookie === 'string' ? cookie : (boxes[0]?.id || target) + '-disp', shown ? 1 : 0, 0);
+		boxes.forEach(box => FlexiForm.show(box, shown));
+		for (const name of (buttonClass || '').split(/\s+/).filter(Boolean)) button?.classList.toggle(name, shown);
+		button?.setAttribute('aria-expanded', String(shown));
 	}
 
 
@@ -1465,37 +1301,27 @@
 		const box = FlexiForm.element(container);
 		if (!box) return;
 		const selects = box.querySelectorAll('select.use_select2_lib, select.has_select2_lib');
-		if (window.fc_use_choicesjs) {
-			for (const select of selects) {
-				const key = select.id || select.name;
-				const registered = window.fc_choices_instances[key];
-				// A cloned select may have the source's ID, but never owns its instance.
-				const instance = select.fc_choices_instance || FlexiForm.data(select, 'fc_choices_instance')
-					|| (registered?.passedElement?.element === select ? registered : null);
-				if (instance && typeof instance.destroy === 'function') {
-					instance.destroy();
-					delete select.fc_choices_instance;
-					window.jQuery?.(select).removeData('fc_choices_instance');
-					if (registered === instance) delete window.fc_choices_instances[key];
-				} else {
-					select.closest('div.choices')?.replaceWith(select);
-					select.removeAttribute('data-choice');
-					select.removeAttribute('tabindex');
-					select.removeAttribute('data-choice-orig-style');
-					select.removeAttribute('style');
-					select.hidden = false;
-					select.classList.remove('choices__input');
-				}
-				FlexiForm.show(select);
+		for (const select of selects) {
+			const key = select.id || select.name;
+			const registered = window.fc_choices_instances[key];
+			// A cloned select may have the source's ID, but never owns its instance.
+			const instance = select.fc_choices_instance || FlexiForm.data(select, 'fc_choices_instance')
+				|| (registered?.passedElement?.element === select ? registered : null);
+			if (instance && typeof instance.destroy === 'function') {
+				instance.destroy();
+				delete select.fc_choices_instance;
+				window.jQuery?.(select).removeData('fc_choices_instance');
+				if (registered === instance) delete window.fc_choices_instances[key];
+			} else {
+				select.closest('div.choices')?.replaceWith(select);
+				select.removeAttribute('data-choice');
+				select.removeAttribute('tabindex');
+				select.removeAttribute('data-choice-orig-style');
+				select.removeAttribute('style');
+				select.hidden = false;
+				select.classList.remove('choices__input');
 			}
-		} else {
-			const containers = box.querySelectorAll('div.select2-container');
-			if (!containers.length) return;
-			containers.forEach(element => element.remove());
-			for (const select of selects) {
-				if (window.jQuery?.fn.select2) window.jQuery(select).select2('destroy');
-				FlexiForm.show(select);
-			}
+			FlexiForm.show(select);
 		}
 	}
 
@@ -1547,15 +1373,7 @@
 			return;
 		}
 
-		// Route to the correct library
-		if (window.fc_use_choicesjs)
-		{
-			fc_attachChoices(sbox, targets);
-		}
-		else
-		{
-			fc_attachSelect2Legacy(sbox, targets);
-		}
+		fc_attachChoices(sbox, targets);
 	}
 
 
@@ -2163,310 +1981,6 @@
 		}
 	}
 
-	/* ===========================
-	   SELECT2 LEGACY IMPLEMENTATION
-	   =========================== */
-
-	function fc_attachSelect2Legacy(sbox, s2_elems)
-	{
-		// Adapt new (jQuery-free) input types: sbox is a DOM element, s2_elems is an array of <select>
-		var sboxJ = jQuery(sbox);
-		var elemsJ = (s2_elems && s2_elems.jquery) ? s2_elems : jQuery(s2_elems);
-
-		// Attach select2 to specific to select elements having specific CSS class, for select-multiple show values as togglable checkboxes
-		elemsJ.each(function()
-		{
-			function fc_formatSel2Option(item, container, query, escapeMarkup)
-			{
-				var data_title = jQuery(item.element).attr('data-title');
-				var result_text = escapeMarkup(item.text);
-				return !data_title ? result_text : "<div title='" + escapeMarkup(data_title) + "'>" + result_text + "</div>";
-			}
-
-			var sel_EL = jQuery(this);
-
-			var sel2ops = {
-				minimumResultsForSearch: 10,
-				formatResult: fc_formatSel2Option
-			};
-
-			if ( sel_EL.hasClass('fc_select2_noselect') )
-			{
-				sel2ops.formatNoMatches = function() { return ''; };
-				sel2ops.dropdownCssClass = 'select2-hidden';
-				sel2ops.minimumResultsForSearch = -1;
-			}
-			if (sel_EL.attr('multiple') && !sel_EL.hasClass('fc_select2_no_check'))
-			{
-				sel2ops.closeOnSelect = false;
-			}
-
-			if (sel_EL.attr('multiple') && !sel_EL.hasClass('fc_select2_no_check'))
-			{
-				sel_EL.select2(sel2ops).addClass('select2_fc_checkboxes');
-			} else
-			{
-				sel_EL.select2(sel2ops);
-			}
-
-			// Set initially selected data (this allows setting order too)
-			if ( sel_EL.get(0).hasAttribute('data-select2-initdata') )
-			{
-				sel_EL.select2('data', sel_EL.data('select2-initdata'));
-			}
-
-			// Make sortable if requested
-			if ( sel_EL.hasClass('fc_select2_sortable') )
-			{
-				sel_EL.select2_sortable();
-			}
-
-			// Select2 is attached: templates and plugins can decorate it
-			sel_EL[0].dispatchEvent(new CustomEvent('flexicontent:select2-ready', { bubbles: true }));
-		});
-
-		// Bridge jQuery change → native change event so delegated listeners (filters.php etc.) fire
-		elemsJ.each(function() {
-			var el = this;
-			jQuery(el).on('change', function() {
-				if (el._fc_dispatching_native) return;
-				el._fc_dispatching_native = true;
-				el.dispatchEvent(new Event('change', { bubbles: true }));
-				setTimeout(function() { el._fc_dispatching_native = false; }, 0);
-			});
-		});
-
-
-		// Customization of SELECT2 JS selectors
-		sboxJ.find('div.use_select2_lib').each(function()
-		{
-			var el_container = jQuery(this);
-			var sel_EL = el_container.next('select');
-
-
-			// MULTI-SELECT2: Initialize internal labels, placing the label so that it overlaps the text filter box
-			var fc_label_text = sel_EL.attr('data-fc_label_text');
-			if (!fc_label_text) fc_label_text = sel_EL.attr('fc_label_text');
-			if (fc_label_text)
-			{
-				var _label = (fc_label_text.length >= 30) ? fc_label_text.substring(0, 28) + '...' : fc_label_text;
-
-				jQuery('<span/>', {
-					'class': 'fc_has_inner_label fc_has_inner_label_select2',
-					'text': _label
-				}).prependTo(el_container.find('.select2-search-field'));
-			}
-
-
-			// MULTI-SELECT2: Initialize internal prompts, placing the prompt so that it overlaps the text filter box
-			var fc_prompt_text = sel_EL.attr('data-fc_prompt_text');
-			if (!fc_prompt_text) fc_prompt_text = sel_EL.attr('fc_prompt_text');
-			if (fc_prompt_text)
-			{
-				var _prompt = (fc_prompt_text.length >= 30) ? fc_prompt_text.substring(0, 28) + '...' : fc_prompt_text;
-
-				jQuery('<span/>', {
-					'class': 'fc_has_inner_prompt fc_has_inner_prompt_select2',
-					'text': _prompt
-				}).prependTo(el_container.find('.select2-search-field')).hide();
-			}
-
-
-			// SINGLE-SELECT2: Highlight selects with an active value
-			if ( ! sel_EL.attr('multiple') && sel_EL.hasClass('fc_add_highlight') )
-			{
-				var el = el_container.find('.select2-choice');
-				var val = sel_EL.val();
-				if (val === null) {
-					//el.addClass('fc_highlight_disabled');
-				} else if (!!val && val.length) {
-					el.addClass('fc_highlight');
-				} else {
-					el.removeClass('fc_highlight');
-				}
-			}
-		});
-
-
-		// MULTI-SELECT2:
-		elemsJ.on('select2-open', function()
-		{
-
-			// Add events to handle focusing the text filter box (hide inner label)
-			var sel_EL = jQuery(this);
-			var el = sel_EL.parent().find('.select2-input');
-			var el_label = el.prevAll('.fc_has_inner_label');
-			if (el_label) el_label.hide();
-			var el_prompt = el.prevAll('.fc_has_inner_prompt');
-			if (el_prompt) el_prompt.show();
-
-
-			// Allow listing already selected options WHEN having class 'select2_fc_checkboxes'
-			if (sel_EL.hasClass('select2_fc_checkboxes')) {
-				var els = jQuery('#select2-drop').find('.select2-selected');
-				els.addClass('select2-selected-visible').removeClass('select2-selected');
-
-				// Suppress the onchange attribute while selector is open
-				sel_EL.data('onchange', sel_EL.attr('onchange'));
-				sel_EL.removeAttr('onchange');
-			}
-
-
-		}).on('select2-close', function(e)
-		{
-
-			// Add events to handle bluring the text filter box (show inner label)
-			var sel_EL = jQuery(this);
-
-			// Re-open if this was closed while selecting, FOR select2 v4, use 'select2:closing' instead
-			if ( sel_EL.data('field_being_selected') )
-			{
-				sel_EL.select2('open');
-				jQuery('#select2-drop').find('.select2-no-results').remove();
-				return;
-			}
-
-			var el = sel_EL.parent().find('.select2-input');
-			var el_label = el.prevAll('.fc_has_inner_label');
-			if (el_label) el_label.show();
-			var el_prompt = el.prevAll('.fc_has_inner_prompt');
-			if (el_prompt) el_prompt.hide();
-
-			// Restore already selected options state
-			if (sel_EL.hasClass('select2_fc_checkboxes')) {
-				var els = jQuery('#select2-drop').find('.select2-selected-visible');
-				els.removeClass('select2-selected-visible').addClass('select2-selected');
-			}
-
-
-			// Restore the onchange attribute when selector closes, running the JS if changes were made
-			if ( sel_EL.data('onchange') )
-			{
-				sel_EL.attr('onchange', sel_EL.data('onchange'));
-				sel_EL.data('onchange', null);
-			}
-
-			// Trigger change event on close if this was prevented
-			if ( sel_EL.data('field_being_edited') )
-			{
-				sel_EL.data('field_being_edited', null);
-				sel_EL.trigger('change');
-				// LEGACY browsers ??
-				/*if ( sel_EL.attr('onchange') )
-				{
-					eval(sel_EL.attr('onchange'));
-				}*/
-			}
-
-
-		}).on('select2-selecting', function(e)
-		{
-
-			// Handle toggling MULTI-SELECT2 as checkboxes
-			var sel_EL = jQuery(this);
-			if ( sel_EL.attr('multiple') && sel_EL.hasClass('select2_fc_checkboxes') )
-			{
-				var vals = sel_EL.val();
-				var nVals = new Array();
-				var i = 0;
-				var found = 0;
-				if (vals && vals.length)
-				{
-					for (var n = 0; n < vals.length; ++n)
-					{
-						if (vals[n] != e.val) nVals[i++] = vals[n];
-						else found = 1;
-					}
-				}
-
-				if (!found) nVals[i++] = e.val;
-				sel_EL.data('set_selected_values', nVals);
-				sel_EL.data('field_being_edited', true);
-				sel_EL.data('field_being_selected', true);
-			}
-
-
-		}).on('change', function(e)
-		{
-
-			// SELECT2: Handle change event
-			var sel_EL = jQuery(this);
-
-			// Clear 'being_selected' FLAG but not the 'being_edited', as this will be done by the 'close' event, also stop event propagation if 'being_edited'
-			sel_EL.data('field_being_selected', null);
-			if (sel_EL.data('field_being_edited'))
-			{
-				e.preventDefault();
-				e.stopPropagation();
-				e.stopImmediatePropagation();
-			}
-
-			var nVals = sel_EL.data('set_selected_values');
-			if (nVals)
-			{
-				jQuery('#select2-drop').find('.select2-selected-visible, .select2-selected').removeClass('select2-selected-visible').removeClass('select2-selected');
-				jQuery('#select2-drop').find('.select2-selected').removeClass('select2-selected-visible').removeClass('select2-selected');
-
-				// Specific values were requested to be set, but first clear data value, to prevent loop in the change event
-				sel_EL.data('set_selected_values', null).select2('val', nVals).trigger('change');
-			}
-
-
-			// SINGLE-SELECT2:
-			if ( ! sel_EL.attr('multiple') && sel_EL.hasClass('fc_add_highlight') )
-			{
-				// Handle highlighting selected value
-				var el = jQuery(this).prev('div').find('.select2-choice');
-				var val = sel_EL.val();
-				if (!!val && val.length) {
-					el.addClass('fc_highlight');
-				} else {
-					el.removeClass('fc_highlight');
-				}
-			}
-
-
-			// MULTI-SELECT2:
-			if ( sel_EL.attr('multiple') )
-			{
-				// Allow listing already selected options WHEN having class 'select2_fc_checkboxes'
-				if (jQuery(this).hasClass('select2_fc_checkboxes')) {
-					var els = jQuery('#select2-drop').find('.select2-selected');
-					els.addClass('select2-selected-visible').removeClass('select2-selected');//.removeClass('select2-result-selectable');
-				}
-			}
-
-		});
-
-
-		// MULTI-SELECT2: Handle highlighting selected value
-		sboxJ.find('div.use_select2_lib.select2-container-multi input').on('keydown', function()
-		{
-			var el = jQuery(this);
-			setTimeout(function() {
-				var val = el.val();
-				if (!!val && val.length) {
-					var el_prompt = el.prevAll('.fc_has_inner_prompt');
-					if (el_prompt) el_prompt.hide();
-				} else {
-					var el_prompt = el.prevAll('.fc_has_inner_prompt');
-					if (el_prompt) el_prompt.show();
-				}
-			}, 0);
-		});
-
-
-		// SELECT2: scrollbar wrap problem
-		elemsJ.on('loaded open', function()
-		{
-			var ul = jQuery('#select2-drop ul.select2-results');
-			var needsScroll= ul.prop('scrollHeight') > ul.prop('clientHeight');
-			if (needsScroll) ul.css('overflow-y', 'scroll');
-			else  ul.css('overflow-y', 'auto');
-		});
-	}
-
-
 	/* Valid HTML for legacy modals using rel, TODO: add more */
 	if (typeof jQuery !== 'undefined') {
 		jQuery(document).ready(function() {
@@ -2590,154 +2104,80 @@
 	}
 
 
-	function fc_attachSingleSlider(cfg, type)
+	function fc_attachSingleSlider(cfg, type = 2)
 	{
-		var slider_tag_id = cfg.name + (cfg.sfx || '');
-		var slider = document.getElementById(slider_tag_id + '_nouislider');
-		//if (jQuery(slider).length) { window.console.log('not found slider ID: ' + slider_tag_id + '_nouislider'); return; }
-
-		var selectSL = jQuery('#' + slider_tag_id + '-sel');
-		var inputSL = document.getElementById(slider_tag_id + '-val');
-		var isSingle = 1;
-		!!type || (type = 2);  // 1: drop-down select , 2: slider (default type)
-
-		var IEversion = fc_isIE();
-		var is_IE8 = IEversion && IEversion < 9;
-		var use_select = is_IE8 || type == 1;
-		if (use_select)
-		{
-			if (selectSL.length)
-			{
-				var selected;
-				jQuery.each(cfg.step_values, function(key, value)
-				{
-					selectSL.append(
-						jQuery('<option></option>')
-							.attr('value', cfg.step_values[key])
-							.text(cfg.step_labels[key])
-					);
+		const id = cfg.name + (cfg.sfx || '');
+		const slider = document.getElementById(id + '_nouislider');
+		const select = document.getElementById(id + '-sel');
+		const input = document.getElementById(id + '-val');
+		const steps = cfg.step_values || [];
+		if (!input || !steps.length) return;
+		const initial = Math.max(0, Math.min(Number(cfg.initial_pos) || 0, steps.length - 1));
+		function apply(value) {
+			for (const [selector, classes, prefix] of [
+				[cfg.element_selector, cfg.element_class_list, cfg.element_class_prefix],
+				[cfg.elem_container_selector, cfg.elem_container_class, cfg.elem_container_prefix],
+			]) {
+				if (!selector || !classes) continue;
+				document.querySelectorAll(selector).forEach(node => {
+					node.classList.remove(...classes.trim().split(/\\s+/).filter(Boolean));
+					if (prefix !== undefined) node.classList.add(prefix + value);
 				});
-
-				selectSL
-					.val(cfg.step_values[cfg.initial_pos])
-					.on('change', function(e, data) {
-						var slider_input = jQuery('#' + slider_tag_id + '-val').get(0);
-
-						if (cfg.element_class_list != '')
-						{
-							jQuery(cfg.element_selector).removeClass(cfg.element_class_list).addClass(cfg.element_class_prefix + selectSL.val());
-						}
-						if (cfg.elem_container_class != '')
-						{
-							jQuery(cfg.elem_container_selector).removeClass(cfg.elem_container_class).addClass(cfg.elem_container_prefix + selectSL.val());
-						}
-
-						fclib_setCookie(slider_input.name, selectSL.val(), 0);  // nDays 0 , aka no expiration date, keep cookie till browser closes
-					})
-					.css('display', '');  // avoid show() it adds display: block
 			}
+			input.value = value;
+			fclib_setCookie(input.name, value, 0);
+		}
+		if (type == 1 || !slider || !window.noUiSlider || steps.length === 1) {
+			if (!select || select.dataset.fcSliderReady) return;
+			select.dataset.fcSliderReady = '1';
+			select.replaceChildren(...steps.map((value, index) => new Option(cfg.step_labels?.[index] ?? value, value)));
+			select.value = steps[initial];
+			select.addEventListener('change', () => apply(select.value));
+			select.style.removeProperty('display');
 			return;
 		}
-		slider.style.display = '';
-
-		var step_values = cfg.step_values;
-		var step_labels = cfg.step_labels;
-
-		noUiSlider.create(slider, {
-			start: cfg.initial_pos,
-			connect: false,
-			step: 1,
-			range: {'min': 0, 'max': (cfg.step_values.length - 1)},
+		if (slider.noUiSlider) return;
+		slider.style.display = cfg.start_hidden ? 'none' : '';
+		noUiSlider.create(slider, {start: initial, connect: false, step: 1, range:{min:0, max:steps.length - 1}});
+		const handle = slider.querySelector('.noUi-handle');
+		const tip = document.createElement('span');
+		tip.className = 'fc-sliderTooltip fc-bottom';
+		const label = document.createElement('span');
+		tip.append(label);
+		handle?.append(tip);
+		slider.noUiSlider.on('update', values => {
+			const index = Math.round(Number(values[0]));
+			input.value = steps[index];
+			const text = String(cfg.step_labels?.[index] ?? steps[index]);
+			label.textContent = text.length > 40 ? text.slice(0, 36) + ' ?' : text;
+			tip.classList.toggle('fc-left', index * 2 >= steps.length - 1);
+			tip.classList.toggle('fc-right', index * 2 < steps.length - 1);
 		});
-		if (!!cfg.start_hidden) jQuery(slider).hide();
-
-		var tipHandles = slider.getElementsByClassName('noUi-handle'),
-		tooltips = [];
-
-		// Add divs to the slider handles.
-		for ( var i = 0; i < tipHandles.length; i++ )
-		{
-			tooltips[i] = document.createElement('span');
-			tipHandles[i].appendChild(tooltips[i]);
-
-			tooltips[i].className += 'fc-sliderTooltip fc-bottom'; // Add a class for styling
-			tooltips[i].innerHTML = '<span></span>'; // Add additional markup
-			tooltips[i] = tooltips[i].getElementsByTagName('span')[0];  // Replace the tooltip reference with the span we just added
-		}
-
-		// When the slider changes, display the value in the tooltips and set it into the input form elements
-		slider.noUiSlider.on('update', function( values, handle ) {
-			var value = parseInt(values[handle]);
-			var i = value;
-
-			if ( handle ) {
-				alert('This slider does not have a right handler');
-			} else {
-				inputSL.value = typeof step_values[value] !== 'undefined' ? step_values[value] : value;
-			}
-			var tooltip_text = typeof step_labels[value] !== 'undefined' ? step_labels[value] : value;
-			var max_len = 36;
-			tooltips[handle].innerHTML = '<span class=\"icon-image\"></span> ' +
-				(tooltip_text.length > max_len+4 ? tooltip_text.substring(0, max_len)+' ...' : tooltip_text);
-			var left  = jQuery(tooltips[handle]).closest('.noUi-origin').position().left;
-			var width = jQuery(tooltips[handle]).closest('.noUi-base').width();
-
-			//window.console.log ('handle: ' + handle + ', left : ' + left + ', width : ' + width);
-			if (isSingle) {
-				left<(50/100)*width ?
-					jQuery(tooltips[handle]).parent().removeClass('fc-left').addClass('fc-right') :
-					jQuery(tooltips[handle]).parent().removeClass('fc-right').addClass('fc-left');
-			}
-			else {
-				alert('This slider only has 1 handle');
-			}
-		});
-
-		// Handle form autosubmit
-		slider.noUiSlider.on('change', function() {
-			var slider = jQuery('#' + slider_tag_id + '_nouislider');
-			var slider_input = jQuery('#' + slider_tag_id + '-val').get(0);
-
-			if (cfg.element_class_list != '')
-			{
-				jQuery(cfg.element_selector).removeClass(cfg.element_class_list).addClass(cfg.element_class_prefix + slider_input.value);
-			}
-			if (cfg.elem_container_class != '')
-			{
-				jQuery(cfg.elem_container_selector).removeClass(cfg.elem_container_class).addClass(cfg.elem_container_prefix + slider_input.value);
-			}
-
-			fclib_setCookie(slider_input.name, slider_input.value, 0);  // nDays 0 , aka no expiration date, keep cookie till browser closes
-		});
-
-		inputSL.addEventListener('change', function(){
-			var value = 0;  // default is first value = empty
-			for(var i=1; i<step_values.length-1; i++)
-			{
-				if (step_values[i] == this.value) { value=i; break; }
-			}
-			slider.noUiSlider.set([value, null]);
+		slider.noUiSlider.on('change', () => apply(input.value));
+		input.addEventListener('change', () => {
+			const index = steps.findIndex(value => String(value) === input.value);
+			slider.noUiSlider.set(index < 0 ? 0 : index);
+			apply(input.value);
 		});
 	}
-
 
 
 	// Toggle elements of all other views when switching between views (e.g. details / thumbnails views)
-	function fc_toggle_view_mode(new_btn)
+	function fc_toggle_view_mode(value)
 	{
-		var btns = new_btn.parent().children();
-
-		btns.removeClass('active');
-		btns.each(function(index, value)
-		{
-			var btn = jQuery(value);
-			jQuery(btn.data('toggle_selector')).hide();
-		});
-
-		new_btn.addClass('active');
-		jQuery(new_btn.data('toggle_selector')).show().css('display', '').css('visibility', '');
+		const button = FlexiForm.element(value);
+		if (!button?.parentElement) return;
+		for (const tab of button.parentElement.children) {
+			const selected = tab === button;
+			tab.classList.toggle('active', selected);
+			if (tab.dataset.toggle_selector) {
+				document.querySelectorAll(tab.dataset.toggle_selector).forEach(node => {
+					node.style.display = selected ? '' : 'none';
+					if (selected) node.style.removeProperty('visibility');
+				});
+			}
+		}
 	}
-
 
 
 	// Create a sanitized filename similar to what server-side code will accept
@@ -2911,7 +2351,7 @@
 	function fc_initSelect2(event, container_sel, reAddOnEvents)
 	{
 		const box = fc_initContainer(event, container_sel, reAddOnEvents, fc_initSelect2);
-		if (window.fc_use_choicesjs ? typeof Choices === 'undefined' : !window.jQuery?.fn.select2) return;
+		if (!(window.fc_Choices || window.Choices)) return;
 		fc_attachSelect2(box, box.querySelectorAll('select.use_select2_lib'));
 	}
 

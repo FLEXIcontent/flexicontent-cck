@@ -64,7 +64,7 @@ $url   = 'index.php?option=com_flexicontent&format=raw&task=filemanager.';
 </div>
 
 <script>
-jQuery(document).ready(function () {
+document.addEventListener('DOMContentLoaded', () => {
 	var url = <?php echo json_encode($url); ?>, token = <?php echo json_encode($token); ?>;
 	var txt = {
 		confirm: <?php echo json_encode(Text::_('FLEXI_ORPHANS_CONFIRM_TEXT')); ?>,
@@ -78,83 +78,97 @@ jQuery(document).ready(function () {
 		stopped: <?php echo json_encode(Text::_('FLEXI_ORPHANS_STOPPED')); ?>,
 		scanned: <?php echo json_encode(Text::_('FLEXI_ORPHANS_SCANNED')); ?>
 	};
-	var total = 0, deleted = 0, skipped = 0, t0 = 0, errors = [], lines = [], found_on = '';
+	const node = id => document.getElementById('fc-orphans-' + id);
+	const show = (id, visible) => { node(id).style.display = visible ? '' : 'none'; };
+	let total = 0, deleted = 0, skipped = 0, started = 0, errors = [], lines = [], foundOn = '';
+	let scan;
 
-	function call(task, data) {
-		return jQuery.ajax({ url: url + task, data: jQuery.extend({}, data, (function () { var o = {}; o[token] = 1; return o; })()), dataType: 'json', cache: false });
+	async function call(task, data, signal) {
+		const endpoint = new URL(url + task, document.baseURI);
+		for (const [key, value] of Object.entries({...data, [token]: 1})) endpoint.searchParams.set(key, value);
+		const response = await fetch(endpoint, {credentials: 'same-origin', cache: 'no-store', signal});
+		if (!response.ok) throw Error('HTTP ' + response.status);
+		return response.json();
 	}
 
-	function fail(msg) {
-		jQuery('#fc-orphans-finding').html('<span style="color:#b00;">' + jQuery('<div>').text(msg).html() + '</span>');
+	async function find() {
+		scan?.abort();
+		const current = scan = new AbortController();
+		show('confirm', false);
+		show('finding', true);
+		node('finding').textContent = <?php echo json_encode(Text::_('FLEXI_ORPHANS_FINDING')); ?>;
+		try {
+			const result = await call('orphanscount', {min_age_hours: node('skip-recent').checked ? 24 : 0}, current.signal);
+			if (current.signal.aborted) return;
+			if (!result?.ok) throw Error(result?.error || txt.halted);
+			total = result.count;
+			lines = result.lines || [];
+			foundOn = result.found_on || '';
+			const summary = [result.skipped_recent ? txt.skipped.replace('%d', result.skipped_recent) : '',
+				txt.scanned.replace('%1$d', result.checked).replace('%2$s', result.elapsed)].filter(Boolean).join(' ');
+			if (!total) {
+				node('finding').textContent = txt.none + ' ' + summary;
+				return;
+			}
+			show('finding', false);
+			node('confirm-text').textContent = txt.confirm.replace('%d', total) + ' ' + summary;
+			node('start').textContent = txt.start.replace('%d', total);
+			show('confirm', true);
+		} catch (error) {
+			if (!current.signal.aborted) node('finding').textContent = error.message;
+		}
 	}
 
-	function find() {
-		jQuery('#fc-orphans-confirm').hide();
-		jQuery('#fc-orphans-finding').show().html(<?php echo json_encode(Text::_('FLEXI_ORPHANS_FINDING')); ?> + ' <img src="components/com_flexicontent/assets/images/ajax-loader.gif" alt="" />');
-
-		call('orphanscount', { min_age_hours: jQuery('#fc-orphans-skip-recent').is(':checked') ? 24 : 0 })
-			.done(function (r) {
-				if (!r || !r.ok) { return fail((r && r.error) || 'Error'); }
-
-				total = r.count;
-				lines = r.lines || [];
-				found_on = r.found_on || '';
-				var extra = r.skipped_recent ? '<br/>' + txt.skipped.replace('%d', r.skipped_recent) : '';
-				extra += '<br/><small>' + txt.scanned.replace('%1$d', r.checked).replace('%2$s', r.elapsed) + '</small>';
-
-				if (!total) {
-					return jQuery('#fc-orphans-finding').html(txt.none + extra);
-				}
-
-				jQuery('#fc-orphans-finding').hide();
-				jQuery('#fc-orphans-confirm-text').html(txt.confirm.replace('%d', '<strong>' + total + '</strong>') + extra);
-				jQuery('#fc-orphans-start').text(txt.start.replace('%d', total));
-				jQuery('#fc-orphans-confirm').show();
-			})
-			.fail(function (xhr) { fail('HTTP ' + xhr.status); });
+	function render(message = '') {
+		const processed = deleted + skipped;
+		const percent = total ? Math.min(100, processed / total * 100) : 100;
+		node('inside').style.width = (percent * 3) + 'px';
+		node('percent').textContent = percent.toFixed(2) + ' %';
+		node('status').replaceChildren(txt.progress.replace('%1$d', processed).replace('%2$d', total),
+			' ? ' + <?php echo json_encode(Text::_('FLEXI_DELETE')); ?> + ' ' + deleted,
+			document.createElement('br'), txt.time + ' ' + ((Date.now() - started) / 1000).toFixed(2) + ' secs',
+			document.createElement('br'), message);
+		node('errors').replaceChildren(...errors.map(error => {
+			const line = document.createElement('div');
+			line.textContent = error;
+			return line;
+		}));
 	}
 
-	function render(extra) {
-		var processed = deleted + skipped;
-		var percent = total ? Math.min(100, processed / total * 100) : 100;
-		jQuery('#fc-orphans-inside').css('width', Math.min(300, percent * 3) + 'px');
-		jQuery('#fc-orphans-percent').text(' ' + percent.toFixed(2) + ' %');
-		jQuery('#fc-orphans-status').html(txt.progress.replace('%1$d', processed).replace('%2$d', total)
-			+ ' &ndash; ' + <?php echo json_encode(Text::_('FLEXI_DELETE')); ?> + ': ' + deleted
-			+ '<br/><br/>' + txt.time + ': ' + ((Date.now() - t0) / 1000).toFixed(2) + ' secs' + (extra || ''));
-		jQuery('#fc-orphans-errors').html(errors.map(function (e) { return jQuery('<div>').text(e).html(); }).join('<br/>'));
+	async function step() {
+		try {
+			const result = await call('orphansdelete', {batch: 25});
+			if (!result) throw Error(txt.halted);
+			deleted += result.deleted || 0;
+			skipped += result.skipped || 0;
+			if (result.error) errors.push(result.error);
+			errors.push(...(result.warnings || []));
+			if (!result.ok) throw Error(txt.halted);
+			render();
+			if (result.remaining > 0) {
+				setTimeout(step, 20);
+				return;
+			}
+			render(txt.done.replace('%d', deleted));
+		} catch (error) {
+			errors.push(error.message);
+			render(txt.stopped.replace('%d', deleted));
+		}
+		show('close', true);
 	}
 
-	function finish(halted) {
-		render('<br/><br/><strong' + (halted ? ' style="color:#b00;"' : '') + '>' + (halted ? txt.stopped.replace('%d', deleted) : txt.done.replace('%d', deleted)) + '</strong>');
-		jQuery('#fc-orphans-close').show().off('click').on('click', function () {
-			try { window.parent.jQuery('#fc_modal_popup_container').dialog('close'); } catch (e) { window.close(); }
-		});
+	function close() {
+		if (window.parent !== window && typeof window.parent.fc_closeDialog === 'function') window.parent.fc_closeDialog('fc_modal_popup_container');
+		else window.close();
 	}
 
-	function step() {
-		call('orphansdelete', { batch: 25 })
-			.done(function (r) {
-				if (!r) { errors.push(txt.halted); return finish(true); }
-				deleted += r.deleted || 0;
-				skipped += r.skipped || 0;
-				if (r.error) { errors.push(r.error); }
-				(r.warnings || []).forEach(function (w) { errors.push(w); });
-				render();
-
-				if (!r.ok) { errors.push(txt.halted); return finish(true); }
-				if (r.remaining > 0) { return setTimeout(step, 20); }
-				finish();
-			})
-			.fail(function (xhr) { errors.push(txt.halted + ' (HTTP ' + xhr.status + ')'); finish(true); });
-	}
-
-	jQuery('#fc-orphans-skip-recent').on('change', find);
+	node('skip-recent').addEventListener('change', find);
+	node('close').addEventListener('click', close);
 
 	// The list was sent together with the count, the text file is created in the browser and saved
-	jQuery('#fc-orphans-download').on('click', function () {
+	node('download').addEventListener('click', function () {
 		var header = [
-			'# Orphaned files (not used by any item), found on ' + found_on + ' UTC',
+			'# Orphaned files (not used by any item), found on ' + foundOn + ' UTC',
 			'# Files: ' + lines.length,
 			'# id\tfile name\toriginal name\ttitle\ttype\tuploaded\tpath / url'
 		];
@@ -170,15 +184,13 @@ jQuery(document).ready(function () {
 		setTimeout(function () { URL.revokeObjectURL(a.href); document.body.removeChild(a); }, 1000);
 	});
 
-	jQuery('#fc-orphans-cancel').on('click', function () {
-		try { window.parent.jQuery('#fc_modal_popup_container').dialog('close'); } catch (e) { window.close(); }
-	});
-
-	jQuery('#fc-orphans-start').on('click', function () {
-		if (!confirm(<?php echo json_encode(Text::_('FLEXI_ORPHANS_CONFIRM_FINAL')); ?>)) { return; }
-		jQuery('#fc-orphans-step1, #fc-orphans-confirm').hide();
-		jQuery('#fc-orphans-run').show();
-		t0 = Date.now();
+	node('cancel').addEventListener('click', close);
+	node('start').addEventListener('click', () => {
+		if (!confirm(<?php echo json_encode(Text::_('FLEXI_ORPHANS_CONFIRM_FINAL')); ?>)) return;
+		show('step1', false);
+		show('confirm', false);
+		show('run', true);
+		started = Date.now();
 		render();
 		step();
 	});
