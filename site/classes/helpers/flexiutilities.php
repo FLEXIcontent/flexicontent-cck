@@ -114,7 +114,7 @@ class FLEXIUtilities
 		 */
 
 		$query = $db->getQuery(true)
-			->select('DISTINCT lc.lang_id as id, lc.image as image_prefix, lc.lang_code as code, lc.title_native, lc.sef')
+			->select('lc.lang_id as id, lc.image as image_prefix, lc.lang_code as code, lc.title_native, lc.sef')
 			//->select('CASE WHEN CHAR_LENGTH(lc.title_native) THEN CONCAT(lc.title, " (", lc.title_native, ")") ELSE lc.title END as name')
 			->select('lc.title as name')
 			->from('#__languages as lc')

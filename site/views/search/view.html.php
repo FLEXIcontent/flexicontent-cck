@@ -802,6 +802,13 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 		$min = $min_word_len ? $min_word_len  : $params->get('minchars', 3);
 		$max = $params->get('maxchars', 200);
 
+		// A LIKE %word% search ("No space languages") does not use the FULLTEXT index, so the shortest word of that index
+		// does not apply to it: most Chinese words have two characters
+		if (flexicontent_db::useLikeSearch($params->get('filter_word_like_any', 0), $searchword))
+		{
+			$min = 1;
+		}
+
 		if (FLEXIadvsearchHelper::limitSearchWord($searchword, $min, $max))
 		{
 			$error = Text::sprintf( 'FLEXI_SEARCH_MESSAGE', $min, $max );
@@ -975,10 +982,7 @@ class FLEXIcontentViewSearch extends \Joomla\CMS\MVC\View\HtmlView
 					 * (1) Skip / Ignore this for languages with spaces,
 					 * (2) Skip / Ignore this if current language supports splitting via dictionary
 					 */
-					if ($filter_word_like_any
-						&& in_array(flexicontent_html::getUserCurrentLang(), array('zh', 'jp', 'ja', 'th'))
-						&& ! FlexicontentFields::getLangHandler(\Joomla\CMS\Factory::getApplication()->getLanguage()->getTag(), $_hasHandlerOnly = true)
-					)
+					if (flexicontent_db::useLikeSearch($filter_word_like_any, $searchword))
 					{
 						// Do not highlight too small words, since we do not consider spaces
 						if (strlen($word_found) <= 2)

@@ -3377,15 +3377,20 @@ class FlexicontentModelItems extends FCModelAdminList
 	 */
 	function getItemsWithTags(&$total=null, $start=0, $limit=100000)
 	{
-		$query = 'SELECT SQL_CALC_FOUND_ROWS DISTINCT a.id '
-			. ' FROM #__content AS a'
-			. ' JOIN #__flexicontent_tags_item_relations AS tg ON a.id = tg.itemid'
+		$from = ' FROM #__content AS a'
+			. ' JOIN #__flexicontent_tags_item_relations AS tg ON a.id = tg.itemid';
+
+		// The id order makes the pages of the list (start, limit) well defined
+		$query = 'SELECT DISTINCT a.id '
+			. $from
+			. ' ORDER BY a.id'
 			. ($limit ? ' LIMIT ' . (int) $start . ', ' . (int) $limit : '')
 		;
 		$item_ids = $this->_db->setQuery($query)->loadColumn();
 
 		// Get items total
-		$total = $this->_db->setQuery('SELECT FOUND_ROWS()')->loadResult();
+		// Not SQL_CALC_FOUND_ROWS + FOUND_ROWS(): MySQL 8.0.17+ deprecates them
+		$total = $this->_db->setQuery('SELECT COUNT(DISTINCT a.id) ' . $from)->loadResult();
 
 		return $item_ids;
 	}
@@ -3401,14 +3406,15 @@ class FlexicontentModelItems extends FCModelAdminList
 	 */
 	function getAllItems(&$total=null, $start=0, $limit=100000)
 	{
-		$query = 'SELECT SQL_CALC_FOUND_ROWS DISTINCT a.id '
+		$query = 'SELECT a.id '
 			. ' FROM #__content AS a'
+			. ' ORDER BY a.id'
 			. ($limit ? ' LIMIT ' . (int) $start . ', ' . (int) $limit : '')
 		;
 		$item_ids = $this->_db->setQuery($query)->loadColumn();
 
 		// Get items total
-		$total = $this->_db->setQuery('SELECT FOUND_ROWS()')->loadResult();
+		$total = $this->_db->setQuery('SELECT COUNT(*) FROM #__content')->loadResult();
 
 		return $item_ids;
 	}
@@ -3714,14 +3720,15 @@ class FlexicontentModelItems extends FCModelAdminList
 		// Return all items, since we included a core field other than tag
 		if ($use_all_items == true)
 		{
-			$query = 'SELECT SQL_CALC_FOUND_ROWS id'
+			$query = 'SELECT id'
 				. ' FROM #__content'
+				. ' ORDER BY id'
 				. ($limit ? ' LIMIT ' . (int) $start . ', ' . (int) $limit : '')
 			;
 			$item_list = $this->_db->setQuery($query)->loadColumn();
 
 			// Get items total
-			$total = $this->_db->setQuery('SELECT FOUND_ROWS()')->loadResult();
+			$total = $this->_db->setQuery('SELECT COUNT(*) FROM #__content')->loadResult();
 
 			return $item_list;
 		}
@@ -3749,14 +3756,17 @@ class FlexicontentModelItems extends FCModelAdminList
 			;
 		}
 
-		$query = 'SELECT SQL_CALC_FOUND_ROWS a.*'
-			. ' FROM (('. implode(') UNION ( ', $queries) . ')) AS a'
+		$from = ' FROM (('. implode(') UNION ( ', $queries) . ')) AS a';
+
+		$query = 'SELECT a.*'
+			. $from
+			. ' ORDER BY 1'
 			. ($limit ? ' LIMIT ' . (int) $start . ', ' . (int) $limit : '')
 		;
 		$item_list = $this->_db->setQuery($query)->loadColumn();
 
 		// Get items total
-		$total = $this->_db->setQuery('SELECT FOUND_ROWS()')->loadResult();
+		$total = $this->_db->setQuery('SELECT COUNT(*) ' . $from)->loadResult();
 
 		/**
 		 * NOTE: array_unique() creates gaps in the index of the array,
@@ -3936,7 +3946,8 @@ class FlexicontentModelItems extends FCModelAdminList
 					break;
 
 				case 'ie.search_index':
-					$textwhere[] = ' MATCH (ie.search_index) AGAINST (' . $this->_db->Quote($search_prefix . $escaped_search . '*', false ).' IN BOOLEAN MODE)';
+					$ft_search = implode('%', flexicontent_db::getBooleanSearchWords(explode('%', $search_prefix . $escaped_search)));
+					$textwhere[] = ' MATCH (ie.search_index) AGAINST (' . $this->_db->Quote($ft_search . '*', false ).' IN BOOLEAN MODE)';
 					break;
 			}
 		}

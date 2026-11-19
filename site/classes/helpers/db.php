@@ -401,6 +401,224 @@ class flexicontent_db
 	}
 
 
+	/**
+	 * The storage engine of a FLEXIcontent table, in lower case: 'myisam', 'innodb', ...
+	 *
+	 * @param   string  $tbl  The table name without prefix, e.g. 'flexicontent_items_ext'
+	 */
+	static function getTableEngine($tbl = 'flexicontent_items_ext')
+	{
+		static $engines = null;
+
+		// One query per request for all FLEXIcontent tables
+		if ($engines === null)
+		{
+			$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+			$engines = $db->setQuery(
+				'SELECT t.TABLE_NAME AS name, LOWER(t.ENGINE) AS engine FROM information_schema.TABLES AS t'
+				. ' WHERE t.TABLE_SCHEMA = DATABASE()'
+				. '  AND t.TABLE_NAME LIKE ' . $db->quote($db->escape($db->getPrefix() . 'flexicontent_', true) . '%', false)
+			)->loadAssocList('name', 'engine');
+		}
+
+		$name = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class)->getPrefix() . $tbl;
+
+		return isset($engines[$name]) ? $engines[$name] : '';
+	}
+
+
+	/**
+	 * The shortest word that the database adds to the FULLTEXT index of a table.
+	 * MyISAM and InnoDB each have their own server setting for it (defaults: 4 and 3 characters)
+	 *
+	 * @param   string  $tbl  The table name without prefix
+	 */
+	static function getMinWordLen($tbl = 'flexicontent_items_ext')
+	{
+		static $lengths = array();
+
+		$variable = self::getTableEngine($tbl) === 'innodb' ? 'innodb_ft_min_token_size' : 'ft_min_word_len';
+
+		if (!isset($lengths[$variable]))
+		{
+			$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+			$_dbvariable = $db->setQuery("SHOW VARIABLES LIKE '" . $variable . "'")->loadObject();
+			$lengths[$variable] = (int) @ $_dbvariable->Value;
+		}
+
+		return $lengths[$variable];
+	}
+
+
+	/**
+	 * Whether a text search runs as LIKE %text% and not on the FULLTEXT index ("No space languages" setting).
+	 *
+	 * The FULLTEXT index holds text of a language that does not separate its words with spaces as whole phrases,
+	 * so a word inside a phrase is never found there. With the setting enabled the LIKE search is used when
+	 * - the language of the page is Chinese, Japanese or Thai, or
+	 * - the searched text itself is Chinese or Japanese: a site can show its interface in another language
+	 *   and hold Chinese content,
+	 * unless the page language has a dictionary word splitter (Thai), which makes the index usable.
+	 *
+	 * @param   mixed   $like_any  The "filter_word_like_any" parameter
+	 * @param   string  $text      The searched text
+	 *
+	 * @return  bool
+	 */
+	static function useLikeSearch($like_any, $text)
+	{
+		if (!(int) $like_any)
+		{
+			return false;
+		}
+
+		if (FlexicontentFields::getLangHandler(\Joomla\CMS\Factory::getApplication()->getLanguage()->getTag(), $_hasHandlerOnly = true))
+		{
+			return false;
+		}
+
+		return in_array(flexicontent_html::getUserCurrentLang(), array('zh', 'jp', 'ja', 'th'))
+			|| preg_match('/[\p{Han}\p{Hiragana}\p{Katakana}]/u', (string) $text) === 1;
+	}
+
+
+	/**
+	 * The condition of a LIKE %text% search on a column, see useLikeSearch().
+	 *
+	 * The words of the text are searched one by one: all of them must be found, or with the "any word" phrase
+	 * at least one of them. The "exact" phrase searches the text as it was typed.
+	 *
+	 * @param   string  $column  The column to search, e.g. ie.search_index
+	 * @param   string  $text    The searched text, without the search prefix: it is matched inside words
+	 * @param   string  $phrase  The search phrase: all, any, exact ...
+	 * @param   string  $prefix  The search prefix, when the words of the column have it ("Small / common words searchable")
+	 *
+	 * @return  string
+	 */
+	static function getLikeSearchCondition($column, $text, $phrase = 'all', $prefix = '')
+	{
+		$db    = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$text  = trim((string) $text);
+
+		// A phrase in double quotes is searched as it was typed too
+		if (preg_match('/^"(.+)"$/us', $text, $quoted))
+		{
+			$text   = trim($quoted[1]);
+			$phrase = 'exact';
+		}
+
+		// In a column with prefixed words the words of a phrase follow each other as "one vvvtwo"
+		$words = $phrase === 'exact'
+			? array($prefix === '' ? $text : preg_replace('/\s+/u', ' ' . $prefix, $text))
+			: array_unique(preg_split('/\s+/u', $text, -1, PREG_SPLIT_NO_EMPTY));
+		$conds = array();
+
+		foreach ($words as $word)
+		{
+			$conds[] = 'LOWER (' . $column . ') LIKE ' . $db->Quote('%' . $db->escape($word, true) . '%', false);
+		}
+
+		if (!$conds)
+		{
+			return ' 0=1 ';
+		}
+
+		return count($conds) === 1
+			? ' ' . $conds[0]
+			: ' (' . implode($phrase === 'any' ? ' OR ' : ' AND ', $conds) . ') ';
+	}
+
+
+	/**
+	 * Make the words of a search text safe for a boolean FULLTEXT search on an InnoDB table.
+	 *
+	 * MyISAM reads a character such as - ' or @ inside a word as part of the word or as a word separator.
+	 * InnoDB reads some of them as operators: "mid-century" then excludes "century", and "user@example.com",
+	 * a lone "*" or a trailing "+" are SQL errors. Others split the word in the index, so that "O'Neill" or
+	 * "l'atelier" are stored as "neill" and "atelier" and the full word finds nothing.
+	 *
+	 * So on InnoDB a word is split at every character that is not a letter, a digit or a combining mark,
+	 * as InnoDB's own index does. The parts of such a word that the index does not hold are left out:
+	 * parts shorter than the minimum word length, and parts (except the last, which may be unfinished)
+	 * that the index does not find as a word, such as "com" or "the" from InnoDB's list of ignored words.
+	 * Nothing is changed for a MyISAM table.
+	 *
+	 * @param   array   $words  The words of the search text, with the search prefix already added
+	 * @param   string  $tbl    The table (without prefix) that will be searched
+	 * @param   string  $col    The column with the FULLTEXT index
+	 * @param   bool    $required_words  True when every word but the last will be a required whole word (search suggestions):
+	 *                                   then also whole words that the index does not hold are left out
+	 *
+	 * @return  array
+	 */
+	static function getBooleanSearchWords($words, $tbl = 'flexicontent_items_ext', $col = 'search_index', $required_words = false)
+	{
+		if (self::getTableEngine($tbl) !== 'innodb')
+		{
+			return $words;
+		}
+
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$min_word_len = self::getMinWordLen($tbl);
+		$safe_words   = array();
+
+		// Does the index hold this word?
+		$is_indexed = function ($word) use ($db, $tbl, $col)
+		{
+			return (bool) $db->setQuery(
+				'SELECT 1 FROM #__' . $tbl
+				. ' WHERE MATCH (' . $col . ') AGAINST (' . $db->quote('+' . $word) . ' IN BOOLEAN MODE)', 0, 1
+			)->loadResult();
+		};
+
+		$last_word = count($words) - 1;
+
+		foreach (array_values($words) as $n => $word)
+		{
+			$parts = preg_split('/[^\p{L}\p{N}\p{M}]+/u', (string) $word, -1, PREG_SPLIT_NO_EMPTY);
+
+			if ($parts === array((string) $word))
+			{
+				if (!$required_words || $n === $last_word || $is_indexed($word))
+				{
+					$safe_words[] = $word;
+				}
+
+				continue;
+			}
+
+			$last = count($parts) - 1;
+			$kept = array();
+
+			foreach ($parts as $i => $part)
+			{
+				if (StringHelper::strlen($part) < $min_word_len)
+				{
+					continue;
+				}
+
+				if (($i < $last || ($required_words && $n < $last_word)) && !$is_indexed($part))
+				{
+					continue;
+				}
+
+				$kept[] = $part;
+			}
+
+			// The last part may be the unfinished start of a word (mid-cent), so it was not checked above.
+			// Leave it out if the index has no row with the parts before it and a word starting with it
+			if (count($kept) > 1 && end($kept) === $parts[$last] && !$is_indexed(implode(' +', array_slice($kept, 0, -1)) . ' +' . $parts[$last] . '*'))
+			{
+				array_pop($kept);
+			}
+
+			$safe_words = array_merge($safe_words, $kept);
+		}
+
+		return $safe_words;
+	}
+
+
 	/*
 	 * Find stopwords and too small words
 	 *

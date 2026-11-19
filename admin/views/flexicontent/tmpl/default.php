@@ -194,6 +194,17 @@ $items_task = 'task=items.';
 
 
 		<?php
+		// Optional task: move the DB tables to InnoDB
+		if ($this->dopostinstall && $config_saved && !empty($this->dbengine_pending))
+		{
+			echo '<div class="fc-mssg fc-info">'
+				. \Joomla\CMS\Language\Text::sprintf('FLEXI_DBENGINE_NOTE', (int) $this->dbengine_pending)
+				. ' <a class="btn btn-small btn-sm" href="index.php?option=com_flexicontent&amp;view=flexicontent&amp;layout=dbengine">' . \Joomla\CMS\Language\Text::_('FLEXI_DBENGINE_OPEN') . '</a>'
+				. '</div>';
+		}
+		?>
+
+		<?php
 		// BOF -- SHOW DASHBOARD BUTTONS -- (POST installation is DONE)
 		if ($this->dopostinstall && $config_saved) :
 		?>

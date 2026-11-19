@@ -3147,11 +3147,15 @@ class ParentClassItem extends FCModelAdmin
 			  KEY `field_id` (`field_id`),
 			  KEY `item_id` (`item_id`),
 			  FULLTEXT `search_index` (`search_index`),
-			  KEY `value_id` (`value_id`)
-			) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`
+			  KEY `value_id` (`value_id`(191))
+			) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`
 			';
 			$this->_db->setQuery($query);
 			$this->_db->execute();
+
+			// A new table must not come back as MyISAM on a site that was moved to InnoDB
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/dbengine.php';
+			FlexicontentDbEngine::followSiteEngine($this->_db, $tbl_name);
 		}
 
 

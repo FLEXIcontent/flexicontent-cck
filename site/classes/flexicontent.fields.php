@@ -3997,6 +3997,24 @@ class FlexicontentFields
 		$colname = !empty($filter->filter_colname)
 			? $filter->filter_colname
 			: 'value';
+
+		// A field value column has no FULLTEXT index. Only MyISAM can run a boolean MATCH without one (it reads every row),
+		// InnoDB answers with SQL error 1191. So on other engines match the words of a text search filter with LIKE
+		if (strpos($valueswhere, ' MATCH (_v_) ') !== false && substr($colname, -12) !== 'search_index'
+			&& flexicontent_db::getTableEngine('flexicontent_fields_item_relations') !== 'myisam'
+		)
+		{
+			$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+			$like_clauses = array();
+
+			foreach (preg_split('/[\s,\.]+/u', (string) reset($value), -1, PREG_SPLIT_NO_EMPTY) as $word)
+			{
+				$like_clauses[] = '_v_ LIKE ' . $db->Quote('%' . $db->escape($word, true) . '%', false);
+			}
+
+			$valueswhere = $like_clauses ? ' AND (' . implode(' OR ', $like_clauses) . ')' : ' AND 0 = 1';
+		}
+
 		$valueswhere = str_replace('_v_', $colname, $valueswhere);
 
 		$valuesfrom = !empty($filter->filter_valuesfrom)
@@ -5550,8 +5568,9 @@ class FlexicontentFields
 				{
 					$item_list[$row->id] = $row;
 				}
-				$db->setQuery("SELECT FOUND_ROWS()");
-				$total = $db->loadResult();
+				$total = !empty($options->count_query)
+					? $db->setQuery($options->count_query)->loadResult()
+					: count($rows);
 			}
 			else
 			{
@@ -5810,10 +5829,7 @@ class FlexicontentFields
 		}
 		else
 		{
-			$query = 'SELECT ' . ($itemcount ? 'SQL_CALC_FOUND_ROWS' : '') . ' i.*, ext.*,'
-				.' GROUP_CONCAT(c.id SEPARATOR  ",") AS catidlist, '
-				.' GROUP_CONCAT(c.alias SEPARATOR  ",") AS  cataliaslist '
-				. @ $orderby_col
+			$from_where_group = ''
 				.' FROM #__content AS i '
 				.' LEFT JOIN #__flexicontent_items_ext AS ext ON i.id=ext.item_id '
 				. @ $item_join
@@ -5827,9 +5843,24 @@ class FlexicontentFields
 				. @ $itemowned_where
 				. ($scopes_where ? ' AND ' . implode(' AND ', $scopes_where) : '')
 				.' GROUP BY i.id '
+				;
+
+			$query = 'SELECT i.*, ext.*,'
+				.' GROUP_CONCAT(c.id SEPARATOR  ",") AS catidlist, '
+				.' GROUP_CONCAT(c.alias SEPARATOR  ",") AS  cataliaslist '
+				. @ $orderby_col
+				. $from_where_group
 				. $orderby
+				// A unique last sort key, so that a limited list always holds the same items when sort values are equal
+				. ($itemcount && trim((string) $orderby) !== '' && strpos($orderby, 'i.id') === false ? ', i.id' : '')
 				.@ $limit
 				;
+
+			// When the list is limited, its total is the number of rows of the same query without the LIMIT
+			// Not SQL_CALC_FOUND_ROWS + FOUND_ROWS(): MySQL 8.0.17+ deprecates them
+			$options->count_query = $itemcount
+				? 'SELECT COUNT(*) AS total FROM (SELECT i.id ' . $from_where_group . ') AS fc_list'
+				: null;
 		}
 
 		//echo "<pre>".$query."</pre>";

@@ -234,9 +234,9 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 				return $this->_data_pending;
 			}
 
+			// This list has no LIMIT: its total is its number of rows
 			$this->_data_pending = $this->_getList($query);
-			$this->_db->setQuery('SELECT FOUND_ROWS()');
-			$this->_total_pending = $this->_db->loadResult();
+			$this->_total_pending = count($this->_data_pending);
 		}
 
 		return $this->_data_pending;
@@ -280,8 +280,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			}
 
 			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
-			$this->_db->setQuery("SELECT FOUND_ROWS()");
-			$this->_total = $this->_db->loadResult();
+			$this->_total = $this->_getTotalOfQuery();
 
 			$filter_order = $this->getState('filter_order');
 			$default_size_message = $filter_order != 'a.size' ? null : '
@@ -351,6 +350,19 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 
 
 	/**
+	 * Total number of the files that the list query finds: the row count of the same query with only the id column
+	 * (same tables, joins and conditions, no LIMIT)
+	 * Not SQL_CALC_FOUND_ROWS + FOUND_ROWS(): MySQL 8.0.17+ deprecates them
+	 *
+	 * @return integer
+	 */
+	protected function _getTotalOfQuery()
+	{
+		return $this->_db->setQuery('SELECT COUNT(*) FROM (' . $this->_buildQuery(array(), $ids_only = true) . ') AS fc_list')->loadResult();
+	}
+
+
+	/**
 	 * Method to get the total nr of the records
 	 *
 	 * @return integer
@@ -371,9 +383,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 					return $this->_total_pending = 0;
 				}
 
-				$this->_getList($query, 0, 1);
-				$this->_db->setQuery("SELECT FOUND_ROWS()");
-				$this->_total_pending = $this->_db->loadResult();
+				$this->_total_pending = $this->_getTotalOfQuery();
 			}
 
 			return $this->_total_pending;
@@ -389,9 +399,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 				return $this->_total = 0;
 			}
 
-			$this->_getList($query, 0, 1);
-			$this->_db->setQuery("SELECT FOUND_ROWS()");
-			$this->_total = $this->_db->loadResult();
+			$this->_total = $this->_getTotalOfQuery();
 		}
 
 		return $this->_total;
@@ -788,7 +796,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		}
 		else
 		{
-			$columns[] = 'SQL_CALC_FOUND_ROWS a.*, '
+			$columns[] = 'a.*, '
 				. ' u.name AS editor, '
 				. ' ua.name AS uploader, '
 				. ' mm.id AS mm_id, '
@@ -2359,15 +2367,19 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	 */
 	function getFileIds($skip_urls=true, &$total=null, $start=0, $limit=5000)
 	{
-		$query = 'SELECT SQL_CALC_FOUND_ROWS id '
-			. ' FROM #__flexicontent_files'
-			. ($skip_urls ? ' WHERE url = 0 ' : '')
+		$from_where = ' FROM #__flexicontent_files'
+			. ($skip_urls ? ' WHERE url = 0 ' : '');
+
+		// The id order makes the pages of the list (start, limit) well defined
+		$query = 'SELECT id '
+			. $from_where
+			. ' ORDER BY id'
 			. ($limit ? ' LIMIT ' . (int) $start . ', ' . (int) $limit : '')
 			;
 		$file_ids = $this->_db->setQuery($query)->loadColumn();
 
 		// Get items total
-		$total = $this->_db->setQuery('SELECT FOUND_ROWS()')->loadResult();
+		$total = $this->_db->setQuery('SELECT COUNT(*) ' . $from_where)->loadResult();
 
 		return $file_ids;
 	}

@@ -40,6 +40,8 @@ jobs:
           php -d error_reporting=-1 tests/extra-votes-without-rating.php
           php -d error_reporting=-1 tests/plain-page-item-data.php
           php -d error_reporting=-1 tests/items-stable-order.php
+          php -d error_reporting=-1 tests/list-totals.php
+          php -d error_reporting=-1 tests/like-search.php
           php -d error_reporting=-1 tests/thumbnail-widths.php
           php -d error_reporting=-1 tests/webp-generation.php
           php -d error_reporting=-1 tests/pdftotext-php8.php

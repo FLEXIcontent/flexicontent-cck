@@ -5,4 +5,4 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_edit_coupons` (
 	timestamp INT NOT NULL,
 	token VARCHAR(255) NOT NULL,
 	PRIMARY KEY  (`id`)
-) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
+) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`;

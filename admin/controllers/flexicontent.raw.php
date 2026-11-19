@@ -54,6 +54,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		$this->registerTask('addmcatitemrelations',		'addMcatItemRelations');
 		$this->registerTask('updatelanguageData',			'updateLanguageData');
 		$this->registerTask('createdbindexes',				'createDBindexes');
+		$this->registerTask('convertdbcharset',				'convertDBCharset');
 		$this->registerTask('createversionstable',		'createVersionsTable');
 		$this->registerTask('populateversionstable',	'populateVersionsTable');
 		$this->registerTask('createauthorstable',			'createauthorstable');
@@ -63,6 +64,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		$this->registerTask('cleanupoldtables',				'cleanupOldTables');
 		$this->registerTask('addcurrentversiondata',	'addCurrentVersionData');
 		$this->registerTask('updateinitialpermission', 'updateInitialPermission');
+		$this->registerTask('convertdbengine',				'convertDBEngine');
 
 		$this->registerTask('createlanguagepack',			'createLanguagePack');
 		$this->registerTask('fcversioncompare',				'FCVersionCompare');
@@ -804,6 +806,52 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 
 
 	/**
+	 * Method to convert the FLEXIcontent DB tables that still use the 3-byte utf8 character set to utf8mb4
+	 *
+	 * Each table is copied by its ALTER, so a request converts tables for a few seconds only (at least one table)
+	 * The dashboard repeats the request while the reply contains the "fc-dbcharset-more" marker
+	 *
+	 * @return	void
+	 */
+	function convertDBCharset()
+	{
+		// Check for request forgeries
+		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+
+		if (!\Joomla\CMS\Factory::getApplication()->getIdentity()->authorise('core.admin', 'com_flexicontent'))
+		{
+			jexit('<span class="install-notok"></span>' . \Joomla\CMS\Language\Text::_('JERROR_ALERTNOAUTHOR'));
+		}
+
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/dbcharset.php';
+
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+
+		// The database server finishes an ALTER even if this request is cut off
+		@set_time_limit(0);
+		ignore_user_abort(true);
+
+		$failed = false;
+
+		foreach (FlexicontentDbCharset::convertPending($db, 0, 5) as $tblname => $result)
+		{
+			$failed = $failed || !$result[0];
+			echo '<div>' . ($result[0] ? '' : '<span class="install-notok"></span>')
+				. htmlspecialchars(($tblname !== '' ? $tblname . ': ' : '') . $result[1], ENT_QUOTES, 'UTF-8') . '</div>';
+		}
+
+		if ($failed)
+		{
+			return;
+		}
+
+		echo FlexicontentDbCharset::getPendingTables($db)
+			? '<span class="fc-dbcharset-more"></span>'
+			: '<span class="install-ok"></span>';
+	}
+
+
+	/**
 	 * Method to create the versions table
 	 *
 	 * @access	public
@@ -823,17 +871,21 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 					`item_id` int(11) unsigned NOT NULL default '0',
 					`version_id` int(11) unsigned NOT NULL default '0',
 					`comment` mediumtext NOT NULL,
-					`created` datetime NOT NULL default '0000-00-00 00:00:00',
+					`created` datetime NOT NULL default '1000-01-01 00:00:00',
 					`created_by` int(11) unsigned NOT NULL default '0',
 					`state` int(3) NOT NULL default '0',
 					`keep` tinyint(1) NOT NULL default '0',
 					PRIMARY KEY  (`id`),
 					KEY `version2item` (`item_id`,`version_id`)
-					) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
+					) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`";
 
 		try
 		{
 			$db->setQuery($query)->execute();
+
+			// A new table must not come back as MyISAM on a site that was moved to InnoDB
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/dbengine.php';
+			FlexicontentDbEngine::followSiteEngine($db, '#__flexicontent_versions');
 		}
 		catch (Exception $e)
 		{
@@ -919,6 +971,68 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 
 
 	/**
+	 * Optional task: move one FLEXIcontent DB table to InnoDB and verify it
+	 *
+	 * One table per request, so that the task can be continued after a timeout. The page repeats the request
+	 * while the reply contains the "fc-dbengine-more" marker, and shows a reply that names its table
+	 * (data-table) in the row of that table
+	 *
+	 * @return	void
+	 */
+	function convertDBEngine()
+	{
+		// Check for request forgeries
+		\Joomla\CMS\Session\Session::checkToken('request') or jexit(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+
+		$app = \Joomla\CMS\Factory::getApplication();
+		$notok = '<span class="install-notok"></span>';
+
+		if (!$app->getIdentity()->authorise('core.admin', 'com_flexicontent'))
+		{
+			jexit('<div>' . $notok . \Joomla\CMS\Language\Text::_('JERROR_ALERTNOAUTHOR') . '</div>');
+		}
+
+		// The administrator must have confirmed that a backup exists
+		if (!$app->input->getInt('backup_confirmed', 0))
+		{
+			jexit('<div>' . $notok . \Joomla\CMS\Language\Text::_('FLEXI_DBENGINE_BACKUP_CONFIRM') . '</div>');
+		}
+
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/dbengine.php';
+
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+
+		if (!FlexicontentDbEngine::getPreflight($db)->ok)
+		{
+			jexit('<div>' . $notok . \Joomla\CMS\Language\Text::_('FLEXI_DBENGINE_CANNOT_START') . '</div>');
+		}
+
+		// The database server finishes an ALTER even if this request is cut off
+		@set_time_limit(0);
+		ignore_user_abort(true);
+
+		$result = FlexicontentDbEngine::convertNext($db);
+
+		if ($result === null)
+		{
+			jexit('<div><span class="install-ok"></span>' . \Joomla\CMS\Language\Text::_('FLEXI_DBENGINE_ALL_DONE') . '</div>');
+		}
+
+		// The page shows the result in the row of this table, the table name is therefore sent apart from the text
+		echo '<div' . ($result[0] !== '' ? ' data-table="' . htmlspecialchars($result[0], ENT_QUOTES, 'UTF-8') . '"' : '') . '>'
+			. ($result[1] ? '<span class="install-ok"></span>' : $notok)
+			. htmlspecialchars($result[2], ENT_QUOTES, 'UTF-8') . '</div>';
+
+		if ($result[1])
+		{
+			echo FlexicontentDbEngine::getPendingTables($db)
+				? '<span class="fc-dbengine-more"></span>'
+				: '<div><span class="install-ok"></span>' . \Joomla\CMS\Language\Text::_('FLEXI_DBENGINE_ALL_DONE') . '</div>';
+		}
+	}
+
+
+	/**
 	 * Method to create the authors table
 	 *
 	 * @access	public
@@ -935,15 +1049,19 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 
 		$query 	= " CREATE TABLE IF NOT EXISTS #__flexicontent_authors_ext (
   				`user_id` int(11) unsigned NOT NULL,
-  				`author_basicparams` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
-  				`author_catparams` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  				`author_basicparams` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  				`author_catparams` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
 					PRIMARY KEY  (`user_id`)
-					) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
+					) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`";
 		$db->setQuery($query);
 
 		try
 		{
 			$result = $db->execute();
+
+			// A new table must not come back as MyISAM on a site that was moved to InnoDB
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/dbengine.php';
+			FlexicontentDbEngine::followSiteEngine($db, '#__flexicontent_authors_ext');
 		}
 		catch (Exception $e)
 		{

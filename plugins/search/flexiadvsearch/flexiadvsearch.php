@@ -837,9 +837,12 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 		// *** Get the items
 		// ***
 
-		$query = 'SELECT SQL_CALC_FOUND_ROWS i.id'
+		// The total of matching items is a column of the list: COUNT(*) OVER(), counted after GROUP BY. One statement
+		// instead of SQL_CALC_FOUND_ROWS + FOUND_ROWS(), which MySQL 8.0.17+ deprecates
+		$query = 'SELECT i.id'
 			. $orderby_col
 			. $select_relevance
+			. ', COUNT(*) OVER() AS fc_list_total'
 			. ' FROM #__flexicontent_items_tmp AS i'
 			. $join_clauses_with_text
 			. $orderby_join
@@ -848,28 +851,29 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 			. $and_where_filters
 			. ' GROUP BY i.id '
 			. $orderby
+			// A unique last sort key. Without SQL_CALC_FOUND_ROWS the database may stop sorting at the LIMIT,
+			// and rows with equal sort values could then repeat or go missing across pages
+			. (trim((string) $orderby) !== '' && strpos($orderby, 'i.id') === false ? ', i.id' : '')
 			;
 		//echo "Adv search plugin main SQL query: ".nl2br($query)."<br/><br/>";
 
 		// NOTE: The plugin will return a PRECONFIGURED limited number of results, the SEARCH VIEW to do the pagination, splicing (appropriately) the data returned by all search plugins
 		try {
-			// Get items, we use direct query because some extensions break the SQL_CALC_FOUND_ROWS, so let's bypass them (at this point it is OK)
-			// *** Usage of FOUND_ROWS() will fail when (e.g.) Joom!Fish or Falang are installed, in this case we will be forced to re-execute the query ...
-			// PLUS, we don't need Joom!Fish or Falang layer at --this-- STEP which may slow down the query considerably in large sites
+			// Get items, we use direct query because we don't need Joom!Fish or Falang layer at --this-- STEP
+			// which may slow down the query considerably in large sites
 			$query_limited = $query . ' LIMIT '.$search_limit.' OFFSET 0';
 			$rows = flexicontent_db::directQuery($query_limited);
 			$item_ids = array();
 			foreach ($rows as $row) $item_ids[] = $row->id;
 
-			// Get current items total for pagination
-			$db->setQuery("SELECT FOUND_ROWS()");
-			$fc_searchview['view_total'] = $db->loadResult();
+			// Get current items total for pagination: every row of the list carries it
+			$fc_searchview['view_total'] = $rows ? $rows[0]->fc_list_total : 0;
 			$app->setUserState('fc_view_total_'.$view, $fc_searchview['view_total']);
 		}
 
 		catch (Exception $e) {
 			// Get items via normal joomla SQL layer
-			$db->setQuery(str_replace('SQL_CALC_FOUND_ROWS', '', $query), 0, $search_limit);
+			$db->setQuery($query, 0, $search_limit);
 			$item_ids = $db->loadColumn(0);
 		}
 
@@ -1047,8 +1051,8 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 		$text = preg_replace('/(\b[^\s,\.]+\b)/u', $search_prefix.'$0', $text_np);
 
 		// Split to words
-		$words_np = preg_split('/\s\s*/u', $text_np);
-		$words = preg_split('/\s\s*/u', $text);
+		$words_np = flexicontent_db::getBooleanSearchWords(preg_split('/\s\s*/u', $text_np), 'flexicontent_items_tmp', 'title');
+		$words = flexicontent_db::getBooleanSearchWords(preg_split('/\s\s*/u', $text), $si_tbl);
 
 		if (strlen($text))
 		{
@@ -1066,16 +1070,17 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 
 			/*
 			 * LIKE %word% search (needed by languages without spaces),
-			 * (1) Skip / Ignore this for languages with spaces,
+			 * (1) Skip / Ignore this for languages with spaces, unless the searched text itself is Chinese or Japanese
 			 * (2) Skip / Ignore this if current language supports splitting via dictionary
 			 */
-			if ($filter_word_like_any
-				&& in_array(flexicontent_html::getUserCurrentLang(), array('zh', 'jp', 'ja', 'th'))
-				&& ! FlexicontentFields::getLangHandler(\Joomla\CMS\Factory::getApplication()->getLanguage()->getTag(), $_hasHandlerOnly = true)
-			)
+			if (flexicontent_db::useLikeSearch($filter_word_like_any, $text_np))
 			{
-				$_index_match = ' LOWER ('.$ts.'.search_index) LIKE '.$db->Quote( '%'.$escaped_text.'%', false );
-				$_title_relev = ' LOWER (i.title) LIKE '.$db->Quote( '%'.$escaped_text.'%', false );
+				// The text without the search prefix, because it is also matched inside the words of the index
+				$_index_match = flexicontent_db::getLikeSearchCondition($ts . '.search_index', $text_np, $phrase, $search_prefix);
+				$_title_relev = flexicontent_db::getLikeSearchCondition('i.title', $text_np, $phrase);
+
+				// Needed by "Most relevant first: Yes". Without it the relevance column was empty: an SQL syntax error
+				$_index_relev = $_index_match;
 			}
 
 			/*

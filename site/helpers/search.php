@@ -110,25 +110,36 @@ class FLEXIadvsearchHelper
 
 		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
+		$insert = 'INSERT INTO #__flexicontent_search_log (search_term, hits) VALUES (' . $db->Quote($search_term) . ', 1)'
+			. ' ON DUPLICATE KEY UPDATE hits = hits + 1';
+
 		try
 		{
-			// Create table on first use, so that updated sites need no manual SQL
-			$db->setQuery(
-				'CREATE TABLE IF NOT EXISTS `#__flexicontent_search_log` ('
-				. ' `search_term` varchar(128) NOT NULL default \'\','
-				. ' `hits` int(11) unsigned NOT NULL default \'1\','
-				. ' PRIMARY KEY (`search_term`), KEY `hits` (`hits`)'
-				. ') ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`'
-			)->execute();
-
-			$db->setQuery(
-				'INSERT INTO #__flexicontent_search_log (search_term, hits) VALUES (' . $db->Quote($search_term) . ', 1)'
-				. ' ON DUPLICATE KEY UPDATE hits = hits + 1'
-			)->execute();
+			$db->setQuery($insert)->execute();
 		}
 		catch (\Exception $e)
 		{
-			// Never break search because of logging
+			// Most likely the table does not exist yet: create it on first use, so that updated sites need no manual SQL
+			try
+			{
+				$db->setQuery(
+					'CREATE TABLE IF NOT EXISTS `#__flexicontent_search_log` ('
+					. ' `search_term` varchar(128) NOT NULL default \'\','
+					. ' `hits` int(11) unsigned NOT NULL default \'1\','
+					. ' PRIMARY KEY (`search_term`), KEY `hits` (`hits`)'
+					. ') ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`'
+				)->execute();
+
+				// A new table must not come back as MyISAM on a site that was moved to InnoDB
+				require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/dbengine.php';
+				\FlexicontentDbEngine::followSiteEngine($db, '#__flexicontent_search_log');
+
+				$db->setQuery($insert)->execute();
+			}
+			catch (\Exception $e2)
+			{
+				// Never break search because of logging
+			}
 		}
 	}
 

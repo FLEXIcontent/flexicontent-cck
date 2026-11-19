@@ -385,10 +385,7 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 			');
 		}
 
-		$query = "SHOW VARIABLES LIKE '%ft_min_word_len%'";
-		$db->setQuery($query);
-		$_dbvariable = $db->loadObject();
-		$ft_min_word_len = (int) @ $_dbvariable->Value;
+		$ft_min_word_len = flexicontent_db::getMinWordLen();
 		$notice_ft_min_word_len	= $app->getUserStateFromRequest( $option.'.fields.notice_ft_min_word_len',	'notice_ft_min_word_len',	0, 'int' );
 		//if ( $cparams->get('show_usability_messages', 1) )     // Important usability messages
 		//{
@@ -409,7 +406,7 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 			if ($ft_min_word_len > 1 && $notice_ft_min_word_len < 10)
 			{
 				$app->setUserState( $option.'.fields.notice_ft_min_word_len', $notice_ft_min_word_len+1 );
-				$app->enqueueMessage("NOTE : Database limits minimum search word length (ft_min_word_len) to ".$ft_min_word_len, 'message');
+				$app->enqueueMessage("NOTE : Database limits minimum search word length (" . (flexicontent_db::getTableEngine() === 'innodb' ? 'innodb_ft_min_token_size' : 'ft_min_word_len') . ") to ".$ft_min_word_len, 'message');
 				$app->enqueueMessage('Please enable: "Searching small/common words":
 					<a class="btn" href="index.php?option=com_config&view=component&component=com_flexicontent&path=&"><span class="icon-options"></span>Configuration</a>
 					and then click to re-INDEX both search indexes', 'notice');

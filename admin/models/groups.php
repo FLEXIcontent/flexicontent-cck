@@ -184,7 +184,7 @@ class FlexicontentModelGroups extends FCModelAdminList
 
 		// Create a query with all its clauses: WHERE, HAVING and ORDER BY, etc
 		$query = $this->_db->getQuery(true)
-			->select('SQL_CALC_FOUND_ROWS a.*')
+			->select('a.*')
 			->select($editor_col_quoted . ' AS editor')
 			->from('#__' . $this->records_dbtbl . ' AS a')
 			->group('a.id');
