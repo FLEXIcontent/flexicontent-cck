@@ -1123,12 +1123,12 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 				case 'exact':
 					// Speed optimization ... 2-level searching: first require ALL words via FULLTEXT index, then require exact text via LIKE %phrase%
 					$newtext = '+' . implode(' +', $words);
-					$escaped_text = $db->escape($newtext, true);
+					$escaped_text = $db->escape($newtext);
 					$quoted_text  = $db->Quote($escaped_text, false);
 
 					// Relevance by title, try to match (EXACT) words, via OR ignoring stop words and short words ...
 					$newtext_np = implode(' ', $words_np);
-					$escaped_text_np = $db->escape($newtext_np, true);
+					$escaped_text_np = $db->escape($newtext_np);
 					$quoted_text_np  = $db->Quote($escaped_text_np, false);
 
 					$_index_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) AND '.$ts.'.search_index LIKE '.$exact_text;
@@ -1146,12 +1146,12 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 						? '+' . implode( ' +', $words ) . ''  // This is worked for Thai language.
 						: '+' . implode( '* +', $words ) . '*';  // This is not worked for Thai language.
 
-					$escaped_text = $db->escape($newtext, true);
+					$escaped_text = $db->escape($newtext);
 					$quoted_text  = $db->Quote($escaped_text, false);
 
 					// Relevance by title, try to match (PREFIXED) words, via OR ignoring stop words and short words ...
 					$newtext_np = implode( '* ', $words_np ) . '*';
-					$escaped_text_np = $db->escape($newtext_np, true);
+					$escaped_text_np = $db->escape($newtext_np);
 					$quoted_text_np  = $db->Quote($escaped_text_np, false);
 
 					if ($is_nospace_language)
@@ -1177,12 +1177,12 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 				case 'any':
 				default:
 					$newtext = implode( '* ', $words ) . '*';
-					$escaped_text = $db->escape($newtext, true);
+					$escaped_text = $db->escape($newtext);
 					$quoted_text  = $db->Quote($escaped_text, false);
 
 					// Relevance by title, try to match (PREFIXED) words, via OR ignoring stop words and short words ...
 					$newtext_np = implode( '* ', $words_np ) . '*';
-					$escaped_text_np = $db->escape($newtext_np, true);
+					$escaped_text_np = $db->escape($newtext_np);
 					$quoted_text_np  = $db->Quote($escaped_text_np, false);
 
 					$_index_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';

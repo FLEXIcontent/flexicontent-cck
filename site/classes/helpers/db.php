@@ -575,7 +575,7 @@ class flexicontent_db
 
 		foreach (array_values($words) as $n => $word)
 		{
-			$parts = preg_split('/[^\p{L}\p{N}\p{M}]+/u', (string) $word, -1, PREG_SPLIT_NO_EMPTY);
+			$parts = preg_split('/[^\p{L}\p{N}\p{M}_]+/u', (string) $word, -1, PREG_SPLIT_NO_EMPTY);
 
 			if ($parts === array((string) $word))
 			{
@@ -641,7 +641,7 @@ class flexicontent_db
 		$_words = array();
 		foreach ($words as $word)
 		{
-			$quoted_word = $db->escape($word, true);
+			$quoted_word = $db->escape($word);
 			$q = sprintf($query, $quoted_word);
 			$result = $db->setQuery($q)->loadAssocList();
 

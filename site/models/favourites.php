@@ -500,7 +500,7 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 					else
 					{
 						$newtext = '+' . implode( ' +', $words );
-						$quoted_text = $db->escape($newtext, true);
+						$quoted_text = $db->escape($newtext);
 						$quoted_text = $db->Quote( $quoted_text, false );
 						$exact_text  = $db->Quote( '%'. $escaped_text .'%', false );
 						$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) AND '.$ts.'.search_index LIKE '.$exact_text;
@@ -519,9 +519,9 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 					$jinput->set('shortwords', implode(' ', $shortwords));
 
 					$newtext = '+' . implode( '* +', $words ) . '*';
-					$quoted_text = $db->escape($newtext, true);
+					$quoted_text = $db->escape($newtext);
 					$quoted_text = $db->Quote( $quoted_text, false );
-					$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
+					$_text_match = empty($words) ? ' 0=1 ' : ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
 					break;
 
 				case 'any':
@@ -537,9 +537,9 @@ class FlexicontentModelFavourites extends \Joomla\CMS\MVC\Model\BaseDatabaseMode
 					$jinput->set('shortwords', implode(' ', $shortwords));
 
 					$newtext = implode( '* ', $words ) . '*';
-					$quoted_text = $db->escape($newtext, true);
+					$quoted_text = $db->escape($newtext);
 					$quoted_text = $db->Quote( $quoted_text, false );
-					$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
+					$_text_match = empty($words) ? ' 0=1 ' : ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
 					break;
 			}
 
