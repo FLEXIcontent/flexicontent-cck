@@ -1113,7 +1113,8 @@ class FlexicontentModelItems extends FCModelAdminList
 			$query =
 				'SELECT a.*, ie.item_id as item_id, ie.search_index AS search_index, ie.type_id, '. $lang .' cousr.name AS editor'
 				. ($filter_cats || $filter_catsinstate != 99 ?
-					', rel.catid as rel_catid' : ''
+					// One row per item: its main category when that is among the joined categories, else the lowest category id
+					', COALESCE(MAX(CASE WHEN rel.catid = a.catid THEN rel.catid END), MIN(rel.catid)) as rel_catid' : ''
 				)
 				. ', cr.rating_count AS rating_count' . $ratings_col
 				. ', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'

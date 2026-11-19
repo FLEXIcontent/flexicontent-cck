@@ -2679,7 +2679,13 @@ return $html;
 			. $select_rated
 			. ', mc.title AS maincat_title, mc.alias AS maincat_alias'   // Main category data
 			. ', CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug'
-			. ', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', '.$_cl.'.id, '.$_cl.'.alias) ELSE '.$_cl.'.id END as categoryslug'
+			// The category of the item link: the main category, or (category scope, when the option says not to link via the
+			// main category) one of the item's categories. The query has one row per item, so "one of" needs a definite
+			// choice: the category with the lowest id
+			. ($_cl === 'mc'
+				? ', CASE WHEN CHAR_LENGTH(mc.alias) THEN CONCAT_WS(\':\', mc.id, mc.alias) ELSE mc.id END as categoryslug'
+				: ', SUBSTRING(MIN(CONCAT(LPAD(c.id, 10, \'0\'), CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END)), 11) as categoryslug'
+			)
 			. ', GROUP_CONCAT(rel.catid SEPARATOR ",") as itemcats'
 			. ' FROM #__content AS i'
 			. ' JOIN #__flexicontent_items_ext AS ie on ie.item_id = i.id'

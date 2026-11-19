@@ -790,7 +790,17 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 
 		else
 		{
-			$query = 'SELECT i.*, ie.*, u.name as author, ty.name AS typename, ty.alias AS typealias, rel.catid as rel_catid,'
+			// One row per item, so an item that is in several categories needs a definite one here: the category that the
+			// list ordered it by (see below). That is its main category when the page lists it, else the lowest category id
+			$_page_cats = $this->_data_cats ? implode(',', array_map('intval', $this->_data_cats)) : '';
+			$_on_page   = $_page_cats !== '' ? ' AND rel.catid IN (' . $_page_cats . ')' : '';
+
+			$query = 'SELECT i.*, ie.*, u.name as author, ty.name AS typename, ty.alias AS typealias,'
+				. ' COALESCE('
+				. '  MAX(CASE WHEN rel.catid = i.catid' . $_on_page . ' THEN rel.catid END),'
+				. ($_page_cats !== '' ? '  MIN(CASE WHEN rel.catid IN (' . $_page_cats . ') THEN rel.catid END),' : '')
+				. '  MIN(rel.catid)'
+				. ' ) as rel_catid,'
 				. ' c.title AS maincat_title, c.alias AS maincat_alias,'  // Main category data
 				. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
 				. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
@@ -836,6 +846,24 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 			$id_orderby = $list_total && trim((string) $orderby) !== '' && strpos($orderby, 'i.id') === false
 				? ', i.id'
 				: '';
+
+			// The list is grouped by item: ordering by category and position (rel.catid, rel.ordering) then needs a definite row
+			// of an item that is in several of the listed categories. As for the author item limits above: the row of its
+			// main category when that category is listed, else the lowest category id
+			if ($list_total && strpos((string) $orderby, 'rel.') !== false)
+			{
+				$orderby = preg_replace('/\brel\.catid\b/',
+					'COALESCE(MAX(CASE WHEN rel.catid = i.catid THEN rel.catid END), MIN(rel.catid))',
+					$orderby
+				);
+
+				// The position inside that same category
+				$orderby = preg_replace('/\brel\.ordering\b/',
+					'COALESCE(MAX(CASE WHEN rel.catid = i.catid THEN rel.ordering END),'
+					. ' SUBSTRING_INDEX(GROUP_CONCAT(rel.ordering ORDER BY rel.catid), \',\', 1) + 0)',
+					$orderby
+				);
+			}
 
 			$query .= ""
 				. @ $orderby_join  // optional
