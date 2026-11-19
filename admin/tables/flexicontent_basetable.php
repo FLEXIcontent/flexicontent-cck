@@ -16,4 +16,23 @@ require_once('flexicontent_basetable_trait.php');
 class flexicontent_basetable extends \Joomla\CMS\Table\Table
 {
 	use flexicontent_basetable_trait;
+
+	/**
+	 * Store the record with the values that the database stores for it when strict mode is off (a text cut to the
+	 * length of its column, '' as 0 in a number column, a value for a required column that a new row leaves out),
+	 * so that the database accepts it with strict mode on too
+	 *
+	 * @param   boolean  $updateNulls  True to update fields even if they are null.
+	 *
+	 * @return  boolean  True on success.
+	 */
+	public function store($updateNulls = false)
+	{
+		if (class_exists('flexicontent_db'))
+		{
+			flexicontent_db::fitRecordToColumns($this, $this->getFields(), empty($this->{$this->_tbl_key}), $updateNulls);
+		}
+
+		return parent::store($updateNulls);
+	}
 }

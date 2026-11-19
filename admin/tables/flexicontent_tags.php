@@ -443,6 +443,9 @@ class flexicontent_tags extends flexicontent_basetable
 			}
 		}
 
+		// The values that the database stores when strict mode is off (a name cut to its column), so that it accepts the record in strict mode too
+		flexicontent_db::fitRecordToColumns($record, $this->_tbl_fields[$this->_tbl], !$this->$k, $updateNulls);
+
 		if ($this->$k)
 		{
 			$ret = $this->_db->updateObject($this->_tbl, $record, $k, $updateNulls);
@@ -459,6 +462,7 @@ class flexicontent_tags extends flexicontent_basetable
 		if ($ext_exists)
 		{
 			$record_ext->check();
+			flexicontent_db::fitRecordToColumns($record_ext, $record_ext->getFields());
 			$record_ext->store();
 		}
 

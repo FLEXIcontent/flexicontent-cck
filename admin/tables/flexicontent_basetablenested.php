@@ -16,4 +16,22 @@ require_once('flexicontent_basetable_trait.php');
 class flexicontent_basetablenested extends \Joomla\CMS\Table\Nested
 {
 	use flexicontent_basetable_trait;
+
+	/**
+	 * Store the record with its texts cut to the length of their columns, as the database does when strict mode is off,
+	 * so that it accepts the record with strict mode on too
+	 *
+	 * @param   boolean  $updateNulls  True to update fields even if they are null.
+	 *
+	 * @return  boolean  True on success.
+	 */
+	public function store($updateNulls = false)
+	{
+		if (class_exists('flexicontent_db'))
+		{
+			flexicontent_db::fitRecordToColumns($this, $this->getFields());
+		}
+
+		return parent::store($updateNulls);
+	}
 }
