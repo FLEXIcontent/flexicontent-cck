@@ -2316,6 +2316,9 @@ class plgFlexicontent_fieldsImage extends FCField
 				$obj->uploaded		= $date->toSql();
 				$obj->uploaded_by	= $user->get('id');
 
+				// A new row: its required columns (description, attribs) need a value, or strict mode refuses the INSERT
+				flexicontent_db::fitRecordToTable($obj, '#__flexicontent_files', true);
+
 				if ($format === 'json')
 				{
 					$log = \Joomla\CMS\Log\Log::getInstance();

@@ -81,6 +81,8 @@ namespace {
     }
     class flexicontent_html { public static function dataFilter($value, ...$args) { return $value; } }
     class flexicontent_upload { public static function getExt($path) { return pathinfo($path, PATHINFO_EXTENSION); } }
+    // The controller fits a new file record to its table's columns before the INSERT; there is no table here.
+    class flexicontent_db { public static function fitRecordToTable($record, $table, $isNew = false) {} }
     function jimport($name) {}
     function sourcePath($relative) {
         $installed = getenv('FLEXI_INSTALLED_ROOT');

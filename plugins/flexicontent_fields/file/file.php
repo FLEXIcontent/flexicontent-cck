@@ -1483,6 +1483,8 @@ class plgFlexicontent_fieldsFile extends FCField
 						$_fo->uploaded          = Factory::getDate('now')->toSql();
 						$_fo->uploaded_by       = $_user->get('id');
 
+						// A new row: its required columns (attribs) need a value, or strict mode refuses the INSERT
+						flexicontent_db::fitRecordToTable($_fo, '#__flexicontent_files', true);
 						$_db->insertObject('#__flexicontent_files', $_fo);
 						$v = (int) $_db->insertid();
 						$v = $v ?: ($use_ingroup ? null : false);
