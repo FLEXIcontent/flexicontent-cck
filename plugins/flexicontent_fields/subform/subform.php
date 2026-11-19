@@ -266,6 +266,14 @@ class plgFlexicontent_fieldsSubform extends FCField
 			return;
 		}
 		$jfield_html = $jfield->input;
+		if (FLEXI_J40GE && $multiple && !$use_ingroup)
+		{
+			$document->getWebAssetManager()->registerAndUseStyle(
+				'plg_flexicontent_fields_subform.row-controls',
+				'plugins/flexicontent_fields/subform/css/form.css',
+				['version' => 'auto']
+			);
+		}
 
 		$field->html[] = $pretext . '
 			' . $jfield_html . '
@@ -278,7 +286,7 @@ class plgFlexicontent_fieldsSubform extends FCField
 		// Handle single / multiple values (multiple values are handled by the subform field itself)
 		else
 		{
-			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">
+			$field->html = '<div class="fc-subform-field fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">
 				' . (isset($field->html[-1]) ? $field->html[-1] : '') . $field->html[0] . '
 			</div>';
 		}
