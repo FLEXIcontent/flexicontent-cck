@@ -1080,6 +1080,9 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 			{
 				$_index_match = ' LOWER ('.$ts.'.search_index) LIKE '.$db->Quote( '%'.$escaped_text.'%', false );
 				$_title_relev = ' LOWER (i.title) LIKE '.$db->Quote( '%'.$escaped_text.'%', false );
+
+				// Needed by "Most relevant first: Yes". Without it the relevance column was empty: an SQL syntax error
+				$_index_relev = $_index_match;
 			}
 
 			/*
