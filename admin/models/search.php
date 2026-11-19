@@ -343,6 +343,8 @@ class FLEXIcontentModelSearch extends FCModelAdminList
 		$filter_order_Dir = $this->getState('filter_order_Dir');
 
 		$orderby = $filter_order.' '.$filter_order_Dir;
+		// Several index entries can share an item's title. Keep tied rows on the same page.
+		$orderby .= $this->getState('filter_indextype') === 'advanced' ? ', ai.sid' : ', ext.item_id';
 		$orderby = ' ORDER BY '.$orderby;
 
 		return $orderby;
