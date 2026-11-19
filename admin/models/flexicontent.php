@@ -1174,7 +1174,9 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 
 			if (count($_update_clauses))
 			{
-				$update_queries[$tblname] = 'UPDATE #__' . $tblname . ' SET ' . implode(' , ', $_update_clauses);
+				// IGNORE, as the same statement has after an item is saved: the clauses cast a text value to a number or a date,
+				// and without it strict mode refuses the whole UPDATE at the first value that is not a number
+				$update_queries[$tblname] = 'UPDATE IGNORE #__' . $tblname . ' SET ' . implode(' , ', $_update_clauses);
 			}
 		}
 
