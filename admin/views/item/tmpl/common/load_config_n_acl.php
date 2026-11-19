@@ -204,74 +204,18 @@ if ($tags_editable)
 // Version history uses its own pager and comment tools.
 if (!$isSite && $this->perms['canversion'])
 {
-	$this->document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/jquery.pager.js', array('version' => FLEXI_VHASH));
-	$this->document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/jquery.autogrow.js', array('version' => FLEXI_VHASH));
-	$this->document->addScriptDeclaration("
-		PageClick = function(pageclickednumber) {
-			jQuery.ajax({ url: '".\Joomla\CMS\Uri\Uri::base(true)."/index.php?option=com_flexicontent&".$task_items."getversionlist&id=".$this->row->id."&active=".$this->row->version."&". \Joomla\CMS\Session\Session::getFormToken() ."=1&format=raw&page='+pageclickednumber, context: jQuery('#version_tbl'), success: function(str){
-				jQuery(this).html(\"\\
-				<table class='fc-table-list fc-tbl-short' style='margin:10px;'>\\
-				\"+str+\"\\
-				</table>\\
-				\");
-				jQuery('#version_tbl').find('.hasTooltip').tooltip({html: true, container: jQuery('#version_tbl')});
-				jQuery('#version_tbl').find('.hasPopover').popover({html: true, container: jQuery('#version_tbl'), trigger : 'hover focus'});
-
-				// Attach click event to version compare links of the newly created page
-				jQuery(this).find('a.modal-versions').each(function(index, value) {
-					jQuery(this).on('click', function() {
-						// Load given URL in an popup dialog
-						var url = jQuery(this).attr('href');
-						fc_showDialog(url, 'fc_modal_popup_container');
-						return false;
-					});
-				});
-			}});
-
-			// Reattach pagination inside the newly created page
-			jQuery('#fc_pager').pager({ pagenumber: pageclickednumber, pagecount: ".$this->pagecount.", buttonClickCallback: PageClick });
-		}
-
-		jQuery(document).ready(function()
-		{
-			// For the initially displayed versions page:  Add onclick event that opens compare in popup
-			jQuery('a.modal-versions').each(function(index, value) {
-				jQuery(this).on('click', function() {
-					// Load given URL in an popup dialog
-					var url = jQuery(this).attr('href');
-					fc_showDialog(url, 'fc_modal_popup_container');
-					return false;
-				});
-			});
-
-			// Attach pagination for versions listing
-			jQuery('#fc_pager').pager({
-				pagenumber: " . $this->current_page . ",
-				pagecount: " . $this->pagecount . ",
-				buttonClickCallback: PageClick
-			});
-
-			// Attach textarea autogrow height (while typing)
-			jQuery('#versioncomment').autogrow({
-				minHeight: 32,
-				maxHeight: 250,
-				lineHeight: 16
-			});
-		});
-	");
+	$this->document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/assets/js/item-history.js', array('version' => FLEXI_VHASH));
+	$historyUrl = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&'
+		. $task_items . 'getversionlist&id=' . $this->row->id . '&active=' . $this->row->version
+		. '&' . \Joomla\CMS\Session\Session::getFormToken() . '=1&format=raw';
+	$this->document->addScriptDeclaration('FlexiForm.ready(() => fc_initItemHistory('
+		. json_encode($historyUrl, JSON_HEX_TAG | JSON_HEX_AMP) . ', ' . (int) $this->current_page . ', ' . (int) $this->pagecount . '));');
 }
 
 
 // ITEM SCREEN
 $this->document->addScriptDeclaration
 ("
-	jQuery(document).ready(function(){
-		var hits = new itemscreen('hits', {id:".($this->row->id ? $this->row->id : 0).", task:'".$ctrl_items."gethits', sess_token:'" . \Joomla\CMS\Session\Session::getFormToken() . "'});
-		//hits.fetchscreen();
-		var votes = new itemscreen('votes', {id:".($this->row->id ? $this->row->id : 0).", task:'".$ctrl_items."getvotes', sess_token:'" . \Joomla\CMS\Session\Session::getFormToken() . "'});
-		//votes.fetchscreen();
-	});
-
 	function reseter(task, id, div)
 	{
 		var res = new itemscreen();
@@ -294,13 +238,14 @@ $this->document->addScriptDeclaration
 if ($permsplacement && $this->perms['canright'] && $permsplacement === 2)
 {
 	$this->document->addScriptDeclaration("
-		jQuery(document).ready(function()
+		FlexiForm.ready(function()
 		{
-			jQuery('fieldset.flexiaccess legend + div#tabacces').hide();
-			jQuery('fieldset.flexiaccess legend').on('click', function(ev)
-			{
-				var panel = jQuery(this).next();
-				panel.is(':visible') ? panel.slideUp(600) : panel.slideDown(600);
+			document.querySelectorAll('fieldset.flexiaccess legend + #tabacces').forEach(panel => FlexiForm.show(panel, false));
+			document.querySelectorAll('fieldset.flexiaccess legend').forEach(legend => {
+				legend.addEventListener('click', () => {
+					const panel = legend.nextElementSibling;
+					FlexiForm.show(panel, !FlexiForm.visible(panel));
+				});
 			});
 		});
 	");

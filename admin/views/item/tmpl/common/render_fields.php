@@ -1670,13 +1670,9 @@ ob_start();
 if ($this->fields && $typeid) :
 
 	$this->document->addScriptDeclaration("
-		jQuery(document).ready(function(){
-			jQuery('#jform_type_id').change(function() {
-				if (jQuery('#jform_type_id').val() != '".$typeid."')
-					jQuery('#fc-change-warning').css('display', 'block');
-				else
-					jQuery('#fc-change-warning').css('display', 'none');
-			});
+		FlexiForm.ready(function(){
+			const type = document.getElementById('jform_type_id');
+			type?.addEventListener('change', () => FlexiForm.show(document.getElementById('fc-change-warning'), type.value !== '".$typeid."'));
 		});
 	");
 	?>

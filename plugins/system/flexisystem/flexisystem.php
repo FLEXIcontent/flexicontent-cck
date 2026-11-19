@@ -338,10 +338,10 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 
 
 			$js .= "
-				jQuery(document).ready(function() {
+				document.addEventListener('DOMContentLoaded', function() {
 					Joomla.fc_max_input_vars = " . $max_input_vars . ";
 					" . ((JDEBUG || $fcdebug) ? 'Joomla.fc_debug = 1;' : '') . "
-					jQuery(document.forms['adminForm']).attr('data-fc_doserialized_submit', '1');
+					document.forms['adminForm']?.setAttribute('data-fc_doserialized_submit', '1');
 					" . /*(($option=='com_flexicontent' && $view='category') ? "jQuery(document.forms['adminForm']).attr('data-fc_force_apply_ajax', '1');" : "") .*/ "
 				});
 			";

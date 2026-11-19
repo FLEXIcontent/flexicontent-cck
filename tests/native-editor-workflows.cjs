@@ -910,6 +910,25 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
     assert.deepEqual(testData, ['establishment']);
   });
 
+  await test('Item history loads the next page and opens compare without jQuery', async page => {
+    await form(page, '<table id="version_tbl"><tbody><tr><td>Earlier version</td></tr></tbody></table>' +
+      '<div id="fc_pager"></div><textarea id="versioncomment"></textarea>');
+    await page.route('https://fixture.invalid/versions?**', route => {
+      assert.equal(new URL(route.request().url()).searchParams.get('page'), '2');
+      return route.fulfill({contentType:'text/html', body:
+        '<tbody><tr><td><a class="modal-versions" href="/compare">Compare version 2</a></td></tr></tbody>'});
+    });
+    await page.addScriptTag({content:source('site/assets/js/item-history.js')});
+    await page.evaluate(() => {
+      window.fc_initTooltips = () => {};
+      window.fc_showDialog = url => { window.comparison = url; };
+      fc_initItemHistory('/versions', 1, 3);
+    });
+    await page.getByRole('button', {name:'2', exact:true}).click();
+    await page.waitForFunction(() => document.querySelector('#fc_pager [aria-current=page]')?.textContent === '2');
+    await page.getByRole('link', {name:'Compare version 2'}).click();
+    assert.equal(await page.evaluate(() => window.comparison), 'https://fixture.invalid/compare');
+  });
   await browser.close();
   console.log(JSON.stringify(results, null, 2));
   if (results.some(result => result.status !== 'pass')) process.exitCode = 1;

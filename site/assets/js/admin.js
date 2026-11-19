@@ -67,9 +67,10 @@ function fc_submit_form(form, task) {
       }
       form.dispatchEvent(new CustomEvent('flexicontent:save-failed', {bubbles: true}));
     };
-    form.dispatchEvent(new CustomEvent('flexicontent:save-start', {bubbles: true}));
     const url = new URL(form.action, document.baseURI), method = (form.method || 'post').toUpperCase();
+    const data = body.toString();
     if (method === 'GET') body.forEach((value, key) => url.searchParams.append(key, value));
+    form.dispatchEvent(new CustomEvent('flexicontent:save-start', {bubbles: true, detail:{url:url.href, data}}));
     const receive = html => {
       cleanup();
       const box = document.getElementById('system-message-container');
@@ -81,7 +82,7 @@ function fc_submit_form(form, task) {
       box.replaceChildren(template.content);
       if (box.querySelector('.alert-success, .alert-message, joomla-alert[type=success], joomla-alert[type=message]')
         && !box.querySelector('.alert-danger, .alert-error, joomla-alert[type=danger], joomla-alert[type=error]')) {
-        form.dispatchEvent(new CustomEvent('flexicontent:save-confirmed'));
+        form.dispatchEvent(new CustomEvent('flexicontent:save-confirmed', {detail:{status:200, responseText:html}}));
       }
     };
     // Restore the form and messages BEFORE legacy global ajaxSuccess/ajaxError
