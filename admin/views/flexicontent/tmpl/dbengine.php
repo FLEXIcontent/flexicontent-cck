@@ -53,15 +53,17 @@ $task_url = 'index.php?option=com_flexicontent&task=flexicontent.convertdbengine
 				<th><?php echo Text::_('FLEXI_DBENGINE_ROWS'); ?></th>
 				<th><?php echo Text::_('FLEXI_DBENGINE_SIZE'); ?></th>
 				<th><?php echo Text::_('FLEXI_DBENGINE_TIME'); ?></th>
+				<th><?php echo Text::_('FLEXI_STATE'); ?></th>
 			</tr>
 		</thead>
-		<tbody>
+		<tbody id="fc-dbengine-tables">
 		<?php foreach ($pending as $table) : ?>
-			<tr>
+			<tr data-table="<?php echo $esc($table->name); ?>">
 				<td><?php echo $esc($table->name); ?></td>
-				<td style="text-align: right;"><?php echo (int) $table->rows; ?></td>
-				<td style="text-align: right;"><?php echo $esc(FlexicontentDbEngine::formatBytes($table->bytes)); ?></td>
-				<td style="text-align: right;"><?php echo $esc(FlexicontentDbEngine::formatSeconds($table->seconds)); ?></td>
+				<td style="text-align: right; white-space: nowrap;"><?php echo (int) $table->rows; ?></td>
+				<td style="text-align: right; white-space: nowrap;"><?php echo $esc(FlexicontentDbEngine::formatBytes($table->bytes)); ?></td>
+				<td style="text-align: right; white-space: nowrap;"><?php echo $esc(FlexicontentDbEngine::formatSeconds($table->seconds)); ?></td>
+				<td class="fc-dbengine-state"></td>
 			</tr>
 		<?php endforeach; ?>
 		</tbody>
@@ -97,25 +99,70 @@ $task_url = 'index.php?option=com_flexicontent&task=flexicontent.convertdbengine
 		var box = document.getElementById('fc-dbengine-backup');
 		var btn = document.getElementById('fc-dbengine-start');
 		var log = document.getElementById('fc-dbengine-log');
+		var rows = document.getElementById('fc-dbengine-tables');
 		if (!box || !btn) return;
 
 		box.addEventListener('change', function() { btn.disabled = !box.checked; });
 
+		// The state cell of the table that the next request converts: the first one without a result (same order as the task)
+		var nextCell = function()
+		{
+			var cells = rows.querySelectorAll('td.fc-dbengine-state');
+			for (var i = 0; i < cells.length; i++) if (!cells[i].hasChildNodes()) return cells[i];
+			return null;
+		};
+
+		// Show the reply: a result goes into the row of its table, anything else below the list
+		var show = function(html)
+		{
+			var reply = document.createElement('div');
+			reply.innerHTML = html;
+
+			while (reply.firstChild)
+			{
+				var node = reply.firstChild, name = node.nodeType === 1 ? node.getAttribute('data-table') : null, cell = null;
+
+				for (var tr = name === null ? null : rows.firstElementChild; tr; tr = tr.nextElementSibling)
+				{
+					if (tr.getAttribute('data-table') === name) cell = tr.querySelector('td.fc-dbengine-state');
+				}
+
+				if (cell)
+				{
+					cell.innerHTML = node.innerHTML;
+					reply.removeChild(node);
+				}
+				else log.appendChild(node);
+			}
+		};
+
 		// One request converts and verifies one table. Repeat until the reply no longer asks for more
 		var convert = function()
 		{
+			var cell = nextCell();
+			if (cell)
+			{
+				cell.innerHTML = '<span class="spinner-border spinner-border-sm" aria-hidden="true"></span> &hellip;';
+				cell.parentNode.scrollIntoView({block: 'nearest'});
+			}
+
+			// A reply without a result for this table (a refusal, an error, a cut off request) leaves its row open
+			var done = function() { if (cell && cell.querySelector('.spinner-border')) cell.innerHTML = ''; };
+
 			var xhr = new XMLHttpRequest();
 			xhr.open('GET', <?php echo json_encode($task_url); ?>);
 			xhr.onload = function()
 			{
 				var more = xhr.status === 200 && xhr.responseText.indexOf('fc-dbengine-more') !== -1;
-				log.insertAdjacentHTML('beforeend', xhr.status === 200 ? xhr.responseText : '<div><span class="install-notok"></span>HTTP ' + xhr.status + '</div>');
+				show(xhr.status === 200 ? xhr.responseText : '<div><span class="install-notok"></span>HTTP ' + xhr.status + '</div>');
+				done();
 				if (more) convert();
 				else log.insertAdjacentHTML('beforeend', '<div><a class="btn" href="index.php?option=com_flexicontent&view=flexicontent&layout=dbengine"><?php echo Text::_('FLEXI_DBENGINE_RELOAD', true); ?></a></div>');
 			};
 			xhr.onerror = xhr.ontimeout = function()
 			{
 				// The database server finishes the table it is converting even when the request is cut off
+				done();
 				log.insertAdjacentHTML('beforeend', '<div><?php echo Text::_('FLEXI_DBENGINE_TIMEOUT', true); ?> <a class="btn" href="index.php?option=com_flexicontent&view=flexicontent&layout=dbengine"><?php echo Text::_('FLEXI_DBENGINE_RELOAD', true); ?></a></div>');
 			};
 			xhr.send();

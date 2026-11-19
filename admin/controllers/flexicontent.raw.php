@@ -969,7 +969,8 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 	 * Optional task: move one FLEXIcontent DB table to InnoDB and verify it
 	 *
 	 * One table per request, so that the task can be continued after a timeout. The page repeats the request
-	 * while the reply contains the "fc-dbengine-more" marker
+	 * while the reply contains the "fc-dbengine-more" marker, and shows a reply that names its table
+	 * (data-table) in the row of that table
 	 *
 	 * @return	void
 	 */
@@ -1012,8 +1013,10 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 			jexit('<div><span class="install-ok"></span>' . \Joomla\CMS\Language\Text::_('FLEXI_DBENGINE_ALL_DONE') . '</div>');
 		}
 
-		echo '<div>' . ($result[1] ? '<span class="install-ok"></span>' : $notok)
-			. htmlspecialchars(($result[0] !== '' ? $result[0] . ': ' : '') . $result[2], ENT_QUOTES, 'UTF-8') . '</div>';
+		// The page shows the result in the row of this table, the table name is therefore sent apart from the text
+		echo '<div' . ($result[0] !== '' ? ' data-table="' . htmlspecialchars($result[0], ENT_QUOTES, 'UTF-8') . '"' : '') . '>'
+			. ($result[1] ? '<span class="install-ok"></span>' : $notok)
+			. htmlspecialchars($result[2], ENT_QUOTES, 'UTF-8') . '</div>';
 
 		if ($result[1])
 		{
