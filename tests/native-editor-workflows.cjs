@@ -36,6 +36,148 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
     await page.addScriptTag({content: source('site/assets/js/validate.js')});
     await page.waitForFunction(() => !!document.formvalidator);
   };
+  const loadDependencies = page => page.addScriptTag({content: source('site/assets/js/flexi-lib.js')});
+  await test('Administrator dependencies initialize, refresh and rebind without jQuery', async page => {
+    await form(page, `
+      <select id="mode" class="fcform_toggler_element">
+        <option value="simple" data-hide_list="configuration" data-setoff_list="#shortcut">Simple</option>
+        <option value="advanced" data-show_list="configuration" data-seton_list="#shortcut"
+          data-fcconfigs="{'preset':'two', 'flags':'b, c', 'note':'Example'}"
+          data-fcreadonly="{'note':1}" data-refsh_list="#jform_params_preset">Advanced</option>
+      </select>
+      <div class="control-group" id="config-row"><label>Configuration</label><select id="jform_params_preset" class="fcform_toggler_element">
+        <option value="one" data-hide_list="extra">One</option>
+        <option value="two" data-show_list="extra">Two</option>
+      </select><span class="configuration"></span></div>
+      <div class="extra fc_toggle_current" id="extra">Extra</div>
+      <div id="shortcut">Shortcut</div>
+      <select id="jform_params_flags" multiple><option value="a">A</option><option value="b">B</option><option value="c">C</option></select>
+      <input id="jform_note">
+      <div class="fcform_toggler_element">
+        <input id="off" type="radio" name="force" checked>
+        <input id="on" type="radio" name="force" data-force_list="configuration">
+      </div>`);
+    await loadDependencies(page);
+    await page.evaluate(() => {
+      const form = document.forms[0];
+      FlexiForm.data(form, 'skip_validation', 'previous');
+      fc_bindFormDependencies(form, 2, '.control-group');
+      fc_bindFormDependencies(form, 2, '.control-group');
+    });
+    await page.locator('#config-row').waitFor({state: 'hidden'});
+    await page.locator('#extra').waitFor({state: 'hidden'});
+    await page.locator('#shortcut').waitFor({state: 'hidden'});
+    assert.equal(await page.evaluate(() => FlexiForm.data(document.forms[0], 'skip_validation')), 'previous');
+    await page.selectOption('#mode', 'advanced');
+    await page.locator('#config-row').waitFor({state: 'visible'});
+    await page.locator('#shortcut').waitFor({state: 'visible'});
+    await page.locator('#extra').waitFor({state: 'visible'});
+    assert.equal(await page.locator('#jform_params_preset').inputValue(), 'two');
+    assert.deepEqual(await page.locator('#jform_params_flags').evaluate(el => [...el.selectedOptions].map(option => option.value)), ['b', 'c']);
+    assert.equal(await page.locator('#jform_note').inputValue(), 'Example');
+    assert.equal(await page.locator('#jform_note').evaluate(el => el.readOnly), true);
+    await page.selectOption('#mode', 'simple');
+    await page.locator('#config-row').waitFor({state: 'hidden'});
+    await page.check('#on');
+    await page.locator('#config-row').waitFor({state: 'visible'});
+  });
+  if (process.env.FLEXI_TEST_JQUERY) await test('Conditional settings accept native and legacy synthetic change events exactly once', async page => {
+    await form(page, `
+      <select id="mode" class="fcform_toggler_element">
+        <option value="show" data-show_list="detail" data-fcconfigs="{'description':'Visible'}">Show</option>
+        <option value="hide" data-hide_list="detail" data-fcconfigs="{'description':'Hidden'}">Hide</option>
+      </select>
+      <div class="detail">Detail</div><input id="jform_description">`);
+    await loadDependencies(page);
+    await page.evaluate(() => {
+      window.updates = 0;
+      document.querySelector('#jform_description').addEventListener('blur', () => updates++);
+      fc_bindFormDependencies('#adminForm', 0, '');
+      fc_bindFormDependencies('#adminForm', 0, '');
+      updates = 0;
+    });
+    await page.evaluate(() => jQuery('#mode').val('hide').trigger('change'));
+    await page.locator('.detail').waitFor({state: 'hidden'});
+    assert.equal(await page.evaluate(() => updates), 1);
+    await page.selectOption('#mode', 'show');
+    await page.locator('.detail').waitFor({state: 'visible'});
+    assert.equal(await page.evaluate(() => updates), 2);
+  }, true);
+  await test('Text repeaters add, reorder, enforce limits, and keep an empty last row without jQuery', async page => {
+    await form(page, `
+      <ul id="sortables_42"><li class="fcfieldval_container" style="height:70px">
+        <span class="fcfield-drag-handle" style="display:inline-block;width:55px">Move</span>
+        <label for="custom_text_0" data-for="custom_text_0">Text</label>
+        <input class="fcfield_textval required" id="custom_text_0" name="custom[text][0]" value="First">
+        <button type="button" class="remove" onclick="textRows.remove(this)">Remove</button>
+      </li></ul><button type="button" id="add" onclick="textRows.add(this, null, {scroll_visible: false})">Add</button>`);
+    await validate(page);
+    await loadDependencies(page);
+    await page.addScriptTag({content: source('site/librairies/choicesjs/sortable.min.js')});
+    await page.addScriptTag({content: source('plugins/flexicontent_fields/text/js/form.js')});
+    await page.evaluate(() => {
+      window.textRows = fcfield_text.repeater({fieldId: 42, initialCount: 1, id: 'custom_text', name: 'custom[text]', defaultValue: '', max: 2});
+      fcfield_text.attachOrdering(42);
+    });
+    await page.click('#add');
+    assert.equal(await page.inputValue('#custom_text_1'), '');
+    assert.equal(await page.locator('label[for="custom_text_1"]').getAttribute('data-for'), 'custom_text_1');
+    assert.equal(await page.evaluate(() => document.formvalidator.isValid(document.forms[0])), false);
+    await page.fill('#custom_text_1', 'Second');
+    const handles = page.locator('.fcfield-drag-handle');
+    const start = await handles.first().boundingBox(), end = await handles.last().boundingBox();
+    await page.mouse.move(start.x + 12, start.y + 8);
+    await page.mouse.down();
+    await page.mouse.move(end.x + 12, end.y + 45, {steps: 15});
+    await page.mouse.up();
+    assert.deepEqual(await page.evaluate(() => [...new FormData(document.forms[0])].filter(([name]) => name.startsWith('custom')).map(([, value]) => value)), ['Second', 'First']);
+    const dialog = page.waitForEvent('dialog');
+    const extraClick = page.click('#add');
+    await (await dialog).accept();
+    await extraClick;
+    assert.equal(await handles.count(), 2);
+    await page.locator('.remove').first().click();
+    await page.locator('.remove').first().click();
+    assert.equal(await handles.count(), 1);
+    assert.equal(await page.inputValue('#custom_text_2'), '');
+  });
+  await test('Cloning Text Select preserves the original Choices widget and initializes the clone without jQuery', async page => {
+    await form(page, `
+      <ul id="sortables_43"><li class="fcfieldval_container">
+        <input class="fcfield_textval" id="custom_text_0" name="custom[text][0]" value="Original">
+        <select name="sample[]" class="use_select2_lib fcfield_textselval" onchange="fcfield_text.selectValue(this)">
+          <option value="">Choose</option><option value="sample">A sample</option>
+        </select>
+      </li></ul><button type="button" id="add">Add</button>`);
+    await validate(page);
+    await loadDependencies(page);
+    await page.addScriptTag({content: source('site/librairies/choicesjs/choices.min.js')});
+    await page.addStyleTag({content: source('site/librairies/choicesjs/choices.min.css')});
+    await page.addScriptTag({content: source('plugins/flexicontent_fields/text/js/form.js')});
+    await page.evaluate(() => {
+      window.Joomla.JText = Joomla.Text;
+      window.fc_use_choicesjs = true;
+      fc_attachSelect2('#sortables_43');
+      window.originalChoice = document.querySelector('select').fc_choices_instance;
+      window.textSelectRows = fcfield_text.repeater({fieldId: 43, initialCount: 1, id: 'custom_text', name: 'custom[text]', defaultValue: '', max: 2});
+      document.getElementById('add').addEventListener('click', event => textSelectRows.add(event.target, null, {scroll_visible: false}));
+    });
+    await page.click('#add');
+    assert.equal(await page.locator('div.choices').count(), 2);
+    assert.deepEqual(await page.evaluate(() => {
+      const [first, second] = document.querySelectorAll('select');
+      return [first.fc_choices_instance === originalChoice, second.fc_choices_instance.passedElement.element === second];
+    }), [true, true]);
+    await page.locator('div.choices').last().click();
+    await page.locator('div.choices').last().locator('[data-choice][data-value="sample"]').click();
+    assert.equal(await page.inputValue('#custom_text_1'), 'sample');
+    assert.equal(await page.inputValue('#custom_text_0'), 'Original');
+    assert.deepEqual(await page.evaluate(() => {
+      const clone = document.getElementById('custom_text_1_select');
+      textSelectRows.remove(null, clone.closest('li'));
+      return [clone.isConnected, !!clone.fc_choices_instance, document.querySelector('select').fc_choices_instance === originalChoice];
+    }), [false, false, true]);
+  });
   await test('Required, optional, disabled and dynamically added controls', async page => {
     await form(page, '<label for="title">Title</label><input id="title" name="title" class="required"><input name="optional" class="validate-email"><fieldset disabled><input class="required" name="inactive"></fieldset>');
     await validate(page);

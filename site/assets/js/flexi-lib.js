@@ -1,7 +1,6 @@
 ﻿
-	window.fc_init_hide_dependent = 1;
+	window.fc_init_hide_dependent = 0;
 	window.fc_refreshing_dependent = 0;
-	window.fc_dependent_params = {};
 	window.fc_cascade_field_funcs = {};
 	window.fc_Dialogs = {};
 
@@ -227,340 +226,204 @@
 
 
 	// Scroll into view
-	function fc_scrollIntoView (elem, smooth)
+	function fc_scrollIntoView(elem, smooth)
 	{
-		var cTop = elem.offset().top;
-		var cHeight = elem.outerHeight(true);
-		var windowTop = jQuery(window).scrollTop();
-		var visibleHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
-		var top_extra = 90;
-		var bottom_extra = 80;
-
-		//window.console.log ('cTop: ' + cTop + ' , windowTop: ' + windowTop);
-		//window.console.log ('cHeight: ' + cHeight + ' , visibleHeight: ' + visibleHeight);
-		if (cTop - top_extra < windowTop) {
-			if (smooth) {
-				jQuery('html, body').animate({scrollTop: cTop - top_extra}, 400);
-			} else {
-				jQuery('html, body').scrollTop(cTop - top_extra);
-			}
-		} else if (cTop + cHeight + bottom_extra > windowTop + visibleHeight) {
-			if (smooth) {
-				jQuery('html, body').animate({scrollTop: cTop - visibleHeight + cHeight + bottom_extra}, 400);
-			} else {
-				jQuery('html, body').scrollTop(cTop - visibleHeight + cHeight + bottom_extra);
-			}
-		}
+		const target = FlexiForm.element(elem);
+		if (!target) return;
+		const rect = target.getBoundingClientRect();
+		const bottom = rect.bottom + (parseFloat(getComputedStyle(target).marginBottom) || 0);
+		const offset = rect.top < 90 ? rect.top - 90
+			: bottom > window.innerHeight - 80 ? bottom - window.innerHeight + 80 : 0;
+		if (offset) window.scrollBy({ top: offset, behavior: smooth ? 'smooth' : 'instant' });
 	}
 
 
-	function fc_findFormDependencies(el, toggleParent, toggleParentSelector, field)
+	const fcDependencyBindings = new WeakMap();
+	const fcDependencyTogglers = 'select.fcform_toggler_element, .fcform_toggler_element input[type="radio"]';
+	let fcDependencyUpdates = null;
+
+	function fc_findFormDependencies(option, toggleParent, toggleParentSelector, field)
 	{
-		var seton_list = el.data('_seton_list');   // (selector comma list) show elements by selector
-		var setoff_list= el.data('_setoff_list');  // (selector comma list) hide elements by selector
-		var refsh_list = el.data('_refsh_list');   // (selector comma list) trigger change on elements
+		option = FlexiForm.element(option);
+		field = FlexiForm.element(field);
+		if (!option || !field) return [];
 
-		var show_list  = el.data('_show_list');    // (classnames comma list) grant  display dependency to elements (container shown  when dependencies are zero)
-		var hide_list  = el.data('_hide_list');    // (classnames comma list) revoke display dependency to elements (container hidden when dependencies non-zero)
-		var force_list = el.data('_force_list');   // (classnames comma list) show regardless of display dependencies (this is non-persistent -and- element's dependencies are not cleared)
-
-		var fcreadonly = el.data('_fcreadonly');   // (JSON format, element name : value) set readonly property of elements, 1:ON , 2:OFF
-		var fcconfigs  = el.data('_fcconfigs');    // (JSON format, element name : value) set value of elements
-
-		var _d;
-		if (!seton_list) {
-			seton_list = {};
-			seton_list[0] = el.attr('data-seton_list')  ? el.attr('data-seton_list')  : null;
-			el.data('_seton_list', seton_list);
-		}
-		if (!setoff_list) {
-			setoff_list = {};
-			setoff_list[0] = el.attr('data-setoff_list')  ? el.attr('data-setoff_list')  : null;
-			el.data('_setoff_list', setoff_list);
-		}
-		if (!refsh_list) {
-			refsh_list = {};
-			refsh_list[0] = el.attr('data-refsh_list')  ? el.attr('data-refsh_list')  : null;
-			el.data('_refsh_list', refsh_list);
-		}
-
-		if (!fcreadonly) {
-			var fcreadonly = el.attr('data-fcreadonly');
-			if (fcreadonly) {
-				fcreadonly = fcreadonly.replace(/\'/g, '"');
-				fcreadonly = jQuery.parseJSON(fcreadonly);
-			}
-			el.data('_fcconfigs', fcconfigs);
-		}
-		if (!fcconfigs) {
-			var fcconfigs = el.attr('data-fcconfigs');
-			if (fcconfigs) {
-				fcconfigs = fcconfigs.replace(/\'/g, '"');
-				fcconfigs = jQuery.parseJSON(fcconfigs);
-			}
-			el.data('_fcconfigs', fcconfigs);
-		}
-
-		if (!show_list) {
-			show_list = {};
-			_d  = el.attr('data-show_list')  ? el.attr('data-show_list').split(',')  : Array();
-			for (var i = 0; i<_d.length; i++) show_list[_d[i].trim()] = 1;
-			el.data('_show_list', show_list);
-		}
-		if (!hide_list) {
-			hide_list = {};
-			_d = el.attr('data-hide_list')  ? el.attr('data-hide_list').split(',')  : Array();
-			for (var i = 0; i<_d.length; i++) hide_list[_d[i].trim()] = 1;
-			el.data('_hide_list', hide_list);
-		}
-		if (!force_list) {
-			force_list = {};
-			_d = el.attr('data-force_list') ? el.attr('data-force_list').split(',') : Array();
-			for (var i = 0; i<_d.length; i++) force_list[_d[i].trim()] = 1;
-			el.data('_force_list', force_list);
-		}
-
-		var toBeUpdated = Array();
-		var u = 0;
-		jQuery.each( force_list, function( cname, val ) {
-			if (!fc_dependent_params.hasOwnProperty(cname))  fc_dependent_params[cname] = Array();
-			fc_dependent_params[cname][fc_dependent_params[cname].length] = el;
-
-			if (val) {
-				jQuery('.'+cname).each(function( index ) {
-					var c = jQuery(this);
-					c.attr('data-fc_forced_display', '1');
-					toBeUpdated[u++] = c;
-				});
-			}
-		});
-		jQuery.each( hide_list, function( cname, val ) {
-			if (!fc_dependent_params.hasOwnProperty(cname))  fc_dependent_params[cname] = Array();
-			fc_dependent_params[cname][fc_dependent_params[cname].length] = el;
-
-			if (val) {
-				jQuery('.'+cname).each(function( index ) {
-					var c = jQuery(this);
-					var dlist = c.data('fc_depend_list');
-					if (!dlist) dlist = {};
-					if (dlist.hasOwnProperty(cname)) dlist[cname]++; else dlist[cname]= 1;
-					c.data('fc_depend_list', dlist);
-					if (c.attr('data-fc_forced_display')!='1') {
-						toBeUpdated[u++] = c;
-					}
-				});
-			}
-		});
-
-		// Display fields / enable input on them ( removeAttr + css ),  force them to update display ( trigger:click ), and to validate new value ( trigger:blur )
-		if (fcconfigs) for (var fieldname in fcconfigs) {
-			if (fcconfigs.hasOwnProperty(fieldname)) {
-				var jf_field = jQuery('#'+'jform_attribs_'+fieldname); // first try 'jform_attribs'
-				if (!jf_field.length) {
-					jf_field = jQuery('#'+'jform_params_'+fieldname);  // then try 'jform_params'
-					if (!jf_field.length) {
-						jf_field = jQuery('#'+'jform_'+fieldname);  // then try just 'jform_'
-						if (!jf_field.length) continue;
-					}
-				}
-				jf_field = jf_field.first();
-
-				if (jf_field.is('fieldset')) {
-					jf_field.find('input').removeAttr('disabled').removeAttr('readonly');
-					jf_field.find('label').removeAttr('disabled').css('pointer-events', 'auto').css('opacity', '1');
-					jf_field.find(':input[value="'+fcconfigs[fieldname]+'"]').next().trigger('click').trigger('blur');
-				} else if (jf_field.is('select')) {
-
-					jf_field.removeAttr('disabled').removeAttr('readonly');
-					if (jf_field.prop('multiple')) {
-						jf_field.val('').trigger('change');
-						jQuery.each(fcconfigs[fieldname].split(','), function(i, val){
-							jf_field.find('option[value=\"' + val.trim() + '\"]').attr('selected', 'selected');
-						});
+		const updated = new Set();
+		const updateClasses = (attribute, delta) => {
+			const names = (option.getAttribute('data-' + attribute) || '').split(',').map(name => name.trim()).filter(Boolean);
+			for (const name of new Set(names)) {
+				for (const target of document.getElementsByClassName(name)) {
+					if (delta === 0) {
+						target.setAttribute('data-fc_forced_display', '1');
 					} else {
-						jf_field.val(fcconfigs[fieldname]);
+						const list = FlexiForm.data(target, 'fc_depend_list') || Object.create(null);
+						list[name] = (Number(list[name]) || 0) + delta;
+						FlexiForm.data(target, 'fc_depend_list', list);
 					}
-					jf_field.trigger('change');
-
-				} else {
-					jf_field.removeAttr('disabled').removeAttr('readonly').val(fcconfigs[fieldname]).trigger('click').trigger('blur');
+					updated.add(target);
 				}
 			}
-		}
+		};
+		updateClasses('force_list', 0);
+		updateClasses('hide_list', 1);
+		fc_configureDependencyFields(option, field);
+		updateClasses('show_list', -1);
 
-		if (fcreadonly) for (var fieldname in fcreadonly) {
-			if (fcreadonly.hasOwnProperty(fieldname)) {
-				var jf_field = jQuery('#'+'jform_attribs_'+fieldname); // first try 'jform_attribs'
-				if (!jf_field.length) {
-					jf_field = jQuery('#'+'jform_params_'+fieldname);  // then try 'jform_params'
-					if (!jf_field.length) {
-						jf_field = jQuery('#'+'jform_'+fieldname);  // then try just 'jform_'
-						if (!jf_field.length) continue;
-					}
-				}
-				jf_field = jf_field.first();
-
-				if (fcreadonly[fieldname] && !field.hasClass('fccustom_revert')) {
-					if (jf_field.is('fieldset')) {
-						jf_field.find('input').attr('readonly', 'readonly');
-						jf_field.find('label').attr('disabled', true).css('pointer-events', 'none').css('opacity', '0.65');
-					} else if (jf_field.is('select')) {
-						jf_field.attr('readonly', 'readonly').css('pointer-events', 'none').css('opacity', '0.85');
-					} else {
-						jf_field.attr('readonly', 'readonly').css('opacity', '0.85')
-					}
-				} else {
-					if (jf_field.is('fieldset')) {
-						jf_field.find('input').removeAttr('disabled');
-						jf_field.find('label').removeAttr('disabled').css('pointer-events', 'auto').css('opacity', '1');
-					}
-					else {
-						jf_field.removeAttr('readonly').css('pointer-events', 'auto').css('opacity', '1');
-					}
-				}
-			}
-		}
-
-		jQuery.each( show_list, function( cname, val ) {
-			if (!fc_dependent_params.hasOwnProperty(cname))  fc_dependent_params[cname] = Array();
-			fc_dependent_params[cname][fc_dependent_params[cname].length] = el;
-
-			if (val) {
-				jQuery('.'+cname).each(function( index ) {
-					var c = jQuery(this);
-					var dlist = c.data('fc_depend_list');
-					if (!dlist) dlist = {};
-					if (dlist.hasOwnProperty(cname)) dlist[cname]--; else dlist[cname]= -1;
-					c.data('fc_depend_list', dlist);
-					if (c.attr('data-fc_forced_display')!='1') {
-						toBeUpdated[u++] = c;
-					}
-				});
-			}
-		});
-
-		setTimeout(function(){
-			jQuery.each( setoff_list, function( i, selector ) {
-				if (selector) {
-					jQuery(selector).each(function( index ) {
-						var c = jQuery(this);
-						c.slideUp('fast');
-					});
-				}
-			});
-			jQuery.each( seton_list, function( i, selector ) {
-				if (selector) {
-					jQuery(selector).each(function( index ) {
-						var c = jQuery(this);
-						c.slideDown('fast');
-					});
-				}
-			});
-		}, !fc_init_hide_dependent ? 0 : 50);
-
+		const hide = option.getAttribute('data-setoff_list');
+		const show = option.getAttribute('data-seton_list');
+		if (hide || show) setTimeout(() => {
+			if (hide) document.querySelectorAll(hide).forEach(target => FlexiForm.show(target, false));
+			if (show) document.querySelectorAll(show).forEach(target => FlexiForm.show(target));
+		}, fc_init_hide_dependent ? 50 : 0);
 
 		if (!fc_init_hide_dependent) {
-			fc_applyFormDependencies(toBeUpdated, toggleParent, toggleParentSelector, 0);
-
-			if (!fc_refreshing_dependent) {
+			fc_applyFormDependencies(updated, toggleParent, toggleParentSelector);
+			const refresh = option.getAttribute('data-refsh_list');
+			if (refresh && !fc_refreshing_dependent) {
 				fc_refreshing_dependent = 1;
-
-				// Refresh needed dependencies
-				if (typeof refsh_list != 'string') jQuery.each( refsh_list, function( i, selector ) {
-					if (selector) {
-						jQuery(selector).each(function( index ) {
-							var c = jQuery(this);
-							if (c.is('select'))
-								c.trigger('fcform_run_deps');  // instead of change
-							else if (c.is('input[type="radio"]'))
-								c.closest('.fcform_toggler_element').find('input[type="radio"]:checked').trigger('fcform_run_deps');  // instead of click
-							else if (c.is('fieldset') && c.hasClass('radio'))
-								c.find('input[type="radio"]:checked').trigger('fcform_run_deps');  // instead of click
-						});
+				try {
+					for (const control of document.querySelectorAll(refresh)) {
+						const target = control.matches('select') ? control
+							: (control.closest('.fcform_toggler_element') || control).querySelector('input[type="radio"]:checked');
+						target?.dispatchEvent(new Event('fcform_run_deps'));
 					}
-				});
+				} finally {
+					fc_refreshing_dependent = 0;
+				}
 			}
-			fc_refreshing_dependent = 0;
 		}
 
-		// Restore the form to select the element with value ''
-		if ( field.hasClass('fccustom_revert') && el.value!='' )
-		{
-			var currVal;
-			if ( field.is('fieldset') ) {
-				currVal = field.find('input[type="radio"]:checked').val();
-				if (currVal!='') {
-					field.find('input').attr('disabled', 'disabled');
-					field.find('label').attr('disabled', true).css('pointer-events', 'none').css('opacity', '0.65');
-				}
-			} else {
-				currVal = field.val();
-				if (currVal!='') field.attr('disabled', 'disabled').css('pointer-events', 'none').css('opacity', '0.85');
+		if (field.classList.contains('fccustom_revert') && option.value !== '') {
+			const radio = field.matches('fieldset, .fcform_toggler_element:not(select)');
+			const current = radio ? field.querySelector('input[type="radio"]:checked') : field;
+			if (current?.value) {
+				const controls = radio ? [...field.querySelectorAll('input[type="radio"]')] : [field];
+				const disabled = controls.map(control => control.disabled);
+				controls.forEach(control => { control.disabled = true; });
+				setTimeout(() => {
+					controls.forEach((control, index) => { control.disabled = disabled[index]; });
+					if (radio) controls.find(control => control.value === '')?.click();
+					else {
+						field.value = '';
+						field.click();
+					}
+				}, 200);
 			}
-
-			if (currVal!='') setTimeout(function(){
-				if (field.is('fieldset')) {
-					field.find('input').removeAttr('disabled').removeAttr('readonly');
-					field.find('label').removeAttr('disabled').css('pointer-events', 'auto').css('opacity', '1');
-					field.find(':input[value=""]').next().trigger('click');
-				} else {
-					field.removeAttr('disabled').removeAttr('readonly').css('pointer-events', 'auto').css('opacity', '1');
-					field.val('').trigger('click');
-				}
-			}, 200);
 		}
-
-		return toBeUpdated;
+		return [...updated];
 	}
 
+	function fc_configureDependencyFields(option, field)
+	{
+		const configs = attribute => {
+			const value = option.getAttribute('data-' + attribute);
+			if (!value) return [];
+			// Older field XML stores objects with single quotes.
+			try { return Object.entries(JSON.parse(value) || {}); }
+			catch (_) { return Object.entries(JSON.parse(value.replace(/'/g, '"')) || {}); }
+		};
+		const find = name => document.getElementById('jform_attribs_' + name)
+			|| document.getElementById('jform_params_' + name) || document.getElementById('jform_' + name);
+		const readOnly = (target, enabled) => {
+			target.toggleAttribute('readonly', enabled);
+			if (target.matches('select, label')) target.style.pointerEvents = enabled ? 'none' : '';
+			if (!target.matches('input[type="radio"]')) target.style.opacity = enabled ? '0.65' : '';
+			if (target.matches('label')) target.toggleAttribute('disabled', enabled);
+		};
 
-	// Add toggling of dependent form elements
+		for (const [name, value] of configs('fcconfigs')) {
+			const target = find(name);
+			if (!target) continue;
+			if (target.matches('fieldset')) {
+				const inputs = [...target.querySelectorAll('input')];
+				inputs.forEach(input => {
+					input.disabled = false;
+					readOnly(input, false);
+				});
+				target.querySelectorAll('label').forEach(label => readOnly(label, false));
+				inputs.find(input => input.value === String(value))?.click();
+			} else {
+				target.disabled = false;
+				readOnly(target, false);
+				if (target.matches('select[multiple]')) {
+					const selected = String(value).split(',').map(value => value.trim());
+					for (const item of target.options) item.selected = selected.includes(item.value);
+				} else {
+					target.value = value;
+				}
+				if (target.matches('select')) FlexiForm.change(target);
+				else {
+					target.click();
+					target.dispatchEvent(new FocusEvent('blur'));
+				}
+			}
+		}
+
+		for (const [name, value] of configs('fcreadonly')) {
+			const target = find(name);
+			if (!target) continue;
+			const enabled = Boolean(value) && !field.classList.contains('fccustom_revert');
+			if (target.matches('fieldset')) {
+				target.querySelectorAll('input, label').forEach(control => readOnly(control, enabled));
+			} else {
+				readOnly(target, enabled);
+			}
+		}
+	}
+
+	// Add toggling of dependent form elements.
 	function fc_bindFormDependencies(container, toggleParent, toggleParentSelector)
 	{
-		var vTimeStart = new Date().getTime();
-
-		var toBeUpdated_ALL = Array();
-		var k = 0;
-
-		// Performance concern: use custom event
-
-		// Bind dependencies of select elements
-		jQuery(container+' select.fcform_toggler_element').on('change fcform_run_deps', function(e, data) {
-			var toBeUpdated = fc_findFormDependencies( jQuery('option:selected', this), toggleParent, toggleParentSelector, jQuery(this) );
-			for (var i = 0; i < toBeUpdated.length; i++) {
-				toBeUpdated_ALL[k++] = toBeUpdated[i];
+		const box = FlexiForm.element(container);
+		if (!box) return;
+		const controls = [...box.querySelectorAll(fcDependencyTogglers)];
+		const forms = new Map();
+		for (const control of controls) {
+			if (control.form && !forms.has(control.form)) {
+				forms.set(control.form, FlexiForm.data(control.form, 'skip_validation'));
 			}
-		});
-
-		// Bind dependencies of radio elements
-		jQuery(container+' .fcform_toggler_element input:radio').on('click fcform_run_deps', function(e, data) {
-			var toBeUpdated = fc_findFormDependencies( jQuery(this), toggleParent, toggleParentSelector, jQuery(this).parent('.fcform_toggler_element') );
-			for (var i = 0; i < toBeUpdated.length; i++) {
-				toBeUpdated_ALL[k++] = toBeUpdated[i];
+			if (fcDependencyBindings.has(control)) continue;
+			const select = control.matches('select');
+			const eventType = select ? 'change' : 'click';
+			let running = false;
+			const run = event => {
+				if (running || event?.originalEvent) return;
+				running = true;
+				try {
+					const option = select ? control.selectedOptions[0] : control;
+					const field = select ? control : control.closest('.fcform_toggler_element');
+					const targets = fc_findFormDependencies(option, toggleParent, toggleParentSelector, field);
+					if (fcDependencyUpdates) targets.forEach(target => fcDependencyUpdates.add(target));
+				} finally {
+					running = false;
+				}
+			};
+			fcDependencyBindings.set(control, run);
+			control.addEventListener(eventType, run);
+			control.addEventListener('fcform_run_deps', run);
+			// Select2 and older plugins can still trigger synthetic jQuery events.
+			if (window.jQuery) {
+				const events = select ? 'change.fcDependencies fcform_run_deps.fcDependencies' : 'fcform_run_deps.fcDependencies';
+				window.jQuery(control).on(events, run);
 			}
-		});
+		}
 
-		// *** Update the form
-		jQuery('form').data('skip_validation' ,1);
-
-		// Enqueue dependencies by triggering change on select elements
-		jQuery('form select.fcform_toggler_element').trigger('fcform_run_deps');
-		// Enqueue dependencies by triggering change on radio elements
-		jQuery('form .fcform_toggler_element input[type="radio"]:checked').trigger('fcform_run_deps');
-
-		//alert(toBeUpdated_ALL.length);
-		// Apply form changes according to dependencies
-		fc_applyFormDependencies(toBeUpdated_ALL, toggleParent, toggleParentSelector, 1);
-
-		// Clear this flag to indicate that form initialization is done
-		fc_init_hide_dependent = 0;
-
-		jQuery('form').data('skip_validation', null);
-
-		/*setTimeout(function(){ }, 20);*/
-		if (!!Joomla.fc_debug) window.console.log( 'fc_bindFormDependencies() time: ' + ((new Date())  - vTimeStart) + ' ms');
+		const wasInitializing = fc_init_hide_dependent;
+		const previousUpdates = fcDependencyUpdates;
+		fcDependencyUpdates = new Set();
+		fc_init_hide_dependent = 1;
+		try {
+			for (const form of forms.keys()) FlexiForm.data(form, 'skip_validation', 1);
+			for (const control of controls) {
+				if (control.matches('select, :checked')) fcDependencyBindings.get(control)();
+			}
+			fc_applyFormDependencies(fcDependencyUpdates, toggleParent, toggleParentSelector);
+		} finally {
+			fcDependencyUpdates = previousUpdates;
+			fc_init_hide_dependent = wasInitializing;
+			for (const [form, previous] of forms) FlexiForm.data(form, 'skip_validation', previous ?? null);
+		}
 	}
-
 
 	/* Attach form validation to inner elements of the given selector */
 	function fc_validationAttach(sel)
@@ -656,34 +519,27 @@
 	}
 
 
-	function fc_applyFormDependencies(toBeUpdated, toggleParent, toggleParentSelector, noFX)
+	function fc_applyFormDependencies(toBeUpdated, toggleParent, toggleParentSelector)
 	{
-		var emptySet = jQuery();
-		jQuery.each( toBeUpdated, function( i, val ) {
-			var c = jQuery(this);
-			var dlist = c.data('fc_depend_list');
-			if (!dlist) dlist = {};
-			var forced = c.attr('data-fc_forced_display');
-
-			jQuery.each(dlist, function( i, val ) { if(val<=0) delete dlist[i]; if(val>=1) dlist[i]=1 ;});
-			c.data('fc_depend_list', dlist);
-
-			var toggledBox = !toggleParent || c.hasClass('fc_toggle_current') ? emptySet : (toggleParentSelector ? c.parents(toggleParentSelector) : c.parents().eq(toggleParent));
-
-			if ( jQuery.isEmptyObject(dlist) || forced=='1' )
-			{
-				toggledBox.length ? toggledBox.slideDown(noFX ? 0 : 500) : c.slideDown(noFX ? 0 : 500);
+		const updated = [...toBeUpdated].map(FlexiForm.element).filter(Boolean);
+		for (const target of updated) {
+			const list = FlexiForm.data(target, 'fc_depend_list') || {};
+			for (const name of Object.keys(list)) {
+				if (list[name] > 0) list[name] = 1;
+				else delete list[name];
 			}
-			else
-			{
-				toggledBox.length ? toggledBox.slideUp(noFX ? 0 : 500) : c.slideUp(noFX ? 0 : 500);
-			}
-		});
+			FlexiForm.data(target, 'fc_depend_list', list);
 
-		jQuery.each( toBeUpdated, function( i, val ) {
-			var c = jQuery(this);
-			c.attr('data-fc_forced_display', '0');
-		});
+			const show = !Object.keys(list).length || target.getAttribute('data-fc_forced_display') === '1';
+			const parents = [];
+			if (toggleParent && !target.classList.contains('fc_toggle_current')) {
+				for (let parent = target.parentElement; parent; parent = parent.parentElement) parents.push(parent);
+			}
+			const wrappers = toggleParentSelector ? parents.filter(parent => parent.matches(toggleParentSelector))
+				: parents.slice(toggleParent, toggleParent + 1);
+			(wrappers.length ? wrappers : [target]).forEach(box => FlexiForm.show(box, show));
+		}
+		for (const target of updated) target.setAttribute('data-fc_forced_display', '0');
 	}
 
 	function fcCascadedField_update(elVal, trgID, field_id, item_id, field_type, cascade_prompt, prompt_enabled, valindex)
@@ -1592,51 +1448,39 @@
 	/* Destroy select library (select2 or choices.js) from cloned elements for reinit */
 	function fc_destroySelectLib(container)
 	{
+		const box = FlexiForm.element(container);
+		if (!box) return;
+		const selects = box.querySelectorAll('select.use_select2_lib, select.has_select2_lib');
 		if (window.fc_use_choicesjs) {
-			// Destroy Choices.js instances
-			container.find('select.use_select2_lib, select.has_select2_lib').each(function() {
-				var el = this;
-				// Prefer the instance stored on the element (avoids id/name registry collisions)
-				var inst = jQuery(el).data('fc_choices_instance');
-				// Only use the registry instance when it really belongs to THIS element: when a
-				// field is cloned, the cloned <select> still has the id/name of the original, so
-				// a registry lookup by id/name would destroy the ORIGINAL instance instead.
-				if (!inst && window.fc_choices_instances) {
-					var regInst = window.fc_choices_instances[el.id || el.name];
-					if (regInst && regInst.passedElement && regInst.passedElement.element === el) {
-						inst = regInst;
-					}
-				}
-				if (inst && typeof inst.destroy === 'function') {
-					inst.destroy();
+			for (const select of selects) {
+				const key = select.id || select.name;
+				const registered = window.fc_choices_instances[key];
+				// A cloned select may have the source's ID, but never owns its instance.
+				const instance = select.fc_choices_instance || FlexiForm.data(select, 'fc_choices_instance')
+					|| (registered?.passedElement?.element === select ? registered : null);
+				if (instance && typeof instance.destroy === 'function') {
+					instance.destroy();
+					delete select.fc_choices_instance;
+					window.jQuery?.(select).removeData('fc_choices_instance');
+					if (registered === instance) delete window.fc_choices_instances[key];
 				} else {
-					// Clone without its own instance: unwrap the duplicated Choices markup so the
-					// select can be re-initialised cleanly by the caller (fc_attachSelect2). Also
-					// reset the attributes Choices.js added (data-choice=active, hidden, tabindex=-1,
-					// class choices__input) which otherwise make `new Choices(el)` fail silently.
-					var wrapper = jQuery(el).closest('div.choices');
-					if (wrapper.length) wrapper.replaceWith(el);
-					el.removeAttribute('data-choice');
-					el.removeAttribute('tabindex');
-					el.hidden = false;
-					el.classList.remove('choices__input');
-					if (el.getAttribute('data-choice-orig-style')) {
-						el.removeAttribute('data-choice-orig-style');
-						el.style.cssText = '';
-					} else {
-						el.removeAttribute('style');
-					}
+					select.closest('div.choices')?.replaceWith(select);
+					select.removeAttribute('data-choice');
+					select.removeAttribute('tabindex');
+					select.removeAttribute('data-choice-orig-style');
+					select.removeAttribute('style');
+					select.hidden = false;
+					select.classList.remove('choices__input');
 				}
-				jQuery(el).removeData('fc_choices_instance');
-				if (window.fc_choices_instances && inst) delete window.fc_choices_instances[el.id || el.name];
-				jQuery(el).show();
-			});
+				FlexiForm.show(select);
+			}
 		} else {
-			// Destroy Select2 instances (legacy)
-			var sel2_elements = container.find('div.select2-container');
-			if (sel2_elements.length) {
-				sel2_elements.remove();
-				container.find('select.use_select2_lib, select.has_select2_lib').select2('destroy').show();
+			const containers = box.querySelectorAll('div.select2-container');
+			if (!containers.length) return;
+			containers.forEach(element => element.remove());
+			for (const select of selects) {
+				if (window.jQuery?.fn.select2) window.jQuery(select).select2('destroy');
+				FlexiForm.show(select);
 			}
 		}
 	}

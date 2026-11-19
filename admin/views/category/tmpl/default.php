@@ -27,7 +27,7 @@ $this->document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flex
 $this->document->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/css/tabber.css', array('version' => FLEXI_VHASH));
 $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 $js = "
-	jQuery(document).ready(function(){
+	FlexiForm.ready(function(){
 		fc_bindFormDependencies('#flexicontent', 2, '.control-group');
 	});
 ";

@@ -37,7 +37,7 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 
 // Add FC dependencies JS
 $js = "
-	jQuery(document).ready(function(){
+	FlexiForm.ready(function(){
 		fc_bindFormDependencies('#flexicontent', 0, '');
 	});
 ";
