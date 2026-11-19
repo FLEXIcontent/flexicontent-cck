@@ -71,21 +71,15 @@ for ($n = 0; $n < $max_count; $n++)
 		$_showon = $grouped_field->parameters->get('showon', '');
 		if ($_showon)
 		{
-			$showOnConditions  = FormHelper::parseShowOnConditions($_showon, $_formControl = 'custom', $_formGroup = '');
-			$dataShowOnPattern = $_showon ? 'data-showon-pattern=\'' . json_encode($showOnConditions) . '\'' : '';
-
-			// Cases handled
-			$cases_handled = [];
-			foreach($showOnConditions as $showCase)
+			$showOnConditions = FormHelper::parseShowOnConditions($_showon, 'custom', '');
+			$showOnPattern = $showOnConditions;
+			foreach ($showOnConditions as $conditionIndex => $condition)
 			{
-				// When a new field group value is added, we will use this to replace it with the correct field index and set it as data-shown, then initialize the showon script
-				if (!in_array($showCase['field'], $cases_handled)) {
-					$dataShowOnPattern = str_replace($showCase['field'], $showCase['field'] . '[__n__]', $dataShowOnPattern);
-				}
-				$cases_handled[] = $showCase['field'];
+				$showOnConditions[$conditionIndex]['field'] = $condition['field'] . '[' . $n . ']';
+				$showOnPattern[$conditionIndex]['field'] = $condition['field'] . '[__n__]';
 			}
-			$dataShowOn = str_replace('[__n__]', '[' . $n . ']', $dataShowOnPattern);
-			$dataShowOn = str_replace('data-showon-pattern=', 'data-showon=', $dataShowOn);
+			$dataShowOn = 'data-showon="' . htmlspecialchars(json_encode($showOnConditions), ENT_QUOTES, 'UTF-8') . '"';
+			$dataShowOnPattern = 'data-showon-pattern="' . htmlspecialchars(json_encode($showOnPattern), ENT_QUOTES, 'UTF-8') . '"';
 
 			static $_shown_added = false;
 			if (!$_shown_added)

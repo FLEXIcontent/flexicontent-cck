@@ -37,6 +37,95 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
     await page.waitForFunction(() => !!document.formvalidator);
   };
   const loadDependencies = page => page.addScriptTag({content: source('site/assets/js/flexi-lib.js')});
+  await test('Native field groups keep paired values and restore an empty last row', async page => {
+    const row = (index, left, right) => `<li class="fc-fieldgroup-collapsed" style="min-height:65px">
+      <button type="button" class="fcfield-drag-handle">Drag</button>
+      <button type="button" class="fcfield-delvalue" onclick="group.remove(this)">Remove</button>
+      <button type="button" class="fc-toggle-group-down" onclick="fcfield_group.toggleDetails(this, true)">Expand</button>
+      <button type="button" class="fc-toggle-group-up" onclick="fcfield_group.toggleDetails(this, false)" hidden>Collapse</button>
+      <div class="control-fc_subgroup fcAlwaysVisibleField">
+        <label class="fc_sub_label" for="custom_left_${index}">Name</label>
+        <div class="fcfieldval_container_77"><input class="fcfield_textval" id="custom_left_${index}" name="custom[left][${index}]" value="${left}"></div>
+      </div>
+      <div class="control-fc_subgroup" style="display:none" data-showon-pattern='[{"field":"custom[left][__n__]","values":["show"],"sign":"="}]'>
+        <label class="fc_sub_label" for="custom_right_${index}">Detail</label>
+        <div class="fcfieldval_container_78"><input class="fcfield_textval" id="custom_right_${index}" name="custom[right][${index}]" value="${right}"></div>
+      </div></li>`;
+    await form(page, `<div id="sortables_outer_76" class="fc-fieldgroup-values"><ul class="fcfield-group" id="sortables_76">${row(0, 'Red', 'One')}${row(1, 'Blue', 'Two')}</ul></div>
+      <button type="button" id="add-group" onclick="group.add(null, {scroll_visible:false, animate_visible:false})">Add group</button>`);
+    await page.addStyleTag({content: source('plugins/flexicontent_fields/fieldgroup/css/form.css')});
+    await loadDependencies(page);
+    await validate(page);
+    await page.addScriptTag({content: source('site/librairies/choicesjs/sortable.min.js')});
+    await page.addScriptTag({content: source('plugins/flexicontent_fields/text/js/form.js')});
+    await page.addScriptTag({content: source('plugins/flexicontent_fields/fieldgroup/js/form.js')});
+    await page.evaluate(() => {
+      Joomla.Showon = { initialise(row) { window.lastShowon = JSON.parse(row.querySelector('[data-showon]').dataset.showon); } };
+      for (const [id, field] of [[77, 'left'], [78, 'right']]) {
+        const child = fcfield_text.repeater({fieldId:id, initialCount:2, id:'custom_' + field, name:'custom[' + field + ']', defaultValue:'', max:0});
+        window['addField' + id] = (_, row, element, options) => child.add(null, element, options);
+        window['deleteField' + id] = (_, row, element) => child.remove(null, element);
+      }
+      window.group = fcfield_group.repeater({id:76, initialCount:2, max:3, fields:[{id:77,name:'left'},{id:78,name:'right'}]});
+    });
+    const rows = page.locator('#sortables_76 > li');
+    await rows.first().getByRole('button', {name:'Expand'}).click();
+    assert.equal(await rows.first().locator('#custom_right_0').isVisible(), false);
+    await rows.first().getByRole('button', {name:'Collapse'}).click();
+    await page.getByRole('button', {name:'Add group'}).click();
+    assert.equal(await rows.count(), 3);
+    assert.equal(await page.locator('label[for="custom_left_2"]').count(), 1);
+    assert.equal(await page.evaluate(() => lastShowon[0].field), 'custom[left][2]');
+    await page.locator('#custom_left_2').fill('Green');
+    await page.locator('#custom_right_2').evaluate(input => { input.value = 'Three'; });
+    const active = await rows.last().getByRole('button', {name:'Drag'}).boundingBox();
+    const destination = await rows.nth(1).boundingBox();
+    await page.mouse.move(active.x + active.width/2, active.y + active.height/2);
+    await page.mouse.down();
+    await page.mouse.move(active.x + active.width/2, destination.y + destination.height/4, {steps:18});
+    await page.mouse.up();
+    const values = () => page.evaluate(() => [...new FormData(document.getElementById('adminForm'))].filter(([name]) => name.startsWith('custom[')).map(([,value]) => value));
+    assert.deepEqual(await values(), ['Red','One','Green','Three','Blue','Two']);
+    const dialog = page.waitForEvent('dialog');
+    const limit = page.getByRole('button', {name:'Add group'}).click();
+    assert.match((await dialog).message(), /3$/);
+    await (await dialog).accept();
+    await limit;
+    assert.equal(await rows.count(), 3);
+    await rows.first().getByRole('button', {name:'Remove'}).click();
+    await rows.first().getByRole('button', {name:'Remove'}).click();
+    await rows.first().getByRole('button', {name:'Remove'}).click();
+    assert.equal(await rows.count(), 1);
+    assert.deepEqual(await values(), ['', '']);
+    assert.equal(await page.evaluate(() => lastShowon[0].field), 'custom[left][3]');
+    assert.equal(await page.locator('[name^="_duplicated_"]').count(), 0);
+  });
+  if (process.env.FLEXI_TEST_JQUERY) await test('Field groups pass jQuery collections to legacy child hooks', async page => {
+    await form(page, '<ul id="sortables_80"><li><div class="fcfieldval_container_81"><input name="custom[email][0]" id="custom_email_0" value="first@example.test"></div><button type="button" class="remove">Remove</button></li></ul>');
+    await loadDependencies(page);
+    await page.addScriptTag({content: source('plugins/flexicontent_fields/fieldgroup/js/form.js')});
+    const result = await page.evaluate(() => {
+      const config = {id:80, initialCount:1, max:0, fields:[{id:81,name:'email'}]};
+      const calls = [];
+      window.addField81 = (_, row, child, options) => {
+        calls.push([!!row.jquery, !!child.jquery, options.remove_previous]);
+        const input = child.find('input');
+        input.attr({name:'custom[email][1]', id:'custom_email_1'}).val('');
+      };
+      window.deleteField81 = (_, row, child) => calls.push([!!row.jquery, !!child.jquery]);
+      const group = fcfield_group.repeater(config);
+      const row = group.add(null, {scroll_visible:false,animate_visible:false});
+      group.remove(row.querySelector('.remove'));
+      window.addField81 = () => 'cancel';
+      const cancelled = group.add(null, {scroll_visible:false,animate_visible:false});
+      return {
+        calls, cancelled,
+        rowCount: document.querySelector('#sortables_80').children.length,
+        remaining:document.querySelector('input[name="custom[email][0]"]').value
+      };
+    });
+    assert.deepEqual(result, {calls:[[true,true,2],[true,true]], cancelled:'cancel', rowCount:1, remaining:'first@example.test'});
+  }, true);
   await test('Native tag picker handles quick tags, keyboard selection, creation and retries', async page => {
     await form(page, '<select id="jform_language"><option value="en-GB">English</option><option value="fr-FR">French</option></select><div id="tags"><input id="input-tags"></div><div id="fc_tagbox"><ul id="ultagbox"></ul><input type="checkbox" id="quick-tag-5" name="jform[tag][]" value="5"></div>');
     await page.addStyleTag({content: source('site/assets/css/flexicontent.css')});

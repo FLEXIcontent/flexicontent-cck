@@ -2,7 +2,7 @@
 
 Run `node tests/native-editor-workflows.cjs` with Playwright and its Chromium browser installed. The suite intercepts its fixture HTTP requests; it needs no Joomla database and does not contact a live site.
 
-Set `FLEXI_TEST_JQUERY` to a Joomla installation's `media/vendor/jquery/js/jquery.min.js` to also run the legacy AJAX hook, synthetic form and cascade events, and Select2 compatibility cases. Every other case asserts that `window.jQuery` is absent.
+Set `FLEXI_TEST_JQUERY` to a Joomla installation's `media/vendor/jquery/js/jquery.min.js` to also run the legacy AJAX hook, grouped field callbacks, synthetic form and cascade events, and Select2 compatibility cases. Every other case asserts that `window.jQuery` is absent.
 
 The cases exercise required and optional validation, checkbox and category limits, hidden editor synchronization, idle upload queues, large-form serialization, AJAX recovery, cancellation, toolbar POST data, record insertion and removal, drag ordering and group boundaries, batch field loading, native dialogs, ordered dialog scripts, form ownership and focus restoration. Further checks exercise dependent settings, Text value controls and cloning a live Choices widget. Tag checks cover keyboard selection, quick tags, removal and assignment errors. Cascade checks cover delayed responses, Choices option refreshes, radio chains and legacy multi-select changes.
 
@@ -18,4 +18,6 @@ The shared administrator dependency engine and the Text and Text Select repeatab
 
 The item editor and CSV import share a native tag picker. Cascaded selectors use native events and fetch. PrettyCheckable rendering and synthetic jQuery changes still have compatibility hooks when an older widget is enabled.
 
-jQuery loaders remain enabled for field groups, other field-specific repeaters, Plupload widgets, Inputmask initialization, legacy Select2, color and subform plugins, and PHP-generated scripts in editor and manager views. Third-party field plugins and site overrides are outside this patch.
+Field group add, remove, compact controls and drag ordering use native DOM APIs and Sortable. Grouped Text and Text Select fields receive DOM nodes. Grouped field plugins with older add or remove callbacks still receive jQuery collections when jQuery is available. The browser tests cover paired values, row-specific conditions, limits, reset of the final row, and a cancelled legacy add.
+
+jQuery loaders remain enabled for older child-field callbacks, other field-specific repeaters, Plupload widgets, Inputmask initialization, legacy Select2, color and subform plugins, and PHP-generated scripts in editor and manager views. Third-party field plugins and site overrides are outside this patch.

@@ -214,6 +214,7 @@ class plgFlexicontent_fieldsText extends FCField
 				{
 					fcfield_text.repeater(".$config.").remove(el, fieldval_box);
 				}
+				addField".$field->id.".fcNative = deleteField".$field->id.".fcNative = true;
 			";
 
 			$remove_button = '<span class="' . $btn_item_class . ' fcfield-delvalue ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';

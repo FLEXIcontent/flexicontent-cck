@@ -25,7 +25,7 @@ window.fcfield_text = (() => {
       row.querySelectorAll('.fc-field-invalid').forEach(element => element.remove());
       const input = row.querySelector('input.fcfield_textval');
       if (!input) return;
-      const currentId = input.id;
+      const currentId = input.dataset.originalId || input.id;
       input.id = config.id + '_' + index;
       input.name = config.name + '[' + index + ']';
       input.defaultValue = input.value = input.getAttribute('data-defvals') || config.defaultValue;
