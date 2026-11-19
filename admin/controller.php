@@ -30,6 +30,46 @@ use Joomla\String\StringHelper;
  */
 class FlexicontentController extends \Joomla\CMS\MVC\Controller\AdminController
 {
+	/**
+	 * The error messages that this controller recorded
+	 *
+	 * @var array
+	 */
+	protected $_fc_errors = array();
+
+
+	/**
+	 * Record the reason of a refused or failed step, to show it as a message.
+	 *
+	 * Joomla's controllers no longer have setError() and getError() (Joomla 5 and later), but FLEXIcontent's
+	 * controllers use them. Without these two methods a refused save ended in a PHP fatal error.
+	 *
+	 * @param   string|\Exception  $error  The message
+	 *
+	 * @return  void
+	 */
+	public function setError($error)
+	{
+		$this->_fc_errors[] = $error;
+	}
+
+
+	/**
+	 * The most recent error message (or the one with the given index), false when there is none.
+	 *
+	 * @param   int|null  $i         Index of the message, null for the most recent one
+	 * @param   bool      $toString  Return the message of an exception object
+	 *
+	 * @return  string|\Exception|false
+	 */
+	public function getError($i = null, $toString = true)
+	{
+		$error = $i === null ? end($this->_fc_errors) : ($this->_fc_errors[$i] ?? false);
+
+		return $toString && $error instanceof \Throwable ? $error->getMessage() : $error;
+	}
+
+
 	public function __construct($config = array())
 	{
 		parent::__construct($config);
