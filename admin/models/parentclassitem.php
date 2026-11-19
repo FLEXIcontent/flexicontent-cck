@@ -2767,16 +2767,21 @@ class ParentClassItem extends FCModelAdmin
 		// *** Delete old versions that are above the limit of kept versions
 		// ***
 
-		$vcount	= FLEXIUtilities::getVersionsCount($item->id);
+		// A version marked as permanent backup does not count towards the limit and is never rotated away
+		$kept_version = (int) FLEXIUtilities::getKeptVersion($item->id);
+		$vcount	= FLEXIUtilities::getVersionsCount($item->id, true);
 		$vmax	= $cparams->get('nr_versions', 10);
 
 		if ($vcount > $vmax) {
-			$deleted_version = FLEXIUtilities::getFirstVersion($item->id, $vmax, $current_version);
+			$deleted_version = FLEXIUtilities::getFirstVersion($item->id, $vmax, $current_version, true);
+			$keep_filter_values = $kept_version ? ' AND version!=' . $kept_version : '';
+			$keep_filter_meta   = $kept_version ? ' AND version_id!=' . $kept_version : '';
 			$query = 'DELETE'
 					.' FROM #__flexicontent_items_versions'
 					.' WHERE item_id = ' . (int)$item->id
 					.' AND version <=' . $deleted_version
 					.' AND version!=' . (int)$current_version
+					. $keep_filter_values
 					;
 			$this->_db->setQuery($query);
 			$this->_db->execute();
@@ -2786,6 +2791,7 @@ class ParentClassItem extends FCModelAdmin
 					.' WHERE item_id = ' . (int)$item->id
 					.' AND version_id <=' . $deleted_version
 					.' AND version_id!=' . (int)$current_version
+					. $keep_filter_meta
 					;
 			$this->_db->setQuery($query);
 			$this->_db->execute();
@@ -4828,7 +4834,7 @@ class ParentClassItem extends FCModelAdmin
 	 */
 	function getVersionList($limitstart=0, $versionsperpage=0)
 	{
-		$query 	= 'SELECT v.version_id AS nr, v.created AS date, ua.name AS modifier, v.comment AS comment'
+		$query 	= 'SELECT v.version_id AS nr, v.created AS date, ua.name AS modifier, v.comment AS comment, v.keep AS keep'
 				.' FROM #__flexicontent_versions AS v'
 				.' LEFT JOIN #__users AS ua ON ua.id = v.created_by'
 				.' WHERE item_id = ' . (int)$this->_id

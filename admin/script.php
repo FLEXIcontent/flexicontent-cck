@@ -566,6 +566,10 @@ class com_flexicontentInstallerScript
 		$db->setQuery($query);
 		$fi_vers_tbl_exists = (bool) count($db->loadObjectList());
 
+		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_versions"';
+		$db->setQuery($query);
+		$fv_vers_tbl_exists = (bool) count($db->loadObjectList());
+
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_favourites"';
 		$db->setQuery($query);
 		$favs_tbl_exists = (bool) count($db->loadObjectList());
@@ -774,6 +778,7 @@ class com_flexicontentInstallerScript
 					$tbls = array();
 					if ($fi_rels_tbl_exists) $tbls[] = "#__flexicontent_fields_item_relations";
 					if ($fi_vers_tbl_exists) $tbls[] = "#__flexicontent_items_versions";
+					if ($fv_vers_tbl_exists) $tbls[] = "#__flexicontent_versions";
 					if ($favs_tbl_exists)    $tbls[] = "#__flexicontent_favourites";
 					if ($files_tbl_exists)   $tbls[] = "#__flexicontent_files";
 					if ($fields_tbl_exists)  $tbls[] = "#__flexicontent_fields";
@@ -806,6 +811,11 @@ class com_flexicontentInstallerScript
 					}
 					if ($fi_vers_tbl_exists && !array_key_exists('suborder', $tbl_fields['#__flexicontent_items_versions'])) {
 						$queries[] = "ALTER TABLE `#__flexicontent_items_versions` ADD `suborder` INT(11) NOT NULL DEFAULT '1' AFTER `valueorder`";
+					}
+
+					// Versions metadata TABLE: permanent backup flag (excluded from rotation)
+					if ($fv_vers_tbl_exists && !array_key_exists('keep', $tbl_fields['#__flexicontent_versions'])) {
+						$queries[] = "ALTER TABLE `#__flexicontent_versions` ADD `keep` TINYINT(1) NOT NULL DEFAULT '0' AFTER `state`";
 					}
 
 					if ($fi_rels_tbl_exists && !array_key_exists('value_integer', $tbl_fields['#__flexicontent_fields_item_relations'])) {

@@ -55,6 +55,8 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 		'download', 'download_file', 'download_files', 'download_tree', 'weblink',
 		'save2new', 'save2copy', 'save_a_preview',
 		'field_set_value',
+		'getversionlist',
+		'setversionkeep',
 	);
 
 	/**
@@ -2694,6 +2696,56 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 
 		$ctrlTask = 'task=items.edit';
 		$this->setRedirect('index.php?option=com_flexicontent&' . $ctrlTask . '&cid[]=' . $id, $msg);
+	}
+
+
+	/**
+	 * Mark (or unmark) one version as a permanent backup for an item.
+	 * Only one version per item can be permanent; it is excluded from version rotation.
+	 *
+	 * @return void
+	 */
+	function setversionkeep()
+	{
+		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+
+		$app     = \Joomla\CMS\Factory::getApplication();
+		$cid     = $this->input->get('cid', array(), 'array');
+		$id      = $this->input->getInt('id', !empty($cid[0]) ? (int) $cid[0] : 0);
+		$version = $this->input->getInt('version', 0);
+
+		$record_model = $this->getModel($this->record_name);
+		$record = $id ? \FLEXIUtilities::getVersionRecord($id) : null;
+
+		if (!$record || empty($record->id) || !$record_model->canEdit($record))
+		{
+			$app->setHeader('status', '403 Forbidden', true);
+			$this->setRedirect($this->returnURL, \Joomla\CMS\Language\Text::_('FLEXI_ALERTNOTAUTH_TASK'), 'error');
+
+			return;
+		}
+
+		$result = \FLEXIUtilities::setVersionKeep($id, $version);
+		if (!$result['success'])
+		{
+			$app->setHeader('status', '404', true);
+			$this->setRedirect($this->returnURL, $result['error'], 'error');
+
+			return;
+		}
+
+		$msg = \Joomla\CMS\Language\Text::sprintf(
+			$result['keep'] ? 'FLEXI_VERSION_KEPT' : 'FLEXI_VERSION_UNKEPT',
+			$version
+		);
+
+		if ($app->input->getCmd('format') === 'raw')
+		{
+			echo json_encode(array('success' => 1, 'version' => $version, 'keep' => $result['keep'], 'message' => $msg));
+			jexit();
+		}
+
+		$this->setRedirect('index.php?option=com_flexicontent&task=items.edit&cid[]=' . (int) $id, $msg);
 	}
 
 

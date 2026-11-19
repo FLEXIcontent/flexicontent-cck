@@ -31,6 +31,8 @@ class flexicontent_versions extends \Joomla\CMS\Table\Table
 	var $created_by 		= null;
 	/** @var int */
 	var $state				= null;
+	/** @var int   1 = permanent backup, excluded from version rotation */
+	var $keep				= null;
 
 	function __construct(& $db) {
 		parent::__construct('#__flexicontent_versions', 'id', $db);

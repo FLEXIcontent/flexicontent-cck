@@ -410,50 +410,8 @@ if ($tags_editable || (!$isSite && $this->perms['canversion']))
 
 		" . ($isSite || !$this->perms['canversion'] ? "" : "
 
-		PageClick = function(pageclickednumber) {
-			jQuery.ajax({ url: '".\Joomla\CMS\Uri\Uri::base(true)."/index.php?option=com_flexicontent&".$task_items."getversionlist&id=".$this->row->id."&active=".$this->row->version."&". \Joomla\CMS\Session\Session::getFormToken() ."=1&format=raw&page='+pageclickednumber, context: jQuery('#version_tbl'), success: function(str){
-				jQuery(this).html(\"\\
-				<table class='fc-table-list fc-tbl-short' style='margin:10px;'>\\
-				\"+str+\"\\
-				</table>\\
-				\");
-				jQuery('#version_tbl').find('.hasTooltip').tooltip({html: true, container: jQuery('#version_tbl')});
-				jQuery('#version_tbl').find('.hasPopover').popover({html: true, container: jQuery('#version_tbl'), trigger : 'hover focus'});
-
-				// Attach click event to version compare links of the newly created page
-				jQuery(this).find('a.modal-versions').each(function(index, value) {
-					jQuery(this).on('click', function() {
-						// Load given URL in an popup dialog
-						var url = jQuery(this).attr('href');
-						fc_showDialog(url, 'fc_modal_popup_container');
-						return false;
-					});
-				});
-			}});
-
-			// Reattach pagination inside the newly created page
-			jQuery('#fc_pager').pager({ pagenumber: pageclickednumber, pagecount: ".$this->pagecount.", buttonClickCallback: PageClick });
-		}
-
 		jQuery(document).ready(function()
 		{
-			// For the initially displayed versions page:  Add onclick event that opens compare in popup
-			jQuery('a.modal-versions').each(function(index, value) {
-				jQuery(this).on('click', function() {
-					// Load given URL in an popup dialog
-					var url = jQuery(this).attr('href');
-					fc_showDialog(url, 'fc_modal_popup_container');
-					return false;
-				});
-			});
-
-			// Attach pagination for versions listing
-			jQuery('#fc_pager').pager({
-				pagenumber: " . $this->current_page . ",
-				pagecount: " . $this->pagecount . ",
-				buttonClickCallback: PageClick
-			});
-
 			// Attach textarea autogrow height (while typing)
 			jQuery('#versioncomment').autogrow({
 				minHeight: 32,

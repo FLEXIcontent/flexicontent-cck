@@ -336,13 +336,14 @@ class FLEXIUtilities
 	 * @return int
 	 * @since 1.5
 	 */
-	static function &getFirstVersion($id, $max, $current_version)
+	static function &getFirstVersion($id, $max, $current_version, $exclude_kept = false)
 	{
 		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query = 'SELECT version_id'
 				.' FROM #__flexicontent_versions'
 				.' WHERE item_id = ' . (int)$id
 				.' AND version_id!=' . (int)$current_version
+				.($exclude_kept ? ' AND keep = 0' : '')
 				.' ORDER BY version_id DESC'
 				;
 		$db->setQuery($query, ($max-1), 1);
@@ -357,17 +358,94 @@ class FLEXIUtilities
 	 * @return int
 	 * @since 1.5
 	 */
-	static function &getVersionsCount($id)
+	static function &getVersionsCount($id, $exclude_kept = false)
 	{
 		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$query = 'SELECT COUNT(*)'
 				.' FROM #__flexicontent_versions'
 				.' WHERE item_id = ' . (int)$id
+				.($exclude_kept ? ' AND keep = 0' : '')
 				;
 		$db->setQuery($query);
 		$versionscount = $db->loadResult();
 
 		return $versionscount;
+	}
+
+
+	/**
+	 * Load the minimal item data needed by the version history table and access checks.
+	 * Avoids the full item model, which is not available in the frontend RAW context.
+	 *
+	 * @return object|null
+	 */
+	static function getVersionRecord($id)
+	{
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$db->setQuery(
+			'SELECT c.id, c.created, c.created_by, c.version AS current_version, ua.name AS creator, ie.type_id'
+			.' FROM #__content AS c'
+			.' LEFT JOIN #__users AS ua ON ua.id = c.created_by'
+			.' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = c.id'
+			.' WHERE c.id = ' . (int) $id
+		);
+
+		return $db->loadObject();
+	}
+
+
+	/**
+	 * Toggle the permanent-backup flag of one version.
+	 * Only one version per item can be kept; the kept version is excluded from rotation.
+	 *
+	 * @param   int  $id       Item id
+	 * @param   int  $version  Version number
+	 *
+	 * @return  array  array('success' => bool, 'keep' => int, 'error' => string)
+	 */
+	static function setVersionKeep($id, $version)
+	{
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+
+		$db->setQuery(
+			'SELECT id, keep FROM #__flexicontent_versions'
+			.' WHERE item_id = ' . (int) $id
+			.' AND version_id = ' . (int) $version
+		);
+		$row = $db->loadObject();
+
+		if (!$row)
+		{
+			return array('success' => false, 'keep' => 0, 'error' => \Joomla\CMS\Language\Text::_('FLEXI_VERSION_NOT_FOUND'));
+		}
+
+		$new_keep = (int) $row->keep ? 0 : 1;
+
+		// Clear any other permanent backup of this item, then toggle the requested version
+		$db->setQuery('UPDATE #__flexicontent_versions SET keep = 0 WHERE item_id = ' . (int) $id)->execute();
+		$db->setQuery('UPDATE #__flexicontent_versions SET keep = ' . $new_keep . ' WHERE id = ' . (int) $row->id)->execute();
+
+		return array('success' => true, 'keep' => $new_keep, 'error' => '');
+	}
+
+
+	/**
+	 * Get the version marked as permanent backup for an item (0 if none)
+	 *
+	 * @return int
+	 */
+	static function getKeptVersion($id)
+	{
+		$db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$query = 'SELECT version_id'
+				.' FROM #__flexicontent_versions'
+				.' WHERE item_id = ' . (int)$id
+				.' AND keep = 1'
+				.' ORDER BY id DESC'
+				;
+		$db->setQuery($query, 0, 1);
+
+		return (int) $db->loadResult();
 	}
 
 

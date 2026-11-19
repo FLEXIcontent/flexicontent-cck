@@ -826,6 +826,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 					`created` datetime NOT NULL default '0000-00-00 00:00:00',
 					`created_by` int(11) unsigned NOT NULL default '0',
 					`state` int(3) NOT NULL default '0',
+					`keep` tinyint(1) NOT NULL default '0',
 					PRIMARY KEY  (`id`),
 					KEY `version2item` (`item_id`,`version_id`)
 					) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
