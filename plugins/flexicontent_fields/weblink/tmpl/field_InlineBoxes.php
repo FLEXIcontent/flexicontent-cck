@@ -83,7 +83,7 @@
 
 				$class_attribs = array(
 					'class'    => 'urlimagelist',
-					'onchange' => 'jQuery(this).closest(\'.fc-field-props-box\').find(\'.fcfield_message_box\').html(\'\'); if (this.selectedIndex > 0) { var mm_id=jQuery(this).parent().parent().find(\'.urlimage\').attr(\'id\'); jQuery(\'#\' + mm_id).data(\'basepath\', \'' . \Joomla\CMS\Uri\Uri::root() .'\'); jInsertFieldValue(this.value, mm_id); this.selectedIndex = 0; }',
+					'onchange' => 'fcfield_weblink.selectImage(this);',
 					'style' => 'width: auto; margin: 0;',
 				);
 				$imagelist = '<div style="width: 36px; overflow: hidden; display: flex; border: 0; border-radius: 0; margin-bottom: 1px; margin-' . (!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl() ? 'left' : 'right') .': 0px">'.

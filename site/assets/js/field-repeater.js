@@ -58,9 +58,7 @@ window.FlexiFieldRepeater = (() => {
       else previous.after(row);
       try {
         adapter?.attach?.(row, ref, config);
-        for (const input of row.querySelectorAll('input.has_inputmask')) {
-          if (typeof window.Inputmask === 'function') new window.Inputmask().mask(input);
-        }
+        window.fc_initInputMasks?.(row);
         fc_validationAttach(row);
         fc_bootstrapAttach(row);
         fc_initSelect2(null, row);

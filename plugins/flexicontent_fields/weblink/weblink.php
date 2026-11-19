@@ -293,6 +293,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			\Joomla\CMS\Language\Text::script("FLEXI_FIELD_WEBLINK_ENTER_MEDIA_URL_WARNING", true);
 			\Joomla\CMS\Language\Text::script("FLEXI_FIELD_MEDIA_URL", true);
 			\Joomla\CMS\Language\Text::script("FLEXI_ERROR", true);
+			flexicontent_html::loadFramework('media-metadata');
 			$document->getWebAssetManager()->registerAndUseScript('plg_flexicontent_fields_weblink.form', 'plugins/flexicontent_fields/weblink/js/form.js', array('version' => FLEXI_VHASH));
 
 			$mm_mode_common_js_added = true;

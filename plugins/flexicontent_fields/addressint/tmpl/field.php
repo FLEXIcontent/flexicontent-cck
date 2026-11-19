@@ -76,7 +76,7 @@ foreach ($values as $value)
 	<div class="fcfield_field_data_box fcfield_addressint_data">
 
 		<div>
-			<div id="'.$elementid_n.'_messages" class="alert alert-warning fc-iblock addrint_messages" style="display:none;"></div>
+			<div id="'.$elementid_n.'_messages" class="alert alert-warning fc-iblock addrint_messages" data-map-engine="'.($mapapi_edit === 'googlemap' ? 'googlemap' : 'nominatim').'" style="display:none;"></div>
 		</div>
 
 		<table class="fc-form-tbl fcfullwidth fcinner fc-addressint-field-tbl"><tbody>
@@ -281,7 +281,7 @@ foreach ($values as $value)
 	';
 
 	$dom_ready_js .= '
-		if (' . ($mapapi_edit !== 'googlemap' ? 'true' : 'window.jQuery && window.google?.maps') . ') {
+		if (' . ($mapapi_edit !== 'googlemap' ? 'true' : 'window.google?.maps') . ') {
 			fcfield_address.start("'.$elementid_n.'", "'.$field_name_js.'", '.($coords_are_empty ? 'false' : 'true').');
 		}
 	';

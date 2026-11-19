@@ -1,4 +1,16 @@
 window.fcfield_address = (() => {
+  const shared = window.fcfield_addrint ||= {};
+  const engines = shared.engines ||= {};
+  const engineFor = id => {
+    const container = document.getElementById(id + '_messages');
+    return engines[container?.dataset.mapEngine] || Object.values(engines)[0];
+  };
+
+  for (const method of ['initAutoComplete', 'initMap', 'initMarkerSelector', 'changeAutoCompleteType', 'updateMarkerIcon']) {
+    shared[method] = (id, ...args) => engineFor(id)?.[method]?.(id, ...args);
+  }
+  shared.toggle_USA_state = input => engineFor(input.id.replace(/_country$/, ''))?.toggle_USA_state(input);
+
   function setEnabled(button, enabled) {
     const row = button.closest('.fcfieldval_container');
     const properties = row?.querySelector('.fc-field-value-properties-box');
@@ -52,7 +64,7 @@ window.fcfield_address = (() => {
   }
 
   function ready(row, ref, config) {
-    if (config.mapEngine !== 'googlemap' || (window.jQuery && window.google?.maps)) start(ref.id, config.fieldKey);
+    if (config.mapEngine !== 'googlemap' || window.google?.maps) start(ref.id, config.fieldKey);
   }
 
   return { prepare, ready, setEnabled, start };

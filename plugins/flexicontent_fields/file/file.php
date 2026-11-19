@@ -239,7 +239,7 @@ class plgFlexicontent_fieldsFile extends FCField
 				}";
 
 			$document->getWebAssetManager()->addInlineScript("
-			jQuery(document).ready(function()
+			FlexiForm.ready(function()
 			{
 				fc_attachSingleSlider(".$thumb_size_slider_cfg.", ".$thumb_size_resizer.");
 			});
@@ -354,15 +354,7 @@ class plgFlexicontent_fieldsFile extends FCField
 
 			function file_fcfield_del_existing_value".$field->id."(el)
 			{
-				var el  = jQuery(el);
-				var box = jQuery(el).closest('.fcfieldval_container');
-				if ( el.prop('checked') ) {
-					box.find('.fc_preview_thumb').css('opacity', 0.4);
-					box.find('.fc_filedata_txt').css('text-decoration', 'line-through');
-				} else {
-					box.find('.fc_preview_thumb').css('opacity', 1);
-					box.find('.fc_filedata_txt').css('text-decoration', '');
-				}
+				FlexiMediaField.setFileRemoval(el);
 			}
 
 
@@ -379,14 +371,7 @@ class plgFlexicontent_fieldsFile extends FCField
 
 			function fc_openFileSelection_".$field->id."(element)
 			{
-				var obj = jQuery(element);
-				var url = obj.attr('data-href');
-
-				url = url.replace( '__rowno__',  obj.attr('data-rowno') ? obj.attr('data-rowno') : '' );
-				url = url.replace( '__thisid__', obj.attr('id') ? obj.attr('id') : '' );
-
-				//window.console.log(obj.attr('data-rowno'));
-				//window.console.log(url);
+				var url = element.dataset.href.replace('__rowno__', element.dataset.rowno || '').replace('__thisid__', element.id);
 
 				fcfield_file.dialog_handle['".$field_name_js."'] = fc_field_dialog_handle_".$field->id." = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, 0, {title: '".\Joomla\CMS\Language\Text::_('FLEXI_FIELD_FILE_SELECT_FILE', true)."', paddingW: 10, paddingH: 16});
 				return false;
@@ -467,6 +452,7 @@ class plgFlexicontent_fieldsFile extends FCField
 			if (!\Joomla\CMS\HTML\HTMLHelper::getServiceRegistry()->hasService('fcuploader')) {
 				\Joomla\CMS\HTML\HTMLHelper::getServiceRegistry()->register('fcuploader', 'JHtmlFcuploader');
 			}
+			flexicontent_html::loadFramework('media-field-controls');
 			$document->getWebAssetManager()->registerAndUseScript('plg_flexicontent_fields_file.form', 'plugins/flexicontent_fields/file/js/form.js', array('version' => FLEXI_VHASH));
 		}
 
@@ -502,42 +488,10 @@ class plgFlexicontent_fieldsFile extends FCField
 		if ($use_myfiles == 4) {
 			$document->getWebAssetManager()->addInlineScript('
 				function jInsertFieldValue(value, id)
-				{	
-					console.log(id);
-					var elem = jQuery(\'#\'+id).get(0);
-					elem.value = value;
-		
-					let file_is_image = value.match(/\.(jpg|png|gif|xcf|odg|wbmp|bmp|ico|jpeg|webp)$/i);
-					let preview_img = jQuery(elem).closest(\'.fcfieldval_container\').find(\'img.inline-preview-img\');
-					let preview_obj = jQuery(elem).closest(\'.fcfieldval_container\').find(\'object.inline-preview-obj\');
-					console.log(preview_img);
-					console.log(preview_obj);
-
-					if (preview_img.length > 0) {
-						if (file_is_image) {
-							let juri_root = preview_img.parent().attr(\'data-juri-root\');
-							preview_img.attr(\'src\', juri_root + \'/\' + value);
-							preview_img.show();
-						} else {
-							preview_img.attr(\'src\', \'\');
-							preview_img.hide();
-						}
-					}
-					if (preview_obj.length > 0) {
-						if (!file_is_image) {
-							let juri_root = preview_obj.parent().attr(\'data-juri-root\');
-							preview_obj.attr(\'data\', juri_root + \'/\' + value);
-							preview_obj.show();
-						} else {
-							preview_obj.attr(\'data\', \'\');
-							preview_obj.hide();
-						}
-					}
-
-					fcfield_file.assignMediaFile(id, value, \''.Uri::root().'/\' + value);
-
-					if (typeof SqueezeBox != \'undefined\') SqueezeBox.close();
-					if (typeof jQuery != \'undefined\') jQuery(\'#fc_modal_popup_container\').dialog(\'close\');
+				{
+					var box = FlexiMediaField.row(document.getElementById(id));
+					var editor = window.fcfield_mediafile && box?.querySelector(\'[data-fc-media-key][data-fc-media-type="mediafile"]\') ? fcfield_mediafile : window.fcfield_file || fcfield_file;
+					editor.selectMediaFile(id, value, '.json_encode(rtrim(Uri::root(), '/') . '/').');
 				}
 			');
 		}
@@ -644,7 +598,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		{
 			$field->html = '
 			<button type="button" class="fcfield-expand-view-btn btn btn-small" data-expandedFieldState="0" aria-label="' . \Joomla\CMS\Language\Text::_('FLEXI_EXPAND') . '"
-				onclick="fc_toggleCompactValuesView(this, jQuery(this).closest(\'.container_fcfield\'));"
+				onclick="fc_toggleCompactValuesView(this, this.closest(\'.container_fcfield\'));"
 			>
 				<span class="fcfield-expand-view ' . $font_icon_class . '" aria-hidden="true"></span>&nbsp; ' . \Joomla\CMS\Language\Text::_('FLEXI_EXPAND', true) . '
 			</button>

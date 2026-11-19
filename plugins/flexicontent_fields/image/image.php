@@ -317,7 +317,7 @@ class plgFlexicontent_fieldsImage extends FCField
 				}";
 
 			$document->getWebAssetManager()->addInlineScript("
-			jQuery(document).ready(function()
+			FlexiForm.ready(function()
 			{
 				fc_attachSingleSlider(".$thumb_size_slider_cfg.", ".$thumb_size_resizer.");
 			});
@@ -436,6 +436,8 @@ class plgFlexicontent_fieldsImage extends FCField
 			if (!\Joomla\CMS\HTML\HTMLHelper::getServiceRegistry()->hasService('fcuploader')) {
 				\Joomla\CMS\HTML\HTMLHelper::getServiceRegistry()->register('fcuploader', 'JHtmlFcuploader');
 			}
+			flexicontent_html::loadFramework('media-field-controls');
+			flexicontent_html::loadFramework('media-metadata');
 			$document->getWebAssetManager()->registerAndUseScript('plg_flexicontent_fields_image.form', 'plugins/flexicontent_fields/image/js/form.js', array('version' => FLEXI_VHASH));
 		}
 

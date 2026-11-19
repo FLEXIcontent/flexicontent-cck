@@ -75,10 +75,10 @@ window.fcfield_media_rows = (() => {
     if (legacy && window.jQuery?.fn.fieldMedia) window.jQuery(legacy).fieldMedia();
     const quantum = row.querySelector('.quantummanager');
     if (quantum && typeof window.initQuantumuploadimage === 'function') window.initQuantumuploadimage(row);
-    if (config.kind === 'mediafile' && window.jQuery) window.fcfield_mediafile?.initValue?.(ref.id.replace(/^custom_/, ''), config.fieldKey);
+    if (config.kind === 'mediafile') window.fcfield_mediafile?.initValue?.(ref.id.replace(/^custom_/, ''), config.fieldKey);
     if (config.kind === 'image' && options.animate_visible) {
       const uploader = row.querySelector('.fc_file_uploader');
-      if ((window.FlexiUploader || window.jQuery) && window[uploader?.dataset.tagidPrefix]) {
+      if (window[uploader?.dataset.tagidPrefix]) {
         row.querySelector('.fc_files_uploader_toggle_btn')?.click();
       }
     }

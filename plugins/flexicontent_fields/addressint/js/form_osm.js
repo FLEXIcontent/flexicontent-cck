@@ -45,15 +45,17 @@
 	 * Public object — merge with existing fcfield_addrint if already set
 	 * ------------------------------------------------------------------ */
 	window.fcfield_addrint = window.fcfield_addrint || {};
-	var FC = window.fcfield_addrint;
+	var shared = window.fcfield_addrint;
+	var FC = Object.create(shared);
+	(shared.engines ||= {}).nominatim = FC;
 
-	FC.allowed_countries = FC.allowed_countries || {};
-	FC.single_country    = FC.single_country    || {};
-	FC.map_zoom          = FC.map_zoom          || {};
-	FC.map_type          = FC.map_type          || {};
-	FC.configure         = FC.configure         || {};   // ignoré (compatibilité Google Maps)
-	FC.tile_url          = FC.tile_url          || {};   // tile server URL par champ (optionnel)
-	FC.LatLon            = FC.LatLon            || {};
+	shared.allowed_countries = shared.allowed_countries || {};
+	shared.single_country    = shared.single_country    || {};
+	shared.map_zoom          = shared.map_zoom          || {};
+	shared.map_type          = shared.map_type          || {};
+	shared.configure         = shared.configure         || {};   // ignoré (compatibilité Google Maps)
+	shared.tile_url      = shared.tile_url      || {};   // tile server URL par champ (optionnel)
+	shared.LatLon            = shared.LatLon            || {};
 
 	/* ------------------------------------------------------------------ *
 	 * DOM helpers

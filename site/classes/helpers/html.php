@@ -1834,122 +1834,10 @@ class flexicontent_html
 				break;
 
 			case 'inputmask':
-				if ($jquery_for_plugins) flexicontent_html::loadJQuery();
-
+				flexicontent_html::loadFramework('form-utils');
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/inputmask';
-				$document->addScript($framework_path.'/jquery.inputmask.bundle.min.js');
-
-				// Extra inputmask declarations definitions, e.g. ...
-				$js .= "";
-
-				// Attach inputmask to all input fields that have appropriate tag parameters
-				$js .= "
-					jQuery(document).ready(function(){
-						Inputmask.extendAliases({
-							decimal: {
-								alias: 'numeric',
-								autoGroup: true,
-								radixPoint: '.',
-								groupSeparator: ',',
-								clearMaskOnLostFocus: true,
-								removeMaskOnSubmit: true,
-								unmaskAsNumber: false
-							},
-							decimal_comma: {
-								alias: 'numeric',
-								autoGroup: true,
-								radixPoint: ',',
-								groupSeparator: '.',
-								clearMaskOnLostFocus: true,
-								removeMaskOnSubmit: true,
-								unmaskAsNumber: false
-							},
-							currency: {
-								alias: 'numeric',
-								prefix: '$ ',
-								groupSeparator: ',',
-								autoGroup: true,
-								digits: 2,
-								digitsOptional: false,
-								clearMaskOnLostFocus: true,
-								removeMaskOnSubmit: true,
-								unmaskAsNumber: false
-							},
-							currency_euro: {
-								alias: 'currency',
-								prefix: '\u20ac ',
-								groupSeparator: ',',
-								autoGroup: true,
-								digits: 2,
-								digitsOptional: false,
-								clearMaskOnLostFocus: false,
-								removeMaskOnSubmit: true,
-								unmaskAsNumber: false
-							},
-							percentage_zero_nolimit: {
-								alias: 'percentage',
-								digits: 2,
-								radixPoint: '.',
-								autoGroup: true,
-								min: 0,
-								max: '',
-								suffix: ' %',
-								allowPlus: false,
-								allowMinus: false,
-								clearMaskOnLostFocus: true,
-								removeMaskOnSubmit: true,
-								unmaskAsNumber: false
-							},
-							percentage_nolimit_nolimit: {
-								alias: 'percentage',
-								digits: 2,
-								radixPoint: '.',
-								autoGroup: true,
-								min: '',
-								max: '',
-								suffix: ' %',
-								allowPlus: false,
-								allowMinus: true,
-								clearMaskOnLostFocus: true,
-								removeMaskOnSubmit: true,
-								unmaskAsNumber: false
-							},
-							integer: {
-								alias: 'numeric',
-								digits: 0,
-								radixPoint: '',
-								clearMaskOnLostFocus: true,
-								removeMaskOnSubmit: true,
-								unmaskAsNumber: false
-							},
-							unsigned: {
-								alias: 'numeric',
-								digits: 0,
-								radixPoint: '',
-								allowPlus: false,
-								allowMinus: false,
-								clearMaskOnLostFocus: true,
-								removeMaskOnSubmit: true,
-								unmaskAsNumber: false
-							},
-							'mobile': {
-								'mask': '9999 999 999',
-								'autounmask': true,
-								'insertMode': true,
-								clearMaskOnLostFocus: true,
-								removeMaskOnSubmit: true,
-								unmaskAsNumber: false
-							}
-						});
-
-						jQuery('input.has_inputmask').each(function() {
-							jQuery(this).inputmask();
-						});
-						jQuery('input.inputmask-regex').each(function() {
-							jQuery(this).inputmask('Regex');
-						});
-					});
-				";
+				$document->addScript($framework_path.'/inputmask.min.js', array('version' => '5.0.10'));
+				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/input-masks.js', array('version' => FLEXI_VHASH));
 				break;
 
 			case 'prettyCheckable':
@@ -2315,6 +2203,16 @@ class flexicontent_html
 			case 'native-field-controls':
 				flexicontent_html::loadFramework('form-utils');
 				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/native-field-controls.js', array('version' => FLEXI_VHASH));
+				break;
+
+			case 'media-field-controls':
+				flexicontent_html::loadFramework('form-utils');
+				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/media-field-controls.js', array('version' => FLEXI_VHASH));
+				break;
+
+			case 'media-metadata':
+				flexicontent_html::loadFramework('form-utils');
+				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/media-metadata.js', array('version' => FLEXI_VHASH));
 				break;
 
 			case 'flexi-lib-form':

@@ -125,7 +125,7 @@ foreach ($field->value as $index => $value)
 	$select_existing = '';
 	$pick_existing = '';
 	$addExistingURL = sprintf($filesElementURL, $elementid_n);
-	$addExistingURL_onclick = "fcfield_image.dialog_handle['".$field_name_js."'] = fc_field_dialog_handle_".$field->id." = fc_showDialog(jQuery(this).attr('data-href'), 'fc_modal_popup_container', 0, 0, 0, 0, {title: '".Text::_('FLEXI_SELECT_IMAGE', true)."', paddingW: 10, paddingH: 16});";
+	$addExistingURL_onclick = "fcfield_image.dialog_handle['".$field_name_js."'] = fc_field_dialog_handle_".$field->id." = fc_showDialog(this.dataset.href, 'fc_modal_popup_container', 0, 0, 0, 0, {title: '".Text::_('FLEXI_SELECT_IMAGE', true)."', paddingW: 10, paddingH: 16});";
 
 	if ($image_source >= 0)
 	{
@@ -171,10 +171,10 @@ foreach ($field->value as $index => $value)
 				<input type="text" name="'.$fieldname_n.'[existingname]" id="'.$mm_id.'" value="'.htmlspecialchars($img_path, ENT_COMPAT, 'UTF-8').'" readonly="readonly"
 					class="existingname input-large field-media-input hasTipImgpath" onchange="fcfield_image.update_path_tip(this);" title="'.htmlspecialchars('<span id="TipImgpath"></span>', ENT_COMPAT, 'UTF-8').'" data-basepath="'.\Joomla\CMS\Uri\Uri::root().'"
 				/>
-				<a class="fc_image_field_mm_modal btn '.$tooltip_class.'" title="'.Text::_('FLEXI_SELECT_IMAGE').'" onclick="var mm_id=jQuery(this).parent().find(\'.existingname\').attr(\'id\'); fcfield_image.currElement[\''.$field_name_js.'\']=mm_id; SqueezeBox.open(\''.$mm_link.'\', {size:{x: ((window.innerWidth-120) > 1360 ? 1360 : (window.innerWidth-120)), y: ((window.innerHeight-220) > 800 ? 800 : (window.innerHeight-220))}, handler: \'iframe\', onClose: function() { fcfield_image.incrementValCnt(\''.$field_name_js.'\'); } });  return false;">
+				<a class="fc_image_field_mm_modal btn '.$tooltip_class.'" title="'.Text::_('FLEXI_SELECT_IMAGE').'" onclick="var mm_id=this.parentElement.querySelector(\'.existingname\').id; fcfield_image.currElement[\''.$field_name_js.'\']=mm_id; SqueezeBox.open(\''.$mm_link.'\', {size:{x: ((window.innerWidth-120) > 1360 ? 1360 : (window.innerWidth-120)), y: ((window.innerHeight-220) > 800 ? 800 : (window.innerHeight-220))}, handler: \'iframe\', onClose: function() { fcfield_image.incrementValCnt(\''.$field_name_js.'\'); } });  return false;">
 					'.Text::_('FLEXI_SELECT').'
 				</a>
-				<a class="btn '.$tooltip_class.'" href="javascript:;" title="'.Text::_('FLEXI_CLEAR').'" onclick="var mm_id=jQuery(this).parent().find(\'.existingname\').attr(\'id\'); fcfield_image.clearField(this, {}, \''.$field_name_js.'\'); jInsertFieldValue(\'\', mm_id); return false;" >
+				<a class="btn '.$tooltip_class.'" href="javascript:;" title="'.Text::_('FLEXI_CLEAR').'" onclick="var mm_id=this.parentElement.querySelector(\'.existingname\').id; fcfield_image.clearField(this, {}, \''.$field_name_js.'\'); jInsertFieldValue(\'\', mm_id); return false;" >
 					<i class="icon-remove"></i>
 				</a>
 			</div>
@@ -244,8 +244,8 @@ foreach ($field->value as $index => $value)
 			$select_existing = $jfield->input;
 
 			// Workaround field to clear both existingname and originalname input fields
-			$select_existing = str_replace('button-clear"', 'button-clear" onclick="jQuery(this).parent().find(\'input\').attr(\'value\', \'\');"', $select_existing);
-			$select_existing = str_replace('quantumuploadimage-delete only-icon"', 'quantumuploadimage-delete only-icon" onclick="let el = jQuery(this).closest(\'.fcfieldval_container\').find(\'input\'); if (el.length) { el.attr(\'value\', \'\'); el.val(\'\'); }"', $select_existing);
+			$select_existing = str_replace('button-clear"', 'button-clear" onclick="var el = this.parentElement.querySelector(\'input\'); if (el) el.defaultValue = \'\';"', $select_existing);
+			$select_existing = str_replace('quantumuploadimage-delete only-icon"', 'quantumuploadimage-delete only-icon" onclick="this.closest(\'.fcfieldval_container\').querySelectorAll(\'input\').forEach(el => { el.defaultValue = \'\'; el.value = \'\'; });"', $select_existing);
 
 			if ($use_quantum)
 			{
@@ -398,11 +398,7 @@ foreach ($field->value as $index => $value)
 		$pick_existing_n = $pick_existing ? str_replace('__FORMFLDID__', $elementid_n.'_existingname', $pick_existing_n) : '';
 	}
 
-	$toggleUploader_onclick = 'var box = jQuery(this).closest(\'.fcfieldval_container\'); ' .
-		'var isVisible = box.find(\'.fc_file_uploader\').is(\':visible\'); ' .
-		'isVisible ? jQuery(this).removeClass(\'active\') : jQuery(this).addClass(\'active\'); ' .
-		'isVisible ? box.find(\'.fcfield_preview_box\').show() : box.find(\'.fcfield_preview_box\').hide(); ' .
-		'';
+	$toggleUploader_onclick = 'if (!FlexiMediaField.beforeToggle(this, \'image\')) return; ';
 
 	if ($use_inline_uploaders)
 	{
@@ -475,7 +471,7 @@ foreach ($field->value as $index => $value)
 					<li>'.$uploader_html->mediaUrlBtn.'</li>
 				</ul>
 			</div>
-			<span class="btn btn-outline-secondary fcfont-icon icon icon-pencil fas fa-info-circle image-option" onclick="jQuery(\'.fcimg_value_props[data-name=' . $elementid_n . ']\').toggle(150);"></span>
+			<span class="btn btn-outline-secondary fcfont-icon icon icon-pencil fas fa-info-circle image-option" onclick="fcfield_image.toggleProperties(this);"></span>
 			'.$uploader_html->clearBtn.'
 			' : '') . '
 		</div>
@@ -496,7 +492,7 @@ foreach ($field->value as $index => $value)
 					' . ($use_myfiles > 0 ? $uploader_html->myFilesBtn : '') . '
 					'.$uploader_html->mediaUrlBtn.'
 					'.$uploader_html->clearBtn.'
-					<span class="btn btn-outline-secondary fcfont-icon icon icon-pencil fas fa-info-circle image-option" onclick="jQuery(\'.fcimg_value_props[data-name=' . $elementid_n . ']\').toggle(150);"></span>
+					<span class="btn btn-outline-secondary fcfont-icon icon icon-pencil fas fa-info-circle image-option" onclick="fcfield_image.toggleProperties(this);"></span>
 				</div>
 			</div>
 			' : '') . '
@@ -557,7 +553,7 @@ foreach ($field->value as $index => $value)
 //document.addEventListener('DOMContentLoaded', function()
 $js = ""
 	. (!$per_value_js ? "" : "
-	jQuery(document).ready(function()
+	FlexiForm.ready(function()
 	{
 		" . $per_value_js . "
 	});

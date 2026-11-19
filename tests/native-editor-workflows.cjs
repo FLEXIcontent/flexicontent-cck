@@ -738,6 +738,178 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
     await page.waitForFunction(()=>window.inlineModuleValue==='kept');
     assert.deepEqual(await page.evaluate(()=>[externalModuleValue,inlineModuleValue]),['kept','kept']);
   });
+  await test('Standalone Inputmask preserves FLEXIcontent presets and Joomla submit values', async page => {
+    await form(page, [
+      '<input class="has_inputmask" name="decimal" data-inputmask="\'alias\': \'decimal\'">',
+      '<input class="has_inputmask" name="euro" data-inputmask="\'alias\': \'decimal_comma\'">',
+      '<input class="has_inputmask" name="date" data-inputmask="\'alias\': \'dd/mm/yyyy\'">',
+      '<input class="has_inputmask" name="dateTime" data-inputmask="\'alias\': \'datetime\'">',
+      '<input class="has_inputmask" name="time" data-inputmask="\'alias\': \'hh:mm t\'">',
+      '<input class="has_inputmask" name="phone" data-inputmask="\'mask\': \'9{4,4} 9{3,3} 9{3,3}\', \'removeMaskOnSubmit\': \'true\'">',
+      '<input class="inputmask-regex" name="regex" data-inputmask-regex="[A-Z]{2}[0-9]{2}">',
+    ].join(''));
+    await page.route('https://fixture.invalid/save', route => route.fulfill({body: 'Saved'}));
+    for (const file of ['site/librairies/inputmask/inputmask.min.js', 'site/assets/js/input-masks.js', 'site/assets/js/admin.js']) {
+      await page.addScriptTag({content: source(file)});
+    }
+    for (const [name, entered, displayed] of [
+      ['decimal', '1234.5', '1,234.5'],
+      ['euro', '1234,5', '1.234,5'],
+      ['date', '29022028', '29/02/2028'],
+      ['dateTime', '191120261415', '19/11/2026 14:15'],
+      ['time', '0245pm', '02:45 pm'],
+      ['phone', '0912345678', '0912 345 678'],
+      ['regex', 'A!B12', 'AB12']
+    ]) {
+      const input = page.locator('[name="' + name + '"]');
+      await input.pressSequentially(entered);
+      await input.press('Tab');
+      assert.equal(await input.inputValue(), displayed, name);
+    }
+    await page.evaluate(() => {
+      const row = document.createElement('div');
+      row.innerHTML = '<input class="has_inputmask" name="added" data-inputmask="\'alias\': \'unsigned\'">';
+      document.getElementById('adminForm').append(row);
+      fc_initInputMasks(row);
+    });
+    const added = page.locator('[name=added]');
+    await added.pressSequentially('-27');
+    await added.press('Tab');
+    assert.equal(await added.inputValue(), '27');
+    const [request] = await Promise.all([
+      page.waitForRequest(req => req.url().endsWith('/save') && req.method() === 'POST'),
+      page.waitForURL('**/save', {waitUntil:'domcontentloaded'}),
+      page.evaluate(() => Joomla.submitform('items.save', document.getElementById('adminForm')))
+    ]);
+    const fields = new URLSearchParams(request.postData());
+    assert.equal(fields.get('decimal'), '1234.5');
+    assert.equal(fields.get('euro'), '1234,5');
+    assert.equal(fields.get('phone'), '0912345678');
+    assert.equal(fields.get('date'), '29/02/2028');
+    assert.equal(fields.get('added'), '27');
+  });
+
+  await test('Web Link metadata ignores stale results and supports providers that require JSONP', async page => {
+    await form(page, '<input id="link_link"><input id="link_image"><div id="fcfield_message_box_link"></div>');
+    await page.route('https://noembed.com/embed?**', async route => {
+      const endpoint = new URL(route.request().url());
+      const callback = endpoint.searchParams.get('callback');
+      const clip = new URL(endpoint.searchParams.get('url')).pathname;
+      if (callback) return route.fulfill({contentType:'text/javascript', body: callback + '({thumbnail_url:"https://fixture.invalid/thumb.png"})'});
+      if (clip === '/old12345678') {
+        await new Promise(resolve => setTimeout(resolve, 200));
+        return route.fulfill({headers:{'Access-Control-Allow-Origin':'*'}, json:{thumbnail_url:'https://fixture.invalid/old.png'}}).catch(() => {});
+      }
+      return route.abort();
+    });
+    for (const file of ['site/assets/js/media-metadata.js', 'plugins/flexicontent_fields/weblink/js/form.js']) {
+      await page.addScriptTag({content: source(file)});
+    }
+    await page.evaluate(async () => {
+      const input = document.getElementById('link_link');
+      input.value = 'https://youtu.be/old12345678';
+      const first = fcfield_weblink.fetchData('link');
+      input.value = 'https://youtu.be/dQw4w9WgXcQ';
+      await Promise.all([first, fcfield_weblink.fetchData('link')]);
+    });
+    assert.equal(await page.locator('#link_image').inputValue(), 'https://fixture.invalid/thumb.png');
+    assert.equal(await page.evaluate(() => Object.keys(window).filter(key => /^fcMediaMetadata\d+$/.test(key)).length), 0);
+  });
+
+  await test('Shared Media metadata fills native form values and clears the embed', async page => {
+    const props = ['title','author','duration','description','thumb','api_type','media_id','embed_url','height','width'];
+    await form(page, '<input id="clip_url"><div id="fcfield_message_box_clip"></div><table>' +
+      props.map(key => '<tr><td><input id="clip_' + key + '" name="' + key + '"></td></tr>').join('') +
+      '<tr><td id="clip_preview"></td></tr></table>');
+    await page.route('https://www.youtube.com/embed/**', route => route.fulfill({body:''}));
+    await page.route('https://www.googleapis.com/youtube/v3/videos?**', route => {
+      assert.equal(new URL(route.request().url()).searchParams.get('id'), 'dQw4w9WgXcQ');
+      return route.fulfill({headers:{'Access-Control-Allow-Origin':'*'}, json:{items:[{
+        snippet:{title:'Fixture <b>title</b>', channelTitle:'Fixture author', description:'Fixture description', thumbnails:{medium:{url:'https://fixture.invalid/thumb.jpg'}}},
+        contentDetails:{duration:'PT1M13S'}
+      }]}});
+    });
+    for (const file of ['site/assets/js/media-metadata.js', 'plugins/flexicontent_fields/sharedmedia/js/form.js']) {
+      await page.addScriptTag({content: source(file)});
+    }
+    await page.locator('#clip_url').fill('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+    await page.evaluate(async () => {
+      fcfield_sharemedia.use_native_apis.clip = 1;
+      await fcfield_sharemedia.fetchData('clip', 'clip');
+    });
+    assert.equal(await page.locator('#clip_title').inputValue(),'Fixture <b>title</b>');
+    assert.equal(await page.locator('#clip_duration').inputValue(),'73');
+    assert.equal(await page.locator('#clip_media_id').inputValue(),'dQw4w9WgXcQ');
+    assert.equal(await page.locator('#clip_preview iframe').getAttribute('src'),'https://www.youtube.com/embed/dQw4w9WgXcQ');
+    await page.evaluate(() => fcfield_sharemedia.clearData('clip'));
+    assert.equal(await page.locator('#clip_preview iframe').count(), 0);
+    assert.equal(await page.locator('#clip_media_id').inputValue(), '');
+  });
+
+  await test('Google Maps accepts a place and updates form coordinates without jQuery', async page => {
+    await form(page, '<input id="a_autocomplete"><select id="a_ac_type"><option value="geocode">Address</option><option value="establishment">Business</option></select>' +
+      '<div id="a_messages" data-map-engine="googlemap"></div><div id="a_addressint_map"><div id="map_canvas_a"></div></div>' +
+      ['country','city','addr_display','lat','lon','zoom','marker_tolerance'].map(key => '<input id="a_' + key + '">').join(''));
+    await page.evaluate(() => {
+      const events = { addListener(target, event, callback) {
+        target[event] = callback;
+        return {remove() { delete target[event]; }};
+      }};
+      window.google = {maps:{
+        event:events,
+        places:{Autocomplete:class {
+          constructor(input, options) { this.options = options; }
+          getPlace() { return window.testPlace; }
+          setTypes(types) { this.types = types; }
+        }},
+        Map:class { constructor(canvas, options) { this.zoom = options.zoom; } getZoom() { return this.zoom; } },
+        Marker:class { constructor(options) { this.position = options.position; } getPosition() { return this.position; } setPosition(pos) { this.position = pos; } setIcon(icon) { this.icon = icon; } },
+        Geocoder:class { geocode(_, callback) { callback([window.testPlace], 'OK'); } },
+        geometry:{spherical:{computeDistanceBetween:() => window.testDistance}},
+        MapTypeId:{ROADMAP:'roadmap'}, Animation:{DROP:'drop'}, GeocoderStatus:{OK:'OK'}
+      }};
+      window.testPlace = {
+        formatted_address:'1 Fixture Road, Taipei, Taiwan',
+        geometry:{location:{lat:() => 25.031, lng:() => 121.567}},
+        address_components:[
+          {types:['country'], short_name:'TW', long_name:'Taiwan'},
+          {types:['locality'], short_name:'Taipei', long_name:'Taipei'}
+        ]
+      };
+    });
+    await page.addScriptTag({content:source('plugins/flexicontent_fields/addressint/js/form.js')});
+    await page.addScriptTag({content:source('plugins/flexicontent_fields/addressint/js/repeater.js')});
+    await page.addScriptTag({content:source('plugins/flexicontent_fields/addressint/js/form_osm.js')});
+    await page.evaluate(() => {
+      const fields = fcfield_addrint;
+      fields.allowed_countries.address = ['TW'];
+      fields.map_zoom.address = 16;
+      fields.map_type.address = 'ROADMAP';
+      fcfield_address.start('a', 'address');
+      fields.autoComplete.a.place_changed();
+      fields.google_maps.a.zoom = 18;
+      fields.google_maps.a.zoom_changed();
+    });
+    assert.equal(await page.locator('#a_addr_display').inputValue(), '1 Fixture Road, Taipei, Taiwan');
+    assert.equal(await page.locator('#a_country').inputValue(), 'TW');
+    assert.equal(await page.locator('#a_zoom').inputValue(), '18');
+    await page.evaluate(() => {
+      testDistance = 150;
+      fcfield_addrint.posMarker.a.position = {lat:25.032, lng:121.568};
+      fcfield_addrint.posMarker.a.dragend();
+    });
+    assert.equal(await page.locator('#a_lat').inputValue(), '25.032');
+    assert.equal(await page.locator('#a_lon').inputValue(), '121.568');
+    assert.match(await page.locator('#a_messages').textContent(), /WITHIN_TOLERANCE/);
+    const testData = await page.evaluate(() => {
+      const fields = fcfield_addrint;
+      document.getElementById('a_ac_type').value = 'establishment';
+      fields.changeAutoCompleteType('a');
+      return fields.autoComplete.a.types;
+    });
+    assert.deepEqual(testData, ['establishment']);
+  });
+
   await browser.close();
   console.log(JSON.stringify(results, null, 2));
   if (results.some(result => result.status !== 'pass')) process.exitCode = 1;
