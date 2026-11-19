@@ -86,6 +86,27 @@ namespace {
 		$create($a, 'flexicontent_compact', '(id INT NOT NULL, value VARCHAR(190) NOT NULL, UNIQUE KEY k(id,value)) ENGINE=InnoDB ROW_FORMAT=COMPACT DEFAULT CHARSET=utf8mb3');
 		$create($a, 'flexicontent_binary', '(value VARCHAR(10), token VARBINARY(255) UNIQUE) ENGINE=MyISAM DEFAULT CHARSET=utf8mb3');
 		$create($a, 'flexicontent_metadata', "(term VARCHAR(255), KEY lookup(term) COMMENT 'reviewed sort') ENGINE=MyISAM DEFAULT CHARSET=utf8mb3");
+		// Separate connections, same installation. Another installation's lock must be independent.
+		foreach (['charset', 'engine'] as $operation)
+		{
+			$lock = 'flexicontent_db' . $operation . '_' . substr(hash('sha256', $database . ':' . $a->getPrefix()), 0, 40);
+			$b->setQuery('SELECT GET_LOCK(' . $b->quote($lock) . ', 0)')->loadResult();
+			try
+			{
+				if ($operation === 'charset')
+				{
+					$equal(false, FlexicontentDbCharset::convertPending($a)[''][0], 'concurrent charset conversion');
+				}
+				else
+				{
+					$equal(false, FlexicontentDbEngine::convertNext($a)[1], 'concurrent engine conversion');
+				}
+			}
+			finally
+			{
+				$b->setQuery('SELECT RELEASE_LOCK(' . $b->quote($lock) . ')')->loadResult();
+			}
+		}
 		$tables = FlexicontentDbCharset::getPendingTables($a);
 		foreach (['compact', 'binary', 'metadata'] as $name)
 		{
