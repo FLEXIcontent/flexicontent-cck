@@ -1591,10 +1591,34 @@ class com_flexicontentInstallerScript
 				</tr>
 
 		<?php
+		// DATETIME columns of older installations default to the zero date, which a database server in its default (strict)
+		// mode refuses in every ALTER TABLE that is run outside of Joomla. Give them the default of a new installation
+		?>
+				<tr class="row0">
+					<td class="key" style="font-size:11px;">Zero-date column defaults: </td>
+					<td>
+					<?php
+					require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/dbengine.php';
+
+					try {
+						$date_cols = FlexicontentDbEngine::fixZeroDateDefaults($db);
+
+						echo $date_cols
+							? '<span class="badge bg-success badge-success">' . count($date_cols) . ' column(s) updated</span> ' . htmlspecialchars(implode(', ', $date_cols), ENT_QUOTES, 'UTF-8')
+							: '<span class="badge bg-info badge-info">nothing to do</span>';
+					}
+					catch (Exception $e) {
+						echo '<span class="badge badge-error">SQL Error</span> '. $e->getMessage() . '<br/>';
+					}
+					?>
+					</td>
+				</tr>
+
+		<?php
 		// Convert the tables that still use the 3-byte utf8 character set to utf8mb4. Every table is copied by its ALTER,
 		// so the large ones are left for the dashboard's post-installation task, which converts one table per request
 		?>
-				<tr class="row0">
+				<tr class="row1">
 					<td class="key" style="font-size:11px;">Convert DB tables to utf8mb4: </td>
 					<td>
 					<?php
@@ -1640,6 +1664,21 @@ class com_flexicontentInstallerScript
 				if (!empty($engine_result)) {
 					echo '<span class="badge badge-error">SQL Error</span> ' . htmlspecialchars($engine_result[0] . ': ' . $engine_result[2], ENT_QUOTES, 'UTF-8') . '<br/>';
 				}
+			}
+			catch (Exception $e) {
+				echo '<span class="badge badge-error">SQL Error</span> '. $e->getMessage() . '<br/>';
+			}
+		}
+		?>
+
+		<?php
+		// Upgrade of a site that was moved to InnoDB: a table that this upgrade has just created must not stay MyISAM
+		if (!FLEXI_NEW_INSTALL)
+		{
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/dbengine.php';
+
+			try {
+				FlexicontentDbEngine::followSiteEngineForEmptyTables($db);
 			}
 			catch (Exception $e) {
 				echo '<span class="badge badge-error">SQL Error</span> '. $e->getMessage() . '<br/>';

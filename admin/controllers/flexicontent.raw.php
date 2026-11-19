@@ -871,7 +871,7 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 					`item_id` int(11) unsigned NOT NULL default '0',
 					`version_id` int(11) unsigned NOT NULL default '0',
 					`comment` mediumtext NOT NULL,
-					`created` datetime NOT NULL default '0000-00-00 00:00:00',
+					`created` datetime NOT NULL default '1000-01-01 00:00:00',
 					`created_by` int(11) unsigned NOT NULL default '0',
 					`state` int(3) NOT NULL default '0',
 					PRIMARY KEY  (`id`),
@@ -881,6 +881,10 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		try
 		{
 			$db->setQuery($query)->execute();
+
+			// A new table must not come back as MyISAM on a site that was moved to InnoDB
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/dbengine.php';
+			FlexicontentDbEngine::followSiteEngine($db, '#__flexicontent_versions');
 		}
 		catch (Exception $e)
 		{
@@ -1053,6 +1057,10 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		try
 		{
 			$result = $db->execute();
+
+			// A new table must not come back as MyISAM on a site that was moved to InnoDB
+			require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/dbengine.php';
+			FlexicontentDbEngine::followSiteEngine($db, '#__flexicontent_authors_ext');
 		}
 		catch (Exception $e)
 		{

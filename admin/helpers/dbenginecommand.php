@@ -45,7 +45,10 @@ class FlexicontentDbEngineCommand extends AbstractCommand
 			. " to wait while a table is being converted.\n"
 			. "The command converts one table after the other and verifies each one (row count, checksum of the key columns,"
 			. " FULLTEXT indexes). It can be stopped and started again: tables that are already InnoDB are skipped.\n"
-			. "To go back, restore the backup, or run for a table: ALTER TABLE `<table>` ENGINE=MyISAM"
+			. "To go back, restore the backup, or run these two statements together for a table:"
+			. " SET SESSION sql_mode = ''; ALTER TABLE `<table>` ENGINE=MyISAM;
+"
+			. "(the tables hold zero dates, which the database server otherwise refuses when it copies a table)"
 		);
 	}
 
