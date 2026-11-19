@@ -318,7 +318,7 @@ class FCIndexedField extends FCField
 			// Attribute for default value(s)
 			if (!empty($default_values))
 			{
-				$attribs .= ' data-defvals="'.implode('|||', $default_values).'" ';
+				$attribs .= ' data-defvals="' . htmlspecialchars(implode('|||', $default_values), ENT_QUOTES, 'UTF-8') . '" ';
 			}
 
 			// Client-side Validation and sortable class
@@ -400,204 +400,30 @@ class FCIndexedField extends FCField
 		// Handle multiple records
 		if ($multiple && !$ajax)
 		{
-			// Add the drag and drop sorting feature
-			if ($add_ctrl_btns) $js .= "
-			jQuery(document).ready(function(){
-				jQuery('#sortables_".$field->id."').sortable({
-					handle: '.fcfield-drag-handle',
-					/*containment: 'parent',*/
-					tolerance: 'pointer'
-					".($fields_box_placing ? "
-					,start: function(e) {
-						//jQuery(e.target).children().css('float', 'left');
-						//fc_setEqualHeights(jQuery(e.target), 0);
-					}
-					,stop: function(e) {
-						//jQuery(e.target).children().css({'float': 'none', 'min-height': '', 'height': ''});
-					}
-					" : '')."
-				});
-			});
-			";
-
-			if ($max_values) \Joomla\CMS\Language\Text::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
-			$js .= "
-			function addField".$field->id."(el, groupval_box, fieldval_box, params)
-			{
-				var insert_before   = (typeof params!== 'undefined' && typeof params.insert_before   !== 'undefined') ? params.insert_before   : 0;
-				var remove_previous = (typeof params!== 'undefined' && typeof params.remove_previous !== 'undefined') ? params.remove_previous : 0;
-				var scroll_visible  = (typeof params!== 'undefined' && typeof params.scroll_visible  !== 'undefined') ? params.scroll_visible  : 1;
-				var animate_visible = (typeof params!== 'undefined' && typeof params.animate_visible !== 'undefined') ? params.animate_visible : 1;
-
-				if(!remove_previous && (rowCount".$field->id." >= maxValues".$field->id.") && (maxValues".$field->id." != 0)) {
-					alert(Joomla.JText._('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + maxValues".$field->id.");
-					return 'cancel';
-				}
-
-				// Find last container of fields and clone it to create a new container of fields
-				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
-				var newField  = lastField.clone();
-
-			".(!$display_as_select ? "
-				// Remove HTML added by prettyCheckable JS, from the dupicate new INPUT SET
-				var prettyContainers = newField.find('.prettyradio, .prettycheckbox');
-				prettyContainers.find('input, label').each(function() {
-					var el = jQuery(this);
-					el.insertAfter(el.parent());
-				});
-				prettyContainers.remove();
-
-				// Update INPUT SET container id
-				newField.find('.fc_input_set').attr('id', '".$elementid."_'+uniqueRowNum".$field->id.");
-
-				// Update the new INPUT SET
-				var theSet = newField.find('input:radio, input:checkbox');
-				//if(window.console) window.console.log('theSet.length: ' + theSet.length);
-				var nr = 0;
-				theSet.each(function() {
-					var elem = jQuery(this);
-					elem.attr('name', '".$fieldname."['+uniqueRowNum".$field->id."+']".(static::$valueIsArr ? '[]' : '')."');
-					elem.attr('id', '".$elementid."_'+uniqueRowNum".$field->id."+'_'+nr);
-					elem.attr('class', '".$elementid."_'+uniqueRowNum".$field->id." + ' " . $input_classes . "');
-					elem.attr('data-is-defval') ?
-						elem.attr('checked', 'checked') :
-						elem.removeAttr('checked') ;
-
-					".($use_prettycheckable && $prettycheckable_added ?
-						"elem.attr('data-element-grpid', '".$elementid."_'+uniqueRowNum".$field->id.");" :
-						"elem.attr('data-element-grpid', '".$elementid."_'+uniqueRowNum".$field->id.");" )."
-
-					".(!$placeInsideLabel ?
-						"elem.next('label').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_'+nr);" :
-						"elem.closest('label').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_'+nr);" )."   // special case for field with image place input and image inside labels
-					nr++;
-				});
-
-				// Reapply prettyCheckable JS
-				newField.find('.use_prettycheckable').each(function() {
-					var elem = jQuery(this);
-					var lbl = elem.prev('label');
-					var lbl_html = lbl.html();
-					lbl.remove();
-					elem.prettyCheckable({ label: lbl_html });
-				});
-
-			" : "
-
-				// Update the new select field
-				var elem= newField.find('select.fcfield_textselval').first();
-				var defvals = elem.attr('data-defvals');
-				if ( defvals && defvals.length )
-				{
-					jQuery.each(defvals.split('|||'), function(i, val){
-						elem.find('option[value=\"' + val + '\"]').attr('selected', 'selected');
-					});
-				}
-				else elem.val('');
-				elem.attr('name', '".$fieldname."['+uniqueRowNum".$field->id."+']".(static::$valueIsArr ? '[]' : '')."');
-				elem.attr('id', '".$elementid."_'+uniqueRowNum".$field->id.");
-				elem.attr('data-uniqueRowNum', uniqueRowNum".$field->id.");
-
-				// Destroy any select library elements (select2 or choices.js)
-				fc_destroySelectLib(newField);
-			")."
-
-				// Update value holder
-				newField.find('.fcfield_value_holder')
-					.attr('id', '".$valueholder_id."_'+uniqueRowNum".$field->id.")
-					.attr('name', '".$valueholder_nm."['+uniqueRowNum".$field->id."+']');
-				";
-
-			// Add new field to DOM
-			$js .= "
-				lastField ?
-					(insert_before ? newField.insertBefore( lastField ) : newField.insertAfter( lastField ) ) :
-					newField.appendTo( jQuery('#sortables_".$field->id."') ) ;
-				if (remove_previous) lastField.remove();
-
-				// Attach form validation on new element
-				fc_validationAttach(newField);
-
-				// Re-init any select2 elements
-				fc_attachSelect2(newField);
-				";
-
-			// Listen to the changes of depends-on-master field
+			$config = array(
+				'arrayValue' => static::$valueIsArr,
+				'holderId' => $valueholder_id,
+				'holderName' => $valueholder_nm,
+			);
 			if ($cascade_after)
 			{
-				$mvno = $single_master ? "'0'" : "uniqueRowNum".$field->id;
-				$js .= "
-				fcCascadedField(".$field->id.", '".$item->id."', '".$field->field_type."', 'select#".$srcELid."_'+".$mvno."+', input.".$srcELid."_'+".$mvno.", '".$trgELid."_'+uniqueRowNum".$field->id.", ".$cascadePromptJs.", ".static::$promptEnabled.", uniqueRowNum".$field->id.");
-				";
+				$config['cascade'] = array(
+					'itemId' => (string) $item->id,
+					'fieldType' => $field->field_type,
+					'sourceBase' => $srcELid,
+					'singleMaster' => $single_master,
+					'prompt' => $cascade_prompt,
+					'promptEnabled' => static::$promptEnabled,
+				);
 			}
-
-			else
-			{
-				$js .= "
-				jQuery('#".$elementid."_'+uniqueRowNum".$field->id.").each(function() {
-					var el = jQuery(this);
-					setTimeout(function(){
-						el.trigger('change');
-					}, 20); // >0 is enough
-				});
-				";
-			}
-
-			// Add new element to sortable objects (if field not in group)
-			if ($add_ctrl_btns) $js .= "
-				//jQuery('#sortables_".$field->id."').sortable('refresh');  // Refresh was done appendTo ?
-				";
-
-			// Show new field, increment counters
-			$js .="
-				//newField.fadeOut({ duration: 400, easing: 'swing' }).fadeIn({ duration: 200, easing: 'swing' });
-				if (scroll_visible) fc_scrollIntoView(newField, 1);
-				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800, function() { jQuery(this).css('opacity', ''); });
-
-				// Enable tooltips on new element
-				newField.find('.hasTooltip').tooltip({html: true, container: newField});
-				newField.find('.hasPopover').popover({html: true, container: newField, trigger : 'hover focus'});
-
-				rowCount".$field->id."++;       // incremented / decremented
-				uniqueRowNum".$field->id."++;   // incremented only
-			}
-
-
-			function deleteField".$field->id."(el, groupval_box, fieldval_box)
-			{
-				// Disable clicks on remove button, so that it is not reclicked, while we do the field value hide effect (before DOM removal of field value)
-				var btn = fieldval_box ? false : jQuery(el);
-				if (btn && rowCount".$field->id." > 1) btn.css('pointer-events', 'none').off('click');
-
-				// Find field value container
-				var row = fieldval_box ? fieldval_box : jQuery(el).closest('li');
-
-				// Add empty container if last element, instantly removing the given field value container
-				if(rowCount".$field->id." == 1)
-					addField".$field->id."(null, groupval_box, row, {remove_previous: 1, scroll_visible: 0, animate_visible: 0});
-
-				// Remove if not last one, if it is last one, we issued a replace (copy,empty new,delete old) above
-				if (rowCount".$field->id." > 1)
-				{
-					// Destroy the remove/add/etc buttons, so that they are not reclicked, while we do the field value hide effect (before DOM removal of field value)
-					row.find('.fcfield-delvalue').remove();
-					row.find('.fcfield-expand-view').remove();
-					row.find('.fcfield-insertvalue').remove();
-					row.find('.fcfield-drag-handle').remove();
-					// Do hide effect then remove from DOM
-					row.slideUp(400, function(){ jQuery(this).remove(); });
-					rowCount".$field->id."--;
-				}
-			}
-			";
-
-			$css .= '';
+			flexicontent_html::loadFramework('indexed-field');
+			$js .= $this->buildValueRepeater($field, $elementid, $fieldname, $use_ingroup ? 0 : $max_values, $add_ctrl_btns, $config, 'fcfield_indexed');
 
 			$remove_button = '<span class="' . $btn_item_class . ' fcfield-delvalue ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
 			$move2         = '<span class="' . $btn_item_class . ' fcfield-drag-handle ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
 			$add_here = '';
-			$add_here .= $add_position==2 || $add_position==3 ? '<span class="' . $btn_item_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
-			$add_here .= $add_position==1 || $add_position==3 ? '<span class="' . $btn_item_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
+			$add_here .= $add_position==2 || $add_position==3 ? '<span class="' . $btn_item_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField'.$field->id.'(null, this.closest(\'ul\'), this.closest(\'li\'), {insert_before: 1});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
+			$add_here .= $add_position==1 || $add_position==3 ? '<span class="' . $btn_item_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, this.closest(\'ul\'), this.closest(\'li\'), {insert_before: 0});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
 		}
 
 		// Field not multi-value
@@ -612,11 +438,6 @@ class FCIndexedField extends FCField
 
 
 		// Added field's custom CSS / JS
-		if ($multiple) $js .= "
-			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
-			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
-			var maxValues".$field->id." = ".$max_values.";
-		";
 		if (!$ajax && $js)  $document->addScriptDeclaration($js);
 		if (!$ajax && $css) $document->addStyleDeclaration($css);
 
@@ -765,7 +586,6 @@ class FCIndexedField extends FCField
 							$d[] = (object) array('id' => $options[$v]->value, 'text' => $options[$v]->text);
 						}
 					}
-					//$per_val_js .= 'jQuery("#'.$elementid_n.'").select2("data", '.json_encode($d).');';
 					$this_val_attribs .= ' data-select2-initdata = "' . htmlentities(json_encode($d), ENT_QUOTES, 'UTF-8') . '"';
 				}
 
@@ -837,7 +657,7 @@ class FCIndexedField extends FCField
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
 			if (!$add_position) $field->html .= '
 				<div class="'.$btn_group_class.' fc-xpended-btns">
-					<span class="fcfield-addvalue ' . $font_icon_class . ' ' . $btn_item_class . '" onclick="addField'.$field->id.'(jQuery(this).closest(\'.fc-xpended-btns\').get(0));" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_TO_BOTTOM' ).'">
+					<span class="fcfield-addvalue ' . $font_icon_class . ' ' . $btn_item_class . '" onclick="addField'.$field->id.'(this.closest(\'.fc-xpended-btns\'));" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_TO_BOTTOM' ).'">
 						'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_VALUE' ).'
 					</span>
 				</div>';

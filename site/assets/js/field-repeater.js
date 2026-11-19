@@ -8,8 +8,11 @@ window.FlexiFieldRepeater = (() => {
     control.name = name;
     delete control.dataset.originalId;
     if (control instanceof HTMLSelectElement) {
-      for (const option of control.options) option.defaultSelected = option.value === value;
-      control.value = value;
+      const values = new Set(Array.isArray(value) ? value : [value]);
+      for (const option of control.options) option.defaultSelected = option.selected = values.has(option.value);
+      if (!control.multiple && !Array.from(control.options).some(option => values.has(option.value))) control.selectedIndex = -1;
+    } else if (control.matches('input[type=radio], input[type=checkbox]')) {
+      control.defaultChecked = control.checked = value;
     } else {
       control.defaultValue = control.value = value;
     }
@@ -61,6 +64,7 @@ window.FlexiFieldRepeater = (() => {
         fc_bootstrapAttach(row);
         fc_initSelect2(null, row);
         fc_initTooltips(null, row);
+        adapter?.ready?.(row, ref, config);
       } catch (error) {
         fc_destroySelectLib(row);
         row.remove();

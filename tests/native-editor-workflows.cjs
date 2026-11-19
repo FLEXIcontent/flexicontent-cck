@@ -229,6 +229,34 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
     await page.locator('#dependent-row').waitFor({state: 'hidden'});
     assert.equal(await page.locator('#child option').textContent(), 'Select a parent');
   });
+  await test('A cloned indexed field follows the controller in its own group', async page => {
+    await form(page, `<ul class="fcfield-group">
+      <li><select id="custom_parent_0"><option value="original">Original</option></select>
+        <div class="control-group"><select id="custom_child_0"><option value="keep">Keep</option></select></div>
+      </li>
+      <li>
+        <div class="control-group" id="cloned"><select id="custom_child_4"><option value="old">Old</option></select></div>
+        <select id="custom_parent_9"><option value="current">Current</option></select>
+      </li>
+    </ul>`);
+    const requests = [];
+    await loadDependencies(page);
+    await page.addScriptTag({content:source('site/assets/js/indexed-field.js')});
+    await page.route(/\/index\.php\?option=com_flexicontent/, route => {
+      const params = new URLSearchParams(route.request().postData());
+      requests.push([params.get('valgrps'), params.get('valindex')]);
+      return route.fulfill({body:'<option value="">Select</option><option value="new">New</option>'});
+    });
+    await page.evaluate(() => {
+      fcCascadedField(21, 42, 'select', 'select#custom_parent_0, input.custom_parent_0', 'custom_child_0', 'Select', true, 0);
+      fcfield_indexed.ready(document.getElementById('cloned'), { id:'custom_child_4', index:4 }, {
+        fieldId:21, cascade:{ sourceBase:'custom_parent', itemId:42, fieldType:'select', prompt:'Select', promptEnabled:true },
+      });
+    });
+    await page.locator('#custom_child_4 option[value="new"]').waitFor({state:'attached'});
+    assert.deepEqual(requests, [['current','4']]);
+    assert.equal(await page.inputValue('#custom_child_0'), 'keep');
+  });
   await test('Chained cascades survive replaced radio groups without jQuery', async page => {
     await form(page, `
       <select id="parent"><option value="">None</option><option value="region">Region</option></select>
@@ -626,6 +654,41 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
     assert.equal(await page.locator('label[for=off]').getAttribute('class'),'btn active btn-danger');
     await page.locator('label[for=on]').click();
     assert.equal(await page.locator('label[for=on]').getAttribute('class'),'btn active btn-success');
+  });
+  await test('Related items can be picked without a select enhancer or jQuery', async page => {
+    await form(page, `<div class="container_fcfield">
+      <input type="checkbox" class="fc_field_filter" name="filter[4][]" value="blue" checked>
+      <input type="checkbox" class="fc_field_filter" name="filter[4][]" value="red">
+      <div class="fcfield-relation-value_box" data-field_id="7" data-item_id="11">
+        <select id="category" class="fcfield-relation-cat_selector" onchange="fcfield_relation.cat_selector_change(this)">
+          <option value="">Select category</option><option value="8">Category</option>
+        </select>
+        <div class="fcfield-relation-item_selector_box">
+          <select id="pick" class="fcfield-relation-item_selector" onchange="fcfield_relation.add_related(this)"><option value="">-</option></select>
+        </div>
+        <select id="related" multiple class="fcfield-relation-selected_items" name="custom[related][]"
+          onchange="fcfield_relation.selected_items_modified(this)" data-fc_choices_search_remote="1"></select>
+      </div>
+    </div>`);
+    const requests = [];
+    await page.route('https://fixture.invalid/index.php?*', route => {
+      requests.push({ url:new URL(route.request().url()), body:new URLSearchParams(route.request().postData()) });
+      return route.fulfill({ json:{ error:'', options:[{item_id:9,item_title:'Cedar'}] } });
+    });
+    await page.addScriptTag({content:source('plugins/flexicontent_fields/relation/js/form.js')});
+    await page.evaluate(() => { window.sessionToken7 = 'fixtureToken'; });
+    await page.selectOption('#category','8');
+    await page.waitForFunction(() => document.querySelector('#pick option[value="9"]'));
+    await page.selectOption('#pick','9');
+    assert.deepEqual(await page.evaluate(() => new FormData(document.forms[0]).getAll('custom[related][]')), ['9:8']);
+    assert(await page.locator('#pick option[value="9"]').isDisabled());
+    await page.selectOption('#related', []);
+    assert.equal(await page.locator('#related option').count(), 0);
+    assert.equal(await page.locator('#pick option[value="9"]').isDisabled(), false);
+    assert.equal(requests[0].url.searchParams.get('fixtureToken'), '1');
+    assert.equal(requests[0].body.get('item_id'), '11');
+    assert.equal(requests[0].body.get('catid'), '8');
+    assert.deepEqual(new URLSearchParams(requests[0].body.get('customfilts')).getAll('filter[4][]'), ['blue']);
   });
   await test('Editor tabs with optional tooltip classes initialize without jQuery',async page=>{
     await form(page,'<div id="editor-tabs" class="fctabber"><div id="basic-tab" class="tabbertab"><h3 class="hasTooltip">Basic</h3><input name="basic"></div><div id="content-tab" class="tabbertab"><h3 class="hasPopover">Content</h3><input name="content"></div></div>');

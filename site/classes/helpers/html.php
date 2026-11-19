@@ -1953,7 +1953,8 @@ class flexicontent_html
 				break;
 
 			case 'prettyCheckable':
-				if ($load_jquery) flexicontent_html::loadJQuery();
+				if (!$jquery_for_plugins) return false;
+				flexicontent_html::loadJQuery(1, 0, 0);
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/prettyCheckable';
 				$document->addScript($framework_path.'/dev/prettyCheckable.js');
@@ -2304,6 +2305,11 @@ class flexicontent_html
 				flexicontent_html::loadFramework('flexi-lib');
 				flexicontent_html::loadFramework('sortable');
 				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/field-repeater.js', array('version' => FLEXI_VHASH));
+				break;
+
+			case 'indexed-field':
+				flexicontent_html::loadFramework('field-repeater');
+				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/indexed-field.js', array('version' => FLEXI_VHASH));
 				break;
 
 			case 'flexi-lib-form':

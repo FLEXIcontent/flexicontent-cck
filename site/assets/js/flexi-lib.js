@@ -631,7 +631,7 @@
 		}
 	}
 
-	function fcCascadedField(fieldId, itemId, fieldType, sourceSelector, targetId, prompt, promptEnabled, index)
+	function fcCascadedField(fieldId, itemId, fieldType, sourceSelector, targetId, prompt, promptEnabled, index, initialize = false)
 	{
 		const target = document.getElementById(targetId);
 		// The generated selector identifies both a select and its radio/checkbox equivalent.
@@ -686,7 +686,13 @@
 			legacy.on('change.fcCascade', syntheticChange);
 			binding.signal.addEventListener('abort', () => legacy.off('change.fcCascade', syntheticChange), { once: true });
 		}
-		FlexiForm.show(row, hasValue(chosen()));
+		if (initialize) {
+			const trigger = isSelect ? source : source.querySelector('input:checked') || source.querySelector('input');
+			if (trigger) update({ target: trigger });
+			else FlexiForm.show(row, false);
+		} else {
+			FlexiForm.show(row, hasValue(chosen()));
+		}
 	}
 
 
@@ -1824,10 +1830,14 @@
 			if (isRemoteSearch && typeof window.fc_fetch_relation_choices === 'function') {
 				var remoteContainer = choicesInstance.containerOuter && choicesInstance.containerOuter.element;
 				var searchTimer = null;
+				var requestNumber = 0;
 				var fetchRemote = function(query) {
 					clearTimeout(searchTimer);
+					const current = ++requestNumber;
 					searchTimer = setTimeout(function() {
+						if (!el.isConnected || el.fc_choices_instance !== choicesInstance) return;
 						window.fc_fetch_relation_choices(el.id, query, function(options) {
+							if (current !== requestNumber || !el.isConnected || el.fc_choices_instance !== choicesInstance) return;
 							if (!options) options = [];
 							var selectedIds = [];
 							Array.prototype.forEach.call(el.options, function(opt) {
@@ -1856,6 +1866,9 @@
 					remoteContainer.addEventListener('input', remoteHandler);
 					remoteContainer.addEventListener('focusin', remoteHandler);
 				}
+				el.addEventListener('fc:relation-options', function() {
+					if (el.fc_choices_instance === choicesInstance) fetchRemote(choicesInstance.input?.element.value || '');
+				});
 				fetchRemote('');
 			}
 
