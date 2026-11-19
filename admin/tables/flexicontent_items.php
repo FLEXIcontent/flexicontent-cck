@@ -804,9 +804,9 @@ class flexicontent_items extends _flexicontent_items
 			}
 		}
 
-		// The values that the database stores when strict mode is off (a text cut to its column, '' as 0 in a number column),
-		// so that it accepts the three records in strict mode too
-		flexicontent_db::fitRecordToColumns($record, $this->getFields(), !$this->$k);
+		// The values that the database stores when strict mode is off (a text cut to its column, '' as 0 in a number column,
+		// '' for a NULL in a NOT NULL column), so that it accepts the three records in strict mode too
+		flexicontent_db::fitRecordToColumns($record, $this->getFields(), !$this->$k, $updateNulls);
 
 		if ($this->$k)
 		{
@@ -859,7 +859,7 @@ class flexicontent_items extends _flexicontent_items
 		// Update extended data record
 		if ($ext_exists)
 		{
-			flexicontent_db::fitRecordToColumns($record_ext, $this->_tbl_fields[$this->_tbl_ext]);
+			flexicontent_db::fitRecordToColumns($record_ext, $this->_tbl_fields[$this->_tbl_ext], false, $updateNulls);
 			$ret = $this->_db->updateObject($this->_tbl_ext, $record_ext, $fk_ext, $updateNulls);
 		}
 
@@ -877,7 +877,7 @@ class flexicontent_items extends _flexicontent_items
 		// Update #__flexicontent_items_tmp table
 		if ($tmp_exists)
 		{
-			flexicontent_db::fitRecordToColumns($record_tmp, $this->_tbl_fields[$this->_tbl_tmp]);
+			flexicontent_db::fitRecordToColumns($record_tmp, $this->_tbl_fields[$this->_tbl_tmp], false, $updateNulls);
 			$ret = $this->_db->updateObject($this->_tbl_tmp, $record_tmp, $fk_tmp, $updateNulls);
 		}
 

@@ -1863,17 +1863,19 @@ class flexicontent_db
 	 * Give a record the values that the database stores for it when strict mode is off, so that strict mode accepts it too.
 	 *
 	 * With strict mode off, the database cuts a text that is longer than its VARCHAR column, stores an empty string in
-	 * a number column as 0, and fills a NOT NULL column that has no default and that an INSERT leaves out with an empty
-	 * string or 0. With strict mode on (the mode Joomla sets on its connection) it refuses the statement in all three
-	 * cases. Here the record gets those same values before it is stored.
+	 * a number column as 0, fills a NOT NULL column that has no default and that an INSERT leaves out with an empty
+	 * string or 0, and stores the same for a NULL that an UPDATE writes into a NOT NULL column. With strict mode on
+	 * (the mode Joomla sets on its connection) it refuses the statement in all four cases. Here the record gets those
+	 * same values before it is stored.
 	 *
-	 * @param   object  $record   The record that will be stored
-	 * @param   array   $columns  The columns of its table, as returned by getTableColumns($table, false)
-	 * @param   bool    $isNew    True for an INSERT: the required columns that the record does not set are filled too
+	 * @param   object  $record       The record that will be stored
+	 * @param   array   $columns      The columns of its table, as returned by getTableColumns($table, false)
+	 * @param   bool    $isNew        True for an INSERT: the required columns that the record does not set are filled too
+	 * @param   bool    $updateNulls  True for an UPDATE that also writes the properties that are NULL
 	 *
 	 * @return  void
 	 */
-	static function fitRecordToColumns($record, $columns, $isNew = false)
+	static function fitRecordToColumns($record, $columns, $isNew = false, $updateNulls = false)
 	{
 		foreach ($columns as $name => $column)
 		{
@@ -1882,9 +1884,14 @@ class flexicontent_db
 
 			if (!isset($record->$name))
 			{
-				// Leave out: columns that may be NULL or have a default, the auto-increment key, and dates
-				if (!$isNew || $column->Null !== 'NO' || $column->Default !== null || stripos((string) $column->Extra, 'auto_increment') !== false
-					|| preg_match('/^(date|time|year)/', $type))
+				// Leave out: columns that may be NULL, the auto-increment key, and dates
+				if ($column->Null !== 'NO' || stripos((string) $column->Extra, 'auto_increment') !== false || preg_match('/^(date|time|year)/', $type))
+				{
+					continue;
+				}
+
+				// An INSERT leaves the column out: the database needs a value only if the column has no default
+				if ($isNew ? $column->Default !== null : (!$updateNulls || !property_exists($record, $name)))
 				{
 					continue;
 				}
@@ -1902,6 +1909,28 @@ class flexicontent_db
 				$record->$name = StringHelper::substr($record->$name, 0, (int) $m[1]);
 			}
 		}
+	}
+
+
+	/**
+	 * The same for a record of the given table: see fitRecordToColumns()
+	 *
+	 * @param   object  $record  The record that will be stored
+	 * @param   string  $table   The name of its table, e.g. '#__flexicontent_files'
+	 * @param   bool    $isNew   True for an INSERT
+	 *
+	 * @return  void
+	 */
+	static function fitRecordToTable($record, $table, $isNew = false)
+	{
+		static $columns = array();
+
+		if (!isset($columns[$table]))
+		{
+			$columns[$table] = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class)->getTableColumns($table, false);
+		}
+
+		self::fitRecordToColumns($record, $columns[$table], $isNew);
 	}
 
 

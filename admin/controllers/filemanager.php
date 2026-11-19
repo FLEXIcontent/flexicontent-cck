@@ -1127,6 +1127,8 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		if ($file_mode == 'db_mode')
 		{
 			// Insert file record in DB
+			// A new row: its required columns (attribs) need a value and its title must fit, or strict mode refuses the INSERT
+			flexicontent_db::fitRecordToTable($fileObj, '#__' . $this->records_dbtbl, true);
 			$db->insertObject('#__' . $this->records_dbtbl, $fileObj);
 
 			// Get id of new file record
@@ -1374,6 +1376,8 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		$fileObj->uploaded    = \Joomla\CMS\Factory::getDate('now')->toSql();
 		$fileObj->uploaded_by = $user->get('id');
 
+		// A new row: its required columns (attribs) need a value and its title must fit, or strict mode refuses the INSERT
+		flexicontent_db::fitRecordToTable($fileObj, '#__' . $this->records_dbtbl, true);
 		$db->insertObject('#__' . $this->records_dbtbl, $fileObj);
 
 		// Get id of new file record
@@ -2163,6 +2167,8 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 					$fileObj->uploaded_by = $user->get('id');
 
 					// Add the record to the DB
+					// A new row: its required columns (attribs) need a value and its title must fit, or strict mode refuses the INSERT
+					flexicontent_db::fitRecordToTable($fileObj, '#__' . $this->records_dbtbl, true);
 					$db->insertObject('#__' . $this->records_dbtbl, $fileObj);
 					$file_ids[$filename] = $db->insertid();
 

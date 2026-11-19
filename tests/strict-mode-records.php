@@ -67,6 +67,23 @@ namespace {
 	$same(false, isset($u->type_id), 'update: a number column that the record does not hold is not added');
 	$same(null, $u->note, 'update: NULL is kept');
 
+	// An existing row that is stored with its NULL properties too (Table::store($updateNulls = true)): a NULL in a
+	// NOT NULL column is stored as an empty string or 0 when strict mode is off, and is refused when it is on
+	$n = (object) array('title' => null, 'hits' => null, 'state' => null, 'note' => null, 'created' => null, 'id' => 5);
+	flexicontent_db::fitRecordToColumns($n, $columns, false, true);
+	$same('', $n->title, 'update with NULLs: NULL in a NOT NULL text column becomes an empty string');
+	$same(0, $n->hits, 'update with NULLs: NULL in a NOT NULL number column becomes 0');
+	$same(0, $n->state, 'update with NULLs: the same for a column that has a default');
+	$same(null, $n->note, 'update with NULLs: NULL is kept in a column that may be NULL');
+	$same(null, $n->created, 'update with NULLs: a date column is left alone');
+	$same(false, property_exists($n, 'sub_items'), 'update with NULLs: a column that the record does not hold is not added');
+
+	// Without the NULL properties (updateObject skips them) nothing changes
+	$s = (object) array('title' => null, 'hits' => null);
+	flexicontent_db::fitRecordToColumns($s, $columns);
+	$same(null, $s->title, 'update: a NULL that is not written is kept');
+	$same(null, $s->hits, 'update: a NULL number that is not written is kept');
+
 	// Characters, not bytes
 	$m = (object) array('title' => '植牙完整指南一二三四五六七');
 	flexicontent_db::fitRecordToColumns($m, $columns);
