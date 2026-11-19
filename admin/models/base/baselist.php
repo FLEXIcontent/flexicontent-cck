@@ -1031,7 +1031,11 @@ abstract class FCModelAdminList extends \Joomla\CMS\MVC\Model\ListModel
 		$table = $this->getTable($this->records_jtable, '');
 
 		$cid      = is_array($id) ? $id : array($id);
-		$accesses = is_array($access) ? $access : array($access);
+
+		// One access level for the given record(s): the category list passes one id and one level. It was then looked up by
+		// record id in a one-element list, was not found, and the record got access level NULL: stored as 0 with strict mode
+		// off, refused (Column 'access' cannot be null) with strict mode on
+		$accesses = is_array($access) ? $access : array_fill_keys($cid, $access);
 
 		foreach ($cid as $id)
 		{

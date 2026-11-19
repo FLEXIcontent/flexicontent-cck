@@ -84,13 +84,6 @@ class plgSystemFlexisystem extends CMSPlugin
 		if (!$this->cparams->get('bootstrap_ver', null)) {
 			$this->cparams->set('bootstrap_ver', (FLEXI_J40GE ? 5 : 2));
 		}
-
-		// Temporary workaround until code is updated
-		if (FLEXI_J40GE) {
-			Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class)->setQuery(
-				"SET sql_mode=(SELECT REPLACE(REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''),'STRICT_TRANS_TABLES',''))"
-			)->execute();
-		}
 	}
 
 
