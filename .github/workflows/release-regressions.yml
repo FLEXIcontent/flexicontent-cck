@@ -28,6 +28,7 @@ jobs:
           php -d error_reporting=-1 tests/manager-checkin-controls.php
           php -d error_reporting=-1 tests/favourites-controller.php
           php -d error_reporting=-1 tests/gallery-options.php
+          php -d error_reporting=-1 tests/phone-country-roundtrip.php
           php -d error_reporting=-1 tests/flexibreak-layouts.php
           php -d error_reporting=-1 tests/module-tab-state.php
           for framework in fancybox galleriffic elastislide multibox fcxSlide image-picker zTree photoswipe glightbox swiper; do

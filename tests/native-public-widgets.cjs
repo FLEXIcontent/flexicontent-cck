@@ -84,6 +84,24 @@ const {chromium} = require('playwright'), assert = require('node:assert/strict')
     const comparisons = await page.evaluate(() => window.comparisons.map(s => ({mode:s.options.mode, labels:s.options.showLabels, count:s.images.length, sizes:s.sizes})));
     assert.equal(comparisons.length,2); assert.equal(comparisons[0].mode,'vertical'); assert.equal(comparisons[0].labels,false); assert.equal(comparisons[0].count,2); assert.deepEqual(comparisons[1].sizes,[]);
     assert.equal(await page.evaluate(() => typeof jQuery), 'undefined'); assert.deepEqual(errors, []);
+    // A Joomla header must not intercept the legacy gallery's close control or backdrop.
+    // Exercise hit testing with the shipped styles, including their normal load order.
+    await page.setViewportSize({width:768,height:900});
+    await page.setContent(`<header style="position:relative;z-index:10;height:260px;background:#234">Site navigation</header>
+      <div class="MultiBoxContainer" style="display:block;top:240px;left:54px;width:640px;height:400px">
+        <div class="MultiBoxClose" role="button" aria-label="Close gallery"></div>
+      </div><div class="vegas-overlay" style="position:fixed;inset:0"></div>`);
+    await page.addStyleTag({path:path.join(__dirname,'../site/librairies/jmultibox/styles/multibox.css')});
+    await page.addStyleTag({path:path.join(__dirname,'../site/librairies/jmultibox/styles/jquery.vegas.css')});
+    await page.evaluate(()=>{
+      document.querySelector('.MultiBoxClose').addEventListener('click',()=>{window.galleryClosed=true});
+      document.querySelector('.vegas-overlay').addEventListener('click',()=>{window.backdropClicked=true});
+    });
+    await page.getByRole('button',{name:'Close gallery'}).click({timeout:2500});
+    assert.equal(await page.evaluate(()=>window.galleryClosed),true);
+    await page.mouse.click(20,20);
+    assert.equal(await page.evaluate(()=>window.backdropClicked),true);
     console.log('PASS: favourite success/failure and two modules, safe cookie rendering, Sortable, Bootstrap state isolation, pagebreak navigation/show-all/hash/wrap without jQuery');
+    console.log('PASS: Multibox close control and backdrop remain above Joomla navigation');
   } finally { await browser.close(); }
 })().catch(error => {console.error(error); process.exitCode=1;});

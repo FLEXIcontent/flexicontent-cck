@@ -23,6 +23,16 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 	static $field_types = null; // Automatic, do not remove since needed for proper late static binding, define explicitely when a field can render other field types
 	var $task_callable = null;  // Field's methods allowed to be called via AJAX
 
+	// Country options include a leading '+' and sometimes an area-code space.
+	// Use the same safe digits for option values, saved data and telephone URLs.
+	protected static function normalizeCountryCode($value)
+	{
+		$value = trim((string) $value);
+		return preg_match('/^\+?[0-9]+(?: [0-9]+)*$/D', $value)
+			? str_replace(array('+', ' '), '', $value)
+			: '';
+	}
+
 	// ***
 	// *** CONSTRUCTOR
 	// ***
@@ -178,7 +188,7 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 		{
 			$country_op          = new stdClass;
 			$allowed_countries[] = $country_op;
-			$country_op->value   = $country_code;
+			$country_op->value   = static::normalizeCountryCode($country_code);
 			$country_op->text    = \Joomla\CMS\Language\Text::_('PLG_FC_PHONENUMBERS_CC_' . $country_code);
 
 			if (count($ac_country_allowed_list))
@@ -274,9 +284,12 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 					<input class="fcfield_textval phonelabel" name="'.$fieldname_n.'[label]" id="'.$elementid_n.'_label" type="text" value="'.@$value['label'].'" '.$label_attribs.' />
 				</td></tr>');
 
+			$selected_cc = static::normalizeCountryCode($value['cc'] ?? $ac_country_default);
 			$phonecc = (!$use_cc ? '' : '
 				<tr><td class="key">' .\Joomla\CMS\Language\Text::_( 'PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_COUNTRY_CODE' ). '</td><td>
-' . \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $allowed_countries, $fieldname_n.'[cc]', $countries_attribs . ' class="use_select2_lib phonecc"', 'value', 'text', ($value['cc'] ?? $ac_country_default), $elementid_n.'_cc') . '				</td></tr>');
+' . \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $allowed_countries, $fieldname_n.'[cc]', $countries_attribs . ' class="use_select2_lib phonecc"', 'value', 'text', $selected_cc, $elementid_n.'_cc')
+				. ($single_country ? '<input type="hidden" name="' . $fieldname_n . '[cc]" value="' . static::normalizeCountryCode($single_country) . '" />' : '')
+				. '				</td></tr>');
 
 			$phone = '
 				<tr><td class="key">' .\Joomla\CMS\Language\Text::_( 'PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_PHONE_NUMBER' ). '</td><td>
@@ -461,8 +474,7 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 			$phone3 = htmlspecialchars(isset($value['phone3']) ? (string) $value['phone3'] : '', ENT_QUOTES, 'UTF-8');
 
 			// A tel URL accepts only the normalized phone components, never raw stored text.
-			$raw_tel_cc = isset($value['cc']) ? trim((string) $value['cc']) : '';
-			$tel_cc     = preg_match('/^\+?[0-9]+$/D', $raw_tel_cc) ? ltrim($raw_tel_cc, '+') : '';
+			$tel_cc     = static::normalizeCountryCode($value['cc'] ?? '');
 			$tel_phone1 = preg_replace('/[^0-9A-Z]/i', '', isset($value['phone1']) ? (string) $value['phone1'] : '');
 			$tel_phone2 = preg_replace('/[^0-9A-Z]/i', '', isset($value['phone2']) ? (string) $value['phone2'] : '');
 			$tel_phone3 = preg_replace('/[^0-9A-Z]/i', '', isset($value['phone3']) ? (string) $value['phone3'] : '');
@@ -556,8 +568,7 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 			$v['phone1'] = preg_replace($regex, '', strtoupper($v['phone1']));
 			$v['phone2'] = preg_replace($regex, '', strtoupper($v['phone2']));
 			$v['phone3'] = preg_replace($regex, '', strtoupper($v['phone3']));
-			$raw_cc      = isset($v['cc']) ? trim((string) $v['cc']) : '';
-			$v['cc']     = preg_match('/^\+?[0-9]+$/D', $raw_cc) ? ltrim($raw_cc, '+') : '';
+			$v['cc']     = static::normalizeCountryCode($v['cc'] ?? '');
 
 			// enforce max length
 			$newpost[$new]['phone1'] = $phone1_maxlength ? substr($v['phone1'], 0, $phone1_maxlength) : $v['phone1'];

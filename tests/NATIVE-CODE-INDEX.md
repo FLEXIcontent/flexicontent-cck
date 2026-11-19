@@ -1,6 +1,6 @@
 # Native workflow patch: code index
 
-This is the cumulative file index for draft PR #1421 against upstream master `bda8b4c7172c6efc0274ee9f15107128201338be`, including the 20 November follow-up. It contains **45 authored runtime JavaScript files**, 3 changed vendor JavaScript files and **11 browser test files**. Existing native files may have targeted fixes rather than a complete rewrite.
+This is the cumulative file index for draft PR #1421 against upstream master `bda8b4c7172c6efc0274ee9f15107128201338be`, including the 20 November field-catalogue follow-up. It contains **45 authored runtime JavaScript files**, 5 changed vendor JavaScript files and **12 browser test files**. Existing native files may have targeted fixes rather than a complete rewrite.
 
 The PHP templates also generate JavaScript; the relevant integrations are linked below. The complete binary Git patch includes all PHP, XML, language, CSS/LESS, tests and screenshots as well.
 
@@ -59,12 +59,15 @@ Choices remains the select enhancer. It is independent of optional gallery selec
 ## Changed vendor JavaScript
 
 - [site/librairies/galleriffic/js/jquery.galleriffic.js](../site/librairies/galleriffic/js/jquery.galleriffic.js)
+- [site/librairies/jmultibox/js/jmultibox.js](../site/librairies/jmultibox/js/jmultibox.js)
+- [site/librairies/jmultibox/js/jmultibox.min.js](../site/librairies/jmultibox/js/jmultibox.min.js)
 - [site/librairies/inputmask/inputmask.min.js](../site/librairies/inputmask/inputmask.min.js)
 - [site/librairies/wavesurfer/wavesurfer.min.js](../site/librairies/wavesurfer/wavesurfer.min.js)
 
 ## Browser regression suites
 
 - [tests/image-media-clone.cjs](../tests/image-media-clone.cjs)
+- [tests/multibox-layout.cjs](../tests/multibox-layout.cjs)
 - [tests/native-admin-workflows.cjs](../tests/native-admin-workflows.cjs)
 - [tests/native-color-input.cjs](../tests/native-color-input.cjs)
 - [tests/native-editor-workflows.cjs](../tests/native-editor-workflows.cjs)
@@ -90,8 +93,12 @@ Choices remains the select enhancer. It is independent of optional gallery selec
 - [site/assets/less/flexi_frontend.less](../site/assets/less/flexi_frontend.less)
 - [site/assets/less/flexi_frontend_rtl.less](../site/assets/less/flexi_frontend_rtl.less)
 - [site/librairies/galleriffic/css/basic.css](../site/librairies/galleriffic/css/basic.css)
+- [site/librairies/jmultibox/styles/multibox.css](../site/librairies/jmultibox/styles/multibox.css)
+- [site/librairies/jmultibox/styles/jquery.vegas.css](../site/librairies/jmultibox/styles/jquery.vegas.css)
 
 ## Follow-up PHP integrations
+
+- [plugins/flexicontent_fields/phonenumbers/phonenumbers.php](../plugins/flexicontent_fields/phonenumbers/phonenumbers.php), with [country round-trip regression](phone-country-roundtrip.php)
 
 - [site/classes/helpers/html.php](../site/classes/helpers/html.php)
 - [site/controller.php](../site/controller.php)

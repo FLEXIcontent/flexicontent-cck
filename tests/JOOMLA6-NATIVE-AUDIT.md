@@ -77,11 +77,46 @@ The initial Kitchen Sink automation had a scroll/stability timeout during Choice
 
 ## Automated validation
 
-- **66 PHP/Node/Python regression commands passed**, including dependency load order/deduplication/manual opt-out, item/category favourites, gallery settings, Flexibreak rendering and malformed module cookies.
-- **11 browser/Node suites passed**: shared editors (41 cases), real Joomla dialogs (three widths), maintenance (nine cases), managers (seven cases), masks (25 cases), colors, uploader, public waveform, legacy helper migration, public widgets and media cloning.
-- **241 PHP and JavaScript syntax checks passed** across the cumulative changed source set. The readable patched Inputmask file is included; the changed Galleriffic vendor file was also exercised in the browser.
+### Persistent field catalogue follow-up
+
+The laboratory now has seven additional content types, 57 named custom fields
+and 20 persistent sample items, linked from a field-test catalogue. The original
+Kitchen Sink and Input Mask types remain available. Each gallery engine has its
+own image field and sample page, so another engine cannot conceal its dependency
+requirements. RokBox, JCE MediaBox, Widgetkit, comments and account integrations
+are explicitly marked with their external setup prerequisites.
+
+All seven new types passed administrator and frontend save/reopen checks and
+frontend create-form checks with jQuery blocked in the editors. Added TinyMCE,
+text and grouped Choices rows persisted, then were removed and the original
+sample values restored exactly. Public sample pages were checked at desktop and
+mobile widths. Ten bundled gallery modes, including Pannellum with a synthetic
+2:1 panorama, were exercised at 390, 768 and 1280 pixels.
+
+These fixtures exposed two further defects fixed in this patch:
+
+- Phone country options used `+886` while saved values used `886`, clearing the
+  selection on reopening and losing it on the next save. Options, selection,
+  save normalization and telephone URLs now share numeric country codes. A
+  disabled single-country select also submits its value through a hidden input.
+  Actual save/reopen passed for `+1`, `+886` and `+1 441`; the PHP regression also
+  covers legacy values, configured defaults and invalid input.
+- Multibox's close button could sit below Cassiopeia's header at tablet widths,
+  and large images extended outside a mobile viewport. Modal stacking and image
+  sizing now keep the viewer accessible. Both readable and minified scripts are
+  tested with wide, tall and small images at three widths; the existing public
+  widget test checks close-button and backdrop pointer hit testing.
+
+The new regression commands are `php tests/phone-country-roundtrip.php` and
+`node tests/multibox-layout.cjs` (the latter uses `FLEXI_TEST_JQUERY`). Both are
+wired into the existing CI workflows. Laboratory content and template changes
+are local fixtures and are not included in the extension package.
+
+- **67 PHP/Node/Python regression commands passed**, including dependency load order/deduplication/manual opt-out, item/category favourites, gallery settings, phone country persistence, Flexibreak rendering and malformed module cookies. The local HTTP-size fixture initially failed inside the network sandbox; its rerun outside that sandbox passed all 53 HTTP and six no-cURL checks. It contacts loopback servers only.
+- **12 browser/Node suites passed**: shared editors (41 cases), real Joomla dialogs (three widths), maintenance (nine cases), managers (seven cases), masks (25 cases), colors, uploader, public waveform, legacy helper migration, public widgets, Multibox layout and media cloning.
+- **245 PHP and JavaScript syntax checks passed** across the cumulative changed source set. Both patched Multibox scripts are included; the changed Galleriffic vendor file was also exercised in the browser.
 - `git diff --check` passed. Source hashes and raw output remain in private lab evidence; no credentials, configuration files or sessions are committed.
-- CI runs the added browser and PHP regressions. The four hosted workflows at the previous audit commit `09e42af` passed. Results for the follow-up commit must be assessed on that commit's checks.
+- CI runs the added browser and PHP regressions. The four hosted workflows at the previous audit commit `4c083f8e7` passed. Results for the follow-up commit must be assessed on that commit's checks.
 
 ## Remaining dependencies and release limits
 
@@ -98,7 +133,7 @@ The earlier remaining-work list is superseded: recent favourites, module tab-sta
 
 Joomla Dialog/messages are used by the tested core managers and editors, and Joomla messages handle the favourites failure path. Some direct browser alerts remain in legacy/untested views and compatibility fallbacks. This is not a claim that every alert throughout the package has been converted.
 
-Inputmask and Galleriffic have adjacent `UPSTREAM-PATCHES.md` notes for vendor changes. Reconcile those patches when updating the libraries. Juxtapose still uses its pre-existing external CDN dependency; external availability is a release consideration.
+Inputmask, Galleriffic and Multibox have adjacent `UPSTREAM-PATCHES.md` notes for vendor changes. Reconcile those patches when updating the libraries. Juxtapose and Pannellum use external CDN dependencies; external availability is a release consideration.
 
 Keep the PR in draft pending review and the untested external-provider, browser/platform and installer matrix described above. Optional jQuery plugins are supported by design; the patch does not claim full release certification or zero jQuery in every bundled file.
 
@@ -114,6 +149,8 @@ Screenshots show the same 390-pixel viewport before/after layout changes. Counts
 
 Galleriffic controls at the same 1280-pixel viewport: [before](audit-images/galleriffic-before-1280.png), [after](audit-images/galleriffic-after-1280.png), and [mobile](audit-images/galleriffic-mobile.png).
 
+Multibox at 768 pixels: [header covering the close control](audit-images/multibox-before-768.png), [corrected stacking](audit-images/multibox-after-768.png), and [image fitting at 390 pixels](audit-images/multibox-mobile.png).
+
 [Mobile rich-text controls](audit-images/editor-mobile.png) and [mobile mask controls](audit-images/masks-mobile.png) supplement the full-page width measurements.
 
 ## API references
@@ -124,3 +161,4 @@ Galleriffic controls at the same 1280-pixel viewport: [before](audit-images/gall
 
 - [Joomla native tabs](https://manual.joomla.org/docs/next/general-concepts/bootstrap/tabs/) and [editor registry API](https://manual.joomla.org/docs/4.4/general-concepts/javascript/js-library/editors/).
 - [Juxtapose source](https://github.com/NUKnightLab/juxtapose) and [FancyBox 3 options](https://github.com/fancyapps/fancybox/blob/master/docs/index.html).
+- [CSS stacking contexts](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Positioned_layout/Stacking_context); Cassiopeia's installed header layer was verified in the browser.

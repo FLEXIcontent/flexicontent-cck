@@ -396,6 +396,19 @@ Base script. Great!!
 			if (tempSRC !== contentObj.src) {
 				var border = parseInt(container.css('border-left-width'), 10);
 
+				// Fit image content before calculating the viewer position. Leave room
+				// for the border, the outside close button and the navigation controls.
+				if (type === 'image') {
+					var imageWidth = contentObj[0].naturalWidth || contentObj.width;
+					var imageHeight = contentObj[0].naturalHeight || contentObj.height;
+					var availableWidth = Math.max(1, $(window).width() - border * 2 - 52);
+					var availableHeight = Math.max(1, $(window).height() - border * 2 - 52 - (options.showControls ? 100 : 0));
+					var scale = Math.min(1, availableWidth / imageWidth, availableHeight / imageHeight);
+					contentObj.width = Math.max(1, Math.floor(imageWidth * scale));
+					contentObj.height = Math.max(1, Math.floor(imageHeight * scale));
+					contentObj.css({width: contentObj.width, height: contentObj.height});
+				}
+
 				if (options.fixedTop) {
 					var top = options.fixedTop;
 				}

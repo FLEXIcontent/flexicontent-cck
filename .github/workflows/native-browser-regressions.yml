@@ -41,4 +41,5 @@ jobs:
           node tests/native-public-waveform.cjs
           node tests/native-legacy-helpers.cjs
           node tests/native-public-widgets.cjs
+          node tests/multibox-layout.cjs
           node tests/image-media-clone.cjs
