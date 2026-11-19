@@ -1442,14 +1442,34 @@ class flexicontent_html
 	}
 
 
-	/**
-	 * Utility function to load each JS Frameworks once
-	 *
-	 * @param 	string 		$text
-	 * @param 	int 		$nb
-	 * @return 	string
-	 * @since 1.5
-	 */
+	/** Load the shared tag picker for an item or import form. */
+	static function loadTagPicker($fieldName, $assignTask, $itemLanguage = false)
+	{
+		$app = \Joomla\CMS\Factory::getApplication();
+		$document = $app->getDocument();
+		$root = \Joomla\CMS\Uri\Uri::root(true);
+		$base = \Joomla\CMS\Uri\Uri::base(true);
+		$token = \Joomla\CMS\Session\Session::getFormToken() . '=1';
+		$config = array(
+			'name' => $fieldName,
+			'suggestions' => $base . '/components/com_flexicontent/tasks/core.php?task=viewtags&format=json&lang='
+				. rawurlencode($app->getLanguage()->getTag()) . '&' . $token,
+			'assign' => $base . '/index.php?option=com_flexicontent&task=' . $assignTask . '&format=raw&' . $token,
+			'itemLanguage' => $itemLanguage,
+			'keepOpen' => $itemLanguage,
+			'removeLabel' => \Joomla\CMS\Language\Text::_('FLEXI_DELETE_TAG'),
+			'requestError' => \Joomla\CMS\Language\Text::_('JERROR_AN_ERROR_HAS_OCCURRED'),
+			'assignError' => \Joomla\CMS\Language\Text::_('FLEXI_ERROR_SAVING_TAG'),
+		);
+		self::loadFramework('form-utils');
+		$document->addScript($root . '/components/com_flexicontent/assets/js/tag-picker.js', array('version' => 'auto'));
+		$document->addStyleSheet($root . '/components/com_flexicontent/assets/css/tag-picker.css', array('version' => 'auto'));
+		$document->addScriptDeclaration('FlexiForm.ready(() => fc_initTagPicker('
+			. json_encode($config, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT)
+			. '));');
+	}
+
+	/** Load a JavaScript framework once per request. */
 	static function loadFramework( $framework, $mode='', $params=null )
 	{
 		// Detect already loaded framework

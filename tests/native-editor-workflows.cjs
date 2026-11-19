@@ -37,6 +37,152 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
     await page.waitForFunction(() => !!document.formvalidator);
   };
   const loadDependencies = page => page.addScriptTag({content: source('site/assets/js/flexi-lib.js')});
+  await test('Native tag picker handles quick tags, keyboard selection, creation and retries', async page => {
+    await form(page, '<select id="jform_language"><option value="en-GB">English</option><option value="fr-FR">French</option></select><div id="tags"><input id="input-tags"></div><div id="fc_tagbox"><ul id="ultagbox"></ul><input type="checkbox" id="quick-tag-5" name="jform[tag][]" value="5"></div>');
+    await page.addStyleTag({content: source('site/assets/css/flexicontent.css')});
+    await page.addStyleTag({content: source('site/assets/css/tag-picker.css')});
+    let delayed;
+    await page.route(/\/tags\?/, async route => {
+      assert.equal(route.request().headers()['x-requested-with'], 'XMLHttpRequest');
+      const request = new URL(route.request().url());
+      const term = request.searchParams.get('q');
+      const language = request.searchParams.get('item_lang');
+      if (term === 'slow') {
+        await new Promise(resolve => { delayed = resolve; });
+        await route.fulfill({json:[{id: 9, name: 'Outdated'}]}).catch(() => {});
+        return;
+      }
+      const records = [{id: 5, name: 'Quick'}, {id: 6, name: '<Sample>', translated_text: language === 'fr-FR' ? 'Échantillon' : ''}];
+      await route.fulfill({json: term ? records.filter(item => item.name.toLowerCase().includes(term.toLowerCase())) : records});
+    });
+    const posted = [];
+    await page.route('https://fixture.invalid/assign', route => {
+      assert.equal(route.request().method(), 'POST');
+      const name = new URLSearchParams(route.request().postData()).get('name');
+      posted.push(name);
+      return route.fulfill({body: posted.length === 1 ? '0|Creation denied' : '8|New | tag'});
+    });
+    await page.addScriptTag({content: source('site/assets/js/tag-picker.js')});
+    await page.evaluate(() => fc_initTagPicker({
+      name: 'jform[tag][]', suggestions: '/tags?task=viewtags', assign: '/assign', keepOpen: true, itemLanguage: true,
+      removeLabel: 'Remove tag', requestError: 'Lookup failed', assignError: 'Assignment failed'
+    }));
+    const input = page.locator('#input-tags');
+    await input.focus();
+    const options = page.getByRole('option', {name: 'Quick'});
+    await options.waitFor();
+    await input.press('ArrowDown');
+    const active = await input.getAttribute('aria-activedescendant');
+    assert.equal(await page.locator('#' + active).innerText(), 'Quick');
+    await input.press('Enter');
+    assert.equal(await page.locator('#quick-tag-5').isChecked(), true);
+    assert.equal(await options.count(), 0);
+
+    await page.selectOption('#jform_language', 'fr-FR');
+    await input.fill('slow');
+    await page.waitForFunction(() => document.activeElement.id === 'input-tags');
+    for (let count = 0; !delayed && count < 30; count++) await new Promise(resolve => setTimeout(resolve, 25));
+    assert(delayed, 'The delayed request started');
+    await input.fill('Sample');
+    const sample = page.getByRole('option', {name: '<Sample> (Échantillon)'});
+    await sample.click();
+    delayed();
+    assert.equal(await page.getByText('Outdated').count(), 0);
+    assert.equal(await page.locator('#ultagbox span').innerText(), '<Sample> (Échantillon)');
+    await page.getByRole('link', {name: 'Remove tag'}).click();
+    assert.equal(await page.locator('#ultagbox li').count(), 0);
+    await input.fill('New | tag');
+    await input.press('Enter');
+    await page.getByText('Creation denied').waitFor();
+    assert.equal(await input.inputValue(), 'New | tag');
+    await input.press('Enter');
+    await page.getByText('New | tag', {exact: true}).waitFor();
+    assert.deepEqual(posted, ['New | tag', 'New | tag']);
+    assert.equal(await page.locator('#ultagbox input').getAttribute('name'), 'jform[tag][]');
+  });
+  await test('Cascades replace Choices options and ignore stale responses without jQuery', async page => {
+    await form(page, `
+      <select id="parent"><option value="">None</option><option value="slow">Slow</option><option value="fast">Fast</option></select>
+      <div class="control-group" id="dependent-row"><select id="child" class="use_select2_lib">
+        <option value="">Choose</option><option value="old">Old</option>
+      </select><span class="field_cascade_loading"></span></div>`);
+    await loadDependencies(page);
+    await page.addScriptTag({content: source('site/librairies/choicesjs/choices.min.js')});
+    const calls = [];
+    let delayed;
+    await page.route(/\/index\.php\?option=com_flexicontent/, async route => {
+      const body = new URLSearchParams(route.request().postData());
+      assert.equal(body.get('extfunc'), 'getCascadedField');
+      calls.push(body.get('valgrps'));
+      if (body.get('valgrps') === 'slow') await new Promise(resolve => { delayed = resolve; });
+      const option = body.get('valgrps') === 'slow' ? 'outdated' : 'new';
+      await route.fulfill({body: '<option value="">Choose</option><option value="' + option + '">' + option + '</option>'}).catch(() => {});
+    });
+    await page.evaluate(() => {
+      window.Joomla.JText = Joomla.Text;
+      window.fc_use_choicesjs = true;
+      fc_initSelect2(null, document);
+      fcCascadedField(13, 42, 'select', 'select#parent, input.parent', 'child', 'Select a parent', true, 0);
+      fcCascadedField(13, 42, 'select', 'select#parent, input.parent', 'child', 'Select a parent', true, 0);
+    });
+    await page.locator('#dependent-row').waitFor({state: 'hidden'});
+    const slow = page.waitForRequest(request => request.postData()?.includes('valgrps=slow'));
+    await page.selectOption('#parent', 'slow');
+    await slow;
+    await page.selectOption('#parent', 'fast');
+    await page.locator('#child option[value="new"]').waitFor({state: 'attached'});
+    delayed?.();
+    assert.deepEqual(calls, ['slow', 'fast']);
+    assert.equal(await page.locator('#child option[value="outdated"]').count(), 0);
+    assert.equal(await page.locator('#child').evaluate(el => el.fc_choices_instance.dropdown.element.textContent.includes('new')), true);
+    await page.selectOption('#parent', '');
+    await page.locator('#dependent-row').waitFor({state: 'hidden'});
+    assert.equal(await page.locator('#child option').textContent(), 'Select a parent');
+  });
+  await test('Chained cascades survive replaced radio groups without jQuery', async page => {
+    await form(page, `
+      <select id="parent"><option value="">None</option><option value="region">Region</option></select>
+      <div class="control-group"><div id="child" class="fc_input_set"></div><span class="field_cascade_loading"></span></div>
+      <div class="control-group" id="end-row"><select id="end" name="end"><option value="">Select</option></select><span class="field_cascade_loading"></span></div>`);
+    await loadDependencies(page);
+    const values = [];
+    await page.route(/\/index\.php\?option=com_flexicontent/, route => {
+      const body = new URLSearchParams(route.request().postData());
+      values.push([body.get('field_id'), body.get('valgrps')]);
+      const html = body.get('field_id') === '1'
+        ? '<input type="radio" class="child" id="radio" name="child" value="zone"><label for="radio">Zone</label>'
+        : '<option value="district">District</option>';
+      return route.fulfill({body: html});
+    });
+    await page.evaluate(() => {
+      fcCascadedField(1, 42, 'radio', 'select#parent, input.parent', 'child', 'Select region', false, 0);
+      fcCascadedField(2, 42, 'select', 'select#child, input.child', 'end', 'Select zone', false, 0);
+    });
+    await page.selectOption('#parent', 'region');
+    await page.check('#radio');
+    await page.locator('#end option[value="district"]').waitFor({state: 'attached'});
+    await page.selectOption('#parent', '');
+    await page.locator('#end-row').waitFor({state: 'hidden'});
+    await page.selectOption('#parent', 'region');
+    await page.check('#radio');
+    await page.locator('#end option[value="district"]').waitFor({state: 'attached'});
+    assert.deepEqual(values, [['1', 'region'], ['2', 'zone'], ['1', 'region'], ['2', 'zone']]);
+  });
+  if (process.env.FLEXI_TEST_JQUERY) await test('Legacy synthetic cascade events send each selected value once', async page => {
+    await form(page, '<select multiple id="parent"><option value="one">One</option><option value="two">Two</option></select><div class="control-group"><select id="child"></select><span class="field_cascade_loading"></span></div>');
+    await loadDependencies(page);
+    const payloads = [];
+    await page.route(/\/index\.php\?option=com_flexicontent/, route => {
+      payloads.push(new URLSearchParams(route.request().postData()).getAll('valgrps[]'));
+      return route.fulfill({body: '<option value="descendant">Descendant</option>'});
+    });
+    await page.evaluate(() => {
+      fcCascadedField(1, 42, 'select', 'select#parent, input.parent', 'child', '', true, 0);
+      jQuery('#parent').val(['one','two']).trigger('change');
+    });
+    await page.locator('#child option[value="descendant"]').waitFor({state: 'attached'});
+    assert.deepEqual(payloads, [['one', 'two']]);
+  }, true);
   await test('Administrator dependencies initialize, refresh and rebind without jQuery', async page => {
     await form(page, `
       <select id="mode" class="fcform_toggler_element">

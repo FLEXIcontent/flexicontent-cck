@@ -358,6 +358,9 @@ class FCIndexedField extends FCField
 				$cascade_prompt = $field->parameters->get('cascade_prompt', '');
 				$cascade_prompt = $cascade_prompt ? \Joomla\CMS\Language\Text::_($cascade_prompt) : \Joomla\CMS\Language\Text::_('FLEXI_PLEASE_SELECT') . ': ' . \Joomla\CMS\Language\Text::_($master_field->label);
 
+				$cascadePromptJs = json_encode($cascade_prompt, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+				flexicontent_html::loadFramework('flexi-lib');
+				\Joomla\CMS\Language\Text::script('FLEXI_LOADING', true);
 				$srcELid = 'custom_' . $master_field->name;
 				$trgELid = $elementid;
 				$single_master = ! $master_field->parameters->get('use_ingroup', 0) && !$master_field->parameters->get('multiple', 0);
@@ -522,14 +525,9 @@ class FCIndexedField extends FCField
 			// Listen to the changes of depends-on-master field
 			if ($cascade_after)
 			{
-				$mvno = $single_master ? "'0'" : "rowNo";
+				$mvno = $single_master ? "'0'" : "uniqueRowNum".$field->id;
 				$js .= "
-				fc_cascade_field_funcs['".$srcELid."_'+uniqueRowNum".$field->id."] = function(rowNo){
-					return function () {
-						fcCascadedField(".$field->id.", '".$item->id."', '".$field->field_type."', 'select#".$srcELid."_'+".$mvno."+', input.".$srcELid."_'+".$mvno.", '".$trgELid."_'+rowNo, '".htmlspecialchars( $cascade_prompt, ENT_COMPAT, 'UTF-8' )."', ".static::$promptEnabled.", rowNo);
-					}
-				}(uniqueRowNum".$field->id.");
-				fc_cascade_field_funcs['".$srcELid."_'+uniqueRowNum".$field->id."]();
+				fcCascadedField(".$field->id.", '".$item->id."', '".$field->field_type."', 'select#".$srcELid."_'+".$mvno."+', input.".$srcELid."_'+".$mvno.", '".$trgELid."_'+uniqueRowNum".$field->id.", ".$cascadePromptJs.", ".static::$promptEnabled.", uniqueRowNum".$field->id.");
 				";
 			}
 
@@ -798,10 +796,7 @@ class FCIndexedField extends FCField
 				{
 					$mvno = $single_master ? '0' : $n;
 					$per_val_js .= "
-						fc_cascade_field_funcs['".$srcELid.'_'.$n."'] = function(){
-							fcCascadedField(".$field->id.", '".$item->id."', '".$field->field_type."', 'select#".$srcELid.'_'.$mvno.", input.".$srcELid.'_'.$mvno."', '".$trgELid.'_'.$n."', '".htmlspecialchars( $cascade_prompt, ENT_COMPAT, 'UTF-8' )."', ".static::$promptEnabled.", ".$n.");
-						}
-						fc_cascade_field_funcs['".$srcELid.'_'.$n."']();
+						fcCascadedField(".$field->id.", '".$item->id."', '".$field->field_type."', 'select#".$srcELid.'_'.$mvno.", input.".$srcELid.'_'.$mvno."', '".$trgELid.'_'.$n."', ".$cascadePromptJs.", ".static::$promptEnabled.", ".$n.");
 					";
 				}
 			}
@@ -817,7 +812,7 @@ class FCIndexedField extends FCField
 		}
 		if ($per_val_js)
 			$document->addScriptDeclaration('
-				jQuery(document).ready(function(){
+				FlexiForm.ready(function(){
 					'.$per_val_js.'
 				});
 			');

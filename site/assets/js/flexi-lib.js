@@ -1,7 +1,6 @@
 ﻿
 	window.fc_init_hide_dependent = 0;
 	window.fc_refreshing_dependent = 0;
-	window.fc_cascade_field_funcs = {};
 	window.fc_Dialogs = {};
 
 	function fc_getAutoSizePos(winwidth, winheight, params)
@@ -542,144 +541,153 @@
 		for (const target of updated) target.setAttribute('data-fc_forced_display', '0');
 	}
 
-	function fcCascadedField_update(elVal, trgID, field_id, item_id, field_type, cascade_prompt, prompt_enabled, valindex)
+	const fcCascadeBindings = new WeakMap();
+	const fcCascadeRequests = new WeakMap();
+	const fcCascadeMarker = { elementClear: true };
+
+	function fcCascadedField_clear(element, prompt, promptEnabled)
 	{
-    // Joomla Base URL
-		var base_url = !!jbase_url_fc ? jbase_url_fc : '';;
-
-		var trgEL = jQuery('#'+trgID);
-		trgEL.parent().find('.field_cascade_loading').html('<img src="'+base_url+'components/com_flexicontent/assets/images/ajax-loader.gif" align="center" /> ... Loading');
-
-		var loading_prompt = '';  // Joomla.JText._('FLEXI_PLEASE_WAIT')
-		fcCascadedField_clear(trgEL, loading_prompt, prompt_enabled);
-		trgEL.removeAttr('data-defvals');  // Remove default values of select2 JS
-
-		jQuery.ajax({
-			type: 'POST',
-			url: base_url + 'index.php?option=com_flexicontent&tmpl=component&format=raw',
-			data: {
-				lang: (typeof fc_sef_lang != 'undefined' ? fc_sef_lang : ''),
-				task: 'call_extfunc',
-				omethod: 'html', /* unused */
-				exttype: 'plugins',
-				extfolder: 'flexicontent_fields',
-				extname: field_type,
-				extfunc: 'getCascadedField',
-				field_id: field_id,
-				item_id: item_id,
-				valgrps: elVal,
-				valindex: valindex
+		const target = FlexiForm.element(element);
+		if (!target) return;
+		if (target.matches('select')) {
+			const hadOptions = [...target.options].some(option => option.value && option.value !== '_field_selection_prompt_');
+			target.replaceChildren();
+			if (prompt) {
+				const option = new Option(prompt, '');
+				option.disabled = !promptEnabled;
+				target.append(option);
 			}
-		}).done( function(data) {
-			//window.console.log ('Got data for:' + trgEL.attr('id'));
-			trgEL.parent().find('.field_cascade_loading').html('');
-			data = data.trim();
+			target.value = '';
+			target.fc_choices_instance?.refresh?.(false, false, true);
+			if (hadOptions) target.dispatchEvent(new CustomEvent('change', { bubbles: true, detail: fcCascadeMarker }));
+		} else {
+			const source = target.querySelector('input[type="radio"], input[type="checkbox"]');
+			const message = document.createElement('span');
+			message.className = 'fcpadded alert alert-info';
+			message.textContent = prompt;
+			// The next level listens on the stable input-set container.
+			if (source) source.dispatchEvent(new CustomEvent('change', { bubbles: true, detail: fcCascadeMarker }));
+			target.replaceChildren(...(prompt ? [message] : []));
+		}
+	}
 
-			if (data!='')
-			{
-				trgEL.empty().append(data).val('');
-				var trgTagName = trgEL.prop("tagName");
+	async function fcCascadedField_update(value, targetId, fieldId, itemId, fieldType, prompt, promptEnabled, index)
+	{
+		const target = document.getElementById(targetId);
+		if (!target) return;
+		fcCascadeRequests.get(target)?.abort();
+		const request = new AbortController();
+		fcCascadeRequests.set(target, request);
+		const status = target.parentElement.querySelector('.field_cascade_loading');
+		if (status) status.textContent = FlexiForm.text('FLEXI_LOADING');
+		fcCascadedField_clear(target, '', promptEnabled);
+		target.removeAttribute('data-defvals');
 
-				// Special case 0: Re-attach cascade function to the updated HTML of radio/checkbox set
-				if (fc_cascade_field_funcs.hasOwnProperty(trgID) && trgTagName!='SELECT')
-				{
-					//window.console.log ('Re-attach cascade function for new HTML source for tag ID:' + trgID);
-					fc_cascade_field_funcs[trgID]();
+		const body = new URLSearchParams({
+			task: 'call_extfunc', extfunc: 'getCascadedField', exttype: 'plugins', extfolder: 'flexicontent_fields',
+			extname: fieldType, omethod: 'html', field_id: fieldId, item_id: itemId, valindex: index, lang: window.fc_sef_lang || ''
+		});
+		if (Array.isArray(value)) value.forEach(entry => body.append('valgrps[]', entry));
+		else body.set('valgrps', value);
+
+		try {
+			const url = new URL('index.php?option=com_flexicontent&tmpl=component&format=raw', window.jbase_url_fc || document.baseURI);
+			const response = await fetch(url, { method: 'POST', body, signal: request.signal });
+			if (!response.ok) throw new Error('Dependent options request failed');
+			const html = (await response.text()).trim();
+			if (request.signal.aborted || !target.isConnected) return;
+			if (!html) {
+				fcCascadedField_clear(target, prompt, promptEnabled);
+				return;
+			}
+			const select = target.matches('select');
+			const fragment = document.createElement('template');
+			fragment.innerHTML = html;
+			if (!fragment.content.querySelector(select ? 'option' : 'input[type="radio"], input[type="checkbox"]')) {
+				throw new Error('Unexpected dependent options response');
+			}
+			target.replaceChildren(fragment.content);
+			if (select) {
+				target.value = '';
+				target.fc_choices_instance?.refresh?.(false, false, true);
+				FlexiForm.change(target);
+			} else if (window.jQuery?.fn.prettyCheckable) {
+				for (const input of target.querySelectorAll('.use_prettycheckable')) {
+					const label = input.nextElementSibling;
+					if (label?.matches('label')) {
+						const labelHtml = label.innerHTML;
+						label.remove();
+						window.jQuery(input).prettyCheckable({ color: 'blue', label: labelHtml });
+					}
 				}
-
-				// Special case 1: Re-apply prettyCheckable to the updated HTML of radio/checkbox set
-				trgEL.find('.use_prettycheckable').each(function() {
-					var elem = jQuery(this);
-					var lbl = elem.next('label');
-					var lbl_html = elem.next('label').html();
-					lbl.remove();
-					elem.prettyCheckable({
-						color: 'blue',
-						label: lbl_html
-					});
-				});
 			}
-			else
-			{
-				trgEL.empty().append('<option value="" '+(!prompt_enabled ? 'disabled="disabled"' : '')+'>'+cascade_prompt+'</option>');
+		} catch (error) {
+			if (!request.signal.aborted && status) status.textContent = FlexiForm.text('JERROR_AN_ERROR_HAS_OCCURRED');
+		} finally {
+			if (fcCascadeRequests.get(target) === request) {
+				fcCascadeRequests.delete(target);
+				if (status?.textContent === FlexiForm.text('FLEXI_LOADING')) status.textContent = '';
 			}
-			trgEL.trigger('change');  // Retrigger change event to update select2 display
-		});
+		}
 	}
 
-	function fcCascadedField_clear(el, prompt, prompt_enabled)
+	function fcCascadedField(fieldId, itemId, fieldType, sourceSelector, targetId, prompt, promptEnabled, index)
 	{
-		var trgTagName = el.prop("tagName");
-		if (trgTagName=='SELECT')
-		{
-			el.empty();
-			if (prompt) el.append('<option value="" '+(!prompt_enabled ? 'disabled="disabled"' : '')+'>' + prompt + '</option>');
-			el.trigger('change', [{elementClear:1}]);
-		}
-		else
-		{
-			el.find('input').first().trigger('change', [{elementClear:1}]);
-			el.empty();
-			if (prompt) el.append('<span class="fcpadded alert alert-info">'+prompt+'</span>');
-		}
-	}
+		const target = document.getElementById(targetId);
+		// The generated selector identifies both a select and its radio/checkbox equivalent.
+		// Use the stable container when the source currently has no choices.
+		const sourceId = /^select#([^,]+),\s*input\.\1$/.exec(sourceSelector)?.[1];
+		const firstOption = document.querySelector(sourceSelector);
+		const source = (sourceId && document.getElementById(sourceId)) || firstOption?.closest('.fc_input_set') || firstOption;
+		if (!source || !target || source === target) return;
 
-	function fcCascadedField(field_id, item_id, field_type, srcSelector, trgID, cascade_prompt, prompt_enabled, valindex)
-	{
-		var onEL  = jQuery(srcSelector);
-		var onEL2 = onEL.parent().find('select.use_select2_lib');
-		var isSel2 = onEL2.length != 0;
-
-		var srcEL = isSel2 ? onEL2 : onEL;
-		var trgEL = jQuery('#'+trgID);
-		//window.console.log ('ATTACHING fcCascadedField() FOR source SELECTOR: ' + srcSelector + ' to UPDATE element with ID: ' + trgID + ' , valindex: ' + valindex);
-
-		var elementClear = (typeof data!== 'undefined' && typeof data.elementClear !== 'undefined') ? data.elementClear : 0;  // workaround for radio, checkbox causing unneeded server call
-		var elType = srcEL.attr('type');
-		if (elType=='radio' || elType=='checkbox') {
-			var elVal = Array();
-			srcEL.parent().parent().find('input:checked').each(function( index ) {
-				elVal[elVal.length] = jQuery(this).val();
-			});
-			elVal = elVal.join(',');
-		} else {
-			var elVal = srcEL.val();
-		}
-
-		if ( !elementClear && !! elVal )
-		{
-			trgEL.closest('.fcfieldval_container_outer, .control-group').show();
-		} else {
-			trgEL.closest('.fcfieldval_container_outer, .control-group').hide();
-		}
-
-		srcEL.on('change', function(e, data){
-			var elementClear = (typeof data!== 'undefined' && typeof data.elementClear !== 'undefined') ? data.elementClear : 0;  // workaround for radio, checkbox causing unneeded server call
-			var elType = srcEL.attr('type');
-			if (elType=='radio' || elType=='checkbox') {
-				var elVal = Array();
-				srcEL.parent().parent().find('input:checked').each(function( index ) {
-					elVal[elVal.length] = jQuery(this).val();
-				});
-				elVal = elVal.join(',');
-			} else {
-				var elVal = srcEL.val();
+		fcCascadeBindings.get(target)?.abort();
+		const binding = new AbortController();
+		fcCascadeBindings.set(target, binding);
+		const isSelect = source.matches('select');
+		const row = target.closest('.fcfieldval_container_outer, .control-group');
+		function chosen(event) {
+			if (isSelect) {
+				const fromChoices = event?.detail?.value !== undefined ? source.fc_choices_instance?.getValue(true) : undefined;
+				const raw = fromChoices ?? FlexiForm.value(source);
+				const valid = value => value && value !== '_field_selection_prompt_';
+				return Array.isArray(raw) ? raw.filter(valid) : valid(raw) ? raw : '';
 			}
+			const checked = source.matches('input:checked') ? [source] : [...source.querySelectorAll('input:checked')];
+			return checked.filter(input => input.matches(sourceSelector)).map(input => input.value).join(',');
+		}
+		const hasValue = value => Array.isArray(value) ? value.length > 0 : Boolean(value);
 
-			//window.console.log ('CHANGED element ID: ' + srcEL.attr('id') + ' , isCHECKED: ' + srcEL.is(':checked') + ' type: '+srcEL.attr('type'));
-			if ( !elementClear && !! elVal )
-			{
-				//window.console.log ('CHANGED element ID: ' + srcEL.attr('id') + ' --> Updating:' + trgEL.attr('id') + ' for VALGRP: -' + elVal + '-  value of 1st element: ' + srcEL.val() + ' type: '+srcEL.attr('type'));
-				trgEL.closest('.fcfieldval_container_outer, .control-group').show();
-				fcCascadedField_update(elVal, trgID, field_id, item_id, field_type, cascade_prompt, prompt_enabled, valindex);
-			} else {
-				//window.console.log ('CHANGED element ID: ' + srcEL.attr('id') + ' --> Clearing:' + trgEL.attr('id') + ' TAG type: ' + trgEL.prop("tagName"));
-				trgEL.closest('.fcfieldval_container_outer, .control-group').hide();
-				fcCascadedField_clear(trgEL, cascade_prompt, prompt_enabled);
+		function update(event, detail = event.detail) {
+			if (!event.target.matches(sourceSelector)) return;
+			if (!target.isConnected) {
+				binding.abort();
+				return;
 			}
-		});
-	}
+			const value = detail?.elementClear ? '' : chosen(event);
+			const show = hasValue(value);
+			FlexiForm.show(row, show);
+			if (show) {
+				fcCascadedField_update(value, targetId, fieldId, itemId, fieldType, prompt, promptEnabled, index);
+			} else {
+				fcCascadeRequests.get(target)?.abort();
+				fcCascadeRequests.delete(target);
+				const status = target.parentElement.querySelector('.field_cascade_loading');
+				if (status) status.textContent = '';
+				fcCascadedField_clear(target, prompt, promptEnabled);
+			}
+		}
 
+		source.addEventListener('change', update, { signal: binding.signal });
+		// Select2 and PrettyCheckable can still provide synthetic events.
+		if (window.jQuery) {
+			const legacy = window.jQuery(source);
+			const syntheticChange = (event, detail) => { if (!event.originalEvent) update(event, detail); };
+			legacy.on('change.fcCascade', syntheticChange);
+			binding.signal.addEventListener('abort', () => legacy.off('change.fcCascade', syntheticChange), { once: true });
+		}
+		FlexiForm.show(row, hasValue(chosen()));
+	}
 
 
 	// *** Check that a variable is not null and is defined (has a value)

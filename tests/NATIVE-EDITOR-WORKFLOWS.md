@@ -2,9 +2,9 @@
 
 Run `node tests/native-editor-workflows.cjs` with Playwright and its Chromium browser installed. The suite intercepts its fixture HTTP requests; it needs no Joomla database and does not contact a live site.
 
-Set `FLEXI_TEST_JQUERY` to a Joomla installation's `media/vendor/jquery/js/jquery.min.js` to also run the legacy AJAX hook, synthetic change event and Select2 compatibility cases. Every other case asserts that `window.jQuery` is absent.
+Set `FLEXI_TEST_JQUERY` to a Joomla installation's `media/vendor/jquery/js/jquery.min.js` to also run the legacy AJAX hook, synthetic form and cascade events, and Select2 compatibility cases. Every other case asserts that `window.jQuery` is absent.
 
-The cases exercise required and optional validation, checkbox and category limits, hidden editor synchronization, idle upload queues, large-form serialization, AJAX recovery, cancellation, toolbar POST data, record insertion and removal, drag ordering and group boundaries, batch field loading, native dialogs, ordered dialog scripts, form ownership and focus restoration. Further checks exercise dependent settings, Text value controls and cloning a live Choices widget.
+The cases exercise required and optional validation, checkbox and category limits, hidden editor synchronization, idle upload queues, large-form serialization, AJAX recovery, cancellation, toolbar POST data, record insertion and removal, drag ordering and group boundaries, batch field loading, native dialogs, ordered dialog scripts, form ownership and focus restoration. Further checks exercise dependent settings, Text value controls and cloning a live Choices widget. Tag checks cover keyboard selection, quick tags, removal and assignment errors. Cascade checks cover delayed responses, Choices option refreshes, radio chains and legacy multi-select changes.
 
 These are browser tests of the shared helpers. Successful POST interception does not prove a Joomla database save, authorization, or file upload. Those operations also need an installed-site regression run with representative content types and field settings.
 
@@ -16,4 +16,6 @@ This change moves shared submission/validation, record-list controls, dialogs, m
 
 The shared administrator dependency engine and the Text and Text Select repeatable controls use native DOM events. Legacy jQuery events still reach dependent selects when Select2 or an older plugin sends them. Text Select uses the existing Choices integration and supports the legacy Select2 setting.
 
-jQuery loaders remain enabled for field groups, other field-specific repeaters, cascaded value selectors, tag autocomplete, Plupload widgets, Inputmask initialization, legacy Select2, color and subform plugins, and PHP-generated scripts in editor and manager views. Third-party field plugins and site overrides are outside this patch.
+The item editor and CSV import share a native tag picker. Cascaded selectors use native events and fetch. PrettyCheckable rendering and synthetic jQuery changes still have compatibility hooks when an older widget is enabled.
+
+jQuery loaders remain enabled for field groups, other field-specific repeaters, Plupload widgets, Inputmask initialization, legacy Select2, color and subform plugins, and PHP-generated scripts in editor and manager views. Third-party field plugins and site overrides are outside this patch.
