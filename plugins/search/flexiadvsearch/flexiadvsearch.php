@@ -1070,16 +1070,17 @@ class plgSearchFlexiadvsearch extends \Joomla\CMS\Plugin\CMSPlugin
 
 			/*
 			 * LIKE %word% search (needed by languages without spaces),
-			 * (1) Skip / Ignore this for languages with spaces,
+			 * (1) Skip / Ignore this for languages with spaces, unless the searched text itself is Chinese or Japanese
 			 * (2) Skip / Ignore this if current language supports splitting via dictionary
 			 */
-			if ($filter_word_like_any
-				&& in_array(flexicontent_html::getUserCurrentLang(), array('zh', 'jp', 'ja', 'th'))
-				&& ! FlexicontentFields::getLangHandler(\Joomla\CMS\Factory::getApplication()->getLanguage()->getTag(), $_hasHandlerOnly = true)
-			)
+			if (flexicontent_db::useLikeSearch($filter_word_like_any, $text_np))
 			{
-				$_index_match = ' LOWER ('.$ts.'.search_index) LIKE '.$db->Quote( '%'.$escaped_text.'%', false );
-				$_title_relev = ' LOWER (i.title) LIKE '.$db->Quote( '%'.$escaped_text.'%', false );
+				// The text without the search prefix, because it is also matched inside the words of the index
+				$_index_match = flexicontent_db::getLikeSearchCondition($ts . '.search_index', $text_np, $phrase, $search_prefix);
+				$_title_relev = flexicontent_db::getLikeSearchCondition('i.title', $text_np, $phrase);
+
+				// Needed by "Most relevant first: Yes". Without it the relevance column was empty: an SQL syntax error
+				$_index_relev = $_index_match;
 			}
 
 			/*
