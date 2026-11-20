@@ -3,6 +3,26 @@ var fcfield_file = {
   use_native_apis: [],
   dialog_handle: [],
 
+  pdf_thumb_url: '',
+
+  toggleFields(id) {
+    const panel = Array.from(document.querySelectorAll('.fc-file-value-props[data-name]'))
+      .find(element => element.dataset.name === id);
+    if (!panel) return;
+    const open = panel.matches('details') ? !panel.open : getComputedStyle(panel).display === 'none';
+    if (panel.matches('details')) panel.open = open;
+    else panel.style.display = open ? 'block' : 'none';
+    for (const button of document.querySelectorAll('.fc-file-edit-btn[data-for], .fc-field-mediaurl-btn[data-for]')) {
+      if (button.dataset.for !== id) continue;
+      button.classList.toggle('active', open);
+      button.setAttribute('aria-expanded', String(open));
+    }
+  },
+
+  toggleMediaURL(id) {
+    fcfield_file.toggleFields(id);
+  },
+
   initValue() {},
   fileFiltered() {},
 
@@ -42,6 +62,11 @@ var fcfield_file = {
   },
 
   assignFile(id, file, keepModal, key) {
+    const thumb = FlexiMediaField.row(document.getElementById(id))?.querySelector('img.fc_preview_thumb');
+    const isPdf = String(file?.ext).toLowerCase() === 'pdf' || /\.pdf$/i.test(file?.filename || '');
+    if (thumb && isPdf && !file.preview && Number(file.url) !== 1 && /^[1-9]\d*$/.test(file.id) && fcfield_file.pdf_thumb_url) {
+      file = {...file, preview: fcfield_file.pdf_thumb_url.replace('__ID__', file.id)};
+    }
     return FlexiMediaField.assignFile(id, file, keepModal, key, fcfield_file.dialog_handle);
   },
 
@@ -77,7 +102,8 @@ var fcfield_file = {
       if (file.custom1 !== undefined) FlexiMediaField.setValue(box, '.fc_filecustom1', file.custom1);
       if (file.custom2 !== undefined) FlexiMediaField.setValue(box, '.fc_filecustom2', file.custom2);
       const ext = String(file.ext || '').toUpperCase();
-      if (ext && !/phpThumb/i.test(box.querySelector('.fc_preview_thumb')?.getAttribute('src') || '')) {
+      const preview = box.querySelector('.fc_preview_thumb')?.getAttribute('src');
+      if (ext && (!preview || preview === FlexiMediaField.placeholder)) {
         FlexiMediaField.setText(box, '.fc_preview_text', ext);
       }
     });

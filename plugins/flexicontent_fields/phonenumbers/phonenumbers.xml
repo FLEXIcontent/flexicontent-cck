@@ -34,6 +34,10 @@
 				<option value="0" show_list="" hide_list="multivalue-mode">FLEXI_NO</option>
 				<option value="1" show_list="multivalue-mode" hide_list="">FLEXI_YES</option>
 			</field>
+			<field name="fields_box_placing" type="radio" default="0" label="FLEXI_FIELD_VALUES_PER_ROW" description="FLEXI_FIELD_VALUES_PER_ROW_DESC" depend_class="fieldgroupoff multivalue-mode" class="btn-group group-fcinfo">
+				<option value="0">1</option>
+				<option value="1">FLEXI_MULTIPLE</option>
+			</field>
 			<field name="add_position" type="multilist" subtype="radio" default="3" label="FLEXI_FIELD_ADD_POSITION" description="FLEXI_FIELD_ADD_POSITION_DESC" depend_class="fieldgroupoff multivalue-mode" class="btn-group group-fcinfo">
 				<option value="0">FLEXI_FIELD_APPEND_BTN</option>
 				<option value="1">FLEXI_FIELD_INLINE_APPEND_BTN</option>
@@ -41,6 +45,7 @@
 				<option value="3">FLEXI_FIELD_INLINE_BOTH_BTN</option>
 			</field>
 			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" depend_class="fieldgroupoff multivalue-mode" />
+			<field name="form_card_width" type="text" default="320" size="6" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_FORM_CARD_WIDTH" description="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_FORM_CARD_WIDTH_DESC" />
 			<field name="showon" type="text" default="" label="FLEXI_FIELD_SHOWON" description="FLEXI_FIELD_SHOWON_DESC" />
 			<field name="required" type="radio" default="0" label="FLEXI_FIELD_REQUIRED" description="FLEXI_FIELD_REQUIRED_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>

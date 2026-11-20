@@ -25,9 +25,9 @@ window.FlexiFieldRepeater = (() => {
   }
 
   function prepareControls(row, ref, config) {
-    for (const { selector, key, value } of config.controls) {
+    for (const { selector, key, value, idSuffix = key } of config.controls) {
       const control = row.querySelector(selector);
-      if (control) setControl(row, control, ref.id + '_' + key, ref.name + '[' + key + ']', value);
+      if (control) setControl(row, control, ref.id + '_' + idSuffix, ref.name + '[' + key + ']', value);
     }
   }
 

@@ -74,6 +74,83 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
     assert.equal(await second.getAttribute('aria-expanded'),'true');assert.equal(await page.locator('.mf_value_props').nth(1).isVisible(),true);
     await page.locator('#custom_audio_1_file-title').fill('Clone');assert.equal(await page.locator('#custom_audio_0_file-title').inputValue(),'Original');
   });
+  await test('Phone cards submit the locked country for each cloned row', async page => {
+    await form(page, `<ul id="sortables_33"><li class="fcfieldval_container fc-phone-card">
+      <label for="custom_phone_0_cc">Country</label>
+      <select class="phonecc" id="custom_phone_0_cc" name="custom[phone][0][cc]" disabled><option selected value="886">Taiwan</option></select>
+      <input type="hidden" class="phonecc-locked" name="custom[phone][0][cc]" value="886">
+    </li></ul>`);
+    await loadDependencies(page);
+    await validate(page);
+    await page.addScriptTag({content: source('site/assets/js/field-repeater.js')});
+    await page.evaluate(() => {
+      const repeater = FlexiFieldRepeater.get({fieldId: 33, initialCount: 1, id: 'custom_phone', name: 'custom[phone]',
+        controls: [{selector: 'select.phonecc', key: 'cc', value: '886'},
+          {selector: 'input.phonecc-locked', key: 'cc', idSuffix: 'cc_locked', value: '886'}]});
+      repeater.add(null, document.querySelector('li'), {animate_visible: false, scroll_visible: false});
+    });
+    assert.equal(await page.locator('label').nth(1).getAttribute('for'), 'custom_phone_1_cc');
+    assert.equal(await page.locator('#custom_phone_1_cc').isDisabled(), true);
+    assert.deepEqual(await page.locator('form').evaluate(form => [...new FormData(form)].filter(([key]) => key.includes('[cc]'))),
+      [['custom[phone][0][cc]', '886'], ['custom[phone][1][cc]', '886']]);
+  });
+  await test('File cards replace, clone and clear local PDF previews without retaining PDF styling', async page => {
+    await form(page, `<div id="flexicontent"><div class="fcfieldval_container fc-media-card">
+      <input class="fc-file-id" id="custom_docs_0_file-id" name="custom[docs][0][file-id]">
+      <input class="fc_filedata_txt" data-fc-media-key="docs" id="custom_docs_0_file-data-txt" name="custom[docs][0][file-data-txt]">
+      <input class="fc_filetitle" id="custom_docs_0_file-title" name="custom[docs][0][file-title]">
+      <details class="fc-file-value-props" data-name="custom_docs_0"><summary>File properties</summary>
+        <textarea name="custom[docs][0][custom1]" id="custom_docs_0_custom1">Original</textarea></details>
+      <div class="fcfield_preview_box auto"><span class="fc_preview_text"></span><img class="fc_preview_thumb"></div>
+    </div></div>`);
+    for (const file of ['site/assets/js/field-repeater.js', 'site/assets/js/media-repeater.js',
+      'site/assets/js/media-field-controls.js', 'plugins/flexicontent_fields/file/js/form.js']) {
+      await page.addScriptTag({content: source(file)});
+    }
+    await page.addStyleTag({content: source('site/assets/css/flexi_form_fields.css')});
+    const assign = file => page.evaluate(file => fcfield_file.assignFile('custom_docs_0_file-id', file, 1, 'docs'), file);
+    const thumb = page.locator('.fc_preview_thumb').first();
+    const fit = image => image.evaluate(element => getComputedStyle(element).objectFit);
+    const pdf = {id: 7, filename: 'book.pdf', ext: 'pdf', altname: 'Book'};
+    await page.evaluate(() => { fcfield_file.pdf_thumb_url = '/file/pdf_thumb.php?id=__ID__'; });
+    assert.equal(await assign(pdf), true);
+    assert.equal(await thumb.getAttribute('src'), '/file/pdf_thumb.php?id=7');
+    assert.equal(await fit(thumb), 'contain');
+    assert.equal(await page.locator('.fc_filetitle').inputValue(), 'Book');
+    await page.locator('summary').focus();
+    await page.keyboard.press('Enter');
+    assert.equal(await page.locator('details').evaluate(panel => panel.open), true);
+    await page.evaluate(() => {
+      const row = document.querySelector('.fcfieldval_container').cloneNode(true);
+      fcfield_media_rows.prepare(row, {id: 'custom_docs_1', name: 'custom[docs][1]', index: 1},
+        {kind: 'file', name: 'custom[docs]', defaults: {}});
+      document.getElementById('flexicontent').append(row);
+    });
+    assert.equal(await page.locator('details').nth(1).evaluate(panel => panel.open), false);
+    assert.equal(await page.locator('#custom_docs_1_custom1').inputValue(), '');
+    assert.equal(await page.locator('#custom_docs_0_custom1').inputValue(), 'Original');
+    const clone = page.locator('.fc_preview_thumb').nth(1);
+    assert.equal(await fit(clone), 'cover');
+    assert.match(await clone.getAttribute('src'), /^data:/);
+    assert.equal(await page.locator('#custom_docs_1_file-title').inputValue(), '');
+    const png = {id: 8, filename: 'photo.png', ext: 'png', preview: '/photo.png', altname: 'Photo'};
+    await assign(png);
+    await page.evaluate(file => fcfield_file.refreshFileRows(file), png);
+    assert.equal(await fit(thumb), 'cover');
+    assert.equal(await thumb.getAttribute('src'), '/photo.png');
+    assert.equal(await page.locator('.fc_preview_text').first().textContent(), '');
+    await assign(pdf);
+    await page.evaluate(() => fcfield_file.clearField(document.getElementById('custom_docs_0_file-id'), {}, 'docs'));
+    assert.match(await thumb.getAttribute('src'), /^data:/);
+    assert.equal(await fit(thumb), 'cover');
+    await assign({...pdf, url: 1});
+    assert.match(await thumb.getAttribute('src'), /^data:/);
+    await page.locator('.fcfield_preview_box').first().evaluate(element => element.remove());
+    let requests = 0;
+    page.on('request', request => { if (request.url().includes('pdf_thumb.php')) requests++; });
+    await assign(pdf);
+    assert.equal(requests, 0);
+  });
   await test('Image card panels preserve URLs and delayed uploaders open once', async page => {
     await form(page, '<div class="fcfieldval_container"><div id="custom_photo_0_fc_preview_msg"></div><div class="fcfield_preview_box">Preview</div><div id="upload_0" class="fc_file_uploader" data-tagid-prefix="upload_" style="display:none"></div><button type="button" class="fc_files_uploader_toggle_btn" onclick="window.uploadClicks++; document.getElementById(\'upload_0\').style.display=\'block\'">Upload</button><button type="button" id="url-button" class="fcfield-mediaurl-btn" data-for="custom_photo_0" onclick="fcfield_image.toggleMediaURL(\'custom_photo_0\')">URL</button><button type="button" id="edit-button" class="fc-image-edit-btn" data-for="custom_photo_0" onclick="fcfield_image.toggleFields(\'custom_photo_0\')">Edit</button><div class="fcimg_url_props" style="display:none"><div class="fcfield-image-mediaurl-box"><input id="custom_photo_0_mediaurl" value="https://example.test/video"></div></div><div class="fcimg_value_props" data-name="custom_photo_0" style="display:none"><input value="Caption"></div></div>');
     await page.evaluate(()=>{const input=document.createElement('input');input.id='custom_photo_0';input.type='hidden';document.querySelector('.fcfieldval_container').append(input);});

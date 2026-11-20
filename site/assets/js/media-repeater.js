@@ -45,6 +45,7 @@ window.fcfield_media_rows = (() => {
     const originalId = primary.dataset.originalId || primary.id;
     const oldId = image ? originalId : originalId.replace(/_file-id$/, '');
     reindexControls(row, oldId, ref, config);
+    row.querySelectorAll('details.fc-file-value-props').forEach(panel => { panel.open = false; });
     if (config.kind === 'mediafile') {
       row.querySelectorAll('.mf_value_props').forEach(panel => { panel.style.display = 'none'; });
       row.querySelectorAll('.fc-media-edit-btn, .fcfield-mediaurl-btn').forEach(button => {
