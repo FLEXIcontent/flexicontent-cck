@@ -821,6 +821,10 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 				$db->setQuery($query);
 				$col_data = $db->loadAssocList('COLUMN_NAME');
 				foreach($col_data as $col => $data) {
+					// An older Joomla language column must not downgrade existing four-byte text.
+					if ($data['CHARACTER_SET_NAME'] === 'utf8mb4' && $jchset !== 'utf8mb4') {
+						continue;
+					}
 					if ($data['CHARACTER_SET_NAME'] <> $jchset || $data['COLLATION_NAME'] <> $jcname) {
 						$query = "ALTER TABLE ".$full_tbl_name." MODIFY `".$col."` ". $tbl_cols[$col];
 						$db->setQuery($query);

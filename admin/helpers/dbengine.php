@@ -193,7 +193,8 @@ class FlexicontentDbEngine
 		}
 
 		// Only one conversion at a time: a second ALTER would wait for the first and then copy the table again
-		$lock = $db->quote($db->getPrefix() . 'flexicontent_dbengine');
+		$database = (string) $db->setQuery('SELECT DATABASE()')->loadResult();
+		$lock = $db->quote('flexicontent_dbengine_' . substr(hash('sha256', $database . ':' . $db->getPrefix()), 0, 40));
 
 		if (!$db->setQuery('SELECT GET_LOCK(' . $lock . ', 0)')->loadResult())
 		{
@@ -311,15 +312,10 @@ class FlexicontentDbEngine
 	 */
 	public static function followSiteEngine($db, $tablename)
 	{
-		static $site_engine = null;
-
-		if ($site_engine === null)
-		{
-			$site_engine = strtolower((string) $db->setQuery(
-				'SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE()'
-				. ' AND TABLE_NAME = ' . $db->quote($db->getPrefix() . 'flexicontent_items_ext')
-			)->loadResult());
-		}
+		$site_engine = strtolower((string) $db->setQuery(
+			'SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE()'
+			. ' AND TABLE_NAME = ' . $db->quote($db->getPrefix() . 'flexicontent_items_ext')
+		)->loadResult());
 
 		if ($site_engine !== 'innodb')
 		{

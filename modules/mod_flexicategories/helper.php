@@ -19,6 +19,27 @@ defined('_JEXEC') or die;
  */
 abstract class ModFlexiCategoriesHelper
 {
+	/** Resolve the child layout independently of the outer category list. */
+	public static function getItemsLayoutPath($layout)
+	{
+		$layout = (string) $layout;
+		$path = \Joomla\CMS\Helper\ModuleHelper::getLayoutPath('mod_flexicategories', $layout . '_items');
+
+		// A legacy module may select the item partial itself as its layout.
+		if (basename($path) === 'default.php' && str_ends_with($layout, '_items'))
+		{
+			$path = \Joomla\CMS\Helper\ModuleHelper::getLayoutPath('mod_flexicategories', $layout);
+		}
+
+		// Joomla returns the outer default.php when the requested partial is missing.
+		if (basename($path) === 'default.php')
+		{
+			return \Joomla\CMS\Helper\ModuleHelper::getLayoutPath('mod_flexicategories', 'default_items');
+		}
+
+		return $path;
+	}
+
 	/**
 	 * Get list of articles
 	 *

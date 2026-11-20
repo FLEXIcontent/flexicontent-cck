@@ -22,5 +22,5 @@ if ($cat_card_layout === 'top') {
 	echo '<ul class="categories-module' . $moduleclass_sfx . ' list-unstyled d-flex flex-column gap-2" style="list-style:none;padding-left:0">';
 }
 ?>
-<?php require \Joomla\CMS\Helper\ModuleHelper::getLayoutPath('mod_flexicategories', $params->get('layout', 'default') . '_items'); ?>
+<?php require ModFlexiCategoriesHelper::getItemsLayoutPath($params->get('layout', 'default')); ?>
 </ul>
