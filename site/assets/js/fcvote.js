@@ -377,7 +377,7 @@
 			if (voting_group) voting_group.style.opacity = '';
 		})
 		.catch(function(err) {
-			alert('Error: ' + (err.message || err));
+			FlexiForm.alert('Error: ' + (err.message || err));
 			under_vote = false;
 			if (voting_group) voting_group.style.opacity = '';
 		});
@@ -550,7 +550,7 @@
 				box_loading.classList.remove('ajax-loader');
 				box_loading.style.display = 'none';
 			}
-			alert('Error: ' + (err.message || err));
+			FlexiForm.alert('Error: ' + (err.message || err));
 		});
 	}
 
@@ -640,16 +640,18 @@
 	 *  REVIEW FORM — Delete the review of the current user
 	 * ================================================================ */
 
-	function fcvote_delete_review(tagid, form) {
+	function fcvote_delete_review(tagid, form, confirmed = false) {
 		var btn = form.querySelector('.fcvote_review_form_delete_btn');
-		if (!window.confirm(btn ? btn.getAttribute('data-confirm') : '')) return;
+		if (btn?.disabled) return false;
+		if (!confirmed) return FlexiForm.confirmAction(btn || form, btn?.getAttribute('data-confirm') || '', () => fcvote_delete_review(tagid, form, true));
 
 		var box = document.getElementById(tagid);
 		var url = fcvote_root_url()
 			+ 'index.php?option=com_flexicontent&format=raw&task=deletereviewform'
 			+ '&lang=' + (typeof window.fc_sef_lang !== 'undefined' ? window.fc_sef_lang : '');
 
-		fetch(url, {
+		if (btn) btn.disabled = true;
+		return fetch(url, {
 			method: 'POST',
 			headers: { 'X-Requested-With': 'XMLHttpRequest' },
 			body: new FormData(form)
@@ -668,7 +670,10 @@
 			}
 		})
 		.catch(function(err) {
-			alert('Error: ' + (err.message || err));
+			FlexiForm.alert('Error: ' + (err.message || err));
+		})
+		.finally(function() {
+			if (btn) btn.disabled = false;
 		});
 	}
 
@@ -679,8 +684,9 @@
 	 *  REVIEW LIST — Delete the review of the current user (button of the list)
 	 * ================================================================ */
 
-	function fcvote_review_delete_own(btn, contentId) {
-		if (!window.confirm(btn.getAttribute('data-confirm') || '')) return false;
+	function fcvote_review_delete_own(btn, contentId, confirmed = false) {
+		if (btn.disabled) return false;
+		if (!confirmed) return FlexiForm.confirmAction(btn, btn.getAttribute('data-confirm') || '', () => fcvote_review_delete_own(btn, contentId, true));
 
 		var body = new URLSearchParams();
 		body.set('content_id', contentId);
@@ -717,11 +723,11 @@
 			btn.disabled = false;
 			var tmp = document.createElement('div');
 			tmp.innerHTML = (data && data.html) || '';
-			alert(tmp.textContent.replace(/^\s*[×x]\s*/, '').trim() || 'Error');
+			FlexiForm.alert(tmp.textContent.replace(/^\s*[×x]\s*/, '').trim() || 'Error');
 		})
 		.catch(function(err) {
 			btn.disabled = false;
-			alert('Error: ' + (err.message || err));
+			FlexiForm.alert('Error: ' + (err.message || err));
 		});
 
 		return false;
@@ -814,7 +820,7 @@
 		})
 		.catch(function(err) {
 			if (btn) btn.disabled = false;
-			alert('Error: ' + (err.message || err));
+			FlexiForm.alert('Error: ' + (err.message || err));
 		});
 	}
 
@@ -853,7 +859,7 @@
 			for (var i = 0; i < btns.length; i++) btns[i].disabled = false;
 
 			if (!data || data.error) {
-				alert((data && data.msg) || 'Error');
+				FlexiForm.alert((data && data.msg) || 'Error');
 				return;
 			}
 
@@ -871,7 +877,7 @@
 		})
 		.catch(function(err) {
 			for (var i = 0; i < btns.length; i++) btns[i].disabled = false;
-			alert('Error: ' + (err.message || err));
+			FlexiForm.alert('Error: ' + (err.message || err));
 		});
 
 		return false;
@@ -1080,8 +1086,9 @@
 	 *  REVIEW LIST — Moderation: approve / trash a pending review
 	 * ================================================================ */
 
-	function fcvote_review_moderate(btn, action, reviewId) {
-		if (action === 'trash' && !window.confirm(btn.getAttribute('data-confirm') || '')) return false;
+	function fcvote_review_moderate(btn, action, reviewId, confirmed = false) {
+		if (btn.disabled) return false;
+		if (action === 'trash' && !confirmed) return FlexiForm.confirmAction(btn, btn.getAttribute('data-confirm') || '', () => fcvote_review_moderate(btn, action, reviewId, true));
 
 		var row = btn.closest('.fcvote-review-item') || document.getElementById('review_' + reviewId);
 		var body = new URLSearchParams();
@@ -1103,7 +1110,7 @@
 		.then(function(data) {
 			if (!data || data.error) {
 				btn.disabled = false;
-				alert((data && data.msg) || 'Error');
+				FlexiForm.alert((data && data.msg) || 'Error');
 				return;
 			}
 			// The page is reloaded when the last modal is closed, the other copy of the review (page / modal) is updated then
@@ -1128,7 +1135,7 @@
 		})
 		.catch(function(err) {
 			btn.disabled = false;
-			alert('Error: ' + (err.message || err));
+			FlexiForm.alert('Error: ' + (err.message || err));
 		});
 
 		return false;

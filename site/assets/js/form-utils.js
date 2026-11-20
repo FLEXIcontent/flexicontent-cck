@@ -74,6 +74,40 @@ window.FlexiForm = (() => {
   };
   const escapeHTML = value => { const node = document.createElement('span'); node.textContent = value; return node.innerHTML; };
   const message = (type, value) => Joomla.renderMessages({[type]:[escapeHTML(value)]});
+  const pendingActions = new WeakSet(), approvedForms = new WeakSet();
+  // Inline event handlers must return false immediately; a Promise does not
+  // cancel the browser's original navigation or form submission.
+  function runAction(owner, action) {
+    if (!owner || pendingActions.has(owner)) return false;
+    pendingActions.add(owner);
+    Promise.resolve().then(action).catch(error => message('error', error.message || String(error)))
+      .finally(() => pendingActions.delete(owner));
+    return false;
+  }
+  function confirmAction(owner, question, action) {
+    return runAction(owner, async () => { if (await confirm(question)) await action(); });
+  }
+  function followLink(link, event) {
+    const next = link.cloneNode(false);
+    next.removeAttribute('id'); next.removeAttribute('onclick');
+    if (event?.ctrlKey || event?.metaKey || event?.shiftKey || event?.button === 1) next.target = '_blank';
+    next.hidden = true; document.body.append(next); next.click(); next.remove();
+  }
+  function confirmLink(link, question, event) {
+    return confirmAction(link, question, () => followLink(link, event));
+  }
+  function alertLink(link, notice, event) {
+    return runAction(link, async () => { await alert(notice); followLink(link, event); });
+  }
+  function confirmSubmit(form, question, event) {
+    if (approvedForms.has(form)) { approvedForms.delete(form); return true; }
+    const submitter = event?.submitter;
+    return confirmAction(form, question, () => {
+      approvedForms.add(form);
+      try { HTMLFormElement.prototype.requestSubmit.call(form, submitter || undefined); }
+      finally { approvedForms.delete(form); }
+    });
+  }
   function clearSelect(select) {
     const choices = select.fc_choices_instance || data(select, 'fc_choices_instance');
     if (choices) { choices.removeActiveItems(); if (!select.multiple) choices.setChoiceByValue(''); }
@@ -105,5 +139,5 @@ window.FlexiForm = (() => {
       }
     }
   }
-  return {element, ready, visible, value, data, show, focusInvalid, change, cloneFieldRow, text, insertHTML, alert, confirm, message, clearSelect};
+  return {element, ready, visible, value, data, show, focusInvalid, change, cloneFieldRow, text, insertHTML, alert, confirm, message, runAction, confirmAction, confirmLink, alertLink, confirmSubmit, clearSelect};
 })();

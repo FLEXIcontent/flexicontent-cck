@@ -402,7 +402,7 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 				if (" . ($folder_mode ? 'true' : 'false') . " && deleted && filenames.has(deleted))
 				{
 					const removedOriginal = [...originals].some(field => field.value === deleted);
-					alert(" . json_encode(\Joomla\CMS\Language\Text::_('FLEXI_DELETE_FILE_IN_LIST_WINDOW_MUST_CLOSE'), JSON_HEX_TAG | JSON_HEX_AMP) . "
+					FlexiForm.alert(" . json_encode(\Joomla\CMS\Language\Text::_('FLEXI_DELETE_FILE_IN_LIST_WINDOW_MUST_CLOSE'), JSON_HEX_TAG | JSON_HEX_AMP) . "
 						+ (removedOriginal ? '\\n' + " . json_encode(\Joomla\CMS\Language\Text::_('FLEXI_EXISTING_FILE_REMOVED_SAVE_RECOMMENEDED'), JSON_HEX_TAG | JSON_HEX_AMP) . " : ''));
 				}
 				document.querySelectorAll('a[data-filename], a[data-fileid]').forEach(link => {
@@ -422,7 +422,7 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 					.filter(input => input.closest('tr')?.querySelector('.fc_set_file_assignment:not(.striketext)'));
 				if (!inputs.length)
 				{
-					alert(" . json_encode(\Joomla\CMS\Language\Text::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', \Joomla\CMS\Language\Text::_('FLEXI_SELECT')), JSON_HEX_TAG | JSON_HEX_AMP) . ");
+					FlexiForm.alert(" . json_encode(\Joomla\CMS\Language\Text::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', \Joomla\CMS\Language\Text::_('FLEXI_SELECT')), JSON_HEX_TAG | JSON_HEX_AMP) . ");
 					return;
 				}
 
@@ -461,11 +461,11 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 			{
 				if (document.adminForm.boxchecked.value==0)
 				{
-					alert('". flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', \Joomla\CMS\Language\Text::_('FLEXI_DELETE')), 'd')."');
+					FlexiForm.alert('". flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', \Joomla\CMS\Language\Text::_('FLEXI_DELETE')), 'd')."');
 				}
 				else
 				{
-					if (confirm('".flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_ARE_YOU_SURE'), 's')."')) Joomla.submitbutton('filemanager.remove');
+					return FlexiForm.confirmAction(document.adminForm, '".flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_ARE_YOU_SURE'), 's')."', () => Joomla.submitbutton('filemanager.remove'));
 				}
 			}
 		";

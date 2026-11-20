@@ -12,6 +12,7 @@ static $js_and_css_added = false;
 if (!$js_and_css_added)
 {
 	$document = \Joomla\CMS\Factory::getApplication()->getDocument();
+	flexicontent_html::loadFramework('flexi-lib');
 	$cparams  = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
 	$use_font = $cparams->get('use_font_icons', 1);
 
@@ -49,7 +50,7 @@ if (!$js_and_css_added)
 			$icon_is_fav  = $heart_svg('fcfavs-heart-fill');
 			$icon_not_fav = $heart_svg('fcfavs-heart-border');
 
-			$_attribs = 'class="fcfavs-icon_login '.$tooltip_class.'" title="'.$tooltip_title.'" onclick="alert(\''.\Joomla\CMS\Language\Text::_( 'FLEXI_FAVOURE_LOGIN_TIP', true ).'\')"';
+			$_attribs = 'class="fcfavs-icon_login '.$tooltip_class.'" title="'.$tooltip_title.'" onclick="FlexiForm.alert(\''.\Joomla\CMS\Language\Text::_( 'FLEXI_FAVOURE_LOGIN_TIP', true ).'\')"';
 			$icon_login_fav = '<span class="fcfavs-btn"><span ' . $_attribs . '>' . $heart_svg('fcfavs-svg_login') . '</span></span>';
 			break;
 
@@ -58,7 +59,7 @@ if (!$js_and_css_added)
 			$icon_is_fav  = '<span class="fcfavs-btn"><span class="fcfavs-btn-inner fcfavs-heart-fill"></span></span>';
 			$icon_not_fav = '<span class="fcfavs-btn"><span class="fcfavs-btn-inner fcfavs-heart-border"></span></span>';
 
-			$_attribs = 'class="fcfavs-btn-inner fcfavs-heart-fill fcfavs-heart-login '.$tooltip_class.'" title="'.$tooltip_title.'" onclick="alert(\''.\Joomla\CMS\Language\Text::_( 'FLEXI_FAVOURE_LOGIN_TIP', true ).'\')" ';
+			$_attribs = 'class="fcfavs-btn-inner fcfavs-heart-fill fcfavs-heart-login '.$tooltip_class.'" title="'.$tooltip_title.'" onclick="FlexiForm.alert(\''.\Joomla\CMS\Language\Text::_( 'FLEXI_FAVOURE_LOGIN_TIP', true ).'\')" ';
 			$icon_login_fav = '<span class="fcfavs-btn"><span ' . $_attribs . '></span></span>';
 			break;
 	}

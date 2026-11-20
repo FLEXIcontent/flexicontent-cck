@@ -442,7 +442,7 @@ class fc_Waveform_LazyLoad
 		{
 			if (!preview)
 			{
-				alert(Joomla.JText._('Preview can not load file. Reference to preview file is empty.'));
+				FlexiForm.alert(Joomla.JText._('Preview can not load file. Reference to preview file is empty.'));
 				return;
 			}
 

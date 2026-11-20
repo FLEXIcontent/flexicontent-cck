@@ -239,7 +239,7 @@ async function fetchcounter(el_id, task_name)
 	if (!response.ok) return;
 	const count = (await response.text()).trim();
 	document.getElementById(el_id).textContent = count;
-	if (count === '0' && confirm("<?php echo Text::_('FLEXI_ITEMS_REFRESH_CONFIRM', true); ?>")) {
+	if (count === '0' && await FlexiForm.confirm("<?php echo Text::_('FLEXI_ITEMS_REFRESH_CONFIRM', true); ?>")) {
 		location.href = 'index.php?option=com_flexicontent&view=items';
 	}
 }
@@ -351,7 +351,7 @@ var move_within_ordering_groups_limits = <?php echo '"'.Text::_('FLEXI_MOVE_WITH
 				unassociated_items = Math.max(0, unassociated_items - limit);
 				document.getElementById('orphan_items_count').textContent = unassociated_items;
 			}
-			if (confirm("<?php echo Text::_('FLEXI_ITEMS_REFRESH_CONFIRM', true); ?>")) {
+			if (await FlexiForm.confirm("<?php echo Text::_('FLEXI_ITEMS_REFRESH_CONFIRM', true); ?>")) {
 				location.href = 'index.php?option=com_flexicontent&view=items';
 			}
 		} catch (error) {
@@ -369,7 +369,7 @@ FlexiForm.ready(function () {
 		const box = document.getElementById('fixCatBox');
 		const category = box.querySelector('#default_cat').value;
 		if (!category) {
-			alert('Please select a category');
+			FlexiForm.alert('Please select a category');
 			return;
 		}
 		const url = new URL(box.dataset.action, document.baseURI);

@@ -476,7 +476,7 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 			$popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&amp;view=search&amp;layout=indexer&amp;tmpl=component&amp;indexer=basic';
 			$btn_text = str_replace('<br/>', '', \Joomla\CMS\Language\Text::_('FLEXI_REINDEX_BASIC_CONTENT_LISTS'));
 			$btn_name = 'search_adv_index_dirty_only';
-			$full_js="if (!confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_MAY_TAKE_TIME_IN_LARGE_WEBSITES'), 'd')) . "')) return false; var url = this.dataset.taskurl; fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 420, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
+			$full_js="if (!(await FlexiForm.confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_MAY_TAKE_TIME_IN_LARGE_WEBSITES'), 'd')) . "'))) return false; var url = this.dataset.taskurl; fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 420, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
 						.$loading_msg."<\/span>'; window.location.reload(false)}, {'title': '".flexicontent_html::encodeHTML(strip_tags(\Joomla\CMS\Language\Text::_('FLEXI_REINDEX_BASIC_CONTENT_LISTS')), 'd')."'}); return false;";
 			$btn_arr[] = flexicontent_html::addToolBarButton(
 				$btn_text, $btn_name, $full_js,
@@ -489,7 +489,7 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 			$popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&amp;view=search&amp;layout=indexer&amp;tmpl=component&amp;indexer=advanced';
 			$btn_text = str_replace('<br/>', '', \Joomla\CMS\Language\Text::_('FLEXI_REINDEX_ADVANCED_SEARCH_VIEW'));
 			$btn_name = 'search_adv_index_dirty_only';
-			$full_js="if (!confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_MAY_TAKE_TIME_IN_LARGE_WEBSITES'), 'd')) . "')) return false; var url = this.dataset.taskurl; fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 420, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
+			$full_js="if (!(await FlexiForm.confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_MAY_TAKE_TIME_IN_LARGE_WEBSITES'), 'd')) . "'))) return false; var url = this.dataset.taskurl; fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 420, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
 						.$loading_msg."<\/span>'; window.location.reload(false)}, {'title': '".flexicontent_html::encodeHTML(strip_tags(\Joomla\CMS\Language\Text::_('FLEXI_REINDEX_ADVANCED_SEARCH_VIEW')), 'd')."'}); return false;";
 			$btn_arr[] = flexicontent_html::addToolBarButton(
 				$btn_text, $btn_name, $full_js,
@@ -502,7 +502,7 @@ class FLEXIcontentViewSearch extends FlexicontentViewBaseRecords
 			$popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&amp;view=search&amp;layout=indexer&amp;tmpl=component&amp;indexer=advanced&amp;rebuildmode=quick';
 			$btn_text = str_replace('<br/>', '', \Joomla\CMS\Language\Text::_('FLEXI_REINDEX_ADVANCED_SEARCH_VIEW_DIRTY_ONLY'));
 			$btn_name = 'search_adv_index_dirty_only';
-			$full_js="if (!confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_MAY_TAKE_TIME_IN_LARGE_WEBSITES'), 'd')) . "')) return false; var url = this.dataset.taskurl; fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 420, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
+			$full_js="if (!(await FlexiForm.confirm('" . str_replace('<br>', '\n', flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_MAY_TAKE_TIME_IN_LARGE_WEBSITES'), 'd')) . "'))) return false; var url = this.dataset.taskurl; fc_showDialog(url, 'fc_modal_popup_container', 0, 550, 420, function(){document.body.innerHTML='<span class=\"fc_loading_msg\">"
 						.$loading_msg."<\/span>'; window.location.reload(false)}, {'title': '".flexicontent_html::encodeHTML(strip_tags(\Joomla\CMS\Language\Text::_('FLEXI_REINDEX_ADVANCED_SEARCH_VIEW_DIRTY_ONLY')), 'd')."'}); return false;";
 			$btn_arr[] = flexicontent_html::addToolBarButton(
 				$btn_text, $btn_name, $full_js,

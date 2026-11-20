@@ -412,7 +412,7 @@ class fc_Waveform_LazyLoad
 		{
 			if (!file.dataset.wfpreview && !file.dataset.wforiginal)
 			{
-				alert(Joomla.JText._('FLEXI_PLEASE_UPLOAD_A_FILE'));
+				FlexiForm.alert(Joomla.JText._('FLEXI_PLEASE_UPLOAD_A_FILE'));
 				return;
 			}
 

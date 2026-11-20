@@ -120,13 +120,13 @@ $rv_star_svg = '<svg viewBox="0 0 576 512" aria-hidden="true" focusable="false" 
 		.then(function(r) { return r.json(); })
 		.then(function(data) {
 			wrap.style.opacity = '';
-			if (data.error) { alert(data.msg || 'Error'); return; }
+			if (data.error) { FlexiForm.alert(data.msg || 'Error'); return; }
 			var s = wrap.querySelectorAll('button');
 			for (var i = 0; i < s.length; i++) s[i].style.color = (i < value) ? '#f5a623' : '#ccc';
 		})
 		.catch(function(err) {
 			wrap.style.opacity = '';
-			alert('Error: ' + (err.message || err));
+			FlexiForm.alert('Error: ' + (err.message || err));
 		});
 		return false;
 	}

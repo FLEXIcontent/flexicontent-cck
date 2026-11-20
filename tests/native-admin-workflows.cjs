@@ -6,6 +6,33 @@ async function test(name,html,run){const page=await browser.newPage(),errors=[];
 try{await page.route('https://fixture.invalid/',r=>r.fulfill({contentType:'text/html',body:html}));await page.goto('https://fixture.invalid/');await page.addScriptTag({path:path.join(root,'site/assets/js/form-utils.js')});await page.evaluate(()=>{window.messages=[];FlexiForm.message=(type,text)=>messages.push({type,text});window.fc_initTooltips=()=>{};});await run(page);assert.deepEqual(errors,[]);assert.equal(await page.evaluate(()=>typeof jQuery),'undefined');results.push({name,status:'pass'});}finally{await page.close();}}
 try{
 const parentForm='<form id="adminForm"><input name="task"><input name="newstate"><input name="boxchecked" value="1"></form>';
+await test('Builder form storage round-trips current textarea and hidden input values',
+ '<form id="builder"><textarea id="layout_html" name="html">Old HTML</textarea><textarea id="layout_css" name="css">Old CSS</textarea><input id="layout_components" name="components" type="hidden" value="[]"><input id="layout_styles" name="styles" type="hidden" value="[]"><input id="layout_assets" name="assets" type="hidden" value="[]"></form>',async page=>{
+ const source=require('node:fs').readFileSync(path.join(root,'site/helpers/html/fclayoutbuilder.php'),'utf8');
+ // Execute the authored form-storage adapter and save command from the PHP
+ // single-quoted script, with only the unrelated canvas engine substituted.
+ const decode=s=>s.replace(/\\([\\'])/g,'$1');
+ const start=source.indexOf("editor.StorageManager.add(\\'form-storage\\', {");
+ const end=source.indexOf('\n\t\t\t});',start);
+ const saveStart=source.indexOf("pn.addButton(\\'options\\', [{",source.indexOf('// Add to default Buttons panel'));
+ const saveEnd=source.indexOf('\n\t\t\t}]);',saveStart);
+ assert(start>0&&end>start&&saveStart>0&&saveEnd>saveStart);
+ await page.evaluate(()=>{
+  window.element_id='layout';window.editor_sfx='test';
+  window.editor={StorageManager:{add:(name,adapter)=>window.storage=adapter},getHtml:()=>'<p>Builder & source</p>',getCss:()=>'.sample { color: red; }',getStyle:()=>[{selectors:['sample'],style:{color:'red'}}],getComponents:()=>[{tagName:'p',content:'Builder & source'}],AssetManager:{getAll:()=>[]}};
+  window.pn={addButton:(name,buttons)=>window.saveBuilder=buttons[0].command};
+ });
+ await page.addScriptTag({content:decode(source.slice(start,end+7))});
+ await page.addScriptTag({content:decode(source.slice(saveStart,saveEnd+8))});
+ await page.locator('#layout_html').fill('<p>Edited & current</p>');
+ await page.locator('#layout_components').evaluate(n=>n.value='[{"content":"Current"}]');
+ const loaded=await page.evaluate(()=>new Promise(resolve=>storage.load(['fc-gjs-testhtml','fc-gjs-testcomponents'],resolve)));
+ assert.equal(loaded['fc-gjs-testhtml'],'<p>Edited & current</p>');assert.equal(loaded['fc-gjs-testcomponents'],'[{"content":"Current"}]');
+ await page.evaluate(()=>new Promise(resolve=>storage.store({'fc-gjs-testhtml':'<p>Stored & current</p>','fc-gjs-testcomponents':'[{"content":"Stored"}]'},resolve)));
+ assert.deepEqual(await page.evaluate(()=>[new FormData(document.querySelector('form')).get('html'),new FormData(document.querySelector('form')).get('components')]),['<p>Stored & current</p>','[{"content":"Stored"}]']);
+ await page.evaluate(()=>saveBuilder(editor,null));
+ assert.deepEqual(await page.evaluate(()=>Object.fromEntries(new FormData(document.querySelector('form')))),{html:'<p>Builder & source</p>',css:'.sample { color: red; }',components:'[{"tagName":"p","content":"Builder & source"}]',styles:'[{"selectors":["sample"],"style":{"color":"red"}}]',assets:'[]'});
+});
 await test('File preview handles images, text, clearing and stale asynchronous reads','<input type="file" id="file"><img id="preview" style="display:none"><div id="message"></div>',async page=>{
  await page.evaluate(()=>{window.Joomla={Text:{_:k=>k},JText:{_:k=>k}};window.readers=[];window.FileReader=class{constructor(){readers.push(this)}readAsDataURL(){}};});await page.addScriptTag({path:path.join(root,'site/assets/js/flexi-lib.js')});
  const file=page.locator('#file'),preview=page.locator('#preview');const select=async(name,mimeType)=>{await file.setInputFiles({name,mimeType,buffer:Buffer.from('test')});await page.evaluate(()=>fc_loadImagePreview('file','preview','message',100,'25%'));};

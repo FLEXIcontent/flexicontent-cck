@@ -2717,13 +2717,14 @@ class flexicontent_html
 		$item_url = \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, $Itemid, $item));
 		$link = $item_url . (strpos($item_url, '?') !== false ? '&' : '?') . 'task=remove' . '&' . \Joomla\CMS\Session\Session::getFormToken() . '=1';
 
-		$view =Factory::getApplication()->input->getCm('view', '');
+		$view =Factory::getApplication()->input->getCmd('view', '');
 		$link .= '&isitemview=' . ($view == 'item' ? '1' : '0');
 
 		$targetLink = "_self";
+		self::loadFramework('flexi-lib');
 		$confirm_text = \Joomla\CMS\Language\Text::_('FLEXI_ARE_YOU_SURE_PERMANENT_DELETE', true);
 
-		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="' . $tooltip_placement . '" onclick="return confirm(\''.$confirm_text.'\')" target="'.$targetLink.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
+		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="' . $tooltip_placement . '" onclick="return FlexiForm.confirmLink(this, \''.$confirm_text.'\', event)" target="'.$targetLink.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
 		$output = \Joomla\CMS\Language\Text::_('FLEXI_ICON_SEP') . $output . \Joomla\CMS\Language\Text::_('FLEXI_ICON_SEP');
 
 		return $output;
@@ -3522,9 +3523,10 @@ class flexicontent_html
 		$link = $item_url . (strpos($item_url, '?') !== false ? '&' : '?') . 'task=approval' . '&' . \Joomla\CMS\Session\Session::getFormToken() . '=1';
 
 		$targetLink = "_self";
+		self::loadFramework('flexi-lib');
 		$confirm_text = \Joomla\CMS\Language\Text::_('FLEXI_CONFIRM_SEND_APPROVAL', true) . '\n' . ' (' . addslashes($overlib) . ')';  // '\n': a line break written for the JS string of the onclick attribute (a real line break is a JS syntax error)
 
-		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="' . $tooltip_placement . '" onclick="return confirm(\''.$confirm_text.'\')" target="'.$targetLink.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
+		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="' . $tooltip_placement . '" onclick="return FlexiForm.confirmLink(this, \''.$confirm_text.'\', event)" target="'.$targetLink.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
 		$output = \Joomla\CMS\Language\Text::_('FLEXI_ICON_SEP') . $output . \Joomla\CMS\Language\Text::_('FLEXI_ICON_SEP');
 
 		return $output;
@@ -4738,6 +4740,7 @@ class flexicontent_html
 
 			$document =Factory::getApplication()->getDocument();
 			$document->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/css/fcvote.css', array('version' => FLEXI_VHASH));
+			self::loadFramework('flexi-lib');
 			$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/fcvote.js', array('version' => FLEXI_VHASH));
 
 			// Make the CSRF token available to the JS, via: Joomla.getOptions('csrf.token')
@@ -4889,7 +4892,7 @@ class flexicontent_html
 				{
 					$href = 'javascript:;';
 					$popup_msg = addcslashes($no_acc_msg, "'");
-					$onclick = 'alert(\''.$popup_msg.'\');';
+					$onclick = 'FlexiForm.alert(\''.$popup_msg.'\');';
 				}
 
 				// WITH Redirection
@@ -4898,8 +4901,8 @@ class flexicontent_html
 					$href = $no_acc_url;
 					$popup_msg = addcslashes($no_acc_msg . "\\n\\n" . $no_acc_msg_redirect, "'");
 
-					if ($no_acc_askredirect==2)       $onclick = 'return confirm(\''.$popup_msg.'\');';
-					else if ($no_acc_askredirect==1)  $onclick = 'alert(\''.$popup_msg.'\'); return true;';
+					if ($no_acc_askredirect==2)       $onclick = 'return FlexiForm.confirmLink(this, \''.$popup_msg.'\', event);';
+					else if ($no_acc_askredirect==1)  $onclick = 'return FlexiForm.alertLink(this, \''.$popup_msg.'\', event);';
 					else                              $onclick = 'return true;';
 				}
 			}
@@ -6171,7 +6174,7 @@ class flexicontent_html
 
 		if (strpos($full_js, 'await FlexiForm.confirm(') !== false)
 		{
-			$full_js = "(async () => { " . $full_js . " })(); return false;";
+			$full_js = "return FlexiForm.runAction(this, async () => { " . $full_js . " });";
 		}
 		$full_js = "javascript: $full_js";
 

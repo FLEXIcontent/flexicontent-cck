@@ -217,10 +217,9 @@ $this->document->addScriptDeclaration
 
 	function clickRestore(link)
 	{
-		if (confirm('".\Joomla\CMS\Language\Text::_( 'FLEXI_CONFIRM_VERSION_RESTORE',true )."'))
-		{
-			location.href=link;
-		}
+		FlexiForm.confirm('".\Joomla\CMS\Language\Text::_( 'FLEXI_CONFIRM_VERSION_RESTORE',true )."').then(accepted => {
+			if (accepted) location.href=link;
+		});
 
 		return false;
 	}

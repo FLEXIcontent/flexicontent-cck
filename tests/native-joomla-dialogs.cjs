@@ -10,7 +10,7 @@ if(!joomla)throw Error('Set FLEXI_TEST_JOOMLA to a Joomla 6 installation.');
   for(const width of [1440,768,390]){
    const page=await browser.newPage({viewport:{width,height:900},hasTouch:true}), errors=[];
    page.on('pageerror',e=>errors.push(e.message));
-   await page.route('https://fixture.invalid/**',r=>r.fulfill({contentType:'text/html',body:'<button id="open">Open</button><form id="adminForm"><div id="content" style="display:none"><label for="value">Value</label><input id="value" name="value" value="Preserve me"></div></form><div id="system-message-container"></div>'}));
+   await page.context().route('https://fixture.invalid/**',r=>r.fulfill({contentType:'text/html',body:'<button id="open">Open</button><form id="adminForm"><div id="content" style="display:none"><label for="value">Value</label><input id="value" name="value" value="Preserve me"></div></form><div id="system-message-container"></div>'}));
    await page.goto('https://fixture.invalid/');
    await page.addScriptTag({path:path.join(joomla,'media/system/js/core.js')});
    await page.addScriptTag({type:'module',content:fs.readFileSync(path.join(joomla,'media/system/js/joomla-dialog.js'),'utf8')});
@@ -40,6 +40,69 @@ if(!joomla)throw Error('Set FLEXI_TEST_JOOMLA to a Joomla 6 installation.');
    assert.match(await page.locator('.joomla-dialog-alert').innerText(),/Message <literal>/);
    await page.locator('.joomla-dialog-alert [data-button-ok]').click();
    await page.waitForFunction(()=>window.alertClosed);
+   // Async confirmation must cancel the original event, then preserve normal
+   // navigation, validation and the clicked submitter on acceptance.
+   const submissions=[];
+   page.on('request',r=>{if(r.url().includes('/confirmed-submit'))submissions.push({url:r.url(),body:r.postData()});});
+   await page.evaluate(()=>{
+    window.actions=0;
+    document.body.insertAdjacentHTML('beforeend',`<button id="action" onclick="return FlexiForm.confirmAction(this, 'Proceed?', () => { window.actions++; })">Action</button>
+     <iframe name="result" id="result"></iframe>
+     <a id="confirmed-link" target="result" href="/accepted-link" onclick="return FlexiForm.confirmLink(this, 'Follow?', event)">Follow</a>
+     <a id="alert-link" target="result" href="/alert-link" onclick="return FlexiForm.alertLink(this, 'Notice', event)">Notice</a>
+     <form id="confirm-form" action="/wrong-action" method="post" target="result" onsubmit="return FlexiForm.confirmSubmit(this, 'Submit?', event)">
+      <input id="required" name="required" required value="valid"><button id="submitter" name="operation" value="purge" formaction="/confirmed-submit">Submit</button>
+     </form>`);
+   });
+   const confirm=page.locator('.joomla-dialog-confirm');
+   await page.locator('#action').click();
+   await page.locator('#action').dispatchEvent('click');
+   assert.equal(await confirm.count(),1);
+   await confirm.locator('[data-button-cancel]').click();
+   assert.equal(await page.evaluate(()=>window.actions),0);
+   await page.locator('#action').click();await confirm.locator('[data-button-ok]').click();
+   await page.waitForFunction(()=>window.actions===1);
+   await page.locator('#confirmed-link').click();await confirm.locator('[data-button-cancel]').click();
+   assert.equal(page.frames().filter(f=>f.url().endsWith('/accepted-link')).length,0);
+   await page.locator('#confirmed-link').click();await confirm.locator('[data-button-ok]').click();
+   await page.waitForFunction(()=>document.querySelector('#result').contentWindow.location.pathname==='/accepted-link');
+   await page.locator('#alert-link').click();await page.locator('.joomla-dialog-alert [data-button-ok]').click();
+   await page.waitForFunction(()=>document.querySelector('#result').contentWindow.location.pathname==='/alert-link');
+   await page.locator('#confirmed-link').click({modifiers:['Control']});
+   const popupReady=page.waitForEvent('popup');await confirm.locator('[data-button-ok]').click();
+   const popup=await popupReady;await popup.waitForLoadState();assert(popup.url().endsWith('/accepted-link'));await popup.close();
+   await page.locator('#submitter').click();await confirm.locator('[data-button-cancel]').click();assert.equal(submissions.length,0);
+   await page.locator('#submitter').click();
+   await page.locator('#required').evaluate(el=>el.value='');
+   await confirm.locator('[data-button-ok]').click();
+   assert.equal(submissions.length,0);assert.equal(await confirm.count(),0);
+   await page.locator('#required').fill('valid');await page.locator('#submitter').click();
+   await confirm.locator('[data-button-ok]').click();
+   await page.waitForFunction(()=>document.querySelector('#result').contentWindow.location.pathname==='/confirmed-submit');
+   assert.equal(submissions.length,1);assert.match(submissions[0].body,/operation=purge/);assert.match(submissions[0].body,/required=valid/);
+   await page.locator('#confirm-form').evaluate(el=>el.remove());
+   if(width===1440){
+    await page.addScriptTag({path:path.join(root,'site/assets/js/fcvote.js')});
+    await page.evaluate(()=>{
+     window.jroot_url_fc='https://fixture.invalid/';
+     document.body.insertAdjacentHTML('beforeend','<div id="review-box"><form id="review-form"><input name="content_id" value="42"><button type="button" id="delete-form" class="fcvote_review_form_delete_btn" data-confirm="Delete review?" onclick="fcvote_delete_review(\'review-box\',this.form)">Delete form review</button></form></div><button id="delete-own" data-confirm="Delete own?" data-token="qa_token" onclick="return fcvote_review_delete_own(this,42)">Delete own</button><div class="fcvote-review-item"><button id="trash-review" data-confirm="Trash?" data-token="qa_token" onclick="return fcvote_review_moderate(this,\'trash\',42)">Trash review</button></div>');
+    });
+    for(const id of ['delete-form','delete-own','trash-review']){
+     let requests=0,release;
+     const ready=new Promise(resolve=>release=resolve);
+     await page.route('https://fixture.invalid/index.php?**',async route=>{requests++;await ready;await route.fulfill({contentType:'application/json',body:JSON.stringify({error:true,html:'<div>Retry allowed</div>',msg:'Retry allowed'})});});
+     const button=page.locator('#'+id);
+     await button.click();await button.dispatchEvent('click');assert.equal(await confirm.count(),1);
+     await confirm.locator('[data-button-cancel]').click();assert.equal(requests,0);
+     await button.click();await confirm.locator('[data-button-ok]').click();
+     await page.waitForFunction(id=>document.getElementById(id).disabled,id);
+     await button.dispatchEvent('click');assert.equal(await confirm.count(),0);
+     release();await page.waitForFunction(id=>!document.getElementById(id).disabled,id);assert.equal(requests,1);
+     if(id!=='delete-form')await page.locator('.joomla-dialog-alert [data-button-ok]').click();
+     await button.click();await confirm.locator('[data-button-cancel]').click();assert.equal(requests,1);
+     await page.unroute('https://fixture.invalid/index.php?**');
+    }
+   }
    await page.route('https://fixture.invalid/bootstrap/**', route => route.fulfill({contentType:'text/javascript',body:fs.readFileSync(path.join(joomla,'media/vendor/bootstrap/js',path.basename(new URL(route.request().url()).pathname)))}));
    await page.evaluate(async () => { await import('/bootstrap/popover.js'); });
    await page.evaluate(() => {
