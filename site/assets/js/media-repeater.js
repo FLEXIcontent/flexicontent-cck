@@ -45,6 +45,13 @@ window.fcfield_media_rows = (() => {
     const originalId = primary.dataset.originalId || primary.id;
     const oldId = image ? originalId : originalId.replace(/_file-id$/, '');
     reindexControls(row, oldId, ref, config);
+    if (config.kind === 'mediafile') {
+      row.querySelectorAll('.mf_value_props').forEach(panel => { panel.style.display = 'none'; });
+      row.querySelectorAll('.fc-media-edit-btn, .fcfield-mediaurl-btn').forEach(button => {
+        button.classList.remove('active');
+        button.setAttribute('aria-expanded', 'false');
+      });
+    }
     for (const item of row.querySelectorAll('.fc_file_uploader')) {
       item.id = item.dataset.tagidPrefix + ref.index;
       item.replaceChildren();

@@ -67,6 +67,26 @@ class fc_Waveform_LazyLoad
 	fcfield_mediafile.dialog_handle = [];
 	fcfield_mediafile.base_url = [];
 
+	// Native JS toggles for the icon-only toolbar panels
+	fcfield_mediafile.toggleFields = function(element_id_n)
+	{
+		var box = document.querySelector('.mf_value_props[data-name="' + element_id_n + '"]');
+		if (!box) return;
+
+		var isHidden = (window.getComputedStyle(box).display === 'none');
+		box.style.display = isHidden ? 'block' : 'none';
+		for (const btn of box.closest('.fcfieldval_container').querySelectorAll('.fc-media-edit-btn, .fcfield-mediaurl-btn')) {
+			btn.classList.toggle('active', isHidden);
+			btn.setAttribute('aria-expanded', String(isHidden));
+		}
+	}
+
+	// Kept for backwards compatibility with the old media-URL button
+	fcfield_mediafile.toggleMediaURL = function(element_id_n)
+	{
+		fcfield_mediafile.toggleFields(element_id_n);
+	}
+
 	fcfield_mediafile.lazyLoadAsset = function(asset)
 	{
 		fcfield_mediafile.initValue(asset.getAttribute('data-fc_tagid'), asset.getAttribute('data-fc_fname'));

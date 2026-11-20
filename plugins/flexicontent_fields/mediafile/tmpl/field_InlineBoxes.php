@@ -87,6 +87,8 @@ foreach ($field->value as $file_id)
 	$addExistingURL_onclick = "fc_openFileSelection_".$field->id."(this);";
 	$toggleUploader_onclick = 'if (!FlexiMediaField.beforeToggle(this, \'mediafile\')) return; ';
 
+	$flat_btn_class = ' fc-flat-btn';
+
 	if ($use_inline_uploaders)
 	{
 		$uploader_html = $uploader_html_arr[$n] = \Joomla\CMS\HTML\HTMLHelper::_('fcuploader.getUploader', $field, $u_item_id, null, $n,
@@ -97,8 +99,8 @@ foreach ($field->value as $file_id)
 				'refresh_on_complete' => false,
 				'thumb_size_default' => $thumb_size_default,
 				'toggle_btn' => array(
-					'class' => ($file_btns_position ? 'dropdown-item' : '') . ' ' . $btn_item_class,
-					'text' => '<span class="fcfield-uploadvalue fcfont-icon-inline '.$font_icon_class.'"></span>' . (!$file_btns_position ? '&nbsp; ' . Text::_('FLEXI_UPLOAD') : ''),
+					'class' => $btn_item_class . $flat_btn_class,
+					'text' => '<span class="fc-image-tool-icon fas fa-upload" aria-hidden="true" title="'.Text::_('FLEXI_UPLOAD').'"></span>',
 					'onclick' => $toggleUploader_onclick,
 					'action' => null
 				),
@@ -110,24 +112,18 @@ foreach ($field->value as $file_id)
 		);
 
 		$multi_icon = $form_font_icons ? ' <span class="icon-stack"></span>' : '<span class="pages_stack"></span>';
-		$btn_classes = ($file_btns_position ? 'dropdown-item' : '') . ' ' . $btn_item_class;
-		$uploader_html->multiUploadBtn = '';  /*'
-			<span data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" class="'.$btn_classes.' fc-up fcfield-uploadvalue multi" id="'.$elementid_n.'_mul_uploadvalue">
-				&nbsp; ' . $multi_icon . ' ' . (!$file_btns_position || $file_btns_position==2 ? Text::_('FLEXI_UPLOAD') : '') . '
-			</span>';*/
+		$btn_classes = $btn_item_class . $flat_btn_class;
+		$uploader_html->multiUploadBtn = '';
+		// !!! CLASS: fc-files-modal-link fc-sel NEEDED BY JS !!! DO NOT REMOVE, DO NOT MOVE
 		$uploader_html->myFilesBtn = '
-			<span data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" class="'.$btn_classes.'" data-rowno="'.$n.'" id="'.$elementid_n.'_selectvalue">
-				<span class="fc-files-modal-link  fc-sel fcfield-selectvalue multi fcfont-icon-inline ' . $font_icon_class . '"></span>
-				' .  ($file_btns_position ? $multi_icon : '') . ' ' . (!$file_btns_position || $file_btns_position==2 ? ' ' . Text::_('FLEXI_MY_FILES') : '') . ' ' .'
-			</span>';
+			<button type="button" data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" class="fc-files-modal-link fc-sel fcfield-selectvalue multi '.$btn_classes.'" data-rowno="'.$n.'" id="'.$elementid_n.'_selectvalue" title="'.Text::_('FLEXI_MY_FILES').'">
+				<span class="fc-image-tool-icon fas fa-images" aria-hidden="true"></span>
+			</button>';
 		$uploader_html->mediaUrlBtn = !$usemediaurl ? '' : '
-			<span class="' . ($file_btns_position ? 'dropdown-item' : '') . ' ' . $btn_item_class .'" onclick="fcfield_mediafile.toggleMediaURL(\''.$elementid_n.'\', \''.$field_name_js.'\'); return false;">
-				<span class="fcfield-medialurlvalue fcfont-icon-inline ' . $font_icon_class . '"></span>
-				' . (!$file_btns_position || $file_btns_position==2 ? '&nbsp; ' . Text::_('FLEXI_FIELD_MEDIA_URL') : '') . '
-			</span>';
-		$uploader_html->clearBtn = '
-			 <span class="' . $btn_item_class . ' fcfield-clearvalue ' . $font_icon_class . '" title="'.Text::_('FLEXI_CLEAR').'" onclick="fcfield_mediafile.clearField(this, {}, \''.$field_name_js.'\');">
-			</span>';
+			<button type="button" aria-expanded="false" class="'.$btn_classes.' fcfield-mediaurl-btn" data-for="'.$elementid_n.'" title="'.Text::_('FLEXI_FIELD_MEDIA_URL').'" onclick="fcfield_mediafile.toggleMediaURL(\''.$elementid_n.'\'); return false;">
+				<span class="fc-image-tool-icon fas fa-video" aria-hidden="true"></span>
+			</button>';
+		$uploader_html->clearBtn = '';
 	}
 
 	$fnn = $FN_n;   // Alias ...
@@ -291,7 +287,7 @@ HTML;
 		'.(in_array($form_info_header, [2,3]) && $use_myfiles != 4 ? '
 		<div class="fcclear"></div>
 		<div class="'.$input_grp_class.' fc-xpended-row">
-			<label class="' . $add_on_class . ' badge fc-lbl fc_filedata_title-lbl" style="margin:0">'.Text::_( 'FLEXI_ORIGINAL_FILENAME' ).'</label>
+			<label class="' . $add_on_class . ' fc-prop-lbl fc_filedata_title-lbl" style="margin:0">'.Text::_( 'FLEXI_ORIGINAL_FILENAME' ).'</label>
 			<input type="text" disabled class="' . $add_on_class . ' fc_filedata_title" value="'. htmlentities($filename_original, ENT_COMPAT, 'UTF-8') .'" />
 		</div>' : '').'
 
@@ -307,6 +303,7 @@ HTML;
 			</div>
 
 
+			<div class="mf_value_props" data-name="'.$elementid_n.'" style="display: none;">
 			<div class="inlinefile-data-box" style="flex-basis: auto; flex-shrink: 50;">
 				'.
 
@@ -365,6 +362,7 @@ HTML;
 			'
 
 			</div>
+			</div><!-- EOF .mf_value_props -->
 		</div>
 
 		<div class="fcclear"></div>

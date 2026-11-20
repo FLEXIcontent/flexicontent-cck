@@ -37,6 +37,40 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
     await page.waitForFunction(() => !!document.formvalidator);
   };
   const loadDependencies = page => page.addScriptTag({content: source('site/assets/js/flexi-lib.js')});
+  await test('Nominatim searches require submission, cache results and ignore stale responses', async page => {
+    await form(page, '<div><input id="address_0_autocomplete"><div id="address_0_messages"></div></div>');
+    const requests=[];
+    await page.route('https://geocoder.invalid/**',async route=>{requests.push(route.request().url());await new Promise(r=>setTimeout(r,150));await route.fulfill({json:[]});});
+    await page.addScriptTag({content:source('plugins/flexicontent_fields/addressint/js/form_osm.js')});
+    await page.evaluate(()=>{fcfield_addrint.nominatim_url.address='https://geocoder.invalid/service/';fcfield_addrint.engines.nominatim.initAutoComplete('address_0','address');});
+    await page.locator('#address_0_autocomplete').fill('Taipei');await page.waitForTimeout(500);assert.equal(requests.length,0);
+    await page.locator('#address_0_autocomplete').press('Enter');await page.waitForFunction(()=>!!document.querySelector('.fc-osm-suggestions'));
+    assert.equal(requests.length,1);assert(requests[0].startsWith('https://geocoder.invalid/service/search?'));
+    await page.locator('.fc-osm-search').click();await page.waitForTimeout(250);assert.equal(requests.length,1);
+    await page.locator('#address_0_autocomplete').fill('Taichung');await page.locator('#address_0_autocomplete').press('Enter');await page.locator('#address_0_autocomplete').fill('Changed before response');await page.waitForTimeout(1400);
+    assert.equal(requests.length,2);assert.equal(await page.locator('.fc-osm-suggestions').count(),0);
+  });
+  await test('Address card skip toggles preserve values and independently disabled controls', async page => {
+    await form(page, '<div class="fcfieldval_container"><div class="fc-address-card"><button type="button" class="fcfield-skipvalue" onclick="fcfield_address.toggleSkipped(this)"><span class="fc-skip-icon fa-eye"></span>Skip</button><div class="fc-field-value-properties-box"><input name="address" value="Taipei"><input name="locked" disabled value="fixed"><select name="country"><option>TW</option></select></div></div></div>');
+    await page.addScriptTag({content:source('plugins/flexicontent_fields/addressint/js/repeater.js')});
+    await page.evaluate(()=>{const select=document.querySelector('select');window.choiceCalls=[];select.fc_choices_instance={enable:()=>choiceCalls.push('enable'),disable:()=>choiceCalls.push('disable')};});
+    const button=page.locator('.fcfield-skipvalue');await button.focus();await page.keyboard.press('Enter');
+    assert.equal(await button.getAttribute('aria-pressed'),'true');assert.equal(await page.locator('input[name=address]').isDisabled(),true);
+    assert.equal(await page.locator('form').evaluate(f=>new FormData(f).has('address')),false);
+    await page.keyboard.press('Space');assert.equal(await button.getAttribute('aria-pressed'),'false');
+    assert.equal(await page.locator('input[name=address]').inputValue(),'Taipei');assert.equal(await page.locator('input[name=address]').isEnabled(),true);
+    assert.equal(await page.locator('input[name=locked]').isDisabled(),true);assert.deepEqual(await page.evaluate(()=>choiceCalls),['disable','enable']);
+  });
+  await test('Media File card panels support keyboards and clones target their own properties', async page => {
+    await form(page, '<div class="fcfieldval_container"><input class="fc-file-id" id="custom_audio_0_file-id" name="custom[audio][0][file-id]" value="12"><button type="button" class="fc-media-edit-btn" data-for="custom_audio_0" onclick="fcfield_mediafile.toggleFields(\'custom_audio_0\')">Edit</button><div class="mf_value_props" data-name="custom_audio_0" style="display:none"><label for="custom_audio_0_file-title">Title</label><input id="custom_audio_0_file-title" name="custom[audio][0][file-title]" value="Original"></div></div>');
+    for(const file of ['site/assets/js/field-repeater.js','site/assets/js/media-repeater.js','plugins/flexicontent_fields/mediafile/js/form.js'])await page.addScriptTag({content:source(file)});
+    const button=page.locator('.fc-media-edit-btn').first();await button.focus();await page.keyboard.press('Enter');assert.equal(await button.getAttribute('aria-expanded'),'true');
+    await page.evaluate(()=>{const row=document.querySelector('.fcfieldval_container').cloneNode(true);fcfield_media_rows.prepare(row,{id:'custom_audio_1',name:'custom[audio][1]',index:1},{id:'custom_audio',name:'custom[audio]',kind:'mediafile',defaults:{}});document.forms.adminForm.append(row);});
+    const second=page.locator('.fc-media-edit-btn').nth(1);assert.equal(await second.getAttribute('aria-expanded'),'false');
+    assert.equal(await page.locator('.mf_value_props').nth(1).isVisible(),false);await second.focus();await page.keyboard.press('Space');
+    assert.equal(await second.getAttribute('aria-expanded'),'true');assert.equal(await page.locator('.mf_value_props').nth(1).isVisible(),true);
+    await page.locator('#custom_audio_1_file-title').fill('Clone');assert.equal(await page.locator('#custom_audio_0_file-title').inputValue(),'Original');
+  });
   await test('Image card panels preserve URLs and delayed uploaders open once', async page => {
     await form(page, '<div class="fcfieldval_container"><div id="custom_photo_0_fc_preview_msg"></div><div class="fcfield_preview_box">Preview</div><div id="upload_0" class="fc_file_uploader" data-tagid-prefix="upload_" style="display:none"></div><button type="button" class="fc_files_uploader_toggle_btn" onclick="window.uploadClicks++; document.getElementById(\'upload_0\').style.display=\'block\'">Upload</button><button type="button" id="url-button" class="fcfield-mediaurl-btn" data-for="custom_photo_0" onclick="fcfield_image.toggleMediaURL(\'custom_photo_0\')">URL</button><button type="button" id="edit-button" class="fc-image-edit-btn" data-for="custom_photo_0" onclick="fcfield_image.toggleFields(\'custom_photo_0\')">Edit</button><div class="fcimg_url_props" style="display:none"><div class="fcfield-image-mediaurl-box"><input id="custom_photo_0_mediaurl" value="https://example.test/video"></div></div><div class="fcimg_value_props" data-name="custom_photo_0" style="display:none"><input value="Caption"></div></div>');
     await page.evaluate(()=>{const input=document.createElement('input');input.id='custom_photo_0';input.type='hidden';document.querySelector('.fcfieldval_container').append(input);});

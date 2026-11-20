@@ -23,8 +23,22 @@ window.fcfield_address = (() => {
     for (const control of controls) {
       control.disabled = !enabled;
       control.classList.toggle('fc-field-prop-disabled', !enabled);
+      const choices = control.fc_choices_instance;
+      if (choices) enabled ? choices.enable() : choices.disable();
     }
     properties.classList.toggle('fc-field-value-disabled', !enabled);
+    row.classList.toggle('fc-address-skipped', !enabled);
+    row.querySelector('.fc-address-card')?.classList.toggle('fc-address-skipped', !enabled);
+    const skip = row.querySelector('.fcfield-skipvalue');
+    skip?.setAttribute('aria-pressed', String(!enabled));
+    const icon = skip?.querySelector('.fc-skip-icon');
+    icon?.classList.toggle('fa-eye', enabled);
+    icon?.classList.toggle('fa-eye-slash', !enabled);
+  }
+
+  function toggleSkipped(button) {
+    const properties = button.closest('.fcfieldval_container')?.querySelector('.fc-field-value-properties-box');
+    if (properties) setEnabled(button, properties.classList.contains('fc-field-value-disabled'));
   }
 
   function prepare(row, ref, config) {
@@ -53,6 +67,8 @@ window.fcfield_address = (() => {
       zoom.id = ref.id + '_zoom_label';
       zoom.textContent = config.defaults.zoom;
     }
+    const skip = row.querySelector('.fcfield-skipvalue');
+    if (skip) setEnabled(skip, true);
   }
 
   function start(id, key, showMap = false) {
@@ -67,5 +83,5 @@ window.fcfield_address = (() => {
     if (config.mapEngine !== 'googlemap' || window.google?.maps) start(ref.id, config.fieldKey);
   }
 
-  return { prepare, ready, setEnabled, start };
+  return { prepare, ready, setEnabled, toggleSkipped, start };
 })();

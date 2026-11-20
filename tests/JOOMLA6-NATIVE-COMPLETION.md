@@ -1,5 +1,7 @@
 # Native JavaScript completion pass — 20 November 2026
 
+Follow-up: [upstream Address/Media File cards, live integrations and Linux WebKit](JOOMLA6-INTEGRATIONS-FOLLOWUP.md) records subsequent changes and updated coverage.
+
 The remaining core confirmations, builder persistence and current upstream media-card controls are patched and verified. This extends the [18-defect follow-up](JOOMLA6-AUDIT-FOLLOWUP.md), preserving its fixes and the earlier frontend toolbar work. Keep PR #1421 in draft for review; the limits below prevent full release certification.
 
 This pass started at `2ad8dfe45`. It incorporates upstream through `9372a8744`, including the database/search fixes and the new Image and Shared Media cards. Those card layouts are retained while their controls use the native controllers. The installed lab is Joomla 6.2.0 / web PHP 8.3.15; CLI checks use PHP 8.3.30. Tests used isolated headless browsers.
