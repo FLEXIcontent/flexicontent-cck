@@ -1542,12 +1542,41 @@ textarea.fcfield_textareaval {
 #flexicontent .fc-video-card .sm_url_props input,
 #flexicontent .fc-video-card .sm_value_props input,
 #flexicontent .fc-video-card .sm_value_props textarea {
-	width: 100%;
-	max-width: 100%;
-	box-sizing: border-box;
+	width: 100% !important;
+	max-width: 100% !important;
+	box-sizing: border-box !important;
+	resize: vertical !important;
 }
 #flexicontent .fc-video-card .fc-prop-lbl {
 	display: block;
 	margin: 0 0 2px;
 	font-weight: 600;
+}
+/* Player dimensions on a single compact row */
+#flexicontent .fc-video-card .fc-sm-dimensions {
+	display: flex !important;
+	flex-wrap: nowrap;
+	align-items: center;
+	gap: 3px;
+	width: 100%;
+	box-sizing: border-box;
+	font-size: 0.9em;
+	white-space: nowrap;
+}
+#flexicontent .fc-video-card .fc-sm-dimensions label.fc-sm-dim-lbl {
+	display: inline-block;
+	flex: 0 0 auto;
+	margin: 0;
+	padding: 0;
+	font-weight: 600;
+}
+#flexicontent .fc-video-card .fc-sm-dimensions .fc-sm-dim-sep {
+	flex: 0 0 auto;
+}
+#flexicontent .fc-video-card .fc-sm-dimensions input.sm_width,
+#flexicontent .fc-video-card .fc-sm-dimensions input.sm_height {
+	flex: 1 1 0;
+	width: 100% !important;
+	min-width: 35px;
+	margin: 0;
 }

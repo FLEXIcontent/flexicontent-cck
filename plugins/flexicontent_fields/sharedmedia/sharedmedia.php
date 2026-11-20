@@ -519,13 +519,13 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 				$sm_props .= '
 				<div>
 					<label class="fc-prop-lbl">' . \Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_PLAYER_DIMENSIONS') . '</label>
-					<div class="fc-floated-labels-box" style="margin: 0;">
-						<label class="fc-floated-lbl fc-lbl sm_width-lbl fc-has-value" for="'.$elementid_n.'_width">' . \Joomla\CMS\Language\Text::_('FLEXI_WIDTH') . '</label>
-						<input type="text" class="fcfield_textval sm_width inlineval fc-floated-lbl-input" size="5" id="'.$elementid_n.'_width" name="'.$fieldname_n.'[width]" value="'.htmlspecialchars($value['width'], ENT_COMPAT, 'UTF-8').'" '.($display_edit_size_form==2 ? 'readonly="readonly"' : '').' /> x
-					</div>
-					<div class="fc-floated-labels-box" style="margin: 0;">
-						<label class="fc-floated-lbl fc-lbl sm_height-lbl fc-has-value" for="'.$elementid_n.'_height">' . \Joomla\CMS\Language\Text::_('FLEXI_HEIGHT') . '</label>
-						<input type="text" class="fcfield_textval sm_height inlineval fc-floated-lbl-input" size="5" id="'.$elementid_n.'_height" name="'.$fieldname_n.'[height]" value="'.htmlspecialchars($value['height'], ENT_COMPAT, 'UTF-8').'" '.($display_edit_size_form==2 ? 'readonly="readonly"' : '').' /> ' . \Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_PIXELS') . '
+					<div class="fc-sm-dimensions">
+						<label class="fc-sm-dim-lbl sm_width-lbl" for="'.$elementid_n.'_width">' . \Joomla\CMS\Language\Text::_('FLEXI_WIDTH') . '</label>
+						<input type="text" class="fcfield_textval sm_width inlineval" size="4" id="'.$elementid_n.'_width" name="'.$fieldname_n.'[width]" value="'.htmlspecialchars($value['width'], ENT_COMPAT, 'UTF-8').'" '.($display_edit_size_form==2 ? 'readonly="readonly"' : '').' />
+						<span class="fc-sm-dim-sep">x</span>
+						<label class="fc-sm-dim-lbl sm_height-lbl" for="'.$elementid_n.'_height">' . \Joomla\CMS\Language\Text::_('FLEXI_HEIGHT') . '</label>
+						<input type="text" class="fcfield_textval sm_height inlineval" size="4" id="'.$elementid_n.'_height" name="'.$fieldname_n.'[height]" value="'.htmlspecialchars($value['height'], ENT_COMPAT, 'UTF-8').'" '.($display_edit_size_form==2 ? 'readonly="readonly"' : '').' />
+						<span class="fc-sm-dim-sep">' . \Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_PIXELS') . '</span>
 					</div>
 				</div>';
 			}
