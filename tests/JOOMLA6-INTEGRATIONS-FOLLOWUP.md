@@ -21,3 +21,12 @@ The public Nominatim service forbids autocomplete and limits aggregate applicati
 - Google Maps keys, Disqus/Facebook configuration and Filestack credentials are absent from the lab. Those live integrations remain unverified; controlled-provider regression fixtures are not live-service certification.
 
 Detailed scripts, screenshots, failed diagnostic attempts and raw results are retained locally in `test-env/f6-online-20261120/`. Earlier audit claims apply to their recorded source snapshots; this report covers the additional changes above.
+
+## Visual evidence and cleanup
+
+- [Address card before the empty-map correction](audit-images/integration-address-before-390.png), with a manually entered address.
+- [Address card after correction](audit-images/integration-address-after-390.png), showing its empty skipped state without the unused map area or Google-only filter.
+- [Media File selection-only card](audit-images/integration-media-after-390.png), with a readable filename label and no unavailable metadata action.
+- [Actual live Nominatim result and map](audit-images/integration-live-osm.png).
+
+Twelve final responsive checks passed across both forms and 390/768/1440 widths. Cleanup removed this pass's 12 disposable items and 16 uploads (48 physical files including generated thumbnails), with no owned records/files remaining and protected content/checkouts unchanged. Temporary Media File settings were restored exactly. The temporary WSL test tunnel was stopped.

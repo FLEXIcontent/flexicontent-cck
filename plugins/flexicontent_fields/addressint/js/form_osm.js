@@ -345,13 +345,14 @@
 			var q = inputEl.value.trim(), current = ++generation;
 			dropdownRemove(inputEl.id);
 			if (q.length < MIN_CHARS) return;
+			var message = el(elementid + '_messages');
+			if (message) { message.textContent = ''; message.style.display = 'none'; }
 			button.disabled = true;
 			try {
 				var results = await nominatimSearch(q, countryCodes, field_name_js);
 				if (current === generation && inputEl.isConnected) dropdownPopulate(inputEl, results, elementid, field_name_js);
 			} catch (error) {
 				if (current === generation) {
-					var message = el(elementid + '_messages');
 					if (message) { message.textContent = error.message; message.style.display = ''; }
 				}
 			} finally { button.disabled = false; }

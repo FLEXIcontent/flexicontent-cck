@@ -39,8 +39,8 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
   const loadDependencies = page => page.addScriptTag({content: source('site/assets/js/flexi-lib.js')});
   await test('Nominatim searches require submission, cache results and ignore stale responses', async page => {
     await form(page, '<div><input id="address_0_autocomplete"><div id="address_0_messages"></div></div>');
-    const requests=[];
-    await page.route('https://geocoder.invalid/**',async route=>{requests.push(route.request().url());await new Promise(r=>setTimeout(r,150));await route.fulfill({json:[]});});
+    const requests=[];let fail=false;
+    await page.route('https://geocoder.invalid/**',async route=>{requests.push(route.request().url());await new Promise(r=>setTimeout(r,150));await route.fulfill({status:fail?503:200,json:[]});});
     await page.addScriptTag({content:source('plugins/flexicontent_fields/addressint/js/form_osm.js')});
     await page.evaluate(()=>{fcfield_addrint.nominatim_url.address='https://geocoder.invalid/service/';fcfield_addrint.engines.nominatim.initAutoComplete('address_0','address');});
     await page.locator('#address_0_autocomplete').fill('Taipei');await page.waitForTimeout(500);assert.equal(requests.length,0);
@@ -49,6 +49,9 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
     await page.locator('.fc-osm-search').click();await page.waitForTimeout(250);assert.equal(requests.length,1);
     await page.locator('#address_0_autocomplete').fill('Taichung');await page.locator('#address_0_autocomplete').press('Enter');await page.locator('#address_0_autocomplete').fill('Changed before response');await page.waitForTimeout(1400);
     assert.equal(requests.length,2);assert.equal(await page.locator('.fc-osm-suggestions').count(),0);
+    fail=true;await page.locator('#address_0_autocomplete').fill('Retry');await page.locator('.fc-osm-search').click();await page.waitForFunction(()=>document.getElementById('address_0_messages').textContent.includes('503'));
+    fail=false;await page.locator('.fc-osm-search').click();await page.waitForFunction(()=>!!document.querySelector('.fc-osm-suggestions'));
+    assert.equal(await page.locator('#address_0_messages').isVisible(),false);assert.equal(requests.length,4);
   });
   await test('Address card skip toggles preserve values and independently disabled controls', async page => {
     await form(page, '<div class="fcfieldval_container"><div class="fc-address-card"><button type="button" class="fcfield-skipvalue" onclick="fcfield_address.toggleSkipped(this)"><span class="fc-skip-icon fa-eye"></span>Skip</button><div class="fc-field-value-properties-box"><input name="address" value="Taipei"><input name="locked" disabled value="fixed"><select name="country"><option>TW</option></select></div></div></div>');
