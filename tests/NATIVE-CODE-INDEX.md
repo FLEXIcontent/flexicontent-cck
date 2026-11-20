@@ -1,8 +1,8 @@
 # Native workflow patch: code index
 
-Complete cumulative index for draft PR #1421 against upstream master `a5012aafda32cf4a6e45dd50886fab657d8f0d8a`. Includes **45 authored runtime JavaScript files**, **5 vendor JavaScript files** and **12 browser regression suites**. Existing native files may contain targeted fixes rather than a complete rewrite.
+Complete cumulative index for draft PR #1421 against upstream master `9372a874417917d31ff7d2b19834f5c6fcdd93af`. Includes **48 authored runtime JavaScript files**, **5 vendor JavaScript files** and **12 browser regression suites**. Existing native files may contain targeted fixes rather than a complete rewrite.
 
-The binary Git patch also includes PHP-generated JavaScript, configuration/language files, CSS/LESS, tests and screenshots. Choices remains the core select enhancer; optional legacy galleries request jQuery on demand. See the [current follow-up](JOOMLA6-AUDIT-FOLLOWUP.md), [cumulative audit](JOOMLA6-NATIVE-AUDIT.md) and [test instructions](NATIVE-EDITOR-WORKFLOWS.md).
+The binary Git patch also includes PHP-generated JavaScript, configuration/language files, CSS/LESS, tests and screenshots. Choices remains the core select enhancer; optional legacy galleries request jQuery on demand. See the [completion pass](JOOMLA6-NATIVE-COMPLETION.md), [current follow-up](JOOMLA6-AUDIT-FOLLOWUP.md), [cumulative audit](JOOMLA6-NATIVE-AUDIT.md) and [test instructions](NATIVE-EDITOR-WORKFLOWS.md).
 
 ## Authored runtime JavaScript
 
@@ -51,6 +51,12 @@ The binary Git patch also includes PHP-generated JavaScript, configuration/langu
 - [site/assets/js/tabber-minimized.js](../site/assets/js/tabber-minimized.js)
 - [site/assets/js/tag-picker.js](../site/assets/js/tag-picker.js)
 - [site/assets/js/validate.js](../site/assets/js/validate.js)
+
+- [site/assets/js/fcvote.js](../site/assets/js/fcvote.js)
+
+- [site/assets/js/stateselector.js](../site/assets/js/stateselector.js)
+
+- [site/assets/js/tmpl-common.js](../site/assets/js/tmpl-common.js)
 
 ## Changed vendor JavaScript
 
@@ -277,3 +283,41 @@ The binary Git patch also includes PHP-generated JavaScript, configuration/langu
 - [tests/phone-country-roundtrip.php](../tests/phone-country-roundtrip.php)
 - [tests/template-deletion.php](../tests/template-deletion.php)
 - [tests/upload-field-restrictions.php](../tests/upload-field-restrictions.php)
+
+## Additional completion-pass integration files
+
+- [admin/config.xml](../admin/config.xml)
+- [admin/controllers/fields.php](../admin/controllers/fields.php)
+- [admin/language/en-GB/en-GB.com_flexicontent.ini](../admin/language/en-GB/en-GB.com_flexicontent.ini)
+- [admin/views/search/tmpl/logs.php](../admin/views/search/tmpl/logs.php)
+- [modules/mod_flexicontent/tmpl/carousel.xml](../modules/mod_flexicontent/tmpl/carousel.xml)
+- [modules/mod_flexicontent/tmpl/news.xml](../modules/mod_flexicontent/tmpl/news.xml)
+- [modules/mod_flexicontent/tmpl/swiper.xml](../modules/mod_flexicontent/tmpl/swiper.xml)
+- [plugins/flexicontent_fields/authoritems/en-GB.plg_flexicontent_fields_authoritems.ini](../plugins/flexicontent_fields/authoritems/en-GB.plg_flexicontent_fields_authoritems.ini)
+- [plugins/flexicontent_fields/checkboximage/checkboximage.xml](../plugins/flexicontent_fields/checkboximage/checkboximage.xml)
+- [plugins/flexicontent_fields/color/color.xml](../plugins/flexicontent_fields/color/color.xml)
+- [plugins/flexicontent_fields/core/core.xml](../plugins/flexicontent_fields/core/core.xml)
+- [plugins/flexicontent_fields/date/date.xml](../plugins/flexicontent_fields/date/date.xml)
+- [plugins/flexicontent_fields/email/email.xml](../plugins/flexicontent_fields/email/email.xml)
+- [plugins/flexicontent_fields/fieldgroup/fieldgroup.xml](../plugins/flexicontent_fields/fieldgroup/fieldgroup.xml)
+- [plugins/flexicontent_fields/file/file/share_form.php](../plugins/flexicontent_fields/file/file/share_form.php)
+- [plugins/flexicontent_fields/image/tmpl/value_gallery_swiper.xml](../plugins/flexicontent_fields/image/tmpl/value_gallery_swiper.xml)
+- [plugins/flexicontent_fields/mediafile/en-GB.plg_flexicontent_fields_mediafile.ini](../plugins/flexicontent_fields/mediafile/en-GB.plg_flexicontent_fields_mediafile.ini)
+- [plugins/flexicontent_fields/mediafile/file/share_form.php](../plugins/flexicontent_fields/mediafile/file/share_form.php)
+- [plugins/flexicontent_fields/radioimage/radioimage.xml](../plugins/flexicontent_fields/radioimage/radioimage.xml)
+- [plugins/flexicontent_fields/subform/subform.xml](../plugins/flexicontent_fields/subform/subform.xml)
+- [plugins/flexicontent_fields/text/text.xml](../plugins/flexicontent_fields/text/text.xml)
+- [plugins/system/flexifieldsearch/flexifieldsearch.xml](../plugins/system/flexifieldsearch/flexifieldsearch.xml)
+- [site/language/en-GB/en-GB.com_flexicontent.ini](../site/language/en-GB/en-GB.com_flexicontent.ini)
+- [site/librairies/galleriffic/UPSTREAM-PATCHES.md](../site/librairies/galleriffic/UPSTREAM-PATCHES.md)
+- [site/librairies/inputmask/LICENSE.txt](../site/librairies/inputmask/LICENSE.txt)
+- [site/librairies/inputmask/UPSTREAM-PATCHES.md](../site/librairies/inputmask/UPSTREAM-PATCHES.md)
+- [site/librairies/jmultibox/UPSTREAM-PATCHES.md](../site/librairies/jmultibox/UPSTREAM-PATCHES.md)
+- [site/librairies/wavesurfer/LICENSE.txt](../site/librairies/wavesurfer/LICENSE.txt)
+- [site/templates/faq/item.xml](../site/templates/faq/item.xml)
+- [site/templates/grid/category.xml](../site/templates/grid/category.xml)
+- [site/templates/grid/item.xml](../site/templates/grid/item.xml)
+- [site/templates/items-tabbed/category.xml](../site/templates/items-tabbed/category.xml)
+- [site/templates/items-tabbed/item.xml](../site/templates/items-tabbed/item.xml)
+- [site/templates/table/category.xml](../site/templates/table/category.xml)
+- [site/templates/table/item.xml](../site/templates/table/item.xml)

@@ -1,5 +1,7 @@
 # Follow-up to the independent JavaScript audit — 20 November 2026
 
+Current status: the [native completion pass](JOOMLA6-NATIVE-COMPLETION.md) supersedes the remaining builder, Firefox and Joomla 6 install/upgrade gaps recorded below. This report retains the earlier test snapshot.
+
 All 18 reported defects have fixes and targeted verification. The two high-priority failures (administrator manager buttons and the frontend New item flow) now work without jQuery. This is ready for review in existing **draft PR #1421**, subject to the coverage limits below; it is not release certification.
 
 The independent report tested `92ad14af6`. This follow-up started at `d4952ed3d`, preserving the frontend toolbar patch, and incorporates upstream master `a5012aafda32cf4a6e45dd50886fab657d8f0d8a`. The upstream SQL-mode change and image-plugin cleanup are retained. No PR was merged or release made.

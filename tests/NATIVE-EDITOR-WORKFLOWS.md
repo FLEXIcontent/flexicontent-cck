@@ -64,3 +64,9 @@ php tests/optional-jquery-assets.php photoswipe auto defaults
 ```
 
 The [follow-up report](JOOMLA6-AUDIT-FOLLOWUP.md) separates actual-site CRUD, default-settings and cleanup evidence from isolated fixtures. The site's credentials, database backups and token-bearing raw logs are excluded from this repository.
+
+## Completion-pass regressions
+
+The existing native-joomla-dialogs suite additionally checks asynchronous link/form confirmation, duplicate-click guards, validation and submitter preservation, and review-delete retry. Native-admin-workflows checks builder storage against dirty textarea and hidden-input values. Native-editor-workflows checks image panel/uploader timing and independent Shared Media card clones, including configurations without editable dimensions. These cases remain within the existing suites and CI workflow.
+
+The [completion report](JOOMLA6-NATIVE-COMPLETION.md) records actual builder persistence, expanded browser CRUD, responsive media cards, isolated Joomla 6 install/upgrade and database checks. Its controlled media-provider response is explicitly separate from live-provider certification.

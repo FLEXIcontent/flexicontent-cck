@@ -891,7 +891,13 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
       <button type="button" class="fc-sm-edit-btn" data-for="clip_0" onclick="fcfield_sharemedia.toggleFields('clip_0')">Edit</button>
       <div class="sm_url_props" data-name="clip_0" style="display:none"><input class="sm_url" id="clip_0_url" value="https://example.test/first"></div>
       <div class="sm_value_props" data-name="clip_0" style="display:none">${['title','author','duration','description','thumb','api_type','media_id','embed_url'].map(key => `<input id="clip_0_${key}" name="custom[clip][0][${key}]"><label for="clip_0_${key}">${key}</label>`).join('')}</div>
-      <div id="fcfield_message_box_clip_0"></div><div class="sm_preview" id="clip_0_preview"></div></div>`);
+      <div id="fcfield_message_box_clip_0"></div><div class="fc-video-preview-box"><div class="sm_preview" id="clip_0_preview"></div></div></div>`);
+    await page.evaluate(() => {
+      const wrapper=document.createElement('div');wrapper.id='flexicontent';document.body.append(wrapper);wrapper.append(document.getElementById('adminForm'));
+      const card=document.getElementById('clip-row');card.className='card fc-video-card';card.style.width='250px';
+      document.getElementById('clip_0_description').outerHTML='<textarea id="clip_0_description" name="custom[clip][0][description]" style="min-width:248px"></textarea>';
+    });
+    await page.addStyleTag({content:source('site/assets/css/flexi_form_fields.css')});
     for (const file of ['site/assets/js/field-repeater.js','site/assets/js/native-field-controls.js','site/assets/js/media-metadata.js','plugins/flexicontent_fields/sharedmedia/js/form.js']) await page.addScriptTag({content:source(file)});
     await page.locator('.fc-sm-url-btn').focus(); await page.keyboard.press('Enter');
     assert(await page.locator('.sm_url_props').isVisible());
@@ -911,6 +917,10 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
     assert.equal(await page.locator('#clip_0_url').inputValue(),'https://example.test/first');
     await second.locator('.fc-sm-edit-btn').click();
     assert.equal(await second.locator('.sm_value_props').isVisible(),true);
+    for (const width of [390,768,1440]) {
+      await page.setViewportSize({width,height:960});
+      assert(await second.locator('textarea').evaluate(el=>el.getBoundingClientRect().right<=el.closest('.fc-video-card').getBoundingClientRect().right+1));
+    }
     await page.evaluate(()=>fcfield_sharemedia.clearData('clip_1'));
     assert.equal(await second.locator('.sm_value_props').isVisible(),false);
     assert.equal(await page.locator('#clip-row .sm_value_props').isVisible(),true);
