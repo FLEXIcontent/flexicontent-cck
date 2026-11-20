@@ -15,7 +15,12 @@ namespace Joomla\CMS\Component {
 namespace Joomla\CMS\Uri {
     class Uri { public static function root($path = false) { return $path ? '' : 'https://fixture.invalid/'; } public static function base($path = false) { return self::root($path); } }
 }
-namespace Joomla\CMS\Language { class Text { public static function script(...$args) {} } }
+namespace Joomla\CMS\Language {
+    class Text {
+        public static array $scripts = [];
+        public static function script($key, ...$args) { self::$scripts[$key] = true; }
+    }
+}
 namespace Joomla\CMS\Plugin { class PluginHelper { public static function isEnabled(...$args) { return false; } } }
 namespace Joomla\CMS\HTML {
     class HTMLHelper {
@@ -52,6 +57,9 @@ namespace {
         'loadfw_' . strtolower(str_replace('-', '_', $framework)) => $manual ? 2 : 1,
     ]);
     flexicontent_html::loadFramework('form-utils');
+    foreach (['FLEXI_FORM_IS_BEING_SUBMITTED', 'FLEXI_LOADING', 'FLEXI_AJAX_SAVE_UNCONFIRMED'] as $key) {
+        if (!isset(\Joomla\CMS\Language\Text::$scripts[$key])) throw new \RuntimeException('Native form did not export ' . $key);
+    }
     flexicontent_html::loadFramework('jQuery');
     if (in_array('jquery', $document->events, true)) throw new \RuntimeException('Native page preloaded jQuery');
     $before = $document->events;

@@ -2050,6 +2050,9 @@ class flexicontent_html
 
 			// Used only by content / configuration forms, that have form elements needing this
 			case 'form-utils':
+				\Joomla\CMS\Language\Text::script('FLEXI_FORM_IS_BEING_SUBMITTED', true);
+				\Joomla\CMS\Language\Text::script('FLEXI_AJAX_SAVE_UNCONFIRMED', true);
+				\Joomla\CMS\Language\Text::script('FLEXI_LOADING', true);
 				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/form-utils.js', array('version' => FLEXI_VHASH));
 				break;
 
@@ -2106,9 +2109,6 @@ class flexicontent_html
 				\Joomla\CMS\Language\Text::script('FLEXI_INVALID',true);
 				\Joomla\CMS\Language\Text::script('FLEXI_INPUTMASK_INCOMPLETE', true);
 				\Joomla\CMS\Language\Text::script('FLEXI_VALIDATION_EMAIL_FORMAT', true);
-				\Joomla\CMS\Language\Text::script('FLEXI_FORM_IS_BEING_SUBMITTED', true);
-				\Joomla\CMS\Language\Text::script('FLEXI_AJAX_SAVE_UNCONFIRMED', true);
-				\Joomla\CMS\Language\Text::script('FLEXI_LOADING', true);
 				\Joomla\CMS\Language\Text::script('JLIB_FORM_FIELD_INVALID',true);
 				\Joomla\CMS\Language\Text::script('FLEXI_AUTO',true);
 				\Joomla\CMS\Language\Text::script('FLEXI_FIELD_SELECT_AT_LEAST_PROMPT',true);
