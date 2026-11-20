@@ -26,7 +26,7 @@ Optional gallery/carousel plugins and third-party overrides can still request jQ
 
 ## Additional suites
 
-Run the following with Playwright installed. Set `FLEXI_TEST_JOOMLA` to an installed Joomla 6 root for the real dialog assets. The browser CI workflow downloads a pinned Joomla 6.2.0 package and checks its SHA-256 before extracting those assets.
+Run the following with Playwright installed. Set `FLEXI_TEST_JOOMLA` to an installed Joomla 6 root for the real dialog and Bootstrap tooltip assets. The browser CI workflow downloads a pinned Joomla 6.2.0 package and checks its SHA-256 before extracting those assets.
 
 ```sh
 node tests/native-joomla-dialogs.cjs
@@ -51,3 +51,16 @@ php tests/optional-jquery-assets.php fancybox manual
 The manager suite covers history pagination and failed requests, stale layout requests, parent-dialog submission, empty-selection alerts, and asynchronous file previews. Mask cases use fresh controls and actual keyboard/paste events, including immediate focus followed by typing and tab-then-click entry. The shipped Inputmask patch is documented alongside the vendor source. Browser fixtures test behavior; the installed-site audit separately verifies persisted database values.
 
 The follow-up suites cover delayed Joomla editor-registry removal, restored Choices values, safe recent-favourites rendering, AJAX failure messages, module state isolation, pagebreak navigation, comparison-gallery settings/resizing, conditional legacy dependency loading and typed FancyBox options. The [code index](NATIVE-CODE-INDEX.md) links all changed JavaScript files.
+
+## Independent-audit follow-up
+
+The populated-currency cases exercise Ctrl+A/Delete and Backspace after an existing saved value, preserving input/change events, optional blank values and partial deletion. Uploader cases cover rejection/replacement, manual chunk retry, and configured Scale versus Crop dimensions. Dialog fixtures use actual Joomla Bootstrap assets for touch/outside-tap, hover, focus and Escape. Public-widget fixtures exercise map redraw on tabs with and without IDs.
+
+```sh
+php tests/upload-field-restrictions.php
+php tests/template-deletion.php
+php tests/optional-jquery-assets.php fancybox auto defaults
+php tests/optional-jquery-assets.php photoswipe auto defaults
+```
+
+The [follow-up report](JOOMLA6-AUDIT-FOLLOWUP.md) separates actual-site CRUD, default-settings and cleanup evidence from isolated fixtures. The site's credentials, database backups and token-bearing raw logs are excluded from this repository.

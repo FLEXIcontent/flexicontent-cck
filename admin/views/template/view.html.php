@@ -216,93 +216,18 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 
 
 
-	/*
-	 * Check that the LESS layout file that stores parameter values exists and is up to date (its modification time after XML file modification)
-	 */
+	/** Compatibility entry points; compilation is initiated by the save model. */
 	function check_xml_to_less($layout = null)
 	{
-		$tmpldir = JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$layout->name;
-
-		// ****************************************************************************************************************************
-		// Create / Update the "variable defaults" FILEs (using defaults from XML files): config_auto_item.less / config_auto_item.less
-		// ****************************************************************************************************************************
-
-		$view = $layout->view;
-		$less_data = "/* This is created automatically, do NOT edit this manually! \nThis is used by _layout_type_ layout to save parameters as less variables. \nNOTE: Make sure that this is imported by 'config.less' \n to make a parameter be a LESS variable, edit parameter in _layout_type_.xml and add cssprep=\"less\" \n created parameters will be like: @FCLL_parameter_name: value; */\n\n";
-		$_less_auto = false;
-		if ( !file_exists($tmpldir . '/less/include/config_auto_'.$view.'.less') || filemtime($tmpldir . '/less/include/config_auto_'.$view.'.less') < filemtime($tmpldir . '/'.$view.'.xml') ) {
-			$_less_auto = $tmpldir . '/less/include/config_auto_'.$view.'.less';
-			file_put_contents($_less_auto, str_replace("FCLL_", "FCI_", str_replace("_layout_type_", $view, $less_data)));
-		}
-		if (!$_less_auto) return;
-
-		$layout_type = $view === 'item' ? 'items' : 'category';
 		$model = new FlexicontentModelTemplate();
-		$model->setLayoutType($layout_type);
-		$_layout = $model->getData();
-		$_conf = $model->getLayoutConf();
-		$_attribs = $_conf->attribs;
-		$model->storeLessConf($layout->name, $cfgname='', $layout_type, $_attribs);
+		$model->check_xml_to_less($layout);
 	}
 
-	/*
-	 * Check that less files for all layouts of current template (=folder) exist and are up-to-date
-	 */
 	function check_less_files($folder)
 	{
-		// **************************************************************************************
-		// Get both single item ('items') and multi-item ('category') layouts of current template
-		// 'folder' and apply Template Parameters values into the form fields structures
-		// **************************************************************************************
-
-		$tmpl = flexicontent_tmpl::getTemplates( $folder, $skip_less=true );
-
-		$tmpldir = JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$folder;
-
-		// Create less folders if they do not exist already
-		if ( !is_dir( $tmpldir . '/less' ) ) if ( !mkdir( $tmpldir . '/less') )  \Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_('Unable to create "/less/" folder'), 'warning');
-
-		// Abort if directory creation failed
-		if ( ! is_dir( $tmpldir . '/less' ) ) return;
-
-
-		// ***********************************************************************
-		// Create CUSTOM config.less, that is include by item.less / category.less
-		// ************************************************************ ***********
-
-		if ( !is_dir( $tmpldir . '/less/include' ) ) if ( !mkdir( $tmpldir . '/less/include') )  \Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_('Unable to create "/less/include" folder'), 'warning');
-		if ( !file_exists($tmpldir . '/less/include/config.less') ) {
-			file_put_contents($tmpldir . '/less/include/config.less', "/* Place your less variables, mixins, etc, here \n1. This is commonly imported by files: item.less and category.less, \n2. If you add extra less file imports, then place files \ninside same folder for automatic compiling to be triggered */\n\n@import 'config_auto_item.less';\n@import 'config_auto_category.less';\n");
-		}
-
-
-		// *************************************************************************
-		// Create files item.less / category.less by COPYING item.css / category.css
-		// *************************************************************************
-
-		$less_files = array('/css/item.css'=>'/less/item.less', '/css/category.css'=>'/less/category.less');
-		foreach($less_files as $css_name => $less_name) {
-			if ( !file_exists($tmpldir . $css_name) )  continue;  // Do not try to copy CSS file that does not exist
-			if ( !file_exists($tmpldir . $less_name) ) {
-				if ( !\Joomla\Filesystem\File::copy($tmpldir.$css_name, $tmpldir.$less_name) ) {
-					\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_('Unable to create file: "'.$tmpldir.$less_name.'"'), 'warning');
-				} else {
-					$file_data = "@import 'include/config.less';\n\n";
-					$file_data .= preg_replace("/[ \t]*\*zoom[\s]*:[\s]*expression[^\r\n]+[\r\n]+/u", "", file_get_contents($tmpldir.$less_name));  // copy and replace old invalid code
-					file_put_contents($tmpldir.$less_name, $file_data);
-				}
-			}
-		}
-
-
-		// Check that the LESS layout files that stores parameter values exist
-		// and they are up to date (their modification time after XML file modification)
-
-		$_layout = !isset($tmpl->items->$folder)  ?  false  :  $tmpl->items->$folder;
-		$this->check_xml_to_less($_layout);
-
-		$_layout = !isset($tmpl->category->$folder)  ?  false  :  $tmpl->category->$folder;
-		$this->check_xml_to_less($_layout);
+		$model = new FlexicontentModelTemplate();
+		$model->check_less_files($folder);
 	}
+
 }
 ?>

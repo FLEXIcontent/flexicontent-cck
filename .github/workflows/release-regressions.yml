@@ -32,6 +32,7 @@ jobs:
           php -d error_reporting=-1 tests/flexibreak-layouts.php
           php -d error_reporting=-1 tests/module-tab-state.php
           php -d error_reporting=-1 tests/upload-field-restrictions.php
+          php -d error_reporting=-1 tests/template-deletion.php
           php -d error_reporting=-1 tests/optional-jquery-assets.php fancybox auto defaults
           php -d error_reporting=-1 tests/optional-jquery-assets.php photoswipe auto defaults
           for framework in fancybox galleriffic elastislide multibox fcxSlide image-picker zTree photoswipe glightbox swiper; do

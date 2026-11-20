@@ -38,7 +38,7 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
   };
   const loadDependencies = page => page.addScriptTag({content: source('site/assets/js/flexi-lib.js')});
   await test('Validation summary excludes inline error text from wrapping labels', async page => {
-    await form(page, '<label for="email">Address<input id="email" name="email" class="validate-email" value="aaaa@" data-error-mssg="This value is not valid"></label>');
+    await form(page, '<label for="email">Address<span class="form-control-feedback">This value is not valid</span><input id="email" name="email" class="validate-email" value="aaaa@" data-error-mssg="This value is not valid"></label>');
     await validate(page);
     for (let attempt = 0; attempt < 2; attempt++) {
       assert.equal(await page.evaluate(() => document.formvalidator.isValid(document.forms.adminForm)), false);

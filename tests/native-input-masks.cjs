@@ -43,6 +43,24 @@ const {chromium}=require('playwright'),path=require('node:path'),assert=require(
    assert.equal(await input.evaluate(n=>n.inputmask.unmaskedvalue()),'','Cleared currency remains empty');
    results.push({name:alias+' select-all/Delete/retype '+value,status:'pass'});
   }
+  for(const alias of ['currency','currency_euro'])for(const key of ['Delete','Backspace']){
+   await setup({alias});await paste('9876.54');
+   for(const value of ['249.95','-1249.95','0','0.50']){
+    await input.click();await input.press('Control+A');await input.press(key);await input.pressSequentially(value);await input.press('Tab');
+    assert.equal(Number(await input.evaluate(n=>n.inputmask.unmaskedvalue())),Number(value),'Replace a populated/reopened currency amount without losing digits');
+   }
+   results.push({name:alias+' populated select-all/'+key+'/retype',status:'pass'});
+  }
+  for(const alias of ['currency','decimal','integer','percentage']){
+   await setup({alias});await paste('42');await input.click();
+   await page.evaluate(()=>{window.clearEvents=[];const n=document.getElementById('masked');for(const type of ['input','change'])n.addEventListener(type,()=>clearEvents.push(type));});
+   await input.press('Control+A');await input.press('Delete');await input.press('Tab');
+   assert.equal(await input.evaluate(n=>n.inputmask.unmaskedvalue()),'');
+   const events=await page.evaluate(()=>clearEvents);assert(events.includes('input')&&events.includes('change'),'A user clear retains normal input/change notifications');
+   await paste('42');await input.click();await input.press('End');await input.press('Backspace');await input.press('Tab');
+   assert.notEqual(await input.evaluate(n=>n.inputmask.unmaskedvalue()),'','Deleting one character must not clear the complete number');
+   results.push({name:alias+' full clear events and partial deletion',status:'pass'});
+  }
   for(const[options,value]of [[{alias:'email'},'aaaa@'],[{alias:'dd/mm/yyyy'},'20'],[{alias:'hh:mm'},'14'],[{mask:'AA-9999'},'QA02'],[{regex:'FC-[0-9]{3}'},'FC-6']]){await setup(options);await input.pressSequentially(value);await input.press('Tab');assert.equal(await page.evaluate(()=>document.formvalidator.isValid(document.getElementById('adminForm'))),false);results.push({name:'Reject incomplete '+(options.alias||options.mask||options.regex),status:'pass'});}
   await setup({alias:'url'});assert.equal(await page.evaluate(()=>document.formvalidator.isValid(document.getElementById('adminForm'))),true);results.push({name:'Optional blank mask remains valid',status:'pass'});
   assert.deepEqual(errors,[]);assert.equal(await page.evaluate(()=>typeof jQuery),'undefined');

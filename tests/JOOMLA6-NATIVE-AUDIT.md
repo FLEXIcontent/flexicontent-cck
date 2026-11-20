@@ -1,12 +1,14 @@
 # Joomla 6 native workflow audit — 20 November 2026
 
-The tested core workflows pass on the Laragon `f6.test` laboratory with Joomla 6.2.0, PHP 8.3.30 and Choices enabled. Native workflows are tested with jQuery absent/blocked. Selected legacy plugins retain jQuery, loaded only when those plugins are requested. This follows the agreed compatibility policy; it is not package-wide removal of every jQuery reference.
+> Current status: the [independent-audit follow-up](JOOMLA6-AUDIT-FOLLOWUP.md) supersedes the older dependency counts, Firefox gap and validation totals below. All 18 reported defects have targeted fixes and verification. Earlier sections retain their original test scope; they do not imply that every historical check was repeated on the latest commit.
+
+The tested core workflows pass on the Laragon `f6.test` laboratory with Joomla 6.2.0, web PHP 8.3.15 (CLI tests: 8.3.30) and Choices enabled. Native workflows are tested with jQuery absent/blocked. Selected legacy plugins retain jQuery, loaded only when those plugins are requested. This follows the agreed compatibility policy; it is not package-wide removal of every jQuery reference.
 
 The patch is ready for code review in **draft PR #1421**. The complete [code index](NATIVE-CODE-INDEX.md) links the JavaScript rewrites, CSS and integration files. The coverage limits below still prevent full release certification.
 
 ## Branch and environment
 
-Work remains on `refactor/native-editor-workflows-20261119`, the existing PR branch. Current upstream master `bda8b4c7172c6efc0274ee9f15107128201338be` was merged, retaining newer history `keep`, strict database and dashboard/charset behavior. No new PR, merge to master, or release is part of this audit.
+Work remains on `refactor/native-editor-workflows-20261119`, the existing PR branch. Upstream master `a5012aafda32cf4a6e45dd50886fab657d8f0d8a` is merged, retaining newer history `keep`, strict database and dashboard/charset behavior. No new PR, merge to master, or release is part of this audit.
 
 Local runtime files were backed up, overlaid from the source worktree and SHA-256 verified. A private database/media backup precedes writes. The lab's missing history `keep` column was added without discarding versions, and Joomla's charset maintenance was completed through its interface. Those are lab upgrade operations, not new migration logic in this patch. Test credentials, configuration files, sessions, database dumps and raw token-bearing browser logs are excluded from the PR.
 
@@ -160,13 +162,13 @@ The styling follows the installed Joomla 6.2 toolbar markup and
 
 ## Remaining dependencies and release limits
 
-The inventory scans tracked and untracked PHP, JS, XML, JSON, CSS and LESS under administrator, site, plugins and modules. It found **2,506 matching lines in 344 files**, including **108 authored files**; the remainder are vendor/minified files. Comments, retained packages and guarded compatibility hooks count as textual matches, not necessarily executed dependencies.
+The inventory scans tracked and untracked PHP, JS, XML, JSON, CSS and LESS under administrator, site, plugins and modules. It found **2,385 matching lines in 319 files**, including **83 authored files**; the remainder are vendor/minified files. Comments, retained packages and guarded compatibility hooks count as textual matches, not necessarily executed dependencies.
 
 The following jQuery paths remain intentionally optional:
 
 - FancyBox, elastislide, Galleriffic, multibox and the fcxSlide carousel. Their actual controls passed in the installed site; their dependencies load when requested, without jQuery UI.
 - Explicitly requested image-picker, zTree, mousewheel and legacy custom-scrollbar widgets. Asset-loader behavior is tested; every third-party widget configuration is not certified. Choices mode uses native CSS scrolling for the scrollbar path.
-- Legacy InlineBoxes/media output and old Joomla media overrides; builder canvas content and third-party overrides that explicitly request jQuery/Bootstrap 4. These remain compatibility paths, with configuration-specific coverage outstanding.
+- InlineBoxes links now use native handlers; optional popup engines and old Joomla media overrides, builder canvas content and third-party overrides that explicitly request jQuery/Bootstrap 4. These remain compatibility paths, with configuration-specific coverage outstanding.
 - Guarded exported jQuery UI/data/event bridges for existing integrations. The rewritten helpers themselves run without jQuery; external custom callers are not comprehensively certified.
 
 The earlier remaining-work list is superseded: recent favourites, module tab-state handlers, Flexibreak, Use Global, cookie/form restoration and editor adapters have now been migrated and tested. The current loader's `select2` compatibility name selects Choices; `prettyCheckable` does not load its vendor widget. Their retained package files/hooks do not mean normal configuration pages execute those libraries.
