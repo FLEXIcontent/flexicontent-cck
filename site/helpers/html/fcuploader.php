@@ -47,7 +47,7 @@ abstract class JHtmlFcuploader
 
 		return (object) array(
 			'toggleBtn' => '
-				<span class="'.$tBtn['class'].' fc_files_uploader_toggle_btn" data-rowno="'.$n.'" onclick="'.$tBtn['onclick'].$up_tag_id.'.toggleUploader(jQuery(this).data(\'rowno\'), '.$tBtn['action'].');">
+				<span class="'.$tBtn['class'].' fc_files_uploader_toggle_btn" data-rowno="'.$n.'" onclick="'.$tBtn['onclick'].'if (window.'.$up_tag_id.') '.$up_tag_id.'.toggleUploader(jQuery(this).data(\'rowno\'), '.$tBtn['action'].');">
 					' . $tBtn['text'] . '
 				</span>
 			',

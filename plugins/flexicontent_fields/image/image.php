@@ -171,8 +171,8 @@ class plgFlexicontent_fieldsImage extends FCField
 
 		$autoassign = (int) $field->parameters->get( 'autoassign', 1 );
 
-		$thumb_size_resizer = (int) $field->parameters->get('thumb_size_resizer', 2);
-		$thumb_size_default = (int) $field->parameters->get('thumb_size_default', 120);
+		$thumb_size_resizer = (int) $field->parameters->get('thumb_size_resizer', 0);
+		$thumb_size_default = (int) $field->parameters->get('thumb_size_default', 200);
 		$thumb_method       = (int) $field->parameters->get('thumb_method', 1);
 		$preview_thumb_w    = $preview_thumb_h = 600;
 
@@ -277,7 +277,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			$resize_cfg->slider_name = 'fcfield-'.$field->id.'-uploader-thumb-size';
 			$resize_cfg->element_selector = 'div.fcfield-'.$field->id.'-uploader-thumb-box';
 
-			$resize_cfg->elem_container_selector = '.fcfieldval_container_'.$field->id.' div.fc-box';
+			$resize_cfg->elem_container_selector = '.fcfieldval_container_'.$field->id.' .fc-image-card';
 			$resize_cfg->element_selector = '.fcfieldval_container_'.$field->id.' div.fc_file_uploader ul.plupload_filelist > li';
 
 			$resize_cfg->element_class_prefix = 'thumb_';
@@ -463,8 +463,8 @@ class plgFlexicontent_fieldsImage extends FCField
 				newField.find('table.fcimg_dbfile_tbl').parent('display', 'none');
 
 				// The properties box and its toggle (pencil) button must refer to the new value, not to the value that was cloned
-				newField.find('.fcimg_value_props').attr('data-name', element_id);
-				newField.find('.image-option').attr('onclick', 'jQuery(\'.fcimg_value_props[data-name=' + element_id + ']\').toggle(150);');
+				newField.find('.fcimg_value_props, .fcimg_url_props').attr('data-name', element_id);
+				newField.find('.fc-image-edit-btn').attr('data-for', element_id).attr('onclick', 'fcfield_image.toggleFields(\'' + element_id + '\');');
 				";
 
 			if ($linkto_url) $js .= "
@@ -487,7 +487,7 @@ class plgFlexicontent_fieldsImage extends FCField
 
 				newField.find('input.img_mediaurl').val(".json_encode($default_mediaurl).");
 
-				newField.find('.fcfield-medialurlvalue').attr('onclick', 'fcfield_image.toggleMediaURL(\'' + element_id + '\', \'".$field_name_js."\');');
+				newField.find('.fcfield-mediaurl-btn').attr('data-for', element_id).attr('onclick', 'fcfield_image.toggleMediaURL(\'' + element_id + '\', \'".$field_name_js."\');');
 				newField.find('.img_fetch_btn').attr('onclick', 'fcfield_image.fetchData(\'' + element_id + '\', \'".$field_name_js."\'); return false;');
 				newField.find('.img_clear_btn').attr('onclick', 'fcfield_image.clearData(\'' + element_id + '\', \'".$field_name_js."\'); return false;');
 				newField.find('.fcfield_message_box').attr('id','fcfield_message_box_' + element_id);

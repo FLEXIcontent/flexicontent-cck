@@ -1326,7 +1326,7 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 #flexicontent ul.fcfield-sortables > li [class*=" fcfield-"].fcfont-icon {
   vertical-align: top;
   background: none;
-  margin: 0px 0px 2px 0px;
+  margin: 0px 0px 0px 0px;
   color: #555;
   transition: all 0.3s ease-in;
 }
@@ -1351,7 +1351,7 @@ div.container_fcfield div.toggle_all_values_buttons_box {
 #flexicontent ul.fcfield-sortables > li [class*=" fcfield-"].fcfont-icon:before,
 #flexicontent ul.fcfield-sortables > li [class^="fcfield-"].fcfont-icon:after,
 #flexicontent ul.fcfield-sortables > li [class*=" fcfield-"].fcfont-icon:after {
-  margin: 0px 0px 2px 0px;
+  margin: 0px 0px 0px 0px;
   background: none;
   font-family: "IcoMoon";
   font-style: normal;
@@ -2042,13 +2042,290 @@ span.fcfield-disablevalue.fcfont-icon.icon.icon- {
   height: 2.62rem !important;
 }
 /**group button */
-.buttons.btn-group.fc-iblock.dropdown {
-  margin-left: -20px !important;
-  width: 88px;
+#flexicontent .buttons.btn-group.fc-iblock.dropdown {
+  margin-left: 0 !important;
+  width: auto;
+  display: inline-flex;
+  align-items: center;
 }
 span.add-on.fcfont-icon.icon.icon-.image-option {
   cursor: pointer;
 }
 textarea.fcfield_textareaval {
   resize: both;
+}
+/***********************************************************
+ * EDIT FORM: full-width inline upload area and aligned field toolbar
+ * (shared by backend and frontend forms, image/file/mediafile fields)
+ ***********************************************************/
+#flexicontent .fc-field-props-box.fc-upload-props-box {
+  float: none !important;
+  clear: both;
+  width: 100% !important;
+  max-width: none !important;
+  position: relative;
+  margin-right: 0;
+}
+#flexicontent .fc-upload-props-box .fc-field-value-properties-box {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+}
+/* Neutralize the fixed thumbnail width (.fc-box.thumb_250 = 252px) for inline uploaders */
+#flexicontent .fc_file_uploader.fc_inline_uploader.fc-box {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+#flexicontent .fc_file_uploader.fc_inline_uploader .plupload_scroll > .plupload_container {
+  width: 100%;
+  min-width: 0 !important;
+}
+/* Toolbar row: vertically aligned icons, no negative margin or fixed width */
+#flexicontent .fc-upload-props-box > .btn-group {
+  display: flex !important;
+  align-items: center;
+  flex-wrap: wrap;
+  width: 100%;
+  margin: 4px 0 16px 0 !important;
+}
+#flexicontent .fcfieldval_container .fc-xpended-btns {
+  align-items: center;
+  float: none !important;
+}
+#flexicontent .fcfieldval_container .fc-xpended-btns > .buttons.btn-group {
+  height: 2.62rem;
+}
+#flexicontent .fcfieldval_container .fc-xpended-btns > .buttons [role="button"].fcfield-addvalue {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.62rem;
+  left: auto;
+  top: auto;
+  box-sizing: border-box;
+}
+#flexicontent .fcfieldval_container .fc-xpended-btns > .btn,
+#flexicontent .fcfieldval_container .fc-xpended-btns > .buttons .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.62rem;
+  box-sizing: border-box;
+}
+/* Image field card: Joomla card plus field-specific border/shadow */
+#flexicontent .card.fc-image-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #b2bfcd;
+  border-radius: 0.25rem;
+  box-shadow: 0 2px 10px -8px var(--template-bg-dark-50);
+}
+#flexicontent .fc-image-card > .fc-image-card-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+}
+/* Toolbar follows the card width and wraps when the card is narrow */
+#flexicontent .fc-image-card .fc-xpended-btns {
+  display: flex !important;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+}
+/* No extra space between toolbar and image */
+#flexicontent .fc-image-card .fc-field-props-box.fc-upload-props-box,
+#flexicontent .fc-image-card .fc-field-value-properties-box {
+  margin-top: 0;
+}
+#flexicontent .fc-image-card .plupload_droptext {
+  line-height: 1.2 !important;
+  font-size: 12px !important;
+  padding: 4px 0 !important;
+}
+/* Uploader panel stays inside the card when toggled on */
+#flexicontent .fc-image-card .fc_file_uploader,
+#flexicontent .fc-image-card .fc_file_uploader .plupload_scroll,
+#flexicontent .fc-image-card .fc_file_uploader .plupload_scroll > .plupload_container,
+#flexicontent .fc-image-card .fc_file_uploader ul.plupload_filelist {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  box-sizing: border-box;
+}
+#flexicontent .fc-image-card .fc_file_uploader ul.plupload_filelist > li {
+  max-width: 100% !important;
+  box-sizing: border-box;
+}
+#flexicontent .fc-image-card .fc_file_uploader .plupload_img_preview > img {
+  max-width: 100% !important;
+  height: auto !important;
+}
+#flexicontent .fc-image-card .fc-xpended-btns > * {
+  flex: 1 1 auto;
+  margin: 2px;
+  box-sizing: border-box;
+}
+/* Image fills the card; the thumb-size slider resizes the card itself */
+#flexicontent .fc-image-card .fcfield_preview_box,
+#flexicontent .fc-image-card .fcfield-preview-image-wrap {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+}
+/* Fixed square preview area: every card has the same height regardless of image orientation */
+#flexicontent .fc-image-card .fcfield_preview_box {
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: #f8f9fa;
+}
+#flexicontent .fc-image-card .fcfield-preview-image-wrap {
+  height: 100%;
+}
+#flexicontent .fc-image-card .fcfield_preview_box img.fc_preview_thumb {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0 !important;
+  object-fit: contain;
+  object-position: center center;
+}
+#flexicontent .fc-image-card.thumb_90 {
+  width: 90px;
+}
+#flexicontent .fc-image-card.thumb_120 {
+  width: 120px;
+}
+#flexicontent .fc-image-card.thumb_150 {
+  width: 150px;
+}
+#flexicontent .fc-image-card.thumb_200 {
+  width: 200px;
+}
+#flexicontent .fc-image-card.thumb_250 {
+  width: 250px;
+}
+/* Icon-only toolbar buttons - flat, no background, hand cursor */
+#flexicontent .fc-xpended-btns .fc-flat-btn,
+#flexicontent .fc-xpended-btns .fc-flat-btn:hover,
+#flexicontent .fc-xpended-btns .fc-flat-btn:active,
+#flexicontent .fc-xpended-btns .fc-flat-btn.active {
+  background: transparent !important;
+  background-color: transparent !important;
+  color: inherit !important;
+  box-shadow: none !important;
+  cursor: pointer;
+}
+/* Uniform hover / active color for every image card toolbar button */
+#flexicontent .fc-image-card .fc-xpended-btns .fc-flat-btn:hover,
+#flexicontent .fc-image-card .fc-xpended-btns .fc-flat-btn:focus,
+#flexicontent .fc-image-card .fc-xpended-btns .fc-flat-btn.active {
+  background: rgba(0, 0, 0, 0.08) !important;
+  background-color: rgba(0, 0, 0, 0.08) !important;
+}
+/* Icon glyph is absolutely positioned (zero-size inline span), center it vertically */
+#flexicontent .fc-xpended-btns .fc-flat-btn .fcfont-icon-inline:before {
+  top: 50%;
+  transform: translateY(-50%);
+}
+/* FontAwesome tool icons (upload / my files): centered, no legacy IcoMoon :before positioning */
+#flexicontent .fc-xpended-btns .fc-flat-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+#flexicontent .fc-xpended-btns .fc-flat-btn .fc-image-tool-icon {
+  line-height: 1;
+}
+#flexicontent .fc-xpended-btns .fc-flat-btn .fc-image-tool-icon:before {
+  position: static !important;
+  top: auto !important;
+  left: auto !important;
+  width: auto !important;
+  height: auto !important;
+  line-height: 1 !important;
+  margin: 0 !important;
+  transform: none !important;
+}
+/* Image wrapper inside the fixed square preview */
+#flexicontent .fc-image-card .fcfield_preview_box .fcfield-preview-image-wrap {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  line-height: 0;
+}
+/* Top toolbar (move / add before / add after / remove) */
+#flexicontent .fc-image-card .fc-image-top-toolbar {
+  margin-bottom: 0;
+}
+/* Bottom toolbar (upload / gallery / media URL / edit fields) */
+#flexicontent .fc-image-card .fc-image-bottom-toolbar {
+  justify-content: center;
+  margin: 0;
+  clear: both;
+}
+/* The 4 buttons form one joined group */
+#flexicontent .fc-image-card .fc-image-btn-group {
+  display: flex !important;
+  flex: 1 1 auto !important;
+  flex-wrap: nowrap;
+  width: 100%;
+  min-width: 0;
+  margin: 0 !important;
+  border: 1px solid #b2bfcd;
+  border-radius: 0.25rem;
+  overflow: hidden;
+}
+#flexicontent .fc-image-card .fc-image-btn-group > * {
+  flex: 1 1 0 !important;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0 4px !important;
+  border: 0 !important;
+  border-right: 1px solid #b2bfcd !important;
+  border-radius: 0 !important;
+}
+#flexicontent .fc-image-card .fc-image-btn-group > *:last-child {
+  border-right: 0 !important;
+}
+/* No borders on the toolbars inside the image card */
+#flexicontent .fc-image-card .fc-xpended-btns,
+#flexicontent .fc-image-card .fc-xpended-btns *,
+#flexicontent .fc-image-card .fc-image-btn-group,
+#flexicontent .fc-image-card .fc-image-btn-group * {
+  border: 0 !important;
+}
+/* Keep the edit form inside the card when toggled open */
+#flexicontent .fc-image-card > .fc-image-card-body {
+  min-width: 0;
+}
+#flexicontent .fc-image-card .fcimg_value_props,
+#flexicontent .fc-image-card .fcimg_url_props {
+  width: 100%;
+  max-width: 100%;
+  margin-top: 10px;
+  padding: 16px 8px 8px;
+  box-sizing: border-box;
+}
+#flexicontent .fc-image-card .fcimg_value_props .fc-form-tbl,
+#flexicontent .fc-image-card .fcimg_url_props .fc-form-tbl {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+#flexicontent .fc-image-card .fcimg_value_props input,
+#flexicontent .fc-image-card .fcimg_value_props textarea,
+#flexicontent .fc-image-card .fcimg_value_props select,
+#flexicontent .fc-image-card .fcimg_url_props input,
+#flexicontent .fc-image-card .fcimg_url_props textarea,
+#flexicontent .fc-image-card .fcimg_url_props select {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }

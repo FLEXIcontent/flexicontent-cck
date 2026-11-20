@@ -398,11 +398,16 @@ foreach ($field->value as $index => $value)
 		$pick_existing_n = $pick_existing ? str_replace('__FORMFLDID__', $elementid_n.'_existingname', $pick_existing_n) : '';
 	}
 
-	$toggleUploader_onclick = 'var box = jQuery(this).closest(\'.fcfieldval_container\'); ' .
-		'var isVisible = box.find(\'.fc_file_uploader\').is(\':visible\'); ' .
-		'isVisible ? jQuery(this).removeClass(\'active\') : jQuery(this).addClass(\'active\'); ' .
-		'isVisible ? box.find(\'.fcfield_preview_box\').show() : box.find(\'.fcfield_preview_box\').hide(); ' .
-		'';
+	$toggleUploader_onclick = 'var box = this.closest(\'.fcfieldval_container\'); ' .
+		'if (!box) return; ' .
+		'var uploader = box.querySelector(\'.fc_file_uploader\'); ' .
+		'var isVisible = uploader && window.getComputedStyle(uploader).display !== \'none\'; ' .
+		'isVisible ? this.classList.remove(\'active\') : this.classList.add(\'active\'); ' .
+		'var preview = box.querySelector(\'.fcfield_preview_box\'); ' .
+		'if (preview) preview.style.display = isVisible ? \'\' : \'none\'; ';
+
+	// Icon-only buttons, no text labels
+	$flat_btn_class = ' fc-flat-btn';
 
 	if ($use_inline_uploaders)
 	{
@@ -414,8 +419,8 @@ foreach ($field->value as $index => $value)
 				'refresh_on_complete' => false,
 				'thumb_size_default' => $thumb_size_default,
 				'toggle_btn' => array(
-					'class' => ($file_btns_position ? 'dropdown-item' : '') . ' ' . $btn_item_class,
-					'text' => '<span class="fcfield-uploadvalue fcfont-icon-inline '.$font_icon_class.'"></span>' . (!$file_btns_position ? '&nbsp; ' . Text::_('FLEXI_UPLOAD') : ''),
+					'class' => $btn_item_class . $flat_btn_class,
+					'text' => '<span class="fc-image-tool-icon fas fa-upload" aria-hidden="true" title="' . Text::_('FLEXI_UPLOAD') . '"></span>',
 					'onclick' => $toggleUploader_onclick,
 					'action' => null
 				),
@@ -426,81 +431,57 @@ foreach ($field->value as $index => $value)
 			)
 		);
 
-		$multi_icon = $form_font_icons ? ' <span class="icon-stack"></span>' : '<span class="pages_stack"></span>';
-		$btn_classes = ($file_btns_position ? 'dropdown-item' : '') . ' ' . $btn_item_class;
-		$uploader_html->multiUploadBtn = '';  /*'
-			<span data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" class="'.$btn_classes.' fc-up fcfield-uploadvalue multi" id="'.$elementid_n.'_mul_uploadvalue">
-				&nbsp; ' . $multi_icon . ' ' . (!$file_btns_position || $file_btns_position==2 ? Text::_('FLEXI_UPLOAD') : '') . '
-			</span>';*/
+		$btn_classes = $btn_item_class . $flat_btn_class;
+		$uploader_html->multiUploadBtn = '';
 		// !!! CLASS: fc-files-modal-link fc-sel NEEDED BY JS !!! DO NOT REMOVE, DO NOT MOVE
 		$uploader_html->myFilesBtn = '
-			<span data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" class="fc-files-modal-link fc-sel '.$btn_classes.'" data-rowno="'.$n.'" id="'.$elementid_n.'_selectvalue">
-				<span class="fcfield-selectvalue multi fcfont-icon-inline ' . $font_icon_class . '"></span>
-				' .  ($file_btns_position ? $multi_icon : '') . ' ' . (!$file_btns_position || $file_btns_position==2 ? '&nbsp; ' . Text::_('FLEXI_MY_FILES') : '') . ' ' .'
+			<span data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" class="fc-files-modal-link fc-sel '.$btn_classes.'" title="' . Text::_('FLEXI_MY_FILES') . '" data-rowno="'.$n.'" id="'.$elementid_n.'_selectvalue">
+				<span class="fc-image-tool-icon fas fa-images" aria-hidden="true"></span>
 			</span>';
 		// !!! CLASS: fc-files-modal-link fc-up NEEDED BY JS !!! DO NOT REMOVE, DO NOT MOVE
 		$uploader_html->mediaUrlBtn = !$usemediaurl ? '' : '
-			<span class="fc-files-modal-link fc-sel ' . ($file_btns_position ? 'dropdown-item' : '') . ' ' . $btn_item_class .'" onclick="fcfield_image.toggleMediaURL(\''.$elementid_n.'\', \''.$field_name_js.'\'); return false;">
-				<span class="fcfield-medialurlvalue fcfont-icon-inline ' . $font_icon_class . '"></span>
-				' . (!$file_btns_position || $file_btns_position==2 ? '&nbsp; ' . Text::_('FLEXI_FIELD_MEDIA_URL') : '') . '
-			</span>';
-		$uploader_html->clearBtn = '
-			 <span class="' . $btn_item_class . ' fcfield-clearvalue ' . $font_icon_class . '" title="'.Text::_('FLEXI_CLEAR').'" onclick="fcfield_image.clearField(this, {}, \''.$field_name_js.'\');">
+			<span class="fc-files-modal-link fc-sel fcfield-mediaurl-btn ' . $btn_classes .'" data-for="' . $elementid_n . '" title="' . Text::_('FLEXI_FIELD_MEDIA_URL') . '" onclick="fcfield_image.toggleMediaURL(\''.$elementid_n.'\', \''.$field_name_js.'\'); return false;">
+				<span class="fc-image-tool-icon fas fa-video" aria-hidden="true"></span>
 			</span>';
 	}
 
-	$drop_btn_class =
-		(FLEXI_J40GE
-			? 'toolbar dropdown-toggle dropdown-toggle-split'
-			: 'toolbar dropdown-toggle'
-		);
-	$drop_btn_style = 'padding: 0.4rem; box-sizing: border-box; max-height: 100%; margin: 0; height: 100%;';
+	// Edit button, in the toolbar below the image
+	$info_button = '<span class="fc-flat-btn fc-image-edit-btn" data-for="' . $elementid_n . '" title="' . Text::_('FLEXI_EDIT_OPTIONS') . '" onclick="fcfield_image.toggleFields(\'' . $elementid_n . '\');"><span class="fc-image-tool-icon fas fa-edit" aria-hidden="true"></span></span>';
+
+	// Remove button shown directly in the top toolbar (no dropdown)
+	$remove_button_direct = (isset($remove_button) && $remove_button !== '') ? $remove_button : '';
+
+	// Toolbar below the image: upload / gallery / media URL / edit fields
+	$has_value_props = $linkto_url || $usemediaurl || $usealt || $usetitle || $usedesc || $usecust1 || $usecust2;
+	$bottom_toolbar = ($use_inline_uploaders || $has_value_props) ? '
+		<div class="'.$btn_group_class.' fc-xpended-btns fc-image-bottom-toolbar">
+			<div class="btn-group fc-image-btn-group" role="group">
+				'.($use_inline_uploaders ?
+					$uploader_html->toggleBtn .
+					($use_myfiles > 0 ? $uploader_html->myFilesBtn : '') .
+					$uploader_html->mediaUrlBtn
+				: '').'
+				'.$info_button.'
+			</div>
+		</div>' : '';
 
 	$field->html[] = '
 		'.($multiple && !$none_props ? '<div class="fcclear"></div>' : '').'
+		<div class="card fc-image-card thumb_'.$thumb_size_default.'">
+		<div class="fc-image-card-body">
 		'.(!$add_ctrl_btns ? '' : '
-		<div class="'.$btn_group_class.' fc-xpended-btns">
+		<div class="'.$btn_group_class.' fc-xpended-btns fc-image-top-toolbar">
 			'.$move2.'
-			'.$remove_button.'
-			'.(!$add_position ? '' : $add_here)
-			.($use_inline_uploaders && !$file_btns_position ?'
-			<div class="buttons '.$btn_item_class.' fc-iblock ' . (FLEXI_J40GE ? ' dropdown ' : '') . '" style="padding:0 !important;">
-				<div role="button" class="' . $drop_btn_class . ' fcfield-addvalue ' . $font_icon_class . '" data-toggle="dropdown" data-bs-toggle="dropdown" style="'.$drop_btn_style.'">
-					<span class="caret"></span>
-				</div>
-				<ul class="dropdown-menu dropdown-menu-right" role="menu">
-					<li>'.$uploader_html->toggleBtn.'</li>
-					<li>'.$uploader_html->multiUploadBtn.'</li>
-					' . ($use_myfiles > 0 ? '<li>'.$uploader_html->myFilesBtn.'</li>' : '') . '
-					<li>'.$uploader_html->mediaUrlBtn.'</li>
-				</ul>
-			</div>
-			<span class="btn btn-outline-secondary fcfont-icon icon icon-pencil fas fa-info-circle image-option" onclick="jQuery(\'.fcimg_value_props[data-name=' . $elementid_n . ']\').toggle(150);"></span>
-			'.$uploader_html->clearBtn.'
-			' : '') . '
+			'.(!$add_position ? '' : $add_here).'
+			'.$remove_button_direct.'
 		</div>
 		'.($fields_box_placing ? '<div class="fcclear"></div>' : '').'
 		').'
-					
 					'.$originalname.'
 					'.$existingname.'
 
-		<div class="fc-field-props-box" ' . (!$multiple ? 'style="width: 80%; max-width: 1000px; position: relative;"' : ''). '>
-
-			'.($use_inline_uploaders && ($file_btns_position || !$add_ctrl_btns) ? '
-			<div class="fcclear"></div>
-			<div class="btn-group" style="margin: 4px 0 16px 0; display: inline-block;">
-				<div class="'.$btn_group_class.' fc-xpended-btns">
-					'.$uploader_html->toggleBtn.'
-					'.$uploader_html->multiUploadBtn.'
-					' . ($use_myfiles > 0 ? $uploader_html->myFilesBtn : '') . '
-					'.$uploader_html->mediaUrlBtn.'
-					'.$uploader_html->clearBtn.'
-					<span class="btn btn-outline-secondary fcfont-icon icon icon-pencil fas fa-info-circle image-option" onclick="jQuery(\'.fcimg_value_props[data-name=' . $elementid_n . ']\').toggle(150);"></span>
-				</div>
-			</div>
-			' : '') . '
-			<div class="fc-field-value-properties-box" style="flex-direction: column;">
+		<div class="fc-field-props-box fc-upload-props-box">
+			<div class="fc-field-value-properties-box">
 
 				'.($image_source === -2 || $image_source === -1  ?  // Do not add image preview box if using Joomla Media Manager (or intro/full mode)
 			$select_existing.'
@@ -511,22 +492,30 @@ foreach ($field->value as $index => $value)
 							' . $uploader_html->container . '
 						</div>
 					').'
-					<div class="fcfield_preview_box fc-box thumb_'.$thumb_size_default.'">
-						'.$imgpreview.'
+					<div class="fcfield_preview_box fc-box">
+						'.($imgpreview !== '' ? '<span class="fcfield-preview-image-wrap">'.$imgpreview.'</span>' : $imgpreview).'
 						<div class="fcclear"></div>
 					'.$select_existing.'
 					</div>
 				').'
+				'.$bottom_toolbar.'
 				'
 
 		.(($linkto_url || $usemediaurl || $usealt || $usetitle || $usedesc || $usecust1 || $usecust2) ?
 			'
 
-				<div class="fcimg_value_props" data-name="'.$elementid_n.'" style="display: none;"><!-- init form with compact mode !-->
-    						'.$fc_preview_msg.'
+				'.(($linkto_url || $usemediaurl) ? '
+				<div class="fcimg_url_props" data-name="'.$elementid_n.'" style="display: none;">
+					'.$fc_preview_msg.'
 					<div class="fc-form-tbl fcinner fccompact">
 						' . @ $urllink . '
 						' . @ $mediaurl . '
+					</div>
+				</div>
+				' : '').'
+				'.(($usealt || $usetitle || $usedesc || $usecust1 || $usecust2) ? '
+				<div class="fcimg_value_props" data-name="'.$elementid_n.'" style="display: none;">
+					<div class="fc-form-tbl fcinner fccompact">
 						' . @ $alt . '
 						' . @ $title . '
 						' . @ $desc . '
@@ -534,11 +523,14 @@ foreach ($field->value as $index => $value)
 						' . @ $cust2 . '
 					</div>
 				</div>
+				' : '').'
 				'
 			: '') .'
 
 			</div><!-- EOF class="fc-field-value-properties-box" -->
 		</div><!-- EOF class="fc-field-props-box" -->
+		</div><!-- EOF class="fc-image-card-body" -->
+		</div><!-- EOF class="card" -->
 		';
 
 	if (!$image_subpath)

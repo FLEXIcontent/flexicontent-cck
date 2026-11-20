@@ -23,16 +23,58 @@
 
 	fcfield_image.toggleMediaURL = function(element_id_n, config_name)
 	{
-		var url = jQuery("#"+element_id_n+"_mediaurl").val();
-		var msg_box = jQuery("#fcfield_message_box_"+element_id_n);
+		var input = document.getElementById(element_id_n + '_mediaurl');
+		if (!input) return;
 
-		if (url != "" && jQuery("#"+element_id_n+"_mediaurl").closest('.fcfield-image-mediaurl-box').is(":visible"))
+		var mediaurl_box = input.closest('.fcfield-image-mediaurl-box');
+		if (!mediaurl_box) return;
+
+		var value_box = mediaurl_box.closest('.fcfieldval_container');
+		if (!value_box) return;
+
+		var msg_box = document.getElementById('fcfield_message_box_' + element_id_n);
+		var btn = value_box.querySelector('.fcfield-mediaurl-btn[data-for="' + element_id_n + '"]');
+		var props = value_box.querySelector('.fcimg_url_props');
+		// Test the wrapper, not the inner box: with an existing URL the inner box has no inline display:none
+		var isOpen = props ? (window.getComputedStyle(props).display !== 'none') : (window.getComputedStyle(mediaurl_box).display !== 'none');
+
+		// Second click: close the URL zone, even when a video URL is already set
+		if (isOpen)
 		{
-			msg_box.html("<span class=\"alert alert-warning fc-iblock fcpadded\">" + Joomla.JText._('FLEXI_FIELD_IMAGE_CLEAR_MEDIA_URL_FIRST') + "</span>");
+			mediaurl_box.style.display = 'none';
+			if (props) props.style.display = 'none';
+			if (btn) btn.classList.remove('active');
+			if (msg_box) msg_box.innerHTML = '';
 			return;
 		}
 
-		jQuery("#"+element_id_n+"_mediaurl").closest('.fcfield-image-mediaurl-box').slideToggle();
+		// Show the fields linked to the media URL
+		if (props) props.style.display = 'block';
+
+		// Hide the uploader and bring the preview back
+		var uploaders = value_box.querySelectorAll('.fc_file_uploader');
+		for (var i = 0; i < uploaders.length; i++) uploaders[i].style.display = 'none';
+
+		var preview = value_box.querySelector('.fcfield_preview_box');
+		if (preview) preview.style.display = '';
+
+		var toggles = value_box.querySelectorAll('.fc_files_uploader_toggle_btn');
+		for (var j = 0; j < toggles.length; j++) toggles[j].classList.remove('active');
+
+		mediaurl_box.style.display = 'block';
+		if (btn) btn.classList.add('active');
+	}
+
+	fcfield_image.toggleFields = function(element_id_n)
+	{
+		var props = document.querySelector('.fcimg_value_props[data-name="' + element_id_n + '"]');
+		if (!props) return;
+
+		var btn = document.querySelector('.fc-image-edit-btn[data-for="' + element_id_n + '"]');
+		var isHidden = (window.getComputedStyle(props).display === 'none');
+
+		props.style.display = isHidden ? 'block' : 'none';
+		if (btn) btn.classList.toggle('active', isHidden);
 	}
 
 
@@ -40,7 +82,22 @@
 	{
 		var fnn  = field_name_n.replace(/-/g, '_');
 		var box = jQuery('#custom_' + field_name_n + '_fc_preview_msg').closest('.fcfieldval_container');
-		box.find('.fc_files_uploader_toggle_btn').click();
+		var btn = box.find('.fc_files_uploader_toggle_btn');
+		var tries = 0;
+
+		// The plupload instance is created on document ready: wait for it before triggering the toggle
+		var clickWhenReady = function()
+		{
+			var match = (btn.attr('onclick') || '').match(/(\w+)\.toggleUploader/);
+			if (match && window[match[1]])
+			{
+				btn.get(0).click();
+				return;
+			}
+			if (++tries < 40) window.setTimeout(clickWhenReady, 50);
+		};
+
+		clickWhenReady();
 	}
 
 

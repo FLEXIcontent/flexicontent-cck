@@ -865,7 +865,7 @@ class plgFlexicontent_fieldsFile extends FCField
 				'.($fields_box_placing ? '<div class="fcclear"></div>' : '').'
 				').'
 
-				<div class="fc-field-props-box" style="' . (!$multiple || $use_ingroup ? 'width: 96%; max-width: 1020px;' : ''). '">
+				<div class="fc-field-props-box fc-upload-props-box">
 
 					'.($use_inline_uploaders && ($file_btns_position || !$add_ctrl_btns) ? '
 					<div class="fcclear"></div>
