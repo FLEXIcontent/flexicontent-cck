@@ -814,7 +814,7 @@ if ($js)
 						$type_names[] = $this->types[$type_id]->jname;
 					}
 					echo count($row_types) > 3 ? '
-						<span class="btn btn-mini hasTooltip nowrap_box" onclick="jQuery(this).next().toggle();" title="' . flexicontent_html::getToolTip(Text::_('FLEXI_ASSIGNED_TYPES', true), '<ul class="fc_plain"><li>'.implode('</li><li>', $type_names).'</li></ul>', 0, 1) . '">
+						<span class="btn btn-mini hasTooltip nowrap_box" onclick="fc_toggle_box_via_btn(this.nextElementSibling, this);" title="' . flexicontent_html::getToolTip(Text::_('FLEXI_ASSIGNED_TYPES', true), '<ul class="fc_plain"><li>'.implode('</li><li>', $type_names).'</li></ul>', 0, 1) . '">
 							'.count($row_types).' <i class="icon-briefcase"></i>
 						</span>
 						<div class="fc_assignments_box fc_types">' : '';

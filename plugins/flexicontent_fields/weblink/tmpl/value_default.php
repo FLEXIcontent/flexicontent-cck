@@ -82,11 +82,11 @@ foreach ($values as $value)
 			$link_params .= ' data-type="iframe"';
 		}
 
-		//$link_params .= ' onclick="fc_field_dialog_handle_'.$field->id.' = fc_showDialog(jQuery(this).attr(\'href\'), \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;" ';
+		//$link_params .= ' onclick="fc_field_dialog_handle_'.$field->id.' = fc_showDialog(this.getAttribute(\'href\'), \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;" ';
 	}
 	elseif ($target === '_popup')
 	{
-		$link_params .= ' onclick="fc_field_dialog_handle_'.$field->id.' = fc_showDialog(jQuery(this).attr(\'href\'), \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;" ';
+		$link_params .= ' onclick="fc_field_dialog_handle_'.$field->id.' = fc_showDialog(this.getAttribute(\'href\'), \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;" ';
 	}
 	else if ($target === '_modal')
 	{

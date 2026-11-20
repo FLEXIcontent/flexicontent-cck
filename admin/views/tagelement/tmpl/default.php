@@ -37,6 +37,12 @@ $useAssocs= flexicontent_db::useAssociations();
 $btn_class = 'btn';
 $ico_class = 'fc-man-icon-s';
 $out_class = FLEXI_J40GE ? 'btn btn-outline-dark' : 'btn';
+$state_icons = array(1 => 'icon-publish', 0 => 'icon-unpublish', -2 => 'icon-trash');
+$state_names = array(
+	1 => \Joomla\CMS\Language\Text::_('JPUBLISHED'),
+	0 => \Joomla\CMS\Language\Text::_('JUNPUBLISHED'),
+	-2 => \Joomla\CMS\Language\Text::_('JTRASHED'),
+);
 
 
 
@@ -272,7 +278,7 @@ if ($js)
 			</td>
 
 			<td class="col_state">
-				<?php $state = isset($state_icons[$row->published]) ? $row->state : 'u'; ?>
+				<?php $state = isset($state_icons[$row->published]) ? (int) $row->published : 0; ?>
 				<span class="<?php echo $state_icons[$state]; ?>" title="<?php echo $state_names[$state]; ?>"></span>
 			</td>
 

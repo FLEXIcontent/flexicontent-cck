@@ -41,7 +41,7 @@ FlexiForm.ready(() => FlexiAdmin.bindResultForm(document.getElementById('adminFo
 			<input id="copy" type="submit" class="fc_button" value="<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_COPY_PARAMETERS_BUTTON' ); ?>" />
 			</td>
 			<td width="50%" align="left">
-			<input type="button" class="fc_button" onclick="window.parent.fc_closeDialog();" value="<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_CANCEL' ); ?>" />
+			<input type="button" class="fc_button" onclick="window.parent.fc_closeDialog('fc_modal_popup_container');" value="<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_CANCEL' ); ?>" />
 			</td>
 		</tr>
 	</table>

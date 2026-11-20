@@ -37,6 +37,8 @@ if(!jquery)throw new Error('Set FLEXI_TEST_JQUERY to the Joomla jQuery asset use
     else await page.locator('.MultiBoxNext').click();
    }
    await page.locator('.MultiBoxClose').click();await page.locator('.MultiBoxContainer').waitFor({state:'hidden'});
+   await page.locator('a.mb').first().click();await page.waitForTimeout(1400);
+   await page.keyboard.press('Escape');await page.locator('.MultiBoxContainer').waitFor({state:'hidden'});
    assert.deepEqual(errors,[]);console.log(`PASS: ${file}, ${width}px: wide/tall/small images fit, navigate and close`);
    await page.close();
   }

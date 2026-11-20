@@ -582,14 +582,15 @@ tabberObj.prototype.tabShow = function(tabberIndex)
 	}
 
 	// Force redraw of any google maps inside TAB
-	var elArr = document.querySelectorAll('#' + div.id + ' .has_fc_google_maps_map');
+	var elArr = div.querySelectorAll('.has_fc_google_maps_map');
 	for (var n = 0, len = elArr.length; n < len; n++)
 	{
-		google.maps.event.trigger(elArr[n].dataset.google_maps_ref, 'resize');
+		var map = elArr[n].google_maps_ref || window.FlexiForm?.data(elArr[n], 'google_maps_ref');
+		if (map && window.google?.maps) google.maps.event.trigger(map, 'resize');
 	}
 
 	// Force redraw of any openstreet maps inside TAB
-	var osArr = document.querySelectorAll('#' + div.id + ' .has_fc_openstreet_map');
+	var osArr = div.querySelectorAll('.has_fc_openstreet_map');
 	for (var n = 0, len = osArr.length; n < len; n++)
 	{
 		osArr[n].os_maps_ref.invalidateSize();

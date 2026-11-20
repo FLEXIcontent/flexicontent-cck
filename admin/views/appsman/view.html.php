@@ -221,7 +221,7 @@ class FlexicontentViewAppsman extends \Joomla\CMS\MVC\View\HtmlView
 		// We will not use the default getInput() function of J1.6+ since we want to create a radio selection field with flags
 		// we could also create a new class and override getInput() method but maybe this is an overkill, we may do it in the future
 		$lists['languages'] = flexicontent_html::buildlanguageslist('language'
-			, ' style="vertical-align:top;" onchange="var m=jQuery(\'#fc_import_about_langcol\'); this.value ? m.hide(600) : m.show(600);"'
+			, ' style="vertical-align:top;" onchange="FlexiForm.show(document.getElementById(\'fc_import_about_langcol\'), !this.value);"'
 			, $formvals['language'], 6/*'- '.\Joomla\CMS\Language\Text::_('FLEXI_USE_LANGUAGE_COLUMN').' -'*/, $allowed_langs, $published_only=true
 			, $disable_langs=null, $add_all=true, $conf=array('required'=>true)
 		).'
@@ -229,7 +229,7 @@ class FlexicontentViewAppsman extends \Joomla\CMS\MVC\View\HtmlView
 				'.\Joomla\CMS\Language\Text::_('FLEXI_USE_LANGUAGE_COLUMN_TIP').'
 			</span>';
 
-		$lists['states'] = flexicontent_html::buildstateslist('state', ' style="vertical-align:top;" onchange="var m=jQuery(\'#fc_import_about_statecol\'); this.value ? m.hide(600) : m.show(600);"'
+		$lists['states'] = flexicontent_html::buildstateslist('state', ' style="vertical-align:top;" onchange="FlexiForm.show(document.getElementById(\'fc_import_about_statecol\'), !this.value);"'
 			, $formvals['state'], 2/*'- '.\Joomla\CMS\Language\Text::_('FLEXI_USE_STATE_COLUMN').' -'*/).
 			'<span class="fc-mssg-inline fc-note fc-nobgimage" id="fc_import_about_statecol" style="display:none;">
 				'.\Joomla\CMS\Language\Text::_('FLEXI_USE_STATE_COLUMN_TIP').'
@@ -351,7 +351,7 @@ class FlexicontentViewAppsman extends \Joomla\CMS\MVC\View\HtmlView
 		if ($js)
 		{
 			$document->addScriptDeclaration('
-				jQuery(document).ready(function(){
+				FlexiForm.ready(function(){
 					' . $js . '
 				});
 			');

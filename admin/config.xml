@@ -187,7 +187,7 @@
 
 				<field name="" type="separator" default="FLEXI_SELECT_LIB_DESC" label="" level="level3" class="alert alert-info fcpadded" />
 				<!-- Preserve the saved value for legacy template display settings. Dropdown controls now use Choices. -->
-				<field name="select_lib_type" type="hidden" default="0" />
+				<field name="select_lib_type" type="hidden" default="1" />
 				<field name="loadfw_select2" type="fcradio" default="1" label="FLEXI_SELECT_LIB_LOAD" description="FLEXI_SELECT_LIB_LOAD_DESC" class="btn-group btn-group-yesno">
 					<option value="1">FLEXI_BOTH</option>
 					<option value="2">FLEXI_MANUALLY_IN_FRONTEND</option>

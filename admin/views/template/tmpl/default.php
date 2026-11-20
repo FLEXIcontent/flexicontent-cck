@@ -141,7 +141,6 @@ if (!$use_editor)  $app->enqueueMessage(\Joomla\CMS\Language\Text::_('Codemirror
 <script>
 	function tmpls_fcfield_init_ordering()
 	{
-		<?php echo $this->jssort . ';' ; ?>
 	}
 
 	var jformToken   = '<?php echo \Joomla\CMS\Session\Session::getFormToken();?>';

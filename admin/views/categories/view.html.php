@@ -647,6 +647,7 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 		//$toolbar->appendButton('Popup', 'params', \Joomla\CMS\Language\Text::_('FLEXI_COPY_PARAMS'), str_replace('&', '&amp;', $popup_load_url), 600, 440);
 		$js .= "
             document.querySelectorAll('#toolbar-params a.toolbar, #toolbar-params button').forEach(button => {
+                button.removeAttribute('onclick');
                 button.addEventListener('click', event => {
                     event.preventDefault();
                     fc_showDialog('" . $popup_load_url . "', 'fc_modal_popup_container', 0, 600, 440,

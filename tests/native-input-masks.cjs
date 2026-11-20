@@ -35,6 +35,14 @@ const {chromium}=require('playwright'),path=require('node:path'),assert=require(
    await input.click();const value=alias==='integer'?'-42':'42';await input.pressSequentially(value);await input.press('Tab');assert.equal(await input.inputValue(),value);
    await paste('0');assert.equal(await input.inputValue(),'0');results.push({name:'Empty '+alias+' survives tab then click without adding a zero',status:'pass'});
   }
+  for(const alias of ['currency','currency_euro'])for(const value of ['249.95','-1249.95','0','0.50']){
+   await setup({alias});await input.click();await input.press('Control+A');await input.press('Delete');
+   await input.pressSequentially(value);await input.press('Tab');
+   assert.equal(Number(await input.evaluate(n=>n.inputmask.unmaskedvalue())),Number(value),'Full clear must preserve every currency digit');
+   await input.click();await input.press('Control+A');await input.press('Delete');await input.press('Tab');
+   assert.equal(await input.evaluate(n=>n.inputmask.unmaskedvalue()),'','Cleared currency remains empty');
+   results.push({name:alias+' select-all/Delete/retype '+value,status:'pass'});
+  }
   for(const[options,value]of [[{alias:'email'},'aaaa@'],[{alias:'dd/mm/yyyy'},'20'],[{alias:'hh:mm'},'14'],[{mask:'AA-9999'},'QA02'],[{regex:'FC-[0-9]{3}'},'FC-6']]){await setup(options);await input.pressSequentially(value);await input.press('Tab');assert.equal(await page.evaluate(()=>document.formvalidator.isValid(document.getElementById('adminForm'))),false);results.push({name:'Reject incomplete '+(options.alias||options.mask||options.regex),status:'pass'});}
   await setup({alias:'url'});assert.equal(await page.evaluate(()=>document.formvalidator.isValid(document.getElementById('adminForm'))),true);results.push({name:'Optional blank mask remains valid',status:'pass'});
   assert.deepEqual(errors,[]);assert.equal(await page.evaluate(()=>typeof jQuery),'undefined');

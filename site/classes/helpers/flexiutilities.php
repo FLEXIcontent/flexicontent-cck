@@ -855,21 +855,21 @@ $fc_plgs[$fieldtype] = new $className($dispatcher, array('type'=>'flexicontent_f
 			elseif ($comments === 1 && $perms->CanComments)
 			{
 				call_user_func($addEntry,
-					'<a href="index.php?option=com_jcomments&amp;task=view&amp;fog=com_flexicontent" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;">'.
+					'<a href="index.php?option=com_jcomments&amp;task=view&amp;fog=com_flexicontent" onclick="var url = this.getAttribute(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;">'.
 						'<span class="fcsb-icon-comments icon-comments"></span>' . \Joomla\CMS\Language\Text::_('FLEXI_COMMENTS') .
 					'</a>', '', false);
 			}
 			elseif ($comments === 3 && $perms->CanComments)
 			{
 				call_user_func($addEntry,
-					'<a href="index.php?option=com_komento" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;">'.
+					'<a href="index.php?option=com_komento" onclick="var url = this.getAttribute(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;">'.
 						'<span class="fcsb-icon-comments icon-comments"></span>' . \Joomla\CMS\Language\Text::_('FLEXI_COMMENTS') .
 					'</a>', '', false);
 			}
 			elseif ($comments === 0 && $cparams->get('comments_admin_link'))
 			{
 				call_user_func($addEntry,
-					'<a href="' . $cparams->get('comments_admin_link') . '" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;">'.
+					'<a href="' . $cparams->get('comments_admin_link') . '" onclick="var url = this.getAttribute(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;">'.
 						'<span class="fcsb-icon-comments icon-comments"></span>'.\Joomla\CMS\Language\Text::_('FLEXI_COMMENTS').
 					'</a>', '', false);
 			}
@@ -930,7 +930,7 @@ $fc_plgs[$fieldtype] = new $className($dispatcher, array('type'=>'flexicontent_f
 
 			$perms->CanIndex
 				? call_user_func($addEntry,
-					'<a href="index.php?option=com_flexicontent&view=search&layout=logs&tmpl=component" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;" >'.
+					'<a href="index.php?option=com_flexicontent&view=search&layout=logs&tmpl=component" onclick="var url = this.getAttribute(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;" >'.
 						'<span class="fcsb-icon-book icon-book"></span>'.\Joomla\CMS\Language\Text::_( 'FLEXI_NAV_SD_SEARCH_LOGS' ).
 					'</a>', '', false) : null;
 
@@ -965,7 +965,7 @@ $fc_plgs[$fieldtype] = new $className($dispatcher, array('type'=>'flexicontent_f
 			if ($perms->CanPlugins)
 			{
 				call_user_func($addEntry,
-				'<a href="index.php?option=com_plugins" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;" >'.
+				'<a href="index.php?option=com_plugins" onclick="var url = this.getAttribute(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\'); return false;" >'.
 					'<span class="fcsb-icon-plugins icon-power-cord"></span>'.\Joomla\CMS\Language\Text::_( 'FLEXI_PLUGINS' ).
 				'</a>', '', false);
 			}
@@ -973,7 +973,7 @@ $fc_plgs[$fieldtype] = new $className($dispatcher, array('type'=>'flexicontent_f
 			if ($perms->CanConfig && empty($_SERVER['HTTPS']))
 			{
 				call_user_func($addEntry,
-				'<a href="https://flexicontent.org/downloads/translations.html?tmpl=component" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 650, 0); return false;" >'.
+				'<a href="https://flexicontent.org/downloads/translations.html?tmpl=component" onclick="var url = this.getAttribute(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 650, 0); return false;" >'.
 					'<span class="fcsb-icon-translations icon-flag"></span>'.\Joomla\CMS\Language\Text::_( 'FLEXI_TRANSLATION_PACKAGES' ).
 				'</a>', '', false);
 			}

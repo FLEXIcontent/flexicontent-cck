@@ -424,7 +424,7 @@ if (!empty($this->items) && ($load_masonry_feat || $load_masonry_std))
 	$ibox_margin_left_right_feat = intval($ibox_margin_left_right_feat);
 
 	$js = "
-		jQuery(document).ready(function(){
+		FlexiForm.ready(function(){
 	";
 	if ($load_masonry_feat) {
 		$js .= "
@@ -1021,7 +1021,7 @@ if ($leadnum) :
 					<?php endif; ?>
 					<?php if ($readmore_shown && $content_layout_feat == 0 || $content_layout_feat == 1 || $content_layout_feat == 4 || $content_layout_feat == 5 || $content_layout_feat == 6) : ?>
 						<div class="fcitem_readon readmore <?php echo $readmore_align_feat; ?>">
-							<a href="<?php echo $link_url; ?>" class="<?php echo $readon_class; ?>" itemprop="url" <?php echo ($lead_link_to_popup ? 'onclick="var url = jQuery(this).attr(\'href\')+\''.$_tmpl_.'\'; fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;"' : '');?> >
+							<a href="<?php echo $link_url; ?>" class="<?php echo $readon_class; ?>" itemprop="url" <?php echo ($lead_link_to_popup ? 'onclick="var url = this.getAttribute(\'href\')+\''.$_tmpl_.'\'; fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;"' : '');?> >
 								<?php
 								$read_more_text = $item->params->get('readmore')  ?  $item->params->get('readmore') : \Joomla\CMS\Language\Text::sprintf('FLEXI_READ_MORE', $item->title);
 								echo $readon_type === 1
@@ -1044,7 +1044,7 @@ if ($leadnum) :
 					<?php endif; ?>
 					<?php if ($readmore_shown && $content_layout_feat == 2 || $content_layout_feat == 3 ) : ?>
 						<div class="fcitem_readon readmore <?php echo $readmore_align_feat; ?>">
-							<a href="<?php echo $link_url; ?>" class="<?php echo $readon_class; ?>" itemprop="url" <?php echo ($lead_link_to_popup ? 'onclick="var url = jQuery(this).attr(\'href\')+\''.$_tmpl_.'\'; fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;"' : '');?> >
+							<a href="<?php echo $link_url; ?>" class="<?php echo $readon_class; ?>" itemprop="url" <?php echo ($lead_link_to_popup ? 'onclick="var url = this.getAttribute(\'href\')+\''.$_tmpl_.'\'; fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;"' : '');?> >
 								<?php
 								$read_more_text = $item->params->get('readmore')  ?  $item->params->get('readmore') : \Joomla\CMS\Language\Text::sprintf('FLEXI_READ_MORE', $item->title);
 								echo $readon_type === 1
@@ -1591,7 +1591,7 @@ if ($count > $leadnum) :
 					<?php endif; ?>
 					<?php if ($readmore_shown && $content_layout == 0 || $content_layout == 1 || $content_layout == 4 || $content_layout == 5 || $content_layout == 6) : ?>
 						<div class="fcitem_readon readmore <?php echo $readmore_align; ?>">
-							<a href="<?php echo $link_url; ?>" class="<?php echo $readon_class; ?>" itemprop="url" <?php echo ($lead_link_to_popup ? 'onclick="var url = jQuery(this).attr(\'href\')+\''.$_tmpl_.'\'; fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;"' : '');?> >
+							<a href="<?php echo $link_url; ?>" class="<?php echo $readon_class; ?>" itemprop="url" <?php echo ($lead_link_to_popup ? 'onclick="var url = this.getAttribute(\'href\')+\''.$_tmpl_.'\'; fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;"' : '');?> >
 								<?php
 								$read_more_text = $item->params->get('readmore')  ?  $item->params->get('readmore') : \Joomla\CMS\Language\Text::sprintf('FLEXI_READ_MORE', $item->title);
 								echo $readon_type === 1
@@ -1614,7 +1614,7 @@ if ($count > $leadnum) :
 					<?php endif; ?>
 					<?php if ($readmore_shown && $content_layout == 2 || $content_layout == 3) : ?>
 						<div class="fcitem_readon readmore <?php echo $readmore_align; ?>">
-							<a href="<?php echo $link_url; ?>" class="<?php echo $readon_class; ?>" itemprop="url" <?php echo ($lead_link_to_popup ? 'onclick="var url = jQuery(this).attr(\'href\')+\''.$_tmpl_.'\'; fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;"' : '');?> >
+							<a href="<?php echo $link_url; ?>" class="<?php echo $readon_class; ?>" itemprop="url" <?php echo ($lead_link_to_popup ? 'onclick="var url = this.getAttribute(\'href\')+\''.$_tmpl_.'\'; fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'\'}); return false;"' : '');?> >
 								<?php
 								$read_more_text = $item->params->get('readmore')  ?  $item->params->get('readmore') : \Joomla\CMS\Language\Text::sprintf('FLEXI_READ_MORE', $item->title);
 								echo $readon_type === 1

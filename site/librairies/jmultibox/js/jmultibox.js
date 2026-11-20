@@ -213,6 +213,7 @@ Base script. Great!!
 			previousButton.removeClass('MultiBoxButtonDisabled');
 			nextButton.removeClass('MultiBoxButtonDisabled');
 			opened = false;
+			document.removeEventListener('keydown', onKeyDown);
 		};
 
 		var getOpenClosePos = function(el) {
@@ -284,6 +285,7 @@ Base script. Great!!
 				}
 				else {
 					opened = true;
+					document.addEventListener('keydown', onKeyDown);
 
 					if (options.useOverlay) {
 						alert(options.path+'overlays/'+options.overlaybg);
@@ -340,7 +342,15 @@ Base script. Great!!
 			};
 		};
 
+		var onKeyDown = function(event) {
+			if (event.key === 'Escape' && opened === true) {
+				event.preventDefault();
+				close();
+			}
+		};
+
 		var close = function() {
+			document.removeEventListener('keydown', onKeyDown);
 			//Hide overlay
 			if (options.useOverlay) {
 				$('.vegas-overlay').animate({

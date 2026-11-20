@@ -8,7 +8,7 @@ if(!joomla)throw Error('Set FLEXI_TEST_JOOMLA to a Joomla 6 installation.');
  const browser=await chromium.launch({headless:true}), results=[];
  try{
   for(const width of [1440,768,390]){
-   const page=await browser.newPage({viewport:{width,height:900}}), errors=[];
+   const page=await browser.newPage({viewport:{width,height:900},hasTouch:true}), errors=[];
    page.on('pageerror',e=>errors.push(e.message));
    await page.route('https://fixture.invalid/**',r=>r.fulfill({contentType:'text/html',body:'<button id="open">Open</button><form id="adminForm"><div id="content" style="display:none"><label for="value">Value</label><input id="value" name="value" value="Preserve me"></div></form><div id="system-message-container"></div>'}));
    await page.goto('https://fixture.invalid/');
@@ -40,6 +40,24 @@ if(!joomla)throw Error('Set FLEXI_TEST_JOOMLA to a Joomla 6 installation.');
    assert.match(await page.locator('.joomla-dialog-alert').innerText(),/Message <literal>/);
    await page.locator('.joomla-dialog-alert [data-button-ok]').click();
    await page.waitForFunction(()=>window.alertClosed);
+   await page.route('https://fixture.invalid/bootstrap/**', route => route.fulfill({contentType:'text/javascript',body:fs.readFileSync(path.join(joomla,'media/vendor/bootstrap/js',path.basename(new URL(route.request().url()).pathname)))}));
+   await page.evaluate(async () => { await import('/bootstrap/popover.js'); });
+   await page.evaluate(() => {
+    document.body.insertAdjacentHTML('beforeend','<div style="padding:80px"><button type="button" id="help" class="hasTooltip" title="Helpful text">Help</button><button type="button" id="second-help" class="hasTooltip" title="Another tip">Other help</button><input id="outside"></div>');
+    fc_initTooltips(null, document.body);
+   });
+   const help=page.locator('#help');
+   await help.tap();await page.locator('.tooltip.show').waitFor();
+   await page.locator('#outside').tap();await page.locator('.tooltip.show').waitFor({state:'detached'});
+   // A synthetic hover after a touch scroll must not open another control.
+   await page.locator('#second-help').dispatchEvent('mouseover');
+   assert.equal(await page.locator('.tooltip.show').count(),0);
+   await help.tap();await page.locator('.tooltip.show').waitFor();
+   await page.keyboard.press('Escape');await page.locator('.tooltip.show').waitFor({state:'detached'});
+   await page.locator('#outside').click();await help.hover();await page.locator('.tooltip.show').waitFor();
+   await page.mouse.move(1,1);await page.locator('.tooltip.show').waitFor({state:'detached'});
+   await help.focus();await page.locator('.tooltip.show').waitFor();
+   await page.locator('#outside').focus();await page.locator('.tooltip.show').waitFor({state:'detached'});
    assert.deepEqual(errors,[]);assert.equal(await page.evaluate(()=>typeof jQuery),'undefined');
    results.push({width,status:'pass'});await page.close();
   }

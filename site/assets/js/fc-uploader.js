@@ -101,14 +101,16 @@ window.FlexiUploader = (() => {
           errors.push(file.name + ': ' + translate('FLEXI_UPLOAD_TYPE_REJECTED'));
           continue;
         }
+        // Selecting a replacement in a single-value field releases the old slot,
+        // including a server-rejected file. Keep it until a new valid choice is made.
+        if (this.options.upload_maxcount === 1) {
+          for (const entry of this.files.filter(entry => ['done', 'failed'].includes(entry.state))) this.remove(entry);
+        }
         if (this.files.some(entry => entry.state !== 'done' && entry.file.name === file.name &&
             entry.file.size === file.size && entry.file.lastModified === file.lastModified)) continue;
         if (this.options.upload_maxcount && this.files.filter(entry => entry.state !== 'done').length >= this.options.upload_maxcount) {
           errors.push(file.name + ': ' + translate('FLEXI_UPLOAD_LIMIT_REACHED'));
           continue;
-        }
-        if (this.options.upload_maxcount === 1) {
-          for (const entry of this.files.filter(entry => entry.state === 'done')) this.remove(entry);
         }
         const id = 'fc-upload-' + Array.from(crypto.getRandomValues(new Uint32Array(4)), n => n.toString(16).padStart(8, '0')).join('');
         const entry = {id, file, name: file.name, state: 'queued', getNative: () => file};
@@ -118,7 +120,7 @@ window.FlexiUploader = (() => {
       }
       this.message.textContent = errors.join(' ');
       this.refresh();
-      if (this.options.autostart_on_select) this.start();
+      if (this.options.autostart_on_select) this.start(false);
     }
 
     addRow(entry) {
@@ -196,8 +198,9 @@ window.FlexiUploader = (() => {
       this.refresh();
     }
 
-    async start() {
-      if (this.running || this.disposed || !this.files.some(entry => entry.state !== 'done')) return;
+    async start(retryFailed = true) {
+      const pending = entry => entry.state === 'queued' || (retryFailed && entry.state === 'failed');
+      if (this.running || this.disposed || !this.files.some(pending)) return;
       this.running = true;
       this.refresh();
       const status = this.container.parentElement.querySelector('input.validate-fcuploader');
@@ -207,7 +210,7 @@ window.FlexiUploader = (() => {
       }
       try {
         for (const entry of [...this.files]) {
-          if (this.disposed || entry.state === 'done' || !this.files.includes(entry)) continue;
+          if (this.disposed || !pending(entry) || !this.files.includes(entry)) continue;
           await this.upload(entry);
         }
         if (!this.disposed && this.options.refresh_on_complete && this.files.length &&

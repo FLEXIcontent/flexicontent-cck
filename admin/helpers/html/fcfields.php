@@ -61,7 +61,7 @@ abstract class JHtmlFcfields extends JHtmlFcbase
 		{
 			$link = '';
 			//$onclick = 'var url = jQuery(this).attr(\'data-href\'); var the_dialog = fc_showAsDialog(jQuery(\'#fieldgroup_fields_list_' . $row->id . '\'), null, null, null, {\'title\': Joomla.JText._(\'FLEXI_EDIT\')})';
-			$onclick = 'jQuery(\'#fieldgroup_fields_list_' . $row->id . '\').slideToggle()';
+			$onclick = 'fc_toggle_box_via_btn(\'fieldgroup_fields_list_' . $row->id . '\', this)';
 
 			$icon_tip       = flexicontent_html::getToolTip('This field is a fieldgroup', '', 1, 1);
 			$icon_class     = 'icon-stack';
@@ -181,7 +181,7 @@ abstract class JHtmlFcfields extends JHtmlFcbase
 				}
 
 				return '
-				<span class="btn btn-primary" onclick="jQuery(\'#fieldgroup_fields_list_' . $row->id . '\').slideToggle();">'
+				<span class="btn btn-primary" onclick="fc_toggle_box_via_btn(\'fieldgroup_fields_list_' . $row->id . '\', this);">'
 					. ucfirst($row_type) . ' ' . \Joomla\CMS\Language\Text::_('FLEXI_FIELDS') . '
 				</span>
 				<div id="fieldgroup_fields_list_' . $row->id . '" style="display: none; position: absolute; width: 200px;">

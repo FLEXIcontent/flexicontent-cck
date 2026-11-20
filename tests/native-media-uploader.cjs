@@ -24,8 +24,9 @@ const {chromium} = require('playwright');
       }
       const payload = route.request().postDataBuffer().toString('latin1');
       const field = key => payload.match(new RegExp('name="' + key + '"\\r\\n\\r\\n([^\\r]+)'))?.[1];
-      const request = {chunk: Number(field('chunk')), chunks: Number(field('chunks')), uploadId: field('upload_id')};
+      const request = {chunk: Number(field('chunk')), chunks: Number(field('chunks')), uploadId: field('upload_id'), name: field('name')};
       requests.push(request);
+      if (request.name === 'rejected.txt') return route.fulfill({status: 415, json: {error: {message: 'Rejected type'}}});
       if (request.chunk === 1 && failSecondChunk) {
         failSecondChunk = false;
         await page.locator('.fc_uploader_status_box').evaluate(box => {
@@ -33,7 +34,7 @@ const {chromium} = require('playwright');
         });
         return route.fulfill({status: 500, json: {jsonrpc: '2.0', error: {message: 'Temporary error'}}});
       }
-      return route.fulfill({json: {jsonrpc: '2.0', data: request.chunk === 1 ? {id: 87, filename: 'test.txt'} : null}});
+      return route.fulfill({json: {jsonrpc: '2.0', data: request.chunk === request.chunks - 1 ? {id: 87, filename: request.name} : null}});
     });
     await page.goto('https://fixture.invalid/');
     await page.evaluate(() => {
@@ -43,6 +44,18 @@ const {chromium} = require('playwright');
     for (const file of ['fc-upload-transport.js', 'fc-uploader.js']) {
       await page.addScriptTag({path: path.join(__dirname, '..', 'site', 'assets', 'js', file)});
     }
+    const sizes = await page.evaluate(async () => {
+      const canvas = document.createElement('canvas'); canvas.width = 400; canvas.height = 200;
+      canvas.getContext('2d').fillRect(0, 0, 400, 200);
+      const file = new File([await new Promise(resolve => canvas.toBlob(resolve, 'image/png'))], 'image.png', {type:'image/png'});
+      const result = [];
+      for (const upload_method of [0, 1]) {
+        const blob = await FlexiUploadTransport.resize(file, {resize_on_upload:1, upload_max_w:80, upload_max_h:80, upload_method, upload_quality:90});
+        const bitmap = await createImageBitmap(blob); result.push([bitmap.width, bitmap.height]); bitmap.close();
+      }
+      return result;
+    });
+    assert.deepEqual(sizes, [[80, 40], [80, 80]], 'Honor the configured Scale and Crop processing methods');
     await page.evaluate(() => {
       window.owner = new FlexiUploader.Uploader({
         tag_id: 'fixture_', action: '/upload', upload_maxcount: 1, autostart_on_select: true,
@@ -76,6 +89,15 @@ const {chromium} = require('playwright');
     assert.equal(requests[0].uploadId, requests[1].uploadId);
     assert.equal(requests[2].uploadId, requests[3].uploadId);
     assert.notEqual(requests[0].uploadId, requests[2].uploadId);
+    await input.setInputFiles({name: 'rejected.txt', mimeType: 'text/plain', buffer: Buffer.from('rejected')});
+    await page.waitForFunction(() => document.querySelector('.fc-native-upload-status').textContent === 'Rejected type');
+    const rejectedRequests = requests.length;
+    // A new selection replaces the failed single-file slot without retrying it.
+    await input.setInputFiles({name: 'replacement.txt', mimeType: 'text/plain', buffer: Buffer.from('valid')});
+    await page.waitForFunction(() => assigned.length === 2);
+    assert.equal(requests.length, rejectedRequests + 1);
+    assert.equal(requests.at(-1).name, 'replacement.txt');
+    assert.equal(await page.locator('.fc-native-upload-message').textContent(), '');
     assert.equal(await page.evaluate(() => typeof window.jQuery), 'undefined');
     await page.evaluate(() => owner.clearUploader(0));
     assert.equal(await input.count(), 0);

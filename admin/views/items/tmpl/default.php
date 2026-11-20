@@ -1650,9 +1650,10 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 \Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration('
 	function fc_edit_jarticle_modal_load( container )
 	{
-		if ( container.find("iframe").get(0).contentWindow.location.href.indexOf("view=articles") != -1 )
+		var frame = FlexiForm.element(container).querySelector("iframe");
+		if (frame && frame.contentWindow.location.href.indexOf("view=articles") !== -1)
 		{
-			container.dialog("close");
+			fc_closeDialog("fc_modal_popup_container");
 		}
 	}
 	function fc_edit_jarticle_modal_close()

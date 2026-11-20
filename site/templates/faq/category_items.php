@@ -123,7 +123,7 @@ if (!empty($this->items) && ($this->params->get('cols_placement', 1)==1))
 	flexicontent_html::loadFramework('imagesLoaded');
 	
 	$js = "
-		jQuery(document).ready(function(){
+		FlexiForm.ready(function(){
 	";
 	if ($this->params->get('cols_placement', 1)==1) {
 		$js .= "

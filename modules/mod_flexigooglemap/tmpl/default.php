@@ -17,7 +17,6 @@ use Joomla\CMS\Uri\Uri;
 defined('_JEXEC') or die('Restricted access');
 
 
-flexicontent_html::loadFramework('jQuery');
 flexicontent_html::loadFramework('flexi-lib');
 
 // Check if having at least 1 location, otherwise skip showing the map
@@ -99,9 +98,9 @@ if ($info_popup <= 1) {
 		? 'module_' . $module->id . '_window'   // For "_modal" case we use same (named) window for all links
 		: $marker_clicktarget;
 	if ($marker_clicktarget === '_popup') {
-		$onclick_js  = 'fc_field_dialog_handle_' . $module->id . ' = fc_showDialog(jQuery(this).data(\'content_link\'), \'fc_modal_popup_container\', 0, ' . $windows_width . ', ' . $windows_height . ', 0, {title: \'\'}); return false;';
+		$onclick_js  = 'fc_field_dialog_handle_' . $module->id . ' = fc_showDialog(this._fcContentLink, \'fc_modal_popup_container\', 0, ' . $windows_width . ', ' . $windows_height . ', 0, {title: \'\'}); return false;';
 	} else {
-		$onclick_js  = 'window.open(jQuery(this).data(\'content_link\'), \'' . $_target_win . '\', \'toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=' . $windows_width . ',height=' . $windows_height . '\'); return false;';
+		$onclick_js  = 'window.open(this._fcContentLink, \'' . $_target_win . '\', \'toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=' . $windows_width . ',height=' . $windows_height . '\'); return false;';
 	}
 
 	// For case of link to item views we will add tmpl=component to the URL
@@ -425,7 +424,7 @@ CSS;
 	function fc_MapMad_geolocateMe_<?= $module->id; ?>(map)
 	{
 		let output     = document.getElementById('map_mssg_box_<?= $module->id; ?>');
-		let zoom_level = jQuery('select.geo-locate-zoom-level-<?= $module->id; ?>').val();
+		let zoom_level = document.querySelector('select.geo-locate-zoom-level-<?= $module->id; ?>')?.value;
 		zoom_level     = parseInt(zoom_level) ? parseInt(zoom_level) : <?php echo $geo_locate_zoom_def; ?>;
 
 		if (!navigator.geolocation) {
@@ -603,7 +602,7 @@ CSS;
 				marker._icon_url = locations[i][3] == '__default__' ? '<?php echo $defaultMarkerURL ?: $defaut_icon_url; ?>' : locations[i][3];
 				marker._map_ref = map;
 
-				jQuery(marker).data('content_link', mapItems[i].content_link);
+				marker._fcContentLink = mapItems[i].content_link;
 				if (<?php echo strlen($onclick_js) ? 1 : 0 ?>)
 					google.maps.event.addListener(marker, 'click', fc_MapMod_on_marker_click_<?= $module->id; ?>);
 				else {
@@ -862,7 +861,7 @@ CSS;
 				marker._map_ref = map;
 				//marker.setOpacity(<?php echo $marker_opacity; ?>);
 
-				jQuery(marker).data('content_link', mapItems[i].content_link);
+				marker._fcContentLink = mapItems[i].content_link;
 				if (<?php echo strlen($onclick_js) ? 1 : 0 ?>)
 					marker.on('click', fc_MapMod_on_marker_click_<?= $module->id; ?>);
 

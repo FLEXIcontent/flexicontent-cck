@@ -296,7 +296,7 @@ abstract class JHtmlFcbase
 		}
 		elseif (!empty($config['useModal']))
 		{
-			$attrs .= ' onclick="' . 'var url = jQuery(this).attr(\'data-href\'); ' .
+			$attrs .= ' onclick="' . 'var url = this.getAttribute(\'data-href\'); ' .
 				'var the_dialog = fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, ' . \Joomla\CMS\Language\Text::_($config['useModal']->onclosefunc) . ', ' .
 				'{title:\'' . \Joomla\CMS\Language\Text::_($config['useModal']->title,  true) . '\', loadFunc: ' . \Joomla\CMS\Language\Text::_($config['useModal']->onloadfunc) . '}); return false;' .
 			'"';
@@ -394,7 +394,7 @@ abstract class JHtmlFcbase
 		if ($target === '__modal__')
 		{
 			$edit_title = htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', true), ENT_QUOTES, 'UTF-8');
-			$target_attr = ' onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'' . $edit_title . '\'}); return false;"';
+			$target_attr = ' onclick="var url = this.getAttribute(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title: \'' . $edit_title . '\'}); return false;"';
 		}
 		else
 		{
@@ -469,7 +469,7 @@ abstract class JHtmlFcbase
 			'icon_class' => (!empty($config->icon_class) ? $config->icon_class: 'icon-cog'),
 			'custom_txt' => (!empty($config->custom_txt) ? $config->custom_txt : ''),
 			'custom_tip' => (!empty($config->custom_tip) ? $config->custom_tip : \Joomla\CMS\Language\Text::_('FLEXI_MANUAL_ORDER')),
-			'click_attr' => (!empty($config->click_attr) ? $config->click_attr : 'jQuery(\'.fcitem_order_no\').slideToggle();'),
+			'click_attr' => (!empty($config->click_attr) ? $config->click_attr : 'fc_toggle_box_via_btn(document.querySelectorAll(\'.fcitem_order_no\'), this);'),
 		);
 
 		return '

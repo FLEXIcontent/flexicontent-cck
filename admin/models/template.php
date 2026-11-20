@@ -205,6 +205,7 @@ class FlexicontentModelTemplate extends FCModelAdmin
 
 		// Store LESS configuration (less variables)
 		$this->storeLessConf($this->_folder, $this->_cfgname, $this->_type, $this->_config['attribs']);
+		flexicontent_tmpl::getTemplates($this->_folder, false);
 
 		return true;
 	}

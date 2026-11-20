@@ -147,8 +147,6 @@ abstract class JHtmlFcuploader
 			'refresh_on_complete' => (bool) $options['refresh_on_complete'],
 			'thumb_size_default' => (int) $options['thumb_size_default'],
 			'height_spare' => (int) $options['height_spare'],
-			'extensions' => $options['layout'] === 'image'
-				? array('jpg', 'jpeg', 'gif', 'png', 'webp', 'bmp', 'wbmp', 'ico', 'zip', 'avi') : array(),
 		);
 		// Register before field-ready callbacks auto-open the queue; DOM creation stays lazy.
 		$js = '
@@ -180,16 +178,14 @@ abstract class JHtmlFcuploader
 			return $uops[$conf_index];
 		}
 		
-		$uconf = new \Joomla\Registry\Registry();
-		$uconf->merge(\Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent'));
-
-		if (!empty($field))
-		{
-			$uconf->merge($field->parameters);
-		}
+		$uconf = flexicontent_upload::getUploadParams($field);
 
 		// Try field with upload_maxsize and resize_on_upload parameters
 		$u = array();
+		$u['extensions'] = array_values(array_unique(array_filter(preg_split('/\s*,\s*/', strtolower(
+			$uconf->get('upload_extensions', 'bmp,wbmp,csv,doc,docx,webp,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,txt,xcf,xls,xlsx,zip,ics')
+			. ',' . $uconf->get('ignore_extensions', '')
+		)))));
 		$u['upload_maxsize']   = (int) $uconf->get('upload_maxsize', 10000000);
 		$u['resize_on_upload'] = (int) $uconf->get('resize_on_upload', 1);
 
@@ -198,7 +194,7 @@ abstract class JHtmlFcuploader
 			$u['upload_max_w']   = (int) $uconf->get('upload_max_w', 4000);
 			$u['upload_max_h']   = (int) $uconf->get('upload_max_h', 3000);
 			$u['upload_quality'] = (int) $uconf->get('upload_quality', 95);
-			$u['upload_method']  = (int) $uconf->get('upload_method', 1);
+			$u['upload_method']  = (int) $uconf->get('upload_method', 0);
 		}
 
 		return $uops[$conf_index] = $u;

@@ -75,11 +75,12 @@ window.FlexiUploadTransport = (() => {
     const bitmap = await createImageBitmap(file, {imageOrientation: 'from-image'});
     try {
       if (bitmap.width <= width && bitmap.height <= height) return file;
-      const scale = options.upload_crop ? Math.max(width / bitmap.width, height / bitmap.height)
+      const crop = options.upload_crop ?? Number(options.upload_method) === 1;
+      const scale = crop ? Math.max(width / bitmap.width, height / bitmap.height)
         : Math.min(width / bitmap.width, height / bitmap.height);
       const canvas = document.createElement('canvas');
-      canvas.width = options.upload_crop ? width : Math.max(1, Math.round(bitmap.width * scale));
-      canvas.height = options.upload_crop ? height : Math.max(1, Math.round(bitmap.height * scale));
+      canvas.width = crop ? width : Math.max(1, Math.round(bitmap.width * scale));
+      canvas.height = crop ? height : Math.max(1, Math.round(bitmap.height * scale));
       const scaledWidth = bitmap.width * scale;
       const scaledHeight = bitmap.height * scale;
       canvas.getContext('2d').drawImage(bitmap, (canvas.width - scaledWidth) / 2,

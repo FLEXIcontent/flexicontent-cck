@@ -886,16 +886,16 @@ class plgFlexicontent_fieldsCore extends FCField
 					{
 						case 1:
 							$document->getWebAssetManager()->addInlineScript("
-										jQuery(document).ready(function(){
-											jQuery('#".$filter_ffid."').on('keydown keypress keyup', false);
+										FlexiForm.ready(function(){
+											document.getElementById('".$filter_ffid."')?.setAttribute('readonly', 'readonly');
 										});
 									");
 						break;
 						case 3:
 							$document->getWebAssetManager()->addInlineScript("
-										jQuery(document).ready(function(){
-											jQuery('#".$filter_ffid."1').on('keydown keypress keyup', false);
-											jQuery('#".$filter_ffid."2').on('keydown keypress keyup', false);
+										FlexiForm.ready(function(){
+											document.getElementById('".$filter_ffid."1')?.setAttribute('readonly', 'readonly');
+											document.getElementById('".$filter_ffid."2')?.setAttribute('readonly', 'readonly');
 										});
 									");
 						break;

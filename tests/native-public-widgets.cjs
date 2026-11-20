@@ -84,6 +84,24 @@ const {chromium} = require('playwright'), assert = require('node:assert/strict')
     const comparisons = await page.evaluate(() => window.comparisons.map(s => ({mode:s.options.mode, labels:s.options.showLabels, count:s.images.length, sizes:s.sizes})));
     assert.equal(comparisons.length,2); assert.equal(comparisons[0].mode,'vertical'); assert.equal(comparisons[0].labels,false); assert.equal(comparisons[0].count,2); assert.deepEqual(comparisons[1].sizes,[]);
     assert.equal(await page.evaluate(() => typeof jQuery), 'undefined'); assert.deepEqual(errors, []);
+    await load('site/assets/js/tabber-minimized.js');
+    await page.evaluate(() => {
+      document.body.innerHTML = '<div id="map-tabs" class="fctabber"><div class="tabbertab" title="First">First tab</div><div id="map-panel" class="tabbertab" title="Map"><div id="google-map" class="has_fc_google_maps_map"></div><div id="osm-map" class="has_fc_openstreet_map"></div></div></div>';
+      window.resizeEvents = [];
+      const map = {id:'actual-map-object'};
+      document.getElementById('google-map').google_maps_ref = map;
+      document.getElementById('osm-map').os_maps_ref = {invalidateSize(){resizeEvents.push('osm');}};
+      window.google = {maps:{event:{trigger(instance, event){if(instance !== map)throw Error('Map instance was converted to a string');resizeEvents.push(event);}}}};
+      window.mapTabs = new tabberObj({div:document.getElementById('map-tabs')});
+      resizeEvents.length = 0;
+    });
+    await page.getByRole('link',{name:'Map',exact:true}).click();
+    assert.deepEqual(await page.evaluate(()=>resizeEvents), ['resize','osm']);
+    await page.getByRole('link',{name:'First',exact:true}).click();
+    await page.evaluate(()=>{const el=document.getElementById('google-map');FlexiForm.data(el,'google_maps_ref',el.google_maps_ref);delete el.google_maps_ref;resizeEvents.length=0;});
+    await page.getByRole('link',{name:'Map',exact:true}).click();
+    assert.deepEqual(await page.evaluate(()=>resizeEvents), ['resize','osm']);
+    assert.deepEqual(errors, []);
     // A Joomla header must not intercept the legacy gallery's close control or backdrop.
     // Exercise hit testing with the shipped styles, including their normal load order.
     await page.setViewportSize({width:768,height:900});

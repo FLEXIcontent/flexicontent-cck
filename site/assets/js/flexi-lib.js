@@ -2275,11 +2275,56 @@
 		fc_bootstrapAttach(fc_initContainer(event, container_sel, reAddOnEvents, fc_initBootstrap));
 	}
 
+	const fc_openHelp = new Map();
+	let fc_touchHelp = false, fc_touchHelpOwner = null, fc_touchHelpWasOpen = false;
+	['Tooltip', 'Popover'].forEach(name => {
+		const type = name.toLowerCase();
+		document.addEventListener('show.bs.' + type, event => {
+			if (!event.target.matches('.hasTooltip, .hasPopover')) return;
+			// A touch-induced mouseenter can arrive after focus has scrolled the
+			// form. Only the help control actually tapped may open in that case.
+			if (fc_touchHelp && event.target !== fc_touchHelpOwner && document.activeElement !== event.target) {
+				event.preventDefault();
+				return;
+			}
+			fc_openHelp.set(event.target, name);
+		});
+		document.addEventListener('hidden.bs.' + type, event => fc_openHelp.delete(event.target));
+	});
+	function fc_dismissHelp(event)
+	{
+		fc_openHelp.forEach((name, owner) => {
+			const popup = document.getElementById(owner.getAttribute('aria-describedby'));
+			if (event.type === 'keydown' || (!owner.contains(event.target) && !popup?.contains(event.target))) {
+				window.bootstrap?.[name]?.getInstance(owner)?.hide();
+				fc_openHelp.delete(owner);
+			}
+		});
+	}
+	// Touch generates hover without a corresponding mouseleave on many devices.
+	// Dismiss help on an outside tap, focus move or Escape, including cloned fields.
+	document.addEventListener('pointerdown', event => {
+		fc_touchHelp = event.pointerType === 'touch';
+		fc_touchHelpOwner = fc_touchHelp ? event.target.closest('.hasTooltip, .hasPopover') : null;
+		fc_touchHelpWasOpen = fc_openHelp.has(fc_touchHelpOwner);
+		fc_dismissHelp(event);
+	}, true);
+	document.addEventListener('pointerup', event => {
+		if (event.pointerType === 'touch' && fc_touchHelpOwner?.contains(event.target)) {
+			const name = fc_touchHelpOwner.matches('.hasPopover') ? 'Popover' : 'Tooltip';
+			const instance = window.bootstrap?.[name]?.getInstance(fc_touchHelpOwner);
+			if (fc_touchHelpWasOpen) instance?.hide(); else instance?.show();
+		}
+	});
+	document.addEventListener('click', fc_dismissHelp);
+	document.addEventListener('focusin', fc_dismissHelp);
+	document.addEventListener('keydown', event => { if (event.key === 'Escape') fc_dismissHelp(event); });
+
 	function fc_initTooltips(event, container_sel, reAddOnEvents)
 	{
 		const box = fc_initContainer(event, container_sel, reAddOnEvents, fc_initTooltips);
 		[['Tooltip', '.hasTooltip'], ['Popover', '.hasPopover']].forEach(([name, selector]) => {
-			const options = {html: true, container: box, ...(name === 'Popover' ? {trigger: 'hover focus'} : {})};
+			const options = {html: true, container: box, trigger: 'hover focus'};
 			box.querySelectorAll(selector).forEach(el => {
 				const Native = window.bootstrap?.[name];
 				if (Native) Native.getOrCreateInstance(el, options);

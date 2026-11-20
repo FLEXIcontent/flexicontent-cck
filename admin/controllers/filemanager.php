@@ -1043,7 +1043,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		}
 
 		// Sanitize filename further and make unique
-		$params = null;
+		$params = flexicontent_upload::getUploadParams($field ?? null);
 		$err_text = null;
 		$filesize = $file['size'];
 		$filename_original = strip_tags($file['name']);  // Store original filename before sanitizing the filename

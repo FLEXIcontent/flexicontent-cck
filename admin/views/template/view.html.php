@@ -180,9 +180,6 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 		}
 
 
-		// Check that less files for all layouts of current template (=folder) exist and are up-to-date
-		$this->check_less_files($folder);
-
 		// Create / load layout parameters if not already done above
 		if (!is_object($layout->params))
 		{
@@ -192,10 +189,9 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 		}
 		// ... values applied at the template form file
 
-		// Load the template again but ... this time allow triggering less compiling if needed
-		flexicontent_tmpl::getTemplates($folder, $skip_less=false);
-
-		// Load language file (this will also load the template and also trigger less compiling)
+		// Viewing the editor must not regenerate CSS from saved/default parameters.
+		// The model compiles the layout after saving its LESS configuration.
+		// Loading translations has no compilation side effects.
 		FLEXIUtilities::loadTemplateLanguageFile($folder);
 
 		//print_r($layout);
@@ -208,7 +204,6 @@ class FlexicontentViewTemplate extends \Joomla\CMS\MVC\View\HtmlView
 		$this->user = $user;
 		$this->type = $type;
 		$this->folder = $folder;
-		$this->jssort = $jssort;
 		$this->positions = $positions;
 		$this->used = $used;
 		$this->fbypos = $fbypos;

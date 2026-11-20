@@ -25,7 +25,7 @@ jobs:
           curl --fail --location --output /tmp/joomla.tar.gz https://github.com/joomla/joomla-cms/releases/download/6.2.0/Joomla_6.2.0-Stable-Full_Package.tar.gz
           echo 'f7a4c3962c4a8682f5847ea9d47d2848f6eb475109805935c9e19a5c6511829d  /tmp/joomla.tar.gz' | sha256sum --check
           mkdir /tmp/joomla-browser-assets
-          tar -xzf /tmp/joomla.tar.gz -C /tmp/joomla-browser-assets media/system media/vendor/jquery media/templates/administrator/atum
+          tar -xzf /tmp/joomla.tar.gz -C /tmp/joomla-browser-assets media/system media/vendor/jquery media/vendor/bootstrap media/templates/administrator/atum
       - name: Run isolated browser regressions
         env:
           FLEXI_TEST_JOOMLA: /tmp/joomla-browser-assets

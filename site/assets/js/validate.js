@@ -246,7 +246,9 @@ var JFormValidator_FC = function () {
     if (invalid.length) {
       const errors = new Set();
       for (const el of invalid) {
-        const lbl = label(el), text = lbl?.textContent || F.data(el, 'label_text');
+        const lbl = label(el), copy = lbl?.cloneNode(true);
+        copy?.querySelectorAll('.fc-field-invalid').forEach(note => note.remove());
+        const text = copy?.textContent.trim() || F.data(el, 'label_text');
         if (lbl) F.show(lbl.closest('.control-group'));
         if (text) errors.add(F.text('JLIB_FORM_FIELD_INVALID') + text.replace('*', ''));
       }

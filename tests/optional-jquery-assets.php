@@ -32,6 +32,7 @@ namespace {
     $_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0';
     require __DIR__ . '/../site/classes/helpers/html.php';
     $framework = $argv[1] ?? 'fancybox'; $manual = ($argv[2] ?? '') === 'manual';
+    $defaults = ($argv[3] ?? '') === 'defaults';
     $document = new class {
         public array $events = [];
         public function addScript($url, ...$args) { $this->events[] = $url; }
@@ -47,10 +48,11 @@ namespace {
         public function enqueueMessage($text, $type) { throw new \RuntimeException($text); }
     };
     \Joomla\CMS\Component\ComponentHelper::$params = new \Joomla\Registry\Registry([
-        'select_lib_type' => 1, 'loadfw_jquery' => 2,
+        'select_lib_type' => $defaults ? 0 : 1, 'loadfw_jquery' => $defaults ? 1 : 2,
         'loadfw_' . strtolower(str_replace('-', '_', $framework)) => $manual ? 2 : 1,
     ]);
     flexicontent_html::loadFramework('form-utils');
+    flexicontent_html::loadFramework('jQuery');
     if (in_array('jquery', $document->events, true)) throw new \RuntimeException('Native page preloaded jQuery');
     $before = $document->events;
     flexicontent_html::loadFramework($framework);

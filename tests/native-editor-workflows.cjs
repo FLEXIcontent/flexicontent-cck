@@ -37,6 +37,16 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
     await page.waitForFunction(() => !!document.formvalidator);
   };
   const loadDependencies = page => page.addScriptTag({content: source('site/assets/js/flexi-lib.js')});
+  await test('Validation summary excludes inline error text from wrapping labels', async page => {
+    await form(page, '<label for="email">Address<input id="email" name="email" class="validate-email" value="aaaa@" data-error-mssg="This value is not valid"></label>');
+    await validate(page);
+    for (let attempt = 0; attempt < 2; attempt++) {
+      assert.equal(await page.evaluate(() => document.formvalidator.isValid(document.forms.adminForm)), false);
+      const summary = JSON.parse(await page.locator('#system-message-container').textContent());
+      assert.deepEqual(summary.error, ['JLIB_FORM_FIELD_INVALIDAddress']);
+      assert.equal(await page.locator('label .fc-field-invalid').count(), 1);
+    }
+  });
   await test('Native field groups keep paired values and restore an empty last row', async page => {
     const row = (index, left, right) => `<li class="fc-fieldgroup-collapsed" style="min-height:65px">
       <button type="button" class="fcfield-drag-handle">Drag</button>

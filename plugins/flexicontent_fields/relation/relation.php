@@ -304,7 +304,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 			$items_options_select[$n] = '';
 			foreach ($items_arr_v as $itemdata)
 			{
-				$itemtitle = (StringHelper::strlen($itemdata->title) > $maxtitlechars) ? StringHelper::substr($itemdata->title, 0, $maxtitlechars) . "..." : $itemdata->title;
+				$itemtitle = (StringHelper::strlen($itemdata->title) > $maxtitlechars) ? StringHelper::substr($itemdata->title, 0, $maxtitlechars) . '... (#' . (int) $itemdata->id . ')' : $itemdata->title;
 				if ($prepend_item_state)
 				{
 					$statestr = $state_shortname[$itemdata->state] ?? '';
@@ -1636,7 +1636,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 		{
 			if (!flexicontent_security::canViewItemState($itemdata, $user)) continue;
 			$itemtitle = StringHelper::strlen($itemdata->title) > $maxtitlechars
-				? StringHelper::substr($itemdata->title, 0, $maxtitlechars) . '...'
+				? StringHelper::substr($itemdata->title, 0, $maxtitlechars) . '... (#' . (int) $itemdata->id . ')'
 				: $itemdata->title;
 
 			$itemdata->state = (int) $itemdata->state;
@@ -2040,7 +2040,7 @@ class plgFlexicontent_fieldsRelation extends FCField
 		foreach ($items_arr as $itemdata)
 		{
 			$itemtitle = StringHelper::strlen($itemdata->title) > $maxtitlechars
-				? StringHelper::substr($itemdata->title, 0, $maxtitlechars) . '...'
+				? StringHelper::substr($itemdata->title, 0, $maxtitlechars) . '... (#' . (int) $itemdata->id . ')'
 				: $itemdata->title;
 			$append_field_text = [];
 			foreach ($append_field_ids as $append_field)

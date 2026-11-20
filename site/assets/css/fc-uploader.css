@@ -23,7 +23,9 @@
   min-width: 0;
 }
 
+#flexicontent .fc_file_uploader:has(> .fc-native-upload),
 .fc_file_uploader:has(> .fc-native-upload) {
+  width: 100%;
   max-width: 100%;
   min-width: 0;
 }

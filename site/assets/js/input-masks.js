@@ -60,9 +60,18 @@
     currency: {
       alias: 'numeric',
       prefix: '$ ',
+      placeholder: '',
       groupSeparator: ',',
       digits: 2,
-      digitsOptional: false,
+      // Keep the radix optional while typing so a full clear resets the caret.
+      // Pad to two decimals when leaving the field or submitting the form.
+      digitsOptional: true,
+      enforceDigitsOnBlur: true,
+      onBeforeWrite(event, buffer, caret, options) {
+        // Optional empty amounts must stay empty, rather than becoming 0.00.
+        const settings = this.unmaskedvalue() ? options : {...options, enforceDigitsOnBlur: false};
+        return Inputmask.prototype.aliases.numeric.onBeforeWrite.call(this, event, buffer, caret, settings);
+      },
       clearMaskOnLostFocus: true,
       removeMaskOnSubmit: true,
       unmaskAsNumber: false
@@ -72,7 +81,7 @@
       prefix: '\u20ac ',
       groupSeparator: ',',
       digits: 2,
-      digitsOptional: false,
+      digitsOptional: true,
       clearMaskOnLostFocus: false,
       removeMaskOnSubmit: true,
       unmaskAsNumber: false

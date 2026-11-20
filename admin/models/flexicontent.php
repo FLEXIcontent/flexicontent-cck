@@ -2485,7 +2485,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 				\Joomla\CMS\Language\Text::sprintf('FLEXI_ALERT_UPDATE_SINDEX_BASIC',
 					$dirty_basic,
 					' href="index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=basic" '.
-					' class="btn" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 420, function(){window.location.reload(false)}); return false;" '
+					' class="btn" onclick="var url = this.getAttribute(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 420, function(){window.location.reload(false)}); return false;" '
 				) . '
 			</div>';
 		}
@@ -2497,7 +2497,7 @@ class FlexicontentModelFlexicontent extends \Joomla\CMS\MVC\Model\BaseDatabaseMo
 				\Joomla\CMS\Language\Text::sprintf('FLEXI_ALERT_UPDATE_SINDEX_ADVANCED',
 					$dirty_advanced,
 					' href="index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced" ' .
-					' class="btn" onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 420, function(){window.location.reload(false)}); return false;" '
+					' class="btn" onclick="var url = this.getAttribute(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 550, 420, function(){window.location.reload(false)}); return false;" '
 				) . '
 			</div>';
 		}

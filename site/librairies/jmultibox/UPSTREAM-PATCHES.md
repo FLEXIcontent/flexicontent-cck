@@ -15,3 +15,8 @@ enlarging smaller images, and reserve space for borders, the outside close
 button and controls. `tests/multibox-layout.cjs` checks both shipped scripts with
 wide, tall and small images at 390, 768 and 1280 pixels. The gallery interaction
 API and non-image content dimensions are unchanged.
+
+Escape now closes an open viewer. The key listener is registered only while the
+viewer is open and removed on close/reset. Both shipped scripts are covered by
+the open, Escape, reopen sequence in `tests/multibox-layout.cjs`. Rebuild the
+minified script from `js/jmultibox.js` with Terser 5.44.1 when changing it.

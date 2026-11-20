@@ -1476,7 +1476,7 @@ class flexicontent_html
 		$view = $input->getCmd('view', 'flexicontent');
 		return FLEXI_J40GE && $app->isClient('administrator')
 			&& (($input->getCmd('option') === 'com_config' && $input->getCmd('component') === 'com_flexicontent') || in_array($input->getCmd('option'), ['com_modules', 'com_menus'], true) || ($view === 'flexicontent' && in_array($input->getCmd('layout', ''), ['', 'default'], true)) || in_array($view, array(
-				'item', 'items', 'itemcompare', 'itemelement', 'tagelement', 'field', 'fields', 'type', 'types', 'tag', 'tags', 'template', 'templates', 'category', 'categories', 'users', 'groups', 'stats', 'search', 'import', 'file', 'filemanager', 'fileselement',
+				'item', 'items', 'itemcompare', 'itemelement', 'tagelement', 'field', 'fields', 'type', 'types', 'tag', 'tags', 'template', 'templates', 'category', 'categories', 'users', 'groups', 'stats', 'search', 'import', 'file', 'filemanager', 'fileselement', 'review', 'reviews', 'mediadata', 'mediadatas', 'appsman', 'fccategoryelement', 'user', 'group',
 			), true));
 	}
 
@@ -1505,6 +1505,7 @@ class flexicontent_html
 				// Selected legacy widgets below request their own dependencies explicitly.
 				$useChoicesJs = (int) $cparams->get('select_lib_type', 0) === 1;
 				$load_jquery = !self::usesNativeAdminAssets()
+					&& !(FLEXI_J40GE && $app->isClient('site'))
 					&& ( (int) $cparams->get('loadfw_jquery', 1) === 1 || !$app->isClient('site') )
 					&& ! ( $app->isClient('site') && $useChoicesJs );
 
@@ -3807,7 +3808,7 @@ class flexicontent_html
 
 		$output = ' <a href="' . $link . '" class="' . $button_classes . '" data-placement="' . $tooltip_placement . '" title="' . $tooltip_title . '"
 		' . (!$menu_typeid
-			? 'onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 1200, 0, false, {\'title\': \''.flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_TYPE'), 2).'\'}); return false;" '
+			? 'onclick="var url = this.getAttribute(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 1200, 0, false, {\'title\': \''.flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_TYPE'), 2).'\'}); return false;" '
 			: '') . '
 		>' . $image.$caption . '</a>';
 
