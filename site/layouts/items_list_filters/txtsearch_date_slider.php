@@ -154,7 +154,7 @@ else
 	$rght_no = '2';  // sometimes unused
 
 	$js = "
-		jQuery(document).ready(function()
+		FlexiForm.ready(function()
 		{
 			var slider = document.getElementById('".$filter_ffid."_nouislider');
 
@@ -183,7 +183,7 @@ else
 			var showAsTooltips = " . ($showAsTooltips ? 1 : 0) . ";
 			var nodeHandles = slider.getElementsByClassName('noUi-handle'),
 				tooltips = [];
-			var mssgHandle = jQuery(slider).parent().find('.fcfilter_nouislider_txtbox').get(0),
+			var mssgHandle = slider.parentElement.querySelector('.fcfilter_nouislider_txtbox'),
 				txtBoxes = [];
 
 			// Add divs to the slider handles.
@@ -246,36 +246,13 @@ else
 					var max_len = 36;
 					setLabel(tooltips[handle], tooltip_text.length > max_len+4 ? tooltip_text.substring(0, max_len)+' ...' : tooltip_text);
 
-					var left  = jQuery(tooltips[handle]).closest('.noUi-origin').position().left;
-					var width = jQuery(tooltips[handle]).closest('.noUi-base').width();
-					
-					//window.console.log ('handle: ' + handle + ', left : ' + left + ', width : ' + width);
-					if (isSingle)
-					{
-						left<(50/100)*width ?
-							jQuery(tooltips[handle]).parent().removeClass('fc-left').addClass('fc-right') :
-							jQuery(tooltips[handle]).parent().removeClass('fc-right').addClass('fc-left');
-					}
-
-					else if (handle)
-					{
-						left<=(76/100)*width ?
-							jQuery(tooltips[handle]).parent().removeClass('fc-left').addClass('fc-right') :
-							jQuery(tooltips[handle]).parent().removeClass('fc-right').addClass('fc-left');
-						left<=(49/100)*width ?
-							jQuery(tooltips[handle]).parent().addClass('fc-bottom') :
-							jQuery(tooltips[handle]).parent().removeClass('fc-bottom');
-					}
-
-					else
-					{
-						left>=(24/100)*width ?
-							jQuery(tooltips[handle]).parent().removeClass('fc-right').addClass('fc-left') :
-							jQuery(tooltips[handle]).parent().removeClass('fc-left').addClass('fc-right');
-						left>=(51/100)*width ?
-							jQuery(tooltips[handle]).parent().addClass('fc-bottom') :
-							jQuery(tooltips[handle]).parent().removeClass('fc-bottom');
-					}
+                    const base = tooltips[handle].closest('.noUi-base').getBoundingClientRect();
+                    const left = tooltips[handle].closest('.noUi-origin').getBoundingClientRect().left - base.left;
+                    const width = base.width;
+                    const right = isSingle ? left < .5 * width : handle ? left <= .76 * width : left < .24 * width;
+                    tooltips[handle].parentElement.classList.toggle('fc-right', right);
+                    tooltips[handle].parentElement.classList.toggle('fc-left', !right);
+                    tooltips[handle].parentElement.classList.toggle('fc-bottom', !isSingle && (handle ? left <= .49 * width : left >= .51 * width));
 				}
 				else
 				{
@@ -288,10 +265,8 @@ else
 			// Handle form autosubmit
 			slider.noUiSlider.on('change', function()
 			{
-				var slider = jQuery('#".$filter_ffid."_nouislider');
-				var jform  = slider.closest('form');
-				var form   = jform.get(0);
-				adminFormPrepare(form, parseInt(jform.attr('data-fc-autosubmit')));
+                const form = slider.closest('form');
+                if (form) adminFormPrepare(form, parseInt(form.dataset.fcAutosubmit) || 0);
 			});
 			
 			input1.addEventListener('change', function()

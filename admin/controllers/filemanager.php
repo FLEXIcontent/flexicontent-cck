@@ -860,14 +860,16 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			// Create name of the unique temporary filename to use for concatenation of the chunks, or get the filename from session
 			$fileName = $this->input->get('filename', '', 'string');
 
-			$fileName_tmp = $app->getUserState($fileName, date('Y_m_d_') . uniqid());
+			$uploadId = $this->input->post->getString('upload_id', '');
+			$stateKey = preg_match('/^[a-f0-9]{32}$/D', $uploadId) ? 'com_flexicontent.upload.' . $uploadId : $fileName;
+			$fileName_tmp = $app->getUserState($stateKey, date('Y_m_d_') . uniqid());
 
 			// The state key is the client-sent file name, so only use a value with the form given below
 			if (!is_string($fileName_tmp) || !preg_match('/^\d{4}_\d{2}_\d{2}_[0-9a-f]{13}$/D', $fileName_tmp))
 			{
 				$fileName_tmp = date('Y_m_d_') . uniqid();
 			}
-			$app->setUserState($fileName, $fileName_tmp);
+			$app->setUserState($stateKey, $fileName_tmp);
 			$filePath_tmp = $targetDir . DIRECTORY_SEPARATOR . $fileName_tmp;
 
 			// CREATE tmp file inside the Joomla temporary folder, but if this FAILS, then CREATE tmp file inside SERVER tmp directory
@@ -933,7 +935,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			}
 
 			// Clear the temporary filename, from user state
-			$app->setUserState($fileName, null);
+			$app->setUserState($stateKey, null);
 
 			// Cleanup left-over files
 			if (file_exists($targetDir))
@@ -945,7 +947,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 						continue;
 					}
 
-					if (time() - $fileInfo->getCTime() >= 60)
+					if (time() - $fileInfo->getMTime() >= 600)
 					{
 						unlink($fileInfo->getRealPath());
 					}
@@ -1041,7 +1043,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 		}
 
 		// Sanitize filename further and make unique
-		$params = null;
+		$params = flexicontent_upload::getUploadParams($field ?? null);
 		$err_text = null;
 		$filesize = $file['size'];
 		$filename_original = strip_tags($file['name']);  // Store original filename before sanitizing the filename

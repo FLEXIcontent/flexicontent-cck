@@ -7,6 +7,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 use Joomla\CMS\Language\Text;
+flexicontent_html::loadFramework('flexi-lib');
 
 $app    = \Joomla\CMS\Factory::getApplication();
 $db     = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
@@ -139,7 +140,7 @@ $csvLink = htmlspecialchars($base, ENT_QUOTES, 'UTF-8') . '&amp;order=' . $order
 
 	<?php if ($canPurge && $total) : ?>
 	<form id="fclog-purge-form" action="index.php?option=com_flexicontent&amp;view=search&amp;layout=logs&amp;tmpl=component" method="post" style="display: none;"
-		onsubmit="return confirm('<?php echo htmlspecialchars(Text::_('FLEXI_SEARCH_LOG_PURGE_CONFIRM'), ENT_QUOTES, 'UTF-8'); ?>');">
+		onsubmit="return FlexiForm.confirmSubmit(this, <?php echo htmlspecialchars(json_encode(Text::_('FLEXI_SEARCH_LOG_PURGE_CONFIRM')), ENT_QUOTES, 'UTF-8'); ?>, event);">
 		<input type="hidden" name="purge" value="1" />
 		<?php echo \Joomla\CMS\HTML\HTMLHelper::_('form.token'); ?>
 	</form>

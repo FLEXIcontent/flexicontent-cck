@@ -163,172 +163,85 @@ if (!@$attributes['skipparams'])
 		$ext_option = 'com_flexicontent';
 		$ext_view   = $view;
 		$doc 	= \Joomla\CMS\Factory::getApplication()->getDocument();
-		$js 	= "
-var ilayout_names = ['".$lays."'];
+		$options = json_encode([
+			'layouts' => array_column($tmpls, 'name'),
+			'view' => $ext_view, 'option' => $ext_option, 'id' => (int) $pk,
+			'token' => \Joomla\CMS\Session\Session::getFormToken(),
+			'loading' => \Joomla\CMS\Language\Text::_('FLEXI_LOADING'),
+			'label' => \Joomla\CMS\Language\Text::_('FLEXI_PARAMETERS_THEMES_SPECIFIC'),
+			'active' => (string) $value,
+		], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+		$js = <<<JS
+(function(config) {
+	let request;
+	function getPanel(name) {
+		const target = document.getElementById(name + '-attribs-options');
+		if (!target) return null;
+		const panel = target.nextElementSibling || target;
+		const header = panel === target ? target.previousElementSibling : target;
+		if (!panel.id) panel.id = name + '-attribs-options-panel';
+		return {panel, header, wrapper: panel.parentElement, link: header?.querySelector('a')};
+	}
 
-function ilayout_disablePanel(element)
-{
-	var panel_header_id = element+'-attribs-options',
-		panel_id = panel_header_id + '-panel';
-	
-	var el,
-		panel_header = jQuery('#'+panel_header_id),
-		panel = panel_header.next();
-	
-	if (!panel.length)
-	{
-		panel_id = panel_header_id;
-		panel_header_id = '';
-
-		panel = jQuery('#'+panel_id),
-		panel_header = panel.prev();
-
-		if (!panel.length)
-		{
-			return;
+	window.ilayout_activatePanel = async function(active) {
+		request?.abort();
+		for (const name of config.layouts) {
+			if (name === active) continue;
+			const box = getPanel(name);
+			if (!box || box.wrapper.classList.contains('pane-disabled')) continue;
+			box.panel.querySelectorAll('textarea:enabled, select:enabled, input[type=radio]:enabled:checked, input[type=checkbox]:enabled:checked, input:not([type=button]):not([type=radio]):not([type=checkbox]):enabled')
+				.forEach(input => { input.disabled = true; input.classList.add('fclayout_disabled_element'); });
+			box.wrapper.classList.add('pane-disabled');
+			FlexiForm.show(box.wrapper, false);
 		}
-	}
-
-	if (panel.parent().hasClass('pane-disabled'))
-	{
-		return;
-	}
-
-	var form_fields_active = panel.find('textarea:enabled, select:enabled, input[type=\"radio\"]:enabled:checked, input[type=\"checkbox\"]:enabled:checked, input:not(:button):not(:radio):not(:checkbox):enabled');
-	form_fields_active.each(function(index)
-	{
-		el = jQuery(this);
-		//if ( el.is(':disabled') ) return;  // no need, because above we selected only enabled elements
-		el.addClass('fclayout_disabled_element');
-		el.attr('disabled', 'disabled');
-	});
-	
-	var panel_header_link = panel.prev().find('a');
-
-	panel.parent().addClass('pane-disabled').hide();
-}
-
-function ilayout_loadPanel(element)
-{
-	var panel_header_id = element+'-attribs-options',
-		panel_id = panel_header_id + '-panel';
-	
-	var el,
-		panel_header = jQuery('#'+panel_header_id),
-		panel = panel_header.next();
-	
-	if (!panel.length)
-	{
-		panel_id = panel_header_id;
-		panel_header_id = '';
-
-		panel = jQuery('#'+panel_id),
-		panel_header = panel.prev();
-
-		if (!panel.length)
-		{
-			return;
-		}
-	}
-
-	var panel_header_link = panel_header.find('a');
-	if (!panel.attr('id'))
-	{
-		panel.attr('id', panel_id);
-	}
-
-	if (panel.closest('.fc_preloaded').length)
-	{
-		//window.console.log('Found preloaded panel, using it: ' + panel_id);
-
-		panel.closest('.fc_preloaded').removeClass('fc_preloaded');
-	 	setTimeout(function(){
-			if (panel_header_link.hasClass('collapsed') || panel_header.hasClass('pane-toggler'))
-			{
-				//window.console.log('clicking to open: ' + panel.attr('id'));
-				// This does not work inside non-focus TAB, and causes options to stay closed, so we disabled auto-opening the slider ...
-				//panel_header_link.hasClass('collapsed') ? panel_header_link.trigger('click') : panel_header.trigger('click');
-			}
-		}, 300);
-		return;
-	}
-
-	// Add LOADING animation into the panel header, and show outer box that contains the panel header and the panel
-	var _loading_img = '<img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" style=\"vertical-align: middle;\">';
-	panel_header_link.html('<span><span class=\"btn\"><i class=\"icon-edit\"><\/i>'+(panel.hasClass('fc_layout_loaded') ? '".\Joomla\CMS\Language\Text::_( 'FLEXI_REFRESHING' )."' : '".\Joomla\CMS\Language\Text::_( 'FLEXI_LOADING' )."')+' ... '+_loading_img+'<\/span><\/span>');
-	panel.parent().removeClass('pane-disabled').show();
-
-	//window.console.log('Server call to load panel : ' + element);
-
-	// Re-enabled an already loaded panel, (avoid re-downloading which will cause modified parameters to be lost)
-	if (panel.hasClass('fc_layout_loaded'))
-	{
-	 	panel.find('.fclayout_disabled_element').removeAttr('disabled').removeClass('fclayout_disabled_element');
-	 	setTimeout(function(){
-			panel_header_link.html('<span><span class=\"btn\"><i class=\"icon-edit\"><\/i>".\Joomla\CMS\Language\Text::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ).": '+element+'<\/span><\/span>');
-
-			if (panel_header_link.hasClass('collapsed') || panel_header.hasClass('pane-toggler'))
-			{
-				//window.console.log('clicking to open: ' + panel.attr('id'));
-				panel_header_link.hasClass('collapsed') ? panel_header_link.trigger('click') : panel_header.trigger('click');
-			}
-		}, 300);
-	}
-	
-	// (AJAX) Retrieve layout parameters for the selected template
-	else
-	{
-		jQuery.ajax({
-			type: 'GET',
-			url: 'index.php?option=com_flexicontent&task=templates.getlayoutparams&ext_view=".$ext_view."&ext_option=".$ext_option."&ext_name='+element+'&ext_id=".$pk."&layout_name=item&ext_type=templates&directory='+element+'&format=raw&" . \Joomla\CMS\Session\Session::getFormToken() . "=1',
-			success: function(str)
-			{
-				panel.addClass('fc_layout_loaded');
-
-				// Initialize JS and CSS of the layout
-				fc_initDynamicLayoutJsCss(panel_id, ['subform-row-add'], str);
-
-				panel_header_link.html('<span><span class=\"btn\"><i class=\"icon-edit\"><\/i>".\Joomla\CMS\Language\Text::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ).": '+element+'<\/span><\/span>');
-
-				if (panel_header_link.hasClass('collapsed') || panel_header.hasClass('pane-toggler'))
-				{
-					//window.console.log('clicking to open: ' + panel.attr('id'));
-					panel_header_link.hasClass('collapsed') ? panel_header_link.trigger('click') : panel_header.trigger('click');
-				}
-			}
+		FlexiForm.show(document.getElementById('__content_type_default_layout__'), !active);
+		const box = getPanel(active);
+		if (!box) return;
+		box.wrapper.classList.remove('pane-disabled');
+		FlexiForm.show(box.wrapper);
+		box.panel.querySelectorAll('.fclayout_disabled_element').forEach(input => {
+			input.disabled = false;
+			input.classList.remove('fclayout_disabled_element');
 		});
-	}
-}
-
-
-function ilayout_activatePanel(active_layout_name)
-{
-	var inactives = jQuery.grep(ilayout_names, function( layout_name, index )
-	{
-		return layout_name != active_layout_name;
-	});
-
-	for (var i = 0; i < inactives.length; i++)
-	{
-		ilayout_disablePanel(inactives[i]);
-	}
-
-	if (active_layout_name)
-	{
-		ilayout_loadPanel(active_layout_name);
-		jQuery('#__content_type_default_layout__').hide();
-	}
-	else
-	{
-		jQuery('#__content_type_default_layout__').show();
-	}
-}
-
-
-jQuery(document).ready(function() {
-	ilayout_activatePanel('".$value."');
-});
-";
+		const preload = box.panel.closest('.fc_preloaded');
+		if (preload) {
+			preload.classList.remove('fc_preloaded');
+			box.panel.classList.add('fc_layout_loaded');
+			return;
+		}
+		if (!box.panel.classList.contains('fc_layout_loaded')) {
+			const current = request = new AbortController();
+			box.panel.setAttribute('aria-busy', 'true');
+			if (box.link) box.link.textContent = config.loading;
+			const url = new URL('index.php', document.baseURI);
+			url.search = new URLSearchParams({
+				option: 'com_flexicontent', task:'templates.getlayoutparams', ext_view: config.view,
+				ext_option: config.option, ext_name: active, ext_id: config.id, layout_name: 'item',
+				ext_type: 'templates', directory: active, format: 'raw', [config.token]: '1'
+			});
+			try {
+				const response = await fetch(url, {credentials:'same-origin', signal:current.signal});
+				if (!response.ok || response.redirected) throw Error(response.statusText);
+				const html = await response.text();
+				if (current.signal.aborted) return;
+				fc_initDynamicLayoutJsCss(box.panel.id, ['subform-row-add'], html);
+				box.panel.classList.add('fc_layout_loaded');
+			} catch (error) {
+				if (!current.signal.aborted) Joomla.renderMessages({error:[error.message || FlexiForm.text('JERROR_AN_ERROR_HAS_OCCURRED')]});
+				return;
+			} finally {
+				if (request === current) box.panel.removeAttribute('aria-busy');
+				if (box.link) box.link.textContent = config.label + ' ' + active;
+			}
+		}
+		if (box.link?.classList.contains('collapsed')) box.link.click();
+		else if (box.header?.classList.contains('pane-toggler')) box.header.click();
+	};
+	FlexiForm.ready(() => window.ilayout_activatePanel(config.active));
+})({$options});
+JS;
+		flexicontent_html::loadFramework('flexi-lib');
+		$doc->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/assets/js/color-input.js', array('version' => 'auto'), array('defer' => true));
 		$doc->addScriptDeclaration($js);
 }
 		

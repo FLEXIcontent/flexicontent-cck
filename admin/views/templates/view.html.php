@@ -212,7 +212,7 @@ class FlexicontentViewTemplates extends FlexicontentViewBaseRecords
 			$btn_icon = 'icon-download';
 			$btn_name = 'download';
 			$btn_task = 'appsman.exportxml';
-			$extra_js = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; jQuery('<input>').attr({type: 'hidden', name: 'table', value: '" . $this->db_tbl . "'}).appendTo(jQuery(f));";
+			$extra_js = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; var input = Object.assign(document.createElement('input'), {type: 'hidden', name: 'table', value: '" . $this->db_tbl . "'}); f.append(input);";
 			flexicontent_html::addToolBarButton(
 				'Export now',
 				$btn_name, $full_js='', $msg_alert='', $msg_confirm=\Joomla\CMS\Language\Text::_('FLEXI_EXPORT_NOW_AS_XML'),
@@ -221,7 +221,7 @@ class FlexicontentViewTemplates extends FlexicontentViewBaseRecords
 			$btn_icon = 'icon-box-add';
 			$btn_name = 'box-add';
 			$btn_task = 'appsman.addtoexport';
-			$extra_js = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; jQuery('<input>').attr({type: 'hidden', name: 'table', value: '" . $this->db_tbl . "'}).appendTo(jQuery(f));";
+			$extra_js = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; var input = Object.assign(document.createElement('input'), {type: 'hidden', name: 'table', value: '" . $this->db_tbl . "'}); f.append(input);";
 			flexicontent_html::addToolBarButton(
 				'Add to export',
 				$btn_name, $full_js='', $msg_alert='', $msg_confirm=\Joomla\CMS\Language\Text::_('FLEXI_ADD_TO_EXPORT_LIST'),
@@ -240,7 +240,7 @@ class FlexicontentViewTemplates extends FlexicontentViewBaseRecords
 		if ($js)
 		{
 			$document->addScriptDeclaration('
-				jQuery(document).ready(function(){
+				FlexiForm.ready(function(){
 					' . $js . '
 				});
 			');

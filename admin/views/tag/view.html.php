@@ -317,9 +317,10 @@ class FlexicontentViewTag extends FlexicontentViewBaseRecord
 			$document->addScriptDeclaration('
 				function fc_edit_jtag_modal_load( container )
 				{
-					if ( container.find("iframe").get(0).contentWindow.location.href.indexOf("view=tags") != -1 )
+					var frame = FlexiForm.element(container).querySelector("iframe");
+					if (frame && frame.contentWindow.location.href.indexOf("view=tags") !== -1)
 					{
-						container.dialog("close");
+						fc_closeDialog("fc_modal_popup_container");
 					}
 				}
 				function fc_edit_jtag_modal_close()
@@ -334,7 +335,7 @@ class FlexicontentViewTag extends FlexicontentViewBaseRecord
 			\Joomla\CMS\Toolbar\ToolbarHelper::divider();
 			flexicontent_html::addToolBarButton(
 				'FLEXI_EDIT_JTAG', $btn_name='edit_jtag',
-				$full_js="var url = jQuery(this).attr('data-href'); var the_dialog = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, fc_edit_jtag_modal_close, {title:'".$modal_title."', loadFunc: fc_edit_jtag_modal_load}); return false;",
+				$full_js="var url = this.getAttribute('data-href'); var the_dialog = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, fc_edit_jtag_modal_close, {title:'".$modal_title."', loadFunc: fc_edit_jtag_modal_load}); return false;",
 				$msg_alert='', $msg_confirm='',
 				$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="spaced-btn btn-info".$tip_class, $btn_icon="icon-pencil",
 				'data-placement="bottom" data-href="index.php?option=com_tags&task=tag.edit&id='.$jtag_id.'" title="Edit all details of joomla tag"'
@@ -348,7 +349,7 @@ class FlexicontentViewTag extends FlexicontentViewBaseRecord
 
 		if ($js)
 		{
-			$document->addScriptDeclaration('jQuery(document).ready(function(){'
+			$document->addScriptDeclaration('FlexiForm.ready(function(){'
 				.$js.
 			'});');
 		}

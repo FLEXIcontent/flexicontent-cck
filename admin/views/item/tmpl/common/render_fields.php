@@ -315,7 +315,7 @@ if ($tags_displayed) : ob_start();  // tags ?>
 		ob_start();
 		?>
 		<div class="control-label" id="jform_tag-lbl-outer">
-			<label id="jform_tag-lbl" data-for="input-tags" <?php echo $label_attrs; ?> >
+			<label id="jform_tag-lbl" for="input-tags" data-for="input-tags" <?php echo $label_attrs; ?> >
 				<?php echo $field ? $field->label : Text::_($this->form->getField('tag')->getAttribute('label'));
 				/* $field->label is set per type */ ?>
 				<i class="icon-tags-2"></i>
@@ -364,7 +364,7 @@ if ($tags_displayed) : ob_start();  // tags ?>
 								<li class="tagitem">
 									<span>' . htmlspecialchars((string) $tag->name, ENT_QUOTES, 'UTF-8') . ($tag->translated_text ? ' (' . htmlspecialchars((string) $tag->translated_text, ENT_QUOTES, 'UTF-8') . ')' : '') . '</span>
 									<input type="hidden" name="jform[tag][]" value="'.$tag->id.'" />
-									<a href="javascript:;" class="deletetag" onclick="javascript:deleteTag(this);" title="'.Text::_('FLEXI_DELETE_TAG').'"></a>
+									<a href="#" class="deletetag" title="'.Text::_('FLEXI_DELETE_TAG').'"></a>
 								</li>';
 							}
 							else
@@ -1640,13 +1640,9 @@ ob_start();
 if ($this->fields && $typeid) :
 
 	$this->document->addScriptDeclaration("
-		jQuery(document).ready(function(){
-			jQuery('#jform_type_id').change(function() {
-				if (jQuery('#jform_type_id').val() != '".$typeid."')
-					jQuery('#fc-change-warning').css('display', 'block');
-				else
-					jQuery('#fc-change-warning').css('display', 'none');
-			});
+		FlexiForm.ready(function(){
+			const type = document.getElementById('jform_type_id');
+			type?.addEventListener('change', () => FlexiForm.show(document.getElementById('fc-change-warning'), type.value !== '".$typeid."'));
 		});
 	");
 	?>

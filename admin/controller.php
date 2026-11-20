@@ -178,7 +178,6 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\AdminController
 		if ( $print_logging_info ) $start_microtime = microtime(true);
 		$model  = $this->getModel('flexicontent');
 		$model->checkCollations();
-		$model->install_template_overrides();
 		$model->install_3rdParty_plugins();
 
 		$params = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');

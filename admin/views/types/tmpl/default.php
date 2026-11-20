@@ -109,28 +109,12 @@ $js .= "
 // Delete a specific list filter
 function delFilter(name)
 {
-	//if(window.console) window.console.log('Clearing filter:'+name);
-	var myForm = jQuery('#adminForm');
-	var filter = jQuery('#'+name);
-
-	if (!filter.length)
-	{
-		return;
-	}
-	else if (filter.attr('type') == 'checkbox')
-	{
-		filter.checked = '';
-	}
-	else
-	{
-		filter.val('');
-
-		// Case that input has Calendar JS attached
-		if (filter.attr('data-alt-value'))
-		{
-			filter.attr('data-alt-value', '');
-		}
-	}
+    const field = document.getElementById(name);
+    if (!field) return;
+    if (field.type === 'checkbox') field.checked = false;
+    else if (field.tagName === 'SELECT') FlexiForm.clearSelect(field);
+    else field.value = '';
+    if (field.hasAttribute('data-alt-value')) field.setAttribute('data-alt-value', '');
 }
 
 function delAllFilters()
@@ -434,7 +418,7 @@ if ($js)
 					$jview_ops[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '0', 'FLEXI_ROUTE_TO_ITEM_VIEW');
 					$jview_ops[] = \Joomla\CMS\HTML\HTMLHelper::_('select.option', '2', 'FLEXI_REDIRECT_TO_ITEM_VIEW');
 
-					echo \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $jview_ops, 'allow_jview['.$row->id.']', 'class="fcfield_selectval" size="1" onchange="Joomla.listItemTask(\'cb'.$i.'\',\'types.toggle_jview\'); Joomla.submitform()"', 'value', 'text', $allow_jview, 'allow_jview'.$row->id, $translate=true);
+					echo \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $jview_ops, 'allow_jview['.$row->id.']', 'class="fcfield_selectval" size="1" onchange="return Joomla.listItemTask(\'cb'.$i.'\',\'types.toggle_jview\')"', 'value', 'text', $allow_jview, 'allow_jview'.$row->id, $translate=true);
 				?>
 			</td>
 

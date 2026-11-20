@@ -1,351 +1,216 @@
-	var fcfield_relation = {};
+/** Related item selectors for Choices.js and the separate category/item pickers. */
+window.fcfield_relation = (() => {
+  const boxSelector = '.fcfield-relation-value_box';
+  const itemsSelector = 'select.fcfield-relation-item_selector';
+  const selectedSelector = 'select.fcfield-relation-selected_items';
+  const categorySelector = 'select.fcfield-relation-cat_selector';
+  const pickerRequests = new WeakMap();
+  const searchRequests = new WeakMap();
 
-	// Hide the separate category/items pickers when Choices.js remote-search is active
-	// (single-field UI). Kept intact for the legacy select2 rendering.
-	fcfield_relation.hideLegacyPickers = function(scope)
-	{
-		if (!window.fc_use_choicesjs) return;
-		var boxes;
-		if (scope && scope.nodeType === 1)
-		{
-			var $scope = jQuery(scope);
-			boxes = $scope.closest('.fcfield-relation-value_box').add($scope.find('.fcfield-relation-value_box'));
-		}
-		else
-		{
-			boxes = jQuery(document).find('.fcfield-relation-value_box');
-		}
-		boxes.each(function() {
-			var sel = jQuery(this).find('select.fcfield-relation-selected_items');
-			if (sel.length && sel.attr('data-fc_choices_search_remote'))
-			{
-				// Only the standalone item picker is redundant in single-field Choices.js UI:
-				// the category selector stays (it drives the remote search).
-				jQuery(this).find('.fcfield-relation-item_selector_box, .fcfield-relation-order_hint').each(function() {
-					this.hidden = true;
-					this.style.setProperty('display', 'none', 'important');
-				});
-			}
-		});
-	}
+  function usesRemote(select) {
+    return window.fc_use_choicesjs && !window.skip_select2_js && select.multiple && select.hasAttribute('data-fc_choices_search_remote');
+  }
 
-	fcfield_relation.add_related = function(el)
-	{
-		if (!parseInt(jQuery(el).val())) return false;
+  function hideLegacyPickers(scope = document) {
+    const boxes = scope.matches?.(boxSelector) ? [scope] : scope.querySelectorAll(boxSelector);
+    for (const box of boxes) {
+      if (!usesRemote(box.querySelector(selectedSelector))) continue;
+      for (const element of box.querySelectorAll('.fcfield-relation-item_selector_box, .fcfield-relation-order_hint')) {
+        element.style.setProperty('display', 'none', 'important');
+        element.hidden = true;
+      }
+    }
+  }
 
-		var val_box = el;
-		while ((val_box = val_box.parentNode) && val_box.className.indexOf('fcfield-relation-value_box') < 0);
+  function refreshSelect(select) {
+    if (select.fc_choices_instance) select.fc_choices_instance.refresh();
+    else if (window.jQuery?.fn.select2) window.jQuery(select).trigger('change.select2');
+  }
 
-		var elementid = val_box.getAttribute('data-elementid'),
-			item_selector = jQuery(el),
-			item_id = parseInt(item_selector.val()),
-			cat_selector = jQuery('#' + elementid + '_cat_selector'),
-			cat_id = cat_selector.val(),
-			selected_item = item_selector.find('option:selected'),
-			item_title = selected_item.text(),
-			itemid_catid = item_id + ':' + cat_id;
+  function markSelected(box) {
+    const selected = box.querySelector(selectedSelector);
+    const picker = box.querySelector(itemsSelector);
+    const ids = new Set([...selected.selectedOptions].map(option => option.value.split(':')[0]));
+    for (const option of picker.options) option.disabled = ids.has(option.value);
+    picker.value = '';
+    refreshSelect(picker);
+  }
 
-		//window.console.log(itemid_catid);
+  function addRelated(picker) {
+    if (!(Number(picker.value) > 0)) return false;
+    const box = picker.closest(boxSelector);
+    const selected = box.querySelector(selectedSelector);
+    const value = picker.value + ':' + box.querySelector(categorySelector).value;
+    if (![...selected.selectedOptions].some(option => option.value.split(':')[0] === picker.value)) {
+      selected.append(new Option(picker.selectedOptions[0].text, value, true, true));
+      FlexiForm.change(selected);
+    }
+    return true;
+  }
 
-		var selitems_selector = jQuery('#' + elementid);
-		selitems_selector.append(jQuery('<option>', {
-			value: itemid_catid,
-			text: item_title,
-			selected: 'selected'
-		})).trigger('change');
+  function selectedItemsModified(select) {
+    if (!usesRemote(select)) {
+      for (const option of [...select.options]) {
+        if (!option.selected) option.remove();
+      }
+      refreshSelect(select);
+      markSelected(select.closest(boxSelector));
+    }
+    return true;
+  }
 
-		return true;
-	}
+  function serializeFilters(box) {
+    const params = new URLSearchParams();
+    const filters = box.closest('.container_fcfield')?.querySelectorAll('select.fc_field_filter, input.fc_field_filter') || [];
+    for (const filter of filters) {
+      if (!filter.name || filter.matches(':disabled, input[type=checkbox]:not(:checked), input[type=radio]:not(:checked)')) continue;
+      if (filter.matches('select')) {
+        for (const option of filter.selectedOptions) {
+          if (!option.disabled && !option.closest('optgroup[disabled]')) params.append(filter.name, option.value);
+        }
+      } else {
+        params.append(filter.name, filter.value);
+      }
+    }
+    return params.toString();
+  }
 
+  async function requestItems(box, category, signal) {
+    const { field_id, item_id, item_type, item_lang } = box.dataset;
+    const url = new URL('index.php', window.jbase_url_fc || document.baseURI);
+    url.search = new URLSearchParams({ option:'com_flexicontent', tmpl:'component', format:'raw' });
+    const token = window['sessionToken' + field_id];
+    if (token) url.searchParams.set(token, '1');
+    const body = new URLSearchParams({
+      task:'call_extfunc', omethod:'html', exttype:'plugins', extfolder:'flexicontent_fields',
+      extname:'relation', extfunc:'getCategoryItems', field_id, catid:category, customfilts:serializeFilters(box),
+    });
+    if (Number(item_id)) body.set('item_id', item_id);
+    else {
+      body.set('type_id', item_type);
+      body.set('lang_code', item_lang);
+    }
+    const response = await fetch(url, {
+      method:'POST', body, signal, headers:{ 'X-Requested-With':'XMLHttpRequest' },
+    });
+    if (!response.ok) throw new Error('Related item request failed');
+    return response.json();
+  }
 
-	fcfield_relation.mark_selected = function(elementid)
-	{
-		var item_selector = jQuery('#' + elementid + '_item_selector');
-		var selitems_selector = jQuery('#' + elementid);
+  async function searchItems(elementId, query, callback) {
+    const select = document.getElementById(elementId);
+    const box = select?.closest(boxSelector);
+    if (!box) return callback?.([]);
+    searchRequests.get(select)?.abort();
+    const category = Number(box.querySelector(categorySelector).value);
+    if (!category) return callback?.([]);
+    const request = new AbortController();
+    searchRequests.set(select, request);
+    try {
+      const data = await requestItems(box, category, request.signal);
+      if (request.signal.aborted || !select.isConnected) return;
+      const term = String(query || '').toLowerCase();
+      const options = data?.error ? [] : (data?.options || [])
+        .filter(option => String(option.item_title || '').toLowerCase().includes(term))
+        .map(option => ({ value: option.item_id + ':' + category, label: option.item_title }));
+      callback?.(options, data);
+    } catch (error) {
+      if (!request.signal.aborted && select.isConnected) callback?.([], null);
+    }
+  }
 
-		var selitems_arr = selitems_selector.val();
-		selitems_arr = !!selitems_arr ? selitems_arr : [];
+  function showPickerError(picker, message) {
+    const error = document.createElement('span');
+    error.className = 'add-on fc-relation-field-error';
+    error.setAttribute('role', 'status');
+    error.textContent = message;
+    const display = picker.fc_choices_instance?.containerOuter.element || document.getElementById('s2id_' + picker.id) || picker;
+    display.after(error);
+  }
 
-		for (var i = 0; i < selitems_arr.length; i++)
-		{
-			selitems_arr[i] = parseInt(selitems_arr[i]).toString();
-		}
-		//window.console.log(selitems_arr);
+  async function loadPicker(box, category) {
+    const picker = box.querySelector(itemsSelector);
+    const wrapper = picker.closest('.fcfield-relation-item_selector_box');
+    wrapper.querySelector('.fc-relation-field-error')?.remove();
+    pickerRequests.get(picker)?.abort();
+    const request = new AbortController();
+    pickerRequests.set(picker, request);
+    picker.replaceChildren(new Option('-', ''));
+    refreshSelect(picker);
+    if (!category) {
+      wrapper.removeAttribute('aria-busy');
+      return;
+    }
+    wrapper.setAttribute('aria-busy', 'true');
+    try {
+      const data = await requestItems(box, category, request.signal);
+      if (request.signal.aborted || !picker.isConnected) return;
+      if (data?.error) {
+        showPickerError(picker, data.error);
+        return;
+      }
+      const options = data?.options || [];
+      picker.options[0].text = FlexiForm.text(options.length ? 'FLEXI_RIFLD_ADD_ITEM' : 'FLEXI_RIFLD_NO_ITEMS');
+      for (const option of options) picker.add(new Option(option.item_title, option.item_id));
+      markSelected(box);
+    } catch (error) {
+      if (!request.signal.aborted && picker.isConnected) showPickerError(picker, FlexiForm.text('FLEXI_RIFLD_ERROR'));
+    } finally {
+      if (pickerRequests.get(picker) === request) wrapper.removeAttribute('aria-busy');
+    }
+  }
 
-		[].forEach.call(
-			document.querySelectorAll('#' + item_selector.attr('id') + ' option'),
-			function(el)
-			{
-				if (selitems_arr.indexOf(el.value) >= 0)
-				{
-					el.disabled = true;
-					el.setAttribute('disabled', 'disabled');
-				}
-				else
-				{
-					el.disabled = false;
-					el.removeAttribute('disabled');
-				}
-			}
-		);
+  function categoryChanged(category) {
+    const box = category?.closest(boxSelector);
+    if (!box) return false;
+    const selected = box.querySelector(selectedSelector);
+    if (usesRemote(selected)) {
+      searchRequests.get(selected)?.abort();
+      selected.dispatchEvent(new Event('fc:relation-options'));
+    } else {
+      loadPicker(box, Number(category.value));
+    }
+    return true;
+  }
 
-		// Clear item selection
-		setTimeout(function() {
-			item_selector.val('').trigger('change');
-		}, 50);
+  function filtersChanged(filter) {
+    for (const category of filter.closest('.container_fcfield')?.querySelectorAll(categorySelector) || []) {
+      if (Number(category.value)) categoryChanged(category);
+    }
+  }
 
-		return true;
-	}
+  function prepare(row, ref, config) {
+    const box = row.querySelector(boxSelector);
+    if (!box) return false;
+    box.dataset.elementid = ref.id;
+    const category = box.querySelector(categorySelector);
+    const picker = box.querySelector(itemsSelector);
+    const selected = box.querySelector(selectedSelector);
+    const defaults = config.singleCategory ? [category.options[1]?.value || ''] : category.dataset.defvals?.split('|||') || [''];
+    picker.replaceChildren(new Option('-', ''));
+    selected.replaceChildren();
+    FlexiFieldRepeater.setControl(row, category, ref.id + '_cat_selector', ref.id + '_cat_selector', defaults);
+    FlexiFieldRepeater.setControl(row, picker, ref.id + '_item_selector', ref.id + '_item_selector', '');
+    FlexiFieldRepeater.setControl(row, selected, ref.id, ref.name + '[]', '');
+    box.querySelector('label.cat_selector-lbl').id = category.id + '-lbl';
+    box.querySelector('label.item_selector-lbl').id = picker.id + '-lbl';
+    box.querySelector('label.selected_items-lbl').id = selected.id + '-lbl';
+    box.querySelector('.fc-relation-field-error')?.remove();
+    picker.closest('.fcfield-relation-item_selector_box').removeAttribute('aria-busy');
+    const holder = row.querySelector('.fcfield_value_holder');
+    if (holder) FlexiFieldRepeater.setControl(row, holder, config.holderId + '_' + ref.index, config.holderName + '[' + ref.index + ']', '-');
+  }
 
+  function ready(row, ref, config) {
+    hideLegacyPickers(row);
+    const box = row.querySelector(boxSelector);
+    if (config.singleCategory && !usesRemote(box.querySelector(selectedSelector))) categoryChanged(box.querySelector(categorySelector));
+  }
 
-	fcfield_relation.selected_items_modified = function(el)
-	{
-		var val_box = el;
-		while ((val_box = val_box.parentNode) && val_box.className.indexOf('fcfield-relation-value_box') < 0);
-
-		var elementid = val_box.getAttribute('data-elementid');
-
-		fcfield_relation.mark_selected(elementid);
-
-		// Under Choices.js remote-search, the select holds the AJAX-loaded options:
-		// never strip non-selected options (the onchange fires on every add/remove).
-		if (window.fc_use_choicesjs && jQuery(el).attr('data-fc_choices_search_remote'))
-		{
-			return true;
-		}
-
-		var selitems_selector = jQuery('#' + elementid);
-		setTimeout(function() {
-			var non_selected = selitems_selector.find('option:not(:selected)');
-			if (non_selected.length)
-			{
-				non_selected.remove();
-				selitems_selector.trigger('change');
-			}
-		}, 50);
-
-		return true;
-	}
-
-	fcfield_relation.filters_change = function(el)
-	{
-		let value_fields = jQuery(el).closest('.container_fcfield').find('select.fcfield-relation-selected_items');
-		value_fields.each(function (){
-			let cat_selector = jQuery(this).closest('.fcfield-relation-value_box').find('select.fcfield-relation-cat_selector');
-			if (jQuery(cat_selector).val())
-			{
-				fcfield_relation.cat_selector_change(cat_selector.get(0));
-			}
-		});
-	}
-
-	// Remote search for the single-field (Choices.js) UI.
-	// Queries getCategoryItems with the current category + custom filters and
-	// returns [{value, label}, ...] to the caller. value is "itemid:catid".
-	fcfield_relation.search_items = function(elementid, query, callback)
-	{
-		let selector = jQuery('#' + elementid);
-		if (!selector.length) { if (callback) callback([]); return; }
-
-		let val_box = selector.closest('.fcfield-relation-value_box').get(0);
-		let field_id   = val_box.getAttribute('data-field_id');
-		let item_id    = val_box.getAttribute('data-item_id');
-		let item_type  = val_box.getAttribute('data-item_type');
-		let item_lang  = val_box.getAttribute('data-item_lang');
-		let load_method = parseInt(selector.attr('data-load_method') || 3);
-
-		let cat_selector = document.getElementById(elementid + '_cat_selector');
-		let catid = cat_selector ? parseInt(cat_selector.value) : 0;
-
-		if (!catid)
-		{
-			if (callback) callback([]);
-			return;
-		}
-
-		let custom_filters = jQuery(val_box).closest('.container_fcfield').find('select.fc_field_filter, input.fc_field_filter');
-		let customfilts = custom_filters.serialize();
-
-		let ajax_data = {
-			task: 'call_extfunc',
-			omethod: 'html',
-			exttype: 'plugins',
-			extfolder: 'flexicontent_fields',
-			extname: 'relation',
-			extfunc: 'getCategoryItems',
-			customfilts: customfilts,
-			field_id: field_id,
-			catid: catid
-		};
-		if (parseInt(item_id)) ajax_data.item_id = item_id;
-		else { ajax_data.type_id = item_type; ajax_data.lang_code = item_lang; }
-
-		let base_url = !!jbase_url_fc ? jbase_url_fc : '';
-
-		jQuery.ajax({
-			type: 'POST',
-			url: base_url + 'index.php?option=com_flexicontent&tmpl=component&format=raw&' + eval('sessionToken' + field_id) + '=1',
-			dataType: 'json',
-			data: ajax_data
-		}).done(function(data) {
-			let options = [];
-			if (data && !data.error && data.options && data.options.length)
-			{
-				// Optional client-side filter on the typed query (title only)
-				let q = (query || '').toString().toLowerCase();
-				for (let i = 0; i < data.options.length; i++)
-				{
-					let opt = data.options[i];
-					let label = (opt.item_title || '').toString();
-					if (!q || label.toLowerCase().indexOf(q) >= 0)
-					{
-						options.push({ value: opt.item_id + ':' + catid, label: label });
-					}
-				}
-			}
-			if (callback) callback(options, data);
-		}).fail(function() {
-			if (callback) callback([], null);
-		});
-	}
-
-	fcfield_relation.cat_selector_change = function(el)
-	{
-		let val_box = el;
-		while ((val_box = val_box.parentNode) && val_box.className.indexOf('fcfield-relation-value_box') < 0);
-
-		let elementid = val_box.getAttribute('data-elementid'),
-			elementbase = val_box.getAttribute('data-elementbase'),
-			item_id = val_box.getAttribute('data-item_id'),
-			field_id = val_box.getAttribute('data-field_id'),
-			item_type = val_box.getAttribute('data-item_type'),
-			item_lang = val_box.getAttribute('data-item_lang');
-
-		let cat_selector = document.getElementById(elementid + '_cat_selector');
-		let catid = parseInt(cat_selector.value);
-
-		let custom_filters = jQuery(val_box).closest('.container_fcfield').find('select.fc_field_filter, input.fc_field_filter');
-		/*let customfilts = {};
-		let i = 0;
-		custom_filters.each(function(){
-			let filt = jQuery(this);
-			customfilts[filt.attr('name').replace('filter_', '')] = filt.val();
-		});*/
-		let customfilts = custom_filters.serialize();
-
-		let item_selector = jQuery('#' + elementid + '_item_selector');
-		// Remove any previous error message
-		item_selector.parent().find('.fc-relation-field-error').remove();
-
-		// Check for empty category
-		if (!catid)
-		{
-			item_selector.empty();
-			item_selector.append('<option value="">-</option>');
-			item_selector.val('').trigger('change');  // trigger change event to update select2 display
-			item_selector.show();
-			return;
-		}
-
-		let sel2_item_selector = jQuery('#s2id_' + elementid + '_item_selector');
-		sel2_item_selector.hide();
-
-		let loading = jQuery('<div class="fc_loading_msg" style="position:relative; background-color:transparent;"></div>');
-		loading.insertAfter(sel2_item_selector);
-
-		let ajax_data = {
-			task: 'call_extfunc',
-			omethod: 'html', /* unused */
-			exttype: 'plugins',
-			extfolder: 'flexicontent_fields',
-			extname: 'relation',
-			extfunc: 'getCategoryItems',
-			customfilts: customfilts,
-			field_id: field_id,
-			catid: catid
-		};
-		//console.log(ajax_data);  //console.trace();
-
-		if (parseInt(item_id))
-		{
-			ajax_data.item_id = item_id;
-		}
-		else
-		{
-			ajax_data.type_id = item_type;
-			ajax_data.lang_code = item_lang;
-		}
-
-		// Joomla Base URL
-		let base_url = !!jbase_url_fc ? jbase_url_fc : '';
-
-		jQuery.ajax({
-			type: 'POST',
-			url: base_url + 'index.php?option=com_flexicontent&tmpl=component&format=raw&' + eval('sessionToken' + field_id) + '=1',
-			dataType: 'json',
-			data: ajax_data
-		}).done( function(data) {
-			//window.console.log ('Got data for:' + cat_selector.attr('id'));
-			item_selector.empty();
-
-			if (data=='')                   item_selector.append('<option value="">' + Joomla.JText._('FLEXI_RIFLD_ERROR') + '</option>');
-			else if (data.error!='')        item_selector.append('<option value="">-</option>');
-			else if (!data.options.length)  item_selector.append('<option value="">' + Joomla.JText._('FLEXI_RIFLD_NO_ITEMS') + '</option>');
-			else {
-				item_selector.append('<option value="">- ' + Joomla.JText._('FLEXI_RIFLD_ADD_ITEM', true) + '-</option>');
-				let item;
-				for(let i=0; i<data.options.length; i++)
-				{
-					item = data.options[i];
-					item_selector.append(
-						jQuery('<option>', {
-							value: item.item_id,
-							text: item.item_title
-						})
-					);
-				}
-			}
-
-			// Disable selected values (this will also trigger change event to update select2 display)
-			fcfield_relation.mark_selected(elementid);
-
-			// Remove loading animation
-			sel2_item_selector.next().remove();
-
-			// Show the item selector or display the error message
-			if (data && data.error!='')
-				jQuery('<span class="add-on fc-relation-field-error"> <span class="icon-warning"></span> '+data.error+'</span>').insertAfter(item_selector);
-			else
-				sel2_item_selector.show();
-		});
-
-		return true;
-	}
-
-	// Global hook used by flexi-lib.js (fc_attachChoices) to fetch remote results
-	// for a relation field's selected-items select. Returns array of {value,label}.
-	window.fc_fetch_relation_choices = function(elementid, query, callback)
-	{
-		fcfield_relation.search_items(elementid, query, callback);
-	}
-
-	// Hide the legacy pickers when the category changes (single-field Choices.js UI).
-	jQuery(document).ready(function()
-	{
-		fcfield_relation.hideLegacyPickers();
-		if (window.fc_use_choicesjs)
-		{
-			jQuery(document).on('change', 'select.fcfield-relation-cat_selector', function()
-			{
-				var val_box = this;
-				while ((val_box = val_box.parentNode) && val_box.className.indexOf('fcfield-relation-value_box') < 0);
-
-				// Refresh the remote-search dropdown choices for the affected value box
-				jQuery(val_box).find('select.fcfield-relation-selected_items').each(function() {
-					var inst = jQuery(this).data('fc_choices_instance');
-					if (!inst || !inst.containerOuter || !inst.containerOuter.element) return;
-					jQuery(inst.containerOuter.element).find('input.choices__input').trigger('focusin');
-				});
-			});
-		}
-	});
+  window.fc_fetch_relation_choices = searchItems;
+  document.addEventListener('DOMContentLoaded', () => hideLegacyPickers(), { once:true });
+  return {
+    prepare, ready, hideLegacyPickers, search_items:searchItems, add_related:addRelated,
+    selected_items_modified:selectedItemsModified, cat_selector_change:categoryChanged, filters_change:filtersChanged,
+  };
+})();

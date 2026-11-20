@@ -177,154 +177,8 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 		// Handle multiple records
 		if ($multiple)
 		{
-			// Add the drag and drop sorting feature
-			if ($add_ctrl_btns) $js .= "
-			jQuery(document).ready(function(){
-				jQuery('#sortables_".$field->id."').sortable({
-					handle: '.fcfield-drag-handle',
-					cancel: false,
-					/*containment: 'parent',*/
-					tolerance: 'pointer'
-					".($fields_box_placing ? "
-					,start: function(e) {
-						//jQuery(e.target).children().css('float', 'left');
-						//fc_setEqualHeights(jQuery(e.target), 0);
-					}
-					,stop: function(e) {
-						//jQuery(e.target).children().css({'float': 'none', 'min-height': '', 'height': ''});
-					}
-					" : '')."
-				});
-			});
-			";
-
-			if ($max_values) \Joomla\CMS\Language\Text::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
-			$js .= "
-			function addField".$field->id."(el, groupval_box, fieldval_box, params)
-			{
-				var insert_before   = (typeof params!== 'undefined' && typeof params.insert_before   !== 'undefined') ? params.insert_before   : 0;
-				var remove_previous = (typeof params!== 'undefined' && typeof params.remove_previous !== 'undefined') ? params.remove_previous : 0;
-				var scroll_visible  = (typeof params!== 'undefined' && typeof params.scroll_visible  !== 'undefined') ? params.scroll_visible  : 1;
-				var animate_visible = (typeof params!== 'undefined' && typeof params.animate_visible !== 'undefined') ? params.animate_visible : 1;
-
-				if(!remove_previous && (rowCount".$field->id." >= maxValues".$field->id.") && (maxValues".$field->id." != 0)) {
-					alert(Joomla.JText._('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + maxValues".$field->id.");
-					return 'cancel';
-				}
-
-				// Find last container of fields and clone it to create a new container of fields
-				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
-				var newField  = lastField.clone();
-				newField.find('.fc-has-value').removeClass('fc-has-value');
-
-				// New element's field name and id
-				var uniqueRowN = uniqueRowNum" . $field->id . ";
-				var element_id = '" . $elementid . "_' + uniqueRowN;
-				var fname_pfx  = '" . $fieldname . "[' + uniqueRowN + ']';
-				";
-
-			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
-			$js .= "
-				// Convert HTML to DOM element
-				//var newField = jQuery(newField_HTML);
-
-				var elements = ['sm_url', 'sm_embed_url', 'sm_api_type', 'sm_media_id', 'sm_title', 'sm_author', 'sm_duration', 'sm_width', 'sm_height', 'sm_description', 'sm_thumb'];
-				for	(var i = 0; i < elements.length; i++)
-				{
-					var el_name = elements[i].replace(/^sm_/, '');
-
-					theInput = newField.find('.' + elements[i]);
-					theInput.attr('name', fname_pfx + '[' + el_name + ']');
-					theInput.attr('id', element_id + '_' + el_name);
-
-					theLabel = newField.find('label.' + elements[i]+'-lbl');
-					theLabel.attr('for', element_id + '_' + el_name);
-				}
-				newField.find('.sm_preview').attr('id', element_id + '_preview');
-				newField.find('.sm_url_props, .sm_value_props').attr('data-name', element_id);
-				newField.find('.fc-sm-url-btn, .fc-sm-fetch-btn, .fc-sm-clear-btn, .fc-sm-edit-btn').attr('data-for', element_id);
-				newField.find('.fc-sm-url-btn').attr('onclick', 'fcfield_sharemedia.toggleURL(\'' + element_id + '\');');
-				newField.find('.fc-sm-fetch-btn').attr('onclick', 'fcfield_sharemedia.fetchData(\'' + element_id + '\', \'".$field_name_js."\');');
-				newField.find('.fc-sm-clear-btn').attr('onclick', 'fcfield_sharemedia.clearData(\'' + element_id + '\', \'".$field_name_js."\');');
-				newField.find('.fc-sm-edit-btn').attr('onclick', 'fcfield_sharemedia.toggleFields(\'' + element_id + '\');');
-				newField.find('.fcfield_message_box').attr('id', 'fcfield_message_box_' + element_id);
-				";
-
-			// Add new field to DOM
-			$js .= "
-				lastField ?
-					(insert_before ? newField.insertBefore( lastField ) : newField.insertAfter( lastField ) ) :
-					newField.appendTo( jQuery('#sortables_".$field->id."') ) ;
-				if (remove_previous) lastField.remove();
-
-				// Attach form validation on new element
-				fc_validationAttach(newField);
-				";
-
-				// Extra actions after adding element to the DOM
-			$js .= "
-				// Clear any existing message
-				jQuery('#fcfield_message_box_' + element_id).html('');
-
-				// Clear old value (user entered) URL
-				jQuery('#' + element_id + '_url').val('');
-
-				// Clear and hide old value fields
-				fcfield_sharemedia.clearData(element_id, '".$field_name_js."');
-				";
-
-			// Add new element to sortable objects (if field not in group)
-			if ($add_ctrl_btns) $js .= "
-				//jQuery('#sortables_".$field->id."').sortable('refresh');  // Refresh was done appendTo ?
-				";
-
-			// Show new field, increment counters
-			$js .="
-				//newField.fadeOut({ duration: 400, easing: 'swing' }).fadeIn({ duration: 200, easing: 'swing' });
-				if (scroll_visible) fc_scrollIntoView(newField, 1);
-				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800, function() { jQuery(this).css('opacity', ''); });
-
-				// Enable tooltips on new element
-				newField.find('.hasTooltip').tooltip({html: true, container: newField});
-				newField.find('.hasPopover').popover({html: true, container: newField, trigger : 'hover focus'});
-
-				// Focus new element
-				newField.find('input, select, textarea').first().focus();
-
-				rowCount".$field->id."++;       // incremented / decremented
-				uniqueRowNum".$field->id."++;   // incremented only
-			}
-
-
-			function deleteField".$field->id."(el, groupval_box, fieldval_box)
-			{
-				// Disable clicks on remove button, so that it is not reclicked, while we do the field value hide effect (before DOM removal of field value)
-				var btn = fieldval_box ? false : jQuery(el);
-				if (btn && rowCount".$field->id." > 1) btn.css('pointer-events', 'none').off('click');
-
-				// Find field value container
-				var row = fieldval_box ? fieldval_box : jQuery(el).closest('li');
-
-				// Add empty container if last element, instantly removing the given field value container
-				if(rowCount".$field->id." == 1)
-					addField".$field->id."(null, groupval_box, row, {remove_previous: 1, scroll_visible: 0, animate_visible: 0});
-
-				// Remove if not last one, if it is last one, we issued a replace (copy,empty new,delete old) above
-				if (rowCount".$field->id." > 1)
-				{
-					// Destroy the remove/add/etc buttons, so that they are not reclicked, while we do the field value hide effect (before DOM removal of field value)
-					row.find('.fcfield-delvalue').remove();
-					row.find('.fcfield-expand-view').remove();
-					row.find('.fcfield-insertvalue').remove();
-					row.find('.fcfield-drag-handle').remove();
-					// Do hide effect then remove from DOM
-					row.slideUp(400, function(){ jQuery(this).remove(); });
-					rowCount".$field->id."--;
-				}
-			}
-			";
-
-			$css .= '';
+			flexicontent_html::loadFramework('native-field-controls');
+			$js .= $this->buildValueRepeater($field, $elementid, $fieldname, $max_values, $add_ctrl_btns, array(), 'fcfield_sharedmedia_rows');
 
 			$remove_button = '
 				<button type="button" class="' . $btn_item_class . $flat_btn_class . ' fcfield-delvalue ' . $font_icon_class . '"
@@ -338,13 +192,13 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 			$add_here = '';
 			$add_here .= $add_position==2 || $add_position==3 ? '
 				<button type="button" class="' . $btn_item_class . $flat_btn_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '"
-				 title="' . \Joomla\CMS\Language\Text::_('FLEXI_ADD_BEFORE') . '"
-				 onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1}); return false;"
+				 aria-label="' . \Joomla\CMS\Language\Text::_('FLEXI_ADD_BEFORE') . '"
+				 onclick="addField'.$field->id.'(null, this.closest(\'ul\'), this.closest(\'li\'), {insert_before: 1}); return false;"
 				></button> ' : '';
 			$add_here .= $add_position==1 || $add_position==3 ? '
 				<button type="button" class="' . $btn_item_class . $flat_btn_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"
-				 title="' . \Joomla\CMS\Language\Text::_('FLEXI_ADD_AFTER') . '"
-				 onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0}); return false;"
+				 aria-label="' . \Joomla\CMS\Language\Text::_('FLEXI_ADD_AFTER') . '"
+				 onclick="addField'.$field->id.'(null, this.closest(\'ul\'), this.closest(\'li\'), {insert_before: 0}); return false;"
 				></button> ' : '';
 		}
 
@@ -366,6 +220,9 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 			\Joomla\CMS\Language\Text::script('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_RESPONSE_PARSING_FAILED', false);
 			\Joomla\CMS\Language\Text::script('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_SERVER_RESPONDED_WITH_ERROR', false);
 			\Joomla\CMS\Language\Text::script('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_REASON', false);
+			\Joomla\CMS\Language\Text::script('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_PREVIEW', false);
+			\Joomla\CMS\Language\Text::script('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_URL_NOT_MEDIA', false);
+			flexicontent_html::loadFramework('media-metadata');
 			$document->getWebAssetManager()->registerAndUseScript('plg_flexicontent_fields_sharedmedia.form', 'plugins/flexicontent_fields/sharedmedia/js/form.js', array('version' => FLEXI_VHASH));
 		}
 
@@ -452,10 +309,10 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 			}
 
 			// Icon-only toolbar below the preview: URL / fetch / clear / edit fields
-			$url_btn = '<span class="' . $btn_item_class . $flat_btn_class . ' fc-sm-url-btn" data-for="' . $elementid_n . '" title="' . \Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_MEDIA_URL') . '" onclick="fcfield_sharemedia.toggleURL(\'' . $elementid_n . '\');"><span class="fc-image-tool-icon fas fa-video" aria-hidden="true"></span></span>';
-			$fetch_btn = '<span class="' . $btn_item_class . $flat_btn_class . ' fc-sm-fetch-btn" data-for="' . $elementid_n . '" title="' . \Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_FETCH') . '" onclick="fcfield_sharemedia.fetchData(\'' . $elementid_n . '\', \'' . $field_name_js . '\');"><span class="fc-image-tool-icon fas fa-sync" aria-hidden="true"></span></span>';
-			$clear_btn = '<span class="' . $btn_item_class . $flat_btn_class . ' fc-sm-clear-btn" data-for="' . $elementid_n . '" title="' . \Joomla\CMS\Language\Text::_('FLEXI_CLEAR') . '" onclick="fcfield_sharemedia.clearData(\'' . $elementid_n . '\', \'' . $field_name_js . '\');"><span class="fc-image-tool-icon fas fa-trash" aria-hidden="true"></span></span>';
-			$edit_btn = '<span class="' . $btn_item_class . $flat_btn_class . ' fc-sm-edit-btn" data-for="' . $elementid_n . '" title="' . \Joomla\CMS\Language\Text::_('FLEXI_EDIT_OPTIONS') . '" onclick="fcfield_sharemedia.toggleFields(\'' . $elementid_n . '\');"><span class="fc-image-tool-icon fas fa-edit" aria-hidden="true"></span></span>';
+			$url_btn = '<button type="button" class="' . $btn_item_class . $flat_btn_class . ' fc-sm-url-btn" data-for="' . $elementid_n . '" title="' . \Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_MEDIA_URL') . '" aria-label="' . \Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_MEDIA_URL') . '" aria-expanded="false" onclick="fcfield_sharemedia.toggleURL(\'' . $elementid_n . '\');"><span class="fc-image-tool-icon fas fa-video" aria-hidden="true"></span></button>';
+			$fetch_btn = '<button type="button" class="' . $btn_item_class . $flat_btn_class . ' fc-sm-fetch-btn" data-for="' . $elementid_n . '" title="' . \Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_FETCH') . '" aria-label="' . \Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_FETCH') . '" onclick="fcfield_sharemedia.fetchData(\'' . $elementid_n . '\', \'' . $field_name_js . '\');"><span class="fc-image-tool-icon fas fa-sync" aria-hidden="true"></span></button>';
+			$clear_btn = '<button type="button" class="' . $btn_item_class . $flat_btn_class . ' fc-sm-clear-btn" data-for="' . $elementid_n . '" title="' . \Joomla\CMS\Language\Text::_('FLEXI_CLEAR') . '" aria-label="' . \Joomla\CMS\Language\Text::_('FLEXI_CLEAR') . '" onclick="fcfield_sharemedia.clearData(\'' . $elementid_n . '\', \'' . $field_name_js . '\');"><span class="fc-image-tool-icon fas fa-trash" aria-hidden="true"></span></button>';
+			$edit_btn = '<button type="button" class="' . $btn_item_class . $flat_btn_class . ' fc-sm-edit-btn" data-for="' . $elementid_n . '" title="' . \Joomla\CMS\Language\Text::_('FLEXI_EDIT_OPTIONS') . '" aria-label="' . \Joomla\CMS\Language\Text::_('FLEXI_EDIT_OPTIONS') . '" aria-expanded="false" onclick="fcfield_sharemedia.toggleFields(\'' . $elementid_n . '\');"><span class="fc-image-tool-icon fas fa-edit" aria-hidden="true"></span></button>';
 
 			$bottom_toolbar = '
 				<div class="' . $btn_group_class . ' fc-xpended-btns fc-image-bottom-toolbar">
@@ -474,42 +331,42 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 
 			$sm_props .= ($display_embed_url_form && !$use_native_apis) ? '
 				<div>
-					<label class="fc-prop-lbl">' . \Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_EMBED_URL') . '</label>
+					<label class="fc-prop-lbl" for="'.$elementid_n.'_embed_url">' . \Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_EMBED_URL') . '</label>
 					<input type="text" class="fcfield_textval sm_embed_url" readonly="readonly" id="'.$elementid_n.'_embed_url" name="'.$fieldname_n.'[embed_url]" value="'.htmlspecialchars($value['embed_url'], ENT_COMPAT, 'UTF-8').'" />
 				</div>' : '
 				<input type="hidden" class="sm_embed_url" id="'.$elementid_n.'_embed_url" name="'.$fieldname_n.'[embed_url]" value="'.htmlspecialchars($value['embed_url'], ENT_COMPAT, 'UTF-8').'" />';
 
 			$sm_props .= $display_api_type_form ? '
 				<div>
-					<label class="fc-prop-lbl">' . \Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_EMBED_METHOD') . '</label>
+					<label class="fc-prop-lbl" for="'.$elementid_n.'_api_type">' . \Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_EMBED_METHOD') . '</label>
 					<input type="text" class="fcfield_textval sm_api_type" readonly="readonly" id="'.$elementid_n.'_api_type" name="'.$fieldname_n.'[api_type]" value="'.htmlspecialchars($value['api_type'], ENT_COMPAT, 'UTF-8').'" />
 				</div>' : '
 				<input type="hidden" class="sm_api_type" id="'.$elementid_n.'_api_type" name="'.$fieldname_n.'[api_type]" value="'.htmlspecialchars($value['api_type'], ENT_COMPAT, 'UTF-8').'" />';
 
 			$sm_props .= $display_media_id_form ? '
 				<div>
-					<label class="fc-prop-lbl">' . \Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_MEDIA_ID') . '</label>
+					<label class="fc-prop-lbl" for="'.$elementid_n.'_media_id">' . \Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_MEDIA_ID') . '</label>
 					<input type="text" class="fcfield_textval sm_media_id" readonly="readonly" id="'.$elementid_n.'_media_id" name="'.$fieldname_n.'[media_id]" value="'.htmlspecialchars($value['media_id'], ENT_COMPAT, 'UTF-8').'" />
 				</div>' : '
 				<input type="hidden" class="sm_media_id" id="'.$elementid_n.'_media_id" name="'.$fieldname_n.'[media_id]" value="'.htmlspecialchars($value['media_id'], ENT_COMPAT, 'UTF-8').'" />';
 
 			$sm_props .= $display_title_form ? '
 				<div>
-					<label class="fc-prop-lbl">' . \Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_TITLE') . '</label>
+					<label class="fc-prop-lbl" for="'.$elementid_n.'_title">' . \Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_TITLE') . '</label>
 					<input type="text" class="fcfield_textval sm_title" id="'.$elementid_n.'_title" name="'.$fieldname_n.'[title]" value="'.htmlspecialchars($value['title'], ENT_COMPAT, 'UTF-8').'" '.($display_title_form==2 ? 'readonly="readonly"' : '').' />
 				</div>' : '
 				<input type="hidden" class="sm_title" id="'.$elementid_n.'_title" name="'.$fieldname_n.'[title]" value="'.htmlspecialchars($value['title'], ENT_COMPAT, 'UTF-8').'" />';
 
 			$sm_props .= $display_author_form ? '
 				<div>
-					<label class="fc-prop-lbl">' . \Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_AUTHOR') . '</label>
+					<label class="fc-prop-lbl" for="'.$elementid_n.'_author">' . \Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_AUTHOR') . '</label>
 					<input type="text" class="fcfield_textval sm_author" id="'.$elementid_n.'_author" name="'.$fieldname_n.'[author]" value="'.htmlspecialchars($value['author'], ENT_COMPAT, 'UTF-8').'" '.($display_author_form==2 ? 'readonly="readonly"' : '').' />
 				</div>' : '
 				<input type="hidden" class="sm_author" id="'.$elementid_n.'_author" name="'.$fieldname_n.'[author]" value="'.htmlspecialchars($value['author'], ENT_COMPAT, 'UTF-8').'" />';
 
 			$sm_props .= $display_duration_form ? '
 				<div>
-					<label class="fc-prop-lbl">' . \Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_DURATION') . '</label>
+					<label class="fc-prop-lbl" for="'.$elementid_n.'_duration">' . \Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_DURATION') . '</label>
 					<input type="text" class="fcfield_textval inlineval sm_duration" id="'.$elementid_n.'_duration" name="'.$fieldname_n.'[duration]" value="'.htmlspecialchars($value['duration'], ENT_COMPAT, 'UTF-8').'" size="10" '.($display_duration_form==2 ? 'readonly="readonly"' : '').' /> ' . \Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_SECONDS') . '
 				</div>' : '
 				<input type="hidden" class="sm_duration" id="'.$elementid_n.'_duration" name="'.$fieldname_n.'[duration]" value="'.htmlspecialchars($value['duration'], ENT_COMPAT, 'UTF-8').'" />';
@@ -532,7 +389,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 
 			$sm_props .= $display_description_form ? '
 				<div>
-					<label class="fc-prop-lbl">' . \Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_DESCRIPTION') . '</label>
+					<label class="fc-prop-lbl" for="'.$elementid_n.'_description">' . \Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_DESCRIPTION') . '</label>
 					<textarea class="fcfield_textareaval sm_description" id="'.$elementid_n.'_description" name="'.$fieldname_n.'[description]" rows="5" '.($display_description_form==2 ? 'readonly="readonly"' : '').'>' . $value['description'] . '</textarea>
 				</div>' : '
 				<input type="hidden" class="sm_description" id="'.$elementid_n.'_description" name="'.$fieldname_n.'[description]" value="'.htmlspecialchars($value['description'], ENT_COMPAT, 'UTF-8').'" />';
@@ -559,13 +416,14 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 					</div>
 
 					'.$bottom_toolbar.'
+					<div><span class="fcfield_message_box" id="fcfield_message_box_'.$elementid_n.'"></span></div>
 
 					<div class="sm_url_props" data-name="'.$elementid_n.'" style="display: none;">
 						<div class="fc-form-tbl fcinner fccompact">
 							<div>
 								<input type="text" class="fcfield_textval' . $required_class . ' sm_url" id="'.$elementid_n.'_url" name="'.$fieldname_n.'[url]" value="'.htmlspecialchars($value['url'], ENT_COMPAT, 'UTF-8').'" placeholder="' . \Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_MEDIA_URL') . '" />
 							</div>
-							<div><span class="fcfield_message_box" id="fcfield_message_box_'.$elementid_n.'"></span></div>
+
 						</div>
 					</div>
 
@@ -588,7 +446,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 		if ($per_val_js)
 		{
 			$js .= "
-			jQuery(document).ready(function()
+			FlexiForm.ready(function()
 			{
 				" . $per_val_js . "
 			});
@@ -596,11 +454,6 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 		}
 
 		// Add field's CSS / JS
-		if ($multiple) $js .= "
-			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
-			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
-			var maxValues".$field->id." = ".$max_values.";
-		";
 		if ($js)  $document->getWebAssetManager()->addInlineScript($js);
 		if ($css) $document->getWebAssetManager()->addInlineStyle($css);
 
@@ -620,7 +473,7 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 				<div class="'.$btn_group_class.' fc-xpended-btns">
 					<button type="button" class="fcfield-addvalue ' . $font_icon_class . ' fccleared"
 						aria-label="' . \Joomla\CMS\Language\Text::_( 'FLEXI_ADD_VALUE' ) . '" title="' . \Joomla\CMS\Language\Text::_( 'FLEXI_ADD_VALUE' ) . '"
-						onclick="addField'.$field->id.'(jQuery(this).closest(\'.fc-xpended-btns\').get(0)); return false;"
+						onclick="addField'.$field->id.'(this.closest(\'.fc-xpended-btns\')); return false;"
 					>
 						' . \Joomla\CMS\Language\Text::_( 'FLEXI_ADD_VALUE' ) . '
 					</button>

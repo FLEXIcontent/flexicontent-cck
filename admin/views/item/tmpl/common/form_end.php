@@ -7,7 +7,7 @@ defined('_JEXEC') or die('Restricted access');
 ?>
 			<?php if ($buttons_placement === 1) : /* PLACE buttons at BOTTOM of form */ ?>
 			<div class="fctoolbar_bottom_placement fcpos_right">
-				<div id="fctoolbar_btn" class="btn btn-primary" onclick="fc_toggle_box_via_btn(<?php echo FLEXI_J40GE ? "jQuery('#fctoolbar').parent()" : "'fctoolbar'"; ?>, this, 'btn-primary');" >
+				<div id="fctoolbar_btn" class="btn btn-primary" onclick="fc_toggle_box_via_btn(<?php echo FLEXI_J40GE ? "document.getElementById('fctoolbar')?.parentElement" : "'fctoolbar'"; ?>, this, 'btn-primary');" >
 					<?php echo \Joomla\CMS\Language\Text::_('JTOOLBAR'); ?> <span class="icon-wrench"></span></a>
 				</div>
 				<?php // An EXAMPLE of adding more buttons: $this->toolbar->appendButton('Standard', 'cancel', 'JCANCEL', 'items.cancel', false);
@@ -57,7 +57,7 @@ defined('_JEXEC') or die('Restricted access');
 
 	<?php if ($buttons_placement === 3) : /* PLACE buttons at RIGHT of form */ ?>
 		<div class="span2 col-md-2 fctoolbar_side_placement">
-			<div id="fctoolbar_btn" class="btn btn-primary" onclick="fc_toggle_box_via_btn(<?php echo FLEXI_J40GE ? "jQuery('#fctoolbar').parent()" : "'fctoolbar'"; ?>, this, 'btn-primary');" >
+			<div id="fctoolbar_btn" class="btn btn-primary" onclick="fc_toggle_box_via_btn(<?php echo FLEXI_J40GE ? "document.getElementById('fctoolbar')?.parentElement" : "'fctoolbar'"; ?>, this, 'btn-primary');" >
 				<?php echo \Joomla\CMS\Language\Text::_('JTOOLBAR'); ?> <span class="icon-wrench"></span></a>
 			</div>
 			<?php // An EXAMPLE of adding more buttons: $this->toolbar->appendButton('Standard', 'cancel', 'JCANCEL', 'items.cancel', false);

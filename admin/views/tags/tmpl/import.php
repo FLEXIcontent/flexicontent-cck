@@ -19,36 +19,14 @@
 defined('_JEXEC') or die('Restricted access');
 
 $ctrl_task = FLEXI_J16GE ? 'task=tags.' : 'controller=tags&task=';
-$close_popup_js = FLEXI_J16GE ? "window.parent.SqueezeBox.close();" : "window.parent.document.getElementById('sbox-window').close();";
+$close_popup_js = "window.parent.fc_closeDialog();";
+?>
+<?php
+flexicontent_html::loadFramework('flexi-lib');
+\Joomla\CMS\Factory::getApplication()->getDocument()->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/assets/js/admin-actions.js', array('version' => FLEXI_VHASH));
 ?>
 <script>
-(function ($) {
-
-	$(document).ready(function() {
-
-		var ajaxloader = '<span class="ajax-loader"><\/span>';
-		var adminForm = $('#adminForm');
-		var log_bind = $('#log-bind');
-
-		adminForm.on('submit', function(e, data)
-		{
-			e.preventDefault();
-			log_bind.html(ajaxloader);
-
-			$.ajax({
-				type: 'POST',
-				data: adminForm.serialize(),
-				url:  adminForm.prop('action'),
-				success: function(str) {
-					log_bind.html(str);
-				}
-			});
-
-		});
-
-	});
-
-})(jQuery);
+FlexiForm.ready(() => FlexiAdmin.bindResultForm(document.getElementById('adminForm'), document.getElementById('log-bind')));
 </script>
 
 <style>
@@ -58,7 +36,7 @@ $close_popup_js = FLEXI_J16GE ? "window.parent.SqueezeBox.close();" : "window.pa
 	}
 </style>
 
-<form action="index.php?option=com_flexicontent&".$ctrl_task."import&layout=import&<?php echo FLEXI_J16GE ? 'format=raw' : 'tmpl=component';?>" method="post" name="adminForm" id="adminForm" style="height: 92%;">
+<form action="index.php?option=com_flexicontent&<?php echo $ctrl_task; ?>import&layout=import&<?php echo FLEXI_J16GE ? 'format=raw' : 'tmpl=component';?>" method="post" name="adminForm" id="adminForm" style="height: 92%;">
 
 	<fieldset style="height: 92%;">
 		<legend style="font-size:12px; font-style:arial;" >

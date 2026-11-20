@@ -120,13 +120,13 @@ $rv_star_svg = '<svg viewBox="0 0 576 512" aria-hidden="true" focusable="false" 
 		.then(function(r) { return r.json(); })
 		.then(function(data) {
 			wrap.style.opacity = '';
-			if (data.error) { alert(data.msg || 'Error'); return; }
+			if (data.error) { FlexiForm.alert(data.msg || 'Error'); return; }
 			var s = wrap.querySelectorAll('button');
 			for (var i = 0; i < s.length; i++) s[i].style.color = (i < value) ? '#f5a623' : '#ccc';
 		})
 		.catch(function(err) {
 			wrap.style.opacity = '';
-			alert('Error: ' + (err.message || err));
+			FlexiForm.alert('Error: ' + (err.message || err));
 		});
 		return false;
 	}
@@ -145,28 +145,12 @@ $js .= "
 // Delete a specific list filter
 function delFilter(name)
 {
-	//if(window.console) window.console.log('Clearing filter:'+name);
-	var myForm = jQuery('#adminForm');
-	var filter = jQuery('#'+name);
-
-	if (!filter.length)
-	{
-		return;
-	}
-	else if (filter.attr('type') == 'checkbox')
-	{
-		filter.checked = '';
-	}
-	else
-	{
-		filter.val('');
-
-		// Case that input has Calendar JS attached
-		if (filter.attr('data-alt-value'))
-		{
-			filter.attr('data-alt-value', '');
-		}
-	}
+    const filter = document.getElementById(name);
+    if (!filter) return;
+    if (filter.type === 'checkbox') filter.checked = false;
+    else if (filter.tagName === 'SELECT') FlexiForm.clearSelect(filter);
+    else filter.value = '';
+    if (filter.hasAttribute('data-alt-value')) filter.setAttribute('data-alt-value', '');
 }
 
 // Show only the reviews of a specific item (click on the reviews counter of the item)

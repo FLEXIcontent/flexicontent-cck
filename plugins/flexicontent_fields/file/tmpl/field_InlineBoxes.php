@@ -20,7 +20,6 @@ foreach ($field->value as $file_id)
 	$filename_original = $file_data->filename_original ? $file_data->filename_original : $file_data->filename;
 
 	$preview_css       = 'width:100px; height:100px;';
-	$preview_img_style = '';
 	$ext_lower         = strtolower((string) $file_data->ext);
 
 	if (!in_array($ext_lower, $imagesExt))
@@ -30,7 +29,6 @@ foreach ($field->value as $file_id)
 			// Render the first page of a local PDF via the field's thumbnail endpoint
 			$preview_src = \Joomla\CMS\Uri\Uri::root() . 'plugins/flexicontent_fields/file/pdf_thumb.php?id=' . (int) $file_id . '&w=400&k=' . md5(\Joomla\CMS\Factory::getApplication()->get('secret') . 'fc_pdf_thumb');
 			$preview_text = '';
-			$preview_img_style = 'object-fit: contain; padding: 4px; background: #fff;';
 			$has_preview = true;
 		}
 		else
@@ -82,17 +80,7 @@ foreach ($field->value as $file_id)
 	$default_stamp_val = isset($form_data[$file_id])  ?  (int)$form_data[$file_id]['stamp']  :  1;
 
 	$addExistingURL_onclick = "fc_openFileSelection_".$field->id."(this);";
-	$toggleUploader_onclick = 'var box = this.closest(\'.fcfieldval_container\'); ' .
-		'if (!box) return; ' .
-		'var mediaFileBox = box.querySelector(\'.fc_media_file_box\'); ' .
-		'if (mediaFileBox) { var previewBox = box.querySelector(\'.fcfield_preview_box\'); ' .
-		'if (previewBox) previewBox.style.display = window.getComputedStyle(previewBox).display === \'none\' ? \'\' : \'none\'; ' .
-		'mediaFileBox.style.display = window.getComputedStyle(mediaFileBox).display === \'none\' ? \'\' : \'none\'; return; }' .
-		'var uploader = box.querySelector(\'.fc_file_uploader\'); ' .
-		'var isVisible = uploader && window.getComputedStyle(uploader).display !== \'none\'; ' .
-		'isVisible ? this.classList.remove(\'active\') : this.classList.add(\'active\'); ' .
-		'var preview = box.querySelector(\'.fcfield_preview_box\'); ' .
-		'if (preview) preview.style.display = isVisible ? \'\' : \'none\'; ';
+	$toggleUploader_onclick = 'if (!FlexiMediaField.beforeToggle(this, \'file\')) return; ';
 
 	$flat_btn_class = ' fc-flat-btn';
 
@@ -129,7 +117,7 @@ foreach ($field->value as $file_id)
 			<span class="'.$btn_classes.' fc-field-mediaurl-btn" data-for="'.$elementid_n.'" title="'.Text::_('FLEXI_FIELD_MEDIA_URL').'" onclick="fcfield_file.toggleMediaURL(\''.$elementid_n.'\'); return false;">
 				<span class="fc-image-tool-icon fas fa-link" aria-hidden="true"></span>
 			</span>';
-		$uploader_html->clearBtn = '';
+		$uploader_html->clearBtn = '<button type="button" class="'.$btn_classes.' fcfield-clearvalue '.$font_icon_class.'" title="'.Text::_('FLEXI_CLEAR').'" aria-label="'.Text::_('FLEXI_CLEAR').'" onclick="fcfield_file.clearField(this, {}, \''.$field_name_js.'\');"></button>';
 	}
 
 
@@ -148,7 +136,7 @@ foreach ($field->value as $file_id)
 		{
 			$modal_url   = "index.php?option=com_ajax&view=default&tmpl=component&asset=com_content&author=&plugin=quantummanagermedia&format=html";
 			$modal_url  .= $jmedia_subpath ? "&folder=".$jmedia_subpath : '';			$modal_title = 'Select file'; $width = 0; $height = 0;
-			$onclick_js  = "var url = jQuery(this).attr('data-href'); var fieldid = jQuery(this).closest('.fc_media_file_box').find('input').attr('id'); url = url+ '&fieldid=' + fieldid;"
+			$onclick_js  = "var url = this.dataset.href; var fieldid = this.closest('.fc_media_file_box').querySelector('input').id; url = url+ '&fieldid=' + fieldid;"
 				. " var the_dialog = fc_showDialog(url, 'fc_modal_popup_container', 0, {$width}, {$height}, null, "
 				. " {title:'{$modal_title}', loadFunc: null}); return false;";
 			$select_file_btn =
@@ -158,7 +146,7 @@ foreach ($field->value as $file_id)
 			$juri_root = \Joomla\CMS\Uri\Uri::root(true);
 			$file_placeholder_text = 'No file selected';
 			$file_placeholder_src  = '';//$juri_root . '/' .'......./person_placeholder.jpg';
-			$file_clear_value_js   = "jQuery(this).parent().find('input[type=text]').val(''); fcfield_file.clearMediaFile(this, '".$file_placeholder_src."');";
+			$file_clear_value_js   = "fcfield_file.clearMediaFile(this, '".$file_placeholder_src."');";
 
 			$file_is_img  = !$file_data->filename ? false : in_array(strtolower(pathinfo($file_data->filename, PATHINFO_EXTENSION)), $imagesExt);
 			$filename_ext = pathinfo($file_data->filename, PATHINFO_EXTENSION);
@@ -179,7 +167,7 @@ foreach ($field->value as $file_id)
 													<object data="{$object_src}" type="" width="480" height="180" class="inline-preview-obj" style="{$object_style}; background:#eee; border-radius: 6px 6px 0 0;"></object>
 												</div>
 												<div class="input-group">
-													<input class="form-control input-group-prepend fc_mediafile" type="text" readonly="" style="flex-grow:20; min-width:unset" value="{$file_data->filename}" id="{$elementid_n}_mediafile" name="{$fieldname_n}[mediafile]" placeholder="{$file_placeholder_text}" data-config_name={$field_name_js}" />
+													<input class="form-control input-group-prepend fc_mediafile" type="text" readonly="" style="flex-grow:20; min-width:unset" value="{$file_data->filename}" id="{$elementid_n}_mediafile" name="{$fieldname_n}[mediafile]" placeholder="{$file_placeholder_text}" data-config_name="{$field_name_js}" />
 													{$select_file_btn}
 													<button type="button" href="#" title="Clear" class="form-control btn input-group-append fit-contents clear-btn" onclick="{$file_clear_value_js}"><i class="icon-cancel"></i></button>
 												</div>
@@ -271,12 +259,58 @@ HTML;
 				</div>';
 	}
 
+	$properties =
+			( $iform_lang ? '
+				<div class="'.$input_grp_class.' fc-xpended-row inlinefile-lang-box">
+					<label class="' . $add_on_class . ' fc-lbl '.$tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_LANGUAGE', 'FLEXI_FILE_LANGUAGE_DESC', 1, 1).'" id="'.$elementid_n.'_file-lang-lbl" for="'.$elementid_n.'_file-lang">
+						'.Text::_( 'FLEXI_LANGUAGE' ).'
+					</label>
+					'.flexicontent_html::buildlanguageslist($fieldname_n.'[file-lang]', 'class="fc_filelang use_select2_lib"', (!isset($form_data[$file_id]) ? $file_data->language : $form_data[$file_id]['file-lang']), 1).'
+				</div>' : '').
+
+			( $iform_access ? '
+				<div class="'.$input_grp_class.' fc-xpended-row inlinefile-access-box">
+					<label class="' . $add_on_class . ' fc-lbl '.$tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_ACCESS', 'FLEXI_FILE_ACCESS_DESC', 1, 1).'" id="'.$elementid_n.'_file-access-lbl" for="'.$elementid_n.'_file-access">
+						'.Text::_( 'FLEXI_ACCESS' ).'
+					</label>
+					'.\Joomla\CMS\HTML\HTMLHelper::_('access.assetgrouplist', $fieldname_n.'[file-access]', (!isset($form_data[$file_id]) ? $file_data->access : $form_data[$file_id]['file-access']), $attribs=' class="fc_fileaccess use_select2_lib" ', $config=array(/*'title' => Text::_('FLEXI_SELECT'), */'id' => $elementid_n.'_file-access')).'
+				</div>' : '').
+
+			( $iform_desc ? '
+				<div class="'.$input_grp_class.' fc-xpended-row inlinefile-desc-box">
+					<label class="' . $add_on_class . ' fc-lbl inlinefile-desc-lbl '.$tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_DESCRIPTION', 'FLEXI_FILE_DESCRIPTION_DESC', 1, 1).'" id="'.$elementid_n.'_file-desc-lbl" for="'.$elementid_n.'_file-desc">
+						'.Text::_( 'FLEXI_DESCRIPTION' ).'
+					</label>
+					<textarea id="'.$elementid_n.'_file-desc" cols="24" rows="3" name="'.$fieldname_n.'[file-desc]" class="fc_filedesc fcfield_textareaval">'.htmlspecialchars((string) (!isset($form_data[$file_id]) ? $file_data->description : $form_data[$file_id]['file-desc']), ENT_QUOTES, 'UTF-8').'</textarea>
+				</div>' : '').
+
+			$custom_form_html.
+
+			( $iform_dir ? '
+				<div class="'.$input_grp_class.' fc-xpended-row inlinefile-secure-box">
+					<label class="' . $add_on_class . ' fc-lbl inlinefile-secure-lbl '.$tooltip_class.'" data-placement="top" title="'.flexicontent_html::getToolTip('FLEXI_URL_SECURE', 'FLEXI_URL_SECURE_DESC', 1, 1).'" id="'.$elementid_n.'_secure-lbl">
+						'.Text::_( 'FLEXI_URL_SECURE' ).'
+					</label>
+					'.($file_id ? '<span class="inlinefile-secure-info">'.Text::_($file_data->secure ? 'FLEXI_YES' : 'FLEXI_NO').'</span>' : '').'
+					<span class="inlinefile-secure-data" style="'.($file_id ? 'display:none;' : '').'">
+						'.flexicontent_html::buildradiochecklist(array(1 => Text::_('FLEXI_YES'), 0 => Text::_('FLEXI_NO')), $fieldname_n.'[secure]', $form_data[$file_id]['secure'] ?? $file_data->secure, 1, ' class="fc_filedir" '.($file_id ? 'disabled="disabled"' : ''), $elementid_n.'_secure').'
+					</span>
+				</div>' : '').
+
+			( $iform_stamp ? '
+				<div class="'.$input_grp_class.' fc-xpended-row inlinefile-stamp-box">
+					<label class="' . $add_on_class . ' fc-lbl inlinefile-stamp-lbl '.$tooltip_class.'" data-placement="top" title="'.flexicontent_html::getToolTip('FLEXI_DOWNLOAD_STAMPING', 'FLEXI_FILE_DOWNLOAD_STAMPING_DESC', 1, 1).'" id="'.$elementid_n.'_stamp-lbl">
+						'.Text::_( 'FLEXI_DOWNLOAD_STAMPING' ).'
+					</label>
+					'.flexicontent_html::buildradiochecklist( array(1=> Text::_( 'FLEXI_YES' ), 0=> Text::_( 'FLEXI_NO' )) , $fieldname_n.'[stamp]', (!isset($form_data[$file_id]) ? $file_data->stamp : (int)$form_data[$file_id]['stamp']), 1, ' class="fc_filestamp" ', $elementid_n.'_stamp').'
+				</div>' : '');
+
 	$field->html[] = '
 
 		<span class="fc_filedata_storage_name" style="display:none;">'.htmlspecialchars((string) $file_data->filename, ENT_QUOTES, 'UTF-8').'</span>
 		<div class="fc_filedata_txt_nowrap nowrap_hidden">'.htmlspecialchars((string) $file_data->filename, ENT_QUOTES, 'UTF-8').'<br/>'.htmlspecialchars((string) $file_data->altname, ENT_QUOTES, 'UTF-8').'</div>
 		<input class="fc_filedata_txt inlinefile-data-txt '. $info_txt_classes . $required_class .'" style="display:none;"
-			readonly="readonly" name="'.$fieldname_n.'[file-data-txt]" id="'.$elementid_n.'_file-data-txt" '.$info_txt_tooltip.'
+			data-fc-media-key="'.$field_name_js.'" data-fc-media-type="file" readonly="readonly" name="'.$fieldname_n.'[file-data-txt]" id="'.$elementid_n.'_file-data-txt" '.$info_txt_tooltip.'
 			value="'.htmlspecialchars($file_data->filename, ENT_COMPAT, 'UTF-8').'"
 			data-label_text="'.$field->label.'"
 			data-filename="'.htmlspecialchars($file_data->filename, ENT_COMPAT, 'UTF-8').'"
@@ -317,11 +351,17 @@ HTML;
 			<div class="inlinefile-prv-box" style="'. ($use_myfiles == 4 && $inputmode == 1 && !$use_quantum ? 'width: 100%' : 'flex-basis: auto;') . '">
 				'.($form_file_preview && $use_myfiles != 4 ? '<div class="fcfield_preview_box' . ($form_file_preview === 2 ? ' auto' : '') . '" style="'.$preview_css.'">
 					<div class="fc_preview_text">' . $preview_text . '</div>
-					<img id="'.$elementid_n.'_image_preview" src="'.$preview_src.'" class="fc_preview_thumb" style="'.$preview_img_style.'" alt="Preview image placeholder"/></div>' : '').'
+					<img id="'.$elementid_n.'_image_preview" src="'.$preview_src.'" class="fc_preview_thumb" alt="Preview image placeholder"/></div>' : '').'
 				'.(!$media_field_html && !empty($uploader_html) ? $uploader_html->container : $media_field_html).'
 			</div>
 
 		</div>
+
+		'.($properties === '' ? '' : '
+		<details class="fc-file-value-props" data-name="'.$elementid_n.'">
+			<summary>'.Text::_('FLEXI_FILE_PROPERTIES').'</summary>
+			'.$properties.'
+		</details>').'
 
 		<div class="fcclear"></div>
 		';
@@ -349,7 +389,7 @@ HTML;
 //document.addEventListener('DOMContentLoaded', function()
 $js = ""
 . (!$per_value_js ? "" : "
-	jQuery(document).ready(function()
+	FlexiForm.ready(function()
 	{
 		" . $per_value_js . "
 	});

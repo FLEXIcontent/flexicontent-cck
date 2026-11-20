@@ -389,7 +389,7 @@ class FlexicontentViewCategory extends FlexicontentViewBaseRecord
 			$edit_layout = htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS'), ENT_QUOTES, 'UTF-8');
 			flexicontent_html::addToolBarButton(
 				'FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', $btn_name='edit_layout_params',
-				$full_js="var url = jQuery(this).attr('data-href'); fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, 0, {title:'".$edit_layout."'}); return false;",
+				$full_js="var url = this.getAttribute('data-href'); fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, 0, {title:'".$edit_layout."'}); return false;",
 				$msg_alert='', $msg_confirm='',
 				$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="btn-info".$tip_class, $btn_icon="icon-pencil",
 				'data-placement="bottom" data-href="index.php?option=com_flexicontent&amp;view=template&amp;type=category&amp;tmpl=component&amp;ismodal=1&amp;folder=' . $row_clayout
@@ -471,7 +471,7 @@ class FlexicontentViewCategory extends FlexicontentViewBaseRecord
 		if (empty($level_name))
 		{
 			\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::sprintf('FLEXI_ABOUT_INVALID_ACCESS_LEVEL_PLEASE_SAVE_NEW', $row->access, 'Public'), 'warning');
-			$document->addScriptDeclaration("jQuery(document).ready(function() { jQuery('#jform_access').val(1).trigger('change'); });");
+			$document->addScriptDeclaration("FlexiForm.ready(function() { const access = document.getElementById('jform_access'); if (access) { access.value = '1'; access.fc_choices_instance?.setChoiceByValue('1'); FlexiForm.change(access); } });");
 		}
 
 
@@ -481,7 +481,7 @@ class FlexicontentViewCategory extends FlexicontentViewBaseRecord
 
 		if ($js)
 		{
-			$document->addScriptDeclaration('jQuery(document).ready(function(){'
+			$document->addScriptDeclaration('FlexiForm.ready(function(){'
 				.$js.
 			'});');
 		}

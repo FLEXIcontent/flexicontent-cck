@@ -232,33 +232,16 @@ $document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctab
 
 <script>
 
-function fetchcounter(el_id, task_name)
+async function fetchcounter(el_id, task_name)
 {
-	var url = "index.php?option=com_flexicontent&<?php echo $items_task; ?>"+task_name+"&tmpl=component&format=raw";
-
-	jQuery.ajax(
-	{
-		url : url,
-		type: 'get',
-		data : null,
-		success:function(data, textStatus, jqXHR)
-		{
-			jQuery('#' + el_id).html(data);
-
-			if (data == 0)
-			{
-				if (confirm("<?php echo Text::_( 'FLEXI_ITEMS_REFRESH_CONFIRM',true ); ?>"))
-				{
-					location.href = 'index.php?option=com_flexicontent&view=items';
-				}
-			}
-			return data;
-		},
-		error: function(jqXHR, textStatus, errorThrown)
-		{
-				//if fails
-		}
-	});
+	const url = "index.php?option=com_flexicontent&<?php echo $items_task; ?>" + task_name + "&tmpl=component&format=raw";
+	const response = await fetch(url, {headers: {'X-Requested-With': 'XMLHttpRequest'}});
+	if (!response.ok) return;
+	const count = (await response.text()).trim();
+	document.getElementById(el_id).textContent = count;
+	if (count === '0' && await FlexiForm.confirm("<?php echo Text::_('FLEXI_ITEMS_REFRESH_CONFIRM', true); ?>")) {
+		location.href = 'index.php?option=com_flexicontent&view=items';
+	}
 }
 
 // the function overloads joomla standard event
@@ -290,35 +273,69 @@ function submitform(pressbutton)
 // Delete a specific list filter
 function delFilter(name)
 {
-	//if(window.console) window.console.log('Clearing filter:'+name);
-	var myForm = jQuery('#adminForm');
-	var filter = jQuery('#'+name);
+	const filter = document.getElementById(name);
+	if (!filter) return;
+	if (filter.type === 'checkbox') filter.checked = false;
+	else if (filter.multiple) filter.selectedIndex = -1;
+	else filter.value = '';
+	if (filter.hasAttribute('data-alt-value')) filter.dataset.altValue = '';
+}
 
-	if (!filter.length)
-	{
-		return;
-	}
-	else if (filter.attr('type') == 'checkbox')
-	{
-		filter.removeAttr('checked');
-	}
-	else
-	{
-		filter.val('');
+function selectItemTypeFilter(button)
+{
+	const tabs = button.closest('nav');
+	const form = button.form;
+	const select = form.elements.namedItem('filter_type[]');
+	if (tabs.inert || !select || FlexiForm.visible(document.getElementById('fc_filter_form_blocker'))) return;
 
-		// Case that input has Calendar JS attached
-		if (filter.attr('data-alt-value'))
-		{
-			filter.attr('data-alt-value', '');
-		}
+	// Submit the shortcut independently of the filter panel's Apply mode. Keep the
+	// select and its Choices widget at the values belonging to the displayed list.
+	const requestedType = document.createElement('input');
+	requestedType.type = 'hidden';
+	requestedType.name = select.name;
+	requestedType.value = button.value;
+	const association = form.elements.filter_assockey;
+	const previousAssociation = association?.checked;
+	const previousPage = form.elements.limitstart?.value;
+	const wasDisabled = select.disabled;
+	try {
+		select.disabled = true;
+		if (button.value) form.append(requestedType);
+		if (association) association.checked = false;
+		if (form.elements.limitstart) form.elements.limitstart.value = '0';
+		Joomla.submitform('', form);
+	} finally {
+		requestedType.remove();
+		select.disabled = wasDisabled;
+		if (association) association.checked = previousAssociation;
+		if (form.elements.limitstart) form.elements.limitstart.value = previousPage;
 	}
+
+	const blocker = document.getElementById('fc_filter_form_blocker');
+	if (FlexiForm.visible(blocker)) {
+		tabs.inert = true;
+		tabs.setAttribute('aria-busy', 'true');
+		window.addEventListener('pageshow', function (event) {
+			if (!event.persisted) return;
+			tabs.inert = false;
+			tabs.removeAttribute('aria-busy');
+			FlexiForm.show(blocker, false);
+		}, {once: true});
+	}
+}
+
+function toggleItemAssignments(button, selector)
+{
+	const show = button.getAttribute('aria-expanded') !== 'true';
+	button.setAttribute('aria-expanded', String(show));
+	document.querySelectorAll(selector).forEach(box => FlexiForm.show(box, show));
 }
 
 function delAllFilters()
 {
-	jQuery('.fc_field_filter').val('');  // clear custom filters
+	document.querySelectorAll('.fc_field_filter').forEach(filter => delFilter(filter.id));  // clear custom filters
 	delFilter('search');
-	<?php $single_type ? '' : "delFilter('filter_type'); "; ?>
+	delFilter('filter_type');
 	delFilter('filter_state');
 	delFilter('filter_cats');
 	delFilter('filter_featured');
@@ -334,8 +351,8 @@ function delAllFilters()
 	delFilter('filter_assockey');
 	delFilter('filter_order');
 	delFilter('filter_order_Dir');
-	jQuery('#filter_subcats').attr('checked', 'checked');  // default: include subcats
-	jQuery('#filter_catsinstate').val('1');	  // default: published categories
+	document.getElementById('filter_subcats').checked = true;  // default: include subcats
+	document.getElementById('filter_catsinstate').value = '1';	  // default: published categories
 }
 
 <?php if ($this->reOrderingActive) : ?>
@@ -348,84 +365,59 @@ var move_within_ordering_groups_limits = <?php echo '"'.Text::_('FLEXI_MOVE_WITH
 
 <?php if ($this->unassociated && !$this->badcatitems) : ?>
 	var unassociated_items = <?php echo $this->unassociated; ?>;
-	function bindItems()
+	async function bindItems()
 	{
-		jQuery('#log-bind').html('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" />');
-		jQuery('#orphan_items_mssg').html("<?php echo Text::_( 'FLEXI_ITEMS_TO_BIND', true ); ?>");
-
-    var postData = jQuery('#bindToTypeBox').serializeArray();
-    var taskURL  = jQuery('#bindToTypeBox').attr("data-action");
-
-		taskURL += '&typeid=' + jQuery('#bindToTypeBox').find('#typeid').val();
-		taskURL += '&bind_limit=' + jQuery('#bindToTypeBox').find('#bind_limit').val();
-
-    jQuery.ajax(
-		{
-			url : taskURL,
-			type: "POST",
-			data : postData,
-			success:function(data, textStatus, jqXHR)
-			{
-				jQuery('#log-bind').html(data);
-				bind_limit = jQuery('#bind_limit').val();
-				unassociated_items = unassociated_items - bind_limit;
-
-				if (unassociated_items > 0)
-				{
-					jQuery('#orphan_items_count').html(unassociated_items);
-					bindItems();
-				}
-				else
-				{
-					jQuery('#orphan_items_count').html('0');
-					if(confirm("<?php echo Text::_( 'FLEXI_ITEMS_REFRESH_CONFIRM',true ); ?>"))
-					{
-						location.href = 'index.php?option=com_flexicontent&view=items';
-					}
-				}
-				//if (fetchcounter('orphan_items_count', 'getOrphansItems', jQuery('#bind_limit').val()) != 0) bindItems();
-			},
-			error: function(jqXHR, textStatus, errorThrown)
-			{
-			    //if fails
+		const box = document.getElementById('bindToTypeBox');
+		const log = document.getElementById('log-bind');
+		const limit = Number(box.querySelector('#bind_limit').value);
+		if (!(limit > 0)) return;
+		const url = new URL(box.dataset.action, document.baseURI);
+		url.searchParams.set('typeid', box.querySelector('#typeid').value);
+		url.searchParams.set('bind_limit', String(limit));
+		log.textContent = <?php echo json_encode(Text::_('FLEXI_LOADING')); ?>;
+		document.getElementById('orphan_items_mssg').textContent = <?php echo json_encode(Text::_('FLEXI_ITEMS_TO_BIND')); ?>;
+		try {
+			while (unassociated_items > 0) {
+				const response = await fetch(url, {method: 'POST', headers: {'X-Requested-With': 'XMLHttpRequest'}});
+				if (!response.ok) throw new Error('HTTP ' + response.status);
+				log.innerHTML = await response.text();
+				unassociated_items = Math.max(0, unassociated_items - limit);
+				document.getElementById('orphan_items_count').textContent = unassociated_items;
 			}
-		});
+			if (await FlexiForm.confirm("<?php echo Text::_('FLEXI_ITEMS_REFRESH_CONFIRM', true); ?>")) {
+				location.href = 'index.php?option=com_flexicontent&view=items';
+			}
+		} catch (error) {
+			Joomla.renderMessages({error: [FlexiForm.text('JERROR_AN_ERROR_HAS_OCCURRED')]});
+		}
 	}
 <?php endif; ?>
 
 <?php if ($this->badcatitems) : ?>
-jQuery(document).ready(function(){
-	jQuery('#button-fixcat').on('click', function(event)
-	{
-		var default_cat = jQuery('#fixCatBox').find('#default_cat');
-
-		if (!default_cat.val())
-		{
-			alert('Please select a category');
-			return false;
-		}
-
-		var action = jQuery('#fixCatBox').data('action') + '&default_cat=' + default_cat.val();
-
-		jQuery(this).parent().remove();
-		jQuery('#log-fixcat').html('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" />');
+FlexiForm.ready(function () {
+	const button = document.getElementById('button-fixcat');
+	button?.addEventListener('click', async event => {
+		event.preventDefault();
 		event.stopImmediatePropagation();
-
-    jQuery.ajax(
-		{
-			url : action,
-			type: 'post',
-			data : null,
-			success:function(data, textStatus, jqXHR)
-			{
-				jQuery('#log-fixcat').html(data);
-				fetchcounter('badcat_items_count', 'getBadCatItems');
-			},
-			error: function(jqXHR, textStatus, errorThrown)
-			{
-			    //if fails
-			}
-		});
+		const box = document.getElementById('fixCatBox');
+		const category = box.querySelector('#default_cat').value;
+		if (!category) {
+			FlexiForm.alert('Please select a category');
+			return;
+		}
+		const url = new URL(box.dataset.action, document.baseURI);
+		url.searchParams.set('default_cat', category);
+		button.disabled = true;
+		try {
+			const response = await fetch(url, {method: 'POST', headers: {'X-Requested-With': 'XMLHttpRequest'}});
+			if (!response.ok) throw new Error('HTTP ' + response.status);
+			document.getElementById('log-fixcat').innerHTML = await response.text();
+			await fetchcounter('badcat_items_count', 'getBadCatItems');
+		} catch (error) {
+			Joomla.renderMessages({error: [FlexiForm.text('JERROR_AN_ERROR_HAS_OCCURRED')]});
+		} finally {
+			button.disabled = false;
+		}
 	});
 });
 <?php endif; ?>
@@ -524,96 +516,35 @@ if ($this->max_tab_types && count($this->itemTypes) >= $this->max_tab_types)
 }
 elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 {
-	echo '
-	<div style="overflow: hidden; margin: -8px 0; ">
-		<div class="fctabber s-cblue" id="items_type_tabset">';
-
-	$type_class = empty($filter_type) ? ' tabbertabforced' : '';
-	$__tip_class = ''; //' hasTooltip';
-	$__tip_props = ''; //' data-placement="top" data-title="' . Text::_('FLEXI_ALL') . '" ';
-
-	echo '
-		<div class="tabbertab ' . $type_class . '" id="type_tab_all" style="padding-left: 0; padding-right: 0; border-left: 0; border-right: 0; border-bottom: 0;">
-			<h3 class="tabberheading ' . $__tip_class . '" ' . $__tip_props . '
-				onmouseup="jQuery(\'#filter_assockey\').removeAttr(\'checked\'); jQuery(\'#filter_type\').val([]); jQuery(\'#filter_type\').trigger(\'change\')"
-			>' . Text::_('FLEXI_ALL') . '</h3>
-		</div>
-		';
-
-	if (count($filter_type) > 1)
+	// These controls filter the whole list. The returned list determines the active type.
+	$typeButtons = array('' => Text::_('FLEXI_ALL'));
+	$subtypeButtons = array();
+	foreach ($this->itemTypes as $itemType)
 	{
-		$type_class  = ' tabbertabforced';
-		$_name = count($filter_type) . ' ' . Text::_('FLEXI_TYPES');
-
-		$__tip_props = ''; //' data-placement="top" data-title="' . $_name . '" ';
-		$__tip_class = ''; //' hasTooltip';
-		echo '
-			<div class="tabbertab ' . $type_class . '" id="type_tab_all" style="padding-left: 0; padding-right: 0; border-left: 0; border-right: 0; border-bottom: 0;">
-				<h3 class="tabberheading ' . $__tip_class . '" ' . $__tip_props . '
-				>' . $_name . '</h3>
-			</div>
-			';
-	}
-
-	$main_types = [];
-	$sub_types  = [];
-	foreach($this->itemTypes as $itemType) {
-		if ($itemType->params->get('is_subtype', 0)) {
-			$sub_types[] = $itemType;
-		} else {
-			$main_types[] = $itemType;
+		if ($itemType->params->get('is_subtype', 0))
+		{
+			$subtypeButtons[$itemType->id] = Text::_($itemType->name);
+		}
+		else
+		{
+			$typeButtons[$itemType->id] = Text::_($itemType->name);
 		}
 	}
-	$sorted_itemTypes = array_merge($main_types, $sub_types);
-
-	$subtype_count = 0;
-	$itemType = reset($sorted_itemTypes);
-	do
-	{
-		if ($itemType->params->get('is_subtype', 0) && $subtype_count == 0) {
-			$type_class = ' subtypes-header';
-			echo '
-				<div class="tabbertab ' . $type_class . '" id="type_tab_break_subtype" style="padding:0; border: 0;">
-					<h3 class="tabberheading ' . $type_class . '"
-						data-data_attr_a="' . (int) $itemType->id . '"
-					> Subtypes: </h3>
-			';
-			echo '</div>';
-		}
-
-		$type_class = $single_type && in_array($itemType->id, $filter_type) ? ' tabbertabforced' : '';
-		$__tip_class = ''; //' hasTooltip';
-		$__tip_props = ''; //' data-placement="top" data-title="' . Text::_( $itemType->name ) . '" ';
-		if ($itemType->params->get('is_subtype', 0)) {
-			$type_class .= ' fc-subtype';
-			$subtype_count++;
-		}
-		echo '
-			<div class="tabbertab ' . $type_class . '" id="type_tab_' . (int) $itemType->id . '" style="padding-left: 0; padding-right: 0; border-left: 0; border-right: 0; border-bottom: 0;">
-				<h3 class="tabberheading ' . $__tip_class . $type_class . '" ' . $__tip_props . '
-					data-data_attr_a="' . (int) $itemType->id . '"
-					onmouseup="jQuery(\'#filter_assockey\').removeAttr(\'checked\'); jQuery(\'#filter_type\').val([this.getAttribute(\'data-data_attr_a\')]); jQuery(\'#filter_type\').trigger(\'change\')"
-				>' . Text::_( $itemType->name ) . '</h3>
-		';
-		echo '</div>';
-
-		$itemType = next($sorted_itemTypes);
-		if (0 && $itemType && $itemType->params->get('is_subtype', 0) && $subtype_count == 0) {
-			$type_class = ' break-subtypes';
-			echo '
-				<div class="tabbertab ' . $type_class . '" id="type_tab_break_subtype" style="padding:0; border: 0;">
-					<h3 class="tabberheading ' . $type_class . '"
-						data-data_attr_a="' . (int) $itemType->id . '"
-					></h3>
-			';
-			echo '</div>';
-		}
-
-	} while($itemType);
-
-	echo '
-		</div>
-	</div>';
+	?>
+	<nav id="items_type_tabset" class="nav nav-tabs" aria-label="<?php echo htmlspecialchars(Text::_('FLEXI_TYPE'), ENT_QUOTES, 'UTF-8'); ?>">
+		<?php foreach ($typeButtons + $subtypeButtons as $id => $label) :
+			$active = $id === '' ? !$filter_type : $single_type && (int) $id === (int) $single_type_id;
+			if ($subtypeButtons && $id === array_key_first($subtypeButtons)) : ?>
+				<span class="nav-link disabled"><?php echo Text::_('FLEXI_SUBTYPES'); ?></span>
+			<?php endif; ?>
+			<button type="button" class="nav-link<?php echo $active ? ' active' : ''; ?>"<?php echo $active ? ' aria-current="page"' : ''; ?>
+				value="<?php echo $id === '' ? '' : (int) $id; ?>" onclick="selectItemTypeFilter(this)"><?php echo htmlspecialchars($label, ENT_QUOTES, 'UTF-8'); ?></button>
+			<?php if ($id === '' && count($filter_type) > 1) : ?>
+				<span class="nav-link active" aria-current="page"><?php echo count($filter_type) . ' ' . Text::_('FLEXI_TYPES'); ?></span>
+			<?php endif; ?>
+		<?php endforeach; ?>
+	</nav>
+	<?php
 }
 ?>
 
@@ -632,7 +563,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 				<input id="button-bind" type="button"
 					class="<?php echo $btn_class; ?> btn-primary" style='float:none !important; box-sizing: border-box; min-width: 200px;'
-					value="<?php echo Text::_('FLEXI_BIND'); ?>" onclick="jQuery(this).parent().hide(); bindItems();"
+					value="<?php echo Text::_('FLEXI_BIND'); ?>" onclick="FlexiForm.show(this.parentElement, false); bindItems();"
 				/>
 
 				<?php
@@ -780,7 +711,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 						document.addEventListener('mousedown', function(e) {
 							// The Select2 (legacy) drop-down and its mask are appended to <body>, outside of the box:
 							// picking a (second) value there is not a click outside of the box
-							if (!dirty || box.contains(e.target) || (e.target.closest && e.target.closest('.select2-drop, #select2-drop-mask'))) return;
+							if (!dirty || box.contains(e.target) || e.target.closest?.('.select2-drop, #select2-drop-mask, #items_type_tabset')) return;
 							dirty = false;
 							if (!!document.adminForm.limitstart) document.adminForm.limitstart.value = 0;
 							Joomla.submitform();
@@ -799,10 +730,10 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 			<div class="btn-group">
 				<?php if (!isset($disable_columns['cats']) && $max_cats_cnt > 1): ?>
-					<div id="fc-toggle-cats_btn" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?>  hidden-phone" title="<?php echo Text::_('FLEXI_SECONDARY_CATEGORIES'); ?>" onclick="jQuery(this).data('box_showing', !jQuery(this).data('box_showing')); jQuery(this).data('box_showing') ? jQuery('.fc_assignments_box.fc_cats').show(400) : jQuery('.fc_assignments_box.fc_cats').hide(400);" ><span class="icon-tree-2"></span></div>
+					<div id="fc-toggle-cats_btn" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?>  hidden-phone" title="<?php echo Text::_('FLEXI_SECONDARY_CATEGORIES'); ?>" onclick="toggleItemAssignments(this, '.fc_assignments_box.fc_cats');" ><span class="icon-tree-2"></span></div>
 				<?php endif; ?>
 				<?php if (!isset($disable_columns['tags']) && $max_tags_cnt > 1): ?>
-					<div id="fc-toggle-tags_btn" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?>  hidden-phone hidden-tablet" title="<?php echo Text::_('FLEXI_TAGS'); ?>" onclick="jQuery(this).data('box_showing', !jQuery(this).data('box_showing')); jQuery(this).data('box_showing') ? jQuery('.fc_assignments_box.fc_tags').show(400) : jQuery('.fc_assignments_box.fc_tags').hide(400);" ><span class="icon-tags"></span></div>
+					<div id="fc-toggle-tags_btn" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?>  hidden-phone hidden-tablet" title="<?php echo Text::_('FLEXI_TAGS'); ?>" onclick="toggleItemAssignments(this, '.fc_assignments_box.fc_tags');" ><span class="icon-tags"></span></div>
 				<?php endif; ?>
 
 				<div id="fc_mainChooseColBox_btn" class="<?php echo $this->tooltip_class . ' ' . $out_class; ?> hidden-phone" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" title="<?php echo flexicontent_html::getToolTip('FLEXI_COLUMNS', 'FLEXI_ABOUT_AUTO_HIDDEN_COLUMNS', 1, 1); ?>">
@@ -945,7 +876,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				<?php echo HTMLHelper::_('grid.sort', 'FLEXI_STATUS', 'a.' . $this->state_propname, $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_state') || $this->getModel()->getState('filter_catsinstate') != 1) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_state'); jQuery('#filter_catsinstate').val('1'); document.adminForm.submit();"></span>
+					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_state'); document.getElementById('filter_catsinstate').value = '1'; document.adminForm.submit();"></span>
 				</span>
 				<?php endif; ?>
 			</th>
@@ -986,7 +917,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 			<?php if ($useAssocs && !isset($disable_columns['assocs'])) : ?>
 			<th class="col_assocs_count"><?php $colposition++; ?>
-				<div id="fc-toggle-assocs_btn" style="padding: 4px 0 2px 6px;" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?>" title="<?php echo Text::_('FLEXI_ASSOCIATIONS'); ?>" onclick="jQuery('#columnchoose_<?php echo $this->data_tbl_id . '_'. $colposition; ?>_label').click();" >
+				<div id="fc-toggle-assocs_btn" style="padding: 4px 0 2px 6px;" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?>" title="<?php echo Text::_('FLEXI_ASSOCIATIONS'); ?>" onclick="document.getElementById('columnchoose_<?php echo $this->data_tbl_id . '_'. $colposition; ?>_label').click();" >
 					<span class="icon-flag"></span>
 				</div>
 			</th>
@@ -1046,7 +977,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				<?php echo Text::_( 'FLEXI_CATEGORIES' ); ?>
 				<?php if ($this->getModel()->getState('filter_cats') || $this->getModel()->getState('filter_subcats') == 0) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_cats'); jQuery('#filter_subcats').attr('checked', 'checked'); document.adminForm.submit();"></span>
+					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_cats'); document.getElementById('filter_subcats').checked = true; document.adminForm.submit();"></span>
 				</span>
 				<?php endif; ?>
 			</th>
@@ -1538,7 +1469,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				}
 				echo $_maincat;
 				echo count($row_cats) ? '
-					<span class="btn btn-mini ' . $this->popover_class . ' nowrap_box" onclick="jQuery(this).next().toggle(400);" data-content="'.flexicontent_html::getToolTip(Text::_('FLEXI_CATEGORIES'), '<ul class="fc_plain"><li>'.implode('</li><li>', $cat_names).'</li></ul>', 0, 1).'">
+					<span class="btn btn-mini ' . $this->popover_class . ' nowrap_box" onclick="FlexiForm.show(this.nextElementSibling, !FlexiForm.visible(this.nextElementSibling));" data-content="'.flexicontent_html::getToolTip(Text::_('FLEXI_CATEGORIES'), '<ul class="fc_plain"><li>'.implode('</li><li>', $cat_names).'</li></ul>', 0, 1).'">
 						'.count($row_cats).' <i class="icon-tree-2"></i>
 					</span>
 					<div class="fc_assignments_box fc_cats">' : '';
@@ -1565,7 +1496,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 						}
 					}
 					echo count($row_tags) ? '
-						<span class="btn btn-mini ' . $this->popover_class . ' nowrap_box" onclick="jQuery(this).next().toggle(400);" data-content="'.flexicontent_html::getToolTip(Text::_('FLEXI_TAGS'), '<ul class="fc_plain"><li>'.implode('</li><li>', $tag_names).'</li></ul>', 0, 1).'">
+						<span class="btn btn-mini ' . $this->popover_class . ' nowrap_box" onclick="FlexiForm.show(this.nextElementSibling, !FlexiForm.visible(this.nextElementSibling));" data-content="'.flexicontent_html::getToolTip(Text::_('FLEXI_TAGS'), '<ul class="fc_plain"><li>'.implode('</li><li>', $tag_names).'</li></ul>', 0, 1).'">
 							'.count($row_tags).' <i class="icon-tags"></i>
 						</span>
 						<div class="fc_assignments_box fc_tags">' : '';
@@ -1691,9 +1622,10 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 \Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration('
 	function fc_edit_jarticle_modal_load( container )
 	{
-		if ( container.find("iframe").get(0).contentWindow.location.href.indexOf("view=articles") != -1 )
+		var frame = FlexiForm.element(container).querySelector("iframe");
+		if (frame && frame.contentWindow.location.href.indexOf("view=articles") !== -1)
 		{
-			container.dialog("close");
+			fc_closeDialog("fc_modal_popup_container");
 		}
 	}
 	function fc_edit_jarticle_modal_close()

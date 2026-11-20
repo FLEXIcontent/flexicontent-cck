@@ -20,6 +20,25 @@ if ($this->showall)
 }
 
 $display_method = (int) $this->params->get('display_method', 1);
+if (FLEXI_J40GE)
+{
+	$accordion = $display_method === 4;
+	$selector = 'article' . $this->row->id . ($accordion ? '-sliders' : '-tabs');
+	$t = array($this->texts[0]);
+	$t[] = \Joomla\CMS\HTML\HTMLHelper::_($accordion ? 'bootstrap.startAccordion' : 'uitab.startTabSet', $selector, array('active' => $selector . '-1', 'parent' => true));
+	for ($i = 1; $i <= $this->pagescount; $i++)
+	{
+		$page = $this->_generateToc($this->row, $i);
+		$t[] = $accordion
+			? \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addSlide', $selector, htmlspecialchars($page->title, ENT_QUOTES, 'UTF-8'), $selector . '-' . $i)
+			: \Joomla\CMS\HTML\HTMLHelper::_('uitab.addTab', $selector, $selector . '-' . $i, $page->title);
+		$t[] = $this->texts[$i];
+		$t[] = \Joomla\CMS\HTML\HTMLHelper::_($accordion ? 'bootstrap.endSlide' : 'uitab.endTab');
+	}
+	$t[] = \Joomla\CMS\HTML\HTMLHelper::_($accordion ? 'bootstrap.endAccordion' : 'uitab.endTabSet');
+	$this->_text = implode("\n", $t);
+	return;
+}
 $style = $display_method === 4 ? 'sliders' : 'tabs';
 
 // Add introduction text

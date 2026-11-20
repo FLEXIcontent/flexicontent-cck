@@ -1,789 +1,250 @@
-	/**
-	 * Global variables
-	 */
-
-	var fcfield_addrint = {};
-
-	fcfield_addrint.configure = [];
-
-	fcfield_addrint.autoComplete    = [];
-	fcfield_addrint.gmapslistener   = [];
-	fcfield_addrint.google_maps     = [];
-	fcfield_addrint.openstreet_maps = [];
-	fcfield_addrint.map_data        = [];
-
-	fcfield_addrint.allowed_countries = [];
-	fcfield_addrint.single_country    = [];
-	fcfield_addrint.map_zoom = [];
-	fcfield_addrint.map_type = [];
-
-	fcfield_addrint.LatLon    = [];
-	fcfield_addrint.posMarker = [];
-
-	fcfield_addrint.algolia_api_id    = [];
-	fcfield_addrint.algolia_api_key   = [];
-
-
-
-
-	/**
-	 *  Google Maps Engine
-	 */
-
-
-	// initialize autocomplete
-	fcfield_addrint.initAutoComplete = function(elementid_n, config_name)
-	{
-		var ac_input   = document.getElementById(elementid_n + '_autocomplete');
-		var ac_type    = jQuery('#' + elementid_n + '_ac_type').val();
-		var ac_country = fcfield_addrint.single_country[config_name];
-
-		var ac_options = {};
-		if (ac_type)    ac_options.types = [ ac_type ];
-		if (ac_country) ac_options.componentRestrictions = {country: ac_country};
-
-		var placesAutocomplete = new google.maps.places.Autocomplete( ac_input, ac_options );
-
-		// Create a reference
-		fcfield_addrint.autoComplete[elementid_n] = placesAutocomplete;
-
-		// Apply field's configuration
-		fcfield_addrint.configure[config_name] (placesAutocomplete);
-
-		fcfield_addrint.gmapslistener[elementid_n] = google.maps.event.addListener(fcfield_addrint.autoComplete[elementid_n], 'place_changed', function()
-		{
-			jQuery('#' + elementid_n + '_messages').html('').hide();
-			fcfield_addrint.fillInAddress(elementid_n, false, config_name);
-		});
-
-		return true;
-	}
-
-
-	// Build trusted local marker images as DOM nodes; option labels always stay text.
-	fcfield_addrint.markerLabel = function(select, value, label)
-	{
-		var span = document.createElement('span');
-		span.className = 'fc-marker-label';
-		var option = Array.prototype.find.call(select.options, function(o) { return o.value === String(value || ''); });
-		var base = select.getAttribute('data-marker-base-url');
-		if (option && value && base) {
-			try {
-				var baseUrl = new URL(base, window.location.href);
-				var url = new URL(encodeURIComponent(String(value)), baseUrl);
-				if (/^https?:$/.test(url.protocol) && url.origin === window.location.origin && url.pathname.indexOf(baseUrl.pathname) === 0) {
-					var image = document.createElement('img');
-					image.className = 'flag fc-marker-img'; image.alt = ''; image.src = url.href;
-					span.appendChild(image);
-				}
-			} catch (error) { /* A missing/invalid marker URL leaves a usable text option. */ }
-		}
-		span.appendChild(document.createTextNode(option ? option.textContent : String(label || '')));
-		return span;
-	};
-
-	// Initialize marker selector (or retain the native control and a selected-image preview on mobile).
-	fcfield_addrint.initMarkerSelector = function(elementid_n, config_name)
-	{
-		var theSelect = jQuery('#' + elementid_n + '_custom_marker');
-		if (!theSelect.length) return;
-		var el = theSelect[0];
-		var prevKey = el.id || el.name;
-		var prevInst = el.fc_choices_instance || theSelect.data('fc_choices_instance') || (window.fc_choices_instances && window.fc_choices_instances[prevKey]);
-		if (prevInst && prevInst.passedElement && prevInst.passedElement.element === el) prevInst.destroy();
-		delete el.fc_choices_instance;
-		theSelect.removeData('fc_choices_instance');
-		if (window.fc_choices_instances && window.fc_choices_instances[prevKey] === prevInst) delete window.fc_choices_instances[prevKey];
-
-		if (window.skip_select2_js) {
-			var preview = el.nextElementSibling;
-			if (!preview || !preview.classList.contains('fc-marker-native-preview')) {
-				preview = document.createElement('span'); preview.className = 'fc-marker-native-preview';
-				preview.setAttribute('aria-hidden', 'true'); el.after(preview);
-			}
-			var updatePreview = function() {
-				preview.replaceChildren();
-				var image = fcfield_addrint.markerLabel(el, el.value, '').querySelector('img');
-				if (image) preview.appendChild(image);
-				preview.hidden = !image;
-			};
-			theSelect.off('change.fcMarkerPreview').on('change.fcMarkerPreview', updatePreview);
-			updatePreview();
-			return;
-		}
-		var nativePreview = el.nextElementSibling;
-		if (nativePreview && nativePreview.classList.contains('fc-marker-native-preview')) nativePreview.remove();
-
-		if (window.fc_use_choicesjs) {
-			window.fc_choices_instances = window.fc_choices_instances || {};
-			var options = {
-				allowHTML: false,
-				allowHtmlUserInput: false,
-				shouldSort: false,
-				callbackOnCreateTemplates: function() {
-					var templates = {};
-					['item', 'choice'].forEach(function(kind) {
-						templates[kind] = function(config, data, extra, group) {
-							var node = (window.fc_Choices || Choices).defaults.templates[kind].call(this, config, data, extra, group);
-							Array.prototype.slice.call(node.childNodes).forEach(function(child) { if (child.nodeType === 3) child.remove(); });
-							node.prepend(fcfield_addrint.markerLabel(el, data.value, data.label));
-							return node;
-						};
-					});
-					return templates;
-				}
-			};
-			el.dispatchEvent(new CustomEvent('flexicontent:choices-options', {bubbles: true, detail: {options: options}}));
-			// FLEXIcontent's own Choices.js, even when another copy replaced window.Choices
-			var instance = new (window.fc_Choices || Choices)(el, options);
-			el.fc_choices_instance = instance;
-			theSelect.data('fc_choices_instance', instance);
-			window.fc_choices_instances[prevKey] = instance;
-			instance.containerOuter.element.classList.add('fc-choices-outer');
-			el.dispatchEvent(new CustomEvent('flexicontent:choices-ready', {bubbles: true, detail: {instance: instance}}));
-		} else {
-			theSelect.select2({
-				formatResult: function(state) { return fcfield_addrint.format_marker_image(state, theSelect); },
-				formatSelection: function(state) { return fcfield_addrint.format_marker_image(state, theSelect); },
-				escapeMarkup: function(markup) { return markup; }
-			});
-		}
-	};
-
-
-	// Calculate marker anchor values
-	fcfield_addrint.getCustomMarkerAnchor = function(anc, a, w, h)
-	{
-		switch(anc)
-		{
-			case 'TopL' : a.wA = 0;   a.hA = 0; break;
-			case 'TopC' : a.wA = w/2; a.hA = 0; break;
-			case 'TopR' : a.wA = w;   a.hA = 0; break;
-
-			case 'MidL' : a.wA = 0;   a.hA = h/2; break;
-			case 'MidC' : a.wA = w/2; a.hA = h/2; break;
-			case 'MidR' : a.wA = w;   a.hA = h/2; break;
-
-			case 'BotL' : a.wA = 0;   a.hA = h; break;
-			case 'BotC' : a.wA = w/2; a.hA = h; break;
-			case 'BotR' : a.wA = w;   a.hA = h; break;
-		}
-	}
-
-
-	// Get custom marker image Url
-	fcfield_addrint.getCustomMarkerUrl = function(elementid_n)
-	{
-		var theSelect = jQuery('#' + elementid_n + '_custom_marker');
-
-		return url = theSelect.length ? theSelect.data('marker-base-url') + theSelect.val() : '';
-	}
-
-
-	// Update marker on map
-	fcfield_addrint.updateMarkerIcon = function(elementid_n, config_name)
-	{
-		var img = new Image();
-		var url = fcfield_addrint.getCustomMarkerUrl(elementid_n);
-		var anc = jQuery('#' + elementid_n + '_marker_anchor').val() || 'BotC';
-
-		img.addEventListener("load", function()
-		{
-			var w = this.naturalWidth, h = this.naturalHeight, a = {};
-
-			fcfield_addrint.getCustomMarkerAnchor(anc, a, w, h);
-
-			var icon = {
-				url: url,
-				size: new google.maps.Size(w, h),
-				origin: new google.maps.Point(0, 0),
-				anchor: new google.maps.Point(a.wA, a.hA)
-			};
-			if (fcfield_addrint.posMarker[elementid_n]) fcfield_addrint.posMarker[elementid_n].setIcon(icon);
-		});
-
-		img.src = url;
-	}
-
-
-	// re-initialize autocomplete
-	fcfield_addrint.changeAutoCompleteType = function(elementid_n, config_name)
-	{
-		/*
-		// Remove listener that update the google map on autocomplete selection
-		google.maps.event.removeListener( fcfield_addrint.gmapslistener[elementid_n] );
-
-		// Clone replace input to remove the currently configured autocomplete search
-		var el = document.getElementById(elementid_n + '_autocomplete');
-		el.parentNode.replaceChild(el.cloneNode(true), el);
-
-		// Attach new autocomplete search
-		return fcfield_addrint.initAutoComplete(elementid_n, config_name);
-		*/
-		jQuery('#' + elementid_n + '_ac_type').val()
-			? fcfield_addrint.autoComplete[elementid_n].setTypes([jQuery('#' + elementid_n + '_ac_type').val()])
-			: fcfield_addrint.autoComplete[elementid_n].setTypes([]);
-	}
-
-
-	fcfield_addrint.initMap = function(elementid_n, config_name)
-	{
-		var el = document.getElementById('map_canvas_' + elementid_n);
-
-		jQuery(el).addClass('has_fc_google_maps_map');
-
-		// Show map container
-		jQuery('#' + elementid_n + '_addressint_map').css('display', '');
-
-		var zoom = parseInt(jQuery('#' + elementid_n + '_zoom').val());
-		zoom = !isNaN(zoom) ? zoom : fcfield_addrint.map_zoom[config_name];
-
-		fcfield_addrint.google_maps[elementid_n] = new google.maps.Map(el, {
-			center: fcfield_addrint.LatLon[elementid_n],
-			scrollwheel: false,
-			zoom: zoom,
-			mapTypeId: google.maps.MapTypeId[ fcfield_addrint.map_type[config_name] ],
-			zoomControl: true,
-			mapTypeControl: true,
-			streetViewControl: true,
-			scaleControl: true,
-			rotateControl: true,
-		});
-
-		el.dataset = !!el.dataset ? el.dataset : {};
-		el.dataset.google_maps_ref = fcfield_addrint.google_maps[elementid_n];
-
-		var posMarker = new google.maps.Marker({
-			map: fcfield_addrint.google_maps[elementid_n],
-			draggable:true,
-			animation: google.maps.Animation.DROP,
-			position: fcfield_addrint.LatLon[elementid_n],
-			icon: fcfield_addrint.getCustomMarkerUrl(elementid_n)
-		});
-		fcfield_addrint.posMarker[elementid_n] = posMarker;
-
-		google.maps.event.addListener(fcfield_addrint.google_maps[elementid_n], "zoom_changed", function()
-		{
-			jQuery('#' + elementid_n + '_zoom').val(fcfield_addrint.google_maps[elementid_n].getZoom());
-		});
-
-		google.maps.event.addListener(posMarker, "dragend", function (event)
-		{
-			fcfield_addrint.geocodePosition(elementid_n, this.getPosition(), posMarker, config_name);
-		});
-	}
-
-
-	fcfield_addrint.geocodePosition = function(elementid_n, pos, marker, config_name)
-	{
-		jQuery('#' + elementid_n + '_messages')
-			.removeClass('alert-success').removeClass('alert-warning').addClass('alert-info')
-			.html("Searching address of new marker position ...").show();
-		geocoder = new google.maps.Geocoder();
-		geocoder.geocode(
-			{ latLng: pos },
-			function(results, status)
-			{
-				if (status == google.maps.GeocoderStatus.OK)
-				{
-					var tolerance = parseInt( jQuery('#' + elementid_n + '_marker_tolerance').val() );
-					if ( !tolerance || tolerance < 1 )
-					{
-						tolerance = 50;
-						jQuery('#' + elementid_n + '_marker_tolerance').val(tolerance);
-					}
-
-					var distance = Math.round( parseInt( google.maps.geometry.spherical.computeDistanceBetween(results[0].geometry.location, pos) ) );
-					if (distance > tolerance)
-					{
-						jQuery('#' + elementid_n + '_lat').val(pos.lat);
-						jQuery('#' + elementid_n + '_lon').val(pos.lng);
-						jQuery('#' + elementid_n + '_messages')
-							.removeClass('alert-success').removeClass('alert-warning').addClass('alert-info')
-							.html( Joomla.JText._('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ADDRESS_NOT_FOUND_WITHIN_TOLERANCE').replace("%s", tolerance) + "<br/> -" + Joomla.JText._('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ADDRESS_ONLY_LONG_LAT') ).show();
-					}
-					else
-					{
-						jQuery('#' + elementid_n + '_messages').html('');
-						fcfield_addrint.fillInAddress(elementid_n,  results[0], config_name);
-						marker.setPosition( results[0].geometry.location );
-						var html = ! jQuery('#' + elementid_n + '_messages').html().length ? "" : jQuery('#' + elementid_n + '_messages').html() + "<br/> ";
-						jQuery('#' + elementid_n + '_messages')
-							.removeClass('alert-info').removeClass('alert-warning').addClass('alert-success')
-							.html(html + Joomla.JText._('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ADDRESS_FOUND_WITHIN_TOLERANCE').replace("%s", distance)).show();
-					}
-				}
-				else
-				{
-					jQuery('#' + elementid_n + '_lat').val(pos.lat);
-					jQuery('#' + elementid_n + '_lon').val(pos.lng);
-					jQuery('#' + elementid_n + '_messages')
-						.removeClass('alert-info').removeClass('alert-success').removeClass('alert-info').addClass('alert-warning')
-						.html( Joomla.JText._('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ADDRESS_FOUND_WITHIN_TOLERANCE') + "<br/> -" + Joomla.JText._('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_ADDRESS_ONLY_LONG_LAT') ).show();
-				}
-			}
-		);
-	}
-
-
-	// fill address fields when autocomplete address is selected
-	fcfield_addrint.fillInAddress = function(elementid_n, place, config_name)
-	{
-		var redrawMap = false;
-		if (typeof place === "undefined" || !place)
-		{
-			place = fcfield_addrint.autoComplete[elementid_n].getPlace();
-			redrawMap = true;
-		}
-		//window.console.log(place);
-
-		if (typeof place.address_components == 'undefined') return;
-
-		// Check allowed country, (zero length means all allowed)
-		var country_valid = fcfield_addrint.allowed_countries[config_name].length == 0;
-		var selected_country = '';
-
-		if (!country_valid)
-		{
-			//place.address_components.forEach(function(o)
-			for(var j=0; j<place.address_components.length; j++)
-			{
-				var o = place.address_components[j];
-				if (o.types[0] != 'country') continue;
-				selected_country = o.long_name;
-				for(var i=0; i<fcfield_addrint.allowed_countries[config_name].length; i++)
-				{
-					if (o.short_name == fcfield_addrint.allowed_countries[config_name][i])
-					{
-						country_valid = true;
-						break;
-					}
-				}
-				if (country_valid) break;
-			}
-		}
-
-		if (!country_valid)
-		{
-			jQuery('#' + elementid_n + '_messages').removeClass('alert-success').removeClass('alert-info').addClass('alert-warning').html(
-				Joomla.JText._('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_COUNTRY_NOT_ALLOWED_WARNING') + ': <b>'
-				+ selected_country + '</b><br/>'
-				+ '<b>' + Joomla.JText._('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_PLEASE_USE_COUNTRIES') + '</b>: '
-				+ fcfield_addrint.allowed_countries[config_name].join(', ')
-			).show();
-			return false;
-		}
-		else
-		{
-			jQuery('#' + elementid_n + '_messages').html('').hide();
-		}
-
-
-		// Empty all fields in case they are not set to a new value
-		jQuery('' +
-			'#' + elementid_n + '_autocomplete, #' + elementid_n + '_name, #' + elementid_n + '_url,' +
-			'#' + elementid_n + '_addr_display, #' + elementid_n + '_addr_formatted,' +
-			'#' + elementid_n + '_addr1, #' + elementid_n + '_addr2, #' + elementid_n + '_addr3,' +
-			'#' + elementid_n + '_city, #' + elementid_n + '_state, #' + elementid_n + '_province, #' + elementid_n + '_country,' +
-			'#' + elementid_n + '_zip, #' + elementid_n + '_zip_suffix, #' + elementid_n + '_lat, #' + elementid_n + '_lon'
-		).val('');
-
-		// load city, country code, postal code
-		var country_long_name = "";
-		place.address_components.forEach(function(o)
-		{
-			switch(o.types[0])
-			{
-				// load city
-				case "locality":
-				jQuery('#' + elementid_n + '_city').val(o.long_name);
-				break;
-
-				// load country code
-				case "country":
-				jQuery('#' + elementid_n + '_country').val(o.short_name).trigger('change');
-				country_long_name = o.long_name;
-				break;
-
-				// load postal code
-				case "postal_code":
-				jQuery('#' + elementid_n + '_zip').val(o.long_name);
-				break;
-
-				// load postal code suffix
-				case "postal_code_suffix":
-				jQuery('#' + elementid_n + '_zip_suffix').val(o.long_name);
-				break;
-
-				// province
-				case "administrative_area_level_1":
-				jQuery('#' + elementid_n + '_province').val(o.long_name);
-				break;
-			}
-		});
-
-		var street_address = '', index = -1, div = document.createElement('div');
-
-		// Get FULL address
-		if (typeof place.formatted_address != 'undefined')
-			street_address = place.formatted_address;
-		else if (typeof place.adr_address != 'undefined')
-			street_address = place.adr_address;
-
-		//window.console.log(street_address);
-
-		// Strip tags
-		div.innerHTML = street_address;
-		street_address = div.textContent || div.innerText; // innerText: FF >= 45  --  textContent: IE >= 9
-		street_address = !!street_address ? street_address : "";  // Case div.textContent was empty string and div.innerText was undefined
-
-		// Convert full-address to just street-address, by splitting at the (zip) postal code
-		if (jQuery('#' + elementid_n + '_zip').val())
-		{
-			street_address = street_address.split( jQuery('#' + elementid_n + '_zip').val() )[0];
-		}
-
-		// Also split at the city / province or country in case that postal code (zip) was missing or in case it was placed after city or  province
-		index = jQuery('#' + elementid_n + '_city').val() ? street_address.lastIndexOf( jQuery('#' + elementid_n + '_city').val() ) : -1;
-		if (index != -1)  street_address = street_address.substring(0, index);
-
-		index = jQuery('#' + elementid_n + '_province').val() ? street_address.lastIndexOf( jQuery('#' + elementid_n + '_province').val() ) : -1;
-		if (index != -1)  street_address = street_address.substring(0, index);
-
-		if (country_long_name)  street_address = street_address.split(country_long_name)[0];
-
-		// Get the street address trimming any spaces, commas
-		street_address = street_address.replace(/(^\s*,)|(,\s*$)/g, '')
-		jQuery('#' + elementid_n + '_addr1').val(street_address);
-
-		if(jQuery('#' + elementid_n + '_country').val() == 'US')
-		{
-			// load state
-			place.address_components.forEach(function(o){
-				if(o.types[0] == 'administrative_area_level_1')
-				{
-					jQuery('#' + elementid_n + '_state').val(o.short_name).trigger('change');
-				}
-			});
-		}
-
-		// load suggested display address
-		jQuery('#' + elementid_n + '_addr_display, #' + elementid_n + '_addr_formatted').val(place.formatted_address);
-
-		// name to google maps
-		if ( place.formatted_address.indexOf(place.name) == -1 )
-		{
-			jQuery('#' + elementid_n + '_name').val(place.name);
-		}
-
-		// url to google maps
-		jQuery('#' + elementid_n + '_url').val(place.url);
-
-		// default zoom level
-		jQuery('#' + elementid_n + '_zoom').val(fcfield_addrint.map_zoom[config_name]);
-		jQuery('#' + elementid_n + '_zoom_label').text(fcfield_addrint.map_zoom[config_name]);
-
-		// latitude
-		jQuery('#' + elementid_n + '_lat').val(place.geometry.location.lat);
-
-		// longitude
-		jQuery('#' + elementid_n + '_lon').val(place.geometry.location.lng);
-
-		// reset map lat/lon
-		fcfield_addrint.LatLon[elementid_n] = place.geometry.location;
-
-		// redraw map
-		if (redrawMap)
-		{
-			fcfield_addrint.initMap(elementid_n, config_name);
-		}
-
-		// Trigger 'change' and 'blur' events on all fields in case they were not set to a new value, so that validation will work
-		jQuery('' +
-			'#' + elementid_n + '_autocomplete, #' + elementid_n + '_name, #' + elementid_n + '_url,' +
-			'#' + elementid_n + '_addr_display, #' + elementid_n + '_addr_formatted,' +
-			'#' + elementid_n + '_addr1, #' + elementid_n + '_addr2, #' + elementid_n + '_addr3,' +
-			'#' + elementid_n + '_city, #' + elementid_n + '_state, #' + elementid_n + '_province, #' + elementid_n + '_country,' +
-			'#' + elementid_n + '_zip, #' + elementid_n + '_zip_suffix, #' + elementid_n + '_lat, #' + elementid_n + '_lon'
-		).trigger('change').trigger('blur');
-	}
-
-
-	// Hide / show and disable / enable US state property
-	fcfield_addrint.toggle_USA_state = function(el)
-	{
-		var country = jQuery(el);
-		var usstate_row = country.closest('table').find('.fc_gm_usstate_row');
-		if (country.val()=='US')
-		{
-			usstate_row.show(600);
-			usstate_row.find('.fc_gm_usstate').removeAttr('disabled');
-		}
-		else
-		{
-			usstate_row.hide(600);
-			usstate_row.find('.fc_gm_usstate').attr('disabled', 'disabled');
-			usstate_row.find('.invalid').removeClass('invalid').removeAttr('aria-invalid');
-		}
-	}
-
-
-	fcfield_addrint.format_marker_image = function (state, theSelect)
-	{
-		return fcfield_addrint.markerLabel(theSelect[0], state.id, state.text).outerHTML;
-	}
-
-
-
-
-	/**
-	 *  Algolia search Engine with OpenStreetMaps
-	 */
-
-
-	// Update marker icon on map, on marker selector change
-	fcfield_addrint.updateMarkerIcon_OS = function(elementid_n, config_name)
-	{
-		var img = new Image();
-		var url = fcfield_addrint.getCustomMarkerUrl(elementid_n);
-		var anc = jQuery('#' + elementid_n + '_marker_anchor').val() || 'BotC';
-
-		var map     = fcfield_addrint.map_data[elementid_n].theMap;
-		var markers = fcfield_addrint.map_data[elementid_n].theMarkers;
-
-		img.addEventListener("load", function()
-		{
-			var w = this.naturalWidth, h = this.naturalHeight, a = {};
-
-			fcfield_addrint.getCustomMarkerAnchor(anc, a, w, h);
-
-			markers.forEach(function (marker) {
-				marker.setIcon(L.icon({
-					iconUrl: url,
-					iconSize: [w, h],
-					iconAnchor: [a.wA, a.hA]
-				}));
-			});
-		});
-
-		img.src = url;
-	}
-
-
-	// Handle changes in search autocomplete text, adding (temporarily) multiple markers that match current search text
-	fcfield_addrint.handleOnSuggestions_OS = function (e, d)
-	{
-		d.theMarkers.forEach(function (item) { fcfield_addrint.removeMarker_OS(item, d); });
-		d.theMarkers = [];
-
-		if (e.suggestions.length === 0)
-		{
-			d.theMap.setView(new L.LatLng(45, 0), 11);
-			return;
-		}
-
-		e.suggestions.forEach(function (item) { fcfield_addrint.addMarker_OS(item, d); });
-		fcfield_addrint.findBestZoom_OS(d);
-	}
-
-	// Handle highlighting (opacity 100%) the marker of the search result row that is currently active (e.g. mouse hovered by the or touched)
-	fcfield_addrint.handleOnCursorchanged_OS = function (e, d)
-	{
-		d.theMarkers.forEach(function(marker, markerIndex)
-		{
-			if (markerIndex === e.suggestionIndex) {
-				marker.setOpacity(1);
-				marker.setZIndexOffset(1000);
-			} else {
-				marker.setZIndexOffset(0);
-				marker.setOpacity(0.5);
-			}
-		});
-	}
-
-
-	// Handle selecting a specific search result by keeping the specific marker, and removing all other search result markers
-	fcfield_addrint.handleOnChange_OS = function (e, d)
-	{
-		d.theMarkers.forEach(function(marker, markerIndex)
-		{
-			if (markerIndex === e.suggestionIndex) {
-				d.theMarkers = [marker];
-				marker.setOpacity(1);
-				fcfield_addrint.findBestZoom_OS(d);
-			} else {
-				fcfield_addrint.removeMarker_OS(marker, d);
-			}
-		});
-	}
-
-
-	// Handle removing all markers from map
-	fcfield_addrint.handleOnClear_OS = function (e, d)
-	{
-		d.theMap.setView(new L.LatLng(45, 0), 11);
-		d.theMarkers.forEach(function (item) { fcfield_addrint.removeMarker_OS(item, d); });
-	}
-
-
-	// Handle adding a marker into the map (e.g. search result markers, or a marker for an already selectd location)
-	fcfield_addrint.addMarker_OS = function (suggestion, d, icon, opacity)
-	{
-		var opacity = !!opacity ? opacity : .4
-		var marker  = L.marker(suggestion.latlng, {opacity: opacity});
-
-		if (!!icon)
-		{
-			marker.setIcon(L.icon({ iconUrl: icon }));
-		}
-
-		marker.addTo(d.theMap);
-		d.theMarkers.push(marker);
-
-		return marker;
-	}
-
-
-	// Handle removing a marker from the map
-	fcfield_addrint.removeMarker_OS = function (marker, d)
-	{
-		d.theMap.removeLayer(marker);
-	}
-
-
-	// Handle moving map's view port and also setting an appropriate map zoom so that all markers in the map are visible
-	fcfield_addrint.findBestZoom_OS = function (d)
-	{
-		var featureGroup = L.featureGroup(d.theMarkers);
-		d.theMap.fitBounds(featureGroup.getBounds().pad(0.5), {animate: false, maxZoom: 10});
-	}
-
-
-	// Handle moving map's view port and also setting an appropriate map zoom so that all markers in the map are visible
-	fcfield_addrint.changeAutoCompleteType_OS = function (elementid_n, config_name)
-	{
-		var ac_type = jQuery('#' + elementid_n + '_ac_type').val();
-		fcfield_addrint.map_data[elementid_n].thePlacesAutocomplete.configure({type: ac_type});
-	}
-
-
-	// Initaliaze Algolia search Engine (uses OpenStreetMap)
-	fcfield_addrint.initAutoComplete_OS = function(elementid_n, config_name)
-	{
-		var el = document.getElementById(elementid_n + '_addressint_map');
-
-		jQuery("#" + elementid_n + "_addressint_map").css('display', '');
-		jQuery(el).addClass('has_fc_openstreet_map');
-
-
-		/**
-	   * Create Open Street Map
-		 */
-		var map = L.map('map_canvas_' + elementid_n, {
-			scrollWheelZoom: true,
-			zoomControl: true
-		});
-
-		// Store a reference to the map, e.g. to redraw it on TAB focus
-		el.os_maps_ref = map;
-
-		// Catch zoom change
-    map.on('zoomend',function(e){
-			jQuery('#' + elementid_n + '_zoom').val(map.getZoom());
+/** Google Maps address editor. Nominatim uses its own implementation of the same field hooks. */
+(() => {
+  const shared = window.fcfield_addrint ||= {};
+  const FC = Object.create(shared);
+  (shared.engines ||= {}).googlemap = FC;
+  for (const name of ['configure','autoComplete','gmapslistener','google_maps','allowed_countries','single_country','map_zoom','map_type','LatLon','posMarker']) {
+    shared[name] ||= [];
+  }
+  const field = (id, key) => document.getElementById(id + '_' + key);
+  const get = (id, key) => field(id, key)?.value || '';
+  const configure = (id, key, value) => {
+    const control = field(id, key);
+    if (control) control.value = value ?? '';
+  };
+  const change = control => {
+    control?.fc_choices_instance?.refresh();
+    FlexiForm.change(control);
+  };
+  const translation = key => FlexiForm.text('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_' + key);
+  const requests = new WeakMap();
+
+  function notify(id, lines = [], type = 'info') {
+    const box = field(id, 'messages');
+    if (!box) return;
+    box.classList.remove('alert-warning','alert-success','alert-info');
+    box.classList.add('alert-' + type);
+    box.replaceChildren(...lines.flatMap((line, i) => [
+      ...(i ? [document.createElement('br')] : []), document.createTextNode(line),
+    ]));
+    FlexiForm.show(box, lines.length > 0);
+  }
+
+  function coordinates(point) {
+    return { lat:typeof point.lat === 'function' ? point.lat() : point.lat,
+      lng:typeof point.lng === 'function' ? point.lng() : point.lng };
+  }
+
+  FC.initAutoComplete = (id, config) => {
+    const input = field(id, 'autocomplete');
+    const Autocomplete = window.google?.maps?.places?.Autocomplete;
+    if (!input || !Autocomplete) return;
+    const options = {};
+    const type = get(id, 'ac_type');
+    if (type) options.types = [type];
+    if (FC.single_country[config]) options.componentRestrictions = { country:FC.single_country[config] };
+    FC.gmapslistener[id]?.remove?.();
+    const picker = FC.autoComplete[id] = new Autocomplete(input, options);
+    FC.configure[config]?.(picker);
+    FC.gmapslistener[id] = google.maps.event.addListener(picker, 'place_changed', () => FC.fillInAddress(id, null, config));
+  };
+
+  FC.changeAutoCompleteType = id => {
+    const type = get(id, 'ac_type');
+    FC.autoComplete[id]?.setTypes(type ? [type] : []);
+  };
+
+  FC.getCustomMarkerUrl = id => {
+    const select = field(id, 'custom_marker');
+    if (!select?.value || !select.dataset.markerBaseUrl) return '';
+    try {
+      const base = new URL(select.dataset.markerBaseUrl, document.baseURI);
+      const url = new URL(encodeURIComponent(select.value), base);
+      return url.origin === location.origin && url.pathname.startsWith(base.pathname) ? url.href : '';
+    } catch { return ''; }
+  };
+
+  FC.markerLabel = (select, value, label) => {
+    const node = document.createElement('span');
+    node.className = 'fc-marker-label';
+    if (value && select.dataset.markerBaseUrl) {
+      let url;
+      try { url = new URL(encodeURIComponent(value), new URL(select.dataset.markerBaseUrl, document.baseURI)); } catch { /* Invalid marker URL. */ }
+      if (url?.origin === location.origin) {
+        const image = document.createElement('img');
+        image.className = 'flag fc-marker-img';
+        image.alt = '';
+        image.src = url.href;
+        node.append(image);
+      }
+    }
+    node.append(document.createTextNode([...select.options].find(option => option.value === String(value))?.textContent || label || ''));
+    return node;
+  };
+
+  FC.initMarkerSelector = id => {
+    const select = field(id, 'custom_marker');
+    if (!select) return;
+    const key = select.id;
+    const existing = select.fc_choices_instance || window.fc_choices_instances?.[key];
+    if (existing?.passedElement?.element === select) existing.destroy();
+    delete select.fc_choices_instance;
+    if (window.fc_choices_instances?.[key]) delete window.fc_choices_instances[key];
+
+    const Choices = window.fc_Choices || window.Choices;
+    if (window.fc_use_choicesjs && Choices && !window.skip_select2_js) {
+      const options = {
+        allowHTML:false, allowHtmlUserInput:false, shouldSort:false,
+        callbackOnCreateTemplates:() => Object.fromEntries(['item','choice'].map(kind => [kind, function(config, data, extra, group) {
+          const node = Choices.defaults.templates[kind].call(this, config, data, extra, group);
+          for (const child of [...node.childNodes]) if (child.nodeType === Node.TEXT_NODE) child.remove();
+          node.prepend(FC.markerLabel(select, data.value, data.label));
+          return node;
+        }])),
+      };
+      select.dispatchEvent(new CustomEvent('flexicontent:choices-options', { bubbles:true, detail:{options} }));
+      const instance = select.fc_choices_instance = new Choices(select, options);
+      (window.fc_choices_instances ||= {})[key] = instance;
+      instance.containerOuter.element.classList.add('fc-choices-outer');
+      select.dispatchEvent(new CustomEvent('flexicontent:choices-ready', { bubbles:true, detail:{instance} }));
+      return;
+    }
+
+    const preview = document.createElement('span');
+    preview.className = 'fc-marker-native-preview';
+    preview.setAttribute('aria-hidden','true');
+    if (select.nextElementSibling?.matches('.fc-marker-native-preview')) select.nextElementSibling.remove();
+    select.after(preview);
+    const show = () => {
+      if (!preview.isConnected) { select.removeEventListener('change', show); return; }
+      const image = FC.markerLabel(select, select.value, '').querySelector('img');
+      preview.replaceChildren(...(image ? [image] : []));
+      preview.hidden = !image;
+    };
+    select.addEventListener('change', show);
+    show();
+  };
+
+  FC.updateMarkerIcon = id => {
+    const marker = FC.posMarker[id];
+    if (!marker) return;
+    const url = FC.getCustomMarkerUrl(id);
+    if (!url) { marker.setIcon(null); return; }
+    const anchor = get(id, 'marker_anchor') || 'BotC';
+    const image = new Image();
+    image.addEventListener('load', () => {
+      if (FC.posMarker[id] !== marker || FC.getCustomMarkerUrl(id) !== url || (get(id, 'marker_anchor') || 'BotC') !== anchor) return;
+      const w = image.naturalWidth, h = image.naturalHeight;
+      const x = anchor.endsWith('L') ? 0 : anchor.endsWith('R') ? w : w/2;
+      const y = anchor.startsWith('Top') ? 0 : anchor.startsWith('Mid') ? h/2 : h;
+      marker.setIcon({ url, size:new google.maps.Size(w,h), anchor:new google.maps.Point(x,y) });
     });
+    image.src = url;
+  };
 
-		// Redraw map after delay (catch case of parent container resizing)
-		setTimeout(function() {
-			map.invalidateSize();
-		}, 10);
+  FC.initMap = (id, config) => {
+    const canvas = document.getElementById('map_canvas_' + id);
+    if (!canvas || !window.google?.maps?.Map) return;
+    canvas.classList.add('has_fc_google_maps_map');
+    FlexiForm.show(field(id,'addressint_map'));
+    const position = FC.LatLon[id];
+    const zoom = Number.parseInt(get(id, 'zoom'),10);
+    const map = FC.google_maps[id] = new google.maps.Map(canvas, {
+      center:position, scrollwheel:false, zoom:Number.isFinite(zoom) ? zoom : FC.map_zoom[config],
+      mapTypeId:google.maps.MapTypeId[FC.map_type[config]], zoomControl:true, mapTypeControl:true,
+      streetViewControl:true, scaleControl:true, rotateControl:true,
+    });
+    const marker = FC.posMarker[id] = new google.maps.Marker({
+      map, position, draggable:true, animation:google.maps.Animation.DROP, icon:FC.getCustomMarkerUrl(id),
+    });
+    FC.updateMarkerIcon(id);
+    google.maps.event.addListener(map, 'zoom_changed', () => configure(id, 'zoom', map.getZoom()));
+    google.maps.event.addListener(marker, 'dragend', () => FC.geocodePosition(id, marker.getPosition(), marker, config));
+  };
 
+  FC.geocodePosition = (id, position, marker, config) => {
+    const box = field(id,'messages');
+    if (!box) return;
+    const request = {};
+    requests.set(box, request);
+    notify(id, ['Searching address of new marker position ...']);
+    new google.maps.Geocoder().geocode({ location:position }, (results, status) => {
+      if (!box.isConnected || requests.get(box) !== request) return;
+      const location = results?.[0]?.geometry?.location;
+      const tolerance = Math.max(Number.parseInt(get(id,'marker_tolerance'),10) || 50, 1);
+      configure(id, 'marker_tolerance', tolerance);
+      const distance = location && google.maps.geometry?.spherical
+        ? Math.round(google.maps.geometry.spherical.computeDistanceBetween(location, position)) : Infinity;
+      if (status === google.maps.GeocoderStatus.OK && distance <= tolerance && FC.fillInAddress(id, results[0], config)) {
+        marker.setPosition(location);
+        notify(id, [translation('MARKER_ADDRESS_FOUND_WITHIN_TOLERANCE').replace('%s', distance)], 'success');
+      } else {
+        const { lat, lng } = coordinates(position);
+        configure(id, 'lat', lat);
+        configure(id, 'lon', lng);
+        const key = location ? 'MARKER_ADDRESS_NOT_FOUND_WITHIN_TOLERANCE' : 'MARKER_ADDRESS_NOT_FOUND_AT_MARKER';
+        notify(id, [translation(key).replace('%s', tolerance), translation('MARKER_ADDRESS_ONLY_LONG_LAT')], 'warning');
+      }
+    });
+  };
 
-		/**
-		 * Initialize autocomplete search box
-		 */
-		var placesAutocomplete = places({
-			appId: fcfield_addrint.algolia_api_id,
-			apiKey: fcfield_addrint.algolia_api_key,
-			container: document.querySelector('#' + elementid_n + '_autocomplete'),
-			templates: {
-				value: function(suggestion) {
-					return suggestion.name;
-				}
-			}
-		});
+  FC.fillInAddress = (id, place, config) => {
+    const redraw = !place;
+    if (redraw) requests.delete(field(id, 'messages'));
+    place ||= FC.autoComplete[id]?.getPlace();
+    if (!place?.address_components || !place.geometry?.location) return false;
+    const parts = Object.fromEntries(place.address_components.map(value => [value.types[0], value]));
+    const allowed = (FC.allowed_countries[config] || []).map(country => country.toUpperCase());
+    const country = parts.country?.short_name || '';
+    if (allowed.length && !allowed.includes(country.toUpperCase())) {
+      notify(id, [translation('COUNTRY_NOT_ALLOWED_WARNING') + ': ' + (parts.country?.long_name || ''),
+        translation('PLEASE_USE_COUNTRIES') + ': ' + allowed.join(', ')], 'warning');
+      return false;
+    }
+    notify(id);
+    const markup = document.createElement('template');
+    markup.innerHTML = place.formatted_address || place.adr_address || '';
+    const full = markup.content.textContent || '';
+    const city = parts.locality?.long_name, province = parts.administrative_area_level_1?.long_name;
+    const zip = parts.postal_code?.long_name;
+    let street = zip ? full.split(zip)[0] : full;
+    for (const part of [city, province]) {
+      const index = part ? street.lastIndexOf(part) : -1;
+      if (index !== -1) street = street.slice(0,index);
+    }
+    if (parts.country?.long_name) street = street.split(parts.country.long_name)[0];
+    const { lat, lng } = coordinates(place.geometry.location);
+    const values = {
+      autocomplete:'', addr_display:full, addr_formatted:full, addr1:street.replace(/(^\s*,)|(,\s*$)/g,''),
+      addr2:'', addr3:'', name:full.includes(place.name || '') ? '' : place.name,
+      url:place.url, city, province, zip, zip_suffix:parts.postal_code_suffix?.long_name,
+      country, state:country === 'US' ? parts.administrative_area_level_1?.short_name : '', lat, lon:lng,
+    };
+    for (const [key, value] of Object.entries(values)) configure(id, key, value);
+    configure(id,'zoom', FC.map_zoom[config]);
+    const zoom = field(id,'zoom_label');
+    if (zoom) zoom.textContent = FC.map_zoom[config];
+    FC.LatLon[id] = place.geometry.location;
+    if (redraw) FC.initMap(id,config);
+    for (const key of Object.keys(values)) {
+      const control = field(id,key);
+      change(control);
+      control?.dispatchEvent(new FocusEvent('blur'));
+    }
+    return true;
+  };
 
-		// Apply field's configuration
-		fcfield_addrint.configure[config_name] (placesAutocomplete);
-
-
-		/**
-		 * Store a references to map, markers, placesAutocomplete
-		 * e.g. to update marker icon, re-configure autocomplete on search type selector change
-		 */
-		var d = {theMap: map, theMarkers: [], thePlacesAutocomplete: placesAutocomplete};
-		fcfield_addrint.map_data[elementid_n] = d;
-		fcfield_addrint.openstreet_maps[elementid_n + '_addressint_map'] = map;
-
-
-		/**
-		 * Add current value as marker on the map
-		 */
-		var lat_lon = [jQuery('#' + elementid_n + '_lat').val(), jQuery('#' + elementid_n + '_lon').val()];
-		var icon = jQuery('#' + elementid_n + '_custom_marker').val();
-
-		map.setView(lat_lon, jQuery('#' + elementid_n + '_zoom').val());
-		fcfield_addrint.addMarker_OS({latlng: lat_lon}, d, icon, 1);
-
-
-		/**
-		 * Actions to take when an autocomplete is done
-		 */
-		placesAutocomplete.on('change', function resultSelected(e)
-		{
-			//window.console.log(e.suggestion);
-			var t = e.suggestion.type;
-
-			!!!document.querySelector('#' + elementid_n + '_name') ? false : document.querySelector('#' + elementid_n + '_name').value =
-				(t === 'busStop' || t === 'trainStation' || t === 'townhall' || t === 'airport') && !!e.suggestion.value ? e.suggestion.value : '';
-
-			!!!document.querySelector('#' + elementid_n + '_addr1') ? false : document.querySelector('#' + elementid_n + '_addr1').value =
-				t === 'address' && !!e.suggestion.value ? e.suggestion.value : '';
-
-			!!!document.querySelector('#' + elementid_n + '_city') ? false : document.querySelector('#' + elementid_n + '_city').value =
-				(!!e.suggestion.city ? e.suggestion.city : (t === 'city' && !!e.suggestion.value ? e.suggestion.value : ''));
-
-			!!!document.querySelector('#' + elementid_n + '_province') ? false : document.querySelector('#' + elementid_n + '_province').value =
-				e.suggestion.administrative || '';
-
-			!!!document.querySelector('#' + elementid_n + '_zip') ? false : document.querySelector('#' + elementid_n + '_zip').value = e.suggestion.postcode || '';
-
-			var country = !!!document.querySelector('#' + elementid_n + '_country') ? false : e.suggestion.countryCode.toUpperCase() || '';
-			jQuery('#' + elementid_n + '_country').val(country).trigger('change');
-
-			!!!document.querySelector('#' + elementid_n + '_lat') ? false : document.querySelector('#' + elementid_n + '_lat').value = e.suggestion.latlng['lat'] || '';
-			!!!document.querySelector('#' + elementid_n + '_lon') ? false : document.querySelector('#' + elementid_n + '_lon').value = e.suggestion.latlng['lng'] || '';
-
-			// Not applicable fields, clear them after an autocomplete operation
-			!!!document.querySelector('#' + elementid_n + '_addr_formatted') ? false : document.querySelector('#' + elementid_n + '_addr_formatted').value = '';
-			!!!document.querySelector('#' + elementid_n + '_url') ? false : document.querySelector('#' + elementid_n + '_url').value = '';
-
-			!!!document.querySelector('#' + elementid_n + '_zip_suffix') ? false : document.querySelector('#' + elementid_n + '_zip_suffix').value = '';
-			!!!document.querySelector('#' + elementid_n + '_addr2') ? false : document.querySelector('#' + elementid_n + '_addr2').value = '';
-			!!!document.querySelector('#' + elementid_n + '_addr3') ? false : document.querySelector('#' + elementid_n + '_addr3').value = '';
-		});
-
-		var osmLayer = new L.TileLayer(
-			'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-				minZoom: 1,
-				maxZoom: 19,
-				attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
-			}
-		);
-
-		map.addLayer(osmLayer);
-
-		placesAutocomplete.on('suggestions', function (e) { fcfield_addrint.handleOnSuggestions_OS(e, d); });
-		placesAutocomplete.on('cursorchanged', function (e) { fcfield_addrint.handleOnCursorchanged_OS(e, d); });
-		placesAutocomplete.on('change', function (e) { fcfield_addrint.handleOnChange_OS(e, d); });
-		placesAutocomplete.on('clear', function (e) { fcfield_addrint.handleOnClear_OS(e, d); });
-	}
+  FC.toggle_USA_state = country => {
+    const row = country?.closest('table')?.querySelector('.fc_gm_usstate_row');
+    if (!row) return;
+    const enabled = country.value === 'US';
+    FlexiForm.show(row, enabled);
+    const state = row.querySelector('.fc_gm_usstate');
+    if (state) state.disabled = !enabled;
+    if (!enabled) for (const element of row.querySelectorAll('.invalid')) {
+      element.classList.remove('invalid');
+      element.removeAttribute('aria-invalid');
+    }
+  };
+  for (const method of ['geocodePosition', 'fillInAddress', 'markerLabel', 'getCustomMarkerUrl']) shared[method] = FC[method];
+})();

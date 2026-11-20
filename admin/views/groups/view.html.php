@@ -135,13 +135,13 @@ class FlexicontentViewGroups extends FlexicontentViewBaseRecords
 		}
 
 		$js = '';
-		if ($search)            $js .= "jQuery('.col_title').addClass('filtered_column');";
-		if ($filter_id)         $js .= "jQuery('.col_id').addClass('filtered_column');";
+		if ($search)            $js .= "document.querySelectorAll('.col_title').forEach(el => el.classList.add('filtered_column'));";
+		if ($filter_id)         $js .= "document.querySelectorAll('.col_id').forEach(el => el.classList.add('filtered_column'));";
 
 		if ($js)
 		{
 			$document->addScriptDeclaration('
-				jQuery(document).ready(function(){
+				FlexiForm.ready(function(){
 					' . $js . '
 				});
 			');
@@ -278,9 +278,9 @@ class FlexicontentViewGroups extends FlexicontentViewBaseRecords
 		$document->addScriptDeclaration('
 			function fc_edit_jgroup_modal_load( container )
 			{
-				if ( container.find("iframe").get(0).contentWindow.location.href.indexOf("view=groups") != -1 )
+				if ( FlexiForm.element(container).querySelector("iframe").contentWindow.location.href.indexOf("view=groups") != -1 )
 				{
-					container.dialog("close");
+					fc_closeDialog(FlexiForm.element(container).id);
 				}
 			}
 			function fc_edit_jgroup_modal_close()
@@ -299,7 +299,7 @@ class FlexicontentViewGroups extends FlexicontentViewBaseRecords
 			\Joomla\CMS\Toolbar\ToolbarHelper::divider();
 			flexicontent_html::addToolBarButton(
 				'FLEXI_NEW', $btn_name='add_jgroup',
-				$full_js="var url = jQuery(this).attr('data-href'); var the_dialog = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, fc_edit_jgroup_modal_close, {title:'".$modal_title."', loadFunc: fc_edit_jgroup_modal_load}); return false;",
+				$full_js="var url = this.getAttribute('data-href'); var the_dialog = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, fc_edit_jgroup_modal_close, {title:'".$modal_title."', loadFunc: fc_edit_jgroup_modal_load}); return false;",
 				$msg_alert='', $msg_confirm='',
 				$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class=$this->btn_sm_class . " btn-success " . $this->tooltip_class, $btn_icon="icon-new icon-white",
 				'data-placement="bottom" data-href="index.php?option=com_users&amp;task=group.edit&amp;id=0" title="Add new Joomla group"'
@@ -322,7 +322,7 @@ class FlexicontentViewGroups extends FlexicontentViewBaseRecords
 			$btn_icon = 'icon-download';
 			$btn_name = 'download';
 			$btn_task    = 'appsman.exportxml';
-			$extra_js    = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; jQuery('<input>').attr({type: 'hidden', name: 'table', value: 'usergroups'}).appendTo(jQuery(f));";
+			$extra_js    = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; var input=Object.assign(document.createElement('input'),{type:'hidden',name:'table',value:'usergroups'}); f.append(input);";
 			flexicontent_html::addToolBarButton(
 				'Export now',
 				$btn_name, $full_js='', $msg_alert='', $msg_confirm=\Joomla\CMS\Language\Text::_('FLEXI_EXPORT_NOW_AS_XML'),
@@ -331,7 +331,7 @@ class FlexicontentViewGroups extends FlexicontentViewBaseRecords
 			$btn_icon = 'icon-box-add';
 			$btn_name = 'box-add';
 			$btn_task    = 'appsman.addtoexport';
-			$extra_js    = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; jQuery('<input>').attr({type: 'hidden', name: 'table', value: 'usergroups'}).appendTo(jQuery(f));";
+			$extra_js    = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; var input=Object.assign(document.createElement('input'),{type:'hidden',name:'table',value:'usergroups'}); f.append(input);";
 			flexicontent_html::addToolBarButton(
 				'Add to export',
 				$btn_name, $full_js='', $msg_alert='', $msg_confirm=\Joomla\CMS\Language\Text::_('FLEXI_ADD_TO_EXPORT_LIST'),
@@ -349,7 +349,7 @@ class FlexicontentViewGroups extends FlexicontentViewBaseRecords
 		if ($js)
 		{
 			$document->addScriptDeclaration('
-				jQuery(document).ready(function(){
+				FlexiForm.ready(function(){
 					' . $js . '
 				});
 			');

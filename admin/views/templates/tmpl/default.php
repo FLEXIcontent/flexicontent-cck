@@ -39,23 +39,19 @@ $form_token = \Joomla\CMS\Session\Session::getFormToken();
 $js = "
 var fc_tmpls_modal;
 
-jQuery(document).ready(function() {
-	jQuery('span.deletable-template').click(function( event ) {
-		var answer = confirm('".\Joomla\CMS\Language\Text::_( 'FLEXI_TEMPLATE_DELETE_CONFIRM',true )."')
+FlexiForm.ready(function() {
+	document.querySelectorAll('span.deletable-template').forEach(el => el.addEventListener('click', async function(event) {
+		var answer = await FlexiForm.confirm('".\Joomla\CMS\Language\Text::_( 'FLEXI_TEMPLATE_DELETE_CONFIRM',true )."');
 		if (!answer) return;
-		var el = jQuery(this);
-		var tmpl_name = el.attr('id').replace('del-','');
-		
-		el.html('<img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" style=\"vertical-align: middle;\">');
-		jQuery.ajax({
-			type: \"GET\",
-			url:  \"index.php?option=com_flexicontent&".$ctrl_task."remove&format=raw&dir=\" + tmpl_name + \"&".$form_token."=1\",
-			success: function(str) {
-				el.parent().css('width','200px');
-				el.parent().html(str);
-			}
-		});
-	});
+		if (el.getAttribute('aria-busy') === 'true') return;
+		el.setAttribute('aria-busy', 'true');
+		try {
+			const response = await fetch(\"index.php?option=com_flexicontent&".$ctrl_task."remove&format=raw&dir=\" + encodeURIComponent(el.id.replace('del-','')) + \"&".$form_token."=1\", {credentials:'same-origin'});
+			if (!response.ok) throw Error(response.statusText);
+			await FlexiForm.insertHTML(el.parentElement, await response.text());
+		} catch (error) { FlexiForm.message('error', error.message); }
+		finally { el.removeAttribute('aria-busy'); }
+	}));
 });
 ";
 \Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration($js);
@@ -168,7 +164,7 @@ $list_total_cols = 8;
 					</span>
 			 	<?php endif; ?>
 				<?php /*<a class="modal" onclick="javascript:;" rel="{handler: 'iframe', size: {x: 390, y: 210}}" href="<?php echo $copylink; ?>"><?php echo $copyTmpl_icon; ?></a>*/ ?>
-				<span class="<?php echo $this->btn_sm_class; ?> hasTooltip" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_DUPLICATE_TEMPLATE', true); ?>" onclick="var url = jQuery(this).attr('data-href'); fc_tmpls_modal = fc_showDialog(url, 'fc_modal_popup_container', 0, 440, 300, fc_template_modal_close); return false;" data-href="<?php echo $copylink; ?>">
+				<span class="<?php echo $this->btn_sm_class; ?> hasTooltip" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_DUPLICATE_TEMPLATE', true); ?>" onclick="var url = this.getAttribute('data-href'); fc_tmpls_modal = fc_showDialog(url, 'fc_modal_popup_container', 0, 440, 300, fc_template_modal_close); return false;" data-href="<?php echo $copylink; ?>">
 					<?php echo $copyTmpl_icon; ?>
 				</span>
 			</td>

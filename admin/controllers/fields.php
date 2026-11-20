@@ -715,7 +715,7 @@ class FlexicontentControllerFields extends FlexicontentControllerBaseAdmin
 			function field_toggleprop(shortname, onoff)
 			{
 				if (window.parent.document.adminForm.boxchecked.value==0) {
-					alert("' . \Joomla\CMS\Language\Text::_('FLEXI_NO_ITEMS_SELECTED', true) . '");
+					window.parent.FlexiForm.alert("' . \Joomla\CMS\Language\Text::_('FLEXI_NO_ITEMS_SELECTED', true) . '");
 					return false;
 				}
 				var fc_blocker_mssg = document.getElementsByClassName("fc_blocker_mssg")[0];

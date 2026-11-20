@@ -125,7 +125,7 @@ foreach ($field->value as $index => $value)
 	$select_existing = '';
 	$pick_existing = '';
 	$addExistingURL = sprintf($filesElementURL, $elementid_n);
-	$addExistingURL_onclick = "fcfield_image.dialog_handle['".$field_name_js."'] = fc_field_dialog_handle_".$field->id." = fc_showDialog(jQuery(this).attr('data-href'), 'fc_modal_popup_container', 0, 0, 0, 0, {title: '".Text::_('FLEXI_SELECT_IMAGE', true)."', paddingW: 10, paddingH: 16});";
+	$addExistingURL_onclick = "fcfield_image.dialog_handle['".$field_name_js."'] = fc_field_dialog_handle_".$field->id." = fc_showDialog(this.dataset.href, 'fc_modal_popup_container', 0, 0, 0, 0, {title: '".Text::_('FLEXI_SELECT_IMAGE', true)."', paddingW: 10, paddingH: 16});";
 
 	if ($image_source >= 0)
 	{
@@ -171,10 +171,10 @@ foreach ($field->value as $index => $value)
 				<input type="text" name="'.$fieldname_n.'[existingname]" id="'.$mm_id.'" value="'.htmlspecialchars($img_path, ENT_COMPAT, 'UTF-8').'" readonly="readonly"
 					class="existingname input-large field-media-input hasTipImgpath" onchange="fcfield_image.update_path_tip(this);" title="'.htmlspecialchars('<span id="TipImgpath"></span>', ENT_COMPAT, 'UTF-8').'" data-basepath="'.\Joomla\CMS\Uri\Uri::root().'"
 				/>
-				<a class="fc_image_field_mm_modal btn '.$tooltip_class.'" title="'.Text::_('FLEXI_SELECT_IMAGE').'" onclick="var mm_id=jQuery(this).parent().find(\'.existingname\').attr(\'id\'); fcfield_image.currElement[\''.$field_name_js.'\']=mm_id; SqueezeBox.open(\''.$mm_link.'\', {size:{x: ((window.innerWidth-120) > 1360 ? 1360 : (window.innerWidth-120)), y: ((window.innerHeight-220) > 800 ? 800 : (window.innerHeight-220))}, handler: \'iframe\', onClose: function() { fcfield_image.incrementValCnt(\''.$field_name_js.'\'); } });  return false;">
+				<a class="fc_image_field_mm_modal btn '.$tooltip_class.'" title="'.Text::_('FLEXI_SELECT_IMAGE').'" onclick="var mm_id=this.parentElement.querySelector(\'.existingname\').id; fcfield_image.currElement[\''.$field_name_js.'\']=mm_id; SqueezeBox.open(\''.$mm_link.'\', {size:{x: ((window.innerWidth-120) > 1360 ? 1360 : (window.innerWidth-120)), y: ((window.innerHeight-220) > 800 ? 800 : (window.innerHeight-220))}, handler: \'iframe\', onClose: function() { fcfield_image.incrementValCnt(\''.$field_name_js.'\'); } });  return false;">
 					'.Text::_('FLEXI_SELECT').'
 				</a>
-				<a class="btn '.$tooltip_class.'" href="javascript:;" title="'.Text::_('FLEXI_CLEAR').'" onclick="var mm_id=jQuery(this).parent().find(\'.existingname\').attr(\'id\'); fcfield_image.clearField(this, {}, \''.$field_name_js.'\'); jInsertFieldValue(\'\', mm_id); return false;" >
+				<a class="btn '.$tooltip_class.'" href="javascript:;" title="'.Text::_('FLEXI_CLEAR').'" onclick="var mm_id=this.parentElement.querySelector(\'.existingname\').id; fcfield_image.clearField(this, {}, \''.$field_name_js.'\'); jInsertFieldValue(\'\', mm_id); return false;" >
 					<i class="icon-remove"></i>
 				</a>
 			</div>
@@ -244,8 +244,8 @@ foreach ($field->value as $index => $value)
 			$select_existing = $jfield->input;
 
 			// Workaround field to clear both existingname and originalname input fields
-			$select_existing = str_replace('button-clear"', 'button-clear" onclick="jQuery(this).parent().find(\'input\').attr(\'value\', \'\');"', $select_existing);
-			$select_existing = str_replace('quantumuploadimage-delete only-icon"', 'quantumuploadimage-delete only-icon" onclick="let el = jQuery(this).closest(\'.fcfieldval_container\').find(\'input\'); if (el.length) { el.attr(\'value\', \'\'); el.val(\'\'); }"', $select_existing);
+			$select_existing = str_replace('button-clear"', 'button-clear" onclick="var el = this.parentElement.querySelector(\'input\'); if (el) el.defaultValue = \'\';"', $select_existing);
+			$select_existing = str_replace('quantumuploadimage-delete only-icon"', 'quantumuploadimage-delete only-icon" onclick="this.closest(\'.fcfieldval_container\').querySelectorAll(\'input\').forEach(el => { el.defaultValue = \'\'; el.value = \'\'; });"', $select_existing);
 
 			if ($use_quantum)
 			{
@@ -398,15 +398,8 @@ foreach ($field->value as $index => $value)
 		$pick_existing_n = $pick_existing ? str_replace('__FORMFLDID__', $elementid_n.'_existingname', $pick_existing_n) : '';
 	}
 
-	$toggleUploader_onclick = 'var box = this.closest(\'.fcfieldval_container\'); ' .
-		'if (!box) return; ' .
-		'var uploader = box.querySelector(\'.fc_file_uploader\'); ' .
-		'var isVisible = uploader && window.getComputedStyle(uploader).display !== \'none\'; ' .
-		'isVisible ? this.classList.remove(\'active\') : this.classList.add(\'active\'); ' .
-		'var preview = box.querySelector(\'.fcfield_preview_box\'); ' .
-		'if (preview) preview.style.display = isVisible ? \'\' : \'none\'; ';
+	$toggleUploader_onclick = 'if (!FlexiMediaField.beforeToggle(this, \'image\')) return; ';
 
-	// Icon-only buttons, no text labels
 	$flat_btn_class = ' fc-flat-btn';
 
 	if ($use_inline_uploaders)
@@ -435,18 +428,20 @@ foreach ($field->value as $index => $value)
 		$uploader_html->multiUploadBtn = '';
 		// !!! CLASS: fc-files-modal-link fc-sel NEEDED BY JS !!! DO NOT REMOVE, DO NOT MOVE
 		$uploader_html->myFilesBtn = '
-			<span data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" class="fc-files-modal-link fc-sel '.$btn_classes.'" title="' . Text::_('FLEXI_MY_FILES') . '" data-rowno="'.$n.'" id="'.$elementid_n.'_selectvalue">
+			<button type="button" data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" class="fc-files-modal-link fc-sel '.$btn_classes.'" aria-label="' . htmlspecialchars(Text::_('FLEXI_MY_FILES'), ENT_QUOTES, 'UTF-8') . '" title="' . Text::_('FLEXI_MY_FILES') . '" data-rowno="'.$n.'" id="'.$elementid_n.'_selectvalue">
 				<span class="fc-image-tool-icon fas fa-images" aria-hidden="true"></span>
-			</span>';
+			</button>';
 		// !!! CLASS: fc-files-modal-link fc-up NEEDED BY JS !!! DO NOT REMOVE, DO NOT MOVE
 		$uploader_html->mediaUrlBtn = !$usemediaurl ? '' : '
-			<span class="fc-files-modal-link fc-sel fcfield-mediaurl-btn ' . $btn_classes .'" data-for="' . $elementid_n . '" title="' . Text::_('FLEXI_FIELD_MEDIA_URL') . '" onclick="fcfield_image.toggleMediaURL(\''.$elementid_n.'\', \''.$field_name_js.'\'); return false;">
+			<button type="button" class="fc-files-modal-link fc-sel fcfield-mediaurl-btn ' . $btn_classes .'" data-for="' . $elementid_n . '" aria-label="' . htmlspecialchars(Text::_('FLEXI_FIELD_MEDIA_URL'), ENT_QUOTES, 'UTF-8') . '" aria-expanded="false" title="' . Text::_('FLEXI_FIELD_MEDIA_URL') . '" onclick="fcfield_image.toggleMediaURL(\''.$elementid_n.'\', \''.$field_name_js.'\'); return false;">
 				<span class="fc-image-tool-icon fas fa-video" aria-hidden="true"></span>
-			</span>';
+			</button>';
 	}
 
 	// Edit button, in the toolbar below the image
-	$info_button = '<span class="fc-flat-btn fc-image-edit-btn" data-for="' . $elementid_n . '" title="' . Text::_('FLEXI_EDIT_OPTIONS') . '" onclick="fcfield_image.toggleFields(\'' . $elementid_n . '\');"><span class="fc-image-tool-icon fas fa-edit" aria-hidden="true"></span></span>';
+	$has_edit_props = $linkto_url || $usealt || $usetitle || $usedesc || $usecust1 || $usecust2;
+	$info_button = !$has_edit_props ? '' : '<button type="button" class="fc-flat-btn fc-image-edit-btn" data-for="' . $elementid_n . '" aria-label="' . htmlspecialchars(Text::_('FLEXI_EDIT_OPTIONS'), ENT_QUOTES, 'UTF-8') . '" aria-expanded="false" title="' . Text::_('FLEXI_EDIT_OPTIONS') . '" onclick="fcfield_image.toggleFields(\'' . $elementid_n . '\');"><span class="fc-image-tool-icon fas fa-edit" aria-hidden="true"></span></button>';
+	$clear_button = '<button type="button" class="fc-flat-btn fcfield-clearvalue" aria-label="' . htmlspecialchars(Text::_('FLEXI_CLEAR'), ENT_QUOTES, 'UTF-8') . '" title="' . Text::_('FLEXI_CLEAR') . '" onclick="fcfield_image.clearField(this, {}, \'' . $field_name_js . '\');"><span class="fc-image-tool-icon fas fa-eraser" aria-hidden="true"></span></button>';
 
 	// Remove button shown directly in the top toolbar (no dropdown)
 	$remove_button_direct = (isset($remove_button) && $remove_button !== '') ? $remove_button : '';
@@ -461,7 +456,7 @@ foreach ($field->value as $index => $value)
 					($use_myfiles > 0 ? $uploader_html->myFilesBtn : '') .
 					$uploader_html->mediaUrlBtn
 				: '').'
-				'.$info_button.'
+				'.$info_button . ($use_inline_uploaders ? $clear_button : '').'
 			</div>
 		</div>' : '';
 
@@ -498,24 +493,24 @@ foreach ($field->value as $index => $value)
 					'.$select_existing.'
 					</div>
 				').'
+				'.$fc_preview_msg.'
 				'.$bottom_toolbar.'
 				'
 
 		.(($linkto_url || $usemediaurl || $usealt || $usetitle || $usedesc || $usecust1 || $usecust2) ?
 			'
 
-				'.(($linkto_url || $usemediaurl) ? '
+				'.($usemediaurl ? '
 				<div class="fcimg_url_props" data-name="'.$elementid_n.'" style="display: none;">
-					'.$fc_preview_msg.'
 					<div class="fc-form-tbl fcinner fccompact">
-						' . @ $urllink . '
 						' . @ $mediaurl . '
 					</div>
 				</div>
 				' : '').'
-				'.(($usealt || $usetitle || $usedesc || $usecust1 || $usecust2) ? '
+				'.($has_edit_props ? '
 				<div class="fcimg_value_props" data-name="'.$elementid_n.'" style="display: none;">
 					<div class="fc-form-tbl fcinner fccompact">
+						' . @ $urllink . '
 						' . @ $alt . '
 						' . @ $title . '
 						' . @ $desc . '
@@ -549,7 +544,7 @@ foreach ($field->value as $index => $value)
 //document.addEventListener('DOMContentLoaded', function()
 $js = ""
 	. (!$per_value_js ? "" : "
-	jQuery(document).ready(function()
+	FlexiForm.ready(function()
 	{
 		" . $per_value_js . "
 	});

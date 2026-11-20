@@ -95,31 +95,7 @@ $js = '';
 $js .= "
 
 // Delete a specific list filter
-function delFilter(name)
-{
-	//if(window.console) window.console.log('Clearing filter:'+name);
-	var myForm = jQuery('#adminForm');
-	var filter = jQuery('#'+name);
-
-	if (!filter.length)
-	{
-		return;
-	}
-	else if (filter.attr('type') == 'checkbox')
-	{
-		filter.checked = '';
-	}
-	else
-	{
-		filter.val('');
-
-		// Case that input has Calendar JS attached
-		if (filter.attr('data-alt-value'))
-		{
-			filter.attr('data-alt-value', '');
-		}
-	}
-}
+function delFilter(name) { const field=document.getElementById(name); if (!field) return; if(field.type==='checkbox')field.checked=false; else if(field.tagName==='SELECT')FlexiForm.clearSelect(field); else field.value=''; }
 
 function delAllFilters()
 {

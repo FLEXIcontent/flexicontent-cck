@@ -1,0 +1,8 @@
+.fc-fieldgroup-collapsed .control-fc_subgroup:not(.fcAlwaysVisibleField),
+.fc-fieldgroup-values[hidden],
+.fcfield-group [hidden].fc-toggle-group-up,
+.fcfield-group [hidden].fc-toggle-group-down,
+.toggle_all_values_buttons_box [hidden].fc-hide-vals-btn,
+.toggle_all_values_buttons_box [hidden].fc-show-vals-btn {
+  display: none !important;
+}

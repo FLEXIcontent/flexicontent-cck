@@ -354,143 +354,102 @@ if ($use_jmedia_man)
 
 $js .= "
 
-// Delete a specific list filter
+// Clear list filters through their original form controls.
 function delFilter(name)
 {
-	//if(window.console) window.console.log('Clearing filter:'+name);
-	var myForm = jQuery('#adminForm');
-	var filter = jQuery('#'+name);
-
-	if (!filter.length)
-	{
-		return;
-	}
-	else if (filter.attr('type') == 'checkbox')
-	{
-		filter.checked = '';
-	}
-	else
-	{
-		filter.val('');
-
-		// Case that input has Calendar JS attached
-		if (filter.attr('data-alt-value'))
-		{
-			filter.attr('data-alt-value', '');
-		}
-	}
+	const filter = document.getElementById(name);
+	if (!filter) return;
+	if (filter.type === 'checkbox') filter.checked = false;
+	else filter.value = '';
+	if (filter.hasAttribute('data-alt-value')) filter.setAttribute('data-alt-value', '');
+	filter.fc_choices_instance?.refresh();
 }
 
 function delAllFilters()
 {
-	delFilter('search');
-	delFilter('filter_uploader');
-	delFilter('filter_state');
-	delFilter('filter_access');
-	delFilter('filter_lang');
-	delFilter('filter_url');
-	delFilter('filter_stamp');
-	delFilter('filter_secure');
-	delFilter('filter_ext');
-	delFilter('item_id');
-	delFilter('filter_order');
-	delFilter('filter_order_Dir');
+	['search', 'filter_uploader', 'filter_state', 'filter_access', 'filter_lang', 'filter_url',
+		'filter_stamp', 'filter_secure', 'filter_ext', 'item_id', 'filter_order', 'filter_order_Dir'].forEach(delFilter);
 }
 
 function disabledEventPropagation(event)
 {
-	if (event.stopPropagation)
+	event.stopPropagation();
+}
+
+function fman_zoom_thumb(event, control)
+{
+	event.stopPropagation();
+	const box = control.closest('.fc-fileman-grid-thumb-box');
+	const image = box?.querySelector('img.fc-fileman-thumb');
+	const button = box?.querySelector('.fc-fileman-preview-btn');
+	if (!image) return;
+
+	const overlay = document.getElementById('fc-fileman-overlay');
+	if (image.classList.contains('fc_zoomed'))
 	{
-		event.stopPropagation();
+		button?.classList.remove('active', 'btn-info');
+		image.classList.remove('fc_zoomed');
+		setTimeout(() => {
+			image.classList.remove('fc_zooming');
+			FlexiForm.show(overlay, false);
+		}, 320);
 	}
-	else if(window.event)
+	else if (!image.classList.contains('fc_zooming'))
 	{
-		window.event.cancelBubble=true;
+		FlexiForm.show(overlay);
+		image.classList.add('fc_zooming');
+		requestAnimationFrame(() => requestAnimationFrame(() => {
+			image.classList.add('fc_zoomed');
+			button?.classList.add('active', 'btn-info');
+		}));
 	}
 }
 
-// Thumbnail zoom
-function fman_zoom_thumb(e, obj)
+function fman_toggle_thumb_selection(box, selected)
 {
-	disabledEventPropagation(e);
-
-	var box = jQuery(obj).closest('.fc-fileman-grid-thumb-box');
-	var img = box.find('img.fc-fileman-thumb');
-	var btn = box.find('.fc-fileman-preview-btn');
-
-	if (img.length==0) return;
-	var IEversion = fc_isIE();
-
-	if (img.hasClass('fc_zoomed'))
-	{
-		btn.removeClass('active btn-info');
-		img.removeClass('fc_zoomed');
-		setTimeout(function(){
-			img.removeClass('fc_zooming');
-			jQuery('#fc-fileman-overlay').hide();
-			if (IEversion && IEversion < 9) img.css('left', '');
-		}, (!IEversion || IEversion > 9 ? 320 : 20));
-	}
-	else
-	{
-		if (img.hasClass('fc_zooming')) return;
-		jQuery('#fc-fileman-overlay').show();
-		img.addClass('fc_zooming');
-		setTimeout(function(){
-			img.addClass('fc_zoomed');
-			btn.addClass('active btn-info');
-			if (IEversion && IEversion < 9) img.css('left', jQuery(window).width()/2-(img.width()/2));
-		}, 20);
-	}
+	if (!box) return;
+	box.classList.toggle('selected', selected);
+	box.querySelector('.fc-fileman-selection-mark')?.classList.toggle('selected', selected);
 }
 
-
-// Toggle file selection (thumbs view) when click on parent container
-function fman_toggle_thumb_selection(box, new_value)
+function fman_sync_cid(id, fromCheckbox)
 {
-	var i = box.find('.fc-fileman-selection-mark');
-	new_value ? box.addClass('selected') : box.removeClass('selected');
-	new_value ? i.addClass('selected') : i.removeClass('selected') ;
+	const input = document.getElementById('cb' + id);
+	const box = document.getElementById('_cb' + id)?.closest('.fc-fileman-grid-thumb-box');
+	if (!input) return;
+	if (!fromCheckbox) input.click();
+	fman_toggle_thumb_selection(box, input.checked);
 }
 
-
-// Sync a file selection between the details/thumb views
-function fman_sync_cid(id, is_cb)
+function fman_set_cids(input)
 {
-	is_cb = !!is_cb;
-	var CB  = jQuery('input#cb' + id);
-	var CB_box = jQuery('span#_cb' + id);
-
-	var c = CB.prop('checked');
-	if (!is_cb)
-	{
-		CB.prop('checked', !c);
-		!c ? CB.attr('checked', 'checked') : CB.removeAttr('checked');
-
-		// Run onclick function of the input TAG, this must be after the 'checked' property is manually modified
-		var input = CB.get(0);
-		if (typeof input.onclick == 'function')
-		{
-			input.onclick.apply(input);
-		}
-	}
-
-	fman_toggle_thumb_selection(CB_box.closest('.fc-fileman-grid-thumb-box'), !c);
-}
-
-
-// Select ALL files in thumbnails view
-function fman_set_cids(el)
-{
-	var val = el.prop('checked');
-	val ? el.closest('.btn').addClass('".$this->btn_iv_class."') : el.closest('.btn').removeClass('".$this->btn_iv_class."');
-
-	jQuery('div.adminthumbs.fcmanthumbs').children('.fc-fileman-grid-thumb-box').each(function(index, value)
-	{
-		fman_toggle_thumb_selection(jQuery(value), val);
+	const selected = input.checked;
+	input.closest('.btn')?.classList.toggle('".$this->btn_iv_class."', selected);
+	document.querySelectorAll('.adminthumbs.fcmanthumbs > .fc-fileman-grid-thumb-box').forEach(box => {
+		fman_toggle_thumb_selection(box, selected);
 	});
 }
 
+function fman_toggle_add_files(button)
+{
+	const panel = document.getElementById('fc-fileman-addfiles-col');
+	const shown = !FlexiForm.visible(panel);
+	const list = document.getElementById('fc-fileman-fileslist-col');
+	list.classList.toggle('span6', shown);
+	list.classList.toggle('col-md-6', shown);
+	fc_config_store(FCMAN_conf, 'addfiles_box', shown ? 1 : 0);
+	fc_toggle_box_via_btn(panel, button, '', shown ? button.nextElementSibling : button.previousElementSibling, shown ? 1 : 0);
+	return false;
+}
+
+function fman_switch_view(button, thumbnails)
+{
+	fc_toggle_view_mode(button);
+	const chooser = document.getElementById('fc_mainChooseColBox_btn');
+	if (thumbnails && chooser.classList.contains('btn-primary')) chooser.click();
+	chooser.classList.toggle('disabled', thumbnails);
+	chooser.style.pointerEvents = thumbnails ? 'none' : '';
+}
 
 var _file_data = new Array();
 ";
@@ -621,7 +580,7 @@ if ($enable_multi_uploader)
 	$cfg = new stdClass();
 	$cfg->slider_name = 'fc-uploader-grid-thumb-size';
 	$cfg->elem_container_selector = '#'.$uploader_tag_id . $up_sfx_n;
-	$cfg->element_selector = '#'.$uploader_tag_id . $up_sfx_n .' ul.plupload_filelist > li';
+	$cfg->element_selector = '#'.$uploader_tag_id . $up_sfx_n .' .fc-native-upload-list > li';
 	$cfg->element_class_prefix = 'thumb_';
 	$cfg->values = array(90, 120, 150, 200, 250);
 	$cfg->labels = array();
@@ -677,15 +636,9 @@ if ($enable_multi_uploader)
 
 	$js .= '
 		setTimeout(function(){
-			var defaultTab = 0;
-			var uploderTab = 0;
-			var IEversion = fc_isIE();
-			var is_IE8_IE9 = IEversion && IEversion < 10;
-			if (is_IE8_IE9) fctabber["fc-fileman-addfiles"].tabShow(uploderTab);
-
 			// Show outer container of uploader
-			jQuery("#fc-fileman-formbox-2").show();
-			jQuery("#'.$uploader_tag_id . $up_sfx_n.'").css("min-height", 180);
+			FlexiForm.show(document.getElementById("fc-fileman-formbox-2"));
+			document.getElementById("'.$uploader_tag_id . $up_sfx_n.'").style.minHeight = "180px";
 
 			// Show uploader
 			'.$uploader_tag_id.'.toggleUploader("'.$up_sfx_n.'");
@@ -693,11 +646,10 @@ if ($enable_multi_uploader)
 			// Also set filelist height
 			'.$uploader_tag_id.'.autoResize("'.$up_sfx_n.'");
 
-			// Uploader does not initialize properly when hidden in IE8 / IE9 with "runtime": "html4" (it does if using "runtime": "flash")
-			if (!is_IE8_IE9 || fc_has_flash_addon()) fctabber["fc-fileman-addfiles"].tabShow(defaultTab);
+			fctabber["fc-fileman-addfiles"]?.tabShow(0);
 
 			// Hide basic uploader form if using multi-uploader script
-			jQuery("#fc-fileman-formbox-1").hide();
+			FlexiForm.show(document.getElementById("fc-fileman-formbox-1"), false);
 		}, 20);
 	';
 }
@@ -712,23 +664,23 @@ if ($use_jmedia_man && $use_links)
 if ($js)
 {
 	$document->addScriptDeclaration('
-		jQuery(document).ready(function()
+		FlexiForm.ready(function()
 		{
 			' . $js . '
+			document.getElementById("adminForm")?.addEventListener("change", event => {
+				const checkbox = event.target;
+				if (checkbox.type === "checkbox" && checkbox.name === "cid[]" && /^cb\d+$/.test(checkbox.id)) {
+					fman_sync_cid(checkbox.id.slice(2), true);
+				}
+			});
 		});
 	');
 }
 
 
-/*<div id="themeswitcher" class="pull-right"> </div>
-<script>
-	jQuery(function() {
-		jQuery.fn.themeswitcher && jQuery('#themeswitcher').themeswitcher({cookieName:''});
-	});
-</script>*/
 ?>
 
-	<div id="fc-fileman-overlay" onclick="jQuery('img.fc_zoomed, li.fc_zoomed .plupload_img_preview img').trigger('click');"></div>
+	<div id="fc-fileman-overlay" onclick="document.querySelectorAll('img.fc_zoomed').forEach(image => image.click());"></div>
 
 
 	<div id="flexicontent" class="flexicontent">
@@ -849,7 +801,6 @@ if ($js)
 															}
 															var markDirty = function() { dirty = true; };
 															box.addEventListener('change', markDirty, true);
-															if (window.jQuery) jQuery(box).on('change', markDirty);
 															document.addEventListener('mousedown', function(e) {
 																if (!dirty || box.contains(e.target)) return;
 																dirty = false;
@@ -899,7 +850,7 @@ if ($js)
 											>
 												<div class="group-fcset" style="display: inline-block; vertical-align: middle;">
 													<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value=""
-													       onclick="Joomla.checkAll(this); fman_set_cids(jQuery(this));" style="display: none;" />
+													       onclick="Joomla.checkAll(this); fman_set_cids(this);" style="display: none;" />
 													<label for="checkall-toggle" class="green single" style="color: inherit;">
 														&nbsp;<?php echo Text::_('FLEXI_ALL'); ?>
 													</label>&nbsp;
@@ -916,7 +867,7 @@ if ($js)
 					'; ?>
 											<?php echo '
 						<span style="' . ($show_addfiles ? 'display: none;' : '') . '" class="fc_hidden_1270 btn-success fc_noeffect ' . $this->btn_sm_class . ' ' . $this->tooltip_class . '"
-							onclick="var tagid = \'fc-fileman-addfiles-col\'; var fileslist_col = jQuery(\'#fc-fileman-fileslist-col\'); var isv = jQuery(\'#\' + tagid).is(\':visible\'); isv ? fileslist_col.removeClass(\'span6 col-md-6\') : fileslist_col.addClass(\'span6 col-md-6\'); fc_config_store(FCMAN_conf, \'addfiles_box\', (isv ? 0 : 1)); fc_toggle_box_via_btn(tagid, this, \'\', jQuery(this).next()); return false;"
+							onclick="return fman_toggle_add_files(this);"
 							data-title="' . flexicontent_html::getToolTip('', 'FLEXI_ADD_FILE', 1, 1) . '" data-placement="bottom"
 						>
 							<span class="icon-upload"></span>
@@ -924,7 +875,7 @@ if ($js)
 					'; ?>
 											<?php echo '
 						<span style="' . (!$show_addfiles ? 'display: none;' : '') . '" class="fc_hidden_1270 fc_noeffect ' . $this->btn_sm_class . ' ' . $this->tooltip_class . '"
-							onclick="var tagid = \'fc-fileman-addfiles-col\'; var fileslist_col = jQuery(\'#fc-fileman-fileslist-col\'); var isv = jQuery(\'#\' + tagid).is(\':visible\'); isv ? fileslist_col.removeClass(\'span6 col-md-6\') : fileslist_col.addClass(\'span6 col-md-6\'); fc_config_store(FCMAN_conf, \'addfiles_box\', (isv ? 0 : 1)); fc_toggle_box_via_btn(tagid, this, \'\', jQuery(this).prev()); return false;"
+							onclick="return fman_toggle_add_files(this);"
 							data-title="' . flexicontent_html::getToolTip('', 'FLEXI_EXPAND', 1, 1) . '" data-placement="bottom"
 						>
 							<span class="icon-expand-2"></span>
@@ -934,7 +885,7 @@ if ($js)
 
 											<?php if ($isFilesElement): ?>
 												<div class="fc-iblock nowrap_box" style="position: relative; vertical-align: middle;">
-							<span class="btn btn-primary <?php echo $this->btn_sm_class . ' ' . $this->tooltip_class; ?>" id="insert_selected_btn" onclick="fc_fileselement_assign_files(jQuery(this));"
+							<span class="btn btn-primary <?php echo $this->btn_sm_class . ' ' . $this->tooltip_class; ?>" id="insert_selected_btn" onclick="fc_fileselement_assign_files();"
 							      data-title="<?php echo flexicontent_html::getToolTip('', 'FLEXI_FILEMAN_INSERT_SELECTED', 1, 1); ?>" data-placement="bottom">
 								<span class="icon-plus"></span> <?php echo Text::_('FLEXI_INSERT'); ?>
 							</span>
@@ -947,13 +898,13 @@ if ($js)
 
 											<div class="btn-group" style="margin: 0 12px;">
 												<button type="button" class="<?php echo $this->btn_sm_class; ?> list-view <?php echo $this->tooltip_class; ?> active" id="btn-fman-list-view"
-												        onclick="fc_toggle_view_mode(jQuery(this)); var c = jQuery('#fc_mainChooseColBox_btn'); c.removeClass('disabled').css('pointer-events', '');" data-toggle_selector=".fman_list_element" style="min-width: 40px;"
+												        onclick="fman_switch_view(this, false);" data-toggle_selector=".fman_list_element" style="min-width: 40px;"
 												        data-title="<?php echo flexicontent_html::getToolTip('', 'FLEXI_FILEMAN_DETAILS', 1, 1); ?>" data-placement="bottom"
 												>
 													<i class="icon-list-view"></i>
 												</button>
 												<button type="button" class="<?php echo $this->btn_sm_class; ?> grid-view <?php echo $this->tooltip_class; ?>" id="btn-fman-grid-view"
-												        onclick="fc_toggle_view_mode(jQuery(this)); var c = jQuery('#fc_mainChooseColBox_btn'); c.hasClass('btn-primary') ? c.click() : false; c.addClass('disabled').css('pointer-events', 'none');" data-toggle_selector=".fman_grid_element" style="min-width: 40px;"
+												        onclick="fman_switch_view(this, true);" data-toggle_selector=".fman_grid_element" style="min-width: 40px;"
 												        data-title="<?php echo flexicontent_html::getToolTip('', 'FLEXI_FILEMAN_GRID', 1, 1); ?>" data-placement="bottom"
 												>
 													<i class="icon-grid-view"></i>
@@ -1166,7 +1117,7 @@ if ($js)
 								if (empty($thumb_or_icon))
 								{
 									$thumb_or_icon = file_exists($file_abspath)
-										? '<img class="fc-fileman-thumb" onclick="if (jQuery(this).hasClass(\'fc_zoomed\')) { fman_zoom_thumb(event, this); return false; }" src="'.Uri::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_url.$f. '&amp;w=800&amp;h=800&amp;zc=1&amp;q=95&amp;f=jpeg&amp;ar=x" alt="'.$filename_original.'" />'
+										? '<img class="fc-fileman-thumb" onclick="if (this.classList.contains(\'fc_zoomed\')) { fman_zoom_thumb(event, this); return false; }" src="'.Uri::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .$file_url.$f. '&amp;w=800&amp;h=800&amp;zc=1&amp;q=95&amp;f=jpeg&amp;ar=x" alt="'.$filename_original.'" />'
 										: '<span class="badge badge-box badge-important">'.Text::_('FLEXI_FILE_NOT_FOUND').'</span>';
 								}
 
@@ -1257,7 +1208,7 @@ if ($js)
 											$link = trim(Uri::root(), '/') . str_replace(Uri::root(true), '', $link);
 
 											echo '
-											<a href="javascript:;" onclick="jQuery(\'#copyUrlModal\').find(\'.linkbox\').html(\''.$link.'\')"
+											<a href="javascript:;" onclick="document.querySelector(\'#copyUrlModal .linkbox\').textContent = \''.$link.'\'"
 												class="toolbar btn btn-info btn-copy-url" data-clipboard-text="'.$link.'"
 												data-toggle="modal" data-target="#copyUrlModal" data-bs-toggle="modal" data-bs-target="#copyUrlModal">'
 												. '<span class="icon-link"></span>
@@ -1339,7 +1290,7 @@ if ($js)
 												// Note we will pass true to canEdit parameter because we want to create an assign link
 												echo HTMLHelper::_($hlpname . '.edit_link', $row, $i, true, array(
 													'linkedPrefix' => '<span class="icon-checkbox"></span><span class="icon-new"></span>',
-													'onclick' => 'if (jQuery(this).hasClass(\'striketext\')) return; ' . $row->file_assign_link,
+													'onclick' => 'if (this.classList.contains(\'striketext\')) return; ' . $row->file_assign_link,
 													'attribs' => array(
 														'id' => 'file' . $row->id,
 														'class' => 'fc_set_file_assignment fc-iblock text-dark ' . $this->btn_sm_class . ' ' . $this->tooltip_class,
@@ -1449,7 +1400,7 @@ if ($js)
 
 									<?php if ($isFilesElement) : /* Direct delete button for fileselement view */ ?>
 										<td>
-											<a class="btn btn-mini ntxt" href="javascript:;" onclick="if (confirm('<?php echo Text::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>')) { return Joomla.listItemTask('cb<?php echo $i; ?>','filemanager.remove'); }">
+											<a class="btn btn-mini ntxt" href="javascript:;" onclick="FlexiForm.confirm('<?php echo Text::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>').then(accepted => { if (accepted) Joomla.listItemTask('cb<?php echo $i; ?>','filemanager.remove'); }); return false;">
 												<span class="icon-remove" title="<?php echo Text::_('FLEXI_REMOVE'); ?>"></span>
 											</a>
 										</td>
@@ -1567,7 +1518,7 @@ if ($js)
 					<span class="btn fc-fileman-preview-btn icon-search" onclick="fman_zoom_thumb(event, this); return false;"></span>
 					'; ?>
 									<span class="btn fc-fileman-selection-mark icon-checkmark" id="_cb<?php echo $i; ?>" ></span>
-									<span class="btn fc-fileman-delete-btn icon-remove" onclick="if (confirm('<?php echo Text::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>')) { document.adminForm.filename.value='<?php echo rawurlencode($row->filename);?>'; return Joomla.listItemTask('cb<?php echo $i; ?>','filemanager.remove'); }"></span>
+									<span class="btn fc-fileman-delete-btn icon-remove" onclick="FlexiForm.confirm('<?php echo Text::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>').then(accepted => { if (accepted) { document.adminForm.filename.value='<?php echo rawurlencode($row->filename);?>'; Joomla.listItemTask('cb<?php echo $i; ?>','filemanager.remove'); } }); return false;"></span>
 									<span class="fc-fileman-filename-box"><?php echo $row->title_cut; ?></span>
 								</div>
 								<?php
@@ -1676,7 +1627,7 @@ if ($js)
 					<span id="fc_dispInfoBox_btn" class="' . $this->btn_sm_class . '" onclick="fc_toggle_box_via_btn(\'upload_info_box\', this, \'btn-primary\');"><i class="icon-info"></i>'. Text::_( 'FLEXI_FILES_INFO_UPLOAD' ).'</span>
 					'.
 												($enable_multi_uploader ? '
-						<span class="' . $this->btn_sm_class . ' ' . $this->tooltip_class.'" onclick="jQuery(\'#fc-fileman-formbox-1\').toggle(); jQuery(\'#fc-fileman-formbox-2\').toggle(); setTimeout(function(){ '.$uploader_tag_id.'.autoResize(\''.$up_sfx_n.'\'); }, 100);"
+						<span class="' . $this->btn_sm_class . ' ' . $this->tooltip_class.'" onclick="for (const id of [\'fc-fileman-formbox-1\', \'fc-fileman-formbox-2\']) { const panel = document.getElementById(id); FlexiForm.show(panel, !FlexiForm.visible(panel)); } setTimeout(function(){ '.$uploader_tag_id.'.autoResize(\''.$up_sfx_n.'\'); }, 100);"
 							id="single_multi_uploader" data-title="' . flexicontent_html::getToolTip('', 'FLEXI_TOGGLE_BASIC_UPLOADER_DESC', 1, 1) . '" style="float: ' . (\Joomla\CMS\Factory::getApplication()->getLanguage()->isRTL() ? 'left;' : 'right;') . '"
 						data-placement="'. (\Joomla\CMS\Factory::getApplication()->getLanguage()->isRTL() ? 'right' : 'left') . '">
 							'.Text::_( 'FLEXI_TOGGLE_BASIC_UPLOADER' ).'
@@ -1848,7 +1799,7 @@ if ($js)
 
 															<tr>
 																<td style="text-align:right; padding: 12px 4px;">
-																	<input type="button" id="file-props-apply" class="btn btn-success" onclick="var up = jQuery('#<?php echo $uploader_tag_id . $up_sfx_n; ?>').data('plupload_instance'); jQuery(up).data('fc_plupload_instance').submit_props_form(this, up); return false;" value="<?php echo Text::_( 'FLEXI_APPLY' ); ?>"/>
+																	<input type="button" id="file-props-apply" class="btn btn-success" onclick="FlexiUploader.submitProperties(this, '<?php echo $uploader_tag_id . $up_sfx_n; ?>'); return false;" value="<?php echo Text::_( 'FLEXI_APPLY' ); ?>"/>
 																</td>
 																<td style="text-align:left; padding: 12px 4px;">
 																	<input type="button" id="file-props-close" class="btn" onclick="fc_file_props_handle.dialog('close'); return false;" value="<?php echo Text::_( 'FLEXI_CANCEL' ); ?>"/>
@@ -2002,7 +1953,7 @@ if ($js)
 									<h3 class="tabberheading hasTooltip" data-placement="bottom" title="<?php echo Text::_($tab_title . '_DESC'); ?>"> <?php echo Text::_($tab_title); ?> </h3>
 
 									<div class="fc_loading_msg alert alert-info" style="display:none;"> &nbsp; &nbsp; <?php echo Text::_('FLEXI_LOADING') .' ... '. Text::_('FLEXI_PLEASE_WAIT'); ?></div>
-									<form action="<?php echo $action_url . 'addurl'; ?>" class="form-validate form-horizontal" name="addUrlForm" id="addUrlForm" method="post" onsubmit="this.style.display='none'; jQuery(this).prev().show(); return true;">
+									<form action="<?php echo $action_url . 'addurl'; ?>" class="form-validate form-horizontal" name="addUrlForm" id="addUrlForm" method="post" onsubmit="this.style.display='none'; FlexiForm.show(this.previousElementSibling); return true;">
 										<fieldset class="fc-fileman-tab" >
 											<fieldset class="fc-formbox" id="fc-fileman-formbox-3">
 
@@ -2063,7 +2014,7 @@ if ($js)
 																		$modal_url   = "index.php?option=com_ajax&view=default&tmpl=component&asset=com_content&author=&plugin=quantummanagermedia&format=html";
 																		$modal_url  .= $jmedia_subpath ? "&folder=".$jmedia_subpath : '';
 																		$modal_title = 'Select file'; $width = 0; $height = 0;
-																		$onclick_js  = "var url = jQuery(this).attr('data-href'); "
+																		$onclick_js  = "var url = this.dataset.href; "
 																			. " var the_dialog = fc_showDialog(url, 'fc_modal_popup_container', 0, {$width}, {$height}, null, "
 																			. " {title:'{$modal_title}', loadFunc: null}); return false;";
 																		$select_file_btn =
@@ -2073,7 +2024,7 @@ if ($js)
 																		$juri_root = \Joomla\CMS\Uri\Uri::root(true);
 																		$file_placeholder_text = 'No file selected';
 																		$file_placeholder_src  = $juri_root . '/' .'administrator/components/com_events/assets/images/person_placeholder.jpg';
-																		$file_clear_value_js   = "jQuery(this).parent().find('input[type=text]').val(''); jQuery(this).parent().parent().find('.inline-preview-img').attr('src', '".$file_placeholder_src."'); ";
+																		$file_clear_value_js   = "this.parentElement.querySelector('input[type=text]').value = ''; this.parentElement.parentElement.querySelector('.inline-preview-img').src = '".$file_placeholder_src."'; ";
 
 																		echo <<<HTML
 										<div class="control-group">
@@ -2210,7 +2161,7 @@ $jMedia_file_displayData['mediaTypeNames'] = array_values(array_intersect_key(
 <?php echo flexicontent_fileeditor::renderCustomRows((object) array('id' => 0, 'custom1' => '', 'custom2' => ''), '', 3); ?>
 
 														<tr>
-															<td></td><td><input style="margin-top: 64px;" type="button" class="btn btn-primary" value="Advanced properties" onclick="jQuery('.advanced-file-props').toggle({ direction: 'left' }, 300);"/></td>
+															<td></td><td><input style="margin-top: 64px;" type="button" class="btn btn-primary" value="Advanced properties" onclick="document.querySelectorAll('.advanced-file-props').forEach(row => FlexiForm.show(row, !FlexiForm.visible(row)));"/></td>
 														</tr>
 
 														<tr class="advanced-file-props" style="display: none;">
@@ -2436,8 +2387,8 @@ $jMedia_file_displayData['mediaTypeNames'] = array_values(array_intersect_key(
 	</style>
 
 	<script>
-	  jQuery(document).ready(function() {
-		  if (jQuery('a.btn-copy-url').length) {
+	  FlexiForm.ready(function() {
+		  if (document.querySelector('a.btn-copy-url')) {
 			  var clipboard = new ClipboardJS('a.btn-copy-url');
 		  }
 	  });
@@ -2469,19 +2420,33 @@ $jMedia_file_displayData['mediaTypeNames'] = array_values(array_intersect_key(
 
 <script>
 		/* Submit task access for given row_id and selected level */
-	setAccessLevel = function (el, file_id) {
-		let access = {};
-		access[file_id] = jQuery(el).val();
-	  jQuery.ajax({
-		  type: "GET",
-			dataType: 'json',
-		  url: "index.php?option=com_flexicontent&task=filemanager.access&<?php echo \Joomla\CMS\Session\Session::getFormToken(); ?>=1",
-		  data: { cid: file_id, access: access, isAjax: 1, format: 'html' }
-		}).done(function( response ) {
-			var data = response.data;
-		  console.log(response);
-	  });
-	};
+	async function setAccessLevel(input, id)
+	{
+		const url = new URL("index.php?option=com_flexicontent&task=filemanager.access&<?php echo \Joomla\CMS\Session\Session::getFormToken(); ?>=1", document.baseURI);
+		const selected = input.value;
+		const previous = input.dataset.savedAccess || [...input.options].find(option => option.defaultSelected)?.value;
+		const params = new URLSearchParams({cid: id, isAjax: '1', format: 'html'});
+		params.set('access[' + id + ']', selected);
+		for (const [name, value] of params) url.searchParams.set(name, value);
+		input.disabled = true;
+		try
+		{
+			const response = await fetch(url, {credentials: 'same-origin', cache: 'no-store'});
+			const payload = await response.json();
+			if (!response.ok || payload.error || payload.success === false) throw Error(payload.message || response.statusText);
+			input.dataset.savedAccess = selected;
+		}
+		catch (error)
+		{
+			if (previous !== undefined) input.value = previous;
+			input.fc_choices_instance?.refresh();
+			Joomla.renderMessages({error: [error.message]});
+		}
+		finally
+		{
+			input.disabled = false;
+		}
+	}
 </script>
 
 
@@ -2489,9 +2454,9 @@ $jMedia_file_displayData['mediaTypeNames'] = array_values(array_intersect_key(
 \Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration('
 	function fc_edit_mmdata_modal_load( container )
 	{
-		if ( container.find("iframe").get(0).contentWindow.location.href.indexOf("view=mediadatas") != -1 )
+		if ( FlexiForm.element(container)?.querySelector("iframe")?.contentWindow.location.href.includes("view=mediadatas") )
 		{
-			container.dialog("close");
+			fc_closeDialog("fc_modal_popup_container");
 		}
 	}
 	function fc_edit_mmdata_modal_close()
@@ -2501,16 +2466,13 @@ $jMedia_file_displayData['mediaTypeNames'] = array_values(array_intersect_key(
 	}
 
 	function jInsertFieldValue(value, id) {
-		var elem = jQuery(\'#\'+id).get(0);
-
-		elem.value = value;
-		let preview_img = jQuery(elem).parent().parent().find(\'img.inline-preview-img\');
-		if (preview_img.length > 0) {
-			let juri_root = preview_img.attr(\'data-juri-root\');
-			preview_img.attr(\'src\', juri_root + \'/\' + value);
-		}
-		if (typeof SqueezeBox != \'undefined\') SqueezeBox.close();
-		if (typeof jQuery != \'undefined\') jQuery(\'#fc_modal_popup_container\').dialog(\'close\');
+		const input = document.getElementById(id);
+		if (!input) return;
+		input.value = value;
+		const preview = input.parentElement.parentElement.querySelector("img.inline-preview-img");
+		if (preview) preview.src = preview.dataset.juriRoot + "/" + value;
+		if (typeof SqueezeBox !== "undefined") SqueezeBox.close();
+		fc_closeDialog("fc_modal_popup_container");
 	}
 
 ');

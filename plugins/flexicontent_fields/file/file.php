@@ -5,7 +5,7 @@
  *
  * @author          Emmanuel Danan, Georgios Papadakis, Yannick Berges, others, see contributor page
  * @link            https://flexicontent.org
- * @copyright       Copyright © 2020, FLEXIcontent team, All Rights Reserved
+ * @copyright       Copyright Â© 2020, FLEXIcontent team, All Rights Reserved
  * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
  */
 
@@ -167,6 +167,13 @@ class plgFlexicontent_fieldsFile extends FCField
 
 		$custom_props = self::getCustomProps($field, $inputmode);
 
+		$secure_default = !$iform_dir ? 1 : (int) $field->parameters->get('iform_dir_default', 1);
+		$stamp_default = !$iform_stamp ? 1 : (int) $field->parameters->get('iform_stamp_default', 1);
+		$custom_prop_defaults = array();
+		foreach ($custom_props as $n => $cp)
+		{
+			if ($cp['form']) $custom_prop_defaults['custom' . $n] = $cp['default'];
+		}
 
 
 		$mediapath   = $cparams->get('media_path', 'components/com_flexicontent/medias');
@@ -236,7 +243,7 @@ class plgFlexicontent_fieldsFile extends FCField
 				}";
 
 			$document->getWebAssetManager()->addInlineScript("
-			jQuery(document).ready(function()
+			FlexiForm.ready(function()
 			{
 				fc_attachSingleSlider(".$thumb_size_slider_cfg.", ".$thumb_size_resizer.");
 			});
@@ -351,15 +358,7 @@ class plgFlexicontent_fieldsFile extends FCField
 
 			function file_fcfield_del_existing_value".$field->id."(el)
 			{
-				var el  = jQuery(el);
-				var box = jQuery(el).closest('.fcfieldval_container');
-				if ( el.prop('checked') ) {
-					box.find('.fc_preview_thumb').css('opacity', 0.4);
-					box.find('.fc_filedata_txt').css('text-decoration', 'line-through');
-				} else {
-					box.find('.fc_preview_thumb').css('opacity', 1);
-					box.find('.fc_filedata_txt').css('text-decoration', '');
-				}
+				FlexiMediaField.setFileRemoval(el);
 			}
 
 
@@ -376,14 +375,7 @@ class plgFlexicontent_fieldsFile extends FCField
 
 			function fc_openFileSelection_".$field->id."(element)
 			{
-				var obj = jQuery(element);
-				var url = obj.attr('data-href');
-
-				url = url.replace( '__rowno__',  obj.attr('data-rowno') ? obj.attr('data-rowno') : '' );
-				url = url.replace( '__thisid__', obj.attr('id') ? obj.attr('id') : '' );
-
-				//window.console.log(obj.attr('data-rowno'));
-				//window.console.log(url);
+				var url = element.dataset.href.replace('__rowno__', element.dataset.rowno || '').replace('__thisid__', element.id);
 
 				fcfield_file.dialog_handle['".$field_name_js."'] = fc_field_dialog_handle_".$field->id." = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, 0, {title: '".\Joomla\CMS\Language\Text::_('FLEXI_FIELD_FILE_SELECT_FILE', true)."', paddingW: 10, paddingH: 16});
 				return false;
@@ -394,230 +386,19 @@ class plgFlexicontent_fieldsFile extends FCField
 		// Handle multiple records
 		if ($multiple)
 		{
-			// Add the drag and drop sorting feature
-			if ($add_ctrl_btns) $js .= "
-			jQuery(document).ready(function(){
-				jQuery('#sortables_".$field->id."').sortable({
-					handle: '.fcfield-drag-handle',
-					cancel: false,
-					/*containment: 'parent',*/
-					tolerance: 'pointer'
-					".($fields_box_placing ? "
-					,start: function(e) {
-						//jQuery(e.target).children().css('float', 'left');
-						//fc_setEqualHeights(jQuery(e.target), 0);
-					}
-					,stop: function(e) {
-						//jQuery(e.target).children().css({'float': 'none', 'min-height': '', 'height': ''});
-					}
-					" : '')."
-				});
-			});
-			";
-
-			if ($max_values) \Joomla\CMS\Language\Text::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
-			$js .= "
-			function addField".$field->id."(el, groupval_box, fieldval_box, params)
-			{
-				var insert_before   = (typeof params!== 'undefined' && typeof params.insert_before   !== 'undefined') ? params.insert_before   : 0;
-				var remove_previous = (typeof params!== 'undefined' && typeof params.remove_previous !== 'undefined') ? params.remove_previous : 0;
-				var scroll_visible  = (typeof params!== 'undefined' && typeof params.scroll_visible  !== 'undefined') ? params.scroll_visible  : 1;
-				var animate_visible = (typeof params!== 'undefined' && typeof params.animate_visible !== 'undefined') ? params.animate_visible : 1;
-
-				if(!remove_previous && (rowCount".$field->id." >= maxValues".$field->id.") && (maxValues".$field->id." != 0)) {
-					alert(Joomla.JText._('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + maxValues".$field->id.");
-					return 'cancel';
-				}
-
-				// Find last container of fields and clone it to create a new container of fields
-				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
-				var newField  = lastField.clone();
-				newField.find('.fc-has-value').removeClass('fc-has-value');
-
-				// New element's field name and id
-				var uniqueRowN = uniqueRowNum" . $field->id . ";
-				var element_id = '" . $elementid . "_' + uniqueRowN;
-				var fname_pfx  = '" . $fieldname . "[' + uniqueRowN + ']';
-
-				var theInput = newField.find('input.inlinefile-del').first();
-				theInput.removeAttr('checked');
-				theInput.attr('name', fname_pfx + '[file-del]');
-				theInput.attr('id', element_id + '_file-del');
-				newField.find('.inlinefile-del-lbl').first().attr('for', element_id + '_file-del').attr('id', element_id + '_file-del-lbl');
-
-				var theInput = newField.find('input.fc_filedata').first();
-				theInput.val('');
-				theInput.attr('name', fname_pfx + '[file-data]');
-				theInput.attr('id', element_id + '_file-data');
-				theInput.attr('data-rowno', uniqueRowN);
-
-				newField.find('.inlinefile-data-lbl').first().attr('for', element_id + '_file-data-txt').attr('id', element_id + '_file-data-lbl');
-
-				var theInput = newField.find('input.fc-file-id').first();
-				theInput.val('');
-				theInput.attr('name', fname_pfx + '[file-id]');
-				theInput.attr('id', element_id + '_file-id');
-
-				var theInput = newField.find('input.fc_mediafile').first();
-				//theInput.val('');
-				theInput.attr('name', fname_pfx + '[mediafile]');
-				theInput.attr('id', element_id + '_mediafile');
-				//newField.find('inline-preview-img').attr('src', '');
-				
-				var theInput = newField.find('input.field-media-input').first();
-				theInput.val('');
-				theInput.attr('name', fname_pfx + '[mediafile]');
-				theInput.attr('id', element_id + '_mediafile'); 
-				
-				" .(!FLEXI_J40GE ? "newField.find('.field-media-wrapper').fieldMedia();" : '') . "
-				newField.find('.field-media-wrapper').find('.button-clear').click();
-				newField.find('.clear-btn').click();
-
-				newField.find('.fc_filedata_txt_nowrap').html('-');
-
-				var theInput = newField.find('input.fc_filedata_txt').first();
-				theInput.attr('value', '');
-				theInput.removeAttr('data-filename')
-					;
-				theInput.data('filename', null);
-				theInput.attr('name', fname_pfx + '[file-data-txt]');
-				theInput.attr('id', element_id + '_file-data-txt');
-
-				".($iform_title ? "
-				var theInput = newField.find('input.fc_filetitle').first();
-				theInput.val('');
-				theInput.attr('name', fname_pfx + '[file-title]');
-				theInput.attr('id', element_id + '_file-title');
-				newField.find('.fc-file-title-lbl').first().attr('for', element_id + '_file-title').attr('id', element_id + '_file-title-lbl');
-				" : "")."
-
-				var imgPreview = newField.find('.fc_preview_thumb').first();
-				imgPreview.attr('id', element_id + '_image_preview');
-				imgPreview.attr('src', 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=');
-				imgPreview.parent().find('.fc_preview_msg').html('');
-				imgPreview.parent().find('.fc_preview_text').html('');
-				".($form_file_preview != 1 ? '
-				imgPreview.parent().hide();' : '')."
-
-				// Destroy any select library elements (select2 or choices.js)
-				fc_destroySelectLib(newField);
-
-				// Update button for modal file selection
-				var theBTN = newField.find('span.addfile');
-				theBTN.attr('id', element_id + '_addfile');
-				theBTN.attr('data-rowno', uniqueRowN);
-
-				// Update uploader related data
-				var fcUploader = newField.find('.fc_file_uploader');
-				var upBTN, mulupBTN, mulselBTN;
-				if (fcUploader.length)
-				{
-					// Update uploader attributes
-					fcUploader.empty().hide();
-					fcUploader.attr('id', fcUploader.attr('data-tagid-prefix') + uniqueRowN);
-
-					// Update button for toggling uploader
-					upBTN = newField.find('.fc_files_uploader_toggle_btn');
-					upBTN.attr('data-rowno', uniqueRowN);
-
-					mulupBTN = newField.find('.fc-files-modal-link.fc-up');
-					mulupBTN.attr('id', element_id + '_mul_uploadvalue');
-					mulupBTN.attr('data-rowno', uniqueRowN);
-
-					mulselBTN = newField.find('.fc-files-modal-link.fc-sel');
-					mulselBTN.attr('id', element_id + '_selectvalue');
-					mulselBTN.attr('data-rowno', uniqueRowN);
-				}
-
-				// Update the optional media-URL button
-				newField.find('.fc-field-mediaurl-btn').attr('data-for', element_id);
-				newField.find('.fc-field-mediaurl-btn').attr('onclick', 'fcfield_file.toggleMediaURL(\'' + element_id + '\');');
-				";
-
-			// Add new field to DOM
-			$js .= "
-				lastField ?
-					(insert_before ? newField.insertBefore( lastField ) : newField.insertAfter( lastField ) ) :
-					newField.appendTo( jQuery('#sortables_".$field->id."') ) ;
-				if (remove_previous) lastField.remove();
-
-				// Attach form validation on new element
-				fc_validationAttach(newField);
-
-				// Re-init any select2 elements
-				fc_attachSelect2(newField);
-				";
-
-			// Add new element to sortable objects (if field not in group)
-			if ($add_ctrl_btns) $js .= "
-				//jQuery('#sortables_".$field->id."').sortable('refresh');  // Refresh was done appendTo ?
-				";
-
-			// Show new field, increment counters
-			$js .="
-				//newField.fadeOut({ duration: 400, easing: 'swing' }).fadeIn({ duration: 200, easing: 'swing' });
-				if (scroll_visible) fc_scrollIntoView(newField, 1);
-				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800, function() { jQuery(this).css('opacity', ''); });
-
-				// Enable tooltips on new element
-				newField.find('.hasTooltip').tooltip({html: true, container: newField});
-				newField.find('.hasPopover').popover({html: true, container: newField, trigger : 'hover focus'});
-
-				// Attach bootstrap event on new element
-				fc_bootstrapAttach(newField);
-
-				rowCount".$field->id."++;       // incremented / decremented
-				uniqueRowNum".$field->id."++;   // incremented only
-
-				// return HTML Tag ID of field containing the file ID, needed when creating file rows to assign multi-fields at once
-				return '".$elementid."_' + (uniqueRowNum".$field->id." - 1) + '_file-id';
-			}
-
-
-			function deleteField".$field->id."(el, groupval_box, fieldval_box)
-			{
-				// Disable clicks on remove button, so that it is not reclicked, while we do the field value hide effect (before DOM removal of field value)
-				var btn = fieldval_box ? false : jQuery(el);
-				if (btn && rowCount".$field->id." > 1) btn.css('pointer-events', 'none').off('click');
-
-				// Find field value container
-				var row = fieldval_box ? fieldval_box : jQuery(el).closest('li');
-
-				if ( 1 ) // A deleted container always has a value, thus decrement (or empty) the counter value in the 'required' form element
-				{
-					var valcounter = document.getElementById('custom_".$field_name_js."');
-					if (valcounter) {
-						valcounter.value = ( !valcounter.value || valcounter.value=='1' )  ?  ''  :  parseInt(valcounter.value) - 1;
-					}
-					//if(window.console) window.console.log ('valcounter.value: ' + valcounter.value);
-				}
-
-				// Add empty container if last element, instantly removing the given field value container
-				if(rowCount".$field->id." == 1)
-					addField".$field->id."(null, groupval_box, row, {remove_previous: 1, scroll_visible: 0, animate_visible: 0});
-
-				// Remove if not last one, if it is last one, we issued a replace (copy,empty new,delete old) above
-				if (rowCount".$field->id." > 1)
-				{
-					// Destroy the remove/add/etc buttons, so that they are not reclicked, while we do the field value hide effect (before DOM removal of field value)
-					row.find('.fcfield-delvalue').remove();
-					row.find('.fcfield-expand-view').remove();
-					row.find('.fcfield-insertvalue').remove();
-					row.find('.fcfield-drag-handle').remove();
-					// Do hide effect then remove from DOM
-					row.slideUp(400, function(){ jQuery(this).remove(); });
-					rowCount".$field->id."--;
-				}
-			}
-			";
-
-			$css .= '';
+			$config = array(
+				'kind' => 'file', 'fieldKey' => $field_name_js,
+				'previewAlways' => $form_file_preview === 1,
+				'defaults' =>  $custom_prop_defaults + array('file-access' => '1', 'secure' => (string) $secure_default, 'stamp' => (string) $stamp_default),
+			);
+			$document->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/assets/js/media-repeater.js', array('version' => FLEXI_VHASH));
+			$js .= $this->buildValueRepeater($field, $elementid, $fieldname, $max_values, $add_ctrl_btns, $config, 'fcfield_media_rows');
 
 			$remove_button = '<span class="' . $btn_item_class . $flat_btn_class . ' fcfield-delvalue ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
 			$move2         = '<span class="' . $btn_item_class . $flat_btn_class . ' fcfield-drag-handle ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
 			$add_here = '';
-			$add_here .= $add_position==2 || $add_position==3 ? '<span class="' . $btn_item_class . $flat_btn_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
-			$add_here .= $add_position==1 || $add_position==3 ? '<span class="' . $btn_item_class . $flat_btn_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
+			$add_here .= $add_position==2 || $add_position==3 ? '<span class="' . $btn_item_class . $flat_btn_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField'.$field->id.'(null, this.closest(\'ul\'), this.closest(\'li\'), {insert_before: 1});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
+			$add_here .= $add_position==1 || $add_position==3 ? '<span class="' . $btn_item_class . $flat_btn_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, this.closest(\'ul\'), this.closest(\'li\'), {insert_before: 0});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
 		}
 
 		// Field not multi-value
@@ -677,15 +458,11 @@ class plgFlexicontent_fieldsFile extends FCField
 			if (!\Joomla\CMS\HTML\HTMLHelper::getServiceRegistry()->hasService('fcuploader')) {
 				\Joomla\CMS\HTML\HTMLHelper::getServiceRegistry()->register('fcuploader', 'JHtmlFcuploader');
 			}
+			flexicontent_html::loadFramework('media-field-controls');
 			$document->getWebAssetManager()->registerAndUseScript('plg_flexicontent_fields_file.form', 'plugins/flexicontent_fields/file/js/form.js', array('version' => FLEXI_VHASH));
 		}
 
 		// Add field's CSS / JS
-		if ($multiple) $js .= "
-			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
-			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
-			var maxValues".$field->id." = ".$max_values.";
-		";
 		if ($js)  $document->getWebAssetManager()->addInlineScript($js);
 		if ($css) $document->getWebAssetManager()->addInlineStyle($css);
 
@@ -710,42 +487,10 @@ class plgFlexicontent_fieldsFile extends FCField
 		if ($use_myfiles == 4) {
 			$document->getWebAssetManager()->addInlineScript('
 				function jInsertFieldValue(value, id)
-				{	
-					console.log(id);
-					var elem = jQuery(\'#\'+id).get(0);
-					elem.value = value;
-		
-					let file_is_image = value.match(/\.(jpg|png|gif|xcf|odg|wbmp|bmp|ico|jpeg|webp)$/i);
-					let preview_img = jQuery(elem).closest(\'.fcfieldval_container\').find(\'img.inline-preview-img\');
-					let preview_obj = jQuery(elem).closest(\'.fcfieldval_container\').find(\'object.inline-preview-obj\');
-					console.log(preview_img);
-					console.log(preview_obj);
-
-					if (preview_img.length > 0) {
-						if (file_is_image) {
-							let juri_root = preview_img.parent().attr(\'data-juri-root\');
-							preview_img.attr(\'src\', juri_root + \'/\' + value);
-							preview_img.show();
-						} else {
-							preview_img.attr(\'src\', \'\');
-							preview_img.hide();
-						}
-					}
-					if (preview_obj.length > 0) {
-						if (!file_is_image) {
-							let juri_root = preview_obj.parent().attr(\'data-juri-root\');
-							preview_obj.attr(\'data\', juri_root + \'/\' + value);
-							preview_obj.show();
-						} else {
-							preview_obj.attr(\'data\', \'\');
-							preview_obj.hide();
-						}
-					}
-
-					fcfield_file.assignMediaFile(id, value, \''.Uri::root().'/\' + value);
-
-					if (typeof SqueezeBox != \'undefined\') SqueezeBox.close();
-					if (typeof jQuery != \'undefined\') jQuery(\'#fc_modal_popup_container\').dialog(\'close\');
+				{
+					var box = FlexiMediaField.row(document.getElementById(id));
+					var editor = window.fcfield_mediafile && box?.querySelector(\'[data-fc-media-key][data-fc-media-type="mediafile"]\') ? fcfield_mediafile : window.fcfield_file || fcfield_file;
+					editor.selectMediaFile(id, value, '.json_encode(rtrim(Uri::root(), '/') . '/').');
 				}
 			');
 		}
@@ -763,7 +508,8 @@ class plgFlexicontent_fieldsFile extends FCField
 						' . ($uploader_html ?
 							$uploader_html->toggleBtn .
 							($use_myfiles > 0 ? $uploader_html->myFilesBtn : '') .
-							$uploader_html->mediaUrlBtn
+							$uploader_html->mediaUrlBtn .
+							$uploader_html->multiUploadBtn . $uploader_html->clearBtn
 						: '') . '
 						' . $edit_btn . '
 					</div>
@@ -805,7 +551,7 @@ class plgFlexicontent_fieldsFile extends FCField
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
 			if (!$add_position) $field->html .= '
 				<div class="'.$btn_group_class.' fc-xpended-btns">
-					<span class="fcfield-addvalue ' . $font_icon_class . ' ' . $btn_item_class . '" onclick="addField'.$field->id.'(jQuery(this).closest(\'.fc-xpended-btns\').get(0));" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_TO_BOTTOM' ).'">
+					<span class="fcfield-addvalue ' . $font_icon_class . ' ' . $btn_item_class . '" onclick="addField'.$field->id.'(this.closest(\'.fc-xpended-btns\'));" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_TO_BOTTOM' ).'">
 						'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_VALUE' ).'
 					</span>
 				</div>';

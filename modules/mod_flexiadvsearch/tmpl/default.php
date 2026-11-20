@@ -32,7 +32,7 @@ $r = 0;  // Row counter of the odd / even row classes
 $isJ4 =defined('FLEXI_J40GE') && FLEXI_J40GE;
 
 $wa = Factory::getApplication()->getDocument()->getWebAssetManager();
-$wa->useScript('jquery');
+flexicontent_html::loadFramework('flexi-lib');
 
 require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
 $action = Route::_(FlexicontentHelperRoute::getSearchRoute(0, $itemid), true);
@@ -374,43 +374,21 @@ $js ="";
 if ($autodisplayadvoptions)
 {
  $js .= '
-	jQuery(document).ready(function() {
-	  var status = {
-	    "true": "open",
-	    "false": "close"
-	  };
-
-
-	  jQuery("#modfcadvsearch_fcsearch_txtflds_row_'.$module->id.'").css("position","relative").hide(0, function(){}).css("position","static");
-
-	  '. (($autodisplayadvoptions==1 && !$use_advsearch_options) ? '' : 'jQuery("#modfcadvsearch_fcsearch_txtflds_row_'.$module->id.'").css("position","relative").toggle(500, function(){}).css("position","static");') .'
-
-	  jQuery("#modfcadvsearch_use_advsearch_options_'.$module->id.'").click(function() {
-
-		  jQuery("#modfcadvsearch_fcsearch_txtflds_row_'.$module->id.'").css("position","relative").toggle(500, function(){}).css("position","static");
+    FlexiForm.ready(function() {
+      const toggle = document.getElementById("modfcadvsearch_use_advsearch_options_'.$module->id.'");
+      const targets = ["modfcadvsearch_fcsearch_txtflds_row_'.$module->id.'", "modfcadvsearch_fc_advsearch_options_set_'.$module->id.'"];
+      const update = function() {
+        const expanded = toggle ? toggle.checked : '.($use_advsearch_options ? 'true' : 'false').';
+        targets.forEach(function(id) { const row = document.getElementById(id); if (row) row.hidden = !expanded; });
+        if (toggle) {
+          toggle.setAttribute("aria-expanded", String(expanded));
+          toggle.nextElementSibling?.classList.toggle("btn-primary", expanded);
+        }
+      };
+      toggle?.addEventListener("change", update);
+      update();
     });
-  '
-  .( 1 /*$this->params->get('canseltypes', 1)!=2*//*disable hiding*/ ? '' : '
-	  jQuery("#modfcadvsearch_fcsearch_contenttypes_row_'.$module->id.'").css("position","relative").hide(0, function(){}).css("position","static");
-
-	  '. (($autodisplayadvoptions==1 && !$use_advsearch_options) ? '' : 'jQuery("#modfcadvsearch_fcsearch_contenttypes_row_'.$module->id.'").css("position","relative").toggle(500, function(){}).css("position","static");') .'
-
-	  jQuery("#modfcadvsearch_use_advsearch_options_'.$module->id.'").click(function() {
-
-		  jQuery("#modfcadvsearch_fcsearch_contenttypes_row_'.$module->id.'").css("position","relative").toggle(500, function(){}).css("position","static");
-    }); ').
-  '
-	  jQuery("#modfcadvsearch_fc_advsearch_options_set_'.$module->id.'").css("position","relative").hide(0, function(){}).css("position","static");
-
-	  '. (($autodisplayadvoptions==1 && !$use_advsearch_options) ? '' : 'jQuery("#modfcadvsearch_fc_advsearch_options_set_'.$module->id.'").css("position","relative").toggle(500, function(){}).css("position","static");') .'
-
-	  jQuery("#modfcadvsearch_use_advsearch_options_'.$module->id.'").click(function() {
-
-		  jQuery("#modfcadvsearch_fc_advsearch_options_set_'.$module->id.'").css("position","relative").toggle(500, function(){}).css("position","static");
-    });
-
-	});
-	';
+ ';
 }
 
 if (!empty($js)) {
@@ -562,7 +540,7 @@ id="mod_search_searchword-'.$module->id.'" class="'.($isJ4 ? 'form-control ' : '
 			$checked_attr  = $use_advsearch_options ? 'checked=checked' : '';
 			$checked_class = $use_advsearch_options ? 'btn-primary' : '';
 			$advbox_button_html = '
-			<input type="checkbox" id="modfcadvsearch_use_advsearch_options_'.$module->id.'" name="use_advsearch_options" value="1" '.$checked_attr.' onclick="jQuery(this).next().toggleClass(\'btn-primary\');" style="display:none" />
+			<input type="checkbox" id="modfcadvsearch_use_advsearch_options_'.$module->id.'" name="use_advsearch_options" value="1" '.$checked_attr.'  style="display:none" />
 			<label id="modfcadvsearch_use_advsearch_options_lbl_'.$module->id.'" class="btn '.$checked_class.' hasTooltip" for="modfcadvsearch_use_advsearch_options_'.$module->id.'" title="'.Text::_('FLEXI_SEARCH_ADVANCED_OPTIONS').'">
 				<span class="icon-list"></span>' . Text::_('FLEXI_SEARCH_ADVANCED') . '
 			</label>
@@ -612,12 +590,12 @@ $input_grp_class = !$isJ4
 
 <?php
 $js = '
-	jQuery(document).ready(function() {
-		jQuery("#'.$form_id.' input:not(.fc_autosubmit_exclude):not(.select2-input), #'.$form_id.' select:not(.fc_autosubmit_exclude)").on("change", function() {
-			var form=document.getElementById("'.$form_id.'");
-			adminFormPrepare(form, 1);
-		});
-	});
+	FlexiForm.ready(function() {
+        const form = document.getElementById("'.$form_id.'");
+        form?.addEventListener("change", function(event) {
+            if (event.target.matches("input:not(.fc_autosubmit_exclude):not(.select2-input), select:not(.fc_autosubmit_exclude)")) adminFormPrepare(form, 1);
+        });
+    });
 ';
 $wa->addInlineScript($js);
 ?>

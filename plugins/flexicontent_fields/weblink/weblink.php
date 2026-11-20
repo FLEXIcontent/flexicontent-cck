@@ -257,9 +257,6 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		{
 			if (!$use_jformfields)
 			{
-				// Check and if needed install Joomla template overrides into current Joomla template
-				flexicontent_html::install_template_overrides();
-
 				// We will use the mootools based media manager
 				\Joomla\CMS\HTML\HTMLHelper::_('behavior.framework', true);
 
@@ -293,6 +290,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			\Joomla\CMS\Language\Text::script("FLEXI_FIELD_WEBLINK_ENTER_MEDIA_URL_WARNING", true);
 			\Joomla\CMS\Language\Text::script("FLEXI_FIELD_MEDIA_URL", true);
 			\Joomla\CMS\Language\Text::script("FLEXI_ERROR", true);
+			flexicontent_html::loadFramework('media-metadata');
 			$document->getWebAssetManager()->registerAndUseScript('plg_flexicontent_fields_weblink.form', 'plugins/flexicontent_fields/weblink/js/form.js', array('version' => FLEXI_VHASH));
 
 			$mm_mode_common_js_added = true;
@@ -305,290 +303,19 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		// Handle multiple records
 		if ($multiple)
 		{
-			// Add the drag and drop sorting feature
-			if ($add_ctrl_btns) $js .= "
-			jQuery(document).ready(function(){
-				jQuery('#sortables_".$field->id."').sortable({
-					handle: '.fcfield-drag-handle',
-					cancel: false,
-					/*containment: 'parent',*/
-					tolerance: 'pointer'
-					".($fields_box_placing ? "
-					,start: function(e) {
-						//jQuery(e.target).children().css('float', 'left');
-						//fc_setEqualHeights(jQuery(e.target), 0);
-					}
-					,stop: function(e) {
-						//jQuery(e.target).children().css({'float': 'none', 'min-height': '', 'height': ''});
-					}
-					" : '')."
-				});
-			});
-			";
-
-			if ($max_values) \Joomla\CMS\Language\Text::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
-			$js .= "
-			function addField".$field->id."(el, groupval_box, fieldval_box, params)
-			{
-				var insert_before   = (typeof params!== 'undefined' && typeof params.insert_before   !== 'undefined') ? params.insert_before   : 0;
-				var remove_previous = (typeof params!== 'undefined' && typeof params.remove_previous !== 'undefined') ? params.remove_previous : 0;
-				var scroll_visible  = (typeof params!== 'undefined' && typeof params.scroll_visible  !== 'undefined') ? params.scroll_visible  : 1;
-				var animate_visible = (typeof params!== 'undefined' && typeof params.animate_visible !== 'undefined') ? params.animate_visible : 1;
-
-				if(!remove_previous && (rowCount".$field->id." >= maxValues".$field->id.") && (maxValues".$field->id." != 0)) {
-					alert(Joomla.JText._('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + maxValues".$field->id.");
-					return 'cancel';
-				}
-
-				// Find last container of fields and clone it to create a new container of fields
-				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
-				var newField  = lastField.clone();
-				newField.find('.fc-has-value').removeClass('fc-has-value');
-
-				// New element's field name and id
-				var uniqueRowN = uniqueRowNum" . $field->id . ";
-				var element_id = '" . $elementid . "_' + uniqueRowN;
-				var fname_pfx  = '" . $fieldname . "[' + uniqueRowN + ']';
-				";
-
-			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
-			$js .= "
-				// Update new URL's address
-				theInput = newField.find('input.urllink').first();
-				theInput.attr('value', ".json_encode($default_link).");
-				theInput.attr('name', fname_pfx + '[link]');
-				theInput.attr('id', element_id + '_link');
-				newField.find('.urllink-lbl').first().attr('for', element_id + '_link');
-
-				// Update inputmask
-				var has_inputmask = newField.find('input.has_inputmask').length != 0;
-				if (has_inputmask)  newField.find('input.has_inputmask').inputmask();
-				";
-
-			if ($allow_relative_addrs === 2) $js .= "
-				var nr = 0;
-				newField.find('input.autoprefix').each(function() {
-					var elem = jQuery(this);
-					elem.attr('name', fname_pfx + '[autoprefix]');
-					elem.attr('id', element_id + '_autoprefix_'+nr);
-					elem.next().removeClass('active');
-					elem.prop('checked', false);
-					elem.next().attr('for', element_id + '_autoprefix_'+nr);
-					nr++;
-				});
-				";
-
-			// Update new URL optional properties
-			if ($useimage)
-			{
-				$js .= "
-				theInput = newField.find('input.urlimage').first();
-				theInput.attr('value', ".json_encode($default_image).");
-				theInput.attr('name', fname_pfx + '[image]');
-				theInput.attr('id', element_id + '_image');
-				newField.find('.urlimage-lbl').first().attr('for', element_id + '_image');
-
-				theInput = newField.find('img.media-preview').first();
-				theInput.attr('id', element_id + '_image_preview');
-				theInput.attr('src', '');
-
-				theInput.parent().prev().attr('id', element_id + '_image_preview_empty');
-				theInput.parent().prev().css('display', '');
-
-				theInput.parent().attr('id', element_id + '_image_preview_img');
-				theInput.parent().css('display', 'none');
-
-				var elements = ['img_fetch_btn', 'img_clear_btn'];
-				for	(var i = 0; i < elements.length; i++)
-				{
-					theInput = newField.find('.' + elements[i]).first();
-					var el_name = elements[i].replace(/^img_/, '');
-					theInput.attr('name', fname_pfx + '['+el_name+']');
-					theInput.attr('id', element_id + '_' + el_name);
-				}
-
-				newField.find('.img_fetch_btn').attr('onclick', 'fcfield_weblink.fetchData(\'' + element_id + '\', \'".$field_name_js."\'); return false;');
-				newField.find('.img_clear_btn').attr('onclick', 'fcfield_weblink.clearData(\'' + element_id + '\', \'".$field_name_js."\'); return false;');
-				newField.find('.fcfield_message_box').attr('id','fcfield_message_box_' + element_id);
-
-				// Clear any existing message
-				jQuery('#fcfield_message_box_' + element_id).html('');
-				";
-			}
-
-			if ($usetitle) $js .= "
-				theInput = newField.find('input.urltitle').first();
-				theInput.attr('value', ".json_encode($default_title).");
-				theInput.attr('name', fname_pfx + '[title]');
-				theInput.attr('id', element_id + '_title');
-				newField.find('.urltitle-lbl').first().attr('for', element_id + '_title');
-				";
-
-			if ($usetext) $js .= "
-				theInput = newField.find('input.urllinktext').first();
-				theInput.attr('value', ".json_encode($default_text).");
-				theInput.attr('name', fname_pfx + '[linktext]');
-				theInput.attr('id', element_id + '_linktext');
-				newField.find('.urllinktext-lbl').first().attr('for', element_id + '_linktext');
-				";
-
-			if ($useaddrtype) $js .= "
-				theField = newField.find('".($useaddrtype==1 ? 'input' : 'select').".urladdrtype').first();
-				theField.attr('value', '');
-				theField.attr('name', fname_pfx + '[addrtype]');
-				theField.attr('id', element_id + '_addrtype');
-				theField.attr('onchange', 'document.getElementById(\'' + element_id + '_link\').value = this.value');
-				newField.find('.urladdrtype-lbl').first().attr('for', element_id + '_addrtype');
-				";
-
-			// Do not load the default from viewing configuration !, this will allow re-configuring default in viewing configuration at any time
-			if ($useclass) $js .= "
-				theField = newField.find('".($useclass==1 ? 'input' : 'select').".urlclass').first();
-				theField.attr('value', '');
-				theField.attr('name', fname_pfx + '[class]');
-				theField.attr('id', element_id + '_class');
-				newField.find('.urlclass-lbl').first().attr('for', element_id + '_class');
-				";
-
-			if ($useid) $js .= "
-				theInput = newField.find('input.urlid').first();
-				theInput.attr('value', ".json_encode($default_id).");
-				theInput.attr('name', fname_pfx + '[id]');
-				theInput.attr('id', element_id + '_id');
-				newField.find('.urlid-lbl').first().attr('for', element_id + '_id');
-				";
-
-			// Do not load the default from viewing configuration !, this will allow re-configuring default in viewing configuration at any time
-			if ($usetarget) $js .= "
-				theInput = newField.find('select.urltarget').first();
-				theInput.val('');
-				theInput.attr('name', fname_pfx + '[target]');
-				theInput.attr('target', element_id + '_target');
-				newField.find('.urltarget-lbl').first().attr('for', element_id + '_target');
-				";
-
-			if ($usehits) $js .="
-				theInput = newField.find('input.urlhits').first();
-				theInput.val('0');
-				theInput.attr('name', fname_pfx + '[hits]');
-				theInput.attr('id', element_id + '_hits');
-				newField.find('.urlhits-lbl').first().attr('for', element_id + '_hits');
-
-				// Destroy any select library elements (select2 or choices.js)
-				fc_destroySelectLib(newField);
-
-				// Set hits to zero for new row value
-				newField.find('span.hitcount').html('0 ' + " . json_encode(\Joomla\CMS\Language\Text::_('FLEXI_HITS')) . ");
-				";
-
-			// Add new field to DOM
-			$js .= "
-				lastField ?
-					(insert_before ? newField.insertBefore( lastField ) : newField.insertAfter( lastField ) ) :
-					newField.appendTo( jQuery('#sortables_".$field->id."') ) ;
-				if (remove_previous) lastField.remove();
-
-				// Attach form validation on new element
-				fc_validationAttach(newField);
-
-				// Re-init any select2 elements
-				fc_attachSelect2(newField);
-
-				" .
-				// Re-init joomla media form field element (J3 only)
-				($useimage && $use_jformfields && !FLEXI_J40GE ? "newField.find('.field-media-wrapper').fieldMedia();" : '') .
-				// Clear image preview
-				($useimage && $use_jformfields ? "newField.find('.field-media-wrapper').find('.button-clear').click();" : '')
-				;
-
-			// Add new element to sortable objects (if field not in group)
-			if ($add_ctrl_btns) $js .= "
-				//jQuery('#sortables_".$field->id."').sortable('refresh');  // Refresh was done appendTo ?
-				";
-
-			// Show new field, increment counters
-			$js .="
-				//newField.fadeOut({ duration: 400, easing: 'swing' }).fadeIn({ duration: 200, easing: 'swing' });
-				if (scroll_visible) fc_scrollIntoView(newField, 1);
-				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800, function() { jQuery(this).css('opacity', ''); });
-
-				" .
-				/*
-				// Set tooltip data placeholders (this is for preview on mouseover)
-				var _name = '_image';
-				newField.find('.media-preview').html('<span class=\"hasTipPreview\" title=\"&lt;strong&gt;" . \Joomla\CMS\Language\Text::_('JLIB_FORM_MEDIA_PREVIEW_SELECTED_IMAGE', true)
-					. "&lt;/strong&gt;&lt;br /&gt;&lt;span style=&quot;display: block;&quot; id=&quot;' + element_id + _name + '_preview_empty&quot; style=&quot;display:none&quot;&gt;" . \Joomla\CMS\Language\Text::_('JLIB_FORM_MEDIA_PREVIEW_EMPTY', true)
-					. "&lt;/span&gt;&lt;span style=&quot;display: block;&quot; id=&quot;' + element_id + _name + '_preview_img&quot;&gt;&lt;img src=&quot;&quot; alt=&quot;" . \Joomla\CMS\Language\Text::_('JLIB_FORM_MEDIA_PREVIEW_SELECTED_IMAGE', true)
-					. "&quot; id=&quot;' + element_id + _name + '_preview&quot; class=&quot;media-preview&quot; style=&quot; style=&quot;max-width:480px; max-height:360&quot; &quot; /&gt;&lt;/span&gt;\"><span class=\"icon-eye\" aria-hidden=\"true\"></span><span class=\"icon-image\" aria-hidden=\"true\"></span> "
-					. \Joomla\CMS\Language\Text::_('FLEXI_FIELD_WEBLINK_URLIMAGE', true)
-					. "</span>');
-				*/
-				"
-
-				// Show tooltips
-				var tipped_elements = newField.find('.hasTipImgpath, .hasTipPreview');
-				tipped_elements.each(function() {
-					var title = this.get('title');
-					if (title) {
-						var parts = title.split('::', 2);
-						this.store('tip:title', parts[0]);
-						this.store('tip:text', parts[1]);
-					}
-				});
-
-				if (tipped_elements.length)
-				{
-					var imgpath_JTooltips = new Tips(jQuery(newField).find('.hasTipImgpath').get(0), { \"maxTitleChars\": 50, \"fixed\": false, \"onShow\": jMediaRefreshImgpathTip});
-					var imgprev_JTooltips = new Tips(jQuery(newField).find('.hasTipPreview').get(0), { \"maxTitleChars\": 50, \"fixed\": false, \"onShow\": jMediaRefreshPreviewTip});
-				}
-
-				// Enable tooltips on new element
-				newField.find('.hasTooltip').tooltip({html: true, container: newField});
-				newField.find('.hasPopover').popover({html: true, container: newField, trigger : 'hover focus'});
-
-				// Attach bootstrap event on new element
-				fc_bootstrapAttach(newField);
-
-				rowCount".$field->id."++;       // incremented / decremented
-				uniqueRowNum".$field->id."++;   // incremented only
-			}
-
-
-			function deleteField".$field->id."(el, groupval_box, fieldval_box)
-			{
-				// Disable clicks on remove button, so that it is not reclicked, while we do the field value hide effect (before DOM removal of field value)
-				var btn = fieldval_box ? false : jQuery(el);
-				if (btn && rowCount".$field->id." > 1) btn.css('pointer-events', 'none').off('click');
-
-				// Find field value container
-				var row = fieldval_box ? fieldval_box : jQuery(el).closest('li');
-
-				// Add empty container if last element, instantly removing the given field value container
-				if(rowCount".$field->id." == 1)
-					addField".$field->id."(null, groupval_box, row, {remove_previous: 1, scroll_visible: 0, animate_visible: 0});
-
-				// Remove if not last one, if it is last one, we issued a replace (copy,empty new,delete old) above
-				if (rowCount".$field->id." > 1)
-				{
-					// Destroy the remove/add/etc buttons, so that they are not reclicked, while we do the field value hide effect (before DOM removal of field value)
-					row.find('.fcfield-delvalue').remove();
-					row.find('.fcfield-expand-view').remove();
-					row.find('.fcfield-insertvalue').remove();
-					row.find('.fcfield-drag-handle').remove();
-					// Do hide effect then remove from DOM
-					row.slideUp(400, function(){ jQuery(this).remove(); });
-					rowCount".$field->id."--;
-				}
-			}
-			";
-
-			$css .= '';
+			flexicontent_html::loadFramework('native-field-controls');
+			$config = array(
+				'defaults' => array('link' => $default_link, 'image' => $default_image, 'title' => $default_title,
+					'linktext' => $default_text, 'id' => $default_id, 'hits' => '0'),
+				'hitsLabel' => \Joomla\CMS\Language\Text::_('FLEXI_HITS'),
+			);
+			$js .= $this->buildValueRepeater($field, $elementid, $fieldname, $max_values, $add_ctrl_btns, $config, 'fcfield_weblink_rows');
 
 			$remove_button = '<span class="' . $btn_item_class . ' fcfield-delvalue ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
 			$move2         = '<span class="' . $btn_item_class . ' fcfield-drag-handle ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
 			$add_here = '';
-			$add_here .= $add_position==2 || $add_position==3 ? '<span class="' . $btn_item_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
-			$add_here .= $add_position==1 || $add_position==3 ? '<span class="' . $btn_item_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
+			$add_here .= $add_position==2 || $add_position==3 ? '<span class="' . $btn_item_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField'.$field->id.'(null, this.closest(\'ul\'), this.closest(\'li\'), {insert_before: 1});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
+			$add_here .= $add_position==1 || $add_position==3 ? '<span class="' . $btn_item_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, this.closest(\'ul\'), this.closest(\'li\'), {insert_before: 0});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
 		}
 
 		// Field not multi-value
@@ -650,7 +377,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		if ($per_val_js)
 		{
 			$js .= "
-			jQuery(document).ready(function()
+			FlexiForm.ready(function()
 			{
 				" . $per_val_js . "
 			});
@@ -658,11 +385,6 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		}
 
 		// Add field's CSS / JS
-		if ($multiple) $js .= "
-			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
-			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
-			var maxValues".$field->id." = ".$max_values.";
-		";
 		if ($js)  $document->getWebAssetManager()->addInlineScript($js);
 		if ($css) $document->getWebAssetManager()->addInlineStyle($css);
 
@@ -680,7 +402,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
 			if (!$add_position) $field->html .= '
 				<div class="'.$btn_group_class.' fc-xpended-btns">
-					<span class="fcfield-addvalue ' . $font_icon_class . ' ' . $btn_item_class . '" onclick="addField'.$field->id.'(jQuery(this).closest(\'.fc-xpended-btns\').get(0));" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_TO_BOTTOM' ).'">
+					<span class="fcfield-addvalue ' . $font_icon_class . ' ' . $btn_item_class . '" onclick="addField'.$field->id.'(this.closest(\'.fc-xpended-btns\'));" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_TO_BOTTOM' ).'">
 						'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_VALUE' ).'
 					</span>
 				</div>';
@@ -713,7 +435,7 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		{
 			$field->html = '
 			<button type="button" class="fcfield-expand-view-btn btn btn-small" data-expandedFieldState="0" aria-label="' . \Joomla\CMS\Language\Text::_('FLEXI_EXPAND') . '"
-				onclick="fc_toggleCompactValuesView(this, jQuery(this).closest(\'.container_fcfield\'));"
+				onclick="fc_toggleCompactValuesView(this, this.closest(\'.container_fcfield\'));"
 			>
 				<span class="fcfield-expand-view ' . $font_icon_class . '" aria-hidden="true"></span>&nbsp; ' . \Joomla\CMS\Language\Text::_('FLEXI_EXPAND', true) . '
 			</button>

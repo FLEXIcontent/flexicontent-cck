@@ -18,12 +18,12 @@
     </languages>
 
     <config>
-        <fields name="params">
+        <fields name="params" addfieldpath="/administrator/components/com_flexicontent/elements">
             <fieldset name="basic">
 
                 <field
                     name="highlight_color"
-                    type="color"
+                    type="fccolor"
                     label="PLG_SYSTEM_FLEXICONTENT_FIELDSEARCH_HIGHLIGHT_COLOR_LABEL"
                     description="PLG_SYSTEM_FLEXICONTENT_FIELDSEARCH_HIGHLIGHT_COLOR_DESC"
                     default="#fff176"

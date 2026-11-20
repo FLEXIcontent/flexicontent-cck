@@ -573,23 +573,77 @@ a.plupload_disabled:hover {
   background: #ececec;
   padding: 5px 10px !important;
 }
-.view-item.task-edit #fctoolbar.btn-toolbar > * .btn.btn-sm {
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
+#flexicontent.flexi_edit:not(.full_body_box) #fctoolbar.btn-toolbar {
+  display: flex !important;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
 }
-.view-item.task-edit #fctoolbar.btn-toolbar > *,
-#fctoolbar.btn-toolbar > * > * {
-  font-size: initial !important;
+#flexicontent.flexi_edit:not(.full_body_box) #fctoolbar.btn-toolbar > * {
+  margin: 0 !important;
+  width: auto;
+}
+#flexicontent.flexi_edit:not(.full_body_box) #fctoolbar.btn-toolbar .btn {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2.75rem !important;
+  padding: 0.5rem 0.75rem !important;
+  font-family: inherit;
+  font-size: 1rem !important;
+  line-height: 1.5 !important;
+  border-radius: 0.25rem;
+  white-space: normal;
+}
+#flexicontent.flexi_edit:not(.full_body_box) #fctoolbar.btn-toolbar .btn > [class^="icon-"],
+#flexicontent.flexi_edit:not(.full_body_box) #fctoolbar.btn-toolbar .btn > [class*=" icon-"] {
+  flex-shrink: 0;
+  margin: 0;
+}
+#flexicontent.flexi_edit:not(.full_body_box) #fctoolbar.btn-toolbar .buttons.btn-group {
+  padding: 0;
+  background: transparent;
+  align-items: stretch;
+}
+#flexicontent.flexi_edit:not(.full_body_box) #fctoolbar.btn-toolbar .buttons.btn-group > joomla-toolbar-button {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: auto;
+  margin: 0 !important;
+  padding: 0;
+  min-height: 0 !important;
+}
+#flexicontent.flexi_edit:not(.full_body_box) #fctoolbar.btn-toolbar .buttons.btn-group > joomla-toolbar-button > .btn {
+  width: 100%;
+  border-start-end-radius: 0;
+  border-end-end-radius: 0;
+}
+#flexicontent.flexi_edit:not(.full_body_box) #fctoolbar.btn-toolbar .buttons.btn-group > .dropdown-toggle-split {
+  flex: 0 0 2.75rem;
+  width: 2.75rem !important;
+  border-start-start-radius: 0;
+  border-end-start-radius: 0;
+  border-inline-start-color: rgba(255, 255, 255, 0.35);
+}
+#flexicontent.flexi_edit:not(.full_body_box) #fctoolbar.btn-toolbar .buttons.btn-group > .dropdown-menu {
+  max-width: calc(100vw - 3rem);
+}
+#flexicontent.flexi_edit:not(.full_body_box) #fctoolbar.btn-toolbar .buttons.btn-group > .dropdown-menu .btn {
+  justify-content: flex-start;
+  text-align: start;
+}
+@media (max-width: 479px) {
+  #flexicontent.flexi_edit:not(.full_body_box) #fctoolbar.btn-toolbar > * {
+    width: 100%;
+  }
+}
+#flexicontent.flexi_edit:not(.full_body_box) .fctoolbar_side_placement #fctoolbar.btn-toolbar > * {
+  width: 100%;
 }
 #fctoolbar.btn-toolbar > *,
 #toolbar.btn-toolbar > * {
   margin-top: 0px !important;
-}
-.view-item.task-edit .button-cancel.btn.btn-danger,
-.view-item.task-edit .toolbar.btn.btn-success {
-  margin-top: 0 !important;
-  padding-top: 0.5rem !important;
-  padding-bottom: 0.5rem !important;
 }
 fieldset.fc_search_set,
 fieldset.fc_filter_set {

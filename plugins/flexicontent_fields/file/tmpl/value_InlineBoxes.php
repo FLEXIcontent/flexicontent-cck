@@ -409,9 +409,9 @@ else if ($prop !== 'display_properties_only') :
 			$view_file_classes = $file_classes . ' btn-info fcfile_viewFile';
 			$actions_arr[] = '
 				<button type="button" data-href="' . $view_link . '" class="' . $view_file_classes .'" title="' . $viewinfo . '" '
-					. ($viewinside>=2 ? ' onclick="var url = jQuery(this).attr(\'data-href\'); window.open(url, ' . ($viewinside==3 ? "'_self'" : "") . ');" ' : '')
-					. ($viewinside==1 ? ' onclick="var url = jQuery(this).attr(\'data-href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title:\''. $filetitle_escaped .'\'}); return false;" ' : '')
-					. ($viewinside==0 ? ' onclick="var url = jQuery(this).attr(\'data-href\'); jQuery.fancybox.open([{ src: url , type: \'iframe\'}]); "' : '')
+					. ($viewinside>=2 ? ' onclick="var url = this.getAttribute(\'data-href\'); window.open(url, ' . ($viewinside==3 ? "'_self'" : "") . ');" ' : '')
+					. ($viewinside==1 ? ' onclick="var url = this.getAttribute(\'data-href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title:\''. $filetitle_escaped .'\'}); return false;" ' : '')
+					. ($viewinside==0 ? ' onclick="var url = this.getAttribute(\'data-href\'); jQuery.fancybox.open([{ src: url , type: \'iframe\'}]); "' : '')
 					. '
 				>
 					' . ($compact_display != 2 ? $viewtext : '') . '
@@ -454,7 +454,7 @@ else if ($prop !== 'display_properties_only') :
 				.'&file_id='.$file_id.'&content_id='.$item->id.'&field_id='.$field->id;
 			$actions_arr[] =
 				'<button class="' . $file_classes . ' fcfile_shareFile" title="'.$shareinfo.'" data-href="'.$send_form_url.'"
-					onclick="var url = jQuery(this).attr(\'data-href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 800, 800, 0, {title:\''.htmlspecialchars($sharetext, ENT_COMPAT, 'UTF-8').'\'}); return false;" '.
+					onclick="var url = this.getAttribute(\'data-href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 800, 800, 0, {title:\''.htmlspecialchars($sharetext, ENT_COMPAT, 'UTF-8').'\'}); return false;" '.
 				'>
 					' . ($compact_display != 2 ? htmlspecialchars($sharetext, ENT_COMPAT, 'UTF-8') : '') . '
 					' . ($compact_display == 2 ? ' <span class="icon-mail"></span>' : '') . '
@@ -498,7 +498,7 @@ else if ($prop !== 'display_properties_only') :
 			$actions_arr[] = '
 				<a href="' . $dl_link . (strpos($dl_link, '?') !== false ? '&amp;' : '?') . 'method=view" ' . ($viewinside==2 ? 'target="_blank"' : '')
 					. ' class="' . ($viewinside==0 ? 'fancybox ' : '') . $file_classes . ' fcfile_viewFile" '.($viewinside==0 ? 'data-type="iframe" ' : '')
-					. ($viewinside==1 ? ' onclick="var url = jQuery(this).attr(\'href\');  fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title:\''. $filetitle_escaped .'\'}); return false;" ' : '')
+					. ($viewinside==1 ? ' onclick="var url = this.getAttribute(\'href\');  fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title:\''. $filetitle_escaped .'\'}); return false;" ' : '')
 					. ' title="' . $viewinfo . '" >
 					' . $viewtext . '
 				</a>';
@@ -536,7 +536,7 @@ else if ($prop !== 'display_properties_only') :
 				.'&file_id='.$file_id.'&content_id='.$item->id.'&field_id='.$field->id;
 			$actions_arr[] =
 				'<a href="'.$send_form_url.'" class="fcfile_shareFile" title="'.$shareinfo.'" '.
-				'  onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 800, 800, 0, {title:\''.$sharetext.'\'}); return false;">'
+				'  onclick="var url = this.getAttribute(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 800, 800, 0, {title:\''.$sharetext.'\'}); return false;">'
 				.$sharetext
 				.'</a>';
 		}

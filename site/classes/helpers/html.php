@@ -372,7 +372,7 @@ class flexicontent_html
 				$less->setFormatter('compressed');
 			}
 
-			// wikimedia/less.php nécessite les répertoires d'import explicites
+			// wikimedia/less.php requires explicit import directories
 			$importDirs = array_merge(
 				array(dirname($path . $in) . DS),
 				$inc_paths,
@@ -592,8 +592,8 @@ class flexicontent_html
 		if ($legacy_cookie) $jinput->cookie->set('columnchoose_'.$data_tbl_id, null, 1, '', '');
 
 		$js = "
-		var show_col_{$data_tbl_id} = Array();
-		jQuery(document).ready(function() {
+		var show_col_{$data_tbl_id} = [];
+		FlexiForm.ready(function() {
 		";
 
 		// Get visibility of table columns from Posted Form or from Browser Cookie
@@ -1208,7 +1208,6 @@ class flexicontent_html
 					'.implode('', $options).'
 				</fieldset>
 			';
-			Factory::getApplication()->getDocument()->addScriptDeclaration('jQuery(document).ready(function(){ jQuery(\'input[name="'.$layout_type.'"]\').click( function() { adminFormPrepare(this.form, 2); }); });');
 		}
 		return $outside_label.$html;
 	}
@@ -1442,14 +1441,46 @@ class flexicontent_html
 	}
 
 
-	/**
-	 * Utility function to load each JS Frameworks once
-	 *
-	 * @param 	string 		$text
-	 * @param 	int 		$nb
-	 * @return 	string
-	 * @since 1.5
-	 */
+	/** Load the shared tag picker for an item or import form. */
+	static function loadTagPicker($fieldName, $assignTask, $itemLanguage = false)
+	{
+		$app = \Joomla\CMS\Factory::getApplication();
+		$document = $app->getDocument();
+		$root = \Joomla\CMS\Uri\Uri::root(true);
+		$base = \Joomla\CMS\Uri\Uri::base(true);
+		$token = \Joomla\CMS\Session\Session::getFormToken() . '=1';
+		$config = array(
+			'name' => $fieldName,
+			'suggestions' => $base . '/components/com_flexicontent/tasks/core.php?task=viewtags&format=json&lang='
+				. rawurlencode($app->getLanguage()->getTag()) . '&' . $token,
+			'assign' => $base . '/index.php?option=com_flexicontent&task=' . $assignTask . '&format=raw&' . $token,
+			'itemLanguage' => $itemLanguage,
+			'keepOpen' => $itemLanguage,
+			'removeLabel' => \Joomla\CMS\Language\Text::_('FLEXI_DELETE_TAG'),
+			'requestError' => \Joomla\CMS\Language\Text::_('JERROR_AN_ERROR_HAS_OCCURRED'),
+			'assignError' => \Joomla\CMS\Language\Text::_('FLEXI_ERROR_SAVING_TAG'),
+		);
+		self::loadFramework('form-utils');
+		$document->addScript($root . '/components/com_flexicontent/assets/js/tag-picker.js', array('version' => 'auto'));
+		$document->addStyleSheet($root . '/components/com_flexicontent/assets/css/tag-picker.css', array('version' => 'auto'));
+		$document->addScriptDeclaration('FlexiForm.ready(() => fc_initTagPicker('
+			. json_encode($config, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT)
+			. '));');
+	}
+
+	/** Administrator views that can start without the shared jQuery loader. */
+	static function usesNativeAdminAssets()
+	{
+		$app = Factory::getApplication();
+		$input = $app->getInput();
+		$view = $input->getCmd('view', 'flexicontent');
+		return FLEXI_J40GE && $app->isClient('administrator')
+			&& (($input->getCmd('option') === 'com_config' && $input->getCmd('component') === 'com_flexicontent') || in_array($input->getCmd('option'), ['com_modules', 'com_menus'], true) || ($view === 'flexicontent' && in_array($input->getCmd('layout', ''), ['', 'default'], true)) || in_array($view, array(
+				'item', 'items', 'itemcompare', 'itemelement', 'tagelement', 'field', 'fields', 'type', 'types', 'tag', 'tags', 'template', 'templates', 'category', 'categories', 'users', 'groups', 'stats', 'search', 'import', 'file', 'filemanager', 'fileselement', 'review', 'reviews', 'mediadata', 'mediadatas', 'appsman', 'fccategoryelement', 'user', 'group',
+			), true));
+	}
+
+	/** Load a JavaScript framework once per request. */
 	static function loadFramework( $framework, $mode='', $params=null )
 	{
 		// Detect already loaded framework
@@ -1470,13 +1501,15 @@ class flexicontent_html
 		{
 			if ($load_jquery === null)
 			{
-				// Choices.js mode on the site front loads NO jQuery (keeps front entirely
-				// jQuery-free); select2 legacy keeps jQuery + mousewheel.
+				// Generic/native pages do not preload jQuery in Choices mode.
+				// Selected legacy widgets below request their own dependencies explicitly.
 				$useChoicesJs = (int) $cparams->get('select_lib_type', 0) === 1;
-				$load_jquery = ( (int) $cparams->get('loadfw_jquery', 1) === 1 || !$app->isClient('site') ) && ! ( $app->isClient('site') && $useChoicesJs );
+				$load_jquery = !self::usesNativeAdminAssets()
+					&& !(FLEXI_J40GE && $app->isClient('site'))
+					&& ( (int) $cparams->get('loadfw_jquery', 1) === 1 || !$app->isClient('site') )
+					&& ! ( $app->isClient('site') && $useChoicesJs );
 
-				// jQuery plugins without a jQuery-free alternative still need jQuery in Choices.js mode,
-				// so it is loaded on the pages that use them (unless jQuery loading is turned off)
+				// Retained for the legacy bootstrap-toggle compatibility path.
 				$jquery_for_plugins = (int) $cparams->get('loadfw_jquery', 1) === 1 || !$app->isClient('site');
 
 				// Choices.js mode without jQuery for plugins: the site front has no jQuery at all
@@ -1537,7 +1570,7 @@ class flexicontent_html
 			case 'touch-punch':
 				$mobileDetector = flexicontent_html::getMobileDetector();
 				$isMobile = $mobileDetector->isMobile() || $mobileDetector->isTablet();
-				if ($isMobile)
+				if ($isMobile && $load_jquery)
 				{
 					if ($load_jquery) flexicontent_html::loadJQuery();
 					$document->addScript(\Joomla\CMS\Uri\Uri::root(true).$lib_path.'/jquery/js/jquery-ui/jquery.ui.touch-punch.min.js');
@@ -1552,7 +1585,6 @@ class flexicontent_html
 				$url_grapjs_css = 'https://unpkg.com/grapesjs@' . $grapjs_vers . '/dist/css/grapes.min.css';
 				$url_grapjs_js = 'https://unpkg.com/grapesjs@' . $grapjs_vers . '/dist/grapes.min.js';
 
-				$document->addStyleSheet($framework_path.'/stylesheets/toastr.min.css');
 				$document->addStyleSheet($url_grapjs_css);
 				$document->addStyleSheet($framework_path.'/stylesheets/grapesjs-preset-webpage.min.css?0.1.10');
 				$document->addStyleSheet($framework_path.'/stylesheets/tooltip.css');
@@ -1560,7 +1592,7 @@ class flexicontent_html
 				$document->addStyleSheet($framework_path.'/stylesheets/demos.css');
 
 				$document->addScript('https://static.filestackapi.com/v3/filestack.js');
-				$document->addScript($framework_path.'/js/toastr.min.js');
+				flexicontent_html::loadFramework('flexi-lib');
 				$document->addScript($url_grapjs_js);
 
 
@@ -1583,15 +1615,12 @@ class flexicontent_html
 				break;
 
 			case 'grapesjs_view':
-				$js .= "
-					jQuery(document).ready(function(){
-						jQuery('.tab-container').click(function(e)
-						{
-							e.preventDefault();
-							return true;
-						});
+				self::loadFramework('form-utils');
+				$js .= "FlexiForm.ready(function () {
+					document.querySelectorAll('.tab-container').forEach(function (tab) {
+						tab.addEventListener('click', function (event) { event.preventDefault(); });
 					});
-				";
+				});";
 				break;
 
 			case 'sabberworm':
@@ -1601,8 +1630,7 @@ class flexicontent_html
 				break;
 
 			case 'mousewheel':
-				// mousewheel is a jQuery plugin; in choices mode (jQuery-free front) it is not loaded.
-				if (!$load_jquery) break;
+				// Called only by widgets that actually use the mousewheel plugin.
 				flexicontent_html::loadJQuery(1, 0, 0);  // a jQuery plugin: load jQuery itself (core only, without jQuery UI)
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/mousewheel';
@@ -1616,7 +1644,7 @@ class flexicontent_html
 				$mcsb_site_choices = $app->isClient('site') && (int) $mcsb_cparams->get('select_lib_type', 0) === 1;
 				if ($mcsb_site_choices) break;
 
-				if ($load_jquery) flexicontent_html::loadJQuery();
+				flexicontent_html::loadJQuery(1, 0, 0);
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/mCSB';
 
@@ -1645,7 +1673,7 @@ class flexicontent_html
 				break;
 
 			case 'image-picker':
-				if ($load_jquery) flexicontent_html::loadJQuery();
+				flexicontent_html::loadJQuery(1, 0, 0);
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/image-picker';
 				$document->addScript($framework_path.'/image-picker.min.js');
@@ -1703,260 +1731,41 @@ class flexicontent_html
 				break;
 
 			case 'select2':
-				// Load flexi-lib, as it contains the select2 attach function: fc_attachSelect2()
+				// Keep the framework name and load setting used by existing layouts.
 				flexicontent_html::loadFramework('flexi-lib');
-
-				// Disable select2 JS in mobile devices and instead use chosen JS ...
 				$mobileDetector = flexicontent_html::getMobileDetector();
 				$isMobile = $mobileDetector->isMobile() || $mobileDetector->isTablet();
-
-				// Get component parameters to check which select library to use
-				$cparams = \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
-				$useChoicesJs = $cparams->get('select_lib_type', 0) == 1;
-
-				// Pass the library choice to JavaScript
-				$js .= "window.fc_use_choicesjs = " . ($useChoicesJs ? 'true' : 'false') . ";\n";
-
-				// Set the mobile flag now too, not only on DOMContentLoaded, for scripts that run before that (fields, templates)
-				$js .= "window.skip_select2_js = " . ($isMobile ? 1 : 0) . ";\n";
-
-				// Load choices.js UI strings for all languages
+				$framework_path = \Joomla\CMS\Uri\Uri::root(true) . $lib_path . '/choicesjs';
+				$css_path = \Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/assets/css';
+				$version = array('version' => '11.1.0');
+				$document->addScript($framework_path . '/choices.min.js', $version);
+				$document->addScript($framework_path . '/sortable.min.js', $version);
+				$document->addStyleSheet($framework_path . '/choices.min.css', $version);
+				$document->addStyleSheet($css_path . '/flexi_choices.css', array('version' => '2.4'));
 				\Joomla\CMS\Language\Text::script('FLEXI_NO_RESULTS', false);
 				\Joomla\CMS\Language\Text::script('FLEXI_NO_CHOICES', false);
 
-				if ($useChoicesJs) {
-					// === CHOICES.JS LIBRARY ===
-					$ver = '11.1.0';
-					$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/choicesjs';
-					$css_path = \Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/css';
-
-					$document->addScript($framework_path.'/choices.min.js', array('version' => $ver));
-					$document->addScript($framework_path.'/sortable.min.js', array('version' => $ver));
-					$document->addStyleSheet($framework_path.'/choices.min.css', array('version' => $ver));
-					$document->addStyleSheet($css_path.'/flexi_choices.css', array('version' => '2.4'));
-
-					// Keep a reference to this copy: Joomla loads its own older Choices.js (deferred) for its fancy-select
-					// fields, e.g. on the type form, and that copy replaces window.Choices once this one has run
-					$js .= "window.fc_Choices = window.Choices;\n";
-
-					// Attach Choices.js JS but skip it in mobiles and use native selects instead
-					$js .= "
-						document.addEventListener('DOMContentLoaded', function()
-						{
-							window.skip_select2_js = ".($isMobile ? 1 : 0).";
-							fc_attachSelect2('body');
-						});
-					";
-				} else {
-					// === SELECT2 LIBRARY (legacy) ===
-					// select2js is a jQuery plugin: jQuery and mouse wheel are only loaded for this legacy path
-					if ($load_jquery) flexicontent_html::loadJQuery();
-					flexicontent_html::loadFramework('mousewheel');
-
-					// Load chosen function (if not loaded already) and target specific selector
-					if ($isMobile) {
-						try {
-							\Joomla\CMS\HTML\HTMLHelper::_('formbehavior.chosen', '.use_chosen_lib');
-						} catch (\Throwable $e) {
-							// 'chosen' WebAsset preset removed in Joomla 6 core — safe to ignore,
-							// Tom Select already handles mobile/touch correctly.
-						}
-					}
-
-					// Regardless if we loaded chosen JS or some other code loaded it, prevent it from ... attaching to elements meant for select2
-					$js .= "
-					if (typeof jQuery.fn.chosen == 'function') {
-						jQuery.fn.chosen_fc = jQuery.fn.chosen;
-						jQuery.fn.chosen = function(){
-							var args = arguments;
-							var result;
-							jQuery(this).each(function() {
-								if (jQuery(this).hasClass('use_select2_lib') || jQuery(this).hasClass('fc_no_js_attach')) return;
-								result = jQuery(this).chosen_fc(args);
-							});
-							return result;
-						};
-					}
-					";
-
-					$ver = '3.5.4';
-					$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/select2';
-					$framework_folder = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'select2';
-					$document->addScript($framework_path.'/select2.min.js', array('version' => $ver));
-					$document->addScript($framework_path.'/select2.sortable.js', array('version' => $ver));
-					$document->addStyleSheet($framework_path.'/select2.css', array('version' => $ver));
-
-					$lang_code = flexicontent_html::getUserCurrentLang();
-					if ( $lang_code && $lang_code!='en' )
-					{
-						// Try language shortcode
-						if ( file_exists($framework_folder.DS.'select2_locale_'.$lang_code.'.js') ) {
-							$document->addScript($framework_path.'/select2_locale_'.$lang_code.'.js', array('version' => $ver));
-						}
-						// Try country language code
-						else {
-							$country_code = flexicontent_html::getUserCurrentLang($short_tag=false);
-							if ( $country_code && file_exists($framework_folder.DS.'select2_locale_'.$country_code.'.js') ) {
-								$document->addScript($framework_path.'/select2_locale_'.$country_code.'.js', array('version' => $ver));
-							}
-						}
-					}
-
-					// Attach select2 JS but skip it in mobiles and use chosen instead
-					$js .= "
-						jQuery(document).ready(function()
-						{
-							window.skip_select2_js = ".($isMobile ? 1 : 0).";
-							fc_attachSelect2('body');
-						});
-					";
-				}
+				// Keep FLEXIcontent's Choices instance if Joomla's fancy-select loads its copy later.
+				$js .= "window.fc_Choices = window.Choices;\n"
+					. "window.fc_use_choicesjs = true;\n"
+					. "window.skip_select2_js = " . ($isMobile ? 1 : 0) . ";\n"
+					. "FlexiForm.ready(function() { fc_attachSelect2(document.body); });\n";
 				break;
 
 			case 'inputmask':
-				if ($jquery_for_plugins) flexicontent_html::loadJQuery();
-
+				flexicontent_html::loadFramework('form-utils');
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/inputmask';
-				$document->addScript($framework_path.'/jquery.inputmask.bundle.min.js');
-
-				// Extra inputmask declarations definitions, e.g. ...
-				$js .= "";
-
-				// Attach inputmask to all input fields that have appropriate tag parameters
-				$js .= "
-					jQuery(document).ready(function(){
-						Inputmask.extendAliases({
-							decimal: {
-								alias: 'numeric',
-								autoGroup: true,
-								radixPoint: '.',
-								groupSeparator: ',',
-								clearMaskOnLostFocus: true,
-								removeMaskOnSubmit: true,
-								unmaskAsNumber: false
-							},
-							decimal_comma: {
-								alias: 'numeric',
-								autoGroup: true,
-								radixPoint: ',',
-								groupSeparator: '.',
-								clearMaskOnLostFocus: true,
-								removeMaskOnSubmit: true,
-								unmaskAsNumber: false
-							},
-							currency: {
-								alias: 'numeric',
-								prefix: '$ ',
-								groupSeparator: ',',
-								autoGroup: true,
-								digits: 2,
-								digitsOptional: false,
-								clearMaskOnLostFocus: true,
-								removeMaskOnSubmit: true,
-								unmaskAsNumber: false
-							},
-							currency_euro: {
-								alias: 'currency',
-								prefix: '\u20ac ',
-								groupSeparator: ',',
-								autoGroup: true,
-								digits: 2,
-								digitsOptional: false,
-								clearMaskOnLostFocus: false,
-								removeMaskOnSubmit: true,
-								unmaskAsNumber: false
-							},
-							percentage_zero_nolimit: {
-								alias: 'percentage',
-								digits: 2,
-								radixPoint: '.',
-								autoGroup: true,
-								min: 0,
-								max: '',
-								suffix: ' %',
-								allowPlus: false,
-								allowMinus: false,
-								clearMaskOnLostFocus: true,
-								removeMaskOnSubmit: true,
-								unmaskAsNumber: false
-							},
-							percentage_nolimit_nolimit: {
-								alias: 'percentage',
-								digits: 2,
-								radixPoint: '.',
-								autoGroup: true,
-								min: '',
-								max: '',
-								suffix: ' %',
-								allowPlus: false,
-								allowMinus: true,
-								clearMaskOnLostFocus: true,
-								removeMaskOnSubmit: true,
-								unmaskAsNumber: false
-							},
-							integer: {
-								alias: 'numeric',
-								digits: 0,
-								radixPoint: '',
-								clearMaskOnLostFocus: true,
-								removeMaskOnSubmit: true,
-								unmaskAsNumber: false
-							},
-							unsigned: {
-								alias: 'numeric',
-								digits: 0,
-								radixPoint: '',
-								allowPlus: false,
-								allowMinus: false,
-								clearMaskOnLostFocus: true,
-								removeMaskOnSubmit: true,
-								unmaskAsNumber: false
-							},
-							'mobile': {
-								'mask': '9999 999 999',
-								'autounmask': true,
-								'insertMode': true,
-								clearMaskOnLostFocus: true,
-								removeMaskOnSubmit: true,
-								unmaskAsNumber: false
-							}
-						});
-
-						jQuery('input.has_inputmask').each(function() {
-							jQuery(this).inputmask();
-						});
-						jQuery('input.inputmask-regex').each(function() {
-							jQuery(this).inputmask('Regex');
-						});
-					});
-				";
+				$document->addScript($framework_path.'/inputmask.min.js', array('version' => '5.0.10'));
+				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/input-masks.js', array('version' => FLEXI_VHASH));
 				break;
 
 			case 'prettyCheckable':
-				if ($load_jquery) flexicontent_html::loadJQuery();
-
-				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/prettyCheckable';
-				$document->addScript($framework_path.'/dev/prettyCheckable.js');
-				$document->addStyleSheet($framework_path.'/dist/prettyCheckable.css');
-				$js .= "
-					jQuery(document).ready(function(){
-						jQuery('input.use_prettycheckable').each(function() {
-							var elem = jQuery(this);
-							var lbl = elem.next('label');
-							var lbl_html = elem.next('label').html();
-							lbl.remove();
-							elem.prettyCheckable({
-								color: 'blue',
-								label: lbl_html
-							});
-						});
-					});
-				";
-				break;
+				// Native inputs preserve the label, keyboard focus and form state.
+				return $_loaded[$framework] = false;
 
 			case 'multibox':
 			case 'jmultibox':
-				if ($jquery_for_plugins) flexicontent_html::loadJQuery();
+				flexicontent_html::loadJQuery(1, 0, 0);
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/jmultibox';
 
@@ -1976,8 +1785,7 @@ class flexicontent_html
 				break;
 
 			case 'fancybox':
-				// fancybox is a jQuery plugin; in choices mode (jQuery-free front) it is not loaded.
-				if (!$load_jquery) break;
+				// An explicitly selected gallery needs jQuery core, independently of the select widget.
 				flexicontent_html::loadJQuery(1, 0, 0);  // a jQuery plugin: load jQuery itself (core only, without jQuery UI)
 
 				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js');
@@ -2006,7 +1814,7 @@ class flexicontent_html
 				break;
 
 			case 'galleriffic':
-				if ($load_jquery) flexicontent_html::loadJQuery();
+				flexicontent_html::loadJQuery(1, 0, 0);
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/galleriffic';
 				$document->addStyleSheet($framework_path.'/css/basic.css');
@@ -2015,7 +1823,7 @@ class flexicontent_html
 				break;
 
 			case 'elastislide':
-				if ($jquery_for_plugins) flexicontent_html::loadJQuery();
+				flexicontent_html::loadJQuery(1, 0, 0);
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/elastislide';
 				$document->addStyleSheet($framework_path.'/css/gallery.css');
@@ -2028,7 +1836,8 @@ class flexicontent_html
 				break;
 
 			case 'photoswipe':
-				if ($jquery_for_plugins) flexicontent_html::loadJQuery();
+				// This bundled version exposes a native API; its jQuery adapter uses removed .live().
+				flexicontent_html::loadFramework('form-utils');
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/photoswipe';
 
@@ -2041,8 +1850,8 @@ class flexicontent_html
 				$document->addScript($framework_path.'/code.photoswipe.min.js');
 
 				$js .= "
-					jQuery(document).ready(function() {
-						var myPhotoSwipe = jQuery('.photoswipe_fccontainer a').photoSwipe();
+					FlexiForm.ready(function() {
+						Code.photoSwipe('.photoswipe_fccontainer a');
 					});
 				";
 				break;
@@ -2072,7 +1881,8 @@ class flexicontent_html
 				break;
 
 			case 'fcxSlide':
-				if ($jquery_for_plugins) flexicontent_html::loadJQuery();
+				flexicontent_html::loadJQuery(1, 0, 0);
+				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/jquery-easing.js');
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/fcxSlide';
 				$document->addScript($framework_path.'/class.fcxSlide.js', array('version' => FLEXI_VHASH));
@@ -2086,7 +1896,7 @@ class flexicontent_html
 				break;
 
 			case 'zTree':
-				if ($load_jquery) flexicontent_html::loadJQuery();
+				flexicontent_html::loadJQuery(1, 0, 0);
 
 				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/zTree';
 				$document->addStyleSheet($framework_path.'/css/flexi_ztree.css');
@@ -2095,43 +1905,6 @@ class flexicontent_html
 				//$document->addScript($framework_path.'/js/jquery.ztree.core-3.5.js');
 				//$document->addScript($framework_path.'/js/jquery.ztree.excheck-3.5.js');
 				//$document->addScript($framework_path.'/js/jquery.ztree.exedit-3.5.js');
-				break;
-
-			case 'plupload':
-				if ($load_jquery) flexicontent_html::loadJQuery();
-
-				$framework_path = \Joomla\CMS\Uri\Uri::root(true).$lib_path.'/plupload';
-				$framework_folder = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'plupload';
-				$document->addScript($framework_path.'/js/plupload.full.min.js');
-
-				if ($mode=='ui') {
-					$document->addStyleSheet($framework_path.'/js/jquery.ui.plupload/css/jquery.ui.plupload.css');
-					$document->addScript($framework_path.'/js/jquery.ui.plupload/jquery.ui.plupload.min.js');
-					//$document->addScript($framework_path.'/js/themeswitcher.js');
-				} else {
-					$document->addStyleSheet($framework_path.'/js/jquery.plupload.queue/css/jquery.plupload.queue.css');
-					$document->addScript($framework_path.'/js/jquery.plupload.queue/jquery.plupload.queue.js');
-				}
-
-				$lang_code = flexicontent_html::getUserCurrentLang();
-				if ( $lang_code && $lang_code!='en' )
-				{
-					// Try language shortcode
-					if ( file_exists($framework_folder.DS.'js'.DS.'i18n'.DS.$lang_code.'.js') ) {
-						$document->addScript($framework_path.'/js/i18n/'.$lang_code.'.js');
-					}
-					// Try country language code
-					else {
-						$country_code = flexicontent_html::getUserCurrentLang($short_tag=false);
-						$country_code = str_replace('-', '_', $country_code);    // Files for this library use underscore ...
-						if ( $country_code && file_exists($framework_folder.DS.'js'.DS.'i18n'.DS.$country_code.'.js') ) {
-							$document->addScript($framework_path.'/js/i18n/'.$country_code.'.js');
-						}
-					}
-				}
-				// For debugging
-				//$document->addScript($framework_path.'/js/moxie.min.js');
-				//$document->addScript($framework_path.'/js/plupload.dev.js');
 				break;
 
 			case 'nouislider':
@@ -2194,6 +1967,11 @@ class flexicontent_html
 				break;
 
 			case 'flexi-lib':
+				flexicontent_html::loadFramework('form-utils');
+				if (version_compare(JVERSION, '5.0', '>='))
+				{
+					$document->getWebAssetManager()->useScript('joomla.dialog-autocreate')->useScript('messages');
+				}
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
 				flexicontent_html::loadFramework('flexi_js_common');
@@ -2252,10 +2030,10 @@ class flexicontent_html
 				);
 
 				if ( $cparams->get('page_reloading_enable', 1) ) :
-					// Choices.js mode keeps the site front free of jQuery, so the overlay is only added when jQuery is there
+					// Preserve configured progress styling on native forms.
 					$js .= '
-						if (window.jQuery) jQuery( document ).ready(function() {
-							jQuery("body").prepend(\'\\
+						FlexiForm.ready(function() {
+							if (!document.getElementById("fc_filter_form_blocker")) document.body.insertAdjacentHTML("afterbegin", \'\\
 								<div id="fc_filter_form_blocker" style="display: none;">\\
 									<div class="fc_blocker_overlay" style="' . $styles->overlay_box . '"></div>\\
 									<div class="fc_blocker_content" style="' . $styles->content_box . '">\\
@@ -2271,7 +2049,46 @@ class flexicontent_html
 				break;
 
 			// Used only by content / configuration forms, that have form elements needing this
+			case 'form-utils':
+				\Joomla\CMS\Language\Text::script('FLEXI_FORM_IS_BEING_SUBMITTED', true);
+				\Joomla\CMS\Language\Text::script('FLEXI_AJAX_SAVE_UNCONFIRMED', true);
+				\Joomla\CMS\Language\Text::script('FLEXI_LOADING', true);
+				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/form-utils.js', array('version' => FLEXI_VHASH));
+				break;
+
+			case 'sortable':
+				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/librairies/choicesjs/sortable.min.js', array('version' => FLEXI_VHASH));
+				break;
+
+			case 'field-repeater':
+				flexicontent_html::loadFramework('flexi-lib');
+				flexicontent_html::loadFramework('sortable');
+				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/field-repeater.js', array('version' => FLEXI_VHASH));
+				break;
+
+			case 'indexed-field':
+				flexicontent_html::loadFramework('field-repeater');
+				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/indexed-field.js', array('version' => FLEXI_VHASH));
+				break;
+
+			case 'native-field-controls':
+				flexicontent_html::loadFramework('form-utils');
+				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/native-field-controls.js', array('version' => FLEXI_VHASH));
+				break;
+
+			case 'media-field-controls':
+				flexicontent_html::loadFramework('form-utils');
+				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/media-field-controls.js', array('version' => FLEXI_VHASH));
+				break;
+
+			case 'media-metadata':
+				flexicontent_html::loadFramework('form-utils');
+				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/media-metadata.js', array('version' => FLEXI_VHASH));
+				break;
+
 			case 'flexi-lib-form':
+				flexicontent_html::loadFramework('form-utils');
+				flexicontent_html::loadFramework('sortable');
 				if ($load_jquery) flexicontent_html::loadJQuery();
 
 				$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/flexi-lib-form.js', array('version' => FLEXI_VHASH));
@@ -2290,6 +2107,8 @@ class flexicontent_html
 				\Joomla\CMS\Language\Text::script("FLEXI_INDEXED_FIELD_STATE_COL_DISABLED", true);
 				\Joomla\CMS\Language\Text::script('FLEXI_REQUIRED',true);
 				\Joomla\CMS\Language\Text::script('FLEXI_INVALID',true);
+				\Joomla\CMS\Language\Text::script('FLEXI_INPUTMASK_INCOMPLETE', true);
+				\Joomla\CMS\Language\Text::script('FLEXI_VALIDATION_EMAIL_FORMAT', true);
 				\Joomla\CMS\Language\Text::script('JLIB_FORM_FIELD_INVALID',true);
 				\Joomla\CMS\Language\Text::script('FLEXI_AUTO',true);
 				\Joomla\CMS\Language\Text::script('FLEXI_FIELD_SELECT_AT_LEAST_PROMPT',true);
@@ -2898,13 +2717,14 @@ class flexicontent_html
 		$item_url = \Joomla\CMS\Router\Route::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, $Itemid, $item));
 		$link = $item_url . (strpos($item_url, '?') !== false ? '&' : '?') . 'task=remove' . '&' . \Joomla\CMS\Session\Session::getFormToken() . '=1';
 
-		$view =Factory::getApplication()->input->getCm('view', '');
+		$view =Factory::getApplication()->input->getCmd('view', '');
 		$link .= '&isitemview=' . ($view == 'item' ? '1' : '0');
 
 		$targetLink = "_self";
+		self::loadFramework('flexi-lib');
 		$confirm_text = \Joomla\CMS\Language\Text::_('FLEXI_ARE_YOU_SURE_PERMANENT_DELETE', true);
 
-		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="' . $tooltip_placement . '" onclick="return confirm(\''.$confirm_text.'\')" target="'.$targetLink.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
+		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="' . $tooltip_placement . '" onclick="return FlexiForm.confirmLink(this, \''.$confirm_text.'\', event)" target="'.$targetLink.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
 		$output = \Joomla\CMS\Language\Text::_('FLEXI_ICON_SEP') . $output . \Joomla\CMS\Language\Text::_('FLEXI_ICON_SEP');
 
 		return $output;
@@ -3703,9 +3523,10 @@ class flexicontent_html
 		$link = $item_url . (strpos($item_url, '?') !== false ? '&' : '?') . 'task=approval' . '&' . \Joomla\CMS\Session\Session::getFormToken() . '=1';
 
 		$targetLink = "_self";
+		self::loadFramework('flexi-lib');
 		$confirm_text = \Joomla\CMS\Language\Text::_('FLEXI_CONFIRM_SEND_APPROVAL', true) . '\n' . ' (' . addslashes($overlib) . ')';  // '\n': a line break written for the JS string of the onclick attribute (a real line break is a JS syntax error)
 
-		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="' . $tooltip_placement . '" onclick="return confirm(\''.$confirm_text.'\')" target="'.$targetLink.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
+		$output	= ' <a href="'.$link.'" class="'.$button_classes.'" data-placement="' . $tooltip_placement . '" onclick="return FlexiForm.confirmLink(this, \''.$confirm_text.'\', event)" target="'.$targetLink.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
 		$output = \Joomla\CMS\Language\Text::_('FLEXI_ICON_SEP') . $output . \Joomla\CMS\Language\Text::_('FLEXI_ICON_SEP');
 
 		return $output;
@@ -3989,7 +3810,7 @@ class flexicontent_html
 
 		$output = ' <a href="' . $link . '" class="' . $button_classes . '" data-placement="' . $tooltip_placement . '" title="' . $tooltip_title . '"
 		' . (!$menu_typeid
-			? 'onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 1200, 0, false, {\'title\': \''.flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_TYPE'), 2).'\'}); return false;" '
+			? 'onclick="var url = this.getAttribute(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 1200, 0, false, {\'title\': \''.flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_TYPE'), 2).'\'}); return false;" '
 			: '') . '
 		>' . $image.$caption . '</a>';
 
@@ -4919,6 +4740,7 @@ class flexicontent_html
 
 			$document =Factory::getApplication()->getDocument();
 			$document->addStyleSheet(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/css/fcvote.css', array('version' => FLEXI_VHASH));
+			self::loadFramework('flexi-lib');
 			$document->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/fcvote.js', array('version' => FLEXI_VHASH));
 
 			// Make the CSRF token available to the JS, via: Joomla.getOptions('csrf.token')
@@ -5070,7 +4892,7 @@ class flexicontent_html
 				{
 					$href = 'javascript:;';
 					$popup_msg = addcslashes($no_acc_msg, "'");
-					$onclick = 'alert(\''.$popup_msg.'\');';
+					$onclick = 'FlexiForm.alert(\''.$popup_msg.'\');';
 				}
 
 				// WITH Redirection
@@ -5079,8 +4901,8 @@ class flexicontent_html
 					$href = $no_acc_url;
 					$popup_msg = addcslashes($no_acc_msg . "\\n\\n" . $no_acc_msg_redirect, "'");
 
-					if ($no_acc_askredirect==2)       $onclick = 'return confirm(\''.$popup_msg.'\');';
-					else if ($no_acc_askredirect==1)  $onclick = 'alert(\''.$popup_msg.'\'); return true;';
+					if ($no_acc_askredirect==2)       $onclick = 'return FlexiForm.confirmLink(this, \''.$popup_msg.'\', event);';
+					else if ($no_acc_askredirect==1)  $onclick = 'return FlexiForm.alertLink(this, \''.$popup_msg.'\', event);';
 					else                              $onclick = 'return true;';
 				}
 			}
@@ -6317,6 +6139,7 @@ class flexicontent_html
 		$tbname = 'toolbar'
 	)
 	{
+		self::loadFramework('flexi-lib');
 		if (FLEXI_J40GE) {
 		$toolbar = \Joomla\CMS\Toolbar\Toolbar::getInstance($tbname);
 		} else {
@@ -6336,7 +6159,7 @@ class flexicontent_html
 			$full_js = $extra_js ."; Joomla.submitbutton('$task');";
 			if ($confirm)
 			{
-				$full_js = "if (confirm('".$confirm_msg."')) { ".$full_js." }";
+				$full_js = "if (await FlexiForm.confirm('".$confirm_msg."')) { ".$full_js." }";
 			}
 			if (!$menu)
 			{
@@ -6346,9 +6169,13 @@ class flexicontent_html
 
 		if ($list)
 		{
-			$full_js = "if (document.adminForm.boxchecked.value==0) { alert('".$err_msg."') ;} else { ".$full_js." }";
+			$full_js = "if (document.adminForm.boxchecked.value==0) { FlexiForm.alert('".$err_msg."') ;} else { ".$full_js." }";
 		}
 
+		if (strpos($full_js, 'await FlexiForm.confirm(') !== false)
+		{
+			$full_js = "return FlexiForm.runAction(this, async () => { " . $full_js . " });";
+		}
 		$full_js = "javascript: $full_js";
 
 		$button_html	= '
@@ -6357,7 +6184,7 @@ class flexicontent_html
 			class="toolbar ' . $btn_sm_class . ' ' . $btn_class . '"
 			' . $attrs . '
 		>
-			<span class="'.$class.'" title="'.htmlspecialchars($text, ENT_QUOTES, 'UTF-8').'"></span>
+			<span class="'.$class.'" aria-hidden="true"></span>
 			'.$text.'
 		</'.$tag_type.'>';
 
@@ -6424,13 +6251,15 @@ class flexicontent_html
 			$drop_btn = str_replace('<button ', '<button id="btngroup_id_' . $btngroup_id . '" ', $drop_btn);
 		}
 
+		$primary_button = str_replace('_DDI_class_', '', array_shift($btn_arr));
 		$buttons_html = '
 			<div class="buttons btn-group' . (FLEXI_J40GE ? ' dropdown' : '') . '">
-				'.array_shift($btn_arr).'
+				'.$primary_button.'
 			  '.($drop_btn ?: '
-			  <button class="' . $drop_btn_class . '"
+			  <button type="button" class="' . $drop_btn_class . '"
 					' . (FLEXI_J40GE ? ' data-bs-toggle="dropdown" ' : ' data-toggle="dropdown" ') .'
 					id="btngroup_id_' . $btngroup_id . '" aria-expanded="false"
+					aria-label="' . htmlspecialchars(\Joomla\CMS\Language\Text::_('JOPTIONS'), ENT_QUOTES, 'UTF-8') . '"
 				>
 			    <span class="caret"></span>
 			  </button>').'
@@ -6924,60 +6753,9 @@ class flexicontent_html
 	}
 
 
-	// Check and if needed install Joomla template overrides into current Joomla template
+	/** @deprecated Joomla's media field no longer needs per-template layouts. */
 	public static function install_template_overrides($display_mssg = false)
 	{
-		$app =Factory::getApplication();
-
-		$pathDestFolder_arr = array(
-			Path::clean(JPATH_BASE.'/templates/'.$app->getTemplate().'/html/com_media/images/'),
-			Path::clean(JPATH_BASE.'/templates/'.$app->getTemplate().'/html/com_media/imageslist/')
-		);
-		$pathSourceFolder_arr = array(
-			Path::clean(JPATH_ROOT.'/components/com_flexicontent/layouts/html/com_media/images'),
-			Path::clean(JPATH_ROOT.'/components/com_flexicontent/layouts/html/com_media/imageslist')
-		);
-
-		$install_count = $update_count = 0;
-
-		foreach($pathDestFolder_arr as $i => $pathDestFolder)
-		{
-			$pathSourceFolder = $pathSourceFolder_arr[$i];
-
-			// 1. Check DESTINATION folder
-			if ( !is_dir($pathDestFolder) && !mkdir($pathDestFolder, 0755, true) )
-			{
-				echo '<span class="alert alert-warning"> Error, unable to create folder: '. $pathDestFolder.'</span>';
-			}
-
-			// 2. Copy override files
-			$files = glob($pathSourceFolder . '/*.*');
-
-			foreach($files as $sourcepath)
-			{
-				$dest_path = $pathDestFolder . basename($sourcepath);
-
-				$not_exists = !file_exists($dest_path);
-				if ($not_exists || filemtime($sourcepath) > filemtime($dest_path))
-				{
-					$not_exists ? $install_count++ : $update_count++;
-					copy($sourcepath, $dest_path);
-				}
-			}
-		}
-
-		if ($display_mssg)
-		{
-			if ($install_count)
-			{
-				Factory::getApplication()->enqueueMessage('<span class="badge">' . \Joomla\CMS\Language\Text::_('FLEXI_INSTALLED') . '</span> ' . $install_count . ' template overrides', 'message');
-			}
-
-			if ($display_mssg && $update_count)
-			{
-				Factory::getApplication()->enqueueMessage('<span class="badge">' . \Joomla\CMS\Language\Text::_('FLEXI_UPDATED') . '</span> ' . $update_count . ' template overrides', 'message');
-			}
-		}
 	}
 
 

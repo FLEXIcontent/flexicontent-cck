@@ -29,7 +29,7 @@ foreach ($values as $value)
 		continue;
 	}
 
-	$duration = intval($value['duration']);
+	$duration = (int) ($value['duration'] ?? 0);
 	if ($display_duration && $duration)
 	{
 		$h = $duration >= 3600  ?  intval($duration/3600)  :  0;
@@ -112,12 +112,12 @@ foreach ($values as $value)
 
 		$player_html = '
 		<div class="fc_sharedmedia_player_outer" id="' . $player_id . '_box"
-			style="min-width: ' . $_width . 'px; min-height: ' . $_height . 'px; border: none; overflow:hidden;"
+			style="width: ' . max(1, $_width) . 'px; max-width: 100%; aspect-ratio: ' . max(1, $_width) . ' / ' . max(1, $_height) . '; position: relative; border: none; overflow:hidden;"
 		>
 			<iframe id="' . $player_id . '"
 				class="fc_sharedmedia_player_frame seamless"
 				src="' . htmlspecialchars($player_url, ENT_QUOTES, 'UTF-8') . '"
-				style="min-width:' . $_width . 'px; min-height:' . $_height . 'px; border: none; overflow:hidden;"
+				style="position: absolute; inset: 0; width: 100%; height: 100%; border: none; overflow:hidden;"
 				allowfullscreen allowtransparency allow="autoplay"
 			>
 			</iframe>

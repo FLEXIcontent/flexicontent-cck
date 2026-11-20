@@ -83,6 +83,7 @@
 	list-style: none !important;
 	display: flex;
     gap: 10px;
+	flex-wrap: wrap;
 	align-items: flex-start;
 }
 /* FIELD: multiple-value (sortable) container (not cleared) */
@@ -963,9 +964,9 @@ div.fcimg_value_props {
 }
 .fcfield_field_data_box {
 	float: left;
-	min-width: 540px;
+	min-width: min(540px, 100%);
 	width: unset;
-	max-width: unset;
+	max-width: 100%;
 	padding: 0;
 	margin: 0;
 	box-sizing: border-box;
@@ -1162,6 +1163,25 @@ span.add-on.fcfont-icon.icon.icon-.image-option {
 }
 textarea.fcfield_textareaval {
 	resize: both;
+}
+
+/* Keep multi-property field inputs within narrow editing panes. */
+@media (max-width: 575.98px) {
+  #flexicontent .fcfield_field_data_box,
+  #flexicontent .fcfield_field_preview_box,
+  #flexicontent .fc_termtitle,
+  #flexicontent .fc_termtext,
+  #flexicontent .fc-field-props-box { min-width: 0; max-width: 100%; width: 100%; }
+  #flexicontent .fcfieldval_container table.fc-form-tbl,
+  #flexicontent .fcfieldval_container table.fc-form-tbl > tbody,
+  #flexicontent .fcfieldval_container table.fc-form-tbl > tbody > tr,
+  #flexicontent .fcfieldval_container table.fc-form-tbl > tbody > tr > td {
+    display: block; width: 100% !important; max-width: 100%; box-sizing: border-box;
+  }
+  #flexicontent .fcfieldval_container table.fc-form-tbl .key { padding-block-end: .25rem; }
+  #flexicontent .fcfieldval_container input:not([type=checkbox]):not([type=radio]),
+  #flexicontent .fcfieldval_container textarea,
+  #flexicontent .fcfieldval_container .choices { max-width: 100%; min-width: 0; }
 }
 
 /***********************************************************
@@ -1549,6 +1569,8 @@ textarea.fcfield_textareaval {
 #flexicontent .fc-media-card .mf_value_props select {
 	width: 100% !important;
 	max-width: 100% !important;
+	min-width: 0 !important;
+	margin-inline: 0 !important;
 	box-sizing: border-box !important;
 	resize: vertical !important;
 }
@@ -1674,9 +1696,12 @@ textarea.fcfield_textareaval {
 #flexicontent .fc-address-card .fcfield_addressint_map {
 	grid-column: 2;
 	grid-row: 1;
-	display: block !important;
+	display: block;
 	min-width: 0;
 	margin: 0;
+}
+#flexicontent .fc-address-card .fc-field-value-properties-box:not(:has(.leaflet-container, .has_fc_google_maps_map)) {
+	grid-template-columns: minmax(0, 1fr);
 }
 #flexicontent .fc-address-card .fcfield_addressint_data table {
 	width: 100% !important;
@@ -1962,4 +1987,10 @@ textarea.fcfield_textareaval {
 /* Phone card: spacing between multiple cards on the same row */
 #flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox.floated .fc-phone-card {
 	margin: 0 10px 10px 0;
+}
+
+#flexicontent .fcfield_preview_box img.fc_preview_thumb[src*="/file/pdf_thumb.php?"] {
+	object-fit: contain;
+	padding: 4px;
+	background: #fff;
 }

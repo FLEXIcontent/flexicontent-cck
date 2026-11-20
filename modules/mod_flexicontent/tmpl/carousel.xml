@@ -117,7 +117,7 @@
 				<option value="dotted">Dotted</option>
 				<option value="double">Double</option>
 			</field>
-			<field name="carousel_border_color_feat" type="color" default="#cccccc" label="border color" description="This is the border color applied around the items" />
+			<field name="carousel_border_color_feat" type="fccolor" default="#cccccc" label="border color" description="This is the border color applied around the items" />
 			<field name="carousel_border_radius_feat" type="text" default="0" label="border radius" description="e.g. 4px, 0.5rem, 50% for circle" />
 			<field name="carousel_margin_top_bottom_feat" type="text"  default="0px" label="margin top/bottom" description="This is the margin applied at top and bottom of the items" />
 			<field name="carousel_margin_left_right_feat" type="text"  default="0px" label="margin left/right" description="This is the margin applied at left and right of the items" />
@@ -161,7 +161,7 @@
 				<option value="dotted">Dotted</option>
 				<option value="double">Double</option>
 			</field>
-			<field name="carousel_border_color" type="color" default="#cccccc" label="border color" description="This is the border color applied around the items" />
+			<field name="carousel_border_color" type="fccolor" default="#cccccc" label="border color" description="This is the border color applied around the items" />
 			<field name="carousel_border_radius" type="text" default="0" label="border radius" description="e.g. 4px, 0.5rem, 50% for circle" />
 			<field name="carousel_margin_top_bottom" type="text" default="0" label="margin top/bottom" description="This is the margin applied at top and bottom of the items" />
 			<field name="carousel_margin_left_right" type="text" default="0" hint="px only e.g. 10px — used by carousel JS" label="margin left/right" description="This is the margin applied between items (px only, used by the carousel JS to compute item spacing)" />

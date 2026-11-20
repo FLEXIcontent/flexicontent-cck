@@ -64,44 +64,14 @@ $js ="";
 
 if ($autodisplayadvoptions)
 {
-	$js .= '
-	if (window.jQuery) jQuery(document).ready(function() {
-	  var status = {
-	    "true": "open",
-	    "false": "close"
-	  };
-	  
-    
-	  jQuery("#fcsearch_txtflds_row").css("position","relative").hide(0, function(){}).css("position","static");
-	  
-	  '. (($autodisplayadvoptions==1 && !$use_advsearch_options) ? '' : 'jQuery("#fcsearch_txtflds_row").css("position","relative").toggle(500, function(){}).css("position","static");') .'
-		
-	  jQuery("#use_advsearch_options").click(function() {
-	  
-		  jQuery("#fcsearch_txtflds_row").css("position","relative").toggle(500, function(){}).css("position","static");
-    });
-  '
-		.( 1 /*$this->params->get('canseltypes', 1)!=2*//*disable hiding*/ ? '' : '
-	  jQuery("#fcsearch_contenttypes_row").css("position","relative").hide(0, function(){}).css("position","static");
-	  
-	  '. (($autodisplayadvoptions==1 && !$use_advsearch_options) ? '' : 'jQuery("#fcsearch_contenttypes_row").css("position","relative").toggle(500, function(){}).css("position","static");') .'
-		
-	  jQuery("#use_advsearch_options").click(function() {
-	  
-		  jQuery("#fcsearch_contenttypes_row").css("position","relative").toggle(500, function(){}).css("position","static");
-    }); ').
-		'
-	  jQuery("#fc_advsearch_options_set").css("position","relative").hide(0, function(){}).css("position","static");
-	  
-	  '. (($autodisplayadvoptions==1 && !$use_advsearch_options) ? '' : 'jQuery("#fc_advsearch_options_set").css("position","relative").toggle(500, function(){}).css("position","static");') .'
-		
-	  jQuery("#use_advsearch_options").click(function() {
-	  
-		  jQuery("#fc_advsearch_options_set").css("position","relative").toggle(500, function(){}).css("position","static");
-    });
-    
-	});
-	';
+ $js .= 'FlexiForm.ready(function() {
+   const toggle = document.getElementById("use_advsearch_options");
+   const update = function(show) {
+     ["fcsearch_txtflds_row", "fc_advsearch_options_set"].forEach(id => FlexiForm.show(document.getElementById(id), show));
+   };
+   update(' . (($autodisplayadvoptions == 1 && !$use_advsearch_options) ? 'false' : 'true') . ');
+   toggle?.addEventListener("change", function() { update(this.checked); });
+ });';
 }
 
 $this->document->addScriptDeclaration($js);
@@ -577,98 +547,51 @@ if ($disp_slide_filter)
 	</form>
 
 <?php
-// Automatic submission
-$filter_autosubmit = 0;
-if ($filter_autosubmit) {
-	$js = '
-		if (window.jQuery) jQuery(document).ready(function() {
-			var form=document.getElementById("'.$form_id.'");
-			if (!!form)
-			{
-				jQuery(form.elements).filter("input:not(.fc_autosubmit_exclude):not(.select2-input), select:not(.fc_autosubmit_exclude)").on("change", function() {
-					adminFormPrepare(form, 2);
-				});
-				jQuery(form).attr("data-fc-autosubmit", "2");
-			}
-		});
-	';
-} else {
-	$js = '
-		if (window.jQuery) jQuery(document).ready(function() {
-			var form=document.getElementById("'.$form_id.'");
-			if (!!form)
-			{
-				jQuery(form.elements).filter("input:not(.fc_autosubmit_exclude):not(.select2-input), select:not(.fc_autosubmit_exclude)").on("change", function() {
-					adminFormPrepare(form, 1);
-				});
-				jQuery(form).attr("data-fc-autosubmit", "1");
-			}
-		});
-	';
-}
-
-// Notify select library fields to clear their values when reseting the form
-$js .= '
-		if (window.jQuery) jQuery(document).ready(function() {
-			jQuery("#'.$form_id.' .fc_button.button_reset").on("click", function() {
-				if (window.fc_use_choicesjs) {
-					jQuery("#'.$form_id.'_filter_box .use_select2_lib").each(function() {
-						var instanceKey = this.id || this.name;
-						if (window.fc_choices_instances && window.fc_choices_instances[instanceKey]) {
-							window.fc_choices_instances[instanceKey].removeActiveItems();
-						}
-					});
-				} else {
-					jQuery("#'.$form_id.'_filter_box .use_select2_lib").select2("val", "");
-				}
-			});
-		});
-	';
-$document = \Joomla\CMS\Factory::getApplication()->getDocument();
+// Prepare filter changes without submitting; the Search button submits this form.
+$js = '
+ FlexiForm.ready(function() {
+   const form = document.getElementById("'.$form_id.'");
+   if (!form) return;
+   form.dataset.fcAutosubmit = "1";
+   form.addEventListener("change", function(event) {
+     if (event.target.matches("input:not(.fc_autosubmit_exclude):not(.select2-input), select:not(.fc_autosubmit_exclude)")) adminFormPrepare(form, 1);
+   });
+   form.querySelector(".fc_button.button_reset")?.addEventListener("click", function() {
+     form.querySelectorAll(".use_select2_lib").forEach(select => FlexiForm.clearSelect(select));
+   });
+ });';
+$document = Factory::getApplication()->getDocument();
 $document->addScriptDeclaration($js);
 
-
-// FORM in slider
+// Remember the native Bootstrap collapse state.
 if ($disp_slide_filter)
 {
-	\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration("
-	if (window.jQuery) (function($) {
-		$(document).ready(function ()
-		{
-			$('#" . $ff_slider_tagid ."').on('shown', function ()
-			{
-				var active_slides = fclib_getCookie('" . $cookie_name ."');
-				try { active_slides = JSON.parse(active_slides); } catch(e) { active_slides = {}; }
-
-				active_slides['" . $ff_slider_tagid ."'] = $('#" . $ff_slider_tagid ." .in').attr('id');
-				fclib_setCookie('" . $cookie_name ."', JSON.stringify(active_slides), 7);
-				//window.console.log(JSON.stringify(active_slides));
-			});
-
-			$('#" . $ff_slider_tagid ."').on('hidden', function ()
-			{
-				var active_slides = fclib_getCookie('" . $cookie_name ."');
-				try { active_slides = JSON.parse(active_slides); } catch(e) { active_slides = {}; }
-
-				active_slides['" . $ff_slider_tagid ."'] = null;
-				fclib_setCookie('" . $cookie_name ."', JSON.stringify(active_slides), 7);
-				//window.console.log(JSON.stringify(active_slides));
-			});
-
-			var active_slides = fclib_getCookie('" . $cookie_name ."');
-			try { active_slides = JSON.parse(active_slides); } catch(e) { active_slides = {}; }
-
-			if (!!active_slides['" . $ff_slider_tagid ."'])
-			{
-				// Hide default active slide
-				$('#" . $ff_slider_tagid ." .collapse').removeClass('in');
-
-				// Show the last active slide
-				$('#' + active_slides['" . $ff_slider_tagid ."']).addClass('in');
-			}
-		});
-	})(jQuery);
-	");
+ $document->addScriptDeclaration('
+ FlexiForm.ready(function() {
+   const container = document.getElementById("'.$ff_slider_tagid.'");
+   if (!container) return;
+   const read = function() {
+     try { return JSON.parse(fclib_getCookie("'.$cookie_name.'")) || {}; } catch (_) { return {}; }
+   };
+   ["shown.bs.collapse", "hidden.bs.collapse"].forEach(name => container.addEventListener(name, function(event) {
+     const state = read();
+     state[container.id] = name === "shown.bs.collapse" ? event.target.id : null;
+     fclib_setCookie("'.$cookie_name.'", JSON.stringify(state), 7);
+   }));
+   const state = read();
+   if (Object.prototype.hasOwnProperty.call(state, container.id)) {
+     container.querySelectorAll(".collapse").forEach(panel => {
+       const open = panel.id === state[container.id];
+       panel.classList.toggle("show", open);
+       panel.classList.toggle("in", open);
+       container.querySelectorAll("[data-bs-toggle=collapse], [data-toggle=collapse]").forEach(button => {
+         if ((button.getAttribute("data-bs-target") || button.getAttribute("href")) === "#" + panel.id) {
+           button.setAttribute("aria-expanded", String(open)); button.classList.toggle("collapsed", !open);
+         }
+       });
+     });
+   }
+ });');
 }
 // Adding CSS
 $css = '

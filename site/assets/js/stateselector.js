@@ -171,7 +171,7 @@ var fc_statehandler = function(options)
 			})
 			.catch(function(err)
 			{
-				alert('Error status: ' + ((err && err.status) || 0) + ' , Error text: ' + ((err && (err.text || err.message)) || ''));
+				FlexiForm.alert('Error status: ' + ((err && err.status) || 0) + ' , Error text: ' + ((err && (err.text || err.message)) || ''));
 			});
 	};
 

@@ -2,15 +2,14 @@
 // Exercise the actual restoration helper with detached-button and existing-button cases.
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
 const code=fs.readFileSync(path.join(__dirname,'../plugins/flexicontent_fields/image/js/form.js'),'utf8');
-const helper=code.match(/fcfield_image\.prepareMediaClone = function\(source, clone\)[\s\S]*?\n\t};/);
-assert(helper,'Image media clone helper must be present');
-const context={fcfield_image:{}};vm.runInNewContext(helper[0],context,{timeout:1000});
+const context={window:{},document:{readyState:'loading',addEventListener(){}}};
+vm.runInNewContext(code,context,{timeout:1000});
 const prepare=context.fcfield_image.prepareMediaClone;
 let copies=0;const clear={cloneNode(deep){assert.equal(deep,true);copies++;return {cloned:true};}};
 const source={querySelectorAll(){return [{buttonClearEl:clear}];}};
 function media(hasButton=false,hasGroup=true){
- const appended=[];const group={appendChild(node){appended.push(node);}};
- return {appended,getAttribute(){return '.button-clear';},querySelector(selector){if(selector==='.button-clear')return hasButton||appended.length?{}:null;if(selector==='.input-group')return hasGroup?group:null;throw Error('Unexpected selector '+selector);},appendChild:group.appendChild};
+ const appended=[];const group={append(node){appended.push(node);}};
+ return {appended,getAttribute(){return '.button-clear';},querySelector(selector){if(selector==='.button-clear')return hasButton||appended.length?{}:null;if(selector==='.input-group')return hasGroup?group:null;throw Error('Unexpected selector '+selector);},append:group.append};
 }
 const target=media(),clone={querySelectorAll(){return [target];}};
 prepare(source,clone);assert.equal(copies,1);assert.deepEqual(target.appended,[{cloned:true}]);

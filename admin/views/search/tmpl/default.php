@@ -101,28 +101,12 @@ $js .= "
 // Delete a specific list filter
 function delFilter(name)
 {
-	//if(window.console) window.console.log('Clearing filter:'+name);
-	var myForm = jQuery('#adminForm');
-	var filter = jQuery('#'+name);
-
-	if (!filter.length)
-	{
-		return;
-	}
-	else if (filter.attr('type') == 'checkbox')
-	{
-		filter.checked = '';
-	}
-	else
-	{
-		filter.val('');
-
-		// Case that input has Calendar JS attached
-		if (filter.attr('data-alt-value'))
-		{
-			filter.attr('data-alt-value', '');
-		}
-	}
+    const field = document.getElementById(name);
+    if (!field) return;
+    if (field.type === 'checkbox') field.checked = false;
+    else if (field.tagName === 'SELECT') FlexiForm.clearSelect(field);
+    else field.value = '';
+    if (field.hasAttribute('data-alt-value')) field.setAttribute('data-alt-value', '');
 }
 
 function delAllFilters()
@@ -370,7 +354,7 @@ if ($js)
 				echo \Joomla\CMS\HTML\HTMLHelper::_($hlpname . '.edit_link', $row, $i, $row->canEdit, $config = array(
 					'ctrl'     => 'items',
 					'view'     => 'item',
-					'onclick'  => 'var url = jQuery(this).attr(\'data-href\'); var the_dialog = fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, fc_edit_fcitem_modal_close, {title:\'' . \Joomla\CMS\Language\Text::_('FLEXI_EDIT', true) . '\', loadFunc: fc_edit_fcitem_modal_load}); return false;" ',
+					'onclick'  => 'var url = this.getAttribute(\'data-href\'); var the_dialog = fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, fc_edit_fcitem_modal_close, {title:\'' . \Joomla\CMS\Language\Text::_('FLEXI_EDIT', true) . '\', loadFunc: fc_edit_fcitem_modal_load}); return false;" ',
 				));
 				?>
 			</td>
@@ -408,7 +392,7 @@ if ($js)
 						<span id="search_index_text_<?php echo $text_cnt; ?>" style="display: none;">
 							<?php echo $_search_index; ?>
 						</span>
-						<span class="badge" onclick="var box = jQuery('#search_index_text_<?php echo $text_cnt; ?>'); fc_itemelement_view_handle = fc_showAsDialog(box, 800, 0, null, { title: '<?php echo \Joomla\CMS\Language\Text::_('FLEXI_MORE', true); ?>'}); return false;" style="cursor: pointer">...</span>
+						<span class="badge" onclick="var box = document.getElementById('search_index_text_<?php echo $text_cnt; ?>'); fc_itemelement_view_handle = fc_showAsDialog(box, 800, 0, null, { title: '<?php echo \Joomla\CMS\Language\Text::_('FLEXI_MORE', true); ?>'}); return false;" style="cursor: pointer">...</span>
 						<?php
 						echo iconv_substr($_search_index, -300, 300, "UTF-8");
 					}

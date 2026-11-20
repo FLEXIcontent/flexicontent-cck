@@ -345,8 +345,6 @@ $document = $app->getDocument();
 // hors contexte web (CLI, API, tâches planifiées, etc.)
 if ($document !== null && method_exists($document, 'getWebAssetManager')) {
     $wa = $document->getWebAssetManager();
-    $wa->useScript('jquery');
-    $wa->useScript('jquery-noconflict');
     if ($js !== '') {
         $wa->addInlineScript($js);
     }
@@ -354,10 +352,10 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 
 
 			$js .= "
-				jQuery(document).ready(function() {
+				document.addEventListener('DOMContentLoaded', function() {
 					Joomla.fc_max_input_vars = " . $max_input_vars . ";
 					" . ((JDEBUG || $fcdebug) ? 'Joomla.fc_debug = 1;' : '') . "
-					jQuery(document.forms['adminForm']).attr('data-fc_doserialized_submit', '1');
+					document.forms['adminForm']?.setAttribute('data-fc_doserialized_submit', '1');
 					" . /*(($option=='com_flexicontent' && $view='category') ? "jQuery(document.forms['adminForm']).attr('data-fc_force_apply_ajax', '1');" : "") .*/ "
 				});
 			";
@@ -370,14 +368,14 @@ if ($document !== null && method_exists($document, 'getWebAssetManager')) {
 			)
 		) {
 			if (Factory::getApplication()->getDocument() !== null) {
-				HTMLHelper::_('jquery.framework');
+				flexicontent_html::loadFramework('form-utils');
 			}
 			$js .= "
-				jQuery(document).ready(function() {
+				FlexiForm.ready(function() {
 					var el = parent.document.getElementById('fc_modal_popup_container');
 					if (el) {
-						jQuery('.navbar').hide();
-						jQuery('body').css('padding-top', 0);
+						document.querySelectorAll('.navbar').forEach(node => node.hidden = true);
+						document.body.style.paddingTop = '0';
 					}
 				});
 			";

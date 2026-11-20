@@ -71,7 +71,7 @@
 			<field name="colors_by_textarea" type="textarea" filter="string" default="none, #049cdb, #46a546, #9d261d, #ffc40d, #f89406, #c3325f, #7a43b6, #ffffff, #999999, #555555, #000000" label="Specific colors" description="" depend_class="colors-by-textarea"/>
 			<field name="colors_by_picker" type="subform" label="Specific colors" description="" layout="joomla.form.field.subform.repeatable-table" icon="list" multiple="true" depend_class="colors-by-picker fcsubform-compact">
 				<form name="specific_colors_list" repeat="true">
-					<field name="code" type="color" label="Code" description="" />
+					<field name="code" type="fccolor" label="Code" description="" />
 				</form>
 			</field>
 

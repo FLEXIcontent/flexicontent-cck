@@ -179,11 +179,20 @@ div.gf_container div.controls {
 	margin: 8px 0;
 }
 div.gf_container div.controls div.ss-controls {
+	position: relative;
+}
+div.gf_container .gf_controls_overlay {
+	position: relative;
+	height: 0;
+	z-index: 12;
+	overflow: visible;
+}
+div.gf_container .gf_controls_overlay .ss-controls-box {
+	margin: 0;
+}
+div.gf_container .gf_controls_overlay div.ss-controls {
 	position: absolute;
-	top: 0;
-	z-index: 1000;
 	top: 8px;
-	/*float: left;*/
 }
 div.gf_container div.controls div.nav-controls {
 	float: right;

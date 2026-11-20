@@ -1,86 +1,56 @@
-var itemscreen = function(name, options)
-{
-	options = options || {};
-	this.initialize = function(name, options)
-	{
-		this.name = name;
-		this.options = {};
-		this.options.id = options.id || '';
-		this.options.sess_token = options.sess_token || '';
-		this.options.script_url = options.script_url || 'index.php?option=com_flexicontent&controller=items&tmpl=component' + (this.options.sess_token ? '&' + this.options.sess_token + '=1' : '');
-		this.options.task = options.task || '';
-	};
+var itemscreen = function (name, options = {}) {
+  this.name = name;
+  this.options = {
+    id: options.id || '',
+    sess_token: options.sess_token || '',
+    script_url: options.script_url || 'index.php?option=com_flexicontent&controller=items&tmpl=component'
+      + (options.sess_token ? '&' + options.sess_token + '=1' : ''),
+    task: options.task || ''
+  };
 
-	this.fetchscreen = function(name)  
-	{
-		var doname = typeof name != 'undefined' ? name : this.name;
-		var base_url = !!jbase_url_fc ? jbase_url_fc : '';
+  async function request(url, params) {
+    const endpoint = new URL(url, document.baseURI);
+    for (const [key, value] of Object.entries(params)) endpoint.searchParams.set(key, value);
+    const response = await fetch(endpoint, {credentials: 'same-origin'});
+    if (!response.ok) throw new Error('Error status: ' + response.status + ' , Error text: ' + response.statusText);
+    return response.text();
+  }
 
-		if (this.options.id <= 0)
-		{
-			jQuery('#'+doname).html('0');
-			return;
-		}
+  async function update(targetName, url, params) {
+    const target = document.getElementById(targetName);
+    if (!target) return;
+    const loader = document.createElement('img');
+    loader.src = (window.jbase_url_fc || '') + 'components/com_flexicontent/assets/images/ajax-loader.gif';
+    loader.alt = '';
+    target.replaceChildren(loader);
+    try {
+      target.innerHTML = await request(url, params);
+    } catch (error) {
+      target.textContent = error.message;
+    }
+  }
 
-		jQuery('#'+doname).html('<p><img src="'+base_url+'components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
-		jQuery.ajax({
-			url: this.options.script_url + "&format=raw&task=" + this.options.task + "&id=" + this.options.id,
-			type: 'get',
-			data: {},
-			success: function (data)
-			{
-				jQuery('#'+doname).html(data);
-			},
-			error: function (xhr, ajaxOptions, thrownError)
-			{
-				jQuery('#'+doname).html('Error status: ' + xhr.status + ' , Error text: ' + thrownError);
-			}
-		});
-	};
+  this.fetchscreen = function (targetName = this.name) {
+    if (this.options.id <= 0) {
+      const target = document.getElementById(targetName);
+      if (target) target.textContent = '0';
+      return;
+    }
+    return update(targetName, this.options.script_url, {format: 'raw', task: this.options.task, id: this.options.id});
+  };
 
-	this.addtag = function(cid, tagname, url)
-	{
-		jQuery.ajax({
-			url: url+'&cid='+cid,
-			type: 'get',
-			data : {'name' : tagname },
-			success: function (data)
-	    {
-				myvar = data.split("|");
-				if( ((typeof myvar[0])!="undefined") && (typeof myvar[1]!="undefined") )
-				{
-					if (myvar[0]!='0')
-						addToList(myvar[0], myvar[1]);
-					else
-						alert(myvar[1]);
-				}
-	    },
-	    error: function (xhr, ajaxOptions, thrownError)
-	    {
-	    	alert('Failed to add tag'); //alert('Error status: ' + xhr.status + ' , Error text: ' + thrownError);
-			}
-		});
-	};
+  this.addtag = async function (cid, tagname, url) {
+    try {
+      const [id, label] = (await request(url, {cid, name: tagname})).split('|');
+      if (label === undefined) return;
+      if (id !== '0') addToList(id, label);
+      else FlexiForm.alert(label);
+    } catch (error) {
+      FlexiForm.alert('Failed to add tag');
+    }
+  };
 
-	this.reseter = function(task, id, name, url)
-	{
-		var doname = typeof name != 'undefined' ? name : this.name;
-		var base_url = !!jbase_url_fc ? jbase_url_fc : '';
-
-		jQuery('#'+doname).html('<p><img src="'+base_url+'components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
-		jQuery.ajax({
-			url: url+'&format=raw&task='+task+'&id='+id,
-			type: 'get',
-			success: function (data)
-			{
-				jQuery('#'+doname).html(data);
-			},
-			error: function (xhr, ajaxOptions, thrownError)
-			{
-				jQuery('#'+doname).html('Error status: ' + xhr.status + ' , Error text: ' + thrownError);
-			}
-		});
-	};
-
-	this.initialize(name, options);
+  this.reseter = function (task, id, targetName, url) {
+    return update(targetName ?? this.name, url, {format: 'raw', task, id});
+  };
 };

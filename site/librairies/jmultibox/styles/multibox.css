@@ -2,7 +2,8 @@
 	MultiBox
 	v1.3
 **************************************************************/
-.MultiBoxContainer{position:absolute;border:10px solid #000;background-color:#FFF;display:none;z-index:2;text-align:left;
+/* Match Joomla's modal layer so site navigation cannot cover gallery controls. */
+.MultiBoxContainer{position:absolute;border:10px solid #000;background-color:#FFF;display:none;z-index:1055;text-align:left;
 -moz-border-radius: 8px;
 -webkit-border-radius: 8px;
 border-radius: 8px;

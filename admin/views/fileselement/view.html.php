@@ -294,7 +294,6 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 
 			// Add JS frameworks
 			flexicontent_html::loadFramework('select2');
-			flexicontent_html::loadFramework('prettyCheckable');
 			flexicontent_html::loadFramework('flexi-lib');
 			flexicontent_html::loadFramework('flexi-lib-form');
 
@@ -387,150 +386,74 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 
 		// *** BOF FOLDER MODE specific ***
 
-		// Add JS to document to initialize the file list
-		// eg Find and mark file usage by fileid / filename search (respectively: DB mode / Folder mode)
-		if ($folder_mode)
-		{
-			$js = "
-			document.addEventListener('DOMContentLoaded', function()
-			{
-				var delfilename = '".$delfilename."';
-				var remove_existing_files_from_list = 0;
-				var remove_new_files_from_list = 0;
-
-				// Find and mark file usage by filename search
-				var original_objs = jQuery(window.parent.document.body).find('.fcfieldval_container_".$fieldid." .originalname');  // newly selected field values, not yet saved in DB
-				var existing_objs = jQuery(window.parent.document.body).find('.fcfieldval_container_".$fieldid." .".$existing_class."');  // existing (or optionally newly selected too) field values, already saved in DB
-
-				var imgobjs = Array();
-				for (i=0,n=original_objs.length; i<n; i++)
-				{
-					if (original_objs[i].value) imgobjs.push(original_objs[i].value);
-					if (delfilename!='' && original_objs[i].value == delfilename)
-					{
-						//window.parent.fcfield_assignImage".$fieldid."('".$targetid."', '', '', 0);
-						remove_existing_files_from_list = 1;
-					}
-				}
-				for (i=0,n=existing_objs.length; i<n; i++)
-				{
-					if (existing_objs[i].value) imgobjs.push(existing_objs[i].value);
-					if (delfilename!='' && existing_objs[i].value == delfilename)
-					{
-						//window.parent.fcfield_assignImage".$fieldid."('".$targetid."', '', '', 0);
-						remove_new_files_from_list = 1;
-					}
-				}
-
-				if ( remove_existing_files_from_list || remove_new_files_from_list )
-				{
-					mssg = '".\Joomla\CMS\Language\Text::_('FLEXI_DELETE_FILE_IN_LIST_WINDOW_MUST_CLOSE')."';
-					mssg = mssg + '\\n' + (remove_existing_files_from_list ? '".\Joomla\CMS\Language\Text::_('FLEXI_EXISTING_FILE_REMOVED_SAVE_RECOMMENEDED',true)."' : '');
-					alert( mssg );
-					//window.parent.fcfield_assignImage".$fieldid."('".$targetid."', '', '', 0);
-				}
-
-				for (i=0,n=imgobjs.length; i<n; i++)
-				{
-					var rows = jQuery.find('a[data-filename=\"'+ imgobjs[i] +'\"]');
-					jQuery(rows).addClass('striketext');
-				}
-
-				".($autoassign && count($pending_file_names) ? "
-				jQuery('td.is-pending-file input').next().trigger('click');
-				" : "")."
-
-				".($autoassign==1 && count($pending_file_names) ? "
-				jQuery('#insert_selected_btn').trigger('click');
-				" : "")."
-			});
-			";
-		}
-
-		else
-		{
-			$js = "
-			document.addEventListener('DOMContentLoaded', function()
-			{
-				// Find and mark file usage by filename search
-				var existing_objs = jQuery(window.parent.document.body).find('.fcfieldval_container_".$fieldid." .".$existing_class."');  // existing (or optionally newly selected too) field values, already saved in DB
-				for (i=0,n=existing_objs.length; i<n; i++)
-				{
-					var rows = jQuery.find('a[data-filename=\"'+ existing_objs[i].innerHTML +'\"]');
-					jQuery(rows).addClass('striketext');
-				}
-
-				// Find and mark file usage by fileid search
-				var id_objs = jQuery(window.parent.document.body).find('.fcfieldval_container_".$fieldid." input.contains_fileid');
-				var imgids = Array();
-				for (i=0,n=id_objs.length; i<n; i++)
-				{
-					if ( id_objs[i].value) imgids.push(id_objs[i].value);
-				}
-				for (i=0,n=imgids.length; i<n; i++)
-				{
-					var rows = jQuery.find('a[data-fileid=\"'+ imgids[i] +'\"]');
-					jQuery(rows).addClass('striketext');
-				}
-
-				".($autoassign && count($pending_file_names) ? "
-				jQuery('td.is-pending-file input').next().trigger('click');
-				" : "")."
-
-				".($autoassign==1 && count($pending_file_names) ? "
-				jQuery('#insert_selected_btn').trigger('click');
-				" : "")."
-			});
-			";
-		}
-
-
-		$js .= "
+		$selector = '.fcfieldval_container_' . (int) $fieldid . ' ';
+		$js = "
 			var fcfiles_keep_modal = 0;
-			var fcfiles_targetid = '".$targetid."';
+			var fcfiles_targetid = " . json_encode($targetid, JSON_HEX_TAG | JSON_HEX_AMP) . ";
 
-			function fc_fileselement_assign_files(el)
+			FlexiForm.ready(function()
 			{
-				var rows = jQuery('input[name=\"cid[]\"]:checked');
-				if (!rows.length)
+				const parentDocument = window.parent.document;
+				const fields = parentDocument.querySelectorAll(" . json_encode($selector . '.' . $existing_class) . ");
+				const originals = " . ($folder_mode ? "parentDocument.querySelectorAll(" . json_encode($selector . '.originalname') . ")" : "[]") . ";
+				const filenames = new Set([...fields, ...originals].map(field => field.value || field.textContent.trim()).filter(Boolean));
+				const ids = new Set([...parentDocument.querySelectorAll(" . json_encode($selector . 'input.contains_fileid') . ")].map(field => field.value).filter(Boolean));
+				const deleted = " . json_encode($delfilename, JSON_HEX_TAG | JSON_HEX_AMP) . ";
+				if (" . ($folder_mode ? 'true' : 'false') . " && deleted && filenames.has(deleted))
 				{
-					alert('Please select some files');
+					const removedOriginal = [...originals].some(field => field.value === deleted);
+					FlexiForm.alert(" . json_encode(\Joomla\CMS\Language\Text::_('FLEXI_DELETE_FILE_IN_LIST_WINDOW_MUST_CLOSE'), JSON_HEX_TAG | JSON_HEX_AMP) . "
+						+ (removedOriginal ? '\\n' + " . json_encode(\Joomla\CMS\Language\Text::_('FLEXI_EXISTING_FILE_REMOVED_SAVE_RECOMMENEDED'), JSON_HEX_TAG | JSON_HEX_AMP) . " : ''));
+				}
+				document.querySelectorAll('a[data-filename], a[data-fileid]').forEach(link => {
+					if (filenames.has(link.dataset.filename) || ids.has(link.dataset.fileid)) link.classList.add('striketext');
+				});
+				" . ($autoassign && count($pending_file_names) ? "
+				document.querySelectorAll('td.is-pending-file input').forEach(input => input.nextElementSibling?.click());
+				" : "") . "
+				" . ($autoassign == 1 && count($pending_file_names) ? "
+				document.getElementById('insert_selected_btn')?.click();
+				" : "") . "
+			});
+
+			function fc_fileselement_assign_files()
+			{
+				const inputs = [...document.querySelectorAll('input[name=\"cid[]\"]:checked')]
+					.filter(input => input.closest('tr')?.querySelector('.fc_set_file_assignment:not(.striketext)'));
+				if (!inputs.length)
+				{
+					FlexiForm.alert(" . json_encode(\Joomla\CMS\Language\Text::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', \Joomla\CMS\Language\Text::_('FLEXI_SELECT')), JSON_HEX_TAG | JSON_HEX_AMP) . ");
 					return;
 				}
 
-				jQuery('#fileman_tabset').hide();
-				jQuery('#fileman_tabset').prev().show();
-
+				const tabs = document.getElementById('fileman_tabset');
+				FlexiForm.show(tabs, false);
+				FlexiForm.show(tabs?.previousElementSibling);
 				setTimeout(function()
 				{
 					fcfiles_keep_modal = 1;
-					var row_count = 0;
-					rows.each(function(index, value)
+					for (const [index, input] of inputs.entries())
 					{
-						var row = jQuery(this).closest('tr');
-						var assign_file_btn = row.find('.fc_set_file_assignment');
-						if (row_count > 0 || fcfiles_targetid == '')
+						if (index || !fcfiles_targetid)
 						{
-							// Add after given element or at end if element was not provided
-							fcfiles_targetid = fcfiles_targetid ?
-								window.parent.addField".$fieldid."(null, null, jQuery('#'+fcfiles_targetid, parent.document).closest('li.fcfieldval_container'), {insert_before: 0, scroll_visible: 0, animate_visible: 0}) :
-								window.parent.addField".$fieldid."(null);
+							const row = window.parent.document.getElementById(fcfiles_targetid)?.closest('.fcfieldval_container');
+							fcfiles_targetid = row
+								? window.parent.addField" . $fieldid . "(null, null, row, {insert_before: 0, scroll_visible: 0, animate_visible: 0})
+								: window.parent.addField" . $fieldid . "(null);
 						}
-						if (fcfiles_targetid == 'cancel')  return false;  // Stop .each() loop
-						row_count++;
-						assign_file_btn.trigger('click');
-					});
-					window.parent.fc_field_dialog_handle_".$fieldid.".dialog('close');
+						if (!fcfiles_targetid || fcfiles_targetid === 'cancel') break;
+						input.closest('tr').querySelector('.fc_set_file_assignment').click();
+					}
+					window.parent.fc_field_dialog_handle_" . $fieldid . "?.dialog('close');
 				}, 50);
 			}
 
-			function fc_fileselement_assign_file(target_valuebox_tagid, file_data, f_preview)
+			function fc_fileselement_assign_file(targetId, data, preview)
 			{
-				file_data.preview = f_preview;
-				var result = window.parent.fcfield_assignFile".$fieldid."(target_valuebox_tagid, file_data, fcfiles_keep_modal);
-				if (result != 'cancel')
+				const result = window.parent.fcfield_assignFile" . $fieldid . "(targetId, {...data, preview}, fcfiles_keep_modal);
+				if (result !== 'cancel' && result !== false)
 				{
-					jQuery('file'+file_data.id).className = 'striketext';
+					document.getElementById('file' + data.id)?.classList.add('striketext');
 				}
 			}
 
@@ -538,11 +461,11 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 			{
 				if (document.adminForm.boxchecked.value==0)
 				{
-					alert('". flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', \Joomla\CMS\Language\Text::_('FLEXI_DELETE')), 'd')."');
+					FlexiForm.alert('". flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::sprintf('FLEXI_SELECT_LIST_ITEMS_TO', \Joomla\CMS\Language\Text::_('FLEXI_DELETE')), 'd')."');
 				}
 				else
 				{
-					if (confirm('".flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_ARE_YOU_SURE'), 's')."')) Joomla.submitbutton('filemanager.remove');
+					return FlexiForm.confirmAction(document.adminForm, '".flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_ARE_YOU_SURE'), 's')."', () => Joomla.submitbutton('filemanager.remove'));
 				}
 			}
 		";

@@ -463,9 +463,9 @@ abstract class JHtmlFclayoutbuilder
 						modalImportLabel: \'<div style="margin-bottom: 10px; font-size: 13px;">Paste here your HTML/CSS and click Import</div>\',
 						modalImportContent: function(editor)
 						{
-							//\'<script>\n\' + document.querySelector(\'#\' + element_id + \'_js\').textContent.trim() + \'\n<\/script>\n\'
-							return document.querySelector(\'#\' + element_id + \'_html\').textContent.trim() + \'\n\' +
-								\'<style>\n\' + document.querySelector(\'#\' + element_id + \'_css\').textContent.trim() + \'\n<\/style>\n\';
+							//\'<script>\n\' + document.querySelector(\'#\' + element_id + \'_js\').value.trim() + \'\n<\/script>\n\'
+							return document.querySelector(\'#\' + element_id + \'_html\').value.trim() + \'\n\' +
+								\'<style>\n\' + document.querySelector(\'#\' + element_id + \'_css\').value.trim() + \'\n<\/style>\n\';
 						},
 
 						filestackOpts: null, //{ key: \'AYmqZc2e8RLGLE7TGkX3Hz\' },
@@ -860,7 +860,7 @@ abstract class JHtmlFclayoutbuilder
 			var modal = editor.Modal;
 			editor.Commands.add(\'canvas-clear\', function()
 			{
-				if (confirm(\'Are you sure to clean the canvas?\'))
+				return FlexiForm.confirmAction(editor.getContainer(), \'Are you sure to clean the canvas?\', () =>
 				{
 					var comps = editor.DomComponents.clear();
 					var composer = editor.CssComposer.clear();
@@ -868,7 +868,7 @@ abstract class JHtmlFclayoutbuilder
 					{
 						editor.store(res => console.log(\'Store callback\'));
 					}, 0);
-				}
+				});
 			});
 
 
@@ -913,18 +913,12 @@ abstract class JHtmlFclayoutbuilder
 
 			// Simple warn notifier
 			var origWarn = console.warn;
-			toastr.options = {
-				closeButton: true,
-				preventDuplicates: true,
-				showDuration: 250,
-				hideDuration: 150
-			};
 			console.warn = function (msg) {
-				if (msg.indexOf(\'[undefined]\') == -1 && msg.indexOf(\'writeDynaList\') == -1)
+				if (typeof msg === \'string\' && msg.indexOf(\'[undefined]\') == -1 && msg.indexOf(\'writeDynaList\') == -1)
 				{
-					toastr.warning(msg);
+					FlexiForm.message(\'warning\', msg);
 				}
-				origWarn(msg);
+				origWarn.apply(console, arguments);
 			};
 
 
@@ -1013,17 +1007,17 @@ abstract class JHtmlFclayoutbuilder
 
 					keys.forEach(key => {
 						var el_id = key.replace(\'fc-gjs-\' + editor_sfx, \'\');
-						var value = document.querySelector(\'#\' + element_id + \'_\' +  el_id).textContent;
+						var value = document.querySelector(\'#\' + element_id + \'_\' +  el_id).value;
 
 						console.log(\'Load: \' + key + \' \' + el_id);
 
 						/*if (key == \'html\')
 						{
-							var js   = document.querySelector(\'#\' + element_id + \'_js\').textContent.trim();
+							var js   = document.querySelector(\'#\' + element_id + \'_js\').value.trim();
 
 							if (js)
 							{
-								value = value + \'\n<script>\n\' + document.querySelector(\'#\' + element_id + \'_js\').textContent + \'\n<\/script>\n\';
+								value = value + \'\n<script>\n\' + document.querySelector(\'#\' + element_id + \'_js\').value + \'\n<\/script>\n\';
 							}
 						}*/
 
@@ -1053,12 +1047,12 @@ abstract class JHtmlFclayoutbuilder
 
 						if (0) //(el_id == \'html\')
 						{
-							document.querySelector(\'#\' + element_id + \'_html\').innerHTML = editor.getHtml();
-							document.querySelector(\'#\' + element_id + \'_js\').innerHTML = editor.getJs();
+							document.querySelector(\'#\' + element_id + \'_html\').value = editor.getHtml();
+							document.querySelector(\'#\' + element_id + \'_js\').value = editor.getJs();
 						}
 						else
 						{
-							document.querySelector(\'#\' + element_id + \'_\' +  el_id).innerHTML = data[key];
+							document.querySelector(\'#\' + element_id + \'_\' +  el_id).value = data[key];
 						}
 					}
 
@@ -1329,12 +1323,12 @@ abstract class JHtmlFclayoutbuilder
 				className: \'fa fa-floppy-o\',
 				command: function(editor1, sender) {
 					sender && sender.set(\'active\', true);
-					document.querySelector(\'#\' + element_id + \'_html\').innerHTML = editor.getHtml().trim();
-					//document.querySelector(\'#\' + element_id + \'_js\').innerHTML = editor.getJs().trim();
-					document.querySelector(\'#\' + element_id + \'_css\').innerHTML = editor.getCss().trim();
-					document.querySelector(\'#\' + element_id + \'_styles\').innerHTML = JSON.stringify(editor.getStyle());
-					document.querySelector(\'#\' + element_id + \'_components\').innerHTML = JSON.stringify(editor.getComponents());
-					document.querySelector(\'#\' + element_id + \'_assets\').innerHTML = JSON.stringify(editor.AssetManager.getAll());
+					document.querySelector(\'#\' + element_id + \'_html\').value = editor.getHtml().trim();
+					//document.querySelector(\'#\' + element_id + \'_js\').value = editor.getJs().trim();
+					document.querySelector(\'#\' + element_id + \'_css\').value = editor.getCss().trim();
+					document.querySelector(\'#\' + element_id + \'_styles\').value = JSON.stringify(editor.getStyle());
+					document.querySelector(\'#\' + element_id + \'_components\').value = JSON.stringify(editor.getComponents());
+					document.querySelector(\'#\' + element_id + \'_assets\').value = JSON.stringify(editor.AssetManager.getAll());
 
 					setTimeout(function()
 					{
@@ -1445,7 +1439,7 @@ abstract class JHtmlFclayoutbuilder
 			editor.load(res => console.log(\'Load callback\'));
 
 			editor.on(\'storage:error\', (err) => {
-				alert(`Error: ${err}`);
+				FlexiForm.message(\'error\', `Error: ${err}`);
 			});
 
 			editor.on(\'change:device\', () => console.log(\'Current device: \', editor.getDevice()));

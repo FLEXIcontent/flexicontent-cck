@@ -4,6 +4,53 @@ use Joomla\CMS\Language\LanguageFactoryInterface;
 
 class flexicontent_upload
 {
+	/** Resolve the same upload restrictions for the field UI and the endpoint. */
+	public static function getUploadParams($field = null)
+	{
+		$params = clone \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+		if ($field && isset($field->parameters))
+		{
+			$params->merge($field->parameters);
+		}
+		if ($field && $field->field_type === 'image')
+		{
+			$images = array('bmp', 'wbmp', 'gif', 'jpg', 'jpeg', 'png', 'webp', 'ico');
+			$allowed = preg_split('/\s*,\s*/', strtolower($params->get('upload_extensions', implode(',', $images)) ?? ''));
+			$params->set('upload_extensions', implode(',', array_intersect($images, $allowed)));
+			$params->set('ignore_extensions', '');
+			$params->set('image_extensions', implode(',', $images));
+			$params->set('restrict_uploads', 1);
+		}
+		return $params;
+	}
+
+	/** Existing thumbnail files owned by a DB-mode image, never arbitrary directory contents. */
+	public static function getImageThumbnails($file, $fields, $includeWebp = true)
+	{
+		$name = (string) $file->filename;
+		if (!$name || $name !== basename($name) || preg_match('#[/\\\\\x00]#', $name) || strpos($name, '..') !== false) return array();
+		$root = realpath(JPATH_SITE);
+		$paths = array();
+		foreach ($fields as $field)
+		{
+			$params = new \Joomla\Registry\Registry($field->attribs);
+			if ((int) $params->get('image_source', 0) !== 0 || (int) $params->get('target_dir', 1) !== (int) $file->secure) continue;
+			$folder = realpath(JPATH_SITE . '/' . $params->get('dir', 'images/stories/flexicontent'));
+			if (!$folder || !$root || strpos($folder . DIRECTORY_SEPARATOR, $root . DIRECTORY_SEPARATOR) !== 0 || $folder === $root) continue;
+			foreach (array('b', 'l', 'm', 's') as $size) foreach (array('', 'fld' . (int) $field->id . '_') as $prefix)
+			{
+				$names = array($size . '_' . $prefix . $name);
+				if ($includeWebp) $names[] = $size . '_' . $prefix . pathinfo($name, PATHINFO_FILENAME) . '.webp';
+				foreach ($names as $thumb)
+				{
+					$path = $folder . DIRECTORY_SEPARATOR . $thumb;
+					if (is_file($path) && !is_link($path)) $paths[$path] = $path;
+				}
+			}
+		}
+		return array_values($paths);
+	}
+
 	static function makeSafe($file, $language = null)
 	{
 		// Replace [] with () and multiple spaces with a single hyphen.

@@ -213,6 +213,7 @@ Base script. Great!!
 			previousButton.removeClass('MultiBoxButtonDisabled');
 			nextButton.removeClass('MultiBoxButtonDisabled');
 			opened = false;
+			document.removeEventListener('keydown', onKeyDown);
 		};
 
 		var getOpenClosePos = function(el) {
@@ -284,6 +285,7 @@ Base script. Great!!
 				}
 				else {
 					opened = true;
+					document.addEventListener('keydown', onKeyDown);
 
 					if (options.useOverlay) {
 						alert(options.path+'overlays/'+options.overlaybg);
@@ -340,7 +342,15 @@ Base script. Great!!
 			};
 		};
 
+		var onKeyDown = function(event) {
+			if (event.key === 'Escape' && opened === true) {
+				event.preventDefault();
+				close();
+			}
+		};
+
 		var close = function() {
+			document.removeEventListener('keydown', onKeyDown);
 			//Hide overlay
 			if (options.useOverlay) {
 				$('.vegas-overlay').animate({
@@ -395,6 +405,19 @@ Base script. Great!!
 		var resize = function() {
 			if (tempSRC !== contentObj.src) {
 				var border = parseInt(container.css('border-left-width'), 10);
+
+				// Fit image content before calculating the viewer position. Leave room
+				// for the border, the outside close button and the navigation controls.
+				if (type === 'image') {
+					var imageWidth = contentObj[0].naturalWidth || contentObj.width;
+					var imageHeight = contentObj[0].naturalHeight || contentObj.height;
+					var availableWidth = Math.max(1, $(window).width() - border * 2 - 52);
+					var availableHeight = Math.max(1, $(window).height() - border * 2 - 52 - (options.showControls ? 100 : 0));
+					var scale = Math.min(1, availableWidth / imageWidth, availableHeight / imageHeight);
+					contentObj.width = Math.max(1, Math.floor(imageWidth * scale));
+					contentObj.height = Math.max(1, Math.floor(imageHeight * scale));
+					contentObj.css({width: contentObj.width, height: contentObj.height});
+				}
 
 				if (options.fixedTop) {
 					var top = options.fixedTop;

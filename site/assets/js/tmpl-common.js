@@ -191,7 +191,7 @@
 			}
 		})
 		.catch(function(err) {
-			alert('Error fetching: ' + err);
+			FlexiForm.alert('Error fetching: ' + err);
 		});
 	}
 
