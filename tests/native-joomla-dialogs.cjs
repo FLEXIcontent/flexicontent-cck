@@ -43,7 +43,11 @@ if(!joomla)throw Error('Set FLEXI_TEST_JOOMLA to a Joomla 6 installation.');
    // Async confirmation must cancel the original event, then preserve normal
    // navigation, validation and the clicked submitter on acceptance.
    const submissions=[];
-   page.on('request',r=>{if(r.url().includes('/confirmed-submit'))submissions.push({url:r.url(),body:r.postData()});});
+   page.on('request', request => {
+    if (request.isNavigationRequest() && request.method() === 'POST' && request.frame().name() === 'result') {
+     submissions.push({path: new URL(request.url()).pathname, body: request.postData()});
+    }
+   });
    await page.evaluate(()=>{
     window.actions=0;
     document.body.insertAdjacentHTML('beforeend',`<button id="action" onclick="return FlexiForm.confirmAction(this, 'Proceed?', () => { window.actions++; })">Action</button>
@@ -53,6 +57,10 @@ if(!joomla)throw Error('Set FLEXI_TEST_JOOMLA to a Joomla 6 installation.');
      <form id="confirm-form" action="/wrong-action" method="post" target="result" onsubmit="return FlexiForm.confirmSubmit(this, 'Submit?', event)">
       <input id="required" name="required" required value="valid"><button id="submitter" name="operation" value="purge" formaction="/confirmed-submit">Submit</button>
      </form>`);
+    window.acceptedSubmits = 0;
+    document.addEventListener('submit', event => {
+     if (event.target.id === 'confirm-form' && !event.defaultPrevented) window.acceptedSubmits++;
+    });
    });
    const confirm=page.locator('.joomla-dialog-confirm');
    await page.locator('#action').click();
@@ -72,14 +80,18 @@ if(!joomla)throw Error('Set FLEXI_TEST_JOOMLA to a Joomla 6 installation.');
    const popupReady=page.waitForEvent('popup');await confirm.locator('[data-button-ok]').click();
    const popup=await popupReady;await popup.waitForLoadState();assert(popup.url().endsWith('/accepted-link'));await popup.close();
    await page.locator('#submitter').click();await confirm.locator('[data-button-cancel]').click();assert.equal(submissions.length,0);
+   assert.equal(await page.evaluate(() => window.acceptedSubmits), 0);
    await page.locator('#submitter').click();
    await page.locator('#required').evaluate(el=>el.value='');
    await confirm.locator('[data-button-ok]').click();
    assert.equal(submissions.length,0);assert.equal(await confirm.count(),0);
+   assert.equal(await page.evaluate(() => window.acceptedSubmits), 0);
    await page.locator('#required').fill('valid');await page.locator('#submitter').click();
    await confirm.locator('[data-button-ok]').click();
    await page.waitForFunction(()=>document.querySelector('#result').contentWindow.location.pathname==='/confirmed-submit');
-   assert.equal(submissions.length,1);assert.match(submissions[0].body,/operation=purge/);assert.match(submissions[0].body,/required=valid/);
+   assert.equal(await page.evaluate(() => window.acceptedSubmits), 1);
+   assert.deepEqual(submissions.map(request => request.path), ['/confirmed-submit']);
+   assert.match(submissions[0].body,/operation=purge/);assert.match(submissions[0].body,/required=valid/);
    await page.locator('#confirm-form').evaluate(el=>el.remove());
    if(width===1440){
     await page.addScriptTag({path:path.join(root,'site/assets/js/fcvote.js')});

@@ -2998,7 +2998,7 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 					<li class="tagitem">
 						<span>' . $tag->name . '</span>
 						<input type="hidden" name="jform[tag][]" value="' . $tag->tid . '" />
-						<a href="javascript:;" class="deletetag" onclick="javascript:deleteTag(this);" title="' . \Joomla\CMS\Language\Text::_('FLEXI_DELETE_TAG') . '"></a>
+						<a href="#" class="deletetag" title="' . \Joomla\CMS\Language\Text::_('FLEXI_DELETE_TAG') . '"></a>
 					</li>';
 				}
 				else

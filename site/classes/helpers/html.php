@@ -6753,60 +6753,9 @@ class flexicontent_html
 	}
 
 
-	// Check and if needed install Joomla template overrides into current Joomla template
+	/** @deprecated Joomla's media field no longer needs per-template layouts. */
 	public static function install_template_overrides($display_mssg = false)
 	{
-		$app =Factory::getApplication();
-
-		$pathDestFolder_arr = array(
-			Path::clean(JPATH_BASE.'/templates/'.$app->getTemplate().'/html/com_media/images/'),
-			Path::clean(JPATH_BASE.'/templates/'.$app->getTemplate().'/html/com_media/imageslist/')
-		);
-		$pathSourceFolder_arr = array(
-			Path::clean(JPATH_ROOT.'/components/com_flexicontent/layouts/html/com_media/images'),
-			Path::clean(JPATH_ROOT.'/components/com_flexicontent/layouts/html/com_media/imageslist')
-		);
-
-		$install_count = $update_count = 0;
-
-		foreach($pathDestFolder_arr as $i => $pathDestFolder)
-		{
-			$pathSourceFolder = $pathSourceFolder_arr[$i];
-
-			// 1. Check DESTINATION folder
-			if ( !is_dir($pathDestFolder) && !mkdir($pathDestFolder, 0755, true) )
-			{
-				echo '<span class="alert alert-warning"> Error, unable to create folder: '. $pathDestFolder.'</span>';
-			}
-
-			// 2. Copy override files
-			$files = glob($pathSourceFolder . '/*.*');
-
-			foreach($files as $sourcepath)
-			{
-				$dest_path = $pathDestFolder . basename($sourcepath);
-
-				$not_exists = !file_exists($dest_path);
-				if ($not_exists || filemtime($sourcepath) > filemtime($dest_path))
-				{
-					$not_exists ? $install_count++ : $update_count++;
-					copy($sourcepath, $dest_path);
-				}
-			}
-		}
-
-		if ($display_mssg)
-		{
-			if ($install_count)
-			{
-				Factory::getApplication()->enqueueMessage('<span class="badge">' . \Joomla\CMS\Language\Text::_('FLEXI_INSTALLED') . '</span> ' . $install_count . ' template overrides', 'message');
-			}
-
-			if ($display_mssg && $update_count)
-			{
-				Factory::getApplication()->enqueueMessage('<span class="badge">' . \Joomla\CMS\Language\Text::_('FLEXI_UPDATED') . '</span> ' . $update_count . ' template overrides', 'message');
-			}
-		}
 	}
 
 

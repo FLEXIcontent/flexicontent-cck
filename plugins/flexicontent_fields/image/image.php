@@ -222,14 +222,11 @@ class plgFlexicontent_fieldsImage extends FCField
 		}
 
 
-		// Add JS /CSS for Media manager mode, and also check their PHP layouts overides exist
+		// Add JS /CSS for Media manager mode
 		static $mm_mode_common_js_added = false;
 
 		if ($image_source === -2 && !$mm_mode_common_js_added)
 		{
-			// Check and if needed install Joomla template overrides into current Joomla template
-			flexicontent_html::install_template_overrides();
-
 			if (!$use_jformfields)
 			{
 				// We will use the mootools based media manager

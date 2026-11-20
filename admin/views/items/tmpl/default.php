@@ -302,7 +302,7 @@ function delAllFilters()
 {
 	document.querySelectorAll('.fc_field_filter').forEach(filter => delFilter(filter.id));  // clear custom filters
 	delFilter('search');
-	<?php $single_type ? '' : "delFilter('filter_type'); "; ?>
+	delFilter('filter_type');
 	delFilter('filter_state');
 	delFilter('filter_cats');
 	delFilter('filter_featured');

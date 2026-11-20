@@ -257,9 +257,6 @@ class plgFlexicontent_fieldsWeblink extends FCField
 		{
 			if (!$use_jformfields)
 			{
-				// Check and if needed install Joomla template overrides into current Joomla template
-				flexicontent_html::install_template_overrides();
-
 				// We will use the mootools based media manager
 				\Joomla\CMS\HTML\HTMLHelper::_('behavior.framework', true);
 
