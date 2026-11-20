@@ -677,7 +677,8 @@ class com_flexicontentInstallerScript
 		foreach ($tbl_names_arr as $tbl_name)
 		{
 			$full_tbl_name = $dbprefix . $tbl_name;
-			$query = "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '".$dbname."' AND TABLE_NAME = '".$full_tbl_name."'";// ." AND COLUMN_NAME = 'attribs'";
+			$query = "SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE, COLUMN_DEFAULT, CHARACTER_SET_NAME, COLLATION_NAME, COLUMN_COMMENT, EXTRA"
+				. " FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = " . $db->quote($dbname) . " AND TABLE_NAME = " . $db->quote($full_tbl_name);
 			$db->setQuery($query);
 			$tbl_datatypes[$tbl_name] = $db->loadAssocList('COLUMN_NAME');
 		}
@@ -885,6 +886,10 @@ class com_flexicontentInstallerScript
 					if ( $favs_tbl_exists && !array_key_exists('type', $tbl_fields['#__flexicontent_favourites'])) {
 						$queries[] = "ALTER TABLE `#__flexicontent_favourites` ADD `type` INT(11) NOT NULL DEFAULT '0' AFTER `notify`";
 					}
+					if ($favs_tbl_exists && !$db->setQuery("SHOW INDEX FROM `#__flexicontent_favourites` WHERE Key_name = 'type' OR (Column_name = 'type' AND Seq_in_index = 1)")->loadObject())
+					{
+						$queries[] = "ALTER TABLE `#__flexicontent_favourites` ADD INDEX `type` (`type`)";
+					}
 
 					// Files TABLE
 					$tbl_name = 'flexicontent_files';
@@ -932,6 +937,11 @@ class com_flexicontentInstallerScript
 					// Fields TABLE
 					$tbl_name = 'flexicontent_fields';
 					$changes = array();
+					$asset = $tbl_datatypes[$tbl_name]['asset_id'] ?? null;
+					if ($asset && $asset['IS_NULLABLE'] === 'NO' && $asset['COLUMN_DEFAULT'] === null)
+					{
+						$changes[] = "ALTER COLUMN `asset_id` SET DEFAULT 0";
+					}
 
 					if ( $fields_tbl_exists && !array_key_exists('untranslatable', $tbl_fields['#__'.$tbl_name])) {
 						$changes[] = "ADD `untranslatable` TINYINT(1) NOT NULL DEFAULT '0' AFTER `isadvsearch`";
@@ -1509,8 +1519,14 @@ class com_flexicontentInstallerScript
 					<?php
 
 			    $queries = array();
-					if ( !$fields_tbl_exists ) {
-						$queries[] = "ALTER TABLE #__flexicontent_fields MODIFY description TEXT NOT NULL";
+					$description = $tbl_datatypes['flexicontent_fields']['description'] ?? null;
+					if ($description && $description['DATA_TYPE'] === 'varchar' && $description['EXTRA'] === ''
+						&& in_array($description['COLUMN_DEFAULT'], array(null, '', "''", 'NULL'), true))
+					{
+						// Match the capacity of a new site without changing existing text, collation or nullability.
+						$queries[] = "ALTER TABLE `#__flexicontent_fields` MODIFY `description` TEXT CHARACTER SET "
+							. $db->quoteName($description['CHARACTER_SET_NAME']) . ' COLLATE ' . $db->quoteName($description['COLLATION_NAME'])
+							. ($description['IS_NULLABLE'] === 'YES' ? ' NULL' : ' NOT NULL') . ' COMMENT ' . $db->quote($description['COLUMN_COMMENT']);
 					}
 
 					if ( !empty($queries) ) {

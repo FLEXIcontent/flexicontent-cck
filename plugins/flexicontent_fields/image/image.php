@@ -171,8 +171,8 @@ class plgFlexicontent_fieldsImage extends FCField
 
 		$autoassign = (int) $field->parameters->get( 'autoassign', 1 );
 
-		$thumb_size_resizer = (int) $field->parameters->get('thumb_size_resizer', 2);
-		$thumb_size_default = (int) $field->parameters->get('thumb_size_default', 120);
+		$thumb_size_resizer = (int) $field->parameters->get('thumb_size_resizer', 0);
+		$thumb_size_default = (int) $field->parameters->get('thumb_size_default', 200);
 		$thumb_method       = (int) $field->parameters->get('thumb_method', 1);
 		$preview_thumb_w    = $preview_thumb_h = 600;
 
@@ -277,7 +277,7 @@ class plgFlexicontent_fieldsImage extends FCField
 			$resize_cfg->slider_name = 'fcfield-'.$field->id.'-uploader-thumb-size';
 			$resize_cfg->element_selector = 'div.fcfield-'.$field->id.'-uploader-thumb-box';
 
-			$resize_cfg->elem_container_selector = '.fcfieldval_container_'.$field->id.' div.fc-box';
+			$resize_cfg->elem_container_selector = '.fcfieldval_container_'.$field->id.' .fc-image-card';
 			$resize_cfg->element_selector = '.fcfieldval_container_'.$field->id.' div.fc_file_uploader ul.plupload_filelist > li';
 
 			$resize_cfg->element_class_prefix = 'thumb_';

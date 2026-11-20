@@ -103,6 +103,11 @@ namespace {
 	$same(' ' . $like('kitchen vvvsink'), flexicontent_db::getLikeSearchCondition($col, 'kitchen sink', 'exact', 'vvv'), 'prefix, exact phrase');
 	$same(" LOWER (i.title) LIKE '%kitchen sink%'", flexicontent_db::getLikeSearchCondition('i.title', 'kitchen sink', 'exact'), 'title, exact phrase');
 
+	$same(' (' . $like('coffee table') . ' OR ' . $like('marble bench') . ') ',
+		flexicontent_db::getLikeSearchCondition($col, '"coffee table" "marble bench"', 'any'), 'two quoted phrases');
+	$same(' (' . $like('coffee vvvtable') . ' AND ' . $like('marble') . ') ',
+		flexicontent_db::getLikeSearchCondition($col, '"coffee table" marble', 'all', 'vvv'), 'quoted phrase and word with prefixes');
+
 	// Wildcards and quotes of the text are escaped
 	$same(true, strpos(flexicontent_db::getLikeSearchCondition($col, '100%', 'all'), '100\\%') !== false, 'percent sign is escaped');
 	$same(true, strpos(flexicontent_db::getLikeSearchCondition($col, "o'neill", 'all'), "o\\'neill") !== false, 'single quote is escaped');

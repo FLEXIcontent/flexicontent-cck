@@ -37,6 +37,17 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
     await page.waitForFunction(() => !!document.formvalidator);
   };
   const loadDependencies = page => page.addScriptTag({content: source('site/assets/js/flexi-lib.js')});
+  await test('Image card panels preserve URLs and delayed uploaders open once', async page => {
+    await form(page, '<div class="fcfieldval_container"><div id="custom_photo_0_fc_preview_msg"></div><div class="fcfield_preview_box">Preview</div><div id="upload_0" class="fc_file_uploader" data-tagid-prefix="upload_" style="display:none"></div><button type="button" class="fc_files_uploader_toggle_btn" onclick="window.uploadClicks++; document.getElementById(\'upload_0\').style.display=\'block\'">Upload</button><button type="button" id="url-button" class="fcfield-mediaurl-btn" data-for="custom_photo_0" onclick="fcfield_image.toggleMediaURL(\'custom_photo_0\')">URL</button><button type="button" id="edit-button" class="fc-image-edit-btn" data-for="custom_photo_0" onclick="fcfield_image.toggleFields(\'custom_photo_0\')">Edit</button><div class="fcimg_url_props" style="display:none"><div class="fcfield-image-mediaurl-box"><input id="custom_photo_0_mediaurl" value="https://example.test/video"></div></div><div class="fcimg_value_props" data-name="custom_photo_0" style="display:none"><input value="Caption"></div></div>');
+    await page.evaluate(()=>{const input=document.createElement('input');input.id='custom_photo_0';input.type='hidden';document.querySelector('.fcfieldval_container').append(input);});
+    for(const file of ['site/assets/js/media-field-controls.js','site/assets/js/media-metadata.js','plugins/flexicontent_fields/image/js/form.js'])await page.addScriptTag({content:source(file)});
+    await page.evaluate(()=>{window.uploadClicks=0;fcfield_image.showUploader('photo_0');fcfield_image.showUploader('photo_0');window.setTimeout(()=>window.upload_={},100);});
+    await page.waitForFunction(()=>window.uploadClicks===1);
+    await page.locator('#url-button').click();assert.equal(await page.locator('#upload_0').isVisible(),false);assert(await page.locator('.fcimg_url_props').isVisible());
+    await page.locator('#url-button').click();assert.equal(await page.locator('.fcimg_url_props').isVisible(),false);assert.equal(await page.locator('#custom_photo_0_mediaurl').inputValue(),'https://example.test/video');
+    await page.locator('#edit-button').focus();await page.keyboard.press('Enter');assert(await page.locator('.fcimg_value_props').isVisible());assert.equal(await page.locator('#edit-button').getAttribute('aria-expanded'),'true');
+    await page.keyboard.press('Space');assert.equal(await page.locator('.fcimg_value_props').isVisible(),false);
+  });
   await test('Validation summary excludes inline error text from wrapping labels', async page => {
     await form(page, '<label for="email">Address<span class="form-control-feedback">This value is not valid</span><input id="email" name="email" class="validate-email" value="aaaa@" data-error-mssg="This value is not valid"></label>');
     await validate(page);

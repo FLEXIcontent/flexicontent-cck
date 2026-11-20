@@ -49,7 +49,7 @@ abstract class JHtmlFcuploader
 			'toggleBtn' => '
 				<button type="button" class="'.$tBtn['class'].' fc_files_uploader_toggle_btn" data-rowno="'.$n.'"
 					aria-label="'.htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_UPLOAD'), ENT_QUOTES, 'UTF-8').'" aria-expanded="false"
-					onclick="'.$tBtn['onclick'].$up_tag_id.'.toggleUploader(Number(this.dataset.rowno), '.$tBtn['action'].', this);">
+					onclick="'.$tBtn['onclick'].'if (window.'.$up_tag_id.') '.$up_tag_id.'.toggleUploader(Number(this.dataset.rowno), '.$tBtn['action'].', this);">
 					' . $tBtn['text'] . '
 				</button>
 			',

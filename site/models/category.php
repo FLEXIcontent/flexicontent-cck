@@ -1414,6 +1414,13 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 				$_index_relev = $_index_match;
 			}
 
+			elseif (($terms = flexicontent_db::getQuotedSearchTerms($text_np, $phrase)) !== null)
+			{
+				$_index_match = flexicontent_db::getQuotedFulltextCondition($ts . '.search_index', $terms, $phrase, $search_prefix);
+				$_title_relev = flexicontent_db::getQuotedFulltextCondition('i.title', $terms, $phrase);
+				$_index_relev = $_index_match;
+			}
+
 			/*
 			 * FullText search
 			 */
@@ -1447,12 +1454,12 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 				case 'exact':
 					// Speed optimization ... 2-level searching: first require ALL words via FULLTEXT index, then require exact text via LIKE %phrase%
 					$newtext = '+' . implode(' +', $words);
-					$escaped_text = $db->escape($newtext, true);
+					$escaped_text = $db->escape($newtext);
 					$quoted_text  = $db->Quote($escaped_text, false);
 
 					// Relevance by title, try to match (EXACT) words, via OR ignoring stop words and short words ...
 					$newtext_np = implode(' ', $words_np);
-					$escaped_text_np = $db->escape($newtext_np, true);
+					$escaped_text_np = $db->escape($newtext_np);
 					$quoted_text_np  = $db->Quote($escaped_text_np, false);
 
 					$_index_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) AND '.$ts.'.search_index LIKE '.$exact_text;
@@ -1462,12 +1469,12 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 
 				case 'all':
 					$newtext = '+' . implode( '* +', $words ) . '*';
-					$escaped_text = $db->escape($newtext, true);
+					$escaped_text = $db->escape($newtext);
 					$quoted_text  = $db->Quote($escaped_text, false);
 
 					// Relevance by title, try to match (PREFIXED) words, via OR ignoring stop words and short words ...
 					$newtext_np = implode( '* ', $words_np ) . '*';
-					$escaped_text_np = $db->escape($newtext_np, true);
+					$escaped_text_np = $db->escape($newtext_np);
 					$quoted_text_np  = $db->Quote($escaped_text_np, false);
 
 					$_index_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
@@ -1478,12 +1485,12 @@ class FlexicontentModelCategory extends \Joomla\CMS\MVC\Model\BaseDatabaseModel 
 				case 'any':
 				default:
 					$newtext = implode( '* ', $words ) . '*';
-					$escaped_text = $db->escape($newtext, true);
+					$escaped_text = $db->escape($newtext);
 					$quoted_text  = $db->Quote($escaped_text, false);
 
 					// Relevance by title, try to match (PREFIXED) words, via OR ignoring stop words and short words ...
 					$newtext_np = implode( '* ', $words_np ) . '*';
-					$escaped_text_np = $db->escape($newtext_np, true);
+					$escaped_text_np = $db->escape($newtext_np);
 					$quoted_text_np  = $db->Quote($escaped_text_np, false);
 
 					$_index_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';

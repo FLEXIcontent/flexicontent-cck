@@ -19,18 +19,38 @@ var fcfield_image = {
   toggleMediaURL(id) {
     const input = document.getElementById(id + '_mediaurl');
     const box = input?.closest('.fcfield-image-mediaurl-box');
-    if (!box) return;
-    const shown = FlexiForm.visible(box);
-    if (input.value && shown) {
-      FlexiMediaMetadata.notice(document.getElementById('fcfield_message_box_' + id),
-        FlexiForm.text('FLEXI_FIELD_IMAGE_CLEAR_MEDIA_URL_FIRST'));
-      return;
+    const row = box?.closest('.fcfieldval_container');
+    if (!row) return;
+    const props = row.querySelector('.fcimg_url_props');
+    const button = row.querySelector('.fcfield-mediaurl-btn[data-for="' + id + '"]');
+    const shown = getComputedStyle(props || box).display !== 'none';
+    // Closing the panel preserves an existing URL and its fetched thumbnail.
+    if (!shown) {
+      row.querySelectorAll('.fc_file_uploader').forEach(node => FlexiForm.show(node, false));
+      FlexiForm.show(row.querySelector('.fcfield_preview_box'));
+      row.querySelectorAll('.fc_files_uploader_toggle_btn').forEach(node => {
+        node.classList.remove('active'); node.setAttribute('aria-expanded', 'false');
+      });
     }
+    FlexiForm.show(props, !shown);
     FlexiForm.show(box, !shown);
+    button?.classList.toggle('active', !shown);
+    button?.setAttribute('aria-expanded', String(!shown));
+    FlexiMediaMetadata.notice(document.getElementById('fcfield_message_box_' + id));
+  },
+
+  toggleFields(id) {
+    const props = document.querySelector('.fcimg_value_props[data-name="' + id + '"]');
+    if (!props) return;
+    const shown = getComputedStyle(props).display === 'none';
+    FlexiForm.show(props, shown);
+    const button = document.querySelector('.fc-image-edit-btn[data-for="' + id + '"]');
+    button?.classList.toggle('active', shown);
+    button?.setAttribute('aria-expanded', String(shown));
   },
 
   showUploader(fieldName) {
-    FlexiMediaField.showUploader('custom_' + fieldName + '_fc_preview_msg');
+    FlexiMediaField.showUploader('custom_' + fieldName);
   },
 
   clearData(id, key) {

@@ -187,10 +187,25 @@ window.FlexiMediaField = (() => {
     return true;
   }
 
+  const pendingUploaders = new WeakSet();
   function showUploader(id) {
     const box = row(document.getElementById(id));
     const uploader = box?.querySelector('.fc_file_uploader');
-    if (uploader && window[uploader.dataset.tagidPrefix]) box.querySelector('.fc_files_uploader_toggle_btn')?.click();
+    if (!uploader || pendingUploaders.has(uploader)) return;
+    pendingUploaders.add(uploader);
+    let attempts = 0;
+    const openWhenReady = () => {
+      if (!uploader.isConnected) { pendingUploaders.delete(uploader); return; }
+      if (window[uploader.dataset.tagidPrefix]) {
+        pendingUploaders.delete(uploader);
+        if (getComputedStyle(uploader).display === 'none') box.querySelector('.fc_files_uploader_toggle_btn')?.click();
+      } else if (++attempts < 40) {
+        window.setTimeout(openWhenReady, 50);
+      } else {
+        pendingUploaders.delete(uploader);
+      }
+    };
+    openWhenReady();
   }
 
   return { placeholder, row, changeCount, resetRemoval, beforeToggle, clearUploader, uploaded,
