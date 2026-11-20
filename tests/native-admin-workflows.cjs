@@ -5,6 +5,46 @@ const root=path.resolve(__dirname,'..');
 async function test(name,html,run){const page=await browser.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
 try{await page.route('https://fixture.invalid/',r=>r.fulfill({contentType:'text/html',body:html}));await page.goto('https://fixture.invalid/');await page.addScriptTag({path:path.join(root,'site/assets/js/form-utils.js')});await page.evaluate(()=>{window.messages=[];FlexiForm.message=(type,text)=>messages.push({type,text});window.fc_initTooltips=()=>{};});await run(page);assert.deepEqual(errors,[]);assert.equal(await page.evaluate(()=>typeof jQuery),'undefined');results.push({name,status:'pass'});}finally{await page.close();}}
 try{
+await test('Items type shortcuts replace a multiple selection and keep the current tab until navigation', `
+ <form id="adminForm" method="post" action="/items" target="results">
+   <nav id="items_type_tabset"><span aria-current="page">2 Types</span>
+     <button type="button" value="3" onclick="selectItemTypeFilter(this)">Article</button>
+     <button type="button" value="" onclick="selectItemTypeFilter(this)">All</button>
+   </nav>
+   <select id="filter_type" name="filter_type[]" multiple>
+     <option selected>1</option><option selected>2</option><option>3</option>
+   </select>
+   <input name="limitstart" value="20"><input type="checkbox" checked id="filter_assockey" name="filter_assockey" value="group">
+ </form><iframe name="results"></iframe>`, async page => {
+ const source = require('node:fs').readFileSync(path.join(root, 'admin/views/items/tmpl/default.php'), 'utf8');
+ await page.evaluate(() => { window.Joomla = { Text: { _: () => 'Submitting the form' } }; });
+ await page.addScriptTag({path: path.join(root, 'site/assets/js/admin.js')});
+ await page.addScriptTag({content: source.slice(source.indexOf('function delFilter(name)'), source.indexOf('function toggleItemAssignments'))});
+ const submissions = [];
+ await page.route('**/items', async route => {
+   submissions.push(new URLSearchParams(route.request().postData()));
+   await route.fulfill({contentType:'text/html', body:'Results'});
+ });
+ for (const label of ['Article', 'All']) {
+   const button = page.getByRole('button', {name:label, exact:true});
+   const request = page.waitForResponse('**/items');
+   await button.focus();
+   await page.keyboard.press('Enter');
+   await request;
+   assert.deepEqual(submissions.at(-1).getAll('filter_type[]'), label === 'All' ? [] : ['3']);
+   assert.equal(submissions.at(-1).get('limitstart'), '0');
+   assert.equal(submissions.at(-1).has('filter_assockey'), false);
+   assert.equal(await page.locator('[aria-current="page"]').textContent(), '2 Types');
+   assert.equal(await page.locator('nav').evaluate(nav => nav.inert), true);
+   assert.equal(await page.locator('.fc_blocker_mssg').textContent(), 'Submitting the form');
+   await page.locator('nav button').first().evaluate(el => el.click());
+   await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pageshow', {persisted:true})));
+   assert.deepEqual(await page.locator('#filter_type').evaluate(el => [...el.selectedOptions].map(o => o.value)), ['1', '2']);
+   assert.equal(await page.locator('nav').evaluate(nav => nav.inert), false);
+   assert.equal(await page.locator('#filter_assockey').isChecked(), true);
+ }
+ assert.equal(submissions.length, 2);
+});
 const parentForm='<form id="adminForm"><input name="task"><input name="newstate"><input name="boxchecked" value="1"></form>';
 await test('Builder form storage round-trips current textarea and hidden input values',
  '<form id="builder"><textarea id="layout_html" name="html">Old HTML</textarea><textarea id="layout_css" name="css">Old CSS</textarea><input id="layout_components" name="components" type="hidden" value="[]"><input id="layout_styles" name="styles" type="hidden" value="[]"><input id="layout_assets" name="assets" type="hidden" value="[]"></form>',async page=>{

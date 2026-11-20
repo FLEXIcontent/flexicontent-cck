@@ -281,14 +281,46 @@ function delFilter(name)
 	if (filter.hasAttribute('data-alt-value')) filter.dataset.altValue = '';
 }
 
-function selectItemTypeFilter(value)
+function selectItemTypeFilter(button)
 {
+	const tabs = button.closest('nav');
+	const form = button.form;
+	const select = form.elements.namedItem('filter_type[]');
+	if (tabs.inert || !select || FlexiForm.visible(document.getElementById('fc_filter_form_blocker'))) return;
+
+	// Quick filters apply immediately, including when other filters use an Apply button.
+	const choices = select.fc_choices_instance;
+	const previousTypes = Array.from(select.selectedOptions, option => option.value);
+	const setTypes = values => {
+		if (choices) {
+			choices.removeActiveItems();
+			choices.setChoiceByValue(values);
+		} else {
+			for (const option of select.options) option.selected = values.includes(option.value);
+		}
+	};
+	const association = form.elements.filter_assockey;
+	const previousAssociation = association?.checked;
+	const previousPage = form.elements.limitstart?.value;
+	setTypes(button.value ? [button.value] : []);
 	delFilter('filter_assockey');
-	const select = document.getElementById('filter_type');
-	if (!select) return;
-	select.value = value || '';
-	select.fc_choices_instance?.refresh();
-	FlexiForm.change(select);
+	if (form.elements.limitstart) form.elements.limitstart.value = '0';
+	Joomla.submitform('', form);
+
+	const blocker = document.getElementById('fc_filter_form_blocker');
+	if (FlexiForm.visible(blocker)) {
+		tabs.inert = true;
+		tabs.setAttribute('aria-busy', 'true');
+		window.addEventListener('pageshow', function (event) {
+			if (!event.persisted) return;
+			setTypes(previousTypes);
+			if (association) association.checked = previousAssociation;
+			if (form.elements.limitstart) form.elements.limitstart.value = previousPage;
+			tabs.inert = false;
+			tabs.removeAttribute('aria-busy');
+			FlexiForm.show(blocker, false);
+		}, {once: true});
+	}
 }
 
 function toggleItemAssignments(button, selector)
@@ -483,96 +515,35 @@ if ($this->max_tab_types && count($this->itemTypes) >= $this->max_tab_types)
 }
 elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 {
-	echo '
-	<div style="overflow: hidden; margin: -8px 0; ">
-		<div class="fctabber s-cblue" id="items_type_tabset">';
-
-	$type_class = empty($filter_type) ? ' tabbertabforced' : '';
-	$__tip_class = ''; //' hasTooltip';
-	$__tip_props = ''; //' data-placement="top" data-title="' . Text::_('FLEXI_ALL') . '" ';
-
-	echo '
-		<div class="tabbertab ' . $type_class . '" id="type_tab_all" style="padding-left: 0; padding-right: 0; border-left: 0; border-right: 0; border-bottom: 0;">
-			<h3 class="tabberheading ' . $__tip_class . '" ' . $__tip_props . '
-				onmouseup="selectItemTypeFilter()"
-			>' . Text::_('FLEXI_ALL') . '</h3>
-		</div>
-		';
-
-	if (count($filter_type) > 1)
+	// These controls filter the whole list. The returned list determines the active type.
+	$typeButtons = array('' => Text::_('FLEXI_ALL'));
+	$subtypeButtons = array();
+	foreach ($this->itemTypes as $itemType)
 	{
-		$type_class  = ' tabbertabforced';
-		$_name = count($filter_type) . ' ' . Text::_('FLEXI_TYPES');
-
-		$__tip_props = ''; //' data-placement="top" data-title="' . $_name . '" ';
-		$__tip_class = ''; //' hasTooltip';
-		echo '
-			<div class="tabbertab ' . $type_class . '" id="type_tab_all" style="padding-left: 0; padding-right: 0; border-left: 0; border-right: 0; border-bottom: 0;">
-				<h3 class="tabberheading ' . $__tip_class . '" ' . $__tip_props . '
-				>' . $_name . '</h3>
-			</div>
-			';
-	}
-
-	$main_types = [];
-	$sub_types  = [];
-	foreach($this->itemTypes as $itemType) {
-		if ($itemType->params->get('is_subtype', 0)) {
-			$sub_types[] = $itemType;
-		} else {
-			$main_types[] = $itemType;
+		if ($itemType->params->get('is_subtype', 0))
+		{
+			$subtypeButtons[$itemType->id] = Text::_($itemType->name);
+		}
+		else
+		{
+			$typeButtons[$itemType->id] = Text::_($itemType->name);
 		}
 	}
-	$sorted_itemTypes = array_merge($main_types, $sub_types);
-
-	$subtype_count = 0;
-	$itemType = reset($sorted_itemTypes);
-	do
-	{
-		if ($itemType->params->get('is_subtype', 0) && $subtype_count == 0) {
-			$type_class = ' subtypes-header';
-			echo '
-				<div class="tabbertab ' . $type_class . '" id="type_tab_break_subtype" style="padding:0; border: 0;">
-					<h3 class="tabberheading ' . $type_class . '"
-						data-data_attr_a="' . (int) $itemType->id . '"
-					> Subtypes: </h3>
-			';
-			echo '</div>';
-		}
-
-		$type_class = $single_type && in_array($itemType->id, $filter_type) ? ' tabbertabforced' : '';
-		$__tip_class = ''; //' hasTooltip';
-		$__tip_props = ''; //' data-placement="top" data-title="' . Text::_( $itemType->name ) . '" ';
-		if ($itemType->params->get('is_subtype', 0)) {
-			$type_class .= ' fc-subtype';
-			$subtype_count++;
-		}
-		echo '
-			<div class="tabbertab ' . $type_class . '" id="type_tab_' . (int) $itemType->id . '" style="padding-left: 0; padding-right: 0; border-left: 0; border-right: 0; border-bottom: 0;">
-				<h3 class="tabberheading ' . $__tip_class . $type_class . '" ' . $__tip_props . '
-					data-data_attr_a="' . (int) $itemType->id . '"
-					onmouseup="selectItemTypeFilter(this.dataset.data_attr_a)"
-				>' . Text::_( $itemType->name ) . '</h3>
-		';
-		echo '</div>';
-
-		$itemType = next($sorted_itemTypes);
-		if (0 && $itemType && $itemType->params->get('is_subtype', 0) && $subtype_count == 0) {
-			$type_class = ' break-subtypes';
-			echo '
-				<div class="tabbertab ' . $type_class . '" id="type_tab_break_subtype" style="padding:0; border: 0;">
-					<h3 class="tabberheading ' . $type_class . '"
-						data-data_attr_a="' . (int) $itemType->id . '"
-					></h3>
-			';
-			echo '</div>';
-		}
-
-	} while($itemType);
-
-	echo '
-		</div>
-	</div>';
+	?>
+	<nav id="items_type_tabset" class="nav nav-tabs" aria-label="<?php echo htmlspecialchars(Text::_('FLEXI_TYPE'), ENT_QUOTES, 'UTF-8'); ?>">
+		<?php foreach ($typeButtons + $subtypeButtons as $id => $label) :
+			$active = $id === '' ? !$filter_type : $single_type && (int) $id === (int) $single_type_id;
+			if ($subtypeButtons && $id === array_key_first($subtypeButtons)) : ?>
+				<span class="nav-link disabled"><?php echo Text::_('FLEXI_SUBTYPES'); ?></span>
+			<?php endif; ?>
+			<button type="button" class="nav-link<?php echo $active ? ' active' : ''; ?>"<?php echo $active ? ' aria-current="page"' : ''; ?>
+				value="<?php echo $id === '' ? '' : (int) $id; ?>" onclick="selectItemTypeFilter(this)"><?php echo htmlspecialchars($label, ENT_QUOTES, 'UTF-8'); ?></button>
+			<?php if ($id === '' && count($filter_type) > 1) : ?>
+				<span class="nav-link active" aria-current="page"><?php echo count($filter_type) . ' ' . Text::_('FLEXI_TYPES'); ?></span>
+			<?php endif; ?>
+		<?php endforeach; ?>
+	</nav>
+	<?php
 }
 ?>
 
@@ -739,7 +710,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 						document.addEventListener('mousedown', function(e) {
 							// The Select2 (legacy) drop-down and its mask are appended to <body>, outside of the box:
 							// picking a (second) value there is not a click outside of the box
-							if (!dirty || box.contains(e.target) || (e.target.closest && e.target.closest('.select2-drop, #select2-drop-mask'))) return;
+							if (!dirty || box.contains(e.target) || e.target.closest?.('.select2-drop, #select2-drop-mask, #items_type_tabset')) return;
 							dirty = false;
 							if (!!document.adminForm.limitstart) document.adminForm.limitstart.value = 0;
 							Joomla.submitform();
