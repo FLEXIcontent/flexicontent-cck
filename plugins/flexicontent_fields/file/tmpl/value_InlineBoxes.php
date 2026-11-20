@@ -287,6 +287,9 @@ foreach($values as $file_id)
 		$dl_link = $isAdmin ? flexicontent_html::getSefUrl($dl_link) : Route::_( $dl_link );
 	}
 
+	// Download limits: mark the download button / link so that it can be disabled when the quota is exhausted
+	$dl_attr = $authorized ? flexicontent_downloadlimit::getButtonAttrs($field, $file_id, $item->id) : '';
+
 	// SOME behavior FLAGS
 	$not_downloadable = !$dl_link || $prop=='namelist';
 	$filename_shown = (!$authorized || $show_filename);
@@ -394,7 +397,7 @@ else if ($prop !== 'display_properties_only') :
 			// The Download Button
 			$_download_btn_html = '
 				<button type="button" onclick="window.open(\''.$dl_link.'\', ' . ($non_file_url ? "''": "'_self'") . ')"
-					class="' . $file_classes . ' btn-success fcfile_downloadFile ' . $analytics_classes . '" title="'.htmlspecialchars($downloadsinfo, ENT_COMPAT, 'UTF-8').'"
+					class="' . $file_classes . ' btn-success fcfile_downloadFile ' . $analytics_classes . '"' . $dl_attr . ' title="'.htmlspecialchars($downloadsinfo, ENT_COMPAT, 'UTF-8').'"
 				>
 					' . ($compact_display != 2 ? $downloadstext : '') . '
 					' . ($compact_display == 2 ? ' <span class="icon-download"></span>' : '') . '
@@ -488,7 +491,7 @@ else if ($prop !== 'display_properties_only') :
 			// The download link, if filename/title not shown, then display a 'download' prompt text
 			$actions_arr[] =
 				($filename_shown && $link_filename ? $icon.' ' : '')
-				.'<a href="' . $dl_link . '" class="' . $file_classes . ' fcfile_downloadFile ' . $analytics_classes . '" title="' . htmlspecialchars($downloadsinfo, ENT_COMPAT, 'UTF-8') . '" ' . ($non_file_url ? 'target="_blank"' : '') . '>'
+				.'<a href="' . $dl_link . '" class="' . $file_classes . ' fcfile_downloadFile ' . $analytics_classes . '"' . $dl_attr . ' title="' . htmlspecialchars($downloadsinfo, ENT_COMPAT, 'UTF-8') . '" ' . ($non_file_url ? 'target="_blank"' : '') . '>'
 				.($filename_shown && $link_filename ? $name_str : $downloadstext)
 				.'</a>';
 		}

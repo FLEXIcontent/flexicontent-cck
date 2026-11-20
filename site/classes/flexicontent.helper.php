@@ -61,6 +61,7 @@ spl_autoload_register(static function ($class) {
 		'flexicontent_upload'   => JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'upload.php',
 		'flexicontent_tmpl'     => JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'tmpl.php',
 		'flexicontent_security' => JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'security.php',
+		'flexicontent_downloadlimit' => JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'downloadlimit.php',
 		'flexicontent_db'       => JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'db.php',
 		'flexicontent_ajax'     => JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'ajax.php',
 		'flexicontent_favs'     => JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'helpers'.DS.'favs.php',
