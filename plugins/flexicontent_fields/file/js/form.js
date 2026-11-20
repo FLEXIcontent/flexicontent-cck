@@ -3,6 +3,25 @@
 	fcfield_file.debugToConsole = [];
 	fcfield_file.use_native_apis = [];
 	fcfield_file.dialog_handle = [];
+	fcfield_file.pdf_thumb_url = '';
+
+	// Native JS toggles for the icon-only toolbar panels
+	fcfield_file.toggleFields = function(element_id_n)
+	{
+		var box = document.querySelector('.fc-file-value-props[data-name="' + element_id_n + '"]');
+		if (!box) return;
+
+		var btn = document.querySelector('.fc-file-edit-btn[data-for="' + element_id_n + '"]');
+		var isHidden = (window.getComputedStyle(box).display === 'none');
+		box.style.display = isHidden ? 'block' : 'none';
+		if (btn) btn.classList.toggle('active', isHidden);
+	}
+
+	// Kept for backwards compatibility with the old media-URL button
+	fcfield_file.toggleMediaURL = function(element_id_n)
+	{
+		fcfield_file.toggleFields(element_id_n);
+	}
 
 	fcfield_file.initValue = function(field_name_n, config_name)
 	{
@@ -217,9 +236,19 @@
 		container.find('.fc_filedata_txt_nowrap').html(text_nowrap).show();
 		container.find('.fc_filedata_title').val(displaytitle);
 
-		container.find('.fc_preview_thumb').attr('src', file.preview ? file.preview : 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=');
+		var is_pdf      = (file.ext && String(file.ext).toLowerCase() === 'pdf') || /\.pdf$/i.test(file.filename || '');
+		var pdf_preview = (is_pdf && !file.preview && fcfield_file.pdf_thumb_url && file.id)
+			? fcfield_file.pdf_thumb_url.replace('__ID__', file.id)
+			: '';
+		var has_preview = !!file.preview || !!pdf_preview;
 
-		if (file.preview)
+		container.find('.fc_preview_thumb')
+			.attr('src', file.preview ? file.preview : (pdf_preview || 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='))
+			.css('object-fit', pdf_preview ? 'contain' : '')
+			.css('padding', pdf_preview ? '4px' : '')
+			.css('background', pdf_preview ? '#fff' : '');
+
+		if (has_preview)
 		{
 			container.find('.fc_preview_text').html('');
 			if (keep_modal != 2)
@@ -230,7 +259,7 @@
 		}
 		else
 		{
-			container.find('.fc_preview_text').html(file.ext.toUpperCase());
+			container.find('.fc_preview_text').html(String(file.ext || ext).toUpperCase());
 
 			if (container.find('.fcfield_preview_box').hasClass('auto'))
 			{

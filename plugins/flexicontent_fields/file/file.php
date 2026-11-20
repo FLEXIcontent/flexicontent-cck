@@ -74,6 +74,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		$input_grp_class = $cparams->get('bootstrap_ver', 2)==2  ?  'input-append input-prepend' : 'input-group';
 		$btn_item_class  = $cparams->get('bootstrap_ver', 2)==2  ?  'btn' : 'btn btn-outline-secondary';
 		$btn_group_class = $cparams->get('bootstrap_ver', 2)==2  ?  'btn-group' : 'btn-group';
+		$flat_btn_class  = ' fc-flat-btn';
 		$form_font_icons = $cparams->get('form_font_icons', 1);
 		$font_icon_class = $form_font_icons ? ' fcfont-icon' : '';
 		$font_icon_class .= FLEXI_J40GE ? ' icon icon- ' : '';
@@ -147,8 +148,11 @@ class plgFlexicontent_fieldsFile extends FCField
 
 		$iform_allowdel = 0;//$field->parameters->get('iform_allowdel', 1);
 		$fields_box_placing = (int) $field->parameters->get('fields_box_placing', 1);
-		$show_values_expand_btn = (int) $field->parameters->get('show_values_expand_btn', 1);
 		$form_file_preview  = (int) $field->parameters->get('form_file_preview', 2);
+
+		// Width of the file card in the item form
+		$form_card_width = (int) $field->parameters->get('form_card_width', 250);
+		$form_card_width = $form_card_width > 0 ? $form_card_width : 250;
 
 		$iform_title = $inputmode==1 ? 0 : $field->parameters->get('iform_title', 1);
 		$iform_desc  = $inputmode==1 ? 0 : $field->parameters->get('iform_desc',  1);
@@ -163,22 +167,7 @@ class plgFlexicontent_fieldsFile extends FCField
 
 		$custom_props = self::getCustomProps($field, $inputmode);
 
-		// JS code used when cloning a value box: reset custom property inputs to their default
-		$custom_props_js = '';
-		foreach ($custom_props as $n => $cp)
-		{
-			if (!$cp['form']) continue;
-			$custom_props_js .= "
-				var theInput = newField.find('textarea.fc_filecustom" . $n . "').first();
-				theInput.val(" . json_encode($cp['default'], JSON_HEX_TAG | JSON_HEX_AMP) . ");
-				theInput.attr('name', fname_pfx + '[custom" . $n . "]');
-				theInput.attr('id', element_id + '_custom" . $n . "');
-				newField.find('.inlinefile-custom" . $n . "-lbl').first().attr('for', element_id + '_custom" . $n . "').attr('id', element_id + '_custom" . $n . "-lbl');
-			";
-		}
 
-		$secure_default = !$iform_dir   ? 1 : (int) $field->parameters->get('iform_dir_default', 1);
-		$stamp_default  = !$iform_stamp ? 1 : (int) $field->parameters->get('iform_stamp_default', 1);
 
 		$mediapath   = $cparams->get('media_path', 'components/com_flexicontent/medias');
 		$docspath    = $cparams->get('file_path', 'components/com_flexicontent/uploads');
@@ -485,7 +474,6 @@ class plgFlexicontent_fieldsFile extends FCField
 				newField.find('.clear-btn').click();
 
 				newField.find('.fc_filedata_txt_nowrap').html('-');
-				newField.find('.fc_filedata_title').val('-');
 
 				var theInput = newField.find('input.fc_filedata_txt').first();
 				theInput.attr('value', '');
@@ -495,6 +483,14 @@ class plgFlexicontent_fieldsFile extends FCField
 				theInput.attr('name', fname_pfx + '[file-data-txt]');
 				theInput.attr('id', element_id + '_file-data-txt');
 
+				".($iform_title ? "
+				var theInput = newField.find('input.fc_filetitle').first();
+				theInput.val('');
+				theInput.attr('name', fname_pfx + '[file-title]');
+				theInput.attr('id', element_id + '_file-title');
+				newField.find('.fc-file-title-lbl').first().attr('for', element_id + '_file-title').attr('id', element_id + '_file-title-lbl');
+				" : "")."
+
 				var imgPreview = newField.find('.fc_preview_thumb').first();
 				imgPreview.attr('id', element_id + '_image_preview');
 				imgPreview.attr('src', 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=');
@@ -502,89 +498,6 @@ class plgFlexicontent_fieldsFile extends FCField
 				imgPreview.parent().find('.fc_preview_text').html('');
 				".($form_file_preview != 1 ? '
 				imgPreview.parent().hide();' : '')."
-
-				".($iform_title ? "
-				var theInput = newField.find('input.fc_filetitle').first();
-				theInput.val('');
-				theInput.attr('name', fname_pfx + '[file-title]');
-				theInput.attr('id', element_id + '_file-title');
-				newField.find('.inlinefile-title-lbl').first().attr('for', element_id + '_file-title').attr('id', element_id + '_file-title-lbl');
-				" : "")."
-
-				".($iform_lang ? "
-				var theInput = newField.find('select.fc_filelang').first();
-				theInput.get(0).selectedIndex = 0;
-				theInput.attr('name', fname_pfx + '[file-lang]');
-				theInput.attr('id', element_id + '_file-lang');
-				newField.find('.inlinefile-lang-lbl').first().attr('for', element_id + '_file-lang').attr('id', element_id + '_file-lang-lbl');
-				" : "")."
-
-				".($iform_access ? "
-				var theInput = newField.find('select.fc_fileaccess').first();
-				//theInput.get(0).selectedIndex = 0;
-				theInput.val('1');
-				theInput.attr('name', fname_pfx + '[file-access]');
-				theInput.attr('id', element_id + '_file-access');
-				newField.find('.inlinefile-access-lbl').first().attr('for', element_id + '_file-access').attr('id', element_id + '_file-access-lbl');
-				" : "")."
-
-				".($iform_dir ? "
-				var nr = 0;
-				newField.find('.inlinefile-secure-info').remove();
-				newField.find('.inlinefile-secure-data').show();
-				newField.find('input.fc_filedir').each(function() {
-					var elem = jQuery(this);
-					elem.removeAttr('disabled');
-					elem.attr('name', fname_pfx + '[secure]');
-					elem.attr('id', element_id + '_secure_'+nr);
-					if (elem.val() == " . (int) $secure_default .")
-					{
-						elem.next().addClass('active');
-						elem.prop('checked', true);
-					}
-					else
-					{
-						elem.next().removeClass('active');
-						elem.prop('checked', false);
-					}
-					elem.next().attr('for', element_id + '_secure_'+nr).attr('id', element_id + '_file-secure'+nr+'-lbl');
-					nr++;
-				});
-				" : "")."
-
-				".($iform_stamp ? "
-				var nr = 0;
-				newField.find('.inlinefile-stamp-info').remove();
-				newField.find('.inlinefile-stamp-data').show();
-				newField.find('input.fc_filestamp').each(function() {
-					var elem = jQuery(this);
-					elem.removeAttr('disabled');
-					elem.attr('name', fname_pfx + '[stamp]');
-					elem.attr('id', element_id + '_stamp_'+nr);
-					if (elem.val() == " . (int) $stamp_default .")
-					{
-						elem.next().addClass('active');
-						elem.prop('checked', true);
-					}
-					else
-					{
-						elem.next().removeClass('active');
-						elem.prop('checked', false);
-					}
-					elem.next().attr('for', element_id + '_stamp_'+nr).attr('id', element_id + '_file-stamp'+nr+'-lbl');
-					nr++;
-				});
-				" : "")."
-
-				".($iform_desc ? "
-				var theInput = newField.find('textarea.fc_filedesc').first();
-				theInput.val('');
-				theInput.attr('name', fname_pfx + '[file-desc]');
-				theInput.attr('id', element_id + '_file-desc');
-				newField.find('.inlinefile-desc-lbl').first().attr('for', element_id + '_file-desc').attr('id', element_id + '_file-desc-lbl');
-				" : "")."
-
-				".$custom_props_js."
 
 				// Destroy any select library elements (select2 or choices.js)
 				fc_destroySelectLib(newField);
@@ -615,6 +528,10 @@ class plgFlexicontent_fieldsFile extends FCField
 					mulselBTN.attr('id', element_id + '_selectvalue');
 					mulselBTN.attr('data-rowno', uniqueRowN);
 				}
+
+				// Update the optional media-URL button
+				newField.find('.fc-field-mediaurl-btn').attr('data-for', element_id);
+				newField.find('.fc-field-mediaurl-btn').attr('onclick', 'fcfield_file.toggleMediaURL(\'' + element_id + '\');');
 				";
 
 			// Add new field to DOM
@@ -696,11 +613,11 @@ class plgFlexicontent_fieldsFile extends FCField
 
 			$css .= '';
 
-			$remove_button = '<span class="' . $btn_item_class . ' fcfield-delvalue ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
-			$move2         = '<span class="' . $btn_item_class . ' fcfield-drag-handle ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
+			$remove_button = '<span class="' . $btn_item_class . $flat_btn_class . ' fcfield-delvalue ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
+			$move2         = '<span class="' . $btn_item_class . $flat_btn_class . ' fcfield-drag-handle ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
 			$add_here = '';
-			$add_here .= $add_position==2 || $add_position==3 ? '<span class="' . $btn_item_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
-			$add_here .= $add_position==1 || $add_position==3 ? '<span class="' . $btn_item_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
+			$add_here .= $add_position==2 || $add_position==3 ? '<span class="' . $btn_item_class . $flat_btn_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
+			$add_here .= $add_position==1 || $add_position==3 ? '<span class="' . $btn_item_class . $flat_btn_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
 		}
 
 		// Field not multi-value
@@ -716,6 +633,8 @@ class plgFlexicontent_fieldsFile extends FCField
 
 		// Add field's custom CSS / JS
 		$js .= "
+			fcfield_file.pdf_thumb_url = '".\Joomla\CMS\Uri\Uri::root()."plugins/flexicontent_fields/file/pdf_thumb.php?id=__ID__&w=400&k=".md5(\Joomla\CMS\Factory::getApplication()->get('secret').'fc_pdf_thumb')."';
+
 			/**
 			 * Method Wrappers to class methods (used for compatibility)
 			 */
@@ -785,13 +704,6 @@ class plgFlexicontent_fieldsFile extends FCField
 		//$this->setItem($item);
 		//$this->displayField( $formlayout );
 
-		$drop_btn_class =
-			(FLEXI_J40GE
-				? 'toolbar dropdown-toggle dropdown-toggle-split'
-				: 'toolbar dropdown-toggle'
-			);
-		$drop_btn_style = 'padding: 0.4rem; box-sizing: border-box; max-height: 100%; margin: 0; height: 100%;';
-
 		include(self::getFormPath($this->fieldtypes[0], $formlayout));
 
 		// Use inline media field
@@ -841,48 +753,41 @@ class plgFlexicontent_fieldsFile extends FCField
 		foreach($field->html as $n => &$_html)
 		{
 			$uploader_html = $use_inline_uploaders ? $uploader_html_arr[$n] : false;
+
+			// Icon-only edit button, in the toolbar below the preview, opens the file edit popup
+			$edit_btn = '<button type="button" class="' . $btn_item_class . $flat_btn_class . ' fc-file-edit-btn" title="' . \Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_FILE_EDIT_FILE' ) . '" onclick="return fc_editFile_'.$field->id.'(this);"><span class="fc-image-tool-icon fas fa-edit" aria-hidden="true"></span></button>';
+
+			$bottom_toolbar = '
+				<div class="' . $btn_group_class . ' fc-xpended-btns fc-image-bottom-toolbar">
+					<div class="btn-group fc-image-btn-group" role="group">
+						' . ($uploader_html ?
+							$uploader_html->toggleBtn .
+							($use_myfiles > 0 ? $uploader_html->myFilesBtn : '') .
+							$uploader_html->mediaUrlBtn
+						: '') . '
+						' . $edit_btn . '
+					</div>
+				</div>';
+
 			$_html = '
-				'.(!$add_ctrl_btns ? '' : '
-				<div class="'.$btn_group_class.' fc-xpended-btns">
-					'.$move2.'
-					'.$remove_button.'
-					'.(!$add_position ? '' : $add_here)
-					.($use_inline_uploaders && !$file_btns_position ? '
-					<div class="buttons '.$btn_item_class.' fc-iblock ' . (FLEXI_J40GE ? ' dropdown ' : '') . '" style="padding:0 !important;">
-						<div role="button" class="' . $drop_btn_class . ' fcfield-addvalue ' . $font_icon_class . '" data-toggle="dropdown" data-bs-toggle="dropdown" style="'.$drop_btn_style.'">
-							<span class="caret"></span>
-						</div>
-						<ul class="dropdown-menu dropdown-menu-right" role="menu">
-							<li>'.$uploader_html->toggleBtn.'</li>
-							<li>'.$uploader_html->multiUploadBtn.'</li>
-							' . ($use_myfiles > 0 ? '<li>'.$uploader_html->myFilesBtn.'</li>' : '') . '
-							<li>'.$uploader_html->mediaUrlBtn.'</li>
-						</ul>
-					</div>
-					'.$uploader_html->clearBtn.'
-					' : '') . '
+				' . ($multiple && !$add_ctrl_btns ? '<div class="fcclear"></div>' : '') . '
+				<div class="card fc-video-card fc-media-card fc-file-card" style="width: '.$form_card_width.'px; max-width: 100%;">
+				<div class="fc-video-card-body">
+				' . (!$add_ctrl_btns ? '' : '
+				<div class="' . $btn_group_class . ' fc-xpended-btns fc-image-top-toolbar">
+					' . $move2 . '
+					' . (!$add_position ? '' : $add_here) . '
+					' . $remove_button . '
 				</div>
-				'.($fields_box_placing ? '<div class="fcclear"></div>' : '').'
-				').'
-
+				') . '
 				<div class="fc-field-props-box fc-upload-props-box">
-
-					'.($use_inline_uploaders && ($file_btns_position || !$add_ctrl_btns) ? '
-					<div class="fcclear"></div>
-					<div class="btn-group" style="margin: 4px 0 16px 0; display: inline-block;">
-						<div class="'.$btn_group_class.' fc-xpended-btns">
-							'.$uploader_html->toggleBtn.'
-							'.$uploader_html->multiUploadBtn.'
-							' . ($use_myfiles > 0 ? $uploader_html->myFilesBtn : '') . '
-							'.$uploader_html->mediaUrlBtn.'
-							'.$uploader_html->clearBtn.'
-						</div>
+					<div class="fc-field-value-properties-box">
+						' . $_html . '
+						' . $bottom_toolbar . '
 					</div>
-					' : '') . '
-
-				'.$_html.'
-
 				</div>
+				</div><!-- EOF .fc-video-card-body -->
+				</div><!-- EOF .card -->
 				';
 		}
 		unset($_html);
@@ -932,19 +837,6 @@ class plgFlexicontent_fieldsFile extends FCField
 			{
 				$field->html = $uploader_html->thumbResizer . ' ' . $field->html;
 			}
-		}
-
-		// Add toggle button for: Compact values view (= multiple values per row)
-		$show_values_expand_btn = $formlayout === 'field_InlineBoxes' ? $show_values_expand_btn : 0;
-		if (!$use_ingroup && $show_values_expand_btn)
-		{
-			$field->html = '
-			<button type="button" class="fcfield-expand-view-btn btn btn-small" data-expandedFieldState="0" aria-label="' . \Joomla\CMS\Language\Text::_('FLEXI_EXPAND') . '"
-				onclick="fc_toggleCompactValuesView(this, jQuery(this).closest(\'.container_fcfield\'));"
-			>
-				<span class="fcfield-expand-view ' . $font_icon_class . '" aria-hidden="true"></span>&nbsp; ' . \Joomla\CMS\Language\Text::_('FLEXI_EXPAND', true) . '
-			</button>
-			' . $field->html;
 		}
 
 		// Button for popup file selection
@@ -1573,13 +1465,17 @@ class plgFlexicontent_fieldsFile extends FCField
 					continue;
 				}
 
+				// Keep track of the properties actually submitted by the form;
+				// properties edited in the file manager modal are not posted here
+				$submitted_props = $v;
+
 				// validate data or empty/set default values
 				$v['file-del']   = !$iform_allowdel ? 0 : (int) (!empty($v['file-del']) ? 1 : 0);
-				$v['file-title'] = !$iform_title  ? '' : flexicontent_html::dataFilter($v['file-title'],  1000,  'STRING', 0);
-				$v['file-desc']  = !$iform_desc   ? '' : flexicontent_html::dataFilter($v['file-desc'],   10000, 'STRING', 0);
-				$v['file-lang']  = !$iform_lang   ? '' : flexicontent_html::dataFilter($v['file-lang'],   9,     'STRING', 0);
-				$v['file-access']= !$iform_access ? '' : flexicontent_html::dataFilter($v['file-access'], 9,     'ACCESSLEVEL', 0);
-				$v['stamp']      = !$iform_stamp  ? 1 : ((int) $v['stamp'] ? 1 : 0);
+				$v['file-title'] = !$iform_title  ? '' : flexicontent_html::dataFilter(isset($v['file-title']) ? $v['file-title'] : '',  1000, 'STRING', 0);
+				$v['file-desc']  = !$iform_desc   ? '' : flexicontent_html::dataFilter(isset($v['file-desc'])  ? $v['file-desc']  : '', 10000, 'STRING', 0);
+				$v['file-lang']  = !$iform_lang   ? '' : flexicontent_html::dataFilter(isset($v['file-lang'])  ? $v['file-lang']  : '', 9,     'STRING', 0);
+				$v['file-access']= !$iform_access ? '' : flexicontent_html::dataFilter(isset($v['file-access']) ? $v['file-access'] : '', 9,     'ACCESSLEVEL', 0);
+				$v['stamp']      = !$iform_stamp  ? 1 : ((int) (isset($v['stamp']) ? $v['stamp'] : 1) ? 1 : 0);
 				foreach ($custom_props as $cn => $cp)
 				{
 					// HTML allowed, filtered according to the Text Filters of Joomla for the current user's groups
@@ -1588,7 +1484,7 @@ class plgFlexicontent_fieldsFile extends FCField
 
 				if( $new_file )
 				{
-					$v['secure']   = !$iform_dir    ? 1 : ((int) $v['secure'] ? 1 : 0);
+					$v['secure']   = !$iform_dir    ? 1 : ((int) (isset($v['secure']) ? $v['secure'] : 1) ? 1 : 0);
 				}
 
 				$db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
@@ -1643,10 +1539,10 @@ class plgFlexicontent_fieldsFile extends FCField
 						$app->input->set('return', null);
 						$app->input->set('secure', 0);
 						$app->input->set('stamp', 0);
-						$app->input->set('file-url-title', $v['file-title']);
-						$app->input->set('file-url-desc', $v['file-desc']);
-						$app->input->set('file-url-lang', $v['file-lang']);
-						$app->input->set('file-url-access', $v['file-access']);
+						$app->input->set('file-url-title', isset($v['file-title']) ? $v['file-title'] : '');
+						$app->input->set('file-url-desc', isset($v['file-desc']) ? $v['file-desc'] : '');
+						$app->input->set('file-url-lang', isset($v['file-lang']) ? $v['file-lang'] : '');
+						$app->input->set('file-url-access', isset($v['file-access']) ? $v['file-access'] : '');
 
 						$upload_errs = null;
 						$file_id = $fman->addurl(null, $upload_errs);
@@ -1665,12 +1561,17 @@ class plgFlexicontent_fieldsFile extends FCField
 					$dbdata = array();
 
 					$dbdata['id'] = $file_id;
-					if ($iform_title)  $dbdata['altname'] = $v['file-title'];
-					if ($iform_desc)   $dbdata['description'] = $v['file-desc'];
-					if ($iform_lang)   $dbdata['language'] = $v['file-lang'];
-					if ($iform_access) $dbdata['access'] = $v['file-access'];
-					if ($iform_stamp)  $dbdata['stamp']  = $v['stamp'];
-					foreach ($custom_props as $cn => $cp) $dbdata['custom' . $cn] = $v['custom' . $cn];
+					// Only update properties that were actually submitted by the form;
+					// the others are edited from the file manager modal
+					if ($iform_title && isset($submitted_props['file-title']))  $dbdata['altname'] = $v['file-title'];
+					if ($iform_desc  && isset($submitted_props['file-desc']))   $dbdata['description'] = $v['file-desc'];
+					if ($iform_lang  && isset($submitted_props['file-lang']))   $dbdata['language'] = $v['file-lang'];
+					if ($iform_access && isset($submitted_props['file-access'])) $dbdata['access'] = $v['file-access'];
+					if ($iform_stamp && isset($submitted_props['stamp']))        $dbdata['stamp']  = $v['stamp'];
+					foreach ($custom_props as $cn => $cp)
+					{
+						if (isset($submitted_props['custom' . $cn])) $dbdata['custom' . $cn] = $v['custom' . $cn];
+					}
 					//if ($iform_dir)  $dbdata['secure'] = $v['secure'];  // !! Do not change folder for existing files
 
 					// Load file data from DB
