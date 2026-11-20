@@ -288,24 +288,28 @@ function selectItemTypeFilter(button)
 	const select = form.elements.namedItem('filter_type[]');
 	if (tabs.inert || !select || FlexiForm.visible(document.getElementById('fc_filter_form_blocker'))) return;
 
-	// Quick filters apply immediately, including when other filters use an Apply button.
-	const choices = select.fc_choices_instance;
-	const previousTypes = Array.from(select.selectedOptions, option => option.value);
-	const setTypes = values => {
-		if (choices) {
-			choices.removeActiveItems();
-			choices.setChoiceByValue(values);
-		} else {
-			for (const option of select.options) option.selected = values.includes(option.value);
-		}
-	};
+	// Submit the shortcut independently of the filter panel's Apply mode. Keep the
+	// select and its Choices widget at the values belonging to the displayed list.
+	const requestedType = document.createElement('input');
+	requestedType.type = 'hidden';
+	requestedType.name = select.name;
+	requestedType.value = button.value;
 	const association = form.elements.filter_assockey;
 	const previousAssociation = association?.checked;
 	const previousPage = form.elements.limitstart?.value;
-	setTypes(button.value ? [button.value] : []);
-	delFilter('filter_assockey');
-	if (form.elements.limitstart) form.elements.limitstart.value = '0';
-	Joomla.submitform('', form);
+	const wasDisabled = select.disabled;
+	try {
+		select.disabled = true;
+		if (button.value) form.append(requestedType);
+		if (association) association.checked = false;
+		if (form.elements.limitstart) form.elements.limitstart.value = '0';
+		Joomla.submitform('', form);
+	} finally {
+		requestedType.remove();
+		select.disabled = wasDisabled;
+		if (association) association.checked = previousAssociation;
+		if (form.elements.limitstart) form.elements.limitstart.value = previousPage;
+	}
 
 	const blocker = document.getElementById('fc_filter_form_blocker');
 	if (FlexiForm.visible(blocker)) {
@@ -313,9 +317,6 @@ function selectItemTypeFilter(button)
 		tabs.setAttribute('aria-busy', 'true');
 		window.addEventListener('pageshow', function (event) {
 			if (!event.persisted) return;
-			setTypes(previousTypes);
-			if (association) association.checked = previousAssociation;
-			if (form.elements.limitstart) form.elements.limitstart.value = previousPage;
 			tabs.inert = false;
 			tabs.removeAttribute('aria-busy');
 			FlexiForm.show(blocker, false);

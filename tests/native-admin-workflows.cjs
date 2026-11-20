@@ -35,6 +35,7 @@ await test('Items type shortcuts replace a multiple selection and keep the curre
    assert.equal(submissions.at(-1).get('limitstart'), '0');
    assert.equal(submissions.at(-1).has('filter_assockey'), false);
    assert.equal(await page.locator('[aria-current="page"]').textContent(), '2 Types');
+   assert.deepEqual(await page.locator('#filter_type').evaluate(el => [...el.selectedOptions].map(o => o.value)), ['1', '2']);
    assert.equal(await page.locator('nav').evaluate(nav => nav.inert), true);
    assert.equal(await page.locator('.fc_blocker_mssg').textContent(), 'Submitting the form');
    await page.locator('nav button').first().evaluate(el => el.click());
