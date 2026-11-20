@@ -7,6 +7,25 @@
 	fcfield_sharemedia.youtube_key = [];
 
 
+	// Native JS toggles for the two icon-only toolbar panels
+	fcfield_sharemedia.toggleURL = function(element_id_n)
+	{
+		var box = document.querySelector('.sm_url_props[data-name="' + element_id_n + '"]');
+		if (!box) return;
+
+		var btn = document.querySelector('.fc-sm-url-btn[data-for="' + element_id_n + '"]');
+		var isHidden = (window.getComputedStyle(box).display === 'none');
+		box.style.display = isHidden ? 'block' : 'none';
+		if (btn) btn.classList.toggle('active', isHidden);
+	}
+
+
+	fcfield_sharemedia.toggleFields = function(element_id_n)
+	{
+		fcfield_sharemedia.toggleMETArows(element_id_n, 0);
+	}
+
+
 	fcfield_sharemedia.youtubeDurationToSeconds = function(duration)
 	{
 		var match = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
@@ -335,7 +354,8 @@
 		}
 		else
 		{
-			document.getElementById(element_id_n+"_preview").innerHTML = "";
+			// Keep a blank iframe so an empty/cloned card keeps the same 16:9 height as the others
+			document.getElementById(element_id_n+"_preview").innerHTML = '<iframe class="sharedmedia seamless" src="about:blank" style="width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden;" allowFullScreen></iframe>';
 		}
 	}
 
@@ -357,15 +377,15 @@
 	{
 		action = typeof action === "undefined" ? 0 : action;
 
-		var fields = ['title', 'author', 'duration', 'description', 'api_type', 'embed_url', 'media_id', 'preview', 'width', 'height'];
-		var fields_selector = "#" + element_id_n + "_" + fields.join(", " + "#" + element_id_n + "_");
+		var props = document.querySelector('.sm_value_props[data-name="' + element_id_n + '"]');
+		if (!props) return;
 
-		switch (action)
-		{
-			case 1: jQuery(fields_selector).closest("tr").fadeIn(2000); break;
-			case -1: jQuery(fields_selector).closest("tr").hide(); break;
-			case 0: jQuery(fields_selector).closest("tr").toggle(0); break;
-		}
+		var btn = document.querySelector('.fc-sm-edit-btn[data-for="' + element_id_n + '"]');
+		var isHidden = (window.getComputedStyle(props).display === 'none');
+		var show = action === 1 || (action === 0 && isHidden);
+
+		props.style.display = show ? 'block' : 'none';
+		if (btn) btn.classList.toggle('active', show);
 	}
 
 
