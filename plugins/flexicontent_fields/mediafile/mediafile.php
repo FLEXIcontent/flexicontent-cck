@@ -74,6 +74,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		$input_grp_class = $cparams->get('bootstrap_ver', 2)==2  ?  'input-append input-prepend' : 'input-group';
 		$btn_item_class  = $cparams->get('bootstrap_ver', 2)==2  ?  'btn' : 'btn btn-outline-secondary';
 		$btn_group_class = $cparams->get('bootstrap_ver', 2)==2  ?  'btn-group' : 'btn-group';
+		$flat_btn_class  = ' fc-flat-btn';
 		$form_font_icons = $cparams->get('form_font_icons', 1);
 		$font_icon_class = $form_font_icons ? ' fcfont-icon' : '';
 		$font_icon_class .= FLEXI_J40GE ? ' icon icon- ' : '';
@@ -139,6 +140,10 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		$add_ctrl_btns = !$use_ingroup && $multiple;
 
 		$form_info_header = (int) $field->parameters->get('form_info_header', 3);
+
+		// Width of the media file card in the item edit form
+		$form_card_width = (int) $field->parameters->get('form_card_width', 250);
+		$form_card_width = $form_card_width > 0 ? $form_card_width : 250;
 
 		// Inline file property editing
 		$inputmode = (int)$field->parameters->get( 'inputmode', 1 ) ;  // 1: file selection only,  0: inline file properties editing
@@ -587,6 +592,13 @@ class plgFlexicontent_fieldsMediafile extends FCField
 					mulselBTN.attr('id', element_id + '_selectvalue');
 					mulselBTN.attr('data-rowno', uniqueRowN);
 				}
+
+				// Update the toggled properties panel and its icon button
+				newField.find('.mf_value_props').attr('data-name', element_id);
+				newField.find('.fc-media-edit-btn').attr('data-for', element_id);
+				newField.find('.fc-media-edit-btn').attr('onclick', 'fcfield_mediafile.toggleFields(\'' + element_id + '\');');
+				newField.find('.fcfield-mediaurl-btn').attr('data-for', element_id);
+				newField.find('.fcfield-mediaurl-btn').attr('onclick', 'fcfield_mediafile.toggleMediaURL(\'' + element_id + '\');');
 				";
 
 			// Add new field to DOM
@@ -681,11 +693,27 @@ class plgFlexicontent_fieldsMediafile extends FCField
 
 			$css .= '';
 
-			$remove_button = '<span class="' . $btn_item_class . ' fcfield-delvalue ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
-			$move2         = '<span class="' . $btn_item_class . ' fcfield-drag-handle ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
+			$remove_button = '
+				<button type="button" class="' . $btn_item_class . $flat_btn_class . ' fcfield-delvalue ' . $font_icon_class . '"
+					title="' . \Joomla\CMS\Language\Text::_( 'FLEXI_REMOVE_VALUE' ) . '"
+					onclick="deleteField'.$field->id.'(this); return false;"
+				></button>';
+			$move2 = '
+				<button type="button" class="' . $btn_item_class . $flat_btn_class . ' fcfield-drag-handle ' . $font_icon_class . '" onclick="event.preventDefault(); return false;"
+					title="' . \Joomla\CMS\Language\Text::_( 'FLEXI_CLICK_TO_DRAG' ) . '"
+				></button>';
 			$add_here = '';
-			$add_here .= $add_position==2 || $add_position==3 ? '<span class="' . $btn_item_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
-			$add_here .= $add_position==1 || $add_position==3 ? '<span class="' . $btn_item_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
+			$add_here .= $add_position==2 || $add_position==3 ? '
+				<button type="button" class="' . $btn_item_class . $flat_btn_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '"
+					title="' . \Joomla\CMS\Language\Text::_( 'FLEXI_ADD_BEFORE' ) . '"
+					onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1}); return false;"
+				></button> ' : '';
+			$add_here .= $add_position==1 || $add_position==3 ? '
+				<button type="button" class="' . $btn_item_class . $flat_btn_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"
+					title="' . \Joomla\CMS\Language\Text::_( 'FLEXI_ADD_AFTER' ) . '"
+					onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0}); return false;"
+				></button> ' : '';
+
 		}
 
 		// Field not multi-value
@@ -845,48 +873,42 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		foreach($field->html as $n => &$_html)
 		{
 			$uploader_html = $use_inline_uploaders ? $uploader_html_arr[$n] : false;
+			$elementid_n   = $elementid.'_'.$n;
+
+			// Icon-only edit button, in the toolbar below the preview
+			$edit_btn = '<span class="' . $btn_item_class . $flat_btn_class . ' fc-media-edit-btn" data-for="' . $elementid_n . '" title="' . \Joomla\CMS\Language\Text::_( 'FLEXI_EDIT_OPTIONS' ) . '" onclick="fcfield_mediafile.toggleFields(\'' . $elementid_n . '\');"><span class="fc-image-tool-icon fas fa-edit" aria-hidden="true"></span></span>';
+
+			$bottom_toolbar = '
+				<div class="' . $btn_group_class . ' fc-xpended-btns fc-image-bottom-toolbar">
+					<div class="btn-group fc-image-btn-group" role="group">
+						' . ($uploader_html ?
+							$uploader_html->toggleBtn .
+							($use_myfiles > 0 ? $uploader_html->myFilesBtn : '') .
+							$uploader_html->mediaUrlBtn
+						: '') . '
+						' . $edit_btn . '
+					</div>
+				</div>';
+
 			$_html = '
-				'.(!$add_ctrl_btns ? '' : '
-				<div class="'.$btn_group_class.' fc-xpended-btns">
-					'.$move2.'
-					'.$remove_button.'
-					'.(!$add_position ? '' : $add_here)
-					.($use_inline_uploaders && !$file_btns_position ? '
-					<div class="buttons '.$btn_item_class.' fc-iblock ' . (FLEXI_J40GE ? ' dropdown ' : '') . '" style="padding:0 !important;">
-						<div role="button" class="' . $drop_btn_class . ' fcfield-addvalue ' . $font_icon_class . '" data-toggle="dropdown" data-bs-toggle="dropdown" style="'.$drop_btn_style.'">
-							<span class="caret"></span>
-						</div>
-						<ul class="dropdown-menu dropdown-menu-right" role="menu">
-							<li>'.$uploader_html->toggleBtn.'</li>
-							<li>'.$uploader_html->multiUploadBtn.'</li>
-							' . ($use_myfiles > 0 ? '<li>'.$uploader_html->myFilesBtn.'</li>' : '') . '
-							<li>'.$uploader_html->mediaUrlBtn.'</li>
-						</ul>
-					</div>
-					'.$uploader_html->clearBtn.'
-					' : '') . '
+				' . ($multiple && !$add_ctrl_btns ? '<div class="fcclear"></div>' : '') . '
+				<div class="card fc-video-card fc-media-card" style="width: '.$form_card_width.'px; max-width: 100%;">
+				<div class="fc-video-card-body">
+				' . (!$add_ctrl_btns ? '' : '
+				<div class="' . $btn_group_class . ' fc-xpended-btns fc-image-top-toolbar">
+					' . $move2 . '
+					' . (!$add_position ? '' : $add_here) . '
+					' . $remove_button . '
 				</div>
-				'.($fields_box_placing ? '<div class="fcclear"></div>' : '').'
-				').'
-
+				') . '
 				<div class="fc-field-props-box fc-upload-props-box">
-
-					'.($use_inline_uploaders && ($file_btns_position || !$add_ctrl_btns) ? '
-					<div class="fcclear"></div>
-					<div class="btn-group" style="margin: 4px 0 16px 0; display: inline-block;">
-						<div class="'.$btn_group_class.' fc-xpended-btns">
-							'.$uploader_html->toggleBtn.'
-							'.$uploader_html->multiUploadBtn.'
-							' . ($use_myfiles > 0 ? $uploader_html->myFilesBtn : '') . '
-							'.$uploader_html->mediaUrlBtn.'
-							'.$uploader_html->clearBtn.'
-						</div>
+					<div class="fc-field-value-properties-box">
+						' . $_html . '
+						' . $bottom_toolbar . '
 					</div>
-					' : '') . '
-
-				'.$_html.'
-
 				</div>
+				</div><!-- EOF .fc-video-card-body -->
+				</div><!-- EOF .card -->
 				';
 		}
 		unset($_html);
