@@ -1879,3 +1879,87 @@ textarea.fcfield_textareaval {
 #flexicontent .fc-address-card.fc-address-multi .fc-addressint-latlon {
 	grid-template-columns: minmax(0, 1fr);
 }
+/* Phone card: keep all fields inside the card */
+#flexicontent .fc-phone-card {
+	box-sizing: border-box;
+}
+#flexicontent .fc-phone-card .fc-phone-top-row {
+	display: flex !important;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: flex-start;
+	gap: 4px;
+	width: 100%;
+	box-sizing: border-box;
+}
+#flexicontent .fc-phone-card .fc-phone-top-row .fc-xpended-btns {
+	flex: 0 0 auto;
+	justify-content: flex-start !important;
+	width: auto !important;
+	margin: 0;
+}
+#flexicontent .fc-phone-card .fc-phone-top-row .fc-xpended-btns > * {
+	flex: 0 0 auto !important;
+	margin: 0 2px 0 0 !important;
+}
+#flexicontent .fc-phone-card > .fc-video-card-body {
+	min-width: 0;
+}
+#flexicontent .fc-phone-card .fc-phonenumbers-field-tbl {
+	display: block;
+	width: 100% !important;
+	max-width: 100%;
+	min-width: 0;
+	padding: 0 10px 8px;
+	box-sizing: border-box;
+}
+#flexicontent .fc-phone-card .fc-phone-row {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	width: 100%;
+	min-width: 0;
+	box-sizing: border-box;
+}
+#flexicontent .fc-phone-card .fc-phone-lbl {
+	display: block;
+	width: auto;
+	margin: 0;
+	padding: 0;
+	text-align: left;
+	font-weight: 600;
+}
+#flexicontent .fc-phone-card .fc-phone-fields {
+	display: flex;
+	flex-direction: row;
+	gap: 4px;
+	width: 100%;
+	min-width: 0;
+	box-sizing: border-box;
+}
+#flexicontent .fc-phone-card .fc-phonenumbers-field-tbl .nowrap_box {
+	flex: 1 1 0;
+	display: block;
+	width: auto;
+	max-width: 100%;
+	min-width: 0;
+	white-space: normal;
+	box-sizing: border-box;
+}
+#flexicontent .fc-phone-card .fc-phonenumbers-field-tbl input,
+#flexicontent .fc-phone-card .fc-phonenumbers-field-tbl select {
+	width: 100% !important;
+	max-width: 100% !important;
+	min-width: 0 !important;
+	margin: 0 !important;
+	box-sizing: border-box !important;
+}
+#flexicontent .fc-phone-card .fc-phonenumbers-field-tbl .select2-container,
+#flexicontent .fc-phone-card .fc-phonenumbers-field-tbl .choices {
+	width: 100% !important;
+	max-width: 100% !important;
+}
+/* Phone card: spacing between multiple cards on the same row */
+#flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox.floated .fc-phone-card {
+	margin: 0 10px 10px 0;
+}
