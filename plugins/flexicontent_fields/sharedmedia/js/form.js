@@ -18,11 +18,28 @@ window.fcfield_sharemedia = (() => {
   }
 
   function toggleMETArows(id, action = 0) {
+    const props = document.querySelector('.sm_value_props[data-name="' + CSS.escape(id) + '"]');
+    if (props) { togglePanel(props, '.fc-sm-edit-btn', id, action); return; }
     for (const key of ['title', 'author', 'duration', 'description', 'api_type', 'embed_url', 'media_id', 'preview', 'width', 'height']) {
       const row = field(id, key)?.closest('tr');
       if (row) row.style.display = action === -1 || (!action && row.style.display !== 'none') ? 'none' : '';
     }
   }
+
+  function togglePanel(panel, selector, id, action = 0) {
+    if (!panel) return;
+    const show = action === 1 || (action === 0 && getComputedStyle(panel).display === 'none');
+    panel.style.display = show ? 'block' : 'none';
+    const button = document.querySelector(selector + '[data-for="' + CSS.escape(id) + '"]');
+    button?.classList.toggle('active', show);
+    button?.setAttribute('aria-expanded', String(show));
+  }
+
+  function toggleURL(id) {
+    togglePanel(document.querySelector('.sm_url_props[data-name="' + CSS.escape(id) + '"]'), '.fc-sm-url-btn', id);
+  }
+
+  function toggleFields(id) { toggleMETArows(id); }
 
   const embedHosts = {
     youtube: 'https://www.youtube.com/embed/',
@@ -54,7 +71,7 @@ window.fcfield_sharemedia = (() => {
     FlexiMediaMetadata.notice(message(id), '');
     setEmbedData(id, '', '');
     setMetaData(id, {});
-    for (const key of ['height','width']) field(id, key).value = '';
+    for (const key of ['height','width']) { const control = field(id, key); if (control) control.value = ''; }
     toggleMETArows(id, -1);
   }
 
@@ -133,5 +150,5 @@ window.fcfield_sharemedia = (() => {
     if (event.target.matches?.('.fcfield_sharedmedia_valuebox')) setHeight('iframe.sharedmedia', 2/3);
   }, true);
 
-  return { debugToConsole, use_native_apis, youtube_key, fetchData, clearData, setMetaData, setEmbedData, toggleMETArows, setHeight, youtubeDurationToSeconds };
+  return { debugToConsole, use_native_apis, youtube_key, fetchData, clearData, setMetaData, setEmbedData, toggleMETArows, toggleURL, toggleFields, setHeight, youtubeDurationToSeconds };
 })();

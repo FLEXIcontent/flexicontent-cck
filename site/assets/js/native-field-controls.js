@@ -157,7 +157,7 @@ function fc_reindexFieldControls(row, oldId, ref, defaults) {
     } else if (element.id.includes(oldId)) {
       element.id = element.id.replace(oldId, ref.id);
     }
-    for (const attr of ['onclick', 'onchange', 'for', 'aria-controls', 'data-for']) {
+    for (const attr of ['onclick', 'onchange', 'for', 'aria-controls', 'data-for', 'data-name']) {
       const value = element.getAttribute(attr);
       if (value?.includes(oldId)) element.setAttribute(attr, value.replaceAll(oldId, ref.id));
     }
@@ -193,6 +193,10 @@ window.fcfield_sharedmedia_rows = (() => {
     const oldId = (url.dataset.originalId || url.id).slice(0, -4);
     fc_reindexFieldControls(row, oldId, ref, {});
     for (const node of row.querySelectorAll('.fcfield_message_box, .sm_preview')) node.replaceChildren();
+    for (const panel of row.querySelectorAll('.sm_url_props, .sm_value_props')) panel.style.display = 'none';
+    for (const button of row.querySelectorAll('.fc-sm-url-btn, .fc-sm-edit-btn')) {
+      button.classList.remove('active'); button.setAttribute('aria-expanded', 'false');
+    }
     for (const name of ['title', 'author', 'duration', 'description', 'api_type', 'embed_url', 'media_id', 'preview', 'width', 'height']) {
       FlexiForm.show(row.querySelector('#' + CSS.escape(ref.id + '_' + name))?.closest('tr'), false);
     }

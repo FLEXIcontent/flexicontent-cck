@@ -886,6 +886,36 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
     assert.equal(await page.locator('#clip_media_id').inputValue(), '');
   });
 
+  await test('Shared Media card panels and clones keep independent controls', async page => {
+    await form(page, `<div id="clip-row"><button type="button" class="fc-sm-url-btn" data-for="clip_0" onclick="fcfield_sharemedia.toggleURL('clip_0')">URL</button>
+      <button type="button" class="fc-sm-edit-btn" data-for="clip_0" onclick="fcfield_sharemedia.toggleFields('clip_0')">Edit</button>
+      <div class="sm_url_props" data-name="clip_0" style="display:none"><input class="sm_url" id="clip_0_url" value="https://example.test/first"></div>
+      <div class="sm_value_props" data-name="clip_0" style="display:none">${['title','author','duration','description','thumb','api_type','media_id','embed_url'].map(key => `<input id="clip_0_${key}" name="custom[clip][0][${key}]"><label for="clip_0_${key}">${key}</label>`).join('')}</div>
+      <div id="fcfield_message_box_clip_0"></div><div class="sm_preview" id="clip_0_preview"></div></div>`);
+    for (const file of ['site/assets/js/field-repeater.js','site/assets/js/native-field-controls.js','site/assets/js/media-metadata.js','plugins/flexicontent_fields/sharedmedia/js/form.js']) await page.addScriptTag({content:source(file)});
+    await page.locator('.fc-sm-url-btn').focus(); await page.keyboard.press('Enter');
+    assert(await page.locator('.sm_url_props').isVisible());
+    await page.locator('.fc-sm-edit-btn').click();
+    await page.evaluate(() => {
+      const clone=document.getElementById('clip-row').cloneNode(true);clone.id='clone-row';
+      fcfield_sharedmedia_rows.prepare(clone,{id:'clip_1',name:'custom[clip][1]'});document.getElementById('adminForm').append(clone);
+    });
+    const second=page.locator('#clone-row');
+    assert.equal(await second.locator('.sm_value_props').getAttribute('data-name'),'clip_1');
+    assert.equal(await second.locator('.fc-sm-edit-btn').getAttribute('aria-expanded'),'false');
+    assert.equal(await second.locator('.sm_url').inputValue(),'');
+    await second.locator('.fc-sm-url-btn').click();
+    await second.locator('.sm_url').fill('https://example.test/second');
+    await second.locator('.fc-sm-url-btn').click();
+    assert.equal(await second.locator('.sm_url_props').isVisible(),false);
+    assert.equal(await page.locator('#clip_0_url').inputValue(),'https://example.test/first');
+    await second.locator('.fc-sm-edit-btn').click();
+    assert.equal(await second.locator('.sm_value_props').isVisible(),true);
+    await page.evaluate(()=>fcfield_sharemedia.clearData('clip_1'));
+    assert.equal(await second.locator('.sm_value_props').isVisible(),false);
+    assert.equal(await page.locator('#clip-row .sm_value_props').isVisible(),true);
+  });
+
   await test('Google Maps accepts a place and updates form coordinates without jQuery', async page => {
     await form(page, '<input id="a_autocomplete"><select id="a_ac_type"><option value="geocode">Address</option><option value="establishment">Business</option></select>' +
       '<div id="a_messages" data-map-engine="googlemap"></div><div id="a_addressint_map"><div id="map_canvas_a"></div></div>' +
