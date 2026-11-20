@@ -2539,3 +2539,243 @@ textarea.fcfield_textareaval {
 #flexicontent .fc-media-card input.fc_filedata_txt.inlinefile-data-txt {
   width: calc(100% - 20px) !important;
 }
+/***********************************************************
+ * ADDRESSINT field: toolbar on top-left, fields left, map right
+ ***********************************************************/
+#flexicontent .fc-address-card .fc-address-top-row {
+  display: flex !important;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 4px;
+  width: 100%;
+  box-sizing: border-box;
+}
+#flexicontent .fc-address-card .fc-address-top-row .fc-xpended-btns {
+  flex: 0 0 auto;
+  justify-content: flex-start !important;
+  width: auto !important;
+  margin: 0;
+}
+#flexicontent .fc-address-card .fc-field-value-properties-box {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+  gap: 30px;
+  align-items: start;
+  width: 100%;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+#flexicontent .fc-address-card .fcfield_addressint_data {
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 0;
+}
+#flexicontent .fc-address-card .fcfield_addressint_map {
+  grid-column: 2;
+  grid-row: 1;
+  display: block !important;
+  min-width: 0;
+  margin: 0;
+}
+#flexicontent .fc-address-card .fcfield_addressint_data table {
+  width: 100% !important;
+  table-layout: fixed;
+}
+#flexicontent .fc-address-card .fcfield_addressint_data input[type="text"],
+#flexicontent .fc-address-card .fcfield_addressint_data textarea,
+#flexicontent .fc-address-card .fcfield_addressint_data select {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+#flexicontent .fc-address-card .fcfield_addressint_canvas_outer {
+  display: block;
+  width: 100%;
+  margin: 0;
+}
+#flexicontent .fc-address-card .addrint_map_canvas {
+  width: 100% !important;
+  height: auto !important;
+  min-height: 220px;
+  aspect-ratio: 4 / 3;
+}
+@media (max-width: 520px) {
+  #flexicontent .fc-address-card .fc-field-value-properties-box {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  #flexicontent .fc-address-card .fcfield_addressint_data,
+  #flexicontent .fc-address-card .fcfield_addressint_map {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}
+#flexicontent .fc-address-card .fc-address-top-row .fc-xpended-btns > * {
+  flex: 0 0 auto !important;
+  margin: 0 2px 0 0 !important;
+}
+/* Address card: labels above their fields */
+#flexicontent .fc-address-card .fc-addressint-field-tbl,
+#flexicontent .fc-address-card .fc-addressint-field-tbl tbody,
+#flexicontent .fc-address-card .fc-addressint-field-tbl tr,
+#flexicontent .fc-address-card .fc-addressint-field-tbl td {
+  display: block;
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+}
+#flexicontent .fc-address-card .fc-addressint-field-tbl td.key {
+  text-align: left !important;
+}
+#flexicontent .fc-address-card .fc-addressint-field-tbl td.key > label,
+#flexicontent .fc-address-card .fc-addressint-field-tbl td.key > .fc-prop-lbl {
+  display: block !important;
+  width: auto !important;
+  margin: 0 0 2px !important;
+  padding: 0 !important;
+  text-align: left !important;
+  font-weight: 600;
+}
+#flexicontent .fc-address-card .fc-addressint-field-tbl .fc-xpended-row {
+  flex-direction: column;
+  align-items: stretch;
+}
+#flexicontent .fc-address-card .fc-addressint-field-tbl .fc-xpended-row > label {
+  text-align: left !important;
+  min-width: 0 !important;
+}
+#flexicontent .fc-address-card .fcfield_addressint_map .fc-xpended {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  width: 100% !important;
+}
+#flexicontent .fc-address-card .fcfield_addressint_map .fc-xpended > label {
+  text-align: left !important;
+  min-width: 0 !important;
+}
+/* Address card: spacing between multiple cards on the same row */
+#flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox.floated .fc-address-card {
+  margin: 0 10px 10px 0;
+}
+/* Address card: borderless skip button, whole card greyed when skipped */
+#flexicontent .fc-address-card .fcfield-skipvalue {
+  border: 0 !important;
+}
+#flexicontent .fc-address-card.fc-address-skipped {
+  background: #ececec !important;
+  opacity: 0.6;
+  filter: grayscale(1);
+}
+#flexicontent .fc-address-card.fc-address-skipped .fcfield-skipvalue {
+  color: #c00;
+}
+/* Address card: marker tolerance / zoom below the map */
+#flexicontent .fc-address-card .fc-addressint-map-opts {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+  margin-top: 8px;
+  box-sizing: border-box;
+}
+#flexicontent .fc-address-card .fc-addressint-map-opts .fc-xpended {
+  flex: 1 1 120px;
+  width: auto !important;
+  margin: 0;
+}
+/* Address card: latitude and longitude side by side */
+#flexicontent .fc-address-card .fc-addressint-latlon {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+@media (max-width: 400px) {
+  #flexicontent .fc-address-card .fc-addressint-latlon {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+/* Address card: keep all left-column fields inside their column */
+#flexicontent .fc-address-card .fcfield_addressint_data,
+#flexicontent .fc-address-card .fcfield_addressint_data * {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+#flexicontent .fc-address-card .fcfield_addressint_data .fc-xpended-row > * {
+  min-width: 0;
+  max-width: 100%;
+}
+#flexicontent .fc-address-card .fcfield_addressint_data .select2-container,
+#flexicontent .fc-address-card .fcfield_addressint_data .choices,
+#flexicontent .fc-address-card .fcfield_addressint_data .select2-container .select2-selection {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+#flexicontent .fc-address-card .fcfield_addressint_data label {
+  overflow-wrap: anywhere;
+}
+#flexicontent .fc-address-card .fcfield_field_preview_box.fcfield_addressint_map {
+  padding: 0;
+}
+#flexicontent .fc-address-card .fcfield_addressint_data {
+  display: flex !important;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+}
+/* Address card: search icon + autocomplete + type list on one row */
+#flexicontent .fc-address-card .addrint_autocomplete_row {
+  flex-direction: row !important;
+  align-items: center !important;
+  flex-wrap: nowrap;
+  gap: 6px;
+}
+#flexicontent .fc-address-card .addrint_autocomplete_row > label {
+  flex: 0 0 auto;
+  width: auto !important;
+  min-width: 0 !important;
+  text-align: center !important;
+  margin: 0;
+}
+#flexicontent .fc-address-card .addrint_autocomplete_row .addrint_autocomplete {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+#flexicontent .fc-address-card .addrint_autocomplete_row .select2-container,
+#flexicontent .fc-address-card .addrint_autocomplete_row .choices {
+  flex: 0 0 120px;
+  width: 120px !important;
+  max-width: 120px !important;
+}
+#flexicontent .fc-address-card .addrint_autocomplete_row .addrint_autocomplete {
+  width: auto !important;
+}
+/* Address card: marker select and its preview/info on one row */
+#flexicontent .fc-address-card .fc_gm_custom_marker_row > td:last-child,
+#flexicontent .fc-address-card .fc_gm_marker_anchor_row > td:last-child {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  flex-wrap: nowrap;
+  gap: 8px;
+}
+#flexicontent .fc-address-card .fc_gm_custom_marker_row > td:last-child > .select2-container,
+#flexicontent .fc-address-card .fc_gm_custom_marker_row > td:last-child > .choices,
+#flexicontent .fc-address-card .fc_gm_marker_anchor_row > td:last-child > .select2-container,
+#flexicontent .fc-address-card .fc_gm_marker_anchor_row > td:last-child > .choices {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: auto !important;
+  max-width: 100% !important;
+}
+#flexicontent .fc-address-card .fc-marker-native-preview {
+  flex: 0 0 auto;
+  order: 1;
+  margin: 0;
+}
+#flexicontent .fc-address-card.fc-address-multi .fc-addressint-latlon {
+  grid-template-columns: minmax(0, 1fr);
+}

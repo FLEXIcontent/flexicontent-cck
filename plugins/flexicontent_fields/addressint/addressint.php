@@ -65,6 +65,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		$input_grp_class = $cparams->get('bootstrap_ver', 2)==2  ?  'input-append input-prepend' : 'input-group';
 		$btn_item_class  = $cparams->get('bootstrap_ver', 2)==2  ?  'btn' : 'btn btn-outline-secondary';
 		$btn_group_class = $cparams->get('bootstrap_ver', 2)==2  ?  'btn-group' : 'btn-group';
+		$flat_btn_class  = ' fc-flat-btn';
 		$form_font_icons = $cparams->get('form_font_icons', 1);
 		$font_icon_class = $form_font_icons ? ' fcfont-icon' : '';
 		$font_icon_class .= FLEXI_J40GE ? ' icon icon- ' : '';
@@ -124,6 +125,10 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		// MAP Engine to use in item form: 'googlemap' or 'nominatim'
 		$mapapi_edit = $field->parameters->get('mapapi_edit', 'googlemap');
 
+		// Width of the address card in the item edit form
+		$form_card_width = (int) $field->parameters->get('form_card_width', 600);
+		$form_card_width = $form_card_width > 0 ? $form_card_width : 600;
+
 		// Some parameter shortcuts
 		$addr_edit_mode = $field->parameters->get('addr_edit_mode', 'plaintext');
 		$edit_latlon    = (int) $field->parameters->get('edit_latlon',  1);
@@ -136,6 +141,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		$use_country    = (int) $field->parameters->get('use_country',  1);
 
 		$use_custom_marker   = (int) $field->parameters->get('use_custom_marker', 1);
+		$show_marker_anchor  = (int) $field->parameters->get('show_marker_anchor', 0);
 		$default_marker_file = $field->parameters->get('default_marker_file', '');
 		$custom_marker_path  = $field->parameters->get('custom_marker_path', 'modules/mod_flexigooglemap/assets/marker');
 
@@ -270,8 +276,8 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			$ac_type_options .= '<option value="'.htmlspecialchars($ac_type, ENT_COMPAT, 'UTF-8').'"  '.($ac_type == $ac_types_default ? 'selected="selected"' : '').'>'.\Joomla\CMS\Language\Text::_($lbl)."</option>\n";
 		}
 
-		// CSS classes of value container
-		$value_classes  = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
+		// CSS classes of value container ('floated' => several values side by side)
+		$value_classes  = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id . ($fields_box_placing ? ' floated' : '');
 
 		// Field name and HTML TAG id
 		$fieldname = 'custom['.$field->name.']';
@@ -330,7 +336,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 					cancel: false,
 					/*containment: 'parent',*/
 					tolerance: 'pointer'
-					".($field->parameters->get('fields_box_placing', 1) ? "
+					".($fields_box_placing ? "
 					,start: function(e) {
 						//jQuery(e.target).children().css('float', 'left');
 						//fc_setEqualHeights(jQuery(e.target), 0);
@@ -611,8 +617,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 					row.find('.fcfield-expand-view').remove();
 					row.find('.fcfield-insertvalue').remove();
 					row.find('.fcfield-drag-handle').remove();
-					row.find('.fcfield-enablevalue').remove();
-					row.find('.fcfield-disablevalue').remove();
+					row.find('.fcfield-skipvalue').parent().remove();
 					// Do hide effect then remove from DOM
 					row.slideUp(400, function(){ jQuery(this).remove(); });
 					rowCount".$field->id."--;
@@ -622,11 +627,27 @@ class plgFlexicontent_fieldsAddressint extends FCField
 
 			$css .= '';
 
-			$remove_button = '<span class="' . $btn_item_class . ' fcfield-delvalue ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
-			$move2         = '<span class="' . $btn_item_class . ' fcfield-drag-handle ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
+			$remove_button = '
+				<button type="button" class="' . $btn_item_class . $flat_btn_class . ' fcfield-delvalue ' . $font_icon_class . '"
+					title="' . \Joomla\CMS\Language\Text::_( 'FLEXI_REMOVE_VALUE' ) . '"
+					onclick="deleteField'.$field->id.'(this); return false;"
+				></button>';
+			$move2 = '
+				<button type="button" class="' . $btn_item_class . $flat_btn_class . ' fcfield-drag-handle ' . $font_icon_class . '" onclick="event.preventDefault(); return false;"
+					title="' . \Joomla\CMS\Language\Text::_( 'FLEXI_CLICK_TO_DRAG' ) . '"
+				></button>';
 			$add_here = '';
-			$add_here .= $add_position==2 || $add_position==3 ? '<span class="' . $btn_item_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
-			$add_here .= $add_position==1 || $add_position==3 ? '<span class="' . $btn_item_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
+			$add_here .= $add_position==2 || $add_position==3 ? '
+				<button type="button" class="' . $btn_item_class . $flat_btn_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '"
+					title="' . \Joomla\CMS\Language\Text::_( 'FLEXI_ADD_BEFORE' ) . '"
+					onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1}); return false;"
+				></button> ' : '';
+			$add_here .= $add_position==1 || $add_position==3 ? '
+				<button type="button" class="' . $btn_item_class . $flat_btn_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"
+					title="' . \Joomla\CMS\Language\Text::_( 'FLEXI_ADD_AFTER' ) . '"
+					onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0}); return false;"
+				></button> ' : '';
+
 		}
 
 		// Field not multi-value
@@ -640,39 +661,41 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		}
 
 
-		// Add field's custom CSS / JS
+		// Skip value: grey out the whole card, click again to re-enable
 		$js .= "
-			function enableField".$field->id."(el, groupval_box, fieldval_box)
+			function toggleSkipField".$field->id."(el)
 			{
-				// Find field value container
-				var row = fieldval_box ? fieldval_box : jQuery(el).closest('.fcfieldval_container');
+				var row   = jQuery(el).closest('.fcfieldval_container');
+				var card  = row.find('.fc-address-card');
+				var icon  = jQuery(el).find('.fc-skip-icon');
+				var disabled = card.hasClass('fc-address-skipped');
 
-				row.find('.fcfield-enablevalue').parent().hide();
-				row.find('.fcfield-disablevalue').parent().show();
-
-				row.find('.fc-field-prop-disabled').removeAttr('disabled').prop('disabled', false).removeClass('fc-field-prop-disabled');
-				row.find('.fc-field-value-properties-box').removeClass('fc-field-value-disabled');
-			}
-			function disableField".$field->id."(el, groupval_box, fieldval_box)
-			{
-				// Find field value container
-				var row = fieldval_box ? fieldval_box : jQuery(el).closest('.fcfieldval_container');
-
-				row.find('.fcfield-enablevalue').parent().show();
-				row.find('.fcfield-disablevalue').parent().hide();
-
-				row.find(':enabled').attr('disabled', 'disabled').prop('disabled', true).addClass('fc-field-prop-disabled');
-				row.find('.fc-field-value-properties-box').addClass('fc-field-value-disabled');
+				if (disabled)
+				{
+					row.removeClass('fc-address-skipped');
+					card.removeClass('fc-address-skipped');
+					icon.removeClass('fa-eye-slash').addClass('fa-eye');
+					row.find('.fc-field-prop-disabled').removeAttr('disabled').prop('disabled', false).removeClass('fc-field-prop-disabled');
+					row.find('.fc-field-value-properties-box').removeClass('fc-field-value-disabled');
+				}
+				else
+				{
+					row.addClass('fc-address-skipped');
+					card.addClass('fc-address-skipped');
+					icon.removeClass('fa-eye').addClass('fa-eye-slash');
+					row.find('.fc-field-value-properties-box :enabled').attr('disabled', 'disabled').prop('disabled', true).addClass('fc-field-prop-disabled');
+					row.find('.fc-field-value-properties-box').addClass('fc-field-value-disabled');
+				}
 			}
 		";
 
-		// Check if not required, and add buttons  Edit / Skip to allow skipping the value block
-		$enable_disable_btns = !$required /*&& count($required_props)*/ ? '
-			<div class="'.$input_grp_class.' fc-xpended-btns" style="%s">
-				<span class="fcfield-enablevalue ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ENABLE_N_EDIT_VALUE_DATA' ).'" onclick="enableField'.$field->id.'(this);"> '.\Joomla\CMS\Language\Text::_( 'FLEXI_EDIT' ).'</span>
-			</div>
-			<div class="'.$input_grp_class.' fc-xpended-btns" style="%s">
-				<span class="fcfield-disablevalue ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_SKIP_VALUE_DATA_ON_SAVE' ).'" onclick="disableField'.$field->id.'(this);"> '.\Joomla\CMS\Language\Text::_( 'FLEXI_SKIP' ).'</span>
+		// Skip feature is available for non-required fields
+		$enable_disable_btns = !$required;
+
+		// Skip button only (borderless icon), toggles the disabled state of the value
+		$skip_btn = $enable_disable_btns ? '
+			<div class="fc-xpended-btns">
+				<button type="button" class="' . $btn_item_class . $flat_btn_class . ' fcfield-skipvalue" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_SKIP_VALUE_DATA_ON_SAVE' ).'" onclick="toggleSkipField'.$field->id.'(this); return false;"><span class="fc-image-tool-icon fas __EYE_ICON__ fc-skip-icon" aria-hidden="true"></span></button>
 			</div>
 		' : '';
 
@@ -735,17 +758,30 @@ class plgFlexicontent_fieldsAddressint extends FCField
 
 		foreach($field->html as $n => & $_html_)
 		{
+			$value_is_disabled = !empty($field->fc_form_data[$n]->value_disabled);
+			$skip_btn_n = str_replace('__EYE_ICON__', $value_is_disabled ? 'fa-eye-slash' : 'fa-eye', $skip_btn);
+
 			$_html_ = '
-				'.(!$add_ctrl_btns ? '' : '
-				<div class="'.$btn_group_class.' fc-xpended-btns">
-					'.$move2.'
-					'.$remove_button.'
-					'.(!$add_position ? '' : $add_here).'
+				<div class="card fc-video-card fc-address-card'.($fields_box_placing ? ' fc-address-multi' : '').($value_is_disabled ? ' fc-address-skipped' : '').'" style="'.($fields_box_placing ? 'width: '.$form_card_width.'px; max-width: 100%;' : 'width: 100%; max-width: 100%;').'">
+				<div class="fc-video-card-body">
+
+				<div class="fc-address-top-row">
+					'.(!$add_ctrl_btns ? '' : '
+					<div class="'.$btn_group_class.' fc-xpended-btns fc-image-top-toolbar">
+						'.$move2.'
+						'.$remove_button.'
+						'.(!$add_position ? '' : $add_here).'
+					</div>
+					')
+					. $skip_btn_n . '
 				</div>
-				')
-				. ($enable_disable_btns ? sprintf($enable_disable_btns, !$field->fc_form_data[$n]->value_disabled ? 'display:none' : '',  $field->fc_form_data[$n]->value_disabled ? 'display:none' : '') : '') . '
 				<div class="fcclear"></div>
-				'.$_html_;
+
+				'.$_html_.'
+
+				</div><!-- EOF .fc-video-card-body -->
+				</div><!-- EOF .card -->
+				';
 		}
 		unset($_html_);
 

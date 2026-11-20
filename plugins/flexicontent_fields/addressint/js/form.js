@@ -185,7 +185,7 @@
 	{
 		var img = new Image();
 		var url = fcfield_addrint.getCustomMarkerUrl(elementid_n);
-		var anc = jQuery('#' + elementid_n + '_marker_anchor').val();
+		var anc = jQuery('#' + elementid_n + '_marker_anchor').val() || 'BotC';
 
 		img.addEventListener("load", function()
 		{
@@ -546,7 +546,7 @@
 	{
 		var img = new Image();
 		var url = fcfield_addrint.getCustomMarkerUrl(elementid_n);
-		var anc = jQuery('#' + elementid_n + '_marker_anchor').val();
+		var anc = jQuery('#' + elementid_n + '_marker_anchor').val() || 'BotC';
 
 		var map     = fcfield_addrint.map_data[elementid_n].theMap;
 		var markers = fcfield_addrint.map_data[elementid_n].theMarkers;
