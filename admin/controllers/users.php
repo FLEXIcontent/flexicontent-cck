@@ -398,8 +398,15 @@ class FlexicontentControllerUsers extends FlexicontentControllerBaseAdmin
 						$app->logout($user->id);
 					}
 
-					$user->block = $block;
-					$user->save();
+					// 0 or 1: a boolean false reaches the database as an empty string, which strict mode refuses for a number column
+					$user->block = (int) $block;
+
+					if (!$user->save())
+					{
+						$err_msg .= ($block ? 'Could not block user: ' : 'Could not unblock user: ') . $user->get('name') . ' : ' . $user->getError() . "<br>";
+						continue;
+					}
+
 					$msg .= ($block ? 'Blocked user: ' : 'Unblocked user: ') . $user->get('name') . "<br>";
 				}
 			}

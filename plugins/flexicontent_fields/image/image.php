@@ -1397,22 +1397,6 @@ class plgFlexicontent_fieldsImage extends FCField
 
 
 		// ***
-		// *** Rearrange file array so that file properties are groupped per value number
-		// ***
-
-		//echo "<pre>"; print_r($file); echo "</pre>";
-		$files = array();
-		if ($file) foreach( $file as $key => $all )
-		{
-			foreach( $all as $i => $val )
-			{
-				$files[$i][$key] = $val;
-			}
-		}
-		//echo "<pre>"; print_r($files); echo "</pre>";
-
-
-		// ***
 		// *** Reformat the posted data & handle uploading / removing / deleting / replacing image files
 		// ***
 
@@ -1456,36 +1440,9 @@ class plgFlexicontent_fieldsImage extends FCField
 			}
 
 
-			// Add system message if upload error
-			$err_code = isset($files[$n]['error'])
-				? $files[$n]['error']
-				: UPLOAD_ERR_NO_FILE;
-
-			if ( $err_code && $err_code !== UPLOAD_ERR_NO_FILE )
-			{
-				$err_msg = array(
-					UPLOAD_ERR_INI_SIZE => 'The uploaded file exceeds the upload_max_filesize directive in php.ini',
-					UPLOAD_ERR_INI_SIZE => 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form',
-					UPLOAD_ERR_PARTIAL  => 'The uploaded file was only partially uploaded',
-					UPLOAD_ERR_NO_FILE  => 'No file was uploaded',
-					UPLOAD_ERR_NO_TMP_DIR => 'Missing a temporary folder',
-					UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk',
-					UPLOAD_ERR_EXTENSION => 'A PHP extension stopped the file upload'
-				);
-				Factory::getApplication()->enqueueMessage("FILE FIELD: ".$err_msg[$err_code], 'warning' );
-				continue;
-			}
-
-			// Handle uploading a new original file
-			$new_file = $err_code === 0;
-			$new_file_uploaded = null;
-			if ($new_file)
-			{
-				$new_file_uploaded = $this->uploadOriginalFile($field, $v, $files[$n]);
-			}
-
 			// Handle copying original files from a server folder during CSV import
-			else if ($is_importcsv && $import_media_folder )
+			// (the item form has no file input for this field: its uploader sends the files in requests of their own)
+			if ($is_importcsv && $import_media_folder )
 			{
 				$filename = basename($v['originalname']);
 				$sub_folder = dirname($v['originalname']);
@@ -1915,157 +1872,6 @@ class plgFlexicontent_fieldsImage extends FCField
 	// ***
 	// *** VARIOUS HELPER METHODS
 	// ***
-
-
-	/**
-	 * Method to handle the uploading of an image file (for 'DB-reusable' mode and not for 'folder' mode)
-	 */
-
-	function uploadOriginalFile($field, &$post, $file)
-	{
-		$app    = Factory::getApplication();
-		$format = $app->input->get('format', 'html', 'cmd');
-		$err_text = null;
-
-		// Get the component configuration
-		$cparams = ComponentHelper::getParams( 'com_flexicontent' );
-		$params = clone($cparams);
-
-		// Merge field parameters into the global parameters
-		$fparams = $field->parameters;
-		$params->merge($fparams);
-
-
-		// Set FTP credentials, if given
-		\Joomla\CMS\Client\ClientHelper::setCredentialsFromRequest('ftp');
-
-		// Make the filename safe
-		$file['name'] = File::makeSafe($file['name']);
-
-		$all_media    = $field->parameters->get('list_all_media_files', 0);
-		$unique_thumb_method = $field->parameters->get('unique_thumb_method', 0);
-
-		// IMAGE SOURCE, should be always ZERO (DB-mode) inside this function
-		$image_source = (int) $field->parameters->get('image_source', 0);
-		$image_source = $image_source > 1 ? $this->nonImplementedMode($image_source, $field) : $image_source;
-		$target_dir   = (int) $field->parameters->get('target_dir', 1);
-
-		// FLAG to indicate if images are shared across fields, has the effect of adding field id to image thumbnails
-		$multiple_image_usages = $image_source == 0 && $all_media && $unique_thumb_method == 0;
-		$extra_prefix = $multiple_image_usages  ?  'fld' . $field->id . '_'  :  '';
-
-		if ( isset($file['name']) && $file['name'] != '' )
-		{
-			// Only handle the secure folder
-			$path = ($target_dir ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH).DS;
-
-			/**
-			 * Check that file contents are safe, and make filename file-system safe
-			 * transliterating it according to given language (this forces lowercase)
-			 */
-			$upload_check = flexicontent_upload::check($file, $err_text, $params);
-
-			/**
-			 * Sanitize the file name (filesystem-safe, (this should have been done above already))
-			 * and also return an unique filename for the given folder
-			 */
-			$filename     = flexicontent_upload::sanitize($path, $file['name']);
-			$filepath     = Path::clean($path.$filename);
-
-			//perform security check according
-			if (!$upload_check)
-			{
-				if ($format === 'json')
-				{
-					$log = \Joomla\CMS\Log\Log::getInstance('com_flexicontent.error.php');
-					$log->addEntry(array(
-						'comment' => 'Invalid: ' . $filepath . ': ' . $err_text
-					));
-					header('HTTP/1.0 415 Unsupported Media Type');
-					die('Error. Unsupported Media Type!');
-				}
-
-				$app->enqueueMessage('Field: ' . $field->label . ' : ' . \Joomla\CMS\Language\Text::_($err_text), 'error');
-				return false;
-			}
-
-			//get the extension to record it in the DB
-			$ext = strtolower(flexicontent_upload::getExt($filename));
-
-			/**
-			 * We allow Joomla default security to execute, if user really uploads an image file, it should not be trigger anyway
-			 */
-			$upload_success = File::upload($file['tmp_name'], $filepath);
-
-			if (!$upload_success)
-			{
-				if ($format === 'json')
-				{
-					$log = \Joomla\CMS\Log\Log::getInstance('com_flexicontent.error.php');
-					$log->addEntry(array('comment' => 'Cannot upload: '.$filepath));
-					header('HTTP/1.0 409 Conflict');
-					jexit('Error. File already exists');
-				}
-
-				$app->enqueueMessage('Field: ' . $field->label . ' : ' . \Joomla\CMS\Language\Text::_('FLEXI_UNABLE_TO_UPLOAD_FILE'), 'error');
-				return false;
-			}
-			else
-			{
-				$db     = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
-				$user   = Factory::getApplication()->getIdentity();
-				$config = Factory::getApplication()->getConfig();
-
-				$timezone = $config->get('offset');
-				$date = Factory::getDate('now');
-				$date->setTimeZone( new DateTimeZone( $timezone ) );
-
-				$obj = new stdClass();
-				$obj->filename	= $filename;
-				$obj->altname		= $file['name'];
-				$obj->url				= 0;
-				$obj->secure		= 1;
-				$obj->access		= 1;  // public
-				$obj->ext				= $ext;
-				$obj->hits			= 0;
-				$obj->uploaded		= $date->toSql();
-				$obj->uploaded_by	= $user->get('id');
-
-				// A new row: its required columns (description, attribs) need a value, or strict mode refuses the INSERT
-				flexicontent_db::fitRecordToTable($obj, '#__flexicontent_files', true);
-
-				if ($format === 'json')
-				{
-					$log = \Joomla\CMS\Log\Log::getInstance();
-					$log->addEntry(array('comment' => $filepath));
-
-					$db->insertObject('#__flexicontent_files', $obj);
-					jexit('FLEXI_UPLOAD_COMPLETE');
-				}
-				else
-				{
-					$db->insertObject('#__flexicontent_files', $obj);
-					$app->enqueueMessage($field->label . ' : ' . \Joomla\CMS\Language\Text::_('FLEXI_UPLOAD_COMPLETE'));
-
-					$sizes = array('l', 'm', 's', 'b');
-					foreach ($sizes as $size)
-					{
-						// create the thumbnail
-						$this->create_thumb( $field, $filename, $size, $src_path='', $dest_path='', $copy_original=0, $extra_prefix );
-
-						// set the filename for posting
-						$post['originalname'] = $filename;
-					}
-					return true;
-				}
-			}
-		}
-		else
-		{
-			$app->enqueueMessage('Field: ' . $field->label . ' : ' . \Joomla\CMS\Language\Text::_('FLEXI_UNABLE_TO_UPLOAD_FILE'), 'error');
-			return false;
-		}
-	}
 
 
 	/**
