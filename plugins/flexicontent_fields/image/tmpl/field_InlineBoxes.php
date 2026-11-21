@@ -288,16 +288,15 @@ foreach ($field->value as $index => $value)
 
 		if (isset($value['existingname']))
 		{
-			$ext = strtolower(flexicontent_upload::getExt($image_subpath));
-			$f = in_array( $ext, array('png', 'gif', 'jpeg', 'jpg', 'webp', 'wbmp', 'bmp', 'ico') ) ? '&f='.$ext : '';
-			$img_link = str_replace('\\', '/', $img_link);
-
-			/*$img_link = \Joomla\CMS\Uri\Uri::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' .
-				htmlspecialchars($img_link . '&w='.$preview_thumb_w . '&h=' . $preview_thumb_h . '&zc=1&q=95&ar=x' . $f);*/
-
-			$img_link = htmlspecialchars(phpThumbURL(
-				'src=' . $img_link . '&w=' . $preview_thumb_w . '&h=' . $preview_thumb_h . '&zc='.($thumb_method ? 1: 0).'&q=95&ar=x' . $f,
-				\Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/librairies/phpthumb/phpThumb.php'
+			$img_src  = str_replace('\\', '/', $abs_url_base . $image_subpath);
+			$img_link = flexicontent_images::phpThumbURL(array(
+				'src' => $img_src,
+				'w'   => $preview_thumb_w,
+				'h'   => $preview_thumb_h,
+				'zc'  => $thumb_method ? 1 : 0,
+				'q'   => 95,
+				'ar'  => 'x',
+				'f'   => flexicontent_images::phpThumbFormat($img_src),
 			));
 		}
 	}
