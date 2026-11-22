@@ -75,7 +75,6 @@ class JFormFieldFclayout extends GroupedlistField
 		// Get current extension and id being edited
 		$app    = Factory::getApplication();
 		$jinput = $app->input;
-		$task   = $jinput->get('task', '', 'CMD');
 
 		$ext_option = $jinput->get('option', '', 'CMD');
 		$ext_view   = $jinput->get('view', '', 'CMD');
@@ -277,7 +276,6 @@ class JFormFieldFclayout extends GroupedlistField
 		// ---------------------------------------------------------------
 		// Build the select element
 		// ---------------------------------------------------------------
-		$_name      = $this->fieldname;
 		$fieldname  = $this->name;
 		$element_id = $this->id;
 
@@ -290,27 +288,9 @@ class JFormFieldFclayout extends GroupedlistField
 		}
 
 		$attribs .= ' class="fc-element-auto-init ' . $class . '"';
-		$attribs .= ' onchange="fc_getLayout_' . $_name . '(this);"';
 
 		$tmpl_container = (string) ($attributes['tmpl_container'] ?? '');
 		$params_source  = (string) ($attributes['params_source']  ?? '');
-
-		// Determine fieldset group name for current view
-		switch ($ext_view)
-		{
-			case 'field':
-				$fld_groupname = 'attribs_';
-				break;
-			case 'type':
-				$fld_groupname = in_array($task, ['edit', 'add']) ? 'attribs_' : 'params_';
-				break;
-			case 'component':
-				$fld_groupname = '';
-				break;
-			default:
-				$fld_groupname = 'params_';
-				break;
-		}
 
 		flexicontent_html::loadFramework('flexi-lib');
 		Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_flexicontent/assets/js/layout-params.js', array('version' => 'auto'));
@@ -319,18 +299,17 @@ class JFormFieldFclayout extends GroupedlistField
 		{
 			$options = json_encode(array(
 				'remote' => $params_source === 'file', 'container' => $tmpl_container,
-				'stripPrefix' => $stripPrefix, 'layouts' => $layout_files, 'label' => $layout_label,
+				'stripPrefix' => $stripPrefix, 'trimDisplayName' => $trimDisplayname,
+				'layouts' => $layout_files, 'label' => $layout_label,
 				'url' => 'index.php?' . http_build_query(array(
 					'option' => 'com_flexicontent', 'task' => 'templates.getlayoutparams',
 					'ext_option' => $ext_option, 'ext_view' => $ext_view, 'ext_type' => $ext_type,
 					'ext_name' => $ext_name, 'layout_pfx' => $layout_pfx, 'ext_id' => $pk,
 					'directory' => $directory, 'layout_sfx' => $layout_sfx, 'format' => 'raw', Session::getFormToken() => 1,
 				)),
-			), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
-			$element = json_encode('jform_' . $fld_groupname . $_name);
-			echo '<script>function fc_getLayout_' . $_name . '(el, initial) { return fc_loadLayoutParams(el, initial, ' . $options . '); }
-			FlexiForm.ready(() => { const el = document.getElementById(' . $element . '); if (!el) return;
-			fc_getLayout_' . $_name . '(el, true); el.addEventListener("initialize-fc-element", () => fc_getLayout_' . $_name . '(el, true)); });</script>';
+			));
+			$attribs .= ' data-fc-layout-params="' . htmlspecialchars($options, ENT_QUOTES, 'UTF-8') . '"';
+			Text::script('FLEXI_PLEASE_WAIT');
 		}
 
 		// Compute the current selected values

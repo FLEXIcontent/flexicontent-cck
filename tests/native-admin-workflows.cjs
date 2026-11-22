@@ -105,4 +105,76 @@ await test('Layout requests abort stale selections and keep the latest form',lay
 await test('Layout HTTP failure preserves the existing form and permits retry',layout,async page=>{
  await page.evaluate(()=>{window.fc_initDynamicLayoutJsCss=(id,events,html)=>{document.getElementById(id).innerHTML=html;};window.options={remote:true,url:'/params',container:'layout',stripPrefix:'',label:'Layout'};});let calls=0;await page.route('**/params?**',r=>r.fulfill(++calls===1?{status:500,body:'Failure'}:{body:'<input value="Recovered">'}));await page.addScriptTag({path:path.join(root,'site/assets/js/layout-params.js')});await page.evaluate(()=>fc_loadLayoutParams(document.getElementById('layout'),true,options));assert.equal(await page.locator('#attrib-layout').innerText(),'Original');assert.equal(await page.evaluate(()=>messages.length),1);await page.evaluate(()=>fc_loadLayoutParams(document.getElementById('layout'),true,options));assert.equal(await page.locator('#attrib-layout input').inputValue(),'Recovered');
 });
+
+await test('Layouts inserted by a field type change load and keep saved parameters aligned', `
+  <form id="adminForm">
+    <input name="task" value="fields.save">
+    <div id="fieldspecificproperties"></div>
+  </form>`, async page => {
+  const requests = [];
+  let failRequest;
+  await page.route('**/params?**', async route => {
+    const filename = new URL(route.request().url()).searchParams.get('layout_name');
+    requests.push(filename);
+    if (filename === 'value_gallery_glightbox' && failRequest) {
+      await failRequest;
+      return route.fulfill({status: 503, body: 'Service unavailable'});
+    }
+    return route.fulfill({body: '<input name="layout_setting" value="' + filename + '">'});
+  });
+  await page.evaluate(() => {
+    window.Joomla = {Text: {_: key => key}};
+    window.fc_initDynamicLayoutJsCss = (id, events, html) => { document.getElementById(id).innerHTML = html; };
+    window.submissions = [];
+    const form = document.getElementById('adminForm');
+    form.addEventListener('submit', event => {
+      event.preventDefault();
+      submissions.push(Object.fromEntries(new FormData(form)));
+    });
+    window.submitLayoutForm = task => { form.elements.task.value = task; form.requestSubmit(); };
+  });
+  await page.addScriptTag({path: path.join(root, 'site/assets/js/layout-params.js')});
+  await page.evaluate(() => {
+    const properties = document.getElementById('fieldspecificproperties');
+    properties.innerHTML = `
+      <ul><li><a href="#attrib-gallery">Gallery</a></li></ul>
+      <div id="attrib-gallery"></div>
+      <select id="gallery" name="gallery">
+        <option value="12" data-filename="value_gallery_swiper">Swiper</option>
+        <option value="11" data-filename="value_gallery_glightbox">GLightbox</option>
+      </select>`;
+    const select = properties.querySelector('select');
+    select.dataset.fcLayoutParams = JSON.stringify({
+      remote:true, url:'/params', container:'gallery', stripPrefix:'value_', trimDisplayName:'gallery_', label:'Desktop'
+    });
+    select.dispatchEvent(new CustomEvent('initialize-fc-element', {bubbles:true}));
+    properties.dispatchEvent(new CustomEvent('joomla:updated', {bubbles:true}));
+  });
+  await page.waitForFunction(() => document.querySelector('#attrib-gallery input')?.value === 'value_gallery_swiper');
+  assert.deepEqual(requests, ['value_gallery_swiper']);
+  assert.equal(await page.locator('[href="#attrib-gallery"]').innerText(), 'Desktop: swiper');
+
+  let releaseFailure;
+  failRequest = new Promise(resolve => { releaseFailure = resolve; });
+  await page.locator('#gallery').selectOption('11');
+  await page.locator('#attrib-gallery[aria-busy="true"]').waitFor();
+  try {
+    await page.evaluate(() => { submitLayoutForm('fields.save'); submitLayoutForm('fields.cancel'); });
+    assert.deepEqual(await page.evaluate(() => submissions.map(entry => entry.task)), ['fields.cancel']);
+    assert.equal(await page.evaluate(() => messages[0]?.type), 'warning');
+  } finally {
+    releaseFailure();
+  }
+  await page.waitForFunction(() => !document.querySelector('#attrib-gallery[aria-busy]'));
+  assert.equal(await page.locator('#gallery').inputValue(), '12');
+  assert.equal(await page.locator('#attrib-gallery input').inputValue(), 'value_gallery_swiper');
+
+  failRequest = null;
+  await page.locator('#gallery').selectOption('11');
+  await page.waitForFunction(() => !document.querySelector('#attrib-gallery[aria-busy]'));
+  await page.evaluate(() => submitLayoutForm('fields.save'));
+  assert.deepEqual(await page.evaluate(() => submissions.at(-1)), {
+    task:'fields.save', gallery:'11', layout_setting:'value_gallery_glightbox'
+  });
+});
 }finally{await browser.close();console.log(JSON.stringify(results,null,2));}})().catch(e=>{console.error(e);process.exitCode=1});

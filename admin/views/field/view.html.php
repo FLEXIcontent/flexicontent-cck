@@ -368,6 +368,11 @@ class FlexicontentViewField extends FlexicontentViewBaseRecord
 	
 		if (!$row->iscore)
 		{
+			// A type loaded from the raw view may introduce layout and colour controls.
+			$assets = \Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/assets/js/';
+			$document->addScript($assets . 'layout-params.js', array('version' => 'auto'));
+			$document->addScript($assets . 'color-input.js', array('version' => 'auto'), array('defer' => true));
+			\Joomla\CMS\Language\Text::script('FLEXI_PLEASE_WAIT');
 			$fieldSettingsUrl = json_encode(
 				'index.php?option=com_flexicontent&task=fields.getfieldspecificproperties&format=raw&cid=' . (int) $form->getValue('id')
 			);
@@ -389,7 +394,7 @@ class FlexicontentViewField extends FlexicontentViewBaseRecord
 							headers: {'X-Requested-With': 'XMLHttpRequest'},
 							signal: request.signal
 						});
-						if (!response.ok) throw new Error('HTTP ' + response.status);
+						if (!response.ok || response.redirected) throw new Error('HTTP ' + response.status);
 						const html = await response.text();
 						if (request.signal.aborted) return;
 						fc_initDynamicLayoutJsCss('fieldspecificproperties', ['subform-row-add'], html);
@@ -398,7 +403,7 @@ class FlexicontentViewField extends FlexicontentViewBaseRecord
 					} catch (error) {
 						if (request.signal.aborted) return;
 						typeSelect.value = appliedType;
-						typeSelect.fc_choices_instance?.refresh();
+						typeSelect.fc_choices_instance?.setChoiceByValue(appliedType);
 						Joomla.renderMessages({error: [FlexiForm.text('JERROR_AN_ERROR_HAS_OCCURRED')]});
 					} finally {
 						if (fieldSettingsRequest === request) properties.removeAttribute('aria-busy');
