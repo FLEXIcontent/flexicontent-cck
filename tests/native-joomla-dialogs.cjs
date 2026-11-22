@@ -19,18 +19,39 @@ if(!joomla)throw Error('Set FLEXI_TEST_JOOMLA to a Joomla 6 installation.');
    await page.addStyleTag({path:path.join(joomla,'media/templates/administrator/atum/css/template.css')});
    await page.locator('#open').click();
    for(let i=0;i<2;i++){
-    await page.evaluate(()=>window.handle=fc_showAsDialog(document.getElementById('content'),1000,700,null,{title:'Test <literal>',closeOnEscape:true}));
+    await page.evaluate(() => {
+      const content = document.getElementById('content');
+      const tooltip = document.createElement('span');
+      tooltip.id = 'temporary-tooltip';
+      content.after(tooltip);
+      if (!document.getElementById('after-content')) {
+        const sibling = document.createElement('span');
+        sibling.id = 'after-content';
+        tooltip.after(sibling);
+      }
+      window.closeCalls = 0;
+      window.handle = fc_showAsDialog(content, 1000, 700, () => { window.closeCalls++; }, {title:'Test <literal>',closeOnEscape:true});
+    });
     const dialog=page.locator('joomla-dialog.fc-joomla-dialog dialog[open]');
     await dialog.waitFor();assert.equal(await dialog.locator('h3').innerText(),'Test <literal>');
     assert.equal(await page.locator('#value').evaluate(el=>el.form.id),'adminForm');
     await page.locator('#value').fill('Round trip '+i);
     assert.equal(await page.evaluate(()=>new FormData(document.getElementById('adminForm')).get('value')),'Round trip '+i);
     const bounds=await dialog.boundingBox();assert(bounds.x>=-1 && bounds.x+bounds.width<=width+1);
-    await page.keyboard.press('Escape');await dialog.waitFor({state:'detached'});
+    // Bootstrap removes the picker's former next sibling when its tooltip fades.
+    await page.locator('#temporary-tooltip').evaluate(node => node.remove());
+    if (i === 0) await dialog.locator('[data-button-close]').click();
+    else await page.keyboard.press('Escape');
+    await dialog.waitFor({state:'detached'});
+    assert.deepEqual(errors, []);
     await page.locator('#adminForm #content').waitFor({state:'attached'});
     assert.equal(await page.locator('#adminForm #content').count(),1);
     assert.equal(await page.locator('#value').getAttribute('form'),null);
     assert.equal(await page.evaluate(()=>document.activeElement.id),'open');
+    assert.deepEqual(await page.evaluate(() => [
+      document.getElementById('content').nextElementSibling?.id, window.closeCalls,
+      FlexiForm.data(document.body, 'fc_modal_count'), document.body.classList.contains('fc-no-scroll')
+    ]), ['after-content', 1, 0, false]);
    }
    await page.evaluate(()=>{window.confirmed=null;FlexiForm.confirm('Delete <literal>?').then(v=>window.confirmed=v);});
    await page.locator('joomla-dialog-confirm').count();

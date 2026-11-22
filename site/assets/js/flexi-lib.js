@@ -109,12 +109,17 @@
 		const Dialog = window.customElements?.get('joomla-dialog');
 		const titleText = document.createElement('span'); titleText.textContent = settings.title || '';
 		const popup = Dialog && settings.modal !== false ? new Dialog({
-			popupType: 'inline', popupContent: content, textHeader: titleText.innerHTML,
+			popupType: 'inline', textHeader: titleText.innerHTML,
 			cancelable: settings.closeOnEscape !== false, className: 'fc-joomla-dialog',
 			preferredParent: settings.keepPlace ? marker.parentNode : document.body
 		}) : null;
-		const dialog = popup ? popup.getBody().closest('dialog') : document.createElement('dialog');
-		if (!popup) {
+		const popupBody = popup?.getBody();
+		const dialog = popupBody ? popupBody.closest('dialog') : document.createElement('dialog');
+		if (popupBody) {
+			// Restore the live form at our marker. Joomla's inline-content restoration
+			// would also try to insert it before its former sibling, which may be a transient tooltip.
+			popupBody.append(content);
+		} else {
 		dialog.className = 'fc-native-dialog ui-dialog ui-widget ui-widget-content';
 		dialog.style.cssText = 'position:fixed;padding:0;margin:auto;max-width:calc(100vw - 10px);max-height:calc(100vh - 10px);border:1px solid #aaa;';
 		const titlebar = document.createElement('div');
