@@ -33,6 +33,11 @@
 			});
 			new FormData(form).forEach(function (value, name) {
 				if (/^[a-f0-9]{32}$/i.test(name) || /^(task|fc_doajax_submit|fcdata_serialized(?:_count)?)$/.test(name)) return;
+
+				// Banner and Plupload can add or remove idle values during initialization.
+				if (value === '' && /^fcb_video_posters\[\d+\]\[(landscape|portrait)\]\[(image|video)\]$/.test(name)) return;
+				if (value === '0' && /^custom_.+_uploader_\d+_count$/.test(name)) return;
+
 				if (Object.prototype.hasOwnProperty.call(editors, name)) value = editors[name];
 				if (value instanceof File) value = value.name ? [value.name, value.size, value.lastModified].join(':') : '';
 				values.push([name, String(value)]);
@@ -71,6 +76,7 @@
 			};
 		}
 		window.addEventListener('beforeunload', function (event) {
+			if (navigator.userActivation && !navigator.userActivation.hasBeenActive) return;
 			if (!leaving && (form.fc_ajax_saving || snapshot() !== saved)) {
 				event.preventDefault();
 				event.returnValue = '';
