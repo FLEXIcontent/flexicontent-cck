@@ -1049,15 +1049,19 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
         target[event] = callback;
         return {remove() { delete target[event]; }};
       }};
+      class PlaceAutocompleteElement extends HTMLElement {}
+      customElements.define('gmp-place-autocomplete', PlaceAutocompleteElement);
       window.google = {maps:{
         event:events,
-        places:{Autocomplete:class {
-          constructor(input, options) { this.options = options; }
-          getPlace() { return window.testPlace; }
-          setTypes(types) { this.types = types; }
-        }},
-        Map:class { constructor(canvas, options) { this.zoom = options.zoom; } getZoom() { return this.zoom; } },
-        Marker:class { constructor(options) { this.position = options.position; } getPosition() { return this.position; } setPosition(pos) { this.position = pos; } setIcon(icon) { this.icon = icon; } },
+        places:{PlaceAutocompleteElement},
+        Map:class {
+          constructor(canvas, options) { this.div = canvas; this.zoom = options.zoom; }
+          getZoom() { return this.zoom; } getDiv() { return this.div; } setOptions(options) { Object.assign(this, options); }
+        },
+        Marker:class {
+          constructor(options) { this.position = options.position; this.map = options.map; }
+          getPosition() { return this.position; } setPosition(pos) { this.position = pos; } setIcon(icon) { this.icon = icon; } getMap() { return this.map; }
+        },
         Geocoder:class { geocode(_, callback) { callback([window.testPlace], 'OK'); } },
         geometry:{spherical:{computeDistanceBetween:() => window.testDistance}},
         MapTypeId:{ROADMAP:'roadmap'}, Animation:{DROP:'drop'}, GeocoderStatus:{OK:'OK'}
@@ -1080,7 +1084,20 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
       fields.map_zoom.address = 16;
       fields.map_type.address = 'ROADMAP';
       fcfield_address.start('a', 'address');
-      fields.autoComplete.a.place_changed();
+      // A picked prediction: the widget hands over a Place, whose details are fetched before use.
+      const selection = new Event('gmp-select');
+      selection.placePrediction = {toPlace: () => ({
+        async fetchFields() {},
+        formattedAddress:testPlace.formatted_address,
+        location:testPlace.geometry.location,
+        addressComponents:testPlace.address_components.map(part => ({types:part.types, shortText:part.short_name, longText:part.long_name})),
+      })};
+      fields.autoComplete.a.dispatchEvent(selection);
+    });
+    await page.waitForFunction(() => document.getElementById('a_addr_display').value !== '');
+    assert.equal(await page.locator('#a_autocomplete').evaluate(el => el.tagName), 'GMP-PLACE-AUTOCOMPLETE');
+    await page.evaluate(() => {
+      const fields = fcfield_addrint;
       fields.google_maps.a.zoom = 18;
       fields.google_maps.a.zoom_changed();
     });
@@ -1099,7 +1116,7 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
       const fields = fcfield_addrint;
       document.getElementById('a_ac_type').value = 'establishment';
       fields.changeAutoCompleteType('a');
-      return fields.autoComplete.a.types;
+      return fields.autoComplete.a.includedPrimaryTypes;
     });
     assert.deepEqual(testData, ['establishment']);
   });
