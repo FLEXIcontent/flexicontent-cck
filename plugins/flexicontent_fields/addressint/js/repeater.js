@@ -19,7 +19,7 @@ window.fcfield_address = (() => {
     FlexiForm.show(row.querySelector('.fcfield-disablevalue')?.parentElement, enabled);
     const controls = enabled
       ? properties.querySelectorAll('.fc-field-prop-disabled')
-      : properties.querySelectorAll('input:enabled, select:enabled, textarea:enabled, button:enabled');
+      : properties.querySelectorAll('input:enabled, select:enabled, textarea:enabled, button:enabled, gmp-place-autocomplete:not([disabled])');
     for (const control of controls) {
       control.disabled = !enabled;
       control.classList.toggle('fc-field-prop-disabled', !enabled);
@@ -43,11 +43,14 @@ window.fcfield_address = (() => {
 
   function prepare(row, ref, config) {
     const prefix = config.id + '_';
-    for (const control of row.querySelectorAll('input, textarea, select')) {
+    for (const control of row.querySelectorAll('input, textarea, select, gmp-place-autocomplete')) {
       const original = control.dataset.originalId || control.id;
       const key = original.startsWith(prefix) ? original.slice(prefix.length).match(/^\d+_(.+)$/)?.[1] : null;
       if (!key) continue;
-      FlexiFieldRepeater.setControl(row, control, ref.id + '_' + key, ref.name + '[' + key + ']', config.defaults[key] ?? '');
+      const value = key === 'ac_type'
+        ? ([...control.options].find(option => option.defaultSelected) || control.options[0])?.value
+        : config.defaults[key];
+      FlexiFieldRepeater.setControl(row, control, ref.id + '_' + key, ref.name + '[' + key + ']', value ?? '');
       if (key === 'autocomplete') delete control.dataset.osmInit;
     }
     for (const [selector, id] of [
@@ -76,6 +79,7 @@ window.fcfield_address = (() => {
     const autocomplete = document.getElementById(id + '_autocomplete');
     if (autocomplete) field?.initAutoComplete?.(id, key);
     if (showMap) field?.initMap?.(id, key);
+    else engineFor(id)?.previewEmptyMap?.(id, key);
     if (document.getElementById(id + '_custom_marker')) field?.initMarkerSelector?.(id, key);
   }
 

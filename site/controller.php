@@ -359,6 +359,78 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 
 
 	/**
+	 * Download limits: quota status of download buttons shown on a page (POST, never cached)
+	 * Request: pairs = "fieldId:fileId:itemId,..."   Response: {"fieldId:fileId:itemId": {"blocked": bool, "html": string}}
+	 *
+	 * @access public
+	 */
+	public function dlstatus()
+	{
+		$app = \Joomla\CMS\Factory::getApplication();
+		$app->allowCache(false);
+		$app->setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0', true);
+		$app->setHeader('Content-Type', 'application/json; charset=utf-8', true);
+
+		if ($app->getInput()->getMethod() !== 'POST')
+		{
+			$app->setHeader('status', 405, true);
+			$app->sendHeaders();
+			echo '{}';
+			$app->close();
+		}
+
+		require_once JPATH_SITE . '/components/com_flexicontent/classes/helpers/downloadlimit.php';
+
+		$pairs  = array_slice(array_unique(array_filter(explode(',', $this->input->post->getString('pairs', '')))), 0, 200);
+		$user   = $app->getIdentity();
+		$result = array();
+		$cache  = array();
+		$infos  = array();
+
+		foreach ($pairs as $pair)
+		{
+			if (!preg_match('/^(\d+):(\d+):(\d+)$/D', $pair, $m))
+			{
+				continue;
+			}
+
+			list(, $fieldId, $fileId, $itemId) = $m;
+			$ckey = $fieldId . ':' . $itemId;
+
+			if (!isset($cache[$ckey]))
+			{
+				$settings = flexicontent_downloadlimit::getFieldSettings($fieldId, $itemId);
+				$cache[$ckey] = array($settings, $settings ? flexicontent_downloadlimit::getState($settings, $user) : null);
+			}
+
+			list($settings, $state) = $cache[$ckey];
+
+			$result[$pair] = array(
+				'blocked' => $settings && !flexicontent_downloadlimit::canDownloadFile($settings, $state, (int) $fileId),
+				'html'    => '',
+			);
+
+			// Only blocked buttons need the text, with the time until the limit resets filled in
+			if ($result[$pair]['blocked'])
+			{
+				if (!isset($infos[$ckey]))
+				{
+					$infos[$ckey] = flexicontent_downloadlimit::getResetInfo($settings, $user);
+				}
+
+				$html = trim($settings['modal_html']) !== '' ? $settings['modal_html'] : \Joomla\CMS\Language\Text::_('FLEXI_DL_LIMIT_DEFAULT_MODAL');
+				$result[$pair]['html'] = flexicontent_downloadlimit::replacePlaceholders($html, $infos[$ckey]);
+				$result[$pair]['reset_in'] = (int) $infos[$ckey]['reset_in'];  // seconds until a download is possible again
+			}
+		}
+
+		$app->sendHeaders();
+		echo json_encode($result);
+		$app->close();
+	}
+
+
+	/**
 	 *  Ajax favourites
 	 *
 	 * @access public
@@ -2597,6 +2669,38 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			$item->load($file_node->contentid);
 			$field->load($file_node->fieldid);
 			FlexicontentFields::loadFieldConfig($field, $item);
+
+
+			/**
+			 * Download limits (per user group quota), only for real downloads, not for viewing
+			 */
+
+			if ($method === 'download')
+			{
+				require_once JPATH_SITE . '/components/com_flexicontent/classes/helpers/downloadlimit.php';
+				$dl_settings = flexicontent_downloadlimit::getSettings($field->parameters);
+				$dl_special  = !$using_access;  // coupon or cart token: access levels were bypassed
+
+				if ($dl_settings && (!$dl_special || $dl_settings['count_special']) && !flexicontent_downloadlimit::consume($dl_settings, $file_id, $file_node->fieldid, $user))
+				{
+					$dl_info = flexicontent_downloadlimit::getResetInfo($dl_settings, $user);
+					$dl_msg = \Joomla\CMS\Language\Text::sprintf(
+						'FLEXI_DL_LIMIT_REACHED',
+						$dl_info['limit'],
+						flexicontent_downloadlimit::formatWindow($dl_info['window']),
+						flexicontent_downloadlimit::formatDuration($dl_info['reset_in'])
+					);
+
+					// Multi-file downloads skip the file, single file download is refused
+					if ($task !== 'download_tree' && $task !== 'download_files')
+					{
+						throw new \RuntimeException($dl_msg, 403);
+					}
+
+					$app->enqueueMessage($dl_msg, 'warning');
+					continue;
+				}
+			}
 
 
 			/**

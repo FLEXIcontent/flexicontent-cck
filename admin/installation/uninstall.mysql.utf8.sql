@@ -22,4 +22,5 @@ DROP TABLE IF EXISTS
 `#__flexicontent_authors_ext`,
 `#__flexicontent_download_coupons`,
 `#__flexicontent_download_history`,
+`#__flexicontent_download_log`,
 `#__flexicontent_search_log`;

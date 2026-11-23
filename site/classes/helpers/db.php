@@ -1372,8 +1372,23 @@ class flexicontent_db
 
 		$db->setQuery($query);
 		$field_types = $db->loadObjectList('field_type');
+		$lang = \Joomla\CMS\Factory::getApplication()->getLanguage();
 
 		foreach($field_types as $field_type) {
+			// A plugin manifest may name the plugin with a language key, as Joomla's own do (the Comments field:
+			// PLG_FLEXICONTENT_FIELDS_COMMENTS). That key is stored as the name, so load the plugin's language
+			// (administrator folder first, then the plugin's own) and show its translation.
+			if (preg_match('/^[A-Z][A-Z0-9_]*$/', $field_type->title)) {
+				$extension = 'plg_flexicontent_fields_' . $field_type->field_type;
+
+				foreach (array($extension, $extension . '.sys') as $file) {
+					$lang->load($file, JPATH_ADMINISTRATOR)
+						|| $lang->load($file, JPATH_PLUGINS . '/flexicontent_fields/' . $field_type->field_type);
+				}
+
+				$field_type->title = \Joomla\CMS\Language\Text::_($field_type->title);
+			}
+
 			$field_type->friendly = preg_replace("/FLEXIcontent[ \t]*-[ \t]*/i", "", $field_type->title);
 		}
 		if (!$group) return $field_types;

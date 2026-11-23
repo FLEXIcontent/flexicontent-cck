@@ -2411,6 +2411,35 @@
 				<option value="1">FLEXI_CROP</option>
 			</field>
 
+			<field name="" type="separator" default="FLEXI_DL_LIMIT_TAB" icon_class="icon-download" level="tab_open" box_type="1" remove_boxes="2" />
+			<field name="dl_limit_enable" type="radio" default="0" label="FLEXI_DL_LIMIT_ENABLE" description="FLEXI_DL_LIMIT_ENABLE_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="" type="separator" default="FLEXI_DL_LIMIT_INFO" level="level3" class="alert alert-info fcpadded" />
+			<field name="dl_limit_count_mode" type="radio" default="0" label="FLEXI_DL_LIMIT_COUNT_MODE" description="FLEXI_DL_LIMIT_COUNT_MODE_DESC" class="btn-group group-fcinfo">
+				<option value="0">FLEXI_DL_LIMIT_MODE_ANY</option>
+				<option value="1">FLEXI_DL_LIMIT_MODE_UNIQUE</option>
+			</field>
+			<field name="dl_limit_window" type="number" min="1" default="24" size="5" label="FLEXI_DL_LIMIT_WINDOW" description="FLEXI_DL_LIMIT_WINDOW_DESC" />
+			<field name="dl_limit_window_unit" type="list" default="60" label="FLEXI_DL_LIMIT_WINDOW_UNIT" description="FLEXI_DL_LIMIT_WINDOW_UNIT_DESC">
+				<option value="1">FLEXI_DL_LIMIT_UNIT_MINUTES</option>
+				<option value="60">FLEXI_DL_LIMIT_UNIT_HOURS</option>
+				<option value="1440">FLEXI_DL_LIMIT_UNIT_DAYS</option>
+			</field>
+			<field name="dl_limit_groups" type="subform" multiple="true" layout="joomla.form.field.subform.repeatable-table" label="FLEXI_DL_LIMIT_GROUPS" description="FLEXI_DL_LIMIT_GROUPS_DESC">
+				<form>
+					<field name="group_id" type="usergrouplist" label="FLEXI_DL_LIMIT_GROUP" />
+					<field name="limit" type="number" min="-1" default="" label="FLEXI_DL_LIMIT_LIMIT" />
+				</form>
+			</field>
+			<field name="dl_limit_guest_ip_factor" type="number" min="1" default="5" size="5" label="FLEXI_DL_LIMIT_IP_FACTOR" description="FLEXI_DL_LIMIT_IP_FACTOR_DESC" />
+			<field name="dl_limit_count_special" type="radio" default="0" label="FLEXI_DL_LIMIT_COUNT_SPECIAL" description="FLEXI_DL_LIMIT_COUNT_SPECIAL_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="dl_limit_modal_html" type="textarea" filter="raw" rows="6" cols="60" default="" label="FLEXI_DL_LIMIT_MODAL_HTML" description="FLEXI_DL_LIMIT_MODAL_HTML_DESC" />
+
 			<field name="" type="separator" default="FLEXI_RESTRICT_UPLOADS_VERIFY_FILE_CONTENTS" icon_class="icon-checkbox" level="tab_open" box_type="1" remove_boxes="2" />
 			<field name="restrict_uploads" type="fcradio" default="1" label="FLEXI_RESTRICT_UPLOADS" description="FLEXI_RESTRICT_UPLOADS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>

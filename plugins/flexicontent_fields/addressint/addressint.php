@@ -298,22 +298,6 @@ class plgFlexicontent_fieldsAddressint extends FCField
 			fcfield_addrint.map_type["'.$field_name_js.'"] = "' . strtoupper($map_type) . '";
 		';
 
-		// Google Maps: pass component restrictions via configure()
-		if ($mapapi_edit === 'googlemap')
-		{
-			$conf_ops = array();
-			if (count($ac_country_allowed_list))
-			{
-				$conf_ops[] = 'country:[\'' . implode("', '", $ac_country_allowed_list) . '\']';
-			}
-			$js .= '
-			fcfield_addrint.configure["' . $field_name_js . '"] = function(placesAutocomplete)
-			{
-				if (' . ($conf_ops ? 1 : 0)  . ') placesAutocomplete.setComponentRestrictions({' . implode(', ', $conf_ops) . '});
-			}
-			';
-		}
-
 		// Nominatim: pass optional tile server URL
 		if ($mapapi_edit === 'nominatim')
 		{
@@ -405,6 +389,9 @@ class plgFlexicontent_fieldsAddressint extends FCField
 
 			if ($mapapi_edit === 'googlemap')
 			{
+				\Joomla\CMS\Language\Text::script('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AUTOCOMPLETE_LABEL');
+				\Joomla\CMS\Language\Text::script('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_PLACE_SEARCH_FAILED');
+
 				// Load form.js (Google Maps autocomplete + map)
 				$document->getWebAssetManager()->registerAndUseScript('plg_flexicontent_fields_addressint.form', 'plugins/flexicontent_fields/addressint/js/form.js', array('version' => FLEXI_VHASH));
 

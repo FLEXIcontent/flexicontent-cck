@@ -3,7 +3,7 @@
   const shared = window.fcfield_addrint ||= {};
   const FC = Object.create(shared);
   (shared.engines ||= {}).googlemap = FC;
-  for (const name of ['configure','autoComplete','gmapslistener','google_maps','allowed_countries','single_country','map_zoom','map_type','LatLon','posMarker']) {
+  for (const name of ['autoComplete','google_maps','allowed_countries','single_country','map_zoom','map_type','LatLon','posMarker']) {
     shared[name] ||= [];
   }
   const field = (id, key) => document.getElementById(id + '_' + key);
@@ -35,23 +35,71 @@
       lng:typeof point.lng === 'function' ? point.lng() : point.lng };
   }
 
+  function primaryTypes(type) {
+    // The new API accepts specific address types, plus the cities and regions collections.
+    if (type === 'address') return ['street_address', 'premise', 'subpremise'];
+    return type ? [type] : [];
+  }
+
   FC.initAutoComplete = (id, config) => {
     const input = field(id, 'autocomplete');
-    const Autocomplete = window.google?.maps?.places?.Autocomplete;
-    if (!input || !Autocomplete) return;
-    const options = {};
-    const type = get(id, 'ac_type');
-    if (type) options.types = [type];
-    if (FC.single_country[config]) options.componentRestrictions = { country:FC.single_country[config] };
-    FC.gmapslistener[id]?.remove?.();
-    const picker = FC.autoComplete[id] = new Autocomplete(input, options);
-    FC.configure[config]?.(picker);
-    FC.gmapslistener[id] = google.maps.event.addListener(picker, 'place_changed', () => FC.fillInAddress(id, null, config));
+    const PlaceAutocompleteElement = window.google?.maps?.places?.PlaceAutocompleteElement;
+    if (!input || !PlaceAutocompleteElement || FC.autoComplete[id] === input) return;
+
+    // A repeated value may already contain a cloned widget with its own input.
+    const picker = input instanceof PlaceAutocompleteElement ? input : new PlaceAutocompleteElement();
+    if (picker !== input) {
+      picker.id = input.id;
+      picker.className = input.className;
+      picker.name = input.name;
+      picker.disabled = input.disabled;
+      input.replaceWith(picker);
+    }
+    FC.autoComplete[id] = picker;
+    picker.description = translation('AUTOCOMPLETE_LABEL');
+    picker.includedPrimaryTypes = primaryTypes(get(id, 'ac_type'));
+    const countries = (FC.allowed_countries[config] || []).filter(Boolean);
+    // Google accepts at most 15 codes. Larger lists are checked when applying the selection.
+    picker.includedRegionCodes = countries.length <= 15 ? countries : [];
+    const box = field(id, 'messages');
+    const reportFailure = () => notify(id, [translation('PLACE_SEARCH_FAILED')], 'warning');
+    picker.addEventListener('gmp-error', reportFailure);
+    picker.addEventListener('gmp-select', async ({placePrediction}) => {
+      const request = {};
+      requests.set(box, request);
+      const current = () => picker.isConnected && !picker.disabled && requests.get(box) === request;
+      let place;
+      try {
+        place = placePrediction.toPlace();
+        const fields = ['addressComponents', 'formattedAddress', 'location'];
+        if (field(id, 'name')) fields.push('displayName');
+        if (field(id, 'url')) fields.push('googleMapsURI');
+        await place.fetchFields({ fields });
+      } catch {
+        if (current()) reportFailure();
+        return;
+      }
+      if (!current()) return;
+      if (!place.location || !place.addressComponents?.length) {
+        reportFailure();
+        return;
+      }
+      // Marker dragging supplies a GeocoderResult. Both paths share the field's address mapping.
+      FC.fillInAddress(id, {
+        address_components:place.addressComponents.map(part => ({
+          types:part.types, long_name:part.longText, short_name:part.shortText,
+        })),
+        formatted_address:place.formattedAddress,
+        geometry:{ location:place.location },
+        name:place.displayName,
+        url:place.googleMapsURI,
+      }, config, true);
+    });
   };
 
   FC.changeAutoCompleteType = id => {
-    const type = get(id, 'ac_type');
-    FC.autoComplete[id]?.setTypes(type ? [type] : []);
+    const picker = FC.autoComplete[id];
+    if (picker) picker.includedPrimaryTypes = primaryTypes(get(id, 'ac_type'));
   };
 
   FC.getCustomMarkerUrl = id => {
@@ -142,18 +190,42 @@
     image.src = url;
   };
 
-  FC.initMap = (id, config) => {
+  FC.previewEmptyMap = (id, config) => {
+    const properties = field(id, 'messages')?.closest('.fc-field-value-properties-box');
+    if (!properties) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return;
+      observer.disconnect();
+      const canvas = document.getElementById('map_canvas_' + id);
+      if (properties.contains(canvas) && !canvas.classList.contains('has_fc_google_maps_map')) {
+        FC.initMap(id, config, false);
+      }
+    });
+    observer.observe(properties);
+  };
+
+  FC.initMap = (id, config, hasPosition = true) => {
     const canvas = document.getElementById('map_canvas_' + id);
     if (!canvas || !window.google?.maps?.Map) return;
     canvas.classList.add('has_fc_google_maps_map');
     FlexiForm.show(field(id,'addressint_map'));
     const position = FC.LatLon[id];
     const zoom = Number.parseInt(get(id, 'zoom'),10);
-    const map = FC.google_maps[id] = new google.maps.Map(canvas, {
-      center:position, scrollwheel:false, zoom:Number.isFinite(zoom) ? zoom : FC.map_zoom[config],
+    const options = {
+      center:hasPosition ? position : {lat:0, lng:0}, scrollwheel:false,
+      zoom:hasPosition ? (Number.isFinite(zoom) ? zoom : FC.map_zoom[config]) : 2,
       mapTypeId:google.maps.MapTypeId[FC.map_type[config]], zoomControl:true, mapTypeControl:true,
       streetViewControl:true, scaleControl:true, rotateControl:true,
-    });
+    };
+    let map = FC.google_maps[id];
+    if (map?.getDiv() === canvas) map.setOptions(options);
+    else map = FC.google_maps[id] = new google.maps.Map(canvas, options);
+    if (!hasPosition) return;
+    if (FC.posMarker[id]?.getMap() === map) {
+      FC.posMarker[id].setPosition(position);
+      FC.updateMarkerIcon(id);
+      return;
+    }
     const marker = FC.posMarker[id] = new google.maps.Marker({
       map, position, draggable:true, animation:google.maps.Animation.DROP, icon:FC.getCustomMarkerUrl(id),
     });
@@ -188,10 +260,7 @@
     });
   };
 
-  FC.fillInAddress = (id, place, config) => {
-    const redraw = !place;
-    if (redraw) requests.delete(field(id, 'messages'));
-    place ||= FC.autoComplete[id]?.getPlace();
+  FC.fillInAddress = (id, place, config, redraw = false) => {
     if (!place?.address_components || !place.geometry?.location) return false;
     const parts = Object.fromEntries(place.address_components.map(value => [value.types[0], value]));
     const allowed = (FC.allowed_countries[config] || []).map(country => country.toUpperCase());
@@ -202,9 +271,11 @@
       return false;
     }
     notify(id);
-    const markup = document.createElement('template');
-    markup.innerHTML = place.formatted_address || place.adr_address || '';
-    const full = markup.content.textContent || '';
+    if (redraw) {
+      const skip = field(id, 'autocomplete')?.closest('.fcfieldval_container')?.querySelector('.fcfield-skipvalue');
+      if (skip) window.fcfield_address.setEnabled(skip, true);
+    }
+    const full = place.formatted_address || '';
     const city = parts.locality?.long_name, province = parts.administrative_area_level_1?.long_name;
     const zip = parts.postal_code?.long_name;
     let street = zip ? full.split(zip)[0] : full;

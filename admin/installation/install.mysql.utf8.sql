@@ -368,6 +368,22 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_download_history` (
   KEY `file_id` (`file_id`)
 ) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`;
 
+CREATE TABLE IF NOT EXISTS `#__flexicontent_download_log` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL DEFAULT 0,
+  `visitor_id` varchar(32) NOT NULL DEFAULT '',
+  `ip_hash` varchar(32) NOT NULL DEFAULT '',
+  `file_id` int(11) NOT NULL,
+  `field_id` int(11) NOT NULL DEFAULT 0,
+  `downloaded_on` datetime NOT NULL,
+  `expire_on` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `user_time` (`user_id`, `downloaded_on`),
+  KEY `visitor_time` (`visitor_id`, `downloaded_on`),
+  KEY `ip_time` (`ip_hash`, `downloaded_on`),
+  KEY `expire_on` (`expire_on`)
+) ENGINE=MyISAM CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`;
+
 CREATE TABLE IF NOT EXISTS `#__flexicontent_download_coupons` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
