@@ -46,15 +46,17 @@ $rem_filt_tip    = ' class="' . $this->tooltip_class . ' filterdel" title="'.fle
 
 
 /**
- * JS for Columns chooser box and Filters box
+ * Resizable / movable / hideable columns (replaces the old column chooser), settings are stored in the browser
  */
 
-flexicontent_html::jscode_to_showhide_table(
-	'mainChooseColBox',
-	'adminListTableFC' . $this->view,
-	$start_html = '',  //'<span class="badge ' . (FLEXI_J40GE ? 'badge-dark' : 'badge-inverse') . '">' . \Joomla\CMS\Language\Text::_('FLEXI_COLUMNS', true) . '<\/span> &nbsp; ',
-	$end_html = '<div id="fc-columns-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="' . \Joomla\CMS\Language\Text::_('FLEXI_HIDE') . '" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/div>'
-);
+$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/css/fc_table_tools.css', array('version' => FLEXI_VHASH));
+$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/css/fc_type_tabs.css', array('version' => FLEXI_VHASH));
+$document->addScript(\Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/js/fc-table-tools.js', array('version' => FLEXI_VHASH));
+
+foreach (array('FLEXI_TBL_MOVE_COL', 'FLEXI_TBL_HIDE_COL', 'FLEXI_TBL_SHOW_COL', 'FLEXI_TBL_FIT_COL', 'FLEXI_TBL_RESET_WIDTHS', 'FLEXI_TBL_RESET_COLS') as $fc_txt)
+{
+	\Joomla\CMS\Language\Text::script($fc_txt);
+}
 
 
 
@@ -173,7 +175,7 @@ if ($js)
 <?php endif;?>
 
 
-	<div id="fc-managers-header">
+	<div id="fc-managers-header" class="fc-mh-items fc-mh-solo">
 
 		<?php if (!empty($this->lists['scope_tip'])) : ?>
 		<div class="fc-filter-head-box filter-search nowrap_box" style="margin: 0;">
@@ -263,14 +265,14 @@ if ($js)
 				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_NUM' ); ?>
 			</th-->
 
-			<th class="col_cb left">
+			<th class="col_cb left" data-col="cb">
 				<div class="group-fcset">
 					<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value="" title="<?php echo \Joomla\CMS\Language\Text::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
 					<label for="checkall-toggle" class="green single"></label>
 				</div>
 			</th>
 
-			<th class="hideOnDemandClass left nowrap">
+			<th class="hideOnDemandClass left nowrap" data-col="title">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort',   'FLEXI_NAME', 'a.name', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				<?php if (strlen($this->getModel()->getState('search'))) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -279,11 +281,11 @@ if ($js)
 				<?php endif; ?>
 			</th>
 
-			<th class="hideOnDemandClass nowrap" >
+			<th class="hideOnDemandClass nowrap"  data-col="username">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort',   'FLEXI_USER_NAME', 'a.username', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 			</th>
 
-			<th class="hideOnDemandClass nowrap">
+			<th class="hideOnDemandClass nowrap" data-col="logged">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort',   'FLEXI_USER_LOGGED', 'loggedin', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_logged')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -292,7 +294,7 @@ if ($js)
 				<?php endif; ?>
 			</th>
 
-			<th class="hideOnDemandClass nowrap">
+			<th class="hideOnDemandClass nowrap" data-col="status">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort',   'COM_USERS_HEADING_ENABLED', 'a.block', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				<?php if (strlen($this->getModel()->getState('filter_state'))) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -301,7 +303,7 @@ if ($js)
 				<?php endif; ?>
 			</th>
 
-			<th class="hideOnDemandClass nowrap hidden-phone">
+			<th class="hideOnDemandClass nowrap hidden-phone" data-col="active">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort',   'COM_USERS_HEADING_ACTIVATED', 'a.activation', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				<?php if (strlen($this->getModel()->getState('filter_active'))) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -310,7 +312,7 @@ if ($js)
 				<?php endif; ?>
 			</th>
 
-			<th class="hideOnDemandClass nowrap">
+			<th class="hideOnDemandClass nowrap" data-col="usergrp">
 				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_USERGROUPS' ); ?>
 				<?php if ($this->getModel()->getState('filter_usergrp')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -319,7 +321,7 @@ if ($js)
 				<?php endif; ?>
 			</th>
 
-			<th class="hideOnDemandClass nowrap">
+			<th class="hideOnDemandClass nowrap" data-col="itemscount">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort',   'FLEXI_ITEMS', 'itemscount', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_itemscount')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -328,7 +330,7 @@ if ($js)
 				<?php endif; ?>
 			</th>
 
-			<th class="hideOnDemandClass nowrap">
+			<th class="hideOnDemandClass nowrap" data-col="uploadssize">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort',   'FLEXI_FILES_MBS', 'uploadssize', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_uploadssize')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -337,11 +339,11 @@ if ($js)
 				<?php endif; ?>
 			</th>
 
-			<th class="hideOnDemandClass left nowrap">
+			<th class="hideOnDemandClass left nowrap" data-col="email">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort',   'FLEXI_USER_EMAIL', 'a.email', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 			</th>
 
-			<th style="width:110px;" class="hideOnDemandClass">
+			<th style="width:110px;" class="hideOnDemandClass" data-col="registered">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort',   'FLEXI_REGISTRED_DATE', 'a.registerDate', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				<?php
 				if ($this->date == '1') :
@@ -356,7 +358,7 @@ if ($js)
 				?>
 			</th>
 
-			<th style="width:110px;" class="hideOnDemandClass nowrap">
+			<th style="width:110px;" class="hideOnDemandClass nowrap" data-col="visited">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort',   'FLEXI_USER_LAST_VISIT', 'a.lastvisitDate', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				<?php
 				if ($this->date == '2') :
@@ -371,7 +373,7 @@ if ($js)
 				?>
 			</th>
 
-			<th class="hideOnDemandClass col_id center hidden-phone hidden-tablet">
+			<th class="hideOnDemandClass col_id center hidden-phone hidden-tablet" data-col="id">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order']); ?>
 				<?php if ($this->getModel()->getState('filter_id')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -448,55 +450,55 @@ if ($js)
 				<?php echo $this->pagination->getRowOffset($i); ?>
 			</td-->
 
-			<td class="col_cb">
+			<td class="col_cb" data-col="cb">
 				<!--div class="adminlist-table-row"></div-->
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_($hlpname . '.grid_id', $i, $row->id); ?>
 			</td>
 
-			<td class="col_title">
+			<td class="col_title" data-col="title">
 				<a href="<?php echo $edit_link; ?>">
 					<?php echo $row->name; ?></a>
 			</td>
-			<td>
+			<td data-col="username">
 				<!-- <a class="modal" rel="{handler: 'iframe', size: {x: 800, y: 500}, onClose: function() {alert('hello');} }" href="<?php echo $edit_link; ?>"> -->
 				<?php echo $row->username; ?>
 				<!-- </a> -->
 			</td>
-			<td class="center col_logged">
+			<td class="center col_logged" data-col="logged">
 				<?php echo $row->loggedin ? '<img src="'.$tick_img.'" width="16" height="16" style="border:0;" class="fc-man-icon-s" alt="" />': ''; ?>
 			</td>
 
-			<td class="center col_status">
+			<td class="center col_status" data-col="status">
 				<a href="javascript:void(0);" onclick="return Joomla.listItemTask('cb<?php echo $i;?>','<?php echo $block_task;?>')">
 					<img src="images/<?php echo $block_img;?>" class="<?php echo $this->tooltip_class; ?> fc-man-icon-s" width="16" height="16" style="border:0;" title="<?php echo $block_title; ?>" alt="<?php echo $block_title; ?>" />
 				</a>
 			</td>
 
-			<td class="center col_active hidden-phone">
+			<td class="center col_active hidden-phone" data-col="active">
 				<img src="images/<?php echo $activation_img;?>" class="<?php echo $this->tooltip_class; ?> fc-man-icon-s" width="16" height="16" style="border:0;" title="<?php echo $activation_title; ?>" alt="<?php echo $activation_title; ?>" />
 			</td>
 
-			<td class="center col_usergrp">
+			<td class="center col_usergrp" data-col="usergrp">
 				<?php echo \Joomla\CMS\Language\Text::_( $row->groupname ); ?>
 			</td>
-			<td class="center col_itemscount">
+			<td class="center col_itemscount" data-col="itemscount">
 				<?php echo $itemscount; ?>
 			</td>
-			<td class="right col_uploadssize">
+			<td class="right col_uploadssize" data-col="uploadssize">
 				<?php echo number_format(($row->uploadssize / (1024*1024)) , 2); ?>
 			</td>
-			<td class="left">
+			<td class="left" data-col="email">
 				<a href="mailto:<?php echo $row->email; ?>">
 					<?php echo $row->email; ?></a>
 			</td>
-			<td class="nowrap col_registered">
+			<td class="nowrap col_registered" data-col="registered">
 				<?php echo $registered; ?>
 			</td>
-			<td class="nowrap col_visited">
+			<td class="nowrap col_visited" data-col="visited">
 				<?php echo $lvisit; ?>
 			</td>
 
-			<td class="col_id center hidden-phone hidden-tablet">
+			<td class="col_id center hidden-phone hidden-tablet" data-col="id">
 				<?php echo $row->id; ?>
 			</td>
 
@@ -508,6 +510,7 @@ if ($js)
 	</tbody>
 
 	</table>
+	<script>window.fcTableTools && fcTableTools.init('adminListTableFC<?php echo $this->view; ?>');</script>
 
 
 	<div>

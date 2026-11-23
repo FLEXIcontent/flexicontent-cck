@@ -1,0 +1,853 @@
+/**
+ * FLEXIcontent: tabs of the content types in the items manager (browser like tabs)
+ */
+
+.fc-type-tabs {
+	--fc-tabbar-bg: #dfe3e9;
+	--fc-tab-active-bg: var(--card-bg, #fff);
+	--fc-tab-radius: 10px;
+
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-end;
+	gap: 2px;
+	margin: 0;
+	padding: 8px 12px 0;
+	background: var(--fc-tabbar-bg);
+	border-radius: var(--fc-tab-radius) var(--fc-tab-radius) 0 0;
+}
+
+[data-bs-theme="dark"] .fc-type-tabs {
+	--fc-tabbar-bg: #15191d;
+	--fc-tab-active-bg: var(--card-bg, #23282d);
+}
+
+.fc-type-tab {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	max-width: 240px;
+	margin: 0;
+	padding: .55rem 1.15rem;
+	font: inherit;
+	font-size: .95rem;
+	line-height: 1.3;
+	color: #4b5563;
+	background: transparent;
+	border: 0;
+	border-radius: var(--fc-tab-radius) var(--fc-tab-radius) 0 0;
+	cursor: pointer;
+	transition: background-color .12s ease, color .12s ease;
+}
+
+[data-bs-theme="dark"] .fc-type-tab {
+	color: #aab2bd;
+}
+
+.fc-type-tab-label {
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.fc-type-tab:hover {
+	color: #111827;
+	background: rgba(255, 255, 255, .6);
+}
+
+[data-bs-theme="dark"] .fc-type-tab:hover {
+	color: #fff;
+	background: rgba(255, 255, 255, .08);
+}
+
+.fc-type-tab:focus-visible {
+	outline: 2px solid var(--primary-bg, #0d6efd);
+	outline-offset: -2px;
+}
+
+/* Thin separator between neighbouring inactive tabs */
+.fc-type-tab:not(.is-active) + .fc-type-tab:not(.is-active)::before {
+	content: '';
+	position: absolute;
+	inset-inline-start: -2px;
+	top: 28%;
+	bottom: 28%;
+	width: 1px;
+	background: rgba(107, 114, 128, .35);
+}
+
+/* Active tab: same color as the page below it, with the curved "flares" of browser tabs */
+.fc-type-tab.is-active {
+	z-index: 2;
+	font-weight: 600;
+	color: var(--primary-bg, #1c4f9c);
+	background: var(--fc-tab-active-bg);
+	cursor: default;
+}
+
+.fc-type-tab.is-active::before,
+.fc-type-tab.is-active::after {
+	content: '';
+	position: absolute;
+	bottom: 0;
+	width: var(--fc-tab-radius);
+	height: var(--fc-tab-radius);
+	pointer-events: none;
+}
+
+.fc-type-tab.is-active::before {
+	inset-inline-start: calc(var(--fc-tab-radius) * -1);
+	background: radial-gradient(circle at 0 0, transparent var(--fc-tab-radius), var(--fc-tab-active-bg) calc(var(--fc-tab-radius) + .5px));
+}
+
+.fc-type-tab.is-active::after {
+	inset-inline-end: calc(var(--fc-tab-radius) * -1);
+	background: radial-gradient(circle at 100% 0, transparent var(--fc-tab-radius), var(--fc-tab-active-bg) calc(var(--fc-tab-radius) + .5px));
+}
+
+[dir="rtl"] .fc-type-tab.is-active::before {
+	background: radial-gradient(circle at 100% 0, transparent var(--fc-tab-radius), var(--fc-tab-active-bg) calc(var(--fc-tab-radius) + .5px));
+}
+
+[dir="rtl"] .fc-type-tab.is-active::after {
+	background: radial-gradient(circle at 0 0, transparent var(--fc-tab-radius), var(--fc-tab-active-bg) calc(var(--fc-tab-radius) + .5px));
+}
+
+.fc-type-tab.is-static,
+.fc-type-tab.is-static:hover {
+	cursor: default;
+}
+
+/* Subtypes */
+.fc-type-tabs-sep {
+	align-self: center;
+	padding: 0 .4rem 0 1rem;
+	font-size: .75rem;
+	letter-spacing: .05em;
+	text-transform: uppercase;
+	color: #6b7280;
+	opacity: .8;
+}
+
+.fc-type-tab.fc-subtype {
+	padding: .45rem .9rem;
+	font-size: .88rem;
+}
+
+/* Waiting for the list to reload */
+.fc-type-tabs.is-busy {
+	cursor: progress;
+}
+
+.fc-type-tabs.is-busy .fc-type-tab:not(.is-active) {
+	opacity: .55;
+	pointer-events: none;
+}
+
+/* The filter row below the tabs: a white band over the full width (grey tabs, white filter row, grey table header),
+   with no gap before the table */
+.fc-type-tabs ~ #fc-managers-header,
+#fc-managers-header.fc-mh-solo {
+	display: flow-root;
+	margin: 0 !important;
+	padding: 10px 12px 5px;
+	background: var(--card-bg, #fff);
+}
+
+[data-bs-theme="dark"] .fc-type-tabs ~ #fc-managers-header,
+[data-bs-theme="dark"] #fc-managers-header.fc-mh-solo {
+	background: var(--card-bg, #23282d);
+}
+
+.fc-type-tabs ~ .fcclear,
+#fc-managers-header.fc-mh-solo ~ .fcclear {
+	height: 0;
+	margin: 0;
+	padding: 0;
+}
+
+.fc-type-tabs ~ .fc-table-wrap,
+.fc-type-tabs ~ .fc-table-wrap > table,
+.fc-type-tabs ~ table.fcmanlist,
+#fc-managers-header.fc-mh-solo ~ .fc-table-wrap,
+#fc-managers-header.fc-mh-solo ~ .fc-table-wrap > table,
+#fc-managers-header.fc-mh-solo ~ table.fcmanlist {
+	margin-top: 0 !important;
+}
+
+
+/* ==========================================================================
+   Filter row of the items manager: search group and counters
+   ========================================================================== */
+
+#flexicontent #fc-managers-header.fc-mh-items {
+	--fc-ctl-border: var(--template-bg-dark-20, #b9c5d8);
+	--fc-ctl-bg: var(--card-bg, #fff);
+}
+
+/* The groups are no longer white strips behind their controls (the whole row is white) */
+#flexicontent #fc-managers-header.fc-mh-items .btn-group {
+	background: transparent !important;
+}
+
+/* Search: scope selector, text input and buttons form ONE group: the group draws the outer border and rounded corners,
+   its parts only have thin separators between them */
+#flexicontent #fc-managers-header.fc-mh-items .filter-search > .btn-group {
+	display: flex !important;
+	flex-wrap: nowrap;
+	align-items: stretch;
+	width: auto;
+	margin: 0;
+	padding: 0 !important;
+	background: var(--fc-ctl-bg) !important;
+	border: 1px solid var(--fc-ctl-border);
+	border-radius: .4rem;
+}
+
+#flexicontent #fc-managers-header.fc-mh-items .filter-search > .btn-group > :not(#fc-filters-box):not(script):not(select) {
+	align-self: stretch;
+	height: auto !important;
+	min-height: calc(var(--form-inp-height, 50px) - 2px);
+	margin: 0 !important;
+	border: 0 !important;
+	border-radius: 0 !important;
+	box-shadow: none !important;
+}
+
+/* Separators */
+#flexicontent #fc-managers-header.fc-mh-items .filter-search > .btn-group > .select2-container ~ #search,
+#flexicontent #fc-managers-header.fc-mh-items .filter-search > .btn-group > #search ~ button,
+#flexicontent #fc-managers-header.fc-mh-items .filter-search > .btn-group > #search ~ #fc_filters_box_btn {
+	border-inline-start: 1px solid var(--fc-ctl-border) !important;
+}
+
+/* Rounded corners of the first and of the last part (they sit inside the border of the group) */
+#flexicontent #fc-managers-header.fc-mh-items .filter-search > .btn-group > .select2-container,
+#flexicontent #fc-managers-header.fc-mh-items .filter-search > .btn-group > .select2-container a.select2-choice {
+	border-start-start-radius: calc(.4rem - 1px) !important;
+	border-end-start-radius: calc(.4rem - 1px) !important;
+}
+
+#flexicontent #fc-managers-header.fc-mh-items .filter-search > .btn-group > button:last-child {
+	border-start-end-radius: calc(.4rem - 1px) !important;
+	border-end-end-radius: calc(.4rem - 1px) !important;
+}
+
+/* The scope selector (select2): no border / margin / background of its own, it fills the height of the group */
+#flexicontent #fc-managers-header.fc-mh-items .filter-search > .btn-group > .select2-container {
+	display: flex !important;
+	min-width: 0;
+	background: transparent !important;
+}
+
+#flexicontent #fc-managers-header.fc-mh-items .filter-search > .btn-group > .select2-container a.select2-choice {
+	display: flex;
+	align-items: center;
+	flex: 1 1 auto;
+	height: auto !important;
+	margin: 0 !important;
+	border: 0 !important;
+	box-shadow: none !important;
+	background: transparent !important;
+}
+
+/* The text input is glued to the selector (older rules pushed it away with a margin) */
+#flexicontent #fc-managers-header.fc-mh-items .filter-search > .btn-group > #search {
+	background: transparent !important;
+}
+
+/* Buttons of the group: light, the filters button stays dark while filters are active */
+#flexicontent #fc-managers-header.fc-mh-items .filter-search > .btn-group > button {
+	color: inherit;
+	background: transparent;
+}
+
+#flexicontent #fc-managers-header.fc-mh-items .filter-search > .btn-group > button:hover,
+#flexicontent #fc-managers-header.fc-mh-items .filter-search > .btn-group > button:focus,
+#flexicontent #fc-managers-header.fc-mh-items .filter-search > .btn-group > button:active {
+	color: inherit;
+	background: rgba(127, 127, 127, .12);
+}
+
+/* Counters ("Results ..." and "Page ...") look like the other controls */
+#flexicontent #fc-managers-header.fc-mh-items .fc_item_total_data,
+#flexicontent #fc-managers-header.fc-mh-items .fc_pages_counter {
+	display: inline-flex !important;
+	align-items: center;
+	box-sizing: border-box;
+	min-height: var(--form-inp-height, 50px);
+	margin: 0 0 0 12px !important;
+	padding: 0 16px !important;
+	font-size: .95rem;
+	line-height: 1.2;
+	color: inherit;
+	background: var(--fc-ctl-bg) !important;
+	background-image: none !important;
+	border: 1px solid var(--fc-ctl-border) !important;
+	border-radius: .4rem;
+}
+
+/* The scope selector is a Choices.js control (.choices): no border / margin / background of its own, it fills the group */
+#flexicontent #fc-managers-header.fc-mh-items .filter-search > .btn-group > .choices {
+	display: flex !important;
+	flex-direction: column;
+	justify-content: center;
+	min-width: 0;
+	margin: 0 !important;
+	padding: 0 !important;
+	background: transparent !important;
+	border: 0 !important;
+	border-start-start-radius: calc(.4rem - 1px) !important;
+	border-end-start-radius: calc(.4rem - 1px) !important;
+}
+
+#flexicontent #fc-managers-header.fc-mh-items .filter-search > .btn-group > .choices .choices__inner {
+	display: flex;
+	align-items: center;
+	flex: 1 1 auto;
+	min-height: 0 !important;
+	height: auto !important;
+	margin: 0 !important;
+	padding-top: 0 !important;
+	padding-bottom: 0 !important;
+	background: transparent !important;
+	border: 0 !important;
+	border-radius: 0 !important;
+	box-shadow: none !important;
+}
+
+/* Separator between the selector and the text input */
+#flexicontent #fc-managers-header.fc-mh-items .filter-search > .btn-group > .choices ~ #search {
+	border-inline-start: 1px solid var(--fc-ctl-border) !important;
+}
+
+/* Same corner radius for all controls of the row: the icon buttons group and the "limit" box */
+#flexicontent #fc-managers-header.fc-mh-items .fc-filter-head-box:not(.filter-search) > .btn-group > * {
+	border-radius: 0 !important;
+}
+
+#flexicontent #fc-managers-header.fc-mh-items .fc-filter-head-box:not(.filter-search) > .btn-group > :first-child {
+	border-start-start-radius: .4rem !important;
+	border-end-start-radius: .4rem !important;
+}
+
+#flexicontent #fc-managers-header.fc-mh-items .fc-filter-head-box:not(.filter-search) > .btn-group > :last-child {
+	border-start-end-radius: .4rem !important;
+	border-end-end-radius: .4rem !important;
+}
+
+#flexicontent #fc-managers-header.fc-mh-items .limit #limit,
+#flexicontent #fc-managers-header.fc-mh-items .limit select,
+#flexicontent #fc-managers-header.fc-mh-items .limit .choices__inner {
+	border-radius: .4rem !important;
+}
+
+
+/* Icon buttons group: a light hover, the icon stays readable */
+#flexicontent #fc-managers-header.fc-mh-items .fc-filter-head-box:not(.filter-search) > .btn-group > *:not(.btn-primary):hover,
+#flexicontent #fc-managers-header.fc-mh-items .fc-filter-head-box:not(.filter-search) > .btn-group > *:not(.btn-primary):focus {
+	color: inherit !important;
+	background: rgba(127, 127, 127, .14) !important;
+}
+
+#flexicontent #fc-managers-header.fc-mh-items .fc-filter-head-box:not(.filter-search) > .btn-group > *:not(.btn-primary):hover *,
+#flexicontent #fc-managers-header.fc-mh-items .fc-filter-head-box:not(.filter-search) > .btn-group > *:not(.btn-primary):focus * {
+	color: inherit !important;
+}
+
+
+/* Ordering mode: help and actions in a normal bar (they used to be floating buttons over the table header) */
+.fc-reorder-panel {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: .75rem 1.5rem;
+	margin: 0 0 12px;
+	padding: .75rem 1rem;
+	background: var(--card-bg, #fff);
+	border: 1px solid var(--card-border-color, #cfd4da);
+	border-inline-start: 4px solid var(--primary-bg, #0d6efd);
+	border-radius: .4rem;
+}
+
+.fc-reorder-help {
+	display: flex;
+	align-items: flex-start;
+	gap: .6rem;
+	flex: 1 1 380px;
+	line-height: 1.4;
+}
+
+.fc-reorder-help [class^="icon-"] {
+	margin-top: .15rem;
+	color: var(--primary-bg, #0d6efd);
+}
+
+.fc-reorder-actions {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: .5rem;
+}
+
+.fc-reorder-actions .btn {
+	display: inline-flex;
+	align-items: center;
+	gap: .4rem;
+	padding: .45rem .9rem !important;
+	border-radius: .4rem;
+}
+
+/* ==========================================================================
+   Ordering mode: Category / Order Type selectors in a white row (same band as the filters)
+   ========================================================================== */
+
+#flexicontent #fcorder_notes_box {
+	--fc-ctl-border: var(--template-bg-dark-20, #b9c5d8);
+	--fc-ctl-bg: var(--card-bg, #fff);
+
+	display: flex !important;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: .75rem 1rem;
+	margin: 0 !important;
+	padding: 5px 12px 12px !important;
+	line-height: 1.3 !important;
+	max-width: none;
+	background: var(--fc-ctl-bg);
+}
+
+#flexicontent #fcorder_notes_box .fc-iblock {
+	display: block;
+	margin: 0 !important;
+}
+
+/* Label + selector as one group with a common border (like the search group) */
+#flexicontent #fcorder_notes_box .fc-filter {
+	margin: 0 !important;
+}
+
+#flexicontent #fcorder_notes_box .fc-filter .input-group {
+	flex-wrap: nowrap;
+	margin: 0;
+	background: var(--fc-ctl-bg);
+	border: 1px solid var(--fc-ctl-border);
+	border-radius: .4rem;
+}
+
+#flexicontent #fcorder_notes_box .input-group-prepend {
+	display: flex;
+	align-items: stretch;
+	width: 100%;
+	margin: 0 !important;
+}
+
+#flexicontent #fcorder_notes_box .input-group-text {
+	display: flex;
+	align-items: center;
+	margin: 0 !important;
+	padding: 0 14px !important;
+	font-weight: 600;
+	color: inherit !important;
+	background: rgba(127, 127, 127, .14) !important;
+	border: 0 !important;
+	border-inline-end: 1px solid var(--fc-ctl-border) !important;
+	border-radius: calc(.4rem - 1px) 0 0 calc(.4rem - 1px) !important;
+}
+
+/* The selector (Choices.js): no frame of its own, readable single line */
+#flexicontent #fcorder_notes_box .choices {
+	min-width: 240px;
+	margin: 0 !important;
+	background: transparent !important;
+	border: 0 !important;
+}
+
+#flexicontent #fcorder_notes_box #order_type_selector .choices {
+	min-width: 420px;
+}
+
+#flexicontent #fcorder_notes_box .choices__inner {
+	display: flex;
+	align-items: center;
+	min-height: calc(var(--form-inp-height, 50px) - 2px) !important;
+	height: auto !important;
+	margin: 0 !important;
+	padding: 0 2.2rem 0 .9rem !important;
+	line-height: 1.3 !important;
+	background: transparent !important;
+	border: 0 !important;
+	border-radius: 0 !important;
+	box-shadow: none !important;
+}
+
+#flexicontent #fcorder_notes_box .choices__list--single,
+#flexicontent #fcorder_notes_box .choices__list--single .choices__item {
+	width: 100%;
+	padding: 0 !important;
+	overflow: hidden;
+	line-height: 1.3 !important;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+/* The drop-down list: wide enough, compact items */
+#flexicontent #fcorder_notes_box .choices__list--dropdown {
+	z-index: 50;
+	width: max-content !important;
+	min-width: 100% !important;
+	max-width: 560px;
+}
+
+#flexicontent #fcorder_notes_box .choices__list--dropdown .choices__item {
+	min-height: 0 !important;
+	padding: .55rem .9rem !important;
+	line-height: 1.35 !important;
+	white-space: normal;
+}
+
+#flexicontent #fcorder_notes_box .choices__list--dropdown .choices__input,
+#flexicontent #fcorder_notes_box .choices__input--cloned {
+	min-height: 0 !important;
+	margin: 0 !important;
+	padding: .55rem .9rem !important;
+	line-height: 1.3 !important;
+}
+
+/* The help / actions bar continues the same white band, directly followed by the table header */
+#flexicontent #fcorder_notes_box ~ .fc-reorder-panel {
+	margin: 0;
+	border-width: 0;
+	border-radius: 0;
+}
+
+
+/* Zebra: filters row white, selectors row slightly tinted, info row white again, then the grey table header */
+#flexicontent #fcorder_notes_box {
+	background-image: linear-gradient(rgba(100, 116, 139, .08), rgba(100, 116, 139, .08));
+	padding-top: 12px !important;
+}
+
+/* The selected value is centered vertically (it used to stick to the top) */
+#flexicontent #fcorder_notes_box .choices__list--single {
+	display: flex;
+	align-items: center;
+	align-self: stretch;
+}
+
+#flexicontent #fcorder_notes_box .choices__list--single .choices__item {
+	display: flex;
+	align-items: center;
+	height: 100%;
+}
+
+
+/* Managers without type tabs (e.g. fields): the white band has rounded top corners */
+#fc-managers-header.fc-mh-solo {
+	border-radius: .4rem .4rem 0 0;
+}
+
+
+/* Fixed widths of the selectors of the ordering mode (they used to stretch to the width of their longest option) */
+#flexicontent #fcorder_notes_box .fc-iblock {
+	flex: 0 0 auto;
+	width: min(360px, 100%);
+}
+
+#flexicontent #fcorder_notes_box #order_type_selector {
+	width: min(560px, 100%);
+}
+
+#flexicontent #fcorder_notes_box.fc-order-fields #order_type_selector {
+	width: min(420px, 100%);
+}
+
+#flexicontent #fcorder_notes_box .fc-iblock .choices,
+#flexicontent #fcorder_notes_box #order_type_selector .choices {
+	flex: 1 1 auto;
+	width: auto;
+	min-width: 0;
+}
+
+
+/* The groups fill their (fixed width) boxes, so the selectors follow each other without empty space */
+#flexicontent #fcorder_notes_box .fc-filter,
+#flexicontent #fcorder_notes_box .fc-filter .input-group {
+	width: 100%;
+}
+
+/* Compact lists in the ordering mode (items, option groups and their headings) */
+#flexicontent #fcorder_notes_box .choices__list--dropdown .choices__item,
+#flexicontent #fcorder_notes_box .choices__list--dropdown .choices__heading {
+	height: auto !important;
+	min-height: 0 !important;
+	margin: 0 !important;
+	padding: .4rem .9rem !important;
+	line-height: 1.3 !important;
+}
+
+#flexicontent #fcorder_notes_box .choices__list--dropdown .choices__heading {
+	font-size: .8rem;
+	padding-top: .6rem !important;
+}
+
+
+/* ==========================================================================
+   File manager
+   ========================================================================== */
+
+/* The search group, the limit box and the counters share one row: tighter gaps */
+#flexicontent #fc-managers-header.fc-mh-fm .fc-filter-head-box {
+	margin-inline-end: 8px;
+}
+
+#flexicontent #fc-managers-header.fc-mh-fm .fc_item_total_data,
+#flexicontent #fc-managers-header.fc-mh-fm .fc_pages_counter {
+	margin-inline-start: 6px !important;
+	padding: 0 12px !important;
+}
+
+/* Second row: select all, upload, view mode, columns and the thumbnails size slider, all on one line */
+#flexicontent #fc-managers-header.fc-mh-fm .fc-fm-toolbar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: stretch;
+	gap: .5rem;
+	margin: 8px 0 0;
+}
+
+#flexicontent #fc-managers-header.fc-mh-fm .fc-fm-toolbar > .btn-group {
+	margin: 0 !important;
+}
+
+/* The columns button is as tall as its neighbours */
+#flexicontent #fc-managers-header.fc-mh-fm .fc-fm-toolbar > .fc-iblock:not(.fc-fm-thumbsize) {
+	display: flex;
+	margin: 0;
+}
+
+#flexicontent #fc-managers-header.fc-mh-fm #fc_mainChooseColBox_btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+	min-width: 2.6rem;
+	padding: 0 .75rem;
+}
+
+#flexicontent #fc-managers-header.fc-mh-fm .fc-fm-thumbsize {
+	display: flex;
+	align-items: center;
+	margin: 0 0 0 calc(1.5rem + 10px);
+}
+
+#flexicontent #fc-managers-header.fc-mh-fm .fc-fm-thumbsize [id$="thumb-size_nouislider"] {
+	width: 200px;
+	max-width: 200px;
+	margin: 0 !important;
+}
+
+/* The yellow size label is shown only while the handle is hovered or dragged */
+#flexicontent .fc-fm-thumbsize .noUi-handle .fc-sliderTooltip {
+	display: none;
+}
+
+#flexicontent .fc-fm-thumbsize .noUi-handle:hover .fc-sliderTooltip,
+#flexicontent .fc-fm-thumbsize .noUi-handle.noUi-active .fc-sliderTooltip {
+	display: inline-block;
+}
+
+/* Zebra of the file list */
+.fc-table-wrap.fman_list_element table.fcmanlist > tbody > tr.row1 > td {
+	background: rgba(100, 116, 139, .08);
+}
+
+[data-bs-theme="dark"] .fc-table-wrap.fman_list_element table.fcmanlist > tbody > tr.row1 > td {
+	background: rgba(255, 255, 255, .05);
+}
+
+/* File manager: half of the default gap between the list and the uploader */
+#flexicontent .row.fc-fm-row {
+	--bs-gutter-x: .75rem;
+}
+
+#flexicontent .row.fc-fm-row > #fc-fileman-fileslist-col.span6 {
+	padding-inline: 6px !important;
+}
+
+#flexicontent .row.fc-fm-row > #fc-fileman-addfiles-col {
+	padding-inline: 6px !important;
+}
+
+/* Search (indexes) manager: the list type selector lives inside the header band */
+#flexicontent #fc-managers-header .fc-index-type {
+	display: flex;
+	align-items: center;
+	gap: .5rem;
+}
+
+#flexicontent #fc-managers-header .fc-index-type .label {
+	color: #fff;
+}
+
+
+/* ==========================================================================
+   Other styles of the type tabs (global configuration: Items Manager - Appearance - Content type tabs style)
+   Default style: browser tabs (above). Added: hanging tabs, underline
+   ========================================================================== */
+
+/* --- Hanging tabs: separate rounded tabs hanging from the top bar, the active one is lifted and lighter --- */
+.fc-type-tabs.fc-tabs-hanging {
+	align-items: center;
+	gap: 4px;
+	padding: 8px 10px;
+}
+
+.fc-type-tabs.fc-tabs-hanging .fc-type-tab {
+	padding: .45rem 1.05rem;
+	border-radius: 9px;
+}
+
+.fc-type-tabs.fc-tabs-hanging .fc-type-tab.fc-subtype {
+	padding: .4rem .85rem;
+}
+
+/* No separators and no curved flares: the tabs are separate shapes */
+.fc-type-tabs.fc-tabs-hanging .fc-type-tab:not(.is-active) + .fc-type-tab:not(.is-active)::before,
+.fc-type-tabs.fc-tabs-hanging .fc-type-tab.is-active::before,
+.fc-type-tabs.fc-tabs-hanging .fc-type-tab.is-active::after {
+	display: none;
+}
+
+.fc-type-tabs.fc-tabs-hanging .fc-type-tab.is-active {
+	background: var(--fc-tab-active-bg);
+	box-shadow: 0 1px 3px rgba(15, 23, 42, .22), 0 0 0 1px rgba(15, 23, 42, .04);
+}
+
+[data-bs-theme="dark"] .fc-type-tabs.fc-tabs-hanging .fc-type-tab.is-active {
+	box-shadow: 0 1px 3px rgba(0, 0, 0, .55);
+}
+
+
+/* --- Underline: plain tabs on a white bar, a colored line under the active one --- */
+.fc-type-tabs.fc-tabs-underline {
+	--fc-tabbar-bg: var(--card-bg, #fff);
+	align-items: flex-end;
+	gap: .25rem;
+	padding: 8px 12px 0;
+	border-bottom: 1px solid rgba(107, 114, 128, .28);
+}
+
+[data-bs-theme="dark"] .fc-type-tabs.fc-tabs-underline {
+	--fc-tabbar-bg: var(--card-bg, #23282d);
+}
+
+.fc-type-tabs.fc-tabs-underline .fc-type-tab {
+	padding: .6rem 1rem .7rem;
+	border-radius: 7px 7px 0 0;
+}
+
+.fc-type-tabs.fc-tabs-underline .fc-type-tab.fc-subtype {
+	padding: .5rem .85rem .6rem;
+}
+
+.fc-type-tabs.fc-tabs-underline .fc-type-tab:not(.is-active) + .fc-type-tab:not(.is-active)::before,
+.fc-type-tabs.fc-tabs-underline .fc-type-tab.is-active::before {
+	display: none;
+}
+
+.fc-type-tabs.fc-tabs-underline .fc-type-tab:not(.is-active):hover {
+	color: var(--body-color, #111827);
+	background: rgba(107, 114, 128, .1);
+}
+
+.fc-type-tabs.fc-tabs-underline .fc-type-tab.is-active {
+	background: transparent;
+}
+
+.fc-type-tabs.fc-tabs-underline .fc-type-tab.is-active::after {
+	inset-inline-start: .6rem;
+	inset-inline-end: .6rem;
+	bottom: -1px;
+	width: auto;
+	height: 3px;
+	background: var(--primary-bg, #1c4f9c);
+	border-radius: 3px 3px 0 0;
+}
+
+
+/* --- Flat: square tabs in a solid bar separated by thin lines, the active one is filled with the accent color --- */
+.fc-type-tabs.fc-tabs-flat {
+	--fc-tabbar-bg: #e9ecf0;
+	align-items: stretch;
+	gap: 0;
+	padding: 0;
+	border-radius: 0;
+}
+
+[data-bs-theme="dark"] .fc-type-tabs.fc-tabs-flat {
+	--fc-tabbar-bg: #1a1f24;
+}
+
+.fc-type-tabs.fc-tabs-flat .fc-type-tab {
+	padding: .7rem 1.3rem;
+	border-radius: 0;
+	border-inline-end: 1px solid rgba(107, 114, 128, .22);
+}
+
+.fc-type-tabs.fc-tabs-flat .fc-type-tab.fc-subtype {
+	padding: .7rem 1.1rem;
+}
+
+.fc-type-tabs.fc-tabs-flat .fc-type-tab:not(.is-active) + .fc-type-tab:not(.is-active)::before,
+.fc-type-tabs.fc-tabs-flat .fc-type-tab.is-active::before,
+.fc-type-tabs.fc-tabs-flat .fc-type-tab.is-active::after {
+	display: none;
+}
+
+.fc-type-tabs.fc-tabs-flat .fc-type-tab:not(.is-active):hover {
+	background: rgba(107, 114, 128, .15);
+}
+
+.fc-type-tabs.fc-tabs-flat .fc-type-tab.is-active {
+	color: #fff;
+	background: var(--primary-bg, #1c4f9c);
+}
+
+.fc-type-tabs.fc-tabs-flat .fc-type-tabs-sep {
+	align-self: center;
+	padding: 0 .6rem 0 1.1rem;
+}
+
+
+/* --- Pills: rounded capsules on the grey bar (like the other styles), the active one is white with an accent outline --- */
+.fc-type-tabs.fc-tabs-pills {
+	align-items: center;
+	gap: .4rem;
+	padding: 10px 12px;
+}
+
+.fc-type-tabs.fc-tabs-pills .fc-type-tab {
+	padding: .4rem 1.05rem;
+	border: 1px solid transparent;
+	border-radius: 999px;
+}
+
+.fc-type-tabs.fc-tabs-pills .fc-type-tab.fc-subtype {
+	padding: .35rem .9rem;
+}
+
+.fc-type-tabs.fc-tabs-pills .fc-type-tab:not(.is-active) + .fc-type-tab:not(.is-active)::before,
+.fc-type-tabs.fc-tabs-pills .fc-type-tab.is-active::before,
+.fc-type-tabs.fc-tabs-pills .fc-type-tab.is-active::after {
+	display: none;
+}
+
+.fc-type-tabs.fc-tabs-pills .fc-type-tab.is-active {
+	color: var(--primary-bg, #1c4f9c);
+	background: var(--fc-tab-active-bg);
+	border-color: rgba(28, 79, 156, .35);
+	border-color: color-mix(in srgb, var(--primary-bg, #1c4f9c) 38%, transparent);
+	box-shadow: 0 1px 2px rgba(15, 23, 42, .12);
+}

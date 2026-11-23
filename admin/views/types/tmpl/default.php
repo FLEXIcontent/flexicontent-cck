@@ -47,15 +47,17 @@ $view_items  = Text::_('FLEXI_VIEW', true); //Text::_('FLEXI_VIEW_ITEMS', true);
 
 
 /**
- * JS for Columns chooser box and Filters box
+ * Resizable / movable / hideable columns (replaces the old column chooser), settings are stored in the browser
  */
 
-flexicontent_html::jscode_to_showhide_table(
-	'mainChooseColBox',
-	'adminListTableFC' . $this->view,
-	$start_html = '',  //'<span class="badge ' . (FLEXI_J40GE ? 'badge-dark' : 'badge-inverse') . '">' . Text::_('FLEXI_COLUMNS', true) . '<\/span> &nbsp; ',
-	$end_html = '<div id="fc-columns-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="' . Text::_('FLEXI_HIDE') . '" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/div>'
-);
+$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/css/fc_table_tools.css', array('version' => FLEXI_VHASH));
+$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/css/fc_type_tabs.css', array('version' => FLEXI_VHASH));
+$document->addScript(\Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/js/fc-table-tools.js', array('version' => FLEXI_VHASH));
+
+foreach (array('FLEXI_TBL_MOVE_COL', 'FLEXI_TBL_HIDE_COL', 'FLEXI_TBL_SHOW_COL', 'FLEXI_TBL_FIT_COL', 'FLEXI_TBL_RESET_WIDTHS', 'FLEXI_TBL_RESET_COLS') as $fc_txt)
+{
+	\Joomla\CMS\Language\Text::script($fc_txt);
+}
 
 
 
@@ -176,7 +178,7 @@ if ($js)
 <?php endif;?>
 
 
-	<div id="fc-managers-header">
+	<div id="fc-managers-header" class="fc-mh-items fc-mh-solo">
 
 		<?php if (!empty($this->lists['scope_tip'])) : ?>
 		<div class="fc-filter-head-box filter-search nowrap_box" style="margin: 0;">
@@ -296,58 +298,58 @@ if ($js)
 	<thead>
 		<tr>
 
-			<th class="col_num hidden-phone">
+			<th class="col_num hidden-phone" data-col="num">
 				<?php echo Text::_( 'FLEXI_NUM' ); ?>
 			</th>
 
-			<th class="col_cb left">
+			<th class="col_cb left" data-col="cb">
 				<div class="group-fcset">
 					<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value="" title="<?php echo Text::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
 					<label for="checkall-toggle" class="green single"></label>
 				</div>
 			</th>
 
-			<th class="col_status hideOnDemandClass left">
+			<th class="col_status hideOnDemandClass left" data-col="status">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_STATUS', 'a.' . $this->state_propname, $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="col_title hideOnDemandClass title">
+			<th class="col_title hideOnDemandClass title" data-col="title">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_TYPE_NAME', 'a.name', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="col_redirect hideOnDemandClass hidden-phone hidden-tablet">
+			<th class="col_redirect hideOnDemandClass hidden-phone hidden-tablet" data-col="redirect" data-col-label="<?php echo htmlspecialchars(Text::_('FLEXI_JOOMLA_ARTICLE_VIEW'), ENT_QUOTES, 'UTF-8'); ?>">
 				<?php echo $article_viewing_tip . Text::_( 'FLEXI_JOOMLA_ARTICLE_VIEW' )."<br/><small>(" . Text::_( 'FLEXI_ALLOWED') .' / '. Text::_( 'FLEXI_REROUTED' ) .' / '. Text::_( 'FLEXI_REDIRECTED' ) . ")</small>"; ?>
 			</th>
 
-			<th class="col_template left hideOnDemandClass hidden-phone hidden-tablet" colspan="2">
+			<th class="col_template left hideOnDemandClass hidden-phone hidden-tablet" colspan="2" data-col="template" data-col-label="<?php echo htmlspecialchars(Text::_('FLEXI_TEMPLATE'), ENT_QUOTES, 'UTF-8'); ?>">
 				<?php echo $default_template_tip.Text::_( 'FLEXI_TEMPLATE' )."<br/><small>(".Text::_( 'FLEXI_PROPERTY_DEFAULT' )." ".Text::_( 'FLEXI_TEMPLATE_ITEM' ).")</small>"; ?>
 			</th>
 
-			<th class="col_template left hideOnDemandClass hidden-phone hidden-tablet" >
+			<th class="col_template left hideOnDemandClass hidden-phone hidden-tablet"  data-col="maincat" data-col-label="<?php echo htmlspecialchars(Text::_('FLEXI_MAIN_CATEGORY'), ENT_QUOTES, 'UTF-8'); ?>">
 				<?php echo $limit_maincat_tip.Text::_( 'FLEXI_MAIN_CATEGORY' ) . '<br/><small>(' . Text::_( 'FLEXI_SUBTREE_LIMITATION' ) . ')</small>'; ?>
 			</th>
 
-			<th class="col_iflayout center hideOnDemandClass hidden-phone hidden-tablet" colspan="2" >
+			<th class="col_iflayout center hideOnDemandClass hidden-phone hidden-tablet" colspan="2"  data-col="iflayout" data-col-label="<?php echo htmlspecialchars(Text::_('Form') . ' ' . Text::_('FLEXI_LAYOUT'), ENT_QUOTES, 'UTF-8'); ?>">
 				<?php echo Text::_( 'Form'). ' ' . Text::_( 'FLEXI_LAYOUT' ) . '<br/><small>(' . Text::_( 'FLEXI_FRONTEND' ) . ' ' . Text::_( 'FLEXI_BACKEND' ) . ')</small>'; ?>
 			</th>
 
-			<th class="col_alias hideOnDemandClass hidden-phone hidden-tablet">
+			<th class="col_alias hideOnDemandClass hidden-phone hidden-tablet" data-col="alias">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_ALIAS', 'a.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="col_fassigned hideOnDemandClass center">
+			<th class="col_fassigned hideOnDemandClass center" data-col="fassigned">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_FIELDS', 'fassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="col_iassigned hideOnDemandClass center">
+			<th class="col_iassigned hideOnDemandClass center" data-col="iassigned">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_ITEMS', 'iassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="col_access hideOnDemandClass hidden-phone">
+			<th class="col_access hideOnDemandClass hidden-phone" data-col="access">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_ACCESS', 'a.access', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="col_id hideOnDemandClass center hidden-phone hidden-tablet">
+			<th class="col_id hideOnDemandClass center hidden-phone hidden-tablet" data-col="id">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order']); ?>
 			</th>
 
@@ -388,16 +390,16 @@ if ($js)
 			?>
 		<tr class="<?php echo 'row' . ($i % 2); ?>">
 
-			<td class="col_num hidden-phone">
+			<td class="col_num hidden-phone" data-col="num">
 				<?php echo $this->pagination->getRowOffset($i); ?>
 			</td>
 
-			<td class="col_cb">
+			<td class="col_cb" data-col="cb">
 				<!--div class="adminlist-table-row"></div-->
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_($hlpname . '.grid_id', $i, $row->id); ?>
 			</td>
 
-			<td class="col_status" style="padding-right: 8px;">
+			<td class="col_status" style="padding-right: 8px;" data-col="status">
 				<div class="btn-group fc-group fc-types">
 					<?php
 					//echo \Joomla\CMS\HTML\HTMLHelper::_('jgrid.published', $row->state, $i, $ctrl, $stateIsChangeable);
@@ -408,7 +410,7 @@ if ($js)
 				</div>
 			</td>
 
-			<td class="col_title ">
+			<td class="col_title " data-col="title">
 				<?php
 				/**
 				 * Display an edit pencil or a check-in button if: either (a) current user has Global
@@ -424,7 +426,7 @@ if ($js)
 				?>
 			</td>
 
-			<td class="col_redirect hidden-phone hidden-tablet">
+			<td class="col_redirect hidden-phone hidden-tablet" data-col="redirect">
 				<?php
 					$jarticle_url_handling_txts = array(0 => 'FLEXI_ROUTE_TO_ITEM_VIEW', 1 => 'FLEXI_ALLOWED', '2' => 'FLEXI_REDIRECT_TO_ITEM_VIEW');
 					$allow_jview = $row->config->get("allow_jview");
@@ -438,53 +440,53 @@ if ($js)
 				?>
 			</td>
 
-			<td class="col_edit_layout hidden-phone hidden-tablet">
+			<td class="col_edit_layout hidden-phone hidden-tablet" data-col="template">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_($hlpname . '.edit_layout', $row, '__modal__', $i, $this->perms->CanTemplates, $row_ilayout); ?>
 			</td>
 
-			<td class="col_template  hidden-phone hidden-tablet">
+			<td class="col_template  hidden-phone hidden-tablet" data-col="template">
 				<?php echo $row_ilayout; ?>
 			</td>
 
-			<td class="col_allowed_subtree  hidden-phone hidden-tablet">
+			<td class="col_allowed_subtree  hidden-phone hidden-tablet" data-col="maincat">
 				<?php echo isset($globalcats[$catid_allowed_parent]) ? $globalcats[$catid_allowed_parent]->title : '-'; ?>
 			</td>
 
-			<td class="col_iflayout_fe  center hidden-phone hidden-tablet">
+			<td class="col_iflayout_fe  center hidden-phone hidden-tablet" data-col="iflayout">
 				<?php echo $row_form_ilayout_fe; ?>
 			</td>
 
-			<td class="col_iflayout_be  center hidden-phone hidden-tablet">
+			<td class="col_iflayout_be  center hidden-phone hidden-tablet" data-col="iflayout">
 				<?php echo $row_form_ilayout_be; ?>
 			</td>
 
-			<td class="col_alias  hidden-phone hidden-tablet">
+			<td class="col_alias  hidden-phone hidden-tablet" data-col="alias">
 				<?php echo StringHelper::strlen($row->alias) > 25
 					? StringHelper::substr( htmlspecialchars($row->alias, ENT_QUOTES, 'UTF-8'), 0 , 25) . '...'
 					: htmlspecialchars($row->alias, ENT_QUOTES, 'UTF-8');
 				?>
 			</td>
 
-			<td class="col_fassigned center">
+			<td class="col_fassigned center" data-col="fassigned">
 				<a class="badge fc-assignments-btn" href="<?php echo $fields_link; ?>">
 					<?php echo $row->fassigned; ?>
 				</a>
 			</td>
 
-			<td class="col_iassigned center">
+			<td class="col_iassigned center" data-col="iassigned">
 				<a class="badge bg-info badge-info fc-assignments-btn" href="<?php echo $items_link; ?>">
 					<?php echo $row->iassigned; ?>
 				</a>
 			</td>
 
-			<td class="col_access hidden-phone">
+			<td class="col_access hidden-phone" data-col="access">
 				<?php echo $row->canEdit
 					? flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'class="fcfield_selectval" onchange="return Joomla.listItemTask(\'cb'.$i.'\',\''.$ctrl.'access\')"')
 					: $this->escape($row->access_level);
 				?>
 			</td>
 
-			<td class="col_id center hidden-phone hidden-tablet">
+			<td class="col_id center hidden-phone hidden-tablet" data-col="id">
 				<?php echo $row->id; ?>
 			</td>
 
@@ -495,6 +497,7 @@ if ($js)
 	</tbody>
 
 	</table>
+	<script>window.fcTableTools && fcTableTools.init('adminListTableFC<?php echo $this->view; ?>');</script>
 
 
 	<div>

@@ -31,45 +31,10 @@ $dashboard_buttons_hide = $this->params->get('dashboard_buttons_hide', array());
 $dashboard_buttons_hide = FLEXIUtilities::paramToArray($dashboard_buttons_hide);
 
 $sbtns = array_flip($dashboard_buttons_hide);
-$skip_content_fieldset = isset($sbtns['items']) && isset($sbtns['additem']) && isset($sbtns['cats']) && isset($sbtns['addcat']) && isset($sbtns['files']) && isset($sbtns['comments']);
-$skip_types_fieldset   = isset($sbtns['types']) && isset($sbtns['addtype']) && isset($sbtns['fields']) && isset($sbtns['addfield']) && isset($sbtns['tags']) && isset($sbtns['addtag']);
 // Reviews button: show only if reviews are enabled in the voting field and user can manage reviews
-$showReviews = false;
+require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/dashboard.php';
+$showReviews = FlexicontentDashboard::reviewsEnabled($this->perms);
 
-if (!isset($sbtns['reviews']) && $this->perms->CanReviews && file_exists(JPATH_ADMINISTRATOR . '/components/com_flexicontent/views/reviews'))
-{
-	$rv_db    = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
-	$rv_field = $rv_db->setQuery('SELECT * FROM #__flexicontent_fields WHERE field_type = ' . $rv_db->Quote('voting'))->loadObject();
-
-	if ($rv_field)
-	{
-		$rv_item = (object) array('type_id' => 0);
-		FlexicontentFields::loadFieldConfig($rv_field, $rv_item);
-		$showReviews = (int) $rv_field->parameters->get('allow_reviews', 0) > 0;
-	}
-}
-
-$skip_viewing_fieldset = isset($sbtns['templates']) && isset($sbtns['index']) && isset($sbtns['stats']) && !$showReviews;
-$skip_users_fieldset   = isset($sbtns['users']) && isset($sbtns['adduser']) && isset($sbtns['groups']) && isset($sbtns['addgroup']);
-$skip_expert_fieldset  = isset($sbtns['import']) && isset($sbtns['plgfields']) && isset($sbtns['plgsystem']) && isset($sbtns['plgflexicontent']);
-
-$sectionTypes   = $this->perms->CanTypes || $this->perms->CanFields || $this->perms->CanTags || $this->perms->CanFiles;
-$sectionViewing = $this->perms->CanTemplates || $this->perms->CanIndex || $this->perms->CanStats || $showReviews;
-$sectionUsers   = $this->perms->CanAuthors || $this->perms->CanGroups;
-$sectionExpert  = $this->perms->CanPlugins || $this->perms->CanImport;
-
-$skip_types_fieldset   = $skip_types_fieldset   || !$sectionTypes;
-$skip_viewing_fieldset = $skip_viewing_fieldset || !$sectionViewing;
-$skip_users_fieldset   = $skip_users_fieldset   || !$sectionUsers;
-$skip_expert_fieldset  = $skip_users_fieldset   || !$sectionExpert;
-
-if (isset($sbtns['comments'])) $commentsShown = false;
-else if (
-	($this->params->get('comments')==1 && $this->perms->CanComments) ||  // Can administer JComments
-	($this->params->get('comments')==3 && $user->authorise('core.manage', 'com_komento')) ||  // Can administer Komento
-	(!$this->params->get('comments') && $this->params->get('comments_admin_link'))  // Custom comments extension
-) $commentsShown = true;
-else $commentsShown = false;
 
 // disable dashboard sliders
 $dashboard_sliders_disable = $this->params->get('dashboard_sliders_disable', array());
@@ -355,458 +320,57 @@ $items_task = 'task=items.';
 		?>
 		</div><!-- END OF .fc-dashboard-notices -->
 
-		<div class="fc-dashboard-layout">
-		<section class="fc-dashboard-cards">
-		<div id="fc-dash-boardbtns">
 		<?php
-		// BOF -- SHOW DASHBOARD BUTTONS -- (POST installation is DONE)
-		if ($this->dopostinstall && $config_saved) :
-			/**
-			 * Render a Joomla-style combined quickicon: main link on the left,
-			 * a "+" add link on the right (Joomla quickicon-group markup).
-			 */
-			$render_combo_quickicon = function ($link, $icon, $label, $add_link, $add_label, $modal = false, $modal_width = 0)
+		// Customizable blocks of buttons (layout is stored in the component parameter "dashboard_layout")
+		$dash_ready    = $this->dopostinstall && $config_saved;
+		$dash_is_admin = $user->authorise('core.admin', 'com_flexicontent');
+
+		$dash_layout   = FlexicontentDashboard::getLayout($this->params);
+		$dash_titles   = FlexicontentDashboard::getSysTitles($dash_layout);
+		$dash_registry = array();
+
+		if ($dash_ready)
+		{
+			$dash_registry = FlexicontentDashboard::getRegistry($this->perms, $this->params, $user, $showReviews);
+
+			if ($dash_is_admin)
 			{
-				$add_js_title = flexicontent_html::encodeHTML($add_label, 2);
-				$add_onclick  = $modal
-					? "var url = jQuery(this).attr('href'); fc_showDialog(url, 'fc_modal_popup_container', 0, ".(int) $modal_width.", 0, false, {'title': '".$add_js_title."'}); return false;"
-					: '';
-				?>
-				<div class="fc-board-button fc-board-button-combo quick-icons">
-					<ul class="quickicon-group list-unstyled d-flex w-100 mb-0">
-						<li class="quickicon">
-							<a href="<?php echo $link; ?>">
-								<div class="quickicon-info">
-									<div class="quickicon-icon"><div class="<?php echo $icon; ?>" aria-hidden="true"></div></div>
-								</div>
-								<div class="quickicon-name d-flex align-items-end"><?php echo $label; ?></div>
-							</a>
-						</li>
-						<li class="quickicon-linkadd j-links-link d-flex">
-							<a class="d-flex" href="<?php echo $add_link; ?>" title="<?php echo htmlspecialchars($add_label, ENT_COMPAT, 'UTF-8'); ?>"<?php if ($add_onclick) echo ' onclick="'.htmlspecialchars($add_onclick, ENT_COMPAT, 'UTF-8').'"'; ?>>
-								<span class="icon-plus" aria-hidden="true"></span>
-							</a>
-						</li>
-					</ul>
-				</div>
-				<?php
-			};
+				$dash_data = FlexicontentDashboard::getEditorData($dash_layout, $dash_registry);
+				$dash_data['url']   = 'index.php?option=com_flexicontent&format=raw&task=flexicontent.';
+				$dash_data['token'] = \Joomla\CMS\Session\Session::getFormToken();
+				$dash_data['icons'] = array(
+					'icon-link', 'icon-home', 'icon-star', 'icon-cog', 'icon-wrench', 'icon-file-alt', 'icon-folder', 'icon-images',
+					'icon-users', 'icon-tags', 'icon-search', 'icon-chart', 'icon-book', 'icon-upload', 'icon-download', 'icon-envelope',
+					'icon-globe', 'icon-bookmark', 'icon-heart', 'icon-flag', 'icon-help', 'icon-puzzle', 'icon-cube', 'icon-power-cord',
+					'icon-paint-brush', 'icon-comment', 'icon-lock', 'icon-calendar', 'icon-print', 'icon-cart', 'icon-database', 'icon-code',
+				);
+				$this->document->addScriptOptions('com_flexicontent.dashboard', $dash_data);
+
+				foreach (array(
+					'FLEXI_DASH_CUSTOMIZE', 'FLEXI_DASH_ADD_BLOCK', 'FLEXI_DASH_RESET', 'FLEXI_DASH_RESET_CONFIRM', 'FLEXI_DASH_ADD_BUTTON',
+					'FLEXI_DASH_NEW_BLOCK', 'FLEXI_DASH_BLOCK_TITLE', 'FLEXI_DASH_WIDTH', 'FLEXI_DASH_REMOVE', 'FLEXI_DASH_BUILTIN_BUTTONS',
+					'FLEXI_DASH_CUSTOM_LINK', 'FLEXI_DASH_LINK_TITLE', 'FLEXI_DASH_LINK_URL', 'FLEXI_DASH_ICON', 'FLEXI_DASH_OPEN_IN',
+					'FLEXI_DASH_TARGET_SELF', 'FLEXI_DASH_TARGET_BLANK', 'FLEXI_DASH_TARGET_MODAL', 'FLEXI_DASH_NO_MORE_BUTTONS',
+					'FLEXI_DASH_SAVE_ERROR', 'FLEXI_DASH_UNAVAILABLE', 'FLEXI_DASH_TOGGLE_PLUS', 'FLEXI_DASH_EMPTY_BLOCK',
+					'FLEXI_DASH_DELETE_BLOCK_CONFIRM', 'FLEXI_DASH_SYSTEM_BLOCK', 'FLEXI_DASH_BG_COLOR', 'FLEXI_DASH_EXPORT', 'FLEXI_DASH_IMPORT', 'FLEXI_DASH_IMPORT_OK', 'FLEXI_DASH_IMPORT_ERROR', 'FLEXI_DASH_BG_RESET', 'FLEXI_DASH_STANDARD_BUTTONS', 'FLEXI_DASH_ALREADY_USED', 'FLEXI_DASH_PICK_HINT', 'FLEXI_DASH_EDIT_LINK', 'FLEXI_DASH_HINT', 'FLEXI_DASH_URL_REQUIRED',
+					'FLEXI_SAVE', 'FLEXI_CANCEL', 'FLEXI_ADD', 'FLEXI_DELETE',
+				) as $dash_txt)
+				{
+					\Joomla\CMS\Language\Text::script($dash_txt);
+				}
+
+				$this->document->addScript(\Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/js/dashboard_layout.js', array('version' => FLEXI_VHASH), array('defer' => true));
+			}
+		}
 		?>
 
-		<?php if (empty($skip_content_fieldset)): ?>
-		<fieldset class="fc-board-set card fc-dashboard-card">
-			<h3 class="fc-board-header card-header"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_NAV_SD_CONTENT_EDITING' );?></h3>
-
-			<div class="fc-board-set-inner card-body"><?php
-			$show_items_btn    = !isset($sbtns['items']);
-			$show_additem_btn  = !isset($sbtns['additem']);
-			$can_add_any_item  = false;
-
-			if ($show_additem_btn)
-			{
-				// Check if user can create in at least one published category
-				require_once("components/com_flexicontent/models/item.php");
-
-				$itemmodel = new FlexicontentModelItem();
-				$can_add_any_item = $itemmodel->getItemAccess()->get('access-create');
-			}
-
-			if ($show_items_btn && $show_additem_btn && $can_add_any_item)
-			{
-				$render_combo_quickicon(
-					'index.php?option='.$option.'&amp;view=items',
-					'icon-file-alt',
-					\Joomla\CMS\Language\Text::_('FLEXI_ITEMS'),
-					'index.php?option='.$option.'&amp;view=types&amp;tmpl=component&amp;layout=typeslist&amp;action=new',
-					\Joomla\CMS\Language\Text::_('FLEXI_NEW_ITEM'),
-					true,
-					1200
-				);
-			}
-			else
-			{
-				if ($show_items_btn)
-				{
-					$link = 'index.php?option='.$option.'&amp;view=items';
-					FlexicontentViewFlexicontent::quickiconButton( $link, '', 'icon-items', \Joomla\CMS\Language\Text::_( 'FLEXI_ITEMS' ) );
-				}
-				if ($show_additem_btn && $can_add_any_item)
-				{
-					$link = 'index.php?option='.$option.'&amp;view=types&amp;tmpl=component&amp;layout=typeslist&amp;action=new';
-					FlexicontentViewFlexicontent::quickiconButton($link, '', 'icon-apply', \Joomla\CMS\Language\Text::_('FLEXI_NEW_ITEM' ), 1, 1, 1200, 0);
-				}
-			}
-			/*if ($this->perms->CanArchives && !isset($sbtns['archives']))
-			{
-				$link = 'index.php?option='.$option.'&amp;view=archive';
-				FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-archive.png', \Joomla\CMS\Language\Text::_( 'FLEXI_ARCHIVE' ) );
-			}*/
-			if ($this->perms->CanCats)
-			{
-				$show_cats_btn    = !isset($sbtns['cats']);
-				$show_addcat_btn  = !isset($sbtns['addcat']);
-				$can_create_cat   = $show_addcat_btn ? FlexicontentHelperPerm::getPermAny('core.create') : false;
-
-				if ($show_cats_btn && $show_addcat_btn && $can_create_cat)
-				{
-					$render_combo_quickicon(
-						'index.php?option='.$option.'&amp;view=categories',
-						'icon-folder',
-						\Joomla\CMS\Language\Text::_('FLEXI_CATEGORIES'),
-						'index.php?option='.$option.'&amp;view=category',
-						\Joomla\CMS\Language\Text::_('FLEXI_NEW_CATEGORY')
-					);
-				}
-				else
-				{
-					if ($show_cats_btn)
-					{
-						$link = 'index.php?option='.$option.'&amp;view=categories';
-						FlexicontentViewFlexicontent::quickiconButton( $link, '' ,'icon-folder', \Joomla\CMS\Language\Text::_( 'FLEXI_CATEGORIES' ) );
-					}
-					if ($show_addcat_btn && $can_create_cat)
-					{
-						$link = 'index.php?option='.$option.'&amp;view=category';
-						FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-folder-plus', \Joomla\CMS\Language\Text::_( 'FLEXI_NEW_CATEGORY' ) );
-					}
-				}
-			}
-			// Files moved here from "Types & Fields", right after Categories
-			if ($this->perms->CanFiles && !isset($sbtns['files']))
-			{
-				$link = 'index.php?option='.$option.'&amp;view=filemanager';
-				FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-images' , \Joomla\CMS\Language\Text::_( 'FLEXI_FILEMANAGER' ) );
-			}
-			if (isset($sbtns['comments']))
-			{
-				// skip
-			}
-			elseif (
-				($this->params->get('comments')==1 && $this->perms->CanComments) ||  // Can administer JComments
-				($this->params->get('comments')==3 && $user->authorise('core.manage', 'com_komento')) ||  // Can administer Komento
-				(!$this->params->get('comments') && $this->params->get('comments_admin_link'))  // Custom comments extension
-			) {
-				echo '<span class="fc-board-button_sep"></span>';
-				switch((int) $this->params->get('comments'))
-				{
-					case 1:
-						$link = 'index.php?option=com_jcomments&amp;task=view&amp;fog=com_flexicontent';
-						$link_title = \Joomla\CMS\Language\Text::_('JComments');
-						break;
-					case 3:
-						$link = 'index.php?option=com_komento';
-						$link_title = \Joomla\CMS\Language\Text::_('Komento');
-						break;
-					default:
-						$link = $this->params->get('comments_admin_link');
-						$link_title = \Joomla\CMS\Language\Text::_('FLEXI_COMMENTS');
-						break;
-				}
-				FlexicontentViewFlexicontent::quickiconButton( $link, '', 'icon-comment', $link_title, 1 );
-			}
-			elseif ($this->params->get('comments')==1 && !$this->perms->JComments_Installed)
-			{
-				echo '<span class="fc-board-button_sep"></span>';
-				$link = '';
-				FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-comment' , \Joomla\CMS\Language\Text::_( 'FLEXI_JCOMMENTS_MISSING' ), 1 );
-			}
-			?>
-			</div>
-		</fieldset>
-		<?php endif; ?>
-
-
-		<?php if (empty($skip_types_fieldset)): ?>
-		<fieldset class="fc-board-set card fc-dashboard-card">
-			<h3 class="fc-board-header card-header"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_NAV_SD_TYPES_N_FIELDS' );?></h3>
-
-			<div class="fc-board-set-inner card-body"><?php
-			$add_sep = false;
-			if ($this->perms->CanTypes)
-			{
-				$show_types_btn   = !isset($sbtns['types']);
-				$show_addtype_btn = !isset($sbtns['addtype']);
-
-				if ($show_types_btn && $show_addtype_btn)
-				{
-					$render_combo_quickicon(
-						'index.php?option='.$option.'&amp;view=types',
-						'icon-briefcase',
-						\Joomla\CMS\Language\Text::_('FLEXI_TYPES'),
-						'index.php?option='.$option.'&amp;view=type',
-						\Joomla\CMS\Language\Text::_('FLEXI_NEW_TYPE')
-					);
-					$add_sep = true;
-				}
-				else
-				{
-					if ($show_types_btn) {
-						$link = 'index.php?option='.$option.'&amp;view=types';
-						FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-briefcase', \Joomla\CMS\Language\Text::_( 'FLEXI_TYPES' ) );
-						$add_sep = true;
-					}
-					if ($show_addtype_btn) {
-						$link = 'index.php?option='.$option.'&amp;view=type';
-						FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-file-add', \Joomla\CMS\Language\Text::_( 'FLEXI_NEW_TYPE' ) );
-						$add_sep = true;
-					}
-				}
-			}
-			if ($this->perms->CanFields)
-			{
-				$show_fields_btn   = !isset($sbtns['fields']);
-				$show_addfield_btn = !isset($sbtns['addfield']);
-
-				if ($show_fields_btn && $show_addfield_btn)
-				{
-					$render_combo_quickicon(
-						'index.php?option='.$option.'&amp;view=fields',
-						'icon-signup',
-						\Joomla\CMS\Language\Text::_('FLEXI_FIELDS'),
-						'index.php?option='.$option.'&amp;view=field',
-						\Joomla\CMS\Language\Text::_('FLEXI_NEW_FIELD')
-					);
-					$add_sep = true;
-				}
-				else
-				{
-					if ($show_fields_btn) {
-						$link = 'index.php?option='.$option.'&amp;view=fields';
-						FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-signup', \Joomla\CMS\Language\Text::_( 'FLEXI_FIELDS' ) );
-						$add_sep = true;
-					}
-					if ($show_addfield_btn) {
-						$link = 'index.php?option='.$option.'&amp;view=field';
-						FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-file-add', \Joomla\CMS\Language\Text::_( 'FLEXI_NEW_FIELD' ) );
-						$add_sep = true;
-					}
-				}
-				$addTagsBtns  = $this->perms->CanTags && (!isset($sbtns['tags']) || !isset($sbtns['addtag']));
-				if ($add_sep && $addTagsBtns)
-					echo '<span class="fc-board-button_sep"></span>';
-			}
-			if ($this->perms->CanTags)
-			{
-				$show_tags_btn   = !isset($sbtns['tags']);
-				$show_addtag_btn = !isset($sbtns['addtag']);
-
-				if ($show_tags_btn && $show_addtag_btn)
-				{
-					$render_combo_quickicon(
-						'index.php?option='.$option.'&amp;view=tags',
-						'icon-tags',
-						\Joomla\CMS\Language\Text::_('FLEXI_TAGS'),
-						'index.php?option='.$option.'&amp;view=tag',
-						\Joomla\CMS\Language\Text::_('FLEXI_NEW_TAG')
-					);
-				}
-				else
-				{
-					if ($show_tags_btn) {
-						$link = 'index.php?option='.$option.'&amp;view=tags';
-						FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-tags', \Joomla\CMS\Language\Text::_( 'FLEXI_TAGS' ) );
-					}
-					if ($show_addtag_btn) {
-						$link = 'index.php?option='.$option.'&amp;view=tag';
-						FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-file-add', \Joomla\CMS\Language\Text::_( 'FLEXI_NEW_TAG' ) );
-					}
-				}
-			}
-			?>
-			</div>
-		</fieldset>
-		<?php endif; ?>
-
-
-		<?php if (empty($skip_viewing_fieldset)): ?>
-		<fieldset class="fc-board-set card fc-dashboard-card">
-			<h3 class="fc-board-header card-header"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_NAV_SD_CONTENT_VIEWING' );?></h3>
-
-			<div class="fc-board-set-inner card-body"><?php
-			$add_sep = false;
-			if ($this->perms->CanTemplates && !isset($sbtns['templates']))
-			{
-				$link = 'index.php?option='.$option.'&amp;view=templates';
-				FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-paint-brush', \Joomla\CMS\Language\Text::_( 'FLEXI_TEMPLATES' ) );
-				$add_sep = true;
-			}
-			if ($this->perms->CanIndex && !isset($sbtns['index']))
-			{
-				$link = 'index.php?option='.$option.'&amp;view=search';
-				FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-search', \Joomla\CMS\Language\Text::_( 'FLEXI_SEARCH_INDEXES' ) );
-				$add_sep = true;
-			}
-
-			if ($this->perms->CanIndex)
-			{
-				$link = 'index.php?option='.$option.'&amp;view=search&amp;layout=logs&amp;tmpl=component';
-				FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-book', \Joomla\CMS\Language\Text::_( 'FLEXI_NAV_SD_SEARCH_LOGS' ), $modal = 1 );
-				$add_sep = true;
-			}
-
-			if ($this->perms->CanStats && !isset($sbtns['stats']))
-			{
-				if ($add_sep)
-					echo '<span class="fc-board-button_sep"></span>';
-
-				$link = 'index.php?option='.$option.'&amp;view=stats';
-				FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-chart', \Joomla\CMS\Language\Text::_( 'FLEXI_STATISTICS' ) );
-				$add_sep = true;
-			}
-
-			if ($showReviews)
-			{
-				if ($add_sep)
-					echo '<span class="fc-board-button_sep"></span>';
-
-				$link = 'index.php?option='.$option.'&amp;view=reviews';
-				FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-comments-2', \Joomla\CMS\Language\Text::_( 'FLEXI_REVIEWS' ) );
-			}
-			?>
-			</div>
-		</fieldset>
-		<?php endif; ?>
-
-
-		<?php if (empty($skip_users_fieldset)): ?>
-		<fieldset class="fc-board-set card fc-dashboard-card">
-			<h3 class="fc-board-header card-header"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_NAV_SD_USERS_N_GROUPS' );?></h3>
-
-			<div class="fc-board-set-inner card-body"><?php
-			if ($this->perms->CanAuthors)
-			{
-				$show_users_btn    = !isset($sbtns['users']);
-				$show_adduser_btn  = !isset($sbtns['adduser']);
-
-				if ($show_users_btn && $show_adduser_btn)
-				{
-					$render_combo_quickicon(
-						'index.php?option='.$option.'&amp;view=users',
-						'icon-users',
-						\Joomla\CMS\Language\Text::_('FLEXI_USERS'),
-						'index.php?option='.$option.'&amp;task=users.add',
-						\Joomla\CMS\Language\Text::_('FLEXI_ADD_USER')
-					);
-				}
-				else
-				{
-					if ($show_users_btn) {
-						$link = 'index.php?option='.$option.'&amp;view=users';
-						FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-users', \Joomla\CMS\Language\Text::_( 'FLEXI_USERS' ) );
-					}
-					if ($show_adduser_btn) {
-						$link = 'index.php?option='.$option.'&amp;task=users.add';
-						FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-file-add', \Joomla\CMS\Language\Text::_( 'FLEXI_ADD_USER' ) );
-					}
-				}
-			}
-			if ($this->perms->CanGroups)
-			{
-				$show_groups_btn   = !isset($sbtns['groups']);
-				$show_addgroup_btn = !isset($sbtns['addgroup']);
-
-				if ($show_groups_btn && $show_addgroup_btn)
-				{
-					$render_combo_quickicon(
-						'index.php?option='.$option.'&amp;view=groups',
-						'icon-users-cog',
-						\Joomla\CMS\Language\Text::_('FLEXI_GROUPS'),
-						'index.php?option='.$option.'&amp;task=groups.add',
-						\Joomla\CMS\Language\Text::_('FLEXI_ADD_GROUP')
-					);
-				}
-				else
-				{
-					if ($show_groups_btn) {
-						$link = 'index.php?option='.$option.'&amp;view=groups';
-						FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-users-cog', \Joomla\CMS\Language\Text::_( 'FLEXI_GROUPS' ) );
-					}
-					if ($show_addgroup_btn) {
-						$link = 'index.php?option='.$option.'&amp;task=groups.add';
-						FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-file-add', \Joomla\CMS\Language\Text::_( 'FLEXI_ADD_GROUP' ) );
-					}
-				}
-			}
-			?>
-			</div>
-		</fieldset>
-		<?php endif; ?>
-
-
-		<?php if (empty($skip_expert_fieldset)): ?>
-		<fieldset class="fc-board-set card fc-dashboard-card">
-			<h3 class="fc-board-header card-header"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_NAV_SD_EXPERT_USAGE' );?></h3>
-
-			<div class="fc-board-set-inner card-body"><?php
-			$add_sep = false;
-			if ($this->perms->CanImport && !isset($sbtns['import']))
-			{
-				$link = 'index.php?option='.$option.'&amp;view=import';
-				FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-upload', \Joomla\CMS\Language\Text::_( 'FLEXI_IMPORT' ) );
-				$add_sep = true;
-			}
-			if ($this->perms->CanPlugins)
-			{
-				if ($add_sep && (!isset($sbtns['plgfields']) || !isset($sbtns['plgsystem']) || !isset($sbtns['plgflexicontent'])))
-					echo '<span class="fc-board-button_sep"></span>';
-
-				if (!isset($sbtns['plgfields'])) {
-					$link = 'index.php?option=com_plugins&amp;filter_folder=flexicontent_fields';
-					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-power-cord', \Joomla\CMS\Language\Text::_( 'FLEXI_PLUGINS' ). ' - Fields', 1 );
-				}
-				if (!isset($sbtns['plgsystem'])) {
-					$link = 'index.php?option=com_plugins&amp;filter_folder=system&amp;filter_search=flexi';
-					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-cube', \Joomla\CMS\Language\Text::_( 'FLEXI_PLUGINS' ). ' - System', 1 );
-				}
-				if (!isset($sbtns['plgflexicontent'])) {
-					$link = 'index.php?option=com_plugins&amp;filter_folder=flexicontent';
-					FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-puzzle', \Joomla\CMS\Language\Text::_( 'FLEXI_PLUGINS' ). ' - Flexicontent', 1 );
-				}
-			}
-			if ( $this->perms->CanEdit )
-			{
-				//$link = 'index.php?option=com_content&amp;view=featured';
-				//if (!isset($sbtns['featured'])) FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-featured.png', \Joomla\CMS\Language\Text::_( 'FLEXI_FEATURED' ), 1 );
-			}
-			?>
-			</div>
-		</fieldset>
-		<?php endif; ?>
-
-
-		<?php if ($this->params->get('support_url')): ?>
-		<fieldset class="fc-board-set card fc-dashboard-card">
-			<h3 class="fc-board-header card-header"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_HELP' );?></h3>
-
-			<div class="fc-board-set-inner card-body"><?php
-			$link = $this->params->get('support_url');
-			FlexicontentViewFlexicontent::quickiconButton( $link, '','icon-help', \Joomla\CMS\Language\Text::_( 'FLEXI_SUPPORT' ), 1 );
-
-			// Read installation file
-			/*$manifest_path = JPATH_ADMINISTRATOR .DS. 'components' .DS. 'com_flexicontent' .DS. 'flexicontent.xml';
-			$com_xml = \Joomla\CMS\Installer\Installer::parseXMLInstallFile( $manifest_path );
-			if (!empty($com_xml['authorUrl']))
-			{
-				FlexicontentViewFlexicontent::quickiconButton( $com_xml['authorUrl'], 'icon-48-dashboard.png', \Joomla\CMS\Language\Text::_( 'FLEXI_ABOUT' ), 1 );
-			}*/
-			?>
-			</div>
-		</fieldset>
-		<?php endif; ?>
-
 		<?php
-		// EOF -- SHOW DASHBOARD BUTTONS
-		endif; ?>
-
-
-		</div> <!-- END OF #fc-dash-boardbtns -->
-		</section><!-- END OF .fc-dashboard-cards -->
-
-		<aside class="fc-dashboard-updates">
-			<h2 class="visually-hidden"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_DASHBOARD_SYSTEM_INFO' ); ?></h2>
-
+		// The system blocks are rendered first, then placed by the dashboard layout like the blocks of buttons
+		$dash_sys = array();
+		ob_start();
+?>
 			<section class="fc-board-set card fc-dashboard-card fc-dashboard-updatecheck">
-				<h3 class="fc-board-header card-header"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_DASHBOARD_SYSTEM_INFO' ); ?></h3>
+				<h3 class="fc-board-header card-header"><?php echo htmlspecialchars($dash_titles['sysinfo'], ENT_QUOTES, 'UTF-8'); ?></h3>
 				<div class="fc-board-set-inner card-body">
 		<?php
 		echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.startAccordion', 'fc-dash-update-sliders', array());
@@ -832,10 +396,12 @@ $items_task = 'task=items.';
 		?>
 				</div>
 			</section>
-
-
+<?php
+		$dash_sys['sysinfo'] = ob_get_clean();
+		ob_start();
+?>
 			<section class="fc-board-set card fc-dashboard-card fc-dashboard-waiting">
-				<h3 class="fc-board-header card-header"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_DASHBOARD_WAITING_ACTION' ); ?></h3>
+				<h3 class="fc-board-header card-header"><?php echo htmlspecialchars($dash_titles['waiting'], ENT_QUOTES, 'UTF-8'); ?></h3>
 				<div class="fc-board-set-inner card-body">
 		<?php
 		if (!$this->dopostinstall || !$this->allplgpublish) :
@@ -1087,8 +653,24 @@ $items_task = 'task=items.';
 		endif; /* !$skip_sliders */ ?>
 				</div>
 			</section>
+<?php
+		$dash_sys['waiting'] = ob_get_clean();
+		?>
 
-		</aside><!-- END OF .fc-dashboard-updates -->
+		<div class="fc-dashboard-layout">
+		<section class="fc-dashboard-cards">
+			<div id="fc-dash-boardbtns" class="fc-dash-grid">
+				<?php echo FlexicontentDashboard::render($dash_layout, $dash_registry, $dash_sys); ?>
+			</div> <!-- END OF #fc-dash-boardbtns -->
+
+			<?php if ($dash_ready && $dash_is_admin) : ?>
+			<div class="fc-dash-toolbar" id="fc-dash-toolbar">
+				<button type="button" class="btn fc-dash-customize-btn" id="fc-dash-customize">
+					<span class="icon-cog" aria-hidden="true"></span> <?php echo \Joomla\CMS\Language\Text::_('FLEXI_DASH_CUSTOMIZE'); ?>
+				</button>
+			</div>
+			<?php endif; ?>
+		</section><!-- END OF .fc-dashboard-cards -->
 		</div><!-- END OF .fc-dashboard-layout -->
 
 

@@ -475,7 +475,13 @@ class plgFlexicontent_fieldsFile extends FCField
 
 				newField.find('.fc_filedata_txt_nowrap').html('-');
 
+				// New value must not show the original file name of the cloned value
+				newField.find('input.fc_filedata_title, input.fc_filedata_alttitle').val('').attr('value', '').removeAttr('title');
+				newField.find('.fc_filedata_storage_name').empty();
+				newField.find('.fc-file-info').attr('data-fc-info', '{}');
+
 				var theInput = newField.find('input.fc_filedata_txt').first();
+				theInput.val('');
 				theInput.attr('value', '');
 				theInput.removeAttr('data-filename')
 					;

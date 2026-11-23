@@ -108,6 +108,7 @@
 
 			box.find('.fc_filedata_txt').val('');
 			box.find('.fc_filedata_txt_nowrap').html('');
+			fcfield_file.setFileInfo(box, '', '', {});
 			box.find('.fc_filedata_txt').removeAttr('data-filename');
 			box.find('.fc_filedata_txt').data('filename', null);
 			box.find('.hasvalue').val('');
@@ -138,6 +139,114 @@
 		box.find('.inline-preview-obj').hide();
 	}
 
+	// Show original file name and title (altname) of a value, the other data (url, description, custom1/2, ext, size) go into the tooltip
+	// data: object with the other data, merged into the current data if merge is true, otherwise replacing them
+	fcfield_file.setFileInfo = function(container, original, title, data, merge)
+	{
+		original = original || '';
+		title    = title || '';
+		container.find('.fc_filedata_title').val(original);
+		container.find('.fc_filedata_alttitle').val(title);
+
+		container.find('.fc-file-info').each(function()
+		{
+			var box = jQuery(this), info = {};
+			if (merge)
+			{
+				try { info = JSON.parse(box.attr('data-fc-info') || '{}') || {}; } catch (e) { info = {}; }
+			}
+			info = jQuery.extend(info, data || {});
+			info.title = title;
+			box.attr('data-fc-info', JSON.stringify(info));
+			fcfield_file.updateTip(box);
+		});
+	};
+
+
+	/*
+	 * Tooltip (the standard Bootstrap one, as used by the other form labels) with the data of the file:
+	 * Title, URL link, Description, custom1/custom2, MIME type / Size
+	 */
+	fcfield_file.mimes = {
+		pdf: 'application/pdf', zip: 'application/zip', rar: 'application/vnd.rar', '7z': 'application/x-7z-compressed',
+		gz: 'application/gzip', tar: 'application/x-tar', dmg: 'application/x-apple-diskimage',
+		exe: 'application/vnd.microsoft.portable-executable', msi: 'application/x-msi', apk: 'application/vnd.android.package-archive',
+		doc: 'application/msword', docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+		xls: 'application/vnd.ms-excel', xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+		ppt: 'application/vnd.ms-powerpoint', pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+		odt: 'application/vnd.oasis.opendocument.text', ods: 'application/vnd.oasis.opendocument.spreadsheet',
+		txt: 'text/plain', csv: 'text/csv', html: 'text/html', htm: 'text/html', css: 'text/css', js: 'text/javascript',
+		json: 'application/json', xml: 'application/xml', rtf: 'application/rtf',
+		jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', gif: 'image/gif', webp: 'image/webp', svg: 'image/svg+xml',
+		bmp: 'image/bmp', ico: 'image/x-icon', tif: 'image/tiff', tiff: 'image/tiff', avif: 'image/avif',
+		mp3: 'audio/mpeg', wav: 'audio/wav', ogg: 'audio/ogg', m4a: 'audio/mp4', flac: 'audio/flac',
+		mp4: 'video/mp4', webm: 'video/webm', mov: 'video/quicktime', avi: 'video/x-msvideo', mkv: 'video/x-matroska',
+		epub: 'application/epub+zip', iso: 'application/x-iso9660-image'
+	};
+
+	fcfield_file.formatSize = function(size)
+	{
+		if (size === '' || size === null || typeof size === 'undefined') return '';
+		if (isNaN(size)) return String(size);   // already formatted text, e.g. "12 KB"
+		size = parseFloat(size);
+		if (!size) return '';
+		if (size < 1024) return size + ' B';
+		if (size < 1048576) return (size / 1024).toFixed(size < 10240 ? 1 : 0).replace(/\.0$/, '') + ' KB';
+		return (size / 1048576).toFixed(1).replace(/\.0$/, '') + ' MB';
+	};
+
+	// HTML of the tooltip, empty string if there is nothing to show
+	fcfield_file.buildTipHtml = function(box)
+	{
+		var info = {}, labels = {};
+		try { info   = JSON.parse(box.attr('data-fc-info') || '{}') || {}; } catch (e) {}
+		try { labels = JSON.parse(box.attr('data-fc-custom-labels') || '{}') || {}; } catch (e) {}
+
+		var plain = function(html, max)
+		{
+			var txt = jQuery('<div></div>').html(String(html || '')).text().replace(/\s+/g, ' ').trim();
+			return txt.length > max ? txt.substr(0, max) + '\u2026' : txt;
+		};
+
+		var root = jQuery('<div class="fc-file-tip-box"></div>');
+		var add = function(cls, text, label)
+		{
+			if (!text) return;
+			var line = jQuery('<div></div>').addClass(cls);
+			if (label) line.append(jQuery('<b></b>').text(label + ': '));
+			root.append(line.append(document.createTextNode(text)));
+		};
+
+		add('fc-file-tip-title', plain(info.title, 200));
+		add('fc-file-tip-url', info.url ? String(info.url) : '');
+		add('fc-file-tip-desc', plain(info.description, 300));
+		add('fc-file-tip-custom', plain(info.custom1, 300), labels[1] || '');
+		add('fc-file-tip-custom', plain(info.custom2, 300), labels[2] || '');
+		add('fc-file-tip-meta', [fcfield_file.mimes[String(info.ext || '').toLowerCase()] || '', fcfield_file.formatSize(info.size)].filter(Boolean).join(' \u00b7 '));
+
+		return root.children().length ? jQuery('<div></div>').append(root).html() : '';
+	};
+
+	fcfield_file.updateTip = function(box)
+	{
+		if (typeof jQuery.fn.tooltip !== 'function') return;
+		var html = fcfield_file.buildTipHtml(box);
+
+		box.find('input.fc-file-info-val').each(function()
+		{
+			var el = jQuery(this);
+			el.tooltip('dispose');
+			el.removeAttr('title').removeAttr('data-bs-original-title');
+			if (html) el.attr('title', html).tooltip({html: true, container: 'body', trigger: 'hover'});
+		});
+	};
+
+	document.addEventListener('DOMContentLoaded', function()
+	{
+		if (typeof jQuery === 'undefined') return;
+		jQuery('.fc-file-info').each(function() { fcfield_file.updateTip(jQuery(this)); });
+	});
+
 	fcfield_file.assignMediaFile = function(value_container_id, filename, file_preview)
 	{
 		//filename = decodeURIComponent(filename);
@@ -156,7 +265,7 @@
 		container.find('.fc_filedata_txt').removeAttr('data-filename');
 		container.find('.fc_filedata_txt').data('filename', filename);
 		container.find('.fc_filedata_txt_nowrap').html(text_nowrap).show();
-		container.find('.fc_filedata_title').val(displaytitle);
+		fcfield_file.setFileInfo(container, originalname, '', {url: /^(https?:)?\/\//i.test(filename || '') ? filename : '', description: '', custom1: '', custom2: '', ext: ext, size: ''});
 		container.find('.fc_preview_thumb').attr('src', file_preview);
 
 		var is_image = file_preview.match(/\.(jpeg|jpg|gif|png|webp)$/) != null;
@@ -234,7 +343,14 @@
 		container.find('.fc_filedata_txt').removeAttr('data-filename');
 		container.find('.fc_filedata_txt').data('filename', file.filename);
 		container.find('.fc_filedata_txt_nowrap').html(text_nowrap).show();
-		container.find('.fc_filedata_title').val(displaytitle);
+		fcfield_file.setFileInfo(container, originalname, file.altname && (file.altname!=file.filename) ? file.altname : '', {
+			url: parseInt(file.url, 10) === 1 ? file.filename : '',
+			description: file.description || '',
+			custom1: file.custom1 || '',
+			custom2: file.custom2 || '',
+			ext: file.ext || '',
+			size: typeof file.size !== 'undefined' ? file.size : ''
+		});
 
 		var is_pdf      = (file.ext && String(file.ext).toLowerCase() === 'pdf') || /\.pdf$/i.test(file.filename || '');
 		var pdf_preview = (is_pdf && !file.preview && fcfield_file.pdf_thumb_url && file.id)
@@ -337,7 +453,10 @@
 			container.find('.fc_filedata_storage_name').text(filename);
 			container.find('.fc_filedata_txt').val(filename).attr('data-filename', filename).data('filename', filename);
 			container.find('.fc_filedata_txt_nowrap').empty().append(document.createTextNode(filename)).append('<br/>').append(document.createTextNode(altname));
-			container.find('.fc_filedata_title').val(original);
+			var upd = {description: file.description || ''};
+			if (typeof file.custom1 !== 'undefined') upd.custom1 = file.custom1 || '';
+			if (typeof file.custom2 !== 'undefined') upd.custom2 = file.custom2 || '';
+			fcfield_file.setFileInfo(container, original, altname, upd, true);
 			container.find('.fc_filetitle').val(altname).blur();
 			container.find('.fc_filedesc').val(file.description || '');
 			if (typeof file.custom1 !== 'undefined') container.find('.fc_filecustom1').val(file.custom1 || '');

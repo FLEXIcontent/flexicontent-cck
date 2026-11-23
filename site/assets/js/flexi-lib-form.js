@@ -19,6 +19,40 @@
 	}
 	
 	
+	/**
+	 * Is the value already in the sortable list (values may have a ":suffix", e.g. "fieldname:displaymethod:title")
+	 */
+	function fcfield_sortable_has(container_id, val)
+	{
+		var found = false;
+		jQuery('#'+container_id).children('li').each(function(){
+			var v = (jQuery(this).attr('data-value') || '').replace('field_', '');
+			if (v === val || v.split(':')[0] === val) found = true;
+		});
+		return found;
+	}
+
+
+	/**
+	 * Disable, in the selector of a sortable list, the options that are already in the list
+	 */
+	function fcfield_sync_selector(tagid)
+	{
+		var selector = jQuery('#'+tagid+'_selector');
+		if (!selector.length) return;
+
+		var used = {};
+		jQuery('#sortable-'+tagid).children('li').each(function(){
+			used[(jQuery(this).attr('data-value') || '').replace('field_', '').split(':')[0]] = 1;
+		});
+
+		selector.find('option').each(function(){
+			var v = jQuery(this).val();
+			jQuery(this).prop('disabled', !!(v && used[v]));
+		});
+	}
+
+
 	function fcfield_add_sortable_element(selector)
 	{
 		var selobj = jQuery(selector);
@@ -27,6 +61,17 @@
 		
 		var val = selobj.val();
 		if (!val) return true;
+
+		// Do not add an element that is already in the list. This also protects against the change event being fired twice
+		// for a single selection (e.g. natively and then by select2), which used to add the same element two times
+		if (fcfield_sortable_has(container, val))
+		{
+			setTimeout(function(){
+				jQuery(selobj).val('').trigger('change');
+			}, 50);
+			return true;
+		}
+
 		var lbl = selobj.find('option:selected').text();
 		jQuery('#'+container).append(
 			'<li data-value="field_'+val+'" class="fcrecord">'+
@@ -38,6 +83,7 @@
 		var field_list = jQuery('#'+tagid).val();
 		field_list += field_list ? ','+val : val;
 		jQuery('#'+tagid).val(field_list);
+		fcfield_sync_selector(tagid);
 
 		setTimeout(function(){
 			jQuery(selobj).val('').trigger('change');
@@ -55,6 +101,7 @@
 			fields[i++] = jQuery(this).attr('data-value').replace('field_', '');
 		});
 		jQuery(hidden_id).val(fields.join(','))
+		fcfield_sync_selector(hidden_id.replace('#', ''));
 	}
 	
 	

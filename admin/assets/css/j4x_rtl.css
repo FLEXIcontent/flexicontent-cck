@@ -516,6 +516,9 @@ dl#content-pane.tabs {
 .icon-tags:before {
   content: "\f02c";
 }
+.icon-files:before {
+  content: "\f15b";
+}
 .icon-items:before {
   content: "\f0c5";
 }

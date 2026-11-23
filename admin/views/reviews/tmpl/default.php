@@ -41,15 +41,17 @@ $out_class = FLEXI_J40GE ? 'btn btn-outline-dark' : 'btn';
 
 
 /**
- * JS for Columns chooser box and Filters box
+ * Resizable / movable / hideable columns (replaces the old column chooser), settings are stored in the browser
  */
 
-flexicontent_html::jscode_to_showhide_table(
-	'mainChooseColBox',
-	'adminListTableFC' . $this->view,
-	$start_html = '',  //'<span class="badge ' . (FLEXI_J40GE ? 'badge-dark' : 'badge-inverse') . '">' . \Joomla\CMS\Language\Text::_('FLEXI_COLUMNS', true) . '<\/span> &nbsp; ',
-	$end_html = '<div id="fc-columns-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="' . \Joomla\CMS\Language\Text::_('FLEXI_HIDE') . '" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/div>'
-);
+$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/css/fc_table_tools.css', array('version' => FLEXI_VHASH));
+$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/css/fc_type_tabs.css', array('version' => FLEXI_VHASH));
+$document->addScript(\Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/js/fc-table-tools.js', array('version' => FLEXI_VHASH));
+
+foreach (array('FLEXI_TBL_MOVE_COL', 'FLEXI_TBL_HIDE_COL', 'FLEXI_TBL_SHOW_COL', 'FLEXI_TBL_FIT_COL', 'FLEXI_TBL_RESET_WIDTHS', 'FLEXI_TBL_RESET_COLS') as $fc_txt)
+{
+	\Joomla\CMS\Language\Text::script($fc_txt);
+}
 
 
 
@@ -241,7 +243,7 @@ if ($js)
 <?php endif;?>
 
 
-	<div id="fc-managers-header">
+	<div id="fc-managers-header" class="fc-mh-items fc-mh-solo">
 
 		<?php if (!empty($this->lists['scope_tip'])) : ?>
 		<div class="fc-filter-head-box filter-search nowrap_box" style="margin: 0;">
@@ -369,64 +371,64 @@ if ($js)
 				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_NUM' ); ?>
 			</th-->
 
-			<th class="col_cb left">
+			<th class="col_cb left" data-col="cb">
 				<div class="group-fcset">
 					<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value="" title="<?php echo \Joomla\CMS\Language\Text::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
 					<label for="checkall-toggle" class="green single"></label>
 				</div>
 			</th>
 
-			<th class="hideOnDemandClass left">
+			<th class="hideOnDemandClass left" data-col="status">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_STATUS', 'a.' . $this->state_propname, $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="hideOnDemandClass title">
+			<th class="hideOnDemandClass title" data-col="title">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_TITLE', 'a.' . $this->title_propname, $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="hideOnDemandClass left">
+			<th class="hideOnDemandClass left" data-col="item">
 				<?php echo \Joomla\CMS\Language\Text::_('FLEXI_ITEM'); ?>
 			</th>
 
-			<th class="hideOnDemandClass center">
+			<th class="hideOnDemandClass center" data-col="rating">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_REVIEW_RATING', 'a.average_rating', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="col_reviews hideOnDemandClass center">
+			<th class="col_reviews hideOnDemandClass center" data-col="reviews">
 				<span class="column_toggle_lbl" style="display:none;"><small class="badge bg-info badge-info"><?php echo \Joomla\CMS\Language\Text::_('FLEXI_REVIEWS'); ?></small></span>
 				<span class="<?php echo $this->tooltip_class; ?>" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_REVIEWS'); ?>" data-placement="top"><?php echo $rv_icon_reviews; ?></span>
 			</th>
 
-			<th class="col_helpful hideOnDemandClass center">
+			<th class="col_helpful hideOnDemandClass center" data-col="helpful">
 				<span class="column_toggle_lbl" style="display:none;"><small class="badge bg-info badge-info"><?php echo \Joomla\CMS\Language\Text::_('FLEXI_REVIEW_HELPFUL'); ?></small></span>
 				<span class="<?php echo $this->tooltip_class; ?>" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_REVIEW_HELPFUL_YES_NO'); ?>" data-placement="top"><?php echo $rv_icon_helpful; ?></span>
 			</th>
 
-			<th class="hideOnDemandClass center">
+			<th class="hideOnDemandClass center" data-col="approved">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_REVIEW_APPROVED', 'a.approved', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="hideOnDemandClass center">
+			<th class="hideOnDemandClass center" data-col="verified">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_REVIEW_VERIFIED', 'a.verified', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="hideOnDemandClass center hidden-phone hidden-tablet">
+			<th class="hideOnDemandClass center hidden-phone hidden-tablet" data-col="reviewer">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_REVIEW_REVIEWER', 'a.user_id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="hideOnDemandClass center hidden-phone hidden-tablet">
+			<th class="hideOnDemandClass center hidden-phone hidden-tablet" data-col="email">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_REVIEW_EMAIL', 'a.email', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="hideOnDemandClass center hidden-phone">
+			<th class="hideOnDemandClass center hidden-phone" data-col="created">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_CREATED', 'a.submit_date', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="hideOnDemandClass center hidden-phone hidden-tablet">
+			<th class="hideOnDemandClass center hidden-phone hidden-tablet" data-col="modified">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_MODIFIED', 'a.update_date', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="hideOnDemandClass col_id center hidden-phone hidden-tablet">
+			<th class="hideOnDemandClass col_id center hidden-phone hidden-tablet" data-col="id">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', 'FLEXI_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order']); ?>
 			</th>
 
@@ -469,12 +471,12 @@ if ($js)
 				<?php echo $this->pagination->getRowOffset($i); ?>
 			</td-->
 
-			<td class="col_cb">
+			<td class="col_cb" data-col="cb">
 				<!--div class="adminlist-table-row"></div-->
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_($hlpname . '.grid_id', $i, $row->id); ?>
 			</td>
 
-			<td class="col_status" style="padding-right: 8px;">
+			<td class="col_status" style="padding-right: 8px;" data-col="status">
 				<div class="btn-group fc-group fc-reviews">
 					<?php
 					//echo \Joomla\CMS\HTML\HTMLHelper::_('jgrid.published', $row->published, $i, $ctrl, $stateIsChangeable);
@@ -486,7 +488,7 @@ if ($js)
 				</div>
 			</td>
 
-			<td class="col_title smaller">
+			<td class="col_title smaller" data-col="title">
 				<?php
 				/**
 				 * Display an edit pencil or a check-in button if: either (a) current user has Global
@@ -508,7 +510,7 @@ if ($js)
 				?>
 			</td>
 
-			<td class="left">
+			<td class="left" data-col="item">
 				<?php
 				/**
 				 * Display the title of the reviewed item, linked to the item's edit form
@@ -529,7 +531,7 @@ if ($js)
 				?>
 			</td>
 
-			<td class="center nowrap">
+			<td class="center nowrap" data-col="rating">
 				<?php
 				/**
 				 * Display the rating (stars) given by the reviewer
@@ -558,7 +560,7 @@ if ($js)
 				?>
 			</td>
 
-			<td class="col_reviews center" style="padding: 0;">
+			<td class="col_reviews center" style="padding: 0;" data-col="reviews">
 				<?php
 				/**
 				 * Number of reviews of the item, click to list only the reviews of this item
@@ -579,7 +581,7 @@ if ($js)
 				?>
 			</td>
 
-			<td class="col_helpful center" style="padding: 0;">
+			<td class="col_helpful center" style="padding: 0;" data-col="helpful">
 				<?php
 				/**
 				 * Number of 'helpful' votes of the review, Yes / No (nothing is displayed if there are no votes)
@@ -600,7 +602,7 @@ if ($js)
 				?>
 			</td>
 
-			<td class="center">
+			<td class="center" data-col="approved">
 				<?php
 				/**
 				 * Display review approved toggler
@@ -609,7 +611,7 @@ if ($js)
 				?>
 			</td>
 
-			<td class="center">
+			<td class="center" data-col="verified">
 				<?php
 				/**
 				 * Display review approved toggler
@@ -624,7 +626,7 @@ if ($js)
 				?>
 			</td>
 
-			<td class="center hidden-phone hidden-tablet">
+			<td class="center hidden-phone hidden-tablet" data-col="reviewer">
 				<?php
 				if ($row->author_name)
 				{
@@ -642,23 +644,23 @@ if ($js)
 				?>
 			</td>
 
-			<td class="center hidden-phone hidden-tablet">
+			<td class="center hidden-phone hidden-tablet" data-col="email">
 				<?php echo $row->email; ?>
 			</td>
 
-			<td class="center hidden-phone">
+			<td class="center hidden-phone" data-col="created">
 				<?php echo ($row->submit_date && strpos($row->submit_date, '0000') !== 0 && strpos($row->submit_date, '1000') !== 0)
 					? \Joomla\CMS\HTML\HTMLHelper::_('date', $row->submit_date, $date_format)
 					: $_NEVER_; ?>
 			</td>
 
-			<td class="center hidden-phone hidden-tablet">
+			<td class="center hidden-phone hidden-tablet" data-col="modified">
 				<?php echo ($row->update_date && strpos($row->update_date, '0000') !== 0 && strpos($row->update_date, '1000') !== 0)
 					? \Joomla\CMS\HTML\HTMLHelper::_('date', $row->update_date, $date_format)
 					: $_NEVER_; ?>
 			</td>
 
-			<td class="col_id center hidden-phone hidden-tablet">
+			<td class="col_id center hidden-phone hidden-tablet" data-col="id">
 				<?php echo $row->id; ?>
 			</td>
 
@@ -670,6 +672,7 @@ if ($js)
 	</tbody>
 
 	</table>
+	<script>window.fcTableTools && fcTableTools.init('adminListTableFC<?php echo $this->view; ?>');</script>
 
 
 	<div>

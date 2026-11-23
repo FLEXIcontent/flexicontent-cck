@@ -2034,7 +2034,7 @@ body .fc-nowrap-box .nowrap_box .label,
   box-sizing: border-box;
   clear: both;
   float: left;
-  margin: 0 0 1% 0 !important;
+  margin: 0 !important;
   width: 100%;
 }
 #flexicontent .fc-xpended .input-group-text:first-child,
