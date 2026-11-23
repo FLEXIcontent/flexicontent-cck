@@ -119,6 +119,9 @@
 			// Restore the live form at our marker. Joomla's inline-content restoration
 			// would also try to insert it before its former sibling, which may be a transient tooltip.
 			popupBody.append(content);
+			// Joomla's dialog body is a block box. As a flex column it lets the content's flex:1 fill it,
+			// else an iframe dialog (e.g. item edit) falls back to the 150px default iframe height.
+			popupBody.style.cssText += ';display:flex;flex-direction:column;min-height:0;';
 		} else {
 		dialog.className = 'fc-native-dialog ui-dialog ui-widget ui-widget-content';
 		dialog.style.cssText = 'position:fixed;padding:0;margin:auto;max-width:calc(100vw - 10px);max-height:calc(100vh - 10px);border:1px solid #aaa;';
