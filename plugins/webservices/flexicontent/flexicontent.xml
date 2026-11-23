@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension type="plugin" group="webservices" method="upgrade">
+	<name>plg_webservices_flexicontent</name>
+	<author>FLEXIcontent Team</author>
+	<creationDate>2026-11</creationDate>
+	<copyright>(C) 2026 FLEXIcontent Team</copyright>
+	<license>GNU General Public License version 2 or later</license>
+	<authorEmail>noreply@flexicontent.org</authorEmail>
+	<authorUrl>https://flexicontent.org</authorUrl>
+	<version>1.0.0</version>
+	<description>PLG_WEBSERVICES_FLEXICONTENT_XML_DESCRIPTION</description>
+	<namespace path="src">Joomla\Plugin\WebServices\Flexicontent</namespace>
+	<files>
+		<folder plugin="flexicontent">services</folder>
+		<folder>src</folder>
+	</files>
+	<languages>
+		<language tag="en-GB">language/en-GB/plg_webservices_flexicontent.ini</language>
+		<language tag="en-GB">language/en-GB/plg_webservices_flexicontent.sys.ini</language>
+	</languages>
+</extension>

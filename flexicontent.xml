@@ -12,7 +12,10 @@
 	<version>5.3</version>
 	<!-- The description is optional and defaults to the name -->
 	<description>COM_FLEXICONTENT_DESCRIPTION</description>
-	
+
+	<!-- PSR-4 namespace root: admin/src, site/src and api/components/com_flexicontent/src are mapped by Joomla -->
+	<namespace path="src">Joomla\Component\Flexicontent</namespace>
+
 	<!-- Runs on install/uninstall/update -->
 	<scriptfile>script.php</scriptfile>
 	
@@ -105,6 +108,8 @@
 			<folder>helpers</folder>
 			<folder>installation</folder>
 			<folder>models</folder>
+			<folder>services</folder>
+			<folder>src</folder>
 			<folder>tables</folder>
 			<folder>tasks</folder>
 			<folder>views</folder>
@@ -226,6 +231,9 @@
 		<plugin name="flexisearch"        folder="plugins/search/flexisearch"       instfolder="search">Search - Flexisearch, for Joomla standard search view</plugin>
 		<plugin name="flexiadvsearch"     folder="plugins/search/flexiadvsearch"    instfolder="search">Search - Flexiadvsearch, for FLEXIcontent search view</plugin>
 		
+		<!-- Plugins: webservices (Joomla API application) -->
+		<plugin name="flexicontent"       folder="plugins/webservices/flexicontent" instfolder="webservices" enabled="1">Web Services - FLEXIcontent, routes for the Joomla API application</plugin>
+
 		<!-- Plugins: system -->
 		<plugin name="flexisystem"        folder="plugins/system/flexisystem"       instfolder="system">System - Flexisystem, core tasks</plugin>
 		<plugin name="flexiadvroute"      folder="plugins/system/flexiadvroute"     instfolder="system">System - Flexiadvroute, routing tasks</plugin>
@@ -242,6 +250,13 @@
 		<module name="mod_flexiadvsearch"  folder="modules/mod_flexiadvsearch">FLEXIcontent - Search</module>
 		<module name="mod_flexigooglemap"  folder="modules/mod_flexigooglemap">FLEXIcontent - Google Maps</module>
 	</additional>
+
+	<!-- API application files (Joomla 4+ webservices) -->
+	<api>
+		<files folder="api/components/com_flexicontent">
+			<folder>src</folder>
+		</files>
+	</api>
 
 <updateservers>
     <server type="extension" priority="1" name="FLEXIcontent CCK update">
