@@ -533,11 +533,9 @@ if ($display_cat_list && !$mcats_selection)
 
 			if (cid_val.length == 0)
 			{
-				var fcform = jQuery(form);
-				var default_action = fcform.attr("data-fcform_default_action"); 
-
-				fcform.attr("action", default_action);
-				fcform.attr("data-fcform_action", default_action); 
+				var default_action = form.getAttribute("data-fcform_default_action");
+				form.setAttribute("action", default_action);
+				form.setAttribute("data-fcform_action", default_action);
 
 				adminFormPrepare(form, 1);
 				return;

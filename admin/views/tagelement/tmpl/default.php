@@ -37,6 +37,12 @@ $useAssocs= flexicontent_db::useAssociations();
 $btn_class = 'btn';
 $ico_class = 'fc-man-icon-s';
 $out_class = FLEXI_J40GE ? 'btn btn-outline-dark' : 'btn';
+$state_icons = array(1 => 'icon-publish', 0 => 'icon-unpublish', -2 => 'icon-trash');
+$state_names = array(
+	1 => \Joomla\CMS\Language\Text::_('JPUBLISHED'),
+	0 => \Joomla\CMS\Language\Text::_('JUNPUBLISHED'),
+	-2 => \Joomla\CMS\Language\Text::_('JTRASHED'),
+);
 
 
 
@@ -96,25 +102,25 @@ $js .= "
 function delFilter(name)
 {
 	//if(window.console) window.console.log('Clearing filter:'+name);
-	var myForm = jQuery('#adminForm');
-	var filter = jQuery('#'+name);
+	var myForm = document.getElementById('adminForm');
+	var filter = document.getElementById(name);
 
-	if (!filter.length)
+	if (!filter)
 	{
 		return;
 	}
-	else if (filter.attr('type') == 'checkbox')
+	else if (filter.type === 'checkbox')
 	{
 		filter.checked = '';
 	}
 	else
 	{
-		filter.val('');
+		if (filter.tagName === 'SELECT') FlexiForm.clearSelect(filter); else filter.value = '';
 
 		// Case that input has Calendar JS attached
-		if (filter.attr('data-alt-value'))
+		if (filter.hasAttribute('data-alt-value'))
 		{
-			filter.attr('data-alt-value', '');
+			filter.setAttribute('data-alt-value', '');
 		}
 	}
 }
@@ -272,7 +278,7 @@ if ($js)
 			</td>
 
 			<td class="col_state">
-				<?php $state = isset($state_icons[$row->published]) ? $row->state : 'u'; ?>
+				<?php $state = isset($state_icons[$row->published]) ? (int) $row->published : 0; ?>
 				<span class="<?php echo $state_icons[$state]; ?>" title="<?php echo $state_names[$state]; ?>"></span>
 			</td>
 

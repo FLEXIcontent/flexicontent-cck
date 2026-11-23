@@ -458,7 +458,8 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		}
 
 		// Get Favourites field configuration
-		$favs_field = reset(FlexicontentFields::getFieldsByIds(array(12)));
+		$favs_fields = FlexicontentFields::getFieldsByIds(array(12));
+		$favs_field = reset($favs_fields);
 		$favs_field->parameters = new \Joomla\Registry\Registry($favs_field->attribs);
 
 		$usercount = (int) $favs_field->parameters->get('display_favoured_usercount', 0);
@@ -473,8 +474,9 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		// Guest user does not have DB data, instead use Cookie data
 		else
 		{
-			// Get model of the give type
-			$model = $this->getModel($type);
+			// Frontend editing can register the administrator item model under the same
+			// legacy class name. Use the shared favourites helpers with an explicit ID.
+			$favourite_type = $type === 'category' ? 1 : 0;
 
 			if (!$user->id)
 			{
@@ -490,14 +492,14 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 			else
 			{
 				// Toggle favourite
-				$isfav = $model->getFavoured();
+				$isfav = flexicontent_db::getFavoured($favourite_type, $id, $user->id);
 				$isfav
-					? $model->removefav()
-					: $model->addfav();
+					? flexicontent_db::removefav($favourite_type, $id, $user->id)
+					: flexicontent_db::addfav($favourite_type, $id, $user->id);
 			}
 
 			// Output response for counter (if this has been enabled)
-			$favs = $model->getFavourites();
+			$favs = flexicontent_db::getFavourites($favourite_type, $id);
 			echo $isfav
 				? ($favs && $usercount ? '-' . $favs : 'removed')
 				: ($favs && $usercount ? '+' . $favs : 'added');
@@ -2150,7 +2152,8 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		\Joomla\CMS\Session\Session::checkToken('request') or die(\Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
 
 		$name = $this->input->get('name', null, 'string');
-		$cid  = $this->input->get('id', array(0), 'array');
+		// The site router may populate the main input's id with the active menu's article id.
+		$cid  = $this->input->post->get('id', $this->input->get->get('id', array(0), 'array'), 'array');
 		$cid  = ArrayHelper::toInteger($cid, array(0));
 		$cid  = (int) $cid[0];
 
@@ -2159,7 +2162,8 @@ class FlexicontentController extends \Joomla\CMS\MVC\Controller\BaseController
 		spl_autoload_register(static function ($class) {
 			if ($class === 'FlexicontentModelTag' && is_file($f = JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'tag.php')) require_once $f;
 		}, true, true);
-		$model = new FlexicontentModelTag();
+		// Save must not pick up the routed article id through the model state either.
+		$model = new FlexicontentModelTag(['ignore_request' => true]);
 		$model->setId($cid);
 		$tag = $model->getTag($name);
 

@@ -180,9 +180,10 @@ class FlexicontentViewUser extends FlexicontentViewBaseRecord
 		$document->addScriptDeclaration('
 			function fc_edit_juser_modal_load( container )
 			{
-				if ( container.find("iframe").get(0).contentWindow.location.href.indexOf("view=users") != -1 )
+				var frame = FlexiForm.element(container).querySelector("iframe");
+				if (frame && frame.contentWindow.location.href.indexOf("view=users") !== -1)
 				{
-					container.dialog("close");
+					fc_closeDialog("fc_modal_popup_container");
 				}
 			}
 			function fc_edit_juser_modal_close()
@@ -197,7 +198,7 @@ class FlexicontentViewUser extends FlexicontentViewBaseRecord
 		\Joomla\CMS\Toolbar\ToolbarHelper::divider();
 		flexicontent_html::addToolBarButton(
 			'FLEXI_EDIT_JUSER', $btn_name='edit_juser',
-			$full_js="var url = jQuery(this).attr('data-href'); var the_dialog = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, fc_edit_juser_modal_close, {title:'".$modal_title."', loadFunc: fc_edit_juser_modal_load}); return false;",
+			$full_js="var url = this.getAttribute('data-href'); var the_dialog = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, fc_edit_juser_modal_close, {title:'".$modal_title."', loadFunc: fc_edit_juser_modal_load}); return false;",
 			$msg_alert='', $msg_confirm='',
 			$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class="spaced-btn btn-info".$tip_class, $btn_icon="icon-pencil",
 			'data-placement="bottom" data-href="index.php?option=com_users&task=user.edit&id='.($row->id ?? 0).'" title="Edit all details of joomla user"'
@@ -354,7 +355,7 @@ class FlexicontentViewUser extends FlexicontentViewBaseRecord
 
 		if ($js)
 		{
-			$document->addScriptDeclaration('jQuery(document).ready(function(){'
+			$document->addScriptDeclaration('FlexiForm.ready(function(){'
 				.$js.
 			'});');
 		}

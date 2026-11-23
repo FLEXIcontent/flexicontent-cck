@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 defined( '_JEXEC' ) or die( 'Restricted access' );
 if ( \Joomla\CMS\Factory::getApplication()->input->getInt('print', 0) ) return;
 

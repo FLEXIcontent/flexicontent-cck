@@ -404,6 +404,7 @@
 			<field name="" type="separator" default="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_NOMINATIM_INFO" level="level3" class="alert alert-info fcpadded" depend_class="nominatim-edit-api" />
 
 			<field name="nominatim_tile_url" type="text" default="" hint="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_NOMINATIM_TILE_URL" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_NOMINATIM_TILE_URL_DESC" depend_class="nominatim-edit-api" />
+			<field name="nominatim_api_url" type="url" default="" hint="https://nominatim.openstreetmap.org/" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_NOMINATIM_API_URL" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_NOMINATIM_API_URL_DESC" depend_class="nominatim-edit-api" />
 
 			<field name="api_lang_code_edit" type="text" default="" label="Force language code (e.g. en)" description="Let this be empty to use language of current user" />
 

@@ -75,7 +75,6 @@ class JFormFieldFclayout extends GroupedlistField
 		// Get current extension and id being edited
 		$app    = Factory::getApplication();
 		$jinput = $app->input;
-		$task   = $jinput->get('task', '', 'CMD');
 
 		$ext_option = $jinput->get('option', '', 'CMD');
 		$ext_view   = $jinput->get('view', '', 'CMD');
@@ -277,7 +276,6 @@ class JFormFieldFclayout extends GroupedlistField
 		// ---------------------------------------------------------------
 		// Build the select element
 		// ---------------------------------------------------------------
-		$_name      = $this->fieldname;
 		$fieldname  = $this->name;
 		$element_id = $this->id;
 
@@ -290,134 +288,28 @@ class JFormFieldFclayout extends GroupedlistField
 		}
 
 		$attribs .= ' class="fc-element-auto-init ' . $class . '"';
-		$attribs .= ' onchange="fc_getLayout_' . $_name . '(this);"';
 
 		$tmpl_container = (string) ($attributes['tmpl_container'] ?? '');
 		$params_source  = (string) ($attributes['params_source']  ?? '');
 
-		// Determine fieldset group name for current view
-		switch ($ext_view)
-		{
-			case 'field':
-				$fld_groupname = 'attribs_';
-				break;
-			case 'type':
-				$fld_groupname = in_array($task, ['edit', 'add']) ? 'attribs_' : 'params_';
-				break;
-			case 'component':
-				$fld_groupname = '';
-				break;
-			default:
-				$fld_groupname = 'params_';
-				break;
-		}
-
-		flexicontent_html::loadJQuery();
-
+		flexicontent_html::loadFramework('flexi-lib');
+		Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_flexicontent/assets/js/layout-params.js', array('version' => 'auto'));
+		Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_flexicontent/assets/js/color-input.js', array('version' => 'auto'), array('defer' => true));
 		if (empty($attributes['skipparams']))
 		{
-			if ($params_source === 'file')
-			{
-				$js = "
-function fc_getLayout_{$_name}(el, initial)
-{
-	var bs_tab_handle = jQuery('a[href=\"#attrib-{$tmpl_container}\"]');
-	var fc_tab_handle = jQuery('#{$tmpl_container}');
-
-	var panel_header = bs_tab_handle;
-	var panel_id     = 'attrib-{$tmpl_container}';
-	var panel_sel    = '#'+panel_id;
-	var panel        = jQuery('#'+panel_id);
-
-	if (!panel_header.length && fc_tab_handle.length)
-	{
-		panel_header = fc_tab_handle;
-		panel_header.closest('.tabberlive').children('.fc_empty_box,.field-spacer').remove();
-		panel     = panel_header.closest('.tabberlive').children().eq( panel_header.parent().index() + 1 );
-		panel_id  = panel.attr('id');
-		panel_sel = '#' + panel_id;
-	}
-
-	if (!panel_header.length) { return; }
-
-	if (initial && jQuery(el).data('fc-layout-first-run')) { return; }
-	jQuery(el).data('fc-layout-first-run', 1);
-
-	var selected_option = jQuery(el).find(':selected');
-	var filename        = selected_option.data('filename');
-	var display_name    = selected_option.data('displayname');
-	var layout_name     = filename ? filename.replace(/^({$stripPrefix})/, '') : selected_option.val();
-
-	display_name = display_name ? display_name : layout_name.replace(/^({$trimDisplayname})/, '');
-	filename     = filename ? filename : '{$stripPrefix}' + layout_name;
-
-	var _loading_img = '<img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" style=\"vertical-align: middle;\">';
-	bs_tab_handle.length
-		? panel_header.html('<a href=\"javascript:void(0);\"><span> {$layout_label}: '+_loading_img+'</span></a>')
-		: panel_header.html('<i class=\"{$icon_class}\"></i> {$layout_label}: ' + _loading_img);
-	panel.html('');
-
-	jQuery.ajax({
-		type: 'GET',
-		url: 'index.php?option=com_flexicontent&task=templates.getlayoutparams&ext_option={$ext_option}&ext_view={$ext_view}&ext_type={$ext_type}&ext_name={$ext_name}&layout_pfx={$layout_pfx}&ext_id={$pk}&directory={$directory}&layout_sfx={$layout_sfx}&layout_name='+filename+'&format=raw&" . Session::getFormToken() . "=1',
-		success: function(str) {
-			if (bs_tab_handle.length)
-			{
-				panel_header.html('<a href=\"javascript:void(0);\"><span> {$layout_label}: '+display_name+'</span></a>');
-				panel_header.parent().css('display', '');
-			}
-			else
-			{
-				display_name = display_name.replace('_', ' ').replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
-				panel_header.html('<i class=\"{$icon_class}\"></i> {$layout_label}: ' + display_name);
-			}
-			fc_initDynamicLayoutJsCss(panel_id, ['subform-row-add'], str);
-		}
-	});
-}
-";
-			}
-			else
-			{
-				$layoutsList = implode("','", $layout_files);
-				$js          = "
-function fc_getLayout_{$_name}(el, initial)
-{
-	if (initial && jQuery(el).data('fc-layout-first-run')) { return; }
-	jQuery(el).data('fc-layout-first-run', 1);
-
-	var container = jQuery('a[href=\"#attrib-{$tmpl_container}\"]');
-	if (container) container.parent().css('display', 'none');
-
-	var filename    = jQuery(el).find(':selected').data('filename');
-	var layout_name = filename ? filename : el.value;
-
-	var layouts = ['{$layoutsList}'];
-	for (var i = 0; i < layouts.length; i++)
-	{
-		if (layouts[i] == layout_name) continue;
-		var c = jQuery('a[href=\"#attrib-{$tmpl_container}_' + layouts[i] + '\"]');
-		if (c) { c.parent().css('display', 'none'); }
-	}
-
-	var container = jQuery('a[href=\"#attrib-{$tmpl_container}_' + layout_name + '\"]');
-	if (container) container.parent().css('display', '');
-}
-";
-			}
-
-			$js .= "
-jQuery(document).ready(function(){
-	var el = document.getElementById('jform_{$fld_groupname}{$_name}');
-	fc_getLayout_{$_name}(el, 1);
-
-	el.addEventListener('initialize-fc-element', function() {
-		fc_getLayout_{$_name}(el, 1);
-	});
-});
-";
-			// Add inline so it works when changing FLEXIcontent field type
-			echo '<script>' . $js . '</script>';
+			$options = json_encode(array(
+				'remote' => $params_source === 'file', 'container' => $tmpl_container,
+				'stripPrefix' => $stripPrefix, 'trimDisplayName' => $trimDisplayname,
+				'layouts' => $layout_files, 'label' => $layout_label,
+				'url' => 'index.php?' . http_build_query(array(
+					'option' => 'com_flexicontent', 'task' => 'templates.getlayoutparams',
+					'ext_option' => $ext_option, 'ext_view' => $ext_view, 'ext_type' => $ext_type,
+					'ext_name' => $ext_name, 'layout_pfx' => $layout_pfx, 'ext_id' => $pk,
+					'directory' => $directory, 'layout_sfx' => $layout_sfx, 'format' => 'raw', Session::getFormToken() => 1,
+				)),
+			));
+			$attribs .= ' data-fc-layout-params="' . htmlspecialchars($options, ENT_QUOTES, 'UTF-8') . '"';
+			Text::script('FLEXI_PLEASE_WAIT');
 		}
 
 		// Compute the current selected values

@@ -292,6 +292,14 @@ $controller	= \Joomla\CMS\MVC\Controller\BaseController::getInstance('Flexiconte
 
 $controller->execute( $task );
 
+if ($format === 'html' && FLEXI_J40GE)
+{
+	$admin_assets = \Joomla\CMS\Uri\Uri::root(true) . '/administrator/components/com_flexicontent/assets/';
+	$document->addStyleSheet($admin_assets . 'css/native-admin.css', array('version' => FLEXI_VHASH));
+	$document->addScript($admin_assets . 'js/native-admin-layout.js', array('version' => FLEXI_VHASH), array('defer' => true));
+	\Joomla\CMS\Language\Text::script('FLEXI_SCROLL_TABLE');
+}
+
 // Redirect if set by the controller
 $controller->redirect();
 
@@ -307,8 +315,9 @@ $layout = $jinput->getString('layout', '');
 
 if ($format === 'html')
 {
-	// Load jquery Framework, but let some views decide for themselves, so that they can choose not to load some parts of jQuery.ui JS
-	if ($view != 'item' || $view != 'fileselement') flexicontent_html::loadFramework('jQuery');
+	flexicontent_html::loadFramework('form-utils');
+	flexicontent_html::loadFramework('sortable');
+	if (!flexicontent_html::usesNativeAdminAssets()) flexicontent_html::loadFramework('jQuery');
 
 	if ( 1 ) // always load tooltips JS in backend
 	{

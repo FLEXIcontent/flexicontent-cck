@@ -3,6 +3,11 @@
  * Matching the select2 overrides in flexi_shared.less / flexi_form.less
  */
 
+/* Clear sibling editors while open; remain below Joomla's modal layer. */
+.choices.is-open {
+	z-index: 1000;
+}
+
 /* ===========================
    SINGLE SELECT - Core sizing
    =========================== */

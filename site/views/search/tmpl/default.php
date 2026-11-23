@@ -30,7 +30,7 @@ if ($menu) $page_classes .= ' menuitem'.$menu->id;
 	<?php
 	if (Factory::getApplication()->input->getInt('print', 0)) {
 	if ($this->params->get('print_behaviour', 'auto') == 'auto') : ?>
-		<script>jQuery(document).ready(function(){ window.print(); });</script>
+		<script>FlexiForm.ready(function(){ window.print(); });</script>
 	<?php	elseif ($this->params->get('print_behaviour') == 'button') : ?>
 	<input type='button' id='printBtn' name='printBtn' value='<?php echo Text::_('Print');?>' class='btn btn-info' onclick='this.style.display="none"; window.print(); return false;'>
 	<?php endif;

@@ -199,33 +199,17 @@ $js .= (!$isXtdBtn ? "" : "
 // Delete a specific list filter
 function delFilter(name)
 {
-	//if(window.console) window.console.log('Clearing filter:'+name);
-	var myForm = jQuery('#adminForm');
-	var filter = jQuery('#'+name);
-
-	if (!filter.length)
-	{
-		return;
-	}
-	else if (filter.attr('type') == 'checkbox')
-	{
-		filter.checked = '';
-	}
-	else
-	{
-		filter.val('');
-
-		// Case that input has Calendar JS attached
-		if (filter.attr('data-alt-value'))
-		{
-			filter.attr('data-alt-value', '');
-		}
-	}
+    const filter = document.getElementById(name);
+    if (!filter) return;
+    if (filter.type === 'checkbox') filter.checked = false;
+    else if (filter.tagName === 'SELECT') FlexiForm.clearSelect(filter);
+    else filter.value = '';
+    if (filter.hasAttribute('data-alt-value')) filter.setAttribute('data-alt-value', '');
 }
 
 function delAllFilters()
 {
-	jQuery('.fc_field_filter').val('');
+	document.querySelectorAll('.fc_field_filter').forEach(filter => delFilter(filter.id));
 	delFilter('search');
 	delFilter('filter_level');
 	delFilter('filter_state');
@@ -434,7 +418,7 @@ if ($js)
 
 					<?php else: ?>
 
-						<a style="cursor: default;" href="javascript:;" onclick="var box = jQuery('#assoc_not_allowed_msg'); fc_itemelement_view_handle = fc_showAsDialog(box, 300, 200, null, { title: '<?php echo \Joomla\CMS\Language\Text::_('FLEXI_ABOUT', true); ?>'}); return false;">
+						<a style="cursor: default;" href="javascript:;" onclick="var box = document.getElementById('assoc_not_allowed_msg'); fc_itemelement_view_handle = fc_showAsDialog(box, 300, 200, null, { title: '<?php echo \Joomla\CMS\Language\Text::_('FLEXI_ABOUT', true); ?>'}); return false;">
 
 					<?php endif; ?>
 

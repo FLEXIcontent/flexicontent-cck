@@ -191,7 +191,7 @@ class JFormFieldMultiList extends JFormFieldGroupedList
 			if ( \Joomla\CMS\Factory::getApplication()->input->get('option', '', 'cmd') != 'com_flexicontent' )
 			{
 				$js = "
-				jQuery(document).ready(function(){
+				FlexiForm.ready(function(){
 					".(FLEXI_J30GE ?
 						"fc_bindFormDependencies('body', 2, '.control-group');" :
 						"fc_bindFormDependencies('body', 1, 'li');"

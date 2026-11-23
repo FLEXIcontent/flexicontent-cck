@@ -359,18 +359,12 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		$document->addStyleSheet($version_assets.'/css/flexi_versions.css', array('version' => FLEXI_VHASH));
 
 		// Add JS frameworks
-		// The form scripts (fields, validation, uploaders) need jQuery, also on the site in Choices.js mode
-		if (!$isAdmin && (int) $cparams->get('loadfw_jquery', 1) === 1)
+		// Joomla 4+ item forms load the native controls. A legacy widget can still request its own assets.
+		if (!FLEXI_J40GE)
 		{
 			flexicontent_html::loadJQuery();
 		}
-		else
-		{
-			flexicontent_html::loadFramework('jQuery');
-		}
 		flexicontent_html::loadFramework('select2');
-		flexicontent_html::loadFramework('touch-punch');
-		flexicontent_html::loadFramework('prettyCheckable');
 		flexicontent_html::loadFramework('flexi-lib');
 		flexicontent_html::loadFramework('flexi-lib-form');
 
@@ -690,7 +684,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		{
 			// Not important just save space
 			$this->document->addStyleDeclaration('#toolbar, #isisJsData{display:none !important;} div.container-main {margin-top: 16px;}');
-			$this->document->addScriptDeclaration('jQuery(document).ready(function(){ var jtoolbar_box = jQuery(\'#toolbar\').closest(\'.subhead-collapse\').hide();  jtoolbar_box.prev().remove(); });');
+			$this->document->addScriptDeclaration('FlexiForm.ready(function(){ const toolbar = document.getElementById(\'toolbar\')?.closest(\'.subhead-collapse\'); toolbar?.previousElementSibling?.remove(); FlexiForm.show(toolbar, false); });');
 		}
 
 
@@ -1275,7 +1269,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 		if (empty($level_name))
 		{
 			\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::sprintf('FLEXI_ABOUT_INVALID_ACCESS_LEVEL_PLEASE_SAVE_NEW', $item->access, 'Public'), 'warning');
-			$document->addScriptDeclaration("jQuery(document).ready(function() { jQuery('#jform_access').val(1).trigger('change'); });");
+			$document->addScriptDeclaration("FlexiForm.ready(function() { const access = document.getElementById('jform_access'); if (access) { access.value = '1'; access.fc_choices_instance?.refresh(); FlexiForm.change(access); } });");
 		}
 
 
@@ -2004,7 +1998,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 			{
 				$btn_name='edit_layout';
 				$btn_arr[$btn_name] = flexicontent_html::addToolBarButton(
-					'FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', $btn_name, $full_js="var url = jQuery(this).attr('data-href'); fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, 0, {title:'".$edit_layout."'}); return false;",
+					'FLEXI_EDIT_LAYOUT_N_GLOBAL_PARAMETERS', $btn_name, $full_js="var url = this.dataset.href; fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, 0, {title:'".$edit_layout."'}); return false;",
 					$msg_alert='', $msg_confirm='',
 					$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
 					$btn_class='btn-fcaction ' . (FLEXI_J40GE ? ' _DDI_class_ ' . $this->btn_iv_class : '') . ' ' . $this->tooltip_class, $btn_icon="icon-pencil",
@@ -2032,8 +2026,8 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 				.'&task=call_extfunc&exttype=plugins&extfolder=system&extname=flexisyspro&extfunc=collaborate_form'
 				.'&content_id='.$item->id;
 			$full_js = $has_pro
-				? "var url = jQuery(this).attr('data-href'); fc_showDialog(url, 'fc_modal_popup_container', 0, 800, 800, 0, {title:'" . \Joomla\CMS\Language\Text::_($btn_title) . "'}); return false;"
-				: "var box = jQuery('#fc_available_in_pro'); fc_file_props_handle = fc_showAsDialog(box, 480, 320, null, {title:'" . \Joomla\CMS\Language\Text::_($btn_title) . "'}); return false;";
+				? "var url = this.dataset.href; fc_showDialog(url, 'fc_modal_popup_container', 0, 800, 800, 0, {title:'" . \Joomla\CMS\Language\Text::_($btn_title) . "'}); return false;"
+				: "var box = document.getElementById('fc_available_in_pro'); fc_file_props_handle = fc_showAsDialog(box, 480, 320, null, {title:'" . \Joomla\CMS\Language\Text::_($btn_title) . "'}); return false;";
 
 			$btn_name='collaborate';
 			$btn_arr[$btn_name] = '<div id="fc_available_in_pro" style="display: none;">' . \Joomla\CMS\Language\Text::_('FLEXI_AVAILABLE_IN_PRO_VERSION') . '</div>' . flexicontent_html::addToolBarButton(

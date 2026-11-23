@@ -47,9 +47,11 @@ abstract class JHtmlFcuploader
 
 		return (object) array(
 			'toggleBtn' => '
-				<span class="'.$tBtn['class'].' fc_files_uploader_toggle_btn" data-rowno="'.$n.'" onclick="'.$tBtn['onclick'].'if (window.'.$up_tag_id.') '.$up_tag_id.'.toggleUploader(jQuery(this).data(\'rowno\'), '.$tBtn['action'].');">
+				<button type="button" class="'.$tBtn['class'].' fc_files_uploader_toggle_btn" data-rowno="'.$n.'"
+					aria-label="'.htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_UPLOAD'), ENT_QUOTES, 'UTF-8').'" aria-expanded="false"
+					onclick="'.$tBtn['onclick'].'if (window.'.$up_tag_id.') '.$up_tag_id.'.toggleUploader(Number(this.dataset.rowno), '.$tBtn['action'].', this);">
 					' . $tBtn['text'] . '
-				</span>
+				</button>
 			',
 			'thumbResizer' => (($resize_cfg = @ $options['resize_cfg']) ? '
 				<select id="'.$resize_cfg->slider_name.'-sel" class="fc_uploader_size_select fc_no_js_attach" name="'.$resize_cfg->slider_name.'-sel" style="float: left; display: none;"></select>
@@ -119,74 +121,43 @@ abstract class JHtmlFcuploader
 		$uops = self::getUploadConf($field);
 
 
-		// ***
-		// *** Load plupload JS framework
-		// ***
-
-		$pluploadlib = \Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/librairies/plupload/';
-		$plupload_mode = 'runtime';  // 'runtime,ui'
-		flexicontent_html::loadFramework('plupload', $plupload_mode);
 		flexicontent_html::loadFramework('flexi-lib');
+		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
+		$assetPath = \Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/assets/';
+		$version = array('version' => FLEXI_VHASH);
+		$document->addStyleSheet($assetPath . 'css/fc-uploader.css', $version);
+		$document->addScript($assetPath . 'js/fc-upload-transport.js', $version);
+		$document->addScript($assetPath . 'js/fc-uploader.js', $version);
 
-		\Joomla\CMS\Language\Text::script("FLEXI_PREPARING_FILE_DATA", true);
-		\Joomla\CMS\Language\Text::script("FLEXI_UPLOAD_FINISHED", true);
-		\Joomla\CMS\Language\Text::script("FLEXI_LOADING_IMAGES", true);
-		\Joomla\CMS\Language\Text::script("FLEXI_THUMBNAILS", true);
-		\Joomla\CMS\Language\Text::script("FLEXI_UPLOADING", true);
-		\Joomla\CMS\Language\Text::script("FLEXI_PLEASE_WAIT", true);
-		\Joomla\CMS\Language\Text::script("FLEXI_FILE_PROPERTIES", true);
-		\Joomla\CMS\Language\Text::script("FLEXI_APPLYING_DOT", true);
-		\Joomla\CMS\Factory::getApplication()->getDocument()->addScript(\Joomla\CMS\Uri\Uri::root(true).'/components/com_flexicontent/assets/js/plupload-extend.js', array('version' => FLEXI_VHASH));
-
-		// Add plupload Queue handling functions and initialize a plupload Queue
-		$js = '
-		var '.$up_tag_id.';
-		var '.$up_tag_id.'_options = {
-			mode: "'.$plupload_mode.'",
-			tag_id: "'.$up_tag_id.'",
-			action: "'.$options['action'].'",
-
-			upload_maxsize: "'.$uops['upload_maxsize'].'",
-			upload_maxcount: '.$options['upload_maxcount'].',
-
-			view_layout: "'.$options['layout'].'",
-			autostart_on_select: '.($options['autostart_on_select'] ? 'true' : 'false').',
-			edit_properties: '.($options['edit_properties'] ? 'true' : 'false').',
-			add_size_slider: '.($options['add_size_slider'] ? 'true' : 'false').',
-			refresh_on_complete: '.($options['refresh_on_complete'] ? 'true' : 'false').',
-			thumb_size_default: '.$options['thumb_size_default'].',
-			thumb_size_slider_cfg: '.$options['thumb_size_slider_cfg'].',
-			height_spare: '.$options['height_spare'].',
-
-			handle_FileFiltered: '.$options['handle_FileFiltered'].',
-			handle_FileUploaded: '.$options['handle_FileUploaded'].',
-
-			resize_on_upload: '.($uops['resize_on_upload'] ? 'true' : 'false').',
-			'.($uops['resize_on_upload'] ? '
-			upload_max_w: '.$uops['upload_max_w'].',
-			upload_max_h: '.$uops['upload_max_h'].',
-			upload_quality: '.$uops['upload_quality'].',
-			upload_crop: '.($uops['upload_method'] ? 'true' : 'false').',
-			' : '').'
-
-			flash_swf_url : "'.$pluploadlib.'/js/Moxie.swf",
-			silverlight_xap_url : "'.$pluploadlib.'/js/Moxie.xap"
-		};
-
-		jQuery(document).ready(function()
+		foreach (array('FLEXI_UPLOAD', 'FLEXI_START_UPLOAD', 'FLEXI_REMOVE_FILE', 'FLEXI_THUMBNAILS',
+			'FLEXI_UPLOADING', 'FLEXI_UPLOAD_FINISHED', 'FLEXI_PLEASE_WAIT', 'FLEXI_FILE_PROPERTIES',
+			'FLEXI_UPLOAD_TYPE_REJECTED', 'FLEXI_UPLOAD_LIMIT_REACHED', 'FLEXI_UPLOAD_ASSIGN_FAILED',
+			'JLIB_HTML_MOVE_UP', 'JLIB_HTML_MOVE_DOWN') as $key)
 		{
-			// Create a configuration object, to be used by all uploaders in this group
-			var uploader = '.$up_tag_id.' = new fc_plupload('.$up_tag_id.'_options);
+			\Joomla\CMS\Language\Text::script($key, true);
+		}
 
-			// Register debounced autoresizing of all uploaders in this group
-			var uploader_resize = fc_debounce_exec(uploader.autoResize, 200, false, uploader);
-			jQuery(window).resize(function()
-			{
-				uploader_resize();
-			});
-		});
+		$configuration = $uops + array(
+			'tag_id' => $up_tag_id,
+			'action' => $options['action'],
+			'upload_maxcount' => (int) $options['upload_maxcount'],
+			'autostart_on_select' => (bool) $options['autostart_on_select'],
+			'edit_properties' => (bool) $options['edit_properties'],
+			'add_size_slider' => (bool) $options['add_size_slider'],
+			'refresh_on_complete' => (bool) $options['refresh_on_complete'],
+			'thumb_size_default' => (int) $options['thumb_size_default'],
+			'height_spare' => (int) $options['height_spare'],
+		);
+		// Register before field-ready callbacks auto-open the queue; DOM creation stays lazy.
+		$js = '
+		var ' . $up_tag_id . ' = new FlexiUploader.Uploader(Object.assign(' .
+			json_encode($configuration, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) . ', {
+			thumb_size_slider_cfg: ' . $options['thumb_size_slider_cfg'] . ',
+			handle_FileFiltered: ' . $options['handle_FileFiltered'] . ',
+			handle_FileUploaded: ' . $options['handle_FileUploaded'] . '
+		}));
+		window.addEventListener("resize", fc_debounce_exec(' . $up_tag_id . '.autoResize, 200, false, ' . $up_tag_id . '));
 		';
-
 		\Joomla\CMS\Factory::getApplication()->getDocument()->addScriptDeclaration($js);
 	}
 
@@ -207,16 +178,14 @@ abstract class JHtmlFcuploader
 			return $uops[$conf_index];
 		}
 		
-		$uconf = new \Joomla\Registry\Registry();
-		$uconf->merge(\Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent'));
-
-		if (!empty($field))
-		{
-			$uconf->merge($field->parameters);
-		}
+		$uconf = flexicontent_upload::getUploadParams($field);
 
 		// Try field with upload_maxsize and resize_on_upload parameters
 		$u = array();
+		$u['extensions'] = array_values(array_unique(array_filter(preg_split('/\s*,\s*/', strtolower(
+			$uconf->get('upload_extensions', 'bmp,wbmp,csv,doc,docx,webp,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,txt,xcf,xls,xlsx,zip,ics')
+			. ',' . $uconf->get('ignore_extensions', '')
+		)))));
 		$u['upload_maxsize']   = (int) $uconf->get('upload_maxsize', 10000000);
 		$u['resize_on_upload'] = (int) $uconf->get('resize_on_upload', 1);
 
@@ -225,7 +194,7 @@ abstract class JHtmlFcuploader
 			$u['upload_max_w']   = (int) $uconf->get('upload_max_w', 4000);
 			$u['upload_max_h']   = (int) $uconf->get('upload_max_h', 3000);
 			$u['upload_quality'] = (int) $uconf->get('upload_quality', 95);
-			$u['upload_method']  = (int) $uconf->get('upload_method', 1);
+			$u['upload_method']  = (int) $uconf->get('upload_method', 0);
 		}
 
 		return $uops[$conf_index] = $u;

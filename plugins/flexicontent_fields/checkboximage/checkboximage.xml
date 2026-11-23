@@ -113,7 +113,7 @@
 				<option value="48">48x48</option>
 				<option value="64">64x64</option>
 			</field>
-			<field name="icon_color_form" type="color" default="" label="FLEXI_ICON_COLOR" description="" depend_class="icontype_font"/>
+			<field name="icon_color_form" type="fccolor" default="" label="FLEXI_ICON_COLOR" description="" depend_class="icontype_font"/>
 
 			<field name="" type="separator" default="FLEXI_FIELD_VALUE_AUTO_VALUE_CREATION" level="level2" />
 			<field name="" type="separator" default="FLEXI_FC_PRO_ONLY_INFO" level="level4" class="alert alert-warning fcpadded" />
@@ -266,7 +266,7 @@
 				<option value="48">48x48</option>
 				<option value="64">64x64</option>
 			</field>
-			<field name="icon_color" type="color" default="" label="FLEXI_ICON_COLOR" description="" depend_class="icontype_font view_with_image"/>
+			<field name="icon_color" type="fccolor" default="" label="FLEXI_ICON_COLOR" description="" depend_class="icontype_font view_with_image"/>
 			<field name="display_all" type="radio" default="0" label="FLEXI_DISPLAY_NONSELECTED_VALUES" description="FLEXI_DISPLAY_NONSELECTED_VALUES_DESC" class="btn-group group-fcmethod">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -389,7 +389,7 @@
 				<option value="48">48x48</option>
 				<option value="64">64x64</option>
 			</field>
-			<field name="icon_color_filter" type="color" default="" label="FLEXI_ICON_COLOR" description="" depend_class="icontype_font filter_with_image"/>
+			<field name="icon_color_filter" type="fccolor" default="" label="FLEXI_ICON_COLOR" description="" depend_class="icontype_font filter_with_image"/>
 
 			<field name="display_filter_as" type="multilist" default="0" label="FLEXI_DISPLAY_FILTER_AS" toggle_related="1" description="FLEXI_DISPLAY_FILTER_AS_DESC" class="use_select2_lib">
 				<option value="0" show_list="filt-drop-down" hide_list="filt-as-slider">FLEXI_DISPLAY_AS_DROP_DOWN</option>
@@ -466,7 +466,7 @@
 				<option value="48">48x48</option>
 				<option value="64">64x64</option>
 			</field>
-			<field name="icon_color_filter_s" type="color" default="" label="FLEXI_ICON_COLOR" description="" depend_class="icontype_font filter_with_image_s"/>
+			<field name="icon_color_filter_s" type="fccolor" default="" label="FLEXI_ICON_COLOR" description="" depend_class="icontype_font filter_with_image_s"/>
 
 			<field name="display_filter_as_s" type="multilist" default="0" label="FLEXI_DISPLAY_FILTER_AS" toggle_related="1" description="FLEXI_DISPLAY_FILTER_AS_DESC" class="use_select2_lib">
 				<option value="0" show_list="filt-drop-down-s" hide_list="filt-as-slider-s">FLEXI_DISPLAY_AS_DROP_DOWN</option>

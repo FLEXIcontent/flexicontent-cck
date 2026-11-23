@@ -223,6 +223,8 @@ foreach($values as $file_id)
 	// e. FILENAME / TITLE: decide whether to show it (if we do not use button, then displaying of filename is forced)
 	$filetitle = $file_data->altname ? $file_data->altname : $file_data->filename;
 	$filetitle_escaped = htmlspecialchars($filetitle, ENT_COMPAT, 'UTF-8');
+	// GLightbox renders the decoded data-title as HTML. Keep the title as text.
+	$lightbox_title = htmlspecialchars($filetitle_escaped, ENT_COMPAT, 'UTF-8');
 
 	if ($lowercase_filename) $filetitle = StringHelper::strtolower( $filetitle );
 	$filename_original = $file_data->filename_original ? $file_data->filename_original : $file_data->filename;
@@ -231,7 +233,7 @@ foreach($values as $file_id)
 	$name_escaped = htmlspecialchars($name_str, ENT_COMPAT, 'UTF-8');
 
 	$name_classes = $file_classes . ' fcfile_title';
-	$name_html = '<span class="' . $name_classes . '">'. $name_str . '</span>';
+	$name_html = '<span class="' . $name_classes . '">'. htmlspecialchars((string) $name_str, ENT_QUOTES, 'UTF-8') . '</span>';
 
 
 	// f. DESCRIPTION: either as tooltip or as inline text
@@ -414,7 +416,7 @@ else if ($prop !== 'display_properties_only') :
 			{
 				$actions_arr[] = '
 				<a href="' . $view_link . '" class="' . $view_file_classes . ' fcfile_glightbox" title="' . $viewinfo . '"
-					data-type="external" data-title="' . $filetitle_escaped . '"
+					data-type="external" data-title="' . $lightbox_title . '"
 				>
 					' . ($compact_display != 2 ? $viewtext : '') . '
 					' . ($compact_display == 2 ? ' ' . $svg_eye : '') . '
@@ -471,7 +473,7 @@ else if ($prop !== 'display_properties_only') :
 				.'&file_id='.$file_id.'&content_id='.$item->id.'&field_id='.$field->id;
 			$actions_arr[] =
 				'<button class="' . $file_classes . ' fcfile_shareFile" title="'.$shareinfo.'" data-href="'.$send_form_url.'"
-					onclick="var url = jQuery(this).attr(\'data-href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 800, 800, 0, {title:\''.htmlspecialchars($sharetext, ENT_COMPAT, 'UTF-8').'\'}); return false;" '.
+					onclick="var url = this.getAttribute(\'data-href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 800, 800, 0, {title:\''.htmlspecialchars($sharetext, ENT_COMPAT, 'UTF-8').'\'}); return false;" '.
 				'>
 					' . ($compact_display != 2 ? htmlspecialchars($sharetext, ENT_COMPAT, 'UTF-8') : '') . '
 					' . ($compact_display == 2 ? ' ' . $svg_mail : '') . '
@@ -518,7 +520,7 @@ else if ($prop !== 'display_properties_only') :
 			{
 				$actions_arr[] = '
 				<a href="' . $view_link . '" class="' . $file_classes . ' fcfile_viewFile fcfile_glightbox"'
-					. ' data-type="external" data-title="' . $filetitle_escaped . '" title="' . $viewinfo . '" >'
+					. ' data-type="external" data-title="' . $lightbox_title . '" title="' . $viewinfo . '" >'
 					. $viewtext
 				. '</a>';
 			}
@@ -567,7 +569,7 @@ else if ($prop !== 'display_properties_only') :
 				.'&file_id='.$file_id.'&content_id='.$item->id.'&field_id='.$field->id;
 			$actions_arr[] =
 				'<a href="'.$send_form_url.'" class="fcfile_shareFile" title="'.$shareinfo.'" '.
-				'  onclick="var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 800, 800, 0, {title:\''.$sharetext.'\'}); return false;">'
+				'  onclick="var url = this.getAttribute(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 800, 800, 0, {title:\''.$sharetext.'\'}); return false;">'
 				.$sharetext
 				.'</a>';
 		}
@@ -779,7 +781,7 @@ Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript(
 
 	" . (!$per_value_js ? "" : "
 	//document.addEventListener('DOMContentLoaded', function()
-	jQuery(document).ready(function()
+	FlexiForm.ready(function()
 	{
 		" . $per_value_js . "
 	});

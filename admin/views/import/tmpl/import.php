@@ -407,7 +407,7 @@ $tabCnt[$tabSetCnt] = 0;
 								<li class="tagitem">
 									<span><?php echo htmlspecialchars($tag->name, ENT_COMPAT, 'UTF-8'); ?></span>
 									<input type="hidden" name="tags_ids[]" value="<?php echo (int) $tag->id; ?>" />
-									<a href="javascript:;" class="deletetag" onclick="javascript:deleteTag(this);" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_DELETE_TAG'); ?>"></a>
+									<a href="#" class="deletetag" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_DELETE_TAG'); ?>"></a>
 								</li>
 							<?php endforeach; ?>
 							</ul>

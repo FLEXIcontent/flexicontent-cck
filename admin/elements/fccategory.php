@@ -84,11 +84,11 @@ class JFormFieldFccategory extends \Joomla\CMS\Form\FormField
 			$js = "
 			function fcClearSelectedCategory(element_id)
 			{
-				jQuery('#'+element_id+'_name').val('');
-				jQuery('#'+element_id+'_name').attr('placeholder', '".\Joomla\CMS\Language\Text::_( 'FLEXI_FORM_SELECT',true )."');
-				jQuery('#'+element_id).val('');
-				jQuery('#'+element_id + '_clear').addClass('hidden');
-				jQuery('#'+element_id + '_edit').addClass('hidden');
+				document.getElementById(element_id+'_name').value = '';
+				document.getElementById(element_id+'_name').setAttribute('placeholder', '".\Joomla\CMS\Language\Text::_( 'FLEXI_FORM_SELECT',true )."');
+				document.getElementById(element_id).value = '';
+				document.getElementById(element_id+'_clear')?.classList.add('hidden');
+				document.getElementById(element_id+'_edit')?.classList.add('hidden');
 				return false;
 			};
 
@@ -102,9 +102,9 @@ class JFormFieldFccategory extends \Joomla\CMS\Form\FormField
 				var edit_btn = document.getElementById(fc_select_cat_element_id+'_edit');
 				if (edit_btn) edit_btn.href = 'index.php?option=com_flexicontent&task=category.edit&id=' + id;"
 			.($allowEdit  ? "
-				jQuery('#'+fc_select_cat_element_id+'_edit').removeClass('hidden');" : '')
+				document.getElementById(fc_select_cat_element_id+'_edit')?.classList.remove('hidden');" : '')
 			.($allowClear ? "
-				jQuery('#'+fc_select_cat_element_id+'_clear').removeClass('hidden');" :'')
+				document.getElementById(fc_select_cat_element_id+'_clear')?.classList.remove('hidden');" :'')
 			."
 				//$('sbox-btn-close').fireEvent('click');
 				fc_field_dialog_handle_record.dialog('close');
@@ -147,7 +147,7 @@ class JFormFieldFccategory extends \Joomla\CMS\Form\FormField
 		<span class="input-append">
 			<input type="text" id="'.$element_id.'_name" placeholder="'.\Joomla\CMS\Language\Text::_( 'FLEXI_FORM_SELECT',true ).'" value="'.$title.'" '.$required_param.' readonly="readonly" />
 			'. //<a class="modal btn hasTooltip" onclick="fc_select_cat_element_id=\''.$element_id.'\'" href="'.$link.'" rel="'.$rel.'" title="'.$_select.'">
-			'<a class="btn hasTooltip" onclick="fc_select_cat_element_id=\''.$element_id.'\'; var url = jQuery(this).attr(\'href\'); window.fc_field_dialog_handle_record = fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title:\''.$_select.'\'}); return false;" href="'.$link.'" title="'.$_select.'" >
+			'<a class="btn hasTooltip" onclick="fc_select_cat_element_id=\''.$element_id.'\'; var url = this.getAttribute(\'href\'); window.fc_field_dialog_handle_record = fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title:\''.$_select.'\'}); return false;" href="'.$link.'" title="'.$_select.'" >
 				'.\Joomla\CMS\Language\Text::_( 'FLEXI_FORM_SELECT' ).'
 			</a>
 			'.($allowEdit ? '

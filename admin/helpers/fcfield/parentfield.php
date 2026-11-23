@@ -527,6 +527,38 @@ class FCField extends \Joomla\CMS\Plugin\CMSPlugin
 		return $this->getLayoutPath($plg, $layout ?: 'value', $plg_subtype, $default_layout='value_default');
 	}
 
+	// Expose the established callbacks for both standalone values and field groups.
+	protected function buildValueRepeater($field, $id, $name, $max, $sortable, array $config, $adapter = 'null')
+	{
+		flexicontent_html::loadFramework('field-repeater');
+		$fieldId = (int) $field->id;
+		$config = json_encode($config + array(
+			'fieldId' => $fieldId,
+			'initialCount' => count($field->value),
+			'id' => $id,
+			'name' => $name,
+			'max' => (int) $max,
+		), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+
+		if ($max)
+		{
+			\Joomla\CMS\Language\Text::script('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED', true);
+		}
+
+		$js = $sortable ? "FlexiForm.ready(() => FlexiFieldRepeater.attachOrdering($fieldId));" : '';
+		return $js . "
+			function addField$fieldId(el, groupval_box, fieldval_box, params)
+			{
+				return FlexiFieldRepeater.get($config, $adapter).add(el, fieldval_box, params);
+			}
+			function deleteField$fieldId(el, groupval_box, fieldval_box)
+			{
+				FlexiFieldRepeater.get($config, $adapter).remove(el, fieldval_box);
+			}
+			addField$fieldId.fcNative = deleteField$fieldId.fcNative = true;
+		";
+	}
+
 
 
 	/**

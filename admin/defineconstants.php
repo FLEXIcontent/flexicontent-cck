@@ -164,6 +164,13 @@ if (defined('JPATH_SITE')) {
 	define('FLEXI_VHASH',	md5(filemtime(__FILE__) . filectime(__FILE__) . FLEXI_VERSION
 		. @filemtime(JPATH_SITE . '/components/com_flexicontent/assets/js/flexi-lib.js')
 		. @filemtime(JPATH_SITE . '/components/com_flexicontent/assets/js/flexi-lib-form.js')
+		. @filemtime(JPATH_SITE . '/components/com_flexicontent/assets/js/form-utils.js')
+		. @filemtime(JPATH_SITE . '/components/com_flexicontent/assets/js/admin.js')
+		. @filemtime(JPATH_SITE . '/components/com_flexicontent/assets/js/validate.js')
+		. @filemtime(JPATH_SITE . '/administrator/components/com_flexicontent/assets/js/batchprocess.js')
+		. @filemtime(JPATH_SITE . '/components/com_flexicontent/assets/js/fc-uploader.js')
+		. @filemtime(JPATH_SITE . '/components/com_flexicontent/assets/js/fc-upload-transport.js')
+		. @filemtime(JPATH_SITE . '/components/com_flexicontent/assets/css/fc-uploader.css')
 		. @filemtime(JPATH_SITE . '/components/com_flexicontent/librairies/choicesjs/choices.min.js')
 		. @filemtime(JPATH_SITE . '/components/com_flexicontent/assets/css/flexi_filters.css')
 		. @filemtime(JPATH_SITE . '/components/com_flexicontent/assets/css/flexi_choices.css')));    

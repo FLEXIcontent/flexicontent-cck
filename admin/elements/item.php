@@ -85,30 +85,30 @@ class JFormFieldItem extends FormField
 			$js = "
 			function fcClearSelectedItem(element)
 			{
-				let el = typeof element === 'string' ? jQuery('#'+element) : jQuery(element).closest('.fcselectitem_box').next('.fcselectitem_value');
-				let box = el.prev('.fcselectitem_box');
-				el.val('');
-				box.find('.fcselectitem_name').val('');
-				box.find('.fcselectitem_name').attr('placeholder', '".Text::_( 'FLEXI_FORM_SELECT',true )."');
-				box.find('.fcselectitem_clear').addClass('hidden');
-				box.find('.fcselectitem_edit').addClass('hidden');
+				let el = typeof element === 'string' ? document.getElementById(element) : element.closest('.fcselectitem_box').nextElementSibling;
+				let box = el.previousElementSibling;
+				el.value = ''; FlexiForm.change(el);
+				box.querySelector('.fcselectitem_name').value = '';
+				box.querySelector('.fcselectitem_name').setAttribute('placeholder', '".Text::_( 'FLEXI_FORM_SELECT',true )."');
+				box.querySelector('.fcselectitem_clear')?.classList.add('hidden');
+				box.querySelector('.fcselectitem_edit')?.classList.add('hidden');
 				return false;
 			};
 
 			var fc_select_element_id;
 			function fcSelectItem(id, cid, title, selected_item, assign_all_assocs)
 			{
-				let el = jQuery('#'+fc_select_element_id);
-				let box = el.prev('.fcselectitem_box');
+				let el = document.getElementById(fc_select_element_id);
+				let box = el.previousElementSibling;
 
-				el.val(id);
-				el.trigger('change');
-				box.find('.fcselectitem_name').val(title);
+				el.value = id;
+				FlexiForm.change(el);
+				box.querySelector('.fcselectitem_name').value = title;
 				" .
 				($allowEdit  ? "
-					box.find('.fcselectitem_edit').removeClass('hidden');" : '') .
+					box.querySelector('.fcselectitem_edit')?.classList.remove('hidden');" : '') .
 				($allowClear ? "
-					box.find('.fcselectitem_clear').removeClass('hidden');" :'') .
+					box.querySelector('.fcselectitem_clear')?.classList.remove('hidden');" :'') .
 				"
 
 				if (!!assign_all_assocs)
@@ -134,9 +134,9 @@ class JFormFieldItem extends FormField
 							document.getElementById(element_id_lang + '_name').value = assoc.title;
 							" .
 							($allowEdit  ? "
-								jQuery('#'+element_id_lang + '_edit').removeClass('hidden');" : '') .
+								document.getElementById(element_id_lang + '_edit')?.classList.remove('hidden');" : '') .
 							($allowClear ? "
-								jQuery('#'+element_id_lang + '_clear').removeClass('hidden');" :'') .
+								document.getElementById(element_id_lang + '_clear')?.classList.remove('hidden');" :'') .
 							"
 						}
 						else {}
@@ -185,7 +185,7 @@ class JFormFieldItem extends FormField
 		<span class="input-append fcselectitem_box '.$class.'">
 			<input type="text" class="fcselectitem_name" placeholder="'.Text::_( $hint, true ).'" value="'.htmlspecialchars((string) $title, ENT_QUOTES, 'UTF-8').'" '.$required_param.' readonly="readonly" />
 			'. //<a class="modal btn hasTooltip" onclick="fc_select_element_id=\''.$element_id.'\'" href="'.$link.'" rel="'.$rel.'" title="'.$_select.'">
-			'<a class="btn hasTooltip" onclick="fc_select_element_id = jQuery(this).closest(\'.fcselectitem_box\').next(\'.fcselectitem_value\').attr(\'id\'); var url = jQuery(this).attr(\'href\'); window.fc_field_dialog_handle_record = fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title:\''.$_select.'\'}); return false;" href="'.$link.'" title="'.$_select.'" >
+			'<a class="btn hasTooltip" onclick="fc_select_element_id = this.closest(\'.fcselectitem_box\').nextElementSibling.id; var url = this.href; window.fc_field_dialog_handle_record = fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title:\''.$_select.'\'}); return false;" href="'.$link.'" title="'.$_select.'" >
 				'.Text::_( 'FLEXI_FORM_SELECT' ).'
 			</a>
 			'.($allowEdit ? '

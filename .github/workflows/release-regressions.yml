@@ -25,6 +25,20 @@ jobs:
       - name: Release regressions
         run: |
           php -d error_reporting=-1 tests/item-comments-selector.php
+          php -d error_reporting=-1 tests/manager-checkin-controls.php
+          php -d error_reporting=-1 tests/favourites-controller.php
+          php -d error_reporting=-1 tests/gallery-options.php
+          php -d error_reporting=-1 tests/phone-country-roundtrip.php
+          php -d error_reporting=-1 tests/flexibreak-layouts.php
+          php -d error_reporting=-1 tests/module-tab-state.php
+          php -d error_reporting=-1 tests/upload-field-restrictions.php
+          php -d error_reporting=-1 tests/template-deletion.php
+          php -d error_reporting=-1 tests/optional-jquery-assets.php fancybox auto defaults
+          php -d error_reporting=-1 tests/optional-jquery-assets.php photoswipe auto defaults
+          for framework in fancybox galleriffic elastislide multibox fcxSlide image-picker zTree photoswipe glightbox swiper; do
+            php -d error_reporting=-1 tests/optional-jquery-assets.php "$framework"
+            php -d error_reporting=-1 tests/optional-jquery-assets.php "$framework" manual
+          done
           php -d error_reporting=-1 tests/statistics-data.php
           php -d error_reporting=-1 tests/group-by-columns.php
           php -d error_reporting=-1 tests/search-index-order.php

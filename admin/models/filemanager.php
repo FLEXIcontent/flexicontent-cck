@@ -2123,6 +2123,8 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 
 		$files = $this->_db->setQuery($query)->loadObjectList();
 
+		$imageFields = $this->_db->setQuery("SELECT id, attribs FROM #__flexicontent_fields WHERE field_type = 'image'")->loadObjectList();
+
 		foreach($files as $file)
 		{
 			if ($file->url != 1)
@@ -2134,6 +2136,22 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 				if (is_file($path) && !\Joomla\Filesystem\File::delete($path)) {
 					$this->delete_warnings[] = \Joomla\CMS\Language\Text::_( 'FLEXI_UNABLE_TO_DELETE' ) . $path;
 					\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_( 'FLEXI_UNABLE_TO_DELETE' ) . $path, 'warning');
+				}
+				if (!is_file($path))
+				{
+					// Different originals can share the stem of a generated WebP. Keep
+					// those variants while a surviving record could still own them.
+					$stem = pathinfo($file->filename, PATHINFO_FILENAME);
+					$others = $this->_db->setQuery('SELECT filename FROM #__flexicontent_files WHERE id NOT IN (' . $cid_list . ')'
+						. ' AND secure = ' . (int) $file->secure . ' AND filename LIKE ' . $this->_db->quote($this->_db->escape($stem, true) . '.%', false))->loadColumn();
+					if (!in_array($file->filename, $others, true)) foreach (flexicontent_upload::getImageThumbnails($file, $imageFields, !$others) as $thumbnail)
+					{
+						if (!\Joomla\Filesystem\File::delete($thumbnail))
+						{
+							$this->delete_warnings[] = \Joomla\CMS\Language\Text::_('FLEXI_UNABLE_TO_DELETE') . $thumbnail;
+							\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_UNABLE_TO_DELETE') . $thumbnail, 'warning');
+						}
+					}
 				}
 			}
 		}

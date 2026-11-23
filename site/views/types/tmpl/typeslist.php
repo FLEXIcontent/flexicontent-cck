@@ -18,5 +18,7 @@
 
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
+$language = \Joomla\CMS\Factory::getApplication()->getLanguage();
+$language->load('com_flexicontent', JPATH_ADMINISTRATOR, null, false, true);
 require_once(JPATH_BASE.DS."administrator".DS."components".DS."com_flexicontent".DS."views".DS."types".DS."tmpl".DS."typeslist.php");
 ?>

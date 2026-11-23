@@ -412,10 +412,10 @@
 				image.alt = imageData.title;
 				image.src = imageData.slideUrl;
 
-				image.width  = imageData.width;
-				image.height = imageData.height;
-				image.style.maxWidth  = imageData.width + 'px';
-				image.style.maxHeight = (this.slideHeight > imageData.height ? imageData.height + 'px' : '');
+				if (imageData.width > 0) image.width = imageData.width;
+				if (imageData.height > 0) image.height = imageData.height;
+				image.style.maxWidth = imageData.width > 0 ? imageData.width + 'px' : '100%';
+				image.style.maxHeight = (imageData.height > 0 && this.slideHeight > imageData.height ? imageData.height + 'px' : '');
 				return this;
 			},
 
@@ -721,10 +721,10 @@
 					image.alt = imageData.title;
 					image.src = imageData.slideUrl;
 
-					image.width  = imageData.width;
-					image.height = imageData.height;
-					image.style.maxWidth  = imageData.width + 'px';
-					image.style.maxHeight = (this.slideHeight > imageData.height ? imageData.height + 'px' : '');
+					if (imageData.width > 0) image.width = imageData.width;
+					if (imageData.height > 0) image.height = imageData.height;
+					image.style.maxWidth = imageData.width > 0 ? imageData.width + 'px' : '100%';
+					image.style.maxHeight = (imageData.height > 0 && this.slideHeight > imageData.height ? imageData.height + 'px' : '');
 				}
 
 				// This causes the preloader (if still running) to relocate out from the currentIndex
@@ -1103,13 +1103,11 @@
 		// Setup controls
 		if (this.ssControlsContainerSel) {
 			this.$ssControlsContainer = $(this.ssControlsContainerSel).empty();
-			if (this.autoStart) {
-				this.$ssControlsContainer
-					.append('<div class="ss-controls"><a href="#pause" class="pause" title="'+this.pauseLinkText+'">'+this.pauseLinkText+'</a></div>');
-			} else {
-				this.$ssControlsContainer
-					.append('<div class="ss-controls"><a href="#play" class="play" title="'+this.playLinkText+'">'+this.playLinkText+'</a></div>');
-			}
+			var label = this.autoStart ? this.pauseLinkText : this.playLinkText;
+			var action = this.autoStart ? 'pause' : 'play';
+			$('<div>', {'class': 'ss-controls'}).append(
+				$('<a>', {href: '#' + action, 'class': action, title: $.galleriffic.stripHtml(label)}).html(label)
+			).appendTo(this.$ssControlsContainer);
 
 			this.$ssControlsContainer.find('div.ss-controls a')
 				.click(function(e) {

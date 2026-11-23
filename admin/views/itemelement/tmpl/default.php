@@ -240,32 +240,32 @@ $js .= (!$isXtdBtn ? "" : "
 function delFilter(name)
 {
 	//if(window.console) window.console.log('Clearing filter:'+name);
-	var myForm = jQuery('#adminForm');
-	var filter = jQuery('#'+name);
+	var myForm = document.getElementById('adminForm');
+	var filter = document.getElementById(name);
 
-	if (!filter.length)
+	if (!filter)
 	{
 		return;
 	}
-	else if (filter.attr('type') == 'checkbox')
+	else if (filter.type === 'checkbox')
 	{
-		filter.removeAttr('checked');
+		filter.checked = false;
 	}
 	else
 	{
-		filter.val('');
+		if (filter.tagName === 'SELECT') FlexiForm.clearSelect(filter); else filter.value = '';
 
 		// Case that input has Calendar JS attached
-		if (filter.attr('data-alt-value'))
+		if (filter.hasAttribute('data-alt-value'))
 		{
-			filter.attr('data-alt-value', '');
+			filter.setAttribute('data-alt-value', '');
 		}
 	}
 }
 
 function delAllFilters()
 {
-	jQuery('.fc_field_filter').val('');  // clear custom filters
+	document.querySelectorAll('.fc_field_filter').forEach(filter => { if (filter.tagName === 'SELECT') FlexiForm.clearSelect(filter); else filter.value = ''; });  // clear custom filters
 	delFilter('search');
 	delFilter('filter_type');
 	delFilter('filter_state');
@@ -391,7 +391,7 @@ if ($js)
 				<?php echo HTMLHelper::_('grid.sort', 'FLEXI_STATUS', 'a.' . $this->state_propname, $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_state') || $this->getModel()->getState('filter_catsinstate') != 1) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_state'); jQuery('#filter_catsinstate').val('1'); document.adminForm.submit();"></span>
+					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_state'); document.getElementById('filter_catsinstate').value='1'; document.adminForm.submit();"></span>
 				</span>
 				<?php endif; ?>
 			</th>
@@ -432,7 +432,7 @@ if ($js)
 
 			<?php if ($useAssocs && !isset($disable_columns['assocs'])) : ?>
 			<th class="col_assocs_count"><?php $colposition++; ?>
-				<div id="fc-toggle-assocs_btn" style="padding: 4px 0 2px 6px;" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?>" title="<?php echo Text::_('FLEXI_ASSOCIATIONS'); ?>" onclick="jQuery('#columnchoose_<?php echo $this->data_tbl_id . '_'. $colposition; ?>_label').click();" >
+				<div id="fc-toggle-assocs_btn" style="padding: 4px 0 2px 6px;" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?>" title="<?php echo Text::_('FLEXI_ASSOCIATIONS'); ?>" onclick="document.querySelector('#columnchoose_<?php echo $this->data_tbl_id . '_'. $colposition; ?>_label').click();" >
 					<span class="icon-flag"></span>
 				</div>
 			</th>
@@ -477,7 +477,7 @@ if ($js)
 				<?php echo HTMLHelper::_('grid.sort', 'FLEXI_MAIN_CATEGORY', 'c.title', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_cats') || $this->getModel()->getState('filter_subcats') == 0) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_cats'); jQuery('#filter_subcats').attr('checked', 'checked'); document.adminForm.submit();"></span>
+					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_cats'); document.getElementById('filter_subcats').checked=true; document.adminForm.submit();"></span>
 				</span>
 				<?php endif; ?>
 			</th>
@@ -590,7 +590,7 @@ if ($js)
 							<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 
 						<?php else: /* (unused) Disable with message */ ?>
-							<a style="cursor: default;" href="javascript:;" onclick="var box = jQuery('#assoc_not_allowed_msg'); fc_itemelement_view_handle = fc_showAsDialog(box, 300, 200, null, { title: '<?php echo Text::_('FLEXI_ABOUT', true); ?>'}); return false;">
+							<a style="cursor: default;" href="javascript:;" onclick="var box = document.getElementById('assoc_not_allowed_msg'); fc_itemelement_view_handle = fc_showAsDialog(box, 300, 200, null, { title: '<?php echo Text::_('FLEXI_ABOUT', true); ?>'}); return false;">
 								<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 							</a>
 						<?php endif; ?>

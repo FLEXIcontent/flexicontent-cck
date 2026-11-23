@@ -73,7 +73,7 @@ class plgFlexicontent_fieldsTextselect extends FCField
 		if ( !in_array($field->field_type, static::$field_types) ) return;
 
 		// Call respective method of 'text' field, field_type is not changed since 'text' field can handle current field type
-		FLEXIUtilities::call_FC_Field_Func('text', 'onBeforeSaveField', array(&$field, &$post, &$file, &$item));
+		return FLEXIUtilities::call_FC_Field_Func('text', 'onBeforeSaveField', array(&$field, &$post, &$file, &$item));
 	}
 
 

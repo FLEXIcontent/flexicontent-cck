@@ -159,13 +159,13 @@ class FlexicontentControllerBaseAdmin extends FlexicontentController
 		$app  = \Joomla\CMS\Factory::getApplication();
 		$user = \Joomla\CMS\Factory::getApplication()->getIdentity();
 
-		$httpStatus = $this->exitSuccess ? '200 OK' : '400 Bad Request';
+		$httpStatus = $this->exitSuccess ? 200 : 400;
 
 		foreach	($this->exitHttpHead as $header)
 		{
 			if (key($header) == 'status')
 			{
-				$httpStatus = key($header);
+				$httpStatus = (int) reset($header);
 			}
 
 			$app->setHeader(key($header), reset($header), true);

@@ -33,6 +33,7 @@ class plgFlexicontent_fieldsAuthoritems extends FCField
 	public function __construct( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
+		\Joomla\CMS\Plugin\CMSPlugin::loadLanguage('plg_flexicontent_fields_authoritems', JPATH_ADMINISTRATOR);
 	}
 
 
@@ -45,6 +46,7 @@ class plgFlexicontent_fieldsAuthoritems extends FCField
 	public function onDisplayField(&$field, &$item)
 	{
 		if ( !in_array($field->field_type, static::$field_types) ) return;
+		$field->html = \Joomla\CMS\Language\Text::_('FLEXI_FIELD_AI_AUTOMATIC');
 	}
 
 

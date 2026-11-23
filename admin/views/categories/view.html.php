@@ -646,11 +646,15 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 		$popup_load_url = \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&view=categories&layout=params&tmpl=component';
 		//$toolbar->appendButton('Popup', 'params', \Joomla\CMS\Language\Text::_('FLEXI_COPY_PARAMS'), str_replace('&', '&amp;', $popup_load_url), 600, 440);
 		$js .= "
-			jQuery('#toolbar-params a.toolbar, #toolbar-params button')
-				.attr('href', '".$popup_load_url."')
-				.attr('onclick', 'var url = jQuery(this).attr(\'href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 600, 440, function(){document.body.innerHTML=\'<span class=\"fc_loading_msg\">"
-					.$loading_msg."<\/span>\'; window.location.reload(false)}, {\'title\': \'".flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_COPY_PARAMS'), 2)."\'}); return false;');
-		";
+            document.querySelectorAll('#toolbar-params a.toolbar, #toolbar-params button').forEach(button => {
+                button.removeAttribute('onclick');
+                button.addEventListener('click', event => {
+                    event.preventDefault();
+                    fc_showDialog('" . $popup_load_url . "', 'fc_modal_popup_container', 0, 600, 440,
+                        () => window.location.reload(), {title: '" . flexicontent_html::encodeHTML(\Joomla\CMS\Language\Text::_('FLEXI_COPY_PARAMS'), 2) . "'});
+                });
+            });
+        ";
 		\Joomla\CMS\Toolbar\ToolbarHelper::custom( $btn_task, 'params.png', 'params_f2.png', 'FLEXI_COPY_CONFIG', false );
 
 		//$toolbar->appendButton('Popup', 'move', \Joomla\CMS\Language\Text::_('FLEXI_BATCH'), \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&amp;view=categories&amp;layout=batch&amp;tmpl=component', 800, 440);
@@ -698,7 +702,7 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 			$btn_icon = 'icon-download';
 			$btn_name = 'download';
 			$btn_task = 'appsman.exportxml';
-			$extra_js = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; jQuery('<input>').attr({type: 'hidden', name: 'table', value: '" . $this->db_tbl . "'}).appendTo(jQuery(f));";
+			$extra_js = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; var table=document.createElement('input'); table.type='hidden'; table.name='table'; table.value='" . $this->db_tbl . "'; f.append(table);";
 			$btn_arr[] = flexicontent_html::addToolBarButton(
 				'Export now',
 				$btn_name, $full_js='', $msg_alert='', $msg_confirm=\Joomla\CMS\Language\Text::_('FLEXI_EXPORT_NOW_AS_XML'),
@@ -710,7 +714,7 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 			$btn_icon = 'icon-box-add';
 			$btn_name = 'box-add';
 			$btn_task = 'appsman.addtoexport';
-			$extra_js = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; jQuery('<input>').attr({type: 'hidden', name: 'table', value: '" . $this->db_tbl . "'}).appendTo(jQuery(f));";
+			$extra_js = " var f=document.getElementById('adminForm'); f.elements['view'].value='appsman'; var table=document.createElement('input'); table.type='hidden'; table.name='table'; table.value='" . $this->db_tbl . "'; f.append(table);";
 			$btn_arr[] = flexicontent_html::addToolBarButton(
 				'Add to export',
 				$btn_name, $full_js='', $msg_alert='', $msg_confirm=\Joomla\CMS\Language\Text::_('FLEXI_ADD_TO_EXPORT_LIST'),
@@ -736,7 +740,7 @@ class FlexicontentViewCategories extends FlexicontentViewBaseRecords
 		if ($js)
 		{
 			$document->addScriptDeclaration('
-				jQuery(document).ready(function(){
+				FlexiForm.ready(function(){
 					' . $js . '
 				});
 			');

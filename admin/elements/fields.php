@@ -52,7 +52,6 @@ class JFormFieldFields extends \Joomla\CMS\Form\FormField
 
 		if ($js_css_added === null)
 		{
-			flexicontent_html::loadJQuery();
 			flexicontent_html::loadFramework('flexi-lib-form');
 			$js_css_added = true;
 		}

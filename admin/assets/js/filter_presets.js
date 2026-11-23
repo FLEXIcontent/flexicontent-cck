@@ -153,9 +153,9 @@
 				var del = el('button', 'fc-preset-del', '×');
 				del.type = 'button';
 				del.title = T('FLEXI_PRESET_DELETE', 'Delete');
-				del.addEventListener('click', function (e) {
+				del.addEventListener('click', async function (e) {
 					e.stopPropagation();
-					if (!window.confirm(T('FLEXI_PRESET_DELETE_CONFIRM', 'Delete this preset?'))) return;
+					if (!await FlexiForm.confirm(T('FLEXI_PRESET_DELETE_CONFIRM', 'Delete this preset?'))) return;
 					var l = load();
 					l.splice(index, 1);
 					store(l);
@@ -216,7 +216,7 @@
 				if (existing > -1) {
 					list[existing] = entry;
 				} else if (list.length >= MAX_PRESETS) {
-					window.alert(T('FLEXI_PRESET_MAX', 'Maximum 5 presets, delete one first'));
+					FlexiForm.alert(T('FLEXI_PRESET_MAX', 'Maximum 5 presets, delete one first'));
 					render();
 					return;
 				} else {

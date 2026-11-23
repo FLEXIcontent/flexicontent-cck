@@ -23,6 +23,16 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 	static $field_types = null; // Automatic, do not remove since needed for proper late static binding, define explicitely when a field can render other field types
 	var $task_callable = null;  // Field's methods allowed to be called via AJAX
 
+	// Country options include a leading '+' and sometimes an area-code space.
+	// Use the same safe digits for option values, saved data and telephone URLs.
+	protected static function normalizeCountryCode($value)
+	{
+		$value = trim((string) $value);
+		return preg_match('/^\+?[0-9]+(?: [0-9]+)*$/D', $value)
+			? str_replace(array('+', ' '), '', $value)
+			: '';
+	}
+
 	// ***
 	// *** CONSTRUCTOR
 	// ***
@@ -183,7 +193,7 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 		{
 			$country_op          = new stdClass;
 			$allowed_countries[] = $country_op;
-			$country_op->value   = $country_code;
+			$country_op->value   = static::normalizeCountryCode($country_code);
 			$country_op->text    = \Joomla\CMS\Language\Text::_('PLG_FC_PHONENUMBERS_CC_' . $country_code);
 
 			if (count($ac_country_allowed_list))
@@ -207,9 +217,6 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 		$fieldname = 'custom['.$field->name.']';
 		$elementid = 'custom_'.$field->name;
 
-		// JS safe Field name
-		$field_name_js = str_replace('-', '_', $field->name);
-
 		// JS & CSS of current field
 		$js = '';
 		$css = '';
@@ -217,151 +224,21 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 		// Handle multiple records
 		if ($multiple)
 		{
-			// Add the drag and drop sorting feature
-			if ($add_ctrl_btns) $js .= "
-			jQuery(document).ready(function(){
-				jQuery('#sortables_".$field->id."').sortable({
-					handle: '.fcfield-drag-handle',
-					cancel: false,
-					/*containment: 'parent',*/
-					tolerance: 'pointer'
-					".($fields_box_placing ? "
-					,start: function(e) {
-						//jQuery(e.target).children().css('float', 'left');
-						//fc_setEqualHeights(jQuery(e.target), 0);
-					}
-					,stop: function(e) {
-						//jQuery(e.target).children().css({'float': 'none', 'min-height': '', 'height': ''});
-					}
-					" : '')."
-				});
-			});
-			";
-
-			if ($max_values) \Joomla\CMS\Language\Text::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
-			$js .= "
-			function addField".$field->id."(el, groupval_box, fieldval_box, params)
-			{
-				var insert_before   = (typeof params!== 'undefined' && typeof params.insert_before   !== 'undefined') ? params.insert_before   : 0;
-				var remove_previous = (typeof params!== 'undefined' && typeof params.remove_previous !== 'undefined') ? params.remove_previous : 0;
-				var scroll_visible  = (typeof params!== 'undefined' && typeof params.scroll_visible  !== 'undefined') ? params.scroll_visible  : 1;
-				var animate_visible = (typeof params!== 'undefined' && typeof params.animate_visible !== 'undefined') ? params.animate_visible : 1;
-
-				if(!remove_previous && (rowCount".$field->id." >= maxValues".$field->id.") && (maxValues".$field->id." != 0)) {
-					alert(Joomla.JText._('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + maxValues".$field->id.");
-					return 'cancel';
-				}
-
-				// Find last container of fields and clone it to create a new container of fields
-				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
-				var newField  = lastField.clone();
-				newField.find('.fc-has-value').removeClass('fc-has-value');
-
-				// New element's field name and id
-				var uniqueRowN = uniqueRowNum" . $field->id . ";
-				var element_id = '" . $elementid . "_' + uniqueRowN;
-				var fname_pfx  = '" . $fieldname . "[' + uniqueRowN + ']';
-				";
-
-			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
-			$js .= "
-				theInput = newField.find('input.phonelabel').first();
-				theInput.val('');
-				theInput.attr('name', fname_pfx + '[label]');
-				theInput.attr('id', element_id + '_label');
-				newField.find('.phonelabel-lbl').first().attr('for', element_id + '_label');
-
-				theSelect = newField.find('select.phonecc').first();
-				theSelect.val('');
-				theSelect.attr('name', fname_pfx + '[cc]');
-				theSelect.attr('id', element_id + '_cc');
-				//newField.find('.phonecc-lbl').first().attr('for', element_id + '_cc');
-
-				theInput = newField.find('input.phonenum1').first();
-				theInput.val('');
-				theInput.attr('name', fname_pfx + '[phone1]');
-				theInput.attr('id', element_id + '_phone1');
-				newField.find('.phonenum1-lbl').first().attr('for', element_id + '_phone1');
-
-				theInput = newField.find('input.phonenum2').first();
-				theInput.val('');
-				theInput.attr('name', fname_pfx + '[phone2]');
-				theInput.attr('id', element_id + '_phone2');
-				newField.find('.phonenum2-lbl').first().attr('for', element_id + '_phone2');
-
-				theInput = newField.find('input.phonenum3').first();
-				theInput.val('');
-				theInput.attr('name', fname_pfx + '[phone3]');
-				theInput.attr('id', element_id + '_phone3');
-				newField.find('.phonenum3-lbl').first().attr('for', element_id + '_phone3');
-				";
-
-			// Add new field to DOM
-			$js .= "
-				lastField ?
-					(insert_before ? newField.insertBefore( lastField ) : newField.insertAfter( lastField ) ) :
-					newField.appendTo( jQuery('#sortables_".$field->id."') ) ;
-				if (remove_previous) lastField.remove();
-
-				// Attach form validation on new element
-				fc_validationAttach(newField);
-				";
-
-			// Add new element to sortable objects (if field not in group)
-			if ($add_ctrl_btns) $js .= "
-				//jQuery('#sortables_".$field->id."').sortable('refresh');  // Refresh was done appendTo ?
-				";
-
-			// Show new field, increment counters
-			$js .="
-				//newField.fadeOut({ duration: 400, easing: 'swing' }).fadeIn({ duration: 200, easing: 'swing' });
-				if (scroll_visible) fc_scrollIntoView(newField, 1);
-				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800, function() { jQuery(this).css('opacity', ''); });
-
-				// Enable tooltips on new element
-				newField.find('.hasTooltip').tooltip({html: true, container: newField});
-				newField.find('.hasPopover').popover({html: true, container: newField, trigger : 'hover focus'});
-
-				rowCount".$field->id."++;       // incremented / decremented
-				uniqueRowNum".$field->id."++;   // incremented only
-			}
-
-
-			function deleteField".$field->id."(el, groupval_box, fieldval_box)
-			{
-				// Disable clicks on remove button, so that it is not reclicked, while we do the field value hide effect (before DOM removal of field value)
-				var btn = fieldval_box ? false : jQuery(el);
-				if (btn && rowCount".$field->id." > 1) btn.css('pointer-events', 'none').off('click');
-
-				// Find field value container
-				var row = fieldval_box ? fieldval_box : jQuery(el).closest('li');
-
-				// Add empty container if last element, instantly removing the given field value container
-				if(rowCount".$field->id." == 1)
-					addField".$field->id."(null, groupval_box, row, {remove_previous: 1, scroll_visible: 0, animate_visible: 0});
-
-				// Remove if not last one, if it is last one, we issued a replace (copy,empty new,delete old) above
-				if (rowCount".$field->id." > 1)
-				{
-					// Destroy the remove/add/etc buttons, so that they are not reclicked, while we do the field value hide effect (before DOM removal of field value)
-					row.find('.fcfield-delvalue').remove();
-					row.find('.fcfield-expand-view').remove();
-					row.find('.fcfield-insertvalue').remove();
-					row.find('.fcfield-drag-handle').remove();
-					// Do hide effect then remove from DOM
-					row.slideUp(400, function(){ jQuery(this).remove(); });
-					rowCount".$field->id."--;
-				}
-			}
-			";
-
-			$css .= '';
+			$config = array('controls' => array(
+				array('selector' => 'input.phonelabel', 'key' => 'label', 'value' => ''),
+				array('selector' => 'select.phonecc', 'key' => 'cc', 'value' => static::normalizeCountryCode($ac_country_default)),
+				array('selector' => 'input.phonecc-locked', 'key' => 'cc', 'idSuffix' => 'cc_locked', 'value' => static::normalizeCountryCode($single_country)),
+				array('selector' => 'input.phonenum1', 'key' => 'phone1', 'value' => ''),
+				array('selector' => 'input.phonenum2', 'key' => 'phone2', 'value' => ''),
+				array('selector' => 'input.phonenum3', 'key' => 'phone3', 'value' => ''),
+			));
+			$js .= $this->buildValueRepeater($field, $elementid, $fieldname, $max_values, $add_ctrl_btns, $config);
 
 			$remove_button = '<span class="' . $btn_item_class . $flat_btn_class . ' fcfield-delvalue ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
 			$move2         = '<span class="' . $btn_item_class . $flat_btn_class . ' fcfield-drag-handle ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
 			$add_here = '';
-			$add_here .= $add_position==2 || $add_position==3 ? '<span class="' . $btn_item_class . $flat_btn_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
-			$add_here .= $add_position==1 || $add_position==3 ? '<span class="' . $btn_item_class . $flat_btn_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
+			$add_here .= $add_position==2 || $add_position==3 ? '<span class="' . $btn_item_class . $flat_btn_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField'.$field->id.'(null, this.closest(\'ul\'), this.closest(\'li\'), {insert_before: 1});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
+			$add_here .= $add_position==1 || $add_position==3 ? '<span class="' . $btn_item_class . $flat_btn_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, this.closest(\'ul\'), this.closest(\'li\'), {insert_before: 0});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
 		}
 
 		// Field not multi-value
@@ -376,11 +253,6 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 
 
 		// Add field's CSS / JS
-		if ($multiple) $js .= "
-			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
-			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
-			var maxValues".$field->id." = ".$max_values.";
-		";
 		if ($js)  $document->getWebAssetManager()->addInlineScript($js);
 		if ($css) $document->getWebAssetManager()->addInlineStyle($css);
 
@@ -421,11 +293,14 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 					</div>
 				</div>');
 
+			$selected_cc = static::normalizeCountryCode($value['cc'] ?? $ac_country_default);
 			$phonecc = (!$use_cc ? '' : '
 				<div class="fc-phone-row">
 					<label class="fc-phone-lbl phonecc-lbl" for="'.$elementid_n.'_cc">' . \Joomla\CMS\Language\Text::_( 'PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_COUNTRY_CODE' ) . '</label>
 					<div class="fc-phone-fields">
-' . \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $allowed_countries, $fieldname_n.'[cc]', $countries_attribs . ' class="use_select2_lib phonecc"', 'value', 'text', ($value['cc'] ?? $ac_country_default), $elementid_n.'_cc') . '					</div>
+' . \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $allowed_countries, $fieldname_n.'[cc]', $countries_attribs . ' class="use_select2_lib phonecc"', 'value', 'text', $selected_cc, $elementid_n.'_cc')
+				. ($single_country ? '<input class="phonecc-locked" type="hidden" name="' . $fieldname_n . '[cc]" value="' . static::normalizeCountryCode($single_country) . '" />' : '')
+				. '					</div>
 				</div>');
 
 			$phone = '
@@ -492,7 +367,7 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
 			if (!$add_position) $field->html .= '
 				<div class="'.$btn_group_class.' fc-xpended-btns fc-image-bottom-toolbar">
-					<span class="fcfield-addvalue ' . $font_icon_class . ' ' . $btn_item_class . $flat_btn_class . '" onclick="addField'.$field->id.'(jQuery(this).closest(\'.fc-xpended-btns\').get(0));" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_TO_BOTTOM' ).'">
+					<span class="fcfield-addvalue ' . $font_icon_class . ' ' . $btn_item_class . $flat_btn_class . '" onclick="addField'.$field->id.'(this.closest(\'.fc-xpended-btns\'));" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_TO_BOTTOM' ).'">
 						'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_VALUE' ).'
 					</span>
 				</div>';
@@ -620,8 +495,7 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 			$phone3 = htmlspecialchars(isset($value['phone3']) ? (string) $value['phone3'] : '', ENT_QUOTES, 'UTF-8');
 
 			// A tel URL accepts only the normalized phone components, never raw stored text.
-			$raw_tel_cc = isset($value['cc']) ? trim((string) $value['cc']) : '';
-			$tel_cc     = preg_match('/^\+?[0-9]+$/D', $raw_tel_cc) ? ltrim($raw_tel_cc, '+') : '';
+			$tel_cc     = static::normalizeCountryCode($value['cc'] ?? '');
 			$tel_phone1 = preg_replace('/[^0-9A-Z]/i', '', isset($value['phone1']) ? (string) $value['phone1'] : '');
 			$tel_phone2 = preg_replace('/[^0-9A-Z]/i', '', isset($value['phone2']) ? (string) $value['phone2'] : '');
 			$tel_phone3 = preg_replace('/[^0-9A-Z]/i', '', isset($value['phone3']) ? (string) $value['phone3'] : '');
@@ -715,8 +589,7 @@ class plgFlexicontent_fieldsPhonenumbers extends FCField
 			$v['phone1'] = preg_replace($regex, '', strtoupper($v['phone1']));
 			$v['phone2'] = preg_replace($regex, '', strtoupper($v['phone2']));
 			$v['phone3'] = preg_replace($regex, '', strtoupper($v['phone3']));
-			$raw_cc      = isset($v['cc']) ? trim((string) $v['cc']) : '';
-			$v['cc']     = preg_match('/^\+?[0-9]+$/D', $raw_cc) ? ltrim($raw_cc, '+') : '';
+			$v['cc']     = static::normalizeCountryCode($v['cc'] ?? '');
 
 			// enforce max length
 			$newpost[$new]['phone1'] = $phone1_maxlength ? substr($v['phone1'], 0, $phone1_maxlength) : $v['phone1'];

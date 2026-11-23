@@ -6958,3 +6958,11 @@ ul.fc_ac_dropdown > li.fc_ac_item.is-active {
   text-decoration: none;
   color: inherit;
 }
+
+/* Wrap navigation controls instead of clipping letters or expanding the page. */
+#flexicontent .pagination { flex-wrap: wrap; max-width: 100%; }
+#fc_alpha .aichargrp {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 2px;
+  float: none; position: static; width: 100%;
+}
+#fc_alpha .fc_alpha_index { float: none; position: static; }

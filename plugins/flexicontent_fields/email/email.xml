@@ -59,7 +59,7 @@
 			<!--display this initialize suborm in email form">-->
 			<field name="nothing" type="subform" label="nothing" description="" layout="joomla.form.field.subform.repeatable-table" icon="list" multiple="true" depend_class="colors-by-picker fcsubform-compact">
 				<form name="specific_colors_list" repeat="true">
-					<field name="code" type="color" label="Code" description="" />
+					<field name="code" type="fccolor" label="Code" description="" />
 				</form>
 			</field>
 

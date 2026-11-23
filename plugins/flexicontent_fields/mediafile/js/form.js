@@ -60,6 +60,7 @@ class fc_Waveform_LazyLoad
 	var fcfield_mediafile_base_url = [];
 	var audio_spectrum_arr = [];
 	var audio_spectrum_conf = [];
+	const waveformAudio = /\.(?:aac|flac|m4a|mp3|oga|ogg|opus|wav|webm)(?:[?#]|$)/i;
 
 	fcfield_mediafile.debugToConsole = [];
 	fcfield_mediafile.use_native_apis = [];
@@ -72,10 +73,12 @@ class fc_Waveform_LazyLoad
 		var box = document.querySelector('.mf_value_props[data-name="' + element_id_n + '"]');
 		if (!box) return;
 
-		var btn = document.querySelector('.fc-media-edit-btn[data-for="' + element_id_n + '"]');
 		var isHidden = (window.getComputedStyle(box).display === 'none');
 		box.style.display = isHidden ? 'block' : 'none';
-		if (btn) btn.classList.toggle('active', isHidden);
+		for (const btn of box.closest('.fcfieldval_container').querySelectorAll('.fc-media-edit-btn, .fcfield-mediaurl-btn')) {
+			btn.classList.toggle('active', isHidden);
+			btn.setAttribute('aria-expanded', String(isHidden));
+		}
 	}
 
 	// Kept for backwards compatibility with the old media-URL button
@@ -91,24 +94,18 @@ class fc_Waveform_LazyLoad
 
 	fcfield_mediafile.initValue = function(tagid, config_name)
 	{
-		var fnn  = tagid.replace(/-/g, '_');
-		var file = jQuery('#custom_' + tagid + '_file-data-txt');
+		if (!window.WaveSurfer || !audio_spectrum_conf[config_name]) return;
+		var fnn = tagid.replace(/-/g, '_');
+		var file = document.getElementById('custom_' + tagid + '_file-data-txt');
+		var box = document.getElementById('fc_mediafile_audio_spectrum_box_' + fnn);
+		var spectrum = document.getElementById('fc_mediafile_audio_spectrum_' + fnn);
+		var controls = document.getElementById('fc_mediafile_controls_' + fnn);
+		if (!file || !box || !spectrum || !controls || mediaWaveforms.has(spectrum)) return;
+		var slider = document.getElementById('fc_mediafile_slider_' + fnn);
 		var loading_timer = null, progress_timer = null;
-
-		var box    = jQuery('#fc_mediafile_audio_spectrum_box_' + fnn);
-		var slider = document.querySelector('#fc_mediafile_slider_' + fnn);
-
-		var _progressBar = box.find('.fc_mediafile_audio_spectrum_progressbar');
-		if (_progressBar.length)
-		{
-			var bar          = _progressBar.find('.bar').get(0);
-			var barText      = _progressBar.find('.barText').get(0);
-			var progressBar  = box.find('.fc_mediafile_audio_spectrum_progressbar').get(0);
-		}
-		else
-		{
-			progressBar = false;
-		}
+		var progressBar = box.querySelector('.fc_mediafile_audio_spectrum_progressbar');
+		var bar = progressBar?.querySelector('.bar');
+		var barText = progressBar?.querySelector('.barText');
 
 		var keyPressedDown = function(key_event)
 		{
@@ -146,7 +143,7 @@ class fc_Waveform_LazyLoad
 			var formattedTime = secondsToTimestamp(audio_spectrum.getCurrentTime());
 
 			// v7: WaveSurfer no longer creates <wave> elements; position timer inside the container
-			var container = document.querySelector('#fc_mediafile_audio_spectrum_' + fnn);
+			var container = spectrum;
 			if (!container) return;
 
 			if (!container.querySelector('.fccurrentTimeBox'))
@@ -279,15 +276,7 @@ class fc_Waveform_LazyLoad
 
 		var loadFile = function ()
 		{
-			var isURL = /^(f|ht)tps?:\/\//i.test(file.data('wfpreview'));
-			var url   = isURL ? file.data('wfpreview') : fcfield_mediafile_base_url[config_name] + '/' + file.data('wfpreview');
-			// v7: load() renders waveform and loads audio; pass peaks only when available
-			if (audio_spectrum._saved_peaks_) {
-				audio_spectrum.load(url, [audio_spectrum._saved_peaks_]);
-			} else {
-				audio_spectrum.load(url);
-			}
-			audio_spectrum._loading_started_ = true;
+			return loadWaveform(file, spectrum, config_name);
 		}
 
 
@@ -328,31 +317,30 @@ class fc_Waveform_LazyLoad
 		audio_spectrum._stopProgressBar   = stopProgressBar;
 		audio_spectrum._updateProgressBar = updateProgressBar;
 
-		jQuery('#fc_mediafile_audio_spectrum_' + fnn).data('audio_spectrum', audio_spectrum);
+		mediaWaveforms.set(spectrum, audio_spectrum);
 
-		// v7 polyfill for empty() — used by clearField() to reset the waveform display
-		audio_spectrum.empty = function()
+		audio_spectrum.resetPreview = function()
 		{
-			try { audio_spectrum.stop(); } catch(e) {}
-			audio_spectrum.loaded            = false;
+			audio_spectrum.pause();
+			audio_spectrum.start_on_ready = false;
+			audio_spectrum.loaded = false;
 			audio_spectrum._loading_started_ = false;
-			audio_spectrum._saved_peaks_     = null;
-			var container = document.querySelector('#fc_mediafile_audio_spectrum_' + fnn);
-			if (container)
-			{
-				container.querySelectorAll('canvas').forEach(function(c) {
-					c.getContext('2d').clearRect(0, 0, c.width, c.height);
-				});
-			}
+			audio_spectrum._saved_peaks_ = null;
+			audio_spectrum.empty();
+			buttons.play.style.display = 'inline-block';
+			buttons.play.disabled = false;
+			buttons.pause.style.display = 'none';
+			buttons.pause.disabled = true;
+			buttons.pause.classList.remove('is_active');
+			buttons.stop.disabled = true;
 		};
 
 		// Get control buttons
-		var controls = jQuery('#fc_mediafile_controls_' + fnn);
 		var buttons = {
-			load:  controls.find('.loadBtn').get(0),
-			play:  controls.find('.playBtn').get(0),
-			pause: controls.find('.pauseBtn').get(0),
-			stop:  controls.find('.stopBtn').get(0)
+			load:  controls.querySelector('.loadBtn'),
+			play:  controls.querySelector('.playBtn'),
+			pause: controls.querySelector('.pauseBtn'),
+			stop:  controls.querySelector('.stopBtn')
 		}
 
 		audio_spectrum._buttons_ = buttons;
@@ -391,6 +379,7 @@ class fc_Waveform_LazyLoad
 
 		audio_spectrum.on('ready', function()
 		{
+			if (audio_spectrum.getDuration() <= 0.001) return;
 			buttons.play.disabled  = false;
 			buttons.pause.disabled = false;
 			buttons.stop.disabled  = false;
@@ -432,30 +421,18 @@ class fc_Waveform_LazyLoad
 		// v7: 'interaction' replaces 'seek'; callback receives newTime in seconds, not 0-1 progress
 		audio_spectrum.on('interaction', seekHandler);
 
-		audio_spectrum.on('error', function(e) {
-			console.warn(e);
+
+
+		box.addEventListener('keydown', event => {
+			if (!event.target.matches('button, [role="button"], input')) keyPressedDown(event);
 		});
-
-		box.get(0).addEventListener("keydown", function (event) {
-			return keyPressedDown(event);
-		}, false);
-		box.get(0).addEventListener("keydown", function (event) {
-			return keyPressedDown(event);
-		}, false);
-
-		buttons.play.addEventListener("keydown", function (event) {
-			return keyPressedDown(event);
-		}, false);
-		buttons.pause.addEventListener("keydown", function (event) {
-			return keyPressedDown(event);
-		}, false);
 
 		// Add events of playback buttons
 		buttons.play.addEventListener('click', function()
 		{
-			if (!!!file.data('wfpreview'))
+			if (!file.dataset.wfpreview && !file.dataset.wforiginal)
 			{
-				alert(Joomla.JText._('FLEXI_PLEASE_UPLOAD_A_FILE'));
+				FlexiForm.alert(Joomla.JText._('FLEXI_PLEASE_UPLOAD_A_FILE'));
 				return;
 			}
 
@@ -547,7 +524,7 @@ class fc_Waveform_LazyLoad
 
 		buttons.load.addEventListener('click', function()
 		{
-			if (!!file.data('wfpreview'))
+			if (file.dataset.wfpreview || file.dataset.wforiginal)
 			{
 				buttons.pause.disabled = true;
 				buttons.stop.disabled  = true;
@@ -560,374 +537,167 @@ class fc_Waveform_LazyLoad
 		}, false);
 
 
-		// Render waveform from pre-computed peaks (if peaks JSON is available)
-		if (!!file.data('wfpreview') && !!file.data('wfpeaks'))
-		{
-			var isURL   = /^(f|ht)tps?:\/\//i.test(file.data('wfpreview'));
-			var mp3Url  = isURL ? file.data('wfpreview') : fcfield_mediafile_base_url[config_name] + '/' + file.data('wfpreview');
-			var jsonUrl = isURL ? file.data('wfpeaks')   : fcfield_mediafile_base_url[config_name] + '/' + file.data('wfpeaks');
+		const status = document.createElement('span');
+		status.className = 'fc-waveform-status';
+		status.setAttribute('role', 'status');
+		controls.after(status);
 
-			updateProgressBar(0);
+		// Render pre-computed peaks or decode an available audio file.
+		loadWaveform(file, spectrum, config_name);
+	};
 
-			jQuery.ajax({
-				url:      jsonUrl,
-				dataType: 'json',
-				data:     { format: 'json' },
+	const mediaWaveforms = new WeakMap();
+	const mediaWaveformRequests = new WeakMap();
 
-				progress: function(t)
-				{
-					var e = t.lengthComputable ? t.loaded / t.total : t.loaded / (t.loaded + 1e6);
-					updateProgressBar(Math.round(100 * e), null);
-				},
-
-				success: function(response)
-				{
-					var data = response.data;
-					data.unshift(data[1]);
-
-					// v7: store peaks for reuse; wrap in array for per-channel format
-					audio_spectrum._saved_peaks_ = data;
-
-					// v7: load() with peaks renders waveform immediately while audio loads in background
-					audio_spectrum.load(mp3Url, [data]);
-					audio_spectrum._loading_started_ = true;
-
-					stopProgressBar(100);
-				}
-			});
-		}
-
+	function mediaWaveformURL(path, key)
+	{
+		if (/^(?:https?:)?\/\//i.test(path)) return path;
+		return (fcfield_mediafile_base_url[key] || '').replace(/\/$/, '') + '/' + path.replace(/^\//, '');
 	}
 
-	fcfield_mediafile.showUploader = function(field_name_n, config_name)
+	function cancelWaveform(spectrum)
 	{
-		var fnn  = field_name_n.replace(/-/g, '_');
-		var box = jQuery('#custom_' + field_name_n + '_file-data-txt').closest('.fcfieldval_container');
-		box.find('.fc_files_uploader_toggle_btn').click();
+		if (!spectrum) return;
+		mediaWaveformRequests.get(spectrum)?.abort();
+		mediaWaveformRequests.delete(spectrum);
 	}
 
-
-	fcfield_mediafile.fileFiltered = function(uploader, file, config_name)
+	async function loadWaveform(input, spectrum, key)
 	{
-	}
-
-
-	fcfield_mediafile.fileUploaded = function(uploader, file, result, config_name)
-	{
-		// Get 'fc_plupload' class instance from uploader
-		var _this = jQuery(uploader).data('fc_plupload_instance');
+		const player = mediaWaveforms.get(spectrum);
+		if (!player || !input?.isConnected || (!input.dataset.wfpreview && !input.dataset.wforiginal)) return;
+		cancelWaveform(spectrum);
+		const request = new AbortController();
+		mediaWaveformRequests.set(spectrum, request);
+		const original = input.dataset.wforiginal;
+		const preview = input.dataset.wfpreview;
+		const active = () => !request.signal.aborted && input.isConnected;
+		player._loading_started_ = true;
+		player.loaded = false;
+		player._dummyProgress();
 		try {
-			var response = eval(result.response);
-		} catch(err) {
-			var response = eval('(' + result.response + ')');
-		}
-
-		if (!!response.error)
-		{
-			alert(response.error.message);
-			return;
-		}
-
-		var file = response.data;
-		file.targetid    = jQuery(uploader.settings.container).closest('.fcfieldval_container').find('.fc_filedata_txt').attr('id');
-		file.preview_url = jQuery(uploader.settings.container).find('.plupload_img_preview > img').attr('src');
-		fcfield_mediafile.assignFile(file.targetid, file, 0, config_name);
-	}
-
-
-	fcfield_mediafile.clearFieldUploader = function(box, config_name)
-	{
-		var upload_container = box.find('.fc_file_uploader');
-		var upload_instance = upload_container.data('plupload_instance');
-
-		var upBTN = box.find('.fc_files_uploader_toggle_btn');
-		if (upload_instance)
-		{
-			jQuery(upload_instance).data('fc_plupload_instance').clearUploader(upBTN.data('rowno'));
-		}
-		upBTN.removeClass('active');
-		upload_container.hide();
-	}
-
-
-	fcfield_mediafile.clearField = function(el, options, config_name)
-	{
-		var box = jQuery(el).closest('.fcfieldval_container');
-		var hasValue = box.find('.hasvalue').val();
-		var valcounter = document.getElementById('custom_' + config_name);
-
-		options = options || {};
-		options.hide_image = options.hide_image || false;
-		options.keep_props = options.keep_props || false;
-
-		box.find('.field-media-wrapper').find('.button-clear').click();
-		box.find('.clear-btn').click();
-
-		if (options.hide_image)
-		{
-			box.find('.fcfield_preview_box').hide();
-		}
-		else
-		{
-			fcfield_mediafile.clearFieldUploader(box, config_name);
-			// v7: empty() is a polyfill added to each instance in initValue
-			box.find('.fc_mediafile_audio_spectrum').data('audio_spectrum').empty();
-
-			box.find('.fc_filedata_txt').val('');
-			box.find('.fc_filedata_txt_nowrap').html('');
-			box.find('.fc_filedata_txt').removeAttr('data-filename').removeAttr('data-wfpreview').removeAttr('data-wfpeaks');
-			box.find('.fc_filedata_txt').data('filename', null).data('wfpreview', null).data('wfpeaks', null);
-			box.find('.hasvalue').val('');
-			box.find('.fc_preview_thumb').attr('src', 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=');
-			box.find('.fc_preview_text').html('');
-			box.find('.fc_preview_msg').html('');
-			box.find('.fcfield_preview_box').hide();
-
-			box.find('.fc_media_file_box').show();
-
-			if (hasValue) valcounter.value = ( valcounter.value=='' || valcounter.value=='1' )  ?  ''  :  parseInt(valcounter.value) - 1;
-		}
-		if (options.keep_props)
-		{
-			box.find('input, textarea').val('');
-		}
-	}
-
-	fcfield_mediafile.clearMediaFile = function(clear_btn, placeholder_path)
-	{
-		var box = jQuery(clear_btn).closest('.fcfieldval_container');
-		box.find('.fc-file-id').val('0');
-		box.find('.fc_filedata_txt').val('');
-		box.find('.inline-preview-img').attr('src', placeholder_path);
-		box.find('.inline-preview-obj').attr('data', placeholder_path);
-		box.find('.inline-preview-img').hide();
-		box.find('.inline-preview-obj').hide();
-	}
-
-	fcfield_mediafile.assignMediaFile = function(value_container_id, filename, file_preview)
-	{
-		var originalname = filename;
-		var displaytitle = '';
-		var text_nowrap  = filename;
-
-		var container   = jQuery('#'+value_container_id).closest('.fcfieldval_container');
-		var config_name = jQuery('#'+value_container_id).data('config_name');
-
-		var ext      = filename ? filename.split('.').pop() : '';
-		var baseName = fcfield_mediafile.getFileBasename(filename);
-
-		var waveform_preview = !filename ? '' : filename.substr(0, filename.lastIndexOf(".")) + '.mp3';
-		var waveform_peaks   = !filename ? '' : filename.substr(0, filename.lastIndexOf(".")) + '.json';
-
-		waveform_preview = !filename ? '' : waveform_preview.replace(baseName, '/audio_preview/' + baseName);
-		waveform_peaks   = !filename ? '' : waveform_peaks.replace(baseName, '/audio_preview/' + baseName);
-
-		var _name = filename;
-		var _url = fcfield_mediafile_base_url[config_name] + '/' + filename;
-		var isURL = /^(f|ht)tps?:\/\//i.test(_name);
-
-		var mp3Preview = isURL ? waveform_preview : fcfield_mediafile_base_url[config_name] + waveform_preview;
-		var jsonPeaks  = isURL ? waveform_peaks : fcfield_mediafile_base_url[config_name] + waveform_peaks;
-
-		container.find('.fc-file-id').val(0);
-		container.find('.fc_filedata_storage_name').html(filename);
-		container.find('.fc_filedata_txt').val(originalname).removeClass('file_unpublished').blur();
-		container.find('.fc_filedata_txt').removeAttr('data-filename');
-		container.find('.fc_filedata_txt').data('filename', filename);
-		container.find('.fc_filedata_txt_nowrap').html(text_nowrap).show();
-		container.find('.fc_filedata_title').val(displaytitle);
-		container.find('.fc_preview_thumb').attr('src', file_preview);
-
-		container.find('.fc_filedata_txt').data('wfpreview', waveform_preview);
-		container.find('.fc_filedata_txt').data('wfpeaks', waveform_peaks);
-
-		var is_image = file_preview.match(/\.(jpeg|jpg|gif|png|webp)$/) != null;
-		if (is_image)
-		{
-			container.find('.fc_preview_text').html('');
-			container.find('.inline-preview-img').show();
-		}
-		else
-		{
-			container.find('.fc_preview_text').html(ext.toUpperCase());
-			container.find('.inline-preview-img').hide();
-			if (container.find('.fcfield_preview_box').hasClass('auto'))
-			{
-				container.find('.fcfield_preview_box').hide();
+			let peaks;
+			if (input.dataset.wfpeaks) {
+				try {
+					const response = await fetch(mediaWaveformURL(input.dataset.wfpeaks, key), {signal: request.signal});
+					const payload = response.ok ? await response.json() : null;
+					const data = payload?.data;
+					if (Array.isArray(data) && data.length > 1) peaks = [data[1], ...data];
+				} catch { /* The player can decode audio without precomputed peaks. */ }
 			}
-		}
-
-		container.find('.fc_filetitle').val(filename).blur();
-		container.find('.fc_filelang').val('').trigger('change');
-		container.find('.fc_filedesc').val('');
-
-		// Load the audio waveform
-		var audio_spectrum = container.find('.fc_mediafile_audio_spectrum').data('audio_spectrum');
-		if (!!filename)
-		{
-			audio_spectrum._dummyProgress();
-
-			jQuery.ajax({
-				dataType: 'json',
-				url: jsonPeaks
-			}).success(function (response)
-			{
-				var data = response.data;
-				data.unshift(data[1]);
-
-				// v7: store peaks and render waveform via load()
-				audio_spectrum._saved_peaks_     = data;
-				audio_spectrum._loading_started_ = false;
-				audio_spectrum.loaded            = false;
-
-				setTimeout(function () {
-					audio_spectrum._stopProgressBar();
-					// v7: load() with peaks renders waveform; wrap peaks in array for per-channel format
-					audio_spectrum.load(mp3Preview, [data]);
-					audio_spectrum._loading_started_ = true;
-				}, 10);
-			});
-		}
-
-		// Increment value counter (which is optionally used as 'required' form element)
-		var valcounter = document.getElementById('custom_' + config_name);
-		if (valcounter)
-		{
-			valcounter.value = valcounter.value=='' ? '1' : parseInt(valcounter.value) + 1;
-		}
-
-		var remove_obj = container.find('.inlinefile-del');
-		remove_obj.removeAttr('checked').trigger('change');
-
-		// Re-validate
-		jQuery(valcounter).trigger('blur');
-		return true;
-	}
-
-	fcfield_mediafile.getFileBasename = function(str)
-	{
-		var base = new String(str).substring(str.lastIndexOf('/') + 1);
-		if (base.lastIndexOf(".") != -1)
-		{
-			base = base.substring(0, base.lastIndexOf("."));
-		}
-		return base;
-	}
-
-	fcfield_mediafile.assignFile = function(value_container_id, file, keep_modal, config_name)
-	{
-		// Decode php utf8_encode
-		for (const key in file) {
+			if (!active()) return;
+			const audio = original && !peaks ? original : mediaWaveformURL(preview, key);
 			try {
-				file[key] = decodeURIComponent(file[key]);
-			} catch(err) {
-				file[key] = file[key];
+				await player.load(audio, peaks ? [peaks] : undefined);
+			} catch (error) {
+				if (!active() || !original || audio === original) throw error;
+				await player.load(original);
+			}
+		} catch {
+			if (active()) {
+				player.resetPreview();
+				const message = spectrum.closest('.fc_mediafile_audio_spectrum_box')?.querySelector('.fc-waveform-status');
+				if (message) message.textContent = FlexiForm.text('PLG_FLEXICONTENT_FIELDS_MEDIAFILE_FILE_NOT_FOUND');
+			}
+		} finally {
+			if (mediaWaveformRequests.get(spectrum) === request) {
+				mediaWaveformRequests.delete(spectrum);
+				player._stopProgressBar();
 			}
 		}
-
-		// We use altname (aka title) that is by default (unless modified) same as 'filename_original'
-		var originalname = file.filename_original ? file.filename_original : file.filename;
-		var displaytitle = file.altname && (file.altname!=file.filename) ? file.altname : '-';
-		var text_nowrap  = file.altname && (file.altname!=file.filename) ? file.filename+'<br/>'+file.altname : '';
-
-		var container = jQuery('#'+value_container_id).closest('.fcfieldval_container');
-
-		var ext      = file.filename ? file.filename.split('.').pop() : '';
-		var baseName = fcfield_mediafile.getFileBasename(file.filename);
-
-		var waveform_preview = !file.filename ? '' : file.filename.substr(0, file.filename.lastIndexOf(".")) + '.mp3';
-		var waveform_peaks   = !file.filename ? '' : file.filename.substr(0, file.filename.lastIndexOf(".")) + '.json';
-
-		waveform_preview = !file.filename ? '' : waveform_preview.replace(baseName, '/audio_preview/' + baseName);
-		waveform_peaks   = !file.filename ? '' : waveform_peaks.replace(baseName, '/audio_preview/' + baseName);
-
-		var _name = file.filename;
-		var _url = fcfield_mediafile_base_url[config_name] + '/' + file.filename;
-		var isURL = /^(f|ht)tps?:\/\//i.test(_name);
-
-		var mp3Preview = isURL ? waveform_preview : fcfield_mediafile_base_url[config_name] + waveform_preview;
-		var jsonPeaks  = isURL ? waveform_peaks : fcfield_mediafile_base_url[config_name] + waveform_peaks;
-
-		container.find('.fc-file-id').val(file.id);
-		container.find('.fc_filedata_storage_name').html(file.filename);
-		container.find('.fc_filedata_txt').val(originalname).removeClass('file_unpublished').blur();
-		container.find('.fc_filedata_txt').removeAttr('data-filename');
-		container.find('.fc_filedata_txt').data('filename', file.filename);
-		container.find('.fc_filedata_txt').data('wfpreview', waveform_preview);
-		container.find('.fc_filedata_txt').data('wfpeaks', waveform_peaks);
-		container.find('.fc_filedata_txt_nowrap').html(text_nowrap).show();
-		container.find('.fc_filedata_title').val(displaytitle);
-
-		container.find('.fc_preview_thumb').attr('src', file.preview ? file.preview : 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=');
-
-		if (file.preview)
-		{
-			container.find('.fc_preview_text').html('');
-			if (keep_modal != 2)
-			{
-				container.find('.fcfield_preview_box').show();
-				fcfield_mediafile.clearFieldUploader(container, config_name);
-			}
-		}
-		else
-		{
-			container.find('.fc_preview_text').html(file.ext.toUpperCase());
-
-			if (container.find('.fcfield_preview_box').hasClass('auto'))
-			{
-				container.find('.fcfield_preview_box').hide();
-			}
-		}
-
-		var audio_spectrum = container.find('.fc_mediafile_audio_spectrum').data('audio_spectrum');
-		container.find('.fc_filetitle').val(file.altname).blur();
-		container.find('.fc_filelang').val(file.language).trigger('change');
-		container.find('.fc_filedesc').val(file.description);
-
-		// Load the audio waveform
-		if (!!file.filename)
-		{
-			audio_spectrum._dummyProgress();
-
-			jQuery.ajax({
-				dataType: 'json',
-				url: jsonPeaks
-			}).success(function (response)
-			{
-				var data = response.data;
-				data.unshift(data[1]);
-
-				// v7: store peaks and render waveform via load()
-				audio_spectrum._saved_peaks_     = data;
-				audio_spectrum._loading_started_ = false;
-				audio_spectrum.loaded            = false;
-
-				setTimeout(function () {
-					audio_spectrum._stopProgressBar();
-					// v7: load() with peaks renders waveform; wrap peaks in array for per-channel format
-					audio_spectrum.load(mp3Preview, [data]);
-					audio_spectrum._loading_started_ = true;
-				}, 10);
-			});
-		}
-
-		// Increment value counter (which is optionally used as 'required' form element)
-		var valcounter = document.getElementById('custom_' + config_name);
-		if (valcounter)
-		{
-			valcounter.value = valcounter.value=='' ? '1' : parseInt(valcounter.value) + 1;
-		}
-
-		var remove_obj = container.find('.inlinefile-del');
-		remove_obj.removeAttr('checked').trigger('change');
-
-		// Close file select modal dialog
-		if (!keep_modal && !!fcfield_mediafile.dialog_handle[config_name])
-		{
-			fcfield_mediafile.dialog_handle[config_name].dialog('close');
-		}
-
-		// Re-validate
-		jQuery(valcounter).trigger('blur');
-		return true;
 	}
+
+	function clearWaveform(box)
+	{
+		const input = box.querySelector('.fc_filedata_txt');
+		if (input) {
+			delete input.dataset.wfpreview;
+			delete input.dataset.wfpeaks;
+			delete input.dataset.wforiginal;
+		}
+		const spectrum = box.querySelector('.fc_mediafile_audio_spectrum');
+		cancelWaveform(spectrum);
+		const player = mediaWaveforms.get(spectrum);
+		player?._stopProgressBar();
+		const message = spectrum?.closest('.fc_mediafile_audio_spectrum_box')?.querySelector('.fc-waveform-status');
+		if (message) message.textContent = '';
+		player?.resetPreview();
+	}
+
+	function assignWaveform(box, input, file, key)
+	{
+		if (!input) return;
+		clearWaveform(box);
+		if (!waveformAudio.test(file.filename)) return;
+		if (String(file.secure) === '0' && String(file.url ?? 0) === '0' && input.dataset.wfPublicRoot) {
+			input.dataset.wforiginal = input.dataset.wfPublicRoot + '/' + file.filename.split('/').map(encodeURIComponent).join('/');
+		}
+		const path = file.filename.replace(/(^|\/)([^/]+)\.[^./]+$/, '$1audio_preview/$2');
+		const hasFileExtension = path !== file.filename;
+		input.dataset.wfpreview = file.waveform_preview || (hasFileExtension ? path + '.mp3' : '');
+		input.dataset.wfpeaks = file.waveform_peaks || (hasFileExtension ? path + '.json' : '');
+		loadWaveform(input, box.querySelector('.fc_mediafile_audio_spectrum'), key);
+	}
+
+	fcfield_mediafile.disposeValue = function(box)
+	{
+		const spectrum = box.querySelector('.fc_mediafile_audio_spectrum');
+		const player = mediaWaveforms.get(spectrum);
+		if (!player) return;
+		cancelWaveform(spectrum);
+		player._stopProgressBar();
+		player.destroy();
+		mediaWaveforms.delete(spectrum);
+		const index = audio_spectrum_arr.indexOf(player);
+		if (index !== -1) audio_spectrum_arr.splice(index, 1);
+	};
+
+	fcfield_mediafile.showUploader = function(fieldName)
+	{
+		FlexiMediaField.showUploader('custom_' + fieldName + '_file-data-txt');
+	};
+
+	fcfield_mediafile.fileFiltered = function() {};
+
+	fcfield_mediafile.fileUploaded = function(uploader, file, result, key)
+	{
+		const upload = FlexiMediaField.uploaded(uploader, result, '.fc_filedata_txt');
+		if (upload) fcfield_mediafile.assignFile(upload.target.id, upload.file, 0, key);
+	};
+
+	fcfield_mediafile.clearFieldUploader = function(box)
+	{
+		FlexiMediaField.clearUploader(box);
+	};
+
+	fcfield_mediafile.clearField = function(element, options, key)
+	{
+		FlexiMediaField.clearFile(element, options, key, clearWaveform);
+	};
+
+	fcfield_mediafile.clearMediaFile = function(button, placeholder)
+	{
+		FlexiMediaField.clearMediaFile(button, placeholder, clearWaveform);
+	};
+
+	fcfield_mediafile.assignMediaFile = function(id, filename, preview)
+	{
+		return FlexiMediaField.assignFile(id, {id: 0, filename, preview}, 1, null, null, assignWaveform, true);
+	};
+
+	fcfield_mediafile.selectMediaFile = function(id, filename, root)
+	{
+		if (filename) fcfield_mediafile.assignMediaFile(id, filename, root + filename);
+		if (typeof SqueezeBox !== 'undefined') SqueezeBox.close();
+		fc_closeDialog('fc_modal_popup_container');
+	};
+
+	fcfield_mediafile.getFileBasename = function(path)
+	{
+		return String(path).split('/').pop().replace(/\.[^.]*$/, '');
+	};
+
+	fcfield_mediafile.assignFile = function(id, file, keepModal, key)
+	{
+		return FlexiMediaField.assignFile(id, file, keepModal, key, fcfield_mediafile.dialog_handle, assignWaveform);
+	};

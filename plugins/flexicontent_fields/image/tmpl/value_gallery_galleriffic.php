@@ -13,9 +13,7 @@ if ($is_ingroup)
 	return;
 }
 
-// In Choices.js mode the front is jQuery-free, so the jQuery based Galleriffic JS is skipped
-// (thumbnail grid stays visible, no slideshow animation, no popup, no console errors).
-$gallery_useChoices_gf = (int) \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('select_lib_type', 0) === 1;
+// The selected gallery loads its own dependencies, independently of Choices.
 
 
 // ***
@@ -95,9 +93,6 @@ foreach ($values as $n => $value)
 ';
 	$firstImageHtml = $firstImage ?: '<img class="image-fist-image" src="'.\Joomla\CMS\Uri\Uri::root(true).'/'.$srcl.'" alt="' . $title_encoded . '" style="width: 100%; height: 100%;" />';
 }
-$js = "";
-if (!$gallery_useChoices_gf)
-{
 $js = "
 var gf_gallery_" . $uid . ";
 
@@ -112,7 +107,7 @@ $(document).ready(function()
 
 	var sliderBox  = $('#gf_thumbs_" . $uid . "');
 
-	sliderBox.find('.gf_fancybox').fancybox({
+	if (" . ($enable_popup ? 'true' : 'false') . ") sliderBox.find('.gf_fancybox').fancybox({
 		'openEffect'	: 'elastic',
 		'closeEffect'	: 'elastic',
 		'openEasing'  : 'easeOutCubic',
@@ -168,7 +163,6 @@ $(document).ready(function()
 });
 })(jQuery);
 ";
-}
 
 if ($js) \Joomla\CMS\Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript($js);
 
@@ -179,17 +173,8 @@ if ($js) \Joomla\CMS\Factory::getApplication()->getDocument()->getWebAssetManage
 
 if ( !isset(static::$js_added[$field->id][__FILE__]) )
 {
-	// Skip jQuery based frameworks in Choices.js (jQuery-free) mode
-	if (!$gallery_useChoices_gf)
-	{
-		flexicontent_html::loadFramework('galleriffic');
-
-		// Load Fancybox if needed
-		//if ( $enable_popup )
-		//{
-			flexicontent_html::loadFramework('fancybox');
-		//}
-	}
+	flexicontent_html::loadFramework('galleriffic');
+	if ($enable_popup) flexicontent_html::loadFramework('fancybox');
 
 	static::$js_added[$field->id][__FILE__] = array();
 }
@@ -282,7 +267,7 @@ if ($result !== _FC_RETURN_)
 
 			'. $navigation_top .'
 
-		<div class="gf_controls_box" ' . ($over_image_btns ? 'style="height: 0; overflow: hidden;"' : '') . '>
+		<div class="gf_controls_box' . ($over_image_btns ? ' gf_controls_overlay' : '') . '">
 			<div id="gf_sscontrols_' . $uid . '" class="controls ss-controls-box"></div>
 			' . (!$over_image_btns ? '
 			<div id="gf_navcontrols_' . $uid . '" class="controls nav-controls-box"></div>

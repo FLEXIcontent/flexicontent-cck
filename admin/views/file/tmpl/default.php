@@ -125,7 +125,7 @@ $fc_in_modal = \Joomla\CMS\Factory::getApplication()->input->getCmd('tmpl') === 
 											$modal_url   = "index.php?option=com_ajax&view=default&tmpl=component&asset=com_content&author=&fieldid=filename&plugin=quantummanagermedia&format=html";
 											$modal_url  .= '&folder=';
 											$modal_title = 'Select file'; $width = 0; $height = 0;
-											$onclick_js  = "var url = jQuery(this).attr('data-href'); "
+											$onclick_js  = "var url = this.dataset.href; "
 												. " var the_dialog = fc_showDialog(url, 'fc_modal_popup_container', 0, {$width}, {$height}, null, "
 												. " {title:'{$modal_title}', loadFunc: null}); return false;";
 											$select_file_btn =
@@ -135,7 +135,7 @@ $fc_in_modal = \Joomla\CMS\Factory::getApplication()->input->getCmd('tmpl') === 
 											$juri_root = \Joomla\CMS\Uri\Uri::root(true);
 											$file_placeholder_text = 'No file selected';
 											$file_placeholder_src  = $juri_root . '/' .'administrator/components/com_events/assets/images/person_placeholder.jpg';
-											$file_clear_value_js   = "jQuery(this).parent().find('input[type=text]').val(''); jQuery(this).parent().parent().find('.inline-preview-img').attr('src', '".$file_placeholder_src."'); ";
+											$file_clear_value_js   = "this.parentElement.querySelector('input[type=text]').value = ''; this.parentElement.parentElement.querySelector('.inline-preview-img').setAttribute('src', '".$file_placeholder_src."'); ";
 											$value_src = $this->row->filename ? $juri_root . '/' . $this->row->filename : $file_placeholder_src;
 
 											$file_is_img  = in_array(strtolower(pathinfo($this->row->filename, PATHINFO_EXTENSION)), array('jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'));
@@ -376,7 +376,7 @@ HTML;
 
 		<?php if ($fc_can_edit_properties && (flexicontent_fileeditor::visible($fc_editor_params, 'language') || flexicontent_fileeditor::visible($fc_editor_params, 'access') || flexicontent_fileeditor::visible($fc_editor_params, 'stamp') || flexicontent_fileeditor::visible($fc_editor_params, 'hits'))) : ?>
 		<tr>
-			<td></td><td><input style="margin-top: 64px;" type="button" class="btn btn-primary" value="Advanced properties" onclick="jQuery('.advanced-file-props').toggle({ direction: 'left' }, 300);"/></td>
+			<td></td><td><input style="margin-top: 64px;" type="button" class="btn btn-primary" value="Advanced properties" onclick="document.querySelectorAll('.advanced-file-props').forEach(row => FlexiForm.show(row, !FlexiForm.visible(row)));"/></td>
 		</tr>
 
 		<tr<?php echo $fc_editor_attrs('language'); ?> class="advanced-file-props">
@@ -634,7 +634,8 @@ HTML;
 
 	function fcFileModalClose()
 	{
-		try { window.parent.jQuery('#fc_modal_popup_container').dialog('close'); } catch (e) { window.close(); }
+		if (window.parent !== window && typeof window.parent.fc_closeDialog === 'function') window.parent.fc_closeDialog('fc_modal_popup_container');
+		else window.close();
 	}
 
 	// After a confirmed (AJAX) save, show the new data in the values of the parent (item) form that use this file
@@ -659,15 +660,12 @@ HTML;
 <?php endif; ?>
 <script>
 	function jInsertFieldValue(value, id) {
-		var elem = jQuery('#'+id).get(0);
-
-		elem.value = value;
-		let preview_img = jQuery(elem).parent().parent().find('img.inline-preview-img');
-		if (preview_img.length > 0) {
-			let juri_root = preview_img.attr('data-juri-root');
-			preview_img.attr('src', juri_root + '/' + value);
-		}
-		if (typeof SqueezeBox != 'undefined') SqueezeBox.close();
-		if (typeof jQuery != 'undefined') jQuery('#fc_modal_popup_container').dialog('close');
+		const input = document.getElementById(id);
+		if (!input) return;
+		input.value = value;
+		const preview = input.parentElement.parentElement.querySelector('img.inline-preview-img');
+		if (preview) preview.src = preview.dataset.juriRoot + '/' + value;
+		if (typeof SqueezeBox !== 'undefined') SqueezeBox.close();
+		fc_closeDialog('fc_modal_popup_container');
 	}
 </script>

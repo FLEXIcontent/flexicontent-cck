@@ -116,250 +116,64 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 		}
 
 
-		$js = '';
-		$css = '';
+		$compact_edit_global = (int) $field->parameters->get('compact_edit_global', 0);
+		if ($multiple || $compact_edit_global)
+		{
+			flexicontent_html::loadFramework('flexi-lib');
+			$assets = \Joomla\CMS\Uri\Uri::root(true) . '/plugins/flexicontent_fields/fieldgroup/';
+			$document->addScript($assets . 'js/form.js', array('version' => 'auto'));
+			$document->addStyleSheet($assets . 'css/form.css', array('version' => 'auto'));
+		}
 
-		// Handle multiple records
+		$remove_button = $move2 = $togglers = $add_here = '';
 		if ($multiple)
 		{
-			// Add the drag and drop sorting feature
-			if ($add_ctrl_btns) $js .= "
-			jQuery(document).ready(function(){
-				jQuery('#sortables_".$field->id."').sortable({
-					handle: '.fcfield-drag-handle',
-					cancel: false,
-					/*containment: 'parent',*/
-					tolerance: 'pointer'
-					".($fields_box_placing ? "
-					,start: function(e) {
-						//jQuery(e.target).children().css('float', 'left');
-						//fc_setEqualHeights(jQuery(e.target), 0);
-					}
-					,stop: function(e) {
-						//jQuery(e.target).children().css({'float': 'none', 'min-height': '', 'height': ''});
-					}
-					" : '')."
-				});
-			});
-			";
-			$js .= "
-			jQuery(document).ready(function(){"
-				.($compact_edit==2 ? "jQuery('#sortables_".$field->id."').find('.fc-toggle-group-down').data('fc_noeffect', 1).trigger('click');" : "")
-				.($compact_edit==1 ? "jQuery('#sortables_".$field->id."').find('.fc-toggle-group-up').data('fc_noeffect', 1).trigger('click');" : "")
-			."});
-			";
+			flexicontent_html::loadFramework('sortable');
+			if ($max_values) \Joomla\CMS\Language\Text::script('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED', true);
 
-			if ($max_values) \Joomla\CMS\Language\Text::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
-			$js .= "
-			var uniqueRowNum".$field->id."	= ".$max_count.";  // Unique row number incremented only
-			var rowCount".$field->id."	= ".$max_count.";      // Counts existing rows to be able to limit a max number of values
-			var maxValues".$field->id." = ".$max_values.";
-			";
-
-			// Create function call for add/deleting Field values
-			$addField_pattern = "
-				var fieldval_box = groupval_box.find('.fcfieldval_container__GRP_FID_');
-				if (typeof addField_GRP_FID_ !== 'undefined')
-				{
-					fieldval_box.find('.invalid').removeClass('invalid').attr('aria-invalid', 'false');
-					var newSubLabel = fieldval_box.closest('.control-fc_subgroup').find('label.fc_sub_label');
-					var newLabelFor = 'custom_%s_'+uniqueRowNum".$field->id.";
-					console.log(newSubLabel);
-					newSubLabel.attr('id', newLabelFor + '-lbl');
-					newSubLabel.attr('for', newLabelFor);
-					newSubLabel.attr('data-for', newLabelFor);
-					addField_GRP_FID_(null, groupval_box, groupval_box.find('.fcfieldval_container__GRP_FID_'), add_params);
-				}
-				else {
-					// Clear displayed values of other value-set
-					fieldval_box.find('.fc-non-editable-value').html('-');
-				}
-				";
-			$delField_pattern = "
-				if (typeof deleteField_GRP_FID_ !== 'undefined')
-				{
-					if (rowCount".$field->id." == 1)
-					{
-						// We need to update the current grouped label of the field if this was the last element being re-added
-						var fieldval_box = groupval_box.find('.fcfieldval_container__GRP_FID_');
-						fieldval_box.find('.invalid').removeClass('invalid').attr('aria-invalid', 'false');
-						var newSubLabel = fieldval_box.closest('.control-fc_subgroup').find('label.fc_sub_label');
-						var newLabelFor = 'custom_%s_'+uniqueRowNum".$field->id.";
-						newSubLabel.attr('for', newLabelFor);
-						newSubLabel.attr('data-for', newLabelFor);
-					}
-					deleteField_GRP_FID_(null, groupval_box, groupval_box.find('.fcfieldval_container__GRP_FID_'));
-				}
-				";
-			$addField_funcs = $delField_funcs = '';
-			foreach($grouped_fields as $field_id => $grouped_field)
+			$children = array();
+			foreach ($grouped_fields as $child)
 			{
-				if ($grouped_field->formhidden == 4) continue;
-				if ($isAdmin) {
-					if ( $grouped_field->parameters->get('backend_hidden')  ||  (isset($grouped_field->formhidden_grp) && in_array($grouped_field->formhidden_grp, array(2,3))) ) continue;
-				} else {
-					if ( $grouped_field->parameters->get('frontend_hidden') ||  (isset($grouped_field->formhidden_grp) && in_array($grouped_field->formhidden_grp, array(1,3))) ) continue;
-				}
-
-				$addField_funcs .= str_replace("_GRP_FID_",  $grouped_field->id,  sprintf($addField_pattern, $grouped_field->name)  );
-				$delField_funcs .= str_replace("_GRP_FID_",  $grouped_field->id,  sprintf($delField_pattern, $grouped_field->name)  );
+				// Only children rendered by the current layout will be initialized.
+				$children[] = array('id' => (int) $child->id, 'name' => $child->name);
 			}
+			$config = json_encode(array(
+				'id' => (int) $field->id,
+				'initialCount' => $max_count,
+				'max' => $max_values,
+				'fields' => $children,
+			), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+			$id = (int) $field->id;
+			$document->getWebAssetManager()->addInlineScript("
+				function addField{$id}(el, groupval_box, fieldval_box, params) {
+					return fcfield_group.repeater({$config})?.add(fieldval_box, params);
+				}
+				function deleteField{$id}(el) {
+					fcfield_group.repeater({$config})?.remove(el);
+				}
+				FlexiForm.ready(() => fcfield_group.repeater({$config}));
+			");
 
-			$js .= "
-			function addField".$field->id."(el, groupval_box, fieldval_box, params)
+			$remove_label = \Joomla\CMS\Language\Text::_('FLEXI_REMOVE_VALUE', true);
+			$remove_button = '<button type="button" class="' . $btn_item_class . ' fcfield-delvalue ' . $font_icon_class . '" title="' . $remove_label . '" aria-label="' . $remove_label . '" onclick="deleteField' . $id . '(this);"></button>';
+			$move2 = '<span class="' . $btn_item_class . ' fcfield-drag-handle ' . $font_icon_class . '" title="' . \Joomla\CMS\Language\Text::_('FLEXI_CLICK_TO_DRAG', true) . '"></span>';
+			foreach (array(2 => 'before', 1 => 'after') as $position => $side)
 			{
-				var insert_before   = (typeof params!== 'undefined' && typeof params.insert_before   !== 'undefined') ? params.insert_before   : 0;
-				var remove_previous = (typeof params!== 'undefined' && typeof params.remove_previous !== 'undefined') ? params.remove_previous : 0;
-				var scroll_visible  = (typeof params!== 'undefined' && typeof params.scroll_visible  !== 'undefined') ? params.scroll_visible  : 1;
-				var animate_visible = (typeof params!== 'undefined' && typeof params.animate_visible !== 'undefined') ? params.animate_visible : 1;
-
-				if(!remove_previous && (rowCount".$field->id." >= maxValues".$field->id.") && (maxValues".$field->id." != 0)) {
-					alert(Joomla.JText._('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + maxValues".$field->id.");
-					return 'cancel';
-				}
-
-				// Find last container of fields and clone it to create a new container of fields
-				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().find('ul.fcfield-sortables').children().last();
-				var newField  = lastField.clone();
-				newField.find('.fc-has-value').removeClass('fc-has-value');
-
-				// Need to at least change FORM field names and HTML tag IDs before adding the container to the DOM
-				var theSet = newField.find('input, select, textarea, button');
-				var nr = 0;
-				theSet.each(function()
-				{
-					if (!!this.id)
-					{
-						this.setAttribute('data-original-id', this.id);
-					}
-					this.setAttribute('name', '_duplicated_".$field->id."_'+uniqueRowNum".$field->id."+'_'+nr);
-					this.setAttribute('id', '_duplicated_".$field->id."_'+uniqueRowNum".$field->id."+'_'+nr);
-					nr++;
-				});
-				
-				theControls = newField.find('.control-group');
-				theControls.each(function()
-				{
-					data_showon_pattern = this.hasAttribute('data-showon-pattern') ? this.getAttribute('data-showon-pattern') : '';
-					if (data_showon_pattern)
-					{
-						data_showon_n = data_showon_pattern.replace(/\[__n__\]/g, '['+uniqueRowNum".$field->id."+']');
-						this.setAttribute('data-showon', data_showon_n);
-						this.removeAttribute('data-showon-initialised');
-					}
-				});
-				";
-
-			// Add new field to DOM
-			$js .= "
-				lastField ?
-					(insert_before ? newField.insertBefore( lastField ) : newField.insertAfter( lastField ) ) :
-					newField.appendTo( jQuery('#sortables_".$field->id."') ) ;
-				";
-
-			// Add new element to sortable objects (if field not in group) -- NOTE: remove_previous: 2 means remove element without do any cleanup actions
-			if ($add_ctrl_btns) $js .= "
-				//jQuery('#sortables_".$field->id."').sortable('refresh');  // Refresh was done appendTo ?
-
-				// Add new values for each field
-				var groupval_box = newField;
-				var add_params = {remove_previous: 2, scroll_visible: 0, animate_visible: 0};
-				".$addField_funcs."
-				";
-
-			// Remove previous if so requested
-			$js .="
-				if (remove_previous) lastField.remove();
-				";
-
-			// Initialize showon conditions if needed
-			$js .="
-				// Initialise showon conditions if needed
-				if (theControls.length) typeof Joomla.Showon != 'undefined'
-					? Joomla.Showon.initialise(newField[0])
-					: console.log('Joomla.Showon.initialise not found');
-				";
-
-			// Show new field, increment counters
-			$js .="
-				//newField.fadeOut({ duration: 400, easing: 'swing' }).fadeIn({ duration: 200, easing: 'swing' });
-				if (scroll_visible) fc_scrollIntoView(newField, 1);
-				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800, function() { jQuery(this).css('opacity', ''); });
-
-				// Enable tooltips on new element
-				newField.find('.hasTooltip').tooltip({html: true, container: newField});
-				newField.find('.hasPopover').popover({html: true, container: newField, trigger : 'hover focus'});
-
-				rowCount".$field->id."++;       // incremented / decremented
-				uniqueRowNum".$field->id."++;   // incremented only
+				if ($add_position != $position && $add_position != 3) continue;
+				$label = \Joomla\CMS\Language\Text::_('FLEXI_ADD_' . strtoupper($side), true);
+				$add_here .= '<button type="button" class="' . $btn_item_class . ' fcfield-insertvalue fc_' . $side . ' ' . $font_icon_class . '" title="' . $label . '" aria-label="' . $label . '" onclick="addField' . $id . '(this, null, this.closest(\'li\'), {insert_before: ' . (int) ($side === 'before') . '});"></button> ';
 			}
-
-
-			function deleteField".$field->id."(el)
+			if ($compact_edit)
 			{
-				// Disable clicks on remove button, so that it is not reclicked, while we do the field value hide effect (before DOM removal of field value)
-				var btn = jQuery(el);
-				if (btn && rowCount".$field->id." > 1) btn.css('pointer-events', 'none').off('click');
-
-				// Find field value container
-				var row = btn.closest('li');
-
-				// Do cleanup by calling the deleteField of each individual field, these functions will re-add last element as empty if needed
-				var groupval_box = jQuery(el).closest('li');
-				".$delField_funcs."
-				if(rowCount".$field->id." == 1)
-				{
-					uniqueRowNum".$field->id."++;   // increment unique row id, since last group was re-added
-				}
-
-				// Also remove the group field values container if not last one
-				if (rowCount".$field->id." > 1)
-				{
-					// Destroy the remove/add/etc buttons, so that they are not reclicked, while we do the field value hide effect (before DOM removal of field value)
-					row.find('.fcfield-delvalue').remove();
-					row.find('.fcfield-expand-view').remove();
-					row.find('.fcfield-insertvalue').remove();
-					row.find('.fcfield-drag-handle').remove();
-					// Do hide effect then remove from DOM
-					row.fadeOut(420, function(){ this.remove(); });
-					rowCount".$field->id."--;
-				}
+				$open = '<button type="button" class="fc-toggle-group-down ' . $btn_item_class . ' btn-success" style="vertical-align: top; text-shadow: unset; min-width: 120px;" onclick="fcfield_group.toggleDetails(this, true);"' . ($compact_edit == 2 ? ' hidden' : '') . '>
+					<i class="icon-downarrow"></i>' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD_GROUP_EDIT_DETAILS') . '
+				</button>';
+				$close = '<button type="button" class="fc-toggle-group-up ' . $btn_item_class . '" style="vertical-align: top; text-shadow: unset; min-width: 120px;" onclick="fcfield_group.toggleDetails(this, false);"' . ($compact_edit == 1 ? ' hidden' : '') . '>
+					<i class="icon-uparrow"></i>' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD_GROUP_HIDE_DETAILS') . '
+				</button>';
+				$togglers = $compact_edit == 1 ? $open . $close : $close . $open;
 			}
-			";
-
-			$css .= '';
-
-			$remove_button = '<span class="' . $btn_item_class . ' fcfield-delvalue ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
-			$move2         = '<span class="' . $btn_item_class . ' fcfield-drag-handle ' . $font_icon_class . '" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
-			$add_here = '';
-			$add_here .= $add_position==2 || $add_position==3 ? '<span class="' . $btn_item_class . ' fcfield-insertvalue fc_before ' . $font_icon_class . '" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
-			$add_here .= $add_position==1 || $add_position==3 ? '<span class="' . $btn_item_class . ' fcfield-insertvalue fc_after ' . $font_icon_class . '"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
-			$_opener = !$compact_edit ? '' : '
-				<span class="fc-toggle-group-down ' . $btn_item_class . ' btn-success" style="vertical-align: top; text-shadow: unset; '.($compact_edit==2 ? 'display:none;' :'').' min-width: 120px;" onclick="fc_toggle_box_via_btn(jQuery(this).closest(\'li\').find(\'.fcfieldval_container_outer:not(.fcAlwaysVisibleField)\'), this, \'\', jQuery(this).prev(), 1); jQuery(this).prev().before(jQuery(this)); return false;">
-					<i class="icon-downarrow"></i>'.\Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_GROUP_EDIT_DETAILS' ). '
-				</span>
-			';
-			$_closer = !$compact_edit ? '' : '
-				<span class="fc-toggle-group-up ' . $btn_item_class . '" style="vertical-align: top; text-shadow: unset; '.($compact_edit==1 ? 'display:none;' :'').' min-width: 120px;" onclick="fc_toggle_box_via_btn(jQuery(this).closest(\'li\').find(\'.fcfieldval_container_outer:not(.fcAlwaysVisibleField)\'), this, \'\', jQuery(this).prev(), 0); jQuery(this).prev().before(jQuery(this)); return false;">
-					<i class="icon-uparrow"></i>'.\Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_GROUP_HIDE_DETAILS' ). '
-				</span>
-			';
-			$togglers = $compact_edit==1 ? $_opener . $_closer : $_closer . $_opener;
 		}
-
-		// Field not multi-value
-		else
-		{
-			$remove_button = '';
-			$move2         = '';
-			$togglers = '';
-			$add_here = '';
-			$js .= '';
-			$css .= '';
-		}
-
-		if ($js)  $document->getWebAssetManager()->addInlineScript($js);
-		if ($css) $document->getWebAssetManager()->addInlineStyle($css);
 
 		$close_btn = FLEXI_J30GE ? '<a class="close" data-dismiss="alert">&#215;</a>' : '<a class="fc-close" onclick="this.parentNode.parentNode.removeChild(this.parentNode);">&#215;</a>';
 		$alert_box = FLEXI_J30GE ? '<div %s class="alert alert-%s %s">'.$close_btn.'%s</div>' : '<div %s class="fc-mssg fc-%s %s">'.$close_btn.'%s</div>';
@@ -425,21 +239,19 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 		$element_style = $fields_box_placing ? ' style="width: fit-content; display:block" ' : '';
 		if (count($field->html))
 		{
-			$field->html = '<li class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'" '.$element_style.'>' .
-				implode(
-				'</li><li class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'" '.$element_style.'>',
-					$field->html
-				).
-				'</li>';
-			$field->html = '<div id="sortables_outer_'.$field->id.'"><ul class="'.$list_classes.'" style="'.$list_style.'" id="sortables_'.$field->id.'">' .$field->html. '</ul></div>';
+			$row_classes = 'fcfieldval_container valuebox fcfieldval_container_' . $field->id;
+			if ($multiple && $compact_edit == 1) $row_classes .= ' fc-fieldgroup-collapsed';
+			$row_open = '<li class="' . $row_classes . '" ' . $element_style . '>';
+			$field->html = $row_open . implode('</li>' . $row_open, $field->html) . '</li>';
+			$field->html = '<div class="fc-fieldgroup-values" id="sortables_outer_' . $field->id . '"><ul class="' . $list_classes . '" style="' . $list_style . '" id="sortables_' . $field->id . '">' . $field->html . '</ul></div>';
 		}
 		else
 		{
 			$field->html = '';
 		}
-		if (!$add_position) $field->html .= '
-			<div class="'.$btn_group_class.' fc-xpended-btns">
-				<span class="fcfield-addvalue ' . $font_icon_class . ' ' . $btn_item_class . '" onclick="jQuery(this).parent().prev().prev().find(\'.fc-show-vals-btn\').data(\'fc_noeffect\', 1).trigger(\'click\'); addField'.$field->id.'(jQuery(this).closest(\'.fc-xpended-btns\').get(0));" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_TO_BOTTOM' ).'">'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_VALUE' ).'</span>
+		if ($multiple && !$add_position) $field->html .= '
+			<div class="' . $btn_group_class . ' fc-xpended-btns">
+				<button type="button" class="fcfield-addvalue ' . $font_icon_class . ' ' . $btn_item_class . '" onclick="fcfield_group.toggleValues(' . $field->id . ', true); addField' . $field->id . '(this);" title="' . \Joomla\CMS\Language\Text::_('FLEXI_ADD_TO_BOTTOM', true) . '">' . \Joomla\CMS\Language\Text::_('FLEXI_ADD_VALUE') . '</button>
 			</div>
 		';
 
@@ -454,14 +266,14 @@ class plgFlexicontent_fieldsFieldgroup extends FCField
 				'<span class="alert alert-warning fc-iblock fc-small" style="margin: 0 0 8px 0;">
 					<b>Warning</b>: installed version of Field: \'<b>'.$field->field_type.'</b>\' was meant for FLEXIcontent versions prior to: v'.self::$prior_to_version.' It may or may not work properly in later versions
 				</span>' : '').*/
-			($field->parameters->get('compact_edit_global', 0) ? '
+			($compact_edit_global ? '
 			<div class="toggle_all_values_buttons_box">
-				<span id="sortables_'.$field->id.'_hide_vals_btn" class="btn fc-hide-vals-btn" onclick="fc_toggle_box_via_btn(jQuery(\'#sortables_outer_'.$field->id.'\'), this, \'\', jQuery(this).next(), 0); return false;">
-					<i class="icon-uparrow"></i>'.\Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_GROUP_HIDE_VALUES' ).'
-				</span>
-				<span id="sortables_'.$field->id.'_show_vals_btn" class="btn btn-success fc-show-vals-btn" onclick="fc_toggle_box_via_btn(jQuery(\'#sortables_outer_'.$field->id.'\'), this, \'\', jQuery(this).prev(), 1); return false;" style="display:none;">
-					<i class="icon-downarrow"></i>'.\Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_GROUP_SHOW_VALUES' ).'
-				</span>
+				<button type="button" id="sortables_' . $field->id . '_hide_vals_btn" class="btn fc-hide-vals-btn" onclick="fcfield_group.toggleValues(' . $field->id . ', false, true);">
+					<i class="icon-uparrow"></i>' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD_GROUP_HIDE_VALUES') . '
+				</button>
+				<button type="button" id="sortables_' . $field->id . '_show_vals_btn" class="btn btn-success fc-show-vals-btn" onclick="fcfield_group.toggleValues(' . $field->id . ', true, true);" hidden>
+					<i class="icon-downarrow"></i>' . \Joomla\CMS\Language\Text::_('FLEXI_FIELD_GROUP_SHOW_VALUES') . '
+				</button>
 			</div>
 				' : '').'
 			' . $field->html;

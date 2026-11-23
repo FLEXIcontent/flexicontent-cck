@@ -515,6 +515,7 @@ class com_flexicontentInstallerScript
 
 		// Delete files of earlier versions that are no longer part of the package
 		$this->_removeObsoleteFiles();
+		$this->removeLegacyMediaOverrides();
 
 		/*
 		// always create or modify these parameters
@@ -2041,41 +2042,14 @@ class com_flexicontentInstallerScript
 
 
 		<?php
-		// Remove template overrides, TODO make this more robust ...
+		// Remove stock template overrides from earlier versions
 		?>
 				<tr class="row0">
 					<td class="key" style="font-size:11px;">Remove template overrides</td>
 					<td>
 						<?php
-						// Get DEFAULT backend ('administrator') and frontend ('site') Joomla template names
-						$admin_tmpl = $app->getTemplate();
-						$site_tmpl  = $db->setQuery('SELECT template FROM #__template_styles WHERE client_id = 0 AND home = 1')->loadResult();
-
-						$tmpl_override_files = array(
-							JPATH_ADMINISTRATOR . '/templates/' . $admin_tmpl . '/html/com_media/images/default_fc.php',
-							JPATH_ADMINISTRATOR . '/templates/' . $admin_tmpl . '/html/com_media/imageslist/default_fc.php',
-							JPATH_SITE . '/templates/' . $site_tmpl . '/html/com_media/images/default_fc.php',
-							JPATH_SITE . '/templates/' . $site_tmpl . '/html/com_media/imageslist/default_fc.php',
-						);
-
-						$count_removed = 0;
-
-						if (!empty($tmpl_override_files))
-						{
-							foreach($tmpl_override_files as $file)
-							{
-								if (\Joomla\Filesystem\File::exists($file))
-								{
-									if (!\Joomla\Filesystem\File::delete($file))
-									{
-										echo 'Cannot delete legacy file: ' . $file . '<br />';
-									}
-									else $count_removed++;
-								}
-							}
-							echo '<span class="badge bg-success badge-success">template override(s) removed: ' . $count_removed . '</span>';
-						}
-						else echo '<span class="badge bg-info badge-info">nothing to do</span>';
+						$count_removed = $this->removeLegacyMediaOverrides();
+						echo '<span class="badge bg-success badge-success">template override(s) removed: ' . $count_removed . '</span>';
 						?>
 					</td>
 				</tr>
@@ -2175,6 +2149,60 @@ class com_flexicontentInstallerScript
 	}
 
 
+	/** Remove copies installed by previous releases, including those in inactive templates. */
+	private function removeLegacyMediaOverrides(): int
+	{
+		// SHA-256 of the shipped layouts, normalized to LF across Git and ZIP installations.
+		$stockHashes = [
+			'images' => [
+				'd223a067e299a2f423c7c49c419adde7d9f4011c69d70bb6aab212f71772971a', // 234df181b
+				'da40791134464094711fb2f33b9912031f5f88b77e16c0774771028e87fb134e', // 7a302ccd4
+				'8799232f340d9c00d504402484ea5b491706dfc54aecb8e5789dfb176676f2fc', // 90f3832db
+				'9c8b0b0ec6f66904c8ddd5001a02da20aca4d4d7a127eea803dcb93311481d60', // a4cda1ac8
+				'83d4d6ade68c11e030739b108271d1718451b8aeccd58b174ac5978b1b7ee1bc', // ef718f34c
+				'9e96bbd915395e4eca9f6c015c56b33a66a8992df9d43b9b14e00d43442e2e62', // dd75d7ab9
+				'fa52c77b9e6e6d2ed1f6acc90d46777f9cb9fceca303676ceda0da801f45d1e7', // 5aeef1daf
+				'4d8f8fdc53672d5f10e1684013f70df8ebefe1389ea0b539a737021cf86b236a', // 23ae0cd68
+				'55a10b0c750adeb9203a85fe9678933ff3da42b831fb08c4c092ecd18655909e', // 5d9038eb4
+			],
+			'imageslist' => [
+				'3935c352719dbf5d933fee7b43b401ceab971bc34515eedce4778018ce56202d', // 234df181b
+				'6da8a18068a3dbdb498681a1aff28be5183b7a7db192cf2b71d93e855122d568', // a4cda1ac8
+				'f0c61bb42646f10084b26a2bea19eda0d8e7ce7d2dd268ba3c34edf15c94dc4f', // ef718f34c
+				'2ade77373c860979ed8234cf31c66d940608dec849feb9667dea5e08b9449987', // dd75d7ab9
+				'322bbdcd46d5c681f72ab94d7921660501a37e22c823ecad80433b76798ec704', // 600d1c233
+				'6b48fc41f4a1a88b7657dbea7b5f3640d3bc3ebb3b2903055c136b493e7b2050', // 23ae0cd68
+				'92f3b5442a768039073753c131f3e4c829224ed8b2e75aad5f05b6d47cc69bac', // 5d9038eb4
+			],
+		];
+		$removed = 0;
+
+		foreach ([JPATH_SITE, JPATH_ADMINISTRATOR] as $base)
+		{
+			foreach ($stockHashes as $view => $hashes)
+			{
+				foreach (glob($base . '/templates/*/html/com_media/' . $view . '/default_fc.php') ?: [] as $file)
+				{
+					if (!is_file($file) || is_link($file))
+					{
+						continue;
+					}
+
+					$contents = file_get_contents($file);
+					if ($contents !== false && in_array(hash('sha256', str_replace("\r\n", "\n", $contents)), $hashes, true))
+					{
+						if (unlink($file))
+						{
+							$removed++;
+						}
+					}
+				}
+			}
+		}
+		return $removed;
+	}
+
+
 	/**
 	 * An update copies the new files but does not delete files that left the package: remove them here
 	 *
@@ -2185,6 +2213,8 @@ class com_flexicontentInstallerScript
 	private function _removeObsoleteFiles()
 	{
 		$obsolete = array(
+			JPATH_SITE . '/components/com_flexicontent/layouts/html/com_media/images' => array('default_fc.php'),
+			JPATH_SITE . '/components/com_flexicontent/layouts/html/com_media/imageslist' => array('default_fc.php'),
 			// json_encode() / json_decode() fallback for PHP < 5.2, removed in 5.3
 			JPATH_SITE . '/components/com_flexicontent/librairies/json' => array('JSON.php', 'jsonwrapper_inner.php'),
 		);

@@ -47,109 +47,20 @@ $selectedIdsQuery = count($selectedIdsQueryParts)
 <div style="heading">
 	<?php echo \Joomla\CMS\Language\Text::_('FLEXI_TASK_RUNNING'); ?> ... <br/>
 	
+<?php
+flexicontent_html::loadFramework('flexi-lib');
+\Joomla\CMS\Factory::getApplication()->getDocument()->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/assets/js/admin-actions.js', array('version' => FLEXI_VHASH));
+
+$indexer_query = 'index.php?option=com_flexicontent&format=raw&' . $ctrl_task;
+$indexer_params = '&indexer=' . rawurlencode($indexer_name) . '&rebuildmode=' . rawurlencode($rebuildmode)
+ . '&' . \Joomla\CMS\Session\Session::getFormToken() . '=1' . $selectedIdsQuery;
+?>
 <script>
-jQuery(document).ready(function() {
-        var total_time = 0;
-        var records_per_call = 1000;
-        var width = 0;
-        var looper = 0;
-        var onesector = 1000;
-        var fields_length = 0;
-        var items_length = 0;
-        var number = 0;
-        var selectedQuery = <?php echo json_encode($selectedIdsQuery); ?>;
-        function updateprogress() {
-                if(looper>=number && looper) {
-			jQuery('div#insideprogress').css('width', '300px');
-			jQuery('div#updatepercent').text(' 100 %');
-			jQuery('div#statuscomment').html( jQuery('div#statuscomment').html() + '<br/><br/><strong>INDEXING FINISHED</strong>. You may close this window');
-			//jQuery('img#page_loading_img').hide();
-			return;
-		}
-
-		var start_time = new Date().getTime();
-
-                jQuery.ajax({
-                        url: "index.php?option=com_flexicontent&format=raw&<?php echo $ctrl_task; ?>index&records_per_call="+records_per_call+"&records_cnt="+looper+"&indexer=<?php echo $indexer_name;?>"+"&rebuildmode=<?php echo $rebuildmode; ?>"+selectedQuery,
-			success: function(response, status2, xhr2) {
-				var request_time = new Date().getTime() - start_time;
-				total_time += request_time;
-				
-				var arr = response.split('|');
-				var result = arr[0].trim();
-				if ( result=='fail' || result!='success' )
-				{
-					jQuery('div#statuscomment').html( '<span style="font-weight:bold;">INDEXER HALTED, due to server response</span>: <br/> ' + (result=='fail'  ?  arr[1]  :  response) );
-					//jQuery('img#page_loading_img').hide();
-					looper = number;
-					return;
-				}
-				//looper=looper+records_per_call;
-				looper=parseInt(arr[1]);
-				
-				width = onesector*looper;
-				if (width>300) width = 300;
-				percent = width/3;
-				jQuery('div#insideprogress').css('width', width+'px');
-				jQuery('div#updatepercent').html(' '+percent.toFixed(2)+' %');
-				jQuery('div#statuscomment').html(
-					(looper<number?looper:number)+' / '+number+' <?php echo $records_name; ?> <br/>'
-					+ '<br/>' + arr[2]
-					+ '<br/>' + 'Total task time: '+parseFloat(total_time/1000).toFixed(2) + ' secs'
-					+ '<br/>' + arr[3]
-				);
-				setTimeout(updateprogress, 20);  // milliseconds to delay updating the HTML display
-			},
-			error: function (xhr, ajaxOptions, thrownError) {
-				alert(xhr.status);
-				alert(thrownError);
-			}
-		});
-	}
-
-	var start_time = new Date().getTime();
-
-        jQuery.ajax({
-                url: "index.php?option=com_flexicontent&format=raw&<?php echo $ctrl_task; ?>countrows&indexer=<?php echo $indexer_name;?>&<?php echo \Joomla\CMS\Session\Session::getFormToken().'=1'; ?>"+selectedQuery,
-		success: function(response, status, xhr) {
-			var request_time = new Date().getTime() - start_time;
-			total_time += request_time;
-			
-			var arr = response.split('|');
-			var result = arr[0].trim();
-			if( result=='fail' || result!='success' )
-			{
-				jQuery('div#statuscomment').html( '<span style="font-weight:bold;">INDEXER HALTED, due to server response</span>: <br/> ' + (result=='fail'  ?  arr[1]  :  response) );
-				return;
-			}
-			//items = jQuery.parseJSON(arr[1]);
-			//fields = jQuery.parseJSON(arr[2]);
-			//number = fields.length*items.length;
-			
-			items_length = arr[1];
-			fields_length = arr[2];
-			number = items_length;
-			onesector = (number==0)?300:(300/number);
-			
-			looper=parseInt(arr[3]);
-			width = 0;
-			percent = 0;
-			jQuery('div#insideprogress').css('width', width+'px');
-			jQuery('div#updatepercent').html(' '+percent.toFixed(2)+' %');
-			jQuery('div#statuscomment').html(
-				(looper<number?looper:number)+' / '+number+' <?php echo $records_name; ?> <br/>'
-					+ '<br/>' + arr[4]
-					+ '<br/>' + 'Total task time: '+parseFloat(total_time/1000).toFixed(2) + ' secs'
-					+ '<br/>' + arr[5]
-			);
-			updateprogress();
-		},
-		error: function (xhr, ajaxOptions, thrownError) {
-			alert(xhr.status);
-			alert(thrownError);
-		}
-	});
-});
+FlexiForm.ready(() => FlexiAdmin.runIndexer(<?php echo json_encode(array(
+ 'countUrl' => $indexer_query . 'countrows' . $indexer_params,
+ 'indexUrl' => $indexer_query . 'index' . $indexer_params,
+ 'records' => $records_name,
+)); ?>));
 </script>
 
 <style>

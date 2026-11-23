@@ -1534,3 +1534,10 @@ h2.fc_search_result_title a {
 .swiper.fc_swiper_main{
 	width: 100% !important;
 	}
+/* Wrap navigation controls instead of clipping letters or expanding the page. */
+#flexicontent .pagination { flex-wrap: wrap; max-width: 100%; }
+#fc_alpha .aichargrp {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 2px;
+  float: none; position: static; width: 100%;
+}
+#fc_alpha .fc_alpha_index { float: none; position: static; }

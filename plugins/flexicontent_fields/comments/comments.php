@@ -52,6 +52,7 @@ class plgFlexicontent_fieldsComments extends FCField
 
 		$document	= \Joomla\CMS\Factory::getApplication()->getDocument();
 
+		$display = '';
 		//API comments
 		$comment_api 	= $field->parameters->get('comment_api');
 
@@ -168,7 +169,7 @@ class plgFlexicontent_fieldsComments extends FCField
 					$fdatanumposts." ".$fdatawidth." ".$fdatacolorscheme."></div>";
 	}
 	$catid= $item->catid;
-	$catids = $field->parameters->get('catid');
+	$catids = (array) $field->parameters->get('catid', []);
 	// Include : 1 or Exclude : -1 categories : 0 all
 	$method_category = $field->parameters->get('method_category', '0');
 	if ($method_category == 1 && in_array($catid, $catids)){//render comment in include mode

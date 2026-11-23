@@ -8,7 +8,7 @@
 	$input_classes = empty($simple_form_layout)
 		? 'fcfield_textval'
 		: 'fcfield_textval fc-floated-lbl-input';
-	$ff_events = 'onfocus="jQuery(this).prev().addClass(\'fc-has-value\');" onblur="if (this.value===\'\') jQuery(this).prev().removeClass(\'fc-has-value\');"';
+	$ff_events = 'onfocus="this.previousElementSibling?.classList.add(\'fc-has-value\');" onblur="if (this.value===\'\') this.previousElementSibling?.classList.remove(\'fc-has-value\');"';
 
 	$n = 0;
 
@@ -83,7 +83,7 @@
 
 				$class_attribs = array(
 					'class'    => 'urlimagelist',
-					'onchange' => 'jQuery(this).closest(\'.fc-field-props-box\').find(\'.fcfield_message_box\').html(\'\'); if (this.selectedIndex > 0) { var mm_id=jQuery(this).parent().parent().find(\'.urlimage\').attr(\'id\'); jQuery(\'#\' + mm_id).data(\'basepath\', \'' . \Joomla\CMS\Uri\Uri::root() .'\'); jInsertFieldValue(this.value, mm_id); this.selectedIndex = 0; }',
+					'onchange' => 'fcfield_weblink.selectImage(this);',
 					'style' => 'width: auto; margin: 0;',
 				);
 				$imagelist = '<div style="width: 36px; overflow: hidden; display: flex; border: 0; border-radius: 0; margin-bottom: 1px; margin-' . (!\Joomla\CMS\Factory::getApplication()->getLanguage()->isRtl() ? 'left' : 'right') .': 0px">'.

@@ -158,33 +158,33 @@ class FlexicontentViewUsers extends FlexicontentViewBaseRecords
 
 		$js =
 
-			($search ? "jQuery('.col_title').addClass('filtered_column');" : '') .
+			($search ? "document.querySelectorAll('.col_title').forEach(el => el.classList.add('filtered_column'));" : '') .
 
-			($filter_itemscount ? "jQuery('.col_itemscount').addClass('filtered_column');" : '') .
+			($filter_itemscount ? "document.querySelectorAll('.col_itemscount').forEach(el => el.classList.add('filtered_column'));" : '') .
 
-			($filter_usergrp ? "jQuery('.col_usergrp').addClass('filtered_column');" : '') .
+			($filter_usergrp ? "document.querySelectorAll('.col_usergrp').forEach(el => el.classList.add('filtered_column'));" : '') .
 
-			($filter_logged ? "jQuery('.col_logged').addClass('filtered_column');" : '') .
+			($filter_logged ? "document.querySelectorAll('.col_logged').forEach(el => el.classList.add('filtered_column'));" : '') .
 
-			(strlen($filter_state) ? "jQuery('.col_status').addClass('filtered_column');" : '') .
+			(strlen($filter_state) ? "document.querySelectorAll('.col_status').forEach(el => el.classList.add('filtered_column'));" : '') .
 
-			(strlen($filter_active) ? "jQuery('.col_active').addClass('filtered_column');" : '') .
+			(strlen($filter_active) ? "document.querySelectorAll('.col_active').forEach(el => el.classList.add('filtered_column'));" : '') .
 
-			($filter_id ? "jQuery('.col_id').addClass('filtered_column');" : '');
+			($filter_id ? "document.querySelectorAll('.col_id').forEach(el => el.classList.add('filtered_column'));" : '');
 
 		if ($startdate || $enddate)
 		{
 			if ($date == 1) {
-				$js .= "jQuery('.col_registered').addClass('filtered_column');";
+				$js .= "document.querySelectorAll('.col_registered').forEach(el => el.classList.add('filtered_column'));";
 			} else if ($date == 2) {
-				$js .= "jQuery('.col_visited').addClass('filtered_column');";
+				$js .= "document.querySelectorAll('.col_visited').forEach(el => el.classList.add('filtered_column'));";
 			}
 		}
 
 		if ($js)
 		{
 			$document->addScriptDeclaration('
-				jQuery(document).ready(function(){
+				FlexiForm.ready(function(){
 					' . $js . '
 				});
 			');
@@ -595,9 +595,9 @@ class FlexicontentViewUsers extends FlexicontentViewBaseRecords
 		$document->addScriptDeclaration('
 			function fc_edit_juser_modal_load( container )
 			{
-				if ( container.find("iframe").get(0).contentWindow.location.href.indexOf("view=users") != -1 )
+				if ( FlexiForm.element(container).querySelector("iframe").contentWindow.location.href.indexOf("view=users") != -1 )
 				{
-					container.dialog("close");
+					fc_closeDialog(FlexiForm.element(container).id);
 				}
 			}
 			function fc_edit_juser_modal_close()
@@ -616,7 +616,7 @@ class FlexicontentViewUsers extends FlexicontentViewBaseRecords
 			\Joomla\CMS\Toolbar\ToolbarHelper::divider();
 			flexicontent_html::addToolBarButton(
 				'FLEXI_NEW', $btn_name='add_juser',
-				$full_js="var url = jQuery(this).attr('data-href'); var the_dialog = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, fc_edit_juser_modal_close, {title:'".$modal_title."', loadFunc: fc_edit_juser_modal_load}); return false;",
+				$full_js="var url = this.getAttribute('data-href'); var the_dialog = fc_showDialog(url, 'fc_modal_popup_container', 0, 0, 0, fc_edit_juser_modal_close, {title:'".$modal_title."', loadFunc: fc_edit_juser_modal_load}); return false;",
 				$msg_alert='', $msg_confirm='',
 				$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false, $btn_class=$this->btn_sm_class . " btn-success " . $this->tooltip_class, $btn_icon="icon-new icon-white",
 				'data-placement="bottom" data-href="index.php?option=com_users&amp;task=user.edit&amp;id=0" title="Add new Joomla user"'
@@ -653,7 +653,7 @@ class FlexicontentViewUsers extends FlexicontentViewBaseRecords
 		if ($js)
 		{
 			$document->addScriptDeclaration('
-				jQuery(document).ready(function(){
+				FlexiForm.ready(function(){
 					' . $js . '
 				});
 			');

@@ -1,0 +1,45 @@
+name: Native browser regressions
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  chromium:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser test dependencies
+        run: |
+          npm install --no-save --package-lock=false playwright@1.60.0
+          npx playwright install --with-deps chromium
+      - name: Fetch pinned Joomla browser assets
+        run: |
+          curl --fail --location --output /tmp/joomla.tar.gz https://github.com/joomla/joomla-cms/releases/download/6.2.0/Joomla_6.2.0-Stable-Full_Package.tar.gz
+          echo 'f7a4c3962c4a8682f5847ea9d47d2848f6eb475109805935c9e19a5c6511829d  /tmp/joomla.tar.gz' | sha256sum --check
+          mkdir /tmp/joomla-browser-assets
+          tar -xzf /tmp/joomla.tar.gz -C /tmp/joomla-browser-assets media/system media/vendor/jquery media/vendor/bootstrap media/templates/administrator/atum
+      - name: Run isolated browser regressions
+        env:
+          FLEXI_TEST_JOOMLA: /tmp/joomla-browser-assets
+          FLEXI_TEST_JQUERY: /tmp/joomla-browser-assets/media/vendor/jquery/js/jquery.min.js
+        run: |
+          node tests/native-editor-workflows.cjs
+          node tests/native-joomla-dialogs.cjs
+          node tests/native-maintenance.cjs
+          node tests/native-admin-workflows.cjs
+          node tests/native-input-masks.cjs
+          node tests/native-color-input.cjs
+          node tests/native-media-uploader.cjs
+          node tests/native-public-waveform.cjs
+          node tests/native-legacy-helpers.cjs
+          node tests/native-public-widgets.cjs
+          node tests/multibox-layout.cjs
+          node tests/image-media-clone.cjs
