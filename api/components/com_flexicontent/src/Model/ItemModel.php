@@ -11,6 +11,7 @@
 namespace Joomla\Component\Flexicontent\Api\Model;
 
 use Joomla\CMS\MVC\Model\ItemModel as BaseItemModel;
+use Joomla\Component\Flexicontent\Api\Helper\AccessHelper;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
@@ -42,7 +43,7 @@ class ItemModel extends BaseItemModel
             return null;
         }
 
-        if (isset($this->_item[$pk])) {
+        if (\array_key_exists($pk, (array) $this->_item)) {
             return $this->_item[$pk];
         }
 
@@ -61,7 +62,8 @@ class ItemModel extends BaseItemModel
 
         $item = $db->setQuery($query)->loadObject();
 
-        $this->_item[$pk] = $item ?: null;
+        // Do not leak the existence of an item the user is not allowed to see
+        $this->_item[$pk] = ($item && AccessHelper::isItemVisible($item)) ? $item : null;
 
         return $this->_item[$pk];
     }

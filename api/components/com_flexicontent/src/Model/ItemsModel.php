@@ -12,6 +12,7 @@ namespace Joomla\Component\Flexicontent\Api\Model;
 
 use Joomla\CMS\MVC\Factory\MVCFactoryInterface;
 use Joomla\CMS\MVC\Model\ListModel;
+use Joomla\Component\Flexicontent\Api\Helper\AccessHelper;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
@@ -45,6 +46,7 @@ class ItemsModel extends ListModel
                 'alias', 'a.alias',
                 'catid', 'a.catid',
                 'state', 'a.state',
+                'access', 'a.access',
                 'created', 'a.created',
                 'modified', 'a.modified',
                 'ordering', 'a.ordering',
@@ -109,6 +111,9 @@ class ItemsModel extends ListModel
         if ($language) {
             $query->where($db->quoteName('a.language') . ' = ' . $db->quote($language));
         }
+
+        // Published items and Joomla viewing access levels for non-managers
+        AccessHelper::applyListRestrictions($query, $db);
 
         // Ordering (validated against filter_fields by the controller)
         $query->order(

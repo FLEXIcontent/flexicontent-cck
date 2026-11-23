@@ -12,6 +12,7 @@ namespace Joomla\Component\Flexicontent\Api\Controller;
 
 use Joomla\CMS\Filter\InputFilter;
 use Joomla\CMS\MVC\Controller\ApiController;
+use Joomla\Component\Flexicontent\Api\Helper\AccessHelper;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
@@ -62,8 +63,11 @@ class ItemsController extends ApiController
             $this->modelState->set('filter.search', $filter->clean($apiFilterInfo['search'], 'STRING'));
         }
 
-        if (\array_key_exists('state', $apiFilterInfo)) {
+        if (\array_key_exists('state', $apiFilterInfo) && AccessHelper::canManage()) {
             $this->modelState->set('filter.published', $filter->clean($apiFilterInfo['state'], 'INT'));
+        } elseif (!AccessHelper::canManage()) {
+            // Non-managers must never see unpublished/archived/trashed items
+            $this->modelState->set('filter.published', 1);
         }
 
         if (\array_key_exists('category', $apiFilterInfo)) {
