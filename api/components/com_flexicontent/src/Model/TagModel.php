@@ -49,8 +49,11 @@ class TagModel extends BaseItemModel
         $itemCount = $db->createQuery();
 
         $itemCount->select('COUNT(*)')
-            ->from($db->quoteName('#__flexicontent_tags_item_relations', 'rel'))
-            ->where($db->quoteName('rel.tid') . ' = ' . $db->quoteName('a.id'));
+            ->from($db->quoteName('#__flexicontent_tags_item_relations', 'rel'));
+
+        AccessHelper::applyItemCountRestrictions($itemCount, $db, 'rel', 'itemid');
+
+        $itemCount->where($db->quoteName('rel.tid') . ' = ' . $db->quoteName('a.id'));
 
         $query->select([
                 'a.id',

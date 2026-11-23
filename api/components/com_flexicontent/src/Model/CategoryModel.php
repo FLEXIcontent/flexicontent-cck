@@ -61,8 +61,11 @@ class CategoryModel extends BaseItemModel
         $itemCount = $db->createQuery();
 
         $itemCount->select('COUNT(*)')
-            ->from($db->quoteName('#__flexicontent_cats_item_relations', 'rel'))
-            ->where($db->quoteName('rel.catid') . ' = ' . $db->quoteName('a.id'));
+            ->from($db->quoteName('#__flexicontent_cats_item_relations', 'rel'));
+
+        AccessHelper::applyItemCountRestrictions($itemCount, $db, 'rel', 'itemid');
+
+        $itemCount->where($db->quoteName('rel.catid') . ' = ' . $db->quoteName('a.id'));
 
         $query->select([
                 'a.id',

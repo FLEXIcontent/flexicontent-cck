@@ -49,8 +49,11 @@ class TypeModel extends BaseItemModel
         $itemCount = $db->createQuery();
 
         $itemCount->select('COUNT(*)')
-            ->from($db->quoteName('#__flexicontent_items_ext', 'item'))
-            ->where($db->quoteName('item.type_id') . ' = ' . $db->quoteName('a.id'));
+            ->from($db->quoteName('#__flexicontent_items_ext', 'item'));
+
+        AccessHelper::applyItemCountRestrictions($itemCount, $db, 'item', 'item_id');
+
+        $itemCount->where($db->quoteName('item.type_id') . ' = ' . $db->quoteName('a.id'));
 
         $query->select([
                 'a.id',

@@ -173,7 +173,10 @@ class ItemsModel extends ListModel
         $search = $this->getState('filter.search');
 
         if (!empty($search)) {
-            $query->where($db->quoteName('a.title') . ' LIKE ' . $db->quote('%' . $db->escape($search, true) . '%'));
+            // escape(..., true) protects SQL and LIKE wildcards; quote(..., false)
+            // avoids escaping the result a second time.
+            $like = '%' . $db->escape($search, true) . '%';
+            $query->where($db->quoteName('a.title') . ' LIKE ' . $db->quote($like, false));
         }
 
         // Filter: publication state

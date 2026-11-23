@@ -64,9 +64,10 @@ final class FieldFilterHelper
         $mode   = strtolower(trim((string) $match));
 
         if ($mode === 'like' || $mode === 'contains') {
-            $query->where(
-                $db->quoteName('fv.value') . ' LIKE ' . $db->quote('%' . $db->escape($needle) . '%')
-            );
+            // escape(..., true) protects SQL and LIKE wildcards; quote(..., false)
+            // avoids escaping the result a second time.
+            $like = $db->quote('%' . $db->escape($needle, true) . '%', false);
+            $query->where($db->quoteName('fv.value') . ' LIKE ' . $like);
         } else {
             $query->where($db->quoteName('fv.value') . ' = ' . $db->quote($needle));
         }

@@ -75,8 +75,11 @@ class TagsModel extends ListModel
         $itemCount = $db->createQuery();
 
         $itemCount->select('COUNT(*)')
-            ->from($db->quoteName('#__flexicontent_tags_item_relations', 'rel'))
-            ->where($db->quoteName('rel.tid') . ' = ' . $db->quoteName('a.id'));
+            ->from($db->quoteName('#__flexicontent_tags_item_relations', 'rel'));
+
+        AccessHelper::applyItemCountRestrictions($itemCount, $db, 'rel', 'itemid');
+
+        $itemCount->where($db->quoteName('rel.tid') . ' = ' . $db->quoteName('a.id'));
 
         $query->select([
                 'a.id',
@@ -98,10 +101,12 @@ class TagsModel extends ListModel
         $search = trim((string) $this->getState('filter.search', ''));
 
         if ($search !== '') {
-            $like = '%' . $db->escape($search, true) . '%';
+            // escape(..., true) protects SQL and LIKE wildcards; quote(..., false)
+            // avoids escaping the result a second time.
+            $like = $db->quote('%' . $db->escape($search, true) . '%', false);
             $query->where(
-                '(' . $db->quoteName('a.name') . ' LIKE ' . $db->quote($like)
-                . ' OR ' . $db->quoteName('a.alias') . ' LIKE ' . $db->quote($like) . ')'
+                '(' . $db->quoteName('a.name') . ' LIKE ' . $like
+                . ' OR ' . $db->quoteName('a.alias') . ' LIKE ' . $like . ')'
             );
         }
 

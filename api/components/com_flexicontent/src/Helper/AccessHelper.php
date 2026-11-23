@@ -128,6 +128,39 @@ final class AccessHelper
     }
 
     /**
+     * Restrict an item-count subquery to items readable by the current user.
+     *
+     * The taxonomy endpoints expose an item_count. For non-managers it must
+     * count only published items within their viewing access levels, otherwise
+     * the metadata would reveal the existence of hidden content.
+     *
+     * @param   QueryInterface     $query        The count subquery to restrict.
+     * @param   DatabaseInterface  $db           The database driver.
+     * @param   string             $alias        Alias of the relation/ext table in the subquery.
+     * @param   string             $itemIdColumn Column holding the content item id.
+     *
+     * @return  void
+     */
+    public static function applyItemCountRestrictions(
+        QueryInterface $query,
+        DatabaseInterface $db,
+        string $alias,
+        string $itemIdColumn
+    ): void {
+        if (self::canManage()) {
+            return;
+        }
+
+        $query->join(
+                'INNER',
+                $db->quoteName('#__content', 'c')
+                . ' ON ' . $db->quoteName('c.id') . ' = ' . $db->quoteName($alias . '.' . $itemIdColumn)
+            )
+            ->where($db->quoteName('c.state') . ' = 1')
+            ->where($db->quoteName('c.access') . ' IN (' . implode(',', self::getViewLevels()) . ')');
+    }
+
+    /**
      * Check whether a loaded item may be returned to the current user.
      *
      * @param   object  $item  The item row.
