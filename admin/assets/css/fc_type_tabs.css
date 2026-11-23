@@ -887,3 +887,11 @@
 #items_type_tabset.nav ~ table.fcmanlist {
 	margin-top: 0 !important;
 }
+
+
+/* Wider search input (it was 200px, short phrases did not fit); it may shrink on narrow screens */
+#flexicontent #fc-managers-header.fc-mh-items .filter-search > .btn-group > #search {
+	flex: 0 1 340px;
+	width: 340px;
+	min-width: 200px;
+}
