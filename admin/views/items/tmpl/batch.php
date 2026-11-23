@@ -279,18 +279,18 @@ ob_start(); ?>
 	<div class="fcclear"></div>
 
 	<div class="toggle_all_values_buttons_box" style="display: inline-block; float: right;">
-		<span id="advanced_ops_hide_vals_btn" class="btn fc-hide-vals-btn" style="display:none;"
+		<button type="button" id="advanced_ops_hide_vals_btn" class="btn fc-hide-vals-btn" style="display:none;"
 		 onclick="fc_toggle_box_via_btn(document.getElementById('advanced_ops_box'), this, '', this.nextElementSibling, 0); return false;"
 		 title="<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_ADVANCED_OPTIONS' ); ?> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_HIDE' ); ?>"
 		>
 			<i class="icon-uparrow"></i> <i class="icon-cog"></i>
-		</span>
-		<span id="advanced_ops_show_vals_btn" class="btn btn-success fc-show-vals-btn"
+		</button>
+		<button type="button" id="advanced_ops_show_vals_btn" class="btn btn-success fc-show-vals-btn"
 		 onclick="fc_toggle_box_via_btn(document.getElementById('advanced_ops_box'), this, '', this.previousElementSibling, 1); return false;"
 		 title="<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_ADVANCED_OPTIONS' ); ?> <?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_SHOW' ); ?>"
 		>
 			<i class="icon-downarrow"></i> <i class="icon-cog"></i>
-		</span>
+		</button>
 	</div>
 <?php endif; ?>
 

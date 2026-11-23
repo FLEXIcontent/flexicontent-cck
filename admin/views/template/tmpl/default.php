@@ -487,13 +487,13 @@ $this->document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flex
 
 			<div style="max-width:1024px; margin-bottom:16px;">
 
-				<div id="fc-mini-help_btn1" class="btn" onclick="fc_toggle_box_via_btn('fc-mini-help-heritage', this, 'btn-primary');" style="margin: 0 32px 0 0;">
+				<button type="button" id="fc-mini-help_btn1" class="btn" onclick="fc_toggle_box_via_btn('fc-mini-help-heritage', this, 'btn-primary');" style="margin: 0 32px 0 0;">
 					<span class="icon-help"></span> <?php echo \Joomla\CMS\Language\Text::_('FLEXI_HELP2'); ?>
-				</div>
+				</button>
 
-				<div id="fc-mini-help_btn2" class="btn" onclick="fc_toggle_box_via_btn('fc-mini-help-less', this, 'btn-primary');" style="margin: 0 0 0 0;">
+				<button type="button" id="fc-mini-help_btn2" class="btn" onclick="fc_toggle_box_via_btn('fc-mini-help-less', this, 'btn-primary');" style="margin: 0 0 0 0;">
 					<span class="icon-help"></span> <?php echo \Joomla\CMS\Language\Text::_('CSS'); ?> ... <small><?php echo \Joomla\CMS\Language\Text::_('FLEXI_ADVANCED_USERS'); ?></small>
-				</div>
+				</button>
 
 				<div class="fcclear"></div>
 
@@ -742,9 +742,9 @@ $this->document->addScript(\Joomla\CMS\Uri\Uri::base(true).'/components/com_flex
 
 				<?php foreach ($code_btn_lbls as $_posname => $btn_lbl) : ?>
 				<div class="code_box <?php echo $_posname; ?> nowrap_box" style="display:none;" >
-					<div class="btn <?php echo $tip_class; ?>"
+					<button type="button" class="btn <?php echo $tip_class; ?>"
 						title="<?php echo flexicontent_html::getToolTip('Insert code', $code_btn_tips[$_posname], 0, 1); ?>"
-						onclick="toggle_code_inputbox(this);"><span class="icon-eye"></span><?php echo \Joomla\CMS\Language\Text::_( $code_btn_lbls[$_posname] ); ?></div>
+						onclick="toggle_code_inputbox(this);"><span class="icon-eye"></span><?php echo \Joomla\CMS\Language\Text::_( $code_btn_lbls[$_posname] ); ?></button>
 					<div class="nowrap_box" style="display:none; float:left; clear:both; margin:2px 0px 0px 0px;">
 						<div class="alert alert-warning" style="clear:both; margin:2px 0px 2px 0px;"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_COPY_CODE' ); ?></div>
 						<div class="alert alert-info" style="clear:both; margin:2px 0px 2px 0px;">

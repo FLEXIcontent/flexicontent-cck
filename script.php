@@ -369,9 +369,9 @@ class com_flexicontentInstallerScript
 		//echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addSlide', 'additional-extensions', \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_LOG') . ' : ' . \Joomla\CMS\Language\Text::_( 'COM_FLEXICONTENT_ADDITIONAL_EXTENSIONS' ), 'additional-extensions-slide0' );
 		?>
 
-		<span class="btn btn-primary" onclick="var tbl = document.getElementById('fc_additional_extensions_log'); tbl.style.display = tbl.style.display === 'none' ? '' : 'none';">
+		<button type="button" class="btn btn-primary" onclick="var tbl = document.getElementById('fc_additional_extensions_log'); tbl.style.display = tbl.style.display === 'none' ? '' : 'none';">
 			<?php echo \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_LOG') . ' : ' . \Joomla\CMS\Language\Text::_( 'COM_FLEXICONTENT_ADDITIONAL_EXTENSIONS' ); ?>
-		</span>
+		</button>
 
 		<table class="adminlist" id="fc_additional_extensions_log" style="display: none;">
 			<thead>
@@ -547,9 +547,9 @@ class com_flexicontentInstallerScript
 		//echo \Joomla\CMS\HTML\HTMLHelper::_('bootstrap.addSlide', 'upgrade-tasks', \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_LOG') . ' : ' . \Joomla\CMS\Language\Text::_( 'COM_FLEXICONTENT_UPGRADE_TASKS' ), 'upgrade-tasks-slide0' );
 		?>
 
-		<span class="btn btn-primary" onclick="var tbl = document.getElementById('fc_upgrade_tasks_log'); tbl.style.display = tbl.style.display === 'none' ? '' : 'none';">
+		<button type="button" class="btn btn-primary" onclick="var tbl = document.getElementById('fc_upgrade_tasks_log'); tbl.style.display = tbl.style.display === 'none' ? '' : 'none';">
 			<?php echo \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_LOG') . ' : ' . \Joomla\CMS\Language\Text::_( 'COM_FLEXICONTENT_UPGRADE_TASKS' ); ?>
-		</span>
+		</button>
 
 		<table class="adminlist" id="fc_upgrade_tasks_log" style="display: none;">
 			<thead>
@@ -1737,9 +1737,9 @@ class com_flexicontentInstallerScript
 		?>
 
 		<div class="alert alert-success" style="margin: 8px 0 64px 0;">
-			<span class="btn btn-info" onclick="window.open('index.php?option=com_flexicontent','_self');" style="cursor: pointer;">
+			<button type="button" class="btn btn-info" onclick="window.open('index.php?option=com_flexicontent','_self');" style="cursor: pointer;">
 				<?php echo \Joomla\CMS\Language\Text::_('FLEXI_DASHBOARD'); ?>
-  		</span>
+  		</button>
 			<?php echo \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_PLEASE_COMPLETE_POST_INSTALL_TASKS_AT_DASHBOARD'); ?>
   	</div>
 
