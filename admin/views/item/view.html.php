@@ -2005,7 +2005,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 					'data-placement="right" data-href="index.php?option=com_flexicontent&amp;view=template&amp;type=items&amp;tmpl=component&amp;ismodal=1&amp;folder=' . $item->itemparams->get('ilayout', $tparams->get('ilayout', 'default'))
 					. '&amp;' . \Joomla\CMS\Session\Session::getFormToken() . '=1' .
 					'" title="Edit the display layout of this item. <br/><br/>Note: this layout maybe assigned to content types or other items, thus changing it will effect them too"',
-					$auto_add = 0,$tbname
+					$auto_add = 0, $tag_type='button', $tbname
 				);
 			}
 		}
@@ -2036,7 +2036,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 					$btn_task='', $extra_js='', $btn_list=false, $btn_menu=true, $btn_confirm=false,
 					$btn_class='btn-fcaction ' . (FLEXI_J40GE ? ' _DDI_class_' . $this->btn_iv_class : '') . ' ' . $this->tooltip_class, $btn_icon="icon-mail",
 					'data-placement="right" data-href="' . $task_url . '" title="' . $btn_info . '"',
-					$auto_add = 0, $tbname
+					$auto_add = 0, $tag_type='button', $tbname
 				);
 		}
 
