@@ -42,7 +42,8 @@ final class Flexicontent extends CMSPlugin implements SubscriberInterface
     /**
      * Registers com_flexicontent API routes.
      *
-     * MVP: Items only. Categories / Tags / Types routes are added in later phases.
+     * Read-only resources: items, categories, tags and types. Write operations
+     * are registered by createCRUDRoutes but refused by the controllers.
      *
      * @param   BeforeApiRouteEvent  $event  The event object.
      *
@@ -58,9 +59,8 @@ final class Flexicontent extends CMSPlugin implements SubscriberInterface
             ['component' => 'com_flexicontent']
         );
 
-        // Phase 2 (not enabled yet):
-        // $router->createCRUDRoutes('v1/flexicontent/categories', 'categories', ['component' => 'com_flexicontent']);
-        // $router->createCRUDRoutes('v1/flexicontent/tags', 'tags', ['component' => 'com_flexicontent']);
-        // $router->createCRUDRoutes('v1/flexicontent/types', 'types', ['component' => 'com_flexicontent']);
+        $router->createCRUDRoutes('v1/flexicontent/categories', 'categories', ['component' => 'com_flexicontent']);
+        $router->createCRUDRoutes('v1/flexicontent/tags', 'tags', ['component' => 'com_flexicontent']);
+        $router->createCRUDRoutes('v1/flexicontent/types', 'types', ['component' => 'com_flexicontent']);
     }
 }

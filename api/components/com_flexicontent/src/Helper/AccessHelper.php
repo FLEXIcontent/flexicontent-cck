@@ -86,6 +86,48 @@ final class AccessHelper
     }
 
     /**
+     * Add published/access read restrictions to a taxonomy-like list query.
+     *
+     * Used by categories, tags and types, whose publication column is named
+     * "published" instead of the "state" column used by content items.
+     *
+     * @param   QueryInterface     $query           The list query to restrict.
+     * @param   DatabaseInterface  $db              The database driver.
+     * @param   string             $alias           The alias of the queried table.
+     * @param   ?string            $accessColumn    The access column, or null to skip the access check.
+     * @param   boolean            $allowNullAccess Whether a NULL access value is visible (Joomla tags bridge).
+     *
+     * @return  void
+     */
+    public static function applyPublishedRestrictions(
+        QueryInterface $query,
+        DatabaseInterface $db,
+        string $alias,
+        ?string $accessColumn = 'access',
+        bool $allowNullAccess = false
+    ): void {
+        if (self::canManage()) {
+            return;
+        }
+
+        $query->where($db->quoteName($alias . '.published') . ' = 1');
+
+        if ($accessColumn === null) {
+            return;
+        }
+
+        $levels = self::getViewLevels();
+        $column = $db->quoteName($alias . '.' . $accessColumn);
+        $access = $column . ' IN (' . implode(',', $levels) . ')';
+
+        if ($allowNullAccess) {
+            $access = '(' . $column . ' IS NULL OR ' . $access . ')';
+        }
+
+        $query->where($access);
+    }
+
+    /**
      * Check whether a loaded item may be returned to the current user.
      *
      * @param   object  $item  The item row.
@@ -103,5 +145,37 @@ final class AccessHelper
         }
 
         return \in_array((int) ($item->access ?? 1), self::getViewLevels(), true);
+    }
+
+    /**
+     * Check whether a loaded taxonomy row may be returned to the current user.
+     *
+     * @param   object   $item            The row.
+     * @param   ?string  $accessColumn    Property holding the access level, or null to skip the access check.
+     * @param   boolean  $allowNullAccess Whether a NULL access value is visible (Joomla tags bridge).
+     *
+     * @return  boolean
+     */
+    public static function isPublishedVisible(object $item, ?string $accessColumn = 'access', bool $allowNullAccess = false): bool
+    {
+        if (self::canManage()) {
+            return true;
+        }
+
+        if ((int) ($item->published ?? 0) !== 1) {
+            return false;
+        }
+
+        if ($accessColumn === null) {
+            return true;
+        }
+
+        $access = $item->{$accessColumn} ?? null;
+
+        if ($access === null) {
+            return $allowNullAccess;
+        }
+
+        return \in_array((int) $access, self::getViewLevels(), true);
     }
 }
