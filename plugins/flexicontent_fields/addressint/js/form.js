@@ -7,7 +7,7 @@
 	fcfield_addrint.configure = [];
 
 	fcfield_addrint.autoComplete    = [];
-	fcfield_addrint.gmapslistener   = [];
+	fcfield_addrint.addressRequests = new WeakMap();
 	fcfield_addrint.google_maps     = [];
 	fcfield_addrint.openstreet_maps = [];
 	fcfield_addrint.map_data        = [];
@@ -31,33 +31,78 @@
 	 */
 
 
-	// initialize autocomplete
+	// Autocomplete details and reverse geocoding both update the same address row.
+	fcfield_addrint.beginAddressRequest = function(elementid_n)
+	{
+		const row = document.getElementById(elementid_n + '_messages');
+		const request = {};
+		fcfield_addrint.addressRequests.set(row, request);
+		return () => row.isConnected && fcfield_addrint.addressRequests.get(row) === request;
+	};
+
 	fcfield_addrint.initAutoComplete = function(elementid_n, config_name)
 	{
-		var ac_input   = document.getElementById(elementid_n + '_autocomplete');
-		var ac_type    = jQuery('#' + elementid_n + '_ac_type').val();
-		var ac_country = fcfield_addrint.single_country[config_name];
+		const input = document.getElementById(elementid_n + '_autocomplete');
+		const Widget = window.google?.maps?.places?.PlaceAutocompleteElement;
+		if (!input || !Widget || fcfield_addrint.autoComplete[elementid_n] === input) return;
 
-		var ac_options = {};
-		if (ac_type)    ac_options.types = [ ac_type ];
-		if (ac_country) ac_options.componentRestrictions = {country: ac_country};
-
-		var placesAutocomplete = new google.maps.places.Autocomplete( ac_input, ac_options );
-
-		// Create a reference
-		fcfield_addrint.autoComplete[elementid_n] = placesAutocomplete;
-
-		// Apply field's configuration
-		fcfield_addrint.configure[config_name] (placesAutocomplete);
-
-		fcfield_addrint.gmapslistener[elementid_n] = google.maps.event.addListener(fcfield_addrint.autoComplete[elementid_n], 'place_changed', function()
+		// Repeated rows can already contain a cloned custom element.
+		const picker = input instanceof Widget ? input : new Widget();
+		if (picker !== input)
 		{
-			jQuery('#' + elementid_n + '_messages').html('').hide();
-			fcfield_addrint.fillInAddress(elementid_n, false, config_name);
-		});
+			picker.id = input.id;
+			picker.name = input.name;
+			picker.className = input.className;
+			picker.disabled = input.disabled;
+			input.replaceWith(picker);
+		}
+		fcfield_addrint.autoComplete[elementid_n] = picker;
+		picker.description = Joomla.JText._('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AUTOCOMPLETE_LABEL');
+		picker.placeholder = picker.description;
+		picker.noInputIcon = !!picker.parentElement.querySelector('.addrint_autocomplete-lbl .icon-search');
+		const countries = fcfield_addrint.allowed_countries[config_name];
+		// For longer allowlists, validate the selected country in fillInAddress.
+		picker.includedRegionCodes = countries.length <= 15 ? countries : [];
+		fcfield_addrint.changeAutoCompleteType(elementid_n);
 
+		const showError = () => jQuery('#' + elementid_n + '_messages')
+			.removeClass('alert-info alert-success').addClass('alert-warning')
+			.text(Joomla.JText._('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_PLACE_SEARCH_FAILED')).show();
+		picker.addEventListener('gmp-error', showError);
+		picker.addEventListener('gmp-select', async ({placePrediction}) => {
+			const isCurrent = fcfield_addrint.beginAddressRequest(elementid_n);
+			const place = placePrediction.toPlace();
+			const fields = ['addressComponents', 'formattedAddress', 'location'];
+			if (document.getElementById(elementid_n + '_name')) fields.push('displayName');
+			if (document.getElementById(elementid_n + '_url')) fields.push('googleMapsURI');
+			try
+			{
+				await place.fetchFields({fields});
+			}
+			catch
+			{
+				if (isCurrent() && !picker.disabled) showError();
+				return;
+			}
+			if (!isCurrent() || picker.disabled) return;
+			if (!place.location || !place.addressComponents?.length || !place.formattedAddress)
+			{
+				showError();
+				return;
+			}
+			// Reuse the address mapping also used for GeocoderResult after a marker drag.
+			fcfield_addrint.fillInAddress(elementid_n, {
+				address_components: place.addressComponents.map(part => ({
+					types: part.types, long_name: part.longText, short_name: part.shortText
+				})),
+				formatted_address: place.formattedAddress,
+				geometry: {location: place.location},
+				name: place.displayName,
+				url: place.googleMapsURI
+			}, config_name, true);
+		});
 		return true;
-	}
+	};
 
 
 	// Build trusted local marker images as DOM nodes; option labels always stay text.
@@ -206,24 +251,15 @@
 	}
 
 
-	// re-initialize autocomplete
-	fcfield_addrint.changeAutoCompleteType = function(elementid_n, config_name)
+	fcfield_addrint.changeAutoCompleteType = function(elementid_n)
 	{
-		/*
-		// Remove listener that update the google map on autocomplete selection
-		google.maps.event.removeListener( fcfield_addrint.gmapslistener[elementid_n] );
-
-		// Clone replace input to remove the currently configured autocomplete search
-		var el = document.getElementById(elementid_n + '_autocomplete');
-		el.parentNode.replaceChild(el.cloneNode(true), el);
-
-		// Attach new autocomplete search
-		return fcfield_addrint.initAutoComplete(elementid_n, config_name);
-		*/
-		jQuery('#' + elementid_n + '_ac_type').val()
-			? fcfield_addrint.autoComplete[elementid_n].setTypes([jQuery('#' + elementid_n + '_ac_type').val()])
-			: fcfield_addrint.autoComplete[elementid_n].setTypes([]);
-	}
+		const picker = fcfield_addrint.autoComplete[elementid_n];
+		if (!picker) return;
+		const type = document.getElementById(elementid_n + '_ac_type')?.value;
+		picker.includedPrimaryTypes = type === 'address'
+			? ['street_address', 'premise', 'subpremise']
+			: (type ? [type] : []);
+	};
 
 
 	fcfield_addrint.initMap = function(elementid_n, config_name)
@@ -276,6 +312,7 @@
 
 	fcfield_addrint.geocodePosition = function(elementid_n, pos, marker, config_name)
 	{
+		const isCurrent = fcfield_addrint.beginAddressRequest(elementid_n);
 		jQuery('#' + elementid_n + '_messages')
 			.removeClass('alert-success').removeClass('alert-warning').addClass('alert-info')
 			.html("Searching address of new marker position ...").show();
@@ -284,6 +321,7 @@
 			{ latLng: pos },
 			function(results, status)
 			{
+				if (!isCurrent()) return;
 				if (status == google.maps.GeocoderStatus.OK)
 				{
 					var tolerance = parseInt( jQuery('#' + elementid_n + '_marker_tolerance').val() );
@@ -327,17 +365,9 @@
 
 
 	// fill address fields when autocomplete address is selected
-	fcfield_addrint.fillInAddress = function(elementid_n, place, config_name)
+	fcfield_addrint.fillInAddress = function(elementid_n, place, config_name, redrawMap = false)
 	{
-		var redrawMap = false;
-		if (typeof place === "undefined" || !place)
-		{
-			place = fcfield_addrint.autoComplete[elementid_n].getPlace();
-			redrawMap = true;
-		}
-		//window.console.log(place);
-
-		if (typeof place.address_components == 'undefined') return;
+		if (!place?.address_components || !place.geometry?.location) return;
 
 		// Check allowed country, (zero length means all allowed)
 		var country_valid = fcfield_addrint.allowed_countries[config_name].length == 0;
@@ -353,7 +383,7 @@
 				selected_country = o.long_name;
 				for(var i=0; i<fcfield_addrint.allowed_countries[config_name].length; i++)
 				{
-					if (o.short_name == fcfield_addrint.allowed_countries[config_name][i])
+					if (o.short_name.toUpperCase() === fcfield_addrint.allowed_countries[config_name][i].toUpperCase())
 					{
 						country_valid = true;
 						break;
@@ -378,6 +408,13 @@
 			jQuery('#' + elementid_n + '_messages').html('').hide();
 		}
 
+
+		if (redrawMap)
+		{
+			const skip = document.getElementById(elementid_n + '_autocomplete')
+				.closest('.fc-address-skipped')?.querySelector('.fcfield-skipvalue');
+			if (skip) skip.click();
+		}
 
 		// Empty all fields in case they are not set to a new value
 		jQuery('' +
@@ -484,10 +521,10 @@
 		jQuery('#' + elementid_n + '_zoom_label').text(fcfield_addrint.map_zoom[config_name]);
 
 		// latitude
-		jQuery('#' + elementid_n + '_lat').val(place.geometry.location.lat);
+		jQuery('#' + elementid_n + '_lat').val(place.geometry.location.lat());
 
 		// longitude
-		jQuery('#' + elementid_n + '_lon').val(place.geometry.location.lng);
+		jQuery('#' + elementid_n + '_lon').val(place.geometry.location.lng());
 
 		// reset map lat/lon
 		fcfield_addrint.LatLon[elementid_n] = place.geometry.location;

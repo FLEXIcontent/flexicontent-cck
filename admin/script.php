@@ -635,6 +635,10 @@ class com_flexicontentInstallerScript
 		$db->setQuery($query);
 		$dl_coupons_tbl_exists = (bool) count($db->loadObjectList());
 
+		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_download_log"';
+		$db->setQuery($query);
+		$dl_log_tbl_exists = (bool) count($db->loadObjectList());
+
 		$query = 'SHOW TABLES LIKE "' . $dbprefix . 'flexicontent_file_usage"';
 		$db->setQuery($query);
 		$file_usage_tbl_exists = (bool) count($db->loadObjectList());
@@ -1372,6 +1376,25 @@ class com_flexicontentInstallerScript
 							PRIMARY KEY (`id`),
 							KEY `user_id` (`user_id`),
 							KEY `file_id` (`file_id`)
+						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
+					}
+
+					if ( !$dl_log_tbl_exists ) {
+						$queries[] = "
+						CREATE TABLE `#__flexicontent_download_log` (
+							`id` int(11) NOT NULL AUTO_INCREMENT,
+							`user_id` int(11) NOT NULL DEFAULT 0,
+							`visitor_id` varchar(32) NOT NULL DEFAULT '',
+							`ip_hash` varchar(32) NOT NULL DEFAULT '',
+							`file_id` int(11) NOT NULL,
+							`field_id` int(11) NOT NULL DEFAULT 0,
+							`downloaded_on` datetime NOT NULL,
+							`expire_on` datetime NOT NULL,
+							PRIMARY KEY (`id`),
+							KEY `user_time` (`user_id`, `downloaded_on`),
+							KEY `visitor_time` (`visitor_id`, `downloaded_on`),
+							KEY `ip_time` (`ip_hash`, `downloaded_on`),
+							KEY `expire_on` (`expire_on`)
 						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
 					}
 
