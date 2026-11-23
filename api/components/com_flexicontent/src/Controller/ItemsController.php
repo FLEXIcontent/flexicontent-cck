@@ -10,6 +10,7 @@
 
 namespace Joomla\Component\Flexicontent\Api\Controller;
 
+use Joomla\CMS\Access\Exception\NotAllowed;
 use Joomla\CMS\Filter\InputFilter;
 use Joomla\CMS\MVC\Controller\ApiController;
 use Joomla\Component\Flexicontent\Api\Helper\AccessHelper;
@@ -121,6 +122,20 @@ class ItemsController extends ApiController
         }
 
         return parent::displayList();
+    }
+
+    /**
+     * Refuse record edition before Joomla tries to load a legacy table.
+     *
+     * The parent edit() loads the table before calling allowEdit(), which fails
+     * for the API-only item model. All writes are disabled, so fail early with
+     * a clean 403 (same behaviour as the taxonomy endpoints).
+     *
+     * @return  static
+     */
+    public function edit()
+    {
+        throw new NotAllowed('JLIB_APPLICATION_ERROR_EDIT_NOT_PERMITTED', 403);
     }
 
     /**
