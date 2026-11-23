@@ -203,6 +203,40 @@ class ItemsModel extends ListModel
             $query->where($db->quoteName('a.language') . ' = ' . $db->quote($language));
         }
 
+        // Filter: author
+        $authorId = $this->getState('filter.created_by');
+
+        if (is_numeric($authorId)) {
+            $query->where($db->quoteName('a.created_by') . ' = ' . (int) $authorId);
+        }
+
+        // Filter: Joomla access level (ACL restrictions are applied below)
+        $access = $this->getState('filter.access');
+
+        if (is_numeric($access)) {
+            $query->where($db->quoteName('a.access') . ' = ' . (int) $access);
+        }
+
+        // Filter: featured
+        $featured = $this->getState('filter.featured');
+
+        if (is_numeric($featured)) {
+            $query->where($db->quoteName('a.featured') . ' = ' . (int) $featured);
+        }
+
+        // Filter: tag
+        $tagId = (int) $this->getState('filter.tag');
+
+        if ($tagId > 0) {
+            $tagQuery = $db->createQuery();
+            $tagQuery->select('1')
+                ->from($db->quoteName('#__flexicontent_tags_item_relations', 'tr'))
+                ->where($db->quoteName('tr.itemid') . ' = ' . $db->quoteName('a.id'))
+                ->where($db->quoteName('tr.tid') . ' = ' . $tagId);
+
+            $query->where('EXISTS (' . $tagQuery . ')');
+        }
+
         // Published items and Joomla viewing access levels for non-managers
         AccessHelper::applyListRestrictions($query, $db);
 

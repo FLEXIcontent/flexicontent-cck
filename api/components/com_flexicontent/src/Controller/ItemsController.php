@@ -82,6 +82,22 @@ class ItemsController extends ApiController
             $this->modelState->set('filter.language', $filter->clean($apiFilterInfo['language'], 'STRING'));
         }
 
+        if (\array_key_exists('author', $apiFilterInfo)) {
+            $this->modelState->set('filter.created_by', $filter->clean($apiFilterInfo['author'], 'INT'));
+        }
+
+        if (\array_key_exists('access', $apiFilterInfo)) {
+            $this->modelState->set('filter.access', $filter->clean($apiFilterInfo['access'], 'INT'));
+        }
+
+        if (\array_key_exists('featured', $apiFilterInfo)) {
+            $this->modelState->set('filter.featured', $filter->clean($apiFilterInfo['featured'], 'INT'));
+        }
+
+        if (\array_key_exists('tag', $apiFilterInfo)) {
+            $this->modelState->set('filter.tag', $filter->clean($apiFilterInfo['tag'], 'INT'));
+        }
+
         $apiListInfo = $this->input->get('list', [], 'array');
 
         if (\array_key_exists('ordering', $apiListInfo)) {

@@ -106,6 +106,12 @@ class LegacyItemsModel extends \FlexicontentModelItems
         $input->set('search', $search);
         $mapping['search'] = $search;
 
+        // Legacy text search needs an explicit scope; without it the search is
+        // silently ignored. Keep the SQL stub's behaviour: search the title.
+        $scope = $search !== '' ? 'a.title' : '';
+        $input->set('scope', $scope);
+        $mapping['scope'] = $scope;
+
         // FLEXI uses symbolic state codes ('P', 'IP', 'ALL', ...).
         if ($canManage) {
             $published = $apiState->get('filter.published', null);
@@ -114,12 +120,9 @@ class LegacyItemsModel extends \FlexicontentModelItems
             $stateCode = 'P';
         }
 
-        $filterState    = [$stateCode ?: 'ALL'];
-        $filterAccess   = $canManage ? [] : array_map('intval', AccessHelper::getViewLevels());
+        $filterState = [$stateCode ?: 'ALL'];
         $input->set('filter_state', $filterState);
-        $input->set('filter_access', $filterAccess);
-        $mapping['filter_state']  = $filterState;
-        $mapping['filter_access'] = $filterAccess;
+        $mapping['filter_state'] = $filterState;
 
         // Keep the API's exact-category semantics (the legacy default includes subcategories).
         $categoryId = (int) $apiState->get('filter.category_id', 0);
@@ -137,6 +140,29 @@ class LegacyItemsModel extends \FlexicontentModelItems
         $languages = $language !== '' ? [$language] : [];
         $input->set('filter_lang', $languages);
         $mapping['filter_lang'] = $languages;
+
+        $authorId = (int) $apiState->get('filter.created_by', 0);
+        $authors  = $authorId ? [$authorId] : [];
+        $input->set('filter_author', $authors);
+        $mapping['filter_author'] = $authors;
+
+        // A non-manager cannot widen its access by requesting another level.
+        $apiAccess = (int) $apiState->get('filter.access', 0);
+        $filterAccess = $canManage
+            ? ($apiAccess ? [$apiAccess] : [])
+            : array_map('intval', AccessHelper::getViewLevels());
+        $input->set('filter_access', $filterAccess);
+        $mapping['filter_access'] = $filterAccess;
+
+        $featured = $apiState->get('filter.featured', null);
+        $featuredValue = is_numeric($featured) ? (int) $featured : '';
+        $input->set('filter_featured', $featuredValue);
+        $mapping['filter_featured'] = $featuredValue;
+
+        $tagId = (int) $apiState->get('filter.tag', 0);
+        $tags  = $tagId ? [$tagId] : [];
+        $input->set('filter_tag', $tags);
+        $mapping['filter_tag'] = $tags;
 
         $ordering = self::normaliseOrdering((string) $apiState->get('list.ordering', ''));
 
