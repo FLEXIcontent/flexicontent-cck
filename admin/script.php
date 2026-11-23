@@ -912,6 +912,19 @@ class com_flexicontentInstallerScript
 					if ( $fields_tbl_exists && !array_key_exists('asset_id', $tbl_fields['#__'.$tbl_name]) ) {
 						$changes[] = "ADD `asset_id` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `id`";
 					}
+					elseif ( $fields_tbl_exists )
+					{
+						// JTable::store() unsets asset_id before INSERT and fills it afterwards.
+						// A NOT NULL column without a default makes every new field fail in strict mode.
+						$_asset_default = $db->setQuery(
+							'SELECT COLUMN_DEFAULT FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE()'
+							. ' AND TABLE_NAME = ' . $db->quote($db->replacePrefix('#__' . $tbl_name))
+							. ' AND COLUMN_NAME = ' . $db->quote('asset_id')
+						)->loadResult();
+						if ( $_asset_default === null ) {
+							$changes[] = "CHANGE `asset_id` `asset_id` INT(11) UNSIGNED NOT NULL DEFAULT '0' AFTER `id`";
+						}
+					}
 					if ( isset($tbl_datatypes[$tbl_name]) && strtolower($tbl_datatypes[$tbl_name]['attribs']['DATA_TYPE']) != 'mediumtext' ) {
 						$changes[] = "CHANGE `attribs` `attribs` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL";
 					}
@@ -927,6 +940,18 @@ class com_flexicontentInstallerScript
 
 					if ( $types_tbl_exists && !array_key_exists('asset_id', $tbl_fields['#__'.$tbl_name]) ) {
 						$changes[] = "ADD `asset_id` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `id`";
+					}
+					elseif ( $types_tbl_exists )
+					{
+						// Same repair as for the fields table (see above).
+						$_asset_default = $db->setQuery(
+							'SELECT COLUMN_DEFAULT FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE()'
+							. ' AND TABLE_NAME = ' . $db->quote($db->replacePrefix('#__' . $tbl_name))
+							. ' AND COLUMN_NAME = ' . $db->quote('asset_id')
+						)->loadResult();
+						if ( $_asset_default === null ) {
+							$changes[] = "CHANGE `asset_id` `asset_id` INT(11) UNSIGNED NOT NULL DEFAULT '0' AFTER `id`";
+						}
 					}
 					if ( $types_tbl_exists && !array_key_exists('itemscreatable', $tbl_fields['#__'.$tbl_name])) {
 						$changes[] = "ADD `itemscreatable` SMALLINT(8) NOT NULL DEFAULT '0' AFTER `published`";
