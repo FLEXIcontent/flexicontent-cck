@@ -407,7 +407,7 @@
 			<field name="viewtext" type="text" size="40" default="" label="FLEXI_FIELD_FILE_CUSTOM_VIEW_TEXT" depend_class="allow-viewing-custom" description="FLEXI_FIELD_FILE_CUSTOM_VIEW_TEXT_DESC"/>
 			<field name="viewinside" type="radio" default="1" label="View inside" description="Select to view file in same / new window" depend_class="allow-viewing" class="btn-group group-fcinfo">
 				<option value="0">Fancybox modal</option>
-				<option value="1">jQuery modal (responsive + fullscreen)</option>
+				<option value="1">GLightbox modal (responsive + fullscreen)</option>
 				<option value="2">New window</option>
 				<option value="3">Same window</option>
 			</field>

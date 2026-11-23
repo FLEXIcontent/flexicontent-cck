@@ -409,17 +409,32 @@ else if ($prop !== 'display_properties_only') :
 		{
 			$view_link = $dl_link . (strpos($dl_link, '?') !== false ? '&amp;' : '?') . 'method=view';
 			$view_file_classes = $file_classes . ' btn-info fcfile_viewFile';
-			$actions_arr[] = '
+
+			if ($viewinside == 1)
+			{
+				$actions_arr[] = '
+				<a href="' . $view_link . '" class="' . $view_file_classes . ' fcfile_glightbox" title="' . $viewinfo . '"
+					data-type="external" data-title="' . $filetitle_escaped . '"
+				>
+					' . ($compact_display != 2 ? $viewtext : '') . '
+					' . ($compact_display == 2 ? ' ' . $svg_eye : '') . '
+				</a>';
+			}
+			else
+			{
+				$actions_arr[] = '
 				<button type="button" data-href="' . $view_link . '" class="' . $view_file_classes .'" title="' . $viewinfo . '" '
-					. ($viewinside>=2 ? ' onclick="var url = jQuery(this).attr(\'data-href\'); window.open(url, ' . ($viewinside==3 ? "'_self'" : "") . ');" ' : '')
-					. ($viewinside==1 ? ' onclick="var url = jQuery(this).attr(\'data-href\'); fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title:\''. $filetitle_escaped .'\'}); return false;" ' : '')
-					. ($viewinside==0 ? ' onclick="var url = jQuery(this).attr(\'data-href\'); jQuery.fancybox.open([{ src: url , type: \'iframe\'}]); "' : '')
+					. ($viewinside>=2 ? ' onclick="var url = this.getAttribute(\'data-href\'); window.open(url, ' . ($viewinside==3 ? "'_self'" : "") . ');" ' : '')
+					. ($viewinside==0 ? ' onclick="var url = this.getAttribute(\'data-href\'); jQuery.fancybox.open([{ src: url , type: \'iframe\'}]); "' : '')
 					. '
 				>
 					' . ($compact_display != 2 ? $viewtext : '') . '
 					' . ($compact_display == 2 ? ' ' . $svg_eye : '') . '
 				</button>';
-			$fancybox_needed = $viewinside == 0;
+			}
+
+			$fancybox_needed  = $viewinside == 0;
+			$glightbox_needed = $viewinside == 1;
 		}
 
 		// ADD TO CART: the link will add file to download list (tree) (handled via a downloads manager module)
@@ -497,14 +512,28 @@ else if ($prop !== 'display_properties_only') :
 
 		if ($authorized && $allowview && !$file_data->url)
 		{
-			$actions_arr[] = '
-				<a href="' . $dl_link . (strpos($dl_link, '?') !== false ? '&amp;' : '?') . 'method=view" ' . ($viewinside==2 ? 'target="_blank"' : '')
+			$view_link = $dl_link . (strpos($dl_link, '?') !== false ? '&amp;' : '?') . 'method=view';
+
+			if ($viewinside == 1)
+			{
+				$actions_arr[] = '
+				<a href="' . $view_link . '" class="' . $file_classes . ' fcfile_viewFile fcfile_glightbox"'
+					. ' data-type="external" data-title="' . $filetitle_escaped . '" title="' . $viewinfo . '" >'
+					. $viewtext
+				. '</a>';
+			}
+			else
+			{
+				$actions_arr[] = '
+				<a href="' . $view_link . '" ' . ($viewinside==2 ? 'target="_blank"' : '')
 					. ' class="' . ($viewinside==0 ? 'fancybox ' : '') . $file_classes . ' fcfile_viewFile" '.($viewinside==0 ? 'data-type="iframe" ' : '')
-					. ($viewinside==1 ? ' onclick="var url = jQuery(this).attr(\'href\');  fc_showDialog(url, \'fc_modal_popup_container\', 0, 0, 0, 0, {title:\''. $filetitle_escaped .'\'}); return false;" ' : '')
-					. ' title="' . $viewinfo . '" >
-					' . $viewtext . '
+					. ' title="' . $viewinfo . '" >'
+					. $viewtext . '
 				</a>';
-			$fancybox_needed = $viewinside == 0;
+			}
+
+			$fancybox_needed  = $viewinside == 0;
+			$glightbox_needed = $viewinside == 1;
 		}
 
 		// ADD TO CART: the link will add file to download list (tree) (handled via a downloads manager module)

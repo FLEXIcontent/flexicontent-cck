@@ -1102,7 +1102,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		$use_infoseptxt   = $field->parameters->get( 'use_info_separator', 0 ) ;
 		$use_actionseptxt = $field->parameters->get( 'use_action_separator', 0 ) ;
 		$infoseptxt   = $use_infoseptxt   ?  ' '.$field->parameters->get( 'info_separator', '' ).' '    :  '<br>';
-		$actionseptxt = $use_actionseptxt ?  ' '.$field->parameters->get( 'action_separator', '' ).' '  :  '<br>';
+		$actionseptxt = $use_actionseptxt ?  ' '.$field->parameters->get( 'action_separator', '' ).' '  :  '';
 
 		$allowdownloads = $field->parameters->get( 'allowdownloads', 1 ) ;
 		$downloadstext  = $allowdownloads==2 ? $field->parameters->get( 'downloadstext', 'FLEXI_DOWNLOAD' ) : 'FLEXI_DOWNLOAD';
@@ -1125,16 +1125,20 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		// JS safe Field name
 		$field_name_js = str_replace('-', '_', $field->name);
 
-		static $fc_lib_added = false;
-		if ($viewinside==1 && !$fc_lib_added)
+		// GLightbox is a vanilla JS lightbox: the "View inside" modal no longer needs jQuery
+		static $fc_glightbox_added = false;
+		if ($viewinside==1 && !$fc_glightbox_added)
 		{
-			$fc_lib_added = true;
+			$fc_glightbox_added = true;
 
-			flexicontent_html::loadFramework('flexi-lib');
-			require_once JPATH_SITE . '/components/com_flexicontent/helpers/html/fcuploader.php';
-			if (!\Joomla\CMS\HTML\HTMLHelper::getServiceRegistry()->hasService('fcuploader')) {
-				\Joomla\CMS\HTML\HTMLHelper::getServiceRegistry()->register('fcuploader', 'JHtmlFcuploader');
+			flexicontent_html::loadFramework('glightbox');
+
+			$wam = \Joomla\CMS\Factory::getApplication()->getDocument()->getWebAssetManager();
+			if (!$wam->assetExists('script', 'fcfile_glightbox'))
+			{
+				$wam->registerScript('fcfile_glightbox', 'components/com_flexicontent/assets/js/fcfile_glightbox.js', array('version' => FLEXI_VHASH));
 			}
+			$wam->useScript('fcfile_glightbox');
 		}
 
 		// Add needed JS/CSS
@@ -1307,6 +1311,16 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		include(self::getViewPath($field->field_type, $viewlayout));
 
 		if (!empty($fancybox_needed)) flexicontent_html::loadFramework('fancybox');
+		if (!empty($glightbox_needed))
+		{
+			flexicontent_html::loadFramework('glightbox');
+			$wam = \Joomla\CMS\Factory::getApplication()->getDocument()->getWebAssetManager();
+			if (!$wam->assetExists('script', 'fcfile_glightbox'))
+			{
+				$wam->registerScript('fcfile_glightbox', 'components/com_flexicontent/assets/js/fcfile_glightbox.js', array('version' => FLEXI_VHASH));
+			}
+			$wam->useScript('fcfile_glightbox');
+		}
 
 		// Do not convert the array to string if field is in a group, and do not add: FIELD's opentag, closetag, value separator
 		if (!$is_ingroup)
