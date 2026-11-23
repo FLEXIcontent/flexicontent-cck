@@ -405,6 +405,16 @@ function fman_zoom_thumb(event, control)
 	}
 }
 
+document.addEventListener('keydown', event => {
+	if (event.defaultPrevented || event.key !== 'Escape') return;
+	const image = document.querySelector('img.fc-fileman-thumb.fc_zoomed');
+	if (!image) return;
+	event.preventDefault();
+	const button = image.closest('.fc-fileman-grid-thumb-box')?.querySelector('.fc-fileman-preview-btn');
+	button?.focus();
+	fman_zoom_thumb(event, image);
+});
+
 function fman_toggle_thumb_selection(box, selected)
 {
 	if (!box) return;
@@ -745,7 +755,7 @@ if ($js)
 													<input type="text" name="search" id="search" placeholder="<?php echo !empty($this->scope_title) ? $this->scope_title : Text::_('FLEXI_SEARCH'); ?>" value="<?php echo htmlspecialchars($this->lists['search'], ENT_QUOTES, 'UTF-8'); ?>" class="fcfield_textval" />
 													<button title="" data-original-title="<?php echo Text::_('FLEXI_SEARCH'); ?>" class="<?php echo $btn_class . (FLEXI_J40GE ? ' btn-outline-dark ' : ' ') . $this->tooltip_class; ?>" onclick="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-search"></i>' : Text::_('FLEXI_GO'); ?></button>
 
-													<button type="button" id="fc_filters_box_btn" data-original-title="<?php echo Text::_('FLEXI_FILTERS'); ?>" class="<?php echo $this->tooltip_class . ' ' . ($this->count_filters ? 'btn ' . $this->btn_iv_class : $out_class); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary', false, undefined, 1);">
+													<button type="button" id="fc_filters_box_btn" aria-label="<?php echo htmlspecialchars(Text::_('FLEXI_FILTERS'), ENT_QUOTES, 'UTF-8'); ?>" data-original-title="<?php echo Text::_('FLEXI_FILTERS'); ?>" class="<?php echo $this->tooltip_class . ' ' . ($this->count_filters ? 'btn ' . $this->btn_iv_class : $out_class); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary', false, undefined, 1);">
 														<?php echo '<i class="icon-filter"></i>' . ($isFilesElement && $this->count_filters ? Text::_('FLEXI_FILTERS') : ''); ?>
 														<?php echo ($this->count_filters  ? ' <sup>' . $this->count_filters . '</sup>' : ''); ?>
 													</button>
@@ -912,7 +922,7 @@ if ($js)
 											</div>
 
 											<div class="fc-iblock nowrap_box" style="position: relative; vertical-align: middle;">
-												<button type="button" id="fc_mainChooseColBox_btn" class="<?php echo $this->tooltip_class . ' ' . $this->btn_sm_class . ' ' . $out_class; ?> hidden-phone" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" data-title="<?php echo flexicontent_html::getToolTip('FLEXI_COLUMNS', 'FLEXI_ABOUT_AUTO_HIDDEN_COLUMNS', 1, 1); ?>" data-placement="bottom">
+												<button type="button" id="fc_mainChooseColBox_btn" aria-label="<?php echo htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_COLUMNS'), ENT_QUOTES, 'UTF-8'); ?>" class="<?php echo $this->tooltip_class . ' ' . $this->btn_sm_class . ' ' . $out_class; ?> hidden-phone" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" data-title="<?php echo flexicontent_html::getToolTip('FLEXI_COLUMNS', 'FLEXI_ABOUT_AUTO_HIDDEN_COLUMNS', 1, 1); ?>" data-placement="bottom">
 													<span class="icon-contract"></span><sup id="columnchoose_totals"></sup>
 												</button>
 
@@ -920,7 +930,7 @@ if ($js)
 											</div>
 
 											<?php if (!empty($this->minihelp) && FlexicontentHelperPerm::getPerm()->CanConfig): ?>
-											<button type="button" id="fc-mini-help_btn" class=<?php echo $this->btn_sm_class . ' ' . $out_class; ?>" onclick="fc_toggle_box_via_btn('fc-mini-help', this, 'btn-primary');" >
+											<button type="button" id="fc-mini-help_btn" class="<?php echo $this->btn_sm_class . ' ' . $out_class; ?>" onclick="fc_toggle_box_via_btn('fc-mini-help', this, 'btn-primary');" >
 											<span class="icon-help"></span>
 											<?php echo $this->minihelp; ?>
 										</button>
@@ -1515,10 +1525,10 @@ if ($js)
 									<?php
 									echo $thumb_or_icon;
 									echo !$is_img ? '' : '
-					<button type="button" class="btn fc-fileman-preview-btn icon-search" onclick="fman_zoom_thumb(event, this); return false;"></button>
+					<button type="button" class="btn fc-fileman-preview-btn icon-search" aria-label="' . htmlspecialchars(Text::_('FLEXI_PREVIEW'), ENT_QUOTES, 'UTF-8') . '" onclick="fman_zoom_thumb(event, this); return false;"></button>
 					'; ?>
 									<span class="btn fc-fileman-selection-mark icon-checkmark" id="_cb<?php echo $i; ?>" ></span>
-									<button type="button" class="btn fc-fileman-delete-btn icon-remove" onclick="FlexiForm.confirm('<?php echo Text::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>').then(accepted => { if (accepted) { document.adminForm.filename.value='<?php echo rawurlencode($row->filename);?>'; Joomla.listItemTask('cb<?php echo $i; ?>','filemanager.remove'); } }); return false;"></button>
+									<button type="button" class="btn fc-fileman-delete-btn icon-remove" aria-label="<?php echo htmlspecialchars(Text::_('FLEXI_DELETE'), ENT_QUOTES, 'UTF-8'); ?>" onclick="event.stopPropagation(); FlexiForm.confirm('<?php echo Text::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>').then(accepted => { if (accepted) { document.adminForm.filename.value='<?php echo rawurlencode($row->filename);?>'; Joomla.listItemTask('cb<?php echo $i; ?>','filemanager.remove'); } }); return false;"></button>
 									<span class="fc-fileman-filename-box"><?php echo $row->title_cut; ?></span>
 								</div>
 								<?php

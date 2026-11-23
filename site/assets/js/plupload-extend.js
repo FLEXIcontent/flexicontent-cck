@@ -427,9 +427,9 @@ fc_plupload = function(options)
 		{
 			uploader_header
 			.prepend('\
-				<span class="btn fc_plupload_toggleThumbs_btn hasTooltip" title="' + Joomla.JText._('FLEXI_THUMBNAILS') + '" style="float:right; margin: 12px 8px;" onclick="jQuery(this).closest(\'.plupload_container\').toggleClass(\'fc_uploader_hide_preview\');">\
+				<button type="button" class="btn fc_plupload_toggleThumbs_btn hasTooltip" title="' + Joomla.JText._('FLEXI_THUMBNAILS') + '" style="float:right; margin: 12px 8px;" onclick="jQuery(this).closest(\'.plupload_container\').toggleClass(\'fc_uploader_hide_preview\');">\
 					<span class="icon-image"></span>\
-				</span>\
+				</button>\
 			')
 			.prepend('\
 			<div class="btn-group" style="margin: 12px; float: right;">\

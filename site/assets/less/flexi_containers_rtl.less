@@ -235,7 +235,14 @@ div.statetoggler {
 		min-width: auto;
 
 
-		> div.stateopener {
+		> button.stateopener,
+		> .options > button {
+			background: transparent;
+			border: 0;
+			color: inherit;
+			font: inherit;
+		}
+		> .stateopener {
 			line-height: auto;
 			height: auto;
 			width: auto;
@@ -269,13 +276,13 @@ div.statetoggler {
 				color: black;
 			}
 		}
-		> div.stateopener.ajax-loader {
+		> .stateopener.ajax-loader {
 			background-position: center;
 			padding: 8px;
 			margin: -1px -1px -1px -1px;
 		}
 
-		> div.stateopener img {
+		> .stateopener img {
 			padding: 0;
 			margin: 0;
 			border: none;
@@ -302,7 +309,7 @@ div.statetoggler {
 			box-sizing: border-box;
 
 			> div,
-			> span {
+			> :is(span, button) {
 				position: relative;
 				float: right;
 				clear: both;
@@ -321,7 +328,6 @@ div.statetoggler {
 
 				background: none repeat scroll 0 0 transparent;
 				color: black;
-				outline: none;
 				text-decoration: none;
 				white-space: nowrap;
 				text-align: right;
@@ -332,20 +338,20 @@ div.statetoggler {
 				text-align: center;
 				font-weight: bold;
 			}
-			> span:hover {
+			> :is(span, button):hover {
 				background-color: #e7e7e7;
 				background-image: linear-gradient(to bottom,#f0f0f0,#d0d0d0);
 			}
 
-			> span > span,
-			> span > img {
+			> :is(span, button) > span,
+			> :is(span, button) > img {
 				max-width: unset;
 				padding: 0;
 				margin: 0 .5em 0 0;
 				border: none;
 				box-sizing: unset;
 			}
-			> span > img {
+			> :is(span, button) > img {
 				display: unset;
 			}
 		}

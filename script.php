@@ -1739,7 +1739,7 @@ class com_flexicontentInstallerScript
 		<div class="alert alert-success" style="margin: 8px 0 64px 0;">
 			<button type="button" class="btn btn-info" onclick="window.open('index.php?option=com_flexicontent','_self');" style="cursor: pointer;">
 				<?php echo \Joomla\CMS\Language\Text::_('FLEXI_DASHBOARD'); ?>
-  		</button>
+		</button>
 			<?php echo \Joomla\CMS\Language\Text::_('COM_FLEXICONTENT_PLEASE_COMPLETE_POST_INSTALL_TASKS_AT_DASHBOARD'); ?>
   	</div>
 

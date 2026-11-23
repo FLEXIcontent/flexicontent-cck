@@ -1285,7 +1285,7 @@ div table.fc-table-list tr:nth-child(odd) td {
   box-shadow: none;
 }
 [data-bs-theme="dark"] div.statetoggler > div.statetoggler_inner > .options > div,
-[data-bs-theme="dark"] div.statetoggler > div.statetoggler_inner > .options > span {
+[data-bs-theme="dark"] div.statetoggler > div.statetoggler_inner > .options > :is(span, button) {
   color: var(--body-color);
 }
 [data-bs-theme="dark"] .ui-widget-content {
