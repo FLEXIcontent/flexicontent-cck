@@ -14,6 +14,7 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Factory\MVCFactoryInterface;
 use Joomla\CMS\MVC\Model\ListModel;
 use Joomla\Component\Flexicontent\Api\Helper\AccessHelper;
+use Joomla\Component\Flexicontent\Api\Helper\FieldFilterHelper;
 use Joomla\Component\Flexicontent\Api\Legacy\LegacyBootstrap;
 use Joomla\Component\Flexicontent\Api\Legacy\LegacyItemsModel;
 
@@ -235,6 +236,17 @@ class ItemsModel extends ListModel
                 ->where($db->quoteName('tr.tid') . ' = ' . $tagId);
 
             $query->where('EXISTS (' . $tagQuery . ')');
+        }
+
+        // Filter: FLEXIcontent custom field value
+        $fieldCondition = FieldFilterHelper::getCondition(
+            $this->getState('filter.field', ''),
+            $this->getState('filter.field_value', ''),
+            $this->getState('filter.field_match', 'exact')
+        );
+
+        if ($fieldCondition !== null) {
+            $query->where($fieldCondition);
         }
 
         // Published items and Joomla viewing access levels for non-managers

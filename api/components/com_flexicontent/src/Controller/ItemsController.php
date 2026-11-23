@@ -98,6 +98,18 @@ class ItemsController extends ApiController
             $this->modelState->set('filter.tag', $filter->clean($apiFilterInfo['tag'], 'INT'));
         }
 
+        if (\array_key_exists('field', $apiFilterInfo)) {
+            $this->modelState->set('filter.field', $filter->clean($apiFilterInfo['field'], 'STRING'));
+        }
+
+        if (\array_key_exists('field_value', $apiFilterInfo)) {
+            $this->modelState->set('filter.field_value', $filter->clean($apiFilterInfo['field_value'], 'STRING'));
+        }
+
+        if (\array_key_exists('field_match', $apiFilterInfo)) {
+            $this->modelState->set('filter.field_match', $filter->clean($apiFilterInfo['field_match'], 'WORD'));
+        }
+
         $apiListInfo = $this->input->get('list', [], 'array');
 
         if (\array_key_exists('ordering', $apiListInfo)) {

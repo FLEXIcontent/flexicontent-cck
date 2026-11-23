@@ -12,6 +12,7 @@ namespace Joomla\Component\Flexicontent\Api\Legacy;
 
 use Joomla\CMS\Factory;
 use Joomla\Component\Flexicontent\Api\Helper\AccessHelper;
+use Joomla\Component\Flexicontent\Api\Helper\FieldFilterHelper;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
@@ -164,6 +165,11 @@ class LegacyItemsModel extends \FlexicontentModelItems
         $input->set('filter_tag', $tags);
         $mapping['filter_tag'] = $tags;
 
+        // Custom field value filtering is applied to the legacy query directly.
+        $mapping['filter.field']       = (string) $apiState->get('filter.field', '');
+        $mapping['filter.field_value'] = (string) $apiState->get('filter.field_value', '');
+        $mapping['filter.field_match'] = (string) $apiState->get('filter.field_match', 'exact');
+
         $ordering = self::normaliseOrdering((string) $apiState->get('list.ordering', ''));
 
         if ($ordering !== '') {
@@ -240,7 +246,7 @@ class LegacyItemsModel extends \FlexicontentModelItems
     }
 
     /**
-     * Belt-and-braces read ACL inside the legacy list query.
+     * Belt-and-braces read ACL and custom field filtering in the legacy list query.
      *
      * @param   mixed    $query_ids  Optional ids for the second-stage detail query.
      * @param   boolean  $for_count  Whether this is the count query.
@@ -251,17 +257,61 @@ class LegacyItemsModel extends \FlexicontentModelItems
     {
         $query = parent::_buildQuery($query_ids, $for_count);
 
-        if ($query_ids !== false || AccessHelper::canManage()) {
+        if ($query_ids !== false) {
             return $query;
         }
 
-        $restriction = ' AND a.state = 1 AND a.access IN (' . implode(',', AccessHelper::getViewLevels()) . ') ';
-        $position    = strpos($query, ' GROUP BY a.id');
+        $conditions = [];
 
-        if ($position === false) {
-            return $query . $restriction;
+        if (!AccessHelper::canManage()) {
+            $conditions[] = 'a.state = 1';
+            $conditions[] = 'a.access IN (' . implode(',', AccessHelper::getViewLevels()) . ')';
         }
 
-        return substr($query, 0, $position) . $restriction . substr($query, $position);
+        $fieldCondition = FieldFilterHelper::getCondition(
+            $this->getState('filter.field', ''),
+            $this->getState('filter.field_value', ''),
+            $this->getState('filter.field_match', 'exact')
+        );
+
+        if ($fieldCondition !== null) {
+            $conditions[] = $fieldCondition;
+        }
+
+        if (!$conditions) {
+            return $query;
+        }
+
+        return self::appendWhereConditions($query, $conditions);
+    }
+
+    /**
+     * Append AND conditions to a legacy SQL string before GROUP BY / ORDER BY.
+     *
+     * @param   string    $query       The legacy query.
+     * @param   string[]  $conditions  Conditions without the leading AND.
+     *
+     * @return  string
+     */
+    private static function appendWhereConditions(string $query, array $conditions): string
+    {
+        $extra  = ' AND ' . implode(' AND ', $conditions) . ' ';
+        $marker = false;
+        $offset = 0;
+
+        foreach ([' GROUP BY a.id', ' ORDER BY ', ' LIMIT '] as $candidate) {
+            $position = strpos($query, $candidate);
+
+            if ($position !== false && ($marker === false || $position < $marker)) {
+                $marker = $position;
+                $offset = $position;
+            }
+        }
+
+        if ($marker === false) {
+            return rtrim($query) . ' ' . $extra;
+        }
+
+        return substr($query, 0, $offset) . $extra . substr($query, $offset);
     }
 }
