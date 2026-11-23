@@ -10,9 +10,12 @@
 
 namespace Joomla\Component\Flexicontent\Api\Model;
 
+use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Factory\MVCFactoryInterface;
 use Joomla\CMS\MVC\Model\ListModel;
 use Joomla\Component\Flexicontent\Api\Helper\AccessHelper;
+use Joomla\Component\Flexicontent\Api\Legacy\LegacyBootstrap;
+use Joomla\Component\Flexicontent\Api\Legacy\LegacyItemsModel;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
@@ -21,16 +24,22 @@ use Joomla\Component\Flexicontent\Api\Helper\AccessHelper;
 /**
  * Items list model for the API.
  *
- * MVP spike: reads the Joomla content table joined with the FLEXIcontent
- * items extension table (which carries the FLEXI type). Only rows having a
- * FLEXIcontent extension record are returned (INNER JOIN), i.e. items managed
- * by FLEXIcontent. Reusing the legacy FlexicontentModelItems business logic
- * through an adapter is planned for the next phase.
+ * Delegates to the legacy FlexicontentModelItems (through LegacyItemsModel) so
+ * FLEXIcontent's own query, joins and item enrichment stay the single source of
+ * truth. The original SQL query is kept as a safe fallback if the legacy model
+ * cannot be bootstrapped.
  *
  * @since  5.3
  */
 class ItemsModel extends ListModel
 {
+    /**
+     * Legacy model instance. Null = not created yet, false = disabled after an error.
+     *
+     * @var    LegacyItemsModel|false|null
+     */
+    private $legacyModel = null;
+
     /**
      * Constructor.
      *
@@ -56,6 +65,88 @@ class ItemsModel extends ListModel
         }
 
         parent::__construct($config, $factory);
+    }
+
+    /**
+     * Get the legacy FLEXIcontent items model, configured with the API state.
+     *
+     * @return  LegacyItemsModel|null
+     */
+    private function getLegacyModel(): ?LegacyItemsModel
+    {
+        if ($this->legacyModel === false) {
+            return null;
+        }
+
+        if ($this->legacyModel instanceof LegacyItemsModel) {
+            return $this->legacyModel;
+        }
+
+        try {
+            LegacyBootstrap::boot();
+            $this->legacyModel = new LegacyItemsModel([
+                'ignore_request' => true,
+                'api_state'      => $this->getState(),
+            ]);
+        } catch (\Throwable $e) {
+            $this->disableLegacy($e);
+            return null;
+        }
+
+        return $this->legacyModel;
+    }
+
+    /**
+     * Disable the legacy adapter and log the reason; the SQL fallback stays active.
+     *
+     * @param   \Throwable  $error  The caught error.
+     *
+     * @return  void
+     */
+    private function disableLegacy(\Throwable $error): void
+    {
+        $this->legacyModel = false;
+        error_log('[FLEXIcontent API] legacy items model unavailable: ' . $error->getMessage());
+    }
+
+    /**
+     * Items list from the legacy model, with a safe fallback to the API query.
+     *
+     * @return  array
+     */
+    public function getItems()
+    {
+        $legacy = $this->getLegacyModel();
+
+        if ($legacy !== null) {
+            try {
+                return $legacy->getItems();
+            } catch (\Throwable $e) {
+                $this->disableLegacy($e);
+            }
+        }
+
+        return parent::getItems();
+    }
+
+    /**
+     * Total from the legacy model, with a safe fallback to the API query.
+     *
+     * @return  integer
+     */
+    public function getTotal()
+    {
+        $legacy = $this->getLegacyModel();
+
+        if ($legacy !== null) {
+            try {
+                return (int) $legacy->getTotal();
+            } catch (\Throwable $e) {
+                $this->disableLegacy($e);
+            }
+        }
+
+        return (int) parent::getTotal();
     }
 
     /**

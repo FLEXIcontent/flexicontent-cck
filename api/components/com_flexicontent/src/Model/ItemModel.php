@@ -12,6 +12,7 @@ namespace Joomla\Component\Flexicontent\Api\Model;
 
 use Joomla\CMS\MVC\Model\ItemModel as BaseItemModel;
 use Joomla\Component\Flexicontent\Api\Helper\AccessHelper;
+use Joomla\Component\Flexicontent\Api\Legacy\LegacyBootstrap;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
@@ -20,14 +21,50 @@ use Joomla\Component\Flexicontent\Api\Helper\AccessHelper;
 /**
  * Single item model for the API.
  *
- * MVP spike: read-only. Loads the Joomla content row joined with the
- * FLEXIcontent items extension table (which carries the FLEXI type).
+ * Read-only adapter: delegates to the legacy site FlexicontentModelItem and
+ * enforces the API read ACL on the returned row. The original SQL lookup is
+ * kept as a safe fallback if the legacy model cannot be bootstrapped.
  * The ApiController sets the requested id in the 'item.id' model state.
  *
  * @since  5.3
  */
 class ItemModel extends BaseItemModel
 {
+    /**
+     * Legacy item model instance. Null = not created yet, false = disabled after an error.
+     *
+     * @var    \FlexicontentModelItem|false|null
+     */
+    private $legacyModel = null;
+
+    /**
+     * Get the legacy FLEXIcontent site item model.
+     *
+     * @return  \FlexicontentModelItem|null
+     */
+    private function getLegacyModel()
+    {
+        if ($this->legacyModel === false) {
+            return null;
+        }
+
+        if ($this->legacyModel instanceof \FlexicontentModelItem) {
+            return $this->legacyModel;
+        }
+
+        try {
+            LegacyBootstrap::boot();
+            $this->legacyModel = new \FlexicontentModelItem(['ignore_request' => true]);
+        } catch (\Throwable $e) {
+            $this->legacyModel = false;
+            error_log('[FLEXIcontent API] legacy item model unavailable: ' . $e->getMessage());
+
+            return null;
+        }
+
+        return $this->legacyModel;
+    }
+
     /**
      * Method to get a single item.
      *
@@ -45,6 +82,26 @@ class ItemModel extends BaseItemModel
 
         if (\array_key_exists($pk, (array) $this->_item)) {
             return $this->_item[$pk];
+        }
+
+        $legacy = $this->getLegacyModel();
+
+        if ($legacy !== null) {
+            try {
+                $legacy->setId($pk);
+                $item = $legacy->getItem($pk);
+
+                if (!\is_object($item) || !AccessHelper::isItemVisible($item)) {
+                    $item = null;
+                }
+
+                $this->_item[$pk] = $item;
+
+                return $this->_item[$pk];
+            } catch (\Throwable $e) {
+                $this->legacyModel = false;
+                error_log('[FLEXIcontent API] legacy item lookup failed: ' . $e->getMessage());
+            }
         }
 
         $db    = $this->getDatabase();
