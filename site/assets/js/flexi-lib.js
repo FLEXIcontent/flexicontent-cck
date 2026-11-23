@@ -220,8 +220,9 @@
 				loading.remove(); frame.style.visibility = 'visible';
 				try {
 					const doc = frame.contentDocument;
-					const first = doc?.querySelector('a[href]:not([tabindex="-1"]),button:not([disabled]),input:not([type=hidden]):not([disabled]),select:not([disabled]),textarea:not([disabled])');
-					if (first) first.focus(); else frame.contentWindow?.focus();
+					// Move focus into the loaded page, as a normal page load does: Tab then starts at its first
+					// control. Focusing that control directly would open Joomla's skip-to menu on admin pages.
+					frame.contentWindow?.focus();
 					if (params.closeOnEscape) doc?.addEventListener('keydown', event => { if (event.key === 'Escape') handle.close(); });
 				} catch (_) { /* Cross-origin previews do not expose their document. */ }
 				if (typeof params.loadFunc === 'function') params.loadFunc(window.jQuery ? window.jQuery(content) : content);
