@@ -11,17 +11,13 @@
 	margin: 0 0 .5rem;
 }
 
-/* Two-column layout: feature cards on the left, update elements on the right */
+/* All blocks (buttons and system blocks) live in one grid: #fc-dash-boardbtns */
 #flexicontent .fc-dashboard-layout {
-	display: grid;
-	grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
-	grid-template-areas: "cards updates";
-	gap: 1rem;
-	align-items: start;
+	display: block;
 }
 
+/* Wrapper of a system block ("Waiting for action", "System info") */
 #flexicontent .fc-dashboard-updates {
-	grid-area: updates;
 	display: flex;
 	flex-direction: column;
 	gap: 1rem;
@@ -45,15 +41,11 @@
 }
 
 #flexicontent .fc-dashboard-cards {
-	grid-area: cards;
 	min-width: 0;
 }
 
-@media (max-width: 991.98px) {
-	#flexicontent .fc-dashboard-layout {
-		grid-template-columns: minmax(0, 1fr);
-		grid-template-areas: "cards" "updates";
-	}
+#flexicontent .fc-dash-sys-wrap > .fc-dashboard-card {
+	flex: 1 1 auto;
 }
 
 /* Cards */
@@ -123,7 +115,7 @@
 	float: none;
 	clear: none;
 	display: grid;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
+	grid-template-columns: repeat(12, minmax(0, 1fr));
 	gap: 1rem;
 	align-items: stretch;
 	width: 100%;
@@ -135,9 +127,20 @@
 	margin: 0;
 }
 
+/* Block widths: in 1/12 of the row (3 = 1/4, 4 = 1/3, 6 = 1/2, 8 = 2/3, 12 = full row) */
+#flexicontent .fc-dashboard-cards #fc-dash-boardbtns > .fc-dash-span-3 { grid-column: span 3; }
+#flexicontent .fc-dashboard-cards #fc-dash-boardbtns > .fc-dash-span-4 { grid-column: span 4; }
+#flexicontent .fc-dashboard-cards #fc-dash-boardbtns > .fc-dash-span-6 { grid-column: span 6; }
+#flexicontent .fc-dashboard-cards #fc-dash-boardbtns > .fc-dash-span-8 { grid-column: span 8; }
+#flexicontent .fc-dashboard-cards #fc-dash-boardbtns > .fc-dash-span-12 { grid-column: span 12; }
+
 @media (max-width: 1199.98px) {
 	#flexicontent .fc-dashboard-cards #fc-dash-boardbtns {
 		grid-template-columns: minmax(0, 1fr);
+	}
+	#flexicontent .fc-dashboard-cards #fc-dash-boardbtns > .fc-dashboard-card,
+	#flexicontent .fc-dashboard-cards #fc-dash-boardbtns > .fc-dash-sys-wrap {
+		grid-column: auto;
 	}
 }
 
@@ -298,11 +301,17 @@
 	display: flex;
 	flex-direction: column;
 	flex-grow: 1;
-	justify-content: flex-end;
+	justify-content: center;
 	width: auto;
 	height: auto;
 	margin: 0;
 	padding: 0 1rem;
+}
+
+/* Icon and label of the combined tiles are centered vertically like in the standalone tiles */
+#flexicontent div#fc-dash-boardbtns .fc-board-button.fc-board-button-combo .quickicon-info,
+#flexicontent div#fc-dash-boardbtns .fc-board-button.fc-board-button-combo .quickicon-name {
+	margin-block: 0;
 }
 
 #flexicontent div#fc-dash-boardbtns .fc-board-button.fc-board-button-combo .quickicon-linkadd a {
@@ -439,18 +448,6 @@
 	margin: 0 0 .75rem !important;
 }
 
-/* RTL: mirror the columns (cards on the right, updates on the left) */
-[dir="rtl"] #flexicontent .fc-dashboard-layout {
-	grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
-	grid-template-areas: "cards updates";
-}
-
-@media (max-width: 991.98px) {
-	[dir="rtl"] #flexicontent .fc-dashboard-layout {
-		grid-template-columns: minmax(0, 1fr);
-		grid-template-areas: "cards" "updates";
-	}
-}
 
 /* Dark mode fallbacks when Atum CSS variables are not available */
 [data-bs-theme="dark"] #flexicontent .fc-dashboard-card {
@@ -522,4 +519,495 @@
 [data-bs-theme="dark"] #flexicontent .fc-dashboard-updates .fc-mssg.fc-error {
 	background-color: rgba(255, 255, 255, .06);
 	color: var(--body-color, #dee2e6);
+}
+
+
+/* ==========================================================================
+   Dashboard layout editor
+   ========================================================================== */
+
+#flexicontent .fc-dash-toolbar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: flex-end;
+	gap: .5rem;
+	margin: 1rem 0 0;
+}
+
+/* While editing, keep the action bar visible at the bottom of the screen */
+#flexicontent .fc-dash-toolbar.fc-dash-toolbar-editing {
+	position: sticky;
+	bottom: 0;
+	z-index: 20;
+	padding: .6rem .9rem;
+	background: var(--card-bg, #fff);
+	border: 1px solid var(--card-border-color, #ddd);
+	border-radius: var(--card-border-radius, .25rem);
+	box-shadow: 0 -2px 10px rgba(0, 0, 0, .12);
+}
+
+/* System block placeholder shown by the editor */
+#flexicontent .fc-dash-sys-note {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 110px;
+	padding: 1rem;
+	text-align: center;
+	color: var(--body-color, #666);
+	opacity: .6;
+}
+
+#flexicontent .fc-dash-toolbar .fc-dash-hint {
+	flex: 1 1 280px;
+	margin: 0;
+	color: var(--body-color, #555);
+	opacity: .75;
+	font-size: .85rem;
+}
+
+#flexicontent .fc-dash-editing .fc-dashboard-card {
+	overflow: visible;
+	border-style: dashed;
+	border-color: var(--primary-bg, #0d6efd);
+}
+
+#flexicontent .fc-dash-editing .fc-dashboard-card.fc-dash-dragging,
+#flexicontent .fc-dash-editing .fc-dash-tile.fc-dash-dragging {
+	opacity: .35;
+}
+
+#flexicontent .fc-dash-editing .fc-dashboard-card.fc-dash-over {
+	box-shadow: 0 0 0 3px rgba(13, 110, 253, .35);
+}
+
+#flexicontent .fc-dash-editing .fc-board-header {
+	display: flex !important;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: .5rem;
+}
+
+#flexicontent .fc-dash-handle {
+	cursor: grab;
+	opacity: .55;
+	padding: 0 .25rem;
+	font-size: 1.1rem;
+	line-height: 1;
+	user-select: none;
+}
+
+#flexicontent .fc-dash-handle:hover {
+	opacity: 1;
+}
+
+#flexicontent .fc-dash-title-input {
+	flex: 1 1 140px;
+	min-width: 0;
+	padding: .15rem .4rem;
+	font: inherit;
+	font-weight: 600;
+	color: inherit;
+	background: transparent;
+	border: 1px solid transparent;
+	border-radius: .2rem;
+}
+
+#flexicontent .fc-dash-title-input:hover {
+	border-color: var(--card-border-color, #ccc);
+}
+
+#flexicontent .fc-dash-title-input:focus {
+	background: var(--body-bg, #fff);
+	border-color: var(--primary-bg, #0d6efd);
+	outline: 0;
+}
+
+#flexicontent .fc-dash-widths {
+	display: inline-flex;
+	border: 1px solid var(--card-border-color, #ccc);
+	border-radius: .25rem;
+	overflow: hidden;
+}
+
+#flexicontent .fc-dash-widths button {
+	padding: .1rem .45rem;
+	font-size: .75rem;
+	line-height: 1.4;
+	color: inherit;
+	background: transparent;
+	border: 0;
+	border-right: 1px solid var(--card-border-color, #ccc);
+	cursor: pointer;
+}
+
+#flexicontent .fc-dash-widths button:last-child {
+	border-right: 0;
+}
+
+#flexicontent .fc-dash-widths button.active {
+	color: #fff;
+	background: var(--primary-bg, #0d6efd);
+}
+
+#flexicontent .fc-dash-iconbtn,
+dialog.fc-dash-dialog .fc-dash-iconbtn {
+	padding: 0 .35rem;
+	font-size: .95rem;
+	line-height: 1.5;
+	color: inherit;
+	background: transparent;
+	border: 0;
+	border-radius: .2rem;
+	opacity: .6;
+	cursor: pointer;
+}
+
+#flexicontent .fc-dash-iconbtn:hover,
+dialog.fc-dash-dialog .fc-dash-iconbtn:hover {
+	opacity: 1;
+	background: rgba(127, 127, 127, .15);
+}
+
+#flexicontent .fc-dash-iconbtn.danger:hover {
+	color: #fff;
+	background: #dc3545;
+}
+
+#flexicontent .fc-dash-body {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+	align-items: start;
+	align-content: start;
+	gap: .5rem;
+	min-height: 110px;
+	padding: 1rem;
+}
+
+#flexicontent .fc-dash-empty {
+	display: none;
+	grid-column: 1 / -1;
+	padding: 1.5rem 1rem;
+	text-align: center;
+	color: var(--body-color, #666);
+	opacity: .6;
+	border: 2px dashed var(--card-border-color, #ccc);
+	border-radius: var(--card-border-radius, .25rem);
+}
+
+#flexicontent .fc-dash-body:not(:has(.fc-dash-tile)) .fc-dash-empty {
+	display: block;
+}
+
+#flexicontent .fc-dash-tile {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: .25rem;
+	min-height: 104px;
+	padding: .6rem .5rem .5rem;
+	text-align: center;
+	background: var(--tertiary-bg, #f8f9fa);
+	border: 1px solid var(--card-border-color, #e5e7eb);
+	border-radius: var(--card-border-radius, .25rem);
+	cursor: grab;
+}
+
+#flexicontent .fc-dash-tile.unavail {
+	opacity: .55;
+	border-style: dashed;
+}
+
+#flexicontent .fc-dash-tile .fc-dash-tile-icon {
+	font-size: 1.9rem;
+	line-height: 1.2;
+	color: var(--primary-bg, #1c4f9c);
+	pointer-events: none;
+}
+
+#flexicontent .fc-dash-tile .fc-dash-tile-title {
+	width: 100%;
+	padding: .1rem .3rem;
+	font: inherit;
+	font-size: .85rem;
+	font-weight: 600;
+	text-align: center;
+	color: inherit;
+	background: transparent;
+	border: 1px solid transparent;
+	border-radius: .2rem;
+}
+
+#flexicontent .fc-dash-tile .fc-dash-tile-title:hover {
+	border-color: var(--card-border-color, #ccc);
+}
+
+#flexicontent .fc-dash-tile .fc-dash-tile-title:focus {
+	background: var(--body-bg, #fff);
+	border-color: var(--primary-bg, #0d6efd);
+	outline: 0;
+}
+
+#flexicontent .fc-dash-tile .fc-dash-tile-tools {
+	position: absolute;
+	top: 2px;
+	right: 2px;
+	display: flex;
+	gap: 1px;
+}
+
+#flexicontent .fc-dash-tile .fc-dash-tile-url {
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	font-size: .7rem;
+	opacity: .6;
+}
+
+#flexicontent .fc-dash-tile .fc-dash-plus-on {
+	color: var(--primary-bg, #0d6efd);
+	opacity: 1;
+}
+
+#flexicontent .fc-dash-addbtn {
+	grid-column: 1 / -1;
+	justify-self: start;
+}
+
+#flexicontent .fc-dash-newblock {
+	grid-column: 1 / -1;
+	padding: 1rem;
+	text-align: center;
+	color: var(--body-color, #555);
+	background: transparent;
+	border: 2px dashed var(--card-border-color, #ccc);
+	border-radius: var(--card-border-radius, .25rem);
+	cursor: pointer;
+}
+
+#flexicontent .fc-dash-newblock:hover {
+	border-color: var(--primary-bg, #0d6efd);
+	color: var(--primary-bg, #0d6efd);
+}
+
+/* Add / edit button dialog */
+dialog.fc-dash-dialog {
+	width: min(560px, 94vw);
+	max-height: 90vh;
+	padding: 0;
+	color: var(--body-color, #212529);
+	background: var(--body-bg, #fff);
+	border: 1px solid var(--card-border-color, #ccc);
+	border-radius: .4rem;
+	box-shadow: 0 10px 40px rgba(0, 0, 0, .35);
+}
+
+dialog.fc-dash-dialog::backdrop {
+	background: rgba(0, 0, 0, .45);
+}
+
+dialog.fc-dash-dialog .fc-dash-dlg-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: .75rem 1rem;
+	font-weight: 600;
+	border-bottom: 1px solid var(--card-border-color, #ddd);
+}
+
+dialog.fc-dash-dialog .fc-dash-dlg-body {
+	padding: 1rem;
+	overflow: auto;
+	max-height: 62vh;
+}
+
+dialog.fc-dash-dialog .fc-dash-dlg-foot {
+	display: flex;
+	justify-content: flex-end;
+	gap: .5rem;
+	padding: .75rem 1rem;
+	border-top: 1px solid var(--card-border-color, #ddd);
+}
+
+dialog.fc-dash-dialog h4 {
+	margin: 0 0 .5rem;
+	font-size: .9rem;
+	text-transform: uppercase;
+	letter-spacing: .03em;
+	opacity: .7;
+}
+
+dialog.fc-dash-dialog .fc-dash-chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: .4rem;
+	margin-bottom: 1.25rem;
+}
+
+dialog.fc-dash-dialog .fc-dash-chips button {
+	display: inline-flex;
+	align-items: center;
+	gap: .4rem;
+	padding: .3rem .7rem;
+	color: inherit;
+	background: var(--tertiary-bg, #f4f5f7);
+	border: 1px solid var(--card-border-color, #ccc);
+	border-radius: 2rem;
+	cursor: pointer;
+}
+
+dialog.fc-dash-dialog .fc-dash-chips button:disabled {
+	opacity: .4;
+	cursor: not-allowed;
+}
+
+dialog.fc-dash-dialog .fc-dash-pick-hint {
+	margin: 0 0 .6rem;
+	font-size: .85rem;
+	opacity: .7;
+}
+
+dialog.fc-dash-dialog details.fc-dash-custom > summary {
+	margin-bottom: .4rem;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+dialog.fc-dash-dialog .fc-dash-chips button:not(:disabled):hover {
+	color: #fff;
+	background: var(--primary-bg, #0d6efd);
+	border-color: var(--primary-bg, #0d6efd);
+}
+
+dialog.fc-dash-dialog label {
+	display: block;
+	margin: .6rem 0 .2rem;
+	font-size: .85rem;
+	font-weight: 600;
+}
+
+dialog.fc-dash-dialog input[type=text],
+dialog.fc-dash-dialog select {
+	width: 100%;
+}
+
+dialog.fc-dash-dialog .fc-dash-icons {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(38px, 1fr));
+	gap: .3rem;
+	margin-top: .3rem;
+}
+
+dialog.fc-dash-dialog .fc-dash-icons button {
+	padding: .35rem 0;
+	font-size: 1.15rem;
+	color: inherit;
+	background: transparent;
+	border: 1px solid var(--card-border-color, #ccc);
+	border-radius: .25rem;
+	cursor: pointer;
+}
+
+dialog.fc-dash-dialog .fc-dash-icons button.active {
+	color: #fff;
+	background: var(--primary-bg, #0d6efd);
+	border-color: var(--primary-bg, #0d6efd);
+}
+
+dialog.fc-dash-dialog .fc-dash-error {
+	margin-top: .5rem;
+	color: #dc3545;
+	font-size: .85rem;
+}
+
+
+/* "Customize dashboard" button */
+#flexicontent .fc-dash-customize-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: .6rem;
+	padding: .5rem 1.15rem;
+	font-weight: 500;
+	color: #fff;
+	background: linear-gradient(180deg, #2f6fd0 0%, #1c4f9c 100%);
+	border: 1px solid #1a4690;
+	border-radius: .4rem;
+	box-shadow: 0 1px 3px rgba(28, 79, 156, .35);
+	transition: background .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+
+#flexicontent .fc-dash-customize-btn:hover,
+#flexicontent .fc-dash-customize-btn:focus-visible {
+	color: #fff;
+	background: linear-gradient(180deg, #3a7be0 0%, #225ab0 100%);
+	box-shadow: 0 3px 8px rgba(28, 79, 156, .45);
+	transform: translateY(-1px);
+}
+
+#flexicontent .fc-dash-customize-btn:active {
+	transform: none;
+	box-shadow: 0 1px 2px rgba(28, 79, 156, .4);
+}
+
+#flexicontent .fc-dash-customize-btn [class^="icon-"] {
+	margin: 0;
+	font-size: 1.05em;
+}
+
+
+/* Custom background color of a block */
+#flexicontent .fc-dash-colored.fc-dashboard-card,
+#flexicontent .fc-dash-colored > .fc-dashboard-card {
+	background: var(--fc-dash-bg) !important;
+}
+
+#flexicontent .fc-dash-colored .fc-board-header,
+#flexicontent .fc-dash-colored .fc-dash-title-input,
+#flexicontent .fc-dash-colored .fc-dash-handle,
+#flexicontent .fc-dash-colored .fc-dash-iconbtn,
+#flexicontent .fc-dash-colored .fc-dash-colorbtn,
+#flexicontent .fc-dash-colored .fc-dash-widths button:not(.active) {
+	color: var(--fc-dash-fg);
+}
+
+#flexicontent .fc-dash-colored .fc-board-header {
+	background: transparent;
+	border-bottom-color: rgba(127, 127, 127, .35);
+}
+
+#flexicontent .fc-dash-colored .fc-dash-widths,
+#flexicontent .fc-dash-colored .fc-dash-widths button {
+	border-color: rgba(127, 127, 127, .5);
+}
+
+/* Palette icon with the native color picker */
+#flexicontent .fc-dash-colorbtn {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 1.9rem;
+	height: 1.9rem;
+	margin: 0;
+	border-radius: .25rem;
+	opacity: .65;
+	cursor: pointer;
+}
+
+#flexicontent .fc-dash-colorbtn:hover {
+	opacity: 1;
+	background: rgba(127, 127, 127, .15);
+}
+
+#flexicontent .fc-dash-colorbtn input[type=color] {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	padding: 0;
+	opacity: 0;
+	cursor: pointer;
 }

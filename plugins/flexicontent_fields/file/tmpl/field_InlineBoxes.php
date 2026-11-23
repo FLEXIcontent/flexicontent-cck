@@ -339,9 +339,27 @@ HTML;
 
 		'.(in_array($form_info_header, [2,3]) && $use_myfiles != 4 ? '
 		<div class="fcclear"></div>
-		<div class="'.$input_grp_class.' fc-xpended-row">
-			<label class="fc-lbl fc_filedata_title-lbl">'.Text::_( 'FLEXI_ORIGINAL_FILENAME' ).'</label>
-			<input type="text" disabled class="' . $add_on_class . ' fc_filedata_title" value="'. htmlentities($filename_original, ENT_COMPAT, 'UTF-8') .'" />
+		<div class="fc-file-info" data-fc-info="'. htmlspecialchars((string) json_encode(array(
+			'title'       => (string) $file_data->altname,
+			'url'         => (int) $file_data->url === 1 ? (string) $file_data->filename : '',
+			'description' => (string) $file_data->description,
+			'custom1'     => isset($file_data->custom1) ? (string) $file_data->custom1 : '',
+			'custom2'     => isset($file_data->custom2) ? (string) $file_data->custom2 : '',
+			'ext'         => (string) $file_data->ext,
+			'size'        => isset($file_data->size) ? (string) $file_data->size : '',
+		), JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8') .'" data-fc-custom-labels="'. htmlspecialchars((string) json_encode(array(
+			1 => isset($custom_props[1]) ? $custom_props[1]['label'] : '',
+			2 => isset($custom_props[2]) ? $custom_props[2]['label'] : '',
+		), JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8') .'">
+			'.(!$iform_title ? '
+			<div class="fc-file-info-row">
+				<label class="fc-file-info-lbl fc_filedata_alttitle-lbl">'.Text::_( 'FLEXI_FILE_DISPLAY_TITLE' ).'</label>
+				<input type="text" readonly="readonly" tabindex="-1" class="fc-file-info-val fc_filedata_alttitle" value="'. htmlspecialchars((string) $file_data->altname, ENT_COMPAT, 'UTF-8') .'" />
+			</div>' : '').'
+			<div class="fc-file-info-row">
+				<label class="fc-file-info-lbl fc_filedata_title-lbl">'.Text::_( 'FLEXI_ORIGINAL_FILENAME' ).'</label>
+				<input type="text" readonly="readonly" tabindex="-1" class="fc-file-info-val fc_filedata_title" value="'. htmlspecialchars((string) $filename_original, ENT_COMPAT, 'UTF-8') .'" />
+			</div>
 		</div>' : '').'
 
 		<div class="fcclear"></div>

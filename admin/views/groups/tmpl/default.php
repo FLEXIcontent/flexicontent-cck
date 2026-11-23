@@ -43,15 +43,17 @@ $view_entry = \Joomla\CMS\Language\Text::_('FLEXI_VIEW', true);
 
 
 /**
- * JS for Columns chooser box and Filters box
+ * Resizable / movable / hideable columns (replaces the old column chooser), settings are stored in the browser
  */
 
-flexicontent_html::jscode_to_showhide_table(
-	'mainChooseColBox',
-	'adminListTableFC' . $this->view,
-	$start_html = '',  //'<span class="badge ' . (FLEXI_J40GE ? 'badge-dark' : 'badge-inverse') . '">' . \Joomla\CMS\Language\Text::_('FLEXI_COLUMNS', true) . '<\/span> &nbsp; ',
-	$end_html = '<div id="fc-columns-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="' . \Joomla\CMS\Language\Text::_('FLEXI_HIDE') . '" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/div>'
-);
+$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/css/fc_table_tools.css', array('version' => FLEXI_VHASH));
+$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/css/fc_type_tabs.css', array('version' => FLEXI_VHASH));
+$document->addScript(\Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/js/fc-table-tools.js', array('version' => FLEXI_VHASH));
+
+foreach (array('FLEXI_TBL_MOVE_COL', 'FLEXI_TBL_HIDE_COL', 'FLEXI_TBL_SHOW_COL', 'FLEXI_TBL_FIT_COL', 'FLEXI_TBL_RESET_WIDTHS', 'FLEXI_TBL_RESET_COLS') as $fc_txt)
+{
+	\Joomla\CMS\Language\Text::script($fc_txt);
+}
 
 
 
@@ -139,7 +141,7 @@ if ($js)
 <?php endif;?>
 
 
-	<div id="fc-managers-header">
+	<div id="fc-managers-header" class="fc-mh-items fc-mh-solo">
 
 		<?php if (!empty($this->lists['scope_tip'])) : ?>
 		<div class="fc-filter-head-box filter-search nowrap_box" style="margin: 0;">
@@ -216,21 +218,21 @@ if ($js)
 	<table id="adminListTableFC<?php echo $this->view; ?>" class="adminlist table fcmanlist" itemscope itemtype="http://schema.org/WebPage">
 	<thead>
 		<tr>
-			<th class="col_num"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_NUM' ); ?></th>
-			<th class="col_cb left">
+			<th class="col_num" data-col="num"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_NUM' ); ?></th>
+			<th class="col_cb left" data-col="cb">
 				<div class="group-fcset">
 					<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value="" title="<?php echo \Joomla\CMS\Language\Text::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
 					<label for="checkall-toggle" class="green single"></label>
 				</div>
 			</th>
 
-			<th class="col_title hideOnDemandClass left">
+			<th class="col_title hideOnDemandClass left" data-col="title">
 				<?php echo \Joomla\CMS\Language\Text::_('COM_USERS_HEADING_GROUP_TITLE'); ?>
 			</th>
-			<th class="col_usergrp hideOnDemandClass left">
+			<th class="col_usergrp hideOnDemandClass left" data-col="usergrp">
 				<?php echo \Joomla\CMS\Language\Text::_('COM_USERS_HEADING_USERS_IN_GROUP'); ?>
 			</th>
-			<th class="col_id center hideOnDemandClass">
+			<th class="col_id center hideOnDemandClass" data-col="id">
 				<?php echo \Joomla\CMS\Language\Text::_('JGRID_HEADING_ID'); ?>
 			</th>
 		</tr>
@@ -247,14 +249,14 @@ if ($js)
 		$canChange	= $user->authorise('core.edit.state',	'com_users');
 	?>
 		<tr class="row<?php echo $i % 2; ?>">
-			<td class="col_num">
+			<td class="col_num" data-col="num">
 				<?php echo $this->pagination->getRowOffset($i); ?>
 			</td>
-			<td class="col_cb">
+			<td class="col_cb" data-col="cb">
 				<!--div class="adminlist-table-row"></div-->
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_($hlpname . '.grid_id', $i, $item->id); ?>
 			</td>
-			<td class="col_title ">
+			<td class="col_title " data-col="title">
 				<?php echo str_repeat('<span class="gi">|&mdash;</span>', $item->level) ?>
 				<?php if ($canEdit) : ?>
 				<a href="<?php echo \Joomla\CMS\Router\Route::_('index.php?option=com_flexicontent&task=group.edit&id='.$item->id);?>">
@@ -267,7 +269,7 @@ if ($js)
 					<?php echo \Joomla\CMS\Language\Text::_(FLEXI_J40GE ? 'COM_USERS_DEBUG_PERMISSIONS' : 'COM_USERS_DEBUG_GROUP');?></a></div></div></div>
 				<?php endif; ?>
 			</td>
-			<td class="col_usergrp left">
+			<td class="col_usergrp left" data-col="usergrp">
 				<?php echo '<span class="badge bg-info badge-info">'.$item->user_count.'</span>'; ?>
 				<?php
 				if ($item->user_count) {
@@ -278,7 +280,7 @@ if ($js)
 				}
 				?>
 			</td>
-			<td class="col_id center">
+			<td class="col_id center" data-col="id">
 				<?php echo (int) $item->id; ?>
 			</td>
 		</tr>
@@ -286,6 +288,7 @@ if ($js)
 	</tbody>
 
 	</table>
+	<script>window.fcTableTools && fcTableTools.init('adminListTableFC<?php echo $this->view; ?>');</script>
 
 
 	<div>

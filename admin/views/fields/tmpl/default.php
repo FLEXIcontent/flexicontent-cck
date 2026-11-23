@@ -57,12 +57,16 @@ $flexi_toggle    = Text::_('FLEXI_CLICK_TO_TOGGLE', true);
  * JS for Columns chooser box and Filters box
  */
 
-flexicontent_html::jscode_to_showhide_table(
-	'mainChooseColBox',
-	'adminListTableFC' . $this->view,
-	$start_html = '',  //'<span class="badge ' . (FLEXI_J40GE ? 'badge-dark' : 'badge-inverse') . '">' . Text::_('FLEXI_COLUMNS', true) . '<\/span> &nbsp; ',
-	$end_html = '<div id="fc-columns-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="' . Text::_('FLEXI_HIDE') . '" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/div>'
-);
+// Resizable / movable / hideable columns (replaces the old column chooser), settings are stored in the browser
+$document = \Joomla\CMS\Factory::getApplication()->getDocument();
+$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/css/fc_table_tools.css', array('version' => FLEXI_VHASH));
+$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/css/fc_type_tabs.css', array('version' => FLEXI_VHASH));
+$document->addScript(\Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/js/fc-table-tools.js', array('version' => FLEXI_VHASH));
+
+foreach (array('FLEXI_TBL_MOVE_COL', 'FLEXI_TBL_HIDE_COL', 'FLEXI_TBL_SHOW_COL', 'FLEXI_TBL_FIT_COL', 'FLEXI_TBL_RESET_WIDTHS', 'FLEXI_TBL_RESET_COLS') as $fc_txt)
+{
+	Text::script($fc_txt);
+}
 
 
 
@@ -102,12 +106,12 @@ if ($this->reOrderingActive)
 {
 	$_title = Text::_(!$this->filter_type ? 'FLEXI_GLOBAL_ORDER' : 'FLEXI_TYPE_ORDER', true);
 
-	$image_ordering_tip = '<span class="icon-info ' . $this->tooltip_class . '" title="' . flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_ENABLED_DESC', 1, 1)  . '<br><br>' . $_title . '"></span>';
+	$ordering_tip_title = flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_ENABLED_DESC', 1, 1)  . '<br><br>' . $_title;
 	$drag_handle_box = '<div class="fc_drag_handle%s" title="' . Text::_('FLEXI_ORDER_SAVE_WHEN_DONE', true) . '"></div>';
 }
 else
 {
-	$image_ordering_tip = '<span class="icon-info ' . $this->tooltip_class . '" title="' . flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_DISABLED_DESC', 1, 1) . '"></span>';
+	$ordering_tip_title = flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_DISABLED_DESC', 1, 1);
 	$drag_handle_box = '<div class="fc_drag_handle%s" title="' . Text::_('FLEXI_ORDER_COLUMN_FIRST', true) . '" ></div>';
 	$image_saveorder    = '';
 }
@@ -261,7 +265,7 @@ if ($js)
 <?php endif;?>
 
 
-	<div id="fc-managers-header">
+	<div id="fc-managers-header" class="fc-mh-items fc-mh-solo">
 
 		<?php if (!empty($this->lists['scope_tip'])) : ?>
 		<div class="fc-filter-head-box filter-search nowrap_box" style="margin: 0;">
@@ -414,37 +418,32 @@ if ($js)
 
 		<div class="clear"></div>
 
-		<div id="fcorder_notes_box" class="hidden-phone <?php echo $msg_class; ?>" style="<?php echo $msg_style; ?> line-height: 28px; max-width: unset; display: inline-block; margin: 0 32px 0 0;">
+		<div id="fcorder_notes_box" class="hidden-phone fc-order-fields">
 			<?php echo $order_msg;?>
 			<div id="order_type_selector" class="fc-iblock">
 				<?php echo $this->lists['filter_type']; ?>
 			</div>
-		</div>
-
-		<div id="fc_fieldtype_filter_box" class="<?php echo $msg_class; ?>" style="<?php echo $msg_style; ?> line-height: 28px; max-width: unset; display: inline-block;">
-			<?php echo $this->lists['filter_fieldtype']; ?>
+			<div id="fc_fieldtype_filter_box" class="fc-iblock">
+				<?php echo $this->lists['filter_fieldtype']; ?>
+			</div>
 		</div>
 
 		<div class="fcclear"></div>
 
-		<?php if ($canOrder): ?>
-		<div class="hidden-phone" style="z-index: 1; position: sticky; top: 30%; margin: 0 -20px;">
-			<div style="position: absolute; margin: 0; height: 0;">
-				<div style="padding: 0px; font-weight: normal; line-height: 28px; width: auto; text-align: center;">
-					<?php echo HTMLHelper::_($hlpname . '.saveorder_btn', $this->rows, $_config = null); ?>
-				</div>
+		<div class="fc-reorder-panel">
+			<div class="fc-reorder-help">
+				<span><?php echo Text::_($canOrder ? 'FLEXI_REORDER_HELP_FIELDS' : 'FLEXI_FCORDER_ONLY_VIEW'); ?></span>
+			</div>
+			<div class="fc-reorder-actions">
+				<?php if ($canOrder): ?>
+					<?php echo HTMLHelper::_($hlpname . '.manualorder_btn', $this->rows, (object) array('custom_txt' => 'FLEXI_REORDER_MANUAL')); ?>
+					<?php echo HTMLHelper::_($hlpname . '.saveorder_btn', $this->rows, (object) array('custom_txt' => 'FLEXI_REORDER_SAVE')); ?>
+				<?php endif; ?>
+				<button type="button" class="btn btn-sm btn-outline-secondary"
+					onclick="document.getElementById('filter_order').value='a.id'; document.getElementById('filter_order_Dir').value='DESC'; if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();"
+				><?php echo Text::_('FLEXI_REORDER_EXIT'); ?></button>
 			</div>
 		</div>
-		<div class="hidden-phone" style="z-index: 1; position: sticky; top: 30%; margin: 0 -20px;">
-			<div style="position: absolute; margin: 40px 0 0 0; height: 0;">
-				<div style="padding: 0px; font-weight: normal; line-height: 28px; width: auto; text-align: center;">
-					<?php echo HTMLHelper::_($hlpname . '.manualorder_btn', $this->rows, $_config = null); ?>
-				</div>
-			</div>
-		</div>
-		<?php else: ?>
-			<?php echo '<span class="icon-cancel ' . $this->tooltip_class . '" title="'.flexicontent_html::getToolTip('', 'FLEXI_FCORDER_ONLY_VIEW', 1, 1) . '"></span>'; ?>
-		<?php endif; ?>
 
 	<?php endif; ?>
 
@@ -458,45 +457,61 @@ if ($js)
 				<?php echo Text::_( 'FLEXI_NUM' ); ?>
 			</th-->
 
-			<th class="col_order center hidden-phone">
+			<th class="col_order center hidden-phone" data-col="order">
 				<?php
-				echo $canOrder ? $image_ordering_tip : '';
-				echo str_replace('_FLEXI_ORDER_',
+				$order_sort_html = str_replace('_FLEXI_ORDER_',
 					''/*Text::_('FLEXI_ORDER', true)*/,
 					str_replace('_FLEXI_ORDER_</a>', '<span class="icon-menu-2 btn btn-micro"></span></a>',
 					HTMLHelper::_('grid.sort', '_FLEXI_ORDER_', (!$this->filter_type ? 'a.ordering' : 'typeordering'), $this->lists['order_Dir'], $this->lists['order']))
 				);
+
+				// The reordering info is shown as the tooltip of the sort button (it used to be a separate "i" icon, making the header taller)
+				if ($canOrder)
+				{
+					$tip_attr = $ordering_tip_title;
+					$tip_cls  = $this->tooltip_class;
+
+					$order_sort_html = preg_match('/<a\b[^>]*\btitle="/', $order_sort_html)
+						? preg_replace_callback('/(<a\b[^>]*\b)title="[^"]*"/', function ($m) use ($tip_attr) { return $m[1] . 'title="' . $tip_attr . '"'; }, $order_sort_html, 1)
+						: preg_replace_callback('/<a\b/', function ($m) use ($tip_attr) { return '<a title="' . $tip_attr . '"'; }, $order_sort_html, 1);
+
+					$order_sort_html = preg_match('/<a\b[^>]*\bclass="/', $order_sort_html)
+						? preg_replace_callback('/(<a\b[^>]*\bclass=")/', function ($m) use ($tip_cls) { return $m[1] . $tip_cls . ' '; }, $order_sort_html, 1)
+						: preg_replace_callback('/<a\b/', function ($m) use ($tip_cls) { return '<a class="' . $tip_cls . '"'; }, $order_sort_html, 1);
+				}
+
+				echo $order_sort_html;
 				?>
 				<span class="column_toggle_lbl" style="display:none;"><?php echo Text::_( 'FLEXI_ORDER' ); ?></span>
 			</th>
 
-			<th class="col_cb left">
+			<th class="col_cb left" data-col="cb">
 				<div class="group-fcset">
 					<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value="" title="<?php echo Text::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
 					<label for="checkall-toggle" class="green single"></label>
 				</div>
 			</th>
 
-			<th class="col_status hideOnDemandClass left">
+			<th class="col_status hideOnDemandClass left" data-col="status">
 				<?php echo HTMLHelper::_('grid.sort', 'FLEXI_STATUS', 'a.' . $this->state_propname, $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
 			<?php /*<th style="padding:0px;"><?php echo HTMLHelper::_('grid.sort', 'FLEXI_FIELD_DESCRIPTION', 'a.description', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>*/ ?>
 
-			<th class="col_title hideOnDemandClass title" colspan="2" style="text-align:left; padding-left:18px; padding-right:18px;">
+			<th class="col_title hideOnDemandClass title" data-col="title" colspan="2" style="text-align:left; padding-left:18px; padding-right:18px;">
 				<?php echo HTMLHelper::_('grid.sort', 'FLEXI_FIELD_LABEL', 'a.label', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="col_alias hideOnDemandClass hidden-phone hidden-tablet">
+			<th class="col_alias hideOnDemandClass hidden-phone hidden-tablet" data-col="alias">
 				<?php echo HTMLHelper::_('grid.sort', 'FLEXI_FIELD_NAME', 'a.name', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<small>(<?php echo Text::_('FLEXI_ALIAS'); ?>)</small>
 			</th>
 
-			<th class="col_fieldtype hideOnDemandClass hidden-phone" colspan="2">
+			<th class="col_fieldtype hideOnDemandClass hidden-phone" data-col="fieldtype" colspan="2">
 				<?php echo HTMLHelper::_('grid.sort', 'FLEXI_FIELD_TYPE', 'a.field_type', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="hideOnDemandClass center nowrap hidden-phone hidden-tablet" colspan="2">
+			<th class="hideOnDemandClass center nowrap hidden-phone hidden-tablet" data-col="lists" colspan="2">
 				<?php echo '<small class="label" style="padding: 2px 4px; border-radius: 4px;">'.Text::_( 'Content Lists' ).'</small>'; ?><br/>
 				<small>
 					<?php echo HTMLHelper::_('grid.sort', 'FLEXI_SEARCH', 'a.issearch', $this->lists['order_Dir'], $this->lists['order'] ); ?> /
@@ -505,7 +520,7 @@ if ($js)
 				<span class="column_toggle_lbl" style="display:none;"><?php echo '<small class="badge">'.Text::_( 'Content Lists' ).'</small>'; ?></span>
 			</th>
 
-			<th class="hideOnDemandClass center nowrap hidden-phone hidden-tablet" colspan="2">
+			<th class="hideOnDemandClass center nowrap hidden-phone hidden-tablet" data-col="searchview" colspan="2">
 				<?php echo '<small class="label" style="padding: 2px 4px; border-radius: 4px;">'.Text::_( 'Search view' ).'</small>'; ?><br/>
 				<small>
 					<?php echo HTMLHelper::_('grid.sort', 'FLEXI_SEARCH', 'a.isadvsearch', $this->lists['order_Dir'], $this->lists['order'] ); ?> /
@@ -514,27 +529,27 @@ if ($js)
 				<span class="column_toggle_lbl" style="display:none;"><?php echo '<small class="badge">'.Text::_( 'Search view' ).'</small>'; ?></span>
 			</th>
 
-			<th class="col_ntypes hideOnDemandClass left hidden-phone" colspan="2">
+			<th class="col_ntypes hideOnDemandClass left hidden-phone" data-col="ntypes" colspan="2">
 				<?php echo HTMLHelper::_('grid.sort', 'FLEXI_ASSIGNED_TYPES', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="col_common_props hideOnDemandClass left hidden-phone hidden-tablet">
+			<th class="col_common_props hideOnDemandClass left hidden-phone hidden-tablet" data-col="props">
 				<?php echo $common_properties_tip . Text::_('FLEXI_PROPERTIES'); ?>
 			</th>
 
-			<th class="col_showin_clients hideOnDemandClass left hidden-phone hidden-tablet">
+			<th class="col_showin_clients hideOnDemandClass left hidden-phone hidden-tablet" data-col="clients">
 				<?php echo $showin_clients_tip . Text::_('FLEXI_CLIENTS'); ?>
 			</th>
 
-			<th class="col_showin_views hideOnDemandClass left hidden-phone hidden-tablet">
+			<th class="col_showin_views hideOnDemandClass left hidden-phone hidden-tablet" data-col="views">
 				<?php echo $showin_views_tip . Text::_('FLEXI_VIEWS'); ?>
 			</th>
 
-			<th class="col_access hideOnDemandClass left hidden-phone hidden-tablet">
+			<th class="col_access hideOnDemandClass left hidden-phone hidden-tablet" data-col="access">
 				<?php echo HTMLHelper::_('grid.sort', 'FLEXI_ACCESS', 'a.access', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="hideOnDemandClass col_id center hidden-phone hidden-tablet">
+			<th class="hideOnDemandClass col_id center hidden-phone hidden-tablet" data-col="id">
 				<?php echo HTMLHelper::_('grid.sort', 'FLEXI_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order']); ?>
 			</th>
 
@@ -612,7 +627,7 @@ if ($js)
 
 		<?php if ($canOrder) : ?>
 
-			<td class="col_order nowrap center hidden-phone">
+			<td class="col_order nowrap center hidden-phone" data-col="order">
 				<?php
 					$show_orderUp   = $i > 0;
 					$show_orderDown = $i < $total_rows-1;
@@ -638,7 +653,7 @@ if ($js)
 
 		<?php else : ?>
 
-			<td class="center hidden-phone">
+			<td class="center hidden-phone" data-col="order">
 				<?php
 				echo !$this->reOrderingActive
 					? '<span class="icon-move" style="color: #d0d0d0"></span>'
@@ -648,12 +663,12 @@ if ($js)
 
 		<?php endif; ?>
 
-			<td class="col_cb">
+			<td class="col_cb" data-col="cb">
 				<!--div class="adminlist-table-row"></div-->
 				<?php echo HTMLHelper::_($hlpname . '.grid_id', $i, $row->id); ?>
 			</td>
 
-			<td class="col_status">
+			<td class="col_status" data-col="status">
 				<div class="btn-group fc-group fc-fields">
 					<?php
 					/**
@@ -674,11 +689,11 @@ if ($js)
 				</div>
 			</td>
 
-			<td class="col_title_info">
+			<td class="col_title_info" data-col="title">
 				<?php echo HTMLHelper::_($hlpname . '.info_text', $row, $i, 'description', 'FLEXI_FIELD_DESCRIPTION'); ?>
 			</td>
 
-			<td class="col_title">
+			<td class="col_title" data-col="title">
 				<?php
 				echo $padspacer;
 
@@ -700,11 +715,11 @@ if ($js)
 				?>
 			</td>
 
-			<td class="col_alias hidden-phone hidden-tablet">
+			<td class="col_alias hidden-phone hidden-tablet" data-col="alias">
 				<?php echo $row->name; ?>
 			</td>
 
-			<td class="col_fieldtype_info hidden-phone">
+			<td class="col_fieldtype_info hidden-phone" data-col="fieldtype">
 				<?php
 					$ctype_title = '';
 					$ctype_desc = '';
@@ -771,31 +786,31 @@ if ($js)
 				?>
 			</td>
 
-			<td class="col_fieldtype  hidden-phone">
+			<td class="col_fieldtype  hidden-phone" data-col="fieldtype">
 				<?php echo HTMLHelper::_($hlpname . '.fieldtype_info', $row, $i); ?>
 			</td>
 
-			<td class="right hidden-phone hidden-tablet">
+			<td class="right hidden-phone hidden-tablet" data-col="lists">
 				<?php echo $search_filter_icons['search']; ?>
 			</td>
 
-			<td class="left hidden-phone hidden-tablet">
+			<td class="left hidden-phone hidden-tablet" data-col="lists">
 				<?php echo $search_filter_icons['filter']; ?>
 			</td>
 
-			<td class="right hidden-phone hidden-tablet">
+			<td class="right hidden-phone hidden-tablet" data-col="searchview">
 				<?php echo $search_filter_icons['advsearch']; ?>
 			</td>
 
-			<td class="left hidden-phone hidden-tablet">
+			<td class="left hidden-phone hidden-tablet" data-col="searchview">
 				<?php echo $search_filter_icons['advfilter']; ?>
 			</td>
 
-			<td class="col_ntypes_count center hidden-phone">
+			<td class="col_ntypes_count center hidden-phone" data-col="ntypes">
 				<?php echo $row->nrassigned ? '<span class="badge bg-info badge-info hasTooltip">'.$row->nrassigned.'</span>' : $orphan_warning; ?>
 			</td>
 
-			<td class="col_ntypes_list hidden-phone">
+			<td class="col_ntypes_list hidden-phone" data-col="ntypes">
 				<?php
 				if (!count($row->content_types))
 				{
@@ -826,7 +841,7 @@ if ($js)
 				?>
 			</td>
 
-			<td class="col_common_props hidden-phone hidden-tablet">
+			<td class="col_common_props hidden-phone hidden-tablet" data-col="props">
 				<?php
 				echo $row->parameters->get('display_label')
 					? '<span class="icon-info" title="'.Text::_('FLEXI_FIELD_DISPLAY_LABEL').'" style="color:black; font-size: 16px;"></span>'
@@ -843,7 +858,7 @@ if ($js)
 				?>
 			</td>
 
-			<td class="col_showin_clients hidden-phone hidden-tablet">
+			<td class="col_showin_clients hidden-phone hidden-tablet" data-col="clients">
 				<?php
 				$show_in_clients = FLEXIUtilities::paramToArray($row->parameters->get('show_in_clients', array('desktop', 'tablet', 'mobile')));
 				echo ' ';
@@ -859,7 +874,7 @@ if ($js)
 				?>
 			</td>
 
-			<td class="col_showin_views hidden-phone hidden-tablet">
+			<td class="col_showin_views hidden-phone hidden-tablet" data-col="views">
 				<?php
 				$show_in_views = FLEXIUtilities::paramToArray($row->parameters->get('show_in_views', array('item', 'category', 'module', 'backend')));
 				echo ' ';
@@ -875,14 +890,14 @@ if ($js)
 				?>
 			</td>	
 
-			<td class="col_access hidden-phone hidden-tablet">
+			<td class="col_access hidden-phone hidden-tablet" data-col="access">
 				<?php echo $row->canEdit
 					? flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'class="fcfield_selectval" onchange="return Joomla.listItemTask(\'cb'.$i.'\',\''.$ctrl.'access\')"')
 					: $this->escape($row->access_level);
 				?>
 			</td>
 
-			<td class="col_id center hidden-phone hidden-tablet">
+			<td class="col_id center hidden-phone hidden-tablet" data-col="id">
 				<?php echo $row->id; ?>
 			</td>
 
@@ -893,6 +908,7 @@ if ($js)
 	</tbody>
 
 	</table>
+	<script>window.fcTableTools && fcTableTools.init('adminListTableFC<?php echo $this->view; ?>');</script>
 
 
 	<div>

@@ -69,7 +69,21 @@ $copyTmpl_icon     = '<span class="icon-copy"></span>';
 $delTmpl_icon      = '<span class="icon-delete"></span>';
 	//\Joomla\CMS\HTML\HTMLHelper::image ( 'administrator/components/com_flexicontent/assets/images/layout_delete.png', \Joomla\CMS\Language\Text::_( 'FLEXI_REMOVE', true ), ' style="min-width:16px;" class="'.$ico_class.' '.$tip_class.'" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_REMOVE', true ).'" '  );
 
-$list_total_cols = 8;
+$document = \Joomla\CMS\Factory::getApplication()->getDocument();
+
+/**
+ * Resizable / movable / hideable columns (replaces the old column chooser), settings are stored in the browser
+ */
+
+$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/css/fc_table_tools.css', array('version' => FLEXI_VHASH));
+$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/css/fc_type_tabs.css', array('version' => FLEXI_VHASH));
+$document->addScript(\Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/js/fc-table-tools.js', array('version' => FLEXI_VHASH));
+
+foreach (array('FLEXI_TBL_MOVE_COL', 'FLEXI_TBL_HIDE_COL', 'FLEXI_TBL_SHOW_COL', 'FLEXI_TBL_FIT_COL', 'FLEXI_TBL_RESET_WIDTHS', 'FLEXI_TBL_RESET_COLS') as $fc_txt)
+{
+	\Joomla\CMS\Language\Text::script($fc_txt);
+}
+
 ?>
 
 
@@ -97,6 +111,19 @@ $list_total_cols = 8;
 
 
 <div id="outer_templates">
+
+	<div id="fc-managers-header" class="fc-mh-items fc-mh-solo">
+		<div class="fc-filter-head-box nowrap_box">
+			<div class="btn-group">
+				<div id="fc_mainChooseColBox_btn" class="hasTooltip btn btn-outline-dark hidden-phone" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" title="<?php echo flexicontent_html::getToolTip('FLEXI_COLUMNS', 'FLEXI_ABOUT_AUTO_HIDDEN_COLUMNS', 1, 1); ?>">
+					<span class="icon-contract"></span><sup id="columnchoose_totals"></sup>
+				</div>
+			</div>
+			<div id="mainChooseColBox" class="group-fcset fcman-abs" style="display:none;"></div>
+		</div>
+	</div>
+
+	<div class="fcclear"></div>
 	
 	<!--
 	<?php $_class = FLEXI_J30GE ? ' btn' : ' fc_button fcsimple fcsmall'; ?>
@@ -109,20 +136,20 @@ $list_total_cols = 8;
 	
 	<thead>
 		<tr>
-			<th><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_NUM' ); ?></th>
-			<th class="left">
+			<th data-col="num"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_NUM' ); ?></th>
+			<th class="left" data-col="cb">
 				<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value="" title="<?php echo \Joomla\CMS\Language\Text::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
 				<label for="checkall-toggle" class="green single"></label>
 			</th>
-			<th></th>
-			<th class="title" style="text-align:left;"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_TEMPLATE_NAME' ); ?></th>
-			<th colspan="2" style="text-align: left">
-				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_SINGLE_CONTENT' ); ?><br/>
-				<span class="badge text-white bg-info">ITEM Layout</span>
+			<th data-col="actions" data-col-label="<?php echo htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_ACTIONS'), ENT_QUOTES, 'UTF-8'); ?>"></th>
+			<th class="title" style="text-align:left;" data-col="title"><?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_TEMPLATE_NAME' ); ?></th>
+			<th colspan="2" style="text-align: left" data-col="item" data-col-label="<?php echo htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_SINGLE_CONTENT'), ENT_QUOTES, 'UTF-8'); ?>">
+				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_SINGLE_CONTENT' ); ?>
+				<span class="badge text-white bg-info ms-2">ITEM Layout</span>
 			</th>
-			<th colspan="2" style="text-align: left">
-				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_CONTENT_LISTS' ); ?><br/>
-				<span class="badge text-white bg-info">CATEGORY Layout</span>
+			<th colspan="2" style="text-align: left" data-col="cat" data-col-label="<?php echo htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_CONTENT_LISTS'), ENT_QUOTES, 'UTF-8'); ?>">
+				<?php echo \Joomla\CMS\Language\Text::_( 'FLEXI_CONTENT_LISTS' ); ?>
+				<span class="badge text-white bg-info ms-2">CATEGORY Layout</span>
 			</th>
 		</tr>
 	</thead>
@@ -149,15 +176,15 @@ $list_total_cols = 8;
 			$checked	= \Joomla\CMS\HTML\HTMLHelper::_('grid.checkedout', $row, $i );
 			?>
 		<tr class="<?php echo "row$k"; ?>" id="<?php echo 'up-'.$row->name ?>">
-			<td>
+			<td data-col="num">
 				<?php echo $i+1; ?>
 			</td>
-			<td>
+			<td data-col="cb">
 				<!--div class="adminlist-table-row"></div-->
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.id', $i, $row->id); ?>
 				<label for="cb<?php echo $i; ?>" class="green single"></label>
 			</td>
-			<td class="right">
+			<td class="right" data-col="actions">
 				<?php if (!in_array($row->name, $basetemplates)) :?>
 					<span class="<?php echo $this->btn_sm_class; ?> hasTooltip deletable-template" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_REMOVE_TEMPLATE', true); ?>" id="<?php echo 'del-' . $row->name ?>">
 						<?php echo $delTmpl_icon; ?>
@@ -168,7 +195,7 @@ $list_total_cols = 8;
 					<?php echo $copyTmpl_icon; ?>
 				</span>
 			</td>
-			<td>
+			<td data-col="title">
 				<?php echo htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8'); ?>
 				<?php if (in_array($row->name, $basetemplates)) :?>
 					<!--<span class="icon-lock"></span>-->
@@ -176,12 +203,12 @@ $list_total_cols = 8;
 					<span class="icon-user"></span><span class="badge bg-dark text-white"><?php echo \Joomla\CMS\Language\Text::_('FLEXI_USER').' - '.\Joomla\CMS\Language\Text::_('FLEXI_CREATED'); ?></span>
 				<?php endif; ?>
 			</td>
-			<td>
+			<td data-col="item">
 				<?php echo !empty($row->items)
 					? '<a class="' . $this->btn_sm_class . ' hasTooltip" href="'.$itemlink.'" title="'.$edit_layout.'">'.$editSingle_icon.'</a>'
 					: '<span class="' . $this->btn_sm_class . ' disabled">'.$noEditLayout_icon.'</span>'; ?>
 			</td>
-			<td style="text-align: left;">
+			<td style="text-align: left;" data-col="item">
 				<?php if ($defaulttitle_item): ?>
 					<span data-placement="top" class="<?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('', $description_item, 0, 1); ?>" >
 						<i class="icon-info"></i>
@@ -189,12 +216,12 @@ $list_total_cols = 8;
 					<?php echo $defaulttitle_item; ?>
 				<?php endif; ?>
 			</td>
-			<td>
+			<td data-col="cat">
 				<?php echo !empty($row->category)
 					? '<a class="' . $this->btn_sm_class . ' hasTooltip" href="'.$catlink.'" title="'.$edit_layout.'">'.$editMultiple_icon.'</a>'
 					: '<span class="' . $this->btn_sm_class . ' disabled">'.$noEditLayout_icon.'</span>'; ?>
 			</td>
-			<td style="text-align: left;">
+			<td style="text-align: left;" data-col="cat">
 				<?php if ($defaulttitle_cat): ?>
 					<span data-placement="top" class="<?php echo $tip_class; ?>" title="<?php echo flexicontent_html::getToolTip('', $description_cat, 0, 1); ?>" >
 						<i class="icon-info"></i>
@@ -210,10 +237,12 @@ $list_total_cols = 8;
 		?>
 	</tbody>
 
-	<tfoot>
-		<tr>
-			<td colspan="<?php echo $list_total_cols; ?>" style="text-align: left;background-color:transparent !important;">
-				<table class="admintable" style="margin: 0 auto !important;">
+
+	</table>
+	<script>window.fcTableTools && fcTableTools.init('adminListTableFCtemplates');</script>
+
+	<div class="fc-table-legend">
+		<table class="admintable" style="margin: 0 auto !important;">
 					<tr>
 						<td>
 						<?php echo '<span style="font-size: 14px;">'.$copyTmpl_icon.'</span>'; ?>
@@ -243,11 +272,7 @@ $list_total_cols = 8;
 						</td>
 					</tr>
 				</table>
-			</td>
-		</tr>
-	</tfoot>
-
-	</table>
+	</div>
 </div>
 
 <div id="howto_box" >

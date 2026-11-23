@@ -72,6 +72,10 @@ class JFormFieldFields extends \Joomla\CMS\Form\FormField
 
 		$fieldnameastext = (bool) @ $attributes['fieldnameastext'];
 		$groupables = (bool) @ $attributes['groupables'];
+
+		// Sortable list only: keep an optional ":suffix" of the stored values (e.g. "fieldname:displaymethod:title"),
+		// so that values that were typed manually in older versions are not lost when the list is re-saved
+		$keepsuffix = (bool) @ $attributes['keepsuffix'];
 		
 		// NOTE: ELSE should always be 'id', otherwise we break compatiblity with all previous FC versions !
 		$ovalue = ((bool) @ $attributes['fieldnameasvalue']) ?
@@ -332,16 +336,25 @@ class JFormFieldFields extends \Joomla\CMS\Form\FormField
 
 			foreach($values as $val)
 			{
-				if( !isset($v2f[$val]) ) continue;
+				$base = $val;
+				$suffix = '';
+
+				if ($keepsuffix && strpos($val, ':') !== false)
+				{
+					list($base, $suffix) = explode(':', $val, 2);
+				}
+
+				if( !isset($v2f[$base]) ) continue;
 				$sorter_html .= '
-					<li data-value="field_'.$val.'" class="fcrecord">
-						<span class="fcprop_box">'.$v2f[$val]->option_text.'</span>
+					<li data-value="field_'.htmlspecialchars($val, ENT_QUOTES, 'UTF-8').'" class="fcrecord">
+						<span class="fcprop_box">'.$v2f[$base]->option_text
+							.($suffix !== '' ? ' <small class="fcprop_suffix">('.htmlspecialchars($suffix, ENT_QUOTES, 'UTF-8').')</small>' : '').'</span>
 						<span class="delfield_handle" title="'.\Joomla\CMS\Language\Text::_('FLEXI_REMOVE').'" onclick="fcfield_del_sortable_element(this);"></span>
 					</li>';
 			}
 			$sorter_html .= '
 				</ul>
-				<input type="text" id="'.$element_id_sorter.'" name="'.$fieldname_sorter.'" value="'.implode(',', $values).'" class="fc_hidden_value" />
+				<input type="text" id="'.$element_id_sorter.'" name="'.$fieldname_sorter.'" value="'.htmlspecialchars(implode(',', $values), ENT_QUOTES, 'UTF-8').'" class="fc_hidden_value" />
 			</div>
 			<div class="fcclear"></div>';
 
