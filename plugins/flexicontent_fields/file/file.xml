@@ -523,6 +523,36 @@
 			<field name="coupon_hits_limit" type="text" size="5" default="3" label="FLEXI_FIELD_FILE_COUPON_HITS_LIMIT" depend_class="multivalue-mode11" description="FLEXI_FIELD_FILE_COUPON_HITS_LIMIT_DESC"/>
 			<field name="coupon_expiration_days" type="text" size="5" default="15" label="FLEXI_FIELD_FILE_COUPON_EXPIRATION_DAYS" depend_class="multivalue-mode11" description="FLEXI_FIELD_FILE_COUPON_EXPIRATION_DAYS_DESC"/>
 
+			<field name="" type="separator" default="FLEXI_DL_LIMIT_TAB" description="" icon_class="icon-lock" level="tab_open" box_type="1" />
+			<field name="dl_limit_override" type="multilist" subtype="radio" default="0" label="FLEXI_DL_LIMIT_OVERRIDE" description="FLEXI_DL_LIMIT_OVERRIDE_DESC" toggle_related="1" class="btn-group group-fcinfo">
+				<option value="0" show_list="" hide_list="dl-limit-custom">FLEXI_DL_LIMIT_USE_COMPONENT</option>
+				<option value="1" show_list="dl-limit-custom" hide_list="">FLEXI_DL_LIMIT_USE_FIELD</option>
+				<option value="2" show_list="" hide_list="dl-limit-custom">FLEXI_DL_LIMIT_NONE</option>
+			</field>
+			<field name="" type="separator" default="FLEXI_DL_LIMIT_INFO" level="level3" class="alert alert-info fcpadded" depend_class="dl-limit-custom" />
+			<field name="dl_limit_count_mode" type="radio" default="0" label="FLEXI_DL_LIMIT_COUNT_MODE" description="FLEXI_DL_LIMIT_COUNT_MODE_DESC" class="btn-group group-fcinfo" depend_class="dl-limit-custom">
+				<option value="0">FLEXI_DL_LIMIT_MODE_ANY</option>
+				<option value="1">FLEXI_DL_LIMIT_MODE_UNIQUE</option>
+			</field>
+			<field name="dl_limit_window" type="number" min="1" default="24" size="5" label="FLEXI_DL_LIMIT_WINDOW" description="FLEXI_DL_LIMIT_WINDOW_DESC" depend_class="dl-limit-custom" />
+			<field name="dl_limit_window_unit" type="list" default="60" label="FLEXI_DL_LIMIT_WINDOW_UNIT" description="FLEXI_DL_LIMIT_WINDOW_UNIT_DESC" depend_class="dl-limit-custom">
+				<option value="1">FLEXI_DL_LIMIT_UNIT_MINUTES</option>
+				<option value="60">FLEXI_DL_LIMIT_UNIT_HOURS</option>
+				<option value="1440">FLEXI_DL_LIMIT_UNIT_DAYS</option>
+			</field>
+			<field name="dl_limit_groups" type="subform" multiple="true" layout="joomla.form.field.subform.repeatable-table" label="FLEXI_DL_LIMIT_GROUPS" description="FLEXI_DL_LIMIT_GROUPS_DESC" depend_class="dl-limit-custom">
+				<form>
+					<field name="group_id" type="usergrouplist" label="FLEXI_DL_LIMIT_GROUP" />
+					<field name="limit" type="number" min="-1" default="" label="FLEXI_DL_LIMIT_LIMIT" />
+				</form>
+			</field>
+			<field name="dl_limit_guest_ip_factor" type="number" min="1" default="5" size="5" label="FLEXI_DL_LIMIT_IP_FACTOR" description="FLEXI_DL_LIMIT_IP_FACTOR_DESC" depend_class="dl-limit-custom" />
+			<field name="dl_limit_count_special" type="radio" default="0" label="FLEXI_DL_LIMIT_COUNT_SPECIAL" description="FLEXI_DL_LIMIT_COUNT_SPECIAL_DESC" class="btn-group btn-group-yesno" depend_class="dl-limit-custom">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="dl_limit_modal_html" type="textarea" filter="raw" rows="6" cols="60" default="" label="FLEXI_DL_LIMIT_MODAL_HTML" description="FLEXI_DL_LIMIT_MODAL_HTML_DESC" depend_class="dl-limit-custom" />
+
 			<field name="" type="separator" default="FLEXI_FIELD_FILE_FILE_ACTIONS" level="tabset_close" box_type="1" />
 
 
