@@ -113,6 +113,7 @@ class JsonapiView extends BaseApiView
         'urls',
         'attribs',
         'metadata',
+        'flexi_fields',
     ];
 
     /**

@@ -12,6 +12,7 @@ namespace Joomla\Component\Flexicontent\Api\Model;
 
 use Joomla\CMS\MVC\Model\ItemModel as BaseItemModel;
 use Joomla\Component\Flexicontent\Api\Helper\AccessHelper;
+use Joomla\Component\Flexicontent\Api\Helper\FlexiFieldsHelper;
 use Joomla\Component\Flexicontent\Api\Legacy\LegacyBootstrap;
 
 // phpcs:disable PSR1.Files.SideEffects
@@ -95,6 +96,10 @@ class ItemModel extends BaseItemModel
                     $item = null;
                 }
 
+                if ($item !== null) {
+                    FlexiFieldsHelper::attach($item);
+                }
+
                 $this->_item[$pk] = $item;
 
                 return $this->_item[$pk];
@@ -120,7 +125,12 @@ class ItemModel extends BaseItemModel
         $item = $db->setQuery($query)->loadObject();
 
         // Do not leak the existence of an item the user is not allowed to see
-        $this->_item[$pk] = ($item && AccessHelper::isItemVisible($item)) ? $item : null;
+        if ($item && AccessHelper::isItemVisible($item)) {
+            FlexiFieldsHelper::attach($item);
+            $this->_item[$pk] = $item;
+        } else {
+            $this->_item[$pk] = null;
+        }
 
         return $this->_item[$pk];
     }
