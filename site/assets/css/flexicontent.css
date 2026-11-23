@@ -5168,22 +5168,27 @@ div#permissions .tab-content {
 .fcfile_actions {
   margin: 4px;
   clear: both;
-  display: block;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
   width: 100% !important;
   box-sizing: border-box !important;
 }
 .fcfile_actions > a,
+.fcfile_actions > button,
 .fcfile_actions > input,
 .fcfile_actions > form > input {
-  margin: 4px 0;
-  width: 100% !important;
+  margin: 0;
+  width: fit-content !important;
+  max-width: 100%;
   box-sizing: border-box !important;
 }
 .fcfile_actions > form {
-  width: 100% !important;
+  width: fit-content !important;
+  max-width: 100%;
   box-sizing: border-box !important;
-  margin: 0px !important;
-  padding: 0px !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 /* File field viewing: totals */
 .fcfile_total {
@@ -5202,9 +5207,10 @@ div#permissions .tab-content {
   margin-bottom: 2px;
 }
 .fcfile_actions.fcfile_compact > a,
+.fcfile_actions.fcfile_compact > button,
 .fcfile_actions.fcfile_compact > input,
 .fcfile_actions.fcfile_compact > form > input {
-  width: unset !important;
+  width: fit-content !important;
 }
 /* Image field viewing: thumbnails */
 img.fc_field_image {
@@ -5835,6 +5841,8 @@ div table.adminform td {
 .fav-block .fcfavs-icon_box {
   display: inline-flex;
   line-height: 100%;
+  /* Checkbox of the toggle button: not shown, but it takes the click, the Tab key and the Space key */
+  /* SVG heart of toggle styles 0 and 1: an outline when not a favourite, filled when a favourite */
 }
 .fav-block .fcfavs-icon_box * {
   line-height: 100%;
