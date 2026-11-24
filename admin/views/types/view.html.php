@@ -27,6 +27,15 @@ spl_autoload_register(static function ($class) {
  */
 class FlexicontentViewTypes extends FlexicontentViewBaseRecords
 {
+	/**
+	 * Columns of this manager are shown / hidden / moved in the browser (see fc-table-tools.js),
+	 * so the old position based hiding (cookie of the old column chooser) must not apply
+	 */
+	public function hideCol($colposition)
+	{
+		return '';
+	}
+
 	var $proxy_option   = null;
 	var $title_propname = 'name';
 	var $state_propname = 'published';

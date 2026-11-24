@@ -2040,7 +2040,7 @@ body .fc-nowrap-box .nowrap_box .label,
   box-sizing: border-box;
   clear: both;
   float: left;
-  margin: 0 0 1% 0 !important;
+  margin: 0 !important;
   width: 100%;
 }
 #flexicontent .fc-xpended .input-group-text:first-child,
@@ -6032,4 +6032,23 @@ body div .fc_assoc_isuptodate {
 }
 body div .fc_assoc_isuptodate span {
   color: white;
+}
+
+/* Field pickers (sortable lists of fields, e.g. Items Manager custom columns): the dropdown opens above the controls below it */
+.container_fcfield-inner .choices.is-open {
+	z-index: 1000;
+}
+
+.container_fcfield-inner .choices__list--dropdown,
+.container_fcfield-inner .choices__list[aria-expanded] {
+	z-index: 1001;
+	width: max-content;
+	min-width: 100%;
+	max-width: min(520px, 90vw);
+}
+
+.container_fcfield-inner .choices__list--dropdown .choices__item {
+	white-space: normal;
+	word-break: normal;
+	overflow-wrap: break-word;
 }

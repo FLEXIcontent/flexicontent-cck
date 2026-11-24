@@ -73,13 +73,17 @@ $disable_columns = array_flip($disable_columns);
 $single_type_id = $single_type ? reset($filter_type) : 0;
 
 $this->data_tbl_id = 'adminListTableFC' . $this->view . '_type_' . $single_type_id;
-flexicontent_html::jscode_to_showhide_table(
-	'mainChooseColBox',
-	$this->data_tbl_id,
-	$start_html = '',  //'<span class="badge ' . (FLEXI_J40GE ? 'badge-dark' : 'badge-inverse') . '">' . Text::_('FLEXI_COLUMNS', true) . '<\/span> &nbsp; ',
-	$end_html = '<button type="button" id="fc-columns-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="' . Text::_('FLEXI_HIDE') . '" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/button>',
-	$toggle_on_init = 1 // Initial page load (JS Performance) we already hidden columns via PHP Logic
-);
+
+// Resizable / movable / hideable columns (replaces the old column chooser), settings are stored in the browser
+$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/css/fc_table_tools.css', array('version' => FLEXI_VHASH));
+$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/css/fc_type_tabs.css', array('version' => FLEXI_VHASH));
+$document->addScript(\Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/js/fc-table-tools.js', array('version' => FLEXI_VHASH));
+Text::script('FLEXI_TBL_MOVE_COL');
+Text::script('FLEXI_TBL_HIDE_COL');
+Text::script('FLEXI_TBL_SHOW_COL');
+Text::script('FLEXI_TBL_FIT_COL');
+Text::script('FLEXI_TBL_RESET_WIDTHS');
+Text::script('FLEXI_TBL_RESET_COLS');
 
 
 
@@ -123,12 +127,12 @@ $ordering_draggable = $cparams->get('draggable_reordering', 1);
 
 if ($this->reOrderingActive)
 {
-	$image_ordering_tip = '<span class="icon-info ' . $this->tooltip_class . '" title="' . flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_ENABLED_DESC', 1, 1) . '"></span>';
+	$ordering_tip_title = flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_ENABLED_DESC', 1, 1);
 	$drag_handle_box = '<div class="fc_drag_handle%s" title="' . Text::_('FLEXI_ORDER_SAVE_WHEN_DONE', true) . '"></div>';
 }
 else
 {
-	$image_ordering_tip = '<span class="icon-info ' . $this->tooltip_class . '" title="' . flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_DISABLED_DESC', 1, 1) . '"></span>';
+	$ordering_tip_title = flexicontent_html::getToolTip('FLEXI_REORDERING', 'FLEXI_REORDERING_DISABLED_DESC', 1, 1);
 	$drag_handle_box = '<div class="fc_drag_handle%s" title="' . Text::_('FLEXI_ORDER_COLUMN_FIRST', true) . '" ></div>';
 	$image_saveorder    = '';
 }
@@ -516,6 +520,10 @@ if ($this->max_tab_types && count($this->itemTypes) >= $this->max_tab_types)
 }
 elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 {
+	// Style of the tabs: global configuration (Items Manager - Appearance). "bootstrap" are the standard Bootstrap nav tabs
+	$tabs_mode = (string) \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent')->get('iman_type_tabs_style', 'browser');
+
+	if ($tabs_mode === 'bootstrap') :
 	// These controls filter the whole list. The returned list determines the active type.
 	$typeButtons = array('' => Text::_('FLEXI_ALL'));
 	$subtypeButtons = array();
@@ -544,6 +552,98 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 			<?php endif; ?>
 		<?php endforeach; ?>
 	</nav>
+	<?php else :
+	// Tabs of the content types (browser like tabs). A click sets the type filter and submits the form
+	$main_types = array();
+	$sub_types  = array();
+
+	foreach ($this->itemTypes as $itemType)
+	{
+		if ($itemType->params->get('is_subtype', 0))
+		{
+			$sub_types[] = $itemType;
+		}
+		else
+		{
+			$main_types[] = $itemType;
+		}
+	}
+
+	$tab_html = function ($label, $type_id, $active, $extra_class = '', $static = false)
+	{
+		return '<button type="button" role="tab" class="fc-type-tab' . ($active ? ' is-active' : '') . ($static ? ' is-static' : '') . $extra_class . '"'
+			. ' data-type="' . ($type_id === null ? '' : (int) $type_id) . '" aria-selected="' . ($active ? 'true' : 'false') . '">'
+			. '<span class="fc-type-tab-label">' . htmlspecialchars(html_entity_decode((string) $label, ENT_QUOTES, 'UTF-8'), ENT_QUOTES, 'UTF-8') . '</span></button>';
+	};
+
+	$tabs_style = in_array($tabs_mode, array('hanging', 'underline', 'flat', 'pills'), true) ? ' fc-tabs-' . $tabs_mode : '';
+
+	echo '<div class="fc-type-tabs' . $tabs_style . '" id="items_type_tabset" role="tablist">';
+
+	echo $tab_html(Text::_('FLEXI_ALL'), null, empty($filter_type));
+
+	// Several types selected via the filter: a tab that summarizes the selection
+	if (count($filter_type) > 1)
+	{
+		echo $tab_html(count($filter_type) . ' ' . Text::_('FLEXI_TYPES'), null, true, '', true);
+	}
+
+	foreach ($main_types as $itemType)
+	{
+		echo $tab_html(Text::_($itemType->name), $itemType->id, $single_type && in_array($itemType->id, $filter_type));
+	}
+
+	if ($sub_types)
+	{
+		echo '<span class="fc-type-tabs-sep">Subtypes</span>';
+
+		foreach ($sub_types as $itemType)
+		{
+			echo $tab_html(Text::_($itemType->name), $itemType->id, $single_type && in_array($itemType->id, $filter_type), ' fc-subtype');
+		}
+	}
+
+	echo '</div>';
+	?>
+	<script>
+	(function () {
+		var tabs = document.querySelectorAll('#items_type_tabset .fc-type-tab:not(.is-static)');
+
+		Array.prototype.forEach.call(tabs, function (tab) {
+			tab.addEventListener('click', function () {
+				if (tab.classList.contains('is-active') || document.getElementById('items_type_tabset').classList.contains('is-busy')) return;
+
+				// Immediate feedback, then filter the list (the type filter submits the form when it changes)
+				Array.prototype.forEach.call(tabs, function (t) { t.classList.remove('is-active'); t.setAttribute('aria-selected', 'false'); });
+				tab.classList.add('is-active');
+				tab.setAttribute('aria-selected', 'true');
+				document.getElementById('items_type_tabset').classList.add('is-busy');
+
+				// Set the value of the type filter and submit the form directly: triggering the "change" event of the (enhanced)
+				// select was not reliable, the list was reloaded only after another click
+				var id   = tab.getAttribute('data-type');
+				var sel  = document.getElementById('filter_type');
+				var form = document.adminForm;
+
+				var assock = document.getElementById('filter_assockey');
+				if (assock) assock.checked = false;
+
+				if (sel) {
+					Array.prototype.forEach.call(sel.options, function (o) { o.selected = !!id && o.value === id; });
+				}
+				else if (id) {
+					var inp = document.createElement('input');
+					inp.type = 'hidden'; inp.name = 'filter_type[]'; inp.value = id;
+					form.appendChild(inp);
+				}
+
+				if (form.limitstart) form.limitstart.value = 0;
+				Joomla.submitform();
+			});
+		});
+	})();
+	</script>
+	<?php endif; ?>
 	<?php
 }
 ?>
@@ -604,7 +704,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 	<?php if ($this->unassociated && !count($this->rows)) echo '<div style="display: none;">'; ?>
 
 
-	<div id="fc-managers-header">
+	<div id="fc-managers-header" class="fc-mh-items">
 
 		<?php if (!empty($this->lists['scope_tip'])) : ?>
 		<div class="fc-filter-head-box filter-search nowrap_box" style="margin: 0;">
@@ -818,24 +918,20 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 		<div class="fcclear"></div>
 
-		<?php if ($canOrder): ?>
-		<div class="hidden-phone" style="z-index: 1; position: sticky; top: 30%; margin: 0 -20px;">
-			<div style="position: absolute; margin: 0; height: 0;">
-				<div style="padding: 0px; font-weight: normal; line-height: 28px; width: auto; text-align: center;">
-					<?php echo HTMLHelper::_($hlpname . '.saveorder_btn', $this->rows, $_config = null); ?>
-				</div>
+		<div class="fc-reorder-panel">
+			<div class="fc-reorder-help">
+				<span><?php echo Text::_($canOrder ? 'FLEXI_REORDER_HELP' : 'FLEXI_FCORDER_ONLY_VIEW'); ?></span>
+			</div>
+			<div class="fc-reorder-actions">
+				<?php if ($canOrder): ?>
+					<?php echo HTMLHelper::_($hlpname . '.manualorder_btn', $this->rows, (object) array('custom_txt' => 'FLEXI_REORDER_MANUAL')); ?>
+					<?php echo HTMLHelper::_($hlpname . '.saveorder_btn', $this->rows, (object) array('custom_txt' => 'FLEXI_REORDER_SAVE')); ?>
+				<?php endif; ?>
+				<button type="button" class="btn btn-sm btn-outline-secondary"
+					onclick="document.getElementById('filter_order').value='a.id'; document.getElementById('filter_order_Dir').value='DESC'; if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();"
+				><?php echo Text::_('FLEXI_REORDER_EXIT'); ?></button>
 			</div>
 		</div>
-		<div class="hidden-phone" style="z-index: 1; position: sticky; top: 30%; margin: 0 -20px;">
-			<div style="position: absolute; margin: 40px 0 0 0; height: 0;">
-				<div style="padding: 0px; font-weight: normal; line-height: 28px; width: auto; text-align: center;">
-					<?php echo HTMLHelper::_($hlpname . '.manualorder_btn', $this->rows, $_config = null); ?>
-				</div>
-			</div>
-		</div>
-		<?php else: ?>
-			<?php echo '<span class="icon-cancel ' . $this->tooltip_class . '" title="'.flexicontent_html::getToolTip('', 'FLEXI_FCORDER_ONLY_VIEW', 1, 1) . '"></span>'; ?>
-		<?php endif; ?>
 
 	<?php endif; ?>
 
@@ -850,29 +946,45 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				<?php echo Text::_( 'FLEXI_NUM' ); ?>
 			</th-->
 
-			<th class="col_order center hidden-phone "><?php $colposition++; ?>
+			<th class="col_order center hidden-phone " data-col="order"><?php $colposition++; ?>
 				<?php
-				echo $canOrder ? $image_ordering_tip : '';
-				echo str_replace('_FLEXI_ORDER_',
+				$order_sort_html = str_replace('_FLEXI_ORDER_',
 					''/*Text::_('FLEXI_ORDER', true)*/,
 					str_replace('_FLEXI_ORDER_</a>', '<span class="icon-menu-2 btn btn-micro"></span></a>',
 					HTMLHelper::_('grid.sort', '_FLEXI_ORDER_', (!$this->filter_order_type ? 'a.ordering' : 'catsordering'), $this->lists['order_Dir'], $this->lists['order']))
 				);
+
+				// The reordering info is shown as the tooltip of the sort button (it used to be a separate "i" icon, making the header taller)
+				if ($canOrder)
+				{
+					$tip_attr = $ordering_tip_title;
+					$tip_cls  = $this->tooltip_class;
+
+					$order_sort_html = preg_match('/<a\b[^>]*\btitle="/', $order_sort_html)
+						? preg_replace_callback('/(<a\b[^>]*\b)title="[^"]*"/', function ($m) use ($tip_attr) { return $m[1] . 'title="' . $tip_attr . '"'; }, $order_sort_html, 1)
+						: preg_replace_callback('/<a\b/', function ($m) use ($tip_attr) { return '<a title="' . $tip_attr . '"'; }, $order_sort_html, 1);
+
+					$order_sort_html = preg_match('/<a\b[^>]*\bclass="/', $order_sort_html)
+						? preg_replace_callback('/(<a\b[^>]*\bclass=")/', function ($m) use ($tip_cls) { return $m[1] . $tip_cls . ' '; }, $order_sort_html, 1)
+						: preg_replace_callback('/<a\b/', function ($m) use ($tip_cls) { return '<a class="' . $tip_cls . '"'; }, $order_sort_html, 1);
+				}
+
+				echo $order_sort_html;
 				?>
 				<span class="column_toggle_lbl" style="display:none;"><?php echo Text::_( 'FLEXI_ORDER' ); ?></span>
 			</th>
 
-			<th class="col_cb left"><?php $colposition++; ?>
+			<th class="col_cb left" data-col="cb"><?php $colposition++; ?>
 				<div class="group-fcset">
 					<input type="checkbox" name="checkall-toggle" id="checkall-toggle" value="" title="<?php echo Text::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
 					<label for="checkall-toggle" class="green single"></label>
 				</div>
 			</th>
 
-			<th class="left"><?php $colposition++; ?>
+			<th class="left" data-col="notes" data-col-label="<?php echo Text::_('FLEXI_NOTES'); ?>"><?php $colposition++; ?>
 			</th>
 
-			<th class="col_status hideOnDemandClass nowrap left" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th data-col="status" class="col_status hideOnDemandClass nowrap left" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo HTMLHelper::_('grid.sort', 'FLEXI_STATUS', 'a.' . $this->state_propname, $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_state') || $this->getModel()->getState('filter_catsinstate') != 1) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -881,7 +993,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				<?php endif; ?>
 			</th>
 
-			<th class="col_title hideOnDemandClass nowrap left" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th data-col="title" class="col_title hideOnDemandClass nowrap left" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo HTMLHelper::_('grid.sort', 'FLEXI_TITLE', 'a.' . $this->title_propname, $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if (strlen($this->getModel()->getState('search'))) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -892,7 +1004,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 
 			<?php if (!isset($disable_columns['author'])) : ?>
-			<th class="col_authors hideOnDemandClass nowrap left hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th data-col="authors" class="col_authors hideOnDemandClass nowrap left hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo HTMLHelper::_('grid.sort', 'FLEXI_AUTHOR', 'a.created_by', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_author')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -904,7 +1016,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 
 			<?php if (!isset($disable_columns['lang'])) : ?>
-			<th class="col_lang hideOnDemandClass nowrap hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th data-col="lang" class="col_lang hideOnDemandClass nowrap hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo HTMLHelper::_('grid.sort', 'FLEXI_LANGUAGE', 'a.language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_lang')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -916,13 +1028,13 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 
 			<?php if ($useAssocs && !isset($disable_columns['assocs'])) : ?>
-			<th class="col_assocs_count"><?php $colposition++; ?>
-				<button type="button" id="fc-toggle-assocs_btn" style="padding: 4px 0 2px 6px;" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?>" title="<?php echo Text::_('FLEXI_ASSOCIATIONS'); ?>" onclick="document.getElementById('columnchoose_<?php echo $this->data_tbl_id . '_'. $colposition; ?>_label').click();" >
+			<th class="col_assocs_count" data-col="assocs" data-col-label="<?php echo Text::_('FLEXI_ASSOCIATIONS'); ?>"><?php $colposition++; ?>
+				<button type="button" id="fc-toggle-assocs_btn" style="padding: 4px 0 2px 6px;" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?>" title="<?php echo Text::_('FLEXI_ASSOCIATIONS'); ?>" onclick="window.fcTableTools && fcTableTools.toggle('<?php echo $this->data_tbl_id; ?>', 'assocs');" >
 					<span class="icon-flag"></span>
 				</button>
 			</th>
 
-			<th class="col_assocs hideOnDemandClass nowrap hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th data-col="assocs" class="col_assocs hideOnDemandClass nowrap hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo Text::_('FLEXI_ASSOCIATIONS'); ?>
 				<?php if ($this->getModel()->getState('filter_assockey')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -934,7 +1046,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 
 			<?php if (!$single_type || !isset($disable_columns['single_type'])): ?>
-			<th class="col_type hideOnDemandClass nowrap hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th data-col="type" class="col_type hideOnDemandClass nowrap hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo HTMLHelper::_('grid.sort', 'FLEXI_TYPE_NAME', 'type_name', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_type')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -946,21 +1058,21 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 
 			<?php if (!isset($disable_columns['template'])): ?>
-			<th class="col_template hideOnDemandClass nowrap left hidden-phone hidden-tablet" colspan="2" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th data-col="template" class="col_template hideOnDemandClass nowrap left hidden-phone hidden-tablet" colspan="2" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo Text::_('FLEXI_TEMPLATE'); ?>
 			</th>
 			<?php endif; ?>
 
 
 			<?php foreach($this->extra_fields as $field) :?>
-				<th class="hideOnDemandClass nowrap left hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+				<th data-col="extra_<?php echo $this->escape($field->name); ?>" class="hideOnDemandClass nowrap left hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 					<?php echo $field->label; ?>
 				</th>
 			<?php endforeach; ?>
 
 
 			<?php if (!isset($disable_columns['access'])): ?>
-			<th class="col_access hideOnDemandClass nowrap left hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th data-col="access" class="col_access hideOnDemandClass nowrap left hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo HTMLHelper::_('grid.sort', 'FLEXI_ACCESS', 'a.access', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_access')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -972,7 +1084,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 
 			<?php if (!isset($disable_columns['cats'])): ?>
-			<th class="col_cats hideOnDemandClass nowrap left hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th data-col="cats" class="col_cats hideOnDemandClass nowrap left hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo $categories_tip; ?>
 				<?php echo Text::_( 'FLEXI_CATEGORIES' ); ?>
 				<?php if ($this->getModel()->getState('filter_cats') || $this->getModel()->getState('filter_subcats') == 0) : ?>
@@ -985,7 +1097,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 
 			<?php if (!isset($disable_columns['tags'])): ?>
-			<th class="col_tag hideOnDemandClass nowrap left hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th data-col="tags" class="col_tag hideOnDemandClass nowrap left hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo Text::_( 'FLEXI_TAGS' ); ?>
 				<?php if ($this->getModel()->getState('filter_tag')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -997,7 +1109,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 
 			<?php if (!isset($disable_columns['created'])): ?>
-			<th class="col_created hideOnDemandClass nowrap hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th data-col="created" class="col_created hideOnDemandClass nowrap hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo HTMLHelper::_('grid.sort',   'FLEXI_CREATED', 'a.created', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php
 				if ($this->date == '1') :
@@ -1015,7 +1127,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 
 			<?php if (!isset($disable_columns['modified'])) : ?>
-			<th class="col_revised hideOnDemandClass nowrap hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th data-col="revised" class="col_revised hideOnDemandClass nowrap hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo HTMLHelper::_('grid.sort',   'FLEXI_REVISED', 'a.modified', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php
 				if ($this->date == '2') :
@@ -1033,28 +1145,28 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 
 			<?php if (!isset($disable_columns['hits'])) : ?>
-			<th class="col_hits hideOnDemandClass center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th data-col="hits" class="col_hits hideOnDemandClass center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo HTMLHelper::_('grid.sort', 'JGLOBAL_HITS', 'a.hits', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 			<?php endif; ?>
 
 
 			<?php if (!isset($disable_columns['votes'])) : ?>
-			<th class="col_votes hideOnDemandClass center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th data-col="votes" class="col_votes hideOnDemandClass center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo HTMLHelper::_('grid.sort', 'JGLOBAL_VOTES', 'rating_count', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 			<?php endif; ?>
 
 
 			<?php if (!isset($disable_columns['ratings'])) : ?>
-			<th class="col_ratings hideOnDemandClass center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th data-col="ratings" class="col_ratings hideOnDemandClass center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo HTMLHelper::_('grid.sort', 'JGLOBAL_RATINGS', 'rating', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 			<?php endif; ?>
 
 
 			<?php if (!isset($disable_columns['id'])) : ?>
-			<th class="col_id hideOnDemandClass nowrap center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<th data-col="id" class="col_id hideOnDemandClass nowrap center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo HTMLHelper::_('grid.sort', 'FLEXI_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order']); ?>
 				<?php if ($this->getModel()->getState('filter_id')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
@@ -1123,7 +1235,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 		<?php if ($canOrder) : ?>
 
-			<td class="col_order nowrap center hidden-phone"><?php $colposition++; ?>
+			<td class="col_order nowrap center hidden-phone" data-col="order"><?php $colposition++; ?>
 				<?php
 					if ($this->reOrderingActive)
 					{
@@ -1166,7 +1278,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 		<?php else : ?>
 
-			<td class="center hidden-phone"><?php $colposition++; ?>
+			<td class="center hidden-phone" data-col="order"><?php $colposition++; ?>
 				<?php
 				echo !$this->reOrderingActive
 					? '<span class="icon-move" style="color: #d0d0d0"></span>'
@@ -1176,12 +1288,12 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 		<?php endif; ?>
 
-			<td class="col_cb"><?php $colposition++; ?>
+			<td class="col_cb" data-col="cb"><?php $colposition++; ?>
 				<!--div class="adminlist-table-row"></div-->
 				<?php echo HTMLHelper::_($hlpname . '.grid_id', $i, $row->id); ?>
 			</td>
 
-			<td class="col_notes nowrap"><?php $colposition++; ?>
+			<td class="col_notes nowrap" data-col="notes"><?php $colposition++; ?>
 				<?php
 				// Display an icon if item has an unapproved latest version, thus needs revising
 				echo HTMLHelper::_($hlpname . '.reviewing_needed', $row, $user, $i);
@@ -1191,7 +1303,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				?>
 			</td>
 
-			<td class="col_status" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td data-col="status" class="col_status" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<div class="btn-group fc-group fc-items">
 					<?php
 					//echo HTMLHelper::_('jgrid.published', $row->state, $i, $ctrl, $stateIsChangeable, 'cb', $row->publish_up, $row->publish_down);
@@ -1207,7 +1319,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				</div>
 			</td>
 
-			<td class="col_title " style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td data-col="title" class="col_title " style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php
 				/**
 				 * Display an edit pencil or a check-in button if: either (a) current user has Global
@@ -1249,7 +1361,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 
 			<?php if (!isset($disable_columns['author'])) : ?>
-			<td class="col_authors hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td data-col="authors" class="col_authors hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo $row->author; ?>
 			</td>
 			<?php endif; ?>
@@ -1257,7 +1369,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 			
 
 			<?php if (!isset($disable_columns['lang'])) : ?>
-			<td class="col_lang hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td data-col="lang" class="col_lang hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php
 					/**
 					 * Display language
@@ -1269,7 +1381,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 <?php if ($useAssocs && !isset($disable_columns['assocs'])) : ?>
 
-	<td><?php $colposition++; ?>
+	<td data-col="assocs"><?php $colposition++; ?>
 		<?php if (!empty($this->lang_assocs[$row->id])): ?>
 			<?php $row_assocs = $this->lang_assocs[$row->id]; ?>
 			<a href="index.php?option=com_flexicontent&amp;view=items&amp;filter_catsinstate=99&amp;filter_assockey=<?php echo reset($row_assocs)->key; ?>&amp;fcform=1&amp;filter_state=ALL&amp;limit=50"
@@ -1280,7 +1392,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 		<?php endif; ?>
 	</td>
 
-	<td class="hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+	<td data-col="assocs" class="hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 		<?php
 		if (!empty($this->lang_assocs[$row->id]))
 		{
@@ -1350,17 +1462,17 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 
 			<?php if (!$single_type || !isset($disable_columns['single_type'])): ?>
-			<td class="col_type hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td data-col="type" class="col_type hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo Text::_($row->type_name); ?>
 			</td>
 			<?php endif ; ?>
 
 
 			<?php if (!isset($disable_columns['template'])): ?>
-			<td class="col_edit_layout hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition); ?>" >
+			<td data-col="template" class="col_edit_layout hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition); ?>" >
 				<?php echo HTMLHelper::_($hlpname . '.edit_layout', $row, '__modal__', $i, $this->perms->CanTemplates, $row_ilayout); ?>
 			</td>
-			<td class="col_template hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td data-col="template" class="col_template hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo $row_ilayout.($row->config->get('ilayout') ? '' : '<sup>[1]</sup>') ?>
 			</td>
 			<?php endif; ?>
@@ -1368,7 +1480,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
     <?php foreach($this->extra_fields as $field) :?>
 
-			<td class="hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td data-col="extra_<?php echo $this->escape($field->name); ?>" class="hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 		    <?php
 				$raw_value        = isset($row->fields[$field->name]->{$field->methodname}) ? $row->fields[$field->name]->{$field->methodname} : '';
 				$field_appearance = (int) $field->parameters->get('backend_view_appearance', 0);
@@ -1385,7 +1497,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 
 			<?php if (!isset($disable_columns['access'])): ?>
-			<td class="col_access hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td data-col="access" class="col_access hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo $row->canEditState && $this->perms->CanAccLvl
 					? flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'class="fcfield_selectval" onchange="return Joomla.listItemTask(\'cb'.$i.'\',\''.$ctrl.'access\')"')
 					: $row->access_level; ?>
@@ -1394,7 +1506,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 
 			<?php if (!isset($disable_columns['cats'])): ?>
-			<td class="col_cats hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td data-col="cats" class="col_cats hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php
 				// Reorder categories place item's MAIN category first or ...
 				// place first the category being filtered (if order is 'FLEXIcontent')
@@ -1483,7 +1595,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 
 			<?php if (!isset($disable_columns['tags'])): ?>
-			<td class="col_tag hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td data-col="tags" class="col_tag hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php
 					$row_tags  = array();
 					$tag_names = array();
@@ -1510,14 +1622,14 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 
 			<?php if (!isset($disable_columns['created'])) : ?>
-			<td class="col_created hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td data-col="created" class="col_created hidden-phone" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo HTMLHelper::_('date',  $row->created, $date_format); ?>
 			</td>
 			<?php endif; ?>
 
 
 			<?php if (!isset($disable_columns['modified'])) : ?>
-			<td class="col_revised hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td data-col="revised" class="col_revised hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php
 				if ($row->modified == $row->created)  echo Text::_('Same as creation');
 				else echo ($row->modified != $_NULL_DATE_) ? HTMLHelper::_('date', $row->modified, $date_format) : $_NEVER_;
@@ -1527,21 +1639,21 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 
 			<?php if (!isset($disable_columns['hits'])) : ?>
-			<td class="col_hits center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td data-col="hits" class="col_hits center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo '<span class="badge bg-info badge-info"> ' . ($row->hits ?: 0) . '</span>'; ?>
 			</td>
 			<?php endif; ?>
 
 
 			<?php if (!isset($disable_columns['votes'])) : ?>
-			<td class="col_votes center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td data-col="votes" class="col_votes center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo '<span class="badge bg-success badge-success"> ' . ($row->rating_count ?: 0) . '</span>'; ?>
 			</td>
 			<?php endif; ?>
 
 
 			<?php if (!isset($disable_columns['ratings'])) : ?>
-			<td class="col_ratings center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td data-col="ratings" class="col_ratings center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php
 				// An item without votes has no rating. Its 'rating' column holds the voting field's "default rating",
 				// a value that only places unrated items among the rated ones when a list is ordered by rating
@@ -1554,7 +1666,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 
 			<?php if (!isset($disable_columns['id'])) : ?>
-			<td class="col_id center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
+			<td data-col="id" class="col_id center hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo $row->id; ?>
 			</td>
 			<?php endif; ?>
@@ -1579,6 +1691,17 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 	</tbody>
 
 	</table>
+	<script>window.fcTableTools && fcTableTools.init('<?php echo $this->data_tbl_id; ?>');</script>
+	<?php if (!$this->reOrderingActive) : ?>
+	<script>
+	// Entering the ordering mode: the type filter is cleared (ordering is done per category, a type filter would often leave nothing to order)
+	document.addEventListener('click', function (e) {
+		if (!e.target.closest || !e.target.closest('th.col_order a')) return;
+		var sel = document.getElementById('filter_type');
+		if (sel) Array.prototype.forEach.call(sel.options, function (o) { o.selected = false; });
+	}, true);
+	</script>
+	<?php endif; ?>
 
 
 	<div>

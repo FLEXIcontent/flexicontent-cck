@@ -45,15 +45,17 @@ $fcfilter_attrs_row  = ' class="input-prepend fc-xpended-row" ';
 
 
 /**
- * JS for Columns chooser box and Filters box
+ * Resizable / movable / hideable columns (replaces the old column chooser), settings are stored in the browser
  */
 
-flexicontent_html::jscode_to_showhide_table(
-	'mainChooseColBox',
-	'adminListTableFC' . $this->view . ($this->isADV ? '_advanced' : '_basic'),
-	$start_html = '',  //'<span class="badge ' . (FLEXI_J40GE ? 'badge-dark' : 'badge-inverse') . '">' . \Joomla\CMS\Language\Text::_('FLEXI_COLUMNS', true) . '<\/span> &nbsp; ',
-	$end_html = '<button type="button" id="fc-columns-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="' . \Joomla\CMS\Language\Text::_('FLEXI_HIDE') . '" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/button>'
-);
+$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/css/fc_table_tools.css', array('version' => FLEXI_VHASH));
+$document->addStyleSheet(\Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/css/fc_type_tabs.css', array('version' => FLEXI_VHASH));
+$document->addScript(\Joomla\CMS\Uri\Uri::base(true) . '/components/com_flexicontent/assets/js/fc-table-tools.js', array('version' => FLEXI_VHASH));
+
+foreach (array('FLEXI_TBL_MOVE_COL', 'FLEXI_TBL_HIDE_COL', 'FLEXI_TBL_SHOW_COL', 'FLEXI_TBL_FIT_COL', 'FLEXI_TBL_RESET_WIDTHS', 'FLEXI_TBL_RESET_COLS') as $fc_txt)
+{
+	\Joomla\CMS\Language\Text::script($fc_txt);
+}
 
 
 
@@ -156,7 +158,7 @@ if ($js)
 <?php endif;?>
 
 
-	<div id="fc-managers-header">
+	<div id="fc-managers-header" class="fc-mh-items fc-mh-solo">
 
 		<?php if (!empty($this->lists['scope_tip'])) : ?>
 		<div class="fc-filter-head-box filter-search nowrap_box" style="margin: 0;">
@@ -234,14 +236,12 @@ if ($js)
 			</span>
 			<?php endif; ?>
 		</div>
+
+		<div class="fc-filter-head-box nowrap_box fc-index-type">
+			<?php echo '<span class="label">' . \Joomla\CMS\Language\Text::_('FLEXI_LISTING_RECORDS') . '</span>' . $this->lists['filter_indextype']; ?>
+		</div>
 	</div>
 
-
-	<div class="fcclear"></div>
-
-	<?php echo '<span class="label">
-		' . \Joomla\CMS\Language\Text::_('FLEXI_LISTING_RECORDS') . '
-	</span>' . $this->lists['filter_indextype']; ?>
 
 	<div class="fcclear"></div>
 
@@ -260,41 +260,41 @@ if ($js)
 				</div>
 			</th-->
 
-			<th class="hideOnDemandClass left">
+			<th class="hideOnDemandClass left" data-col="id">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', \Joomla\CMS\Language\Text::_('FLEXI_ITEM_ID'), 'a.id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="hideOnDemandClass left title">
+			<th class="hideOnDemandClass left title" data-col="title">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', \Joomla\CMS\Language\Text::_('FLEXI_ITEM_TITLE'), 'a.title', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="hideOnDemandClass left language">
+			<th class="hideOnDemandClass left language" data-col="language">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', \Joomla\CMS\Language\Text::_('FLEXI_LANGUAGE'), 'a.language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
 		<?php if ($this->isADV) : ?>
-			<th class="hideOnDemandClass left">
+			<th class="hideOnDemandClass left" data-col="fieldlabel">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', \Joomla\CMS\Language\Text::_('FLEXI_FIELD_INDEX').' '.\Joomla\CMS\Language\Text::_('FLEXI_FIELD_LABEL'), 'f.label', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="hideOnDemandClass left">
+			<th class="hideOnDemandClass left" data-col="fieldname">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', \Joomla\CMS\Language\Text::_('FLEXI_FIELD_INDEX').' '.\Joomla\CMS\Language\Text::_('FLEXI_FIELD_NAME'), 'f.name', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="hideOnDemandClass left">
+			<th class="hideOnDemandClass left" data-col="fieldtype">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', \Joomla\CMS\Language\Text::_('FLEXI_FIELD_TYPE'), 'f.field_type', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="hideOnDemandClass left">
+			<th class="hideOnDemandClass left" data-col="valuecount">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', \Joomla\CMS\Language\Text::_('FLEXI_INDEX_VALUE_COUNT'), 'ai.extraid', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
-			<th class="hideOnDemandClass left">
+			<th class="hideOnDemandClass left" data-col="valueid">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', \Joomla\CMS\Language\Text::_('FLEXI_INDEX_VALUE_ID'), 'ai.value_id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 		<?php endif; ?>
 
-			<th class="hideOnDemandClass left">
+			<th class="hideOnDemandClass left" data-col="search_index">
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_('grid.sort', \Joomla\CMS\Language\Text::_('FLEXI_SEARCH_INDEX'), ($this->isADV ? 'ai' : 'ext').'.search_index', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 
@@ -335,11 +335,11 @@ if ($js)
 				<?php echo \Joomla\CMS\HTML\HTMLHelper::_($hlpname . '.grid_id', $i, $row->id); ?>
 			</td-->
 
-			<td>
+			<td data-col="id">
 				<?php echo $row->item_id; ?>
 			</td>
 
-			<td class="col_title ">
+			<td class="col_title " data-col="title">
 				<?php
 				/**
 				 * Display an edit pencil or a check-in button if: either (a) current user has Global
@@ -359,29 +359,29 @@ if ($js)
 				?>
 			</td>
 
-			<td>
+			<td data-col="language">
 				<?php echo $row->language; ?>
 			</td>
 
 			<?php if ($this->isADV) : ?>
-				<td>
+				<td data-col="fieldlabel">
 					<?php echo $this->escape($row->label); ?>
 				</td>
-				<td>
+				<td data-col="fieldname">
 					<?php echo $this->escape($row->name); ?>
 				</td>
-				<td class="col_fieldtype">
+				<td class="col_fieldtype" data-col="fieldtype">
 					<?php echo $row->field_type; ?>
 				</td>
-				<td class="center">
+				<td class="center" data-col="valuecount">
 					<?php echo $row->extraid; ?>
 				</td>
-				<td class="center">
+				<td class="center" data-col="valueid">
 					<?php echo $row->value_id; ?>
 				</td>
 			<?php endif; ?>
 
-			<td class="left col_search_index">
+			<td class="left col_search_index" data-col="search_index">
 				<?php
 					$_search_index = !$search_prefix ? $row->search_index : preg_replace('/\b'.$search_prefix.'/u', '', $row->search_index);
 					if (iconv_strlen($row->search_index, "UTF-8")> 610)
@@ -411,6 +411,7 @@ if ($js)
 	</tbody>
 
 	</table>
+	<script>window.fcTableTools && fcTableTools.init('adminListTableFC<?php echo $this->view; ?><?php echo $this->isADV ? '_advanced' : '_basic'; ?>');</script>
 
 
 	<div>

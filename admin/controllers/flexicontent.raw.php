@@ -68,6 +68,8 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 
 		$this->registerTask('createlanguagepack',			'createLanguagePack');
 		$this->registerTask('fcversioncompare',				'FCVersionCompare');
+		$this->registerTask('savedashlayout',					'saveDashLayout');
+		$this->registerTask('resetdashlayout',				'resetDashLayout');
 		$this->registerTask('fcupdateredirect',				'FCUpdateRedirect');
 	}
 
@@ -1546,6 +1548,69 @@ class FlexicontentControllerFlexicontent extends FlexicontentControllerBaseAdmin
 		$this->input->set('layout', 'fversion');
 		parent::display();
 		exit;
+	}
+
+
+	/**
+	 * Output a JSON answer for the dashboard layout editor and stop
+	 */
+	protected function dashJsonExit($ok, $message = '')
+	{
+		@ob_end_clean();
+		header('Content-Type: application/json; charset=utf-8');
+		echo json_encode(array('success' => (bool) $ok, 'message' => $message));
+		exit;
+	}
+
+
+	/**
+	 * Save the layout (blocks and buttons) of the dashboard
+	 */
+	function saveDashLayout()
+	{
+		if (!\Joomla\CMS\Session\Session::checkToken('request'))
+		{
+			$this->dashJsonExit(false, \Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		}
+
+		if (!\Joomla\CMS\Factory::getApplication()->getIdentity()->authorise('core.admin', 'com_flexicontent'))
+		{
+			$this->dashJsonExit(false, \Joomla\CMS\Language\Text::_('JERROR_ALERTNOAUTHOR'));
+		}
+
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/dashboard.php';
+
+		// Not named "layout": that request variable is handled by Joomla / FLEXIcontent and may be filtered
+		$raw    = (string) $this->input->post->get('dashlayout', '', 'raw');
+		$layout = FlexicontentDashboard::sanitize($raw);
+
+		if (!$layout)
+		{
+			$this->dashJsonExit(false, 'Invalid layout data (' . strlen($raw) . ' bytes received, ' . (json_last_error() ? json_last_error_msg() : 'no blocks') . ')');
+		}
+
+		$this->dashJsonExit(FlexicontentDashboard::save($layout));
+	}
+
+
+	/**
+	 * Go back to the default layout of the dashboard
+	 */
+	function resetDashLayout()
+	{
+		if (!\Joomla\CMS\Session\Session::checkToken('request'))
+		{
+			$this->dashJsonExit(false, \Joomla\CMS\Language\Text::_('JINVALID_TOKEN'));
+		}
+
+		if (!\Joomla\CMS\Factory::getApplication()->getIdentity()->authorise('core.admin', 'com_flexicontent'))
+		{
+			$this->dashJsonExit(false, \Joomla\CMS\Language\Text::_('JERROR_ALERTNOAUTHOR'));
+		}
+
+		require_once JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/dashboard.php';
+
+		$this->dashJsonExit(FlexicontentDashboard::save(null));
 	}
 
 

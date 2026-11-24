@@ -2090,6 +2090,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="dashboard_layout" type="hidden" default="" />
 			<field name="dashboard_hide_fc_license_credits" type="fcradio" default="1" label="FLEXI_DASH_HIDE_FC_LICENSE_AND_CREDITS" description="FLEXI_DASH_HIDE_FC_LICENSE_AND_CREDITS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_IN_SLIDER</option>
@@ -2136,6 +2137,15 @@
 
 		<field name="" type="separator" default="FLEXI_PARAMETERS_APPEARANCE" label="" level="level1" />
 
+			<field name="iman_type_tabs_style" type="fcradio" default="browser" label="FLEXI_IMAN_TYPE_TABS_STYLE" description="FLEXI_IMAN_TYPE_TABS_STYLE_DESC" class="btn-group group-fcmethod">
+				<option value="browser">FLEXI_IMAN_TYPE_TABS_BROWSER</option>
+				<option value="hanging">FLEXI_IMAN_TYPE_TABS_HANGING</option>
+				<option value="underline">FLEXI_IMAN_TYPE_TABS_UNDERLINE</option>
+				<option value="flat">FLEXI_IMAN_TYPE_TABS_FLAT</option>
+				<option value="pills">FLEXI_IMAN_TYPE_TABS_PILLS</option>
+				<option value="bootstrap">FLEXI_IMAN_TYPE_TABS_BOOTSTRAP</option>
+			</field>
+
 			<field name="iman_quick_itype_links" type="fcradio" default="1" label="FLEXI_IMAN_QUICK_FILTER_TYPE_LINKS" description="FLEXI_IMAN_QUICK_FILTER_TYPE_LINKS_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
@@ -2177,7 +2187,7 @@
 				checkvals="single_type,lang,assocs,cats,tags,template,access,author,created,modified,hits,votes,ratings,id" defaultvals="single_type"
 				label="FLEXI_IMAN_DISABLE_COLUMNS" description="FLEXI_IMAN_DISABLE_COLUMNS_DESC" cols="3" />
 
-			<field name="items_manager_extra_fields" type="textarea" default="" rows="2" cols="60" label="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS" description="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS_DESC" class="input-xxlarge" />
+			<field name="items_manager_extra_fields" type="fields" fieldnameasvalue="1" issortable="1" keepsuffix="1" filter="string" default="" label="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS" description="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS_DESC" class="input-xxlarge" />
 
 			<field name="items_manager_cols_appearance" type="multilist" subtype="radio" default="0" label="FLEXI_ITEMS_MANAGER_COLS_APPEARANCE" description="FLEXI_ITEMS_MANAGER_COLS_APPEARANCE_DESC" toggle_related="1" class="btn-group group-fcmethod">
 				<option value="0" show_list="" hide_list="items-manager-trim-chars">FLEXI_DEFAULT</option>

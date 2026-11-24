@@ -9,7 +9,22 @@ function fcfield_add2list(id, selector) {
 function fcfield_store_ordering(value) {
   const list = FlexiForm.element(value), input = document.getElementById(list.id.replace('sortable-', '').trim());
   input.value = Array.from(list.children, item => item.dataset.value.replace('field_', '')).join(',');
+  fcfield_sync_selector(input.id);
   FlexiForm.change(input);
+}
+/** Is the value already in the sortable list (values may have a ":suffix", e.g. "fieldname:displaymethod:title") */
+function fcfield_sortable_has(list, val) {
+  return Array.from(list.children).some(item => {
+    const v = (item.dataset.value || '').replace('field_', '');
+    return v === val || v.split(':')[0] === val;
+  });
+}
+/** Disable, in the selector of a sortable list, the options that are already in the list */
+function fcfield_sync_selector(id) {
+  const select = document.getElementById(id + '_selector'), list = document.getElementById('sortable-' + id);
+  if (!select || !list) return;
+  const used = new Set(Array.from(list.children, item => (item.dataset.value || '').replace('field_', '').split(':')[0]));
+  select.querySelectorAll('option').forEach(option => { option.disabled = !!(option.value && used.has(option.value)); });
 }
 function fcfield_del_sortable_element(value) {
   const item = FlexiForm.element(value).closest('li'), list = item.parentElement;
@@ -33,6 +48,8 @@ function fcfield_add_sortable_element(value) {
   const select = FlexiForm.element(value), id = select.id.replace('_selector', '');
   if (!select.value) return true;
   const list = document.getElementById('sortable-' + id), item = document.createElement('li');
+  // Do not add an element that is already in the list (also protects against the change event firing twice for one selection)
+  if (fcfield_sortable_has(list, select.value)) { setTimeout(() => fc_recordSelectReset(select), 50); return true; }
   item.className = 'fcrecord'; item.dataset.value = 'field_' + select.value;
   const label = document.createElement('span'); label.className = 'fcprop_box'; label.textContent = select.selectedOptions[0].textContent;
   item.append(label); fc_recordButton(item, 'delfield_handle', FlexiForm.text('FLEXI_REMOVE'), () => fcfield_del_sortable_element(item.firstChild));
