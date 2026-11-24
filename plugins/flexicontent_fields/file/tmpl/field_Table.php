@@ -144,7 +144,8 @@ foreach ($field->value as $file_id)
 												   onclick="'.$onclick_js.'" href="javascript:" data-href="'.$modal_url.'"
 	><i class="icon-search"></i></a>';  // &nbsp; Select
 			$juri_root = \Joomla\CMS\Uri\Uri::root(true);
-			$file_placeholder_text = 'No file selected';
+			$file_placeholder_text = htmlspecialchars(Text::_('FLEXI_MEDIA_NO_FILE_SELECTED'), ENT_QUOTES, 'UTF-8');
+			$file_clear_label = htmlspecialchars(Text::_('FLEXI_CLEAR'), ENT_QUOTES, 'UTF-8');
 			$file_placeholder_src  = '';//$juri_root . '/' .'......./person_placeholder.jpg';
 			$file_clear_value_js   = "fcfield_file.clearMediaFile(this, '".$file_placeholder_src."');";
 
@@ -169,7 +170,7 @@ foreach ($field->value as $file_id)
 												<div class="input-group">
 													<input class="form-control input-group-prepend fc_mediafile" type="text" readonly="" style="flex-grow:20; min-width:unset" value="{$file_data->filename}" id="{$elementid_n}_mediafile" name="{$fieldname_n}[mediafile]" placeholder="{$file_placeholder_text}" data-config_name="{$field_name_js}" />
 													{$select_file_btn}
-													<button type="button" href="#" title="Clear" class="form-control btn input-group-append fit-contents clear-btn" onclick="{$file_clear_value_js}"><i class="icon-cancel"></i></button>
+													<button type="button" href="#" title="{$file_clear_label}" class="form-control btn input-group-append fit-contents clear-btn" onclick="{$file_clear_value_js}"><i class="icon-cancel"></i></button>
 												</div>
 											</div>
 										</div>
@@ -307,7 +308,7 @@ HTML;
 			<div class="inlinefile-prv-box" style="'. ($use_myfiles == 4 && $inputmode == 1 && !$use_quantum ? 'width: 100%' : 'flex-basis: auto;') . '">
 				'.($form_file_preview && $use_myfiles != 4 ? '<div class="fcfield_preview_box' . ($form_file_preview === 2 ? ' auto' : '') . '" style="'.$preview_css.'">
 					<div class="fc_preview_text">' . $preview_text . '</div>
-					<img id="'.$elementid_n.'_image_preview" src="'.$preview_src.'" class="fc_preview_thumb" alt="Preview image placeholder"/></div>' : '').'
+					<img id="'.$elementid_n.'_image_preview" src="'.$preview_src.'" class="fc_preview_thumb" alt="' . htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_MEDIA_PREVIEW_IMAGE'), ENT_QUOTES, 'UTF-8') . '"/></div>' : '').'
 				'.(!$media_field_html && !empty($uploader_html) ? $uploader_html->container : $media_field_html).'
 			</div>
 

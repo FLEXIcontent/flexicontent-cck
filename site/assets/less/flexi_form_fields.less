@@ -2332,22 +2332,37 @@ textarea.fcfield_textareaval {
   background: var(--bs-secondary-bg, #e9edf2) !important;
 }
 
-#flexicontent .fc-media-card .fc-image-btn-group:has(.fc-tool-label) {
-  gap: .375rem;
-  padding: .125rem .375rem;
+#flexicontent .card:is(.fc-image-card, .fc-video-card) .fc-image-bottom-toolbar {
+  width: 100%;
+  box-sizing: border-box;
 }
-#flexicontent .fc-media-card .fc-image-btn-group:has(.fc-tool-label) > button {
-  position: relative;
-  gap: .4rem;
-  padding-inline: .55rem !important;
-  min-height: 2rem;
+#flexicontent .card:is(.fc-image-card, .fc-video-card) .fc-image-bottom-toolbar .fc-image-btn-group {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 2.75rem), 1fr));
+  width: 100%;
+  gap: .25rem;
+}
+#flexicontent .card:is(.fc-image-card, .fc-video-card) .fc-image-bottom-toolbar .fc-image-btn-group > :is(button, [role="button"]) {
+  width: 100%;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: .25rem;
   height: auto;
-  border: 1px solid var(--fc-card-line) !important;
-  border-radius: .35rem !important;
-  background: var(--bs-body-bg, white) !important;
-  line-height: 1.35;
+  min-height: 2.75rem;
+  padding: .3rem .15rem !important;
 }
-#flexicontent .fc-media-card .fc-tool-label { font-family: var(--bs-body-font-family, system-ui, sans-serif); font-size: .8125rem; font-weight: 500; }
+#flexicontent .fc-image-bottom-toolbar .fcfield-clearvalue:has(.fc-tool-label)::before {
+  content: none !important;
+}
+#flexicontent .fc-image-bottom-toolbar .fc-tool-label {
+  max-width: 100%;
+  font: 500 .75rem/1.2 var(--bs-body-font-family, system-ui, sans-serif);
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
 #flexicontent .fc-media-card .fc_mediafile_controls .fc-waveform-toggle {
   position: relative;
   bottom: auto;

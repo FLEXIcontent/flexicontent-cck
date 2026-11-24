@@ -314,11 +314,11 @@ foreach ($field->value as $index => $value)
 
 	if ($img_link)
 	{
-		$imgpreview = '<img class="fc_preview_thumb" id="'.$elementid_n.'_preview_image" src="'.$img_link.'" alt="Preview image" />';
+		$imgpreview = '<img class="fc_preview_thumb" id="'.$elementid_n.'_preview_image" src="'.$img_link.'" alt="' . htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_MEDIA_PREVIEW_IMAGE'), ENT_QUOTES, 'UTF-8') . '" />';
 	}
 	elseif ($img_link !== false)
 	{
-		$imgpreview = '<img class="fc_preview_thumb" id="'.$elementid_n.'_preview_image" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="Preview image" />';
+		$imgpreview = '<img class="fc_preview_thumb" id="'.$elementid_n.'_preview_image" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="' . htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_MEDIA_PREVIEW_IMAGE'), ENT_QUOTES, 'UTF-8') . '" />';
 	}
 	else
 	{
@@ -413,7 +413,7 @@ foreach ($field->value as $index => $value)
 				'thumb_size_default' => $thumb_size_default,
 				'toggle_btn' => array(
 					'class' => $btn_item_class . $flat_btn_class,
-					'text' => '<span class="fc-image-tool-icon fas fa-upload" aria-hidden="true" title="' . Text::_('FLEXI_UPLOAD') . '"></span>',
+					'text' => flexicontent_html::mediaActionLabel('upload'),
 					'onclick' => $toggleUploader_onclick,
 					'action' => null
 				),
@@ -429,19 +429,19 @@ foreach ($field->value as $index => $value)
 		// !!! CLASS: fc-files-modal-link fc-sel NEEDED BY JS !!! DO NOT REMOVE, DO NOT MOVE
 		$uploader_html->myFilesBtn = '
 			<button type="button" data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" class="fc-files-modal-link fc-sel '.$btn_classes.'" aria-label="' . htmlspecialchars(Text::_('FLEXI_MY_FILES'), ENT_QUOTES, 'UTF-8') . '" title="' . Text::_('FLEXI_MY_FILES') . '" data-rowno="'.$n.'" id="'.$elementid_n.'_selectvalue">
-				<span class="fc-image-tool-icon fas fa-images" aria-hidden="true"></span>
+				' . flexicontent_html::mediaActionLabel('files') . '
 			</button>';
 		// !!! CLASS: fc-files-modal-link fc-up NEEDED BY JS !!! DO NOT REMOVE, DO NOT MOVE
 		$uploader_html->mediaUrlBtn = !$usemediaurl ? '' : '
 			<button type="button" class="fc-files-modal-link fc-sel fcfield-mediaurl-btn ' . $btn_classes .'" data-for="' . $elementid_n . '" aria-label="' . htmlspecialchars(Text::_('FLEXI_FIELD_MEDIA_URL'), ENT_QUOTES, 'UTF-8') . '" aria-expanded="false" title="' . Text::_('FLEXI_FIELD_MEDIA_URL') . '" onclick="fcfield_image.toggleMediaURL(\''.$elementid_n.'\', \''.$field_name_js.'\'); return false;">
-				<span class="fc-image-tool-icon fas fa-video" aria-hidden="true"></span>
+				' . flexicontent_html::mediaActionLabel('url') . '
 			</button>';
 	}
 
 	// Edit button, in the toolbar below the image
 	$has_edit_props = $linkto_url || $usealt || $usetitle || $usedesc || $usecust1 || $usecust2;
-	$info_button = !$has_edit_props ? '' : '<button type="button" class="fc-flat-btn fc-image-edit-btn" data-for="' . $elementid_n . '" aria-label="' . htmlspecialchars(Text::_('FLEXI_EDIT_OPTIONS'), ENT_QUOTES, 'UTF-8') . '" aria-expanded="false" title="' . Text::_('FLEXI_EDIT_OPTIONS') . '" onclick="fcfield_image.toggleFields(\'' . $elementid_n . '\');"><span class="fc-image-tool-icon fas fa-edit" aria-hidden="true"></span></button>';
-	$clear_button = '<button type="button" class="fc-flat-btn fcfield-clearvalue" aria-label="' . htmlspecialchars(Text::_('FLEXI_CLEAR'), ENT_QUOTES, 'UTF-8') . '" title="' . Text::_('FLEXI_CLEAR') . '" onclick="fcfield_image.clearField(this, {}, \'' . $field_name_js . '\');"><span class="fc-image-tool-icon fas fa-eraser" aria-hidden="true"></span></button>';
+	$info_button = !$has_edit_props ? '' : '<button type="button" class="fc-flat-btn fc-image-edit-btn" data-for="' . $elementid_n . '" aria-label="' . htmlspecialchars(Text::_('FLEXI_EDIT_OPTIONS'), ENT_QUOTES, 'UTF-8') . '" aria-expanded="false" title="' . Text::_('FLEXI_EDIT_OPTIONS') . '" onclick="fcfield_image.toggleFields(\'' . $elementid_n . '\');">' . flexicontent_html::mediaActionLabel('edit') . '</button>';
+	$clear_button = '<button type="button" class="fc-flat-btn fcfield-clearvalue" aria-label="' . htmlspecialchars(Text::_('FLEXI_CLEAR'), ENT_QUOTES, 'UTF-8') . '" title="' . Text::_('FLEXI_CLEAR') . '" onclick="fcfield_image.clearField(this, {}, \'' . $field_name_js . '\');">' . flexicontent_html::mediaActionLabel('clear') . '</button>';
 
 	// Remove button shown directly in the top toolbar (no dropdown)
 	$remove_button_direct = (isset($remove_button) && $remove_button !== '') ? $remove_button : '';

@@ -328,6 +328,7 @@ class plgFlexicontent_fieldsFile extends FCField
 		$autoassign = (int) $field->parameters->get( 'autoassign', 1 ) ;
 		$filesElementURL = \Joomla\CMS\Uri\Uri::base(true)
 			.'/index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component'
+			. '&amp;language=' . rawurlencode($app->getLanguage()->getTag())
 			.'&amp;index=%s'
 			.'&amp;field='.$field->id.'&amp;u_item_id='.$u_item_id.'&amp;autoassign='.$autoassign
 			.'&amp;filter_uploader='.$user->id
@@ -500,7 +501,7 @@ class plgFlexicontent_fieldsFile extends FCField
 			$uploader_html = $use_inline_uploaders ? $uploader_html_arr[$n] : false;
 
 			// Icon-only edit button, in the toolbar below the preview, opens the file edit popup
-			$edit_btn = '<button type="button" class="' . $btn_item_class . $flat_btn_class . ' fc-file-edit-btn" title="' . \Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_FILE_EDIT_FILE' ) . '" onclick="return fc_editFile_'.$field->id.'(this);"><span class="fc-image-tool-icon fas fa-edit" aria-hidden="true"></span></button>';
+			$edit_btn = '<button type="button" class="' . $btn_item_class . $flat_btn_class . ' fc-file-edit-btn" title="' . \Joomla\CMS\Language\Text::_( 'FLEXI_FIELD_FILE_EDIT_FILE' ) . '" onclick="return fc_editFile_'.$field->id.'(this);">' . flexicontent_html::mediaActionLabel('edit') . '</button>';
 
 			$bottom_toolbar = '
 				<div class="' . $btn_group_class . ' fc-xpended-btns fc-image-bottom-toolbar">
@@ -509,9 +510,9 @@ class plgFlexicontent_fieldsFile extends FCField
 							$uploader_html->toggleBtn .
 							($use_myfiles > 0 ? $uploader_html->myFilesBtn : '') .
 							$uploader_html->mediaUrlBtn .
-							$uploader_html->multiUploadBtn . $uploader_html->clearBtn
+							$uploader_html->multiUploadBtn
 						: '') . '
-						' . $edit_btn . '
+						' . $edit_btn . ($uploader_html ? ($uploader_html->clearBtn ?? '') : '') . '
 					</div>
 				</div>';
 
