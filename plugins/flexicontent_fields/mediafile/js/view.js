@@ -78,6 +78,7 @@ class fc_Waveform_LazyLoad
 		var controls = document.getElementById('fc_mediafile_controls_' + fnn);
 		if (!file || !waveform || !box || !controls || FlexiForm.data(waveform, 'audio_spectrum')) return;
 		var loading_timer = null, progress_timer = null;
+		var loadingLabel = window.Joomla?.Text?._('FLEXI_FIELD_MEDIAFILE_LOADING_PERCENT') || '%s%';
 
 		var slider = document.getElementById('fc_mediafile_slider_' + fnn);
 		var progressBar = box.querySelector('.fc_mediafile_audio_spectrum_progressbar');
@@ -205,7 +206,7 @@ class fc_Waveform_LazyLoad
 
 			var factor = 100;
 
-			barText.textContent = Joomla.Text._('FLEXI_FIELD_MEDIAFILE_LOADING_PERCENT').replace('%s', percent);
+			barText.textContent = loadingLabel.replace('%s', percent);
 			progressBar.style.opacity = '1';
 			progressBar.style.visibility = 'visible';
 
@@ -215,7 +216,7 @@ class fc_Waveform_LazyLoad
 				var frame = 0;
 				loading_timer = setInterval(function ()
 				{
-					barText.textContent = Joomla.Text._('FLEXI_FIELD_MEDIAFILE_LOADING_PERCENT').replace('%s', percent);
+					barText.textContent = loadingLabel.replace('%s', percent);
 					frame += 1;
 					if (frame >= steps)
 					{
@@ -241,7 +242,7 @@ class fc_Waveform_LazyLoad
 
 			if (!!percent)
 			{
-				barText.textContent = Joomla.Text._('FLEXI_FIELD_MEDIAFILE_LOADING_PERCENT').replace('%s', percent);
+				barText.textContent = loadingLabel.replace('%s', percent);
 				progressBar.style.opacity = '0.75';
 
 				setTimeout(function () {

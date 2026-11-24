@@ -87,6 +87,7 @@ class FlexicontentViewItem extends FlexicontentViewBaseRecord
 			// Load english language file for 'com_flexicontent' component then override with current language file
 			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
 			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+			FLEXIUtilities::loadMediaLanguage(JPATH_ADMINISTRATOR);
 		}
 
 		/**

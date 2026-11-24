@@ -3,6 +3,23 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 class FLEXIUtilities
 {
+	/** Fill the new media labels on sites whose installed component pack predates the uploader. */
+	public static function loadMediaLanguage($clientPath)
+	{
+		$language = \Joomla\CMS\Factory::getApplication()->getLanguage();
+		$tag = $language->getTag();
+		if (!$tag || $tag === 'en-GB') return;
+
+		$bundle = JPATH_SITE . '/components/com_flexicontent';
+		$loaded = $language->load('com_flexicontent_media', $bundle, $tag, true, false);
+		$installed = $language->load('com_flexicontent_media', $clientPath, $tag, true, false);
+		if ($loaded || $installed)
+		{
+			// Prefer the site's French (or other current-language) component pack when it supplies a key.
+			$language->load('com_flexicontent', $clientPath, $tag, true, false);
+		}
+	}
+
 	static function funcIsDisabled($function)
 	{
 		static $disabledFuncs = null;

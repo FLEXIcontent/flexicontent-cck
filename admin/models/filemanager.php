@@ -147,6 +147,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		{
 			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
 			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+			FLEXIUtilities::loadMediaLanguage(JPATH_ADMINISTRATOR);
 		}
 
 

@@ -96,6 +96,8 @@ else
 	// No force loading needed, save some time, and do not force language file reload
 	\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_SITE);
 
+FLEXIUtilities::loadMediaLanguage(JPATH_SITE);
+
 // Load language overrides, just before executing the component (DONE manually for J1.5)
 /*if (!FLEXI_J16GE)
 {

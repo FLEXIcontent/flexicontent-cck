@@ -98,6 +98,7 @@ abstract class JHtmlFcuploader
 
 		$defaults = array(
 			'action' => \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&task=filemanager.uploads'
+				. '&language=' . rawurlencode(\Joomla\CMS\Factory::getApplication()->getLanguage()->getTag())
 				. '&view='.($field ? 'fileselement' : 'filemanager')
 				. '&fieldid='.($field ? $field->id : ''). '&u_item_id='.$u_item_id
 				. '&'.\Joomla\CMS\Session\Session::getFormToken().'=1',

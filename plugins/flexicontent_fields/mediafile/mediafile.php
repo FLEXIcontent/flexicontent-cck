@@ -321,6 +321,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		$autoassign = (int) $field->parameters->get( 'autoassign', 1 ) ;
 		$filesElementURL = \Joomla\CMS\Uri\Uri::base(true)
 			.'/index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component'
+			. '&amp;language=' . rawurlencode($app->getLanguage()->getTag())
 			.'&amp;index=%s'
 			.'&amp;field='.$field->id.'&amp;u_item_id='.$u_item_id.'&amp;autoassign='.$autoassign
 			.'&amp;filter_uploader='.$user->id
