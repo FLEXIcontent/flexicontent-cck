@@ -82,6 +82,41 @@ trait TaxonomyWriteTrait
     }
 
     /**
+     * Read the XML defaults of a registry field group.
+     *
+     * Joomla's Form::filter() only keeps values that are present in the input,
+     * so a partial API payload would otherwise store an empty registry. The
+     * administrator form posts every field, which is what creates the defaults
+     * seen on types made in the back office. Mirror that for API writes.
+     *
+     * @param   Form    $form   The validated legacy form.
+     * @param   string  $group  The registry field group (attribs or params).
+     *
+     * @return  array
+     */
+    private function formGroupDefaults(Form $form, string $group): array
+    {
+        $xml = $form->getXml();
+
+        if (!$xml) {
+            return [];
+        }
+
+        $fields   = $xml->xpath('//fields[@name="' . $group . '"]//field[@default]') ?: [];
+        $defaults = [];
+
+        foreach ($fields as $field) {
+            $name = (string) $field['name'];
+
+            if ($name !== '') {
+                $defaults[$name] = (string) $field['default'];
+            }
+        }
+
+        return $defaults;
+    }
+
+    /**
      * Persist a taxonomy record through the legacy model.
      *
      * @param   array  $data  The data prepared by TaxonomyWriteHelper.
@@ -142,9 +177,23 @@ trait TaxonomyWriteTrait
             }
 
             // These values are outside the legacy XML forms or are merged by
-            // the administrator controller after validation.
+            // the administrator controller after validation. Seed registry
+            // groups with their XML defaults before applying stored/API values,
+            // as a full administrator form submission would do. Without this a
+            // new type would be saved with an empty config, i.e. no default
+            // item layout (attribs.ilayout).
             foreach (['attribs', 'params', 'metadata', 'rules', 'tid', 'jtag_id', 'layouts', 'iflayout'] as $key) {
-                if (\array_key_exists($key, $data)) {
+                if (!\array_key_exists($key, $data)) {
+                    continue;
+                }
+
+                if (\in_array($key, ['attribs', 'params'], true) && \is_array($data[$key])) {
+                    $validData[$key] = \array_merge(
+                        self::formGroupDefaults($form, $key),
+                        (array) ($validData[$key] ?? []),
+                        $data[$key]
+                    );
+                } else {
                     $validData[$key] = $data[$key];
                 }
             }

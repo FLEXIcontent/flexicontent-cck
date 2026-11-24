@@ -113,6 +113,11 @@ flexi_delete_taxonomy("tags", 42, true)
 Les ids de type, champ, catégorie et tag renvoyés par ces outils sont les ids
 FLEXIcontent à réutiliser dans les écritures d’items.
 
+Les types créés via l’API reçoivent les valeurs par défaut de leur formulaire
+XML, comme dans l’administration (notamment `attribs.ilayout = "grid"`). Pour
+choisir un autre template : `flexi_create_taxonomy("types", {"name": "...",
+"attribs": {"ilayout": "article"}})`.
+
 Note : la suppression d’un tag FLEXIcontent laisse le tag Joomla associé par
 défaut (option legacy `remove_cascade_jtags` désactivée). Le champ `jtag_id`
 renvoyé en lecture permet de le repérer et de le supprimer via l’API Joomla
