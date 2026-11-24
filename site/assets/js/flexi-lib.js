@@ -2088,7 +2088,7 @@
 			]) {
 				if (!selector || !classes) continue;
 				document.querySelectorAll(selector).forEach(node => {
-					node.classList.remove(...classes.trim().split(/\\s+/).filter(Boolean));
+					node.classList.remove(...classes.trim().split(/\s+/).filter(Boolean));
 					if (prefix !== undefined) node.classList.add(prefix + value);
 				});
 			}

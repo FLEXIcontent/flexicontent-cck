@@ -46,6 +46,58 @@ await test('Items type shortcuts replace a multiple selection and keep the curre
  }
  assert.equal(submissions.length, 2);
 });
+await test('Status actions are keyboard accessible and preserve focus when the selector closes',
+  '<form><div class="statetoggler"><button id="row42" type="button" class="stateopener" aria-expanded="false" onclick="fc_statehandler_singleton.toggleSelector(this)">Change state</button>'
+  + '<div class="options" style="display:none" data-id="42" data-st=\'[{"i":1},{"i":0}]\'></div></div>'
+  + '<button id="next" type="button">Next</button></form>', async page => {
+    await page.addScriptTag({path: path.join(root, 'site/assets/js/stateselector.js')});
+    await page.evaluate(() => {
+      window.Joomla = {Text: {_: key => ({FLEXI_PUBLISH_THIS_ITEM: 'Publish', FLEXI_UNPUBLISH_THIS_ITEM: 'Unpublish'})[key]}};
+      fc_statehandler_singleton = new fc_statehandler({script_url: '/state?option=fixture'});
+      window.formSubmits = 0;
+      document.querySelector('form').addEventListener('submit', event => {
+        event.preventDefault();
+        window.formSubmits++;
+      });
+    });
+    const changes = [];
+    await page.route('**/state?*', route => {
+      const query = new URL(route.request().url()).searchParams;
+      changes.push([query.get('id'), query.get('state')]);
+      return route.fulfill({json: {html: '<span class="icon-publish"></span>', title: 'Published'}});
+    });
+
+    const opener = page.locator('#row42');
+    const publish = page.getByRole('button', {name: 'Publish', exact: true});
+    const options = page.locator('.options');
+    await opener.focus();
+    await page.keyboard.press('Enter');
+    assert.equal(await opener.getAttribute('aria-expanded'), 'true');
+    await page.keyboard.press('Tab');
+    assert.equal(await publish.evaluate(el => el === document.activeElement), true);
+    await page.keyboard.press('Escape');
+    assert.equal(await opener.getAttribute('aria-expanded'), 'false');
+    assert.equal(await opener.evaluate(el => el === document.activeElement), true);
+    await options.waitFor({state: 'hidden'});
+    assert.deepEqual(changes, []);
+
+    await page.keyboard.press('Space');
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Space');
+    await page.locator('#row42[aria-description="Published"]').waitFor();
+    assert.deepEqual(changes, [['42', '1']]);
+    assert.equal(await opener.evaluate(el => el === document.activeElement), true);
+    assert.equal(await opener.getAttribute('aria-expanded'), 'false');
+    assert.equal(await page.evaluate(() => window.formSubmits), 0);
+    await options.waitFor({state: 'hidden'});
+
+    await page.keyboard.press('Enter');
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Tab');
+    assert.equal(await page.locator('#next').evaluate(el => el === document.activeElement), true);
+    assert.equal(await opener.getAttribute('aria-expanded'), 'false');
+  });
 const parentForm='<form id="adminForm"><input name="task"><input name="newstate"><input name="boxchecked" value="1"></form>';
 await test('Builder form storage round-trips current textarea and hidden input values',
  '<form id="builder"><textarea id="layout_html" name="html">Old HTML</textarea><textarea id="layout_css" name="css">Old CSS</textarea><input id="layout_components" name="components" type="hidden" value="[]"><input id="layout_styles" name="styles" type="hidden" value="[]"><input id="layout_assets" name="assets" type="hidden" value="[]"></form>',async page=>{

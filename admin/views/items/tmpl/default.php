@@ -720,10 +720,10 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				<input type="text" name="search" id="search" placeholder="<?php echo !empty($this->scope_title) ? $this->scope_title : Text::_('FLEXI_SEARCH'); ?>" value="<?php echo htmlspecialchars($this->lists['search'], ENT_QUOTES, 'UTF-8'); ?>" class="fcfield_textval" />
 				<button title="" data-original-title="<?php echo Text::_('FLEXI_SEARCH'); ?>" class="<?php echo $btn_class . (FLEXI_J40GE ? ' btn-outline-dark ' : ' ') . $this->tooltip_class; ?>" onclick="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-search"></i>' : Text::_('FLEXI_GO'); ?></button>
 
-				<div id="fc_filters_box_btn" data-original-title="<?php echo Text::_('FLEXI_FILTERS'); ?>" class="<?php echo $this->tooltip_class . ' ' . ($this->count_filters ? 'btn ' . $this->btn_iv_class : $out_class); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary', false, undefined, 1);">
+				<button type="button" id="fc_filters_box_btn" aria-label="<?php echo htmlspecialchars(Text::_('FLEXI_FILTERS'), ENT_QUOTES, 'UTF-8'); ?>" data-original-title="<?php echo Text::_('FLEXI_FILTERS'); ?>" class="<?php echo $this->tooltip_class . ' ' . ($this->count_filters ? 'btn ' . $this->btn_iv_class : $out_class); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary', false, undefined, 1);">
 					<?php echo FLEXI_J30GE ? '<i class="icon-filter"></i>' : Text::_('FLEXI_FILTERS'); ?>
 					<?php echo ($this->count_filters  ? ' <sup>' . $this->count_filters . '</sup>' : ''); ?>
-				</div>
+				</button>
 
 				<?php
 				$filters_modern = (int) ComponentHelper::getParams('com_flexicontent')->get('backend_filters_style', 1) === 1;
@@ -789,7 +789,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 					</div>
 					<?php endif; ?>
 
-					<div id="fc-filters-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="<?php echo Text::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
+					<button type="button" id="fc-filters-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="<?php echo Text::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></button>
 				</div>
 
 				<?php if ($filters_apply_btn) : ?>
@@ -830,22 +830,22 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 			<div class="btn-group">
 				<?php if (!isset($disable_columns['cats']) && $max_cats_cnt > 1): ?>
-					<div id="fc-toggle-cats_btn" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?>  hidden-phone" title="<?php echo Text::_('FLEXI_SECONDARY_CATEGORIES'); ?>" onclick="toggleItemAssignments(this, '.fc_assignments_box.fc_cats');" ><span class="icon-tree-2"></span></div>
+					<button type="button" id="fc-toggle-cats_btn" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?>  hidden-phone" title="<?php echo Text::_('FLEXI_SECONDARY_CATEGORIES'); ?>" onclick="toggleItemAssignments(this, '.fc_assignments_box.fc_cats');" ><span class="icon-tree-2"></span></button>
 				<?php endif; ?>
 				<?php if (!isset($disable_columns['tags']) && $max_tags_cnt > 1): ?>
-					<div id="fc-toggle-tags_btn" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?>  hidden-phone hidden-tablet" title="<?php echo Text::_('FLEXI_TAGS'); ?>" onclick="toggleItemAssignments(this, '.fc_assignments_box.fc_tags');" ><span class="icon-tags"></span></div>
+					<button type="button" id="fc-toggle-tags_btn" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?>  hidden-phone hidden-tablet" title="<?php echo Text::_('FLEXI_TAGS'); ?>" onclick="toggleItemAssignments(this, '.fc_assignments_box.fc_tags');" ><span class="icon-tags"></span></button>
 				<?php endif; ?>
 
-				<div id="fc_mainChooseColBox_btn" class="<?php echo $this->tooltip_class . ' ' . $out_class; ?> hidden-phone" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" title="<?php echo flexicontent_html::getToolTip('FLEXI_COLUMNS', 'FLEXI_ABOUT_AUTO_HIDDEN_COLUMNS', 1, 1); ?>">
+				<button type="button" id="fc_mainChooseColBox_btn" aria-label="<?php echo htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_COLUMNS'), ENT_QUOTES, 'UTF-8'); ?>" class="<?php echo $this->tooltip_class . ' ' . $out_class; ?> hidden-phone" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" title="<?php echo flexicontent_html::getToolTip('FLEXI_COLUMNS', 'FLEXI_ABOUT_AUTO_HIDDEN_COLUMNS', 1, 1); ?>">
 					<span class="icon-contract"></span><sup id="columnchoose_totals"></sup>
-				</div>
+				</button>
 
 				<?php if (!empty($this->minihelp) && FlexicontentHelperPerm::getPerm()->CanConfig): ?>
-				<div id="fc-mini-help_btn" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?> hidden-phone hidden-tablet" title="<?php echo Text::_('FLEXI_IMAN_ABOUT_ADDING_MORE_COLUMNS_AND_FILTERS'); ?>" onclick="fc_toggle_box_via_btn('fc-mini-help', this, 'btn-primary');" >
+				<button type="button" id="fc-mini-help_btn" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?> hidden-phone hidden-tablet" title="<?php echo Text::_('FLEXI_IMAN_ABOUT_ADDING_MORE_COLUMNS_AND_FILTERS'); ?>" onclick="fc_toggle_box_via_btn('fc-mini-help', this, 'btn-primary');" >
 					<span class="icon-cog"></span>
 					<span class="icon-help"></span>
 					<?php echo $this->minihelp; ?>
-				</div>
+				</button>
 				<?php endif; ?>
 			</div>
 			<div id="mainChooseColBox" class="group-fcset fcman-abs" style="display:none;"></div>
@@ -988,7 +988,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				<?php echo HTMLHelper::_('grid.sort', 'FLEXI_STATUS', 'a.' . $this->state_propname, $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_state') || $this->getModel()->getState('filter_catsinstate') != 1) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_state'); document.getElementById('filter_catsinstate').value = '1'; document.adminForm.submit();"></span>
+					<button type="button" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_REMOVE_FILTER'); ?>" class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_state'); document.getElementById('filter_catsinstate').value = '1'; document.adminForm.submit();"></button>
 				</span>
 				<?php endif; ?>
 			</th>
@@ -997,7 +997,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				<?php echo HTMLHelper::_('grid.sort', 'FLEXI_TITLE', 'a.' . $this->title_propname, $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if (strlen($this->getModel()->getState('search'))) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('search'); document.adminForm.submit();"></span>
+					<button type="button" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_REMOVE_FILTER'); ?>" class="icon-purge fc-del-filter-icon" onclick="delFilter('search'); document.adminForm.submit();"></button>
 				</span>
 				<?php endif; ?>
 			</th>
@@ -1008,7 +1008,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				<?php echo HTMLHelper::_('grid.sort', 'FLEXI_AUTHOR', 'a.created_by', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_author')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_author'); document.adminForm.submit();"></span>
+					<button type="button" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_REMOVE_FILTER'); ?>" class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_author'); document.adminForm.submit();"></button>
 				</span>
 				<?php endif; ?>
 			</th>
@@ -1020,7 +1020,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				<?php echo HTMLHelper::_('grid.sort', 'FLEXI_LANGUAGE', 'a.language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_lang')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_lang'); document.adminForm.submit();"></span>
+					<button type="button" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_REMOVE_FILTER'); ?>" class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_lang'); document.adminForm.submit();"></button>
 				</span>
 				<?php endif; ?>
 			</th>
@@ -1029,16 +1029,16 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 
 			<?php if ($useAssocs && !isset($disable_columns['assocs'])) : ?>
 			<th class="col_assocs_count" data-col="assocs" data-col-label="<?php echo Text::_('FLEXI_ASSOCIATIONS'); ?>"><?php $colposition++; ?>
-				<div id="fc-toggle-assocs_btn" style="padding: 4px 0 2px 6px;" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?>" title="<?php echo Text::_('FLEXI_ASSOCIATIONS'); ?>" onclick="window.fcTableTools && fcTableTools.toggle('<?php echo $this->data_tbl_id; ?>', 'assocs');" >
+				<button type="button" id="fc-toggle-assocs_btn" style="padding: 4px 0 2px 6px;" class="<?php echo $out_class . ' ' . $this->tooltip_class; ?>" title="<?php echo Text::_('FLEXI_ASSOCIATIONS'); ?>" onclick="window.fcTableTools && fcTableTools.toggle('<?php echo $this->data_tbl_id; ?>', 'assocs');" >
 					<span class="icon-flag"></span>
-				</div>
+				</button>
 			</th>
 
 			<th data-col="assocs" class="col_assocs hideOnDemandClass nowrap hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php echo Text::_('FLEXI_ASSOCIATIONS'); ?>
 				<?php if ($this->getModel()->getState('filter_assockey')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_assockey'); document.adminForm.submit();"></span>
+					<button type="button" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_REMOVE_FILTER'); ?>" class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_assockey'); document.adminForm.submit();"></button>
 				</span>
 				<?php endif; ?>
 			</th>
@@ -1050,7 +1050,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				<?php echo HTMLHelper::_('grid.sort', 'FLEXI_TYPE_NAME', 'type_name', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_type')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_type'); document.adminForm.submit();"></span>
+					<button type="button" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_REMOVE_FILTER'); ?>" class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_type'); document.adminForm.submit();"></button>
 				</span>
 				<?php endif; ?>
 			</th>
@@ -1076,7 +1076,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				<?php echo HTMLHelper::_('grid.sort', 'FLEXI_ACCESS', 'a.access', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->getModel()->getState('filter_access')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_access'); document.adminForm.submit();"></span>
+					<button type="button" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_REMOVE_FILTER'); ?>" class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_access'); document.adminForm.submit();"></button>
 				</span>
 				<?php endif; ?>
 			</th>
@@ -1089,7 +1089,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				<?php echo Text::_( 'FLEXI_CATEGORIES' ); ?>
 				<?php if ($this->getModel()->getState('filter_cats') || $this->getModel()->getState('filter_subcats') == 0) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_cats'); document.getElementById('filter_subcats').checked = true; document.adminForm.submit();"></span>
+					<button type="button" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_REMOVE_FILTER'); ?>" class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_cats'); document.getElementById('filter_subcats').checked = true; document.adminForm.submit();"></button>
 				</span>
 				<?php endif; ?>
 			</th>
@@ -1101,7 +1101,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				<?php echo Text::_( 'FLEXI_TAGS' ); ?>
 				<?php if ($this->getModel()->getState('filter_tag')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_tag'); document.adminForm.submit();"></span>
+					<button type="button" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_REMOVE_FILTER'); ?>" class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_tag'); document.adminForm.submit();"></button>
 				</span>
 				<?php endif; ?>
 			</th>
@@ -1116,7 +1116,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 					if (($this->startdate && ($this->startdate != Text::_('FLEXI_FROM'))) || ($this->enddate && ($this->startdate != Text::_('FLEXI_TO')))) :
 				?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('startdate');delFilter('enddate'); document.adminForm.submit();"></span>
+					<button type="button" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_REMOVE_FILTER'); ?>" class="icon-purge fc-del-filter-icon" onclick="delFilter('startdate');delFilter('enddate'); document.adminForm.submit();"></button>
 				</span>
 				<?php
 					endif;
@@ -1134,7 +1134,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 					if (($this->startdate && ($this->startdate != Text::_('FLEXI_FROM'))) || ($this->enddate && ($this->startdate != Text::_('FLEXI_TO')))) :
 				?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('startdate');delFilter('enddate'); document.adminForm.submit();"></span>
+					<button type="button" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_REMOVE_FILTER'); ?>" class="icon-purge fc-del-filter-icon" onclick="delFilter('startdate');delFilter('enddate'); document.adminForm.submit();"></button>
 				</span>
 				<?php
 					endif;
@@ -1170,7 +1170,7 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				<?php echo HTMLHelper::_('grid.sort', 'FLEXI_ID', 'a.id', $this->lists['order_Dir'], $this->lists['order']); ?>
 				<?php if ($this->getModel()->getState('filter_id')) : ?>
 				<span <?php echo $rem_filt_tip; ?>>
-					<span class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_id'); document.adminForm.submit();"></span>
+					<button type="button" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_REMOVE_FILTER'); ?>" class="icon-purge fc-del-filter-icon" onclick="delFilter('filter_id'); document.adminForm.submit();"></button>
 				</span>
 				<?php endif; ?>
 			</th>
@@ -1581,9 +1581,9 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				}
 				echo $_maincat;
 				echo count($row_cats) ? '
-					<span class="btn btn-mini ' . $this->popover_class . ' nowrap_box" onclick="FlexiForm.show(this.nextElementSibling, !FlexiForm.visible(this.nextElementSibling));" data-content="'.flexicontent_html::getToolTip(Text::_('FLEXI_CATEGORIES'), '<ul class="fc_plain"><li>'.implode('</li><li>', $cat_names).'</li></ul>', 0, 1).'">
+					<button type="button" class="btn btn-mini ' . $this->popover_class . ' nowrap_box" onclick="FlexiForm.show(this.nextElementSibling, !FlexiForm.visible(this.nextElementSibling));" data-content="'.flexicontent_html::getToolTip(Text::_('FLEXI_CATEGORIES'), '<ul class="fc_plain"><li>'.implode('</li><li>', $cat_names).'</li></ul>', 0, 1).'">
 						'.count($row_cats).' <i class="icon-tree-2"></i>
-					</span>
+					</button>
 					<div class="fc_assignments_box fc_cats">' : '';
 				echo count($row_cats) > 8
 					? implode(', ', $row_cats)
@@ -1608,9 +1608,9 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 						}
 					}
 					echo count($row_tags) ? '
-						<span class="btn btn-mini ' . $this->popover_class . ' nowrap_box" onclick="FlexiForm.show(this.nextElementSibling, !FlexiForm.visible(this.nextElementSibling));" data-content="'.flexicontent_html::getToolTip(Text::_('FLEXI_TAGS'), '<ul class="fc_plain"><li>'.implode('</li><li>', $tag_names).'</li></ul>', 0, 1).'">
+						<button type="button" class="btn btn-mini ' . $this->popover_class . ' nowrap_box" onclick="FlexiForm.show(this.nextElementSibling, !FlexiForm.visible(this.nextElementSibling));" data-content="'.flexicontent_html::getToolTip(Text::_('FLEXI_TAGS'), '<ul class="fc_plain"><li>'.implode('</li><li>', $tag_names).'</li></ul>', 0, 1).'">
 							'.count($row_tags).' <i class="icon-tags"></i>
-						</span>
+						</button>
 						<div class="fc_assignments_box fc_tags">' : '';
 					echo count($row_tags) > 8
 						? implode(', ', $row_tags)

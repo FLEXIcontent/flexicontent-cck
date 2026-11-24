@@ -1494,7 +1494,7 @@ td.col_edit_layout {
     display: none;
   }
 }
-div#fc-filters-slide-btn {
+button#fc-filters-slide-btn {
   border: 0;
   background: none;
   box-shadow: none;

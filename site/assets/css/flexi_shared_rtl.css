@@ -365,6 +365,7 @@ ul.fcrecords {
 .records_container > ul > li.fcrecord .addfield_handle,
 .records_container > ul > li.fcrecord .delfield_handle {
   display: inline-block;
+  box-sizing: content-box; /* buttons: keep the span sizing */
   width: 18px;
   height: 16px;
   line-height: 16px;
@@ -780,9 +781,16 @@ a.fc_assoc_translation:before {
 }
 body div .fc-del-filter-icon {
   color: #bd362f;
+  padding: 0;
+  border: 0;
+  background: none;
+  line-height: inherit;
   /*color: #942a25; color: darkred;*/
   font-size: 12px !important;
   cursor: pointer;
+}
+button.badge {
+  border: 0;
 }
 /*******
  * Forms

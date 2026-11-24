@@ -151,7 +151,6 @@ class plgFlexicontent_fieldsMediafile extends FCField
 
 		$iform_allowdel = 0;//$field->parameters->get('iform_allowdel', 1);
 		$fields_box_placing = (int) $field->parameters->get('fields_box_placing', 1);
-		$show_values_expand_btn = (int) $field->parameters->get('show_values_expand_btn', 1);
 		$form_file_preview  = (int) $field->parameters->get('form_file_preview', 2);
 
 		$iform_title = $inputmode==1 ? 0 : $field->parameters->get('iform_title', 1);
@@ -575,9 +574,9 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
 			if (!$add_position) $field->html .= '
 				<div class="'.$btn_group_class.' fc-xpended-btns">
-					<span class="fcfield-addvalue ' . $font_icon_class . ' ' . $btn_item_class . '" onclick="addField'.$field->id.'(this.closest(\'.fc-xpended-btns\'));" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_TO_BOTTOM' ).'">
+					<button type="button" class="fcfield-addvalue ' . $font_icon_class . ' ' . $btn_item_class . '" onclick="addField'.$field->id.'(this.closest(\'.fc-xpended-btns\'));" title="'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_TO_BOTTOM' ).'">
 						'.\Joomla\CMS\Language\Text::_( 'FLEXI_ADD_VALUE' ).'
-					</span>
+					</button>
 				</div>';
 		}
 
@@ -607,19 +606,6 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			{
 				$field->html = $uploader_html->thumbResizer . ' ' . $field->html;
 			}
-		}
-
-		// Add toggle button for: Compact values view (= multiple values per row)
-		$show_values_expand_btn = $formlayout === 'field_InlineBoxes' ? $show_values_expand_btn : 0;
-		if (!$use_ingroup && $show_values_expand_btn)
-		{
-			$field->html = '
-			<button type="button" class="fcfield-expand-view-btn btn btn-small" data-expandedFieldState="0" aria-label="' . \Joomla\CMS\Language\Text::_('FLEXI_EXPAND') . '"
-				onclick="fc_toggleCompactValuesView(this, this.closest(\'.container_fcfield\'));"
-			>
-				<span class="fcfield-expand-view ' . $font_icon_class . '" aria-hidden="true"></span>&nbsp; ' . \Joomla\CMS\Language\Text::_('FLEXI_EXPAND', true) . '
-			</button>
-			' . $field->html;
 		}
 
 		// Button for popup file selection

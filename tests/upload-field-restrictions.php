@@ -33,6 +33,18 @@ namespace {
     check($params->get('upload_maxsize') === 50 && $global->get('upload_maxsize') === 100, 'Field limits must not mutate component parameters');
     $field->field_type = 'file';
     check(flexicontent_upload::getUploadParams($field)->get('upload_extensions') === 'png,pdf', 'File fields must retain non-image support');
+    $field->field_type = 'mediafile';
+    $field->parameters = new \Joomla\Registry\Registry();
+    $media = flexicontent_upload::getUploadParams($field);
+    check(in_array('wav', explode(',', $media->get('upload_extensions')), true), 'Media fields accept audio');
+    check(in_array('webm', explode(',', $media->get('upload_extensions')), true), 'Media fields accept video');
+    check($media->get('upload_maxsize') === 100, 'Media fields inherit the component size limit');
+    $field->parameters = new \Joomla\Registry\Registry(['upload_extensions'=>'wav,pdf','upload_maxsize'=>40]);
+    $media = flexicontent_upload::getUploadParams($field);
+    check($media->get('upload_extensions') === 'wav' && $media->get('ignore_extensions') === '', 'Field restrictions also apply to ignored types');
+    check($media->get('upload_maxsize') === 40, 'Media fields can override the maximum size');
+    check(flexicontent_upload::getAllowedExtensions($media) === ['wav'], 'Local media picker and uploader agree on file types');
+    check(flexicontent_upload::getAllowedExtensions($global) === ['jpg', 'png', 'pdf', 'mp3'], 'File picker includes each configured extension once');
     $created = [];
     try {
         foreach (['s_sample.png','l_sample.png','s_fld7_sample.png','s_sample.webp','s_fld7_sample.webp','s_other.png','original.png'] as $name) {

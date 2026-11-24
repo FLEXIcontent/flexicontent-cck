@@ -349,7 +349,7 @@ class JFormFieldFields extends \Joomla\CMS\Form\FormField
 					<li data-value="field_'.htmlspecialchars($val, ENT_QUOTES, 'UTF-8').'" class="fcrecord">
 						<span class="fcprop_box">'.$v2f[$base]->option_text
 							.($suffix !== '' ? ' <small class="fcprop_suffix">('.htmlspecialchars($suffix, ENT_QUOTES, 'UTF-8').')</small>' : '').'</span>
-						<span class="delfield_handle" title="'.\Joomla\CMS\Language\Text::_('FLEXI_REMOVE').'" onclick="fcfield_del_sortable_element(this);"></span>
+						<button type="button" class="delfield_handle" title="'.\Joomla\CMS\Language\Text::_('FLEXI_REMOVE').'" onclick="fcfield_del_sortable_element(this);"></button>
 					</li>';
 			}
 			$sorter_html .= '

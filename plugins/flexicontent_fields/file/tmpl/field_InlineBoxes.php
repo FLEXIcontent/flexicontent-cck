@@ -110,13 +110,13 @@ foreach ($field->value as $file_id)
 		$uploader_html->multiUploadBtn = '';
 		// !!! CLASS: fc-files-modal-link fc-sel NEEDED BY JS !!! DO NOT REMOVE, DO NOT MOVE
 		$uploader_html->myFilesBtn = '
-			<span data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" class="fc-files-modal-link fc-sel fcfield-selectvalue multi '.$btn_classes.'" data-rowno="'.$n.'" id="'.$elementid_n.'_selectvalue" title="'.Text::_('FLEXI_MY_FILES').'">
+			<button type="button" data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" class="fc-files-modal-link fc-sel fcfield-selectvalue multi '.$btn_classes.'" data-rowno="'.$n.'" id="'.$elementid_n.'_selectvalue" title="'.Text::_('FLEXI_MY_FILES').'">
 				<span class="fc-image-tool-icon fas fa-folder-open" aria-hidden="true"></span>
-			</span>';
+			</button>';
 		$uploader_html->mediaUrlBtn = !$usemediaurl ? '' : '
-			<span class="'.$btn_classes.' fc-field-mediaurl-btn" data-for="'.$elementid_n.'" title="'.Text::_('FLEXI_FIELD_MEDIA_URL').'" onclick="fcfield_file.toggleMediaURL(\''.$elementid_n.'\'); return false;">
+			<button type="button" class="'.$btn_classes.' fc-field-mediaurl-btn" data-for="'.$elementid_n.'" title="'.Text::_('FLEXI_FIELD_MEDIA_URL').'" onclick="fcfield_file.toggleMediaURL(\''.$elementid_n.'\'); return false;">
 				<span class="fc-image-tool-icon fas fa-link" aria-hidden="true"></span>
-			</span>';
+			</button>';
 		$uploader_html->clearBtn = '<button type="button" class="'.$btn_classes.' fcfield-clearvalue '.$font_icon_class.'" title="'.Text::_('FLEXI_CLEAR').'" aria-label="'.Text::_('FLEXI_CLEAR').'" onclick="fcfield_file.clearField(this, {}, \''.$field_name_js.'\');"></button>';
 	}
 
@@ -392,7 +392,7 @@ HTML;
 		";
 	}*/
 
-	if (!$filename_original)
+	if ($use_inline_uploaders)
 	{
 		$per_value_js .= "
 			fcfield_file.showUploader('" . $field->name . '_' . $n . "', '".$field_name_js."');

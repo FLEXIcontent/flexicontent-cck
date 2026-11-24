@@ -578,11 +578,11 @@ class FlexicontentControllerItems extends FlexicontentControllerBaseAdmin
 				<!-- <img src="<?php echo $icon; ?>" style="margin:4px 0 0 0; border-width:0px; vertical-align:top;" alt="<?php echo \Joomla\CMS\Language\Text::_($statedata['desc']); ?>" /> &nbsp; -->
 				*/
 				?>
-				<span style="<?php echo $css; ?>" class="<?php echo $btn_class . ' ' . $statedata['btn_class']; ?>"
+				<button type="button" style="<?php echo $css; ?>" class="<?php echo $btn_class . ' ' . $statedata['btn_class']; ?>"
 					onclick="window.parent.fc_parent_form_submit('fc_modal_popup_container', 'adminForm', {'newstate':'<?php echo $shortname; ?>', 'task':'items.changestate'}, {'task':'items.changestate', 'is_list':true});"
 				>
 					<?php echo \Joomla\CMS\Language\Text::_($statedata['name']); ?>
-				</span>
+				</button>
 			</span>
 		<?php
 			if (isset($statedata['clear']))

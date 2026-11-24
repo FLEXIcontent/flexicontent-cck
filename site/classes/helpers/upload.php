@@ -4,10 +4,19 @@ use Joomla\CMS\Language\LanguageFactoryInterface;
 
 class flexicontent_upload
 {
+	public static function getAllowedExtensions($uconf)
+	{
+		return array_values(array_unique(array_filter(preg_split('/\s*,\s*/', strtolower(
+			$uconf->get('upload_extensions', 'bmp,wbmp,csv,doc,docx,webp,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,txt,xcf,xls,xlsx,zip,ics')
+			. ',' . $uconf->get('ignore_extensions', '')
+		)))));
+	}
+
 	/** Resolve the same upload restrictions for the field UI and the endpoint. */
 	public static function getUploadParams($field = null)
 	{
 		$params = clone \Joomla\CMS\Component\ComponentHelper::getParams('com_flexicontent');
+		$componentMax = $params->get('upload_maxsize', 10000000);
 		if ($field && isset($field->parameters))
 		{
 			$params->merge($field->parameters);
@@ -20,6 +29,20 @@ class flexicontent_upload
 			$params->set('ignore_extensions', '');
 			$params->set('image_extensions', implode(',', $images));
 			$params->set('restrict_uploads', 1);
+		}
+		if ($field && $field->field_type === 'mediafile')
+		{
+			// Both the inline uploader and My Files use these rules at the upload endpoint.
+			$defaults = 'mp3,m4a,wav,ogg,oga,webm,mp4,m4v,mov';
+			$media = explode(',', $defaults . ',aac,flac,opus,ogv,mpeg,mp4a,mp4v');
+			$configured = $field->parameters->get('upload_extensions') ?: $field->parameters->get('iam_upload_extensions');
+			$requested = preg_split('/[\s,]+/', strtolower(trim($configured ?: $defaults)));
+			$allowed = array_intersect($media, array_map(static fn($ext) => ltrim($ext, '.'), $requested));
+			$params->set('upload_extensions', $allowed ? implode(',', $allowed) : $defaults);
+			$params->set('ignore_extensions', '');
+			$params->set('restrict_uploads', 1);
+			$legacyMax = (int) $field->parameters->get('iam_upload_maxsize', 0) * 1000000;
+			$params->set('upload_maxsize', $field->parameters->get('upload_maxsize', $legacyMax ?: $componentMax));
 		}
 		return $params;
 	}

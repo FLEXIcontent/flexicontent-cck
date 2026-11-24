@@ -191,9 +191,9 @@ foreach (array('FLEXI_TBL_MOVE_COL', 'FLEXI_TBL_HIDE_COL', 'FLEXI_TBL_SHOW_COL',
 					</span>
 			 	<?php endif; ?>
 				<?php /*<a class="modal" onclick="javascript:;" rel="{handler: 'iframe', size: {x: 390, y: 210}}" href="<?php echo $copylink; ?>"><?php echo $copyTmpl_icon; ?></a>*/ ?>
-				<span class="<?php echo $this->btn_sm_class; ?> hasTooltip" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_DUPLICATE_TEMPLATE', true); ?>" onclick="var url = this.getAttribute('data-href'); fc_tmpls_modal = fc_showDialog(url, 'fc_modal_popup_container', 0, 440, 300, fc_template_modal_close); return false;" data-href="<?php echo $copylink; ?>">
+				<button type="button" class="<?php echo $this->btn_sm_class; ?> hasTooltip" title="<?php echo \Joomla\CMS\Language\Text::_('FLEXI_DUPLICATE_TEMPLATE', true); ?>" onclick="var url = this.getAttribute('data-href'); fc_tmpls_modal = fc_showDialog(url, 'fc_modal_popup_container', 0, 440, 300, fc_template_modal_close); return false;" data-href="<?php echo $copylink; ?>">
 					<?php echo $copyTmpl_icon; ?>
-				</span>
+				</button>
 			</td>
 			<td data-col="title">
 				<?php echo htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8'); ?>

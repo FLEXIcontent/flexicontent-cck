@@ -55,6 +55,14 @@ $editor   = $jinput->getCmd('editor', '');
 $isXtdBtn = $jinput->getCmd('isxtdbtn', '');
 $function = $jinput->getCmd('function', 'jSelectFcfile');
 $onclick  = $this->escape($function);
+$libraryPicker = $isFilesElement && !$isXtdBtn;
+if ($libraryPicker)
+{
+	$assets = Uri::root() . 'components/com_flexicontent/assets/';
+	HTMLHelper::_('stylesheet', $assets . 'css/file-picker.css', ['version' => 'auto']);
+	HTMLHelper::_('script', $assets . 'js/file-picker.js', ['version' => 'auto'], ['defer' => true]);
+}
+
 
 if (!empty($editor))
 {
@@ -167,6 +175,9 @@ $_tmpl = $isFilesElement ? 'component' : '';
 
 
 $enable_multi_uploader = 1;
+$can_upload = $use_fc_uploads && ($this->CanUpload || ($isFilesElement && $this->layout === 'image'));
+$picker_dashboard = $isFilesElement && $enable_multi_uploader && $can_upload && !$this->require_ftp;
+$has_link_tab = $this->layout !== 'image' && ($use_links || $use_jmedia_man);
 $nonimg_message = $this->layout === 'image' ? '\'\'' : '-1';
 $uploader_tag_id = 'fc_filesman_uploader';
 $up_sfx_n = $this->fieldid ?: '_';
@@ -176,14 +187,17 @@ $up_sfx_n = $this->fieldid ?: '_';
  * Resizable / movable / hideable columns (replaces the old column chooser), settings are stored in the browser
  */
 
-$fc_document = Factory::getApplication()->getDocument();
-$fc_document->addStyleSheet(Uri::base(true) . '/components/com_flexicontent/assets/css/fc_table_tools.css', array('version' => FLEXI_VHASH));
-$fc_document->addStyleSheet(Uri::base(true) . '/components/com_flexicontent/assets/css/fc_type_tabs.css', array('version' => FLEXI_VHASH));
-$fc_document->addScript(Uri::base(true) . '/components/com_flexicontent/assets/js/fc-table-tools.js', array('version' => FLEXI_VHASH));
-
-foreach (array('FLEXI_TBL_MOVE_COL', 'FLEXI_TBL_HIDE_COL', 'FLEXI_TBL_SHOW_COL', 'FLEXI_TBL_FIT_COL', 'FLEXI_TBL_RESET_WIDTHS', 'FLEXI_TBL_RESET_COLS') as $fc_txt)
+if (!$libraryPicker)
 {
-	Text::script($fc_txt);
+	$fc_document = Factory::getApplication()->getDocument();
+	$fc_document->addStyleSheet(Uri::base(true) . '/components/com_flexicontent/assets/css/fc_table_tools.css', array('version' => FLEXI_VHASH));
+	$fc_document->addStyleSheet(Uri::base(true) . '/components/com_flexicontent/assets/css/fc_type_tabs.css', array('version' => FLEXI_VHASH));
+	$fc_document->addScript(Uri::base(true) . '/components/com_flexicontent/assets/js/fc-table-tools.js', array('version' => FLEXI_VHASH));
+
+	foreach (array('FLEXI_TBL_MOVE_COL', 'FLEXI_TBL_HIDE_COL', 'FLEXI_TBL_SHOW_COL', 'FLEXI_TBL_FIT_COL', 'FLEXI_TBL_RESET_WIDTHS', 'FLEXI_TBL_RESET_COLS') as $fc_txt)
+	{
+		Text::script($fc_txt);
+	}
 }
 
 
@@ -204,8 +218,7 @@ $tools_state = isset($FcMansConf->$fc_man_name)
 		'addfiles_box' => 1,
 	);
 
-$show_addfiles = !empty($tools_state->addfiles_box);
-$show_addfiles ? 1 : 0;
+$show_addfiles = !$picker_dashboard && !empty($tools_state->addfiles_box);
 
 
 
@@ -408,6 +421,16 @@ function fman_zoom_thumb(event, control)
 	}
 }
 
+document.addEventListener('keydown', event => {
+	if (event.defaultPrevented || event.key !== 'Escape') return;
+	const image = document.querySelector('img.fc-fileman-thumb.fc_zoomed');
+	if (!image) return;
+	event.preventDefault();
+	const button = image.closest('.fc-fileman-grid-thumb-box')?.querySelector('.fc-fileman-preview-btn');
+	button?.focus();
+	fman_zoom_thumb(event, image);
+});
+
 function fman_toggle_thumb_selection(box, selected)
 {
 	if (!box) return;
@@ -574,7 +597,7 @@ $js .= "
 
 
 
-if ($enable_multi_uploader)
+if ($enable_multi_uploader && $can_upload)
 {
 	// ***
 	// *** Create slider for resizing thumbnails in uploader
@@ -637,24 +660,27 @@ if ($enable_multi_uploader)
 	$upConf = HTMLHelper::_('fcuploader.getUploadConf', $this->field);
 	$uploader_html = HTMLHelper::_('fcuploader.getUploader', $this->field, $this->u_item_id, $uploader_tag_id, $up_sfx_n, $upload_options);
 
-	$js .= '
-		setTimeout(function(){
-			// Show outer container of uploader
-			FlexiForm.show(document.getElementById("fc-fileman-formbox-2"));
-			document.getElementById("'.$uploader_tag_id . $up_sfx_n.'").style.minHeight = "180px";
+	if (!$picker_dashboard)
+	{
+		$js .= '
+			setTimeout(function(){
+				// Show outer container of uploader
+				FlexiForm.show(document.getElementById("fc-fileman-formbox-2"));
+				document.getElementById("'.$uploader_tag_id . $up_sfx_n.'").style.minHeight = "180px";
 
-			// Show uploader
-			'.$uploader_tag_id.'.toggleUploader("'.$up_sfx_n.'");
+				// Show uploader
+				'.$uploader_tag_id.'.toggleUploader("'.$up_sfx_n.'");
 
-			// Also set filelist height
-			'.$uploader_tag_id.'.autoResize("'.$up_sfx_n.'");
+				// Also set filelist height
+				'.$uploader_tag_id.'.autoResize("'.$up_sfx_n.'");
 
-			fctabber["fc-fileman-addfiles"]?.tabShow(0);
+				fctabber["fc-fileman-addfiles"]?.tabShow(0);
 
-			// Hide basic uploader form if using multi-uploader script
-			FlexiForm.show(document.getElementById("fc-fileman-formbox-1"), false);
-		}, 20);
-	';
+				// Hide basic uploader form if using multi-uploader script
+				FlexiForm.show(document.getElementById("fc-fileman-formbox-1"), false);
+			}, 20);
+		';
+	}
 }
 
 if ($use_jmedia_man && $use_links)
@@ -686,7 +712,7 @@ if ($js)
 	<div id="fc-fileman-overlay" onclick="document.querySelectorAll('img.fc_zoomed').forEach(image => image.click());"></div>
 
 
-	<div id="flexicontent" class="flexicontent">
+	<div id="flexicontent" class="flexicontent<?php echo $libraryPicker ? ' fc-file-library' : ''; ?>">
 
 		<div class="<?php echo FLEXI_J40GE ? 'row' : 'row-fluid'; ?>" id="fileman">
 
@@ -730,6 +756,9 @@ if ($js)
 
 								<form action="index.php?option=<?php echo $this->option; ?>&amp;view=<?php echo $this->view; ?>&amp;layout=<?php echo $this->layout; ?>&amp;field=<?php echo $this->fieldid?>" method="post" name="adminForm" id="adminForm">
 
+									<?php if ($libraryPicker) : ?>
+										<?php require __DIR__ . '/picker_toolbar.php'; ?>
+									<?php else : ?>
 									<div id="fc-managers-header" class="fc-mh-items fc-mh-solo fc-mh-fm">
 
 										<?php if (!$this->folder_mode) : ?>
@@ -748,10 +777,10 @@ if ($js)
 													<input type="text" name="search" id="search" placeholder="<?php echo !empty($this->scope_title) ? $this->scope_title : Text::_('FLEXI_SEARCH'); ?>" value="<?php echo htmlspecialchars($this->lists['search'], ENT_QUOTES, 'UTF-8'); ?>" class="fcfield_textval" />
 													<button title="" data-original-title="<?php echo Text::_('FLEXI_SEARCH'); ?>" class="<?php echo $btn_class . (FLEXI_J40GE ? ' btn-outline-dark ' : ' ') . $this->tooltip_class; ?>" onclick="if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();"><?php echo FLEXI_J30GE ? '<i class="icon-search"></i>' : Text::_('FLEXI_GO'); ?></button>
 
-													<div id="fc_filters_box_btn" data-original-title="<?php echo Text::_('FLEXI_FILTERS'); ?>" class="<?php echo $this->tooltip_class . ' ' . ($this->count_filters ? 'btn ' . $this->btn_iv_class : $out_class); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary', false, undefined, 1);">
+													<button type="button" id="fc_filters_box_btn" aria-label="<?php echo htmlspecialchars(Text::_('FLEXI_FILTERS'), ENT_QUOTES, 'UTF-8'); ?>" data-original-title="<?php echo Text::_('FLEXI_FILTERS'); ?>" class="<?php echo $this->tooltip_class . ' ' . ($this->count_filters ? 'btn ' . $this->btn_iv_class : $out_class); ?>" onclick="fc_toggle_box_via_btn('fc-filters-box', this, 'btn-primary', false, undefined, 1);">
 														<?php echo '<i class="icon-filter"></i>' . ($isFilesElement && $this->count_filters ? Text::_('FLEXI_FILTERS') : ''); ?>
 														<?php echo ($this->count_filters  ? ' <sup>' . $this->count_filters . '</sup>' : ''); ?>
-													</div>
+													</button>
 
 													<?php
 													// Modern style of the filters box, selected in component configuration (Items Manager > Appearance)
@@ -786,7 +815,7 @@ if ($js)
 														</div>
 														<?php endif; ?>
 
-														<div id="fc-filters-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="<?php echo Text::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></div>
+														<button type="button" id="fc-filters-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="<?php echo Text::_('FLEXI_HIDE'); ?>" style="cursor: pointer;" onclick="fc_toggle_box_via_btn('fc-filters-box', document.getElementById('fc_filters_box_btn'), 'btn-primary');"></button>
 													</div>
 
 													<?php if ($filters_apply_btn) : ?>
@@ -860,41 +889,53 @@ if ($js)
 												</div>
 											</div>
 
+											<?php if ($enable_multi_uploader && $can_upload && !$this->require_ftp) : ?>
+												<button type="button" class="btn btn-primary" data-fc-upload-dashboard
+													onclick="<?php echo $uploader_tag_id; ?>.openDashboard('<?php echo $up_sfx_n; ?>', this)">
+													<span class="icon-upload" aria-hidden="true"></span>
+													<?php echo Text::_('FLEXI_UPLOAD_FILES'); ?>
+												</button>
+											<?php endif; ?>
+											<?php if ($picker_dashboard && $has_link_tab) : ?>
+												<button type="button" class="btn btn-outline-secondary" onclick="fc_showAsDialog(document.getElementById('fc-fileman-addfiles'), 0, 0, null, {title: this.textContent.trim(), visibleOnClose: 0});">
+													<span class="icon-link" aria-hidden="true"></span> <?php echo Text::_($use_jmedia_man ? 'FLEXI_ADD_LINK' : 'FLEXI_ADD_URL'); ?>
+												</button>
+											<?php elseif (!$picker_dashboard) : ?>
 											<?php echo '
-						<span style="cursor: pointer;" class="fc_shown_1271 ' . $this->btn_sm_class . ' btn-success ' . $this->tooltip_class . '"
+						<button type="button" style="cursor: pointer;" class="fc_shown_1271 ' . $this->btn_sm_class . ' btn-success ' . $this->tooltip_class . '"
 							onclick="var box = document.getElementById(\'fc-fileman-addfiles\'); fc_fm_add_handle = fc_showAsDialog(box, 0, 0, null, { title: \'' . Text::_('FLEXI_ADD_FILE',  true) . '\', visibleOnClose: 1, paddingW: 10, paddingH: 10}); return false;"
 							data-title="' . flexicontent_html::getToolTip('', 'FLEXI_ADD_FILE', 1, 1) . '" data-placement="bottom"
 						>
 							<span class="icon-upload"></span>
-						</span>
+						</button>
 					'; ?>
 											<?php echo '
-						<span style="' . ($show_addfiles ? 'display: none;' : '') . '" class="fc_hidden_1270 btn-success fc_noeffect ' . $this->btn_sm_class . ' ' . $this->tooltip_class . '"
+						<button type="button" style="' . ($show_addfiles ? 'display: none;' : '') . '" class="fc_hidden_1270 btn-success fc_noeffect ' . $this->btn_sm_class . ' ' . $this->tooltip_class . '"
 							onclick="return fman_toggle_add_files(this);"
 							data-title="' . flexicontent_html::getToolTip('', 'FLEXI_ADD_FILE', 1, 1) . '" data-placement="bottom"
 						>
 							<span class="icon-upload"></span>
-						</span>
+						</button>
 					'; ?>
 											<?php echo '
-						<span style="' . (!$show_addfiles ? 'display: none;' : '') . '" class="fc_hidden_1270 fc_noeffect ' . $this->btn_sm_class . ' ' . $this->tooltip_class . '"
+						<button type="button" style="' . (!$show_addfiles ? 'display: none;' : '') . '" class="fc_hidden_1270 fc_noeffect ' . $this->btn_sm_class . ' ' . $this->tooltip_class . '"
 							onclick="return fman_toggle_add_files(this);"
 							data-title="' . flexicontent_html::getToolTip('', 'FLEXI_EXPAND', 1, 1) . '" data-placement="bottom"
 						>
 							<span class="icon-expand-2"></span>
-						</span>
+						</button>
 					'; ?>
-
+											<?php endif; ?>
 
 											<?php if ($isFilesElement): ?>
 												<div class="fc-iblock nowrap_box" style="position: relative; vertical-align: middle;">
-							<span class="btn btn-primary <?php echo $this->btn_sm_class . ' ' . $this->tooltip_class; ?>" id="insert_selected_btn" onclick="fc_fileselement_assign_files();"
+							<button type="button" class="btn btn-primary <?php echo $this->btn_sm_class . ' ' . $this->tooltip_class; ?>" id="insert_selected_btn" onclick="fc_fileselement_assign_files();"
 							      data-title="<?php echo flexicontent_html::getToolTip('', 'FLEXI_FILEMAN_INSERT_SELECTED', 1, 1); ?>" data-placement="bottom">
 								<span class="icon-plus"></span> <?php echo Text::_('FLEXI_INSERT'); ?>
-							</span>
-													<span class="<?php echo $this->btn_sm_class . ' ' . $this->tooltip_class; ?>" onclick="fc_fileselement_delete_files()" data-title="<?php echo flexicontent_html::getToolTip('', 'FLEXI_DELETE', 1, 1); ?>" data-placement="bottom">
+							</button>
+													<button type="button" class="<?php echo $this->btn_sm_class . ' ' . $this->tooltip_class; ?>" onclick="fc_fileselement_delete_files()" data-title="<?php echo flexicontent_html::getToolTip('', 'FLEXI_DELETE', 1, 1); ?>" data-placement="bottom">
 								<span class="icon-remove" style="color: darkred;"></span>
-							</span>
+							</button>
 												</div>
 											<?php endif; ?>
 
@@ -915,18 +956,18 @@ if ($js)
 											</div>
 
 											<div class="fc-iblock nowrap_box" style="position: relative; vertical-align: middle;">
-												<div id="fc_mainChooseColBox_btn" class="<?php echo $this->tooltip_class . ' ' . $this->btn_sm_class . ' ' . $out_class; ?> hidden-phone" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" data-title="<?php echo flexicontent_html::getToolTip('FLEXI_COLUMNS', 'FLEXI_ABOUT_AUTO_HIDDEN_COLUMNS', 1, 1); ?>" data-placement="bottom">
+												<button type="button" id="fc_mainChooseColBox_btn" aria-label="<?php echo htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_COLUMNS'), ENT_QUOTES, 'UTF-8'); ?>" class="<?php echo $this->tooltip_class . ' ' . $this->btn_sm_class . ' ' . $out_class; ?> hidden-phone" onclick="fc_toggle_box_via_btn('mainChooseColBox', this, 'btn-primary');" data-title="<?php echo flexicontent_html::getToolTip('FLEXI_COLUMNS', 'FLEXI_ABOUT_AUTO_HIDDEN_COLUMNS', 1, 1); ?>" data-placement="bottom">
 													<span class="icon-contract"></span><sup id="columnchoose_totals"></sup>
-												</div>
+												</button>
 
 												<div id="mainChooseColBox" class="group-fcset fcman-abs" style="display:none;"></div>
 											</div>
 
 											<?php if (!empty($this->minihelp) && FlexicontentHelperPerm::getPerm()->CanConfig): ?>
-											<div id="fc-mini-help_btn" class=<?php echo $this->btn_sm_class . ' ' . $out_class; ?>" onclick="fc_toggle_box_via_btn('fc-mini-help', this, 'btn-primary');" >
+											<button type="button" id="fc-mini-help_btn" class="<?php echo $this->btn_sm_class . ' ' . $out_class; ?>" onclick="fc_toggle_box_via_btn('fc-mini-help', this, 'btn-primary');" >
 											<span class="icon-help"></span>
 											<?php echo $this->minihelp; ?>
-										</div>
+										</button>
 									<?php endif; ?>
 
 										<div class="fc-iblock fc-fm-thumbsize">
@@ -947,6 +988,9 @@ if ($js)
 
 						</div>
 
+									<?php endif; ?>
+
+						<?php if ($libraryPicker) : ?><div class="fc-picker-table"><?php endif; ?>
 						<table id="adminListTableFC<?php echo $this->getModel()->view_id; ?>" class="adminlist table fcmanlist fman_list_element">
 							<thead>
 							<tr>
@@ -1419,7 +1463,9 @@ if ($js)
 							
 
 						</table>
+						<?php if ($libraryPicker) : ?></div><?php else : ?>
 						<script>window.fcTableTools && fcTableTools.init('adminListTableFC<?php echo $this->getModel()->view_id; ?>');</script>
+						<?php endif; ?>
 
 						<?php if (!$this->folder_mode && !$this->is_pending) :
 								$field_legend = array();
@@ -1509,10 +1555,10 @@ if ($js)
 									<?php
 									echo $thumb_or_icon;
 									echo !$is_img ? '' : '
-					<span class="btn fc-fileman-preview-btn icon-search" onclick="fman_zoom_thumb(event, this); return false;"></span>
+					<button type="button" class="btn fc-fileman-preview-btn icon-search" aria-label="' . htmlspecialchars(Text::_('FLEXI_PREVIEW'), ENT_QUOTES, 'UTF-8') . '" onclick="fman_zoom_thumb(event, this); return false;"></button>
 					'; ?>
 									<span class="btn fc-fileman-selection-mark icon-checkmark" id="_cb<?php echo $i; ?>" ></span>
-									<span class="btn fc-fileman-delete-btn icon-remove" onclick="FlexiForm.confirm('<?php echo Text::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>').then(accepted => { if (accepted) { document.adminForm.filename.value='<?php echo rawurlencode($row->filename);?>'; Joomla.listItemTask('cb<?php echo $i; ?>','filemanager.remove'); } }); return false;"></span>
+									<button type="button" class="btn fc-fileman-delete-btn icon-remove" aria-label="<?php echo htmlspecialchars(Text::_('FLEXI_DELETE'), ENT_QUOTES, 'UTF-8'); ?>" onclick="event.stopPropagation(); FlexiForm.confirm('<?php echo Text::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>').then(accepted => { if (accepted) { document.adminForm.filename.value='<?php echo rawurlencode($row->filename);?>'; Joomla.listItemTask('cb<?php echo $i; ?>','filemanager.remove'); } }); return false;"></button>
 									<span class="fc-fileman-filename-box"><?php echo $row->title_cut; ?></span>
 								</div>
 								<?php
@@ -1522,7 +1568,9 @@ if ($js)
 
 						</div>
 
-						<?php if (!$this->folder_mode) : ?>
+						<?php if ($libraryPicker && !$this->rows) : ?>
+							<p class="fc-picker-empty"><?php echo Text::_('JGLOBAL_NO_MATCHING_RESULTS'); ?></p>
+						<?php elseif (!$this->folder_mode) : ?>
 							<?php echo $pagination_footer; ?>
 						<?php endif; ?>
 
@@ -1554,15 +1602,24 @@ if ($js)
 					</div>
 
 
-					<!-- File(s) by uploading -->
+					<?php if ($picker_dashboard) : ?>
+						<div hidden>
+							<?php echo $uploader_html->container; ?>
+							<?php echo $this->ffields['file-access']; ?>
+							<?php echo $this->ffields['file-lang']; ?>
+						</div>
+					<?php endif; ?>
+
+					<?php if (!$picker_dashboard || $has_link_tab) : ?>
+					<!-- Other file sources and the standalone manager tools -->
 					<div class="span6 col-md-6" id="fc-fileman-addfiles-col" <?php echo !$show_addfiles ? ' style="display: none;" ' : ''; ?> >
 
 						<?php /*echo HTMLHelper::_('tabs.panel', Text::_( 'FLEXI_UPLOAD_FILES' ), 'fileupload' );*/ ?>
 						<?php /* echo HTMLHelper::_('tabs.start'); */ ?>
 
-						<div class="fctabber fc_hidden_1270" id="fc-fileman-addfiles">
+						<div class="fctabber<?php echo $picker_dashboard ? '' : ' fc_hidden_1270'; ?>" id="fc-fileman-addfiles">
 
-							<?php if ($use_fc_uploads) : ?>
+							<?php if ($use_fc_uploads && !$picker_dashboard) : ?>
 
 								<div class="tabbertab" id="local_tab" data-icon2-class="icon-upload fc-icon-orange" data-icon-class="fc-icon-green">
 									<h3 class="tabberheading hasTooltip" data-placement="bottom" title="<?php echo Text::_( 'FLEXI_UPLOAD_FILES_DESC' ); ?>"> <?php echo Text::_( 'FLEXI_UPLOAD_FILES' ); ?> </h3>
@@ -1618,14 +1675,14 @@ if ($js)
 											$show_server_limit = $server_limit_exceeded && ! $enable_multi_uploader;  // plupload JS overcomes server limitations so we will not display it, if using plupload
 
 											echo '
-					<span id="fc_dispInfoBox_btn" class="' . $this->btn_sm_class . '" onclick="fc_toggle_box_via_btn(\'upload_info_box\', this, \'btn-primary\');"><i class="icon-info"></i>'. Text::_( 'FLEXI_FILES_INFO_UPLOAD' ).'</span>
+					<button type="button" id="fc_dispInfoBox_btn" class="' . $this->btn_sm_class . '" onclick="fc_toggle_box_via_btn(\'upload_info_box\', this, \'btn-primary\');"><i class="icon-info"></i>'. Text::_( 'FLEXI_FILES_INFO_UPLOAD' ).'</button>
 					'.
 												($enable_multi_uploader ? '
-						<span class="' . $this->btn_sm_class . ' ' . $this->tooltip_class.'" onclick="for (const id of [\'fc-fileman-formbox-1\', \'fc-fileman-formbox-2\']) { const panel = document.getElementById(id); FlexiForm.show(panel, !FlexiForm.visible(panel)); } setTimeout(function(){ '.$uploader_tag_id.'.autoResize(\''.$up_sfx_n.'\'); }, 100);"
+						<button type="button" class="' . $this->btn_sm_class . ' ' . $this->tooltip_class.'" onclick="for (const id of [\'fc-fileman-formbox-1\', \'fc-fileman-formbox-2\']) { const panel = document.getElementById(id); FlexiForm.show(panel, !FlexiForm.visible(panel)); } setTimeout(function(){ '.$uploader_tag_id.'.autoResize(\''.$up_sfx_n.'\'); }, 100);"
 							id="single_multi_uploader" data-title="' . flexicontent_html::getToolTip('', 'FLEXI_TOGGLE_BASIC_UPLOADER_DESC', 1, 1) . '" style="float: ' . (\Joomla\CMS\Factory::getApplication()->getLanguage()->isRTL() ? 'left;' : 'right;') . '"
 						data-placement="'. (\Joomla\CMS\Factory::getApplication()->getLanguage()->isRTL() ? 'right' : 'left') . '">
 							'.Text::_( 'FLEXI_TOGGLE_BASIC_UPLOADER' ).'
-						</span>
+						</button>
 					' : '') . '
 
 				<div class="fcclear"></div>
@@ -1937,7 +1994,7 @@ if ($js)
 
 
 							<!-- File URL by Form -->
-							<?php if ($this->layout !='image' && ($use_links || $use_jmedia_man)) : /* not applicable for LAYOUT 'image' */ ?>
+							<?php if ($has_link_tab) : ?>
 
 								<?php /*echo HTMLHelper::_('tabs.panel', Text::_( 'FLEXI_ADD_URL' ), 'filebyurl' );*/ ?>
 								<?php
@@ -2364,6 +2421,7 @@ $jMedia_file_displayData['mediaTypeNames'] = array_values(array_intersect_key(
 							<?php /* echo HTMLHelper::_('tabs.end'); */ ?>
 						</div><!-- .fctabber end -->
 					</div><!-- .span6 end -->
+					<?php endif; ?>
 
 					<!-- fc_perf -->
 				</div>  <!-- row / row-fluid -->

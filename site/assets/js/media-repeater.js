@@ -66,6 +66,7 @@ window.fcfield_media_rows = (() => {
       if (!image && !config.previewAlways) preview.parentElement.style.display = 'none';
     }
     row.querySelector('.fc-waveform-status')?.remove();
+    row.querySelector('.fc-upload-result')?.remove();
     const filename = row.querySelector('.fc_filedata_txt');
     if (filename) {
       for (const attr of ['data-filename', 'data-wfpreview', 'data-wfpeaks', 'data-wforiginal']) filename.removeAttribute(attr);
@@ -74,16 +75,14 @@ window.fcfield_media_rows = (() => {
     const current = row.querySelector('.fc_filedata_txt_nowrap');
     if (current) current.textContent = '-';
     const title = row.querySelector('.fc_filedata_title');
+    if (title) title.value = '';
     if (config.kind === 'file') {
       // File field: a new value starts empty (no Title / Original file name / tooltip data of the cloned value)
-      if (title) title.value = '';
       row.querySelectorAll('input.fc_filedata_alttitle').forEach(input => { input.value = ''; });
       row.querySelectorAll('.fc-file-info').forEach(info => {
         info.setAttribute('data-fc-info', '{}');
         window.fcfield_file?.updateTip?.(info);
       });
-    } else if (title) {
-      title.value = '-';
     }
     row.querySelectorAll('.inlinefile-secure-info, .inlinefile-stamp-info').forEach(element => element.remove());
     row.querySelectorAll('.inlinefile-secure-data, .inlinefile-stamp-data').forEach(element => FlexiForm.show(element));
@@ -95,7 +94,9 @@ window.fcfield_media_rows = (() => {
     const quantum = row.querySelector('.quantummanager');
     if (quantum && typeof window.initQuantumuploadimage === 'function') window.initQuantumuploadimage(row);
     if (config.kind === 'mediafile') window.fcfield_mediafile?.initValue?.(ref.id.replace(/^custom_/, ''), config.fieldKey);
-    if (config.kind === 'image' && options.animate_visible) {
+    if (row.querySelector('.fc_auto_uploader')) {
+      FlexiMediaField.showUploader(fieldId(row, config.kind === 'image').id);
+    } else if (config.kind === 'image' && options.animate_visible) {
       const uploader = row.querySelector('.fc_file_uploader');
       if (window[uploader?.dataset.tagidPrefix]) {
         row.querySelector('.fc_files_uploader_toggle_btn')?.click();

@@ -208,7 +208,7 @@ $items_task = 'task=items.';
 				}
 			?>
 				<span id="fc-dash-license" class="nowrap_box fc-mssg-inline fc-info fc-nobgimage" style="">
-					FLEXIcontent <?php echo FLEXI_VERSION . ' ' . FLEXI_RELEASE; ?><br/> GNU/GPL licence, Copyright &copy; 2009-2022
+					FLEXIcontent <?php echo FLEXI_VERSION . ' ' . FLEXI_RELEASE; ?><br/> GNU/GPL licence, Copyright &copy; 2009-2026
 				</span><br/><br/>
 				<span id="fc-dash-devs" class="nowrap_box">
 					<span class="fc-mssg-inline fc-nobgimage fc-noborder nowrap_box" style="text-align:center;" >
@@ -452,7 +452,7 @@ $items_task = 'task=items.';
 				<tr>
 					<td colspan="3">
 						... &nbsp;
-						<?php echo '<span class="'.$btn_class.'" onclick="window.open(\''.$show_all_link.'\')" >' . \Joomla\CMS\Language\Text::_('FLEXI_SHOW_ALL') . ' ( ' . \Joomla\CMS\Language\Text::_('FLEXI_ITEMS_MANAGER') . ' )</span><br/>'; ?>
+						<?php echo '<button type="button" class="'.$btn_class.'" onclick="window.open(\''.$show_all_link.'\')" >' . \Joomla\CMS\Language\Text::_('FLEXI_SHOW_ALL') . ' ( ' . \Joomla\CMS\Language\Text::_('FLEXI_ITEMS_MANAGER') . ' )</button><br/>'; ?>
 					</td>
 				</tr>
 				</tbody>
@@ -507,7 +507,7 @@ $items_task = 'task=items.';
 				<tr>
 					<td colspan="3">
 						... &nbsp;
-						<?php echo '<span class="'.$btn_class.'" onclick="window.open(\''.$show_all_link.'\')" >' . \Joomla\CMS\Language\Text::_('FLEXI_SHOW_ALL') . ' ( ' . \Joomla\CMS\Language\Text::_('FLEXI_ITEMS_MANAGER') . ' )</span><br/>'; ?>
+						<?php echo '<button type="button" class="'.$btn_class.'" onclick="window.open(\''.$show_all_link.'\')" >' . \Joomla\CMS\Language\Text::_('FLEXI_SHOW_ALL') . ' ( ' . \Joomla\CMS\Language\Text::_('FLEXI_ITEMS_MANAGER') . ' )</button><br/>'; ?>
 					</td>
 				</tr>
 				</tbody>
@@ -563,7 +563,7 @@ $items_task = 'task=items.';
 				<tr>
 					<td colspan="3">
 						... &nbsp;
-						<?php echo '<span class="'.$btn_class.'" onclick="window.open(\''.$show_all_link.'\')" >' . \Joomla\CMS\Language\Text::_('FLEXI_SHOW_ALL') . ' ( ' . \Joomla\CMS\Language\Text::_('FLEXI_ITEMS_MANAGER') . ' )</span><br/>'; ?>
+						<?php echo '<button type="button" class="'.$btn_class.'" onclick="window.open(\''.$show_all_link.'\')" >' . \Joomla\CMS\Language\Text::_('FLEXI_SHOW_ALL') . ' ( ' . \Joomla\CMS\Language\Text::_('FLEXI_ITEMS_MANAGER') . ' )</button><br/>'; ?>
 					</td>
 				</tr>
 				</tbody>

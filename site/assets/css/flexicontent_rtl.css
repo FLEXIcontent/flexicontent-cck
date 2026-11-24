@@ -1497,7 +1497,7 @@ td.col_edit_layout {
     display: none;
   }
 }
-div#fc-filters-slide-btn {
+button#fc-filters-slide-btn {
   border: 0;
   background: none;
   box-shadow: none;
@@ -1737,7 +1737,14 @@ div.statetoggler > div.statetoggler_inner {
   min-height: auto;
   min-width: auto;
 }
-div.statetoggler > div.statetoggler_inner > div.stateopener {
+div.statetoggler > div.statetoggler_inner > button.stateopener,
+div.statetoggler > div.statetoggler_inner > .options > button {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  font: inherit;
+}
+div.statetoggler > div.statetoggler_inner > .stateopener {
   line-height: auto;
   height: auto;
   width: auto;
@@ -1751,8 +1758,8 @@ div.statetoggler > div.statetoggler_inner > div.stateopener {
   text-decoration: none;
   position: relative;
 }
-div.statetoggler > div.statetoggler_inner > div.stateopener span.fc_expired,
-div.statetoggler > div.statetoggler_inner > div.stateopener span.fc_scheduled {
+div.statetoggler > div.statetoggler_inner > .stateopener span.fc_expired,
+div.statetoggler > div.statetoggler_inner > .stateopener span.fc_scheduled {
   position: absolute;
   left: -2px;
   right: -2px;
@@ -1762,17 +1769,17 @@ div.statetoggler > div.statetoggler_inner > div.stateopener span.fc_scheduled {
   border-bottom: 1px solid gray;
   opacity: 1;
 }
-div.statetoggler > div.statetoggler_inner > div.stateopener span.fc_expired + span:before,
-div.statetoggler > div.statetoggler_inner > div.stateopener span.fc_scheduled + span:before {
+div.statetoggler > div.statetoggler_inner > .stateopener span.fc_expired + span:before,
+div.statetoggler > div.statetoggler_inner > .stateopener span.fc_scheduled + span:before {
   opacity: 0.4;
   color: black;
 }
-div.statetoggler > div.statetoggler_inner > div.stateopener.ajax-loader {
+div.statetoggler > div.statetoggler_inner > .stateopener.ajax-loader {
   background-position: center;
   padding: 8px;
   margin: -1px -1px -1px -1px;
 }
-div.statetoggler > div.statetoggler_inner > div.stateopener img {
+div.statetoggler > div.statetoggler_inner > .stateopener img {
   padding: 0;
   margin: 0;
   border: none;
@@ -1798,7 +1805,7 @@ div.statetoggler > div.statetoggler_inner > .options {
   box-sizing: border-box;
 }
 div.statetoggler > div.statetoggler_inner > .options > div,
-div.statetoggler > div.statetoggler_inner > .options > span {
+div.statetoggler > div.statetoggler_inner > .options > :is(span, button) {
   position: relative;
   float: right;
   clear: both;
@@ -1814,7 +1821,6 @@ div.statetoggler > div.statetoggler_inner > .options > span {
   min-width: auto;
   background: none repeat scroll 0 0 transparent;
   color: black;
-  outline: none;
   text-decoration: none;
   white-space: nowrap;
   text-align: right;
@@ -1825,19 +1831,19 @@ div.statetoggler > div.statetoggler_inner > .options > div {
   text-align: center;
   font-weight: bold;
 }
-div.statetoggler > div.statetoggler_inner > .options > span:hover {
+div.statetoggler > div.statetoggler_inner > .options > :is(span, button):hover {
   background-color: #e7e7e7;
   background-image: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
 }
-div.statetoggler > div.statetoggler_inner > .options > span > span,
-div.statetoggler > div.statetoggler_inner > .options > span > img {
+div.statetoggler > div.statetoggler_inner > .options > :is(span, button) > span,
+div.statetoggler > div.statetoggler_inner > .options > :is(span, button) > img {
   max-width: unset;
   padding: 0;
   margin: 0 0.5em 0 0;
   border: none;
   box-sizing: unset;
 }
-div.statetoggler > div.statetoggler_inner > .options > span > img {
+div.statetoggler > div.statetoggler_inner > .options > :is(span, button) > img {
   display: unset;
 }
 /************
@@ -2919,6 +2925,7 @@ ul.fcrecords {
 .records_container > ul > li.fcrecord .addfield_handle,
 .records_container > ul > li.fcrecord .delfield_handle {
   display: inline-block;
+  box-sizing: content-box; /* buttons: keep the span sizing */
   width: 18px;
   height: 16px;
   line-height: 16px;
@@ -3334,9 +3341,16 @@ a.fc_assoc_translation:before {
 }
 body div .fc-del-filter-icon {
   color: #bd362f;
+  padding: 0;
+  border: 0;
+  background: none;
+  line-height: inherit;
   /*color: #942a25; color: darkred;*/
   font-size: 12px !important;
   cursor: pointer;
+}
+button.badge {
+  border: 0;
 }
 /*******
  * Forms

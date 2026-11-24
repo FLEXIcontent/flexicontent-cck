@@ -419,12 +419,12 @@ dl.tabs dt.open {
   color: #000000;
   z-index: 100;
 }
-div.current {
+div.current:not(.gslide) {
   border: 1px solid #CCCCCC;
   clear: both;
   padding: 10px;
 }
-div.current dd {
+div.current:not(.gslide) dd {
   margin: 0;
   padding: 0;
 }
@@ -1083,7 +1083,7 @@ div table.fc-table-list tr:nth-child(odd) td {
   background: initial;
 }
 /*** file view ***/
-.view-filemanager span.fc_hidden_1270.fc_noeffect.btn.btn-sm.hasTooltip {
+.view-filemanager button.fc_hidden_1270.fc_noeffect.btn.btn-sm.hasTooltip {
   padding: 8px;
 }
 .view-filemanager .group-fcset {
@@ -1092,7 +1092,7 @@ div table.fc-table-list tr:nth-child(odd) td {
 .view-filemanager span.btn.btn-sm.hasTooltip {
   padding: 8px;
 }
-.view-filemanager div#fc_mainChooseColBox_btn {
+.view-filemanager button#fc_mainChooseColBox_btn {
   padding: 7px;
 }
 /*** dark mode joomla 5 ***/
@@ -1288,7 +1288,7 @@ div table.fc-table-list tr:nth-child(odd) td {
   box-shadow: none;
 }
 [data-bs-theme="dark"] div.statetoggler > div.statetoggler_inner > .options > div,
-[data-bs-theme="dark"] div.statetoggler > div.statetoggler_inner > .options > span {
+[data-bs-theme="dark"] div.statetoggler > div.statetoggler_inner > .options > :is(span, button) {
   color: var(--body-color);
 }
 [data-bs-theme="dark"] .ui-widget-content {
