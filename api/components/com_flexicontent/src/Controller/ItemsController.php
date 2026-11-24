@@ -13,7 +13,11 @@ namespace Joomla\Component\Flexicontent\Api\Controller;
 use Joomla\CMS\Access\Exception\NotAllowed;
 use Joomla\CMS\Filter\InputFilter;
 use Joomla\CMS\MVC\Controller\ApiController;
+use Joomla\CMS\MVC\Controller\Exception\ResourceNotFound;
+use Joomla\CMS\MVC\Controller\Exception\Save as SaveException;
 use Joomla\Component\Flexicontent\Api\Helper\AccessHelper;
+use Joomla\Component\Flexicontent\Api\Helper\WriteHelper;
+use Joomla\Component\Flexicontent\Api\Legacy\LegacyBootstrap;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
@@ -22,8 +26,10 @@ use Joomla\Component\Flexicontent\Api\Helper\AccessHelper;
 /**
  * The items API controller.
  *
- * MVP spike: read-only (GET list / GET item). Write operations are refused
- * until the legacy item save/delete logic is adapted (later phase).
+ * GET uses the API list/detail models. POST/PATCH/DELETE prepare a flat JSON
+ * payload for the legacy FLEXIcontent item model and delegate persistence to
+ * its store()/delete() methods, so field plugins, versioning, tags, categories
+ * and search indexes stay consistent with the administrator application.
  *
  * @since  5.3
  */
@@ -125,21 +131,197 @@ class ItemsController extends ApiController
     }
 
     /**
-     * Refuse record edition before Joomla tries to load a legacy table.
+     * Create a new item (POST).
      *
-     * The parent edit() loads the table before calling allowEdit(), which fails
-     * for the API-only item model. All writes are disabled, so fail early with
-     * a clean 403 (same behaviour as the taxonomy endpoints).
+     * @return  static
+     */
+    public function add()
+    {
+        LegacyBootstrap::boot();
+
+        $payload = $this->getPayload();
+        $payload = $this->normalizeCreatePayload($payload);
+
+        if (!$this->allowAdd($payload)) {
+            throw new NotAllowed('JLIB_APPLICATION_ERROR_CREATE_RECORD_NOT_PERMITTED', 403);
+        }
+
+        $id = $this->saveItem(WriteHelper::prepare($payload, null, true));
+
+        // Joomla's core API returns 200 here; 201 is the correct status for a
+        // created resource and is used by the FLEXIcontent API contract.
+        $this->app->setHeader('status', 201);
+
+        $stored = WriteHelper::loadStoredItem($id);
+
+        // An author may create an item in a workflow state that the read API
+        // intentionally hides. Do not turn a successful POST into a 404.
+        if ($stored !== null && AccessHelper::isItemVisible($stored)) {
+            $this->displayItem($id);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Update an existing item (PATCH).
      *
      * @return  static
      */
     public function edit()
     {
-        throw new NotAllowed('JLIB_APPLICATION_ERROR_EDIT_NOT_PERMITTED', 403);
+        LegacyBootstrap::boot();
+
+        $id = (int) $this->input->getInt('id');
+
+        if (!$id) {
+            throw new ResourceNotFound('JLIB_APPLICATION_ERROR_RECORD', 404);
+        }
+
+        $stored = WriteHelper::loadStoredItem($id);
+
+        if ($stored === null) {
+            throw new ResourceNotFound('JLIB_APPLICATION_ERROR_RECORD', 404);
+        }
+
+        if (!$this->allowEdit(['id' => $id], 'id')) {
+            throw new NotAllowed('JLIB_APPLICATION_ERROR_EDIT_NOT_PERMITTED', 403);
+        }
+
+        $payload = $this->getPayload();
+
+        // State changes are a separate FLEXIcontent permission.
+        if (
+            \array_key_exists('state', $payload)
+            && (int) $payload['state'] !== (int) $stored->state
+            && !AccessHelper::canEditStateItem($stored)
+        ) {
+            throw new NotAllowed('JLIB_APPLICATION_ERROR_EDITSTATE_NOT_PERMITTED', 403);
+        }
+
+        $this->saveItem(WriteHelper::prepare($payload, $stored, false));
+
+        return $this->displayItem($id);
     }
 
     /**
-     * MVP spike is read-only: refuse record creation.
+     * Delete an item (DELETE).
+     *
+     * @param   integer  $id  The primary key to delete item.
+     *
+     * @return  static
+     */
+    public function delete($id = null)
+    {
+        LegacyBootstrap::boot();
+
+        if (!$this->allowDelete()) {
+            throw new NotAllowed('JLIB_APPLICATION_ERROR_DELETE_NOT_PERMITTED', 403);
+        }
+
+        $id = $id === null ? (int) $this->input->getInt('id') : (int) $id;
+
+        if (!$id) {
+            throw new ResourceNotFound('JLIB_APPLICATION_ERROR_RECORD', 404);
+        }
+
+        $stored = WriteHelper::loadStoredItem($id);
+
+        if ($stored === null) {
+            throw new ResourceNotFound('JLIB_APPLICATION_ERROR_RECORD', 404);
+        }
+
+        if (!AccessHelper::canDeleteItem($stored)) {
+            throw new NotAllowed('JLIB_APPLICATION_ERROR_DELETE_NOT_PERMITTED', 403);
+        }
+
+        $model = $this->getModel('item', '', ['ignore_request' => true]);
+
+        if (!$model || !$model->deleteViaLegacy($id)) {
+            throw new SaveException($model ? $model->getError() : 'Model not found', 500);
+        }
+
+        $this->app->setHeader('status', 204);
+
+        return $this;
+    }
+
+    /**
+     * Decode the request payload. Joomla's API controllers expect a flat JSON
+     * object; a JSON:API "data.attributes" envelope is also accepted.
+     *
+     * @return  array
+     */
+    private function getPayload(): array
+    {
+        $json = json_decode((string) $this->input->json->getRaw(), true);
+        $data = $this->input->get('data', \is_array($json) ? $json : [], 'array');
+
+        if (!\is_array($data)) {
+            throw new SaveException('Invalid JSON payload.', 400);
+        }
+
+        return WriteHelper::unwrap($data);
+    }
+
+    /**
+     * Check and complete the mandatory fields of a creation payload.
+     *
+     * @param   array  $payload  The normalised API payload.
+     *
+     * @return  array
+     */
+    private function normalizeCreatePayload(array $payload): array
+    {
+        if (empty($payload['catid'])) {
+            $categories = $payload['categories'] ?? $payload['category_ids'] ?? [];
+
+            if (\is_string($categories)) {
+                $categories = explode(',', $categories);
+            }
+
+            $categories = array_values((array) $categories);
+
+            if (!empty($categories[0])) {
+                $payload['catid'] = (int) $categories[0];
+            }
+        }
+
+        if (trim((string) ($payload['title'] ?? '')) === '' || empty($payload['catid']) || empty($payload['type_id'])) {
+            throw new SaveException('title, catid and type_id are required to create an item.', 422);
+        }
+
+        return $payload;
+    }
+
+    /**
+     * Delegate persistence to the API item model.
+     *
+     * @param   array  $data  The legacy-shaped item data.
+     *
+     * @return  integer
+     */
+    private function saveItem(array $data): int
+    {
+        $model = $this->getModel('item', '', ['ignore_request' => true]);
+
+        if (!$model) {
+            throw new SaveException('JLIB_APPLICATION_ERROR_MODEL_CREATE', 500);
+        }
+
+        $id = $model->saveViaLegacy($data);
+
+        if ($id === false) {
+            throw new SaveException($model->getError() ?: 'JLIB_APPLICATION_ERROR_SAVE_FAILED', 422);
+        }
+
+        $model->clearCache();
+
+        return (int) $id;
+    }
+
+    /**
+     * Can the current user create FLEXIcontent items?
      *
      * @param   array  $data  An array of input data.
      *
@@ -147,11 +329,19 @@ class ItemsController extends ApiController
      */
     protected function allowAdd($data = [])
     {
-        return false;
+        LegacyBootstrap::boot();
+
+        if (!AccessHelper::canCreate()) {
+            return false;
+        }
+
+        $typeId = (int) ($data['type_id'] ?? 0);
+
+        return $typeId === 0 || AccessHelper::canCreateType($typeId);
     }
 
     /**
-     * MVP spike is read-only: refuse record edition.
+     * Can the current user edit this item?
      *
      * @param   array   $data  An array of input data.
      * @param   string  $key   The name of the key for the primary key.
@@ -160,16 +350,27 @@ class ItemsController extends ApiController
      */
     protected function allowEdit($data = [], $key = 'id')
     {
-        return false;
+        LegacyBootstrap::boot();
+
+        $id = (int) ($data[$key] ?? 0);
+        $stored = WriteHelper::loadStoredItem($id);
+
+        return $stored !== null && AccessHelper::canEditItem($stored);
     }
 
     /**
-     * MVP spike is read-only: refuse record deletion.
+     * Can the current user delete FLEXIcontent items?
+     *
+     * Per-item checks are done in delete().
      *
      * @return  boolean
      */
     protected function allowDelete(): bool
     {
-        return false;
+        $user = AccessHelper::getIdentity();
+
+        return $user->authorise('core.manage', 'com_flexicontent')
+            || $user->authorise('core.delete', 'com_flexicontent')
+            || $user->authorise('core.delete.own', 'com_flexicontent');
     }
 }

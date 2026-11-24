@@ -15,6 +15,7 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\User\User;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Database\QueryInterface;
+use Joomla\Component\Flexicontent\Api\Legacy\LegacyBootstrap;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
@@ -210,5 +211,138 @@ final class AccessHelper
         }
 
         return \in_array((int) $access, self::getViewLevels(), true);
+    }
+
+    /**
+     * Load the legacy permission helper once, for write ACL checks.
+     *
+     * @return  void
+     */
+    private static function bootWriteAcl(): void
+    {
+        LegacyBootstrap::boot();
+    }
+
+    /**
+     * Can the current user create FLEXIcontent items?
+     *
+     * @return  boolean
+     */
+    public static function canCreate(): bool
+    {
+        $user = self::getIdentity();
+
+        if ($user->authorise('core.manage', 'com_flexicontent')) {
+            return true;
+        }
+
+        self::bootWriteAcl();
+
+        return (bool) \FlexicontentHelperPerm::getPerm()->CanAdd;
+    }
+
+    /**
+     * Can the current user create items of the given FLEXIcontent type?
+     *
+     * @param   integer  $typeId  The FLEXIcontent type id.
+     *
+     * @return  boolean
+     */
+    public static function canCreateType(int $typeId): bool
+    {
+        if ($typeId <= 0) {
+            return false;
+        }
+
+        $user = self::getIdentity();
+
+        if ($user->authorise('core.manage', 'com_flexicontent')) {
+            return true;
+        }
+
+        // FLEXIcontent checks core.create on the type asset. Do it directly:
+        // FlexicontentHelperPerm::checkTypeAccess() short-circuits when no type
+        // object is supplied and would therefore grant access to everyone.
+        return $user->authorise('core.create', 'com_flexicontent.type.' . $typeId);
+    }
+
+    /**
+     * Can the current user edit the given item?
+     *
+     * Mirrors ParentClassItem::canEdit(): FLEXIcontent uses the Joomla content
+     * article asset, not a com_flexicontent.item asset.
+     *
+     * @param   object  $item  The stored item row.
+     *
+     * @return  boolean
+     */
+    public static function canEditItem(object $item): bool
+    {
+        $user = self::getIdentity();
+
+        if ($user->authorise('core.manage', 'com_flexicontent')) {
+            return true;
+        }
+
+        self::bootWriteAcl();
+
+        $asset   = 'com_content.article.' . (int) $item->id;
+        $isOwner = (int) ($item->created_by ?? 0) > 0 && (int) $item->created_by === (int) $user->id;
+
+        $hasTypeEdit     = !empty($item->type_id) && \FlexicontentHelperPerm::checkTypeAccess($item->type_id, 'core.edit');
+        $hasTypeEditOwn  = !empty($item->type_id) && \FlexicontentHelperPerm::checkTypeAccess($item->type_id, 'core.edit.own');
+        $globalEdit      = $user->authorise('core.edit', 'com_flexicontent');
+        $globalEditOwn   = $user->authorise('core.edit.own', 'com_flexicontent');
+
+        return ($globalEdit || $hasTypeEdit) && $user->authorise('core.edit', $asset)
+            || ($globalEditOwn || $hasTypeEditOwn) && $user->authorise('core.edit.own', $asset) && $isOwner;
+    }
+
+    /**
+     * Can the current user delete the given item?
+     *
+     * @param   object  $item  The stored item row.
+     *
+     * @return  boolean
+     */
+    public static function canDeleteItem(object $item): bool
+    {
+        $user = self::getIdentity();
+
+        if ($user->authorise('core.manage', 'com_flexicontent')) {
+            return true;
+        }
+
+        $asset   = 'com_content.article.' . (int) $item->id;
+        $isOwner = (int) ($item->created_by ?? 0) > 0 && (int) $item->created_by === (int) $user->id;
+        $global  = $user->authorise('core.delete', 'com_flexicontent')
+            || $user->authorise('core.delete.own', 'com_flexicontent');
+
+        return $user->authorise('core.delete', $asset)
+            || ($global || $user->authorise('core.delete.own', $asset)) && $isOwner;
+    }
+
+    /**
+     * Can the current user change the publication state of the given item?
+     *
+     * @param   object  $item  The stored item row.
+     *
+     * @return  boolean
+     */
+    public static function canEditStateItem(object $item): bool
+    {
+        $user = self::getIdentity();
+
+        if ($user->authorise('core.manage', 'com_flexicontent')) {
+            return true;
+        }
+
+        $asset   = 'com_content.article.' . (int) $item->id;
+        $isOwner = (int) ($item->created_by ?? 0) > 0 && (int) $item->created_by === (int) $user->id;
+
+        return $user->authorise('core.edit.state', $asset)
+            || $user->authorise('core.edit.state.own', $asset) && $isOwner
+            || $user->authorise('core.edit.state', 'com_flexicontent')
+            || $user->authorise('core.edit.state.own', 'com_flexicontent') && $isOwner;
     }
 }
