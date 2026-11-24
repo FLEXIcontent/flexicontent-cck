@@ -631,6 +631,7 @@ if ($enable_multi_uploader && $can_upload)
 
 	$upload_options = array(
 		'action' => Uri::base(true) . '/index.php?option=com_flexicontent&task=filemanager.uploads'
+			. '&language=' . rawurlencode($app->getLanguage()->getTag())
 			. '&view='.$this->view
 			. '&history=' . ($isFilesElement ? 1 : 0)
 			. '&fieldid='.$this->fieldid . '&u_item_id='.$this->u_item_id
@@ -754,7 +755,7 @@ if ($js)
 						<div class="<?php echo $show_addfiles ? 'span6 col-md-6' : ''; ?> fullwidth_1270" id="fc-fileman-fileslist-col" data-icon-class="icon-list">
 							<fieldset class="fc-formbox" id="fc-fileman-formbox-0">
 
-								<form action="index.php?option=<?php echo $this->option; ?>&amp;view=<?php echo $this->view; ?>&amp;layout=<?php echo $this->layout; ?>&amp;field=<?php echo $this->fieldid?>" method="post" name="adminForm" id="adminForm">
+								<form action="index.php?option=<?php echo $this->option; ?>&amp;view=<?php echo $this->view; ?>&amp;layout=<?php echo $this->layout; ?>&amp;field=<?php echo $this->fieldid?>&amp;language=<?php echo rawurlencode($app->getLanguage()->getTag()); ?>" method="post" name="adminForm" id="adminForm">
 
 									<?php if ($libraryPicker) : ?>
 										<?php require __DIR__ . '/picker_toolbar.php'; ?>

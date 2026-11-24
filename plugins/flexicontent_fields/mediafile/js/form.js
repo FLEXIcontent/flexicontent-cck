@@ -103,6 +103,7 @@ class fc_Waveform_LazyLoad
 		if (!file || !box || !spectrum || !controls || mediaWaveforms.has(spectrum)) return;
 		var slider = document.getElementById('fc_mediafile_slider_' + fnn);
 		var loading_timer = null, progress_timer = null;
+		var loadingLabel = window.Joomla?.Text?._('FLEXI_FIELD_MEDIAFILE_LOADING_PERCENT') || '%s%';
 		var progressBar = box.querySelector('.fc_mediafile_audio_spectrum_progressbar');
 		var bar = progressBar?.querySelector('.bar');
 		var barText = progressBar?.querySelector('.barText');
@@ -199,7 +200,7 @@ class fc_Waveform_LazyLoad
 
 			var factor = 100;
 
-			barText.innerHTML = 'Loading : ' + percent + ' %';
+			barText.textContent = loadingLabel.replace('%s', percent);
 			progressBar.style.opacity = '1';
 			progressBar.style.visibility = 'visible';
 
@@ -209,7 +210,7 @@ class fc_Waveform_LazyLoad
 				var frame = 0;
 				loading_timer = setInterval(function ()
 				{
-					barText.innerHTML = 'Loading : ' + percent + ' %';
+					barText.textContent = loadingLabel.replace('%s', percent);
 					frame += 1;
 					if (frame >= steps)
 					{
@@ -235,7 +236,7 @@ class fc_Waveform_LazyLoad
 
 			if (!!percent)
 			{
-				barText.innerHTML = 'Loading : ' + percent + ' %';
+				barText.textContent = loadingLabel.replace('%s', percent);
 				progressBar.style.opacity = '0.75';
 
 				setTimeout(function () {
@@ -291,7 +292,7 @@ class fc_Waveform_LazyLoad
 			progressColor: audio_spectrum_conf[config_name]['progressColor'],
 			cursorColor:   audio_spectrum_conf[config_name]['cursorColor'],
 			cursorWidth:   parseInt(audio_spectrum_conf[config_name]['cursorWidth']) || 2,
-			height:        128,
+			height:        spectrum.closest('.fc-media-card') ? 64 : 128,
 
 			// v7 removed: backend, mediaControls, xhr, scrollParent, autoCenter, hideScrollbar, plugins
 		});

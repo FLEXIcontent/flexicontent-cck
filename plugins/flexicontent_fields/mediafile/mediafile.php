@@ -142,8 +142,8 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		$form_info_header = (int) $field->parameters->get('form_info_header', 3);
 
 		// Width of the media file card in the item edit form
-		$form_card_width = (int) $field->parameters->get('form_card_width', 250);
-		$form_card_width = $form_card_width > 0 ? $form_card_width : 250;
+		$form_card_width = (int) $field->parameters->get('form_card_width', 420);
+		$form_card_width = $form_card_width > 0 ? $form_card_width : 420;
 
 		// Inline file property editing
 		$inputmode = (int)$field->parameters->get( 'inputmode', 1 ) ;  // 1: file selection only,  0: inline file properties editing
@@ -321,6 +321,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		$autoassign = (int) $field->parameters->get( 'autoassign', 1 ) ;
 		$filesElementURL = \Joomla\CMS\Uri\Uri::base(true)
 			.'/index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component'
+			. '&amp;language=' . rawurlencode($app->getLanguage()->getTag())
 			.'&amp;index=%s'
 			.'&amp;field='.$field->id.'&amp;u_item_id='.$u_item_id.'&amp;autoassign='.$autoassign
 			.'&amp;filter_uploader='.$user->id
@@ -447,6 +448,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 
 			\Joomla\CMS\Language\Text::script('PLG_FLEXICONTENT_FIELDS_MEDIAFILE_RESPONSE_PARSING_FAILED', true);
 			\Joomla\CMS\Language\Text::script('PLG_FLEXICONTENT_FIELDS_MEDIAFILE_FILE_NOT_FOUND', true);
+			\Joomla\CMS\Language\Text::script('FLEXI_FIELD_MEDIAFILE_LOADING_PERCENT');
 			\Joomla\CMS\Language\Text::script('FLEXI_PLEASE_UPLOAD_A_FILE', true);
 
 			//flexicontent_html::loadFramework('wavesurfer');
@@ -456,6 +458,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 				\Joomla\CMS\HTML\HTMLHelper::getServiceRegistry()->register('fcuploader', 'JHtmlFcuploader');
 			}
 			$document->getWebAssetManager()->registerAndUseScript('plg_flexicontent_fields_mediafile.wavesurfer', 'components/com_flexicontent/librairies/wavesurfer/wavesurfer.min.js', array('version' => '7.12.12'));
+			$document->getWebAssetManager()->useStyle('fontawesome');
 			flexicontent_html::loadFramework('media-field-controls');
 			$document->getWebAssetManager()->registerAndUseScript('plg_flexicontent_fields_mediafile.form', 'plugins/flexicontent_fields/mediafile/js/form.js', array('version' => filemtime(JPATH_ROOT . '/plugins/flexicontent_fields/mediafile/js/form.js')));
 
@@ -524,7 +527,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 			$elementid_n   = $elementid.'_'.$n;
 
 			// Icon-only edit button, in the toolbar below the preview
-			$edit_btn = !($iform_title || $iform_desc || $iform_lang || $iform_access || $iform_dir || $iform_stamp) ? '' : '<button type="button" aria-expanded="false" class="' . $btn_item_class . $flat_btn_class . ' fc-media-edit-btn" data-for="' . $elementid_n . '" title="' . \Joomla\CMS\Language\Text::_( 'FLEXI_EDIT_OPTIONS' ) . '" onclick="fcfield_mediafile.toggleFields(\'' . $elementid_n . '\');"><span class="fc-image-tool-icon fas fa-edit" aria-hidden="true"></span></button>';
+			$edit_btn = !($iform_title || $iform_desc || $iform_lang || $iform_access || $iform_dir || $iform_stamp) ? '' : '<button type="button" aria-expanded="false" class="' . $btn_item_class . $flat_btn_class . ' fc-media-edit-btn" data-for="' . $elementid_n . '" title="' . \Joomla\CMS\Language\Text::_( 'FLEXI_EDIT_OPTIONS' ) . '" onclick="fcfield_mediafile.toggleFields(\'' . $elementid_n . '\');">' . flexicontent_html::mediaActionLabel('edit') . '</button>';
 
 			$bottom_toolbar = '
 				<div class="' . $btn_group_class . ' fc-xpended-btns fc-image-bottom-toolbar">
@@ -534,7 +537,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 							($use_myfiles > 0 ? $uploader_html->myFilesBtn : '') .
 							$uploader_html->mediaUrlBtn
 						: '') . '
-						' . $edit_btn . '
+						' . $edit_btn . ($uploader_html ? ($uploader_html->clearBtn ?? '') : '') . '
 					</div>
 				</div>';
 
@@ -785,6 +788,8 @@ class plgFlexicontent_fieldsMediafile extends FCField
 
 			\Joomla\CMS\Language\Text::script('PLG_FLEXICONTENT_FIELDS_MEDIAFILE_RESPONSE_PARSING_FAILED', false);
 			\Joomla\CMS\Language\Text::script('PLG_FLEXICONTENT_FIELDS_MEDIAFILE_FILE_NOT_FOUND', false);
+			\Joomla\CMS\Language\Text::script('FLEXI_FIELD_MEDIAFILE_LOADING_PERCENT');
+			\Joomla\CMS\Language\Text::script('FLEXI_FIELD_MEDIAFILE_PREVIEW_MISSING');
 			\Joomla\CMS\Language\Text::script('FLEXI_FIELD_MEDIAFILE_PLAYBACK_LOAD_FAILED');
 
 			//flexicontent_html::loadFramework('wavesurfer');

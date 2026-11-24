@@ -233,6 +233,12 @@ html[dir="rtl"] .choices .choices__inner {
 	width: 22px !important;
 }
 
+/* An empty editor multiselect has room for its translated placeholder. */
+.fcfieldval_container .choices[data-type="select-multiple"] .choices__list--multiple:empty + .choices__input--cloned {
+	flex: 1 1 0;
+	min-width: 0 !important;
+}
+
 .choices.is-open .choices__input--cloned {
 	min-width: 124px !important;
 	width: auto !important;

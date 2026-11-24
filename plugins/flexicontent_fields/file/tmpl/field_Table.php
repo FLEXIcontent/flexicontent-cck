@@ -18,6 +18,11 @@ foreach ($field->value as $file_id)
 
 	$file_data         = $files_data[$file_id];
 	$filename_original = $file_data->filename_original ? $file_data->filename_original : $file_data->filename;
+	$file_summary = $use_myfiles != 4 && in_array($form_info_header, [1, 2, 3])
+		? \Joomla\CMS\Layout\LayoutHelper::render('flexicontent_fields.file_summary', [
+			'file' => $file_data, 'header' => (int) $form_info_header, 'showTitle' => !$iform_title,
+		], JPATH_SITE . '/components/com_flexicontent/layouts')
+		: '';
 
 	$preview_css = 'width:100px; height:100px;';
 
@@ -139,7 +144,8 @@ foreach ($field->value as $file_id)
 												   onclick="'.$onclick_js.'" href="javascript:" data-href="'.$modal_url.'"
 	><i class="icon-search"></i></a>';  // &nbsp; Select
 			$juri_root = \Joomla\CMS\Uri\Uri::root(true);
-			$file_placeholder_text = 'No file selected';
+			$file_placeholder_text = htmlspecialchars(Text::_('FLEXI_MEDIA_NO_FILE_SELECTED'), ENT_QUOTES, 'UTF-8');
+			$file_clear_label = htmlspecialchars(Text::_('FLEXI_CLEAR'), ENT_QUOTES, 'UTF-8');
 			$file_placeholder_src  = '';//$juri_root . '/' .'......./person_placeholder.jpg';
 			$file_clear_value_js   = "fcfield_file.clearMediaFile(this, '".$file_placeholder_src."');";
 
@@ -164,7 +170,7 @@ foreach ($field->value as $file_id)
 												<div class="input-group">
 													<input class="form-control input-group-prepend fc_mediafile" type="text" readonly="" style="flex-grow:20; min-width:unset" value="{$file_data->filename}" id="{$elementid_n}_mediafile" name="{$fieldname_n}[mediafile]" placeholder="{$file_placeholder_text}" data-config_name="{$field_name_js}" />
 													{$select_file_btn}
-													<button type="button" href="#" title="Clear" class="form-control btn input-group-append fit-contents clear-btn" onclick="{$file_clear_value_js}"><i class="icon-cancel"></i></button>
+													<button type="button" href="#" title="{$file_clear_label}" class="form-control btn input-group-append fit-contents clear-btn" onclick="{$file_clear_value_js}"><i class="icon-cancel"></i></button>
 												</div>
 											</div>
 										</div>
@@ -292,12 +298,8 @@ HTML;
 			<div class="fcclear"></div>
 		' : '')).'
 
-		'.(in_array($form_info_header, [2,3]) && $use_myfiles != 4 ? '
-		<div class="fcclear"></div>
-		<div class="'.$input_grp_class.' fc-xpended-row">
-			<label class="' . $add_on_class . ' badge fc-lbl fc_filedata_title-lbl" style="margin:0">'.Text::_( 'FLEXI_ORIGINAL_FILENAME' ).'</label>
-			<input type="text" disabled class="' . $add_on_class . ' fc_filedata_title" value="'. htmlentities($filename_original, ENT_COMPAT, 'UTF-8') .'" />
-		</div>' : '').'
+		'.$file_summary.'
+		<input type="hidden" class="fc_filedata_title" value="'.htmlspecialchars((string) $filename_original, ENT_QUOTES, 'UTF-8').'" />
 
 		<div class="fcclear"></div>
 
@@ -306,7 +308,7 @@ HTML;
 			<div class="inlinefile-prv-box" style="'. ($use_myfiles == 4 && $inputmode == 1 && !$use_quantum ? 'width: 100%' : 'flex-basis: auto;') . '">
 				'.($form_file_preview && $use_myfiles != 4 ? '<div class="fcfield_preview_box' . ($form_file_preview === 2 ? ' auto' : '') . '" style="'.$preview_css.'">
 					<div class="fc_preview_text">' . $preview_text . '</div>
-					<img id="'.$elementid_n.'_image_preview" src="'.$preview_src.'" class="fc_preview_thumb" alt="Preview image placeholder"/></div>' : '').'
+					<img id="'.$elementid_n.'_image_preview" src="'.$preview_src.'" class="fc_preview_thumb" alt="' . htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_MEDIA_PREVIEW_IMAGE'), ENT_QUOTES, 'UTF-8') . '"/></div>' : '').'
 				'.(!$media_field_html && !empty($uploader_html) ? $uploader_html->container : $media_field_html).'
 			</div>
 

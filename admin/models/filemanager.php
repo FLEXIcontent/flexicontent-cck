@@ -147,6 +147,7 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 		{
 			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
 			\Joomla\CMS\Factory::getApplication()->getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+			FLEXIUtilities::loadMediaLanguage(JPATH_ADMINISTRATOR);
 		}
 
 
@@ -1915,8 +1916,9 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 	 *
 	 * @since   3.3.0
 	 */
-	public function getFilesUsageItems(array $file_ids)
+	public function getFilesUsageItems(array $file_ids, &$imageFileIds = null)
 	{
+		$imageFileIds = [];
 		$file_ids = array_values(array_filter(ArrayHelper::toInteger($file_ids)));
 
 		if (!$file_ids)
@@ -1953,7 +1955,11 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 				. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type = ' . $db->Quote('image') . $field_ids_list
 				. ' JOIN #__flexicontent_files AS a ON rel.value LIKE ' . $like_str . ' AND a.filename <> ""'
 				. ' AND a.id IN (' . $file_ids_list . ')';
-			$rows = array_merge($rows, $db->setQuery($query)->loadObjectList());
+			foreach ($db->setQuery($query)->loadObjectList() as $row)
+			{
+				$imageFileIds[(int) $row->file_id] = (int) $row->file_id;
+				$rows[] = $row;
+			}
 		}
 
 		// (c) Download links added to DB tables via the Fcfile XTD button

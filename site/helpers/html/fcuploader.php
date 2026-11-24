@@ -67,7 +67,7 @@ abstract class JHtmlFcuploader
 						<input type="text" value="" class="validate-fcuploader fc_hidden_value" data-error-mssg="" data-error-css="" />
 					</div>
 					<div id="'. $up_tag_id . $n .'" data-tagid-prefix="'. $up_tag_id .'" class="fc_file_uploader '.$up_css_class.' '.$up_tag_id.'" style="display: none;">
-						<span class="alert alert-warning">File uploader script failed to start</span>
+						<span class="alert alert-warning">' . htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_UPLOAD_START_FAILED'), ENT_QUOTES, 'UTF-8') . '</span>
 					</div>
 				</div>
 			'
@@ -98,6 +98,7 @@ abstract class JHtmlFcuploader
 
 		$defaults = array(
 			'action' => \Joomla\CMS\Uri\Uri::base(true) . '/index.php?option=com_flexicontent&task=filemanager.uploads'
+				. '&language=' . rawurlencode(\Joomla\CMS\Factory::getApplication()->getLanguage()->getTag())
 				. '&view='.($field ? 'fileselement' : 'filemanager')
 				. '&fieldid='.($field ? $field->id : ''). '&u_item_id='.$u_item_id
 				. '&'.\Joomla\CMS\Session\Session::getFormToken().'=1',
@@ -126,6 +127,8 @@ abstract class JHtmlFcuploader
 		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$assetPath = \Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/assets/';
 		$version = array('version' => FLEXI_VHASH);
+		require_once JPATH_SITE . '/components/com_flexicontent/librairies/uppy/language.php';
+		FlexicontentUppyLanguage::register($document);
 		$dashboardPath = \Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/librairies/uppy/dist/dashboard.min';
 		$document->addStyleSheet($dashboardPath . '.css', $version);
 		$document->addScript($dashboardPath . '.js', $version);
@@ -134,9 +137,12 @@ abstract class JHtmlFcuploader
 		$document->addScript($assetPath . 'js/fc-uploader.js', $version);
 
 		foreach (array('FLEXI_UPLOAD', 'FLEXI_START_UPLOAD', 'FLEXI_REMOVE_FILE', 'FLEXI_THUMBNAILS',
+			'FLEXI_OFFICE_PREVIEW_UNAVAILABLE', 'FLEXI_OFFICE_PREVIEW_LIMIT', 'FLEXI_OFFICE_PREVIEW_SHEETS', 'FLEXI_OFFICE_PREVIEW_SLIDE',
 			'FLEXI_UPLOAD_DROP_OR_CHOOSE', 'FLEXI_UPLOAD_ACCEPTED_TYPES', 'FLEXI_PREVIEW', 'JCLOSE',
 			'FLEXI_UPLOAD_FILES', 'FLEXI_UPLOAD_MAX_EACH', 'FLEXI_ACCESS', 'FLEXI_LANGUAGE',
 			'FLEXI_UPLOADING', 'FLEXI_UPLOAD_FINISHED', 'FLEXI_PLEASE_WAIT', 'FLEXI_FILE_PROPERTIES',
+			'FLEXI_UPLOAD_CONNECTION_FAILED', 'FLEXI_UPLOAD_INVALID_RESPONSE', 'FLEXI_UPLOAD_REQUEST_FAILED',
+			'FLEXI_UPLOAD_INVALID_URL', 'FLEXI_UPLOAD_UNCONFIRMED',
 			'FLEXI_UPLOAD_TYPE_REJECTED', 'FLEXI_UPLOAD_LIMIT_REACHED', 'FLEXI_UPLOAD_ASSIGN_FAILED',
 			'JLIB_HTML_MOVE_UP', 'JLIB_HTML_MOVE_DOWN') as $key)
 		{

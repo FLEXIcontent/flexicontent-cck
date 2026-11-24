@@ -106,15 +106,7 @@ var fcfield_file = {
     epub: 'application/epub+zip', iso: 'application/x-iso9660-image'
   },
 
-  formatSize(size) {
-    if (size === '' || size === null || size === undefined) return '';
-    if (isNaN(size)) return String(size);   // already formatted text, e.g. "12 KB"
-    size = parseFloat(size);
-    if (!size) return '';
-    if (size < 1024) return size + ' B';
-    if (size < 1048576) return (size / 1024).toFixed(size < 10240 ? 1 : 0).replace(/\.0$/, '') + ' KB';
-    return (size / 1048576).toFixed(1).replace(/\.0$/, '') + ' MB';
-  },
+  formatSize(size) { return FlexiMediaField.formatSize(size); },
 
   // HTML of the tooltip (Title, URL link, Description, custom1/custom2, MIME type / Size), empty string if there is nothing to show
   buildTipHtml(info) {
@@ -141,6 +133,9 @@ var fcfield_file = {
     };
 
     add('fc-file-tip-title', plain(data.title, 200));
+    const stored = info.closest('.fcfieldval_container')?.querySelector('.fc_filedata_txt')?.dataset.filename;
+    const summary = info.querySelector('.fc-asset-summary[data-header="3"]');
+    if (summary && stored !== summary.querySelector('.fc-asset-name').textContent) add('fc-file-tip-name', stored);
     add('fc-file-tip-url', data.url ? String(data.url) : '');
     add('fc-file-tip-desc', plain(data.description, 300));
     add('fc-file-tip-custom', plain(data.custom1, 300), labels[1] || '');
@@ -154,9 +149,10 @@ var fcfield_file = {
   updateTip(info) {
     const html = fcfield_file.buildTipHtml(info);
     const Native = window.bootstrap?.Tooltip;
-    const options = {html: true, container: 'body', trigger: 'hover'};
+    const options = {html: true, container: 'body', trigger: 'hover focus'};
 
-    info.querySelectorAll('input.fc-file-info-val').forEach(input => {
+    info.querySelectorAll('.fc-asset-name, input.fc-file-info-val').forEach(input => {
+      if (input.matches('.fc-asset-name')) input.tabIndex = html ? 0 : -1;
       if (Native) {
         Native.getInstance(input)?.dispose();
         input.removeAttribute('title');
@@ -223,6 +219,7 @@ var fcfield_file = {
       FlexiMediaField.setValue(box, '.fc_filedesc', file.description);
       if (file.custom1 !== undefined) FlexiMediaField.setValue(box, '.fc_filecustom1', file.custom1);
       if (file.custom2 !== undefined) FlexiMediaField.setValue(box, '.fc_filecustom2', file.custom2);
+      FlexiMediaField.setFileSummary(box, file, true);
       const update = {description: file.description || ''};
       if (file.custom1 !== undefined) update.custom1 = file.custom1 || '';
       if (file.custom2 !== undefined) update.custom2 = file.custom2 || '';

@@ -34,7 +34,7 @@ const {chromium} = require('playwright');
         });
         return route.fulfill({status: 500, json: {jsonrpc: '2.0', error: {message: 'Temporary error'}}});
       }
-      return route.fulfill({json: {jsonrpc: '2.0', data: request.chunk === request.chunks - 1 ? {id: 87, filename: request.name} : null}});
+      return route.fulfill({json: {jsonrpc: '2.0', data: request.chunk === request.chunks - 1 ? {id: 87, filename: request.name, size: 2048, secure: 1} : null}});
     });
     await page.goto('https://fixture.invalid/');
     await page.evaluate(() => {
@@ -121,7 +121,8 @@ const {chromium} = require('playwright');
       container.className = 'fc_file_uploader fc_auto_uploader';
       container.dataset.tagidPrefix = 'fixture_';
       const card = container.closest('section');
-      card.insertAdjacentHTML('afterbegin', '<input id="file_name" class="fc_filedata_txt" value="previous.pdf"><input class="fc_filedata_title" value="previous.pdf"><button id="upload" type="button" class="fc_files_uploader_toggle_btn" data-rowno="0" aria-haspopup="dialog">Upload</button>');
+      card.insertAdjacentHTML('afterbegin', '<input class="fc-file-id" type="hidden" value="17"><input id="file_name" class="fc_filedata_txt" value="previous.pdf"><input class="fc_filedata_title" value="previous.pdf"><button id="upload" type="button" class="fc_files_uploader_toggle_btn" data-rowno="0" aria-haspopup="dialog">Upload</button>');
+      card.insertAdjacentHTML('afterbegin', '<div class="fc-asset-summary" hidden><span class="fc-asset-tile"></span><span class="fc-asset-name"></span><div class="fc-asset-meta"><span class="fc-asset-type"></span><span class="fc-asset-size"></span><span class="fc-asset-secure" hidden>Secure</span></div></div>');
       document.getElementById('upload').onclick = event => FlexiMediaField.beforeToggle(event.currentTarget, 'file');
       window.fixture_ = new FlexiUploader.Uploader({
         tag_id: 'fixture_', action: '/upload', upload_maxcount: 1, autostart_on_select: true,
@@ -132,13 +133,15 @@ const {chromium} = require('playwright');
     });
     const drop = page.locator('.fc-upload-drop');
     assert.equal(await drop.locator('.fc-upload-cloud').count(), 1);
-    assert(await drop.isVisible(), 'A populated card starts open');
+    assert.equal(await drop.isVisible(), false, 'A saved assignment hides the empty tile');
     await page.locator('#upload').click();
     await page.locator('.fc-upload-dialog[open] .uppy-Dashboard').waitFor();
     await page.keyboard.press('Escape');
     await page.locator('.fc-upload-dialog').waitFor({state: 'detached'});
-    assert(await drop.isVisible());
+    assert.equal(await drop.isVisible(), false);
     assert.equal(await page.locator('.fc_filedata_title').inputValue(), 'previous.pdf');
+    await page.evaluate(() => FlexiMediaField.clearFile('#file_name', {}, 'file'));
+    assert(await drop.isVisible(), 'Clearing the assignment restores the tile');
     await drop.locator('input').focus();
     await page.keyboard.press('Enter');
     const dashboard = page.locator('.fc-upload-dialog[open]');
@@ -154,9 +157,16 @@ const {chromium} = require('playwright');
     await dashboard.locator('.uppy-DashboardContent-save').click();
     await dashboard.locator('.uppy-StatusBar-actionBtn--upload').click();
     await dashboard.waitFor({state: 'detached'});
-    assert(await drop.isVisible(), 'Assignment keeps the replacement drop area open');
+    assert.equal(await drop.isVisible(), false, 'A successful upload hides the empty tile');
+    assert(await page.locator('#upload').isVisible(), 'Replace remains available');
     assert.equal(await page.locator('.fc_filedata_title').inputValue(), 'guide.pdf');
-    const assignedPreview = page.locator('.fc-upload-result');
+    const summary = page.locator('.fc-asset-summary');
+    assert(await summary.isVisible());
+    assert.equal(await summary.locator('.fc-asset-name').textContent(), 'guide.pdf');
+    assert.equal(await summary.locator('.fc-asset-size').textContent(), '2 KB');
+    assert.equal(await summary.locator('.fc-asset-type').textContent(), 'PDF');
+    assert(await summary.locator('.fc-asset-secure').isVisible());
+    const assignedPreview = summary.locator('.fc-asset-meta .fc-upload-result');
     await assignedPreview.click();
     const pdf = page.locator('.glightbox-container iframe[title="guide.pdf"]');
     await pdf.waitFor({state: 'attached'});
@@ -173,6 +183,60 @@ const {chromium} = require('playwright');
     }
     await page.keyboard.press('Escape');
     await page.locator('.glightbox-container').waitFor({state: 'detached'});
+    // Office previews read the selected bytes inside the component's isolated viewer.
+    const officePath = '/components/com_flexicontent/librairies/office-preview/';
+    await page.route('**' + officePath + '**', route => {
+      const asset = new URL(route.request().url()).pathname.slice(officePath.length);
+      return route.fulfill({path: path.join(__dirname, '..', 'site', 'librairies', 'office-preview', asset)});
+    });
+    const sheetjs = require('../site/librairies/office-preview/sheetjs/xlsx.core.min.js');
+    const workbook = sheetjs.utils.book_new();
+    for (const sheet of ['First', 'Second']) {
+      sheetjs.utils.book_append_sheet(workbook, sheetjs.utils.aoa_to_sheet([[sheet + ' worksheet', 27]]), sheet);
+    }
+    const bytes = sheetjs.write(workbook, {type: 'array', bookType: 'xlsx'});
+    await page.evaluate(data => {
+      Joomla.getOptions = () => ({root: ''});
+      const name = 'sample.xlsx';
+      const blob = new Blob([Uint8Array.from(data)]);
+      const url = URL.createObjectURL(blob);
+      const preview = FlexiUploader.mediaElement(FlexiUploader.mediaType(name), url, name);
+      preview.id = 'office-test';
+      document.body.append(preview);
+    }, Array.from(new Uint8Array(bytes)));
+    const office = page.frameLocator('#office-test');
+    await office.getByText('First worksheet', {exact: true}).waitFor();
+    await office.locator('select').selectOption('Second');
+    assert(await office.getByText('Second worksheet', {exact: true}).isVisible());
+    assert.equal(await page.locator('#office-test').getAttribute('sandbox'), 'allow-scripts');
+
+    const deck = require('node:fs').readFileSync(path.join(__dirname, 'fixtures', 'office-preview.pptx'));
+    await page.evaluate(bytes => {
+      const name = 'sample.pptx';
+      const url = URL.createObjectURL(new Blob([Uint8Array.from(bytes)]));
+      const preview = FlexiUploader.mediaElement(FlexiUploader.mediaType(name), url, name);
+      preview.id = 'slides-test';
+      document.body.append(preview);
+    }, Array.from(deck));
+    const slides = page.frameLocator('#slides-test');
+    const canvas = slides.locator('canvas');
+    await slides.locator('canvas[aria-description*="Coastal field notes"]').waitFor();
+    const backgroundPixel = () => canvas.evaluate(el => Array.from(el.getContext('2d').getImageData(3, 3, 1, 1).data));
+    assert.deepEqual(await backgroundPixel(), [19, 87, 110, 255]);
+    const hasTitleInk = await canvas.evaluate(el => {
+      const context = el.getContext('2d');
+      const pixels = context.getImageData(0, el.height * .22, el.width, el.height * .42).data;
+      for (let i = 0; i < pixels.length; i += 4) {
+        if (Math.min(pixels[i], pixels[i + 1], pixels[i + 2]) > 220) return true;
+      }
+      return false;
+    });
+    assert(hasTitleInk, 'The white title should be painted over the blue background');
+    await slides.locator('select').selectOption('1');
+    await slides.locator('canvas[aria-description*="Estuary survey"]').waitFor();
+    assert.deepEqual(await backgroundPixel(), [147, 63, 33, 255]);
+    await page.locator('#office-test').evaluate(el => el.remove());
+
     // An assigned Gallery image occupies the empty tile and remains a replacement drop target.
     await page.evaluate(() => {
       const card = document.createElement('section');

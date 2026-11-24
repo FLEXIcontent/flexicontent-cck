@@ -824,6 +824,12 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 
 		if ( $print_logging_info ) { global $fc_run_times; $start_microtime = microtime(true); }
 
+		if ($jinput->getString('fc_confirm_unlink'))
+		{
+			// Use the same confirmation in the manager, modal and template overrides.
+			require JPATH_ADMINISTRATOR . '/components/com_flexicontent/views/filemanager/tmpl/unlink_confirmation.php';
+			return;
+		}
 		parent::display($tpl);
 
 		if ( $print_logging_info ) @$fc_run_times['template_render'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;

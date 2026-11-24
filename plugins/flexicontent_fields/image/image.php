@@ -348,6 +348,7 @@ class plgFlexicontent_fieldsImage extends FCField
 		// URL for modal fileselement view
 		$filesElementURL =
 			\Joomla\CMS\Uri\Uri::base(true).'/index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;layout=image'
+			. '&amp;language=' . rawurlencode($app->getLanguage()->getTag())
 			.'&amp;field='.$field->id.'&amp;u_item_id='.$u_item_id.'&amp;targetid=%s_existingname&amp;thumb_w='.$preview_thumb_w.'&amp;thumb_h='.$preview_thumb_h.'&amp;autoassign='.$autoassign
 			.'&amp;'.\Joomla\CMS\Session\Session::getFormToken().'=1';
 

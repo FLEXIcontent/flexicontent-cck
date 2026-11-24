@@ -98,6 +98,39 @@ window.FlexiMediaField = (() => {
     return !!box.querySelector('.fc_filedata_txt')?.value || Number(box.querySelector('.fc-file-id')?.value) > 0;
   }
 
+  function syncFileCard(box) {
+    if (box?.querySelector('.fc-file-id')) box.classList.toggle('fc-has-assigned-file', hasFile(box));
+  }
+
+  function formatSize(bytes) {
+    if (!bytes || Number(bytes) <= 0) return '';
+    if (!Number.isFinite(Number(bytes))) return String(bytes);
+    const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+    const unit = Math.min(units.length - 1, Math.max(0, Math.floor(Math.log(bytes) / Math.log(1024))));
+    return new Intl.NumberFormat(document.documentElement.lang || undefined, {maximumFractionDigits: 1})
+      .format(Number(bytes) / 1024 ** unit) + ' ' + units[unit];
+  }
+
+  function setFileSummary(box, file = {}, merge = false) {
+    const summary = box?.querySelector('.fc-asset-summary');
+    if (!summary) return;
+    const stored = file.filename || '';
+    const original = file.filename_original || stored;
+    const name = summary.querySelector('.fc-asset-name');
+    name.textContent = summary.dataset.header === '1' ? stored : original;
+    if (summary.dataset.header === '3' && original !== stored) name.title = stored;
+    else name.removeAttribute('title');
+    const ext = (file.ext || original.match(/\.([a-z0-9]+)$/i)?.[1] || '').toUpperCase();
+    setText(summary, '.fc-asset-tile, .fc-asset-type', ext);
+    const title = file.altname;
+    setText(summary, '.fc-asset-title', summary.dataset.showTitle === '1' && title !== stored && title !== original ? title : '');
+    if (!merge || file.size !== undefined) setText(summary, '.fc-asset-size', formatSize(file.size));
+    if (!merge || file.secure !== undefined) {
+      summary.querySelector('.fc-asset-secure').hidden = Number(file.secure) !== 1 || Number(file.url) > 0;
+    }
+    summary.hidden = !name.textContent;
+  }
+
   function clearFile(element, options, key, clearPreview) {
     const box = row(element);
     if (!box) return;
@@ -118,6 +151,8 @@ window.FlexiMediaField = (() => {
       if (hadValue && counter(key)?.value === previousCount) changeCount(key, -1);
     }
     if (options?.keep_props) setValue(box, 'input, textarea', '');
+    syncFileCard(box);
+    if (!hasFile(box)) setFileSummary(box);
   }
 
   function clearMediaFile(button, emptyPreview, clearPreview) {
@@ -137,6 +172,8 @@ window.FlexiMediaField = (() => {
       preview.setAttribute(preview.matches('img') ? 'src' : 'data', emptyPreview || placeholder);
       FlexiForm.show(preview, false);
     });
+    syncFileCard(box);
+    setFileSummary(box);
     if (hadValue) changeCount(field?.dataset.config_name || input?.closest('[data-fc-media-key]')?.dataset.fcMediaKey, -1);
   }
 
@@ -154,6 +191,10 @@ window.FlexiMediaField = (() => {
     const input = box.querySelector('.fc_filedata_txt');
     key ||= target.dataset.config_name || input?.closest('[data-fc-media-key]')?.dataset.fcMediaKey;
     const file = {...source};
+    // The retained preview belongs to the previously uploaded local File.
+    if (input?.dataset.filename !== file.filename || Number(box.querySelector('.fc-file-id')?.value) !== Number(file.id)) {
+      box.querySelector('.fc-upload-result')?.remove();
+    }
     if (!fromFolder) Object.keys(file).forEach(name => {
       if (typeof file[name] !== 'string') return;
       try { file[name] = decodeURIComponent(file[name]); } catch { /* Already decoded. */ }
@@ -194,7 +235,9 @@ window.FlexiMediaField = (() => {
     setValue(box, '.fc_filelang', file.language, 'change');
     setValue(box, '.fc_filedesc', file.description);
     resetRemoval(box.querySelector('.inlinefile-del'));
+    setFileSummary(box, file);
     assignPreview?.(box, input, file, key);
+    syncFileCard(box);
     changeCount(key, hadValue ? 0 : 1);
     if (!keepModal) dialogs?.[key]?.dialog('close');
     return true;
@@ -203,6 +246,7 @@ window.FlexiMediaField = (() => {
   const pendingUploaders = new WeakSet();
   function showUploader(id) {
     const box = row(document.getElementById(id));
+    syncFileCard(box);
     const uploader = box?.querySelector('.fc_file_uploader');
     if (!uploader || pendingUploaders.has(uploader)) return;
     pendingUploaders.add(uploader);
@@ -227,5 +271,5 @@ window.FlexiMediaField = (() => {
   }
 
   return { placeholder, row, changeCount, resetRemoval, beforeToggle, clearUploader, uploaded,
-    setValue, setText, clearFile, clearMediaFile, setFileRemoval, assignFile, showUploader };
+    setValue, setText, formatSize, setFileSummary, clearFile, clearMediaFile, setFileRemoval, assignFile, showUploader };
 })();

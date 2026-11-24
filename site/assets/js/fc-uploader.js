@@ -5,6 +5,12 @@ window.FlexiUploader = (() => {
   const queues = new WeakMap();
   const translate = key => (Joomla.Text || Joomla.JText)._(key);
   const imageExtensions = /\.(jpe?g|gif|png|webp|bmp|wbmp|ico)$/i;
+  const officeTypes = {
+    pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    xls: 'application/vnd.ms-excel', ods: 'application/vnd.oasis.opendocument.spreadsheet', csv: 'text/csv'
+  };
   const mediaTypes = {
     pdf: 'application/pdf', mp3: 'audio/mpeg', m4a: 'audio/mp4', mp4a: 'audio/mp4',
     wav: 'audio/wav', oga: 'audio/ogg', ogg: 'audio/ogg', aac: 'audio/aac', flac: 'audio/flac',
@@ -14,10 +20,34 @@ window.FlexiUploader = (() => {
 
   function mediaType(name) {
     const extension = name.split('.').pop().toLowerCase();
+    if (Object.hasOwn(officeTypes, extension)) return officeTypes[extension];
     return Object.hasOwn(mediaTypes, extension) ? mediaTypes[extension] : '';
   }
 
   function mediaElement(type, url, name) {
+    if (Object.values(officeTypes).includes(type)) {
+      const frame = document.createElement('iframe');
+      frame.className = 'fc-upload-media-preview';
+      frame.title = name;
+      frame.setAttribute('sandbox', 'allow-scripts');
+      frame.referrerPolicy = 'no-referrer';
+      // The sandbox has an opaque origin. Only send the locally selected blob to its first document.
+      frame.addEventListener('load', async () => {
+        if (!url.startsWith('blob:')) return;
+        const target = frame.contentWindow;
+        try {
+          const file = await (await fetch(url)).blob();
+          if (frame.isConnected && frame.contentWindow === target) {
+            target.postMessage({name, file, language: document.documentElement.lang, loading: translate('FLEXI_PLEASE_WAIT'),
+              unavailable: translate('FLEXI_OFFICE_PREVIEW_UNAVAILABLE'),
+              limit: translate('FLEXI_OFFICE_PREVIEW_LIMIT'), sheets: translate('FLEXI_OFFICE_PREVIEW_SHEETS'),
+              slide: translate('FLEXI_OFFICE_PREVIEW_SLIDE')}, '*');
+          }
+        } catch { /* The viewer may have closed and released its object URL. */ }
+      }, {once: true});
+      frame.src = (Joomla.getOptions('system.paths', {}).root || '') + '/components/com_flexicontent/librairies/office-preview/viewer.html';
+      return frame;
+    }
     const el = document.createElement(type === 'application/pdf' ? 'iframe' : type.split('/')[0]);
     el.className = 'fc-upload-media-preview';
     el.title = name;
@@ -55,10 +85,11 @@ window.FlexiUploader = (() => {
 
   function openPreview(control, url, name, type = '', onClose) {
     const isPdf = type === 'application/pdf';
+    const documentPreview = isPdf || Object.values(officeTypes).includes(type);
     const element = type ? mediaElement(type, isPdf ? url + '#view=FitH' : url, name) : null;
     const viewer = GLightbox({
       elements: [element ? {type: 'inline', content: element} : {href: url, type: 'image', alt: name}],
-      ...(isPdf && {width: '100%', height: '100%'}),
+      ...(documentPreview && {width: '100%', height: '100%'}),
       draggable: false, touchNavigation: false
     });
     viewer.on('close', () => {
@@ -68,7 +99,7 @@ window.FlexiUploader = (() => {
       if (control.isConnected) control.focus();
     });
     viewer.open();
-    if (isPdf) {
+    if (documentPreview) {
       viewer.modal.classList.add('fc-upload-pdf-viewer');
       const title = document.createElement('span');
       title.className = 'fc-upload-pdf-title';
@@ -95,7 +126,7 @@ window.FlexiUploader = (() => {
     constructor(container, options, owner, suffix) {
       this.container = container;
       this.dropTarget = container.closest('.fc-image-card') ||
-        (container.classList.contains('fc_auto_uploader') ? container.parentElement : container);
+        (container.classList.contains('fc_auto_uploader') ? container.closest('.fcfieldval_container') || container.parentElement : container);
       this.options = options;
       this.owner = owner;
       this.settings = {container};
@@ -377,7 +408,9 @@ window.FlexiUploader = (() => {
               thumb.src = preview;
               open.prepend(thumb);
             }
-            this.container.after(open);
+            const metadata = !imageExtensions.test(entry.name) && row?.querySelector('.fc-asset-meta');
+            if (metadata) metadata.append(open);
+            else this.container.after(open);
           }
         }
       } catch (error) {
