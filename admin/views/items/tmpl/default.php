@@ -1541,6 +1541,15 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 				}
 				$row->catids = $catids;
 
+				// Pill with the number of items of a category, a click lists the items of the category
+				$cat_count_pill = function ($category) {
+					return '<a href="index.php?option=com_flexicontent&amp;view=items&amp;filter_cats=' . (int) $category->id
+						. '&amp;filter_catsinstate=99&amp;fcform=1&amp;filter_state=ALL&amp;limit=50"'
+						. ' class="' . $this->btn_sm_class . ' fc_assocs_count fc_cat_items_count ' . $this->tooltip_class . '"'
+						. ' title="' . htmlspecialchars(Text::_('FLEXI_ITEMS'), ENT_QUOTES, 'UTF-8') . '">'
+						. (int) ($category->items_count ?? 0) . '</a>';
+				};
+
 				$nr = count($row->catids);
 				$ix = 0;
 				$nn = 0;
@@ -1564,18 +1573,18 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 					$short_name = StringHelper::strlen($title) > 40  ? StringHelper::substr( $title , 0 , 40) . '...' : $title;
 					if (!$isMainCat)
 					{
-						$row_cats[] = !$this->perms->CanCats ? $short_name : '
+						$row_cats[] = (!$this->perms->CanCats ? $short_name : '
 							<span class="'.$catClass.'" title="'.$edit_cat_title.'">
 								<a href="'.$catLink.'">'.$short_name.'</a>
-							</span>';
+							</span>') . ' ' . $cat_count_pill($category);
 						$cat_names[] = $short_name;
 					}
 					else
 					{
-						$_maincat = !$this->perms->CanCats ? '<span class="badge">' . $short_name . '</span>' : '
+						$_maincat = (!$this->perms->CanCats ? '<span class="badge">' . $short_name . '</span>' : '
 						<span class="'.$catClass.'" title="'.$edit_cat_title.'">
 							<a href="'.$catLink.'">'.$short_name.'</a>
-						</span>';
+						</span>') . ' ' . $cat_count_pill($category);
 					}
 					$ix++;
 				}
@@ -1597,25 +1606,34 @@ elseif ($this->max_tab_types && count($this->itemTypes) > 1)
 			<?php if (!isset($disable_columns['tags'])): ?>
 			<td data-col="tags" class="col_tag hidden-phone hidden-tablet" style="<?php echo $this->hideCol($colposition++); ?>" >
 				<?php
+					// Chip of a tag: the name (link to edit the tag) and a small pill with the number of items having the tag (link to list them)
+					$tag_chip = function ($tag) {
+						$name  = htmlspecialchars((string) $tag->name, ENT_QUOTES, 'UTF-8');
+						$count = (int) ($tag->items_count ?? 0);
+						$label = !empty($this->perms->CanTags)
+							? '<a class="fc-tag-chip-name" href="index.php?option=com_flexicontent&amp;task=tag.edit&amp;id=' . (int) $tag->id . '" title="' . htmlspecialchars(Text::_('FLEXI_EDIT_TAG'), ENT_QUOTES, 'UTF-8') . ': ' . $name . '">' . $name . '</a>'
+							: '<span class="fc-tag-chip-name" title="' . $name . '">' . $name . '</span>';
+
+						return '<span class="fc-tag-chip">' . $label
+							. '<a class="fc-opt-count' . ($count ? '' : ' is-zero') . '" href="index.php?option=com_flexicontent&amp;view=items&amp;filter_tag[]=' . (int) $tag->id
+							. '&amp;filter_catsinstate=99&amp;fcform=1&amp;filter_state=ALL&amp;limit=50" title="' . htmlspecialchars(Text::_('FLEXI_ITEMS'), ENT_QUOTES, 'UTF-8') . '">' . $count . '</a></span>';
+					};
+
 					$row_tags  = array();
 					$tag_names = array();
 					foreach ($row->tagids as $key => $_itag)
 					{
 						if ( isset($this->itemTags[$_itag]) )
 						{
-							$row_tags[] = ' <span class="itemtag">'.htmlspecialchars((string) $this->itemTags[$_itag]->name, ENT_QUOTES, 'UTF-8').'</span> ';
+							$row_tags[] = $tag_chip($this->itemTags[$_itag]);
 							$tag_names[] = $this->itemTags[$_itag]->name;
 						}
 					}
 					echo count($row_tags) ? '
-						<button type="button" class="btn btn-mini ' . $this->popover_class . ' nowrap_box" onclick="FlexiForm.show(this.nextElementSibling, !FlexiForm.visible(this.nextElementSibling));" data-content="'.flexicontent_html::getToolTip(Text::_('FLEXI_TAGS'), '<ul class="fc_plain"><li>'.implode('</li><li>', $tag_names).'</li></ul>', 0, 1).'">
+						<button type="button" class="btn btn-mini fc_tags_toggle ' . $this->popover_class . ' nowrap_box" onclick="const box = this.nextElementSibling; FlexiForm.show(box, !FlexiForm.visible(box));" data-content="'.flexicontent_html::getToolTip(Text::_('FLEXI_TAGS'), '<ul class="fc_plain"><li>'.implode('</li><li>', $tag_names).'</li></ul>', 0, 1).'">
 							'.count($row_tags).' <i class="icon-tags"></i>
 						</button>
-						<div class="fc_assignments_box fc_tags">' : '';
-					echo count($row_tags) > 8
-						? implode(', ', $row_tags)
-						: (count($row_tags) ? '<ul class="fc_plain"><li>' . implode('</li><li>', $row_tags) . '</li></ul>' : '');
-					echo count($row_tags) ? '</div>' : '';
+						<div class="fc_assignments_box fc_tags"><div class="fc-tag-chips">' . implode('', $row_tags) . '</div></div>' : '';
 				?>
 			</td>
 			<?php endif; ?>

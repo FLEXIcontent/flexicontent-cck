@@ -3330,7 +3330,9 @@ class FlexicontentModelItems extends FCModelAdminList
 		if (empty($catids)) $catids = $this->_catids;
 		if (empty($catids)) return array();
 
+		// items_count: number of items assigned to the category (main or secondary), used by the pill in the categories column
 		$query = 'SELECT DISTINCT c.id, c.title'
+			. ', (SELECT COUNT(DISTINCT r.itemid) FROM #__flexicontent_cats_item_relations AS r WHERE r.catid = c.id) AS items_count'
 			. ' FROM #__categories AS c'
 			. ' WHERE c.id IN ('. implode(',', $catids) .') '
 			. (FLEXI_J16GE ? ' AND c.extension="'.FLEXI_CAT_EXTENSION.'"' : '')
@@ -3357,7 +3359,9 @@ class FlexicontentModelItems extends FCModelAdminList
 		if (empty($tagids)) $tagids = $this->_tagids;
 		if (empty($tagids)) return array();
 
+		// items_count: number of items assigned to the tag, used by the pill in the tags column
 		$query = 'SELECT DISTINCT t.*'
+			. ', (SELECT COUNT(DISTINCT r.itemid) FROM #__flexicontent_tags_item_relations AS r WHERE r.tid = t.id) AS items_count'
 			. ' FROM #__flexicontent_tags AS t'
 			. ' WHERE t.id IN ('. implode(',', $tagids) .') '
 		;

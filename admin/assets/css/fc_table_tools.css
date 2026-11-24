@@ -93,6 +93,11 @@ table.fc-table-fixed td {
 	overflow-wrap: anywhere;
 }
 
+/* Cells with images (e.g. an icon in a custom column): no ellipsis dots when the column is narrower than the image */
+table.fc-table-fixed td:has(img, picture, svg, video) {
+	text-overflow: clip;
+}
+
 /* Header cells */
 th.fc-col-th {
 	position: relative;
@@ -260,7 +265,8 @@ body.fc-col-resizing {
 	align-items: center;
 }
 
-.choices__item .fc-opt-count {
+.choices__item .fc-opt-count,
+.fc-tag-chip .fc-opt-count {
 	display: inline-flex;
 	flex: 0 0 auto;
 	align-items: center;
@@ -268,7 +274,7 @@ body.fc-col-resizing {
 	min-width: 1.8rem;
 	margin-inline-end: .65rem;
 	padding: 0 .45rem;
-	font-size: .75rem;
+	font-size: .70rem;
 	font-weight: 600;
 	line-height: 1.6;
 	color: #fff;
@@ -276,7 +282,8 @@ body.fc-col-resizing {
 	border-radius: 1rem;
 }
 
-.choices__item .fc-opt-count.is-zero {
+.choices__item .fc-opt-count.is-zero,
+.fc-tag-chip .fc-opt-count.is-zero {
 	color: inherit;
 	background: rgba(127, 127, 127, .2);
 	opacity: .8;
@@ -301,4 +308,79 @@ body.fc-col-resizing {
 #flexicontent #fc-managers-header #mainChooseColBox.fcman-abs {
 	left: 0;
 	right: auto;
+}
+
+
+/* Pill with the number of items, shown right of a category name (links to the list of the items of the category) */
+#flexicontent .fc-table-wrap td a.fc_cat_items_count,
+#flexicontent .fc-table-wrap td button.fc_tags_toggle {
+	display: inline-flex !important;
+	align-items: center;
+	justify-content: center;
+	width: auto !important;
+	min-width: 2rem;
+	margin-inline-start: .4rem;
+	padding: .1rem .5rem;
+	font-size: .8rem;
+	line-height: 1.5;
+	text-align: center;
+	text-decoration: none;
+	vertical-align: middle;
+	color: inherit;
+	background: var(--card-bg, #fff);
+	border: 1px solid var(--template-bg-dark-20, #b9c5d8);
+	border-radius: .35rem;
+}
+
+/* The tags button (number of tags + icon) has the same size as the pills; the pill of a tag is placed right of it */
+#flexicontent .fc-table-wrap td button.fc_tags_toggle {
+	gap: .25rem;
+	margin-inline-start: 0;
+	cursor: pointer;
+}
+
+
+
+/* Tags list of the items manager (opened by the tags button): a chip per tag = name (edit link) + blue pill with the number of items */
+.fc-tag-chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: .35rem;
+	margin-top: .4rem;
+}
+
+/* Same corners and border as the pills of the tags button and of the categories */
+#flexicontent .fc-table-wrap .fc-tag-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: .4rem;
+	max-width: 100%;
+	padding: .1rem .3rem .1rem .5rem;
+	font-size: .75rem;
+	line-height: 1.5;
+	background: var(--card-bg, #fff);
+	border: 1px solid var(--template-bg-dark-20, #b9c5d8);
+	border-radius: .35rem;
+}
+
+/* A name stays on one line (the table cells break words anywhere, which cut it into pieces); a name that does not fit in a narrow column ends with an ellipsis */
+#flexicontent .fc-table-wrap .fc-tag-chip .fc-tag-chip-name {
+	flex: 0 1 auto;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow-wrap: normal;
+	word-break: normal;
+}
+
+#flexicontent .fc-table-wrap .fc-tag-chip a.fc-opt-count {
+	flex: none;
+	margin-inline-end: 0;
+	color: #fff !important;
+	text-decoration: none !important;
+}
+
+#flexicontent .fc-table-wrap .fc-tag-chip a.fc-opt-count.is-zero {
+	color: inherit !important;
 }
