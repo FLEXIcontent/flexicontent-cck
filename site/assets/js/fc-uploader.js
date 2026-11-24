@@ -90,6 +90,8 @@ window.FlexiUploader = (() => {
     const viewer = GLightbox({
       elements: [element ? {type: 'inline', content: element} : {href: url, type: 'image', alt: name}],
       ...(documentPreview && {width: '100%', height: '100%'}),
+      // Mount inside the compact file picker when it is already a native modal.
+      dialogHost: control.closest('dialog[open]'),
       draggable: false, touchNavigation: false
     });
     viewer.on('close', () => {
@@ -106,9 +108,6 @@ window.FlexiUploader = (() => {
       title.textContent = name;
       viewer.modal.querySelector('.gcontainer').prepend(title);
     }
-    // Keep the lightbox interactive when the compact file picker is itself a native modal.
-    const dialog = control.closest('dialog[open]');
-    if (dialog && viewer.modal) dialog.append(viewer.modal);
   }
 
   function resetUploadValidation(input) {
