@@ -373,12 +373,12 @@ HTML;
 
 				<!--div id="fc_mediafile_current_time_' . $fnn . '" class="media_time">00:00:00</div-->
 				<div id="fc_mediafile_controls_' . $fnn . '" class="fc_mediafile_controls">
-					<a href="javascript:;" class="btn playBtn">
-						<span class="icon-play-circle controls"></span><span class="btnControlsText">' . Text::_('FLEXI_FIELD_MEDIAFILE_PLAY') . '</span>
-					</a>
-					<a href="javascript:;" class="btn pauseBtn" style="display: none;">
-						<span class="icon-pause-circle controls"></span><span class="btnControlsText">' . Text::_('FLEXI_FIELD_MEDIAFILE_PAUSE') . '</span>
-					</a>
+					<button type="button" class="btn playBtn fc-waveform-toggle" aria-label="' . htmlspecialchars(Text::_('FLEXI_FIELD_MEDIAFILE_PLAY'), ENT_QUOTES, 'UTF-8') . '">
+						<i class="fas fa-play" aria-hidden="true"></i>
+					</button>
+					<button type="button" class="btn pauseBtn fc-waveform-toggle" aria-label="' . htmlspecialchars(Text::_('FLEXI_FIELD_MEDIAFILE_PAUSE'), ENT_QUOTES, 'UTF-8') . '" style="display: none;">
+						<i class="fas fa-pause" aria-hidden="true"></i>
+					</button>
 					<a href="javascript:;" class="btn stopBtn" style="display: none;">
 						<span class="icon-stop-circle controls"></span><span class="btnControlsText">' . Text::_('FLEXI_FIELD_MEDIAFILE_STOP') . '</span>
 					</a>

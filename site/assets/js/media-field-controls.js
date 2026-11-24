@@ -98,6 +98,10 @@ window.FlexiMediaField = (() => {
     return !!box.querySelector('.fc_filedata_txt')?.value || Number(box.querySelector('.fc-file-id')?.value) > 0;
   }
 
+  function syncFileCard(box) {
+    if (box?.querySelector('.fc-file-id')) box.classList.toggle('fc-has-assigned-file', hasFile(box));
+  }
+
   function clearFile(element, options, key, clearPreview) {
     const box = row(element);
     if (!box) return;
@@ -118,6 +122,7 @@ window.FlexiMediaField = (() => {
       if (hadValue && counter(key)?.value === previousCount) changeCount(key, -1);
     }
     if (options?.keep_props) setValue(box, 'input, textarea', '');
+    syncFileCard(box);
   }
 
   function clearMediaFile(button, emptyPreview, clearPreview) {
@@ -137,6 +142,7 @@ window.FlexiMediaField = (() => {
       preview.setAttribute(preview.matches('img') ? 'src' : 'data', emptyPreview || placeholder);
       FlexiForm.show(preview, false);
     });
+    syncFileCard(box);
     if (hadValue) changeCount(field?.dataset.config_name || input?.closest('[data-fc-media-key]')?.dataset.fcMediaKey, -1);
   }
 
@@ -154,6 +160,10 @@ window.FlexiMediaField = (() => {
     const input = box.querySelector('.fc_filedata_txt');
     key ||= target.dataset.config_name || input?.closest('[data-fc-media-key]')?.dataset.fcMediaKey;
     const file = {...source};
+    // The retained preview belongs to the previously uploaded local File.
+    if (input?.dataset.filename !== file.filename || Number(box.querySelector('.fc-file-id')?.value) !== Number(file.id)) {
+      box.querySelector('.fc-upload-result')?.remove();
+    }
     if (!fromFolder) Object.keys(file).forEach(name => {
       if (typeof file[name] !== 'string') return;
       try { file[name] = decodeURIComponent(file[name]); } catch { /* Already decoded. */ }
@@ -195,6 +205,7 @@ window.FlexiMediaField = (() => {
     setValue(box, '.fc_filedesc', file.description);
     resetRemoval(box.querySelector('.inlinefile-del'));
     assignPreview?.(box, input, file, key);
+    syncFileCard(box);
     changeCount(key, hadValue ? 0 : 1);
     if (!keepModal) dialogs?.[key]?.dialog('close');
     return true;
@@ -203,6 +214,7 @@ window.FlexiMediaField = (() => {
   const pendingUploaders = new WeakSet();
   function showUploader(id) {
     const box = row(document.getElementById(id));
+    syncFileCard(box);
     const uploader = box?.querySelector('.fc_file_uploader');
     if (!uploader || pendingUploaders.has(uploader)) return;
     pendingUploaders.add(uploader);

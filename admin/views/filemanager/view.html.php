@@ -699,6 +699,12 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 
 		if ( $print_logging_info ) { global $fc_run_times; $start_microtime = microtime(true); }
 
+		if ($jinput->getString('fc_confirm_unlink'))
+		{
+			// Use the same confirmation in the manager, modal and template overrides.
+			require JPATH_ADMINISTRATOR . '/components/com_flexicontent/views/filemanager/tmpl/unlink_confirmation.php';
+			return;
+		}
 		parent::display($tpl);
 
 		if ( $print_logging_info ) @$fc_run_times['template_render'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
@@ -827,10 +833,13 @@ class FlexicontentViewFilemanager extends FlexicontentViewBaseRecords
 				'FLEXI_DELETE', 'delete', sprintf($confirm_js('FLEXI_ARE_YOU_SURE'), $contrl . 'remove'), '', 'icon-remove',
 				\Joomla\CMS\Language\Text::_('FLEXI_FILEMAN_DELETE_UNUSED_DESC'), 'btn-warning'
 			);
-			$btn_arr[] = $mk_btn(
-				'FLEXI_FILEMAN_REMOVE_ASSOC_DELETE', 'delete_unlink', sprintf($confirm_js('FLEXI_FILEMAN_REMOVE_ASSOC_DELETE_CONFIRM'), $contrl . 'removeunlink'), '', 'icon-unlink',
-				\Joomla\CMS\Language\Text::_('FLEXI_FILEMAN_REMOVE_ASSOC_DELETE_DESC'), 'btn-danger'
-			);
+			if ($user->authorise('flexicontent.deletefile', 'com_flexicontent') && $user->authorise('core.edit', 'com_content'))
+			{
+				$btn_arr[] = $mk_btn(
+					'FLEXI_FILEMAN_REMOVE_ASSOC_DELETE', 'delete_unlink', sprintf($confirm_js('FLEXI_FILEMAN_REMOVE_ASSOC_DELETE_CONFIRM'), $contrl . 'removeunlink'), '', 'icon-unlink',
+					\Joomla\CMS\Language\Text::_('FLEXI_FILEMAN_REMOVE_ASSOC_DELETE_DESC'), 'btn-danger'
+				);
+			}
 			$mk_drop('toolbar-delete', 'icon-delete', 'FLEXI_DELETE', $btn_arr, 'files_delete_btns_group');
 		}
 
