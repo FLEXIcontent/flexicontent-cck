@@ -150,6 +150,14 @@ trait TaxonomyWriteTrait
             $legacy->setState($this->getName() . '.id', $id);
             $legacy->getItem($id);
 
+            // The legacy field model loads the plugin XML (image.xml, file.xml,
+            // ...) in preprocessForm(). With load_data=false Joomla passes an
+            // empty array there, so without this hint every new field gets the
+            // default "text" settings and misses image_source / dir / target_dir.
+            if ($this->getName() === 'field' && method_exists($legacy, 'setFieldType')) {
+                $legacy->setFieldType((string) ($data['field_type'] ?? ''));
+            }
+
             $form = $legacy->getForm($data, false);
 
             if (!$form) {

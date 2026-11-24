@@ -213,6 +213,7 @@ class UploadTests(unittest.TestCase):
                 filename="photo.png",
                 content_base64=base64.b64encode(b"png").decode(),
                 field_id=135,
+                item_id=151,
             )
 
         client.request.assert_called_once_with(
@@ -222,6 +223,7 @@ class UploadTests(unittest.TestCase):
                 "filename": "photo.png",
                 "content_base64": base64.b64encode(b"png").decode(),
                 "field_id": 135,
+                "item_id": 151,
             },
         )
         self.assertEqual(result["uploaded"]["id"], 42)

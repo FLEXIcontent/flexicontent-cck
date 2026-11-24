@@ -370,7 +370,8 @@ def flexi_upload_file(
     content_path: Annotated[str | None, Field(description="Local file path to upload.")] = None,
     field_id: Annotated[int | None, Field(description="Target FLEXIcontent field id, for field-specific limits and storage.", ge=1)] = None,
     field_name: Annotated[str | None, Field(description="Target field name or label, resolved through the fields API.")] = None,
-    secure: Annotated[bool | None, Field(description="Store in secure uploads (true) or public medias (false).")] = None,
+    item_id: Annotated[int | None, Field(description="Item id owning the value. Required for folder-mode image fields.", ge=1)] = None,
+    secure: Annotated[bool | None, Field(description="Store in secure uploads (true) or public medias (false); DB-mode image fields only.")] = None,
     alt: Annotated[str | None, Field(description="Alternative text for image fields.")] = None,
     description: Annotated[str | None, Field(description="Description stored on the FLEXIcontent file record.")] = None,
 ) -> dict[str, Any]:
@@ -406,6 +407,7 @@ def flexi_upload_file(
         "filename": filename.strip(),
         "content_base64": content_base64,
         "field_id": field_id,
+        "item_id": item_id,
         "secure": secure,
         "alt": alt,
         "description": description,
@@ -420,7 +422,7 @@ def flexi_upload_file(
     attrs = entry.get("attributes", {})
     uploaded = {key: attrs[key] for key in (
         "id", "filename", "original_name", "extension", "size", "mime_type",
-        "secure", "url", "field_id", "field_type", "field_value",
+        "secure", "storage", "url", "field_id", "field_type", "field_value",
     ) if key in attrs}
 
     return {

@@ -133,17 +133,34 @@ renvoyé en lecture permet de le repérer et de le supprimer via l’API Joomla
 
 ## Uploads
 
-L’endpoint `POST /v1/flexicontent/media` écrit le fichier dans les répertoires
-configurés de FLEXIcontent (`file_path` sécurisé ou `media_path` public) et crée
-l’entrée `#__flexicontent_files` correspondante. Les extensions et la taille
-sont validées avec la configuration du composant et, si `field_id`/`field_name`
-est fourni, avec celle du champ cible. Les images sont vérifiées avec
-`getimagesizefromstring()`.
+L’endpoint `POST /v1/flexicontent/media` respecte le mode de stockage du champ
+image cible :
+
+- **Mode BDD** (`image_source=0`) : le fichier va dans `file_path` (sécurisé) ou
+  `media_path` (public) selon `target_dir`, et une entrée `#__flexicontent_files`
+  est créée. Le paramètre `secure` de l’outil permet de forcer le choix.
+- **Mode dossier** (`image_source>=1`) : `item_id` est obligatoire. L’original
+  est écrit dans `<dir>/item_<item_id>_field_<field_id>/original/`, exactement
+  là où `image.php` le cherche. Aucune entrée `#__flexicontent_files` n’est
+  créée et `secure` vaut `0`. Les miniatures sont générées par FLEXIcontent au
+  premier affichage, dans le dossier parent. Le répertoire `original` est
+  protégé par un `.htaccess` quand `protect_original=1`.
+- Les modes Joomla media manager / intro-full (`image_source<0`) sont refusés.
+
+Les extensions et la taille sont validées avec la configuration du composant
+et, si `field_id`/`field_name` est fourni, avec celle du champ cible. Les images
+sont vérifiées avec `getimagesizefromstring()` puis décodées avec
+`imagecreatefromstring()` : un PNG tronqué ou corrompu est rejeté au lieu de
+produire une valeur inutilisable.
 
 Le champ `field_value` de la réponse est directement utilisable dans `fields` :
 une liste d’objets `originalname` pour un champ `image`, l’id du fichier pour
-un champ `file`/`media`. `secure` est choisi depuis `target_dir` du champ, avec
-`1` par défaut ; le paramètre `secure` de l’outil permet de forcer le choix.
+un champ `file`/`media`. La réponse indique aussi `storage`
+(`flexicontent_files` ou `field_folder`).
+
+```python
+flexi_upload_file(content_path="/tmp/photo.png", field_name="image_principale", item_id=151)
+```
 
 Le serveur accepte soit du contenu base64, soit un chemin local lisible par le
 processus MCP. Dans les deux cas, un seul doit être fourni. Les écritures sont

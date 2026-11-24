@@ -31,9 +31,10 @@ use Joomla\Filesystem\Path;
 /**
  * Upload files into FLEXIcontent's own storage.
  *
- * The file is written to the configured uploads/medias directory and a
- * #__flexicontent_files record is created, so the result can be used both by
- * image fields (filename) and by file/media fields (FLEXIcontent file id).
+ * DB-mode files go to FLEXIcontent's uploads/medias directory and are
+ * registered in #__flexicontent_files. Folder-mode image fields instead store
+ * the original under the field's own item folder, exactly where image.php
+ * looks for it. The returned field_value is ready for item writes either way.
  *
  * @since  5.3
  */
@@ -80,21 +81,68 @@ class MediaController extends ApiController
         $payload  = $this->readPayload();
         $original = $this->originalName($payload);
         $bytes    = $this->readBytes($payload);
-        $field    = $this->loadField((int) ($payload['field_id'] ?? 0));
+        $fieldId  = (int) ($payload['field_id'] ?? 0);
+        $field    = $this->loadField($fieldId);
         $ext      = strtolower((string) \flexicontent_upload::getExt($original));
 
         $this->checkExtension($ext, $field);
         $this->checkSize(strlen($bytes), $field);
         $this->checkImage($bytes, $ext);
 
-        // Follow the target field's target_dir (secure uploads by default).
-        // An explicit payload value always wins.
+        $fieldType   = (string) ($field->field_type ?? '');
         $fieldParams = $field !== null ? new \Joomla\Registry\Registry($field->attribs ?? '') : null;
-        $targetDir   = $fieldParams !== null ? (int) $fieldParams->get('target_dir', 1) : 1;
-        $secure      = \array_key_exists('secure', $payload)
-            ? (int) !empty($payload['secure'])
-            : ($field !== null ? $targetDir : 1);
-        $root        = $secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;
+
+        // Image fields have two incompatible storage modes. In DB mode the
+        // file lives in FLEXIcontent's uploads/medias folder and is registered
+        // in #__flexicontent_files. In folder mode the original lives under
+        // <dir>/item_<item_id>_field_<field_id>/original/ and the field value
+        // is only a filename. Use the same paths as image.php::getThumbPaths().
+        $imageSource = null;
+
+        if ($fieldType === 'image' && $fieldParams !== null) {
+            $imageSource = (int) $fieldParams->get('image_source', 0);
+
+            if ($imageSource < 0) {
+                throw new SaveException(
+                    'This image field uses the Joomla media/intro-full source mode, which the API cannot upload to.',
+                    422
+                );
+            }
+        }
+
+        $folderMode = $imageSource !== null && $imageSource >= 1;
+
+        if ($folderMode) {
+            $itemId = (int) ($payload['item_id'] ?? 0);
+
+            if ($itemId <= 0 || $fieldId <= 0) {
+                throw new SaveException('item_id and field_id are required for folder-mode image fields.', 422);
+            }
+
+            $dir = trim(str_replace('\\', '/', (string) $fieldParams->get('dir', 'images/stories/flexicontent')), '/');
+
+            if ($dir === '' || preg_match('#(^|/)\.\.?(/|$)#', $dir)) {
+                throw new SaveException('The target field has an invalid image folder.', 422);
+            }
+
+            $folderName = 'item_' . $itemId . '_field_' . $fieldId;
+            $folder     = $dir . '/' . $folderName . '/original';
+            $root       = Path::clean(JPATH_SITE . DS . str_replace('/', DS, $folder));
+            $secure     = 0;
+        } else {
+            // Follow the target field's target_dir (secure uploads by default).
+            // An explicit payload value always wins.
+            $targetDir = $fieldParams !== null ? (int) $fieldParams->get('target_dir', 1) : 1;
+            $secure    = \array_key_exists('secure', $payload)
+                ? (int) !empty($payload['secure'])
+                : ($field !== null ? $targetDir : 1);
+            $root      = $secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;
+
+            $params = ComponentHelper::getParams('com_flexicontent');
+            $folder = $secure
+                ? $params->get('file_path', 'components/com_flexicontent/uploads')
+                : $params->get('media_path', 'components/com_flexicontent/medias');
+        }
 
         if (!is_dir($root) && !mkdir($root, 0755, true) && !is_dir($root)) {
             throw new SaveException('The upload directory could not be created.', 500);
@@ -107,19 +155,19 @@ class MediaController extends ApiController
             throw new SaveException('The uploaded file could not be stored.', 500);
         }
 
-        try {
-            $fileId = $this->createFileRecord($filename, $original, $ext, $bytes, $secure, $payload);
-        } catch (\Throwable $e) {
-            // Do not leave an orphaned file behind when the database write fails.
-            @unlink($target);
-            throw new SaveException('The uploaded file could not be registered: ' . $e->getMessage(), 500);
+        $fileId = 0;
+
+        if (!$folderMode) {
+            try {
+                $fileId = $this->createFileRecord($filename, $original, $ext, $bytes, $secure, $payload);
+            } catch (\Throwable $e) {
+                // Do not leave an orphaned file behind when the database write fails.
+                @unlink($target);
+                throw new SaveException('The uploaded file could not be registered: ' . $e->getMessage(), 500);
+            }
         }
 
-        $params     = ComponentHelper::getParams('com_flexicontent');
-        $folder     = $secure ? $params->get('file_path', 'components/com_flexicontent/uploads')
-                             : $params->get('media_path', 'components/com_flexicontent/medias');
-        $url        = rtrim(Uri::root() ?: '', '/') . '/' . trim(str_replace('\\', '/', $folder), '/') . '/' . rawurlencode($filename);
-        $fieldType  = (string) ($field->field_type ?? '');
+        $url        = rtrim(Uri::root() ?: '', '/') . '/' . trim(str_replace('\\', '/', (string) $folder), '/') . '/' . rawurlencode($filename);
         $fieldValue = $fieldType === 'image'
             ? [['originalname' => $filename, 'alt' => (string) ($payload['alt'] ?? '')]]
             : $fileId;
@@ -135,9 +183,10 @@ class MediaController extends ApiController
                 'size'          => strlen($bytes),
                 'mime_type'     => $this->mimeType($bytes),
                 'secure'        => $secure,
+                'storage'       => $folderMode ? 'field_folder' : 'flexicontent_files',
                 'url'           => $url,
                 'path'          => str_replace('\\', '/', $target),
-                'field_id'      => (int) ($payload['field_id'] ?? 0),
+                'field_id'      => $fieldId,
                 'field_type'    => $fieldType,
                 'field_value'   => $fieldValue,
             ],
@@ -194,6 +243,7 @@ class MediaController extends ApiController
             'error'       => (int) ($file['error'] ?? 0),
             'secure'      => $this->input->getInt('secure', 1),
             'field_id'    => $this->input->getInt('field_id', 0),
+            'item_id'     => $this->input->getInt('item_id', 0),
             'description' => $this->input->getString('description', ''),
             'alt'         => $this->input->getString('alt', ''),
         ];
@@ -364,6 +414,21 @@ class MediaController extends ApiController
 
         if (!@getimagesizefromstring($bytes)) {
             throw new SaveException('The file is not a valid image.', 422);
+        }
+
+        // getimagesizefromstring() only reads the header. FLEXIcontent's
+        // thumbnailing uses GD/ImageMagick, so reject truncated or corrupt
+        // images here instead of leaving an unusable value on the item.
+        if (\function_exists('imagecreatefromstring')) {
+            $image = @imagecreatefromstring($bytes);
+
+            if ($image === false) {
+                throw new SaveException('The file is not a decodable image.', 422);
+            }
+
+            if (\is_resource($image) || $image instanceof \GdImage) {
+                imagedestroy($image);
+            }
         }
     }
 
