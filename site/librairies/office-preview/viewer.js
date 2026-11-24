@@ -53,6 +53,46 @@ async function renderWorkbook(file, name, labels) {
   show();
 }
 
+async function renderPresentation(file, labels) {
+  await loadScript('pptx-browser/slides.min.js');
+  const canvas = document.createElement('canvas');
+  canvas.className = 'slide';
+  canvas.setAttribute('role', 'img');
+  document.querySelector('main').append(canvas);
+  const viewer = new FCPresentation.PptxRenderer();
+  window.addEventListener('pagehide', () => viewer.destroy(), {once: true});
+  await viewer.load(file);
+  const count = viewer.slideCount;
+  const {cx, cy} = viewer.slideSize;
+  const width = Math.min(1280, Math.floor(1600 * cx / cy));
+  if (!count || !(width >= 1) || !(cy > 0)) throw new Error();
+  const select = document.createElement('select');
+  select.setAttribute('aria-label', labels.slide);
+  for (let index = 0; index < count; index++) {
+    select.add(new Option(labels.slide + ' ' + (index + 1) + ' / ' + count, String(index)));
+  }
+  async function show() {
+    select.disabled = true;
+    try {
+      const index = Number(select.value);
+      await viewer.renderSlide(index, canvas, width);
+      const title = select.selectedOptions[0].textContent;
+      canvas.setAttribute('aria-label', title);
+      canvas.setAttribute('aria-description', await viewer.extractText(index));
+      canvas.hidden = false;
+      document.getElementById('message').textContent = '';
+    } catch {
+      canvas.hidden = true;
+      document.getElementById('message').textContent = labels.unavailable;
+    } finally {
+      select.disabled = false;
+    }
+  }
+  if (count > 1) document.querySelector('nav').append(select);
+  select.addEventListener('change', show);
+  await show();
+}
+
 async function receive(event) {
   const labels = event.data;
   if (event.source !== parent || !(labels?.file instanceof Blob) || typeof labels.name !== 'string') return;
@@ -72,6 +112,8 @@ async function receive(event) {
       for (const link of document.querySelectorAll('main a[href]')) {
         if (!link.getAttribute('href').startsWith('#')) link.removeAttribute('href');
       }
+    } else if (/\.pptx$/i.test(labels.name)) {
+      return await renderPresentation(labels.file, labels);
     } else {
       await renderWorkbook(labels.file, labels.name, labels);
     }

@@ -6,6 +6,7 @@ window.FlexiUploader = (() => {
   const translate = key => (Joomla.Text || Joomla.JText)._(key);
   const imageExtensions = /\.(jpe?g|gif|png|webp|bmp|wbmp|ico)$/i;
   const officeTypes = {
+    pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
     docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     xls: 'application/vnd.ms-excel', ods: 'application/vnd.oasis.opendocument.spreadsheet', csv: 'text/csv'
@@ -39,7 +40,8 @@ window.FlexiUploader = (() => {
           if (frame.isConnected && frame.contentWindow === target) {
             target.postMessage({name, file, language: document.documentElement.lang, loading: translate('FLEXI_PLEASE_WAIT'),
               unavailable: translate('FLEXI_OFFICE_PREVIEW_UNAVAILABLE'),
-              limit: translate('FLEXI_OFFICE_PREVIEW_LIMIT'), sheets: translate('FLEXI_OFFICE_PREVIEW_SHEETS')}, '*');
+              limit: translate('FLEXI_OFFICE_PREVIEW_LIMIT'), sheets: translate('FLEXI_OFFICE_PREVIEW_SHEETS'),
+              slide: translate('FLEXI_OFFICE_PREVIEW_SLIDE')}, '*');
           }
         } catch { /* The viewer may have closed and released its object URL. */ }
       }, {once: true});
