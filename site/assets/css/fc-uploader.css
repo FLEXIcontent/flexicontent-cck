@@ -82,7 +82,8 @@
 .fc-image-card:has(.fc-image-preview-button img[src]:not([src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="])) div:has(> .fc_auto_uploader):not(:has(.fc-native-upload-row, .fc-native-upload-message:not(:empty), .fc-field-invalid)) {
   display: none !important; /* The uploader helper sets display inline. */
 }
-.fc_auto_uploader:has(~ .fc-upload-result img) :is(.fc-upload-drop, .fc-upload-formats) {
+.fc-has-assigned-file .fc_auto_uploader :is(.fc-upload-drop, .fc-upload-formats),
+.fc_auto_uploader:has(~ .fc-upload-result) :is(.fc-upload-drop, .fc-upload-formats) {
   display: none;
 }
 #flexicontent .fc-image-card .fc-image-preview-button,

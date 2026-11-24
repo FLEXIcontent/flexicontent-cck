@@ -1635,7 +1635,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 				}
 			}
 
-			$li[] = '<li><a href="' . \Joomla\CMS\Router\Route::_('index.php?option=com_flexicontent&task=items.edit&cid=' . $usage_item->id) . '" target="_blank" rel="noopener">'
+			$li[] = '<li><a href="' . \Joomla\CMS\Router\Route::_('index.php?option=com_flexicontent&task=items.edit&id=' . $usage_item->id) . '" target="_blank" rel="noopener">'
 				. htmlspecialchars($usage_item->title, ENT_QUOTES, 'UTF-8') . '</a> <small>(#' . $usage_item->id . ')</small>'
 				. ' &ndash; <small>' . (count($names) > 3 ? implode(', ', array_slice($names, 0, 3)) . ' ... +' . (count($names) - 3) : implode(', ', $names)) . '</small></li>';
 		}
@@ -1847,20 +1847,32 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 					continue;
 				}
 
-				$inuse_files[] = $file->filename_original ? $file->filename_original : $file->filename;
+				$inuse_files[] = htmlspecialchars($file->filename_original ?: $file->filename, ENT_QUOTES, 'UTF-8');
 			}
 
 			$app->enqueueMessage(\Joomla\CMS\Language\Text::_('FLEXI_CANNOT_REMOVE_FILES_IN_USE') . ': ' . implode(', ', $inuse_files), 'warning');
 
 			// List the items that use these files (with links to edit them), so that the associations can be removed
-			$usage_items = $model->getFilesUsageItems(array_diff($cid, $deletable));
+			$blocked = array_diff($cid, $deletable);
+			$usage_items = $model->getFilesUsageItems($blocked, $imageFileIds);
+			$help = $imageFileIds ? '<p>' . \Joomla\CMS\Language\Text::_('FLEXI_FILEMAN_REMOVE_GALLERY_USAGE') . '</p>' : '';
+			$unlinkable = array_diff($blocked, $imageFileIds);
+			if ($unlinkable && $candelete && $user->authorise('core.edit', 'com_content'))
+			{
+				// The warning links to a read-only confirmation. The form submits the exact file IDs by POST.
+				$link = new \Joomla\CMS\Uri\Uri($this->returnURL ?: 'index.php?option=com_flexicontent&view=filemanager');
+				$link->setVar('fc_confirm_unlink', implode(',', $unlinkable));
+				$link->setFragment('fc-unlink-confirm');
+				$help .= '<p><a href="' . htmlspecialchars((string) $link, ENT_QUOTES, 'UTF-8') . '">'
+					. Text::_('FLEXI_FILEMAN_REMOVE_ASSOC_DELETE') . '</a></p>';
+			}
 
 			if ($usage_items)
 			{
 				$app->enqueueMessage(
 					\Joomla\CMS\Language\Text::sprintf('FLEXI_FILES_IN_USE_BY_ITEMS', count($usage_items))
 					. $this->_getUsageItemsHtml($usage_items, $files)
-					. '<br>' . \Joomla\CMS\Language\Text::_('FLEXI_FILEMAN_USE_REMOVE_ASSOC_BTN'),
+					. $help,
 					'warning'
 				);
 			}

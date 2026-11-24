@@ -456,6 +456,7 @@ class plgFlexicontent_fieldsMediafile extends FCField
 				\Joomla\CMS\HTML\HTMLHelper::getServiceRegistry()->register('fcuploader', 'JHtmlFcuploader');
 			}
 			$document->getWebAssetManager()->registerAndUseScript('plg_flexicontent_fields_mediafile.wavesurfer', 'components/com_flexicontent/librairies/wavesurfer/wavesurfer.min.js', array('version' => '7.12.12'));
+			$document->getWebAssetManager()->useStyle('fontawesome');
 			flexicontent_html::loadFramework('media-field-controls');
 			$document->getWebAssetManager()->registerAndUseScript('plg_flexicontent_fields_mediafile.form', 'plugins/flexicontent_fields/mediafile/js/form.js', array('version' => filemtime(JPATH_ROOT . '/plugins/flexicontent_fields/mediafile/js/form.js')));
 
