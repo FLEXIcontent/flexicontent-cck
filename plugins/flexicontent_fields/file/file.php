@@ -151,8 +151,8 @@ class plgFlexicontent_fieldsFile extends FCField
 		$form_file_preview  = (int) $field->parameters->get('form_file_preview', 2);
 
 		// Width of the file card in the item form
-		$form_card_width = (int) $field->parameters->get('form_card_width', 250);
-		$form_card_width = $form_card_width > 0 ? $form_card_width : 250;
+		$form_card_width = (int) $field->parameters->get('form_card_width', 400);
+		$form_card_width = $form_card_width > 0 ? $form_card_width : 400;
 
 		$iform_title = $inputmode==1 ? 0 : $field->parameters->get('iform_title', 1);
 		$iform_desc  = $inputmode==1 ? 0 : $field->parameters->get('iform_desc',  1);

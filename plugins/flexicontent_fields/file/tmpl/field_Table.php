@@ -18,6 +18,11 @@ foreach ($field->value as $file_id)
 
 	$file_data         = $files_data[$file_id];
 	$filename_original = $file_data->filename_original ? $file_data->filename_original : $file_data->filename;
+	$file_summary = $use_myfiles != 4 && in_array($form_info_header, [1, 2, 3])
+		? \Joomla\CMS\Layout\LayoutHelper::render('flexicontent_fields.file_summary', [
+			'file' => $file_data, 'header' => (int) $form_info_header, 'showTitle' => !$iform_title,
+		], JPATH_SITE . '/components/com_flexicontent/layouts')
+		: '';
 
 	$preview_css = 'width:100px; height:100px;';
 
@@ -292,12 +297,8 @@ HTML;
 			<div class="fcclear"></div>
 		' : '')).'
 
-		'.(in_array($form_info_header, [2,3]) && $use_myfiles != 4 ? '
-		<div class="fcclear"></div>
-		<div class="'.$input_grp_class.' fc-xpended-row">
-			<label class="' . $add_on_class . ' badge fc-lbl fc_filedata_title-lbl" style="margin:0">'.Text::_( 'FLEXI_ORIGINAL_FILENAME' ).'</label>
-			<input type="text" disabled class="' . $add_on_class . ' fc_filedata_title" value="'. htmlentities($filename_original, ENT_COMPAT, 'UTF-8') .'" />
-		</div>' : '').'
+		'.$file_summary.'
+		<input type="hidden" class="fc_filedata_title" value="'.htmlspecialchars((string) $filename_original, ENT_QUOTES, 'UTF-8').'" />
 
 		<div class="fcclear"></div>
 

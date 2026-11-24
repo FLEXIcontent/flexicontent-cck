@@ -34,7 +34,7 @@ const {chromium} = require('playwright');
         });
         return route.fulfill({status: 500, json: {jsonrpc: '2.0', error: {message: 'Temporary error'}}});
       }
-      return route.fulfill({json: {jsonrpc: '2.0', data: request.chunk === request.chunks - 1 ? {id: 87, filename: request.name} : null}});
+      return route.fulfill({json: {jsonrpc: '2.0', data: request.chunk === request.chunks - 1 ? {id: 87, filename: request.name, size: 2048, secure: 1} : null}});
     });
     await page.goto('https://fixture.invalid/');
     await page.evaluate(() => {
@@ -122,6 +122,7 @@ const {chromium} = require('playwright');
       container.dataset.tagidPrefix = 'fixture_';
       const card = container.closest('section');
       card.insertAdjacentHTML('afterbegin', '<input class="fc-file-id" type="hidden" value="17"><input id="file_name" class="fc_filedata_txt" value="previous.pdf"><input class="fc_filedata_title" value="previous.pdf"><button id="upload" type="button" class="fc_files_uploader_toggle_btn" data-rowno="0" aria-haspopup="dialog">Upload</button>');
+      card.insertAdjacentHTML('afterbegin', '<div class="fc-asset-summary" hidden><span class="fc-asset-tile"></span><span class="fc-asset-name"></span><div class="fc-asset-meta"><span class="fc-asset-type"></span><span class="fc-asset-size"></span><span class="fc-asset-secure" hidden>Secure</span></div></div>');
       document.getElementById('upload').onclick = event => FlexiMediaField.beforeToggle(event.currentTarget, 'file');
       window.fixture_ = new FlexiUploader.Uploader({
         tag_id: 'fixture_', action: '/upload', upload_maxcount: 1, autostart_on_select: true,
@@ -159,7 +160,13 @@ const {chromium} = require('playwright');
     assert.equal(await drop.isVisible(), false, 'A successful upload hides the empty tile');
     assert(await page.locator('#upload').isVisible(), 'Replace remains available');
     assert.equal(await page.locator('.fc_filedata_title').inputValue(), 'guide.pdf');
-    const assignedPreview = page.locator('.fc-upload-result');
+    const summary = page.locator('.fc-asset-summary');
+    assert(await summary.isVisible());
+    assert.equal(await summary.locator('.fc-asset-name').textContent(), 'guide.pdf');
+    assert.equal(await summary.locator('.fc-asset-size').textContent(), '2 KB');
+    assert.equal(await summary.locator('.fc-asset-type').textContent(), 'PDF');
+    assert(await summary.locator('.fc-asset-secure').isVisible());
+    const assignedPreview = summary.locator('.fc-asset-meta .fc-upload-result');
     await assignedPreview.click();
     const pdf = page.locator('.glightbox-container iframe[title="guide.pdf"]');
     await pdf.waitFor({state: 'attached'});
