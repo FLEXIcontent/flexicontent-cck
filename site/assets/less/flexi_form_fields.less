@@ -1642,6 +1642,50 @@ textarea.fcfield_textareaval {
 #flexicontent .fc-media-card input.fc_filedata_txt.inlinefile-data-txt {
 	margin: 0 10px !important;
 }
+/* Keep waveform zoom inside the editor card and let the card set the available width. */
+#flexicontent .fc-media-card .fc-field-value-properties-box {
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+#flexicontent .fc-media-card .fc_mediafile_player_box {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  width: 100%;
+  min-width: 0;
+}
+#flexicontent .fc-media-card .fc_mediafile_controls {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+}
+#flexicontent .fc-media-card .fc_mediafile_audio_spectrum_box_outer {
+  min-width: 0;
+}
+#flexicontent .fc-media-card .fc_mediafile_controls .btn {
+  width: auto !important;
+  height: auto;
+  padding: .25rem .625rem;
+}
+#flexicontent .fc-media-card .fc_mediafile_controls .controls {
+  display: none;
+}
+#flexicontent .fc-media-card .fc_mediafile_controls .btnControlsText {
+  display: inline;
+}
+#flexicontent .fc-media-card .fc_mediafile_controls .fc_mediafile_wf_zoom_box {
+  flex: 1 1 7rem;
+  min-width: 0;
+  white-space: normal;
+}
+#flexicontent .fc-media-card .fc_mediafile_wf_zoom_box label {
+  display: block;
+  margin: 0;
+  font-size: .8rem;
+}
+#flexicontent .fc-media-card .fc_mediafile_wf_zoom_box input {
+  width: 100%;
+  max-width: 100%;
+}
 /* Media card: all text fields follow the card width */
 #flexicontent .fc-media-card .fc_uploader_n_props_box,
 #flexicontent .fc-media-card .inlinefile-data-box {

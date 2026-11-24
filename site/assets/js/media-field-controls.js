@@ -26,7 +26,13 @@ window.FlexiMediaField = (() => {
       FlexiForm.show(media, !FlexiForm.visible(media));
       return false;
     }
-    const opening = !FlexiForm.visible(box.querySelector('.fc_file_uploader'));
+    const uploader = box.querySelector('.fc_file_uploader');
+    const owner = window[uploader?.dataset.tagidPrefix];
+    if (uploader?.classList.contains('fc_auto_uploader') && owner?.openDashboard) {
+      owner.openDashboard(button.dataset.rowno, button);
+      return false;
+    }
+    const opening = !FlexiForm.visible(uploader);
     button.classList.toggle('active', opening);
     button.setAttribute('aria-expanded', String(opening));
     FlexiForm.show(preview, !opening);
@@ -40,10 +46,15 @@ window.FlexiMediaField = (() => {
     box?.querySelectorAll('.fc_file_uploader').forEach(container => {
       const prefix = container.dataset.tagidPrefix;
       const suffix = prefix ? container.id.slice(prefix.length) : '';
-      window[prefix]?.clearUploader(suffix);
-      container.style.display = 'none';
+      const owner = window[prefix];
+      owner?.clearUploader(suffix);
+      if (container.classList.contains('fc_auto_uploader') && owner?.toggleUploader) {
+        owner.toggleUploader(suffix, 'show');
+      } else {
+        container.style.display = 'none';
+      }
     });
-    box?.querySelectorAll('.fc_files_uploader_toggle_btn').forEach(button => {
+    box?.querySelectorAll('.fc_files_uploader_toggle_btn:not([aria-haspopup])').forEach(button => {
       button.classList.remove('active');
       button.setAttribute('aria-expanded', 'false');
     });
@@ -98,7 +109,7 @@ window.FlexiMediaField = (() => {
     if (!options?.hide_image) {
       clearUploader(box);
       clearPreview?.(box);
-      setValue(box, '.fc_filedata_txt, .fc-file-id, .hasvalue', '');
+      setValue(box, '.fc_filedata_txt, .fc_filedata_title, .fc-file-id, .hasvalue', '');
       const input = box.querySelector('.fc_filedata_txt');
       if (input) delete input.dataset.filename;
       setText(box, '.fc_filedata_storage_name, .fc_filedata_txt_nowrap, .fc_preview_text, .fc_preview_msg', '');
@@ -160,7 +171,7 @@ window.FlexiMediaField = (() => {
     }
     setText(box, '.fc_filedata_txt_nowrap', distinctTitle || fromFolder ? file.filename : '', distinctTitle ? file.altname : '');
     FlexiForm.show(box.querySelector('.fc_filedata_txt_nowrap'));
-    setValue(box, '.fc_filedata_title', fromFolder ? '' : distinctTitle ? file.altname : '-');
+    setValue(box, '.fc_filedata_title', file.filename_original || file.filename);
 
     const previewBox = box.querySelector('.fcfield_preview_box');
     box.querySelector('.fc_preview_thumb')?.setAttribute('src', file.preview || placeholder);
@@ -200,7 +211,12 @@ window.FlexiMediaField = (() => {
       if (!uploader.isConnected) { pendingUploaders.delete(uploader); return; }
       if (window[uploader.dataset.tagidPrefix]) {
         pendingUploaders.delete(uploader);
-        if (getComputedStyle(uploader).display === 'none') box.querySelector('.fc_files_uploader_toggle_btn')?.click();
+        const prefix = uploader.dataset.tagidPrefix;
+        if (uploader.classList.contains('fc_auto_uploader') && window[prefix].toggleUploader) {
+          window[prefix].toggleUploader(uploader.id.slice(prefix.length), 'show');
+        } else if (getComputedStyle(uploader).display === 'none') {
+          box.querySelector('.fc_files_uploader_toggle_btn')?.click();
+        }
       } else if (++attempts < 40) {
         window.setTimeout(openWhenReady, 50);
       } else {

@@ -25,7 +25,7 @@ var fcfield_image = {
     const button = row.querySelector('.fcfield-mediaurl-btn[data-for="' + id + '"]');
     const shown = getComputedStyle(props || box).display !== 'none';
     // Closing the panel preserves an existing URL and its fetched thumbnail.
-    if (!shown) {
+    if (!shown && !row.querySelector('.fc_auto_uploader')) {
       row.querySelectorAll('.fc_file_uploader').forEach(node => FlexiForm.show(node, false));
       FlexiForm.show(row.querySelector('.fcfield_preview_box'));
       row.querySelectorAll('.fc_files_uploader_toggle_btn').forEach(node => {
@@ -138,7 +138,7 @@ var fcfield_image = {
         caption.textContent = ' ';
         caption.removeAttribute('title');
       }
-      FlexiForm.show(preview);
+      FlexiForm.show(preview, !box.querySelector('.fc_auto_uploader'));
       FlexiMediaField.changeCount(key, hadValue ? -1 : 0);
     }
     if (options?.keep_props) FlexiMediaField.setValue(box, 'input, textarea', '');

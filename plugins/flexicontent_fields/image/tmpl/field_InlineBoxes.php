@@ -460,6 +460,13 @@ foreach ($field->value as $index => $value)
 			</div>
 		</div>' : '';
 
+	if ($imgpreview !== '')
+	{
+		$imgpreview = $use_inline_uploaders
+			? '<button type="button" class="fcfield-preview-image-wrap fc-image-preview-button" aria-label="' . htmlspecialchars(Text::_('FLEXI_PREVIEW'), ENT_QUOTES, 'UTF-8') . '" onclick="FlexiUploader.previewImage(this)">' . $imgpreview . '</button>'
+			: '<span class="fcfield-preview-image-wrap">' . $imgpreview . '</span>';
+	}
+
 	$field->html[] = '
 		'.($multiple && !$none_props ? '<div class="fcclear"></div>' : '').'
 		<div class="card fc-image-card thumb_'.$thumb_size_default.'">
@@ -488,7 +495,7 @@ foreach ($field->value as $index => $value)
 						</div>
 					').'
 					<div class="fcfield_preview_box fc-box">
-						'.($imgpreview !== '' ? '<span class="fcfield-preview-image-wrap">'.$imgpreview.'</span>' : $imgpreview).'
+						'.$imgpreview.'
 						<div class="fcclear"></div>
 					'.$select_existing.'
 					</div>
@@ -528,7 +535,7 @@ foreach ($field->value as $index => $value)
 		</div><!-- EOF class="card" -->
 		';
 
-	if (!$image_subpath)
+	if ($use_inline_uploaders)
 	{
 		$per_value_js .= "
 			fcfield_image.showUploader('" . $field->name . '_' . $n . "', '".$field_name_js."');

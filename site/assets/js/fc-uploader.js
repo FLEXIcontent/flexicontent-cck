@@ -47,24 +47,37 @@ window.FlexiUploader = (() => {
     const kind = file.name.split('.').pop().toUpperCase();
     const control = button(translate('FLEXI_PREVIEW') + ' ' + kind, 'btn-outline-secondary fc-upload-preview', () => {
       const url = URL.createObjectURL(isImage ? file : file.slice(0, file.size, type));
-      const element = isImage ? null : mediaElement(type, url, file.name);
-      const viewer = GLightbox({
-        elements: [element ? {type: 'inline', content: element} : {href: url, type: 'image', alt: file.name}],
-        draggable: false, touchNavigation: false
-      });
-      viewer.on('close', () => {
-        if (element instanceof HTMLMediaElement) element.pause();
-        URL.revokeObjectURL(url);
-        viewer.destroy();
-        if (control.isConnected) control.focus();
-      });
-      viewer.open();
-      // Keep the lightbox interactive when the compact file picker is itself a native modal.
-      const dialog = control.closest('dialog[open]');
-      if (dialog && viewer.modal) dialog.append(viewer.modal);
+      openPreview(control, url, file.name, type, () => URL.revokeObjectURL(url));
     });
     control.setAttribute('aria-label', translate('FLEXI_PREVIEW') + ' ' + file.name);
     return control;
+  }
+
+  function openPreview(control, url, name, type = '', onClose) {
+    const isPdf = type === 'application/pdf';
+    const element = type ? mediaElement(type, isPdf ? url + '#view=FitH' : url, name) : null;
+    const viewer = GLightbox({
+      elements: [element ? {type: 'inline', content: element} : {href: url, type: 'image', alt: name}],
+      ...(isPdf && {width: '100%', height: '100%'}),
+      draggable: false, touchNavigation: false
+    });
+    viewer.on('close', () => {
+      if (element instanceof HTMLMediaElement) element.pause();
+      onClose?.();
+      viewer.destroy();
+      if (control.isConnected) control.focus();
+    });
+    viewer.open();
+    if (isPdf) {
+      viewer.modal.classList.add('fc-upload-pdf-viewer');
+      const title = document.createElement('span');
+      title.className = 'fc-upload-pdf-title';
+      title.textContent = name;
+      viewer.modal.querySelector('.gcontainer').prepend(title);
+    }
+    // Keep the lightbox interactive when the compact file picker is itself a native modal.
+    const dialog = control.closest('dialog[open]');
+    if (dialog && viewer.modal) dialog.append(viewer.modal);
   }
 
   function resetUploadValidation(input) {
@@ -81,6 +94,8 @@ window.FlexiUploader = (() => {
   class Queue {
     constructor(container, options, owner, suffix) {
       this.container = container;
+      this.dropTarget = container.closest('.fc-image-card') ||
+        (container.classList.contains('fc_auto_uploader') ? container.parentElement : container);
       this.options = options;
       this.owner = owner;
       this.settings = {container};
@@ -154,9 +169,9 @@ window.FlexiUploader = (() => {
         footer.append(size);
       }
       container.replaceChildren(panel);
-      container.addEventListener('dragover', this.onDragOver);
-      container.addEventListener('dragleave', this.onDragLeave);
-      container.addEventListener('drop', this.onDrop);
+      this.dropTarget.addEventListener('dragover', this.onDragOver);
+      this.dropTarget.addEventListener('dragleave', this.onDragLeave);
+      this.dropTarget.addEventListener('drop', this.onDrop);
       this.refresh();
     }
 
@@ -173,7 +188,7 @@ window.FlexiUploader = (() => {
     };
 
     onDragLeave = event => {
-      if (!this.container.contains(event.relatedTarget)) this.container.classList.remove('fc-upload-dragover');
+      if (!this.dropTarget.contains(event.relatedTarget)) this.container.classList.remove('fc-upload-dragover');
     };
 
     onDrop = event => {
@@ -181,8 +196,9 @@ window.FlexiUploader = (() => {
       if (!event.dataTransfer?.files.length) return;
       event.preventDefault();
       event.stopPropagation();
-      if (window.FlexiUploadDashboard && !this.options.autostart_on_select) {
-        FlexiUploadDashboard.open(this, this.input, Array.from(event.dataTransfer.files));
+      if (window.FlexiUploadDashboard) {
+        const opener = event.target.closest?.('.fc-image-preview-button, .fc-upload-result') || this.input;
+        FlexiUploadDashboard.open(this, opener, Array.from(event.dataTransfer.files));
       } else {
         this.addFiles(event.dataTransfer.files);
       }
@@ -352,7 +368,7 @@ window.FlexiUploader = (() => {
         // Inline fields destroy their queue when they accept the file. Keep its preview with the assigned value.
         if (this.disposed && this.container.isConnected && response.data?.filename) {
           const open = previewButton(entry.file);
-          if (open) {
+          if (open && !this.container.closest('.fc-image-card')?.querySelector('.fc-image-preview-button')) {
             open.classList.add('fc-upload-result');
             const row = this.container.closest('.fcfieldval_container');
             if (preview && !row?.querySelector('img.fc_preview_thumb')) {
@@ -431,10 +447,10 @@ window.FlexiUploader = (() => {
     destroy() {
       this.disposed = true;
       for (const entry of [...this.files]) this.remove(entry);
-      this.container.removeEventListener('dragover', this.onDragOver);
-      this.container.removeEventListener('dragleave', this.onDragLeave);
+      this.dropTarget.removeEventListener('dragover', this.onDragOver);
+      this.dropTarget.removeEventListener('dragleave', this.onDragLeave);
       this.container.classList.remove('fc-upload-dragover');
-      this.container.removeEventListener('drop', this.onDrop);
+      this.dropTarget.removeEventListener('drop', this.onDrop);
       if (this.toggleButton) {
         this.toggleButton.classList.remove('active');
         this.toggleButton.setAttribute('aria-expanded', 'false');
@@ -458,7 +474,7 @@ window.FlexiUploader = (() => {
       const show = action ? action === 'show' : !current || container.style.display === 'none';
       container.style.display = show ? '' : 'none';
       const result = container.parentElement.querySelector('.fc-upload-result');
-      if (result) result.hidden = show;
+      if (result && !container.classList.contains('fc_auto_uploader')) result.hidden = show;
       if (button) {
         button.classList.toggle('active', show);
         button.setAttribute('aria-expanded', String(show));
@@ -493,7 +509,9 @@ window.FlexiUploader = (() => {
 
     openDashboard(suffix, opener) {
       const queue = this.toggleUploader(suffix, 'show');
-      if (queue && window.FlexiUploadDashboard) FlexiUploadDashboard.open(queue, opener);
+      if (!queue) return;
+      if (window.FlexiUploadDashboard) FlexiUploadDashboard.open(queue, opener);
+      else queue.input.click();
     }
 
     autoResize(suffix) {
@@ -535,6 +553,13 @@ window.FlexiUploader = (() => {
     Uploader,
     mediaType,
     mediaElement,
+    previewImage(control) {
+      const image = control.querySelector('img');
+      if (image && window.GLightbox) {
+        const name = control.closest('.fc-image-card')?.querySelector('.fc_preview_msg')?.textContent.trim();
+        openPreview(control, image.currentSrc || image.src, name || image.alt);
+      }
+    },
     toggleImageProperties(button) {
       const props = button.closest('.fcfieldval_container')?.querySelector('.fcimg_value_props');
       if (!props) return;

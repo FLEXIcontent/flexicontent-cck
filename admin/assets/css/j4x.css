@@ -441,12 +441,12 @@ dl.tabs dt.open {
   color: #000000;
   z-index: 100;
 }
-div.current {
+div.current:not(.gslide) {
   border: 1px solid #CCCCCC;
   clear: both;
   padding: 10px;
 }
-div.current dd {
+div.current:not(.gslide) dd {
   margin: 0;
   padding: 0;
 }
