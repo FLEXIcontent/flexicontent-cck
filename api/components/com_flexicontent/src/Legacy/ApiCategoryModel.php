@@ -44,6 +44,18 @@ class ApiCategoryModel extends \FlexicontentModelCategory
 
         $data['copycid'] = (int) ($data['copycid'] ?? 0);
 
+        // FCModelAdmin::_prepareBind() checks class_uses($this) to detect the
+        // nestable trait. On this adapter the trait belongs to the parent class,
+        // so the legacy check misses it and leaves every API-created category
+        // at the root. Apply the same relocation explicitly.
+        if (property_exists($record, 'parent_id') && method_exists($record, 'setLocation')) {
+            $parentId = (int) ($data['parent_id'] ?? 0);
+
+            if ($parentId > 0 && (int) $record->parent_id !== $parentId) {
+                $record->setLocation($parentId, 'last-child');
+            }
+        }
+
         \FCModelAdmin::_prepareBind($record, $data);
     }
 }

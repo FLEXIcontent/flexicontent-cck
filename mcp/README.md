@@ -90,6 +90,7 @@ opencode mcp list
 | `flexi_create_item` | écriture | `POST /items` |
 | `flexi_update_item` | écriture | `PATCH /items/{id}` partiel |
 | `flexi_delete_item` | écriture | `DELETE /items/{id}`, exige `confirm=true` |
+| `flexi_upload_file` | écriture | Upload image/fichier (`POST /media`) |
 | `flexi_create_taxonomy` | écriture | `POST /{types,fields,categories,tags}` |
 | `flexi_update_taxonomy` | écriture | `PATCH /{resource}/{id}` partiel |
 | `flexi_delete_taxonomy` | écriture | `DELETE /{resource}/{id}`, exige `confirm=true` |
@@ -108,6 +109,13 @@ flexi_create_taxonomy("tags", {"name": "Urgent"})
 
 flexi_update_taxonomy("tags", 42, {"published": 0})
 flexi_delete_taxonomy("tags", 42, true)
+
+// Upload : content_path ou content_base64, avec field_id ou field_name.
+flexi_upload_file(content_path="/tmp/arbre.png", field_name="image_principale")
+flexi_upload_file(filename="arret.pdf", content_base64="...", field_name="fichier_pdf")
+
+// La valeur renvoyée s'attache directement à un item :
+flexi_create_item("Arrêté", 24, 11, fields={"image_principale": [{"originalname": "arbre.png"}]})
 ```
 
 Les ids de type, champ, catégorie et tag renvoyés par ces outils sont les ids
@@ -122,6 +130,24 @@ Note : la suppression d’un tag FLEXIcontent laisse le tag Joomla associé par
 défaut (option legacy `remove_cascade_jtags` désactivée). Le champ `jtag_id`
 renvoyé en lecture permet de le repérer et de le supprimer via l’API Joomla
 `/v1/tags` si nécessaire.
+
+## Uploads
+
+L’endpoint `POST /v1/flexicontent/media` écrit le fichier dans les répertoires
+configurés de FLEXIcontent (`file_path` sécurisé ou `media_path` public) et crée
+l’entrée `#__flexicontent_files` correspondante. Les extensions et la taille
+sont validées avec la configuration du composant et, si `field_id`/`field_name`
+est fourni, avec celle du champ cible. Les images sont vérifiées avec
+`getimagesizefromstring()`.
+
+Le champ `field_value` de la réponse est directement utilisable dans `fields` :
+une liste d’objets `originalname` pour un champ `image`, l’id du fichier pour
+un champ `file`/`media`. `secure` est choisi depuis `target_dir` du champ, avec
+`1` par défaut ; le paramètre `secure` de l’outil permet de forcer le choix.
+
+Le serveur accepte soit du contenu base64, soit un chemin local lisible par le
+processus MCP. Dans les deux cas, un seul doit être fourni. Les écritures sont
+également bloquées par `FLEXI_READONLY=1`.
 
 ## Tests
 

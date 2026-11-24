@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import base64
+import tempfile
 import unittest
+from pathlib import Path
 from unittest.mock import Mock, patch
 
 from flexicontent_mcp.api import FlexiApiError, FlexiClient, _message_from_body
@@ -14,6 +17,7 @@ from flexicontent_mcp.server import (
     flexi_describe,
     flexi_search_items,
     flexi_update_taxonomy,
+    flexi_upload_file,
 )
 
 TEST_CONFIG = Config(
@@ -179,6 +183,92 @@ class TaxonomyWriteTests(unittest.TestCase):
                 flexi_update_taxonomy("tags", 8, {"name": "Interdit"})
             with self.assertRaises(ValueError):
                 flexi_delete_taxonomy("tags", 8, confirm=True)
+            get_client.assert_not_called()
+
+
+class UploadTests(unittest.TestCase):
+    def _response(self) -> dict[str, object]:
+        return {
+            "data": {
+                "id": "42",
+                "attributes": {
+                    "id": 42,
+                    "filename": "photo.png",
+                    "field_type": "image",
+                    "field_value": [{"originalname": "photo.png"}],
+                    "url": "https://example.test/uploads/photo.png",
+                },
+            }
+        }
+
+    def test_upload_accepts_base64_content(self) -> None:
+        client = Mock()
+        client.request.return_value = self._response()
+
+        with (
+            patch("flexicontent_mcp.server.get_config", return_value=TEST_CONFIG),
+            patch("flexicontent_mcp.server.get_client", return_value=client),
+        ):
+            result = flexi_upload_file(
+                filename="photo.png",
+                content_base64=base64.b64encode(b"png").decode(),
+                field_id=135,
+            )
+
+        client.request.assert_called_once_with(
+            "POST",
+            "/media",
+            payload={
+                "filename": "photo.png",
+                "content_base64": base64.b64encode(b"png").decode(),
+                "field_id": 135,
+            },
+        )
+        self.assertEqual(result["uploaded"]["id"], 42)
+        self.assertEqual(result["field_value"], [{"originalname": "photo.png"}])
+
+    def test_upload_can_read_a_local_file(self) -> None:
+        client = Mock()
+        client.request.return_value = self._response()
+        client.list_resource.return_value = {
+            "data": [{"attributes": {"id": 135, "name": "image_principale"}}]
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / "local photo.png"
+            source.write_bytes(b"png")
+
+            with (
+                patch("flexicontent_mcp.server.get_config", return_value=TEST_CONFIG),
+                patch("flexicontent_mcp.server.get_client", return_value=client),
+            ):
+                result = flexi_upload_file(content_path=str(source), field_name="image_principale")
+
+        self.assertEqual(result["uploaded"]["filename"], "photo.png")
+
+    def test_upload_requires_exactly_one_content_source(self) -> None:
+        with patch("flexicontent_mcp.server.get_config", return_value=TEST_CONFIG):
+            with self.assertRaises(ValueError):
+                flexi_upload_file(filename="photo.png")
+            with self.assertRaises(ValueError):
+                flexi_upload_file(filename="photo.png", content_base64="eA==", content_path="/tmp/x")
+
+    def test_upload_is_disabled_in_read_only_mode(self) -> None:
+        read_only = Config(
+            base_url=TEST_CONFIG.base_url,
+            token=TEST_CONFIG.token,
+            read_only=True,
+            verify_ssl=True,
+            timeout=5.0,
+            max_limit=25,
+        )
+
+        with (
+            patch("flexicontent_mcp.server.get_config", return_value=read_only),
+            patch("flexicontent_mcp.server.get_client") as get_client,
+        ):
+            with self.assertRaises(ValueError):
+                flexi_upload_file(filename="photo.png", content_base64="eA==")
             get_client.assert_not_called()
 
 

@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import base64
 import logging
 from functools import lru_cache
+from pathlib import Path
 from typing import Annotated, Any, Literal
 
 from mcp.server.fastmcp import FastMCP
@@ -35,6 +37,11 @@ with flexi_create_taxonomy / flexi_update_taxonomy / flexi_delete_taxonomy.
 Call flexi_describe(kind="taxonomies") first for the allowed attributes of each
 resource and its defaults. Writes respect the Joomla API token's ACL.
 Deletion requires confirm=true.
+
+Images and files are uploaded with flexi_upload_file. Pass its field_value in
+the 'fields' object of flexi_create_item/flexi_update_item to attach the upload
+to an item. An optional field_id (or field_name) applies that field's extension
+and size limits and chooses the right storage area.
 """.strip()
 
 TaxonomyResource = Literal["categories", "tags", "types", "fields"]
@@ -340,6 +347,87 @@ def flexi_create_item(
         raise FlexiApiError(201, "Item was created but the API returned no representation")
 
     return {"created": compact_item(entry, include_fields=True)}
+
+
+def _resolve_field_id(client: FlexiClient, field_name: str) -> int:
+    response = client.list_resource(
+        "fields",
+        [("filter[search]", field_name), ("page[limit]", 100)],
+    )
+
+    for entry in response.get("data", []):
+        attrs = entry.get("attributes", {}) if isinstance(entry, dict) else {}
+        if str(attrs.get("name", "")) == field_name or str(attrs.get("label", "")) == field_name:
+            return int(attrs["id"])
+
+    raise ValueError(f"FLEXIcontent field {field_name!r} was not found")
+
+
+@server.tool(annotations=ToolAnnotations(idempotentHint=False, openWorldHint=True))
+def flexi_upload_file(
+    filename: Annotated[str | None, Field(description="Original file name with extension. Derived from content_path when omitted.")] = None,
+    content_base64: Annotated[str | None, Field(description="Base64-encoded file content.")] = None,
+    content_path: Annotated[str | None, Field(description="Local file path to upload.")] = None,
+    field_id: Annotated[int | None, Field(description="Target FLEXIcontent field id, for field-specific limits and storage.", ge=1)] = None,
+    field_name: Annotated[str | None, Field(description="Target field name or label, resolved through the fields API.")] = None,
+    secure: Annotated[bool | None, Field(description="Store in secure uploads (true) or public medias (false).")] = None,
+    alt: Annotated[str | None, Field(description="Alternative text for image fields.")] = None,
+    description: Annotated[str | None, Field(description="Description stored on the FLEXIcontent file record.")] = None,
+) -> dict[str, Any]:
+    """Upload an image or file into FLEXIcontent storage."""
+    _require_writes()
+
+    if (content_base64 is None) == (content_path is None):
+        raise ValueError("Provide exactly one of content_base64 or content_path")
+
+    if content_path is not None:
+        source = Path(content_path).expanduser()
+
+        if not source.is_file():
+            raise ValueError(f"File not found: {content_path}")
+
+        filename = filename or source.name
+        content_base64 = base64.b64encode(source.read_bytes()).decode("ascii")
+    elif not filename:
+        raise ValueError("filename is required when uploading content_base64")
+
+    if not filename or not filename.strip():
+        raise ValueError("filename must not be empty")
+
+    if field_id is not None and field_name:
+        raise ValueError("Provide either field_id or field_name, not both")
+
+    client = get_client()
+
+    if field_id is None and field_name:
+        field_id = _resolve_field_id(client, field_name)
+
+    payload = _payload({
+        "filename": filename.strip(),
+        "content_base64": content_base64,
+        "field_id": field_id,
+        "secure": secure,
+        "alt": alt,
+        "description": description,
+    })
+
+    response = client.request("POST", "/media", payload=payload)
+    entry = response.get("data") if isinstance(response, dict) else None
+
+    if not isinstance(entry, dict):
+        raise FlexiApiError(201, "File was uploaded but the API returned no representation")
+
+    attrs = entry.get("attributes", {})
+    uploaded = {key: attrs[key] for key in (
+        "id", "filename", "original_name", "extension", "size", "mime_type",
+        "secure", "url", "field_id", "field_type", "field_value",
+    ) if key in attrs}
+
+    return {
+        "uploaded": uploaded,
+        "field_value": attrs.get("field_value"),
+        "hint": "Use field_value in flexi_create_item/flexi_update_item fields.",
+    }
 
 
 @server.tool(annotations=ToolAnnotations(idempotentHint=True, openWorldHint=True))

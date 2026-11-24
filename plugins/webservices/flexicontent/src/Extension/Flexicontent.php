@@ -64,5 +64,17 @@ final class Flexicontent extends CMSPlugin implements SubscriberInterface
         $router->createCRUDRoutes('v1/flexicontent/tags', 'tags', ['component' => 'com_flexicontent']);
         $router->createCRUDRoutes('v1/flexicontent/types', 'types', ['component' => 'com_flexicontent']);
         $router->createCRUDRoutes('v1/flexicontent/fields', 'fields', ['component' => 'com_flexicontent']);
+
+        // File/image uploads. Only POST is implemented by MediaController; the
+        // other CRUD verbs are not registered for this resource.
+        $router->addRoutes([
+            new \Joomla\Router\Route(
+                ['POST'],
+                'v1/flexicontent/media',
+                'media.add',
+                [],
+                ['component' => 'com_flexicontent']
+            ),
+        ]);
     }
 }

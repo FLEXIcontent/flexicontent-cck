@@ -182,7 +182,10 @@ trait TaxonomyWriteTrait
             // as a full administrator form submission would do. Without this a
             // new type would be saved with an empty config, i.e. no default
             // item layout (attribs.ilayout).
-            foreach (['attribs', 'params', 'metadata', 'rules', 'tid', 'jtag_id', 'layouts', 'iflayout'] as $key) {
+            // The categorytree form field has no options in the API application
+            // (the legacy $globalcats tree is not bootstrapped there), so
+            // Form::filter() drops parent_id. The API payload is authoritative.
+            foreach (['attribs', 'params', 'metadata', 'rules', 'tid', 'jtag_id', 'layouts', 'iflayout', 'parent_id'] as $key) {
                 if (!\array_key_exists($key, $data)) {
                     continue;
                 }

@@ -181,6 +181,11 @@ def compact_taxonomy(resource: str, entry: dict[str, Any]) -> dict[str, Any]:
     attrs = attributes(entry)
     if resource == "fields":
         keys = ("id", "name", "label", "field_type", "iscore", "published", "access")
+    elif resource == "categories":
+        keys = (
+            "id", "name", "title", "alias", "parent_id", "level", "path",
+            "extension", "published", "state", "access", "item_count",
+        )
     else:
         keys = ("id", "name", "title", "alias", "published", "state", "item_count")
     return {key: attrs[key] for key in keys if key in attrs}
