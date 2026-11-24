@@ -142,8 +142,8 @@ class plgFlexicontent_fieldsMediafile extends FCField
 		$form_info_header = (int) $field->parameters->get('form_info_header', 3);
 
 		// Width of the media file card in the item edit form
-		$form_card_width = (int) $field->parameters->get('form_card_width', 250);
-		$form_card_width = $form_card_width > 0 ? $form_card_width : 250;
+		$form_card_width = (int) $field->parameters->get('form_card_width', 420);
+		$form_card_width = $form_card_width > 0 ? $form_card_width : 420;
 
 		// Inline file property editing
 		$inputmode = (int)$field->parameters->get( 'inputmode', 1 ) ;  // 1: file selection only,  0: inline file properties editing

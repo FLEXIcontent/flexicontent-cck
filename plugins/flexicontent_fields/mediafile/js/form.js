@@ -291,7 +291,7 @@ class fc_Waveform_LazyLoad
 			progressColor: audio_spectrum_conf[config_name]['progressColor'],
 			cursorColor:   audio_spectrum_conf[config_name]['cursorColor'],
 			cursorWidth:   parseInt(audio_spectrum_conf[config_name]['cursorWidth']) || 2,
-			height:        128,
+			height:        spectrum.closest('.fc-media-card') ? 64 : 128,
 
 			// v7 removed: backend, mediaControls, xhr, scrollParent, autoCenter, hideScrollbar, plugins
 		});

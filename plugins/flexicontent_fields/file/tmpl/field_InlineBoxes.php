@@ -18,6 +18,11 @@ foreach ($field->value as $file_id)
 
 	$file_data         = $files_data[$file_id];
 	$filename_original = $file_data->filename_original ? $file_data->filename_original : $file_data->filename;
+	$file_summary = $use_myfiles != 4 && in_array($form_info_header, [1, 2, 3])
+		? \Joomla\CMS\Layout\LayoutHelper::render('flexicontent_fields.file_summary', [
+			'file' => $file_data, 'header' => (int) $form_info_header, 'showTitle' => !$iform_title,
+		], JPATH_SITE . '/components/com_flexicontent/layouts')
+		: '';
 
 	$preview_css       = 'width:100px; height:100px;';
 	$ext_lower         = strtolower((string) $file_data->ext);
@@ -95,7 +100,7 @@ foreach ($field->value as $file_id)
 				'thumb_size_default' => $thumb_size_default,
 				'toggle_btn' => array(
 					'class' => $btn_item_class . $flat_btn_class,
-					'text' => '<span class="fc-image-tool-icon fas fa-upload" aria-hidden="true" title="'.Text::_('FLEXI_UPLOAD').'"></span>',
+					'text' => '<span class="fc-image-tool-icon fas fa-upload" aria-hidden="true"></span><span class="fc-tool-label">'.Text::_('FLEXI_UPLOAD').'</span>',
 					'onclick' => $toggleUploader_onclick,
 					'action' => null
 				),
@@ -111,7 +116,7 @@ foreach ($field->value as $file_id)
 		// !!! CLASS: fc-files-modal-link fc-sel NEEDED BY JS !!! DO NOT REMOVE, DO NOT MOVE
 		$uploader_html->myFilesBtn = '
 			<button type="button" data-href="'.$addExistingURL.'" onclick="'.$addExistingURL_onclick.'" class="fc-files-modal-link fc-sel fcfield-selectvalue multi '.$btn_classes.'" data-rowno="'.$n.'" id="'.$elementid_n.'_selectvalue" title="'.Text::_('FLEXI_MY_FILES').'">
-				<span class="fc-image-tool-icon fas fa-folder-open" aria-hidden="true"></span>
+				<span class="fc-image-tool-icon fas fa-folder-open" aria-hidden="true"></span><span class="fc-tool-label">'.Text::_('FLEXI_MY_FILES').'</span>
 			</button>';
 		$uploader_html->mediaUrlBtn = !$usemediaurl ? '' : '
 			<button type="button" class="'.$btn_classes.' fc-field-mediaurl-btn" data-for="'.$elementid_n.'" title="'.Text::_('FLEXI_FIELD_MEDIA_URL').'" onclick="fcfield_file.toggleMediaURL(\''.$elementid_n.'\'); return false;">
@@ -337,7 +342,7 @@ HTML;
 			<div class="fcclear"></div>
 		' : '')).'
 
-		'.(in_array($form_info_header, [2,3]) && $use_myfiles != 4 ? '
+		'.($file_summary !== '' ? '
 		<div class="fcclear"></div>
 		<div class="fc-file-info" data-fc-info="'. htmlspecialchars((string) json_encode(array(
 			'title'       => (string) $file_data->altname,
@@ -351,15 +356,8 @@ HTML;
 			1 => isset($custom_props[1]) ? $custom_props[1]['label'] : '',
 			2 => isset($custom_props[2]) ? $custom_props[2]['label'] : '',
 		), JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8') .'">
-			'.(!$iform_title ? '
-			<div class="fc-file-info-row">
-				<label class="fc-file-info-lbl fc_filedata_alttitle-lbl">'.Text::_( 'FLEXI_FILE_DISPLAY_TITLE' ).'</label>
-				<input type="text" readonly="readonly" tabindex="-1" class="fc-file-info-val fc_filedata_alttitle" value="'. htmlspecialchars((string) $file_data->altname, ENT_COMPAT, 'UTF-8') .'" />
-			</div>' : '').'
-			<div class="fc-file-info-row">
-				<label class="fc-file-info-lbl fc_filedata_title-lbl">'.Text::_( 'FLEXI_ORIGINAL_FILENAME' ).'</label>
-				<input type="text" readonly="readonly" tabindex="-1" class="fc-file-info-val fc_filedata_title" value="'. htmlspecialchars((string) $filename_original, ENT_COMPAT, 'UTF-8') .'" />
-			</div>
+			'.$file_summary.'
+			<input type="hidden" class="fc_filedata_title" value="'.htmlspecialchars((string) $filename_original, ENT_QUOTES, 'UTF-8').'" />
 		</div>' : '').'
 
 		<div class="fcclear"></div>

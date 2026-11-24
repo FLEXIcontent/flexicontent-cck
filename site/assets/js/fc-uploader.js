@@ -406,7 +406,9 @@ window.FlexiUploader = (() => {
               thumb.src = preview;
               open.prepend(thumb);
             }
-            this.container.after(open);
+            const metadata = !imageExtensions.test(entry.name) && row?.querySelector('.fc-asset-meta');
+            if (metadata) metadata.append(open);
+            else this.container.after(open);
           }
         }
       } catch (error) {

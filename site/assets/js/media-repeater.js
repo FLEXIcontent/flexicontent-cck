@@ -76,6 +76,7 @@ window.fcfield_media_rows = (() => {
     if (current) current.textContent = '-';
     const title = row.querySelector('.fc_filedata_title');
     if (title) title.value = '';
+    if (row.querySelector('.fc-asset-summary')) FlexiMediaField.setFileSummary(row);
     if (config.kind === 'file') {
       // File field: a new value starts empty (no Title / Original file name / tooltip data of the cloned value)
       row.querySelectorAll('input.fc_filedata_alttitle').forEach(input => { input.value = ''; });
