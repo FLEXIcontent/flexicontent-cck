@@ -887,7 +887,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 				if (!$out = @fopen("{$filePath_tmp}", "ab"))
 				{
 					// Die("{'jsonrpc' : '2.0', 'error' : {'code': 102, 'message': 'Failed to open output stream: " . json_encode($filePath_tmp) . " fopen failed. reason: " . json_encode(implode(' ', error_get_last())) . "'}, 'data' : null}");
-					die('{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream. Temporary path not writable."}, "data" : null}');
+					die(json_encode(['jsonrpc' => '2.0', 'error' => ['code' => 102, 'message' => \Joomla\CMS\Language\Text::_('FLEXI_UPLOAD_OUTPUT_STREAM_ERROR')], 'data' => null]));
 				}
 			}
 
@@ -895,19 +895,19 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 			{
 				if ($_FILES["file"]["error"] || !is_uploaded_file($_FILES["file"]["tmp_name"]))
 				{
-					die('{"jsonrpc" : "2.0", "error" : {"code": 103, "message": "Failed to move uploaded file."}, "data" : null}');
+					die(json_encode(['jsonrpc' => '2.0', 'error' => ['code' => 103, 'message' => \Joomla\CMS\Language\Text::_('FLEXI_UPLOAD_MOVE_FAILED')], 'data' => null]));
 				}
 
 				if (!$in = @fopen($_FILES["file"]["tmp_name"], "rb"))
 				{
-					die('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "data" : null}');
+					die(json_encode(['jsonrpc' => '2.0', 'error' => ['code' => 101, 'message' => \Joomla\CMS\Language\Text::_('FLEXI_UPLOAD_INPUT_STREAM_ERROR')], 'data' => null]));
 				}
 			}
 			else
 			{
 				if (!$in = @fopen("php://input", "rb"))
 				{
-					die('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "data" : null}');
+					die(json_encode(['jsonrpc' => '2.0', 'error' => ['code' => 101, 'message' => \Joomla\CMS\Language\Text::_('FLEXI_UPLOAD_INPUT_STREAM_ERROR')], 'data' => null]));
 				}
 			}
 
@@ -1033,10 +1033,10 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 						$errors = trim(ob_get_contents());
 						ob_clean();
 
-						if ($errors) \Joomla\CMS\Factory::getApplication()->enqueueMessage( 'Error renaming file of field: \'<b>' . $field->label . '</b>\' : <br/> <pre>' . $errors . '</pre>', 'notice');
+						if ($errors) \Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::sprintf('FLEXI_UPLOAD_RENAME_ERROR', htmlspecialchars($field->label, ENT_QUOTES, 'UTF-8'), htmlspecialchars($errors, ENT_QUOTES, 'UTF-8')), 'notice');
 					}
 					catch (ParseError $e) {
-						\Joomla\CMS\Factory::getApplication()->enqueueMessage( "Automatic filename custom code, failed with: <pre>" . $e->getMessage() . '</pre>', 'warning');
+						\Joomla\CMS\Factory::getApplication()->enqueueMessage(\Joomla\CMS\Language\Text::sprintf('FLEXI_UPLOAD_CUSTOM_NAME_ERROR', htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8')), 'warning');
 					}
 					break;
 			}
@@ -1144,7 +1144,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 				$res = $model->createMediaData($field, $fileObj);
 				if (!$res)
 				{
-					$error_msg = \Joomla\CMS\Language\Text::_("File uploaded successfully.\nBut got error reading media (audio/video) properties")
+					$error_msg = \Joomla\CMS\Language\Text::_('FLEXI_UPLOAD_MEDIA_PROPERTIES_ERROR')
 						. ":\n  " . $model->getError();
 					$this->exitHttpHead = array( 0 => array('status' => '500 Error') );
 					$this->exitMessages = array( 0 => array('warning' => $error_msg) );
@@ -1160,7 +1160,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 					$res = $model->createAudioPreview($field, $fileObj);
 					if (!$res)
 					{
-						$error_msg = \Joomla\CMS\Language\Text::_("File uploaded successfully.\nBut got error during creating preview files")
+						$error_msg = \Joomla\CMS\Language\Text::_('FLEXI_UPLOAD_MEDIA_PREVIEWS_ERROR')
 							. ":\n  " . $model->getError();
 						$this->exitHttpHead = array( 0 => array('status' => '500 Error') );
 						$this->exitMessages = array( 0 => array('warning' => $error_msg) );
@@ -1908,7 +1908,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 		if (count($denied_files))
 		{
-			$app->enqueueMessage(' You are not allowed to delete files: ' . implode(', ', $denied_files), 'warning');
+			$app->enqueueMessage(\Joomla\CMS\Language\Text::sprintf('FLEXI_FILES_DELETE_DENIED', htmlspecialchars(implode(', ', $denied_files), ENT_QUOTES, 'UTF-8')), 'warning');
 		}
 
 		$allowed_cid = array_keys($allowed_files);
@@ -2017,7 +2017,7 @@ class FlexicontentControllerFilemanager extends FlexicontentControllerBaseAdmin
 
 		if (count($denied_files))
 		{
-			$app->enqueueMessage(' You are not allowed to change state of files: ' . implode(', ', $denied_files), 'warning');
+			$app->enqueueMessage(\Joomla\CMS\Language\Text::sprintf('FLEXI_FILES_STATE_DENIED', htmlspecialchars(implode(', ', $denied_files), ENT_QUOTES, 'UTF-8')), 'warning');
 		}
 
 		$allowed_cid = array_keys($allowed_files);

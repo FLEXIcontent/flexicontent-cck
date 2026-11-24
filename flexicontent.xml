@@ -62,9 +62,12 @@
 	</files>
 
 	<!-- Site Language files Copy Section -->
-	<languages folder="site/language">
-		<language tag="en-GB">en-GB/en-GB.com_flexicontent.ini</language>
-		<language tag="en-GB">en-GB/en-GB.flexicontent.ini</language>
+	<languages>
+		<language tag="en-GB">site/language/en-GB/en-GB.com_flexicontent.ini</language>
+		<language tag="en-GB">site/language/en-GB/en-GB.flexicontent.ini</language>
+		<language tag="en-GB">site/language/en-GB/en-GB.lib_flexicontent_uppy.ini</language>
+		<language tag="fr-FR">site/librairies/uppy/language/fr-FR/lib_flexicontent_uppy.ini</language>
+		<language tag="zh-TW">site/librairies/uppy/language/zh-TW/lib_flexicontent_uppy.ini</language>
 	</languages>
 	
 	
@@ -111,10 +114,13 @@
 		</files>
 		
 		<!-- Admin Language files Copy Section -->
-		<languages folder="admin/language">
-			<language tag="en-GB">en-GB/en-GB.com_flexicontent.ini</language>
-			<language tag="en-GB">en-GB/en-GB.com_flexicontent.sys.ini</language>
-			<language tag="en-GB">en-GB/en-GB.flexicontent.ini</language>
+		<languages>
+			<language tag="en-GB">admin/language/en-GB/en-GB.com_flexicontent.ini</language>
+			<language tag="en-GB">admin/language/en-GB/en-GB.com_flexicontent.sys.ini</language>
+			<language tag="en-GB">admin/language/en-GB/en-GB.flexicontent.ini</language>
+			<language tag="en-GB">site/language/en-GB/en-GB.lib_flexicontent_uppy.ini</language>
+			<language tag="fr-FR">site/librairies/uppy/language/fr-FR/lib_flexicontent_uppy.ini</language>
+			<language tag="zh-TW">site/librairies/uppy/language/zh-TW/lib_flexicontent_uppy.ini</language>
 		</languages>
 		
 		<params>

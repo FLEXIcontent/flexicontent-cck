@@ -22,17 +22,17 @@ window.FlexiUploadTransport = (() => {
         if (event.lengthComputable) progress(event.loaded);
       };
       xhr.onabort = () => reject(signal.reason);
-      xhr.onerror = xhr.ontimeout = () => reject(new Error('The upload connection failed. Try again.'));
+      xhr.onerror = xhr.ontimeout = () => reject(new Error(Joomla.Text._('FLEXI_UPLOAD_CONNECTION_FAILED')));
       xhr.onload = () => {
         let response;
         try {
           response = JSON.parse(xhr.responseText);
         } catch (_) {
-          reject(new Error('The server did not return an upload response. Check that you are still signed in.'));
+          reject(new Error(Joomla.Text._('FLEXI_UPLOAD_INVALID_RESPONSE')));
           return;
         }
         if (xhr.status < 200 || xhr.status >= 300 || response?.jsonrpc !== '2.0' || response.error) {
-          reject(new Error(response?.error?.message || 'Upload failed.'));
+          reject(new Error(response?.error?.message || Joomla.Text._('FLEXI_UPLOAD_REQUEST_FAILED')));
           return;
         }
         resolve(response);
@@ -43,7 +43,7 @@ window.FlexiUploadTransport = (() => {
 
   async function upload(action, blob, name, fields, signal, progress) {
     const endpoint = new URL(action, document.baseURI);
-    if (endpoint.origin !== location.origin) throw new Error('Invalid upload URL.');
+    if (endpoint.origin !== location.origin) throw new Error(Joomla.Text._('FLEXI_UPLOAD_INVALID_URL'));
     const uploadId = Array.from(crypto.getRandomValues(new Uint8Array(16)), byte => byte.toString(16).padStart(2, '0')).join('');
     const chunks = Math.max(1, Math.ceil(blob.size / chunkSize));
     let response;
@@ -60,7 +60,7 @@ window.FlexiUploadTransport = (() => {
       form.set('file', blob.slice(offset, offset + chunkSize), name);
       response = await send(endpoint.href, form, signal, loaded => progress(Math.min(blob.size, offset + loaded) / Math.max(1, blob.size)));
     }
-    if (!response.data || (!response.data.id && !response.data.filename)) throw new Error('The server did not confirm the uploaded file.');
+    if (!response.data || (!response.data.id && !response.data.filename)) throw new Error(Joomla.Text._('FLEXI_UPLOAD_UNCONFIRMED'));
     delete response.data.full_path;
     return response;
   }

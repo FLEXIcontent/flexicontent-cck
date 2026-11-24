@@ -96,10 +96,13 @@ function open(queue, opener = queue.input, droppedFiles = []) {
   dialog.showModal();
 
   const lang = document.documentElement.lang.toLowerCase();
+  const locale = Joomla.getOptions?.('flexicontent.uppyLocale');
+  const rules = new Intl.PluralRules(lang || undefined);
   const uppy = new Uppy({
     id: queue.container.id,
     autoProceed: droppedFiles.length > 0 && !!queue.options.autostart_on_select,
-    locale: lang.startsWith('fr') ? french : /^zh-(tw|hant)/.test(lang) ? chinese : undefined,
+    locale: locale?.strings ? {strings: locale.strings, pluralize: count => rules.select(count)}
+      : lang.startsWith('fr') ? french : /^zh-(tw|hant)/.test(lang) ? chinese : undefined,
     restrictions: {
       allowedFileTypes: extensions.length ? extensions.map(ext => '.' + ext) : null,
       maxNumberOfFiles: upload_maxcount || null,

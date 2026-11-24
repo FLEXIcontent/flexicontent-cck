@@ -205,7 +205,7 @@ class fc_Waveform_LazyLoad
 
 			var factor = 100;
 
-			barText.innerHTML = 'Loading : ' + percent + ' %';
+			barText.textContent = Joomla.Text._('FLEXI_FIELD_MEDIAFILE_LOADING_PERCENT').replace('%s', percent);
 			progressBar.style.opacity = '1';
 			progressBar.style.visibility = 'visible';
 
@@ -215,7 +215,7 @@ class fc_Waveform_LazyLoad
 				var frame = 0;
 				loading_timer = setInterval(function ()
 				{
-					barText.innerHTML = 'Loading : ' + percent + ' %';
+					barText.textContent = Joomla.Text._('FLEXI_FIELD_MEDIAFILE_LOADING_PERCENT').replace('%s', percent);
 					frame += 1;
 					if (frame >= steps)
 					{
@@ -241,7 +241,7 @@ class fc_Waveform_LazyLoad
 
 			if (!!percent)
 			{
-				barText.innerHTML = 'Loading : ' + percent + ' %';
+				barText.textContent = Joomla.Text._('FLEXI_FIELD_MEDIAFILE_LOADING_PERCENT').replace('%s', percent);
 				progressBar.style.opacity = '0.75';
 
 				setTimeout(function () {
@@ -442,7 +442,7 @@ class fc_Waveform_LazyLoad
 		{
 			if (!preview)
 			{
-				FlexiForm.alert(Joomla.JText._('Preview can not load file. Reference to preview file is empty.'));
+				FlexiForm.alert(Joomla.Text._('FLEXI_FIELD_MEDIAFILE_PREVIEW_MISSING'));
 				return;
 			}
 

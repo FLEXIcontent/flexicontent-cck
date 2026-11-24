@@ -309,18 +309,18 @@ class plgFlexicontent_fieldsSharedmedia extends FCField
 			}
 
 			// Icon-only toolbar below the preview: URL / fetch / clear / edit fields
-			$url_btn = '<button type="button" class="' . $btn_item_class . $flat_btn_class . ' fc-sm-url-btn" data-for="' . $elementid_n . '" title="' . \Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_MEDIA_URL') . '" aria-label="' . \Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_MEDIA_URL') . '" aria-expanded="false" onclick="fcfield_sharemedia.toggleURL(\'' . $elementid_n . '\');"><span class="fc-image-tool-icon fas fa-video" aria-hidden="true"></span></button>';
-			$fetch_btn = '<button type="button" class="' . $btn_item_class . $flat_btn_class . ' fc-sm-fetch-btn" data-for="' . $elementid_n . '" title="' . \Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_FETCH') . '" aria-label="' . \Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_FETCH') . '" onclick="fcfield_sharemedia.fetchData(\'' . $elementid_n . '\', \'' . $field_name_js . '\');"><span class="fc-image-tool-icon fas fa-sync" aria-hidden="true"></span></button>';
-			$clear_btn = '<button type="button" class="' . $btn_item_class . $flat_btn_class . ' fc-sm-clear-btn" data-for="' . $elementid_n . '" title="' . \Joomla\CMS\Language\Text::_('FLEXI_CLEAR') . '" aria-label="' . \Joomla\CMS\Language\Text::_('FLEXI_CLEAR') . '" onclick="fcfield_sharemedia.clearData(\'' . $elementid_n . '\', \'' . $field_name_js . '\');"><span class="fc-image-tool-icon fas fa-trash" aria-hidden="true"></span></button>';
-			$edit_btn = '<button type="button" class="' . $btn_item_class . $flat_btn_class . ' fc-sm-edit-btn" data-for="' . $elementid_n . '" title="' . \Joomla\CMS\Language\Text::_('FLEXI_EDIT_OPTIONS') . '" aria-label="' . \Joomla\CMS\Language\Text::_('FLEXI_EDIT_OPTIONS') . '" aria-expanded="false" onclick="fcfield_sharemedia.toggleFields(\'' . $elementid_n . '\');"><span class="fc-image-tool-icon fas fa-edit" aria-hidden="true"></span></button>';
+			$url_btn = '<button type="button" class="' . $btn_item_class . $flat_btn_class . ' fc-sm-url-btn" data-for="' . $elementid_n . '" title="' . \Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_MEDIA_URL') . '" aria-label="' . \Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_MEDIA_URL') . '" aria-expanded="false" onclick="fcfield_sharemedia.toggleURL(\'' . $elementid_n . '\');">' . flexicontent_html::mediaActionLabel('url') . '</button>';
+			$fetch_btn = '<button type="button" class="' . $btn_item_class . $flat_btn_class . ' fc-sm-fetch-btn" data-for="' . $elementid_n . '" title="' . \Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_FETCH') . '" aria-label="' . \Joomla\CMS\Language\Text::_('PLG_FLEXICONTENT_FIELDS_SHAREDMEDIA_FETCH') . '" onclick="fcfield_sharemedia.fetchData(\'' . $elementid_n . '\', \'' . $field_name_js . '\');">' . flexicontent_html::mediaActionLabel('fetch') . '</button>';
+			$clear_btn = '<button type="button" class="' . $btn_item_class . $flat_btn_class . ' fc-sm-clear-btn" data-for="' . $elementid_n . '" title="' . \Joomla\CMS\Language\Text::_('FLEXI_CLEAR') . '" aria-label="' . \Joomla\CMS\Language\Text::_('FLEXI_CLEAR') . '" onclick="fcfield_sharemedia.clearData(\'' . $elementid_n . '\', \'' . $field_name_js . '\');">' . flexicontent_html::mediaActionLabel('clear') . '</button>';
+			$edit_btn = '<button type="button" class="' . $btn_item_class . $flat_btn_class . ' fc-sm-edit-btn" data-for="' . $elementid_n . '" title="' . \Joomla\CMS\Language\Text::_('FLEXI_EDIT_OPTIONS') . '" aria-label="' . \Joomla\CMS\Language\Text::_('FLEXI_EDIT_OPTIONS') . '" aria-expanded="false" onclick="fcfield_sharemedia.toggleFields(\'' . $elementid_n . '\');">' . flexicontent_html::mediaActionLabel('edit') . '</button>';
 
 			$bottom_toolbar = '
 				<div class="' . $btn_group_class . ' fc-xpended-btns fc-image-bottom-toolbar">
 					<div class="btn-group fc-image-btn-group" role="group">
 						' . $url_btn . '
 						' . $fetch_btn . '
-						' . $clear_btn . '
 						' . $edit_btn . '
+						' . $clear_btn . '
 					</div>
 				</div>';
 

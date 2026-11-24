@@ -12,6 +12,23 @@ use Joomla\CMS\Toolbar\ToolbarFactoryInterface;
 
 class flexicontent_html
 {
+	/** Visible, translated caption and decorative icon used by the media field footers. */
+	public static function mediaActionLabel($action)
+	{
+		static $actions = [
+			'upload' => ['upload', 'FLEXI_MEDIA_ACTION_UPLOAD'],
+			'files'  => ['folder-open', 'FLEXI_MY_FILES'],
+			'url'    => ['link', 'FLEXI_MEDIA_ACTION_URL'],
+			'edit'   => ['edit', 'FLEXI_EDIT'],
+			'clear'  => ['times', 'FLEXI_CLEAR'],
+			'fetch'  => ['sync', 'FLEXI_FETCH'],
+		];
+		[$icon, $key] = $actions[$action];
+
+		return '<span class="fc-image-tool-icon fas fa-' . $icon . '" aria-hidden="true"></span>'
+			. '<span class="fc-tool-label">' . htmlspecialchars(\Joomla\CMS\Language\Text::_($key), ENT_QUOTES, 'UTF-8') . '</span>';
+	}
+
 	static $use_bootstrap = true;
 	static $icon_classes = null;
 	static $option = 'com_flexicontent';
