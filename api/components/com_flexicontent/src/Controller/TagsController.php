@@ -15,13 +15,13 @@ namespace Joomla\Component\Flexicontent\Api\Controller;
 // phpcs:enable PSR1.Files.SideEffects
 
 /**
- * Read-only FLEXIcontent tags API controller.
+ * FLEXIcontent tags API controller.
  *
  * FLEXI tags are exposed with their Joomla tag bridge (jtag_id) when present.
  *
  * @since  5.3
  */
-class TagsController extends ReadOnlyController
+class TagsController extends TaxonomyController
 {
     /**
      * The content type of the item.
@@ -29,6 +29,20 @@ class TagsController extends ReadOnlyController
      * @var    string
      */
     protected $contentType = 'tags';
+
+    /**
+     * API resource name.
+     *
+     * @var    string
+     */
+    protected $resource = 'tags';
+
+    /**
+     * Singular model name.
+     *
+     * @var    string
+     */
+    protected $singular = 'tag';
 
     /**
      * The default view for the display method.

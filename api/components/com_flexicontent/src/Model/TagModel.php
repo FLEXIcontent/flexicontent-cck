@@ -25,6 +25,28 @@ use Joomla\Component\Flexicontent\Api\Helper\AccessHelper;
  */
 class TagModel extends BaseItemModel
 {
+    use TaxonomyWriteTrait;
+
+    /**
+     * Legacy model class used for persistence.
+     *
+     * @return  string
+     */
+    protected function legacyModelClass(): string
+    {
+        return \FlexicontentModelTag::class;
+    }
+
+    /**
+     * Legacy list model class used for deletion.
+     *
+     * @return  string
+     */
+    protected function legacyListModelClass(): string
+    {
+        return \FlexicontentModelTags::class;
+    }
+
     /**
      * Get one FLEXIcontent tag.
      *

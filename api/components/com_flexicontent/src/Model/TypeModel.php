@@ -25,6 +25,28 @@ use Joomla\Component\Flexicontent\Api\Helper\AccessHelper;
  */
 class TypeModel extends BaseItemModel
 {
+    use TaxonomyWriteTrait;
+
+    /**
+     * Legacy model class used for persistence.
+     *
+     * @return  string
+     */
+    protected function legacyModelClass(): string
+    {
+        return \Joomla\Component\Flexicontent\Api\Legacy\ApiTypeModel::class;
+    }
+
+    /**
+     * Legacy list model class used for deletion.
+     *
+     * @return  string
+     */
+    protected function legacyListModelClass(): string
+    {
+        return \FlexicontentModelTypes::class;
+    }
+
     /**
      * Get one FLEXIcontent content type.
      *

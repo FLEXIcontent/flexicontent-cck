@@ -108,5 +108,11 @@ final class LegacyBootstrap
         // decideLayout() and the frontend viewing-access checks).
         require_once $fcAdmin . '/models/items.php';
         require_once $fcSite . '/models/item.php';
+
+        // Writable taxonomy endpoints delegate to the same administrator
+        // models used by the FLEXIcontent back office.
+        foreach (['types', 'type', 'fields', 'field', 'tags', 'tag', 'categories', 'category'] as $model) {
+            require_once $fcAdmin . '/models/' . $model . '.php';
+        }
     }
 }

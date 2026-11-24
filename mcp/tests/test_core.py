@@ -6,9 +6,14 @@ from unittest.mock import Mock, patch
 from flexicontent_mcp.api import FlexiApiError, FlexiClient, _message_from_body
 from flexicontent_mcp.config import Config
 from flexicontent_mcp.server import (
+    TAXONOMY_SCHEMAS,
     _page,
+    flexi_create_taxonomy,
     flexi_delete_item,
+    flexi_delete_taxonomy,
+    flexi_describe,
     flexi_search_items,
+    flexi_update_taxonomy,
 )
 
 TEST_CONFIG = Config(
@@ -83,6 +88,97 @@ class WriteGuardTests(unittest.TestCase):
         ):
             with self.assertRaises(ValueError):
                 flexi_delete_item(id=7, confirm=False)
+            get_client.assert_not_called()
+
+
+class TaxonomyWriteTests(unittest.TestCase):
+    def _entry(self, record_id: int, name: str) -> dict[str, object]:
+        return {
+            "id": str(record_id),
+            "attributes": {"id": record_id, "name": name, "published": 1},
+        }
+
+    def test_describe_exposes_taxonomy_schemas(self) -> None:
+        with patch("flexicontent_mcp.server.get_client") as get_client:
+            result = flexi_describe(kind="taxonomies")
+
+        get_client.assert_not_called()
+        self.assertEqual(result["taxonomies"], TAXONOMY_SCHEMAS)
+        self.assertIn("name", result["taxonomies"]["types"]["required"])
+
+    def test_create_requires_resource_specific_field(self) -> None:
+        with (
+            patch("flexicontent_mcp.server.get_config", return_value=TEST_CONFIG),
+            patch("flexicontent_mcp.server.get_client") as get_client,
+        ):
+            with self.assertRaises(ValueError):
+                flexi_create_taxonomy("types", {"alias": "sans-nom"})
+            get_client.assert_not_called()
+
+    def test_create_posts_attributes_and_compacts_response(self) -> None:
+        client = Mock()
+        client.request.return_value = {"data": self._entry(12, "Test type")}
+
+        with (
+            patch("flexicontent_mcp.server.get_config", return_value=TEST_CONFIG),
+            patch("flexicontent_mcp.server.get_client", return_value=client),
+        ):
+            result = flexi_create_taxonomy(
+                "types",
+                {"name": "Test type", "alias": None, "published": 1},
+            )
+
+        client.request.assert_called_once_with(
+            "POST",
+            "/types",
+            payload={"name": "Test type", "published": 1},
+        )
+        self.assertEqual(result["created"]["name"], "Test type")
+
+    def test_update_sends_only_changed_attributes(self) -> None:
+        client = Mock()
+        client.get_resource.return_value = {"data": self._entry(8, "Before")}
+        client.request.return_value = {"data": self._entry(8, "After")}
+
+        with (
+            patch("flexicontent_mcp.server.get_config", return_value=TEST_CONFIG),
+            patch("flexicontent_mcp.server.get_client", return_value=client),
+        ):
+            result = flexi_update_taxonomy("tags", 8, {"name": "After"})
+
+        client.request.assert_called_once_with("PATCH", "/tags/8", payload={"name": "After"})
+        self.assertEqual(result["before"]["name"], "Before")
+        self.assertEqual(result["after"]["name"], "After")
+
+    def test_delete_requires_confirmation(self) -> None:
+        with (
+            patch("flexicontent_mcp.server.get_config", return_value=TEST_CONFIG),
+            patch("flexicontent_mcp.server.get_client") as get_client,
+        ):
+            with self.assertRaises(ValueError):
+                flexi_delete_taxonomy("tags", 8, confirm=False)
+            get_client.assert_not_called()
+
+    def test_writes_are_disabled_in_read_only_mode(self) -> None:
+        read_only = Config(
+            base_url=TEST_CONFIG.base_url,
+            token=TEST_CONFIG.token,
+            read_only=True,
+            verify_ssl=True,
+            timeout=5.0,
+            max_limit=25,
+        )
+
+        with (
+            patch("flexicontent_mcp.server.get_config", return_value=read_only),
+            patch("flexicontent_mcp.server.get_client") as get_client,
+        ):
+            with self.assertRaises(ValueError):
+                flexi_create_taxonomy("tags", {"name": "Interdit"})
+            with self.assertRaises(ValueError):
+                flexi_update_taxonomy("tags", 8, {"name": "Interdit"})
+            with self.assertRaises(ValueError):
+                flexi_delete_taxonomy("tags", 8, confirm=True)
             get_client.assert_not_called()
 
 

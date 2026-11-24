@@ -133,6 +133,10 @@ class FlexiClient:
         """Get one item by id."""
         return self.request("GET", f"/items/{int(item_id)}", params) or {}
 
+    def get_resource(self, resource: str, resource_id: int) -> dict[str, Any]:
+        """Get one taxonomy record by id."""
+        return self.request("GET", f"/{resource}/{int(resource_id)}") or {}
+
 
 def _offset(params: Iterable[tuple[str, Any]]) -> int:
     """Return the requested page offset, if any."""

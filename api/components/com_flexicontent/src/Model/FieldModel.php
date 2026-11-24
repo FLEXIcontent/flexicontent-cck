@@ -24,6 +24,28 @@ use Joomla\Component\Flexicontent\Api\Helper\AccessHelper;
  */
 class FieldModel extends BaseItemModel
 {
+    use TaxonomyWriteTrait;
+
+    /**
+     * Legacy model class used for persistence.
+     *
+     * @return  string
+     */
+    protected function legacyModelClass(): string
+    {
+        return \FlexicontentModelField::class;
+    }
+
+    /**
+     * Legacy list model class used for deletion.
+     *
+     * @return  string
+     */
+    protected function legacyListModelClass(): string
+    {
+        return \FlexicontentModelFields::class;
+    }
+
     /**
      * Get one FLEXIcontent field.
      *

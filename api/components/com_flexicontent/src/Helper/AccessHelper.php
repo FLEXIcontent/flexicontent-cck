@@ -345,4 +345,209 @@ final class AccessHelper
             || $user->authorise('core.edit.state', 'com_flexicontent')
             || $user->authorise('core.edit.state.own', 'com_flexicontent') && $isOwner;
     }
+
+    /**
+     * Can the current user manage FLEXIcontent content types?
+     *
+     * @return  boolean
+     */
+    public static function canManageTypes(): bool
+    {
+        $user = self::getIdentity();
+
+        if ($user->authorise('core.manage', 'com_flexicontent')) {
+            return true;
+        }
+
+        return $user->authorise('flexicontent.managetypes', 'com_flexicontent');
+    }
+
+    /**
+     * Can the current user create custom fields?
+     *
+     * @return  boolean
+     */
+    public static function canCreateField(): bool
+    {
+        $user = self::getIdentity();
+
+        if ($user->authorise('core.manage', 'com_flexicontent')) {
+            return true;
+        }
+
+        self::bootWriteAcl();
+
+        return (bool) \FlexicontentHelperPerm::getPerm()->CanAddField;
+    }
+
+    /**
+     * Can the current user edit a custom field?
+     *
+     * @param   integer  $id  The field id.
+     *
+     * @return  boolean
+     */
+    public static function canEditField(int $id): bool
+    {
+        $user = self::getIdentity();
+
+        if ($user->authorise('core.manage', 'com_flexicontent')) {
+            return true;
+        }
+
+        if ($id > 0 && $user->authorise('flexicontent.editfield', 'com_flexicontent.field.' . $id)) {
+            return true;
+        }
+
+        self::bootWriteAcl();
+
+        return (bool) \FlexicontentHelperPerm::getPerm()->CanFields;
+    }
+
+    /**
+     * Can the current user delete custom fields?
+     *
+     * The legacy model forbids deleting the first six core fields.
+     *
+     * @param   integer  $id     The field id, or 0 for a general check.
+     * @param   integer  $iscore Whether this is a core field.
+     *
+     * @return  boolean
+     */
+    public static function canDeleteField(int $id = 0, int $iscore = 0): bool
+    {
+        $user = self::getIdentity();
+
+        if ($id > 0 && $id < 7) {
+            return false;
+        }
+
+        if ($user->authorise('core.manage', 'com_flexicontent')) {
+            return true;
+        }
+
+        if ($id > 0 && $user->authorise('flexicontent.deletefield', 'com_flexicontent.field.' . $id)) {
+            return true;
+        }
+
+        return $user->authorise('flexicontent.deletefield', 'com_flexicontent');
+    }
+
+    /**
+     * Can the current user create categories at the given parent?
+     *
+     * @param   integer  $parentId  The parent category id.
+     *
+     * @return  boolean
+     */
+    public static function canCreateCategory(int $parentId = 1): bool
+    {
+        $user = self::getIdentity();
+
+        if ($user->authorise('core.manage', 'com_flexicontent')) {
+            return true;
+        }
+
+        if ($user->authorise('core.create', 'com_content')) {
+            return true;
+        }
+
+        return $parentId > 0 && $user->authorise('core.create', 'com_content.category.' . $parentId);
+    }
+
+    /**
+     * Can the current user edit a category?
+     *
+     * @param   integer  $id  The category id.
+     *
+     * @return  boolean
+     */
+    public static function canEditCategory(int $id): bool
+    {
+        $user = self::getIdentity();
+
+        if ($user->authorise('core.manage', 'com_flexicontent')) {
+            return true;
+        }
+
+        if ($user->authorise('flexicontent.managecats', 'com_flexicontent')) {
+            return true;
+        }
+
+        return $id > 0
+            && ($user->authorise('core.edit', 'com_content.category.' . $id)
+                || $user->authorise('core.edit.own', 'com_content.category.' . $id));
+    }
+
+    /**
+     * Can the current user delete categories?
+     *
+     * @param   integer  $id  The category id, or 0 for a general check.
+     *
+     * @return  boolean
+     */
+    public static function canDeleteCategory(int $id = 0): bool
+    {
+        $user = self::getIdentity();
+
+        if ($user->authorise('core.manage', 'com_flexicontent')) {
+            return true;
+        }
+
+        if ($user->authorise('flexicontent.managecats', 'com_flexicontent')) {
+            return true;
+        }
+
+        if ($id > 0 && $user->authorise('core.delete', 'com_content.category.' . $id)) {
+            return true;
+        }
+
+        return $user->authorise('core.delete', 'com_content');
+    }
+
+    /**
+     * Can the current user create FLEXIcontent tags?
+     *
+     * @return  boolean
+     */
+    public static function canCreateTag(): bool
+    {
+        $user = self::getIdentity();
+
+        if ($user->authorise('core.manage', 'com_flexicontent')) {
+            return true;
+        }
+
+        return $user->authorise('flexicontent.createtags', 'com_flexicontent');
+    }
+
+    /**
+     * Can the current user manage existing FLEXIcontent tags?
+     *
+     * @return  boolean
+     */
+    public static function canManageTags(): bool
+    {
+        $user = self::getIdentity();
+
+        if ($user->authorise('core.manage', 'com_flexicontent')) {
+            return true;
+        }
+
+        return $user->authorise('flexicontent.managetags', 'com_flexicontent');
+    }
+
+    /**
+     * Can the current user create the Joomla tag bridged to a FLEXI tag?
+     *
+     * The legacy tag model delegates this to flexicontent_db::createFindJoomlaTags(),
+     * which checks the com_tags asset itself. Check it up front so the API can
+     * return a clean 403 instead of creating a tag with an empty jtag_id.
+     *
+     * @return  boolean
+     */
+    public static function canCreateJoomlaTag(): bool
+    {
+        return self::getIdentity()->authorise('core.create', 'com_tags');
+    }
 }

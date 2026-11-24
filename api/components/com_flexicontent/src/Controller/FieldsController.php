@@ -17,7 +17,7 @@ use Joomla\Component\Flexicontent\Api\Helper\AccessHelper;
 // phpcs:enable PSR1.Files.SideEffects
 
 /**
- * Read-only FLEXIcontent custom fields API controller.
+ * FLEXIcontent custom fields API controller.
  *
  * Supported filters: filter[search], filter[state], filter[core],
  * filter[form], filter[type] and filter[access] (the latter is manager-only).
@@ -25,7 +25,7 @@ use Joomla\Component\Flexicontent\Api\Helper\AccessHelper;
  *
  * @since  5.3
  */
-class FieldsController extends ReadOnlyController
+class FieldsController extends TaxonomyController
 {
     /**
      * The content type of the item.
@@ -33,6 +33,20 @@ class FieldsController extends ReadOnlyController
      * @var    string
      */
     protected $contentType = 'fields';
+
+    /**
+     * API resource name.
+     *
+     * @var    string
+     */
+    protected $resource = 'fields';
+
+    /**
+     * Singular model name.
+     *
+     * @var    string
+     */
+    protected $singular = 'field';
 
     /**
      * The default view for the display method.

@@ -28,9 +28,55 @@ Before creating or editing an item, call flexi_describe to discover the valid
 type ids, category ids and custom field names. Use those exact FLEXIcontent ids
 in write payloads: tag_ids/category_ids are FLEXIcontent ids, while the read API
 also exposes Joomla tag ids in relationships. Prefer small searches, then
-flexi_get_item for the full record including flexi_fields. Writes respect the
-Joomla API token's ACL. Deletion requires confirm=true.
+flexi_get_item for the full record including flexi_fields.
+
+Types, fields, categories and tags can also be created, updated and deleted
+with flexi_create_taxonomy / flexi_update_taxonomy / flexi_delete_taxonomy.
+Call flexi_describe(kind="taxonomies") first for the allowed attributes of each
+resource and its defaults. Writes respect the Joomla API token's ACL.
+Deletion requires confirm=true.
 """.strip()
+
+TaxonomyResource = Literal["categories", "tags", "types", "fields"]
+
+TAXONOMY_SCHEMAS: dict[str, dict[str, Any]] = {
+    "types": {
+        "required": ["name"],
+        "defaults": {"published": 1, "itemscreatable": 0, "access": 1},
+        "allowed": [
+            "name", "alias", "description", "published", "itemscreatable",
+            "access", "attribs", "layouts", "iflayout",
+        ],
+    },
+    "fields": {
+        "required": ["label"],
+        "defaults": {
+            "field_type": "text", "published": 1, "access": 1,
+            "ordering": 999, "tid": [],
+        },
+        "allowed": [
+            "field_type", "name", "label", "description", "published", "access",
+            "ordering", "issearch", "isadvsearch", "isfilter", "isadvfilter",
+            "untranslatable", "formhidden", "valueseditable", "edithelp",
+            "positions", "attribs", "tid", "type_ids", "types", "layouts",
+            "iflayout",
+        ],
+    },
+    "categories": {
+        "required": ["title"],
+        "defaults": {"parent_id": 1, "published": 1, "access": 1, "language": "*"},
+        "allowed": [
+            "title", "alias", "parent_id", "published", "access", "language",
+            "note", "description", "metadesc", "metakey", "metadata",
+            "params", "layouts",
+        ],
+    },
+    "tags": {
+        "required": ["name"],
+        "defaults": {"published": 1},
+        "allowed": ["name", "alias", "published", "jtag_id"],
+    },
+}
 
 server = FastMCP("flexicontent", instructions=SERVER_INSTRUCTIONS)
 
@@ -192,11 +238,21 @@ def flexi_list_taxonomies(
 @server.tool(annotations=ToolAnnotations(readOnlyHint=True, openWorldHint=True))
 def flexi_describe(
     kind: Annotated[
-        Literal["write", "fields", "types", "categories"],
+        Literal["write", "fields", "types", "categories", "taxonomies"],
         Field(description="Which schema bundle to return."),
     ] = "write",
 ) -> dict[str, Any]:
-    """Return ids and names needed to build item write payloads."""
+    """Return ids and schemas needed to build FLEXIcontent write payloads."""
+    if kind == "taxonomies":
+        return {
+            "kind": kind,
+            "taxonomies": TAXONOMY_SCHEMAS,
+            "note": (
+                "Pass the attributes object to flexi_create_taxonomy or "
+                "flexi_update_taxonomy. Unknown attributes are ignored by the API."
+            ),
+        }
+
     client = get_client()
     limit = get_config().max_limit
     result: dict[str, Any] = {"kind": kind}
@@ -364,6 +420,131 @@ def flexi_delete_item(
     client.request("DELETE", f"/items/{id}")
 
     return {"deleted": id, "before": before}
+
+
+@server.tool(annotations=ToolAnnotations(readOnlyHint=True, openWorldHint=True))
+def flexi_get_taxonomy(
+    resource: Annotated[
+        TaxonomyResource,
+        Field(description="Taxonomy resource to read."),
+    ],
+    id: Annotated[int, Field(description="FLEXIcontent record id.", ge=1)],
+) -> dict[str, Any]:
+    """Get one type, field, category or tag by id."""
+    response = get_client().get_resource(resource, id)
+    entry = response.get("data") if isinstance(response, dict) else None
+
+    if not isinstance(entry, dict):
+        raise FlexiApiError(404, f"{resource} record {id} was not found or is not visible")
+
+    return {"resource": resource, "entry": compact_taxonomy(resource, entry)}
+
+
+def _taxonomy_payload(
+    resource: TaxonomyResource,
+    attributes: dict[str, Any],
+    require_schema: bool,
+) -> dict[str, Any]:
+    values = {key: value for key, value in attributes.items() if value is not None}
+
+    if not values:
+        raise ValueError("At least one attribute must be provided")
+
+    schema = TAXONOMY_SCHEMAS[resource]
+
+    if require_schema:
+        singular = {
+            "categories": "category",
+            "tags": "tag",
+            "types": "type",
+            "fields": "field",
+        }[resource]
+
+        for key in schema["required"]:
+            if key not in values or values[key] in (None, ""):
+                raise ValueError(f"{key} is required to create a {singular}")
+
+    return values
+
+
+@server.tool(annotations=ToolAnnotations(idempotentHint=False, openWorldHint=True))
+def flexi_create_taxonomy(
+    resource: Annotated[
+        TaxonomyResource,
+        Field(description="Taxonomy resource to create."),
+    ],
+    attributes: Annotated[
+        dict[str, Any],
+        Field(description="Attributes to create; see flexi_describe(kind='taxonomies')."),
+    ],
+) -> dict[str, Any]:
+    """Create a FLEXIcontent type, field, category or tag."""
+    _require_writes()
+
+    payload = _taxonomy_payload(resource, attributes, require_schema=True)
+    response = get_client().request("POST", f"/{resource}", payload=payload)
+    entry = response.get("data") if isinstance(response, dict) else None
+
+    if not isinstance(entry, dict):
+        raise FlexiApiError(201, f"{resource} record was created but no representation was returned")
+
+    return {"created": compact_taxonomy(resource, entry)}
+
+
+@server.tool(annotations=ToolAnnotations(idempotentHint=True, openWorldHint=True))
+def flexi_update_taxonomy(
+    resource: Annotated[
+        TaxonomyResource,
+        Field(description="Taxonomy resource to update."),
+    ],
+    id: Annotated[int, Field(description="FLEXIcontent record id.", ge=1)],
+    attributes: Annotated[
+        dict[str, Any],
+        Field(description="Attributes to change; omitted attributes keep their current value."),
+    ],
+) -> dict[str, Any]:
+    """Partially update a FLEXIcontent type, field, category or tag."""
+    _require_writes()
+
+    payload = _taxonomy_payload(resource, attributes, require_schema=False)
+    client = get_client()
+
+    before_response = client.get_resource(resource, id)
+    before_entry = before_response.get("data")
+    before = compact_taxonomy(resource, before_entry) if isinstance(before_entry, dict) else None
+
+    response = client.request("PATCH", f"/{resource}/{id}", payload=payload)
+    entry = response.get("data") if isinstance(response, dict) else None
+
+    return {
+        "before": before,
+        "after": compact_taxonomy(resource, entry) if isinstance(entry, dict) else None,
+    }
+
+
+@server.tool(annotations=ToolAnnotations(destructiveHint=True, idempotentHint=True, openWorldHint=True))
+def flexi_delete_taxonomy(
+    resource: Annotated[
+        TaxonomyResource,
+        Field(description="Taxonomy resource to delete."),
+    ],
+    id: Annotated[int, Field(description="FLEXIcontent record id.", ge=1)],
+    confirm: Annotated[bool, Field(description="Must be true to confirm deletion.")] = False,
+) -> dict[str, Any]:
+    """Delete a FLEXIcontent type, field, category or tag. Requires confirm=true."""
+    _require_writes()
+
+    if confirm is not True:
+        raise ValueError("Deletion requires confirm=true")
+
+    client = get_client()
+    before_response = client.get_resource(resource, id)
+    before_entry = before_response.get("data")
+    before = compact_taxonomy(resource, before_entry) if isinstance(before_entry, dict) else None
+
+    client.request("DELETE", f"/{resource}/{id}")
+
+    return {"deleted": id, "resource": resource, "before": before}
 
 
 def main() -> None:

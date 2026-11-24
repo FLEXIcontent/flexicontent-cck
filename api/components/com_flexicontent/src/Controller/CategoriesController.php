@@ -17,14 +17,14 @@ use Joomla\Component\Flexicontent\Api\Helper\AccessHelper;
 // phpcs:enable PSR1.Files.SideEffects
 
 /**
- * Read-only FLEXIcontent categories API controller.
+ * FLEXIcontent categories API controller.
  *
  * FLEXIcontent stores its categories in #__categories using the extension
  * configured in the component parameters (com_content by default).
  *
  * @since  5.3
  */
-class CategoriesController extends ReadOnlyController
+class CategoriesController extends TaxonomyController
 {
     /**
      * The content type of the item.
@@ -32,6 +32,20 @@ class CategoriesController extends ReadOnlyController
      * @var    string
      */
     protected $contentType = 'categories';
+
+    /**
+     * API resource name.
+     *
+     * @var    string
+     */
+    protected $resource = 'categories';
+
+    /**
+     * Singular model name.
+     *
+     * @var    string
+     */
+    protected $singular = 'category';
 
     /**
      * The default view for the display method.

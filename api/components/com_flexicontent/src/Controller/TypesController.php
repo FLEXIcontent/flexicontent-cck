@@ -17,11 +17,11 @@ use Joomla\Component\Flexicontent\Api\Helper\AccessHelper;
 // phpcs:enable PSR1.Files.SideEffects
 
 /**
- * Read-only FLEXIcontent content types API controller.
+ * FLEXIcontent content types API controller.
  *
  * @since  5.3
  */
-class TypesController extends ReadOnlyController
+class TypesController extends TaxonomyController
 {
     /**
      * The content type of the item.
@@ -29,6 +29,20 @@ class TypesController extends ReadOnlyController
      * @var    string
      */
     protected $contentType = 'types';
+
+    /**
+     * API resource name.
+     *
+     * @var    string
+     */
+    protected $resource = 'types';
+
+    /**
+     * Singular model name.
+     *
+     * @var    string
+     */
+    protected $singular = 'type';
 
     /**
      * The default view for the display method.

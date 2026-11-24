@@ -85,13 +85,38 @@ opencode mcp list
 | `flexi_search_items` | lecture | Recherche d’items avec filtres JSON:API |
 | `flexi_get_item` | lecture | Détail d’un item + `flexi_fields` |
 | `flexi_list_taxonomies` | lecture | Catégories, tags, types, champs |
-| `flexi_describe` | lecture | Ids/noms utiles avant une écriture |
+| `flexi_get_taxonomy` | lecture | Détail d’un type, champ, catégorie ou tag |
+| `flexi_describe` | lecture | Ids/noms et schémas `kind="taxonomies"` |
 | `flexi_create_item` | écriture | `POST /items` |
 | `flexi_update_item` | écriture | `PATCH /items/{id}` partiel |
 | `flexi_delete_item` | écriture | `DELETE /items/{id}`, exige `confirm=true` |
+| `flexi_create_taxonomy` | écriture | `POST /{types,fields,categories,tags}` |
+| `flexi_update_taxonomy` | écriture | `PATCH /{resource}/{id}` partiel |
+| `flexi_delete_taxonomy` | écriture | `DELETE /{resource}/{id}`, exige `confirm=true` |
 
 Les écritures suivent l’ACL du token Joomla. `FLEXI_READONLY=1` permet de
 brancher le même serveur sur un profil OpenCode en lecture seule.
+
+Exemples :
+
+```jsonc
+// flexi_describe(kind="taxonomies") donne les attributs autorisés par ressource.
+flexi_create_taxonomy("types", {"name": "Reglementation", "alias": "reglementation"})
+flexi_create_taxonomy("fields", {"label": "Numéro", "name": "numero", "field_type": "text"})
+flexi_create_taxonomy("categories", {"title": "Actualités", "parent_id": 1})
+flexi_create_taxonomy("tags", {"name": "Urgent"})
+
+flexi_update_taxonomy("tags", 42, {"published": 0})
+flexi_delete_taxonomy("tags", 42, true)
+```
+
+Les ids de type, champ, catégorie et tag renvoyés par ces outils sont les ids
+FLEXIcontent à réutiliser dans les écritures d’items.
+
+Note : la suppression d’un tag FLEXIcontent laisse le tag Joomla associé par
+défaut (option legacy `remove_cascade_jtags` désactivée). Le champ `jtag_id`
+renvoyé en lecture permet de le repérer et de le supprimer via l’API Joomla
+`/v1/tags` si nécessaire.
 
 ## Tests
 
