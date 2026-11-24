@@ -1,0 +1,18 @@
+[project]
+name = "flexicontent-mcp"
+version = "0.1.0"
+description = "MCP server exposing the FLEXIcontent Joomla JSON:API to AI agents"
+requires-python = ">=3.10"
+dependencies = [
+    "mcp>=1.30,<2",
+]
+
+[project.scripts]
+flexicontent-mcp = "flexicontent_mcp.server:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["flexicontent_mcp"]

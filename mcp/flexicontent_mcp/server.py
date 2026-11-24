@@ -1,0 +1,377 @@
+"""MCP tools for the FLEXIcontent Joomla JSON:API."""
+
+from __future__ import annotations
+
+import logging
+from functools import lru_cache
+from typing import Annotated, Any, Literal
+
+from mcp.server.fastmcp import FastMCP
+from mcp.types import ToolAnnotations
+from pydantic import Field
+
+from .api import (
+    FlexiApiError,
+    FlexiClient,
+    Params,
+    compact_item,
+    compact_taxonomy,
+)
+from .config import Config
+
+LOGGER = logging.getLogger("flexicontent_mcp")
+
+SERVER_INSTRUCTIONS = """
+FLEXIcontent content management tools backed by the Joomla JSON:API.
+
+Before creating or editing an item, call flexi_describe to discover the valid
+type ids, category ids and custom field names. Use those exact FLEXIcontent ids
+in write payloads: tag_ids/category_ids are FLEXIcontent ids, while the read API
+also exposes Joomla tag ids in relationships. Prefer small searches, then
+flexi_get_item for the full record including flexi_fields. Writes respect the
+Joomla API token's ACL. Deletion requires confirm=true.
+""".strip()
+
+server = FastMCP("flexicontent", instructions=SERVER_INSTRUCTIONS)
+
+
+@lru_cache(maxsize=1)
+def get_config() -> Config:
+    return Config.from_env()
+
+
+@lru_cache(maxsize=1)
+def get_client() -> FlexiClient:
+    return FlexiClient(get_config())
+
+
+def _add(params: Params, key: str, value: Any) -> None:
+    if value is not None:
+        params.append((key, value))
+
+
+def _page(limit: int, offset: int) -> tuple[int, int]:
+    max_limit = get_config().max_limit
+    if limit < 1:
+        raise ValueError("limit must be at least 1")
+    if offset < 0:
+        raise ValueError("offset must be zero or greater")
+    return min(limit, max_limit), offset
+
+
+def _require_writes() -> None:
+    if get_config().read_only:
+        raise ValueError("Writes are disabled by FLEXI_READONLY=1")
+
+
+def _payload(values: dict[str, Any]) -> dict[str, Any]:
+    return {key: value for key, value in values.items() if value is not None}
+
+
+@server.tool(annotations=ToolAnnotations(readOnlyHint=True, openWorldHint=True))
+def flexi_search_items(
+    query: Annotated[str | None, Field(description="Search in item titles.")] = None,
+    type_id: Annotated[int | None, Field(description="FLEXIcontent type id.")] = None,
+    category_id: Annotated[int | None, Field(description="FLEXIcontent category id.")] = None,
+    tag_id: Annotated[int | None, Field(description="FLEXIcontent tag id.")] = None,
+    state: Annotated[int | None, Field(description="Publication state. Managers may use -5, -2, 0, 1.")] = None,
+    author_id: Annotated[int | None, Field(description="Joomla author id.")] = None,
+    access: Annotated[int | None, Field(description="Joomla access level.")] = None,
+    language: Annotated[str | None, Field(description="Language tag, e.g. fr-FR.")] = None,
+    field: Annotated[str | None, Field(description="Custom field name or id to filter on.")] = None,
+    field_value: Annotated[str | None, Field(description="Value of the custom field filter.")] = None,
+    field_match: Annotated[Literal["exact", "like"], Field(description="Custom field match mode.")] = "exact",
+    ordering: Annotated[str | None, Field(description="API ordering column, e.g. a.created.")] = None,
+    direction: Annotated[Literal["asc", "desc"], Field(description="Sort direction.")] = "asc",
+    limit: Annotated[int, Field(description="Maximum number of items to return.")] = 20,
+    offset: Annotated[int, Field(description="Number of items to skip.")] = 0,
+) -> dict[str, Any]:
+    """Search FLEXIcontent items and return a compact list."""
+    limit, offset = _page(limit, offset)
+    params: Params = []
+
+    _add(params, "filter[search]", query)
+    _add(params, "filter[type]", type_id)
+    _add(params, "filter[category]", category_id)
+    _add(params, "filter[tag]", tag_id)
+    _add(params, "filter[state]", state)
+    _add(params, "filter[author]", author_id)
+    _add(params, "filter[access]", access)
+    _add(params, "filter[language]", language)
+    _add(params, "filter[field]", field)
+
+    if field_value is not None:
+        _add(params, "filter[field_value]", field_value)
+        _add(params, "filter[field_match]", field_match)
+
+    _add(params, "list[ordering]", ordering)
+    if direction != "asc":
+        _add(params, "list[direction]", direction)
+
+    params.append(("page[limit]", limit))
+    params.append(("page[offset]", offset))
+
+    response = get_client().list_items(params)
+    items = [compact_item(entry) for entry in response.get("data", []) if isinstance(entry, dict)]
+
+    return {
+        "items": items,
+        "count": len(items),
+        "pagination": response.get("meta", {}).get("pagination"),
+    }
+
+
+@server.tool(annotations=ToolAnnotations(readOnlyHint=True, openWorldHint=True))
+def flexi_get_item(
+    id: Annotated[int, Field(description="FLEXIcontent item id.", ge=1)],
+    include_fields: Annotated[bool, Field(description="Include custom flexi_fields values.")] = True,
+) -> dict[str, Any]:
+    """Get one FLEXIcontent item by id."""
+    response = get_client().get_item(id)
+    entry = response.get("data")
+
+    if not isinstance(entry, dict):
+        raise FlexiApiError(404, f"Item {id} was not found or is not visible")
+
+    return {"item": compact_item(entry, include_fields=include_fields)}
+
+
+@server.tool(annotations=ToolAnnotations(readOnlyHint=True, openWorldHint=True))
+def flexi_list_taxonomies(
+    resource: Annotated[
+        Literal["categories", "tags", "types", "fields"],
+        Field(description="Taxonomy resource to list."),
+    ],
+    query: Annotated[str | None, Field(description="Search by name, label or alias.")] = None,
+    state: Annotated[int | None, Field(description="Publication state.")] = None,
+    parent_id: Annotated[int | None, Field(description="Parent category id (categories only).")] = None,
+    level: Annotated[int | None, Field(description="Category level (categories only).")] = None,
+    language: Annotated[str | None, Field(description="Language tag (categories only).")] = None,
+    jtag: Annotated[int | None, Field(description="0/1 Joomla tag bridge filter (tags only).")] = None,
+    core: Annotated[int, Field(description="0 custom fields only, 1 core fields only (fields only).")] = 0,
+    type_id: Annotated[int | None, Field(description="Fields attached to this type id (fields only).")] = None,
+    include_form: Annotated[bool, Field(description="Include form_* pseudo-fields (fields only).")] = False,
+    limit: Annotated[int, Field(description="Maximum number of records to return.")] = 50,
+    offset: Annotated[int, Field(description="Number of records to skip.")] = 0,
+) -> dict[str, Any]:
+    """List FLEXIcontent categories, tags, types or fields."""
+    limit, offset = _page(limit, offset)
+    params: Params = []
+
+    _add(params, "filter[search]", query)
+    _add(params, "filter[state]", state)
+
+    if resource == "categories":
+        _add(params, "filter[parent_id]", parent_id)
+        _add(params, "filter[level]", level)
+        _add(params, "filter[language]", language)
+    elif resource == "tags":
+        _add(params, "filter[jtag]", jtag)
+    elif resource == "fields":
+        _add(params, "filter[core]", core)
+        _add(params, "filter[form]", 1 if include_form else 0)
+        _add(params, "filter[type]", type_id)
+
+    params.append(("page[limit]", limit))
+    params.append(("page[offset]", offset))
+
+    response = get_client().list_resource(resource, params)
+    entries = [
+        compact_taxonomy(resource, entry)
+        for entry in response.get("data", [])
+        if isinstance(entry, dict)
+    ]
+
+    return {
+        "resource": resource,
+        "entries": entries,
+        "count": len(entries),
+    }
+
+
+@server.tool(annotations=ToolAnnotations(readOnlyHint=True, openWorldHint=True))
+def flexi_describe(
+    kind: Annotated[
+        Literal["write", "fields", "types", "categories"],
+        Field(description="Which schema bundle to return."),
+    ] = "write",
+) -> dict[str, Any]:
+    """Return ids and names needed to build item write payloads."""
+    client = get_client()
+    limit = get_config().max_limit
+    result: dict[str, Any] = {"kind": kind}
+
+    if kind in ("write", "types"):
+        response = client.list_resource("types", [("page[limit]", limit)])
+        result["types"] = [compact_taxonomy("types", e) for e in response.get("data", [])]
+
+    if kind in ("write", "categories"):
+        response = client.list_resource("categories", [("page[limit]", limit)])
+        result["categories"] = [compact_taxonomy("categories", e) for e in response.get("data", [])]
+
+    if kind in ("write", "fields"):
+        response = client.list_resource(
+            "fields",
+            [("filter[core]", 0), ("filter[form]", 0), ("page[limit]", limit)],
+        )
+        result["fields"] = [compact_taxonomy("fields", e) for e in response.get("data", [])]
+
+    result["note"] = (
+        "Use FLEXIcontent ids for type_id, catid, categories and tags. "
+        "Custom fields are passed by field name in the 'fields' object."
+    )
+    return result
+
+
+@server.tool(annotations=ToolAnnotations(idempotentHint=False, openWorldHint=True))
+def flexi_create_item(
+    title: Annotated[str, Field(description="Item title. Required.", min_length=1)],
+    catid: Annotated[int, Field(description="Main FLEXIcontent category id. Required.", ge=1)],
+    type_id: Annotated[int, Field(description="FLEXIcontent type id. Required.", ge=1)],
+    alias: Annotated[str | None, Field(description="URL alias.")] = None,
+    state: Annotated[int | None, Field(description="Publication state.")] = None,
+    access: Annotated[int | None, Field(description="Joomla access level.")] = None,
+    language: Annotated[str | None, Field(description="Language tag.")] = None,
+    created_by: Annotated[int | None, Field(description="Joomla author id.")] = None,
+    tags: Annotated[list[int] | None, Field(description="FLEXIcontent tag ids.")] = None,
+    categories: Annotated[list[int] | None, Field(description="Additional FLEXIcontent category ids.")] = None,
+    fields: Annotated[dict[str, Any] | None, Field(description="Custom field values keyed by field name.")] = None,
+    text: Annotated[str | None, Field(description="Body text; split into introtext/fulltext by FLEXIcontent.")] = None,
+    introtext: Annotated[str | None, Field(description="Introductory text.")] = None,
+    fulltext: Annotated[str | None, Field(description="Text after the readmore marker.")] = None,
+    metakey: Annotated[str | None, Field(description="Meta keywords.")] = None,
+    metadesc: Annotated[str | None, Field(description="Meta description.")] = None,
+    note: Annotated[str | None, Field(description="Admin note.")] = None,
+    publish_up: Annotated[str | None, Field(description="Publication start date.")] = None,
+    publish_down: Annotated[str | None, Field(description="Publication end date.")] = None,
+    featured: Annotated[int | None, Field(description="Featured flag.")] = None,
+) -> dict[str, Any]:
+    """Create a FLEXIcontent item."""
+    _require_writes()
+
+    if not title.strip():
+        raise ValueError("title must not be empty")
+    if catid <= 0 or type_id <= 0:
+        raise ValueError("catid and type_id must be greater than zero")
+
+    payload = _payload({
+        "title": title.strip(),
+        "catid": catid,
+        "type_id": type_id,
+        "alias": alias,
+        "state": state,
+        "access": access,
+        "language": language,
+        "created_by": created_by,
+        "tags": tags,
+        "categories": categories,
+        "fields": fields,
+        "text": text,
+        "introtext": introtext,
+        "fulltext": fulltext,
+        "metakey": metakey,
+        "metadesc": metadesc,
+        "note": note,
+        "publish_up": publish_up,
+        "publish_down": publish_down,
+        "featured": featured,
+    })
+
+    response = get_client().request("POST", "/items", payload=payload)
+    entry = response.get("data") if isinstance(response, dict) else None
+
+    if not isinstance(entry, dict):
+        raise FlexiApiError(201, "Item was created but the API returned no representation")
+
+    return {"created": compact_item(entry, include_fields=True)}
+
+
+@server.tool(annotations=ToolAnnotations(idempotentHint=True, openWorldHint=True))
+def flexi_update_item(
+    id: Annotated[int, Field(description="FLEXIcontent item id.", ge=1)],
+    title: Annotated[str | None, Field(description="New title.")] = None,
+    alias: Annotated[str | None, Field(description="New URL alias.")] = None,
+    state: Annotated[int | None, Field(description="New publication state.")] = None,
+    access: Annotated[int | None, Field(description="New Joomla access level.")] = None,
+    language: Annotated[str | None, Field(description="New language tag.")] = None,
+    tags: Annotated[list[int] | None, Field(description="Replace all FLEXIcontent tag ids.")] = None,
+    categories: Annotated[list[int] | None, Field(description="Replace additional category ids.")] = None,
+    fields: Annotated[dict[str, Any] | None, Field(description="Custom field values to change.")] = None,
+    text: Annotated[str | None, Field(description="New body text.")] = None,
+    introtext: Annotated[str | None, Field(description="New introtext.")] = None,
+    fulltext: Annotated[str | None, Field(description="New fulltext.")] = None,
+    metakey: Annotated[str | None, Field(description="New meta keywords.")] = None,
+    metadesc: Annotated[str | None, Field(description="New meta description.")] = None,
+    note: Annotated[str | None, Field(description="New admin note.")] = None,
+    publish_up: Annotated[str | None, Field(description="New publication start date.")] = None,
+    publish_down: Annotated[str | None, Field(description="New publication end date.")] = None,
+    featured: Annotated[int | None, Field(description="New featured flag.")] = None,
+) -> dict[str, Any]:
+    """Partially update a FLEXIcontent item."""
+    _require_writes()
+
+    payload = _payload({
+        "title": title,
+        "alias": alias,
+        "state": state,
+        "access": access,
+        "language": language,
+        "tags": tags,
+        "categories": categories,
+        "fields": fields,
+        "text": text,
+        "introtext": introtext,
+        "fulltext": fulltext,
+        "metakey": metakey,
+        "metadesc": metadesc,
+        "note": note,
+        "publish_up": publish_up,
+        "publish_down": publish_down,
+        "featured": featured,
+    })
+
+    if not payload:
+        raise ValueError("At least one field must be provided for an update")
+
+    client = get_client()
+    before_response = client.get_item(id)
+    before_entry = before_response.get("data")
+    before = compact_item(before_entry, include_fields=True) if isinstance(before_entry, dict) else None
+
+    response = client.request("PATCH", f"/items/{id}", payload=payload)
+    entry = response.get("data") if isinstance(response, dict) else None
+    after = compact_item(entry, include_fields=True) if isinstance(entry, dict) else None
+
+    return {"before": before, "after": after}
+
+
+@server.tool(annotations=ToolAnnotations(destructiveHint=True, idempotentHint=True, openWorldHint=True))
+def flexi_delete_item(
+    id: Annotated[int, Field(description="FLEXIcontent item id.", ge=1)],
+    confirm: Annotated[bool, Field(description="Must be true to confirm deletion.")] = False,
+) -> dict[str, Any]:
+    """Delete a FLEXIcontent item. Requires confirm=true."""
+    _require_writes()
+
+    if confirm is not True:
+        raise ValueError("Deletion requires confirm=true")
+
+    client = get_client()
+    before_response = client.get_item(id)
+    before_entry = before_response.get("data")
+    before = compact_item(before_entry) if isinstance(before_entry, dict) else None
+
+    client.request("DELETE", f"/items/{id}")
+
+    return {"deleted": id, "before": before}
+
+
+def main() -> None:
+    """Run the MCP server over stdio."""
+    logging.basicConfig(level=logging.INFO)
+    LOGGER.info("Starting FLEXIcontent MCP server")
+    server.run(transport="stdio")
+
+
+if __name__ == "__main__":
+    main()
