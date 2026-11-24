@@ -98,6 +98,7 @@ function open(queue, opener = queue.input, droppedFiles = []) {
   const lang = document.documentElement.lang.toLowerCase();
   const uppy = new Uppy({
     id: queue.container.id,
+    autoProceed: droppedFiles.length > 0 && !!queue.options.autostart_on_select,
     locale: lang.startsWith('fr') ? french : /^zh-(tw|hant)/.test(lang) ? chinese : undefined,
     restrictions: {
       allowedFileTypes: extensions.length ? extensions.map(ext => '.' + ext) : null,
@@ -106,7 +107,8 @@ function open(queue, opener = queue.input, droppedFiles = []) {
     }
   });
   uppy.use(Dashboard, {
-    inline: true, target: body, width: '100%', height: 450, theme: 'auto',
+    inline: true, target: body, width: '100%', height: 450,
+    theme: dialog.closest('[data-bs-theme]')?.dataset.bsTheme === 'dark' ? 'dark' : 'light',
     proudlyDisplayPoweredByUppy: false, showProgressDetails: true,
     doneButtonHandler: () => dialog.close()
   });

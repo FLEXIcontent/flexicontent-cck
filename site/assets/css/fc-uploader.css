@@ -52,8 +52,6 @@
   padding: .75rem .5rem;
   border: 2px dashed var(--border-color, #aeb7c2);
   border-radius: .375rem;
-  background: var(--tertiary-bg, #f3f5f8);
-  color: var(--body-color, #253248);
   font-size: .875rem;
   line-height: 1.35;
   text-align: center;
@@ -61,8 +59,23 @@
   cursor: pointer;
 }
 
+.fc-native-upload .fc-upload-drop,
+.fc-upload-dialog .uppy-Dashboard-inner,
+.fc-upload-dialog .uppy-Dashboard-AddFilesPanel {
+  background: var(--tertiary-bg, #f3f5f8);
+  color: var(--body-color, #253248);
+}
+.fc-upload-dialog .uppy-Dashboard-AddFiles { border-color: var(--border-color, #aeb7c2); }
+.fc-upload-dialog .uppy-Dashboard-AddFiles-title { color: var(--body-color, #253248); }
+.fc-upload-dialog .uppy-Dashboard-browse { color: var(--link-color, #3459bc); }
+
 .fc-image-card .fc-upload-drop {
   aspect-ratio: 1;
+}
+
+/* The image field uses a transparent pixel until a thumbnail is assigned. */
+#flexicontent .fc-image-card:has(.fc_auto_uploader) .fcfield_preview_box:has(img[src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="]) {
+  display: none;
 }
 
 .fc-upload-drop .fc-upload-cloud {
@@ -122,6 +135,39 @@
   border: 0;
 }
 iframe.fc-upload-media-preview { height: 60vh; }
+.fc-upload-pdf-viewer .gcontainer {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  background: #202124;
+}
+.fc-upload-pdf-title {
+  align-content: center;
+  min-height: 44px;
+  padding-inline: 1rem 3.5rem;
+  color: #fff;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.glightbox-container.fc-upload-pdf-viewer .gclose {
+  inset: 0 auto auto;
+  inset-inline-end: 0;
+  width: 44px;
+  height: 44px;
+  opacity: 1;
+}
+.glightbox-container.fc-upload-pdf-viewer :is(.gprev, .gnext) { display: none; }
+.fc-upload-pdf-viewer :is(.gslide, .gslide-inner-content, .ginner-container, .ginlined-content, iframe.fc-upload-media-preview) {
+  width: 100%;
+  height: 100%;
+  max-height: none;
+}
+.glightbox-container.fc-upload-pdf-viewer :is(.gslide-inline, .ginlined-content) {
+  padding: 0;
+  max-height: none;
+  overflow: hidden;
+  box-shadow: none;
+}
 .fc-upload-dashboard-preview { align-self: center; width: 100%; }
 .fc-upload-dialog .fc-upload-media-preview { max-height: min(350px, 50vh); }
 .fc-upload-dialog > header {

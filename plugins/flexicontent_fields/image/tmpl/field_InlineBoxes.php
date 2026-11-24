@@ -528,7 +528,7 @@ foreach ($field->value as $index => $value)
 		</div><!-- EOF class="card" -->
 		';
 
-	if (!$image_subpath)
+	if ($use_inline_uploaders)
 	{
 		$per_value_js .= "
 			fcfield_image.showUploader('" . $field->name . '_' . $n . "', '".$field_name_js."');

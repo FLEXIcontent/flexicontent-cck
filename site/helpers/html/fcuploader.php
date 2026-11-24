@@ -48,7 +48,7 @@ abstract class JHtmlFcuploader
 		return (object) array(
 			'toggleBtn' => '
 				<button type="button" class="'.$tBtn['class'].' fc_files_uploader_toggle_btn" data-rowno="'.$n.'"
-					aria-label="'.htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_UPLOAD'), ENT_QUOTES, 'UTF-8').'" aria-expanded="false"
+					aria-label="'.htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_UPLOAD'), ENT_QUOTES, 'UTF-8').'" ' . (!empty($options['autostart_on_select']) ? 'aria-haspopup="dialog"' : 'aria-expanded="false"') . '
 					onclick="'.$tBtn['onclick'].'if (window.'.$up_tag_id.') '.$up_tag_id.'.toggleUploader(Number(this.dataset.rowno), '.$tBtn['action'].', this);">
 					' . $tBtn['text'] . '
 				</button>

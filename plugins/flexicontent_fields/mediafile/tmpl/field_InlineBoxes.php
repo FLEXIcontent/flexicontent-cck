@@ -423,7 +423,7 @@ HTML;
 		";
 	}*/
 
-	if (!$filename_original)
+	if ($use_inline_uploaders)
 	{
 		$per_value_js .= "
 			fcfield_mediafile.showUploader('" . $field->name . '_' . $n . "', '".$field_name_js."');

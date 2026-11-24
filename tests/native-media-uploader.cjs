@@ -105,24 +105,46 @@ const {chromium} = require('playwright');
 
     // A field must keep the selected PDF accessible after its upload callback destroys the queue.
     await page.addStyleTag({path: path.join(__dirname, '..', 'site', 'assets', 'css', 'fc-uploader.css')});
+    await page.addStyleTag({path: path.join(__dirname, '..', 'admin', 'assets', 'css', 'j4x.css')});
+    await page.emulateMedia({colorScheme: 'dark'});
     for (const css of ['glightbox/dist/css/glightbox.min.css', 'uppy/dist/dashboard.min.css']) {
       await page.addStyleTag({path: path.join(__dirname, '..', 'site', 'librairies', css)});
     }
     for (const asset of ['glightbox/dist/js/glightbox.min.js', 'uppy/dist/dashboard.min.js']) {
       await page.addScriptTag({path: path.join(__dirname, '..', 'site', 'librairies', asset)});
     }
+    for (const file of ['form-utils.js', 'media-field-controls.js']) {
+      await page.addScriptTag({path: path.join(__dirname, '..', 'site', 'assets', 'js', file)});
+    }
     await page.evaluate(() => {
-      window.owner = new FlexiUploader.Uploader({
+      const container = document.getElementById('fixture_0');
+      container.className = 'fc_file_uploader fc_auto_uploader';
+      container.dataset.tagidPrefix = 'fixture_';
+      const card = container.closest('section');
+      card.insertAdjacentHTML('afterbegin', '<input id="file_name" class="fc_filedata_txt" value="previous.pdf"><input class="fc_filedata_title" value="previous.pdf"><button id="upload" type="button" class="fc_files_uploader_toggle_btn" data-rowno="0" aria-haspopup="dialog">Upload</button>');
+      document.getElementById('upload').onclick = event => FlexiMediaField.beforeToggle(event.currentTarget, 'file');
+      window.fixture_ = new FlexiUploader.Uploader({
         tag_id: 'fixture_', action: '/upload', upload_maxcount: 1, autostart_on_select: true,
-        extensions: ['pdf'], handle_FileUploaded: () => owner.clearUploader(0)
+        extensions: ['pdf'], handle_FileUploaded: (queue, file, result) =>
+          FlexiMediaField.assignFile('file_name', result.data, 0, 'file')
       });
-      owner.toggleUploader(0, 'show');
+      FlexiMediaField.showUploader('file_name');
     });
     const drop = page.locator('.fc-upload-drop');
     assert.equal(await drop.locator('.fc-upload-cloud').count(), 1);
+    assert(await drop.isVisible(), 'A populated card starts open');
+    await page.locator('#upload').click();
+    await page.locator('.fc-upload-dialog[open] .uppy-Dashboard').waitFor();
+    await page.keyboard.press('Escape');
+    await page.locator('.fc-upload-dialog').waitFor({state: 'detached'});
+    assert(await drop.isVisible());
+    assert.equal(await page.locator('.fc_filedata_title').inputValue(), 'previous.pdf');
     await drop.locator('input').focus();
     await page.keyboard.press('Enter');
     const dashboard = page.locator('.fc-upload-dialog[open]');
+    assert.equal(await dashboard.locator('[data-uppy-theme]').getAttribute('data-uppy-theme'), 'light');
+    const background = el => getComputedStyle(el).backgroundColor;
+    assert.equal(await dashboard.locator('.uppy-Dashboard-inner').evaluate(background), await drop.evaluate(background));
     await dashboard.locator('input[type=file]').first().setInputFiles({
       name: 'guide.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4')
     });
@@ -132,9 +154,23 @@ const {chromium} = require('playwright');
     await dashboard.locator('.uppy-DashboardContent-save').click();
     await dashboard.locator('.uppy-StatusBar-actionBtn--upload').click();
     await dashboard.waitFor({state: 'detached'});
+    assert(await drop.isVisible(), 'Assignment keeps the replacement drop area open');
+    assert.equal(await page.locator('.fc_filedata_title').inputValue(), 'guide.pdf');
     const assignedPreview = page.locator('.fc-upload-result');
     await assignedPreview.click();
-    await page.locator('.glightbox-container iframe[title="guide.pdf"]').waitFor({state: 'attached'});
+    const pdf = page.locator('.glightbox-container iframe[title="guide.pdf"]');
+    await pdf.waitFor({state: 'attached'});
+    await page.locator('.gslide.current').evaluate(el => Promise.all(el.getAnimations({subtree: true}).map(a => a.finished)));
+    for (const viewport of [{width: 1920, height: 960}, {width: 390, height: 844}]) {
+      await page.setViewportSize(viewport);
+      const frame = await pdf.boundingBox();
+      const close = await page.locator('.glightbox-container .gclose').boundingBox();
+      assert.equal(frame.x, 0);
+      assert.equal(frame.width, viewport.width);
+      assert(frame.y >= close.y + close.height && frame.y <= 48);
+      assert.equal(frame.y + frame.height, viewport.height);
+      assert.equal(await page.locator('.gslide.current').evaluate(el => getComputedStyle(el).borderTopWidth), '0px');
+    }
     await page.keyboard.press('Escape');
     await page.locator('.glightbox-container').waitFor({state: 'detached'});
     assert.deepEqual(throwable, []);

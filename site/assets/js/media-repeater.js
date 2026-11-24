@@ -75,7 +75,7 @@ window.fcfield_media_rows = (() => {
     const current = row.querySelector('.fc_filedata_txt_nowrap');
     if (current) current.textContent = '-';
     const title = row.querySelector('.fc_filedata_title');
-    if (title) title.value = '-';
+    if (title) title.value = '';
     row.querySelectorAll('.inlinefile-secure-info, .inlinefile-stamp-info').forEach(element => element.remove());
     row.querySelectorAll('.inlinefile-secure-data, .inlinefile-stamp-data').forEach(element => FlexiForm.show(element));
   }
@@ -86,7 +86,9 @@ window.fcfield_media_rows = (() => {
     const quantum = row.querySelector('.quantummanager');
     if (quantum && typeof window.initQuantumuploadimage === 'function') window.initQuantumuploadimage(row);
     if (config.kind === 'mediafile') window.fcfield_mediafile?.initValue?.(ref.id.replace(/^custom_/, ''), config.fieldKey);
-    if (config.kind === 'image' && options.animate_visible) {
+    if (row.querySelector('.fc_auto_uploader')) {
+      FlexiMediaField.showUploader(fieldId(row, config.kind === 'image').id);
+    } else if (config.kind === 'image' && options.animate_visible) {
       const uploader = row.querySelector('.fc_file_uploader');
       if (window[uploader?.dataset.tagidPrefix]) {
         row.querySelector('.fc_files_uploader_toggle_btn')?.click();
