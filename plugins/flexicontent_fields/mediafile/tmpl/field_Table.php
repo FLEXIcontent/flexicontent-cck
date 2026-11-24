@@ -425,7 +425,8 @@ HTML;
 					' . ($allowdownloads ? $_download_btn_html : '') . '
 					' . (!$wf_zoom_slider ? '' : '
 					<div class="fc_mediafile_wf_zoom_box">
-						- <input id="fc_mediafile_slider_' . $fnn. '" type="range" min="0.5" max="200" value="0.5" class="fc_mediafile_wf_zoom" /> +
+						<label for="fc_mediafile_slider_' . $fnn . '">' . Text::_('FLEXI_FIELD_MEDIAFILE_WAVEFORM_ZOOM') . '</label>
+						<input id="fc_mediafile_slider_' . $fnn . '" type="range" min="1" max="8" step="0.25" value="1" class="fc_mediafile_wf_zoom" data-zoom-factor disabled />
 					</div>
 					') . '
 				</div>

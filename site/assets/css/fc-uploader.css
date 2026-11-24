@@ -78,6 +78,37 @@
   display: none;
 }
 
+/* A selected image occupies the drop area and accepts the next drop on the picture. */
+.fc-image-card:has(.fc-image-preview-button img[src]:not([src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="])) div:has(> .fc_auto_uploader):not(:has(.fc-native-upload-row, .fc-native-upload-message:not(:empty), .fc-field-invalid)) {
+  display: none !important; /* The uploader helper sets display inline. */
+}
+.fc_auto_uploader:has(~ .fc-upload-result img) :is(.fc-upload-drop, .fc-upload-formats) {
+  display: none;
+}
+#flexicontent .fc-image-card .fc-image-preview-button,
+#flexicontent .fc_auto_uploader ~ .fc-upload-result:has(img) {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: zoom-in;
+}
+#flexicontent .fc_auto_uploader ~ .fc-upload-result:has(img) {
+  display: block;
+  width: 100%;
+  font-size: 0;
+}
+#flexicontent .fc_auto_uploader ~ .fc-upload-result img {
+  width: 100%;
+  height: 8rem;
+  margin: 0;
+  object-fit: contain;
+}
+.fc-image-card:has(.fc-upload-dragover) .fc-image-preview-button,
+.fc-upload-dragover ~ .fc-upload-result:has(img) {
+  outline: 2px solid var(--link-color, #3459bc);
+  outline-offset: -2px;
+}
+
 .fc-upload-drop .fc-upload-cloud {
   display: grid;
   place-items: center;

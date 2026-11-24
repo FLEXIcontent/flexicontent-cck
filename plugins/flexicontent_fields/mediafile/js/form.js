@@ -297,14 +297,21 @@ class fc_Waveform_LazyLoad
 		});
 
 
-		if (!!slider) slider.oninput = fc_debounce(function()
+		function updateZoom()
 		{
-			window.console.log(slider.value);
-			var zoomLevel = parseInt(slider.value);
-			window.console.log('Zooming to: ' + zoomLevel);
-			audio_spectrum.zoom(zoomLevel);
-			updateTimer();
-		}, 200);
+			const duration = audio_spectrum.getDuration();
+			if (!slider || !audio_spectrum.loaded || !duration || !spectrum.clientWidth) return;
+			const value = Number(slider.value);
+			// Older layout overrides specify pixels per second directly.
+			const pixelsPerSecond = slider.hasAttribute('data-zoom-factor')
+				? (value === 1 ? 0 : value * spectrum.clientWidth / duration)
+				: value;
+			audio_spectrum.zoom(pixelsPerSecond);
+		}
+		if (slider) {
+			slider.oninput = fc_debounce(updateZoom, 80);
+			audio_spectrum.on('resize', updateZoom);
+		}
 
 
 		// Register new player to known players array
@@ -326,6 +333,7 @@ class fc_Waveform_LazyLoad
 			audio_spectrum.loaded = false;
 			audio_spectrum._loading_started_ = false;
 			audio_spectrum._saved_peaks_ = null;
+			if (slider) { slider.disabled = true; slider.value = slider.min; }
 			audio_spectrum.empty();
 			buttons.play.style.display = 'inline-block';
 			buttons.play.disabled = false;
@@ -387,6 +395,12 @@ class fc_Waveform_LazyLoad
 			if (!audio_spectrum.loaded)
 			{
 				audio_spectrum.loaded = true;
+				if (slider) {
+					slider.disabled = false;
+					slider.parentNode.style.display = 'inline-block';
+					slider.parentNode.style.visibility = 'visible';
+					updateZoom();
+				}
 			}
 
 			if (!!audio_spectrum.start_on_ready)
@@ -473,8 +487,6 @@ class fc_Waveform_LazyLoad
 				audio_spectrum.play();
 			}
 
-			if (!!slider) slider.parentNode.style.display    = 'inline-block';
-			if (!!slider) slider.parentNode.style.visibility = 'visible';
 			buttons.play.disabled  = true;
 			buttons.pause.disabled = false;
 			buttons.stop.disabled  = false;

@@ -173,6 +173,45 @@ const {chromium} = require('playwright');
     }
     await page.keyboard.press('Escape');
     await page.locator('.glightbox-container').waitFor({state: 'detached'});
+    // An assigned Gallery image occupies the empty tile and remains a replacement drop target.
+    await page.evaluate(() => {
+      const card = document.createElement('section');
+      card.className = 'fc-image-card fcfieldval_container';
+      card.innerHTML = '<div><div id="gallery_0" data-tagid-prefix="gallery_" class="fc_file_uploader fc_auto_uploader"></div></div><div class="fcfield_preview_box"><button type="button" class="fc-image-preview-button"><img class="fc_preview_thumb"></button></div>';
+      document.body.id = 'flexicontent';
+      document.body.append(card);
+      const picture = card.querySelector('img');
+      picture.src = FlexiMediaField.placeholder;
+      window.gallery_ = new FlexiUploader.Uploader({
+        tag_id: 'gallery_', action: '/upload', upload_maxcount: 1, autostart_on_select: true, extensions: ['png'],
+        handle_FileUploaded: (queue, file, result) => {
+          picture.src = result.preview;
+          FlexiMediaField.clearUploader(card);
+        }
+      });
+      gallery_.toggleUploader(0, 'show');
+    });
+    const gallery = page.locator('.fc-image-card');
+    const picture = gallery.locator('.fc-image-preview-button');
+    async function dropImage(target, name) {
+      await target.evaluate(async (el, name) => {
+        const canvas = document.createElement('canvas');
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+        const files = new DataTransfer();
+        files.items.add(new File([blob], name, {type: 'image/png'}));
+        el.dispatchEvent(new DragEvent('drop', {bubbles: true, cancelable: true, dataTransfer: files}));
+      }, name);
+      await dashboard.waitFor({state: 'detached'});
+      assert.equal(requests.at(-1).name, name);
+    }
+    assert(await gallery.locator('.fc-upload-drop').isVisible());
+    await dropImage(gallery.locator('.fc-upload-drop'), 'first.png');
+    assert(await picture.isVisible());
+    assert.equal(await gallery.locator('.fc-upload-drop').isVisible(), false);
+    assert.equal(await gallery.locator('.fc-upload-result').count(), 0);
+    await dropImage(picture, 'second.png');
+    await picture.locator('img').evaluate(el => { el.src = FlexiMediaField.placeholder; });
+    assert(await gallery.locator('.fc-upload-drop').isVisible());
     assert.deepEqual(throwable, []);
     console.log('Native controls, upload queue, failed assignment and retry isolation pass without jQuery.');
   } finally {
