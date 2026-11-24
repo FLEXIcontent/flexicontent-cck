@@ -998,6 +998,16 @@ class FlexicontentModelFilemanager extends FCModelAdminList
 			}
 		}
 
+		// A field picker lists files the field can actually use, before counting and pagination.
+		if ($this->getName() === 'fileselement' && $field && in_array($field->field_type, ['file', 'mediafile'], true))
+		{
+			$extensions = flexicontent_upload::getAllowedExtensions(flexicontent_upload::getUploadParams($field));
+			$localTypes = $extensions ? 'a.ext IN (' . implode(',', $this->_db->quote($extensions)) . ')' : '1 = 0';
+			$where[] = $field->field_type === 'mediafile'
+				? '(a.url <> 1 AND ' . $localTypes . ')'
+				: '(a.url <> 0 OR ' . $localTypes . ')';
+		}
+
 		// Text search and search scope
 		$scope  = $this->getState('scope');
 		$search = $this->getState('search');

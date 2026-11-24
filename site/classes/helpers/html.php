@@ -5237,7 +5237,7 @@ class flexicontent_html
 	 * @return array
 	 * @since 1.5
 	 */
-	static function buildfilesextlist($name, $attribs, $selected, $displaytype=1, $tagid=null)
+	static function buildfilesextlist($name, $attribs, $selected, $displaytype=1, $tagid=null, $extensions=null)
 	{
 		$db =Factory::getContainer()->get(DatabaseInterface::class);
 		$query = 'SELECT DISTINCT ext'
@@ -5252,7 +5252,7 @@ class flexicontent_html
 		else if ($displaytype)
 			$options[] = \Joomla\CMS\HTML\HTMLHelper::_( 'select.option', '', \Joomla\CMS\Language\Text::_( 'FLEXI_ALL_EXT' ));
 
-		foreach ($data as $val)
+		foreach ($extensions === null ? $data : array_intersect($data, $extensions) as $val)
 			$options[] = \Joomla\CMS\HTML\HTMLHelper::_( 'select.option', $val, $val);
 
 		$tagid = $tagid ? $tagid : str_replace( '[', '_', preg_replace('#\]|\[\]#', '',($name)) );

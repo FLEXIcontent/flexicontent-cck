@@ -43,6 +43,8 @@ namespace {
     $media = flexicontent_upload::getUploadParams($field);
     check($media->get('upload_extensions') === 'wav' && $media->get('ignore_extensions') === '', 'Field restrictions also apply to ignored types');
     check($media->get('upload_maxsize') === 40, 'Media fields can override the maximum size');
+    check(flexicontent_upload::getAllowedExtensions($media) === ['wav'], 'Local media picker and uploader agree on file types');
+    check(flexicontent_upload::getAllowedExtensions($global) === ['jpg', 'png', 'pdf', 'mp3'], 'File picker includes each configured extension once');
     $created = [];
     try {
         foreach (['s_sample.png','l_sample.png','s_fld7_sample.png','s_sample.webp','s_fld7_sample.webp','s_other.png','original.png'] as $name) {

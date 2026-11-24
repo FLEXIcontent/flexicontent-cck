@@ -526,6 +526,11 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 		 */
 
 		$lists = array();
+		if (!$jinput->getCmd('isxtdbtn'))
+		{
+			// The file library uses native selects in its compact search toolbar.
+			$this->select_class = 'form-select';
+		}
 
 
 		// Build publication state filter
@@ -696,18 +701,24 @@ class FlexicontentViewFileselement extends FlexicontentViewBaseRecords
 
 
 		// Build extension filter
+		$lists['picker_ext'] = flexicontent_html::buildfilesextlist(
+			'filter_ext',
+			array(
+				'class' => $this->select_class,
+				'size' => '1',
+				'aria-label' => \Joomla\CMS\Language\Text::_('FLEXI_PICKER_ALL_TYPES'),
+				'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
+			),
+			$filter_ext,
+			\Joomla\CMS\Language\Text::_('FLEXI_PICKER_ALL_TYPES'),
+			null,
+			!empty($field) && in_array($field->field_type, ['file', 'image', 'mediafile'], true)
+				? flexicontent_upload::getAllowedExtensions(flexicontent_upload::getUploadParams($field))
+				: null
+		);
 		$lists['filter_ext'] = $this->getFilterDisplay(array(
 			'label' => \Joomla\CMS\Language\Text::_('FLEXI_ALL_EXT'),
-			'html' => flexicontent_html::buildfilesextlist(
-				'filter_ext',
-				array(
-					'class' => $this->select_class,
-					'size' => '1',
-					'onchange' => 'if (!!document.adminForm.limitstart) document.adminForm.limitstart.value=0; Joomla.submitform();',
-				),
-				$filter_ext,
-				'-'
-			)
+			'html' => $lists['picker_ext']
 		));
 
 
