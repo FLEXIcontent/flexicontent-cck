@@ -122,14 +122,20 @@ abstract class JHtmlFcuploader
 
 
 		flexicontent_html::loadFramework('flexi-lib');
+		flexicontent_html::loadFramework('glightbox');
 		$document = \Joomla\CMS\Factory::getApplication()->getDocument();
 		$assetPath = \Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/assets/';
 		$version = array('version' => FLEXI_VHASH);
+		$dashboardPath = \Joomla\CMS\Uri\Uri::root(true) . '/components/com_flexicontent/librairies/uppy/dist/dashboard.min';
+		$document->addStyleSheet($dashboardPath . '.css', $version);
+		$document->addScript($dashboardPath . '.js', $version);
 		$document->addStyleSheet($assetPath . 'css/fc-uploader.css', $version);
 		$document->addScript($assetPath . 'js/fc-upload-transport.js', $version);
 		$document->addScript($assetPath . 'js/fc-uploader.js', $version);
 
 		foreach (array('FLEXI_UPLOAD', 'FLEXI_START_UPLOAD', 'FLEXI_REMOVE_FILE', 'FLEXI_THUMBNAILS',
+			'FLEXI_UPLOAD_DROP_OR_CHOOSE', 'FLEXI_UPLOAD_ACCEPTED_TYPES', 'FLEXI_PREVIEW', 'JCLOSE',
+			'FLEXI_UPLOAD_FILES', 'FLEXI_UPLOAD_MAX_EACH', 'FLEXI_ACCESS', 'FLEXI_LANGUAGE',
 			'FLEXI_UPLOADING', 'FLEXI_UPLOAD_FINISHED', 'FLEXI_PLEASE_WAIT', 'FLEXI_FILE_PROPERTIES',
 			'FLEXI_UPLOAD_TYPE_REJECTED', 'FLEXI_UPLOAD_LIMIT_REACHED', 'FLEXI_UPLOAD_ASSIGN_FAILED',
 			'JLIB_HTML_MOVE_UP', 'JLIB_HTML_MOVE_DOWN') as $key)

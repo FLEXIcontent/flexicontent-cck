@@ -102,6 +102,41 @@ const {chromium} = require('playwright');
     await page.evaluate(() => owner.clearUploader(0));
     assert.equal(await input.count(), 0);
     assert.equal(await page.locator('#toggle').getAttribute('aria-expanded'), 'false');
+
+    // A field must keep the selected PDF accessible after its upload callback destroys the queue.
+    await page.addStyleTag({path: path.join(__dirname, '..', 'site', 'assets', 'css', 'fc-uploader.css')});
+    for (const css of ['glightbox/dist/css/glightbox.min.css', 'uppy/dist/dashboard.min.css']) {
+      await page.addStyleTag({path: path.join(__dirname, '..', 'site', 'librairies', css)});
+    }
+    for (const asset of ['glightbox/dist/js/glightbox.min.js', 'uppy/dist/dashboard.min.js']) {
+      await page.addScriptTag({path: path.join(__dirname, '..', 'site', 'librairies', asset)});
+    }
+    await page.evaluate(() => {
+      window.owner = new FlexiUploader.Uploader({
+        tag_id: 'fixture_', action: '/upload', upload_maxcount: 1, autostart_on_select: true,
+        extensions: ['pdf'], handle_FileUploaded: () => owner.clearUploader(0)
+      });
+      owner.toggleUploader(0, 'show');
+    });
+    const drop = page.locator('.fc-upload-drop');
+    assert.equal(await drop.locator('.fc-upload-cloud').count(), 1);
+    await drop.locator('input').focus();
+    await page.keyboard.press('Enter');
+    const dashboard = page.locator('.fc-upload-dialog[open]');
+    await dashboard.locator('input[type=file]').first().setInputFiles({
+      name: 'guide.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4')
+    });
+    await dashboard.locator('.uppy-Dashboard-Item-action--edit').click();
+    const preview = dashboard.locator('iframe.fc-upload-media-preview');
+    assert.equal(await preview.getAttribute('title'), 'guide.pdf');
+    await dashboard.locator('.uppy-DashboardContent-save').click();
+    await dashboard.locator('.uppy-StatusBar-actionBtn--upload').click();
+    await dashboard.waitFor({state: 'detached'});
+    const assignedPreview = page.locator('.fc-upload-result');
+    await assignedPreview.click();
+    await page.locator('.glightbox-container iframe[title="guide.pdf"]').waitFor({state: 'attached'});
+    await page.keyboard.press('Escape');
+    await page.locator('.glightbox-container').waitFor({state: 'detached'});
     assert.deepEqual(throwable, []);
     console.log('Native controls, upload queue, failed assignment and retry isolation pass without jQuery.');
   } finally {
