@@ -4,6 +4,14 @@ use Joomla\CMS\Language\LanguageFactoryInterface;
 
 class flexicontent_upload
 {
+	public static function getAllowedExtensions($uconf)
+	{
+		return array_values(array_unique(array_filter(preg_split('/\s*,\s*/', strtolower(
+			$uconf->get('upload_extensions', 'bmp,wbmp,csv,doc,docx,webp,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,txt,xcf,xls,xlsx,zip,ics')
+			. ',' . $uconf->get('ignore_extensions', '')
+		)))));
+	}
+
 	/** Resolve the same upload restrictions for the field UI and the endpoint. */
 	public static function getUploadParams($field = null)
 	{

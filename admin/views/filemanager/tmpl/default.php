@@ -55,6 +55,14 @@ $editor   = $jinput->getCmd('editor', '');
 $isXtdBtn = $jinput->getCmd('isxtdbtn', '');
 $function = $jinput->getCmd('function', 'jSelectFcfile');
 $onclick  = $this->escape($function);
+$libraryPicker = $isFilesElement && !$isXtdBtn;
+if ($libraryPicker)
+{
+	$assets = Uri::root() . 'components/com_flexicontent/assets/';
+	HTMLHelper::_('stylesheet', $assets . 'css/file-picker.css', ['version' => 'auto']);
+	HTMLHelper::_('script', $assets . 'js/file-picker.js', ['version' => 'auto'], ['defer' => true]);
+}
+
 
 if (!empty($editor))
 {
@@ -179,12 +187,15 @@ $up_sfx_n = $this->fieldid ?: '_';
  * JS for Columns chooser box and Filters box
  */
 
-flexicontent_html::jscode_to_showhide_table(
-	'mainChooseColBox',
-	'adminListTableFC' . $this->getModel()->view_id,
-	$start_html = '',  //'<span class="badge ' . (FLEXI_J40GE ? 'badge-dark' : 'badge-inverse') . '">' . Text::_('FLEXI_COLUMNS', true) . '<\/span> &nbsp; ',
-	$end_html = '<button type="button" id="fc-columns-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="' . Text::_('FLEXI_HIDE') . '" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/button>'
-);
+if (!$libraryPicker)
+{
+	flexicontent_html::jscode_to_showhide_table(
+		'mainChooseColBox',
+		'adminListTableFC' . $this->getModel()->view_id,
+		$start_html = '',  //'<span class="badge ' . (FLEXI_J40GE ? 'badge-dark' : 'badge-inverse') . '">' . Text::_('FLEXI_COLUMNS', true) . '<\/span> &nbsp; ',
+		$end_html = '<button type="button" id="fc-columns-slide-btn" class="icon-arrow-up-2 btn btn-outline-secondary" title="' . Text::_('FLEXI_HIDE') . '" style="cursor: pointer;" onclick="fc_toggle_box_via_btn(\\\'mainChooseColBox\\\', document.getElementById(\\\'fc_mainChooseColBox_btn\\\'), \\\'btn-primary\\\');"><\/button>'
+	);
+}
 
 
 
@@ -698,7 +709,7 @@ if ($js)
 	<div id="fc-fileman-overlay" onclick="document.querySelectorAll('img.fc_zoomed').forEach(image => image.click());"></div>
 
 
-	<div id="flexicontent" class="flexicontent">
+	<div id="flexicontent" class="flexicontent<?php echo $libraryPicker ? ' fc-file-library' : ''; ?>">
 
 		<div class="<?php echo FLEXI_J40GE ? 'row' : 'row-fluid'; ?>" id="fileman">
 
@@ -742,6 +753,9 @@ if ($js)
 
 								<form action="index.php?option=<?php echo $this->option; ?>&amp;view=<?php echo $this->view; ?>&amp;layout=<?php echo $this->layout; ?>&amp;field=<?php echo $this->fieldid?>" method="post" name="adminForm" id="adminForm">
 
+									<?php if ($libraryPicker) : ?>
+										<?php require __DIR__ . '/picker_toolbar.php'; ?>
+									<?php else : ?>
 									<div id="fc-managers-header">
 
 										<?php if (!$this->folder_mode) : ?>
@@ -971,6 +985,9 @@ if ($js)
 
 						</div>
 
+									<?php endif; ?>
+
+						<?php if ($libraryPicker) : ?><div class="fc-picker-table"><?php endif; ?>
 						<table id="adminListTableFC<?php echo $this->getModel()->view_id; ?>" class="adminlist table fcmanlist fman_list_element">
 							<thead>
 							<tr>
@@ -1427,8 +1444,8 @@ if ($js)
 
 									<?php if ($isFilesElement) : /* Direct delete button for fileselement view */ ?>
 										<td>
-											<a class="btn btn-mini ntxt" href="javascript:;" onclick="FlexiForm.confirm('<?php echo Text::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>').then(accepted => { if (accepted) Joomla.listItemTask('cb<?php echo $i; ?>','filemanager.remove'); }); return false;">
-												<span class="icon-remove" title="<?php echo Text::_('FLEXI_REMOVE'); ?>"></span>
+											<a class="btn btn-mini ntxt" href="javascript:;" aria-label="<?php echo $this->escape(Text::_('FLEXI_REMOVE')); ?>" onclick="FlexiForm.confirm('<?php echo Text::_('FLEXI_SURE_TO_DELETE_FILE', true); ?>').then(accepted => { if (accepted) Joomla.listItemTask('cb<?php echo $i; ?>','filemanager.remove'); }); return false;">
+												<span class="<?php echo $libraryPicker ? 'icon-trash' : 'icon-remove'; ?>" aria-hidden="true" title="<?php echo Text::_('FLEXI_REMOVE'); ?>"></span>
 											</a>
 										</td>
 									<?php endif; ?>
@@ -1472,6 +1489,7 @@ if ($js)
 							</tfoot>
 
 						</table>
+						<?php if ($libraryPicker) : ?></div><?php endif; ?>
 
 						<div id="adminListThumbsFCfiles<?php echo $this->layout.$this->fieldid; ?>" class="adminthumbs fcmanthumbs fman_grid_element" style="display: none;">
 							<?php
@@ -1555,7 +1573,9 @@ if ($js)
 
 						</div>
 
-						<?php if (!$this->folder_mode) : ?>
+						<?php if ($libraryPicker && !$this->rows) : ?>
+							<p class="fc-picker-empty"><?php echo Text::_('JGLOBAL_NO_MATCHING_RESULTS'); ?></p>
+						<?php elseif (!$this->folder_mode) : ?>
 							<?php echo $pagination_footer; ?>
 						<?php endif; ?>
 

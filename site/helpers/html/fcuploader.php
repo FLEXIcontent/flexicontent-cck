@@ -188,10 +188,7 @@ abstract class JHtmlFcuploader
 
 		// Try field with upload_maxsize and resize_on_upload parameters
 		$u = array();
-		$u['extensions'] = array_values(array_unique(array_filter(preg_split('/\s*,\s*/', strtolower(
-			$uconf->get('upload_extensions', 'bmp,wbmp,csv,doc,docx,webp,gif,ico,jpg,jpeg,odg,odp,ods,odt,pdf,png,ppt,pptx,txt,xcf,xls,xlsx,zip,ics')
-			. ',' . $uconf->get('ignore_extensions', '')
-		)))));
+		$u['extensions'] = flexicontent_upload::getAllowedExtensions($uconf);
 		$u['upload_maxsize']   = (int) $uconf->get('upload_maxsize', 10000000);
 		$u['resize_on_upload'] = (int) $uconf->get('resize_on_upload', 1);
 
