@@ -336,7 +336,7 @@ class JFormFieldFields extends \Joomla\CMS\Form\FormField
 				$sorter_html .= '
 					<li data-value="field_'.$val.'" class="fcrecord">
 						<span class="fcprop_box">'.$v2f[$val]->option_text.'</span>
-						<span class="delfield_handle" title="'.\Joomla\CMS\Language\Text::_('FLEXI_REMOVE').'" onclick="fcfield_del_sortable_element(this);"></span>
+						<button type="button" class="delfield_handle" title="'.\Joomla\CMS\Language\Text::_('FLEXI_REMOVE').'" onclick="fcfield_del_sortable_element(this);"></button>
 					</li>';
 			}
 			$sorter_html .= '

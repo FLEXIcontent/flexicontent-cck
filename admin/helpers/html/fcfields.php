@@ -181,9 +181,9 @@ abstract class JHtmlFcfields extends JHtmlFcbase
 				}
 
 				return '
-				<span class="btn btn-primary" onclick="fc_toggle_box_via_btn(\'fieldgroup_fields_list_' . $row->id . '\', this);">'
+				<button type="button" class="btn btn-primary" onclick="fc_toggle_box_via_btn(\'fieldgroup_fields_list_' . $row->id . '\', this);">'
 					. ucfirst($row_type) . ' ' . \Joomla\CMS\Language\Text::_('FLEXI_FIELDS') . '
-				</span>
+				</button>
 				<div id="fieldgroup_fields_list_' . $row->id . '" style="display: none; position: absolute; width: 200px;">
 					<div class="alert alert-info" style="margin: 0; padding: 4px 12px;">
 						' . implode('<br>', $field_links) . '

@@ -2369,18 +2369,18 @@ class flexicontent_html
 						'. $text . '
 					</div>' : '') . '
 					<span class="readmore">
-						<span style="cursor: pointer;" class="btn btn-mini" onclick="' . $box_js . ' fc_file_props_handle = fc_showAsDialog(box, 800, 600, null, { title: \'' . \Joomla\CMS\Language\Text::_($options['modal_title']) . '\'}); return false;">
+						<button type="button" style="cursor: pointer;" class="btn btn-mini" onclick="' . $box_js . ' fc_file_props_handle = fc_showAsDialog(box, 800, 600, null, { title: \'' . \Joomla\CMS\Language\Text::_($options['modal_title']) . '\'}); return false;">
 							<span class="'.$options['more_icon'].'"></span>
 							'.\Joomla\CMS\Language\Text::_($options['more_txt']).'
-						</span>
+						</button>
 					</span>';
 				break;
 			case 1:
 				$text2 = '
-					<span style="cursor: pointer;" class="btn btn-mini" onclick="var box = this.nextElementSibling; box.style.display = box.style.display == \'none\' ? \'block\' : \'none\'; return false;">
+					<button type="button" style="cursor: pointer;" class="btn btn-mini" onclick="var box = this.nextElementSibling; box.style.display = box.style.display == \'none\' ? \'block\' : \'none\'; return false;">
 						<span class="'.$options['more_icon'].'"></span>
 						'.\Joomla\CMS\Language\Text::_($options['more_txt']).'
-					</span>
+					</button>
 					<span class="fc_cutted_text" style="display: none;">
 						' . htmlspecialchars(StringHelper::substr($cleantext, $chars), ENT_COMPAT, 'UTF-8') . '
 					</span>';
@@ -3413,12 +3413,16 @@ class flexicontent_html
 			);
 
 			$output = '
-			<div class="statetoggler ' . $button_classes . ' ' . $tooltip_class . '" ' . ($tooltip_placement ? ' data-placement="' . $tooltip_placement . '"' : '') . ' title="' . $tooltip_title . '" onclick="fc_statehandler_singleton.toggleSelector(this)">
+			<div class="statetoggler ' . $button_classes . ' ' . $tooltip_class . '" ' . ($tooltip_placement ? ' data-placement="' . $tooltip_placement . '"' : '') . ' title="' . $tooltip_title . '">
 				<div class="statetoggler_inner">
-					<div id="row' . $record->id . '" class="stateopener ntxt">
+					<button type="button" id="row' . $record->id . '" class="stateopener ntxt"
+						aria-label="' . htmlspecialchars(\Joomla\CMS\Language\Text::_('FLEXI_CHANGE_STATE'), ENT_QUOTES, 'UTF-8') . '"
+						aria-description="' . htmlspecialchars(strip_tags($state_text ?: $state_names[$state]), ENT_QUOTES, 'UTF-8') . '"
+						aria-expanded="false" aria-controls="fc-state-options-' . $record->id . '"
+						onclick="fc_statehandler_singleton.toggleSelector(this)">
 						' . $stateicon . '
-					</div>
-					<div class="options" data-id="' . $record->id . '" ' . $state_js_ids_list . ' ' . $state_js_titles_list . '></div>
+					</button>
+					<div class="options" id="fc-state-options-' . $record->id . '" data-id="' . $record->id . '" ' . $state_js_ids_list . ' ' . $state_js_titles_list . '></div>
 				</div>
 			</div>';
 		}

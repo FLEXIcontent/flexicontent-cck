@@ -886,7 +886,7 @@ $items_task = 'task=items.';
 				<tr>
 					<td colspan="3">
 						... &nbsp;
-						<?php echo '<span class="'.$btn_class.'" onclick="window.open(\''.$show_all_link.'\')" >' . \Joomla\CMS\Language\Text::_('FLEXI_SHOW_ALL') . ' ( ' . \Joomla\CMS\Language\Text::_('FLEXI_ITEMS_MANAGER') . ' )</span><br/>'; ?>
+						<?php echo '<button type="button" class="'.$btn_class.'" onclick="window.open(\''.$show_all_link.'\')" >' . \Joomla\CMS\Language\Text::_('FLEXI_SHOW_ALL') . ' ( ' . \Joomla\CMS\Language\Text::_('FLEXI_ITEMS_MANAGER') . ' )</button><br/>'; ?>
 					</td>
 				</tr>
 				</tbody>
@@ -941,7 +941,7 @@ $items_task = 'task=items.';
 				<tr>
 					<td colspan="3">
 						... &nbsp;
-						<?php echo '<span class="'.$btn_class.'" onclick="window.open(\''.$show_all_link.'\')" >' . \Joomla\CMS\Language\Text::_('FLEXI_SHOW_ALL') . ' ( ' . \Joomla\CMS\Language\Text::_('FLEXI_ITEMS_MANAGER') . ' )</span><br/>'; ?>
+						<?php echo '<button type="button" class="'.$btn_class.'" onclick="window.open(\''.$show_all_link.'\')" >' . \Joomla\CMS\Language\Text::_('FLEXI_SHOW_ALL') . ' ( ' . \Joomla\CMS\Language\Text::_('FLEXI_ITEMS_MANAGER') . ' )</button><br/>'; ?>
 					</td>
 				</tr>
 				</tbody>
@@ -997,7 +997,7 @@ $items_task = 'task=items.';
 				<tr>
 					<td colspan="3">
 						... &nbsp;
-						<?php echo '<span class="'.$btn_class.'" onclick="window.open(\''.$show_all_link.'\')" >' . \Joomla\CMS\Language\Text::_('FLEXI_SHOW_ALL') . ' ( ' . \Joomla\CMS\Language\Text::_('FLEXI_ITEMS_MANAGER') . ' )</span><br/>'; ?>
+						<?php echo '<button type="button" class="'.$btn_class.'" onclick="window.open(\''.$show_all_link.'\')" >' . \Joomla\CMS\Language\Text::_('FLEXI_SHOW_ALL') . ' ( ' . \Joomla\CMS\Language\Text::_('FLEXI_ITEMS_MANAGER') . ' )</button><br/>'; ?>
 					</td>
 				</tr>
 				</tbody>

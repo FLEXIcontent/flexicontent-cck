@@ -63,21 +63,14 @@ var fc_statehandler = function(options)
 		}
 	};
 
-	// As jQuery's :hidden
-	var isHidden = function(el)
-	{
-		return !(el.offsetWidth || el.offsetHeight || el.getClientRects().length);
-	};
-
 	// As jQuery's .slideToggle(): animate height, padding and margin from / to zero
-	var slideToggle = function(el, ms)
+	var slideToggle = function(el, show, ms)
 	{
 		if (el.fcSlide)
 		{
-			el.fcSlide.finish();
+			el.fcSlide.onfinish = null;
+			el.fcSlide.cancel();
 		}
-
-		var show = isHidden(el);
 
 		if (show)
 		{
@@ -153,6 +146,7 @@ var fc_statehandler = function(options)
 				if (toggler && typeof data.title != 'undefined')
 				{
 					toggler.setAttribute('data-original-title', data.title);
+					if (row.matches('button.stateopener')) row.setAttribute('aria-description', data.title);
 				}
 
 				if (typeof data.error != 'undefined')
@@ -181,9 +175,12 @@ var fc_statehandler = function(options)
 	{
 		if (!fc_statehandler_singleton) return;
 
-		var toggler = el;
-		var ops = toggler.querySelector('.options');
+		var toggler = el.closest('.statetoggler');
+		var ops = toggler?.querySelector('.options');
 		if (!ops) return;
+		var button = toggler.querySelector('button.stateopener');
+		var show = this.active_selector_box !== toggler;
+		if (button) button.setAttribute('aria-expanded', String(show));
 
 		var fc_state_titles = typeof _fc_state_titles != 'undefined' ? _fc_state_titles : {
 			 '1': 'FLEXI_PUBLISH_THIS_ITEM',
@@ -196,30 +193,52 @@ var fc_statehandler = function(options)
 			 'u': 'FLEXI_UNKNOWN'
 		};
 
-		if (isHidden(ops))
+		if (show)
 		{
-			this.active_selector_box = null;
+			if (this.active_selector_box && this.active_selector_box !== toggler)
+			{
+				this.toggleSelector(this.active_selector_box);
+			}
 
 			toggler.classList.add('active');
 			toggler.style.zIndex = 100; // should 3 or more
 
 			if (ops.children.length == 0)
 			{
-				var html = ''; //'<div>' + text('FLEXI_ACTION') + '</div>';
-
 				var iid    = ops.getAttribute('data-id');
 				var states = jsonData(ops, 'st') || [];
 				var titles = jsonData(ops, 'tt');
 
-				states.forEach(function(item)
+				states.forEach(item =>
 				{
-					var action_text = (titles && !! titles[item.i]) ? (text('FLEXI_SET_STATE_TO') + ' ' + titles[item.i]) : text(fc_state_titles[item.i]);
-
-					html += fc_statehandler_singleton.options.font_icons
-						? '<span onclick="fc_statehandler_singleton.setState(\'' + item.i + '\', \'' + iid + '\')"><span class="icon-' + fc_state_icons[item.i] + '"></span>' + action_text + '</span>'
-						: '<span onclick="fc_statehandler_singleton.setState(\'' + item.i + '\', \'' + iid + '\')"><img src="' + fc_statehandler_singleton.options.img_path + fc_state_imgs[item.i] + '"/>' + action_text + '</span>';
+					var action = document.createElement('button');
+					action.type = 'button';
+					var icon;
+					if (this.options.font_icons)
+					{
+						icon = document.createElement('span');
+						icon.className = 'icon-' + fc_state_icons[item.i];
+						icon.setAttribute('aria-hidden', 'true');
+					}
+					else
+					{
+						icon = document.createElement('img');
+						icon.src = this.options.img_path + fc_state_imgs[item.i];
+						icon.alt = '';
+					}
+					var label = titles && titles[item.i]
+						? text('FLEXI_SET_STATE_TO') + ' ' + titles[item.i]
+						: text(fc_state_titles[item.i]);
+					action.append(icon, label);
+					action.addEventListener('click', event =>
+					{
+						event.stopPropagation();
+						button?.focus();
+						this.toggleSelector(toggler);
+						this.setState(item.i, iid);
+					});
+					ops.append(action);
 				});
-				ops.insertAdjacentHTML('beforeend', html);
 			}
 			this.active_selector_box = toggler;
 		}
@@ -227,12 +246,15 @@ var fc_statehandler = function(options)
 		{
 			this.active_selector_box = null;
 
-			setTimeout(function(){
-				toggler.classList.remove('active');
-				toggler.style.zIndex = '';
+			setTimeout(() => {
+				if (this.active_selector_box !== toggler)
+				{
+					toggler.classList.remove('active');
+					toggler.style.zIndex = '';
+				}
 			}, 200);
 		}
-		slideToggle(ops, 200);
+		slideToggle(ops, show, 200);
 	};
 
 
@@ -244,8 +266,7 @@ var fc_statehandler = function(options)
 		if (!box) return;  // no open container
 		if (box === event.target || box.contains(event.target)) return;  // if target of the click is the container or a descendant of it
 
-		box.click();
-		this.active_selector_box = null;
+		this.toggleSelector(box);
 	};
 };
 
@@ -255,4 +276,20 @@ var fc_statehandler_singleton = false;
 document.addEventListener('mouseup', function(event)
 {
 	if (fc_statehandler_singleton) fc_statehandler_singleton.closeSelector(event);
+});
+
+document.addEventListener('keydown', function(event)
+{
+	var box = fc_statehandler_singleton && fc_statehandler_singleton.active_selector_box;
+	if (event.defaultPrevented || event.key !== 'Escape' || !box || !box.contains(event.target)) return;
+	event.preventDefault();
+	box.querySelector('button.stateopener')?.focus();
+	fc_statehandler_singleton.toggleSelector(box);
+});
+
+document.addEventListener('focusout', function(event)
+{
+	var box = fc_statehandler_singleton && fc_statehandler_singleton.active_selector_box;
+	if (!box || !box.contains(event.target) || !event.relatedTarget || box.contains(event.relatedTarget)) return;
+	fc_statehandler_singleton.toggleSelector(box);
 });
