@@ -867,6 +867,13 @@ if ($js)
 												</div>
 											</div>
 
+											<?php if ($enable_multi_uploader && ($this->CanUpload || ($isFilesElement && $this->layout === 'image'))) : ?>
+												<button type="button" class="btn btn-primary" data-fc-upload-dashboard
+													onclick="<?php echo $uploader_tag_id; ?>.openDashboard('<?php echo $up_sfx_n; ?>', this)">
+													<span class="icon-upload" aria-hidden="true"></span>
+													<?php echo Text::_('FLEXI_UPLOAD_FILES'); ?>
+												</button>
+											<?php endif; ?>
 											<?php echo '
 						<button type="button" style="cursor: pointer;" class="fc_shown_1271 ' . $this->btn_sm_class . ' btn-success ' . $this->tooltip_class . '"
 							onclick="var box = document.getElementById(\'fc-fileman-addfiles\'); fc_fm_add_handle = fc_showAsDialog(box, 0, 0, null, { title: \'' . Text::_('FLEXI_ADD_FILE',  true) . '\', visibleOnClose: 1, paddingW: 10, paddingH: 10}); return false;"

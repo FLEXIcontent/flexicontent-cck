@@ -36,6 +36,7 @@ window.FlexiMediaField = (() => {
 
   function clearUploader(box) {
     box = FlexiForm.element(box);
+    box?.querySelectorAll('.fc-upload-result').forEach(button => button.remove());
     box?.querySelectorAll('.fc_file_uploader').forEach(container => {
       const prefix = container.dataset.tagidPrefix;
       const suffix = prefix ? container.id.slice(prefix.length) : '';
@@ -62,7 +63,7 @@ window.FlexiMediaField = (() => {
       return null;
     }
     return response.data ? {
-      target, file: response.data,
+      target, file: response.preview ? {...response.data, preview: response.preview} : response.data,
       preview: response.preview || container.querySelector('.plupload_img_preview > img')?.getAttribute('src') || ''
     } : null;
   }
@@ -111,6 +112,7 @@ window.FlexiMediaField = (() => {
   function clearMediaFile(button, emptyPreview, clearPreview) {
     const box = row(button);
     if (!box) return;
+    box.querySelector('.fc-upload-result')?.remove();
     const hadValue = hasFile(box);
     const field = box.querySelector('.fc_media_file_box .fc_mediafile');
     const input = box.querySelector('.fc_filedata_txt');

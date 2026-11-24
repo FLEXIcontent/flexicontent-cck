@@ -66,6 +66,7 @@ window.fcfield_media_rows = (() => {
       if (!image && !config.previewAlways) preview.parentElement.style.display = 'none';
     }
     row.querySelector('.fc-waveform-status')?.remove();
+    row.querySelector('.fc-upload-result')?.remove();
     const filename = row.querySelector('.fc_filedata_txt');
     if (filename) {
       for (const attr of ['data-filename', 'data-wfpreview', 'data-wfpeaks', 'data-wforiginal']) filename.removeAttribute(attr);
