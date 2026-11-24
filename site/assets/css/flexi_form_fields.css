@@ -3178,6 +3178,13 @@ textarea.fcfield_textareaval {
 #flexicontent .fc-asset-meta > :empty,
 #flexicontent .fc-asset-tile:empty,
 #flexicontent .fc-media-card:not(.fc-file-card) .fc-asset-tile { display: none; }
+/* File card: the Title is the heading, the file name / URL below it is smaller and muted (the markup keeps the name first) */
+#flexicontent .fc-file-card .fc-asset-details { display: flex; flex-direction: column; }
+#flexicontent .fc-file-card .fc-asset-title { order: 1; color: inherit; font-size: 1rem; font-weight: 600; line-height: 1.35; }
+#flexicontent .fc-file-card .fc-asset-name { order: 2; color: var(--fc-card-muted); font-size: .8125rem; font-weight: 400; line-height: 1.35; }
+#flexicontent .fc-file-card .fc-asset-meta { order: 3; }
+/* Without a Title the file name is the heading */
+#flexicontent .fc-file-card .fc-asset-details:has(> .fc-asset-title:empty) > .fc-asset-name { color: inherit; font-size: 1rem; font-weight: 600; }
 #flexicontent .fc-media-card .fc-field-value-properties-box > .fc_uploader_n_props_box {
   padding: 0 var(--fc-card-inset);
 }

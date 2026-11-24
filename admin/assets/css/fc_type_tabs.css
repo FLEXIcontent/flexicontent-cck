@@ -147,7 +147,8 @@
 /* The filter row below the tabs: a white band over the full width (grey tabs, white filter row, grey table header),
    with no gap before the table */
 .fc-type-tabs ~ #fc-managers-header,
-#fc-managers-header.fc-mh-solo {
+#fc-managers-header.fc-mh-solo,
+#flexicontent #fc-managers-header.fc-mh-items {
 	display: flow-root;
 	margin: 0 !important;
 	padding: 10px 12px 5px;
@@ -155,23 +156,32 @@
 }
 
 [data-bs-theme="dark"] .fc-type-tabs ~ #fc-managers-header,
-[data-bs-theme="dark"] #fc-managers-header.fc-mh-solo {
+[data-bs-theme="dark"] #fc-managers-header.fc-mh-solo,
+[data-bs-theme="dark"] #flexicontent #fc-managers-header.fc-mh-items {
 	background: var(--card-bg, #23282d);
 }
 
 .fc-type-tabs ~ .fcclear,
-#fc-managers-header.fc-mh-solo ~ .fcclear {
+#fc-managers-header.fc-mh-solo ~ .fcclear,
+#fc-managers-header.fc-mh-items ~ .fcclear {
 	height: 0;
 	margin: 0;
 	padding: 0;
 }
 
 .fc-type-tabs ~ .fc-table-wrap,
-.fc-type-tabs ~ .fc-table-wrap > table,
 .fc-type-tabs ~ table.fcmanlist,
 #fc-managers-header.fc-mh-solo ~ .fc-table-wrap,
-#fc-managers-header.fc-mh-solo ~ .fc-table-wrap > table,
-#fc-managers-header.fc-mh-solo ~ table.fcmanlist {
+#fc-managers-header.fc-mh-solo ~ table.fcmanlist,
+#fc-managers-header.fc-mh-items ~ .fc-table-wrap,
+#fc-managers-header.fc-mh-items ~ table.fcmanlist {
+	margin-top: 0 !important;
+}
+
+/* The table may be inside an extra scroll wrapper (.fc-table-scroll), so it is selected as a descendant */
+.fc-type-tabs ~ .fc-table-wrap table.fcmanlist,
+#fc-managers-header.fc-mh-solo ~ .fc-table-wrap table.fcmanlist,
+#fc-managers-header.fc-mh-items ~ .fc-table-wrap table.fcmanlist {
 	margin-top: 0 !important;
 }
 
