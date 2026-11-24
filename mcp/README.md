@@ -78,7 +78,9 @@ flexicontent-mcp --profile prod --transport streamable-http --port 8000 \
 Endpoint : `http://127.0.0.1:8000/mcp`. Écouter sur `127.0.0.1` et placer un
 reverse proxy authentifié devant avant exposition. Le token Joomla reste côté
 serveur. Voir [`docs/mcp-clients.md`](../docs/mcp-clients.md) pour OpenCode,
-Claude Desktop, Claude Code, Cursor, VS Code/Copilot et Windsurf.
+Claude Desktop, Claude Code, Cursor, VS Code/Copilot et Windsurf. Un tutoriel
+prêt à publier est aussi disponible dans
+[`docs/tutoriel-mcp.md`](../docs/tutoriel-mcp.md).
 
 ## Configuration OpenCode
 
