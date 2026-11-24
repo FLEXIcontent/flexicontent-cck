@@ -3131,8 +3131,7 @@ textarea.fcfield_textareaval {
   margin: .5rem 0;
   border-radius: .375rem;
 }
-#flexicontent .fc-video-preview-box:has(.sm_preview iframe[src="about:blank"]),
-#flexicontent .fc-video-preview-box:has(.sm_preview:empty) {
+#flexicontent .fc-video-card .sm_preview iframe:is(:not([src]), [src=""], [src="about:blank"]) {
   display: none;
 }
 #flexicontent .fc-media-card .fc-field-value-properties-box:has(.fc-asset-summary) > .fc_filedata_txt,
@@ -3242,10 +3241,15 @@ textarea.fcfield_textareaval {
 }
 
 #flexicontent .card:is(.fc-image-card, .fc-video-card) .fc-image-bottom-toolbar {
+  padding-inline: .5rem;
   width: 100%;
   box-sizing: border-box;
 }
+#flexicontent .card.fc-media-card .fc-image-bottom-toolbar {
+  padding-inline: var(--fc-card-inset);
+}
 #flexicontent .card:is(.fc-image-card, .fc-video-card) .fc-image-bottom-toolbar .fc-image-btn-group {
+  padding-inline: 0;
   display: grid !important;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 2.75rem), 1fr));
   width: 100%;
@@ -3261,6 +3265,14 @@ textarea.fcfield_textareaval {
   height: auto;
   min-height: 2.75rem;
   padding: .3rem .15rem !important;
+}
+#flexicontent .card:is(.fc-image-card, .fc-video-card) .fc-image-bottom-toolbar .fc-image-btn-group > :is(button, [role="button"]):first-child {
+  align-items: flex-start !important;
+  padding-inline-start: 0 !important;
+}
+#flexicontent .card:is(.fc-image-card, .fc-video-card) .fc-image-bottom-toolbar .fc-image-btn-group > :is(button, [role="button"]):last-child:not(:first-child) {
+  align-items: flex-end !important;
+  padding-inline-end: 0 !important;
 }
 #flexicontent .fc-image-bottom-toolbar .fcfield-clearvalue:has(.fc-tool-label)::before {
   content: none !important;
