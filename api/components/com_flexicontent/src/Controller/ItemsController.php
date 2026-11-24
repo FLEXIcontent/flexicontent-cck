@@ -238,7 +238,8 @@ class ItemsController extends ApiController
         $model = $this->getModel('item', '', ['ignore_request' => true]);
 
         if (!$model || !$model->deleteViaLegacy($id)) {
-            throw new SaveException($model ? $model->getError() : 'Model not found', 500);
+            // Do not expose internal/legacy errors to API clients.
+            throw new SaveException('JLIB_APPLICATION_ERROR_DELETE_FAILED', 500);
         }
 
         $this->app->setHeader('status', 204);
@@ -254,8 +255,12 @@ class ItemsController extends ApiController
      */
     private function getPayload(): array
     {
-        $json = json_decode((string) $this->input->json->getRaw(), true);
-        $data = $this->input->get('data', \is_array($json) ? $json : [], 'array');
+        $raw  = (string) $this->input->json->getRaw();
+        $json = $raw !== '' ? json_decode($raw, true) : null;
+
+        // Prefer the request body: a 'data' query parameter must not be able to
+        // replace or pollute the JSON payload sent by the client.
+        $data = \is_array($json) ? $json : $this->input->get('data', [], 'array');
 
         if (!\is_array($data)) {
             throw new SaveException('Invalid JSON payload.', 400);

@@ -214,7 +214,10 @@ final class WriteHelper
             }
         }
 
-        $data['id']     = $isNew ? 0 : (int) ($payload['id'] ?? ($stored->id ?? 0));
+        // The resource id comes only from the URL/stored row. A client-supplied
+        // 'id' (e.g. a JSON:API envelope) must never redirect the write to a
+        // different item.
+        $data['id']     = $isNew ? 0 : (int) ($stored->id ?? 0);
         $data['vstate'] = (int) ($payload['vstate'] ?? 2);
 
         // Tags and secondary categories use FLEXIcontent ids, like the 'tag_ids'
