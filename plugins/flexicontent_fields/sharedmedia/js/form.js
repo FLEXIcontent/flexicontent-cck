@@ -5,6 +5,7 @@ window.fcfield_sharemedia = (() => {
   const youtube_key = [];
   const field = (id, name) => document.getElementById(id + '_' + name);
   const message = id => document.getElementById('fcfield_message_box_' + id);
+  const legacyFrames = 'iframe.sharedmedia:not(.fc-video-preview-box iframe)';
 
   function setHeight(selector, factor) {
     for (const frame of document.querySelectorAll(selector)) frame.style.height = Math.floor(factor * frame.clientWidth) + 'px';
@@ -63,7 +64,7 @@ window.fcfield_sharemedia = (() => {
     frame.style.cssText = 'width:100%;height:100%;border:0;';
     frame.allowFullscreen = true;
     preview.append(frame);
-    requestAnimationFrame(() => setHeight('iframe.sharedmedia', 2/3));
+    requestAnimationFrame(() => setHeight(legacyFrames, 2/3));
   }
 
   function clearData(id) {
@@ -144,10 +145,18 @@ window.fcfield_sharemedia = (() => {
     }
   }
 
-  window.addEventListener('resize', () => setHeight('iframe.sharedmedia', 2/3));
-  document.addEventListener('DOMContentLoaded', () => setHeight('iframe.sharedmedia', 2/3), {once:true});
+  document.addEventListener('keydown', event => {
+    if (event.key !== 'Enter' || event.defaultPrevented || event.isComposing || event.keyCode === 229 || !event.target.matches?.('input.sm_url')) return;
+    const fetchButton = event.target.closest('.fc-video-card')?.querySelector('.fc-sm-fetch-btn');
+    if (!fetchButton) return;
+    event.preventDefault();
+    if (!event.repeat) fetchButton.click();
+  });
+
+  window.addEventListener('resize', () => setHeight(legacyFrames, 2/3));
+  document.addEventListener('DOMContentLoaded', () => setHeight(legacyFrames, 2/3), {once:true});
   document.addEventListener('mouseenter', event => {
-    if (event.target.matches?.('.fcfield_sharedmedia_valuebox')) setHeight('iframe.sharedmedia', 2/3);
+    if (event.target.matches?.('.fcfield_sharedmedia_valuebox')) setHeight(legacyFrames, 2/3);
   }, true);
 
   return { debugToConsole, use_native_apis, youtube_key, fetchData, clearData, setMetaData, setEmbedData, toggleMETArows, toggleURL, toggleFields, setHeight, youtubeDurationToSeconds };

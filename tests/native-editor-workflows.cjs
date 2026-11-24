@@ -972,9 +972,10 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
 
   await test('Shared Media metadata fills native form values and clears the embed', async page => {
     const props = ['title','author','duration','description','thumb','api_type','media_id','embed_url','height','width'];
-    await form(page, '<input id="clip_url"><div id="fcfield_message_box_clip"></div><table>' +
+    await form(page, '<div class="fc-video-card"><input class="sm_url" id="clip_url"><button type="button" class="fc-sm-fetch-btn">Fetch</button>' +
+      '<div id="fcfield_message_box_clip"></div><table>' +
       props.map(key => '<tr><td><input id="clip_' + key + '" name="' + key + '"></td></tr>').join('') +
-      '<tr><td id="clip_preview"></td></tr></table>');
+      '<tr><td id="clip_preview"></td></tr></table></div><button type="submit">Save</button>');
     await page.route('https://www.youtube.com/embed/**', route => route.fulfill({body:''}));
     await page.route('https://www.googleapis.com/youtube/v3/videos?**', route => {
       assert.equal(new URL(route.request().url()).searchParams.get('id'), 'dQw4w9WgXcQ');
@@ -987,10 +988,13 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
       await page.addScriptTag({content: source(file)});
     }
     await page.locator('#clip_url').fill('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
-    await page.evaluate(async () => {
+    await page.evaluate(() => {
       fcfield_sharemedia.use_native_apis.clip = 1;
-      await fcfield_sharemedia.fetchData('clip', 'clip');
+      document.querySelector('.fc-sm-fetch-btn').onclick = () => fcfield_sharemedia.fetchData('clip', 'clip');
+      document.forms.adminForm.onsubmit = event => { event.preventDefault(); throw new Error('Enter submitted the item'); };
     });
+    await page.locator('#clip_url').press('Enter');
+    await page.waitForFunction(() => document.getElementById('clip_media_id').value === 'dQw4w9WgXcQ');
     assert.equal(await page.locator('#clip_title').inputValue(),'Fixture <b>title</b>');
     assert.equal(await page.locator('#clip_duration').inputValue(),'73');
     assert.equal(await page.locator('#clip_media_id').inputValue(),'dQw4w9WgXcQ');
@@ -1002,6 +1006,7 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
 
   await test('Shared Media card panels and clones keep independent controls', async page => {
     await form(page, `<div id="clip-row"><button type="button" class="fc-sm-url-btn" data-for="clip_0" onclick="fcfield_sharemedia.toggleURL('clip_0')">URL</button>
+      <button type="button" class="fc-sm-fetch-btn" data-for="clip_0">Fetch</button>
       <button type="button" class="fc-sm-edit-btn" data-for="clip_0" onclick="fcfield_sharemedia.toggleFields('clip_0')">Edit</button>
       <div class="sm_url_props" data-name="clip_0" style="display:none"><input class="sm_url" id="clip_0_url" value="https://example.test/first"></div>
       <div class="sm_value_props" data-name="clip_0" style="display:none">${['title','author','duration','description','thumb','api_type','media_id','embed_url'].map(key => `<input id="clip_0_${key}" name="custom[clip][0][${key}]"><label for="clip_0_${key}">${key}</label>`).join('')}</div>
@@ -1026,6 +1031,12 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
     assert.equal(await second.locator('.sm_url').inputValue(),'');
     await second.locator('.fc-sm-url-btn').click();
     await second.locator('.sm_url').fill('https://example.test/second');
+    await page.evaluate(() => document.querySelectorAll('.fc-sm-fetch-btn').forEach(button => {
+      button.addEventListener('click', () => button.dataset.clicks = String(Number(button.dataset.clicks || 0) + 1));
+    }));
+    await second.locator('.sm_url').press('Enter');
+    assert.equal(await second.locator('.fc-sm-fetch-btn').getAttribute('data-clicks'), '1');
+    assert.equal(await page.locator('#clip-row .fc-sm-fetch-btn').getAttribute('data-clicks'), null);
     await second.locator('.fc-sm-url-btn').click();
     assert.equal(await second.locator('.sm_url_props').isVisible(),false);
     assert.equal(await page.locator('#clip_0_url').inputValue(),'https://example.test/first');
@@ -1036,6 +1047,11 @@ const source = file => fs.readFileSync(path.join(root, file), 'utf8');
       assert(await second.locator('textarea').evaluate(el=>el.getBoundingClientRect().right<=el.closest('.fc-video-card').getBoundingClientRect().right+1));
     }
     await page.evaluate(()=>fcfield_sharemedia.clearData('clip_1'));
+    const player = second.locator('.fc-video-preview-box');
+    assert(await player.isVisible());
+    const bounds = await player.boundingBox();
+    assert(Math.abs(bounds.height - bounds.width * 9 / 16) < 1);
+    assert.equal(await player.evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(0, 0, 0)');
     assert.equal(await second.locator('.sm_value_props').isVisible(),false);
     assert.equal(await page.locator('#clip-row .sm_value_props').isVisible(),true);
   });
