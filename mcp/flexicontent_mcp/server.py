@@ -436,6 +436,7 @@ def flexi_upload_file(
 def flexi_update_item(
     id: Annotated[int, Field(description="FLEXIcontent item id.", ge=1)],
     title: Annotated[str | None, Field(description="New title.")] = None,
+    catid: Annotated[int | None, Field(description="New main FLEXIcontent category id.", ge=1)] = None,
     alias: Annotated[str | None, Field(description="New URL alias.")] = None,
     state: Annotated[int | None, Field(description="New publication state.")] = None,
     access: Annotated[int | None, Field(description="New Joomla access level.")] = None,
@@ -458,6 +459,7 @@ def flexi_update_item(
 
     payload = _payload({
         "title": title,
+        "catid": catid,
         "alias": alias,
         "state": state,
         "access": access,

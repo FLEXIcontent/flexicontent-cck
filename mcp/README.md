@@ -88,7 +88,7 @@ opencode mcp list
 | `flexi_get_taxonomy` | lecture | Détail d’un type, champ, catégorie ou tag |
 | `flexi_describe` | lecture | Ids/noms et schémas `kind="taxonomies"` |
 | `flexi_create_item` | écriture | `POST /items` |
-| `flexi_update_item` | écriture | `PATCH /items/{id}` partiel |
+| `flexi_update_item` | écriture | `PATCH /items/{id}` partiel, y compris `catid` |
 | `flexi_delete_item` | écriture | `DELETE /items/{id}`, exige `confirm=true` |
 | `flexi_upload_file` | écriture | Upload image/fichier (`POST /media`) |
 | `flexi_create_taxonomy` | écriture | `POST /{types,fields,categories,tags}` |
@@ -116,6 +116,9 @@ flexi_upload_file(filename="arret.pdf", content_base64="...", field_name="fichie
 
 // La valeur renvoyée s'attache directement à un item :
 flexi_create_item("Arrêté", 24, 11, fields={"image_principale": [{"originalname": "arbre.png"}]})
+
+// Déplacer un item dans une autre catégorie principale :
+flexi_update_item(151, catid=27)
 ```
 
 Les ids de type, champ, catégorie et tag renvoyés par ces outils sont les ids

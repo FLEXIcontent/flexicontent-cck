@@ -16,6 +16,7 @@ from flexicontent_mcp.server import (
     flexi_delete_taxonomy,
     flexi_describe,
     flexi_search_items,
+    flexi_update_item,
     flexi_update_taxonomy,
     flexi_upload_file,
 )
@@ -184,6 +185,31 @@ class TaxonomyWriteTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 flexi_delete_taxonomy("tags", 8, confirm=True)
             get_client.assert_not_called()
+
+
+class ItemWriteTests(unittest.TestCase):
+    def _entry(self, item_id: int, catid: int) -> dict[str, object]:
+        return {
+            "id": str(item_id),
+            "attributes": {"id": item_id, "title": "Item", "catid": catid},
+        }
+
+    def test_update_item_can_change_main_category(self) -> None:
+        client = Mock()
+        client.get_item.return_value = {"data": self._entry(151, 24)}
+        client.request.return_value = {"data": self._entry(151, 27)}
+
+        with (
+            patch("flexicontent_mcp.server.get_config", return_value=TEST_CONFIG),
+            patch("flexicontent_mcp.server.get_client", return_value=client),
+        ):
+            result = flexi_update_item(151, catid=27)
+
+        client.request.assert_called_once_with(
+            "PATCH", "/items/151", payload={"catid": 27}
+        )
+        self.assertEqual(result["before"]["catid"], 24)
+        self.assertEqual(result["after"]["catid"], 27)
 
 
 class UploadTests(unittest.TestCase):
