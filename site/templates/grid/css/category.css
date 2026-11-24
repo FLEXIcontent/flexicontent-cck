@@ -263,13 +263,13 @@ div.comments {
   transition: all 0.4s;
 }
 .news.fc-items-block .fc-item-block-featured-wrapper-innerbox {
-  padding: 0px 0px 0px 0px;
+  padding: 8px 12px 8px 0px;
   border-width: 0px;
   background-color: none;
   border-color: none;
 }
 .news.fc-items-block .fc-item-block-standard-wrapper-innerbox {
-  padding: 0px 0px;
+  padding: 0px 2px;
   border-width: 0px;
   background-color: none;
   border-color: none;
@@ -442,7 +442,7 @@ div.comments {
 .news.fc-items-block .fc-item-block-standard-wrapper.mod_hl_hover:hover .fc-item-block-standard-wrapper-innerbox {
   /*background-color: #D0D0D0;
 	border-color: #888 #555 #555 #888;*/
-  box-shadow: 2px 2px 20px 0px rgba(0, 0, 0, 0.5);
+  box-shadow: 2px 2px 20px 0px #000000;
   z-index: 2;
   -webkit-transition: all 0.4s;
   transition: all 0.4s;
@@ -469,12 +469,12 @@ div.comments {
 }*/
 .news.fc-items-block.featured-block {
   background-color: none;
-  padding: 0 0;
+  padding: 8 12;
   /*margin: @FCC_box_margin_top_bottom_feat @FCC_box_margin_left_right_feat;*/
 }
 .news.fc-items-block.standard-block {
   background-color: none;
-  padding: 0 0;
+  padding: 8 12;
   /*margin: @FCC_box_margin_top_bottom @FCC_box_margin_left_right;*/
 }
 /*
@@ -800,14 +800,14 @@ header.tool .btn:hover {
   display: grid;
 }
 .featured-block.fc-items-block {
-  column-gap: 2rem;
-  row-gap: 2rem;
+  column-gap: 15;
+  row-gap: 15;
   margin-bottom: 4rem;
   margin-top: 4rem;
 }
 .standard-block.fc-items-block {
-  column-gap: 2rem;
-  row-gap: 2rem;
+  column-gap: 50px;
+  row-gap: 50px;
   margin-bottom: 2rem;
   margin-top: 2rem;
 }
@@ -822,10 +822,10 @@ footer.fc_block {
   margin-top: auto;
 }
 .standard-block.fc-items-block {
-  grid-template-columns: repeat(auto-fill, minmax(198px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 }
 .featured-block.fc-items-block {
-  grid-template-columns: repeat(auto-fit, minmax(198px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(85%, 1fr));
 }
 /*
 .standard-block.fc-items-block.cols_2,
@@ -907,10 +907,10 @@ footer.fc_block {
 }
 /** masonry style **/
 .news.fc-items-block .fc-item-block-standard-wrapper.masonry {
-  width: 200px;
-  margin-bottom: 2rem;
+  width: 300px;
+  margin-bottom: 50px;
 }
 .news.fc-items-block .fc-item-block-featured-wrapper.masonry {
-  width: 200px;
-  margin-bottom: 2rem;
+  width: 100%;
+  margin-bottom: 15;
 }

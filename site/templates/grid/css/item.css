@@ -36,9 +36,9 @@ body #flexicontent .fc_item_title a {
 /* Label styling */
 body #flexicontent .flexi.label,
 body #flexicontent .desc-title.label {
-  background-color: rgba(255, 255, 255, 0);
-  color: #000000;
-  border-radius: 0px;
+  background-color: #999999;
+  color: #ffffff;
+  border-radius: 3px;
   padding: 0;
   font-weight: bold;
 }
@@ -47,7 +47,7 @@ body #flexicontent ul.tabbernav > li a {
   /*border: 1px solid lighten(@FCI_tab_bg_color_start,50%) + !important;*/
   background-color: #e4f1f8;
   /*background-image: linear-gradient(to bottom, @FCI_tab_bg_color_start , @FCI_tab_bg_color_end );*/
-  color: #3093c7;
+  color: #ffffff;
 }
 body #flexicontent ul.tabbernav > li.tabberactive a::before {
   border-top: 4px solid #3093c7;
