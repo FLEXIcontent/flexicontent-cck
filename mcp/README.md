@@ -121,8 +121,39 @@ flexi_create_item("Arrêté", 24, 11, fields={"image_principale": [{"originalnam
 flexi_update_item(151, catid=27)
 ```
 
+Exemple de champ `select` filtrable assigné à un type, puis ajouté aux filtres
+d'une catégorie :
+
+```jsonc
+flexi_create_taxonomy("fields", {
+  "label": "type de lois",
+  "name": "type_de_lois",
+  "field_type": "select",
+  "published": 1,
+  "isfilter": 1,
+  "isadvfilter": 1,
+  "tid": [11],
+  "attribs": {
+    "field_elements": "environnement::environnement%%\r\néconomie::économie%%\r\nsport::sport%%",
+    "text_or_value": "1",
+    "display_label_filter": "2"
+  }
+})
+
+flexi_update_taxonomy("categories", 34, {
+  "params": { "use_filters": 1, "filters": "136,142" }
+})
+```
+
 Les ids de type, champ, catégorie et tag renvoyés par ces outils sont les ids
 FLEXIcontent à réutiliser dans les écritures d’items.
+
+Fixture `Réglementations` de la base de dev : type **11**, catégorie **34**,
+champs **135** (`image_principale`), **136** (`date_publication_reglementation`),
+**137** (`lien_site_officiel`) et **142** (`type_de_lois`), items **151-155**.
+Répartition de `type_de_lois` : **151/154** = `environnement`, **152/155** =
+`économie`, **153** = `sport`. Le champ 142 est filtrable et référencé dans
+`params.filters` de la catégorie 34 avec le champ 136.
 
 Les types créés via l’API reçoivent les valeurs par défaut de leur formulaire
 XML, comme dans l’administration (notamment `attribs.ilayout = "grid"`). Pour
