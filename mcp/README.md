@@ -1,30 +1,84 @@
 # Serveur MCP FLEXIcontent
 
-Serveur MCP local (stdio) qui expose l’API JSON:API FLEXIcontent de Joomla.
-Il ne modifie pas le cœur FLEXIcontent : il traduit les outils MCP en appels
-`Bearer` vers `/api/index.php/v1/flexicontent`.
+Serveur MCP qui expose l’API JSON:API FLEXIcontent de Joomla (transport stdio
+par défaut, ou HTTP Streamable). Il ne modifie pas le cœur FLEXIcontent : il
+traduit les outils MCP en appels `Bearer` vers `/api/index.php/v1/flexicontent`.
 
 ## Installation
 
 ```sh
 cd repos/flexicontent-cck/mcp
 python3 -m venv .venv
-.venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python -m pip install -e .
 ```
 
-Pour un DDEV avec certificat auto-signé, garder `FLEXI_VERIFY_SSL=0` en
-développement. En production, laisser la valeur par défaut (`1`).
+`-e .` installe la commande `flexicontent-mcp` dans le venv. Pour une
+installation non éditable : `.venv/bin/python -m pip install .`.
 
-## Variables d’environnement
+## Configuration
+
+Priorité : **options CLI > variables d’environnement > profil TOML > défauts**.
+
+Profil dans `$XDG_CONFIG_HOME/flexicontent-mcp/config.toml`
+(`~/.config/flexicontent-mcp/config.toml` par défaut) :
+
+```toml
+default_profile = "dev"
+
+[profiles.dev]
+base_url = "https://flexi-dev.ddev.site/api/index.php/v1/flexicontent"
+token_env = "FLEXI_API_TOKEN"
+verify_ssl = false
+
+[profiles.prod]
+base_url = "https://example.com/api/index.php/v1/flexicontent"
+token_file = "prod.token"     # relatif au fichier de configuration, 0600
+read_only = true
+```
+
+Le token peut venir de `token_env`, `token_file` ou `token_command` (commande
+qui l’affiche sur stdout, analysée comme argv, sans shell). Le fichier de
+configuration peut être changé avec `--config` ou `FLEXI_CONFIG`.
+
+```sh
+flexicontent-mcp --profile dev
+flexicontent-mcp --base-url https://... --token-env MY_TOKEN --no-verify-ssl
+flexicontent-mcp --profile prod --read-only
+flexicontent-mcp --help
+```
+
+### Variables d’environnement
 
 | Variable | Requise | Défaut | Rôle |
 |---|---|---|---|
 | `FLEXI_BASE_URL` | oui | — | URL de base de l’API, sans slash final |
-| `FLEXI_API_TOKEN` | oui | — | Token Joomla API (Bearer) |
+| `FLEXI_API_TOKEN` | oui* | — | Token Joomla API (Bearer) |
+| `FLEXI_PROFILE` | non | — | Profil à utiliser |
+| `FLEXI_CONFIG` | non | — | Chemin du fichier TOML |
+| `FLEXI_TOKEN_ENV` / `FLEXI_TOKEN_FILE` / `FLEXI_TOKEN_COMMAND` | non | — | Source du token |
 | `FLEXI_READONLY` | non | `0` | `1` désactive `create`/`update`/`delete` |
 | `FLEXI_VERIFY_SSL` | non | `1` | `0` accepte le certificat DDEV auto-signé |
 | `FLEXI_TIMEOUT` | non | `30` | Timeout HTTP en secondes |
 | `FLEXI_MAX_LIMIT` | non | `100` | Plafond de `limit` pour toutes les listes |
+| `FLEXI_TRANSPORT` | non | `stdio` | `stdio`, `sse` ou `streamable-http` |
+| `FLEXI_HOST` / `FLEXI_PORT` | non | `127.0.0.1` / `8000` | Écoute HTTP |
+| `FLEXI_ALLOWED_HOSTS` / `FLEXI_ALLOWED_ORIGINS` | non | — | Listes séparées par des virgules (HTTP) |
+
+\* Ou une autre source de token (`token_env`, `token_file`, `token_command`).
+
+## Transports
+
+stdio par défaut. Pour un client distant ou web :
+
+```sh
+flexicontent-mcp --profile prod --transport streamable-http --port 8000 \
+  --allowed-host mcp.example.com:*
+```
+
+Endpoint : `http://127.0.0.1:8000/mcp`. Écouter sur `127.0.0.1` et placer un
+reverse proxy authentifié devant avant exposition. Le token Joomla reste côté
+serveur. Voir [`docs/mcp-clients.md`](../docs/mcp-clients.md) pour OpenCode,
+Claude Desktop, Claude Code, Cursor, VS Code/Copilot et Windsurf.
 
 ## Configuration OpenCode
 
@@ -35,14 +89,9 @@ développement. En production, laisser la valeur par défaut (`1`).
     "servers": {
       "flexicontent": {
         "type": "local",
-        "command": [
-          "/home/yannick/www/flexi-dev/repos/flexicontent-cck/mcp/.venv/bin/python",
-          "/home/yannick/www/flexi-dev/repos/flexicontent-cck/mcp/run.py"
-        ],
+        "command": ["flexicontent-mcp", "--profile", "prod"],
         "environment": {
-          "FLEXI_BASE_URL": "https://flexi-dev.ddev.site/api/index.php/v1/flexicontent",
-          "FLEXI_API_TOKEN": "{env:FLEXI_API_TOKEN}",
-          "FLEXI_VERIFY_SSL": "0"
+          "FLEXI_API_TOKEN": "{env:FLEXI_API_TOKEN}"
         }
       }
     }
@@ -50,9 +99,9 @@ développement. En production, laisser la valeur par défaut (`1`).
 }
 ```
 
-Pour le poste de dev DDEV, `run-dev.sh` lit automatiquement `admin_token`
-depuis `bruno/flexicontent-api/environments/dev.bru` : aucun secret dans
-`opencode.json`. La configuration réellement utilisée est donc :
+Sur le poste de dev DDEV, `run-dev.sh` lit automatiquement `admin_token` depuis
+`bruno/flexicontent-api/environments/dev.bru` et utilise `config.dev.toml` :
+aucun secret dans `opencode.json`. Configuration réellement utilisée :
 
 ```jsonc
 {
@@ -61,11 +110,7 @@ depuis `bruno/flexicontent-api/environments/dev.bru` : aucun secret dans
     "servers": {
       "flexicontent": {
         "type": "local",
-        "command": ["/home/yannick/www/flexi-dev/repos/flexicontent-cck/mcp/run-dev.sh"],
-        "environment": {
-          "FLEXI_BASE_URL": "https://flexi-dev.ddev.site/api/index.php/v1/flexicontent",
-          "FLEXI_VERIFY_SSL": "0"
-        }
+        "command": ["/home/yannick/www/flexi-dev/repos/flexicontent-cck/mcp/run-dev.sh"]
       }
     }
   }

@@ -19,6 +19,7 @@ from .api import (
     compact_item,
     compact_taxonomy,
 )
+from .cli import build_parser, config_overrides
 from .config import Config
 
 LOGGER = logging.getLogger("flexicontent_mcp")
@@ -88,14 +89,32 @@ TAXONOMY_SCHEMAS: dict[str, dict[str, Any]] = {
 server = FastMCP("flexicontent", instructions=SERVER_INSTRUCTIONS)
 
 
-@lru_cache(maxsize=1)
+_active_config: Config | None = None
+
+
+def set_config(config: Config) -> None:
+    """Replace the active configuration (used by the CLI and tests)."""
+    global _active_config
+    _active_config = config
+    _client_for.cache_clear()
+
+
 def get_config() -> Config:
-    return Config.from_env()
+    """Return the active configuration, loading it on first use."""
+    global _active_config
+    if _active_config is None:
+        _active_config = Config.load()
+    return _active_config
 
 
 @lru_cache(maxsize=1)
+def _client_for(config: Config) -> FlexiClient:
+    return FlexiClient(config)
+
+
 def get_client() -> FlexiClient:
-    return FlexiClient(get_config())
+    """Return the API client for the active configuration."""
+    return _client_for(get_config())
 
 
 def _add(params: Params, key: str, value: Any) -> None:
@@ -114,7 +133,7 @@ def _page(limit: int, offset: int) -> tuple[int, int]:
 
 def _require_writes() -> None:
     if get_config().read_only:
-        raise ValueError("Writes are disabled by FLEXI_READONLY=1")
+        raise ValueError("Writes are disabled by configuration (read_only=true)")
 
 
 def _payload(values: dict[str, Any]) -> dict[str, Any]:
@@ -639,11 +658,46 @@ def flexi_delete_taxonomy(
     return {"deleted": id, "resource": resource, "before": before}
 
 
-def main() -> None:
-    """Run the MCP server over stdio."""
-    logging.basicConfig(level=logging.INFO)
-    LOGGER.info("Starting FLEXIcontent MCP server")
-    server.run(transport="stdio")
+def main(argv: list[str] | None = None) -> None:
+    """Parse the CLI, load the configuration and run the MCP server."""
+    args = build_parser().parse_args(argv)
+    config = Config.load(cli=config_overrides(args))
+    set_config(config)
+
+    logging.basicConfig(level=getattr(logging, args.log_level))
+    LOGGER.info(
+        "Starting FLEXIcontent MCP server (profile=%s, transport=%s)",
+        config.profile,
+        config.transport,
+    )
+
+    if config.transport == "stdio":
+        server.run(transport="stdio")
+        return
+
+    server.settings.host = config.host
+    server.settings.port = config.port
+
+    security = server.settings.transport_security
+    if security is not None:
+        if config.allowed_hosts:
+            security.allowed_hosts = list(config.allowed_hosts)
+        if config.allowed_origins:
+            security.allowed_origins = list(config.allowed_origins)
+        if config.host not in ("127.0.0.1", "localhost", "::1") and not config.allowed_hosts:
+            security.allowed_hosts = [f"{config.host}:*", "localhost:*", "127.0.0.1:*"]
+            LOGGER.warning(
+                "HTTP server bound to %s; configure allowed_hosts or put it behind "
+                "an authenticated reverse proxy",
+                config.host,
+            )
+
+    LOGGER.info(
+        "MCP endpoint: http://%s:%s/mcp",
+        config.host,
+        config.port,
+    )
+    server.run(transport=config.transport)
 
 
 if __name__ == "__main__":

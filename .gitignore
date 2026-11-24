@@ -91,6 +91,12 @@ site/medias/*
 !site/uploads/.htaccess
 !site/medias/.htaccess
 
+# Python / MCP build artefacts
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+
 # Local development tool settings
 .claude/
 

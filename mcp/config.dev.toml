@@ -1,0 +1,7 @@
+# Profil de développement DDEV (utilisé par run-dev.sh).
+# Le token reste fourni par FLEXI_API_TOKEN, jamais écrit dans ce fichier.
+default_profile = "dev"
+
+[profiles.dev]
+base_url = "https://flexi-dev.ddev.site/api/index.php/v1/flexicontent"
+verify_ssl = false

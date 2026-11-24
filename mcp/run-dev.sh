@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Dev-only launcher: read the DDEV API token from the Bruno environment file
-# so the OpenCode config does not need to contain a secret.
+# and use the local dev profile. No secret is stored in the MCP configuration.
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -11,8 +11,9 @@ if [ ! -f "$BRUNO_ENV" ]; then
   exit 1
 fi
 
+export FLEXI_CONFIG="$HERE/config.dev.toml"
 export FLEXI_API_TOKEN="$(
   awk -F': *' '/^[[:space:]]+admin_token:/ {print $2; exit}' "$BRUNO_ENV"
 )"
 
-exec "$HERE/.venv/bin/python" "$HERE/run.py" "$@"
+exec "$HERE/.venv/bin/python" "$HERE/run.py" --profile dev "$@"

@@ -2,9 +2,11 @@
 name = "flexicontent-mcp"
 version = "0.1.0"
 description = "MCP server exposing the FLEXIcontent Joomla JSON:API to AI agents"
+readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "mcp>=1.30,<2",
+    "tomli>=1.2; python_version < '3.11'",
 ]
 
 [project.scripts]
