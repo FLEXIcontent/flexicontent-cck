@@ -209,6 +209,32 @@ const {chromium} = require('playwright');
     await office.locator('select').selectOption('Second');
     assert(await office.getByText('Second worksheet', {exact: true}).isVisible());
     assert.equal(await page.locator('#office-test').getAttribute('sandbox'), 'allow-scripts');
+
+    const deck = require('node:fs').readFileSync(path.join(__dirname, 'fixtures', 'office-preview.pptx'));
+    await page.evaluate(bytes => {
+      const name = 'sample.pptx';
+      const url = URL.createObjectURL(new Blob([Uint8Array.from(bytes)]));
+      const preview = FlexiUploader.mediaElement(FlexiUploader.mediaType(name), url, name);
+      preview.id = 'slides-test';
+      document.body.append(preview);
+    }, Array.from(deck));
+    const slides = page.frameLocator('#slides-test');
+    const canvas = slides.locator('canvas');
+    await slides.locator('canvas[aria-description*="Coastal field notes"]').waitFor();
+    const backgroundPixel = () => canvas.evaluate(el => Array.from(el.getContext('2d').getImageData(3, 3, 1, 1).data));
+    assert.deepEqual(await backgroundPixel(), [19, 87, 110, 255]);
+    const hasTitleInk = await canvas.evaluate(el => {
+      const context = el.getContext('2d');
+      const pixels = context.getImageData(0, el.height * .22, el.width, el.height * .42).data;
+      for (let i = 0; i < pixels.length; i += 4) {
+        if (Math.min(pixels[i], pixels[i + 1], pixels[i + 2]) > 220) return true;
+      }
+      return false;
+    });
+    assert(hasTitleInk, 'The white title should be painted over the blue background');
+    await slides.locator('select').selectOption('1');
+    await slides.locator('canvas[aria-description*="Estuary survey"]').waitFor();
+    assert.deepEqual(await backgroundPixel(), [147, 63, 33, 255]);
     await page.locator('#office-test').evaluate(el => el.remove());
 
     // An assigned Gallery image occupies the empty tile and remains a replacement drop target.

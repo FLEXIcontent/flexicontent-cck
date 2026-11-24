@@ -1,0 +1,51 @@
+--- a/src/index.js
++++ b/src/index.js
+@@ -204,4 +203,0 @@
+-    // Load Google Font substitutes for MS fonts used in this slide
+-    const usedFonts = collectUsedFonts([slideDoc, layoutDoc, this.masterDoc]);
+-    await loadGoogleFontsFor(usedFonts, this.themeData);
+-
+--- a/src/render.js
++++ b/src/render.js
+@@ -599,0 +600 @@
++    const defRPr = g1(pPr, 'defRPr');
+@@ -606 +606,0 @@
+-    const defRPr = g1(pPr, 'defRPr');
+@@ -871,2 +871 @@
+-        const c = run.color;
+-        ctx.fillStyle = c ? colorToCss(c) : '#000000';
++        ctx.fillStyle = run.color || '#000000';
+--- a/src/zip.js
++++ b/src/zip.js
+@@ -64 +64,2 @@
+-  const files  = {};
++  const files = Object.create(null);
++  let remaining = 96 * 1024 * 1024; // Total decompressed preview budget.
+@@ -114,6 +115,2 @@
+-    try {
+-      files[name] = method === 0
+-        ? compData.slice()                      // STORED
+-        : await inflateRaw(compData);           // DEFLATE
+-    } catch (e) {
+-      console.warn(`[zip.js] Failed to decompress "${name}":`, e.message);
++    if (uncompSize > remaining || (method === 0 && compSize > remaining)) {
++      throw new RangeError('Presentation exceeds the preview budget');
+@@ -120,0 +118,3 @@
++    const entry = method === 0 ? compData.slice() : await inflateRaw(compData, remaining);
++    remaining -= entry.length;
++    files[name] = entry;
+@@ -132 +132 @@
+-async function inflateRaw(compData) {
++async function inflateRaw(compData, remaining) {
+@@ -134,5 +134 @@
+-  const writer = ds.writable.getWriter();
+-  const reader = ds.readable.getReader();
+-
+-  writer.write(compData);
+-  writer.close();
++  const reader = new Blob([compData]).stream().pipeThrough(ds).getReader();
+@@ -145,0 +142,4 @@
++    if (totalLen + value.length > remaining) {
++      await reader.cancel();
++      throw new RangeError('Presentation exceeds the preview budget');
++    }
